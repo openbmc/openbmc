@@ -20,6 +20,9 @@ RPROVIDES:${PN} = "virtual-psplash virtual-psplash-support"
 SRC_URI = " \
     http://www.freedesktop.org/software/plymouth/releases/${BPN}-${PV}.tar.xz \
     file://0001-Make-full-path-to-systemd-tty-ask-password-agent-con.patch \
+    file://0001-systemd-switch-to-KillMode-mixed.patch \
+    file://0001-plymouth-start-service-in-add-related-kernel-paramet.patch \
+    file://0001-plymouth-Add-the-retain-splash-option.patch \
         "
 
 SRC_URI[md5sum] = "8a25d23f3ae732af300a56fa33cacff2"

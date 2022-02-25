@@ -135,30 +135,27 @@ class LtpComplianceParser(object):
 
     def parse(self, logfile):
         test_regex = {}
-        test_regex['PASSED'] = re.compile(r"^PASS")
-        test_regex['FAILED'] = re.compile(r"^FAIL")
-        test_regex['SKIPPED'] = re.compile(r"(?:UNTESTED)|(?:UNSUPPORTED)")
+        test_regex['FAILED'] = re.compile(r"FAIL")
 
         section_regex = {}
-        section_regex['test'] = re.compile(r"^Testing")
+        section_regex['test'] = re.compile(r"^Executing")
 
         with open(logfile, errors='replace') as f:
+            name = logfile
+            result = "PASSED"
             for line in f:
-                result = section_regex['test'].search(line)
-                if result:
-                    self.name = ""
-                    self.name = line.split()[1].strip()
-                    self.results[self.name] = "PASSED"
-                    failed = 0
+                regex_result = section_regex['test'].search(line)
+                if regex_result:
+                    name = line.split()[1].strip()
 
-                failed_result = test_regex['FAILED'].search(line)
-                if failed_result:
-                    failed = line.split()[1].strip()
-                    if int(failed) > 0:
-                        self.results[self.name] = "FAILED"
+                regex_result = test_regex['FAILED'].search(line)
+                if regex_result:
+                    result = "FAILED"
+            self.results[name] = result
 
         for test in self.results:
             result = self.results[test]
+            print (self.results)
             self.section['log'] = self.section['log'] + ("%s: %s\n" % (result.strip()[:-2], test.strip()))
 
         return self.results, self.section

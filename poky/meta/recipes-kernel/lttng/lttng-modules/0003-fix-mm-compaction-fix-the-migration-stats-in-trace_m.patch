@@ -1,0 +1,61 @@
+From afc4fe8905620a3eb14a5ed16146dac1db0f8111 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Sun, 23 Jan 2022 13:26:17 -0500
+Subject: [PATCH 3/7] fix: mm: compaction: fix the migration stats in
+ trace_mm_compaction_migratepages() (v5.17)
+
+See upstream commit :
+
+  commit 84b328aa81216e08804d8875d63f26bda1298788
+  Author: Baolin Wang <baolin.wang@linux.alibaba.com>
+  Date:   Fri Jan 14 14:08:40 2022 -0800
+
+    mm: compaction: fix the migration stats in trace_mm_compaction_migratepages()
+
+    Now the migrate_pages() has changed to return the number of {normal
+    page, THP, hugetlb} instead, thus we should not use the return value to
+    calculate the number of pages migrated successfully.  Instead we can
+    just use the 'nr_succeeded' which indicates the number of normal pages
+    migrated successfully to calculate the non-migrated pages in
+    trace_mm_compaction_migratepages().
+
+    Link: https://lkml.kernel.org/r/b4225251c4bec068dcd90d275ab7de88a39e2bd7.1636275127.git.baolin.wang@linux.alibaba.com
+
+Upstream-Status: Backport [lttng-modules commit afc4fe8905620a3eb14a5ed16146dac1db0f8111]
+
+Change-Id: Ib8e8f2a16a273f16cd73fe63afbbfc25c0a2540c
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/instrumentation/events/compaction.h | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/include/instrumentation/events/compaction.h b/include/instrumentation/events/compaction.h
+index 3cc25537..340e41f5 100644
+--- a/include/instrumentation/events/compaction.h
++++ b/include/instrumentation/events/compaction.h
+@@ -97,7 +97,20 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(compaction_isolate_template,
+ 
+ #endif /* #else #if LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,0,0) */
+ 
+-#if LTTNG_KERNEL_RANGE(3,12,30, 3,13,0) || \
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,17,0))
++LTTNG_TRACEPOINT_EVENT(mm_compaction_migratepages,
++
++	TP_PROTO(unsigned long nr_all,
++		unsigned int nr_succeeded),
++
++	TP_ARGS(nr_all, nr_succeeded),
++
++	TP_FIELDS(
++		ctf_integer(unsigned long, nr_migrated, nr_succeeded)
++		ctf_integer(unsigned long, nr_failed, nr_all - nr_succeeded)
++	)
++)
++#elif LTTNG_KERNEL_RANGE(3,12,30, 3,13,0) || \
+ 	LTTNG_KERNEL_RANGE(3,14,25, 3,15,0) || \
+ 	(LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(3,16,0))
+ LTTNG_TRACEPOINT_EVENT_CODE_MAP(mm_compaction_migratepages,
+-- 
+2.19.1
+

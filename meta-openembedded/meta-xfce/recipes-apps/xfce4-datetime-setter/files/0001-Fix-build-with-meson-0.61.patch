@@ -1,0 +1,26 @@
+From d463b7e9abbbc87ec0e25216a24d9a40d347f1a6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 24 Jan 2022 09:59:02 -0800
+Subject: [PATCH] Fix build with meson >= 0.61
+
+Upstream-Status: Submitted [https://github.com/schnitzeltony/xfce4-datetime-setter/pull/3]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ panels/datetime/meson.build | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/panels/datetime/meson.build b/panels/datetime/meson.build
+index 241e177..4356907 100644
+--- a/panels/datetime/meson.build
++++ b/panels/datetime/meson.build
+@@ -10,7 +10,6 @@ desktop_in = configure_file(
+ )
+ 
+ i18n.merge_file(
+-  desktop,
+   type: 'desktop',
+   input: desktop_in,
+   output: 'xfce-datetime.desktop',
+-- 
+2.34.1
+

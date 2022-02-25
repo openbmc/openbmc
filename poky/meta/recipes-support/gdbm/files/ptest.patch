@@ -9,11 +9,11 @@ Upstream-Status: Pending
 
 ---
  Makefile.am       |  5 +++++
- tests/Makefile.am | 11 +++++++++++
- 2 files changed, 16 insertions(+)
+ tests/Makefile.am | 12 ++++++++++++
+ 2 files changed, 17 insertions(+)
 
 diff --git a/Makefile.am b/Makefile.am
-index 25e200d..03d5ef0 100644
+index 59e2643..5f3ceb0 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -64,3 +64,8 @@ ChangeLog:
@@ -26,13 +26,14 @@ index 25e200d..03d5ef0 100644
 +		$(MAKE) -C $$subdir DESTDIR=$(DESTDIR)/$$subdir $@; \
 +	done
 diff --git a/tests/Makefile.am b/tests/Makefile.am
-index 337cbed..92ec3be 100644
+index fac6826..5dc2091 100644
 --- a/tests/Makefile.am
 +++ b/tests/Makefile.am
-@@ -139,3 +139,14 @@ d_creat_ce_LDADD = ../src/libgdbm.la ../compat/libgdbm_compat.la
+@@ -143,3 +143,15 @@ d_creat_ce_LDADD = ../src/libgdbm.la ../compat/libgdbm_compat.la
+ t_wordwrap_LDADD = ../tools/libgdbmapp.a
  
  SUBDIRS = gdbmtool
- 
++
 +buildtests: $(check_PROGRAMS) $(TESTSUITE)
 +
 +install-ptest: $(check_PROGRAMS) $(TESTSUITE)
@@ -44,3 +45,6 @@ index 337cbed..92ec3be 100644
 +			$(INSTALL_PROGRAM) $$file $(DESTDIR) ; \
 +		fi \
 +	done
+-- 
+2.25.1
+

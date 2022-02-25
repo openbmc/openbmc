@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "git://github.com/ubinux/dnf-plugin-tui.git;branch=master;protocol=https"
-SRCREV = "3ccf87915ceb70eac055a07eb80bc9105e916620"
+SRCREV = "7c45fd65dcd811def66161f6d572c3930f2ba4d8"
 PV = "1.3"
 
 SRC_URI:append:class-target = " file://oe-remote.repo.sample"
@@ -37,4 +37,4 @@ RDEPENDS:${PN} += " \
 "
 
 BBCLASSEXTEND = "nativesdk"
-PNBLACKLIST[dnf-plugin-tui] ?= "${@bb.utils.contains('PACKAGE_CLASSES', 'package_rpm', '', 'does not build correctly without package_rpm in PACKAGE_CLASSES', d)}"
+SKIP_RECIPE[dnf-plugin-tui] ?= "${@bb.utils.contains('PACKAGE_CLASSES', 'package_rpm', '', 'does not build correctly without package_rpm in PACKAGE_CLASSES', d)}"

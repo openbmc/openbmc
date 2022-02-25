@@ -1,0 +1,103 @@
+From c8f96e7716404549b19b9a774f5d9987325608bc Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Wed, 26 Jan 2022 14:37:52 -0500
+Subject: [PATCH 4/7] fix: btrfs: pass fs_info to
+ trace_btrfs_transaction_commit (v5.17)
+
+See upstream commit :
+
+  commit 2e4e97abac4c95f8b87b2912ea013f7836a6f10b
+  Author: Josef Bacik <josef@toxicpanda.com>
+  Date:   Fri Nov 5 16:45:29 2021 -0400
+
+    btrfs: pass fs_info to trace_btrfs_transaction_commit
+
+    The root on the trans->root can be anything, and generally we're
+    committing from the transaction kthread so it's usually the tree_root.
+    Change this to just take an fs_info, and to maintain compatibility
+    simply put the ROOT_TREE_OBJECTID as the root objectid for the
+    tracepoint.  This will allow use to remove trans->root.
+
+
+Upstream-Status: Backport [lttng-modules commit c8f96e7716404549b19b9a774f5d9987325608bc]
+
+Change-Id: Ie5a4804330edabffac0714fcb9c25b8c8599e424
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/instrumentation/events/btrfs.h | 44 ++++++++++++++++++--------
+ 1 file changed, 31 insertions(+), 13 deletions(-)
+
+diff --git a/include/instrumentation/events/btrfs.h b/include/instrumentation/events/btrfs.h
+index 0a0e085a..785f16ac 100644
+--- a/include/instrumentation/events/btrfs.h
++++ b/include/instrumentation/events/btrfs.h
+@@ -43,7 +43,19 @@ struct extent_state;
+ #define lttng_fs_info_fsid fs_info->fsid
+ #endif
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,14,0) || \
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,17,0))
++LTTNG_TRACEPOINT_EVENT(btrfs_transaction_commit,
++
++	TP_PROTO(const struct btrfs_fs_info *fs_info),
++
++	TP_ARGS(fs_info),
++
++	TP_FIELDS(
++		ctf_integer(u64, generation, fs_info->generation)
++		ctf_integer(u64, root_objectid, BTRFS_ROOT_TREE_OBJECTID)
++	)
++)
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,14,0) || \
+ 	LTTNG_SLE_KERNEL_RANGE(4,4,73,5,0,0, 4,4,73,6,0,0) || \
+ 	LTTNG_SLE_KERNEL_RANGE(4,4,82,6,0,0, 4,4,82,7,0,0) || \
+ 	LTTNG_SLE_KERNEL_RANGE(4,4,92,6,0,0, 4,4,92,7,0,0) || \
+@@ -59,7 +71,25 @@ LTTNG_TRACEPOINT_EVENT(btrfs_transaction_commit,
+ 		ctf_integer(u64, root_objectid, root->root_key.objectid)
+ 	)
+ )
++#else
++LTTNG_TRACEPOINT_EVENT(btrfs_transaction_commit,
++
++	TP_PROTO(struct btrfs_root *root),
++
++	TP_ARGS(root),
+ 
++	TP_FIELDS(
++		ctf_integer(u64, generation, root->fs_info->generation)
++		ctf_integer(u64, root_objectid, root->root_key.objectid)
++	)
++)
++#endif
++
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,14,0) || \
++	LTTNG_SLE_KERNEL_RANGE(4,4,73,5,0,0, 4,4,73,6,0,0) || \
++	LTTNG_SLE_KERNEL_RANGE(4,4,82,6,0,0, 4,4,82,7,0,0) || \
++	LTTNG_SLE_KERNEL_RANGE(4,4,92,6,0,0, 4,4,92,7,0,0) || \
++	LTTNG_SLE_KERNEL_RANGE(4,4,103,6,0,0, 4,5,0,0,0,0))
+ LTTNG_TRACEPOINT_EVENT_CLASS(btrfs__inode,
+ 
+ 	TP_PROTO(const struct inode *inode),
+@@ -99,18 +129,6 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__inode, btrfs_inode_evict,
+ 	TP_ARGS(inode)
+ )
+ #else
+-LTTNG_TRACEPOINT_EVENT(btrfs_transaction_commit,
+-
+-	TP_PROTO(struct btrfs_root *root),
+-
+-	TP_ARGS(root),
+-
+-	TP_FIELDS(
+-		ctf_integer(u64, generation, root->fs_info->generation)
+-		ctf_integer(u64, root_objectid, root->root_key.objectid)
+-	)
+-)
+-
+ LTTNG_TRACEPOINT_EVENT_CLASS(btrfs__inode,
+ 
+ 	TP_PROTO(struct inode *inode),
+-- 
+2.19.1
+

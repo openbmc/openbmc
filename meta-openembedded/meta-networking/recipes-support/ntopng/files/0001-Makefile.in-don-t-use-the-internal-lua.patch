@@ -15,18 +15,18 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  1 file changed, 2 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index e67623bec..99cb9f06e 100755
+index d737e74..a611b16 100755
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -31,7 +31,6 @@ MONGOOSE_INC=-I$(MONGOOSE_HOME)
- LUA_PLATFORM=generi
- LUA_HOME=${PWD}/third-party/lua-5.3.5
+@@ -36,7 +36,6 @@ MONGOOSE_INC=-I$(MONGOOSE_HOME)
+ LUA_PLATFORM=generic
+ LUA_HOME=${PWD}/third-party/lua-5.4.3
  LUA_INC=-I$(LUA_HOME)/src
 -LUA_LIB=$(LUA_HOME)/src/liblua.a
  
  ifeq ($(OS),Linux)
  	LUA_PLATFORM=linux
-@@ -123,7 +122,6 @@ RPM_PKG = $(TARGET)-$(NTOPNG_VERSION)-@REVISION@.$(PLATFORM).rpm
+@@ -102,7 +101,6 @@ RPM_PKG = $(TARGET)-$(NTOPNG_VERSION)-@REVISION@.$(PLATFORM).rpm
  RPM_DATA_PKG = $(TARGET)-data-$(NTOPNG_VERSION)-@REVISION@.noarch.rpm
  ######
  
@@ -35,5 +35,5 @@ index e67623bec..99cb9f06e 100755
  ifneq ($(HAS_ZEROMQ), 0)
  LIB_TARGETS += $(ZEROMQ_LIB)
 -- 
-2.17.1
+2.25.1
 

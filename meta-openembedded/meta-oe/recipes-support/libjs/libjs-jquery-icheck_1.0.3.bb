@@ -5,11 +5,9 @@ HOMEPAGE = "http://fronteed.com/iCheck"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://icheck.js;start_line=1;end_line=8;md5=404078d7de9f05ed64d364274f790055"
 
-DEPENDS = "virtual/libc"
+SRC_URI = "git://github.com/fronteed/icheck.git;protocol=https;branch=${PV}"
 
-SRC_URI = "git://github.com/fronteed/icheck.git;protocol=https;branch=${PV};tag=${PV}"
-
-FILES:${PN} += "${datadir}/javascript/jquery-icheck"
+SRCREV = "c8c1af84e4b90b4aea31466aad09bf877619e943"
 
 S = "${WORKDIR}/git"
 
@@ -39,4 +37,6 @@ do_install() {
         install -d ${D}${datadir}/javascript/jquery-icheck/skins/square/
         install -m 0644 ${S}/skins/square/* ${D}${datadir}/javascript/jquery-icheck/skins/square/
 }
+
+FILES:${PN} += "${datadir}/javascript/jquery-icheck"
 

@@ -3,7 +3,7 @@ DESCRIPTION = "Minimalistic user-space library oriented to Netlink developers, p
     functions for common tasks in parsing, validating, and constructing both the Netlink header and TLVs."
 HOMEPAGE = "https://www.netfilter.org/projects/libmnl/index.html"
 SECTION = "libs"
-LICENSE = "LGPLv2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 
 SRC_URI = "https://netfilter.org/projects/libmnl/files/libmnl-${PV}.tar.bz2;name=tar"

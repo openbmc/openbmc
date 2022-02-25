@@ -8,7 +8,7 @@ has a particular state."
 
 require xorg-lib-common.inc
 
-LICENSE = "MIT-style"
+LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c0fb37f44e02bdbde80546024400728d"
 
 DEPENDS += "libice xorgproto xtrans"

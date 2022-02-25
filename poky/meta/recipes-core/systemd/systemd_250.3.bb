@@ -25,6 +25,8 @@ SRC_URI += "file://touchscreen.rules \
            file://0003-implment-systemd-sysv-install-for-OE.patch \
            file://0001-systemd.pc.in-use-ROOTPREFIX-without-suffixed-slash.patch \
            file://0001-test-parse-argument-Include-signal.h.patch \
+           file://0001-mkdir-allow-to-create-directory-whose-path-contains-.patch \
+           file://0029-network-enable-KeepConfiguration-when-running-on-net.patch \
            "
 
 # patches needed by musl
@@ -34,7 +36,6 @@ SRC_URI_MUSL = "\
                file://0003-missing_type.h-add-__compare_fn_t-and-comparison_fn_.patch \
                file://0004-add-fallback-parse_printf_format-implementation.patch \
                file://0005-src-basic-missing.h-check-for-missing-strndupa.patch \
-               file://0006-Include-netinet-if_ether.h.patch \
                file://0007-don-t-fail-if-GLOB_BRACE-and-GLOB_ALTDIRFUNC-is-not-.patch \
                file://0008-add-missing-FTW_-macros-for-musl.patch \
                file://0009-fix-missing-of-__register_atfork-for-non-glibc-build.patch \
@@ -54,6 +55,9 @@ SRC_URI_MUSL = "\
                file://0025-Handle-__cpu_mask-usage.patch \
                file://0026-Handle-missing-gshadow.patch \
                file://0028-missing_syscall.h-Define-MIPS-ABI-defines-for-musl.patch \
+               file://0001-pass-correct-parameters-to-getdents64.patch \
+               file://0002-Add-sys-stat.h-for-S_IFDIR.patch \
+               file://0001-Adjust-for-musl-headers.patch \
                "
 
 PAM_PLUGINS = " \
@@ -66,6 +70,7 @@ PACKAGECONFIG ??= " \
     ${@bb.utils.filter('DISTRO_FEATURES', 'acl audit efi ldconfig pam selinux smack usrmerge polkit seccomp', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'rfkill', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xkbcommon', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', '', 'link-udev-shared', d)} \
     backlight \
     binfmt \
     gshadow \
@@ -156,6 +161,9 @@ PACKAGECONFIG[kmod] = "-Dkmod=true,-Dkmod=false,kmod"
 PACKAGECONFIG[ldconfig] = "-Dldconfig=true,-Dldconfig=false,,ldconfig"
 PACKAGECONFIG[libidn] = "-Dlibidn=true,-Dlibidn=false,libidn,,libidn"
 PACKAGECONFIG[libidn2] = "-Dlibidn2=true,-Dlibidn2=false,libidn2,,libidn2"
+# Link udev shared with systemd helper library.
+# If enabled the udev package depends on the systemd package (which has the needed shared library).
+PACKAGECONFIG[link-udev-shared] = "-Dlink-udev-shared=true,-Dlink-udev-shared=false"
 PACKAGECONFIG[localed] = "-Dlocaled=true,-Dlocaled=false"
 PACKAGECONFIG[logind] = "-Dlogind=true,-Dlogind=false"
 PACKAGECONFIG[lz4] = "-Dlz4=true,-Dlz4=false,lz4"
@@ -214,11 +222,6 @@ PACKAGECONFIG[zstd] = "-Dzstd=true,-Dzstd=false,zstd"
 rootprefix ?= "${root_prefix}"
 rootlibdir ?= "${base_libdir}"
 rootlibexecdir = "${rootprefix}/lib"
-
-# This links udev statically with systemd helper library.
-# Otherwise udev package would depend on systemd package (which has the needed shared library),
-# and always pull it into images.
-EXTRA_OEMESON += "-Dlink-udev-shared=false"
 
 EXTRA_OEMESON += "-Dnobody-user=nobody \
                   -Dnobody-group=nobody \
@@ -349,7 +352,7 @@ do_install() {
 
 python populate_packages:prepend (){
     systemdlibdir = d.getVar("rootlibdir")
-    do_split_packages(d, systemdlibdir, '^lib(.*)\.so\.*', 'lib%s', 'Systemd %s library', extra_depends='', allow_links=True)
+    do_split_packages(d, systemdlibdir, r'^lib(.*)\.so\.*', 'lib%s', 'Systemd %s library', extra_depends='', allow_links=True)
 }
 PACKAGES_DYNAMIC += "^lib(udev|systemd|nss).*"
 

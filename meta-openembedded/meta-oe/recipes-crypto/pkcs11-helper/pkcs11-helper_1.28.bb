@@ -6,10 +6,10 @@ certificates, or selecting a certificate directly by serialized id, handling \
 card removal and card insert events, handling card ie-insert to a different \
 slot, supporting session expiration and much more all using a simple API."
 
-HOMEPAGE = "http://www.opensc-project.org/pkcs11-helper/"
+HOMEPAGE = "https://github.com/OpenSC/pkcs11-helper"
 SECTION = "Development/Libraries"
 
-LICENSE = "GPLv2 & BSD"
+LICENSE = "GPLv2 & BSD-3-Clause"
 LIC_FILES_CHKSUM = " \
     file://COPYING;md5=30f10d22cfb1ba98ccd714a41ad3311a \
     file://COPYING.GPL;md5=8a71d0475d08eee76d8b6d0c6dbec543 \

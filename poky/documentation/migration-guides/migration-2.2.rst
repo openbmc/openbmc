@@ -439,7 +439,7 @@ The following miscellaneous changes have occurred:
 
 -  ``packagegroup-core-tools-testapps``: Removed Piglit.
 
--  :ref:`image.bbclass <ref-classes-image>`: Renamed COMPRESS(ION) to CONVERSION. This change
+-  :ref:`ref-classes-image`: Renamed COMPRESS(ION) to CONVERSION. This change
    means that ``COMPRESSIONTYPES``, ``COMPRESS_DEPENDS`` and
    ``COMPRESS_CMD`` are deprecated in favor of ``CONVERSIONTYPES``,
    ``CONVERSION_DEPENDS`` and ``CONVERSION_CMD``. The ``COMPRESS*``

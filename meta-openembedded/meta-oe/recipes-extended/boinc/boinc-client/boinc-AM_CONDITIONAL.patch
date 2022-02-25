@@ -14,7 +14,7 @@ diff --git a/configure.ac b/configure.ac
 index d81d795de4..7beeb34ae2 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -63,6 +63,7 @@ m4_pattern_allow([AC_PROG_OBJCXX])
+@@ -59,6 +59,7 @@ m4_pattern_allow([AC_PROG_OBJCXX])
  m4_ifdef([AC_PROG_OBJCXX],[AC_PROG_OBJCXX],)
  dnl ------
  AC_PROG_CPP
@@ -22,12 +22,3 @@ index d81d795de4..7beeb34ae2 100644
  AC_PROG_MAKE_SET
  SAH_LINKS
  AC_LANG_PUSH(C)
-@@ -1068,6 +1069,8 @@ AM_CONDITIONAL(ENABLE_BOINCCRYPT, [test "x${enable_server}" = xyes  || test "x${
- AM_CONDITIONAL(INSTALL_HEADERS, [test "${enable_install_headers}" = yes])
- AM_CONDITIONAL(HAVE_CUDA_LIB, [test "${enable_client}" = yes -a -f ./coprocs/CUDA/posix/${boinc_platform}/libcudart.so])
- 
-+PKG_CHECK_MODULES([GTK2], [gtk+-2.0])
-+
- dnl ======================================================================
- dnl some more vodoo required for building portable client-binary (client, clientgui)
- dnl ======================================================================

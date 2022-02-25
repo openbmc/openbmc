@@ -12,26 +12,24 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 refresh patch to 4.0
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
- autogen.sh | 9 ---------
- 1 file changed, 9 deletions(-)
+ autogen.sh | 7 -------
+ 1 file changed, 7 deletions(-)
 
 diff --git a/autogen.sh b/autogen.sh
-index cf5d7057..cb73cf9d 100755
+index 0aa7507..36e0423 100755
 --- a/autogen.sh
 +++ b/autogen.sh
-@@ -52,12 +52,3 @@ cat configure.seed | sed \
-     -e "s/@NDPI_VERSION_SHORT@/$NDPI_VERSION_SHORT/g" \
-     -e "s/@FUZZY@/$FUZZY/g" \
-     > configure.ac
+@@ -33,10 +33,3 @@ if test -z $PKG_CONFIG; then
+     echo "pkg-config is missing: please install it (apt-get install pkg-config) and try again"
+     exit
+ fi
 -
 -autoreconf -ivf
--cat configure | sed "s/#define PACKAGE/#define NDPI_PACKAGE/g" | sed "s/#define VERSION/#define NDPI_VERSION/g"  > configure.tmp
--cat configure.tmp > configure
 -
 -echo "./configure $@"
 -chmod +x configure
 -./configure $@
 -
 -- 
-2.17.1
+2.25.1
 

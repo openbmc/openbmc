@@ -1,7 +1,7 @@
 DESCRIPTION = "GNU gperf is a perfect hash function generator"
 HOMEPAGE = "http://www.gnu.org/software/gperf"
 SUMMARY  = "Generate a perfect hash function from a set of keywords"
-LICENSE  = "GPLv3+"
+LICENSE  = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
                     file://src/main.cc;beginline=8;endline=19;md5=dec8f611845d047387ed56b5b85fa99b"
 

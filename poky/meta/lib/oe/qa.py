@@ -48,6 +48,9 @@ class ELFFile:
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
+    def close(self):
         if self.data:
             self.data.close()
 
@@ -127,6 +130,9 @@ class ELFFile:
         know the position
         """
         return self.getShort(ELFFile.E_MACHINE)
+
+    def set_objdump(self, cmd, output):
+        self.objdump_output[cmd] = output
 
     def run_objdump(self, cmd, d):
         import bb.process

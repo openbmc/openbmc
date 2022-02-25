@@ -1,6 +1,6 @@
 SUMMARY = "Linux kernel"
 SECTION = "kernel"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 HOMEPAGE = "https://www.yoctoproject.org/"
 
 LIC_FILES_CHKSUM ?= "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"

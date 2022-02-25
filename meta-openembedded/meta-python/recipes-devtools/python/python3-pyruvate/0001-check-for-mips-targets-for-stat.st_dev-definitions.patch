@@ -1,0 +1,45 @@
+From 56984b19469ff5b69b8b8e180dc75cf825bb1123 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 25 Jan 2022 22:28:11 -0800
+Subject: [PATCH] check for mips targets for stat.st_dev definitions
+
+st_dev has wrong type in glibc when using mips/O32 ABI
+its type should be dev_t but it is set to unsigned long int
+this is specific issue on mips/o32 ABI in glibc for details
+
+See
+https://sourceware.org/bugzilla/show_bug.cgi?id=17786
+
+currently the build fails on mips archirecture with type mismatches
+
+      Fixes
+      error[E0308]: mismatched types
+*        --> /usr/src/debug/python3-pyruvate/1.1.2-r0/cargo_home/bitbake/libsystemd-0.4.1/src/logging.rs:296:25
+          |
+      296 |                 device: stat.st_dev,
+          |                         ^^^^^^^^^^^ expected `u64`, found `u32`
+
+Upstream-Status: Submitted [https://github.com/lucab/libsystemd-rs/pull/103]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/logging.rs | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/logging.rs b/src/logging.rs
+index a68c36a..6e374ae 100644
+--- a/src/logging.rs
++++ b/src/logging.rs
+@@ -292,7 +292,10 @@ impl JournalStream {
+     pub fn from_fd<F: AsRawFd>(fd: F) -> std::io::Result<Self> {
+         nix::sys::stat::fstat(fd.as_raw_fd())
+             .map(|stat| JournalStream {
++                #[cfg(not(target_arch = "mips"))]
+                 device: stat.st_dev,
++                #[cfg(target_arch = "mips")]
++                device: stat.st_dev as u64,
+                 inode: stat.st_ino,
+             })
+             .map_err(std::io::Error::from)
+-- 
+2.35.0
+

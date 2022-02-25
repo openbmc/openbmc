@@ -5,7 +5,7 @@ These programs use error correcting protocols ({z,x,y}modem) to send (sz, sx, sb
 receive (rz, rx, rb) files over a dial-in serial port from a variety of programs \
 running under various operating systems. "
 HOMEPAGE = "http://www.ohse.de/uwe/software/lrzsz.html"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3 \
 			file://src/lrz.c;beginline=1;endline=10;md5=5276956373ff7d8758837f6399a1045f"
 SECTION = "console/network"

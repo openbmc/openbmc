@@ -4,7 +4,7 @@ to PCI bus configuration space and several utilities based on this library.'
 HOMEPAGE = "http://atrey.karlin.mff.cuni.cz/~mj/pciutils.shtml"
 SECTION = "console/utils"
 
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 DEPENDS = "zlib kmod"
 

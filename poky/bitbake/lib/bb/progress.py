@@ -148,7 +148,7 @@ class MultiStageProgressReporter:
     for tasks made up of python code spread across multiple
     classes / functions - the progress reporter object can
     be passed around or stored at the object level and calls
-    to next_stage() and update() made whereever needed.
+    to next_stage() and update() made wherever needed.
     """
     def __init__(self, d, stage_weights, debug=False):
         """

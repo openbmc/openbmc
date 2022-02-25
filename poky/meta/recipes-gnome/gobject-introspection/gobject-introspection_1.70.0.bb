@@ -6,7 +6,7 @@ generation for bindings, API verification and documentation generation."
 HOMEPAGE = "https://wiki.gnome.org/action/show/Projects/GObjectIntrospection"
 BUGTRACKER = "https://gitlab.gnome.org/GNOME/gobject-introspection/issues"
 SECTION = "libs"
-LICENSE = "LGPLv2+ & GPLv2+ & MIT"
+LICENSE = "LGPL-2.0-or-later & GPL-2.0-or-later & MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c434e8128a68bedd59b80b2ac1eb1c4a \
                     file://tools/compiler.c;endline=20;md5=fc5007fc20022720e6c0b0cdde41fabd \
                     file://giscanner/sourcescanner.c;endline=22;md5=194d6e0c1d00662f32d030ce44de8d39 \
@@ -14,7 +14,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=c434e8128a68bedd59b80b2ac1eb1c4a \
                     "
 
 SRC_URI = "${GNOME_MIRROR}/${BPN}/${@oe.utils.trim_version("${PV}", 2)}/${BPN}-${PV}.tar.xz \
-           file://0001-giscanner-ignore-error-return-codes-from-ldd-wrapper.patch \
            file://0001-build-Avoid-the-doctemplates-hack.patch \
            "
 
@@ -33,9 +32,7 @@ DEPENDS += " libffi zlib glib-2.0 python3 flex-native bison-native autoconf-arch
 # target build needs qemu to run temporary introspection binaries created
 # on the fly by g-ir-scanner and a native version of itself to run
 # native versions of its own tools during build.
-# Also prelink-rtld is used to find out library dependencies of introspection binaries
-# (standard ldd doesn't work when cross-compiling).
-DEPENDS:append:class-target = " gobject-introspection-native qemu-native prelink-native"
+DEPENDS:append:class-target = " gobject-introspection-native qemu-native"
 
 # needed for writing out the qemu wrapper script
 export STAGING_DIR_HOST
@@ -54,13 +51,6 @@ EXTRA_OEMESON:class-target = " \
     ${@bb.utils.contains('GI_DATA_ENABLED', 'True', '-Dbuild_introspection_data=true', '-Dbuild_introspection_data=false', d)} \
     ${@'-Dgir_dir_prefix=${libdir}' if d.getVar('MULTILIBS') else ''} \
 "
-
-# Need to ensure ld.so.conf exists so prelink-native works
-# both before we build and if we install from sstate
-do_configure[prefuncs] += "gobject_introspection_preconfigure"
-python gobject_introspection_preconfigure () {
-    oe.utils.write_ld_so_conf(d)
-}
 
 do_configure:prepend:class-native() {
         # Tweak the native python scripts so that they don't refer to the
@@ -113,7 +103,7 @@ EOF
         # for a different architecture
         cat > ${B}/g-ir-scanner-lddwrapper << EOF
 #!/bin/sh
-prelink-rtld --root=$STAGING_DIR_HOST "\$@"
+$OBJDUMP -p "\$@"
 EOF
         chmod +x ${B}/g-ir-scanner-lddwrapper
 

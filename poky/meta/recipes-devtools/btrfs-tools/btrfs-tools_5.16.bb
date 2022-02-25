@@ -7,7 +7,7 @@ btrfs and an utility (btrfs-convert) to make a btrfs filesystem from an ext3."
 
 HOMEPAGE = "https://btrfs.wiki.kernel.org"
 
-LICENSE = "GPLv2 & LGPLv2.1+"
+LICENSE = "GPL-2.0-only & LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = " \
     file://COPYING;md5=fcb02dc552a041dee27e4b85c7396067 \
     file://libbtrfsutil/COPYING;md5=4fbd65380cdd255951079008b364516c \

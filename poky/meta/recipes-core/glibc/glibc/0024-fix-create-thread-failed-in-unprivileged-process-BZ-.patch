@@ -1,0 +1,88 @@
+From 6609858239b8f94e12c19eac0cec425511d1211f Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sun, 29 Aug 2021 20:49:16 +0800
+Subject: [PATCH] fix create thread failed in unprivileged process [BZ #28287]
+
+Since commit [d8ea0d0168 Add an internal wrapper for clone, clone2 and clone3]
+applied, start a unprivileged container (docker run without --privileged),
+it creates a thread failed in container.
+
+In commit d8ea0d0168, it calls __clone3 if HAVE_CLONE3_WAPPER is defined.  If
+__clone3 returns -1 with ENOSYS, fall back to clone or clone2.
+
+As known from [1], cloneXXX fails with EPERM if CLONE_NEWCGROUP,
+CLONE_NEWIPC, CLONE_NEWNET, CLONE_NEWNS, CLONE_NEWPID, or CLONE_NEWUTS
+was specified by an unprivileged process (process without CAP_SYS_ADMIN)
+
+[1] https://man7.org/linux/man-pages/man2/clone3.2.html
+
+So if __clone3 returns -1 with EPERM, fall back to clone or clone2 could
+fix the issue. Here are the test steps:
+
+1) Prepare test code
+cat > conftest.c <<ENDOF
+ #include <pthread.h>
+ #include <stdio.h>
+
+int check_me = 0;
+void* func(void* data) {check_me = 42; printf("start thread: check_me %d\n", check_me); return &check_me;}
+int main()
+{
+  pthread_t t;
+  void *ret;
+  pthread_create (&t, 0, func, 0);
+  pthread_join (t, &ret);
+  printf("check_me %d, p %p\n", check_me, &ret);
+  return (check_me != 42 || ret != &check_me);
+}
+
+ENDOF
+
+2) Compile
+gcc -o conftest -pthread conftest.c
+
+3) Start a container with glibc 2.34 installed
+[skip details]
+docker run -it <container-image-name> bash
+
+4) Run conftest without this patch
+$ ./conftest
+check_me 0, p 0x7ffd91ccd400
+
+5) Run conftest with this patch
+$ ./conftest
+start thread: check_me 42
+check_me 42, p 0x7ffe253c6f20
+
+Upstream-Status: Inappropriate [Rejected by upstream]
+
+Upstream glibc rejected it because the latest docker has resolved the issue [1],
+and upstream glibc does not backward compatibility with old docker[2]
+
+In order to build Yocto with uninative in old docker, we need this local
+patch
+
+[1] https://github.com/moby/moby/commit/9f6b562dd12ef7b1f9e2f8e6f2ab6477790a6594
+[2] https://sourceware.org/pipermail/libc-alpha/2021-August/130590.html
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ sysdeps/unix/sysv/linux/clone-internal.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sysdeps/unix/sysv/linux/clone-internal.c b/sysdeps/unix/sysv/linux/clone-internal.c
+index a71effcbd3..a0569113aa 100644
+--- a/sysdeps/unix/sysv/linux/clone-internal.c
++++ b/sysdeps/unix/sysv/linux/clone-internal.c
+@@ -52,7 +52,7 @@ __clone_internal (struct clone_args *cl_args,
+   /* Try clone3 first.  */
+   int saved_errno = errno;
+   ret = __clone3 (cl_args, sizeof (*cl_args), func, arg);
+-  if (ret != -1 || errno != ENOSYS)
++  if (ret != -1 || (errno != ENOSYS && errno != EPERM))
+     return ret;
+ 
+   /* NB: Restore errno since errno may be checked against non-zero
+-- 
+2.27.0
+

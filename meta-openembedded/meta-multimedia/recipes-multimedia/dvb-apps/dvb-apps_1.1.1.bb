@@ -91,10 +91,10 @@ FILES:dvb-zap-data = "${docdir}/dvb-apps/szap"
 
 python populate_packages:prepend () {
     dvb_libdir = bb.data.expand('${libdir}', d)
-    do_split_packages(d, dvb_libdir, '^lib(.*)\.so$', 'lib%s', 'DVB %s package', extra_depends='', allow_links=True)
-    do_split_packages(d, dvb_libdir, '^lib(.*)\.la$', 'lib%s-dev', 'DVB %s development package', extra_depends='${PN}-dev')
-    do_split_packages(d, dvb_libdir, '^lib(.*)\.a$', 'lib%s-dev', 'DVB %s development package', extra_depends='${PN}-dev')
-    do_split_packages(d, dvb_libdir, '^lib(.*)\.so\.*', 'lib%s', 'DVB %s library', extra_depends='', allow_links=True)
+    do_split_packages(d, dvb_libdir, r'^lib(.*)\.so$', 'lib%s', 'DVB %s package', extra_depends='', allow_links=True)
+    do_split_packages(d, dvb_libdir, r'^lib(.*)\.la$', 'lib%s-dev', 'DVB %s development package', extra_depends='${PN}-dev')
+    do_split_packages(d, dvb_libdir, r'^lib(.*)\.a$', 'lib%s-dev', 'DVB %s development package', extra_depends='${PN}-dev')
+    do_split_packages(d, dvb_libdir, r'^lib(.*)\.so\.*', 'lib%s', 'DVB %s library', extra_depends='', allow_links=True)
 }
 
 INSANE_SKIP:${PN} = "ldflags"

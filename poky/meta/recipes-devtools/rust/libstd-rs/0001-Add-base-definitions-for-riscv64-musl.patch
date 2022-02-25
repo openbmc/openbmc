@@ -3,21 +3,19 @@ From: Ralf Anton Beier <ralf_beier@me.com>
 Date: Sun, 8 Aug 2021 11:05:06 +0200
 Subject: [PATCH 1/4] Add base definitions for riscv64 + musl
 
-https://github.com/rust-lang/libc/pull/1994/commits/030a07761f61f3293d53752e60edbd330a9d718d
+https://github.com/rust-lang/libc-0.2.106/pull/1994/commits/030a07761f61f3293d53752e60edbd330a9d718d
 
-Upstream-Status: Submitted [https://github.com/rust-lang/libc/pull/2537]
+Upstream-Status: Submitted [https://github.com/rust-lang/libc-0.2.106/pull/2537]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Ralf Anton Beier <ralf_beier@me.com>
 ---
  .../src/unix/linux_like/linux/musl/b64/mod.rs |   3 +
  .../linux_like/linux/musl/b64/riscv64/mod.rs  | 832 ++++++++++++++++++
  2 files changed, 835 insertions(+)
- create mode 100644 vendor/libc/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
+ create mode 100644 vendor/libc-0.2.106/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
 
-diff --git a/vendor/libc/src/unix/linux_like/linux/musl/b64/mod.rs b/vendor/libc/src/unix/linux_like/linux/musl/b64/mod.rs
-index cfcdaaecf..7261b95d2 100644
---- a/vendor/libc/src/unix/linux_like/linux/musl/b64/mod.rs
-+++ b/vendor/libc/src/unix/linux_like/linux/musl/b64/mod.rs
+--- a/vendor/libc-0.2.106/src/unix/linux_like/linux/musl/b64/mod.rs
++++ b/vendor/libc-0.2.106/src/unix/linux_like/linux/musl/b64/mod.rs
 @@ -163,6 +163,9 @@ cfg_if! {
      } else if #[cfg(any(target_arch = "x86_64"))] {
          mod x86_64;
@@ -28,11 +26,8 @@ index cfcdaaecf..7261b95d2 100644
      } else {
          // Unknown target_arch
      }
-diff --git a/vendor/libc/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs b/vendor/libc/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
-new file mode 100644
-index 000000000..c656189c4
 --- /dev/null
-+++ b/vendor/libc/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
++++ b/vendor/libc-0.2.106/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
 @@ -0,0 +1,832 @@
 +//! RISC-V-specific definitions for 64-bit linux-like values
 +
@@ -866,6 +861,3 @@ index 000000000..c656189c4
 +pub const SYS_process_madvise: ::c_long = 440;
 +pub const SYS_epoll_pwait2: ::c_long = 441;
 +pub const SYS_mount_setattr: ::c_long = 442;
--- 
-2.20.1
-

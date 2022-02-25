@@ -16,7 +16,7 @@ SRC_URI:append:class-target = " file://run-ptest \
 SRC_URI[md5sum] = "f4a2b0284d80353b995f8ef2385ed73c"
 SRC_URI[sha256sum] = "3be4a26d825ffdfda52a56fc43246456989a3630093cced3fbddf4771ee58a70"
 
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464\
 	            file://examples/COPYING;md5=4031593b2166d6c47cae282d944a7ede"

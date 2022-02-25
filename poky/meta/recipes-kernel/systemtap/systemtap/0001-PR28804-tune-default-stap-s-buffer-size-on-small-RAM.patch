@@ -1,0 +1,84 @@
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+PR28804: tune default stap -s ## buffer size on small RAM machines
+
+Insert a forgotten division by num_online_cpu() to adjust downward the
+calculated bufsize.  Tweak normal defaults back to 128 * 2 * 64K
+(16MB) per CPU, as the stap man page indicates.  This may need further
+tweaking when balancing against staprun consumption performance, but
+at least we have the docs lined up with the code at the moment.
+
+PR28804: tune default stap -s ## buffer size on small RAM machines
+
+Use si_meminfo to limit default buffer size.  Note in the man page
+that the "-s ##" parameter is per-CPU.
+
+diff --git a/man/stap.1.in b/man/stap.1.in
+index 55dbc2c93..285a27b34 100644
+--- a/man/stap.1.in
++++ b/man/stap.1.in
+@@ -239,8 +239,8 @@ and average amount of time spent in each probe-point. Also shows
+ the derivation for each probe-point.
+ .TP
+ .BI \-s " NUM"
+-Use NUM megabyte buffers for kernel-to-user data transfer.  On a
+-multiprocessor in bulk mode, this is a per-processor amount.
++Use NUM megabyte buffers for kernel-to-user data transfer per processor.
++The default is 16MB, or less on smaller memory machines.
+ .TP
+ .BI \-I " DIR"
+ Add the given directory to the tapset search directory.  See the
+diff --git a/runtime/transport/transport.c b/runtime/transport/transport.c
+index 18ecccea2..44afff814 100644
+--- a/runtime/transport/transport.c
++++ b/runtime/transport/transport.c
+@@ -72,8 +72,11 @@ static inline void _stp_unlock_inode(struct inode *inode);
+ #include "procfs.c"
+ #include "control.c"
+ 
+-static unsigned _stp_nsubbufs = 256;
+-static unsigned _stp_subbuf_size = 8 * STP_BUFFER_SIZE; /* 64K */
++/* set default buffer parameters.  User may override these via stap -s #, and
++   the runtime may auto-shrink it on low memory machines too. */
++/* NB: Note default in man/stap.1.in */
++static unsigned _stp_nsubbufs = 128;
++static unsigned _stp_subbuf_size = 2 * STP_BUFFER_SIZE; /* 2 * 64K */
+ 
+ /* module parameters */
+ static int _stp_bufsize;
+@@ -602,17 +605,30 @@ static int _stp_transport_init(void)
+         _stp_need_kallsyms_stext = 0;
+ #endif
+ 
+-	if (_stp_bufsize) {
+-		unsigned size = _stp_bufsize * 1024 * 1024;
++        if (_stp_bufsize == 0) { // option not specified?
++		struct sysinfo si;
++                long _stp_bufsize_avail;
++                si_meminfo(&si);
++                _stp_bufsize_avail = (long)((si.freeram + si.bufferram) / 4 / num_online_cpus())
++                        << PAGE_SHIFT; // limit to quarter of free ram total
++                if ((_stp_nsubbufs * _stp_subbuf_size * num_online_cpus()) > _stp_bufsize_avail) {
++                        _stp_bufsize = max_t (int, 1, _stp_bufsize_avail / 1024 / 1024);
++                        dbug_trans(1, "Shrinking default _stp_bufsize to %d MB/cpu due to low free memory\n", _stp_bufsize);
++                }
++        }      
++        
++	if (_stp_bufsize) { // overridden by user or by si_meminfo heuristic?
++		long size = _stp_bufsize * 1024 * 1024;
+ 		_stp_subbuf_size = 65536;
++                // bump up subbuf size from 64K to 1M to keep _stp_nsubbufs not too large
+ 		while (size / _stp_subbuf_size > 64 &&
+ 		       _stp_subbuf_size < 1024 * 1024) {
+ 			_stp_subbuf_size <<= 1;
+ 		}
+ 		_stp_nsubbufs = size / _stp_subbuf_size;
+-		dbug_trans(1, "Using %d subbufs of size %d\n", _stp_nsubbufs, _stp_subbuf_size);
+ 	}
+-
++        dbug_trans(1, "Using %d subbufs of size %d\n", _stp_nsubbufs, _stp_subbuf_size);
++        
+ 	ret = _stp_transport_fs_init(THIS_MODULE->name);
+ 	if (ret)
+ 		goto err0;

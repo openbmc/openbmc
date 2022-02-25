@@ -4,7 +4,7 @@
 require musl.inc
 inherit linuxloader
 
-SRCREV = "b76f37fd5625d038141b52184956fb4b7838e9a5"
+SRCREV = "c4d4028dde90562f631edf559fbc42d8ec1b29de"
 
 BASEVER = "1.2.2"
 
@@ -78,7 +78,7 @@ FILES:${PN}-dev =+ "${libdir}/libcrypt.a ${libdir}/libdl.a ${libdir}/libm.a \
 
 RDEPENDS:${PN}-dev += "linux-libc-headers-dev bsd-headers-dev libssp-nonshared-staticdev"
 RPROVIDES:${PN}-dev += "libc-dev virtual-libc-dev"
-RPROVIDES:${PN} += "ldd libsegfault rtld(GNU_HASH)"
+RPROVIDES:${PN} += "ldd rtld(GNU_HASH)"
 
 LEAD_SONAME = "libc.so"
 INSANE_SKIP:${PN}-dev = "staticdev"

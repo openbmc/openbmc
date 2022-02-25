@@ -6,7 +6,7 @@ HOMEPAGE = "http://www.gnu.org/software/inetutils"
 SECTION = "net"
 DEPENDS = "ncurses netbase readline virtual/crypt"
 
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=0c7051aef9219dc7237f206c5c4179a7"
 

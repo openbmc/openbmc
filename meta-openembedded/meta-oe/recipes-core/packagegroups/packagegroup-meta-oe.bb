@@ -327,11 +327,13 @@ RDEPENDS:packagegroup-meta-oe-devtools:remove:powerpc64 = "android-tools breakpa
 RDEPENDS:packagegroup-meta-oe-devtools:remove:powerpc64le = "android-tools breakpad lshw luajit ply uftrace"
 RDEPENDS:packagegroup-meta-oe-devtools:remove:riscv64 = "breakpad concurrencykit heaptrack lshw ltrace luajit nodejs ply uftrace"
 RDEPENDS:packagegroup-meta-oe-devtools:remove:riscv32 = "breakpad concurrencykit heaptrack lshw ltrace luajit nodejs ply uftrace"
+RDEPENDS:packagegroup-meta-oe-devtools:remove:libc-musl:riscv32 = "php"
 RDEPENDS:packagegroup-meta-oe-devtools:remove:aarch64 = "concurrencykit"
 RDEPENDS:packagegroup-meta-oe-devtools:remove:x86 = "ply"
 
 RDEPENDS:packagegroup-meta-oe-extended ="\
     bitwise \
+    ${@bb.utils.contains("DISTRO_FEATURES", "x11 wayland opengl", "boinc-client", "", d)} \
     brotli \
     byacc \
     cmatrix \
@@ -407,7 +409,6 @@ RDEPENDS:packagegroup-meta-oe-extended ="\
     libstatgrab \
     lockfile-progs \
     logwatch \
-    mailx \
     mraa \
     ostree \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "pam-plugin-ccreds pam-plugin-ldapdb pam-ssh-agent-auth", "", d)} \
@@ -419,6 +420,7 @@ RDEPENDS:packagegroup-meta-oe-extended ="\
     sedutil \
     libsigrok \
     libsigrokdecode \
+    s-nail \
     sigrok-cli \
     snappy \
     tipcutils \
@@ -655,7 +657,7 @@ RDEPENDS:packagegroup-meta-oe-kernel:remove:riscv32 = "crash makedumpfile oprofi
 
 RDEPENDS:packagegroup-meta-oe-multimedia ="\
     alsa-oss \
-    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "faad2", "", d)} \
+    ${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "commercial", "faad2", "", d)} \
     dirsplit \
     genisoimage \
     icedax \
@@ -669,7 +671,7 @@ RDEPENDS:packagegroup-meta-oe-multimedia ="\
     libburn \
     libcdio-paranoia \
     libcdio \
-    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "libmad", "", d)} \
+    ${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "commercial", "libmad", "", d)} \
     libmms \
     libdvdread \
     libopus \
@@ -683,7 +685,7 @@ RDEPENDS:packagegroup-meta-oe-multimedia ="\
     wavpack \
     libvpx \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "xsp", "", d)} \
-    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "mpv", "", d)} \
+    ${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "commercial", "mpv", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "pavucontrol", "", d)} \
     libopusenc \
 "
@@ -763,6 +765,7 @@ RDEPENDS:packagegroup-meta-oe-support ="\
     hwdata \
     iksemel \
     gengetopt \
+    googlebenchmark \
     imagemagick \
     iniparser \
     inotify-tools \
@@ -821,7 +824,6 @@ RDEPENDS:packagegroup-meta-oe-support ="\
     libusbgx \
     lockdev \
     logwarn \
-    libjs-jquery \
     libjs-sizzle \
     liblinebreak \
     mailcap \

@@ -1278,7 +1278,7 @@ class Recipe(LayerIndexItemObj_LayerBranch):
                     filename, filepath, pn, pv, layerbranch,
                     summary="", description="", section="", license="",
                     homepage="", bugtracker="", provides="", bbclassextend="",
-                    inherits="", blacklisted="", updated=None):
+                    inherits="", disallowed="", updated=None):
         self.id = id
         self.filename = filename
         self.filepath = filepath
@@ -1294,7 +1294,7 @@ class Recipe(LayerIndexItemObj_LayerBranch):
         self.bbclassextend = bbclassextend
         self.inherits = inherits
         self.updated = updated or datetime.datetime.today().isoformat()
-        self.blacklisted = blacklisted
+        self.disallowed = disallowed
         if isinstance(layerbranch, LayerBranch):
             self.layerbranch = layerbranch
         else:

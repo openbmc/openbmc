@@ -6,7 +6,8 @@ DefaultDependencies=no
 
 [Service]
 Type=oneshot
-ExecStart=mkdir -p {DATA_MOUNT_POINT}/workdir{LOWERDIR} && mkdir -p {DATA_MOUNT_POINT}/upper{LOWERDIR}
+ExecStart=mkdir -p {DATA_MOUNT_POINT}/upper{LOWERDIR}
+ExecStart=mkdir -p {DATA_MOUNT_POINT}/workdir{LOWERDIR}
 RemainAfterExit=true
 StandardOutput=journal
 

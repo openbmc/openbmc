@@ -35,11 +35,10 @@ import subprocess
 import sys
 import pexpect
 
-import oeqa.utils.sshcontrol as sshcontrol
-from oeqa.controllers.masterimage import MasterImageHardwareTarget
+from oeqa.controllers.controllerimage import ControllerImageHardwareTarget
 
 
-class EdgeRouterTarget(MasterImageHardwareTarget):
+class EdgeRouterTarget(ControllerImageHardwareTarget):
 
     def __init__(self, d):
         super(EdgeRouterTarget, self).__init__(d)
@@ -58,15 +57,15 @@ class EdgeRouterTarget(MasterImageHardwareTarget):
 
 
     def _deploy(self):
-        self.master.run("umount /mnt/testrootfs;")
-        self.master.ignore_status = False
-        self.master.copy_to(self.kernel, "~/test-kernel")
-        self.master.copy_to(self.rootfs, "~/test-rootfs.%s" % self.image_fstype)
+        self.controller.run("umount /mnt/testrootfs;")
+        self.controller.ignore_status = False
+        self.controller.copy_to(self.kernel, "~/test-kernel")
+        self.controller.copy_to(self.rootfs, "~/test-rootfs.%s" % self.image_fstype)
         for cmd in self.deploy_cmds:
-            self.master.run(cmd)
+            self.controller.run(cmd)
 
     def _start(self, params=None):
-        self.power_cycle(self.master)
+        self.power_cycle(self.controller)
         try:
             serialconn = pexpect.spawn(self.serialcontrol_cmd, env=self.origenv, logfile=sys.stdout)
             serialconn.expect("U-Boot")

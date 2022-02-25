@@ -1,4 +1,4 @@
-LICENSE = "GPLv3+"
+LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 require diffutils.inc
@@ -18,6 +18,7 @@ CFLAGS:mingw32 = " -DSA_RESTART=0"
 # Fix "Argument list too long" error when len(TMPDIR) = 410
 acpaths = "-I ./m4"
 
+EXTRA_OEMAKE:append:mingw32 = " LIBS='-lbcrypt'"
 inherit ptest
 
 RDEPENDS:${PN}-ptest += "make perl"

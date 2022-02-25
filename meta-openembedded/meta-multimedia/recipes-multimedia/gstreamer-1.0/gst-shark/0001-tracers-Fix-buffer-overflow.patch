@@ -1,0 +1,33 @@
+From d84807ec6d6f8511e4ec939a745d4d7bb35c3cfb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 4 Feb 2022 09:22:48 -0800
+Subject: [PATCH] tracers: Fix buffer overflow
+
+Fixes
+| ../../../git/plugins/tracers/gstcpuusagecompute.c:106:9: error: 'fscanf' may overflow; destination buffer in argument 3 has size 8, but the corresponding specifier may require size 9 [-Werror,-Wfortify-sour
+ce]
+|         cpu_name, &user[0], &nice[0], &system[0], &idle[0], &iowait, &irq,
+|         ^
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ plugins/tracers/gstcpuusagecompute.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plugins/tracers/gstcpuusagecompute.c b/plugins/tracers/gstcpuusagecompute.c
+index 39255fb..00bae66 100644
+--- a/plugins/tracers/gstcpuusagecompute.c
++++ b/plugins/tracers/gstcpuusagecompute.c
+@@ -69,7 +69,7 @@ gst_cpu_usage_compute (GstCPUUsage * cpu_usage)
+   gint *idle;
+   gint *idle_aux;
+ 
+-  gchar cpu_name[CPU_NAME_MAX_SIZE];
++  gchar cpu_name[CPU_NAME_MAX_SIZE+1];
+   gint iowait;                  /* Time waiting for I/O to complete */
+   gint irq;                     /* Time servicing interrupts        */
+   gint softirq;                 /* Time servicing softirqs          */
+-- 
+2.35.1
+

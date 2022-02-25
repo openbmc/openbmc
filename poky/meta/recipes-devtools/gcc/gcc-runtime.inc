@@ -64,7 +64,11 @@ DEBUG_PREFIX_MAP:class-target = " \
    "
 
 do_configure () {
-	export CXX="${CXX} -nostdinc++ -nostdlib++"
+	export CXX="${CXX} -nostdinc++ -L${WORKDIR}/dummylib"
+	# libstdc++ isn't built yet so CXX would error not able to find it which breaks stdc++'s configure
+	# tests. Create a dummy empty lib for the purposes of configure.
+	mkdir -p ${WORKDIR}/dummylib
+	touch ${WORKDIR}/dummylib/libstdc++.so
 	for d in libgcc ${RUNTIMETARGET}; do
 		echo "Configuring $d"
 		rm -rf ${B}/${TARGET_SYS}/$d/
@@ -302,7 +306,7 @@ do_check() {
     export DEJAGNU="${WORKDIR}/dejagnu/site.exp"
 
     # HACK: this works around the configure setting CXX with -nostd* args
-    sed -i 's/-nostdinc++ -nostdlib++//g' $(find ${B} -name testsuite_flags | head -1)
+    sed -i 's#-nostdinc++ -L${WORKDIR}/dummylib##g' $(find ${B} -name testsuite_flags | head -1)
 
     if [ "${TOOLCHAIN_TEST_TARGET}" = "user" ]; then
         # qemu user has issues allocating large amounts of memory

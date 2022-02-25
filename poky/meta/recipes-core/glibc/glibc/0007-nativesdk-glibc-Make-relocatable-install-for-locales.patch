@@ -1,4 +1,4 @@
-From 24bffe9c2645cd6542e29cb57786dc703cced07b Mon Sep 17 00:00:00 2001
+From bf1603b3d73f64de777be00f7e55f2cfef596102 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 3 Aug 2018 09:55:12 -0700
 Subject: [PATCH] nativesdk-glibc: Make relocatable install for locales
@@ -19,10 +19,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  4 files changed, 8 insertions(+), 7 deletions(-)
 
 diff --git a/locale/findlocale.c b/locale/findlocale.c
-index ab09122b0c..f42cc75780 100644
+index 5986373edd..856ba9afc0 100644
 --- a/locale/findlocale.c
 +++ b/locale/findlocale.c
-@@ -56,7 +56,7 @@ struct __locale_data *const _nl_C[] attribute_hidden =
+@@ -55,7 +55,7 @@ struct __locale_data *const _nl_C[] attribute_hidden =
     which are somehow addressed.  */
  struct loaded_l10nfile *_nl_locale_file_list[__LC_LAST];
  
@@ -31,7 +31,7 @@ index ab09122b0c..f42cc75780 100644
  
  /* Checks if the name is actually present, that is, not NULL and not
     empty.  */
-@@ -166,7 +166,7 @@ _nl_find_locale (const char *locale_path, size_t locale_path_len,
+@@ -165,7 +165,7 @@ _nl_find_locale (const char *locale_path, size_t locale_path_len,
  
        /* Nothing in the archive.  Set the default path to search below.  */
        locale_path = _nl_default_locale_path;
@@ -67,10 +67,10 @@ index b3d4da0185..22f9dc1140 100644
  /* Load the locale data for CATEGORY from the file specified by *NAME.
     If *NAME is "", use environment variables as specified by POSIX, and
 diff --git a/locale/programs/locale.c b/locale/programs/locale.c
-index ca0a95be99..6b98895203 100644
+index e9275d6b83..a9109155e5 100644
 --- a/locale/programs/locale.c
 +++ b/locale/programs/locale.c
-@@ -632,6 +632,7 @@ nameentcmp (const void *a, const void *b)
+@@ -631,6 +631,7 @@ nameentcmp (const void *a, const void *b)
  		  ((const struct nameent *) b)->name);
  }
  
@@ -78,7 +78,7 @@ index ca0a95be99..6b98895203 100644
  
  static int
  write_archive_locales (void **all_datap, char *linebuf)
-@@ -645,7 +646,7 @@ write_archive_locales (void **all_datap, char *linebuf)
+@@ -644,7 +645,7 @@ write_archive_locales (void **all_datap, char *linebuf)
    int fd, ret = 0;
    uint32_t cnt;
  
@@ -87,7 +87,7 @@ index ca0a95be99..6b98895203 100644
    if (fd < 0)
      return 0;
  
-@@ -700,8 +701,8 @@ write_archive_locales (void **all_datap, char *linebuf)
+@@ -699,8 +700,8 @@ write_archive_locales (void **all_datap, char *linebuf)
  	  if (cnt)
  	    putchar_unlocked ('\n');
  

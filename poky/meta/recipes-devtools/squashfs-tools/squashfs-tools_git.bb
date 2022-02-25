@@ -4,7 +4,7 @@ SUMMARY = "Tools for manipulating SquashFS filesystems"
 HOMEPAGE = "https://github.com/plougher/squashfs-tools"
 DESCRIPTION = "Tools to create and extract Squashfs filesystems."
 SECTION = "base"
-LICENSE = "GPL-2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://../COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 PV = "4.5"

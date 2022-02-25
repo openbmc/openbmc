@@ -4,7 +4,7 @@ track of the changes each patch makes. Patches can be applied, un-applied,\
 refreshed, etc."
 HOMEPAGE = "http://savannah.nongnu.org/projects/quilt/"
 SECTION = "devel"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
 SRC_URI = "${SAVANNAH_GNU_MIRROR}/quilt/quilt-${PV}.tar.gz \
@@ -16,8 +16,7 @@ SRC_URI = "${SAVANNAH_GNU_MIRROR}/quilt/quilt-${PV}.tar.gz \
 
 SRC_URI:append:class-target = " file://gnu_patch_test_fix_target.patch"
 
-SRC_URI[md5sum] = "6800c2404a2c0598ab2eff92a636ba70"
-SRC_URI[sha256sum] = "314b319a6feb13bf9d0f9ffa7ce6683b06919e734a41275087ea457cc9dc6e07"
+SRC_URI[sha256sum] = "3be3be0987e72a6c364678bb827e3e1fcc10322b56bc5f02b576698f55013cc2"
 
 inherit autotools-brokensep ptest
 

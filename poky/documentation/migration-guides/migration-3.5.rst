@@ -22,6 +22,18 @@ Recipe changes
   recipes now need to use ``;protocol=https`` at the end of GitHub
   URLs. The same script as above can be used to convert the recipes.
 
+- Network access from tasks is now disabled by default on kernels which support
+  this feature (on most recent distros such as CentOS 8 and Debian 11 onwards).
+  This means that tasks accessing the network need to be marked as such with the ``network``
+  flag. For example::
+
+     do_mytask[network] = "1"
+
+  This is allowed by default from ``do_fetch`` but not from any of our other standard
+  tasks. Recipes shouldn't be accessing the network outside of ``do_fetch`` as it
+  usually undermines fetcher source mirroring, image and licence manifests, software
+  auditing and supply chain security.
+
 - The :term:`TOPDIR` variable and the current working directory are no longer modified
   when parsing recipes. Any code depending on that behaviour will no longer work.
 
@@ -40,5 +52,5 @@ Recipe changes
   and :ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:removal (override style syntax)`.
 
 - :ref:`allarch <ref-classes-allarch>` packagegroups can no longer depend on packages
-  which use :term:`PKG` renaming such as :ref:`debian.bbclass <ref-classes-debian>`.
+  which use :term:`PKG` renaming such as :ref:`ref-classes-debian`.
 

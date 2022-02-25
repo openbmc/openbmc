@@ -3,22 +3,18 @@ DESCRIPTION = "Piglit is an open-source test suite for OpenGL and OpenCL \
 implementations."
 HOMEPAGE = "https://gitlab.freedesktop.org/mesa/piglit"
 BUGTRACKER = "https://gitlab.freedesktop.org/mesa/piglit/-/issues"
-LICENSE = "MIT & LGPLv2+ & GPLv3 & GPLv2+ & BSD-3-Clause"
+LICENSE = "MIT & LGPL-2.0-or-later & GPL-3.0-only & GPL-2.0-or-later & BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b2beded7103a3d8a442a2a0391d607b0"
 
 SRC_URI = "git://gitlab.freedesktop.org/mesa/piglit.git;protocol=https;branch=main \
            file://0001-cmake-install-bash-completions-in-the-right-place.patch \
            file://0001-cmake-use-proper-WAYLAND_INCLUDE_DIRS-variable.patch \
            file://0001-Add-a-missing-include-for-htobe32-definition.patch \
-           file://0001-generated_tests-gen_tcs-tes_input_tests.py-do-not-ha.patch \
            file://0002-tests-util-piglit-shader.c-do-not-hardcode-build-pat.patch \
-           file://0001-serializer.py-make-.gz-files-reproducible.patch \
-           file://0001-framework-profile.py-make-test-lists-reproducible.patch \
-           file://0001-tests-shader.py-sort-the-file-list-before-working-on.patch \
            "
 UPSTREAM_CHECK_COMMITS = "1"
 
-SRCREV = "11ee10ba04a95d4b36ef844420f0a5838002b5a8"
+SRCREV = "2f80c7cc9c02d37574dc8ba3140b7dd8eb3cbf82"
 # (when PV goes above 1.0 remove the trailing r)
 PV = "1.0+gitr${SRCPV}"
 

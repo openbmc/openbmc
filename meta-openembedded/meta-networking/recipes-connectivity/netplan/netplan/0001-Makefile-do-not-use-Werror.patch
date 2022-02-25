@@ -10,14 +10,17 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index 8645aee..50fc0da 100644
+index 0368e41..53d6a9d 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -7,7 +7,6 @@ BUILDFLAGS = \
- 	-D_XOPEN_SOURCE=500 \
+@@ -8,7 +8,6 @@ BUILDFLAGS = \
  	-DSBINDIR=\"$(SBINDIR)\" \
+ 	-I${CURDIR}/include \
  	-Wall \
 -	-Werror \
  	$(NULL)
  
- SYSTEMD_GENERATOR_DIR=$(shell pkg-config --variable=systemdsystemgeneratordir systemd)
+ SRCS = \
+-- 
+2.25.1
+

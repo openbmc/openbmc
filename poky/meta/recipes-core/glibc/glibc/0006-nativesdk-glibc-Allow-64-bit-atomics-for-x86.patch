@@ -1,4 +1,4 @@
-From b30f380cd88ae181a4a6a3a4784206ffe3ccd19b Mon Sep 17 00:00:00 2001
+From a1fbd7ef1da02f334ff72c52cb11116164649067 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 31 Dec 2015 14:35:35 -0800
 Subject: [PATCH] nativesdk-glibc: Allow 64 bit atomics for x86
@@ -13,14 +13,14 @@ Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- sysdeps/x86/atomic-machine.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ sysdeps/x86/atomic-machine.h | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
 diff --git a/sysdeps/x86/atomic-machine.h b/sysdeps/x86/atomic-machine.h
-index 695222e4fa..9d39bfdbd5 100644
+index 2692d94a92..9d39bfdbd5 100644
 --- a/sysdeps/x86/atomic-machine.h
 +++ b/sysdeps/x86/atomic-machine.h
-@@ -52,15 +52,14 @@ typedef uintmax_t uatomic_max_t;
+@@ -52,19 +52,14 @@ typedef uintmax_t uatomic_max_t;
  #define LOCK_PREFIX "lock;"
  
  #define USE_ATOMIC_COMPILER_BUILTINS	1
@@ -33,6 +33,10 @@ index 695222e4fa..9d39bfdbd5 100644
  # define BR_CONSTRAINT			"q"
  # define IBR_CONSTRAINT			"iq"
  #else
+-/* Since the Pentium, i386 CPUs have supported 64-bit atomics, but the
+-   i386 psABI supplement provides only 4-byte alignment for uint64_t
+-   inside structs, so it is currently not possible to use 64-bit
+-   atomics on this platform.  */
 -# define __HAVE_64B_ATOMICS		0
  # define SP_REG				"esp"
  # define SEG_REG			"gs"

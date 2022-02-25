@@ -217,8 +217,8 @@ your Metadata, the easier it is to cope with future changes.
    -  Use Board Support Package (BSP) layers from silicon vendors when
       possible.
 
-   -  Familiarize yourself with the `Yocto Project curated layer
-      index <https://www.yoctoproject.org/software-overview/layers/>`__
+   -  Familiarize yourself with the
+      :yocto_home:`Yocto Project curated layer index</software-overview/layers/>`
       or the :oe_layerindex:`OpenEmbedded layer index <>`.
       The latter contains more layers but they are less universally
       validated.

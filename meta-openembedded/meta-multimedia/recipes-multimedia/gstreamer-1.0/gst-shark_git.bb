@@ -10,14 +10,15 @@ DEPENDS = "gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad "
 
 SRCBRANCH ?= "master"
 
-PV = "0.7.2"
+PV = "0.7.3.1"
 
-SRCREV_base = "50e3dbd3b131de2a39d3917576e8f834631ec46b"
-SRCREV_common = "88e512ca7197a45c4114f7fa993108f23245bf50"
+SRCREV_base = "5413ef5475e5b70476c2480a75ca3746d91d4caf"
+SRCREV_common = "b64f03f6090245624608beb5d2fff335e23a01c0"
 SRCREV_FORMAT = "base_common"
 SRC_URI = " \
     git://github.com/RidgeRun/gst-shark.git;protocol=https;branch=${SRCBRANCH};name=base \
     git://gitlab.freedesktop.org/gstreamer/common.git;protocol=https;destsuffix=git/common;name=common;;branch=master \
+    file://0001-tracers-Fix-buffer-overflow.patch \
     "
 
 S = "${WORKDIR}/git"

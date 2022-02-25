@@ -3,7 +3,7 @@ DESCRIPTION = "The groff (GNU troff) software is a typesetting package which rea
 formatting commands and produces formatted output."
 SECTION = "base"
 HOMEPAGE = "http://www.gnu.org/software/groff/"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 

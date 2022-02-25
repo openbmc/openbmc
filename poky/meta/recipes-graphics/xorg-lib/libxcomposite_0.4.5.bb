@@ -11,7 +11,7 @@ compositing transformations through a client."
 
 require xorg-lib-common.inc
 
-LICENSE = "MIT-style"
+LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=3f2907aad541f6f226fbc58cc1b3cdf1"
 
 DEPENDS += " xorgproto virtual/libx11 libxfixes libxext"

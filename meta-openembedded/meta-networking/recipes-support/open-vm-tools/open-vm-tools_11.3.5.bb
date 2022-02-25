@@ -43,6 +43,7 @@ SRC_URI = "git://github.com/vmware/open-vm-tools.git;protocol=https;branch=maste
            file://0013-misc-Do-not-print-NULL-string-into-logs.patch;patchdir=.. \
            file://0001-Make-HgfsConvertFromNtTimeNsec-aware-of-64-bit-time_.patch;patchdir=.. \
            file://0002-hgfsServerLinux-Consider-64bit-time_t-possibility.patch;patchdir=.. \
+           file://0001-open-vm-tools-Correct-include-path-for-poll.h.patch;patchdir=.. \
            "
 
 UPSTREAM_CHECK_GITTAGREGEX = "stable-(?P<pver>\d+(\.\d+)+)"

@@ -1,0 +1,47 @@
+From 7584cfc04914cb0842a986e9808686858b9c8630 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 31 Jan 2022 10:47:53 -0500
+Subject: [PATCH 7/7] fix: net: socket: rename SKB_DROP_REASON_SOCKET_FILTER
+ (v5.17)
+
+No version check needed since this change is between two RCs, see
+upstream commit :
+
+  commit 364df53c081d93fcfd6b91085ff2650c7f17b3c7
+  Author: Menglong Dong <imagedong@tencent.com>
+  Date:   Thu Jan 27 17:13:01 2022 +0800
+
+    net: socket: rename SKB_DROP_REASON_SOCKET_FILTER
+
+    Rename SKB_DROP_REASON_SOCKET_FILTER, which is used
+    as the reason of skb drop out of socket filter before
+    it's part of a released kernel. It will be used for
+    more protocols than just TCP in future series.
+
+    Link: https://lore.kernel.org/all/20220127091308.91401-2-imagedong@tencent.com/
+
+Upstream-Status: Backport [lttng-modules commit 7584cfc04914cb0842a986e9808686858b9c8630]
+
+Change-Id: I666461a5b541fe9e0bf53ad996ce33237af4bfbb
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/instrumentation/events/skb.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/instrumentation/events/skb.h b/include/instrumentation/events/skb.h
+index c6d7095d..237e54ad 100644
+--- a/include/instrumentation/events/skb.h
++++ b/include/instrumentation/events/skb.h
+@@ -20,7 +20,7 @@ LTTNG_TRACEPOINT_ENUM(skb_drop_reason,
+ 		ctf_enum_value("NO_SOCKET",	SKB_DROP_REASON_NO_SOCKET)
+ 		ctf_enum_value("PKT_TOO_SMALL",	SKB_DROP_REASON_PKT_TOO_SMALL)
+ 		ctf_enum_value("TCP_CSUM",	SKB_DROP_REASON_TCP_CSUM)
+-		ctf_enum_value("TCP_FILTER",	SKB_DROP_REASON_TCP_FILTER)
++		ctf_enum_value("SOCKET_FILTER",	SKB_DROP_REASON_SOCKET_FILTER)
+ 		ctf_enum_value("UDP_CSUM",	SKB_DROP_REASON_UDP_CSUM)
+ 		ctf_enum_value("MAX",		SKB_DROP_REASON_MAX)
+ 	)
+-- 
+2.19.1
+

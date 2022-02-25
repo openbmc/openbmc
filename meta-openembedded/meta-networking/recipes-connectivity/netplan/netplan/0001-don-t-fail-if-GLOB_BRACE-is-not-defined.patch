@@ -4,18 +4,17 @@ Date: Fri, 25 Dec 2020 11:41:43 +0900
 Subject: [PATCH] don't fail if GLOB_BRACE is not defined
 
 Signed-off-by: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
-
 ---
  src/util.c | 6 ++++++
  1 file changed, 6 insertions(+)
 
 diff --git a/src/util.c b/src/util.c
-index a4c0dba..fd4542d 100644
+index 841ec12..59595da 100644
 --- a/src/util.c
 +++ b/src/util.c
-@@ -25,6 +25,12 @@
- #include "util.h"
- #include "netplan.h"
+@@ -32,6 +32,12 @@
+ #include "names.h"
+ #include "yaml-helpers.h"
  
 +/* Don't fail if the standard library
 + * doesn't provide brace expansion */
@@ -23,6 +22,9 @@ index a4c0dba..fd4542d 100644
 +#define GLOB_BRACE 0
 +#endif
 +
- GHashTable* wifi_frequency_24;
- GHashTable* wifi_frequency_5;
+ NETPLAN_ABI GHashTable*
+ wifi_frequency_24;
  
+-- 
+2.25.1
+

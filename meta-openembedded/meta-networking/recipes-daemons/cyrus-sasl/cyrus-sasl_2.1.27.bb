@@ -98,4 +98,4 @@ FILES:${PN}-staticdev += "${libdir}/sasl2/*.a"
 INSANE_SKIP:${PN} += "dev-so"
 
 # CVE-2020-8032 affects only openSUSE
-CVE_CHECK_WHITELIST += "CVE-2020-8032"
+CVE_CHECK_IGNORE += "CVE-2020-8032"

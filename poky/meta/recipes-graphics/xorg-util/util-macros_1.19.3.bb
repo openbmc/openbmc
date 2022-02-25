@@ -4,7 +4,7 @@ DESCRIPTION = "M4 autotools macros used by various X.org programs."
 
 require xorg-util-common.inc
 
-LICENSE = "MIT & MIT-style"
+LICENSE = "MIT & MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1970511fddd439b07a6ba789d28ff662"
 
 PE = "1"

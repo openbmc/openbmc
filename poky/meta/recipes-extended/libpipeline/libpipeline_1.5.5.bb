@@ -3,7 +3,7 @@ DESCRIPTION = "This is a C library for setting up and running pipelines of proce
 without needing to involve shell command-line parsing which is often \
 error-prone and insecure."
 HOMEPAGE = "http://libpipeline.nongnu.org/"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 SRC_URI = "${SAVANNAH_GNU_MIRROR}/libpipeline/libpipeline-${PV}.tar.gz"

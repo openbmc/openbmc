@@ -117,7 +117,7 @@ class NpmShrinkWrap(FetchMethod):
 
             # Handle http tarball sources
             elif version.startswith("http") and integrity:
-                localfile = os.path.join("npm2", os.path.basename(version))
+                localfile = npm_localfile(os.path.basename(version))
 
                 uri = URI(version)
                 uri.params["downloadfilename"] = localfile

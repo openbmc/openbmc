@@ -31,7 +31,7 @@ RDEPENDS:packagegroup-meta-multimedia = "\
     dleyna-renderer \
     dleyna-server \
     dvb-apps \
-    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "faac fdk-aac mpd", "", d)} \
+    ${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "commercial", "faac fdk-aac mpd", "", d)} \
     gerbera \
     libao \
     libavc1394 \
@@ -45,7 +45,7 @@ RDEPENDS:packagegroup-meta-multimedia = "\
     mpc \
     ncmpc \
     libmpd \
-    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "opencore-amr vo-aacenc vo-amrwbenc", "", d)} \
+    ${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "commercial", "opencore-amr vo-aacenc vo-amrwbenc", "", d)} \
     gst-shark \
     gstd \
     rtmpdump \
@@ -57,24 +57,24 @@ RDEPENDS:packagegroup-meta-multimedia = "\
     pipewire \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "projucer", "", d)} \
     libcamera \
-    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "libde265 openh264", "", d)} \
+    ${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "commercial", "libde265 openh264", "", d)} \
     vorbis-tools \
     libdvbcsa \
     libopenmpt \
     libuvc \
     mimic \
-    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "minidlna", "", d)} \
+    ${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "commercial", "minidlna", "", d)} \
     mycroft \
     openal-soft \
     opusfile \
     opus-tools \
     libdvdcss \
-    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", bb.utils.contains("DISTRO_FEATURES", "x11", "vlc", "", d), "", d)} \
-    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "sox streamripper", "", d)} \
+    ${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "commercial", bb.utils.contains("DISTRO_FEATURES", "x11", "vlc", "", d), "", d)} \
+    ${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "commercial", "sox streamripper", "", d)} \
     tinyalsa \
     tremor \
     webrtc-audio-processing \
-    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", bb.utils.contains_any("TRANSLATED_TARGET_ARCH", "i586 i686 x86-64", "x265", "", d), "", d)} \
+    ${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "commercial", bb.utils.contains_any("TRANSLATED_TARGET_ARCH", "i586 i686 x86-64", "x265", "", d), "", d)} \
 "
 RDEPENDS:packagegroup-meta-multimedia:remove:libc-musl = "projucer"
 RDEPENDS:packagegroup-meta-multimedia:remove:powerpc64le = "openh264"

@@ -1,0 +1,78 @@
+From a52d763559d1017ca73d2a2933aba1c78ad354c6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal@rzerosystems.com>
+Date: Thu, 27 Jan 2022 16:32:25 -0600
+Subject: [PATCH] unattended-upgrade: Remove distro_info usage to check devel
+ releases
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The distro-info python3 package is used to check if the release is a
+devel release and choice if continue with unattended-upgrade for now
+remove it because needs support into python3-distro-info [1].
+
+[1] https://salsa.debian.org/debian/distro-info
+
+Signed-off-by: Aníbal Limón <anibal@rzerosystems.com>
+
+Upstream-Status: Inappropriate
+---
+ unattended-upgrade | 38 --------------------------------------
+ 1 file changed, 38 deletions(-)
+
+diff --git a/unattended-upgrade b/unattended-upgrade
+index 802d4d5..3b4e83e 100755
+--- a/unattended-upgrade
++++ b/unattended-upgrade
+@@ -83,9 +83,6 @@ import apt
+ import apt_inst
+ import apt_pkg
+ 
+-import distro_info
+-
+-
+ # the reboot required flag file used by packages
+ REBOOT_REQUIRED_FILE = "/var/run/reboot-required"
+ KEPT_PACKAGES_FILE = "var/lib/unattended-upgrades/kept-back"
+@@ -2061,41 +2058,6 @@ def run(options,             # type: Options
+     if should_stop():
+         return UnattendedUpgradesResult(False)
+ 
+-    # check to see if want to auto-upgrade the devel release
+-    if apt_pkg.config.find("Unattended-Upgrade::DevRelease") == "auto":
+-        try:
+-            if DISTRO_ID.lower() == 'ubuntu':
+-                devel = (distro_info.UbuntuDistroInfo() .
+-                         devel(result="object"))
+-            elif DISTRO_ID.lower() == 'debian':
+-                devel = (distro_info.DebianDistroInfo() .
+-                         devel(result="object"))
+-            else:
+-                devel = (distro_info.DistroInfo(DISTRO_ID) .
+-                         devel(result="object"))
+-        except Exception as e:
+-            logging.warning("Could not figure out development release: %s" % e)
+-        else:
+-            if ((devel.series == DISTRO_CODENAME
+-                 and devel.release is not None
+-                 and devel.release - date.today() > DEVEL_UNTIL_RELEASE)):
+-                syslog.syslog((_("Not running on this development "
+-                                 "release before %s") %
+-                              (devel.release - DEVEL_UNTIL_RELEASE
+-                               - datetime.timedelta(days=1))))
+-                logging.warning(_("Not running on this development "
+-                                  "release before %s") %
+-                                (devel.release - DEVEL_UNTIL_RELEASE
+-                                 - datetime.timedelta(days=1)))
+-                return UnattendedUpgradesResult(True)
+-
+-            logging.debug("Running on the development release")
+-    elif "(development branch)" in DISTRO_DESC and not\
+-            apt_pkg.config.find_b("Unattended-Upgrade::DevRelease", True):
+-        syslog.syslog(_("Not running on the development release."))
+-        logging.info(_("Not running on the development release."))
+-        return UnattendedUpgradesResult(True)
+-
+     logging.info(_("Starting unattended upgrades script"))
+ 
+     # check and get lock

@@ -8,7 +8,7 @@ python () {
 
 require xorg-lib-common.inc
 
-LICENSE = "MIT & MIT-style & BSD-1-Clause & HPND & HPND-sell-variant"
+LICENSE = "MIT & MIT & BSD-1-Clause & HPND & HPND-sell-variant"
 LIC_FILES_CHKSUM = "file://COPYING;md5=172255dee66bb0151435b2d5d709fcf7"
 
 SRC_URI[md5sum] = "c5fa5a86a20e3591bed6c046498d4b8f"

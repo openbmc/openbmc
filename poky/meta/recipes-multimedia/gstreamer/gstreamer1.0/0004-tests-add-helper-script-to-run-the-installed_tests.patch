@@ -1,0 +1,74 @@
+From 4dcbabebca2ad6f1fdd59ee35a858082e87db7b6 Mon Sep 17 00:00:00 2001
+From: Jose Quaresma <quaresma.jose@gmail.com>
+Date: Sun, 2 May 2021 01:58:01 +0100
+Subject: [PATCH 4/4] tests: add helper script to run the installed_tests
+
+- this is a bash script that will run the installed_tests
+with some of the environment variables used in the meson
+testing framework.
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/789]
+
+Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
+---
+ subprojects/gstreamer/tests/check/meson.build   | 17 +++++++++++++++++
+ .../gstreamer/tests/check/template.sh.in        |  9 +++++++++
+ .../gstreamer/tests/check/template.test.in      |  2 +-
+ 3 files changed, 27 insertions(+), 1 deletion(-)
+ create mode 100755 subprojects/gstreamer/tests/check/template.sh.in
+
+diff --git a/subprojects/gstreamer/tests/check/meson.build b/subprojects/gstreamer/tests/check/meson.build
+index 48ec2532f8..7dc4990d4e 100644
+--- a/subprojects/gstreamer/tests/check/meson.build
++++ b/subprojects/gstreamer/tests/check/meson.build
+@@ -185,6 +185,23 @@ foreach t : core_tests
+         install_dir: installed_tests_metadir,
+         configuration: test_conf
+       )
++
++      # All the tests will be deployed on the target machine and
++      # we use the home folder ~ for the registry which will then expand at runtime.
++      # Using the /tmp/gstreamer-1.0/@0@.registry can be problematic as it mostly
++      # is mounted using tmpfs and if the machine crash from some reason we can lost the registry
++      # that is useful for debug propose of the tests itself.
++      env += {'GST_REGISTRY': '~/.cache/gstreamer-1.0/@0@.registry'.format(test_name)}
++
++      # Set the full path for the test it self.
++      env += {'TEST': '@0@/@1@'.format(join_paths(prefix, installed_tests_execdir), test_name)}
++
++      configure_file(
++        input : 'template.sh.in',
++        output: test_name + '.sh',
++        install_dir: installed_tests_execdir,
++        configuration : env,
++      )
+     endif
+ 
+     test(test_name, exe, env: env, timeout : 3 * 60)
+diff --git a/subprojects/gstreamer/tests/check/template.sh.in b/subprojects/gstreamer/tests/check/template.sh.in
+new file mode 100755
+index 0000000000..cf7d31b0ea
+--- /dev/null
++++ b/subprojects/gstreamer/tests/check/template.sh.in
+@@ -0,0 +1,9 @@
++#!/bin/sh
++
++set -ax
++
++CK_DEFAULT_TIMEOUT="@CK_DEFAULT_TIMEOUT@"
++GST_PLUGIN_LOADING_WHITELIST="@GST_PLUGIN_LOADING_WHITELIST@"
++GST_REGISTRY=@GST_REGISTRY@
++GST_STATE_IGNORE_ELEMENTS="@GST_STATE_IGNORE_ELEMENTS@"
++exec @TEST@
+diff --git a/subprojects/gstreamer/tests/check/template.test.in b/subprojects/gstreamer/tests/check/template.test.in
+index f701627f87..b74ef6ad73 100644
+--- a/subprojects/gstreamer/tests/check/template.test.in
++++ b/subprojects/gstreamer/tests/check/template.test.in
+@@ -1,3 +1,3 @@
+ [Test]
+ Type=session
+-Exec=@installed_tests_dir@/@program@
++Exec=@installed_tests_dir@/@program@.sh
+-- 
+2.33.1
+

@@ -4,7 +4,7 @@ DESCRIPTION = "Tool Command Language, is an open-source multi-purpose C library 
 SECTION = "devel/tcltk"
 
 # http://www.tcl.tk/software/tcltk/license.html
-LICENSE = "tcl & BSD-3-Clause"
+LICENSE = "TCL & BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://license.terms;md5=058f6229798281bbcac4239c788cfa38 \
     file://compat/license.terms;md5=058f6229798281bbcac4239c788cfa38 \
     file://library/license.terms;md5=058f6229798281bbcac4239c788cfa38 \
@@ -31,7 +31,7 @@ SRC_URI:class-native = "${BASE_SRC_URI}"
 
 # Upstream don't believe this is an exploitable issue
 # https://core.tcl-lang.org/tcl/info/7079e4f91601e9c7
-CVE_CHECK_WHITELIST += "CVE-2021-35331"
+CVE_CHECK_IGNORE += "CVE-2021-35331"
 
 UPSTREAM_CHECK_REGEX = "tcl(?P<pver>\d+(\.\d+)+)-src"
 

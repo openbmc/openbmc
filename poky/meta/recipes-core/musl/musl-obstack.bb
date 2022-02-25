@@ -4,7 +4,7 @@
 SUMMARY = "A standalone library to implement GNU libc's obstack"
 DESCRIPTION = "copy + paste of the obstack functions and macros found in GNU gcc libiberty library for use with musl libc"
 HOMEPAGE = "https://github.com/pullmoll/musl-obstack"
-LICENSE = "GPL-2.0+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=3d23e4eef8243efcaab6f0a438078932"
 SECTION = "libs"
 

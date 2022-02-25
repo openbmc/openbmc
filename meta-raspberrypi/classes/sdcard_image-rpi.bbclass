@@ -79,11 +79,11 @@ def split_overlays(d, out, ver=None):
     dts = d.getVar("KERNEL_DEVICETREE")
     # Device Tree Overlays are assumed to be suffixed by '-overlay.dtb' (4.1.x) or by '.dtbo' (4.4.9+) string and will be put in a dedicated folder
     if out:
-        overlays = oe.utils.str_filter_out('\S+\-overlay\.dtb$', dts, d)
-        overlays = oe.utils.str_filter_out('\S+\.dtbo$', overlays, d)
+        overlays = oe.utils.str_filter_out(r'\S+\-overlay\.dtb$', dts, d)
+        overlays = oe.utils.str_filter_out(r'\S+\.dtbo$', overlays, d)
     else:
-        overlays = oe.utils.str_filter('\S+\-overlay\.dtb$', dts, d) + \
-                   " " + oe.utils.str_filter('\S+\.dtbo$', dts, d)
+        overlays = oe.utils.str_filter(r'\S+\-overlay\.dtb$', dts, d) + \
+                   " " + oe.utils.str_filter(r'\S+\.dtbo$', dts, d)
 
     return overlays
 

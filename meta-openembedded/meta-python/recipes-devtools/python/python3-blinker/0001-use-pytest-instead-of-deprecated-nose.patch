@@ -1,0 +1,36 @@
+From 9750d01118ee59ab174525e30d987065b69c0538 Mon Sep 17 00:00:00 2001
+From: pgajdos <pgajdos@suse.cz>
+Date: Wed, 8 Jul 2020 15:22:19 +0200
+Subject: [PATCH] use pytest instead of deprecated nose
+
+Upstream-Status: Submitted [https://github.com/jek/blinker/pull/60]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/test_signals.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_signals.py b/tests/test_signals.py
+index 9771e40..ccbc35b 100644
+--- a/tests/test_signals.py
++++ b/tests/test_signals.py
+@@ -4,7 +4,7 @@ import time
+ 
+ import blinker
+ 
+-from nose.tools import assert_raises
++import pytest
+ 
+ 
+ jython = sys.platform.startswith('java')
+@@ -232,7 +232,7 @@ def test_meta_connect_failure():
+         pass
+     sig = blinker.Signal()
+ 
+-    assert_raises(TypeError, sig.connect, receiver)
++    pytest.raises(TypeError, sig.connect, receiver)
+     assert not sig.receivers
+     assert not sig._by_receiver
+     assert sig._by_sender == {blinker.base.ANY_ID: set()}
+-- 
+2.35.1
+

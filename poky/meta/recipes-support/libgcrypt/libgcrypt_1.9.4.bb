@@ -7,10 +7,10 @@ BUGTRACKER = "https://bugs.g10code.com/gnupg/index"
 SECTION = "libs"
 
 # helper program gcryptrnd and getrandom are under GPL, rest LGPL
-LICENSE = "GPLv2+ & LGPLv2.1+ & GPLv3+"
-LICENSE:${PN} = "LGPLv2.1+"
-LICENSE:${PN}-dev = "GPLv2+ & LGPLv2.1+"
-LICENSE:dumpsexp-dev = "GPLv3+"
+LICENSE = "GPL-2.0-or-later & LGPL-2.1-or-later & GPL-3.0-or-later"
+LICENSE:${PN} = "LGPL-2.1-or-later"
+LICENSE:${PN}-dev = "GPL-2.0-or-later & LGPL-2.1-or-later"
+LICENSE:dumpsexp-dev = "GPL-3.0-or-later"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
                     file://COPYING.LIB;md5=bbb461211a33b134d42ed5ee802b37ff \
@@ -30,7 +30,7 @@ SRC_URI = "${GNUPG_MIRROR}/libgcrypt/libgcrypt-${PV}.tar.bz2 \
 SRC_URI[sha256sum] = "ea849c83a72454e3ed4267697e8ca03390aee972ab421e7df69dfe42b65caaf7"
 
 # Below whitelisted CVEs are disputed and not affecting crypto libraries for any distro.
-CVE_CHECK_WHITELIST += "CVE-2018-12433 CVE-2018-12438"
+CVE_CHECK_IGNORE += "CVE-2018-12433 CVE-2018-12438"
 
 BINCONFIG = "${bindir}/libgcrypt-config"
 

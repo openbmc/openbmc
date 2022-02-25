@@ -2,7 +2,7 @@ SUMMARY = "Perl scripting language"
 HOMEPAGE = "http://www.perl.org/"
 DESCRIPTION = "Perl is a highly capable, feature-rich programming language"
 SECTION = "devel"
-LICENSE = "Artistic-1.0 | GPL-1.0+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://Copying;md5=5b122a36d0f6dc55279a0ebc69f3c60b \
                     file://Artistic;md5=71a4d5d9acc18c0952a6df2218bb68da \
                     "
@@ -356,7 +356,15 @@ do_create_rdepends_inc() {
 
 # Some additional dependencies that the above doesn't manage to figure out
 RDEPENDS:${PN}-module-file-spec += "${PN}-module-file-spec-unix"
+RDEPENDS:${PN}-module-io-file += "${PN}-module-symbol"
 RDEPENDS:${PN}-module-math-bigint += "${PN}-module-math-bigint-calc"
+RDEPENDS:${PN}-module-test-builder += "${PN}-module-list-util"
+RDEPENDS:${PN}-module-test-builder += "${PN}-module-scalar-util"
+RDEPENDS:${PN}-module-test-builder-formatter += "${PN}-module-test2-formatter-tap"
+RDEPENDS:${PN}-module-test2-api += "${PN}-module-test2-event-fail"
+RDEPENDS:${PN}-module-test2-api += "${PN}-module-test2-event-pass"
+RDEPENDS:${PN}-module-test2-api += "${PN}-module-test2-event-v2"
+RDEPENDS:${PN}-module-test2-formatter-tap += "${PN}-module-test2-formatter"
 RDEPENDS:${PN}-module-thread-queue += "${PN}-module-attributes"
 RDEPENDS:${PN}-module-overload += "${PN}-module-overloading"
 
@@ -366,12 +374,12 @@ EOPREAMBLE
     cp -r packages-split packages-split.new && cd packages-split.new
     find . -name \*.pm | xargs sed -i '/^=head/,/^=cut/d'
     egrep -r "^\s*(\<use .*|\<require .*);?" perl-module-* --include="*.pm" | \
-    sed "s/\/.*\.pm: */ += /g;s/[\"\']//g;s/;.*/\"/g;s/+= .*\(require\|use\)\> */+= \"perl-module-/g;s/CPANPLUS::.*/cpanplus/g;s/CPAN::.*/cpan/g;s/::/-/g;s/ [^+\"].*//g;s/_/-/g;s/\.pl\"$/\"/;s/\"\?\$/\"/;s/(//;" | tr [:upper:] [:lower:] | \
+    sed "s/\/.*\.pm: */ += /g;s/[\"\']//g;s/;.*/\"/g;s/+= .*\(require\|use\)\> */+= \"perl-module-/g;s/CPANPLUS::.*/cpanplus/g;s/CPAN::.*/cpan/g;s/::/-/g;s/ [^+\"].*//g;s/_/-/g;s/\.pl\"$/\"/;s/\"\?\$/\"/;s/(//;s/)//;" | tr [:upper:] [:lower:] | \
     awk '{if ($3 != "\x22"$1"\x22"){ print $0}}'| \
     grep -v -e "\-vms\-" -e module-5 -e "^$" -e "\\$" -e your -e tk -e autoperl -e html -e http -e parse-cpan -e perl-ostype -e ndbm-file -e module-mac -e fcgi -e lwp -e dbd -e dbix | \
     sort -u | \
     sed 's/^/RDEPENDS:/;s/perl-module-/${PN}-module-/g;s/module-\(module-\)/\1/g;s/\(module-load\)-conditional/\1/g;s/encode-configlocal/&-pm/;' | \
-    egrep -wv '=>|module-a|module-apache.?|module-apr|module-authen-sasl|module-b-asmdata|module-convert-ebcdic|module-devel-size|module-digest-perl-md5|module-dumpvalue|module-extutils-constant-aaargh56hash|module-extutils-xssymset|module-file-bsdglob|module-for|module-it|module-io-socket-inet6|module-io-socket-ssl|module-io-string|module-ipc-system-simple|module-lexical|module-local-lib|metadata|module-modperl-util|module-pluggable-object|module-test-builder-io-scalar|module-test2|module-text-unidecode|module-unicore|module-win32|objects\sload|syscall.ph|systeminfo.ph|%s' | \
+    egrep -wv '=>|module-a|module-apache.?|module-apr|module-authen-sasl|module-b-asmdata|module-convert-ebcdic|module-devel-size|module-digest-perl-md5|module-dumpvalue|module-extutils-constant-aaargh56hash|module-extutils-xssymset|module-file-bsdglob|module-for|module-it|module-io-socket-inet6|module-io-socket-ssl|module-io-string|module-ipc-system-simple|module-lexical|module-local-lib|metadata|module-modperl-util|module-pluggable-object|module-test-builder-io-scalar|module-text-unidecode|module-unicore|module-win32|objects\sload|syscall.ph|systeminfo.ph|%s' | \
     egrep -wv '=>|module-algorithm-diff|module-carp|module-c<extutils-mm-unix>|module-l<extutils-mm-unix>|module-encode-hanextra|module-extutils-makemaker-version-regex|module-file-spec|module-io-compress-lzma|module-io-uncompress-unxz|module-locale-maketext-lexicon|module-log-agent|module-meta-notation|module-net-localcfg|module-net-ping-external|module-b-deparse|module-scalar-util|module-some-module|module-symbol|module-uri|module-win32api-file' > ${WORKDIR}/perl-rdepends.generated
     cat ${WORKDIR}/perl-rdepends.inc ${WORKDIR}/perl-rdepends.generated > ${THISDIR}/files/perl-rdepends.txt
 }

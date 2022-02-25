@@ -2,7 +2,7 @@ SUMMARY = "Extremely fast non-cryptographic hash algorithm"
 DESCRIPTION = "xxHash is an extremely fast non-cryptographic hash algorithm, \
 working at speeds close to RAM limits."
 HOMEPAGE = "http://www.xxhash.com/"
-LICENSE = "BSD-2-Clause & GPL-2.0"
+LICENSE = "BSD-2-Clause & GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=cdfe7764d5685d8e08b3df302885d7f3 \
                     file://cli/COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                    "

@@ -211,11 +211,12 @@ RDEPENDS:packagegroup-meta-networking-support = "\
     netcat \
     netcat-openbsd \
     libtdb \
-    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "non-commercial", "netperf", "", d)} \
+    ${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "non-commercial", "netperf", "", d)} \
     yp-tools \
     ypbind-mt \
     yp-tools \
     mtr \
+    netsniff-ng \
     ntp ntpdate sntp ntpdc ntpq ntp-tickadj ntp-utils \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "ntpsec", "", d)} \
     nbd-client \

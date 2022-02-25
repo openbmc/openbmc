@@ -133,7 +133,7 @@ mount -o rw,loop,noatime,nodiratime /run/media/$1/$2 /rootmnt
 echo "Copying rootfs files..."
 cp -a /rootmnt/* /ssd
 
-touch /ssd/etc/masterimage
+touch /ssd/etc/controllerimage
 
 if [ -d /ssd/etc/ ] ; then
     # We dont want udev to mount our root device while we're booting...

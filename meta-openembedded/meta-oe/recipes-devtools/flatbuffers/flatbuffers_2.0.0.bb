@@ -17,7 +17,7 @@ SRCREV = "a9a295fecf3fbd5a4f571f53b01f63202a3e2113"
 SRC_URI = "git://github.com/google/flatbuffers.git;branch=master;protocol=https"
 S = "${WORKDIR}/git"
 
-CVE_CHECK_WHITELIST += "CVE-2020-35864"
+CVE_CHECK_IGNORE += "CVE-2020-35864"
 
 CXXFLAGS += "-fPIC"
 BUILD_CXXFLAGS += "-fPIC"

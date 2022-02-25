@@ -10,7 +10,7 @@ dot-matrix, inkjet and laser models. \
 HOMEPAGE = "http://www.ghostscript.com"
 SECTION = "console/utils"
 
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f98ffa763e50cded76f49bce73aade16"
 
 DEPENDS = "ghostscript-native tiff jpeg fontconfig cups libpng"
@@ -21,7 +21,7 @@ UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)\.tar"
 
 # As of ghostscript 9.54.0 the jpeg issue in the CVE is present in the gs jpeg sources
 # however we use an external jpeg which doesn't have the issue.
-CVE_CHECK_WHITELIST += "CVE-2013-6629"
+CVE_CHECK_IGNORE += "CVE-2013-6629"
 
 def gs_verdir(v):
     return "".join(v.split("."))

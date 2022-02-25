@@ -1,11 +1,12 @@
-From f08ab3ac2ce43ac91d3bf65b26f26436690f499b Mon Sep 17 00:00:00 2001
+From 6c3eeaf6435608f744303c17d52245f926cd28ac Mon Sep 17 00:00:00 2001
 From: Andre McCurdy <armccurdy@gmail.com>
 Date: Tue, 26 Jan 2016 15:16:01 -0800
-Subject: [PATCH 1/4] fix maybe-uninitialized warnings when compiling with -Os
+Subject: [PATCH] fix maybe-uninitialized warnings when compiling with -Os
 
 Upstream-Status: Pending
 
 Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+
 ---
  gst-libs/gst/codecparsers/gstvc1parser.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -23,6 +24,3 @@ index 2c60ced..e8226d8 100644
    guint8 structA[8] = { 0, };
    guint8 structB[12] = { 0, };
    GstBitReader br;
--- 
-2.28.0
-

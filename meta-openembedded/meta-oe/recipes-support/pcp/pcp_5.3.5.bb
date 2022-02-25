@@ -219,3 +219,7 @@ FILES:${PN}-dev += " \
         ${datadir}/man/man3/pms* \
         ${datadir}/man/man3/pmt* \
 "
+#| chkacc1.c:8:10: fatal error: localconfig.h: No such file or directory
+#|     8 | #include "localconfig.h"
+#|       |          ^~~~~~~~~~~~~~~
+PARALLEL_MAKE = ""

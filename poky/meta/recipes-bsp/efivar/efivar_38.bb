@@ -2,7 +2,7 @@ SUMMARY = "Tools to manipulate UEFI variables"
 DESCRIPTION = "efivar provides a simple command line interface to the UEFI variable facility"
 HOMEPAGE = "https://github.com/rhboot/efivar"
 
-LICENSE = "LGPLv2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6626bb1e20189cfa95f2c508ba286393"
 
 COMPATIBLE_HOST = "(i.86|x86_64|arm|aarch64).*-linux"

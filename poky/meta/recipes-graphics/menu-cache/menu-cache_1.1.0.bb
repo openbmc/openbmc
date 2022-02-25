@@ -2,7 +2,7 @@ SUMMARY = "Library for caching application menus"
 DESCRIPTION = "A library creating and utilizing caches to speed up freedesktop.org application menus"
 HOMEPAGE = "http://lxde.sourceforge.net/"
 
-LICENSE = "LGPLv2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0964c689fcf4c21c6797ea87408416b6"
 
 SECTION = "x11/libs"

@@ -6,7 +6,7 @@ The program supports recursive retrieval of web-authoring pages as well as \
 FTP sites"
 HOMEPAGE = "https://www.gnu.org/software/wget/"
 SECTION = "console/network"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c678957b0c8e964aa6c70fd77641a71e"
 
 inherit autotools gettext texinfo update-alternatives pkgconfig

@@ -4,7 +4,7 @@ different spelling libraries and programs with a consistent interface."
 SECTION = "libs"
 HOMEPAGE = "https://abiword.github.io/enchant/"
 BUGTRACKER = "https://github.com/AbiWord/enchant/issues/"
-LICENSE = "LGPLv2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=4fbd65380cdd255951079008b364516c"
 
 DEPENDS = "glib-2.0"

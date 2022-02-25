@@ -3,7 +3,7 @@ HOMEPAGE = "https://github.com/arsv/perl-cross"
 DESCRIPTION = "perl-cross provides configure script, top-level Makefile and some auxiliary files for perl, \
 with the primary emphasis on cross-compiling the source."
 SECTION = "devel"
-LICENSE = "Artistic-1.0 | GPL-1.0+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 # README.md is taken from https://github.com/arsv/perl-cross/blob/master/README.md
 # but is not provided inside the release tarballs
 LIC_FILES_CHKSUM = "file://${WORKDIR}/README.md;md5=252fcce2026b765fee1ad74d2fb07a3b"

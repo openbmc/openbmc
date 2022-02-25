@@ -6,7 +6,7 @@ instances to and from JSON data types."
 HOMEPAGE = "https://wiki.gnome.org/Projects/JsonGlib"
 BUGTRACKER = "https://gitlab.gnome.org/GNOME/json-glib/issues"
 
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=7fbc338309ac38fefcd64b04bb903e34"
 
 DEPENDS = "glib-2.0"

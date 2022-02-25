@@ -1,5 +1,5 @@
 SUMMARY = "A clock combined with a game of pong"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 DEPENDS = "virtual/libx11 xdmcp xau"
 
 inherit features_check pkgconfig

@@ -10,7 +10,7 @@ extensions."
 
 require xorg-lib-common.inc
 
-LICENSE = "MIT-style"
+LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=879ce266785414bd1cbc3bc2f4d9d7c8"
 
 DEPENDS += "xorgproto virtual/libx11"

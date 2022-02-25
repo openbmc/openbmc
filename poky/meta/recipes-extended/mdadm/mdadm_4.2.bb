@@ -3,7 +3,7 @@ HOMEPAGE = "http://www.kernel.org/pub/linux/utils/raid/mdadm/"
 DESCRIPTION = "mdadm is a Linux utility used to manage and monitor software RAID devices."
 
 # Some files are GPLv2+ while others are GPLv2.
-LICENSE = "GPLv2 & GPLv2+"
+LICENSE = "GPL-2.0-only & GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://mdmon.c;beginline=4;endline=18;md5=af7d8444d9c4d3e5c7caac0d9d34039d \
                     file://mdadm.h;beglinlne=4;endline=22;md5=462bc9936ac0d3da110191a3f9994161"
@@ -22,6 +22,8 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/raid/mdadm/${BPN}-${PV}.tar.xz \
            file://0001-mdadm-add-option-y-for-use-syslog-to-recive-event-re.patch \
            file://include_sysmacros.patch \
            file://0001-mdadm-skip-test-11spare-migration.patch \
+           file://0001-Fix-parsing-of-r-in-monitor-manager-mode.patch \
+           file://0001-Makefile-install-mdcheck.patch \
            "
 
 SRC_URI[sha256sum] = "461c215670864bb74a4d1a3620684aa2b2f8296dffa06743f26dda5557acf01d"
@@ -92,6 +94,7 @@ do_install_ptest() {
 	done
 }
 
+RDEPENDS:${PN} += "bash"
 RDEPENDS:${PN}-ptest += "bash e2fsprogs-mke2fs"
 RRECOMMENDS:${PN}-ptest += " \
     coreutils \

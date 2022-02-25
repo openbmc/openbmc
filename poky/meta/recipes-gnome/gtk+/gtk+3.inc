@@ -9,7 +9,7 @@ SECTION = "libs"
 DEPENDS = "glib-2.0 cairo pango atk jpeg libpng gdk-pixbuf \
            gdk-pixbuf-native"
 
-LICENSE = "LGPLv2 & LGPLv2+ & LGPLv2.1+"
+LICENSE = "LGPL-2.0-only & LGPL-2.0-or-later & LGPL-2.1-or-later"
 
 inherit autotools gettext pkgconfig gtk-doc update-alternatives gtk-immodules-cache gsettings features_check gobject-introspection
 

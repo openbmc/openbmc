@@ -4,7 +4,7 @@ These tests are useful for verifying the functionality of software as \
 installed and packaged, and complement rather than replace build-time \
 ('make check') tests."
 HOMEPAGE = "https://wiki.gnome.org/GnomeGoals/InstalledTests"
-LICENSE = "LGPLv2+"
+LICENSE = "LGPL-2.0-or-later"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=3bf50002aefd002f49e7bb854063f7e7 \
                     file://src/gnome-desktop-testing-runner.c;beginline=1;endline=20;md5=7ef3ad9da2ffcf7707dc11151fe007f4"

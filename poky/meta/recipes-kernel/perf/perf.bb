@@ -7,7 +7,7 @@ and software features (software counters, tracepoints) \
 as well."
 HOMEPAGE = "https://perf.wiki.kernel.org/index.php/Main_Page"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 
 PR = "r9"
 

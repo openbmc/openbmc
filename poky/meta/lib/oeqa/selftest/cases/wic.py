@@ -851,7 +851,7 @@ class Wic2(WicTestCase):
         self.assertEqual(0, bitbake('wic-image-minimal').status)
         self.remove_config(config)
 
-        with runqemu('wic-image-minimal', ssh=False) as qemu:
+        with runqemu('wic-image-minimal', ssh=False, runqemuparams='nographic') as qemu:
             cmd = "mount | grep '^/dev/' | cut -f1,3 -d ' ' | egrep -c -e '/dev/sda1 /boot' " \
                   "-e '/dev/root /|/dev/sda2 /' -e '/dev/sda3 /media' -e '/dev/sda4 /mnt'"
             status, output = qemu.run_serial(cmd)
@@ -871,7 +871,7 @@ class Wic2(WicTestCase):
         self.remove_config(config)
 
         with runqemu('core-image-minimal', ssh=False,
-                     runqemuparams='ovmf', image_fstype='wic') as qemu:
+                     runqemuparams='nographic ovmf', image_fstype='wic') as qemu:
             cmd = "grep sda. /proc/partitions  |wc -l"
             status, output = qemu.run_serial(cmd)
             self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
@@ -1059,27 +1059,38 @@ class Wic2(WicTestCase):
         self.assertEqual(0, bitbake('core-image-minimal-mtdutils').status)
         self.remove_config(config)
 
-        with runqemu('core-image-minimal-mtdutils', ssh=False, image_fstype='wic') as qemu:
+        with runqemu('core-image-minimal-mtdutils', ssh=False,
+                     runqemuparams='nographic', image_fstype='wic') as qemu:
             cmd = "grep sda. /proc/partitions  |wc -l"
             status, output = qemu.run_serial(cmd)
             self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
             self.assertEqual(output, '2')
 
-    def test_rawcopy_plugin(self):
+    def _rawcopy_plugin(self, fstype):
         """Test rawcopy plugin"""
         img = 'core-image-minimal'
         machine = get_bb_var('MACHINE', img)
+        params = ',unpack' if fstype.endswith('.gz') else ''
         with NamedTemporaryFile("w", suffix=".wks") as wks:
-            wks.writelines(['part /boot --active --source bootimg-pcbios\n',
-                            'part / --source rawcopy --sourceparams="file=%s-%s.ext4" --use-uuid\n'\
-                             % (img, machine),
-                            'bootloader --timeout=0 --append="console=ttyS0,115200n8"\n'])
+            wks.write('part / --source rawcopy --sourceparams="file=%s-%s.%s%s"\n'\
+                      % (img, machine, fstype, params))
             wks.flush()
             cmd = "wic create %s -e %s -o %s" % (wks.name, img, self.resultdir)
             runCmd(cmd)
             wksname = os.path.splitext(os.path.basename(wks.name))[0]
             out = glob(self.resultdir + "%s-*direct" % wksname)
             self.assertEqual(1, len(out))
+
+    def test_rawcopy_plugin(self):
+        self._rawcopy_plugin('ext4')
+
+    def test_rawcopy_plugin_unpack(self):
+        fstype = 'ext4.gz'
+        config = 'IMAGE_FSTYPES = "%s"\n' % fstype
+        self.append_config(config)
+        self.assertEqual(0, bitbake('core-image-minimal').status)
+        self.remove_config(config)
+        self._rawcopy_plugin(fstype)
 
     def test_empty_plugin(self):
         """Test empty plugin"""
@@ -1109,7 +1120,8 @@ class Wic2(WicTestCase):
         self.assertEqual(0, bitbake('core-image-minimal').status)
         self.remove_config(config)
 
-        with runqemu('core-image-minimal', ssh=False, image_fstype='wic') as qemu:
+        with runqemu('core-image-minimal', ssh=False,
+                     runqemuparams='nographic', image_fstype='wic') as qemu:
             # Check that we have ONLY two /dev/sda* partitions (/boot and /)
             cmd = "grep sda. /proc/partitions | wc -l"
             status, output = qemu.run_serial(cmd)
@@ -1170,7 +1182,7 @@ class Wic2(WicTestCase):
         self.remove_config(config)
 
         with runqemu('core-image-minimal', ssh=False,
-                     runqemuparams='ovmf', image_fstype='wic') as qemu:
+                     runqemuparams='nographic ovmf', image_fstype='wic') as qemu:
             # Check that /boot has EFI bootx64.efi (required for EFI)
             cmd = "ls /boot/EFI/BOOT/bootx64.efi | wc -l"
             status, output = qemu.run_serial(cmd)
@@ -1408,7 +1420,7 @@ class Wic2(WicTestCase):
             bb.utils.rename(new_image_path, image_path)
 
             # Check if it boots in qemu
-            with runqemu('core-image-minimal', ssh=False) as qemu:
+            with runqemu('core-image-minimal', ssh=False, runqemuparams='nographic') as qemu:
                 cmd = "ls /etc/"
                 status, output = qemu.run_serial('true')
                 self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))

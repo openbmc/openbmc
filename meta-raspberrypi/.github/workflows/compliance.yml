@@ -1,0 +1,47 @@
+# SPDX-FileCopyrightText: Andrei Gherzan <andrei.gherzan@huawei.com>
+#
+# SPDX-License-Identifier: MIT
+
+name: Compliance
+
+on:
+  pull_request:
+
+jobs:
+  dco:
+    name: DCO
+    runs-on: [self-hosted, Linux]
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Build a temporary DCO image
+        uses: ./.github/actions/docker-build
+        with:
+          docker_image: dco-check
+          id: ${{ github.event.number }}
+      - name: Do DCO check
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/work:ro" \
+            --env "BASE_REF=$GITHUB_BASE_REF" \
+            "dco-check-${{ github.event.number }}"
+      - name: Cleanup temporary docker image
+        uses: ./.github/actions/docker-clean-image
+        with:
+          docker_image: dco-check-${{ github.event.number }}
+        if: always()
+      - name: Cleanup dangling docker images
+        uses: ./.github/actions/docker-clean-dangling
+        if: always()
+  reuse:
+    name: reuse
+    runs-on: [self-hosted, Linux]
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Do reuse check
+        continue-on-error: true
+        uses: fsfe/reuse-action@v1

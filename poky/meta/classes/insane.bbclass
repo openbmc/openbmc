@@ -48,7 +48,7 @@ enabled tests are listed here, the do_package_qa task will run under fakeroot."
 
 ALL_QA = "${WARN_QA} ${ERROR_QA}"
 
-UNKNOWN_CONFIGURE_WHITELIST ?= "--enable-nls --disable-nls --disable-silent-rules --disable-dependency-tracking --with-libtool-sysroot --disable-static"
+UNKNOWN_CONFIGURE_OPT_IGNORE ?= "--enable-nls --disable-nls --disable-silent-rules --disable-dependency-tracking --with-libtool-sysroot --disable-static"
 
 # This is a list of directories that are expected to be empty.
 QA_EMPTY_DIRS ?= " \
@@ -325,8 +325,8 @@ def package_qa_check_arch(path,name,d, elf, messages):
     if not elf:
         return
 
-    target_os   = d.getVar('TARGET_OS')
-    target_arch = d.getVar('TARGET_ARCH')
+    target_os   = d.getVar('HOST_OS')
+    target_arch = d.getVar('HOST_ARCH')
     provides = d.getVar('PROVIDES')
     bpn = d.getVar('BPN')
 
@@ -684,26 +684,44 @@ def package_qa_recipe(warnfuncs, errorfuncs, pn, d):
 
     return len(errors) == 0
 
+def prepopulate_objdump_p(elf, d):
+    output = elf.run_objdump("-p", d)
+    return (elf.name, output)
+
 # Walk over all files in a directory and call func
 def package_qa_walk(warnfuncs, errorfuncs, package, d):
     #if this will throw an exception, then fix the dict above
-    target_os   = d.getVar('TARGET_OS')
-    target_arch = d.getVar('TARGET_ARCH')
+    target_os   = d.getVar('HOST_OS')
+    target_arch = d.getVar('HOST_ARCH')
 
     warnings = {}
     errors = {}
+    elves = {}
     for path in pkgfiles[package]:
             elf = None
             if os.path.isfile(path):
                 elf = oe.qa.ELFFile(path)
                 try:
                     elf.open()
+                    elf.close()
                 except oe.qa.NotELFFileError:
                     elf = None
+            if elf:
+                elves[path] = elf
+
+    results = oe.utils.multiprocess_launch(prepopulate_objdump_p, elves.values(), d, extraargs=(d,))
+    for item in results:
+        elves[item[0]].set_objdump("-p", item[1])
+
+    for path in pkgfiles[package]:
+            if path in elves:
+                elves[path].open()
             for func in warnfuncs:
-                func(path, package, d, elf, warnings)
+                func(path, package, d, elves.get(path), warnings)
             for func in errorfuncs:
-                func(path, package, d, elf, errors)
+                func(path, package, d, elves.get(path), errors)
+            if path in elves:
+                elves[path].close()
 
     for w in warnings:
         oe.qa.handle_error(w, warnings[w], d)
@@ -974,7 +992,7 @@ def package_qa_check_unhandled_features_check(pn, d, messages):
         var_set = False
         for kind in ['DISTRO', 'MACHINE', 'COMBINED']:
             for var in ['ANY_OF_' + kind + '_FEATURES', 'REQUIRED_' + kind + '_FEATURES', 'CONFLICT_' + kind + '_FEATURES']:
-                if d.getVar(var) is not None or d.overridedata.get(var) is not None:
+                if d.getVar(var) is not None or d.hasOverrides(var):
                     var_set = True
         if var_set:
             oe.qa.handle_error("unhandled-features-check", "%s: recipe doesn't inherit features_check" % pn, d)
@@ -1252,7 +1270,7 @@ Rerun configure task after fixing this."""
             options = set()
             for line in output.splitlines():
                 options |= set(line.partition(flag)[2].split())
-            whitelist = set(d.getVar("UNKNOWN_CONFIGURE_WHITELIST").split())
+            whitelist = set(d.getVar("UNKNOWN_CONFIGURE_OPT_IGNORE").split())
             options -= whitelist
             if options:
                 pn = d.getVar('PN')

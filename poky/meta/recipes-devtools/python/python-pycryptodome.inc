@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=29242a70410a4eeff488a28164e7ab93"
 
 inherit pypi
 
-PYPI_PACKAGE_EXT = "zip"
+PYPI_PACKAGE_EXT = "tar.gz"
 
 RDEPENDS:${PN} += " \
     ${PYTHON_PN}-io \

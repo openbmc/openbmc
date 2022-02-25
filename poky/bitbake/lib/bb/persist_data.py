@@ -63,7 +63,7 @@ class SQLTable(collections.abc.MutableMapping):
             """
             Decorator that starts a database transaction and creates a database
             cursor for performing queries. If no exception is thrown, the
-            database results are commited. If an exception occurs, the database
+            database results are committed. If an exception occurs, the database
             is rolled back. In all cases, the cursor is closed after the
             function ends.
 

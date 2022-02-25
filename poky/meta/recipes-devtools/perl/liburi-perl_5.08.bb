@@ -5,7 +5,7 @@ and manipulate the various components that make up these strings."
 
 HOMEPAGE = "http://search.cpan.org/dist/URI/"
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPL-1.0+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=c453e94fae672800f83bc1bd7a38b53f"
 

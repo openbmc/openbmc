@@ -1,20 +1,16 @@
-Index: libxml++-2.40.1/Makefile.am
-===================================================================
---- libxml++-2.40.1.orig/Makefile.am
-+++ libxml++-2.40.1/Makefile.am
-@@ -24,5 +24,8 @@ dist_noinst_SCRIPTS = autogen.sh
- 
- DISTCLEANFILES = MSVC_Net2010/libxml++/libxml++config.h
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -40,5 +40,8 @@ EXTRA_DIST = \
+   tools/conf_tests/have_exception_ptr.cc \
+   untracked/README
  
 +install-ptest:
 +	make -C examples install-ptest
 +
  # Optional: auto-generate the ChangeLog file from the git log on make dist
  include $(top_srcdir)/build/dist-changelog.am
-Index: libxml++-2.40.1/examples/Makefile.am
-===================================================================
---- libxml++-2.40.1.orig/examples/Makefile.am
-+++ libxml++-2.40.1/examples/Makefile.am
+--- a/examples/Makefile.am
++++ b/examples/Makefile.am
 @@ -19,6 +19,8 @@ AM_CPPFLAGS = -I$(top_builddir) -I$(top_
  AM_CXXFLAGS = $(LIBXMLXX_WXXFLAGS)
  LDADD = $(top_builddir)/libxml++/libxml++-$(LIBXMLXX_API_VERSION).la $(LIBXMLXX_LIBS)
@@ -51,10 +47,10 @@ Index: libxml++-2.40.1/examples/Makefile.am
 @@ -154,10 +173,10 @@ dist_noinst_DATA = \
  # file are located in different directories.
  dom_read_write/make_check.sh: Makefile
- 	echo '# Generated and used by "make check"' >$@
--	echo 'dom_read_write/dom_read_write "$(srcdir)/dom_read_write/example.xml" dom_read_write/example_output.xml >/dev/null' >>$@
-+	echo 'cd dom_read_write && .libs/dom_read_write "example.xml" example_output.xml >/dev/null' >>$@
- 	chmod +x $@
+ 	$(AM_V_GEN)echo '# Generated and used by "make check"' >$@
+-	$(AM_V_at)echo 'dom_read_write/dom_read_write "$(srcdir)/dom_read_write/example.xml" dom_read_write/example_output.xml >/dev/null' >>$@
++	$(AM_V_at)echo 'cd dom_read_write && .libs/dom_read_write "example.xml" example_output.xml >/dev/null' >>$@
+ 	$(AM_V_at)chmod +x $@
  
 -script_template = cd "$(srcdir)/<!progname!>" && "$(abs_builddir)/<!progname!>/<!progname!>" >/dev/null
 +script_template = cd "<!progname!>" && ".libs/<!progname!>" >/dev/null

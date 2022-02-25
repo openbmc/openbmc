@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: Andrei Gherzan <andrei.gherzan@huawei.com>
+#
+# SPDX-License-Identifier: MIT
+
+name: "Cleanup dangling docker images"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Cleanup dangling images
+      shell: bash
+      run: |
+        echo -n "Cleanup dangling images... "
+        if ! docker rmi $(docker images --filter "dangling=true" -q --no-trunc) > /dev/null 2>&1; then
+          echo "no dangling images found."
+        else
+          echo "done."
+        fi

@@ -199,7 +199,7 @@ class BBCooker:
 
         self.inotify_modified_files = []
 
-        def _process_inotify_updates(server, cooker, abort):
+        def _process_inotify_updates(server, cooker, halt):
             cooker.process_inotify_updates()
             return 1.0
 
@@ -505,7 +505,7 @@ class BBCooker:
             logger.debug("Base environment change, triggering reparse")
             self.reset()
 
-    def runCommands(self, server, data, abort):
+    def runCommands(self, server, data, halt):
         """
         Run any queued asynchronous command
         This is done by the idle handler so it runs in true context rather than
@@ -578,7 +578,7 @@ class BBCooker:
                 if pkgs_to_build[0] in set(ignore.split()):
                     bb.fatal("%s is in ASSUME_PROVIDED" % pkgs_to_build[0])
 
-                taskdata, runlist = self.buildTaskData(pkgs_to_build, None, self.configuration.abort, allowincomplete=True)
+                taskdata, runlist = self.buildTaskData(pkgs_to_build, None, self.configuration.halt, allowincomplete=True)
 
                 mc = runlist[0][0]
                 fn = runlist[0][3]
@@ -607,7 +607,7 @@ class BBCooker:
             data.emit_env(env, envdata, True)
             logger.plain(env.getvalue())
 
-        # emit the metadata which isnt valid shell
+        # emit the metadata which isn't valid shell
         for e in sorted(envdata.keys()):
             if envdata.getVarFlag(e, 'func', False) and envdata.getVarFlag(e, 'python', False):
                 logger.plain("\npython %s () {\n%s}\n", e, envdata.getVar(e, False))
@@ -616,7 +616,7 @@ class BBCooker:
             self.disableDataTracking()
             self.reset()
 
-    def buildTaskData(self, pkgs_to_build, task, abort, allowincomplete=False):
+    def buildTaskData(self, pkgs_to_build, task, halt, allowincomplete=False):
         """
         Prepare a runqueue and taskdata object for iteration over pkgs_to_build
         """
@@ -663,7 +663,7 @@ class BBCooker:
         localdata = {}
 
         for mc in self.multiconfigs:
-            taskdata[mc] = bb.taskdata.TaskData(abort, skiplist=self.skiplist, allowincomplete=allowincomplete)
+            taskdata[mc] = bb.taskdata.TaskData(halt, skiplist=self.skiplist, allowincomplete=allowincomplete)
             localdata[mc] = data.createCopy(self.databuilder.mcdata[mc])
             bb.data.expandKeys(localdata[mc])
 
@@ -737,7 +737,7 @@ class BBCooker:
         Prepare a runqueue and taskdata object for iteration over pkgs_to_build
         """
 
-        # We set abort to False here to prevent unbuildable targets raising
+        # We set halt to False here to prevent unbuildable targets raising
         # an exception when we're just generating data
         taskdata, runlist = self.buildTaskData(pkgs_to_build, task, False, allowincomplete=True)
 
@@ -1425,7 +1425,7 @@ class BBCooker:
 
         # Setup taskdata structure
         taskdata = {}
-        taskdata[mc] = bb.taskdata.TaskData(self.configuration.abort)
+        taskdata[mc] = bb.taskdata.TaskData(self.configuration.halt)
         taskdata[mc].add_provider(self.databuilder.mcdata[mc], self.recipecaches[mc], item)
 
         if quietlog:
@@ -1441,11 +1441,11 @@ class BBCooker:
 
         rq = bb.runqueue.RunQueue(self, self.data, self.recipecaches, taskdata, runlist)
 
-        def buildFileIdle(server, rq, abort):
+        def buildFileIdle(server, rq, halt):
 
             msg = None
             interrupted = 0
-            if abort or self.state == state.forceshutdown:
+            if halt or self.state == state.forceshutdown:
                 rq.finish_runqueue(True)
                 msg = "Forced shutdown"
                 interrupted = 2
@@ -1487,10 +1487,10 @@ class BBCooker:
         Attempt to build the targets specified
         """
 
-        def buildTargetsIdle(server, rq, abort):
+        def buildTargetsIdle(server, rq, halt):
             msg = None
             interrupted = 0
-            if abort or self.state == state.forceshutdown:
+            if halt or self.state == state.forceshutdown:
                 rq.finish_runqueue(True)
                 msg = "Forced shutdown"
                 interrupted = 2
@@ -1533,7 +1533,7 @@ class BBCooker:
 
         bb.event.fire(bb.event.BuildInit(packages), self.data)
 
-        taskdata, runlist = self.buildTaskData(targets, task, self.configuration.abort)
+        taskdata, runlist = self.buildTaskData(targets, task, self.configuration.halt)
 
         buildname = self.data.getVar("BUILDNAME", False)
 
@@ -1763,7 +1763,7 @@ class CookerCollectFiles(object):
     def __init__(self, priorities, mc=''):
         self.mc = mc
         self.bbappends = []
-        # Priorities is a list of tupples, with the second element as the pattern.
+        # Priorities is a list of tuples, with the second element as the pattern.
         # We need to sort the list with the longest pattern first, and so on to
         # the shortest.  This allows nested layers to be properly evaluated.
         self.bbfile_config_priorities = sorted(priorities, key=lambda tup: tup[1], reverse=True)
@@ -2167,6 +2167,8 @@ class CookerParser(object):
                                             self.total)
 
             bb.event.fire(event, self.cfgdata)
+        else:
+            bb.error("Parsing halted due to errors")
 
         for process in self.processes:
             self.parser_quit.put(None)
@@ -2257,7 +2259,7 @@ class CookerParser(object):
             return False
         except bb.BBHandledException as exc:
             self.error += 1
-            logger.error('Failed to parse recipe: %s' % exc.recipe)
+            logger.debug('Failed to parse recipe: %s' % exc.recipe)
             self.shutdown(clean=False, force=True)
             return False
         except ParsingFailure as exc:

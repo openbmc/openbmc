@@ -763,7 +763,7 @@ system and gives an overview of their function and contents.
 
          export BBSERVER=localhost:$port
 
-      By default, :term:`BBSERVER` also appears in :term:`BB_HASHBASE_WHITELIST`.
+      By default, :term:`BBSERVER` also appears in :term:`BB_BASEHASH_IGNORE_VARS`.
       Consequently, :term:`BBSERVER` is excluded from checksum and dependency
       data.
 
@@ -971,7 +971,7 @@ system and gives an overview of their function and contents.
       When inheriting the :ref:`buildhistory <ref-classes-buildhistory>`
       class, this variable specifies the directory in which build history
       information is kept. For more information on how the variable works,
-      see the ``buildhistory.bbclass`` file.
+      see the :ref:`ref-classes-buildhistory` class.
 
       By default, the :ref:`buildhistory <ref-classes-buildhistory>` class sets the directory as follows::
 
@@ -2162,8 +2162,7 @@ system and gives an overview of their function and contents.
       :term:`S` variable, which is what the OpenEmbedded build
       system uses to locate unpacked recipe source code.
 
-      For more information on ``externalsrc.bbclass``, see the
-      ":ref:`ref-classes-externalsrc`" section. You
+      See the ":ref:`ref-classes-externalsrc`" section for details. You
       can also find information on how to use this variable in the
       ":ref:`dev-manual/common-tasks:building software from an external source`"
       section in the Yocto Project Development Tasks Manual.
@@ -2176,8 +2175,7 @@ system and gives an overview of their function and contents.
       which is what the OpenEmbedded build system uses to locate the Build
       Directory.
 
-      For more information on ``externalsrc.bbclass``, see the
-      ":ref:`ref-classes-externalsrc`" section. You
+      See the ":ref:`ref-classes-externalsrc`" section for details. You
       can also find information on how to use this variable in the
       ":ref:`dev-manual/common-tasks:building software from an external source`"
       section in the Yocto Project Development Tasks Manual.
@@ -2501,7 +2499,7 @@ system and gives an overview of their function and contents.
       :term:`SRC_URI` statements.
 
       The default value for the :term:`FILESPATH` variable is defined in the
-      ``base.bbclass`` class found in ``meta/classes`` in the
+      :ref:`ref-classes-base` class found in ``meta/classes`` in the
       :term:`Source Directory`::
 
          FILESPATH = "${@base_set_filespath(["${FILE_DIRNAME}/${BP}", \
@@ -3085,7 +3083,7 @@ system and gives an overview of their function and contents.
       :term:`IMAGE_INSTALL` variable with care to avoid ordering issues.
 
       Image recipes set :term:`IMAGE_INSTALL` to specify the packages to
-      install into an image through ``image.bbclass``. Additionally,
+      install into an image through :ref:`ref-classes-image`. Additionally,
       there are "helper" classes such as the
       :ref:`core-image <ref-classes-core-image>` class which can
       take lists used with :term:`IMAGE_FEATURES` and turn them into
@@ -3118,7 +3116,7 @@ system and gives an overview of their function and contents.
             BitBake operator within the ``/conf/local.conf`` file or from
             within an image recipe is not recommended. Use of this operator
             in these ways can cause ordering issues. Since
-            ``core-image.bbclass`` sets :term:`IMAGE_INSTALL` to a default
+            :ref:`ref-classes-core-image` sets :term:`IMAGE_INSTALL` to a default
             value using the
             :ref:`?= <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:setting a default value (?=)>`
             operator, using a ``+=`` operation against :term:`IMAGE_INSTALL`
@@ -3556,6 +3554,13 @@ system and gives an overview of their function and contents.
          even if the toolchain's binaries are strippable, there are other files
          needed for the build that are not strippable.
 
+   :term:`INITRAMFS_DEPLOY_DIR_IMAGE`
+      Indicates the deploy directory used by ``do_bundle_initramfs`` where the
+      :term:`INITRAMFS_IMAGE` will be fetched from.
+      This variable is set by default to ``${DEPLOY_DIR_IMAGE}`` in the
+      :ref:`kernel <ref-classes-kernel>` class and it's only meant to be changed
+      when building an initramfs image from a separate multiconfig via :term:`INITRAMFS_MULTICONFIG`.
+
    :term:`INITRAMFS_FSTYPES`
       Defines the format for the output image of an initial RAM filesystem
       (initramfs), which is used during boot. Supported formats are the
@@ -3675,6 +3680,16 @@ system and gives an overview of their function and contents.
       See the :term:`MACHINE` variable for additional
       information.
 
+   :term:`INITRAMFS_MULTICONFIG`
+      Defines the multiconfig to create a multiconfig dependency to be used by the :ref:`kernel <ref-classes-kernel>` class.
+
+      This allows the kernel to bundle an :term:`INITRAMFS_IMAGE` coming from
+      a separate multiconfig, this is meant to be used in addition to :term:`INITRAMFS_DEPLOY_DIR_IMAGE`.
+
+      For more information on how to bundle an initramfs image from a separate
+      multiconfig see the ":ref:`dev-manual/common-tasks:Bundling an Initramfs Image From a Separate Multiconfig`"
+      section in the Yocto Project Development Tasks Manual.
+
    :term:`INITRAMFS_NAME`
       The base name of the initial RAM filesystem image. This variable is
       set in the ``meta/classes/kernel-artifact-names.bbclass`` file as
@@ -3708,7 +3723,7 @@ system and gives an overview of their function and contents.
       The filename of the initialization script as installed to
       ``${sysconfdir}/init.d``.
 
-      This variable is used in recipes when using ``update-rc.d.bbclass``.
+      This variable is used in recipes when using :ref:`ref-classes-update-rc.d`.
       The variable is mandatory.
 
    :term:`INITSCRIPT_PACKAGES`
@@ -3716,7 +3731,7 @@ system and gives an overview of their function and contents.
       are specified, you need to append the package name to the other
       ``INITSCRIPT_*`` as an override.
 
-      This variable is used in recipes when using ``update-rc.d.bbclass``.
+      This variable is used in recipes when using :ref:`ref-classes-update-rc.d`.
       The variable is optional and defaults to the :term:`PN`
       variable.
 
@@ -6346,7 +6361,7 @@ system and gives an overview of their function and contents.
       In the
       example, the package name (``${PN}-dev``) must appear as it would in
       the :term:`PACKAGES` namespace before any renaming of the output package
-      by classes such as ``debian.bbclass``.
+      by classes such as :ref:`ref-classes-debian`.
 
       BitBake, which the OpenEmbedded build system uses, supports
       specifying versioned recommends. Although the syntax varies depending
@@ -7198,7 +7213,7 @@ system and gives an overview of their function and contents.
       following maps the local search path ``universal-4.9`` to the
       server-provided path server_url_sstate_path::
 
-         SSTATE_MIRRORS ?= "file://universal-4.9/(.*) http://server_url_sstate_path/universal-4.8/\1 \n"
+         SSTATE_MIRRORS ?= "file://universal-4.9/(.*) https://server_url_sstate_path/universal-4.8/\1"
 
       If a mirror uses the same structure as
       :term:`SSTATE_DIR`, you need to add "PATH" at the
@@ -7207,7 +7222,7 @@ system and gives an overview of their function and contents.
       ::
 
          SSTATE_MIRRORS ?= "\
-             file://.* http://someserver.tld/share/sstate/PATH;downloadfilename=PATH \n \
+             file://.* https://someserver.tld/share/sstate/PATH;downloadfilename=PATH \
              file://.* file:///some-local-dir/sstate/PATH"
 
    :term:`SSTATE_SCAN_FILES`
@@ -7791,10 +7806,9 @@ system and gives an overview of their function and contents.
 
    :term:`TCLIBC`
       Specifies the GNU standard C library (``libc``) variant to use during
-      the build process. This variable replaces ``POKYLIBC``, which is no
-      longer supported.
+      the build process.
 
-      You can select "glibc", "musl", "newlib", or "baremetal"
+      You can select "glibc", "musl", "newlib", or "baremetal".
 
    :term:`TCLIBCAPPEND`
       Specifies a suffix to be appended onto the

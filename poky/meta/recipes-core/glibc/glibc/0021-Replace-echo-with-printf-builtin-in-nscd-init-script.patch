@@ -1,0 +1,79 @@
+From 77fbd98f551d5b2cd338aa7f524e5ed980edb65e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 31 Dec 2015 14:33:02 -0800
+Subject: [PATCH] Replace echo with printf builtin in nscd init script
+
+The nscd init script calls for #! /bin/bash interpreter
+since it uses bash specific extentions namely (translated strings)
+and echo -n command, replace echo with printf and
+switch the shell interpreter to #!/bin/sh.
+
+Upstream-Status: Submitted [https://patchwork.sourceware.org/project/glibc/patch/20211209203557.1318333-1-raj.khem@gmail.com/]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ nscd/nscd.init | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/nscd/nscd.init b/nscd/nscd.init
+index a882da7d8b..857b541381 100644
+--- a/nscd/nscd.init
++++ b/nscd/nscd.init
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ #
+ # nscd:		Starts the Name Switch Cache Daemon
+ #
+@@ -49,16 +49,16 @@ prog=nscd
+ start () {
+     [ -d /var/run/nscd ] || mkdir /var/run/nscd
+     [ -d /var/db/nscd ] || mkdir /var/db/nscd
+-    echo -n $"Starting $prog: "
++    printf "Starting $prog: "
+     daemon /usr/sbin/nscd
+     RETVAL=$?
+-    echo
++    printf "\n"
+     [ $RETVAL -eq 0 ] && touch /var/lock/subsys/nscd
+     return $RETVAL
+ }
+ 
+ stop () {
+-    echo -n $"Stopping $prog: "
++    printf "Stopping $prog: "
+     /usr/sbin/nscd -K
+     RETVAL=$?
+     if [ $RETVAL -eq 0 ]; then
+@@ -67,11 +67,11 @@ stop () {
+ 	# a non-privileged user
+ 	rm -f /var/run/nscd/nscd.pid
+ 	rm -f /var/run/nscd/socket
+-       	success $"$prog shutdown"
++	success "$prog shutdown"
+     else
+-       	failure $"$prog shutdown"
++	failure "$prog shutdown"
+     fi
+-    echo
++    printf "\n"
+     return $RETVAL
+ }
+ 
+@@ -103,13 +103,13 @@ case "$1" in
+ 	RETVAL=$?
+ 	;;
+     force-reload | reload)
+-    	echo -n $"Reloading $prog: "
++	printf "Reloading $prog: "
+ 	killproc /usr/sbin/nscd -HUP
+ 	RETVAL=$?
+-	echo
++	printf "\n"
+ 	;;
+     *)
+-	echo $"Usage: $0 {start|stop|status|restart|reload|condrestart}"
++	printf "Usage: $0 {start|stop|status|restart|reload|condrestart}\n"
+ 	RETVAL=1
+ 	;;
+ esac

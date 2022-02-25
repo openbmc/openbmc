@@ -33,7 +33,7 @@ databaseCheck()
     $MANAGE migrate --noinput || retval=1
 
     if [ $retval -eq 1 ]; then
-        echo "Failed migrations, aborting system start" 1>&2
+        echo "Failed migrations, halting system start" 1>&2
         return $retval
     fi
     # Make sure that checksettings can pick up any value for TEMPLATECONF
@@ -41,7 +41,7 @@ databaseCheck()
     $MANAGE checksettings --traceback || retval=1
 
     if [ $retval -eq 1 ]; then
-        printf "\nError while checking settings; aborting\n"
+        printf "\nError while checking settings; exiting\n"
         return $retval
     fi
 
@@ -248,7 +248,7 @@ fi
 # 3) the sqlite db if that is being used.
 # 4) pid's we need to clean up on exit/shutdown
 export TOASTER_DIR=$TOASTERDIR
-export BB_ENV_EXTRAWHITE="$BB_ENV_EXTRAWHITE TOASTER_DIR"
+export BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS TOASTER_DIR"
 
 # Determine the action. If specified by arguments, fine, if not, toggle it
 if [ "$CMD" = "start" ] ; then

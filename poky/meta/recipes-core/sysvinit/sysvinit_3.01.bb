@@ -2,7 +2,7 @@ SUMMARY = "System-V like init"
 DESCRIPTION = "This package is required to boot in most configurations.  It provides the /sbin/init program.  This is the first process started on boot, and the last process terminated before the system halts."
 HOMEPAGE = "http://savannah.nongnu.org/projects/sysvinit/"
 SECTION = "base"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe \
                     file://COPYRIGHT;endline=15;md5=a1d3b3526501d3546d530bbe6ab6cdbe \
                     "

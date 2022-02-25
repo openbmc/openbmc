@@ -10,7 +10,7 @@ RDEPENDS:${PN} += "${PYTHON_PN}-importlib-metadata \
                    ${PYTHON_PN}-more-itertools \
 "
 
-inherit pypi ptest setuptools3
+inherit pypi ptest setuptools_build_meta
 
 SRC_URI += " \
 	file://run-ptest \

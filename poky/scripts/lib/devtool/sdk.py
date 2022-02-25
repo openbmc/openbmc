@@ -207,7 +207,7 @@ def sdk_update(args, config, basepath, workspace):
         if not sstate_mirrors:
             with open(os.path.join(conf_dir, 'site.conf'), 'a') as f:
                 f.write('SCONF_VERSION = "%s"\n' % site_conf_version)
-                f.write('SSTATE_MIRRORS:append = " file://.* %s/sstate-cache/PATH \\n "\n' % updateserver)
+                f.write('SSTATE_MIRRORS:append = " file://.* %s/sstate-cache/PATH"\n' % updateserver)
     finally:
         shutil.rmtree(tmpsdk_dir)
 

@@ -19,13 +19,7 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[no-idle-timeout] = ",,"
 
 DEFAULTBACKEND ??= ""
-DEFAULTBACKEND:qemuall ?= "fbdev"
-DEFAULTBACKEND:qemuarm64 = "drm"
-DEFAULTBACKEND:qemux86 = "drm"
-DEFAULTBACKEND:qemux86-64 = "drm"
-# gallium swrast was found to crash weston on startup in x32 qemu
-DEFAULTBACKEND:qemux86-64:x86-x32 = "fbdev"
-DEFAULTBACKEND:x86-x32 = "fbdev"
+DEFAULTBACKEND:qemuall ?= "drm"
 
 do_install() {
         if [ "${VIRTUAL-RUNTIME_init_manager}" != "systemd" ]; then

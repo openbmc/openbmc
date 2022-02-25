@@ -8,7 +8,8 @@ HOMEPAGE = "http://www.isc.org/"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://LICENSE;beginline=4;md5=004a4db50a1e20972e924a8618747c01"
 
-DEPENDS = "openssl libcap zlib"
+DEPENDS = "openssl libcap zlib chrpath-replacement-native"
+EXTRANATIVEPATH += "chrpath-native"
 
 SRC_URI = "https://ftp.isc.org/isc/dhcp/4.4.2-P1/dhcp-4.4.2-P1.tar.gz \
            https://ftp.isc.org/isc/bind9/9.11.32/bind-9.11.32.tar.gz;name=bind;unpack=0 \
@@ -62,8 +63,11 @@ do_compile:prepend() {
 }
 
 do_install:append () {
-    install -d ${D}${sysconfdir}/default
-    install -m 0644 ${WORKDIR}/default-relay ${D}${sysconfdir}/default/dhcp-relay
+    install -Dm 0644 ${WORKDIR}/default-relay ${D}${sysconfdir}/default/dhcp-relay
+    install -Dm 0755 ${B}/bind/bind-9.11.32/lib/isccfg/.libs/libisccfg.so.163 ${D}${libdir}/libisccfg.so.163
+    install -Dm 0755 ${B}/bind/bind-9.11.32/lib/dns/.libs/libdns.so.1115 ${D}${libdir}/libdns.so.1115
+    chrpath --delete ${D}${libdir}/libisccfg.so.163
+    chrpath --delete ${D}${libdir}/libdns.so.1115
 
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_unitdir}/system

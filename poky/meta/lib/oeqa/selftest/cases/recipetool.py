@@ -472,25 +472,6 @@ class RecipetoolCreateTests(RecipetoolBase):
         inherits = ['setuptools3']
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
-    def test_recipetool_create_python3_distutils(self):
-        # Test creating python3 package from tarball (using distutils3 class)
-        temprecipe = os.path.join(self.tempdir, 'recipe')
-        os.makedirs(temprecipe)
-        pn = 'docutils'
-        pv = '0.14'
-        recipefile = os.path.join(temprecipe, '%s_%s.bb' % (pn, pv))
-        srcuri = 'https://files.pythonhosted.org/packages/84/f4/5771e41fdf52aabebbadecc9381d11dea0fa34e4759b4071244fa094804c/docutils-%s.tar.gz' % pv
-        result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
-        self.assertTrue(os.path.isfile(recipefile))
-        checkvars = {}
-        checkvars['LICENSE'] = 'BSD-3-Clause & GPL & PSF'
-        checkvars['LIC_FILES_CHKSUM'] = 'file://COPYING.txt;md5=35a23d42b615470583563132872c97d6'
-        checkvars['SRC_URI'] = 'https://files.pythonhosted.org/packages/84/f4/5771e41fdf52aabebbadecc9381d11dea0fa34e4759b4071244fa094804c/docutils-${PV}.tar.gz'
-        checkvars['SRC_URI[md5sum]'] = 'c53768d63db3873b7d452833553469de'
-        checkvars['SRC_URI[sha256sum]'] = '51e64ef2ebfb29cae1faa133b3710143496eca21c530f3f71424d77687764274'
-        inherits = ['distutils3']
-        self._test_recipe_contents(recipefile, checkvars, inherits)
-
     def test_recipetool_create_github_tarball(self):
         # Basic test to ensure github URL mangling doesn't apply to release tarballs
         temprecipe = os.path.join(self.tempdir, 'recipe')

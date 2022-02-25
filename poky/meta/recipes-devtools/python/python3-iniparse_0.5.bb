@@ -1,6 +1,6 @@
 SUMMARY = "Accessing and Modifying INI files"
 HOMEPAGE = "https://pypi.org/project/iniparse/"
-LICENSE = "MIT & PSF"
+LICENSE = "MIT & PSF-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE-PSF;md5=1c78a5bb3584b353496d5f6f34edb4b2 \
                     file://LICENSE;md5=52f28065af11d69382693b45b5a8eb54"
 

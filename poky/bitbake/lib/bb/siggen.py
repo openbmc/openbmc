@@ -172,8 +172,8 @@ class SignatureGeneratorBasic(SignatureGenerator):
         self.gendeps = {}
         self.lookupcache = {}
         self.setscenetasks = set()
-        self.basewhitelist = set((data.getVar("BB_HASHBASE_WHITELIST") or "").split())
-        self.taskwhitelist = None
+        self.basehash_ignore_vars = set((data.getVar("BB_BASEHASH_IGNORE_VARS") or "").split())
+        self.taskhash_ignore_tasks = None
         self.init_rundepcheck(data)
         checksum_cache_file = data.getVar("BB_HASH_CHECKSUM_CACHE_FILE")
         if checksum_cache_file:
@@ -188,18 +188,18 @@ class SignatureGeneratorBasic(SignatureGenerator):
         self.tidtopn = {}
 
     def init_rundepcheck(self, data):
-        self.taskwhitelist = data.getVar("BB_HASHTASK_WHITELIST") or None
-        if self.taskwhitelist:
-            self.twl = re.compile(self.taskwhitelist)
+        self.taskhash_ignore_tasks = data.getVar("BB_TASKHASH_IGNORE_TASKS") or None
+        if self.taskhash_ignore_tasks:
+            self.twl = re.compile(self.taskhash_ignore_tasks)
         else:
             self.twl = None
 
     def _build_data(self, fn, d):
 
         ignore_mismatch = ((d.getVar("BB_HASH_IGNORE_MISMATCH") or '') == '1')
-        tasklist, gendeps, lookupcache = bb.data.generate_dependencies(d, self.basewhitelist)
+        tasklist, gendeps, lookupcache = bb.data.generate_dependencies(d, self.basehash_ignore_vars)
 
-        taskdeps, basehash = bb.data.generate_dependency_hash(tasklist, gendeps, lookupcache, self.basewhitelist, fn)
+        taskdeps, basehash = bb.data.generate_dependency_hash(tasklist, gendeps, lookupcache, self.basehash_ignore_vars, fn)
 
         for task in tasklist:
             tid = fn + ":" + task
@@ -253,7 +253,8 @@ class SignatureGeneratorBasic(SignatureGenerator):
 
     def rundep_check(self, fn, recipename, task, dep, depname, dataCaches):
         # Return True if we should keep the dependency, False to drop it
-        # We only manipulate the dependencies for packages not in the whitelist
+        # We only manipulate the dependencies for packages not in the ignore
+        # list
         if self.twl and not self.twl.search(recipename):
             # then process the actual dependencies
             if self.twl.search(depname):
@@ -372,15 +373,15 @@ class SignatureGeneratorBasic(SignatureGenerator):
 
         data = {}
         data['task'] = task
-        data['basewhitelist'] = self.basewhitelist
-        data['taskwhitelist'] = self.taskwhitelist
+        data['basehash_ignore_vars'] = self.basehash_ignore_vars
+        data['taskhash_ignore_tasks'] = self.taskhash_ignore_tasks
         data['taskdeps'] = self.taskdeps[fn][task]
         data['basehash'] = self.basehash[tid]
         data['gendeps'] = {}
         data['varvals'] = {}
         data['varvals'][task] = self.lookupcache[fn][task]
         for dep in self.taskdeps[fn][task]:
-            if dep in self.basewhitelist:
+            if dep in self.basehash_ignore_vars:
                 continue
             data['gendeps'][dep] = self.gendeps[fn][dep]
             data['varvals'][dep] = self.lookupcache[fn][dep]
@@ -583,7 +584,7 @@ class SignatureGeneratorUniHashMixIn(object):
         if self.setscenetasks and tid not in self.setscenetasks:
             return
 
-        # This can happen if locked sigs are in action. Detect and just abort
+        # This can happen if locked sigs are in action. Detect and just exit
         if taskhash != self.taskhash[tid]:
             return
 
@@ -794,6 +795,16 @@ def clean_basepaths_list(a):
         b.append(clean_basepath(x))
     return b
 
+# Handled renamed fields
+def handle_renames(data):
+    if 'basewhitelist' in data:
+        data['basehash_ignore_vars'] = data['basewhitelist']
+        del data['basewhitelist']
+    if 'taskwhitelist' in data:
+        data['taskhash_ignore_tasks'] = data['taskwhitelist']
+        del data['taskwhitelist']
+
+
 def compare_sigfiles(a, b, recursecb=None, color=False, collapsed=False):
     output = []
 
@@ -819,13 +830,16 @@ def compare_sigfiles(a, b, recursecb=None, color=False, collapsed=False):
     with bb.compress.zstd.open(b, "rt", encoding="utf-8", num_threads=1) as f:
         b_data = json.load(f, object_hook=SetDecoder)
 
-    def dict_diff(a, b, whitelist=set()):
+    for data in [a_data, b_data]:
+        handle_renames(data)
+
+    def dict_diff(a, b, ignored_vars=set()):
         sa = set(a.keys())
         sb = set(b.keys())
         common = sa & sb
         changed = set()
         for i in common:
-            if a[i] != b[i] and i not in whitelist:
+            if a[i] != b[i] and i not in ignored_vars:
                 changed.add(i)
         added = sb - sa
         removed = sa - sb
@@ -864,15 +878,15 @@ def compare_sigfiles(a, b, recursecb=None, color=False, collapsed=False):
         removed = [x[0] for x in removed]
         return changed, added, removed
 
-    if 'basewhitelist' in a_data and a_data['basewhitelist'] != b_data['basewhitelist']:
-        output.append(color_format("{color_title}basewhitelist changed{color_default} from '%s' to '%s'") % (a_data['basewhitelist'], b_data['basewhitelist']))
-        if a_data['basewhitelist'] and b_data['basewhitelist']:
-            output.append("changed items: %s" % a_data['basewhitelist'].symmetric_difference(b_data['basewhitelist']))
+    if 'basehash_ignore_vars' in a_data and a_data['basehash_ignore_vars'] != b_data['basehash_ignore_vars']:
+        output.append(color_format("{color_title}basehash_ignore_vars changed{color_default} from '%s' to '%s'") % (a_data['basehash_ignore_vars'], b_data['basehash_ignore_vars']))
+        if a_data['basehash_ignore_vars'] and b_data['basehash_ignore_vars']:
+            output.append("changed items: %s" % a_data['basehash_ignore_vars'].symmetric_difference(b_data['basehash_ignore_vars']))
 
-    if 'taskwhitelist' in a_data and a_data['taskwhitelist'] != b_data['taskwhitelist']:
-        output.append(color_format("{color_title}taskwhitelist changed{color_default} from '%s' to '%s'") % (a_data['taskwhitelist'], b_data['taskwhitelist']))
-        if a_data['taskwhitelist'] and b_data['taskwhitelist']:
-            output.append("changed items: %s" % a_data['taskwhitelist'].symmetric_difference(b_data['taskwhitelist']))
+    if 'taskhash_ignore_tasks' in a_data and a_data['taskhash_ignore_tasks'] != b_data['taskhash_ignore_tasks']:
+        output.append(color_format("{color_title}taskhash_ignore_tasks changed{color_default} from '%s' to '%s'") % (a_data['taskhash_ignore_tasks'], b_data['taskhash_ignore_tasks']))
+        if a_data['taskhash_ignore_tasks'] and b_data['taskhash_ignore_tasks']:
+            output.append("changed items: %s" % a_data['taskhash_ignore_tasks'].symmetric_difference(b_data['taskhash_ignore_tasks']))
 
     if a_data['taskdeps'] != b_data['taskdeps']:
         output.append(color_format("{color_title}Task dependencies changed{color_default} from:\n%s\nto:\n%s") % (sorted(a_data['taskdeps']), sorted(b_data['taskdeps'])))
@@ -880,7 +894,7 @@ def compare_sigfiles(a, b, recursecb=None, color=False, collapsed=False):
     if a_data['basehash'] != b_data['basehash'] and not collapsed:
         output.append(color_format("{color_title}basehash changed{color_default} from %s to %s") % (a_data['basehash'], b_data['basehash']))
 
-    changed, added, removed = dict_diff(a_data['gendeps'], b_data['gendeps'], a_data['basewhitelist'] & b_data['basewhitelist'])
+    changed, added, removed = dict_diff(a_data['gendeps'], b_data['gendeps'], a_data['basehash_ignore_vars'] & b_data['basehash_ignore_vars'])
     if changed:
         for dep in sorted(changed):
             output.append(color_format("{color_title}List of dependencies for variable %s changed from '{color_default}%s{color_title}' to '{color_default}%s{color_title}'") % (dep, a_data['gendeps'][dep], b_data['gendeps'][dep]))
@@ -1054,9 +1068,11 @@ def dump_sigfile(a):
     with bb.compress.zstd.open(a, "rt", encoding="utf-8", num_threads=1) as f:
         a_data = json.load(f, object_hook=SetDecoder)
 
-    output.append("basewhitelist: %s" % (sorted(a_data['basewhitelist'])))
+    handle_renames(a_data)
 
-    output.append("taskwhitelist: %s" % (sorted(a_data['taskwhitelist'] or [])))
+    output.append("basehash_ignore_vars: %s" % (sorted(a_data['basehash_ignore_vars'])))
+
+    output.append("taskhash_ignore_tasks: %s" % (sorted(a_data['taskhash_ignore_tasks'] or [])))
 
     output.append("Task dependencies: %s" % (sorted(a_data['taskdeps'])))
 

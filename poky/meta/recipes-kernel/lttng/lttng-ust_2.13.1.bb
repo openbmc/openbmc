@@ -3,7 +3,7 @@ DESCRIPTION = "The LTTng UST 2.x package contains the userspace tracer library t
 HOMEPAGE = "http://lttng.org/ust"
 BUGTRACKER = "https://bugs.lttng.org/projects/lttng-ust"
 
-LICENSE = "LGPLv2.1+ & MIT & GPLv2"
+LICENSE = "LGPL-2.1-or-later & MIT & GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a46577a38ad0c36ff6ff43ccf40c480f"
 
 PYTHON_OPTION = "am_cv_python_pyexecdir='${PYTHON_SITEPACKAGES_DIR}' \

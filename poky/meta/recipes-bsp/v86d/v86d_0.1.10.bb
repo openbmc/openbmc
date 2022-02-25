@@ -3,7 +3,7 @@ HOMEPAGE = "https://tracker.debian.org/pkg/v86d"
 DESCRIPTION = "v86d provides a backend for kernel drivers that need to execute x86 BIOS code. The code is executed in a controlled environment and the results are passed back to the kernel via the netlink interface."
 
 # the copyright info is at the bottom of README, expect break
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://README;md5=94ac1971e4f2309dc322d598e7b1f7dd"
 
 DEPENDS = "virtual/kernel"

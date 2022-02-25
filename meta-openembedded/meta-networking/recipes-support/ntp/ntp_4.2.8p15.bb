@@ -29,7 +29,7 @@ SRC_URI = "http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-${PV}.tar.g
 SRC_URI[sha256sum] = "f65840deab68614d5d7ceb2d0bb9304ff70dcdedd09abb79754a87536b849c19"
 
 # CVE-2016-9312 is only for windows.
-CVE_CHECK_WHITELIST += "CVE-2016-9312"
+CVE_CHECK_IGNORE += "CVE-2016-9312"
 
 inherit autotools update-rc.d useradd systemd pkgconfig
 

@@ -39,7 +39,7 @@ def waflock_hash(d):
 # directory (e.g. if the source is coming from externalsrc and was previously
 # configured elsewhere).
 export WAFLOCK = ".lock-waf_oe_${@waflock_hash(d)}_build"
-BB_HASHBASE_WHITELIST += "WAFLOCK"
+BB_BASEHASH_IGNORE_VARS += "WAFLOCK"
 
 python waf_preconfigure() {
     import subprocess

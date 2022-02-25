@@ -1,0 +1,88 @@
+From 6e9d0d578fdf90901507dd9f9929d0e6fcdd3211 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Wed, 26 Jan 2022 14:49:11 -0500
+Subject: [PATCH 6/7] fix: net: skb: introduce kfree_skb_reason() (v5.17)
+
+See upstream commit :
+
+  commit c504e5c2f9648a1e5c2be01e8c3f59d394192bd3
+  Author: Menglong Dong <imagedong@tencent.com>
+  Date:   Sun Jan 9 14:36:26 2022 +0800
+
+    net: skb: introduce kfree_skb_reason()
+
+    Introduce the interface kfree_skb_reason(), which is able to pass
+    the reason why the skb is dropped to 'kfree_skb' tracepoint.
+
+    Add the 'reason' field to 'trace_kfree_skb', therefor user can get
+    more detail information about abnormal skb with 'drop_monitor' or
+    eBPF.
+
+    All drop reasons are defined in the enum 'skb_drop_reason', and
+    they will be print as string in 'kfree_skb' tracepoint in format
+    of 'reason: XXX'.
+
+    ( Maybe the reasons should be defined in a uapi header file, so that
+    user space can use them? )
+
+Upstream-Status: Backport [lttng-modules commit 6e9d0d578fdf90901507dd9f9929d0e6fcdd3211]
+
+Change-Id: I6766678a288da959498a4736fc3f95bf239c3e94
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/instrumentation/events/skb.h | 31 ++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/include/instrumentation/events/skb.h b/include/instrumentation/events/skb.h
+index d6579363..c6d7095d 100644
+--- a/include/instrumentation/events/skb.h
++++ b/include/instrumentation/events/skb.h
+@@ -13,6 +13,36 @@
+ /*
+  * Tracepoint for free an sk_buff:
+  */
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,17,0))
++LTTNG_TRACEPOINT_ENUM(skb_drop_reason,
++	TP_ENUM_VALUES(
++		ctf_enum_value("NOT_SPECIFIED",	SKB_DROP_REASON_NOT_SPECIFIED)
++		ctf_enum_value("NO_SOCKET",	SKB_DROP_REASON_NO_SOCKET)
++		ctf_enum_value("PKT_TOO_SMALL",	SKB_DROP_REASON_PKT_TOO_SMALL)
++		ctf_enum_value("TCP_CSUM",	SKB_DROP_REASON_TCP_CSUM)
++		ctf_enum_value("TCP_FILTER",	SKB_DROP_REASON_TCP_FILTER)
++		ctf_enum_value("UDP_CSUM",	SKB_DROP_REASON_UDP_CSUM)
++		ctf_enum_value("MAX",		SKB_DROP_REASON_MAX)
++	)
++)
++
++LTTNG_TRACEPOINT_EVENT_MAP(kfree_skb,
++
++	skb_kfree,
++
++	TP_PROTO(struct sk_buff *skb, void *location,
++		enum skb_drop_reason reason),
++
++	TP_ARGS(skb, location, reason),
++
++	TP_FIELDS(
++		ctf_integer_hex(void *, skbaddr, skb)
++		ctf_integer_hex(void *, location, location)
++		ctf_integer_network(unsigned short, protocol, skb->protocol)
++		ctf_enum(skb_drop_reason, uint8_t, reason, reason)
++	)
++)
++#else
+ LTTNG_TRACEPOINT_EVENT_MAP(kfree_skb,
+ 
+ 	skb_kfree,
+@@ -27,6 +57,7 @@ LTTNG_TRACEPOINT_EVENT_MAP(kfree_skb,
+ 		ctf_integer_network(unsigned short, protocol, skb->protocol)
+ 	)
+ )
++#endif
+ 
+ LTTNG_TRACEPOINT_EVENT_MAP(consume_skb,
+ 
+-- 
+2.19.1
+

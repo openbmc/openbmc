@@ -22,11 +22,9 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  create mode 100644 src/basic/parse-printf-format.c
  create mode 100644 src/basic/parse-printf-format.h
 
-diff --git a/meson.build b/meson.build
-index 5bdfd9753d..3421da3a4d 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -656,6 +656,7 @@ endif
+@@ -686,6 +686,7 @@ endif
  foreach header : ['crypt.h',
                    'linux/memfd.h',
                    'linux/vm_sockets.h',
@@ -34,11 +32,9 @@ index 5bdfd9753d..3421da3a4d 100644
                    'sys/auxv.h',
                    'valgrind/memcheck.h',
                    'valgrind/valgrind.h',
-diff --git a/src/basic/meson.build b/src/basic/meson.build
-index 452b965db3..4e64d883dc 100644
 --- a/src/basic/meson.build
 +++ b/src/basic/meson.build
-@@ -321,6 +321,11 @@ endforeach
+@@ -335,6 +335,11 @@ endforeach
  
  basic_sources += generated_gperf_headers
  
@@ -50,9 +46,6 @@ index 452b965db3..4e64d883dc 100644
  ############################################################
  
  arch_list = [
-diff --git a/src/basic/parse-printf-format.c b/src/basic/parse-printf-format.c
-new file mode 100644
-index 0000000000..49437e5445
 --- /dev/null
 +++ b/src/basic/parse-printf-format.c
 @@ -0,0 +1,273 @@
@@ -329,9 +322,6 @@ index 0000000000..49437e5445
 +
 +        return last;
 +}
-diff --git a/src/basic/parse-printf-format.h b/src/basic/parse-printf-format.h
-new file mode 100644
-index 0000000000..47be7522d7
 --- /dev/null
 +++ b/src/basic/parse-printf-format.h
 @@ -0,0 +1,57 @@
@@ -392,8 +382,6 @@ index 0000000000..47be7522d7
 +size_t parse_printf_format(const char *fmt, size_t n, int *types);
 +
 +#endif /* HAVE_PRINTF_H */
-diff --git a/src/basic/stdio-util.h b/src/basic/stdio-util.h
-index 6dc1e72312..cea76b36cf 100644
 --- a/src/basic/stdio-util.h
 +++ b/src/basic/stdio-util.h
 @@ -1,13 +1,13 @@
@@ -409,10 +397,8 @@ index 6dc1e72312..cea76b36cf 100644
  #include "memory-util.h"
 +#include "parse-printf-format.h"
  
- #define snprintf_ok(buf, len, fmt, ...) \
-         ((size_t) snprintf(buf, len, fmt, __VA_ARGS__) < (len))
-diff --git a/src/libsystemd/sd-journal/journal-send.c b/src/libsystemd/sd-journal/journal-send.c
-index fd3fd7ef9c..e8e6ad555b 100644
+ #define snprintf_ok(buf, len, fmt, ...)                                \
+         ({                                                             \
 --- a/src/libsystemd/sd-journal/journal-send.c
 +++ b/src/libsystemd/sd-journal/journal-send.c
 @@ -2,7 +2,6 @@

@@ -1,6 +1,6 @@
 DESCRIPTION = "A small C library that is supposed to make it easy to run an HTTP server as part of another application"
 HOMEPAGE = "http://www.gnu.org/software/libmicrohttpd/"
-LICENSE = "LGPL-2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=57d09285feac8a64efa878e692b14f36"
 SECTION = "net"
 

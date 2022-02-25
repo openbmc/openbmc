@@ -5,7 +5,7 @@ DESCRIPTION = "\
 	http://www.gnupg.org/aegypten/ for details."
 
 HOMEPAGE = "http://www.gnupg.org/related_software/pinentry/index.en.html"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=cbbd794e2a0a289b9dfcc9f513d1996e"
 
 DEPENDS = "gettext-native libassuan libgpg-error"

@@ -110,7 +110,7 @@ references in your own recipes and configurations as they could be
 removed in future releases. You should also rename any custom ``task-*``
 recipes to ``packagegroup-*``, and change them to inherit
 ``packagegroup`` instead of ``task``, as well as taking the opportunity
-to remove anything now handled by ``packagegroup.bbclass``, such as
+to remove anything now handled by :ref:`ref-classes-packagegroup`, such as
 providing ``-dev`` and ``-dbg`` packages, setting
 :term:`LIC_FILES_CHKSUM`, and so forth. See the
 :ref:`ref-classes-packagegroup` section for

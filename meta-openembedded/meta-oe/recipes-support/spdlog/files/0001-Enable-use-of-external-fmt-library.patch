@@ -1,26 +1,68 @@
-From 23ce2fe30e7485d48e2864bdd8276119fbb8cbd1 Mon Sep 17 00:00:00 2001
-From: Philip Balister <philip@balister.org>
-Date: Thu, 3 Dec 2020 09:22:50 -0500
-Subject: [PATCH] Enable use of external fmt library.
-
-Signed-off-by: Philip Balister <philip@balister.org>
----
- include/spdlog/tweakme.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/include/spdlog/tweakme.h b/include/spdlog/tweakme.h
-index 244bc3b3..2594a6fe 100644
+Author: Nilesh Patra <npatra974@gmail.com>
+Description: Use external libfmt by default
+Last-Changed: Sun, May, 14 2020
+Forwarded: not-needed
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -87,7 +87,7 @@ option(SPDLOG_BUILD_WARNINGS "Enable com
+ 
+ # install options
+ option(SPDLOG_INSTALL "Generate the install target" ${SPDLOG_MASTER_PROJECT})
+-option(SPDLOG_FMT_EXTERNAL "Use external fmt library instead of bundled" OFF)
++option(SPDLOG_FMT_EXTERNAL "Use external fmt library instead of bundled" ON)
+ option(SPDLOG_FMT_EXTERNAL_HO "Use external fmt header-only library instead of bundled" OFF)
+ option(SPDLOG_NO_EXCEPTIONS "Compile with -fno-exceptions. Call abort() on any spdlog exceptions" OFF)
+ 
 --- a/include/spdlog/tweakme.h
 +++ b/include/spdlog/tweakme.h
-@@ -63,7 +63,7 @@
+@@ -71,7 +71,7 @@
  // In this case spdlog will try to include <fmt/format.h> so set your -I flag
  // accordingly.
  //
 -// #define SPDLOG_FMT_EXTERNAL
-+#define SPDLOG_FMT_EXTERNAL
++#define SPDLOG_FMT_EXTERNAL 1
  ///////////////////////////////////////////////////////////////////////////////
  
  ///////////////////////////////////////////////////////////////////////////////
--- 
-2.28.0
-
+--- a/include/spdlog/fmt/bin_to_hex.h
++++ b/include/spdlog/fmt/bin_to_hex.h
+@@ -5,6 +5,7 @@
+ 
+ #pragma once
+ 
++#include <spdlog/tweakme.h>
+ #include <cctype>
+ #include <spdlog/common.h>
+ 
+--- a/include/spdlog/fmt/fmt.h
++++ b/include/spdlog/fmt/fmt.h
+@@ -4,7 +4,7 @@
+ //
+ 
+ #pragma once
+-
++#include <spdlog/tweakme.h>
+ //
+ // Include a bundled header-only copy of fmtlib or an external one.
+ // By default spdlog include its own copy.
+--- a/include/spdlog/fmt/ostr.h
++++ b/include/spdlog/fmt/ostr.h
+@@ -7,7 +7,7 @@
+ //
+ // include bundled or external copy of fmtlib's ostream support
+ //
+-
++#include <spdlog/tweakme.h>
+ #if !defined(SPDLOG_FMT_EXTERNAL)
+ #    ifdef SPDLOG_HEADER_ONLY
+ #        ifndef FMT_HEADER_ONLY
+--- a/src/fmt.cpp
++++ b/src/fmt.cpp
+@@ -6,6 +6,7 @@
+ #    error Please define SPDLOG_COMPILED_LIB to compile this file.
+ #endif
+ 
++#include <spdlog/tweakme.h>
+ #if !defined(SPDLOG_FMT_EXTERNAL)
+ #    include <spdlog/fmt/bundled/format-inl.h>
+ 

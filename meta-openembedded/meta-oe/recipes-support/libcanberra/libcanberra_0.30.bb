@@ -34,8 +34,8 @@ PACKAGECONFIG[gtk3] = "--enable-gtk3, --disable-gtk3, gtk+3"
 
 python populate_packages:prepend() {
     plugindir = d.expand('${libdir}/${BPN}-${PV}/')
-    do_split_packages(d, plugindir, '^libcanberra-(.*)\.so$', 'libcanberra-%s', '%s support library', extra_depends='' )
-    do_split_packages(d, plugindir, '^libcanberra-(.*)\.la$', 'libcanberra-%s', '%s support library', extra_depends='' )
+    do_split_packages(d, plugindir, r'^libcanberra-(.*)\.so$', 'libcanberra-%s', '%s support library', extra_depends='' )
+    do_split_packages(d, plugindir, r'^libcanberra-(.*)\.la$', 'libcanberra-%s', '%s support library', extra_depends='' )
 }
 
 PACKAGES =+ "${PN}-gnome ${PN}-gtk2 ${PN}-gtk3 ${PN}-systemd"

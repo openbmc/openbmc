@@ -27,12 +27,10 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  src/core/execute.c      |  4 ++--
  3 files changed, 9 insertions(+), 15 deletions(-)
 
-diff --git a/src/basic/format-util.h b/src/basic/format-util.h
-index b7e18768e3..3195ab205d 100644
 --- a/src/basic/format-util.h
 +++ b/src/basic/format-util.h
-@@ -32,13 +32,7 @@ assert_cc(sizeof(gid_t) == sizeof(uint32_t));
- #  define PRI_TIMEX "li"
+@@ -34,13 +34,7 @@ assert_cc(sizeof(gid_t) == sizeof(uint32
+ #  error Unknown timex member size
  #endif
  
 -#if SIZEOF_RLIM_T == 8
@@ -46,38 +44,36 @@ index b7e18768e3..3195ab205d 100644
  
  #if SIZEOF_DEV_T == 8
  #  define DEV_FMT "%" PRIu64
-diff --git a/src/basic/rlimit-util.c b/src/basic/rlimit-util.c
-index 23d108d5df..3e6fb438d7 100644
 --- a/src/basic/rlimit-util.c
 +++ b/src/basic/rlimit-util.c
-@@ -43,7 +43,7 @@ int setrlimit_closest(int resource, const struct rlimit *rlim) {
+@@ -44,7 +44,7 @@ int setrlimit_closest(int resource, cons
              fixed.rlim_max == highest.rlim_max)
                  return 0;
  
 -        log_debug("Failed at setting rlimit " RLIM_FMT " for resource RLIMIT_%s. Will attempt setting value " RLIM_FMT " instead.", rlim->rlim_max, rlimit_to_string(resource), fixed.rlim_max);
 +        log_debug("Failed at setting rlimit " RLIM_FMT " for resource RLIMIT_%s. Will attempt setting value " RLIM_FMT " instead.", (uintmax_t)rlim->rlim_max, rlimit_to_string(resource), (uintmax_t)fixed.rlim_max);
  
-         if (setrlimit(resource, &fixed) < 0)
-                 return -errno;
-@@ -308,13 +308,13 @@ int rlimit_format(const struct rlimit *rl, char **ret) {
+         return RET_NERRNO(setrlimit(resource, &fixed));
+ }
+@@ -307,13 +307,13 @@ int rlimit_format(const struct rlimit *r
          if (rl->rlim_cur >= RLIM_INFINITY && rl->rlim_max >= RLIM_INFINITY)
-                 s = strdup("infinity");
+                 r = free_and_strdup(&s, "infinity");
          else if (rl->rlim_cur >= RLIM_INFINITY)
--                (void) asprintf(&s, "infinity:" RLIM_FMT, rl->rlim_max);
-+                (void) asprintf(&s, "infinity:" RLIM_FMT, (uintmax_t)rl->rlim_max);
+-                r = asprintf(&s, "infinity:" RLIM_FMT, rl->rlim_max);
++                r = asprintf(&s, "infinity:" RLIM_FMT, (uintmax_t)rl->rlim_max);
          else if (rl->rlim_max >= RLIM_INFINITY)
--                (void) asprintf(&s, RLIM_FMT ":infinity", rl->rlim_cur);
-+                (void) asprintf(&s, RLIM_FMT ":infinity", (uintmax_t)rl->rlim_cur);
+-                r = asprintf(&s, RLIM_FMT ":infinity", rl->rlim_cur);
++                r = asprintf(&s, RLIM_FMT ":infinity", (uintmax_t)rl->rlim_cur);
          else if (rl->rlim_cur == rl->rlim_max)
--                (void) asprintf(&s, RLIM_FMT, rl->rlim_cur);
-+                (void) asprintf(&s, RLIM_FMT, (uintmax_t)rl->rlim_cur);
+-                r = asprintf(&s, RLIM_FMT, rl->rlim_cur);
++                r = asprintf(&s, RLIM_FMT, (uintmax_t)rl->rlim_cur);
          else
--                (void) asprintf(&s, RLIM_FMT ":" RLIM_FMT, rl->rlim_cur, rl->rlim_max);
-+                (void) asprintf(&s, RLIM_FMT ":" RLIM_FMT, (uintmax_t)rl->rlim_cur, (uintmax_t)rl->rlim_max);
- 
-         if (!s)
+-                r = asprintf(&s, RLIM_FMT ":" RLIM_FMT, rl->rlim_cur, rl->rlim_max);
++                r = asprintf(&s, RLIM_FMT ":" RLIM_FMT, (uintmax_t)rl->rlim_cur, (uintmax_t)rl->rlim_max);
+         if (r < 0)
                  return -ENOMEM;
-@@ -405,7 +405,7 @@ int rlimit_nofile_safe(void) {
+ 
+@@ -403,7 +403,7 @@ int rlimit_nofile_safe(void) {
  
          rl.rlim_cur = FD_SETSIZE;
          if (setrlimit(RLIMIT_NOFILE, &rl) < 0)
@@ -86,11 +82,9 @@ index 23d108d5df..3e6fb438d7 100644
  
          return 1;
  }
-diff --git a/src/core/execute.c b/src/core/execute.c
-index 515b2fe748..7693f2d9a0 100644
 --- a/src/core/execute.c
 +++ b/src/core/execute.c
-@@ -5395,9 +5395,9 @@ void exec_context_dump(const ExecContext *c, FILE* f, const char *prefix) {
+@@ -5639,9 +5639,9 @@ void exec_context_dump(const ExecContext
          for (unsigned i = 0; i < RLIM_NLIMITS; i++)
                  if (c->rlimit[i]) {
                          fprintf(f, "%sLimit%s: " RLIM_FMT "\n",

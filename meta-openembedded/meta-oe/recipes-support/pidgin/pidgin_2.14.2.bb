@@ -83,27 +83,27 @@ python populate_packages:prepend () {
     purple   = d.expand('${libdir}/purple-2')
     finch    = d.expand('${libdir}/finch')
 
-    do_split_packages(d, pidgroot, '^([^l][^i][^b].*)\.so$',
+    do_split_packages(d, pidgroot, r'^([^l][^i][^b].*)\.so$',
         output_pattern='pidgin-plugin-%s',
         description='Pidgin plugin %s',
         prepend=True, extra_depends='')
 
-    do_split_packages(d, purple, '^lib(.*)\.so$',
+    do_split_packages(d, purple, r'^lib(.*)\.so$',
         output_pattern='libpurple-protocol-%s',
         description='Libpurple protocol plugin for %s',
         prepend=True, extra_depends='')
 
-    do_split_packages(d, purple, '^(ssl-.*)\.so$',
+    do_split_packages(d, purple, r'^(ssl-.*)\.so$',
         output_pattern='libpurple-plugin-%s',
         description='libpurple plugin %s',
         prepend=True, extra_depends='libpurple-plugin-ssl')
 
-    do_split_packages(d, purple, '^([^l][^i][^b].*)\.so$',
+    do_split_packages(d, purple, r'^([^l][^i][^b].*)\.so$',
         output_pattern='libpurple-plugin-%s',
         description='libpurple plugin %s',
         prepend=True, extra_depends='')
 
-    do_split_packages(d, finch, '^([^l][^i][^b].*)\.so$',
+    do_split_packages(d, finch, r'^([^l][^i][^b].*)\.so$',
         output_pattern='finch-plugin-%s',
         description='Finch plugin %s',
         prepend=True, extra_depends='')

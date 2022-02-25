@@ -1904,7 +1904,7 @@ Behind the scenes, the shared state code works by looking in
 shared state files. Here is an example::
 
    SSTATE_MIRRORS ?= "\
-       file://.* http://someserver.tld/share/sstate/PATH;downloadfilename=PATH \n \
+       file://.* https://someserver.tld/share/sstate/PATH;downloadfilename=PATH \
        file://.* file:///some/local/dir/sstate/PATH"
 
 .. note::

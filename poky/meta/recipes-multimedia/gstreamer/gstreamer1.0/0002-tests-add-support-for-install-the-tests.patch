@@ -1,0 +1,109 @@
+From 62f5bb7bfc2498219df7280e73480d8ed2378ce5 Mon Sep 17 00:00:00 2001
+From: Jose Quaresma <quaresma.jose@gmail.com>
+Date: Sun, 11 Apr 2021 19:48:13 +0100
+Subject: [PATCH 2/4] tests: add support for install the tests
+
+This will provide to run the tests using the gnome-desktop-testing [1]
+
+[1] https://wiki.gnome.org/Initiatives/GnomeGoals/InstalledTests
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/789]
+
+Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
+---
+ subprojects/gstreamer/meson.build             |  4 ++++
+ subprojects/gstreamer/meson_options.txt       |  1 +
+ subprojects/gstreamer/tests/check/meson.build | 22 ++++++++++++++++++-
+ .../gstreamer/tests/check/template.test.in    |  3 +++
+ 4 files changed, 29 insertions(+), 1 deletion(-)
+ create mode 100644 subprojects/gstreamer/tests/check/template.test.in
+
+diff --git a/subprojects/gstreamer/meson.build b/subprojects/gstreamer/meson.build
+index d20fe0040f..b595d8f990 100644
+--- a/subprojects/gstreamer/meson.build
++++ b/subprojects/gstreamer/meson.build
+@@ -562,6 +562,10 @@ if bashcomp_dep.found()
+   endif
+ endif
+ 
++installed_tests_enabled = get_option('installed_tests')
++installed_tests_metadir = join_paths(datadir, 'installed-tests', meson.project_name())
++installed_tests_execdir = join_paths(libexecdir, 'installed-tests', meson.project_name())
++
+ plugins_install_dir = join_paths(get_option('libdir'), 'gstreamer-1.0')
+ 
+ pkgconfig = import('pkgconfig')
+diff --git a/subprojects/gstreamer/meson_options.txt b/subprojects/gstreamer/meson_options.txt
+index 7363bdb7a1..a34ba37dad 100644
+--- a/subprojects/gstreamer/meson_options.txt
++++ b/subprojects/gstreamer/meson_options.txt
+@@ -15,6 +15,7 @@ option('poisoning', type : 'boolean', value : false, description : 'Enable poiso
+ option('memory-alignment', type: 'combo',
+        choices : ['1', '2', '4', '8', '16', '32', '64', '128', '256', '512', '1024', '2048', '4096', '8192', 'malloc', 'pagesize'],
+        value: 'malloc')
++option('installed_tests', type : 'boolean', value : false, description : 'Enable installed tests')
+ 
+ # Feature options
+ option('check', type : 'feature', value : 'auto', description : 'Build unit test libraries')
+diff --git a/subprojects/gstreamer/tests/check/meson.build b/subprojects/gstreamer/tests/check/meson.build
+index 506606684d..00a138a568 100644
+--- a/subprojects/gstreamer/tests/check/meson.build
++++ b/subprojects/gstreamer/tests/check/meson.build
+@@ -124,10 +124,16 @@ test_defines = [
+   '-UG_DISABLE_ASSERT',
+   '-UG_DISABLE_CAST_CHECKS',
+   '-DGST_CHECK_TEST_ENVIRONMENT_BEACON="GST_STATE_IGNORE_ELEMENTS"',
+-  '-DTESTFILE="' + meson.current_source_dir() + '/meson.build"',
+   '-DGST_DISABLE_DEPRECATED',
+ ]
+ 
++testfile = meson.current_source_dir() + '/meson.build'
++if installed_tests_enabled
++  install_data(testfile, install_dir : installed_tests_metadir, rename : 'testfile')
++  testfile = installed_tests_metadir + '/testfile'
++endif
++test_defines += '-DTESTFILE="@0@"'.format(testfile)
++
+ # sanity checking
+ if get_option('check').disabled()
+   if get_option('tests').enabled()
+@@ -151,6 +157,8 @@ foreach t : core_tests
+       include_directories : [configinc],
+       link_with : link_with_libs,
+       dependencies : test_deps + glib_deps + gst_deps,
++      install_dir: installed_tests_execdir,
++      install: installed_tests_enabled,
+     )
+ 
+     env = environment()
+@@ -162,6 +170,18 @@ foreach t : core_tests
+     env.set('GST_PLUGIN_SCANNER_1_0', gst_scanner_dir + '/gst-plugin-scanner')
+     env.set('GST_PLUGIN_LOADING_WHITELIST', 'gstreamer')
+ 
++    if installed_tests_enabled
++      test_conf = configuration_data()
++      test_conf.set('installed_tests_dir', join_paths(prefix, installed_tests_execdir))
++      test_conf.set('program', test_name)
++      configure_file(
++        input: 'template.test.in',
++        output: test_name + '.test',
++        install_dir: installed_tests_metadir,
++        configuration: test_conf
++      )
++    endif
++
+     test(test_name, exe, env: env, timeout : 3 * 60)
+   endif
+ endforeach
+diff --git a/subprojects/gstreamer/tests/check/template.test.in b/subprojects/gstreamer/tests/check/template.test.in
+new file mode 100644
+index 0000000000..f701627f87
+--- /dev/null
++++ b/subprojects/gstreamer/tests/check/template.test.in
+@@ -0,0 +1,3 @@
++[Test]
++Type=session
++Exec=@installed_tests_dir@/@program@
+-- 
+2.33.1
+

@@ -3,7 +3,7 @@ HOMEPAGE = "http://oss.sgi.com/projects/libnuma/"
 DESCRIPTION = "Simple NUMA policy support. It consists of a numactl program \
 to run other programs with a specific NUMA policy and a libnuma to do \
 allocations with NUMA policy in applications."
-LICENSE = "GPL-2.0 & LGPL-2.1"
+LICENSE = "GPL-2.0-only & LGPL-2.1-only"
 SECTION = "apps"
 
 inherit autotools-brokensep ptest

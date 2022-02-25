@@ -5,7 +5,7 @@ BUGTRACKER = "http://bugzilla.pokylinux.org"
 
 PR = "r4"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://mini-x-session;endline=5;md5=b6430bffbcf05f9760e72938826b7487"
 
 SECTION = "x11"

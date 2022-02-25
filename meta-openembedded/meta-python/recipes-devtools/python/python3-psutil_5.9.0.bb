@@ -6,6 +6,8 @@ SRC_URI[sha256sum] = "869842dbd66bb80c3217158e629d6fceaecc3a3166d3d1faee515b05dd
 
 inherit pypi setuptools3
 
+SRC_URI += "file://0001-fix-failure-test-cases.patch"
+
 PACKAGES =+ "${PN}-tests"
 
 FILES:${PN}-tests += " \

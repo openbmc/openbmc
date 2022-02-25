@@ -1,0 +1,28 @@
+Patch pip to disable shebang mangling and also force the python executable
+to be python3 from the environment when building anything for the target
+(or nativesdk). This avoids incorrect interpreter paths in the target scripts.
+
+Upstream-Status: Inappropriate [OE specific config]
+
+Index: pip-22.0.3/src/pip/_vendor/distlib/scripts.py
+===================================================================
+--- pip-22.0.3.orig/src/pip/_vendor/distlib/scripts.py
++++ pip-22.0.3/src/pip/_vendor/distlib/scripts.py
+@@ -135,6 +135,8 @@ class ScriptMaker(object):
+         See also: http://www.in-ulm.de/~mascheck/various/shebang/#length
+                   https://hg.mozilla.org/mozilla-central/file/tip/mach
+         """
++        if '_PYTHON_SYSCONFIGDATA_NAME' in os.environ:
++            return b'#!/usr/bin/env python3'
+         if os.name != 'posix':
+             simple_shebang = True
+         else:
+@@ -340,7 +342,7 @@ class ScriptMaker(object):
+                 return
+ 
+             match = FIRST_LINE_RE.match(first_line.replace(b'\r\n', b'\n'))
+-            if match:
++            if False:
+                 adjust = True
+                 post_interp = match.group(1) or b''
+ 

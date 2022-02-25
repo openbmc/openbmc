@@ -11,11 +11,21 @@ do_shelltest() {
 }
 addtask do_shelltest
 
+python do_pythontest_exec_func_shell() {
+    bb.build.exec_func('do_shelltest', d)
+}
+addtask do_pythontest_exec_func_shell
+
 python do_pythontest_exit () {
     print("This is python stdout")
     sys.exit(1)
 }
 addtask do_pythontest_exit
+
+python do_pythontest_exec_func_python() {
+    bb.build.exec_func('do_pythontest_exit', d)
+}
+addtask do_pythontest_exec_func_python
 
 python do_pythontest_fatal () {
     print("This is python fatal test stdout")

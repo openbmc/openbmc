@@ -4,7 +4,7 @@ manipulation utilities. These are the core utilities which are expected to exist
 every system."
 HOMEPAGE = "http://www.gnu.org/software/coreutils/"
 BUGTRACKER = "http://debbugs.gnu.org/coreutils"
-LICENSE = "GPLv3+"
+LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464 \
                     file://src/ls.c;beginline=1;endline=15;md5=3b8fbaee597c8a9bb88d30840d53048c \
                     "
@@ -26,7 +26,7 @@ SRC_URI[sha256sum] = "ce30acdf4a41bc5bb30dd955e9eaa75fa216b4e3deb08889ed32433c7b
 
 # http://git.savannah.gnu.org/cgit/coreutils.git/commit/?id=v8.27-101-gf5d7c0842
 # runcon is not really a sandbox command, use `runcon ... setsid ...` to avoid this particular issue.
-CVE_CHECK_WHITELIST += "CVE-2016-2781"
+CVE_CHECK_IGNORE += "CVE-2016-2781"
 
 EXTRA_OECONF:class-target = "--enable-install-program=arch,hostname --libexecdir=${libdir}"
 EXTRA_OECONF:class-nativesdk = "--enable-install-program=arch,hostname"
@@ -204,6 +204,3 @@ do_install_ptest () {
 }
 
 FILES:${PN}-ptest += "${bindir}/getlimits"
-
-# These are specific to Opensuse
-CVE_WHITELIST += "CVE-2013-0221 CVE-2013-0222 CVE-2013-0223"

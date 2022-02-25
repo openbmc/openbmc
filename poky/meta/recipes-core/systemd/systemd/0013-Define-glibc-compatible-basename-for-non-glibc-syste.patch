@@ -14,11 +14,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/machine/machine-dbus.c | 5 +++++
  1 file changed, 5 insertions(+)
 
-diff --git a/src/machine/machine-dbus.c b/src/machine/machine-dbus.c
-index fc22e51409..1fed07b941 100644
 --- a/src/machine/machine-dbus.c
 +++ b/src/machine/machine-dbus.c
-@@ -11,6 +11,11 @@
+@@ -10,6 +10,11 @@
  #include <libgen.h>
  #undef basename
  

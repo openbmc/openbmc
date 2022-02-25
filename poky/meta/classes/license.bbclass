@@ -341,30 +341,31 @@ def incompatible_license(d, dont_want_licenses, package=None):
 def check_license_flags(d):
     """
     This function checks if a recipe has any LICENSE_FLAGS that
-    aren't whitelisted.
+    aren't acceptable.
 
-    If it does, it returns the all LICENSE_FLAGS missing from the whitelist, or
-    all of the LICENSE_FLAGS if there is no whitelist.
+    If it does, it returns the all LICENSE_FLAGS missing from the list
+    of acceptable license flags, or all of the LICENSE_FLAGS if there
+    is no list of acceptable flags.
 
-    If everything is is properly whitelisted, it returns None.
+    If everything is is acceptable, it returns None.
     """
 
-    def license_flag_matches(flag, whitelist, pn):
+    def license_flag_matches(flag, acceptlist, pn):
         """
-        Return True if flag matches something in whitelist, None if not.
+        Return True if flag matches something in acceptlist, None if not.
 
-        Before we test a flag against the whitelist, we append _${PN}
+        Before we test a flag against the acceptlist, we append _${PN}
         to it.  We then try to match that string against the
-        whitelist.  This covers the normal case, where we expect
+        acceptlist.  This covers the normal case, where we expect
         LICENSE_FLAGS to be a simple string like 'commercial', which
-        the user typically matches exactly in the whitelist by
+        the user typically matches exactly in the acceptlist by
         explicitly appending the package name e.g 'commercial_foo'.
         If we fail the match however, we then split the flag across
         '_' and append each fragment and test until we either match or
         run out of fragments.
         """
         flag_pn = ("%s_%s" % (flag, pn))
-        for candidate in whitelist:
+        for candidate in acceptlist:
             if flag_pn == candidate:
                     return True
 
@@ -375,27 +376,27 @@ def check_license_flags(d):
             if flag_cur:
                 flag_cur += "_"
             flag_cur += flagment
-            for candidate in whitelist:
+            for candidate in acceptlist:
                 if flag_cur == candidate:
                     return True
         return False
 
-    def all_license_flags_match(license_flags, whitelist):
+    def all_license_flags_match(license_flags, acceptlist):
         """ Return all unmatched flags, None if all flags match """
         pn = d.getVar('PN')
-        split_whitelist = whitelist.split()
+        split_acceptlist = acceptlist.split()
         flags = []
         for flag in license_flags.split():
-            if not license_flag_matches(flag, split_whitelist, pn):
+            if not license_flag_matches(flag, split_acceptlist, pn):
                 flags.append(flag)
         return flags if flags else None
 
     license_flags = d.getVar('LICENSE_FLAGS')
     if license_flags:
-        whitelist = d.getVar('LICENSE_FLAGS_WHITELIST')
-        if not whitelist:
+        acceptlist = d.getVar('LICENSE_FLAGS_ACCEPTED')
+        if not acceptlist:
             return license_flags.split()
-        unmatched_flags = all_license_flags_match(license_flags, whitelist)
+        unmatched_flags = all_license_flags_match(license_flags, acceptlist)
         if unmatched_flags:
             return unmatched_flags
     return None

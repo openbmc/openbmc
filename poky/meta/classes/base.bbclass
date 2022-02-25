@@ -71,7 +71,7 @@ def get_base_dep(d):
         return ""
     return "${BASE_DEFAULT_DEPS}"
 
-BASE_DEFAULT_DEPS = "virtual/${TARGET_PREFIX}gcc virtual/${TARGET_PREFIX}compilerlibs virtual/libc"
+BASE_DEFAULT_DEPS = "virtual/${HOST_PREFIX}gcc virtual/${HOST_PREFIX}compilerlibs virtual/libc"
 
 BASEDEPENDS = ""
 BASEDEPENDS:class-target = "${@get_base_dep(d)}"
@@ -329,7 +329,7 @@ python base_eventhandler() {
         source_mirror_fetch = d.getVar('SOURCE_MIRROR_FETCH', False)
         if not source_mirror_fetch:
             provs = (d.getVar("PROVIDES") or "").split()
-            multiwhitelist = (d.getVar("MULTI_PROVIDER_WHITELIST") or "").split()
+            multiwhitelist = (d.getVar("BB_MULTI_PROVIDER_ALLOWED") or "").split()
             for p in provs:
                 if p.startswith("virtual/") and p not in multiwhitelist:
                     profprov = d.getVar("PREFERRED_PROVIDER_" + p)
@@ -438,6 +438,14 @@ python () {
     if os.path.normpath(d.getVar("WORKDIR")) != os.path.normpath(d.getVar("B")):
         d.appendVar("PSEUDO_IGNORE_PATHS", ",${B}")
 
+    # To add a recipe to the skip list , set:
+    #   SKIP_RECIPE[pn] = "message"
+    pn = d.getVar('PN')
+    skip_msg = d.getVarFlag('SKIP_RECIPE', pn)
+    if skip_msg:
+        bb.debug(1, "Skipping %s %s" % (pn, skip_msg))
+        raise bb.parse.SkipRecipe("Recipe will be skipped because: %s" % (skip_msg))
+
     # Handle PACKAGECONFIG
     #
     # These take the form:
@@ -534,9 +542,9 @@ python () {
         unmatched_license_flags = check_license_flags(d)
         if unmatched_license_flags:
             if len(unmatched_license_flags) == 1:
-                message = "because it has a restricted license '{0}'. Which is not whitelisted in LICENSE_FLAGS_WHITELIST".format(unmatched_license_flags[0])
+                message = "because it has a restricted license '{0}'. Which is not listed in LICENSE_FLAGS_ACCEPTED".format(unmatched_license_flags[0])
             else:
-                message = "because it has restricted licenses {0}. Which are not whitelisted in LICENSE_FLAGS_WHITELIST".format(
+                message = "because it has restricted licenses {0}. Which are not listed in LICENSE_FLAGS_ACCEPTED".format(
                     ", ".join("'{0}'".format(f) for f in unmatched_license_flags))
             bb.debug(1, "Skipping %s %s" % (pn, message))
             raise bb.parse.SkipRecipe(message)
@@ -615,7 +623,7 @@ python () {
                 if unskipped_pkgs:
                     for pkg in skipped_pkgs:
                         bb.debug(1, "Skipping the package %s at do_rootfs because of incompatible license(s): %s" % (pkg, ' '.join(skipped_pkgs[pkg])))
-                        d.setVar('LICENSE_EXCLUSION-' + pkg, ' '.join(skipped_pkgs[pkg]))
+                        d.setVar('_exclude_incompatible-' + pkg, ' '.join(skipped_pkgs[pkg]))
                     for pkg in unskipped_pkgs:
                         bb.debug(1, "Including the package %s" % pkg)
                 else:

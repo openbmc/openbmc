@@ -274,10 +274,15 @@ sstate re-use. In order to function, this class requires the
 
 The ``ccache`` class enables the C/C++ Compiler Cache for the build.
 This class is used to give a minor performance boost during the build.
-However, using the class can lead to unexpected side-effects. Thus, it
-is recommended that you do not use this class. See
-https://ccache.samba.org/ for information on the C/C++ Compiler
-Cache.
+
+See https://ccache.samba.org/ for information on the C/C++ Compiler
+Cache, and the :oe_git:`ccache.bbclass </openembedded-core/tree/meta/classes/ccache.bbclass>`
+file for details about how to enable this mechanism in your configuration
+file, how to disable it for specific recipes, and how to share ``ccache``
+files between builds.
+
+However, using the class can lead to unexpected side-effects. Thus, using
+this class is not recommended.
 
 .. _ref-classes-chrpath:
 

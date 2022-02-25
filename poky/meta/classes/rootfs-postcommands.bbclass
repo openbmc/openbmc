@@ -380,7 +380,7 @@ python overlayfs_qa_check() {
     from oe.overlayfs import mountUnitName
 
     # this is a dumb check for unit existence, not its validity
-    overlayMountPoints = d.getVarFlags("OVERLAYFS_MOUNT_POINT")
+    overlayMountPoints = d.getVarFlags("OVERLAYFS_MOUNT_POINT") or {}
     imagepath = d.getVar("IMAGE_ROOTFS")
     searchpaths = [oe.path.join(imagepath, d.getVar("sysconfdir"), "systemd", "system"),
                    oe.path.join(imagepath, d.getVar("systemd_system_unitdir"))]

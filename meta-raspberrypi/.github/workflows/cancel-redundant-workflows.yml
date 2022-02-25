@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: Andrei Gherzan <andrei.gherzan@huawei.com>
+#
+# SPDX-License-Identifier: MIT
+
+name: Cancel redundant workflows
+
+on:
+  workflow_run:
+    workflows:
+      - "Builds"
+      - "Compliance"
+      - "Yocto Compatible"
+    types:
+      - requested
+
+jobs:
+  cancel-redundant-workflows:
+    runs-on: [self-hosted, Linux]
+    steps:
+    - uses: styfle/cancel-workflow-action@0.9.1
+      with:
+        all_but_latest: true
+        workflow_id: ${{ github.event.workflow.id }}

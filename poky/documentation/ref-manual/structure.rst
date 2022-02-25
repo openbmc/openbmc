@@ -667,16 +667,17 @@ Yocto Project. Metadata has several important subdivisions:
 
 This directory contains the ``*.bbclass`` files. Class files are used to
 abstract common code so it can be reused by multiple packages. Every
-package inherits the ``base.bbclass`` file. Examples of other important
-classes are ``autotools.bbclass``, which in theory allows any
+package inherits the :ref:`ref-classes-base` file. Examples of other important
+classes are :ref:`ref-classes-autotools`, which in theory allows any
 Autotool-enabled package to work with the Yocto Project with minimal
-effort. Another example is ``kernel.bbclass`` that contains common code
+effort. Another example is :ref:`ref-classes-kernel` that contains common code
 and functions for working with the Linux kernel. Functions like image
 generation or packaging also have their specific class files such as
-``image.bbclass``, ``rootfs_*.bbclass`` and ``package*.bbclass``.
+:ref:`ref-classes-image`, :ref:`ref-classes-rootfs*` and
+:ref:`package*.bbclass <ref-classes-package>`.
 
 For reference information on classes, see the
-":ref:`ref-manual/classes:Classes`" chapter.
+":doc:`/ref-manual/classes`" chapter.
 
 .. _structure-meta-conf:
 

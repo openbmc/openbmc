@@ -12,6 +12,18 @@ finish_run() {
 			fatal "ERROR: There's no '/dev' on rootfs."
 		fi
 
+		# Unmount anything that was automounted by busybox via mdev-mount.sh.
+		# We're about to switch_root, and leaving anything mounted will prevent
+		# the next rootfs from modifying the block device.  Ignore ROOT_DISK,
+		# if it was set by setup-live, because it'll be mounted over loopback
+		# to ROOTFS_DIR.
+		local dev
+		for dev in /run/media/*; do
+			if mountpoint -q "${dev}" && [ "${dev##*/}" != "${ROOT_DISK}" ]; then
+				umount -f "${dev}" || debug "Failed to unmount ${dev}"
+			fi
+		done
+
 		info "Switching root to '$ROOTFS_DIR'..."
 
 		debug "Moving /dev, /proc and /sys onto rootfs..."

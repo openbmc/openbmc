@@ -27,4 +27,4 @@ PACKAGES = "${PN} ${PN}-dbg ${PN}-dev"
 FILES:${PN} = "${bindir}/* ${libdir}/libest-3.2.0p.so"
 
 # https://github.com/cisco/libest/issues/104
-PNBLACKLIST[libest] ?= "Needs porting to openssl 3.x"
+SKIP_RECIPE[libest] ?= "Needs porting to openssl 3.x"

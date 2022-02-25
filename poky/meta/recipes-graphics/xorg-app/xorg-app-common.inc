@@ -2,7 +2,7 @@ SUMMARY = "X application"
 HOMEPAGE = "http://www.x.org/"
 BUGTRACKER = "https://bugs.freedesktop.org"
 SECTION = "x11/apps"
-LICENSE = "MIT-X"
+LICENSE = "MIT"
 DEPENDS = "util-macros-native virtual/libx11"
 
 # depends on virtual/libx11

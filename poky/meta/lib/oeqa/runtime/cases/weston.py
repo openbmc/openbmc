@@ -10,7 +10,7 @@ import threading
 import time
 
 class WestonTest(OERuntimeTestCase):
-    weston_log_file = '/tmp/weston.log'
+    weston_log_file = '/tmp/weston-2.log'
 
     @classmethod
     def tearDownClass(cls):
@@ -31,13 +31,13 @@ class WestonTest(OERuntimeTestCase):
         return output.split(" ")
 
     def get_weston_command(self, cmd):
-        return 'export XDG_RUNTIME_DIR=/run/user/0; export WAYLAND_DISPLAY=wayland-0; %s' % cmd
+        return 'export XDG_RUNTIME_DIR=/run/user/`id -u weston`; export WAYLAND_DISPLAY=wayland-1; %s' % cmd
 
     def run_weston_init(self):
         if 'systemd' in self.tc.td['VIRTUAL-RUNTIME_init_manager']:
             self.target.run('systemd-run --collect --unit=weston-ptest.service --uid=0 -p PAMName=login -p TTYPath=/dev/tty6 -E XDG_RUNTIME_DIR=/tmp -E WAYLAND_DISPLAY=wayland-0 /usr/bin/weston --socket=wayland-1 --log=%s' % self.weston_log_file)
         else:
-            self.target.run(self.get_weston_command('openvt -- weston --socket=wayland-1 --log=%s' % self.weston_log_file))
+            self.target.run(self.get_weston_command('openvt -- weston --socket=wayland-2 --log=%s' % self.weston_log_file))
 
     def get_new_wayland_processes(self, existing_wl_processes):
         try_cnt = 0

@@ -23,8 +23,6 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  src/tmpfiles/tmpfiles.c   | 10 ++++++++++
  3 files changed, 38 insertions(+)
 
-diff --git a/src/basic/glob-util.c b/src/basic/glob-util.c
-index e026b29478..815e56ef68 100644
 --- a/src/basic/glob-util.c
 +++ b/src/basic/glob-util.c
 @@ -12,6 +12,12 @@
@@ -48,7 +46,7 @@ index e026b29478..815e56ef68 100644
          /* We want to set GLOB_ALTDIRFUNC ourselves, don't allow it to be set. */
          assert(!(flags & GLOB_ALTDIRFUNC));
  
-@@ -32,9 +39,14 @@ int safe_glob(const char *path, int flags, glob_t *pglob) {
+@@ -32,9 +39,14 @@ int safe_glob(const char *path, int flag
                  pglob->gl_lstat = lstat;
          if (!pglob->gl_stat)
                  pglob->gl_stat = stat;
@@ -63,12 +61,10 @@ index e026b29478..815e56ef68 100644
          if (k == GLOB_NOMATCH)
                  return -ENOENT;
          if (k == GLOB_NOSPACE)
-diff --git a/src/test/test-glob-util.c b/src/test/test-glob-util.c
-index 50b4924679..09c0a20aee 100644
 --- a/src/test/test-glob-util.c
 +++ b/src/test/test-glob-util.c
-@@ -12,6 +12,12 @@
- #include "rm-rf.h"
+@@ -13,6 +13,12 @@
+ #include "tests.h"
  #include "tmpfile-util.h"
  
 +/* Don't fail if the standard library
@@ -77,10 +73,10 @@ index 50b4924679..09c0a20aee 100644
 +#define GLOB_BRACE 0
 +#endif
 +
- static void test_glob_exists(void) {
-         log_info("/* %s */", __func__);
- 
-@@ -41,11 +47,13 @@ static void test_glob_no_dot(void) {
+ TEST(glob_exists) {
+         char name[] = "/tmp/test-glob_exists.XXXXXX";
+         int fd = -1;
+@@ -40,11 +46,13 @@ TEST(glob_no_dot) {
          const char *fn;
  
          _cleanup_globfree_ glob_t g = {
@@ -94,7 +90,7 @@ index 50b4924679..09c0a20aee 100644
          };
  
          int r;
-@@ -55,11 +63,19 @@ static void test_glob_no_dot(void) {
+@@ -52,11 +60,19 @@ TEST(glob_no_dot) {
          assert_se(mkdtemp(template));
  
          fn = strjoina(template, "/*");
@@ -114,11 +110,9 @@ index 50b4924679..09c0a20aee 100644
          assert_se(r == GLOB_NOMATCH);
  
          (void) rm_rf(template, REMOVE_ROOT|REMOVE_PHYSICAL);
-diff --git a/src/tmpfiles/tmpfiles.c b/src/tmpfiles/tmpfiles.c
-index 7e85c50634..145c48a685 100644
 --- a/src/tmpfiles/tmpfiles.c
 +++ b/src/tmpfiles/tmpfiles.c
-@@ -66,6 +66,12 @@
+@@ -67,6 +67,12 @@
  #include "umask-util.h"
  #include "user-util.h"
  
@@ -131,7 +125,7 @@ index 7e85c50634..145c48a685 100644
  /* This reads all files listed in /etc/tmpfiles.d/?*.conf and creates
   * them in the file system. This is intended to be used to create
   * properly owned directories beneath /tmp, /var/tmp, /run, which are
-@@ -1990,7 +1996,9 @@ finish:
+@@ -1961,7 +1967,9 @@ finish:
  
  static int glob_item(Item *i, action_t action) {
          _cleanup_globfree_ glob_t g = {
@@ -141,7 +135,7 @@ index 7e85c50634..145c48a685 100644
          };
          int r = 0, k;
          char **fn;
-@@ -2010,7 +2018,9 @@ static int glob_item(Item *i, action_t action) {
+@@ -1981,7 +1989,9 @@ static int glob_item(Item *i, action_t a
  
  static int glob_item_recursively(Item *i, fdaction_t action) {
          _cleanup_globfree_ glob_t g = {

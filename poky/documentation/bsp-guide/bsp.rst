@@ -166,8 +166,9 @@ section.
 #. *Determine the BSP Layer You Want:* The Yocto Project supports many
    BSPs, which are maintained in their own layers or in layers designed
    to contain several BSPs. To get an idea of machine support through
-   BSP layers, you can look at the `index of
-   machines <&YOCTO_RELEASE_DL_URL;/machines>`__ for the release.
+   BSP layers, you can look at the
+   :yocto_dl:`index of machines </releases/yocto/yocto-&DISTRO;/machines>`
+   for the release.
 
 #. *Optionally Clone the meta-intel BSP Layer:* If your hardware is
    based on current Intel CPUs and devices, you can leverage this BSP
@@ -877,7 +878,7 @@ Yocto Project:
    your BSP layer as listed in the ``recipes.txt`` file, which is found
    in ``poky/meta`` directory of the :term:`Source Directory`
    or in the OpenEmbedded-Core Layer (``openembedded-core``) at
-   https://git.openembedded.org/openembedded-core/tree/meta.
+   :oe_git:`/openembedded-core/tree/meta`.
 
    You should place recipes (``*.bb`` files) and recipe modifications
    (``*.bbappend`` files) into ``recipes-*`` subdirectories by

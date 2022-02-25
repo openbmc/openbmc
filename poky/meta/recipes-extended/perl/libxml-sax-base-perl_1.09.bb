@@ -7,7 +7,7 @@ use this module as a base class so you don't have to, for example, \
 implement the characters() callback."
 
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPL-1.0+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 RDEPENDS:${PN} += "perl-module-extutils-makemaker"
 
 LIC_FILES_CHKSUM = "file://dist.ini;endline=5;md5=8f9c9a55340aefaee6e9704c88466446"

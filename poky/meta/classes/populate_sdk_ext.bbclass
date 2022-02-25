@@ -22,8 +22,8 @@ SDK_INCLUDE_BUILDTOOLS ?= '1'
 SDK_RECRDEP_TASKS ?= ""
 SDK_CUSTOM_TEMPLATECONF ?= "0"
 
-SDK_LOCAL_CONF_WHITELIST ?= ""
-SDK_LOCAL_CONF_BLACKLIST ?= "CONF_VERSION \
+ESDK_LOCALCONF_ALLOW ?= ""
+ESDK_LOCALCONF_REMOVE ?= "CONF_VERSION \
                              BB_NUMBER_THREADS \
                              BB_NUMBER_PARSE_THREADS \
                              PARALLEL_MAKE \
@@ -34,7 +34,7 @@ SDK_LOCAL_CONF_BLACKLIST ?= "CONF_VERSION \
                              TMPDIR \
                              BB_SERVER_TIMEOUT \
                             "
-SDK_INHERIT_BLACKLIST ?= "buildhistory icecc"
+ESDK_CLASS_INHERIT_DISABLE ?= "buildhistory icecc"
 SDK_UPDATE_URL ?= ""
 
 SDK_TARGETS ?= "${PN}"
@@ -282,7 +282,7 @@ python copy_buildsystem () {
         bb.utils.mkdirhier(uninative_outdir)
         shutil.copy(uninative_file, uninative_outdir)
 
-    env_whitelist = (d.getVar('BB_ENV_EXTRAWHITE') or '').split()
+    env_whitelist = (d.getVar('BB_ENV_PASSTHROUGH_ADDITIONS') or '').split()
     env_whitelist_values = {}
 
     # Create local.conf
@@ -294,8 +294,8 @@ python copy_buildsystem () {
     if derivative:
         shutil.copyfile(builddir + '/conf/local.conf', baseoutpath + '/conf/local.conf')
     else:
-        local_conf_whitelist = (d.getVar('SDK_LOCAL_CONF_WHITELIST') or '').split()
-        local_conf_blacklist = (d.getVar('SDK_LOCAL_CONF_BLACKLIST') or '').split()
+        local_conf_whitelist = (d.getVar('ESDK_LOCALCONF_ALLOW') or '').split()
+        local_conf_blacklist = (d.getVar('ESDK_LOCALCONF_REMOVE') or '').split()
         def handle_var(varname, origvalue, op, newlines):
             if varname in local_conf_blacklist or (origvalue.strip().startswith('/') and not varname in local_conf_whitelist):
                 newlines.append('# Removed original setting of %s\n' % varname)
@@ -338,7 +338,7 @@ python copy_buildsystem () {
             f.write('CONF_VERSION = "%s"\n\n' % d.getVar('CONF_VERSION', False))
 
             # Some classes are not suitable for SDK, remove them from INHERIT
-            f.write('INHERIT:remove = "%s"\n' % d.getVar('SDK_INHERIT_BLACKLIST', False))
+            f.write('INHERIT:remove = "%s"\n' % d.getVar('ESDK_CLASS_INHERIT_DISABLE', False))
 
             # Bypass the default connectivity check if any
             f.write('CONNECTIVITY_CHECK_URIS = ""\n\n')
@@ -354,10 +354,10 @@ python copy_buildsystem () {
             f.write('SIGGEN_LOCKEDSIGS_TASKSIG_CHECK = "warn"\n\n')
 
             # We want to be able to set this without a full reparse
-            f.write('BB_HASHCONFIG_WHITELIST:append = " SIGGEN_UNLOCKED_RECIPES"\n\n')
+            f.write('BB_HASHCONFIG_IGNORE_VARS:append = " SIGGEN_UNLOCKED_RECIPES"\n\n')
 
             # Set up whitelist for run on install
-            f.write('BB_SETSCENE_ENFORCE_WHITELIST = "%:* *:do_shared_workdir *:do_rm_work wic-tools:* *:do_addto_recipe_sysroot"\n\n')
+            f.write('BB_SETSCENE_ENFORCE_IGNORE_TASKS = "%:* *:do_shared_workdir *:do_rm_work wic-tools:* *:do_addto_recipe_sysroot"\n\n')
 
             # Hide the config information from bitbake output (since it's fixed within the SDK)
             f.write('BUILDCFG_HEADER = ""\n\n')
@@ -436,7 +436,7 @@ python copy_buildsystem () {
             f.write('meta/conf\n')
 
     # Ensure any variables set from the external environment (by way of
-    # BB_ENV_EXTRAWHITE) are set in the SDK's configuration
+    # BB_ENV_PASSTHROUGH_ADDITIONS) are set in the SDK's configuration
     extralines = []
     for name, value in env_whitelist_values.items():
         actualvalue = d.getVar(name) or ''

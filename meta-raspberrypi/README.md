@@ -39,11 +39,6 @@ This layer depends on:
   * branch: master
   * revision: HEAD
 
-* URI: git://git.openembedded.org/meta-openembedded
-  * layers: meta-oe, meta-multimedia, meta-networking, meta-python
-  * branch: master
-  * revision: HEAD
-
 ## Quick Start
 
 1. source poky/oe-init-build-env rpi-build
@@ -74,6 +69,13 @@ To configure the machine, you have to update the `machine` variable.
 And the same for the `distro`.
 
 For further information, you can read more at <https://kas.readthedocs.io/en/1.0/index.html>
+
+## Contributing
+
+You can send patches using the GitHub pull request process or/and through the
+Yocto mailing list. Refer to the
+[documentation](https://meta-raspberrypi.readthedocs.io/en/latest/contributing.html)
+for more information.
 
 ## Maintainers
 

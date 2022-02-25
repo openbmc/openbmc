@@ -13,7 +13,7 @@ FILESEXTRAPATHS =. "${FILE_DIRNAME}/gcc:${FILE_DIRNAME}/gcc/backport:"
 DEPENDS =+ "mpfr gmp libmpc zlib flex-native"
 NATIVEDEPS = "mpfr-native gmp-native libmpc-native zlib-native flex-native"
 
-LICENSE = "GPL-3.0-with-GCC-exception & GPLv3"
+LICENSE = "GPL-3.0-with-GCC-exception & GPL-3.0-only"
 
 LIC_FILES_CHKSUM = "\
     file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
@@ -33,7 +33,6 @@ SRC_URI = "\
            file://0001-gcc-4.3.1-ARCH_FLAGS_FOR_TARGET.patch \
            file://0002-gcc-poison-system-directories.patch \
            file://0004-64-bit-multilib-hack.patch \
-           file://0005-optional-libstdc.patch \
            file://0007-Use-the-defaults.h-in-B-instead-of-S-and-t-oe-in-B.patch \
            file://0009-cpp-honor-sysroot.patch \
            file://0011-Define-GLIBC_DYNAMIC_LINKER-and-UCLIBC_DYNAMIC_LINKE.patch \
@@ -68,6 +67,7 @@ SRC_URI = "\
            file://0002-CVE-2021-42574.patch \
            file://0003-CVE-2021-42574.patch \
            file://0004-CVE-2021-42574.patch \
+           file://0001-CVE-2021-46195.patch \
 "
 SRC_URI[sha256sum] = "d08edc536b54c372a1010ff6619dd274c0f1603aa49212ba20f7aa2cda36fa8b"
 
@@ -119,4 +119,4 @@ EXTRA_OECONF_PATHS = "\
 "
 
 # Is a binutils 2.26 issue, not gcc
-CVE_CHECK_WHITELIST += "CVE-2021-37322"
+CVE_CHECK_IGNORE += "CVE-2021-37322"

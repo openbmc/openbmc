@@ -3,7 +3,7 @@ DESCRIPTION = "A GObject-based library for accessing the Secret Service API of \
 the freedesktop.org project, a cross-desktop effort to access passwords, \
 tokens and other types of secrets. libsecret provides a convenient wrapper \
 for these methods so consumers do not have to call the low-level DBus methods."
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 HOMEPAGE = "https://github.com/GNOME/libsecret"
 BUGTRACKER = "https://gitlab.gnome.org/GNOME/libsecret/issues"
 LIC_FILES_CHKSUM = "file://COPYING;md5=23c2a5e0106b99d75238986559bb5fc6"

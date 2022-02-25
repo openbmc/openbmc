@@ -3,7 +3,7 @@ DESCRIPTION = "Package provides semi-portable access to hardware-provided atomic
 HOMEPAGE = "https://github.com/ivmai/libatomic_ops/"
 SECTION = "optional"
 PROVIDES += "libatomics-ops"
-LICENSE = "GPLv2 & MIT"
+LICENSE = "GPL-2.0-only & MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://doc/LICENSING.txt;md5=e00dd5c8ac03a14c5ae5225a4525fa2d \
                     "

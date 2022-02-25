@@ -2,7 +2,7 @@ SUMMARY = "Basic TCP/IP networking init scripts and configuration files"
 DESCRIPTION = "This package provides high level tools to configure network interfaces"
 HOMEPAGE = "http://packages.debian.org/ifupdown"
 SECTION = "base"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/copyright;md5=3dd6192d306f582dee7687da3d8748ab"
 PR = "r7"
 

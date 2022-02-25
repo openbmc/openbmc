@@ -4,7 +4,7 @@ machine's processor through dynamic binary translation and provides a set \
 of different hardware and device models for the machine, enabling it to run \
 a variety of guest operating systems"
 HOMEPAGE = "http://qemu.org"
-LICENSE = "GPLv2 & LGPLv2.1"
+LICENSE = "GPL-2.0-only & LGPL-2.1-only"
 
 RDEPENDS:${PN}-ptest = "bash"
 
@@ -27,6 +27,7 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://determinism.patch \
            file://0001-tests-meson.build-use-relative-path-to-refer-to-file.patch \
            file://0001-riscv-Set-5.4-as-minimum-kernel-version-for-riscv32.patch \
+           file://0001-acpi-tpm-Add-missing-device-identification-objects.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 
@@ -36,15 +37,15 @@ SRC_URI:append:class-target = " file://cross.patch"
 SRC_URI:append:class-nativesdk = " file://cross.patch"
 
 # Applies against virglrender < 0.6.0 and not qemu itself
-CVE_CHECK_WHITELIST += "CVE-2017-5957"
+CVE_CHECK_IGNORE += "CVE-2017-5957"
 
 # The VNC server can expose host files uder some circumstances. We don't
 # enable it by default.
-CVE_CHECK_WHITELIST += "CVE-2007-0998"
+CVE_CHECK_IGNORE += "CVE-2007-0998"
 
 # 'The issues identified by this CVE were determined to not constitute a vulnerability.'
 # https://bugzilla.redhat.com/show_bug.cgi?id=1609015#c11
-CVE_CHECK_WHITELIST += "CVE-2018-18438"
+CVE_CHECK_IGNORE += "CVE-2018-18438"
 
 COMPATIBLE_HOST:mipsarchn32 = "null"
 COMPATIBLE_HOST:mipsarchn64 = "null"
@@ -137,17 +138,6 @@ do_install:append() {
 	fi
 }
 # END of qemu-mips workaround
-
-make_qemu_wrapper() {
-        gdk_pixbuf_module_file=`pkg-config --variable=gdk_pixbuf_cache_file gdk-pixbuf-2.0`
-
-        for tool in `ls ${D}${bindir}/qemu-system-*`; do
-                create_wrapper $tool \
-                        GDK_PIXBUF_MODULE_FILE=$gdk_pixbuf_module_file \
-                        FONTCONFIG_PATH=/etc/fonts \
-                        GTK_THEME=Adwaita
-        done
-}
 
 # Disable kvm/virgl/mesa on targets that do not support it
 PACKAGECONFIG:remove:darwin = "kvm virglrenderer glx gtk+"

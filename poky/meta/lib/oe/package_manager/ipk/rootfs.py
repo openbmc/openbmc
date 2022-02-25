@@ -145,51 +145,14 @@ class PkgRootfs(DpkgOpkgRootfs):
             self.pm.recover_packaging_data()
 
         bb.utils.remove(self.d.getVar('MULTILIB_TEMP_ROOTFS'), True)
-
-    def _prelink_file(self, root_dir, filename):
-        bb.note('prelink %s in %s' % (filename, root_dir))
-        prelink_cfg = oe.path.join(root_dir,
-                                   self.d.expand('${sysconfdir}/prelink.conf'))
-        if not os.path.exists(prelink_cfg):
-            shutil.copy(self.d.expand('${STAGING_DIR_NATIVE}${sysconfdir_native}/prelink.conf'),
-                        prelink_cfg)
-
-        cmd_prelink = self.d.expand('${STAGING_DIR_NATIVE}${sbindir_native}/prelink')
-        self._exec_shell_cmd([cmd_prelink,
-                              '--root',
-                              root_dir,
-                              '-amR',
-                              '-N',
-                              '-c',
-                              self.d.expand('${sysconfdir}/prelink.conf')])
-
     '''
     Compare two files with the same key twice to see if they are equal.
     If they are not equal, it means they are duplicated and come from
     different packages.
-    1st: Comapre them directly;
-    2nd: While incremental image creation is enabled, one of the
-         files could be probaly prelinked in the previous image
-         creation and the file has been changed, so we need to
-         prelink the other one and compare them.
     '''
     def _file_equal(self, key, f1, f2):
-
-        # Both of them are not prelinked
         if filecmp.cmp(f1, f2):
             return True
-
-        if bb.data.inherits_class('image-prelink', self.d):
-            if self.image_rootfs not in f1:
-                self._prelink_file(f1.replace(key, ''), f1)
-
-            if self.image_rootfs not in f2:
-                self._prelink_file(f2.replace(key, ''), f2)
-
-            # Both of them are prelinked
-            if filecmp.cmp(f1, f2):
-                return True
-
         # Not equal
         return False
 

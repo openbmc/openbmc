@@ -21,7 +21,7 @@ SRC_URI[sha256sum] = "2ffd417266fb875028fdc0ef349694f63dbcd76d0b0cfacfb52e6151f4
 PROVIDES = "virtual/libx11"
 
 XORG_PN = "libX11"
-LICENSE = "MIT & MIT-style & BSD-1-Clause & HPND & HPND-sell-variant"
+LICENSE = "MIT & MIT & BSD-1-Clause & HPND & HPND-sell-variant"
 LIC_FILES_CHKSUM = "file://COPYING;md5=172255dee66bb0151435b2d5d709fcf7"
 
 DEPENDS += "xorgproto \

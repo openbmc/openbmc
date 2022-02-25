@@ -14,11 +14,19 @@ class StapTest(OERuntimeTestCase):
     @OEHasPackage(['gcc-symlinks'])
     @OEHasPackage(['kernel-devsrc'])
     def test_stap(self):
-        cmd = 'make -C /usr/src/kernel scripts prepare'
-        status, output = self.target.run(cmd, 900)
-        self.assertEqual(status, 0, msg='\n'.join([cmd, output]))
+        try:
+            cmd = 'make -j -C /usr/src/kernel scripts prepare'
+            status, output = self.target.run(cmd, 900)
+            self.assertEqual(status, 0, msg='\n'.join([cmd, output]))
 
-        cmd = 'stap -v --disable-cache -DSTP_NO_VERREL_CHECK -s1 -e \'probe oneshot { print("Hello, "); println("world!") }\''
-        status, output = self.target.run(cmd, 900)
-        self.assertEqual(status, 0, msg='\n'.join([cmd, output]))
-        self.assertIn('Hello, world!', output, msg='\n'.join([cmd, output]))
+            cmd = 'stap -v -p4 -m stap-hello --disable-cache -DSTP_NO_VERREL_CHECK -e \'probe oneshot { print("Hello, "); println("SystemTap!") }\''
+            status, output = self.target.run(cmd, 900)
+            self.assertEqual(status, 0, msg='\n'.join([cmd, output]))
+
+            cmd = 'staprun -v -R -b1 stap-hello.ko'
+            self.assertEqual(status, 0, msg='\n'.join([cmd, output]))
+            self.assertIn('Hello, SystemTap!', output, msg='\n'.join([cmd, output]))
+        except:
+            status, dmesg = self.target.run('dmesg')
+            if status == 0:
+                print(dmesg)

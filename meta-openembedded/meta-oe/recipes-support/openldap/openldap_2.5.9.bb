@@ -23,6 +23,7 @@ SRC_URI = "http://www.openldap.org/software/download/OpenLDAP/openldap-release/$
     file://0001-ldif-filter-fix-parallel-build-failure.patch \
     file://0001-build-top.mk-unset-STRIP_OPTS.patch \
     file://0001-libraries-Makefile.in-ignore-the-mkdir-errors.patch \
+    file://0001-librewrite-include-ldap_pvt_thread.h-before-redefini.patch \
 "
 
 SRC_URI[md5sum] = "237fc2d881c27f8dd5d9f396e2865c11"
@@ -218,8 +219,8 @@ INSANE_SKIP:${PN}-backend-passwd     += "dev-so"
 
 python populate_packages:prepend () {
     backend_dir    = d.expand('${libexecdir}/openldap')
-    do_split_packages(d, backend_dir, 'back_([a-z]*)\.so$', 'openldap-backend-%s', 'OpenLDAP %s backend', prepend=True, extra_depends='', allow_links=True)
-    do_split_packages(d, backend_dir, 'back_([a-z]*)\-.*\.so\..*$', 'openldap-backend-%s', 'OpenLDAP %s backend', extra_depends='', allow_links=True)
+    do_split_packages(d, backend_dir, r'back_([a-z]*)\.so$', 'openldap-backend-%s', 'OpenLDAP %s backend', prepend=True, extra_depends='', allow_links=True)
+    do_split_packages(d, backend_dir, r'back_([a-z]*)\-.*\.so\..*$', 'openldap-backend-%s', 'OpenLDAP %s backend', extra_depends='', allow_links=True)
 
     metapkg = "${PN}-backends"
     d.setVar('ALLOW_EMPTY:' + metapkg, "1")
@@ -236,3 +237,6 @@ python populate_packages:prepend () {
 }
 
 BBCLASSEXTEND = "native"
+
+# CVE-2015-3276 has no target code.
+CVE_CHECK_IGNORE += "CVE-2015-3276"

@@ -19,15 +19,13 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  src/shared/hwdb-util.c    | 19 ++++++++++++++-----
  3 files changed, 38 insertions(+), 31 deletions(-)
 
-diff --git a/src/basic/sort-util.h b/src/basic/sort-util.h
-index 49586a4a24..d92a5ab0ed 100644
 --- a/src/basic/sort-util.h
 +++ b/src/basic/sort-util.h
-@@ -55,18 +55,4 @@ static inline void _qsort_safe(void *base, size_t nmemb, size_t size, __compar_f
-                 _qsort_safe((p), (n), sizeof((p)[0]), (__compar_fn_t) _func_); \
+@@ -61,18 +61,4 @@ static inline void _qsort_safe(void *bas
+                 _qsort_safe((p), (n), sizeof((p)[0]), (comparison_fn_t) _func_); \
          })
  
--static inline void qsort_r_safe(void *base, size_t nmemb, size_t size, __compar_d_fn_t compar, void *userdata) {
+-static inline void qsort_r_safe(void *base, size_t nmemb, size_t size, comparison_userdata_fn_t compar, void *userdata) {
 -        if (nmemb <= 1)
 -                return;
 -
@@ -38,15 +36,13 @@ index 49586a4a24..d92a5ab0ed 100644
 -#define typesafe_qsort_r(p, n, func, userdata)                          \
 -        ({                                                              \
 -                int (*_func_)(const typeof(p[0])*, const typeof(p[0])*, typeof(userdata)) = func; \
--                qsort_r_safe((p), (n), sizeof((p)[0]), (__compar_d_fn_t) _func_, userdata); \
+-                qsort_r_safe((p), (n), sizeof((p)[0]), (comparison_userdata_fn_t) _func_, userdata); \
 -        })
 -
  int cmp_int(const int *a, const int *b);
-diff --git a/src/shared/format-table.c b/src/shared/format-table.c
-index 4c4e4593d8..17b329f315 100644
 --- a/src/shared/format-table.c
 +++ b/src/shared/format-table.c
-@@ -1282,30 +1282,32 @@ static int cell_data_compare(TableData *a, size_t index_a, TableData *b, size_t
+@@ -1324,30 +1324,32 @@ static int cell_data_compare(TableData *
          return CMP(index_a, index_b);
  }
  
@@ -89,7 +85,7 @@ index 4c4e4593d8..17b329f315 100644
          }
  
          /* Order identical lines by the order there were originally added in */
-@@ -1944,7 +1946,12 @@ int table_print(Table *t, FILE *f) {
+@@ -2009,7 +2011,12 @@ int table_print(Table *t, FILE *f) {
                  for (size_t i = 0; i < n_rows; i++)
                          sorted[i] = i * t->n_columns;
  
@@ -103,7 +99,7 @@ index 4c4e4593d8..17b329f315 100644
          }
  
          if (t->display_map)
-@@ -2572,7 +2579,12 @@ int table_to_json(Table *t, JsonVariant **ret) {
+@@ -2647,7 +2654,12 @@ int table_to_json(Table *t, JsonVariant
                  for (size_t i = 0; i < n_rows; i++)
                          sorted[i] = i * t->n_columns;
  
@@ -117,11 +113,9 @@ index 4c4e4593d8..17b329f315 100644
          }
  
          if (t->display_map)
-diff --git a/src/shared/hwdb-util.c b/src/shared/hwdb-util.c
-index d7626aed95..2003fac7c3 100644
 --- a/src/shared/hwdb-util.c
 +++ b/src/shared/hwdb-util.c
-@@ -127,9 +127,13 @@ static struct trie* trie_free(struct trie *trie) {
+@@ -127,9 +127,13 @@ static struct trie* trie_free(struct tri
  
  DEFINE_TRIVIAL_CLEANUP_FUNC(struct trie*, trie_free);
  
@@ -138,7 +132,7 @@ index d7626aed95..2003fac7c3 100644
  }
  
  static int trie_node_add_value(struct trie *trie, struct trie_node *node,
-@@ -157,7 +161,10 @@ static int trie_node_add_value(struct trie *trie, struct trie_node *node,
+@@ -157,7 +161,10 @@ static int trie_node_add_value(struct tr
                          .value_off = v,
                  };
  
@@ -150,7 +144,7 @@ index d7626aed95..2003fac7c3 100644
                  if (val) {
                          /* At this point we have 2 identical properties on the same match-string.
                           * Since we process files in order, we just replace the previous value. */
-@@ -183,7 +190,9 @@ static int trie_node_add_value(struct trie *trie, struct trie_node *node,
+@@ -183,7 +190,9 @@ static int trie_node_add_value(struct tr
                  .line_number = line_number,
          };
          node->values_count++;

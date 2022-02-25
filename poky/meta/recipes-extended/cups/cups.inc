@@ -21,11 +21,11 @@ UPSTREAM_CHECK_URI = "https://github.com/OpenPrinting/cups/releases"
 UPSTREAM_CHECK_REGEX = "cups-(?P<pver>(?!.+\d(b|rc)\d.+).+)-source.tar"
 
 # Issue only applies to MacOS
-CVE_CHECK_WHITELIST += "CVE-2008-1033"
+CVE_CHECK_IGNORE += "CVE-2008-1033"
 # Issue affects pdfdistiller plugin used with but not part of cups
-CVE_CHECK_WHITELIST += "CVE-2009-0032"
+CVE_CHECK_IGNORE += "CVE-2009-0032"
 # This is an Ubuntu only issue.
-CVE_CHECK_WHITELIST += "CVE-2018-6553"
+CVE_CHECK_IGNORE += "CVE-2018-6553"
 
 LEAD_SONAME = "libcupsdriver.so"
 
@@ -117,4 +117,4 @@ cups_sysroot_preprocess () {
 
 # -25317 concerns /var/log/cups having lp ownership.  Our /var/log/cups is
 # root:root, so this doesn't apply.
-CVE_CHECK_WHITELIST += "CVE-2021-25317"
+CVE_CHECK_IGNORE += "CVE-2021-25317"

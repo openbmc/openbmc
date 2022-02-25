@@ -2,7 +2,7 @@ SUMMARY = "Subversion (svn) version control system client"
 HOMEPAGE = "http://subversion.apache.org"
 DESCRIPTION = "Subversion is an open source version control system."
 SECTION = "console/network"
-LICENSE = "Apache-2 & MIT"
+LICENSE = "Apache-2.0 & MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=6487ae7094d359fa90fb9c4096e52e2b"
 
 DEPENDS = "apr-util serf sqlite3 file lz4"

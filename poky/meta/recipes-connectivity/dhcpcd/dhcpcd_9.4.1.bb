@@ -32,8 +32,11 @@ PACKAGECONFIG[ntp] = "--with-hook=ntp, , ,ntp"
 PACKAGECONFIG[chrony] = "--with-hook=ntp, , ,chrony"
 PACKAGECONFIG[ypbind] = "--with-eghook=yp, , ,ypbind-mt"
 
+# add option to override DBDIR location
+DBDIR ?= "${localstatedir}/lib/${BPN}"
+
 EXTRA_OECONF = "--enable-ipv4 \
-                --dbdir=${localstatedir}/lib/${BPN} \
+                --dbdir=${DBDIR} \
                 --sbindir=${base_sbindir} \
                 --runstatedir=/run \
                 --enable-privsep \
@@ -43,15 +46,15 @@ EXTRA_OECONF = "--enable-ipv4 \
                "
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM:${PN} = "--system -d ${localstatedir}/lib/${BPN} -M -s /bin/false -U dhcpcd"
+USERADD_PARAM:${PN} = "--system -d ${DBDIR} -M -s /bin/false -U dhcpcd"
 
 do_install:append () {
     # install systemd unit files
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/dhcpcd*.service ${D}${systemd_system_unitdir}
 
-    chmod 700 ${D}${localstatedir}/lib/${BPN}
-    chown dhcpcd:dhcpcd ${D}${localstatedir}/lib/${BPN}
+    chmod 700 ${D}${DBDIR}
+    chown dhcpcd:dhcpcd ${D}${DBDIR}
 }
 
 FILES:${PN}-dbg += "${libdir}/dhcpcd/dev/.debug"

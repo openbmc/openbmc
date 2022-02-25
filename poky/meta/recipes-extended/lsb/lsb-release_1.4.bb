@@ -1,7 +1,7 @@
 SUMMARY = "lsb_release support for OpenEmbedded"
 SECTION = "console/utils"
 HOMEPAGE = "https://sourceforge.net/projects/lsb/files"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 
 # lsb_release needs getopt
 RDEPENDS:${PN} += "${VIRTUAL-RUNTIME_getopt}"

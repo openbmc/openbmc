@@ -253,7 +253,7 @@ def explode_dep_versions(s):
     """
     Take an RDEPENDS style string of format:
     "DEPEND1 (optional version) DEPEND2 (optional version) ..."
-    skip null value and items appeared in dependancy string multiple times
+    skip null value and items appeared in dependency string multiple times
     and return a dictionary of dependencies and versions.
     """
     r = explode_dep_versions2(s)
@@ -381,7 +381,7 @@ def _print_exception(t, value, tb, realfile, text, context):
 
         error.append("Exception: %s" % ''.join(exception))
 
-        # If the exception is from spwaning a task, let's be helpful and display
+        # If the exception is from spawning a task, let's be helpful and display
         # the output (which hopefully includes stderr).
         if isinstance(value, subprocess.CalledProcessError) and value.output:
             error.append("Subprocess output:")
@@ -402,7 +402,7 @@ def better_exec(code, context, text = None, realfile = "<code>", pythonexception
         code = better_compile(code, realfile, realfile)
     try:
         exec(code, get_context(), context)
-    except (bb.BBHandledException, bb.parse.SkipRecipe, bb.data_smart.ExpansionError):
+    except (bb.BBHandledException, bb.parse.SkipRecipe, bb.data_smart.ExpansionError, bb.process.ExecutionError):
         # Error already shown so passthrough, no need for traceback
         raise
     except Exception as e:
@@ -589,8 +589,8 @@ def preserved_envvars():
     v = [
         'BBPATH',
         'BB_PRESERVE_ENV',
-        'BB_ENV_WHITELIST',
-        'BB_ENV_EXTRAWHITE',
+        'BB_ENV_PASSTHROUGH',
+        'BB_ENV_PASSTHROUGH_ADDITIONS',
     ]
     return v + preserved_envvars_exported()
 
@@ -621,21 +621,21 @@ def filter_environment(good_vars):
 
 def approved_variables():
     """
-    Determine and return the list of whitelisted variables which are approved
+    Determine and return the list of variables which are approved
     to remain in the environment.
     """
     if 'BB_PRESERVE_ENV' in os.environ:
         return os.environ.keys()
     approved = []
-    if 'BB_ENV_WHITELIST' in os.environ:
-        approved = os.environ['BB_ENV_WHITELIST'].split()
-        approved.extend(['BB_ENV_WHITELIST'])
+    if 'BB_ENV_PASSTHROUGH' in os.environ:
+        approved = os.environ['BB_ENV_PASSTHROUGH'].split()
+        approved.extend(['BB_ENV_PASSTHROUGH'])
     else:
         approved = preserved_envvars()
-    if 'BB_ENV_EXTRAWHITE' in os.environ:
-        approved.extend(os.environ['BB_ENV_EXTRAWHITE'].split())
-        if 'BB_ENV_EXTRAWHITE' not in approved:
-            approved.extend(['BB_ENV_EXTRAWHITE'])
+    if 'BB_ENV_PASSTHROUGH_ADDITIONS' in os.environ:
+        approved.extend(os.environ['BB_ENV_PASSTHROUGH_ADDITIONS'].split())
+        if 'BB_ENV_PASSTHROUGH_ADDITIONS' not in approved:
+            approved.extend(['BB_ENV_PASSTHROUGH_ADDITIONS'])
     return approved
 
 def clean_environment():
@@ -1733,5 +1733,21 @@ def environment(**envvars):
         for var in envvars:
             if var in backup:
                 os.environ[var] = backup[var]
-            else:
+            elif var in os.environ:
                 del os.environ[var]
+
+def is_local_uid(uid=''):
+    """
+    Check whether uid is a local one or not.
+    Can't use pwd module since it gets all UIDs, not local ones only.
+    """
+    if not uid:
+        uid = os.getuid()
+    with open('/etc/passwd', 'r') as f:
+        for line in f:
+            line_split = line.split(':')
+            if len(line_split) < 3:
+                continue
+            if str(uid) == line_split[2]:
+                return True
+    return False

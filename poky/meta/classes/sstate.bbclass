@@ -1,4 +1,4 @@
-SSTATE_VERSION = "7"
+SSTATE_VERSION = "8"
 
 SSTATE_ZSTD_CLEVEL ??= "8"
 
@@ -50,21 +50,21 @@ SSTATE_EXTRAPATH[vardepvalue] = ""
 SSTATE_EXTRAPATHWILDCARD[vardepvalue] = ""
 
 # For multilib rpm the allarch packagegroup files can overwrite (in theory they're identical)
-SSTATE_DUPWHITELIST = "${DEPLOY_DIR}/licenses/"
+SSTATE_ALLOW_OVERLAP_FILES = "${DEPLOY_DIR}/licenses/"
 # Avoid docbook/sgml catalog warnings for now
-SSTATE_DUPWHITELIST += "${STAGING_ETCDIR_NATIVE}/sgml ${STAGING_DATADIR_NATIVE}/sgml"
+SSTATE_ALLOW_OVERLAP_FILES += "${STAGING_ETCDIR_NATIVE}/sgml ${STAGING_DATADIR_NATIVE}/sgml"
 # sdk-provides-dummy-nativesdk and nativesdk-buildtools-perl-dummy overlap for different SDKMACHINE
-SSTATE_DUPWHITELIST += "${DEPLOY_DIR_RPM}/sdk_provides_dummy_nativesdk/ ${DEPLOY_DIR_IPK}/sdk-provides-dummy-nativesdk/"
-SSTATE_DUPWHITELIST += "${DEPLOY_DIR_RPM}/buildtools_dummy_nativesdk/ ${DEPLOY_DIR_IPK}/buildtools-dummy-nativesdk/"
+SSTATE_ALLOW_OVERLAP_FILES += "${DEPLOY_DIR_RPM}/sdk_provides_dummy_nativesdk/ ${DEPLOY_DIR_IPK}/sdk-provides-dummy-nativesdk/"
+SSTATE_ALLOW_OVERLAP_FILES += "${DEPLOY_DIR_RPM}/buildtools_dummy_nativesdk/ ${DEPLOY_DIR_IPK}/buildtools-dummy-nativesdk/"
 # target-sdk-provides-dummy overlaps that allarch is disabled when multilib is used
-SSTATE_DUPWHITELIST += "${COMPONENTS_DIR}/sdk-provides-dummy-target/ ${DEPLOY_DIR_RPM}/sdk_provides_dummy_target/ ${DEPLOY_DIR_IPK}/sdk-provides-dummy-target/"
+SSTATE_ALLOW_OVERLAP_FILES += "${COMPONENTS_DIR}/sdk-provides-dummy-target/ ${DEPLOY_DIR_RPM}/sdk_provides_dummy_target/ ${DEPLOY_DIR_IPK}/sdk-provides-dummy-target/"
 # Archive the sources for many architectures in one deploy folder
-SSTATE_DUPWHITELIST += "${DEPLOY_DIR_SRC}"
+SSTATE_ALLOW_OVERLAP_FILES += "${DEPLOY_DIR_SRC}"
 # ovmf/grub-efi/systemd-boot/intel-microcode multilib recipes can generate identical overlapping files
-SSTATE_DUPWHITELIST += "${DEPLOY_DIR_IMAGE}/ovmf"
-SSTATE_DUPWHITELIST += "${DEPLOY_DIR_IMAGE}/grub-efi"
-SSTATE_DUPWHITELIST += "${DEPLOY_DIR_IMAGE}/systemd-boot"
-SSTATE_DUPWHITELIST += "${DEPLOY_DIR_IMAGE}/microcode"
+SSTATE_ALLOW_OVERLAP_FILES += "${DEPLOY_DIR_IMAGE}/ovmf"
+SSTATE_ALLOW_OVERLAP_FILES += "${DEPLOY_DIR_IMAGE}/grub-efi"
+SSTATE_ALLOW_OVERLAP_FILES += "${DEPLOY_DIR_IMAGE}/systemd-boot"
+SSTATE_ALLOW_OVERLAP_FILES += "${DEPLOY_DIR_IMAGE}/microcode"
 
 SSTATE_SCAN_FILES ?= "*.la *-config *_config postinst-*"
 SSTATE_SCAN_CMD ??= 'find ${SSTATE_BUILDDIR} \( -name "${@"\" -o -name \"".join(d.getVar("SSTATE_SCAN_FILES").split())}" \) -type f'
@@ -94,7 +94,7 @@ SSTATE_ARCHS[vardepsexclude] = "ORIGNATIVELSBSTRING"
 
 SSTATE_MANMACH ?= "${SSTATE_PKGARCH}"
 
-SSTATECREATEFUNCS = "sstate_hardcode_path"
+SSTATECREATEFUNCS += "sstate_hardcode_path"
 SSTATECREATEFUNCS[vardeps] = "SSTATE_SCAN_FILES"
 SSTATEPOSTCREATEFUNCS = ""
 SSTATEPREINSTFUNCS = ""
@@ -260,7 +260,7 @@ def sstate_install(ss, d):
                 shareddirs.append(dstdir)
 
     # Check the file list for conflicts against files which already exist
-    whitelist = (d.getVar("SSTATE_DUPWHITELIST") or "").split()
+    whitelist = (d.getVar("SSTATE_ALLOW_OVERLAP_FILES") or "").split()
     match = []
     for f in sharedfiles:
         if os.path.exists(f) and not os.path.islink(f):
@@ -296,7 +296,7 @@ def sstate_install(ss, d):
           "DISTRO_FEATURES on an existing build directory is not supported - you " \
           "should really clean out tmp and rebuild (reusing sstate should be safe). " \
           "It could be the overlapping files detected are harmless in which case " \
-          "adding them to SSTATE_DUPWHITELIST may be the correct solution. It could " \
+          "adding them to SSTATE_ALLOW_OVERLAP_FILES may be the correct solution. It could " \
           "also be your build is including two different conflicting versions of " \
           "things (e.g. bluez 4 and bluez 5 and the correct solution for that would " \
           "be to resolve the conflict. If in doubt, please ask on the mailing list, " \
@@ -350,7 +350,7 @@ def sstate_install(ss, d):
     for lock in locks:
         bb.utils.unlockfile(lock)
 
-sstate_install[vardepsexclude] += "SSTATE_DUPWHITELIST STATE_MANMACH SSTATE_MANFILEPREFIX"
+sstate_install[vardepsexclude] += "SSTATE_ALLOW_OVERLAP_FILES STATE_MANMACH SSTATE_MANFILEPREFIX"
 sstate_install[vardeps] += "${SSTATEPOSTINSTFUNCS}"
 
 def sstate_installpkg(ss, d):
@@ -862,14 +862,18 @@ sstate_create_package () {
 	fi
 	chmod 0664 $TFILE
 	# Skip if it was already created by some other process
-	if [ ! -e ${SSTATE_PKG} ]; then
+	if [ -h ${SSTATE_PKG} ] && [ ! -e ${SSTATE_PKG} ]; then
+		# There is a symbolic link, but it links to nothing.
+		# Forcefully replace it with the new file.
+		ln -f $TFILE ${SSTATE_PKG} || true
+	elif [ ! -e ${SSTATE_PKG} ]; then
 		# Move into place using ln to attempt an atomic op.
 		# Abort if it already exists
-		ln $TFILE ${SSTATE_PKG} && rm $TFILE
+		ln $TFILE ${SSTATE_PKG} || true
 	else
-		rm $TFILE
+		touch ${SSTATE_PKG} 2>/dev/null || true
 	fi
-	touch ${SSTATE_PKG} 2>/dev/null || true
+	rm $TFILE
 }
 
 python sstate_sign_package () {
@@ -905,7 +909,7 @@ sstate_unpack_package () {
 
 	tar -I "$ZSTD" -xvpf ${SSTATE_PKG}
 	# update .siginfo atime on local/NFS mirror if it is a symbolic link
-	[ ! -h ${SSTATE_PKG}.siginfo ] || touch -a ${SSTATE_PKG}.siginfo 2>/dev/null || true
+	[ ! -h ${SSTATE_PKG}.siginfo ] || [ ! -e ${SSTATE_PKG}.siginfo ] || touch -a ${SSTATE_PKG}.siginfo 2>/dev/null || true
 	# update each symbolic link instead of any referenced file
 	touch --no-dereference ${SSTATE_PKG} 2>/dev/null || true
 	[ ! -e ${SSTATE_PKG}.sig ] || touch --no-dereference ${SSTATE_PKG}.sig 2>/dev/null || true
@@ -988,6 +992,8 @@ def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, 
             localdata.setVar('SRC_URI', srcuri)
             bb.debug(2, "SState: Attempting to fetch %s" % srcuri)
 
+            import traceback
+
             try:
                 fetcher = bb.fetch2.Fetch(srcuri.split(), localdata2,
                             connection_cache=thread_worker.connection_cache)
@@ -996,9 +1002,9 @@ def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, 
                 found.add(tid)
                 missed.remove(tid)
             except bb.fetch2.FetchError as e:
-                bb.debug(2, "SState: Unsuccessful fetch test for %s (%s)" % (srcuri, repr(e)))
+                bb.debug(2, "SState: Unsuccessful fetch test for %s (%s)\n%s" % (srcuri, repr(e), traceback.format_exc()))
             except Exception as e:
-                bb.error("SState: cannot test %s: %s" % (srcuri, repr(e)))
+                bb.error("SState: cannot test %s: %s\n%s" % (srcuri, repr(e), traceback.format_exc()))
 
             if progress:
                 bb.event.fire(bb.event.ProcessProgress(msg, len(tasklist) - thread_worker.tasks.qsize()), d)
@@ -1016,15 +1022,18 @@ def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, 
                 msg = "Checking sstate mirror object availability"
                 bb.event.fire(bb.event.ProcessStarted(msg, len(tasklist)), d)
 
-            bb.event.enable_threadlock()
-            pool = oe.utils.ThreadedPool(nproc, len(tasklist),
-                    worker_init=checkstatus_init, worker_end=checkstatus_end,
-                    name="sstate_checkhashes-")
-            for t in tasklist:
-                pool.add_task(checkstatus, t)
-            pool.start()
-            pool.wait_completion()
-            bb.event.disable_threadlock()
+            # Have to setup the fetcher environment here rather than in each thread as it would race
+            fetcherenv = bb.fetch2.get_fetcher_environment(d)
+            with bb.utils.environment(**fetcherenv):
+                bb.event.enable_threadlock()
+                pool = oe.utils.ThreadedPool(nproc, len(tasklist),
+                        worker_init=checkstatus_init, worker_end=checkstatus_end,
+                        name="sstate_checkhashes-")
+                for t in tasklist:
+                    pool.add_task(checkstatus, t)
+                pool.start()
+                pool.wait_completion()
+                bb.event.disable_threadlock()
 
             if progress:
                 bb.event.fire(bb.event.ProcessFinished(msg), d)

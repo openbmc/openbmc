@@ -1,0 +1,130 @@
+From b060c53503339c45808efeb4294a03105a2999a5 Mon Sep 17 00:00:00 2001
+From: Yu Watanabe <watanabe.yu+github@gmail.com>
+Date: Wed, 2 Feb 2022 14:05:45 +0900
+Subject: [PATCH] mkdir: allow to create directory whose path contains symlink
+Cc: pavel@zhukoff.net
+
+Upstream-Status: Backport
+Upstream-Url: https://github.com/systemd/systemd/pull/22359
+
+Signed-off-by: Pavel Zhukov <pavel.zhukov@huawei.com>
+
+
+core/mount: fail early if directory cannot be created
+
+Prompted by #22334.
+
+mkdir: CHASE_NONEXISTENT cannot used in chase_symlinks_and_stat()
+
+mkdir: allow to create directory whose path contains symlink
+
+Fixes a regression caused by 3008a6f21c1c42efe852d69798a2fdd63fe657ec.
+
+Before the commit, when `mkdir_parents_internal()` is called from `mkdir_p()`,
+it uses `_mkdir()` as `flag` is zero. But after the commit, `mkdir_safe_internal()`
+is always used. Hence, if the path contains a symlink, it fails with -ENOTDIR.
+
+To fix the issue, this makes `mkdir_p()` calls `mkdir_parents_internal()` with
+MKDIR_FOLLOW_SYMLINK flag.
+
+Fixes #22334.
+
+test: add a test for mkdir_p()
+---
+ src/basic/mkdir.c     |  4 ++--
+ src/core/mount.c      |  4 +++-
+ src/test/meson.build  |  2 ++
+ src/test/test-mkdir.c | 30 ++++++++++++++++++++++++++++++
+ 4 files changed, 37 insertions(+), 3 deletions(-)
+ create mode 100644 src/test/test-mkdir.c
+
+diff --git a/src/basic/mkdir.c b/src/basic/mkdir.c
+index 6e2b94d024..51a0d74e87 100644
+--- a/src/basic/mkdir.c
++++ b/src/basic/mkdir.c
+@@ -42,7 +42,7 @@ int mkdir_safe_internal(
+         if ((flags & MKDIR_FOLLOW_SYMLINK) && S_ISLNK(st.st_mode)) {
+                 _cleanup_free_ char *p = NULL;
+ 
+-                r = chase_symlinks_and_stat(path, NULL, CHASE_NONEXISTENT, &p, &st, NULL);
++                r = chase_symlinks_and_stat(path, NULL, 0, &p, &st, NULL);
+                 if (r < 0)
+                         return r;
+                 if (r == 0)
+@@ -162,7 +162,7 @@ int mkdir_p_internal(const char *prefix, const char *path, mode_t mode, uid_t ui
+ 
+         assert(_mkdirat != mkdirat);
+ 
+-        r = mkdir_parents_internal(prefix, path, mode, uid, gid, flags, _mkdirat);
++        r = mkdir_parents_internal(prefix, path, mode, uid, gid, flags | MKDIR_FOLLOW_SYMLINK, _mkdirat);
+         if (r < 0)
+                 return r;
+ 
+diff --git a/src/core/mount.c b/src/core/mount.c
+index 0170406351..c650b5abe2 100644
+--- a/src/core/mount.c
++++ b/src/core/mount.c
+@@ -1027,8 +1027,10 @@ static void mount_enter_mounting(Mount *m) {
+                 r = mkdir_p_label(p->what, m->directory_mode);
+                 /* mkdir_p_label() can return -EEXIST if the target path exists and is not a directory - which is
+                  * totally OK, in case the user wants us to overmount a non-directory inode. */
+-                if (r < 0 && r != -EEXIST)
++                if (r < 0 && r != -EEXIST) {
+                         log_unit_error_errno(UNIT(m), r, "Failed to make bind mount source '%s': %m", p->what);
++                        goto fail;
++                }
+         }
+ 
+         if (p) {
+diff --git a/src/test/meson.build b/src/test/meson.build
+index 9a1c481f22..7aa1d9c6ea 100644
+--- a/src/test/meson.build
++++ b/src/test/meson.build
+@@ -193,6 +193,8 @@ tests += [
+ 
+         [['src/test/test-macro.c']],
+ 
++        [['src/test/test-mkdir.c']],
++
+         [['src/test/test-json.c']],
+ 
+         [['src/test/test-modhex.c']],
+diff --git a/src/test/test-mkdir.c b/src/test/test-mkdir.c
+new file mode 100644
+index 0000000000..c715d5f096
+--- /dev/null
++++ b/src/test/test-mkdir.c
+@@ -0,0 +1,30 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
++
++#include <unistd.h>
++
++#include "mkdir.h"
++#include "path-util.h"
++#include "rm-rf.h"
++#include "tests.h"
++#include "tmpfile-util.h"
++
++TEST(mkdir_p) {
++        _cleanup_(rm_rf_physical_and_freep) char *tmp = NULL;
++        _cleanup_free_ char *p = NULL;
++
++        assert_se(mkdtemp_malloc("/tmp/test-mkdir-XXXXXX", &tmp) >= 0);
++
++        assert_se(p = path_join(tmp, "run"));
++        assert_se(mkdir_p(p, 0755) >= 0);
++
++        p = mfree(p);
++        assert_se(p = path_join(tmp, "var/run"));
++        assert_se(mkdir_parents(p, 0755) >= 0);
++        assert_se(symlink("../run", p) >= 0);
++
++        p = mfree(p);
++        assert_se(p = path_join(tmp, "var/run/hoge/foo/baz"));
++        assert_se(mkdir_p(p, 0755) >= 0);
++}
++
++DEFINE_TEST_MAIN(LOG_DEBUG);
+-- 
+2.34.1
+

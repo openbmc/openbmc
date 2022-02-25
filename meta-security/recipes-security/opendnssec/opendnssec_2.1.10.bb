@@ -33,4 +33,4 @@ do_install:append () {
 
 RDEPENDS:${PN} = "softhsm"
 
-PNBLACKLIST[opendnssec] ?= "Needs porting to openssl 3.x"
+SKIP_RECIPE[opendnssec] ?= "Needs porting to openssl 3.x"

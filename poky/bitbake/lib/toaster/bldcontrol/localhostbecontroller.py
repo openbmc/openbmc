@@ -200,7 +200,7 @@ class LocalhostBEController(BuildEnvironmentController):
                 localdirpath = os.path.join(localdirname, dirpath)
                 logger.debug("localhostbecontroller: localdirpath expects '%s'" % localdirpath)
                 if not os.path.exists(localdirpath):
-                    raise BuildSetupException("Cannot find layer git path '%s' in checked out repository '%s:%s'. Aborting." % (localdirpath, giturl, commit))
+                    raise BuildSetupException("Cannot find layer git path '%s' in checked out repository '%s:%s'. Exiting." % (localdirpath, giturl, commit))
 
                 if name != "bitbake":
                     layerlist.append("%03d:%s" % (index,localdirpath.rstrip("/")))
@@ -467,7 +467,7 @@ class LocalhostBEController(BuildEnvironmentController):
             logger.debug("localhostbecontroller: waiting for bblock content to appear")
             time.sleep(1)
         else:
-            raise BuildSetupException("Cannot find bitbake server lock file '%s'. Aborting." % bblock)
+            raise BuildSetupException("Cannot find bitbake server lock file '%s'. Exiting." % bblock)
 
         with open(bblock) as fplock:
             for line in fplock:

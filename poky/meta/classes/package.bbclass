@@ -367,7 +367,7 @@ def source_info(file, d, fatal=True):
 
     return list(debugsources)
 
-def splitdebuginfo(file, dvar, debugdir, debuglibdir, debugappend, debugsrcdir, d):
+def splitdebuginfo(file, dvar, dv, d):
     # Function to split a single file into two components, one is the stripped
     # target system binary, the other contains any debugging information. The
     # two files are linked to reference each other.
@@ -378,7 +378,7 @@ def splitdebuginfo(file, dvar, debugdir, debuglibdir, debugappend, debugsrcdir, 
     import subprocess
 
     src = file[len(dvar):]
-    dest = debuglibdir + os.path.dirname(src) + debugdir + "/" + os.path.basename(src) + debugappend
+    dest = dv["libdir"] + os.path.dirname(src) + dv["dir"] + "/" + os.path.basename(src) + dv["append"]
     debugfile = dvar + dest
     sources = []
 
@@ -397,7 +397,7 @@ def splitdebuginfo(file, dvar, debugdir, debuglibdir, debugappend, debugsrcdir, 
         os.chmod(file, newmode)
 
     # We need to extract the debug src information here...
-    if debugsrcdir:
+    if dv["srcdir"]:
         sources = source_info(file, d)
 
     bb.utils.mkdirhier(os.path.dirname(debugfile))
@@ -412,7 +412,7 @@ def splitdebuginfo(file, dvar, debugdir, debuglibdir, debugappend, debugsrcdir, 
 
     return (file, sources)
 
-def splitstaticdebuginfo(file, dvar, debugstaticdir, debugstaticlibdir, debugstaticappend, debugsrcdir, d):
+def splitstaticdebuginfo(file, dvar, dv, d):
     # Unlike the function above, there is no way to split a static library
     # two components.  So to get similar results we will copy the unmodified
     # static library (containing the debug symbols) into a new directory.
@@ -425,7 +425,7 @@ def splitstaticdebuginfo(file, dvar, debugstaticdir, debugstaticlibdir, debugsta
     import shutil
 
     src = file[len(dvar):]
-    dest = debugstaticlibdir + os.path.dirname(src) + debugstaticdir + "/" + os.path.basename(src) + debugstaticappend
+    dest = dv["staticlibdir"] + os.path.dirname(src) + dv["staticdir"] + "/" + os.path.basename(src) + dv["staticappend"]
     debugfile = dvar + dest
     sources = []
 
@@ -442,7 +442,7 @@ def splitstaticdebuginfo(file, dvar, debugstaticdir, debugstaticlibdir, debugsta
         os.chmod(file, newmode)
 
     # We need to extract the debug src information here...
-    if debugsrcdir:
+    if dv["srcdir"]:
         sources = source_info(file, d)
 
     bb.utils.mkdirhier(os.path.dirname(debugfile))
@@ -455,7 +455,7 @@ def splitstaticdebuginfo(file, dvar, debugstaticdir, debugstaticlibdir, debugsta
 
     return (file, sources)
 
-def inject_minidebuginfo(file, dvar, debugdir, debuglibdir, debugappend, debugsrcdir, d):
+def inject_minidebuginfo(file, dvar, dv, d):
     # Extract just the symbols from debuginfo into minidebuginfo,
     # compress it with xz and inject it back into the binary in a .gnu_debugdata section.
     # https://sourceware.org/gdb/onlinedocs/gdb/MiniDebugInfo.html
@@ -469,7 +469,7 @@ def inject_minidebuginfo(file, dvar, debugdir, debuglibdir, debugappend, debugsr
     minidebuginfodir = d.expand('${WORKDIR}/minidebuginfo')
 
     src = file[len(dvar):]
-    dest = debuglibdir + os.path.dirname(src) + debugdir + "/" + os.path.basename(src) + debugappend
+    dest = dv["libdir"] + os.path.dirname(src) + dv["dir"] + "/" + os.path.basename(src) + dv["append"]
     debugfile = dvar + dest
     minidebugfile = minidebuginfodir + src + '.minidebug'
     bb.utils.mkdirhier(os.path.dirname(minidebugfile))
@@ -1065,6 +1065,54 @@ python fixup_perms () {
                     fix_perms(each_file, fs_perms_table[dir].fmode, fs_perms_table[dir].fuid, fs_perms_table[dir].fgid, dir)
 }
 
+def package_debug_vars(d):
+    # We default to '.debug' style
+    if d.getVar('PACKAGE_DEBUG_SPLIT_STYLE') == 'debug-file-directory':
+        # Single debug-file-directory style debug info
+        debug_vars = {
+            "append": ".debug",
+            "staticappend": "",
+            "dir": "",
+            "staticdir": "",
+            "libdir": "/usr/lib/debug",
+            "staticlibdir": "/usr/lib/debug-static",
+            "srcdir": "/usr/src/debug",
+        }
+    elif d.getVar('PACKAGE_DEBUG_SPLIT_STYLE') == 'debug-without-src':
+        # Original OE-core, a.k.a. ".debug", style debug info, but without sources in /usr/src/debug
+        debug_vars = {
+            "append": "",
+            "staticappend": "",
+            "dir": "/.debug",
+            "staticdir": "/.debug-static",
+            "libdir": "",
+            "staticlibdir": "",
+            "srcdir": "",
+        }
+    elif d.getVar('PACKAGE_DEBUG_SPLIT_STYLE') == 'debug-with-srcpkg':
+        debug_vars = {
+            "append": "",
+            "staticappend": "",
+            "dir": "/.debug",
+            "staticdir": "/.debug-static",
+            "libdir": "",
+            "staticlibdir": "",
+            "srcdir": "/usr/src/debug",
+        }
+    else:
+        # Original OE-core, a.k.a. ".debug", style debug info
+        debug_vars = {
+            "append": "",
+            "staticappend": "",
+            "dir": "/.debug",
+            "staticdir": "/.debug-static",
+            "libdir": "",
+            "staticlibdir": "",
+            "srcdir": "/usr/src/debug",
+        }
+
+    return debug_vars
+
 python split_and_strip_files () {
     import stat, errno
     import subprocess
@@ -1076,42 +1124,7 @@ python split_and_strip_files () {
     oldcwd = os.getcwd()
     os.chdir(dvar)
 
-    # We default to '.debug' style
-    if d.getVar('PACKAGE_DEBUG_SPLIT_STYLE') == 'debug-file-directory':
-        # Single debug-file-directory style debug info
-        debugappend = ".debug"
-        debugstaticappend = ""
-        debugdir = ""
-        debugstaticdir = ""
-        debuglibdir = "/usr/lib/debug"
-        debugstaticlibdir = "/usr/lib/debug-static"
-        debugsrcdir = "/usr/src/debug"
-    elif d.getVar('PACKAGE_DEBUG_SPLIT_STYLE') == 'debug-without-src':
-        # Original OE-core, a.k.a. ".debug", style debug info, but without sources in /usr/src/debug
-        debugappend = ""
-        debugstaticappend = ""
-        debugdir = "/.debug"
-        debugstaticdir = "/.debug-static"
-        debuglibdir = ""
-        debugstaticlibdir = ""
-        debugsrcdir = ""
-    elif d.getVar('PACKAGE_DEBUG_SPLIT_STYLE') == 'debug-with-srcpkg':
-        debugappend = ""
-        debugstaticappend = ""
-        debugdir = "/.debug"
-        debugstaticdir = "/.debug-static"
-        debuglibdir = ""
-        debugstaticlibdir = ""
-        debugsrcdir = "/usr/src/debug"
-    else:
-        # Original OE-core, a.k.a. ".debug", style debug info
-        debugappend = ""
-        debugstaticappend = ""
-        debugdir = "/.debug"
-        debugstaticdir = "/.debug-static"
-        debuglibdir = ""
-        debugstaticlibdir = ""
-        debugsrcdir = "/usr/src/debug"
+    dv = package_debug_vars(d)
 
     #
     # First lets figure out all of the files we may have to process ... do this only once!
@@ -1132,9 +1145,9 @@ python split_and_strip_files () {
                 file = os.path.join(root, f)
 
                 # Skip debug files
-                if debugappend and file.endswith(debugappend):
+                if dv["append"] and file.endswith(dv["append"]):
                     continue
-                if debugdir and debugdir in os.path.dirname(file[len(dvar):]):
+                if dv["dir"] and dv["dir"] in os.path.dirname(file[len(dvar):]):
                     continue
 
                 if file in skipfiles:
@@ -1231,11 +1244,11 @@ python split_and_strip_files () {
     # First lets process debug splitting
     #
     if (d.getVar('INHIBIT_PACKAGE_DEBUG_SPLIT') != '1'):
-        results = oe.utils.multiprocess_launch(splitdebuginfo, list(elffiles), d, extraargs=(dvar, debugdir, debuglibdir, debugappend, debugsrcdir, d))
+        results = oe.utils.multiprocess_launch(splitdebuginfo, list(elffiles), d, extraargs=(dvar, dv, d))
 
-        if debugsrcdir and not hostos.startswith("mingw"):
+        if dv["srcdir"] and not hostos.startswith("mingw"):
             if (d.getVar('PACKAGE_DEBUG_STATIC_SPLIT') == '1'):
-                results = oe.utils.multiprocess_launch(splitstaticdebuginfo, staticlibs, d, extraargs=(dvar, debugstaticdir, debugstaticlibdir, debugstaticappend, debugsrcdir, d))
+                results = oe.utils.multiprocess_launch(splitstaticdebuginfo, staticlibs, d, extraargs=(dvar, dv, d))
             else:
                 for file in staticlibs:
                     results.append( (file,source_info(file, d)) )
@@ -1254,9 +1267,9 @@ python split_and_strip_files () {
             target = inodes[ref][0][len(dvar):]
             for file in inodes[ref][1:]:
                 src = file[len(dvar):]
-                dest = debuglibdir + os.path.dirname(src) + debugdir + "/" + os.path.basename(target) + debugappend
+                dest = dv["libdir"] + os.path.dirname(src) + dv["dir"] + "/" + os.path.basename(target) + dv["append"]
                 fpath = dvar + dest
-                ftarget = dvar + debuglibdir + os.path.dirname(target) + debugdir + "/" + os.path.basename(target) + debugappend
+                ftarget = dvar + dv["libdir"] + os.path.dirname(target) + dv["dir"] + "/" + os.path.basename(target) + dv["append"]
                 bb.utils.mkdirhier(os.path.dirname(fpath))
                 # Only one hardlink of separated debug info file in each directory
                 if not os.access(fpath, os.R_OK):
@@ -1266,7 +1279,7 @@ python split_and_strip_files () {
         # Create symlinks for all cases we were able to split symbols
         for file in symlinks:
             src = file[len(dvar):]
-            dest = debuglibdir + os.path.dirname(src) + debugdir + "/" + os.path.basename(src) + debugappend
+            dest = dv["libdir"] + os.path.dirname(src) + dv["dir"] + "/" + os.path.basename(src) + dv["append"]
             fpath = dvar + dest
             # Skip it if the target doesn't exist
             try:
@@ -1282,17 +1295,17 @@ python split_and_strip_files () {
             lbase = os.path.basename(ltarget)
             ftarget = ""
             if lpath and lpath != ".":
-                ftarget += lpath + debugdir + "/"
-            ftarget += lbase + debugappend
+                ftarget += lpath + dv["dir"] + "/"
+            ftarget += lbase + dv["append"]
             if lpath.startswith(".."):
                 ftarget = os.path.join("..", ftarget)
             bb.utils.mkdirhier(os.path.dirname(fpath))
             #bb.note("Symlink %s -> %s" % (fpath, ftarget))
             os.symlink(ftarget, fpath)
 
-        # Process the debugsrcdir if requested...
+        # Process the dv["srcdir"] if requested...
         # This copies and places the referenced sources for later debugging...
-        copydebugsources(debugsrcdir, sources, d)
+        copydebugsources(dv["srcdir"], sources, d)
     #
     # End of debug splitting
     #
@@ -1316,7 +1329,7 @@ python split_and_strip_files () {
     # Build "minidebuginfo" and reinject it back into the stripped binaries
     if d.getVar('PACKAGE_MINIDEBUGINFO') == '1':
         oe.utils.multiprocess_launch(inject_minidebuginfo, list(elffiles), d,
-                                     extraargs=(dvar, debugdir, debuglibdir, debugappend, debugsrcdir, d))
+                                     extraargs=(dvar, dv, d))
 
     #
     # End of strip
@@ -1455,10 +1468,10 @@ python populate_packages () {
     os.umask(oldumask)
     os.chdir(workdir)
 
-    # Handle LICENSE_EXCLUSION
+    # Handle excluding packages with incompatible licenses
     package_list = []
     for pkg in packages:
-        licenses = d.getVar('LICENSE_EXCLUSION-' + pkg)
+        licenses = d.getVar('_exclude_incompatible-' + pkg)
         if licenses:
             msg = "Excluding %s from packaging as it has incompatible license(s): %s" % (pkg, licenses)
             oe.qa.handle_error("incompatible-license", msg, d)
@@ -2340,7 +2353,7 @@ def gen_packagevar(d, pkgvars="PACKAGEVARS"):
 
         # Ensure that changes to INCOMPATIBLE_LICENSE re-run do_package for
         # affected recipes.
-        ret.append('LICENSE_EXCLUSION-%s' % p)
+        ret.append('_exclude_incompatible-%s' % p)
     return " ".join(ret)
 
 PACKAGE_PREPROCESS_FUNCS ?= ""

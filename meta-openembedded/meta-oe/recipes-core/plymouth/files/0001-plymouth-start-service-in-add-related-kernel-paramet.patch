@@ -1,0 +1,31 @@
+From 658eac007d14d836cb002a5675487bac63d50324 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Mon, 7 Feb 2022 03:22:12 +0000
+Subject: [PATCH] plymouth-start.service.in: add related kernel parameter
+
+Add extra kernel parameter to make the plymouth splash screen
+display during boot.
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/plymouth/plymouth/-/merge_requests/156]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ systemd-units/plymouth-start.service.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/systemd-units/plymouth-start.service.in b/systemd-units/plymouth-start.service.in
+index 830a62d..c20aabe 100644
+--- a/systemd-units/plymouth-start.service.in
++++ b/systemd-units/plymouth-start.service.in
+@@ -9,7 +9,7 @@ ConditionVirtualization=!container
+ IgnoreOnIsolate=true
+ 
+ [Service]
+-ExecStart=@PLYMOUTH_DAEMON_DIR@/plymouthd --mode=boot --pid-file=@plymouthruntimedir@/pid --attach-to-session
++ExecStart=@PLYMOUTH_DAEMON_DIR@/plymouthd --mode=boot  --kernel-command-line="splash plymouth.ignore-serial-consoles" --pid-file=@plymouthruntimedir@/pid --attach-to-session
+ ExecStartPost=-@PLYMOUTH_CLIENT_DIR@/plymouth show-splash
+ Type=forking
+ RemainAfterExit=yes
+-- 
+2.31.1
+

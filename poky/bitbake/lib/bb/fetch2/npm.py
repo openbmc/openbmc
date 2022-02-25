@@ -52,9 +52,13 @@ def npm_filename(package, version):
     """Get the filename of a npm package"""
     return npm_package(package) + "-" + version + ".tgz"
 
-def npm_localfile(package, version):
+def npm_localfile(package, version=None):
     """Get the local filename of a npm package"""
-    return os.path.join("npm2", npm_filename(package, version))
+    if version is not None:
+        filename = npm_filename(package, version)
+    else:
+        filename = package
+    return os.path.join("npm2", filename)
 
 def npm_integrity(integrity):
     """
@@ -157,7 +161,7 @@ class Npm(FetchMethod):
         # Using the 'downloadfilename' parameter as local filename
         # or the npm package name.
         if "downloadfilename" in ud.parm:
-            ud.localfile = d.expand(ud.parm["downloadfilename"])
+            ud.localfile = npm_localfile(d.expand(ud.parm["downloadfilename"]))
         else:
             ud.localfile = npm_localfile(ud.package, ud.version)
 

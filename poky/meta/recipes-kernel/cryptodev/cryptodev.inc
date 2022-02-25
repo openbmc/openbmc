@@ -5,7 +5,7 @@ of hardware accelerators. Cryptodev-linux is implemented as a standalone \
 module that requires no dependencies other than a stock linux kernel. Its \
 API is compatible with OpenBSD's cryptodev userspace API (/dev/crypto)."
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "git://github.com/cryptodev-linux/cryptodev-linux;branch=master;protocol=https \

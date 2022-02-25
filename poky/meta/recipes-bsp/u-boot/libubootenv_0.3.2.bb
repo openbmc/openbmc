@@ -6,7 +6,7 @@ It provides a hardware-independent replacement for fw_printenv/setenv utilities 
 provided by U-Boot"
 
 HOMEPAGE = "https://github.com/sbabic/libubootenv"
-LICENSE = "LGPL-2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://Licenses/lgpl-2.1.txt;md5=4fbd65380cdd255951079008b364516c"
 SECTION = "libs"
 

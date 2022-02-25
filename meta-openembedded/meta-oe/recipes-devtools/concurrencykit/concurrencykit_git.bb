@@ -3,7 +3,7 @@ safe memory reclamation mechanisms and non-blocking data structures \
 designed to aid in the design and implementation of high performance \
 concurrent systems."
 
-LICENSE = "BSD & Apache-2.0"
+LICENSE = "BSD-2-Clause & Apache-2.0"
 HOMEPAGE = "http://concurrencykit.org"
 SECTION = "base"
 
@@ -16,7 +16,7 @@ SRC_URI = "git://github.com/concurrencykit/ck.git;branch=master;protocol=https \
 
 S = "${WORKDIR}/git"
 
-COMPATIBLE_HOST = "(i.86|x86_64|powerpc|powerpc64).*-linux*"
+COMPATIBLE_HOST = "(arm|aarch64|i.86|x86_64|powerpc|powerpc64).*-linux*"
 
 inherit autotools-brokensep
 

@@ -2,7 +2,7 @@ SUMMARY = "Documentation generator for glib-based software"
 DESCRIPTION = "Gtk-doc is a set of scripts that extract specially formatted comments \
                from glib-based software and produce a set of html documentation files from them"
 HOMEPAGE = "https://www.gtk.org/docs/"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
 inherit gnomebase

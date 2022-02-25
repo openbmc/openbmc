@@ -1,5 +1,5 @@
 require patch.inc
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 
 SRC_URI += "file://0001-Unset-need_charset_alias-when-building-for-musl.patch \
             file://0002-Fix-segfault-with-mangled-rename-patch.patch \

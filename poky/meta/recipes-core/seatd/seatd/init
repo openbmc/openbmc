@@ -1,0 +1,45 @@
+#!/bin/sh
+#
+### BEGIN INIT INFO
+# Provides: seatd
+# Required-Start: $local_fs $remote_fs
+# Required-Stop: $local_fs $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+### END INIT INFO
+
+killproc() {
+        pid=`/bin/pidof $1`
+        [ "$pid" != "" ] && kill $pid
+}
+
+case "$1" in
+  start)
+        seatd -g video -n 1 > /tmp/seatd-start-notify &
+        [ -s /tmp/seatd-start-notify ] && exit 0
+        sleep 0.1
+        [ -s /tmp/seatd-start-notify ] && exit 0
+        sleep 0.5
+        [ -s /tmp/seatd-start-notify ] && exit 0
+        sleep 5
+        [ -s /tmp/seatd-start-notify ] && exit 0
+        exit 1
+  ;;
+
+  stop)
+        echo "Stopping seatd"
+        killproc seatd
+  ;;
+
+  restart)
+	$0 stop
+        sleep 1
+        $0 start
+  ;;
+
+  *)
+        echo "usage: $0 { start | stop | restart }"
+  ;;
+esac
+
+exit 0

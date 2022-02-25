@@ -7,7 +7,7 @@ HOMEPAGE = "https://github.com/cronie-crond/cronie/"
 BUGTRACKER = "https://bugzilla.redhat.com"
 
 # Internet Systems Consortium License
-LICENSE = "ISC & BSD-3-Clause & BSD-2-Clause & GPLv2+"
+LICENSE = "ISC & BSD-3-Clause & BSD-2-Clause & GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=dd2a592170760e1386c769e1043b3722 \
                     file://src/cron.c;endline=20;md5=b425c334265026177128353a142633b4 \
                     file://src/popen.c;beginline=3;endline=31;md5=edd50742d8def712e9472dba353668a9"

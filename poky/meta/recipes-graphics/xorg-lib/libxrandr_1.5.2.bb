@@ -8,7 +8,7 @@ specified in the Proceedings of the 2001 Usenix Technical Conference \
 
 require xorg-lib-common.inc
 
-LICENSE = "MIT-style"
+LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c9d1a2118a6cd5727521db8e7a2fee69"
 
 DEPENDS += "virtual/libx11 xorgproto libxrender libxext"

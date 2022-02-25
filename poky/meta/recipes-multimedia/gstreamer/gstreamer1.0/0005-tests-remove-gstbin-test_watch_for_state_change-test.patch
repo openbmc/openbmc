@@ -1,0 +1,107 @@
+From b935abba3d8fa3ea1ce384c08e650afd8c20b78a Mon Sep 17 00:00:00 2001
+From: Claudius Heine <ch@denx.de>
+Date: Wed, 2 Feb 2022 13:47:02 +0100
+Subject: [PATCH] tests: remove gstbin:test_watch_for_state_change testcase
+
+This testcase seems to be flaky, and upstream marked it as such:
+https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/778
+
+This patch removes the testcase to avoid it interfering with out ptest.
+
+Signed-off-by: Claudius Heine <ch@denx.de>
+
+Upstream-Status: Inappropriate [needs proper upstream fix]
+---
+ tests/check/gst/gstbin.c        | 69 -------------------
+ 1 file changed, 69 deletions(-)
+
+diff --git a/tests/check/gst/gstbin.c b/tests/check/gst/gstbin.c
+index e366d5fe20..ac29d81474 100644
+--- a/tests/check/gst/gstbin.c
++++ b/tests/check/gst/gstbin.c
+@@ -691,74 +691,6 @@ GST_START_TEST (test_message_state_changed_children)
+ 
+ GST_END_TEST;
+ 
+-GST_START_TEST (test_watch_for_state_change)
+-{
+-  GstElement *src, *sink, *bin;
+-  GstBus *bus;
+-  GstStateChangeReturn ret;
+-
+-  bin = gst_element_factory_make ("bin", NULL);
+-  fail_unless (bin != NULL, "Could not create bin");
+-
+-  bus = g_object_new (gst_bus_get_type (), NULL);
+-  gst_object_ref_sink (bus);
+-  gst_element_set_bus (GST_ELEMENT_CAST (bin), bus);
+-
+-  src = gst_element_factory_make ("fakesrc", NULL);
+-  fail_if (src == NULL, "Could not create fakesrc");
+-  sink = gst_element_factory_make ("fakesink", NULL);
+-  fail_if (sink == NULL, "Could not create fakesink");
+-
+-  gst_bin_add (GST_BIN (bin), sink);
+-  gst_bin_add (GST_BIN (bin), src);
+-
+-  fail_unless (gst_element_link (src, sink), "could not link src and sink");
+-
+-  /* change state, spawning two times three messages */
+-  ret = gst_element_set_state (GST_ELEMENT (bin), GST_STATE_PAUSED);
+-  fail_unless (ret == GST_STATE_CHANGE_ASYNC);
+-  ret =
+-      gst_element_get_state (GST_ELEMENT (bin), NULL, NULL,
+-      GST_CLOCK_TIME_NONE);
+-  fail_unless (ret == GST_STATE_CHANGE_SUCCESS);
+-
+-  pop_state_changed (bus, 6);
+-  pop_async_done (bus);
+-  pop_latency (bus);
+-
+-  fail_unless (gst_bus_have_pending (bus) == FALSE,
+-      "Unexpected messages on bus");
+-
+-  ret = gst_element_set_state (GST_ELEMENT (bin), GST_STATE_PLAYING);
+-  fail_unless (ret == GST_STATE_CHANGE_SUCCESS);
+-
+-  pop_state_changed (bus, 3);
+-
+-  /* this one might return either SUCCESS or ASYNC, likely SUCCESS */
+-  ret = gst_element_set_state (GST_ELEMENT (bin), GST_STATE_PAUSED);
+-  gst_element_get_state (GST_ELEMENT (bin), NULL, NULL, GST_CLOCK_TIME_NONE);
+-
+-  pop_state_changed (bus, 3);
+-  if (ret == GST_STATE_CHANGE_ASYNC) {
+-    pop_async_done (bus);
+-    pop_latency (bus);
+-  }
+-
+-  fail_unless (gst_bus_have_pending (bus) == FALSE,
+-      "Unexpected messages on bus");
+-
+-  gst_bus_set_flushing (bus, TRUE);
+-
+-  ret = gst_element_set_state (GST_ELEMENT (bin), GST_STATE_NULL);
+-  fail_unless (ret == GST_STATE_CHANGE_SUCCESS);
+-
+-  /* clean up */
+-  gst_object_unref (bus);
+-  gst_object_unref (bin);
+-}
+-
+-GST_END_TEST;
+-
+ GST_START_TEST (test_state_change_error_message)
+ {
+   GstElement *src, *sink, *bin;
+@@ -1956,7 +1888,6 @@ gst_bin_suite (void)
+   tcase_add_test (tc_chain, test_message_state_changed);
+   tcase_add_test (tc_chain, test_message_state_changed_child);
+   tcase_add_test (tc_chain, test_message_state_changed_children);
+-  tcase_add_test (tc_chain, test_watch_for_state_change);
+   tcase_add_test (tc_chain, test_state_change_error_message);
+   tcase_add_test (tc_chain, test_add_linked);
+   tcase_add_test (tc_chain, test_add_self);
+-- 
+2.33.1
+

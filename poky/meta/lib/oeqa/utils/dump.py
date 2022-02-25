@@ -66,6 +66,7 @@ class BaseDumper(object):
 
     def _write_dump(self, command, output):
         fullname = self._construct_filename(command)
+        os.makedirs(os.path.dirname(fullname), exist_ok=True)
         if isinstance(self, MonitorDumper):
             with open(fullname, 'w') as json_file:
                 json.dump(output, json_file, indent=4)

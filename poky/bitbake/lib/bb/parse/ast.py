@@ -333,6 +333,10 @@ def runAnonFuncs(d):
 def finalize(fn, d, variant = None):
     saved_handlers = bb.event.get_handlers().copy()
     try:
+        # Found renamed variables. Exit immediately
+        if d.getVar("_FAILPARSINGERRORHANDLED", False) == True:
+            raise bb.BBHandledException()
+
         for var in d.getVar('__BBHANDLERS', False) or []:
             # try to add the handler
             handlerfn = d.getVarFlag(var, "filename", False)

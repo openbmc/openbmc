@@ -18,7 +18,7 @@ class Distrodata(OESelftestTestCase):
         Product:     oe-core
         Author:      Alexander Kanavin <alex.kanavin@gmail.com>
         """
-        feature = 'LICENSE_FLAGS_WHITELIST += " commercial"\n'
+        feature = 'LICENSE_FLAGS_ACCEPTED += " commercial"\n'
         self.write_config(feature)
 
         pkgs = oe.recipeutils.get_recipe_upgrade_status()
@@ -99,7 +99,7 @@ The following recipes do not have a DESCRIPTION. Please add an entry for DESCRIP
                      return True
             return False
 
-        feature = 'require conf/distro/include/maintainers.inc\nLICENSE_FLAGS_WHITELIST += " commercial"\nPARSE_ALL_RECIPES = "1"\nPACKAGE_CLASSES = "package_ipk package_deb package_rpm"\n'
+        feature = 'require conf/distro/include/maintainers.inc\nLICENSE_FLAGS_ACCEPTED += " commercial"\nPARSE_ALL_RECIPES = "1"\nPACKAGE_CLASSES = "package_ipk package_deb package_rpm"\n'
         self.write_config(feature)
 
         with bb.tinfoil.Tinfoil() as tinfoil:

@@ -4,7 +4,7 @@ an LALR(1) or GLR parser for that grammar.  Bison is upward compatible with Yacc
 grammars ought to work with Bison with no change. Anyone familiar with Yacc should be able to use Bison with \
 little trouble."
 HOMEPAGE = "http://www.gnu.org/software/bison/"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
 SECTION = "devel"
 DEPENDS = "bison-native flex-native"

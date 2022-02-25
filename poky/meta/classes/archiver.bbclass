@@ -5,7 +5,7 @@
 #  1) original (or unpacked) source: ARCHIVER_MODE[src] = "original"
 #  2) patched source: ARCHIVER_MODE[src] = "patched" (default)
 #  3) configured source: ARCHIVER_MODE[src] = "configured"
-#  4) source mirror: ARCHIVE_MODE[src] = "mirror"
+#  4) source mirror: ARCHIVER_MODE[src] = "mirror"
 #  5) The patches between do_unpack and do_patch:
 #     ARCHIVER_MODE[diff] = "1"
 #     And you can set the one that you'd like to exclude from the diff:
@@ -63,7 +63,7 @@ ARCHIVER_WORKDIR = "${WORKDIR}/archiver-work/"
 # When producing a combined mirror directory, allow duplicates for the case
 # where multiple recipes use the same SRC_URI.
 ARCHIVER_COMBINED_MIRRORDIR = "${ARCHIVER_TOPDIR}/mirror"
-SSTATE_DUPWHITELIST += "${DEPLOY_DIR_SRC}/mirror"
+SSTATE_ALLOW_OVERLAP_FILES += "${DEPLOY_DIR_SRC}/mirror"
 
 do_dumpdata[dirs] = "${ARCHIVER_OUTDIR}"
 do_ar_recipe[dirs] = "${ARCHIVER_OUTDIR}"

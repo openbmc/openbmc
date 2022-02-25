@@ -50,4 +50,4 @@ do_install:append () {
 INITSCRIPT_NAME = "smartd"
 INITSCRIPT_PARAMS = "start 60 2 3 4 5 . stop 60 0 1 6 ."
 
-RDEPENDS:${PN} += "mailx"
+RRECOMMENDS:${PN} += "s-nail"

@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: Andrei Gherzan <andrei.gherzan@huawei.com>
+#
+# SPDX-License-Identifier: MIT
+
+name: "Cleanup docker storage"
+
+inputs:
+  docker_image:
+    required: true
+    description: "The name of the docker image"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Cleanup temporary image
+      shell: bash
+      run: |
+        echo "Cleanup ${{ inputs.docker_image }} image..."
+        docker rmi "${{ inputs.docker_image }}" || true

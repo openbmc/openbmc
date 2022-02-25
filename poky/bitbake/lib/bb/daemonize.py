@@ -82,7 +82,7 @@ def createDaemon(function, logfile):
             sys.stdout = so
 
         # Have stdout and stderr be the same so log output matches chronologically
-        # and there aren't two seperate buffers
+        # and there aren't two separate buffers
         sys.stderr = sys.stdout
 
         try:

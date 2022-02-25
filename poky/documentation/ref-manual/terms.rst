@@ -148,7 +148,7 @@ universal, the list includes them just in case:
       and so on.
 
       On the other hand, some container layers (such as
-      `meta-security <https://git.yoctoproject.org/cgit/cgit.cgi/meta-security>`_)
+      :yocto_git:`meta-security </meta-security>`)
       have a top-level directory that is itself an actual layer, as well as
       a variety of sub-layers, both of which could be included in your
       ``bblayers.conf`` file.

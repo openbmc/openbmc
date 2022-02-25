@@ -1,5 +1,5 @@
 SUMMARY = "Package maintenance system from Debian"
-LICENSE = "GPLv2.0+"
+LICENSE = "GPL-2.0-or-later"
 HOMEPAGE = "https://salsa.debian.org/dpkg-team/dpkg"
 DESCRIPTION = "The primary interface for the dpkg suite is the dselect program. A more low-level and less user-friendly interface is available in the form of the dpkg command."
 SECTION = "base"

@@ -9,7 +9,7 @@ configuration methods, like DHCP and domain name resolving, are \
 implemented using plug-ins."
 HOMEPAGE = "http://connman.net/"
 BUGTRACKER = "https://01.org/jira/browse/CM"
-LICENSE  = "GPLv2"
+LICENSE  = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e \
                     file://src/main.c;beginline=1;endline=20;md5=486a279a6ab0c8d152bcda3a5b5edc36"
 

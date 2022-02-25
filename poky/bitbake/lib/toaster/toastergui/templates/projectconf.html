@@ -167,8 +167,8 @@
   {% for fstype in vars_fstypes %}
   <input type="hidden" class="js-checkbox-fstypes-list" value="{{fstype}}">
   {% endfor %}
-  {% for b in vars_blacklist %}
-  <input type="hidden" class="js-config-blacklist-name" value="{{b}}">
+  {% for b in vars_disallowed %}
+  <input type="hidden" class="js-config-disallowed-name" value="{{b}}">
   {% endfor %}
   {% for b in vars_managed %}
   <input type="hidden" class="js-config-managed-name" value="{{b}}">
@@ -238,9 +238,9 @@ function validate_new_variable() {
     }
   }
 
-  var blacklist_configvars = document.getElementsByClassName('js-config-blacklist-name');
-  for (var i = 0, length = blacklist_configvars.length; i < length; i++) {
-    if (blacklist_configvars[i].value.toUpperCase() == variable.toUpperCase()) {
+  var disallowed_configvars = document.getElementsByClassName('js-config-disallowed-name');
+  for (var i = 0, length = disallowed_configvars.length; i < length; i++) {
+    if (disallowed_configvars[i].value.toUpperCase() == variable.toUpperCase()) {
       error_msg = "You cannot edit this variable in Toaster because it is set by the build servers";
     }
   }

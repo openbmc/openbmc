@@ -113,7 +113,6 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-docopt \
     python3-docutils \
     python3-dominate \
-    python3-dt-schema \
     python3-dynamic-dispatch \
     python3-ecdsa \
     python3-editor \
@@ -354,6 +353,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-pytest-asyncio \
     python3-pytest-benchmark \
     python3-pytest-cache \
+    python3-pytest-forked \
     python3-pytest-helpers-namespace \
     python3-pytest-html \
     python3-pytest-metadata \
@@ -361,6 +361,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-pytest-subtests \
     python3-pytest-tempdir \
     python3-pytest-timeout \
+    python3-pytest-xdist \
     python3-pythonping \
     python3-python-vlc \
     python3-pytoml \
@@ -423,7 +424,6 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-tabulate \
     python3-term \
     python3-termcolor \
-    python3-test-generator \
     python3-textparser \
     python3-texttable \
     python3-thrift \
@@ -461,7 +461,6 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-websockets \
     python3-werkzeug \
     python3-werkzeug \
-    python3-wheel \
     python3-whoosh \
     python3-wrapt \
     python3-wtforms \
@@ -535,7 +534,6 @@ RDEPENDS:packagegroup-meta-python3-ptest = "\
     python3-smpplib-ptest \
     python3-soupsieve-ptest \
     python3-sqlparse-ptest \
-    python3-test-generator-ptest \
     python3-typeguard-ptest \
     python3-ujson-ptest \
     python3-u-msgpack-python-ptest \

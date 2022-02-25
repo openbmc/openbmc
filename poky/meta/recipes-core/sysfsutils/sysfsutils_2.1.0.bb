@@ -2,9 +2,9 @@ SUMMARY = "Tools for working with sysfs"
 DESCRIPTION = "Tools for working with the sysfs virtual filesystem.  The tool 'systool' can query devices by bus, class and topology."
 HOMEPAGE = "http://linux-diag.sourceforge.net/Sysfsutils.html"
 
-LICENSE = "GPLv2 & LGPLv2.1"
-LICENSE:${PN} = "GPLv2"
-LICENSE:libsysfs = "LGPLv2.1"
+LICENSE = "GPL-2.0-only & LGPL-2.1-only"
+LICENSE:${PN} = "GPL-2.0-only"
+LICENSE:libsysfs = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=3d06403ea54c7574a9e581c6478cc393 \
                     file://cmd/GPL;md5=d41d4e2e1e108554e0388ea4aecd8d27 \
                     file://lib/LGPL;md5=b75d069791103ffe1c0d6435deeff72e"

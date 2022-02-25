@@ -82,6 +82,6 @@ do_configure:prepend:toolchain-clang:x86() {
 
 BBCLASSEXTEND = "native nativesdk"
 
-SYSROOT_DIRS_BLACKLIST:append:class-target = " ${baselib}/cmake/grpc"
+SYSROOT_DIRS_IGNORE:append:class-target = " ${baselib}/cmake/grpc"
 
 FILES:${PN}-compiler += "${bindir}"

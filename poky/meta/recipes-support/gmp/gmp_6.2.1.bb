@@ -1,6 +1,6 @@
 require gmp.inc
 
-LICENSE = "GPLv2+ | LGPLv3+"
+LICENSE = "GPL-2.0-or-later | LGPL-3.0-or-later"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
                    file://COPYING.LESSERv3;md5=6a6a8e020838b23406c81b19c1d46df6 \
@@ -20,7 +20,7 @@ SRC_URI[sha256sum] = "eae9326beb4158c386e39a356818031bd28f3124cf915f8c5b1dc4c7a3
 acpaths = ""
 
 EXTRA_OECONF += " --enable-cxx=detect"
-EXTRA_OECONF:mipsarchr6:append = " --disable-assembly"
+EXTRA_OECONF:append:mipsarchr6 = " --disable-assembly"
 
 PACKAGES =+ "libgmpxx"
 FILES:libgmpxx = "${libdir}/libgmpxx${SOLIBS}"

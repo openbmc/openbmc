@@ -240,7 +240,7 @@ Automated Image Testing
 -----------------------
 
 A new automated image testing framework has been added through the
-:ref:`testimage.bbclass <ref-classes-testimage*>` class. This
+:ref:`ref-classes-testimage*` classes. This
 framework replaces the older ``imagetest-qemu`` framework.
 
 You can learn more about performing automated image tests in the
@@ -341,7 +341,7 @@ Following is a list of short entries describing other changes:
 
 -  ``libpam``: Deny all services for the ``OTHER`` entries.
 
--  ``image.bbclass``: Move ``runtime_mapping_rename`` to avoid conflict
+-  :ref:`ref-classes-image`: Move ``runtime_mapping_rename`` to avoid conflict
    with ``multilib``. See :yocto_bugs:`YOCTO #4993 </show_bug.cgi?id=4993>`
    in Bugzilla for more information.
 

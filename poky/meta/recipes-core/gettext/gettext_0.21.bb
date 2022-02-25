@@ -5,7 +5,7 @@ naming organization for the message catalogs themselves, a runtime library suppo
 a few stand-alone programs to massage in various ways the sets of translatable and already translated strings."
 HOMEPAGE = "http://www.gnu.org/software/gettext/gettext.html"
 SECTION = "libs"
-LICENSE = "GPLv3+ & LGPL-2.1+"
+LICENSE = "GPL-3.0-or-later & LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c678957b0c8e964aa6c70fd77641a71e"
 
 DEPENDS = "gettext-native virtual/libiconv"

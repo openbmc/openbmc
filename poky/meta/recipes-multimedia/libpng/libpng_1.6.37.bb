@@ -32,4 +32,4 @@ FILES:${PN}-tools = "${bindir}/png-fix-itxt ${bindir}/pngfix ${bindir}/pngcp"
 BBCLASSEXTEND = "native nativesdk"
 
 # CVE-2019-17371 is actually a memory leak in gif2png 2.x
-CVE_CHECK_WHITELIST += "CVE-2019-17371"
+CVE_CHECK_IGNORE += "CVE-2019-17371"

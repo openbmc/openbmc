@@ -28,6 +28,10 @@ def get_image_spdxid(img):
     return "SPDXRef-Image-%s" % img
 
 
+def get_sdk_spdxid(sdk):
+    return "SPDXRef-SDK-%s" % sdk
+
+
 def write_doc(d, spdx_doc, subdir, spdx_deploy=None):
     from pathlib import Path
 

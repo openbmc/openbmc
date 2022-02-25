@@ -41,10 +41,10 @@ index a9c0ec4..89da078 100644
    spec.email         = ["aaron@tenderlovemaking.com", "hsbt@ruby-lang.org"]
  
 diff --git a/ext/io/console/io-console.gemspec b/ext/io/console/io-console.gemspec
-index 36beda7..e932d83 100644
+index aa57f8a..ba7f8e5 100644
 --- a/ext/io/console/io-console.gemspec
 +++ b/ext/io/console/io-console.gemspec
-@@ -4,6 +4,7 @@ _VERSION = "0.5.10"
+@@ -4,6 +4,7 @@ _VERSION = "0.5.11"
  Gem::Specification.new do |s|
    s.name = "io-console"
    s.version = _VERSION
@@ -53,13 +53,13 @@ index 36beda7..e932d83 100644
    s.email = "nobu@ruby-lang.org"
    s.description = "add console capabilities to IO instances."
 diff --git a/lib/ipaddr.gemspec b/lib/ipaddr.gemspec
-index 36e2300..06dc888 100644
+index 1f4798e..48743cf 100644
 --- a/lib/ipaddr.gemspec
 +++ b/lib/ipaddr.gemspec
-@@ -6,6 +6,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+@@ -18,6 +18,7 @@ end
  Gem::Specification.new do |spec|
    spec.name          = "ipaddr"
-   spec.version       = "1.2.3"
+   spec.version       = version
 +  spec.date          = RUBY_RELEASE_DATE
    spec.authors       = ["Akinori MUSHA", "Hajimu UMEMOTO"]
    spec.email         = ["knu@idaemons.org", "ume@mahoroba.org"]
@@ -76,3 +76,6 @@ index 525a15f..f6d0e22 100644
    s.version = RDoc::VERSION
  
    s.authors = [
+-- 
+2.25.1
+

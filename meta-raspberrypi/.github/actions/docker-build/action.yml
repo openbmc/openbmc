@@ -1,0 +1,47 @@
+# SPDX-FileCopyrightText: Andrei Gherzan <andrei.gherzan@huawei.com>
+#
+# SPDX-License-Identifier: MIT
+
+name: "Build a docker image"
+
+inputs:
+  docker_image:
+    required: true
+    description: "The name of the docker image"
+  id:
+    required: true
+    description: "Namespace for the image"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Build the ${{ inputs.docker_image }} docker image
+      shell: bash
+      # We run this unconditinally even if the change doesn't touch the
+      # relevant docker files because there is a chance that another PR (or
+      # something else) rebuilt the local image. For example if the first
+      # version of the PR included change for the relevant docker image but a
+      # subsequent push to the PR branch dropped them. In this way we rebuild
+      # the image to avoid using the changes from the previous push.
+      run: |
+        cd .github/workflows/docker-images/
+        # We build a temporary image namespaced by the PR number so we can
+        # handle multiple runners on the same host using the same docker
+        # storage.
+        tries=3
+        n=1
+        until [ "$n" -gt "$tries" ]; do
+          echo "Building the docker image ${{ inputs.docker_image }}-${{ inputs.id }}... try $n..."
+          if docker build . -f "${{ inputs.docker_image }}/Dockerfile" -t "${{ inputs.docker_image }}-${{ inputs.id }}"; then
+            # This can fail if a dangling images cleaning job runs in
+            # parallel. So we try this a couple of times to minimize
+            # conflict. This is because while building, docker creates a
+            # untagged image first (dangling) before tagging it at the end.
+            # If between these two operations a dangling cleanup happens,
+            # build fails.
+            break
+          fi
+          n=$((n+1))
+        done
+        [ "$n" -lt "$tries" ]
+        echo "Temporary image built in ${{ inputs.docker_image }}."

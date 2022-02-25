@@ -4,7 +4,7 @@ DESCRIPTION = "It provides a Service Provider Interface for the Assistive Techno
 
 HOMEPAGE = "https://wiki.linuxfoundation.org/accessibility/d-bus"
 BUGTRACKER = "http://bugzilla.gnome.org/"
-LICENSE = "LGPL-2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 
 MAJ_VER = "${@oe.utils.trim_version("${PV}", 2)}"

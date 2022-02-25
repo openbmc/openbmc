@@ -1,6 +1,6 @@
 DESCRIPTION = "Linux Kernel for Raspberry Pi"
 SECTION = "kernel"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 COMPATIBLE_MACHINE = "^rpi$"

@@ -13,7 +13,7 @@ DEPENDS:append:class-target = " ${@bb.utils.contains('DISTRO_FEATURES', 'api-doc
 # vala-native contains a native version of vapigen, which we use instead of the target one
 DEPENDS:append:class-target = " vala-native"
 BBCLASSEXTEND = "native"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=fbc093901857fcd118f065f900982c24"
 
 SHRT_VER = "${@d.getVar('PV').split('.')[0]}.${@d.getVar('PV').split('.')[1]}"

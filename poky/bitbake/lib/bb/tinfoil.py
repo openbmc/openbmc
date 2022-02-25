@@ -493,7 +493,7 @@ class Tinfoil:
         Wait for an event from the server for the specified time.
         A timeout of 0 means don't wait if there are no events in the queue.
         Returns the next event in the queue or None if the timeout was
-        reached. Note that in order to recieve any events you will
+        reached. Note that in order to receive any events you will
         first need to set the internal event mask using set_event_mask()
         (otherwise whatever event mask the UI set up will be in effect).
         """
@@ -761,7 +761,7 @@ class Tinfoil:
                                 if parseprogress:
                                     parseprogress.update(event.progress)
                                 else:
-                                    bb.warn("Got ProcessProgress event for someting that never started?")
+                                    bb.warn("Got ProcessProgress event for something that never started?")
                                 continue
                             if isinstance(event, bb.event.ProcessFinished):
                                 if self.quiet > 1:

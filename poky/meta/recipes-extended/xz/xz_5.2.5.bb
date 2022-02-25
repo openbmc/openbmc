@@ -7,13 +7,13 @@ SECTION = "base"
 # which is GPLv3 is an m4 macro which isn't shipped in any of our packages,
 # and the LGPL bits are under lib/, which appears to be used for libgnu, which
 # appears to be used for DOS builds. So we're left with GPLv2+ and PD.
-LICENSE = "GPLv2+ & GPL-3.0-with-autoconf-exception & LGPLv2.1+ & PD"
-LICENSE:${PN} = "GPLv2+"
-LICENSE:${PN}-dev = "GPLv2+"
-LICENSE:${PN}-staticdev = "GPLv2+"
-LICENSE:${PN}-doc = "GPLv2+"
-LICENSE:${PN}-dbg = "GPLv2+"
-LICENSE:${PN}-locale = "GPLv2+"
+LICENSE = "GPL-2.0-or-later & GPL-3.0-with-autoconf-exception & LGPL-2.1-or-later & PD"
+LICENSE:${PN} = "GPL-2.0-or-later"
+LICENSE:${PN}-dev = "GPL-2.0-or-later"
+LICENSE:${PN}-staticdev = "GPL-2.0-or-later"
+LICENSE:${PN}-doc = "GPL-2.0-or-later"
+LICENSE:${PN}-dbg = "GPL-2.0-or-later"
+LICENSE:${PN}-locale = "GPL-2.0-or-later"
 LICENSE:liblzma = "PD"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=97d554a32881fee0aa283d96e47cb24a \

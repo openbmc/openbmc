@@ -8,7 +8,7 @@ processes identified by name.  The fuser command identifies the PIDs \
 of processes that are using specified files or filesystems."
 SECTION = "base"
 DEPENDS = "ncurses virtual/libintl"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/psmisc/psmisc-${PV}.tar.gz"
 

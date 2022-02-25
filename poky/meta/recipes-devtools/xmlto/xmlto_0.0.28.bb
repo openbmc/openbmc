@@ -2,7 +2,7 @@ SUMMARY = "A shell-script tool for converting XML files to various formats"
 HOMEPAGE = "https://pagure.io/xmlto"
 DESCRIPTION = "Utility xmlto is a simple shell-script tool for converting XML files to various formats. It serves as easy to use command line frontend to make fine output without remembering many long options and searching for the syntax of the backends."
 SECTION = "docs/xmlto"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552"
 

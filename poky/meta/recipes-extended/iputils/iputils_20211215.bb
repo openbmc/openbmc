@@ -4,7 +4,7 @@ tracepath, tracepath6, ping, ping6 and arping."
 HOMEPAGE = "https://github.com/iputils/iputils"
 SECTION = "console/network"
 
-LICENSE = "BSD-3-Clause & GPLv2+"
+LICENSE = "BSD-3-Clause & GPL-2.0-or-later"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=bb64c89bb0e23b72930d2380894c47a1"
 
@@ -21,7 +21,7 @@ UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>20\d+)"
 
 # Fixed in 2000-10-10, but the versioning of iputils
 # breaks the version order.
-CVE_CHECK_WHITELIST += "CVE-2000-1213 CVE-2000-1214"
+CVE_CHECK_IGNORE += "CVE-2000-1213 CVE-2000-1214"
 
 PACKAGECONFIG ??= "libcap rarpd \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'ninfod', '', d)} \

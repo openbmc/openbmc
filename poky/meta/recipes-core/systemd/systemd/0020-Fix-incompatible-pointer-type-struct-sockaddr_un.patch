@@ -23,11 +23,9 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  src/nspawn/nspawn.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/nspawn/nspawn.c b/src/nspawn/nspawn.c
-index 575b9da447..ff08ed23cc 100644
 --- a/src/nspawn/nspawn.c
 +++ b/src/nspawn/nspawn.c
-@@ -5354,7 +5354,7 @@ static int cant_be_in_netns(void) {
+@@ -5389,7 +5389,7 @@ static int cant_be_in_netns(void) {
          if (fd < 0)
                  return log_error_errno(errno, "Failed to allocate udev control socket: %m");
  

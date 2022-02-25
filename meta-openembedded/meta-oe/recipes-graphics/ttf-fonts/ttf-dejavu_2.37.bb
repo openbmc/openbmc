@@ -51,5 +51,5 @@ SRC_URI[sha256sum] = "fa9ca4d13871dd122f61258a80d01751d603b4d3ee14095d65453b4e84
 BBCLASSEXTEND = "native nativesdk"
 
 # Allow installation of fonts into recipe-sysroot-native
-SYSROOT_DIRS_BLACKLIST:remove = "${datadir}/fonts"
+SYSROOT_DIRS_IGNORE:remove = "${datadir}/fonts"
 

@@ -3,7 +3,7 @@ DESCRIPTION = "Bellagio is an opensource implementation of the Khronos OpenMAX \
                Integration Layer API to access multimedia components."
 HOMEPAGE = "http://omxil.sourceforge.net/"
 
-LICENSE = "LGPLv2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LICENSE_FLAGS = "${@bb.utils.contains('PACKAGECONFIG', 'amr', 'commercial', '', d)}"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ae6f0f4dbc7ac193b50f323a6ae191cb \
                     file://src/omxcore.h;beginline=1;endline=27;md5=806b1e5566c06486fe8e42b461e03a90"

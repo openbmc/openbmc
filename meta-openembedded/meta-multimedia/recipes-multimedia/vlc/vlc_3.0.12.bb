@@ -129,4 +129,4 @@ FILES:${PN}-staticdev += "\
 
 INSANE_SKIP:${PN} = "dev-so"
 
-EXCLUDE_FROM_WORLD = "${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "0", "1", d)}"
+EXCLUDE_FROM_WORLD = "${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "commercial", "0", "1", d)}"

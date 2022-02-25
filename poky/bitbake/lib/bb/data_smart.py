@@ -33,6 +33,18 @@ __expand_python_regexp__ = re.compile(r"\${@.+?}")
 __whitespace_split__ = re.compile(r'(\s)')
 __override_regexp__ = re.compile(r'[a-z0-9]+')
 
+bitbake_renamed_vars = {
+    "BB_ENV_WHITELIST": "BB_ENV_PASSTHROUGH",
+    "BB_ENV_EXTRAWHITE": "BB_ENV_PASSTHROUGH_ADDITIONS",
+    "BB_HASHBASE_WHITELIST": "BB_BASEHASH_IGNORE_VARS",
+    "BB_HASHCONFIG_WHITELIST": "BB_HASHCONFIG_IGNORE_VARS",
+    "BB_HASHTASK_WHITELIST": "BB_TASKHASH_IGNORE_TASKS",
+    "BB_SETSCENE_ENFORCE_WHITELIST": "BB_SETSCENE_ENFORCE_IGNORE_TASKS",
+    "MULTI_PROVIDER_WHITELIST": "BB_MULTI_PROVIDER_ALLOWED",
+    "BB_STAMP_WHITELIST": "is a deprecated variable and support has been removed",
+    "BB_STAMP_POLICY": "is a deprecated variable and support has been removed",
+}
+
 def infer_caller_details(loginfo, parent = False, varval = True):
     """Save the caller the trouble of specifying everything."""
     # Save effort.
@@ -336,6 +348,16 @@ class VariableHistory(object):
                 lines.append(line)
         return lines
 
+    def get_variable_refs(self, var):
+        """Return a dict of file/line references"""
+        var_history = self.variable(var)
+        refs = {}
+        for event in var_history:
+            if event['file'] not in refs:
+                refs[event['file']] = []
+            refs[event['file']].append(event['line'])
+        return refs
+
     def get_variable_items_files(self, var):
         """
         Use variable history to map items added to a list variable and
@@ -370,6 +392,23 @@ class VariableHistory(object):
             else:
                 self.variables[var] = []
 
+def _print_rename_error(var, loginfo, renamedvars, fullvar=None):
+    info = ""
+    if "file" in loginfo:
+        info = " file: %s" % loginfo["file"]
+    if "line" in loginfo:
+        info += " line: %s" % loginfo["line"]
+    if fullvar and fullvar != var:
+        info += " referenced as: %s" % fullvar
+    if info:
+        info = " (%s)" % info.strip()
+    renameinfo = renamedvars[var]
+    if " " in renameinfo:
+        # A space signals a string to display instead of a rename
+        bb.erroronce('Variable %s %s%s' % (var, renameinfo, info))
+    else:
+        bb.erroronce('Variable %s has been renamed to %s%s' % (var, renameinfo, info))
+
 class DataSmart(MutableMapping):
     def __init__(self):
         self.dict = {}
@@ -377,6 +416,8 @@ class DataSmart(MutableMapping):
         self.inchistory = IncludeHistory()
         self.varhistory = VariableHistory(self)
         self._tracking = False
+        self._var_renames = {}
+        self._var_renames.update(bitbake_renamed_vars)
 
         self.expand_cache = {}
 
@@ -488,17 +529,25 @@ class DataSmart(MutableMapping):
         else:
             self.initVar(var)
 
+    def hasOverrides(self, var):
+        return var in self.overridedata
 
     def setVar(self, var, value, **loginfo):
         #print("var=" + str(var) + "  val=" + str(value))
 
         if not var.startswith("__anon_") and ("_append" in var or "_prepend" in var or "_remove" in var):
             info = "%s" % var
-            if "filename" in loginfo:
-                info += " file: %s" % loginfo[filename]
-            if "lineno" in loginfo:
-                info += " line: %s" % loginfo[lineno]
+            if "file" in loginfo:
+                info += " file: %s" % loginfo["file"]
+            if "line" in loginfo:
+                info += " line: %s" % loginfo["line"]
             bb.fatal("Variable %s contains an operation using the old override syntax. Please convert this layer/metadata before attempting to use with a newer bitbake." % info)
+
+        shortvar = var.split(":", 1)[0]
+        if shortvar in self._var_renames:
+            _print_rename_error(shortvar, loginfo, self._var_renames, fullvar=var)
+            # Mark that we have seen a renamed variable
+            self.setVar("_FAILPARSINGERRORHANDLED", True)
 
         self.expand_cache = {}
         parsing=False
@@ -684,6 +733,14 @@ class DataSmart(MutableMapping):
 
     def setVarFlag(self, var, flag, value, **loginfo):
         self.expand_cache = {}
+
+        if var == "BB_RENAMED_VARIABLES":
+            self._var_renames[flag] = value
+
+        if var in self._var_renames:
+            _print_rename_error(var, loginfo, self._var_renames)
+            # Mark that we have seen a renamed variable
+            self.setVar("_FAILPARSINGERRORHANDLED", True)
 
         if 'op' not in loginfo:
             loginfo['op'] = "set"
@@ -924,6 +981,7 @@ class DataSmart(MutableMapping):
         data.inchistory = self.inchistory.copy()
 
         data._tracking = self._tracking
+        data._var_renames = self._var_renames
 
         data.overrides = None
         data.overridevars = copy.copy(self.overridevars)
@@ -946,7 +1004,7 @@ class DataSmart(MutableMapping):
         value = self.getVar(variable, False)
         for key in keys:
             referrervalue = self.getVar(key, False)
-            if referrervalue and ref in referrervalue:
+            if referrervalue and isinstance(referrervalue, str) and ref in referrervalue:
                 self.setVar(key, referrervalue.replace(ref, value))
 
     def localkeys(self):
@@ -1012,10 +1070,10 @@ class DataSmart(MutableMapping):
         d = self.createCopy()
         bb.data.expandKeys(d)
 
-        config_whitelist = set((d.getVar("BB_HASHCONFIG_WHITELIST") or "").split())
+        config_ignore_vars = set((d.getVar("BB_HASHCONFIG_IGNORE_VARS") or "").split())
         keys = set(key for key in iter(d) if not key.startswith("__"))
         for key in keys:
-            if key in config_whitelist:
+            if key in config_ignore_vars:
                 continue
 
             value = d.getVar(key, False) or ""

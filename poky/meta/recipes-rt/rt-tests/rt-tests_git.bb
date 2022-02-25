@@ -3,7 +3,7 @@ HOMEPAGE = "https://wiki.linuxfoundation.org/realtime/documentation/start"
 DESCRIPTION = "The main aim of the PREEMPT_RT patch is to minimize the amount of kernel code that is non-preemptible Therefore several substitution mechanisms and new mechanisms are implemented."
 SECTION = "tests"
 DEPENDS = "linux-libc-headers virtual/libc numactl"
-LICENSE = "GPLv2 & GPLv2+"
+LICENSE = "GPL-2.0-only & GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 require rt-tests.inc

@@ -1,7 +1,7 @@
 SUMMARY = "System performance tools"
 DESCRIPTION = "The sysstat utilities are a collection of performance monitoring tools for Linux."
 HOMEPAGE = "http://sebastien.godard.pagesperso-orange.fr/"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 SECTION = "console/utils"
 
 SRC_URI = "http://pagesperso-orange.fr/sebastien.godard/${BP}.tar.xz \

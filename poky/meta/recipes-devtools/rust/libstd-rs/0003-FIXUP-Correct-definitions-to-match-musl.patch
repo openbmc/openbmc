@@ -12,10 +12,10 @@ Signed-off-by: Ralf Anton Beier <ralf_beier@me.com>
  .../linux_like/linux/musl/b64/riscv64/mod.rs  | 655 +++++++++---------
  1 file changed, 312 insertions(+), 343 deletions(-)
 
-diff --git a/vendor/libc/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs b/vendor/libc/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
+diff --git a/vendor/libc-0.2.106/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs b/vendor/libc-0.2.106/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
 index c656189c4..1799539c2 100644
---- a/vendor/libc/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
-+++ b/vendor/libc/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
+--- a/vendor/libc-0.2.106/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
++++ b/vendor/libc-0.2.106/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
 @@ -191,351 +191,8 @@ s! {
          pub l_len: ::off64_t,
          pub l_pid: ::pid_t,

@@ -117,17 +117,17 @@ consists of the following pieces:
 -  ``bitbake-selftest``: A standalone command that runs unit tests on
    key pieces of BitBake and its fetchers.
 
--  :ref:`sanity.bbclass <ref-classes-sanity>`: This automatically
+-  :ref:`ref-classes-sanity`: This automatically
    included class checks the build environment for missing tools (e.g.
    ``gcc``) or common misconfigurations such as
    :term:`MACHINE` set incorrectly.
 
--  :ref:`insane.bbclass <ref-classes-insane>`: This class checks the
+-  :ref:`ref-classes-insane`: This class checks the
    generated output from builds for sanity. For example, if building for
    an ARM target, did the build produce ARM binaries. If, for example,
    the build produced PPC binaries then there is a problem.
 
--  :ref:`testimage.bbclass <ref-classes-testimage*>`: This class
+-  :ref:`ref-classes-testimage*`: This class
    performs runtime testing of images after they are built. The tests
    are usually used with :doc:`QEMU </dev-manual/qemu>`
    to boot the images and check the combined runtime result boot

@@ -1,4 +1,4 @@
-From 257ad1ce148417e1cefe2332d8acc5c8216c2522 Mon Sep 17 00:00:00 2001
+From 07bb7fbdacaf9cd6a1a252ffbc98f4e05e305d50 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:58:54 +0000
 Subject: [PATCH] binutils-crosssdk: Generate relocatable SDKs
@@ -21,10 +21,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  3 files changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/gold/layout.cc b/gold/layout.cc
-index a27cb071c75..32b52890b39 100644
+index 3efe8d98ae9..9cc389664a6 100644
 --- a/gold/layout.cc
 +++ b/gold/layout.cc
-@@ -5032,7 +5032,7 @@ Layout::create_interp(const Target* target)
+@@ -5033,7 +5033,7 @@ Layout::create_interp(const Target* target)
        gold_assert(interp != NULL);
      }
  
@@ -34,7 +34,7 @@ index a27cb071c75..32b52890b39 100644
    Output_section_data* odata = new Output_data_const(interp, len, 1);
  
 diff --git a/ld/genscripts.sh b/ld/genscripts.sh
-index 088417ef2d5..46a2db7005c 100755
+index 278f212bdad..0c52ebee4d0 100755
 --- a/ld/genscripts.sh
 +++ b/ld/genscripts.sh
 @@ -304,6 +304,7 @@ DATA_ALIGNMENT_u="${DATA_ALIGNMENT_u-${DATA_ALIGNMENT_r}}"
@@ -59,10 +59,10 @@ index 088417ef2d5..46a2db7005c 100755
  DATA_ALIGNMENT=${DATA_ALIGNMENT_}
  RELOCATING=" "
 diff --git a/ld/scripttempl/elf.sc b/ld/scripttempl/elf.sc
-index 29a8f0781d5..75e46f4adaf 100644
+index bf2268bb0ad..b1811ef130f 100644
 --- a/ld/scripttempl/elf.sc
 +++ b/ld/scripttempl/elf.sc
-@@ -147,8 +147,8 @@ if test -z "$DATA_SEGMENT_ALIGN"; then
+@@ -148,8 +148,8 @@ if test -z "$DATA_SEGMENT_ALIGN"; then
      DATA_SEGMENT_RELRO_END=". = DATA_SEGMENT_RELRO_END (${SEPARATE_GOTPLT-0}, .);"
    fi
  fi

@@ -1,0 +1,45 @@
+Don't wrap CC in quotes as our CC has options and this breaks command lookup.
+
+Upstream-Status: Backport [https://git.sdaoden.eu/browse/s-nail.git/commit/?h=next&id=c08f3c898def715edf9164e169c3b3522f4c7a1f]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From c08f3c898def715edf9164e169c3b3522f4c7a1f Mon Sep 17 00:00:00 2001
+From: Steffen Nurpmeso <steffen@sdaoden.eu>
+Date: Tue, 1 Feb 2022 18:54:16 +0100
+Subject: [-] Remove even more bogus quotation marks (Ross Burton)..
+
+On top of (mk/su-find-command.sh: clearly define space behaviour)
+and (mx-test.sh: remove bogus quotation marks) Ross Burton
+reported some more on the ML.  I looked around and hope this was it.
+---
+ mk/pcb-cc.sh         | 2 +-
+ mk/su-make-errors.sh | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/mk/pcb-cc.sh b/mk/pcb-cc.sh
+index 2697c5cf..075f8988 100755
+--- a/mk/pcb-cc.sh
++++ b/mk/pcb-cc.sh
+@@ -18,7 +18,7 @@ if dowemayhave "$@"; then
+    if acmd_set CC clang || acmd_set CC gcc ||
+          acmd_set CC tcc || acmd_set CC pcc ||
+          acmd_set CC c89 || acmd_set CC c99; then
+-      exec "$CC" "$@"
++      exec $CC "$@"
+    else
+       echo >&2 'boing booom tschak'
+       echo >&2 'ERROR: I cannot find a compiler!'
+diff --git a/mk/su-make-errors.sh b/mk/su-make-errors.sh
+index f5c5144e..7fede15e 100644
+--- a/mk/su-make-errors.sh
++++ b/mk/su-make-errors.sh
+@@ -157,7 +157,7 @@ compile_time() { # {{{
+    # The problem is that at least (some versions of) gcc mangle output.
+    # Ensure we get both arguments on one line.
+    # While here sort numerically.
+-   "${CC}" -E "${TARGET}".c |
++   ${CC} -E "${TARGET}".c |
+       ${awk} '
+          function stripsym(sym){
+             sym = substr(sym, 2)
+-- 

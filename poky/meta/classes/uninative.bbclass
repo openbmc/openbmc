@@ -9,8 +9,8 @@ UNINATIVE_TARBALL ?= "${BUILD_ARCH}-nativesdk-libc-${UNINATIVE_VERSION}.tar.xz"
 #UNINATIVE_CHECKSUM[x86_64] = "dead"
 UNINATIVE_DLDIR ?= "${DL_DIR}/uninative/"
 
-# Enabling uninative will change the following variables so they need to go the parsing white list to prevent multiple recipe parsing
-BB_HASHCONFIG_WHITELIST += "NATIVELSBSTRING SSTATEPOSTUNPACKFUNCS BUILD_LDFLAGS"
+# Enabling uninative will change the following variables so they need to go the parsing ignored variables list to prevent multiple recipe parsing
+BB_HASHCONFIG_IGNORE_VARS += "NATIVELSBSTRING SSTATEPOSTUNPACKFUNCS BUILD_LDFLAGS"
 
 addhandler uninative_event_fetchloader
 uninative_event_fetchloader[eventmask] = "bb.event.BuildStarted"

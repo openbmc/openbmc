@@ -5,7 +5,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENCE.txt;md5=9b95630a648966b142f1a0dcea001cb7"
 
 PYPI_PACKAGE = "RPi.GPIO"
-inherit pypi distutils3
+inherit pypi setuptools3
 
 SRC_URI += "file://0001-Remove-nested-functions.patch"
 SRC_URI[md5sum] = "777617f9dea9a1680f9af43db0cf150e"

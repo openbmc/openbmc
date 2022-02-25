@@ -29,8 +29,30 @@ SPDX_NAMESPACE_PREFIX ??= "http://spdx.org/spdxdoc"
 SPDX_LICENSES ??= "${COREBASE}/meta/files/spdx-licenses.json"
 
 SPDX_ORG ??= "OpenEmbedded ()"
+SPDX_SUPPLIER ??= "Organization: ${SPDX_ORG}"
+SPDX_SUPPLIER[doc] = "The SPDX PackageSupplier field for SPDX packages created from \
+    this recipe. For SPDX documents create using this class during the build, this \
+    is the contact information for the person or organization who is doing the \
+    build."
 
 do_image_complete[depends] = "virtual/kernel:do_create_spdx"
+
+def extract_licenses(filename):
+    import re
+
+    lic_regex = re.compile(b'^\W*SPDX-License-Identifier:\s*([ \w\d.()+-]+?)(?:\s+\W*)?$', re.MULTILINE)
+
+    try:
+        with open(filename, 'rb') as f:
+            size = min(15000, os.stat(filename).st_size)
+            txt = f.read(size)
+            licenses = re.findall(lic_regex, txt)
+            if licenses:
+                ascii_licenses = [lic.decode('ascii') for lic in licenses]
+                return ascii_licenses
+    except Exception as e:
+        bb.warn(f"Exception reading {filename}: {e}")
+    return None
 
 def get_doc_namespace(d, doc):
     import uuid
@@ -226,6 +248,11 @@ def add_package_files(d, doc, spdx_pkg, topdir, get_spdxid, get_types, *, archiv
                         algorithm="SHA256",
                         checksumValue=bb.utils.sha256_file(filepath),
                     ))
+
+                if "SOURCE" in spdx_file.fileTypes:
+                    extracted_lics = extract_licenses(filepath)
+                    if extracted_lics:
+                        spdx_file.licenseInfoInFiles = extracted_lics
 
                 doc.files.append(spdx_file)
                 doc.add_relationship(spdx_pkg, "CONTAINS", spdx_file)
@@ -425,6 +452,7 @@ python do_create_spdx() {
     recipe.name = d.getVar("PN")
     recipe.versionInfo = d.getVar("PV")
     recipe.SPDXID = oe.sbom.get_recipe_spdxid(d)
+    recipe.packageSupplier = d.getVar("SPDX_SUPPLIER")
     if bb.data.inherits_class("native", d) or bb.data.inherits_class("cross", d):
         recipe.annotations.append(create_annotation(d, "isNative"))
 
@@ -534,6 +562,7 @@ python do_create_spdx() {
             spdx_package.name = pkg_name
             spdx_package.versionInfo = d.getVar("PV")
             spdx_package.licenseDeclared = convert_license_to_spdx(package_license, package_doc, d, found_licenses)
+            spdx_package.packageSupplier = d.getVar("SPDX_SUPPLIER")
 
             package_doc.packages.append(spdx_package)
 
@@ -560,7 +589,7 @@ python do_create_spdx() {
             oe.sbom.write_doc(d, package_doc, "packages")
 }
 # NOTE: depending on do_unpack is a hack that is necessary to get it's dependencies for archive the source
-addtask do_create_spdx after do_package do_packagedata do_unpack before do_build do_rm_work
+addtask do_create_spdx after do_package do_packagedata do_unpack before do_populate_sdk do_build do_rm_work
 
 SSTATETASKS += "do_create_spdx"
 do_create_spdx[sstate-inputdirs] = "${SPDXDEPLOY}"
@@ -792,28 +821,77 @@ def spdx_get_src(d):
 do_rootfs[recrdeptask] += "do_create_spdx do_create_runtime_spdx"
 
 ROOTFS_POSTUNINSTALL_COMMAND =+ "image_combine_spdx ; "
+
+do_populate_sdk[recrdeptask] += "do_create_spdx do_create_runtime_spdx"
+POPULATE_SDK_POST_HOST_COMMAND:append:task-populate-sdk = " sdk_host_combine_spdx; "
+POPULATE_SDK_POST_TARGET_COMMAND:append:task-populate-sdk = " sdk_target_combine_spdx; "
+
 python image_combine_spdx() {
+    import os
+    import oe.sbom
+    from pathlib import Path
+    from oe.rootfs import image_list_installed_packages
+
+    image_name = d.getVar("IMAGE_NAME")
+    image_link_name = d.getVar("IMAGE_LINK_NAME")
+    imgdeploydir = Path(d.getVar("IMGDEPLOYDIR"))
+    img_spdxid = oe.sbom.get_image_spdxid(image_name)
+    packages = image_list_installed_packages(d)
+
+    combine_spdx(d, image_name, imgdeploydir, img_spdxid, packages)
+
+    if image_link_name:
+        image_spdx_path = imgdeploydir / (image_name + ".spdx.json")
+        image_spdx_link = imgdeploydir / (image_link_name + ".spdx.json")
+        image_spdx_link.symlink_to(os.path.relpath(image_spdx_path, image_spdx_link.parent))
+
+    def make_image_link(target_path, suffix):
+        if image_link_name:
+            link = imgdeploydir / (image_link_name + suffix)
+            link.symlink_to(os.path.relpath(target_path, link.parent))
+
+    spdx_tar_path = imgdeploydir / (image_name + ".spdx.tar.zst")
+    make_image_link(spdx_tar_path, ".spdx.tar.zst")
+    spdx_index_path = imgdeploydir / (image_name + ".spdx.index.json")
+    make_image_link(spdx_index_path, ".spdx.index.json")
+}
+
+python sdk_host_combine_spdx() {
+    sdk_combine_spdx(d, "host")
+}
+
+python sdk_target_combine_spdx() {
+    sdk_combine_spdx(d, "target")
+}
+
+def sdk_combine_spdx(d, sdk_type):
+    import oe.sbom
+    from pathlib import Path
+    from oe.sdk import sdk_list_installed_packages
+
+    sdk_name = d.getVar("SDK_NAME") + "-" + sdk_type
+    sdk_deploydir = Path(d.getVar("SDKDEPLOYDIR"))
+    sdk_spdxid = oe.sbom.get_sdk_spdxid(sdk_name)
+    sdk_packages = sdk_list_installed_packages(d, sdk_type == "target")
+    combine_spdx(d, sdk_name, sdk_deploydir, sdk_spdxid, sdk_packages)
+
+def combine_spdx(d, rootfs_name, rootfs_deploydir, rootfs_spdxid, packages):
     import os
     import oe.spdx
     import oe.sbom
     import io
     import json
-    from oe.rootfs import image_list_installed_packages
     from datetime import timezone, datetime
     from pathlib import Path
     import tarfile
     import bb.compress.zstd
 
     creation_time = datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    image_name = d.getVar("IMAGE_NAME")
-    image_link_name = d.getVar("IMAGE_LINK_NAME")
-
     deploy_dir_spdx = Path(d.getVar("DEPLOY_DIR_SPDX"))
-    imgdeploydir = Path(d.getVar("IMGDEPLOYDIR"))
     source_date_epoch = d.getVar("SOURCE_DATE_EPOCH")
 
     doc = oe.spdx.SPDXDocument()
-    doc.name = image_name
+    doc.name = rootfs_name
     doc.documentNamespace = get_doc_namespace(d, doc)
     doc.creationInfo.created = creation_time
     doc.creationInfo.comment = "This document was created by analyzing the source of the Yocto recipe during the build."
@@ -825,13 +903,10 @@ python image_combine_spdx() {
     image = oe.spdx.SPDXPackage()
     image.name = d.getVar("PN")
     image.versionInfo = d.getVar("PV")
-    image.SPDXID = oe.sbom.get_image_spdxid(image_name)
+    image.SPDXID = rootfs_spdxid
+    image.packageSupplier = d.getVar("SPDX_SUPPLIER")
 
     doc.packages.append(image)
-
-    spdx_package = oe.spdx.SPDXPackage()
-
-    packages = image_list_installed_packages(d)
 
     for name in sorted(packages.keys()):
         pkg_spdx_path = deploy_dir_spdx / "packages" / (name + ".spdx.json")
@@ -869,14 +944,10 @@ python image_combine_spdx() {
             comment="Runtime dependencies for %s" % name
         )
 
-    image_spdx_path = imgdeploydir / (image_name + ".spdx.json")
+    image_spdx_path = rootfs_deploydir / (rootfs_name + ".spdx.json")
 
     with image_spdx_path.open("wb") as f:
         doc.to_json(f, sort_keys=True)
-
-    if image_link_name:
-        image_spdx_link = imgdeploydir / (image_link_name + ".spdx.json")
-        image_spdx_link.symlink_to(os.path.relpath(image_spdx_path, image_spdx_link.parent))
 
     num_threads = int(d.getVar("BB_NUMBER_THREADS"))
 
@@ -884,7 +955,7 @@ python image_combine_spdx() {
 
     index = {"documents": []}
 
-    spdx_tar_path = imgdeploydir / (image_name + ".spdx.tar.zst")
+    spdx_tar_path = rootfs_deploydir / (rootfs_name + ".spdx.tar.zst")
     with bb.compress.zstd.open(spdx_tar_path, "w", num_threads=num_threads) as f:
         with tarfile.open(fileobj=f, mode="w|") as tar:
             def collect_spdx_document(path):
@@ -946,17 +1017,6 @@ python image_combine_spdx() {
 
             tar.addfile(info, fileobj=index_str)
 
-    def make_image_link(target_path, suffix):
-        if image_link_name:
-            link = imgdeploydir / (image_link_name + suffix)
-            link.symlink_to(os.path.relpath(target_path, link.parent))
-
-    make_image_link(spdx_tar_path, ".spdx.tar.zst")
-
-    spdx_index_path = imgdeploydir / (image_name + ".spdx.index.json")
+    spdx_index_path = rootfs_deploydir / (rootfs_name + ".spdx.index.json")
     with spdx_index_path.open("w") as f:
         json.dump(index, f, sort_keys=True)
-
-    make_image_link(spdx_index_path, ".spdx.index.json")
-}
-

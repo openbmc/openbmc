@@ -6,7 +6,7 @@ export PATH="/sbin:/usr/sbin:/bin:/usr/bin"
 
 usage() {
 	cat <<EOF
-	$0 [<openvt arguments>] [-- <weston options>]
+	$0 [<weston options>]
 EOF
 }
 
@@ -18,11 +18,6 @@ add_weston_argument() {
 	weston_args="$weston_args $1"
 }
 
-# Add openvt extra argument
-add_openvt_argument() {
-	openvt_args="$openvt_args $1"
-
-}
 ## Add module to --modules argument
 add_weston_module() {
 	if [[ "x${weston_modules}" == "x" ]]; then
@@ -37,32 +32,11 @@ if [ -n "$WAYLAND_DISPLAY" ]; then
 fi
 
 if [ -n "$WESTON_USER" ]; then
-	if [ -z "$WESTON_TTY" ]; then
-		echo "ERROR: If you have WESTON_USER variable set, you also need WESTON_TTY."
-		exit 1
-	fi
 	if [ -z "$WESTON_GROUP" ]; then
 		# no explicit WESTON_GROUP given, therefore use WESTON_USER
 		export WESTON_GROUP="${WESTON_USER}"
 	fi
-	weston_args_user="-u $WESTON_USER -t $WESTON_TTY"
 fi
-
-if [ -n "$DISPLAY" ]; then
-	launcher="weston"
-else
-	launcher="weston-launch $weston_args_user --"
-fi
-
-openvt_args="-s"
-while [ -n "$1" ]; do
-	if [ "$1" = "--" ]; then
-		shift
-		break
-	fi
-	openvt_args="$openvt_args $1"
-	shift
-done
 
 weston_args=$*
 
@@ -94,4 +68,4 @@ if test -z "$XDG_RUNTIME_DIR"; then
 	fi
 fi
 
-exec openvt $openvt_args -- $launcher $weston_args --log=@LOCALSTATEDIR@/log/weston.log
+su -c "XDG_RUNTIME_DIR=/run/user/`id -u ${WESTON_USER}` weston $weston_args --log=/tmp/weston.log" $WESTON_USER

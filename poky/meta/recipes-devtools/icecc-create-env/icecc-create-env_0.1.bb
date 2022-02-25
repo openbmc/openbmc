@@ -4,7 +4,7 @@ been modified in order to make it work with OE."
 SECTION = "base"
 # source file has just a "GPL" word, but upstream is GPLv2+.
 # most probably just GPL would be a mistake
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://icecc-create-env;beginline=2;endline=5;md5=ae1df3d6a058bfda40b66094c5f6065f"
 
 PR = "r2"

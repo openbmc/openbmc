@@ -3,7 +3,7 @@ DESCRIPTION = "Powerful set of tools or managing Yocto Linux kernel sources \
 and configuration data. You can use these tools to make a single configuration \
 change, apply multiple patches, or work with your own kernel sources."
 HOMEPAGE = "https://www.yoctoproject.org/"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://tools/kgit;beginline=5;endline=9;md5=9c30e971d435e249624278c3e343e501"
 
 DEPENDS = "git-native"

@@ -2,13 +2,14 @@ SUMMARY = "X driver"
 HOMEPAGE = "http://www.x.org"
 BUGTRACKER = "https://bugs.freedesktop.org"
 SECTION = "x11/drivers"
-LICENSE = "MIT-X"
+LICENSE = "MIT"
 
 PE = "2"
 
 DEPENDS = "virtual/xserver xorgproto util-macros"
 
-SRC_URI = "${XORG_MIRROR}/individual/driver/${BPN}-${PV}.tar.bz2"
+XORG_DRIVER_COMPRESSOR ?= ".tar.bz2"
+SRC_URI = "${XORG_MIRROR}/individual/driver/${BPN}-${PV}${XORG_DRIVER_COMPRESSOR}"
 
 FILES:${PN} += " ${libdir}/xorg/modules/drivers/*.so"
 

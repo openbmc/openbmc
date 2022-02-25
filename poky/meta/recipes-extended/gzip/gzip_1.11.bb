@@ -1,6 +1,6 @@
 require gzip.inc
 
-LICENSE = "GPLv3+"
+LICENSE = "GPL-3.0-or-later"
 
 SRC_URI = "${GNU_MIRROR}/gzip/${BP}.tar.gz \
            file://run-ptest \

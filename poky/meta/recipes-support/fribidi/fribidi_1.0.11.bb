@@ -6,7 +6,7 @@ as Hebrew, Arabic, Syriac, and Thaana. "
 SECTION = "libs"
 HOMEPAGE = "http://fribidi.org/"
 BUGTRACKER = "https://github.com/fribidi/fribidi/issues"
-LICENSE = "LGPLv2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=a916467b91076e631dd8edb7424769c7"
 
 SRC_URI = "https://github.com/${BPN}/${BPN}/releases/download/v${PV}/${BP}.tar.xz \

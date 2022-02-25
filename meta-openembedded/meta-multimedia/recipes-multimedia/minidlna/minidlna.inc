@@ -1,6 +1,6 @@
 DESCRIPTION = "MiniDLNA (aka ReadyDLNA) is server software with the aim of \
 being fully compliant with DLNA/UPnP-AV clients."
-LICENSE = "GPL-2.0|BSD"
+LICENSE = "GPL-2.0|BSD-3-Clause"
 DEPENDS = "ffmpeg flac libav jpeg sqlite3 libexif libogg libid3tag libvorbis"
 
 # because it depends on libav which has commercial flag
@@ -13,7 +13,7 @@ SRC_URI = "git://git.code.sf.net/p/minidlna/git;branch=master;module=git \
            file://minidlna.service \
            file://0001-Update-Gettext-version.patch \
            file://0001-configure-Check-for-clock_gettime-seprately-from-__N.patch \
-           file://0001-Mark-setjmp_buffer-extern-declaration.patch \
+           file://0001-configure.ac-drop-non-standard-checks.patch \
            "
 
 S = "${WORKDIR}/git"

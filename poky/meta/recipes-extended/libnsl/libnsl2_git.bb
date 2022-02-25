@@ -5,7 +5,7 @@ SUMMARY = "Library containing NIS functions using TI-RPC (IPv6 enabled)"
 DESCRIPTION = "This library contains the public client interface for NIS(YP) and NIS+\
                it was part of glibc and now is standalone packages. it also supports IPv6"
 HOMEPAGE = "https://github.com/thkukuk/libnsl"
-LICENSE = "LGPL-2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 SECTION = "libs"
 DEPENDS = "libtirpc"

@@ -15,7 +15,7 @@ PACKAGESPLITFUNCS:prepend = "split_ttf_mplus_packages "
 
 python split_ttf_mplus_packages() {
     plugindir = d.expand('${datadir}/fonts/ttf-mplus/')
-    packages = do_split_packages(d, plugindir, '^(.*)\.ttf$', 'ttf-%s', 'TTF Font %s')
+    packages = do_split_packages(d, plugindir, r'^(.*)\.ttf$', 'ttf-%s', 'TTF Font %s')
     d.setVar('FONT_PACKAGES', ' '.join(packages))
 }
 

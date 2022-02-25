@@ -38,7 +38,7 @@ CVE_PRODUCT = "apple:mdnsresponder"
 # https://www.incibe-cert.es/en/early-warning/vulnerabilities/cve-2007-0613
 # https://security-tracker.debian.org/tracker/CVE-2007-0613
 # https://vulmon.com/vulnerabilitydetails?qid=CVE-2007-0613
-CVE_CHECK_WHITELIST += "CVE-2007-0613"
+CVE_CHECK_IGNORE += "CVE-2007-0613"
 
 PARALLEL_MAKE = ""
 

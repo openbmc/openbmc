@@ -46,4 +46,8 @@ do_install () {
     PCP_MAN_DIR=${D}/${mandir} \
     PCP_DOC_DIR=${D}/${docdir} 
 }
+#| chkacc1.c:8:10: fatal error: localconfig.h: No such file or directory
+#|     8 | #include "localconfig.h"
+#|       |          ^~~~~~~~~~~~~~~
+PARALLEL_MAKE = ""
 

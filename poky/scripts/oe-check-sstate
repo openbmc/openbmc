@@ -47,7 +47,7 @@ def check(args):
     try:
         env = os.environ.copy()
         if not args.same_tmpdir:
-            env['BB_ENV_EXTRAWHITE'] = env.get('BB_ENV_EXTRAWHITE', '') + ' TMPDIR:forcevariable'
+            env['BB_ENV_PASSTHROUGH_ADDITIONS'] = env.get('BB_ENV_PASSTHROUGH_ADDITIONS', '') + ' TMPDIR:forcevariable'
             env['TMPDIR:forcevariable'] = tmpdir
 
         try:

@@ -3,7 +3,7 @@ DESCRIPTION = "SWIG is a compiler that makes it easy to integrate C and C++ \
 code with other languages including Perl, Tcl, Ruby, Python, Java, Guile, \
 Mzscheme, Chicken, OCaml, Pike, and C#."
 HOMEPAGE = "http://swig.sourceforge.net/"
-LICENSE = "BSD-3-Clause & GPLv3"
+LICENSE = "BSD-3-Clause & GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e7807a6282784a7dde4c846626b08fc6 \
                     file://LICENSE-GPL;md5=d32239bcb673463ab874e80d47fae504 \
                     file://LICENSE-UNIVERSITIES;md5=8ce9dcc8f7c994de4a408b205c72ba08"

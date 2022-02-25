@@ -2,7 +2,7 @@ SUMMARY = "Fast lightweight tabbed filemanager"
 DESCRIPTION = "A free file manager application and the standard file manager of LXDE."
 HOMEPAGE = "http://pcmanfm.sourceforge.net/"
 
-LICENSE = "GPLv2 & GPLv2+ & LGPLv2.1+"
+LICENSE = "GPL-2.0-only & GPL-2.0-or-later & LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
                     file://src/pcmanfm.h;endline=22;md5=417b3855771a3a87f8ad753d994491f0 \
                     file://src/gseal-gtk-compat.h;endline=21;md5=46922c8691f58d124f9420fe16149ce2"

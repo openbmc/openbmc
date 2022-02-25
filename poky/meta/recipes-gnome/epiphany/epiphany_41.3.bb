@@ -3,7 +3,7 @@ DESCRIPTION = "Epiphany is an open source web browser for the Linux desktop envi
 It provides a simple and easy-to-use internet browsing experience."
 HOMEPAGE = "https://wiki.gnome.org/Apps/Web"
 BUGTRACKER = "https://gitlab.gnome.org/GNOME/epiphany"
-LICENSE = "GPLv3+"
+LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 DEPENDS = " \

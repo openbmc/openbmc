@@ -25,7 +25,7 @@ from itertools import groupby
 
 from bb.ui import uihelper
 
-featureSet = [bb.cooker.CookerFeatures.SEND_SANITYEVENTS]
+featureSet = [bb.cooker.CookerFeatures.SEND_SANITYEVENTS, bb.cooker.CookerFeatures.BASEDATASTORE_TRACKING]
 
 logger = logging.getLogger("BitBake")
 interactive = sys.stdout.isatty()
@@ -647,7 +647,7 @@ def main(server, eventHandler, params, tf = TerminalFilter):
             if isinstance(event, logging.LogRecord):
                 lastprint = time.time()
                 printinterval = 5000
-                if event.levelno >= bb.msg.BBLogFormatter.ERROR:
+                if event.levelno >= bb.msg.BBLogFormatter.ERRORONCE:
                     errors = errors + 1
                     return_value = 1
                 elif event.levelno == bb.msg.BBLogFormatter.WARNING:
@@ -661,10 +661,10 @@ def main(server, eventHandler, params, tf = TerminalFilter):
                         continue
 
                     # Prefix task messages with recipe/task
-                    if event.taskpid in helper.pidmap and event.levelno != bb.msg.BBLogFormatter.PLAIN:
+                    if event.taskpid in helper.pidmap and event.levelno not in [bb.msg.BBLogFormatter.PLAIN, bb.msg.BBLogFormatter.WARNONCE, bb.msg.BBLogFormatter.ERRORONCE]:
                         taskinfo = helper.running_tasks[helper.pidmap[event.taskpid]]
                         event.msg = taskinfo['title'] + ': ' + event.msg
-                if hasattr(event, 'fn'):
+                if hasattr(event, 'fn') and event.levelno not in [bb.msg.BBLogFormatter.WARNONCE, bb.msg.BBLogFormatter.ERRORONCE]:
                     event.msg = event.fn + ': ' + event.msg
                 logging.getLogger(event.name).handle(event)
                 continue
@@ -875,11 +875,11 @@ def main(server, eventHandler, params, tf = TerminalFilter):
             for failure in taskfailures:
                 summary += "\n  %s" % failure
         if warnings:
-            summary += pluralise("\nSummary: There was %s WARNING message shown.",
-                                 "\nSummary: There were %s WARNING messages shown.", warnings)
+            summary += pluralise("\nSummary: There was %s WARNING message.",
+                                 "\nSummary: There were %s WARNING messages.", warnings)
         if return_value and errors:
-            summary += pluralise("\nSummary: There was %s ERROR message shown, returning a non-zero exit code.",
-                                 "\nSummary: There were %s ERROR messages shown, returning a non-zero exit code.", errors)
+            summary += pluralise("\nSummary: There was %s ERROR message, returning a non-zero exit code.",
+                                 "\nSummary: There were %s ERROR messages, returning a non-zero exit code.", errors)
         if summary and params.options.quiet == 0:
             print(summary)
 

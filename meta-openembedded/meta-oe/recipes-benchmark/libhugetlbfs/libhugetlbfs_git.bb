@@ -76,4 +76,4 @@ INHIBIT_PACKAGE_STRIP = "1"
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
 
 # see https://github.com/libhugetlbfs/libhugetlbfs/issues/52
-PNBLACKLIST[libhugetlbfs] ?= "Needs porting to glibc 2.34+"
+SKIP_RECIPE[libhugetlbfs] ?= "Needs porting to glibc 2.34+"

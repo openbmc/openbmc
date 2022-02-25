@@ -1,4 +1,4 @@
-From 2761400989bcbf11e10bc85f90c3a2ba1305c4ae Mon Sep 17 00:00:00 2001
+From 78b2e81940561069faf7698931a033784f794e40 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 6 Mar 2021 14:48:56 -0800
 Subject: [PATCH] nativesdk-glibc: Fall back to faccessat on faccess2 returns

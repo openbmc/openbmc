@@ -3,7 +3,7 @@ DESCRIPTION = "Flex is a fast lexical analyser generator.  Flex is a tool for ge
 lexical patterns in text."
 HOMEPAGE = "http://sourceforge.net/projects/flex/"
 SECTION = "devel"
-LICENSE = "BSD-3-Clause & LGPL-2.0+"
+LICENSE = "BSD-3-Clause & LGPL-2.0-or-later"
 LICENSE:${PN}-libfl = "BSD-3-Clause"
 
 DEPENDS = "${@bb.utils.contains('PTEST_ENABLED', '1', 'bison-native flex-native', '', d)}"
@@ -31,7 +31,7 @@ UPSTREAM_CHECK_REGEX = "flex-(?P<pver>\d+(\.\d+)+)\.tar"
 # Disputed - yes there is stack exhaustion but no bug and it is building the
 # parser, not running it, effectively similar to a compiler ICE. Upstream no plans to address
 # https://github.com/westes/flex/issues/414
-CVE_CHECK_WHITELIST += "CVE-2019-6293"
+CVE_CHECK_IGNORE += "CVE-2019-6293"
 
 inherit autotools gettext texinfo ptest
 

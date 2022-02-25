@@ -20,7 +20,7 @@ index e42b365..4831a48 100755
  import sys
  import argparse
 @@ -19,7 +20,7 @@ def _generate_sbat(args):
-     FWUPD_URL = "https://github.com/fwupd/fwupd"
+     FWUPD_URL = "https://github.com/fwupd/fwupd-efi"
  
      subprocess.run(
 -        [args.cc, "-x", "c", "-c", "-o", args.outfile, "/dev/null"], check=True
@@ -32,13 +32,13 @@ diff --git a/efi/meson.build b/efi/meson.build
 index 68ea4aa..dcf0d43 100644
 --- a/efi/meson.build
 +++ b/efi/meson.build
-@@ -184,7 +184,7 @@ o_file5 = custom_target('fwup-sbat.o',
+@@ -187,7 +187,7 @@ o_file5 = custom_target('fwup-sbat.o',
                          command : [
-                           join_paths(meson.current_source_dir(), 'generate_sbat.py'),
+                           generate_sbat,
                            '@OUTPUT@',
 -                          '--cc', efi_cc,
 +                          '--cc', ' '.join(efi_cc),
-                           '--objcopy', efi_objcopy,
+                           '--objcopy', objcopy,
                            '--project-name', meson.project_name(),
                            '--project-version', meson.project_version(),
 diff --git a/meson_options.txt b/meson_options.txt
@@ -49,5 +49,5 @@ index d869cd2..17ef7fb 100644
 -option('efi-cc', type : 'string', value : 'gcc', description : 'the compiler to use for EFI modules')
 +option('efi-cc', type : 'array', value : ['gcc'], description : 'the compiler to use for EFI modules')
  option('efi-ld', type : 'string', value : 'ld', description : 'the linker to use for EFI modules')
- option('efi-objcopy', type : 'string', value : 'objcopy', description : 'the objcopy utility to use for EFI modules')
  option('efi-libdir', type : 'string', description : 'path to the EFI lib directory')
+ option('efi-ldsdir', type : 'string', description : 'path to the EFI lds directory')

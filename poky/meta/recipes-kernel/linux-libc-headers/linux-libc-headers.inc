@@ -2,7 +2,7 @@ SUMMARY = "Sanitized set of kernel headers for the C library's use"
 HOMEPAGE = "https://www.kernel.org/"
 DESCRIPTION = "Designed to maintain an Application Programming Interface (API) stable version of the Linux headers"
 SECTION = "devel"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 
 #########################################################################
 ####                        PLEASE READ 

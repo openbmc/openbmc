@@ -5,7 +5,7 @@ DESCRIPTION = "It tries to solve a problem of providing a common set of \
 cryptographic algorithms for higher-level applications by implementing a \
 context-independent set of cryptographic algorithms"
 SECTION = "libs"
-LICENSE = "LGPLv3+ | GPLv2+"
+LICENSE = "LGPL-3.0-or-later | GPL-2.0-or-later"
 
 LIC_FILES_CHKSUM = "file://COPYING.LESSERv3;md5=6a6a8e020838b23406c81b19c1d46df6 \
                     file://COPYINGv2;md5=b234ee4d69f5fce4486a80fdaf4a4263 \

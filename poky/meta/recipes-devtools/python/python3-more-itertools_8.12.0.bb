@@ -7,6 +7,8 @@ SRC_URI[sha256sum] = "7dc6ad46f05f545f900dd59e8dfb4e84a4827b97b3cfecb175ea0c7d24
 
 inherit pypi setuptools3 ptest
 
+PIP_INSTALL_PACKAGE = "more_itertools"
+
 SRC_URI += " \
 	file://run-ptest \
 "

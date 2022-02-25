@@ -9,7 +9,7 @@ object information), and other tools and related libraries."
 HOMEPAGE = "http://www.gnu.org/software/binutils/"
 BUGTRACKER = "http://sourceware.org/bugzilla/"
 SECTION = "devel"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 
 DEPENDS = "flex-native bison-native zlib-native gnu-config-native autoconf-native"
 

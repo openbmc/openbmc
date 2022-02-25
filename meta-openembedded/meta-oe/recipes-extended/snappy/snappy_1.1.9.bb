@@ -10,7 +10,7 @@ compression ratio."
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=f62f3080324a97b3159a7a7e61812d0c"
 
-SRC_URI = "gitsm://github.com/google/snappy.git;protocol=https;branch=master \
+SRC_URI = "gitsm://github.com/google/snappy.git;protocol=https;branch=main \
     file://0001-Add-inline-with-SNAPPY_ATTRIBUTE_ALWAYS_INLINE.patch \
 "
 SRCREV = "2b63814b15a2aaae54b7943f0cd935892fae628f"

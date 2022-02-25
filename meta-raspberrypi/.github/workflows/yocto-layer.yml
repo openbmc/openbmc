@@ -1,0 +1,37 @@
+# SPDX-FileCopyrightText: Andrei Gherzan <andrei.gherzan@huawei.com>
+#
+# SPDX-License-Identifier: MIT
+
+name: Yocto Compatible
+
+on:
+  pull_request:
+
+jobs:
+  yocto-check-layer:
+    name: Validate with yocto-check-layer
+    runs-on: [self-hosted, Linux]
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Build a temporary yocto-builder image
+      uses: ./.github/actions/docker-build
+      with:
+        docker_image: yocto-builder
+        id: ${{ github.event.number }}
+    - name: Run yocto-check-layer
+      run: |
+        docker run --rm -v "$GITHUB_WORKSPACE:/work:ro" \
+          --env "BASE_REF=$GITHUB_BASE_REF" \
+          "yocto-builder-${{ github.event.number }}" \
+          /entrypoint-yocto-check-layer.sh
+    - name: Cleanup temporary docker image
+      uses: ./.github/actions/docker-clean-image
+      with:
+        docker_image: yocto-builder-${{ github.event.number }}
+      if: always()
+    - name: Cleanup dangling docker images
+      uses: ./.github/actions/docker-clean-dangling
+      if: always()

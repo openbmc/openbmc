@@ -34,6 +34,8 @@ ENABLE_UART ??= ""
 
 WM8960="${@bb.utils.contains("MACHINE_FEATURES", "wm8960", "1", "0", d)}"
 
+GPIO_SHUTDOWN_PIN ??= ""
+
 inherit deploy nopackages
 
 do_deploy() {
@@ -251,6 +253,22 @@ do_deploy() {
     elif [ "${ENABLE_CAN}" = "1" ]; then
         echo "# Enable CAN" >>$CONFIG
         echo "dtoverlay=mcp2515-can0,oscillator=${CAN_OSCILLATOR},interrupt=25" >>$CONFIG
+    fi
+
+
+    if [ "${ENABLE_GPIO_SHUTDOWN}" = "1" ]; then
+        if ([ "${ENABLE_I2C}" = "1" ] || [ "${PITFT}" = "1" ]) && [ -z "${GPIO_SHUTDOWN_PIN}" ]; then
+            # By default GPIO shutdown uses the same pin as the (master) I2C SCL.
+            # If I2C is configured and an alternative pin is not configured for
+            # gpio-shutdown, there is a configuration conflict.
+            bbfatal "I2C and gpio-shutdown are both enabled and using the same pins!"
+        fi
+        echo "# Enable gpio-shutdown" >> $CONFIG
+        if [ -z "${GPIO_SHUTDOWN_PIN}" ]; then
+            echo "dtoverlay=gpio-shutdown" >> $CONFIG
+        else
+            echo "dtoverlay=gpio-shutdown,gpio_pin=${GPIO_SHUTDOWN_PIN}" >> $CONFIG
+        fi
     fi
 
     # Append extra config if the user has provided any

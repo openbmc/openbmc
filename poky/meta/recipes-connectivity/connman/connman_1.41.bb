@@ -1,0 +1,15 @@
+require connman.inc
+
+SRC_URI = "${KERNELORG_MIRROR}/linux/network/${BPN}/${BP}.tar.xz \
+           file://0001-plugin.h-Change-visibility-to-default-for-debug-symb.patch \
+           file://0001-connman.service-stop-systemd-resolved-when-we-use-co.patch \
+           file://connman \
+           file://no-version-scripts.patch \
+           "
+
+SRC_URI:append:libc-musl = " file://0002-resolve-musl-does-not-implement-res_ninit.patch"
+
+SRC_URI[sha256sum] = "79fb40f4fdd5530c45aa8e592fb16ba23d3674f3a98cf10b89a6576f198de589"
+
+RRECOMMENDS:${PN} = "connman-conf"
+RCONFLICTS:${PN} = "networkmanager"

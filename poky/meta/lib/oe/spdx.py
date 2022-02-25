@@ -105,10 +105,13 @@ class _ListProperty(_Property):
                 obj._spdx[name] = []
             return obj._spdx[name]
 
+        def set_helper(obj, value):
+            obj._spdx[name] = list(value)
+
         def del_helper(obj):
             del obj._spdx[name]
 
-        attrs[name] = property(get_helper, None, del_helper)
+        attrs[name] = property(get_helper, set_helper, del_helper)
 
     def init(self, source):
         return [self.prop.init(o) for o in source]

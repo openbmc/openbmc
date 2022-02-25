@@ -97,7 +97,7 @@ if [ $? != 0 ] ; then
     exit 251
 fi
 
-if [ "$BB_ENV_EXTRAWHITE" != "" ] ; then
+if [ "BB_ENV_PASSTHROUGH_ADDITIONS" != "" ] ; then
    echo "WARNING: you are running after sourcing the build environment script, this is not recommended"
 fi
 

@@ -2,9 +2,9 @@ SUMMARY = "SBC Audio Codec"
 DESCRIPTION = "Bluetooth low-complexity, subband codec (SBC) library."
 HOMEPAGE = "https://www.bluez.org"
 SECTION = "libs"
-LICENSE = "GPLv2+ & LGPLv2.1+"
-LICENSE:${PN} = "LGPLv2.1+"
-LICENSE:${PN}-examples = "GPLv2+"
+LICENSE = "GPL-2.0-or-later & LGPL-2.1-or-later"
+LICENSE:${PN} = "LGPL-2.1-or-later"
+LICENSE:${PN}-examples = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e \
                     file://COPYING.LIB;md5=fb504b67c50331fc78734fed90fb0e09 \
                     file://src/sbcenc.c;beginline=1;endline=24;md5=08e7a70b127f4100ff2cd7d629147d8d \

@@ -1,0 +1,63 @@
+From a88ee460b93c67ca756bd91ee9a8660813f65bd8 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Sun, 23 Jan 2022 13:04:47 -0500
+Subject: [PATCH 1/7] fix: block: remove GENHD_FL_SUPPRESS_PARTITION_INFO
+ (v5.17)
+
+See upstream commit :
+
+  commit 3b5149ac50970669ee0ddb9629ec77ffd5c0622d
+  Author: Christoph Hellwig <hch@lst.de>
+  Date:   Mon Nov 22 14:06:21 2021 +0100
+
+    block: remove GENHD_FL_SUPPRESS_PARTITION_INFO
+
+    This flag is not set directly anywhere and only inherited from
+    GENHD_FL_HIDDEN.  Just check for GENHD_FL_HIDDEN instead.
+
+    Link: https://lore.kernel.org/r/20211122130625.1136848-11-hch@lst.de
+
+
+Upstream-Status: Backport [lttng-modules commit a88ee460b93c67ca756bd91ee9a8660813f65bd8]
+
+Change-Id: Ide92bdaaff7d16e96be23aaf00cebeaa601235b7
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/wrapper/genhd.h    | 6 ++++++
+ src/lttng-statedump-impl.c | 2 +-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/include/wrapper/genhd.h b/include/wrapper/genhd.h
+index 68980388..3c6dbcbe 100644
+--- a/include/wrapper/genhd.h
++++ b/include/wrapper/genhd.h
+@@ -14,6 +14,12 @@
+ 
+ #include <linux/genhd.h>
+ 
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,17,0))
++#define LTTNG_GENHD_FL_HIDDEN GENHD_FL_HIDDEN
++#else
++#define LTTNG_GENHD_FL_HIDDEN GENHD_FL_SUPPRESS_PARTITION_INFO
++#endif
++
+ #ifdef CONFIG_KALLSYMS_ALL
+ 
+ #include <linux/kallsyms.h>
+diff --git a/src/lttng-statedump-impl.c b/src/lttng-statedump-impl.c
+index c5fca89d..4d7b2921 100644
+--- a/src/lttng-statedump-impl.c
++++ b/src/lttng-statedump-impl.c
+@@ -334,7 +334,7 @@ int lttng_enumerate_block_devices(struct lttng_kernel_session *session)
+ 		 * suppressed
+ 		 */
+ 		if (get_capacity(disk) == 0 ||
+-		    (disk->flags & GENHD_FL_SUPPRESS_PARTITION_INFO))
++		    (disk->flags & LTTNG_GENHD_FL_HIDDEN))
+ 			continue;
+ 
+ 		ret = lttng_statedump_each_block_device(session, disk);
+-- 
+2.19.1
+

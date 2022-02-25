@@ -320,6 +320,24 @@ Appropriate kernel modules will be also included in the image. By default the
 GPIO pin for gpio-ir is set to 18 and the pin for gpio-ir-tx is 17. Both pins
 can be easily changed by modifying variables `GPIO_IR` and `GPIO_IR_TX`.
 
+## Enable gpio-shutdown
+
+When using device tree kernels, set this variable to enable gpio-shutdown:
+
+    ENABLE_GPIO_SHUTDOWN = "1"
+
+This will add the corresponding device tree overlay to config.txt and include
+the gpio-keys kernel module in the image. If System V init is used, additional
+mapping is applied to bind the button event to shutdown command. Systemd init
+should handle the event out of the box.
+
+By default the feature uses gpio pin 3 (except RPi 1 Model B rev 1 enumerates
+the pin as gpio 1). This conflicts with the I2C bus. If you set `ENABLE_I2C`
+to `1` or enabled `PiTFT` support, or otherwise want to use another pin, use
+`GPIO_SHUTDOWN_PIN` to assign another pin. Example using gpio pin 25:
+
+     GPIO_SHUTDOWN_PIN = "25"
+
 ## Manual additions to config.txt
 
 The `RPI_EXTRA_CONFIG` variable can be used to manually add additional lines to

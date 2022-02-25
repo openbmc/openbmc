@@ -3,7 +3,7 @@ DESCRIPTION = "A sendmail replacement for use in MTAs like mutt"
 HOMEPAGE = "https://marlam.de/msmtp/"
 SECTION = "console/network"
 
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 DEPENDS = "zlib gnutls"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"

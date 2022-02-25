@@ -21,7 +21,7 @@ supplied by the RPM Package Manager libraries."
 HOMEPAGE = "http://www.rpm.org"
 
 # libraries are also LGPL - how to express this?
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c4eec0c20c6034b9407a09945b48a43f"
 
 SRC_URI = "git://github.com/rpm-software-management/rpm;branch=rpm-4.17.x;protocol=https \

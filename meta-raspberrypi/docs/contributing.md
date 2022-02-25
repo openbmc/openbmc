@@ -86,6 +86,10 @@ Then, for sending patches to the mailing list, you may use this command:
 
     git send-email --to yocto@lists.yoctoproject.org <generated patch>
 
+When patches are sent through the mailing list, the maintainer will include
+them in a GitHub pull request that will take the patches through the CI
+workflows. This process happens periodically.
+
 ## GitHub issues
 
 In order to manage and track the layer issues more efficiently, the

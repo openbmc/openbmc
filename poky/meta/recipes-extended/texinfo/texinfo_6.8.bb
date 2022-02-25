@@ -4,7 +4,7 @@ online information and printed output from a single source file. The \
 GNU Project uses the Texinfo file format for most of its documentation."
 HOMEPAGE = "http://www.gnu.org/software/texinfo/"
 SECTION = "console/utils"
-LICENSE = "GPLv3+"
+LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 PROVIDES:append:class-native = " texinfo-replacement-native"

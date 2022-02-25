@@ -6,7 +6,7 @@ that are found but fail to compile will exit with an error rather than skip."
 
 HOMEPAGE = "https://metacpan.org/release/Test-Needs"
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPL-1.0+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 
 CPAN_NAME = "Test-Needs"
 CPAN_AUTHOR = "HAARG"

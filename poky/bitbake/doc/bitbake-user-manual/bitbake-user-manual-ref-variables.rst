@@ -138,7 +138,7 @@ overview of their function and contents.
          where:
 
             <action> is:
-               ABORT:     Immediately abort the build when
+               HALT:      Immediately halt the build when
                           a threshold is broken.
                STOPTASKS: Stop the build after the currently
                           executing tasks have finished when
@@ -169,13 +169,13 @@ overview of their function and contents.
 
       Here are some examples::
 
-         BB_DISKMON_DIRS = "ABORT,${TMPDIR},1G,100K WARN,${SSTATE_DIR},1G,100K"
+         BB_DISKMON_DIRS = "HALT,${TMPDIR},1G,100K WARN,${SSTATE_DIR},1G,100K"
          BB_DISKMON_DIRS = "STOPTASKS,${TMPDIR},1G"
-         BB_DISKMON_DIRS = "ABORT,${TMPDIR},,100K"
+         BB_DISKMON_DIRS = "HALT,${TMPDIR},,100K"
 
       The first example works only if you also set the
       :term:`BB_DISKMON_WARNINTERVAL`
-      variable. This example causes the build system to immediately abort
+      variable. This example causes the build system to immediately halt
       when either the disk space in ``${TMPDIR}`` drops below 1 Gbyte or
       the available free inodes drops below 100 Kbytes. Because two
       directories are provided with the variable, the build system also
@@ -189,7 +189,7 @@ overview of their function and contents.
       directory drops below 1 Gbyte. No disk monitoring occurs for the free
       inodes in this case.
 
-      The final example immediately aborts the build when the number of
+      The final example immediately halts the build when the number of
       free inodes in the ``${TMPDIR}`` directory drops below 100 Kbytes. No
       disk space monitoring for the directory itself occurs in this case.
 
@@ -236,23 +236,23 @@ overview of their function and contents.
       based on the interval occur each time a respective interval is
       reached beyond the initial warning (i.e. 1 Gbytes and 100 Kbytes).
 
-   :term:`BB_ENV_EXTRAWHITE`
-      Specifies an additional set of variables to allow through (whitelist)
-      from the external environment into BitBake's datastore. This list of
-      variables are on top of the internal list set in
-      :term:`BB_ENV_WHITELIST`.
+   :term:`BB_ENV_PASSTHROUGH_ADDITIONS`
+      Specifies an additional set of variables to allow through from the
+      external environment into BitBake's datastore. This list of variables
+      are on top of the internal list set in
+      :term:`BB_ENV_PASSTHROUGH`.
 
       .. note::
 
          You must set this variable in the external environment in order
          for it to work.
 
-   :term:`BB_ENV_WHITELIST`
-      Specifies the internal whitelist of variables to allow through from
+   :term:`BB_ENV_PASSTHROUGH`
+      Specifies the internal list of variables to allow through from
       the external environment into BitBake's datastore. If the value of
       this variable is not specified (which is the default), the following
       list is used: :term:`BBPATH`, :term:`BB_PRESERVE_ENV`,
-      :term:`BB_ENV_WHITELIST`, and :term:`BB_ENV_EXTRAWHITE`.
+      :term:`BB_ENV_PASSTHROUGH`, and :term:`BB_ENV_PASSTHROUGH_ADDITIONS`.
 
       .. note::
 
@@ -337,7 +337,7 @@ overview of their function and contents.
 
       For example usage, see :term:`BB_GIT_SHALLOW`.
 
-   :term:`BB_HASHBASE_WHITELIST`
+   :term:`BB_BASEHASH_IGNORE_VARS`
       Lists variables that are excluded from checksum and dependency data.
       Variables that are excluded can therefore change without affecting
       the checksum mechanism. A common example would be the variable for
@@ -358,7 +358,7 @@ overview of their function and contents.
       However, the more accurate the data returned, the more efficient the
       build will be.
 
-   :term:`BB_HASHCONFIG_WHITELIST`
+   :term:`BB_HASHCONFIG_IGNORE_VARS`
       Lists variables that are excluded from base configuration checksum,
       which is used to determine if the cache can be reused.
 
@@ -452,8 +452,9 @@ overview of their function and contents.
 
    :term:`BB_ORIGENV`
       Contains a copy of the original external environment in which BitBake
-      was run. The copy is taken before any whitelisted variable values are
-      filtered into BitBake's datastore.
+      was run. The copy is taken before any variable values configured to
+      pass through from the external environment are filtered into BitBake's
+      datastore.
 
       .. note::
 
@@ -461,8 +462,8 @@ overview of their function and contents.
          queried using the normal datastore operations.
 
    :term:`BB_PRESERVE_ENV`
-      Disables whitelisting and instead allows all variables through from
-      the external environment into BitBake's datastore.
+      Disables environment filtering and instead allows all variables through
+      from the external environment into BitBake's datastore.
 
       .. note::
 
@@ -734,7 +735,7 @@ overview of their function and contents.
          "
 
       This next example shows an error message that occurs because invalid
-      entries are found, which cause parsing to abort::
+      entries are found, which cause parsing to fail::
 
          ERROR: BBFILES_DYNAMIC entries must be of the form {!}<collection name>:<filename pattern>, not:
          /work/my-layer/bbappends/meta-security-isafw/*/*/*.bbappend
@@ -1053,7 +1054,7 @@ overview of their function and contents.
       upstream source, and then locations specified by :term:`MIRRORS` in that
       order.
 
-   :term:`MULTI_PROVIDER_WHITELIST`
+   :term:`BB_MULTI_PROVIDER_ALLOWED`
       Allows you to suppress BitBake warnings caused when building two
       separate recipes that provide the same output.
 
@@ -1179,10 +1180,10 @@ overview of their function and contents.
       your configuration::
 
          PREMIRRORS:prepend = "\
-         git://.*/.* http://downloads.yoctoproject.org/mirror/sources/ \n \
-         ftp://.*/.* http://downloads.yoctoproject.org/mirror/sources/ \n \
-         http://.*/.* http://downloads.yoctoproject.org/mirror/sources/ \n \
-         https://.*/.* http://downloads.yoctoproject.org/mirror/sources/ \n"
+         git://.*/.* http://downloads.yoctoproject.org/mirror/sources/ \
+         ftp://.*/.* http://downloads.yoctoproject.org/mirror/sources/ \
+         http://.*/.* http://downloads.yoctoproject.org/mirror/sources/ \
+         https://.*/.* http://downloads.yoctoproject.org/mirror/sources/"
 
       These changes cause the build system to intercept Git, FTP, HTTP, and
       HTTPS requests and direct them to the ``http://`` sources mirror. You can

@@ -109,7 +109,7 @@ def qemuboot_vars(d):
     build_vars = ['MACHINE', 'TUNE_ARCH', 'DEPLOY_DIR_IMAGE',
                 'KERNEL_IMAGETYPE', 'IMAGE_NAME', 'IMAGE_LINK_NAME',
                 'STAGING_DIR_NATIVE', 'STAGING_BINDIR_NATIVE',
-                'STAGING_DIR_HOST', 'SERIAL_CONSOLES']
+                'STAGING_DIR_HOST', 'SERIAL_CONSOLES', 'UNINATIVE_LOADER']
     return build_vars + [k for k in d.keys() if k.startswith('QB_')]
 
 do_write_qemuboot_conf[vardeps] += "${@' '.join(qemuboot_vars(d))}"
@@ -136,6 +136,8 @@ python do_write_qemuboot_conf() {
                                'qemu-helper-native/1.0-r1/recipe-sysroot-native/usr/bin/')
         else:
             val = d.getVar(k)
+        if val is None:
+            continue
         # we only want to write out relative paths so that we can relocate images
         # and still run them
         if val.startswith(topdir):

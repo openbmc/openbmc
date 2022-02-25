@@ -8,6 +8,7 @@ DEPENDS = "glib-2.0-native libxfce4ui"
 
 SRC_URI = "git://github.com/schnitzeltony/xfce4-datetime-setter.git;protocol=https;branch=master \
            file://fix-inner-dependency.patch \
+           file://0001-Fix-build-with-meson-0.61.patch \
 "
 SRCREV = "5c7a73a3824b03b91719e05e2604b97c7a72d50f"
 

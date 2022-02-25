@@ -1029,6 +1029,7 @@ def get_recipe_upstream_version(rd):
     else:
         ud = bb.fetch2.FetchData(src_uri, rd)
         if rd.getVar("UPSTREAM_CHECK_COMMITS") == "1":
+            bb.fetch2.get_srcrev(rd)
             revision = ud.method.latest_revision(ud, rd, 'default')
             upversion = pv
             if revision != rd.getVar("SRCREV"):

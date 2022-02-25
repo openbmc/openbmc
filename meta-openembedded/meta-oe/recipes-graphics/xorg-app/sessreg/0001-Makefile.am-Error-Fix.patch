@@ -6,7 +6,7 @@ Subject: [PATCH] Makefile.am: Error Fix
 Do not compile man dir since error always occur.
  | sed: file filenames.sed line 3: unterminated `s' command
  | make[2]: *** [sessreg.1] Error 1
-It is not a good way.But can remove it from PNBLACKLIST.
+It is not a good way.But can remove it from SKIP_RECIPE.
 
 Upstream-Status: pending
 

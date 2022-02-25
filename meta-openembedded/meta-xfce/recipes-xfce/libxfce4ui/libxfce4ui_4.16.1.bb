@@ -13,6 +13,7 @@ SRC_URI += "file://0001-libxfce4kbd-private-xfce4-keyboard-shortcuts.xml-fix.pat
 SRC_URI[sha256sum] = "d96946ae5af6bf078dda415419e0021909f763ee0020b42f3e26f603e51585f6"
 
 EXTRA_OECONF += "--with-vendor-info=${DISTRO}"
+EXTRA_OECONF += "--disable-vala"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[gladeui2] = "--enable-gladeui2,--disable-gladeui2,glade"

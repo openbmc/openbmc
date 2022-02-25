@@ -2,7 +2,7 @@ SUMMARY = "Utilities and libraries for handling compiled object files"
 HOMEPAGE = "https://sourceware.org/elfutils"
 DESCRIPTION = "elfutils is a collection of utilities and libraries to read, create and modify ELF binary files, find and handle DWARF debug data, symbols, thread state and stacktraces for processes and core files on GNU/Linux."
 SECTION = "base"
-LICENSE = "GPLv2 & GPLv2+ & LGPLv3+ & GPLv3+"
+LICENSE = "GPL-2.0-only & GPL-2.0-or-later & LGPL-3.0-or-later & GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
                     file://debuginfod/debuginfod-client.c;endline=27;md5=d2adfd8f5347d4c96e3c280393ce66da \
                     "
@@ -107,12 +107,12 @@ PACKAGES =+ "${PN}-binutils libelf libasm libdw libdebuginfod"
 # "The license is now GPLv2/LGPLv3+ for the libraries and GPLv3+ for stand-alone
 # programs. There is now also a formal CONTRIBUTING document describing how to
 # submit patches."
-LICENSE:${PN}-binutils = "GPLv3+"
-LICENSE:${PN} = "GPLv3+"
-LICENSE:libelf = "GPLv2 | LGPLv3+"
-LICENSE:libasm = "GPLv2 | LGPLv3+"
-LICENSE:libdw = "GPLv2 | LGPLv3+"
-LICENSE:libdebuginfod = "GPLv2+ | LGPLv3+"
+LICENSE:${PN}-binutils = "GPL-3.0-or-later"
+LICENSE:${PN} = "GPL-3.0-or-later"
+LICENSE:libelf = "GPL-2.0-only | LGPL-3.0-or-later"
+LICENSE:libasm = "GPL-2.0-only | LGPL-3.0-or-later"
+LICENSE:libdw = "GPL-2.0-only | LGPL-3.0-or-later"
+LICENSE:libdebuginfod = "GPL-2.0-or-later | LGPL-3.0-or-later"
 
 FILES:${PN}-binutils = "\
     ${bindir}/eu-addr2line \

@@ -1,0 +1,82 @@
+From d9458227ddb4bbb8c63c607202a6854886d66090 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Wed, 4 Nov 2020 06:28:28 +0000
+Subject: [PATCH] configure.ac.in: fix host contamination
+
+Fix below error:
+This autoconf log indicates errors, it looked at host include and/or
+library paths while determining system capabilities.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ configure.ac.in | 43 +++----------------------------------------
+ 1 file changed, 3 insertions(+), 40 deletions(-)
+
+diff --git a/configure.ac.in b/configure.ac.in
+index 1d6380c..beffc6c 100644
+--- a/configure.ac.in
++++ b/configure.ac.in
+@@ -167,31 +167,6 @@ fi
+ #
+ REVISION=`git log --pretty=oneline | wc -l`
+ 
+-if test -d "/usr/local/include"; then
+-  CFLAGS="${CFLAGS} -I/usr/local/include"
+-  CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
+-fi
+-
+-if test -d "/usr/local/lib"; then
+-  LIBS="${LIBS} -L/usr/local/lib"
+-fi
+-
+-if test -d /opt/local/include; then :
+-  CFLAGS="${CFLAGS} -I/opt/local/include"
+-  CPPFLAGS="${CPPFLAGS} -I/opt/local/include"
+-fi
+-
+-if test -d /opt/local/lib; then :
+-  LIBS="${LIBS} -L/opt/local/lib"
+-fi
+-
+-if [ test -f /usr/bin/lsb_release ]; then
+-  CODENAME=`/usr/bin/lsb_release -c|cut -f 2`
+-  if [[ $CODENAME == "wheezy" ]]; then :
+-    CPPFLAGS="${CPPFLAGS} -DOLD_NETFILTER_INTERFACE=1"
+-  fi
+-fi
+-
+ SHORT_MACHINE=`uname -m | cut -b1-3`
+ 
+ GIT_RELEASE="@GIT_RELEASE@"
+@@ -300,23 +275,11 @@ fi
+ pkg-config --exists libssl
+ if test "$?" -ne 1; then
+   AC_DEFINE_UNQUOTED(NO_SSL_DL, 1, [has openssl])
+-  SSL_INC="`pkg-config --cflags libssl` -I/usr/include/openssl"
++  SSL_INC="`pkg-config --cflags libssl`"
+   SSL_LIB="`pkg-config --libs libssl` -lssl -lcrypto"
+ else
+-  dnl Workaround for MacOS Brew
+-  if test -d "/usr/local/opt/openssl/lib"; then
+-    AC_DEFINE_UNQUOTED(NO_SSL_DL, 1, [has openssl])
+-    SSL_INC="-I/usr/local/opt/openssl/include"
+-    SSL_LIB="-L/usr/local/opt/openssl/lib -lssl -lcrypto"
+-  dnl Workaround for FreeBSD
+-  elif test -f "/usr/lib/libssl.so"; then
+-    AC_DEFINE_UNQUOTED(NO_SSL_DL, 1, [has openssl])
+-    SSL_INC="-I/usr/include"
+-    SSL_LIB="-L/usr/lib -lssl -lcrypto"
+-  else
+-    echo "Please install openssl-dev(el) package prerequisite"
+-    exit -1
+-  fi
++  echo "Please install openssl-dev(el) package prerequisite"
++  exit -1
+ fi
+ 
+ AC_CHECK_LIB([gcrypt], [gcry_cipher_checktag], [LIBS="${LIBS} -lgcrypt"])
+-- 
+2.25.1
+

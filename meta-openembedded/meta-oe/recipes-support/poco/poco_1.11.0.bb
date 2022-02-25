@@ -72,7 +72,7 @@ python populate_packages:prepend () {
         packages.append(pkg)
         testrunners.append(modulename)
 
-    do_split_packages(d, poco_libdir, '^libPoco(.*)\.so\..*$',
+    do_split_packages(d, poco_libdir, r'^libPoco(.*)\.so\..*$',
                     'poco-%s', 'Poco %s component', extra_depends='', prepend=True, hook=hook)
 
     d.setVar("RRECOMMENDS:%s" % pn, " ".join(packages))

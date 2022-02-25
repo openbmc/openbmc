@@ -14,19 +14,23 @@ just ask for python3 executable.
 Upstream-Status:  Inappropriate [OE specific]
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+
+rebase for 1.0.4
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+
 ---
  meson.build | 7 +------
  1 file changed, 1 insertion(+), 6 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 3255328..7a6094c 100644
+index 8a18c36..34fd546 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -6,12 +6,7 @@ project('mm-common',
-   license: 'GPLv2+'
+@@ -7,12 +7,7 @@ project('mm-common',
+                               # and meson.add_install_script(python3, ...)
  )
  
--python3 = import('python').find_installation('python3')
+-python3 = import('python').find_installation()
 -python_version = python3.language_version()
 -python_version_req = '>= 3.5'
 -if not python_version.version_compare(python_version_req)
@@ -37,5 +41,5 @@ index 3255328..7a6094c 100644
  # Use these instead of meson.source_root() and meson.build_root().
  # source_root() and build_root() are not useful, if this is a subproject.
 -- 
-2.21.0
+2.25.1
 

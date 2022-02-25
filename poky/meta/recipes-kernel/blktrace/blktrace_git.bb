@@ -5,7 +5,7 @@ are three major components: a kernel component, a utility to record the i/o \
 trace information for the kernel to user space, and utilities to analyse and \
 view the trace information."
 HOMEPAGE = "http://brick.kernel.dk/snaps/"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=393a5ca445f6965873eca0259a17f833"
 
 DEPENDS = "libaio"

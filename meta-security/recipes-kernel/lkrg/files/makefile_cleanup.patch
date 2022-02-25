@@ -4,10 +4,10 @@ This needs more work. Its my starting point.
 
 Signed-off-by: Armin Kuster <akuster808@gmail.com>
 
-Index: lkrg-0.9.0/Makefile
+Index: lkrg-0.9.2/Makefile
 ===================================================================
---- lkrg-0.9.0.orig/Makefile
-+++ lkrg-0.9.0/Makefile
+--- lkrg-0.9.2.orig/Makefile
++++ lkrg-0.9.2/Makefile
 @@ -4,28 +4,10 @@
  # Author:
  #  - Adam 'pi3' Zabrocki (http://pi3.com.pl)
@@ -39,7 +39,7 @@ Index: lkrg-0.9.0/Makefile
                    src/modules/hashing/p_lkrg_fast_hash.o \
                    src/modules/comm_channel/p_comm_channel.o \
                    src/modules/integrity_timer/p_integrity_timer.o \
-@@ -91,23 +73,14 @@ $(TARGET)-objs += src/modules/ksyms/p_re
+@@ -92,23 +74,14 @@ $(TARGET)-objs += src/modules/ksyms/p_re
                    src/p_lkrg_main.o
  
  

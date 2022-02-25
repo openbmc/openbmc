@@ -5,7 +5,7 @@ firmware loaders for pcmcia, USB and the hdsp devices."
 HOMEPAGE = "http://www.alsa-project.org"
 BUGTRACKER = "http://alsa-project.org/main/index.php/Bug_Tracking"
 SECTION = "console/utils"
-LICENSE = "GPLv2 & LGPLv2+"
+LICENSE = "GPL-2.0-only & LGPL-2.0-or-later"
 DEPENDS = "alsa-lib"
 
 LIC_FILES_CHKSUM = "file://hdsploader/COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \

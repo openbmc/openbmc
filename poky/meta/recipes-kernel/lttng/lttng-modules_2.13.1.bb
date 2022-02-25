@@ -2,7 +2,7 @@ SECTION = "devel"
 SUMMARY = "Linux Trace Toolkit KERNEL MODULE"
 DESCRIPTION = "The lttng-modules 2.0 package contains the kernel tracer modules"
 HOMEPAGE = "https://lttng.org/"
-LICENSE = "LGPLv2.1 & GPLv2 & MIT"
+LICENSE = "LGPL-2.1-only & GPL-2.0-only & MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=0464cff101a009c403cd2ed65d01d4c4"
 
 inherit module
@@ -10,6 +10,13 @@ inherit module
 include lttng-platforms.inc
 
 SRC_URI = "https://lttng.org/files/${BPN}/${BPN}-${PV}.tar.bz2 \
+           file://0001-fix-block-remove-GENHD_FL_SUPPRESS_PARTITION_INFO-v5.patch \
+           file://0002-fix-block-remove-the-rq_disk-field-in-struct-request.patch \
+           file://0003-fix-mm-compaction-fix-the-migration-stats-in-trace_m.patch \
+           file://0004-fix-btrfs-pass-fs_info-to-trace_btrfs_transaction_co.patch \
+           file://0005-fix-random-rather-than-entropy_store-abstraction-use.patch \
+           file://0006-fix-net-skb-introduce-kfree_skb_reason-v5.17.patch \
+           file://0007-fix-net-socket-rename-SKB_DROP_REASON_SOCKET_FILTER-.patch \
           "
 # Use :append here so that the patch is applied also when using devupstream
 SRC_URI:append = " file://0001-src-Kbuild-change-missing-CONFIG_TRACEPOINTS-to-warn.patch"
@@ -39,7 +46,7 @@ LIC_FILES_CHKSUM:class-devupstream = "file://LICENSE;md5=0464cff101a009c403cd2ed
 DEFAULT_PREFERENCE:class-devupstream = "-1"
 SRC_URI:class-devupstream = "git://git.lttng.org/lttng-modules;branch=stable-2.13"
 
-SRCREV:class-devupstream = "c570be0da77e963d77bac099d468bc0cd5f1bd63"
-PV:class-devupstream = "2.13.0+git${SRCPV}"
+SRCREV:class-devupstream = "7584cfc04914cb0842a986e9808686858b9c8630"
+PV:class-devupstream = "2.13.1+git${SRCPV}"
 S:class-devupstream = "${WORKDIR}/git"
 SRCREV_FORMAT ?= "lttng_git"

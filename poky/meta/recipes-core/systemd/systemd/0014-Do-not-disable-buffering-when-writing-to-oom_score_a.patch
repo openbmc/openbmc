@@ -24,16 +24,14 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  src/basic/process-util.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/basic/process-util.c b/src/basic/process-util.c
-index 2d06f9f60a..f86bd0b7dc 100644
 --- a/src/basic/process-util.c
 +++ b/src/basic/process-util.c
-@@ -1606,7 +1606,7 @@ int set_oom_score_adjust(int value) {
-         sprintf(t, "%i", value);
+@@ -1489,7 +1489,7 @@ int set_oom_score_adjust(int value) {
+         xsprintf(t, "%i", value);
  
          return write_string_file("/proc/self/oom_score_adj", t,
 -                                 WRITE_STRING_FILE_VERIFY_ON_FAILURE|WRITE_STRING_FILE_DISABLE_BUFFER);
 +                                 WRITE_STRING_FILE_VERIFY_ON_FAILURE);
  }
  
- int pidfd_get_pid(int fd, pid_t *ret) {
+ int get_oom_score_adjust(int *ret) {

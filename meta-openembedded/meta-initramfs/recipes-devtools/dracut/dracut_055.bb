@@ -67,4 +67,4 @@ RRECOMMENDS:${PN} = " \
                     "
 
 # CVE-2010-4176 affects only Fedora
-CVE_CHECK_WHITELIST += "CVE-2010-4176"
+CVE_CHECK_IGNORE += "CVE-2010-4176"

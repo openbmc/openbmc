@@ -9,7 +9,6 @@ DEPENDS = " \
     groff-native \
     libtool \
     gdk-pixbuf \
-    librsvg \
     cairo \
     pango \
     expat \
@@ -33,6 +32,10 @@ SRC_URI:append:class-nativesdk = "\
            file://graphviz-setup.sh \
 "
 SRC_URI[sha256sum] = "8e1b34763254935243ccdb83c6ce108f531876d7a5dfd443f255e6418b8ea313"
+
+PACKAGECONFIG ??= "librsvg"
+PACKAGECONFIG:class-nativesdk ??= ""
+PACKAGECONFIG[librsvg] = "--with-librsvg,--without-librsvg,librsvg"
 
 EXTRA_OECONF:append = " PS2PDF=/bin/echo"
 
@@ -73,6 +76,17 @@ do_install:append:class-nativesdk() {
     install -m 0755 ${WORKDIR}/graphviz-setup.sh ${D}${SDKPATHNATIVE}/post-relocate-setup.d
 }
 FILES:${PN}:class-nativesdk += "${SDKPATHNATIVE}"
+
+# create /usr/lib/graphviz/config6
+graphviz_sstate_postinst() {
+    mkdir -p ${SYSROOT_DESTDIR}${bindir}
+    dest=${SYSROOT_DESTDIR}${bindir}/postinst-${PN}
+    echo '#!/bin/sh' > $dest
+    echo '' >> $dest
+    echo 'dot -c' >> $dest
+    chmod 0755 $dest
+}
+SYSROOT_PREPROCESS_FUNCS:append:class-native = " graphviz_sstate_postinst"
 
 PACKAGES =+ "${PN}-python ${PN}-perl ${PN}-demo"
 

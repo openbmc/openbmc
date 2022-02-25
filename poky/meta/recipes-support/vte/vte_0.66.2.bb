@@ -2,8 +2,8 @@ SUMMARY = "Virtual terminal emulator GTK+ widget library"
 DESCRIPTION = "VTE provides a virtual terminal widget for GTK applications."
 HOMEPAGE = "https://wiki.gnome.org/Apps/Terminal/VTE"
 BUGTRACKER = "https://bugzilla.gnome.org/buglist.cgi?product=vte"
-LICENSE = "GPLv3 & LGPLv3+ & MIT-X"
-LICENSE:libvte = "LGPLv3+"
+LICENSE = "GPL-3.0-only & LGPL-3.0-or-later & MIT"
+LICENSE:libvte = "LGPL-3.0-or-later"
 
 LIC_FILES_CHKSUM = " \
     file://COPYING.GPL3;md5=cc702cf3444d1f19680c794cc61948f9 \

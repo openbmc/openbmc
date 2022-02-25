@@ -21,4 +21,4 @@ do_install () {
     oe_runmake install DESTDIR="${D}"
 }
 
-PNBLACKLIST[drbd] ?= "Needs coccinelle to build with SPAAS"
+SKIP_RECIPE[drbd] ?= "Needs coccinelle to build with SPAAS"

@@ -178,10 +178,10 @@ Tests map into the codebase as follows:
 
       $ bitbake-selftest
 
-   To skip tests that access the Internet, use the ``BB_SKIP_NETTEST``
+   To skip tests that access the Internet, use the ``BB_SKIP_NETTESTS``
    variable when running "bitbake-selftest" as follows::
 
-      $ BB_SKIP_NETTEST=yes bitbake-selftest
+      $ BB_SKIP_NETTESTS=yes bitbake-selftest
 
    The default output is quiet and just prints a summary of what was
    run. To see more information, there is a verbose option::

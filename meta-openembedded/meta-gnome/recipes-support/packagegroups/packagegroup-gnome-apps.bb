@@ -10,6 +10,7 @@ RDEPENDS:${PN} = " \
     evolution-data-server \
     evince \
     file-roller \
+    geary \
     gedit \
     ghex \
     gnome-calculator \

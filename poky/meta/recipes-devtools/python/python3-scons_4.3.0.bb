@@ -8,6 +8,7 @@ SRC_URI += " file://0001-Fix-man-page-installation.patch"
 SRC_URI[sha256sum] = "d47081587e3675cc168f1f54f0d74a69b328a2fc90ec4feb85f728677419b879"
 
 PYPI_PACKAGE = "SCons"
+PIP_INSTALL_DIST_PATH = "${B}/build/dist"
 
 inherit pypi setuptools3
 
@@ -24,4 +25,14 @@ RDEPENDS:${PN}:class-target = "\
   python3-pprint \
   "
 
-FILES:${PN}-doc += "${datadir}/scons*.1"
+do_install:append() {
+    install -d ${D}${mandir}/man1
+    mv ${D}${prefix}/scons*.1 ${D}${mandir}/man1/
+}
+FILES:${PN}-doc += "${mandir}/man1/scons*.1"
+
+do_install:append:class-native() {
+    create_wrapper ${D}${bindir}/scons SCONS_LIB_DIR='${STAGING_DIR_HOST}/${PYTHON_SITEPACKAGES_DIR}' PYTHONNOUSERSITE='1'
+}
+
+BBCLASSEXTEND = "native"

@@ -14,7 +14,7 @@ diff --git a/configure.ac b/configure.ac
 index 7beeb34ae2..35234c2762 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1018,6 +1018,11 @@ else
+@@ -1044,6 +1044,11 @@ else
    AM_CONDITIONAL([GUI_GTK], false)
  fi
  
@@ -26,11 +26,3 @@ index 7beeb34ae2..35234c2762 100644
  dnl ---------- libNotify --------------------------------------------------
  if test "${enable_manager}" = yes ; then
    PKG_CHECK_MODULES(LIBNOTIFY, [libnotify])
-@@ -1069,7 +1074,6 @@ AM_CONDITIONAL(ENABLE_BOINCCRYPT, [test "x${enable_server}" = xyes  || test "x${
- AM_CONDITIONAL(INSTALL_HEADERS, [test "${enable_install_headers}" = yes])
- AM_CONDITIONAL(HAVE_CUDA_LIB, [test "${enable_client}" = yes -a -f ./coprocs/CUDA/posix/${boinc_platform}/libcudart.so])
- 
--PKG_CHECK_MODULES([GTK2], [gtk+-2.0])
- 
- dnl ======================================================================
- dnl some more vodoo required for building portable client-binary (client, clientgui)

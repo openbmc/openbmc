@@ -99,26 +99,29 @@ def flattened_licenses(licensestr, choose_licenses):
         raise LicenseSyntaxError(licensestr, exc)
     return flatten.licenses
 
-def is_included(licensestr, whitelist=None, blacklist=None):
-    """Given a license string and whitelist and blacklist, determine if the
-    license string matches the whitelist and does not match the blacklist.
+def is_included(licensestr, include_licenses=None, exclude_licenses=None):
+    """Given a license a list of list to include and a list of
+        licenses to exclude, determine if the license string
+        matches the an include list and does not match the 
+        exclude list.
 
-    Returns a tuple holding the boolean state and a list of the applicable
-    licenses that were excluded if state is False, or the licenses that were
-    included if the state is True.
+        Returns a tuple holding the boolean state and a list of
+        the applicable licenses that were excluded if state is
+        False, or the licenses that were included if the state
+        is True.
     """
 
     def include_license(license):
-        return any(fnmatch(license, pattern) for pattern in whitelist)
+        return any(fnmatch(license, pattern) for pattern in include_licenses)
 
     def exclude_license(license):
-        return any(fnmatch(license, pattern) for pattern in blacklist)
+        return any(fnmatch(license, pattern) for pattern in exclude_licenses)
 
     def choose_licenses(alpha, beta):
         """Select the option in an OR which is the 'best' (has the most
         included licenses and no excluded licenses)."""
         # The factor 1000 below is arbitrary, just expected to be much larger
-        # that the number of licenses actually specified. That way the weight
+        # than the number of licenses actually specified. That way the weight
         # will be negative if the list of licenses contains an excluded license,
         # but still gives a higher weight to the list with the most included
         # licenses.
@@ -131,11 +134,11 @@ def is_included(licensestr, whitelist=None, blacklist=None):
         else:
             return beta
 
-    if not whitelist:
-        whitelist = ['*']
+    if not include_licenses:
+        include_licenses = ['*']
 
-    if not blacklist:
-        blacklist = []
+    if not exclude_licenses:
+        exclude_licenses = []
 
     licenses = flattened_licenses(licensestr, choose_licenses)
     excluded = [lic for lic in licenses if exclude_license(lic)]

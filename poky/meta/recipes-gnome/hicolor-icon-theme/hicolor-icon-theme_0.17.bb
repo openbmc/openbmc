@@ -4,7 +4,7 @@ theme for implementations of the icon theme specification."
 HOMEPAGE = "https://www.freedesktop.org/wiki/Software/icon-theme"
 BUGTRACKER = "https://bugs.freedesktop.org/"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=f08a446809913fc9b3c718f0eaea0426"
 
 SRC_URI = "https://icon-theme.freedesktop.org/releases/${BPN}-${PV}.tar.xz"

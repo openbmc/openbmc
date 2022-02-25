@@ -1,0 +1,47 @@
+From e299bcb05405ff49450307bf3002c1fac14a866c Mon Sep 17 00:00:00 2001
+From: Tim Orling <tim.orling@konsulko.com>
+Date: Sun, 20 Feb 2022 18:55:50 -0800
+Subject: [PATCH] Change hash bang to python3
+
+In setup.py, smartypants and smartypants.py set hash bang to python3.
+
+Upstream-Status: Inappropriate [oe-core specific]
+
+Signed-off-by: Tim Orling <tim.orling@konsulko.com>
+
+---
+ setup.py       | 2 +-
+ smartypants    | 2 +-
+ smartypants.py | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index ff1ea76..96a8b73 100755
+--- a/setup.py
++++ b/setup.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # Copyright (C) 2013, 2014 by Yu-Jie Lin
+ # For detail license information, See COPYING
+ 
+diff --git a/smartypants b/smartypants
+index 189adf5..0cca568 100755
+--- a/smartypants
++++ b/smartypants
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # Copyright (c) 2013, 2014 Yu-Jie Lin
+ # Licensed under the BSD License, for detailed license information, see COPYING
+ 
+diff --git a/smartypants.py b/smartypants.py
+index a70575b..e53bd87 100755
+--- a/smartypants.py
++++ b/smartypants.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ # Copyright (c) 2013, 2014, 2016 Yu-Jie Lin
+ # Copyright (c) 2004, 2005, 2007, 2013 Chad Miller

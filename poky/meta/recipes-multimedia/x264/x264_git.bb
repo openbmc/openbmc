@@ -2,7 +2,7 @@ SUMMARY = "H.264/MPEG-4 AVC video encoder"
 DESCRIPTION = "A free software library and application for encoding video streams into the H.264/MPEG-4 AVC format."
 HOMEPAGE = "http://www.videolan.org/developers/x264.html"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LICENSE_FLAGS = "commercial"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 

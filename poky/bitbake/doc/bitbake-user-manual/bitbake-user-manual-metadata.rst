@@ -1343,8 +1343,8 @@ the build machine cannot influence the build.
 .. note::
 
    By default, BitBake cleans the environment to include only those
-   things exported or listed in its whitelist to ensure that the build
-   environment is reproducible and consistent. You can prevent this
+   things exported or listed in its passthrough list to ensure that the
+   build environment is reproducible and consistent. You can prevent this
    "cleaning" by setting the :term:`BB_PRESERVE_ENV` variable.
 
 Consequently, if you do want something to get passed into the build task
@@ -1352,14 +1352,14 @@ environment, you must take these two steps:
 
 #. Tell BitBake to load what you want from the environment into the
    datastore. You can do so through the
-   :term:`BB_ENV_WHITELIST` and
-   :term:`BB_ENV_EXTRAWHITE` variables. For
+   :term:`BB_ENV_PASSTHROUGH` and
+   :term:`BB_ENV_PASSTHROUGH_ADDITIONS` variables. For
    example, assume you want to prevent the build system from accessing
-   your ``$HOME/.ccache`` directory. The following command "whitelists"
-   the environment variable ``CCACHE_DIR`` causing BitBake to allow that
-   variable into the datastore::
+   your ``$HOME/.ccache`` directory. The following command adds the
+   the environment variable ``CCACHE_DIR`` to BitBake's passthrough
+   list to allow that variable into the datastore::
 
-      export BB_ENV_EXTRAWHITE="$BB_ENV_EXTRAWHITE CCACHE_DIR"
+      export BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS CCACHE_DIR"
 
 #. Tell BitBake to export what you have loaded into the datastore to the
    task environment of every running task. Loading something from the
@@ -1376,7 +1376,7 @@ environment, you must take these two steps:
       A side effect of the previous steps is that BitBake records the
       variable as a dependency of the build process in things like the
       setscene checksums. If doing so results in unnecessary rebuilds of
-      tasks, you can whitelist the variable so that the setscene code
+      tasks, you can also flag the variable so that the setscene code
       ignores the dependency when it creates checksums.
 
 Sometimes, it is useful to be able to obtain information from the

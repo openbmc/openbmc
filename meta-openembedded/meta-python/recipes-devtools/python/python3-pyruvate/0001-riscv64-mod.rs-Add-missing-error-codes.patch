@@ -1,0 +1,32 @@
+From c711fb215de54f960a35cdc48cd506b6b5db4918 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 26 Jan 2022 11:50:58 -0800
+Subject: [PATCH] riscv64/mod.rs: Add missing error codes
+
+These are flagged by apps e.g. python3-pyruvate
+
+Upstream-Status: Submitted [https://github.com/rust-lang/libc/pull/2656]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/unix/linux_like/linux/musl/b64/riscv64/mod.rs | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs b/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
+index b075b4a05..6b17621c7 100644
+--- a/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
++++ b/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
+@@ -548,6 +548,11 @@ pub const EHOSTUNREACH: ::c_int = 113;
+ pub const EALREADY: ::c_int = 114;
+ pub const EINPROGRESS: ::c_int = 115;
+ pub const ESTALE: ::c_int = 116;
++pub const EUCLEAN: ::c_int = 117;
++pub const ENOTNAM: ::c_int = 118;
++pub const ENAVAIL: ::c_int = 119;
++pub const EISNAM: ::c_int = 120;
++pub const EREMOTEIO: ::c_int = 121;
+ pub const EDQUOT: ::c_int = 122;
+ pub const ENOMEDIUM: ::c_int = 123;
+ pub const EMEDIUMTYPE: ::c_int = 124;
+-- 
+2.35.0
+

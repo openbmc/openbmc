@@ -29,7 +29,7 @@ EXTRA_OEMESON:prepend:class-nativesdk = "${@['', '${GIRMESONBUILD}'][d.getVar('G
 
 # Generating introspection data depends on a combination of native and target
 # introspection tools, and qemu to run the target tools.
-DEPENDS:append:class-target = " gobject-introspection gobject-introspection-native qemu-native prelink-native"
+DEPENDS:append:class-target = " gobject-introspection gobject-introspection-native qemu-native"
 
 # Even though introspection is disabled on -native, gobject-introspection package is still
 # needed for m4 macros.

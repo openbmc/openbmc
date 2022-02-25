@@ -8,7 +8,7 @@ TARGET_CC_ARCH:append:libc-musl = " -mmusl"
 # default debug prefix map isn't valid in the SDK
 DEBUG_PREFIX_MAP = ""
 
-EXPORT_SDK_PS1 = "${@ 'export PS1=\'%s\'' % d.getVar('SDK_PS1') if d.getVar('SDK_PS1') else ''}"
+EXPORT_SDK_PS1 = "${@ 'export PS1=\\"%s\\"' % d.getVar('SDK_PS1') if d.getVar('SDK_PS1') else ''}"
 
 # This function creates an environment-setup-script for use in a deployable SDK
 toolchain_create_sdk_env_script () {

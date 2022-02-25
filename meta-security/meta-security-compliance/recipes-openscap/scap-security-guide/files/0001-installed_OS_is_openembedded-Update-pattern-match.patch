@@ -1,0 +1,30 @@
+From d943e41d64da6af89a6b8224110299ad88747497 Mon Sep 17 00:00:00 2001
+From: Akshay Bhat <akshay.bhat@timesys.com>
+Date: Mon, 14 Feb 2022 13:00:31 -0500
+Subject: [PATCH] installed_OS_is_openembedded: Update pattern match
+
+The VERSION_ID string is no longer quoted with f451c68667cca of
+openembedded-core. Update the pattern match check in
+installed_OS_is_openembedded to match the same.
+
+Signed-off-by: Akshay Bhat <akshay.bhat@timesys.com>
+---
+ shared/checks/oval/installed_OS_is_openembedded.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/shared/checks/oval/installed_OS_is_openembedded.xml b/shared/checks/oval/installed_OS_is_openembedded.xml
+index 01df16b43..eaf9f2b10 100644
+--- a/shared/checks/oval/installed_OS_is_openembedded.xml
++++ b/shared/checks/oval/installed_OS_is_openembedded.xml
+@@ -23,7 +23,7 @@
+   </ind:textfilecontent54_test>
+   <ind:textfilecontent54_object id="obj_openembedded" version="1" comment="Check OpenEmbedded version">
+     <ind:filepath>/etc/os-release</ind:filepath>
+-    <ind:pattern operation="pattern match">^VERSION_ID=\"nodistro\.[0-9].$</ind:pattern>
++    <ind:pattern operation="pattern match">^VERSION_ID=nodistro\.[0-9]$</ind:pattern>
+     <ind:instance datatype="int">1</ind:instance>
+   </ind:textfilecontent54_object>
+ 
+-- 
+2.25.1
+

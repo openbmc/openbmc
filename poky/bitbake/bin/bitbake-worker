@@ -262,8 +262,11 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
                 bb.utils.set_process_name("%s:%s" % (the_data.getVar("PN"), taskname.replace("do_", "")))
 
                 if not the_data.getVarFlag(taskname, 'network', False):
-                    logger.debug("Attempting to disable network")
-                    bb.utils.disable_network(uid, gid)
+                    if bb.utils.is_local_uid(uid):
+                        logger.debug("Attempting to disable network for %s" % taskname)
+                        bb.utils.disable_network(uid, gid)
+                    else:
+                        logger.debug("Skipping disable network for %s since %s is not a local uid." % (taskname, uid))
 
                 # exported_vars() returns a generator which *cannot* be passed to os.environ.update() 
                 # successfully. We also need to unset anything from the environment which shouldn't be there 
@@ -437,7 +440,7 @@ class BitbakeWorker(object):
     def handle_cookercfg(self, data):
         self.cookercfg = pickle.loads(data)
         self.databuilder = bb.cookerdata.CookerDataBuilder(self.cookercfg, worker=True)
-        self.databuilder.parseBaseConfiguration()
+        self.databuilder.parseBaseConfiguration(worker=True)
         self.data = self.databuilder.data
 
     def handle_extraconfigdata(self, data):

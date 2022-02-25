@@ -198,8 +198,8 @@ class ImageFeatures(OESelftestTestCase):
         image_name = 'core-image-minimal'
 
         all_image_types = set(get_bb_var("IMAGE_TYPES", image_name).split())
-        blacklist = set(('container', 'elf', 'f2fs', 'multiubi', 'tar.zst', 'wic.zst'))
-        img_types = all_image_types - blacklist
+        skip_image_types = set(('container', 'elf', 'f2fs', 'multiubi', 'tar.zst', 'wic.zst'))
+        img_types = all_image_types - skip_image_types
 
         config = 'IMAGE_FSTYPES += "%s"\n'\
                  'MKUBIFS_ARGS ?= "-m 2048 -e 129024 -c 2047"\n'\
@@ -245,8 +245,8 @@ VIRTUAL-RUNTIME_base-utils = "packagegroup-core-base-utils"
 VIRTUAL-RUNTIME_base-utils-hwclock = "util-linux-hwclock"
 VIRTUAL-RUNTIME_base-utils-syslog = ""
 
-# Blacklist busybox
-PNBLACKLIST[busybox] = "Don't build this"
+# Skip busybox
+SKIP_RECIPE[busybox] = "Don't build this"
 """
         self.write_config(config)
 

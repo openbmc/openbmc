@@ -461,6 +461,14 @@ class BaseConfig(object):
             raise RunQemuError("Could not determine the path to dri drivers on the host via pkg-config.\nPlease install Mesa development files (particularly, dri.pc) on the host machine.")
         os.environ['LIBGL_DRIVERS_PATH'] = dripath.decode('utf-8').strip()
 
+        # This preloads uninative libc pieces and therefore ensures that RPATH/RUNPATH
+        # in host mesa drivers doesn't trick uninative into loading host libc.
+        preload_items = ['libdl.so.2', 'librt.so.1', 'libpthread.so.0']
+        uninative_path = os.path.dirname(self.get("UNINATIVE_LOADER"))
+        if os.path.exists(uninative_path):
+            preload_paths = [os.path.join(uninative_path, i) for i in preload_items]
+            os.environ['LD_PRELOAD'] = " ".join(preload_paths)
+
     def check_args(self):
         for debug in ("-d", "--debug"):
             if debug in sys.argv:
@@ -1369,6 +1377,7 @@ class BaseConfig(object):
                 if self.sdl == True:
                     self.qemu_opt += 'sdl,'
                 elif self.gtk == True:
+                    os.environ['FONTCONFIG_PATH'] = '/etc/fonts'
                     self.qemu_opt += 'gtk,'
 
                 if self.gl == True:

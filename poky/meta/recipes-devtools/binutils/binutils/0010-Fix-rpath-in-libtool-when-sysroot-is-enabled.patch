@@ -1,0 +1,49 @@
+From 1c4581a059afe2799bb825b388ae92f8fa6f19a3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 2 Mar 2015 01:42:38 +0000
+Subject: [PATCH] Fix rpath in libtool when sysroot is enabled
+
+Enabling sysroot support in libtool exposed a bug where the final
+library had an RPATH encoded into it which still pointed to the
+sysroot. This works around the issue until it gets sorted out
+upstream.
+
+Fix suggested by Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ltmain.sh | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/ltmain.sh b/ltmain.sh
+index 70e856e0659..11ee684cccf 100644
+--- a/ltmain.sh
++++ b/ltmain.sh
+@@ -8035,9 +8035,11 @@ EOF
+ 	  test "$opt_mode" != relink && rpath="$compile_rpath$rpath"
+ 	  for libdir in $rpath; do
+ 	    if test -n "$hardcode_libdir_flag_spec"; then
++		  func_replace_sysroot "$libdir"
++		  libdir=$func_replace_sysroot_result
++		  func_stripname '=' '' "$libdir"
++		  libdir=$func_stripname_result
+ 	      if test -n "$hardcode_libdir_separator"; then
+-		func_replace_sysroot "$libdir"
+-		libdir=$func_replace_sysroot_result
+ 		if test -z "$hardcode_libdirs"; then
+ 		  hardcode_libdirs="$libdir"
+ 		else
+@@ -8770,6 +8772,10 @@ EOF
+       hardcode_libdirs=
+       for libdir in $compile_rpath $finalize_rpath; do
+ 	if test -n "$hardcode_libdir_flag_spec"; then
++	  func_replace_sysroot "$libdir"
++	  libdir=$func_replace_sysroot_result
++	  func_stripname '=' '' "$libdir"
++	  libdir=$func_stripname_result
+ 	  if test -n "$hardcode_libdir_separator"; then
+ 	    if test -z "$hardcode_libdirs"; then
+ 	      hardcode_libdirs="$libdir"

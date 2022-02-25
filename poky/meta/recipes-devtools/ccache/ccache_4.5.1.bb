@@ -6,7 +6,7 @@ Objective-C and Objective-C++."
 HOMEPAGE = "http://ccache.samba.org"
 SECTION = "devel"
 
-LICENSE = "GPLv3+"
+LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE.adoc;md5=8fe0fdfdc7a892516526b86c28d06a16"
 
 DEPENDS = "zstd"

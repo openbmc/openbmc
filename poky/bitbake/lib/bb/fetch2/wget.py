@@ -228,7 +228,7 @@ class Wget(FetchMethod):
                         # We let the request fail and expect it to be
                         # tried once more ("try_again" in check_status()),
                         # with the dead connection removed from the cache.
-                        # If it still fails, we give up, which can happend for bad
+                        # If it still fails, we give up, which can happen for bad
                         # HTTP proxy settings.
                         fetch.connection_cache.remove_connection(h.host, h.port)
                     raise urllib.error.URLError(err)
@@ -315,15 +315,7 @@ class Wget(FetchMethod):
         # Avoid tramping the environment too much by using bb.utils.environment
         # to scope the changes to the build_opener request, which is when the
         # environment lookups happen.
-        newenv = {}
-        for name in bb.fetch2.FETCH_EXPORT_VARS:
-            value = d.getVar(name)
-            if not value:
-                origenv = d.getVar("BB_ORIGENV")
-                if origenv:
-                    value = origenv.getVar(name)
-            if value:
-                newenv[name] = value
+        newenv = bb.fetch2.get_fetcher_environment(d)
 
         with bb.utils.environment(**newenv):
             import ssl

@@ -1,0 +1,147 @@
+From 98b7729a776bc5babb39345eeeba3cd1f60d8c9a Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Wed, 26 Jan 2022 14:53:41 -0500
+Subject: [PATCH 5/7] fix: random: rather than entropy_store abstraction, use
+ global (v5.17)
+
+See upstream commit :
+
+  commit 90ed1e67e896cc8040a523f8428fc02f9b164394
+  Author: Jason A. Donenfeld <Jason@zx2c4.com>
+  Date:   Wed Jan 12 17:18:08 2022 +0100
+
+    random: rather than entropy_store abstraction, use global
+
+    Originally, the RNG used several pools, so having things abstracted out
+    over a generic entropy_store object made sense. These days, there's only
+    one input pool, and then an uneven mix of usage via the abstraction and
+    usage via &input_pool. Rather than this uneasy mixture, just get rid of
+    the abstraction entirely and have things always use the global. This
+    simplifies the code and makes reading it a bit easier.
+
+Upstream-Status: Backport [lttng-modules commit 98b7729a776bc5babb39345eeeba3cd1f60d8c9a]
+
+Change-Id: I1a2a14d7b6e69a047804e1e91e00fe002f757431
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/instrumentation/events/random.h | 81 ++++++++++++++++++++++++-
+ 1 file changed, 80 insertions(+), 1 deletion(-)
+
+diff --git a/include/instrumentation/events/random.h b/include/instrumentation/events/random.h
+index ed05d26a..8cc88adb 100644
+--- a/include/instrumentation/events/random.h
++++ b/include/instrumentation/events/random.h
+@@ -8,6 +8,36 @@
+ #include <lttng/tracepoint-event.h>
+ #include <linux/writeback.h>
+ 
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,17,0))
++LTTNG_TRACEPOINT_EVENT_CLASS(random__mix_pool_bytes,
++	TP_PROTO(int bytes, unsigned long IP),
++
++	TP_ARGS(bytes, IP),
++
++	TP_FIELDS(
++		ctf_integer(int, bytes, bytes)
++		ctf_integer_hex(unsigned long, IP, IP)
++	)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(random__mix_pool_bytes, mix_pool_bytes,
++
++	random_mix_pool_bytes,
++
++	TP_PROTO(int bytes, unsigned long IP),
++
++	TP_ARGS(bytes, IP)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(random__mix_pool_bytes, mix_pool_bytes_nolock,
++
++	random_mix_pool_bytes_nolock,
++
++	TP_PROTO(int bytes, unsigned long IP),
++
++	TP_ARGS(bytes, IP)
++)
++#else
+ LTTNG_TRACEPOINT_EVENT_CLASS(random__mix_pool_bytes,
+ 	TP_PROTO(const char *pool_name, int bytes, unsigned long IP),
+ 
+@@ -37,8 +67,24 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(random__mix_pool_bytes, mix_pool_bytes_noloc
+ 
+ 	TP_ARGS(pool_name, bytes, IP)
+ )
++#endif
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,2,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,17,0))
++LTTNG_TRACEPOINT_EVENT_MAP(credit_entropy_bits,
++
++	random_credit_entropy_bits,
++
++	TP_PROTO(int bits, int entropy_count, unsigned long IP),
++
++	TP_ARGS(bits, entropy_count, IP),
++
++	TP_FIELDS(
++		ctf_integer(int, bits, bits)
++		ctf_integer(int, entropy_count, entropy_count)
++		ctf_integer_hex(unsigned long, IP, IP)
++	)
++)
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,2,0))
+ LTTNG_TRACEPOINT_EVENT_MAP(credit_entropy_bits,
+ 
+ 	random_credit_entropy_bits,
+@@ -89,6 +135,38 @@ LTTNG_TRACEPOINT_EVENT_MAP(get_random_bytes,
+ 	)
+ )
+ 
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,17,0))
++LTTNG_TRACEPOINT_EVENT_CLASS(random__extract_entropy,
++	TP_PROTO(int nbytes, int entropy_count, unsigned long IP),
++
++	TP_ARGS(nbytes, entropy_count, IP),
++
++	TP_FIELDS(
++		ctf_integer(int, nbytes, nbytes)
++		ctf_integer(int, entropy_count, entropy_count)
++		ctf_integer_hex(unsigned long, IP, IP)
++	)
++)
++
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(random__extract_entropy, extract_entropy,
++
++	random_extract_entropy,
++
++	TP_PROTO(int nbytes, int entropy_count, unsigned long IP),
++
++	TP_ARGS(nbytes, entropy_count, IP)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(random__extract_entropy, extract_entropy_user,
++
++	random_extract_entropy_user,
++
++	TP_PROTO(int nbytes, int entropy_count, unsigned long IP),
++
++	TP_ARGS(nbytes, entropy_count, IP)
++)
++#else
+ LTTNG_TRACEPOINT_EVENT_CLASS(random__extract_entropy,
+ 	TP_PROTO(const char *pool_name, int nbytes, int entropy_count,
+ 		 unsigned long IP),
+@@ -123,6 +201,7 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(random__extract_entropy, extract_entropy_use
+ 
+ 	TP_ARGS(pool_name, nbytes, entropy_count, IP)
+ )
++#endif
+ 
+ 
+ 
+-- 
+2.19.1
+

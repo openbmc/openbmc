@@ -6,7 +6,7 @@ the screen or to generate output for printing."
 HOMEPAGE = "https://gitlab.gnome.org/GNOME/librsvg"
 BUGTRACKER = "https://gitlab.gnome.org/GNOME/librsvg/issues"
 
-LICENSE = "LGPLv2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=4fbd65380cdd255951079008b364516c \
                    "
 
@@ -51,7 +51,7 @@ do_compile:prepend() {
 }
 
 # Issue only on windows
-CVE_CHECK_WHITELIST += "CVE-2018-1000041"
+CVE_CHECK_IGNORE += "CVE-2018-1000041"
 
 CACHED_CONFIGUREVARS = "ac_cv_path_GDK_PIXBUF_QUERYLOADERS=${STAGING_LIBDIR_NATIVE}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders"
 

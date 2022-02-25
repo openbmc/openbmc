@@ -184,7 +184,7 @@ PATCHRESOLVE = "noop"
 #
 # Monitor the disk space during the build. If there is less that 1GB of space or less
 # than 100K inodes in any key build location (TMPDIR, DL_DIR, SSTATE_DIR), gracefully
-# shutdown the build. If there is less than 100MB or 1K inodes, perform a hard abort
+# shutdown the build. If there is less than 100MB or 1K inodes, perform a hard halt
 # of the build. The reason for this is that running completely out of space can corrupt
 # files and damages the build in ways which may not be easily recoverable.
 # It's necessary to monitor /tmp, if there is no space left the build will fail
@@ -194,10 +194,10 @@ BB_DISKMON_DIRS ??= "\
     STOPTASKS,${DL_DIR},1G,100K \
     STOPTASKS,${SSTATE_DIR},1G,100K \
     STOPTASKS,/tmp,100M,100K \
-    ABORT,${TMPDIR},100M,1K \
-    ABORT,${DL_DIR},100M,1K \
-    ABORT,${SSTATE_DIR},100M,1K \
-    ABORT,/tmp,10M,1K"
+    HALT,${TMPDIR},100M,1K \
+    HALT,${DL_DIR},100M,1K \
+    HALT,${SSTATE_DIR},100M,1K \
+    HALT,/tmp,10M,1K"
 
 #
 # Shared-state files from other locations
@@ -214,7 +214,7 @@ BB_DISKMON_DIRS ??= "\
 # at the end as shown in the examples below. This will be substituted with the
 # correct path within the directory structure.
 #SSTATE_MIRRORS ?= "\
-#file://.* http://someserver.tld/share/sstate/PATH;downloadfilename=PATH \n \
+#file://.* http://someserver.tld/share/sstate/PATH;downloadfilename=PATH \
 #file://.* file:///some/local/dir/sstate/PATH"
 
 #

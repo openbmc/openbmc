@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=e23fadd6ceef8c618fc1c65191d846fa"
 PYPI_PACKAGE = "Cython"
 BBCLASSEXTEND = "native nativesdk"
 
-SRC_URI[sha256sum] = "af377d543a762867da11fcf6e558f7a4a535ff8693f30cce123fab10c00fa312"
+SRC_URI[sha256sum] = "c6a442504db906dfc13a480e96850cced994ecdc076bcf492c43515b78f70da2"
 UPSTREAM_CHECK_REGEX = "Cython-(?P<pver>.*)\.tar"
 
 inherit pypi

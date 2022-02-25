@@ -1,4 +1,4 @@
-do_install:append_harden () {
+do_install:append:harden () {
 	# to hardend
 	sed -i -e 's:UMASK.*:UMASK 027:' ${D}${sysconfdir}/login.defs
 	sed -i -e 's:PASS_MAX_DAYS.*:PASS_MAX_DAYS 365:' ${D}${sysconfdir}/login.defs

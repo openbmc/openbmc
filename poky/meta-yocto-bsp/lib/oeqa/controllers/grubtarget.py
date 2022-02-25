@@ -19,10 +19,9 @@ import subprocess
 import sys
 import pexpect
 
-import oeqa.utils.sshcontrol as sshcontrol
-from oeqa.controllers.masterimage import MasterImageHardwareTarget
+from oeqa.controllers.controllerimage import ControllerImageHardwareTarget
 
-class GrubTarget(MasterImageHardwareTarget):
+class GrubTarget(ControllerImageHardwareTarget):
 
     def __init__(self, d):
         super(GrubTarget, self).__init__(d)
@@ -41,16 +40,16 @@ class GrubTarget(MasterImageHardwareTarget):
 
     def _deploy(self):
         # make sure these aren't mounted
-        self.master.run("umount /boot; umount /mnt/testrootfs;")
-        self.master.ignore_status = False
+        self.controller.run("umount /boot; umount /mnt/testrootfs;")
+        self.controller.ignore_status = False
         # Kernel files may not be in the image, so copy them just in case
-        self.master.copy_to(self.rootfs, "~/test-rootfs." + self.image_fstype)
-        self.master.copy_to(self.kernel, "~/test-kernel")
+        self.controller.copy_to(self.rootfs, "~/test-rootfs." + self.image_fstype)
+        self.controller.copy_to(self.kernel, "~/test-kernel")
         for cmd in self.deploy_cmds:
-            self.master.run(cmd)
+            self.controller.run(cmd)
 
     def _start(self, params=None):
-        self.power_cycle(self.master)
+        self.power_cycle(self.controller)
         try:
             serialconn = pexpect.spawn(self.serialcontrol_cmd, env=self.origenv, logfile=sys.stdout)
             serialconn.expect("GNU GRUB  version 2.00")

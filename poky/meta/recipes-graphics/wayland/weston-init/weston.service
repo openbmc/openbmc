@@ -37,8 +37,8 @@ EnvironmentFile=/etc/default/weston
 ExecStart=/usr/bin/weston --modules=systemd-notify.so
 
 # Optional watchdog setup
-TimeoutStartSec=60
-WatchdogSec=20
+#TimeoutStartSec=60
+#WatchdogSec=20
 
 # The user to run Weston as.
 User=weston

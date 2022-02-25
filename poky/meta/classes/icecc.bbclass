@@ -19,22 +19,21 @@
 # or the default one provided by icecc-create-env.bb will be used
 # (NOTE that this is a modified version of the script need it and *not the one that comes with icecc*
 #
-# User can specify if specific packages or packages belonging to class should not use icecc to distribute
-# compile jobs to remote machines, but handled locally, by defining ICECC_USER_CLASS_BL and ICECC_USER_PACKAGE_BL
-# with the appropriate values in local.conf. In addition the user can force to enable icecc for packages
-# which set an empty PARALLEL_MAKE variable by defining ICECC_USER_PACKAGE_WL.
+# User can specify if specific recipes or recipes belonging to class should not use icecc to distribute
+# compile jobs to remote machines, but handled locally, by defining ICECC_CLASS_DISABLE and ICECC_RECIPE_DISABLE
+# with the appropriate values in local.conf. In addition the user can force to enable icecc for recipes
+# which set an empty PARALLEL_MAKE variable by defining ICECC_RECIPE_ENABLE.
 #
 #########################################################################################
 #Error checking is kept to minimum so double check any parameters you pass to the class
 ###########################################################################################
 
-BB_HASHBASE_WHITELIST += "ICECC_PARALLEL_MAKE ICECC_DISABLED ICECC_USER_PACKAGE_BL \
-    ICECC_USER_CLASS_BL ICECC_USER_PACKAGE_WL ICECC_PATH ICECC_ENV_EXEC \
+BB_BASEHASH_IGNORE_VARS += "ICECC_PARALLEL_MAKE ICECC_DISABLED ICECC_RECIPE_DISABLE \
+    ICECC_CLASS_DISABLE ICECC_RECIPE_ENABLE ICECC_PATH ICECC_ENV_EXEC \
     ICECC_CARET_WORKAROUND ICECC_CFLAGS ICECC_ENV_VERSION \
     ICECC_DEBUG ICECC_LOGFILE ICECC_REPEAT_RATE ICECC_PREFERRED_HOST \
     ICECC_CLANG_REMOTE_CPP ICECC_IGNORE_UNVERIFIED ICECC_TEST_SOCKET \
-    ICECC_ENV_DEBUG ICECC_SYSTEM_PACKAGE_BL ICECC_SYSTEM_CLASS_BL \
-    ICECC_REMOTE_CPP \
+    ICECC_ENV_DEBUG ICECC_REMOTE_CPP \
     "
 
 ICECC_ENV_EXEC ?= "${STAGING_BINDIR_NATIVE}/icecc-create-env"
@@ -66,7 +65,7 @@ CXXFLAGS += "${ICECC_CFLAGS}"
 # Debug flags when generating environments
 ICECC_ENV_DEBUG ??= ""
 
-# "system" recipe blacklist contains a list of packages that can not distribute
+# Disable recipe list contains a list of recipes that can not distribute
 # compile tasks for one reason or the other. When adding new entry, please
 # document why (how it failed) so that we can re-evaluate it later e.g. when
 # there is new version
@@ -79,21 +78,21 @@ ICECC_ENV_DEBUG ??= ""
 #             inline assembly
 # target-sdk-provides-dummy - ${HOST_PREFIX} is empty which triggers the "NULL
 #                             prefix" error.
-ICECC_SYSTEM_PACKAGE_BL += "\
+ICECC_RECIPE_DISABLE += "\
     libgcc-initial \
     pixman \
     systemtap \
     target-sdk-provides-dummy \
     "
 
-# "system" classes that should be blacklisted. When adding new entry, please
+# Classes that should not use icecc. When adding new entry, please
 # document why (how it failed) so that we can re-evaluate it later
 #
 # image - Image aren't compiling, but the testing framework for images captures
 #         PARALLEL_MAKE as part of the test environment. Many tests won't use
 #         icecream, but leaving the high level of parallelism can cause them to
 #         consume an unnecessary amount of resources.
-ICECC_SYSTEM_CLASS_BL += "\
+ICECC_CLASS_DISABLE += "\
     image \
     "
 
@@ -141,32 +140,28 @@ def use_icecc(bb,d):
     pn = d.getVar('PN')
     bpn = d.getVar('BPN')
 
-    # Blacklist/whitelist checks are made against BPN, because there is a good
+    # Enable/disable checks are made against BPN, because there is a good
     # chance that if icecc should be skipped for a recipe, it should be skipped
     # for all the variants of that recipe. PN is still checked in case a user
     # specified a more specific recipe.
     check_pn = set([pn, bpn])
 
-    system_class_blacklist = (d.getVar('ICECC_SYSTEM_CLASS_BL') or "").split()
-    user_class_blacklist = (d.getVar('ICECC_USER_CLASS_BL') or "none").split()
-    package_class_blacklist = system_class_blacklist + user_class_blacklist
+    class_disable = (d.getVar('ICECC_CLASS_DISABLE') or "").split()
 
-    for black in package_class_blacklist:
-        if bb.data.inherits_class(black, d):
-            bb.debug(1, "%s: class %s found in blacklist, disable icecc" % (pn, black))
+    for bbclass in class_disable:
+        if bb.data.inherits_class(bbclass, d):
+            bb.debug(1, "%s: bbclass %s found in disable, disable icecc" % (pn, bbclass))
             return "no"
 
-    system_package_blacklist = (d.getVar('ICECC_SYSTEM_PACKAGE_BL') or "").split()
-    user_package_blacklist = (d.getVar('ICECC_USER_PACKAGE_BL') or "").split()
-    user_package_whitelist = (d.getVar('ICECC_USER_PACKAGE_WL') or "").split()
-    package_blacklist = system_package_blacklist + user_package_blacklist
+    disabled_recipes = (d.getVar('ICECC_RECIPE_DISABLE') or "").split()
+    enabled_recipes = (d.getVar('ICECC_RECIPE_ENABLE') or "").split()
 
-    if check_pn & set(package_blacklist):
-        bb.debug(1, "%s: found in blacklist, disable icecc" % pn)
+    if check_pn & set(disabled_recipes):
+        bb.debug(1, "%s: found in disable list, disable icecc" % pn)
         return "no"
 
-    if check_pn & set(user_package_whitelist):
-        bb.debug(1, "%s: found in whitelist, enable icecc" % pn)
+    if check_pn & set(enabled_recipes):
+        bb.debug(1, "%s: found in enabled recipes list, enable icecc" % pn)
         return "yes"
 
     if d.getVar('PARALLEL_MAKE') == "":
@@ -309,7 +304,7 @@ wait_for_file() {
     local TIMEOUT=$2
     until [ -f "$FILE_TO_TEST" ]
     do
-        TIME_ELAPSED=`expr $TIME_ELAPSED + 1`
+        TIME_ELAPSED=$(expr $TIME_ELAPSED + 1)
         if [ $TIME_ELAPSED -gt $TIMEOUT ]
         then
             return 1
@@ -362,8 +357,8 @@ set_icecc_env() {
         return
     fi
 
-    ICE_VERSION=`$ICECC_CC -dumpversion`
-    ICECC_VERSION=`echo ${ICECC_VERSION} | sed -e "s/@VERSION@/$ICE_VERSION/g"`
+    ICE_VERSION="$($ICECC_CC -dumpversion)"
+    ICECC_VERSION=$(echo ${ICECC_VERSION} | sed -e "s/@VERSION@/$ICE_VERSION/g")
     if [ ! -x "${ICECC_ENV_EXEC}" ]
     then
         bbwarn "Cannot use icecc: invalid ICECC_ENV_EXEC"
@@ -390,18 +385,18 @@ set_icecc_env() {
         chmod 775 $ICE_PATH/$compiler
     done
 
-    ICECC_AS="`${ICECC_CC} -print-prog-name=as`"
+    ICECC_AS="$(${ICECC_CC} -print-prog-name=as)"
     # for target recipes should return something like:
     # /OE/tmp-eglibc/sysroots/x86_64-linux/usr/libexec/arm920tt-oe-linux-gnueabi/gcc/arm-oe-linux-gnueabi/4.8.2/as
     # and just "as" for native, if it returns "as" in current directory (for whatever reason) use "as" from PATH
-    if [ "`dirname "${ICECC_AS}"`" = "." ]
+    if [ "$(dirname "${ICECC_AS}")" = "." ]
     then
         ICECC_AS="${ICECC_WHICH_AS}"
     fi
 
     if [ ! -f "${ICECC_VERSION}.done" ]
     then
-        mkdir -p "`dirname "${ICECC_VERSION}"`"
+        mkdir -p "$(dirname "${ICECC_VERSION}")"
 
         # the ICECC_VERSION generation step must be locked by a mutex
         # in order to prevent race conditions

@@ -28,6 +28,7 @@ BOOST_LIBS = "\
 	graph \
 	headers \
 	iostreams \
+	json \
 	log \
 	math \
 	program_options \

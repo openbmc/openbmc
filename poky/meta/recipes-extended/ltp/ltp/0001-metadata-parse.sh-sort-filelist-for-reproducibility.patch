@@ -1,0 +1,28 @@
+From 4aad23f208cc7725cd61bbe5aaadb9994c794cd0 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Wed, 26 Jan 2022 20:58:46 +0100
+Subject: [PATCH] metadata/parse.sh: sort filelist for reproducibility
+
+find does not guarantee the order of the files.
+
+Upstream-Status: Submitted [https://github.com/linux-test-project/ltp/pull/907]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ metadata/parse.sh | 2 +-
+
+diff --git a/metadata/parse.sh b/metadata/parse.sh
+index b43d024c68..1811665bfe 100755
+--- a/metadata/parse.sh
++++ b/metadata/parse.sh
+@@ -29,7 +29,7 @@ echo ' "tests": {'
+ 
+ first=1
+ 
+-for test in `find testcases/ -name '*.c'`; do
++for test in `find testcases/ -name '*.c'|sort`; do
+ 	a=$($top_builddir/metadata/metaparse -Iinclude -Itestcases/kernel/syscalls/utils/ "$test")
+ 	if [ -n "$a" ]; then
+ 		if [ -z "$first" ]; then
+-- 
+2.20.1
+

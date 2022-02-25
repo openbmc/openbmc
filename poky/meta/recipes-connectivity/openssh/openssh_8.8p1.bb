@@ -28,14 +28,14 @@ SRC_URI = "http://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${PV}.tar
 SRC_URI[sha256sum] = "4590890ea9bb9ace4f71ae331785a3a5823232435161960ed5fc86588f331fe9"
 
 # This CVE is specific to OpenSSH with the pam opie which we don't build/use here
-CVE_CHECK_WHITELIST += "CVE-2007-2768"
+CVE_CHECK_IGNORE += "CVE-2007-2768"
 
 # This CVE is specific to OpenSSH server, as used in Fedora and Red Hat Enterprise Linux 7
 # and when running in a Kerberos environment. As such it is not relevant to OpenEmbedded
-CVE_CHECK_WHITELIST += "CVE-2014-9278"
+CVE_CHECK_IGNORE += "CVE-2014-9278"
 
 # CVE only applies to some distributed RHEL binaries
-CVE_CHECK_WHITELIST += "CVE-2008-3844"
+CVE_CHECK_IGNORE += "CVE-2008-3844"
 
 PAM_SRC_URI = "file://sshd"
 

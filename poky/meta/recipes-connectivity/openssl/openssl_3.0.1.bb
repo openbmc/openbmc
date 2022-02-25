@@ -55,6 +55,15 @@ CFLAGS:append:class-nativesdk = " -DOPENSSLDIR=/not/builtin -DENGINESDIR=/not/bu
 DEPRECATED_CRYPTO_FLAGS ?= ""
 
 do_configure () {
+	# When we upgrade glibc but not uninative we see obtuse failures in openssl. Make
+	# the issue really clear that perl isn't functional due to symbol mismatch issues.
+	cat <<- EOF > ${WORKDIR}/perltest
+	#!/usr/bin/env perl
+	use POSIX;
+	EOF
+	chmod a+x ${WORKDIR}/perltest
+	${WORKDIR}/perltest
+
 	os=${HOST_OS}
 	case $os in
 	linux-gnueabi |\
@@ -160,7 +169,8 @@ do_install:append:class-native () {
 	    OPENSSL_CONF=${libdir}/ssl-3/openssl.cnf \
 	    SSL_CERT_DIR=${libdir}/ssl-3/certs \
 	    SSL_CERT_FILE=${libdir}/ssl-3/cert.pem \
-	    OPENSSL_ENGINES=${libdir}/engines-3
+	    OPENSSL_ENGINES=${libdir}/engines-3 \
+	    OPENSSL_MODULES=${libdir}/ossl-modules
 }
 
 do_install:append:class-nativesdk () {
@@ -245,4 +255,4 @@ CVE_VERSION_SUFFIX = "alphabetical"
 
 # Only affects OpenSSL >= 1.1.1 in combination with Apache < 2.4.37
 # Apache in meta-webserver is already recent enough
-CVE_CHECK_WHITELIST += "CVE-2019-0190"
+CVE_CHECK_IGNORE += "CVE-2019-0190"

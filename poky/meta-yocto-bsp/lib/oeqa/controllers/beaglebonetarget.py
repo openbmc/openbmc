@@ -24,11 +24,10 @@ import subprocess
 import sys
 import pexpect
 
-import oeqa.utils.sshcontrol as sshcontrol
-from oeqa.controllers.masterimage import MasterImageHardwareTarget
+from oeqa.controllers.controllerimage import ControllerImageHardwareTarget
 
 
-class BeagleBoneTarget(MasterImageHardwareTarget):
+class BeagleBoneTarget(ControllerImageHardwareTarget):
 
     dtbs = {'uImage-am335x-bone.dtb': 'am335x-bone.dtb', 'uImage-am335x-boneblack.dtb': 'am335x-boneblack.dtb'}
 
@@ -57,21 +56,21 @@ class BeagleBoneTarget(MasterImageHardwareTarget):
 
 
     def _deploy(self):
-        self.master.run("umount /boot; umount /mnt/testrootfs;")
-        self.master.ignore_status = False
+        self.controller.run("umount /boot; umount /mnt/testrootfs;")
+        self.controller.ignore_status = False
         # Kernel and dtb files may not be in the image, so copy them just in case
-        self.master.copy_to(self.kernel, "~/test-kernel")
+        self.controller.copy_to(self.kernel, "~/test-kernel")
         kernelpath = os.path.dirname(self.kernel)
         for dtborig, dtbfn in self.dtbs.iteritems():
             dtbfile = os.path.join(kernelpath, dtborig)
             if os.path.exists(dtbfile):
-                self.master.copy_to(dtbfile, "~/%s" % dtbfn)
-        self.master.copy_to(self.rootfs, "~/test-rootfs.%s" % self.image_fstype)
+                self.controller.copy_to(dtbfile, "~/%s" % dtbfn)
+        self.controller.copy_to(self.rootfs, "~/test-rootfs.%s" % self.image_fstype)
         for cmd in self.deploy_cmds:
-            self.master.run(cmd)
+            self.controller.run(cmd)
 
     def _start(self, params=None):
-        self.power_cycle(self.master)
+        self.power_cycle(self.controller)
         try:
             serialconn = pexpect.spawn(self.serialcontrol_cmd, env=self.origenv, logfile=sys.stdout)
             # We'd wait for "U-Boot" here but sometimes we connect too late on BeagleBone white to see it

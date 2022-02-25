@@ -87,13 +87,13 @@ class Command(BaseCommand):
 
         # update branches; only those that we already have names listed in the
         # Releases table
-        whitelist_branch_names = [rel.branch_name
-                                  for rel in Release.objects.all()]
-        if len(whitelist_branch_names) == 0:
+        allowed_branch_names = [rel.branch_name
+                                for rel in Release.objects.all()]
+        if len(allowed_branch_names) == 0:
             raise Exception("Failed to make list of branches to fetch")
 
         logger.info("Fetching metadata for %s",
-                    " ".join(whitelist_branch_names))
+                    " ".join(allowed_branch_names))
 
         # We require a non-empty bb.data, but we can fake it with a dictionary
         layerindex = layerindexlib.LayerIndex({"DUMMY" : "VALUE"})
@@ -101,8 +101,8 @@ class Command(BaseCommand):
         http_progress = Spinner()
         http_progress.start()
 
-        if whitelist_branch_names:
-            url_branches = ";branch=%s" % ','.join(whitelist_branch_names)
+        if allowed_branch_names:
+            url_branches = ";branch=%s" % ','.join(allowed_branch_names)
         else:
             url_branches = ""
         layerindex.load_layerindex("%s%s" % (self.apiurl, url_branches))

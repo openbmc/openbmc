@@ -16,7 +16,7 @@ PREFERRED_PROVIDER_virtual/libc-locale ?= "glibc-locale"
 
 CXXFLAGS += "-fvisibility-inlines-hidden"
 
-LIBC_DEPENDENCIES = "libsegfault \
+LIBC_DEPENDENCIES = "\
 		     glibc \
 		     glibc-dbg \
 		     glibc-dev \

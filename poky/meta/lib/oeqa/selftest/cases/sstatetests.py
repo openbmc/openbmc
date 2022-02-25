@@ -177,7 +177,7 @@ class SStateTests(SStateBase):
         # QA checks for this test. It may report errors otherwise.
         self.append_config('ERROR_QA:remove = "version-going-backwards"')
 
-        # For not this only checks if random sstate tasks are handled correctly as a group.
+        # For now this only checks if random sstate tasks are handled correctly as a group.
         # In the future we should add control over what tasks we check for.
 
         sstate_archs_list = []

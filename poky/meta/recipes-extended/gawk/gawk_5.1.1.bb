@@ -8,7 +8,7 @@ SECTION = "console/utils"
 
 # gawk <= 3.1.5: GPLv2
 # gawk >= 3.1.6: GPLv3
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 PACKAGECONFIG ??= "readline"

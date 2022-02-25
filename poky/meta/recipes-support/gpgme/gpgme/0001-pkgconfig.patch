@@ -12,22 +12,23 @@ RP 2015/4/17
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
 Rebase to 1.13.0
-
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Rebase to 1.17.0
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
 ---
  configure.ac            |   1 +
  src/Makefile.am         |   4 +-
- src/gpgme-pthread.pc.in |  15 +++++++
- src/gpgme.m4            | 114 ++++--------------------------------------------
+ src/gpgme-pthread.pc.in |  15 ++++++
+ src/gpgme.m4            | 114 +++-------------------------------------
  src/gpgme.pc.in         |   4 +-
  5 files changed, 28 insertions(+), 110 deletions(-)
  create mode 100644 src/gpgme-pthread.pc.in
 
 diff --git a/configure.ac b/configure.ac
-index 25184f4..1c0a386 100644
+index 80ce79c..d7c0ac1 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -899,6 +899,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
+@@ -905,6 +905,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
                  src/gpgme-glib.pc
                  src/gpgme.h)
  AC_CONFIG_FILES(src/gpgme-config, chmod +x src/gpgme-config)
@@ -36,7 +37,7 @@ index 25184f4..1c0a386 100644
  AC_CONFIG_FILES(lang/cpp/tests/Makefile)
  AC_CONFIG_FILES(lang/cpp/src/GpgmeppConfig-w32.cmake.in)
 diff --git a/src/Makefile.am b/src/Makefile.am
-index d85a85c..d942f3e 100644
+index 39c341f..3aca716 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
 @@ -20,11 +20,11 @@
@@ -75,7 +76,7 @@ index 0000000..074bbf6
 +Cflags: -I${includedir}
 +Requires: libassuan gpg-error
 diff --git a/src/gpgme.m4 b/src/gpgme.m4
-index 6c2be44..d8a75cb 100644
+index 71b0010..30ec151 100644
 --- a/src/gpgme.m4
 +++ b/src/gpgme.m4
 @@ -79,7 +79,7 @@ dnl config script does not match the host specification the script
@@ -274,18 +275,18 @@ index 6c2be44..d8a75cb 100644
 -  AC_SUBST(GPGME_GLIB_LIBS)
  ])
 diff --git a/src/gpgme.pc.in b/src/gpgme.pc.in
-index be288b8..16f56ac 100644
+index 80d59de..932645b 100644
 --- a/src/gpgme.pc.in
 +++ b/src/gpgme.pc.in
 @@ -9,6 +9,6 @@ Name: gpgme
  Description: GnuPG Made Easy to access GnuPG
- Requires: gpg-error, libassuan
+ Requires.private: gpg-error, libassuan
  Version: @PACKAGE_VERSION@
--Cflags: @GPGME_CONFIG_CFLAGS@
--Libs: @GPGME_CONFIG_LIBS@
+-Cflags: -I${includedir} @GPGME_CONFIG_CFLAGS@
+-Libs: -L${libdir} @GPGME_CONFIG_LIBS@
 +Cflags: -I${includedir}
 +Libs: -L${libdir} -lgpgme
  URL: https://www.gnupg.org/software/gpgme/index.html
 -- 
-2.7.4
+2.25.1
 

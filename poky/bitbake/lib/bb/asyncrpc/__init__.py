@@ -28,4 +28,4 @@ def chunkify(msg, max_chunk):
 
 
 from .client import AsyncClient, Client
-from .serv import AsyncServer, AsyncServerConnection
+from .serv import AsyncServer, AsyncServerConnection, ClientError, ServerError

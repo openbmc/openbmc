@@ -100,7 +100,7 @@ INITSCRIPT_PARAMS:lcdproc = "defaults 71 20"
 
 python populate_packages:prepend() {
     plugindir = d.expand('${libdir}/lcdproc')
-    do_split_packages(d, plugindir, '(.*)\.so$', 'lcdd-driver-%s', 'LCDd driver for %s', prepend=True)
+    do_split_packages(d, plugindir, r'(.*)\.so$', 'lcdd-driver-%s', 'LCDd driver for %s', prepend=True)
 }
 
 PACKAGES_DYNAMIC += "^lcdd-driver-.*"

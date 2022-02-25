@@ -1,7 +1,7 @@
 SUMMARY = "A GNU tool for automatically generating Makefiles"
 DESCRIPTION = "Automake is a tool for automatically generating `Makefile.in' files compliant with the GNU Coding \
 Standards. Automake requires the use of Autoconf."
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 HOMEPAGE = "http://www.gnu.org/software/automake/"
 SECTION = "devel"
 

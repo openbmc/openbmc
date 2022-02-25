@@ -9,13 +9,13 @@ Upstream-Status: Submitted [https://github.com/rust-lang/libc/pull/2537]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Ralf Anton Beier <ralf_beier@me.com>
 ---
- vendor/libc/src/unix/linux_like/linux/musl/mod.rs | 3 ++-
+ vendor/libc-0.2.106/src/unix/linux_like/linux/musl/mod.rs | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/vendor/libc/src/unix/linux_like/linux/musl/mod.rs b/vendor/libc/src/unix/linux_like/linux/musl/mod.rs
+diff --git a/vendor/libc-0.2.106/src/unix/linux_like/linux/musl/mod.rs b/vendor/libc-0.2.106/src/unix/linux_like/linux/musl/mod.rs
 index df596e968..1ab13a712 100644
---- a/vendor/libc/src/unix/linux_like/linux/musl/mod.rs
-+++ b/vendor/libc/src/unix/linux_like/linux/musl/mod.rs
+--- a/vendor/libc-0.2.106/src/unix/linux_like/linux/musl/mod.rs
++++ b/vendor/libc-0.2.106/src/unix/linux_like/linux/musl/mod.rs
 @@ -765,7 +765,8 @@ cfg_if! {
                   target_arch = "aarch64",
                   target_arch = "mips64",

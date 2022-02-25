@@ -21,8 +21,6 @@ Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
  src/libsystemd/sd-journal/catalog.c | 1 +
  4 files changed, 12 insertions(+)
 
-diff --git a/src/basic/missing_type.h b/src/basic/missing_type.h
-index f6233090a9..aeaf6ad5ec 100644
 --- a/src/basic/missing_type.h
 +++ b/src/basic/missing_type.h
 @@ -10,3 +10,12 @@
@@ -38,8 +36,6 @@ index f6233090a9..aeaf6ad5ec 100644
 +#define __COMPAR_FN_T
 +typedef int (*__compar_fn_t)(const void *, const void *);
 +#endif
-diff --git a/src/basic/sort-util.h b/src/basic/sort-util.h
-index d92a5ab0ed..a63867c716 100644
 --- a/src/basic/sort-util.h
 +++ b/src/basic/sort-util.h
 @@ -4,6 +4,7 @@
@@ -48,22 +44,18 @@ index d92a5ab0ed..a63867c716 100644
  #include "macro.h"
 +#include "missing_type.h"
  
- void *xbsearch_r(const void *key, const void *base, size_t nmemb, size_t size,
-                  __compar_d_fn_t compar, void *arg);
-diff --git a/src/core/kmod-setup.c b/src/core/kmod-setup.c
-index 8a7f82812a..a56f12f47f 100644
+ /* This is the same as glibc's internal __compar_d_fn_t type. glibc exports a public comparison_fn_t, for the
+  * external type __compar_fn_t, but doesn't do anything similar for __compar_d_fn_t. Let's hence do that
 --- a/src/core/kmod-setup.c
 +++ b/src/core/kmod-setup.c
 @@ -10,6 +10,7 @@
- #include "kmod-setup.h"
  #include "macro.h"
+ #include "recurse-dir.h"
  #include "string-util.h"
 +#include "missing_type.h"
  
  #if HAVE_KMOD
  #include "module-util.h"
-diff --git a/src/libsystemd/sd-journal/catalog.c b/src/libsystemd/sd-journal/catalog.c
-index ce8d47ccc3..00845f9776 100644
 --- a/src/libsystemd/sd-journal/catalog.c
 +++ b/src/libsystemd/sd-journal/catalog.c
 @@ -28,6 +28,7 @@

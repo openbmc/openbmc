@@ -19,4 +19,4 @@ Signed-off-by: Gianfranco Costamagna <costamagnagianfranco@yahoo.it>
 +	LINK_FLAGS "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/linker.version"
  )
  
- install(TARGETS libmosquitto RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+ install(TARGETS libmosquitto

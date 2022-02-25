@@ -279,7 +279,7 @@ class CookerPlugin(layerindexlib.plugin.IndexPlugin):
                                    summary=pn, description=pn, section='?',
                                    license='?', homepage='?', bugtracker='?',
                                    provides='?', bbclassextend='?', inherits='?',
-                                   blacklisted='?', layerbranch=depBranchId)
+                                   disallowed='?', layerbranch=depBranchId)
 
                     index = addElement("recipes", [recipe], index)
 

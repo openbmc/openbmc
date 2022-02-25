@@ -1,0 +1,157 @@
+From 4b1945d3c055de4b49e310f799e6f92c57546349 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Sun, 23 Jan 2022 13:11:47 -0500
+Subject: [PATCH 2/7] fix: block: remove the ->rq_disk field in struct request
+ (v5.17)
+
+See upstream commit :
+
+  commit f3fa33acca9f0058157214800f68b10d8e71ab7a
+  Author: Christoph Hellwig <hch@lst.de>
+  Date:   Fri Nov 26 13:18:00 2021 +0100
+
+    block: remove the ->rq_disk field in struct request
+
+    Just use the disk attached to the request_queue instead.
+
+    Link: https://lore.kernel.org/r/20211126121802.2090656-4-hch@lst.de
+
+Upstream-Status: Backport [lttng-modules commit 4b1945d3c055de4b49e310f799e6f92c57546349]
+
+Change-Id: I24263be519d1b51f4b00bd95f14a9aeb8457889a
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/instrumentation/events/block.h | 95 ++++++++++++++++++++++++--
+ 1 file changed, 91 insertions(+), 4 deletions(-)
+
+diff --git a/include/instrumentation/events/block.h b/include/instrumentation/events/block.h
+index 6782c36f..3e1104d7 100644
+--- a/include/instrumentation/events/block.h
++++ b/include/instrumentation/events/block.h
+@@ -310,7 +310,31 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(block_rq_with_error, block_rq_abort,
+ )
+ #endif
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,17,0))
++/**
++ * block_rq_requeue - place block IO request back on a queue
++ * @rq: block IO operation request
++ *
++ * The block operation request @rq is being placed back into queue
++ * @q.  For some reason the request was not completed and needs to be
++ * put back in the queue.
++ */
++LTTNG_TRACEPOINT_EVENT(block_rq_requeue,
++
++	TP_PROTO(struct request *rq),
++
++	TP_ARGS(rq),
++
++	TP_FIELDS(
++		ctf_integer(dev_t, dev,
++			rq->q->disk ? disk_devt(rq->q->disk) : 0)
++		ctf_integer(sector_t, sector, blk_rq_trace_sector(rq))
++		ctf_integer(unsigned int, nr_sector, blk_rq_trace_nr_sectors(rq))
++		blk_rwbs_ctf_integer(unsigned int, rwbs,
++			lttng_req_op(rq), lttng_req_rw(rq), blk_rq_bytes(rq))
++	)
++)
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0))
+ /**
+  * block_rq_requeue - place block IO request back on a queue
+  * @rq: block IO operation request
+@@ -380,7 +404,24 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(block_rq_with_error, block_rq_requeue,
+  * do for the request. If @rq->bio is non-NULL then there is
+  * additional work required to complete the request.
+  */
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,16,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,17,0))
++LTTNG_TRACEPOINT_EVENT(block_rq_complete,
++
++	TP_PROTO(struct request *rq, blk_status_t error, unsigned int nr_bytes),
++
++	TP_ARGS(rq, error, nr_bytes),
++
++	TP_FIELDS(
++		ctf_integer(dev_t, dev,
++			rq->q->disk ? disk_devt(rq->q->disk) : 0)
++		ctf_integer(sector_t, sector, blk_rq_pos(rq))
++		ctf_integer(unsigned int, nr_sector, nr_bytes >> 9)
++		ctf_integer(int, error, blk_status_to_errno(error))
++		blk_rwbs_ctf_integer(unsigned int, rwbs,
++			lttng_req_op(rq), lttng_req_rw(rq), nr_bytes)
++	)
++)
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,16,0))
+ LTTNG_TRACEPOINT_EVENT(block_rq_complete,
+ 
+ 	TP_PROTO(struct request *rq, blk_status_t error, unsigned int nr_bytes),
+@@ -519,7 +560,26 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(block_rq_with_error, block_rq_complete,
+ 
+ #endif /* #else #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(3,15,0)) */
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,17,0))
++LTTNG_TRACEPOINT_EVENT_CLASS(block_rq,
++
++	TP_PROTO(struct request *rq),
++
++	TP_ARGS(rq),
++
++	TP_FIELDS(
++		ctf_integer(dev_t, dev,
++			rq->q->disk ? disk_devt(rq->q->disk) : 0)
++		ctf_integer(sector_t, sector, blk_rq_trace_sector(rq))
++		ctf_integer(unsigned int, nr_sector, blk_rq_trace_nr_sectors(rq))
++		ctf_integer(unsigned int, bytes, blk_rq_bytes(rq))
++		ctf_integer(pid_t, tid, current->pid)
++		blk_rwbs_ctf_integer(unsigned int, rwbs,
++			lttng_req_op(rq), lttng_req_rw(rq), blk_rq_bytes(rq))
++		ctf_array_text(char, comm, current->comm, TASK_COMM_LEN)
++	)
++)
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0))
+ LTTNG_TRACEPOINT_EVENT_CLASS(block_rq,
+ 
+ 	TP_PROTO(struct request *rq),
+@@ -1513,7 +1573,34 @@ LTTNG_TRACEPOINT_EVENT(block_bio_remap,
+ )
+ #endif
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,17,0))
++/**
++ * block_rq_remap - map request for a block operation request
++ * @rq: block IO operation request
++ * @dev: device for the operation
++ * @from: original sector for the operation
++ *
++ * The block operation request @rq in @q has been remapped.  The block
++ * operation request @rq holds the current information and @from hold
++ * the original sector.
++ */
++LTTNG_TRACEPOINT_EVENT(block_rq_remap,
++
++	TP_PROTO(struct request *rq, dev_t dev, sector_t from),
++
++	TP_ARGS(rq, dev, from),
++
++	TP_FIELDS(
++		ctf_integer(dev_t, dev, disk_devt(rq->q->disk))
++		ctf_integer(sector_t, sector, blk_rq_pos(rq))
++		ctf_integer(unsigned int, nr_sector, blk_rq_sectors(rq))
++		ctf_integer(dev_t, old_dev, dev)
++		ctf_integer(sector_t, old_sector, from)
++		blk_rwbs_ctf_integer(unsigned int, rwbs,
++			lttng_req_op(rq), lttng_req_rw(rq), blk_rq_bytes(rq))
++	)
++)
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0))
+ /**
+  * block_rq_remap - map request for a block operation request
+  * @rq: block IO operation request
+-- 
+2.19.1
+

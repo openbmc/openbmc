@@ -23,7 +23,7 @@ PACKAGECONFIG[TS] = "trusted-service-provider,,libts,libts"
 PARSEC_FEATURES = "${@d.getVar('PACKAGECONFIG_CONFARGS',True).strip().replace(' ', ',')}"
 CARGO_BUILD_FLAGS += " --features ${PARSEC_FEATURES}"
 
-inherit systemd
+inherit pkgconfig systemd
 SYSTEMD_SERVICE:${PN} = "parsec.service"
 
 inherit update-rc.d

@@ -9,6 +9,7 @@ SRC_URI = " \
     git://github.com/uclouvain/openjpeg.git;branch=master;protocol=https \
     file://0002-Do-not-ask-cmake-to-export-binaries-they-don-t-make-.patch \
     file://0001-This-patch-fixed-include-dir-to-usr-include-.-Obviou.patch \
+    file://CVE-2021-29338.patch \
 "
 SRCREV = "37ac30ceff6640bbab502388c5e0fa0bff23f505"
 S = "${WORKDIR}/git"

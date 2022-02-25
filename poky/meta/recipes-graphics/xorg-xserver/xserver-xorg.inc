@@ -1,7 +1,7 @@
 SUMMARY = "The X.Org X server"
 HOMEPAGE = "http://www.x.org"
 SECTION = "x11/base"
-LICENSE = "MIT-X"
+LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5df87950af51ac2c5822094553ea1880"
 
 # xf86-*-* packages depend on an X server built with the xfree86 DDX
@@ -21,13 +21,13 @@ UPSTREAM_CHECK_REGEX = "xorg-server-(?P<pver>\d+(\.(?!99)\d+)+)\.tar"
 
 CVE_PRODUCT = "xorg-server x_server"
 # This is specific to Debian's xserver-wrapper.c
-CVE_CHECK_WHITELIST += "CVE-2011-4613"
+CVE_CHECK_IGNORE += "CVE-2011-4613"
 # As per upstream, exploiting this flaw is non-trivial and it requires exact
 # timing on the behalf of the attacker. Many graphical applications exit if their
 # connection to the X server is lost, so a typical desktop session is either
 # impossible or difficult to exploit. There is currently no upstream patch
 # available for this flaw.
-CVE_CHECK_WHITELIST += "CVE-2020-25697"
+CVE_CHECK_IGNORE += "CVE-2020-25697"
 
 S = "${WORKDIR}/${XORG_PN}-${PV}"
 

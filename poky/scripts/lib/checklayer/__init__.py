@@ -156,6 +156,27 @@ def _find_layer(depend, layers):
                 return layer
     return None
 
+def sanity_check_layers(layers, logger):
+    """
+    Check that we didn't find duplicate collection names, as the layer that will
+    be used is non-deterministic. The precise check is duplicate collections
+    with different patterns, as the same pattern being repeated won't cause
+    problems.
+    """
+    import collections
+
+    passed = True
+    seen = collections.defaultdict(set)
+    for layer in layers:
+        for name, data in layer.get("collections", {}).items():
+            seen[name].add(data["pattern"])
+
+    for name, patterns in seen.items():
+        if len(patterns) > 1:
+            passed = False
+            logger.error("Collection %s found multiple times: %s" % (name, ", ".join(patterns)))
+    return passed
+
 def get_layer_dependencies(layer, layers, logger):
     def recurse_dependencies(depends, layer, layers, logger, ret = []):
         logger.debug('Processing dependencies %s for layer %s.' % \
@@ -261,7 +282,7 @@ def check_command(error_msg, cmd, cwd=None):
         raise RuntimeError(msg)
     return output
 
-def get_signatures(builddir, failsafe=False, machine=None):
+def get_signatures(builddir, failsafe=False, machine=None, extravars=None):
     import re
 
     # some recipes needs to be excluded like meta-world-pkgdata
@@ -272,7 +293,10 @@ def get_signatures(builddir, failsafe=False, machine=None):
     sigs = {}
     tune2tasks = {}
 
-    cmd = 'BB_ENV_EXTRAWHITE="$BB_ENV_EXTRAWHITE BB_SIGNATURE_HANDLER" BB_SIGNATURE_HANDLER="OEBasicHash" '
+    cmd = 'BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS BB_SIGNATURE_HANDLER" BB_SIGNATURE_HANDLER="OEBasicHash" '
+    if extravars:
+        cmd += extravars
+        cmd += ' '
     if machine:
         cmd += 'MACHINE=%s ' % machine
     cmd += 'bitbake '

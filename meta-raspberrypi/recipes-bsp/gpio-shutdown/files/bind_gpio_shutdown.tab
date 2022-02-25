@@ -1,0 +1,2 @@
+# Action on special keypress (Key Power)
+kb::kbrequest:/sbin/shutdown -t1 -a -h -P now

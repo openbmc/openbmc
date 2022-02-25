@@ -14,7 +14,7 @@ UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
 
 S = "${WORKDIR}/git"
 
-DISTUTILS_SETUP_PATH ?= "${B}/bindings/python/"
+SETUPTOOLS_SETUP_PATH ?= "${B}/bindings/python/"
 
 DEPENDS = " \
     flex-native bison-native libaio \
@@ -65,14 +65,14 @@ do_configure() {
 
 do_compile() {
     if ${@bb.utils.contains('PACKAGECONFIG', 'libiio-python3', 'true', 'false', d)}; then
-        distutils3_do_compile
+        setuptools3_do_compile
     fi
     cmake_do_compile
 }
 
 do_install() {
     if ${@bb.utils.contains('PACKAGECONFIG', 'libiio-python3', 'true', 'false', d)}; then
-        distutils3_do_install
+        setuptools3_do_install
     fi
     cmake_do_install
 }

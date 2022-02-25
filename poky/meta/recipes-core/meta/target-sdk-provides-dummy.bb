@@ -58,4 +58,4 @@ DUMMYPROVIDES = "\
 
 require dummy-sdk-package.inc
 
-SSTATE_DUPWHITELIST += "${PKGDATA_DIR}/${PN} ${PKGDATA_DIR}/runtime/${PN}"
+SSTATE_ALLOW_OVERLAP_FILES += "${PKGDATA_DIR}/${PN} ${PKGDATA_DIR}/runtime/${PN}"

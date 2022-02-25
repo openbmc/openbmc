@@ -6,7 +6,7 @@ desktop settings)."
 HOMEPAGE = "https://github.com/libproxy/libproxy"
 BUGTRACKER = "https://github.com/libproxy/libproxy/issues"
 SECTION = "libs"
-LICENSE = "LGPLv2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c \
                     file://utils/proxy.c;beginline=1;endline=18;md5=55152a1006d7dafbef32baf9c30a99c0"
 

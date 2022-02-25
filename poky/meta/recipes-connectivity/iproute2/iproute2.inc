@@ -5,7 +5,7 @@ and tc are the most important.  ip controls IPv4 and IPv6 \
 configuration and tc stands for traffic control."
 HOMEPAGE = "http://www.linuxfoundation.org/collaborate/workgroups/networking/iproute2"
 SECTION = "base"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=eb723b61539feef013de476e68b5c50a \
                     file://ip/ip.c;beginline=3;endline=8;md5=689d691d0410a4b64d3899f8d6e31817"
 

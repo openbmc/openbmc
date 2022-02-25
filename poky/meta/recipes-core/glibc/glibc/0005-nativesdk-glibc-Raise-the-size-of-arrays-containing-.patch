@@ -1,4 +1,4 @@
-From 6af8ce8eceed86addbc188f773a2d36d83ee4042 Mon Sep 17 00:00:00 2001
+From 88a31cd08801df53249963f3b26c7dbcee6ae2f8 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:51:38 +0000
 Subject: [PATCH] nativesdk-glibc: Raise the size of arrays containing dl paths
@@ -41,10 +41,10 @@ index 2b8da8650d..3d9787bda4 100644
  _dl_cache_libcmp (const char *p1, const char *p2)
  {
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index 2c6270e2a7..23018d2f7e 100644
+index daa3af6c51..e323952993 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
-@@ -115,8 +115,8 @@ enum { ncapstr = 1, max_capstrlen = 0 };
+@@ -117,8 +117,8 @@ enum { ncapstr = 1, max_capstrlen = 0 };
     gen-trusted-dirs.awk.  */
  #include "trusted-dirs.h"
  
@@ -98,10 +98,10 @@ index 91966702ca..dc86c20e83 100644
 +const char __invoke_dynamic_linker__[4096] __attribute__ ((section (".interp")))
    = RUNTIME_LINKER;
 diff --git a/elf/ldconfig.c b/elf/ldconfig.c
-index 1037e8d0cf..ffdac84952 100644
+index 101d56ac8e..33debef60a 100644
 --- a/elf/ldconfig.c
 +++ b/elf/ldconfig.c
-@@ -177,6 +177,9 @@ static struct argp argp =
+@@ -176,6 +176,9 @@ static struct argp argp =
    options, parse_opt, NULL, doc, NULL, more_help, NULL
  };
  
@@ -112,10 +112,10 @@ index 1037e8d0cf..ffdac84952 100644
     a platform.  */
  static int
 diff --git a/elf/rtld.c b/elf/rtld.c
-index fbbd60b446..fce9940f80 100644
+index 4b09e84b0d..56d93ff616 100644
 --- a/elf/rtld.c
 +++ b/elf/rtld.c
-@@ -185,6 +185,7 @@ dso_name_valid_for_suid (const char *p)
+@@ -193,6 +193,7 @@ dso_name_valid_for_suid (const char *p)
      }
    return *p != '\0';
  }
@@ -124,10 +124,10 @@ index fbbd60b446..fce9940f80 100644
  static void
  audit_list_init (struct audit_list *list)
 diff --git a/iconv/gconv_conf.c b/iconv/gconv_conf.c
-index 62bee28769..67b60dc88c 100644
+index 077082af66..46b6152455 100644
 --- a/iconv/gconv_conf.c
 +++ b/iconv/gconv_conf.c
-@@ -36,7 +36,7 @@
+@@ -35,7 +35,7 @@
  #include <gconv_parseconfdir.h>
  
  /* This is the default path where we look for module lists.  */

@@ -88,8 +88,8 @@ EOF
 
 	if [ "${SDKMACHINE}" = "i686" ]; then
 		echo 'export NO32LIBS="0"' >>$script
-		echo 'echo "$BB_ENV_EXTRAWHITE" | grep -q "NO32LIBS"' >>$script
-		echo '[ $? != 0 ] && export BB_ENV_EXTRAWHITE="NO32LIBS $BB_ENV_EXTRAWHITE"' >>$script
+		echo 'echo "$BB_ENV_PASSTHROUGH_ADDITIONS" | grep -q "NO32LIBS"' >>$script
+		echo '[ $? != 0 ] && export BB_ENV_PASSTHROUGH_ADDITIONS="NO32LIBS $BB_ENV_PASSTHROUGH_ADDITIONS"' >>$script
 	fi
 }
 
@@ -110,4 +110,5 @@ python do_testsdk() {
 }
 addtask testsdk
 do_testsdk[nostamp] = "1"
+do_testsdk[network] = "1"
 do_testsdk[depends] += "xz-native:do_populate_sysroot"

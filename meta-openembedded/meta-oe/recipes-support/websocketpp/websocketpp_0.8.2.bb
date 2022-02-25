@@ -11,6 +11,7 @@ SRC_URI = "git://github.com/zaphoyd/websocketpp.git;protocol=https;branch=master
            file://855.patch \
            file://857.patch \
            file://0001-Correct-clang-compiler-flags.patch \
+           file://1024.patch \
           "
 
 EXTRA_OECMAKE = "${@bb.utils.contains('DISTRO_FEATURES', 'ptest', '-DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON', '', d)} "

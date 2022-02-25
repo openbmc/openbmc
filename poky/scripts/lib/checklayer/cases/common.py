@@ -54,6 +54,21 @@ class CommonCheckLayer(OECheckLayerTestCase):
         '''
         get_signatures(self.td['builddir'], failsafe=False)
 
+    def test_world_inherit_class(self):
+        '''
+        This also does "bitbake -S none world" along with inheriting "yocto-check-layer"
+        class, which can do additional per-recipe test cases.
+        '''
+        msg = []
+        try:
+            get_signatures(self.td['builddir'], failsafe=False, machine=None, extravars='BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS INHERIT" INHERIT="yocto-check-layer"')
+        except RuntimeError as ex:
+            msg.append(str(ex))
+        if msg:
+            msg.insert(0, 'Layer %s failed additional checks from yocto-check-layer.bbclass\nSee below log for specific recipe parsing errors:\n' % \
+                self.tc.layer['name'])
+            self.fail('\n'.join(msg))
+
     def test_signatures(self):
         if self.tc.layer['type'] == LayerType.SOFTWARE and \
            not self.tc.test_software_layer_signatures:

@@ -5,9 +5,9 @@ Both, server and client side functions are provided. "
 HOMEPAGE = "http://www.gnupg.org/related_software/libassuan/"
 BUGTRACKER = "https://bugs.g10code.com/gnupg/index"
 
-LICENSE = "GPLv3+ & LGPLv2.1+"
-LICENSE:${PN} = "LGPLv2.1+"
-LICENSE:${PN}-doc = "GPLv3+"
+LICENSE = "GPL-3.0-or-later & LGPL-2.1-or-later"
+LICENSE:${PN} = "LGPL-2.1-or-later"
+LICENSE:${PN}-doc = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=f27defe1e96c2e1ecd4e0c9be8967949 \
                     file://COPYING.LIB;md5=2d5025d4aa3495befef8f17206a5b0a1 \
                     file://src/assuan.c;endline=20;md5=ab92143a5a2adabd06d7994d1467ea5c\

@@ -5,20 +5,26 @@ Subject: [PATCH] use closefrom() on linux and glibc 2.34+
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Rebase to 1.17.0
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
 ---
  src/posix-io.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/posix-io.c b/src/posix-io.c
-index e712ef2..ab8ded9 100644
+index 5c6cf1d..52e513a 100644
 --- a/src/posix-io.c
 +++ b/src/posix-io.c
 @@ -570,7 +570,7 @@ _gpgme_io_spawn (const char *path, char *const argv[], unsigned int flags,
                if (fd_list[i].fd > fd)
                  fd = fd_list[i].fd;
              fd++;
--#if defined(__sun) || defined(__FreeBSD__)
+-#if defined(__sun) || defined(__FreeBSD__) || defined(__GLIBC__)
 +#if defined(__sun) || defined(__FreeBSD__) || (defined(__GLIBC__) && __GNUC_PREREQ(2, 34))
              closefrom (fd);
              max_fds = fd;
  #else /*!__sun */
+-- 
+2.25.1
+

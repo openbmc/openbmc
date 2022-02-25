@@ -2,7 +2,7 @@ DESCRIPTION = "Advanced GPIO for the Raspberry Pi. Extends RPi.GPIO with PWM, \
 GPIO interrups, TCP socket interrupts, command line tools and more"
 HOMEPAGE = "https://github.com/metachris/RPIO"
 SECTION = "devel/python"
-LICENSE = "LGPLv3+"
+LICENSE = "LGPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://README.rst;beginline=41;endline=53;md5=d5d95d7486a4d98c999675c23196b25a"
 
 PYPI_PACKAGE = "RPIO"

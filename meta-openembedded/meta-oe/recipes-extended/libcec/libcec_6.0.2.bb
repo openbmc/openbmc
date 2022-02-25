@@ -14,6 +14,7 @@ SRC_URI = "git://github.com/Pulse-Eight/libcec.git;branch=release;protocol=https
            file://0001-CheckPlatformSupport.cmake-Do-not-hardcode-lib-path.patch \
            file://0001-Enhance-reproducibility.patch \
            file://0001-Remove-buggy-test-confusing-host-and-target.patch \
+           file://0001-cecloader-Match-return-type-of-function-LibCecBootlo.patch \
           "
 
 S = "${WORKDIR}/git"

@@ -3,7 +3,7 @@ SECTION = "base"
 HOMEPAGE = "http://sourceforge.net/projects/linuxquota/"
 DESCRIPTION = "Tools and patches for the Linux Diskquota system as part of the Linux kernel"
 BUGTRACKER = "http://sourceforge.net/tracker/?group_id=18136&atid=118136"
-LICENSE = "GPLv2+ & LGPLv2.1+"
+LICENSE = "GPL-2.0-or-later & LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://rquota_server.c;beginline=1;endline=20;md5=fe7e0d7e11c6f820f8fa62a5af71230f \
                     file://svc_socket.c;beginline=1;endline=17;md5=24d5a8792da45910786eeac750be8ceb"
 

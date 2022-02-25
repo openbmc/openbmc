@@ -12,8 +12,6 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  src/test/test-sizeof.c | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/src/test/test-sizeof.c b/src/test/test-sizeof.c
-index e36bee4e8f..4403c0aa52 100644
 --- a/src/test/test-sizeof.c
 +++ b/src/test/test-sizeof.c
 @@ -55,8 +55,10 @@ int main(void) {
@@ -24,10 +22,10 @@ index e36bee4e8f..4403c0aa52 100644
          info(__syscall_ulong_t);
          info(__syscall_slong_t);
 +#endif
+         info(intmax_t);
+         info(uintmax_t);
  
-         info(float);
-         info(double);
-@@ -74,7 +76,9 @@ int main(void) {
+@@ -76,7 +78,9 @@ int main(void) {
          info(ssize_t);
          info(time_t);
          info(usec_t);

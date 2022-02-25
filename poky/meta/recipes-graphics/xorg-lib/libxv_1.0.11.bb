@@ -7,7 +7,7 @@ clients, which may draw in a number of colourspaces, including YUV."
 
 require xorg-lib-common.inc
 
-LICENSE = "MIT-style"
+LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=827da9afab1f727f2a66574629e0f39c"
 
 DEPENDS += "libxext xorgproto"

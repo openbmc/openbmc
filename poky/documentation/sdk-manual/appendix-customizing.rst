@@ -264,7 +264,7 @@ source, you need to do a number of things:
    to find the configuration. The variable you need to set is
    :term:`SSTATE_MIRRORS`::
 
-      SSTATE_MIRRORS = "file://.* http://example.com/some_path/sstate-cache/PATH"
+      SSTATE_MIRRORS = "file://.* https://example.com/some_path/sstate-cache/PATH"
 
    You can set the :term:`SSTATE_MIRRORS` variable in two different places:
 

@@ -63,7 +63,7 @@ class oeSDKExtSelfTest(OESelftestTestCase):
         cls.env_eSDK = oeSDKExtSelfTest.get_esdk_environment('', cls.tmpdir_eSDKQA)
 
         sstate_config="""
-SDK_LOCAL_CONF_WHITELIST = "SSTATE_MIRRORS"
+ESDK_LOCALCONF_ALLOW = "SSTATE_MIRRORS"
 SSTATE_MIRRORS =  "file://.* file://%s/PATH"
 CORE_IMAGE_EXTRA_INSTALL = "perl"
         """ % sstate_dir
@@ -91,7 +91,7 @@ CORE_IMAGE_EXTRA_INSTALL = "perl"
 
         # Configure eSDK to use sstate mirror from poky
         sstate_config="""
-SDK_LOCAL_CONF_WHITELIST = "SSTATE_MIRRORS"
+ESDK_LOCALCONF_ALLOW = "SSTATE_MIRRORS"
 SSTATE_MIRRORS =  "file://.* file://%s/PATH"
             """ % bb_vars["SSTATE_DIR"]
         with open(os.path.join(cls.tmpdir_eSDKQA, 'conf', 'local.conf'), 'a+') as f:

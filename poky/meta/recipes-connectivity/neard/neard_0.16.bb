@@ -1,7 +1,7 @@
 SUMMARY = "Linux NFC daemon"
 DESCRIPTION = "A daemon for the Linux Near Field Communication stack"
 HOMEPAGE = "http://01.org/linux-nfc"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 
 DEPENDS = "dbus glib-2.0 libnl"
 

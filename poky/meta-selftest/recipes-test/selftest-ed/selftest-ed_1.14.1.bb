@@ -1,7 +1,7 @@
 SUMMARY = "Line-oriented text editor -- selftest variant"
 HOMEPAGE = "http://www.gnu.org/software/ed/"
 
-LICENSE = "GPLv3+"
+LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0c7051aef9219dc7237f206c5c4179a7 \
                     file://ed.h;endline=20;md5=4e36b7a40e137f42aee718165590d125 \
                     file://main.c;endline=17;md5=c5b8f78f115df187af76868a2aead16a"

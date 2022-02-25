@@ -4,7 +4,7 @@ files, then merges translations from MO files to create translated \
 XML files. It determines what to translate and how to chunk it into \
 messages using the W3C Internationalization Tag Set (ITS). "
 HOMEPAGE = "http://itstool.org/"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=59c57b95fd7d0e9e238ebbc7ad47c5a5"
 
 inherit autotools python3native

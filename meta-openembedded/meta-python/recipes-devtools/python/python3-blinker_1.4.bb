@@ -8,12 +8,12 @@ SRC_URI[sha256sum] = "471aee25f3992bd325afa3772f1063dbdbbca947a041b8b89466dc00d6
 inherit pypi setuptools3 ptest
 
 SRC_URI += " \
+	file://0001-use-pytest-instead-of-deprecated-nose.patch \
 	file://run-ptest \
 "
 
 RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
-	${PYTHON_PN}-nose \
 "
 
 do_install_ptest() {

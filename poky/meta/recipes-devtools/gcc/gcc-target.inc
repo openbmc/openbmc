@@ -44,7 +44,6 @@ FILES:${PN} = "\
     ${bindir}/${TARGET_PREFIX}gcc* \
     ${bindir}/${TARGET_PREFIX}lto* \
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/collect2* \
-    ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/cc1plus \
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/g++-mapper-server \
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/lto* \
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/lib*${SOLIBS} \
@@ -193,7 +192,7 @@ do_install () {
 	rm -f *c++*
 
 	# We don't care about the gcc-<version> ones for this
-	rm -f *gcc-?.?*
+	rm -f *gcc-?*.?*
 
 	# Not sure why we end up with these but we don't want them...
 	rm -f ${TARGET_PREFIX}${TARGET_PREFIX}*
@@ -257,4 +256,4 @@ do_install:append () {
 # and builds track file dependencies (e.g. perl and its makedepends code).
 # For determinism we don't install this ever and rely on the copy from gcc-cross.
 # [YOCTO #7287]
-SYSROOT_DIRS_BLACKLIST += "${libdir}/gcc"
+SYSROOT_DIRS_IGNORE += "${libdir}/gcc"

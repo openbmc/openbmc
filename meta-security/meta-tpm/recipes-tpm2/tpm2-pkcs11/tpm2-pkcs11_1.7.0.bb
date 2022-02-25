@@ -52,5 +52,5 @@ FILES:${PN} += "\
     ${datadir}/p11-kit/* \
     "
 
-RDEPNDS_${PN} = "tpm2-tools"
+RDEPENDS:${PN} = "tpm2-tools"
 RDEPENDS:${PN}-tools += "${PYTHON_PN}-setuptools ${PYTHON_PN}-pyyaml ${PYTHON_PN}-cryptography ${PYTHON_PN}-pyasn1-modules"

@@ -38,10 +38,10 @@ Welcome to the Yocto Project Documentation
 
 .. toctree::
    :maxdepth: 1
-   :caption: Releases manual
+   :caption: Release Manuals
    :hidden:
 
-   Release Migration Guides <migration-guides/index>
+   Release Information <migration-guides/index>
    releases
 
 .. toctree::

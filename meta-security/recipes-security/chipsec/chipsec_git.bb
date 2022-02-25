@@ -20,7 +20,7 @@ EXTRA_OEMAKE = "CC='${CC}' LDFLAGS='${LDFLAGS}' CFLAGS='${CFLAGS}'"
 DEPENDS = "virtual/kernel nasm-native python3-setuptools-native"
 RDEPENDS:${PN} += "python3 python3-modules"
 
-inherit module distutils3
+inherit module setuptools3
 
 do_compile:append() {
 	cd ${S}/drivers/linux

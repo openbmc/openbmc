@@ -24,7 +24,7 @@ import scriptpath
 scriptpath.add_oe_lib_path()
 scriptpath.add_bitbake_lib_path()
 
-from checklayer import LayerType, detect_layers, add_layers, add_layer_dependencies, get_layer_dependencies, get_signatures, check_bblayers
+from checklayer import LayerType, detect_layers, add_layers, add_layer_dependencies, get_layer_dependencies, get_signatures, check_bblayers, sanity_check_layers
 from oeqa.utils.commands import get_bb_vars
 
 PROGNAME = 'yocto-check-layer'
@@ -40,6 +40,12 @@ def test_layer(td, layer, test_software_layer_signatures):
     tc = CheckLayerTestContext(td=td, logger=logger, layer=layer, test_software_layer_signatures=test_software_layer_signatures)
     tc.loadTests(CASES_PATHS)
     return tc.runTests()
+
+def dump_layer_debug(layer):
+    logger.debug("Found layer %s (%s)" % (layer["name"], layer["path"]))
+    collections = layer.get("collections", {})
+    if collections:
+        logger.debug("%s collections: %s" % (layer["name"], ", ".join(collections)))
 
 def main():
     parser = argparse.ArgumentParser(
@@ -105,6 +111,17 @@ def main():
         dep_layers = dep_layers + layers
     else:
         dep_layers = layers
+
+    logger.debug("Found additional layers:")
+    for l in additional_layers:
+        dump_layer_debug(l)
+    logger.debug("Found dependency layers:")
+    for l in dep_layers:
+        dump_layer_debug(l)
+
+    if not sanity_check_layers(additional_layers + dep_layers, logger):
+        logger.error("Failed layer validation")
+        return 1
 
     logger.info("Detected layers:")
     for layer in layers:

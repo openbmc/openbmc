@@ -1683,12 +1683,12 @@ if True:
                 t=request.POST['configvarDel'].strip()
                 pt = ProjectVariable.objects.get(pk = int(t)).delete()
 
-            # return all project settings, filter out blacklist and elsewhere-managed variables
-            vars_managed,vars_fstypes,vars_blacklist = get_project_configvars_context()
+            # return all project settings, filter out disallowed and elsewhere-managed variables
+            vars_managed,vars_fstypes,vars_disallowed = get_project_configvars_context()
             configvars_query = ProjectVariable.objects.filter(project_id = pid).all()
             for var in vars_managed:
                 configvars_query = configvars_query.exclude(name = var)
-            for var in vars_blacklist:
+            for var in vars_disallowed:
                 configvars_query = configvars_query.exclude(name = var)
 
             return_data = {
@@ -1781,7 +1781,7 @@ if True:
             'MACHINE', 'BBLAYERS'
         }
 
-        vars_blacklist  = {
+        vars_disallowed  = {
             'PARALLEL_MAKE','BB_NUMBER_THREADS',
             'BB_DISKMON_DIRS','BB_NUMBER_THREADS','CVS_PROXY_HOST','CVS_PROXY_PORT',
             'PARALLEL_MAKE','TMPDIR',
@@ -1790,7 +1790,7 @@ if True:
 
         vars_fstypes = Target_Image_File.SUFFIXES
 
-        return(vars_managed,sorted(vars_fstypes),vars_blacklist)
+        return(vars_managed,sorted(vars_fstypes),vars_disallowed)
 
     def projectconf(request, pid):
 
@@ -1799,12 +1799,12 @@ if True:
         except Project.DoesNotExist:
             return HttpResponseNotFound("<h1>Project id " + pid + " is unavailable</h1>")
 
-        # remove blacklist and externally managed varaibles from this list
-        vars_managed,vars_fstypes,vars_blacklist = get_project_configvars_context()
+        # remove disallowed and externally managed varaibles from this list
+        vars_managed,vars_fstypes,vars_disallowed = get_project_configvars_context()
         configvars = ProjectVariable.objects.filter(project_id = pid).all()
         for var in vars_managed:
             configvars = configvars.exclude(name = var)
-        for var in vars_blacklist:
+        for var in vars_disallowed:
             configvars = configvars.exclude(name = var)
 
         context = {
@@ -1812,7 +1812,7 @@ if True:
             'configvars':       configvars,
             'vars_managed':     vars_managed,
             'vars_fstypes':     vars_fstypes,
-            'vars_blacklist':   vars_blacklist,
+            'vars_disallowed':  vars_disallowed,
         }
 
         try:

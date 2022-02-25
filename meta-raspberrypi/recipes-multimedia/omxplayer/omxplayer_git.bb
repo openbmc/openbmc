@@ -4,7 +4,7 @@ Raspberry PI implementation and is quite handy to use standalone"
 HOMEPAGE = "https://github.com/popcornmix/omxplayer"
 SECTION = "console/utils"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=00a27da7ac0f9bcd17320ec29ef4bbf6"
 
 DEPENDS = "libpcre libav virtual/egl boost freetype dbus openssl libssh virtual/libomxil coreutils-native curl-native userland"

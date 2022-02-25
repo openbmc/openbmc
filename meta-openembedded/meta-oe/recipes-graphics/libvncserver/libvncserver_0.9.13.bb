@@ -5,10 +5,10 @@ PRIORITY = "optional"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=361b6b837cad26c6900a926b62aada5f"
 
+# ffmpeg support is not currently compatible with ffmpeg 5.0
 PACKAGECONFIG ??= " \
     24bpp \
     filetransfer \
-    ${@bb.utils.contains('LICENSE_FLAGS_WHITELIST','commercial','ffmpeg','',d)} \
     gcrypt \
     gnutls \
     jpeg \

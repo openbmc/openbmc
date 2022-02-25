@@ -31,16 +31,12 @@ Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
  src/shared/base-filesystem.c |  6 +++---
  2 files changed, 24 insertions(+), 5 deletions(-)
 
-diff --git a/src/basic/fs-util.h b/src/basic/fs-util.h
-index 7f15b558ca..4263298cad 100644
 --- a/src/basic/fs-util.h
 +++ b/src/basic/fs-util.h
-@@ -47,8 +47,27 @@ int futimens_opath(int fd, const struct timespec ts[2]);
+@@ -46,8 +46,27 @@ int futimens_opath(int fd, const struct
  int fd_warn_permissions(const char *path, int fd);
  int stat_warn_permissions(const char *path, const struct stat *st);
  
--#define laccess(path, mode)                                             \
--        (faccessat(AT_FDCWD, (path), (mode), AT_SYMLINK_NOFOLLOW) < 0 ? -errno : 0)
 +/*
 +   Avoid using AT_SYMLINK_NOFOLLOW flag. It doesn't seem like the right thing to
 +   do and it's not portable (not supported by musl). See:
@@ -60,16 +56,15 @@ index 7f15b558ca..4263298cad 100644
 +   or why it needs to return success for broken symlinks. Maybe just historical
 +   and not actually necessary or desired behaviour?
 +*/
-+
-+#define laccess(path, mode) faccessat(AT_FDCWD, (path), (mode), 0)
+ #define laccess(path, mode)                                             \
+-        RET_NERRNO(faccessat(AT_FDCWD, (path), (mode), AT_SYMLINK_NOFOLLOW))
++        RET_NERRNO(faccessat(AT_FDCWD, (path), (mode), 0))
  
  int touch_file(const char *path, bool parents, usec_t stamp, uid_t uid, gid_t gid, mode_t mode);
  int touch(const char *path);
-diff --git a/src/shared/base-filesystem.c b/src/shared/base-filesystem.c
-index 016eb7b82a..b1967f9f2f 100644
 --- a/src/shared/base-filesystem.c
 +++ b/src/shared/base-filesystem.c
-@@ -53,7 +53,7 @@ int base_filesystem_create(const char *root, uid_t uid, gid_t gid) {
+@@ -117,7 +117,7 @@ int base_filesystem_create(const char *r
                  return log_error_errno(errno, "Failed to open root file system: %m");
  
          for (size_t i = 0; i < ELEMENTSOF(table); i++) {
@@ -78,7 +73,7 @@ index 016eb7b82a..b1967f9f2f 100644
                          continue;
  
                  if (table[i].target) {
-@@ -61,7 +61,7 @@ int base_filesystem_create(const char *root, uid_t uid, gid_t gid) {
+@@ -125,7 +125,7 @@ int base_filesystem_create(const char *r
  
                          /* check if one of the targets exists */
                          NULSTR_FOREACH(s, table[i].target) {
@@ -87,7 +82,7 @@ index 016eb7b82a..b1967f9f2f 100644
                                          continue;
  
                                  /* check if a specific file exists at the target path */
-@@ -72,7 +72,7 @@ int base_filesystem_create(const char *root, uid_t uid, gid_t gid) {
+@@ -136,7 +136,7 @@ int base_filesystem_create(const char *r
                                          if (!p)
                                                  return log_oom();
  

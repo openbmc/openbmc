@@ -19,7 +19,7 @@ PACKAGECONFIG[manpages] = ""
 # first place
 EXTRA_OECMAKE = "-DENABLE_EXAMPLES=OFF -DENABLE_APP=OFF -DENABLE_HPACK_TOOLS=OFF"
 
-PACKAGES =+ "lib${PN} ${PN}-client ${PN}-proxy ${PN}-server"
+PACKAGES =+ "lib${BPN} ${PN}-client ${PN}-proxy ${PN}-server"
 
 RDEPENDS:${PN} = "${PN}-client (>= ${PV}) ${PN}-proxy (>= ${PV}) ${PN}-server (>= ${PV})"
 RDEPENDS:${PN}:class-native = ""
@@ -27,7 +27,7 @@ RDEPENDS:${PN}-proxy = "openssl python3-core python3-io python3-shell"
 
 ALLOW_EMPTY:${PN} = "1"
 FILES:${PN} = ""
-FILES:lib${PN} = "${libdir}/*${SOLIBS}"
+FILES:lib${BPN} = "${libdir}/*${SOLIBS}"
 FILES:${PN}-client = "${bindir}/h2load ${bindir}/nghttp"
 FILES:${PN}-proxy = "${bindir}/nghttpx ${datadir}/${BPN}/fetch-ocsp-response"
 FILES:${PN}-server = "${bindir}/nghttpd"

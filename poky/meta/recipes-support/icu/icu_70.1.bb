@@ -147,4 +147,4 @@ do_make_icudata() {
     :
 }
 
-addtask make_icudata before do_configure after do_patch
+addtask make_icudata before do_configure after do_patch do_prepare_recipe_sysroot

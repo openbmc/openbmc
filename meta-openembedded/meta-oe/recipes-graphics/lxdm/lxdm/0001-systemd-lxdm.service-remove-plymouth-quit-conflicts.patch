@@ -1,0 +1,38 @@
+From f662906c52f264e4c139e402932103f47269aa1b Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Mon, 24 Jan 2022 17:16:15 +0800
+Subject: [PATCH] systemd/lxdm.service: remove plymouth-quit conflicts
+
+When use plymouth[1] with lxdm, the plymouth boot splash screen
+will hang there as lxdm.service conflicts with plymouth-quit.service
+and plymouth-quit will fail to start if plymouth-quit.service and
+lxdm.service start at the same time and it will result in the boot
+screen hang forever.
+
+Consider there is also After setting for these two services, so
+remove the conflicts setting to make the service start as expected.
+
+[1] https://gitlab.freedesktop.org/plymouth/plymouth/-/tree/main
+
+Upstream-Status: Submitted [https://sourceforge.net/p/lxdm/code/merge-requests/3]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ systemd/lxdm.service | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/systemd/lxdm.service b/systemd/lxdm.service
+index bf4a0a8..90d8cdb 100644
+--- a/systemd/lxdm.service
++++ b/systemd/lxdm.service
+@@ -1,6 +1,6 @@
+ [Unit]
+ Description=LXDE Display Manager
+-Conflicts=getty@tty1.service plymouth-quit.service
++Conflicts=getty@tty1.service
+ After=systemd-user-sessions.service getty@tty1.service plymouth-quit.service
+ 
+ [Service]
+-- 
+2.17.1
+

@@ -7,7 +7,7 @@ input devices other than the core X keyboard and pointer.  It allows \
 client programs to select input from these devices independently from \
 each other and independently from the core devices."
 
-LICENSE = "MIT & MIT-style"
+LICENSE = "MIT & MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=17b064789fab936a1c58c4e13d965b0f \
                     file://src/XIGetDevFocus.c;endline=23;md5=cdfb0d435a33ec57ea0d1e8e395b729f"
 

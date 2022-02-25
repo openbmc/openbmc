@@ -23,8 +23,8 @@ do_install:append () {
 python populate_packages:prepend () {
     rootdir = bb.data.expand('${libdir}/ao/plugins-4', d)
     rootdir_dbg = bb.data.expand('${libdir}/ao/plugins-4/.debug', d)
-    do_split_packages(d, rootdir, '^(.*)\.so$', output_pattern='${BPN}-plugin-%s', description='AO %s plugin')
-    do_split_packages(d, rootdir_dbg, '^(.*)\.so$', output_pattern='${BPN}-plugin-%s-dbg', description='AO %s plugin debug data')
+    do_split_packages(d, rootdir, r'^(.*)\.so$', output_pattern='${BPN}-plugin-%s', description='AO %s plugin')
+    do_split_packages(d, rootdir_dbg, r'^(.*)\.so$', output_pattern='${BPN}-plugin-%s-dbg', description='AO %s plugin debug data')
 }
 
 PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'alsa pulseaudio', d)}"

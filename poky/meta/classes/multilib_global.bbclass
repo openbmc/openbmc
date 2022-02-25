@@ -137,14 +137,14 @@ def preferred_ml_updates(d):
         prov = prov.replace("virtual/", "")
         return "virtual/" + prefix + "-" + prov
 
-    mp = (d.getVar("MULTI_PROVIDER_WHITELIST") or "").split()
+    mp = (d.getVar("BB_MULTI_PROVIDER_ALLOWED") or "").split()
     extramp = []
     for p in mp:
         if p.endswith("-native") or "-crosssdk-" in p or p.startswith(("nativesdk-", "virtual/nativesdk-")) or 'cross-canadian' in p:
             continue
         for pref in prefixes:
             extramp.append(translate_provide(pref, p))
-    d.setVar("MULTI_PROVIDER_WHITELIST", " ".join(mp + extramp))
+    d.setVar("BB_MULTI_PROVIDER_ALLOWED", " ".join(mp + extramp))
 
     abisafe = (d.getVar("SIGGEN_EXCLUDERECIPES_ABISAFE") or "").split()
     extras = []

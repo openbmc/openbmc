@@ -1,5 +1,5 @@
 SUMMARY = "Tools for erofs filesystems"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 SECTION = "base"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94fa01670a2a8f2d3ab2de15004e0848"
 HOMEPAGE = "https://git.kernel.org/pub/scm/linux/kernel/git/xiang/erofs-utils.git/tree/README"

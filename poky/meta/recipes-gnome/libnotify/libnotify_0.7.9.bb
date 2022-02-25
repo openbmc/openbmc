@@ -6,7 +6,7 @@ in the user's way."
 HOMEPAGE = "https://gitlab.gnome.org/GNOME/libnotify"
 BUGTRACKER = "https://gitlab.gnome.org/GNOME/libnotify/issues"
 SECTION = "libs"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=7fbc338309ac38fefcd64b04bb903e34"
 
 DEPENDS = "dbus glib-2.0 gdk-pixbuf"
@@ -35,4 +35,4 @@ RCONFLICTS:${PN} += "libnotify3"
 RREPLACES:${PN} += "libnotify3"
 
 # -7381 is specific to the NodeJS bindings
-CVE_CHECK_WHITELIST += "CVE-2013-7381"
+CVE_CHECK_IGNORE += "CVE-2013-7381"

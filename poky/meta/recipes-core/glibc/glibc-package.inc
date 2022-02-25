@@ -1,6 +1,6 @@
 INHIBIT_SYSROOT_STRIP = "1"
 
-PACKAGES = "${PN}-dbg catchsegv sln nscd ldconfig ldd tzcode glibc-thread-db ${PN}-pic libmemusage malloc-debug libnss-db libsegfault ${PN}-pcprofile libsotruss ${PN} ${PN}-utils glibc-extra-nss ${PN}-dev ${PN}-staticdev ${PN}-doc ${PN}-src"
+PACKAGES = "${PN}-dbg sln nscd ldconfig ldd ldso tzcode glibc-thread-db ${PN}-pic libmemusage malloc-debug libnss-db ${PN}-pcprofile libsotruss ${PN} ${PN}-utils glibc-extra-nss ${PN}-dev ${PN}-staticdev ${PN}-doc ${PN}-src"
 
 # The ld.so in this glibc supports the GNU_HASH
 RPROVIDES:${PN} = "eglibc rtld(GNU_HASH)"
@@ -23,12 +23,13 @@ ARCH_DYNAMIC_LOADER:aarch64 = "ld-linux-${TARGET_ARCH}.so.1"
 libc_baselibs:append = " ${@oe.utils.conditional('ARCH_DYNAMIC_LOADER', '', '', '${root_prefix}/lib/${ARCH_DYNAMIC_LOADER}', d)}"
 INSANE_SKIP:${PN}:append:aarch64 = " libdir"
 INSANE_SKIP:${PN}-dev += "staticdev"
+INSANE_SKIP:${MLPREFIX}ldso:append = " dev-so libdir"
 
 FILES:${PN} = "${libc_baselibs} ${libexecdir}/* ${sysconfdir}/ld.so.conf"
 RRECOMMENDS:${PN} = "${@bb.utils.contains('DISTRO_FEATURES', 'ldconfig', '${MLPREFIX}ldconfig', '', d)}"
 FILES:ldconfig = "${base_sbindir}/ldconfig"
 FILES:ldd = "${bindir}/ldd"
-FILES:libsegfault = "${base_libdir}/libSegFault*"
+FILES:ldso = "${bindir}/${MLPREFIX}ld.so"
 FILES:libmemusage = "${base_libdir}/libmemusage.so"
 FILES:malloc-debug = "${base_libdir}/libc_malloc_debug.so.0"
 FILES:libnss-db = "${base_libdir}/libnss_db.so.* ${base_libdir}/libnss_db-*.so ${localstatedir}/db/Makefile ${localstatedir}/db/makedbs.sh"
@@ -46,8 +47,6 @@ FILES:nscd = "${sbindir}/nscd* ${sysconfdir}/init.d/nscd ${systemd_system_unitdi
 FILES:${PN}-mtrace = "${bindir}/mtrace"
 FILES:tzcode = "${bindir}/tzselect ${sbindir}/zic ${bindir}/zdump"
 FILES:${PN}-utils = "${bindir}/* ${sbindir}/*"
-FILES:catchsegv = "${bindir}/catchsegv"
-RDEPENDS:catchsegv = "libsegfault"
 FILES:${PN}-pcprofile = "${base_libdir}/libpcprofile.so"
 FILES:glibc-thread-db = "${base_libdir}/libthread_db.so.* ${base_libdir}/libthread_db-*.so"
 RPROVIDES:${PN}-dev += "libc-dev"
@@ -121,6 +120,9 @@ do_install() {
 	fi
         ln -rs ${D}${base_libdir}/libpthread.so.0 ${D}${libdir}/libpthread.so
         ln -rs ${D}${base_libdir}/librt.so.1 ${D}${libdir}/librt.so
+        if [ -n "${MLPREFIX}" ]; then
+                mv ${D}${bindir}/ld.so ${D}${bindir}/${MLPREFIX}ld.so
+        fi
 }
 
 def get_libc_fpu_setting(bb, d):
@@ -160,6 +162,7 @@ do_install_armmultilib () {
 	oe_multilib_header bits/shm.h bits/sigstack.h bits/stat.h bits/statfs.h bits/typesizes.h
 	oe_multilib_header bits/procfs-id.h bits/procfs.h bits/shmlba.h
 	oe_multilib_header bits/struct_stat.h bits/pthread_stack_min.h
+	oe_multilib_header bits/dl_find_object.h bits/rseq.h bits/timesize.h
 
 	oe_multilib_header fpu_control.h gnu/lib-names.h gnu/stubs.h ieee754.h
 
