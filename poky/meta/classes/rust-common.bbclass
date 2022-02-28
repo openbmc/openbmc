@@ -65,7 +65,7 @@ def rust_base_triple(d, thing):
     if thing == "TARGET" and target_is_armv7(d):
         arch = "armv7"
     else:
-        arch = d.getVar('{}_ARCH'.format(thing))
+        arch = oe.rust.arch_to_rust_arch(d.getVar('{}_ARCH'.format(thing)))
 
     # All the Yocto targets are Linux and are 'unknown'
     vendor = "-unknown"

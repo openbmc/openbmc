@@ -313,10 +313,12 @@ def rust_gen_target(d, thing, wd, features, cpu, arch, abi=""):
     sys = sys_for(d, thing)
     prefix = prefix_for(d, thing)
 
+    rust_arch = oe.rust.arch_to_rust_arch(arch)
+
     if abi:
-        arch_abi = "{}-{}".format(arch, abi)
+        arch_abi = "{}-{}".format(rust_arch, abi)
     else:
-        arch_abi = arch
+        arch_abi = rust_arch
 
     features = features or d.getVarFlag('FEATURES', arch_abi) or ""
     features = features.strip()
@@ -329,7 +331,7 @@ def rust_gen_target(d, thing, wd, features, cpu, arch, abi=""):
     tspec['target-pointer-width'] = d.getVarFlag('TARGET_POINTER_WIDTH', arch_abi)
     tspec['target-c-int-width'] = d.getVarFlag('TARGET_C_INT_WIDTH', arch_abi)
     tspec['target-endian'] = d.getVarFlag('TARGET_ENDIAN', arch_abi)
-    tspec['arch'] = arch_to_rust_target_arch(arch)
+    tspec['arch'] = arch_to_rust_target_arch(rust_arch)
     tspec['os'] = "linux"
     if "musl" in tspec['llvm-target']:
         tspec['env'] = "musl"
