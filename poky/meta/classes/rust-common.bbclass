@@ -89,6 +89,10 @@ def rust_base_triple(d, thing):
         libc = bb.utils.contains('TUNE_FEATURES', 'callconvention-hard', 'hf', '', d)
     return arch + vendor + '-' + os + libc
 
+
+# In some cases uname and the toolchain differ on their idea of the arch name
+RUST_BUILD_ARCH = "${@oe.rust.arch_to_rust_arch(d.getVar('BUILD_ARCH'))}"
+
 # Naming explanation
 # Yocto
 # - BUILD_SYS - Yocto triple of the build environment
