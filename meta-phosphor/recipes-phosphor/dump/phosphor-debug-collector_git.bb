@@ -60,6 +60,7 @@ SYSTEMD_SUBSTITUTIONS += "BMC_DUMP_PATH:${bmc_dump_path}:${MGR_SVC}"
 
 FILES:${PN}-manager +=  " \
     ${bindir}/phosphor-dump-manager \
+    ${bindir}/phosphor-offload-handler \
     ${exec_prefix}/lib/tmpfiles.d/coretemp.conf \
     ${datadir}/dump/ \
     "
