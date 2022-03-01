@@ -2,8 +2,9 @@ FILESEXTRAPATHS:prepend:kudo := "${THISDIR}/${PN}:"
 
 CHASSIS_ACTION_TARGETS:append:kudo = " powercycle"
 
-STATE_MGR_PACKAGES:remove:kudo = " ${PN}-host-check ${PN}-reset-sensor-states"
+STATE_MGR_PACKAGES:remove:kudo = " ${PN}-host-check ${PN}-reset-sensor-states ${PN}-chassis-check-power-status"
 SYSTEMD_PACKAGES:remove:kudo = " ${PN}-reset-sensor-states"
+DBUS_SERVICE:${PN}-bmc:remove:kudo = " obmc-bmc-service-quiesce@.target"
 RRECOMMENDS:${PN}-host:remove:kudo = " ${PN}-host-check ${PN}-reset-sensor-states"
 
 pkg_postinst:${PN}-obmc-targets:append:kudo() {
