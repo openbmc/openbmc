@@ -18,6 +18,7 @@ RemainAfterExit=yes
 ExecStart=M_SCRIPT_INSTALL_DIR/usb_network.sh \
     --product-id "M_BMC_USB_PRODUCT_ID" \
     --product-name "M_BMC_USB_PRODUCT_NAME" \
+    --dev-type "M_BMC_USB_TYPE" \
     HOST_MAC_ARG(M_BMC_USB_HOST_MAC) \
     DEV_MAC_ARG(M_BMC_USB_DEV_MAC) \
     --bind-device "M_BMC_USB_BIND_DEV"

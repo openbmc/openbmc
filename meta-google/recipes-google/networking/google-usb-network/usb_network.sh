@@ -23,6 +23,7 @@ ARGUMENT_LIST=(
     "host-mac:"
     "bind-device:"
     "dev-mac:"
+    "dev-type:"
     "gadget-dir-name:"
     "iface-name:"
 )
@@ -35,6 +36,7 @@ $0 [OPTIONS] [stop|start]
         --product-name Product name string (en) for the gadget.
         --host-mac MAC address of the host part of the connection. Optional.
         --dev-mac MAC address of the device (gadget) part of the connection. Optional.
+        --dev-type Type of gadget to instantiate. Default: "eem"
         --bind-device Name of the device to bind, as listed in /sys/class/udc/
         --gadget-dir-name Optional base name for gadget directory. Default: "g1"
         --iface-name Optional name of the network interface. Default: "usb0"
@@ -71,9 +73,9 @@ EOF
     mkdir -p "${config_dir}"
     echo 100 > "${config_dir}/MaxPower"
     mkdir -p "${config_dir}/strings/0x409"
-    echo "EEM" > "${config_dir}/strings/0x409/configuration"
+    echo "${DEV_TYPE^^}" > "${config_dir}/strings/0x409/configuration"
 
-    local func_dir="${gadget_dir}/functions/eem.${IFACE_NAME}"
+    local func_dir="${gadget_dir}/functions/${DEV_TYPE}.${IFACE_NAME}"
     mkdir -p "${func_dir}"
 
     if [[ -n $HOST_MAC_ADDR ]]; then
@@ -91,11 +93,11 @@ EOF
 
 gadget_stop() {
     local gadget_dir="${CONFIGFS_HOME}/usb_gadget/${GADGET_DIR_NAME}"
-    rm -f ${gadget_dir}/configs/c.1/eem.${IFACE_NAME}
+    rm -f ${gadget_dir}/configs/c.1/${DEV_TYPE}.${IFACE_NAME}
     rm -rf ${gadget_dir}/configs/c.1/strings/0x409
     rm -rf ${gadget_dir}/configs/c.1
     rm -rf ${gadget_dir}/strings/0x409
-    rm -rf ${gadget_dir}/functions/eem.${IFACE_NAME}
+    rm -rf ${gadget_dir}/functions/${DEV_TYPE}.${IFACE_NAME}
     rm -rf ${gadget_dir}
 
     rm -f /run/systemd/network/+-bmc-"${IFACE_NAME}".network
@@ -117,6 +119,7 @@ ID_PRODUCT=""
 STR_EN_VENDOR="Google"
 STR_EN_PRODUCT=""
 DEV_MAC_ADDR=""
+DEV_TYPE="eem"
 HOST_MAC_ADDR=""
 BIND_DEVICE=""
 ACTION="start"
@@ -138,6 +141,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --dev-mac)
             DEV_MAC_ADDR=$2
+            shift 2
+            ;;
+        --dev-type)
+            DEV_TYPE=$2
             shift 2
             ;;
         --bind-device)

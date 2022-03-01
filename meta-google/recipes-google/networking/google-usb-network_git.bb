@@ -25,6 +25,7 @@ BMC_USB_ECM_DEV_MAC ??= "invalid"
 BMC_USB_ECM_BIND_DEV ??= ""
 BMC_USB_CONFIG_PRIORITY ??= ""
 BMC_USB_CONFIG_FILENAME ??= "${BMC_USB_CONFIG_PRIORITY}-bmc-usb0.network"
+BMC_USB_TYPE ??= "eem"
 
 SRC_URI += "file://00-bmc-usb0.network.m4"
 SRC_URI += "file://usb_network.service.m4"
@@ -44,6 +45,7 @@ do_compile() {
     m4 \
         -DM_BMC_USB_PRODUCT_ID="${BMC_USB_ECM_PRODUCT_ID}" \
         -DM_BMC_USB_PRODUCT_NAME="${BMC_USB_ECM_PRODUCT_NAME}" \
+        -DM_BMC_USB_TYPE="${BMC_USB_TYPE}" \
         -DM_BMC_USB_HOST_MAC="${BMC_USB_ECM_HOST_MAC}" \
         -DM_BMC_USB_DEV_MAC="${BMC_USB_ECM_DEV_MAC}" \
         -DM_BMC_USB_BIND_DEV="${BMC_USB_ECM_BIND_DEV}" \
