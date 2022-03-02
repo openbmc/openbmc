@@ -108,7 +108,7 @@ while true; do
       pfx="$(ip_bytes_to_str t_pfx_b)"
       (( t_pfx_b[9] &= 0xf0 ))
       stateless_pfx="$(ip_bytes_to_str t_pfx_b)"
-    elif [[ "$line" =~ ^'DNS search list'' '*:' '*([^.-]*)[^.]*[.](.*.google.com)$ ]]; then
+    elif [[ "$line" =~ ^'DNS search list'' '*:' '*([a-z]+[0-9]+)[^.]*[.](.*.google.com)$ ]]; then
       host="${BASH_REMATCH[1]}"
       domain="${BASH_REMATCH[2]}"
     elif [[ "$line" =~ ^from' '(.*)$ ]]; then
