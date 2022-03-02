@@ -200,11 +200,21 @@ if [ "$SLED_PRESENT" != 0 ];then
 fi
 
 if [[ "$ACTION" == "on" ]]; then
-    echo "Power on ${SLED}"
-    trigger_power_button  "$SLED_NUM"  "$DELAY_POWER_ON"
+    if [ "$(get_ac_status "$SLED_NUM")" == "AC on" ];then
+        echo "Power on ${SLED}"
+        trigger_power_button  "$SLED_NUM"  "$DELAY_POWER_ON"
+    else
+        echo "${SLED} is ac-off, please turn on ac before power on"
+        exit 1
+    fi
 elif [[ "$ACTION" == "off" ]];then
-    echo "Power off ${SLED}"
-    trigger_power_button  "$SLED_NUM"  "$DELAY_POWER_OFF"
+    if [ "$(get_ac_status "$SLED_NUM")" == "AC on" ];then
+        echo "Power off ${SLED}"
+        trigger_power_button  "$SLED_NUM"  "$DELAY_POWER_OFF"
+    else
+        echo "${SLED} is already ac-off"
+        exit 1
+    fi
 elif [[ "$ACTION" == "status" ]];then
     get_ac_status "$SLED_NUM"
     #TODO : check or record Host(DC) power status
@@ -215,12 +225,12 @@ elif [[ "$ACTION" == "ac-off" ]];then
 elif [[ "$ACTION" == "dfu" ]]; then
     echo "Set host$SLED_NUM DFU mode"
 
-    # turn ac off
+    # turn ac off, and hold for 25 seconds
     echo "SLED$SLED_NUM: turn ac-off"
     set_gpio "power-host${SLED_NUM}" 0
-    sleep 1
+    sleep 25
 
-    # press power button, and hold for 10 seconds
+    # press power button
     echo "SLED$SLED_NUM: pressing power button"
     if ! press_power_button "$SLED_NUM"; then
         echo "SLED$SLED_NUM: press power button failed"
@@ -228,7 +238,7 @@ elif [[ "$ACTION" == "dfu" ]]; then
         release_power_button "$SLED_NUM"
         exit 1
     fi
-    sleep 10
+    sleep 1
 
     # turn ac on
     echo "SLED$SLED_NUM: turn ac-on"
