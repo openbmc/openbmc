@@ -1,6 +1,8 @@
 SUMMARY = "sdbus++ dbus API / binding generator"
 DESCRIPTION = "Generates bindings against sdbusplus for dbus APIs"
 
+PYPI_PACKAGE = "sdbusplus"
+PV = "1.0"
 inherit setuptools3
 
 include sdbusplus-rev.inc
