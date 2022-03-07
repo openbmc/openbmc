@@ -35,7 +35,7 @@ def dict_merge(target, source, remove):
         if k in target and isinstance(target[k], dict):
             dict_merge(target[k], v, remove)
         else:
-            if remove is True:
+            if remove is True and k in target:
                 target.pop(k)
             else:
                 target[k] = copy.deepcopy(v)
