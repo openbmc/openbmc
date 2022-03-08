@@ -35,7 +35,7 @@ do_install:append() {
   fi
 
   # Build time dictionary sanity check
-  bash -c 'declare -A dict=(${GBMC_MAC_IF_MAP})'
+  bash -c "declare -A dict=(${GBMC_MAC_IF_MAP})"
 
   sed gbmc-mac-config.sh.in \
     -e 's#@EEPROM@#${GBMC_MAC_EEPROM_OF_NAME}#' \
