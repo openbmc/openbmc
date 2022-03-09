@@ -7,6 +7,7 @@ inherit phosphor-settings-manager
 inherit native
 
 SRC_URI += "file://defaults.yaml"
+SRC_URI += "file://host-template.yaml"
 
 PROVIDES += "virtual/phosphor-settings-defaults"
 
@@ -16,4 +17,10 @@ do_install() {
         DEST=${D}${settings_datadir}
         install -d ${DEST}
         install defaults.yaml ${DEST}
+
+        for i in ${OBMC_HOST_INSTANCES};
+        do
+                cat host-template.yaml | sed "s/{}/${i}/g" >> ${DEST}/defaults.yaml
+
+        done
 }
