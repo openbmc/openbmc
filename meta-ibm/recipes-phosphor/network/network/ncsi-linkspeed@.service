@@ -1,0 +1,14 @@
+[Unit]
+Description=Set %i gigabit link speed
+After=network.target
+
+[Service]
+Restart=no
+ExecCondition=/lib/systemd/systemd-networkd-wait-online --timeout 30 -i %i
+# package 0, channel 0, oem command, see Intel I210 datasheet section 10.6.3.10.1
+ExecStart=/usr/libexec/ncsi-netlink-ifindex %i -p 0 -c 0 -o 00000157200001
+SyslogIdentifier=nsci-linkspeed
+Type=oneshot
+
+[Install]
+WantedBy=network.target

@@ -1,0 +1,13 @@
+[Unit]
+Description=Stop %i link failover
+After=network.target
+
+[Service]
+Restart=no
+ExecCondition=/lib/systemd/systemd-networkd-wait-online --timeout 30 -i %i
+ExecStart=/usr/libexec/ncsi-netlink-ifindex %i --set -p 0 -c 0
+SyslogIdentifier=nsci-failover
+Type=oneshot
+
+[Install]
+WantedBy=network.target

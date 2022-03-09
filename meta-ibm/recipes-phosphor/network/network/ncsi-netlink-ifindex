@@ -1,0 +1,12 @@
+#!/bin/sh
+
+IFPATH="/sys/class/net/$1/ifindex"
+
+if [ ! -f "${IFPATH}" ]
+then
+	echo Error: "${IFPATH}" does not exist 1>&2
+	exit 2
+fi
+
+shift
+ncsi-netlink -x "$(cat "${IFPATH}")" "$@"
