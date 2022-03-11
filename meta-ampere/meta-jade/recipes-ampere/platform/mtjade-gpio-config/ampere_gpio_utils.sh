@@ -10,7 +10,6 @@ function usage() {
 
 set_gpio_power_off() {
 	echo "Setting GPIO before Power off"
-	gpio_configure_output "$OCP_MAIN_PWREN" 0
 	rm -f /run/openbmc/host@0-on
 }
 
@@ -20,7 +19,6 @@ set_gpio_power_on() {
 	if [ "$val" == 1 ]; then
 		exit
 	fi
-	gpio_configure_output "$OCP_MAIN_PWREN" 1
 	gpio_configure_output "$SPI0_PROGRAM_SEL" 1
 	gpio_configure_output "$SPI0_BACKUP_SEL" 0
 }
