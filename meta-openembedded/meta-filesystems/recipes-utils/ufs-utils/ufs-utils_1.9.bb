@@ -6,7 +6,7 @@ BRANCH ?= "dev"
 
 SRCREV = "517c0b01e47d4441cc45be351509fb4c96843d5a"
 
-SRC_URI = "git://github.com/westerndigitalcorporation/ufs-utils.git;protocol=git;branch=${BRANCH} \
+SRC_URI = "git://github.com/westerndigitalcorporation/ufs-utils.git;protocol=https;branch=${BRANCH} \
            file://0001-Use-asm-type.h-for-kernel-types.patch \
 "
 

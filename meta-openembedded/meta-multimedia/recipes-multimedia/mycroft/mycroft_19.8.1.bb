@@ -7,7 +7,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=79aa497b11564d1d419ee889e7b498f6"
 
 SRCREV = "913f29d3d550637934f9abf43a097eb2c30d76fc"
-SRC_URI = "git://github.com/MycroftAI/mycroft-core.git;branch=master \
+SRC_URI = "git://github.com/MycroftAI/mycroft-core.git;branch=master;protocol=https \
            file://0001-Remove-python-venv.patch \
            file://0002-dev_setup.sh-Remove-the-git-dependency.patch \
            file://0003-dev_setup.sh-Remove-the-TERM-dependency.patch \

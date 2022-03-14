@@ -1,3 +1,8 @@
 #!/bin/sh
 
 python3 $(dirname $0)/team_basic_test.py
+if [ $? -eq 0 ] ; then
+    echo "PASS: libteam"
+else
+    echo "FAIL: libteam"
+fi

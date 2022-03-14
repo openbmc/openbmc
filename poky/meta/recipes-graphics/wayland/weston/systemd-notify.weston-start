@@ -1,0 +1,9 @@
+#!/bin/sh
+  
+# SPDX-FileCopyrightText: Huawei Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+
+if [[ -x "/usr/lib/weston/systemd-notify.so" ]]; then
+        add_weston_module "systemd-notify.so"
+fi

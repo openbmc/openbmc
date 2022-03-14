@@ -18,7 +18,7 @@ LICENSE = "MIT"
 
 SRC_URI = "https://github.com/intel/libva/releases/download/${PV}/libva-${PV}.tar.bz2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2e48940f94acb0af582e5ef03537800f"
-SRC_URI[sha256sum] = "d3f4873715077a8c969c9bfe4ba8455a133353176be0ffe0c41ffd4155c9a8c8"
+SRC_URI[sha256sum] = "fad383f39f36115814bd0eda1496a4cc01761643bd962635400df2d4470ad460"
 
 S = "${WORKDIR}/libva-${PV}"
 
@@ -27,3 +27,9 @@ UPSTREAM_CHECK_URI = "https://github.com/intel/libva/releases"
 DEPENDS = "libdrm"
 
 inherit meson pkgconfig
+
+PACKAGECONFIG[x11] = "-Dwith_x11=yes,-Dwith_x11=no,virtual/libx11 libxext libxfixes"
+PACKAGECONFIG[glx] = "-Dwith_glx=yes,-Dwith_glx=no,virtual/mesa"
+
+PACKAGECONFIG[wayland] = "-Dwith_wayland=yes,-Dwith_wayland=no,wayland-native wayland"
+

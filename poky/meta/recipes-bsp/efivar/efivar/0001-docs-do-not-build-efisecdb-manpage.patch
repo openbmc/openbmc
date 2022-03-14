@@ -1,0 +1,26 @@
+From f39a1481a9e465387901d52b07ae56dedcc3838b Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Sun, 16 Jan 2022 18:25:33 +0100
+Subject: [PATCH] docs: do not build efisecdb manpage
+
+It requires mandoc, which oe-core does not have.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ docs/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/docs/Makefile b/docs/Makefile
+index c9bf585..91a6078 100644
+--- a/docs/Makefile
++++ b/docs/Makefile
+@@ -5,7 +5,7 @@ include $(TOPDIR)/src/include/version.mk
+ include $(TOPDIR)/src/include/rules.mk
+ include $(TOPDIR)/src/include/defaults.mk
+ 
+-MAN1TARGETS = efisecdb.1 \
++MAN1TARGETS = \
+ 	      efivar.1
+ 
+ MAN3TARGETS = efi_append_variable.3 \

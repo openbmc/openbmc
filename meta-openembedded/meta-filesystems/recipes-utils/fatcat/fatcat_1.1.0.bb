@@ -7,7 +7,7 @@ HOMEPAGE = "https://github.com/Gregwar/fatcat"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=57fbbfebd0dd1d6ff21b8cecb552a03f"
 
-SRC_URI = "git://github.com/Gregwar/fatcat.git \
+SRC_URI = "git://github.com/Gregwar/fatcat.git;branch=master;protocol=https \
            file://0001-Use-unistd.h-not-argp.h-for-all-POSIX-systems.patch \
            "
 

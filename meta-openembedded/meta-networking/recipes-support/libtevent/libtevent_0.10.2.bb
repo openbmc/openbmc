@@ -9,6 +9,7 @@ RDEPENDS:python3-tevent = "python3"
 SRC_URI = "https://samba.org/ftp/tevent/tevent-${PV}.tar.gz \
            file://options-0.10.0.patch \
            file://0001-libtevent-fix-musl-libc-compile-error.patch \
+           file://0001-Fix-pyext_PATTERN-for-cross-compilation.patch \
 "
 LIC_FILES_CHKSUM = "file://tevent.h;endline=26;md5=4e458d658cb25e21efc16f720e78b85a"
 
@@ -42,11 +43,6 @@ EXTRA_OECONF += "--disable-rpath \
                  --with-libiconv=${STAGING_DIR_HOST}${prefix}\
                  --without-gettext \
                 "
-do_install:append() {
-     # add this link for cross check python module existence. eg: on x86-64 host, check python module
-     # under recipe-sysroot which is mips64. 
-     cd ${D}${PYTHON_SITEPACKAGES_DIR}; ln -s _tevent.*.so _tevent.so
-}
 
 PACKAGES += "python3-tevent"
 

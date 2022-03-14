@@ -1,4 +1,4 @@
-Upstream-Status: Submitted [https://github.com/nigels-com/glew/pull/311]
+Upstream-Status: Backport [767e0316450911f1158bd4f7fd8dcd066bae5c55]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 
 From 0ce0a85597db48a2fca619bd95e34af091e54ae8 Mon Sep 17 00:00:00 2001

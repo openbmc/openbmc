@@ -9,7 +9,6 @@
 ##
 
 # add crate fetch support
-inherit crate-fetch
 inherit rust-common
 
 # Where we download our registry and dependencies to

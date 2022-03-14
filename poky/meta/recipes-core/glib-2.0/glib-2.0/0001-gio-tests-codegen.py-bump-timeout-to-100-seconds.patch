@@ -5,7 +5,7 @@ Subject: [PATCH] gio/tests/codegen.py: bump timeout to 100 seconds
 
 This may be necessary on overloaded CI systems.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/glib/-/merge_requests/2348]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
  gio/tests/codegen.py | 2 +-

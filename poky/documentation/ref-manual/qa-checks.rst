@@ -28,7 +28,7 @@ error form along with an explanation.
 .. note::
 
    -  At the end of each message, the name of the associated QA test (as
-      listed in the ":ref:`insane.bbclass <ref-classes-insane>`"
+      listed in the ":ref:`ref-classes-insane`"
       section) appears within square brackets.
 
    -  As mentioned, this list of error and warning messages is for QA
@@ -749,7 +749,7 @@ either raise a warning or an error message, using the
 variables, respectively. You can also disable checks within a particular
 recipe using :term:`INSANE_SKIP`. For information on
 how to work with the QA checks, see the
-":ref:`insane.bbclass <ref-classes-insane>`" section.
+":ref:`ref-classes-insane`" section.
 
 .. note::
 

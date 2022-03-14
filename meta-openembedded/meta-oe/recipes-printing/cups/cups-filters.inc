@@ -2,7 +2,7 @@ DESCRIPTION = "CUPS backends, filters, and other software"
 HOMEPAGE = "http://www.linuxfoundation.org/collaborate/workgroups/openprinting/cups-filters"
 
 LICENSE = "GPLv2 & LGPLv2 & MIT & GPLv2+ & GPLv3"
-LIC_FILES_CHKSUM = "file://COPYING;md5=516215fd57564996d70327db19b368ff"
+LIC_FILES_CHKSUM = "file://COPYING;md5=2d77679ce6a2cc4d873d4ebbf2a401e6"
 
 SECTION = "console/utils"
 

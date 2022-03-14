@@ -2,6 +2,8 @@ We don't use the dist-* targets and hence DIST_DIR isn't used. The current code
 creates a new temp directory in /tmp/ for every invocation of make. Lets
 not do that.
 
+https://github.com/nigels-com/glew/issues/334
+
 Upstream-Status: Pending [a revised version would be needed for upstream]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 

@@ -4,8 +4,8 @@ RDEPENDS:${PN}-extras:remove = " \
        "
 
 #Add python utility.(e.g gpioutil,...)
-RDEPENDS:${PN}-extrasdevtools:append += " ipmitool"
-RDEPENDS:${PN}-extrasdevtools:append += " openssh-sftp-server"
+RDEPENDS:${PN}-extrasdevtools:append = " ipmitool"
+RDEPENDS:${PN}-extrasdevtools:append = " openssh-sftp-server"
 RDEPENDS:${PN}-extras += " python3-smbus"
 
 #Install publickey for image file verification

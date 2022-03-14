@@ -19,7 +19,7 @@ GBS_NAMES = " \
 GBS_ITEMSFMT = "ahb/apb/{0}.conf"
 
 GBS_ITEMS += "${@compose_list(d, 'GBS_ITEMSFMT', 'GBS_NAMES')}"
-GBS_ITEMS:append:gbs += " iio-hwmon-battery.conf"
+GBS_ITEMS:append:gbs = " iio-hwmon-battery.conf"
 
 ENVS = "obmc/hwmon/{0}"
 SYSTEMD_ENVIRONMENT_FILE:${PN}:append:gbs = " ${@compose_list(d, 'ENVS', 'GBS_ITEMS')}"

@@ -15,11 +15,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=0daaf958d5531ab86169ec6e275e1517"
 SECTION = "libs"
 DEPENDS += "rpcsvc-proto-native"
 
-PV = "1.4.2"
+PV = "1.4.3"
 
-SRCREV = "6f54e54455c073d08a56ea627c6cd2355a40eb53"
+SRCREV = "71e0a12c04d130a78674ac6309eefffa6ecee612"
 
-SRC_URI = "git://github.com/thkukuk/${BPN} \
+SRC_URI = "git://github.com/thkukuk/${BPN};branch=master;protocol=https \
            file://0001-Use-cross-compiled-rpcgen.patch \
           "
 

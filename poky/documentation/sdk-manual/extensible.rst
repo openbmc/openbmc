@@ -315,7 +315,7 @@ command:
       $ devtool edit-recipe recipe
 
    From within the editor, you
-   can make modifications to the recipe that take affect when you build
+   can make modifications to the recipe that take effect when you build
    it later.
 
 3. *Build the Recipe or Rebuild the Image*: The next step you take

@@ -1,0 +1,257 @@
+#!/bin/bash -e
+#
+
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+obmc_dir=${script_dir}/../../
+
+cd "$obmc_dir"
+
+# openbmc doesn't control what upstream poky, or any of the other layers do,
+# which do use patches as part of their upstreaming process.
+# meta-phosphor is also included such that patches that the community agrees to
+# hold onto will be allowed in that layer.
+
+patch_files_tmp=$(mktemp)
+allowed_patches_tmp=$(mktemp)
+trap 'rm $patch_files_tmp $allowed_patches_tmp' exit
+
+git ls-files -- \
+  '*.patch' \
+  ':!:poky/**' \
+  ':!:meta-security/**' \
+  ':!:meta-raspberrypi/**' \
+  ':!:meta-openembedded/**' \
+  ':!:meta-phosphor/**' \
+  | sort > "$patch_files_tmp"
+
+
+# The following patches were present on master at the time this test was
+# written.  Their presence in this list should not be acknowlegement that they
+# are now allowed, but ignoring them is required in the intermediate time
+# between when this test was created, and when the maintainers of these repos
+# clean them up.
+#
+# https://github.com/openbmc/docs/blob/master/meta-layer-guidelines.md
+echo "\
+meta-amd/meta-ethanolx/recipes-x86/chassis/x86-power-control/0001-Amd-power-control-modifications-for-EthanolX.patch
+meta-ampere/meta-common/recipes-devtools/mtd/mtd-utils/0001-flashcp-support-offset-option.patch
+meta-aspeed/recipes-bsp/u-boot/files/default-gcc.patch
+meta-bytedance/meta-g220a/recipes-kernel/linux/linux-aspeed/0005-ARM-dts-aspeed-Enable-g220a-uart-route.patch
+meta-bytedance/meta-g220a/recipes-phosphor/ipmi/phosphor-node-manager-proxy/0001-Remove-Total_Power-sensor.patch
+meta-facebook/meta-bletchley/recipes-bsp/u-boot/u-boot-aspeed-sdk/0001-u-boot-ast2600-57600-baudrate-for-bletchley.patch
+meta-facebook/meta-tiogapass/recipes-bsp/u-boot/u-boot-aspeed/0001-configs-ast-common-use-57600-baud-rate-to-match-Tiog.patch
+meta-facebook/meta-yosemitev2/recipes-bsp/u-boot/u-boot-aspeed/0001-board-aspeed-Add-Mux-for-yosemitev2.patch
+meta-facebook/meta-yosemitev2/recipes-bsp/u-boot/u-boot-aspeed/0002-spl-host-console-handle.patch
+meta-google/dynamic-layers/nuvoton-layer/recipes-bsp/images/npcm7xx-igps/0001-Set-FIU0_DRD_CFG-and-FIU_Clk_divider-for-gbmc-hoth.patch
+meta-google/recipes-extended/libconfig/files/0001-conf2struct-Use-the-right-perl.patch
+meta-google/recipes-extended/libconfig/files/0001-makefile-Add-missing-LDFLAGS.patch
+meta-google/recipes-phosphor/initrdscripts/obmc-phosphor-initfs/rwfs-clean-dev.patch
+meta-ingrasys/meta-zaius/recipes-bsp/u-boot/u-boot-aspeed/0001-board-aspeed-Add-reset_phy-for-Zaius.patch
+meta-nuvoton/recipes-bsp/images/npcm7xx-igps/0001-Adjust-paths-for-use-with-Bitbake.patch
+meta-yadro/meta-nicole/recipes-bsp/u-boot/files/0001-Add-system-reset-status-support.patch
+meta-yadro/meta-nicole/recipes-bsp/u-boot/files/0002-config-ast-common-set-fieldmode-to-true.patch
+meta-yadro/meta-nicole/recipes-bsp/u-boot/files/0003-aspeed-add-gpio-support.patch
+meta-yadro/meta-nicole/recipes-bsp/u-boot/files/0004-aspeed-add-bmc-position-support.patch
+meta-yadro/meta-nicole/recipes-kernel/linux/linux-aspeed/0001-Add-NCSI-channel-selector.patch
+meta-yadro/meta-nicole/recipes-phosphor/host/op-proc-control/0001-Stop-and-send-SRESET-for-one-thread-only.patch
+meta-yadro/recipes-phosphor/dbus/phosphor-dbus-interfaces/0001-Add-boot-initiator-mailbox-interface.patch
+meta-yadro/recipes-phosphor/ipmi/phosphor-ipmi-host/0001-Add-support-for-persistent-only-settings.patch
+meta-yadro/recipes-phosphor/ipmi/phosphor-ipmi-host/0002-Add-support-for-boot-initiator-mailbox.patch
+meta-yadro/recipes-phosphor/ipmi/phosphor-ipmi-host/0003-Fix-version-parsing-update-AUX-revision-info.patch
+" | sort > "$allowed_patches_tmp"
+
+files_diff=$(comm -23 "$patch_files_tmp" "$allowed_patches_tmp")
+
+files_count=$(echo -n "$files_diff" | grep -c '^' || true)
+if [[ $files_count -ne 0 ]]; then
+  echo "Patch files found not in allow list"
+  echo "$files_diff"
+  echo "Patches are not allowed on OpenBMC in these layers.  Please upstream your changes and see \
+    https://github.com/openbmc/docs/blob/master/meta-layer-guidelines.md"
+  exit 1
+fi
+
+# Now verify there are no kernel dts files being added in a patch
+# All dts files should be sent upstream and can be carried in the openbmc/linux
+# tree until they are accepted upstream
+dts_files_tmp=$(mktemp)
+allowed_dts_tmp=$(mktemp)
+trap 'rm $dts_files_tmp $allowed_dts_tmp' exit
+
+git ls-files -- \
+  '*.dts' \
+  ':!:poky/**' \
+  ':!:meta-security/**' \
+  ':!:meta-raspberrypi/**' \
+  ':!:meta-openembedded/**' \
+  | sort > "$dts_files_tmp"
+
+# There is a single dts currently in the tree that we will exempt for now
+echo "\
+meta-hpe/meta-dl360poc/recipes-kernel/linux/linux-obmc/gxp.dts
+" | sort > "$allowed_dts_tmp"
+
+files_diff=$(comm -23 "$dts_files_tmp" "$allowed_dts_tmp")
+
+files_count=$(echo -n "$files_diff" | grep -c '^' || true)
+if [[ $files_count -ne 0 ]]; then
+echo "Dts files found not in allow list"
+echo "$files_diff"
+echo "Dts files are not allowed on OpenBMC in these layers. Please upstream your changes and see \
+  https://github.com/openbmc/docs/blob/master/kernel-development.md"
+exit 1
+fi
+
+lint_exempt="\
+meta-amd/recipes-amd/amd-fpga/files/ethanolx/fpgardu.sh
+meta-bytedance/meta-g220a/recipes-network/network/static-mac-addr/mac-check
+meta-bytedance/meta-g220a/recipes-phosphor/datetime/me-time-sync/me-time-sync.sh
+meta-fii/meta-kudo/recipes-kudo/host/files/ampere_power_util.sh
+meta-fii/meta-kudo/recipes-kudo/kudo-fw-utility/kudo-fw/kudo-fw-ver.sh
+meta-fii/meta-kudo/recipes-kudo/kudo-fw-utility/kudo-fw/kudo-fw.sh
+meta-fii/meta-kudo/recipes-kudo/kudo-fw-utility/kudo-fw/kudo-lib.sh
+meta-fii/meta-kudo/recipes-kudo/kudo-sys-utility/kudo-boot/init_once.sh
+meta-fii/meta-kudo/recipes-kudo/kudo-sys-utility/kudo-cmd/kudo-ras.sh
+meta-fii/meta-kudo/recipes-kudo/kudo-sys-utility/kudo-cmd/kudo.sh
+meta-fii/meta-kudo/recipes-kudo/network/usb-network/usb_network.sh
+meta-fii/meta-kudo/recipes-phosphor/console/obmc-console/kudo_uart_mux_ctrl.sh
+meta-google/recipes-google/gpio/gpio-ctrl/lib.sh
+meta-google/recipes-google/host-power-ctrl/gpio-host-pwr/host_isoff.sh
+meta-google/recipes-google/host-power-ctrl/gpio-host-pwr/host_powercycle.sh
+meta-google/recipes-google/host-power-ctrl/gpio-host-pwr/host_poweroff.sh
+meta-google/recipes-google/host-power-ctrl/gpio-host-pwr/host_poweron.sh
+meta-google/recipes-google/host-power-ctrl/gpio-host-pwr/host_reset.sh
+meta-google/recipes-google/host-power-ctrl/gpio-host-pwr/lib.sh
+meta-google/recipes-google/ipmi/ipmi-fru-sh/lib.sh
+meta-google/recipes-google/ncsi/files/gbmc-ncsi-ip-from-ra.sh.in
+meta-google/recipes-google/networking/files/gbmc-ip-monitor-test.sh
+meta-google/recipes-google/networking/files/gbmc-ip-monitor.sh
+meta-google/recipes-google/networking/files/gbmc-mac-config.sh.in
+meta-google/recipes-google/networking/gbmc-bridge/gbmc-br-from-ra.sh
+meta-google/recipes-google/networking/gbmc-bridge/gbmc-br-gw-src.sh
+meta-google/recipes-google/networking/gbmc-bridge/gbmc-br-nft.sh
+meta-google/recipes-google/networking/gbmc-bridge/gbmc-br-ula.sh
+meta-google/recipes-google/networking/google-usb-network/usb_network.sh
+meta-google/recipes-google/networking/google-usb-network/usb_network_test.sh
+meta-google/recipes-google/networking/network-sh/lib.sh
+meta-google/recipes-google/networking/network-sh/test.sh
+meta-google/recipes-google/nftables/files/nft-configure.sh
+meta-google/recipes-google/ssh/authorized-keys-comp/authorized-keys-comp.sh
+meta-google/recipes-google/test/test-sh/test.sh
+meta-google/recipes-phosphor/flash/google-key/verify-bmc-image.sh
+meta-google/recipes-phosphor/flash/inplace-gbmc-update/inplace-gbmc-verify.sh
+meta-hpe/meta-common/recipes-hpe/host/host-boot-enable/host-boot-enable.sh
+meta-hpe/meta-common/recipes-phosphor/initrdscripts/files/gxp-obmc-init.sh
+meta-hpe/meta-dl360poc/recipes-hpe/host/host-boot-enable/host-boot-enable.sh
+meta-ibm/meta-romulus/recipes-phosphor/chassis/vrm-control/vrm-control.sh
+meta-ibm/meta-romulus/recipes-phosphor/gpio/id-button/toggle_identify_led.sh
+meta-ibm/recipes-phosphor/chassis/power-workarounds/witherspoon/power-workarounds.sh
+meta-ibm/recipes-phosphor/chassis/vrm-control/ibm-ac-server/ir35221-unbind-bind.sh
+meta-ibm/recipes-phosphor/chassis/vrm-control/mihawk/ir35221-unbind-bind.sh
+meta-ibm/recipes-phosphor/chassis/vrm-control/vrm-control.sh
+meta-ibm/recipes-phosphor/dump/phosphor-debug-collector/plugins.d/ibm_elogall
+meta-ibm/recipes-phosphor/dump/phosphor-debug-collector/plugins.d/pels
+meta-ibm/recipes-phosphor/gpio/id-button/toggle_identify_led.sh
+meta-ibm/recipes-phosphor/mboxd/mboxd/check_pnor_format.sh
+meta-ingrasys/meta-zaius/recipes-phosphor/chassis/avsbus-control/zaius_avsbus.sh
+meta-ingrasys/meta-zaius/recipes-phosphor/chassis/vcs-control/zaius_vcs.sh
+meta-inventec/meta-transformers/recipes-phosphor/init/transformers-init/transformers-init.sh
+meta-openpower/recipes-bsp/pdata/files/power-target.sh
+meta-openpower/recipes-phosphor/dump/phosphor-debug-collector/plugins.d/guard
+meta-openpower/recipes-phosphor/network/first-boot-set-hostname/first-boot-set-hostname.sh
+meta-openpower/recipes-phosphor/network/first-boot-set-mac/first-boot-set-mac.sh
+meta-openpower/recipes-phosphor/occ/openpower-occ-control/occ-active.sh
+meta-phosphor/recipes-phosphor/initrdscripts/files/obmc-init.sh
+meta-phosphor/recipes-phosphor/initrdscripts/files/obmc-shutdown.sh
+meta-phosphor/recipes-phosphor/initrdscripts/files/obmc-update.sh
+meta-phosphor/recipes-phosphor/initrdscripts/phosphor-mmc-init/mmc-init.sh
+meta-phosphor/recipes-phosphor/interfaces/bmcweb/run-ptest
+meta-phosphor/recipes-phosphor/preinit-mounts/preinit-mounts/init
+meta-phosphor/recipes-support/nss-pam-ldapd/files/nslcd.init
+meta-quanta/meta-common/recipes-quanta/network/usb-network/usb-network.sh
+meta-quanta/meta-gbs/recipes-gbs/gbs-bios-update/files/bios-update.sh
+meta-quanta/meta-gbs/recipes-gbs/gbs-bios-update/files/bios-verify.sh
+meta-quanta/meta-gbs/recipes-gbs/gbs-bmc-update/files/bmc-verify.sh
+meta-quanta/meta-gbs/recipes-gbs/gbs-detect-gpio-present/files/detect-gpio-present.sh
+meta-quanta/meta-gbs/recipes-gbs/gbs-sysinit/files/gbs-sysinit.sh
+meta-quanta/meta-gbs/recipes-gbs/hotswap-power-cycle/files/tray_powercycle.sh
+meta-quanta/meta-gbs/recipes-google/acpi-power-state/acpi-power-state-daemon/gbs-check-host-state.sh
+meta-quanta/meta-gbs/recipes-google/acpi-power-state/acpi-power-state-daemon/gbs-set-failsafe.sh
+meta-quanta/meta-gbs/recipes-phosphor/fans/phosphor-pid-control/fan-table-init.sh
+meta-quanta/meta-gbs/recipes-phosphor/sensors/phosphor-nvme/nvme_json_rewrite.sh
+meta-quanta/meta-gsj/recipes-gsj/detect-fan-fail/files/detect-fan-fail.sh
+meta-quanta/meta-gsj/recipes-gsj/gsj-hotswap-change-setting/files/gsj-hotswap-change-setting.sh
+meta-quanta/meta-gsj/recipes-gsj/quanta-nvme-powerctrl/files/init_once.sh
+meta-quanta/meta-gsj/recipes-gsj/quanta-nvme-powerctrl/files/nvme_powerctrl_library.sh
+meta-quanta/meta-gsj/recipes-gsj/quanta-nvme-powerctrl/files/nvme_powermanager.sh
+meta-quanta/meta-gsj/recipes-gsj/usb-network/files/usb_network.sh
+meta-quanta/meta-gsj/recipes-phosphor/fans/phosphor-pid-control/fan-control.sh
+meta-quanta/meta-gsj/recipes-phosphor/fans/phosphor-pid-control/fan-default-speed.sh
+meta-quanta/meta-olympus-nuvoton/recipes-olympus-nuvoton/power/first-boot-set-psu/first-boot-set-psu.sh
+meta-quanta/meta-olympus-nuvoton/recipes-phosphor/fans/phosphor-pid-control/fan-full-speed.sh
+meta-quanta/meta-q71l/recipes-phosphor/quanta-powerctrl/files/init_once.sh
+meta-quanta/meta-q71l/recipes-phosphor/quanta-powerctrl/files/poweroff.sh
+meta-quanta/meta-q71l/recipes-phosphor/quanta-powerctrl/files/poweron.sh
+meta-yadro/meta-nicole/recipes-phosphor/chassis/avsbus-control/avsbus-control.sh
+"
+
+types=(json shell)
+# shellcheck disable=SC2034
+check_json="eslint --resolve-plugins-relative-to /usr/local/lib/node_modules"
+# shellcheck disable=SC2034
+check_shell="shellcheck -x"
+
+for t in "${types[@]}"; do
+    check_cmd="check_${t}"
+    if ! which "${!check_cmd%% *}" > /dev/null 2>&1; then
+        eval "${check_cmd}=\"echo WARNING: Skipping $t due to missing command:\""
+        echo "${!check_cmd}"
+    fi
+done
+
+non_bbfiles=$(git ls-files -- \
+  ':!:poky/**' \
+  ':!:meta-security/**' \
+  ':!:meta-raspberrypi/**' \
+  ':!:meta-openembedded/**' \
+  | grep -v -e "\.patch$" -e "\.bb$" -e "\.bbappend$")
+
+for f in $non_bbfiles; do
+    unset file_type
+    file_info=$(file "$f")
+    case $file_info in
+        *shell\ script*)
+            file_type="shell"
+            ;;
+
+        *JSON\ data*)
+            file_type="json"
+            ;;
+
+        *)
+            case $f in
+                *.sh)
+                    file_type="shell"
+                    ;;
+
+                *.json)
+                    file_type="json"
+                    ;;
+            esac
+    esac
+
+    if [ -n "$file_type" ]; then
+        check_cmd="check_${file_type}"
+        if ! eval "${!check_cmd} $f"; then
+            if [[ $lint_exempt == *$f* ]]; then
+                echo "EXEMPT: $f"
+            else
+                echo "FAILED: $f"
+                false
+            fi
+        fi
+    fi
+
+done
+
+echo "Repo test passed"

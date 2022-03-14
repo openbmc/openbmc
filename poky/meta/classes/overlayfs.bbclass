@@ -31,44 +31,28 @@
 #   OVERLAYFS_WRITABLE_PATHS[mnt-overlay] = "/usr/share/another-application"
 #
 # Note: the class does not support /etc directory itself, because systemd depends on it
+# For /etc directory use overlayfs-etc class
 
 REQUIRED_DISTRO_FEATURES += "systemd overlayfs"
 
 inherit systemd features_check
 
+OVERLAYFS_CREATE_DIRS_TEMPLATE ??= "${COREBASE}/meta/files/overlayfs-create-dirs.service.in"
+OVERLAYFS_MOUNT_UNIT_TEMPLATE ??= "${COREBASE}/meta/files/overlayfs-unit.mount.in"
+OVERLAYFS_ALL_OVERLAYS_TEMPLATE ??= "${COREBASE}/meta/files/overlayfs-all-overlays.service.in"
+
 python do_create_overlayfs_units() {
-    CreateDirsUnitTemplate = """[Unit]
-Description=Overlayfs directories setup
-Requires={DATA_MOUNT_UNIT}
-After={DATA_MOUNT_UNIT}
-DefaultDependencies=no
+    from oe.overlayfs import mountUnitName
 
-[Service]
-Type=oneshot
-ExecStart=mkdir -p {DATA_MOUNT_POINT}/workdir{LOWERDIR} && mkdir -p {DATA_MOUNT_POINT}/upper{LOWERDIR}
-RemainAfterExit=true
-StandardOutput=journal
-
-[Install]
-WantedBy=multi-user.target
-"""
-    MountUnitTemplate = """[Unit]
-Description=Overlayfs mount unit
-Requires={CREATE_DIRS_SERVICE}
-After={CREATE_DIRS_SERVICE}
-
-[Mount]
-What=overlay
-Where={LOWERDIR}
-Type=overlay
-Options=lowerdir={LOWERDIR},upperdir={DATA_MOUNT_POINT}/upper{LOWERDIR},workdir={DATA_MOUNT_POINT}/workdir{LOWERDIR}
-
-[Install]
-WantedBy=multi-user.target
-"""
+    with open(d.getVar("OVERLAYFS_CREATE_DIRS_TEMPLATE"), "r") as f:
+        CreateDirsUnitTemplate = f.read()
+    with open(d.getVar("OVERLAYFS_MOUNT_UNIT_TEMPLATE"), "r") as f:
+        MountUnitTemplate = f.read()
+    with open(d.getVar("OVERLAYFS_ALL_OVERLAYS_TEMPLATE"), "r") as f:
+        AllOverlaysTemplate = f.read()
 
     def prepareUnits(data, lower):
-        from oe.overlayfs import mountUnitName, helperUnitName
+        from oe.overlayfs import helperUnitName
 
         args = {
             'DATA_MOUNT_POINT': data,
@@ -77,16 +61,39 @@ WantedBy=multi-user.target
             'LOWERDIR': lower,
         }
 
+        bb.debug(1, "Generate systemd unit %s" % mountUnitName(lower))
         with open(os.path.join(d.getVar('WORKDIR'), mountUnitName(lower)), 'w') as f:
             f.write(MountUnitTemplate.format(**args))
 
+        bb.debug(1, "Generate helper systemd unit %s" % helperUnitName(lower))
         with open(os.path.join(d.getVar('WORKDIR'), helperUnitName(lower)), 'w') as f:
             f.write(CreateDirsUnitTemplate.format(**args))
 
+    def prepareGlobalUnit(dependentUnits):
+        from oe.overlayfs import allOverlaysUnitName
+        args = {
+            'ALL_OVERLAYFS_UNITS': " ".join(dependentUnits),
+            'PN': d.getVar('PN')
+        }
+
+        bb.debug(1, "Generate systemd unit with all overlays %s" % allOverlaysUnitName(d))
+        with open(os.path.join(d.getVar('WORKDIR'), allOverlaysUnitName(d)), 'w') as f:
+            f.write(AllOverlaysTemplate.format(**args))
+
+    mountUnitList = []
     overlayMountPoints = d.getVarFlags("OVERLAYFS_MOUNT_POINT")
     for mountPoint in overlayMountPoints:
+        bb.debug(1, "Process variable flag %s" % mountPoint)
         for lower in d.getVarFlag('OVERLAYFS_WRITABLE_PATHS', mountPoint).split():
+            bb.debug(1, "Prepare mount unit for %s with data mount point %s" %
+                     (lower, d.getVarFlag('OVERLAYFS_MOUNT_POINT', mountPoint)))
             prepareUnits(d.getVarFlag('OVERLAYFS_MOUNT_POINT', mountPoint), lower)
+            mountUnitList.append(mountUnitName(lower))
+
+    # set up one unit, which depends on all mount units, so users can set
+    # only one dependency in their units to make sure software starts
+    # when all overlays are mounted
+    prepareGlobalUnit(mountUnitList)
 }
 
 # we need to generate file names early during parsing stage
@@ -95,7 +102,7 @@ python () {
 
     unitList = unitFileList(d)
     for unit in unitList:
-        d.appendVar('SYSTEMD_SERVICE:' + d.getVar('PN'), ' ' + unit);
+        d.appendVar('SYSTEMD_SERVICE:' + d.getVar('PN'), ' ' + unit)
         d.appendVar('FILES:' + d.getVar('PN'), ' ' + strForBash(unit))
 
     d.setVar('OVERLAYFS_UNIT_LIST', ' '.join([strForBash(s) for s in unitList]))

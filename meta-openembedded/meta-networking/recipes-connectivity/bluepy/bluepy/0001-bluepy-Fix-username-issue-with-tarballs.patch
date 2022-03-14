@@ -1,0 +1,32 @@
+From 318a0e7dfaa0f5f233a20c0b347948c8004cf6af Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 20 Oct 2021 14:02:09 -0700
+Subject: [PATCH] bluepy: Fix username issue with tarballs
+
+Fixes
+Cannot change ownership to uid 1000, gid 1000: Operation not permitted
+
+Upstream-Status: Submitted [https://github.com/IanHarvey/bluepy/pull/462]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ bluepy/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/bluepy/Makefile
++++ b/bluepy/Makefile
+@@ -30,13 +30,13 @@ bluepy-helper: $(LOCAL_SRCS) $(IMPORT_SR
+ 	$(CC) -L. $(CFLAGS) $(CPPFLAGS) -o $@ $(LOCAL_SRCS) $(IMPORT_SRCS) $(LDLIBS)
+ 
+ $(IMPORT_SRCS): bluez-src.tgz
+-	tar xzf $<
++	tar xzf $< --no-same-owner
+ 	touch $(IMPORT_SRCS)
+ 
+ .PHONY: bluez-tarfile
+ 
+ bluez-tarfile:
+-	(cd ..; tar czf bluepy/bluez-src.tgz $(BLUEZ_PATH))
++	(cd ..; tar czf bluepy/bluez-src.tgz $(BLUEZ_PATH) --no-same-owner)
+ 
+ GET_SERVICES=get_services.py
+ 

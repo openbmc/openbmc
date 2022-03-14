@@ -14,7 +14,7 @@ zip.c:1228:5: error: format not a string literal and no format arguments [-Werro
 [YOCTO #9552]
 [https://bugzilla.yoctoproject.org/show_bug.cgi?id=9552]
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [need a new release]
 
 Signed-off-by: Edwin Plauchu <edwin.plauchu.camacho@intel.com>
 

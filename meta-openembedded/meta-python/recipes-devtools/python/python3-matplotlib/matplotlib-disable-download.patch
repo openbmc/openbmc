@@ -1,0 +1,60 @@
+Disable automatic downloading of components!
+
+Upstream-Status: Inappropriate [disable feature]
+
+Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+
+--- a/setup.py
++++ b/setup.py
+@@ -317,7 +317,6 @@ setup(  # Finally, pass this all along t
+         "certifi>=2020.06.20",
+         "numpy>=1.17",
+         "setuptools_scm>=4",
+-        "setuptools_scm_git_archive",
+     ],
+     install_requires=[
+         "cycler>=0.10",
+--- a/setupext.py
++++ b/setupext.py
+@@ -64,40 +64,7 @@ def get_from_cache_or_download(url, sha)
+     BytesIO
+         The file loaded into memory.
+     """
+-    cache_dir = _get_xdg_cache_dir()
+-
+-    if cache_dir is not None:  # Try to read from cache.
+-        try:
+-            data = (cache_dir / sha).read_bytes()
+-        except IOError:
+-            pass
+-        else:
+-            if _get_hash(data) == sha:
+-                return BytesIO(data)
+-
+-    # jQueryUI's website blocks direct downloads from urllib.request's
+-    # default User-Agent, but not (for example) wget; so I don't feel too
+-    # bad passing in an empty User-Agent.
+-    with urllib.request.urlopen(
+-            urllib.request.Request(url, headers={"User-Agent": ""}),
+-            context=_get_ssl_context()) as req:
+-        data = req.read()
+-
+-    file_sha = _get_hash(data)
+-    if file_sha != sha:
+-        raise Exception(
+-            f"The downloaded file does not match the expected sha.  {url} was "
+-            f"expected to have {sha} but it had {file_sha}")
+-
+-    if cache_dir is not None:  # Try to cache the downloaded file.
+-        try:
+-            cache_dir.mkdir(parents=True, exist_ok=True)
+-            with open(cache_dir / sha, "xb") as fout:
+-                fout.write(data)
+-        except IOError:
+-            pass
+-
+-    return BytesIO(data)
++    raise IOError(f"Automatic downloading is disabled.")
+ 
+ 
+ def get_and_extract_tarball(urls, sha, dirname):

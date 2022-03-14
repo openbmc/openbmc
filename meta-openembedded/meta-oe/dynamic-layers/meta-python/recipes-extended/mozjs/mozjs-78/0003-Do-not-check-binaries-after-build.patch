@@ -1,0 +1,55 @@
+From 1a47eac590f57c765033c7797b0759dc314f2128 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Mon, 1 Nov 2021 22:52:57 +0100
+Subject: [PATCH] Do not check binaries after build
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+* It buys us a dependency hard to fulfill in different layer setups
+* Mozjs-91 does not perform these checks when setting --enable-project=js. Here
+  for old configuration style --enable-project changes nothing and build wants
+  to check binaries created.
+
+So omit checks by not searching for llvm_objdump and making check_binary.py a
+stub to prevent errors by using unset LLVM_OBJDUMP.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ moz.configure                                   | 7 -------
+ python/mozbuild/mozbuild/action/check_binary.py | 2 +-
+ 2 files changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/moz.configure b/moz.configure
+index 9b0e784..41e3e4d 100755
+--- a/moz.configure
++++ b/moz.configure
+@@ -648,13 +648,6 @@ def llvm_objdump(host_c_compiler, c_compiler, bindgen_config_paths):
+     return (llvm_objdump,)
+ 
+ 
+-llvm_objdump = check_prog('LLVM_OBJDUMP', llvm_objdump, what='llvm-objdump',
+-                          when='--enable-compile-environment',
+-                          paths=toolchain_search_path)
+-
+-add_old_configure_assignment('LLVM_OBJDUMP', llvm_objdump)
+-
+-
+ js_option('--enable-dtrace', help='Build with dtrace support')
+ 
+ dtrace = check_header('sys/sdt.h', when='--enable-dtrace',
+diff --git a/python/mozbuild/mozbuild/action/check_binary.py b/python/mozbuild/mozbuild/action/check_binary.py
+index 57ccfa6..bd2c167 100644
+--- a/python/mozbuild/mozbuild/action/check_binary.py
++++ b/python/mozbuild/mozbuild/action/check_binary.py
+@@ -366,4 +366,4 @@ def main(args):
+ 
+ 
+ if __name__ == '__main__':
+-    sys.exit(main(sys.argv[1:]))
++    sys.exit(0)
+-- 
+2.31.1
+

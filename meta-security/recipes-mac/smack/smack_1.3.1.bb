@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 
 SRCREV = "4a102c7584b39ce693995ffb65e0918a9df98dd8"
 SRC_URI = " \
-	git://github.com/smack-team/smack.git \
+	git://github.com/smack-team/smack.git;branch=master;protocol=https \
 	file://smack_generator_make_fixup.patch \
 	file://run-ptest"
 

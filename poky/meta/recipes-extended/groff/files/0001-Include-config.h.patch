@@ -20,7 +20,11 @@ In file included from TOPDIR/build/tmp/work/aarch64-yoe-linux-musl/groff/1.22.4-
 We delete eqn.cpp and qen.hpp in do_configure
 to ensure they're regenerated and deterministic.
 
-Upstream-Status: Pending
+Issue is fixed upstream with similar patches:
+https://git.savannah.gnu.org/cgit/groff.git/commit/?id=979f3f4266151c7681a68a40d2c4913842a7271d
+https://git.savannah.gnu.org/cgit/groff.git/commit/?id=fe121eeacd53c96105f23209b2c205f436f97359
+
+Upstream-Status: Backport [see links above]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  src/libs/libgroff/assert.cpp  |   4 +

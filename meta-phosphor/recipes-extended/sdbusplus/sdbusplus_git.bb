@@ -1,7 +1,7 @@
 SUMMARY = "C++ bindings for systemd dbus APIs"
 DESCRIPTION = "C++ bindings for systemd dbus APIs."
 
-inherit meson
+inherit pkgconfig meson
 inherit python3native
 include sdbusplus-rev.inc
 

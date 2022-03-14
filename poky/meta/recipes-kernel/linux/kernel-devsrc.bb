@@ -48,7 +48,7 @@ do_install() {
     mkdir -p ${D}/usr/src
     (
 	cd ${D}/usr/src
-	lnr ${D}${KERNEL_BUILD_ROOT}${KERNEL_VERSION}/source kernel
+	ln -rs ${D}${KERNEL_BUILD_ROOT}${KERNEL_VERSION}/source kernel
     )
 
     # for on target purposes, we unify build and source
@@ -109,8 +109,8 @@ do_install() {
 	    fi
 	fi
 
-	if [ "${ARCH}" = "arm64" ]; then
-	    cp -a --parents arch/arm64/kernel/vdso/vdso.lds $kerneldir/build/
+	if [ "${ARCH}" = "arm64" -o "${ARCH}" = "riscv" ]; then
+	    cp -a --parents arch/${ARCH}/kernel/vdso/vdso.lds $kerneldir/build/
 	fi
 	if [ "${ARCH}" = "powerpc" ]; then
 	    cp -a --parents arch/powerpc/kernel/vdso32/vdso32.lds $kerneldir/build 2>/dev/null || :
@@ -184,6 +184,12 @@ do_install() {
 	    cp -a --parents arch/${ARCH}/kernel/syscalls/syscallhdr.sh $kerneldir/build/ 2>/dev/null || :
 	    cp -a --parents arch/${ARCH}/kernel/vdso32/* $kerneldir/build/ 2>/dev/null || :
 	    cp -a --parents arch/${ARCH}/kernel/vdso64/* $kerneldir/build/ 2>/dev/null || :
+	fi
+	if [ "${ARCH}" = "riscv" ]; then
+            cp -a --parents arch/riscv/kernel/vdso/*gettimeofday.* $kerneldir/build/
+            cp -a --parents arch/riscv/kernel/vdso/note.S $kerneldir/build/
+            cp -a --parents arch/riscv/kernel/vdso/gen_vdso_offsets.sh $kerneldir/build/
+	    cp -a --parents arch/riscv/kernel/vdso/* $kerneldir/build/ 2>/dev/null || :
 	fi
 
 	# include the machine specific headers for ARM variants, if available.

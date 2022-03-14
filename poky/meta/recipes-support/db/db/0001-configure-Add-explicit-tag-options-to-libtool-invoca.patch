@@ -7,7 +7,7 @@ This helps cross compile when tag inference via heuristics
 fail because CC variable is having -fPIE -pie and libtool
 smartly removes it when building libraries
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [as far as open source community is concerned, upstream is dead]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---

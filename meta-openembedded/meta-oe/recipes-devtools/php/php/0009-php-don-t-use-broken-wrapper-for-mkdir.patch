@@ -1,0 +1,29 @@
+From 8707720c0aea405f0e06d67354f239232cc823cc Mon Sep 17 00:00:00 2001
+From: Claude Bing <cbing@cybernetics.com>
+Date: Tue, 9 Nov 2021 13:10:02 -0500
+Subject: [PATCH 09/11] php: don't use broken wrapper for mkdir
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+
+update patch to version 7.4.4
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
+update patch to version 8.0.12
+Signed-off-by: Claude Bing <cbing@cybernetics.com>
+---
+ build/Makefile.global | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build/Makefile.global b/build/Makefile.global
+index 6566d052de..eb39421f2a 100644
+--- a/build/Makefile.global
++++ b/build/Makefile.global
+@@ -1,4 +1,4 @@
+-mkinstalldirs = $(top_srcdir)/build/shtool mkdir -p
++mkinstalldirs = mkdir -p
+ INSTALL = $(top_srcdir)/build/shtool install -c
+ INSTALL_DATA = $(INSTALL) -m 644
+ 
+-- 
+2.25.1
+

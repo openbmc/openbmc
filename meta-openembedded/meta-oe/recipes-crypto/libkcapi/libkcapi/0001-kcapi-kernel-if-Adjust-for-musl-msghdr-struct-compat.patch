@@ -1,0 +1,81 @@
+From d54e532821d40f8094a49742831d32ec7e76caed Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 16 Dec 2021 15:18:21 -0800
+Subject: [PATCH] kcapi-kernel-if: Adjust for musl  msghdr struct compatibility
+
+musl sticks to POSIX and defines msg_iovlen and msg_controllen as int
+and socklen_t types respectively whereas glibc and kernel mark them as
+size_t which is them assumed as such in the code here as well, Make the
+needed conversions to get it going on musl/linux also see [1] for more
+info
+
+[1] https://git.musl-libc.org/cgit/musl/commit/?id=7168790763cdeb794df52be6e3b39fbb021c5a64
+
+Upstream-Status: Submitted [https://github.com/smuellerDD/libkcapi/pull/131]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/kcapi-kernel-if.c | 22 ++++++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
+
+diff --git a/lib/kcapi-kernel-if.c b/lib/kcapi-kernel-if.c
+index 739841e..e5d15d4 100644
+--- a/lib/kcapi-kernel-if.c
++++ b/lib/kcapi-kernel-if.c
+@@ -168,10 +168,14 @@ ssize_t _kcapi_common_send_meta(struct kcapi_handle *handle,
+ 	}
+ 
+ 	msg.msg_control = buffer_p;
+-	msg.msg_controllen = bufferlen;
+ 	msg.msg_iov = iov;
++#ifdef __GLIBC__
+ 	msg.msg_iovlen = iovlen;
+-
++	msg.msg_controllen = bufferlen;
++#else
++	msg.msg_iovlen = (int)iovlen;
++	msg.msg_controllen = (socklen_t)bufferlen;
++#endif
+ 	/* encrypt/decrypt operation */
+ 	header = CMSG_FIRSTHDR(&msg);
+ 	if (!header) {
+@@ -193,7 +197,11 @@ ssize_t _kcapi_common_send_meta(struct kcapi_handle *handle,
+ 		}
+ 		header->cmsg_level = SOL_ALG;
+ 		header->cmsg_type = ALG_SET_IV;
++#ifdef __GLIBC__
+ 		header->cmsg_len = iv_msg_size;
++#else
++		header->cmsg_len = (socklen_t)iv_msg_size;
++#endif
+ 		alg_iv = (void*)CMSG_DATA(header);
+ 		alg_iv->ivlen = tfm->info.ivsize;
+ 		memcpy(alg_iv->iv, handle->cipher.iv, tfm->info.ivsize);
+@@ -244,8 +252,11 @@ ssize_t _kcapi_common_send_data(struct kcapi_handle *handle,
+ 	msg.msg_controllen = 0;
+ 	msg.msg_flags = 0;
+ 	msg.msg_iov = iov;
++#ifdef __GLIBC__
+ 	msg.msg_iovlen = iovlen;
+-
++#else
++	msg.msg_iovlen = (int)iovlen;
++#endif
+ 	ret = sendmsg(*_kcapi_get_opfd(handle), &msg, (int)flags);
+ 	if (ret < 0)
+ 		ret = -errno;
+@@ -542,8 +553,11 @@ ssize_t _kcapi_common_recv_data(struct kcapi_handle *handle,
+ 	msg.msg_controllen = 0;
+ 	msg.msg_flags = 0;
+ 	msg.msg_iov = iov;
++#ifdef __GLIBC__
+ 	msg.msg_iovlen = iovlen;
+-
++#else
++	msg.msg_iovlen = (int)iovlen;
++#endif
+ 	ret = recvmsg(*_kcapi_get_opfd(handle), &msg, 0);
+ 	if (ret < 0)
+ 		ret = -errno;
+-- 
+2.34.1
+

@@ -3,7 +3,7 @@ HOMEPAGE = "https://github.com/adafruit/Adafruit_Blinka"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=660e614bc7efb0697cc793d8a22a55c2"
 
-SRC_URI = "git://github.com/adafruit/Adafruit_Blinka.git;branch=main"
+SRC_URI = "git://github.com/adafruit/Adafruit_Blinka.git;branch=main;protocol=https"
 SRCREV = "dc688f354fe779c9267c208b99f310af87e79272"
 
 S = "${WORKDIR}/git"

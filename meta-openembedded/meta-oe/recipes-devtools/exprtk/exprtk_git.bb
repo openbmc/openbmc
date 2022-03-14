@@ -5,7 +5,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 SRCREV = "281c2ccc65b8f91c012ea3725ebcef406378a225"
 
-SRC_URI = "git://github.com/ArashPartow/exprtk.git"
+SRC_URI = "git://github.com/ArashPartow/exprtk.git;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

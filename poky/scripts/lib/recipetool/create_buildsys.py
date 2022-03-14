@@ -545,7 +545,7 @@ class AutotoolsRecipeHandler(RecipeHandler):
                 deps.append('zlib')
             elif keyword in ('AX_CHECK_OPENSSL', 'AX_LIB_CRYPTO'):
                 deps.append('openssl')
-            elif keyword == 'AX_LIB_CURL':
+            elif keyword in ('AX_LIB_CURL', 'LIBCURL_CHECK_CONFIG'):
                 deps.append('curl')
             elif keyword == 'AX_LIB_BEECRYPT':
                 deps.append('beecrypt')
@@ -624,6 +624,7 @@ class AutotoolsRecipeHandler(RecipeHandler):
                     'AX_CHECK_OPENSSL',
                     'AX_LIB_CRYPTO',
                     'AX_LIB_CURL',
+                    'LIBCURL_CHECK_CONFIG',
                     'AX_LIB_BEECRYPT',
                     'AX_LIB_EXPAT',
                     'AX_LIB_GCRYPT',

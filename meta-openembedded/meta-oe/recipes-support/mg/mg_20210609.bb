@@ -6,7 +6,7 @@ DEPENDS = "ncurses libbsd"
 SECTION = "console/editors"
 
 SRCREV = "688f49cd67ab30dfa6482c74815e117cbf7af63a"
-SRC_URI = "git://github.com/hboetes/mg \
+SRC_URI = "git://github.com/hboetes/mg;branch=master;protocol=https \
            file://0001-fileio-Include-sys-param.h-for-MAXNAMLEN.patch \
            file://0002-fileio-Define-DEFFILEMODE-if-platform-is-missing.patch \
            "

@@ -14,7 +14,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=8184208060df880fe3137b93eb88aeea"
 
 DEPENDS = "zlib gzip-native json-c"
 
-SRC_URI = "git://github.com/GENIVI/${BPN}.git;protocol=https \
+SRC_URI = "git://github.com/GENIVI/${BPN}.git;protocol=https;branch=master \
     file://0002-Don-t-execute-processes-as-a-specific-user.patch \
     file://0004-Modify-systemd-config-directory.patch \
     file://317.patch \

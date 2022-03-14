@@ -49,18 +49,17 @@ rc=0
 
 # Pre-Determine if we will miss an allocation due to the number of
 # addresses the FRU actually supports.
-declare -A num_to_if=(@NUM_TO_IF@)
-for key in "${!num_to_if[@]}"; do
+declare -A num_to_intfs=(@NUM_TO_INTFS@)
+for key in "${!num_to_intfs[@]}"; do
   if (( key >= num )); then
-    echo "${num_to_if[$key]} at $key is out of range" >&2
+    echo "${num_to_intfs[$key]} at $key is out of range" >&2
     rc=1
   fi
 done
 
 # Write out each MAC override to the runtime networkd configuration
 for (( i=0; i<num; i++ )); do
-  intf="${num_to_if[$i]}"
-  if [ -n "$intf" ]; then
+  for intf in ${num_to_intfs[$i]}; do
     macstr=$(printf '%02x:%02x:%02x:%02x:%02x:%02x' "${mac[@]}")
     echo "Setting $intf to $macstr" >&2
     for override in /run/systemd/network/{00,}-bmc-$intf.network.d; do
@@ -71,7 +70,7 @@ for (( i=0; i<num; i++ )); do
       mkdir -p "$override"
       printf '[NetDev]\nMACAddress=%s\n' "$macstr" >"$override"/50-mac.conf
     done
-  fi
+  done
   if (( ++mac[5] > 0xff )); then
     echo "MAC assignment too large: ${mac[@]}" >&2
     rc=2

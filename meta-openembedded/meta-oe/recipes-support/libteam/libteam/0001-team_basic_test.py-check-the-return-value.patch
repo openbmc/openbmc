@@ -1,0 +1,34 @@
+From e86a58271d7d0a3b9cd546251d2527e93898bdb8 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Tue, 21 Dec 2021 11:15:31 +0800
+Subject: [PATCH] team_basic_test.py: check the return value
+
+Not only print the traceback like before, also check the
+return value.
+
+Upstream-Status: Submitted [https://github.com/jpirko/libteam/pull/63]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ scripts/team_basic_test.py | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/team_basic_test.py b/scripts/team_basic_test.py
+index 0b64af2..17588c7 100755
+--- a/scripts/team_basic_test.py
++++ b/scripts/team_basic_test.py
+@@ -203,4 +203,10 @@ def main():
+     btest.run()
+ 
+ if __name__ == "__main__":
+-    main()
++    try:
++        ret = main()
++    except Exception as esc:
++        ret = 1
++        import traceback
++        traceback.print_exc()
++    sys.exit(ret)
+-- 
+2.17.1
+

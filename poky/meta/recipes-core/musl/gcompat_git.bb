@@ -37,7 +37,7 @@ do_install () {
 	oe_runmake install 'DESTDIR=${D}'
 	if [ "${SITEINFO_BITS}" = "64" ]; then
 		install -d ${D}/lib64
-		lnr ${D}${GLIBC_LDSO} ${D}/lib64/`basename ${GLIBC_LDSO}`
+		ln -rs ${D}${GLIBC_LDSO} ${D}/lib64/`basename ${GLIBC_LDSO}`
 	fi
 }
 

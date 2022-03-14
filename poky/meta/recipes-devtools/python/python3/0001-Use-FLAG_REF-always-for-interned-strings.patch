@@ -1,4 +1,4 @@
-From 9f63e83b1cec872917647b11155edaffe399d103 Mon Sep 17 00:00:00 2001
+From d7217b79a4e125d4fcc1087743171b94d91d1121 Mon Sep 17 00:00:00 2001
 From: Inada Naoki <songofacandy@gmail.com>
 Date: Sat, 14 Jul 2018 00:46:11 +0900
 Subject: [PATCH] Use FLAG_REF always for interned strings
@@ -11,7 +11,7 @@ Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
  1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/Python/marshal.c b/Python/marshal.c
-index c4538bd..2437160 100644
+index 4125240..341c9aa 100644
 --- a/Python/marshal.c
 +++ b/Python/marshal.c
 @@ -298,9 +298,14 @@ w_ref(PyObject *v, char *flag, WFILE *p)

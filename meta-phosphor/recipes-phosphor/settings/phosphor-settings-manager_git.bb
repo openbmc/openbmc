@@ -4,7 +4,7 @@ d-bus objects to represent various user settings."
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-inherit autotools
+inherit autotools pkgconfig
 inherit obmc-phosphor-dbus-service
 inherit python3native
 inherit phosphor-settings-manager
@@ -36,8 +36,8 @@ EXTRA_OECONF = " \
              SETTINGS_YAML=${STAGING_DIR_NATIVE}${settings_datadir}/defaults.yaml \
              "
 
-# Collect files in SRC_URI that end in ".override.yml" and call a script that
-# writes their contents over that of settings.yaml, which is then updated to
+# Collect files in SRC_URI that end in ".override.yml" or ".remove.yml" and call a script that
+# writes/removes their contents from that of settings.yaml, which is then updated to
 # the merged data values.
 # This doesn't correctly handle globs in ".override.yml" entries in SRC_URI.
 python do_merge_settings () {
@@ -58,7 +58,7 @@ python do_merge_settings () {
         cmd.append(os.path.join(settingsdir, 'mrw-settings.override.yaml'))
 
     fetch = bb.fetch2.Fetch([], d)
-    override_urls = [url for url in fetch.urls if url.endswith('.override.yml')]
+    override_urls = [url for url in fetch.urls if url.endswith(('.override.yml', '.remove.yml'))]
     for url in override_urls:
         bb.debug(2, 'Overriding with source: ' + url)
         local_base = os.path.basename(fetch.localpath(url))

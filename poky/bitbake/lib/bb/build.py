@@ -569,7 +569,6 @@ exit $ret
 def _task_data(fn, task, d):
     localdata = bb.data.createCopy(d)
     localdata.setVar('BB_FILENAME', fn)
-    localdata.setVar('BB_CURRENTTASK', task[3:])
     localdata.setVar('OVERRIDES', 'task-%s:%s' %
                      (task[3:].replace('_', '-'), d.getVar('OVERRIDES', False)))
     localdata.finalize()
@@ -715,19 +714,23 @@ def _exec_task(fn, task, d, quieterr):
                 logger.debug2("Zero size logfn %s, removing", logfn)
                 bb.utils.remove(logfn)
                 bb.utils.remove(loglink)
-    except bb.BBHandledException:
-        event.fire(TaskFailed(task, fn, logfn, localdata, True), localdata)
-        return 1
     except (Exception, SystemExit) as exc:
+        handled = False
+        if isinstance(exc, bb.BBHandledException):
+            handled = True
+
         if quieterr:
+            if not handled:
+                logger.warning(repr(exc))
             event.fire(TaskFailedSilent(task, fn, logfn, localdata), localdata)
         else:
             errprinted = errchk.triggered
             # If the output is already on stdout, we've printed the information in the
             # logs once already so don't duplicate
-            if verboseStdoutLogging:
+            if verboseStdoutLogging or handled:
                 errprinted = True
-            logger.error(repr(exc))
+            if not handled:
+                logger.error(repr(exc))
             event.fire(TaskFailed(task, fn, logfn, localdata, errprinted), localdata)
         return 1
 

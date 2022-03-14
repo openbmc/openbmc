@@ -1,10 +1,19 @@
-Upstream-Status: Pending
+configure: Allow lockdev to be disabled
+
+When the pkgconfig dependencies may be present, it is useful to be
+able to explictly disable the lockdev dependency. This adds such an
+option.
 
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
---- a/configure.in	2013-02-06 18:18:13.000000000 +0100
-+++ b/configure.in	2013-07-21 15:31:27.614828894 +0200
-@@ -40,7 +40,13 @@
+Upstream-Status: Submitted [https://salsa.debian.org/minicom-team/minicom/-/merge_requests/14]
+
+Index: minicom-2.8/configure.ac
+===================================================================
+--- minicom-2.8.orig/configure.ac
++++ minicom-2.8/configure.ac
+@@ -43,7 +43,13 @@ if test "x$enable_socket" = xyes; then
  fi
  
  PKG_PROG_PKG_CONFIG

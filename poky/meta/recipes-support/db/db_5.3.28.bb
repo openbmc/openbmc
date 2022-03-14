@@ -66,8 +66,6 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[verify] = "--enable-verify, --disable-verify"
 PACKAGECONFIG[dbm] = "--enable-dbm,--disable-dbm,"
 
-EXTRA_OEMAKE += "LIBTOOL='./${HOST_SYS}-libtool'"
-
 EXTRA_AUTORECONF += "--exclude=autoheader  -I ${S}/dist/aclocal -I${S}/dist/aclocal_java"
 AUTOTOOLS_SCRIPT_PATH = "${S}/dist"
 
@@ -91,7 +89,7 @@ oe_runconf:prepend() {
 
 do_compile:prepend() {
     # Stop libtool adding RPATHs
-    sed -i -e 's|hardcode_into_libs=yes|hardcode_into_libs=no|' ${B}/${HOST_SYS}-libtool
+    sed -i -e 's|hardcode_into_libs=yes|hardcode_into_libs=no|' ${B}/libtool
 }
 
 do_install:append() {

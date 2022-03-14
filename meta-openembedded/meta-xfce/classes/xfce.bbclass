@@ -1,6 +1,6 @@
 def xfce_verdir(v):
     import re
-    m = re.match("^([0-9]+)\.([0-9]+)", v)
+    m = re.match(r"^([0-9]+)\.([0-9]+)", v)
     return "%s.%s" % (m.group(1), m.group(2))
 
 HOMEPAGE = "http://www.xfce.org"

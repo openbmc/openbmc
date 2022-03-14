@@ -7,8 +7,9 @@ LIC_FILES_CHKSUM = "file://LICENCE;md5=b0e1f0b7d0ce8a62c18b1287b991800e"
 FILESEXTRAPATHS:prepend := "${THISDIR}/python-m2crypto:"
 
 SRC_URI += "file://0001-setup.py-link-in-sysroot-not-in-host-directories.patch \
-            file://cross-compile-platform.patch \
-            file://avoid-host-contamination.patch \
+           file://cross-compile-platform.patch \
+           file://avoid-host-contamination.patch \
+           file://0001-setup.py-address-openssl-3.x-build-issue.patch \
            "
 SRC_URI[sha256sum] = "99f2260a30901c949a8dc6d5f82cd5312ffb8abc92e76633baf231bbbcb2decb"
 

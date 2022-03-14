@@ -7,7 +7,7 @@ LICENSE = "MPL-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=815ca599c9df247a0c7f619bab123dad"
 
 SRCREV = "50b7af06f3a0a456c172b4cb3aceafa8a5cc0036"
-SRC_URI = "git://github.com/Haivision/srt;protocol=https \
+SRC_URI = "git://github.com/Haivision/srt;protocol=https;branch=master \
            file://0001-don-t-install-srt-ffplay.patch \
            file://0001-core-Fix-build-with-GCC-11.-1806.patch \
            "

@@ -18,7 +18,7 @@ S = "${WORKDIR}/${SRCNAME}-${PV}"
 
 DEPENDS = "cracklib virtual/gettext"
 
-inherit autotools distutils3-base gettext
+inherit autotools setuptools3-base gettext
 
 B = "${S}"
 

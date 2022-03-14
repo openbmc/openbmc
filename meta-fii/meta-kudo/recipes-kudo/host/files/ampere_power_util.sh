@@ -1,24 +1,40 @@
 #!/bin/bash
+
+source /usr/libexec/kudo-fw/kudo-lib.sh
+
 # Usage of this utility
 function usage() {
-  echo "usage: power-util mb [on|off|status|cycle|reset|graceful_shutdown|graceful_reset|force_reset]";
+  echo "usage: power-util mb [on|off|graceful_shutdown|host_reset|host_cycle|shutdown_ack|hotswap|power_button]";
+}
+
+hotswap() {
+  kudo.sh rst hotswap
+}
+
+force_off() {
+  echo "Powering down Server"
+
+  set_gpio_ctrl 203 out 1
+  sleep 6
+  set_gpio_ctrl 203 out 0
 }
 
 power_off() {
-  echo "Shutting down Server $2"
+  busctl set-property xyz.openbmc_project.Watchdog /xyz/openbmc_project/watchdog/host0 xyz.openbmc_project.State.Watchdog ExpireAction s xyz.openbmc_project.State.Watchdog.Action.None
   busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s xyz.openbmc_project.State.Chassis.Transition.Off
 }
 
 power_on() {
-  echo "Powering on Server $2"
-  gpioset 6 11=1
+  echo "Powering on Server"
+
+  set_gpio_ctrl 203 out 1
   sleep 1
-  gpioset 6 11=0
+  set_gpio_ctrl 203 out 0
   busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s xyz.openbmc_project.State.Chassis.Transition.On
 }
 
 power_status() {
-  st=$(busctl get-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis CurrentPowerState | cut -d"." -f6)
+  st=$(busctl get-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis CurrentPowerState | cut -d "." -f6)
   if [ "$st" == "On\"" ]; then
   echo "on"
   else
@@ -26,33 +42,80 @@ power_status() {
   fi
 }
 
-power_reset() {
-  echo "Reset on server $2"
-  busctl set-property xyz.openbmc_project.State.Host /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host RequestedHostTransition s xyz.openbmc_project.State.Host.Transition.Reboot
+host_status() {
+  BOOT_OK=$(get_gpio_ctrl 194)
+  S5_N=$(get_gpio_ctrl 204)
+  if [ $S5_N == 1 ] || [ $BOOT_OK == 1 ]; then
+    echo "on"
+  else
+    echo "off"
+  fi
+}
+
+timestamp() {
+  date +"%s" # current time
 }
 
 graceful_shutdown() {
   if [ -f "/run/openbmc/host@0-request" ]; then
-    echo "shutdown host immediately"
-    gpioset 6 11=1
-    sleep 6
-    gpioset 6 11=0
+    echo "Shutdown host immediately"
     power_off
   else
     echo "Triggering graceful shutdown"
-    gpioset -l 2 6=0
+    mkdir /run/openbmc
+    echo "$(timestamp)" > "/run/openbmc/host@0-shutdown-req-time"
+    set_gpio_ctrl 70 out 0
     sleep 3
-    gpioset -l 2 6=1
-    sleep 30s
-    power_off
+    set_gpio_ctrl 70 out 1
   fi
 }
 
-force_reset() {
-  echo "Triggering sysreset pin"
-  gpioset -l 2 1=0
-  sleep 1
-  gpioset -l 2 1=1
+host_reset() {
+  if [ $(host_status) == "on" ]; then
+    echo "Triggering sysreset pin"
+    busctl set-property xyz.openbmc_project.Watchdog /xyz/openbmc_project/watchdog/host0 xyz.openbmc_project.State.Watchdog ExpireAction s xyz.openbmc_project.State.Watchdog.Action.None
+    set_gpio_ctrl 65 out 0
+    sleep 1
+    set_gpio_ctrl 65 out 1
+  else
+    echo "Host is off, cannot reset."
+  fi
+}
+
+host_cycle() {
+  echo "DC cycling host"
+  force_off
+  sleep 2
+  power_on
+}
+
+shutdown_ack() {
+  echo "Receive shutdown ACK triggered"
+  power_off
+
+  if [ -f "/run/openbmc/host@0-shutdown-req-time" ]; then
+    rm -rf "/run/openbmc/host@0-shutdown-req-time"
+  fi
+}
+
+power_button() {
+  echo "Power button trigger event."
+  current_time="$(timestamp)"
+  if [ -f "/run/openbmc/power-button" ]; then
+    echo "Power button released"
+    press_time="$(cat /run/openbmc/power-button)"
+    if [[ "$current_time" -le "(($press_time + 1))" ]]; then
+      power_on
+    elif [[ "$current_time" -ge "(($press_time + 5))" ]]; then
+      power_off
+    else
+      echo "Button press did not match interval."
+    fi
+    rm "/run/openbmc/power-button"
+  else
+    echo "Power button pressed"
+    echo "$(timestamp)" > "/run/openbmc/power-button"
+  fi
 }
 
 if [ $# -lt 2 ]; then
@@ -69,49 +132,33 @@ if [ $1 != "mb" ]; then
 fi
 
 if [ $2 = "on" ]; then
+  sleep 3
   if [ $(power_status) == "off" ]; then
     power_on
   fi
 elif [ $2 = "off" ]; then
   if [ $(power_status) == "on" ]; then
     power_off
+    sleep 6
+    if [ $(host_status) == "on" ]; then
+      force_off
+    fi
   fi
-  # If any request of graceful reset, need to power on
-  if [ -f "/run/openbmc/host@0-graceful-reset" ]; then
-    sleep 20s
-    power_on
-    rm -f "/run/openbmc/host@0-graceful-reset"
-  fi
-elif [ $2 == "cycle" ]; then
-  if [ $(power_status) == "on" ]; then
-    echo "Power cycling server"
-    power_off
-    sleep 20s
-    power_on
-  else
-    echo "Host is already off, do nothing"
-  fi
-elif [ $2 == "reset" ]; then
-  if [ $(power_status) == "on" ]; then
-    power_reset
-  else
-    echo "ERROR: Server not powered on"
-  fi
+elif [[ $2 == "hotswap" ]]; then
+  hotswap
 elif [[ $2 == "graceful_shutdown" ]]; then
   graceful_shutdown
-elif [ $2 == "graceful_reset" ]; then
-  mkdir -p "/run/openbmc/"
-  touch "/run/openbmc/host@0-graceful-reset"
-  graceful_shutdown
-  sleep 20s
-elif [ $2 == "status" ]; then
-  power_status
-elif [ $2 == "force_reset" ]; then
-  force_reset
+elif [ $2 == "host_reset" ]; then
+  host_reset
+elif [ $2 == "host_cycle" ]; then
+  host_cycle
+elif [ $2 == "shutdown_ack" ]; then
+  shutdown_ack
+elif [ $2 == "power_button" ]; then
+  power_button
 else
   echo "Invalid parameter2=$2"
   usage;
 fi
 
 exit 0;
-

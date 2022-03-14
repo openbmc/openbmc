@@ -1,4 +1,4 @@
-From 3e1d00481093e10775eaf69d619c45b32a4aa7dc Mon Sep 17 00:00:00 2001
+From 5985253f2c9025d7c127443a3a9938946f80c2a1 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Martin=20Hundeb=C3=B8ll?= <martin@geanix.com>
 Date: Tue, 6 Nov 2018 14:50:47 +0100
 Subject: [PATCH] buildinfo: strip sysroot and debug-prefix-map from compiler
@@ -21,7 +21,6 @@ https://patchwork.openembedded.org/patch/147229/
 Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Martin Hundebøll <martin@geanix.com>
 
-
 Update to fix buildpaths qa issue for '-fmacro-prefix-map'.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
@@ -31,13 +30,15 @@ Update to fix buildpaths qa issue for '-ffile-prefix-map'.
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
- Configurations/unix-Makefile.tmpl | 10 +++++++++-
+ Configurations/unix-Makefile.tmpl | 12 +++++++++++-
  crypto/build.info                 |  2 +-
- 2 files changed, 10 insertions(+), 2 deletions(-)
+ 2 files changed, 12 insertions(+), 2 deletions(-)
 
+diff --git a/Configurations/unix-Makefile.tmpl b/Configurations/unix-Makefile.tmpl
+index f88a70f..528cdef 100644
 --- a/Configurations/unix-Makefile.tmpl
 +++ b/Configurations/unix-Makefile.tmpl
-@@ -420,13 +420,23 @@ BIN_LDFLAGS={- join(' ', $target{bin_lfl
+@@ -471,13 +471,23 @@ BIN_LDFLAGS={- join(' ', $target{bin_lflags} || (),
                           '$(CNF_LDFLAGS)', '$(LDFLAGS)') -}
  BIN_EX_LIBS=$(CNF_EX_LIBS) $(EX_LIBS)
  
@@ -62,14 +63,16 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  PERLASM_SCHEME= {- $target{perlasm_scheme} -}
  
  # For x86 assembler: Set PROCESSOR to 386 if you want to support
+diff --git a/crypto/build.info b/crypto/build.info
+index efca6cc..eda433e 100644
 --- a/crypto/build.info
 +++ b/crypto/build.info
-@@ -10,7 +10,7 @@ EXTRA=  ../ms/uplink-x86.pl ../ms/uplink
-         ppccpuid.pl pariscid.pl alphacpuid.pl arm64cpuid.pl armv4cpuid.pl
+@@ -109,7 +109,7 @@ DEFINE[../libcrypto]=$UPLINKDEF
  
+ DEPEND[info.o]=buildinf.h
  DEPEND[cversion.o]=buildinf.h
 -GENERATE[buildinf.h]=../util/mkbuildinf.pl "$(CC) $(LIB_CFLAGS) $(CPPFLAGS_Q)" "$(PLATFORM)"
 +GENERATE[buildinf.h]=../util/mkbuildinf.pl "$(CC_Q) $(CFLAGS_Q) $(CPPFLAGS_Q)" "$(PLATFORM)"
- DEPEND[buildinf.h]=../configdata.pm
  
- GENERATE[uplink-x86.s]=../ms/uplink-x86.pl $(PERLASM_SCHEME)
+ GENERATE[uplink-x86.s]=../ms/uplink-x86.pl
+ GENERATE[uplink-x86_64.s]=../ms/uplink-x86_64.pl

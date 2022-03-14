@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;beginline=4;md5=004a4db50a1e20972e924a8618747
 DEPENDS = "openssl libcap zlib"
 
 SRC_URI = "https://ftp.isc.org/isc/dhcp/4.4.2-P1/dhcp-4.4.2-P1.tar.gz \
-           https://ftp.isc.org/isc/bind9/9.11.32/bind-9.11.32.tar.gz;name=bind;downloadfilename=bind.tar.gz;unpack=0 \
+           https://ftp.isc.org/isc/bind9/9.11.32/bind-9.11.32.tar.gz;name=bind;unpack=0 \
            file://default-relay \
            file://init-relay \
            file://dhcrelay.service \
@@ -43,23 +43,22 @@ EXTRA_OECONF = "--enable-paranoia \
                 --enable-libtool \
                 --with-randomdev=/dev/random \
                "
-EXTRA_OEMAKE += "LIBTOOL='${S}/${HOST_SYS}-libtool'"
 
 # Enable shared libs per dhcp README
 do_configure:prepend () {
     cp configure.ac+lt configure.ac
-    rm ${S}/bind/bind.tar.gz
-    mv ${WORKDIR}/bind.tar.gz ${S}/bind/
+    cp ${WORKDIR}/bind-9.11.32.tar.gz ${S}/bind/bind.tar.gz
 }
 
 do_compile:prepend() {
+    # Need to unpack this now instead of earlier as do_configure will delete the configure script
     rm -rf ${S}/bind/bind-9.11.32/
     tar xf ${S}/bind/bind.tar.gz -C ${S}/bind
     install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.guess ${S}/bind/bind-9.11.32/
     install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.sub ${S}/bind/bind-9.11.32/
     cp -fpR ${S}/m4/*.m4 ${S}/bind/bind-9.11.32/libtool.m4/
     rm -rf ${S}/bind/bind-9.11.32/libtool
-    install -m 0755 ${S}/${HOST_SYS}-libtool ${S}/bind/bind-9.11.32/
+    install -m 0755 ${S}/libtool ${S}/bind/bind-9.11.32/
 }
 
 do_install:append () {

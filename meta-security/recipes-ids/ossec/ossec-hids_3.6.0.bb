@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=d625d1520b5e38faefb81cf9772badc9"
 
 
 DEPENDS = "openssl libpcre2 zlib libevent"
-SRC_URI = "git://github.com/ossec/ossec-hids;branch=master \
+SRC_URI = "git://github.com/ossec/ossec-hids;branch=master;protocol=https \
            file://0001-Makefile-drop-running-scrips-install.patch  \
            file://0002-Makefile-don-t-set-uid-gid.patch \
            "

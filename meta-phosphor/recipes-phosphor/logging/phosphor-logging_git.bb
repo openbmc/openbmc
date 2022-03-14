@@ -7,7 +7,7 @@ PV = "1.0+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
-inherit meson
+inherit pkgconfig meson
 inherit python3native
 inherit obmc-phosphor-dbus-service
 inherit phosphor-logging
@@ -53,8 +53,8 @@ FILES:phosphor-rsyslog-config += " \
         ${bindir}/phosphor-rsyslog-conf \
 "
 
-SRC_URI += "git://github.com/openbmc/phosphor-logging"
-SRCREV = "fb9b811e14adeda64185ec858739083718c8f13d"
+SRC_URI += "git://github.com/openbmc/phosphor-logging;branch=master;protocol=https"
+SRCREV = "a2d7b7750ce7a93b1cc785f568acfb69c1ca01b1"
 
 S = "${WORKDIR}/git"
 

@@ -10,42 +10,6 @@
           Enabled:
               Default: 'true'
 
-/xyz/openbmc_project/control/host0/power_mode:
-    - Interface: xyz.openbmc_project.Control.Power.Mode
-      Properties:
-          PowerMode:
-              Default: Mode::PowerMode::MaximumPerformance
-
-/xyz/openbmc_project/control/host0/power_ips:
-    - Interface: xyz.openbmc_project.Control.Power.IdlePowerSaver
-      Properties:
-          Enabled:
-              Default: 'false'
-          EnterUtilizationPercent:
-              Default: 8
-              Validation:
-                  Type: "range"
-                  Validator: 1..95
-                  Unit: "percent"
-          EnterDwellTime:
-              Default: 240000
-              Validation:
-                  Type: "range"
-                  Validator: 10000..600000
-                  Unit: "milliseconds"
-          ExitUtilizationPercent:
-              Default: 12
-              Validation:
-                  Type: "range"
-                  Validator: 5..95
-                  Unit: "percent"
-          ExitDwellTime:
-              Default: 12000
-              Validation:
-                  Type: "range"
-                  Validator: 10000..600000
-                  Unit: "milliseconds"
-
 /xyz/openbmc_project/hardware_isolation/allow_hw_isolation:
     - Interface: xyz.openbmc_project.Object.Enable
       Properties:

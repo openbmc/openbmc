@@ -210,8 +210,8 @@ OE_vars = [
     'others'
 ]
 
-varRegexp = r'^([a-zA-Z_0-9${}-]*)([ \t]*)([+.:]?=[+.]?)([ \t]*)([^\t]+)'
-routineRegexp = r'^([a-zA-Z0-9_ ${}-]+?)\('
+varRegexp = r'^([a-zA-Z_0-9${}:-]*)([ \t]*)([+.:]?=[+.]?)([ \t]*)([^\t]+)'
+routineRegexp = r'^([a-zA-Z0-9_ ${}:-]+?)\('
 
 # Variables seen in the processed .bb
 seen_vars = {}
@@ -369,7 +369,7 @@ if __name__ == "__main__":
             line = line.expandtabs().rstrip()
             # ignore empty lines (or line filled with spaces or tabs only)
             # so that rule6 is always respected
-            if line is not '':
+            if line != '':
                 lines.append(line)
 
     # -- parse the file --
@@ -386,7 +386,7 @@ if __name__ == "__main__":
         line = follow_rule(6, line)
 
         # ignore empty lines
-        if line.isspace() or line is '':
+        if line.isspace() or line == '':
             # flush comments into the olines
             for c in commentBloc:
                 olines.append(c)

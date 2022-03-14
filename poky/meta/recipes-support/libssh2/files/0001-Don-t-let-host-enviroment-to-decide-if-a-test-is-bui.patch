@@ -1,4 +1,4 @@
-From f9e3e2ee7b18ba5bb8efe083171f3e701eb0a663 Mon Sep 17 00:00:00 2001
+From f6abce5ba41a412a247250dcd80e387e53474466 Mon Sep 17 00:00:00 2001
 From: Your Name <you@example.com>
 Date: Mon, 28 Dec 2020 02:08:03 +0000
 Subject: [PATCH] Don't let host enviroment to decide if a test is build
@@ -9,6 +9,7 @@ don't use SSHD on host to decide weither to build a test
 Upstream-Status: Inappropriate[oe specific]
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
 ---
  tests/Makefile.am | 6 +-----
  1 file changed, 1 insertion(+), 5 deletions(-)
@@ -41,6 +42,3 @@ index dc0922f..6cbc35d 100644
 -endif
 \ No newline at end of file
 +endif
--- 
-2.20.1
-

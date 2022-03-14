@@ -5,6 +5,57 @@ import os
 import subprocess
 import bb
 
+# For reproducible builds, this code sets the default SOURCE_DATE_EPOCH in each
+# component's build environment. The format is number of seconds since the
+# system epoch.
+#
+# Upstream components (generally) respect this environment variable,
+# using it in place of the "current" date and time.
+# See https://reproducible-builds.org/specs/source-date-epoch/
+#
+# The default value of SOURCE_DATE_EPOCH comes from the function
+# get_source_date_epoch_value which reads from the SDE_FILE, or if the file
+# is not available will use the fallback of SOURCE_DATE_EPOCH_FALLBACK.
+#
+# The SDE_FILE is normally constructed from the function
+# create_source_date_epoch_stamp which is typically added as a postfuncs to
+# the do_unpack task.  If a recipe does NOT have do_unpack, it should be added
+# to a task that runs after the source is available and before the
+# do_deploy_source_date_epoch task is executed.
+#
+# If a recipe wishes to override the default behavior it should set it's own
+# SOURCE_DATE_EPOCH or override the do_deploy_source_date_epoch_stamp task
+# with recipe-specific functionality to write the appropriate
+# SOURCE_DATE_EPOCH into the SDE_FILE.
+#
+# SOURCE_DATE_EPOCH is intended to be a reproducible value.  This value should
+# be reproducible for anyone who builds the same revision from the same
+# sources.
+#
+# There are 4 ways the create_source_date_epoch_stamp function determines what
+# becomes SOURCE_DATE_EPOCH:
+#
+# 1. Use the value from __source_date_epoch.txt file if this file exists.
+#    This file was most likely created in the previous build by one of the
+#    following methods 2,3,4.
+#    Alternatively, it can be provided by a recipe via SRC_URI.
+#
+# If the file does not exist:
+#
+# 2. If there is a git checkout, use the last git commit timestamp.
+#    Git does not preserve file timestamps on checkout.
+#
+# 3. Use the mtime of "known" files such as NEWS, CHANGLELOG, ...
+#    This works for well-kept repositories distributed via tarball.
+#
+# 4. Use the modification time of the youngest file in the source tree, if
+#    there is one.
+#    This will be the newest file from the distribution tarball, if any.
+#
+# 5. Fall back to a fixed timestamp (SOURCE_DATE_EPOCH_FALLBACK).
+#
+# Once the value is determined, it is stored in the recipe's SDE_FILE.
+
 def get_source_date_epoch_from_known_files(d, sourcedir):
     source_date_epoch = None
     newest_file = None
@@ -41,7 +92,7 @@ def find_git_folder(d, sourcedir):
     for root, dirs, files in os.walk(workdir, topdown=True):
         dirs[:] = [d for d in dirs if d not in exclude]
         if '.git' in dirs:
-            return root
+            return os.path.join(root, ".git")
 
     bb.warn("Failed to find a git repository in WORKDIR: %s" % workdir)
     return None
@@ -106,3 +157,36 @@ def get_source_date_epoch(d, sourcedir):
         fixed_source_date_epoch(d)       # Last resort
     )
 
+def epochfile_read(epochfile, d):
+    cached, efile = d.getVar('__CACHED_SOURCE_DATE_EPOCH') or (None, None)
+    if cached and efile == epochfile:
+        return cached
+
+    if cached and epochfile != efile:
+        bb.debug(1, "Epoch file changed from %s to %s" % (efile, epochfile))
+
+    source_date_epoch = int(d.getVar('SOURCE_DATE_EPOCH_FALLBACK'))
+    try:
+        with open(epochfile, 'r') as f:
+            s = f.read()
+            try:
+                source_date_epoch = int(s)
+            except ValueError:
+                bb.warn("SOURCE_DATE_EPOCH value '%s' is invalid. Reverting to SOURCE_DATE_EPOCH_FALLBACK" % s)
+                source_date_epoch = int(d.getVar('SOURCE_DATE_EPOCH_FALLBACK'))
+        bb.debug(1, "SOURCE_DATE_EPOCH: %d" % source_date_epoch)
+    except FileNotFoundError:
+        bb.debug(1, "Cannot find %s. SOURCE_DATE_EPOCH will default to %d" % (epochfile, source_date_epoch))
+
+    d.setVar('__CACHED_SOURCE_DATE_EPOCH', (str(source_date_epoch), epochfile))
+    return str(source_date_epoch)
+
+def epochfile_write(source_date_epoch, epochfile, d):
+
+    bb.debug(1, "SOURCE_DATE_EPOCH: %d" % source_date_epoch)
+    bb.utils.mkdirhier(os.path.dirname(epochfile))
+
+    tmp_file = "%s.new" % epochfile
+    with open(tmp_file, 'w') as f:
+        f.write(str(source_date_epoch))
+    os.rename(tmp_file, epochfile)

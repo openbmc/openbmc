@@ -5,7 +5,7 @@ SECTION = "x11/wm"
 LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=f27defe1e96c2e1ecd4e0c9be8967949"
 DEPENDS = " \
-    gnome-menus3 \
+    gnome-menus \
     glib-2.0 \
 "
 PV = "0.3"

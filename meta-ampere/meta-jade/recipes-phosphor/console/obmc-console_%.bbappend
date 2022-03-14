@@ -3,8 +3,8 @@ RDEPENDS:${PN} += "bash"
 
 # Remove what installed by common recipe
 OBMC_CONSOLE_HOST_TTY = ""
-SYSTEMD_SUBSTITUTIONS:remove += "OBMC_CONSOLE_HOST_TTY:${OBMC_CONSOLE_HOST_TTY}:${PN}-ssh@.service"
-SYSTEMD_SUBSTITUTIONS:remove += "OBMC_CONSOLE_HOST_TTY:${OBMC_CONSOLE_HOST_TTY}:${PN}-ssh.socket"
+SYSTEMD_SUBSTITUTIONS:remove = "OBMC_CONSOLE_HOST_TTY:${OBMC_CONSOLE_HOST_TTY}:${PN}-ssh@.service"
+SYSTEMD_SUBSTITUTIONS:remove = "OBMC_CONSOLE_HOST_TTY:${OBMC_CONSOLE_HOST_TTY}:${PN}-ssh.socket"
 SYSTEMD_SERVICE:${PN}:remove = " \
                           ${PN}-ssh.socket \
                           ${PN}-ssh@.service \

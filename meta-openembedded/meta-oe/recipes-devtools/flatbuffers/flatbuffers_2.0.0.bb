@@ -14,7 +14,7 @@ RDEPENDS:${PN}-dev += "${PN}-compiler"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 SRCREV = "a9a295fecf3fbd5a4f571f53b01f63202a3e2113"
-SRC_URI = "git://github.com/google/flatbuffers.git"
+SRC_URI = "git://github.com/google/flatbuffers.git;branch=master;protocol=https"
 S = "${WORKDIR}/git"
 
 CVE_CHECK_WHITELIST += "CVE-2020-35864"

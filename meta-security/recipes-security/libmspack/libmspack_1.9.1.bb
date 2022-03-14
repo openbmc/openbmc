@@ -7,7 +7,7 @@ DEPENDS = ""
 LIC_FILES_CHKSUM = "file://COPYING.LIB;beginline=1;endline=2;md5=5b1fd1f66ef926b3c8a5bb00a72a28dd"
 
 SRCREV = "63d3faf90423a4a6c174539a7d32111a840adadc"
-SRC_URI = "git://github.com/kyz/libmspack.git"
+SRC_URI = "git://github.com/kyz/libmspack.git;branch=master;protocol=https"
 
 inherit autotools
 

@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=762732742c73dc6c7fbe8632f06c059a"
 DEPENDS:append:libc-musl = " libucontext"
 
 SRCREV = "f7c6fb6c8e99d6b1b725e5994373bcd19ffdf8fd"
-SRC_URI = "git://github.com/gperftools/gperftools \
+SRC_URI = "git://github.com/gperftools/gperftools;branch=master;protocol=https \
            file://0001-Support-Atomic-ops-on-clang.patch \
            file://0001-fix-build-with-musl-libc.patch \
            file://0001-disbale-heap-checkers-and-debug-allocator-on-musl.patch \

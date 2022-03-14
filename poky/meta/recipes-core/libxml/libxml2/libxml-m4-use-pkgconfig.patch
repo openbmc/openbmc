@@ -5,7 +5,11 @@ Subject: [PATCH] AM_PATH_XML2 uses xml-config which we disable through
 
 binconfig-disabled.bbclass, so port it to use pkg-config instead.
 
-Upstream-Status: Pending
+This cannot be upstreamed, as the original macro supports various
+optional arguments which cannot be supported with a direct call
+to pkg-config.
+
+Upstream-Status: Inappropriate [oe-core specific; see above]
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
 Rebase to 2.9.9

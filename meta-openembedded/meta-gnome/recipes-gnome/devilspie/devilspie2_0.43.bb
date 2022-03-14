@@ -4,15 +4,18 @@ LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=00aefaa50aad75c21367df66102d542c \
                     file://GPL3.txt;md5=d32239bcb673463ab874e80d47fae504"
 
-DEPENDS = "gtk+ glib-2.0 libwnck lua virtual/libx11"
+DEPENDS = "gtk+ glib-2.0 libwnck libxinerama lua virtual/libx11"
 
-SRC_URI = " \
-    http://download.savannah.gnu.org/releases/${BPN}/${BPN}_${PV}-src.tar.gz \
+PV .= "+git${SRCPV}"
+
+SRCREV = "a3ee65b815a0247a0dbdaa39353444cef6f93499"
+
+SRC_URI = "git://github.com/dsalt/devilspie2;branch=master;protocol=https \
     file://default.lua \
     file://devilspie2.desktop \
 "
-SRC_URI[md5sum] = "26eed0b5b4af5c7e13c551eceaeab832"
-SRC_URI[sha256sum] = "ecffc17c62b41e196b72340192a90c4223329df041f135e74c0990860595f828"
+
+S = "${WORKDIR}/git"
 
 inherit features_check pkgconfig gettext
 

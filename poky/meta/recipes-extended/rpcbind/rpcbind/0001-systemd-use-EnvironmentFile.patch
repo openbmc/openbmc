@@ -21,7 +21,7 @@ index 2dd9471..47a46c0 100644
  AC_SUBST([_sbindir])
  AC_CONFIG_COMMANDS_PRE([eval eval _sbindir=$sbindir])
 +AC_SUBST([_sysconfdir])
-+AC_CONFIG_COMMANDS_PRE([eval eval _sysconfdir=$sbindir])
++AC_CONFIG_COMMANDS_PRE([eval eval _sysconfdir=$sysconfdir])
  
  AC_OUTPUT([Makefile systemd/rpcbind.service])
 diff --git a/systemd/rpcbind.service.in b/systemd/rpcbind.service.in

@@ -10,7 +10,6 @@ LIC_FILES_CHKSUM = "file://Copying;md5=5b122a36d0f6dc55279a0ebc69f3c60b \
 
 SRC_URI = "https://www.cpan.org/src/5.0/perl-${PV}.tar.gz;name=perl \
            file://perl-rdepends.txt \
-           file://0001-ExtUtils-MakeMaker-add-LDFLAGS-when-linking-binary-m.patch \
            file://0001-Somehow-this-module-breaks-through-the-perl-wrapper-.patch \
            file://errno_ver.diff \
            file://native-perlinc.patch \
@@ -18,6 +17,9 @@ SRC_URI = "https://www.cpan.org/src/5.0/perl-${PV}.tar.gz;name=perl \
            file://0002-Constant-Fix-up-shebang.patch \
            file://determinism.patch \
            file://CVE-2021-36770.patch \
+           file://aacd2398e766500cb5d83c4d76b642fcf31d997a.patch \
+           file://ea57297a58b8f10ab885c19eec48ea076116cc1f.patch \
+           file://5bc1e5fdd87aa205011512cd1e6cc655bcf677fd.patch \
            "
 SRC_URI:append:class-native = " \
            file://perl-configpm-switch.patch \
@@ -36,7 +38,7 @@ DEPENDS += "perlcross-native zlib virtual/crypt"
 
 PERL_LIB_VER = "${@'.'.join(d.getVar('PV').split('.')[0:2])}.0"
 
-PACKAGECONFIG ??= "bdb gdbm"
+PACKAGECONFIG ??= "gdbm"
 PACKAGECONFIG[bdb] = ",-Ui_db,db"
 PACKAGECONFIG[gdbm] = ",-Ui_gdbm,gdbm"
 
@@ -51,11 +53,13 @@ do_configure:class-target() {
     ./configure --prefix=${prefix} --libdir=${libdir} \
     --target=${TARGET_SYS} \
     -Duseshrplib \
+    -Dusethreads \
     -Dsoname=libperl.so.5 \
     -Dvendorprefix=${prefix} \
     -Darchlibexp=${STAGING_LIBDIR}/perl5/${PV}/${TARGET_ARCH}-linux \
     -Dlibpth='${libdir} ${base_libdir}' \
     -Dglibpth='${libdir} ${base_libdir}' \
+    -Alddlflags=' ${LDFLAGS}' \
     ${PACKAGECONFIG_CONFARGS}
 
     #perl.c uses an ARCHLIB_EXP define to generate compile-time code that
@@ -77,9 +81,11 @@ do_configure:class-nativesdk() {
     ./configure --prefix=${prefix} \
     --target=${TARGET_SYS} \
     -Duseshrplib \
+    -Dusethreads \
     -Dsoname=libperl.so.5 \
     -Dvendorprefix=${prefix} \
     -Darchlibexp=${STAGING_LIBDIR}/perl5/${PV}/${TARGET_ARCH}-linux \
+    -Alddlflags=' ${LDFLAGS}' \
     ${PACKAGECONFIG_CONFARGS}
 
     # See the comment above
@@ -90,9 +96,11 @@ do_configure:class-native() {
     ./configure --prefix=${prefix} \
     -Dbin=${bindir}/perl-native \
     -Duseshrplib \
+    -Dusethreads \
     -Dsoname=libperl.so.5 \
     -Dvendorprefix=${prefix} \
     -Ui_xlocale \
+    -Alddlflags=' ${LDFLAGS}' \
     ${PACKAGECONFIG_CONFARGS}
 }
 

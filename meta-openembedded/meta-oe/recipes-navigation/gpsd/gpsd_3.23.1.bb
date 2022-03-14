@@ -34,6 +34,7 @@ EXTRA_OESCONS = " \
     nostrip='true' \
     systemd='${SYSTEMD_OESCONS}' \
     libdir='${libdir}' \
+    sbindir='${sbindir}' \
     udevdir='${nonarch_base_libdir}/udev' \
     unitdir='${systemd_system_unitdir}' \
     manbuild='false' \
@@ -47,6 +48,7 @@ do_compile:prepend() {
     export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}"
     export PKG_CONFIG="PKG_CONFIG_SYSROOT_DIR=\"${PKG_CONFIG_SYSROOT_DIR}\" pkg-config"
     export STAGING_PREFIX="${STAGING_DIR_HOST}/${prefix}"
+    export CC="${CC}"
     export LD="${CC}"
     export LINKFLAGS="${LDFLAGS}"
 }
@@ -72,15 +74,14 @@ do_install:append() {
 
     # Support for python
     install -d ${D}${PYTHON_SITEPACKAGES_DIR}/gps
-    install -m 755 ${S}/gps/*.py ${D}${PYTHON_SITEPACKAGES_DIR}/gps
+    install -m 755 ${D}${libdir}/gps/*.py ${D}${PYTHON_SITEPACKAGES_DIR}/gps
 }
 
-PACKAGES =+ "libgps libgpsd python3-pygps gpsd-udev gpsd-conf gpsd-gpsctl gps-utils"
+PACKAGES =+ "libgps python3-pygps gpsd-udev gpsd-conf gpsd-gpsctl gps-utils"
 
 RPROVIDES:${PN}-dbg += "python-pygps-dbg"
 
-FILES:${PN}-dev += "${libdir}/pkgconfdir/libgpsd.pc ${libdir}/pkgconfdir/libgps.pc \
-                    ${libdir}/libQgpsmm.prl"
+FILES:${PN}-dev += "${libdir}/libQgpsmm.prl"
 
 FILES:${PN}-doc += "${datadir}/${BPN}/doc"
 
@@ -90,9 +91,6 @@ RRECOMMENDS:${PN} = "gpsd-conf gpsd-udev gpsd-machine-conf"
 SUMMARY:gpsd-udev = "udev relevant files to use gpsd hotplugging"
 FILES:gpsd-udev = "${nonarch_base_libdir}/udev"
 RDEPENDS:gpsd-udev += "udev gpsd-conf"
-
-SUMMARY:libgpsd = "C service library used for communicating with gpsd"
-FILES:libgpsd = "${libdir}/libgpsd.so.*"
 
 SUMMARY:libgps = "C service library used for communicating with gpsd"
 FILES:libgps = "${libdir}/libgps.so.*"
@@ -106,7 +104,32 @@ FILES:gpsd-gpsctl = "${bindir}/gpsctl"
 
 SUMMARY:gps-utils = "Utils used for simulating, monitoring,... a GPS"
 # Python files are required for gps/fake, required for gpsfake.
-FILES:gps-utils = "${bindir}/* ${libdir}/gps/*.py ${libdir}/gps/*.so"
+FILES:gps-utils = "\
+    ${bindir}/cgps         \
+    ${bindir}/gegps        \
+    ${bindir}/gps2udp      \
+    ${bindir}/gpscat       \
+    ${bindir}/gpscsv       \
+    ${bindir}/gpsctl       \
+    ${bindir}/gpsdebuginfo \
+    ${bindir}/gpsdecode    \
+    ${bindir}/gpsfake      \
+    ${bindir}/gpsmon       \
+    ${bindir}/gpspipe      \
+    ${bindir}/gpsplot      \
+    ${bindir}/gpsprof      \
+    ${bindir}/gpsrinex     \
+    ${bindir}/gpssnmp      \
+    ${bindir}/gpssubframe  \
+    ${bindir}/gpxlogger    \
+    ${bindir}/lcdgps       \
+    ${bindir}/ntpshmmon    \
+    ${bindir}/ppscheck     \
+    ${bindir}/ubxtool      \
+    ${bindir}/xgps         \
+    ${bindir}/xgpsspeed    \
+    ${bindir}/zerk         \
+"
 RDEPENDS:gps-utils = "python3-pygps"
 
 SUMMARY:python3-pygps = "Python bindings to gpsd"

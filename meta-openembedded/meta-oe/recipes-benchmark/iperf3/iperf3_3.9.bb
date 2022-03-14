@@ -11,7 +11,7 @@ AUTHOR = "ESNET <info@es.net>, Lawrence Berkeley National Laboratory <websupport
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b7fb682e9941a49f1214dcd7441410d7"
 
-SRC_URI = "git://github.com/esnet/iperf.git \
+SRC_URI = "git://github.com/esnet/iperf.git;branch=master;protocol=https \
            file://0002-Remove-pg-from-profile_CFLAGS.patch \
            file://0001-configure.ac-check-for-CPP-prog.patch \
            "

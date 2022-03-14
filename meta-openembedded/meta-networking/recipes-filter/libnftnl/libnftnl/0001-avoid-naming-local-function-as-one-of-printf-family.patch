@@ -1,6 +1,6 @@
-From c29959e045dd09d0b5727682d4e9dbc10923ac4f Mon Sep 17 00:00:00 2001
-From: Trevor Gamblin <trevor.gamblin@windriver.com>
-Date: Wed, 2 Jun 2021 11:08:51 -0400
+From e03b003610a176d608da9a02e433e7ded7e4b75f Mon Sep 17 00:00:00 2001
+From: Todd Cunningham <tcunningham07@gmail.com>
+Date: Wed, 11 Dec 2019 10:18:56 +1000
 Subject: [PATCH] avoid naming local function as one of printf family
 
 Fixes build issues with clang
@@ -13,6 +13,9 @@ Signed-off-by: Yuan Chao <yuanc.fnst@cn.fujitsu.com>
 Signed-off-by: Todd Cunningham <tcunningham07@gmail.com>
 
 Use wiggle to get the patch to apply for version 1.2.0.
+
+Add the same change in src/expr/last.c to make the patch apply for
+1.2.1. Also correct the patch to show the original author and metadata.
 
 Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
 ---
@@ -33,6 +36,7 @@ Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
  src/expr/fwd.c          | 2 +-
  src/expr/hash.c         | 2 +-
  src/expr/immediate.c    | 2 +-
+ src/expr/last.c         | 2 +-
  src/expr/limit.c        | 2 +-
  src/expr/log.c          | 2 +-
  src/expr/lookup.c       | 2 +-
@@ -66,7 +70,7 @@ Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
  src/obj/synproxy.c      | 2 +-
  src/obj/tunnel.c        | 2 +-
  src/object.c            | 2 +-
- 50 files changed, 51 insertions(+), 51 deletions(-)
+ 51 files changed, 52 insertions(+), 52 deletions(-)
 
 diff --git a/include/expr_ops.h b/include/expr_ops.h
 index 7a6aa23..d3a2855 100644
@@ -265,6 +269,17 @@ index 94b043c..a8a3c1f 100644
 -	.snprintf	= nftnl_expr_immediate_snprintf,
 +	.snprintf_	= nftnl_expr_immediate_snprintf,
  };
+diff --git a/src/expr/last.c b/src/expr/last.c
+index e2a60c4..2f75464 100644
+--- a/src/expr/last.c
++++ b/src/expr/last.c
+@@ -134,5 +134,5 @@ struct expr_ops expr_ops_last = {
+ 	.get		= nftnl_expr_last_get,
+ 	.parse		= nftnl_expr_last_parse,
+ 	.build		= nftnl_expr_last_build,
+-	.snprintf	= nftnl_expr_last_snprintf,
++	.snprintf_	= nftnl_expr_last_snprintf,
+ };
 diff --git a/src/expr/limit.c b/src/expr/limit.c
 index 3dfd54a..f652df0 100644
 --- a/src/expr/limit.c
@@ -376,10 +391,10 @@ index 215a681..75a6b3c 100644
 +	.snprintf_	= nftnl_expr_osf_snprintf,
  };
 diff --git a/src/expr/payload.c b/src/expr/payload.c
-index 9ccb78e..aa17025 100644
+index 82747ec..e9130ec 100644
 --- a/src/expr/payload.c
 +++ b/src/expr/payload.c
-@@ -258,5 +258,5 @@ struct expr_ops expr_ops_payload = {
+@@ -259,5 +259,5 @@ struct expr_ops expr_ops_payload = {
  	.get		= nftnl_expr_payload_get,
  	.parse		= nftnl_expr_payload_parse,
  	.build		= nftnl_expr_payload_build,
@@ -631,5 +646,5 @@ index 46e208b..d321c50 100644
  	}
  	ret = snprintf(buf + offset, remain, "]");
 -- 
-2.31.1
+2.33.1
 

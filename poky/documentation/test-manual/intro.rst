@@ -121,7 +121,7 @@ the following types of tests:
 
       $ bitbake image -c testsdkext
 
-   The tests utilize the ``testsdkext`` class and the ``do_testsdkext`` task.
+   The tests utilize the :ref:`testsdkext <ref-classes-testsdk>` class and the ``do_testsdkext`` task.
 
 -  *Feature Testing:* Various scenario-based tests are run through the
    :ref:`OpenEmbedded Self test (oe-selftest) <ref-manual/release-process:Testing and Quality Assurance>`. We test oe-selftest on each of the main distributions

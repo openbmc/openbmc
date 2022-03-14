@@ -11,11 +11,13 @@ SRC_URI:append = " \
   file://firmware-updates.target \
   file://firmware-updates-pre.target \
   file://40-gbmc-forward.conf \
+  file://40-system.conf \
   "
 
 FILES:${PN}:append = " \
   ${systemd_unitdir}/coredump.conf.d/40-gbmc-coredump.conf \
   ${systemd_unitdir}/resolved.conf.d/40-gbmc-nomdns.conf \
+  ${systemd_unitdir}/system.conf.d/40-system.conf \
   ${libdir}/sysctl.d/40-gbmc-forward.conf \
   "
 
@@ -44,6 +46,9 @@ do_install() {
 
   install -d -m0755 ${D}${libdir}/sysctl.d
   install -m 0644 ${WORKDIR}/40-gbmc-forward.conf ${D}${libdir}/sysctl.d/
+
+  install -d -m 0755 ${D}${systemd_unitdir}/system.conf.d/
+  install -D -m0644 ${WORKDIR}/40-system.conf ${D}${systemd_unitdir}/system.conf.d/
 }
 
 do_install:append:dev() {

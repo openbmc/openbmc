@@ -5,7 +5,6 @@ Wants=xyz.openbmc_project.LED.GroupManager.service
 
 [Service]
 ExecStart=/usr/bin/boot-status-led.sh
-StandardOutput=syslog
 Type=simple
 Restart=on-failure
 

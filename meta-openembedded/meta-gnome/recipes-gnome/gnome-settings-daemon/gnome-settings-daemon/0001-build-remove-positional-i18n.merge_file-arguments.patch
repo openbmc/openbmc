@@ -1,0 +1,40 @@
+From 56535d2f1ec64e847e5fbd0613e78bd0dc046519 Mon Sep 17 00:00:00 2001
+From: Michal Vasilek <michal@vasilek.cz>
+Date: Fri, 14 Jan 2022 23:55:06 +0100
+Subject: [PATCH] build: remove positional i18n.merge_file arguments
+
+otherwise building with meson 0.61+ fails:
+
+    ERROR: Function does not take positional arguments.
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/merge_requests/281]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ plugins/power/meson.build | 1 -
+ plugins/wacom/meson.build | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/plugins/power/meson.build b/plugins/power/meson.build
+index 69e619f..014bb6d 100644
+--- a/plugins/power/meson.build
++++ b/plugins/power/meson.build
+@@ -76,7 +76,6 @@ if host_is_linux
+   )
+ 
+   i18n.merge_file(
+-    policy,
+     input: policy_in,
+     output: policy,
+     po_dir: po_dir,
+diff --git a/plugins/wacom/meson.build b/plugins/wacom/meson.build
+index d8dd0ec..c00323d 100644
+--- a/plugins/wacom/meson.build
++++ b/plugins/wacom/meson.build
+@@ -7,7 +7,6 @@ policy_in = configure_file(
+ )
+ 
+ i18n.merge_file(
+-  policy,
+   input: policy_in,
+   output: policy,
+   po_dir: po_dir,

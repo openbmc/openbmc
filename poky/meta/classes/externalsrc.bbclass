@@ -109,8 +109,8 @@ python () {
             if local_srcuri and task in fetch_tasks:
                 continue
             bb.build.deltask(task, d)
-            if bb.data.inherits_class('reproducible_build', d) and task == 'do_unpack':
-                # The reproducible_build's create_source_date_epoch_stamp function must
+            if task == 'do_unpack':
+                # The reproducible build create_source_date_epoch_stamp function must
                 # be run after the source is available and before the
                 # do_deploy_source_date_epoch task.  In the normal case, it's attached
                 # to do_unpack as a postfuncs, but since we removed do_unpack (above)

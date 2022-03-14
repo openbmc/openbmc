@@ -1,9 +1,9 @@
-From 62651c5c7b4a391f16dbe1b09c6e220efe5c8a35 Mon Sep 17 00:00:00 2001
+From 52aae746760ce5b88e61ce994f5055e4ce809821 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Thu, 29 Mar 2018 15:12:17 +0800
 Subject: [PATCH] support pkgconfig
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [gnupg upstream will not take this, it has been tried with other components]
 
 Rebase to 1.28
 
@@ -14,14 +14,14 @@ Signed-off-by: Armin Kuster <akuster808@gmail.com>
 Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 
 ---
- src/gpg-error.m4 | 159 +----------------------------------------------
- 1 file changed, 3 insertions(+), 156 deletions(-)
+ src/gpg-error.m4 | 160 +----------------------------------------------
+ 1 file changed, 3 insertions(+), 157 deletions(-)
 
 diff --git a/src/gpg-error.m4 b/src/gpg-error.m4
-index d910754..76f045c 100644
+index 56a5d07..28920ae 100644
 --- a/src/gpg-error.m4
 +++ b/src/gpg-error.m4
-@@ -27,156 +27,12 @@ dnl is added to the gpg_config_script_warn variable.
+@@ -27,157 +27,12 @@ dnl is added to the gpg_config_script_warn variable.
  dnl
  AC_DEFUN([AM_PATH_GPG_ERROR],
  [ AC_REQUIRE([AC_CANONICAL_HOST])
@@ -63,7 +63,7 @@ index d910754..76f045c 100644
 -  min_gpg_error_version=ifelse([$1], ,1.33,$1)
 -  ok=no
 -
--  AC_PATH_PROG(GPGRT_CONFIG, gpgrt-config, no)
+-  AC_PATH_PROG(GPGRT_CONFIG, gpgrt-config, no, [$prefix/bin:$PATH])
 -  if test "$GPGRT_CONFIG" != "no"; then
 -    # Determine gpgrt_libdir
 -    #
@@ -78,7 +78,8 @@ index d910754..76f045c 100644
 -    #   Fedora/openSUSE style: /usr/lib, /usr/lib32 or /usr/lib64
 -    # It is assumed that CC is specified to the one of host on cross build.
 -    if libdir_candidates=$(${CC:-cc} -print-search-dirs | \
--          sed -n -e "/^libraries/{s/libraries: =//;s/:/\n/gp}"); then
+-          sed -n -e "/^libraries/{s/libraries: =//;s/:/\\
+-/g;p;}"); then
 -      # From the output of -print-search-dirs, select valid pkgconfig dirs.
 -      libdir_candidates=$(for dir in $libdir_candidates; do
 -        if p=$(cd $dir 2>/dev/null && pwd); then
@@ -181,7 +182,7 @@ index d910754..76f045c 100644
      fi
      if test x"$gpg_error_config_host" != xnone ; then
        if test x"$gpg_error_config_host" != x"$host" ; then
-@@ -192,15 +48,6 @@ AC_DEFUN([AM_PATH_GPG_ERROR],
+@@ -193,15 +48,6 @@ AC_DEFUN([AM_PATH_GPG_ERROR],
        fi
      fi
    else

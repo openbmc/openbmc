@@ -14,6 +14,7 @@ RDEPENDS:${PN} = " \
     ${VIRTUAL-RUNTIME_base-utils} \
     bash \
     obmc-yadro-fwupdate \
+    obmc-yadro-lsinventory \
     obmc-yadro-lssensors \
     obmc-yadro-netconfig \
     phosphor-debug-collector-dreport \
@@ -41,5 +42,5 @@ do_install() {
 
 # Source code repository
 S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/YADRO-KNS/obmc-yadro-cli"
-SRCREV = "76743c3706516bae6b2bb8749706b4ea673e9358"
+SRC_URI = "git://github.com/YADRO-KNS/obmc-yadro-cli;branch=master;protocol=https"
+SRCREV = "ce70f4f732114b1989c63792907b84a3f6e91f84"

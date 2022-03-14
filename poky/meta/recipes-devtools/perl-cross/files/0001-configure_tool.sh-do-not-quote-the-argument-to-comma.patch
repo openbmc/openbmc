@@ -5,7 +5,7 @@ Subject: [PATCH] configure_tool.sh: do not quote the argument to 'command'
 
 As it seems to break things if the argument has spaces and arguments in it.
 
-Upstream-Status: Pending
+Upstream-Status: Backport [443f7bd08b19e71a2e838dcb6cde176998cd350f]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
  cnf/configure_tool.sh | 2 +-

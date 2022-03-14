@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -euo pipefail
-
 tty="$1"
 uart=0
 
@@ -39,4 +37,4 @@ esac
 # this value should be set to 1
 /usr/sbin/ampere_uartmux_ctrl.sh ${uart} 2
 
-/usr/sbin/obmc-console-server --config /etc/obmc-console/server.${tty}.conf ${tty}
+/usr/sbin/obmc-console-server --config /etc/obmc-console/server."${tty}".conf "${tty}"

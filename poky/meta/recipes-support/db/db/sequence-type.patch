@@ -6,7 +6,7 @@ in stdint.h.
 This then breaks the overly complicated type check but as we know that int64_t
 exists and works, we can just delete that.
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [as far as open source community is concerned, upstream is dead]
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
 --- a/dist/aclocal/sequence.m4~	2013-09-09 16:35:02.000000000 +0100

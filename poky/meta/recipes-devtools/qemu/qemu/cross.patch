@@ -1,30 +1,40 @@
+From f51ece86f84c877f255746cba22a6745f37d2b7f Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Tue, 5 Jan 2021 23:00:14 +0000
+Subject: [PATCH] qemu: Upgrade 5.1.0->5.2.0
+
 We need to be able to trigger configure's cross code but we don't want
 to set cross_prefix as it does other things we don't want. Patch things
 so we can do what we need in the target config case.
 
 Upstream-Status: Inappropriate [may be rewritten in a way upstream may accept?]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+---
+ configure | 4 ----
+ 1 file changed, 4 deletions(-)
 
-
-Index: qemu-6.0.0/configure
-===================================================================
---- qemu-6.0.0.orig/configure
-+++ qemu-6.0.0/configure
-@@ -6371,7 +6371,6 @@ if has $sdl2_config; then
- fi
- echo "strip = [$(meson_quote $strip)]" >> $cross
- echo "windres = [$(meson_quote $windres)]" >> $cross
--if test "$cross_compile" = "yes"; then
+diff --git a/configure b/configure
+index 9a79a004d..563b7827f 100755
+--- a/configure
++++ b/configure
+@@ -5128,7 +5128,6 @@ if test "$skip_meson" = no; then
+   fi
+   echo "strip = [$(meson_quote $strip)]" >> $cross
+   echo "windres = [$(meson_quote $windres)]" >> $cross
+-  if test "$cross_compile" = "yes"; then
      cross_arg="--cross-file config-meson.cross"
      echo "[host_machine]" >> $cross
      if test "$mingw32" = "yes" ; then
-@@ -6403,9 +6402,6 @@ if test "$cross_compile" = "yes"; then
+@@ -5160,9 +5159,6 @@ if test "$skip_meson" = no; then
      else
          echo "endian = 'little'" >> $cross
      fi
--else
+-  else
 -    cross_arg="--native-file config-meson.cross"
--fi
- mv $cross config-meson.cross
+-  fi
+   mv $cross config-meson.cross
  
- rm -rf meson-private meson-info meson-logs
+   rm -rf meson-private meson-info meson-logs
+-- 
+2.17.1
+

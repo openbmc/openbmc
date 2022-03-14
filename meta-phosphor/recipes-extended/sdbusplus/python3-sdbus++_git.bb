@@ -1,6 +1,8 @@
 SUMMARY = "sdbus++ dbus API / binding generator"
 DESCRIPTION = "Generates bindings against sdbusplus for dbus APIs"
 
+PYPI_PACKAGE = "sdbusplus"
+PV = "1.0"
 inherit setuptools3
 
 include sdbusplus-rev.inc
@@ -16,7 +18,6 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 S="${WORKDIR}/git/tools"
 
 DEPENDS += " \
-    autoconf-archive-native \
     ${PYTHON_PN}-inflection-native \
     ${PYTHON_PN}-mako-native \
     ${PYTHON_PN}-pyyaml-native \

@@ -61,3 +61,5 @@ python () {
         bb.error("Please ensure recipe %s sets PACKAGE_ARCH before inherit packagegroup" % d.getVar("FILE"))
 }
 
+def qemu_wrapper_cmdline(data, rootfs_path, library_paths):
+    return 'false'

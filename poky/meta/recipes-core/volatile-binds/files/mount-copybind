@@ -31,6 +31,13 @@ if [ -d "$mountpoint" ]; then
     else
         specdir_existed=no
         mkdir "$spec"
+        # If the $spec directory is created we need to take care that
+        # the selinux context is correct
+        if command -v selinuxenabled > /dev/null 2>&1; then
+            if selinuxenabled; then
+                restorecon "$spec"
+            fi
+        fi
     fi
 
     # Fast version of calculating `dirname ${spec}`/.`basename ${spec}`-work
@@ -39,13 +46,24 @@ if [ -d "$mountpoint" ]; then
 
     # Try to mount using overlay, which is must faster than copying files.
     # If that fails, fall back to slower copy.
-    if ! mount -t overlay overlay -olowerdir="$mountpoint",upperdir="$spec",workdir="$overlay_workdir" "$mountpoint" > /dev/null 2>&1; then
+    if command -v selinuxenabled > /dev/null 2>&1; then
+        if selinuxenabled; then
+            mountcontext=",rootcontext=$(matchpathcon -n $mountpoint)"
+        fi
+    fi
+    if ! mount -t overlay overlay -olowerdir="$mountpoint",upperdir="$spec",workdir="$overlay_workdir""$mountcontext" "$mountpoint" > /dev/null 2>&1; then
 
         if [ "$specdir_existed" != "yes" ]; then
             cp -aPR "$mountpoint"/. "$spec/"
         fi
 
         mount -o "bind$options" "$spec" "$mountpoint"
+        # restore the selinux context.
+        if command -v selinuxenabled > /dev/null 2>&1; then
+            if selinuxenabled; then
+                restorecon -R "$mountpoint"
+            fi
+        fi
     fi
 elif [ -f "$mountpoint" ]; then
     if [ ! -f "$spec" ]; then
@@ -53,4 +71,10 @@ elif [ -f "$mountpoint" ]; then
     fi
 
     mount -o "bind$options" "$spec" "$mountpoint"
+    # restore the selinux context.
+    if command -v selinuxenabled > /dev/null 2>&1; then
+        if selinuxenabled; then
+            restorecon -R "$mountpoint"
+        fi
+    fi
 fi

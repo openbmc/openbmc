@@ -1,3 +1,8 @@
+From d5dde7ca91a5aed273d8fe269e1a5194e85c8c79 Mon Sep 17 00:00:00 2001
+From: Scott Garman <scott.a.garman@intel.com>
+Date: Tue, 13 Jul 2010 16:46:46 +0800
+Subject: [PATCH] apmd: upgrade to 3.2.2-14
+
 Add by RP to address "unable to infer tagged configuration" error:
    commit 35de05e61b88c0808a5e885bb0efdf420555d5ad
    Author: Richard Purdie <rpurdie@rpsys.net>
@@ -15,15 +20,18 @@ Upstream-Status: Pending
 
 Signed-off-by: Scott Garman <scott.a.garman@intel.com>
 
-Index: apmd-3.2.2.orig/Makefile
-===================================================================
---- apmd-3.2.2.orig.orig/Makefile	2004-01-04 08:13:18.000000000 +0000
-+++ apmd-3.2.2.orig/Makefile	2008-04-21 17:10:03.000000000 +0100
-@@ -58,9 +57,8 @@
- #CFLAGS=-O3 -m486 -fomit-frame-pointer
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 92fc0fd..8e283dc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -59,8 +59,8 @@ RANLIB=ranlib
  #LDFLAGS=-s
  
--LIBTOOL=libtool --quiet
+ LIBTOOL=libtool --quiet
 -LT_COMPILE = $(LIBTOOL) --mode=compile $(CC)
 -LT_LINK = $(LIBTOOL) --mode=link $(CC)
 +LT_COMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC)

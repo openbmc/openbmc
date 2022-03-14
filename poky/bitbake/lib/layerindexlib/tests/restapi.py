@@ -22,7 +22,7 @@ class LayerIndexWebRestApiTest(LayersTest):
         self.assertFalse(os.environ.get("BB_SKIP_NETTESTS") == "yes", msg="BB_SKIP_NETTESTS set, but we tried to test anyway")
         LayersTest.setUp(self)
         self.layerindex = layerindexlib.LayerIndex(self.d)
-        self.layerindex.load_layerindex('http://layers.openembedded.org/layerindex/api/;branch=sumo', load=['layerDependencies'])
+        self.layerindex.load_layerindex('https://layers.openembedded.org/layerindex/api/;branch=sumo', load=['layerDependencies'])
 
     @skipIfNoNetwork()
     def test_layerindex_is_empty(self):

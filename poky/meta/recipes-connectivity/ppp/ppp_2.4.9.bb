@@ -24,6 +24,7 @@ SRC_URI = "https://download.samba.org/pub/${BPN}/${BP}.tar.gz \
            file://ppp_on_boot \
            file://provider \
            file://ppp@.service \
+           file://0001-ppp-fix-build-against-5.15-headers.patch \
            "
 
 SRC_URI[sha256sum] = "f938b35eccde533ea800b15a7445b2f1137da7f88e32a16898d02dee8adc058d"
@@ -38,6 +39,8 @@ EXTRA_OECONF = "--disable-strip"
 # Typically hard-coded to '-O2 -g' in the Makefile's.
 #
 EXTRA_OEMAKE += ' COPTS="${CFLAGS} -I${STAGING_INCDIR}/openssl -I${S}/include"'
+
+EXTRA_OECONF:append:libc-musl = " --disable-ipxcp"
 
 do_configure () {
 	oe_runconf

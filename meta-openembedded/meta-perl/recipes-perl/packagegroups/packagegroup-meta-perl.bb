@@ -11,6 +11,11 @@ PACKAGES = "\
 
 RDEPENDS:packagegroup-meta-perl = "\
     adduser \
+    compress-raw-bzip2-perl \
+    compress-raw-lzma-perl \
+    compress-raw-zlib-perl \
+    io-compress-perl \
+    io-compress-lzma-perl \
     libalgorithm-diff-perl \
     libauthen-sasl-perl \
     libauthen-radius-perl \

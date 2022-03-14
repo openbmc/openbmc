@@ -1,0 +1,26 @@
+From 667b9ede638677fb37911306937ea62f05897581 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Mon, 18 Oct 2021 15:55:59 +0200
+Subject: [PATCH] is_debianlike(): always return False
+
+Otherwise, host contamination happens.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ mesonbuild/mesonlib/universal.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mesonbuild/mesonlib/universal.py b/mesonbuild/mesonlib/universal.py
+index d670d04..47d1b52 100644
+--- a/mesonbuild/mesonlib/universal.py
++++ b/mesonbuild/mesonlib/universal.py
+@@ -651,7 +651,7 @@ def is_cygwin() -> bool:
+ 
+ 
+ def is_debianlike() -> bool:
+-    return os.path.isfile('/etc/debian_version')
++    return False
+ 
+ 
+ def is_dragonflybsd() -> bool:

@@ -48,7 +48,6 @@ do_install () {
 	install -d ${D}${datadir}/Bastille/OSMap/Modules
 	install -d ${D}${datadir}/Bastille/Questions
 	install -d ${D}${datadir}/Bastille/FKL/configs/
-	install -d ${D}${localstatedir}/log/Bastille
 	install -d ${D}${sysconfdir}/Bastille
 	install -m 0755 AutomatedBastille  ${D}${sbindir}
 	install -m 0755 BastilleBackEnd    ${D}${sbindir}
@@ -148,6 +147,20 @@ do_install () {
 	${THISDIR}/files/set_required_questions.py ${D}${sysconfdir}/Bastille/config ${D}${datadir}/Bastille/Questions
 
 	ln -s RevertBastille ${D}${sbindir}/UndoBastille
+
+    # Create /var/log/Bastille in runtime.
+    if [ "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}" ]; then
+        install -d ${D}${nonarch_libdir}/tmpfiles.d
+        echo "d ${localstatedir}/log/Bastille - - - -" > ${D}${nonarch_libdir}/tmpfiles.d/Bastille.conf
+    fi
+    if [ "${@bb.utils.filter('DISTRO_FEATURES', 'sysvinit', d)}" ]; then
+        install -d ${D}${sysconfdir}/default/volatiles
+        echo "d root root 0755 ${localstatedir}/log/Bastille none" > ${D}${sysconfdir}/default/volatiles/99_Bastille
+    fi
 }
 
-FILES:${PN} += "${datadir}/Bastille ${libdir}/Bastille ${libdir}/perl* ${sysconfdir}/*"
+FILES:${PN} += "${datadir}/Bastille \
+                ${libdir}/Bastille \
+                ${libdir}/perl* \
+                ${sysconfdir}/* \
+                ${nonarch_libdir}/tmpfiles.d"

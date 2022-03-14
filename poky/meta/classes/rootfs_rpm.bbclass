@@ -4,7 +4,7 @@
 
 ROOTFS_PKGMANAGE = "rpm dnf"
 
-# dnf is using our custom distutils, and so will fail without these
+# dnf is using our custom sysconfig module, and so will fail without these
 export STAGING_INCDIR
 export STAGING_LIBDIR
 

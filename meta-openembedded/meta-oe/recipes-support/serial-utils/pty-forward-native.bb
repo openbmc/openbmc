@@ -6,7 +6,7 @@ SECTION = "console/network"
 SRCREV = "00dbec2636ae0385ad028587e20e446272ff97ec"
 PV = "1.1+gitr${SRCPV}"
 
-SRC_URI = "git://github.com/freesmartphone/cornucopia.git;protocol=https"
+SRC_URI = "git://github.com/freesmartphone/cornucopia.git;protocol=https;branch=master"
 S = "${WORKDIR}/git/tools/serial_forward"
 
 inherit autotools native

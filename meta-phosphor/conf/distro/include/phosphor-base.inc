@@ -32,8 +32,8 @@ https://.*/.*    http://downloads.yoctoproject.org/mirror/sources/ \n"
 # The CONNECTIVITY_CHECK_URI's are used to test whether we can successfully
 # fetch from the network (and warn you if not). To disable the test set
 # the variable to be empty.
-# Git example url: git://git.yoctoproject.org/yocto-firewall-test;protocol=git;rev=master
-CONNECTIVITY_CHECK_URIS ?= "https://www.example.com/"
+# Git example url: git://git.yoctoproject.org/yocto-firewall-test;protocol=https;rev=master
+CONNECTIVITY_CHECK_URIS ?= "https://yoctoproject.org/connectivity.html"
 
 SANITY_TESTED_DISTROS ?= " \
             poky-2.4 \n \
@@ -110,10 +110,6 @@ DISTRO_FEATURES += " \
         ${DISTRO_FEATURES_OBMC} \
         "
 
-MACHINE_FEATURES += " \
-        ${OBMC_MACHINE_FEATURES} \
-        "
-
 DISTRO_EXTRA_RDEPENDS:remove:qemuarm = "packagegroup-core-device-devel"
 
 include conf/distro/include/openbmc-phosphor/${MACHINE}.inc
@@ -128,6 +124,9 @@ IMAGE_INSTALL:append = " dbus-broker libnss-systemd"
 # make sense on a BMC anyway.
 BAD_RECOMMENDATIONS += "udev-hwdb"
 BAD_RECOMMENDATIONS += "shared-mime-info"
+
+# e2fsprogs isn't needed on a BMC without MMC, where it gets explicitly added
+BAD_RECOMMENDATIONS += "e2fsprogs-e2fsck"
 
 LAYER_CONF_VERSION ?= "8"
 

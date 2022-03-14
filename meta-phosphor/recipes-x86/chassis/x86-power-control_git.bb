@@ -1,8 +1,8 @@
 SUMMARY = "Chassis Power Control service for Intel based platforms"
 DESCRIPTION = "Chassis Power Control service for Intel based platforms"
 
-SRC_URI = "git://github.com/openbmc/x86-power-control.git;protocol=ssh"
-SRCREV = "f3a33b41348f9f7def1928699d1b356a1d132df5"
+SRC_URI = "git://github.com/openbmc/x86-power-control.git;protocol=https;branch=master"
+SRCREV = "809545a62114b8e88750e4ff2ebc153a8bf1e3db"
 
 PV = "1.0+git${SRCPV}"
 
@@ -11,7 +11,7 @@ S = "${WORKDIR}/git"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
-inherit cmake systemd
+inherit meson systemd pkgconfig
 inherit obmc-phosphor-dbus-service
 
 def get_service(d):

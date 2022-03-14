@@ -19,7 +19,7 @@ As there is already one source file named file.c
 as support/nsm/file.c in support/nsm/Makefile.am,
 so rename ../support/misc/file.c to ../support/misc/misc.c.
 
-Upstream-Status: Submitted[https://marc.info/?l=linux-nfs&m=154502780423058&w=2]
+Upstream-Status: Submitted [https://marc.info/?l=linux-nfs&m=154502780423058&w=2]
 
 Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
 

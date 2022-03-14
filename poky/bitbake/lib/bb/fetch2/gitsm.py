@@ -140,16 +140,6 @@ class GitSM(Git):
         if Git.need_update(self, ud, d):
             return True
 
-        try:
-            # Check for the nugget dropped by the download operation
-            known_srcrevs = runfetchcmd("%s config --get-all bitbake.srcrev" % \
-                                        (ud.basecmd), d, workdir=ud.clonedir)
-
-            if ud.revisions[ud.names[0]] in known_srcrevs.split():
-                return False
-        except bb.fetch2.FetchError:
-            pass
-
         need_update_list = []
         def need_update_submodule(ud, url, module, modpath, workdir, d):
             url += ";bareclone=1;nobranch=1"
@@ -172,13 +162,8 @@ class GitSM(Git):
             shutil.rmtree(tmpdir)
         else:
             self.process_submodules(ud, ud.clonedir, need_update_submodule, d)
-            if len(need_update_list) == 0:
-                # We already have the required commits of all submodules. Drop
-                # a nugget so we don't need to check again.
-                runfetchcmd("%s config --add bitbake.srcrev %s" % \
-                            (ud.basecmd, ud.revisions[ud.names[0]]), d, workdir=ud.clonedir)
 
-        if len(need_update_list) > 0:
+        if need_update_list:
             logger.debug('gitsm: Submodules requiring update: %s' % (' '.join(need_update_list)))
             return True
 
@@ -209,9 +194,6 @@ class GitSM(Git):
             shutil.rmtree(tmpdir)
         else:
             self.process_submodules(ud, ud.clonedir, download_submodule, d)
-            # Drop a nugget for the srcrev we've fetched (used by need_update)
-            runfetchcmd("%s config --add bitbake.srcrev %s" % \
-                        (ud.basecmd, ud.revisions[ud.names[0]]), d, workdir=ud.clonedir)
 
     def unpack(self, ud, destdir, d):
         def unpack_submodules(ud, url, module, modpath, workdir, d):

@@ -5,7 +5,7 @@ PV = "1.0+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=fa818a259cbed7ce8bc2a22d35a464fc"
 
-inherit meson
+inherit pkgconfig meson
 inherit obmc-phosphor-systemd
 
 PACKAGECONFIG ??= ""
@@ -43,9 +43,9 @@ FILES:max31785-msl = "\
         "
 RDEPENDS:max31785-msl = "${VIRTUAL-RUNTIME_base-utils} i2c-tools bash"
 
-SRC_URI += "git://github.com/openbmc/phosphor-hwmon"
+SRC_URI += "git://github.com/openbmc/phosphor-hwmon;branch=master;protocol=https"
 
-SRCREV = "3a816147e3e1e1196e7da61b26ccbd01fdbbf6c2"
+SRCREV = "728f21f8747bd8d05b441a33ccb76f95b22575b8"
 
 S = "${WORKDIR}/git"
 

@@ -4,5 +4,5 @@ Description=Watchdog power state power cycle shutdown
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart=/usr/bin/env kudo.sh rst shutdown
+ExecStart=/usr/libexec/ampere-hostctrl/ampere_power_util.sh mb off
 SyslogIdentifier=phosphor-watchdog

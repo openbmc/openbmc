@@ -6,7 +6,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=3bf50002aefd002f49e7bb854063f7e7 \
                     file://tests/testgtk.c;endline=27;md5=262db5db5f776f9863e56df31423e24c"
 SRC_URI = "http://ftp.gnome.org/pub/gnome/sources/gtk+/2.24/gtk+-${PV}.tar.xz \
            file://xsettings.patch \
-           file://hardcoded_libtool.patch \
            file://toggle-font.diff;striplevel=0 \
            file://doc-fixes.patch \
            file://strict-prototypes.patch \

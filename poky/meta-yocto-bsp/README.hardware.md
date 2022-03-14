@@ -15,7 +15,7 @@ configuration. For more information please see the Yocto Board Support Package
 (BSP) Developer's Guide - documentation source is in documentation/bspguide or 
 download the PDF from:
 
-   http://yoctoproject.org/documentation
+   https://docs.yoctoproject.org/
 
 Note that these reference BSPs use the linux-yocto kernel and in general don't
 pull in binary module support for the platforms. This means some device functionality

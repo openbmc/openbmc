@@ -130,6 +130,10 @@ class DataNode(AstNode):
         else:
             val = groupd["value"]
 
+        if ":append" in key or ":remove" in key or ":prepend" in key:
+            if op in ["append", "prepend", "postdot", "predot", "ques"]:
+                bb.warn(key + " " + groupd[op] + " is not a recommended operator combination, please replace it.")
+
         flag = None
         if 'flag' in groupd and groupd['flag'] is not None:
             flag = groupd['flag']

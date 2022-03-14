@@ -366,7 +366,7 @@ def supports_srcrev(uri):
 def reformat_git_uri(uri):
     '''Convert any http[s]://....git URI into git://...;protocol=http[s]'''
     checkuri = uri.split(';', 1)[0]
-    if checkuri.endswith('.git') or '/git/' in checkuri or re.match('https?://github.com/[^/]+/[^/]+/?$', checkuri):
+    if checkuri.endswith('.git') or '/git/' in checkuri or re.match('https?://git(hub|lab).com/[^/]+/[^/]+/?$', checkuri):
         # Appends scheme if the scheme is missing
         if not '://' in uri:
             uri = 'git://' + uri
@@ -478,6 +478,9 @@ def create_recipe(args):
             storeTagName = params['tag']
             params['nobranch'] = '1'
             del params['tag']
+        # Assume 'master' branch if not set
+        if scheme in ['git', 'gitsm'] and 'branch' not in params and 'nobranch' not in params:
+            params['branch'] = 'master'
         fetchuri = bb.fetch2.encodeurl((scheme, network, path, user, passwd, params))
 
         tmpparent = tinfoil.config_data.getVar('BASE_WORKDIR')
@@ -527,10 +530,9 @@ def create_recipe(args):
             # Remove HEAD reference point and drop remote prefix
             get_branch = [x.split('/', 1)[1] for x in get_branch if not x.startswith('origin/HEAD')]
             if 'master' in get_branch:
-                # If it is master, we do not need to append 'branch=master' as this is default.
                 # Even with the case where get_branch has multiple objects, if 'master' is one
                 # of them, we should default take from 'master'
-                srcbranch = ''
+                srcbranch = 'master'
             elif len(get_branch) == 1:
                 # If 'master' isn't in get_branch and get_branch contains only ONE object, then store result into 'srcbranch'
                 srcbranch = get_branch[0]
@@ -543,8 +545,8 @@ def create_recipe(args):
         # Since we might have a value in srcbranch, we need to
         # recontruct the srcuri to include 'branch' in params.
         scheme, network, path, user, passwd, params = bb.fetch2.decodeurl(srcuri)
-        if srcbranch:
-            params['branch'] = srcbranch
+        if scheme in ['git', 'gitsm']:
+            params['branch'] = srcbranch or 'master'
 
         if storeTagName and scheme in ['git', 'gitsm']:
             # Check srcrev using tag and check validity of the tag
@@ -603,7 +605,7 @@ def create_recipe(args):
                     splitline = line.split()
                     if len(splitline) > 1:
                         if splitline[0] == 'origin' and scriptutils.is_src_url(splitline[1]):
-                            srcuri = reformat_git_uri(splitline[1])
+                            srcuri = reformat_git_uri(splitline[1]) + ';branch=master'
                             srcsubdir = 'git'
                             break
 
@@ -917,6 +919,22 @@ def split_value(value):
     else:
         return value
 
+def fixup_license(value):
+    # Ensure licenses with OR starts and ends with brackets
+    if '|' in value:
+        return '(' + value + ')'
+    return value
+
+def tidy_licenses(value):
+    """Flat, split and sort licenses"""
+    from oe.license import flattened_licenses
+    def _choose(a, b):
+        str_a, str_b  = sorted((" & ".join(a), " & ".join(b)), key=str.casefold)
+        return ["(%s | %s)" % (str_a, str_b)]
+    if not isinstance(value, str):
+        value = " & ".join(value)
+    return sorted(list(set(flattened_licenses(value, _choose))), key=str.casefold)
+
 def handle_license_vars(srctree, lines_before, handled, extravalues, d):
     lichandled = [x for x in handled if x[0] == 'license']
     if lichandled:
@@ -930,10 +948,13 @@ def handle_license_vars(srctree, lines_before, handled, extravalues, d):
     lines = []
     if licvalues:
         for licvalue in licvalues:
-            if not licvalue[0] in licenses:
-                licenses.append(licvalue[0])
+            license = licvalue[0]
+            lics = tidy_licenses(fixup_license(license))
+            lics = [lic for lic in lics if lic not in licenses]
+            if len(lics):
+                licenses.extend(lics)
             lic_files_chksum.append('file://%s;md5=%s' % (licvalue[1], licvalue[2]))
-            if licvalue[0] == 'Unknown':
+            if license == 'Unknown':
                 lic_unknown.append(licvalue[1])
         if lic_unknown:
             lines.append('#')
@@ -942,9 +963,7 @@ def handle_license_vars(srctree, lines_before, handled, extravalues, d):
             for licfile in lic_unknown:
                 lines.append('#   %s' % licfile)
 
-    extra_license = split_value(extravalues.pop('LICENSE', []))
-    if '&' in extra_license:
-        extra_license.remove('&')
+    extra_license = tidy_licenses(extravalues.pop('LICENSE', ''))
     if extra_license:
         if licenses == ['Unknown']:
             licenses = extra_license
@@ -985,7 +1004,7 @@ def handle_license_vars(srctree, lines_before, handled, extravalues, d):
         lines.append('# instead of &. If there is any doubt, check the accompanying documentation')
         lines.append('# to determine which situation is applicable.')
 
-    lines.append('LICENSE = "%s"' % ' & '.join(licenses))
+    lines.append('LICENSE = "%s"' % ' & '.join(sorted(licenses, key=str.casefold)))
     lines.append('LIC_FILES_CHKSUM = "%s"' % ' \\\n                    '.join(lic_files_chksum))
     lines.append('')
 
@@ -1002,55 +1021,37 @@ def handle_license_vars(srctree, lines_before, handled, extravalues, d):
     handled.append(('license', licvalues))
     return licvalues
 
-def get_license_md5sums(d, static_only=False):
+def get_license_md5sums(d, static_only=False, linenumbers=False):
     import bb.utils
+    import csv
     md5sums = {}
-    if not static_only:
+    if not static_only and not linenumbers:
         # Gather md5sums of license files in common license dir
         commonlicdir = d.getVar('COMMON_LICENSE_DIR')
         for fn in os.listdir(commonlicdir):
             md5value = bb.utils.md5_file(os.path.join(commonlicdir, fn))
             md5sums[md5value] = fn
+
     # The following were extracted from common values in various recipes
     # (double checking the license against the license file itself, not just
     # the LICENSE value in the recipe)
-    md5sums['94d55d512a9ba36caa9b7df079bae19f'] = 'GPLv2'
-    md5sums['b234ee4d69f5fce4486a80fdaf4a4263'] = 'GPLv2'
-    md5sums['59530bdf33659b29e73d4adb9f9f6552'] = 'GPLv2'
-    md5sums['0636e73ff0215e8d672dc4c32c317bb3'] = 'GPLv2'
-    md5sums['eb723b61539feef013de476e68b5c50a'] = 'GPLv2'
-    md5sums['751419260aa954499f7abaabaa882bbe'] = 'GPLv2'
-    md5sums['393a5ca445f6965873eca0259a17f833'] = 'GPLv2'
-    md5sums['12f884d2ae1ff87c09e5b7ccc2c4ca7e'] = 'GPLv2'
-    md5sums['8ca43cbc842c2336e835926c2166c28b'] = 'GPLv2'
-    md5sums['ebb5c50ab7cab4baeffba14977030c07'] = 'GPLv2'
-    md5sums['c93c0550bd3173f4504b2cbd8991e50b'] = 'GPLv2'
-    md5sums['9ac2e7cff1ddaf48b6eab6028f23ef88'] = 'GPLv2'
-    md5sums['4325afd396febcb659c36b49533135d4'] = 'GPLv2'
-    md5sums['18810669f13b87348459e611d31ab760'] = 'GPLv2'
-    md5sums['d7810fab7487fb0aad327b76f1be7cd7'] = 'GPLv2' # the Linux kernel's COPYING file
-    md5sums['bbb461211a33b134d42ed5ee802b37ff'] = 'LGPLv2.1'
-    md5sums['7fbc338309ac38fefcd64b04bb903e34'] = 'LGPLv2.1'
-    md5sums['4fbd65380cdd255951079008b364516c'] = 'LGPLv2.1'
-    md5sums['2d5025d4aa3495befef8f17206a5b0a1'] = 'LGPLv2.1'
-    md5sums['fbc093901857fcd118f065f900982c24'] = 'LGPLv2.1'
-    md5sums['a6f89e2100d9b6cdffcea4f398e37343'] = 'LGPLv2.1'
-    md5sums['d8045f3b8f929c1cb29a1e3fd737b499'] = 'LGPLv2.1'
-    md5sums['fad9b3332be894bab9bc501572864b29'] = 'LGPLv2.1'
-    md5sums['3bf50002aefd002f49e7bb854063f7e7'] = 'LGPLv2'
-    md5sums['9f604d8a4f8e74f4f5140845a21b6674'] = 'LGPLv2'
-    md5sums['5f30f0716dfdd0d91eb439ebec522ec2'] = 'LGPLv2'
-    md5sums['55ca817ccb7d5b5b66355690e9abc605'] = 'LGPLv2'
-    md5sums['252890d9eee26aab7b432e8b8a616475'] = 'LGPLv2'
-    md5sums['3214f080875748938ba060314b4f727d'] = 'LGPLv2'
-    md5sums['db979804f025cf55aabec7129cb671ed'] = 'LGPLv2'
-    md5sums['d32239bcb673463ab874e80d47fae504'] = 'GPLv3'
-    md5sums['f27defe1e96c2e1ecd4e0c9be8967949'] = 'GPLv3'
-    md5sums['6a6a8e020838b23406c81b19c1d46df6'] = 'LGPLv3'
-    md5sums['3b83ef96387f14655fc854ddc3c6bd57'] = 'Apache-2.0'
-    md5sums['385c55653886acac3821999a3ccd17b3'] = 'Artistic-1.0 | GPL-2.0' # some perl modules
-    md5sums['54c7042be62e169199200bc6477f04d1'] = 'BSD-3-Clause'
-    md5sums['bfe1f75d606912a4111c90743d6c7325'] = 'MPL-1.1'
+
+    # Read license md5sums from csv file
+    scripts_path = os.path.dirname(os.path.realpath(__file__))
+    for path in (d.getVar('BBPATH').split(':')
+                + [os.path.join(scripts_path, '..', '..')]):
+        csv_path = os.path.join(path, 'lib', 'recipetool', 'licenses.csv')
+        if os.path.isfile(csv_path):
+            with open(csv_path, newline='') as csv_file:
+                fieldnames = ['md5sum', 'license', 'beginline', 'endline', 'md5']
+                reader = csv.DictReader(csv_file, delimiter=',', fieldnames=fieldnames)
+                for row in reader:
+                    if linenumbers:
+                        md5sums[row['md5sum']] = (
+                            row['license'], row['beginline'], row['endline'], row['md5'])
+                    else:
+                        md5sums[row['md5sum']] = row['license']
+
     return md5sums
 
 def crunch_license(licfile):
@@ -1066,54 +1067,127 @@ def crunch_license(licfile):
     import oe.utils
 
     # Note: these are carefully constructed!
-    license_title_re = re.compile(r'^\(?(#+ *)?(The )?.{1,10} [Ll]icen[sc]e( \(.{1,10}\))?\)?:?$')
-    license_statement_re = re.compile(r'^(This (project|software) is( free software)? (released|licen[sc]ed)|(Released|Licen[cs]ed)) under the .{1,10} [Ll]icen[sc]e:?$')
-    copyright_re = re.compile('^(#+)? *Copyright .*$')
+    license_title_re = re.compile(r'^#*\(? *(This is )?([Tt]he )?.{0,15} ?[Ll]icen[sc]e( \(.{1,10}\))?\)?[:\.]? ?#*$')
+    license_statement_re = re.compile(r'^((This (project|software)|.{1,10}) is( free software)? (released|licen[sc]ed)|(Released|Licen[cs]ed)) under the .{1,10} [Ll]icen[sc]e:?$')
+    copyright_re = re.compile('^ *[#\*]* *(Modified work |MIT LICENSED )?Copyright ?(\([cC]\))? .*$')
+    disclaimer_re = re.compile('^ *\*? ?All [Rr]ights [Rr]eserved\.$')
+    email_re = re.compile('^.*<[\w\.-]*@[\w\.\-]*>$')
+    header_re = re.compile('^(\/\**!?)? ?[\-=\*]* ?(\*\/)?$')
+    tag_re = re.compile('^ *@?\(?([Ll]icense|MIT)\)?$')
+    url_re = re.compile('^ *[#\*]* *https?:\/\/[\w\.\/\-]+$')
 
     crunched_md5sums = {}
+
+    # common licenses
+    crunched_md5sums['89f3bf322f30a1dcfe952e09945842f0'] = 'Apache-2.0'
+    crunched_md5sums['13b6fe3075f8f42f2270a748965bf3a1'] = 'BSD-0-Clause'
+    crunched_md5sums['ba87a7d7c20719c8df4b8beed9b78c43'] = 'BSD-2-Clause'
+    crunched_md5sums['7f8892c03b72de419c27be4ebfa253f8'] = 'BSD-3-Clause'
+    crunched_md5sums['21128c0790b23a8a9f9e260d5f6b3619'] = 'BSL-1.0'
+    crunched_md5sums['975742a59ae1b8abdea63a97121f49f4'] = 'EDL-1.0'
+    crunched_md5sums['5322cee4433d84fb3aafc9e253116447'] = 'EPL-1.0'
+    crunched_md5sums['6922352e87de080f42419bed93063754'] = 'EPL-2.0'
+    crunched_md5sums['793475baa22295cae1d3d4046a3a0ceb'] = 'GPL-2.0-only'
+    crunched_md5sums['ff9047f969b02c20f0559470df5cb433'] = 'GPL-2.0-or-later'
+    crunched_md5sums['ea6de5453fcadf534df246e6cdafadcd'] = 'GPL-3.0-only'
+    crunched_md5sums['b419257d4d153a6fde92ddf96acf5b67'] = 'GPL-3.0-or-later'
+    crunched_md5sums['228737f4c49d3ee75b8fb3706b090b84'] = 'ISC'
+    crunched_md5sums['c6a782e826ca4e85bf7f8b89435a677d'] = 'LGPL-2.0-only'
+    crunched_md5sums['32d8f758a066752f0db09bd7624b8090'] = 'LGPL-2.0-or-later'
+    crunched_md5sums['4820937eb198b4f84c52217ed230be33'] = 'LGPL-2.1-only'
+    crunched_md5sums['db13fe9f3a13af7adab2dc7a76f9e44a'] = 'LGPL-2.1-or-later'
+    crunched_md5sums['d7a0f2e4e0950e837ac3eabf5bd1d246'] = 'LGPL-3.0-only'
+    crunched_md5sums['abbf328e2b434f9153351f06b9f79d02'] = 'LGPL-3.0-or-later'
+    crunched_md5sums['eecf6429523cbc9693547cf2db790b5c'] = 'MIT'
+    crunched_md5sums['b218b0e94290b9b818c4be67c8e1cc82'] = 'MIT-0'
+    crunched_md5sums['ddc18131d6748374f0f35a621c245b49'] = 'Unlicense'
+    crunched_md5sums['51f9570ff32571fc0a443102285c5e33'] = 'WTFPL'
+
     # The following two were gleaned from the "forever" npm package
     crunched_md5sums['0a97f8e4cbaf889d6fa51f84b89a79f6'] = 'ISC'
-    crunched_md5sums['eecf6429523cbc9693547cf2db790b5c'] = 'MIT'
-    # https://github.com/vasi/pixz/blob/master/LICENSE
-    crunched_md5sums['2f03392b40bbe663597b5bd3cc5ebdb9'] = 'BSD-2-Clause'
     # https://github.com/waffle-gl/waffle/blob/master/LICENSE.txt
-    crunched_md5sums['e72e5dfef0b1a4ca8a3d26a60587db66'] = 'BSD-2-Clause'
+    crunched_md5sums['50fab24ce589d69af8964fdbfe414c60'] = 'BSD-2-Clause'
     # https://github.com/spigwitmer/fakeds1963s/blob/master/LICENSE
-    crunched_md5sums['8be76ac6d191671f347ee4916baa637e'] = 'GPLv2'
-    # https://github.com/datto/dattobd/blob/master/COPYING
-    # http://git.savannah.gnu.org/cgit/freetype/freetype2.git/tree/docs/GPLv2.TXT
-    crunched_md5sums['1d65c5ad4bf6489f85f4812bf08ae73d'] = 'GPLv2'
+    crunched_md5sums['88a4355858a1433fea99fae34a44da88'] = 'GPLv2'
     # http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
-    # http://git.neil.brown.name/?p=mdadm.git;a=blob;f=COPYING;h=d159169d1050894d3ea3b98e1c965c4058208fe1;hb=HEAD
-    crunched_md5sums['fb530f66a7a89ce920f0e912b5b66d4b'] = 'GPLv2'
-    # https://github.com/gkos/nrf24/blob/master/COPYING
-    crunched_md5sums['7b6aaa4daeafdfa6ed5443fd2684581b'] = 'GPLv2'
-    # https://github.com/josch09/resetusb/blob/master/COPYING
-    crunched_md5sums['8b8ac1d631a4d220342e83bcf1a1fbc3'] = 'GPLv3'
+    crunched_md5sums['063b5c3ebb5f3aa4c85a2ed18a31fbe7'] = 'GPLv2'
     # https://github.com/FFmpeg/FFmpeg/blob/master/COPYING.LGPLv2.1
-    crunched_md5sums['2ea316ed973ae176e502e2297b574bb3'] = 'LGPLv2.1'
+    crunched_md5sums['7f5202f4d44ed15dcd4915f5210417d8'] = 'LGPLv2.1'
     # unixODBC-2.3.4 COPYING
-    crunched_md5sums['1daebd9491d1e8426900b4fa5a422814'] = 'LGPLv2.1'
+    crunched_md5sums['3debde09238a8c8e1f6a847e1ec9055b'] = 'LGPLv2.1'
     # https://github.com/FFmpeg/FFmpeg/blob/master/COPYING.LGPLv3
-    crunched_md5sums['2ebfb3bb49b9a48a075cc1425e7f4129'] = 'LGPLv3'
+    crunched_md5sums['f90c613c51aa35da4d79dd55fc724ceb'] = 'LGPLv3'
     # https://raw.githubusercontent.com/eclipse/mosquitto/v1.4.14/epl-v10
     crunched_md5sums['efe2cb9a35826992b9df68224e3c2628'] = 'EPL-1.0'
-    # https://raw.githubusercontent.com/eclipse/mosquitto/v1.4.14/edl-v10
-    crunched_md5sums['0a9c78c0a398d1bbce4a166757d60387'] = 'EDL-1.0'
+
+    # https://raw.githubusercontent.com/jquery/esprima/3.1.3/LICENSE.BSD
+    crunched_md5sums['80fa7b56a28e8c902e6af194003220a5'] = 'BSD-2-Clause'
+    # https://raw.githubusercontent.com/npm/npm-install-checks/master/LICENSE
+    crunched_md5sums['e659f77bfd9002659e112d0d3d59b2c1'] = 'BSD-2-Clause'
+    # https://raw.githubusercontent.com/silverwind/default-gateway/4.2.0/LICENSE
+    crunched_md5sums['4c641f2d995c47f5cb08bdb4b5b6ea05'] = 'BSD-2-Clause'
+    # https://raw.githubusercontent.com/tad-lispy/node-damerau-levenshtein/v1.0.5/LICENSE
+    crunched_md5sums['2b8c039b2b9a25f0feb4410c4542d346'] = 'BSD-2-Clause'
+    # https://raw.githubusercontent.com/terser/terser/v3.17.0/LICENSE
+    crunched_md5sums['8bd23871802951c9ad63855151204c2c'] = 'BSD-2-Clause'
+    # https://raw.githubusercontent.com/alexei/sprintf.js/1.0.3/LICENSE
+    crunched_md5sums['008c22318c8ea65928bf730ddd0273e3'] = 'BSD-3-Clause'
+    # https://raw.githubusercontent.com/Caligatio/jsSHA/v3.2.0/LICENSE
+    crunched_md5sums['0e46634a01bfef056892949acaea85b1'] = 'BSD-3-Clause'
+    # https://raw.githubusercontent.com/d3/d3-path/v1.0.9/LICENSE
+    crunched_md5sums['b5f72aef53d3b2b432702c30b0215666'] = 'BSD-3-Clause'
+    # https://raw.githubusercontent.com/feross/ieee754/v1.1.13/LICENSE
+    crunched_md5sums['a39327c997c20da0937955192d86232d'] = 'BSD-3-Clause'
+    # https://raw.githubusercontent.com/joyent/node-extsprintf/v1.3.0/LICENSE
+    crunched_md5sums['721f23a96ff4161ca3a5f071bbe18108'] = 'MIT'
+    # https://raw.githubusercontent.com/pvorb/clone/v0.2.0/LICENSE
+    crunched_md5sums['b376d29a53c9573006b9970709231431'] = 'MIT'
+    # https://raw.githubusercontent.com/andris9/encoding/v0.1.12/LICENSE
+    crunched_md5sums['85d8a977ee9d7c5ab4ac03c9b95431c4'] = 'MIT-0'
+    # https://raw.githubusercontent.com/faye/websocket-driver-node/0.7.3/LICENSE.md
+    crunched_md5sums['b66384e7137e41a9b1904ef4d39703b6'] = 'Apache-2.0'
+    # https://raw.githubusercontent.com/less/less.js/v4.1.1/LICENSE
+    crunched_md5sums['b27575459e02221ccef97ec0bfd457ae'] = 'Apache-2.0'
+    # https://raw.githubusercontent.com/microsoft/TypeScript/v3.5.3/LICENSE.txt
+    crunched_md5sums['a54a1a6a39e7f9dbb4a23a42f5c7fd1c'] = 'Apache-2.0'
+    # https://raw.githubusercontent.com/request/request/v2.87.0/LICENSE
+    crunched_md5sums['1034431802e57486b393d00c5d262b8a'] = 'Apache-2.0'
+    # https://raw.githubusercontent.com/dchest/tweetnacl-js/v0.14.5/LICENSE
+    crunched_md5sums['75605e6bdd564791ab698fca65c94a4f'] = 'Unlicense'
+    # https://raw.githubusercontent.com/stackgl/gl-mat3/v2.0.0/LICENSE.md
+    crunched_md5sums['75512892d6f59dddb6d1c7e191957e9c'] = 'Zlib'
+
     lictext = []
     with open(licfile, 'r', errors='surrogateescape') as f:
         for line in f:
             # Drop opening statements
             if copyright_re.match(line):
                 continue
+            elif disclaimer_re.match(line):
+                continue
+            elif email_re.match(line):
+                continue
+            elif header_re.match(line):
+                continue
+            elif tag_re.match(line):
+                continue
+            elif url_re.match(line):
+                continue
             elif license_title_re.match(line):
                 continue
             elif license_statement_re.match(line):
                 continue
-            # Squash spaces, and replace smart quotes, double quotes
-            # and backticks with single quotes
+            # Strip comment symbols
+            line = line.replace('*', '') \
+                       .replace('#', '')
+            # Unify spelling
+            line = line.replace('sub-license', 'sublicense')
+            # Squash spaces
             line = oe.utils.squashspaces(line.strip())
+            # Replace smart quotes, double quotes and backticks with single quotes
             line = line.replace(u"\u2018", "'").replace(u"\u2019", "'").replace(u"\u201c","'").replace(u"\u201d", "'").replace('"', '\'').replace('`', '\'')
+            # Unify brackets
+            line = line.replace("{", "[").replace("}", "]")
             if line:
                 lictext.append(line)
 
@@ -1133,28 +1207,35 @@ def guess_license(srctree, d):
 
     licenses = []
     licspecs = ['*LICEN[CS]E*', 'COPYING*', '*[Ll]icense*', 'LEGAL*', '[Ll]egal*', '*GPL*', 'README.lic*', 'COPYRIGHT*', '[Cc]opyright*', 'e[dp]l-v10']
+    skip_extensions = (".html", ".js", ".json", ".svg", ".ts")
     licfiles = []
     for root, dirs, files in os.walk(srctree):
         for fn in files:
+            if fn.endswith(skip_extensions):
+                continue
             for spec in licspecs:
                 if fnmatch.fnmatch(fn, spec):
                     fullpath = os.path.join(root, fn)
                     if not fullpath in licfiles:
                         licfiles.append(fullpath)
-    for licfile in licfiles:
+    for licfile in sorted(licfiles):
         md5value = bb.utils.md5_file(licfile)
         license = md5sums.get(md5value, None)
         if not license:
             license, crunched_md5, lictext = crunch_license(licfile)
-            if not license:
+            if lictext and not license:
                 license = 'Unknown'
-        licenses.append((license, os.path.relpath(licfile, srctree), md5value))
+                logger.info("Please add the following line for '%s' to a 'lib/recipetool/licenses.csv' " \
+                    "and replace `Unknown` with the license:\n" \
+                    "%s,Unknown" % (os.path.relpath(licfile, srctree), md5value))
+        if license:
+            licenses.append((license, os.path.relpath(licfile, srctree), md5value))
 
     # FIXME should we grab at least one source file with a license header and add that too?
 
     return licenses
 
-def split_pkg_licenses(licvalues, packages, outlines, fallback_licenses=None, pn='${PN}'):
+def split_pkg_licenses(licvalues, packages, outlines, fallback_licenses=[], pn='${PN}'):
     """
     Given a list of (license, path, md5sum) as returned by guess_license(),
     a dict of package name to path mappings, write out a set of
@@ -1162,6 +1243,7 @@ def split_pkg_licenses(licvalues, packages, outlines, fallback_licenses=None, pn
     """
     pkglicenses = {pn: []}
     for license, licpath, _ in licvalues:
+        license = fixup_license(license)
         for pkgname, pkgpath in packages.items():
             if licpath.startswith(pkgpath + '/'):
                 if pkgname in pkglicenses:
@@ -1174,11 +1256,14 @@ def split_pkg_licenses(licvalues, packages, outlines, fallback_licenses=None, pn
             pkglicenses[pn].append(license)
     outlicenses = {}
     for pkgname in packages:
-        license = ' '.join(list(set(pkglicenses.get(pkgname, ['Unknown'])))) or 'Unknown'
+        # Assume AND operator between license files
+        license = ' & '.join(list(set(pkglicenses.get(pkgname, ['Unknown'])))) or 'Unknown'
         if license == 'Unknown' and pkgname in fallback_licenses:
             license = fallback_licenses[pkgname]
+        licenses = tidy_licenses(license)
+        license = ' & '.join(licenses)
         outlines.append('LICENSE:%s = "%s"' % (pkgname, license))
-        outlicenses[pkgname] = license.split()
+        outlicenses[pkgname] = licenses
     return outlicenses
 
 def read_pkgconfig_provides(d):

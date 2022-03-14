@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /usr/sbin/kudo-lib.sh
+source /usr/libexec/kudo-fw/kudo-lib.sh
 
 function set_mux_default(){
     # set all mux route to CPU before power on host
@@ -35,10 +35,6 @@ if [[ $boardver -lt 64 ]]; then
     # Power control
     # S0_BMC_OK, GPIO 69
     set_gpio_ctrl 69 out 1
-
-    # MON_BMC_ALIVE, GPIO 10(EVT), GPIO137(DVT)
-    set_gpio_ctrl 137 out 0 # setting unused GPIO
-    set_gpio_ctrl 10 out 1
 else
     echo "DVT or PVT system"
     # sleep so that FRU and all ipmitool Devices are ready before HOST OS
@@ -49,11 +45,7 @@ else
     # Power control
     # S0_BMC_OK, GPIO 69
     set_gpio_ctrl 69 out 1
-
-    # MON_BMC_ALIVE GPIO137(DVT)
-    set_gpio_ctrl 10 out 0 # setting unused GPIO
-    set_gpio_ctrl 137 out 1
-fi 
+fi
 
 # Disable CPU 1 CLK when cpu not detected
 # echo init_once cpu $CPU1_STATUS > /dev/ttyS0
@@ -72,3 +64,10 @@ if [[ $CPU1_STATUS_N == 1 ]]; then
     i2cset -y -a -f 16 0x6a 11 1 0x01 i
     i2cset -y -a -f 17 0x67 1 2 0x3f 0x0c i
 fi
+
+# Create /run/openbmc for system power files
+mkdir "/run/openbmc"
+
+# Restart psusensor service to enusre that the VBAT sensor doesn't say "no reading" until
+# it's second query after a hotswap
+(sleep 45; systemctl restart xyz.openbmc_project.psusensor.service)&

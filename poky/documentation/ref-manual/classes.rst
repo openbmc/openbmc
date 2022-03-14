@@ -214,13 +214,13 @@ the class.
 =====================
 
 The ``blacklist`` class prevents the OpenEmbedded build system from
-building specific recipes (blacklists them). To use this class, inherit
+building specific recipes. To use this class, inherit
 the class globally and set :term:`PNBLACKLIST` for
-each recipe you wish to blacklist. Specify the :term:`PN`
+each recipe you wish to ignore. Specify the :term:`PN`
 value as a variable flag (varflag) and provide a reason, which is
 reported, if the package is requested to be built as the value. For
-example, if you want to blacklist a recipe called "exoticware", you add
-the following to your ``local.conf`` or distribution configuration::
+example, if you want to ignore a recipe called "exoticware", you
+add the following to your ``local.conf`` or distribution configuration::
 
    INHERIT += "blacklist"
    PNBLACKLIST[exoticware] = "Not supported by our organization."
@@ -515,6 +515,14 @@ used.
 -  Extensions that use ``distutils``-based build systems require the
    ``distutils`` class in their recipes.
 
+   .. note::
+
+      ``distutils`` has been deprecated in Python 3.10 and will be removed
+      in Python 3.12. For this reason the ``distutils3*`` classes are now
+      deprecated and will be removed from core in the near future. Instead,
+      use the ``setuptools3*`` classes.
+
+
 -  Extensions that use build systems based on ``setuptools3`` require
    the :ref:`setuptools3 <ref-classes-setuptools3>` class in their
    recipes.
@@ -570,11 +578,11 @@ be performed using the
 .. note::
 
    The user and group operations added using the
-   extrausers
+   :ref:`extrausers <ref-classes-extrausers>`
    class are not tied to a specific recipe outside of the recipe for the
    image. Thus, the operations can be performed across the image as a
    whole. Use the
-   useradd
+   :ref:`useradd <ref-classes-useradd>`
    class to add user and group configuration to a specific recipe.
 
 Here is an example that uses this class in an image recipe::
@@ -590,19 +598,25 @@ Here is an example that uses this class in an image recipe::
        "
 
 Here is an example that adds two users named "tester-jim" and "tester-sue" and assigns
-passwords::
+passwords. First on host, create the password hash::
+
+   mkpasswd -m sha256crypt tester01
+
+The resulting hash is set to a variable and used in ``useradd`` command parameters.
+Remember to escape the character ``$``::
 
    inherit extrausers
+   PASSWD = "\$X\$ABC123\$A-Long-Hash"
    EXTRA_USERS_PARAMS = "\
-       useradd -P tester01 tester-jim; \
-       useradd -P tester01 tester-sue; \
+       useradd -p '${PASSWD}' tester-jim; \
+       useradd -p '${PASSWD}' tester-sue; \
        "
 
-Finally, here is an example that sets the root password to "1876*18"::
+Finally, here is an example that sets the root password::
 
    inherit extrausers
    EXTRA_USERS_PARAMS = "\
-       usermod -P 1876*18 root; \
+       usermod -p '${PASSWD}' root; \
        "
 
 .. _ref-classes-features_check:
@@ -839,10 +853,10 @@ provided by the recipe ``icecc-create-env-native.bb``.
    icecc.
 
 If you do not want the Icecream distributed compile support to apply to
-specific recipes or classes, you can effectively "blacklist" them by
-listing the recipes and classes using the
+specific recipes or classes, you can ask them to be ignored by Icecream
+by listing the recipes and classes using the
 :term:`ICECC_USER_PACKAGE_BL` and
-:term:`ICECC_USER_CLASS_BL`, variables,
+:term:`ICECC_USER_CLASS_BL` variables,
 respectively, in your ``local.conf`` file. Doing so causes the
 OpenEmbedded build system to handle these compilations locally.
 
@@ -1356,9 +1370,9 @@ is set to 0.
 
 Only a single Initramfs bundle can be added to the FIT image created by
 ``kernel-fitimage`` and the Initramfs bundle in FIT is optional.
-In case of Initramfs, the kernel is configured to be bundled with the rootfs
+In case of Initramfs, the kernel is configured to be bundled with the root filesystem
 in the same binary (example: zImage-initramfs-:term:`MACHINE`.bin).
-When the kernel is copied to RAM and executed, it unpacks the Initramfs rootfs.
+When the kernel is copied to RAM and executed, it unpacks the Initramfs root filesystem.
 The Initramfs bundle can be enabled when :term:`INITRAMFS_IMAGE`
 is specified and that :term:`INITRAMFS_IMAGE_BUNDLE` is set to 1.
 The address where the Initramfs bundle is to be loaded by U-boot is specified
@@ -1494,15 +1508,6 @@ messages for various BitBake severity levels (i.e. ``bbplain``,
 This class is enabled by default since it is inherited by the ``base``
 class.
 
-.. _ref-classes-meta:
-
-``meta.bbclass``
-================
-
-The ``meta`` class is inherited by recipes that do not build any output
-packages themselves, but act as a "meta" target for building other
-recipes.
-
 .. _ref-classes-metadata_scm:
 
 ``metadata_scm.bbclass``
@@ -1600,7 +1605,7 @@ or other tools from the build host).
 You can create a recipe that builds tools that run natively on the host
 a couple different ways:
 
--  Create a myrecipe\ ``-native.bb`` recipe that inherits the ``native``
+-  Create a ``myrecipe-native.bb`` recipe that inherits the ``native``
    class. If you use this method, you must order the inherit statement
    in the recipe after all other inherit statements so that the
    ``native`` class is inherited last.
@@ -1642,7 +1647,7 @@ wish to build tools to run as part of an SDK (i.e. tools that run on
 You can create a recipe that builds tools that run on the SDK machine a
 couple different ways:
 
--  Create a ``nativesdk-``\ myrecipe\ ``.bb`` recipe that inherits the
+-  Create a ``nativesdk-myrecipe.bb`` recipe that inherits the
    ``nativesdk`` class. If you use this method, you must order the
    inherit statement in the recipe after all other inherit statements so
    that the ``nativesdk`` class is inherited last.
@@ -1715,13 +1720,13 @@ layers.
 ``overlayfs.bbclass``
 =======================
 
-It's often desired in Embedded System design to have a read-only rootfs.
+It's often desired in Embedded System design to have a read-only root filesystem.
 But a lot of different applications might want to have read-write access to
 some parts of a filesystem. It can be especially useful when your update mechanism
-overwrites the whole rootfs, but you may want your application data to be preserved
+overwrites the whole root filesystem, but you may want your application data to be preserved
 between updates. The :ref:`overlayfs <ref-classes-overlayfs>` class provides a way
 to achieve that by means of ``overlayfs`` and at the same time keeping the base
-rootfs read-only.
+root filesystem read-only.
 
 To use this class, set a mount point for a partition ``overlayfs`` is going to use as upper
 layer in your machine configuration. The underlying file system can be anything that
@@ -1745,7 +1750,8 @@ Then you can specify writable directories on a recipe basis (e.g. in my-applicat
 
 To support several mount points you can use a different variable flag. Assuming we
 want to have a writable location on the file system, but do not need that the data
-survives a reboot, then we could have a ``mnt-overlay.mount`` unit for a ``tmpfs`` file system.
+survives a reboot, then we could have a ``mnt-overlay.mount`` unit for a ``tmpfs``
+file system.
 
 In your machine configuration::
 
@@ -1755,9 +1761,68 @@ and then in your recipe::
 
   OVERLAYFS_WRITABLE_PATHS[mnt-overlay] = "/usr/share/another-application"
 
+On a practical note, your application recipe might require multiple
+overlays to be mounted before running to avoid writing to the underlying
+file system (which can be forbidden in case of read-only file system)
+To achieve that :ref:`overlayfs <ref-classes-overlayfs>` provides a ``systemd``
+helper service for mounting overlays. This helper service is named
+``${PN}-overlays.service`` and can be depended on in your application recipe
+(named ``application`` in the following example) ``systemd`` unit by adding
+to the unit the following::
+
+  [Unit]
+  After=application-overlays.service
+  Requires=application-overlays.service
+
 .. note::
 
    The class does not support the ``/etc`` directory itself, because ``systemd`` depends on it.
+   In order to get ``/etc`` in overlayfs, see :ref:`overlayfs-etc <ref-classes-overlayfs-etc>`.
+
+.. _ref-classes-overlayfs-etc:
+
+``overlayfs-etc.bbclass``
+=========================
+
+In order to have the ``/etc`` directory in overlayfs a special handling at early
+boot stage is required. The idea is to supply a custom init script that mounts
+``/etc`` before launching the actual init program, because the latter already
+requires ``/etc`` to be mounted.
+
+Example usage in image recipe::
+
+   IMAGE_FEATURES += "overlayfs-etc"
+
+.. note::
+
+   This class must not be inherited directly. Use :term:`IMAGE_FEATURES` or :term:`EXTRA_IMAGE_FEATURES`
+
+Your machine configuration should define at least the device, mount point, and file system type
+you are going to use for ``overlayfs``::
+
+  OVERLAYFS_ETC_MOUNT_POINT = "/data"
+  OVERLAYFS_ETC_DEVICE = "/dev/mmcblk0p2"
+  OVERLAYFS_ETC_FSTYPE ?= "ext4"
+
+To control more mount options you should consider setting mount options
+(``defaults`` is used by default)::
+
+  OVERLAYFS_ETC_MOUNT_OPTIONS = "wsync"
+
+The class provides two options for ``/sbin/init`` generation:
+
+- The default option is to rename the original ``/sbin/init`` to ``/sbin/init.orig``
+  and place the generated init under original name, i.e. ``/sbin/init``. It has an advantage
+  that you won't need to change any kernel parameters in order to make it work,
+  but it poses a restriction that package-management can't be used, because updating
+  the init manager would remove the generated script.
+
+- If you wish to keep original init as is, you can set::
+
+   OVERLAYFS_ETC_USE_ORIG_INIT_NAME = "0"
+
+  Then the generated init will be named ``/sbin/preinit`` and you would need to extend your
+  kernel parameters manually in your bootloader configuration.
 
 .. _ref-classes-own-mirrors:
 
@@ -2319,6 +2384,17 @@ The ``setuptools3`` class supports Python version 3.x extensions that
 use build systems based on ``setuptools``. If your recipe uses these
 build systems, the recipe needs to inherit the ``setuptools3`` class.
 
+.. _ref-classes-setuptools3-base:
+
+``setuptools3-base.bbclass``
+============================
+
+The ``setuptools3-base`` class provides a reusable base for other classes
+that support building Python version 3.x extensions. If you need
+functionality that is not provided by the :ref:`setuptools3 <ref-classes-setuptools3>` class, you may
+want to ``inherit setuptools3-base``. Some recipes do not need the tasks
+in the :ref:`setuptools3 <ref-classes-setuptools3>` class and inherit this class instead.
+
 .. _ref-classes-sign_rpm:
 
 ``sign_rpm.bbclass``
@@ -2799,11 +2875,10 @@ The ``useradd*`` classes support the addition of users or groups for
 usage by the package on the target. For example, if you have packages
 that contain system services that should be run under their own user or
 group, you can use these classes to enable creation of the user or
-group. The ``meta-skeleton/recipes-skeleton/useradd/useradd-example.bb``
+group. The :oe_git:`meta-skeleton/recipes-skeleton/useradd/useradd-example.bb
+</openembedded-core/tree/meta-skeleton/recipes-skeleton/useradd/useradd-example.bb>`
 recipe in the :term:`Source Directory` provides a simple
 example that shows how to add three users and groups to two packages.
-See the ``useradd-example.bb`` recipe for more information on how to use
-these classes.
 
 The ``useradd_base`` class provides basic functionality for user or
 groups settings.

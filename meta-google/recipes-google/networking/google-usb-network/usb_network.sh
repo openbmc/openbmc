@@ -23,6 +23,7 @@ ARGUMENT_LIST=(
     "host-mac:"
     "bind-device:"
     "dev-mac:"
+    "dev-type:"
     "gadget-dir-name:"
     "iface-name:"
 )
@@ -35,6 +36,7 @@ $0 [OPTIONS] [stop|start]
         --product-name Product name string (en) for the gadget.
         --host-mac MAC address of the host part of the connection. Optional.
         --dev-mac MAC address of the device (gadget) part of the connection. Optional.
+        --dev-type Type of gadget to instantiate. Default: "eem"
         --bind-device Name of the device to bind, as listed in /sys/class/udc/
         --gadget-dir-name Optional base name for gadget directory. Default: "g1"
         --iface-name Optional name of the network interface. Default: "usb0"
@@ -43,6 +45,20 @@ HELP
 }
 
 gadget_start() {
+    # Add the gbmcbr configuration if this is a relevant device
+    if (( ID_VENDOR == 0x18d1 && ID_PRODUCT == 0x22b )); then
+        mkdir -p /run/systemd/network
+        cat >/run/systemd/network/+-bmc-"${IFACE_NAME}".network <<EOF
+[Match]
+Name=${IFACE_NAME}
+[Network]
+Bridge=gbmcbr
+[Bridge]
+Cost=85
+EOF
+        networkctl reload || true
+    fi
+
     local gadget_dir="${CONFIGFS_HOME}/usb_gadget/${GADGET_DIR_NAME}"
     mkdir -p "${gadget_dir}"
     echo ${ID_VENDOR} > "${gadget_dir}/idVendor"
@@ -57,9 +73,9 @@ gadget_start() {
     mkdir -p "${config_dir}"
     echo 100 > "${config_dir}/MaxPower"
     mkdir -p "${config_dir}/strings/0x409"
-    echo "ECM" > "${config_dir}/strings/0x409/configuration"
+    echo "${DEV_TYPE^^}" > "${config_dir}/strings/0x409/configuration"
 
-    local func_dir="${gadget_dir}/functions/ecm.${IFACE_NAME}"
+    local func_dir="${gadget_dir}/functions/${DEV_TYPE}.${IFACE_NAME}"
     mkdir -p "${func_dir}"
 
     if [[ -n $HOST_MAC_ADDR ]]; then
@@ -77,12 +93,15 @@ gadget_start() {
 
 gadget_stop() {
     local gadget_dir="${CONFIGFS_HOME}/usb_gadget/${GADGET_DIR_NAME}"
-    rm -f ${gadget_dir}/configs/c.1/ecm.${IFACE_NAME}
+    rm -f ${gadget_dir}/configs/c.1/${DEV_TYPE}.${IFACE_NAME}
     rm -rf ${gadget_dir}/configs/c.1/strings/0x409
     rm -rf ${gadget_dir}/configs/c.1
     rm -rf ${gadget_dir}/strings/0x409
-    rm -rf ${gadget_dir}/functions/ecm.${IFACE_NAME}
+    rm -rf ${gadget_dir}/functions/${DEV_TYPE}.${IFACE_NAME}
     rm -rf ${gadget_dir}
+
+    rm -f /run/systemd/network/+-bmc-"${IFACE_NAME}".network
+    networkctl reload
 }
 
 opts=$(getopt \
@@ -100,6 +119,7 @@ ID_PRODUCT=""
 STR_EN_VENDOR="Google"
 STR_EN_PRODUCT=""
 DEV_MAC_ADDR=""
+DEV_TYPE="eem"
 HOST_MAC_ADDR=""
 BIND_DEVICE=""
 ACTION="start"
@@ -121,6 +141,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --dev-mac)
             DEV_MAC_ADDR=$2
+            shift 2
+            ;;
+        --dev-type)
+            DEV_TYPE=$2
             shift 2
             ;;
         --bind-device)

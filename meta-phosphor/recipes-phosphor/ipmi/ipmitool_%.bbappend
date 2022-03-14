@@ -2,7 +2,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 DEPENDS += "systemd"
 
-SRC_URI = "git://github.com/ipmitool/ipmitool.git;protocol=https"
+SRC_URI = "git://github.com/ipmitool/ipmitool.git;protocol=https;branch=master"
 SRCREV = "c3939dac2c060651361fc71516806f9ab8c38901"
 
 # TODO: when a new company joins the OpenBMC project by signing

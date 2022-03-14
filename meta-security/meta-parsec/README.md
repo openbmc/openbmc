@@ -1,8 +1,7 @@
 meta-parsec layer
 ==============
 
-This layer contains recipes for the Parsec service with Mbed-Crypto,
-Pkcs11 and TPM providers and parsec tools.
+This layer contains recipes for the Parsec service and parsec tools.
 
 Dependencies
 ============
@@ -11,23 +10,12 @@ This layer depends on:
 
     URI: git://git.openembedded.org/meta-openembedded
     branch: master
-    revision: HEAD
-    prio: default
 
     URI git://git.yoctoproject.org/meta-security
     branch: master
-    revision: HEAD
-    prio: default
-
-    URI https://github.com/meta-rust/meta-rust.git
-    branch: master
-    revision: HEAD
-    prio: default
 
     URI https://github.com/kraj/meta-clang.git
     branch: master
-    revision: HEAD
-    prio: default
 
 Adding the meta-parsec layer to your build
 ==========================================
@@ -44,7 +32,6 @@ other layers needed. e.g.:
       /path/to/yocto/meta-yocto-bsp \
       /path/to/meta-openembedded/meta-oe \
       /path/to/meta-openembedded/meta-python \
-      /path/to/meta-rust \
       /path/to/meta-clang \
       /path/to/meta-security/meta-tpm \
       /path/to/meta-security/meta-parsec \
@@ -55,9 +42,16 @@ local.conf:
 
     IMAGE_INSTALL:append = " parsec-service"
 
-  The Parsec service will be deployed into the image built with all the supported
-providers and with the default config file from the Parsec repository:
+  By default the Parsec service will be deployed into the image with
+TPM, PKCS11, MBED-CRYPTO and CRYPTOAUTHLIB providers build in
+and with the default config file from the Parsec repository:
 https://github.com/parallaxsecond/parsec/blob/main/config.toml
+
+  You can use PACKAGECONFIG for Parsec servic recipe to define
+what providers should be built in. For example,
+
+    PACKAGECONFIG:pn-parsec-service = "TPM"
+
   The default Parsec service config file contains the MbedCrypto provider
 enabled. The config file needs to be updated to use the Parsec service
 with other providers like TPM or PKCS11. The required procedures are
@@ -86,24 +80,31 @@ Manual testing with runqemu
   This layer also contains a recipe for pasec-tool which can be used for
 manual testing of the Parsec service:
 
-    IMAGE_INSTALL:append += " parsec-tools"
+    IMAGE_INSTALL:append = " parsec-tools"
 
   There are a series of Parsec Demo videos showing how to use parsec-tool
 to test the Parsec service base functionality:
 https://www.youtube.com/watch?v=ido0CyUdMHM&list=PLKjl7IFAwc4S7WQqqphCsyy6DPDxJ2Skg&index=4
 
+  The parsec-tool recipe also includes `parsec-cli-tests.sh` script
+which runs e2e tests against all providers enabled and configured
+in Parsec service.
+
   You can use runqemu to start a VM with a built image file and run
 manual tests with parsec-tool.
 
+Enabling Parsec providers for manual testing
+============================================
+
 1. MbedCrypto provider
   The default Parsec service config file contains the MbedCrypto provider
-enabled. No changes required for manual testing.
+enabled. No changes required.
 
 2. PKCS11 provider
   The Software HSM can be used for manual testing of the provider by
 including it into your test image:
 
-    IMAGE_INSTALL:append += " softhsm"
+    IMAGE_INSTALL:append = " softhsm"
 
 Inside the running VM:
 - Stop Parsec
@@ -134,7 +135,7 @@ systemctl start parsec
   The IBM Software TPM service can be used for manual testing of the provider by
 including it into your test image:
 
-    IMAGE_INSTALL:append += " ibmswtpm2 tpm2-tools libtss2 libtss2-tcti-mssim"
+    IMAGE_INSTALL:append = " ibmswtpm2 tpm2-tools libtss2 libtss2-tcti-mssim"
 
 Inside the running VM:
 - Stop Parsec
@@ -165,11 +166,11 @@ Maintenance
 Send pull requests, patches, comments or questions to yocto@yoctoproject.org
 
 When sending single patches, please using something like:
-'git send-email -1 --to yocto@yoctoproject.org --subject-prefix=meta-parsec][PATCH'
+'git send-email -1 --to yocto@lists.yoctoproject.org --subject-prefix=meta-parsec][PATCH'
 
 These values can be set as defaults for this repository:
 
-$ git config sendemail.to yocto@yoctoproject.org
+$ git config sendemail.to yocto@lists.yoctoproject.org
 $ git config format.subjectPrefix meta-parsec][PATCH
 
 Now you can just do 'git send-email origin/master' to send all local patches.

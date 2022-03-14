@@ -33,10 +33,10 @@ need to rebuild to add a security fix. If this happens, only the components that
 have been modified should change at the binary level. This would lead to much
 easier and clearer bounds on where validation is needed.
 
-This also gives an additional benefit to the project builds themselves, our hash
-equivalence for :ref:`Shared State <overview-manual/concepts:Shared State>`
-object reuse works much more effectively when the binary output remains the
-same.
+This also gives an additional benefit to the project builds themselves, our
+:ref:`overview-manual/concepts:Hash Equivalence` for
+:ref:`overview-manual/concepts:Shared State` object reuse works much more
+effectively when the binary output remains the same.
 
 .. note::
 
@@ -53,7 +53,7 @@ things we do within the build system to ensure reproducibility include:
 
 -  Adding mappings to the compiler options to ensure debug filepaths are mapped
    to consistent target compatible paths. This is done through the
-   ``DEBUG_PREFIX_MAP`` variable which sets the ``-fmacro-prefix-map`` and
+   :term:`DEBUG_PREFIX_MAP` variable which sets the ``-fmacro-prefix-map`` and
    ``-fdebug-prefix-map`` compiler options correctly to map to target paths.
 -  Being explicit about recipe dependencies and their configuration (no floating
    configure options or host dependencies creeping in). In particular this means

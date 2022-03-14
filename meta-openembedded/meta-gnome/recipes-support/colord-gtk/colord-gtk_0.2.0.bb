@@ -15,11 +15,9 @@ SRC_URI[md5sum] = "66d048803c8b89e5e63da4b461484933"
 SRC_URI[sha256sum] = "2a4cfae08bc69f000f40374934cd26f4ae86d286ce7de89f1622abc59644c717"
 
 EXTRA_OEMESON = "-Dman=false"
-
+GIR_MESON_OPTION = ""
 # gobject-introspection is mandatory and cannot be configured
 REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
 
 # colord
 REQUIRED_DISTRO_FEATURES += "polkit"
-
-UNKNOWN_CONFIGURE_WHITELIST:append = " introspection"

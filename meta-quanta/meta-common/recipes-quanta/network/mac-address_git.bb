@@ -5,7 +5,7 @@ inherit autotools pkgconfig
 inherit systemd
 
 S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/quanta-bmc/mac-address.git;protocol=git"
+SRC_URI = "git://github.com/quanta-bmc/mac-address.git;protocol=https;branch=master"
 SRCREV = "08b87370c56ff69df852eca87391ae46c05d437a"
 
 DEPENDS += "autoconf-archive-native"

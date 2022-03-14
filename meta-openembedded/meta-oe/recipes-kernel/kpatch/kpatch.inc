@@ -3,7 +3,7 @@ DESCRIPTION = "kpatch is a Linux dynamic kernel patching infrastructure which al
 LICENSE = "GPLv2 & LGPLv2"
 DEPENDS = "elfutils bash"
 
-SRC_URI = "git://github.com/dynup/kpatch.git;protocol=https \
+SRC_URI = "git://github.com/dynup/kpatch.git;protocol=https;branch=master \
 	file://0001-kpatch-build-add-cross-compilation-support.patch \
 	file://0002-kpatch-build-allow-overriding-of-distro-name.patch \
 	"

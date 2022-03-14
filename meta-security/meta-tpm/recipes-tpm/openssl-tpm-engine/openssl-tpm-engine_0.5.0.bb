@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=11f0ee3af475c85b907426e285c9bb52"
 DEPENDS += "openssl trousers"
 
 SRC_URI = "\
-    git://github.com/mgerstner/openssl_tpm_engine.git \
+    git://github.com/mgerstner/openssl_tpm_engine.git;branch=master;protocol=https \
     file://0001-create-tpm-key-support-well-known-key-option.patch \
     file://0002-libtpm-support-env-TPM_SRK_PW.patch \
     file://0003-tpm-openssl-tpm-engine-parse-an-encrypted-tpm-SRK-pa.patch \
@@ -35,10 +35,10 @@ inherit autotools-brokensep pkgconfig
 srk_dec_pw ?= "\\"\\\x1\\"\\"nc\\"\\"\\\x3\\"\\"nd\\"\\"\\\x1\\"\\"a\\""
 srk_dec_salt ?= "\\"r\\"\\"\\\x00\\\x00\\"\\"t\\""
 
-CFLAGS:append += "-DSRK_DEC_PW=${srk_dec_pw} -DSRK_DEC_SALT=${srk_dec_salt}"
+CFLAGS:append = " -DSRK_DEC_PW=${srk_dec_pw} -DSRK_DEC_SALT=${srk_dec_salt}"
 
 # Uncomment below line if using the plain srk password for development
-#CFLAGS_append += "-DTPM_SRK_PLAIN_PW"
+#CFLAGS:append = " -DTPM_SRK_PLAIN_PW"
 
 do_configure:prepend() {
     cd ${B}
@@ -46,17 +46,17 @@ do_configure:prepend() {
     touch NEWS AUTHORS ChangeLog README
 }
 
-FILES:${PN}-staticdev += "${libdir}/ssl/engines-1.1/tpm.la"
+FILES:${PN}-staticdev += "${libdir}/ssl/engines-3/tpm.la"
 FILES:${PN}-dbg += "\
-    ${libdir}/ssl/engines-1.1/.debug \
-    ${libdir}/engines-1.1/.debug \
-    ${prefix}/local/ssl/lib/engines-1.1/.debug \
+    ${libdir}/ssl/engines-3/.debug \
+    ${libdir}/engines-3/.debug \
+    ${prefix}/local/ssl/lib/engines-3/.debug \
 "
 FILES:${PN} += "\
-    ${libdir}/ssl/engines-1.1/tpm.so* \
-    ${libdir}/engines-1.1/tpm.so* \
+    ${libdir}/ssl/engines-3/tpm.so* \
+    ${libdir}/engines-3/tpm.so* \
     ${libdir}/libtpm.so* \
-    ${prefix}/local/ssl/lib/engines-1.1/tpm.so* \
+    ${prefix}/local/ssl/lib/engines-3/tpm.so* \
 "
 
 RDEPENDS:${PN} += "libcrypto libtspi"

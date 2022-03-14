@@ -1,0 +1,40 @@
+From 359dc12eb32b2395cf10796157002024e6a58054 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 15 Dec 2021 23:31:11 -0800
+Subject: [PATCH] riscv: Set 5.4 as minimum kernel version for riscv32
+
+5.4 is first stable API as far as rv32 is concerned see [1]
+
+[1] https://sourceware.org/git/?p=glibc.git;a=commit;h=7a55dd3fb6d2c307a002a16776be84310b9c8989
+
+Upstream-Status: Submitted [https://lists.nongnu.org/archive/html/qemu-devel/2021-12/msg02495.html]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Alistair Francis <alistair.francis@wdc.com>
+Cc: Bin Meng <bin.meng@windriver.com>
+Signed-off-by: Matt Madison <matt@madison.systems>
+---
+ linux-user/riscv/target_syscall.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/linux-user/riscv/target_syscall.h b/linux-user/riscv/target_syscall.h
+index dc597c897..9b1316132 100644
+--- a/linux-user/riscv/target_syscall.h
++++ b/linux-user/riscv/target_syscall.h
+@@ -45,10 +45,11 @@ struct target_pt_regs {
+ 
+ #ifdef TARGET_RISCV32
+ #define UNAME_MACHINE "riscv32"
++#define UNAME_MINIMUM_RELEASE "5.4.0"
+ #else
+ #define UNAME_MACHINE "riscv64"
+-#endif
+ #define UNAME_MINIMUM_RELEASE "4.15.0"
++#endif
+ 
+ #define TARGET_MINSIGSTKSZ 2048
+ #define TARGET_MCL_CURRENT 1
+-- 
+2.32.0
+

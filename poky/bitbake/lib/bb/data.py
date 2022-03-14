@@ -285,21 +285,19 @@ def build_dependencies(key, keys, shelldeps, varflagsexcl, d):
         vardeps = varflags.get("vardeps")
 
         def handle_contains(value, contains, d):
-            newvalue = ""
+            newvalue = []
+            if value:
+                newvalue.append(str(value))
             for k in sorted(contains):
                 l = (d.getVar(k) or "").split()
                 for item in sorted(contains[k]):
                     for word in item.split():
                         if not word in l:
-                            newvalue += "\n%s{%s} = Unset" % (k, item)
+                            newvalue.append("\n%s{%s} = Unset" % (k, item))
                             break
                     else:
-                        newvalue += "\n%s{%s} = Set" % (k, item)
-            if not newvalue:
-                return value
-            if not value:
-                return newvalue
-            return value + newvalue
+                        newvalue.append("\n%s{%s} = Set" % (k, item))
+            return "".join(newvalue)
 
         def handle_remove(value, deps, removes, d):
             for r in sorted(removes):
@@ -406,7 +404,9 @@ def generate_dependency_hash(tasklist, gendeps, lookupcache, whitelist, fn):
 
         if data is None:
             bb.error("Task %s from %s seems to be empty?!" % (task, fn))
-            data = ''
+            data = []
+        else:
+            data = [data]
 
         gendeps[task] -= whitelist
         newdeps = gendeps[task]
@@ -424,12 +424,12 @@ def generate_dependency_hash(tasklist, gendeps, lookupcache, whitelist, fn):
 
         alldeps = sorted(seen)
         for dep in alldeps:
-            data = data + dep
+            data.append(dep)
             var = lookupcache[dep]
             if var is not None:
-                data = data + str(var)
+                data.append(str(var))
         k = fn + ":" + task
-        basehash[k] = hashlib.sha256(data.encode("utf-8")).hexdigest()
+        basehash[k] = hashlib.sha256("".join(data).encode("utf-8")).hexdigest()
         taskdeps[task] = alldeps
 
     return taskdeps, basehash

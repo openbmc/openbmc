@@ -15,7 +15,7 @@ SRC_URI = " \
 SYSTEMD_PACKAGES = "${PN}"
 
 do_install () {
-    install -d ${D}/${sbindir}
-    install -m 0755 ${WORKDIR}/kudo.sh ${D}/${sbindir}/kudo.sh
-    install -m 0755 ${WORKDIR}/kudo-ras.sh ${D}/${sbindir}/kudo-ras.sh
+    install -d ${D}${sbindir}
+    install -m 0755 ${WORKDIR}/kudo.sh ${D}${sbindir}/kudo.sh
+    install -m 0755 ${WORKDIR}/kudo-ras.sh ${D}${sbindir}/kudo-ras.sh
 }

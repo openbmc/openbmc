@@ -1,0 +1,6 @@
+[Unit]
+Description=Ampere Computing LLC PSU1 reset hotswap
+
+[Service]
+Restart=no
+ExecStart=/usr/sbin/ampere_psu_reset_hotswap.sh %i

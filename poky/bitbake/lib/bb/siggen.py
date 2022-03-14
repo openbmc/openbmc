@@ -11,6 +11,8 @@ import pickle
 import bb.data
 import difflib
 import simplediff
+import json
+import bb.compress.zstd
 from bb.checksum import FileChecksumCache
 from bb import runqueue
 import hashserv
@@ -18,6 +20,17 @@ import hashserv.client
 
 logger = logging.getLogger('BitBake.SigGen')
 hashequiv_logger = logging.getLogger('BitBake.SigGen.HashEquiv')
+
+class SetEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, set):
+            return dict(_set_object=list(sorted(obj)))
+        return json.JSONEncoder.default(self, obj)
+
+def SetDecoder(dct):
+    if '_set_object' in dct:
+        return set(dct['_set_object'])
+    return dct
 
 def init(d):
     siggens = [obj for obj in globals().values()
@@ -315,6 +328,8 @@ class SignatureGeneratorBasic(SignatureGenerator):
 
         for (f, cs) in self.file_checksum_values[tid]:
             if cs:
+                if "/./" in f:
+                    data = data + "./" + f.split("/./")[1]
                 data = data + cs
 
         if tid in self.taints:
@@ -372,7 +387,12 @@ class SignatureGeneratorBasic(SignatureGenerator):
 
         if runtime and tid in self.taskhash:
             data['runtaskdeps'] = self.runtaskdeps[tid]
-            data['file_checksum_values'] = [(os.path.basename(f), cs) for f,cs in self.file_checksum_values[tid]]
+            data['file_checksum_values'] = []
+            for f,cs in self.file_checksum_values[tid]:
+                if "/./" in f:
+                    data['file_checksum_values'].append(("./" + f.split("/./")[1], cs))
+                else:
+                    data['file_checksum_values'].append((os.path.basename(f), cs))
             data['runtaskhashes'] = {}
             for dep in data['runtaskdeps']:
                 data['runtaskhashes'][dep] = self.get_unihash(dep)
@@ -398,9 +418,9 @@ class SignatureGeneratorBasic(SignatureGenerator):
 
         fd, tmpfile = tempfile.mkstemp(dir=os.path.dirname(sigfile), prefix="sigtask.")
         try:
-            with os.fdopen(fd, "wb") as stream:
-                p = pickle.dump(data, stream, -1)
-                stream.flush()
+            with bb.compress.zstd.open(fd, "wt", encoding="utf-8", num_threads=1) as f:
+                json.dump(data, f, sort_keys=True, separators=(",", ":"), cls=SetEncoder)
+                f.flush()
             os.chmod(tmpfile, 0o664)
             bb.utils.rename(tmpfile, sigfile)
         except (OSError, IOError) as err:
@@ -794,12 +814,10 @@ def compare_sigfiles(a, b, recursecb=None, color=False, collapsed=False):
         formatparams.update(values)
         return formatstr.format(**formatparams)
 
-    with open(a, 'rb') as f:
-        p1 = pickle.Unpickler(f)
-        a_data = p1.load()
-    with open(b, 'rb') as f:
-        p2 = pickle.Unpickler(f)
-        b_data = p2.load()
+    with bb.compress.zstd.open(a, "rt", encoding="utf-8", num_threads=1) as f:
+        a_data = json.load(f, object_hook=SetDecoder)
+    with bb.compress.zstd.open(b, "rt", encoding="utf-8", num_threads=1) as f:
+        b_data = json.load(f, object_hook=SetDecoder)
 
     def dict_diff(a, b, whitelist=set()):
         sa = set(a.keys())
@@ -815,11 +833,11 @@ def compare_sigfiles(a, b, recursecb=None, color=False, collapsed=False):
 
     def file_checksums_diff(a, b):
         from collections import Counter
-        # Handle old siginfo format
-        if isinstance(a, dict):
-            a = [(os.path.basename(f), cs) for f, cs in a.items()]
-        if isinstance(b, dict):
-            b = [(os.path.basename(f), cs) for f, cs in b.items()]
+
+        # Convert lists back to tuples
+        a = [(f[0], f[1]) for f in a]
+        b = [(f[0], f[1]) for f in b]
+
         # Compare lists, ensuring we can handle duplicate filenames if they exist
         removedcount = Counter(a)
         removedcount.subtract(b)
@@ -902,9 +920,9 @@ def compare_sigfiles(a, b, recursecb=None, color=False, collapsed=False):
                 output.append(color_format("{color_title}Variable {var} value changed from '{color_default}{oldval}{color_title}' to '{color_default}{newval}{color_title}'{color_default}", var=dep, oldval=oldval, newval=newval))
 
     if not 'file_checksum_values' in a_data:
-         a_data['file_checksum_values'] = {}
+         a_data['file_checksum_values'] = []
     if not 'file_checksum_values' in b_data:
-         b_data['file_checksum_values'] = {}
+         b_data['file_checksum_values'] = []
 
     changed, added, removed = file_checksums_diff(a_data['file_checksum_values'], b_data['file_checksum_values'])
     if changed:
@@ -1017,6 +1035,8 @@ def calc_taskhash(sigdata):
 
     for c in sigdata['file_checksum_values']:
         if c[1]:
+            if "./" in c[0]:
+                data = data + c[0]
             data = data + c[1]
 
     if 'taint' in sigdata:
@@ -1031,32 +1051,31 @@ def calc_taskhash(sigdata):
 def dump_sigfile(a):
     output = []
 
-    with open(a, 'rb') as f:
-        p1 = pickle.Unpickler(f)
-        a_data = p1.load()
+    with bb.compress.zstd.open(a, "rt", encoding="utf-8", num_threads=1) as f:
+        a_data = json.load(f, object_hook=SetDecoder)
 
-    output.append("basewhitelist: %s" % (a_data['basewhitelist']))
+    output.append("basewhitelist: %s" % (sorted(a_data['basewhitelist'])))
 
-    output.append("taskwhitelist: %s" % (a_data['taskwhitelist']))
+    output.append("taskwhitelist: %s" % (sorted(a_data['taskwhitelist'] or [])))
 
     output.append("Task dependencies: %s" % (sorted(a_data['taskdeps'])))
 
     output.append("basehash: %s" % (a_data['basehash']))
 
-    for dep in a_data['gendeps']:
-        output.append("List of dependencies for variable %s is %s" % (dep, a_data['gendeps'][dep]))
+    for dep in sorted(a_data['gendeps']):
+        output.append("List of dependencies for variable %s is %s" % (dep, sorted(a_data['gendeps'][dep])))
 
-    for dep in a_data['varvals']:
+    for dep in sorted(a_data['varvals']):
         output.append("Variable %s value is %s" % (dep, a_data['varvals'][dep]))
 
     if 'runtaskdeps' in a_data:
-        output.append("Tasks this task depends on: %s" % (a_data['runtaskdeps']))
+        output.append("Tasks this task depends on: %s" % (sorted(a_data['runtaskdeps'])))
 
     if 'file_checksum_values' in a_data:
-        output.append("This task depends on the checksums of files: %s" % (a_data['file_checksum_values']))
+        output.append("This task depends on the checksums of files: %s" % (sorted(a_data['file_checksum_values'])))
 
     if 'runtaskhashes' in a_data:
-        for dep in a_data['runtaskhashes']:
+        for dep in sorted(a_data['runtaskhashes']):
             output.append("Hash for dependent task %s is %s" % (dep, a_data['runtaskhashes'][dep]))
 
     if 'taint' in a_data:

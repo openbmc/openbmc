@@ -14,7 +14,7 @@ BBCLASSEXTEND = "native nativesdk"
 DEPENDS += "go-dep-native libpam"
 
 SRCREV = "92b1e9a8670ccd3916a7d24a06cab1e4c9815bc4"
-SRC_URI = "git://github.com/google/fscrypt.git"
+SRC_URI = "git://github.com/google/fscrypt.git;branch=master;protocol=https"
 GO_IMPORT = "import"
 
 S = "${WORKDIR}/git"

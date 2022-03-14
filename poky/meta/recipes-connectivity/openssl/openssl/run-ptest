@@ -9,4 +9,4 @@ export TOP=.
 # OPENSSL_ENGINES is relative from the test binaries
 export OPENSSL_ENGINES=../engines
 
-perl ./test/run_tests.pl $* | perl -0pe 's#(.*) \.*.ok#PASS: \1#g; s#(.*) \.*.skipped: (.*)#SKIP: \1 (\2)#g; s#(.*) \.*.\nDubious#FAIL: \1#;'
+perl ./test/run_tests.pl $* | sed -u -r -e '/(.*) \.*.ok/ s/^/PASS: /g' -r -e '/Dubious(.*)/ s/^/FAIL: /g' -e '/(.*) \.*.skipped: (.*)/ s/^/SKIP: /g'

@@ -1,3 +1,8 @@
+From a35e79002d36cca3c272ba5625aec86d6b7a38a8 Mon Sep 17 00:00:00 2001
+From: Saul Wold <sgw@linux.intel.com>
+Date: Tue, 9 Apr 2013 23:25:54 -0700
+Subject: [PATCH] busybox: fail on no media
+
 Upstream-Status: Denied
 [https://www.mail-archive.com/busybox@busybox.net/msg22354.html]
 
@@ -10,16 +15,18 @@ removed, but that would be harder to accomplish.
 
 Signed-off-by: Saul Wold <sgw@linux.intel.com>
 
+---
+ util-linux/mount.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Index: busybox-1.20.2/util-linux/mount.c
-===================================================================
---- busybox-1.20.2.orig/util-linux/mount.c
-+++ busybox-1.20.2/util-linux/mount.c
-@@ -598,7 +598,13 @@ static int mount_it_now(struct mntent *m
- 				break;
+diff --git a/util-linux/mount.c b/util-linux/mount.c
+index 4e65b6b..9d7a566 100644
+--- a/util-linux/mount.c
++++ b/util-linux/mount.c
+@@ -746,6 +746,14 @@ static int mount_it_now(struct mntent *mp, unsigned long vfsflags, char *filtero
  			errno = errno_save;
  		}
--
+ 
 +		/*
 +		 * Break if there is no media, no point retrying for all
 +		 * fs types since there is no media available
@@ -27,6 +34,7 @@ Index: busybox-1.20.2/util-linux/mount.c
 +		if (rc == -1 && errno == ENOMEDIUM) {
 +			bb_perror_msg_and_die("mounting %s on %s failed", mp->mnt_fsname, mp->mnt_dir);
 +		}
- 		if (!rc || (vfsflags & MS_RDONLY) || (errno != EACCES && errno != EROFS))
- 			break;
- 		if (!(vfsflags & MS_SILENT))
++
+ 		// Should we retry read-only mount?
+ 		if (vfsflags & MS_RDONLY)
+ 			break;		// no, already was tried

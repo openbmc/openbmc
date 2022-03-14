@@ -9,7 +9,7 @@ HOMEPAGE = "http://www.libimobiledevice.org/"
 DEPENDS = "libplist usbmuxd libusbmuxd libtasn1 gnutls libgcrypt"
 
 SRCREV = "15f8652126664e3a4b980e5d1c039b9053ce8566"
-SRC_URI = "git://github.com/libimobiledevice/libimobiledevice;protocol=https"
+SRC_URI = "git://github.com/libimobiledevice/libimobiledevice;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"
 inherit autotools pkgconfig

@@ -14,7 +14,7 @@ DEPENDS:class-native = "trousers-native"
 
 SRCREV = "bf43837575c5f7d31865562dce7778eae970052e"
 SRC_URI = " \
-    git://git.code.sf.net/p/trousers/tpm-tools \
+    git://git.code.sf.net/p/trousers/tpm-tools;branch=master \
     file://tpm-tools-extendpcr.patch \
     file://04-fix-FTBFS-clang.patch \
     file://openssl1.1_fix.patch \

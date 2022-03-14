@@ -12,7 +12,7 @@ inherit pkgconfig cmake features_check
 
 PV .= "+git${SRCPV}"
 SRCREV = "781fbbadb0bccc749058177b1385c82da9ace880"
-SRC_URI = "git://github.com/glfw/glfw.git"
+SRC_URI = "git://github.com/glfw/glfw.git;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

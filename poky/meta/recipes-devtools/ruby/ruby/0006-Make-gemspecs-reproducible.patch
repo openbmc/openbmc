@@ -1,6 +1,7 @@
+From 6e1dc610724a7aa8368cbcddf4bbe21cccc0f731 Mon Sep 17 00:00:00 2001
 From: Lucas Kanashiro <kanashiro@debian.org>
 Date: Fri, 1 Nov 2019 15:25:17 -0300
-Subject: Make gemspecs reproducible
+Subject: [PATCH] Make gemspecs reproducible
 
 Without an explicit date, they will get the current date and make the
 build unreproducible
@@ -10,34 +11,40 @@ Upstream-Status: Backport [debian]
 ---
  ext/bigdecimal/bigdecimal.gemspec | 1 +
  ext/fiddle/fiddle.gemspec         | 1 +
- ext/io/console/io-console.gemspec | 2 +-
+ ext/io/console/io-console.gemspec | 1 +
  lib/ipaddr.gemspec                | 1 +
  lib/rdoc/rdoc.gemspec             | 1 +
- 5 files changed, 5 insertions(+), 1 deletion(-)
+ 5 files changed, 5 insertions(+)
 
+diff --git a/ext/bigdecimal/bigdecimal.gemspec b/ext/bigdecimal/bigdecimal.gemspec
+index fd49c1b..5b8bb00 100644
 --- a/ext/bigdecimal/bigdecimal.gemspec
 +++ b/ext/bigdecimal/bigdecimal.gemspec
-@@ -6,6 +6,7 @@
+@@ -4,6 +4,7 @@ Gem::Specification.new do |s|
    s.name          = "bigdecimal"
-   s.version       = bigdecimal_version
+   s.version       = "3.1.1"
    s.authors       = ["Kenta Murata", "Zachary Scott", "Shigeo Kobayashi"]
 +  s.date          = RUBY_RELEASE_DATE
    s.email         = ["mrkn@mrkn.jp"]
-
+ 
    s.summary       = "Arbitrary-precision decimal floating-point number library."
+diff --git a/ext/fiddle/fiddle.gemspec b/ext/fiddle/fiddle.gemspec
+index a9c0ec4..89da078 100644
 --- a/ext/fiddle/fiddle.gemspec
 +++ b/ext/fiddle/fiddle.gemspec
-@@ -8,6 +8,7 @@
+@@ -8,6 +8,7 @@ end
  Gem::Specification.new do |spec|
    spec.name          = "fiddle"
    spec.version       = version_module::Fiddle::VERSION
 +  spec.date          = RUBY_RELEASE_DATE
    spec.authors       = ["Aaron Patterson", "SHIBATA Hiroshi"]
    spec.email         = ["aaron@tenderlovemaking.com", "hsbt@ruby-lang.org"]
-
+ 
+diff --git a/ext/io/console/io-console.gemspec b/ext/io/console/io-console.gemspec
+index 36beda7..e932d83 100644
 --- a/ext/io/console/io-console.gemspec
 +++ b/ext/io/console/io-console.gemspec
-@@ -4,6 +4,7 @@
+@@ -4,6 +4,7 @@ _VERSION = "0.5.10"
  Gem::Specification.new do |s|
    s.name = "io-console"
    s.version = _VERSION
@@ -45,23 +52,27 @@ Upstream-Status: Backport [debian]
    s.summary = "Console interface"
    s.email = "nobu@ruby-lang.org"
    s.description = "add console capabilities to IO instances."
+diff --git a/lib/ipaddr.gemspec b/lib/ipaddr.gemspec
+index 36e2300..06dc888 100644
 --- a/lib/ipaddr.gemspec
 +++ b/lib/ipaddr.gemspec
-@@ -6,6 +6,7 @@
+@@ -6,6 +6,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
  Gem::Specification.new do |spec|
    spec.name          = "ipaddr"
-   spec.version       = "1.2.2"
+   spec.version       = "1.2.3"
 +  spec.date          = RUBY_RELEASE_DATE
    spec.authors       = ["Akinori MUSHA", "Hajimu UMEMOTO"]
    spec.email         = ["knu@idaemons.org", "ume@mahoroba.org"]
-
+ 
+diff --git a/lib/rdoc/rdoc.gemspec b/lib/rdoc/rdoc.gemspec
+index 525a15f..f6d0e22 100644
 --- a/lib/rdoc/rdoc.gemspec
 +++ b/lib/rdoc/rdoc.gemspec
-@@ -7,6 +7,7 @@
-
+@@ -7,6 +7,7 @@ end
+ 
  Gem::Specification.new do |s|
    s.name = "rdoc"
 +  s.date = RUBY_RELEASE_DATE
    s.version = RDoc::VERSION
-
+ 
    s.authors = [

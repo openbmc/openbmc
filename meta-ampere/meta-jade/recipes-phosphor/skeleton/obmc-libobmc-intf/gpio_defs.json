@@ -4,6 +4,7 @@
         "power_config": {
             "power_good_in": "PGOOD",
             "power_up_outs": [
+               {"name": "OCP_MAIN_PWREN", "polarity": true},
                {"name": "BMC_SYS_PSON_L", "polarity": false}
             ],
             "reset_outs": [
@@ -22,6 +23,11 @@
         {
             "name": "BMC_SYS_PSON_L",
             "pin": "F2",
+            "direction": "out"
+        },
+        {
+            "name": "OCP_MAIN_PWREN",
+            "pin": "R4",
             "direction": "out"
         },
         {

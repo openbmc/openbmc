@@ -94,21 +94,21 @@ test_gadget_creation_with_defaults() {
     check_file_content ${FAKE_GADGETFS}/${gadget_dir}/strings/0x409/manufacturer "Google"
     check_file_content ${FAKE_GADGETFS}/${gadget_dir}/strings/0x409/product "${product_name}"
     check_file_content ${FAKE_GADGETFS}/${gadget_dir}/configs/c.1/MaxPower "100"
-    check_file_content ${FAKE_GADGETFS}/${gadget_dir}/configs/c.1/strings/0x409/configuration "ECM"
-    check_file_content ${FAKE_GADGETFS}/${gadget_dir}/functions/ecm.usb0/dev_addr "${dev_mac}"
-    check_file_content ${FAKE_GADGETFS}/${gadget_dir}/functions/ecm.usb0/host_addr "${host_mac}"
+    check_file_content ${FAKE_GADGETFS}/${gadget_dir}/configs/c.1/strings/0x409/configuration "EEM"
+    check_file_content ${FAKE_GADGETFS}/${gadget_dir}/functions/eem.usb0/dev_addr "${dev_mac}"
+    check_file_content ${FAKE_GADGETFS}/${gadget_dir}/functions/eem.usb0/host_addr "${host_mac}"
 
-    if ! test -d ${FAKE_GADGETFS}/${gadget_dir}/functions/ecm.usb0; then
+    if ! test -d ${FAKE_GADGETFS}/${gadget_dir}/functions/eem.usb0; then
         test_fail "Function directory was not created"
     fi
 
-    local func_link="${FAKE_GADGETFS}/${gadget_dir}/configs/c.1/ecm.usb0"
+    local func_link="${FAKE_GADGETFS}/${gadget_dir}/configs/c.1/ee.usb0"
     if ! test -L "${func_link}"; then
         test_fail "Symlink to the function was not created in the config"
     fi
 
     local link_dest=$(realpath ${func_link})
-    if [[ $link_dest != ${FAKE_GADGETFS}/${gadget_dir}/functions/ecm.usb0 ]]; then
+    if [[ $link_dest != ${FAKE_GADGETFS}/${gadget_dir}/functions/eem.usb0 ]]; then
         test_fail "Symlink points to the wrong file/dir"
     fi
 
@@ -167,23 +167,23 @@ test_gadget_creation_no_macs() {
     check_file_content ${FAKE_GADGETFS}/${gadget_dir}/strings/0x409/manufacturer "Google"
     check_file_content ${FAKE_GADGETFS}/${gadget_dir}/strings/0x409/product "${product_name}"
     check_file_content ${FAKE_GADGETFS}/${gadget_dir}/configs/c.1/MaxPower "100"
-    check_file_content ${FAKE_GADGETFS}/${gadget_dir}/configs/c.1/strings/0x409/configuration "ECM"
+    check_file_content ${FAKE_GADGETFS}/${gadget_dir}/configs/c.1/strings/0x409/configuration "EEM"
 
-    if test -e ${FAKE_GADGETFS}/${gadget_dir}/functions/ecm.usb0/dev_addr; then
+    if test -e ${FAKE_GADGETFS}/${gadget_dir}/functions/eem.usb0/dev_addr; then
         test_fail "dev_addr should not be set"
     fi
 
-    if test -e ${FAKE_GADGETFS}/${gadget_dir}/functions/ecm.usb0/host_addr; then
+    if test -e ${FAKE_GADGETFS}/${gadget_dir}/functions/eem.usb0/host_addr; then
         test_fail "host_addr should not be set"
     fi
 
-    local func_link="${FAKE_GADGETFS}/${gadget_dir}/configs/c.1/ecm.usb0"
+    local func_link="${FAKE_GADGETFS}/${gadget_dir}/configs/c.1/eem.usb0"
     if ! test -L "${func_link}"; then
         test_fail "Symlink to the function was not created in the config"
     fi
 
     local link_dest=$(realpath ${func_link})
-    if [[ $link_dest != ${FAKE_GADGETFS}/${gadget_dir}/functions/ecm.usb0 ]]; then
+    if [[ $link_dest != ${FAKE_GADGETFS}/${gadget_dir}/functions/eem.usb0 ]]; then
         test_fail "Symlink points to the wrong file/dir"
     fi
 
@@ -214,27 +214,27 @@ test_gadget_creation_alt_iface() {
     check_file_content ${FAKE_GADGETFS}/${gadget_dir}/strings/0x409/manufacturer "Google"
     check_file_content ${FAKE_GADGETFS}/${gadget_dir}/strings/0x409/product "${product_name}"
     check_file_content ${FAKE_GADGETFS}/${gadget_dir}/configs/c.1/MaxPower "100"
-    check_file_content ${FAKE_GADGETFS}/${gadget_dir}/configs/c.1/strings/0x409/configuration "ECM"
+    check_file_content ${FAKE_GADGETFS}/${gadget_dir}/configs/c.1/strings/0x409/configuration "EEM"
 
-    if ! test -d ${FAKE_GADGETFS}/${gadget_dir}/functions/ecm.${iface_name}; then
+    if ! test -d ${FAKE_GADGETFS}/${gadget_dir}/functions/eem.${iface_name}; then
         test_fail "Function directory was not created"
     fi
 
-    if test -e ${FAKE_GADGETFS}/${gadget_dir}/functions/ecm.${iface_name}/dev_addr; then
+    if test -e ${FAKE_GADGETFS}/${gadget_dir}/functions/eem.${iface_name}/dev_addr; then
         test_fail "dev_addr should not be set"
     fi
 
-    if test -e ${FAKE_GADGETFS}/${gadget_dir}/functions/ecm.${iface_name}/host_addr; then
+    if test -e ${FAKE_GADGETFS}/${gadget_dir}/functions/eem.${iface_name}/host_addr; then
         test_fail "host_addr should not be set"
     fi
 
-    local func_link="${FAKE_GADGETFS}/${gadget_dir}/configs/c.1/ecm.${iface_name}"
+    local func_link="${FAKE_GADGETFS}/${gadget_dir}/configs/c.1/eem.${iface_name}"
     if ! test -L "${func_link}"; then
         test_fail "Symlink to the function was not created in the config"
     fi
 
     local link_dest=$(realpath ${func_link})
-    if [[ $link_dest != ${FAKE_GADGETFS}/${gadget_dir}/functions/ecm.${iface_name} ]]; then
+    if [[ $link_dest != ${FAKE_GADGETFS}/${gadget_dir}/functions/eem.${iface_name} ]]; then
         test_fail "Symlink points to the wrong file/dir"
     fi
 

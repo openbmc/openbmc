@@ -152,6 +152,10 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
     fakeenv = {}
     umask = None
 
+    uid = os.getuid()
+    gid = os.getgid()
+
+
     taskdep = workerdata["taskdeps"][fn]
     if 'umask' in taskdep and taskname in taskdep['umask']:
         umask = taskdep['umask'][taskname]
@@ -237,6 +241,7 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
                 the_data = databuilder.mcdata[mc]
                 the_data.setVar("BB_WORKERCONTEXT", "1")
                 the_data.setVar("BB_TASKDEPDATA", taskdepdata)
+                the_data.setVar('BB_CURRENTTASK', taskname.replace("do_", ""))
                 if cfg.limited_deps:
                     the_data.setVar("BB_LIMITEDDEPS", "1")
                 the_data.setVar("BUILDNAME", workerdata["buildname"])
@@ -255,6 +260,10 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
                 the_data.setVar('BB_UNIHASH', unihash)
 
                 bb.utils.set_process_name("%s:%s" % (the_data.getVar("PN"), taskname.replace("do_", "")))
+
+                if not the_data.getVarFlag(taskname, 'network', False):
+                    logger.debug("Attempting to disable network")
+                    bb.utils.disable_network(uid, gid)
 
                 # exported_vars() returns a generator which *cannot* be passed to os.environ.update() 
                 # successfully. We also need to unset anything from the environment which shouldn't be there 
@@ -287,10 +296,12 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
             try:
                 if dry_run:
                     return 0
-                ret = bb.build.exec_task(fn, taskname, the_data, cfg.profile)
-                if fakeroot:
-                    fakerootcmd = shlex.split(the_data.getVar("FAKEROOTCMD"))
-                    subprocess.run(fakerootcmd + ['-S'], check=True, stdout=subprocess.PIPE)
+                try:
+                    ret = bb.build.exec_task(fn, taskname, the_data, cfg.profile)
+                finally:
+                    if fakeroot:
+                        fakerootcmd = shlex.split(the_data.getVar("FAKEROOTCMD"))
+                        subprocess.run(fakerootcmd + ['-S'], check=True, stdout=subprocess.PIPE)
                 return ret
             except:
                 os._exit(1)
@@ -415,7 +426,11 @@ class BitbakeWorker(object):
         if self.queue.startswith(b"<" + item + b">"):
             index = self.queue.find(b"</" + item + b">")
             while index != -1:
-                func(self.queue[(len(item) + 2):index])
+                try:
+                    func(self.queue[(len(item) + 2):index])
+                except pickle.UnpicklingError:
+                    workerlog_write("Unable to unpickle data: %s\n" % ":".join("{:02x}".format(c) for c in self.queue))
+                    raise
                 self.queue = self.queue[(index + len(item) + 3):]
                 index = self.queue.find(b"</" + item + b">")
 

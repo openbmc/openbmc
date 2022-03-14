@@ -1,0 +1,49 @@
+From 96e8f0b2d13e890d9ffff8673f18dcc94290efb2 Mon Sep 17 00:00:00 2001
+From: Tim Orling <tim.orling@konsulko.com>
+Date: Thu, 13 Jan 2022 20:06:33 -0600
+Subject: [PATCH] setup.py: StrictVersion -> packaging.version.*
+
+distutils is deprecated in Python 3.10 and will be removed in Python
+3.12 [1]
+
+The recommended replacement for distutils.version is to use
+packaging.version
+
+StrictVersion can be replaced by packaging.version.Version and helpers
+like packaging.version.parse()
+
+[1] https://www.python.org/dev/peps/pep-0632/
+[2] https://packaging.pypa.io/en/latest/version.html
+
+Upstream-Status: Submitted [https://github.com/gammu/python-gammu/pull/67]
+
+Signed-off-by: Tim Orling <tim.orling@konsulko.com>
+---
+ setup.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index a458181..bffb09d 100755
+--- a/setup.py
++++ b/setup.py
+@@ -30,7 +30,7 @@ import os
+ import platform
+ import subprocess
+ import sys
+-from distutils.version import StrictVersion
++from packaging.version import parse, Version
+ 
+ from setuptools import Extension, setup
+ 
+@@ -112,9 +112,9 @@ class GammuConfig:
+         with open(self.config_path(self.path)) as handle:
+             for line in handle:
+                 if line.startswith("#define GAMMU_VERSION "):
+-                    version = line.split('"')[1]
++                    version = parse(line.split('"')[1])
+ 
+-        if version is None or StrictVersion(version) < StrictVersion(GAMMU_REQUIRED):
++        if version is None or version < parse(GAMMU_REQUIRED):
+             print("Too old Gammu version, please upgrade!")
+             sys.exit(100)
+ 

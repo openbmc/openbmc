@@ -451,12 +451,12 @@ class TaskData:
         for target in self.build_targets:
             if fn in self.build_targets[target]:
                 self.build_targets[target].remove(fn)
-                if len(self.build_targets[target]) == 0:
+                if not self.build_targets[target]:
                     self.remove_buildtarget(target, missing_list)
         for target in self.run_targets:
             if fn in self.run_targets[target]:
                 self.run_targets[target].remove(fn)
-                if len(self.run_targets[target]) == 0:
+                if not self.run_targets[target]:
                     self.remove_runtarget(target, missing_list)
 
     def remove_buildtarget(self, target, missing_list=None):

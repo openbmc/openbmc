@@ -70,28 +70,33 @@ CHIPS:witherspoon-tacoma = " \
                "
 
 CHIPS:p10bmc = " \
+               bus@1e78a000/i2c-bus@200/power-supply@68 \
+               bus@1e78a000/i2c-bus@200/power-supply@69 \
+               bus@1e78a000/i2c-bus@200/power-supply@6a \
+               bus@1e78a000/i2c-bus@200/power-supply@6d \
+               bus@1e78a000/i2c-bus@200/power-supply@6b \
                bus@1e78a000/i2c-bus@400/max31785@52 \
                bus@1e78a000/i2c-bus@780/i2c-switch@70/i2c@3/max31785@52 \
                "
 
 ITEMSFMT = "ahb/apb/{0}.conf"
 ITEMS = "${@compose_list(d, 'ITEMSFMT', 'CHIPS')}"
-ITEMS:append:mihawk += " iio-hwmon-vdd0.conf"
-ITEMS:append:mihawk += " iio-hwmon-vdd1.conf"
-ITEMS:append:mihawk += " iio-hwmon-vcs0.conf"
-ITEMS:append:mihawk += " iio-hwmon-vcs1.conf"
-ITEMS:append:mihawk += " iio-hwmon-vdn0.conf"
-ITEMS:append:mihawk += " iio-hwmon-vdn1.conf"
-ITEMS:append:mihawk += " iio-hwmon-vio0.conf"
-ITEMS:append:mihawk += " iio-hwmon-vio1.conf"
-ITEMS:append:mihawk += " iio-hwmon-vddra.conf"
-ITEMS:append:mihawk += " iio-hwmon-vddrb.conf"
-ITEMS:append:mihawk += " iio-hwmon-vddrc.conf"
-ITEMS:append:mihawk += " iio-hwmon-vddrd.conf"
-ITEMS:append:mihawk += " iio-hwmon-12v.conf"
-ITEMS:append:mihawk += " iio-hwmon-5v.conf"
-ITEMS:append:mihawk += " iio-hwmon-3v.conf"
-ITEMS:append:mihawk += " iio-hwmon-battery.conf"
+ITEMS:append:mihawk = " iio-hwmon-vdd0.conf"
+ITEMS:append:mihawk = " iio-hwmon-vdd1.conf"
+ITEMS:append:mihawk = " iio-hwmon-vcs0.conf"
+ITEMS:append:mihawk = " iio-hwmon-vcs1.conf"
+ITEMS:append:mihawk = " iio-hwmon-vdn0.conf"
+ITEMS:append:mihawk = " iio-hwmon-vdn1.conf"
+ITEMS:append:mihawk = " iio-hwmon-vio0.conf"
+ITEMS:append:mihawk = " iio-hwmon-vio1.conf"
+ITEMS:append:mihawk = " iio-hwmon-vddra.conf"
+ITEMS:append:mihawk = " iio-hwmon-vddrb.conf"
+ITEMS:append:mihawk = " iio-hwmon-vddrc.conf"
+ITEMS:append:mihawk = " iio-hwmon-vddrd.conf"
+ITEMS:append:mihawk = " iio-hwmon-12v.conf"
+ITEMS:append:mihawk = " iio-hwmon-5v.conf"
+ITEMS:append:mihawk = " iio-hwmon-3v.conf"
+ITEMS:append:mihawk = " iio-hwmon-battery.conf"
 
 OCCS = " \
         00--00--00--06/sbefifo1-dev0/occ-hwmon.1 \

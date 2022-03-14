@@ -3,7 +3,7 @@ From: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Date: Fri, 9 Dec 2016 14:35:45 +0200
 Subject: [PATCH] Add option for vmwgfx
 
-Upstream-Status:Submitted
+Upstream-Status: Submitted
 
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>

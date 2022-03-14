@@ -1,4 +1,4 @@
-From 3410d82c9d07aee3e951fc6ae0b41fc1a594e00d Mon Sep 17 00:00:00 2001
+From 7ca9887f84adba065dc2e59b3de55ace2fc72ec0 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 15:00:06 +0800
 Subject: [PATCH] add missing FTW_ macros for musl
@@ -13,7 +13,8 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 
 ---
  src/basic/missing_type.h | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ src/shared/mount-setup.c |  1 +
+ 2 files changed, 21 insertions(+)
 
 diff --git a/src/basic/missing_type.h b/src/basic/missing_type.h
 index aeaf6ad5ec..3df1084ef2 100644
@@ -43,3 +44,15 @@ index aeaf6ad5ec..3df1084ef2 100644
 +#ifndef FTW_SKIP_SIBLINGS
 +#define FTW_SKIP_SIBLINGS 3
 +#endif
+diff --git a/src/shared/mount-setup.c b/src/shared/mount-setup.c
+index ef3527e9a7..c1cab40eb8 100644
+--- a/src/shared/mount-setup.c
++++ b/src/shared/mount-setup.c
+@@ -32,6 +32,7 @@
+ #include "strv.h"
+ #include "user-util.h"
+ #include "virt.h"
++#include "missing_type.h"
+ 
+ typedef enum MountMode {
+         MNT_NONE           = 0,

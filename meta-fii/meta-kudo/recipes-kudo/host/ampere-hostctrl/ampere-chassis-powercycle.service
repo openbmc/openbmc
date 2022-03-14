@@ -1,0 +1,8 @@
+[Unit]
+Description=Ampere Computing LLC Power OFF Chassis
+
+[Service]
+RemainAfterExit=no
+Type=oneshot
+ExecStart=/usr/libexec/ampere-hostctrl/ampere_power_util.sh mb hotswap
+SyslogIdentifier=ampere_power_util.sh

@@ -8,13 +8,12 @@ SECTION = "console/utils"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-SRCREV = "edf8e6f0ea77ede073f07bff0d2ae1fc7a38103b"
+SRCREV = "d97db4fae4c1cd099b506970b285dc2afd818ea2"
 PV = "0.29.2+git${SRCPV}"
 
 SRC_URI = "git://gitlab.freedesktop.org/pkg-config/pkg-config.git;branch=master;protocol=https \
            file://pkg-config-esdk.in \
            file://pkg-config-native.in \
-           file://fix-glib-configure-libtool-usage.patch \
            file://0001-glib-gettext.m4-Update-AM_GLIB_GNU_GETTEXT-to-match-.patch \
            file://0001-autotools-remove-support-for-the-__int64-type.-See-1.patch \
            file://0001-autotools-use-C99-printf-format-specifiers-on-Window.patch \
@@ -67,7 +66,7 @@ pkgconfig_sstate_fixup_esdk () {
 	if [ "${BB_CURRENTTASK}" = "populate_sysroot_setscene" -a "${WITHIN_EXT_SDK}" = "1" ] ; then
 		pkgconfdir="${SSTATE_INSTDIR}/recipe-sysroot-native/${bindir_native}"
 		mv $pkgconfdir/pkg-config $pkgconfdir/pkg-config.real
-		lnr $pkgconfdir/pkg-config-esdk $pkgconfdir/pkg-config
+		ln -rs $pkgconfdir/pkg-config-esdk $pkgconfdir/pkg-config
 		sed -i -e "s|^pkg-config|pkg-config.real|" $pkgconfdir/pkg-config-native
 	fi
 }

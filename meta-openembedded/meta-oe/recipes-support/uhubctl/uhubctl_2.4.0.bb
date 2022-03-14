@@ -7,7 +7,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRCREV = "014b55ac5d1d7fb46a8f1eefe9fc3b87ea65a75f"
-SRC_URI = "git://github.com/mvp/${BPN}"
+SRC_URI = "git://github.com/mvp/${BPN};branch=master;protocol=https"
 S = "${WORKDIR}/git"
 
 # uhubctl gets its program version from "git describe". As we use the source

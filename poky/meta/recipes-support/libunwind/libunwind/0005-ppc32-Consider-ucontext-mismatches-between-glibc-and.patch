@@ -1,7 +1,8 @@
-From 02919d74b1599979884f9cee466ed392d9fc4819 Mon Sep 17 00:00:00 2001
+From 24c751f9d21e892a9833e1b70a696b07872b0f7f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 9 Jul 2016 01:07:53 +0000
-Subject: [PATCH 5/6] ppc32: Consider ucontext mismatches between glibc and
+Subject: [PATCH] ppc32: Consider ucontext mismatches between glibc and
+
  musl
 
 This helps in porting libunwind onto musl based systems
@@ -29,7 +30,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  3 files changed, 92 insertions(+), 79 deletions(-)
 
 diff --git a/src/ppc32/Ginit.c b/src/ppc32/Ginit.c
-index ba30244..c5312d9 100644
+index 7b45455..f8d6886 100644
 --- a/src/ppc32/Ginit.c
 +++ b/src/ppc32/Ginit.c
 @@ -48,12 +48,12 @@ uc_addr (ucontext_t *uc, int reg)
@@ -227,7 +228,7 @@ index c6ba806..b79f15c 100644
  
  #endif
 diff --git a/src/ptrace/_UPT_reg_offset.c b/src/ptrace/_UPT_reg_offset.c
-index c82d1c9..6c31baa 100644
+index b7dd3b7..bfaf756 100644
 --- a/src/ptrace/_UPT_reg_offset.c
 +++ b/src/ptrace/_UPT_reg_offset.c
 @@ -27,6 +27,13 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
@@ -242,8 +243,5 @@ index c82d1c9..6c31baa 100644
 +# undef pt_regs
 +#endif
  
- #ifdef HAVE_ASM_PTRACE_OFFSETS_H
- # include <asm/ptrace_offsets.h>
--- 
-2.20.1
-
+ #ifdef HAVE_ASM_PTRACE_H
+ # include <asm/ptrace.h>

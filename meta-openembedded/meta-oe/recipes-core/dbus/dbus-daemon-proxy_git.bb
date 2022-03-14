@@ -6,7 +6,7 @@ SRCREV = "1226a0a1374628ff191f6d8a56000be5e53e7608"
 PV = "0.0.0+gitr${SRCPV}"
 PR = "r1.59"
 
-SRC_URI = "git://github.com/alban/dbus-daemon-proxy \
+SRC_URI = "git://github.com/alban/dbus-daemon-proxy;branch=master;protocol=https \
            file://0001-dbus-daemon-proxy-Return-DBUS_HANDLER_RESULT_NOT_YET.patch \
            "
 S = "${WORKDIR}/git"

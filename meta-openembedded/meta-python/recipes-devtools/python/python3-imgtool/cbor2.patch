@@ -1,0 +1,67 @@
+Upstream-Status: Submitted [https://github.com/mcu-tools/mcuboot/pull/1190]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From f9c6f31b936d34df9a6551609cb16ed9c348be88 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Tue, 2 Nov 2021 11:12:04 +0000
+Subject: [PATCH] imgtool: prefer cbor2 over cbor
+
+The cbor module is unmaintained, with the last release in 2016[1]. The
+cbor2 module however is under active development and was last released
+just last month[2].
+
+As the APIs are identical, we can import cbor2 and if that fails fall
+back to cbor.
+
+[1] https://pypi.org/project/cbor/#history
+[2] https://pypi.org/project/cbor2/#history
+
+Closes #1189
+
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ scripts/imgtool.nix            | 2 +-
+ scripts/imgtool/boot_record.py | 7 +++++--
+ scripts/requirements.txt       | 2 +-
+ scripts/setup.py               | 2 +-
+ 4 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/scripts/imgtool/boot_record.py b/scripts/imgtool/boot_record.py
+index ac433aa..6f0045e 100644
+--- a/scripts/imgtool/boot_record.py
++++ b/scripts/imgtool/boot_record.py
+@@ -16,8 +16,11 @@
+ # limitations under the License.
+ 
+ from enum import Enum
+-import cbor
+ 
++try:
++    from cbor2 import dumps
++except ImportError:
++    from cbor import dumps
+ 
+ class SwComponent(int, Enum):
+     """
+@@ -46,4 +49,4 @@ def create_sw_component_data(sw_type, sw_version, sw_measurement_description,
+     #       list because later it will be modified by the bootloader.
+     properties[SwComponent.MEASUREMENT_VALUE] = sw_measurement_value
+ 
+-    return cbor.dumps(properties)
++    return dumps(properties)
+diff --git a/scripts/setup.py b/scripts/setup.py
+index a228ea3..692cfb7 100644
+--- a/scripts/setup.py
++++ b/scripts/setup.py
+@@ -17,7 +17,7 @@ setuptools.setup(
+         'cryptography>=2.4.2',
+         'intelhex>=2.2.1',
+         'click',
+-        'cbor>=1.0.0',
++        'cbor2',
+     ],
+     entry_points={
+         "console_scripts": ["imgtool=imgtool.main:imgtool"]
+-- 
+2.25.1
+

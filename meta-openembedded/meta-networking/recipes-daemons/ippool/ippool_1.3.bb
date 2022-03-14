@@ -96,7 +96,7 @@ def get_ppp_version(d):
         return None
 
     bb.debug(1, "pppd plugin dir %s" % pppd_plugin)
-    r = re.compile("\d*\.\d*\.\d*")
+    r = re.compile(r"\d*\.\d*\.\d*")
     for f in os.listdir(pppd_plugin):
         if os.path.isdir(os.path.join(pppd_plugin, f)):
             ma = r.match(f)

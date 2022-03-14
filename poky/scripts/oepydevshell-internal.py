@@ -43,7 +43,7 @@ nonblockingfd(pty)
 nonblockingfd(sys.stdin)
 
 
-histfile = os.path.expanduser("~/.oedevpyshell-history")
+histfile = os.path.expanduser("~/.oepydevshell-history")
 readline.parse_and_bind("tab: complete")
 try:
     readline.read_history_file(histfile)

@@ -22,8 +22,8 @@ SRCREV_default = "f543a0d0e707ab56415f17b0ca6d397394ee8b63"
 # This SRCREV corresponds to the v4.0.3 release of ffmpeg.
 SRCREV_ffmpeg = "fcbd117df3077bad495e99e20f01cf93737bce76"
 
-SRC_URI = "git://github.com/popcornmix/omxplayer.git;protocol=git;branch=master \
-           git://github.com/FFmpeg/FFmpeg;branch=release/4.0;protocol=git;depth=1;name=ffmpeg;destsuffix=git/ffmpeg \
+SRC_URI = "git://github.com/popcornmix/omxplayer.git;protocol=https;branch=master \
+           git://github.com/FFmpeg/FFmpeg;branch=release/4.0;protocol=https;depth=1;name=ffmpeg;destsuffix=git/ffmpeg \
            file://0002-Libraries-and-headers-from-ffmpeg-are-installed-in-u.patch \
            file://0003-Remove-strip-step-in-Makefile.patch \
            file://0004-Add-FFMPEG_EXTRA_CFLAGS-and-FFMPEG_EXTRA_LDFLAGS.patch \

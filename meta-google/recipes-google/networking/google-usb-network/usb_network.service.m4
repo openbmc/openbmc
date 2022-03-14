@@ -10,18 +10,18 @@ define(`DEV_MAC_ARG', `ifelse($1, `invalid', `',
 divert(0)dnl
 dnl
 [Unit]
-Description=USB ECM Gadget
-After=phosphor-ipmi-host.service
+Description=USB Gadget
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=M_SCRIPT_INSTALL_DIR/usb_network.sh \
-    --product-id "M_BMC_USB_ECM_PRODUCT_ID" \
-    --product-name "M_BMC_USB_ECM_PRODUCT_NAME" \
-    HOST_MAC_ARG(M_BMC_USB_ECM_HOST_MAC) \
-    DEV_MAC_ARG(M_BMC_USB_ECM_DEV_MAC) \
-    --bind-device "M_BMC_USB_ECM_BIND_DEV"
+    --product-id "M_BMC_USB_PRODUCT_ID" \
+    --product-name "M_BMC_USB_PRODUCT_NAME" \
+    --dev-type "M_BMC_USB_TYPE" \
+    HOST_MAC_ARG(M_BMC_USB_HOST_MAC) \
+    DEV_MAC_ARG(M_BMC_USB_DEV_MAC) \
+    --bind-device "M_BMC_USB_BIND_DEV"
 ExecStop=M_SCRIPT_INSTALL_DIR/usb_network.sh stop
 
 [Install]

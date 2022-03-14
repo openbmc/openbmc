@@ -11,7 +11,7 @@ SECTION = "utils"
 PV = "20170421"
 
 SRCREV = "fb5630138ccabbbc14a19d372096a04e42573c7d"
-SRC_URI = "git://github.com/boltlinux/musl-utils"
+SRC_URI = "git://github.com/boltlinux/musl-utils;branch=master;protocol=https"
 
 UPSTREAM_CHECK_COMMITS = "1"
 

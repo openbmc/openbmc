@@ -435,7 +435,7 @@ BitBake writes a shell script to
 executes the script. The generated shell script contains all the
 exported variables, and the shell functions with all variables expanded.
 Output from the shell script goes to the file
-``${T}/log.do_taskname.pid``. Looking at the expanded shell functions in
+``${``\ :term:`T`\ ``}/log.do_taskname.pid``. Looking at the expanded shell functions in
 the run file and the output in the log files is a useful debugging
 technique.
 

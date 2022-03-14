@@ -15,10 +15,8 @@
 # limitations under the License.
 
 do_flash () {
-        OFFSET=$1
-
 	# Check the PNOR partition available
-	HOST_MTD=$(cat /proc/mtd | grep "pnor" | sed -n 's/^\(.*\):.*/\1/p')
+	HOST_MTD=$(< /proc/mtd grep "pnor-uefi" | sed -n 's/^\(.*\):.*/\1/p')
 	if [ -z "$HOST_MTD" ];
 	then
 		# If the PNOR partition is not available, then bind again driver
@@ -26,7 +24,7 @@ do_flash () {
 		echo 1e630000.spi > /sys/bus/platform/drivers/aspeed-smc/bind
 		sleep 2
 
-		HOST_MTD=$(cat /proc/mtd | grep "pnor" | sed -n 's/^\(.*\):.*/\1/p')
+		HOST_MTD=$(< /proc/mtd grep "pnor-uefi" | sed -n 's/^\(.*\):.*/\1/p')
 		if [ -z "$HOST_MTD" ];
 		then
 			echo "Fail to probe Host SPI-NOR device"
@@ -34,21 +32,26 @@ do_flash () {
 		fi
 	fi
 
-	echo "--- Flashing firmware to @/dev/$HOST_MTD offset=$OFFSET"
-	flashcp -v $IMAGE /dev/$HOST_MTD $OFFSET
+	echo "--- Flashing firmware to @/dev/$HOST_MTD"
+	flashcp -v "$IMAGE" /dev/"$HOST_MTD"
 }
 
 
 if [ $# -eq 0 ]; then
-	echo "Usage: $(basename $0) <BIOS image file>"
+	echo "Usage: $(basename "$0") <BIOS image file>"
 	exit 0
 fi
 
 IMAGE="$1"
-if [ ! -f $IMAGE ]; then
-	echo $IMAGE
+if [ ! -f "$IMAGE" ]; then
 	echo "The image file $IMAGE does not exist"
 	exit 1
+fi
+
+if [ -z "$2" ]; then
+       DEV_SEL="1"    # by default, select primary device
+else
+       DEV_SEL="$2"
 fi
 
 # Turn off the Host if it is currently ON
@@ -70,21 +73,30 @@ fi
 
 # Switch the host SPI bus to BMC"
 echo "--- Switch the host SPI bus to BMC."
-gpioset 0 226=0
-
-if [[ $? -ne 0 ]]; then
+if ! gpioset 0 226=0; then
 	echo "ERROR: Switch the host SPI bus to BMC. Please check gpio state"
 	exit 1
 fi
 
+# Switch the host SPI bus (between primary and secondary)
+# 227 is BMC_SPI0_BACKUP_SEL
+if [[ $DEV_SEL == 1 ]]; then
+	echo "Run update primary Host SPI-NOR"
+	gpioset 0 227=0       # Primary SPI
+elif [[ $DEV_SEL == 2 ]]; then
+	echo "Run update secondary Host SPI-NOR"
+	gpioset 0 227=1       # Second SPI
+else
+	echo "Please choose primary SPI (1) or second SPI (2)"
+	exit 0
+fi
+
 # Flash the firmware
-do_flash 0x400000
+do_flash
 
 # Switch the host SPI bus to HOST."
 echo "--- Switch the host SPI bus to HOST."
-gpioset 0 226=1
-
-if [[ $? -ne 0 ]]; then
+if ! gpioset 0 226=1; then
 	echo "ERROR: Switch the host SPI bus to HOST. Please check gpio state"
 	exit 1
 fi

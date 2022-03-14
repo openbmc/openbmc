@@ -10,7 +10,7 @@ Subject: [PATCH] Using native binaries
 
 --- a/node.gyp
 +++ b/node.gyp
-@@ -487,6 +487,7 @@
+@@ -294,6 +294,7 @@
                'action_name': 'run_mkcodecache',
                'process_outputs_as_sources': 1,
                'inputs': [
@@ -18,7 +18,7 @@ Subject: [PATCH] Using native binaries
                  '<(mkcodecache_exec)',
                ],
                'outputs': [
-@@ -512,6 +513,7 @@
+@@ -319,6 +320,7 @@
                'action_name': 'node_mksnapshot',
                'process_outputs_as_sources': 1,
                'inputs': [
@@ -28,7 +28,7 @@ Subject: [PATCH] Using native binaries
                'outputs': [
 --- a/tools/v8_gypfiles/v8.gyp
 +++ b/tools/v8_gypfiles/v8.gyp
-@@ -220,6 +220,7 @@
+@@ -68,6 +68,7 @@
          {
            'action_name': 'run_torque_action',
            'inputs': [  # Order matters.
@@ -36,7 +36,15 @@ Subject: [PATCH] Using native binaries
              '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)torque<(EXECUTABLE_SUFFIX)',
              '<@(torque_files)',
            ],
-@@ -351,6 +352,7 @@
+@@ -99,6 +100,7 @@
+             '<@(torque_outputs_inc)',
+           ],
+           'action': [
++	    '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
+             '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)torque<(EXECUTABLE_SUFFIX)',
+             '-o', '<(SHARED_INTERMEDIATE_DIR)/torque-generated',
+             '-v8-root', '<(V8_ROOT)',
+@@ -225,6 +227,7 @@
          {
            'action_name': 'generate_bytecode_builtins_list_action',
            'inputs': [
@@ -44,7 +52,7 @@ Subject: [PATCH] Using native binaries
              '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)bytecode_builtins_list_generator<(EXECUTABLE_SUFFIX)',
            ],
            'outputs': [
-@@ -533,6 +535,7 @@
+@@ -415,6 +418,7 @@
              ],
            },
            'inputs': [
@@ -52,7 +60,7 @@ Subject: [PATCH] Using native binaries
              '<(mksnapshot_exec)',
            ],
            'outputs': [
-@@ -1448,6 +1451,7 @@
+@@ -1548,6 +1552,7 @@
          {
            'action_name': 'run_gen-regexp-special-case_action',
            'inputs': [

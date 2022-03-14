@@ -6,7 +6,9 @@ HOMEPAGE = "https://sourceware.org/systemtap/"
 
 require systemtap_git.inc
 
-SRC_URI += "file://0001-improve-reproducibility-for-c-compiling.patch"
+SRC_URI += "file://0001-improve-reproducibility-for-c-compiling.patch \
+           file://0001-staprun-address-ncurses-6.3-failures.patch \
+           "
 
 DEPENDS = "elfutils"
 
@@ -29,7 +31,7 @@ PACKAGECONFIG[monitor] = "--enable-monitor,--disable-monitor,ncurses json-c"
 PACKAGECONFIG[python3-probes] = "--with-python3-probes,--without-python3-probes,python3-setuptools-native"
 
 inherit autotools gettext pkgconfig systemd
-inherit ${@bb.utils.contains('PACKAGECONFIG', 'python3-probes', 'distutils3-base', '', d)}
+inherit ${@bb.utils.contains('PACKAGECONFIG', 'python3-probes', 'setuptools3-base', '', d)}
 
 # exporter comes with python3-probes
 PACKAGES =+ "${PN}-exporter"

@@ -106,12 +106,12 @@ as was previously assumed. Rather, the value changes based on whether
 large file support is enabled. For most software that uses ``autoconf``,
 this change should not be a problem. However, if you have a recipe that
 bypasses the standard :ref:`ref-tasks-configure` task
-from the ``autotools`` class and the software the recipe is building
+from the :ref:`autotools <ref-classes-autotools>` class and the software the recipe is building
 uses a very old version of ``autoconf``, the recipe might be incapable
 of determining the correct size of ``off_t`` during ``do_configure``.
 
 The best course of action is to patch the software as necessary to allow
-the default implementation from the ``autotools`` class to work such
+the default implementation from the :ref:`autotools <ref-classes-autotools>` class to work such
 that ``autoreconf`` succeeds and produces a working configure script,
 and to remove the overridden ``do_configure`` task such that the default
 implementation does get used.
@@ -262,7 +262,7 @@ The following changes have been made for the Poky distribution:
    With this class enabled, a tarball containing a pre-built C library
    is downloaded at the start of the build.
 
-   The ``uninative`` class is enabled through the
+   The :ref:`uninative <ref-classes-uninative>` class is enabled through the
    ``meta/conf/distro/include/yocto-uninative.inc`` file, which for
    those not using the Poky distribution, can include to easily enable
    the same functionality.

@@ -131,6 +131,20 @@ concat_dtb_helper() {
 		elif [ -e "${DEPLOYDIR}/${UBOOT_NODTB_IMAGE}" -a -e "$deployed_uboot_dtb_binary" ]; then
 			cd ${DEPLOYDIR}
 			cat ${UBOOT_NODTB_IMAGE} $deployed_uboot_dtb_binary | tee ${B}/${CONFIG_B_PATH}/${UBOOT_BINARY} > ${UBOOT_IMAGE}
+
+			if [ -n "${UBOOT_CONFIG}" ]
+			then
+				for config in ${UBOOT_MACHINE}; do
+					i=$(expr $i + 1);
+					for type in ${UBOOT_CONFIG}; do
+						j=$(expr $j + 1);
+						if [ $j -eq $i ]
+						then
+							cp ${UBOOT_IMAGE} ${B}/${CONFIG_B_PATH}/u-boot-$type.${UBOOT_SUFFIX}
+						fi
+					done
+				done
+			fi
 		else
 			bbwarn "Failure while adding public key to u-boot binary. Verified boot won't be available."
 		fi
@@ -162,8 +176,8 @@ concat_dtb() {
 		mkdir -p ${DEPLOYDIR}
 		if [ -n "${UBOOT_CONFIG}" ]; then
 			for config in ${UBOOT_MACHINE}; do
-				CONFIG_B_PATH="${config}"
-				cd ${B}/${config}
+				CONFIG_B_PATH="$config"
+				cd ${B}/$config
 				concat_dtb_helper
 			done
 		else
@@ -179,8 +193,8 @@ concat_spl_dtb() {
 		mkdir -p ${DEPLOYDIR}
 		if [ -n "${UBOOT_CONFIG}" ]; then
 			for config in ${UBOOT_MACHINE}; do
-				CONFIG_B_PATH="${config}"
-				cd ${B}/${config}
+				CONFIG_B_PATH="$config"
+				cd ${B}/$config
 				concat_spl_dtb_helper
 			done
 		else
@@ -205,7 +219,7 @@ install_helper() {
 	fi
 }
 
-# Install SPL dtb and u-boot nodtb to datadir, 
+# Install SPL dtb and u-boot nodtb to datadir,
 install_spl_helper() {
 	if [ -f "${SPL_DIR}/${SPL_DTB_BINARY}" ]; then
 		install -Dm 0644 ${SPL_DIR}/${SPL_DTB_BINARY} ${D}${datadir}/${SPL_DTB_IMAGE}
@@ -231,7 +245,7 @@ do_install:append() {
 	if [ "${PN}" = "${UBOOT_PN}" ]; then
 		if [ -n "${UBOOT_CONFIG}" ]; then
 			for config in ${UBOOT_MACHINE}; do
-				cd ${B}/${config}
+				cd ${B}/$config
 				if [ "${UBOOT_SIGN_ENABLE}" = "1" -o "${UBOOT_FITIMAGE_ENABLE}" = "1" ] && \
 					[ -n "${UBOOT_DTB_BINARY}" ]; then
 					install_helper
@@ -286,19 +300,19 @@ addtask uboot_generate_rsa_keys before do_uboot_assemble_fitimage after do_compi
 # Create a ITS file for the U-boot FIT, for use when
 # we want to sign it so that the SPL can verify it
 uboot_fitimage_assemble() {
-	uboot_its="${1}"
-	uboot_nodtb_bin="${2}"
-	uboot_dtb="${3}"
-	uboot_bin="${4}"
-	spl_dtb="${5}"
+	uboot_its="$1"
+	uboot_nodtb_bin="$2"
+	uboot_dtb="$3"
+	uboot_bin="$4"
+	spl_dtb="$5"
 	uboot_csum="${UBOOT_FIT_HASH_ALG}"
 	uboot_sign_algo="${UBOOT_FIT_SIGN_ALG}"
 	uboot_sign_keyname="${SPL_SIGN_KEYNAME}"
 
-	rm -f ${uboot_its} ${uboot_bin}
+	rm -f $uboot_its $uboot_bin
 
 	# First we create the ITS script
-	cat << EOF >> ${uboot_its}
+	cat << EOF >> $uboot_its
 /dts-v1/;
 
 / {
@@ -308,7 +322,7 @@ uboot_fitimage_assemble() {
     images {
         uboot {
             description = "U-Boot image";
-            data = /incbin/("${uboot_nodtb_bin}");
+            data = /incbin/("$uboot_nodtb_bin");
             type = "standalone";
             os = "u-boot";
             arch = "${UBOOT_ARCH}";
@@ -318,34 +332,34 @@ uboot_fitimage_assemble() {
 EOF
 
 	if [ "${SPL_SIGN_ENABLE}" = "1" ] ; then
-		cat << EOF >> ${uboot_its}
+		cat << EOF >> $uboot_its
             signature {
-                algo = "${uboot_csum},${uboot_sign_algo}";
-                key-name-hint = "${uboot_sign_keyname}";
+                algo = "$uboot_csum,$uboot_sign_algo";
+                key-name-hint = "$uboot_sign_keyname";
             };
 EOF
 	fi
 
-	cat << EOF >> ${uboot_its}
+	cat << EOF >> $uboot_its
         };
         fdt {
             description = "U-Boot FDT";
-            data = /incbin/("${uboot_dtb}");
+            data = /incbin/("$uboot_dtb");
             type = "flat_dt";
             arch = "${UBOOT_ARCH}";
             compression = "none";
 EOF
 
 	if [ "${SPL_SIGN_ENABLE}" = "1" ] ; then
-		cat << EOF >> ${uboot_its}
+		cat << EOF >> $uboot_its
             signature {
-                algo = "${uboot_csum},${uboot_sign_algo}";
-                key-name-hint = "${uboot_sign_keyname}";
+                algo = "$uboot_csum,$uboot_sign_algo";
+                key-name-hint = "$uboot_sign_keyname";
             };
 EOF
 	fi
 
-	cat << EOF >> ${uboot_its}
+	cat << EOF >> $uboot_its
         };
     };
 
@@ -365,8 +379,8 @@ EOF
 	#
 	${UBOOT_MKIMAGE} \
 		${@'-D "${SPL_MKIMAGE_DTCOPTS}"' if len('${SPL_MKIMAGE_DTCOPTS}') else ''} \
-		-f ${uboot_its} \
-		${uboot_bin}
+		-f $uboot_its \
+		$uboot_bin
 
 	if [ "${SPL_SIGN_ENABLE}" = "1" ] ; then
 		#
@@ -375,8 +389,8 @@ EOF
 		${UBOOT_MKIMAGE_SIGN} \
 			${@'-D "${SPL_MKIMAGE_DTCOPTS}"' if len('${SPL_MKIMAGE_DTCOPTS}') else ''} \
 			-F -k "${SPL_SIGN_KEYDIR}" \
-			-K "${spl_dtb}" \
-			-r ${uboot_bin} \
+			-K "$spl_dtb" \
+			-r $uboot_bin \
 			${SPL_MKIMAGE_SIGN_ARGS}
 	fi
 
@@ -408,8 +422,8 @@ do_uboot_assemble_fitimage() {
 		kernel_uboot_fitimage_name=`basename ${STAGING_DATADIR}/u-boot-fitImage-*`
 		kernel_uboot_its_name=`basename ${STAGING_DATADIR}/u-boot-its-*`
 		cd ${B}
-		uboot_fitimage_assemble ${kernel_uboot_its_name} ${UBOOT_NODTB_BINARY} \
-					${UBOOT_DTB_BINARY} ${kernel_uboot_fitimage_name} \
+		uboot_fitimage_assemble $kernel_uboot_its_name ${UBOOT_NODTB_BINARY} \
+					${UBOOT_DTB_BINARY} $kernel_uboot_fitimage_name \
 					${SPL_DTB_BINARY}
 	fi
 }

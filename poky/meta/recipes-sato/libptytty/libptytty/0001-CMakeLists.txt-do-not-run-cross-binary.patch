@@ -1,0 +1,24 @@
+From 989ae1f3651686c1f1046fe1c1596d564c3f452d Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Mon, 13 Dec 2021 14:33:01 +0100
+Subject: [PATCH] CMakeLists.txt: do not run cross-binary
+
+Upstream-Status: Inappropriate [issue reported at https://github.com/yusiwen/libptytty/issues/2]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c1ad6c0..3bd4d97 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -271,7 +271,7 @@ if(NOT HAVE_UNIX_FDPASS)
+   message(FATAL_ERROR "libptytty requires unix-compliant filehandle passing ability")
+ endif()
+ 
+-check_c_source_runs(
++check_c_source_compiles(
+   "
+    #include <grp.h>
+    #include <sys/stat.h>

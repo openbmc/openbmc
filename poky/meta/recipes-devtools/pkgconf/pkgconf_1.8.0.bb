@@ -59,7 +59,7 @@ pkgconf_sstate_fixup_esdk () {
    if [ "${BB_CURRENTTASK}" = "populate_sysroot_setscene" -a "${WITHIN_EXT_SDK}" = "1" ] ; then
        pkgconfdir="${SSTATE_INSTDIR}/recipe-sysroot-native/${bindir_native}"
        mv $pkgconfdir/pkg-config $pkgconfdir/pkg-config.real
-       lnr $pkgconfdir/pkg-config-esdk $pkgconfdir/pkg-config
+       ln -rs $pkgconfdir/pkg-config-esdk $pkgconfdir/pkg-config
        sed -i -e "s|^pkg-config|pkg-config.real|" $pkgconfdir/pkg-config-native
    fi
 }

@@ -1,0 +1,11 @@
+[Unit]
+Description=Turn on AC at Sled%i
+After=motor-init-calibration@%i.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/power-ctrl sled%i ac-on
+SyslogIdentifier=power-ctrl
+
+[Install]
+WantedBy=multi-user.target

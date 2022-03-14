@@ -10,7 +10,7 @@ DEPENDS = ""
 
 PV = "1.1+${SRCPV}"
 SRCREV = "335ee864ef6f4a5d4b525453fd9dbfb3507cfecc"
-SRC_URI = "git://github.com/kaniini/libucontext \
+SRC_URI = "git://github.com/kaniini/libucontext;branch=master;protocol=https \
            file://0001-meson-Add-option-to-pass-cpu.patch \
            "
 

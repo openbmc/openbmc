@@ -8,7 +8,7 @@ PV = "1.0+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
-inherit cmake systemd
+inherit cmake pkgconfig systemd
 inherit obmc-phosphor-ipmiprovider-symlink
 
 DEPENDS += " \
@@ -27,8 +27,8 @@ PACKAGECONFIG[smbios-ipmi-blob] = "-DIPMI_BLOB=ON,-DIPMI_BLOB=OFF,phosphor-ipmi-
 EXTRA_OECMAKE = "-DYOCTO=ON"
 
 S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/openbmc/smbios-mdr.git"
-SRCREV = "dc469c74cfb58cc8f4d7646c94f53f1f327d4817"
+SRC_URI = "git://github.com/openbmc/smbios-mdr.git;branch=master;protocol=https"
+SRCREV = "473d890ea7fa48e1f3925f085e870dae67d68527"
 
 SYSTEMD_SERVICE:${PN} += "smbios-mdrv2.service"
 SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'cpuinfo', 'xyz.openbmc_project.cpuinfo.service', '', d)}"

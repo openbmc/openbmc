@@ -1,0 +1,117 @@
+From 9000ee4d8bb5c5e0bcc588e9bec86eb56f4285e1 Mon Sep 17 00:00:00 2001
+From: Li xin <lixin.fnst@cn.fujitsu.com>
+Date: Fri, 19 Jun 2015 16:45:54 +0900
+Subject: [PATCH] Fix makedefs
+
+1)remove RANLIB, SYSLIBS, AR and get them from env.
+2)reference sysroot when searching header files
+3)include sysroot path instead of absolute include path
+for Linux2 and Linux3 systems.
+4)for non-native build, search STAGING_BASELIBDIR/LIBDIR
+  native build, search host library path for nsl and resolv library
+  which comes from libc
+
+Upstreamstatus: Inappropriate [embedded specific]
+
+Signed-off-by: Yao Zhao <yao.zhao@windriver.com>
+---
+ makedefs | 27 +++++++++++----------------
+ 1 file changed, 11 insertions(+), 16 deletions(-)
+
+diff --git a/makedefs b/makedefs
+index 3448c1e..78e0717 100644
+--- a/makedefs
++++ b/makedefs
+@@ -197,9 +197,6 @@ echo "# pie=$pie"
+ 
+ # Defaults for most sane systems
+ 
+-RANLIB=ranlib
+-SYSLIBS=
+-AR=ar
+ ARFL=rv
+ 
+ # Ugly function to make our error message more visible among the
+@@ -492,12 +489,12 @@ case "$SYSTEM.$RELEASE" in
+ 		case "$CCARGS" in
+ 		 *-DNO_DB*) ;;
+ 		 *-DHAS_DB*) ;;
+-		 *) if [ -f /usr/include/db.h ]
++		 *) if [ -f "$BUILD_SYSROOT"/usr/include/db.h ]
+ 		    then
+ 			: we are all set
+-		    elif [ -f /usr/include/db/db.h ]
++		    elif [ -f "$BUILD_SYSROOT"/usr/include/db/db.h ]
+ 		    then
+-			CCARGS="$CCARGS -I/usr/include/db"
++			CCARGS="$CCARGS -I"$BUILD_SYSROOT"/usr/include/db"
+ 		    else
+ 			# No, we're not going to try db1 db2 db3 etc.
+ 			# On a properly installed system, Postfix builds
+@@ -506,12 +503,12 @@ case "$SYSTEM.$RELEASE" in
+ 			echo "Install the appropriate db*-devel package first." 1>&2
+ 			exit 1
+ 		    fi
+-		    SYSLIBS="-ldb"
++		    SYSLIBS="$SYSLIBS -ldb"
+ 		    ;;
+ 		esac
+ 		for name in nsl resolv $GDBM_LIBS
+ 		do
+-		    for lib in /usr/lib64 /lib64 /usr/lib /lib
++		    for lib in $BUILD_SYSROOT_NSL_PATH
+ 		    do
+ 			test -e $lib/lib$name.a -o -e $lib/lib$name.so && {
+ 			    SYSLIBS="$SYSLIBS -l$name"
+@@ -531,7 +528,7 @@ case "$SYSTEM.$RELEASE" in
+ 		       if [ `expr "X$CCARGS" : "X.*-DNO_EPOLL"` -gt 0 ]
+ 		       then
+ 			   :
+-		       elif [ ! -e /usr/include/sys/epoll.h ]
++		       elif [ ! -e "$BUILD_SYSROOT"/usr/include/sys/epoll.h ]
+ 		       then
+ 			   echo CCARGS="$CCARGS -DNO_EPOLL"
+ 		       else
+@@ -555,8 +552,6 @@ int     main(int argc, char **argv)
+ }
+ EOF
+ 			   ${CC-gcc} -o makedefs.test makedefs.test.c || exit 1
+-			   ./makedefs.test 2>/dev/null ||
+-				CCARGS="$CCARGS -DNO_EPOLL"
+ 			   rm -f makedefs.test makedefs.test.[co]
+ 		       fi;;
+ 		esac
+@@ -572,12 +567,12 @@ EOF
+ 		case "$CCARGS" in
+ 		 *-DNO_DB*) ;;
+ 		 *-DHAS_DB*) ;;
+-		 *) if [ -f /usr/include/db.h ]
++		 *) if [ -f "$BUILD_SYSROOT"/usr/include/db.h ]
+ 		    then
+ 			: we are all set
+-		    elif [ -f /usr/include/db/db.h ]
++		    elif [ -f "$BUILD_SYSROOT"/usr/include/db/db.h ]
+ 		    then
+-			CCARGS="$CCARGS -I/usr/include/db"
++			CCARGS="$CCARGS -I"$BUILD_SYSROOT"/usr/include/db"
+ 		    else
+ 			# On a properly installed system, Postfix builds
+ 			# by including <db.h> and by linking with -ldb
+@@ -585,12 +580,12 @@ EOF
+ 			echo "Install the appropriate db*-devel package first." 1>&2
+ 			exit 1
+ 		    fi
+-		    SYSLIBS="-ldb"
++		    SYSLIBS="$SYSLIBS -ldb"
+ 		    ;;
+ 		esac
+ 		for name in nsl resolv
+ 		do
+-		    for lib in /usr/lib64 /lib64 /usr/lib /usr/lib/* /lib /lib/*
++		    for lib in $BUILD_SYSROOT_NSL_PATH
+ 		    do
+ 			test -e $lib/lib$name.a -o -e $lib/lib$name.so && {
+ 			    SYSLIBS="$SYSLIBS -l$name"
+-- 
+2.17.1
+

@@ -9,7 +9,7 @@ DEPENDS += "libgcrypt"
 
 PV .= "r550-2jnpr1"
 SRCREV = "b1243d29e0c00312ead038b04a2cf5e2fa31d740"
-SRC_URI = "git://github.com/ndpgroup/vpnc \
+SRC_URI = "git://github.com/ndpgroup/vpnc;branch=master;protocol=https \
            file://long-help \
            file://default.conf \
            file://0001-search-for-log-help-in-build-dir.patch \

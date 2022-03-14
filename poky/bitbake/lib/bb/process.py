@@ -60,7 +60,7 @@ class Popen(subprocess.Popen):
         "close_fds": True,
         "preexec_fn": subprocess_setup,
         "stdout": subprocess.PIPE,
-        "stderr": subprocess.STDOUT,
+        "stderr": subprocess.PIPE,
         "stdin": subprocess.PIPE,
         "shell": False,
     }

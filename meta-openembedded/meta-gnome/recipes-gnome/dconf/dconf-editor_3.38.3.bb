@@ -8,6 +8,7 @@ DEPENDS = "dconf gtk+3"
 
 inherit gnomebase vala gettext gsettings bash-completion
 
+SRC_URI += " file://0001-editor-meson.build-fix-meson-0.61-errors.patch"
 SRC_URI[archive.sha256sum] = "571af4c7dad4f049b53e6cd728b79addf08c27ddab6bc57b396d211866ee79e3"
 
 FILES:${PN} += " \

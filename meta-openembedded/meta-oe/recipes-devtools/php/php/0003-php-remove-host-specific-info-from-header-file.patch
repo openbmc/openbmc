@@ -1,0 +1,36 @@
+From c81d0bd3491a6c6371d9df2f43956d109f984310 Mon Sep 17 00:00:00 2001
+From: Claude Bing <cbing@cybernetics.com>
+Date: Tue, 9 Nov 2021 13:02:29 -0500
+Subject: [PATCH 03/11] php: remove host specific info from header file
+
+Based on:
+https://sources.debian.org/data/main/p/php7.3/7.3.6-1/debian/patches/
+        0036-php-5.4.9-fixheader.patch
+
+Upstream-Status: Inappropriate [not author]
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+
+update patch to 8.0.12
+Signed-off-by: Claude Bing <cbing@cybernetics.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 1eafd62a44..90c94323aa 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1289,7 +1289,7 @@ PHP_REMOVE_USR_LIB(LDFLAGS)
+ EXTRA_LDFLAGS="$EXTRA_LDFLAGS $PHP_LDFLAGS"
+ EXTRA_LDFLAGS_PROGRAM="$EXTRA_LDFLAGS_PROGRAM $PHP_LDFLAGS"
+ 
+-UNAME=`uname -a | xargs`
++UNAME=`uname | xargs`
+ PHP_UNAME=${PHP_UNAME:-$UNAME}
+ AC_DEFINE_UNQUOTED(PHP_UNAME,"$PHP_UNAME",[uname -a output])
+ PHP_OS=`uname | xargs`
+-- 
+2.25.1
+

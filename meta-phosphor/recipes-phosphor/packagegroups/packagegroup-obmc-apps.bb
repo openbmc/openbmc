@@ -69,6 +69,7 @@ RDEPENDS:${PN}-devtools = " \
         libgpiod-tools \
         lrzsz \
         rsync \
+        trace-enable \
         "
 
 SUMMARY:${PN}-dbus-monitor = "Support for dbus monitoring"

@@ -35,10 +35,10 @@ while true; do
         fi
         continue
     else
-        if [[ $boot_status != "\"Standby\"" ]] && [[ $led_status != "BLINKING" ]];then
+        if [[ $boot_status != "\"xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Standby\"" ]] && [[ $led_status != "BLINKING" ]];then
             busctl set-property $LED_SERVICE_NAME $LED_INACTIVE_OBJPATH $LED_INTERFACE_NAME $LED_Property b true
             led_status="BLINKING"
-        elif [[ $boot_status == "\"Standby\"" ]] && [[ $led_status != "ON" ]];then
+        elif [[ $boot_status == "\"xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Standby\"" ]] && [[ $led_status != "ON" ]];then
             busctl set-property $LED_SERVICE_NAME $LED_INACTIVE_OBJPATH $LED_INTERFACE_NAME $LED_Property b false
             busctl set-property $LED_SERVICE_NAME $LED_STANDBY_OBJPATH $LED_INTERFACE_NAME $LED_Property b true
             led_status="ON"

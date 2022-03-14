@@ -3,7 +3,7 @@ From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Sun, 1 Nov 2020 20:08:49 +0000
 Subject: [PATCH] Add a missing include for htobe32 definition
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/piglit/-/merge_requests/609]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
  tests/spec/nv_copy_depth_to_color/nv_copy_depth_to_color.c | 2 ++

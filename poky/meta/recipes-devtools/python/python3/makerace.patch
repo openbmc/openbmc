@@ -1,3 +1,8 @@
+From 7cc02dfa593d1350a689d64a7a6f2dc6478afe24 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Tue, 13 Jul 2021 23:19:29 +0100
+Subject: [PATCH] python3: Fix make race
+
 libainstall installs python-config.py but the .pyc cache files are generated
 by the libinstall target. This means some builds may not generate the pyc files
 for python-config.py depending on the order things happen in. This means builds
@@ -8,14 +13,18 @@ Add a dependency to avoid the race.
 Upstream-Status: Pending
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
-Index: Python-3.9.6/Makefile.pre.in
-===================================================================
---- Python-3.9.6.orig/Makefile.pre.in
-+++ Python-3.9.6/Makefile.pre.in
-@@ -1486,7 +1486,7 @@ LIBSUBDIRS=	tkinter tkinter/test tkinter
- 		venv venv/scripts venv/scripts/common venv/scripts/posix \
- 		curses pydoc_data \
- 		zoneinfo
+---
+ Makefile.pre.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index 5e13ba2..026bffd 100644
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -1527,7 +1527,7 @@ TESTSUBDIRS=	ctypes/test \
+ 		unittest/test unittest/test/testmock
+ 
+ TEST_MODULES=@TEST_MODULES@
 -libinstall:	build_all $(srcdir)/Modules/xxmodule.c
 +libinstall:	build_all $(srcdir)/Modules/xxmodule.c libainstall
  	@for i in $(SCRIPTDIR) $(LIBDEST); \

@@ -112,7 +112,17 @@ class Wget(FetchMethod):
             fetchcmd += " -O %s" % shlex.quote(localpath)
 
         if ud.user and ud.pswd:
-            fetchcmd += " --user=%s --password=%s --auth-no-challenge" % (ud.user, ud.pswd)
+            fetchcmd += " --auth-no-challenge"
+            if ud.parm.get("redirectauth", "1") == "1":
+                # An undocumented feature of wget is that if the
+                # username/password are specified on the URI, wget will only
+                # send the Authorization header to the first host and not to
+                # any hosts that it is redirected to.  With the increasing
+                # usage of temporary AWS URLs, this difference now matters as
+                # AWS will reject any request that has authentication both in
+                # the query parameters (from the redirect) and in the
+                # Authorization header.
+                fetchcmd += " --user=%s --password=%s" % (ud.user, ud.pswd)
 
         uri = ud.url.split(";")[0]
         if os.path.exists(ud.localpath):
@@ -356,7 +366,7 @@ class Wget(FetchMethod):
                 except (TypeError, ImportError, IOError, netrc.NetrcParseError):
                     pass
 
-                with opener.open(r) as response:
+                with opener.open(r, timeout=30) as response:
                     pass
             except urllib.error.URLError as e:
                 if try_again:
@@ -583,7 +593,7 @@ class Wget(FetchMethod):
 
         # src.rpm extension was added only for rpm package. Can be removed if the rpm
         # packaged will always be considered as having to be manually upgraded
-        psuffix_regex = r"(tar\.gz|tgz|tar\.bz2|zip|xz|tar\.lz|rpm|bz2|orig\.tar\.gz|tar\.xz|src\.tar\.gz|src\.tgz|svnr\d+\.tar\.bz2|stable\.tar\.gz|src\.rpm)"
+        psuffix_regex = r"(tar\.\w+|tgz|zip|xz|rpm|bz2|orig\.tar\.\w+|src\.tar\.\w+|src\.tgz|svnr\d+\.tar\.\w+|stable\.tar\.\w+|src\.rpm)"
 
         # match name, version and archive type of a package
         package_regex_comp = re.compile(r"(?P<name>%s?\.?v?)(?P<pver>%s)(?P<arch>%s)?[\.-](?P<type>%s$)"

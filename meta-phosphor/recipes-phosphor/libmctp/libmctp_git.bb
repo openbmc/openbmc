@@ -9,9 +9,9 @@ inherit autotools pkgconfig
 HOMEPAGE = "https://github.com/openbmc/libmctp"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=0d30807bb7a4f16d36e96b78f9ed8fae"
-SRC_URI = "git://github.com/openbmc/libmctp \
+SRC_URI = "git://github.com/openbmc/libmctp;branch=master;protocol=https \
 	   file://default"
-SRCREV = "ae59f4fe3a3ceaf52a682ada2a2b54855fad2408"
+SRCREV = "f39c38575828a53d59883ae999f03e6b48ee7c24"
 
 DEPENDS += "autoconf-archive-native \
             systemd \
@@ -21,11 +21,12 @@ SYSTEMD_SERVICE:${PN} = "mctp-demux.service \
                          mctp-demux.socket \
                         "
 
-PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} pcap"
 PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_system_unitdir}, \
                           --without-systemdsystemunitdir,systemd"
 
 PACKAGECONFIG[astlpc-raw-kcs] = "--enable-astlpc-raw-kcs,--disable-astlpc-raw-kcs,udev,udev"
+PACKAGECONFIG[pcap] = "--enable-capture,--disable-capture,libpcap,"
 
 CONFFILES:${PN} = "${sysconfdir}/default/mctp"
 

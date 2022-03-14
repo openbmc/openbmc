@@ -22,7 +22,11 @@ inherit python3native
 DEPENDS:prepend = "nodejs-native "
 RDEPENDS:${PN}:append:class-target = " nodejs"
 
+EXTRA_OENPM = ""
+
 NPM_INSTALL_DEV ?= "0"
+
+NPM_NODEDIR ?= "${RECIPE_SYSROOT_NATIVE}${prefix_native}"
 
 def npm_target_arch_map(target_arch):
     """Maps arch names to npm arch names"""
@@ -57,8 +61,8 @@ def npm_pack(env, srcdir, workdir):
     """Run 'npm pack' on a specified directory"""
     import shlex
     cmd = "npm pack %s" % shlex.quote(srcdir)
-    configs = [("ignore-scripts", "true")]
-    tarball = env.run(cmd, configs=configs, workdir=workdir).strip("\n")
+    args = [("ignore-scripts", "true")]
+    tarball = env.run(cmd, args=args, workdir=workdir).strip("\n")
     return os.path.join(workdir, tarball)
 
 python npm_do_configure() {
@@ -224,15 +228,11 @@ python npm_do_compile() {
 
     bb.utils.remove(d.getVar("NPM_BUILD"), recurse=True)
 
-    env = NpmEnvironment(d, configs=npm_global_configs(d))
-
-    dev = bb.utils.to_boolean(d.getVar("NPM_INSTALL_DEV"), False)
-
     with tempfile.TemporaryDirectory() as tmpdir:
         args = []
-        configs = []
+        configs = npm_global_configs(d)
 
-        if dev:
+        if bb.utils.to_boolean(d.getVar("NPM_INSTALL_DEV"), False):
             configs.append(("also", "development"))
         else:
             configs.append(("only", "production"))
@@ -247,12 +247,10 @@ python npm_do_compile() {
         # Add node-gyp configuration
         configs.append(("arch", d.getVar("NPM_ARCH")))
         configs.append(("release", "true"))
-        nodedir = d.getVar("NPM_NODEDIR")
-        if not nodedir:
-            sysroot = d.getVar("RECIPE_SYSROOT_NATIVE")
-            nodedir = os.path.join(sysroot, d.getVar("prefix_native").strip("/"))
-        configs.append(("nodedir", nodedir))
+        configs.append(("nodedir", d.getVar("NPM_NODEDIR")))
         configs.append(("python", d.getVar("PYTHON")))
+
+        env = NpmEnvironment(d, configs)
 
         # Add node-pre-gyp configuration
         args.append(("target_arch", d.getVar("NPM_ARCH")))
@@ -260,7 +258,8 @@ python npm_do_compile() {
 
         # Pack and install the main package
         tarball = npm_pack(env, d.getVar("NPM_PACKAGE"), tmpdir)
-        env.run("npm install %s" % shlex.quote(tarball), args=args, configs=configs)
+        cmd = "npm install %s %s" % (shlex.quote(tarball), d.getVar("EXTRA_OENPM"))
+        env.run(cmd, args=args)
 }
 
 npm_do_install() {

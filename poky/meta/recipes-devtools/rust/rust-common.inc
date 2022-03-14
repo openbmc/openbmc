@@ -119,22 +119,22 @@ def llvm_features(d):
 
 
 ## arm-unknown-linux-gnueabihf
-DATA_LAYOUT[arm] = "e-m:e-p:32:32-i64:64-v128:64:128-a:0:32-n32-S64"
-LLVM_TARGET[arm] = "${RUST_TARGET_SYS}"
-TARGET_ENDIAN[arm] = "little"
-TARGET_POINTER_WIDTH[arm] = "32"
-TARGET_C_INT_WIDTH[arm] = "32"
-MAX_ATOMIC_WIDTH[arm] = "64"
-FEATURES[arm] = "+v6,+vfp2"
+DATA_LAYOUT[arm-eabi] = "e-m:e-p:32:32-i64:64-v128:64:128-a:0:32-n32-S64"
+LLVM_TARGET[arm-eabi] = "${RUST_TARGET_SYS}"
+TARGET_ENDIAN[arm-eabi] = "little"
+TARGET_POINTER_WIDTH[arm-eabi] = "32"
+TARGET_C_INT_WIDTH[arm-eabi] = "32"
+MAX_ATOMIC_WIDTH[arm-eabi] = "64"
+FEATURES[arm-eabi] = "+v6,+vfp2"
 
 ## armv7-unknown-linux-gnueabihf
-DATA_LAYOUT[armv7] = "e-m:e-p:32:32-i64:64-v128:64:128-a:0:32-n32-S64"
-LLVM_TARGET[armv7] = "${RUST_TARGET_SYS}"
-TARGET_ENDIAN[armv7] = "little"
-TARGET_POINTER_WIDTH[armv7] = "32"
-TARGET_C_INT_WIDTH[armv7] = "32"
-MAX_ATOMIC_WIDTH[armv7] = "64"
-FEATURES[armv7] = "+v7,+vfp2,+thumb2"
+DATA_LAYOUT[armv7-eabi] = "e-m:e-p:32:32-i64:64-v128:64:128-a:0:32-n32-S64"
+LLVM_TARGET[armv7-eabi] = "${RUST_TARGET_SYS}"
+TARGET_ENDIAN[armv7-eabi] = "little"
+TARGET_POINTER_WIDTH[armv7-eabi] = "32"
+TARGET_C_INT_WIDTH[armv7-eabi] = "32"
+MAX_ATOMIC_WIDTH[armv7-eabi] = "64"
+FEATURES[armv7-eabi] = "+v7,+vfp2,+thumb2"
 
 ## aarch64-unknown-linux-{gnu, musl}
 DATA_LAYOUT[aarch64] = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
@@ -151,6 +151,14 @@ TARGET_ENDIAN[x86_64] = "little"
 TARGET_POINTER_WIDTH[x86_64] = "64"
 TARGET_C_INT_WIDTH[x86_64] = "32"
 MAX_ATOMIC_WIDTH[x86_64] = "64"
+
+## x86_64-unknown-linux-gnux32
+DATA_LAYOUT[x86_64-x32] = "e-m:e-p:32:32-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
+LLVM_TARGET[x86_64-x32] = "${RUST_TARGET_SYS}"
+TARGET_ENDIAN[x86_64-x32] = "little"
+TARGET_POINTER_WIDTH[x86_64-x32] = "32"
+TARGET_C_INT_WIDTH[x86_64-x32] = "32"
+MAX_ATOMIC_WIDTH[x86_64-x32] = "64"
 
 ## i686-unknown-linux-{gnu, musl}
 DATA_LAYOUT[i686] = "e-m:e-p:32:32-f64:32:64-f80:32-n8:16:32-S128"
@@ -207,6 +215,14 @@ TARGET_ENDIAN[powerpc] = "big"
 TARGET_POINTER_WIDTH[powerpc] = "32"
 TARGET_C_INT_WIDTH[powerpc] = "32"
 MAX_ATOMIC_WIDTH[powerpc] = "32"
+
+## powerpc64-unknown-linux-{gnu, musl}
+DATA_LAYOUT[powerpc64] = "E-m:e-i64:64-n32:64-S128-v256:256:256-v512:512:512"
+LLVM_TARGET[powerpc64] = "${RUST_TARGET_SYS}"
+TARGET_ENDIAN[powerpc64] = "big"
+TARGET_POINTER_WIDTH[powerpc64] = "64"
+TARGET_C_INT_WIDTH[powerpc64] = "64"
+MAX_ATOMIC_WIDTH[powerpc64] = "64"
 
 ## powerpc64le-unknown-linux-{gnu, musl}
 DATA_LAYOUT[powerpc64le] = "e-m:e-i64:64-n32:64-v256:256:256-v512:512:512"
@@ -292,23 +308,30 @@ TARGET_LLVM_FEATURES = "${@llvm_features(d)}"
 # (original) target.
 TARGET_LLVM_FEATURES:class-native = "${@','.join(llvm_features_from_cc_arch(d))}"
 
-def rust_gen_target(d, thing, wd, features, cpu, arch):
+def rust_gen_target(d, thing, wd, features, cpu, arch, abi=""):
     import json
     sys = sys_for(d, thing)
     prefix = prefix_for(d, thing)
 
-    features = features or d.getVarFlag('FEATURES', arch) or ""
+    rust_arch = oe.rust.arch_to_rust_arch(arch)
+
+    if abi:
+        arch_abi = "{}-{}".format(rust_arch, abi)
+    else:
+        arch_abi = rust_arch
+
+    features = features or d.getVarFlag('FEATURES', arch_abi) or ""
     features = features.strip()
 
     # build tspec
     tspec = {}
-    tspec['llvm-target'] = d.getVarFlag('LLVM_TARGET', arch)
-    tspec['data-layout'] = d.getVarFlag('DATA_LAYOUT', arch)
-    tspec['max-atomic-width'] = int(d.getVarFlag('MAX_ATOMIC_WIDTH', arch))
-    tspec['target-pointer-width'] = d.getVarFlag('TARGET_POINTER_WIDTH', arch)
-    tspec['target-c-int-width'] = d.getVarFlag('TARGET_C_INT_WIDTH', arch)
-    tspec['target-endian'] = d.getVarFlag('TARGET_ENDIAN', arch)
-    tspec['arch'] = arch_to_rust_target_arch(arch)
+    tspec['llvm-target'] = d.getVarFlag('LLVM_TARGET', arch_abi)
+    tspec['data-layout'] = d.getVarFlag('DATA_LAYOUT', arch_abi)
+    tspec['max-atomic-width'] = int(d.getVarFlag('MAX_ATOMIC_WIDTH', arch_abi))
+    tspec['target-pointer-width'] = d.getVarFlag('TARGET_POINTER_WIDTH', arch_abi)
+    tspec['target-c-int-width'] = d.getVarFlag('TARGET_C_INT_WIDTH', arch_abi)
+    tspec['target-endian'] = d.getVarFlag('TARGET_ENDIAN', arch_abi)
+    tspec['arch'] = arch_to_rust_target_arch(rust_arch)
     tspec['os'] = "linux"
     if "musl" in tspec['llvm-target']:
         tspec['env'] = "musl"
@@ -321,7 +344,6 @@ def rust_gen_target(d, thing, wd, features, cpu, arch):
     tspec['vendor'] = "unknown"
     tspec['target-family'] = "unix"
     tspec['linker'] = "{}{}gcc".format(d.getVar('CCACHE'), prefix)
-    tspec['ar'] = "{}ar".format(prefix)
     tspec['cpu'] = cpu
     if features != "":
         tspec['features'] = features

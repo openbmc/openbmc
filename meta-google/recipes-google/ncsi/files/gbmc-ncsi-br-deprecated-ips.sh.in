@@ -1,0 +1,137 @@
+# Copyright 2021 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+[ -z "${gbmc_ncsi_br_deprecated_ips_lib-}" ] || return
+
+source /usr/share/network/lib.sh || exit
+
+gbmc_ncsi_br_deprecated_ips_init=
+gbmc_ncsi_br_deprecated_ips_confip=
+gbmc_ncsi_br_deprecated_ips_lastip=
+
+gbmc_ncsi_br_deprecated_ips_update() {
+  [ -n "$gbmc_ncsi_br_deprecated_ips_init" ] || return
+  [ "$gbmc_ncsi_br_deprecated_ips_confip" != "$gbmc_ncsi_br_deprecated_ips_lastip" ] || return
+  gbmc_ncsi_br_deprecated_ips_confip="$gbmc_ncsi_br_deprecated_ips_lastip"
+
+  printf 'gBMC Bridge NCSI Deprecated Addrs: %s\n' \
+    "${gbmc_ncsi_br_deprecated_ips_lastip:-(deleted)}" >&2
+
+  local contents=
+  local nfcontents=
+  if [ -n "$gbmc_ncsi_br_deprecated_ips_lastip" ]; then
+    local pfx_bytes=()
+    ip_to_bytes pfx_bytes "$gbmc_ncsi_br_deprecated_ips_lastip"
+
+    local pfx="$(ip_bytes_to_str pfx_bytes)"
+    (( pfx_bytes[9] &= 0xf0 ))
+    local stateless_pfx="$(ip_bytes_to_str pfx_bytes)"
+    local gbmcbr_mac="$(ip link show gbmcbr | tail -n 1 | awk '{print $2}')"
+    local gbmcbr_eui48="$(mac_to_eui48 "$gbmcbr_mac")"
+    local stateless_ip="$(ip_pfx_concat "$stateless_pfx/80" "$gbmcbr_eui48")"
+    stateless_ip="${stateless_ip%/*}"
+    pfx_bytes[8]=0
+    pfx_bytes[9]=0
+    local host_pfx="$(ip_bytes_to_str pfx_bytes)"
+    read -r -d '' contents <<EOF
+[Address]
+Address=$pfx/128
+PreferredLifetime=0
+[Address]
+Address=$stateless_pfx/128
+PreferredLifetime=0
+[Address]
+Address=$stateless_ip/128
+PreferredLifetime=0
+[Address]
+Address=$host_pfx/128
+PreferredLifetime=0
+EOF
+    read -r -d '' nfcontents <<EOF
+table inet filter {
+  chain ncsi_input {
+    ip6 saddr != $pfx/76 ip6 daddr $pfx/76 goto ncsi_gbmc_br_pub_input
+  }
+  chain ncsi_forward {
+    ip6 saddr != $pfx/76 ip6 daddr $pfx/76 accept
+  }
+}
+EOF
+  fi
+
+  local file
+  for file in /run/systemd/network/{00,}-bmc-@NCSI_IF@.network.d/50-deprecated.conf; do
+    mkdir -p -m 755 "$(dirname "$file")"
+    if [ -z "$contents" ]; then
+      rm -f "$file"
+    else
+      printf '%s' "$contents" >"$file"
+    fi
+  done
+
+  # Ensure that systemd-networkd performs a reconfiguration as it doesn't
+  # currently check the mtime of drop-in files.
+  touch -c /etc/systemd/network/*-bmc-@NCSI_IF@.network
+
+  if [ "$(systemctl is-active systemd-networkd)" != 'inactive' ]; then
+    networkctl reload && networkctl reconfigure @NCSI_IF@
+  fi
+
+  local rfile=/run/nftables/40-gbmc-ncsi-br.rules
+  mkdir -p -m 755 "$(dirname "$rfile")"
+  if [ -z "$nfcontents" ]; then
+    rm -f "$rfile"
+  else
+    printf '%s' "$nfcontents" >"$rfile"
+  fi
+  systemctl reset-failed nftables && systemctl --no-block reload-or-restart nftables || true
+}
+
+gbmc_ncsi_br_deprecated_ips_hook() {
+  if [ "$change" = 'init' ]; then
+    gbmc_ncsi_br_deprecated_ips_init=1
+    gbmc_ip_monitor_defer
+  elif [ "$change" = 'defer' ]; then
+    gbmc_ncsi_br_deprecated_ips_update
+  elif [ "$change" = 'addr' -a "$intf" = 'gbmcbr' ] &&
+     [ "$scope" = 'global' -a "$fam" = 'inet6' ]; then
+    local pfx_bytes=()
+    ip_to_bytes pfx_bytes "$ip" || return
+    # No ULA Addresses
+    if (( pfx_bytes[0] & 0xfe == 0xfc )); then
+      return
+    fi
+    # We only want to allow a <pfx>::fd0x address, where x>0
+    if (( pfx_bytes[8] != 0xfd || pfx_bytes[9] & 0xf == 0 )); then
+      return
+    fi
+    for (( i = 10; i < 16; ++i )); do
+      if (( pfx_bytes[i] != 0 )); then
+        return
+      fi
+    done
+    if [ "$action" = 'add' -a "$ip" != "$gbmc_ncsi_br_deprecated_ips_lastip" ]; then
+      gbmc_ncsi_br_deprecated_ips_lastip="$ip"
+      gbmc_ip_monitor_defer
+    fi
+    if [ "$action" = 'del' -a "$ip" = "$gbmc_ncsi_br_deprecated_ips_lastip" ]; then
+      gbmc_ncsi_br_deprecated_ips_lastip=
+      gbmc_ip_monitor_defer
+    fi
+  fi
+}
+
+GBMC_IP_MONITOR_HOOKS+=(gbmc_ncsi_br_deprecated_ips_hook)
+
+gbmc_ncsi_br_deprecated_ips_lib=1

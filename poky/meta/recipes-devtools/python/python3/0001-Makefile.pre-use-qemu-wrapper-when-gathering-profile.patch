@@ -1,19 +1,20 @@
-From cf6a9100902484e4d028ee88742dd2487b014a98 Mon Sep 17 00:00:00 2001
+From 9f85089cc3a21d5ff235bb37c6c9758f2b70497d Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 30 Jan 2019 12:41:04 +0100
 Subject: [PATCH] Makefile.pre: use qemu wrapper when gathering profile data
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  Makefile.pre.in | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index a3a02a7..d5503dd 100644
+index f0aedb7..edd70d4 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -507,8 +507,7 @@ build_all_generate_profile:
+@@ -519,8 +519,7 @@ build_all_generate_profile:
  	$(MAKE) @DEF_MAKE_RULE@ CFLAGS_NODIST="$(CFLAGS_NODIST) $(PGO_PROF_GEN_FLAG)" LDFLAGS_NODIST="$(LDFLAGS_NODIST) $(PGO_PROF_GEN_FLAG)" LIBS="$(LIBS)"
  
  run_profile_task:

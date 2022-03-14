@@ -7,7 +7,7 @@ DEPENDS = "nng"
 SRCREV = "cc5d2641babab165d8a9943817c46d36c6dc17c2"
 PV = "1.3.0"
 
-SRC_URI = "git://github.com/cwzx/nngpp"
+SRC_URI = "git://github.com/cwzx/nngpp;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

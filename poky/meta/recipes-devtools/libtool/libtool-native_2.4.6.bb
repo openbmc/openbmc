@@ -2,8 +2,6 @@ require libtool-${PV}.inc
 
 DEPENDS = ""
 
-SRC_URI += "file://prefix.patch"
-
 inherit native
 
 EXTRA_OECONF = " --with-libtool-sysroot=${STAGING_DIR_NATIVE}"
@@ -18,5 +16,5 @@ do_configure:prepend () {
 do_install () {
 	autotools_do_install
 	install -d ${D}${bindir}/
-	install -m 0755 ${HOST_SYS}-libtool ${D}${bindir}/${HOST_SYS}-libtool
+	install -m 0755 libtool ${D}${bindir}/libtool
 }

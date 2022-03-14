@@ -1,4 +1,4 @@
-From 8f916dcb395fe5a2429f2867ba4daf8ef3af073a Mon Sep 17 00:00:00 2001
+From 59e3190e9121c5439d54298b083b44c5c3794a7f Mon Sep 17 00:00:00 2001
 From: Randy MacLeod <Randy.MacLeod@windriver.com>
 Date: Tue, 16 Oct 2018 21:01:04 -0400
 Subject: [PATCH] Fix out of tree builds.
@@ -12,19 +12,20 @@ RP 2013/03/23
 
 Patch refreshed for valgrind-3.14.0.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://bugs.kde.org/show_bug.cgi?id=445211]
 
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
+
 ---
- configure.ac | 66 ++++++++++++++++++++++++++--------------------------
- 1 file changed, 33 insertions(+), 33 deletions(-)
+ configure.ac | 62 ++++++++++++++++++++++++++--------------------------
+ 1 file changed, 31 insertions(+), 31 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 524230d..54861c5 100755
+index b851798..d360896 100755
 --- a/configure.ac
 +++ b/configure.ac
-@@ -396,50 +396,50 @@ case "${host_os}" in
+@@ -447,50 +447,50 @@ case "${host_os}" in
  	     9.*)
  		  AC_MSG_RESULT([Darwin 9.x (${kernel}) / Mac OS X 10.5 Leopard])
  		  AC_DEFINE([DARWIN_VERS], DARWIN_10_5, [Darwin / Mac OS X version])
@@ -91,7 +92,7 @@ index 524230d..54861c5 100755
  		  ;;
  	     17.*)
  		  AC_MSG_RESULT([Darwin 17.x (${kernel}) / macOS 10.13 High Sierra])
-@@ -464,7 +464,7 @@ case "${host_os}" in
+@@ -515,7 +515,7 @@ case "${host_os}" in
                   DEFAULT_SUPP="solaris12.supp ${DEFAULT_SUPP}"
                   ;;
               *)
@@ -100,7 +101,7 @@ index 524230d..54861c5 100755
                   ;;
  	esac
          ;;
-@@ -472,7 +472,7 @@ case "${host_os}" in
+@@ -523,7 +523,7 @@ case "${host_os}" in
       solaris2.12*)
          AC_MSG_RESULT([ok (${host_os})])
          VGCONF_OS="solaris"
@@ -109,7 +110,7 @@ index 524230d..54861c5 100755
          ;;
  
       *) 
-@@ -1095,29 +1095,29 @@ AC_MSG_CHECKING([the glibc version])
+@@ -1237,15 +1237,15 @@ AC_MSG_CHECKING([the glibc version])
  case "${GLIBC_VERSION}" in
       2.2)
  	AC_MSG_RESULT(${GLIBC_VERSION} family)
@@ -123,44 +124,37 @@ index 524230d..54861c5 100755
       2.[[3-6]])
  	AC_MSG_RESULT(${GLIBC_VERSION} family)
 -	DEFAULT_SUPP="glibc-${GLIBC_VERSION}.supp ${DEFAULT_SUPP}"
--	DEFAULT_SUPP="glibc-2.34567-NPTL-helgrind.supp ${DEFAULT_SUPP}"
+-	DEFAULT_SUPP="glibc-2.X-helgrind.supp ${DEFAULT_SUPP}"
 -	DEFAULT_SUPP="glibc-2.X-drd.supp ${DEFAULT_SUPP}"
 +        DEFAULT_SUPP="$srcdir/glibc-${GLIBC_VERSION}.supp ${DEFAULT_SUPP}"
-+        DEFAULT_SUPP="$srcdir/glibc-2.34567-NPTL-helgrind.supp ${DEFAULT_SUPP}"
++        DEFAULT_SUPP="$srcdir/glibc-2.X-helgrind.supp ${DEFAULT_SUPP}"
 +        DEFAULT_SUPP="$srcdir/glibc-2.X-drd.supp ${DEFAULT_SUPP}"
  	;;
       2.[[7-9]])
  	AC_MSG_RESULT(${GLIBC_VERSION} family)
- 	DEFAULT_SUPP="glibc-2.X.supp ${DEFAULT_SUPP}"
--	DEFAULT_SUPP="glibc-2.34567-NPTL-helgrind.supp ${DEFAULT_SUPP}"
--	DEFAULT_SUPP="glibc-2.X-drd.supp ${DEFAULT_SUPP}"
-+        DEFAULT_SUPP="$srcdir/glibc-2.34567-NPTL-helgrind.supp ${DEFAULT_SUPP}"
-+        DEFAULT_SUPP="$srcdir/glibc-2.X-drd.supp ${DEFAULT_SUPP}"
- 	;;
-      2.10|2.11)
- 	AC_MSG_RESULT(${GLIBC_VERSION} family)
+@@ -1258,8 +1258,8 @@ case "${GLIBC_VERSION}" in
  	AC_DEFINE([GLIBC_MANDATORY_STRLEN_REDIRECT], 1,
  		  [Define to 1 if strlen() has been optimized heavily (amd64 glibc >= 2.10)])
  	DEFAULT_SUPP="glibc-2.X.supp ${DEFAULT_SUPP}"
--	DEFAULT_SUPP="glibc-2.34567-NPTL-helgrind.supp ${DEFAULT_SUPP}"
+-	DEFAULT_SUPP="glibc-2.X-helgrind.supp ${DEFAULT_SUPP}"
 -	DEFAULT_SUPP="glibc-2.X-drd.supp ${DEFAULT_SUPP}"
-+        DEFAULT_SUPP="$srcdir/glibc-2.34567-NPTL-helgrind.supp ${DEFAULT_SUPP}"
++        DEFAULT_SUPP="$srcdir/glibc-2.X-helgrind.supp ${DEFAULT_SUPP}"
 +        DEFAULT_SUPP="$srcdir/glibc-2.X-drd.supp ${DEFAULT_SUPP}"
  	;;
       2.*)
  	AC_MSG_RESULT(${GLIBC_VERSION} family)
-@@ -1126,8 +1126,8 @@ case "${GLIBC_VERSION}" in
+@@ -1268,8 +1268,8 @@ case "${GLIBC_VERSION}" in
  	AC_DEFINE([GLIBC_MANDATORY_INDEX_AND_STRLEN_REDIRECT], 1,
  		  [Define to 1 if index() and strlen() have been optimized heavily (x86 glibc >= 2.12)])
  	DEFAULT_SUPP="glibc-2.X.supp ${DEFAULT_SUPP}"
--	DEFAULT_SUPP="glibc-2.34567-NPTL-helgrind.supp ${DEFAULT_SUPP}"
+-	DEFAULT_SUPP="glibc-2.X-helgrind.supp ${DEFAULT_SUPP}"
 -	DEFAULT_SUPP="glibc-2.X-drd.supp ${DEFAULT_SUPP}"
-+        DEFAULT_SUPP="$srcdir/glibc-2.34567-NPTL-helgrind.supp ${DEFAULT_SUPP}"
++        DEFAULT_SUPP="$srcdir/glibc-2.X-helgrind.supp ${DEFAULT_SUPP}"
 +        DEFAULT_SUPP="$srcdir/glibc-2.X-drd.supp ${DEFAULT_SUPP}"
  	;;
       darwin)
  	AC_MSG_RESULT(Darwin)
-@@ -1137,7 +1137,7 @@ case "${GLIBC_VERSION}" in
+@@ -1284,7 +1284,7 @@ case "${GLIBC_VERSION}" in
       bionic)
  	AC_MSG_RESULT(Bionic)
  	AC_DEFINE([BIONIC_LIBC], 1, [Define to 1 if you're using Bionic])
@@ -169,7 +163,7 @@ index 524230d..54861c5 100755
  	;;
       solaris)
  	AC_MSG_RESULT(Solaris)
-@@ -1164,8 +1164,8 @@ if test "$VGCONF_OS" != "solaris"; then
+@@ -1313,8 +1313,8 @@ if test "$VGCONF_OS" != "solaris"; then
      # attempt to detect whether such libraries are installed on the
      # build machine (or even if any X facilities are present); just
      # add the suppressions antidisirregardless.
@@ -180,6 +174,3 @@ index 524230d..54861c5 100755
  fi
  
  
--- 
-2.17.1
-

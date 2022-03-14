@@ -7,7 +7,7 @@ StartLimitBurst=3
 [Service]
 Restart=always
 RestartSec=5
-ExecStart=/usr/sbin/dhcrelay -d --no-pid -rp 3967 -l gbmcncsidhcp -u @NCSI_IF@
+ExecStart=/usr/sbin/dhcrelay -d --no-pid -rp 3967 -l gbmcncsidhcp -u ff02::1:2%%@NCSI_IF@
 
 [Install]
 WantedBy=multi-user.target

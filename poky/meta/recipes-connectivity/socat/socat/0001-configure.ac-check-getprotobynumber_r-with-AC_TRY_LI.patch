@@ -1,0 +1,35 @@
+From d67d6b4f981db9612d808bd723176a1d2996d53a Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Mon, 17 Jan 2022 13:21:32 +0100
+Subject: [PATCH] configure.ac: check getprotobynumber_r with AC_TRY_LINK
+
+AC_TRY_COMPILE won't error out if the function is altogether absent
+(e.g. on linux musl C library), the test needs to link all the way.
+
+Upstream-Status: Submitted [via email to socat@dest-unreach.org]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ configure.ac | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index d4acc9e..973a7f2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -137,13 +137,13 @@ AC_MSG_RESULT($sc_cv_have_prototype_hstrerror)
+ # getprotobynumber_r() is not standardized
+ AC_MSG_CHECKING(for getprotobynumber_r() variant)
+ AC_CACHE_VAL(sc_cv_getprotobynumber_r,
+-[AC_TRY_COMPILE([#include <stddef.h>
++[AC_TRY_LINK([#include <stddef.h>
+ #include <netdb.h>],[getprotobynumber_r(1,NULL,NULL,1024,NULL);],
+ [sc_cv_getprotobynumber_r=1; tmp_bynum_variant=Linux],
+- [AC_TRY_COMPILE([#include <stddef.h>
++ [AC_TRY_LINK([#include <stddef.h>
+  #include <netdb.h>],[getprotobynumber_r(1,NULL,NULL,1024);],
+  [sc_cv_getprotobynumber_r=2; tmp_bynum_variant=Solaris],
+-  [AC_TRY_COMPILE([#include <stddef.h>
++  [AC_TRY_LINK([#include <stddef.h>
+   #include <netdb.h>],[getprotobynumber_r(1,NULL,NULL);],
+   [sc_cv_getprotobynumber_r=3; tmp_bynum_variant=AIX],
+ 

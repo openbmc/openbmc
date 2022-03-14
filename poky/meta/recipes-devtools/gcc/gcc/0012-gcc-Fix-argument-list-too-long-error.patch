@@ -1,37 +1,33 @@
-From 12646c0899dec1b127ce71ebacf2571c1c7360f4 Mon Sep 17 00:00:00 2001
-From: Khem Raj <raj.khem@gmail.com>
-Date: Fri, 29 Mar 2013 09:26:37 +0400
-Subject: [PATCH] gcc: Fix argument list too long error.
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Subject: [PATCH 2/5] gcc: Fix "argument list too long" from install-plugins
 
-There would be an "Argument list too long" error when the
-build directory is longer than 200, this is caused by:
+When building in longer build paths (200+ characters), the
+"echo $(PLUGIN_HEADERS)" from the install-plugins target would cause an
+"argument list too long error" on some systems.
 
-headers=`echo $(PLUGIN_HEADERS) | tr ' ' '\012' | sort -u`
+Avoid this by calling make's sort function on the list which removes
+duplicates and stops the overflow from reaching the echo command.
+The original sort is left to handle the the .h and .def files.
 
-The PLUGIN_HEADERS is too long before sort, so the "echo" can't handle
-it, use the $(sort list) of GNU make which can handle the too long list
-would fix the problem, the header would be short enough after sorted.
-The "tr ' ' '\012'" was used for translating the space to "\n", the
-$(sort list) doesn't need this.
+2021-10-26 Richard Purdie <richard.purdie@linuxfoundation.org>
 
-Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
+gcc/ChangeLog:
 
-RP: gcc then added *.h and *.def additions to this list, breaking the original
-fix. Add the sort to the original gcc code, leaving the tr+sort to fix the original
-issue but include the new files too as reported by Zhuang <qiuguang.zqg@alibaba-inc.com>
+    * Makefile.in: Fix "argument list too long" from install-plugins
 
-Upstream-Status: Pending
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Submitted [https://gcc.gnu.org/pipermail/gcc-patches/2021-October/582722.html]
+Upstream-Status: Backport [https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=66e157188bd2f789809e17e85f917534c9381599]
 ---
  gcc/Makefile.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/gcc/Makefile.in b/gcc/Makefile.in
-index 7da6f439fff..59c45c81393 100644
---- a/gcc/Makefile.in
-+++ b/gcc/Makefile.in
-@@ -3678,7 +3678,7 @@ install-plugin: installdirs lang.install-plugin s-header-vars install-gengtype
+Index: gcc-11.2.0/gcc/Makefile.in
+===================================================================
+--- gcc-11.2.0.orig/gcc/Makefile.in
++++ gcc-11.2.0/gcc/Makefile.in
+@@ -3678,7 +3678,7 @@ install-plugin: installdirs lang.install
  # We keep the directory structure for files in config, common/config or
  # c-family and .def files. All other files are flattened to a single directory.
  	$(mkinstalldirs) $(DESTDIR)$(plugin_includedir)

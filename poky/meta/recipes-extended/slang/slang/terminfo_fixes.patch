@@ -2,7 +2,9 @@ Do not use the JD_TERMCAP macro since we cannot get the terminfo from
 ncurses pkg-config, but fix the macro to not reference host directories.
 Also add src/test/Makefile.in so that we can use -ltermcap if we want to.
 
-Upstream-Status: Pending
+Upstream isn't going to take this, as it forces blank values and
+removes functionality without replacing it.
+Upstream-Status: Inappropriate [see above]
 
 Signed-off-by: Joe Slater <joe.slater@windriver.com>
 

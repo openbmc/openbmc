@@ -1,0 +1,32 @@
+From 03aa51625e0d1aa156c2f7cd71503b1f435d35a4 Mon Sep 17 00:00:00 2001
+From: Claude Bing <cbing@cybernetics.com>
+Date: Tue, 9 Nov 2021 13:08:06 -0500
+Subject: [PATCH 07/11] sapi/cli/config.m4: fix build directory
+
+Upstream-Status: Inappropriate
+
+update patch to version 7.4.4
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
+update patch to version 8.0.12
+Signed-off-by: Claude Bing <cbing@cybernetics.com>
+---
+ sapi/cli/config.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sapi/cli/config.m4 b/sapi/cli/config.m4
+index d17d531683..f2f87f9164 100644
+--- a/sapi/cli/config.m4
++++ b/sapi/cli/config.m4
+@@ -47,7 +47,7 @@ if test "$PHP_CLI" != "no"; then
+   esac
+ 
+   dnl Set executable for tests.
+-  PHP_EXECUTABLE="\$(top_builddir)/\$(SAPI_CLI_PATH)"
++  PHP_EXECUTABLE="${PHP_NATIVE_DIR}/php"
+   PHP_SUBST(PHP_EXECUTABLE)
+ 
+   dnl Expose to Makefile.
+-- 
+2.25.1
+

@@ -1,4 +1,4 @@
-From a2dd127b4163aff6cc35af0d0251321964232ad4 Mon Sep 17 00:00:00 2001
+From 246c5ffe75a2d494e415d8a7522df9fe22056d41 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 7 Oct 2019 13:22:14 +0200
 Subject: [PATCH] setup.py: do not report missing dependencies for disabled
@@ -14,14 +14,14 @@ Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
 Signed-off-by: Alejandro Hernandez Samaniego <alejandro@enedino.org>
 
 ---
- setup.py | 4 ++++
- 1 file changed, 4 insertions(+)
+ setup.py | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/setup.py b/setup.py
-index 7691258..ec3f2a4 100644
+index 2be4738..62f0e18 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -408,6 +408,14 @@ class PyBuildExt(build_ext):
+@@ -517,6 +517,14 @@ class PyBuildExt(build_ext):
                  print("%-*s   %-*s   %-*s" % (longest, e, longest, f,
                                                longest, g))
  

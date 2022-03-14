@@ -15,7 +15,7 @@ pkg_postinst:${PN}:append() {
 	TARGET="../openpower-debug-collector-watchdog@.service"
 	ln -s $TARGET $LINK
 
-	if [ "${@bb.utils.filter('OBMC_MACHINE_FEATURES', 'phal', d)}" != 'phal' ]; then
+	if [ "${@bb.utils.filter('MACHINE_FEATURES', 'phal', d)}" != 'phal' ]; then
 		LINK="$D$systemd_system_unitdir/obmc-host-timeout@0.target.wants/openpower-debug-collector-watchdog-timeout@0.service"
 		TARGET="../openpower-debug-collector-watchdog-timeout@.service"
 		ln -s $TARGET $LINK
@@ -29,7 +29,7 @@ pkg_prerm:${PN}:append() {
 	fi
 	LINK="$D$systemd_system_unitdir/obmc-host-timeout@0.target.wants/openpower-debug-collector-watchdog@0.service"
 	rm $LINK
-	if [ "${@bb.utils.filter('OBMC_MACHINE_FEATURES', 'phal', d)}" != 'phal' ]; then
+	if [ "${@bb.utils.filter('MACHINE_FEATURES', 'phal', d)}" != 'phal' ]; then
 		LINK="$D$systemd_system_unitdir/obmc-host-timeout@0.target.wants/openpower-debug-collector-watchdog-timeout@0.service"
 		rm $LINK
 	fi

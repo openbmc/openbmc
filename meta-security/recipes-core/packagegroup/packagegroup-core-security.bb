@@ -38,8 +38,6 @@ RDEPENDS:packagegroup-security-utils = "\
     python3-privacyidea \
     python3-fail2ban \
     softhsm \
-    libest \
-    opendnssec \
     sshguard \
     ${@bb.utils.contains_any("TUNE_FEATURES", "riscv32 ", "", " libseccomp",d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "sssd google-authenticator-libpam", "",d)} \

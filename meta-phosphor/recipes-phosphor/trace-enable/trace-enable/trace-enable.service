@@ -1,0 +1,10 @@
+[Unit]
+Description=Enable Linux trace events in the boot loader
+RequiresMountsFor=/etc
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/trace-enable /etc/trace-events.conf
+
+[Install]
+WantedBy=multi-user.target

@@ -20,7 +20,7 @@ DBUS_PACKAGES = "${PN}-manager"
 
 SYSTEMD_PACKAGES = "${PN}-monitor"
 
-inherit meson \
+inherit pkgconfig meson \
         obmc-phosphor-dbus-service \
         python3native \
         phosphor-debug-collector
@@ -60,6 +60,7 @@ SYSTEMD_SUBSTITUTIONS += "BMC_DUMP_PATH:${bmc_dump_path}:${MGR_SVC}"
 
 FILES:${PN}-manager +=  " \
     ${bindir}/phosphor-dump-manager \
+    ${bindir}/phosphor-offload-handler \
     ${exec_prefix}/lib/tmpfiles.d/coretemp.conf \
     ${datadir}/dump/ \
     "
@@ -147,7 +148,7 @@ def install_dreport_user_script(script_path, d):
             bb.warn("Invalid format for config value =%s" % line)
             continue
         parse_value = revalue.group(0)
-        config_values = re.split('\W+', parse_value, 1)
+        config_values = re.split(r'\W+', parse_value, 1)
         if(len(config_values) != 2):
             bb.warn("Invalid config value=%s" % parse_value)
             break;

@@ -37,6 +37,9 @@ SRC_URI[sha256sum] = "0c1ba3b1555edefb7c32ae8cd6a3e04322056bc087918f07189eeedfc8
 
 inherit autotools
 
+PACKAGES =+ "${PN}-ipmievd"
+FILES:${PN}-ipmievd += "${sbindir}/ipmievd"
+
 # --disable-dependency-tracking speeds up the build
 # --enable-file-security adds some security checks
 # --disable-intf-free disables FreeIPMI support - we don't want to depend on

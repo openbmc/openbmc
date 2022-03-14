@@ -6,6 +6,7 @@
 import glob
 import os
 import unittest
+import re
 from checklayer import get_signatures, LayerType, check_command, get_depgraph, compare_signatures
 from checklayer.case import OECheckLayerTestCase
 
@@ -14,7 +15,7 @@ class CommonCheckLayer(OECheckLayerTestCase):
         # The top-level README file may have a suffix (like README.rst or README.txt).
         readme_files = glob.glob(os.path.join(self.tc.layer['path'], '[Rr][Ee][Aa][Dd][Mm][Ee]*'))
         self.assertTrue(len(readme_files) > 0,
-                        msg="Layer doesn't contains README file.")
+                        msg="Layer doesn't contain a README file.")
 
         # There might be more than one file matching the file pattern above
         # (for example, README.rst and README-COPYING.rst). The one with the shortest
@@ -25,6 +26,16 @@ class CommonCheckLayer(OECheckLayerTestCase):
             data = f.read()
         self.assertTrue(data,
                 msg="Layer contains a README file but it is empty.")
+
+        # If a layer's README references another README, then the checks below are not valid
+        if re.search('README', data, re.IGNORECASE):
+            return
+
+        self.assertIn('maintainer', data.lower())
+        self.assertIn('patch', data.lower())
+        # Check that there is an email address in the README
+        email_regex = re.compile(r"[^@]+@[^@]+")
+        self.assertTrue(email_regex.match(data))
 
     def test_parse(self):
         check_command('Layer %s failed to parse.' % self.tc.layer['name'],

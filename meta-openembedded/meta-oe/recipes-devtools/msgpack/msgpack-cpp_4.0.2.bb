@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://NOTICE;md5=7a858c074723608e08614061dc044352 \
 
 PV .= "+git${SRCPV}"
 
-SRC_URI = "git://github.com/msgpack/msgpack-c;branch=cpp_master \
+SRC_URI = "git://github.com/msgpack/msgpack-c;branch=cpp_master;protocol=https \
            "
 SRCREV = "3bdbf0d2ee75d46d71afa691a594777d89a22cf7"
 
@@ -18,5 +18,7 @@ DEPENDS += "boost"
 S = "${WORKDIR}/git"
 
 inherit cmake pkgconfig
+
+RDEPENDS:${PN}-dev = ""
 
 BBCLASSEXTEND += "native nativesdk"

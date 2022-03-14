@@ -1,27 +1,35 @@
-Use $libexecdir instead of hardcoding $prefix/lib as this breaks multilib builds.
+From 1724f7bcdbcfdb445778f8a2e530c5c094c18c10 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Tue, 13 Jul 2021 12:56:30 +0100
+Subject: [PATCH] Use $libexecdir instead of hardcoding $prefix/lib as this
+ breaks multilib builds.
 
-Upstream-Status: Inappropriate
+Upstream-Status: Pending
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 
+---
+ config-scripts/cups-directories.m4 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
 diff --git a/config-scripts/cups-directories.m4 b/config-scripts/cups-directories.m4
-index 1430af3a6..6efedc604 100644
+index 2033d47..230166e 100644
 --- a/config-scripts/cups-directories.m4
 +++ b/config-scripts/cups-directories.m4
-@@ -265,7 +265,7 @@ case "$host_os_name" in
- 	*-gnu)
- 		# GNUs
- 		INSTALL_SYSV="install-sysv"
--		CUPS_SERVERBIN="$exec_prefix/lib/cups"
-+		CUPS_SERVERBIN="$libexecdir/cups"
- 		;;
- 	*bsd* | darwin*)
- 		# *BSD and Darwin (macOS)
-@@ -275,7 +275,7 @@ case "$host_os_name" in
- 	*)
- 		# All others
- 		INSTALL_SYSV="install-sysv"
--		CUPS_SERVERBIN="$exec_prefix/lib/cups"
-+		CUPS_SERVERBIN="$libexecdir/cups"
- 		;;
- esac
+@@ -239,7 +239,7 @@ AC_SUBST([CUPS_REQUESTS])
+ AS_CASE(["$host_os_name"], [*-gnu], [
+     # GNUs
+     INSTALL_SYSV="install-sysv"
+-    CUPS_SERVERBIN="$exec_prefix/lib/cups"
++    CUPS_SERVERBIN="$libexecdir/cups"
+ ], [*bsd* | darwin*], [
+     # *BSD and Darwin (macOS)
+     INSTALL_SYSV=""
+@@ -247,7 +247,7 @@ AS_CASE(["$host_os_name"], [*-gnu], [
+ ], [*], [
+     # All others
+     INSTALL_SYSV="install-sysv"
+-    CUPS_SERVERBIN="$exec_prefix/lib/cups"
++    CUPS_SERVERBIN="$libexecdir/cups"
+ ])
  
+ AC_DEFINE_UNQUOTED([CUPS_SERVERBIN], ["$CUPS_SERVERBIN"], [Location of server programs.])

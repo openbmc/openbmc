@@ -10,7 +10,7 @@ LICENSE = "Ruby | BSD-2-Clause | BSD-3-Clause | GPLv2 | ISC | MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5b8c87559868796979806100db3f3805 \
                     file://BSDL;md5=8b50bc6de8f586dc66790ba11d064d75 \
                     file://GPL;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
-                    file://LEGAL;md5=cfe5b0bc9f051b58c7e78db882ca5f9b \
+                    file://LEGAL;md5=f260190bc1e92e363f0ee3c0463d4c7c \
                     "
 
 DEPENDS = "ruby-native zlib openssl libyaml gdbm readline libffi"
@@ -23,7 +23,7 @@ SRC_URI = "http://cache.ruby-lang.org/pub/ruby/${SHRT_VER}/ruby-${PV}.tar.gz \
            "
 UPSTREAM_CHECK_URI = "https://www.ruby-lang.org/en/downloads/"
 
-inherit autotools ptest
+inherit autotools ptest pkgconfig
 
 
 # This snippet lets compiled extensions which rely on external libraries,

@@ -35,6 +35,11 @@ if [ "$?" != "0" ]; then
     echo "Please set git config --global user.email"
     exit 1
 fi
+python3 -c "import jinja2"
+if [ "$?" != "0" ]; then
+    echo "Please ensure jinja2 is available"
+    exit 1
+fi
 bitbake -p
 if [ "$?" != "0" ]; then
     echo "Bitbake parsing failed"

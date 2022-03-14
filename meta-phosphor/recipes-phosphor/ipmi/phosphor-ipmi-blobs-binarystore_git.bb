@@ -6,8 +6,7 @@ PV = "1.0+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
-inherit autotools pkgconfig
-inherit obmc-phosphor-ipmiprovider-symlink
+inherit meson pkgconfig
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "phosphor-ipmi-blobs"
@@ -15,12 +14,17 @@ DEPENDS += "phosphor-logging"
 DEPENDS += "protobuf-native"
 DEPENDS += "protobuf"
 
-S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/openbmc/phosphor-ipmi-blobs-binarystore"
-SRCREV = "c3abe753fca211f49eb68f7d34e37bfc9eb5d4c4"
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[blobtool] = "-Dblobtool=enabled,-Dblobtool=disabled"
 
-FILES:${PN}:append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
-FILES:${PN}:append = " ${libdir}/blob-ipmid/lib*${SOLIBS}"
-FILES:${PN}-dev:append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
+S = "${WORKDIR}/git"
+SRC_URI = "git://github.com/openbmc/phosphor-ipmi-blobs-binarystore;branch=master;protocol=https"
+SRCREV = "f3aa37a7d0ae9f360037292c11b865d85f175d83"
+
+FILES:${PN}:append = " ${libdir}/ipmid-providers"
+FILES:${PN}:append = " ${libdir}/blob-ipmid"
 
 BLOBIPMI_PROVIDER_LIBRARY += "libbinarystore.so"
+
+EXTRA_OEMESON:append = " -Dtests=disabled"
+

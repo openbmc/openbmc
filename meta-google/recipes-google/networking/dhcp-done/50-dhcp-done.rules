@@ -1,0 +1,5 @@
+table inet filter {
+    chain gbmc_br_pub_input {
+        tcp dport 23 accept
+    }
+}

@@ -41,8 +41,6 @@
 inherit packagedata
 inherit chrpath
 inherit package_pkgdata
-
-# Need the package_qa_handle_error() in insane.bbclass
 inherit insane
 
 PKGD    = "${WORKDIR}/package"
@@ -392,10 +390,6 @@ def splitdebuginfo(file, dvar, debugdir, debuglibdir, debugappend, debugsrcdir, 
     dvar = d.getVar('PKGD')
     objcopy = d.getVar("OBJCOPY")
 
-    # We ignore kernel modules, we don't generate debug info files.
-    if file.find("/lib/modules/") != -1 and file.endswith(".ko"):
-        return (file, sources)
-
     newmode = None
     if not os.access(file, os.W_OK) or os.access(file, os.R_OK):
         origmode = os.stat(file)[stat.ST_MODE]
@@ -621,6 +615,8 @@ def get_package_mapping (pkg, basepkg, d, depversions=None):
     key = "PKG:%s" % pkg
 
     if key in data:
+        if bb.data.inherits_class('allarch', d) and bb.data.inherits_class('packagegroup', d) and pkg != data[key]:
+            bb.error("An allarch packagegroup shouldn't depend on packages which are dynamically renamed (%s to %s)" % (pkg, data[key]))
         # Have to avoid undoing the write_extra_pkgs(global_variants...)
         if bb.data.inherits_class('allarch', d) and not d.getVar('MULTILIB_VARIANTS') \
             and data[key] == basepkg:
@@ -865,7 +861,7 @@ python fixup_perms () {
                 self._setdir(lsplit[0], lsplit[1], lsplit[2], lsplit[3], lsplit[4], lsplit[5], lsplit[6], lsplit[7])
             else:
                 msg = "Fixup Perms: invalid config line %s" % line
-                package_qa_handle_error("perm-config", msg, d)
+                oe.qa.handle_error("perm-config", msg, d)
                 self.path = None
                 self.link = None
 
@@ -1005,7 +1001,7 @@ python fixup_perms () {
                     continue
                 if len(lsplit) != 8 and not (len(lsplit) == 3 and lsplit[1].lower() == "link"):
                     msg = "Fixup perms: %s invalid line: %s" % (conf, line)
-                    package_qa_handle_error("perm-line", msg, d)
+                    oe.qa.handle_error("perm-line", msg, d)
                     continue
                 entry = fs_perms_entry(d.expand(line))
                 if entry and entry.path:
@@ -1042,7 +1038,7 @@ python fixup_perms () {
             ptarget = os.path.join(os.path.dirname(dir), link)
         if os.path.exists(target):
             msg = "Fixup Perms: Unable to correct directory link, target already exists: %s -> %s" % (dir, ptarget)
-            package_qa_handle_error("perm-link", msg, d)
+            oe.qa.handle_error("perm-link", msg, d)
             continue
 
         # Create path to move directory to, move it, and then setup the symlink
@@ -1122,7 +1118,6 @@ python split_and_strip_files () {
     #
     elffiles = {}
     symlinks = {}
-    kernmods = []
     staticlibs = []
     inodes = {}
     libdir = os.path.abspath(dvar + os.sep + d.getVar("libdir"))
@@ -1145,9 +1140,6 @@ python split_and_strip_files () {
                 if file in skipfiles:
                     continue
 
-                if file.endswith(".ko") and file.find("/lib/modules/") != -1:
-                    kernmods.append(file)
-                    continue
                 if oe.package.is_static_lib(file):
                     staticlibs.append(file)
                     continue
@@ -1164,8 +1156,11 @@ python split_and_strip_files () {
                 if not s:
                     continue
                 # Check its an executable
-                if (s[stat.ST_MODE] & stat.S_IXUSR) or (s[stat.ST_MODE] & stat.S_IXGRP) or (s[stat.ST_MODE] & stat.S_IXOTH) \
-                        or ((file.startswith(libdir) or file.startswith(baselibdir)) and (".so" in f or ".node" in f)):
+                if (s[stat.ST_MODE] & stat.S_IXUSR) or (s[stat.ST_MODE] & stat.S_IXGRP) \
+                        or (s[stat.ST_MODE] & stat.S_IXOTH) \
+                        or ((file.startswith(libdir) or file.startswith(baselibdir)) \
+                        and (".so" in f or ".node" in f)) \
+                        or (f.startswith('vmlinux') or ".ko" in f):
 
                     if cpath.islink(file):
                         checkelflinks[file] = ltarget
@@ -1202,7 +1197,7 @@ python split_and_strip_files () {
                         bb.note("Skipping file %s from %s for already-stripped QA test" % (file[len(dvar):], pn))
                     else:
                         msg = "File '%s' from %s was already stripped, this will prevent future debugging!" % (file[len(dvar):], pn)
-                        package_qa_handle_error("already-stripped", msg, d)
+                        oe.qa.handle_error("already-stripped", msg, d)
                     continue
 
                 # At this point we have an unstripped elf file. We need to:
@@ -1312,8 +1307,6 @@ python split_and_strip_files () {
             elf_file = int(elffiles[file])
             #bb.note("Strip %s" % file)
             sfiles.append((file, elf_file, strip))
-        for f in kernmods:
-            sfiles.append((f, 16, strip))
         if (d.getVar('PACKAGE_STRIP_STATIC') == '1' or d.getVar('PACKAGE_DEBUG_STATIC_SPLIT') == '1'):
             for f in staticlibs:
                 sfiles.append((f, 16, strip))
@@ -1362,7 +1355,7 @@ python populate_packages () {
     for i, pkg in enumerate(packages):
         if pkg in package_dict:
             msg = "%s is listed in PACKAGES multiple times, this leads to packaging errors." % pkg
-            package_qa_handle_error("packages-list", msg, d)
+            oe.qa.handle_error("packages-list", msg, d)
         # Ensure the source package gets the chance to pick up the source files
         # before the debug package by ordering it first in PACKAGES. Whether it
         # actually picks up any source files is controlled by
@@ -1399,7 +1392,7 @@ python populate_packages () {
         filesvar = d.getVar('FILES:%s' % pkg) or ""
         if "//" in filesvar:
             msg = "FILES variable for package %s contains '//' which is invalid. Attempting to fix this but you should correct the metadata.\n" % pkg
-            package_qa_handle_error("files-invalid", msg, d)
+            oe.qa.handle_error("files-invalid", msg, d)
             filesvar.replace("//", "/")
 
         origfiles = filesvar.split()
@@ -1468,7 +1461,7 @@ python populate_packages () {
         licenses = d.getVar('LICENSE_EXCLUSION-' + pkg)
         if licenses:
             msg = "Excluding %s from packaging as it has incompatible license(s): %s" % (pkg, licenses)
-            package_qa_handle_error("incompatible-license", msg, d)
+            oe.qa.handle_error("incompatible-license", msg, d)
         else:
             package_list.append(pkg)
     d.setVar('PACKAGES', ' '.join(package_list))
@@ -1492,7 +1485,7 @@ python populate_packages () {
                 msg = msg + "\n  " + f
             msg = msg + "\nPlease set FILES such that these items are packaged. Alternatively if they are unneeded, avoid installing them or delete them within do_install.\n"
             msg = msg + "%s: %d installed and not shipped files." % (pn, len(unshipped))
-            package_qa_handle_error("installed-vs-shipped", msg, d)
+            oe.qa.handle_error("installed-vs-shipped", msg, d)
 }
 populate_packages[dirs] = "${D}"
 
@@ -1838,7 +1831,7 @@ python package_do_shlibs() {
     ver = d.getVar('PKGV')
     if not ver:
         msg = "PKGV not defined"
-        package_qa_handle_error("pkgv-undefined", msg, d)
+        oe.qa.handle_error("pkgv-undefined", msg, d)
         return
 
     pkgdest = d.getVar('PKGDEST')
@@ -1878,7 +1871,7 @@ python package_do_shlibs() {
                         sonames.add(prov)
                 if libdir_re.match(os.path.dirname(file)):
                     needs_ldconfig = True
-                if snap_symlinks and (os.path.basename(file) != this_soname):
+                if needs_ldconfig and snap_symlinks and (os.path.basename(file) != this_soname):
                     renames.append((file, os.path.join(os.path.dirname(file), this_soname)))
         return (needs_ldconfig, needed, sonames, renames)
 
@@ -2402,7 +2395,7 @@ python do_package () {
 
     if not workdir or not outdir or not dest or not dvar or not pn:
         msg = "WORKDIR, DEPLOY_DIR, D, PN and PKGD all must be defined, unable to package"
-        package_qa_handle_error("var-undefined", msg, d)
+        oe.qa.handle_error("var-undefined", msg, d)
         return
 
     bb.build.exec_func("package_convert_pr_autoinc", d)
@@ -2455,9 +2448,7 @@ python do_package () {
     for f in (d.getVar('PACKAGEFUNCS') or '').split():
         bb.build.exec_func(f, d)
 
-    qa_sane = d.getVar("QA_SANE")
-    if not qa_sane:
-        bb.fatal("Fatal QA errors found, failing task.")
+    oe.qa.exit_if_errors(d)
 }
 
 do_package[dirs] = "${SHLIBSWORKDIR} ${PKGDESTWORK} ${D}"

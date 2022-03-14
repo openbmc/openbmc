@@ -30,8 +30,8 @@ Refer to the
 ":ref:`kernel-dev/common:working with your own sources`"
 section for information.
 
-How do I install/not-install the kernel image on the rootfs?
-------------------------------------------------------------
+How do I install/not-install the kernel image on the root filesystem?
+---------------------------------------------------------------------
 
 The kernel image (e.g. ``vmlinuz``) is provided by the
 ``kernel-image`` package. Image recipes depend on ``kernel-base``. To

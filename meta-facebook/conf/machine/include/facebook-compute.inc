@@ -1,3 +1,3 @@
-require conf/machine/include/facebook-withhost.inc
+MACHINEOVERRIDES =. "fb-compute:"
 
-OVERRIDES .= ":fb-compute"
+require conf/machine/include/facebook-withhost.inc

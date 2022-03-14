@@ -1,4 +1,4 @@
-From 7b2dd83d8fcd06af8e583b53da79ed0033793d46 Mon Sep 17 00:00:00 2001
+From 8d013fe154a162305f76141151baf767dd04b598 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 27 Feb 2017 09:43:30 +0200
 Subject: [PATCH] Do not hardcode "lib/rpm" as the installation path for
@@ -14,10 +14,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  3 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index fe35a90fa..b2faec6f3 100644
+index eb7d6941b..10a889b5d 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -966,7 +966,7 @@ else
+@@ -871,7 +871,7 @@ else
      usrprefix=$prefix
  fi
  
@@ -27,10 +27,10 @@ index fe35a90fa..b2faec6f3 100644
  
  AC_SUBST(OBJDUMP)
 diff --git a/macros.in b/macros.in
-index 35c8cf9df..9d8b2825c 100644
+index a1f795e5f..689e784ef 100644
 --- a/macros.in
 +++ b/macros.in
-@@ -996,7 +996,7 @@ package or when debugging this package.\
+@@ -933,7 +933,7 @@ package or when debugging this package.\
  %_sharedstatedir	%{_prefix}/com
  %_localstatedir		%{_prefix}/var
  %_lib			lib
@@ -40,7 +40,7 @@ index 35c8cf9df..9d8b2825c 100644
  %_infodir		%{_datadir}/info
  %_mandir		%{_datadir}/man
 diff --git a/rpm.am b/rpm.am
-index 8e1dc2184..3d889ec86 100644
+index 7b57f433b..9bbb9ee96 100644
 --- a/rpm.am
 +++ b/rpm.am
 @@ -1,10 +1,10 @@
@@ -55,4 +55,4 @@ index 8e1dc2184..3d889ec86 100644
 +rpmconfigdir = $(libdir)/rpm
  
  # Libtool version (current-revision-age) for all our libraries
- rpm_version_info = 10:3:1
+ rpm_version_info = 11:0:2

@@ -40,6 +40,7 @@ PTESTS_FAST = "\
     libxml-sax-base-perl-ptest \
     libxml-simple-perl-ptest \
     libxml2-ptest \
+    lua-ptest \
     lzo-ptest \
     m4-ptest \
     nettle-ptest \
@@ -50,10 +51,12 @@ PTESTS_FAST = "\
     python3-atomicwrites-ptest \
     python3-hypothesis-ptest \
     python3-jinja2-ptest \
+    python3-jsonpointer-ptest \
     python3-markupsafe-ptest \
     python3-more-itertools-ptest \
     python3-pluggy-ptest \
     python3-wcwidth-ptest \
+    python3-webcolors-ptest \
     qemu-ptest \
     quilt-ptest \
     sed-ptest \
@@ -61,8 +64,12 @@ PTESTS_FAST = "\
     wayland-ptest \
     zlib-ptest \
 "
+PTESTS_FAST:append:libc-glibc = " glibc-tests-ptest"
+PTESTS_PROBLEMS:remove:libc-glibc = "glibc-tests-ptest"
 PTESTS_FAST:remove:mips64 = "qemu-ptest"
-PTESTS_PROBLEMS:append:mips64 = "qemu-ptest"
+PTESTS_PROBLEMS:append:mips64 = " qemu-ptest"
+PTESTS_FAST:remove:riscv32 = "qemu-ptest"
+PTESTS_PROBLEMS:append:riscv32 = " qemu-ptest"
 
 PTESTS_SLOW = "\
     babeltrace-ptest \
@@ -71,6 +78,7 @@ PTESTS_SLOW = "\
     coreutils-ptest \
     dbus-test-ptest \
     e2fsprogs-ptest \
+    findutils-ptest \
     glib-2.0-ptest \
     gstreamer1.0-ptest \
     libevent-ptest \

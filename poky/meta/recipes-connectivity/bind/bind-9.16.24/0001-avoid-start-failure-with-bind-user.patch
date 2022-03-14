@@ -1,0 +1,27 @@
+From 31dde3562f287429eea94b77250d184818b49063 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Mon, 15 Oct 2018 16:55:09 +0800
+Subject: [PATCH] avoid start failure with bind user
+
+Upstream-Status: Pending
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ init.d | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/init.d b/init.d
+index b2eec60..6e03936 100644
+--- a/init.d
++++ b/init.d
+@@ -57,6 +57,7 @@ case "$1" in
+ 	modprobe capability >/dev/null 2>&1 || true
+ 	if [ ! -f /etc/bind/rndc.key ]; then
+ 	    /usr/sbin/rndc-confgen -a -b 512
++	    chown root:bind /etc/bind/rndc.key >/dev/null 2>&1 || true
+ 	    chmod 0640 /etc/bind/rndc.key
+ 	fi
+ 	if [ -f /var/run/named/named.pid ]; then
+-- 
+2.7.4
+

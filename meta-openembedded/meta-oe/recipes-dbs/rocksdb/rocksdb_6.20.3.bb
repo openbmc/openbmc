@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.Apache;md5=3b83ef96387f14655fc854ddc3c6bd57 \
 SRCREV = "8608d75d85f8e1b3b64b73a4fb6d19baec61ba5c"
 SRCBRANCH = "6.20.fb"
 
-SRC_URI = "git://github.com/facebook/${BPN}.git;branch=${SRCBRANCH} \
+SRC_URI = "git://github.com/facebook/${BPN}.git;branch=${SRCBRANCH};protocol=https \
            file://0001-cmake-Add-check-for-atomic-support.patch \
            file://0001-cmake-Use-exported-target-for-bz2.patch \
            file://0001-folly-Use-SYS_futex-for-syscall.patch \

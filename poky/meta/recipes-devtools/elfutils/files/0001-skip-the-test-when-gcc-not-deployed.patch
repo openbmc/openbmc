@@ -6,7 +6,7 @@ Subject: [PATCH] skip the test when gcc not deployed
 Skip the tests which depend on gcc when
 gcc not deployed.
 
-Upstream-Status: Submitted[https://sourceware.org/ml/elfutils-devel/2019-q2/msg00091.html]
+Upstream-Status: Submitted [https://sourceware.org/ml/elfutils-devel/2019-q2/msg00091.html]
 
 Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
 

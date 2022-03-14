@@ -8,7 +8,7 @@ SECTION = "libs"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=4097ec544cf01e9c7cfc4bdf8e4ed887"
 
-SRC_URI = "git://github.com/vsergeev/c-periphery;protocol=https"
+SRC_URI = "git://github.com/vsergeev/c-periphery;protocol=https;branch=master"
 SRCREV = "23bfa4ab481edbad82a69ee385fc58ce03b63084"
 
 S = "${WORKDIR}/git"

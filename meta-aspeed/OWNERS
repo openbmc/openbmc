@@ -1,3 +1,9 @@
 owners:
 - bradleyb@fuzziesquirrel.com
 - joel@jms.id.au
+
+matchers:
+- exact: recipes-bsp/u-boot
+  reviewers:
+   - chiawei_wang@aspeedtech.com
+   - zweiss@equinix.com

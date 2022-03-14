@@ -1,4 +1,4 @@
-From 039c53dd5baddec3359a05be0bff46a3b32bbb84 Mon Sep 17 00:00:00 2001
+From 80f872e4573f542d33f91514538755557d566f79 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 25 Jan 2019 19:04:13 +0100
 Subject: [PATCH] Do not add /usr/lib/termcap to linker flags to avoid host
@@ -12,10 +12,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 1 deletion(-)
 
 diff --git a/setup.py b/setup.py
-index 20d7f35..ab18ff0 100644
+index 43e807f..11b5cf5 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -957,7 +957,6 @@ class PyBuildExt(build_ext):
+@@ -1149,7 +1149,6 @@ class PyBuildExt(build_ext):
                                                       'termcap'):
                  readline_libs.append('termcap')
              self.add(Extension('readline', ['readline.c'],

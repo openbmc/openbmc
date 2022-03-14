@@ -15,17 +15,6 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-nuvoton \
   ##OEROOT##/meta-google \
-  ##OEROOT##/meta-fii/meta-kudo \
-  "
-BBLAYERS_NON_REMOVABLE ?= " \
-  ##OEROOT##/meta \
-  ##OEROOT##/meta-openembedded/meta-oe \
-  ##OEROOT##/meta-openembedded/meta-networking \
-  ##OEROOT##/meta-openembedded/meta-perl \
-  ##OEROOT##/meta-openembedded/meta-python \
-  ##OEROOT##/meta-security \
-  ##OEROOT##/meta-phosphor \
-  ##OEROOT##/meta-nuvoton \
-  ##OEROOT##/meta-google \
+  ##OEROOT##/meta-fii \
   ##OEROOT##/meta-fii/meta-kudo \
   "

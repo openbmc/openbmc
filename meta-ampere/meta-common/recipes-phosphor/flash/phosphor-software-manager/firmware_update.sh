@@ -21,31 +21,29 @@
 
 usage () {
 	echo "Usage:"
-	echo "	$(basename $0) <image path> "
+	echo "      $(basename "$0") <image path> "
 	echo "Where:"
 	echo "	<image path>: the path link to folder, which include image file and MANIFEST"
 	echo "Example:"
-	echo "	$(basename $0) /tmp/images/ghdh1393"
+	echo "     $(basename "$0") /tmp/images/ghdh1393"
 }
 
 
 IMG_PATH="$1"
-if [ ! -d $IMG_PATH ]; then
-	echo $IMG_PATH
+if [ ! -d "$IMG_PATH" ]; then
 	echo "The folder $IMG_PATH does not exist"
 	usage
 	exit 1
 fi
 
 MANIFEST_PATH="${IMG_PATH}/MANIFEST"
-if [ ! -f $MANIFEST_PATH ]; then
-	echo $MANIFEST_PATH
+if [ ! -f "$MANIFEST_PATH" ]; then
 	echo "The MANIFEST file $MANIFEST_PATH does not exist"
 	usage
 	exit 1
 fi
 
-EXTENDED_VERSION=$(awk '/ExtendedVersion/ {print}' ${MANIFEST_PATH} | cut -d "=" -f 2)
+EXTENDED_VERSION=$(awk '/ExtendedVersion/ {print}' "${MANIFEST_PATH}" | cut -d "=" -f 2)
 
 # If the ExtendedVersion is empty, set default to update UEFI/EDKII on primary device
 if [ -z "$EXTENDED_VERSION" ]
@@ -56,28 +54,28 @@ fi
 # Assign the command based on the ExtendedVersion
 case ${EXTENDED_VERSION} in
 	"primary")
-		export IMAGE=$(find ${IMG_PATH} -type f \( -name "*.img" -o -name "*.bin" -o -name "*.rom" \))
-		export CMD='/usr/sbin/ampere_flash_bios.sh $IMAGE 1'
+		IMAGE=$(find "${IMG_PATH}" -type f \( -name "*.img" -o -name "*.bin" -o -name "*.rom" \))
+		CMD="/usr/sbin/ampere_flash_bios.sh $IMAGE 1"
 		;;
 
 	"secondary")
-		export IMAGE=$(find ${IMG_PATH} -type f \( -name "*.img" -o -name "*.bin" -o -name "*.rom" \))
-		export CMD='/usr/sbin/ampere_flash_bios.sh $IMAGE 2'
+		IMAGE=$(find "${IMG_PATH}" -type f \( -name "*.img" -o -name "*.bin" -o -name "*.rom" \))
+		CMD="/usr/sbin/ampere_flash_bios.sh $IMAGE 2"
 		;;
 
 	"scp-primary")
-		export IMAGE=$(find ${IMG_PATH} -type f \( -name "*.img" -o -name "*.slim" -o -name "*.rom" \))
-		export CMD='/usr/sbin/ampere_firmware_upgrade.sh smpmpro $IMAGE 1'
+		IMAGE=$(find "${IMG_PATH}" -type f \( -name "*.img" -o -name "*.slim" -o -name "*.rom" \))
+		CMD="/usr/sbin/ampere_firmware_upgrade.sh smpmpro $IMAGE 1"
 		;;
 
 	"scp-secondary")
-		export IMAGE=$(find ${IMG_PATH} -type f \( -name "*.img" -o -name "*.slim" -o -name "*.rom" \))
-		export CMD='/usr/sbin/ampere_firmware_upgrade.sh smpmpro $IMAGE 2'
+		IMAGE=$(find "${IMG_PATH}" -type f \( -name "*.img" -o -name "*.slim" -o -name "*.rom" \))
+		CMD="/usr/sbin/ampere_firmware_upgrade.sh smpmpro $IMAGE 2"
 		;;
 
 	"fru")
-		export IMAGE=$(find ${IMG_PATH} -type f \( -name "*.bin" \))
-		export CMD='/usr/sbin/ampere_firmware_upgrade.sh fru $IMAGE'
+		IMAGE=$(find "${IMG_PATH}" -type f \( -name "*.bin" \))
+		CMD="/usr/sbin/ampere_firmware_upgrade.sh fru $IMAGE"
 		;;
 
 	*)
@@ -91,11 +89,10 @@ if [ -z "$IMAGE" ]
 then
 	echo "ERROR: The image file: No such file or directory"
 	exit 1
-else
-	eval $CMD
 fi
 
-if [[ $? -ne 0 ]]; then
+if ! eval "$CMD";
+then
 	echo "ERROR: The firmware update not successfull"
 	exit 1
 fi

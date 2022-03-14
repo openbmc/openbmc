@@ -1,4 +1,4 @@
-From 04e4999c6fa2e9810634745a07f1e380f27b8e61 Mon Sep 17 00:00:00 2001
+From 358a8f053c367aab7fba8ab059244e0530c7ff82 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 17 Mar 2021 13:24:57 -0700
 Subject: [PATCH] reduce thread stack and heap usage for javascriptcore on musl
@@ -25,10 +25,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 19 insertions(+), 3 deletions(-)
 
 diff --git a/Source/JavaScriptCore/runtime/OptionsList.h b/Source/JavaScriptCore/runtime/OptionsList.h
-index bb6d2f1d..a6209742 100644
+index a0c2170e..9e107af7 100644
 --- a/Source/JavaScriptCore/runtime/OptionsList.h
 +++ b/Source/JavaScriptCore/runtime/OptionsList.h
-@@ -71,6 +71,18 @@ JS_EXPORT_PRIVATE bool canUseJITCage();
+@@ -77,6 +77,18 @@ bool canUseWebAssemblyFastMemory();
  // On instantiation of the first VM instance, the Options will be write protected
  // and cannot be modified thereafter.
  
@@ -47,7 +47,7 @@ index bb6d2f1d..a6209742 100644
  #define FOR_EACH_JSC_OPTION(v)                                          \
      v(Bool, useKernTCSM, defaultTCSMValue(), Normal, "Note: this needs to go before other options since they depend on this value.") \
      v(Bool, validateOptions, false, Normal, "crashes if mis-typed JSC options were passed to the VM") \
-@@ -86,9 +98,9 @@ JS_EXPORT_PRIVATE bool canUseJITCage();
+@@ -92,9 +104,9 @@ bool canUseWebAssemblyFastMemory();
      \
      v(Bool, reportMustSucceedExecutableAllocations, false, Normal, nullptr) \
      \
@@ -61,11 +61,11 @@ index bb6d2f1d..a6209742 100644
      v(Bool, crashOnDisallowedVMEntry, ASSERT_ENABLED, Normal, "Forces a crash if we attempt to enter the VM when disallowed") \
      v(Bool, crashIfCantAllocateJITMemory, false, Normal, nullptr) \
 diff --git a/Source/WTF/wtf/Threading.h b/Source/WTF/wtf/Threading.h
-index 9495d6c1..190b3811 100644
+index 178f9808..95ec5a85 100644
 --- a/Source/WTF/wtf/Threading.h
 +++ b/Source/WTF/wtf/Threading.h
-@@ -60,6 +60,10 @@
- #include <dispatch/dispatch.h>
+@@ -67,6 +67,10 @@
+ #undef None
  #endif
  
 +#if OS(LINUX) && !defined(__GLIBC__)

@@ -1,7 +1,7 @@
 SUMMARY  = "OpenCL API C++ bindings"
 DESCRIPTION = "OpenCL API C++ bindings from Khronos"
 
-SRC_URI = "git://github.com/KhronosGroup/OpenCL-CLHPP.git;protocol=https"
+SRC_URI = "git://github.com/KhronosGroup/OpenCL-CLHPP.git;protocol=https;branch=master"
 
 LICENSE  = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=3b83ef96387f14655fc854ddc3c6bd57"

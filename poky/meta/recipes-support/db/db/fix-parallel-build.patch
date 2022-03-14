@@ -2,7 +2,7 @@ With higher paralelism it sometimes fails with:
 libtool: link: `util_log.lo' is not a valid libtool object
 make: *** [db_replicate] Error 1
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [as far as open source community is concerned, upstream is dead]
 
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
 

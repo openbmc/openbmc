@@ -11,8 +11,8 @@ DEPENDS += "phosphor-mapper systemd"
 
 SKELETON_DIR = "op-pwrctl"
 
-FMT = "org.openbmc.control.Power@{0}.service"
-DBUS_SERVICE:${PN} += "${@compose_list(d, 'FMT', 'OBMC_POWER_INSTANCES')}"
+OBMC_CONTROL_POWER_FMT ?= "org.openbmc.control.Power@{0}.service"
+DBUS_SERVICE:${PN} += "${@compose_list(d, 'OBMC_CONTROL_POWER_FMT', 'OBMC_POWER_INSTANCES')}"
 
 SYSTEMD_SERVICE:${PN} += " \
         op-power-start@.service \

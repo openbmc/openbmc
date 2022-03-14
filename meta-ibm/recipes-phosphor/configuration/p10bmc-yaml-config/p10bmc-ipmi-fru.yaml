@@ -1,0 +1,1951 @@
+# A YAML similar to this example would have to be generated, for eg with MRW
+# inputs and system configuration, to depict IPMI Fru information.
+#
+# This file maps IPMI properties to phosphor dbus inventory properties
+#
+# This YAML could help generate C++ code.
+# Format of the YAML:
+# Fruid:
+#   Associated Fru paths
+#     d-bus Interfaces
+#       d-bus Properties
+#         IPMI Fru mapping
+0:
+  /system:
+    entityID: 23
+    entityInstance: 1
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.System:
+1:
+  /system/chassis/motherboard/dimm0:
+    entityID: 32
+    entityInstance: 1
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+2:
+  /system/chassis/motherboard/dimm1:
+    entityID: 32
+    entityInstance: 2
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+3:
+  /system/chassis/motherboard/dimm2:
+    entityID: 32
+    entityInstance: 3
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+4:
+  /system/chassis/motherboard/dimm3:
+    entityID: 32
+    entityInstance: 4
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+5:
+  /system/chassis/motherboard/dimm4:
+    entityID: 32
+    entityInstance: 5
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+6:
+  /system/chassis/motherboard/dimm5:
+    entityID: 32
+    entityInstance: 6
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+7:
+  /system/chassis/motherboard/dimm6:
+    entityID: 32
+    entityInstance: 7
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+8:
+  /system/chassis/motherboard/dimm7:
+    entityID: 32
+    entityInstance: 8
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+9:
+  /system/chassis/motherboard/dimm8:
+    entityID: 32
+    entityInstance: 9
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+10:
+  /system/chassis/motherboard/dimm9:
+    entityID: 32
+    entityInstance: 10
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+11:
+  /system/chassis/motherboard/dimm10:
+    entityID: 32
+    entityInstance: 11
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+12:
+  /system/chassis/motherboard/dimm11:
+    entityID: 32
+    entityInstance: 12
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+13:
+  /system/chassis/motherboard/dimm12:
+    entityID: 32
+    entityInstance: 13
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+14:
+  /system/chassis/motherboard/dimm13:
+    entityID: 32
+    entityInstance: 14
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+15:
+  /system/chassis/motherboard/dimm14:
+    entityID: 32
+    entityInstance: 15
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+16:
+  /system/chassis/motherboard/dimm15:
+    entityID: 32
+    entityInstance: 16
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+17:
+  /system/chassis/motherboard/dimm16:
+    entityID: 32
+    entityInstance: 17
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+18:
+  /system/chassis/motherboard/dimm17:
+    entityID: 32
+    entityInstance: 18
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+19:
+  /system/chassis/motherboard/dimm18:
+    entityID: 32
+    entityInstance: 19
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+20:
+  /system/chassis/motherboard/dimm19:
+    entityID: 32
+    entityInstance: 20
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+21:
+  /system/chassis/motherboard/dimm20:
+    entityID: 32
+    entityInstance: 21
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+22:
+  /system/chassis/motherboard/dimm21:
+    entityID: 32
+    entityInstance: 22
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+23:
+  /system/chassis/motherboard/dimm22:
+    entityID: 32
+    entityInstance: 23
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+24:
+  /system/chassis/motherboard/dimm23:
+    entityID: 32
+    entityInstance: 24
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+25:
+  /system/chassis/motherboard/dimm24:
+    entityID: 32
+    entityInstance: 25
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+26:
+  /system/chassis/motherboard/dimm25:
+    entityID: 32
+    entityInstance: 26
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+27:
+  /system/chassis/motherboard/dimm26:
+    entityID: 32
+    entityInstance: 27
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+28:
+  /system/chassis/motherboard/dimm27:
+    entityID: 32
+    entityInstance: 28
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+29:
+  /system/chassis/motherboard/dimm28:
+    entityID: 32
+    entityInstance: 29
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+30:
+  /system/chassis/motherboard/dimm29:
+    entityID: 32
+    entityInstance: 30
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+31:
+  /system/chassis/motherboard/dimm30:
+    entityID: 32
+    entityInstance: 31
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+32:
+  /system/chassis/motherboard/dimm31:
+    entityID: 32
+    entityInstance: 32
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+33:
+  /system/chassis/motherboard/dimm32:
+    entityID: 32
+    entityInstance: 33
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+34:
+  /system/chassis/motherboard/dimm33:
+    entityID: 32
+    entityInstance: 34
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+35:
+  /system/chassis/motherboard/dimm34:
+    entityID: 32
+    entityInstance: 35
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+36:
+  /system/chassis/motherboard/dimm35:
+    entityID: 32
+    entityInstance: 36
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+37:
+  /system/chassis/motherboard/dimm36:
+    entityID: 32
+    entityInstance: 37
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+38:
+  /system/chassis/motherboard/dimm37:
+    entityID: 32
+    entityInstance: 38
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+39:
+  /system/chassis/motherboard/dimm38:
+    entityID: 32
+    entityInstance: 39
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+40:
+  /system/chassis/motherboard/dimm39:
+    entityID: 32
+    entityInstance: 40
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+41:
+  /system/chassis/motherboard/dimm40:
+    entityID: 32
+    entityInstance: 41
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+42:
+  /system/chassis/motherboard/dimm41:
+    entityID: 32
+    entityInstance: 42
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+43:
+  /system/chassis/motherboard/dimm42:
+    entityID: 32
+    entityInstance: 43
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+44:
+  /system/chassis/motherboard/dimm43:
+    entityID: 32
+    entityInstance: 44
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+45:
+  /system/chassis/motherboard/dimm44:
+    entityID: 32
+    entityInstance: 45
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+46:
+  /system/chassis/motherboard/dimm45:
+    entityID: 32
+    entityInstance: 46
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+47:
+  /system/chassis/motherboard/dimm46:
+    entityID: 32
+    entityInstance: 47
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+48:
+  /system/chassis/motherboard/dimm47:
+    entityID: 32
+    entityInstance: 48
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+49:
+  /system/chassis/motherboard/dimm48:
+    entityID: 32
+    entityInstance: 49
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+50:
+  /system/chassis/motherboard/dimm49:
+    entityID: 32
+    entityInstance: 50
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+51:
+  /system/chassis/motherboard/dimm50:
+    entityID: 32
+    entityInstance: 51
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+52:
+  /system/chassis/motherboard/dimm51:
+    entityID: 32
+    entityInstance: 52
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+53:
+  /system/chassis/motherboard/dimm52:
+    entityID: 32
+    entityInstance: 53
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+54:
+  /system/chassis/motherboard/dimm53:
+    entityID: 32
+    entityInstance: 54
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+55:
+  /system/chassis/motherboard/dimm54:
+    entityID: 32
+    entityInstance: 55
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+56:
+  /system/chassis/motherboard/dimm55:
+    entityID: 32
+    entityInstance: 56
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+57:
+  /system/chassis/motherboard/dimm56:
+    entityID: 32
+    entityInstance: 57
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+58:
+  /system/chassis/motherboard/dimm57:
+    entityID: 32
+    entityInstance: 58
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+59:
+  /system/chassis/motherboard/dimm58:
+    entityID: 32
+    entityInstance: 59
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+60:
+  /system/chassis/motherboard/dimm59:
+    entityID: 32
+    entityInstance: 60
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+61:
+  /system/chassis/motherboard/dimm60:
+    entityID: 32
+    entityInstance: 61
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+62:
+  /system/chassis/motherboard/dimm61:
+    entityID: 32
+    entityInstance: 62
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+63:
+  /system/chassis/motherboard/dimm62:
+    entityID: 32
+    entityInstance: 63
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+64:
+  /system/chassis/motherboard/dimm63:
+    entityID: 32
+    entityInstance: 64
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.Dimm:
+65:
+  /system/chassis/motherboard/dcm0/cpu0:
+    entityID: 3
+    entityInstance: 1
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Board
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Board
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Board
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Item.Cpu:
+66:
+  /system/chassis/motherboard/dcm0/cpu1:
+    entityID: 3
+    entityInstance: 2
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Board
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Board
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Board
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Item.Cpu:
+67:
+  /system/chassis/motherboard/dcm1/cpu0:
+    entityID: 3
+    entityInstance: 3
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Board
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Board
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Board
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Item.Cpu:
+68:
+  /system/chassis/motherboard/dcm1/cpu1:
+    entityID: 3
+    entityInstance: 4
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Board
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Board
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Board
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Item.Cpu:
+69:
+  /system/chassis/motherboard/dcm2/cpu0:
+    entityID: 3
+    entityInstance: 5
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Board
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Board
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Board
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Item.Cpu:
+70:
+  /system/chassis/motherboard/dcm2/cpu1:
+    entityID: 3
+    entityInstance: 6
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Board
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Board
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Board
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Item.Cpu:
+71:
+  /system/chassis/motherboard/dcm3/cpu0:
+    entityID: 3
+    entityInstance: 7
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Board
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Board
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Board
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Item.Cpu:
+72:
+  /system/chassis/motherboard/dcm3/cpu1:
+    entityID: 3
+    entityInstance: 8
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Board
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Board
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Board
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Item.Cpu:

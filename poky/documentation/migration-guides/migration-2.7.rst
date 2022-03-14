@@ -87,8 +87,8 @@ This section provides information about packaging changes.
    ``bind-utils`` package.
 
 -  Debug split: The default debug split has been changed to create
-   separate source packages (i.e. package_name\ ``-dbg`` and
-   package_name\ ``-src``). If you are currently using ``dbg-pkgs`` in
+   separate source packages (i.e. ``package_name-dbg`` and
+   ``package_name-src``). If you are currently using ``dbg-pkgs`` in
    :term:`IMAGE_FEATURES` to bring in debug
    symbols and you still need the sources, you must now also add
    ``src-pkgs`` to :term:`IMAGE_FEATURES`. Source packages remain in the

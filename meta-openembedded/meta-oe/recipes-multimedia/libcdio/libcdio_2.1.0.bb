@@ -4,7 +4,9 @@ SECTION = "libs"
 LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
-SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.bz2"
+SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.bz2 \
+           file://0001-Fix-a-few-Werror-format-security-errors-with-mvprint.patch \
+           "
 
 SRC_URI[md5sum] = "aa7629e8f73662a762f64c444b901055"
 SRC_URI[sha256sum] = "8550e9589dbd594bfac93b81ecf129b1dc9d0d51e90f9696f1b2f9b2af32712b"

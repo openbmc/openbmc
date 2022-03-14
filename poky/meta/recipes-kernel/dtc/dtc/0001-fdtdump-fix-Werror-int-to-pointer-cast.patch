@@ -1,0 +1,40 @@
+Fix the build of fdtdump with mingw.
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From ae0ce1fa7f4d679b5f8df1fc0e797246e43547fe Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 25 Aug 2021 16:13:50 +0400
+Subject: [PATCH] fdtdump: fix -Werror=int-to-pointer-cast
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+With mingw64-gcc, the compiler complains with various warnings:
+error: cast from pointer to integer of different size [-Werror=pointer-to-int-cast]
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20210825121350.213551-1-marcandre.lureau@redhat.com>
+Acked-by: Rob Herring <robh@kernel.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ fdtdump.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fdtdump.c b/fdtdump.c
+index d9fb374..483f367 100644
+--- a/fdtdump.c
++++ b/fdtdump.c
+@@ -21,7 +21,7 @@
+ #define MAX_VERSION 17
+ 
+ #define ALIGN(x, a)	(((x) + ((a) - 1)) & ~((a) - 1))
+-#define PALIGN(p, a)	((void *)(ALIGN((unsigned long)(p), (a))))
++#define PALIGN(p, a)	((void *)(ALIGN((uintptr_t)(p), (a))))
+ #define GET_CELL(p)	(p += 4, *((const fdt32_t *)(p-4)))
+ 
+ static const char *tagname(uint32_t tag)
+-- 
+2.25.1
+

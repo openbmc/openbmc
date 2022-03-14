@@ -7,7 +7,6 @@ ExecStart=/usr/bin/gsj-hotswap-change-setting.sh
 Restart=no
 Type=oneshot
 RemainAfterExit=true
-StandardOutput=syslog
 
 [Install]
 WantedBy=multi-user.target

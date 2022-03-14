@@ -21,7 +21,7 @@ ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains("IMAGE_FEATURES", "read-only
 # otherwise kernel or initramfs end up mounting the rootfs read/write
 # (the default) if supported by the underlying storage.
 #
-# We do this with _append because the default value might get set later with ?=
+# We do this with :append because the default value might get set later with ?=
 # and we don't want to disable such a default that by setting a value here.
 APPEND:append = '${@bb.utils.contains("IMAGE_FEATURES", "read-only-rootfs", " ro", "", d)}'
 
@@ -52,7 +52,7 @@ inherit image-artifact-names
 # the numeric IDs of dynamically created entries remain stable.
 #
 # We want this to run as late as possible, in particular after
-# systemd_sysusers_create and set_user_group. Using _append is not
+# systemd_sysusers_create and set_user_group. Using :append is not
 # enough for that, set_user_group is added that way and would end
 # up running after us.
 SORT_PASSWD_POSTPROCESS_COMMAND ??= " sort_passwd; "
@@ -62,7 +62,7 @@ python () {
 }
 
 systemd_create_users () {
-	for conffile in ${IMAGE_ROOTFS}/usr/lib/sysusers.d/systemd.conf ${IMAGE_ROOTFS}/usr/lib/sysusers.d/systemd-remote.conf; do
+	for conffile in ${IMAGE_ROOTFS}/usr/lib/sysusers.d/*.conf; do
 		[ -e $conffile ] || continue
 		grep -v "^#" $conffile | sed -e '/^$/d' | while read type name id comment; do
 		if [ "$type" = "u" ]; then

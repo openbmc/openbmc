@@ -11,7 +11,7 @@ can be dropped.
 This fixes linking with gcc 10 which uses -fno-common by default,
 disallowing multiple global variable definitions.
 
-Upstream-Status: Pending
+Upstream-Status: Backport [https://salsa.debian.org/minicom-team/minicom/-/commit/db269bba2a68fde03f5df45ac8372a8f1248ca96]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  src/dial.c | 2 --

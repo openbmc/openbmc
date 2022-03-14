@@ -8,15 +8,15 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 DEPENDS = "boost phosphor-ipmi-host phosphor-logging systemd libgpiod"
 
-inherit cmake obmc-phosphor-ipmiprovider-symlink
+inherit cmake pkgconfig obmc-phosphor-ipmiprovider-symlink
 
 EXTRA_OECMAKE="-DENABLE_TEST=0 -DYOCTO=1"
 
 LIBRARY_NAMES = "libzampoemcmds.so"
 
 S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/openbmc/ampere-ipmi-oem.git"
-SRCREV = "1463f7013a17699081c1fbf506ee8d57827d1088"
+SRC_URI = "git://github.com/openbmc/ampere-ipmi-oem.git;branch=master;protocol=https"
+SRCREV = "4c556399c7161d3742cad978fd64e8ad0fd0aa0a"
 
 HOSTIPMI_PROVIDER_LIBRARY += "${LIBRARY_NAMES}"
 NETIPMI_PROVIDER_LIBRARY += "${LIBRARY_NAMES}"

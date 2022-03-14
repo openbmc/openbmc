@@ -20,6 +20,6 @@ DEPENDS += "sdbusplus"
 DEPENDS += "cli11"
 
 S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/openbmc/ssifbridge.git;protocol=git;branch=master"
-SRCREV= "b62da097135346b1027a057c675ffc679c6fe3f6"
+SRC_URI = "git://github.com/openbmc/ssifbridge.git;protocol=https;branch=master"
+SRCREV= "2c2b8280584d05d16a4d0c180be8c3a6ee37aec2"
 

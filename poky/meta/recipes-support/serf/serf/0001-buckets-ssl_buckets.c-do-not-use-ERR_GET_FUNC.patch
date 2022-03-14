@@ -1,0 +1,28 @@
+From 2f45711a66ff99886b6e4a5708e2db01a63e5af4 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Fri, 10 Sep 2021 11:05:10 +0200
+Subject: [PATCH] buckets/ssl_buckets.c: do not use ERR_GET_FUNC
+
+Upstream removed it in
+https://github.com/openssl/openssl/pull/16004
+
+Upstream-Status: Inactive-Upstream [lastrelease: 2015, lastcommit: 2019]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ buckets/ssl_buckets.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/buckets/ssl_buckets.c b/buckets/ssl_buckets.c
+index b01e535..9801f87 100644
+--- a/buckets/ssl_buckets.c
++++ b/buckets/ssl_buckets.c
+@@ -1325,8 +1325,7 @@ static int ssl_need_client_cert(SSL *ssl, X509 **cert, EVP_PKEY **pkey)
+                 return 0;
+             }
+             else {
+-                printf("OpenSSL cert error: %d %d %d\n", ERR_GET_LIB(err),
+-                       ERR_GET_FUNC(err),
++                printf("OpenSSL cert error: %d %d\n", ERR_GET_LIB(err),
+                        ERR_GET_REASON(err));
+                 PKCS12_free(p12);
+                 bio_meth_free(biom);

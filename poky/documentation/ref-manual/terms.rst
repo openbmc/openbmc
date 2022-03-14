@@ -31,7 +31,7 @@ universal, the list includes them just in case:
          busybox_1.21.%.bbappend
 
       That append file
-      would match any ``busybox_1.21.``\ x\ ``.bb`` version of the recipe. So,
+      would match any ``busybox_1.21.x.bb`` version of the recipe. So,
       the append file would match any of the following recipe names:
 
       .. code-block:: shell
@@ -134,10 +134,27 @@ universal, the list includes them just in case:
       the Texas Instruments ARM Cortex-A8 development board).
 
    :term:`Container Layer`
-      Layers that hold other layers. An example of a container layer is
-      OpenEmbedded's `meta-openembedded
-      <https://github.com/openembedded/meta-openembedded>`_ layer. The
-      ``meta-openembedded`` layer contains many ``meta-*`` layers.
+      A flexible definition that typically refers to a single Git checkout
+      which contains multiple (and typically related) sub-layers which can
+      be included independently in your project's ``bblayers.conf`` file.
+
+      In some cases, such as with OpenEmbedded's
+      `meta-openembedded <https://github.com/openembedded/meta-openembedded>`_
+      layer, the top level ``meta-openembedded/`` directory is not itself an actual layer,
+      so you would never explicitly include it in a ``bblayers.conf`` file;
+      rather, you would include any number of its layer subdirectories, such as
+      `meta-openembedded/meta-oe <https://github.com/openembedded/meta-openembedded/tree/master/meta-oe>`_,
+      `meta-openembedded/meta-python <https://github.com/openembedded/meta-openembedded/tree/master/meta-python>`_
+      and so on.
+
+      On the other hand, some container layers (such as
+      `meta-security <https://git.yoctoproject.org/cgit/cgit.cgi/meta-security>`_)
+      have a top-level directory that is itself an actual layer, as well as
+      a variety of sub-layers, both of which could be included in your
+      ``bblayers.conf`` file.
+
+      In either case, the phrase "container layer" is simply used to describe
+      a directory structure which contains multiple valid OpenEmbedded layers.
 
    :term:`Cross-Development Toolchain`
       In general, a cross-development toolchain is a collection of software
@@ -387,7 +404,7 @@ universal, the list includes them just in case:
 
    :term:`Upstream`
       A reference to source code or repositories that are not
-      local to the development system but located in a master area that is
+      local to the development system but located in a remote area that is
       controlled by the maintainer of the source code. For example, in
       order for a developer to work on a particular piece of code, they
       need to first get a copy of it from an "upstream" source.

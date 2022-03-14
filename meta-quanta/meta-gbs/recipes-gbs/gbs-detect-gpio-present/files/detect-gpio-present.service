@@ -5,7 +5,6 @@ Wants=phosphor-gpio-presence@.service
 
 [Service]
 ExecStart=/usr/bin/detect-gpio-present.sh
-StandardOutput=syslog
 Type=simple
 
 [Install]

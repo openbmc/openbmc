@@ -1,0 +1,111 @@
+- name: chassis capabilities path
+  class: group
+  group: path
+  members:
+  - meta: PATH
+    path: /xyz/openbmc_project/control/chassis_capabilities
+
+- name: intrusion property
+  class: group
+  group: property
+  type: boolean
+  members:
+  - interface: xyz.openbmc_project.Control.ChassisCapabilities
+    meta: PROPERTY
+    property: ChassisIntrusionEnabled
+
+- name: watch intrusionenable
+  class: watch
+  watch: property
+  paths: chassis capabilities path
+  properties: intrusion property
+  callback: intrusion enable
+
+- name: watch intrusiondisable
+  class: watch
+  watch: property
+  paths: chassis capabilities path
+  properties: intrusion property
+  callback: intrusion disable
+
+- name: intrusion enable
+  class: condition
+  condition: count
+  paths: chassis capabilities path
+  properties: intrusion property
+  callback: enable log and event
+  countop: '=='
+  countbound: 1
+  op: '=='
+  bound: true
+
+- name: intrusion disable
+  class: condition
+  condition: count
+  paths: chassis capabilities path
+  properties: intrusion property
+  callback: disable log and event
+  countop: '=='
+  countbound: 1
+  op: '=='
+  bound: false
+
+- name: enable log and event
+  class: callback
+  callback: group
+  members:
+  - journal callback enable value
+  - start intrusion sensor
+
+- name: disable log and event
+  class: callback
+  callback: group
+  members:
+  - journal callback disable value
+  - stop intrusion sensor
+
+- name: journal callback enable value
+  class: callback
+  callback: journal
+  paths: chassis capabilities path
+  properties: intrusion property
+  severity: INFO
+  message: chassis intrusion enable
+
+- name: journal callback disable value
+  class: callback
+  callback: journal
+  paths: chassis capabilities path
+  properties: intrusion property
+  severity: INFO
+  message: chassis intrusion disable
+
+- name: stop intrusion sensor
+  description: >
+    'Stop intrusion sensor.'
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StopUnit
+  args:
+    - value: xyz.openbmc_project.intrusionsensor.service
+      type: string
+    - value: replace
+      type: string
+
+- name: start intrusion sensor
+  description: >
+    'Start intrusion sensor.'
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+    - value: xyz.openbmc_project.intrusionsensor.service
+      type: string
+    - value: replace
+      type: string

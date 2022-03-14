@@ -1,0 +1,12 @@
+[Unit]
+Description= Sync time from host via ipmb
+Wants=ipmb.service xyz.openbmc_project.Network.service
+After=ipmb.service xyz.openbmc_project.Network.service
+
+[Service]
+Type=onshot
+ExecStart=/usr/libexec/set-bmc-time-from-host
+RemainAfterExit=no
+
+[Install]
+WantedBy=multi-user.target

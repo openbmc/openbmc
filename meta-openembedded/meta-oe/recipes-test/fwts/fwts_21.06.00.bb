@@ -20,8 +20,7 @@ COMPATIBLE_HOST = "(i.86|x86_64|aarch64|powerpc64).*-linux"
 DEPENDS = "libpcre glib-2.0 dtc bison-native libbsd"
 DEPENDS:append:libc-musl = " libexecinfo"
 
-# Use brokensep for now (https://github.com/ColinIanKing/fwts/issues/2)
-inherit autotools-brokensep bash-completion pkgconfig
+inherit autotools bash-completion pkgconfig
 
 LDFLAGS:append:libc-musl = " -lexecinfo"
 

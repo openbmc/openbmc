@@ -1,1 +1,0 @@
-ALLOW_EMPTY_${PN} = "1"

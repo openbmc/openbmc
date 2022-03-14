@@ -19,10 +19,10 @@ import time
 import signal
 
 def server_prefunc(server, idx):
-    logging.basicConfig(level=logging.DEBUG, filename='bbhashserv.log', filemode='w',
+    logging.basicConfig(level=logging.DEBUG, filename='bbhashserv-%d.log' % idx, filemode='w',
                         format='%(levelname)s %(filename)s:%(lineno)d %(message)s')
     server.logger.debug("Running server %d" % idx)
-    sys.stdout = open('bbhashserv-%d.log' % idx, 'w')
+    sys.stdout = open('bbhashserv-stdout-%d.log' % idx, 'w')
     sys.stderr = sys.stdout
 
 class HashEquivalenceTestSetup(object):
@@ -140,12 +140,17 @@ class HashEquivalenceCommonTests(object):
         })
         self.assertEqual(result['unihash'], unihash, 'Server returned bad unihash')
 
-        result = self.client.get_taskhash(self.METHOD, taskhash, True)
-        self.assertEqual(result['taskhash'], taskhash)
-        self.assertEqual(result['unihash'], unihash)
-        self.assertEqual(result['method'], self.METHOD)
-        self.assertEqual(result['outhash'], outhash)
-        self.assertEqual(result['outhash_siginfo'], siginfo)
+        result_unihash = self.client.get_taskhash(self.METHOD, taskhash, True)
+        self.assertEqual(result_unihash['taskhash'], taskhash)
+        self.assertEqual(result_unihash['unihash'], unihash)
+        self.assertEqual(result_unihash['method'], self.METHOD)
+
+        result_outhash = self.client.get_outhash(self.METHOD, outhash, taskhash)
+        self.assertEqual(result_outhash['taskhash'], taskhash)
+        self.assertEqual(result_outhash['method'], self.METHOD)
+        self.assertEqual(result_outhash['unihash'], unihash)
+        self.assertEqual(result_outhash['outhash'], outhash)
+        self.assertEqual(result_outhash['outhash_siginfo'], siginfo)
 
     def test_stress(self):
         def query_server(failures):
@@ -260,6 +265,39 @@ class HashEquivalenceCommonTests(object):
         result = down_client.report_unihash(taskhash6, self.METHOD, outhash5, unihash6)
         self.assertEqual(result['unihash'], unihash5, 'Server failed to copy unihash from upstream')
 
+        # Tests read through from server with
+        taskhash7 = '9d81d76242cc7cfaf7bf74b94b9cd2e29324ed74'
+        outhash7 = '8470d56547eea6236d7c81a644ce74670ca0bbda998e13c629ef6bb3f0d60b69'
+        unihash7 = '05d2a63c81e32f0a36542ca677e8ad852365c538'
+        self.client.report_unihash(taskhash7, self.METHOD, outhash7, unihash7)
+
+        result = down_client.get_taskhash(self.METHOD, taskhash7, True)
+        self.assertEqual(result['unihash'], unihash7, 'Server failed to copy unihash from upstream')
+        self.assertEqual(result['outhash'], outhash7, 'Server failed to copy unihash from upstream')
+        self.assertEqual(result['taskhash'], taskhash7, 'Server failed to copy unihash from upstream')
+        self.assertEqual(result['method'], self.METHOD)
+
+        taskhash8 = '86978a4c8c71b9b487330b0152aade10c1ee58aa'
+        outhash8 = 'ca8c128e9d9e4a28ef24d0508aa20b5cf880604eacd8f65c0e366f7e0cc5fbcf'
+        unihash8 = 'd8bcf25369d40590ad7d08c84d538982f2023e01'
+        self.client.report_unihash(taskhash8, self.METHOD, outhash8, unihash8)
+
+        result = down_client.get_outhash(self.METHOD, outhash8, taskhash8)
+        self.assertEqual(result['unihash'], unihash8, 'Server failed to copy unihash from upstream')
+        self.assertEqual(result['outhash'], outhash8, 'Server failed to copy unihash from upstream')
+        self.assertEqual(result['taskhash'], taskhash8, 'Server failed to copy unihash from upstream')
+        self.assertEqual(result['method'], self.METHOD)
+
+        taskhash9 = 'ae6339531895ddf5b67e663e6a374ad8ec71d81c'
+        outhash9 = 'afc78172c81880ae10a1fec994b5b4ee33d196a001a1b66212a15ebe573e00b5'
+        unihash9 = '6662e699d6e3d894b24408ff9a4031ef9b038ee8'
+        self.client.report_unihash(taskhash9, self.METHOD, outhash9, unihash9)
+
+        result = down_client.get_taskhash(self.METHOD, taskhash9, False)
+        self.assertEqual(result['unihash'], unihash9, 'Server failed to copy unihash from upstream')
+        self.assertEqual(result['taskhash'], taskhash9, 'Server failed to copy unihash from upstream')
+        self.assertEqual(result['method'], self.METHOD)
+
     def test_ro_server(self):
         (ro_client, ro_server) = self.start_server(dbpath=self.server.dbpath, read_only=True)
 
@@ -287,10 +325,8 @@ class HashEquivalenceCommonTests(object):
 
 
     def test_slow_server_start(self):
-        """
-        Ensures that the server will exit correctly even if it gets a SIGTERM
-        before entering the main loop
-        """
+        # Ensures that the server will exit correctly even if it gets a SIGTERM
+        # before entering the main loop
 
         event = multiprocessing.Event()
 
@@ -312,6 +348,58 @@ class HashEquivalenceCommonTests(object):
         server.process.join(300)
         self.assertIsNotNone(server.process.exitcode, "Server did not exit in a timely manner!")
 
+    def test_diverging_report_race(self):
+        # Tests that a reported task will correctly pick up an updated unihash
+
+        # This is a baseline report added to the database to ensure that there
+        # is something to match against as equivalent
+        outhash1 = 'afd11c366050bcd75ad763e898e4430e2a60659b26f83fbb22201a60672019fa'
+        taskhash1 = '3bde230c743fc45ab61a065d7a1815fbfa01c4740e4c895af2eb8dc0f684a4ab'
+        unihash1 = '3bde230c743fc45ab61a065d7a1815fbfa01c4740e4c895af2eb8dc0f684a4ab'
+        result = self.client.report_unihash(taskhash1, self.METHOD, outhash1, unihash1)
+
+        # Add a report that is equivalent to Task 1. It should ignore the
+        # provided unihash and report the unihash from task 1
+        taskhash2 = '6259ae8263bd94d454c086f501c37e64c4e83cae806902ca95b4ab513546b273'
+        unihash2 = taskhash2
+        result = self.client.report_unihash(taskhash2, self.METHOD, outhash1, unihash2)
+        self.assertEqual(result['unihash'], unihash1)
+
+        # Add another report for Task 2, but with a different outhash (e.g. the
+        # task is non-deterministic). It should still be marked with the Task 1
+        # unihash because it has the Task 2 taskhash, which is equivalent to
+        # Task 1
+        outhash3 = 'd2187ee3a8966db10b34fe0e863482288d9a6185cb8ef58a6c1c6ace87a2f24c'
+        result = self.client.report_unihash(taskhash2, self.METHOD, outhash3, unihash2)
+        self.assertEqual(result['unihash'], unihash1)
+
+
+    def test_diverging_report_reverse_race(self):
+        # Same idea as the previous test, but Tasks 2 and 3 are reported in
+        # reverse order the opposite order
+
+        outhash1 = 'afd11c366050bcd75ad763e898e4430e2a60659b26f83fbb22201a60672019fa'
+        taskhash1 = '3bde230c743fc45ab61a065d7a1815fbfa01c4740e4c895af2eb8dc0f684a4ab'
+        unihash1 = '3bde230c743fc45ab61a065d7a1815fbfa01c4740e4c895af2eb8dc0f684a4ab'
+        result = self.client.report_unihash(taskhash1, self.METHOD, outhash1, unihash1)
+
+        taskhash2 = '6259ae8263bd94d454c086f501c37e64c4e83cae806902ca95b4ab513546b273'
+        unihash2 = taskhash2
+
+        # Report Task 3 first. Since there is nothing else in the database it
+        # will use the client provided unihash
+        outhash3 = 'd2187ee3a8966db10b34fe0e863482288d9a6185cb8ef58a6c1c6ace87a2f24c'
+        result = self.client.report_unihash(taskhash2, self.METHOD, outhash3, unihash2)
+        self.assertEqual(result['unihash'], unihash2)
+
+        # Report Task 2. This is equivalent to Task 1 but there is already a mapping for
+        # taskhash2 so it will report unihash2
+        result = self.client.report_unihash(taskhash2, self.METHOD, outhash1, unihash2)
+        self.assertEqual(result['unihash'], unihash2)
+
+        # The originally reported unihash for Task 3 should be unchanged even if it
+        # shares a taskhash with Task 2
+        self.assertClientGetHash(self.client, taskhash2, unihash2)
 
 class TestHashEquivalenceUnixServer(HashEquivalenceTestSetup, HashEquivalenceCommonTests, unittest.TestCase):
     def get_server_addr(self, server_idx):

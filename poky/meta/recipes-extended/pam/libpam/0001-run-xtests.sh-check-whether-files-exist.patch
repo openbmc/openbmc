@@ -1,0 +1,65 @@
+From e8e8ccfd57e0274b431bc5717bf37c488285b07b Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Wed, 27 Oct 2021 10:30:46 +0800
+Subject: [PATCH] run-xtests.sh: check whether files exist
+
+Fixes:
+ # ./run-xtests.sh . tst-pam_access1
+ mv: cannot stat '/etc/security/opasswd': No such file or directory
+ PASS: tst-pam_access1
+ mv: cannot stat '/etc/security/opasswd-pam-xtests': No such file or directory
+ ==================
+ 1 tests passed
+ 0 tests not run
+ ==================
+
+Upstream-Status: Backport [https://github.com/linux-pam/linux-pam/commit/e8e8ccfd57e0274b431bc5717bf37c488285b07b]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ xtests/run-xtests.sh | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/xtests/run-xtests.sh b/xtests/run-xtests.sh
+index 14f585d9..ff9a4dc1 100755
+--- a/xtests/run-xtests.sh
++++ b/xtests/run-xtests.sh
+@@ -18,10 +18,12 @@ all=0
+ 
+ mkdir -p /etc/security
+ for config in access.conf group.conf time.conf limits.conf ; do
+-	cp /etc/security/$config /etc/security/$config-pam-xtests
++	[ -f "/etc/security/$config" ] &&
++		mv /etc/security/$config /etc/security/$config-pam-xtests
+ 	install -m 644 "${SRCDIR}"/$config /etc/security/$config
+ done
+-mv /etc/security/opasswd /etc/security/opasswd-pam-xtests
++[ -f /etc/security/opasswd ] &&
++	mv /etc/security/opasswd /etc/security/opasswd-pam-xtests
+ 
+ for testname in $XTESTS ; do
+ 	  for cfg in "${SRCDIR}"/$testname*.pamd ; do
+@@ -47,11 +49,15 @@ for testname in $XTESTS ; do
+ 	  all=`expr $all + 1`
+ 	  rm -f /etc/pam.d/$testname*
+ done
+-mv /etc/security/access.conf-pam-xtests /etc/security/access.conf
+-mv /etc/security/group.conf-pam-xtests /etc/security/group.conf
+-mv /etc/security/time.conf-pam-xtests /etc/security/time.conf
+-mv /etc/security/limits.conf-pam-xtests /etc/security/limits.conf
+-mv /etc/security/opasswd-pam-xtests /etc/security/opasswd
++
++for config in access.conf group.conf time.conf limits.conf opasswd ; do
++	if [ -f "/etc/security/$config-pam-xtests" ]; then
++		mv /etc/security/$config-pam-xtests /etc/security/$config
++	else
++		rm -f /etc/security/$config
++	fi
++done
++
+ if test "$failed" -ne 0; then
+ 	  echo "==================="
+ 	  echo "$failed of $all tests failed"
+-- 
+2.32.0
+

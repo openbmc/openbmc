@@ -87,22 +87,21 @@ The following changes have been made to the package QA checks:
    item not mentioned in :term:`ERROR_QA` or :term:`WARN_QA` would be treated as
    a warning. Consequently, several important items were not already in
    the default value of :term:`WARN_QA`. All of the possible QA checks are
-   now documented in the ":ref:`insane.bbclass <ref-classes-insane>`"
-   section.
+   now documented in the ":ref:`ref-classes-insane`" section.
 
 -  An additional QA check has been added to check if
    ``/usr/share/info/dir`` is being installed. Your recipe should delete
    this file within :ref:`ref-tasks-install` if "make
    install" is installing it.
 
--  If you are using the ``buildhistory`` class, the check for the package
+-  If you are using the :ref:`buildhistory <ref-classes-buildhistory>` class,
+   the check for the package
    version going backwards is now controlled using a standard QA check.
    Thus, if you have customized your :term:`ERROR_QA` or :term:`WARN_QA` values
    and still wish to have this check performed, you should add
    "version-going-backwards" to your value for one or the other
    variables depending on how you wish it to be handled. See the
-   documented QA checks in the
-   ":ref:`insane.bbclass <ref-classes-insane>`" section.
+   documented QA checks in the ":ref:`ref-classes-insane`" section.
 
 .. _migration-1.5-directory-layout-changes:
 
@@ -221,8 +220,7 @@ recipes that previously inherited from this class, you should rename
 them from ``task-*`` to ``packagegroup-*`` and inherit packagegroup
 instead.
 
-For more information, see the
-":ref:`packagegroup.bbclass <ref-classes-packagegroup>`" section.
+For more information, see the ":ref:`ref-classes-packagegroup`" section.
 
 .. _migration-1.5-busybox:
 

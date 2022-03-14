@@ -109,16 +109,33 @@ class LocalSigner(object):
             bb.fatal("Could not get gpg version: %s" % e)
 
 
-    def verify(self, sig_file):
+    def verify(self, sig_file, valid_sigs = ''):
         """Verify signature"""
-        cmd = self.gpg_cmd + ["--verify", "--no-permission-warning"]
+        cmd = self.gpg_cmd + ["--verify", "--no-permission-warning", "--status-fd", "1"]
         if self.gpg_path:
             cmd += ["--homedir", self.gpg_path]
 
         cmd += [sig_file]
-        status = subprocess.call(cmd)
-        ret = False if status else True
-        return ret
+        status = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # Valid if any key matches if unspecified
+        if not valid_sigs:
+            ret = False if status.returncode else True
+            return ret
+
+        import re
+        goodsigs = []
+        sigre = re.compile(r'^\[GNUPG:\] GOODSIG (\S+)\s(.*)$')
+        for l in status.stdout.decode("utf-8").splitlines():
+            s = sigre.match(l)
+            if s:
+                goodsigs += [s.group(1)]
+
+        for sig in valid_sigs.split():
+            if sig in goodsigs:
+                return True
+        if len(goodsigs):
+            bb.warn('No accepted signatures found. Good signatures found: %s.' % ' '.join(goodsigs))
+        return False
 
 
 def get_signer(d, backend):

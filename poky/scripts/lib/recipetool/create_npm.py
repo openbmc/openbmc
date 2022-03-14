@@ -6,6 +6,7 @@
 """Recipe creation tool - npm module support plugin"""
 
 import json
+import logging
 import os
 import re
 import sys
@@ -14,8 +15,10 @@ import bb
 from bb.fetch2.npm import NpmEnvironment
 from bb.fetch2.npmsw import foreach_dependencies
 from recipetool.create import RecipeHandler
+from recipetool.create import get_license_md5sums
 from recipetool.create import guess_license
 from recipetool.create import split_pkg_licenses
+logger = logging.getLogger('recipetool')
 
 TINFOIL = None
 
@@ -118,23 +121,33 @@ class NpmRecipeHandler(RecipeHandler):
         licfiles = []
         packages = {}
 
-        def _licfiles_append(licfile):
-            """Append 'licfile' to the license files list"""
-            licfilepath = os.path.join(srctree, licfile)
-            licmd5 = bb.utils.md5_file(licfilepath)
-            licfiles.append("file://%s;md5=%s" % (licfile, licmd5))
-
         # Handle the parent package
-        _licfiles_append("package.json")
         packages["${PN}"] = ""
+
+        def _licfiles_append_fallback_readme_files(destdir):
+            """Append README files as fallback to license files if a license files is missing"""
+
+            fallback = True
+            readmes = []
+            basedir = os.path.join(srctree, destdir)
+            for fn in os.listdir(basedir):
+                upper = fn.upper()
+                if upper.startswith("README"):
+                    fullpath = os.path.join(basedir, fn)
+                    readmes.append(fullpath)
+                if upper.startswith("COPYING") or "LICENCE" in upper or "LICENSE" in upper:
+                    fallback = False
+            if fallback:
+                for readme in readmes:
+                    licfiles.append(os.path.relpath(readme, srctree))
 
         # Handle the dependencies
         def _handle_dependency(name, params, deptree):
             suffix = "-".join([self._npm_name(dep) for dep in deptree])
             destdirs = [os.path.join("node_modules", dep) for dep in deptree]
             destdir = os.path.join(*destdirs)
-            _licfiles_append(os.path.join(destdir, "package.json"))
             packages["${PN}-" + suffix] = destdir
+            _licfiles_append_fallback_readme_files(destdir)
 
         with open(shrinkwrap_file, "r") as f:
             shrinkwrap = json.load(f)
@@ -246,8 +259,35 @@ class NpmRecipeHandler(RecipeHandler):
 
         bb.note("Handling licences ...")
         (licfiles, packages) = self._handle_licenses(srctree, shrinkwrap_file, dev)
-        extravalues["LIC_FILES_CHKSUM"] = licfiles
-        split_pkg_licenses(guess_license(srctree, d), packages, lines_after, [])
+
+        def _guess_odd_license(licfiles):
+            import bb
+
+            md5sums = get_license_md5sums(d, linenumbers=True)
+
+            chksums = []
+            licenses = []
+            for licfile in licfiles:
+                f = os.path.join(srctree, licfile)
+                md5value = bb.utils.md5_file(f)
+                (license, beginline, endline, md5) = md5sums.get(md5value,
+                    (None, "", "", ""))
+                if not license:
+                    license = "Unknown"
+                    logger.info("Please add the following line for '%s' to a "
+                        "'lib/recipetool/licenses.csv' and replace `Unknown`, "
+                        "`X`, `Y` and `MD5` with the license, begin line, "
+                        "end line and partial MD5 checksum:\n" \
+                        "%s,Unknown,X,Y,MD5" % (licfile, md5value))
+                chksums.append("file://%s%s%s;md5=%s" % (licfile,
+                    ";beginline=%s" % (beginline) if beginline else "",
+                    ";endline=%s" % (endline) if endline else "",
+                    md5 if md5 else md5value))
+                licenses.append((license, licfile, md5value))
+            return (licenses, chksums)
+
+        (licenses, extravalues["LIC_FILES_CHKSUM"]) = _guess_odd_license(licfiles)
+        split_pkg_licenses([*licenses, *guess_license(srctree, d)], packages, lines_after)
 
         classes.append("npm")
         handled.append("buildsystem")

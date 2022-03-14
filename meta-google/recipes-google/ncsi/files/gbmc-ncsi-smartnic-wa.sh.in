@@ -1,0 +1,50 @@
+#!/bin/bash
+# Copyright 2021 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+override=/run/systemd/system/gbmc-ncsi-dhcrelay.service.d/10-nosp.conf
+mkdir -p "$(dirname "$override")"
+echo '[Service]' >"$override"
+echo 'ExecStart=' >>"$override"
+# Remove the source relay port from the relay, bringing it back to run on
+# the default port 547. Our relays don't support the source port option needed
+# to run on 3967 for our legacy NICs.
+systemctl cat gbmc-ncsi-dhcrelay | grep '^ExecStart=' | sed 's, -rp 3967,,' >>"$override"
+
+override=/run/systemd/system/gbmc-br-dhcp.service.d/10-direct.conf
+mkdir -p "$(dirname "$override")"
+echo '[Service]' >"$override"
+echo 'ExecStart=' >>"$override"
+# Switch the gbmcbr interface for the NCSI one to avoid passing the SOLICIT
+# message through the BMC relay.
+systemctl cat gbmc-br-dhcp | grep '^ExecStart=' | sed 's, -i gbmcbr, -i @NCSI_IF@,' >>"$override"
+
+systemctl daemon-reload
+systemctl reset-failed gbmc-ncsi-dhcrelay
+systemctl restart --no-block gbmc-ncsi-dhcrelay
+systemctl reset-failed gbmc-br-dhcp
+systemctl restart --no-block gbmc-br-dhcp
+
+read -r -d '' contents <<EOF
+table inet filter {
+  chain ncsi_legacy_input {
+      udp dport {546,547} accept
+  }
+}
+EOF
+rfile=/run/nftables/60-gbmc-ncsi-ra.rules
+mkdir -p "$(dirname "$rfile")"
+printf '%s' "$contents" >"$rfile"
+systemctl reset-failed nftables
+systemctl --no-block reload-or-restart nftables

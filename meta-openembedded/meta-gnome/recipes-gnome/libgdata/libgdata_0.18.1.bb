@@ -22,7 +22,7 @@ do_compile:prepend() {
 }
 
 # goa is required for gnome-photos
-PACKAGECONFIG ??= "goa gtk"
+PACKAGECONFIG ??= "goa gtk vala"
 PACKAGECONFIG[manpages] = "-Dman=true,-Dman=false"
 PACKAGECONFIG[goa] = "-Dgoa=enabled,-Dgoa=disabled,gnome-online-accounts"
 PACKAGECONFIG[gtk] = "-Dgtk=enabled,-Dgtk=disabled,gtk+3"

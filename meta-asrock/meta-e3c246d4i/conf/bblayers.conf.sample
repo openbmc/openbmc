@@ -16,14 +16,3 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-asrock \
   ##OEROOT##/meta-asrock/meta-e3c246d4i \
   "
-BBLAYERS_NON_REMOVABLE ?= " \
-  ##OEROOT##/meta \
-  ##OEROOT##/meta-poky \
-  ##OEROOT##/meta-openembedded/meta-oe \
-  ##OEROOT##/meta-openembedded/meta-networking \
-  ##OEROOT##/meta-openembedded/meta-python \
-  ##OEROOT##/meta-phosphor \
-  ##OEROOT##/meta-aspeed \
-  ##OEROOT##/meta-asrock \
-  ##OEROOT##/meta-asrock/meta-e3c246d4i \
-  "

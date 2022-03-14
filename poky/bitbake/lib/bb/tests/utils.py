@@ -418,7 +418,7 @@ MULTILINE = "  stuff \\
                                ['MULTILINE'],
                                handle_var)
 
-        testvalue = re.sub('\s+', ' ', value_in_callback.strip())
+        testvalue = re.sub(r'\s+', ' ', value_in_callback.strip())
         self.assertEqual(expected_value, testvalue)
 
 class EditBbLayersConf(unittest.TestCase):

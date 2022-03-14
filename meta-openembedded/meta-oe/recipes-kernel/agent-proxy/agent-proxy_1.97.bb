@@ -10,7 +10,7 @@ EXTRA_OEMAKE = "'CC=${CC}'"
 
 SRCREV = "468fe4c31e6c62c9bbb328b06ba71eaf7be0b76a"
 
-SRC_URI = "git://git.kernel.org/pub/scm/utils/kernel/kgdb/agent-proxy.git;protocol=git \
+SRC_URI = "git://git.kernel.org/pub/scm/utils/kernel/kgdb/agent-proxy.git;protocol=git;branch=master \
            file://0001-Makefile-Add-LDFLAGS-variable.patch \
 "
 

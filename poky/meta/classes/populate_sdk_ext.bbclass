@@ -550,7 +550,7 @@ python copy_buildsystem () {
     # We don't need sstate do_package files
     for root, dirs, files in os.walk(sstate_out):
         for name in files:
-            if name.endswith("_package.tgz"):
+            if name.endswith("_package.tar.zst"):
                 f = os.path.join(root, name)
                 os.remove(f)
 
@@ -626,7 +626,7 @@ install_tools() {
 	for script in $scripts; do
 		for scriptfn in `find ${SDK_OUTPUT}/${SDKPATH}/${scriptrelpath} -maxdepth 1 -executable -name "$script"`; do
 			targetscriptfn="${SDK_OUTPUT}/${SDKPATHNATIVE}${bindir_nativesdk}/$(basename $scriptfn)"
-			test -e ${targetscriptfn} || lnr ${scriptfn} ${targetscriptfn}
+			test -e ${targetscriptfn} || ln -rs ${scriptfn} ${targetscriptfn}
 		done
 	done
 	# We can't use the same method as above because files in the sysroot won't exist at this point
@@ -634,7 +634,7 @@ install_tools() {
 	unfsd_path="${SDK_OUTPUT}/${SDKPATHNATIVE}${bindir_nativesdk}/unfsd"
 	if [ "${SDK_INCLUDE_TOOLCHAIN}" = "1" -a ! -e $unfsd_path ] ; then
 		binrelpath=${@os.path.relpath(d.getVar('STAGING_BINDIR_NATIVE'), d.getVar('TMPDIR'))}
-		lnr ${SDK_OUTPUT}/${SDKPATH}/tmp/$binrelpath/unfsd $unfsd_path
+		ln -rs ${SDK_OUTPUT}/${SDKPATH}/tmp/$binrelpath/unfsd $unfsd_path
 	fi
 	touch ${SDK_OUTPUT}/${SDKPATH}/.devtoolbase
 

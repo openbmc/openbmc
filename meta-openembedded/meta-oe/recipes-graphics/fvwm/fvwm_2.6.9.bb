@@ -32,7 +32,7 @@ DEPENDS = " \
 "
 
 SRC_URI = " \
-    git://github.com/fvwmorg/fvwm.git;protocol=https \
+    git://github.com/fvwmorg/fvwm.git;protocol=https;branch=master \
     file://0001-Fix-compilation-for-disabled-gnome.patch \
 "
 

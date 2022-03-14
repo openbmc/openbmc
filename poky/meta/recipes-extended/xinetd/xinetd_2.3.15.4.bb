@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=55c5fdf02cfcca3fc9621b6f2ceae10f"
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"
 
-SRC_URI = "git://github.com/openSUSE/xinetd.git;protocol=https \
+SRC_URI = "git://github.com/openSUSE/xinetd.git;protocol=https;branch=master \
            file://xinetd.init \
            file://xinetd.default \
            file://xinetd.service \

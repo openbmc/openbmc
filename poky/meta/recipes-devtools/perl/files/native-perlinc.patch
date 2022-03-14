@@ -1,4 +1,4 @@
-Upstream-Status:Inappropriate [embedded specific]
+Upstream-Status: Inappropriate [embedded specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 Index: perl-5.8.8/lib/ExtUtils/MM_Unix.pm

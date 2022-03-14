@@ -14,16 +14,18 @@ GIR_MESON_OPTION ?= 'introspection'
 GIR_MESON_ENABLE_FLAG ?= 'true'
 GIR_MESON_DISABLE_FLAG ?= 'false'
 
+# Define g-i options such that they can be disabled completely when GIR_MESON_OPTION is empty
+GIRMESONTARGET = "-D${GIR_MESON_OPTION}=${@bb.utils.contains('GI_DATA_ENABLED', 'True', '${GIR_MESON_ENABLE_FLAG}', '${GIR_MESON_DISABLE_FLAG}', d)} "
+GIRMESONBUILD = "-D${GIR_MESON_OPTION}=${GIR_MESON_DISABLE_FLAG} "
 # Auto enable/disable based on GI_DATA_ENABLED
 EXTRA_OECONF:prepend:class-target = "${@bb.utils.contains('GI_DATA_ENABLED', 'True', '--enable-introspection', '--disable-introspection', d)} "
-EXTRA_OEMESON:prepend:class-target = "-D${GIR_MESON_OPTION}=${@bb.utils.contains('GI_DATA_ENABLED', 'True', '${GIR_MESON_ENABLE_FLAG}', '${GIR_MESON_DISABLE_FLAG}', d)} "
-
+EXTRA_OEMESON:prepend:class-target = "${@['', '${GIRMESONTARGET}'][d.getVar('GIR_MESON_OPTION') != '']}"
 # When building native recipes, disable introspection, as it is not necessary,
 # pulls in additional dependencies, and makes build times longer
 EXTRA_OECONF:prepend:class-native = "--disable-introspection "
 EXTRA_OECONF:prepend:class-nativesdk = "--disable-introspection "
-EXTRA_OEMESON:prepend:class-native = "-D${GIR_MESON_OPTION}=${GIR_MESON_DISABLE_FLAG} "
-EXTRA_OEMESON:prepend:class-nativesdk = "-D${GIR_MESON_OPTION}=${GIR_MESON_DISABLE_FLAG} "
+EXTRA_OEMESON:prepend:class-native = "${@['', '${GIRMESONBUILD}'][d.getVar('GIR_MESON_OPTION') != '']}"
+EXTRA_OEMESON:prepend:class-nativesdk = "${@['', '${GIRMESONBUILD}'][d.getVar('GIR_MESON_OPTION') != '']}"
 
 # Generating introspection data depends on a combination of native and target
 # introspection tools, and qemu to run the target tools.

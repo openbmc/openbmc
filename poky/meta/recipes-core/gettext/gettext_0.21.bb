@@ -22,6 +22,7 @@ SRC_URI = "${GNU_MIRROR}/gettext/gettext-${PV}.tar.gz \
            file://0001-init-env.in-do-not-add-C-CXX-parameters.patch \
            file://mingw.patch \
            file://0001-msgmerge-29-Add-executable-file-mode-bits.patch \
+           file://0001-libtextstyle-fix-builds-with-automake-1.16.4-and-new.patch \
            "
 SRC_URI[sha256sum] = "c77d0da3102aec9c07f43671e60611ebff89a996ef159497ce8e59d075786b12"
 

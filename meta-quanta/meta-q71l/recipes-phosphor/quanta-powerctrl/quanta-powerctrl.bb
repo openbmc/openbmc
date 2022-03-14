@@ -22,7 +22,7 @@ SYSTEMD_SERVICE:${PN} = "host-gpio.service host-poweron.service host-poweroff.se
 
 do_install() {
     install -d ${D}/${bindir}
-    install -m 0755 ${S}init_once.sh ${D}/${bindir}/
-    install -m 0755 ${S}poweroff.sh ${D}/${bindir}/
-    install -m 0755 ${S}poweron.sh ${D}/${bindir}/
+    install -m 0755 ${S}/init_once.sh ${D}/${bindir}/
+    install -m 0755 ${S}/poweroff.sh ${D}/${bindir}/
+    install -m 0755 ${S}/poweron.sh ${D}/${bindir}/
 }

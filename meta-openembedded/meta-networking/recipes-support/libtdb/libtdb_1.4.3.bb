@@ -8,6 +8,7 @@ LIC_FILES_CHKSUM = "file://tools/tdbdump.c;endline=18;md5=b59cd45aa8624578126a8c
 
 SRC_URI = "https://samba.org/ftp/tdb/tdb-${PV}.tar.gz \
            file://tdb-Add-configure-options-for-packages.patch \
+           file://0001-Fix-pyext_PATTERN-for-cross-compilation.patch \
 "
 
 SRC_URI[md5sum] = "e638e8890f743624a754304b3f994f4d"
@@ -38,12 +39,6 @@ EXTRA_OECONF += "--disable-rpath \
                  --builtin-libraries=replace \
                  --with-libiconv=${STAGING_DIR_HOST}${prefix}\
                 "
-
-do_install:append() {
-     # add this link for cross check python module existence. eg: on x86-64 host, check python module
-     # under recipe-sysroot which is mips64.
-     cd ${D}${PYTHON_SITEPACKAGES_DIR}; ln -s tdb.*.so tdb.so
-}
 
 PACKAGES += "tdb-tools python3-tdb"
 

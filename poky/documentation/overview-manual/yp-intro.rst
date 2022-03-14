@@ -371,7 +371,7 @@ Yocto Project:
 
 -  *AutoBuilder:* AutoBuilder is a project that automates build tests
    and quality assurance (QA). By using the public AutoBuilder, anyone
-   can determine the status of the current "master" branch of Poky.
+   can determine the status of the current development branch of Poky.
 
    .. note::
 

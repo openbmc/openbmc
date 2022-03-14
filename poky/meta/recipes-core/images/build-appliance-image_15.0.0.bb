@@ -24,8 +24,8 @@ IMAGE_FSTYPES = "wic.vmdk wic.vhd wic.vhdx"
 
 inherit core-image setuptools3
 
-SRCREV ?= "98dcd17a5c6c3c6ac3f542b47e358c714f88af6a"
-SRC_URI = "git://git.yoctoproject.org/poky \
+SRCREV ?= "9f8e74668730e6eb3eb44df187a40d0a0f8c7b0a"
+SRC_URI = "git://git.yoctoproject.org/poky;branch=master \
            file://Yocto_Build_Appliance.vmx \
            file://Yocto_Build_Appliance.vmxf \
            file://README_VirtualBox_Guest_Additions.txt \
@@ -87,7 +87,7 @@ fakeroot do_populate_poky_src () {
 
 	# Load tap/tun at startup
 	rm -f ${IMAGE_ROOTFS}/sbin/iptables
-	lnr ${IMAGE_ROOTFS}/usr/sbin/iptables ${IMAGE_ROOTFS}/sbin/iptables
+	ln -rs ${IMAGE_ROOTFS}/usr/sbin/iptables ${IMAGE_ROOTFS}/sbin/iptables
 	echo "tun" >> ${IMAGE_ROOTFS}/etc/modules
 
 	# Use Clearlooks GTK+ theme
@@ -109,6 +109,8 @@ fakeroot do_populate_poky_src () {
 }
 
 IMAGE_PREPROCESS_COMMAND += "do_populate_poky_src; "
+# For pip usage above
+do_image[network] = "1"
 
 addtask rootfs after do_unpack
 

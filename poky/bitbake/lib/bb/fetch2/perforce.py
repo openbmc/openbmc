@@ -134,7 +134,7 @@ class Perforce(FetchMethod):
 
         ud.setup_revisions(d)
 
-        ud.localfile = d.expand('%s_%s_%s_%s.tar.gz' % (cleanedhost, cleanedpath, cleandedmodule, ud.revision))
+        ud.localfile = d.expand('%s_%s_%s_%s.tar.gz' % (cleanedhost, cleanedpath, cleanedmodule, ud.revision))
 
     def _buildp4command(self, ud, d, command, depot_filename=None):
         """

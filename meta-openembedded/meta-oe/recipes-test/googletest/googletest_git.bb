@@ -10,7 +10,7 @@ PROVIDES += "gmock gtest"
 
 S = "${WORKDIR}/git"
 SRCREV = "e2239ee6043f73722e7aa812a459f54a28552929"
-SRC_URI = "git://github.com/google/googletest.git"
+SRC_URI = "git://github.com/google/googletest.git;branch=main;protocol=https"
 
 inherit cmake
 

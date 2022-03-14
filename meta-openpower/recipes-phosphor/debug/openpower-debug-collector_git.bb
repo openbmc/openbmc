@@ -4,7 +4,7 @@ DESCRIPTION = "Application to log error during host checkstop and watchdog timeo
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-inherit meson \
+inherit pkgconfig meson \
         obmc-phosphor-systemd \
         python3native \
         phosphor-dbus-yaml
@@ -16,6 +16,7 @@ DEPENDS += " \
         phosphor-logging \
         ${PYTHON_PN}-sdbus++-native \
         cli11 \
+        ipl \
         "
 S = "${WORKDIR}/git"
 
@@ -24,7 +25,7 @@ S = "${WORKDIR}/git"
 APPS =  " \
         checkstop \
         watchdog \
-        ${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'phal', '', 'watchdog-timeout', d)} \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'phal', '', 'watchdog-timeout', d)} \
         "
 
 DEBUG_TMPL = "openpower-debug-collector-{0}@.service"
@@ -34,4 +35,4 @@ SYSTEMD_SERVICE:${PN} += "${@compose_list(d, 'DEBUG_TMPL', 'APPS')}"
 DEPENDS:remove:class-native = "phosphor-logging"
 
 # Do not depend on phosphor-logging for native SDK build
-DEPENDS:remove:class-nativesdk = "phosphor-logging"
+DEPENDS:remove:class-nativesdk = "phosphor-logging ipl"

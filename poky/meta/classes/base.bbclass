@@ -12,7 +12,7 @@ inherit logging
 
 OE_EXTRA_IMPORTS ?= ""
 
-OE_IMPORTS += "os sys time oe.path oe.utils oe.types oe.package oe.packagegroup oe.sstatesig oe.lsb oe.cachedpath oe.license ${OE_EXTRA_IMPORTS}"
+OE_IMPORTS += "os sys time oe.path oe.utils oe.types oe.package oe.packagegroup oe.sstatesig oe.lsb oe.cachedpath oe.license oe.qa oe.reproducible oe.rust ${OE_EXTRA_IMPORTS}"
 OE_IMPORTS[type] = "list"
 
 PACKAGECONFIG_CONFARGS ??= ""
@@ -150,17 +150,18 @@ do_fetch[dirs] = "${DL_DIR}"
 do_fetch[file-checksums] = "${@bb.fetch.get_checksum_file_list(d)}"
 do_fetch[file-checksums] += " ${@get_lic_checksum_file_list(d)}"
 do_fetch[vardeps] += "SRCREV"
+do_fetch[network] = "1"
 python base_do_fetch() {
 
     src_uri = (d.getVar('SRC_URI') or "").split()
-    if len(src_uri) == 0:
+    if not src_uri:
         return
 
     try:
         fetcher = bb.fetch2.Fetch(src_uri, d)
         fetcher.download()
     except bb.fetch2.BBFetchException as e:
-        bb.fatal(str(e))
+        bb.fatal("Bitbake Fetcher Error: " + repr(e))
 }
 
 addtask unpack after do_fetch
@@ -170,15 +171,53 @@ do_unpack[cleandirs] = "${@d.getVar('S') if os.path.normpath(d.getVar('S')) != o
 
 python base_do_unpack() {
     src_uri = (d.getVar('SRC_URI') or "").split()
-    if len(src_uri) == 0:
+    if not src_uri:
         return
 
     try:
         fetcher = bb.fetch2.Fetch(src_uri, d)
         fetcher.unpack(d.getVar('WORKDIR'))
     except bb.fetch2.BBFetchException as e:
-        bb.fatal(str(e))
+        bb.fatal("Bitbake Fetcher Error: " + repr(e))
 }
+
+SSTATETASKS += "do_deploy_source_date_epoch"
+
+do_deploy_source_date_epoch () {
+    mkdir -p ${SDE_DEPLOYDIR}
+    if [ -e ${SDE_FILE} ]; then
+        echo "Deploying SDE from ${SDE_FILE} -> ${SDE_DEPLOYDIR}."
+        cp -p ${SDE_FILE} ${SDE_DEPLOYDIR}/__source_date_epoch.txt
+    else
+        echo "${SDE_FILE} not found!"
+    fi
+}
+
+python do_deploy_source_date_epoch_setscene () {
+    sstate_setscene(d)
+    bb.utils.mkdirhier(d.getVar('SDE_DIR'))
+    sde_file = os.path.join(d.getVar('SDE_DEPLOYDIR'), '__source_date_epoch.txt')
+    if os.path.exists(sde_file):
+        target = d.getVar('SDE_FILE')
+        bb.debug(1, "Moving setscene SDE file %s -> %s" % (sde_file, target))
+        bb.utils.rename(sde_file, target)
+    else:
+        bb.debug(1, "%s not found!" % sde_file)
+}
+
+do_deploy_source_date_epoch[dirs] = "${SDE_DEPLOYDIR}"
+do_deploy_source_date_epoch[sstate-plaindirs] = "${SDE_DEPLOYDIR}"
+addtask do_deploy_source_date_epoch_setscene
+addtask do_deploy_source_date_epoch before do_configure after do_patch
+
+python create_source_date_epoch_stamp() {
+    source_date_epoch = oe.reproducible.get_source_date_epoch(d, d.getVar('S'))
+    oe.reproducible.epochfile_write(source_date_epoch, d.getVar('SDE_FILE'), d)
+}
+do_unpack[postfuncs] += "create_source_date_epoch_stamp"
+
+def get_source_date_epoch_value(d):
+    return oe.reproducible.epochfile_read(d.getVar('SDE_FILE'), d)
 
 def get_layers_branch_rev(d):
     layers = (d.getVar("BBLAYERS") or "").split()
@@ -627,6 +666,10 @@ python () {
         elif uri.scheme == "npm":
             d.appendVarFlag('do_fetch', 'depends', ' nodejs-native:do_populate_sysroot')
 
+        elif uri.scheme == "repo":
+            needsrcrev = True
+            d.appendVarFlag('do_fetch', 'depends', ' repo-native:do_populate_sysroot')
+
         # *.lz4 should DEPEND on lz4-native for unpacking
         if path.endswith('.lz4'):
             d.appendVarFlag('do_unpack', 'depends', ' lz4-native:do_populate_sysroot')
@@ -693,7 +736,7 @@ python () {
             if os.path.basename(p) == machine and os.path.isdir(p):
                 paths.append(p)
 
-        if len(paths) != 0:
+        if paths:
             for s in srcuri.split():
                 if not s.startswith("file://"):
                     continue
@@ -726,7 +769,7 @@ do_cleansstate[nostamp] = "1"
 
 python do_cleanall() {
     src_uri = (d.getVar('SRC_URI') or "").split()
-    if len(src_uri) == 0:
+    if not src_uri:
         return
 
     try:

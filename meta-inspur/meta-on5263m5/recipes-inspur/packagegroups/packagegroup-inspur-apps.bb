@@ -23,9 +23,7 @@ RPROVIDES:${PN}-system += "virtual-obmc-system-mgmt"
 
 SUMMARY:${PN}-chassis = "Inspur Chassis"
 RDEPENDS:${PN}-chassis = " \
-        obmc-control-chassis \
-        obmc-op-control-power \
-        obmc-host-failure-reboots \
+        x86-power-control \
         "
 
 SUMMARY:${PN}-fans = "Inspur Fans"
@@ -33,9 +31,7 @@ RDEPENDS:${PN}-fans = ""
 
 SUMMARY:${PN}-flash = "Inspur Flash"
 RDEPENDS:${PN}-flash = " \
-        obmc-flash-bmc \
-        obmc-mgr-download \
-        obmc-control-bmc \
+        phosphor-software-manager \
         "
 
 SUMMARY:${PN}-system = "Inspur System"

@@ -3,6 +3,7 @@ From: Dan Callaghan <dan.callaghan@opengear.com>
 Date: Fri, 5 Feb 2021 08:56:34 +1000
 Subject: [PATCH] enable LTO
 
+Upstream-Status: Pending
 ---
  Cargo.toml | 3 +++
  1 file changed, 3 insertions(+)

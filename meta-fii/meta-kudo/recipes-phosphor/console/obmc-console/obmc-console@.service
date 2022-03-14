@@ -6,7 +6,7 @@ StartLimitBurst=3
 StartLimitIntervalSec=300
 
 [Service]
-ExecStartPre=/usr/sbin/kudo_uart_mux_ctrl.sh %i
+ExecStartPre=/usr/libexec/obmc-console/kudo_uart_mux_ctrl.sh %i
 ExecStart=/usr/sbin/obmc-console-server --config /etc/obmc-console/server.%i.conf %i
 SyslogIdentifier=obmc-console-server
 Restart=always

@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# create temporary symlink to workaround missing oldfind
+ln -s /usr/bin/find /tmp/oldfind
+# make oldfind visible
+export PATH="/tmp:${PATH}"
+
+export built_programs="find xargs locate updatedb"
+
+# this gets substituted by sed during build
+export VERSION="__run_ptest_version__"
+
+# define missing functions for tests/init.sh
+fu_path_prepend_ () {
+	path_prepend_ $@
+}
+
+print_ver_ () {
+	:
+}
+
+skip_if_root_ () {
+	[ $(id -u) = 0 ] && exit 77;
+}
+
+require_root_ () {
+	[ $(id -u) = 0 ] || exit 77;
+}
+
+expensive_ () {
+	:
+}
+
+export -f fu_path_prepend_
+export -f print_ver_
+export -f skip_if_root_
+export -f require_root_
+export -f expensive_
+
+
+for f in tests/*/*.sh; do
+	bash $f ;
+	case $? in
+		0 )
+			echo -n "PASS";;
+		77 )
+			echo -n "SKIP";;
+		* )
+			echo -n "FAIL";;
+	esac
+	echo ": $f"
+done
+
+#remove symlink
+rm -f /tmp/oldfind
+
+echo

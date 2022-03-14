@@ -16,6 +16,7 @@ RDEPENDS:${PN} = " \
     gnome-calendar \
     gnome-font-viewer \
     gnome-photos \
+    gnome-screenshot \
     gnome-terminal \
     gthumb \
     libwnck3 \

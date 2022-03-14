@@ -15,7 +15,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=8ec30b01163d242ecf07d9cd84e3611f"
 
 DEPENDS = "libtspi tpm-tools"
 
-SRC_URI = "git://git.code.sf.net/p/tpmquotetools/tpm-quote-tools"
+SRC_URI = "git://git.code.sf.net/p/tpmquotetools/tpm-quote-tools;branch=master"
 SRCREV = "4511874d5c9b4504bb96e94f8a14bd6c39a36295"
 
 S = "${WORKDIR}/git"

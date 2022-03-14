@@ -22,19 +22,17 @@ SRCREV ?= "87d4632d36323091e731eb07b8aa65f90293da66"
 BINUTILS_GIT_URI ?= "git://sourceware.org/git/binutils-gdb.git;branch=${SRCBRANCH};protocol=git"
 SRC_URI = "\
      ${BINUTILS_GIT_URI} \
-     file://0004-configure-widen-the-regexp-for-SH-architectures.patch \
      file://0005-Point-scripts-location-to-libdir.patch \
      file://0006-Only-generate-an-RPATH-entry-if-LD_RUN_PATH-is-not-e.patch \
      file://0007-don-t-let-the-distro-compiler-point-to-the-wrong-ins.patch \
      file://0008-warn-for-uses-of-system-directories-when-cross-linki.patch \
-     file://0009-Change-default-emulation-for-mips64-linux.patch \
-     file://0010-Add-support-for-Netlogic-XLP.patch \
      file://0011-fix-the-incorrect-assembling-for-ppc-wait-mnemonic.patch \
-     file://0012-Detect-64-bit-MIPS-targets.patch \
      file://0013-Use-libtool-2.4.patch \
      file://0014-Fix-rpath-in-libtool-when-sysroot-is-enabled.patch \
      file://0015-sync-with-OE-libtool-changes.patch \
      file://0016-Check-for-clang-before-checking-gcc-version.patch \
      file://0017-bfd-Close-the-file-descriptor-if-there-is-no-archive.patch \
+     file://0001-elf-Discard-input-.note.gnu.build-id-sections.patch \
+     file://0001-CVE-2021-42574.patch \
 "
 S  = "${WORKDIR}/git"

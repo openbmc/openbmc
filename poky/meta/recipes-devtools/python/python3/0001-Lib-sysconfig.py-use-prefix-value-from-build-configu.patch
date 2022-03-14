@@ -1,0 +1,32 @@
+From 01d209277e145072e478d8b9acfea3638ee16cdc Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Fri, 10 Sep 2021 12:28:31 +0200
+Subject: [PATCH] Lib/sysconfig.py: use prefix value from build configuration
+ file
+
+This allows correctly substituting them for target installs using
+native python.
+
+Upstream-Status: Inappropriate [oe-core cross builds]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
+---
+ Lib/sysconfig.py | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
+index e64bcdc..40c6b3e 100644
+--- a/Lib/sysconfig.py
++++ b/Lib/sysconfig.py
+@@ -613,6 +613,11 @@ def get_config_vars(*args):
+             _init_non_posix(_CONFIG_VARS)
+         if os.name == 'posix':
+             _init_posix(_CONFIG_VARS)
++        _CONFIG_VARS['installed_base'] = _CONFIG_VARS['prefix']
++        _CONFIG_VARS['base'] = _CONFIG_VARS['prefix']
++        _CONFIG_VARS['installed_platbase'] = _CONFIG_VARS['prefix']
++        _CONFIG_VARS['platbase'] = _CONFIG_VARS['prefix']
++        _CONFIG_VARS['platlibdir'] = _CONFIG_VARS['PLATLIBDIR']
+         # For backward compatibility, see issue19555
+         SO = _CONFIG_VARS.get('EXT_SUFFIX')
+         if SO is not None:

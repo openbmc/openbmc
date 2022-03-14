@@ -1,7 +1,7 @@
-From 8a6e43726ad0ae41bd1cc2c248d91deb31459357 Mon Sep 17 00:00:00 2001
+From aae03b7e626d5f62ab929d51d11352a5a2ff6b2d Mon Sep 17 00:00:00 2001
 From: Lei Maohui <leimaohui@cn.fujitsu.com>
 Date: Tue, 9 Jun 2015 11:11:48 +0900
-Subject: [PATCH] packlib.c: support dictionary byte order dependent
+Subject: [PATCH 1/2] packlib.c: support dictionary byte order dependent
 
 The previous dict files are NOT byte-order independent, in fact they are
 probably ARCHITECTURE SPECIFIC.
@@ -9,7 +9,7 @@ Create the dict files in big endian, and convert to host endian while
 load them. This could fix the endian issue on multiple platform.
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://github.com/cracklib/cracklib/pull/41]
 
 We can't use the endian.h, htobe* and be*toh functions because they are
 not available on older versions of glibc, such as that found in RHEL
@@ -22,11 +22,11 @@ Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 
 Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
 ---
- lib/packlib.c | 214 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ lib/packlib.c | 214 +++++++++++++++++++++++++++++++++++++++++++++-
  1 file changed, 210 insertions(+), 4 deletions(-)
 
 diff --git a/lib/packlib.c b/lib/packlib.c
-index f851424..3aac805 100644
+index 8acb7be..a9d8750 100644
 --- a/lib/packlib.c
 +++ b/lib/packlib.c
 @@ -16,6 +16,12 @@
@@ -317,7 +317,7 @@ index f851424..3aac805 100644
 +	fwrite((char *) &tmpdatum, sizeof(tmpdatum), 1, pwp->ifp);
  
  	fputs(pwp->data_put[0], pwp->dfp);
- 	putc(0, pwp->dfp);
+ 	putc(0, (FILE*) pwp->dfp);
 @@ -464,6 +668,7 @@ GetPW(pwp, number)
             perror("(index fread failed)");
             return NULL;
@@ -335,5 +335,5 @@ index f851424..3aac805 100644
  
  	int r = 1;
 -- 
-1.8.4.2
+2.20.1
 

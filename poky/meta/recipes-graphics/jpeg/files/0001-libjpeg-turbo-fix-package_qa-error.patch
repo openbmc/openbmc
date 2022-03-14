@@ -7,7 +7,7 @@ Fix package qa errors like below:
 libjpeg.so.62.3.0 contains probably-redundant RPATH /usr/lib [useless-rpaths]
 usr/bin/cjpeg contains probably-redundant RPATH /usr/lib
 
-Upstream-Status: Inappropriate[oe-specific]
+Upstream-Status: Inappropriate [oe-specific]
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>

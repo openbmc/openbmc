@@ -27,9 +27,6 @@ ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 export PKG_CONFIG_FOR_BUILD = "${STAGING_BINDIR_NATIVE}/pkg-config-native"
 
 do_configure:prepend() {
-    # Do this because the configure script is running ./libtool directly
-    rm -f libtool
-    ln -s ${TARGET_PREFIX}libtool libtool
     #delete a file that will get confused with generated one in ${B}
     rm -f ${S}/gtk/gtktypefuncs.c
 

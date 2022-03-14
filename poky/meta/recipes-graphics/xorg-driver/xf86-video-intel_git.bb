@@ -9,13 +9,11 @@ Infrastructure (DRI)."
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=8730ad58d11c7bbad9a7066d69f7808e"
 
-SRCREV = "f66d39544bb8339130c96d282a80f87ca1606caf"
+SRCREV = "31486f40f8e8f8923ca0799aea84b58799754564"
 PV = "2.99.917+git${SRCPV}"
 S = "${WORKDIR}/git"
 
-SRC_URI = "git://anongit.freedesktop.org/xorg/driver/xf86-video-intel \
-           file://0001-Sync-i915_pciids-upto-8717c6b7414f.patch \
-           file://0001-i810-Avoid-duplicate-definition-of-I810PatternROP.patch \
+SRC_URI = "git://anongit.freedesktop.org/xorg/driver/xf86-video-intel;branch=master \
 "
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"

@@ -1,4 +1,8 @@
-configure.ac: add CROSSPYTHONPATH into PYTHONPATH for PYTHON_FOR_BUILD
+From baa3a232e64e9bf5ae945366efdb8088ccf9b828 Mon Sep 17 00:00:00 2001
+From: Ricardo Ribalda <ricardo@ribalda.com>
+Date: Tue, 18 Nov 2014 03:35:33 -0500
+Subject: [PATCH] configure.ac: add CROSSPYTHONPATH into PYTHONPATH for
+ PYTHON_FOR_BUILD
 
 When building x86->x86 the system will try to execute .so and related items
 from the default PYTHONPATH.  This will fail if the target CPU contains
@@ -10,11 +14,16 @@ Upstream-Status: Inappropriate [OE-Core integration specific]
 Credits-to: Mark Hatle <mark.hatle@windriver.com>
 Credits-to: Jackie Huang <jackie.huang@windriver.com>
 Signed-off-by: Ricardo Ribalda <ricardo@ribalda.com>
+
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 diff --git a/configure.ac b/configure.ac
-index 4ab19a6..7036a53 100644
+index d0db062..e5e3df8 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -76,7 +76,7 @@ if test "$cross_compiling" = yes; then
+@@ -83,7 +83,7 @@ if test "$cross_compiling" = yes; then
  	    AC_MSG_ERROR([python$PACKAGE_VERSION interpreter not found])
  	fi
          AC_MSG_RESULT($interp)

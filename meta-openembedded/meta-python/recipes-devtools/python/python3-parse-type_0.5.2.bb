@@ -19,6 +19,11 @@ RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
 "
 
+do_configure:prepend() {
+	sed -i -e "/python_version >= 3.0/d" ${S}/setup.py
+	sed -i -e "/use_2to3/d" ${S}/setup.py
+}
+
 do_install_ptest() {
 	install -d ${D}${PTEST_PATH}/tests
 	cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/

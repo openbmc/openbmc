@@ -8,10 +8,14 @@ for dir in /run/nftables /etc/nftables /usr/share/nftables; do
   done
   let i+=1
 done
-rc=0
-nft flush ruleset || rc=$?
+
+rules=""
+trap 'rm -f -- "$rules"' TERM INT EXIT ERR
+rules="$(mktemp)" || exit
+echo 'flush ruleset' >"$rules"
 for key in $(printf "%s\n" "${!basemap[@]}" | sort -r); do
-  echo "Executing ${basemap[$key]}" >&2
-  nft -f "${basemap[$key]}" || rc=$?
+  echo "Loading ${basemap[$key]}" >&2
+  echo '' >>"$rules"
+  cat "${basemap[$key]}" >>"$rules"
 done
-exit $rc
+nft -f "$rules" || exit

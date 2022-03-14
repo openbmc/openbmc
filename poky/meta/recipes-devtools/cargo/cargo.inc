@@ -29,6 +29,8 @@ do_cargo_setup_snapshot () {
 
 addtask cargo_setup_snapshot after do_unpack before do_configure
 do_cargo_setup_snapshot[dirs] += "${WORKDIR}/${CARGO_SNAPSHOT}"
+do_cargo_setup_snapshot[vardepsexclude] += "UNINATIVE_LOADER"
+
 
 do_compile:prepend () {
 	export RUSTC_BOOTSTRAP="1"

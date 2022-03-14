@@ -74,26 +74,26 @@ def createDaemon(function, logfile):
     with open('/dev/null', 'r') as si:
         os.dup2(si.fileno(), sys.stdin.fileno())
 
-    try:
-        so = open(logfile, 'a+')
-        os.dup2(so.fileno(), sys.stdout.fileno())
-        os.dup2(so.fileno(), sys.stderr.fileno())
-    except io.UnsupportedOperation:
-        sys.stdout = open(logfile, 'a+')
+    with open(logfile, 'a+') as so:
+        try:
+            os.dup2(so.fileno(), sys.stdout.fileno())
+            os.dup2(so.fileno(), sys.stderr.fileno())
+        except io.UnsupportedOperation:
+            sys.stdout = so
 
-    # Have stdout and stderr be the same so log output matches chronologically
-    # and there aren't two seperate buffers
-    sys.stderr = sys.stdout
+        # Have stdout and stderr be the same so log output matches chronologically
+        # and there aren't two seperate buffers
+        sys.stderr = sys.stdout
 
-    try:
-        function()
-    except Exception as e:
-        traceback.print_exc()
-    finally:
-        bb.event.print_ui_queue()
-        # os._exit() doesn't flush open files like os.exit() does. Manually flush
-        # stdout and stderr so that any logging output will be seen, particularly
-        # exception tracebacks.
-        sys.stdout.flush()
-        sys.stderr.flush()
-        os._exit(0)
+        try:
+            function()
+        except Exception as e:
+            traceback.print_exc()
+        finally:
+            bb.event.print_ui_queue()
+            # os._exit() doesn't flush open files like os.exit() does. Manually flush
+            # stdout and stderr so that any logging output will be seen, particularly
+            # exception tracebacks.
+            sys.stdout.flush()
+            sys.stderr.flush()
+            os._exit(0)

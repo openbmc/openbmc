@@ -17,15 +17,3 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-quanta \
   ##OEROOT##/meta-quanta/meta-f0b \
   "
-BBLAYERS_NON_REMOVABLE ?= " \
-  ##OEROOT##/meta \
-  ##OEROOT##/meta-openembedded/meta-oe \
-  ##OEROOT##/meta-openembedded/meta-networking \
-  ##OEROOT##/meta-openembedded/meta-perl \
-  ##OEROOT##/meta-openembedded/meta-python \
-  ##OEROOT##/meta-security \
-  ##OEROOT##/meta-phosphor \
-  ##OEROOT##/meta-aspeed \
-  ##OEROOT##/meta-quanta \
-  ##OEROOT##/meta-quanta/meta-f0b \
-  "

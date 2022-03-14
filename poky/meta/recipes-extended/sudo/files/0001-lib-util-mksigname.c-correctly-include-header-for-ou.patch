@@ -1,0 +1,25 @@
+From f993c5c88faacc43971899aae2168ffb3e34dc80 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Fri, 24 Sep 2021 13:36:24 +0200
+Subject: [PATCH] lib/util/mksigname.c: correctly include header for out of
+ tree builds
+
+Upstream-Status: Submitted [https://github.com/sudo-project/sudo/pull/123]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ lib/util/mksigname.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/util/mksigname.c b/lib/util/mksigname.c
+index de8b1ad..0a69e7e 100644
+--- a/lib/util/mksigname.c
++++ b/lib/util/mksigname.c
+@@ -36,7 +36,7 @@ main(int argc, char *argv[])
+ {
+     unsigned int i;
+ 
+-#include "mksigname.h"
++#include "lib/util/mksigname.h"
+ 
+     printf("const char *const sudo_sys_signame[] = {\n");
+     for (i = 0; i < nitems(sudo_sys_signame); i++) {

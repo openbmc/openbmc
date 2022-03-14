@@ -34,6 +34,7 @@ do_compile () {
 do_install:class-native() {
     mkdir -p ${D}/${datadir}/perl-cross/
     cp -rf ${S}/* ${D}/${datadir}/perl-cross/
+    rm -rf ${D}/${datadir}/perl-cross/patches/
 }
 
 BBCLASSEXTEND = "native"

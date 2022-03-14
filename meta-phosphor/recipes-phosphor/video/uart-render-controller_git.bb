@@ -1,7 +1,7 @@
 HOMEPAGE = "https://github.com/jk-ozlabs/uart-render-controller"
 LICENSE = "GPLv2+"
 
-SRC_URI += "git://github.com/jk-ozlabs/uart-render-controller;branch=master"
+SRC_URI += "git://github.com/jk-ozlabs/uart-render-controller;branch=master;protocol=https"
 SRC_URI += "file://uart-render-controller.service"
 
 PR = "r1"
@@ -16,7 +16,7 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += "systemd"
 RDEPENDS:${PN} += "fbterm"
 
-SRCREV = "26ac7f7bd6af52db63451d3633bcf1b167eea3d1"
+SRCREV = "08e854a6c425011d029e4e02241afee5060f15eb"
 PV = "0.1+git${SRCPV}"
 
 S = "${WORKDIR}/git"

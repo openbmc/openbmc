@@ -489,9 +489,10 @@ def OEOuthashBasic(path, sigfile, task, d):
     include_timestamps = False
     include_root = True
     if task == "package":
-        include_timestamps = d.getVar('BUILD_REPRODUCIBLE_BINARIES') == '1'
+        include_timestamps = True
         include_root = False
-    extra_content = d.getVar('HASHEQUIV_HASH_VERSION')
+    hash_version = d.getVar('HASHEQUIV_HASH_VERSION')
+    extra_sigdata = d.getVar("HASHEQUIV_EXTRA_SIGDATA")
 
     filemaps = {}
     for m in (d.getVar('SSTATE_HASHEQUIV_FILEMAP') or '').split():
@@ -506,8 +507,11 @@ def OEOuthashBasic(path, sigfile, task, d):
         basepath = os.path.normpath(path)
 
         update_hash("OEOuthashBasic\n")
-        if extra_content:
-            update_hash(extra_content + "\n")
+        if hash_version:
+            update_hash(hash_version + "\n")
+
+        if extra_sigdata:
+            update_hash(extra_sigdata + "\n")
 
         # It is only currently useful to get equivalent hashes for things that
         # can be restored from sstate. Since the sstate object is named using
@@ -552,21 +556,22 @@ def OEOuthashBasic(path, sigfile, task, d):
                 else:
                     add_perm(stat.S_IXUSR, 'x')
 
-                add_perm(stat.S_IRGRP, 'r')
-                add_perm(stat.S_IWGRP, 'w')
-                if stat.S_ISGID & s.st_mode:
-                    add_perm(stat.S_IXGRP, 's', 'S')
-                else:
-                    add_perm(stat.S_IXGRP, 'x')
-
-                add_perm(stat.S_IROTH, 'r')
-                add_perm(stat.S_IWOTH, 'w')
-                if stat.S_ISVTX & s.st_mode:
-                    update_hash('t')
-                else:
-                    add_perm(stat.S_IXOTH, 'x')
-
                 if include_owners:
+                    # Group/other permissions are only relevant in pseudo context
+                    add_perm(stat.S_IRGRP, 'r')
+                    add_perm(stat.S_IWGRP, 'w')
+                    if stat.S_ISGID & s.st_mode:
+                        add_perm(stat.S_IXGRP, 's', 'S')
+                    else:
+                        add_perm(stat.S_IXGRP, 'x')
+
+                    add_perm(stat.S_IROTH, 'r')
+                    add_perm(stat.S_IWOTH, 'w')
+                    if stat.S_ISVTX & s.st_mode:
+                        update_hash('t')
+                    else:
+                        add_perm(stat.S_IXOTH, 'x')
+
                     try:
                         update_hash(" %10s" % pwd.getpwuid(s.st_uid).pw_name)
                         update_hash(" %10s" % grp.getgrgid(s.st_gid).gr_name)

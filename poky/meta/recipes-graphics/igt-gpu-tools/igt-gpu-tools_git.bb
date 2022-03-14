@@ -12,7 +12,9 @@ inherit meson pkgconfig
 SRCREV = "203def046b466fb2da67f9f15552d84e1c0b41f2"
 PV = "1.26"
 
-SRC_URI = "git://gitlab.freedesktop.org/drm/igt-gpu-tools.git;protocol=https"
+SRC_URI = "git://gitlab.freedesktop.org/drm/igt-gpu-tools.git;protocol=https;branch=master \
+           file://0001-lib-meson.build-fix-meson-0.60-compatibility.patch \
+           "
 
 S = "${WORKDIR}/git"
 

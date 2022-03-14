@@ -11,7 +11,7 @@ DEPENDS:append:libc-musl = " libexecinfo"
 
 SRCREV = "de37569c926c5886768f892c019e3f0468615038"
 SRC_URI = " \
-    git://github.com/linuxaudio/a2jmidid;protocol=https \
+    git://github.com/linuxaudio/a2jmidid;protocol=https;branch=master \
     file://riscv_ucontext.patch \
 "
 

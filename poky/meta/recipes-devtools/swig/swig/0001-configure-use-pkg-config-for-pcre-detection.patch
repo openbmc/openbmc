@@ -4,7 +4,7 @@ Date: Tue, 17 Jun 2014 08:18:17 +0200
 Subject: [PATCH] configure: use pkg-config for pcre detection
 
 Signed-off-by: Koen Kooi <koen.kooi@linaro.org>
-Upstream-Status: pending
+Upstream-Status: Pending
 ---
  configure.ac | 38 +++++++-------------------------------
  1 file changed, 7 insertions(+), 31 deletions(-)

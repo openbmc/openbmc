@@ -1,9 +1,0 @@
-[Unit]
-Description=Control UART mux for obmc-console-client
-
-[Service]
-ExecStart=/usr/bin/env stardragon4800-rep2-console-client.sh
-SyslogIdentifier=stardragon4800-rep2-console-client.sh
-
-[Install]
-WantedBy=multi-user.target

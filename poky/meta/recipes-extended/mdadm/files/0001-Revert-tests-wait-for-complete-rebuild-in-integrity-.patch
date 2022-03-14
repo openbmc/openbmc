@@ -10,7 +10,7 @@ use the previous logic "check wait" which also used
 commonly by other tests such as tests/02r5grow, tests/07revert-grow
 and etc.
 
-Upstream-Status: Submitted[https://marc.info/?l=linux-raid&m=156317157314030&w=2]
+Upstream-Status: Submitted [https://marc.info/?l=linux-raid&m=156317157314030&w=2]
 
 Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
 ---

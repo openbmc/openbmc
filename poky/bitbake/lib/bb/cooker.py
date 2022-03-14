@@ -388,12 +388,22 @@ class BBCooker:
             # Create a new hash server bound to a unix domain socket
             if not self.hashserv:
                 dbfile = (self.data.getVar("PERSISTENT_DIR") or self.data.getVar("CACHE")) + "/hashserv.db"
+                upstream = self.data.getVar("BB_HASHSERVE_UPSTREAM") or None
+                if upstream:
+                    import socket
+                    try:
+                        sock = socket.create_connection(upstream.split(":"), 5)
+                        sock.close()
+                    except socket.error as e:
+                        bb.warn("BB_HASHSERVE_UPSTREAM is not valid, unable to connect hash equivalence server at '%s': %s" 
+                                 % (upstream, repr(e)))
+
                 self.hashservaddr = "unix://%s/hashserve.sock" % self.data.getVar("TOPDIR")
                 self.hashserv = hashserv.create_server(
                     self.hashservaddr,
                     dbfile,
                     sync=False,
-                    upstream=self.data.getVar("BB_HASHSERVE_UPSTREAM") or None,
+                    upstream=upstream,
                 )
                 self.hashserv.serve_as_process()
             self.data.setVar("BB_HASHSERVE", self.hashservaddr)
@@ -804,7 +814,9 @@ class BBCooker:
             for dep in rq.rqdata.runtaskentries[tid].depends:
                 (depmc, depfn, _, deptaskfn) = bb.runqueue.split_tid_mcfn(dep)
                 deppn = self.recipecaches[depmc].pkg_fn[deptaskfn]
-                depend_tree["tdepends"][dotname].append("%s.%s" % (deppn, bb.runqueue.taskname_from_tid(dep)))
+                if depmc:
+                    depmc = "mc:" + depmc + ":"
+                depend_tree["tdepends"][dotname].append("%s%s.%s" % (depmc, deppn, bb.runqueue.taskname_from_tid(dep)))
             if taskfn not in seen_fns:
                 seen_fns.append(taskfn)
                 packages = []
@@ -1656,7 +1668,7 @@ class BBCooker:
         # Return a copy, don't modify the original
         pkgs_to_build = pkgs_to_build[:]
 
-        if len(pkgs_to_build) == 0:
+        if not pkgs_to_build:
             raise NothingToBuild
 
         ignore = (self.data.getVar("ASSUME_PROVIDED") or "").split()
@@ -1795,10 +1807,10 @@ class CookerCollectFiles(object):
         files.sort( key=lambda fileitem: self.calc_bbfile_priority(fileitem)[0] )
         config.setVar("BBFILES_PRIORITIZED", " ".join(files))
 
-        if not len(files):
+        if not files:
             files = self.get_bbfiles()
 
-        if not len(files):
+        if not files:
             collectlog.error("no recipe files to build, check your BBPATH and BBFILES?")
             bb.event.fire(CookerExit(), eventdata)
 
@@ -2208,20 +2220,32 @@ class CookerParser(object):
             yield not cached, mc, infos
 
     def parse_generator(self):
-        while True:
+        empty = False
+        while self.processes or not empty:
+            for process in self.processes.copy():
+                if not process.is_alive():
+                    process.join()
+                    self.processes.remove(process)
+
             if self.parsed >= self.toparse:
                 break
 
             try:
                 result = self.result_queue.get(timeout=0.25)
             except queue.Empty:
+                empty = True
                 pass
             else:
+                empty = False
                 value = result[1]
                 if isinstance(value, BaseException):
                     raise value
                 else:
                     yield result
+
+        if not (self.parsed >= self.toparse):
+            raise bb.parse.ParseError("Not all recipes parsed, parser thread killed/died? Exiting.", None)
+
 
     def parse_next(self):
         result = []

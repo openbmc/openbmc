@@ -1,16 +1,19 @@
-From ceb4111af317ecc54d97bb21878dcccbfdb2983e Mon Sep 17 00:00:00 2001
+From e0df1f07d1707d5daf0358cc60b30f06121f7e60 Mon Sep 17 00:00:00 2001
 From: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
 Date: Fri, 25 Dec 2020 11:41:43 +0900
 Subject: [PATCH] don't fail if GLOB_BRACE is not defined
 
 Signed-off-by: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
+
 ---
  src/util.c | 6 ++++++
  1 file changed, 6 insertions(+)
 
+diff --git a/src/util.c b/src/util.c
+index a4c0dba..fd4542d 100644
 --- a/src/util.c
 +++ b/src/util.c
-@@ -24,6 +24,12 @@
+@@ -25,6 +25,12 @@
  #include "util.h"
  #include "netplan.h"
  

@@ -9,6 +9,7 @@ inherit features_check gnomebase gsettings gtk-icon-cache gettext
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
+SRC_URI += " file://0001-meson.build-address-meson-0.61-failures.patch"
 SRC_URI[archive.sha256sum] = "b9f4bca5d0352718e07b7385fb195a9bbc8fd686b7959b74137854d52aab9c58"
 
 # We don't not have ubuntu's appindicator (yet?)

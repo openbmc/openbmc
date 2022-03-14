@@ -12,7 +12,9 @@ inherit meson gobject-introspection gtk-doc features_check systemd
 
 REQUIRED_DISTRO_FEATURES = "polkit"
 
-SRC_URI = "https://www.freedesktop.org/software/${BPN}/${BPN}-${PV}.tar.xz"
+SRC_URI = "https://www.freedesktop.org/software/${BPN}/${BPN}-${PV}.tar.xz \
+           file://0001-Fix-build-with-meson-0.60.patch \
+           "
 SRC_URI:append:libc-musl = " \
     file://0001-musl-Hack-to-fix-build.patch \
     file://0002-musl-add-missing-fgetspent_r.patch \

@@ -51,9 +51,8 @@ EXTRA_OECMAKE:append = " -DCURRENT_VENDOR=debian -DWITH_DOC=False \
     -DWITH_TESTS=False \
 "
 
-do_configure:prepend () {
-    echo "set( CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH )" >>  ${WORKDIR}/toolchain.cmake
-
+do_configure:prepend() {
+	echo "set( CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH )" >>  ${WORKDIR}/toolchain.cmake
 }
 
 # Unfortunately apt hardcodes this all over the place
@@ -61,7 +60,7 @@ FILES:${PN} += "${prefix}/lib/dpkg ${prefix}/lib/apt"
 RDEPENDS:${PN} += "bash perl dpkg"
 
 customize_apt_conf_sample() {
-    cat > ${D}${sysconfdir}/apt/apt.conf.sample << EOF
+	cat > ${D}${sysconfdir}/apt/apt.conf.sample << EOF
 Dir "${STAGING_DIR_NATIVE}/"
 {
    State "var/lib/apt/"
@@ -114,22 +113,25 @@ EOF
 }
 
 do_install:append:class-native() {
-    customize_apt_conf_sample
+	customize_apt_conf_sample
 }
 
 do_install:append:class-nativesdk() {
-    customize_apt_conf_sample
+	customize_apt_conf_sample
 }
-
 
 do_install:append:class-target() {
-    #Write the correct apt-architecture to apt.conf
-    APT_CONF=${D}/etc/apt/apt.conf
-    echo 'APT::Architecture "${DPKG_ARCH}";' > ${APT_CONF}
+	# Write the correct apt-architecture to apt.conf
+	APT_CONF=${D}${sysconfdir}/apt/apt.conf
+	echo 'APT::Architecture "${DPKG_ARCH}";' > ${APT_CONF}
+
+	# Remove /var/log/apt. /var/log is normally a link to /var/volatile/log
+	# and /var/volatile is a tmpfs mount. So anything created in /var/log
+	# will not be available when the tmpfs is mounted.
+	rm -rf ${D}${localstatedir}/log
 }
 
-# Avoid non-reproducible -src package
-do_install:append () {
-        sed -i -e "s,${B},,g" \
-            ${B}/apt-pkg/tagfile-keys.cc
+do_install:append() {
+	# Avoid non-reproducible -src package
+	sed -i -e "s,${B},,g" ${B}/apt-pkg/tagfile-keys.cc
 }

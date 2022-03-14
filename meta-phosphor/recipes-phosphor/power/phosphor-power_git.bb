@@ -19,6 +19,7 @@ POWER_SERVICE_PACKAGES = " \
     ${PN}-psu-monitor \
     ${PN}-regulators \
     ${PN}-sequencer \
+    ${PN}-control \
 "
 POWER_UTIL_PACKAGES = "${PN}-utils"
 
@@ -54,11 +55,13 @@ REGS_SVC = "phosphor-regulators.service"
 REGS_CONF_SVC = "phosphor-regulators-config.service"
 REGS_MON_ENA_SVC = "phosphor-regulators-monitor-enable.service"
 REGS_MON_DIS_SVC = "phosphor-regulators-monitor-disable.service"
+POWER_CONTROL_SVC = "phosphor-power-control.service"
 
 SYSTEMD_SERVICE:${PN}-sequencer = "${SEQ_MONITOR_SVC} ${SEQ_PGOOD_SVC}"
 SYSTEMD_SERVICE:${PN}-monitor = "${@bb.utils.contains('PACKAGECONFIG', 'monitor', '${PSU_MONITOR_TMPL}', '', d)}"
 SYSTEMD_SERVICE:${PN}-psu-monitor = "${PSU_MONITOR_SVC}"
 SYSTEMD_SERVICE:${PN}-regulators = "${REGS_SVC} ${REGS_CONF_SVC} ${REGS_MON_ENA_SVC} ${REGS_MON_DIS_SVC}"
+SYSTEMD_SERVICE:${PN}-control = "${POWER_CONTROL_SVC}"
 
 
 # TODO: cold-redundancy is not installed in the repo yet
@@ -69,4 +72,5 @@ FILES:${PN}-psu-monitor = "${bindir}/phosphor-psu-monitor ${datadir}/phosphor-ps
 FILES:${PN}-regulators = "${bindir}/phosphor-regulators ${datadir}/phosphor-regulators"
 FILES:${PN}-regulators += "${bindir}/regsctl"
 FILES:${PN}-sequencer = "${bindir}/pseq-monitor"
+FILES:${PN}-control = "${bindir}/phosphor-power-control ${datadir}/phosphor-power-sequencer"
 FILES:${PN}-utils = "${bindir}/psutils"

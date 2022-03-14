@@ -1,4 +1,4 @@
-From db6551741a3654d8e75aff93ea00fbff579f7b02 Mon Sep 17 00:00:00 2001
+From cef23a651ea200e30e1e6ed2a2564505e3a42d46 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 14:18:21 +0800
 Subject: [PATCH] src/basic/missing.h: check for missing strndupa
@@ -73,7 +73,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  51 files changed, 62 insertions(+)
 
 diff --git a/meson.build b/meson.build
-index 1aa20b8246..aafee71eb4 100644
+index 3421da3a4d..ddef6fba91 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -480,6 +480,7 @@ foreach ident : ['secure_getenv', '__secure_getenv']
@@ -109,7 +109,7 @@ index 1ff6160dc8..c9efd862a2 100644
  static int cg_enumerate_items(const char *controller, const char *path, FILE **_f, const char *item) {
          _cleanup_free_ char *fs = NULL;
 diff --git a/src/basic/env-util.c b/src/basic/env-util.c
-index 81b1e3f10e..8fedcfd1cd 100644
+index 1ca445dab4..1f5a212d4e 100644
 --- a/src/basic/env-util.c
 +++ b/src/basic/env-util.c
 @@ -18,6 +18,7 @@
@@ -165,7 +165,7 @@ index f91f8f7a08..fb31596216 100644
  int mkdir_safe_internal(
                  const char *path,
 diff --git a/src/basic/mountpoint-util.c b/src/basic/mountpoint-util.c
-index 8c836a1b74..2eb7e5a634 100644
+index 7e57d9a226..c0e64f2aca 100644
 --- a/src/basic/mountpoint-util.c
 +++ b/src/basic/mountpoint-util.c
 @@ -11,6 +11,7 @@
@@ -273,7 +273,7 @@ index 84c3caf3a5..0fa84eaa38 100644
  BUS_DEFINE_PROPERTY_GET(bus_property_get_tasks_max, "t", TasksMax, tasks_max_resolve);
  
 diff --git a/src/core/dbus-execute.c b/src/core/dbus-execute.c
-index 50daef6702..1cc6d91e64 100644
+index 902e074bd2..ac15b944e6 100644
 --- a/src/core/dbus-execute.c
 +++ b/src/core/dbus-execute.c
 @@ -42,6 +42,7 @@
@@ -297,7 +297,7 @@ index ca9b399d8c..b864480a8c 100644
  int bus_property_get_triggered_unit(
                  sd_bus *bus,
 diff --git a/src/core/execute.c b/src/core/execute.c
-index 2a337b55a2..2a64675c5f 100644
+index 2f2de4d9cf..515b2fe748 100644
 --- a/src/core/execute.c
 +++ b/src/core/execute.c
 @@ -98,6 +98,7 @@
@@ -321,7 +321,7 @@ index a56f12f47f..6b8729ef67 100644
  #if HAVE_KMOD
  #include "module-util.h"
 diff --git a/src/core/service.c b/src/core/service.c
-index cb0a528f0d..740d305710 100644
+index 7b90822f68..4af076eeba 100644
 --- a/src/core/service.c
 +++ b/src/core/service.c
 @@ -41,6 +41,7 @@
@@ -357,7 +357,7 @@ index ae1d43756a..24de98c9f3 100644
  #define PRIV_KEY_FILE CERTIFICATE_ROOT "/private/journal-remote.pem"
  #define CERT_FILE     CERTIFICATE_ROOT "/certs/journal-remote.pem"
 diff --git a/src/journal/journalctl.c b/src/journal/journalctl.c
-index c8fb726d42..858a425d12 100644
+index 3eac97510d..db6913bc7a 100644
 --- a/src/journal/journalctl.c
 +++ b/src/journal/journalctl.c
 @@ -72,6 +72,7 @@
@@ -393,7 +393,7 @@ index bfd42aea7d..daefc56e3e 100644
  static int node_vtable_get_userdata(
                  sd_bus *bus,
 diff --git a/src/libsystemd/sd-bus/bus-socket.c b/src/libsystemd/sd-bus/bus-socket.c
-index 378774fe8b..2694c177d5 100644
+index 09eb49c37f..82f1b3d1be 100644
 --- a/src/libsystemd/sd-bus/bus-socket.c
 +++ b/src/libsystemd/sd-bus/bus-socket.c
 @@ -27,6 +27,7 @@
@@ -405,7 +405,7 @@ index 378774fe8b..2694c177d5 100644
  #define SNDBUF_SIZE (8*1024*1024)
  
 diff --git a/src/libsystemd/sd-bus/sd-bus.c b/src/libsystemd/sd-bus/sd-bus.c
-index a32e2f5e20..97fd3aec82 100644
+index ab8d4e4a60..7e35fbe9e6 100644
 --- a/src/libsystemd/sd-bus/sd-bus.c
 +++ b/src/libsystemd/sd-bus/sd-bus.c
 @@ -42,6 +42,7 @@
@@ -429,7 +429,7 @@ index 13c08fe295..9aae83486e 100644
  #define MAX_SIZE (2*1024*1024)
  
 diff --git a/src/libsystemd/sd-journal/sd-journal.c b/src/libsystemd/sd-journal/sd-journal.c
-index 5728c537bc..94885b0bf6 100644
+index b3240177cb..7e3ae2d24f 100644
 --- a/src/libsystemd/sd-journal/sd-journal.c
 +++ b/src/libsystemd/sd-journal/sd-journal.c
 @@ -40,6 +40,7 @@
@@ -669,7 +669,7 @@ index 65c40de4c8..4ef9a0c6c8 100644
  _printf_(2,3)
  static void path_prepend(char **path, const char *fmt, ...) {
 diff --git a/src/udev/udev-event.c b/src/udev/udev-event.c
-index b28089be71..a7e2232299 100644
+index 9854270b27..71b5fab1e7 100644
 --- a/src/udev/udev-event.c
 +++ b/src/udev/udev-event.c
 @@ -34,6 +34,7 @@

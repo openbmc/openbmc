@@ -1,0 +1,24 @@
+From b9a19aa4bdb21751c04c0e3ba8a9e2e35a10c953 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Mon, 25 Oct 2021 18:18:15 +0200
+Subject: [PATCH] lib/meson.build: fix meson 0.60 compatibility
+
+Upstream-Status: Backport [https://gitlab.freedesktop.org/drm/igt-gpu-tools/-/commit/963917a3565466832a3b2fc22e9285d34a0bf944]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ lib/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/meson.build b/lib/meson.build
+index 9929520e..1a525587 100644
+--- a/lib/meson.build
++++ b/lib/meson.build
+@@ -152,7 +152,7 @@ lib_version = vcs_tag(input : 'version.h.in', output : 'version.h',
+ 
+ lib_intermediates = []
+ foreach f: lib_sources
+-    name = f.underscorify(f)
++    name = f.underscorify()
+     lib = static_library('igt-' + name,
+ 	[ f, lib_version ],
+ 	include_directories: inc,

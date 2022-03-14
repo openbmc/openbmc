@@ -1,4 +1,4 @@
-From 41448708e163c8ec1f980464e7dd6741db427c8a Mon Sep 17 00:00:00 2001
+From 8bea84a598b51a7ac7e50aa8f0f20857a9b6b07b Mon Sep 17 00:00:00 2001
 From: Josep Puigdemont <josep.puigdemont@enea.com>
 Date: Sun, 4 May 2014 16:02:07 +0200
 Subject: [PATCH] Add install-ptest rules.
@@ -13,12 +13,12 @@ Upstream-Status: Pending
  2 files changed, 16 insertions(+)
 
 diff --git a/Makefile.am b/Makefile.am
-index ecc03df..9fbbda5 100644
+index 25e200d..03d5ef0 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -55,3 +55,8 @@ ChangeLog:
-                 awk -f $(top_srcdir)/git2chg.awk                            \
-                     -v append=$(top_srcdir)/$(prev_change_log) > ChangeLog; \
+@@ -64,3 +64,8 @@ ChangeLog:
+             mv ChangeLog.tmp ChangeLog;                                     \
+           rm -f ChangeLog.tmp;                                              \
          fi
 +
 +install-ptest:
@@ -26,12 +26,12 @@ index ecc03df..9fbbda5 100644
 +		$(MAKE) -C $$subdir DESTDIR=$(DESTDIR)/$$subdir $@; \
 +	done
 diff --git a/tests/Makefile.am b/tests/Makefile.am
-index dbe17dd..06f537f 100644
+index 337cbed..92ec3be 100644
 --- a/tests/Makefile.am
 +++ b/tests/Makefile.am
-@@ -169,3 +169,14 @@ EXTRA_DIST += \
-   gdbmtool/base.exp\
-   config/default.exp
+@@ -139,3 +139,14 @@ d_creat_ce_LDADD = ../src/libgdbm.la ../compat/libgdbm_compat.la
+ 
+ SUBDIRS = gdbmtool
  
 +buildtests: $(check_PROGRAMS) $(TESTSUITE)
 +

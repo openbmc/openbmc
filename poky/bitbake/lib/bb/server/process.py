@@ -326,10 +326,10 @@ class ProcessServer():
                         if e.errno != errno.ENOENT:
                             raise
 
-                msg = "Delaying shutdown due to active processes which appear to be holding bitbake.lock"
+                msg = ["Delaying shutdown due to active processes which appear to be holding bitbake.lock"]
                 if procs:
-                    msg += ":\n%s" % str(procs.decode("utf-8"))
-                serverlog(msg)
+                    msg.append(":\n%s" % str(procs.decode("utf-8")))
+                serverlog("".join(msg))
 
     def idle_commands(self, delay, fds=None):
         nextsleep = delay

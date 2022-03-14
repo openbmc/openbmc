@@ -74,7 +74,7 @@ RDEPENDS:packagegroup-meta-multimedia = "\
     tinyalsa \
     tremor \
     webrtc-audio-processing \
-    ${@bb.utils.contains_any("TRANSLATED_TARGET_ARCH", "i586 x86-64", "x265", "", d)} \
+    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", bb.utils.contains_any("TRANSLATED_TARGET_ARCH", "i586 i686 x86-64", "x265", "", d), "", d)} \
 "
 RDEPENDS:packagegroup-meta-multimedia:remove:libc-musl = "projucer"
 RDEPENDS:packagegroup-meta-multimedia:remove:powerpc64le = "openh264"

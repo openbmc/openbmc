@@ -73,13 +73,13 @@ class BBUIEventQueue:
 
         self.eventQueueLock.acquire()
 
-        if len(self.eventQueue) == 0:
+        if not self.eventQueue:
             self.eventQueueLock.release()
             return None
 
         item = self.eventQueue.pop(0)
 
-        if len(self.eventQueue) == 0:
+        if not self.eventQueue:
             self.eventQueueNotify.clear()
 
         self.eventQueueLock.release()

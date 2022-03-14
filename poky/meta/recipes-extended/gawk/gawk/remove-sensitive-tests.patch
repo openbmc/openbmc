@@ -1,0 +1,24 @@
+These tests require an unloaded host as otherwise timing sensitive tests can fail
+https://bugzilla.yoctoproject.org/show_bug.cgi?id=14371
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+--- a/test/Maketests~
++++ b/test/Maketests
+@@ -2069,7 +2069,2 @@
+
+-timeout:
+-	@echo $@ $(ZOS_FAIL)
+-	@AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+-
+ typedregex1:
+@@ -2297,7 +2292,2 @@
+ 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+-
+-time:
+-	@echo $@
+-	@AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+

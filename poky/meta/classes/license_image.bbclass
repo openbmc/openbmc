@@ -75,7 +75,7 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
                 pkg_dic[pkg]["LICENSES"] = re.sub(r'  *', ' ', pkg_dic[pkg]["LICENSES"])
                 pkg_dic[pkg]["LICENSES"] = pkg_dic[pkg]["LICENSES"].split()
                 if pkg in whitelist:
-                    bb.warn("Including %s with an incompatible license %s into the image, because it has been whitelisted." %(pkg, pkg_dic[pkg]["LICENSE"]))
+                    oe.qa.handle_error('license-incompatible', "Including %s with an incompatible license %s into the image, because it has been whitelisted." %(pkg, pkg_dic[pkg]["LICENSE"]), d)
 
             if not "IMAGE_MANIFEST" in pkg_dic[pkg]:
                 # Rootfs manifest
@@ -105,10 +105,10 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
                    continue
 
                 if not os.path.exists(lic_file):
-                   bb.warn("The license listed %s was not in the "\ 
-                            "licenses collected for recipe %s" 
-                            % (lic, pkg_dic[pkg]["PN"]))
-
+                    oe.qa.handle_error('license-file-missing',
+                                       "The license listed %s was not in the "\
+                                       "licenses collected for recipe %s"
+                                       % (lic, pkg_dic[pkg]["PN"]), d)
     # Two options here:
     # - Just copy the manifest
     # - Copy the manifest and the license directories
@@ -274,6 +274,7 @@ do_rootfs[recrdeptask] += "do_populate_lic"
 
 python do_populate_lic_deploy() {
     license_deployed_manifest(d)
+    oe.qa.exit_if_errors(d)
 }
 
 addtask populate_lic_deploy before do_build after do_image_complete

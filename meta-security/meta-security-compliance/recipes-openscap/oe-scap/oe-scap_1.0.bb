@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://README.md;md5=46dec9f167b6e05986cb4023df6d92f4"
 LICENSE = "MIT"
 
 SRCREV = "7147871d7f37d408c0dd7720ef0fd3ec1b54ad98"
-SRC_URI = "git://github.com/akuster/oe-scap.git"
+SRC_URI = "git://github.com/akuster/oe-scap.git;branch=master;protocol=https"
 SRC_URI += " \
             file://run_cve.sh \
             file://run_test.sh \

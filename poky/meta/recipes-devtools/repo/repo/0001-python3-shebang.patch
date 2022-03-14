@@ -1,0 +1,26 @@
+From b8e84b202cd302a7c99288d3835dc9c63071f8f2 Mon Sep 17 00:00:00 2001
+From: Jasper Orschulko <Jasper.Orschulko@iris-sensing.com>
+Date: Tue, 14 Sep 2021 16:46:51 +0200
+Subject: [PATCH] python3 shebang
+
+Yocto does not symlink from python to python3, thus change the shebang from
+python to python3.
+
+Upstream-Status: Inappropriate [configuration]
+Signed-off-by: Jasper Orschulko <Jasper.Orschulko@iris-sensing.com>
+---
+ repo | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/repo b/repo
+index b13e34c..205e0e5 100755
+--- a/repo
++++ b/repo
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # -*- coding:utf-8 -*-
+ #
+ # Copyright (C) 2008 The Android Open Source Project
+--
+2.33.0

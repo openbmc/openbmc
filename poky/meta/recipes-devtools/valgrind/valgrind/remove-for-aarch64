@@ -32,8 +32,8 @@ drd/tests/annotate_trace_memory
 drd/tests/annotate_trace_memory_xml
 drd/tests/atomic_var
 drd/tests/bar_bad
-drd/tests/bar_bad_xml
 drd/tests/bar_trivial
+drd/tests/boost_thread
 drd/tests/bug-235681
 drd/tests/bug322621
 drd/tests/circular_buffer
@@ -66,7 +66,6 @@ drd/tests/pth_barrier2
 drd/tests/pth_barrier3
 drd/tests/pth_barrier_race
 drd/tests/pth_barrier_reinit
-drd/tests/pth_barrier_thr_cr
 drd/tests/pth_broadcast
 drd/tests/pth_cancel_locked
 drd/tests/pth_cleanup_handler
@@ -109,7 +108,6 @@ drd/tests/tc05_simple_race
 drd/tests/tc06_two_races
 drd/tests/tc07_hbl1
 drd/tests/tc08_hbl2
-drd/tests/tc09_bad_unlock
 drd/tests/tc10_rec_lock
 drd/tests/tc11_XCHG
 drd/tests/tc12_rwl_trivial
@@ -174,7 +172,6 @@ helgrind/tests/tc21_pthonce
 helgrind/tests/tc22_exit_w_lock
 helgrind/tests/tc23_bogus_condwait
 helgrind/tests/tc24_nonzero_sem
-helgrind/tests/tls_threads
 memcheck/tests/accounting
 memcheck/tests/addressable
 memcheck/tests/arm64-linux/scalar
@@ -194,13 +191,11 @@ memcheck/tests/dw4
 memcheck/tests/err_disable4
 memcheck/tests/err_disable_arange1
 memcheck/tests/leak-autofreepool-5
-memcheck/tests/leak_cpp_interior
 memcheck/tests/linux/lsframe1
 memcheck/tests/linux/lsframe2
 memcheck/tests/linux/with-space
 memcheck/tests/origin5-bz2
 memcheck/tests/origin6-fp
-memcheck/tests/overlap
 memcheck/tests/partial_load_dflt
 memcheck/tests/pdb-realloc2
 memcheck/tests/sh-mem
@@ -208,7 +203,6 @@ memcheck/tests/sh-mem-random
 memcheck/tests/sigaltstack
 memcheck/tests/sigkill
 memcheck/tests/signal2
-memcheck/tests/supp_unknown
 memcheck/tests/threadname
 memcheck/tests/threadname_xml
 memcheck/tests/unit_oset
@@ -236,5 +230,4 @@ memcheck/tests/wrapmallocstatic
 memcheck/tests/writev1
 memcheck/tests/xml1
 memcheck/tests/linux/stack_changes
-gdbserver_tests/hginfo
 memcheck/tests/linux/timerfd-syscall

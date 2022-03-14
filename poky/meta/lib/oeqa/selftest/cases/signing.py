@@ -159,13 +159,13 @@ class Signing(OESelftestTestCase):
             bitbake('-c clean %s' % test_recipe)
             bitbake('-c populate_lic %s' % test_recipe)
 
-            recipe_sig = glob.glob(sstatedir + '/*/*/*:ed:*_populate_lic.tgz.sig')
-            recipe_tgz = glob.glob(sstatedir + '/*/*/*:ed:*_populate_lic.tgz')
+            recipe_sig = glob.glob(sstatedir + '/*/*/*:ed:*_populate_lic.tar.zst.sig')
+            recipe_archive = glob.glob(sstatedir + '/*/*/*:ed:*_populate_lic.tar.zst')
 
             self.assertEqual(len(recipe_sig), 1, 'Failed to find .sig file.')
-            self.assertEqual(len(recipe_tgz), 1, 'Failed to find .tgz file.')
+            self.assertEqual(len(recipe_archive), 1, 'Failed to find .tar.zst file.')
 
-            ret = runCmd('gpg --homedir %s --verify %s %s' % (self.gpg_dir, recipe_sig[0], recipe_tgz[0]))
+            ret = runCmd('gpg --homedir %s --verify %s %s' % (self.gpg_dir, recipe_sig[0], recipe_archive[0]))
             # gpg: Signature made Thu 22 Oct 2015 01:45:09 PM EEST using RSA key ID 61EEFB30
             # gpg: Good signature from "testuser (nocomment) <testuser@email.com>"
             self.assertIn('gpg: Good signature from', ret.output, 'Package signed incorrectly.')

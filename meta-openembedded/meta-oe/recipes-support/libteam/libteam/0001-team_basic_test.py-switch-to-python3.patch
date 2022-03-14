@@ -1,0 +1,101 @@
+From 06050e79655f0fa7d9daeda1fbd3a9a2c7736841 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Thu, 2 Dec 2021 15:08:25 +0800
+Subject: [PATCH] team_basic_test.py: switch to python3
+
+Switch the script team_basic_test.py to python3
+
+Upstream-Status: Submitted [https://github.com/jpirko/libteam/pull/63]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ scripts/team_basic_test.py | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/scripts/team_basic_test.py b/scripts/team_basic_test.py
+index faabd18..0b64af2 100755
+--- a/scripts/team_basic_test.py
++++ b/scripts/team_basic_test.py
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#! /usr/bin/env python3
+ """
+ Basic test.
+ 
+@@ -32,11 +32,11 @@ def usage():
+     """
+     Print usage of this app
+     """
+-    print "Usage: team_basic_test.py [OPTION...]"
+-    print ""
+-    print "  -h, --help                         print this message"
+-    print "  -c, --loop-count=NUMBER            number of loops (default 1)"
+-    print "  -p, --port=NETDEV                  port device (can be defined multiple times)"
++    print("Usage: team_basic_test.py [OPTION...]")
++    print("")
++    print("  -h, --help                         print this message")
++    print("  -c, --loop-count=NUMBER            number of loops (default 1)")
++    print("  -p, --port=NETDEV                  port device (can be defined multiple times)")
+     sys.exit()
+ 
+ class CmdExecFailedException(Exception):
+@@ -55,15 +55,15 @@ class CmdExecUnexpectedOutputException(Exception):
+         return "Command execution output unexpected: \"%s\" != \"%s\"" % (self.__output, self.__expected_output)
+ 
+ def print_output(out_type, string):
+-    print("%s:\n"
++    print(("%s:\n"
+           "----------------------------\n"
+           "%s"
+-          "----------------------------" % (out_type, string))
++          "----------------------------" % (out_type, string)))
+ 
+ def cmd_exec(cmd, expected_output=None, cleaner=False):
+     cmd = cmd.rstrip(" ")
+     if not cleaner:
+-        print("# \"%s\"" % cmd)
++        print(("# \"%s\"" % cmd))
+     subp = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+     (data_stdout, data_stderr) = subp.communicate()
+@@ -74,7 +74,7 @@ def cmd_exec(cmd, expected_output=None, cleaner=False):
+         if data_stderr:
+             print_output("Stderr", data_stderr)
+         raise CmdExecFailedException(subp.returncode)
+-    output = data_stdout.rstrip()
++    output = (data_stdout.rstrip()).decode()
+     if expected_output:
+         if output != expected_output:
+             raise CmdExecUnexpectedOutputException(output, expected_output)
+@@ -166,7 +166,7 @@ TEAM_PORT_CONFIG='{"prio": 10}'
+             os.removedirs("/tmp/team_test/")
+ 
+     def _run_one_loop(self, run_nr):
+-        print "RUN #%d" % (run_nr)
++        print("RUN #%d" % (run_nr))
+         self._created_teams = []
+         try:
+             for mode_name in self._team_modes:
+@@ -176,7 +176,7 @@ TEAM_PORT_CONFIG='{"prio": 10}'
+             cmd_exec("modprobe -r team_mode_loadbalance team_mode_roundrobin team_mode_activebackup team_mode_broadcast team");
+ 
+     def run(self):
+-        for i in xrange(self._loop_count):
++        for i in range(self._loop_count):
+             self._run_one_loop(i + 1)
+ 
+ def main():
+@@ -186,8 +186,8 @@ def main():
+             "hc:p:",
+             ["help", "loop-count=", "port="]
+         )
+-    except getopt.GetoptError, err:
+-        print str(err)
++    except getopt.GetoptError as err:
++        print(str(err))
+         usage()
+ 
+     btest = TeamBasicTest()
+-- 
+2.17.1
+

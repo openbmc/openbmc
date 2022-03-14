@@ -6,7 +6,7 @@ SECTION = "graphics"
 
 S = "${WORKDIR}/git"
 SRCREV = "ed16b3e69985feaf565efbecea70a1cc2fca2a58"
-SRC_URI = "git://github.com/KhronosGroup/SPIRV-Cross.git \
+SRC_URI = "git://github.com/KhronosGroup/SPIRV-Cross.git;branch=master;protocol=https \
 	file://0001-Add-install-PHONY-target-in-Makefile.patch \
 "
 

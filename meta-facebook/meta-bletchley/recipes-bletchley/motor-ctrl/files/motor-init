@@ -1,0 +1,148 @@
+#!/bin/bash -e
+
+# Initialize for step motor of sled:
+#   Enable pwm and setup pwm duty
+#   Setup gpio pins for step motor control
+#   Moving step motor back to initial position
+
+export PATH=$PATH:/usr/libexec
+
+PWM_CLASS_PATH="/sys/class/pwm/pwmchip0"
+#Sleld 1~6 using bmc pwm8~13 as motor driver stick
+PWM_NUM_OFFSET=7
+PWM_PERIOD=2500000 #400HZ
+PWM_DUTY=250000    #PWM_PERIOD X 10%
+CALIBRATE_TIMEOUT=120
+
+#Enable pwm for sledN
+function open_pwm() {
+    local SLED_NUM="$1"
+    echo "Open pwm of sled$SLED_NUM"
+    PWM_NUM=$(( SLED_NUM + PWM_NUM_OFFSET ))
+    PWM_PATH="${PWM_CLASS_PATH}/pwm${PWM_NUM}"
+    if [ ! -d "$PWM_PATH" ];then
+        echo "$PWM_NUM" > "${PWM_CLASS_PATH}/export"
+    fi
+    if [ -d "$PWM_PATH" ];then
+        echo "set pwm period to $PWM_PERIOD ns"
+        if ! echo "$PWM_PERIOD" > "${PWM_PATH}/period"; then
+            echo "Error: set pwm period fail"
+            return 1
+        fi
+
+        if ! echo 1 > "${PWM_PATH}/enable"; then
+            echo "Error: set pwm enable fail"
+            return 1
+        fi
+
+        if ! echo "$PWM_DUTY" > "${PWM_PATH}/duty_cycle"; then
+            echo "Error: set pwm duty_cycle fail"
+            return 1
+        fi
+    else
+        echo "Error: ${PWM_PATH} not exist, export pwm${PWM_NUM} fail"
+        return 1
+    fi
+}
+
+function set_gpio()
+{
+    NET_NAME=$1
+    OUT_VAL=$2
+    mapfile -t -d " " GPIO_INFO < <(gpiofind "$NET_NAME")
+    if [ "${#GPIO_INFO[@]}" -ne 2 ]; then
+        echo "set_gpio: can not find gpio, $NET_NAME"
+        return 1
+    fi
+    echo -n "set_gpio: set $NET_NAME = $OUT_VAL"
+    if ! gpioset "${GPIO_INFO[0]}" "${GPIO_INFO[1]%$'\n'}"="$OUT_VAL"; then
+        echo " failed"
+        return 1
+    fi
+    echo " success"
+    return 0
+}
+
+function get_gpio()
+{
+    NET_NAME=$1
+    RET_VAL=2
+
+    mapfile -t -d " " GPIO_INFO < <(gpiofind "$NET_NAME")
+    if [ "${#GPIO_INFO[@]}" -ne 2 ]; then
+        echo "get_gpio: can not find gpio, $NET_NAME" >&2
+        return 1
+    fi
+    if ! RET_VAL=$(gpioget "${GPIO_INFO[0]}" "${GPIO_INFO[1]%$'\n'}") ; then
+        echo "get_gpio: get ${NET_NAME} failed" >&2
+        return 1
+    fi
+    echo "${RET_VAL}"
+    return 0
+}
+
+#Init gpio pins for step motor control
+function init_gpios() {
+    echo "Init GPIOs:"
+    motor_ctrl_gpio_pins_names=(    "SLED${1}_MD_STBY_RESET"
+                                    "SLED${1}_MD_IOEXP_EN_FAULT"
+                                    "SLED${1}_MD_DIR"
+                                    "SLED${1}_MD_DECAY"
+                                    "SLED${1}_MD_MODE1"
+                                    "SLED${1}_MD_MODE2"
+                                    "SLED${1}_MD_MODE3" )
+
+    for  gpio_name in "${motor_ctrl_gpio_pins_names[@]}"; do
+        set_gpio "$gpio_name"   0
+    done
+}
+
+if [[ "$1" =~ ^(sled[1-6]{1})$ ]]; then
+  SLED=$1
+  SLED_NUM=${SLED:4}
+else
+  #show_usage
+  echo "invalid sled name: ${1}"
+  exit 1;
+fi
+
+#Check if sled is present
+SLED_PRESENT=$(get_gpio "presence-sled${SLED_NUM}")
+if [ "$SLED_PRESENT" != 0 ];then
+    echo "${SLED} is not present, skip motor initialize"
+    exit 1
+fi
+
+#Init gpios
+init_gpios "$SLED_NUM"
+
+#enable pwm
+open_pwm "$SLED_NUM"
+
+#SLED{N}_MS_DETECT1  (initial position)
+DETECT_PIN1="SLED${SLED_NUM}_MS_DETECT1"
+INIT_POS=$(get_gpio "$DETECT_PIN1")
+
+if [ "$INIT_POS" -eq 1 ];then
+    time_count=0
+    echo "Making motor back to initial position..."
+    motor-ctrl "$SLED" r >/dev/null
+    while  [ "$INIT_POS" -eq 1 ]  ;do
+        INIT_POS=$(get_gpio "$DETECT_PIN1")
+        sleep 0.1
+        time_count=$(( time_count + 1 ))
+        if [  $time_count -gt $CALIBRATE_TIMEOUT ];then
+            echo "Error: Step motor run over 1 cycle but switch never triggered"
+            break
+        fi
+    done
+    motor-ctrl "$SLED" s >/dev/null
+fi
+
+if [ "$INIT_POS" -eq 0 ];then
+    echo "Motor calibrated to initial position."
+    exit 0
+else
+    echo "Find motor initial position failed"
+    exit 1
+fi

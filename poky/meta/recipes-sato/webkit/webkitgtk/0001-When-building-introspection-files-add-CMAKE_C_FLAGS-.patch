@@ -7,7 +7,7 @@ Subject: [PATCH] When building introspection files, add CMAKE_C_FLAGS to the
 g-ir-compiler is using a C compiler internally, so it needs to set
 the proper flags for it.
 
-Upstream-Status: Pending [review on oe-core list]
+Upstream-Status: Submitted [https://bugs.webkit.org/show_bug.cgi?id=232936]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 ---

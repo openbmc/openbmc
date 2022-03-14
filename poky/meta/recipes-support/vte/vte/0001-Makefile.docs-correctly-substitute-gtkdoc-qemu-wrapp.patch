@@ -1,0 +1,24 @@
+From daa30d0039397a735d49ea535305ed0bc5f9d73b Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 26 Oct 2021 09:38:42 +0200
+Subject: [PATCH] Makefile.docs: correctly substitute gtkdoc qemu wrapper
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ doc/reference/Makefile.docs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/doc/reference/Makefile.docs b/doc/reference/Makefile.docs
+index b18f0a4..da18440 100644
+--- a/doc/reference/Makefile.docs
++++ b/doc/reference/Makefile.docs
+@@ -233,7 +233,7 @@ INSTALL_DATA = $(INSTALL) -m 644
+ 
+ GTKDOC_CC = $(CC) $(INCLUDES) $(GTKDOC_DEPS_CFLAGS) $(CPPFLAGS) $(CFLAGS)
+ GTKDOC_LD = $(CC) $(GTKDOC_DEPS_LIBS) $(CFLAGS) $(LDFLAGS)
+-GTKDOC_RUN =
++GTKDOC_RUN = $(top_builddir)/gtkdoc-qemuwrapper
+ 
+ GTKDOC_CHECK_PATH = gtkdoc-check
+ GTKDOC_REBASE = gtkdoc-rebase

@@ -8,7 +8,7 @@ inherit xfce-app features_check
 REQUIRED_DISTRO_FEATURES = "polkit"
 
 SRC_URI = " \
-    git://github.com/ncopa/${BPN}.git \
+    git://github.com/ncopa/${BPN}.git;branch=master;protocol=https \
 "
 SRCREV = "6d3282cc1734c305850d48f5bf4b4d94e88885e9"
 S = "${WORKDIR}/git"

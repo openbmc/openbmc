@@ -6,3 +6,6 @@ PACKAGECONFIG:remove:gbmc = "timesyncd"
 
 # We don't need any legacy sysv rc compatability
 PACKAGECONFIG:remove:gbmc = "sysvinit"
+
+# We don't enable kernel modules
+PACKAGECONFIG:remove:gbmc = "kmod"

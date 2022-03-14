@@ -6,7 +6,7 @@ Subject: [PATCH] serializer.py: make .gz files reproducible
 .gz format contains mtime of the compressed data, and
 SOURCE_DATE_EPOCH is the standard way to make it reproducuble.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/piglit/-/merge_requests/610]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
  tests/serializer.py | 5 ++++-

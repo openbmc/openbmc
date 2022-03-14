@@ -1,4 +1,4 @@
-From f9c4ad3a171d676e3818b8f6897f325ccf0b2203 Mon Sep 17 00:00:00 2001
+From 6ec375eaafc43a2b3c30a0e0e49447d231d81a67 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 9 May 2017 00:57:10 -0700
 
@@ -7,10 +7,10 @@ Date: Tue, 9 May 2017 00:57:10 -0700
  1 file changed, 2 insertions(+)
 
 diff --git a/Makefile.am b/Makefile.am
-index 8166d91..8e05e49 100644
+index 8568dd2..5efc91e 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -2,6 +2,8 @@
+@@ -3,6 +3,8 @@ ACLOCAL_AMFLAGS = -I acinclude
  
  lib_LTLIBRARIES = libSDL2_ttf.la
  

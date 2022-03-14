@@ -14,7 +14,7 @@ option, --yocto-ptest, the valgrind regression test output is unchanged.
 Enforce 30 seconds limit for the test.
 This resume execution of the remaining tests when valgrind hangs.
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [oe-core specific]
 
 Signed-off-by: Dave Lerner <dave.lerner@windriver.com>
 Signed-off-by: Tudor Florea <tudor.florea@enea.com>

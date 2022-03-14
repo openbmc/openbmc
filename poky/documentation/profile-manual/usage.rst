@@ -105,18 +105,18 @@ can be used in a very similar way to the whole host of supported BusyBox
 applets in Yocto. ::
 
    root@crownbay:~# rm linux-2.6.19.2.tar.bz2; \
-                    wget http://downloads.yoctoproject.org/mirror/sources/linux-2.6.19.2.tar.bz2
+                    wget &YOCTO_DL_URL;/mirror/sources/linux-2.6.19.2.tar.bz2
 
 The quickest and easiest way to get some basic overall data about what's
 going on for a particular workload is to profile it using 'perf stat'.
 'perf stat' basically profiles using a few default counters and displays
 the summed counts at the end of the run::
 
-   root@crownbay:~# perf stat wget http://downloads.yoctoproject.org/mirror/sources/linux-2.6.19.2.tar.bz2
+   root@crownbay:~# perf stat wget &YOCTO_DL_URL;/mirror/sources/linux-2.6.19.2.tar.bz2
    Connecting to downloads.yoctoproject.org (140.211.169.59:80)
    linux-2.6.19.2.tar.b 100% |***************************************************| 41727k  0:00:00 ETA
 
-   Performance counter stats for 'wget http://downloads.yoctoproject.org/mirror/sources/linux-2.6.19.2.tar.bz2':
+   Performance counter stats for 'wget &YOCTO_DL_URL;/mirror/sources/linux-2.6.19.2.tar.bz2':
 
          4597.223902 task-clock                #    0.077 CPUs utilized
                23568 context-switches          #    0.005 M/sec
@@ -141,11 +141,11 @@ by 'perf stat'. For example, suppose we wanted to see a summary of all
 the events related to kernel memory allocation/freeing along with cache
 hits and misses::
 
-   root@crownbay:~# perf stat -e kmem:* -e cache-references -e cache-misses wget http://downloads.yoctoproject.org/mirror/sources/linux-2.6.19.2.tar.bz2
+   root@crownbay:~# perf stat -e kmem:* -e cache-references -e cache-misses wget &YOCTO_DL_URL;/mirror/sources/linux-2.6.19.2.tar.bz2
    Connecting to downloads.yoctoproject.org (140.211.169.59:80)
    linux-2.6.19.2.tar.b 100% |***************************************************| 41727k  0:00:00 ETA
 
-   Performance counter stats for 'wget http://downloads.yoctoproject.org/mirror/sources/linux-2.6.19.2.tar.bz2':
+   Performance counter stats for 'wget &YOCTO_DL_URL;/mirror/sources/linux-2.6.19.2.tar.bz2':
 
                 5566 kmem:kmalloc
               125517 kmem:kmem_cache_alloc
@@ -181,7 +181,7 @@ executed in a new shell). perf collects samples until the process exits
 and records them in a file named 'perf.data' in the current working
 directory. ::
 
-   root@crownbay:~# perf record wget http://downloads.yoctoproject.org/mirror/sources/linux-2.6.19.2.tar.bz2
+   root@crownbay:~# perf record wget &YOCTO_DL_URL;/mirror/sources/linux-2.6.19.2.tar.bz2
 
    Connecting to downloads.yoctoproject.org (140.211.169.59:80)
    linux-2.6.19.2.tar.b 100% |************************************************| 41727k  0:00:00 ETA
@@ -219,7 +219,7 @@ between the new profile and the previous one is that we'll add the -g
 option, which will record not just the address of a sampled function,
 but the entire callchain to the sampled function as well::
 
-   root@crownbay:~# perf record -g wget http://downloads.yoctoproject.org/mirror/sources/linux-2.6.19.2.tar.bz2
+   root@crownbay:~# perf record -g wget &YOCTO_DL_URL;/mirror/sources/linux-2.6.19.2.tar.bz2
    Connecting to downloads.yoctoproject.org (140.211.169.59:80)
    linux-2.6.19.2.tar.b 100% |************************************************| 41727k  0:00:00 ETA
    [ perf record: Woken up 3 times to write data ]
@@ -527,8 +527,8 @@ workload, so let's choose the most likely subsystems (identified by the
 string before the colon in the Tracepoint events) and do a 'perf stat'
 run using only those wildcarded subsystems::
 
-   root@crownbay:~# perf stat -e skb:* -e net:* -e napi:* -e sched:* -e workqueue:* -e irq:* -e syscalls:* wget http://downloads.yoctoproject.org/mirror/sources/linux-2.6.19.2.tar.bz2
-   Performance counter stats for 'wget http://downloads.yoctoproject.org/mirror/sources/linux-2.6.19.2.tar.bz2':
+   root@crownbay:~# perf stat -e skb:* -e net:* -e napi:* -e sched:* -e workqueue:* -e irq:* -e syscalls:* wget &YOCTO_DL_URL;/mirror/sources/linux-2.6.19.2.tar.bz2
+   Performance counter stats for 'wget &YOCTO_DL_URL;/mirror/sources/linux-2.6.19.2.tar.bz2':
 
                23323 skb:kfree_skb
                    0 skb:consume_skb
@@ -589,7 +589,7 @@ run using only those wildcarded subsystems::
 Let's pick one of these tracepoints
 and tell perf to do a profile using it as the sampling event::
 
-   root@crownbay:~# perf record -g -e sched:sched_wakeup wget http://downloads.yoctoproject.org/mirror/sources/linux-2.6.19.2.tar.bz2
+   root@crownbay:~# perf record -g -e sched:sched_wakeup wget &YOCTO_DL_URL;/mirror/sources/linux-2.6.19.2.tar.bz2
 
 .. image:: figures/sched-wakeup-profile.png
    :align: center
@@ -648,7 +648,7 @@ applicable to our workload::
 
    root@crownbay:~# perf record -g -e skb:* -e net:* -e napi:* -e sched:sched_switch -e sched:sched_wakeup -e irq:*
     -e syscalls:sys_enter_read -e syscalls:sys_exit_read -e syscalls:sys_enter_write -e syscalls:sys_exit_write
-    wget http://downloads.yoctoproject.org/mirror/sources/linux-2.6.19.2.tar.bz2
+    wget &YOCTO_DL_URL;/mirror/sources/linux-2.6.19.2.tar.bz2
 
 We can look at the raw trace output using 'perf script' with no
 arguments::
@@ -885,7 +885,7 @@ To demonstrate this, open up one window and start the profile using the
 
 In another window, run the wget test::
 
-   root@crownbay:~# wget http://downloads.yoctoproject.org/mirror/sources/linux-2.6.19.2.tar.bz2
+   root@crownbay:~# wget &YOCTO_DL_URL;/mirror/sources/linux-2.6.19.2.tar.bz2
    Connecting to downloads.yoctoproject.org (140.211.169.59:80)
    linux-2.6.19.2.tar.b 100% \|*******************************\| 41727k 0:00:00 ETA
 
@@ -2138,7 +2138,7 @@ For LTTng userspace tracing, you need to have a properly instrumented
 userspace program. For this example, we'll use the 'hello' test program
 generated by the lttng-ust build.
 
-The 'hello' test program isn't installed on the rootfs by the lttng-ust
+The 'hello' test program isn't installed on the root filesystem by the lttng-ust
 build, so we need to copy it over manually. First cd into the build
 directory that contains the hello executable::
 
@@ -2251,7 +2251,7 @@ of the block device you want to trace activity on::
 
 In another shell, execute a workload you want to trace. ::
 
-   root@crownbay:/media/sdc# rm linux-2.6.19.2.tar.bz2; wget http://downloads.yoctoproject.org/mirror/sources/linux-2.6.19.2.tar.bz2; sync
+   root@crownbay:/media/sdc# rm linux-2.6.19.2.tar.bz2; wget &YOCTO_DL_URL;/mirror/sources/linux-2.6.19.2.tar.bz2; sync
    Connecting to downloads.yoctoproject.org (140.211.169.59:80)
    linux-2.6.19.2.tar.b 100% \|*******************************\| 41727k 0:00:00 ETA
 
@@ -2420,7 +2420,7 @@ On the target system, you should see this::
 
 In another shell, execute a workload you want to trace. ::
 
-   root@crownbay:/media/sdc# rm linux-2.6.19.2.tar.bz2; wget http://downloads.yoctoproject.org/mirror/sources/linux-2.6.19.2.tar.bz2; sync
+   root@crownbay:/media/sdc# rm linux-2.6.19.2.tar.bz2; wget &YOCTO_DL_URL;/mirror/sources/linux-2.6.19.2.tar.bz2; sync
    Connecting to downloads.yoctoproject.org (140.211.169.59:80)
    linux-2.6.19.2.tar.b 100% \|*******************************\| 41727k 0:00:00 ETA
 

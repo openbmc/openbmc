@@ -1,4 +1,4 @@
-From ba7202700578d435b07cfdfb7b57e83185752800 Mon Sep 17 00:00:00 2001
+From 6a23d52c905cd1f6a5944255903ec86ea8b904bb Mon Sep 17 00:00:00 2001
 From: Andrei Gherzan <andrei@gherzan.ro>
 Date: Mon, 28 Jan 2019 15:57:54 +0000
 Subject: [PATCH] _tkinter module needs tk module along with tcl. tk is not yet
@@ -15,10 +15,10 @@ Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/setup.py b/setup.py
-index ab18ff0..7691258 100644
+index 11b5cf5..2be4738 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -1706,8 +1706,8 @@ class PyBuildExt(build_ext):
+@@ -1895,8 +1895,8 @@ class PyBuildExt(build_ext):
          self.detect_decimal()
          self.detect_ctypes()
          self.detect_multiprocessing()

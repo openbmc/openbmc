@@ -1,0 +1,11 @@
+--- a/qa/src/GNUlocaldefs
++++ b/qa/src/GNUlocaldefs
+@@ -728,7 +728,7 @@ scale.o:	localconfig.h
+ 779246.o:	libpcp.h
+ aggrstore.o:	libpcp.h
+ badmmv.o:	libpcp.h
+-chkacc1.o:	libpcp.h
++chkacc1.o:	libpcp.h localconfig.h
+ chkacc2.o:	libpcp.h
+ chkacc3.o:	libpcp.h
+ chkacc4.o:	libpcp.h

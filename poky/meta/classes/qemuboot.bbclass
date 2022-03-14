@@ -36,6 +36,8 @@
 #         in system mode, where system is experiencing entropy starvation
 #
 # QB_KERNEL_ROOT: kernel's root, e.g., /dev/vda
+#                 By default "/dev/vda rw" gets passed to the kernel.
+#                 To mount the rootfs read-only QB_KERNEL_ROOT can be set to e.g. "/dev/vda ro".
 #
 # QB_NETWORK_DEVICE: network device, e.g., "-device virtio-net-pci,netdev=net0,mac=@MAC@",
 #                    it needs work with QB_TAP_OPT and QB_SLIRP_OPT.
@@ -91,7 +93,7 @@ QB_RNG ?= "-object rng-random,filename=/dev/urandom,id=rng0 -device virtio-rng-p
 QB_OPT_APPEND ?= ""
 QB_NETWORK_DEVICE ?= "-device virtio-net-pci,netdev=net0,mac=@MAC@"
 QB_CMDLINE_IP_SLIRP ?= "ip=dhcp"
-QB_CMDLINE_IP_TAP ?= "ip=192.168.7.@CLIENT@::192.168.7.@GATEWAY@:255.255.255.0"
+QB_CMDLINE_IP_TAP ?= "ip=192.168.7.@CLIENT@::192.168.7.@GATEWAY@:255.255.255.0::eth0:off:8.8.8.8"
 QB_ROOTFS_EXTRA_OPT ?= ""
 QB_GRAPHICS ?= ""
 
@@ -116,7 +118,10 @@ python do_write_qemuboot_conf() {
     import configparser
 
     qemuboot = "%s/%s.qemuboot.conf" % (d.getVar('IMGDEPLOYDIR'), d.getVar('IMAGE_NAME'))
-    qemuboot_link = "%s/%s.qemuboot.conf" % (d.getVar('IMGDEPLOYDIR'), d.getVar('IMAGE_LINK_NAME'))
+    if d.getVar('IMAGE_LINK_NAME'):
+        qemuboot_link = "%s/%s.qemuboot.conf" % (d.getVar('IMGDEPLOYDIR'), d.getVar('IMAGE_LINK_NAME'))
+    else:
+        qemuboot_link = ""
     finalpath = d.getVar("DEPLOY_DIR_IMAGE")
     topdir = d.getVar('TOPDIR')
     cf = configparser.ConfigParser()
@@ -151,7 +156,7 @@ python do_write_qemuboot_conf() {
     with open(qemuboot, 'w') as f:
         cf.write(f)
 
-    if qemuboot_link != qemuboot:
+    if qemuboot_link and qemuboot_link != qemuboot:
         if os.path.lexists(qemuboot_link):
            os.remove(qemuboot_link)
         os.symlink(os.path.basename(qemuboot), qemuboot_link)

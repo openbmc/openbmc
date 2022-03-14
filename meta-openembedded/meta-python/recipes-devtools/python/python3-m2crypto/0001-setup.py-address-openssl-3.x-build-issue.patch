@@ -1,0 +1,28 @@
+From 0d824e5c2ab13e761ffaeabdccf9513d5b8f280d Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Fri, 8 Oct 2021 11:18:35 +0200
+Subject: [PATCH] setup.py: address openssl 3.x build issue
+
+swig throws:
+| /home/alex/development/poky/build-metaoe/tmp/work/x86_64-linux/python3-m2crypto-native/0.38.0-r0/recipe-sysroot-native/usr/include/openssl/macros.h:155: Error: CPP #error ""OPENSSL_API_COMPAT expresses an impossible API compatibility level"". Use the -cpperraswarn option to continue swig processing.
+
+I'm not sure why; upstream should take a look.
+
+Upstream-Status: Inappropriate [workaround]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ setup.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/setup.py b/setup.py
+index 2c65404..74704bc 100644
+--- a/setup.py
++++ b/setup.py
+@@ -192,6 +192,7 @@ class _M2CryptoBuildExt(build_ext.build_ext):
+ 
+         self.swig_opts.append('-includeall')
+         self.swig_opts.append('-modern')
++        self.swig_opts.append('-cpperraswarn')
+         self.swig_opts.append('-builtin')
+ 
+         # These two lines are a workaround for

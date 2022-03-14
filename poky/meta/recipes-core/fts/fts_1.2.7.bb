@@ -10,7 +10,7 @@ SECTION = "libs"
 
 SRCREV = "0bde52df588e8969879a2cae51c3a4774ec62472"
 
-SRC_URI = "git://github.com/pullmoll/musl-fts.git"
+SRC_URI = "git://github.com/pullmoll/musl-fts.git;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

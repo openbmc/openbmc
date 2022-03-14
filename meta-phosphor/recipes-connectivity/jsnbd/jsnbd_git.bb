@@ -14,8 +14,8 @@ RDEPENDS:${PN} += "nbd-client"
 
 S = "${WORKDIR}/git"
 
-SRC_URI = "git://github.com/openbmc/jsnbd"
-SRCREV = "164fef38b703032045803f05301b256ed045a094"
+SRC_URI = "git://github.com/openbmc/jsnbd;branch=master;protocol=https"
+SRCREV = "7b7c29369cfeb267efa7f45b271aca6910687461"
 
 NBD_PROXY_CONFIG_JSON ??= "${S}/config.sample.json"
 

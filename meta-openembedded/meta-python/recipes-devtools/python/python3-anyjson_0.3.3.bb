@@ -8,6 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=989aa97e73c912a83a3c873fa11deb08"
 inherit pypi setuptools3 ptest
 
 SRC_URI += " \
+	file://0001-setup.py-Do-not-use-2to3.patch \
 	file://run-ptest \
 "
 

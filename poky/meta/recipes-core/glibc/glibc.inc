@@ -41,6 +41,10 @@ PARALLEL_MAKE = ""
 # ensure make uses /bin/bash
 EXTRA_OEMAKE += "SHELL=/bin/bash"
 
+# We do not need bash to run tzselect script, the default is to use
+# bash but it can be configured by setting KSHELL Makefile variable
+EXTRA_OEMAKE += "KSHELL=/bin/sh"
+
 do_configure:prepend() {
 	sed -e "s#/bin/bash#/bin/sh#" -i ${S}/elf/ldd.bash.in
 }

@@ -16,9 +16,12 @@
 
 gbmc_ncsi_br_pub_addr_init=
 gbmc_ncsi_br_pub_addr_lastip=
+gbmc_ncsi_br_pub_addr_confip=
 
 gbmc_ncsi_br_pub_addr_update() {
   [ -n "$gbmc_ncsi_br_pub_addr_init" ] || return
+  [ "$gbmc_ncsi_br_pub_addr_confip" != "$gbmc_ncsi_br_pub_addr_lastip" ] || return
+  gbmc_ncsi_br_pub_addr_confip="$gbmc_ncsi_br_pub_addr_lastip"
 
   printf 'gBMC Bridge Pub Addr from NCSI: %s\n' \
     "${gbmc_ncsi_br_pub_addr_lastip:-(deleted)}" >&2
@@ -36,14 +39,14 @@ gbmc_ncsi_br_pub_addr_update() {
     done
   fi
 
-  local contents='[Network]'$'\n'
+  local contents=
   if (( ${#pfx_bytes[@]} != 0 )); then
     pfx_bytes[8]=0xfd
     local stateless_pfx="$(ip_bytes_to_str pfx_bytes)"
     pfx_bytes[9]=0x01
     local ncsi_pfx="$(ip_bytes_to_str pfx_bytes)"
-    local here=
-    read -r -d '' here <<EOF
+    read -r -d '' contents <<EOF
+[Network]
 Address=$ncsi_pfx/128
 IPv6PrefixDelegation=yes
 [IPv6PrefixDelegation]
@@ -56,17 +59,22 @@ ValidLifetimeSec=60
 Route=$ncsi_pfx/80
 LifetimeSec=60
 [Route]
-Destination=$stateless_pfx/72
+Destination=$stateless_pfx/76
 Type=unreachable
 Metric=1024
 EOF
-    contents+="$here"$'\n'
+    # Delete DHCP configured addresses if we have a host published address
+    rm -f /etc/systemd/network/{00,}-bmc-gbmcbr.network.d/50-public.conf
   fi
 
   local file
   for file in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-public.conf; do
     mkdir -p -m 755 "$(dirname "$file")"
-    printf '%s' "$contents" >"$file"
+    if [ -z "$contents" ]; then
+      rm -f "$file"
+    else
+      printf '%s' "$contents" >"$file"
+    fi
   done
 
   # Ensure that systemd-networkd performs a reconfiguration as it doesn't
@@ -82,16 +90,19 @@ EOF
 gbmc_ncsi_br_pub_addr_hook() {
   if [ "$change" = 'init' ]; then
     gbmc_ncsi_br_pub_addr_init=1
+    gbmc_ip_monitor_defer
+  elif [ "$change" = 'defer' ]; then
     gbmc_ncsi_br_pub_addr_update
   elif [ "$change" = 'addr' -a "$intf" = '@NCSI_IF@' ] &&
-     [ "$scope" = 'global' -a "$fam" = 'inet6' ]; then
+     [ "$scope" = 'global' -a "$fam" = 'inet6' ] &&
+     [[ "$flags" != *deprecated* ]]; then
     if [ "$action" = 'add' -a "$ip" != "$gbmc_ncsi_br_pub_addr_lastip" ]; then
       gbmc_ncsi_br_pub_addr_lastip="$ip"
-      gbmc_ncsi_br_pub_addr_update
+      gbmc_ip_monitor_defer
     fi
     if [ "$action" = 'del' -a "$ip" = "$gbmc_ncsi_br_pub_addr_lastip" ]; then
       gbmc_ncsi_br_pub_addr_lastip=
-      gbmc_ncsi_br_pub_addr_update
+      gbmc_ip_monitor_defer
     fi
   fi
 }

@@ -6,7 +6,7 @@ Subject: [PATCH] framework/profile.py: make test lists reproducible
 These are created with os.walk, which yields different
 order depending on where it's run.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/piglit/-/merge_requests/610]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
  framework/profile.py | 6 +++++-

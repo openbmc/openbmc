@@ -1,4 +1,4 @@
 # Set MaxBootCycleCount to 5 on IBM systems
-EXTRA_OECMAKE:append:p10bmc = "-DMAX_BOOT_CYCLE_COUNT=5"
-EXTRA_OECMAKE:append:witherspoon-tacoma = "-DMAX_BOOT_CYCLE_COUNT=5"
+EXTRA_OEMESON:append:p10bmc = "-Dmax-boot-cycle-count=5"
+EXTRA_OEMESON:append:witherspoon-tacoma = "-Dmax-boot-cycle-count=5"
 

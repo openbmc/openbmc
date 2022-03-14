@@ -1,0 +1,29 @@
+From aec3b64b0aaea0178b44ea65a204d76696e6a45e Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Mon, 10 Jan 2022 14:04:28 +0200
+Subject: [PATCH] setup.py: Do not strip debugging symbols
+
+Do not strip debugging symbols from Linux binaries to avoid
+bitbake build errors related to already-stripped.
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 453dc31..962c507 100644
+--- a/setup.py
++++ b/setup.py
+@@ -6,7 +6,7 @@ from setuptools import Extension, setup
+ dconv_source_files = glob("./deps/double-conversion/double-conversion/*.cc")
+ dconv_source_files.append("./lib/dconv_wrapper.cc")
+ 
+-strip_flags = ["-Wl,--strip-all"] if platform.system() == "Linux" else []
++strip_flags = []
+ 
+ module1 = Extension(
+     "ujson",
+-- 
+2.30.2
+

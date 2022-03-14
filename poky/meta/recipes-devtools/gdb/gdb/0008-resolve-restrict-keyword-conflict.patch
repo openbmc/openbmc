@@ -1,0 +1,48 @@
+From 4ee7e8afb9ff259e889ac938c673fda9ddc5e15a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 10 May 2016 08:47:05 -0700
+Subject: [PATCH 08/10] resolve restrict keyword conflict
+
+GCC detects that we call 'restrict' as param name in function
+signatures and complains since both params are called 'restrict'
+therefore we use __restrict to denote the C99 keywork
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gnulib/import/sys_time.in.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/gnulib/import/sys_time.in.h b/gnulib/import/sys_time.in.h
+index 90a67d18426..664641a1fe8 100644
+--- a/gnulib/import/sys_time.in.h
++++ b/gnulib/import/sys_time.in.h
+@@ -93,20 +93,20 @@ struct timeval
+ #   define gettimeofday rpl_gettimeofday
+ #  endif
+ _GL_FUNCDECL_RPL (gettimeofday, int,
+-                  (struct timeval *restrict, void *restrict)
++                  (struct timeval *__restrict, void *__restrict)
+                   _GL_ARG_NONNULL ((1)));
+ _GL_CXXALIAS_RPL (gettimeofday, int,
+-                  (struct timeval *restrict, void *restrict));
++                  (struct timeval *__restrict, void *__restrict));
+ # else
+ #  if !@HAVE_GETTIMEOFDAY@
+ _GL_FUNCDECL_SYS (gettimeofday, int,
+-                  (struct timeval *restrict, void *restrict)
++                  (struct timeval *__restrict, void *__restrict)
+                   _GL_ARG_NONNULL ((1)));
+ #  endif
+ /* Need to cast, because on glibc systems, by default, the second argument is
+                                                   struct timezone *.  */
+ _GL_CXXALIAS_SYS_CAST (gettimeofday, int,
+-                       (struct timeval *restrict, void *restrict));
++                       (struct timeval *__restrict, void *__restrict));
+ # endif
+ _GL_CXXALIASWARN (gettimeofday);
+ # if defined __cplusplus && defined GNULIB_NAMESPACE
+-- 
+2.33.1
+

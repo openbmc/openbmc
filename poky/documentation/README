@@ -56,9 +56,16 @@ poky.yaml
 This file defines variables used for documentation production.  The variables
 are used to define release pathnames, URLs for the published manuals, etc.
 
-template
-========
-Contains various templates, fonts, and some old PNG files.
+standards.md
+============
+
+This file specifies some rules to follow when contributing to the documentation.
+
+template/
+=========
+
+Contains a template.svg, to make it easier to create consistent
+SVG diagrams.
 
 Sphinx
 ======
@@ -112,6 +119,10 @@ dependencies is to use the Python Package Index (pip).
 To install all required packages run:
 
  $ pip3 install sphinx sphinx_rtd_theme pyyaml
+
+Also install the "inkscape" package from your distribution.
+Inkscape is need to convert SVG graphics to PNG (for EPUB
+export) and to PDF (for PDF export).
 
 To build the documentation locally, run:
 
@@ -327,7 +338,7 @@ References to the BitBake manual can be done:
  - With a specific description instead of the section name:
   :ref:`Azure Storage fetcher (az://) <bitbake:bitbake-user-manual/bitbake-user-manual-fetching:fetchers>`
  - With the section name:
-  ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-intro:usage and syntax` option
+  :ref:`bitbake:bitbake-user-manual/bitbake-user-manual-intro:usage and syntax` option
  - Linking to the entire BitBake manual:
   :doc:`BitBake User Manual <bitbake:index>`
 

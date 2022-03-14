@@ -1,0 +1,45 @@
+From db9e6a4b7a48dee62fccb662347dd638a2d286d5 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@fujitsu.com>
+Date: Thu, 2 Dec 2021 14:29:06 +0900
+Subject: [PATCH] Remove unsuitble part for cross-compile.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Lei Maohui <leimaohui@fujitsu.com>
+---
+ configure.ac               | 6 ------
+ src/libpcp/src/GNUmakefile | 1 -
+ 2 files changed, 7 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 5b25382..5d24714 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -623,12 +623,6 @@ fi
+ which=$WHICH
+ AC_SUBST(which)
+ 
+-if test -z "$AR"; then
+-    AC_PATH_PROGS(AR, [gcc-ar ar], /usr/bin/ar)
+-fi
+-if test ! -x "$AR"; then
+-    AC_MSG_ERROR([cannot find a valid 'ar' command.])
+-fi
+ ar=$AR
+ AC_SUBST(ar)
+ 
+diff --git a/src/libpcp/src/GNUmakefile b/src/libpcp/src/GNUmakefile
+index 3c4ccd6..d1eba19 100644
+--- a/src/libpcp/src/GNUmakefile
++++ b/src/libpcp/src/GNUmakefile
+@@ -176,7 +176,6 @@ exports:	exports.in mk.exports
+ # cases
+ #
+ check.done:	$(OBJECTS)
+-	./check-statics
+ 	touch check.done
+ 
+ ifneq ($(LIBTARGET),)
+-- 
+2.25.1
+

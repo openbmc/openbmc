@@ -1,14 +1,26 @@
+From 629fc6427710e48b78f8b1f300dd698fe898cfd4 Mon Sep 17 00:00:00 2001
+From: Marko Lindqvist <cazfi74@gmail.com>
+Date: Mon, 7 Jan 2013 01:49:40 +0200
+Subject: [PATCH] libtasn1: remove help2man dependency
+
 Upstream-Status: Inappropriate
 
 Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
-diff -Nurd libtasn1-2.14/doc/Makefile.am libtasn1-2.14/doc/Makefile.am
---- libtasn1-2.14/doc/Makefile.am	2012-09-24 15:08:42.000000000 +0300
-+++ libtasn1-2.14/doc/Makefile.am	2013-01-03 07:35:26.702763403 +0200
-@@ -31,7 +31,7 @@
- AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS) \
-	--no-split --number-sections --css-include=texinfo.css
 
+---
+ doc/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/doc/Makefile.am b/doc/Makefile.am
+index a0171a5..8aa4d3d 100644
+--- a/doc/Makefile.am
++++ b/doc/Makefile.am
+@@ -28,7 +28,7 @@ libtasn1_TEXINFOS += asn1Coding-help.texi asn1Decoding-help.texi asn1Parser-help
+ 
+ AM_MAKEINFOHTMLFLAGS = --no-split $(AM_MAKEINFOFLAGS)
+ 
 -dist_man_MANS = $(gdoc_MANS) asn1Parser.1 asn1Coding.1 asn1Decoding.1
 +dist_man_MANS = $(gdoc_MANS)
-
+ 
  HELP2MAN_OPTS = --info-page libtasn1
+ 

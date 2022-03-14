@@ -231,7 +231,7 @@ is available via the :term:`TOPDIR` variable.
 -----------------------
 
 The OpenEmbedded build system creates this directory when you enable
-build history via the ``buildhistory`` class file. The directory
+build history via the :ref:`buildhistory <ref-classes-buildhistory>` class file. The directory
 organizes build information into image, packages, and SDK
 subdirectories. For information on the build history feature, see the
 ":ref:`dev-manual/common-tasks:maintaining build output quality`"

@@ -1,0 +1,103 @@
+#!/bin/bash -e
+#
+# Control step motor rotate of sled
+
+function set_gpio()
+{
+    NET_NAME=$1
+    OUT_VAL=$2
+    mapfile -t -d " " GPIO_INFO < <(gpiofind "$NET_NAME")
+    if [ "${#GPIO_INFO[@]}" -ne 2 ]; then
+        echo "set_gpio: can not find gpio, $NET_NAME"
+        return 1
+    fi
+    echo -n "set_gpio: set $NET_NAME = $OUT_VAL"
+    if ! gpioset "${GPIO_INFO[0]}" "${GPIO_INFO[1]%$'\n'}"="$OUT_VAL"; then
+        echo " failed"
+        return 1
+    fi
+    echo " success"
+    return 0
+}
+
+function get_gpio()
+{
+    NET_NAME=$1
+    RET_VAL=2
+
+    mapfile -t -d " " GPIO_INFO < <(gpiofind "$NET_NAME")
+    if [ "${#GPIO_INFO[@]}" -ne 2 ]; then
+        echo "get_gpio: can not find gpio, $NET_NAME" >&2
+        return 1
+    fi
+    if ! RET_VAL=$(gpioget "${GPIO_INFO[0]}" "${GPIO_INFO[1]%$'\n'}") ; then
+        echo "get_gpio: get ${NET_NAME} failed" >&2
+        return 1
+    fi
+    echo "${RET_VAL}"
+    return 0
+}
+#######################################
+# Setting step motor control pins to start/stop motor
+# Arguments:
+#   1. SLED NUMBER
+#   2. Value of STBY RESET PIN
+#   3. Value of ENABLE PIN
+#   4. Value of DIRECTION PIN
+#   5. Value of Motor Driver VREF PIN
+#######################################
+function set_motor() {
+    STBY_PIN="SLED${1}_MD_STBY_RESET"
+    EN_PIN="SLED${1}_MD_IOEXP_EN_FAULT"
+    DIR_PIN="SLED${1}_MD_DIR"
+    VREF_PIN="SLED${1}_MD_REF_PWM"
+    set_gpio "$STBY_PIN" "$2"
+    set_gpio "$EN_PIN"   "$3"
+    set_gpio "$DIR_PIN"  "$4"
+    set_gpio "$VREF_PIN" "$5"
+}
+
+function show_usage(){
+    echo "Usage: motor-ctrl [sled1 | sled2 | sled3 | sled4 | sled5 | sled6]  [f r s]"
+    echo "      f : Step Motor go forward"
+    echo "      r : Step Motor go reverse"
+    echo "      s : Step Motor stop "
+}
+
+if [ $# -ne 2 ]; then
+    show_usage
+    exit 1;
+fi
+
+if [[ "$1" =~ ^(sled[1-6]{1})$ ]]; then
+    SLED=$1
+    SLED_NUM=${SLED:4}
+    ACTION=$2
+else
+     echo "invalid sled name: $1"
+    exit 1;
+fi
+
+#Check if sled is present
+SLED_PRESENT=$(get_gpio "presence-sled${SLED_NUM}")
+if [ "$SLED_PRESENT" != 0 ];then
+    echo "${SLED} is not present!"
+    exit 1
+fi
+
+if [[ "$ACTION" == "s" ]]; then
+    echo "stop motor"
+    set_motor "$SLED_NUM" 1 0 0 1
+elif [[ "$ACTION" == "f" ]];then
+    echo "start motor, direction:forward"
+    set_motor "$SLED_NUM" 1 1 0 0
+elif [[ "$ACTION" == "r" ]];then
+    echo "start motor, direction:reverse"
+    set_motor "$SLED_NUM" 1 1 1 0
+else
+    echo "Error: Unknown action!"
+    exit 1
+fi
+
+exit 0
+

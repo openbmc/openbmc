@@ -56,7 +56,7 @@ system and gives an overview of their function and contents.
          ALTERNATIVE:busybox = "sh sed test bracket"
 
       For more information on the alternatives system, see the
-      ":ref:`update-alternatives.bbclass <ref-classes-update-alternatives>`"
+      ":ref:`ref-classes-update-alternatives`"
       section.
 
    :term:`ALTERNATIVE_LINK_NAME`
@@ -76,7 +76,7 @@ system and gives an overview of their function and contents.
          If :term:`ALTERNATIVE_LINK_NAME` is not defined, it defaults to ``${bindir}/name``.
 
       For more information on the alternatives system, see the
-      ":ref:`update-alternatives.bbclass <ref-classes-update-alternatives>`"
+      ":ref:`ref-classes-update-alternatives`"
       section.
 
    :term:`ALTERNATIVE_PRIORITY`
@@ -92,7 +92,7 @@ system and gives an overview of their function and contents.
          ALTERNATIVE_PRIORITY_pkg[name] = "priority"
 
       For more information on the alternatives system, see the
-      ":ref:`update-alternatives.bbclass <ref-classes-update-alternatives>`"
+      ":ref:`ref-classes-update-alternatives`"
       section.
 
    :term:`ALTERNATIVE_TARGET`
@@ -122,8 +122,7 @@ system and gives an overview of their function and contents.
          task while retaining support for the command if necessary.
 
       For more information on the alternatives system, see the
-      ":ref:`update-alternatives.bbclass <ref-classes-update-alternatives>`"
-      section.
+      ":ref:`ref-classes-update-alternatives`" section.
 
    :term:`ANY_OF_DISTRO_FEATURES`
       When inheriting the
@@ -400,7 +399,7 @@ system and gives an overview of their function and contents.
          where:
 
             action is:
-               ABORT:     Immediately abort the build when
+               ABORT:     Immediately stop the build when
                           a threshold is broken.
                STOPTASKS: Stop the build after the currently
                           executing tasks have finished when
@@ -438,7 +437,7 @@ system and gives an overview of their function and contents.
       The first example works only if you also provide the
       :term:`BB_DISKMON_WARNINTERVAL`
       variable in the ``conf/local.conf``. This example causes the build
-      system to immediately abort when either the disk space in
+      system to immediately stop when either the disk space in
       ``${TMPDIR}`` drops below 1 Gbyte or the available free inodes drops
       below 100 Kbytes. Because two directories are provided with the
       variable, the build system also issue a warning when the disk space
@@ -452,7 +451,7 @@ system and gives an overview of their function and contents.
       directory drops below 1 Gbyte. No disk monitoring occurs for the free
       inodes in this case.
 
-      The final example immediately aborts the build when the number of
+      The final example immediately stops the build when the number of
       free inodes in the ``${TMPDIR}`` directory drops below 100 Kbytes. No
       disk space monitoring for the directory itself occurs in this case.
 
@@ -641,8 +640,10 @@ system and gives an overview of their function and contents.
       introduce a hard dependency on those other layers.
 
       Use the following form for :term:`BBFILES_DYNAMIC`:
-      collection_name:filename_pattern The following example identifies two
-      collection names and two filename patterns::
+      ``collection_name:filename_pattern``.
+
+      The following example identifies two collection names and two
+      filename patterns::
 
          BBFILES_DYNAMIC += " \
             clang-layer:${LAYERDIR}/bbappends/meta-clang/*/*/*.bbappend \
@@ -650,7 +651,7 @@ system and gives an overview of their function and contents.
             "
 
       This next example shows an error message that occurs because invalid
-      entries are found, which cause parsing to abort:
+      entries are found, which cause parsing to fail:
 
       .. code-block:: none
 
@@ -730,7 +731,7 @@ system and gives an overview of their function and contents.
       Each configuration file you
       use must reside in the :term:`Build Directory`
       ``conf/multiconfig`` directory (e.g.
-      build_directory\ ``/conf/multiconfig/configA.conf``).
+      ``build_directory/conf/multiconfig/configA.conf``).
 
       For information on how to use :term:`BBMULTICONFIG` in an environment
       that supports building targets with multiple configurations, see the
@@ -771,7 +772,7 @@ system and gives an overview of their function and contents.
       :ref:`binconfig-disabled <ref-classes-binconfig-disabled>` class,
       this variable specifies binary configuration scripts to disable in
       favor of using ``pkg-config`` to query the information. The
-      ``binconfig-disabled`` class will modify the specified scripts to
+      :ref:`binconfig-disabled <ref-classes-binconfig-disabled>` class will modify the specified scripts to
       return an error so that calls to them can be easily found and
       replaced.
 
@@ -801,7 +802,7 @@ system and gives an overview of their function and contents.
       ``meta/classes/binconfig.bbclass`` in the :term:`Source Directory`.
       You can also find general
       information on the class in the
-      ":ref:`binconfig.bbclass <ref-classes-binconfig>`" section.
+      ":ref:`ref-classes-binconfig`" section.
 
    :term:`BP`
       The base recipe name and version but without any special recipe name
@@ -939,13 +940,13 @@ system and gives an overview of their function and contents.
       When inheriting the :ref:`buildhistory <ref-classes-buildhistory>`
       class, this variable specifies whether or not to commit the build
       history output in a local Git repository. If set to "1", this local
-      repository will be maintained automatically by the ``buildhistory``
+      repository will be maintained automatically by the :ref:`buildhistory <ref-classes-buildhistory>`
       class and a commit will be created on every build for changes to each
       top-level subdirectory of the build history output (images, packages,
       and sdk). If you want to track changes to build history over time,
       you should set this value to "1".
 
-      By default, the ``buildhistory`` class does not commit the build
+      By default, the :ref:`buildhistory <ref-classes-buildhistory>` class does not commit the build
       history output in a local Git repository::
 
          BUILDHISTORY_COMMIT ?= "0"
@@ -962,7 +963,7 @@ system and gives an overview of their function and contents.
       email@host". Providing an email address or host that is not valid
       does not produce an error.
 
-      By default, the ``buildhistory`` class sets the variable as follows::
+      By default, the :ref:`buildhistory <ref-classes-buildhistory>` class sets the variable as follows::
 
          BUILDHISTORY_COMMIT_AUTHOR ?= "buildhistory <buildhistory@${DISTRO}>"
 
@@ -970,9 +971,9 @@ system and gives an overview of their function and contents.
       When inheriting the :ref:`buildhistory <ref-classes-buildhistory>`
       class, this variable specifies the directory in which build history
       information is kept. For more information on how the variable works,
-      see the ``buildhistory.class``.
+      see the ``buildhistory.bbclass`` file.
 
-      By default, the ``buildhistory`` class sets the directory as follows::
+      By default, the :ref:`buildhistory <ref-classes-buildhistory>` class sets the directory as follows::
 
          BUILDHISTORY_DIR ?= "${TOPDIR}/buildhistory"
 
@@ -999,7 +1000,7 @@ system and gives an overview of their function and contents.
          This saves one file per task and lists the SHA-256 checksums for
          each file staged (i.e. the output of the task).
 
-      By default, the ``buildhistory`` class enables the following
+      By default, the :ref:`buildhistory <ref-classes-buildhistory>` class enables the following
       features::
 
          BUILDHISTORY_FEATURES ?= "image package sdk"
@@ -1015,7 +1016,7 @@ system and gives an overview of their function and contents.
       any file. Specifying an invalid path does not produce an error.
       Consequently, you can include files that might not always be present.
 
-      By default, the ``buildhistory`` class provides paths to the
+      By default, the :ref:`buildhistory <ref-classes-buildhistory>` class provides paths to the
       following files::
 
          BUILDHISTORY_IMAGE_FILES ?= "/etc/passwd /etc/group"
@@ -1028,7 +1029,7 @@ system and gives an overview of their function and contents.
       useful when build history is populated from multiple sources that may not
       all use the same top level directory.
 
-      By default, the ``buildhistory`` class sets the variable as follows::
+      By default, the :ref:`buildhistory <ref-classes-buildhistory>` class sets the variable as follows::
 
          BUILDHISTORY_PATH_PREFIX_STRIP ?= ""
 
@@ -1047,7 +1048,7 @@ system and gives an overview of their function and contents.
       that you have set up manually using ``git remote`` within the local
       repository.
 
-      By default, the ``buildhistory`` class sets the variable as follows::
+      By default, the :ref:`buildhistory <ref-classes-buildhistory>` class sets the variable as follows::
 
          BUILDHISTORY_PUSH_REPO ?= ""
 
@@ -1321,7 +1322,7 @@ system and gives an overview of their function and contents.
       The default value, which is "CLOSED Proprietary", for
       :term:`COPYLEFT_LICENSE_EXCLUDE` is set by the
       :ref:`copyleft_filter <ref-classes-copyleft_filter>` class, which
-      is inherited by the ``archiver`` class.
+      is inherited by the :ref:`archiver <ref-classes-archiver>` class.
 
    :term:`COPYLEFT_LICENSE_INCLUDE`
       A space-separated list of licenses to include in the source archived
@@ -1332,7 +1333,7 @@ system and gives an overview of their function and contents.
 
       The default value is set by the
       :ref:`copyleft_filter <ref-classes-copyleft_filter>` class, which
-      is inherited by the ``archiver`` class. The default value includes
+      is inherited by the :ref:`archiver <ref-classes-archiver>` class. The default value includes
       "GPL*", "LGPL*", and "AGPL*".
 
    :term:`COPYLEFT_PN_EXCLUDE`
@@ -1347,7 +1348,7 @@ system and gives an overview of their function and contents.
       The default value, which is "" indicating to not explicitly exclude
       any recipes by name, for :term:`COPYLEFT_PN_EXCLUDE` is set by the
       :ref:`copyleft_filter <ref-classes-copyleft_filter>` class, which
-      is inherited by the ``archiver`` class.
+      is inherited by the :ref:`archiver <ref-classes-archiver>` class.
 
    :term:`COPYLEFT_PN_INCLUDE`
       A list of recipes to include in the source archived by the
@@ -1361,7 +1362,7 @@ system and gives an overview of their function and contents.
       The default value, which is "" indicating to not explicitly include
       any recipes by name, for :term:`COPYLEFT_PN_INCLUDE` is set by the
       :ref:`copyleft_filter <ref-classes-copyleft_filter>` class, which
-      is inherited by the ``archiver`` class.
+      is inherited by the :ref:`archiver <ref-classes-archiver>` class.
 
    :term:`COPYLEFT_RECIPE_TYPES`
       A space-separated list of recipe types to include in the source
@@ -1371,7 +1372,7 @@ system and gives an overview of their function and contents.
 
       The default value, which is "target*", for :term:`COPYLEFT_RECIPE_TYPES`
       is set by the :ref:`copyleft_filter <ref-classes-copyleft_filter>`
-      class, which is inherited by the ``archiver`` class.
+      class, which is inherited by the :ref:`archiver <ref-classes-archiver>` class.
 
    :term:`COPY_LIC_DIRS`
       If set to "1" along with the
@@ -1582,6 +1583,23 @@ system and gives an overview of their function and contents.
          by :term:`BBFILE_PRIORITY` if that variable is different between two
          layers that contain different versions of the same recipe.
 
+   :term:`DEBUG_PREFIX_MAP`
+      Allows to set C compiler options, such as ``-fdebug-prefix-map``,
+      ``-fmacro-prefix-map``, and ``-ffile-prefix-map``, which allow to
+      replace build-time paths by install-time ones in the debugging sections
+      of binaries.  This makes compiler output files location independent,
+      at the cost of having to pass an extra command to tell the debugger
+      where source files are.
+
+      This is used by the Yocto Project to guarantee
+      :doc:`/test-manual/reproducible-builds` even when the source code of
+      a package uses the ``__FILE__`` or ``assert()`` macros. See the
+      `reproducible-builds.org <https://reproducible-builds.org/docs/build-path/>`__
+      website for details.
+
+      This variable is set in the ``meta/conf/bitbake.conf`` file. It is
+      not intended to be user-configurable.
+
    :term:`DEFAULTTUNE`
       The default CPU and Application Binary Interface (ABI) tunings (i.e.
       the "tune") used by the OpenEmbedded build system. The
@@ -1786,11 +1804,11 @@ system and gives an overview of their function and contents.
    :term:`DEPLOYDIR`
       When inheriting the :ref:`deploy <ref-classes-deploy>` class, the
       :term:`DEPLOYDIR` points to a temporary work area for deployed files that
-      is set in the ``deploy`` class as follows::
+      is set in the :ref:`deploy <ref-classes-deploy>` class as follows::
 
          DEPLOYDIR = "${WORKDIR}/deploy-${PN}"
 
-      Recipes inheriting the ``deploy`` class should copy files to be
+      Recipes inheriting the :ref:`deploy <ref-classes-deploy>` class should copy files to be
       deployed into :term:`DEPLOYDIR`, and the class will take care of copying
       them into :term:`DEPLOY_DIR_IMAGE`
       afterwards.
@@ -1833,7 +1851,7 @@ system and gives an overview of their function and contents.
 
    :term:`DISTRO_EXTRA_RDEPENDS`
       Specifies a list of distro-specific packages to add to all images.
-      This variable takes affect through ``packagegroup-base`` so the
+      This variable takes effect through ``packagegroup-base`` so the
       variable only really applies to the more full-featured images that
       include ``packagegroup-base``. You can use this variable to keep
       distro policy out of generic images. As with all other distro
@@ -1966,8 +1984,7 @@ system and gives an overview of their function and contents.
 
    :term:`DISTUTILS_SETUP_PATH`
       When used by recipes that inherit the
-      :ref:`distutils3 <ref-classes-distutils3>` or
-      :ref:`setuptools3 <ref-classes-setuptools3>` class, this variable should
+      :ref:`distutils3 <ref-classes-distutils3>` class, this variable should
       be used to specify the directory in which the ``setup.py`` file is
       located if it is not at the root of the source tree (as specified by
       :term:`S`). For example, in a recipe where the sources are fetched from
@@ -1976,6 +1993,13 @@ system and gives an overview of their function and contents.
 
          S = "${WORKDIR}/git"
          DISTUTILS_SETUP_PATH = "${S}/python/pythonmodule"
+
+      .. note::
+
+         ``distutils`` has been deprecated in Python 3.10 and will be removed
+         in Python 3.12. For this reason, the use of :ref:`distutils3 <ref-classes-distutils3>`
+         is deprecated. Instead use :ref:`setuptools3 <ref-classes-setuptools3>` and the
+         :term:`SETUPTOOLS_SETUP_PATH` variable.
 
    :term:`DL_DIR`
       The central download directory used by the build process to store
@@ -2060,7 +2084,7 @@ system and gives an overview of their function and contents.
       errors by the OpenEmbedded build system. You set this variable in
       your distribution configuration file. For a list of the checks you
       can control with this variable, see the
-      ":ref:`insane.bbclass <ref-classes-insane>`" section.
+      ":ref:`ref-classes-insane`" section.
 
    :term:`EXCLUDE_FROM_SHLIBS`
       Triggers the OpenEmbedded build system's shared libraries resolver to
@@ -2139,7 +2163,7 @@ system and gives an overview of their function and contents.
       system uses to locate unpacked recipe source code.
 
       For more information on ``externalsrc.bbclass``, see the
-      ":ref:`externalsrc.bbclass <ref-classes-externalsrc>`" section. You
+      ":ref:`ref-classes-externalsrc`" section. You
       can also find information on how to use this variable in the
       ":ref:`dev-manual/common-tasks:building software from an external source`"
       section in the Yocto Project Development Tasks Manual.
@@ -2153,7 +2177,7 @@ system and gives an overview of their function and contents.
       Directory.
 
       For more information on ``externalsrc.bbclass``, see the
-      ":ref:`externalsrc.bbclass <ref-classes-externalsrc>`" section. You
+      ":ref:`ref-classes-externalsrc`" section. You
       can also find information on how to use this variable in the
       ":ref:`dev-manual/common-tasks:building software from an external source`"
       section in the Yocto Project Development Tasks Manual.
@@ -2274,7 +2298,7 @@ system and gives an overview of their function and contents.
       group configurations to a specific recipe.
 
       The set list of commands you can configure using the
-      :term:`EXTRA_USERS_PARAMS` is shown in the ``extrausers`` class. These
+      :term:`EXTRA_USERS_PARAMS` is shown in the :ref:`extrausers <ref-classes-extrausers>` class. These
       commands map to the normal Unix commands of the same names::
 
          # EXTRA_USERS_PARAMS = "\
@@ -2609,7 +2633,7 @@ system and gives an overview of their function and contents.
    :term:`FONT_PACKAGES`
       When inheriting the :ref:`fontcache <ref-classes-fontcache>` class,
       this variable identifies packages containing font files that need to
-      be cached by Fontconfig. By default, the ``fontcache`` class assumes
+      be cached by Fontconfig. By default, the :ref:`fontcache <ref-classes-fontcache>` class assumes
       that fonts are in the recipe's main package (i.e.
       ``${``\ :term:`PN`\ ``}``). Use this variable if fonts you
       need are in a package other than that main package.
@@ -2647,6 +2671,13 @@ system and gives an overview of their function and contents.
 
    :term:`GDB`
       The minimal command and arguments to run the GNU Debugger.
+
+   :term:`GIR_EXTRA_LIBS_PATH`
+      Allows to specify an extra search path for ``.so`` files
+      in GLib related recipes using GObject introspection,
+      and which do not compile without this setting.
+      See the ":ref:`dev-manual/common-tasks:enabling gobject introspection support`"
+      section for details.
 
    :term:`GITDIR`
       The directory in which a local copy of a Git repository is stored
@@ -2817,7 +2848,7 @@ system and gives an overview of their function and contents.
    :term:`ICECC_DISABLED`
       Disables or enables the ``icecc`` (Icecream) function. For more
       information on this function and best practices for using this
-      variable, see the ":ref:`icecc.bbclass <ref-classes-icecc>`"
+      variable, see the ":ref:`ref-classes-icecc`"
       section.
 
       Setting this variable to "1" in your ``local.conf`` disables the
@@ -2875,9 +2906,9 @@ system and gives an overview of their function and contents.
       :ref:`icecc <ref-classes-icecc>` class. You set this variable in
       your ``local.conf`` file.
 
-      When you list classes using this variable, you are "blacklisting"
-      them from distributed compilation across remote hosts. Any classes
-      you list will be distributed and compiled locally.
+      When you list classes using this variable, the recipes inheriting
+      those classes will not benefit from distributed compilation across
+      remote hosts. Instead they will be built locally.
 
    :term:`ICECC_USER_PACKAGE_BL`
       Identifies user recipes that you do not want the Icecream distributed
@@ -2885,9 +2916,9 @@ system and gives an overview of their function and contents.
       :ref:`icecc <ref-classes-icecc>` class. You set this variable in
       your ``local.conf`` file.
 
-      When you list packages using this variable, you are "blacklisting"
-      them from distributed compilation across remote hosts. Any packages
-      you list will be distributed and compiled locally.
+      When you list recipes using this variable, you are excluding them
+      from distributed compilation across remote hosts. Instead they will
+      be built locally.
 
    :term:`ICECC_USER_PACKAGE_WL`
       Identifies user recipes that use an empty
@@ -3714,7 +3745,7 @@ system and gives an overview of their function and contents.
 
          INSANE_SKIP:${PN} += "dev-so"
 
-      See the ":ref:`insane.bbclass <ref-classes-insane>`" section for a
+      See the ":ref:`ref-classes-insane`" section for a
       list of the valid QA checks you can specify using this variable.
 
    :term:`INSTALL_TIMEZONE_FILE`
@@ -3871,7 +3902,7 @@ system and gives an overview of their function and contents.
       typically append this variable to enable extended image types. An
       example is the "kernel-fitimage", which enables fitImage support and
       resides in ``meta/classes/kernel-fitimage.bbclass``. You can register
-      custom kernel image types with the ``kernel`` class using this
+      custom kernel image types with the :ref:`kernel <ref-classes-kernel>` class using this
       variable.
 
    :term:`KERNEL_DEVICETREE`
@@ -4099,7 +4130,7 @@ system and gives an overview of their function and contents.
    :term:`KERNEL_VERSION`
       Specifies the version of the kernel as extracted from ``version.h``
       or ``utsrelease.h`` within the kernel sources. Effects of setting
-      this variable do not take affect until the kernel has been
+      this variable do not take effect until the kernel has been
       configured. Consequently, attempting to refer to this variable in
       contexts prior to configuration will not work.
 
@@ -4266,7 +4297,7 @@ system and gives an overview of their function and contents.
       that the :ref:`debian <ref-classes-debian>` class applies its
       naming policy to given a recipe that packages multiple libraries.
 
-      This variable works in conjunction with the ``debian`` class.
+      This variable works in conjunction with the :ref:`debian <ref-classes-debian>` class.
 
    :term:`LIC_FILES_CHKSUM`
       Checksums of the license text in the recipe source code.
@@ -4347,9 +4378,9 @@ system and gives an overview of their function and contents.
       section in the Yocto Project Development Tasks Manual.
 
    :term:`LICENSE_FLAGS`
-      Specifies additional flags for a recipe you must whitelist through
+      Specifies additional flags for a recipe you must allow through
       :term:`LICENSE_FLAGS_WHITELIST` in
-      order to allow the recipe to be built. When providing multiple flags,
+      order for the recipe to be built. When providing multiple flags,
       separate them with spaces.
 
       This value is independent of :term:`LICENSE` and is
@@ -4362,8 +4393,7 @@ system and gives an overview of their function and contents.
    :term:`LICENSE_FLAGS_WHITELIST`
       Lists license flags that when specified in
       :term:`LICENSE_FLAGS` within a recipe should not
-      prevent that recipe from being built. This practice is otherwise
-      known as "whitelisting" license flags. For more information, see the
+      prevent that recipe from being built.  For more information, see the
       ":ref:`dev-manual/common-tasks:enabling commercially licensed recipes`"
       section in the Yocto Project Development Tasks Manual.
 
@@ -4716,7 +4746,7 @@ system and gives an overview of their function and contents.
       configuration file, a distribution configuration file, an append file
       for the recipe, or the recipe itself). If you use this variable, you
       must also be sure to list the module name in the
-      :term:`KERNEL_MODULE_AUTOLOAD`
+      :term:`KERNEL_MODULE_PROBECONF`
       variable.
 
       Here is the general syntax::
@@ -4891,9 +4921,7 @@ system and gives an overview of their function and contents.
 
       See the ``meta/classes/binconfig.bbclass`` in the
       :term:`Source Directory` for details on how this class
-      applies these additional sed command arguments. For general
-      information on the ``binconfig`` class, see the
-      ":ref:`binconfig.bbclass <ref-classes-binconfig>`" section.
+      applies these additional sed command arguments.
 
    :term:`OE_IMPORTS`
       An internal variable used to tell the OpenEmbedded build system what
@@ -5067,7 +5095,7 @@ system and gives an overview of their function and contents.
 
       For information on packaging and build performance effects as a
       result of the package manager in use, see the
-      ":ref:`package.bbclass <ref-classes-package>`" section.
+      ":ref:`ref-classes-package`" section.
 
    :term:`PACKAGE_DEBUG_SPLIT_STYLE`
       Determines how to split up and package debug and source information
@@ -5169,8 +5197,8 @@ system and gives an overview of their function and contents.
       .. note::
 
          You can use the :term:`PACKAGE_FEED_ARCHS`
-         variable to whitelist specific package architectures. If you do
-         not need to whitelist specific architectures, which is a common
+         variable to allow specific package architectures. If you do
+         not need to allow specific architectures, which is a common
          case, you can omit this variable. Omitting the variable results in
          all available architectures for the current machine being included
          into remote package feeds.
@@ -5286,7 +5314,7 @@ system and gives an overview of their function and contents.
    :term:`PACKAGE_WRITE_DEPS`
       Specifies a list of dependencies for post-installation and
       pre-installation scripts on native/cross tools. If your
-      post-installation or pre-installation script can execute at rootfs
+      post-installation or pre-installation script can execute at root filesystem
       creation time rather than on the target but depends on a native tool
       in order to execute, you need to list the tools in
       :term:`PACKAGE_WRITE_DEPS`.
@@ -5364,7 +5392,7 @@ system and gives an overview of their function and contents.
       so one of two ways:
 
       -  *Append file:* Create an append file named
-         recipename\ ``.bbappend`` in your layer and override the value of
+         ``recipename.bbappend`` in your layer and override the value of
          :term:`PACKAGECONFIG`. You can either completely override the
          variable::
 
@@ -5838,10 +5866,10 @@ system and gives an overview of their function and contents.
       :term:`Build Directory`::
 
          PREMIRRORS:prepend = "\
-             git://.*/.* http://www.yoctoproject.org/sources/ \n \
-             ftp://.*/.* http://www.yoctoproject.org/sources/ \n \
-             http://.*/.* http://www.yoctoproject.org/sources/ \n \
-             https://.*/.* http://www.yoctoproject.org/sources/ \n"
+             git://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
+             ftp://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
+             http://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
+             https://.*/.* &YOCTO_DL_URL;/mirror/sources/"
 
       These changes cause the
       build system to intercept Git, FTP, HTTP, and HTTPS requests and
@@ -5990,7 +6018,7 @@ system and gives an overview of their function and contents.
       names used when installing the Python headers and libraries in
       sysroot (e.g. ``.../python3.3m/...``).
 
-      Recipes that inherit the ``distutils3`` class during cross-builds also
+      Recipes that inherit the :ref:`distutils3 <ref-classes-distutils3>` class during cross-builds also
       use this variable to locate the headers and libraries of the
       appropriate Python that the extension is targeting.
 
@@ -6181,7 +6209,7 @@ system and gives an overview of their function and contents.
    :term:`RM_WORK_EXCLUDE`
       With ``rm_work`` enabled, this variable specifies a list of recipes
       whose work directories should not be removed. See the
-      ":ref:`rm_work.bbclass <ref-classes-rm-work>`" section for more
+      ":ref:`ref-classes-rm-work`" section for more
       details.
 
    :term:`ROOT_HOME`
@@ -6566,9 +6594,9 @@ system and gives an overview of their function and contents.
       :ref:`populate-sdk-ext <ref-classes-populate-sdk-*>` class.
 
       This list overrides the variables specified using the
-      :term:`SDK_LOCAL_CONF_BLACKLIST`
-      variable as well as any variables identified by automatic
-      blacklisting due to the "/" character being found at the start of the
+      :term:`SDK_LOCAL_CONF_BLACKLIST` variable as well as
+      other variables automatically added due to the "/" character
+      being found at the start of the
       value, which is usually indicative of being a path and thus might not
       be valid on the system where the SDK is installed.
 
@@ -6739,23 +6767,21 @@ system and gives an overview of their function and contents.
          $ bitbake -c populate_sdk imagename
 
    :term:`SDKMACHINE`
-      The machine for which the SDK is built. In other words, the SDK is
-      built such that it runs on the target you specify with the
-      :term:`SDKMACHINE` value. The value points to a corresponding ``.conf``
-      file under ``conf/machine-sdk/``.
+      The machine for which the SDK is built. In other words, the SDK is built
+      such that it runs on the target you specify with the :term:`SDKMACHINE`
+      value. The value points to a corresponding ``.conf`` file under
+      ``conf/machine-sdk/`` in the enabled layers, for example ``aarch64``,
+      ``i586``, ``i686``, ``ppc64``, ``ppc64le``, and ``x86_64`` are
+      :oe_git:`available in OpenEmbedded-Core </openembedded-core/tree/meta/conf/machine-sdk>`.
 
-      You can use "i686" and "x86_64" as possible values for this variable.
-      The variable defaults to "i686" and is set in the local.conf file in
-      the Build Directory.
-      ::
-
-         SDKMACHINE ?= "i686"
+      The variable defaults to :term:`BUILD_ARCH` so that SDKs are built for the
+      architecture of the build machine.
 
       .. note::
 
          You cannot set the :term:`SDKMACHINE`
          variable in your distribution configuration file. If you do, the
-         configuration will not take affect.
+         configuration will not take effect.
 
    :term:`SDKPATH`
       Defines the path offered to the user for installation of the SDK that
@@ -6819,6 +6845,30 @@ system and gives an overview of their function and contents.
       incompatible with customizations such as the following::
 
          EXTRA_IMAGE_FEATURES += "read-only-rootfs"
+
+   :term:`SETUPTOOLS_BUILD_ARGS`
+      When used by recipes that inherit the
+      :ref:`setuptools3 <ref-classes-setuptools3>` class, this variable can
+      be used to specify additional arguments to be passed to ``setup.py build``
+      in the ``setuptools3_do_compile()`` task.
+
+   :term:`SETUPTOOLS_INSTALL_ARGS`
+      When used by recipes that inherit the
+      :ref:`setuptools3 <ref-classes-setuptools3>` class, this variable can
+      be used to specify additional arguments to be passed to ``setup.py install``
+      in the ``setuptools3_do_install()`` task.
+
+   :term:`SETUPTOOLS_SETUP_PATH`
+      When used by recipes that inherit the
+      :ref:`setuptools3 <ref-classes-setuptools3>` class, this variable should
+      be used to specify the directory in which the ``setup.py`` file is
+      located if it is not at the root of the source tree (as specified by
+      :term:`S`). For example, in a recipe where the sources are fetched from
+      a Git repository and ``setup.py`` is in a ``python/pythonmodule``
+      subdirectory, you would have this::
+
+         S = "${WORKDIR}/git"
+         SETUPTOOLS_SETUP_PATH = "${S}/python/pythonmodule"
 
    :term:`SIGGEN_EXCLUDE_SAFE_RECIPE_DEPS`
       A list of recipe dependencies that should not be used to determine
@@ -6908,6 +6958,23 @@ system and gives an overview of their function and contents.
       You will see this variable referenced in the default values of
       ``FILES:${PN}-dev``.
 
+   :term:`SOURCE_DATE_EPOCH`
+      This defines a date expressed in number of seconds since
+      the UNIX EPOCH (01 Jan 1970 00:00:00 UTC), which is used by
+      multiple build systems to force a timestamp in built binaries.
+      Many upstream projects already support this variable.
+
+      You will find more details in the `official specifications
+      <https://reproducible-builds.org/specs/source-date-epoch/>`__.
+
+      A value for each recipe is computed from the sources by
+      :oe_git:`meta/lib/oe/reproducible.py </openembedded-core/tree/meta/lib/oe/reproducible.py>`.
+
+      If a recipe wishes to override the default behavior, it should set its
+      own :term:`SOURCE_DATE_EPOCH` value::
+
+          SOURCE_DATE_EPOCH = "1613559011"
+
    :term:`SOURCE_MIRROR_FETCH`
       When you are fetching files to create a mirror of sources (i.e.
       creating a source mirror), setting :term:`SOURCE_MIRROR_FETCH` to "1" in
@@ -6984,91 +7051,13 @@ system and gives an overview of their function and contents.
       for additional information.
 
    :term:`SRC_URI`
-      The list of source files - local or remote. This variable tells the
-      OpenEmbedded build system which bits to pull in for the build and how
-      to pull them in. For example, if the recipe or append file only needs
-      to fetch a tarball from the Internet, the recipe or append file uses
-      a single :term:`SRC_URI` entry. On the other hand, if the recipe or
-      append file needs to fetch a tarball, apply two patches, and include
-      a custom file, the recipe or append file would include four instances
-      of the variable.
 
-      The following list explains the available URI protocols. URI
-      protocols are highly dependent on particular BitBake Fetcher
-      submodules. Depending on the fetcher BitBake uses, various URL
-      parameters are employed. For specifics on the supported Fetchers, see
-      the ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-fetching:fetchers`" section in the
-      BitBake User Manual.
+      See the BitBake manual for the initial description for this variable:
+      :term:`bitbake:SRC_URI`.
 
-      -  ``file://`` - Fetches files, which are usually files shipped
-         with the :term:`Metadata`, from the local machine (e.g.
-         :ref:`patch <overview-manual/concepts:patching>` files).
-         The path is relative to the :term:`FILESPATH`
-         variable. Thus, the build system searches, in order, from the
-         following directories, which are assumed to be a subdirectories of
-         the directory in which the recipe file (``.bb``) or append file
-         (``.bbappend``) resides:
+      The following features are added by OpenEmbedded and the Yocto Project.
 
-         -  ``${BPN}`` - The base recipe name without any special suffix
-            or version numbers.
-
-         -  ``${BP}`` - ``${BPN}-${PV}``. The base recipe name and
-            version but without any special package name suffix.
-
-         -  *files -* Files within a directory, which is named ``files``
-            and is also alongside the recipe or append file.
-
-         .. note::
-
-            If you want the build system to pick up files specified through
-            a
-            SRC_URI
-            statement from your append file, you need to be sure to extend
-            the
-            FILESPATH
-            variable by also using the
-            FILESEXTRAPATHS
-            variable from within your append file.
-
-      -  ``bzr://`` - Fetches files from a Bazaar revision control
-         repository.
-
-      -  ``git://`` - Fetches files from a Git revision control
-         repository.
-
-      -  ``osc://`` - Fetches files from an OSC (openSUSE Build service)
-         revision control repository.
-
-      -  ``repo://`` - Fetches files from a repo (Git) repository.
-
-      -  ``ccrc://`` - Fetches files from a ClearCase repository.
-
-      -  ``http://`` - Fetches files from the Internet using ``http``.
-
-      -  ``https://`` - Fetches files from the Internet using ``https``.
-
-      -  ``ftp://`` - Fetches files from the Internet using ``ftp``.
-
-      -  ``cvs://`` - Fetches files from a CVS revision control
-         repository.
-
-      -  ``hg://`` - Fetches files from a Mercurial (``hg``) revision
-         control repository.
-
-      -  ``p4://`` - Fetches files from a Perforce (``p4``) revision
-         control repository.
-
-      -  ``ssh://`` - Fetches files from a secure shell.
-
-      -  ``svn://`` - Fetches files from a Subversion (``svn``) revision
-         control repository.
-
-      -  ``npm://`` - Fetches JavaScript modules from a registry.
-
-      -  ``az://`` - Fetches files from an Azure Storage account.
-
-      There are standard and recipe-specific options for :term:`SRC_URI`. Here are
-      standard ones:
+      There are standard and recipe-specific options. Here are standard ones:
 
       -  ``apply`` - Whether to apply the patch or not. The default
          action is to apply the patch.
@@ -7101,41 +7090,12 @@ system and gives an overview of their function and contents.
       -  ``notrev`` - Apply the patch only if :term:`SRCREV` is not equal to
          ``rev``.
 
-      Here are some additional options worth mentioning:
+      .. note::
 
-      -  ``unpack`` - Controls whether or not to unpack the file if it is
-         an archive. The default action is to unpack the file.
-
-      -  ``destsuffix`` - Places the file (or extracts its contents) into
-         the specified subdirectory of :term:`WORKDIR` when
-         the Git fetcher is used.
-
-      -  ``subdir`` - Places the file (or extracts its contents) into the
-         specified subdirectory of :term:`WORKDIR` when the local (``file://``)
-         fetcher is used.
-
-      -  ``localdir`` - Places the file (or extracts its contents) into
-         the specified subdirectory of :term:`WORKDIR` when the CVS fetcher is
-         used.
-
-      -  ``subpath`` - Limits the checkout to a specific subpath of the
-         tree when using the Git fetcher is used.
-
-      -  ``name`` - Specifies a name to be used for association with
-         :term:`SRC_URI` checksums or :term:`SRCREV` when you have more than one
-         file or git repository specified in :term:`SRC_URI`. For example::
-
-            SRC_URI = "git://example.com/foo.git;name=first \
-                       git://example.com/bar.git;name=second \
-                       http://example.com/file.tar.gz;name=third"
-
-            SRCREV_first = "f1d2d2f924e986ac86fdf7b36c94bcdf32beec15"
-            SRCREV_second = "e242ed3bffccdf271b7fbaf34ed72d089537b42f"
-            SRC_URI[third.sha256sum] = "13550350a8681c84c861aac2e5b440161c2b33a3e4f302ac680ca5b686de48de"
-
-
-      -  ``downloadfilename`` - Specifies the filename used when storing
-         the downloaded file.
+         If you want the build system to pick up files specified through
+         a :term:`SRC_URI` statement from your append file, you need to be
+         sure to extend the :term:`FILESPATH` variable by also using the
+         :term:`FILESEXTRAPATHS` variable from within your append file.
 
    :term:`SRC_URI_OVERRIDES_PACKAGE_ARCH`
       By default, the OpenEmbedded build system automatically detects
@@ -8085,7 +8045,7 @@ system and gives an overview of their function and contents.
       on enabling, running, and writing these tests, see the
       ":ref:`dev-manual/common-tasks:performing automated runtime testing`"
       section in the Yocto Project Development Tasks Manual and the
-      ":ref:`testimage*.bbclass <ref-classes-testimage*>`" section.
+      ":ref:`ref-classes-testimage*`" section.
 
    :term:`THISDIR`
       The directory in which the file BitBake is currently parsing is
@@ -8141,6 +8101,15 @@ system and gives an overview of their function and contents.
       information on setting up a cross-development environment, see the
       :doc:`/sdk-manual/index` manual.
 
+      Note that this variable applies to building an SDK, not an eSDK,
+      in which case the term:`TOOLCHAIN_HOST_TASK_ESDK` setting should be
+      used instead.
+
+   :term:`TOOLCHAIN_HOST_TASK_ESDK`
+      This variable allows to extend what is installed in the host
+      portion of an eSDK. This is similar to :term:`TOOLCHAIN_HOST_TASK`
+      applying to SDKs.
+
    :term:`TOOLCHAIN_OUTPUTNAME`
       This variable defines the name used for the toolchain output. The
       :ref:`populate_sdk_base <ref-classes-populate-sdk-*>` class sets
@@ -8169,11 +8138,6 @@ system and gives an overview of their function and contents.
       section in the Yocto Project Overview and Concepts Manual. For
       information on setting up a cross-development environment, see the
       :doc:`/sdk-manual/index` manual.
-
-   :term:`TOPDIR`
-      The top-level :term:`Build Directory`. BitBake
-      automatically sets this variable when you initialize your build
-      environment using :ref:`structure-core-script`.
 
    :term:`TRANSLATED_TARGET_ARCH`
       A sanitized version of :term:`TARGET_ARCH`. This
@@ -8290,40 +8254,6 @@ system and gives an overview of their function and contents.
       the ``meta/conf/machine/include/x86/tune-core2.inc`` file::
 
          TUNE_PKGARCH:tune-core2-32 = "core2-32"
-
-   :term:`TUNEABI`
-      An underlying Application Binary Interface (ABI) used by a particular
-      tuning in a given toolchain layer. Providers that use prebuilt
-      libraries can use the :term:`TUNEABI`,
-      :term:`TUNEABI_OVERRIDE`, and
-      :term:`TUNEABI_WHITELIST` variables to check
-      compatibility of tunings against their selection of libraries.
-
-      If :term:`TUNEABI` is undefined, then every tuning is allowed. See the
-      :ref:`sanity <ref-classes-sanity>` class to see how the variable is
-      used.
-
-   :term:`TUNEABI_OVERRIDE`
-      If set, the OpenEmbedded system ignores the
-      :term:`TUNEABI_WHITELIST` variable.
-      Providers that use prebuilt libraries can use the
-      :term:`TUNEABI_OVERRIDE`, :term:`TUNEABI_WHITELIST`, and
-      :term:`TUNEABI` variables to check compatibility of a
-      tuning against their selection of libraries.
-
-      See the :ref:`sanity <ref-classes-sanity>` class to see how the
-      variable is used.
-
-   :term:`TUNEABI_WHITELIST`
-      A whitelist of permissible :term:`TUNEABI` values. If
-      :term:`TUNEABI_WHITELIST` is not set, all tunes are allowed. Providers
-      that use prebuilt libraries can use the :term:`TUNEABI_WHITELIST`,
-      :term:`TUNEABI_OVERRIDE`, and :term:`TUNEABI`
-      variables to check compatibility of a tuning against their selection
-      of libraries.
-
-      See the :ref:`sanity <ref-classes-sanity>` class to see how the
-      variable is used.
 
    :term:`TUNECONFLICTS[feature]`
       Specifies CPU or Application Binary Interface (ABI) tuning features
@@ -8740,12 +8670,12 @@ system and gives an overview of their function and contents.
       warnings by the OpenEmbedded build system. You set this variable in
       your distribution configuration file. For a list of the checks you
       can control with this variable, see the
-      ":ref:`insane.bbclass <ref-classes-insane>`" section.
+      ":ref:`ref-classes-insane`" section.
 
    :term:`WKS_FILE`
       Specifies the location of the Wic kickstart file that is used by the
       OpenEmbedded build system to create a partitioned image
-      (image\ ``.wic``). For information on how to create a partitioned
+      (``image.wic``). For information on how to create a partitioned
       image, see the
       ":ref:`dev-manual/common-tasks:creating partitioned images using wic`"
       section in the Yocto Project Development Tasks Manual. For details on

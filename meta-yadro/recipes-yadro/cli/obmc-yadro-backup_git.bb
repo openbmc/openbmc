@@ -4,7 +4,7 @@ HOMEPAGE = "https://github.com/YADRO-KNS/obmc-yadro-backup"
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-inherit meson
+inherit pkgconfig meson
 
 # License info
 LICENSE = "Apache-2.0"
@@ -12,5 +12,5 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 # Source code repository
 S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/YADRO-KNS/obmc-yadro-backup.git"
+SRC_URI = "git://github.com/YADRO-KNS/obmc-yadro-backup.git;branch=master;protocol=https"
 SRCREV  = "1cb990bb16708ad488980d907387bd3e4d37eb3a"

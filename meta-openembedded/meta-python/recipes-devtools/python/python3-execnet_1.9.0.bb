@@ -6,7 +6,10 @@ HOMEPAGE = "https://execnet.readthedocs.io/en/latest/"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=772fcdaca14b378878d05c7d857e6c3e"
 
-DEPENDS += "python3-pip-native"
+DEPENDS += "\
+    python3-pip-native \
+    python3-setuptools-scm-native \
+"
 
 SRC_URI += "file://run-ptest \
            "

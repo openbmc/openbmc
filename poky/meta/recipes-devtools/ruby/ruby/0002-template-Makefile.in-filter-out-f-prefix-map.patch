@@ -3,7 +3,7 @@ Subject: [PATCH] template/Makefile.in: filter out -f*prefix-map
 If we add DEBUG_PREFIX_MAP into LDFLAGS, ruby and ruby-dbg are no longer
 reproducible.  Fix this.
 
-Upstream-Status: Inapproppriate [oe-core specific]
+Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Tony Battersby <tonyb@cybernetics.com>
 ---
 --- a/tool/mjit_archflag.sh

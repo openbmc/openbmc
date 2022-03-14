@@ -222,8 +222,7 @@ Package Tests (ptest) are built but not installed by default. For
 information on using Package Tests, see the
 ":ref:`dev-manual/common-tasks:testing packages with ptest`"
 section in the Yocto Project Development Tasks Manual. For information on the
-``ptest`` class, see the ":ref:`ptest.bbclass <ref-classes-ptest>`"
-section.
+``ptest`` class, see the ":ref:`ref-classes-ptest`" section.
 
 .. _migration-1.6-build-changes:
 
@@ -231,7 +230,7 @@ Build Changes
 -------------
 
 Separate build and source directories have been enabled by default for
-selected recipes where it is known to work (a whitelist) and for all
+selected recipes where it is known to work and for all
 recipes that inherit the :ref:`cmake <ref-classes-cmake>` class. In
 future releases the :ref:`autotools <ref-classes-autotools>` class
 will enable a separate build directory by default as well. Recipes

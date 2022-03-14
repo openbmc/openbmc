@@ -14,11 +14,11 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  src/configure.ac | 7 +++++++
  1 file changed, 7 insertions(+)
 
-diff --git a/src/configure.ac b/src/configure.ac
-index 0ee86ad..64736f0 100644
---- a/src/configure.ac
-+++ b/src/configure.ac
-@@ -3192,11 +3192,18 @@ AC_TRY_COMPILE([#include <stdio.h>], [int x __attribute__((unused));],
+Index: git/src/configure.ac
+===================================================================
+--- git.orig/src/configure.ac
++++ git/src/configure.ac
+@@ -3264,11 +3264,18 @@ AC_TRY_COMPILE([#include <stdio.h>], [in
  	AC_MSG_RESULT(no))
  
  dnl Checks for header files.
@@ -37,6 +37,3 @@ index 0ee86ad..64736f0 100644
  
  AC_HEADER_DIRENT
  
--- 
-2.7.4
-

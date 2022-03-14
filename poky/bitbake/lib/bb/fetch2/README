@@ -1,0 +1,57 @@
+There are expectations of users of the fetcher code. This file attempts to document
+some of the constraints that are present. Some are obvious, some are less so. It is
+documented in the context of how OE uses it but the API calls are generic.
+
+a) network access for sources is only expected to happen in the do_fetch task.
+   This is not enforced or tested but is required so that we can:
+
+   i) audit the sources used (i.e. for license/manifest reasons) 
+   ii) support offline builds with a suitable cache
+   iii) allow work to continue even with downtime upstream
+   iv) allow for changes upstream in incompatible ways
+   v) allow rebuilding of the software in X years time
+
+b) network access is not expected in do_unpack task.
+
+c) you can take DL_DIR and use it as a mirror for offline builds.
+
+d) access to the network is only made when explicitly configured in recipes
+   (e.g. use of AUTOREV, or use of git tags which change revision).
+
+e) fetcher output is deterministic (i.e. if you fetch configuration XXX now it 
+   will match in future exactly in a clean build with a new DL_DIR).
+   One specific pain point example are git tags. They can be replaced and change
+   so the git fetcher has to resolve them with the network. We use git revisions
+   where possible to avoid this and ensure determinism.
+
+f) network access is expected to work with the standard linux proxy variables
+   so that access behind firewalls works (the fetcher sets these in the 
+   environment but only in the do_fetch tasks).
+
+g) access during parsing has to be minimal, a "git ls-remote" for an AUTOREV 
+   git recipe might be ok but you can't expect to checkout a git tree.
+
+h) we need to provide revision information during parsing such that a version
+   for the recipe can be constructed.
+
+i) versions are expected to be able to increase in a way which sorts allowing 
+   package feeds to operate (see PR server required for git revisions to sort).
+
+j) API to query for possible version upgrades of a url is highly desireable to 
+   allow our automated upgrage code to function (it is implied this does always 
+   have network access).
+
+k) Where fixes or changes to behaviour in the fetcher are made, we ask that 
+   test cases are added (run with "bitbake-selftest bb.tests.fetch"). We do 
+   have fairly extensive test coverage of the fetcher as it is the only way
+   to track all of its corner cases, it still doesn't give entire coverage 
+   though sadly.
+   
+l) If using tools during parse time, they will have to be in ASSUME_PROVIDED
+   in OE's context as we can't build git-native, then parse a recipe and use
+   git ls-remote.
+
+Not all fetchers support all features, autorev is optional and doesn't make
+sense for some. Upgrade detection means different things in different contexts
+too.
+

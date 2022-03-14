@@ -1,6 +1,15 @@
 #!/bin/sh
+
+set -u
+
 export TIMEOUT_DURATION=240
 chown nobody tests
 chown nobody tests/*
 chown nobody ../ptest
+
 su nobody -c "make -B -C tests -k test-suite.log"
+res=$?
+if [ $res -ne 0 ]; then
+    cat tests/test-suite.log
+fi
+exit $res

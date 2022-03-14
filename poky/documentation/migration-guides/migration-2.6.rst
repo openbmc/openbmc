@@ -363,7 +363,7 @@ Post Installation Changes
 
 You must explicitly mark post installs to defer to the target. If you
 want to explicitly defer a postinstall to first boot on the target
-rather than at rootfs creation time, use ``pkg_postinst_ontarget()`` or
+rather than at root filesystem creation time, use ``pkg_postinst_ontarget()`` or
 call ``postinst_intercept delay_to_first_boot`` from ``pkg_postinst()``.
 Any failure of a ``pkg_postinst()`` script (including exit 1) triggers
 an error during the :ref:`ref-tasks-rootfs` task.

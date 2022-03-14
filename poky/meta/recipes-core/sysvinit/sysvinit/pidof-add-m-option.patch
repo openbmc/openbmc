@@ -1,4 +1,4 @@
-From 6c490ea6579a132fabb7dbd25387bb521f820371 Mon Sep 17 00:00:00 2001
+From 96fb53ef2ccd2580cf0aa565ef1629cb05eae50a Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 24 Jul 2013 17:07:22 +0800
 Subject: [PATCH] pidof: add -m option
@@ -10,7 +10,7 @@ each other's pids.
 
 https://bugzilla.redhat.com/show_bug.cgi?id=883856
 
-Upstream-Status: backport
+Upstream-Status: Backport
 Imported patch from: https://bugzilla.redhat.com/attachment.cgi?id=658166
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
@@ -21,7 +21,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  2 files changed, 65 insertions(+), 3 deletions(-)
 
 diff --git a/man/pidof.8 b/man/pidof.8
-index ebe5f55..2fdc4d3 100644
+index 84ed1e4..ac184da 100644
 --- a/man/pidof.8
 +++ b/man/pidof.8
 @@ -25,6 +25,7 @@ pidof -- find the process ID of a running program.
@@ -32,7 +32,7 @@ index ebe5f55..2fdc4d3 100644
  .RB [ \-o
  .IR omitpid[,omitpid...] ]
  .RB [ \-o
-@@ -76,6 +77,11 @@ is shown. The default separator is a space.
+@@ -79,6 +80,11 @@ is shown. The default separator is a space.
  Tells \fIpidof\fP to omit processes with that process id. The special
  pid \fB%PPID\fP can be used to name the parent process of the \fIpidof\fP
  program, in other words the calling shell or shell script.
@@ -45,10 +45,10 @@ index ebe5f55..2fdc4d3 100644
  .TP
  .B 0
 diff --git a/src/killall5.c b/src/killall5.c
-index 8b5cb38..a664954 100644
+index b0728fa..72289e3 100644
 --- a/src/killall5.c
 +++ b/src/killall5.c
-@@ -126,6 +126,7 @@ typedef struct _s_nfs
+@@ -121,6 +121,7 @@ typedef struct _s_nfs
  
  /* List of processes. */
  PROC *plist;
@@ -56,7 +56,7 @@ index 8b5cb38..a664954 100644
  
  /* List of processes to omit. */
  OMIT *omit;
-@@ -361,6 +362,20 @@ static void clear_mnt(void)
+@@ -356,6 +357,20 @@ static void clear_mnt(void)
  	}
  }
  
@@ -77,15 +77,15 @@ index 8b5cb38..a664954 100644
  /*
   *     Check if path is a shadow off a NFS partition.
   */
-@@ -486,6 +501,7 @@ int readproc(int do_stat)
+@@ -481,6 +496,7 @@ int readproc()
  	DIR		*dir;
  	FILE		*fp;
  	PROC		*p, *n;
 +	OMIT		*o, *m;
  	struct dirent	*d;
- 	struct stat	st;
  	char		path[PATH_MAX+1];
-@@ -733,6 +749,17 @@ int readproc(int do_stat)
+ 	char		buf[PATH_MAX+1];
+@@ -670,6 +686,17 @@ int readproc()
  		p->next = plist;
  		plist = p;
  		p->pid = pid;
@@ -103,7 +103,7 @@ index 8b5cb38..a664954 100644
  	}
  	closedir(dir);
  
-@@ -944,6 +971,26 @@ PIDQ_HEAD *pidof(char *prog)
+@@ -870,6 +897,26 @@ PIDQ_HEAD *pidof(char *prog)
  	return q;
  }
  
@@ -130,7 +130,7 @@ index 8b5cb38..a664954 100644
  /* Give usage message and exit. */
  void usage(void)
  {
-@@ -994,6 +1041,7 @@ void nsyslog(int pri, char *fmt, ...)
+@@ -920,6 +967,7 @@ void nsyslog(int pri, char *fmt, ...)
  #define PIDOF_OMIT	0x02
  #define PIDOF_NETFS	0x04
  #define PIDOF_QUIET     0x08
@@ -138,7 +138,7 @@ index 8b5cb38..a664954 100644
  
  /*
   *	Pidof functionality.
-@@ -1011,6 +1059,7 @@ int main_pidof(int argc, char **argv)
+@@ -937,6 +985,7 @@ int main_pidof(int argc, char **argv)
  	char		tmp[512];
          char            sep = ' ';
  
@@ -146,7 +146,7 @@ index 8b5cb38..a664954 100644
  	omit = (OMIT*)0;
  	nlist = (NFS*)0;
  	opterr = 0;
-@@ -1018,7 +1067,7 @@ int main_pidof(int argc, char **argv)
+@@ -944,7 +993,7 @@ int main_pidof(int argc, char **argv)
  	if ((token = getenv("PIDOF_NETFS")) && (strcmp(token,"no") != 0))
  		flags |= PIDOF_NETFS;
  
@@ -155,7 +155,7 @@ index 8b5cb38..a664954 100644
  		case '?':
  			nsyslog(LOG_ERR,"invalid options on command line!\n");
  			closelog();
-@@ -1069,6 +1118,9 @@ int main_pidof(int argc, char **argv)
+@@ -995,6 +1044,9 @@ int main_pidof(int argc, char **argv)
                  case 'z':
                          list_dz_processes = TRUE;
                          break;
@@ -165,7 +165,7 @@ index 8b5cb38..a664954 100644
  		case 'n':
  			flags |= PIDOF_NETFS;
  			break;
-@@ -1100,10 +1152,13 @@ int main_pidof(int argc, char **argv)
+@@ -1026,10 +1078,13 @@ int main_pidof(int argc, char **argv)
  			pid_t spid = 0;
  			while ((p = get_next_from_pid_q(q))) {
  				if ((flags & PIDOF_OMIT) && omit) {
@@ -181,7 +181,7 @@ index 8b5cb38..a664954 100644
  					}
  
  					/*
-@@ -1145,6 +1200,7 @@ int main_pidof(int argc, char **argv)
+@@ -1071,6 +1126,7 @@ int main_pidof(int argc, char **argv)
  		printf("\n");
          }
  

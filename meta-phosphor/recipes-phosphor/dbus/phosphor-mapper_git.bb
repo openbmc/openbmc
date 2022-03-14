@@ -23,9 +23,9 @@ SYSTEMD_SERVICE:${PN} += " \
         mapper-wait@.service \
         mapper-subtree-remove@.service \
         "
-SRC_URI += "git://github.com/openbmc/phosphor-objmgr"
+SRC_URI += "git://github.com/openbmc/phosphor-objmgr;branch=master;protocol=https"
 
-SRCREV = "bedd41655ed9641a9f6c47079e811797869ad8f3"
+SRCREV = "b15df6b28b97a0887e52d5f5e5899b10475943e1"
 
 S = "${WORKDIR}/git"
 

@@ -48,8 +48,8 @@ FILES:${PN}-wsgi-apps-ns = "${PYTHON_SITEPACKAGES_DIR}/obmc/wsgi/apps/__init__.p
 FILES:${PN}-utils = "${PYTHON_SITEPACKAGES_DIR}/obmc/utils"
 FILES:${PN}-dbus = "${PYTHON_SITEPACKAGES_DIR}/obmc/dbuslib"
 
-SRC_URI += "git://github.com/openbmc/pyphosphor"
+SRC_URI += "git://github.com/openbmc/pyphosphor;branch=master;protocol=https"
 
-SRCREV = "d2aadf1220b03580ab5f93fd15e068040cdb895b"
+SRCREV = "cb240aa1ed95799d2ea8bde951c6ed443839a7e0"
 
 S = "${WORKDIR}/git"

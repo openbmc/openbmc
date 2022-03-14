@@ -16,3 +16,6 @@ PACKAGECONFIG:append:mihawk = " verify_signature"
 # Enable sync of persistent files to the alternate BMC chip
 PACKAGECONFIG:append:ibm-ac-server = " sync_bmc_files"
 PACKAGECONFIG:append:mihawk = " sync_bmc_files"
+
+# Enable USB code update
+PACKAGECONFIG:append:p10bmc = " usb_code_update"

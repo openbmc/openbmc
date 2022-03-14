@@ -13,7 +13,7 @@
 INCLUDES = -I. -I../vboxsf -I../vboxsf/include
 MOD_DEFS = -DRT_OS_LINUX -DIN_RING0 -DIN_RT_R0 \
            -DIN_SUP_R0 -DVBOX -DVBOX_WITH_HGCM -DIN_MODULE -DIN_GUEST_R0
-CFLAGS	 = ${INCLUDES} ${MOD_DEFS}
+CFLAGS	 = ${INCLUDES} ${MOD_DEFS} ${EXTRA_CFLAGS}
 LDFLAGS	 =
 
 SRCS     = mount.vboxsf.c \

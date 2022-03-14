@@ -14,8 +14,8 @@ DEPENDS += "phosphor-logging"
 
 RDEPENDS:${PN} += "phosphor-sel-logger"
 
-SRC_URI = "git://github.com/openbmc/phosphor-ecc.git"
-SRCREV = "0841f8abf9b38f981d443ecc552cc2b014764bbf"
+SRC_URI = "git://github.com/openbmc/phosphor-ecc.git;branch=master;protocol=https"
+SRCREV = "c33f294ecc59cd31698ada37827bb5c9f00adc8b"
 
 S = "${WORKDIR}/git"
 

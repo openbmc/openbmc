@@ -1,6 +1,6 @@
 rename test target as run-test
 
-Upstream-Statue: Pending
+Upstream-Status: Pending
 
 test target not only compile the test files, but also run them, which is
 not suitable for cross-compile environment, so rename it as run-test.

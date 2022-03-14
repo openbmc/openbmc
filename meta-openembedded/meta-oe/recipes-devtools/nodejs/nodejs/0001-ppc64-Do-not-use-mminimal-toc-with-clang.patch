@@ -10,11 +10,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  common.gypi | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/common.gypi b/common.gypi
-index ee91fb1d..049c8f8c 100644
 --- a/common.gypi
 +++ b/common.gypi
-@@ -413,7 +413,7 @@
+@@ -417,7 +417,7 @@
              'ldflags': [ '-m32' ],
            }],
            [ 'target_arch=="ppc64" and OS!="aix"', {
@@ -23,6 +21,3 @@ index ee91fb1d..049c8f8c 100644
              'ldflags': [ '-m64' ],
            }],
            [ 'target_arch=="s390x"', {
--- 
-2.32.0
-

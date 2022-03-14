@@ -8,7 +8,7 @@ SRCREV = "21e6e2de1f0062f949fcc52d0b4559dfa3246e0e"
 PV = "0.1+gitr${SRCPV}"
 PR = "r3"
 
-SRC_URI = "git://github.com/android/platform_frameworks_base.git;branch=master"
+SRC_URI = "git://github.com/android/platform_frameworks_base.git;branch=master;protocol=https"
 
 S = "${WORKDIR}/git/data/fonts"
 

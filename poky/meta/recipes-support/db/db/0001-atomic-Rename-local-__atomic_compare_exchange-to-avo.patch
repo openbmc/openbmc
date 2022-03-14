@@ -11,7 +11,7 @@ Fixes
 ../db-5.3.28/src/dbinc/atomic.h:179:19: error: definition of builtin function '__atomic_compare_exchange'
 static inline int __atomic_compare_exchange(
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [as far as open source community is concerned, upstream is dead]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---

@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=393a5ca445f6965873eca0259a17f833"
 
 DEPENDS = "zlib libsigc++-2.0 openssl cppunit"
 
-SRC_URI = "git://github.com/rakshasa/libtorrent \
+SRC_URI = "git://github.com/rakshasa/libtorrent;branch=master;protocol=https \
            file://don-t-run-code-while-configuring-package.patch \
            "
 SRCREV = "756f70010779927dc0691e1e722ed433d5d295e1"

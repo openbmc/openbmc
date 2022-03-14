@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=6ea91368c1bbdf877159435572b931f5 \
                     file://PATENTS;md5=e69ad12202bd20da3c76a5d3648cfa83 \
                    "
 
-SRC_URI = "git://aomedia.googlesource.com/aom;protocol=https"
+SRC_URI = "git://aomedia.googlesource.com/aom;protocol=https;branch=master"
 
 SRCREV = "307ce06ed82d93885ee8ed53e152c9268ac0d98d"
 

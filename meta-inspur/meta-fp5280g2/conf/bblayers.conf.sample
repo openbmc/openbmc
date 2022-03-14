@@ -19,17 +19,3 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-inspur \
   ##OEROOT##/meta-inspur/meta-fp5280g2\
   "
-BBLAYERS_NON_REMOVABLE ?= " \
-  ##OEROOT##/meta \
-  ##OEROOT##/meta-openembedded/meta-oe \
-  ##OEROOT##/meta-openembedded/meta-networking \
-  ##OEROOT##/meta-openembedded/meta-perl \
-  ##OEROOT##/meta-openembedded/meta-python \
-  ##OEROOT##/meta-openembedded/meta-webserver \
-  ##OEROOT##/meta-security \
-  ##OEROOT##/meta-phosphor \
-  ##OEROOT##/meta-aspeed \
-  ##OEROOT##/meta-openpower \
-  ##OEROOT##/meta-inspur \
-  ##OEROOT##/meta-inspur/meta-fp5280g2 \
-  "

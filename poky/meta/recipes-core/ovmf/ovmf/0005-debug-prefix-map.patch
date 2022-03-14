@@ -14,7 +14,7 @@ overflowing section sizes and causing small changes in the binary output.
 Previously we relied on the stripped output being the same which isn't always
 the case if the size of the debug symbols varies.
 
-Upstream-Status: Pending [gcc parts may be upstreamable, nasm patch isn't upstream yet]
+Upstream-Status: Submitted [https://github.com/tianocore/edk2/pull/2202]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---

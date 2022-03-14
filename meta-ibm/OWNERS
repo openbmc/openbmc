@@ -1,3 +1,7 @@
 owners:
-- bradleyb@fuzziesquirrel.com
 - geissonator@yahoo.com
+
+matchers:
+- exact: recipes-kernel
+  reviewers:
+  - joel@jms.id.au

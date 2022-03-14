@@ -688,12 +688,11 @@ Recipe-Space Metadata
 ---------------------
 
 When stored in recipe-space, the kernel Metadata files reside in a
-directory hierarchy below
-:term:`FILESEXTRAPATHS`. For
-a linux-yocto recipe or for a Linux kernel recipe derived by copying and
-modifying
-``oe-core/meta-skeleton/recipes-kernel/linux/linux-yocto-custom.bb`` to
-a recipe in your layer, :term:`FILESEXTRAPATHS` is typically set to
+directory hierarchy below :term:`FILESEXTRAPATHS`. For
+a linux-yocto recipe or for a Linux kernel recipe derived by copying
+:oe_git:`meta-skeleton/recipes-kernel/linux/linux-yocto-custom.bb
+</openembedded-core/tree/meta-skeleton/recipes-kernel/linux/linux-yocto-custom.bb>`
+into your layer and modifying it, :term:`FILESEXTRAPATHS` is typically set to
 ``${``\ :term:`THISDIR`\ ``}/${``\ :term:`PN`\ ``}``.
 See the ":ref:`kernel-dev/common:modifying an existing recipe`"
 section for more information.
@@ -764,7 +763,7 @@ Organizing Your Source
 ======================
 
 Many recipes based on the ``linux-yocto-custom.bb`` recipe use Linux
-kernel sources that have only a single branch - "master". This type of
+kernel sources that have only a single branch. This type of
 repository structure is fine for linear development supporting a single
 machine and architecture. However, if you work with multiple boards and
 architectures, a kernel source repository with multiple branches is more
@@ -773,7 +772,7 @@ board to boot. Sometimes, these patches are works-in-progress or
 fundamentally wrong, yet they are still necessary for specific boards.
 In these situations, you most likely do not want to include these
 patches in every kernel you build (i.e. have the patches as part of the
-lone "master" branch). It is situations like these that give rise to
+default branch). It is situations like these that give rise to
 multiple branches used within a Linux kernel sources Git repository.
 
 Here are repository organization strategies maximizing source reuse,
@@ -813,7 +812,7 @@ Machine Branches
 When you have multiple machines and architectures to support, or you are
 actively working on board support, it is more efficient to create
 branches in the repository based on individual machines. Having machine
-branches allows common source to remain in the "master" branch with any
+branches allows common source to remain in the development branch with any
 features specific to a machine stored in the appropriate machine branch.
 This organization method frees you from continually reintegrating your
 patches into a feature.

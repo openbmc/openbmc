@@ -51,6 +51,7 @@ ARCHIVER_MODE[diff-exclude] ?= ".pc autom4te.cache patches"
 ARCHIVER_MODE[dumpdata] ?= "0"
 ARCHIVER_MODE[recipe] ?= "0"
 ARCHIVER_MODE[mirror] ?= "split"
+ARCHIVER_MODE[compression] ?= "xz"
 
 DEPLOY_DIR_SRC ?= "${DEPLOY_DIR}/sources"
 ARCHIVER_TOPDIR ?= "${WORKDIR}/archiver-sources"
@@ -409,15 +410,16 @@ def create_tarball(d, srcdir, suffix, ar_outdir):
     # that we archive the actual directory and not just the link.
     srcdir = os.path.realpath(srcdir)
 
+    compression_method = d.getVarFlag('ARCHIVER_MODE', 'compression')
     bb.utils.mkdirhier(ar_outdir)
     if suffix:
-        filename = '%s-%s.tar.gz' % (d.getVar('PF'), suffix)
+        filename = '%s-%s.tar.%s' % (d.getVar('PF'), suffix, compression_method)
     else:
-        filename = '%s.tar.gz' % d.getVar('PF')
+        filename = '%s.tar.%s' % (d.getVar('PF'), compression_method)
     tarname = os.path.join(ar_outdir, filename)
 
     bb.note('Creating %s' % tarname)
-    tar = tarfile.open(tarname, 'w:gz')
+    tar = tarfile.open(tarname, 'w:%s' % compression_method)
     tar.add(srcdir, arcname=os.path.basename(srcdir), filter=exclude_useless_paths)
     tar.close()
 

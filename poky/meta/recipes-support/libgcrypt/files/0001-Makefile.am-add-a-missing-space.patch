@@ -3,7 +3,7 @@ From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 24 Feb 2021 19:43:07 +0000
 Subject: [PATCH] Makefile.am: add a missing space
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [by email to gniibe@fsij.org,gcrypt-devel@gnupg.org]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
  cipher/Makefile.am | 2 +-

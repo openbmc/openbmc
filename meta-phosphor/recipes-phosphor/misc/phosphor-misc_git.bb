@@ -5,8 +5,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-SRC_URI = "git://github.com/openbmc/phosphor-misc"
-SRCREV = "688e9134a83379393ddde6aab0602c64e956153d"
+SRC_URI = "git://github.com/openbmc/phosphor-misc;branch=master;protocol=https"
+SRCREV = "669bb350cd2722f0d2bfd6cb4a22142e7e6c1488"
 
 S = "${WORKDIR}/git"
 

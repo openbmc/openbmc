@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Copyright (c) 2018, YADRO
 # Author: Alexander Amelkin <a.amelkin@yadro.com>
@@ -49,10 +49,10 @@ machine() {
 		tmpl=${cfg%/machine/*.conf}
 
         # Skip any machines that don't support meta-phosphor.
-        if [ ! -e $tmpl/bblayers.conf.sample ]; then
+        if [ ! -e "$tmpl/bblayers.conf.sample" ]; then
             continue
         fi
-        if ! grep -q "##OEROOT##/meta-phosphor" $tmpl/bblayers.conf.sample; then
+        if ! grep -q "##OEROOT##/meta-phosphor" "$tmpl/bblayers.conf.sample"; then
             continue
         fi
 
@@ -61,9 +61,9 @@ machine() {
 		if [ -n "$target" ]; then
 			if [ "${name}" = "${target}" ]; then
 				echo "Machine ${target} found in ${tmpl%/conf}"
-				mkdir -p ${build_dir}
+				mkdir -p "${build_dir}"
 				TEMPLATECONF="${tmpl}" source \
-						oe-init-build-env ${build_dir}
+						oe-init-build-env "${build_dir}"
 
 				if [ "$(cat conf/templateconf.cfg)" = "${tmpl}" ]; then
 					sed "s/^\(MACHINE\s*[?:]*\s*=\s*\).*$/\1\"${target}\"/" \
@@ -76,7 +76,7 @@ machine() {
 		fi
 	done
 
-	[ -n "$target" ] && echo "No such machine!"
+	[ -n "$target" ] && echo "No such machine!" >&2 && return 1
 }
 
 if [ -z "$1" ]; then
@@ -90,6 +90,6 @@ else
 	if [ -z "$2" ]; then
 		bld_dir="build/$1"
 	fi
-	machine $1 $bld_dir
+	machine "$1" "$bld_dir"
 fi
 

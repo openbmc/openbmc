@@ -113,7 +113,7 @@ recipes to ``packagegroup-*``, and change them to inherit
 to remove anything now handled by ``packagegroup.bbclass``, such as
 providing ``-dev`` and ``-dbg`` packages, setting
 :term:`LIC_FILES_CHKSUM`, and so forth. See the
-":ref:`packagegroup.bbclass <ref-classes-packagegroup>`" section for
+:ref:`ref-classes-packagegroup` section for
 further details.
 
 .. _migration-1.3-image-features:

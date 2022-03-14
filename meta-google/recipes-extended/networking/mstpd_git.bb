@@ -3,7 +3,7 @@ PV = "0.1+git${SRCPV}"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=4325afd396febcb659c36b49533135d4"
 
-SRC_URI = "git://github.com/mstpd/mstpd"
+SRC_URI = "git://github.com/mstpd/mstpd;branch=master;protocol=https"
 SRCREV = "973c403c79f3d419d9e93a242766ddf0099d1299"
 S = "${WORKDIR}/git"
 

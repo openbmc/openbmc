@@ -23,19 +23,22 @@ Subject: [PATCH] chrony: fix build failure for arma9
 
     Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- sys_linux.c | 20 ++++++++++++++------
- 1 file changed, 14 insertions(+), 6 deletions(-)
+ sys_linux.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
+diff --git a/sys_linux.c b/sys_linux.c
+index 9cab2ef..8104b8f 100644
 --- a/sys_linux.c
 +++ b/sys_linux.c
-@@ -499,14 +499,12 @@ SYS_Linux_EnableSystemCallFilter(int lev
+@@ -484,7 +484,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
  #endif
      SCMP_SYS(gettimeofday),
      SCMP_SYS(settimeofday),
 -    SCMP_SYS(time),
-
+ 
      /* Process */
      SCMP_SYS(clone),
+@@ -494,7 +493,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
      SCMP_SYS(exit),
      SCMP_SYS(exit_group),
      SCMP_SYS(getpid),
@@ -43,7 +46,7 @@ Subject: [PATCH] chrony: fix build failure for arma9
      SCMP_SYS(getuid),
      SCMP_SYS(getuid32),
      SCMP_SYS(rt_sigaction),
-@@ -520,7 +518,6 @@ SYS_Linux_EnableSystemCallFilter(int lev
+@@ -508,7 +506,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
      /* Memory */
      SCMP_SYS(brk),
      SCMP_SYS(madvise),
@@ -51,28 +54,28 @@ Subject: [PATCH] chrony: fix build failure for arma9
      SCMP_SYS(mmap2),
      SCMP_SYS(mprotect),
      SCMP_SYS(mremap),
-@@ -580,8 +577,6 @@ SYS_Linux_EnableSystemCallFilter(int lev
+@@ -568,8 +565,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
      SCMP_SYS(sendmsg),
      SCMP_SYS(sendto),
      SCMP_SYS(shutdown),
 -    /* TODO: check socketcall arguments */
 -    SCMP_SYS(socketcall),
-
+ 
      /* General I/O */
      SCMP_SYS(_newselect),
-@@ -604,7 +599,6 @@ SYS_Linux_EnableSystemCallFilter(int lev
+@@ -593,7 +588,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
  #ifdef __NR_futex_time64
      SCMP_SYS(futex_time64),
  #endif
 -    SCMP_SYS(select),
      SCMP_SYS(set_robust_list),
      SCMP_SYS(write),
-
-@@ -612,6 +606,15 @@ SYS_Linux_EnableSystemCallFilter(int lev
+ 
+@@ -601,6 +595,15 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
      SCMP_SYS(getrandom),
      SCMP_SYS(sysinfo),
      SCMP_SYS(uname),
-+    /* not always available */
++   /* not always available */
 +#if ! defined(__ARM_EABI__)
 +    SCMP_SYS(time),
 +    SCMP_SYS(getrlimit),
@@ -82,5 +85,8 @@ Subject: [PATCH] chrony: fix build failure for arma9
 +    SCMP_SYS(socketcall),
 +#endif
    };
-
+ 
    const int denied_any[] = {
+-- 
+2.25.1
+

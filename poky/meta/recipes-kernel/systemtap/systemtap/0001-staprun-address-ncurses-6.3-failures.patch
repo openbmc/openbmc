@@ -1,0 +1,61 @@
+From 191f528da19193d713d94ee252e2485efd9af4d3 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Mon, 25 Oct 2021 17:59:24 +0200
+Subject: [PATCH] staprun: address ncurses 6.3 failures
+
+Upstream-Status: Submitted [by email to smakarov@redhat.com,systemtap@sourceware.org]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ staprun/monitor.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/staprun/monitor.c b/staprun/monitor.c
+index 478634c09..f4fbfd686 100644
+--- a/staprun/monitor.c
++++ b/staprun/monitor.c
+@@ -448,12 +448,12 @@ void monitor_render(void)
+       if (active_window == 0)
+         wattron(status, A_BOLD);
+       wprintw(status, "\n%*s\t%*s\t%*s\t%*s\t%*s\t%*s\t%s\n",
+-              width[p_index], HIGHLIGHT("index", p_index, comp_fn_index),
+-              width[p_state], HIGHLIGHT("state", p_state, comp_fn_index),
+-              width[p_hits], HIGHLIGHT("hits", p_hits, comp_fn_index),
+-              width[p_min], HIGHLIGHT("min", p_min, comp_fn_index),
+-              width[p_avg], HIGHLIGHT("avg", p_avg, comp_fn_index),
+-              width[p_max], HIGHLIGHT("max", p_max, comp_fn_index),
++              (int)width[p_index], HIGHLIGHT("index", p_index, comp_fn_index),
++              (int)width[p_state], HIGHLIGHT("state", p_state, comp_fn_index),
++              (int)width[p_hits], HIGHLIGHT("hits", p_hits, comp_fn_index),
++              (int)width[p_min], HIGHLIGHT("min", p_min, comp_fn_index),
++              (int)width[p_avg], HIGHLIGHT("avg", p_avg, comp_fn_index),
++              (int)width[p_max], HIGHLIGHT("max", p_max, comp_fn_index),
+               HIGHLIGHT("name", p_name, comp_fn_index));
+       if (active_window == 0)
+         wattroff(status, A_BOLD);
+@@ -466,17 +466,17 @@ void monitor_render(void)
+           json_object *probe, *field;
+           probe = json_object_array_get_idx(jso_probe_list, i);
+           json_object_object_get_ex(probe, "index", &field);
+-          wprintw(status, "%*s\t", width[p_index], json_object_get_string(field));
++          wprintw(status, "%*s\t", (int)width[p_index], json_object_get_string(field));
+           json_object_object_get_ex(probe, "state", &field);
+-          wprintw(status, "%*s\t", width[p_state], json_object_get_string(field));
++          wprintw(status, "%*s\t", (int)width[p_state], json_object_get_string(field));
+           json_object_object_get_ex(probe, "hits", &field);
+-          wprintw(status, "%*s\t", width[p_hits], json_object_get_string(field));
++          wprintw(status, "%*s\t", (int)width[p_hits], json_object_get_string(field));
+           json_object_object_get_ex(probe, "min", &field);
+-          wprintw(status, "%*s\t", width[p_min], json_object_get_string(field));
++          wprintw(status, "%*s\t", (int)width[p_min], json_object_get_string(field));
+           json_object_object_get_ex(probe, "avg", &field);
+-          wprintw(status, "%*s\t", width[p_avg], json_object_get_string(field));
++          wprintw(status, "%*s\t", (int)width[p_avg], json_object_get_string(field));
+           json_object_object_get_ex(probe, "max", &field);
+-          wprintw(status, "%*s\t", width[p_max], json_object_get_string(field));
++          wprintw(status, "%*s\t", (int)width[p_max], json_object_get_string(field));
+           getyx(status, discard, cur_x);
+           json_object_object_get_ex(probe, "name", &field);
+           wprintw(status, "%.*s", max_cols-cur_x-1, json_object_get_string(field));
+-- 
+2.20.1
+

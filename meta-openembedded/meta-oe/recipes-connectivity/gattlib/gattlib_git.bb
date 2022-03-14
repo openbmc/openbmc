@@ -9,7 +9,7 @@ DEPENDS += "glib-2.0-native"
 
 PV = "0.2+git${SRCPV}"
 
-SRC_URI = "git://github.com/labapart/gattlib.git \
+SRC_URI = "git://github.com/labapart/gattlib.git;branch=master;protocol=https \
            file://dbus-avoid-strange-chars-from-the-build-dir.patch \
            "
 
@@ -23,6 +23,7 @@ PACKAGECONFIG[examples] = "-DGATTLIB_BUILD_EXAMPLES=ON,-DGATTLIB_BUILD_EXAMPLES=
 # Set this to force use of DBus API if Bluez version is older than 5.42
 PACKAGECONFIG[force-dbus] = "-DGATTLIB_FORCE_DBUS=TRUE,-DGATTLIB_FORCE_DBUS=FALSE"
 
+EXTRA_OECMAKE += "-DGATTLIB_PYTHON_INTERFACE=OFF"
 EXTRA_OECMAKE += "-DGATTLIB_BUILD_DOCS=OFF"
 
 inherit pkgconfig cmake

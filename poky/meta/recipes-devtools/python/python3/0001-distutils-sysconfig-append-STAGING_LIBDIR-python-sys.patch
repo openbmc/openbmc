@@ -1,4 +1,4 @@
-From e65bfe22c858872b08366aff49119d4145a77f40 Mon Sep 17 00:00:00 2001
+From 78dd1def953e18e7cda0325bb26d27c051bb6890 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 31 Jan 2019 16:46:30 +0100
 Subject: [PATCH] distutils/sysconfig: append
@@ -10,28 +10,14 @@ Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 ---
- Lib/distutils/sysconfig.py | 2 ++
- Lib/sysconfig.py           | 2 ++
- 2 files changed, 4 insertions(+)
+ Lib/sysconfig.py | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
-index b51629e..2df348c 100644
---- a/Lib/distutils/sysconfig.py
-+++ b/Lib/distutils/sysconfig.py
-@@ -438,6 +438,8 @@ def _init_posix():
-         platform=sys.platform,
-         multiarch=getattr(sys.implementation, '_multiarch', ''),
-     ))
-+    if 'STAGING_LIBDIR' in os.environ:
-+        sys.path.append(os.environ['STAGING_LIBDIR']+'/python-sysconfigdata')
-     _temp = __import__(name, globals(), locals(), ['build_time_vars'], 0)
-     build_time_vars = _temp.build_time_vars
-     global _config_vars
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index b2d790b..405273c 100644
+index 40c6b3e..ac94cc7 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
-@@ -419,6 +419,8 @@ def _init_posix(vars):
+@@ -474,6 +474,8 @@ def _init_posix(vars):
      """Initialize the module as appropriate for POSIX systems."""
      # _sysconfigdata is generated at build time, see _generate_posix_vars()
      name = _get_sysconfigdata_name()

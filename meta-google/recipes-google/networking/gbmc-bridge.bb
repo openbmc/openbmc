@@ -20,6 +20,8 @@ SRC_URI += " \
   file://gbmc-br-ensure-ra.service \
   file://gbmc-br-gw-src.sh \
   file://gbmc-br-nft.sh \
+  file://gbmc-br-dhcp.sh \
+  file://gbmc-br-dhcp.service \
   "
 
 FILES:${PN}:append = " \
@@ -31,13 +33,17 @@ FILES:${PN}:append = " \
 
 RDEPENDS:${PN}:append = " \
   bash \
+  dhcp-done \
   gbmc-ip-monitor \
   mstpd-mstpd \
   network-sh \
   ndisc6-rdisc6 \
   "
 
-SYSTEMD_SERVICE:${PN} += "gbmc-br-ensure-ra.service"
+SYSTEMD_SERVICE:${PN} += " \
+  gbmc-br-ensure-ra.service \
+  gbmc-br-dhcp.service \
+  "
 
 GBMC_BR_MAC_ADDR ?= ""
 
@@ -94,8 +100,10 @@ do_install() {
 
   install -d -m0755 ${D}${libexecdir}
   install -m0755 ${WORKDIR}/gbmc-br-ensure-ra.sh ${D}${libexecdir}/
+  install -m0755 ${WORKDIR}/gbmc-br-dhcp.sh ${D}${libexecdir}/
   install -d -m0755 ${D}${systemd_system_unitdir}
-  install -m0755 ${WORKDIR}/gbmc-br-ensure-ra.service ${D}${systemd_system_unitdir}/
+  install -m0644 ${WORKDIR}/gbmc-br-ensure-ra.service ${D}${systemd_system_unitdir}/
+  install -m0644 ${WORKDIR}/gbmc-br-dhcp.service ${D}${systemd_system_unitdir}/
 }
 
 do_rm_work:prepend() {

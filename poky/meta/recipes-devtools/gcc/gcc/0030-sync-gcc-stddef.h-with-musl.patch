@@ -6,7 +6,7 @@ Subject: [PATCH] sync gcc stddef.h with musl
 musl defines ptrdiff_t size_t and wchar_t
 so dont define them here if musl is definining them
 
-Upstream-Status: Pending
+Upstream-Status: Backport [https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=85a438fc78dd12249ca854a3e5c577fefeb1a5cd]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---

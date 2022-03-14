@@ -182,3 +182,5 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 CONFFILES:${PN} = "${sysconfdir}/fstab ${@['', '${sysconfdir}/hostname ${sysconfdir}/hosts'][(d.getVar('hostname') != '')]} ${sysconfdir}/shells"
 CONFFILES:${PN} += "${sysconfdir}/motd ${sysconfdir}/nsswitch.conf ${sysconfdir}/profile"
+
+INSANE_SKIP:${PN} += "empty-dirs"

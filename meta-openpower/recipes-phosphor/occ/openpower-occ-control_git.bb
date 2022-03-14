@@ -4,7 +4,7 @@ HOMEPAGE = "https://github.com/openbmc/openpower-occ-control"
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-inherit autotools \
+inherit meson \
         pkgconfig \
         obmc-phosphor-dbus-service \
         python3native \
@@ -39,11 +39,11 @@ DEPENDS += " \
 
 RDEPENDS:${PN} += "phosphor-state-manager-obmc-targets"
 
-EXTRA_OECONF = " \
-             YAML_PATH=${STAGING_DATADIR_NATIVE}/${PN} \
-             PS_DERATING_FACTOR=${POWER_SUPPLY_DERATING_FACTOR} \
+EXTRA_OEMESON = " \
+             -Dyamldir=${STAGING_DATADIR_NATIVE}/${PN} \
+             -Dps-derating-factor=${POWER_SUPPLY_DERATING_FACTOR} \
              "
-EXTRA_OECONF:append = "${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'i2c-occ', ' --enable-i2c-occ', '', d)}"
+EXTRA_OEMESON:append = "${@bb.utils.contains('MACHINE_FEATURES', 'i2c-occ', ' -Di2c-occ=enabled', '', d)}"
 
 OCC_ENABLE = "enable"
 OCC_DISABLE = "disable"
@@ -77,7 +77,7 @@ DEPENDS:remove:class-native = " \
         sdbusplus \
         virtual/${PN}-config-native \
         "
-RDEPENDS:${PN}:remove:class-native += "phosphor-state-manager-obmc-targets"
+RDEPENDS:${PN}:remove:class-native = "phosphor-state-manager-obmc-targets"
 
 # Remove packages not required for native SDK build
 DEPENDS:remove:class-nativesdk = " \
@@ -86,13 +86,13 @@ DEPENDS:remove:class-nativesdk = " \
         sdbusplus \
         virtual/${PN}-config-native \
         "
-RDEPENDS:${PN}:remove:class-nativesdk += "phosphor-state-manager-obmc-targets"
+RDEPENDS:${PN}:remove:class-nativesdk = "phosphor-state-manager-obmc-targets"
 
 # Provide a means to enable/disable install_error_yaml feature
 PACKAGECONFIG ??= "install_error_yaml"
 PACKAGECONFIG[install_error_yaml] = "\
-        --enable-install_error_yaml,\
-        --disable-install_error_yaml,\
+        -Dinstall-error-yaml=enabled,\
+        -Dinstall-error-yaml=disabled,\
         ,\
         "
 

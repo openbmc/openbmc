@@ -46,30 +46,23 @@ of supported hardware targets, see the following example:
 $ . setup <machine> [build_dir]
 Target machine must be specified. Use one of:
 
-centriq2400-rep         f0b                     fp5280g2
-gsj                     hr630                   hr855xg2
-lanyang                 mihawk                  msn
-neptune                 nicole                  olympus
-olympus-nuvoton         on5263m5                p10bmc
-palmetto                qemuarm                 quanta-q71l
-romulus                 s2600wf                 stardragon4800-rep2
-swift                   tiogapass               vesnin
-witherspoon             witherspoon-tacoma      yosemitev2
-zaius
+bletchley               gsj                     romulus
+dl360poc                kudo                    s2600wf
+e3c246d4i               mihawk                  swift
+ethanolx                mtjade                  tiogapass
+evb-ast2500             nicole                  transformers
+evb-ast2600             olympus-nuvoton         witherspoon
+evb-npcm750             on5263m5                witherspoon-tacoma
+f0b                     p10bmc                  x11spi
+fp5280g2                palmetto                yosemitev2
+g220a                   qemuarm                 zaius
+gbs                     quanta-q71l
 ```
 
 Once you know the target (e.g. romulus), source the `setup` script as follows:
 
 ```
 . setup romulus
-```
-
-For evb-ast2500, please use the below command to specify the machine config,
-because the machine in `meta-aspeed` layer is in a BSP layer and does not
-build the openbmc image.
-
-```
-TEMPLATECONF=meta-evb/meta-evb-aspeed/meta-evb-ast2500/conf . openbmc-env
 ```
 
 ### 4) Build
@@ -166,7 +159,7 @@ The Technical Steering Committee (TSC) guides the project. Members are:
  * Brad Bishop (chair), IBM
  * Nancy Yuen, Google
  * Sai Dasari, Facebook
- * James Mihm, Intel
+ * Terry Duncan, Intel
  * Sagar Dharia, Microsoft
  * Samer El-Haj-Mahmoud, Arm
 

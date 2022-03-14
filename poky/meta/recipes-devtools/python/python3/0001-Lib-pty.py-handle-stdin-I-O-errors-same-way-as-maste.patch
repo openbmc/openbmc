@@ -1,0 +1,47 @@
+From 86061629f4a179e740a17e53dd2c98ab47af2fe2 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Thu, 16 Sep 2021 16:35:37 +0200
+Subject: [PATCH] Lib/pty.py: handle stdin I/O errors same way as master I/O
+ errors
+
+reading stdin can throw the same I/O errors as reading from master fd does,
+e.g. when running under Yocto's test harness:
+======================================================================
+ERROR: test_spawn_doesnt_hang (test.test_pty.PtyTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/test/test_pty.py", line 316, in test_spawn_doesnt_hang
+    pty.spawn([sys.executable, '-c', 'print("hi there")'])
+  File "/usr/lib/python3.10/pty.py", line 181, in spawn
+    _copy(master_fd, master_read, stdin_read)
+  File "/usr/lib/python3.10/pty.py", line 157, in _copy
+    data = stdin_read(STDIN_FILENO)
+  File "/usr/lib/python3.10/pty.py", line 132, in _read
+    return os.read(fd, 1024)
+OSError: [Errno 5] Input/output error
+
+So let's treat both channels the same.
+
+Upstream-Status: Submitted [https://github.com/python/cpython/pull/28388]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
+---
+ Lib/pty.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/Lib/pty.py b/Lib/pty.py
+index 8d8ce40..35439c6 100644
+--- a/Lib/pty.py
++++ b/Lib/pty.py
+@@ -154,7 +154,10 @@ def _copy(master_fd, master_read=_read, stdin_read=_read):
+                 os.write(STDOUT_FILENO, data)
+ 
+         if STDIN_FILENO in rfds:
+-            data = stdin_read(STDIN_FILENO)
++            try:
++                data = stdin_read(STDIN_FILENO)
++            except OSError:
++                data = b""
+             if not data:
+                 fds.remove(STDIN_FILENO)
+             else:

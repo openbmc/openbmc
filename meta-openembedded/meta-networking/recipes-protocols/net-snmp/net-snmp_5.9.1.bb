@@ -1,7 +1,7 @@
 SUMMARY = "Various tools relating to the Simple Network Management Protocol"
 HOMEPAGE = "http://www.net-snmp.org/"
 SECTION = "net"
-LICENSE = "BSD & MIT"
+LICENSE = "BSD-3-Clause & MIT"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=9d100a395a38584f2ec18a8275261687"
 

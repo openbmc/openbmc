@@ -18,7 +18,7 @@
 # Usage: ampere_uartmux_ctrl.sh <CPU UART port number> <UARTx_MODE>
 #        <UARTx_MODE> of 1 sets CPU To BSP
 #        <UARTx_MODE> of 2 sets SCP1 to SI2 
-source /usr/sbin/kudo-lib.sh
+source /usr/libexec/kudo-fw/kudo-lib.sh
 
 if [ $# -lt 1 ]; then
   exit 1
@@ -39,4 +39,3 @@ case "$1" in
     echo "Invalid tty passed to $0. Exiting!" > /dev/ttyS0
     ;;
 esac
-

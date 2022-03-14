@@ -5,27 +5,18 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 inherit allarch
 
 SRC_URI = " \
-    file://ipmi-sensors-${MACHINE}.yaml \
-    file://mtjade-ipmi-fru.yaml \
-    file://mtjade-ipmi-fru-properties.yaml \
+    file://mtjade-ipmi-sensors.yaml \
     "
 
 S = "${WORKDIR}"
 
 do_install() {
-    install -m 0644 -D ipmi-sensors-${MACHINE}.yaml \
-        ${D}${datadir}/${BPN}/ipmi-sensors-${MACHINE}.yaml
-    cat mtjade-ipmi-fru.yaml > fru-read.yaml
-    install -m 0644 -D mtjade-ipmi-fru-properties.yaml \
-        ${D}${datadir}/${BPN}/ipmi-extra-properties.yaml
-    install -m 0644 -D fru-read.yaml \
-        ${D}${datadir}/${BPN}/ipmi-fru-read.yaml
+    install -m 0644 -D mtjade-ipmi-sensors.yaml \
+        ${D}${datadir}/${BPN}/ipmi-sensors.yaml
 }
 
 FILES:${PN}-dev = " \
-    ${datadir}/${BPN}/ipmi-sensors-${MACHINE}.yaml \
-    ${datadir}/${BPN}/ipmi-extra-properties.yaml \
-    ${datadir}/${BPN}/ipmi-fru-read.yaml \
-    "
+                   ${datadir}/${BPN}/ipmi-sensors.yaml \
+                  "
 
 ALLOW_EMPTY:${PN} = "1"

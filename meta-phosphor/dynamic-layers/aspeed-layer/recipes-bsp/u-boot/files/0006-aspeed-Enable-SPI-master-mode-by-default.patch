@@ -1,0 +1,34 @@
+From 7947dbbfb21e10e8fb0f852a14485cedf5df1d36 Mon Sep 17 00:00:00 2001
+From: Chanh Nguyen <chanh@os.amperecomputing.com>
+Date: Sun, 10 Oct 2021 11:57:20 +0700
+Subject: [PATCH] aspeed: Enable SPI master mode by default
+
+The ast2500 share the RGMII1 pin and the hw strap pins
+for SPI interface mode selection ( pin[12:13] ).
+In some systems, the RGMII/NCSI interface will use the pin.
+It makes the SPI interface mode setting is not correct.
+
+This patch will enable the SPI master mode by default.
+
+Signed-off-by: Chanh Nguyen <chanh@os.amperecomputing.com>
+---
+ board/aspeed/ast-g5/ast-g5.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/board/aspeed/ast-g5/ast-g5.c b/board/aspeed/ast-g5/ast-g5.c
+index e67a4bf8b2..82e9f81acc 100644
+--- a/board/aspeed/ast-g5/ast-g5.c
++++ b/board/aspeed/ast-g5/ast-g5.c
+@@ -21,6 +21,9 @@ int board_init(void)
+ 	gd->bd->bi_boot_params = CONFIG_SYS_SDRAM_BASE + 0x100;
+ 	gd->flags = 0;
+ 
++	//pin switch by trap[13:12]     -- [0:1] Enable SPI Master
++	ast_scu_spi_master(1);  /* enable SPI master */
++
+ 	return 0;
+ }
+ 
+-- 
+2.17.1
+

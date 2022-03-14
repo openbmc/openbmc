@@ -21,6 +21,9 @@ RDEPENDS:${PN}-extras:append:fp5280g2 = " \
                                           phosphor-fp5280g2-psu-update \
                                           phosphor-psu-software-manager \
                                           biosconfig-manager \
+                                          srvcfg-manager \
+                                          phosphor-sel-logger \
+                                          tzdata-core \
                                           webui-vue \
                                          "
 

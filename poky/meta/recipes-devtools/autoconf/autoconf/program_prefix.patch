@@ -3,6 +3,7 @@ From: Ross Burton <ross.burton@intel.com>
 Date: Thu, 12 Mar 2020 17:28:38 +0000
 Subject: [PATCH 3/7] program_prefix.patch
 
+Upstream-Status: Inappropriate [oe specific]
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 ---
  lib/autoconf/general.m4 | 2 +-

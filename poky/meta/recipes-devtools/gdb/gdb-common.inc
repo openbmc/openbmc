@@ -2,7 +2,7 @@ SUMMARY = "GNU debugger"
 HOMEPAGE = "http://www.gnu.org/software/gdb/"
 DESCRIPTION = "GDB, the GNU Project debugger, allows you to see what is going on inside another program while it executes -- or what another program was doing at the moment it crashed."
 SECTION = "devel"
-DEPENDS = "expat zlib ncurses virtual/libiconv ${LTTNGUST} bison-native"
+DEPENDS = "expat gmp zlib ncurses virtual/libiconv ${LTTNGUST} bison-native"
 
 LTTNGUST = "lttng-ust"
 LTTNGUST:arc = ""
@@ -27,6 +27,7 @@ EXTRA_OECONF = "--disable-gdbtk --disable-x --disable-werror \
                 --disable-gas --disable-binutils \
                 --disable-ld --disable-gold \
                 --disable-gprof \
+                --with-libgmp-prefix=${STAGING_EXECPREFIXDIR} \
 "
 
 PACKAGECONFIG ??= "readline ${@bb.utils.filter('DISTRO_FEATURES', 'debuginfod', d)}"
@@ -36,7 +37,7 @@ PACKAGECONFIG[python] = "--with-python=${WORKDIR}/python,--without-python,python
 PACKAGECONFIG[babeltrace] = "--with-babeltrace,--without-babeltrace,babeltrace"
 # ncurses is already a hard DEPENDS, but would be added here if it weren't
 PACKAGECONFIG[tui] = "--enable-tui,--disable-tui"
-PACKAGECONFIG[xz] = "--with-lzma,--without-lzma,xz"
+PACKAGECONFIG[xz] = "--with-lzma --with-liblzma-prefix=${STAGING_DIR_HOST},--without-lzma,xz"
 PACKAGECONFIG[debuginfod] = "--with-debuginfod, --without-debuginfod, elfutils"
 
 GDBPROPREFIX = "--program-prefix=''"

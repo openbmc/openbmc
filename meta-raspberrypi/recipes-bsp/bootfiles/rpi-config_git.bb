@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 COMPATIBLE_MACHINE = "^rpi$"
 
 SRCREV = "648ffc470824c43eb0d16c485f4c24816b32cd6f"
-SRC_URI = "git://github.com/Evilpaul/RPi-config.git;protocol=git;branch=master \
+SRC_URI = "git://github.com/Evilpaul/RPi-config.git;protocol=https;branch=master \
           "
 
 S = "${WORKDIR}/git"
@@ -29,6 +29,8 @@ GPIO_IR ?= "18"
 GPIO_IR_TX ?= "17"
 
 CAN_OSCILLATOR ?= "16000000"
+
+ENABLE_UART ??= ""
 
 WM8960="${@bb.utils.contains("MACHINE_FEATURES", "wm8960", "1", "0", d)}"
 
@@ -174,9 +176,11 @@ do_deploy() {
     fi
 
     # UART support
-    if [ "${ENABLE_UART}" = "1" ]; then
+    if [ "${ENABLE_UART}" = "1" ] || [ "${ENABLE_UART}" = "0" ] ; then
         echo "# Enable UART" >>$CONFIG
-        echo "enable_uart=1" >>$CONFIG
+        echo "enable_uart=${ENABLE_UART}" >>$CONFIG
+    elif [ -n "${ENABLE_UART}" ]; then
+        bbfatal "Invalid value for ENABLE_UART [${ENABLE_UART}]. The value for ENABLE_UART can be 0 or 1."
     fi
 
     # Infrared support
@@ -276,6 +280,12 @@ do_deploy:append:raspberrypi3-64() {
 
     echo "# Enable audio (loads snd_bcm2835)" >> $CONFIG
     echo "dtparam=audio=on" >> $CONFIG
+}
+
+do_deploy:append() {
+    if grep -q -E '^.{80}.$' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt; then
+        bbwarn "config.txt contains lines longer than 80 characters, this is not supported"
+    fi
 }
 
 addtask deploy before do_build after do_install

@@ -1,4 +1,4 @@
-Upstream-Status:Inappropriate [embedded specific]
+Upstream-Status: Inappropriate [embedded specific]
 
 Allow the location that .so files are searched for for dynamic
 loading to be changed via an environment variable. This is to allow

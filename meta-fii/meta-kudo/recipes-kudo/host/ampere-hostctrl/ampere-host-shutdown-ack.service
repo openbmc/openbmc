@@ -1,0 +1,11 @@
+[Unit]
+Description=Ampere Computing LLC host shutdown ACK
+Requires=op-wait-power-off@%i.service
+Before=op-wait-power-off@%i.service
+Conflicts=obmc-chassis-poweron@0.target
+
+[Service]
+RemainAfterExit=no
+Type=oneshot
+ExecStart=/usr/libexec/ampere-hostctrl/ampere_power_util.sh mb shutdown_ack
+SyslogIdentifier=ampere_power_util.sh

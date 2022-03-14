@@ -4,7 +4,7 @@ Date: Fri, 16 Dec 2016 16:52:04 +0200
 Subject: [PATCH] Correctly check the stamp file that indicates if we need to
  re-build vala code
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://github.com/lxde/libfm/pull/85]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
  configure.ac | 2 +-

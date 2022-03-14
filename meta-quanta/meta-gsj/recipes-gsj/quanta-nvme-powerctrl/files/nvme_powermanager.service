@@ -6,7 +6,6 @@ After=nvme_gpio.service
 [Service]
 ExecStart=/usr/bin/nvme_powermanager.sh
 Restart=always
-StandardOutput=syslog
 
 [Install]
 WantedBy=multi-user.target

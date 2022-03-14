@@ -4,7 +4,7 @@ LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING.LGPLv2.1;md5=4fbd65380cdd255951079008b364516c"
 
 SRCREV = "b93deed1a231dd6dd7e39b9fe7d2abe05aa00158"
-SRC_URI = "git://github.com/foo86/dcadec.git;protocol=https \
+SRC_URI = "git://github.com/foo86/dcadec.git;protocol=https;branch=master \
            file://0001-define-BASELIB-make-variable.patch \
           "
 

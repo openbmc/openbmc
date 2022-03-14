@@ -7,7 +7,7 @@ db5 does not build because it is redefining a C++11 standard
 library identifier, atomic_init().  Therefore prefix all
 its internal defines with '__db_', to avoid collisions.
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [as far as open source community is concerned, upstream is dead]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---

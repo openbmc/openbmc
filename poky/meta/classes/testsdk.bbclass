@@ -36,12 +36,14 @@ python do_testsdk() {
 }
 addtask testsdk
 do_testsdk[nostamp] = "1"
+do_testsdk[network] = "1"
 
 python do_testsdkext() {
     import_and_run('TESTSDKEXT_CLASS_NAME', d)
 }
 addtask testsdkext
 do_testsdkext[nostamp] = "1"
+do_testsdkext[network] = "1"
 
 python () {
     if oe.types.boolean(d.getVar("TESTIMAGE_AUTO") or "False"):

@@ -10,8 +10,9 @@ DEPENDS = " \
     gnome-online-accounts \
 "
 
-inherit gnomebase gtk-doc gobject-introspection
+inherit gnomebase gtk-doc gobject-introspection pkgconfig
 
+SRC_URI += " file://0001-Update-rest-requirement-to-rest-1.0.patch"
 SRC_URI[archive.md5sum] = "c38af63e49f8fe8baad99537956b69ba"
 SRC_URI[archive.sha256sum] = "6065391f35e7335588cc6b0cc4c1abbce7341488573a654551264cb9793b9379"
 

@@ -20,3 +20,4 @@ CONF_VERSION = "2"
 # Defaults from meta-phosphor/conf/distro/include/phosphor-defaults.inc
 
 require conf/machine/include/obmc-bsp-common.inc
+require conf/machine/include/obmc-evb-common.inc

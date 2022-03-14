@@ -1,4 +1,7 @@
-There are conflict of config files between kea and lib32-kea:
+From d027b1d85a8c1a0193b6e4a00083d3038d699a59 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Tue, 22 Sep 2020 15:02:33 +0800
+Subject: [PATCH] There are conflict of config files between kea and lib32-kea:
 
 | Error: Transaction test error:
 |  file /etc/kea/kea-ctrl-agent.conf conflicts between attempted installs of
@@ -9,17 +12,19 @@ There are conflict of config files between kea and lib32-kea:
 Because they are all commented out, replace the expanded libdir path with
 '$libdir' in the config files to avoid conflict.
 
+Upstream-Status: Pending
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
 ---
  src/bin/keactrl/kea-ctrl-agent.conf.pre | 3 ++-
- src/bin/keactrl/kea-dhcp4.conf.pre      | 6 ++++--
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ src/bin/keactrl/kea-dhcp4.conf.pre      | 4 ++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/src/bin/keactrl/kea-ctrl-agent.conf.pre b/src/bin/keactrl/kea-ctrl-agent.conf.pre
-index 211b7ff..d710ec7 100644
+index e6ae8b8..50a3092 100644
 --- a/src/bin/keactrl/kea-ctrl-agent.conf.pre
 +++ b/src/bin/keactrl/kea-ctrl-agent.conf.pre
-@@ -45,7 +45,8 @@
+@@ -51,7 +51,8 @@
      // Agent will fail to start.
      "hooks-libraries": [
  //  {
@@ -30,26 +35,24 @@ index 211b7ff..d710ec7 100644
  //          "param1": "foo"
  //      }
 diff --git a/src/bin/keactrl/kea-dhcp4.conf.pre b/src/bin/keactrl/kea-dhcp4.conf.pre
-index 5f77a32..70ae3d9 100644
+index 26bf163..49ddb0a 100644
 --- a/src/bin/keactrl/kea-dhcp4.conf.pre
 +++ b/src/bin/keactrl/kea-dhcp4.conf.pre
-@@ -252,7 +252,8 @@
-     //      // of all devices serviced by Kea, including their identifiers
-     //      // (like MAC address), their location in the network, times
-     //      // when they were active etc.
--    //      "library": "@libdir@/kea/hooks/libdhcp_legal_log.so"
-+    //      // Replace $libdir with real library path /usr/lib or /usr/lib64
-+    //      "library": "$libdir/kea/hooks/libdhcp_legal_log.so"
-     //      "parameters": {
-     //          "path": "/var/lib/kea",
-     //          "base-name": "kea-forensic4"
-@@ -269,7 +270,8 @@
-     //      // of specific options or perhaps even a combination of several
-     //      // options and fields to uniquely identify a client. Those scenarios
-     //      // are addressed by the Flexible Identifiers hook application.
--    //      "library": "@libdir@/kea/hooks/libdhcp_flex_id.so",
-+    //      // Replace $libdir with real library path /usr/lib or /usr/lib64
-+    //      "library": "$libdir/kea/hooks/libdhcp_flex_id.so",
-     //      "parameters": {
-     //          "identifier-expression": "substring(relay6[0].option[18],0,8)"
-     //      }
+@@ -252,7 +252,7 @@
+     //       // of all devices serviced by Kea, including their identifiers
+     //       // (like MAC address), their location in the network, times
+     //       // when they were active etc.
+-    //       "library": "@libdir@/kea/hooks/libdhcp_legal_log.so",
++    //       "library": "$libdir/kea/hooks/libdhcp_legal_log.so",
+     //       "parameters": {
+     //           "path": "/var/lib/kea",
+     //           "base-name": "kea-forensic4"
+@@ -269,7 +269,7 @@
+     //       // of specific options or perhaps even a combination of several
+     //       // options and fields to uniquely identify a client. Those scenarios
+     //       // are addressed by the Flexible Identifiers hook application.
+-    //       "library": "@libdir@/kea/hooks/libdhcp_flex_id.so",
++    //       "library": "$libdir/kea/hooks/libdhcp_flex_id.so",
+     //       "parameters": {
+     //           "identifier-expression": "relay4[2].hex"
+     //       }

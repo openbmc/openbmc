@@ -43,7 +43,7 @@ build system applies them against ``local.conf`` and ``auto.conf``:
    :term:`SDK_INHERIT_BLACKLIST`
    are disabled. Using :term:`SDK_INHERIT_BLACKLIST` to disable these
    classes is the typical method to disable classes that are problematic
-   or unnecessary in the SDK context. The default value blacklists the
+   or unnecessary in the SDK context. The default value disables the
    :ref:`buildhistory <ref-classes-buildhistory>`
    and :ref:`icecc <ref-classes-icecc>` classes.
 
@@ -63,9 +63,8 @@ adjustments:
 -  If your SDK configuration inherits additional classes using the
    :term:`INHERIT` variable and you
    do not need or want those classes enabled in the SDK, you can
-   blacklist them by adding them to the
-   :term:`SDK_INHERIT_BLACKLIST`
-   variable as described in the fourth bullet of the previous section.
+   disable them by adding them to the :term:`SDK_INHERIT_BLACKLIST`
+   variable as described in the previous section.
 
    .. note::
 
@@ -275,8 +274,8 @@ source, you need to do a number of things:
       places or it will fail quickly on the OpenEmbedded build system
       side, and its contents will not interfere with the build), then
       you can set the variable in your ``local.conf`` or custom distro
-      configuration file. You can then "whitelist" the variable through
-      to the SDK by adding the following::
+      configuration file. You can then pass the variable to the SDK by
+      adding the following::
 
          SDK_LOCAL_CONF_WHITELIST = "SSTATE_MIRRORS"
 

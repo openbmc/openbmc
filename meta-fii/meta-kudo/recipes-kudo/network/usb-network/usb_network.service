@@ -4,7 +4,7 @@ After=phosphor-ipmi-host.service
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash -c '/usr/sbin/usb_network.sh'
+ExecStart=/bin/bash -c '/usr/libexec/usb-network/usb_network.sh'
 
 [Install]
 WantedBy=multi-user.target

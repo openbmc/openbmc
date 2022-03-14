@@ -39,3 +39,8 @@ Checking whether blkcnt_t is 32 bit: NO
 Checking whether blkcnt_t is 64 bit: OK
 Checking whether fcntl lock supports open file description locks: OK
 Checking for a 64-bit host to support lmdb: NO
+Checking errno of iconv for illegal multibyte sequence: NO
+Checking value of GNUTLS_CIPHER_AES_128_CFB8: OK
+Checking value of GNUTLS_MAC_AES_CMAC_128: OK
+Checking whether fcntl supports flags to send direct I/O availability signals: NO
+Checking whether fcntl supports setting/geting hints: NO

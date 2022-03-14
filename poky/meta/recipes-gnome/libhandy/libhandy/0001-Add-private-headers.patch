@@ -1,0 +1,37 @@
+From e7c3e8fa00f6a68b2e0629db5ee115e641ea710e Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Wed, 8 Dec 2021 07:35:52 +0000
+Subject: [PATCH] Add private headers
+
+After the commit(8157ecc Separate public and private enums) introduced,
+there comes a race as below:
+ | In file included from ../git/src/hdy-settings.c:11:
+ | ../git/src/hdy-settings-private.h:16:10: fatal error: hdy-enums-private.h: No such file or directory
+ |    16 | #include "hdy-enums-private.h"
+
+So also add private headers like private sources to libhandy_sources to
+fix the issue.
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/libhandy/-/merge_requests/796]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ src/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/meson.build b/src/meson.build
+index d087323..6f11f27 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -64,7 +64,7 @@ hdy_private_enums = gnome.mkenums('hdy-enums-private',
+ )
+ 
+ libhandy_public_sources += [hdy_public_enums[0]]
+-libhandy_private_sources += [hdy_private_enums[0]]
++libhandy_private_sources += hdy_private_enums
+ libhandy_generated_headers += [hdy_public_enums[1]]
+ 
+ src_headers = [
+-- 
+2.32.0
+

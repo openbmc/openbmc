@@ -53,6 +53,7 @@ RDEPENDS_PN_SYSTEM_EXTRAS:fb-withhost = " \
         ipmitool \
         phosphor-post-code-manager \
         phosphor-host-postd \
+        tzdata-core \
         "
 
 SUMMARY:${PN}-system = "Facebook System"
