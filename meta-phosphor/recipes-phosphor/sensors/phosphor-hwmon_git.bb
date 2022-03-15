@@ -45,7 +45,7 @@ RDEPENDS:max31785-msl = "${VIRTUAL-RUNTIME_base-utils} i2c-tools bash"
 
 SRC_URI += "git://github.com/openbmc/phosphor-hwmon;branch=master;protocol=https"
 
-SRCREV = "728f21f8747bd8d05b441a33ccb76f95b22575b8"
+SRCREV = "d54618168d143988d183af831228a3a88e7c615b"
 
 S = "${WORKDIR}/git"
 
