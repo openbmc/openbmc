@@ -106,15 +106,6 @@ lint_exempt="\
 meta-amd/recipes-amd/amd-fpga/files/ethanolx/fpgardu.sh
 meta-bytedance/meta-g220a/recipes-network/network/static-mac-addr/mac-check
 meta-bytedance/meta-g220a/recipes-phosphor/datetime/me-time-sync/me-time-sync.sh
-meta-fii/meta-kudo/recipes-kudo/host/files/ampere_power_util.sh
-meta-fii/meta-kudo/recipes-kudo/kudo-fw-utility/kudo-fw/kudo-fw-ver.sh
-meta-fii/meta-kudo/recipes-kudo/kudo-fw-utility/kudo-fw/kudo-fw.sh
-meta-fii/meta-kudo/recipes-kudo/kudo-fw-utility/kudo-fw/kudo-lib.sh
-meta-fii/meta-kudo/recipes-kudo/kudo-sys-utility/kudo-boot/init_once.sh
-meta-fii/meta-kudo/recipes-kudo/kudo-sys-utility/kudo-cmd/kudo-ras.sh
-meta-fii/meta-kudo/recipes-kudo/kudo-sys-utility/kudo-cmd/kudo.sh
-meta-fii/meta-kudo/recipes-kudo/network/usb-network/usb_network.sh
-meta-fii/meta-kudo/recipes-phosphor/console/obmc-console/kudo_uart_mux_ctrl.sh
 meta-google/recipes-google/gpio/gpio-ctrl/lib.sh
 meta-google/recipes-google/host-power-ctrl/gpio-host-pwr/host_isoff.sh
 meta-google/recipes-google/host-power-ctrl/gpio-host-pwr/host_powercycle.sh
