@@ -1,6 +1,8 @@
 #!/bin/bash
 # help information
 
+# Provide source directive to shellcheck.
+# shellcheck source=meta-fii/meta-kudo/recipes-kudo/kudo-fw-utility/kudo-fw/kudo-lib.sh
 source /usr/libexec/kudo-fw/kudo-lib.sh
 
 function usage_rst() {
@@ -71,10 +73,10 @@ function reset() {
       set_gpio_ctrl 203 out 0
       ;;
     display)
-      echo "Virtual reset   #94" $(get_gpio_ctrl 94)
-      echo "S0 System reset #65" $(get_gpio_ctrl 65)
-      echo "Power Button   #203" $(get_gpio_ctrl 203)
-      echo "BMC_CPU SHD Req #70" $(get_gpio_ctrl 70)
+      echo "Virtual reset   #94" "$(get_gpio_ctrl 94)"
+      echo "S0 System reset #65" "$(get_gpio_ctrl 65)"
+      echo "Power Button   #203" "$(get_gpio_ctrl 203)"
+      echo "BMC_CPU SHD Req #70" "$(get_gpio_ctrl 70)"
       ;;
     *)
       usage_rst
@@ -86,15 +88,15 @@ function fw_rev() {
   BMC_CPLD_VER_FILE="/run/cpld0.version"
   MB_CPLD_VER_FILE="/run/cpld1.version"
 
-  cmd=$(cat $BMC_CPLD_VER_FILE)
-  echo " BMC_CPLD: " $cmd
-  cmd=$(cat $MB_CPLD_VER_FILE)
-  echo " MB_CPLD: " $cmd
+  cmd=$(cat ${BMC_CPLD_VER_FILE})
+  echo " BMC_CPLD: " "${cmd}"
+  cmd=$(cat ${MB_CPLD_VER_FILE})
+  echo " MB_CPLD: " "${cmd}"
 
   # BMC Version
 
   # Save VERSION_ID line in string "VERSION_ID=vXX.XX-XX-kudo"
-  StringVersion=$(cat /etc/os-release | awk '/VERSION_ID/')
+  StringVersion=$(awk '/VERSION_ID/' /etc/os-release)
 
   #Save Major Version value between v and . "vXX." then convert Hex to Decimal
   MajorVersion=${StringVersion#*v}
@@ -131,7 +133,7 @@ function fw_rev() {
 function uartmux() {
   case $1 in
     host)
-      if [ `tty` ==  "/dev/ttyS0" ]; then
+      if [ "$(tty)" ==  "/dev/ttyS0" ]; then
         echo "Couldn't redirect to the host console within BMC local console"
       else
         echo "Entering Console use 'shift ~~..' to quit"
@@ -139,7 +141,7 @@ function uartmux() {
       fi
       ;;
     scp)
-      if [ `tty` ==  "/dev/ttyS0" ]; then
+      if [ "$(tty)" ==  "/dev/ttyS0" ]; then
         echo "Couldn't redirect to the scp console within BMC local console"
       else
         echo "Entering Console use 'shift ~~..' to quit"
@@ -167,29 +169,29 @@ function uartmux() {
       set_gpio_ctrl 177 out 0
       ;;
     display)
-      if [ $(get_gpio_ctrl 167) -eq 1 ]; then
+      if [ "$(get_gpio_ctrl 167)" -eq 1 ]; then
         echo " CPU host to BMC console"
       else
         echo " CPU host to header"
       fi
-      if [ $(get_gpio_ctrl 161) -eq 1 ] && [ $(get_gpio_ctrl 177) -eq 1 ]; then
-        if [ $(get_gpio_ctrl 198) -eq 1 ]; then
+      if [ "$(get_gpio_ctrl 161)" -eq 1 ] && [ "$(get_gpio_ctrl 177)" -eq 1 ]; then
+        if [ "$(get_gpio_ctrl 198)" -eq 1 ]; then
           echo " SCP2 host to BMC console"
         else
           echo " SCP1 host to BMC console"
         fi
-      elif [ $(get_gpio_ctrl 161) -eq 0 ] && [ $(get_gpio_ctrl 177) -eq 0 ]; then
-        if [ $(get_gpio_ctrl 198) -eq 1 ]; then
+      elif [ "$(get_gpio_ctrl 161)" -eq 0 ] && [ "$(get_gpio_ctrl 177)" -eq 0 ]; then
+        if [ "$(get_gpio_ctrl 198)" -eq 1 ]; then
           echo " SCP2 host to Header"
         else
           echo " SCP1 host to Header"
         fi
       else
         echo "It's unknown status"
-        echo "167" $(get_gpio_ctrl 167)
-        echo "161" $(get_gpio_ctrl 161)
-        echo "177" $(get_gpio_ctrl 177)
-        echo "198" $(get_gpio_ctrl 198)
+        echo "167" "$(get_gpio_ctrl 167)"
+        echo "161" "$(get_gpio_ctrl 161)"
+        echo "177" "$(get_gpio_ctrl 177)"
+        echo "198" "$(get_gpio_ctrl 198)"
       fi
       ;;
     *)
@@ -203,26 +205,26 @@ function ledtoggle() {
     CurrentLED=$( i2cget -y -f -a 34 0x76 0x05 i 1 | cut -d ' ' -f 2)
   case $1 in
     boot)
-        cmd=$((($CurrentLED & 0x40) != 0))
+        cmd=$(((CurrentLED & 0x40) != 0))
         case $2 in
          on)
             #turn on LED
             if [[ $cmd -eq 0 ]]; then
-                setValue=$(( 0x40 + $CurrentLED ))
-                i2cset -y -f -a 34 0x76 0x10 $setValue
+                setValue=$(( 0x40 + CurrentLED ))
+                i2cset -y -f -a 34 0x76 0x10 "$setValue"
             fi
             ;;
          off)
             #turn off led
             if [[ $cmd -eq 1 ]]; then
-                setValue=$(( 0x80 & $CurrentLED ))
-                i2cset -y -f -a 34 0x76 0x10 $setValue
+                setValue=$(( 0x80 & CurrentLED ))
+                i2cset -y -f -a 34 0x76 0x10 "$setValue"
             fi
             ;;
         toggle)
             #turn on LED
-                setValue=$(( 0x40 ^ $CurrentLED ))
-                i2cset -y -f -a 34 0x76 0x10 $setValue
+                setValue=$(( 0x40 ^ CurrentLED ))
+                i2cset -y -f -a 34 0x76 0x10 "$setValue"
             ;;
          status)
             #displayLED status
@@ -238,26 +240,26 @@ function ledtoggle() {
         esac
       ;;
     att)
-        cmd=$((($CurrentLED & 0x80) != 0))
+        cmd=$(((CurrentLED & 0x80) != 0))
         case $2 in
          on)
             #turn on LED
             if [[ $cmd -eq 0 ]]; then
-                setValue=$(( 0x80 + $CurrentLED ))
-                i2cset -y -f -a 34 0x76 0x10 $setValue
+                setValue=$(( 0x80 + CurrentLED ))
+                i2cset -y -f -a 34 0x76 0x10 "$setValue"
             fi
             ;;
          off)
             #turn off led
             if [[ $cmd -eq 1 ]]; then
-                 setValue=$(( 0x40 & $CurrentLED ))
-                i2cset -y -f -a 34 0x76 0x10 $setValue
+                 setValue=$(( 0x40 & CurrentLED ))
+                i2cset -y -f -a 34 0x76 0x10 "$setValue"
             fi
             ;;
         toggle)
             #turn on LED
-            setValue=$(( 0x80 ^ $CurrentLED ))
-            i2cset -y -f -a 34 0x76 0x10 $setValue
+            setValue=$(( 0x80 ^ CurrentLED ))
+            i2cset -y -f -a 34 0x76 0x10 "$setValue"
             ;;
          status)
             #displayLED status
@@ -281,27 +283,27 @@ function ledtoggle() {
 function usblist() {
   for i in {0..8}
   do
-    cmd="devmem 0xf083"$i"154"
-    printf "udc%d : 0xF803%d154-" "$i" "$i"
+    cmd=$(devmem 0xf083"${i}"154)
+    printf "udc%d : 0xF803%d154-" "${i}" "${i}"
     $cmd
    done
 }
 
 case $1 in
   rst)
-    reset $2
+    reset "$2"
     ;;
   fw)
     fw_rev
     ;;
   uart)
-    uartmux $2
+    uartmux "$2"
     ;;
   usb)
     usblist
     ;;
   led)
-    ledtoggle $2 $3
+    ledtoggle "$2" "$3"
     ;;
   *)
     usage

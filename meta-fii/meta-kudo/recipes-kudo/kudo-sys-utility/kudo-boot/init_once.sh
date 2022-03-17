@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Provide source directive to shellcheck.
+# shellcheck source=meta-fii/meta-kudo/recipes-kudo/kudo-fw-utility/kudo-fw/kudo-lib.sh
 source /usr/libexec/kudo-fw/kudo-lib.sh
 
 function set_mux_default(){
@@ -24,7 +26,7 @@ function set_mux_default(){
 
 # 0 - 63 EVT
 # 64 + DVT/PVT
-boardver=$(printf '%d' `cat /sys/bus/i2c/drivers/fiicpld/34-0076/CMD00 | awk '{print $6}'`)
+boardver=$(printf '%d' "$(awk '{print $6}' /sys/bus/i2c/drivers/fiicpld/34-0076/CMD00)")
 
 # On EVT machines, the secondary SCP EEPROM is used.
 # Set BMC_I2C_BACKUP_SEL to secondary.
@@ -54,9 +56,9 @@ CPU1_STATUS_N=$(get_gpio_ctrl 136)
 if [[ $CPU1_STATUS_N == 1 ]]; then
     #Execute this only on DVT systems
     if [[ $boardver -lt 64 ]]; then
-        echo EVT system $boardver
+        echo EVT system "$boardver"
     else
-        echo DVT system $boardver
+        echo DVT system "$boardver"
         i2cset -y -a -f 37 0x68 0x05 0x03
     fi
     #These i2c deviecs are already installed on EVT systems

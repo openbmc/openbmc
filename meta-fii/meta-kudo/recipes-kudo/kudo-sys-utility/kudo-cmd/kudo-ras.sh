@@ -241,7 +241,7 @@ getReg54Vals() {
 
 
 
-if [ -z $powerState ]
+if [ -z "${powerState}" ]
  then
         echo "System is currently Powered off S6"
 else

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Provide source directive to shellcheck.
+# shellcheck source=meta-fii/meta-kudo/recipes-kudo/kudo-fw-utility/kudo-fw/kudo-lib.sh
 source /usr/libexec/kudo-fw/kudo-lib.sh
 
 # Usage of this utility
@@ -35,7 +37,7 @@ power_on() {
 
 power_status() {
   st=$(busctl get-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis CurrentPowerState | cut -d "." -f6)
-  if [ "$st" == "On\"" ]; then
+  if [ "${st}" == "On\"" ]; then
   echo "on"
   else
   echo "off"
@@ -45,7 +47,7 @@ power_status() {
 host_status() {
   BOOT_OK=$(get_gpio_ctrl 194)
   S5_N=$(get_gpio_ctrl 204)
-  if [ $S5_N == 1 ] || [ $BOOT_OK == 1 ]; then
+  if [ "$S5_N" == 1 ] || [ "$BOOT_OK" == 1 ]; then
     echo "on"
   else
     echo "off"
@@ -63,7 +65,7 @@ graceful_shutdown() {
   else
     echo "Triggering graceful shutdown"
     mkdir /run/openbmc
-    echo "$(timestamp)" > "/run/openbmc/host@0-shutdown-req-time"
+    timestamp > "/run/openbmc/host@0-shutdown-req-time"
     set_gpio_ctrl 70 out 0
     sleep 3
     set_gpio_ctrl 70 out 1
@@ -71,7 +73,7 @@ graceful_shutdown() {
 }
 
 host_reset() {
-  if [ $(host_status) == "on" ]; then
+  if [ "$(host_status)" == "on" ]; then
     echo "Triggering sysreset pin"
     busctl set-property xyz.openbmc_project.Watchdog /xyz/openbmc_project/watchdog/host0 xyz.openbmc_project.State.Watchdog ExpireAction s xyz.openbmc_project.State.Watchdog.Action.None
     set_gpio_ctrl 65 out 0
@@ -114,7 +116,7 @@ power_button() {
     rm "/run/openbmc/power-button"
   else
     echo "Power button pressed"
-    echo "$(timestamp)" > "/run/openbmc/power-button"
+    timestamp > "/run/openbmc/power-button"
   fi
 }
 
@@ -125,36 +127,36 @@ if [ $# -lt 2 ]; then
   exit 0;
 fi
 
-if [ $1 != "mb" ]; then
+if [ "$1" != "mb" ]; then
   echo "Invalid parameter1=$1"
   usage;
   exit 0;
 fi
 
-if [ $2 = "on" ]; then
+if [ "$2" = "on" ]; then
   sleep 3
-  if [ $(power_status) == "off" ]; then
+  if [ "$(power_status)" == "off" ]; then
     power_on
   fi
-elif [ $2 = "off" ]; then
-  if [ $(power_status) == "on" ]; then
+elif [ "$2" = "off" ]; then
+  if [ "$(power_status)" == "on" ]; then
     power_off
     sleep 6
-    if [ $(host_status) == "on" ]; then
+    if [ "$(host_status)" == "on" ]; then
       force_off
     fi
   fi
-elif [[ $2 == "hotswap" ]]; then
+elif [ "$2" == "hotswap" ]; then
   hotswap
-elif [[ $2 == "graceful_shutdown" ]]; then
+elif [ "$2" == "graceful_shutdown" ]; then
   graceful_shutdown
-elif [ $2 == "host_reset" ]; then
+elif [ "$2" == "host_reset" ]; then
   host_reset
-elif [ $2 == "host_cycle" ]; then
+elif [ "$2" == "host_cycle" ]; then
   host_cycle
-elif [ $2 == "shutdown_ack" ]; then
+elif [ "$2" == "shutdown_ack" ]; then
   shutdown_ack
-elif [ $2 == "power_button" ]; then
+elif [ "$2" == "power_button" ]; then
   power_button
 else
   echo "Invalid parameter2=$2"

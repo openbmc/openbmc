@@ -1,10 +1,10 @@
 #!/bin/bash
 
-cd /sys/kernel/config/usb_gadget
+cd /sys/kernel/config/usb_gadget || exit 1
 
 if [ ! -f "g1" ]; then
     mkdir g1
-    cd g1
+    cd g1 || exit 1
 
     echo 0x1d6b > idVendor  # Linux foundation
     echo 0x0104 > idProduct # Multifunction composite gadget

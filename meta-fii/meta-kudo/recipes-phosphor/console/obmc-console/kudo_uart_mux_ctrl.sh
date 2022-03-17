@@ -17,7 +17,10 @@
 # Ampere Computing LLC mtjade: UART MUX/DEMUX for CPU0 UART0,1,4 and CPU1 UART1
 # Usage: ampere_uartmux_ctrl.sh <CPU UART port number> <UARTx_MODE>
 #        <UARTx_MODE> of 1 sets CPU To BSP
-#        <UARTx_MODE> of 2 sets SCP1 to SI2 
+#        <UARTx_MODE> of 2 sets SCP1 to SI2
+
+# Provide source directive to shellcheck.
+# shellcheck source=meta-fii/meta-kudo/recipes-kudo/kudo-fw-utility/kudo-fw/kudo-lib.sh
 source /usr/libexec/kudo-fw/kudo-lib.sh
 
 if [ $# -lt 1 ]; then
