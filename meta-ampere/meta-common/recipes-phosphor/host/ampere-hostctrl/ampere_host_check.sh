@@ -18,9 +18,6 @@ do
 		Get ss xyz.openbmc_project.Condition.HostFirmware \
 		CurrentFirmwareCondition | cut -d"." -f6)
 	if [ "$st" == "Running\"" ]; then
-		mkdir -p /run/openbmc
-		echo "Creating /run/openbmc/host@0-on"
-		touch /run/openbmc/host@0-on
 		exit 0
 	fi
 	sleep 1

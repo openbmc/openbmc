@@ -10,7 +10,6 @@ function usage() {
 
 set_gpio_power_off() {
 	echo "Setting GPIO before Power off"
-	rm -f /run/openbmc/host@0-on
 }
 
 set_gpio_power_on() {
