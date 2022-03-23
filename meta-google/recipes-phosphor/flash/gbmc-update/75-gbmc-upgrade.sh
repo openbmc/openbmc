@@ -41,7 +41,15 @@ gbmc_upgrade_fetch() (
   # Ensure some sane output file limit
   # Currently no BMC image is larger than 64M
   ulimit -H -f $((96 * 1024 * 1024)) || return
-  wget -q -O - "$bootfile_url" | tar -xC "$tmpdir" || true
+  timeout=$((SECONDS + 120))
+  while (( SECONDS < timeout )); do
+    local st=(0)
+    wget -q -O - "$bootfile_url" | tar -xC "$tmpdir" || st=("${PIPESTATUS[@]}")
+    (( st[0] != 0 )) || break
+    shopt -s nullglob
+    rm -rf -- "${tmpdir:?}"/* "${tmpdir:?}"/.*
+    sleep 5
+  done
 
   local sig
   sig="$(find "$tmpdir" -name 'image-*.sig')" || return
