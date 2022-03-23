@@ -40,8 +40,8 @@ meta-bytedance/meta-g220a/recipes-kernel/linux/linux-aspeed/0005-ARM-dts-aspeed-
 meta-bytedance/meta-g220a/recipes-phosphor/ipmi/phosphor-node-manager-proxy/0001-Remove-Total_Power-sensor.patch
 meta-facebook/meta-bletchley/recipes-bsp/u-boot/u-boot-aspeed-sdk/0001-u-boot-ast2600-57600-baudrate-for-bletchley.patch
 meta-facebook/meta-tiogapass/recipes-bsp/u-boot/u-boot-aspeed/0001-configs-ast-common-use-57600-baud-rate-to-match-Tiog.patch
-meta-facebook/meta-yosemitev2/recipes-bsp/u-boot/u-boot-aspeed/0001-board-aspeed-Add-Mux-for-yosemitev2.patch
-meta-facebook/meta-yosemitev2/recipes-bsp/u-boot/u-boot-aspeed/0002-spl-host-console-handle.patch
+meta-facebook/meta-yosemitev2/recipes-bsp/u-boot/u-boot-aspeed-sdk/0001-board-aspeed-Add-Mux-for-yosemitev2.patch
+meta-facebook/meta-yosemitev2/recipes-bsp/u-boot/u-boot-aspeed-sdk/0002-spl-host-console-handle.patch
 meta-google/dynamic-layers/nuvoton-layer/recipes-bsp/images/npcm7xx-igps/0001-Set-FIU0_DRD_CFG-and-FIU_Clk_divider-for-gbmc-hoth.patch
 meta-google/recipes-extended/libconfig/files/0001-conf2struct-Use-the-right-perl.patch
 meta-google/recipes-extended/libconfig/files/0001-makefile-Add-missing-LDFLAGS.patch

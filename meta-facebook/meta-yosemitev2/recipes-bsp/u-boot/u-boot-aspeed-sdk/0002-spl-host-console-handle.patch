@@ -1,6 +1,6 @@
-From 99fdec9719987ce93e4582d31cb7d08c5beb51ef Mon Sep 17 00:00:00 2001
-From: Logananth Sundararaj <logananth.s@hcl.com>
-Date: Mon, 20 Dec 2021 16:51:22 +0530
+From 1fb38f86a77ec6656f87f427124a65dc6c0fdf5f Mon Sep 17 00:00:00 2001
+From: Logananth Sundararaj <logananth_s@hcl.com>
+Date: Tue, 8 Mar 2022 19:24:49 +0530
 Subject: [PATCH] spl-host-console-handle
 
 This patch adds four 1S server console through debug card
@@ -46,18 +46,18 @@ SEL_2  SEL_1   SEL_0   RX_SEL_N  CONSOLE
 0       1       1       0        SLOT4
 1       0       0       1        BMC Debug
 
-Signed-off-by: Logananth Sundararaj <logananth.s@hcl.com>
+Signed-off-by: Logananth Sundararaj <logananth_s@hcl.com>
 ---
- arch/arm/mach-aspeed/platform_g5.S | 69 ++++++++++++++++++++++++++----
+ arch/arm/mach-aspeed/ast2500/platform.S | 69 ++++++++++++++++++++++---
  1 file changed, 61 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm/mach-aspeed/platform_g5.S b/arch/arm/mach-aspeed/platform_g5.S
-index f14b5acc6b..340d7b2b91 100644
---- a/arch/arm/mach-aspeed/platform_g5.S
-+++ b/arch/arm/mach-aspeed/platform_g5.S
-@@ -315,6 +315,59 @@ orr r1, r1, #0xC
- str r1, [r0]
- .endm
+diff --git a/arch/arm/mach-aspeed/ast2500/platform.S b/arch/arm/mach-aspeed/ast2500/platform.S
+index 137ed2c587..76a31c709a 100644
+--- a/arch/arm/mach-aspeed/ast2500/platform.S
++++ b/arch/arm/mach-aspeed/ast2500/platform.S
+@@ -315,6 +315,59 @@ TIME_TABLE_DDR4_1600:
+     str r1, [r0]
+     .endm
  
 +  .macro console_slot1
 +  ldr r0, =0x1e780024
@@ -120,15 +120,15 @@ index f14b5acc6b..340d7b2b91 100644
    cmp r0, r1
    bne case_pos2\@
 - console_bmc
-+  console_slot1
++ console_slot1
    b case_end\@
  case_pos2\@:
-   //Test for position#2
+  //Test for position#2
    ldr r1, =0x01
    cmp r0, r1
    bne case_pos3\@
 - console_bmc
-+  console_slot2
++ console_slot2
    b case_end\@
  case_pos3\@:
   //Test for position#3
@@ -181,5 +181,5 @@ index f14b5acc6b..340d7b2b91 100644
     b case_end\@
  case_pos10\@:
     //Test for position#10
---
+-- 
 2.17.1
