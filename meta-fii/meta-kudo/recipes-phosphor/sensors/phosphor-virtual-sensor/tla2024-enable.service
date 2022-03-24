@@ -1,9 +1,0 @@
-[Unit]
-Description=TLA2024 change scale property
-
-[Service]
-Type=oneshot
-ExecStart=/usr/libexec/phosphor-virtual-sensor/tla2024-enable.sh
-
-[Install]
-WantedBy=multi-user.target
