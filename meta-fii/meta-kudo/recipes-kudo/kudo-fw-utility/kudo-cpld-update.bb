@@ -16,7 +16,7 @@ RDEPENDS:${PN} += "bash"
 FILES:${PN} += "${datadir}/phosphor-ipmi-flash/config-bmccpld.json"
 FILES:${PN} += "${datadir}/phosphor-ipmi-flash/config-mbcpld.json"
 
-SRC_URI:append:kudo = " \
+SRC_URI += " \
     file://phosphor-ipmi-flash-bmccpld-update.service \
     file://phosphor-ipmi-flash-mbcpld-update.service \
     file://config-bmccpld.json \
@@ -24,7 +24,7 @@ SRC_URI:append:kudo = " \
     "
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE:${PN}:append:kudo = " \
+SYSTEMD_SERVICE:${PN} += " \
     phosphor-ipmi-flash-bmccpld-update.service \
     phosphor-ipmi-flash-mbcpld-update.service \
     "
