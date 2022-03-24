@@ -26,6 +26,13 @@
        "Params":{
           "DbusParam":[
              {
+                "ParamName":"CPU0_NBM2G_TMP_V",
+                "Desc":{
+                   "Name":"CPU0_NBM2G_TMP_V",
+                   "SensorType":"voltage"
+                }
+             },
+             {
                 "ParamName":"CPU0_NBM4G_TMP_V",
                 "Desc":{
                    "Name":"CPU0_NBM4G_TMP_V",
@@ -34,7 +41,7 @@
              }
           ]
        },
-       "Expression":"(CPU0_NBM4G_TMP_V == CPU0_NBM4G_TMP_V) ? (CPU0_NBM4G_TMP_V - 1.911) / 0.007 : NULL"
+       "Expression":"(CPU0_NBM4G_TMP_V == CPU0_NBM4G_TMP_V) ? (CPU0_NBM4G_TMP_V - 1.911) / 0.007 : (CPU0_NBM2G_TMP_V == CPU0_NBM2G_TMP_V) ? (CPU0_NBM2G_TMP_V - 2.73) * 100 : NULL"
     },
     {
        "Desc":{

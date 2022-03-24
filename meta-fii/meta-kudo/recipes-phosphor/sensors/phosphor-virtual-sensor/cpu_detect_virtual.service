@@ -1,5 +1,7 @@
 [Unit]
 Description=Detect CPUs to change config
+Requires=xyz.openbmc_project.adcsensor.service
+After=xyz.openbmc_project.adcsensor.service
 Before=phosphor-virtual-sensor.service
 
 [Service]
