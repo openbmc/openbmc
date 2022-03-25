@@ -14,6 +14,7 @@ SRCREV = "8135881590a78b7d101933dce1a1bce66aa1f8d1"
 inherit meson pkgconfig systemd
 
 DEPENDS = " \
+        cli11 \
         openssl \
         phosphor-dbus-interfaces \
         phosphor-logging \
