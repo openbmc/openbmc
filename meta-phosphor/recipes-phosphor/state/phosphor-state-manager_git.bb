@@ -62,7 +62,7 @@ RDEPENDS:${PN}-chassis += "bash"
 EXTRA_OEMESON:append = " -Dtests=disabled"
 
 FILES:${PN}-host = "${bindir}/phosphor-host-state-manager"
-DBUS_SERVICE:${PN}-host += "xyz.openbmc_project.State.Host.service"
+DBUS_SERVICE:${PN}-host += "xyz.openbmc_project.State.Host@.service"
 DBUS_SERVICE:${PN}-host += "phosphor-reboot-host@.service"
 SYSTEMD_SERVICE:${PN}-host += "phosphor-reset-host-reboot-attempts@.service"
 SYSTEMD_SERVICE:${PN}-host += "phosphor-clear-one-time@.service"
@@ -70,7 +70,7 @@ SYSTEMD_SERVICE:${PN}-host += "phosphor-set-host-transition-to-running@.service"
 SYSTEMD_SERVICE:${PN}-host += "phosphor-set-host-transition-to-off@.service"
 
 FILES:${PN}-chassis = "${bindir}/phosphor-chassis-state-manager"
-DBUS_SERVICE:${PN}-chassis += "xyz.openbmc_project.State.Chassis.service"
+DBUS_SERVICE:${PN}-chassis += "xyz.openbmc_project.State.Chassis@.service"
 
 FILES:${PN}-chassis += "${bindir}/obmcutil"
 
@@ -100,7 +100,7 @@ FILES:${PN}-systemd-target-monitor = " \
 SYSTEMD_SERVICE:${PN}-systemd-target-monitor += "phosphor-systemd-target-monitor.service"
 
 FILES:${PN}-scheduled-host-transition = "${bindir}/phosphor-scheduled-host-transition"
-DBUS_SERVICE:${PN}-scheduled-host-transition += "xyz.openbmc_project.State.ScheduledHostTransition.service"
+DBUS_SERVICE:${PN}-scheduled-host-transition += "xyz.openbmc_project.State.ScheduledHostTransition@.service"
 
 FILES:${PN}-chassis-check-power-status = "${bindir}/phosphor-chassis-check-power-status"
 SYSTEMD_SERVICE:${PN}-chassis-check-power-status += "phosphor-chassis-check-power-status@.service"
@@ -193,6 +193,6 @@ SYSTEMD_LINK:${PN}-obmc-targets += "${@compose_list(d, 'QUIESCE_FMT', 'HOST_ERRO
 
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager;branch=master;protocol=https"
-SRCREV = "1ab2b6cea615419da0cb3e1900297ab694dc45ae"
+SRCREV = "211d972d7511c7e6aada8053d52d7cb198a75969"
 
 S = "${WORKDIR}/git"

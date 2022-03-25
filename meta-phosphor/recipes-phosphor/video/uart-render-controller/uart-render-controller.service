@@ -1,8 +1,8 @@
 
 [Unit]
 Description=UART render controller
-Requires=xyz.openbmc_project.State.Host.service
-After=xyz.openbmc_project.State.Host.service
+Requires=xyz.openbmc_project.State.Host@0.service
+After=xyz.openbmc_project.State.Host@0.service
 
 [Service]
 ExecStart=/usr/sbin/obmc-uart-render-controller \

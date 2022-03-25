@@ -8,6 +8,14 @@ pkg_postinst:${PN}-obmc-targets:append() {
     for i in ${OBMC_HOST_INSTANCES};
     do
         mkdir -p $D$systemd_system_unitdir/multi-user.target.requires
+        LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Host@${i}.service"
+        TARGET="../xyz.openbmc_project.State.Host@.service"
+        ln -s $TARGET $LINK
+
+        LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Chassis@${i}.service"
+        TARGET="../xyz.openbmc_project.State.Chassis@.service"
+        ln -s $TARGET $LINK
+
         LINK="$D$systemd_system_unitdir/multi-user.target.requires/obmc-host-reset@${i}.target"
         TARGET="../obmc-host-reset@.target"
         ln -s $TARGET $LINK
@@ -113,6 +121,12 @@ pkg_prerm:${PN}-obmc-targets:append() {
 
     for i in ${OBMC_HOST_INSTANCES};
     do
+
+        LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Host@${i}.service"
+        rm $LINK
+
+        LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Chassis@${i}.service"
+        rm $LINK
 
         LINK="$D$systemd_system_unitdir/multi-user.target.requires/obmc-host-reset@${i}.target"
         rm $LINK
