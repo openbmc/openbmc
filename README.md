@@ -157,7 +157,6 @@ Dive deeper into OpenBMC by opening the
 
 The Technical Steering Committee (TSC) guides the project. Members are:
 
- * Brad Bishop (chair), IBM
  * Nancy Yuen, Google
  * Sai Dasari, Facebook
  * Terry Duncan, Intel
