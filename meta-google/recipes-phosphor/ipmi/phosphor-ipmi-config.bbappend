@@ -18,5 +18,9 @@ do_install:append:gbmc() {
   jq --slurpfile brcfg ${WORKDIR}/gbmc_bridge.json \
     '. + {"${GBMCBR_IPMI_CHANNEL}": $brcfg[0]}' $chjson >${WORKDIR}/tmp
   mv ${WORKDIR}/tmp $chjson
+
+  # Set entity-map.json to empty json for gBMC by default.
+  # Each system will override it if needed.
+  echo "[]" > ${D}${datadir}/ipmi-providers/entity-map.json
 }
 
