@@ -30,6 +30,7 @@ FILES:${PN} += "${libexecdir}/ncsi-netlink-ifindex"
 FILES:${PN} += "${datadir}/network/*.json"
 
 PACKAGECONFIG:append = " sync-mac"
+PACKAGECONFIG:append:p10bmc = " hyp-nw-config"
 
 install_network_configuration(){
     install -d ${D}${datadir}/network/
