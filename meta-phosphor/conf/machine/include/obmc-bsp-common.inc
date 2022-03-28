@@ -3,7 +3,7 @@
 #@DESCRIPTION: Common machine configuration for OpenBMC chips
 
 KERNEL_CLASSES ?= "kernel-fitimage"
-KERNEL_IMAGETYPES ?= "fitImage"
+KERNEL_IMAGETYPES ?= "fitImage vmlinux"
 
 # Static images. This is the default if no other layout is specified.
 IMAGE_FSTYPES += "${@bb.utils.contains_any('DISTRO_FEATURES', \
