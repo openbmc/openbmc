@@ -4,4 +4,5 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
     motor-ctrl \
     phosphor-virtual-sensor \
     usbutils \
+    idevicerestore \
 "
