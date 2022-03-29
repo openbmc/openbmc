@@ -8,8 +8,15 @@ require ${PN}.inc
 inherit meson pkgconfig python3native
 inherit obmc-phosphor-dbus-service obmc-phosphor-systemd
 
-PACKAGECONFIG ??= ""
-PACKAGECONFIG[use-json] = "-Duse-json=enabled, -Duse-json=disabled"
+PACKAGECONFIG ??= "\
+    ${@oe.utils.conditional( \
+        'PREFERRED_PROVIDER_virtual/${PN}-config-native', \
+        'phosphor-led-manager-config-example-native', \
+        'use-json', 'use-yaml', d)} \
+"
+
+PACKAGECONFIG[use-json] = "-Duse-json=enabled,,,,,use-yaml"
+PACKAGECONFIG[use-yaml] = "-Duse-json=disabled,,virtual/${PN}-config-native,,,use-json"
 PACKAGECONFIG[use-lamp-test] = "-Duse-lamp-test=enabled, -Duse-lamp-test=disabled"
 PACKAGECONFIG[monitor-operational-status] = "-Dmonitor-operational-status=enabled, \
                                              -Dmonitor-operational-status=disabled"
@@ -20,13 +27,11 @@ PACKAGE_BEFORE_PN += "${PN}-faultmonitor"
 DEPENDS += "${PYTHON_PN}-native"
 DEPENDS += "${PYTHON_PN}-pyyaml-native"
 DEPENDS += "${PYTHON_PN}-inflection-native"
-DEPENDS += "autoconf-archive-native"
+DEPENDS += "cli11"
+DEPENDS += "nlohmann-json"
+DEPENDS += "phosphor-logging"
 DEPENDS += "sdbusplus ${PYTHON_PN}-sdbus++-native"
 DEPENDS += "systemd"
-DEPENDS += "phosphor-logging"
-DEPENDS += "nlohmann-json"
-
-DEPENDS += "virtual/${PN}-config-native"
 
 RDEPENDS:${PN} += "bash"
 

@@ -1,33 +1,33 @@
-From f09b84e61569f2b991cc3e257c34517a222922d3 Mon Sep 17 00:00:00 2001
-From: Logananth Sundararaj <logananth.s@hcl.com>
-Date: Fri, 3 Dec 2021 15:21:50 +0530
+From 5a649c3dd0452eba0028c51546e2981e0b04de4f Mon Sep 17 00:00:00 2001
+From: Logananth Sundararaj <logananth_s@hcl.com>
+Date: Tue, 8 Mar 2022 19:18:27 +0530
 Subject: [PATCH] board-aspeed-Add-Mux-for-yosemitev2
 
-Signed-off-by: Logananth Sundararaj <logananth.s@hcl.com>
+Signed-off-by: Logananth Sundararaj <logananth_s@hcl.com>
 ---
- arch/arm/mach-aspeed/platform_g5.S | 191 ++++++++++++++++++++++++-----
+ arch/arm/mach-aspeed/ast2500/platform.S | 191 ++++++++++++++++++++----
  1 file changed, 162 insertions(+), 29 deletions(-)
 
-diff --git a/arch/arm/mach-aspeed/platform_g5.S b/arch/arm/mach-aspeed/platform_g5.S
-index 2ac1ca4721..e1c17ae4a3 100644
---- a/arch/arm/mach-aspeed/platform_g5.S
-+++ b/arch/arm/mach-aspeed/platform_g5.S
+diff --git a/arch/arm/mach-aspeed/ast2500/platform.S b/arch/arm/mach-aspeed/ast2500/platform.S
+index aef55c4a0a..137ed2c587 100644
+--- a/arch/arm/mach-aspeed/ast2500/platform.S
++++ b/arch/arm/mach-aspeed/ast2500/platform.S
 @@ -302,6 +302,156 @@ TIME_TABLE_DDR4_1600:
      ldr   r2, =0x00000800
      .endm
-
+ 
 +    .macro console_bmc
 +    ldr r0, =0x1e780024
-+ldr r1, [r0]
-+orr r1, r1, #0xF
-+str r1, [r0]
++    ldr r1, [r0]
++    orr r1, r1, #0xF
++    str r1, [r0]
 +
-+ldr r0, =0x1e780020
-+ldr r1, [r0]
-+and r1, r1, #0xFFFFFFF0
-+orr r1, r1, #0xC
-+str r1, [r0]
-+.endm
++    ldr r0, =0x1e780020
++    ldr r1, [r0]
++    and r1, r1, #0xFFFFFFF0
++    orr r1, r1, #0xC
++    str r1, [r0]
++    .endm
 +
 +.macro console_sel
 +
@@ -71,7 +71,7 @@ index 2ac1ca4721..e1c17ae4a3 100644
 + console_bmc
 +  b case_end\@
 +case_pos2\@:
-+  //Test for position#2
++ //Test for position#2
 +  ldr r1, =0x01
 +  cmp r0, r1
 +  bne case_pos3\@
@@ -169,7 +169,7 @@ index 2ac1ca4721..e1c17ae4a3 100644
      .macro print_hex_char
      and   r1, r1, #0xF
      cmp   r1, #9
-@@ -324,6 +474,16 @@ init_dram:
+@@ -321,6 +471,16 @@ init_dram:
      /********************************************
         Initial Reset Procedure : Begin
       *******************************************/
@@ -186,19 +186,19 @@ index 2ac1ca4721..e1c17ae4a3 100644
      /* Clear AHB bus lock condition */
      ldr   r0, =0x1e600000
      ldr   r1, =0xAEED1A03
-@@ -793,6 +953,8 @@ wait_ddr_reset:
+@@ -794,6 +954,8 @@ wait_ddr_reset:
      clear_delay_timer
      /* end delay 10ms */
-
+ 
 +    uart_console_setup
 +
  /* Debug - UART console message */
  #ifdef CONFIG_DRAM_UART_TO_UART1
      ldr   r0, =0x1e78909c                        @ route UART5 to UART Port1, 2016.08.29
-@@ -806,35 +968,6 @@ wait_ddr_reset:
+@@ -807,35 +969,6 @@ wait_ddr_reset:
      str   r1, [r0]
  #endif
-
+ 
 -    ldr   r0, =0x1e78400c
 -    mov   r1, #0x83
 -    str   r1, [r0]
@@ -231,6 +231,5 @@ index 2ac1ca4721..e1c17ae4a3 100644
      ldr   r0, =0x1e784000
      mov   r1, #0x0D                              @ '\r'
      str   r1, [r0]
---
+-- 
 2.17.1
-

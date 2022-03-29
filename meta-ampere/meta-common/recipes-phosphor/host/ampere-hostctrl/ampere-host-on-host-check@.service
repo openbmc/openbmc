@@ -6,7 +6,6 @@ Conflicts=obmc-host-stop@%i.target
 Conflicts=phosphor-reset-host-check@%i.service
 OnFailure=obmc-host-quiesce@%i.target
 OnFailureJobMode=flush
-ConditionPathExists=!/run/openbmc/host@%i-on
 
 [Service]
 Type=oneshot

@@ -15,13 +15,13 @@ RDEPENDS:${PN} += "bash"
 
 FILES:${PN} += "${datadir}/phosphor-ipmi-flash/config-bios.json"
 
-SRC_URI:append:kudo = " \
+SRC_URI += " \
     file://phosphor-ipmi-flash-bios-update.service \
     file://config-bios.json \
     "
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE:${PN}:append:kudo = " \
+SYSTEMD_SERVICE:${PN} += " \
     phosphor-ipmi-flash-bios-update.service \
     "
 

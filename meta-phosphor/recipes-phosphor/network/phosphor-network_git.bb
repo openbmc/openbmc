@@ -11,7 +11,7 @@ inherit python3native
 inherit systemd
 
 SRC_URI += "git://github.com/openbmc/phosphor-networkd;branch=master;protocol=https"
-SRCREV = "609c12dee5f6bc06a5add8fadd0e9c1caba1e97f"
+SRCREV = "3397be3ca10310a264ee0ab9c5fb17add9e0307b"
 
 DEPENDS += "systemd"
 DEPENDS += "sdbusplus ${PYTHON_PN}-sdbus++-native"
@@ -29,7 +29,7 @@ PACKAGECONFIG[default-link-local-autoconf] = "-Ddefault-link-local-autoconf=true
 PACKAGECONFIG[default-ipv6-accept-ra] = "-Ddefault-ipv6-accept-ra=true,-Ddefault-ipv6-accept-ra=false,,"
 PACKAGECONFIG[nic-ethtool] = "-Dnic-ethtool=true,-Dnic-ethtool=false,,"
 PACKAGECONFIG[sync-mac] = "-Dsync-mac=true,-Dsync-mac=false,nlohmann-json,"
-PACKAGECONFIG[ibm-hyp-nw-config] = "-Dhyp-nw-config=true,-Dhyp-nw-config=false,,"
+PACKAGECONFIG[hyp-nw-config] = "-Dhyp-nw-config=true, -Dhyp-nw-config=false,,"
 
 S = "${WORKDIR}/git"
 
@@ -37,6 +37,6 @@ FILES:${PN} += "${datadir}/dbus-1/system.d"
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} += "xyz.openbmc_project.Network.service"
-SYSTEMD_SERVICE:${PN}:append = "${@bb.utils.contains('PACKAGECONFIG', 'ibm-hyp-nw-config', ' xyz.openbmc_project.Network.Hypervisor.service', '', d)}"
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'hyp-nw-config', 'xyz.openbmc_project.Network.Hypervisor.service', '', d)}"
 
 EXTRA_OEMESON:append = " -Dtests=disabled"

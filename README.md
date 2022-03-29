@@ -16,7 +16,8 @@ customization for your platform.
 - Ubuntu 14.04
 
 ```
-sudo apt-get install -y git build-essential libsdl1.2-dev texinfo gawk chrpath diffstat
+sudo apt-get install -y git build-essential libsdl1.2-dev texinfo gawk chrpath diffstat \
+    zstd pigz
 ```
 
 - Fedora 28

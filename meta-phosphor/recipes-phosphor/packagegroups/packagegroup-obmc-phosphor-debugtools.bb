@@ -13,6 +13,7 @@ RDEPENDS:${PN} = " \
     tcpdump \
     screen \
     valgrind \
+    iperf3 \
     "
 
 # Some older arm architectures don't support valgrind, so explicitly remove

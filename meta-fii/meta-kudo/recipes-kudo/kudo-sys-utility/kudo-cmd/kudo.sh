@@ -101,8 +101,8 @@ function fw_rev() {
   MajorVersion=$(( 16#${MajorVersion%.*}))
 
   #Save SubMajor Version valeu between . and - ".XX-" then convert  Hex to Decimal
-  SubMajorVersion=${StringVersion#*.}
-  SubMajorVersion=$(( 16#${SubMajorVersion%-*}))
+  SubMajorVersion=${StringVersion##*.}
+  SubMajorVersion=$(( 16#${SubMajorVersion%%-*}))
 
   #Save Minor Version value between - and - "-XX-" then convert  Hex to Decimal
   MinorVersion=${StringVersion#*-}

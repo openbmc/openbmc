@@ -504,12 +504,17 @@ python do_generate_phosphor_manifest() {
     version = do_get_version(d)
     build_id = do_get_buildID(d)
     target_machine = d.getVar('MACHINE', True)
-    extended_version = (d.getVar('EXTENDED_VERSION', True) or "")
+    extended_version = d.getVar('EXTENDED_VERSION', True)
+    compatible_names = d.getVar('OBMC_COMPATIBLE_NAMES', True)
     with open('MANIFEST', 'w') as fd:
         fd.write('purpose={}\n'.format(purpose))
         fd.write('version={}\n'.format(version.strip('"')))
         fd.write('BuildId={}\n'.format(build_id.strip('"')))
-        fd.write('ExtendedVersion={}\n'.format(extended_version))
+        if extended_version:
+          fd.write('ExtendedVersion={}\n'.format(extended_version))
+        if compatible_names:
+          for name in compatible_names.split():
+            fd.write('CompatibleName={}\n'.format(name))
         fd.write('KeyType={}\n'.format(get_pubkey_type(d)))
         fd.write('HashType=RSA-SHA256\n')
         fd.write('MachineName={}\n'.format(target_machine))

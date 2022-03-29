@@ -10,7 +10,7 @@ RDEPENDS:${PN} += "bash"
 RPROVIDES:${PN} += "virtual/bmc-update"
 FILES:${PN} += "${datadir}/phosphor-ipmi-flash/config-bmc.json"
 
-SRC_URI:append:kudo = " \
+SRC_URI += " \
     file://config-bmc.json \
     "
 

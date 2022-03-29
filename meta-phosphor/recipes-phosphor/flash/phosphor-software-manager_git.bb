@@ -33,6 +33,7 @@ PACKAGECONFIG[usb_code_update] = "-Dusb-code-update=enabled, -Dusb-code-update=d
 PACKAGECONFIG[ubifs_layout] = "-Dbmc-layout=ubi"
 PACKAGECONFIG[mmc_layout] = "-Dbmc-layout=mmc"
 PACKAGECONFIG[flash_bios] = "-Dhost-bios-upgrade=enabled, -Dhost-bios-upgrade=disabled"
+PACKAGECONFIG[static-dual-image] = "-Dbmc-static-dual-image=enabled, -Dbmc-static-dual-image=disabled"
 
 inherit meson pkgconfig
 inherit obmc-phosphor-dbus-service
@@ -47,6 +48,9 @@ DEPENDS += " \
     ${PYTHON_PN}-sdbus++-native \
     sdbusplus \
 "
+
+# The repo installs several scripts that depends on bash
+RDEPENDS:${PN} += " bash"
 
 RDEPENDS:${PN}-updater += " \
     bash \
@@ -88,6 +92,9 @@ SYSTEMD_SERVICE:${PN}-updater += " \
 
 SYSTEMD_SERVICE:${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'flash_bios', 'obmc-flash-host-bios@.service', '', d)}"
 SYSTEMD_SERVICE:${PN}-usb += "${@bb.utils.contains('PACKAGECONFIG', 'usb_code_update', 'usb-code-update@.service', '', d)}"
+SYSTEMD_SERVICE:${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'static-dual-image', 'obmc-flash-bmc-alt@.service', '', d)}"
+SYSTEMD_SERVICE:${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'static-dual-image', 'obmc-flash-bmc-static-mount-alt.service', '', d)}"
+SYSTEMD_SERVICE:${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'static-dual-image', 'obmc-flash-bmc-prepare-for-sync.service', '', d)}"
 
 S = "${WORKDIR}/git"
 

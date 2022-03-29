@@ -16,7 +16,7 @@ DEPENDS += " \
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-ipmi-blobs;branch=master;protocol=https"
-SRCREV = "3b89eda93870cdc701481afc7da85de7a033e4a6"
+SRCREV = "35b6c3e63527738a0ab052d4fe2c75c1141c2b18"
 
 FILES:${PN} += "${libdir}/ipmid-providers"
 

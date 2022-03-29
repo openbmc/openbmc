@@ -289,10 +289,16 @@
                         "/xyz/openbmc_project/sensors/voltage/ps0_input_voltage",
                         "/xyz/openbmc_project/sensors/current/ps0_output_current",
                         "/xyz/openbmc_project/sensors/voltage/ps0_output_voltage",
+                        "/xyz/openbmc_project/sensors/temperature/ps0_temp0",
+                        "/xyz/openbmc_project/sensors/temperature/ps0_temp1",
+                        "/xyz/openbmc_project/sensors/temperature/ps0_temp2",
                         "/xyz/openbmc_project/sensors/power/ps1_input_power",
                         "/xyz/openbmc_project/sensors/voltage/ps1_input_voltage",
                         "/xyz/openbmc_project/sensors/current/ps1_output_current",
                         "/xyz/openbmc_project/sensors/voltage/ps1_output_voltage",
+                        "/xyz/openbmc_project/sensors/temperature/ps1_temp0",
+                        "/xyz/openbmc_project/sensors/temperature/ps1_temp1",
+                        "/xyz/openbmc_project/sensors/temperature/ps1_temp2",
                         "/xyz/openbmc_project/sensors/altitude/Altitude",
                         "/xyz/openbmc_project/sensors/fan_tach/fan0_0",
                         "/xyz/openbmc_project/sensors/fan_tach/fan0_1",
@@ -362,7 +368,10 @@
                         "/xyz/openbmc_project/sensors/power/ps0_input_power",
                         "/xyz/openbmc_project/sensors/voltage/ps0_input_voltage",
                         "/xyz/openbmc_project/sensors/current/ps0_output_current",
-                        "/xyz/openbmc_project/sensors/voltage/ps0_output_voltage"
+                        "/xyz/openbmc_project/sensors/voltage/ps0_output_voltage",
+                        "/xyz/openbmc_project/sensors/temperature/ps0_temp0",
+                        "/xyz/openbmc_project/sensors/temperature/ps0_temp1",
+                        "/xyz/openbmc_project/sensors/temperature/ps0_temp2"
                     ]
                 },
                 {
@@ -415,7 +424,10 @@
                         "/xyz/openbmc_project/sensors/power/ps1_input_power",
                         "/xyz/openbmc_project/sensors/voltage/ps1_input_voltage",
                         "/xyz/openbmc_project/sensors/current/ps1_output_current",
-                        "/xyz/openbmc_project/sensors/voltage/ps1_output_voltage"
+                        "/xyz/openbmc_project/sensors/voltage/ps1_output_voltage",
+                        "/xyz/openbmc_project/sensors/temperature/ps1_temp0",
+                        "/xyz/openbmc_project/sensors/temperature/ps1_temp1",
+                        "/xyz/openbmc_project/sensors/temperature/ps1_temp2"
                     ]
                 },
                 {
