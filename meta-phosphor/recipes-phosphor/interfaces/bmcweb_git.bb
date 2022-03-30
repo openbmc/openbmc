@@ -17,8 +17,6 @@ SRCREV = "9629907de7880c0853bb4d5b9c624c452a598861"
 
 S = "${WORKDIR}/git"
 
-CXXFLAGS:append = " -DNEW_BOOST_URL"
-
 inherit pkgconfig meson ptest
 
 SRC_URI += " \
