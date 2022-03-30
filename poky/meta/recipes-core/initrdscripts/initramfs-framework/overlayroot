@@ -1,0 +1,112 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: MIT
+#
+# Copyright 2022 (C), Microsoft Corporation
+
+# Simple initramfs module intended to mount a read-write (RW)
+# overlayfs on top of /, keeping the original root filesystem
+# as read-only (RO), free from modifications by the user.
+#
+# NOTE: The read-only IMAGE_FEATURE is not required for this to work
+#
+# This script is based on the overlay-etc.bbclass, which sets up
+# an overlay on top of the /etc directory, but in this case allows
+# accessing the original, unmodified rootfs at /rofs after boot.
+#
+# It relies on the initramfs-module-rootfs to mount the original
+# root filesystem, and requires 'rootrw=<foo>' to be passed as a
+# kernel parameter, specifying the device/partition intended to
+# use as RW.
+#
+# This module needs to be executed after the initramfs-module-rootfs
+# since it relies on it to mount the filesystem at initramfs startup
+# but before the finish module which normally switches root.
+# After overlayroot is executed the usual boot flow continues from
+# the real init process.
+#
+# If something goes wrong while running this module, the rootfs
+# is still mounted RO (with no overlay) and the finish module is
+# executed to continue booting normally.
+#
+# It also has a dependency on overlayfs being enabled in the
+# running kernel via KERNEL_FEATURES (kmeta) or any other means.
+
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+# We get OLDROOT from the rootfs module
+OLDROOT="/rootfs"
+
+NEWROOT="${RWMOUNT}/root"
+RWMOUNT="/overlay"
+ROMOUNT="${RWMOUNT}/rofs"
+UPPER_DIR="${RWMOUNT}/upper"
+WORK_DIR="${RWMOUNT}/work"
+
+MODULES_DIR=/init.d
+
+# Something went wrong, make sure / is mounted as read only anyway.
+exit_gracefully() {
+    echo $1 >/dev/console
+    echo >/dev/console
+    echo "OverlayRoot mounting failed, starting system as read-only" >/dev/console
+    echo >/dev/console
+
+    # The following is borrowed from rootfs-postcommands.bbclass
+    # This basically looks at the real rootfs mounting options and
+    # replaces them with "ro"
+
+    # Tweak the mount option and fs_passno for rootfs in fstab
+    if [ -f ${OLDROOT}/etc/fstab ]; then
+        sed -i -e '/^[#[:space:]]*\/dev\/root/{s/defaults/ro/;s/\([[:space:]]*[[:digit:]]\)\([[:space:]]*\)[[:digit:]]$/\1\20/}' ${OLDROOT}/etc/fstab
+    fi
+
+    # Tweak the "mount -o remount,rw /" command in busybox-inittab inittab
+    if [ -f ${OLDROOT}/etc/inittab ]; then
+        sed -i 's|/bin/mount -o remount,rw /|/bin/mount -o remount,ro /|' ${OLDROOT}/etc/inittab
+    fi
+
+    # Continue as if the overlayroot module didn't exist to continue booting
+    . $MODULES_DIR/99-finish
+    eval "finish_run"
+}
+
+
+if [ -z "$bootparam_rootrw" ]; then
+    exit_gracefully "rootrw= kernel parameter doesn't exist and its required to mount the overlayfs"
+fi
+
+mkdir -p ${RWMOUNT}
+
+# Mount RW device
+if mount -n -t ${bootparam_rootfstype:-ext4} -o ${bootparam_rootflags:-defaults} ${bootparam_rootrw} ${RWMOUNT}
+then
+    # Set up overlay directories
+    mkdir -p ${UPPER_DIR}
+    mkdir -p ${WORK_DIR}
+    mkdir -p ${NEWROOT}
+    mkdir -p ${ROMOUNT}
+
+    # Remount OLDROOT as read-only
+    mount -o bind ${OLDROOT} ${ROMOUNT}
+    mount -o remount,ro ${ROMOUNT}
+
+    # Mount RW overlay
+    mount -t overlay overlay -o lowerdir=${ROMOUNT},upperdir=${UPPER_DIR},workdir=${WORK_DIR} ${NEWROOT} || exit_gracefully "initramfs-overlayroot: Mounting overlay failed"
+else
+    exit_gracefully "initramfs-overlayroot: Mounting RW device failed"
+fi
+
+# Set up filesystems on overlay
+mkdir -p ${NEWROOT}/proc
+mkdir -p ${NEWROOT}/dev
+mkdir -p ${NEWROOT}/sys
+mkdir -p ${NEWROOT}/rofs
+
+mount -n --move ${ROMOUNT} ${NEWROOT}/rofs
+mount -n --move /proc ${NEWROOT}/proc
+mount -n --move /sys ${NEWROOT}/sys
+mount -n --move /dev ${NEWROOT}/dev
+
+exec chroot ${NEWROOT}/ ${bootparam_init:-/sbin/init} || exit_gracefully "Couldn't chroot into overlay"

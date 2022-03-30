@@ -11,7 +11,7 @@ SRC_URI[sha256sum] = "00fedfac5e514321250bbe69eaccc732c8a8158596f77a785c2e3ae9f9
 
 S = "${WORKDIR}/${BPN}"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING.tomoyo;md5=751419260aa954499f7abaabaa882bbe"
 
 FILES:${PN}     += "${libdir}/tomoyo"

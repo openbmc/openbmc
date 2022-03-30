@@ -1,6 +1,6 @@
 DESCRIPTION = "Thumbnail service implementing the thumbnail management D-Bus specification"
 SECTION = "x11/libs"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 DEPENDS = "freetype gdk-pixbuf poppler curl xfce4-dev-tools-native libxml2 libgsf"
 

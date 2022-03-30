@@ -1,6 +1,6 @@
 SUMMARY = "OpenAL is a cross-platform 3D audio API"
 HOMEPAGE = "http://kcat.strangesoft.net/openal.html"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0f159f19f9377e1895fbb477d5a7953e"
 
 inherit cmake pkgconfig

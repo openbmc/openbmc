@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=c403f6882d4f97a9cd927df987d55634"
 
 SRC_URI[sha256sum] = "5c6bd9dc7a543b7fe4304a631f8a8a3b674e2bbfc49c2ae96200cdbe55df6b17"
 
-inherit pypi setuptools3 update-alternatives
+inherit pypi python_poetry_core update-alternatives
 
 ALTERNATIVE:${PN} = "\
     pyrsa-decrypt \

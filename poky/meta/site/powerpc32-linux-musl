@@ -1,0 +1,2 @@
+ac_cv_sizeof_long_double=${ac_cv_sizeof_long_double=8}
+

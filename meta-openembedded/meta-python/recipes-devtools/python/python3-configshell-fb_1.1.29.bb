@@ -12,5 +12,6 @@ SRCREV = "d74a33b69f688ed9b8b28033835303604639d4eb"
 S = "${WORKDIR}/git"
 
 inherit setuptools3
+PIP_INSTALL_PACKAGE = "configshell_fb"
 
 RDEPENDS:${PN} += "python3-modules python3-fcntl python3-six"

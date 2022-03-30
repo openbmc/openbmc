@@ -14,11 +14,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/lib/src/fwts_smbios.c      | 2 +-
  3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/src/lib/src/fwts_acpi_tables.c b/src/lib/src/fwts_acpi_tables.c
-index 4fa1246a..7ef197cd 100644
 --- a/src/lib/src/fwts_acpi_tables.c
 +++ b/src/lib/src/fwts_acpi_tables.c
-@@ -173,7 +173,7 @@ static fwts_acpi_table_rsdp *fwts_acpi_get_rsdp(fwts_framework *fw, void *addr,
+@@ -171,7 +171,7 @@ static fwts_acpi_table_rsdp *fwts_acpi_g
  		return NULL;
  	}
  
@@ -27,7 +25,7 @@ index 4fa1246a..7ef197cd 100644
  		return NULL;
  
  	if (fwts_safe_memcpy(rsdp, mem, sizeof(fwts_acpi_table_rsdp)) != FWTS_OK) {
-@@ -486,7 +486,7 @@ static int fwts_acpi_load_tables_from_firmware(fwts_framework *fw)
+@@ -484,7 +484,7 @@ static int fwts_acpi_load_tables_from_fi
  	if ((rsdp = fwts_acpi_get_rsdp(fw, rsdp_addr, &rsdp_len)) == NULL)
  		return FWTS_ERROR;
  
@@ -36,11 +34,9 @@ index 4fa1246a..7ef197cd 100644
  
  	/* Load any tables from XSDT if it's valid */
  	if (rsdp->xsdt_address) {
-diff --git a/src/lib/src/fwts_mmap.c b/src/lib/src/fwts_mmap.c
-index 2f2514f1..fbd946f4 100644
 --- a/src/lib/src/fwts_mmap.c
 +++ b/src/lib/src/fwts_mmap.c
-@@ -82,7 +82,7 @@ int fwts_munmap(void *mem, const size_t size)
+@@ -82,7 +82,7 @@ int fwts_munmap(void *mem, const size_t
  	off_t offset;
  
  	page_size = fwts_page_size();
@@ -49,11 +45,9 @@ index 2f2514f1..fbd946f4 100644
  
  	if (munmap((void *)((uint8_t *)mem - offset), size + offset) < 0)
  		return FWTS_ERROR;
-diff --git a/src/lib/src/fwts_smbios.c b/src/lib/src/fwts_smbios.c
-index 8da572e9..04315bd3 100644
 --- a/src/lib/src/fwts_smbios.c
 +++ b/src/lib/src/fwts_smbios.c
-@@ -78,7 +78,7 @@ static void *fwts_smbios_find_entry_uefi(
+@@ -78,7 +78,7 @@ static void *fwts_smbios_find_entry_uefi
  	if ((addr = fwts_scan_efi_systab(smbios)) != NULL) {
  		fwts_smbios_entry *mapped_entry;
  
@@ -62,6 +56,3 @@ index 8da572e9..04315bd3 100644
  			if (fwts_safe_memcpy(entry, mapped_entry, size) == FWTS_OK) {
  				(void)fwts_munmap(mapped_entry, size);
  				*type  = FWTS_SMBIOS;
--- 
-2.25.1
-

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+rm -rf tests.log
+sh -e run-test.sh pv . > tests.log 2>&1
+sed -e 's|\(.*\):.*OK|PASS: \1|' \
+    -e 's|\(.*\):.*FAILED|FAIL: \1|' \
+   tests.log

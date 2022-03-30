@@ -10,7 +10,7 @@ SRCREV = "b2fedc4b1b891afd2c26ebfd21f9e440e83c28ff"
 S = "${WORKDIR}/git"
 
 #Default Dual License https://github.com/linux-rdma/rdma-core/blob/master/COPYING.md
-LICENSE = "BSD-2-Clause | GPLv2"
+LICENSE = "BSD-2-Clause | GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING.BSD_FB;md5=0ec18bae1a9df92c8d6ae01f94a289ae \
 		   file://COPYING.GPL2;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 

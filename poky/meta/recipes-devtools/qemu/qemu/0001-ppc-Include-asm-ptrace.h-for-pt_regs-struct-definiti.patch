@@ -1,0 +1,92 @@
+From 91e15627fd05d5a59fd2b88bc5c3491d3e0b56b0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 14 Mar 2022 09:58:21 -0700
+Subject: [PATCH] ppc: Include asm/ptrace.h for pt_regs struct definition
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes
+../qemu-6.2.0/linux-user/host/ppc64/../ppc/host-signal.h:16:32: error: incomplete definition of type 'struct pt_regs'
+    return uc->uc_mcontext.regs->nip;
+           ~~~~~~~~~~~~~~~~~~~~^
+
+Upstream-Status: Submitted [https://patchwork.kernel.org/project/qemu-devel/patch/20220314170223.554679-1-raj.khem@gmail.com/]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>
+---
+ linux-user/include/host/ppc/host-signal.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+--- a/linux-user/host/ppc/host-signal.h
++++ /dev/null
+@@ -1,30 +0,0 @@
+-/*
+- * host-signal.h: signal info dependent on the host architecture
+- *
+- * Copyright (c) 2003-2005 Fabrice Bellard
+- * Copyright (c) 2021 Linaro Limited
+- *
+- * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
+- * See the COPYING file in the top-level directory.
+- */
+-
+-#ifndef PPC_HOST_SIGNAL_H
+-#define PPC_HOST_SIGNAL_H
+-
+-static inline uintptr_t host_signal_pc(ucontext_t *uc)
+-{
+-    return uc->uc_mcontext.regs->nip;
+-}
+-
+-static inline void host_signal_set_pc(ucontext_t *uc, uintptr_t pc)
+-{
+-    uc->uc_mcontext.regs->nip = pc;
+-}
+-
+-static inline bool host_signal_write(siginfo_t *info, ucontext_t *uc)
+-{
+-    return uc->uc_mcontext.regs->trap != 0x400
+-        && (uc->uc_mcontext.regs->dsisr & 0x02000000);
+-}
+-
+-#endif
+--- a/linux-user/host/ppc64/host-signal.h
++++ b/linux-user/host/ppc64/host-signal.h
+@@ -1 +1,32 @@
+-#include "../ppc/host-signal.h"
++/*
++ * host-signal.h: signal info dependent on the host architecture
++ *
++ * Copyright (c) 2003-2005 Fabrice Bellard
++ * Copyright (c) 2021 Linaro Limited
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef PPC_HOST_SIGNAL_H
++#define PPC_HOST_SIGNAL_H
++
++#include <asm/ptrace.h>
++
++static inline uintptr_t host_signal_pc(ucontext_t *uc)
++{
++    return uc->uc_mcontext.gp_regs[PT_NIP];
++}
++
++static inline void host_signal_set_pc(ucontext_t *uc, uintptr_t pc)
++{
++    uc->uc_mcontext.gp_regs[PT_NIP] = pc;
++}
++
++static inline bool host_signal_write(siginfo_t *info, ucontext_t *uc)
++{
++    return uc->uc_mcontext.gp_regs[PT_TRAP] != 0x400
++        && (uc->uc_mcontext.gp_regs[PT_DSISR] & 0x02000000);
++}
++
++#endif

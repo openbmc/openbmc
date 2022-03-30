@@ -2,7 +2,7 @@ DESCRIPTION = "Python data structure and operations for intervals"
 HOMEPAGE = "https://github.com/AlexandreDecan/portion"
 SECTION = "devel/python"
 
-LICENSE = "LGPLv3"
+LICENSE = "LGPL-3.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=05f1e16a8e59ce3e9a979e881816c2ab"
 
 inherit pypi setuptools3

@@ -7,7 +7,9 @@ LICENSE = "BSD-2-Clause"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2be8675acbfdac48935e73897af5f646"
 
-SRC_URI = "git://github.com/edenhill/librdkafka;protocol=https;branch=master"
+SRC_URI = "git://github.com/edenhill/librdkafka;protocol=https;branch=master \
+           file://0001-cmake-Use-CMAKE_INSTALL_LIBDIR.patch \
+          "
 SRCREV = "063a9ae7a65cebdf1cc128da9815c05f91a2a996"
 
 DEPENDS = "zlib openssl zstd"

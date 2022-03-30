@@ -3,7 +3,6 @@ DESCRIPTION = "GNU Gzip is a popular data compression program originally written
 project. Mark Adler wrote the decompression part"
 HOMEPAGE = "http://www.gnu.org/software/gzip/"
 SECTION = "console/utils"
-# change to GPLv3+ in 2007/07. Previous GPLv2 version is 1.3.12
 
 inherit autotools texinfo
 export DEFS="NO_ASM"

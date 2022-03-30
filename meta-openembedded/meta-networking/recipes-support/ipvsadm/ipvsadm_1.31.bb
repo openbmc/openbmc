@@ -11,7 +11,7 @@ methods (NAT, tunneling, and direct routing), and eight load balancing algorithm
 locality-based  least-connection, locality-based least-connection with replication, \
 destination-hashing, and source-hashing)."
 SECTION = "net"
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://README;beginline=40;endline=56;md5=b4e40069f15598d0e3fe2aa177e5ec77"
 
 DEPENDS += "libnl popt"

@@ -1,7 +1,7 @@
 SUMMARY = "Astronomical application which displays the night sky"
 HOMEPAGE    = "http://projects.openmoko.org/projects/orrery/"
 SECTION = "x11/scientific"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://orrery.c;endline=25;md5=d792bdf2b591972da175aecc38d88cfe"
 DEPENDS = "gtk+"
 

@@ -3,7 +3,7 @@ HOMEPAGE = "https://github.com/mvp/uhubctl"
 BUGTRACKER = "https://github.com/mvp/uhubctl/issues"
 DEPENDS = "libusb1"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRCREV = "014b55ac5d1d7fb46a8f1eefe9fc3b87ea65a75f"

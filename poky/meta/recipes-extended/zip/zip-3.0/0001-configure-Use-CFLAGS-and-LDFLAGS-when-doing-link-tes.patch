@@ -1,0 +1,88 @@
+From ab5df4826c4a532da78828b72a2751c899e27ef2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 8 Mar 2022 22:31:21 -0800
+Subject: [PATCH] configure: Use CFLAGS and LDFLAGS when doing link tests
+
+Some case link flags contain important flags which are required during
+linking, link fails otherwise without them, which can result in
+configure detection go wrong, ensure these flags are used along with CC
+when tests involve linking
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ unix/configure | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/unix/configure b/unix/configure
+index 1bc698b..1d9a9bb 100644
+--- a/unix/configure
++++ b/unix/configure
+@@ -517,14 +517,14 @@ for func in rmdir strchr strrchr rename mktemp mktime mkstemp
+ do
+   echo Check for $func
+   echo "int main(){ $func(); return 0; }" > conftest.c
+-  $CC $BFLAG -o conftest conftest.c >/dev/null 2>/dev/null
++  $CC $CFLAGS $LDFLAGS $BFLAG -o conftest conftest.c >/dev/null 2>/dev/null
+   [ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNO_`echo $func | tr '[a-z]' '[A-Z]'`"
+ done
+ 
+ 
+ echo Check for memset
+ echo "int main(){ char k; memset(&k,0,0); return 0; }" > conftest.c
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
++$CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
+ [ $? -ne 0 ] && CFLAGS="${CFLAGS} -DZMEM"
+ 
+ 
+@@ -533,7 +533,7 @@ cat > conftest.c << _EOF_
+ #include <string.h>
+ int main() { int a; int b = 0; memmove( &a, &b, sizeof( a)); return a; }
+ _EOF_
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
++$CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
+ [ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNEED_MEMMOVE"
+ 
+ 
+@@ -542,7 +542,7 @@ cat > conftest.c << _EOF_
+ #include <string.h>
+ int main() { strerror( 0); return 0; }
+ _EOF_
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
++$CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
+ [ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNEED_STRERROR"
+ 
+ echo Check for errno declaration
+@@ -563,7 +563,7 @@ cat > conftest.c << _EOF_
+ int main() { return closedir(opendir(".")); }
+ _EOF_
+ 
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
++$CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
+ if [ $? -ne 0 ]; then
+   OPT=""
+   for lib in ndir dir ucb bsd BSD PW x dirent
+@@ -583,9 +583,9 @@ fi
+ 
+ echo Check for readlink
+ echo "int main(){ return readlink(); }" > conftest.c
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
++$CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
+ if [ $? -ne 0 ]; then
+-  $CC -o conftest conftest.c -lseq >/dev/null 2>/dev/null
++  $CC $CFLAGS $LDFLAGS -o conftest conftest.c -lseq >/dev/null 2>/dev/null
+   [ $? -eq 0 ] && LFLAGS2="${LFLAGS2} -lseq"
+ fi
+ 
+@@ -661,7 +661,7 @@ elif [ -f /xenix ]; then
+ elif uname -X >/dev/null 2>/dev/null; then
+ # SCO shared library check
+   echo "int main() { return 0;}" > conftest.c
+-  $CC -o conftest conftest.c -lc_s -nointl >/dev/null 2> /dev/null
++  $CC $CFLAGS $LDFLAGS -o conftest conftest.c -lc_s -nointl >/dev/null 2> /dev/null
+   [ $? -eq 0 ] && LFLAGS2="-lc_s -nointl"
+ else
+   SYSTEM=`uname -s 2>/dev/null` || SYSTEM="unknown"
+-- 
+2.35.1
+

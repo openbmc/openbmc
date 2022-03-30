@@ -9,7 +9,7 @@ SECTION = "tpm"
 LICENSE = "CPL-1.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=059e8cd6165cb4c31e351f2b69388fd9"
 
-DEPENDS = "libtspi openssl perl"
+DEPENDS = "libtspi openssl perl-native"
 DEPENDS:class-native = "trousers-native"
 
 SRCREV = "bf43837575c5f7d31865562dce7778eae970052e"

@@ -39,6 +39,9 @@ DATABASES = {
     }
 }
 
+# New in Django 3.2
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 # Needed when Using sqlite especially to add a longer timeout for waiting
 # for the database lock to be  released
 # https://docs.djangoproject.com/en/1.6/ref/databases/#database-is-locked-errors

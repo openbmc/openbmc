@@ -1,7 +1,7 @@
 SUMMARY = "VLAN provides vconfig utility"
 HOMEPAGE = "http://www.candelatech.com/~greear/vlan.html"
 SECTION = "misc"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://vconfig.c;beginline=1;endline=19;md5=094ca47de36c20c598b15b32c270ce0a"
 
 SRC_URI = "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/vlan/1.9-3ubuntu10.6/${BPN}_${PV}.orig.tar.gz \

@@ -1,7 +1,7 @@
 SUMMARY = "Management Component Control Protocol utilities"
 HOMEPAGE = "http://www.github.com/CodeConstruct/mctp"
 SECTION = "net"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=4cc91856b08b094b4f406a29dc61db21"
 

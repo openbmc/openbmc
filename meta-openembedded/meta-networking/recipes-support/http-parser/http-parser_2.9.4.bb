@@ -17,6 +17,8 @@ SRCREV = "2343fd6b5214b2ded2cdcf76de2bf60903bb90cd"
 
 S = "${WORKDIR}/git"
 
+EXTRA_OEMAKE = "PLATFORM=linux"
+
 do_configure[noexec] = "1"
 
 do_compile() {
@@ -24,7 +26,7 @@ do_compile() {
 }
 
 do_install() {
-    oe_runmake install DESTDIR=${D} PREFIX=${prefix}
+    oe_runmake install DESTDIR=${D} PREFIX=${prefix} LIBDIR=${libdir}
 }
 
 BBCLASSEXTEND = "native nativesdk"

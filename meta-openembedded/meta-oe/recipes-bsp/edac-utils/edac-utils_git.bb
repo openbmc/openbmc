@@ -1,12 +1,16 @@
 SUMMARY = "Userspace helper for Linux kernel EDAC drivers"
 HOMEPAGE = "https://github.com/grondo/edac-utils"
+DESCRIPTION = "EDAC (Error Detection and Correction) is a set of Linux kernel \
+modules that handle reporting of hardware-related errors. Currently \
+these modules mainly handle detection of ECC memory errors for many \
+x86 and x86-64 chipsets and PCI bus parity errors."
 SECTION = "Applications/System"
-LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
+LICENSE = "GPL-2.0-only"
+LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS = " sysfsutils"
 
-SRCREV = "f9aa96205f610de39a79ff43c7478b7ef02e3138"
+SRCREV = "1c57818ecee186aa47af0342149577df5302c022"
 PV = "0.18+git${SRCPV}"
 
 S = "${WORKDIR}/git"

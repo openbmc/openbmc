@@ -2,7 +2,7 @@ SUMMARY = "This is a filesystem client based on the SSH File Transfer Protocol u
 AUTHOR = "Miklos Szeredi <miklos@szeredi.hu>"
 HOMEPAGE = "https://github.com/libfuse/sshfs"
 SECTION = "console/network"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 DEPENDS = "glib-2.0 fuse3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 

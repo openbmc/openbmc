@@ -2,6 +2,9 @@
 #
 # Perform a bind mount, copying existing files as we do so to ensure the
 # overlaid path has the necessary content.
+# If the target is a directory and overlayfs is available (and the environment
+# variable MOUNT_COPYBIND_AVOID_OVERLAYFS=1 is not set), then an overlay mount
+# will be attempted first.
 
 if [ $# -lt 2 ]; then
     echo >&2 "Usage: $0 spec mountpoint [OPTIONS]"
@@ -48,10 +51,10 @@ if [ -d "$mountpoint" ]; then
     # If that fails, fall back to slower copy.
     if command -v selinuxenabled > /dev/null 2>&1; then
         if selinuxenabled; then
-            mountcontext=",rootcontext=$(matchpathcon -n $mountpoint)"
+            mountcontext=",rootcontext=$(matchpathcon -n "$mountpoint")"
         fi
     fi
-    if ! mount -t overlay overlay -olowerdir="$mountpoint",upperdir="$spec",workdir="$overlay_workdir""$mountcontext" "$mountpoint" > /dev/null 2>&1; then
+    if [ "$MOUNT_COPYBIND_AVOID_OVERLAYFS" = 1 ] || ! mount -t overlay overlay -olowerdir="$mountpoint",upperdir="$spec",workdir="$overlay_workdir""$mountcontext" "$mountpoint" > /dev/null 2>&1; then
 
         if [ "$specdir_existed" != "yes" ]; then
             cp -aPR "$mountpoint"/. "$spec/"

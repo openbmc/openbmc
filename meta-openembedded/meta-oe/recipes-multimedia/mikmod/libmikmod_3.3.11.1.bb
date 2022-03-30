@@ -1,6 +1,6 @@
 DESCRIPTION = "libmikmod is a module player library supporting many formats, including mod, s3m, it, and xm."
 SECTION = "libs"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING.LESSER;md5=4fbd65380cdd255951079008b364516c"
 
 DEPENDS = "alsa-lib texinfo"

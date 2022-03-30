@@ -4,7 +4,7 @@ HOMEPAGE = "https://cihar.com/software/enca/"
 
 DEPENDS += "gettext-native"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=24b9569831c46d4818450b55282476b4"
 
 SRC_URI = "https://dl.cihar.com/enca/enca-${PV}.tar.gz \

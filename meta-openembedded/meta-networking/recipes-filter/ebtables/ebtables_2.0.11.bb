@@ -2,7 +2,7 @@ SUMMARY = "Filtering tool for a Linux-based bridging firewall"
 HOMEPAGE = "http://sourceforge.net/projects/ebtables/"
 DESCRIPTION = "Utility for basic Ethernet frame filtering on a Linux bridge, \
                advanced logging, MAC DNAT/SNAT and brouting."
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=53b4a999993871a28ab1488fdbd2e73e"
 SECTION = "net"
 

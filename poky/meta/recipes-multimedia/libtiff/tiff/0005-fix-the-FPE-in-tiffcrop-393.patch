@@ -1,0 +1,36 @@
+CVE: CVE-2022-0909
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From 4768355a074d562177e0a8b551c561d1af7eb74a Mon Sep 17 00:00:00 2001
+From: 4ugustus <wangdw.augustus@qq.com>
+Date: Tue, 8 Mar 2022 16:22:04 +0000
+Subject: [PATCH 5/6] fix the FPE in tiffcrop (#393)
+
+---
+ libtiff/tif_dir.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libtiff/tif_dir.c b/libtiff/tif_dir.c
+index a6c254fc..77da6ea4 100644
+--- a/libtiff/tif_dir.c
++++ b/libtiff/tif_dir.c
+@@ -335,13 +335,13 @@ _TIFFVSetField(TIFF* tif, uint32_t tag, va_list ap)
+ 		break;
+ 	case TIFFTAG_XRESOLUTION:
+         dblval = va_arg(ap, double);
+-        if( dblval < 0 )
++        if( dblval != dblval || dblval < 0 )
+             goto badvaluedouble;
+ 		td->td_xresolution = _TIFFClampDoubleToFloat( dblval );
+ 		break;
+ 	case TIFFTAG_YRESOLUTION:
+         dblval = va_arg(ap, double);
+-        if( dblval < 0 )
++        if( dblval != dblval || dblval < 0 )
+             goto badvaluedouble;
+ 		td->td_yresolution = _TIFFClampDoubleToFloat( dblval );
+ 		break;
+-- 
+2.25.1
+

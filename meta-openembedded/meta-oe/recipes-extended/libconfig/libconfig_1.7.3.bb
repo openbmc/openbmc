@@ -4,7 +4,7 @@ HOMEPAGE = "https://hyperrealm.github.io/libconfig/"
 BUGTRACKER = "https://github.com/hyperrealm/libconfig/issues"
 SECTION = "libs"
 
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=fad9b3332be894bab9bc501572864b29"
 
 SRC_URI = "https://hyperrealm.github.io/libconfig/dist/libconfig-${PV}.tar.gz"

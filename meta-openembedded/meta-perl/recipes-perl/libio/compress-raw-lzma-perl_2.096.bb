@@ -2,7 +2,7 @@ DESCRIPTION = ""Compress::Raw::Lzma" provides an interface to the in-memory \
 compression/uncompression functions from the lzma compression library."
 
 SECTION = "libs"
-LICENSE = "Artisticv1 | GPLv1+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 
 MAINTAINER=	"Poky <poky@yoctoproject.org>"
 HOMEPAGE=	"https://metacpan.org/release/Compress-Raw-Lzma"

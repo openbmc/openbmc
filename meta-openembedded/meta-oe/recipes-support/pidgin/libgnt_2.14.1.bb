@@ -1,7 +1,7 @@
 SUMMARY = "GNT: The GLib Ncurses Toolkit"
 
 SECTION = "libs"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c9a1abacd0166f595a9fbe6afb1f0d5e"
 DEPENDS = "glib-2.0 ncurses libxml2 glib-2.0-native"
 

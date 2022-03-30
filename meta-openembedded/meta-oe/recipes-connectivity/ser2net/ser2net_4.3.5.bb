@@ -2,7 +2,7 @@ SUMMARY = "A serial to network proxy"
 SECTION = "console/network"
 HOMEPAGE = "http://sourceforge.net/projects/ser2net/"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=bae3019b4c6dc4138c217864bd04331f"
 
 DEPENDS = "gensio libyaml"

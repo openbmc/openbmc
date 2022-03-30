@@ -87,14 +87,14 @@ class TinfoilTests(OESelftestTestCase):
         with bb.tinfoil.Tinfoil() as tinfoil:
             tinfoil.prepare(config_only=True)
 
-            tinfoil.set_event_mask(['bb.event.FilesMatchingFound', 'bb.command.CommandCompleted'])
+            tinfoil.set_event_mask(['bb.event.FilesMatchingFound', 'bb.command.CommandCompleted', 'bb.command.CommandFailed', 'bb.command.CommandExit'])
 
             # Need to drain events otherwise events that were masked may still be in the queue
             while tinfoil.wait_event():
                 pass
 
             pattern = 'conf'
-            res = tinfoil.run_command('testCookerCommandEvent', pattern)
+            res = tinfoil.run_command('testCookerCommandEvent', pattern, handle_events=False)
             self.assertTrue(res)
 
             eventreceived = False
@@ -118,7 +118,7 @@ class TinfoilTests(OESelftestTestCase):
                     else:
                         self.fail('Unexpected event: %s' % event)
 
-            self.assertTrue(commandcomplete, 'Timed out waiting for CommandCompleted event from bitbake server')
+            self.assertTrue(commandcomplete, 'Timed out waiting for CommandCompleted event from bitbake server (Matching event received: %s)' % str(eventreceived))
             self.assertTrue(eventreceived, 'Did not receive FilesMatchingFound event from bitbake server')
 
     def test_setvariable_clean(self):

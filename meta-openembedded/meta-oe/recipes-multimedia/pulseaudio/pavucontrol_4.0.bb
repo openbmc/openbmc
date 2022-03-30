@@ -1,7 +1,7 @@
 DESCRIPTION = "PulseAudio Volume Control (pavucontrol) is a simple GTK based volume control tool ("mixer") for the PulseAudio sound server."
 HOMEPAGE = "https://freedesktop.org/software/pulseaudio/pavucontrol/"
 SECTION = "x11/multimedia"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=751419260aa954499f7abaabaa882bbe"
 
 # glib-2.0-native is required for glib-gettextize, which is used by the

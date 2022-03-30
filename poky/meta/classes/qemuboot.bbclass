@@ -29,7 +29,7 @@
 #
 # QB_AUDIO_DRV: qemu audio driver, e.g., "alsa", set it when support audio
 #
-# QB_AUDIO_OPT: qemu audio option, e.g., "-soundhw ac97,es1370", used
+# QB_AUDIO_OPT: qemu audio option, e.g., "-device AC97", used
 #               when QB_AUDIO_DRV is set.
 #
 # QB_RNG: Pass-through for host random number generator, it can speedup boot

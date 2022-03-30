@@ -1,0 +1,50 @@
+From: Mauro Salvini <m.salvini@koansoftware.com>
+To: u-boot@lists.denx.de
+Subject: [PATCH] rpi: always set fdt_addr with firmware-provided FDT address
+Date: Wed, 12 May 2021 14:39:45 +0200	[thread overview]
+Message-ID: <20210512123945.25649-1-m.salvini@koansoftware.com> (raw)
+
+Raspberry firmware prepares the FDT blob in memory at an address
+that depends on both the memory size and the blob size [1].
+After commit ade243a211d6 ("rpi: passthrough of the firmware provided FDT
+blob") this FDT is passed to kernel through fdt_addr environment variable,
+handled in set_fdt_addr() function in board file.
+
+When u-boot environment is persistently saved, if a change happens
+in loaded FDT (e.g. for a new overlay applied), firmware produces a FDT
+address different from the saved one, but u-boot still use the saved
+one because set_fdt_addr() function does not overwrite the fdt_addr
+variable. So, for example, if there is a script that uses fdt commands for
+e.g. manipulate the bootargs, boot hangs with error
+
+libfdt fdt_check_header(): FDT_ERR_BADMAGIC
+
+Removing the fdt_addr variable in saved environment allows to boot.
+
+With this patch set_fdt_addr() function always overwrite fdt_addr value.
+
+[1] https://www.raspberrypi.org/forums//viewtopic.php?f=107&t=134018
+
+Signed-off-by: Mauro Salvini <m.salvini@koansoftware.com>
+Cc: C?dric Schieli <cschieli@gmail.com>
+Cc: Matthias Brugger <mbrugger@suse.com>
+---
+ board/raspberrypi/rpi/rpi.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/board/raspberrypi/rpi/rpi.c b/board/raspberrypi/rpi/rpi.c
+index df52a4689f..611013471e 100644
+--- a/board/raspberrypi/rpi/rpi.c
++++ b/board/raspberrypi/rpi/rpi.c
+@@ -318,9 +318,6 @@ static void set_fdtfile(void)
+  */
+ static void set_fdt_addr(void)
+ {
+-	if (env_get("fdt_addr"))
+-		return;
+-
+ 	if (fdt_magic(fw_dtb_pointer) != FDT_MAGIC)
+ 		return;
+ 
+-- 
+2.17.1

@@ -1,7 +1,7 @@
 DESCRIPTION = "libserialport is a minimal, cross-platform shared library written in C that is intended to take care of the OS-specific details when writing software that uses serial ports."
 HOMEPAGE = "https://sigrok.org/wiki/Libserialport"
 
-LICENSE = "LGPL-3.0+"
+LICENSE = "LGPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e6a600fd5e1d9cbde2d983680233ad02"
 
 inherit autotools

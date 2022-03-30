@@ -36,7 +36,7 @@ XSERVER_X86_I915 = "xf86-video-intel \
            "
 
 XSERVER_X86_I965 = "xf86-video-intel \
-           ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'mesa-driver-i965', '', d)} \
+           ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'mesa-driver-crocus', '', d)} \
            "
 
 XSERVER_X86_VESA = "xf86-video-vesa"

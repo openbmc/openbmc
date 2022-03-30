@@ -1,13 +1,13 @@
 SUMMARY = "PC/SC Lite smart card framework and applications"
 HOMEPAGE = "http://pcsclite.alioth.debian.org/"
-LICENSE = "BSD-3-Clause & GPLv3+"
+LICENSE = "BSD-3-Clause & GPL-3.0-or-later"
 LICENSE:${PN} = "BSD-3-Clause"
 LICENSE:${PN}-lib = "BSD-3-Clause"
 LICENSE:${PN}-doc = "BSD-3-Clause"
 LICENSE:${PN}-dev = "BSD-3-Clause"
-LICENSE:${PN}-dbg = "BSD-3-Clause & GPLv3+"
-LICENSE:${PN}-spy = "GPLv3+"
-LICENSE:${PN}-spy-dev = "GPLv3+"
+LICENSE:${PN}-dbg = "BSD-3-Clause & GPL-3.0-or-later"
+LICENSE:${PN}-spy = "GPL-3.0-or-later"
+LICENSE:${PN}-spy-dev = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=628c01ba985ecfa21677f5ee2d5202f6"
 
 SRC_URI = "\

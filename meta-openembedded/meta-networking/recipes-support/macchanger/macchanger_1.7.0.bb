@@ -1,7 +1,7 @@
 SUMMARY = "Tool to view/change network interface MAC addresses"
 DESCRIPTION = "A GNU/Linux utility for viewing/manipulating the MAC address of network interfaces."
 HOMEPAGE = "https://github.com/alobbs/macchanger"
-LICENSE  = "GPLv3"
+LICENSE  = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 SECTION = "net"
 

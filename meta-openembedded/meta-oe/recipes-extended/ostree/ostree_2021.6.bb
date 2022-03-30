@@ -4,7 +4,7 @@ tools that combines a \"git-like\" model for committing and downloading \
 bootable filesystem trees, along with a layer for deploying them and managing \
 the bootloader configuration."
 HOMEPAGE = "https://ostree.readthedocs.io"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=5f30f0716dfdd0d91eb439ebec522ec2"
 

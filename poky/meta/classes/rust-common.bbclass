@@ -16,6 +16,7 @@ RUST_PANIC_STRATEGY ?= "unwind"
 # Native builds are not effected by TCLIBC. Without this, rust-native
 # thinks it's "target" (i.e. x86_64-linux) is a musl target.
 RUST_LIBC = "${TCLIBC}"
+RUST_LIBC:class-crosssdk = "glibc"
 RUST_LIBC:class-native = "glibc"
 
 def determine_libc(d, thing):

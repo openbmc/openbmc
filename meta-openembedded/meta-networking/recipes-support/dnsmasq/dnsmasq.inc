@@ -2,7 +2,7 @@ SUMMARY = "Lightweight, easy to configure DNS forwarder and DHCP server"
 HOMEPAGE = "http://www.thekelleys.org.uk/dnsmasq/doc.html"
 SECTION = "net"
 # GPLv3 was added in version 2.41 as license option
-LICENSE = "GPLv2 | GPLv3"
+LICENSE = "GPL-2.0-only | GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3 \
                     file://COPYING-v3;md5=d32239bcb673463ab874e80d47fae504"
 

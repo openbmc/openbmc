@@ -21,11 +21,10 @@ SRC_URI = "gitsm://github.com/tianocore/edk2.git;branch=master;protocol=https \
            file://0003-ovmf-Update-to-latest.patch \
            file://0005-debug-prefix-map.patch \
            file://0006-reproducible.patch \
-           file://0001-Fix-VLA-parameter-warning.patch \
            "
 
-PV = "edk2-stable202111"
-SRCREV = "bb1bba3d776733c41dbfa2d1dc0fe234819a79f2"
+PV = "edk2-stable202202"
+SRCREV = "b24306f15daa2ff8510b06702114724b33895d3c"
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>edk2-stable.*)"
 
 inherit deploy

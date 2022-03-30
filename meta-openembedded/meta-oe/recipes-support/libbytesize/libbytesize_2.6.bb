@@ -1,7 +1,7 @@
 DESCRIPTION = "The goal of this project is to provide a tiny library that would \
 facilitate the common operations with sizes in bytes."
 HOMEPAGE = "https://github.com/rhinstaller/libbytesize"
-LICENSE = "LGPLv2+"
+LICENSE = "LGPL-2.0-or-later"
 SECTION = "devel/lib"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=c07cb499d259452f324bb90c3067d85c"

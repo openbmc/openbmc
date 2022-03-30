@@ -5,7 +5,7 @@ with perl object oriented interface."
 
 HOMEPAGE = "http://search.cpan.org/dist/Parse-Yapp/"
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPL-1.0+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 
 LIC_FILES_CHKSUM = "file://lib/Parse/Yapp.pm;beginline=508;endline=521;md5=41a4542fcde97a600c9de0d782a90256"
 

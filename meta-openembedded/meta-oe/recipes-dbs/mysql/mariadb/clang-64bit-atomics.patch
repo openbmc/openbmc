@@ -1,0 +1,178 @@
+Prevent Clang from emitting atomic libcalls
+
+Clang expects 8-byte alignment for some 64-bit atomic operations
+in some 32-bit targets. Native instruction lock cmpxchg8b (for x86)
+should only require 4-byte alignment.
+
+This patch tries to add 8-byte alignents to data needing atomic ops
+which helps clang to not generate the libatomic calls but emit
+builtins directly.
+
+Upstream-Status: Submitted[https://jira.mariadb.org/browse/MDEV-28162]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/include/my_atomic.h
++++ b/include/my_atomic.h
+@@ -115,6 +115,16 @@
+ #include "atomic/gcc_builtins.h"
+ #endif
+ 
++#include <stdint.h>
++
++# ifdef __GNUC__
++typedef __attribute__((__aligned__(8))) int64 ATOMIC_I64;
++typedef __attribute__((__aligned__(8))) uint64 ATOMIC_U64;
++# else
++typedef int64 ATOMIC_I64;
++typedef uint64 ATOMIC_U64;
++# endif
++
+ #if SIZEOF_LONG == 4
+ #define my_atomic_addlong(A,B) my_atomic_add32((int32*) (A), (B))
+ #define my_atomic_loadlong(A) my_atomic_load32((int32*) (A))
+@@ -123,12 +133,12 @@
+ #define my_atomic_faslong(A,B) my_atomic_fas32((int32*) (A), (B))
+ #define my_atomic_caslong(A,B,C) my_atomic_cas32((int32*) (A), (int32*) (B), (C))
+ #else
+-#define my_atomic_addlong(A,B) my_atomic_add64((int64*) (A), (B))
+-#define my_atomic_loadlong(A) my_atomic_load64((int64*) (A))
+-#define my_atomic_loadlong_explicit(A,O) my_atomic_load64_explicit((int64*) (A), (O))
+-#define my_atomic_storelong(A,B) my_atomic_store64((int64*) (A), (B))
+-#define my_atomic_faslong(A,B) my_atomic_fas64((int64*) (A), (B))
+-#define my_atomic_caslong(A,B,C) my_atomic_cas64((int64*) (A), (int64*) (B), (C))
++#define my_atomic_addlong(A,B) my_atomic_add64((ATOMIC_I64*) (A), (B))
++#define my_atomic_loadlong(A) my_atomic_load64((ATOMIC_I64*) (A))
++#define my_atomic_loadlong_explicit(A,O) my_atomic_load64_explicit((ATOMIC_I64*) (A), (O))
++#define my_atomic_storelong(A,B) my_atomic_store64((ATOMIC_I64*) (A), (B))
++#define my_atomic_faslong(A,B) my_atomic_fas64((ATOMIC_I64*) (A), (B))
++#define my_atomic_caslong(A,B,C) my_atomic_cas64((ATOMIC_I64*) (A), (ATOMIC_I64*) (B), (C))
+ #endif
+ 
+ #ifndef MY_MEMORY_ORDER_SEQ_CST
+--- a/storage/perfschema/pfs_atomic.h
++++ b/storage/perfschema/pfs_atomic.h
+@@ -41,7 +41,7 @@ public:
+   }
+ 
+   /** Atomic load. */
+-  static inline int64 load_64(int64 *ptr)
++  static inline int64 load_64(ATOMIC_I64 *ptr)
+   {
+     return my_atomic_load64(ptr);
+   }
+@@ -53,9 +53,9 @@ public:
+   }
+ 
+   /** Atomic load. */
+-  static inline uint64 load_u64(uint64 *ptr)
++  static inline uint64 load_u64(ATOMIC_U64 *ptr)
+   {
+-    return (uint64) my_atomic_load64((int64*) ptr);
++    return (uint64) my_atomic_load64((ATOMIC_I64*) ptr);
+   }
+ 
+   /** Atomic store. */
+@@ -65,7 +65,7 @@ public:
+   }
+ 
+   /** Atomic store. */
+-  static inline void store_64(int64 *ptr, int64 value)
++  static inline void store_64(ATOMIC_I64 *ptr, int64 value)
+   {
+     my_atomic_store64(ptr, value);
+   }
+@@ -77,9 +77,9 @@ public:
+   }
+ 
+   /** Atomic store. */
+-  static inline void store_u64(uint64 *ptr, uint64 value)
++  static inline void store_u64(ATOMIC_U64 *ptr, uint64 value)
+   {
+-    my_atomic_store64((int64*) ptr, (int64) value);
++    my_atomic_store64((ATOMIC_I64*) ptr, (int64) value);
+   }
+ 
+   /** Atomic add. */
+@@ -89,7 +89,7 @@ public:
+   }
+ 
+   /** Atomic add. */
+-  static inline int64 add_64(int64 *ptr, int64 value)
++  static inline int64 add_64(ATOMIC_I64 *ptr, int64 value)
+   {
+     return my_atomic_add64(ptr, value);
+   }
+@@ -101,9 +101,9 @@ public:
+   }
+ 
+   /** Atomic add. */
+-  static inline uint64 add_u64(uint64 *ptr, uint64 value)
++  static inline uint64 add_u64(ATOMIC_U64 *ptr, uint64 value)
+   {
+-    return (uint64) my_atomic_add64((int64*) ptr, (int64) value);
++    return (uint64) my_atomic_add64((ATOMIC_I64*) ptr, (int64) value);
+   }
+ 
+   /** Atomic compare and swap. */
+@@ -114,7 +114,7 @@ public:
+   }
+ 
+   /** Atomic compare and swap. */
+-  static inline bool cas_64(int64 *ptr, int64 *old_value,
++  static inline bool cas_64(ATOMIC_I64 *ptr, ATOMIC_I64 *old_value,
+                             int64 new_value)
+   {
+     return my_atomic_cas64(ptr, old_value, new_value);
+@@ -129,10 +129,10 @@ public:
+   }
+ 
+   /** Atomic compare and swap. */
+-  static inline bool cas_u64(uint64 *ptr, uint64 *old_value,
++  static inline bool cas_u64(ATOMIC_U64 *ptr, ATOMIC_U64 *old_value,
+                              uint64 new_value)
+   {
+-    return my_atomic_cas64((int64*) ptr, (int64*) old_value,
++    return my_atomic_cas64((ATOMIC_I64*) ptr, (ATOMIC_I64*) old_value,
+                             (uint64) new_value);
+   }
+ };
+--- a/sql/sql_class.h
++++ b/sql/sql_class.h
+@@ -1049,7 +1049,7 @@ static inline void update_global_memory_
+                       (longlong) global_status_var.global_memory_used,
+                       size));
+   // workaround for gcc 4.2.4-1ubuntu4 -fPIE (from DEB_BUILD_HARDENING=1)
+-  int64 volatile * volatile ptr= &global_status_var.global_memory_used;
++  ATOMIC_I64 volatile * volatile ptr= &global_status_var.global_memory_used;
+   my_atomic_add64_explicit(ptr, size, MY_MEMORY_ORDER_RELAXED);
+ }
+ 
+--- a/storage/innobase/include/srv0mon.h
++++ b/storage/innobase/include/srv0mon.h
+@@ -49,7 +49,7 @@ enum monitor_running_status {
+ typedef enum monitor_running_status	monitor_running_t;
+ 
+ /** Monitor counter value type */
+-typedef	int64_t				mon_type_t;
++typedef	ATOMIC_I64			mon_type_t;
+ 
+ /** Two monitor structures are defined in this file. One is
+ "monitor_value_t" which contains dynamic counter values for each
+@@ -568,7 +568,7 @@ Use MONITOR_INC if appropriate mutex pro
+ 	if (enabled) {							\
+ 		ib_uint64_t	value;					\
+ 		value  = my_atomic_add64_explicit(			\
+-			(int64*) &MONITOR_VALUE(monitor), 1,		\
++			(ATOMIC_I64*) &MONITOR_VALUE(monitor), 1,	\
+ 			MY_MEMORY_ORDER_RELAXED) + 1;			\
+ 		/* Note: This is not 100% accurate because of the	\
+ 		inherent race, we ignore it due to performance. */	\
+@@ -585,7 +585,7 @@ Use MONITOR_DEC if appropriate mutex pro
+ 	if (enabled) {							\
+ 		ib_uint64_t	value;					\
+ 		value = my_atomic_add64_explicit(			\
+-			(int64*) &MONITOR_VALUE(monitor), -1,		\
++			(ATOMIC_I64*) &MONITOR_VALUE(monitor), -1,	\
+ 			MY_MEMORY_ORDER_RELAXED) - 1;			\
+ 		/* Note: This is not 100% accurate because of the	\
+ 		inherent race, we ignore it due to performance. */	\

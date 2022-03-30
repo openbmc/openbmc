@@ -461,7 +461,7 @@ and clicking on the ``[...]`` link beneath the "Tag" heading.
 
 Some key tags for the ``poky`` repository are ``jethro-14.0.3``,
 ``morty-16.0.1``, ``pyro-17.0.0``, and
-``&DISTRO_NAME_NO_CAP;-&POKYVERSION;``. These tags represent Yocto Project
+``&DISTRO_NAME_NO_CAP;-&DISTRO;``. These tags represent Yocto Project
 releases.
 
 When you create a local copy of the Git repository, you also have access

@@ -28,6 +28,10 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0001-tests-meson.build-use-relative-path-to-refer-to-file.patch \
            file://0001-riscv-Set-5.4-as-minimum-kernel-version-for-riscv32.patch \
            file://0001-acpi-tpm-Add-missing-device-identification-objects.patch \
+           file://0001-ppc-Include-asm-ptrace.h-for-pt_regs-struct-definiti.patch \
+           file://0001-Define-MAP_SYNC-and-MAP_SHARED_VALIDATE-on-needed-li.patch \
+           file://0001-vhost-vsock-detach-the-virqueue-element-in-case-of-e.patch \
+           file://0002-virtio-net-fix-map-leaking-on-error-during-receive.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 
@@ -140,8 +144,8 @@ do_install:append() {
 # END of qemu-mips workaround
 
 # Disable kvm/virgl/mesa on targets that do not support it
-PACKAGECONFIG:remove:darwin = "kvm virglrenderer glx gtk+"
-PACKAGECONFIG:remove:mingw32 = "kvm virglrenderer glx gtk+"
+PACKAGECONFIG:remove:darwin = "kvm virglrenderer epoxy gtk+"
+PACKAGECONFIG:remove:mingw32 = "kvm virglrenderer epoxy gtk+"
 
 PACKAGECONFIG[sdl] = "--enable-sdl,--disable-sdl,libsdl2"
 PACKAGECONFIG[virtfs] = "--enable-virtfs --enable-attr --enable-cap-ng,--disable-virtfs,libcap-ng attr,"
@@ -163,7 +167,7 @@ PACKAGECONFIG[nettle] = "--enable-nettle,--disable-nettle,nettle"
 PACKAGECONFIG[libusb] = "--enable-libusb,--disable-libusb,libusb1"
 PACKAGECONFIG[fdt] = "--enable-fdt,--disable-fdt,dtc"
 PACKAGECONFIG[alsa] = "--audio-drv-list=default,,alsa-lib"
-PACKAGECONFIG[glx] = "--enable-opengl,--disable-opengl,virtual/libgl"
+PACKAGECONFIG[epoxy] = "--enable-opengl,--disable-opengl,libepoxy"
 PACKAGECONFIG[lzo] = "--enable-lzo,--disable-lzo,lzo"
 PACKAGECONFIG[numa] = "--enable-numa,--disable-numa,numactl"
 PACKAGECONFIG[gnutls] = "--enable-gnutls,--disable-gnutls,gnutls"

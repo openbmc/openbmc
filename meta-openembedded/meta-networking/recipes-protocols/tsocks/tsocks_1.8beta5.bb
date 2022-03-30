@@ -6,7 +6,7 @@ make to establish network connections and negotating them through a \
 SOCKS server as necessary."
 HOMEPAGE = "http://sourceforge.net/projects/tsocks/"
 SECTION = "net"
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=18810669f13b87348459e611d31ab760"
 
 SRC_URI = "http://downloads.sourceforge.net/tsocks/tsocks-${PV}.tar.gz \

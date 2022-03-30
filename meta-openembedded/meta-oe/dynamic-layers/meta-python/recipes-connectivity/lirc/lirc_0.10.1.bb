@@ -5,7 +5,7 @@ DESCRIPTION:append:lirc-remotes = " This package contains some config files for 
 DESCRIPTION:append:lirc-nslu2example = " This package contains a working config for RC5 remotes and a modified NSLU2."
 HOMEPAGE = "http://www.lirc.org"
 SECTION = "console/network"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 DEPENDS = "libxslt-native alsa-lib libftdi libusb1 libusb-compat jack portaudio-v19 python3-pyyaml python3-setuptools-native"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"

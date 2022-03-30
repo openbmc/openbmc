@@ -1,7 +1,7 @@
 SUMMARY = "Portable C library for multiline text editing"
 HOMEPAGE = "http://projects.gnome.org/gtksourceview/"
 
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=fbc093901857fcd118f065f900982c24"
 
 DEPENDS = "gtk+3 libxml2 intltool-native gnome-common-native glib-2.0-native"

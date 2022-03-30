@@ -3,7 +3,7 @@ block devices. It has a plugin-based architecture where each technology (like \
 LVM, Btrfs, MD RAID, Swap,...) is implemented in a separate plugin, possibly \
 with multiple implementations (e.g. using LVM CLI or the new LVM DBus API)."
 HOMEPAGE = "http://rhinstaller.github.io/libblockdev/"
-LICENSE = "LGPLv2+"
+LICENSE = "LGPL-2.0-or-later"
 SECTION = "devel/lib"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=c07cb499d259452f324bb90c3067d85c"

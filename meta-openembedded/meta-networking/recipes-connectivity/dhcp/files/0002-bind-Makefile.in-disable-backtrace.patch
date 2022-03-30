@@ -1,0 +1,31 @@
+From 6c6bbfe6b33e5c7e46a4260d656593dbe610fd8a Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 8 Jun 2021 10:13:57 +0800
+Subject: [PATCH] bind/Makefile.in: disable backtrace
+
+Fixes build error for qemuarm on musl:
+libisc.so: undefined reference to `_Unwind_GetIP'
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ bind/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/bind/Makefile.in b/bind/Makefile.in
+index 2e60091..533d55c 100644
+--- a/bind/Makefile.in
++++ b/bind/Makefile.in
+@@ -22,7 +22,7 @@ prefix = @prefix@
+ exec_prefix = @exec_prefix@
+ 
+ bindconfig = --without-openssl --without-libxml2 --without-libjson \
+-	--without-gssapi --disable-threads --without-lmdb \
++	--without-gssapi --disable-threads --without-lmdb --disable-backtrace \
+ 	--includedir=@includedir@ --libdir=@libdir@  --without-python\
+ 	@BINDLT@ @BINDIOMUX@ @BINDCONFIG@ --enable-full-report
+ 
+-- 
+2.25.1
+

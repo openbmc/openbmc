@@ -180,6 +180,77 @@ class Command(BaseCommand):
         except Exception as e:
             logger.warning("runbuilds: schedule exception %s" % str(e))
 
+    # Test to see if a build pre-maturely died due to a bitbake crash
+    def check_dead_builds(self):
+        do_cleanup = False
+        try:
+            for br in BuildRequest.objects.filter(state=BuildRequest.REQ_INPROGRESS):
+                # Get the build directory
+                if br.project.builddir:
+                    builddir =  br.project.builddir
+                else:
+                    builddir = '%s-toaster-%d' % (br.environment.builddir,br.project.id)
+                # Check log to see if there is a recent traceback
+                toaster_ui_log = os.path.join(builddir, 'toaster_ui.log')
+                test_file = os.path.join(builddir, '._toaster_check.txt')
+                os.system("tail -n 50 %s > %s" % (os.path.join(builddir, 'toaster_ui.log'),test_file))
+                traceback_text = ''
+                is_traceback = False
+                with open(test_file,'r') as test_file_fd:
+                    test_file_tail = test_file_fd.readlines()
+                    for line in test_file_tail:
+                        if line.startswith('Traceback (most recent call last):'):
+                            traceback_text = line
+                            is_traceback = True
+                        elif line.startswith('NOTE: ToasterUI waiting for events'):
+                            # Ignore any traceback before new build start
+                            traceback_text = ''
+                            is_traceback = False
+                        elif line.startswith('Note: Toaster traceback auto-stop'):
+                            # Ignore any traceback before this previous traceback catch
+                            traceback_text = ''
+                            is_traceback = False
+                        elif is_traceback:
+                            traceback_text += line
+                # Test the results
+                is_stop = False
+                if is_traceback:
+                    # Found a traceback
+                    errtype = 'Bitbake crash'
+                    errmsg = 'Bitbake crash\n' + traceback_text
+                    state = BuildRequest.REQ_FAILED
+                    # Clean up bitbake files
+                    bitbake_lock = os.path.join(builddir, 'bitbake.lock')
+                    if os.path.isfile(bitbake_lock):
+                        os.remove(bitbake_lock)
+                    bitbake_sock = os.path.join(builddir, 'bitbake.sock')
+                    if os.path.isfile(bitbake_sock):
+                        os.remove(bitbake_sock)
+                    if os.path.isfile(test_file):
+                        os.remove(test_file)
+                    # Add note to ignore this traceback on next check
+                    os.system('echo "Note: Toaster traceback auto-stop" >> %s' % toaster_ui_log)
+                    is_stop = True
+                # Add more tests here
+                #elif ...
+                # Stop the build request?
+                if is_stop:
+                    brerror = BRError(
+                        req = br,
+                        errtype = errtype,
+                        errmsg = errmsg,
+                        traceback = traceback_text,
+                        )
+                    brerror.save()
+                    br.state = state
+                    br.save()
+                    do_cleanup = True
+            # Do cleanup
+            if do_cleanup:
+                self.cleanup()
+        except Exception as e:
+            logger.error("runbuilds: Error in check_dead_builds %s" % e)
+
     def handle(self, **options):
         pidfile_path = os.path.join(os.environ.get("BUILDDIR", "."),
                                     ".runbuilds.pid")
@@ -187,10 +258,18 @@ class Command(BaseCommand):
         with open(pidfile_path, 'w') as pidfile:
             pidfile.write("%s" % os.getpid())
 
+        # Clean up any stale/failed builds from previous Toaster run
         self.runbuild()
 
         signal.signal(signal.SIGUSR1, lambda sig, frame: None)
 
         while True:
-            signal.pause()
-            self.runbuild()
+            sigset = signal.sigtimedwait([signal.SIGUSR1], 5)
+            if sigset:
+                for sig in sigset:
+                    # Consume each captured pending event
+                    self.runbuild()
+            else:
+                # Check for build exceptions
+                self.check_dead_builds()
+

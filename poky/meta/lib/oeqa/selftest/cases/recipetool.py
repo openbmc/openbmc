@@ -343,7 +343,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         result = runCmd('recipetool create -o %s %s -x %s' % (recipefile, srcuri, tempsrc))
         self.assertTrue(os.path.isfile(recipefile))
         checkvars = {}
-        checkvars['LICENSE'] = 'GPLv2'
+        checkvars['LICENSE'] = 'GPL-2.0-only'
         checkvars['LIC_FILES_CHKSUM'] = 'file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263'
         checkvars['SRC_URI'] = 'https://github.com/logrotate/logrotate/releases/download/${PV}/logrotate-${PV}.tar.xz'
         checkvars['SRC_URI[md5sum]'] = 'a560c57fac87c45b2fc17406cdf79288'
@@ -363,7 +363,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         result = runCmd(['recipetool', 'create', '-o', recipefile, srcuri + ";rev=9f7cf8895ae2d39c465c04cc78e918c157420269", '-x', tempsrc])
         self.assertTrue(os.path.isfile(recipefile), 'recipetool did not create recipe file; output:\n%s' % result.output)
         checkvars = {}
-        checkvars['LICENSE'] = 'LGPLv2.1'
+        checkvars['LICENSE'] = 'LGPL-2.1-only'
         checkvars['LIC_FILES_CHKSUM'] = 'file://COPYING;md5=7fbc338309ac38fefcd64b04bb903e34'
         checkvars['S'] = '${WORKDIR}/git'
         checkvars['PV'] = '1.11+git${SRCPV}'
@@ -377,7 +377,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         temprecipe = os.path.join(self.tempdir, 'recipe')
         os.makedirs(temprecipe)
         pv = '1.7.4.1'
-        srcuri = 'http://www.dest-unreach.org/socat/download/socat-%s.tar.bz2' % pv
+        srcuri = 'http://www.dest-unreach.org/socat/download/Archive/socat-%s.tar.bz2' % pv
         result = runCmd('recipetool create %s -o %s' % (srcuri, temprecipe))
         dirlist = os.listdir(temprecipe)
         if len(dirlist) > 1:
@@ -386,7 +386,7 @@ class RecipetoolCreateTests(RecipetoolBase):
             self.fail('recipetool did not create recipe file; output:\n%s\ndirlist:\n%s' % (result.output, str(dirlist)))
         self.assertEqual(dirlist[0], 'socat_%s.bb' % pv, 'Recipe file incorrectly named')
         checkvars = {}
-        checkvars['LICENSE'] = set(['Unknown', 'GPLv2'])
+        checkvars['LICENSE'] = set(['Unknown', 'GPL-2.0-only'])
         checkvars['LIC_FILES_CHKSUM'] = set(['file://COPYING.OpenSSL;md5=5c9bccc77f67a8328ef4ebaf468116f4', 'file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263'])
         # We don't check DEPENDS since they are variable for this recipe depending on what's in the sysroot
         checkvars['S'] = None
@@ -402,7 +402,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
         self.assertTrue(os.path.isfile(recipefile))
         checkvars = {}
-        checkvars['LICENSE'] = set(['LGPLv2.1', 'MPL-1.1'])
+        checkvars['LICENSE'] = set(['LGPL-2.1-only', 'MPL-1.1-only'])
         checkvars['SRC_URI'] = 'http://taglib.github.io/releases/taglib-${PV}.tar.gz'
         checkvars['SRC_URI[md5sum]'] = 'cee7be0ccfc892fa433d6c837df9522a'
         checkvars['SRC_URI[sha256sum]'] = 'b6d1a5a610aae6ff39d93de5efd0fdc787aa9e9dc1e7026fa4c961b26563526b'

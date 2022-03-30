@@ -29,7 +29,7 @@ Accommodate the values above to your own needs (ex: ext3 / ext4).
 * `GPU_MEM_1024`: GPU memory in megabyte for the 1024MB Raspberry Pi. Ignored by
   the 256MB/512MB RP. Overrides gpu_mem. Max 944. Default not set.
 
-See: <https://www.raspberrypi.org/documentation/configuration/config-txt/memory.md>
+See: <https://www.raspberrypi.com/documentation/computers/config_txt.html#memory-options>
 
 ## VC4
 
@@ -47,7 +47,7 @@ You can supply more licenses separated by comma. Example:
 
     KEY_DECODE_WVC1 = "0x12345678,0xabcdabcd,0x87654321"
 
-See: <https://www.raspberrypi.org/documentation/configuration/config-txt/codeclicence.md>
+See: <https://www.raspberrypi.com/documentation/computers/config_txt.html#licence-key-and-codec-options>
 
 ## Disable overscan
 
@@ -89,7 +89,7 @@ Example official settings for Turbo Mode in Raspberry Pi 2:
     SDRAM_FREQ = "500"
     OVER_VOLTAGE = "6"
 
-See: <https://www.raspberrypi.org/documentation/configuration/config-txt/overclocking.md>
+See: <https://www.raspberrypi.com/documentation/computers/config_txt.html#overclocking-options>
 
 ## HDMI and composite video options
 
@@ -106,7 +106,7 @@ Example to force HDMI output to 720p in CEA mode:
     HDMI_GROUP = "1"
     HDMI_MODE = "4"
 
-See: <https://www.raspberrypi.org/documentation/configuration/config-txt/video.md>
+See: <https://www.raspberrypi.com/documentation/computers/configuration.html#hdmi-configuration>
 
 ## Video camera support with V4L2 drivers
 

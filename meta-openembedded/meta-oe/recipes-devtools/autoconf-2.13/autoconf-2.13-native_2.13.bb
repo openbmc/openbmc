@@ -6,8 +6,8 @@ SECTION = "devel"
 
 HOMEPAGE = "http://www.gnu.org/software/autoconf/"
 
-LICENSE = "GPLv3"
-LICENSE = "GPLv2 & GPLv3"
+LICENSE = "GPL-3.0-only"
+LICENSE = "GPL-2.0-only & GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=361b6b837cad26c6900a926b62aada5f"
 
 SRC_URI = " \

@@ -8,15 +8,17 @@ SECTION = "net"
 
 DEPENDS = "libesmtp"
 
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3"
 
-SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${PV}/${BPN}-${PV}.tar.bz2"
+SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${PV}/${BPN}-${PV}.tar.bz2 \
+           file://0001-Fix-libESMTP-dependency-check.patch \
+           "
 
 # Have to set this or we get -L/lib in LDFLAGS
 EXTRA_OECONF = "--with-libesmtp=${STAGING_EXECPREFIXDIR}"
 
-inherit autotools update-alternatives
+inherit autotools update-alternatives pkgconfig
 
 ALTERNATIVE:${PN} = "sendmail mailq newaliases"
 # /usr/lib/sendmial is required by LSB core test

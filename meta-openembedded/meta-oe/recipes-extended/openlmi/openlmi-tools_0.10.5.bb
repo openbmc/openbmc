@@ -1,7 +1,7 @@
 SUMMARY = "Set of CLI tools for Openlmi providers"
 DESCRIPTION = "openlmi-tools is a set of command line tools for Openlmi providers."
 HOMEPAGE = "http://www.openlmi.org/"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://../COPYING;md5=75859989545e37968a99b631ef42722e"
 SECTION = "System/Management"
 

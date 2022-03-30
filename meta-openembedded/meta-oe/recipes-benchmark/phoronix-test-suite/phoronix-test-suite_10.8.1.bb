@@ -1,7 +1,7 @@
 SUMMARY = "Phoronix Test Suite"
 DESCRIPTION = "The Phoronix Test Suite is designed to carry out both qualitative \
 and quantitative benchmarks in a clean, reproducible, and easy-to-use manner."
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 SECTION = "console/tests"
 

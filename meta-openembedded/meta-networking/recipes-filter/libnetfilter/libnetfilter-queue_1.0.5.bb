@@ -2,7 +2,7 @@ SUMMARY = "Netfilter packet queue access library"
 DESCRIPTION = "Userspace library providing a programming interface (API) to access the Linux kernel netfilter packet queue"
 HOMEPAGE = "http://www.netfilter.org/projects/libnetfilter_queue/index.html"
 SECTION = "libs"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8ca43cbc842c2336e835926c2166c28b"
 DEPENDS = "libnfnetlink libmnl"
 

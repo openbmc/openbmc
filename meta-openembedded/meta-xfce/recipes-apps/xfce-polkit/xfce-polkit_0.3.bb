@@ -1,5 +1,5 @@
 SUMMARY = "A simple PolicyKit authentication agent for XFCE"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=758b03f872a88c99fc36d50c5932091c"
 
 DEPENDS = "libxfce4ui polkit"

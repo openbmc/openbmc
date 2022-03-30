@@ -9,7 +9,7 @@ editing of user keystrokes. Mosh is a replacement for SSH. It's more \
 robust and responsive, especially over Wi-Fi, cellular, and \
 long-distance links."
 HOMEPAGE = "http://mosh.mit.edu"
-LICENSE = "GPLv3+"
+LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 DEPENDS = "protobuf-native protobuf ncurses zlib libio-pty-perl openssl libutempter"

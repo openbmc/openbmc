@@ -83,7 +83,6 @@ SSTATE_ARCHS = " \
     ${BUILD_ARCH} \
     ${BUILD_ARCH}_${ORIGNATIVELSBSTRING} \
     ${BUILD_ARCH}_${SDK_ARCH}_${SDK_OS} \
-    ${BUILD_ARCH}_${TARGET_ARCH} \
     ${SDK_ARCH}_${SDK_OS} \
     ${SDK_ARCH}_${PACKAGE_ARCH} \
     allarch \
@@ -138,7 +137,7 @@ python () {
     elif bb.data.inherits_class('crosssdk', d):
         d.setVar('SSTATE_PKGARCH', d.expand("${BUILD_ARCH}_${SDK_ARCH}_${SDK_OS}"))
     elif bb.data.inherits_class('cross', d):
-        d.setVar('SSTATE_PKGARCH', d.expand("${BUILD_ARCH}_${TARGET_ARCH}"))
+        d.setVar('SSTATE_PKGARCH', d.expand("${BUILD_ARCH}"))
     elif bb.data.inherits_class('nativesdk', d):
         d.setVar('SSTATE_PKGARCH', d.expand("${SDK_ARCH}_${SDK_OS}"))
     elif bb.data.inherits_class('cross-canadian', d):
@@ -260,13 +259,13 @@ def sstate_install(ss, d):
                 shareddirs.append(dstdir)
 
     # Check the file list for conflicts against files which already exist
-    whitelist = (d.getVar("SSTATE_ALLOW_OVERLAP_FILES") or "").split()
+    overlap_allowed = (d.getVar("SSTATE_ALLOW_OVERLAP_FILES") or "").split()
     match = []
     for f in sharedfiles:
         if os.path.exists(f) and not os.path.islink(f):
             f = os.path.normpath(f)
             realmatch = True
-            for w in whitelist:
+            for w in overlap_allowed:
                 w = os.path.normpath(w)
                 if f.startswith(w):
                     realmatch = False
@@ -989,7 +988,7 @@ def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, 
 
             localdata2 = bb.data.createCopy(localdata)
             srcuri = "file://" + sstatefile
-            localdata.setVar('SRC_URI', srcuri)
+            localdata2.setVar('SRC_URI', srcuri)
             bb.debug(2, "SState: Attempting to fetch %s" % srcuri)
 
             import traceback
@@ -1085,7 +1084,7 @@ def setscene_depvalid(task, taskdependees, notneeded, d, log=None):
 
     logit("Considering setscene task: %s" % (str(taskdependees[task])), log)
 
-    directtasks = ["do_populate_lic", "do_deploy_source_date_epoch", "do_shared_workdir", "do_stash_locale", "do_gcc_stash_builddir"]
+    directtasks = ["do_populate_lic", "do_deploy_source_date_epoch", "do_shared_workdir", "do_stash_locale", "do_gcc_stash_builddir", "do_create_spdx"]
 
     def isNativeCross(x):
         return x.endswith("-native") or "-cross-" in x or "-crosssdk" in x or x.endswith("-cross")

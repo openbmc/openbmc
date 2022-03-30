@@ -1,7 +1,7 @@
 SUMMARY = "Linux libcamera framework"
 SECTION = "libs"
 
-LICENSE = "GPL-2.0+ & LGPL-2.1+"
+LICENSE = "GPL-2.0-or-later & LGPL-2.1-or-later"
 
 LIC_FILES_CHKSUM = "\
     file://LICENSES/GPL-2.0-or-later.txt;md5=fed54355545ffd980b814dab4a3b312c \

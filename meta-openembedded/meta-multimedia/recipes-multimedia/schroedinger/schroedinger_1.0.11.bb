@@ -1,6 +1,6 @@
 SUMMARY = "Dirac compressed video encoder/decoder"
 HOMEPAGE = "http://schrodinger.sourceforge.net/"
-LICENSE = "MPL-1.1 | GPLv2 | LGPLv2 | MIT"
+LICENSE = "MPL-1.1 | GPL-2.0-only | LGPL-2.0-only | MIT"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=d91a46405fc074b88c963cc4f2a0aae9 \
                     file://COPYING.GPL;md5=e181e3b7c66f5f96921d813c1074f833 \

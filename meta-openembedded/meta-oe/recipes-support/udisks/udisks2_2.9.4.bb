@@ -1,5 +1,5 @@
 SUMMARY = "udisks provides dbus interfaces for disks and storage devices"
-LICENSE = "GPLv2+ & LGPLv2+"
+LICENSE = "GPL-2.0-or-later & LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=dd79f6dbbffdbc8e86b086a8f0c0ef43"
 
 DEPENDS = " \

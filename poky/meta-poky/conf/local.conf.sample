@@ -2,9 +2,10 @@
 # This file is your local configuration file and is where all local user settings
 # are placed. The comments in this file give some guide to the options a new user
 # to the system might want to change but pretty much any configuration option can
-# be set in this file. More adventurous users can look at local.conf.extended
-# which contains other examples of configuration which can be placed in this file
-# but new users likely won't need any of them initially.
+# be set in this file. More adventurous users can look at
+# local.conf.sample.extended which contains other examples of configuration which
+# can be placed in this file but new users likely won't need any of them
+# initially.
 #
 # Lines starting with the '#' character are commented out and in some cases the
 # default values are provided as comments to show people example syntax. Enabling
@@ -206,7 +207,7 @@ BB_DISKMON_DIRS ??= "\
 # used to accelerate build time. This variable can be used to configure the system
 # to search other mirror locations for these objects before it builds the data itself.
 #
-# This can be a filesystem directory, or a remote url such as http or ftp. These
+# This can be a filesystem directory, or a remote url such as https or ftp. These
 # would contain the sstate-cache results from previous builds (possibly from other
 # machines). This variable works like fetcher MIRRORS/PREMIRRORS and points to the
 # cache locations to check for the shared objects.
@@ -214,7 +215,7 @@ BB_DISKMON_DIRS ??= "\
 # at the end as shown in the examples below. This will be substituted with the
 # correct path within the directory structure.
 #SSTATE_MIRRORS ?= "\
-#file://.* http://someserver.tld/share/sstate/PATH;downloadfilename=PATH \
+#file://.* https://someserver.tld/share/sstate/PATH;downloadfilename=PATH \
 #file://.* file:///some/local/dir/sstate/PATH"
 
 #

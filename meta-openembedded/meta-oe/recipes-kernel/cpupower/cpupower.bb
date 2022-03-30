@@ -1,7 +1,7 @@
 SUMMARY = "Shows and sets processor power related values"
 DESCRIPTION = "cpupower is a collection of tools to examine and tune power \
 saving related features of your processor."
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 DEPENDS = "pciutils gettext-native"
 PROVIDES = "virtual/cpupower"
 

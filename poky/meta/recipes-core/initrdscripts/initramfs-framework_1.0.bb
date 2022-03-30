@@ -18,6 +18,7 @@ SRC_URI = "file://init \
            file://e2fs \
            file://debug \
            file://lvm \
+           file://overlayroot \
           "
 
 S = "${WORKDIR}"
@@ -49,6 +50,9 @@ do_install() {
     # lvm
     install -m 0755 ${WORKDIR}/lvm ${D}/init.d/09-lvm
 
+    # overlayroot needs to run after rootfs module but before finish
+    install -m 0755 ${WORKDIR}/overlayroot ${D}/init.d/91-overlayroot
+
     # Create device nodes expected by some kernels in initramfs
     # before even executing /init.
     install -d ${D}/dev
@@ -64,6 +68,7 @@ PACKAGES = "${PN}-base \
             initramfs-module-rootfs \
             initramfs-module-debug \
             initramfs-module-lvm \
+            initramfs-module-overlayroot \
            "
 
 FILES:${PN}-base = "/init /init.d/99-finish /dev"
@@ -107,3 +112,7 @@ FILES:initramfs-module-debug = "/init.d/00-debug"
 SUMMARY:initramfs-module-lvm = "initramfs lvm rootfs support"
 RDEPENDS:initramfs-module-lvm = "${PN}-base"
 FILES:initramfs-module-lvm = "/init.d/09-lvm"
+
+SUMMARY:initramfs-module-overlayroot = "initramfs support for mounting a RW overlay on top of a RO root filesystem"
+RDEPENDS:initramfs-module-overlayroot = "${PN}-base initramfs-module-rootfs"
+FILES:initramfs-module-overlayroot = "/init.d/91-overlayroot"

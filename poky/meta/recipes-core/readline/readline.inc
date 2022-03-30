@@ -6,7 +6,7 @@ lines, and perform csh-like history expansion on previous commands."
 SECTION = "libs"
 HOMEPAGE = "https://tiswww.case.edu/php/chet/readline/rltop.html"
 
-# GPLv2+ (< 6.0), GPLv3+ (>= 6.0)
+# GPL-2.0-or-later (< 6.0), GPL-3.0-or-later (>= 6.0)
 LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 

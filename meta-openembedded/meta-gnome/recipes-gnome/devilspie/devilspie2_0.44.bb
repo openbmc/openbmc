@@ -1,6 +1,6 @@
 DESCRIPTION = "Devilspie2 is a window matching utility, allowing the user to perform scripted actions on windows as they are created"
 HOMEPAGE = "http://www.gusnan.se/devilspie2"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=00aefaa50aad75c21367df66102d542c \
                     file://GPL3.txt;md5=d32239bcb673463ab874e80d47fae504"
 

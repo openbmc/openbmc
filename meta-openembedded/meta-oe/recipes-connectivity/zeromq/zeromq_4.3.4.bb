@@ -1,6 +1,6 @@
 DESCRIPTION = "ZeroMQ looks like an embeddable networking library but acts like a concurrency framework"
 HOMEPAGE = "http://www.zeromq.org"
-LICENSE = "LGPLv3+"
+LICENSE = "LGPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING.LESSER;md5=d5311495d952062e0e4fbba39cbf3de1"
 
 PACKAGECONFIG ??= "libsodium"

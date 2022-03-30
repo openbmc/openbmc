@@ -2,7 +2,7 @@ SUMMARY = "Utilities for managing the Linux LoWPAN stack"
 DESCRIPTION = "This is a set of utils to manage the Linux LoWPAN stack. \
 The LoWPAN stack aims for IEEE 802.15.4-2003 (and for lesser extent IEEE 802.15.4-2006) compatibility."
 SECTION = "net"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 DEPENDS = "flex-native bison-native libnl python"

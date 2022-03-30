@@ -1,6 +1,6 @@
 SUMMARY = "GNOME Settings"
 DESCRIPTION = "GNOME Settings is GNOME's main interface for configuration of various aspects of your desktop"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=75859989545e37968a99b631ef42722e"
 
 GNOMEBASEBUILDCLASS = "meson"

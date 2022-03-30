@@ -1,6 +1,6 @@
 SUMMARY = "Skype protocol plug-in for libpurple"
 SECTION = "webos/services"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://skypeweb/gpl3.txt;md5=d90260d32cef39f3c8d6c0f05d3adb8e"
 
 DEPENDS = "pidgin json-glib glib-2.0 zlib"

@@ -80,7 +80,7 @@ Manual testing with runqemu
   This layer also contains a recipe for pasec-tool which can be used for
 manual testing of the Parsec service:
 
-    IMAGE_INSTALL:append = " parsec-tools"
+    IMAGE_INSTALL:append = " parsec-tool"
 
   There are a series of Parsec Demo videos showing how to use parsec-tool
 to test the Parsec service base functionality:

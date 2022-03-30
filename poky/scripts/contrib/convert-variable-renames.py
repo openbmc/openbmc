@@ -79,7 +79,7 @@ def processfile(fn):
                     # Find removed names
                     for removed_name in removed_list:
                         if removed_name in line:
-                            print("%s needs further work at line %s because has been deprecated" % (fn, lineno, remove_name))
+                            print("%s needs further work at line %s because %s has been deprecated" % (fn, lineno, removed_name))
                     for check_word in context_check_list:
                         if re.search(check_word, line, re.IGNORECASE):
                             print("%s needs further work at line %s since it contains %s"% (fn, lineno, check_word))

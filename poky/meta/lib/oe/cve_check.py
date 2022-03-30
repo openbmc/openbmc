@@ -146,3 +146,19 @@ def get_cpe_ids(cve_product, version):
         cpe_ids.append(cpe_id)
 
     return cpe_ids
+
+def cve_check_merge_jsons(output, data):
+    """
+    Merge the data in the "package" property to the main data file
+    output
+    """
+    if output["version"] != data["version"]:
+        bb.error("Version mismatch when merging JSON outputs")
+        return
+
+    for product in output["package"]:
+        if product["name"] == data["package"][0]["name"]:
+            bb.error("Error adding the same package twice")
+            return
+
+    output["package"].append(data["package"][0])

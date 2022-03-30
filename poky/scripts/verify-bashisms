@@ -5,7 +5,7 @@
 
 import sys, os, subprocess, re, shutil
 
-whitelist = (
+allowed = (
     # type is supported by dash
     'if type systemctl >/dev/null 2>/dev/null; then',
     'if type systemd-tmpfiles >/dev/null 2>/dev/null; then',
@@ -19,8 +19,8 @@ whitelist = (
     '. $target_sdk_dir/${oe_init_build_env_path} $target_sdk_dir >> $LOGFILE'
     )
 
-def is_whitelisted(s):
-    for w in whitelist:
+def is_allowed(s):
+    for w in allowed:
         if w in s:
             return True
     return False
@@ -49,7 +49,7 @@ def process(filename, function, lineno, script):
         output = e.output.replace(fn.name, function)
         if not output or not output.startswith('possible bashism'):
             # Probably starts with or contains only warnings. Dump verbatim
-            # with one space indention. Can't do the splitting and whitelist
+            # with one space indention. Can't do the splitting and allowed
             # checking below.
             return '\n'.join([filename,
                               ' Unexpected output from checkbashisms.pl'] +
@@ -65,7 +65,7 @@ def process(filename, function, lineno, script):
         #  ...
         #   ...
         result = []
-        # Check the results against the whitelist
+        # Check the results against the allowed list
         for message, source in zip(output[0::2], output[1::2]):
             if not is_whitelisted(source):
                 if lineno is not None:

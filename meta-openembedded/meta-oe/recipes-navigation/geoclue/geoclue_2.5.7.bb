@@ -3,7 +3,7 @@ DESCRIPTION = "Geoclue is a D-Bus service that provides location information. \
 The primary goal of the Geoclue project is to make creating location-aware applications \
 as simple as possible, while the secondary goal is to ensure that no application \
 can access location information without explicit permission from user."
-LICENSE = "GPLv2.0+"
+LICENSE = "GPL-2.0-or-later"
 SECTION = "console/network"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=bdfdd4986a0853eb84eeba85f9d0c4d6"

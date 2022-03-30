@@ -12,7 +12,7 @@ DEPENDS = "glib-2.0-native zlib-native pixman-native qemu-native bison-native me
 EXTRA_OECONF:append = " --target-list=${@get_qemu_system_target_list(d)}"
 
 PACKAGECONFIG ??= "fdt alsa kvm pie \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'virglrenderer glx', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'virglrenderer epoxy', '', d)} \
 "
 
 # Handle distros such as CentOS 5 32-bit that do not have kvm support

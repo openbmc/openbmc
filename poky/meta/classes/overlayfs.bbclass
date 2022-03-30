@@ -103,7 +103,8 @@ python () {
     unitList = unitFileList(d)
     for unit in unitList:
         d.appendVar('SYSTEMD_SERVICE:' + d.getVar('PN'), ' ' + unit)
-        d.appendVar('FILES:' + d.getVar('PN'), ' ' + strForBash(unit))
+        d.appendVar('FILES:' + d.getVar('PN'), ' ' +
+                d.getVar('systemd_system_unitdir') + '/' + strForBash(unit))
 
     d.setVar('OVERLAYFS_UNIT_LIST', ' '.join([strForBash(s) for s in unitList]))
 }

@@ -6,7 +6,7 @@ DESCRIPTION = "Sometimes a malicious local user could cause more problems \
   "
 SECTION = "utils"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=a17cb0a873d252440acfdf9b3d0e7fbf"
 
 SRC_URI = "${GENTOO_MIRROR}/${BP}.tar.gz \

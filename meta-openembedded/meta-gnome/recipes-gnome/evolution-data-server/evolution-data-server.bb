@@ -11,6 +11,7 @@ inherit pkgconfig gsettings gobject-introspection features_check cmake gtk-doc g
 REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI += " \
+    file://0001-cmake-Do-not-export-CC-into-gir-compiler.patch \
     file://0001-CMakeLists.txt-Remove-TRY_RUN-for-iconv.patch \
     file://0002-CMakeLists.txt-remove-CHECK_C_SOURCE_RUNS-check.patch \
     file://0003-contact-Replace-the-Novell-sample-contact-with-somet.patch \
@@ -25,7 +26,7 @@ GI_DATA_ENABLED="False"
 EXTRA_OECMAKE = " \
     -DSYSCONF_INSTALL_DIR=${sysconfdir} \
     -DWITH_KRB5=OFF \
-    -DENABLE_UOA=OFF \
+    -DENABLE_GOA=OFF \
     -DENABLE_GOOGLE_AUTH=OFF \
     -DENABLE_WEATHER=OFF \
     -DVAPIGEN=${STAGING_BINDIR_NATIVE}/vapigen \

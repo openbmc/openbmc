@@ -45,9 +45,6 @@ class BuildSystem(object):
 
         corebase = os.path.abspath(self.d.getVar('COREBASE'))
         layers.append(corebase)
-        # Get relationship between TOPDIR and COREBASE
-        # Layers should respect it
-        corebase_relative = os.path.dirname(os.path.relpath(os.path.abspath(self.d.getVar('TOPDIR')), corebase))
         # The bitbake build system uses the meta-skeleton layer as a layout
         # for common recipies, e.g: the recipetool script to create kernel recipies
         # Add the meta-skeleton layer to be included as part of the eSDK installation
@@ -100,11 +97,10 @@ class BuildSystem(object):
             layerdestpath = destdir
             if corebase == os.path.dirname(layer):
                 layerdestpath += '/' + os.path.basename(corebase)
-            else:
-                layer_relative = os.path.relpath(layer, corebase)
-                if os.path.dirname(layer_relative) == corebase_relative:
-                    layer_relative = os.path.dirname(corebase_relative) + '/' + layernewname
-                layer_relative = os.path.basename(corebase) + '/' + layer_relative
+            # If the layer is located somewhere under the same parent directory
+            # as corebase we keep the layer structure.
+            elif os.path.commonpath([layer, corebase]) == os.path.dirname(corebase):
+                layer_relative = os.path.relpath(layer, os.path.dirname(corebase))
                 if os.path.dirname(layer_relative) != layernewname:
                     layerdestpath += '/' + os.path.dirname(layer_relative)
 

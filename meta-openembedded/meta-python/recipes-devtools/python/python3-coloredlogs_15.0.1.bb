@@ -8,10 +8,6 @@ SRC_URI[sha256sum] = "7c991aa71a4577af2f82600d8f8f3a89f936baeaf9b50a9c197da014e5
 
 inherit pypi setuptools3
 
-do_compile:prepend() {
-    sed -ie "s/find_pth_directory(),/'',/g" ${S}/setup.py
-}
-
 do_install:append() {
     rm -rf ${D}${datadir}
 }

@@ -6,7 +6,7 @@ SECTION = "libs"
 
 HOMEPAGE = "http://search.cpan.org/~pvandry/Locale-gettext-${PV}/"
 
-LICENSE = "Artistic-1.0 | GPLv1+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://README;md5=d028249c2d08dca6ca6c5bb43b56d926"
 
 SRC_URI = "${CPAN_MIRROR}/authors/id/P/PV/PVANDRY/Locale-gettext-${PV}.tar.gz"

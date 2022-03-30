@@ -3,7 +3,7 @@ HOMEPAGE = "http://www.ex-parrot.com/pdw/iftop/"
 SECTION = "net"
 DEPENDS = "libpcap ncurses"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=76498170798db0f4f0fb685a225f702f"
 
 SRC_URI = "http://www.ex-parrot.com/pdw/iftop/download/iftop-${PV}.tar.gz \

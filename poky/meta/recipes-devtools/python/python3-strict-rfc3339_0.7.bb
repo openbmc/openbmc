@@ -8,6 +8,4 @@ SRC_URI[sha256sum] = "5cad17bedfc3af57b399db0fed32771f18fc54bbd917e85546088607ac
 
 inherit pypi setuptools3
 
-PIP_INSTALL_PACKAGE = "strict_rfc3339"
-
 BBCLASSEXTEND = "native nativesdk"

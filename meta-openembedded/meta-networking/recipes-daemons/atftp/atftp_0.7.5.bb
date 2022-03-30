@@ -1,7 +1,7 @@
 SUMMARY = "Advanced TFTP server and client"
 SECTION = "net"
 HOMEPAGE = "http://packages.debian.org/atftp"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f65159f73e603f89d6867d43191900e5"
 
 SRCREV = "00921e75728e3681b051c2e48c59e36c6cfa2e97"

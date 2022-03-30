@@ -4,7 +4,7 @@ WAVE, NeXT/Sun .snd/.au, Berkeley/IRCAM/CARL Sound File, Audio Visual \
 Research, Amiga IFF/8SVX, and NIST SPHERE."
 HOMEPAGE = "http://www.68k.org/~michael/audiofile/"
 SECTION = "libs"
-LICENSE = "LGPLv2 & GPLv2"
+LICENSE = "LGPL-2.0-only & GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c \
                     file://COPYING.GPL;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 

@@ -1,6 +1,6 @@
 SUMMARY = "GNOME editor"
 SECTION = "x11/gnome"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=75859989545e37968a99b631ef42722e"
 
 GNOMEBASEBUILDCLASS = "meson"
@@ -21,12 +21,11 @@ inherit gnomebase gsettings itstool gnome-help gobject-introspection gtk-doc val
 def gnome_verdir(v):
     return oe.utils.trim_version(v, 1)
 
-REQUIRED_DISTRO_FEATURES = "x11"
-
 SRC_URI[archive.sha256sum] = "7a9b18b158808d1892989165f3706c4f1a282979079ab7458a79d3c24ad4deb5"
 
 # gobject-introspection is mandatory and cannot be configured
-REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
+# x11 is needed for tepl and gtksourceview4
+REQUIRED_DISTRO_FEATURES = "gobject-introspection-data x11"
 GIR_MESON_OPTION = ""
 
 GTKDOC_MESON_OPTION = "gtk_doc"

@@ -1,6 +1,6 @@
 SUMMARY = "A fast and lightweight IDE"
 HOMEPAGE = "http://www.geany.org/"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=bd7b2c994af21d318bd2cd3b3f80c2d5"
 
 DEPENDS = "gtk+3 libxml-parser-perl-native python3-docutils-native intltool-native"

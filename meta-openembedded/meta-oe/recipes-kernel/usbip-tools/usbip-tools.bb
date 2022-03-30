@@ -17,7 +17,7 @@ USB device. Client is a machine which uses USB device provided by server \
 over the network. The USB device may be either physical device connected \
 to a server or software entity created on a server using USB gadget subsystem."
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-2.0-only;md5=801f80980d171dd6425610833a22dbe6"
 DEPENDS = "virtual/kernel udev"
 PROVIDES = "virtual/usbip-tools"

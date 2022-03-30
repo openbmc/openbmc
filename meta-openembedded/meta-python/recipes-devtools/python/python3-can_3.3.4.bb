@@ -1,6 +1,6 @@
 SUMMARY = "Controller Area Network (CAN) interface module for Python"
 SECTION = "devel/python"
-LICENSE = "LGPLv3"
+LICENSE = "LGPL-3.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=e6a600fd5e1d9cbde2d983680233ad02"
 
 SRC_URI[md5sum] = "305075968c56bd85130b19d86e9e505d"

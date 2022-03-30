@@ -1,6 +1,6 @@
 DESCRIPTION = "eSpeak is a compact open source software speech synthesizer"
 SECTION = "base"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://License.txt;md5=cb7a20edb4c9f5f478de6523dcd7362c"
 
 SRC_URI = "http://downloads.sourceforge.net/espeak/espeak-1.48.04-source.zip \

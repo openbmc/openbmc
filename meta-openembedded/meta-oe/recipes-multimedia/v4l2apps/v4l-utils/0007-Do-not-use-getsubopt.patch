@@ -1,4 +1,4 @@
-From 4a10eab0e31d69948161241b1801c41201a5d081 Mon Sep 17 00:00:00 2001
+From e4582c11f76b9390a3e172dcf0741dca90a9dc8d Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 30 Nov 2019 18:50:34 -0800
 Subject: [PATCH] Do not use getsubopt
@@ -12,20 +12,21 @@ Imported from Alpine Linux
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  utils/v4l2-ctl/v4l2-ctl-common.cpp | 18 ++++++++++--------
  1 file changed, 10 insertions(+), 8 deletions(-)
 
 diff --git a/utils/v4l2-ctl/v4l2-ctl-common.cpp b/utils/v4l2-ctl/v4l2-ctl-common.cpp
-index 651917e..cea57b7 100644
+index c940171..49c0f39 100644
 --- a/utils/v4l2-ctl/v4l2-ctl-common.cpp
 +++ b/utils/v4l2-ctl/v4l2-ctl-common.cpp
-@@ -785,15 +785,17 @@ static bool parse_subset(char *optarg)
+@@ -956,15 +956,17 @@ static bool parse_subset(char *optarg)
  
  static bool parse_next_subopt(char **subs, char **value)
  {
 -	static char *const subopts[] = {
--	    NULL
+-	    nullptr
 -	};
 -	int opt = getsubopt(subs, subopts, value);
 +	char *p = *subs;

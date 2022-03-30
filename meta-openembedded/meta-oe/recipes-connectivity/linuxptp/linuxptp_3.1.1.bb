@@ -1,6 +1,6 @@
 DESCRIPTION = "Precision Time Protocol (PTP) according to IEEE standard 1588 for Linux"
 HOMEPAGE = "http://linuxptp.sourceforge.net/"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "http://sourceforge.net/projects/linuxptp/files/v3.1/linuxptp-${PV}.tgz \

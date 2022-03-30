@@ -31,7 +31,7 @@ SRC_URI[GeoLiteCity-dat.sha256sum] = "90db2e52195e3d1bcdb2c2789209006d09de5c7428
 SRC_URI[GeoLiteCityv6-dat.md5sum] = "6734ccdc644fc0ba76eb276dce73d005"
 SRC_URI[GeoLiteCityv6-dat.sha256sum] = "c95a9d2643b7f53d7abeed2114388870e13fbbad4653f450a49efa7e4b86aca4"
 
-LICENSE = "LGPL-2.1"
+LICENSE = "LGPL-2.1-only"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=243b725d71bb5df4a1e5920b344b86ad \
                     file://LICENSE;md5=0388276749a542b0d611601fa7c1dcc8 "

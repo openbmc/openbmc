@@ -1,0 +1,76 @@
+From 9b939c0b534c1b7958fa0a3c7aedf30bca910431 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Mon, 7 Jun 2021 23:23:47 +0200
+Subject: [PATCH] Python 3.10+ fix: Use collections.abc.Callable instead of
+ collections.Callable
+
+The deprecated aliases to Collections Abstract Base Classes were removed from
+the collections module in Python 3.10.
+https://docs.python.org/3.10/whatsnew/changelog.html#python-3-10-0-alpha-5
+https://bugs.python.org/issue37324
+---
+ slip/dbus/polkit.py   | 6 +++---
+ slip/util/hookable.py | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/slip/dbus/polkit.py b/slip/dbus/polkit.py
+index 128e8ce..320676d 100644
+--- a/slip/dbus/polkit.py
++++ b/slip/dbus/polkit.py
+@@ -26,7 +26,7 @@
+ 
+ from __future__ import absolute_import
+ 
+-import collections
++import collections.abc
+ import dbus
+ from decorator import decorator
+ from functools import reduce
+@@ -103,14 +103,14 @@ class MyProxy(object):
+             def some_method(self, ...):
+                 ..."""
+ 
+-    assert(func is None or isinstance(func, collections.Callable))
++    assert(func is None or isinstance(func, collections.abc.Callable))
+ 
+     assert(
+         authfail_result in (None, AUTHFAIL_DONTCATCH) or
+         authfail_exception is None)
+     assert(
+         authfail_callback is None or
+-        isinstance(authfail_callback, collections.Callable))
++        isinstance(authfail_callback, collections.abc.Callable))
+     assert(
+         authfail_exception is None or
+         issubclass(authfail_exception, Exception))
+diff --git a/slip/util/hookable.py b/slip/util/hookable.py
+index 89c7392..0cd9967 100644
+--- a/slip/util/hookable.py
++++ b/slip/util/hookable.py
+@@ -23,7 +23,7 @@
+ """This module contains variants of certain base types which call registered
+ hooks on changes."""
+ 
+-import collections
++import collections.abc
+ from six import with_metaclass
+ 
+ __all__ = ["Hookable", "HookableSet"]
+@@ -67,7 +67,7 @@ class _HookEntry(object):
+ 
+     def __init__(self, hook, args, kwargs, hookable=None):
+ 
+-        assert(isinstance(hook, collections.Callable))
++        assert(isinstance(hook, collections.abc.Callable))
+         assert(isinstance(hookable, Hookable))
+ 
+         for n, x in enumerate(args):
+@@ -174,7 +174,7 @@ def add_hook_hookable(self, hook, *args, **kwargs):
+         self.__add_hook(hook, self, *args, **kwargs)
+ 
+     def __add_hook(self, hook, _hookable, *args, **kwargs):
+-        assert isinstance(hook, collections.Callable)
++        assert isinstance(hook, collections.abc.Callable)
+         assert isinstance(_hookable, Hookable)
+         hookentry = _HookEntry(hook, args, kwargs, hookable=_hookable)
+         self.__hooks__.add(hookentry)

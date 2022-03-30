@@ -4,7 +4,7 @@ Unicode Standard Annex #14 (UAX #14).  East_Asian_Width informative \
 properties defined by Annex #11 (UAX #11) may be concerned to determin \
 breaking positions.  This package also implements "default" Grapheme \
 Cluster segmentation described in Annex #29 (UAX #29)."
-LICENSE = "Artistic-1.0 | GPLv1+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5b122a36d0f6dc55279a0ebc69f3c60b"
 
 SRC_URI = "git://github.com/hatukanezumi/sombok.git;protocol=https;branch=master \

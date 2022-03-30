@@ -1,7 +1,7 @@
 SUMMARY = "Library for reading, mastering and writing optical discs"
 HOMEPAGE = "http://libburnia-project.org/"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=9ac2e7cff1ddaf48b6eab6028f23ef88"
 
 SRC_URI = "http://files.libburnia-project.org/releases/${BPN}-${PV}.tar.gz"

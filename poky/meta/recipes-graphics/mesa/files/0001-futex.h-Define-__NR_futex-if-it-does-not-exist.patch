@@ -1,4 +1,4 @@
-From 8973e297f2f9b17498b9dc0e37a19481d4bb7df9 Mon Sep 17 00:00:00 2001
+From 253b042d2bf10e9abfa9cc508e0782aefd834145 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 16 Oct 2020 11:03:47 -0700
 Subject: [PATCH] futex.h: Define __NR_futex if it does not exist
@@ -12,10 +12,13 @@ working
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  src/util/futex.h | 4 ++++
  1 file changed, 4 insertions(+)
 
+diff --git a/src/util/futex.h b/src/util/futex.h
+index 43097f4..941b0ec 100644
 --- a/src/util/futex.h
 +++ b/src/util/futex.h
 @@ -34,6 +34,10 @@

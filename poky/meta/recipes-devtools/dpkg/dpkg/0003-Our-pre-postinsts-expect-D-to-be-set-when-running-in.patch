@@ -12,14 +12,14 @@ ALIMON 2016/05/26
 ALIMON 2017/02/21
 KKang 2019/02/20
 ---
- src/script.c | 53 +++-------------------------------------------------
- 1 file changed, 3 insertions(+), 50 deletions(-)
+ src/main/script.c | 54 +++--------------------------------------------
+ 1 file changed, 3 insertions(+), 51 deletions(-)
 
-diff --git a/src/script.c b/src/script.c
-index abe65b6f7..621ff9b27 100644
---- a/src/script.c
-+++ b/src/script.c
-@@ -96,58 +96,11 @@ setexecute(const char *path, struct stat *stab)
+diff --git a/src/main/script.c b/src/main/script.c
+index abe65b6..0edb8f1 100644
+--- a/src/main/script.c
++++ b/src/main/script.c
+@@ -96,58 +96,10 @@ setexecute(const char *path, struct stat *stab)
  static const char *
  maintscript_pre_exec(struct command *cmd)
  {
@@ -49,9 +49,7 @@ index abe65b6f7..621ff9b27 100644
 -			         "using --force-script-chrootless?"));
 -		else if (rc)
 -			ohshite(_("failed to chroot to '%.250s'"), instdir);
-+	if (*instdir) {
-+		setenv("D", instdir, 1);
- 	}
+-	}
 -	/* Switch to a known good directory to give the maintainer script
 -	 * a saner environment, also needed after the chroot(). */
 -	if (chdir(changedir))
@@ -68,19 +66,21 @@ index abe65b6f7..621ff9b27 100644
 -		debug(dbg_scripts, "fork/exec %s (%s )", cmd->filename,
 -		      args.buf);
 -		varbuf_destroy(&args);
--	}
++        if (*instdir) {
++                setenv("D", instdir, 1);
+ 	}
 -	if (instdirlen == 0 || in_force(FORCE_SCRIPT_CHROOTLESS))
 -		return cmd->filename;
 -
 -	if (strlen(cmd->filename) < instdirlen)
 -		internerr("maintscript name '%s' length < instdir length %zd",
 -		          cmd->filename, instdirlen);
- 
+-
 -	return cmd->filename + instdirlen;
 +	return cmd->filename;
  }
  
  /**
 -- 
-2.17.1
+2.25.1
 

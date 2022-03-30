@@ -1,7 +1,7 @@
 DESCRIPTION = "Doxygen is the de facto standard tool for generating documentation from annotated C++ sources."
 HOMEPAGE = "http://www.doxygen.org/"
 
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS = "flex-native bison-native"

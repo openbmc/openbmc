@@ -1,7 +1,7 @@
 DESCRIPTION = "Library for password quality checking and generating random passwords"
 HOMEPAGE = "https://github.com/libpwquality/libpwquality"
 SECTION = "devel/lib"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bd2f1386df813a459a0c34fde676fc2"
 
 SRCNAME = "libpwquality"

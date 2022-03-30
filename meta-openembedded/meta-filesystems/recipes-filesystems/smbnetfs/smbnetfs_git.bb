@@ -4,7 +4,7 @@ DESCRIPTION = "SMBNetFS is a Linux/FreeBSD filesystem that allow you to use \
                neighborhood in Microsoft Windows. Please donate me to help \
                in SMBNetFS development."
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=eb723b61539feef013de476e68b5c50a"
 HOMEPAGE ="http://sourceforge.net/projects/smbnetfs"
 
@@ -16,9 +16,9 @@ inherit autotools pkgconfig features_check
 # samba depends on libpam
 REQUIRED_DISTRO_FEATURES = "pam"
 
-PV = "0.6.1+git${SRCPV}"
+PV = "0.6.3"
 
-SRCREV = "a117eec8de7ed7249871da73dcc350283ce72069"
+SRCREV = "736d5e599df3bebce3450125118ac2e70358b0c9"
 
 SRC_URI = "git://smbnetfs.git.sourceforge.net/gitroot/smbnetfs/smbnetfs;branch=master \
            file://configure.patch \

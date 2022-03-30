@@ -1,16 +1,17 @@
-From bb2f0bea553d51d659a9bc46f7ae186885405151 Mon Sep 17 00:00:00 2001
+From d34bdbd80e5a1f309d2ba280cdc66ff0ee0e5c43 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 13 Jan 2020 15:23:47 -0800
 Subject: [PATCH] meson misdetects 64bit atomics on mips/clang
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  src/util/u_atomic.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/util/u_atomic.c b/src/util/u_atomic.c
-index e4bffa8..58e1ddd 100644
+index 5a5eab4..e499516 100644
 --- a/src/util/u_atomic.c
 +++ b/src/util/u_atomic.c
 @@ -21,7 +21,7 @@
@@ -22,6 +23,3 @@ index e4bffa8..58e1ddd 100644
  
  #include <stdint.h>
  #include <pthread.h>
--- 
-2.24.1
-

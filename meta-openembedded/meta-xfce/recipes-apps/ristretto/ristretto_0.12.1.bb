@@ -1,7 +1,7 @@
 SUMMARY = "Tiny image-viewer"
 HOMEPAGE = "https://docs.xfce.org/apps/ristretto/start"
 SECTION = "x11/application"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=35d145429ad3cbf5308d1dc93f66376b"
 
 DEPENDS = "exo libexif libxfce4ui libxfce4util xfconf cairo file"

@@ -9,7 +9,7 @@ HOMEPAGE = "http://www.nongnu.org/quagga/"
 SECTION = "net"
 
 
-LICENSE = "GPL-2.0 & LGPL-2.0"
+LICENSE = "GPL-2.0-only & LGPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=81bcece21748c91ba9992349a91ec11d \
                     file://COPYING.LIB;md5=01ef24401ded36cd8e5d18bfe947240c"
 

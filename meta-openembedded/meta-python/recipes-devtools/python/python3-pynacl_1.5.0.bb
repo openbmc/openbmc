@@ -8,10 +8,9 @@ SRC_URI[sha256sum] = "8ac7448f09ab85811607bdd21ec2464495ac8b7c66d146bf545b0f08fb
 
 PYPI_PACKAGE = "PyNaCl"
 
-inherit pypi setuptools3
+inherit pypi python_setuptools_build_meta
 
 DEPENDS += "\
-    ${PYTHON_PN}-wheel-native \
     ${PYTHON_PN}-cffi-native \
     libsodium \
 "

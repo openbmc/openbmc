@@ -6,7 +6,7 @@ Protocol (MTP) in the form of a library suitable primarily for POSIX \
 compliant operating systems"
 SUMMARY = "libmtp is an Initiator implementation of the Media Transfer Protocol (MTP)"
 HOMEPAGE = "http://libmtp.sourceforge.net/"
-LICENSE = "LGPL-2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "\
     file://COPYING;md5=0448d3676bc0de00406af227d341a4d1 \
     file://src/ptp.c;beginline=3;endline=22;md5=303cc4422fd549ef8689aded20434a9a \

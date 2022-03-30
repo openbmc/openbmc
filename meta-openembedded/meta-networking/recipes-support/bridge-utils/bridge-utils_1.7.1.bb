@@ -1,7 +1,7 @@
 SUMMARY = "Tools for ethernet bridging"
 HOMEPAGE = "http://www.linuxfoundation.org/collaborate/workgroups/networking/bridge"
 SECTION = "net"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=f9d20a453221a1b7e32ae84694da2c37"
 

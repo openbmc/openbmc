@@ -5,7 +5,7 @@ DESCRIPTION = "The utilities are designed primarily to be used on storage server
 "
 HOMEPAGE = "https://github.com/intel/ledmon"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3 \
 "
 

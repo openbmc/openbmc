@@ -343,7 +343,7 @@ class DevtoolAddTests(DevtoolBase):
         self.assertIn(srcdir, result.output)
         self.assertIn(recipefile, result.output)
         checkvars = {}
-        checkvars['LICENSE'] = 'GPLv2'
+        checkvars['LICENSE'] = 'GPL-2.0-only'
         checkvars['LIC_FILES_CHKSUM'] = 'file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263'
         checkvars['S'] = '${WORKDIR}/git'
         checkvars['PV'] = '0.1+git${SRCPV}'

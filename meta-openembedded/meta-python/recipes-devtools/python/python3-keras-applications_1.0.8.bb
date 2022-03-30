@@ -10,6 +10,8 @@ SRCREV ?= "3b180cb10eda683dda7913ecee2e6487288d292d"
 
 inherit setuptools3
 
+PIP_INSTALL_PACKAGE = "Keras_Applications"
+
 S = "${WORKDIR}/git"
 
 BBCLASSEXTEND = "native"

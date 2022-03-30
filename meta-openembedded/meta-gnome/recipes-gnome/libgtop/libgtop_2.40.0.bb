@@ -1,5 +1,5 @@
 SUMMARY = "A library for collecting system monitoring data"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552"
 
 inherit gnomebase lib_package gtk-doc gobject-introspection gettext upstream-version-is-even

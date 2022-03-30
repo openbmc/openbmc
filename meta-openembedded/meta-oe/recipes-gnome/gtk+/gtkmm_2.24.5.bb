@@ -2,7 +2,7 @@ SUMMARY = "C++ bindings for the GTK+ toolkit"
 HOMEPAGE = "http://www.gtkmm.org/"
 SECTION = "libs"
 
-LICENSE = "LGPLv2.1 & GPLv2"
+LICENSE = "LGPL-2.1-only & GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d8045f3b8f929c1cb29a1e3fd737b499 \
                     file://COPYING.tools;md5=751419260aa954499f7abaabaa882bbe"
 

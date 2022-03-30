@@ -1,6 +1,6 @@
 SUMMARY = "libgphoto2 allows you to access digital cameras"
 SECTION = "libs"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0448d3676bc0de00406af227d341a4d1"
 
 DEPENDS = "libtool jpeg virtual/libusb0 libexif zlib libxml2"
@@ -24,6 +24,11 @@ EXTRA_OECONF = " --with-drivers=all udevscriptdir=${nonarch_base_libdir}/udev ac
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[gd] = ",--without-gdlib,gd"
 PACKAGECONFIG[serial] = "--enable-serial,--disable-serial,lockdev"
+
+do_configure:prepend() {
+    rm -rf ${S}/libgphoto2_port/auto-m4/*
+    rm -rf ${S}/auto-m4/*
+}
 
 do_configure:append() {
     cp ${STAGING_DATADIR_NATIVE}/gettext/po/Makefile.in.in ${S}/libgphoto2_port/po/

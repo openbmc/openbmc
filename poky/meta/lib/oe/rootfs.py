@@ -190,10 +190,6 @@ class Rootfs(object, metaclass=ABCMeta):
         post_process_cmds = self.d.getVar("ROOTFS_POSTPROCESS_COMMAND")
         rootfs_post_install_cmds = self.d.getVar('ROOTFS_POSTINSTALL_COMMAND')
 
-        bb.utils.mkdirhier(self.image_rootfs)
-
-        bb.utils.mkdirhier(self.deploydir)
-
         execute_pre_post_process(self.d, pre_process_cmds)
 
         if self.progress_reporter:

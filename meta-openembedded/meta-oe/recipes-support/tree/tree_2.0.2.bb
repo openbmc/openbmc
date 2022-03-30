@@ -1,7 +1,7 @@
 SUMMARY = "A recursive directory listing command"
 HOMEPAGE = "http://mama.indstate.edu/users/ice/tree/"
 SECTION = "console/utils"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=393a5ca445f6965873eca0259a17f833"
 
 SRC_URI = "http://mama.indstate.edu/users/ice/tree/src/${BP}.tgz"

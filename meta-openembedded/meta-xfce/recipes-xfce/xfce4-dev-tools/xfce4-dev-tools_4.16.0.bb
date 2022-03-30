@@ -1,7 +1,7 @@
 SUMMARY = "Xfce4 development tools"
 HOMEPAGE = "http://www.xfce.org"
 SECTION = "x11/libs"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=9ac2e7cff1ddaf48b6eab6028f23ef88"
 
 DEPENDS = "glib-2.0"

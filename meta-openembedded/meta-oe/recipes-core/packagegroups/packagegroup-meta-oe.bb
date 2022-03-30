@@ -223,6 +223,7 @@ RDEPENDS:packagegroup-meta-oe-dbs ="\
     soci \
     sqlite \
 "
+RDEPENDS:packagegroup-meta-oe-dbs:remove:libc-musl:powerpc = "rocksdb"
 
 RDEPENDS:packagegroup-meta-oe-dbs-python2 ="\
     ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", bb.utils.contains('I_SWEAR_TO_MIGRATE_TO_PYTHON3', 'yes', 'mysql-python', '', d), "", d)} \
@@ -303,6 +304,7 @@ RDEPENDS:packagegroup-meta-oe-devtools ="\
     squashfs-tools-ng \
     uftrace \
     unifex \
+    valijson \
     libxerces-c \
     xerces-c-samples \
     xmlrpc-c \
@@ -446,7 +448,7 @@ RDEPENDS:packagegroup-meta-oe-extended:remove:mipsarch = "upm mraa minifi-cpp ti
 RDEPENDS:packagegroup-meta-oe-extended:remove:mips = "sysdig"
 RDEPENDS:packagegroup-meta-oe-extended:remove:powerpc = "upm mraa minifi-cpp"
 RDEPENDS:packagegroup-meta-oe-extended:remove:powerpc64 = "upm mraa minifi-cpp"
-RDEPENDS:packagegroup-meta-oe-extended:remove:powerpc64le = "upm mraa"
+RDEPENDS:packagegroup-meta-oe-extended:remove:powerpc64le = "upm mraa sysdig"
 RDEPENDS:packagegroup-meta-oe-extended:remove:riscv64 = "upm libleak libyang mraa sysdig tiptop"
 RDEPENDS:packagegroup-meta-oe-extended:remove:riscv32 = "upm libleak libyang mraa sysdig tiptop"
 
@@ -759,6 +761,7 @@ RDEPENDS:packagegroup-meta-oe-support ="\
     gpm \
     gsoap \
     hdf5 \
+    hstr \
     htop \
     hunspell-dictionaries \
     hunspell \
@@ -948,6 +951,7 @@ RDEPENDS:packagegroup-meta-oe-support:remove:riscv32 = "gperftools uim"
 RDEPENDS:packagegroup-meta-oe-support:remove:powerpc = "ssiapi tbb"
 RDEPENDS:packagegroup-meta-oe-support:remove:powerpc64le = "ssiapi"
 RDEPENDS:packagegroup-meta-oe-support:remove:libc-musl = "pcp"
+RDEPENDS:packagegroup-meta-oe-support:remove:libc-musl:powerpc = "gsl"
 
 RDEPENDS:packagegroup-meta-oe-test ="\
     bats \

@@ -1,6 +1,6 @@
 DESCRIPTION = "Netsniff-ng is a fast zero-copy analyzer, pcap capturing and replaying tool"
 HOMEPAGE = "http://netsniff-ng.org"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=9dd40dfb621eed702c0775577fbb7011"
 DEPENDS = "libpcap"
 

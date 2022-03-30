@@ -2,7 +2,7 @@ SUMMARY = "Gst-Shark Tracers"
 DESCRIPTION = "Benchmarks and profiling tools for GStreamer"
 HOMEPAGE = "https://developer.ridgerun.com/wiki/index.php?title=GstShark"
 SECTION = "multimedia"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=e1caa368743492879002ad032445fa97"
 

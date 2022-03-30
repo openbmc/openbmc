@@ -13,8 +13,6 @@ EXTRA_OECONF += "--with-sysroot=${SDKPATH}/sysroots/${TUNE_PKGARCH}${TARGET_VEND
 # e.g. we switch between different machines with different tunes.
 EXTRA_OECONF[vardepsexclude] = "TUNE_PKGARCH"
 
-LDGOLD:sdkmingw32 = ""
-
 do_install () {
 	autotools_do_install
 

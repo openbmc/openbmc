@@ -1,7 +1,7 @@
 SUMMARY = "Tools of dm-thin device-mapper"
 DESCRIPTION = "A suite of tools for manipulating the metadata of the dm-thin device-mapper target."
 HOMEPAGE = "https://github.com/jthornber/thin-provisioning-tools"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 SECTION = "devel"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"

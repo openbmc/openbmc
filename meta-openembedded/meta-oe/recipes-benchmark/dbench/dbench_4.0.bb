@@ -2,7 +2,7 @@ SUMMARY = "The dbench (disk) and tbench (TCP) benchmarks"
 SUMMARY:dbench = "Filesystem load benchmark"
 SUMMARY:tbench = "TCP load benchmark"
 HOMEPAGE = "http://samba.org/ftp/tridge/dbench/"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 DEPENDS = "popt"

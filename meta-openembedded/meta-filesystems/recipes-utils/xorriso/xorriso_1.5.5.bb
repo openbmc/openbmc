@@ -2,7 +2,7 @@ DESCRIPTION = "xorriso copies file objects from POSIX compliant filesystems \
 into Rock Ridge enhanced ISO 9660 filesystems and allows session-wise \
 manipulation of such filesystems"
 
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 SRC_URI = "http://www.gnu.org/software/${BPN}/${BPN}-${PV}.tar.gz"

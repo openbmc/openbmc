@@ -1,7 +1,7 @@
 SUMMARY = "A user-mode PPPoE client and server suite for Linux"
 HOMEPAGE = "http://www.roaringpenguin.com/products/pppoe"
 SECTION = "net"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://doc/LICENSE;md5=a194eaefae2be54ee3221339b10d0581"
 
 PR = "r10"

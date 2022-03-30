@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=5b4be4b2549338526758ef479c040943 \
 
 inherit update-rc.d update-alternatives systemd autotools
 
-SRC_URI = "git://github.com/troglobit/sysklogd.git;nobranch=1;protocol=https \
+SRC_URI = "git://github.com/troglobit/sysklogd.git;branch=master;protocol=https \
            file://sysklogd \
            "
 

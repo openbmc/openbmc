@@ -8,14 +8,14 @@ Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
 
 Upstream-Status: Inappropriate [embedded specific]
 ---
- src/archives.c | 3 ++-
+ src/main/archives.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/src/archives.c b/src/archives.c
-index bff5f14..b711013 100644
---- a/src/archives.c
-+++ b/src/archives.c
-@@ -449,8 +449,9 @@ tarobject_set_mtime(struct tar_entry *te, const char *path)
+diff --git a/src/main/archives.c b/src/main/archives.c
+index 92340b9..7a55c27 100644
+--- a/src/main/archives.c
++++ b/src/main/archives.c
+@@ -490,8 +490,9 @@ tarobject_set_mtime(struct tar_entry *te, const char *path)
  
    if (te->type == TAR_FILETYPE_SYMLINK) {
  #ifdef HAVE_LUTIMES
@@ -27,5 +27,5 @@ index bff5f14..b711013 100644
    } else {
      if (utimes(path, tv))
 -- 
-2.1.4
+2.25.1
 

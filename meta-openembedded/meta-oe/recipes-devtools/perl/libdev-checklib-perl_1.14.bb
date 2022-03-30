@@ -4,7 +4,7 @@ and its headers are available, by attempting to compile a simple program and \
 link against it."
 HOMEPAGE = "https://metacpan.org/pod/Devel::CheckLib"
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPL-1.0+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 
 LIC_FILES_CHKSUM = "file://README;md5=7911cdbb572d25c5f2e2ea17f669efc2"
 

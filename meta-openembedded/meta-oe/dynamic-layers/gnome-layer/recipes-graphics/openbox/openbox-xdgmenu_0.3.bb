@@ -2,7 +2,7 @@ SUMMARY = "Openbox configuration tool"
 AUTHOR = "Siegfried Gevatter"
 HOMEPAGE = "https://launchpad.net/openbox-xdgmenu/"
 SECTION = "x11/wm"
-LICENSE = "GPLv3+"
+LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=f27defe1e96c2e1ecd4e0c9be8967949"
 DEPENDS = " \
     gnome-menus \

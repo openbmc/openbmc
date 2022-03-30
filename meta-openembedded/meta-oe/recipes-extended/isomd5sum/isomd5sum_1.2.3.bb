@@ -4,7 +4,7 @@ DESCRIPTION = "Tools for taking the MD5 sum of ISO images"
 DEPENDS = "popt python3 openssl curl popt-native"
 RDEPENDS:${BPN} = "openssl curl"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8ca43cbc842c2336e835926c2166c28b"
 
 SRC_URI = "git://github.com/rhinstaller/isomd5sum.git;branch=master;protocol=https \

@@ -1,7 +1,7 @@
 DESCRIPTION = "A feature rich Remote Desktop Application written in GTK+"
 HOMEPAGE = "https://remmina.org"
 SECTION = "Support"
-LICENSE = "GPLv2 & openssl"
+LICENSE = "GPL-2.0-only & OpenSSL"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=dab7215512044d49037272ce1ac4ea8f file://LICENSE.OpenSSL;md5=c1eb3cee0a4dea27503c531267a69769"
 
 DEPENDS = " \

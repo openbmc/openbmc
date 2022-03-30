@@ -1,6 +1,6 @@
 SUMMARY = "Rdfind is a program that finds duplicate files"
 HOMEPAGE = "https://rdfind.pauldreik.se/"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=fa22e16ebbe6638b2bd253338fbded9f"
 
 DEPENDS = "nettle autoconf-archive"

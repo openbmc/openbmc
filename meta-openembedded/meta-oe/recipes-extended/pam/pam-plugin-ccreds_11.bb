@@ -1,7 +1,7 @@
 SUMMARY = "PAM cached credentials module"
 HOMEPAGE = "https://www.padl.com/OSS/pam_ccreds.html"
 SECTION = "libs"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
 DEPENDS = "libpam openssl db"

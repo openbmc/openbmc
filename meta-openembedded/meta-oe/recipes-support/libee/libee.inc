@@ -5,7 +5,7 @@ but hopefully convenient API layer above the CEE standard."
 HOMEPAGE = "http://www.libee.org"
 SECTION = "base"
 
-LICENSE = "LGPL-2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1c2687de35e36ba3b999136236a66cd6"
 
 SRC_URI = "http://www.libee.org/download/files/download/${BPN}-${PV}.tar.gz\

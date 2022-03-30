@@ -151,6 +151,13 @@ ALTERNATIVE_LINK_NAME[uptime.1] = "${mandir}/man1/uptime.1"
 ALTERNATIVE_LINK_NAME[kill.1] = "${mandir}/man1/kill.1"
 ALTERNATIVE_LINK_NAME[stat.1] = "${mandir}/man1/stat.1"
 
+# The statx() requires glibc >= 2.28 and linux kernel >= 4.11, it doesn't work
+# when glibc >= 2.28 ((Ubuntu 20.04 in docker) and kernel < 4.11 (Host OS
+# CentOS 7), we can check kernel version and disable it, but that would cause
+# two different signatures for coreutils-native, so disable it unconditionally
+# for deterministic build.
+EXTRA_OECONF:append:class-native = " ac_cv_func_statx=0"
+
 python __anonymous() {
     for prog in d.getVar('base_bindir_progs').split():
         d.setVarFlag('ALTERNATIVE_LINK_NAME', prog, '%s/%s' % (d.getVar('base_bindir'), prog))

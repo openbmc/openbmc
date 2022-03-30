@@ -9,7 +9,7 @@ THIS IS NOT THE SORT OF THING YOU WANT TO DO EVERYDAY \
 SECTION = "libs"
 HOMEPAGE= "https://metacpan.org/release/Sub-Uplevel"
 
-LICENSE = "Artistic-1.0 | GPL-1.0+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=7f1207cd3108e4ade18448d81e6bcb6c"
 
 CPAN_PACKAGE = "Sub-Uplevel"

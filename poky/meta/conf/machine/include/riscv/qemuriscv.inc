@@ -36,4 +36,4 @@ QB_ROOTFS_OPT = "-drive id=disk0,file=@ROOTFS@,if=none,format=raw -device virtio
 QB_SERIAL_OPT = "-device virtio-serial-device -chardev null,id=virtcon -device virtconsole,chardev=virtcon"
 QB_TCPSERIAL_OPT = " -device virtio-serial-device -chardev socket,id=virtcon,port=@PORT@,host=127.0.0.1 -device virtconsole,chardev=virtcon"
 QB_GRAPHICS = "-device bochs-display"
-QB_OPT_APPEND = "-device virtio-mouse-pci -device virtio-keyboard-pci"
+QB_OPT_APPEND = "-device virtio-tablet-pci -device virtio-keyboard-pci"

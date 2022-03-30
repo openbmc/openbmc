@@ -424,12 +424,12 @@ information including the website, wiki pages, and user manuals:
    development documentation, and access to a rich Yocto Project
    Development Community into which you can tap.
 
--  **Developer Screencast:** The `Getting Started with the Yocto Project -
-   New Developer Screencast Tutorial <https://vimeo.com/36450321>`__
-   provides a 30-minute video created for users unfamiliar with the
-   Yocto Project but familiar with Linux build hosts. While this
-   screencast is somewhat dated, the introductory and fundamental
-   concepts are useful for the beginner.
+-  **Video Seminar:** The `Introduction to the Yocto Project and Bitbake, Part 1
+   <https://youtu.be/yuE7my3KOpo>`__ and
+   `Introduction to the Yocto Project and Bitbake, Part 2
+   <https://youtu.be/iZ05TTyzGHk>`__ videos offer a video seminar
+   introducing you to the most important aspects of developing a
+   custom embedded Linux distribution with the Yocto Project.
 
 -  **Yocto Project Overview and Concepts Manual:** The
    :doc:`/overview-manual/index` is a great

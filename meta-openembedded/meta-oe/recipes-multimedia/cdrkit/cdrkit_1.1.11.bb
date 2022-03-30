@@ -1,7 +1,7 @@
 SUMMARY = "CD/DVD command line tools"
 HOMEPAGE = "http://cdrkit.org/"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b30d3b2750b668133fc17b401e1b98f8"
 
 # While writing download from cdrkit.org was broken so get sources from debian

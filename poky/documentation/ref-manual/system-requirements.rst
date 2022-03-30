@@ -41,15 +41,15 @@ distributions:
 
 -  Ubuntu 20.04 (LTS)
 
--  Fedora 33
-
 -  Fedora 34
+
+-  Fedora 35
 
 -  CentOS 7.x
 
 -  CentOS 8.x
 
--  Debian GNU/Linux 8.x (Jessie)
+-  AlmaLinux 8.5
 
 -  Debian GNU/Linux 9.x (Stretch)
 
@@ -57,9 +57,7 @@ distributions:
 
 -  Debian GNU/Linux 11.x (Bullseye)
 
--  OpenSUSE Leap 15.1
-
--  OpenSUSE Leap 15.2
+-  OpenSUSE Leap 15.3
 
 .. note::
 

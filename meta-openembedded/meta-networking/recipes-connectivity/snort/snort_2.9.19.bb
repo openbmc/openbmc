@@ -1,7 +1,7 @@
 DESCRIPTION = "snort - a free lightweight network intrusion detection system for UNIX and Windows."
 HOMEPAGE = "http://www.snort.org/"
 SECTION = "net"
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=78fa8ef966b48fbf9095e13cc92377c5"
 
 DEPENDS = "xz libpcap libpcre daq libdnet util-linux daq-native libtirpc bison-native"

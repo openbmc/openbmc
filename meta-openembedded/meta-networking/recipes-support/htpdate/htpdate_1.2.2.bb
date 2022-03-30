@@ -15,7 +15,7 @@ DESCRIPTION = "The  HTTP Time Protocol (HTP) is used to synchronize a computer's
 
 HOMEPAGE = "http://www.vervest.org/htp/"
 
-LICENSE = "GPL-2.0+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://htpdate.c;beginline=26;endline=30;md5=d7018a4d2c5a6eab392709a05e5e168a"
 
 SRC_URI = "http://www.vervest.org/htp/archive/c/htpdate-${PV}.tar.xz \

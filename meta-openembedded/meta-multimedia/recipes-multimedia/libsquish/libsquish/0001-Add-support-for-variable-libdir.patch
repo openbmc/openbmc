@@ -1,0 +1,70 @@
+From 20d14f323c877eca631f0a75efcf19727fb18dd9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 22 Mar 2022 09:17:06 -0700
+Subject: [PATCH] Add support for variable libdir
+
+sometimes libdir is not 'lib' in such cases set LIBDIR_SUFFIX to 32 or
+64 to append to it.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile     | 9 +++++----
+ config.in    | 2 ++
+ squish.pc.in | 3 ++-
+ 3 files changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 1c01f89..768a4a7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -10,13 +10,13 @@ LIB = libsquish.a
+ all : $(LIB) squish.pc
+ 
+ install : $(LIB) squish.pc
+-	install squish.h $(INSTALL_DIR)/include 
+-	install libsquish.a $(INSTALL_DIR)/lib
+-	install squish.pc $(INSTALL_DIR)/lib/pkgconfig
++	install squish.h $(INSTALL_DIR)/include
++	install libsquish.a $(INSTALL_DIR)/lib$(LIBDIR_SUFFIX)
++	install squish.pc $(INSTALL_DIR)/lib$(LIBDIR_SUFFIX)/pkgconfig
+ 
+ uninstall:
+ 	$(RM) $(INSTALL_DIR)/include/squish.h
+-	$(RM) $(INSTALL_DIR)/lib/libsquish.a
++	$(RM) $(INSTALL_DIR)/lib$(LIBDIR_SUFFIX)/libsquish.a
+ 
+ $(LIB) : $(OBJ)
+ 	$(AR) cr $@ $?
+@@ -30,4 +30,5 @@ clean :
+ 
+ squish.pc:
+ 	sed 's|@PREFIX@|$(PREFIX)|' $@.in > $@
++	sed 's|@LIBDIR_SUFFIX@|$(LIBDIR_SUFFIX)|' $@.in > $@
+ 
+diff --git a/config.in b/config.in
+index fdca022..a6cf833 100644
+--- a/config.in
++++ b/config.in
+@@ -19,3 +19,5 @@ endif
+ 
+ # where should we install to
+ INSTALL_DIR ?= @PREFIX@
++# libdir is architecture specific
++LIBDIR_SUFFIX ?= @LIBDIR_SUFFIX@
+diff --git a/squish.pc.in b/squish.pc.in
+index ca04334..73c21bb 100644
+--- a/squish.pc.in
++++ b/squish.pc.in
+@@ -1,6 +1,7 @@
+ prefix=@PREFIX@
++suffix=@LIBDIR_SUFFIX@
+ exec_prefix=${prefix}
+-libdir=${prefix}/lib
++libdir=${prefix}/lib${suffix}
+ sharedlibdir=${libdir}
+ includedir=${prefix}/include
+ 
+-- 
+2.35.1
+

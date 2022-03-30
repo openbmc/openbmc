@@ -1,7 +1,11 @@
 
 # Some additional dependencies that the above doesn't manage to figure out
 RDEPENDS:perl-module-file-spec += "perl-module-file-spec-unix"
+RDEPENDS:perl-module-scalar-util += "perl-module-list-util"
+RDEPENDS:perl-module-file-temp += "perl-module-scalar-util"
+RDEPENDS:perl-module-file-temp += "perl-module-file-spec"
 RDEPENDS:perl-module-io-file += "perl-module-symbol"
+RDEPENDS:perl-module-io-file += "perl-module-carp"
 RDEPENDS:perl-module-math-bigint += "perl-module-math-bigint-calc"
 RDEPENDS:perl-module-test-builder += "perl-module-list-util"
 RDEPENDS:perl-module-test-builder += "perl-module-scalar-util"

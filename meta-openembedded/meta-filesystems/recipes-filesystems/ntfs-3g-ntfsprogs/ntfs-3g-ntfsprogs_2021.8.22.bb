@@ -2,7 +2,7 @@ DESCRIPTION = "The NTFS-3G driver is an open source, freely available NTFS drive
 HOMEPAGE = "http://www.ntfs-3g.org/"
 DEPENDS = "fuse libgcrypt"
 PROVIDES = "ntfsprogs ntfs-3g"
-LICENSE = "GPLv2 & LGPLv2"
+LICENSE = "GPL-2.0-only & LGPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
                     file://COPYING.LIB;md5=f30a9716ef3762e3467a2f62bf790f0a"
 

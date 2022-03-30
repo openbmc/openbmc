@@ -8,7 +8,7 @@ SECTION = "libs"
 
 HOMEPAGE = "http://search.cpan.org/~ovid/Text-Diff/"
 
-LICENSE = "Artistic-1.0 | GPL-2.0+"
+LICENSE = "Artistic-1.0 | GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=385c55653886acac3821999a3ccd17b3"
 
 SRC_URI = "${CPAN_MIRROR}/authors/id/O/OV/OVID/Text-Diff-${PV}.tar.gz"

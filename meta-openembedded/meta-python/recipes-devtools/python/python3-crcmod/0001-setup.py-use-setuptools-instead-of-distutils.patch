@@ -1,0 +1,22 @@
+From 3dc1e9584ed2ac81e7526b8dbf76b4a06ea8ac76 Mon Sep 17 00:00:00 2001
+From: Justin Bronder <jsbronder@cold-front.org>
+Date: Tue, 1 Mar 2022 10:34:42 -0500
+Subject: [PATCH] setup.py use setuptools instead of distutils
+
+Upstream-Status: Pending
+Signed-off-by: Justin Bronder <jsbronder@cold-front.org>
+---
+ setup.py | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index e3a524b..2f2bcfc 100644
+--- a/setup.py
++++ b/setup.py
+@@ -1,5 +1,4 @@
+-from distutils.core import setup
+-from distutils.extension import Extension
++from setuptools import Extension, setup
+ import sys,os
+ 
+ if sys.version_info[0] == 2:

@@ -8,7 +8,7 @@
 # - test suite
 # - validate signed-off-by
 
-status_values = ("accepted", "pending", "inappropriate", "backport", "submitted", "denied")
+status_values = ("accepted", "pending", "inappropriate", "backport", "submitted", "denied", "inactive-upstream")
 
 class Result:
     # Whether the patch has an Upstream-Status or not
@@ -46,7 +46,7 @@ def patchreview(path, patches):
     # hyphen or spaces, maybe a colon, some whitespace, then the value, all case
     # insensitive.
     sob_re = re.compile(r"^[\t ]*(Signed[-_ ]off[-_ ]by:?)[\t ]*(.+)", re.IGNORECASE | re.MULTILINE)
-    status_re = re.compile(r"^[\t ]*(Upstream[-_ ]Status:?)[\t ]*(\w*)", re.IGNORECASE | re.MULTILINE)
+    status_re = re.compile(r"^[\t ]*(Upstream[-_ ]Status:?)[\t ]*([\w-]*)", re.IGNORECASE | re.MULTILINE)
     cve_tag_re = re.compile(r"^[\t ]*(CVE:)[\t ]*(.*)", re.IGNORECASE | re.MULTILINE)
     cve_re = re.compile(r"cve-[0-9]{4}-[0-9]{4,6}", re.IGNORECASE)
 

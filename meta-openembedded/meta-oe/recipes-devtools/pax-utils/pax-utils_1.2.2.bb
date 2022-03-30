@@ -4,7 +4,7 @@ utilities for ELF binaries. It can check ELF binary files and running \
 processes for issues that might be relevant when using ELF binaries \
 along with PaX, such as non-PIC code or executable stack and heap."
 HOMEPAGE = "http://www.gentoo.org/proj/en/hardened/pax-utils.xml"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=eb723b61539feef013de476e68b5c50a"
 
 SRC_URI = "https://dev.gentoo.org/~vapier/dist/pax-utils-${PV}.tar.xz"

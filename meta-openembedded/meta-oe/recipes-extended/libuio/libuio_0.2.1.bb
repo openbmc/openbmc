@@ -1,6 +1,6 @@
 SUMMARY = "Libuio - helper library for UIO subsystem"
 SECTION = "base"
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=393a5ca445f6965873eca0259a17f833"
 
 SRC_URI = "git://git.code.sf.net/p/libuio/code;branch=master \

@@ -7,7 +7,7 @@ LogFS is included in the mainline Linux kernel and was introduced in \
 version 2.6.34, released on May 16, 2010."
 HOMEPAGE = "https://github.com/prasad-joshi/logfsprogs"
 SECTION = "base"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://fsck.c;md5=3859dc73da97909ff1d0125e88a27e02"
 DEPENDS = "zlib"
 

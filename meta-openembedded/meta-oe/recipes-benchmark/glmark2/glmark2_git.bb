@@ -4,7 +4,7 @@ It uses only the subset of the OpenGL 2.0 API that is compatible with OpenGL ES 
 HOMEPAGE = "https://github.com/glmark2/glmark2"
 BUGTRACKER = "https://github.com/glmark2/glmark2/issues"
 
-LICENSE = "GPLv3+ & SGIv1"
+LICENSE = "GPL-3.0-or-later & SGI-1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
                     file://COPYING.SGI;beginline=5;md5=269cdab4af6748677acce51d9aa13552"
 

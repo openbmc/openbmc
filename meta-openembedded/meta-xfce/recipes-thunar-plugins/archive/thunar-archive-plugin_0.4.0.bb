@@ -1,6 +1,6 @@
 DESCRIPTION = "Thunar Archive Plugin allows you to create and extract archive files using file context menus in Thunar"
 HOMEPAGE = "http://goodies.xfce.org/projects/thunar-plugins/thunar-archive-plugin"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=252890d9eee26aab7b432e8b8a616475"
 
 inherit thunar-plugin

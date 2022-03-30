@@ -8,7 +8,7 @@ eID cards have also been confirmed to work."
 
 HOMEPAGE = "http://www.opensc-project.org/opensc/"
 SECTION = "System Environment/Libraries"
-LICENSE = "LGPLv2+"
+LICENSE = "LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=cb8aedd3bced19bd8026d96a8b6876d7"
 
 #v0.21.0

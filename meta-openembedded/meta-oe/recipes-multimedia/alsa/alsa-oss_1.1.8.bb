@@ -1,6 +1,6 @@
 SUMMARY = "Alsa OSS Compatibility Package"
 SECTION = "libs/multimedia"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ed055b4eff93da784176a01582e6ec1a"
 DEPENDS = "alsa-lib"
 

@@ -3,7 +3,7 @@ DESCRIPTION = "OWFS is an easy way to use the powerful 1-wire system of Dallas/M
 HOMEPAGE = "http://www.owfs.org/"
 SECTION = "console/network"
 
-LICENSE = "GPLv2 & LGPLv2"
+LICENSE = "GPL-2.0-only & LGPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=628b867016631792781a8735a04760e5 \
                     file://COPYING.LIB;md5=9021b7435efdd9fb22beef8291134099"
 

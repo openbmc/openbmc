@@ -9,7 +9,7 @@ functions are missing, mainly because no-one ever requested them. \
 HOMEPAGE = "https://github.com/perl5-dbi/DBD-mysql"
 
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPL-1.0+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 DEPENDS += "libdev-checklib-perl-native libdbi-perl-native libmysqlclient"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=d0a06964340e5c0cde88b7af611f755c"

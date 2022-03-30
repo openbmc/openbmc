@@ -3,7 +3,7 @@ DESCRIPTION = "Fast Artificial Neural Network (FANN) Library is a free open sour
 HOMEPAGE = "https://github.com/libfann/fann"
 SECTION = "libs/devel"
 
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=f14599a2f089f6ff8c97e2baa4e3d575"
 
 inherit cmake

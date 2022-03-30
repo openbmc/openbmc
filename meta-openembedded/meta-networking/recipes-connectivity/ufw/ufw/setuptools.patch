@@ -1,0 +1,20 @@
+Move to setuptools as distutils is now deprecated.
+
+Upstream-Status: Submitted [https://code.launchpad.net/~tgamblin/ufw/distutils-to-setuptools]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/setup.py b/setup.py
+index cb67a6a..de648d3 100644
+--- a/setup.py
++++ b/setup.py
+@@ -25,8 +25,8 @@
+ #
+ 
+ from __future__ import print_function
+-from distutils.command.install import install as _install
+-from distutils.core import setup
++from setuptools.command.install import install as _install
++from setuptools import setup
+ import errno
+ import os
+ import re

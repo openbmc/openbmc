@@ -1,7 +1,7 @@
 SUMMARY = "Tools for managing AUFS mounts"
 SECTION = "base"
 HOMEPAGE = "http://aufs.sourceforge.net/"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=892f569a555ba9c07a568a7c0c4fa63a"
 
 DEPENDS = "coreutils-native aufs-util-native"

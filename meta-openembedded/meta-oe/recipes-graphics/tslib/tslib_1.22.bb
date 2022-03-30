@@ -7,7 +7,7 @@ HOMEPAGE = "http://tslib.org/"
 
 AUTHOR = "Martin Kepplinger <martink@posteo.de>"
 SECTION = "base"
-LICENSE = "LGPLv2+ & GPLv2+"
+LICENSE = "LGPL-2.0-or-later & GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "\
     file://COPYING;md5=fc178bcd425090939a8b634d1d6a9594 \
     file://tests/COPYING;md5=a23a74b3f4caf9616230789d94217acb \

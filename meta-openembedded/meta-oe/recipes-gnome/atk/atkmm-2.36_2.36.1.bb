@@ -1,7 +1,7 @@
 SUMMARY = "C++ bindings for the atk"
 SECTION = "libs"
 
-LICENSE = "LGPLv2.1 & GPLv2"
+LICENSE = "LGPL-2.1-only & GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2d5025d4aa3495befef8f17206a5b0a1 \
                     file://COPYING.tools;md5=751419260aa954499f7abaabaa882bbe"
 

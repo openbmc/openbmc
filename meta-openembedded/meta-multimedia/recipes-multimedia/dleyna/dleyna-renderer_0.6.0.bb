@@ -4,7 +4,7 @@ that allow clients to discover and manipulate Digital Media Renderers. \
 An implementation of such a service for linux is also included."
 HOMEPAGE = "https://01.org/dleyna/"
 
-LICENSE = "LGPLv2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c \
                     file://libdleyna/renderer/server.c;endline=21;md5=f51acd4757fb6a779a87122c43cf1346"
 

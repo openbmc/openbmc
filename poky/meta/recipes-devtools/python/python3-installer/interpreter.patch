@@ -1,0 +1,61 @@
+Let us override the hashbang directly (possibly upstreamable), and don't
+play games with hashbangs: for now assume that even hashbangs with spaces
+are simple (assume the spaces are only used to separate arguments) and
+we don't have long hashbangs.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/src/installer/__main__.py b/src/installer/__main__.py
+index 3357ec5..d2fd8d2 100644
+--- a/src/installer/__main__.py
++++ b/src/installer/__main__.py
+@@ -23,6 +23,13 @@ def _get_main_parser() -> argparse.ArgumentParser:
+         type=str,
+         help="destination directory (prefix to prepend to each file)",
+     )
++    parser.add_argument(
++        "--interpreter",
++        "-i",
++        type=str,
++        default=sys.executable,
++        help=f"interpreter (defaults to {sys.executable})",
++    )
+     parser.add_argument(
+         "--compile-bytecode",
+         action="append",
+@@ -73,7 +80,7 @@ def _main(cli_args: Sequence[str], program: Optional[str] = None) -> None:
+     with WheelFile.open(args.wheel) as source:
+         destination = SchemeDictionaryDestination(
+             scheme_dict=_get_scheme_dict(source.distribution),
+-            interpreter=sys.executable,
++            interpreter=args.interpreter,
+             script_kind=get_launcher_kind(),
+             bytecode_optimization_levels=bytecode_levels,
+             destdir=args.destdir,
+diff --git a/src/installer/scripts.py b/src/installer/scripts.py
+index 7e3c8fc..ba6ed5a 100644
+--- a/src/installer/scripts.py
++++ b/src/installer/scripts.py
+@@ -59,20 +59,7 @@ def _build_shebang(executable: str, forlauncher: bool) -> bytes:
+     https://bitbucket.org/pypa/distlib/src/58cd5c6/distlib/scripts.py#lines-124
+     """
+     executable_bytes = executable.encode("utf-8")
+-    if forlauncher:  # The launcher can just use the command as-is.
+-        return b"#!" + executable_bytes
+-    if _is_executable_simple(executable_bytes):
+-        return b"#!" + executable_bytes
+-
+-    # Shebang support for an executable with a space in it is under-specified
+-    # and platform-dependent, so we use a clever hack to generate a script to
+-    # run in ``/bin/sh`` that should work on all reasonably modern platforms.
+-    # Read the following message to understand how the hack works:
+-    # https://github.com/pradyunsg/installer/pull/4#issuecomment-623668717
+-
+-    quoted = shlex.quote(executable).encode("utf-8")
+-    # I don't understand a lick what this is trying to do.
+-    return b"#!/bin/sh\n'''exec' " + quoted + b' "$0" "$@"\n' + b"' '''"
++    return b"#!" + executable_bytes
+
+
+ class InvalidScript(ValueError):

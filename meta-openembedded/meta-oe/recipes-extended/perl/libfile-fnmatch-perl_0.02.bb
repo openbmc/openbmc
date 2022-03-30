@@ -6,7 +6,7 @@ are nonetheless useful and familiar to a large audience of end-users."
 
 HOMEPAGE = "http://search.cpan.org/dist/File-FnMatch/"
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPL-1.0+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 
 LIC_FILES_CHKSUM = "file://README;beginline=34;endline=37;md5=54fdfac62963b7cece5583ab38f2cf0d"
 

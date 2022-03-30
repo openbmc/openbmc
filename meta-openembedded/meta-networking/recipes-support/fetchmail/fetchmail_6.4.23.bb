@@ -5,7 +5,7 @@ and forwarding utility intended to be used over on-demand TCP/IP links (such as 
 connections). It supports every remote-mail protocol now in use on the Internet: POP2, POP3, \
 RPOP, APOP, KPOP, all flavors of IMAP, ETRN, and ODMR. It can even support IPv6 and IPSEC."
 SECTION = "mail"
-LICENSE = "GPLv2 & MIT"
+LICENSE = "GPL-2.0-only & MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c3a05d9b9d3784c824c9b92a648e1353"
 
 DEPENDS = "openssl"

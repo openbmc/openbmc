@@ -4,7 +4,7 @@ simple integration into other software."
 HOMEPAGE = "http://www.libde265.org/"
 SECTION = "libs/multimedia"
 
-LICENSE = "LGPLv3 & MIT"
+LICENSE = "LGPL-3.0-only & MIT"
 LICENSE_FLAGS = "commercial"
 LIC_FILES_CHKSUM = "file://COPYING;md5=695b556799abb2435c97a113cdca512f"
 

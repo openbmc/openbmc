@@ -1,7 +1,7 @@
 SUMMARY = "RocksDB an embeddable, persistent key-value store"
 DESCRIPTION = "RocksDB is library that provides an embeddable, persistent key-value store for fast storage."
 HOMEPAGE = "http://rocksdb.org/"
-LICENSE = "(Apache-2.0 | GPL-2.0) & BSD-3-Clause"
+LICENSE = "(Apache-2.0 | GPL-2.0-only) & BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.Apache;md5=3b83ef96387f14655fc854ddc3c6bd57 \
                     file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://LICENSE.leveldb;md5=fb04ff57a14f308f2eed4a9b87d45837"
@@ -22,6 +22,7 @@ SRC_URI = "git://github.com/facebook/${BPN}.git;branch=${SRCBRANCH};protocol=htt
 
 SRC_URI:append:riscv32 = " file://0001-replace-old-sync-with-new-atomic-builtin-equivalents.patch"
 SRC_URI:append:mips = " file://0001-replace-old-sync-with-new-atomic-builtin-equivalents.patch"
+SRC_URI:append:powerpc = " file://0001-replace-old-sync-with-new-atomic-builtin-equivalents.patch"
 SRC_URI:remove:toolchain-clang:riscv32 = "file://0001-replace-old-sync-with-new-atomic-builtin-equivalents.patch"
 
 S = "${WORKDIR}/git"
@@ -51,3 +52,7 @@ do_install:append() {
 }
 
 LDFLAGS:append:riscv64 = " -pthread"
+
+# Need toku_time_now() implemented for ppc/musl
+# see utilities/transactions/lock/range/range_tree/lib/portability/toku_time.h
+COMPATIBLE_HOST:libc-musl:powerpc = "null"

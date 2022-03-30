@@ -20,8 +20,8 @@ Hash {
 }
 
 Co-authored-by: Richard Lau <rlau@redhat.com>
-
-Refs: https://github.com/nodejs/node/issues/40455
+Signed-off-by: Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
+Upstream-Status: Backport [https://github.com/nodejs/node/issues/40455]
 ---
  doc/api/cli.md                                         | 10 ++++++++++
  src/crypto/crypto_util.cc                              | 10 ++++++++++
@@ -34,7 +34,7 @@ diff --git a/doc/api/cli.md b/doc/api/cli.md
 index 74057706bf8d..608b9cdeddf1 100644
 --- a/doc/api/cli.md
 +++ b/doc/api/cli.md
-@@ -652,6 +652,14 @@ Load an OpenSSL configuration file on startup. Among other uses, this can be
+@@ -687,6 +687,14 @@ Load an OpenSSL configuration file on startup. Among other uses, this can be
  used to enable FIPS-compliant crypto if Node.js is built
  against FIPS-enabled OpenSSL.
  
@@ -47,9 +47,9 @@ index 74057706bf8d..608b9cdeddf1 100644
 +[providers readme][].
 +
  ### `--pending-deprecation`
+ 
  <!-- YAML
- added: v8.0.0
-@@ -1444,6 +1452,7 @@ Node.js options that are allowed are:
+@@ -1544,6 +1552,7 @@ Node.js options that are allowed are:
  * `--no-warnings`
  * `--node-memory-debug`
  * `--openssl-config`
@@ -57,19 +57,19 @@ index 74057706bf8d..608b9cdeddf1 100644
  * `--pending-deprecation`
  * `--policy-integrity`
  * `--preserve-symlinks-main`
-@@ -1814,6 +1823,7 @@ $ node --max-old-space-size=1536 index.js
- [emit_warning]: process.md#process_process_emitwarning_warning_type_code_ctor
+@@ -1933,6 +1942,7 @@ $ node --max-old-space-size=1536 index.js
+ [emit_warning]: process.md#processemitwarningwarning-options
  [jitless]: https://v8.dev/blog/jitless
  [libuv threadpool documentation]: https://docs.libuv.org/en/latest/threadpool.html
 +[providers readme]: https://github.com/openssl/openssl/blob/openssl-3.0.0/README-PROVIDERS.md
  [remote code execution]: https://www.owasp.org/index.php/Code_Injection
+ [security warning]: #warning-binding-inspector-to-a-public-ipport-combination-is-insecure
  [timezone IDs]: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
- [ways that `TZ` is handled in other environments]: https://www.gnu.org/software/libc/manual/html_node/TZ-Variable.html
 diff --git a/src/crypto/crypto_util.cc b/src/crypto/crypto_util.cc
 index 7e0c8ba3eb60..796ea3025e41 100644
 --- a/src/crypto/crypto_util.cc
 +++ b/src/crypto/crypto_util.cc
-@@ -136,6 +136,16 @@ void InitCryptoOnce() {
+@@ -148,6 +148,16 @@ void InitCryptoOnce() {
    }
  #endif
  
@@ -100,20 +100,6 @@ index 00bdc6688a4c..3363860919a9 100644
  
  #include <errno.h>
  #include <sstream>
-@@ -809,6 +812,13 @@ PerProcessOptionsParser::PerProcessOptionsParser(
-             &PerProcessOptions::secure_heap_min,
-             kAllowedInEnvironment);
- #endif
-+#if OPENSSL_VERSION_MAJOR >= 3
-+  AddOption("--openssl-legacy-provider",
-+            "enable OpenSSL 3.0 legacy provider",
-+            &PerProcessOptions::openssl_legacy_provider,
-+            kAllowedInEnvironment);
-+
-+#endif  // OPENSSL_VERSION_MAJOR
-   AddOption("--use-largepages",
-             "Map the Node.js static code to large pages. Options are "
-             "'off' (the default value, meaning do not map), "
 diff --git a/src/node_options.h b/src/node_options.h
 index fd772478d04d..1c0e018ab16f 100644
 --- a/src/node_options.h
@@ -143,7 +129,7 @@ diff --git a/test/parallel/test-process-env-allowed-flags-are-documented.js b/te
 index 64626b71f019..8a4e35997907 100644
 --- a/test/parallel/test-process-env-allowed-flags-are-documented.js
 +++ b/test/parallel/test-process-env-allowed-flags-are-documented.js
-@@ -40,6 +40,10 @@ for (const line of [...nodeOptionsLines, ...v8OptionsLines]) {
+@@ -43,6 +43,10 @@ for (const line of [...nodeOptionsLines, ...v8OptionsLines]) {
    }
  }
  
@@ -154,7 +140,7 @@ index 64626b71f019..8a4e35997907 100644
  // Filter out options that are conditionally present.
  const conditionalOpts = [
    {
-@@ -47,6 +51,7 @@ const conditionalOpts = [
+@@ -50,6 +54,7 @@ const conditionalOpts = [
      filter: (opt) => {
        return [
          '--openssl-config',

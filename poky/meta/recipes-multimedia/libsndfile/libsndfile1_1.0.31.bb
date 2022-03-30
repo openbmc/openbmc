@@ -9,7 +9,9 @@ SECTION = "libs/multimedia"
 LICENSE = "LGPL-2.1-only"
 
 SRC_URI = "https://github.com/libsndfile/libsndfile/releases/download/${PV}/libsndfile-${PV}.tar.bz2 \
+           file://noopus.patch \
           "
+UPSTREAM_CHECK_URI = "https://github.com/libsndfile/libsndfile/releases/"
 
 SRC_URI[md5sum] = "3f3b2a86a032f064ef922a2c8c191f7b"
 SRC_URI[sha256sum] = "a8cfb1c09ea6e90eff4ca87322d4168cdbe5035cb48717b40bf77e751cc02163"

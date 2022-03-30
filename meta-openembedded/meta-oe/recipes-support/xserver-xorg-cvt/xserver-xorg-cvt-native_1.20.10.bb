@@ -1,6 +1,6 @@
 SUMMARY = "X.Org X cvt"
 HOMEPAGE = "https://linux.die.net/man/1/cvt"
-LICENSE = "MIT-X"
+LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5df87950af51ac2c5822094553ea1880"
 
 DEPENDS += "pixman-native xorgproto-native libxrandr-native"

@@ -6,7 +6,7 @@ SRC_URI[sha256sum] = "57d6060839e3a7f150eaab6fe4e726d9e3e7cffe2150fb223d73f92421
 
 PYPI_PACKAGE = "Flask-Migrate"
 
-inherit pypi setuptools3
+inherit pypi python_setuptools_build_meta
 
 RDEPENDS:${PN} += "\
     ${PYTHON_PN}-flask-sqlalchemy \

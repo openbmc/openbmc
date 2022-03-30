@@ -6,7 +6,7 @@ SUMMARY = "GeoIP perl API library to access location database"
 DESCRIPTION = "perl library for country/city/organization to IP address or hostname mapping"
 HOMEPAGE = "http://www.maxmind.com/app/ip-location"
 SECTION = "libdevel"
-LICENSE = "Artistic-1.0 | GPL-1.0+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e4f3ea6e9b28af88dc0321190a1f8250"
 
 S = "${WORKDIR}/git"

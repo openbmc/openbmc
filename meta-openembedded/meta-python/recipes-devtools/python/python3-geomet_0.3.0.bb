@@ -14,6 +14,7 @@ SRC_URI = "git://github.com/geomet/geomet.git;protocol=https;branch=release-${PV
 SRCREV = "73ec5ec96cca32f2e2461d3964fc3d4ab80248f9"
 
 inherit setuptools3
+PIP_INSTALL_PACKAGE = "geomet"
 
 RDEPENDS:${PN} += "\
     ${PYTHON_PN}-click \

@@ -7,7 +7,7 @@ SRC_URI[sha256sum] = "9f50f446828eb9d45b267433fd3e9da8d801f614129124863f9c51ebce
 
 DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
 
-inherit pypi setuptools_build_meta
+inherit pypi python_setuptools_build_meta
 
 DEPENDS += "${PYTHON_PN}-toml-native"
 

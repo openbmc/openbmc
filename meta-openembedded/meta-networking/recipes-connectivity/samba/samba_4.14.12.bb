@@ -1,7 +1,7 @@
 HOMEPAGE = "https://www.samba.org/"
 SECTION = "console/network"
 
-LICENSE = "GPL-3.0+ & LGPL-3.0+ & GPL-2.0+"
+LICENSE = "GPL-3.0-or-later & LGPL-3.0-or-later & GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
                     file://${COREBASE}/meta/files/common-licenses/LGPL-3.0-or-later;md5=c51d3eef3be114124d11349ca0d7e117 \
                     file://${COREBASE}/meta/files/common-licenses/GPL-2.0-or-later;md5=fed54355545ffd980b814dab4a3b312c"

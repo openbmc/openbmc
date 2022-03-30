@@ -16,6 +16,7 @@ SRC_URI = "git://github.com/plougher/squashfs-tools.git;protocol=https;branch=ma
            file://CVE-2021-41072-requisite-3.patch;striplevel=2 \
            file://CVE-2021-41072.patch;striplevel=2 \
            "
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))"
 
 S = "${WORKDIR}/git/squashfs-tools"
 

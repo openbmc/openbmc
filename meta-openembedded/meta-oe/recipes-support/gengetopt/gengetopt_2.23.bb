@@ -3,7 +3,7 @@ DESCRIPTION = "Gengetopt is a tool to write command line option parsing code for
 SECTION = "utils"
 HOMEPAGE = "https://www.gnu.org/software/gengetopt/gengetopt.html"
 
-LICENSE = "GPLv3+"
+LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ff95bfe019feaf92f524b73dd79e76eb"
 
 SRC_URI = "${GNU_MIRROR}/gengetopt/${BPN}-${PV}.tar.xz"

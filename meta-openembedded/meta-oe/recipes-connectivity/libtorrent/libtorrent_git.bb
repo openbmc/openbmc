@@ -1,7 +1,7 @@
 DESCRIPTION = "libTorrent is a BitTorrent library written in C++ for *nix, \
 with a focus on high performance and good code."
 HOMEPAGE = "http://libtorrent.rakshasa.no/"
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=393a5ca445f6965873eca0259a17f833"
 
 DEPENDS = "zlib libsigc++-2.0 openssl cppunit"

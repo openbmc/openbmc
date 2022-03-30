@@ -12,11 +12,10 @@ https://sources.debian.org/data/main/libt/libtool/2.4.6-10/debian/patches/
 
 Upstream-Status: Submitted [https://lists.gnu.org/archive/html/libtool-patches/2021-10/msg00011.html]
 
----
-Index: libtool-2.4.6/m4/libtool.m4
-===================================================================
---- libtool-2.4.6.orig/m4/libtool.m4
-+++ libtool-2.4.6/m4/libtool.m4
+diff --git a/m4/libtool.m4 b/m4/libtool.m4
+index 022c1292..1a8a2998 100644
+--- a/m4/libtool.m4
++++ b/m4/libtool.m4
 @@ -728,7 +728,6 @@ _LT_CONFIG_SAVE_COMMANDS([
      cat <<_LT_EOF >> "$cfgfile"
  #! $SHELL
@@ -25,3 +24,6 @@ Index: libtool-2.4.6/m4/libtool.m4
  # NOTE: Changes made to this file will be lost: look at ltmain.sh.
  
  # Provide generalized library-building support services.
+-- 
+2.25.1
+

@@ -1,6 +1,6 @@
 SUMMARY = "SMPP library for python"
 SECTION = "devel/python"
-LICENSE = "GPLv3.0"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://README.md;md5=8b4e2ac8cf248f7b991784f88b630852"
 
 PYPI_PACKAGE = "smpplib"

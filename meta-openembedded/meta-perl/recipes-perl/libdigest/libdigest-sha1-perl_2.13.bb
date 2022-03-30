@@ -3,7 +3,7 @@ DESCRIPTION = "Digest::SHA1 - Perl interface to the SHA-1 algorithm"
 HOMEPAGE = "http://search.cpan.org/~gaas/Digest-SHA1-2.13/"
 SECTION = "libs"
 
-LICENSE = "Artistic-1.0|GPLv1+"
+LICENSE = "Artistic-1.0|GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://README;beginline=10;endline=14;md5=ff5867ebb4bc1103a7a416aef2fce00a"
 
 SRC_URI = "http://search.cpan.org/CPAN/authors/id/G/GA/GAAS/Digest-SHA1-${PV}.tar.gz \

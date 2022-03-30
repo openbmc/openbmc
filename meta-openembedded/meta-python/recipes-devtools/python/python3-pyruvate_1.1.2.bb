@@ -12,7 +12,9 @@ SRC_URI[sha256sum] = "10befedd97e73fc18b902d02aa3b24e8978aa162242c1b664849c886c0
 
 S = "${WORKDIR}/pyruvate-${PV}"
 
-inherit pypi setuptools3_rust
+inherit pypi python_setuptools3_rust
+
+PIP_INSTALL_DIST_PATH = "${S}/dist"
 
 # crossbeam-* -> std::sync::atomic AtomicI64, AtomicU64
 # not supported on mips/powerpc with 32-bit pointers
@@ -21,9 +23,6 @@ RUSTFLAGS:append:mips = " --cfg crossbeam_no_atomic_64"
 RUSTFLAGS:append:mipsel = " --cfg crossbeam_no_atomic_64"
 RUSTFLAGS:append:powerpc = " --cfg crossbeam_no_atomic_64"
 RUSTFLAGS:append:riscv32 = " --cfg crossbeam_no_atomic_64"
-
-SRC_URI:append:mips = " file://0001-check-for-mips-targets-for-stat.st_dev-definitions.patch;patchdir=../cargo_home/bitbake/libsystemd-0.4.1/"
-SRC_URI:append = " file://0001-riscv64-mod.rs-Add-missing-error-codes.patch;patchdir=../cargo_home/bitbake/libc-0.2.112/"
 
 SRC_URI += " \
     crate://crates.io/aho-corasick/0.7.18 \
@@ -64,7 +63,7 @@ SRC_URI += " \
     crate://crates.io/humantime/2.1.0 \
     crate://crates.io/instant/0.1.12 \
     crate://crates.io/lazy_static/1.4.0 \
-    crate://crates.io/libc/0.2.112 \
+    crate://crates.io/libc/0.2.120 \
     crate://crates.io/libsystemd/0.4.1 \
     crate://crates.io/log/0.4.14 \
     crate://crates.io/memchr/2.4.1 \
@@ -116,6 +115,10 @@ SRC_URI += " \
     crate://crates.io/winapi-x86_64-pc-windows-gnu/0.4.0 \
     crate://crates.io/winapi/0.3.9 \
 "
+SRC_URI += "\
+            file://0001-linux.rs-Define-consts-for-rv32-architecture.patch;patchdir=../cargo_home/bitbake/nix-0.23.1/ \
+            "
+SRC_URI:append:mips = " file://0001-check-for-mips-targets-for-stat.st_dev-definitions.patch;patchdir=../cargo_home/bitbake/libsystemd-0.4.1/"
 
 # The following configs & dependencies are from setuptools extras_require.
 # These dependencies are optional, hence can be controlled via PACKAGECONFIG.

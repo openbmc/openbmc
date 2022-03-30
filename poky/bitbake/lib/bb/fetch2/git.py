@@ -462,7 +462,10 @@ class Git(FetchMethod):
 
             logger.info("Creating tarball of git repository")
             with create_atomic(ud.fullmirror) as tfile:
-                runfetchcmd("tar -czf %s ." % tfile, d, workdir=ud.clonedir)
+                mtime = runfetchcmd("git log --all -1 --format=%cD", d,
+                        quiet=True, workdir=ud.clonedir)
+                runfetchcmd("tar -czf %s --owner pokybuild --group users --mtime \"%s\" ."
+                        % (tfile, mtime), d, workdir=ud.clonedir)
             runfetchcmd("touch %s.done" % ud.fullmirror, d)
 
     def clone_shallow_local(self, ud, dest, d):

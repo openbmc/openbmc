@@ -11,7 +11,7 @@ Rsyslog is an enhanced syslogd supporting, among others, MySQL,\
 
 DEPENDS = "zlib libestr libfastjson bison-native flex-native liblogging"
 HOMEPAGE = "http://www.rsyslog.com/"
-LICENSE = "GPLv3 & LGPLv3 & Apache-2.0"
+LICENSE = "GPL-3.0-only & LGPL-3.0-only & Apache-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=51d9635e646fb75e1b74c074f788e973 \
                     file://COPYING.LESSER;md5=cb7903f1e5c39ae838209e130dca270a \
                     file://COPYING.ASL20;md5=052f8a09206615ab07326ff8ce2d9d32\

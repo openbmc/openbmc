@@ -36,7 +36,7 @@ python () {
         return
 
     tos = d.getVar("TARGET_OS")
-    whitelist = ["mingw32"]
+    tos_known = ["mingw32"]
     extralibcs = [""]
     if "musl" in d.getVar("BASECANADIANEXTRAOS"):
         extralibcs.append("musl")
@@ -51,8 +51,8 @@ python () {
                 entry = entry + "-gnu" + variant
             elif libc:
                 entry = entry + "-" + libc
-            whitelist.append(entry)
-    if tos not in whitelist:
+            tos_known.append(entry)
+    if tos not in tos_known:
         bb.fatal("Building cross-candian for an unknown TARGET_SYS (%s), please update cross-canadian.bbclass" % d.getVar("TARGET_SYS"))
 
     for n in ["PROVIDES", "DEPENDS"]:

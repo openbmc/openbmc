@@ -153,7 +153,7 @@ class BSPCheckLayer(OECheckLayerTestCase):
                 # do_build can be ignored: it is know to have
                 # different signatures in some cases, for example in
                 # the allarch ca-certificates due to RDEPENDS=openssl.
-                # That particular dependency is whitelisted via
+                # That particular dependency is marked via
                 # SIGGEN_EXCLUDE_SAFE_RECIPE_DEPS, but still shows up
                 # in the sstate signature hash because filtering it
                 # out would be hard and running do_build multiple

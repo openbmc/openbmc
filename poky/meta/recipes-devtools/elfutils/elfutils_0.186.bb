@@ -102,8 +102,8 @@ BBCLASSEXTEND = "native nativesdk"
 # Package utilities separately
 PACKAGES =+ "${PN}-binutils libelf libasm libdw libdebuginfod"
 
-# shared libraries are licensed GPLv2 or GPLv3+, binaries GPLv3+
-# according to NEWS file:
+# Shared libraries are licensed GPL-2.0-only or GPL-3.0-or-later, binaries
+# GPL-3.0-or-later. According to NEWS file:
 # "The license is now GPLv2/LGPLv3+ for the libraries and GPLv3+ for stand-alone
 # programs. There is now also a formal CONTRIBUTING document describing how to
 # submit patches."

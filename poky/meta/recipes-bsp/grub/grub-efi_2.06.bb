@@ -46,11 +46,21 @@ EXTRA_OECONF += "--enable-efiemu=no"
 
 do_mkimage() {
 	cd ${B}
+
+	GRUB_MKIMAGE_MODULES="${GRUB_BUILDIN}"
+
+	# If 'all' is included in GRUB_BUILDIN we will include all available grub2 modules
+	if [ "${@ bb.utils.contains('GRUB_BUILDIN', 'all', 'True', 'False', d)}" = "True" ]; then
+		bbdebug 1 "Including all available modules"
+		# Get the list of all .mod files in grub-core build directory
+		GRUB_MKIMAGE_MODULES=$(find ${B}/grub-core/ -type f -name "*.mod" -exec basename {} .mod \;)
+	fi
+
 	# Search for the grub.cfg on the local boot media by using the
 	# built in cfg file provided via this recipe
-	grub-mkimage -c ../cfg -p ${EFIDIR} -d ./grub-core/ \
+	grub-mkimage -v -c ../cfg -p ${EFIDIR} -d ./grub-core/ \
 	               -O ${GRUB_TARGET}-efi -o ./${GRUB_IMAGE_PREFIX}${GRUB_IMAGE} \
-	               ${GRUB_BUILDIN}
+	               ${GRUB_MKIMAGE_MODULES}
 }
 
 addtask mkimage before do_install after do_compile
@@ -70,6 +80,7 @@ do_install() {
     install -m 644 ${B}/${GRUB_IMAGE_PREFIX}${GRUB_IMAGE} ${D}${EFI_FILES_PATH}/${GRUB_IMAGE}
 }
 
+# To include all available modules, add 'all' to GRUB_BUILDIN
 GRUB_BUILDIN ?= "boot linux ext2 fat serial part_msdos part_gpt normal \
                  efi_gop iso9660 configfile search loadenv test"
 

@@ -5,7 +5,7 @@ provides the server daemon for the iSCSI protocol, as well as the utility \
 programs used to manage it. iSCSI is a protocol for distributed \
 disk access using SCSI commands sent over Internet Protocol networks."
 HOMEPAGE = "http://www.open-iscsi.com/"
-LICENSE = "GPLv2 & LGPLv2.1"
+LICENSE = "GPL-2.0-only & LGPL-2.1-only"
 SECTION = "net"
 DEPENDS = "openssl flex-native bison-native open-isns util-linux kmod"
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"

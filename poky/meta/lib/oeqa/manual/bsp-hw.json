@@ -26,7 +26,7 @@
                     "expected_results": ""
                 },
                 "5": {
-                    "action": "Remove USB, and reboot into new installed system. \nNote:   If installation was successfully completed and received this message \"\"(sdx): Volume was not properly unmounted...Please run fsck.\"\" ignore it because this was whitelisted according to bug 9652.",
+                    "action": "Remove USB, and reboot into new installed system. \nNote:   If installation was successfully completed and received this message \"\"(sdx): Volume was not properly unmounted...Please run fsck.\"\" ignore it because this was allowed according to bug 9652.",
                     "expected_results": ""
                 }
             },

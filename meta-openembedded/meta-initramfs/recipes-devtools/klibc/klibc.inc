@@ -2,7 +2,7 @@ DESCRIPTION = "klibc is intended to be a minimalistic libc subset for \
 use with initramfs.  It is deliberately written for small size, \
 minimal entaglement, and portability, not speed."
 SECTION = "libs"
-LICENSE = "BSD-3-Clause & GPL-2.0 & MIT & Zlib"
+LICENSE = "BSD-3-Clause & GPL-2.0-only & MIT & Zlib"
 LIC_FILES_CHKSUM = "file://usr/klibc/LICENSE;md5=d75181f10e998c21eb147f6d2e43ce8b"
 DEPENDS = "linux-libc-headers perl-native"
 

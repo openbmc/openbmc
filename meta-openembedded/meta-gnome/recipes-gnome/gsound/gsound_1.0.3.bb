@@ -1,5 +1,5 @@
 SUMMARY = "Small gobject library for playing system sounds"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=447b837ae57f08b7060593ac6256163f"
 
 DEPENDS = " \

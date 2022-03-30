@@ -1,6 +1,3 @@
-require rust.inc
-inherit cross
-
 python do_rust_gen_targets () {
     wd = d.getVar('WORKDIR') + '/targets/'
     # It is important 'TARGET' is last here so that it overrides our less
@@ -30,11 +27,7 @@ INHIBIT_DEFAULT_RUST_DEPS = "1"
 # so it might make sense to take it's mapping. For now, though, we just mention
 # the bits we need explicitly.
 DEPENDS += "rust-llvm-native"
-DEPENDS += "virtual/${TARGET_PREFIX}gcc virtual/${TARGET_PREFIX}compilerlibs virtual/libc"
 DEPENDS += "rust-native"
-
-PROVIDES = "virtual/${TARGET_PREFIX}rust"
-PN = "rust-cross-${TUNE_PKGARCH}-${TCLIBC}"
 
 # In the cross compilation case, rustc doesn't seem to get the rpath quite
 # right. It manages to include '../../lib/${TARGET_PREFIX}', but doesn't

@@ -1,6 +1,6 @@
 SUMMARY = "(OTR) Messaging allows you to have private conversations over instant messaging"
 HOMEPAGE = "https://otr.cypherpunks.ca/"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=92fe174bad6da3763f6e9e9eaff6df24"
 DEPENDS = "libgcrypt libotr pidgin gtk+ intltool-native glib-2.0 glib-2.0-native"
 REQUIRED_DISTRO_FEATURES = "x11"

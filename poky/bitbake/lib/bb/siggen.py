@@ -156,6 +156,9 @@ class SignatureGenerator(object):
 
         return DataCacheProxy()
 
+    def exit(self):
+        return
+
 class SignatureGeneratorBasic(SignatureGenerator):
     """
     """
@@ -488,6 +491,18 @@ class SignatureGeneratorUniHashMixIn(object):
         if getattr(self, '_client', None) is None:
             self._client = hashserv.create_client(self.server)
         return self._client
+
+    def reset(self, data):
+        if getattr(self, '_client', None) is not None:
+            self._client.close()
+            self._client = None 
+        return super().reset(data)
+
+    def exit(self):
+        if getattr(self, '_client', None) is not None:
+            self._client.close()
+            self._client = None
+        return super().exit()
 
     def get_stampfile_hash(self, tid):
         if tid in self.taskhash:
@@ -1002,7 +1017,7 @@ def compare_sigfiles(a, b, recursecb=None, color=False, collapsed=False):
         if changed:
             for dep in sorted(changed):
                 if not collapsed:
-                    output.append(color_format("{color_title}Hash for dependent task %s changed{color_default} from %s to %s") % (clean_basepath(dep), a[dep], b[dep]))
+                    output.append(color_format("{color_title}Hash for task dependency %s changed{color_default} from %s to %s") % (clean_basepath(dep), a[dep], b[dep]))
                 if callable(recursecb):
                     recout = recursecb(dep, a[dep], b[dep])
                     if recout:

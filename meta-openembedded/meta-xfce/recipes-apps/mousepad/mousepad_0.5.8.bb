@@ -1,6 +1,6 @@
 SUMMARY = "A simple text editor for Xfce"
 SECTION = "x11/application"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
 DEPENDS = "gtk+3 gtksourceview4 xfconf xfce4-dev-tools-native"

@@ -9,41 +9,42 @@ Avoid to call AC_TRY_RUN to check if GSSAPI libraries support SPNEGO
 on cross-compile environment by definition AC_ARG_ENABLE enable-spnego
 
 Signed-off-by: Roy.Li <rongqing.li@windriver.com>
-
 ---
- m4/sasl2.m4 | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+ m4/sasl2.m4 | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/m4/sasl2.m4 b/m4/sasl2.m4
-index 56e0504..cf62607 100644
+index 80371ef..ff70083 100644
 --- a/m4/sasl2.m4
 +++ b/m4/sasl2.m4
-@@ -314,7 +314,18 @@ if test "$gssapi" != no; then
-   cmu_save_LIBS="$LIBS"
-   LIBS="$LIBS $GSSAPIBASE_LIBS"
- 
--  AC_MSG_CHECKING([for SPNEGO support in GSSAPI libraries])
-+  AC_ARG_ENABLE([spnego],
-+              [AC_HELP_STRING([--enable-spnego=<DIR>],
-+                              [enable SPNEGO support in GSSAPI libraries [no]])],
-+              [spnego=$enableval],
-+              [spnego=no])
-+
-+  if test "$spnego" = no; then
-+       echo "no"
-+  elif test "$spnego" = yes; then
-+       AC_DEFINE(HAVE_GSS_SPNEGO,,[Define if your GSSAPI implementation supports SPNEGO])
-+  else
-+       AC_MSG_CHECKING([for SPNEGO support in GSSAPI libraries])
-   AC_TRY_RUN([
+@@ -316,6 +316,18 @@ if test "$gssapi" != no; then
+   AC_CACHE_CHECK([for SPNEGO support in GSSAPI libraries],[ac_cv_gssapi_supports_spnego],[
+     cmu_save_LIBS="$LIBS"
+     LIBS="$LIBS $GSSAPIBASE_LIBS"
++    AC_ARG_ENABLE([spnego],
++                [AC_HELP_STRING([--enable-spnego=<DIR>],
++                                [enable SPNEGO support in GSSAPI libraries [no]])],
++                [spnego=$enableval],
++                [spnego=no])
++  
++    if test "$spnego" = no; then
++         echo "no"
++    elif test "$spnego" = yes; then
++         AC_DEFINE(HAVE_GSS_SPNEGO,,[Define if your GSSAPI implementation supports SPNEGO])
++    else
++         AC_MSG_CHECKING([for SPNEGO support in GSSAPI libraries])
+     AC_TRY_RUN([
  #ifdef HAVE_GSSAPI_H
  #include <gssapi.h>
-@@ -341,7 +352,7 @@ int main(void)
- 	AC_MSG_RESULT(yes) ],
- 	AC_MSG_RESULT(no))
-   LIBS="$cmu_save_LIBS"
+@@ -343,7 +355,7 @@ int main(void)
+   AS_IF([test "$ac_cv_gssapi_supports_spnego" = yes],[
+     AC_DEFINE(HAVE_GSS_SPNEGO,,[Define if your GSSAPI implementation supports SPNEGO])
+   ])
 -
 +   fi
  else
    AC_MSG_RESULT([disabled])
  fi
+-- 
+2.25.1
+

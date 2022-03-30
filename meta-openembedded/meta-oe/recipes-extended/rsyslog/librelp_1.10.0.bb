@@ -1,7 +1,7 @@
 SUMMARY = "A reliable logging library"
 HOMEPAGE = "https://github.com/rsyslog/librelp"
 
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1fb9c10ed9fd6826757615455ca893a9"
 
 DEPENDS = "gmp nettle libidn zlib gnutls openssl"

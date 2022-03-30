@@ -1,0 +1,33 @@
+CVE: CVE-2022-0908
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From ef5a0bf271823df168642444d051528a68205cb0 Mon Sep 17 00:00:00 2001
+From: Even Rouault <even.rouault@spatialys.com>
+Date: Thu, 17 Feb 2022 15:28:43 +0100
+Subject: [PATCH 4/6] TIFFFetchNormalTag(): avoid calling memcpy() with a null
+ source pointer and size of zero (fixes #383)
+
+---
+ libtiff/tif_dirread.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/libtiff/tif_dirread.c b/libtiff/tif_dirread.c
+index d84147a0..4e8ce729 100644
+--- a/libtiff/tif_dirread.c
++++ b/libtiff/tif_dirread.c
+@@ -5079,7 +5079,10 @@ TIFFFetchNormalTag(TIFF* tif, TIFFDirEntry* dp, int recover)
+ 								_TIFFfree(data);
+ 							return(0);
+ 						}
+-						_TIFFmemcpy(o,data,(uint32_t)dp->tdir_count);
++						if (dp->tdir_count > 0 )
++						{
++							_TIFFmemcpy(o,data,(uint32_t)dp->tdir_count);
++						}
+ 						o[(uint32_t)dp->tdir_count]=0;
+ 						if (data!=0)
+ 							_TIFFfree(data);
+-- 
+2.25.1
+

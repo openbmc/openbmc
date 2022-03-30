@@ -8,7 +8,7 @@ DESCRIPTION = "\
 HOMEPAGE = "https://github.com/makedumpfile/makedumpfile"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
-LICENSE = "GPLv2.0"
+LICENSE = "GPL-2.0-only"
 
 SRCBRANCH ?= "master"
 SRCREV = "06ef8e2b814feb08a668b7a3783c86674e49a7b1"

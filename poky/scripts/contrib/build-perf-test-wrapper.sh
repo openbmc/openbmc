@@ -87,21 +87,10 @@ if [ $# -ne 0 ]; then
     exit 1
 fi
 
-if [ -n "$email_to" ]; then
-    if ! [ -x "$(command -v phantomjs)" ]; then
-        echo "ERROR: Sending email needs phantomjs."
-        exit 1
-    fi
-    if ! [ -x "$(command -v optipng)" ]; then
-        echo "ERROR: Sending email needs optipng."
-        exit 1
-    fi
-fi
-
 # Open a file descriptor for flock and acquire lock
 LOCK_FILE="/tmp/oe-build-perf-test-wrapper.lock"
 if ! exec 3> "$LOCK_FILE"; then
-    echo "ERROR: Unable to open lock file"
+    echo "ERROR: Unable to open loemack file"
     exit 1
 fi
 if ! flock -n 3; then
@@ -226,7 +215,7 @@ if [ -n "$results_repo" ]; then
     if [ -n "$email_to" ]; then
         echo "Emailing test report"
         os_name=`get_os_release_var PRETTY_NAME`
-        "$script_dir"/oe-build-perf-report-email.py --to "$email_to" --subject "Build Perf Test Report for $os_name" --text $report_txt --html $report_html "${OE_BUILD_PERF_REPORT_EMAIL_EXTRA_ARGS[@]}"
+        "$script_dir"/oe-build-perf-report-email.py --to "$email_to" --subject "Build Perf Test Report for $os_name" --text $report_txt "${OE_BUILD_PERF_REPORT_EMAIL_EXTRA_ARGS[@]}"
     fi
 
     # Upload report files, unless we're on detached head

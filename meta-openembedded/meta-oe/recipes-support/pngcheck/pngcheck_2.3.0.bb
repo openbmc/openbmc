@@ -1,6 +1,6 @@
 SUMMARY = "pngcheck verifies the integrity of PNG, JNG and MNG files"
 HOMEPAGE = "http://www.libpng.org/pub/png/apps/pngcheck.html"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://gpl/COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 DEPENDS = "zlib libpng"
 

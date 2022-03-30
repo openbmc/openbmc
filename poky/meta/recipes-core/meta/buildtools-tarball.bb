@@ -99,11 +99,14 @@ TOOLCHAIN_NEED_CONFIGSITE_CACHE = ""
 # The recipe doesn't need any default deps
 INHIBIT_DEFAULT_DEPS = "1"
 
+# Directory in testsdk that contains testcases
+TESTSDK_CASES = "buildtools-cases"
+
 python do_testsdk() {
     import oeqa.sdk.testsdk
     testsdk = oeqa.sdk.testsdk.TestSDK()
 
-    cases_path = os.path.join(os.path.abspath(os.path.dirname(oeqa.sdk.testsdk.__file__)), "buildtools-cases")
+    cases_path = os.path.join(os.path.abspath(os.path.dirname(oeqa.sdk.testsdk.__file__)), d.getVar("TESTSDK_CASES"))
     testsdk.context_executor_class.default_cases = cases_path
 
     testsdk.run(d)

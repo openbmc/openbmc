@@ -2,7 +2,7 @@ DESCRIPTION = "This package includes some useful diagnostics tools for \
 IPv6 networks, including ndisc6, rdisc6, tcptraceroute6 and traceroute6."
 SECTION = "net"
 HOMEPAGE = "http://www.remlab.net/ndisc6/"
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 PV = "1.0.5"

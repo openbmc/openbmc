@@ -1,7 +1,7 @@
 SUMMARY = "Hierarchical, reference counted memory pool system with destructors"
 HOMEPAGE = "http://tevent.samba.org"
 SECTION = "libs"
-LICENSE = "LGPLv3+"
+LICENSE = "LGPL-3.0-or-later"
 
 DEPENDS += "libtalloc libtirpc"
 RDEPENDS:python3-tevent = "python3"

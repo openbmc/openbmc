@@ -1,6 +1,6 @@
 DESCRIPTION = "The CAPS Audio Plugin Suite - LADSPA plugin suite"
 HOMEPAGE = "http://quitte.de/dsp/caps.html"
-LICENSE = "GPL-3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 SRC_URI = "http://quitte.de/dsp/${BPN}_${PV}.tar.bz2 \

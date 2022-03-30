@@ -13,13 +13,14 @@ http://lists.gnu.org/archive/html/libtool/2010-10/msg00048.html
 
 Upstream-Status: Submitted [https://lists.gnu.org/archive/html/libtool-patches/2021-10/msg00014.html]
 
-diff --git a/m4/libtool.m4 b/m4/libtool.m4
---- a/m4/libtool.m4
-+++ b/m4/libtool.m4
-@@ -1215,28 +1215,28 @@ _LT_DECL([], [ECHO], [1], [An echo program that protects backslashes])
- # ----------------
+Index: libtool-2.4.7/m4/libtool.m4
+===================================================================
+--- libtool-2.4.7.orig/m4/libtool.m4
++++ libtool-2.4.7/m4/libtool.m4
+@@ -1244,28 +1244,28 @@ _LT_DECL([], [ECHO], [1], [An echo progr
  AC_DEFUN([_LT_WITH_SYSROOT],
- [AC_MSG_CHECKING([for sysroot])
+ [m4_require([_LT_DECL_SED])dnl
+ AC_MSG_CHECKING([for sysroot])
 -AC_ARG_WITH([sysroot],
 -[AS_HELP_STRING([--with-sysroot@<:@=DIR@:>@],
 +AC_ARG_WITH([libtool-sysroot],
@@ -40,8 +41,8 @@ diff --git a/m4/libtool.m4 b/m4/libtool.m4
     fi
     ;; #(
   /*)
--   lt_sysroot=`echo "$with_sysroot" | sed -e "$sed_quote_subst"`
-+   lt_sysroot=`echo "$with_libtool_sysroot" | sed -e "$sed_quote_subst"`
+-   lt_sysroot=`echo "$with_sysroot" | $SED -e "$sed_quote_subst"`
++   lt_sysroot=`echo "$with_libtool_sysroot" | $SED -e "$sed_quote_subst"`
     ;; #(
   no|'')
     ;; #(
@@ -51,10 +52,11 @@ diff --git a/m4/libtool.m4 b/m4/libtool.m4
     AC_MSG_ERROR([The sysroot must be an absolute path.])
     ;;
  esac
-diff --git a/tests/sysroot.at b/tests/sysroot.at
---- a/tests/sysroot.at
-+++ b/tests/sysroot.at
-@@ -64,7 +64,7 @@ while read file; do
+Index: libtool-2.4.7/tests/sysroot.at
+===================================================================
+--- libtool-2.4.7.orig/tests/sysroot.at
++++ libtool-2.4.7/tests/sysroot.at
+@@ -65,7 +65,7 @@ while read file; do
  done])
  
  LDFLAGS="$LDFLAGS --sysroot=$sysroot -no-undefined"
@@ -63,7 +65,7 @@ diff --git a/tests/sysroot.at b/tests/sysroot.at
  
  #???
  if test PATH = "$shlibpath_var"; then
-@@ -114,7 +114,7 @@ AM_INIT_AUTOMAKE([foreign])
+@@ -115,7 +115,7 @@ AM_INIT_AUTOMAKE([foreign])
  AC_PROG_CC
  AC_CONFIG_SRCDIR([lib2.c])
  LT_INIT
@@ -72,7 +74,7 @@ diff --git a/tests/sysroot.at b/tests/sysroot.at
  AC_SUBST([sysroot])
  AC_OUTPUT(Makefile)
  ]])
-@@ -155,7 +155,7 @@ AM_INIT_AUTOMAKE([foreign])
+@@ -156,7 +156,7 @@ AM_INIT_AUTOMAKE([foreign])
  AC_PROG_CC
  AC_CONFIG_SRCDIR([prog.c])
  LT_INIT

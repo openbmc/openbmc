@@ -15,4 +15,6 @@ S = "${WORKDIR}/git"
 
 inherit setuptools3
 
+PIP_INSTALL_PACKAGE = "marshmallow"
+
 RDEPENDS:${PN} += "python3-core"

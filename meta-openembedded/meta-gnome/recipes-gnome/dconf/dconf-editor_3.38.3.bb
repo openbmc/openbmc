@@ -1,5 +1,5 @@
 SUMMARY = "Configuration editor for dconf"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 GNOMEBASEBUILDCLASS = "meson"

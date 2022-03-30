@@ -9,7 +9,7 @@ done when adding or deleting new users."
 SUMMARY = "High-performance and highly configurable RADIUS server"
 HOMEPAGE = "http://www.freeradius.org/"
 SECTION = "System/Servers"
-LICENSE = "GPLv2 & LGPLv2+"
+LICENSE = "GPL-2.0-only & LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=eb723b61539feef013de476e68b5c50a"
 DEPENDS = "openssl-native openssl libidn libtool libpcap libtalloc"
 

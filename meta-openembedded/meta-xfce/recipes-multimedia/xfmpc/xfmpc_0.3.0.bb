@@ -1,6 +1,6 @@
 SUMMARY = "Music Player Daemon (MPD) client written in GTK+"
 HOMEPAGE = "https://goodies.xfce.org/projects/applications/xfmpc"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 DEPENDS = "libxfce4util libxfce4ui libmpd vala-native"
 

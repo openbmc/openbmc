@@ -16,12 +16,12 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 index b722d4fb..ce88b9e3 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -45,7 +45,7 @@ endif()
+@@ -52,7 +52,7 @@ endif()
  
  # build dependencies
  find_package(Gpgme REQUIRED)
 -PKG_CHECK_MODULES (LIBSOLV REQUIRED libsolv)
 +PKG_CHECK_MODULES (LIBSOLV REQUIRED libsolv libsolvext)
  set(LIBSOLV_LIBRARY ${LIBSOLV_LIBRARIES})
- find_package(OpenSSL REQUIRED)
+
  

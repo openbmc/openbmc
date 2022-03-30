@@ -2,7 +2,7 @@ SUMMARY = "RTMP Dump"
 DESCRIPTION = "rtmpdump is a toolkit for RTMP streams. All forms of RTMP are \
 supported, including rtmp://, rtmpt://, rtmpe://, rtmpte://, and rtmps://."
 HOMEPAGE = "http://rtmpdump.mplayerhq.hu/"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 DEPENDS = "gnutls zlib"

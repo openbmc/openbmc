@@ -4,7 +4,7 @@ DESCRIPTION = "Libao is a cross-platform audio library that allows programs to \
 SECTION = "multimedia"
 HOMEPAGE = "https://www.xiph.org/ao/"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
 SRC_URI="http://downloads.xiph.org/releases/ao/${BP}.tar.gz"

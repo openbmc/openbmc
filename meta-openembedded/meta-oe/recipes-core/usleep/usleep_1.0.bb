@@ -1,6 +1,6 @@
 SUMMARY = "A user tool to support sleeping some number of microseconds"
 SECTION = "base"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 S = "${WORKDIR}"

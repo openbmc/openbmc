@@ -4,7 +4,7 @@ and group accounts"
 HOMEPAGE = "https://pagure.io/libuser"
 BUGTRACKER = "https://pagure.io/libuser/issues"
 
-LICENSE = "LGPLv2"
+LICENSE = "LGPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5f30f0716dfdd0d91eb439ebec522ec2 \
                     file://lib/user.h;endline=19;md5=76b301f63c39fa992062395efbdc9558 \
                     file://samples/testuser.c;endline=19;md5=3b87fa660fa3f4a6bb31d624afe30ba1"

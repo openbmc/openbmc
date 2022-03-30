@@ -1,0 +1,32 @@
+From b2187b45f61ce362a9d58d9081d66daddb4e577f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 20 Mar 2022 15:54:14 -0700
+Subject: [PATCH] geany.m4: Do not tinker with pkg-config paths
+
+OE sets up these paths correctly w.r.t. target sysroot
+
+Upstream-Status: Inappropriate [OE-Specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ build/geany.m4 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/build/geany.m4
++++ b/build/geany.m4
+@@ -32,7 +32,8 @@ AC_DEFUN([GP_CHECK_GEANY],
+ [
+     AC_REQUIRE([PKG_PROG_PKG_CONFIG])
+ 
+-    GP_GEANY_PKG_CONFIG_PATH_PUSH
++    dnl GP_GEANY_PKG_CONFIG_PATH_PUSH
++    AC_REQUIRE([_GP_GEANY_LIBDIR])
+ 
+     PKG_CHECK_MODULES([GEANY], [geany >= $1])
+     geanypluginsdir=$geany_libdir/geany
+@@ -40,5 +41,5 @@ AC_DEFUN([GP_CHECK_GEANY],
+     AC_SUBST([geanypluginsdir])
+     AC_SUBST([GEANY_VERSION])
+ 
+-    GP_GEANY_PKG_CONFIG_PATH_POP
++    dnl GP_GEANY_PKG_CONFIG_PATH_POP
+ ])

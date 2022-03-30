@@ -6,7 +6,9 @@ SECTION = "console/utils"
 LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
 
-SRC_URI = "${GNU_MIRROR}/grep/grep-${PV}.tar.xz"
+SRC_URI = "${GNU_MIRROR}/grep/grep-${PV}.tar.xz \
+           file://0001-mcontext-is-not-a-standard-layout-so-glibc-and-musl-.patch \
+          "
 
 SRC_URI[sha256sum] = "5c10da312460aec721984d5d83246d24520ec438dd48d7ab5a05dbc0d6d6823c"
 

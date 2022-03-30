@@ -1,6 +1,6 @@
 SUMMARY = "New set of tools for working with SquashFS images"
 SECTION = "base"
-LICENSE = "GPL-3.0+ & LGPL-3.0+ & MIT & BSD-2-Clause & Zlib"
+LICENSE = "GPL-3.0-or-later & LGPL-3.0-or-later & MIT & BSD-2-Clause & Zlib"
 LIC_FILES_CHKSUM = "file://COPYING.md;md5=c0de2c0aca56349dab98e97992316f7e \
                     file://licenses/GPLv3.txt;md5=1ebbd3e34237af26da5dc08a4e440464 \
                     file://licenses/hash_table.txt;md5=874823605326caeaabaa95bfbd0f9fb0 \

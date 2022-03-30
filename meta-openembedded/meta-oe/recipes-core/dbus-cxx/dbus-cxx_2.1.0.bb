@@ -2,7 +2,7 @@ SUMMARY = "D-Bus wrapper in C++ for dbus"
 HOMEPAGE = "https://dbus-cxx.github.io/"
 BUGTRACKER = "https://github.com/libsigcplusplus/libsigcplusplus/issues"
 SECTION = "base"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4cf0188f02184e1e84b9586ac53c3f83"
 
 SRC_URI = "git://github.com/dbus-cxx/dbus-cxx.git;branch=master;protocol=https \

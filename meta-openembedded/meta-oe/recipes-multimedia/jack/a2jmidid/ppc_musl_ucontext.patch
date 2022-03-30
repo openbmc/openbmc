@@ -1,0 +1,19 @@
+Add musl/ppc mcontext differences specific checks to choose
+correct gregs and context structure definitions
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/sigsegv.c
++++ b/sigsegv.c
+@@ -95,7 +95,11 @@ static void signal_segv(int signum, sigi
+     for(i = 0; i < NGREG; i++)
+         a2j_error("reg[%02d]       = 0x" REGFORMAT, i,
+ #if defined(__powerpc__) && !defined(__powerpc64__)
++# if defined(__GLIBC__)
+                 ucontext->uc_mcontext.uc_regs[i]
++# else
++                ucontext->uc_regs->gregs[i]
++# endif
+ #elif defined(__powerpc64__)
+                 ucontext->uc_mcontext.gp_regs[i]
+ #elif defined(__sparc__) && defined(__arch64__)

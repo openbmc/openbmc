@@ -1,0 +1,35 @@
+From 4e83392e840fa7b05e778710b8c202d102477a13 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 27 Aug 2018 21:24:20 +0800
+Subject: [PATCH] `named/lwresd -V' and start log hide build options
+
+The build options expose build path directories, so hide them.
+[snip]
+$ named -V
+|built by make with *** (options are hidden)
+[snip]
+
+Upstream-Status: Inappropriate [oe-core specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Refreshed for 9.16.0
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index bf20690..c5d330f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -35,7 +35,7 @@ AC_DEFINE([PACKAGE_VERSION_EXTRA], ["][bind_VERSION_EXTRA]["], [BIND 9 Extra par
+ AC_DEFINE([PACKAGE_DESCRIPTION], [m4_ifnblank(bind_DESCRIPTION, [" ]bind_DESCRIPTION["], [])], [An extra string to print after PACKAGE_STRING])
+ AC_DEFINE([PACKAGE_SRCID], ["][bind_SRCID]["], [A short hash from git])
+ 
+-bind_CONFIGARGS="${ac_configure_args:-default}"
++bind_CONFIGARGS="(removed for reproducibility)"
+ AC_DEFINE_UNQUOTED([PACKAGE_CONFIGARGS], ["$bind_CONFIGARGS"], [Either 'defaults' or used ./configure options])
+ 
+ AC_DEFINE([PACKAGE_BUILDER], ["make"], [make or Visual Studio])

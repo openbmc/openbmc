@@ -19,6 +19,9 @@ EXTRA_OECMAKE =  "-DPYBIND11_TEST=OFF"
 
 inherit cmake setuptools3 python3native
 
+PIP_INSTALL_DIST_PATH = "${S}/dist"
+PIP_INSTALL_PACKAGE = "pybind11"
+
 do_configure() {
 	cmake_do_configure
 }

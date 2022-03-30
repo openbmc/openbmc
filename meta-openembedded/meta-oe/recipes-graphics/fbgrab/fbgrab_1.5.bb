@@ -1,6 +1,6 @@
 SUMMARY = "FBGrab is a framebuffer screenshot program"
 HOMEPAGE = "https://github.com/GunnarMonell/fbgrab"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ea5bed2f60d357618ca161ad539f7c0a"
 SECTION = "console/utils"
 DEPENDS = "libpng zlib"

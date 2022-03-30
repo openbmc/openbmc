@@ -6,7 +6,7 @@ across an interconnecting network to a destination system, either transferring \
 data for a specified time interval, or alternatively transferring a specified \
 number of bytes."
 HOMEPAGE = "http://www.nuttcp.net/Welcome%20Page.html"
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 SECTION = "net"
 LIC_FILES_CHKSUM = "file://${BP}.c;beginline=4;endline=30;md5=496a7c0bb83c07ff528d226bf85e05c5"
 

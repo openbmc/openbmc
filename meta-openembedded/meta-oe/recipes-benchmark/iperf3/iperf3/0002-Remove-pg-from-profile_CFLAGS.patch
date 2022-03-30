@@ -1,4 +1,4 @@
-From 3ae408402635ea21ad90cd722c99ae3334376c91 Mon Sep 17 00:00:00 2001
+From 155ae12f7809e387a379703d8c09f227e430336d Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 14 Jul 2017 13:00:16 -0700
 Subject: [PATCH] Remove -pg from profile_CFLAGS
@@ -7,12 +7,13 @@ musl fails to link with missing gcrt1.o
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+
 ---
  src/Makefile.am | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/Makefile.am b/src/Makefile.am
-index 5be8562..3881aa6 100644
+index 11d3e17..4058cff 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
 @@ -58,9 +58,9 @@ if ENABLE_PROFILING
@@ -27,6 +28,3 @@ index 5be8562..3881aa6 100644
  endif
  
  # Specify the sources and various flags for the test cases
--- 
-2.21.0
-

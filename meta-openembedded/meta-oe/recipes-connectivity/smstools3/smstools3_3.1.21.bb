@@ -1,7 +1,7 @@
 SUMMARY = "SMS Gateway software"
 DESCRIPTION = "The SMS Server Tools 3 is a SMS Gateway software which can send and receive short messages through GSM modems and mobile phones."
 SECTION = "console/network"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=4d21efa1bb2a186360dde4035f860682"
 HOMEPAGE = "http://smstools3.kekekasvi.com"
 

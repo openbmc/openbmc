@@ -1,6 +1,6 @@
 SUMMARY = "Backup, restore, import, and export panel layouts"
 SECTION = "x11/application"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 inherit python3native gettext gtk-icon-cache features_check

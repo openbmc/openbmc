@@ -1,7 +1,7 @@
 SUMMARY = "nmon performance monitor"
 HOMEPAGE = "http://nmon.sf.net"
 SECTION = "console/utils"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://Documentation.txt;md5=dbb13658cf55d687c4f2ff771a696d4a"
 DEPENDS = "ncurses"
 DEPENDS:append:libc-musl = " bsd-headers"

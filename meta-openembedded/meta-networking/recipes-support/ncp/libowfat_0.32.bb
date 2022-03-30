@@ -3,7 +3,7 @@ DESCRIPTION = "libowfat is a library of general purpose APIs extracted from Dan 
 Bernstein's software (libdjb), reimplemented and covered by the GNU \
 General Public License Version 2 (no later versions)."
 HOMEPAGE = "http://www.fefe.de/libowfat"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8ca43cbc842c2336e835926c2166c28b"
 
 SRC_URI = "https://www.fefe.de/${BPN}/${BP}.tar.xz \

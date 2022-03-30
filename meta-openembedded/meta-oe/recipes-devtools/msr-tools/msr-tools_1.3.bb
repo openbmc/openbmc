@@ -1,6 +1,6 @@
 SUMMARY = "utilies to read and write Intel model-specific registers"
 HOMEPAGE = "https://01.org/msr-tools"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://Makefile;beginline=1;endline=11;md5=678a3928c856042424c734f4a7586e65"
 SECTION = "devel"
 

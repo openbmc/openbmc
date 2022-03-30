@@ -58,7 +58,6 @@ if 'sqlite' in settings.DATABASES['default']['ENGINE']:
             return _base_insert(self, *args, **kwargs)
     QuerySet._insert = _insert
 
-    from django.utils import six
     def _create_object_from_params(self, lookup, params):
         """
         Tries to create an object using passed params.
@@ -1717,7 +1716,7 @@ class CustomImageRecipe(Recipe):
 
     def generate_recipe_file_contents(self):
         """Generate the contents for the recipe file."""
-        # If we have no excluded packages we only need to _append
+        # If we have no excluded packages we only need to :append
         if self.excludes_set.count() == 0:
             packages_conf = "IMAGE_INSTALL:append = \" "
 

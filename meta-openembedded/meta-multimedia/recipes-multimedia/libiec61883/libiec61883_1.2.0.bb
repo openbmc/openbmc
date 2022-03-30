@@ -6,7 +6,7 @@ SECTION = "libs/multimedia"
 
 DEPENDS = "libraw1394"
 
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=771782cb6245c7fbbe74bc0ec059beff"
 
 SRC_URI = "https://www.kernel.org/pub/linux/libs/ieee1394/${BPN}-${PV}.tar.xz"

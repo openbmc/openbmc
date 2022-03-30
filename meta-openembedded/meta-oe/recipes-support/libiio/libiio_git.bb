@@ -1,14 +1,14 @@
 SUMMARY = "Library for interfacing with IIO devices"
 HOMEPAGE = "https://wiki.analog.com/resources/tools-software/linux-software/libiio"
 SECTION = "libs"
-LICENSE = "LGPLv2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING.txt;md5=7c13b3376cea0ce68d2d2da0a1b3a72c"
 
-SRCREV = "565bf68eccfdbbf22cf5cb6d792e23de564665c7"
-PV = "0.21+git${SRCPV}"
+SRCREV = "92d6a35f3d8d721cda7d6fe664b435311dd368b4"
+PV = "0.23"
 
 SRC_URI = "git://github.com/analogdevicesinc/libiio.git;protocol=https;branch=master \
-           file://0001-python-Do-not-verify-whether-libiio-is-installed-whe.patch \
+           file://0001-CMake-Move-include-CheckCSourceCompiles-before-its-m.patch \
 "
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
 
@@ -28,16 +28,19 @@ EXTRA_OECMAKE = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '-DWITH_SYSTEMD=ON -DSYSTEMD_UNIT_INSTALL_DIR=${systemd_system_unitdir}', '', d)} \
 "
 
-PACKAGECONFIG ??= "usb_backend network_backend serial_backend"
-
-NETWORK_BACKEND_DEPENDENCIES = "\
-    libxml2 \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'zeroconf', 'avahi', '', d)} \
+PACKAGECONFIG ??= " \
+    usb_backend network_backend serial_backend xml_backend \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'zeroconf', 'dnssd', '', d)} \
 "
 
-PACKAGECONFIG[usb_backend] = "-DWITH_USB_BACKEND=ON,-DWITH_USB_BACKEND=OFF,libusb1 libxml2"
-PACKAGECONFIG[network_backend] = "-DWITH_NETWORK_BACKEND=ON,-DWITH_NETWORK_BACKEND=OFF, ${NETWORK_BACKEND_DEPENDENCIES}"
-PACKAGECONFIG[serial_backend] = "-DWITH_SERIAL_BACKEND=ON,-DWITH_SERIAL_BACKEND=off,libserialport libxml2"
+# network_backend, serial_backend and usb_backend depend on xml_backend, so don't switch it off
+XML_BACKEND_DISABLE = "${@bb.utils.contains_any('PACKAGECONFIG', 'network_backend serial_backend usb_backend', '', '-DWITH_XML_BACKEND=off', d)}"
+
+PACKAGECONFIG[usb_backend] = "-DWITH_USB_BACKEND=ON -DWITH_XML_BACKEND=ON,-DWITH_USB_BACKEND=OFF,libusb1 libxml2"
+PACKAGECONFIG[network_backend] = "-DWITH_NETWORK_BACKEND=ON -DWITH_XML_BACKEND=ON,-DWITH_NETWORK_BACKEND=OFF,libxml2"
+PACKAGECONFIG[serial_backend] = "-DWITH_SERIAL_BACKEND=ON -DWITH_XML_BACKEND=ON,-DWITH_SERIAL_BACKEND=off,libserialport libxml2"
+PACKAGECONFIG[xml_backend] = "-DWITH_XML_BACKEND=ON,${XML_BACKEND_DISABLE},libxml2"
+PACKAGECONFIG[dnssd] = "-DHAVE_DNS_SD=ON,-DHAVE_DNS_SD=off,avahi"
 PACKAGECONFIG[libiio-python3] = "-DPYTHON_BINDINGS=ON,-DPYTHON_BINDINGS=OFF"
 
 PACKAGES =+ "${PN}-iiod ${PN}-tests ${PN}-${PYTHON_PN}"
@@ -70,6 +73,7 @@ do_compile() {
     cmake_do_compile
 }
 
+PIP_INSTALL_PACKAGE = "pylibiio"
 do_install() {
     if ${@bb.utils.contains('PACKAGECONFIG', 'libiio-python3', 'true', 'false', d)}; then
         setuptools3_do_install

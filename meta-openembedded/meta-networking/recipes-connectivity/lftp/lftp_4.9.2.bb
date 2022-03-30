@@ -3,7 +3,7 @@ DESCRIPTION = "LFTP is a sophisticated file transfer program with \
                FISH, SFTP, HTTPS and FTPS protocols"
 HOMEPAGE = "http://lftp.yar.ru/"
 SECTION = "console/network"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 SRC_URI = "http://lftp.yar.ru/ftp/lftp-${PV}.tar.bz2"

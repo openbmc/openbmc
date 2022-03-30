@@ -4,7 +4,7 @@ DESCRIPTION = "libsoc is a C library to interface with common peripherals (gpio,
 
 HOMEPAGE = "https://github.com/jackmitch/libsoc"
 
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://LICENCE;md5=e0bfebea12a718922225ba987b2126a5"
 
 inherit autotools pkgconfig python3-dir

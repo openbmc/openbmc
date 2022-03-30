@@ -1,7 +1,7 @@
 SUMMARY = "The GIMP is the GNU Image Manipulation Program"
 HOMEPAGE = "http://www.gimp.org"
 SECTION = "x11/graphics"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c678957b0c8e964aa6c70fd77641a71e"
 
 DEPENDS = " \
@@ -55,6 +55,7 @@ EXTRA_OECONF:append:toolchain-clang:arm = " --disable-vector-icons"
 EXTRA_OECONF:append:toolchain-clang:riscv32 = " --disable-vector-icons"
 EXTRA_OECONF:append:toolchain-clang:mips = " --disable-vector-icons"
 EXTRA_OECONF:append:toolchain-clang:x86 = " --disable-vector-icons"
+EXTRA_OECONF:append:powerpc = " --disable-vector-icons"
 
 do_configure:append() {
     find ${B} -name Makefile | xargs sed -i s:'-I$(includedir)':'-I.':g

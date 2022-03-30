@@ -1,6 +1,6 @@
 SUMMARY = "Linux DVB API applications and utilities"
 HOMEPAGE = "http://www.linuxtv.org"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 SRCREV = "3d43b280298c39a67d1d889e01e173f52c12da35"
 

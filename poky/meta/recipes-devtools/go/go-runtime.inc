@@ -38,7 +38,6 @@ do_compile() {
 	fi
 	cd ${B}
 }
-do_compile[dirs] =+ "${GOTMPDIR} ${B}/bin ${B}/pkg"
 do_compile[cleandirs] += "${GOTMPDIR} ${B}/bin ${B}/pkg"
 
 do_install() {

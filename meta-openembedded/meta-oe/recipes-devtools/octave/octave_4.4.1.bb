@@ -2,7 +2,7 @@ DESCRIPTION = "High-level language, primarily intended for numerical computation
 HOMEPAGE = "http://www.gnu.org/software/octave/"
 SECTION = "math"
 
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 DEPENDS = "gperf-native texinfo lapack pcre readline"

@@ -1,4 +1,4 @@
-From a5076415ed2c226ca7115d27e0ce51a8a0302090 Mon Sep 17 00:00:00 2001
+From 142f40b80ea908831ef7a4d694cec6a5985a0724 Mon Sep 17 00:00:00 2001
 From: Ed Bartosh <ed.bartosh@linux.intel.com>
 Date: Tue, 13 Jun 2017 14:55:52 +0300
 Subject: [PATCH] Disabled reading host configs.

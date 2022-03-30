@@ -1,6 +1,6 @@
 SUMMARY = "unittest-based test runner with Ant/JUnit like XML reporting"
 HOMEPAGE = "https://github.com/pycontribs/xmlrunner"
-LICENSE = "LGPL-3.0"
+LICENSE = "LGPL-3.0-only"
 LIC_FILES_CHKSUM = "file://PKG-INFO;md5=fa964f202b6ae067ed5828fe43c77c1a"
 
 SRC_URI[md5sum] = "7b0b152ed2d278516aedbc0cac22dfb3"

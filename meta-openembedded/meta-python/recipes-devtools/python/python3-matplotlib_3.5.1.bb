@@ -5,7 +5,7 @@ publication-quality figures in a variety of hardcopy formats \
 and interactive environments across platforms."
 HOMEPAGE = "https://github.com/matplotlib/matplotlib"
 SECTION = "devel/python"
-LICENSE = "PSF"
+LICENSE = "PSF-2.0"
 LIC_FILES_CHKSUM = "\
     file://setup.py;beginline=296;endline=296;md5=20e7ab4d2b2b1395a0e4ab800181eb96 \
     file://LICENSE/LICENSE;md5=afec61498aa5f0c45936687da9a53d74 \

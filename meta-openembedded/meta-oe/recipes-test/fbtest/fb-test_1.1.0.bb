@@ -1,6 +1,6 @@
 SUMMARY = "Test suite for Linux framebuffer"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=eb723b61539feef013de476e68b5c50a"
 
 SRCREV = "063ec650960c2d79ac51f5c5f026cb05343a33e2"

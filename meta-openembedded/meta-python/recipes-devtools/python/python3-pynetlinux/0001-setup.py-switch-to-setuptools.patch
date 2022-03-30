@@ -1,0 +1,32 @@
+From a36abadfb2d135260bef7703a1d0b56e6aa7eeff Mon Sep 17 00:00:00 2001
+From: Tim Orling <tim.orling@konsulko.com>
+Date: Mon, 28 Feb 2022 08:21:33 -0800
+Subject: [PATCH] setup.py: switch to setuptools
+
+In Python 3.10, 'distutils' has been deprecated and is slated for
+removal in Python 3.12.
+
+Switch from 'distutils.core' to 'setuptools'. This also allows for the
+'wheel' binary archive format to be built with 'setup.py bdist_wheel'.
+
+Upstream-Status: Submitted
+[https://github.com/rlisagor/pynetlinux/pull/12]
+
+Signed-off-by: Tim Orling <tim.orling@konsulko.com>
+---
+ setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 670e064..45f1053 100755
+--- a/setup.py
++++ b/setup.py
+@@ -1,4 +1,4 @@
+-from distutils.core import setup
++from setuptools import setup
+ 
+ setup(
+     name = "pynetlinux",
+-- 
+2.30.2
+

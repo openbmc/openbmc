@@ -7,6 +7,6 @@ PYPI_PACKAGE = "PyHamcrest"
 
 SRC_URI[sha256sum] = "dfb19cf6d71743e086fbb761ed7faea5aacbc8ec10c17a08b93ecde39192a3db"
 
-inherit pypi setuptools3
+inherit pypi python_setuptools_build_meta
 
 RDEPENDS:${PN} += "${PYTHON_PN}-six"

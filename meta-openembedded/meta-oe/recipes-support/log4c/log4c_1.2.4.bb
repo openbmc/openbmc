@@ -1,6 +1,6 @@
 SUMMARY = "Log4c is a C library for flexible logging to files, syslog and other destinations"
 HOMEPAGE = "http://log4c.sourceforge.net"
-LICENSE = "LGPLv2"
+LICENSE = "LGPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BP}.tar.gz \

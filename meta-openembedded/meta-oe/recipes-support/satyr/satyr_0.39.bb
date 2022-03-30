@@ -3,7 +3,7 @@ failure processing, analysis, and reporting supporting kernel space, user \
 space, Python, and Java programs"
 
 HOMEPAGE = "https://github.com/abrt/satyr"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 
 inherit autotools-brokensep python3native pkgconfig
 

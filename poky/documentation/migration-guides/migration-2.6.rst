@@ -118,8 +118,7 @@ For names of recipes removed because of this repository change, see the
 ---------------------------------------------------------------------------------------------------
 
 Previously, it was possible for Python recipes that inherited the
-``distutils`` and
-:ref:`distutils3 <ref-classes-distutils3>` classes to fetch code
+``distutils`` and ``distutils3`` classes to fetch code
 during the :ref:`ref-tasks-configure` task to satisfy
 dependencies mentioned in ``setup.py`` if those dependencies were not
 provided in the sysroot (i.e. recipes providing the dependencies were

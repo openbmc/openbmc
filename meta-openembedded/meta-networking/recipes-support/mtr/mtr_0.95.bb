@@ -4,7 +4,7 @@ HOMEPAGE = "http://www.bitwizard.nl/mtr/"
 SECTION = "net"
 DEPENDS = "ncurses"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://ui/mtr.c;beginline=5;endline=16;md5=00a894a39d53726a27386534d1c4e468"
 

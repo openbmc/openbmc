@@ -1,7 +1,7 @@
 SUMMARY = "Enable NumLock in X11 sessions"
 HOMEPAGE = "http://home.kde.org/~seli/numlockx/"
 SECTION = "x11/apps"
-LICENSE = "MIT-X"
+LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=dcb1cc75e21540a4a66b54e38d95b047"
 DEPENDS = "virtual/libx11 libxtst"
 

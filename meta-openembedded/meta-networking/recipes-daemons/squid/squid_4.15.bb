@@ -7,7 +7,7 @@ enabled by default for simpler installation and high performance. \
 "
 HOMEPAGE = "http://www.squid-cache.org"
 SECTION = "web"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 
 MAJ_VER = "${@oe.utils.trim_version("${PV}", 1)}"
 MIN_VER = "${@oe.utils.trim_version("${PV}", 2)}"

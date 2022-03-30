@@ -12,7 +12,7 @@ SRC_URI = "https://github.com/tpm2-software/${BPN}/releases/download/${PV}/${BPN
 
 SRC_URI[sha256sum] = "8900a6603f74310b749b65f23c3461cde6e2a23a5f61058b21004c25f9cf19e8"
 
-inherit autotools pkgconfig systemd extrausers
+inherit autotools pkgconfig systemd useradd
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[oxygen] = ",--disable-doxygen-doc, "
@@ -22,10 +22,9 @@ EXTRA_OECONF += "--enable-static --with-udevrulesdir=${nonarch_base_libdir}/udev
 EXTRA_OECONF += "--runstatedir=/run"
 EXTRA_OECONF:remove = " --disable-static"
 
-EXTRA_USERS_PARAMS = "\
-	useradd -p '' tss; \
-	groupadd tss; \
-	"
+USERADD_PACKAGES = "${PN}"
+GROUPADD_PARAM:${PN} = "--system tss"
+USERADD_PARAM:${PN} = "--system -M -d /var/lib/tpm -s /bin/false -g tss tss"
 
 do_install:append() {
     # Remove /run as it is created on startup

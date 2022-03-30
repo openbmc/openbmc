@@ -1,7 +1,7 @@
 SUMMARY = "A robust, scalable, and reliable SQL server"
 HOMEPAGE = "http://mariadb.org"
 SECTION = "libs"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b1becf0cfa3366e0f4d854d1d264f311"
 
 SRC_URI = "https://archive.mariadb.org/${BP}/source/${BP}.tar.gz \
@@ -12,7 +12,6 @@ SRC_URI = "https://archive.mariadb.org/${BP}/source/${BP}.tar.gz \
            file://mysql-systemd-start \
            file://configure.cmake-fix-valgrind.patch \
            file://support-files-CMakeLists.txt-fix-do_populate_sysroot.patch \
-           file://c11_atomics.patch \
            file://fix-arm-atomic.patch \
            file://0001-Fix-library-LZ4-lookup.patch \
            file://0001-innobase-Define-__NR_futex-if-it-does-not-exist.patch \
@@ -20,11 +19,12 @@ SRC_URI = "https://archive.mariadb.org/${BP}/source/${BP}.tar.gz \
            file://ssize_t.patch \
            file://mm_malloc.patch \
            file://sys_futex.patch \
-           file://0001-MDEV-25785-Add-support-for-OpenSSL-3.0.patch \
+           file://mariadb-openssl3.patch \
+           file://clang-64bit-atomics.patch \
           "
 SRC_URI:append:libc-musl = " file://ppc-remove-glibc-dep.patch"
 
-SRC_URI[sha256sum] = "75bf9b147a95d38160d01a73b098d50a1960563b46d16a235971fff64d99643c"
+SRC_URI[sha256sum] = "da286919ffc9c913282202349709b6ba4ebcd342815e8dae0aa6b6bd8f515cd4"
 
 UPSTREAM_CHECK_URI = "https://github.com/MariaDB/server/releases"
 
@@ -62,17 +62,19 @@ FILES:${PN}-setupdb = "${sysconfdir}/init.d/install_db \
                        ${bindir}/mysql-systemd-start \
                        "
 
-PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)} openssl"
 PACKAGECONFIG:class-native = ""
 PACKAGECONFIG[pam] = ",-DWITHOUT_AUTH_PAM=TRUE,libpam"
 PACKAGECONFIG[valgrind] = "-DWITH_VALGRIND=TRUE,-DWITH_VALGRIND=FALSE,valgrind"
 PACKAGECONFIG[krb5] = ", ,krb5"
 PACKAGECONFIG[zstd] = "-DWITH_ROCKSDB_ZSTD=ON,-DWITH_ROCKSDB_ZSTD=OFF,zstd"
+PACKAGECONFIG[openssl] = "-DWITH_SSL='system',-DWITH_SSL='bundled',openssl"
 
 # MariaDB doesn't link properly with gold
 # https://mariadb.atlassian.net/browse/MDEV-5982
 TARGET_CFLAGS += "-fuse-ld=bfd"
 LDFLAGS += " -pthread"
+
 BUILD_CFLAGS += "-fuse-ld=bfd"
 BUILD_CXXFLAGS += "-fuse-ld=bfd"
 
@@ -203,7 +205,7 @@ RDEPENDS:${PN}-client = "perl perl-module-getopt-long perl-module-file-temp \
 RDEPENDS:${PN}-server = "perl perl-module-getopt-long perl-module-data-dumper \
     perl-module-file-basename perl-module-file-path perl-module-sys-hostname \
     perl-module-file-copy perl-module-file-temp perl-module-posix \
-    ${PN}-client ${PN}-setupdb libdbi-perl libdbd-mysql-perl"
+    ${PN}-client ${PN}-setupdb libdbi-perl libdbd-mysql-perl lzo"
 RDEPENDS:${PN}-leftovers = "perl perl-module-cwd perl-module-benchmark perl-module-getopt-long \
     perl-module-posix perl-module-data-dumper perl-module-sigtrap perl-module-threads \
     perl-module-threads-shared perl-module-io-socket perl-module-sys-hostname perl-module-file-copy \

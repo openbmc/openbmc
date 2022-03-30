@@ -2,7 +2,7 @@ SUMMARY = "H.265/HEVC video encoder"
 DESCRIPTION = "A free software library and application for encoding video streams into the H.265/HEVC format."
 HOMEPAGE = "http://www.videolan.org/developers/x265.html"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LICENSE_FLAGS = "commercial"
 LIC_FILES_CHKSUM = "file://../COPYING;md5=c9e0427bc58f129f99728c62d4ad4091"
 

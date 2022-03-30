@@ -1,6 +1,6 @@
 DESCRIPTION = "A library of C++ classes for flexible logging to files, syslog, IDSA and other destinations."
 HOMEPAGE = "http://sourceforge.net/projects/log4cpp/"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=7fbc338309ac38fefcd64b04bb903e34"
 
 SRC_URI = "http://downloads.sourceforge.net/${BPN}/${BP}.tar.gz \

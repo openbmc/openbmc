@@ -1,7 +1,7 @@
 SUMMARY = "lm_sensors configuration files"
 DESCRIPTION = "Hardware health monitoring configuration files"
 HOMEPAGE = "http://www.lm-sensors.org/"
-LICENSE = "MIT-X"
+LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

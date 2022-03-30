@@ -8,7 +8,7 @@ Normal entries are entries which match one of the many included regular \
 expression files contain in the database."
 SECTION = "Applications/System"
 HOMEPAGE = "http://logcheck.org/"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=c93c0550bd3173f4504b2cbd8991e50b"
 
 SRC_URI = "${DEBIAN_MIRROR}/main/l/${BPN}/${BPN}_${PV}.tar.xz \

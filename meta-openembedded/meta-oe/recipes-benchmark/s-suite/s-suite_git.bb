@@ -1,5 +1,5 @@
 SUMMARY = "Small collection of benchmarks for storage I/O"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b529aaa6a0c50f15d29f89609b5c22f3"
 
 SRCREV = "f97f1ae321d1fb8111a2c638075702ed2512ff07"

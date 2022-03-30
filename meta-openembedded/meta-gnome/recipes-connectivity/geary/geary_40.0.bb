@@ -1,6 +1,6 @@
 SUMMARY = "Geary is an email application built around conversations, for the GNOME 3 desktop."
 SECTION = "network"
-LICENSE = "LGPL-2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2a2244d5a13871ad950c55877546a6a2"
 
 DEPENDS = " \
@@ -30,16 +30,19 @@ DEPENDS = " \
 
 RDEPENDS:${PN} = "gnome-keyring"
 
-inherit meson pkgconfig mime-xdg gtk-icon-cache gobject-introspection vala
+inherit meson pkgconfig mime-xdg gtk-icon-cache gobject-introspection vala features_check
 
 SRC_URI = " \
 	git://github.com/GNOME/geary.git;nobranch=1;protocol=https \
+        file://0001-Util.Cache.Lru-Workaround-missing-generic-type-argum.patch \
+        file://0002-Fix-accessibility-issues-with-initializer-of-constan.patch \
 "
 
 S = "${WORKDIR}/git"
 SRCREV = "e561775c1580a9f60a726355b2b897bfc9cb3382"
 
-REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
+# for gnome-online-accounts
+REQUIRED_DISTRO_FEATURES = "gobject-introspection-data x11"
 
 GIR_MESON_OPTION = ""
 EXTRA_OEMESON = "-Dprofile=release"

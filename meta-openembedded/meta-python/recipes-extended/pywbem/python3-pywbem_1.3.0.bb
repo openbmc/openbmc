@@ -13,7 +13,7 @@ at http://www.dmtf.org/standards/wbem. \
 It also provides a Python provider interface, and is the fastest and easiest \
 way to write providers on the planet."
 HOMEPAGE = "http://pywbem.github.io"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=fbc093901857fcd118f065f900982c24"
 
 SRC_URI[sha256sum] = "5df0af28f81891a3914a12f3a30b11b1981f7b30e09c5a42c011797e7fce9b6a"

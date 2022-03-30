@@ -896,6 +896,7 @@ python buildhistory_eventhandler() {
                 if os.path.isdir(olddir):
                     shutil.rmtree(olddir)
                 rootdir = e.data.getVar("BUILDHISTORY_DIR")
+                bb.utils.mkdirhier(rootdir)
                 entries = [ x for x in os.listdir(rootdir) if not x.startswith('.') ]
                 bb.utils.mkdirhier(olddir)
                 for entry in entries:

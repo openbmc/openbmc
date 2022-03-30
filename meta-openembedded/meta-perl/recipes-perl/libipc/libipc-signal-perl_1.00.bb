@@ -5,7 +5,7 @@ dealing with signals."
 HOMEPAGE = "http://search.cpan.org/~rosch/IPC-Signal-1.00/"
 SECTION = "libs"
 
-LICENSE = "Artistic-1.0|GPLv1+"
+LICENSE = "Artistic-1.0|GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://README;beginline=16;endline=18;md5=f36550f59a0ae5e6e3b0be6a4da60d26"
 
 S = "${WORKDIR}/IPC-Signal-${PV}"

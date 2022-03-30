@@ -11,7 +11,7 @@ do_install () {
     if [ -e "${IMA_EVM_X509}" ]; then
         install -d ${D}/${sysconfdir}/keys
         install "${IMA_EVM_X509}" ${D}${sysconfdir}/keys/x509_evm.der
-        lnr ${D}${sysconfdir}/keys/x509_evm.der ${D}${sysconfdir}/keys/x509_ima.der
+        ln -rs ${D}${sysconfdir}/keys/x509_evm.der ${D}${sysconfdir}/keys/x509_ima.der
     fi
 }
 do_install[file-checksums] += "${@'${IMA_EVM_X509}:%s' % os.path.exists('${IMA_EVM_X509}')}"

@@ -2,7 +2,7 @@ SUMMARY = "Telepathy Framework glib-base helper library"
 DESCRIPTION = "Telepathy Framework: GLib-based helper library for connection managers"
 HOMEPAGE = "http://telepathy.freedesktop.org/wiki/"
 DEPENDS = "glib-2.0 dbus hostpython-runtime-native dbus-native dbus-glib libxslt-native"
-LICENSE = "LGPLv2.1+"
+LICENSE = "LGPL-2.1-or-later"
 
 SRC_URI = "http://telepathy.freedesktop.org/releases/telepathy-glib/${BP}.tar.gz"
 SRC_URI[md5sum] = "cbeb0a24acc26e7f095be281c324da69"

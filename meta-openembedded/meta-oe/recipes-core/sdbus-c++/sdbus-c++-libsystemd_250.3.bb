@@ -3,7 +3,7 @@ DESCRIPTION = "libsystemd static library built specifically as an integral compo
 
 SECTION = "libs"
 
-LICENSE = "LGPLv2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE.LGPL2.1;md5=4fbd65380cdd255951079008b364516c"
 
 inherit meson pkgconfig

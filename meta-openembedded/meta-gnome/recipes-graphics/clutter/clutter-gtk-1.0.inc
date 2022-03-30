@@ -5,7 +5,7 @@ a Clutter stage into any GtkContainer; and GtkClutterActor, a Clutter \
 actor for embedding any GtkWidget inside a Clutter stage."
 HOMEPAGE = "http://www.clutter-project.org/"
 BUGTRACKER = "https://gitlab.gnome.org/GNOME/clutter/-/issues"
-LICENSE = "LGPLv2+"
+LICENSE = "LGPL-2.0-or-later"
 
 CLUTTERBASEBUILDCLASS = "meson"
 inherit clutter features_check upstream-version-is-even gobject-introspection gtk-doc

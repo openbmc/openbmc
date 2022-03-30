@@ -1,6 +1,6 @@
 SUMMARY = "Pure-JavaScript CSS selector engine"
 HOMEPAGE = "https://github.com/jquery/sizzle/wiki"
-LICENSE = "GPL-2.0 & MIT & AFL-2.1"
+LICENSE = "GPL-2.0-only & MIT & AFL-2.1"
 LIC_FILES_CHKSUM = "file://MIT-LICENSE.txt;md5=e43aa437a6a1ba421653bd5034333bf9"
 
 SRC_URI = "http://kr.archive.ubuntu.com/ubuntu/pool/universe/s/sizzle/sizzle_1.10.18.orig.tar.gz"

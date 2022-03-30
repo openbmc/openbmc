@@ -1,7 +1,7 @@
 SUMMARY = "multi-protocol instant messaging client"
 
 SECTION = "x11/network"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 DEPENDS = "python3 virtual/libintl intltool-native libxml2 gconf glib-2.0-native"
 

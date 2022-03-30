@@ -3,7 +3,7 @@ shipped with this package can be used to acquire various kinds of system stats."
 SUMMARY = "Drivers for character-based LCD displays"
 HOMEPAGE = "http://lcdproc.org"
 SECTION = "utils"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 DEPENDS = "ncurses lirc"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=18810669f13b87348459e611d31ab760 \

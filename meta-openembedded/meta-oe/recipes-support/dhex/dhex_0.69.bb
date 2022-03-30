@@ -4,7 +4,7 @@ HOMEPAGE = "http://www.dettus.net/dhex/"
 
 DEPENDS = "ncurses"
 
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://README.txt;beginline=229;endline=241;md5=6f252a421b65bcecf624382ba3c899da"
 
 SRC_URI = "http://www.dettus.net/dhex/dhex_0.69.tar.gz"

@@ -1,6 +1,6 @@
 SUMMARY = "Hard disk temperature monitor daemon"
 SECTION = "console/network"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 
 PR = "r1"
 

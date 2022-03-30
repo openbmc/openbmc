@@ -1,7 +1,7 @@
 SECTION = "console/utils"
 SUMMARY = "Console text editor with good functionality, good choice for vi-haters"
 HOMEPAGE = "http://joe-editor.sourceforge.net/"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/joe-editor/joe-${PV}.tar.gz"

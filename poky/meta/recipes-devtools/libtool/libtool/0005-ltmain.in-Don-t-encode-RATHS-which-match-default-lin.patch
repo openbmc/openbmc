@@ -12,10 +12,11 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
 Upstream-Status: Submitted [https://lists.gnu.org/archive/html/libtool-patches/2021-10/msg00013.html]
 
-diff -u b/build-aux/ltmain.in b/build-aux/ltmain.in
---- b/build-aux/ltmain.in
-+++ b/build-aux/ltmain.in	2012-08-22 11:01:34.191345989 -0700
-@@ -7286,8 +7286,16 @@
+diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
+index 96238350..6fb58ed2 100644
+--- a/build-aux/ltmain.in
++++ b/build-aux/ltmain.in
+@@ -7672,8 +7672,16 @@ EOF
  		  esac
  		fi
  	      else
@@ -34,7 +35,7 @@ diff -u b/build-aux/ltmain.in b/build-aux/ltmain.in
  	      fi
  	    elif test -n "$runpath_var"; then
  	      case "$perm_rpath " in
-@@ -8019,8 +8027,16 @@
+@@ -8406,8 +8414,16 @@ EOF
  	      esac
  	    fi
  	  else
@@ -53,7 +54,7 @@ diff -u b/build-aux/ltmain.in b/build-aux/ltmain.in
  	  fi
  	elif test -n "$runpath_var"; then
  	  case "$perm_rpath " in
-@@ -8070,8 +8086,14 @@
+@@ -8461,8 +8477,14 @@ EOF
  	      esac
  	    fi
  	  else
@@ -70,3 +71,6 @@ diff -u b/build-aux/ltmain.in b/build-aux/ltmain.in
  	  fi
  	elif test -n "$runpath_var"; then
  	  case "$finalize_perm_rpath " in
+-- 
+2.25.1
+

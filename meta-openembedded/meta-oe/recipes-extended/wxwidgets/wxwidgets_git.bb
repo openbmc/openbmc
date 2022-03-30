@@ -24,6 +24,8 @@ DEPENDS += " \
 SRC_URI = " \
     git://github.com/wxWidgets/wxWidgets.git;branch=master;protocol=https \
     file://0001-wx-config.in-Disable-cross-magic-it-does-not-work-fo.patch \
+    file://fix-libdir-for-multilib.patch \
+    file://respect-DESTDIR-when-create-link.patch \
 "
 PV = "3.1.4"
 SRCREV= "6cdaedd42ba59331b3dc4ead50e0bac76ae14c19"
@@ -37,6 +39,7 @@ EXTRA_OECMAKE += " \
     -DwxUSE_LIBPNG=sys \
     -DwxUSE_LIBTIFF=sys \
     -DwxUSE_REGEX=builtin \
+    -DwxPLATFORM_LIB_DIR=${@d.getVar('baselib').replace('lib', '')} \
 "
 EXTRA_OECMAKE:append:libc-musl = " \
     -DHAVE_LOCALE_T=OFF \
@@ -101,4 +104,7 @@ FILES:${PN} += " \
     ${libdir}/wx/ \
 "
 
-FILES:${PN}-dev += "${libdir}/wx/include/"
+FILES:${PN}-dev += " \
+    ${libdir}/wx/include/ \
+    ${libdir}/wx/config/ \
+"

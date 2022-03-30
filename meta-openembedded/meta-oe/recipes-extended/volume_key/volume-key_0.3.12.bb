@@ -1,7 +1,7 @@
 DESCRIPTION = "The volume_key project provides a libvolume_key, a library for manipulating \
 storage volume encryption keys and storing them separately from volumes, and an \
 associated command-line tool, named volume_key."
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 SECTION = "devel/lib"
 
 HOMEPAGE = "https://pagure.io/volume_key"

@@ -12,7 +12,8 @@ SECTION = "devel/python"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=cc572ccc4b18a4b7d13be5d01bc8213e"
 
-SRC_URI[md5sum] = "749ddca1c70be1697fecc443fb1fdb16"
 SRC_URI[sha256sum] = "73977fc746b36cc41184dd43c3fe81323e7b8b06c2bb0826c4f59a20c56bb9f1"
+
+SRC_URI += "file://0001-setup.py-switch-to-setuptools.patch"
 
 inherit setuptools3 pypi

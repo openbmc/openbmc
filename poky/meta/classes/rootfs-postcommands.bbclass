@@ -78,12 +78,8 @@ systemd_create_users () {
 			eval groupadd --root ${IMAGE_ROOTFS} $groupadd_params || true
 		elif [ "$type" = "m" ]; then
 			group=$id
-			if [ ! `grep -q "^${group}:" ${IMAGE_ROOTFS}${sysconfdir}/group` ]; then
-				eval groupadd --root ${IMAGE_ROOTFS} --system $group
-			fi
-			if [ ! `grep -q "^${name}:" ${IMAGE_ROOTFS}${sysconfdir}/passwd` ]; then
-				eval useradd --root ${IMAGE_ROOTFS} --shell /sbin/nologin --system $name
-			fi
+			eval groupadd --root ${IMAGE_ROOTFS} --system $group || true
+			eval useradd --root ${IMAGE_ROOTFS} --shell /sbin/nologin --system $name --no-user-group || true
 			eval usermod --root ${IMAGE_ROOTFS} -a -G $group $name
 		fi
 		done
@@ -376,25 +372,45 @@ rootfs_reproducible () {
 	fi
 }
 
+# Perform a dumb check for unit existence, not its validity
 python overlayfs_qa_check() {
     from oe.overlayfs import mountUnitName
 
-    # this is a dumb check for unit existence, not its validity
     overlayMountPoints = d.getVarFlags("OVERLAYFS_MOUNT_POINT") or {}
     imagepath = d.getVar("IMAGE_ROOTFS")
-    searchpaths = [oe.path.join(imagepath, d.getVar("sysconfdir"), "systemd", "system"),
+    sysconfdir = d.getVar("sysconfdir")
+    searchpaths = [oe.path.join(imagepath, sysconfdir, "systemd", "system"),
                    oe.path.join(imagepath, d.getVar("systemd_system_unitdir"))]
+    fstabpath = oe.path.join(imagepath, sysconfdir, "fstab")
+
+    if not any(os.path.exists(path) for path in [*searchpaths, fstabpath]):
+        return
+
+    fstabDevices = []
+    if os.path.isfile(fstabpath):
+        with open(fstabpath, 'r') as f:
+            for line in f:
+                if line[0] == '#':
+                    continue
+                path = line.split(maxsplit=2)
+                if len(path) > 2:
+                    fstabDevices.append(path[1])
 
     allUnitExist = True;
     for mountPoint in overlayMountPoints:
-        path = d.getVarFlag('OVERLAYFS_MOUNT_POINT', mountPoint)
-        unit = mountUnitName(path)
+        mountPath = d.getVarFlag('OVERLAYFS_MOUNT_POINT', mountPoint)
+        if mountPath in fstabDevices:
+            continue
 
-        if not any(os.path.isfile(oe.path.join(dirpath, unit))
-                   for dirpath in searchpaths):
-            bb.warn('Unit name %s not found in systemd unit directories' % unit)
-            allUnitExist = False;
+        mountUnit = mountUnitName(mountPath)
+        if any(os.path.isfile(oe.path.join(dirpath, mountUnit))
+               for dirpath in searchpaths):
+            continue
+
+        bb.warn('Mount path %s not found in fstat and unit %s not found '
+                'in systemd unit directories' % (mountPath, mountUnit))
+        allUnitExist = False;
 
     if not allUnitExist:
-        bb.fatal('Not all mount units are installed by the BSP')
+        bb.fatal('Not all mount paths and units are installed in the image')
 }

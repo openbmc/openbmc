@@ -30,10 +30,11 @@ python devupstream_virtclass_handler () {
     # Develpment releases are never preferred by default
     d.setVar("DEFAULT_PREFERENCE", "-1")
 
-    uri = bb.fetch2.URI(d.getVar("SRC_URI").split()[0])
+    src_uri = d.getVar("SRC_URI:class-devupstream") or d.getVar("SRC_URI")
+    uri = bb.fetch2.URI(src_uri.split()[0])
 
     if uri.scheme == "git" and not d.getVar("S:class-devupstream"):
-        d.setVar("S:class-devupstream", "${WORKDIR}/git")
+        d.setVar("S", "${WORKDIR}/git")
 
     # Modify the PV if the recipe hasn't already overridden it
     pv = d.getVar("PV")

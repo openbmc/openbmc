@@ -18,19 +18,17 @@ SRC_URI = "git://anongit.freedesktop.org/xorg/driver/xf86-video-intel;branch=mas
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"
 
-DEPENDS += "virtual/libx11 drm libpciaccess pixman"
+DEPENDS += "virtual/libx11 drm libpciaccess pixman cairo libpng libxcb libxcomposite libxdamage libxrender libxrandr libxext libxfixes"
 
-PACKAGECONFIG ??= "sna xvmc uxa udev ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'dri dri2 dri3', '', d)}"
+PACKAGECONFIG ??= "sna xvmc uxa udev ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'dri2 dri3', '', d)}"
 
-PACKAGECONFIG[dri] = "--enable-dri,--disable-dri"
-PACKAGECONFIG[dri1] = "--enable-dri1,--disable-dri1"
 PACKAGECONFIG[dri2] = "--enable-dri2,--disable-dri2"
 PACKAGECONFIG[dri3] = "--enable-dri3,--disable-dri3"
 PACKAGECONFIG[sna] = "--enable-sna,--disable-sna"
 PACKAGECONFIG[uxa] = "--enable-uxa,--disable-uxa"
 PACKAGECONFIG[udev] = "--enable-udev,--disable-udev,udev"
 PACKAGECONFIG[xvmc] = "--enable-xvmc,--disable-xvmc,libxvmc xcb-util"
-PACKAGECONFIG[tools] = "--enable-tools,--disable-tools,libxinerama libxrandr libxdamage libxfixes libxcursor libxtst libxrender libxscrnsaver libxext libx11 pixman libxcb libxshmfence"
+PACKAGECONFIG[tools] = "--enable-tools,--disable-tools,libxinerama libxcursor libxtst libxscrnsaver libxshmfence"
 
 # --enable-kms-only option is required by ROOTLESS_X
 EXTRA_OECONF += '${@oe.utils.conditional( "ROOTLESS_X", "1", " --enable-kms-only", "", d )}'

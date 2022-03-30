@@ -423,18 +423,22 @@ set_icecc_env() {
     bbnote "Using icecc tarball: $ICECC_VERSION"
 }
 
+do_configure[network] = "1"
 do_configure:prepend() {
     set_icecc_env
 }
 
+do_compile[network] = "1"
 do_compile:prepend() {
     set_icecc_env
 }
 
+do_compile_kernelmodules[network] = "1"
 do_compile_kernelmodules:prepend() {
     set_icecc_env
 }
 
+do_install[network] = "1"
 do_install:prepend() {
     set_icecc_env
 }

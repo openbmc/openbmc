@@ -559,6 +559,24 @@ def sanity_check_conffiles(d):
                 bb.fatal(str(e))
             d.setVar("BB_INVALIDCONF", True)
 
+def drop_v14_cross_builds(d):
+    import glob
+    indexes = glob.glob(d.expand("${SSTATE_MANIFESTS}/index-${BUILD_ARCH}_*"))
+    for i in indexes:
+        with open(i, "r") as f:
+            lines = f.readlines()
+            for l in reversed(lines):
+                try:
+                    (stamp, manifest, workdir) = l.split()
+                except ValueError:
+                    bb.fatal("Invalid line '%s' in sstate manifest '%s'" % (l, i))
+                for m in glob.glob(manifest + ".*"):
+                    if m.endswith(".postrm"):
+                        continue
+                    sstate_clean_manifest(m, d)
+                bb.utils.remove(stamp + "*")
+                bb.utils.remove(workdir, recurse = True)
+
 def sanity_handle_abichanges(status, d):
     #
     # Check the 'ABI' of TMPDIR
@@ -577,7 +595,10 @@ def sanity_handle_abichanges(status, d):
             status.addresult("The layout of TMPDIR changed for Recipe Specific Sysroots.\nConversion doesn't make sense and this change will rebuild everything so please delete TMPDIR (%s).\n" % d.getVar("TMPDIR"))
         elif int(abi) <= 13 and current_abi == "14":
             status.addresult("TMPDIR changed to include path filtering from the pseudo database.\nIt is recommended to use a clean TMPDIR with the new pseudo path filtering so TMPDIR (%s) would need to be removed to continue.\n" % d.getVar("TMPDIR"))
-
+        elif int(abi) == 14 and current_abi == "15":
+            drop_v14_cross_builds(d)
+            with open(abifile, "w") as f:
+                f.write(current_abi)
         elif (abi != current_abi):
             # Code to convert from one ABI to another could go here if possible.
             status.addresult("Error, TMPDIR has changed its layout version number (%s to %s) and you need to either rebuild, revert or adjust it at your own risk.\n" % (abi, current_abi))
@@ -892,6 +913,11 @@ def check_sanity_everybuild(status, d):
                     # base directory path
                     mirror_base = urllib.parse.urlparse(mirror[:-1*len('/PATH')]).path
                     check_symlink(mirror_base, d)
+
+    # Check sstate mirrors aren't being used with a local hash server and no remote
+    hashserv = d.getVar("BB_HASHSERVE")
+    if d.getVar("SSTATE_MIRRORS") and hashserv and hashserv.startswith("unix://") and not d.getVar("BB_HASHSERVE_UPSTREAM"):
+        bb.warn("You are using a local hash equivalence server but have configured an sstate mirror. This will likely mean no sstate will match from the mirror. You may wish to disable the hash equivalence use (BB_HASHSERVE), or use a hash equivalence server alongside the sstate mirror.")
 
     # Check that TMPDIR hasn't changed location since the last time we were run
     tmpdir = d.getVar('TMPDIR')

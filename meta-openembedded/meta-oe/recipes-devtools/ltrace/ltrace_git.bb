@@ -6,7 +6,7 @@ It can also intercept and print the system calls executed by the program.\
 "
 HOMEPAGE = "http://ltrace.org/"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=eb723b61539feef013de476e68b5c50a"
 
 PE = "1"

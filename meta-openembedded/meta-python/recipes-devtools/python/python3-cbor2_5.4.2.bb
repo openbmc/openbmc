@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/Apache-2.0;md5=89aea4e17d99a7ca
 
 SRC_URI[sha256sum] = "e283e70b55a049ff364cc5e648fde587e4d9b0e87e4b2664c69e639135e6b3b8"
 
-inherit pypi setuptools3 ptest
+inherit pypi python_setuptools_build_meta ptest
 
 SRC_URI += " \
         file://run-ptest \

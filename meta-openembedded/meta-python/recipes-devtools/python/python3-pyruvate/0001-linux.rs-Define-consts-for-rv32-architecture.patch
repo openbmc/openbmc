@@ -1,0 +1,26 @@
+From 3a3bd8475f93d54cb5bb62d239247fef2e03a733 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 5 Mar 2022 00:37:01 -0800
+Subject: [PATCH] linux.rs: Define consts for rv32 architecture
+
+Upstream-Status: Submitted [https://github.com/nix-rust/nix/pull/1669]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/sys/ioctl/linux.rs | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/sys/ioctl/linux.rs b/src/sys/ioctl/linux.rs
+index 68ebaba..08cd0c3 100644
+--- a/src/sys/ioctl/linux.rs
++++ b/src/sys/ioctl/linux.rs
+@@ -34,6 +34,7 @@ mod consts {
+           target_arch = "s390x",
+           target_arch = "x86_64",
+           target_arch = "aarch64",
++          target_arch = "riscv32",
+           target_arch = "riscv64"))]
+ mod consts {
+     #[doc(hidden)]
+-- 
+2.35.1
+

@@ -4,7 +4,7 @@ error corrections, hence the name paranoia."
 HOMEPAGE = "https://www.xiph.org/"
 SECTION = "multimedia"
 
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING-LGPL;md5=d370feaa1c9edcdbd29ca27ea3d2304d"
 
 SRC_URI = "http://downloads.xiph.org/releases/cdparanoia/cdparanoia-III-${PV}.src.tgz \

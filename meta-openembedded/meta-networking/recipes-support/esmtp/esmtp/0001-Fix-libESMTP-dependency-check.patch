@@ -1,0 +1,44 @@
+From 63dbf8a9f04b34474021e8f0bf239b7446f10a7f Mon Sep 17 00:00:00 2001
+From: Jiaqing Zhao <jiaqing.zhao@linux.intel.com>
+Date: Thu, 3 Mar 2022 09:01:23 +0000
+Subject: [PATCH] Fix libESMTP dependency check
+
+Since libesmtp-1.1.0, libesmtp-config is removed, use pkg-config to
+check for existence instead.
+
+Signed-off-by: Jiaqing Zhao <jiaqing.zhao@linux.intel.com>
+---
+ configure.ac | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 64b19b4..83346a8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -11,6 +11,8 @@ AC_PROG_CC
+ 
+ AC_HEADER_STDC
+ 
++PKG_PROG_PKG_CONFIG
++
+ dnl getopt needs this
+ AC_C_CONST
+ 
+@@ -30,11 +32,11 @@ then
+ 	AC_CHECK_HEADER(libesmtp.h, ,[AC_MSG_ERROR([libesmtp.h not found in $with_libesmtp])])
+ fi    
+ AC_MSG_CHECKING(for libESMTP)
+-if libesmtp-config --version > /dev/null 2>&1
++if $PKG_CONFIG --exists 'libesmtp-1.0'
+ then
+ 	AC_MSG_RESULT(yes)
+-	CFLAGS="$CFLAGS `libesmtp-config --cflags`"
+-	LIBS="$LIBS `libesmtp-config --libs`"
++	CFLAGS="$CFLAGS `$PKG_CONFIG --cflags 'libesmtp-1.0'`"
++	LIBS="$LIBS `$PKG_CONFIG --libs 'libesmtp-1.0'`"
+ else
+ 	AC_MSG_RESULT(no)
+ 	AC_MSG_ERROR(libESMTP library not found)
+-- 
+2.32.0
+

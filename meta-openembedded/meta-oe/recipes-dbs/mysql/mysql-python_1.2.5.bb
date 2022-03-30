@@ -1,7 +1,7 @@
 SUMMARY = "Python interface to MySQL"
 HOMEPAGE = "https://github.com/farcepest/MySQLdb1"
 SECTION = "devel/python"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://GPL-2.0;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS = "mysql5"

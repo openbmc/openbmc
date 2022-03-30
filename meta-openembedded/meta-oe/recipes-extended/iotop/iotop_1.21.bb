@@ -1,5 +1,5 @@
 SUMMARY = "A top utility for I/O"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=48e7be78bd2671d08c9c3bad71f1cfaa"
 
 DEPENDS = "ncurses"

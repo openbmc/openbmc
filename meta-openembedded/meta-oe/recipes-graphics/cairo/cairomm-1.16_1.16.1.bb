@@ -1,6 +1,6 @@
 SUMMARY = "C++ bindings for Cairo graphics library"
 
-LICENSE = "LGPLv2"
+LICENSE = "LGPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c46bda00ffbb0ba1dac22f8d087f54d9"
 
 GNOMEBASEBUILDCLASS = "meson"

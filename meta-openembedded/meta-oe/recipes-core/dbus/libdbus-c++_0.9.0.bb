@@ -2,7 +2,7 @@ SUMMARY = "DBus-C++ Library"
 DESCRIPTION = "DBus-c++ attempts to provide a C++ API for D-BUS. The library has a glib and an Ecore mainloop integration. It also offers an optional own main loop."
 HOMEPAGE = "http://dbus-cplusplus.sourceforge.net"
 SECTION = "base"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=fbc093901857fcd118f065f900982c24"
 DEPENDS = "dbus expat glib-2.0 libpcre"
 

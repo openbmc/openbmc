@@ -1,0 +1,137 @@
+From da29ba6a27d8e78562052c79061476848915eb2a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 9 Mar 2022 12:13:28 -0800
+Subject: [PATCH] configure: Pass LDFLAGS to tests doing link step
+
+Ensures that right flags from recipes are honored, otherwise tests fail
+which otherwise should not.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ unix/configure | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/unix/configure b/unix/configure
+index d4b0a8e..49579f3 100755
+--- a/unix/configure
++++ b/unix/configure
+@@ -116,7 +116,7 @@ _EOF_
+ 	# Special Mac OS X shared library "ld" option?
+         if test ` uname -s 2> /dev/null ` = 'Darwin'; then
+           lf='-Wl,-search_paths_first'
+-          $CC $CFLAGS $lf conftest.c > /dev/null 2>/dev/null
++          $CC $CFLAGS $LDFLAGS $lf conftest.c > /dev/null 2>/dev/null
+           if test $? -eq 0; then
+             BZLF=${lf}
+           fi
+@@ -276,7 +276,7 @@ int main()
+ }
+ _EOF_
+ # compile it
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
++$CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
+ if [ $? -ne 0 ]; then
+   echo -- no Large File Support
+ else
+@@ -322,7 +322,7 @@ int main()
+ }
+ _EOF_
+ # compile it
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
++$CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
+ if [ $? -ne 0 ]; then
+   echo "-- no Unicode (wchar_t) support"
+ else
+@@ -383,7 +383,7 @@ for func in fchmod fchown lchown nl_langinfo
+ do
+   echo Check for $func
+   echo "int main(){ $func(); return 0; }" > conftest.c
+-  $CC $BFLAG -o conftest conftest.c >/dev/null 2>/dev/null
++  $CC $BFLAG $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
+   [ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DNO_`echo $func | tr '[a-z]' '[A-Z]'`"
+ done
+ 
+@@ -395,14 +395,14 @@ temp_link="link_$$"
+   echo "int main() { lchmod(\"${temp_file}\", 0666); }" \
+ ) > conftest.c
+ ln -s "${temp_link}" "${temp_file}" && \
+- $CC $BFLAG -o conftest conftest.c >/dev/null 2>/dev/null && \
++ $CC $BFLAG $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null && \
+  ./conftest
+ [ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DNO_LCHMOD"
+ rm -f "${temp_file}"
+ 
+ echo Check for memset
+ echo "int main(){ char k; memset(&k,0,0); return 0; }" > conftest.c
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
++$CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
+ [ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DZMEM"
+ 
+ echo Check for errno declaration
+@@ -422,12 +422,12 @@ cat > conftest.c << _EOF_
+ int main() { return closedir(opendir(".")); }
+ _EOF_
+ 
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
++$CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
+ if [ $? -ne 0 ]; then
+   OPT=""
+   for lib in ndir dir ucb bsd BSD PW x dirent
+   do
+-    $CC -o conftest conftest.c -l$lib >/dev/null 2>/dev/null
++    $CC $CLFAGS $LDFLAGS -o conftest conftest.c -l$lib >/dev/null 2>/dev/null
+     [ $? -eq 0 ] && OPT=-l$lib && break
+   done
+   if [ ${OPT} ]; then
+@@ -440,9 +440,9 @@ fi
+ # Dynix/ptx 1.3 needed this
+ echo Check for readlink
+ echo "int main(){ return readlink(); }" > conftest.c
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
++$CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
+ if [ $? -ne 0 ]; then
+-  $CC -o conftest conftest.c -lseq >/dev/null 2>/dev/null
++  $CC $CFLAGS $LDFLAGS -o conftest conftest.c -lseq >/dev/null 2>/dev/null
+   [ $? -eq 0 ] && LFLAGS2="${LFLAGS2} -lseq"
+ fi
+ 
+@@ -501,7 +501,7 @@ int main()
+ }
+ _EOF_
+ # compile it
+-$CC ${CFLAGS} ${CFLAGSR} -o conftest conftest.c >/dev/null 2>/dev/null
++$CC ${CFLAGS} ${CFLAGSR} $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
+ if [ $? -ne 0 ]; then
+   echo "-- no MBCS support"
+   CFLAGSR="${CFLAGSR} -DNO_MBCS"
+@@ -515,7 +515,7 @@ else
+   do
+     echo Check for MBCS $func
+     echo "int main() { $func(); return 0; }" > conftest.c
+-    $CC $BFLAG -o conftest conftest.c >/dev/null 2>/dev/null
++    $CC $BFLAG $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
+     [ $? -eq 0 ] && CFLAGSR="${CFLAGSR} -D`echo $func | tr '[a-z]' '[A-Z]'`=$func"
+   done
+ fi
+@@ -557,7 +557,7 @@ elif [ -f /xenix ]; then
+ elif uname -X >/dev/null 2>/dev/null; then
+ # SCO shared library check
+   echo "int main() { return 0;}" > conftest.c
+-  $CC -o conftest conftest.c -lc_s -nointl >/dev/null 2> /dev/null
++  $CC $CFLAGS $LDFLAGS -o conftest conftest.c -lc_s -nointl >/dev/null 2> /dev/null
+   [ $? -eq 0 ] && LFLAGS2="-lc_s -nointl"
+ else
+   SYSTEM=`uname -s 2>/dev/null` || SYSTEM="unknown"
+@@ -565,7 +565,7 @@ else
+   case $SYSTEM in
+      OSF1|ULTRIX)
+         echo Check for -Olimit option
+-        $CC ${CFLAGS} -Olimit 1000 -o conftest conftest.c >/dev/null 2>/dev/null
++        $CC ${CFLAGS} ${LDFLAGS} -Olimit 1000 -o conftest conftest.c >/dev/null 2>/dev/null
+         [ $? -eq 0 ] && CFLAGSR="${CFLAGSR} -Olimit 1000"
+         ;;
+ ###     HP-UX)
+-- 
+2.35.1
+

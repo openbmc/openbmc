@@ -1,4 +1,4 @@
-From 550e98013b0e003c1a6771d8e811375913adf16b Mon Sep 17 00:00:00 2001
+From fa47185d9c8150a0dcb0ea12b92fcf139edbef35 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Wed, 27 Oct 2021 20:18:47 +0200
 Subject: [PATCH] Support cross builds a bit better
@@ -17,10 +17,10 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index dfcc2c3..192b1b5 100644
+index 136e812..f5b91e0 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -234,6 +234,7 @@ release builds of SpiderMonkey. Try configuring SpiderMonkey with
+@@ -252,6 +252,7 @@ release builds of SpiderMonkey. Try configuring SpiderMonkey with
  --disable-debug.''')
  endif
  
@@ -28,15 +28,15 @@ index dfcc2c3..192b1b5 100644
  # Check if a minimal SpiderMonkey program compiles, links, and runs. If not,
  # it's most likely the case that SpiderMonkey was configured incorrectly, for
  # example by building mozglue as a shared library.
-@@ -254,6 +255,7 @@ could not be compiled, linked, or run. Most likely you should build it with a
- different configuration. Check the recommended configuration:
- https://github.com/spidermonkey-embedders/spidermonkey-embedding-examples/blob/esr78/docs/Building%20SpiderMonkey.md''')
+@@ -282,6 +283,7 @@ elif minimal_program.returncode() != 0
+ failed to execute. Most likely you should build it with a different
+ configuration.''' + recommended_configuration)
  endif
 +endif # not meson.is_cross_build()
  
  have_printf_alternative_int = cc.compiles('''
  #include <stdio.h>
-@@ -662,7 +664,7 @@ endif
+@@ -682,7 +684,7 @@ subdir('installed-tests')
  
  # Note: The test program in test/ needs to be ported
  #       to Windows before we can build it on Windows.
@@ -45,6 +45,3 @@ index dfcc2c3..192b1b5 100644
      subdir('test')
  endif
  
--- 
-2.31.1
-

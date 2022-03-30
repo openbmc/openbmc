@@ -7,7 +7,7 @@ offered by Mission Critical Linux, or the LKCD kernel patch."
 HOMEPAGE = "http://people.redhat.com/anderson"
 SECTION = "devel"
 
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING3;md5=d32239bcb673463ab874e80d47fae504"
 
 DEPENDS = "zlib readline coreutils-native ncurses-native"

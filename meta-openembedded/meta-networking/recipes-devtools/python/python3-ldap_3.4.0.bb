@@ -4,7 +4,7 @@ DESCRIPTION = "This module provides access to the LDAP \
 instead of C API. The module mainly acts as a wrapper for the \
 OpenLDAP 2.x libraries. Errors will appear as exceptions."
 HOMEPAGE = "http://www.python-ldap.org/"
-LICENSE = "PSF"
+LICENSE = "PSF-2.0"
 LIC_FILES_CHKSUM = "file://LICENCE;md5=36ce9d726d0321b73c1521704d07db1b"
 
 DEPENDS = "python3 openldap cyrus-sasl"

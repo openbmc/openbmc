@@ -1,7 +1,7 @@
 SUMMARY = "Very Secure FTP server"
 HOMEPAGE = "https://security.appspot.com/vsftpd.html"
 SECTION = "net"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=a6067ad950b28336613aed9dd47b1271"
 
 DEPENDS = "libcap openssl"

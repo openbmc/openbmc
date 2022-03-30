@@ -2,7 +2,7 @@ SUMMARY = "Trace and analyze execution of a program written in C/C++"
 HOMEPAGE = "https://github.com/namhyung/uftrace"
 BUGTRACKER = "https://github.com/namhyung/uftrace/issues"
 SECTION = "devel"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS = "elfutils"

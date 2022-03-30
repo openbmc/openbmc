@@ -5,7 +5,7 @@ DESCRIPTION = "Constructs and (by default) mails MIME messages. \
                like programs."
 HOMEPAGE = "http://search.cpan.org/~rosch/mime-construct/mime-construct"
 SECTION = "mail"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://debian/copyright;md5=5e2e5da619ac8ef8c84767ccc4656e96"
 
 SRC_URI = "${CPAN_MIRROR}/authors/id/R/RO/ROSCH/mime-construct-${PV}.tar.gz \

@@ -17,5 +17,7 @@ DEPENDS:append:class-native = " python-native "
 
 inherit setuptools3
 
+PIP_INSTALL_PACKAGE = "python_cson"
+
 BBCLASSEXTEND = "native"
 

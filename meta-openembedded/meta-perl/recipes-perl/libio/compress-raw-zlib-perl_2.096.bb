@@ -2,7 +2,7 @@ DESCRIPTION = "The *Compress::Raw::Zlib* module provides a Perl interface to the
 compression library (see "AUTHOR" for details about where to get *zlib*)."
 
 SECTION = "libs"
-LICENSE = "Artisticv1 | GPLv1+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 
 MAINTAINER=	"Poky <poky@yoctoproject.org>"
 HOMEPAGE=	"https://metacpan.org/release/Compress-Raw-Zlib"

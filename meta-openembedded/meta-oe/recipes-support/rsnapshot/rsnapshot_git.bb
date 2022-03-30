@@ -3,7 +3,7 @@ HOMEPAGE = "http://www.rsnapshot.org"
 BUGTRACKER = "https://sourceforge.net/projects/rsnapshot/"
 SECTION = "console/network"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=892f569a555ba9c07a568a7c0c4fa63a"
 
 RDEPENDS:${PN} = "rsync \

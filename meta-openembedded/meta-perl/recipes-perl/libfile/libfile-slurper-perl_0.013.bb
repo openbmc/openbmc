@@ -4,7 +4,7 @@ All functions are optionally exported. All functions throw exceptions on \
 errors, write functions don't return any meaningful value."
 
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPL-1.0+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 
 HOMEPAGE=       "https://metacpan.org/release/File-Slurper"
 

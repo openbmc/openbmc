@@ -5,7 +5,7 @@ supports all pointer devices and settings provided by this library. Similar \
 software include gpm and jamd."
 HOMEPAGE = "https://salsa.debian.org/consolation-team/consolation"
 SECTION = "console/utils"
-LICENSE = "GPL-2.0+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=73ca626e1d9048abfc7d599370650827"
 
 DEPENDS = " \

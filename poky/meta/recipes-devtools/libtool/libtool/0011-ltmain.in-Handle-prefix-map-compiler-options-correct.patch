@@ -8,19 +8,21 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
 Upstream-Status: Submitted [https://lists.gnu.org/archive/html/libtool-patches/2021-10/msg00019.html]
 
-Index: libtool-2.4.6/build-aux/ltmain.in
+Index: libtool-2.4.7/build-aux/ltmain.in
 ===================================================================
---- libtool-2.4.6.orig/build-aux/ltmain.in
-+++ libtool-2.4.6/build-aux/ltmain.in
-@@ -5424,9 +5424,10 @@ func_mode_link ()
-       # --sysroot=*          for sysroot support
-       # -O*, -g*, -flto*, -fwhopr*, -fuse-linker-plugin GCC link-time optimization
+--- libtool-2.4.7.orig/build-aux/ltmain.in
++++ libtool-2.4.7/build-aux/ltmain.in
+@@ -5419,11 +5419,12 @@ func_mode_link ()
        # -stdlib=*            select c++ std lib with clang
+       # -fsanitize=*         Clang/GCC memory and address sanitizer
+       # -fuse-ld=*           Linker select flags for GCC
 +      # -f*-prefix-map*      needed for lto linking
+       # -Wa,*                Pass flags directly to the assembler
        -64|-mips[0-9]|-r[0-9][0-9]*|-xarch=*|-xtarget=*|+DA*|+DD*|-q*|-m*| \
        -t[45]*|-txscale*|-p|-pg|--coverage|-fprofile-*|-F*|@*|-tp=*|--sysroot=*| \
--      -O*|-g*|-flto*|-fwhopr*|-fuse-linker-plugin|-fstack-protector*|-stdlib=*)
-+      -O*|-g*|-flto*|-fwhopr*|-fuse-linker-plugin|-fstack-protector*|-stdlib=*|-f*-prefix-map*)
-         func_quote_for_eval "$arg"
- 	arg=$func_quote_for_eval_result
+       -O*|-g*|-flto*|-fwhopr*|-fuse-linker-plugin|-fstack-protector*|-stdlib=*| \
+-      -specs=*|-fsanitize=*|-fuse-ld=*|-Wa,*)
++      -specs=*|-fsanitize=*|-fuse-ld=*|-f*-prefix-map*|-Wa,*)
+         func_quote_arg pretty "$arg"
+ 	arg=$func_quote_arg_result
          func_append compile_command " $arg"

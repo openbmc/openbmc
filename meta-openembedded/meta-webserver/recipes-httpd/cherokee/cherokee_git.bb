@@ -2,7 +2,7 @@ SUMMARY = "Cherokee Web Server fast and secure"
 SUMMARY:cget = "Small downloader based in the Cherokee client library"
 HOMEPAGE = "http://www.cherokee-project.com/"
 SECTION = "network"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
 DEPENDS = "unzip-native libpcre openssl mysql5 ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'libpam', '', d)}"

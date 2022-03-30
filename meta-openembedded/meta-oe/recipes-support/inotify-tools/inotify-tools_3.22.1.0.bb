@@ -2,7 +2,7 @@ SUMMARY = "Command line tools and C library providing a simple interface to inot
 AUTHOR = "Rohan McGovern <rohan@mcgovern.id.au>"
 HOMEPAGE = "http://wiki.github.com/rvoicilas/inotify-tools"
 SECTION = "console/devel"
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ac6c26e52aea428ee7f56dc2c56424c6"
 
 SRCREV = "4b72dcd15299e1d0cb096397d9aab513ffed1657"

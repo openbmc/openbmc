@@ -1,0 +1,28 @@
+From: Khem Raj <raj.khem@gmail.com>
+Subject: [PATCH] ltmain.in: Parse additional clang options
+
+clang uses -rtlib and --unwindlib to select proper compiler runtime in
+some cases. There fore pass these options to linker when found in
+ldflags
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: libtool-2.4.7/build-aux/ltmain.in
+===================================================================
+--- libtool-2.4.7.orig/build-aux/ltmain.in
++++ libtool-2.4.7/build-aux/ltmain.in
+@@ -5420,10 +5420,12 @@ func_mode_link ()
+       # -fsanitize=*         Clang/GCC memory and address sanitizer
+       # -fuse-ld=*           Linker select flags for GCC
+       # -f*-prefix-map*      needed for lto linking
++      # -rtlib=*             select c runtime lib with clang
++      # --unwindlib=*        select unwinder library with clang
+       # -Wa,*                Pass flags directly to the assembler
+       -64|-mips[0-9]|-r[0-9][0-9]*|-xarch=*|-xtarget=*|+DA*|+DD*|-q*|-m*| \
+       -t[45]*|-txscale*|-p|-pg|--coverage|-fprofile-*|-F*|@*|-tp=*|--sysroot=*| \
+-      -O*|-g*|-flto*|-fwhopr*|-fuse-linker-plugin|-fstack-protector*|-stdlib=*| \
++      -O*|-g*|-flto*|-fwhopr*|-fuse-linker-plugin|-fstack-protector*|-stdlib=*|-rtlib=*|--unwindlib=*| \
+       -specs=*|-fsanitize=*|-fuse-ld=*|-f*-prefix-map*|-Wa,*)
+         func_quote_arg pretty "$arg"
+ 	arg=$func_quote_arg_result

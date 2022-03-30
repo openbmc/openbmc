@@ -4,7 +4,7 @@ DESCRIPTION = "Open-source binary diff, differential compression tools, \
 HOMEPAGE = "http://xdelta.org/"
 SECTION = "console/utils"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=393a5ca445f6965873eca0259a17f833"
 
 SRC_URI = "git://github.com/jmacd/xdelta.git;branch=release3_1_apl;protocol=https"

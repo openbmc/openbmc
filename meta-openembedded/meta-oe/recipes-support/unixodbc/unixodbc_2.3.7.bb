@@ -3,7 +3,7 @@ DESCRIPTION = "unixODBC is an Open Source ODBC sub-system and an ODBC SDK \
 for Linux, Mac OSX, and UNIX."
 
 HOMEPAGE = "http://www.unixodbc.org/"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7b37bf80a3df5a65b355433ae36d206"
 
 DEPENDS = "libtool readline"

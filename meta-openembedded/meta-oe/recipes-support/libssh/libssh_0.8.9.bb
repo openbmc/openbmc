@@ -1,7 +1,7 @@
 SUMMARY = "Multiplatform C library implementing the SSHv2 and SSHv1 protocol"
 HOMEPAGE = "http://www.libssh.org"
 SECTION = "libs"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=dabb4958b830e5df11d2b0ed8ea255a0"
 
 DEPENDS = "zlib openssl"

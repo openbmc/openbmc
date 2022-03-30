@@ -1,35 +1,3 @@
 #!/bin/sh
-
-output() {
-  retcode=$?
-  if [ $retcode -eq 0 ]
-    then echo "PASS: $i"
-  elif [ $retcode -eq 77 ]
-    then echo "SKIP: $i"
-  else echo "FAIL: $i"
-  fi
-}
-
-export DBUS_TEST_HOMEDIR=./test
-export XDG_RUNTIME_DIR=./test
-export LD_LIBRARY_PATH=@PTEST_PATH@/test/.libs
-
-files=`ls test/test-*`
-
-for i in $files
-do
-     #these programs are used by testcase test-bus, don't run here
-     #additionally, test-names needs to be run under X
-     if [ $i = "test/test-service" ] \
-        || [ $i = "test/test-shell-service" ] \
-        || [ $i = "test/test-segfault" ] \
-        || [ $i = "test/test-bus" ] \
-        || [ $i = "test/test-names" ]
-     then
-         continue
-     fi
-
-     ./$i ./test/data >/dev/null 2>&1
-     output
-done 
+gnome-desktop-testing-runner dbus
 

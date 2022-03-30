@@ -153,7 +153,11 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
                 else:
                     raise RuntimeError("Duplicate controller module found for %s. Layers should create unique controller module names" % module)
 
-        for p in sys.path:
+        # sys.path can contain duplicate paths, but because of the login in
+        # add_controller_list this doesn't work and causes testimage to abort.
+        # Remove duplicates using an intermediate dictionary to ensure this
+        # doesn't happen.
+        for p in list(dict.fromkeys(sys.path)):
             controllerpath = os.path.join(p, 'oeqa', 'controllers')
             if os.path.exists(controllerpath):
                 add_controller_list(controllerpath)

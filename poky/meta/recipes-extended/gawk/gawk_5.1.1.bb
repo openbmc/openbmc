@@ -6,8 +6,8 @@ HOMEPAGE = "https://www.gnu.org/software/gawk/"
 BUGTRACKER  = "bug-gawk@gnu.org"
 SECTION = "console/utils"
 
-# gawk <= 3.1.5: GPLv2
-# gawk >= 3.1.6: GPLv3
+# gawk <= 3.1.5: GPL-2.0-only
+# gawk >= 3.1.6: GPL-3.0-only
 LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 

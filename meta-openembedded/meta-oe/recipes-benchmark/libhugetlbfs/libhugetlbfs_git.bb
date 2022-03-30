@@ -1,6 +1,6 @@
 SUMMARY = "A library which provides easy access to huge pages of memory"
 HOMEPAGE = "https://github.com/libhugetlbfs/libhugetlbfs"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://LGPL-2.1;md5=2d5025d4aa3495befef8f17206a5b0a1"
 
 DEPENDS = "sysfsutils"

@@ -1,0 +1,79 @@
+From 001971eef84485562f912d8edd4fc7688acfad91 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 8 Mar 2022 22:38:47 -0800
+Subject: [PATCH] configure: Pass LDFLAGS to link tests
+
+LDFLAGS can contain critical flags without which linking wont succeed
+therefore ensure that all configure tests involving link time checks are
+using LDFLAGS on compiler commandline along with CFLAGS to ensure the
+tests perform correctly. Without this some tests may fail resulting in
+wrong confgure result, ending in miscompiling the package
+
+Upstream-Status: Submitted [https://github.com/madler/zlib/pull/599]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/configure b/configure
+index e974d1f..69dfa3f 100755
+--- a/configure
++++ b/configure
+@@ -410,7 +410,7 @@ if test $shared -eq 1; then
+   echo Checking for shared library support... | tee -a configure.log
+   # we must test in two steps (cc then ld), required at least on SunOS 4.x
+   if try $CC -w -c $SFLAGS $test.c &&
+-     try $LDSHARED $SFLAGS -o $test$shared_ext $test.o; then
++     try $LDSHARED $SFLAGS $LDFLAGS -o $test$shared_ext $test.o; then
+     echo Building shared library $SHAREDLIBV with $CC. | tee -a configure.log
+   elif test -z "$old_cc" -a -z "$old_cflags"; then
+     echo No shared library support. | tee -a configure.log
+@@ -492,7 +492,7 @@ int main(void) {
+ }
+ EOF
+   fi
+-  if try $CC $CFLAGS -o $test $test.c; then
++  if try $CC $CFLAGS $LDFLAGS -o $test $test.c; then
+     sizet=`./$test`
+     echo "Checking for a pointer-size integer type..." $sizet"." | tee -a configure.log
+   else
+@@ -530,7 +530,7 @@ int main(void) {
+   return 0;
+ }
+ EOF
+-  if try $CC $CFLAGS -o $test $test.c; then
++  if try $CC $CFLAGS $LDFLAGS -o $test $test.c; then
+     echo "Checking for fseeko... Yes." | tee -a configure.log
+   else
+     CFLAGS="${CFLAGS} -DNO_FSEEKO"
+@@ -547,7 +547,7 @@ cat > $test.c <<EOF
+ #include <errno.h>
+ int main() { return strlen(strerror(errno)); }
+ EOF
+-if try $CC $CFLAGS -o $test $test.c; then
++if try $CC $CFLAGS $LDFLAGS -o $test $test.c; then
+   echo "Checking for strerror... Yes." | tee -a configure.log
+ else
+   CFLAGS="${CFLAGS} -DNO_STRERROR"
+@@ -654,7 +654,7 @@ int main()
+   return (mytest("Hello%d\n", 1));
+ }
+ EOF
+-  if try $CC $CFLAGS -o $test $test.c; then
++  if try $CC $CFLAGS $LDFLAGS -o $test $test.c; then
+     echo "Checking for vsnprintf() in stdio.h... Yes." | tee -a configure.log
+ 
+     echo >> configure.log
+@@ -744,7 +744,7 @@ int main()
+ }
+ EOF
+ 
+-  if try $CC $CFLAGS -o $test $test.c; then
++  if try $CC $CFLAGS $LDFLAGS -o $test $test.c; then
+     echo "Checking for snprintf() in stdio.h... Yes." | tee -a configure.log
+ 
+     echo >> configure.log
+-- 
+2.35.1
+

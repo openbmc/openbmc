@@ -15,10 +15,13 @@ GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase gobject-introspection gettext features_check
 
+# for gtksourceview4
+REQUIRED_DISTRO_FEATURES += "x11"
+
 SRC_URI[archive.sha256sum] = "a86397a895dca9c0de7a5ccb063bda8f7ef691cccb950ce2cfdee367903e7a63"
 
 # gobject-introspection is mandatory and cannot be configured
-REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
+REQUIRED_DISTRO_FEATURES += "gobject-introspection-data"
 GIR_MESON_OPTION = ""
 
 GTKDOC_MESON_OPTION = "gtk_doc"

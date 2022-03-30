@@ -2,7 +2,7 @@ SUMMARY = "download online streams into audio files"
 DESCRIPTION = "This command-line tool can be used to record MPEG III \
 and OGG online radio-streams into track-separated audio files."
 HOMEPAGE = "http://streamripper.sourceforge.net"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8ca43cbc842c2336e835926c2166c28b"
 DEPENDS = "glib-2.0 libmad libogg libvorbis"
 

@@ -9,7 +9,7 @@ HOMEPAGE = "http://www.openl2tp.org/"
 SECTION = "net"
 
 # cli and usl use license LGPL-2.1
-LICENSE = "GPL-2.0 & LGPL-2.1"
+LICENSE = "GPL-2.0-only & LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e9d9259cbbf00945adc25a470c1d3585 \
                     file://LICENSE;md5=f8970abd5ea9be701a0deedf5afd77a5 \
                     file://cli/LICENSE;md5=9c1387a3c5213aa40671438af3e00793 \

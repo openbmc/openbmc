@@ -2,7 +2,7 @@ DESCRIPTION="Anthy is a system for Japanese input method. It converts Hiragana t
 AUTHOR = "Anthy Developers <anthy-dev@lists.sourceforge.jp>"
 HOMEPAGE = "http://anthy.sourceforge.jp"
 
-LICENSE = "LGPLv2.1 & GPLv2"
+LICENSE = "LGPL-2.1-only & GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=11f384074d8e93e263b5664ef08a411a \
     file://alt-cannadic/COPYING;md5=c93c0550bd3173f4504b2cbd8991e50b \
 "

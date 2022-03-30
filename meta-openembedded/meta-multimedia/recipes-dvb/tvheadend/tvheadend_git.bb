@@ -5,7 +5,7 @@ inherit autotools-brokensep gettext gitpkgv pkgconfig
 
 DEPENDS = "avahi cmake-native dvb-apps libdvbcsa libpcre2 openssl uriparser zlib"
 
-LICENSE = "GPLv3+"
+LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=9cae5acac2e9ee2fc3aec01ac88ce5db"
 
 SRC_URI = "git://github.com/tvheadend/tvheadend.git;branch=master;protocol=https \

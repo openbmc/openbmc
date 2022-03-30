@@ -13,7 +13,7 @@ SECTION = "libs"
 
 HOMEPAGE = "http://search.cpan.org/~kubota/Text-WrapI18N-${PV}/"
 
-LICENSE = "Artistic-1.0 | GPLv1+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://README;md5=080862e1e40cdcddef4393e137285858"
 
 SRC_URI = "${CPAN_MIRROR}/authors/id/K/KU/KUBOTA/Text-WrapI18N-${PV}.tar.gz"

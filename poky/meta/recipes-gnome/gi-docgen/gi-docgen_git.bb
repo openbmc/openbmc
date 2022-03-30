@@ -16,7 +16,6 @@ SRCREV = "37b04455ff58cb2ec3f58917d0737c435344f2fb"
 S = "${WORKDIR}/git"
 
 inherit setuptools3
-PIP_INSTALL_PACKAGE = "gi_docgen"
 
 RDEPENDS:${PN} += "python3-asyncio python3-core python3-jinja2 python3-json python3-markdown python3-markupsafe python3-pygments python3-toml python3-typogrify python3-xml"
 

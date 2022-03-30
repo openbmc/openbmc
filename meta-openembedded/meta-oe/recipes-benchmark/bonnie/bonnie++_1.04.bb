@@ -1,7 +1,7 @@
 SUMMARY = "Tests large file IO and creation/deletion of small files"
 HOMEPAGE = "http://www.coker.com.au/bonnie++/"
 SECTION = "benchmark/tests"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://copyright.txt;md5=cd4dde95a6b9d122f0a9150ae9cc3ee0"
 
 SRC_URI = "http://www.coker.com.au/bonnie++/${BPN}_${PV}.tgz \

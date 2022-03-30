@@ -2,7 +2,7 @@ SUMMARY = "Configure network interfaces for parallel routing"
 HOMEPAGE = "http://www.linuxfoundation.org/collaborate/workgroups/networking/bonding"
 SECTION = "net"
 
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://debian/copyright;md5=acc89812938cf9ad6b1debc37cea0253"
 
 inherit manpages

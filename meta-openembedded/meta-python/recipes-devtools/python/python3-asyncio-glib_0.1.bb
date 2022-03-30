@@ -1,6 +1,6 @@
 SUMMARY = "An implementation of the Python 3 asyncio event loop on top of GLib"
 AUTHOR = "James Henstridge"
-LICENSE = "LGPL-2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING.LGPL;md5=4fbd65380cdd255951079008b364516c"
 
 inherit setuptools3 pypi

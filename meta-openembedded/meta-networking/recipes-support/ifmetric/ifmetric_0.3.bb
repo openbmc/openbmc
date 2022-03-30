@@ -1,6 +1,6 @@
 DESCRIPTION = "Set routing metrics for a network interface"
 
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=94d55d512a9ba36caa9b7df079bae19f"
 
 SRC_URI = "http://0pointer.de/lennart/projects/ifmetric/ifmetric-${PV}.tar.gz \

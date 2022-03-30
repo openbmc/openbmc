@@ -7,7 +7,7 @@ job descriptions in a simple-to-understand text format. Several example job \
 files are included. fio displays all sorts of I/O performance information."
 HOMEPAGE = "http://freecode.com/projects/fio"
 SECTION = "console/tests"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS = "libaio zlib coreutils-native"

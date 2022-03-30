@@ -1,6 +1,6 @@
 SUMMARY = "extremely simple MTA to get mail off the system to a mail hub"
 HOMEPAGE = "http://packages.qa.debian.org/s/ssmtp.html"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0c56db0143f4f80c369ee3af7425af6e"
 
 SRC_URI = "${DEBIAN_MIRROR}/main/s/${BPN}/${BPN}_${PV}.orig.tar.bz2 \

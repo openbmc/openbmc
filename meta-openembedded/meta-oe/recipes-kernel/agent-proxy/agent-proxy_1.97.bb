@@ -1,7 +1,7 @@
 SUMMARY = "Proxy for UDP/TCP debug connections"
 DESCRIPTION = "The agent-proxy will forward tcp or udp connections as well as allow for script multiplexing of terminal sessions."
 HOMEPAGE = "http://kgdb.wiki.kernel.org/"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=eb723b61539feef013de476e68b5c50a"
 
 SECTION = "devel"

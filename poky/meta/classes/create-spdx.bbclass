@@ -40,7 +40,7 @@ do_image_complete[depends] = "virtual/kernel:do_create_spdx"
 def extract_licenses(filename):
     import re
 
-    lic_regex = re.compile(b'^\W*SPDX-License-Identifier:\s*([ \w\d.()+-]+?)(?:\s+\W*)?$', re.MULTILINE)
+    lic_regex = re.compile(rb'^\W*SPDX-License-Identifier:\s*([ \w\d.()+-]+?)(?:\s+\W*)?$', re.MULTILINE)
 
     try:
         with open(filename, 'rb') as f:
@@ -94,7 +94,6 @@ def convert_license_to_spdx(lic, document, d, existing={}):
     from pathlib import Path
     import oe.spdx
 
-    available_licenses = d.getVar("AVAILABLE_LICENSES").split()
     license_data = d.getVar("SPDX_LICENSE_DATA")
     extracted = {}
 
@@ -112,8 +111,8 @@ def convert_license_to_spdx(lic, document, d, existing={}):
         if name == "PD":
             # Special-case this.
             extracted_info.extractedText = "Software released to the public domain"
-        elif name in available_licenses:
-            # This license can be found in COMMON_LICENSE_DIR or LICENSE_PATH
+        else:
+            # Seach for the license in COMMON_LICENSE_DIR and LICENSE_PATH
             for directory in [d.getVar('COMMON_LICENSE_DIR')] + (d.getVar('LICENSE_PATH') or '').split():
                 try:
                     with (Path(directory) / name).open(errors="replace") as f:
@@ -122,18 +121,14 @@ def convert_license_to_spdx(lic, document, d, existing={}):
                 except FileNotFoundError:
                     pass
             if extracted_info.extractedText is None:
-                # Error out, as the license was in available_licenses so should
-                # be on disk somewhere.
-                bb.error("Cannot find text for license %s" % name)
-        else:
-            # If it's not SPDX, or PD, or in available licenses, then NO_GENERIC_LICENSE must be set
-            filename = d.getVarFlag('NO_GENERIC_LICENSE', name)
-            if filename:
-                filename = d.expand("${S}/" + filename)
-                with open(filename, errors="replace") as f:
-                    extracted_info.extractedText = f.read()
-            else:
-                bb.error("Cannot find any text for license %s" % name)
+                # If it's not SPDX or PD, then NO_GENERIC_LICENSE must be set
+                filename = d.getVarFlag('NO_GENERIC_LICENSE', name)
+                if filename:
+                    filename = d.expand("${S}/" + filename)
+                    with open(filename, errors="replace") as f:
+                        extracted_info.extractedText = f.read()
+                else:
+                    bb.error("Cannot find any text for license %s" % name)
 
         extracted[name] = extracted_info
         document.hasExtractedLicensingInfos.append(extracted_info)
@@ -600,7 +595,7 @@ python do_create_spdx_setscene () {
 }
 addtask do_create_spdx_setscene
 
-do_create_spdx[dirs] = "${SPDXDEPLOY} ${SPDXWORK}"
+do_create_spdx[dirs] = "${SPDXWORK}"
 do_create_spdx[cleandirs] = "${SPDXDEPLOY} ${SPDXWORK}"
 do_create_spdx[depends] += "${PATCHDEPENDENCY}"
 do_create_spdx[deptask] = "do_create_spdx"

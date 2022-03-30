@@ -21,7 +21,7 @@ build system applies them against ``local.conf`` and ``auto.conf``:
    specific to the :term:`Build Host`.
 
 -  Variables listed in
-   :term:`SDK_LOCAL_CONF_BLACKLIST`
+   :term:`ESDK_LOCALCONF_REMOVE`
    are excluded. These variables are not allowed through from the
    OpenEmbedded build system configuration into the extensible SDK
    configuration. Typically, these variables are specific to the machine
@@ -29,19 +29,19 @@ build system applies them against ``local.conf`` and ``auto.conf``:
    of the extensible SDK configuration.
 
    For a list of the variables excluded by default, see the
-   :term:`SDK_LOCAL_CONF_BLACKLIST`
+   :term:`ESDK_LOCALCONF_REMOVE`
    in the glossary of the Yocto Project Reference Manual.
 
 -  Variables listed in
-   :term:`SDK_LOCAL_CONF_WHITELIST`
+   :term:`ESDK_LOCALCONF_ALLOW`
    are included. Including a variable in the value of
-   :term:`SDK_LOCAL_CONF_WHITELIST` overrides either of the previous two
+   :term:`ESDK_LOCALCONF_ALLOW` overrides either of the previous two
    filters. The default value is blank.
 
 -  Classes inherited globally with
    :term:`INHERIT` that are listed in
-   :term:`SDK_INHERIT_BLACKLIST`
-   are disabled. Using :term:`SDK_INHERIT_BLACKLIST` to disable these
+   :term:`ESDK_CLASS_INHERIT_DISABLE`
+   are disabled. Using :term:`ESDK_CLASS_INHERIT_DISABLE` to disable these
    classes is the typical method to disable classes that are problematic
    or unnecessary in the SDK context. The default value disables the
    :ref:`buildhistory <ref-classes-buildhistory>`
@@ -63,13 +63,13 @@ adjustments:
 -  If your SDK configuration inherits additional classes using the
    :term:`INHERIT` variable and you
    do not need or want those classes enabled in the SDK, you can
-   disable them by adding them to the :term:`SDK_INHERIT_BLACKLIST`
+   disable them by adding them to the :term:`ESDK_CLASS_INHERIT_DISABLE`
    variable as described in the previous section.
 
    .. note::
 
       The default value of
-      SDK_INHERIT_BLACKLIST
+      ESDK_CLASS_INHERIT_DISABLE
       is set using the "?=" operator. Consequently, you will need to
       either define the entire list by using the "=" operator, or you
       will need to append a value using either ":append" or the "+="
@@ -92,7 +92,7 @@ adjustments:
 
    -  Disable the tasks if they are added by a class and you do not need
       the functionality the class provides in the extensible SDK. To
-      disable the tasks, add the class to the :term:`SDK_INHERIT_BLACKLIST`
+      disable the tasks, add the class to the :term:`ESDK_CLASS_INHERIT_DISABLE`
       variable as described in the previous section.
 
 -  Generally, you want to have a shared state mirror set up so users of
@@ -277,7 +277,7 @@ source, you need to do a number of things:
       configuration file. You can then pass the variable to the SDK by
       adding the following::
 
-         SDK_LOCAL_CONF_WHITELIST = "SSTATE_MIRRORS"
+         ESDK_LOCALCONF_ALLOW = "SSTATE_MIRRORS"
 
    -  Alternatively, if you just want to set the :term:`SSTATE_MIRRORS`
       variable's value for the SDK alone, create a

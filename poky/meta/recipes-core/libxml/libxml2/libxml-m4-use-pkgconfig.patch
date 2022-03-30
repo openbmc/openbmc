@@ -22,11 +22,11 @@ Signed-off-by: Tony Tascioglu <tony.tascioglu@windriver.com>
  libxml.m4 | 190 ++----------------------------------------------------
  1 file changed, 5 insertions(+), 185 deletions(-)
 
-diff --git a/libxml.m4 b/libxml.m4
-index 09de9fe2..1c535853 100644
---- a/libxml.m4
-+++ b/libxml.m4
-@@ -1,192 +1,12 @@
+Index: libxml2-2.9.13/libxml.m4
+===================================================================
+--- libxml2-2.9.13.orig/libxml.m4
++++ libxml2-2.9.13/libxml.m4
+@@ -1,191 +1,12 @@
 -# Configure paths for LIBXML2
 -# Simon Josefsson 2020-02-12
 -# Fix autoconf 2.70+ warnings
@@ -151,9 +151,8 @@ index 09de9fe2..1c535853 100644
 -      {
 -        printf("\n*** An old version of libxml (%d.%d.%d) was found.\n",
 -               xml_major_version, xml_minor_version, xml_micro_version);
--        printf("*** You need a version of libxml newer than %d.%d.%d. The latest version of\n",
+-        printf("*** You need a version of libxml newer than %d.%d.%d.\n",
 -           major, minor, micro);
--        printf("*** libxml is always available from ftp://ftp.xmlsoft.org.\n");
 -        printf("***\n");
 -        printf("*** If you have already installed a sufficiently new version, this error\n");
 -        printf("*** probably means that the wrong copy of the xml2-config shell script is\n");
@@ -224,6 +223,3 @@ index 09de9fe2..1c535853 100644
 -  AC_SUBST(XML_LIBS)
 -  rm -f conf.xmltest
  ])
--- 
-2.7.4
-

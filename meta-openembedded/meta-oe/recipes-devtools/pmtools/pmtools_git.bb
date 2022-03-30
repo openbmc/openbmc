@@ -1,7 +1,7 @@
 DESCRIPTION = "This is a small collection of power management \
     test and investigation tools"
 HOMEPAGE = "http://lesswatts.org/projects/acpi"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3"
 
 PV = "20130209+git${SRCPV}"

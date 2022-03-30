@@ -2,7 +2,7 @@ SUMMARY = "Open-LLDP"
 DESCRIPTION = "Link Layer Discovery Protocol for Linux that includes support for DCBX"
 HOMEPAGE = "http://open-lldp.org/start"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8c2bc283e65df398ced5f5b747e78162"
 
 S = "${WORKDIR}/git"

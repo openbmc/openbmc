@@ -1,0 +1,75 @@
+From 9a84a44d5df4618dd616137fa755bd71b7eacc5f Mon Sep 17 00:00:00 2001
+From: Mike Frysinger <vapier@gentoo.org>
+Date: Sun, 23 Jan 2022 12:44:24 -0500
+Subject: [PATCH] gas: drop old cygnus install hack
+
+This was needed when gas was using the automake cygnus option, but
+this was removed years ago by Simon in d0ac1c44885daf68f631befa37e
+("Bump to autoconf 2.69 and automake 1.15.1").  So delete it here.
+The info pages are already & still installed by default w/out it.
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=9a84a44d5df4618dd616137fa755bd71b7eacc5f]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gas/Makefile.in  | 14 +++++---------
+ gas/doc/local.mk |  4 ----
+ 2 files changed, 5 insertions(+), 13 deletions(-)
+
+diff --git a/gas/Makefile.in b/gas/Makefile.in
+index 8f0a56fd8d6..67dac53f68c 100644
+--- a/gas/Makefile.in
++++ b/gas/Makefile.in
+@@ -1854,7 +1854,7 @@ info: info-recursive
+ 
+ info-am: $(INFO_DEPS) info-local
+ 
+-install-data-am: install-data-local install-info-am install-man
++install-data-am: install-info-am install-man
+ 
+ install-dvi: install-dvi-recursive
+ 
+@@ -2008,10 +2008,10 @@ uninstall-man: uninstall-man1
+ 	distclean-DEJAGNU distclean-compile distclean-generic \
+ 	distclean-hdr distclean-libtool distclean-tags dvi dvi-am html \
+ 	html-am html-local info info-am info-local install install-am \
+-	install-data install-data-am install-data-local install-dvi \
+-	install-dvi-am install-exec install-exec-am install-exec-local \
+-	install-html install-html-am install-info install-info-am \
+-	install-man install-man1 install-pdf install-pdf-am install-ps \
++	install-data install-data-am install-dvi install-dvi-am \
++	install-exec install-exec-am install-exec-local install-html \
++	install-html-am install-info install-info-am install-man \
++	install-man1 install-pdf install-pdf-am install-ps \
+ 	install-ps-am install-strip installcheck installcheck-am \
+ 	installdirs installdirs-am maintainer-clean \
+ 	maintainer-clean-aminfo maintainer-clean-generic mostlyclean \
+@@ -2211,10 +2211,6 @@ doc/asconfig.texi: doc/$(CONFIG).texi doc/$(am__dirstamp)
+ 	$(AM_V_GEN)cp $(srcdir)/doc/$(CONFIG).texi doc/asconfig.texi
+ 	$(AM_V_at)chmod u+w doc/asconfig.texi
+ 
+-# We want install to imply install-info as per GNU standards, despite the
+-# cygnus option.
+-install-data-local: install-info
+-
+ # Maintenance
+ 
+ # We need it for the taz target in ../Makefile.in.
+diff --git a/gas/doc/local.mk b/gas/doc/local.mk
+index c2de441257c..ac205cf08a2 100644
+--- a/gas/doc/local.mk
++++ b/gas/doc/local.mk
+@@ -101,10 +101,6 @@ CPU_DOCS = \
+ 	%D%/c-z80.texi \
+ 	%D%/c-z8k.texi
+ 
+-# We want install to imply install-info as per GNU standards, despite the
+-# cygnus option.
+-install-data-local: install-info
+-
+ # This one isn't ready for prime time yet.  Not even a little bit.
+ 
+ noinst_TEXINFOS = %D%/internals.texi
+-- 
+2.27.0
+

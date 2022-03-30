@@ -2,7 +2,7 @@ SUMMARY = "Multitouch viewer"
 DESCRIPTION = "mtview is a small X application that shows a graphical view of your MT-enabled hardware. It uses mtdev."
 HOMEPAGE = "http://bitmath.org/code/mtview/"
 
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4c61b8950dc1aab4d2aa7c2ae6b1cfb3"
 
 inherit autotools pkgconfig features_check

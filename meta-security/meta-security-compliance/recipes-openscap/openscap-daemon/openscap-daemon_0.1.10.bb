@@ -4,7 +4,7 @@
 SUMARRY = "The OpenSCAP Daemon is a service that runs in the background."
 HOME_URL = "https://www.open-scap.org/tools/openscap-daemon/"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=40d2542b8c43a3ec2b7f5da31a697b88"
-LICENSE = "LGPL-2.1"
+LICENSE = "LGPL-2.1-only"
 
 DEPENDS = "python3-dbus"
 
@@ -13,7 +13,7 @@ SRC_URI = "git://github.com/OpenSCAP/openscap-daemon.git;branch=master;protocol=
            file://0001-Renamed-module-and-variables-to-get-rid-of-async.patch \
           "
 
-inherit setuptools3
+inherit setuptools_build_meta
 
 S = "${WORKDIR}/git"
 

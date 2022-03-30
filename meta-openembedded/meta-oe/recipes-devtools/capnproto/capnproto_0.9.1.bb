@@ -14,6 +14,7 @@ S = "${WORKDIR}/git/c++"
 inherit cmake
 
 CXXFLAGS:append:mips = " -latomic"
+CXXFLAGS:append:powerpc = " -latomic"
 CXXFLAGS:append:riscv32 = " -latomic"
 
 EXTRA_OECMAKE += "\

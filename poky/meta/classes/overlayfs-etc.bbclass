@@ -26,7 +26,7 @@
 # overlay is out of scope of this class
 
 ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains("IMAGE_FEATURES", "overlayfs-etc", "create_overlayfs_etc_preinit;", "", d)}'
-IMAGE_FEATURES_CONFLICTS_overlayfs-etc = "package-management"
+IMAGE_FEATURES_CONFLICTS_overlayfs-etc = "${@ 'package-management' if bb.utils.to_boolean(d.getVar('OVERLAYFS_ETC_USE_ORIG_INIT_NAME'), True) else ''}"
 
 OVERLAYFS_ETC_MOUNT_POINT ??= ""
 OVERLAYFS_ETC_FSTYPE ??= ""

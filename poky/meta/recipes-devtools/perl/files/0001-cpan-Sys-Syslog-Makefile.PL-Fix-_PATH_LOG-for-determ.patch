@@ -1,0 +1,36 @@
+From a73fff1fcf0def4ce93964f1b63fe3ad0967259d Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Fri, 18 Feb 2022 09:44:26 +0000
+Subject: [PATCH] cpan/Sys-Syslog/Makefile.PL: Fix _PATH_LOG for deterministic
+
+It checks host's path such as /dev/log and uses it, this doesn't make sense for
+cross build, and it causes undeterministic, for example, the contianer os
+usually doesn't have /dev/log which leads to a different build result since
+other host usually has /dev/log, so make it always use the default value to fix
+the issue.
+
+Submitted a ticket to upstream: https://rt.cpan.org/Ticket/Display.html?id=141612
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ cpan/Sys-Syslog/Makefile.PL | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/cpan/Sys-Syslog/Makefile.PL b/cpan/Sys-Syslog/Makefile.PL
+index d09ba69..d44e58c 100644
+--- a/cpan/Sys-Syslog/Makefile.PL
++++ b/cpan/Sys-Syslog/Makefile.PL
+@@ -130,6 +130,8 @@ else {
+     $_PATH_LOG = "";
+ }
+ 
++# OE specific
++$_PATH_LOG = "";
+ 
+ # if possible, generate the code that handles the constants with 
+ # ExtUtils::Constant, otherwise use cached copy in fallback/
+-- 
+2.31.1
+

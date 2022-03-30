@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=bccf824202692270a1e0829a62e3f47b"
 
 PYPI_PACKAGE := "Pint"
 
-inherit pypi ptest setuptools3
+inherit pypi ptest python_setuptools_build_meta
 
 SRC_URI[sha256sum] = "8c4bce884c269051feb7abc69dbfd18403c0c764abc83da132e8a7222f8ba801"
 

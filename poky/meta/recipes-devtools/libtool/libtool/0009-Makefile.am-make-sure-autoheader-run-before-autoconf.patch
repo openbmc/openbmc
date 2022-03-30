@@ -13,15 +13,11 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
 Upstream-Status: Submitted [https://lists.gnu.org/archive/html/libtool-patches/2021-10/msg00015.html]
 
----
- Makefile.am | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
 diff --git a/Makefile.am b/Makefile.am
-index 4142c90..fe1a9fc 100644
+index 6b546092..84795d87 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -365,7 +365,7 @@ lt_configure_deps = $(lt_aclocal_m4) $(lt_aclocal_m4_deps)
+@@ -370,7 +370,7 @@ lt_configure_deps = $(lt_aclocal_m4) $(lt_aclocal_m4_deps)
  $(lt_aclocal_m4): $(lt_aclocal_m4_deps)
  	$(AM_V_GEN)cd '$(srcdir)/$(ltdl_dir)' && $(ACLOCAL) -I ../m4
  
@@ -31,5 +27,5 @@ index 4142c90..fe1a9fc 100644
  
  $(lt_config_h_in): $(lt_configure_deps)
 -- 
-2.29.2
+2.25.1
 

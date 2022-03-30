@@ -1,7 +1,7 @@
 SUMMARY = "The tdb library"
 HOMEPAGE = "http://tdb.samba.org/"
 SECTION = "libs"
-LICENSE = "LGPL-3.0+ & GPL-3.0+"
+LICENSE = "LGPL-3.0-or-later & GPL-3.0-or-later"
 
 LIC_FILES_CHKSUM = "file://tools/tdbdump.c;endline=18;md5=b59cd45aa8624578126a8c98f48018c4 \
                     file://include/tdb.h;endline=27;md5=f5bb544641d3081821bcc1dd58310be6"

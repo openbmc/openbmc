@@ -4,7 +4,7 @@ The module implements perlio layer for gzip."
 
 HOMEPAGE = "https://metacpan.org/pod/PerlIO::gzip"
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPL-1.0+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://README;beginline=55;endline=61;md5=bc3da2dec1fbea59ac91172c5e0eb837"
 
 DEPENDS += "perl"

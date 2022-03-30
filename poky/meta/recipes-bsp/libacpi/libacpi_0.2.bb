@@ -22,7 +22,7 @@ UPSTREAM_CHECK_URI = "http://www.ngolde.de/libacpi.html"
 
 inherit lib_package
 
-COMPATIBLE_HOST = '(x86_64|i.86).*-(linux|freebsd.*)'
+COMPATIBLE_HOST = '(x86_64|i.86|aarch64).*-(linux|freebsd.*)'
 
 CFLAGS += "-fPIC"
 EXTRA_OEMAKE = '-e MAKEFLAGS= STRIP="echo"'

@@ -1,14 +1,9 @@
 inherit kernel-uboot kernel-artifact-names uboot-sign
 
-KERNEL_IMAGETYPE_REPLACEMENT = ""
-
-python __anonymous () {
+def get_fit_replacement_type(d):
     kerneltypes = d.getVar('KERNEL_IMAGETYPES') or ""
+    replacementtype = ""
     if 'fitImage' in kerneltypes.split():
-        depends = d.getVar("DEPENDS")
-        depends = "%s u-boot-tools-native dtc-native" % depends
-        d.setVar("DEPENDS", depends)
-
         uarch = d.getVar("UBOOT_ARCH")
         if uarch == "arm64":
             replacementtype = "Image"
@@ -22,15 +17,18 @@ python __anonymous () {
             replacementtype = "linux.bin"
         else:
             replacementtype = "zImage"
+    return replacementtype
 
-        d.setVar("KERNEL_IMAGETYPE_REPLACEMENT", replacementtype)
+KERNEL_IMAGETYPE_REPLACEMENT ?= "${@get_fit_replacement_type(d)}"
+DEPENDS:append = " ${@'u-boot-tools-native dtc-native' if 'fitImage' in (d.getVar('KERNEL_IMAGETYPES') or '').split() else ''}"
 
+python __anonymous () {
         # Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
         # to kernel.bbclass . We have to override it, since we pack zImage
         # (at least for now) into the fitImage .
         typeformake = d.getVar("KERNEL_IMAGETYPE_FOR_MAKE") or ""
         if 'fitImage' in typeformake.split():
-            d.setVar('KERNEL_IMAGETYPE_FOR_MAKE', typeformake.replace('fitImage', replacementtype))
+            d.setVar('KERNEL_IMAGETYPE_FOR_MAKE', typeformake.replace('fitImage', d.getVar('KERNEL_IMAGETYPE_REPLACEMENT')))
 
         image = d.getVar('INITRAMFS_IMAGE')
         if image:
@@ -63,6 +61,11 @@ FIT_DESC ?= "Kernel fitImage for ${DISTRO_NAME}/${PV}/${MACHINE}"
 
 # Sign individual images as well
 FIT_SIGN_INDIVIDUAL ?= "0"
+
+FIT_CONF_PREFIX ?= "conf-"
+FIT_CONF_PREFIX[doc] = "Prefix to use for FIT configuration node name"
+
+FIT_SUPPORTED_INITRAMFS_FSTYPES ?= "cpio.lz4 cpio.lzo cpio.lzma cpio.xz cpio.zst cpio.gz ext2.gz cpio"
 
 # Keys used to sign individually image nodes.
 # The keys to sign image nodes must be different from those used to sign
@@ -358,7 +361,7 @@ fitimage_emit_section_config() {
 	# Test if we have any DTBs at all
 	sep=""
 	conf_desc=""
-	conf_node="conf-"
+	conf_node="${FIT_CONF_PREFIX}"
 	kernel_line=""
 	fdt_line=""
 	ramdisk_line=""
@@ -407,9 +410,9 @@ fitimage_emit_section_config() {
 		# default node is selected based on dtb ID if it is present,
 		# otherwise its selected based on kernel ID
 		if [ -n "$dtb_image" ]; then
-			default_line="default = \"conf-$dtb_image\";"
+			default_line="default = \"${FIT_CONF_PREFIX}$dtb_image\";"
 		else
-			default_line="default = \"conf-$kernel_id\";"
+			default_line="default = \"${FIT_CONF_PREFIX}$kernel_id\";"
 		fi
 	fi
 
@@ -565,17 +568,22 @@ fitimage_assemble() {
 	#
 	if [ "x${ramdiskcount}" = "x1" ] && [ "${INITRAMFS_IMAGE_BUNDLE}" != "1" ]; then
 		# Find and use the first initramfs image archive type we find
-		for img in cpio.lz4 cpio.lzo cpio.lzma cpio.xz cpio.zst cpio.gz ext2.gz cpio; do
+		found=
+		for img in ${FIT_SUPPORTED_INITRAMFS_FSTYPES}; do
 			initramfs_path="${DEPLOY_DIR_IMAGE}/${INITRAMFS_IMAGE_NAME}.$img"
-			echo -n "Searching for $initramfs_path..."
 			if [ -e "$initramfs_path" ]; then
-				echo "found"
+				bbnote "Found initramfs image: $initramfs_path"
+				found=true
 				fitimage_emit_section_ramdisk $1 "$ramdiskcount" "$initramfs_path"
 				break
 			else
-				echo "not found"
+				bbnote "Did not find initramfs image: $initramfs_path"
 			fi
 		done
+
+		if [ -z "$found" ]; then
+			bbfatal "Could not find a valid initramfs type for ${INITRAMFS_IMAGE_NAME}, the supported types are: ${FIT_SUPPORTED_INITRAMFS_FSTYPES}"
+		fi
 	fi
 
 	fitimage_emit_section_maint $1 sectend
@@ -685,12 +693,12 @@ do_kernel_generate_rsa_keys() {
 			# make directory if it does not already exist
 			mkdir -p "${UBOOT_SIGN_KEYDIR}"
 
-			echo "Generating RSA private key for signing fitImage"
+			bbnote "Generating RSA private key for signing fitImage"
 			openssl genrsa ${FIT_KEY_GENRSA_ARGS} -out \
 				"${UBOOT_SIGN_KEYDIR}/${UBOOT_SIGN_KEYNAME}".key \
 			"${FIT_SIGN_NUMBITS}"
 
-			echo "Generating certificate for signing fitImage"
+			bbnote "Generating certificate for signing fitImage"
 			openssl req ${FIT_KEY_REQ_ARGS} "${FIT_KEY_SIGN_PKCS}" \
 				-key "${UBOOT_SIGN_KEYDIR}/${UBOOT_SIGN_KEYNAME}".key \
 				-out "${UBOOT_SIGN_KEYDIR}/${UBOOT_SIGN_KEYNAME}".crt
@@ -703,12 +711,12 @@ do_kernel_generate_rsa_keys() {
 			# make directory if it does not already exist
 			mkdir -p "${UBOOT_SIGN_KEYDIR}"
 
-			echo "Generating RSA private key for signing fitImage"
+			bbnote "Generating RSA private key for signing fitImage"
 			openssl genrsa ${FIT_KEY_GENRSA_ARGS} -out \
 				"${UBOOT_SIGN_KEYDIR}/${UBOOT_SIGN_IMG_KEYNAME}".key \
 			"${FIT_SIGN_NUMBITS}"
 
-			echo "Generating certificate for signing fitImage"
+			bbnote "Generating certificate for signing fitImage"
 			openssl req ${FIT_KEY_REQ_ARGS} "${FIT_KEY_SIGN_PKCS}" \
 				-key "${UBOOT_SIGN_KEYDIR}/${UBOOT_SIGN_IMG_KEYNAME}".key \
 				-out "${UBOOT_SIGN_KEYDIR}/${UBOOT_SIGN_IMG_KEYNAME}".crt
@@ -724,13 +732,13 @@ kernel_do_deploy:append() {
 	if echo ${KERNEL_IMAGETYPES} | grep -wq "fitImage"; then
 
 		if [ "${INITRAMFS_IMAGE_BUNDLE}" != "1" ]; then
-			echo "Copying fit-image.its source file..."
+			bbnote "Copying fit-image.its source file..."
 			install -m 0644 ${B}/fit-image.its "$deployDir/fitImage-its-${KERNEL_FIT_NAME}.its"
 			if [ -n "${KERNEL_FIT_LINK_NAME}" ] ; then
 				ln -snf fitImage-its-${KERNEL_FIT_NAME}.its "$deployDir/fitImage-its-${KERNEL_FIT_LINK_NAME}"
 			fi
 
-			echo "Copying linux.bin file..."
+			bbnote "Copying linux.bin file..."
 			install -m 0644 ${B}/linux.bin $deployDir/fitImage-linux.bin-${KERNEL_FIT_NAME}${KERNEL_FIT_BIN_EXT}
 			if [ -n "${KERNEL_FIT_LINK_NAME}" ] ; then
 				ln -snf fitImage-linux.bin-${KERNEL_FIT_NAME}${KERNEL_FIT_BIN_EXT} "$deployDir/fitImage-linux.bin-${KERNEL_FIT_LINK_NAME}"
@@ -738,14 +746,14 @@ kernel_do_deploy:append() {
 		fi
 
 		if [ -n "${INITRAMFS_IMAGE}" ]; then
-			echo "Copying fit-image-${INITRAMFS_IMAGE}.its source file..."
+			bbnote "Copying fit-image-${INITRAMFS_IMAGE}.its source file..."
 			install -m 0644 ${B}/fit-image-${INITRAMFS_IMAGE}.its "$deployDir/fitImage-its-${INITRAMFS_IMAGE_NAME}-${KERNEL_FIT_NAME}.its"
 			if [ -n "${KERNEL_FIT_LINK_NAME}" ] ; then
 				ln -snf fitImage-its-${INITRAMFS_IMAGE_NAME}-${KERNEL_FIT_NAME}.its "$deployDir/fitImage-its-${INITRAMFS_IMAGE_NAME}-${KERNEL_FIT_LINK_NAME}"
 			fi
 
 			if [ "${INITRAMFS_IMAGE_BUNDLE}" != "1" ]; then
-				echo "Copying fitImage-${INITRAMFS_IMAGE} file..."
+				bbnote "Copying fitImage-${INITRAMFS_IMAGE} file..."
 				install -m 0644 ${B}/arch/${ARCH}/boot/fitImage-${INITRAMFS_IMAGE} "$deployDir/fitImage-${INITRAMFS_IMAGE_NAME}-${KERNEL_FIT_NAME}${KERNEL_FIT_BIN_EXT}"
 				if [ -n "${KERNEL_FIT_LINK_NAME}" ] ; then
 					ln -snf fitImage-${INITRAMFS_IMAGE_NAME}-${KERNEL_FIT_NAME}${KERNEL_FIT_BIN_EXT} "$deployDir/fitImage-${INITRAMFS_IMAGE_NAME}-${KERNEL_FIT_LINK_NAME}"
@@ -764,9 +772,9 @@ kernel_do_deploy:append() {
 		# If we're also creating and/or signing the uboot fit, now we need to
 		# deploy it, it's its file, as well as u-boot-spl.dtb
 		install -m 0644 ${B}/u-boot-spl-${MACHINE}*.dtb "$deployDir/"
-		echo "Copying u-boot-fitImage file..."
+		bbnote "Copying u-boot-fitImage file..."
 		install -m 0644 ${B}/u-boot-fitImage-* "$deployDir/"
-		echo "Copying u-boot-its file..."
+		bbnote "Copying u-boot-its file..."
 		install -m 0644 ${B}/u-boot-its-* "$deployDir/"
 	fi
 }

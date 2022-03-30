@@ -3,7 +3,7 @@ HOMEPAGE = "http://rsync.samba.org/"
 DESCRIPTION = "rsync is an open source utility that provides fast incremental file transfer."
 BUGTRACKER = "http://rsync.samba.org/bugzilla.html"
 SECTION = "console/network"
-# GPLv2+ (<< 3.0.0), GPLv3+ (>= 3.0.0)
+# GPL-2.0-or-later (<< 3.0.0), GPL-3.0-or-later (>= 3.0.0)
 # Includes opennsh and xxhash dynamic link exception
 LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=9e5a4f9b3a253d51520617aa54f8eb26"

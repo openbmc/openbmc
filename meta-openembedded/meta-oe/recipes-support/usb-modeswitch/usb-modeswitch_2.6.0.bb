@@ -1,5 +1,5 @@
 SUMMARY = "A mode switching tool for controlling 'flip flop' (multiple device) USB gear"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=091556bd6d0154cd4c2d17a1bfc7380a"
 
 DEPENDS = "libusb1"

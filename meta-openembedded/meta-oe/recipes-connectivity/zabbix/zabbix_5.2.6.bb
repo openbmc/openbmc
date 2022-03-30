@@ -17,7 +17,7 @@ organisations with a few servers and for large companies with a \
 multitude of servers."
 HOMEPAGE = "http://www.zabbix.com/"
 SECTION = "Applications/Internet"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=300e938ad303147fede2294ed78fe02e"
 DEPENDS  = "libevent libpcre openldap virtual/libiconv zlib"
 

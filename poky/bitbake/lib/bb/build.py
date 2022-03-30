@@ -582,7 +582,7 @@ def _exec_task(fn, task, d, quieterr):
     running it with its own local metadata, and with some useful variables set.
     """
     if not d.getVarFlag(task, 'task', False):
-        event.fire(TaskInvalid(task, d), d)
+        event.fire(TaskInvalid(task, fn, d), d)
         logger.error("No such task: %s" % task)
         return 1
 

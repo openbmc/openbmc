@@ -1,5 +1,5 @@
 SUMMARY = "Grilo is a framework forsearching media content from various sources"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=fbc093901857fcd118f065f900982c24"
 
 DEPENDS = " \

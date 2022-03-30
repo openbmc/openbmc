@@ -2,7 +2,7 @@ SUMMARY = "Toybox combines common utilities together into a single executable."
 HOMEPAGE = "http://www.landley.net/toybox/"
 DEPENDS = "attr virtual/crypt"
 
-LICENSE = "BSD-0-Clause"
+LICENSE = "0BSD"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=78659a599b9325da368f2f1eb88f19c7"
 
 inherit cml1 update-alternatives

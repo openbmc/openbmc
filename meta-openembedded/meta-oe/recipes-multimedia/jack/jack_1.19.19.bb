@@ -6,7 +6,7 @@ flow model and lock-free programming techniques for graph access have \
 been used to have a more dynamic and robust system."
 SECTION = "libs/multimedia"
 
-LICENSE = "GPLv2 & LGPLv2.1"
+LICENSE = "GPL-2.0-only & LGPL-2.1-only"
 LIC_FILES_CHKSUM = " \
     file://common/jack/control.h;beginline=2;endline=21;md5=e6df0bf30cde8b3b825451459488195d \
     file://common/jack/jack.h;beginline=1;endline=19;md5=6b736ed6b810592b135480a5e853392e \

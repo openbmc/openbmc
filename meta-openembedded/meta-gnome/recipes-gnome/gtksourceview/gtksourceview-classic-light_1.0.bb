@@ -1,5 +1,5 @@
 DESCRIPTION = "Gtksourceview Classic-Light theme"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://classic-light.xml;beginline=6;endline=23;md5=2b4f75364fad00a4d752214dcbd7d7c3"
 
 inherit allarch

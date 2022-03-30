@@ -152,6 +152,9 @@ class DataContext(dict):
         self['d'] = metadata
 
     def __missing__(self, key):
+        # Skip commonly accessed invalid variables
+        if key in ['bb', 'oe', 'int', 'bool', 'time', 'str', 'os']:
+            raise KeyError(key)
         value = self.metadata.getVar(key)
         if value is None or self.metadata.getVarFlag(key, 'func', False):
             raise KeyError(key)
@@ -670,10 +673,11 @@ class DataSmart(MutableMapping):
             self.varhistory.record(**loginfo)
             self.setVar(newkey, val, ignore=True, parsing=True)
 
-        for i in (__setvar_keyword__):
-            src = self.getVarFlag(key, i, False)
-            if src is None:
+        srcflags = self.getVarFlags(key, False, True) or {}
+        for i in srcflags:
+            if i not in (__setvar_keyword__):
                 continue
+            src = srcflags[i]
 
             dest = self.getVarFlag(newkey, i, False) or []
             dest.extend(src)

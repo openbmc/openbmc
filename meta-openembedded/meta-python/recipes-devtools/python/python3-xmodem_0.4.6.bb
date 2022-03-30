@@ -7,8 +7,13 @@ SRC_URI[sha256sum] = "089737298f5738eabc43f2519efdc80b402693768f16383f7013b9e6f8
 
 inherit pypi setuptools3
 
+do_install:append() {
+    install -d ${D}${docdir}/${PN}
+    mv ${D}/usr/doc/* ${D}${docdir}/${PN}/
+    rmdir ${D}/usr/doc
+}
+
 RDEPENDS:${PN} += " \
     ${PYTHON_PN}-logging \
 "
-
 BBCLASSEXTEND = "native nativesdk"

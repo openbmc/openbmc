@@ -5,7 +5,7 @@ such as phones and laptops."
 HOMEPAGE = "http://irda.sourceforge.net/"
 BUGTRACKER = "http://sourceforge.net/p/irda/bugs/"
 SECTION = "base"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://irdadump/COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
                     file://smcinit/COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3 \
                     file://man/COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \

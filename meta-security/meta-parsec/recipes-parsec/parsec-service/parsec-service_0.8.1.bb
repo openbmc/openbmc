@@ -12,7 +12,12 @@ SRC_URI += "crate://crates.io/parsec-service/${PV} \
 
 DEPENDS = "clang-native"
 
-PACKAGECONFIG ??= "TPM PKCS11 MBED-CRYPTO CRYPTOAUTHLIB"
+PACKAGECONFIG ??= "PKCS11 MBED-CRYPTO CRYPTOAUTHLIB"
+
+have_TPM = "${@bb.utils.contains('DISTRO_FEATURES', 'tpm2', 'TPM', '', d)}"
+PACKAGECONFIG:append = " ${@bb.utils.contains('BBFILE_COLLECTIONS', 'tpm-layer', '${have_TPM}', '', d)}"
+
+
 PACKAGECONFIG[ALL] = "all-providers cryptoki/generate-bindings tss-esapi/generate-bindings,,tpm2-tss libts,libts"
 PACKAGECONFIG[TPM] = "tpm-provider tss-esapi/generate-bindings,,tpm2-tss"
 PACKAGECONFIG[PKCS11] = "pkcs11-provider cryptoki/generate-bindings,"

@@ -203,7 +203,8 @@ do_install:append() {
 INITSCRIPT_PACKAGES = "${PN}-slapd"
 INITSCRIPT_NAME:${PN}-slapd = "openldap"
 INITSCRIPT_PARAMS:${PN}-slapd = "defaults"
-SYSTEMD_SERVICE:${PN}-slapd = "hostapd.service"
+SYSTEMD_PACKAGES = "${PN}-slapd"
+SYSTEMD_SERVICE:${PN}-slapd = "slapd.service"
 SYSTEMD_AUTO_ENABLE:${PN}-slapd ?= "disable"
 
 PACKAGES_DYNAMIC += "^${PN}-backends.* ^${PN}-backend-.*"

@@ -1,6 +1,6 @@
 SUMMARY = "Xfce4 Widget library and X Window System interaction"
 SECTION = "x11/libs"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=252890d9eee26aab7b432e8b8a616475"
 DEPENDS = "intltool-native perl-native gtk+3 libice libsm libxfce4util xfce4-dev-tools xfconf virtual/libx11"
 

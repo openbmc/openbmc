@@ -78,7 +78,7 @@ def getDiskData(BBDirs):
         action = pathSpaceInodeRe.group(1)
         if action == "ABORT":
             # Emit a deprecation warning
-            logger.warnonce("The BB_DISKMON_DIRS \"ABORT\" action has been been renamed to \"HALT\", update configuration")
+            logger.warnonce("The BB_DISKMON_DIRS \"ABORT\" action has been renamed to \"HALT\", update configuration")
             action = "HALT"
 
         if action not in ("HALT", "STOPTASKS", "WARN"):

@@ -3,7 +3,7 @@
 
 SUMMARY = "Simple utility for swapping an fbtft-based device as the console."
 HOMEPAGE = "https://gitlab.com/pibox/con2fbmap"
-LICENSE = "GPL-3.0"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 SECTION = "console/utils"
 DEPENDS = ""

@@ -16,6 +16,8 @@ REQUIRED_DISTRO_FEATURES = "wayland"
 
 DEPENDS += "lvgl"
 
+EXTRA_OECMAKE += "-DLIB_INSTALL_DIR=${BASELIB}"
+
 inherit cmake
 inherit features_check
 

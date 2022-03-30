@@ -27,7 +27,7 @@ DEPENDS = "libdevmapper \
            json-c \
           "
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 
 SRC_URI = "git://git.opensvc.com/multipath-tools/.git;protocol=http;branch=master \
            file://multipathd.oe \

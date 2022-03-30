@@ -4,7 +4,7 @@ DESCRIPTION = "The Intel Speed Select Technology (Intel SST) is a powerful new \
 collection of features giving you more granular control over CPU performance \
 for optimized total cost of ownership."
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 
 inherit kernelsrc
 

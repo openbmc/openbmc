@@ -14,6 +14,15 @@ diff --git a/pylib/gyp/common.py b/pylib/gyp/common.py
 index b268d229..4f9cb0ec 100644
 --- a/pylib/gyp/common.py
 +++ b/pylib/gyp/common.py
+@@ -4,7 +4,7 @@
+ 
+ from __future__ import with_statement
+ 
+-import collections
++import collections.abc
+ import errno
+ import filecmp
+ import os.path
 @@ -494,7 +494,7 @@ def uniquer(seq, idfun=None):
  
  

@@ -1,6 +1,6 @@
 DESCRIPTION = "Pythonic DBus library"
 HOMEPAGE = "https://pypi.python.org/pypi/pydbus/"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a916467b91076e631dd8edb7424769c7"
 
 SRC_URI += "file://0001-Support-asynchronous-calls-58.patch \

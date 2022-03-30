@@ -1,6 +1,6 @@
 SUMMARY = "Xfce Calender"
 SECTION = "x11/application"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=9ac2e7cff1ddaf48b6eab6028f23ef88"
 DEPENDS = "gtk+ xfce4-panel libical popt"
 

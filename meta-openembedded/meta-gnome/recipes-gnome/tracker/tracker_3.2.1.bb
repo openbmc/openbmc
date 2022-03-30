@@ -1,5 +1,5 @@
 SUMMARY = "Tracker is a file search engine"
-LICENSE = "GPLv2 & LGPLv2.1"
+LICENSE = "GPL-2.0-only & LGPL-2.1-only"
 LIC_FILES_CHKSUM = " \
     file://COPYING.GPL;md5=ee31012bf90e7b8c108c69f197f3e3a4 \
     file://COPYING.LGPL;md5=2d5025d4aa3495befef8f17206a5b0a1 \

@@ -1,6 +1,6 @@
 SUMMARY = "Protocol plugin for Office 365/Lync/OCS for Adium, Pidgin, Miranda and Telepathy IM Framework"
 SECTION = "webos/services"
-LICENSE = "GPLv2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 DEPENDS = "pidgin gmime intltool-native glib-2.0-native"

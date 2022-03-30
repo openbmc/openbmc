@@ -1,7 +1,7 @@
 SUMMARY = "MusicBrainz client library"
 DESCRIPTION = "The MusicBrainz client is a library which can be built into other programs.  The library allows you to access the data held on the MusicBrainz server."
 HOMEPAGE = "http://musicbrainz.org"
-LICENSE = "LGPLv2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING.txt;md5=fbc093901857fcd118f065f900982c24"
 DEPENDS = "expat libxml2 libxml2-native neon neon-native libmusicbrainz-native"
 

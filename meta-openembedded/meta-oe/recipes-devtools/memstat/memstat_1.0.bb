@@ -6,7 +6,7 @@ is used and which 'old' libs are loaded. \
 HOMEPAGE = "http://memstattool.sourceforge.net/"
 SECTION = "devtool"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 
 S = "${WORKDIR}/memstattool"
 

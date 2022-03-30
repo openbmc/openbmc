@@ -2,7 +2,7 @@ DESCRIPTION = "Links is graphics and text mode WWW \
 browser, similar to Lynx."
 HOMEPAGE = "http://links.twibright.com/"
 SECTION = "console/network"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b0c80473f97008e42e29a9f80fcc55ff"
 DEPENDS = "jpeg libpng flex openssl zlib"
 

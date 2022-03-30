@@ -11,7 +11,7 @@ DESCRIPTION = "The turbostat tool allows you to determine the actual \
 processor frequency and idle power saving state residency on supported \
 processors."
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://../COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 COMPATIBLE_HOST = '(x86_64.*|i.86.*)-linux'
 COMPATIBLE_HOST:libc-musl = "null"

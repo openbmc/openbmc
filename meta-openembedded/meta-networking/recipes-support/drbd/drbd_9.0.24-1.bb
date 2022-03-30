@@ -4,7 +4,7 @@ DESCRIPTION = "DRBD is a block device which is designed to build high \
                block device via (a dedicated) network. You could see \
                it as a network raid-1."
 HOMEPAGE = "http://oss.linbit.com/drbd/"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5574c6965ae5f583e55880e397fbb018"
 DEPENDS = "virtual/kernel"
 

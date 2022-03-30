@@ -14,15 +14,12 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 Upstream-Status: Submitted [https://lists.gnu.org/archive/html/libtool-patches/2021-10/msg00020.html]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
----
- Makefile.am | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index 2752ecc..29950db 100644
+index 84795d87..8c9949ed 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -328,7 +328,7 @@ EXTRA_DIST     += $(lt_aclocal_m4) \
+@@ -333,7 +333,7 @@ EXTRA_DIST     += $(lt_aclocal_m4) \
  		  $(lt_obsolete_m4) \
  		  $(stamp_mk)
  
@@ -32,5 +29,5 @@ index 2752ecc..29950db 100644
  
  # Don't let unused scripts leak into the libltdl Makefile
 -- 
-2.29.2
+2.25.1
 

@@ -1,6 +1,6 @@
 SUMMARY = "A GObject library for Facebook Graph API"
 SECTION = "x11/gnome"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5804fe91d3294da4ac47c02b454bbc8a"
 
 DEPENDS = " \
@@ -10,7 +10,10 @@ DEPENDS = " \
     gnome-online-accounts \
 "
 
-inherit gnomebase gtk-doc gobject-introspection pkgconfig
+inherit gnomebase gtk-doc gobject-introspection pkgconfig features_check
+
+# for gnome-online-accounts
+REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI += " file://0001-Update-rest-requirement-to-rest-1.0.patch"
 SRC_URI[archive.md5sum] = "c38af63e49f8fe8baad99537956b69ba"

@@ -1,0 +1,31 @@
+From eef7c44c10de32ba399ab162cb5799fafdce3fa5 Mon Sep 17 00:00:00 2001
+From: Joe Slater <joe.slater@windriver.com>
+Date: Tue, 15 Mar 2022 22:00:04 +0000
+Subject: [PATCH] fixline1: fix line 1
+
+Ironically, fixline1 needs its first line modified by
+fixline1.  We do that, manually.
+
+Upstream-Status: Inappropriate [OE specific cross build setup]
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+---
+ fixline1 | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/fixline1 b/fixline1
+index 113e9bb..8a38e96 100755
+--- a/fixline1
++++ b/fixline1
+@@ -1,4 +1,7 @@
+-#!expect --
++#!/bin/sh
++# expect won't see the exec \
++exec expect -- "$0" ${1+"$@"}
++
+ # Synopsis: fixline1 newpath < input > output
+ # Author: Don Libes
+ 
+-- 
+2.32.0
+

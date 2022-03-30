@@ -1,7 +1,7 @@
 SUMMARY = "Hierarchical, reference counted memory pool system with destructors"
 HOMEPAGE = "http://ldb.samba.org"
 SECTION = "libs"
-LICENSE = "LGPL-3.0+ & LGPL-2.1+ & GPL-3.0+"
+LICENSE = "LGPL-3.0-or-later & LGPL-2.1-or-later & GPL-3.0-or-later"
 
 DEPENDS += "libtdb libtalloc libtevent popt"
 RDEPENDS:pyldb += "python3"

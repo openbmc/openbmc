@@ -1,7 +1,7 @@
 SUMMARY = "MPEG Audio Decoder library"
 HOMEPAGE = "http://sourceforge.net/projects/mad/"
 BUGTRACKER = "http://sourceforge.net/tracker/?group_id=12349&atid=112349"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LICENSE_FLAGS = "commercial"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
     file://COPYRIGHT;md5=8e55eb14894e782b84488d5a239bc23d \

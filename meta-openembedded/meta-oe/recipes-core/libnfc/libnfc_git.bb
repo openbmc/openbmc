@@ -1,7 +1,7 @@
 SUMMARY  = "Platform independent Near Field Communication (NFC) library"
 DESCRIPTION = "libnfc is a library which allows userspace application access \
 to NFC devices."
-LICENSE  = "LGPLv3"
+LICENSE  = "LGPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b52f2d57d10c4f7ee67a7eb9615d5d24"
 SECTION = "libs"
 

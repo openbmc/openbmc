@@ -115,7 +115,6 @@ def make_dtb_boot_files(d):
     # Generate IMAGE_BOOT_FILES entries for device tree files listed in
     # KERNEL_DEVICETREE.
     alldtbs = d.getVar('KERNEL_DEVICETREE')
-    imgtyp = d.getVar('KERNEL_IMAGETYPE')
 
     def transform(dtb):
         base = os.path.basename(dtb)

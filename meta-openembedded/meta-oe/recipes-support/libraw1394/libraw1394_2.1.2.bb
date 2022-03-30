@@ -1,7 +1,7 @@
 SUMMARY = "base library for low-level IEEE 1394 accesses"
 HOMEPAGE = "https://ieee1394.wiki.kernel.org/index.php/Libraries#libraw1394"
 SECTION = "libs"
-LICENSE = "LGPL-2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=d8045f3b8f929c1cb29a1e3fd737b499"
 
 SRC_URI = "https://www.kernel.org/pub/linux/libs/ieee1394/${BPN}-${PV}.tar.gz"

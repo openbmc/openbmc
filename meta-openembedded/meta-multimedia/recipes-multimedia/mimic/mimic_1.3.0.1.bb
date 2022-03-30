@@ -4,7 +4,7 @@ HOMEPAGE = "https://mimic.mycroft.ai/"
 SECTION = "multimedia"
 
 # "Mimic is available under permissive BSD-like licenses"
-LICENSE = "MIT-X & \
+LICENSE = "MIT & \
            PD & \
            CMU-Tex & \
            BSD & \

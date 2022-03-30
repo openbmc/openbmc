@@ -11,6 +11,7 @@ import hashlib
 import tempfile
 import collections
 import os
+import tarfile
 from bb.fetch2 import URI
 from bb.fetch2 import FetchMethod
 import bb
@@ -626,6 +627,35 @@ class GitShallowTarballNamingTest(FetcherTest):
 
         dir = os.listdir(self.dldir)
         self.assertIn(self.mirror_tarball, dir)
+
+
+class CleanTarballTest(FetcherTest):
+    def setUp(self):
+        super(CleanTarballTest, self).setUp()
+        self.recipe_url = "git://git.openembedded.org/bitbake"
+        self.recipe_tarball = "git2_git.openembedded.org.bitbake.tar.gz"
+
+        self.d.setVar('BB_GENERATE_MIRROR_TARBALLS', '1')
+        self.d.setVar('SRCREV', '82ea737a0b42a8b53e11c9cde141e9e9c0bd8c40')
+
+    @skipIfNoNetwork()
+    def test_that_the_tarball_contents_does_not_leak_info(self):
+        fetcher = bb.fetch.Fetch([self.recipe_url], self.d)
+
+        fetcher.download()
+
+        fetcher.unpack(self.unpackdir)
+        mtime = bb.process.run('git log --all -1 --format=%ct',
+                cwd=os.path.join(self.unpackdir, 'git'))
+        self.assertEqual(len(mtime), 2)
+        mtime = int(mtime[0])
+
+        archive = tarfile.open(os.path.join(self.dldir, self.recipe_tarball))
+        self.assertNotEqual(len(archive.members), 0)
+        for member in archive.members:
+            self.assertEqual(member.uname, 'pokybuild')
+            self.assertEqual(member.gname, 'users')
+            self.assertEqual(member.mtime, mtime)
 
 
 class FetcherLocalTest(FetcherTest):

@@ -1,5 +1,7 @@
 require gzip.inc
 
+# change to GPL-3.0-or-later in 2007/07. Previous GPL-2.0-or-later version is
+# 1.3.12
 LICENSE = "GPL-3.0-or-later"
 
 SRC_URI = "${GNU_MIRROR}/gzip/${BP}.tar.gz \

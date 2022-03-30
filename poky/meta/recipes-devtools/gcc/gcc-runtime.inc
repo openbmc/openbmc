@@ -2,7 +2,7 @@ require gcc-configure-common.inc
 
 SUMMARY = "Runtime libraries from GCC"
 
-# Over-ride the LICENSE set by gcc-${PV}.inc to remove "& GPLv3"
+# Over-ride the LICENSE set by gcc-${PV}.inc to remove "& GPL-3.0-only"
 # All gcc-runtime packages are now covered by the runtime exception.
 LICENSE = "GPL-3.0-with-GCC-exception"
 

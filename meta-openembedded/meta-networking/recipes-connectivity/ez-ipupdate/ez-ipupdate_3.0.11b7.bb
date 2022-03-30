@@ -1,7 +1,7 @@
 SUMMARY = "daemon that sends updates when your IP changes"
 HOMEPAGE = "http://sourceforge.net/projects/ez-ipupdate/"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=7783169b4be06b54e86730eb01bc3a31"
 
 SRC_URI = "http://sourceforge.net/projects/ez-ipupdate/files/${BPN}/${PV}/${BPN}-${PV}.tar.gz \

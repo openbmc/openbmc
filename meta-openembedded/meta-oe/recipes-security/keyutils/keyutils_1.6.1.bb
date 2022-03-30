@@ -7,7 +7,7 @@ DESCRIPTION = "\
 HOMEPAGE = "http://people.redhat.com/dhowells/keyutils"
 SECTION = "base"
 
-LICENSE = "LGPLv2.1+ & GPLv2.0+"
+LICENSE = "LGPL-2.1-or-later & GPL-2.0-or-later"
 
 LIC_FILES_CHKSUM = "file://LICENCE.GPL;md5=5f6e72824f5da505c1f4a7197f004b45 \
                     file://LICENCE.LGPL;md5=7d1cacaa3ea752b72ea5e525df54a21f"

@@ -1,7 +1,7 @@
 SUMMARY = "This is the set of GNU shar utilities."
 HOMEPAGE = "http://www.gnu.org/software/sharutils/"
 SECTION = "console/utils"
-LICENSE="GPLv3+"
+LICENSE="GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 inherit gettext autotools update-alternatives

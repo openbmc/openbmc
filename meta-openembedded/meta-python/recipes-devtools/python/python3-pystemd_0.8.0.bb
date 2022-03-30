@@ -1,5 +1,5 @@
 SUMMARY = "Python bindings for interacting with systemd over DBus"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=4fbd65380cdd255951079008b364516c"
 
 SRC_URI[md5sum] = "f993739eca645749f18d4ccfd4a0fbf3"

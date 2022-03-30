@@ -11,7 +11,14 @@ CVE_PRODUCT = "libtiff"
 SRC_URI = "http://download.osgeo.org/libtiff/tiff-${PV}.tar.gz \
            file://0001-tiffset-fix-global-buffer-overflow-for-ASCII-tags-wh.patch \
            file://561599c99f987dc32ae110370cfdd7df7975586b.patch \
-           file://eecb0712f4c3a5b449f70c57988260a667ddbdef.patch"
+           file://eecb0712f4c3a5b449f70c57988260a667ddbdef.patch \
+           file://0001-tif_jbig.c-fix-crash-when-reading-a-file-with-multip.patch \
+           file://0002-tiffcrop-fix-issue-380-and-382-heap-buffer-overflow-.patch \
+           file://0003-add-checks-for-return-value-of-limitMalloc-392.patch \
+           file://0004-TIFFFetchNormalTag-avoid-calling-memcpy-with-a-null-.patch \
+           file://0005-fix-the-FPE-in-tiffcrop-393.patch \
+           file://0006-fix-heap-buffer-overflow-in-tiffcp-278.patch \
+           "
 
 SRC_URI[sha256sum] = "0e46e5acb087ce7d1ac53cf4f56a09b221537fc86dfc5daaad1c2e89e1b37ac8"
 

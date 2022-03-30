@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENCE;md5=dc9277482effe59b734b004cbcc1fee7"
 
 SRC_URI[sha256sum] = "3e0be507486d4e21cf9d08847c7e57dd61a1603950399985f7c5a0be7fd33e36"
 
-inherit pypi setuptools3 ptest
+inherit pypi python_setuptools_build_meta ptest
 
 BBCLASSEXTEND = "native nativesdk"
 
@@ -20,10 +20,6 @@ RDEPENDS:${PN} += " \
 RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
 "
-
-do_configure:prepend() {
-	sed -i -e "/use_2to3=True,/d" ${S}/setup.py
-}
 
 do_install_ptest() {
 	cp -f ${S}/test_simpleeval.py ${D}${PTEST_PATH}/

@@ -1,0 +1,3 @@
+require ${BPN}.inc
+
+SRC_URI[sha256sum] = "d92bd13c5630905eeb6a983dcb702204da9731460c2a6e4e39f867996f371040"

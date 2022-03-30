@@ -2,9 +2,6 @@ From 8659eeeeda74d71e12080121f0b13a88cbdda433 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linux.intel.com>
 Date: Tue, 21 Feb 2017 11:23:27 -0600
 Subject: [PATCH] dpkg-deb/build.c: Remove usage of --clamp-mtime in tar
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 
 Recently dpkg added --clamp-mtime to tar to create reproducible
 build tarballs [1].
@@ -23,14 +20,14 @@ Update patch context for dpkg 1.19.4.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- dpkg-deb/build.c | 2 +-
+ src/deb/build.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/dpkg-deb/build.c b/dpkg-deb/build.c
-index 68d1875..053fcb7 100644
---- a/dpkg-deb/build.c
-+++ b/dpkg-deb/build.c
-@@ -457,7 +457,7 @@ tarball_pack(const char *dir, filenames_feed_func *tar_filenames_feeder,
+diff --git a/src/deb/build.c b/src/deb/build.c
+index 5c74ff3..76613ad 100644
+--- a/src/deb/build.c
++++ b/src/deb/build.c
+@@ -505,7 +505,7 @@ tarball_pack(const char *dir, filenames_feed_func *tar_filenames_feeder,
  
      command_init(&cmd, TAR, "tar -cf");
      command_add_args(&cmd, "tar", "-cf", "-", "--format=gnu",
@@ -40,4 +37,5 @@ index 68d1875..053fcb7 100644
      if (options->mode)
        command_add_args(&cmd, "--mode", options->mode, NULL);
 -- 
-2.11.0
+2.25.1
+

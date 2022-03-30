@@ -300,13 +300,8 @@ in the ``meta-poky`` layer:
 
 .. note::
 
-   Configurations set in the
-   conf/local.conf
-   file can also be set in the
-   conf/site.conf
-   and
-   conf/auto.conf
-   configuration files.
+   Configurations set in the ``conf/local.conf`` file can also be set
+   in the ``conf/site.conf`` and ``conf/auto.conf`` configuration files.
 
 The ``bblayers.conf`` file tells BitBake what layers you want considered
 during the build. By default, the layers listed in this file include
@@ -1036,12 +1031,10 @@ for example, to determine whether or not to run specific tests. See the
 :term:`IMAGE_MANIFEST`
 variable for additional information.
 
-Optimizing processes that are run across the image include ``mklibs``,
-``prelink``, and any other post-processing commands as defined by the
+Optimizing processes that are run across the image include ``mklibs``
+and any other post-processing commands as defined by the
 :term:`ROOTFS_POSTPROCESS_COMMAND`
-variable. The ``mklibs`` process optimizes the size of the libraries,
-while the ``prelink`` process optimizes the dynamic linking of shared
-libraries to reduce start up time of executables.
+variable. The ``mklibs`` process optimizes the size of the libraries.
 
 After the root filesystem is built, processing begins on the image
 through the :ref:`ref-tasks-image`
@@ -1379,15 +1372,15 @@ associated with an extensible SDK:
    Specifies whether or not the toolchain is included when building the
    extensible SDK.
 
--  :term:`SDK_LOCAL_CONF_WHITELIST`:
+-  :term:`ESDK_LOCALCONF_ALLOW`:
    A list of variables allowed through from the build system
    configuration into the extensible SDK configuration.
 
--  :term:`SDK_LOCAL_CONF_BLACKLIST`:
+-  :term:`ESDK_LOCALCONF_REMOVE`:
    A list of variables not allowed through from the build system
    configuration into the extensible SDK configuration.
 
--  :term:`SDK_INHERIT_BLACKLIST`:
+-  :term:`ESDK_CLASS_INHERIT_DISABLE`:
    A list of classes to remove from the
    :term:`INHERIT` value globally
    within the extensible SDK configuration.
@@ -1729,7 +1722,7 @@ it construct the basehash. The following statement effectively results
 in a list of global variable dependency excludes (i.e. variables never
 included in any checksum)::
 
-   BB_HASHBASE_WHITELIST ?= "TMPDIR FILE PATH PWD BB_TASKHASH BBPATH DL_DIR \\
+   BB_BASEHASH_IGNORE_VARS ?= "TMPDIR FILE PATH PWD BB_TASKHASH BBPATH DL_DIR \\
        SSTATE_DIR THISDIR FILESEXTRAPATHS FILE_DIRNAME HOME LOGNAME SHELL TERM \\
        USER FILESPATH STAGING_DIR_HOST STAGING_DIR_TARGET COREBASE PRSERV_HOST \\
        PRSERV_DUMPDIR PRSERV_DUMPFILE PRSERV_LOCKDOWN PARALLEL_MAKE \\

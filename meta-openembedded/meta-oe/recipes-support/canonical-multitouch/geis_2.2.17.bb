@@ -7,7 +7,7 @@ system-wide input gesture recognition mechanism."
 
 HOMEPAGE = "https://launchpad.net/geis"
 
-LICENSE = "GPLv3 & LGPLv3"
+LICENSE = "GPL-3.0-only & LGPL-3.0-only"
 LIC_FILES_CHKSUM = " \
     file://COPYING;md5=6a6a8e020838b23406c81b19c1d46df6 \
     file://COPYING.GPL;md5=f27defe1e96c2e1ecd4e0c9be8967949 \

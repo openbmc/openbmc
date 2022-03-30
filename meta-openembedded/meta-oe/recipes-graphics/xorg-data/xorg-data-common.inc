@@ -1,6 +1,6 @@
 HOMEPAGE = "http://www.x.org"
 SECTION = "x11/data"
-LICENSE = "MIT-X"
+LICENSE = "MIT"
 
 XORG_PN = "${BPN}"
 

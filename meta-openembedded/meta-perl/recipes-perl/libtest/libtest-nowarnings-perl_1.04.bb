@@ -14,7 +14,7 @@ The test is run by an \\"END\\" block in Test::NoWarnings. It will not be \
 run when any forked children exit."
 
 SECTION = "libs"
-LICENSE = "LGPL-2.1"
+LICENSE = "LGPL-2.1-only"
 
 HOMEPAGE= "https://metacpan.org/release/Test-NoWarnings"
 

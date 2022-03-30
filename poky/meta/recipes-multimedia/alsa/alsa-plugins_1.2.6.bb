@@ -6,15 +6,15 @@ HOMEPAGE = "http://alsa-project.org"
 BUGTRACKER = "http://alsa-project.org/main/index.php/Bug_Tracking"
 SECTION = "multimedia"
 
-# The primary license of alsa-plugins is LGPLv2.1.
+# The primary license of alsa-plugins is LGPL-2.1-only.
 #
-# m4/attributes.m4 is licensed under GPLv2+. m4/attributes.m4 is part of the
-# build system, and doesn't affect the licensing of the build result.
+# m4/attributes.m4 is licensed under GPL-2.0-or-later. m4/attributes.m4 is part
+# of the build system, and doesn't affect the licensing of the build result.
 #
-# The samplerate plugin source code is licensed under GPLv2+ to be consistent
-# with the libsamplerate license. However, if the licensee has a commercial
-# license for libsamplerate, the samplerate plugin may be used under the terms
-# of LGPLv2.1 like the rest of the plugins.
+# The samplerate plugin source code is licensed under GPL-2.0-or-later to be
+# consistent with the libsamplerate license. However, if the licensee has a
+# commercial license for libsamplerate, the samplerate plugin may be used under
+# the terms of LGPL-2.1-only like the rest of the plugins.
 LICENSE = "LGPL-2.1-only & GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=a916467b91076e631dd8edb7424769c7 \
                     file://COPYING.GPL;md5=59530bdf33659b29e73d4adb9f9f6552 \

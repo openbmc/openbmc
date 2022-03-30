@@ -8,7 +8,7 @@ DESCRIPTION = "Plymouth is an application that runs very early in the boot proce
 HOMEPAGE = "http://www.freedesktop.org/wiki/Software/Plymouth"
 SECTION = "base"
 
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 

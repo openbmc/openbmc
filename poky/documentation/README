@@ -113,12 +113,17 @@ documentation with Python3.
 Sphinx might be available in your Linux distro packages repositories,
 however it is not recommended to use distro packages, as they might be
 old versions, especially if you are using an LTS version of your
-distro. The recommended method to install Sphinx and all required
-dependencies is to use the Python Package Index (pip).
+distro. The recommended method to install the latest versions of Sphinx
+and of its required dependencies is to use the Python Package Index (pip).
 
 To install all required packages run:
 
  $ pip3 install sphinx sphinx_rtd_theme pyyaml
+
+To make sure you always have the latest versions of such packages, you
+should regularly run the same command with an added "--upgrade" option:
+
+ $ pip3 install --upgrade sphinx sphinx_rtd_theme pyyaml
 
 Also install the "inkscape" package from your distribution.
 Inkscape is need to convert SVG graphics to PNG (for EPUB
@@ -170,17 +175,18 @@ The layout of the Yocto Project manuals is organized as follows
     Book
       Chapter
         Section
-          Section
-            Section
+          Subsection
+            Subsubsection
+              Subsubsubsection
 
-Here are the heading styles defined in Sphinx:
+Here are the heading styles that we use in the manuals:
 
-    Book              => overline ===
-      Chapter         => overline ***
-        Section       => ====
-          Section     => ----
-            Section   => ^^^^
-              Section => """" or ~~~~
+    Book                       => overline ===
+      Chapter                  => overline ***
+        Section                => ====
+          Subsection           => ----
+            Subsubsection      => ~~~~
+              Subsubsubsection => ^^^^
 
 With this proposal, we preserve the same TOCs between Sphinx and Docbook.
 

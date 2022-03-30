@@ -1,6 +1,6 @@
 SUMMARY = "Simple DirectMedia Layer truetype font library"
 SECTION = "libs"
-DEPENDS = "virtual/libsdl2 freetype virtual/libgl"
+DEPENDS = "virtual/libsdl2 freetype virtual/egl"
 LICENSE = "Zlib"
 LIC_FILES_CHKSUM = "file://COPYING.txt;md5=e98cfd01ca78f683e9d035795810ce87"
 

@@ -23,15 +23,14 @@ CVE_PRODUCT = "sqlite"
 inherit autotools pkgconfig siteinfo
 
 # enable those which are enabled by default in configure
-PACKAGECONFIG ?= "fts4 fts5 json1 rtree dyn_ext"
-PACKAGECONFIG:class-native ?= "fts4 fts5 json1 rtree dyn_ext"
+PACKAGECONFIG ?= "fts4 fts5 rtree dyn_ext"
+PACKAGECONFIG:class-native ?= "fts4 fts5 rtree dyn_ext"
 
 PACKAGECONFIG[editline] = "--enable-editline,--disable-editline,libedit"
 PACKAGECONFIG[readline] = "--enable-readline,--disable-readline,readline ncurses"
 PACKAGECONFIG[fts3] = "--enable-fts3,--disable-fts3"
 PACKAGECONFIG[fts4] = "--enable-fts4,--disable-fts4"
 PACKAGECONFIG[fts5] = "--enable-fts5,--disable-fts5"
-PACKAGECONFIG[json1] = "--enable-json1,--disable-json1"
 PACKAGECONFIG[rtree] = "--enable-rtree,--disable-rtree"
 PACKAGECONFIG[session] = "--enable-session,--disable-session"
 PACKAGECONFIG[dyn_ext] = "--enable-dynamic-extensions,--disable-dynamic-extensions"

@@ -11,6 +11,7 @@ import hashlib
 import time
 import inspect
 from xmlrpc.server import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
+import bb.server.xmlrpcclient
 
 import bb
 

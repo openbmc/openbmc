@@ -10,6 +10,7 @@ SRC_URI = "git://github.com/berkerpeksag/astor.git;branch=master;protocol=https 
 SRCREV ?= "c7553c79f9222e20783fe9bd8a553f932e918072"
 
 inherit setuptools3
+PIP_INSTALL_PACKAGE = "astor"
 
 S = "${WORKDIR}/git"
 

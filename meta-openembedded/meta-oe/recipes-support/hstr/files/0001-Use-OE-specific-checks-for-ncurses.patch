@@ -1,0 +1,42 @@
+From f3fb4f12fac75efe0d8f1a923ad5992a7433d0db Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Wed, 2 Mar 2022 06:22:15 +0000
+Subject: [PATCH] Use OE-specific checks for ncurses
+
+Upstream-Status: Inappropriate[oe specific]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ src/include/hstr.h        | 2 +-
+ src/include/hstr_curses.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/include/hstr.h b/src/include/hstr.h
+index 5eac881..c47cadb 100644
+--- a/src/include/hstr.h
++++ b/src/include/hstr.h
+@@ -26,7 +26,7 @@
+ #elif defined(__FreeBSD__)
+   #include <ncurses.h>
+ #else
+-  #include <ncursesw/curses.h>
++  #include <curses.h>
+ #endif
+ #include <readline/chardefs.h>
+ #include <signal.h>
+diff --git a/src/include/hstr_curses.h b/src/include/hstr_curses.h
+index 8a50ab9..1f081a8 100644
+--- a/src/include/hstr_curses.h
++++ b/src/include/hstr_curses.h
+@@ -24,7 +24,7 @@
+ #elif defined(__FreeBSD__)
+ #include <ncurses.h>
+ #else
+-#include <ncursesw/curses.h>
++#include <curses.h>
+ #endif
+ 
+ #define color_attr_on(C) if(terminal_has_colors()) { attron(C); }
+-- 
+2.31.1
+

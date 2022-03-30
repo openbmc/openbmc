@@ -1,4 +1,4 @@
-From 17cc080e58894644dd18664ac6f3451096d5f065 Mon Sep 17 00:00:00 2001
+From 4fd67b6adb7c1d8524ba17d1a0b3894f901555a9 Mon Sep 17 00:00:00 2001
 From: Yi Zhao <yi.zhao@windriver.com>
 Date: Thu, 13 May 2021 15:23:16 +0800
 Subject: [PATCH] Makefile.am: only build dhcrelay
@@ -26,5 +26,5 @@ index ed692a5..34f9772 100644
  DIST_SUBDIRS = $(SUBDIRS) keama
  
 -- 
-2.17.1
+2.25.1
 

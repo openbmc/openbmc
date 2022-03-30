@@ -1,0 +1,30 @@
+From ed1dd35e0e23a98e57567718a0d474fd29cc348a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 19 Mar 2022 21:36:41 -0700
+Subject: [PATCH] cmake: Use CMAKE_INSTALL_LIBDIR
+
+this ensures that it is portable across platforms e.g. ppc64/linux
+uses lib64 not lib
+
+Upstream-Status: Submitted [https://github.com/edenhill/librdkafka/pull/3770]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index d1129bce..774473fa 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -219,7 +219,7 @@ configure_file("packaging/cmake/config.h.in" "${GENERATED_DIR}/config.h")
+ 
+ include(GNUInstallDirs)
+ 
+-set(config_install_dir "lib/cmake/${PROJECT_NAME}")
++set(config_install_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+ 
+ set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ 
+-- 
+2.35.1
+

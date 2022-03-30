@@ -9,7 +9,7 @@ addresses from ippoold. \
 "
 HOMEPAGE = "http://www.openl2tp.org/"
 SECTION = "console/network"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 
 SRC_URI = "https://sourceforge.net/projects/openl2tp/files/${BPN}/${PV}/${BPN}-${PV}.tar.gz \
            file://runtest.sh \

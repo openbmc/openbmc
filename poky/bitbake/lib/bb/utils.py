@@ -453,12 +453,15 @@ def lockfile(name, shared=False, retry=True, block=False):
     consider the possibility of sending a signal to the process to break
     out - at which point you want block=True rather than retry=True.
     """
-    if len(name) > 255:
-        root, ext = os.path.splitext(name)
-        name = root[:255 - len(ext)] + ext
+    basename = os.path.basename(name)
+    if len(basename) > 255:
+        root, ext = os.path.splitext(basename)
+        basename = root[:255 - len(ext)] + ext
 
     dirname = os.path.dirname(name)
     mkdirhier(dirname)
+
+    name = os.path.join(dirname, basename)
 
     if not os.access(dirname, os.W_OK):
         logger.error("Unable to acquire lock '%s', directory is not writable",
@@ -538,7 +541,7 @@ def md5_file(filename):
     Return the hex string representation of the MD5 checksum of filename.
     """
     import hashlib
-    return _hasher(hashlib.md5(), filename)
+    return _hasher(hashlib.new('MD5', usedforsecurity=False), filename)
 
 def sha256_file(filename):
     """

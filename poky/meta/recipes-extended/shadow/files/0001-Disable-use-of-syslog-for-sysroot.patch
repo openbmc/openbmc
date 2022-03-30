@@ -1,124 +1,22 @@
-From 531cd5ca6eadef29b4799459f1bcfc002ecbd424 Mon Sep 17 00:00:00 2001
-From: Scott Garman <scott.a.garman@intel.com>
-Date: Thu, 14 Apr 2016 12:28:57 +0200
-Subject: [PATCH] Disable use of syslog for sysroot
+Disable use of syslog for shadow-native tools
 
 Disable use of syslog to prevent sysroot user and group additions from
 writing entries to the host's syslog. This patch should only be used
 with the shadow-native recipe.
 
-Upstream-Status: Inappropriate [disable feature]
+Upstream-Status: Inappropriate [OE specific configuration]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
-Signed-off-by: Scott Garman <scott.a.garman@intel.com>
-Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
-Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
-
----
- src/groupadd.c  | 3 +++
- src/groupdel.c  | 3 +++
- src/groupmems.c | 3 +++
- src/groupmod.c  | 3 +++
- src/useradd.c   | 3 +++
- src/userdel.c   | 4 ++++
- src/usermod.c   | 3 +++
- 7 files changed, 22 insertions(+)
-
-diff --git a/src/groupadd.c b/src/groupadd.c
-index 66ccb53..776ea51 100644
---- a/src/groupadd.c
-+++ b/src/groupadd.c
-@@ -11,6 +11,9 @@
+Index: shadow-4.11.1/configure.ac
+===================================================================
+--- shadow-4.11.1.orig/configure.ac
++++ shadow-4.11.1/configure.ac
+@@ -204,7 +204,7 @@ AC_DEFINE_UNQUOTED(PASSWD_PROGRAM, "$sha
+ 	[Path to passwd program.])
  
- #ident "$Id$"
- 
-+/* Disable use of syslog since we're running this command against a sysroot */
-+#undef USE_SYSLOG
-+
- #include <ctype.h>
- #include <fcntl.h>
- #include <getopt.h>
-diff --git a/src/groupdel.c b/src/groupdel.c
-index c84faa7..1076f4b 100644
---- a/src/groupdel.c
-+++ b/src/groupdel.c
-@@ -11,6 +11,9 @@
- 
- #ident "$Id$"
- 
-+/* Disable use of syslog since we're running this command against a sysroot */
-+#undef USE_SYSLOG
-+
- #include <ctype.h>
- #include <fcntl.h>
- #include <grp.h>
-diff --git a/src/groupmems.c b/src/groupmems.c
-index a0e3266..6540cb1 100644
---- a/src/groupmems.c
-+++ b/src/groupmems.c
-@@ -9,6 +9,9 @@
- 
- #include <config.h>
- 
-+/* Disable use of syslog since we're running this command against a sysroot */
-+#undef USE_SYSLOG
-+
- #include <fcntl.h>
- #include <getopt.h>
- #include <grp.h>
-diff --git a/src/groupmod.c b/src/groupmod.c
-index 006eca1..78b1ad6 100644
---- a/src/groupmod.c
-+++ b/src/groupmod.c
-@@ -11,6 +11,9 @@
- 
- #ident "$Id$"
- 
-+/* Disable use of syslog since we're running this command against a sysroot */
-+#undef USE_SYSLOG
-+
- #include <ctype.h>
- #include <fcntl.h>
- #include <getopt.h>
-diff --git a/src/useradd.c b/src/useradd.c
-index 456b9de..2b0d703 100644
---- a/src/useradd.c
-+++ b/src/useradd.c
-@@ -11,6 +11,9 @@
- 
- #ident "$Id$"
- 
-+/* Disable use of syslog since we're running this command against a sysroot */
-+#undef USE_SYSLOG
-+
- #include <assert.h>
- #include <ctype.h>
- #include <errno.h>
-diff --git a/src/userdel.c b/src/userdel.c
-index 7012b0e..08bb5d1 100644
---- a/src/userdel.c
-+++ b/src/userdel.c
-@@ -8,6 +8,10 @@
-  */
- 
- #include <config.h>
-+
-+/* Disable use of syslog since we're running this command against a sysroot */
-+#undef USE_SYSLOG
-+
- #include <assert.h>
- #include <dirent.h>
- #include <errno.h>
-diff --git a/src/usermod.c b/src/usermod.c
-index 9473a7d..7d4f7b5 100644
---- a/src/usermod.c
-+++ b/src/usermod.c
-@@ -11,6 +11,9 @@
- 
- #ident "$Id$"
- 
-+/* Disable use of syslog since we're running this command against a sysroot */
-+#undef USE_SYSLOG
-+
- #include <assert.h>
- #include <ctype.h>
- #include <errno.h>
+ dnl XXX - quick hack, should disappear before anyone notices :).
+-AC_DEFINE(USE_SYSLOG, 1, [Define to use syslog().])
++AC_DEFINE(USE_SYSLOG, 0, [Define to use syslog().])
+ if test "$ac_cv_func_ruserok" = "yes"; then
+ 	AC_DEFINE(RLOGIN, 1, [Define if login should support the -r flag for rlogind.])
+ 	AC_DEFINE(RUSEROK, 0, [Define to the ruserok() "success" return value (0 or 1).])

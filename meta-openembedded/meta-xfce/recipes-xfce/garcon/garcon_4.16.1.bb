@@ -1,6 +1,6 @@
 DESCRIPTION = "Xfce Menu Library"
 SECTION = "x11/libs"
-LICENSE = "LGPLv2"
+LICENSE = "LGPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=04a01abcbdabffae1ca26335a293276b"
 DEPENDS = "xfce4-dev-tools-native libxfce4ui intltool-native"
 

@@ -2,7 +2,7 @@ SUMMARY = "Linux kernel userland utilities for the PCMCIA subsystem"
 HOMEPAGE = "https://www.kernel.org/pub/linux/utils/kernel/pcmcia/"
 SECTION = "kernel/userland"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
 DEPENDS = "udev sysfsutils flex-native bison-native"

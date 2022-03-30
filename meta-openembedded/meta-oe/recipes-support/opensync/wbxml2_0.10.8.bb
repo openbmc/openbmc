@@ -1,7 +1,7 @@
 SUMMARY = "WBXML parsing and encoding library"
 HOMEPAGE = "http://libwbxml.opensync.org/"
 SECTION = "libs"
-LICENSE = "LGPLv2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c1128ee5341ccd5927d8bafe4b6266e1"
 
 DEPENDS = "expat"

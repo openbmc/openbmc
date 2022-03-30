@@ -7,10 +7,13 @@ HOMEPAGE = "https://git.adelielinux.org/adelie/gcompat"
 LICENSE = "NCSA"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=eb33ef4af05a9c7602843afb7adfe792"
 
-SRC_URI = "git://git.adelielinux.org/adelie/gcompat.git;protocol=https;branch=current"
-
+SRC_URI = "git://git.adelielinux.org/adelie/gcompat.git;protocol=https;branch=current \
+          "
+SRC_URI:append:powerpc = "\
+           file://0001-make-Static-PIE-does-not-work-on-musl-ppc.patch \
+           "
 PV = "1.0.0+1.1+git${SRCPV}"
-SRCREV = "af5a49e489fdc04b9cf02547650d7aeaccd43793"
+SRCREV = "4d6a5156a6eb7f56b30d93853a872e36dadde81b"
 
 S = "${WORKDIR}/git"
 

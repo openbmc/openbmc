@@ -15,7 +15,6 @@ RDEPENDS:packagegroup-security-tpm = " \
     tpm-quote-tools \
     swtpm \
     openssl-tpm-engine \
-    libtpm \
     ${X86_TPM_MODULES} \
     "
 

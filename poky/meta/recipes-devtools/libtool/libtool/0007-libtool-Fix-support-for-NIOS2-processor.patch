@@ -15,15 +15,11 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
 Upstream-Status: Submitted [https://lists.gnu.org/archive/html/libtool-patches/2021-10/msg00021.html]
 
----
- build-aux/ltmain.in | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
-
 diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
-index d5cf07a..4164284 100644
+index 6fb58ed2..606f17be 100644
 --- a/build-aux/ltmain.in
 +++ b/build-aux/ltmain.in
-@@ -504,6 +504,12 @@ libtool_validate_options ()
+@@ -519,6 +519,12 @@ libtool_validate_options ()
      test : = "$debug_cmd" || func_append preserve_args " --debug"
  
      case $host in
@@ -36,7 +32,7 @@ index d5cf07a..4164284 100644
        # Solaris2 added to fix http://debbugs.gnu.org/cgi/bugreport.cgi?bug=16452
        # see also: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=59788
        *cygwin* | *mingw* | *pw32* | *cegcc* | *solaris2* | *os2*)
-@@ -6220,6 +6226,15 @@ func_mode_link ()
+@@ -6246,6 +6252,15 @@ func_mode_link ()
  	if test -n "$library_names" &&
  	   { test no = "$use_static_libs" || test -z "$old_library"; }; then
  	  case $host in
@@ -52,7 +48,7 @@ index d5cf07a..4164284 100644
  	  *cygwin* | *mingw* | *cegcc* | *os2*)
  	      # No point in relinking DLLs because paths are not encoded
  	      func_append notinst_deplibs " $lib"
-@@ -6290,6 +6305,11 @@ func_mode_link ()
+@@ -6316,6 +6331,11 @@ func_mode_link ()
  	    elif test -n "$soname_spec"; then
  	      # bleh windows
  	      case $host in
@@ -65,5 +61,5 @@ index d5cf07a..4164284 100644
  	        func_arith $current - $age
  		major=$func_arith_result
 -- 
-2.5.1
+2.25.1
 

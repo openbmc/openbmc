@@ -1,0 +1,24 @@
+From 37559b659e22886d5f55837d4f167ba5fda73e85 Mon Sep 17 00:00:00 2001
+From: Adrian Freihofer <adrian.freihofer@siemens.com>
+Date: Sun, 29 Aug 2021 15:50:35 +0200
+Subject: [PATCH] do-not-ask-host-for-ifcfg-defaults
+
+---
+ meson.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index d0cec83..289aa1b 100644
+--- a/meson.build
++++ b/meson.build
+@@ -304,8 +304,8 @@ else
+   distro = 'unknown'
+ endif
+ 
+-enable_ifcfg_rh = get_option('ifcfg_rh') or (distro == 'redhat')
+-enable_ifupdown = get_option('ifupdown') or (distro == 'debian')
++enable_ifcfg_rh = get_option('ifcfg_rh')
++enable_ifupdown = get_option('ifupdown')
+ 
+ config_plugins_default = get_option('config_plugins_default')
+ config_h.set_quoted('NM_CONFIG_DEFAULT_MAIN_PLUGINS', config_plugins_default)

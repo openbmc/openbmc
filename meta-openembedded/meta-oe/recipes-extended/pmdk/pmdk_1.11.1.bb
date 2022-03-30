@@ -11,7 +11,8 @@ DEPENDS:append:libc-musl = " fts"
 
 S = "${WORKDIR}/git"
 
-SRC_URI = "git://github.com/pmem/pmdk.git;branch=stable-1.11;protocol=https"
+SRC_URI = "git://github.com/pmem/pmdk.git;branch=stable-1.11;protocol=https \
+           file://0001-use-daxctl-libdaxctl.h-instead-of-ndctl-libdaxctl.h.patch"
 SRCREV = "5b21904a257eff47f2e87fcbf2de46111f03ddd8"
 
 inherit autotools-brokensep pkgconfig

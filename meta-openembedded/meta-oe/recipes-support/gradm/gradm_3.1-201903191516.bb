@@ -7,7 +7,7 @@ via a password to the kernel and parsing rules to be passed to the \
 kernel"
 HOMEPAGE = "http://grsecurity.net/index.php"
 SECTION = "admin"
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=4641e94ec96f98fabc56ff9cc48be14b"
 DEPENDS = "flex-native bison-native ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'libpam', '', d)}"
 

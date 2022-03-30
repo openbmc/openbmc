@@ -1,8 +1,8 @@
-HOMEPAGE = "https://github.com/netdata/netdata/"
 SUMMARY = "Real-time performance monitoring"
 DESCRIPTION = "Netdata is high-fidelity infrastructure monitoring and troubleshooting. \
                Open-source, free, preconfigured, opinionated, and always real-time."
-LICENSE = "GPLv3"
+HOMEPAGE = "https://github.com/netdata/netdata/"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=fc9b848046ef54b5eaee6071947abd24"
 
 DEPENDS += "libuv util-linux zlib"
@@ -41,6 +41,7 @@ USERADD_PACKAGES = "${PN}"
 USERADD_PARAM:${PN} = "--system --no-create-home --home-dir ${localstatedir}/run/netdata --user-group netdata"
 
 PACKAGECONFIG ??= "https"
+PACKAGECONFIG[cloud] = "--enable-cloud, --disable-cloud, json-c"
 PACKAGECONFIG[compression] = "--enable-compression, --disable-compression, lz4"
 PACKAGECONFIG[https] = "--enable-https, --disable-https, openssl"
 
@@ -75,6 +76,6 @@ do_install:append() {
     chown -R netdata:netdata ${D}${datadir}/netdata/web
 }
 
-FILES_${PN} += "${localstatedir}/cache/netdata/ ${localstatedir}/lib/netdata/"
+FILES:${PN} += "${localstatedir}/cache/netdata/ ${localstatedir}/lib/netdata/"
 
 RDEPENDS:${PN} = "bash zlib"

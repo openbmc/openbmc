@@ -3,7 +3,7 @@ AUTHOR = "Alan Ott"
 HOMEPAGE = "http://www.signal11.us/oss/hidapi/"
 SECTION = "libs"
 
-LICENSE = "BSD-3-Clause | GPLv3"
+LICENSE = "BSD-3-Clause | GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=7c3949a631240cb6c31c50f3eb696077"
 
 DEPENDS = "libusb udev"

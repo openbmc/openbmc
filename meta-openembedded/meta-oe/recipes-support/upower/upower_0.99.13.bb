@@ -1,5 +1,5 @@
 DESCRIPTION = "UPower is an abstraction for enumerating power devices, listening to device events and querying history and statistics. "
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0de8fbf1d97a140d1d93b9f14dcfbf08"
 
 DEPENDS = "intltool-native libusb1 libgudev glib-2.0 dbus-glib"

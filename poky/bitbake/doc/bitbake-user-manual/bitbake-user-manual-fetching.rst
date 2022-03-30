@@ -405,7 +405,7 @@ This fetcher supports the following parameters:
      ``git@gitlab.freedesktop.org:mesa/mesa.git``, however the expected URL in
      :term:`SRC_URI` is the following::
 
-       SRC_URI = "git://git@gitlab.freedesktop.org/mesa/mesa.git;protocol=ssh;..."
+       SRC_URI = "git://git@gitlab.freedesktop.org/mesa/mesa.git;branch=main;protocol=ssh;..."
 
      Note the ``:`` character changed for a ``/`` before the path to the project.
 
@@ -432,9 +432,9 @@ This fetcher supports the following parameters:
    raw Git metadata is provided. This parameter implies the "nocheckout"
    parameter as well.
 
--  *"branch":* The branch(es) of the Git tree to clone. If unset, this
-   is assumed to be "master". The number of branch parameters much match
-   the number of name parameters.
+-  *"branch":* The branch(es) of the Git tree to clone. Unless
+   "nobranch" is set to "1", this is a mandatory parameter. The number of
+   branch parameters must match the number of name parameters.
 
 -  *"rev":* The revision to use for the checkout. The default is
    "master".
@@ -457,9 +457,9 @@ This fetcher supports the following parameters:
 
 Here are some example URLs::
 
-   SRC_URI = "git://git.oe.handhelds.org/git/vip.git;tag=version-1"
-   SRC_URI = "git://git.oe.handhelds.org/git/vip.git;protocol=http"
-   SRC_URI = "git://git@gitlab.freedesktop.org/mesa/mesa.git;protocol=ssh;..."
+   SRC_URI = "git://github.com/fronteed/icheck.git;protocol=https;branch=${PV};tag=${PV}"
+   SRC_URI = "git://github.com/asciidoc/asciidoc-py;protocol=https;branch=main"
+   SRC_URI = "git://git@gitlab.freedesktop.org/mesa/mesa.git;branch=main;protocol=ssh;..."
 
 .. note::
 
@@ -687,6 +687,22 @@ Here is an example URL::
    SRC_URI = "az://<azure-storage-account>.blob.core.windows.net/<foo_container>/<bar_file>"
 
 It can also be used when setting mirrors definitions using the :term:`PREMIRRORS` variable.
+
+Crate Fetcher (``crate://``)
+----------------------------
+
+This submodule fetches code for
+`Rust language "crates" <https://doc.rust-lang.org/reference/glossary.html?highlight=crate#crate>`__
+corresponding to Rust libraries and programs to compile. Such crates are typically shared
+on https://crates.io/ but this fetcher supports other crate registries too.
+
+The format for the :term:`SRC_URI` setting must be::
+
+   SRC_URI = "crate://REGISTRY/NAME/VERSION"
+
+Here is an example URL::
+
+   SRC_URI = "crate://crates.io/glob/0.2.11"
 
 Other Fetchers
 --------------

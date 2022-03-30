@@ -4,7 +4,7 @@ events with stack traces. Dedicated analysis tools then allow you to interpret \
 the heap memory profile to find hotspots to reduce memory, leaks, allocation \
 hotspots and temporary allocations"
 HOMEPAGE = "https://phabricator.kde.org/source/heaptrack/"
-LICENSE = "LGPL-2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 
 DEPENDS = "zlib boost libunwind elfutils"

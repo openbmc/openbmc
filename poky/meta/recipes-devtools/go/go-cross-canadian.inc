@@ -27,7 +27,6 @@ do_compile() {
 	./make.bash --host-only --no-banner
 	cd ${B}
 }
-do_compile[dirs] =+ "${GOTMPDIR} ${B}/bin ${B}/pkg"
 do_compile[cleandirs] += "${GOTMPDIR} ${B}/bin ${B}/pkg"
 
 

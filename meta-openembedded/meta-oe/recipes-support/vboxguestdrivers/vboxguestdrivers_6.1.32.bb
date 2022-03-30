@@ -1,6 +1,6 @@
 SUMMARY = "VirtualBox Linux Guest Drivers"
 SECTION = "core"
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/${VBOX_NAME}/COPYING;md5=e197d5641bb35b29d46ca8c4bf7f2660"
 
 DEPENDS = "virtual/kernel"

@@ -1,6 +1,6 @@
 require bash.inc
 
-# GPLv2+ (< 4.0), GPLv3+ (>= 4.0)
+# GPL-2.0-or-later (< 4.0), GPL-3.0-or-later (>= 4.0)
 LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 

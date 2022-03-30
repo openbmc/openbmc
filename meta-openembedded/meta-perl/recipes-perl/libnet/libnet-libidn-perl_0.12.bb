@@ -5,7 +5,7 @@ Domain Names according to IDNA (RFC 3490), in a way very much inspired by \
 Turbo Fredriksson's PHP-IDN. \
 "
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPLv1+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 HOMEPAGE = "http://search.cpan.org/dist/Net-LibIDN/"
 DEPENDS += "libidn"
 # We must need glibc-gconvs to enable charset related functions,

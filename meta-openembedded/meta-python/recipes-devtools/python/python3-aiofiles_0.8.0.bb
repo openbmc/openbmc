@@ -8,7 +8,7 @@ SRC_URI[sha256sum] = "8334f23235248a3b2e83b2c3a78a22674f39969b96397126cc93664d9a
 
 PYPI_PACKAGE = "aiofiles"
 
-inherit pypi setuptools3
+inherit pypi python_poetry_core
 
 RDEPENDS:${PN} = "\
     ${PYTHON_PN}-asyncio \

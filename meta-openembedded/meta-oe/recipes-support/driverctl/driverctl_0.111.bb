@@ -1,5 +1,5 @@
 SUMMARY = "driverctl is a device driver control utility for Linux"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/LGPL-2.1-only;md5=1a6d268fd218675ffea8be556788b780"
 
 REQUIRED_DISTRO_FEATURES = "systemd"

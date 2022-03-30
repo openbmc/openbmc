@@ -4,7 +4,7 @@ more limited in the types of events it supports due to the limited nature of \
 systemd-networkd(8)."
 AUTHOR = "Clayton Craft and others"
 
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=84dcc94da3adb52b53ae4fa38fe49e5d"
 
 inherit features_check systemd

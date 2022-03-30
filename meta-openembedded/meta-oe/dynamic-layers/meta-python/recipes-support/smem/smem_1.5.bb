@@ -6,7 +6,7 @@ libraries and applications in a virtual memory system."
 HOMEPAGE = "http://www.selenic.com/smem/"
 SECTION = "Applications/System"
 
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 HG_CHANGESET = "98273ce331bb"

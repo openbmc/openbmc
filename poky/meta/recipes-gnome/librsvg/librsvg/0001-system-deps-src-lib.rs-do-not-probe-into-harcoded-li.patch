@@ -1,4 +1,4 @@
-From c6d52d37c546ebaa5d794fd5bcfa1ca1fc249dc2 Mon Sep 17 00:00:00 2001
+From c0b0ef51b3c997a1c20ef9381ba2201ed477f609 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Tue, 21 Sep 2021 16:54:23 +0200
 Subject: [PATCH] system-deps/src/lib.rs: do not probe into harcoded list of
@@ -8,24 +8,25 @@ Oe-core defines custom targets, and this probe fails.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
 ---
  vendor/system-deps/.cargo-checksum.json |  2 +-
  vendor/system-deps/src/lib.rs           | 16 +---------------
  2 files changed, 2 insertions(+), 16 deletions(-)
 
 diff --git a/vendor/system-deps/.cargo-checksum.json b/vendor/system-deps/.cargo-checksum.json
-index 725ee53..c3b8fe5 100644
+index 862df8b..931748e 100644
 --- a/vendor/system-deps/.cargo-checksum.json
 +++ b/vendor/system-deps/.cargo-checksum.json
 @@ -1 +1 @@
--{"files":{"Cargo.toml":"3923d630403610a69f9943621bd13c1033944124acc96642e194064dc8b0554a","LICENSE-APACHE":"a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2","LICENSE-MIT":"23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3","README.md":"3fe7396637bf9233908f41c6001cfcb00a379225e06e36e508c8b3d7264a8aae","src/lib.rs":"d5c73ae844b7b45704591676bc53699006bfbc51ca8e36f1ca346f40721469d4","src/metadata.rs":"657bc1b77e949e4800f9dd808790ffa535820e1658d412121a1da548e0cdd02c","src/test.rs":"d0684718d09789d6f74a21dd1ffaa169ddec7cd2d007ebb559cd1aba50d9301a","src/tests/lib/libteststatic.a":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","src/tests/testanotherlib.pc":"bb4fd942324e6d49ce3becd827aa5c948d1924ca6681904a3695c19b1424eb3c","src/tests/testdata.pc":"43f481e989c03674fed5ef78c6420b3f8d36a2ce001928d86c418d1844acd5e7","src/tests/testlib-2.0.pc":"152eb0c70c14c3d948118408f3d1fd3bb7531b02aa792db85bd957f7db90b45b","src/tests/testlib-3.0.pc":"cd39c2ef88f6828c9291150cc4b624e769abef484674eaebaa4f67979501315f","src/tests/testlib.pc":"75c0d8a5345f65794f583c83e1cf0dbf3385af6e6abea1d61bb86eef707a52db","src/tests/teststaticlib.pc":"77df23f6c7c1d47aff18453b47c87e53ec8a96017546e0a55c8c4d1e13b70134","src/tests/toml-missing-file/no-cargo-toml-here":"6ab4da4b56f15315df6538610cfcd2ba3d0f9a7a8414678ff00ab5a78f7d41fa"},"package":"7b1487aaddaacbc5d60a2a507ba1617c5ca66c57dd0dd07d0c5efd5b693841d4"}
+-{"files":{"Cargo.toml":"927df7476ebf5f5983169cfd973f4c95b84da17caeb20d33cccf50e326af5316","LICENSE-APACHE":"a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2","LICENSE-MIT":"23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3","README.md":"3fe7396637bf9233908f41c6001cfcb00a379225e06e36e508c8b3d7264a8aae","src/lib.rs":"c38fd96ca3233ebee3bb7e37ca8f8a7a2685cdd7fcccf0210eaa879aa91dc684","src/metadata.rs":"657bc1b77e949e4800f9dd808790ffa535820e1658d412121a1da548e0cdd02c","src/test.rs":"9d5f8c1fb7a821352d6ba75cb005ead3e36b4f359e61feb605ab8a36d4fd31f8","src/tests/lib/libteststatic.a":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","src/tests/testanotherlib.pc":"bb4fd942324e6d49ce3becd827aa5c948d1924ca6681904a3695c19b1424eb3c","src/tests/testdata.pc":"43f481e989c03674fed5ef78c6420b3f8d36a2ce001928d86c418d1844acd5e7","src/tests/testlib-2.0.pc":"152eb0c70c14c3d948118408f3d1fd3bb7531b02aa792db85bd957f7db90b45b","src/tests/testlib-3.0.pc":"cd39c2ef88f6828c9291150cc4b624e769abef484674eaebaa4f67979501315f","src/tests/testlib.pc":"75c0d8a5345f65794f583c83e1cf0dbf3385af6e6abea1d61bb86eef707a52db","src/tests/teststaticlib.pc":"77df23f6c7c1d47aff18453b47c87e53ec8a96017546e0a55c8c4d1e13b70134","src/tests/toml-missing-file/no-cargo-toml-here":"6ab4da4b56f15315df6538610cfcd2ba3d0f9a7a8414678ff00ab5a78f7d41fa"},"package":"a1a45a1c4c9015217e12347f2a411b57ce2c4fc543913b14b6fe40483328e709"}
 \ No newline at end of file
-+{"files":{"Cargo.toml":"3923d630403610a69f9943621bd13c1033944124acc96642e194064dc8b0554a","LICENSE-APACHE":"a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2","LICENSE-MIT":"23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3","README.md":"3fe7396637bf9233908f41c6001cfcb00a379225e06e36e508c8b3d7264a8aae","src/lib.rs":"b822a9360e8f10930d48a27ce3ddb7e0ba3cbc5fb2054131ea9bdf55b1a45204","src/metadata.rs":"657bc1b77e949e4800f9dd808790ffa535820e1658d412121a1da548e0cdd02c","src/test.rs":"d0684718d09789d6f74a21dd1ffaa169ddec7cd2d007ebb559cd1aba50d9301a","src/tests/lib/libteststatic.a":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","src/tests/testanotherlib.pc":"bb4fd942324e6d49ce3becd827aa5c948d1924ca6681904a3695c19b1424eb3c","src/tests/testdata.pc":"43f481e989c03674fed5ef78c6420b3f8d36a2ce001928d86c418d1844acd5e7","src/tests/testlib-2.0.pc":"152eb0c70c14c3d948118408f3d1fd3bb7531b02aa792db85bd957f7db90b45b","src/tests/testlib-3.0.pc":"cd39c2ef88f6828c9291150cc4b624e769abef484674eaebaa4f67979501315f","src/tests/testlib.pc":"75c0d8a5345f65794f583c83e1cf0dbf3385af6e6abea1d61bb86eef707a52db","src/tests/teststaticlib.pc":"77df23f6c7c1d47aff18453b47c87e53ec8a96017546e0a55c8c4d1e13b70134","src/tests/toml-missing-file/no-cargo-toml-here":"6ab4da4b56f15315df6538610cfcd2ba3d0f9a7a8414678ff00ab5a78f7d41fa"},"package":"7b1487aaddaacbc5d60a2a507ba1617c5ca66c57dd0dd07d0c5efd5b693841d4"}
++{"files":{"Cargo.toml":"927df7476ebf5f5983169cfd973f4c95b84da17caeb20d33cccf50e326af5316","LICENSE-APACHE":"a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2","LICENSE-MIT":"23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3","README.md":"3fe7396637bf9233908f41c6001cfcb00a379225e06e36e508c8b3d7264a8aae","src/lib.rs":"534efc2f977d8c67d5be3a4c3e81093a6c00ab2de1102404166b1573ad96dbd2","src/metadata.rs":"657bc1b77e949e4800f9dd808790ffa535820e1658d412121a1da548e0cdd02c","src/test.rs":"9d5f8c1fb7a821352d6ba75cb005ead3e36b4f359e61feb605ab8a36d4fd31f8","src/tests/lib/libteststatic.a":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","src/tests/testanotherlib.pc":"bb4fd942324e6d49ce3becd827aa5c948d1924ca6681904a3695c19b1424eb3c","src/tests/testdata.pc":"43f481e989c03674fed5ef78c6420b3f8d36a2ce001928d86c418d1844acd5e7","src/tests/testlib-2.0.pc":"152eb0c70c14c3d948118408f3d1fd3bb7531b02aa792db85bd957f7db90b45b","src/tests/testlib-3.0.pc":"cd39c2ef88f6828c9291150cc4b624e769abef484674eaebaa4f67979501315f","src/tests/testlib.pc":"75c0d8a5345f65794f583c83e1cf0dbf3385af6e6abea1d61bb86eef707a52db","src/tests/teststaticlib.pc":"77df23f6c7c1d47aff18453b47c87e53ec8a96017546e0a55c8c4d1e13b70134","src/tests/toml-missing-file/no-cargo-toml-here":"6ab4da4b56f15315df6538610cfcd2ba3d0f9a7a8414678ff00ab5a78f7d41fa"},"package":"a1a45a1c4c9015217e12347f2a411b57ce2c4fc543913b14b6fe40483328e709"}
 diff --git a/vendor/system-deps/src/lib.rs b/vendor/system-deps/src/lib.rs
-index be919e2..97536a3 100644
+index 45ab1ce..f87d1ec 100644
 --- a/vendor/system-deps/src/lib.rs
 +++ b/vendor/system-deps/src/lib.rs
-@@ -805,21 +805,7 @@ impl Config {
+@@ -800,21 +800,7 @@ impl Config {
      }
  
      fn check_cfg(&self, cfg: &cfg_expr::Expression) -> Result<bool, Error> {
@@ -48,6 +49,3 @@ index be919e2..97536a3 100644
      }
  }
  
--- 
-2.20.1
-

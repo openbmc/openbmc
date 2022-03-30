@@ -8,7 +8,7 @@ Manual Organization
 
 Folders exist for individual manuals as follows:
 
-* bitbake-user-manual      - The BitBake User Manual 
+* bitbake-user-manual      --- The BitBake User Manual 
 
 Each folder is self-contained regarding content and figures.
 

@@ -443,7 +443,7 @@ def find_sstate_manifest(taskdata, taskdata2, taskname, d, multilibcache):
     elif "-cross-canadian" in taskdata:
         pkgarchs = ["${SDK_ARCH}_${SDK_ARCH}-${SDKPKGSUFFIX}"]
     elif "-cross-" in taskdata:
-        pkgarchs = ["${BUILD_ARCH}_${TARGET_ARCH}"]
+        pkgarchs = ["${BUILD_ARCH}"]
     elif "-crosssdk" in taskdata:
         pkgarchs = ["${BUILD_ARCH}_${SDK_ARCH}_${SDK_OS}"]
     else:

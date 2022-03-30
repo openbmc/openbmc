@@ -1,6 +1,6 @@
 SUMMARY = "A font editor"
 HOMEPAGE = "http://fontforge.github.io/en-US/"
-LICENSE = "BSD-3-Clause & GPLv3"
+LICENSE = "BSD-3-Clause & GPL-3.0-only"
 LIC_FILES_CHKSUM = " \
     file://COPYING.gplv3;md5=d32239bcb673463ab874e80d47fae504 \
     file://LICENSE;md5=d042f3d2a8fd7208b704a499168e3c89 \

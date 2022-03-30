@@ -1,0 +1,40 @@
+From a4ed9fc8da720585f853d2ca6ffd30e2fa4d1247 Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <trevor.gamblin@windriver.com>
+Date: Wed, 9 Mar 2022 12:50:39 -0500
+Subject: [PATCH] Makefile.am: do not install /etc/ethertypes
+
+The /etc/ethertypes is provided by netbase since 6.0[1].
+Do not instal the file in ebtables, otherwise there would be a conflict:
+Error: Transaction test error:
+  file /etc/ethertypes conflicts between attempted installs of
+netbase-1:6.2-r0.corei7_64 and iptables-1.8.7-r0.corei7_64
+
+[1]
+https://salsa.debian.org/md/netbase/-/commit/316680c6a2c3641b6abc76b3eebf88781f609d35)
+
+This patch is based off of the same change made for the ebtables recipe:
+
+http://cgit.openembedded.org/meta-openembedded/tree/meta-networking/recipes-filter/ebtables/ebtables-2.0.11/0001-Makefile.am-do-not-install-etc-ethertypes.patch?h=master
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
+---
+ Makefile.am | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 799bf8b8..2eb1843f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -18,7 +18,6 @@ SUBDIRS         += iptables
+ 
+ if ENABLE_NFTABLES
+ confdir		= $(sysconfdir)
+-dist_conf_DATA	= etc/ethertypes
+ endif
+ 
+ .PHONY: tarball
+-- 
+2.35.1
+

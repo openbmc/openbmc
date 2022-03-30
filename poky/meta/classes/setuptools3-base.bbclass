@@ -1,6 +1,6 @@
 DEPENDS:append:class-target = " ${PYTHON_PN}-native ${PYTHON_PN}"
 DEPENDS:append:class-nativesdk = " ${PYTHON_PN}-native ${PYTHON_PN}"
-RDEPENDS:${PN} += "${@['', '${PYTHON_PN}-core']['${CLASSOVERRIDE}' == 'class-target']}"
+RDEPENDS:${PN}:append:class-target = " ${PYTHON_PN}-core"
 
 export STAGING_INCDIR
 export STAGING_LIBDIR

@@ -2,7 +2,7 @@ SUMMARY = "Netfilter connection tracking library"
 DESCRIPTION = "Userspace library providing a programming interface (API) to the Linux kernel netfilter connection tracking state table"
 HOMEPAGE = "http://www.netfilter.org/projects/libnetfilter_conntrack/index.html"
 SECTION = "libs"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8ca43cbc842c2336e835926c2166c28b"
 DEPENDS = "libnfnetlink libmnl"
 

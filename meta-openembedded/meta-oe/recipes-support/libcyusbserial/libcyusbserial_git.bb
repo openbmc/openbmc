@@ -1,7 +1,7 @@
 SUMMARY = "Enable userspace control of Cypress USB-Serial bridge devices"
 HOMEPAGE = "https://github.com/cyrozap/libcyusbserial"
 BUGTRACKER = "https://github.com/cyrozap/libcyusbserial/issues"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING.LESSER.txt;md5=4fbd65380cdd255951079008b364516c"
 DEPENDS = "libusb udev"
 

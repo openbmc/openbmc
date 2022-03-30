@@ -5,7 +5,7 @@ HOMEPAGE = "http://linux.bytesex.org/fbida/"
 AUTHOR = "Gerd Hoffmann"
 SECTION = "utils"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e8feb78a32950a909621bbb51f634b39"
 
 DEPENDS = "virtual/libiconv jpeg fontconfig freetype libexif libdrm pixman poppler libepoxy cairo"
@@ -38,6 +38,8 @@ PACKAGECONFIG[lirc] = ",,lirc"
 PACKAGECONFIG[egl] = ",,"
 
 EXTRA_OEMAKE += ""${@bb.utils.contains('PACKAGECONFIG', 'egl', 'HAVE_CAIRO_GL=yes', 'HAVE_CAIRO_GL=no', d)}""
+
+CFLAGS += "${@bb.utils.contains('DISTRO_FEATURES', 'x11', '', '-DEGL_NO_X11=1', d)}"
 
 do_compile() {
     sed -i -e 's# fbgs# \$(srcdir)/fbgs#; s#-Ijpeg#-I\$(srcdir)/jpeg#; s# jpeg/# \$(srcdir)/jpeg/#' ${S}/GNUmakefile

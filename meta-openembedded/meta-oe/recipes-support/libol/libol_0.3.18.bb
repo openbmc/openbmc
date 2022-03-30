@@ -1,7 +1,7 @@
 SUMMARY = "A tiny C support library"
 HOMEPAGE = "https://my.balabit.com/downloads/libol"
 SECTION = "libs"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c93c0550bd3173f4504b2cbd8991e50b"
 
 SRC_URI = "http://www.balabit.com/downloads/libol/0.3/${BP}.tar.gz \

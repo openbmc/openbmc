@@ -3,7 +3,7 @@
 
 SUMMARY = "libleak detects memory leak by hooking memory functions (e.g. malloc) by LD_PRELOAD"
 HOMEPAGE = "https://github.com/WuBingzheng/libleak"
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://README.md;beginline=18;endline=21;md5=de4f705f12cdedbe452b2c3524572b03"
 
 DEPENDS += "libbacktrace"

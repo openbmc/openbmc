@@ -10,7 +10,7 @@ be calculated *before* the warnings test is run, resulting in a TAP error. \
 demonstration.)"
 
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPL-1.0+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 
 HOMEPAGE=       "https://metacpan.org/release/Test-Warnings"
 

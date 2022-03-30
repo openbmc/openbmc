@@ -90,17 +90,17 @@ example::
 
 then in ``setup.py`` it works with source code in a relative fashion, such
 as ``../../src``. This causes pseudo to fail as it isn't able to track
-the paths properly. This release introduces a new :term:`DISTUTILS_SETUP_PATH`
+the paths properly. This release introduces a new ``DISTUTILS_SETUP_PATH``
 variable so that recipes can specify it explicitly, for example::
 
    S = "${WORKDIR}/git"
    DISTUTILS_SETUP_PATH = "${S}/python/pythonmodule"
 
-Recipes that inherit from :ref:`distutils3 <ref-classes-distutils3>` (or
+Recipes that inherit from ``distutils3`` (or
 :ref:`setuptools3 <ref-classes-setuptools3>` which itself inherits
-:ref:`distutils3 <ref-classes-distutils3>`) that also set :term:`S` to
+``distutils3``) that also set :term:`S` to
 point to a Python module within a subdirectory in the aforementioned
-manner should be changed to set :term:`DISTUTILS_SETUP_PATH` instead.
+manner should be changed to set ``DISTUTILS_SETUP_PATH`` instead.
 
 
 .. _migration-3.3-bitbake:

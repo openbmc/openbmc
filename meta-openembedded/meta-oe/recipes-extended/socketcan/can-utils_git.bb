@@ -1,5 +1,5 @@
 SUMMARY = "Linux CAN network development utilities"
-LICENSE = "GPLv2 & BSD-3-Clause"
+LICENSE = "GPL-2.0-only & BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://include/linux/can.h;endline=44;md5=a9e1169c6c9a114a61329e99f86fdd31"
 
 DEPENDS = "libsocketcan"

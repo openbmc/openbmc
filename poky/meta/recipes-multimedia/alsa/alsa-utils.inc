@@ -4,7 +4,8 @@ designed to allow users to control the various parts of the ALSA system."
 HOMEPAGE = "http://www.alsa-project.org"
 BUGTRACKER = "http://alsa-project.org/main/index.php/Bug_Tracking"
 SECTION = "console/utils"
-# Some parts are GPLv2+, some are only GPLv2 (e.g. axfer, alsactl) so result is GPLv2
+# Some parts are GPL-2.0-or-later, some are GPL-2.0-only (e.g. axfer, alsactl)
+# so result is GPL-2.0-only
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
                     file://alsactl/utils.c;beginline=3;endline=18;md5=96cc06a4cebe5eb7975688ffb0e65642"

@@ -2,7 +2,7 @@ SUMMARY = "Simple tool for input event debugging"
 HOMEPAGE = "http://people.freedesktop.org/~whot/evtest/"
 AUTHOR = "Vojtech Pavlik <vojtech@suse.cz>"
 SECTION = "console/utils"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 DEPENDS = "libxml2"

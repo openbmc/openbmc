@@ -1,0 +1,29 @@
+From f5ab30abd37ee884fb3ccaad0a8d21108ca2c812 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 28 Feb 2022 21:37:19 -0800
+Subject: [PATCH] setup.py: Port to use setuptools
+
+Needed to get it going with wheel, distutils is deprecated for long
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Linux/python/setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Linux/python/setup.py b/Linux/python/setup.py
+index e429e6f..da96843 100644
+--- a/Linux/python/setup.py
++++ b/Linux/python/setup.py
+@@ -22,7 +22,7 @@
+ #//  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ #//  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ 
+-from distutils.core import setup, Extension
++from setuptools import setup, Extension
+ import os.path
+ 
+ RTIMU_sources = [
+-- 
+2.35.1
+

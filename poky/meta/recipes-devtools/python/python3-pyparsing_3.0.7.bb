@@ -19,6 +19,7 @@ inherit pypi setuptools3
 RDEPENDS:${PN} += " \
     ${PYTHON_PN}-datetime \
     ${PYTHON_PN}-debugger \
+    ${PYTHON_PN}-html \
     ${PYTHON_PN}-json \
     ${PYTHON_PN}-netclient \
     ${PYTHON_PN}-pprint \

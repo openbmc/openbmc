@@ -55,7 +55,7 @@ RDEPENDS:packagegroup-meta-multimedia = "\
     tearsofsteel-1080p \
     schroedinger \
     pipewire \
-    ${@bb.utils.contains("DISTRO_FEATURES", "x11", "projucer", "", d)} \
+    ${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "commercial", "projucer", "", d)} \
     libcamera \
     ${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "commercial", "libde265 openh264", "", d)} \
     vorbis-tools \

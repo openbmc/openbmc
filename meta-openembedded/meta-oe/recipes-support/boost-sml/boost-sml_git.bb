@@ -9,10 +9,10 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=e4224ccaecb14d942c71d31bef20d78c"
 
 DEPENDS += "boost qemu-native"
 
-PV = "git${SRCPV}"
+PV = "1.1.5"
 
 SRC_URI = "git://github.com/boost-ext/sml.git;protocol=https;branch=master"
-SRCREV = "bcc8dc7815c0d17ad3a8bd52b202f4e90d4d4ca1"
+SRCREV = "7ed8f85fbe5b5af87bfb818e9e0347aaf7f7056d"
 
 S = "${WORKDIR}/git"
 

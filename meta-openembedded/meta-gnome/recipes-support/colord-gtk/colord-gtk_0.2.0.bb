@@ -1,6 +1,6 @@
 SUMMARY = "GTK support library for colord"
 HOMEPAGE = "https://www.freedesktop.org/software/colord/"
-LICENSE = "LGPLv3"
+LICENSE = "LGPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e6a600fd5e1d9cbde2d983680233ad02"
 
 inherit meson gobject-introspection gettext gtk-doc features_check

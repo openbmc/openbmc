@@ -7,6 +7,6 @@ python do_deploy_setscene () {
     sstate_setscene(d)
 }
 addtask do_deploy_setscene
-do_deploy[dirs] = "${DEPLOYDIR} ${B}"
+do_deploy[dirs] = "${B}"
 do_deploy[cleandirs] = "${DEPLOYDIR}"
 do_deploy[stamp-extra-info] = "${MACHINE_ARCH}"

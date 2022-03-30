@@ -2,7 +2,7 @@ SUMMARY = "pam-ssh-agent-auth"
 DESCRIPTION = "A PAM module which permits authentication via ssh-agent."
 HOMEPAGE = "http://sourceforge.net/projects/pamsshagentauth/"
 SECTION = "libs"
-LICENSE = "openssl & BSD"
+LICENSE = "OpenSSL & BSD"
 LIC_FILES_CHKSUM = "file://LICENSE.OpenSSL;md5=8ab01146141ded59b75f8ba7811ed05a \
                     file://OPENSSH_LICENSE;md5=7ae09218173be1643c998a4b71027f9b \
 "

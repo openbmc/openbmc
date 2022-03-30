@@ -3,7 +3,7 @@ DESCRIPTION = "High-level C++ D-Bus library designed to provide easy-to-use yet 
 
 SECTION = "libs"
 
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1803fa9c2c3ce8cb06b4861d75310742"
 
 inherit cmake pkgconfig systemd ptest
@@ -21,7 +21,7 @@ SRCREV = "65782bbf435d91e5eb6af9ddab110df406a824a9"
 SRC_URI = "git://github.com/Kistler-Group/sdbus-cpp.git;protocol=https;branch=master"
 SRC_URI += "file://run-ptest"
 
-EXTRA_OECMAKE = "-DBUILD_CODE_GEN=ON \
+EXTRA_OECMAKE = "-DBUILD_CODE_GEN=OFF \
                  -DBUILD_DOC=ON \
                  -DBUILD_DOXYGEN_DOC=OFF"
 

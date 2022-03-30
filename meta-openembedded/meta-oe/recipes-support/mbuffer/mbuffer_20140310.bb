@@ -1,6 +1,6 @@
 DESCRIPTION = "mbuffer is a tool for buffering data streams with a large set of unique features."
 HOMEPAGE = "http://www.maier-komor.de/mbuffer.html"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=d32239bcb673463ab874e80d47fae504"
 SECTION = "console/network"
 

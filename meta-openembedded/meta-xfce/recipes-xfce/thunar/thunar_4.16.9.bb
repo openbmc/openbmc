@@ -1,6 +1,6 @@
 SUMMARY = "File manager for the Xfce Desktop Environment"
 SECTION = "x11"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 DEPENDS = "libxml-parser-perl-native exo gdk-pixbuf libxfce4ui libsm startup-notification libnotify xfce4-panel udev"
 

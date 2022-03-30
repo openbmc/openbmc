@@ -3,7 +3,7 @@ DESCRIPTION = "Clutter is an Open GL based interactive canvas library, \
 designed for creating fast, mainly 2D single window applications such as media \
 box UIs, presentations, kiosk style applications and so on."
 HOMEPAGE = "http://www.clutter-project.org/"
-LICENSE = "LGPLv2.1+"
+LICENSE = "LGPL-2.1-or-later"
 
 inherit clutter ptest-gnome features_check upstream-version-is-even gobject-introspection
 # depends on cogl-1.0 which needs opengl

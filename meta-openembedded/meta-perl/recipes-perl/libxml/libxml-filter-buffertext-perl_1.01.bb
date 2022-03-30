@@ -7,7 +7,7 @@ to, and most don't.  This filter does the trivial but oft-repeated task \
 of putting all characters into a single event. \
 "
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPLv1+"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 HOMEPAGE = "http://search.cpan.org/dist/XML-Filter-BufferText/"
 DEPENDS += "libxml-sax-perl-native"
 RDEPENDS:${PN} += "libxml-sax-perl"

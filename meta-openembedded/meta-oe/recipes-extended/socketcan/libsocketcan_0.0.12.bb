@@ -2,7 +2,7 @@ SUMMARY = "Control basic functions in socketcan from userspace"
 HOMEPAGE = "http://www.pengutronix.de"
 SECTION = "libs/network"
 
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://src/libsocketcan.c;beginline=3;endline=17;md5=97e38adced4385d8fba1ae2437cedee1"
 
 SRCREV = "077def398ad303043d73339112968e5112d8d7c8"

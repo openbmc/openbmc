@@ -1,4 +1,4 @@
-From 73b1c416674d285b021e218da1a3ddb884e606da Mon Sep 17 00:00:00 2001
+From d2d7af496b4f4a13779179dbcbb98de56b09783f Mon Sep 17 00:00:00 2001
 From: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Date: Mon, 9 Nov 2015 11:07:27 +0200
 Subject: [PATCH] Enable more tests while cross-compiling
@@ -9,16 +9,15 @@ case we can depend on glib-2.0-native.
 
 Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
-
 ---
  gio/tests/meson.build | 24 ++++++++++++------------
  1 file changed, 12 insertions(+), 12 deletions(-)
 
 diff --git a/gio/tests/meson.build b/gio/tests/meson.build
-index 5dbfb8e..3fd7998 100644
+index e8d10a0f11f2..abe676767c60 100644
 --- a/gio/tests/meson.build
 +++ b/gio/tests/meson.build
-@@ -221,7 +221,7 @@ if host_machine.system() != 'windows'
+@@ -250,7 +250,7 @@ if host_machine.system() != 'windows'
  
    #  Test programs that need to bring up a session bus (requires dbus-daemon)
    have_dbus_daemon = find_program('dbus-daemon', required : false).found()
@@ -27,76 +26,78 @@ index 5dbfb8e..3fd7998 100644
      annotate_args = [
        '--annotate', 'org.project.Bar', 'Key1', 'Value1',
        '--annotate', 'org.project.Bar', 'org.gtk.GDBus.Internal', 'Value2',
-@@ -570,12 +570,12 @@ if installed_tests_enabled
+@@ -601,14 +601,14 @@ if installed_tests_enabled
    endforeach
  endif
  
 -if not meson.is_cross_build() or meson.has_exe_wrapper()
 +if meson.is_cross_build()
  
+   compiler_type = '--compiler=@0@'.format(cc.get_id())
+ 
    plugin_resources_c = custom_target('plugin-resources.c',
      input : 'test4.gresource.xml',
      output : 'plugin-resources.c',
 -    command : [glib_compile_resources,
 +    command : ['glib-compile-resources',
+                compiler_type,
                 '--target=@OUTPUT@',
                 '--sourcedir=' + meson.current_source_dir(),
-                '--generate-source',
-@@ -599,7 +599,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+@@ -634,7 +634,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
    test_gresource = custom_target('test.gresource',
      input : 'test.gresource.xml',
      output : 'test.gresource',
 -    command : [glib_compile_resources,
 +    command : ['glib-compile-resources',
+                compiler_type,
                 '--target=@OUTPUT@',
                 '--sourcedir=' + meson.current_source_dir(),
-                '--sourcedir=' + meson.current_build_dir(),
-@@ -610,7 +610,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+@@ -647,7 +647,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
    test_resources2_c = custom_target('test_resources2.c',
      input : 'test3.gresource.xml',
      output : 'test_resources2.c',
 -    command : [glib_compile_resources,
 +    command : ['glib-compile-resources',
+                compiler_type,
                 '--target=@OUTPUT@',
                 '--sourcedir=' + meson.current_source_dir(),
-                '--generate',
-@@ -621,7 +621,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+@@ -660,7 +660,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
    test_resources2_h = custom_target('test_resources2.h',
      input : 'test3.gresource.xml',
      output : 'test_resources2.h',
 -    command : [glib_compile_resources,
 +    command : ['glib-compile-resources',
+                compiler_type,
                 '--target=@OUTPUT@',
                 '--sourcedir=' + meson.current_source_dir(),
-                '--generate',
-@@ -633,7 +633,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+@@ -674,7 +674,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
      input : 'test2.gresource.xml',
      depends : big_test_resource,
      output : 'test_resources.c',
 -    command : [glib_compile_resources,
 +    command : ['glib-compile-resources',
+                compiler_type,
                 '--target=@OUTPUT@',
                 '--sourcedir=' + meson.current_source_dir(),
-                '--sourcedir=' + meson.current_build_dir(),
-@@ -644,7 +644,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+@@ -687,7 +687,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
    digit_test_resources_c = custom_target('digit_test_resources.c',
      input : '111_digit_test.gresource.xml',
      output : 'digit_test_resources.c',
 -    command : [glib_compile_resources,
 +    command : ['glib-compile-resources',
+                compiler_type,
                 '--target=@OUTPUT@',
                 '--sourcedir=' + meson.current_source_dir(),
-                '--sourcedir=' + meson.current_build_dir(),
-@@ -655,7 +655,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+@@ -700,7 +700,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
    digit_test_resources_h = custom_target('digit_test_resources.h',
      input : '111_digit_test.gresource.xml',
      output : 'digit_test_resources.h',
 -    command : [glib_compile_resources,
 +    command : ['glib-compile-resources',
+                compiler_type,
                 '--target=@OUTPUT@',
                 '--sourcedir=' + meson.current_source_dir(),
-                '--generate',
-@@ -688,11 +688,11 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+@@ -742,11 +742,11 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
  
    ld = find_program('ld', required : false)
  
@@ -107,15 +108,18 @@ index 5dbfb8e..3fd7998 100644
        output : 'test5.gresource',
 -      command : [glib_compile_resources,
 +      command : ['glib-compile-resources',
+                  compiler_type,
                   '--target=@OUTPUT@',
                   '--sourcedir=' + meson.current_source_dir(),
-                  '--sourcedir=' + meson.current_build_dir(),
-@@ -704,7 +704,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+@@ -760,7 +760,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
      test_resources_binary_c = custom_target('test_resources_binary.c',
        input : 'test5.gresource.xml',
        output : 'test_resources_binary.c',
 -      command : [glib_compile_resources,
 +      command : ['glib-compile-resources',
+                  compiler_type,
                   '--target=@OUTPUT@',
                   '--sourcedir=' + meson.current_source_dir(),
-                  '--sourcedir=' + meson.current_build_dir(),
+-- 
+2.34.1
+

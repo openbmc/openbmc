@@ -73,11 +73,11 @@ of the following environment variables (in any order):
     gl-es - enable virgl-based GL acceleration, using OpenGL ES (also needs gtk or sdl options)
     egl-headless - enable headless EGL output; use vnc (via publicvnc option) or spice to see it
     (hint: if /dev/dri/renderD* is absent due to lack of suitable GPU, 'modprobe vgem' will create
-    one sutable for mesa llvmpipe sofware renderer)
+    one suitable for mesa llvmpipe software renderer)
     serial - enable a serial console on /dev/ttyS0
     serialstdio - enable a serial console on the console (regardless of graphics mode)
-    slirp - enable user networking, no root privileges is required
-    snapshot - don't write changes to back to images
+    slirp - enable user networking, no root privilege is required
+    snapshot - don't write changes back to images
     kvm - enable KVM when running x86/x86_64 (VT-capable CPU required)
     kvm-vhost - enable KVM with vhost when running x86/x86_64 (VT-capable CPU required)
     publicvnc - enable a VNC server open to all hosts
@@ -352,10 +352,10 @@ class BaseConfig(object):
     def check_arg_path(self, p):
         """
         - Check whether it is <image>.qemuboot.conf or contains <image>.qemuboot.conf
-        - Check whether is a kernel file
-        - Check whether is a image file
-        - Check whether it is a nfs dir
-        - Check whether it is a OVMF flash file
+        - Check whether it is a kernel file
+        - Check whether it is an image file
+        - Check whether it is an NFS dir
+        - Check whether it is an OVMF flash file
         """
         if p.endswith('.qemuboot.conf'):
             self.qemuboot = p
@@ -366,7 +366,7 @@ class BaseConfig(object):
             self.kernel =  p
         elif os.path.exists(p) and (not os.path.isdir(p)) and '-image-' in os.path.basename(p):
             self.rootfs = p
-            # Check filename against self.fstypes can hanlde <file>.cpio.gz,
+            # Check filename against self.fstypes can handle <file>.cpio.gz,
             # otherwise, its type would be "gz", which is incorrect.
             fst = ""
             for t in self.fstypes:
@@ -814,7 +814,7 @@ class BaseConfig(object):
         self.set('QB_MEM', qb_mem)
 
         mach = self.get('MACHINE')
-        if not mach.startswith('qemumips'):
+        if not mach.startswith(('qemumips', 'qemux86')):
             self.kernel_cmdline_script += ' mem=%s' % self.get('QB_MEM').replace('-m','').strip() + 'M'
 
         self.qemu_opt_script += ' %s' % self.get('QB_MEM')

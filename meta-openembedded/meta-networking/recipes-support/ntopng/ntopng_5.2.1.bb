@@ -8,7 +8,7 @@ SECTION = "console/network"
 
 DEPENDS = "curl libmaxminddb libpcap lua mariadb ndpi json-c rrdtool zeromq"
 RDEPENDS:${PN} = "bash redis"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 SRCREV = "d3ce78948e8d81dc1e2c5298ce556f9f2247aac1"

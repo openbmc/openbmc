@@ -2,7 +2,7 @@ SUMMARY = "libnetfilter_acct accounting infrastructure."
 DESCRIPTION = "libnetfilter_acct is the userspace library providing interface to extended accounting infrastructure."
 HOMEPAGE = "http://netfilter.org/projects/libnetfilter_acct/index.html"
 SECTION = "libs"
-LICENSE = "LGPL-2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 DEPENDS = "libnfnetlink libmnl"
 

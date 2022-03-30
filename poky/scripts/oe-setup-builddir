@@ -94,9 +94,9 @@ into your configuration please add entries to conf/bblayers.conf.
 
 EOM
 
-    # Put the abosolute path to the layers in bblayers.conf so we can run
-    # bitbake without the init script after the first run
-    # ##COREBASE## is deprecated as it's meaning was inconsistent, but continue
+    # Put the absolute path to the layers in bblayers.conf so we can run
+    # bitbake without the init script after the first run.
+    # ##COREBASE## is deprecated as its meaning was inconsistent, but continue
     # to replace it for compatibility.
     sed -e "s|##OEROOT##|$OEROOT|g" \
         -e "s|##COREBASE##|$OEROOT|g" \
@@ -115,7 +115,7 @@ The Yocto Project has extensive documentation about OE including a reference
 manual which can be found at:
     https://docs.yoctoproject.org
 
-For more information about OpenEmbedded see their website:
+For more information about OpenEmbedded see the website:
     https://www.openembedded.org/
 
 EOM

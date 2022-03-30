@@ -5,7 +5,7 @@ SECTION = "libs"
 DEPENDS = "glib-2.0"
 
 BBCLASSEXTEND = "native"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=fbc093901857fcd118f065f900982c24"
 
 PE = "1"

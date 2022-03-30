@@ -1,0 +1,30 @@
+From cdaa837d48894737ca0b4e7d2dfb365119e53759 Mon Sep 17 00:00:00 2001
+From: Jan Beich <jbeich@FreeBSD.org>
+Date: Tue, 25 Jan 2022 11:49:54 +0000
+Subject: [PATCH] meson: Drop unused argument for i18n.merge_file()
+
+Ignored in Meson < 0.60.0, deprecated since 0.60.1 and fatal since 0.61.0.
+
+data/meson.build:23:0: ERROR: Function does not take positional arguments.
+
+Part-of: <https://gitlab.gnome.org/GNOME/gnome-shell-extensions/-/merge_requests/210>
+
+Upstream-Status: Backport[https://gitlab.gnome.org/GNOME/gnome-shell-extensions/-/commit/cdaa837d48894737ca0b4e7d2dfb365119e53759]
+---
+ data/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/data/meson.build b/data/meson.build
+index 27f4287..a4bcd5e 100644
+--- a/data/meson.build
++++ b/data/meson.build
+@@ -1,5 +1,5 @@
+ session_desktop = 'gnome-classic.desktop'
+-i18n.merge_file('',
++i18n.merge_file(
+   input:  session_desktop + '.in',
+   output: session_desktop,
+   po_dir: '../po',
+-- 
+2.34.1
+

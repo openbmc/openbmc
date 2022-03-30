@@ -1,0 +1,49 @@
+From 2a0dd2b300242230faa92cf8e26ccd70231bc9ef Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 19 Mar 2022 23:37:58 -0700
+Subject: [PATCH] cmake: Use CMAKE_INSTALL_LIBDIR and CMAKE_INSTALL_BINDIR
+
+This ensures the install paths are not hardcoded.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ cmake/CMakeLists.txt       | 4 ++--
+ src/samples/CMakeLists.txt | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/cmake/CMakeLists.txt b/cmake/CMakeLists.txt
+index a9f8908..7eadc60 100644
+--- a/cmake/CMakeLists.txt
++++ b/cmake/CMakeLists.txt
+@@ -11,7 +11,7 @@ export(EXPORT ${package_name}
+     FILE "${CMAKE_CURRENT_BINARY_DIR}/${package_name}Targets.cmake"
+     NAMESPACE ${package_name}::)
+ 
+-install(EXPORT ${package_name} DESTINATION lib/cmake/${package_name}
++install(EXPORT ${package_name} DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}
+     FILE ${package_name}Targets.cmake
+     NAMESPACE ${package_name}::)
+ 
+@@ -19,4 +19,4 @@ install(FILES
+     "${CMAKE_CURRENT_BINARY_DIR}/${package_name}Config.cmake"
+     FindPahoMqttC.cmake
+     "${CMAKE_CURRENT_BINARY_DIR}/${package_name}ConfigVersion.cmake"
+-    DESTINATION lib/cmake/${package_name})
++    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${package_name})
+diff --git a/src/samples/CMakeLists.txt b/src/samples/CMakeLists.txt
+index 953f5dc..d26729a 100644
+--- a/src/samples/CMakeLists.txt
++++ b/src/samples/CMakeLists.txt
+@@ -103,7 +103,7 @@ endif()
+ 
+ ## install binaries
+ install(TARGETS ${INSTALL_TARGETS} EXPORT PahoMqttCppSamples
+-	RUNTIME DESTINATION bin
+-	LIBRARY DESTINATION lib
++	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
++	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+ )
+ 
+-- 
+2.35.1
+

@@ -1,0 +1,33 @@
+From c06d8a8990c996cbb854508a944202ba70ba7a7c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 3 Mar 2022 20:10:04 -0800
+Subject: [PATCH] cmake: Do not export CC into gir compiler
+
+this helps cross compilers where full compiler commandline defines the
+compiler rather than just CC variable, therefore let it use the default
+values from environment and not synthesize it from CMAKE_C_COMPILER just
+for this case.
+
+Upstream-Status: Submitted [https://github.com/libical/libical/pull/552]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ cmake/modules/GObjectIntrospectionMacros.cmake | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/cmake/modules/GObjectIntrospectionMacros.cmake b/cmake/modules/GObjectIntrospectionMacros.cmake
+index 83aff931..d7d3f898 100644
+--- a/cmake/modules/GObjectIntrospectionMacros.cmake
++++ b/cmake/modules/GObjectIntrospectionMacros.cmake
+@@ -50,8 +50,7 @@ macro(gir_add_introspections introspections_girs)
+     set(_gir_libtool "--no-libtool")
+ 
+     add_custom_command(
+-      COMMAND ${CMAKE_COMMAND} -E env "CC='${CMAKE_C_COMPILER}'"
+-              ${GObjectIntrospection_SCANNER}
++      COMMAND ${GObjectIntrospection_SCANNER}
+               ${GObjectIntrospection_SCANNER_ARGS}
+               --namespace=${_gir_namespace}
+               --nsversion=${_gir_version}
+-- 
+2.35.1
+

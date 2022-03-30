@@ -4,7 +4,7 @@ for the console and xterm, with sample clients included \
 (emacs, etc)."
 HOMEPAGE = "https://www.nico.schottelius.org/software/gpm"
 SECTION = "console/utils"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=18810669f13b87348459e611d31ab760"
 
 PV = "1.99.7+git${SRCREV}"

@@ -1,6 +1,6 @@
 DESCRIPTION = "D-Bus interfaces for querying and manipulating user account information"
 HOMEPAGE = "https://www.freedesktop.org/wiki/Software/AccountsService/"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 DEPENDS = " \

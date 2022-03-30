@@ -2,7 +2,7 @@ SUMMARY = "library to read digital audio CDs with error correction"
 HOMEPAGE = "http://www.gnu.org/software/libcdio/"
 BUGTRUCKER = "https://github.com/rocky/libcdio-paranoia/issues/"
 SECTION = "libs"
-LICENSE = "GPLv3+"
+LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 DEPENDS = "libcdio"
 

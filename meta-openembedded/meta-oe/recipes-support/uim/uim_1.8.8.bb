@@ -1,6 +1,6 @@
 DESCRIPTION = "A multilingual user input method library"
 HOMEPAGE = "http://uim.freedesktop.org/"
-LICENSE = "BSD-3-Clause & LGPLv2+"
+LICENSE = "BSD-3-Clause & LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ab2826b41ca0ff4030d38cc39791d1c8"
 SECTION = "inputmethods"
 
@@ -51,6 +51,9 @@ PARALLEL_MAKE = ""
 
 #Because m4 file's find maxdepth=2, so copy the m4 files of the deep depth.
 do_configure:prepend () {
+    rm -rf ${S}/m4.generated/lt*.m4 ${S}/m4.generated/libtool.m4
+    rm -rf ${S}/sigscheme/libgcroots/m4/lt*.m4 ${S}/sigscheme/libgcroots/m4/libtool.m4
+    rm -rf ${S}/sigscheme/m4/lt*.m4 ${S}/sigscheme/m4/libtool.m4
     cp ${S}/sigscheme/m4/* ${S}/m4/
 }
 

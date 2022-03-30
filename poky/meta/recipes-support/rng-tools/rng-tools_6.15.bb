@@ -34,6 +34,8 @@ INITSCRIPT_PARAMS = "start 03 2 3 4 5 . stop 30 0 6 1 ."
 
 SYSTEMD_SERVICE:${PN} = "rngd.service"
 
+CFLAGS += " -DJENT_CONF_ENABLE_INTERNAL_TIMER "
+
 # Refer autogen.sh in rng-tools
 do_configure:prepend() {
     cp ${S}/README.md ${S}/README

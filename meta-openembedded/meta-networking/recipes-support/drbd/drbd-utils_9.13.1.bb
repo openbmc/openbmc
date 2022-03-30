@@ -5,7 +5,7 @@ Think of it as networked raid 1. It is a building block for\
 setting up high availability (HA) clusters."
 HOMEPAGE = "http://www.drbd.org/"
 SECTION = "admin"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5574c6965ae5f583e55880e397fbb018"
 
 SRC_URI = "git://github.com/LINBIT/drbd-utils;name=drbd-utils;branch=${PV};protocol=https \

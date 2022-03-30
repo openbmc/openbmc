@@ -20,7 +20,8 @@ inherit autotools pkgconfig update-alternatives
 ALTERNATIVE:${PN} = "lsusb"
 ALTERNATIVE_PRIORITY = "100"
 
-# The binaries are mostly GPLv2+ apart from lsusb.py which is GPLv2 or v3.
+# The binaries are mostly GPL-2.0-or-later apart from lsusb.py which is
+# GPL-2.0-only or GPL-3.0-only.
 LICENSE:${PN} = "GPL-2.0-or-later"
 LICENSE:${PN}-python = "GPL-2.0-only | GPL-3.0-only"
 

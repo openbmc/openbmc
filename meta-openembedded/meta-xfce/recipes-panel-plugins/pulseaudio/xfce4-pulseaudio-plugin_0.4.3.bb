@@ -1,5 +1,5 @@
 SUMMARY = "Pulseaudio mixer for the xfce panel"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=f5eac6bb0d6ec0dc655e417781d4015f"
 
 inherit xfce-panel-plugin features_check

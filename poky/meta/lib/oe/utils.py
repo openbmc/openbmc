@@ -221,12 +221,12 @@ def packages_filter_out_system(d):
     PN-dbg PN-doc PN-locale-eb-gb removed.
     """
     pn = d.getVar('PN')
-    blacklist = [pn + suffix for suffix in ('', '-dbg', '-dev', '-doc', '-locale', '-staticdev', '-src')]
+    pkgfilter = [pn + suffix for suffix in ('', '-dbg', '-dev', '-doc', '-locale', '-staticdev', '-src')]
     localepkg = pn + "-locale-"
     pkgs = []
 
     for pkg in d.getVar('PACKAGES').split():
-        if pkg not in blacklist and localepkg not in pkg:
+        if pkg not in pkgfilter and localepkg not in pkg:
             pkgs.append(pkg)
     return pkgs
 

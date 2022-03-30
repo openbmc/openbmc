@@ -1,6 +1,6 @@
 SUMMARY = "a SocketCAN over Ethernet tunnel"
 HOMEPAGE = "https://github.com/mguentner/cannelloni"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 
 SRC_URI = "git://github.com/mguentner/cannelloni.git;protocol=https;branch=master"
 SRCREV = "0bd7e27db35bdef361226882ae04205504f7b2f4"

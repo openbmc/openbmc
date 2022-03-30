@@ -1,6 +1,6 @@
 SUMMARY = "This is a filesystem client based on the HTTP using FUSE"
 HOMEPAGE = "http://httpfs.sourceforge.net"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://debian/copyright;md5=83f224c5182f148ec92e0b9f84b3c6c7"
 
 inherit pkgconfig

@@ -3,7 +3,7 @@ DESCRIPTION = "GSSDP implements resource discovery and announcement over SSDP \
                (Simpe Service Discovery Protocol)."
 HOMEPAGE = "https://gitlab.gnome.org/GNOME/gssdp/"
 BUGTRACKER = "https://gitlab.gnome.org/GNOME/gssdp/-/issues"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 
 SRC_URI = "${GNOME_MIRROR}/${BPN}/1.4/${BPN}-${PV}.tar.xz"

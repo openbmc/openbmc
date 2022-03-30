@@ -61,9 +61,9 @@ DISTRO_FEATURES += "systemd overlayfs"
         self.add_overlay_conf_to_machine()
 
         res = bitbake('core-image-minimal', ignore_status=True)
-        line = getline(res, "Unit name mnt-overlay.mount not found in systemd unit directories")
+        line = getline(res, " Mount path /mnt/overlay not found in fstat and unit mnt-overlay.mount not found in systemd unit directories")
         self.assertTrue(line and line.startswith("WARNING:"), msg=res.output)
-        line = getline(res, "Not all mount units are installed by the BSP")
+        line = getline(res, "Not all mount paths and units are installed in the image")
         self.assertTrue(line and line.startswith("ERROR:"), msg=res.output)
 
     def test_mount_unit_not_set(self):
@@ -107,7 +107,7 @@ OVERLAYFS_MOUNT_POINT[usr-share-overlay] = "/usr/share/overlay"
         line = getline(res, "Missing required mount point for OVERLAYFS_MOUNT_POINT[mnt-overlay] in your MACHINE configuration")
         self.assertTrue(line and line.startswith("Parsing recipes...ERROR:"), msg=res.output)
 
-    def test_correct_image(self):
+    def _test_correct_image(self, recipe, data):
         """
         Summary:   Check that we can create an image when all parameters are
                    set correctly
@@ -124,31 +124,6 @@ VIRTUAL-RUNTIME_init_manager = "systemd"
 
 # enable overlayfs in the kernel
 KERNEL_EXTRA_FEATURES:append = " features/overlayfs/overlayfs.scc"
-"""
-
-        systemd_machine_unit_append = """
-SYSTEMD_SERVICE:${PN} += " \
-    mnt-overlay.mount \
-"
-
-do_install:append() {
-    install -d ${D}${systemd_system_unitdir}
-    cat <<EOT > ${D}${systemd_system_unitdir}/mnt-overlay.mount
-[Unit]
-Description=Tmpfs directory
-DefaultDependencies=no
-
-[Mount]
-What=tmpfs
-Where=/mnt/overlay
-Type=tmpfs
-Options=mode=1777,strictatime,nosuid,nodev
-
-[Install]
-WantedBy=multi-user.target
-EOT
-}
-
 """
 
         overlayfs_recipe_append = """
@@ -179,7 +154,7 @@ EOT
 
         self.write_config(config)
         self.add_overlay_conf_to_machine()
-        self.write_recipeinc('systemd-machine-units', systemd_machine_unit_append)
+        self.write_recipeinc(recipe, data)
         self.write_recipeinc('overlayfs-user', overlayfs_recipe_append)
 
         bitbake('core-image-minimal')
@@ -209,6 +184,59 @@ EOT
 
             line = getline_qemu(output, "upperdir=/mnt/overlay/upper/usr/share/another-overlay-mount")
             self.assertTrue(line and line.startswith("overlay"), msg=output)
+
+    def test_correct_image_fstab(self):
+        """
+        Summary:   Check that we can create an image when all parameters are
+                   set correctly via fstab
+        Expected:  Image is created successfully
+        Author:    Stefan Herbrechtsmeier <stefan.herbrechtsmeier@weidmueller.com>
+        """
+
+        base_files_append = """
+do_install:append() {
+    cat <<EOT >> ${D}${sysconfdir}/fstab
+tmpfs                /mnt/overlay         tmpfs      mode=1777,strictatime,nosuid,nodev  0  0
+EOT
+}
+"""
+
+        self._test_correct_image('base-files', base_files_append)
+
+    def test_correct_image_unit(self):
+        """
+        Summary:   Check that we can create an image when all parameters are
+                   set correctly via mount unit
+        Expected:  Image is created successfully
+        Author:    Vyacheslav Yurkov <uvv.mail@gmail.com>
+        """
+
+        systemd_machine_unit_append = """
+SYSTEMD_SERVICE:${PN} += " \
+    mnt-overlay.mount \
+"
+
+do_install:append() {
+    install -d ${D}${systemd_system_unitdir}
+    cat <<EOT > ${D}${systemd_system_unitdir}/mnt-overlay.mount
+[Unit]
+Description=Tmpfs directory
+DefaultDependencies=no
+
+[Mount]
+What=tmpfs
+Where=/mnt/overlay
+Type=tmpfs
+Options=mode=1777,strictatime,nosuid,nodev
+
+[Install]
+WantedBy=multi-user.target
+EOT
+}
+
+"""
+
+        self._test_correct_image('systemd-machine-units', systemd_machine_unit_append)
 
 class OverlayFSEtcRunTimeTests(OESelftestTestCase):
     """overlayfs-etc class tests"""

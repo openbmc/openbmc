@@ -3,7 +3,7 @@ HOMEPAGE = "http://tcl.sourceforge.net"
 SECTION = "devel/tcltk"
 
 # http://www.tcl.tk/software/tcltk/license.html
-LICENSE = "tcl"
+LICENSE = "TCL"
 LIC_FILES_CHKSUM = "file://${S}/../license.terms;md5=c88f99decec11afa967ad33d314f87fe \
     file://${S}/../compat/license.terms;md5=c88f99decec11afa967ad33d314f87fe \
     file://${S}/../doc/license.terms;md5=c88f99decec11afa967ad33d314f87fe \

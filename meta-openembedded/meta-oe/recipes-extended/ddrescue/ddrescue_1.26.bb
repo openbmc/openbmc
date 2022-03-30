@@ -4,7 +4,7 @@ DESCRIPTION = "GNU ddrescue is a data recovery tool. It copies data \
     trying hard to rescue data in case of read errors."
 HOMEPAGE = "http://www.gnu.org/software/ddrescue/ddrescue.html"
 SECTION = "console"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=76d6e300ffd8fb9d18bd9b136a9bba13 \
                     file://main_common.cc;beginline=5;endline=16;md5=ad099df052bdd8297f490712285069da \

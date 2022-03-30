@@ -39,6 +39,9 @@ def preferred_ml_updates(d):
                     override = ":virtclass-multilib-" + p
                     localdata.setVar("OVERRIDES", localdata.getVar("OVERRIDES", False) + override)
                     if "-canadian-" in pkg:
+                        newtune = localdata.getVar("DEFAULTTUNE:" + "virtclass-multilib-" + p, False)
+                        if newtune:
+                            localdata.setVar("DEFAULTTUNE", newtune)
                         newname = localdata.expand(v)
                     else:
                         newname = localdata.expand(v).replace(version_str, version_str + p + '-')

@@ -193,7 +193,7 @@ def find_license_files(d):
                                     os.path.join(srcdir, non_generic_lic), None, None))
             non_generic_lics[non_generic_lic] = license_type
         else:
-            # Add explicity avoid of CLOSED license because this isn't generic
+            # Explicitly avoid the CLOSED license because this isn't generic
             if license_type != 'CLOSED':
                 # And here is where we warn people that their licenses are lousy
                 oe.qa.handle_error("license-exists",
@@ -252,52 +252,34 @@ def return_spdx(d, license):
 def canonical_license(d, license):
     """
     Return the canonical (SPDX) form of the license if available (so GPLv3
-    becomes GPL-3.0) or the passed license if there is no canonical form.
+    becomes GPL-3.0-only) or the passed license if there is no canonical form.
     """
     return d.getVarFlag('SPDXLICENSEMAP', license) or license
 
-def available_licenses(d):
-    """
-    Return the available licenses by searching the directories specified by
-    COMMON_LICENSE_DIR and LICENSE_PATH.
-    """
-    lic_dirs = ((d.getVar('COMMON_LICENSE_DIR') or '') + ' ' +
-                (d.getVar('LICENSE_PATH') or '')).split()
-
-    licenses = []
-    for lic_dir in lic_dirs:
-        licenses += os.listdir(lic_dir)
-
-    licenses = sorted(licenses)
-    return licenses
-
-# Only determine the list of all available licenses once. This assumes that any
-# additions to LICENSE_PATH have been done before this file is parsed.
-AVAILABLE_LICENSES := "${@' '.join(available_licenses(d))}"
-
 def expand_wildcard_licenses(d, wildcard_licenses):
     """
-    Return actual spdx format license names if wildcards are used. We expand
-    wildcards from SPDXLICENSEMAP flags and AVAILABLE_LICENSES.
+    There are some common wildcard values users may want to use. Support them
+    here.
     """
-    import fnmatch
+    licenses = set(wildcard_licenses)
+    mapping = {
+        "AGPL-3.0*" : ["AGPL-3.0-only", "AGPL-3.0-or-later"],
+        "GPL-3.0*" : ["GPL-3.0-only", "GPL-3.0-or-later"],
+        "LGPL-3.0*" : ["LGPL-3.0-only", "LGPL-3.0-or-later"],
+    }
+    for k in mapping:
+        if k in wildcard_licenses:
+            licenses.remove(k)
+            for item in mapping[k]:
+                licenses.add(item)
 
-    licenses = wildcard_licenses[:]
-    spdxmapkeys = d.getVarFlags('SPDXLICENSEMAP').keys()
-    for wld_lic in wildcard_licenses:
-        spdxflags = fnmatch.filter(spdxmapkeys, wld_lic)
-        licenses += [d.getVarFlag('SPDXLICENSEMAP', flag) for flag in spdxflags]
-        # Assume if we're passed "GPLv3" or "*GPLv3" it means -or-later as well
-        if not wld_lic.endswith(("-or-later", "-only", "*", "+")):
-            spdxflags = fnmatch.filter(spdxmapkeys, wld_lic + "+")
-            licenses += [d.getVarFlag('SPDXLICENSEMAP', flag) for flag in spdxflags]
+    for l in licenses:
+        if l in oe.license.obsolete_license_list():
+            bb.fatal("Error, %s is an obsolete license, please use an SPDX reference in INCOMPATIBLE_LICENSE" % l)
+        if "*" in l:
+            bb.fatal("Error, %s is an invalid license wildcard entry" % l)
 
-    spdx_lics = d.getVar('AVAILABLE_LICENSES').split()
-    for wld_lic in wildcard_licenses:
-        licenses += fnmatch.filter(spdx_lics, wld_lic)
-
-    licenses = list(set(licenses))
-    return licenses
+    return list(licenses)
 
 def incompatible_license_contains(license, truevalue, falsevalue, d):
     license = canonical_license(d, license)

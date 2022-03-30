@@ -11,8 +11,9 @@ LIC_FILES_CHKSUM = " \
     file://about.html;md5=dcde438d73cf42393da9d40fabc0c9bc \
 "
 
-SRC_URI = "git://github.com/eclipse/paho.mqtt.cpp;protocol=http;branch=master;protocol=https"
-
+SRC_URI = "git://github.com/eclipse/paho.mqtt.cpp;protocol=http;branch=master;protocol=https \
+           file://0001-cmake-Use-CMAKE_INSTALL_LIBDIR-and-CMAKE_INSTALL_BIN.patch \
+"
 SRCREV = "33921c8b68b351828650c36816e7ecf936764379"
 
 DEPENDS = "openssl paho-mqtt-c"

@@ -4,7 +4,6 @@ ac_cv_sizeof_double=${ac_cv_sizeof_double=8}
 ac_cv_sizeof_float=${ac_cv_sizeof_float=4}
 ac_cv_sizeof_int=${ac_cv_sizeof_int=4}
 ac_cv_sizeof_long=${ac_cv_sizeof_long=8}
-ac_cv_sizeof_long_double=${ac_cv_sizeof_long_double=16}
 ac_cv_sizeof_long_int=${ac_cv_sizeof_long_int=8}
 ac_cv_sizeof_long_long=${ac_cv_sizeof_long_long=8}
 ac_cv_sizeof_long_long_int=${ac_cv_sizeof_long_long_int=8}

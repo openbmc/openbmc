@@ -1,7 +1,7 @@
 SUMMARY = "Convert HTML to Markdown-formatted text"
 HOMEPAGE = "https://github.com/Alir3z4/html2text"
 
-LICENSE = "GPL-3.0"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 SRC_URI[md5sum] = "c77b580c94d1a9e0145f23cc4472993d"

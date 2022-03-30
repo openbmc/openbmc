@@ -10,21 +10,17 @@ Upstream-Status: Pending
  src/utilities/Makefile.am | 2 +-
  3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/src/Makefile.am b/src/Makefile.am
-index f8066af..6b979f8 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
-@@ -12,7 +12,7 @@ AM_CPPFLAGS = \
- 	-I$(top_srcdir)/src/acpica/source/compiler	\
+@@ -13,7 +13,7 @@ AM_CPPFLAGS = \
  	-I$(top_srcdir)/efi_runtime			\
+ 	-I$(top_srcdir)/smccc_test			\
  	-pthread `pkg-config --cflags glib-2.0 gio-2.0` \
 -	-Wall -Werror -Wextra				\
 +	-Wall -Wextra					\
  	-Wno-address-of-packed-member			\
  	-Wfloat-equal -Wmissing-declarations		\
  	-Wno-long-long -Wredundant-decls -Wshadow	\
-diff --git a/src/lib/src/Makefile.am b/src/lib/src/Makefile.am
-index 55c52b4..50efa97 100644
 --- a/src/lib/src/Makefile.am
 +++ b/src/lib/src/Makefile.am
 @@ -25,7 +25,7 @@ AM_CPPFLAGS = \
@@ -36,8 +32,6 @@ index 55c52b4..50efa97 100644
  	-Wno-address-of-packed-member
  
  pkglib_LTLIBRARIES = libfwts.la
-diff --git a/src/utilities/Makefile.am b/src/utilities/Makefile.am
-index a7d9b9c..e1bf141 100644
 --- a/src/utilities/Makefile.am
 +++ b/src/utilities/Makefile.am
 @@ -16,7 +16,7 @@
@@ -49,6 +43,3 @@ index a7d9b9c..e1bf141 100644
  	-I$(srcdir)/../lib/include
  
  bin_PROGRAMS = kernelscan
--- 
-2.25.1
-

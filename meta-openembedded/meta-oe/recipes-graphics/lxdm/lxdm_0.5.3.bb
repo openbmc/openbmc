@@ -1,6 +1,6 @@
 SUMMARY = "LXDM is the lightweight display manager"
 HOMEPAGE = "http://blog.lxde.org/?p=531"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 SRC_URI = "${SOURCEFORGE_MIRROR}/project/${BPN}/${BPN}%20${PV}/${BPN}-${PV}.tar.xz \
            file://lxdm.conf \

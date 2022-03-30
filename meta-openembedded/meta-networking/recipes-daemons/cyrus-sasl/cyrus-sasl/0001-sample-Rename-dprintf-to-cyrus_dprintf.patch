@@ -1,0 +1,91 @@
+From ade70f39c4aa5a8830462d9ccf3b8f8dd968c0d8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 28 Feb 2022 11:10:26 -0800
+Subject: [PATCH] sample: Rename dprintf to cyrus_dprintf
+
+This avoids shadowing the dprintf implementations in glibc
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sample/client.c | 12 ++++++------
+ sample/common.c |  2 +-
+ sample/common.h |  2 +-
+ 3 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/sample/client.c b/sample/client.c
+index e723c6b7..6a04f428 100644
+--- a/sample/client.c
++++ b/sample/client.c
+@@ -241,9 +241,9 @@ int mysasl_negotiate(FILE *in, FILE *out, sasl_conn_t *conn)
+     int r, c;
+ 
+     /* get the capability list */
+-    dprintf(0, "receiving capability list... ");
++    cyrus_dprintf(0, "receiving capability list... ");
+     len = recv_string(in, buf, sizeof buf);
+-    dprintf(0, "%s\n", buf);
++    cyrus_dprintf(0, "%s\n", buf);
+ 
+     if (mech) {
+ 	/* make sure that 'mech' appears in 'buf' */
+@@ -262,7 +262,7 @@ int mysasl_negotiate(FILE *in, FILE *out, sasl_conn_t *conn)
+ 	return -1;
+     }
+     
+-    dprintf(1, "using mechanism %s\n", chosenmech);
++    cyrus_dprintf(1, "using mechanism %s\n", chosenmech);
+ 
+     /* we send up to 3 strings;
+        the mechanism chosen, the presence of initial response,
+@@ -276,7 +276,7 @@ int mysasl_negotiate(FILE *in, FILE *out, sasl_conn_t *conn)
+     }
+ 
+     for (;;) {
+-	dprintf(2, "waiting for server reply...\n");
++	cyrus_dprintf(2, "waiting for server reply...\n");
+ 
+ 	c = fgetc(in);
+ 	switch (c) {
+@@ -303,10 +303,10 @@ int mysasl_negotiate(FILE *in, FILE *out, sasl_conn_t *conn)
+ 	}
+ 
+ 	if (data) {
+-	    dprintf(2, "sending response length %d...\n", len);
++	    cyrus_dprintf(2, "sending response length %d...\n", len);
+ 	    send_string(out, data, len);
+ 	} else {
+-	    dprintf(2, "sending null response...\n");
++	    cyrus_dprintf(2, "sending null response...\n");
+ 	    send_string(out, "", 0);
+ 	}
+     }
+diff --git a/sample/common.c b/sample/common.c
+index 712549fd..d138e450 100644
+--- a/sample/common.c
++++ b/sample/common.c
+@@ -127,7 +127,7 @@ int recv_string(FILE *f, char *buf, int buflen)
+ 
+ int debuglevel = 0;
+ 
+-int dprintf(int lvl, const char *fmt, ...)
++int cyrus_dprintf(int lvl, const char *fmt, ...)
+ {
+     va_list ap;
+     int ret = 0;
+diff --git a/sample/common.h b/sample/common.h
+index 819d0101..cd56907a 100644
+--- a/sample/common.h
++++ b/sample/common.h
+@@ -43,7 +43,7 @@ extern int send_string(FILE *f, const char *s, int l);
+ extern int recv_string(FILE *f, char *buf, int buflen);
+ 
+ extern int debuglevel;
+-extern int dprintf(int lvl, const char *fmt, ...);
++extern int cyrus_dprintf(int lvl, const char *fmt, ...);
+ 
+ extern void saslerr(int why, const char *what);
+ extern void saslfail(int why, const char *what);
+-- 
+2.35.1
+

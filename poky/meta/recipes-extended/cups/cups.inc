@@ -49,6 +49,7 @@ PACKAGECONFIG[xinetd] = "--with-xinetd=${sysconfdir}/xinetd.d,--without-xinetd,x
 
 EXTRA_OECONF = " \
                --enable-dbus \
+               --with-dbusdir=${sysconfdir}/dbus-1 \
                --enable-browsing \
                --disable-gssapi \
                --enable-debug \

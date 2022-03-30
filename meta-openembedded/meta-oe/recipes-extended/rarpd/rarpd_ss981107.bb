@@ -22,7 +22,7 @@ SRC_URI += "file://0001-rarpd.8-add-man-file.patch \
     file://rarpd.service \
 "
 
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://rarpd.c;md5=199b20b172ea93121bc613a9c77b6931"
 
 S = "${WORKDIR}/${BPN}"

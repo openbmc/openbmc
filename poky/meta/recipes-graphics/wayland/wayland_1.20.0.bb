@@ -27,7 +27,7 @@ PACKAGECONFIG ??= "dtd-validation"
 PACKAGECONFIG[dtd-validation] = "-Ddtd_validation=true,-Ddtd_validation=false,libxml2,,"
 
 EXTRA_OEMESON = "-Ddocumentation=false"
-EXTRA_OEMESON:class-native = "-Ddocumentation=false -Dlibraries=false"
+EXTRA_OEMESON:class-native = "-Ddocumentation=false"
 
 # Wayland installs a M4 macro for other projects to use, which uses the target
 # pkg-config to find files.  Replace pkg-config with pkg-config-native.

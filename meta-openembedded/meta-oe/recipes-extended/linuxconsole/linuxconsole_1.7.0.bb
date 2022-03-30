@@ -5,7 +5,7 @@ input subsystem (providing support for serial mice, touchscreens etc.), and test
 the input event layer."
 HOMEPAGE = "https://sourceforge.net/projects/linuxconsole"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS = "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"

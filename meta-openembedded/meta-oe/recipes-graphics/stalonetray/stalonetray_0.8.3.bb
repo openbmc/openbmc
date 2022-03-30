@@ -1,7 +1,7 @@
 SUMMARY = "Stand-alone system tray"
 DESCRIPTION = "Stalonetray is a stand-alone freedesktop.org and KDE system tray"
 SECTION = "x11/graphics"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
 DEPENDS = "virtual/libx11"

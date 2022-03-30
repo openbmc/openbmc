@@ -1,0 +1,100 @@
+From ddf634b92bf96b35f521db6da329628b4525c2eb Mon Sep 17 00:00:00 2001
+From: Sven Schwermer <sven.schwermer@disruptive-technologies.com>
+Date: Fri, 25 Feb 2022 21:37:13 +0100
+Subject: [PATCH 2/2] fcc-unlock: Make scripts POSIX shell compatible
+
+This allows us to not rely on bash which may not be available on
+constrained systems, e.g. Yocto-built embedded systems. The scripts now
+pass shellcheck.
+
+Signed-off-by: Sven Schwermer <sven.schwermer@disruptive-technologies.com>
+---
+ data/fcc-unlock/105b | 8 ++++----
+ data/fcc-unlock/1199 | 6 +++---
+ data/fcc-unlock/1eac | 8 ++++----
+ 3 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/data/fcc-unlock/105b b/data/fcc-unlock/105b
+index f276050f..772c90f4 100644
+--- a/data/fcc-unlock/105b
++++ b/data/fcc-unlock/105b
+@@ -15,20 +15,20 @@ shift
+ # second and next arguments are control port names
+ for PORT in "$@"; do
+   # match port type in Linux 5.14 and newer
+-  grep -q MBIM /sys/class/wwan/${PORT}/type 2>/dev/null && {
++  grep -q MBIM "/sys/class/wwan/$PORT/type" 2>/dev/null && {
+     MBIM_PORT=$PORT
+     break
+   }
+   # match port name in Linux 5.13
+-  [[ $PORT == *"MBIM"* ]] && {
++  echo "$PORT" | grep -q MBIM && {
+     MBIM_PORT=$PORT
+     break
+   }
+ done
+ 
+ # fail if no MBIM port exposed
+-[ -n "${MBIM_PORT}" ] || exit 2
++[ -n "$MBIM_PORT" ] || exit 2
+ 
+ # run qmicli operation over MBIM
+-qmicli --device-open-proxy --device=/dev/${MBIM_PORT} --dms-foxconn-set-fcc-authentication=0
++qmicli --device-open-proxy --device="/dev/$MBIM_PORT" --dms-foxconn-set-fcc-authentication=0
+ exit $?
+diff --git a/data/fcc-unlock/1199 b/data/fcc-unlock/1199
+index e1d3804c..6dbf8d1b 100644
+--- a/data/fcc-unlock/1199
++++ b/data/fcc-unlock/1199
+@@ -19,15 +19,15 @@ shift
+ # second and next arguments are control port names
+ for PORT in "$@"; do
+   # match port name
+-  [[ $PORT == *"cdc-wdm"* ]] && {
++  echo "$PORT" | grep -q cdc-wdm && {
+     CDC_WDM_PORT=$PORT
+     break
+   }
+ done
+ 
+ # fail if no cdc-wdm port exposed
+-[ -n "${CDC_WDM_PORT}" ] || exit 2
++[ -n "$CDC_WDM_PORT" ] || exit 2
+ 
+ # run qmicli operation
+-qmicli --device-open-proxy --device=/dev/${CDC_WDM_PORT} --dms-set-fcc-authentication
++qmicli --device-open-proxy --device="/dev/$CDC_WDM_PORT" --dms-set-fcc-authentication
+ exit $?
+diff --git a/data/fcc-unlock/1eac b/data/fcc-unlock/1eac
+index d9342852..44ce46d7 100644
+--- a/data/fcc-unlock/1eac
++++ b/data/fcc-unlock/1eac
+@@ -15,20 +15,20 @@ shift
+ # second and next arguments are control port names
+ for PORT in "$@"; do
+   # match port type in Linux 5.14 and newer
+-  grep -q MBIM /sys/class/wwan/${PORT}/type 2>/dev/null && {
++  grep -q MBIM "/sys/class/wwan/$PORT/type" 2>/dev/null && {
+     MBIM_PORT=$PORT
+     break
+   }
+   # match port name in Linux 5.13
+-  [[ $PORT == *"MBIM"* ]] && {
++  echo "$PORT" | grep -q MBIM && {
+     MBIM_PORT=$PORT
+     break
+   }
+ done
+ 
+ # fail if no MBIM port exposed
+-[ -n "${MBIM_PORT}" ] || exit 2
++[ -n "$MBIM_PORT" ] || exit 2
+ 
+ # run mbimcli operation
+-mbimcli --device-open-proxy --device=/dev/${MBIM_PORT} --quectel-set-radio-state=on
++mbimcli --device-open-proxy --device="/dev/$MBIM_PORT" --quectel-set-radio-state=on
+ exit $?
+-- 
+2.34.1
+

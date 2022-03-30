@@ -9,6 +9,8 @@ S = "${WORKDIR}/git"
 
 inherit setuptools3
 
+PIP_INSTALL_PACKAGE = "PyMetno"
+
 RDEPENDS:${PN} = "\
 	${PYTHON_PN}-aiohttp (>=3.6.1) \
 	${PYTHON_PN}-async-timeout (>=3.0.1) \

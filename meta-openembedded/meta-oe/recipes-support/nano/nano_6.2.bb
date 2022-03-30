@@ -4,7 +4,7 @@ Not ANOther editor) is an enhanced clone of the \
 Pico text editor."
 HOMEPAGE = "http://www.nano-editor.org/"
 SECTION = "console/utils"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=f27defe1e96c2e1ecd4e0c9be8967949"
 
 DEPENDS = "ncurses file"

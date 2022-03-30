@@ -4,7 +4,7 @@ It provides a GStreamer sink to upload frames to GL and an actor that \
 implements the ClutterGstPlayer interface using playbin."
 HOMEPAGE = "http://www.clutter-project.org/"
 BUGTRACKER = "https://gitlab.gnome.org/GNOME/clutter-gst/-/issues"
-LICENSE = "LGPLv2+"
+LICENSE = "LGPL-2.0-or-later"
 
 inherit clutter features_check upstream-version-is-even gobject-introspection
 # depends on clutter-1.0 which depends on cogl-1.0

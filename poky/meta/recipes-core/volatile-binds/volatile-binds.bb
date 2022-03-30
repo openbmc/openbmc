@@ -37,6 +37,9 @@ SYSTEMD_SERVICE:${PN} = "${@volatile_systemd_services(d)}"
 
 FILES:${PN} += "${systemd_system_unitdir}/*.service ${servicedir}"
 
+# Set to 1 to forcibly skip OverlayFS, and default to copy+bind
+AVOID_OVERLAYFS = "0"
+
 do_compile () {
     while read spec mountpoint; do
         if [ -z "$spec" ]; then
@@ -47,6 +50,7 @@ do_compile () {
         servicefile="$(echo "$servicefile" | tr / -).service"
         sed -e "s#@what@#$spec#g; s#@where@#$mountpoint#g" \
             -e "s#@whatparent@#${spec%/*}#g; s#@whereparent@#${mountpoint%/*}#g" \
+            -e "s#@avoid_overlayfs@#${@d.getVar('AVOID_OVERLAYFS')}#g" \
             volatile-binds.service.in >$servicefile
     done <<END
 ${@d.getVar('VOLATILE_BINDS').replace("\\n", "\n")}

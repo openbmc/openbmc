@@ -2,7 +2,7 @@ SUMMARY = "netcf"
 DESCRIPTION = "netcf is a cross-platform network configuration library."
 HOMEPAGE = "https://pagure.io/netcf"
 SECTION = "libs"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=fb919cc88dbe06ec0b0bd50e001ccf1f"
 

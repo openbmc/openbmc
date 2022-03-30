@@ -1,6 +1,6 @@
 SUMMARY = "JavaScript library for dynamic web applications"
 HOMEPAGE = "https://jquery.com/"
-LICENSE = "GPL-2 | MIT"
+LICENSE = "GPL-2.0-only | MIT"
 LIC_FILES_CHKSUM = "file://usr/share/doc/libjs-jquery/copyright;md5=04bfd6e5b918af29f2f79ce44527da62"
 
 SRC_URI = "http://kr.archive.ubuntu.com/ubuntu/pool/main/j/jquery/${BPN}_${PV}~dfsg-3_all.deb"

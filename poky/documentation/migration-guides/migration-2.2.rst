@@ -26,8 +26,8 @@ Staging Directories in Sysroot Has Been Simplified
 
 The way directories are staged in sysroot has been simplified and
 introduces the new :term:`SYSROOT_DIRS`,
-:term:`SYSROOT_DIRS_NATIVE`, and
-:term:`SYSROOT_DIRS_BLACKLIST`. See the
+:term:`SYSROOT_DIRS_NATIVE`, and ``SYSROOT_DIRS_BLACKLIST``
+(replaced by :term:`SYSROOT_DIRS_IGNORE` in version 3.5). See the
 :oe_lists:`v2 patch series on the OE-Core Mailing List
 </pipermail/openembedded-core/2016-May/121365.html>`
 for additional information.

@@ -1113,7 +1113,7 @@ list describes them in order of preference:
 #. *Use the LICENSE_FLAGS Variable to Define the Recipes that Have Commercial or
    Other Types of Specially-Licensed Packages:* For each of those recipes, you can
    specify a matching license string in a ``local.conf`` variable named
-   :term:`LICENSE_FLAGS_WHITELIST`.
+   :term:`LICENSE_FLAGS_ACCEPTED`.
    Specifying the matching license string signifies that you agree to
    the license. Thus, the build system can build the corresponding
    recipe and include the component in the image. See the
@@ -1122,15 +1122,15 @@ list describes them in order of preference:
    how to use these variables.
 
    If you build as you normally would, without specifying any recipes in
-   the :term:`LICENSE_FLAGS_WHITELIST` variable, the build stops and provides
+   the :term:`LICENSE_FLAGS_ACCEPTED` variable, the build stops and provides
    you with the list of recipes that you have tried to include in the image
-   that need entries in the :term:`LICENSE_FLAGS_WHITELIST` variable. Once you
+   that need entries in the :term:`LICENSE_FLAGS_ACCEPTED` variable. Once you
    enter the appropriate license flags into it, restart the build to continue
    where it left off. During the build, the prompt will not appear again since
    you have satisfied the requirement.
 
    Once the appropriate license flags are on the white list in the
-   :term:`LICENSE_FLAGS_WHITELIST` variable, you can build the encumbered
+   :term:`LICENSE_FLAGS_ACCEPTED` variable, you can build the encumbered
    image with no change at all to the normal build process.
 
 #. *Get a Pre-Built Version of the BSP:* You can get this type of BSP by
@@ -1143,7 +1143,7 @@ list describes them in order of preference:
    click-through license agreements presented by the website. If you
    want to build the image yourself using the recipes contained within
    the BSP tarball, you will still need to create an appropriate
-   :term:`LICENSE_FLAGS_WHITELIST` to match the encumbered recipes in the
+   :term:`LICENSE_FLAGS_ACCEPTED` to match the encumbered recipes in the
    BSP.
 
 .. note::

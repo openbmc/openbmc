@@ -9,7 +9,7 @@ contains \
 "
 HOMEPAGE = "https://github.com/relan/exfat"
 SECTION = "universe/otherosfs"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "https://github.com/relan/exfat/releases/download/v${PV}/${BP}.tar.gz"

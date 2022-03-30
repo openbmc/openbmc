@@ -1,5 +1,5 @@
 SUMMARY = "Transparent Inter-Process Communication protocol"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://tipclog/tipc.h;endline=35;md5=985b6ea8735818511d276c1b466cce98"
 
 SRC_URI = "git://git.code.sf.net/p/tipc/tipcutils;branch=master \

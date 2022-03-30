@@ -3,7 +3,7 @@ to the Trusted Computing Group OPAL 2.0 SSC specification."
 SUMMARY = "The Drive Trust Alliance Self Encrypting Drive Utility"
 HOMEPAGE = "https://github.com/Drive-Trust-Alliance/sedutil"
 SECTION = "console/utils"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-only"
 
 LIC_FILES_CHKSUM = "file://Common/LICENSE.txt;md5=d32239bcb673463ab874e80d47fae504"
 

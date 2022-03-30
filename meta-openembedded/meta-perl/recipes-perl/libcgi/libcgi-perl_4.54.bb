@@ -4,7 +4,7 @@ submissions, file uploads, reading and writing cookies, query string generation 
 and manipulation, and processing and preparing HTTP headers."
 HOMEPAGE = "http://search.cpan.org/~leejo/CGI-4.28/lib/CGI.pod"
 SECTION = "libs"
-LICENSE = "Artistic-2.0 | GPL-2.0"
+LICENSE = "Artistic-2.0 | GPL-2.0-only"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=415fc49abed2728f9480cd32c8d67beb"
 

@@ -5,7 +5,7 @@ make using PKCS"
 HOMEPAGE = "https://github.com/OpenSC/libp11"
 BUGTRACKER = "https://github.com/OpenSC/libp11/issues"
 SECTION = "Development/Libraries"
-LICENSE = "LGPLv2+"
+LICENSE = "LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=fad9b3332be894bab9bc501572864b29"
 DEPENDS = "libtool openssl"
 

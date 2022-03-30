@@ -1,5 +1,5 @@
 SUMMARY = "Collection of scripts and build utilities for documentation"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = " \
     file://COPYING;md5=d67c6f9f1515506abfea4f0d920c0774 \
     file://COPYING.GPL;md5=eb723b61539feef013de476e68b5c50a \

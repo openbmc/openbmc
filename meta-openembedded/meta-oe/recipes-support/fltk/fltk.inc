@@ -1,7 +1,7 @@
 SUMMARY = "FLTK is a cross-platform C++ GUI toolkit"
 HOMEPAGE = "http://www.fltk.org"
 SECTION = "libs"
-LICENSE = "LGPLv2 & FLTK"
+LICENSE = "LGPL-2.0-only & FLTK"
 LIC_FILES_CHKSUM = "file://COPYING;md5=f6b26344a24a941a01a5b0826e80b5ca"
 
 SRC_URI = " \

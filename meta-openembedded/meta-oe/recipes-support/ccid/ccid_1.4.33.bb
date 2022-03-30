@@ -1,6 +1,6 @@
 SUMMARY = "Generic USB CCID smart card reader driver"
 HOMEPAGE = "https://ccid.apdu.fr/"
-LICENSE = "LGPLv2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2d5025d4aa3495befef8f17206a5b0a1"
 
 DEPENDS = "virtual/libusb0 pcsc-lite"

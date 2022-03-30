@@ -20,7 +20,7 @@ built-in raw socket interface of the Linux kernel, so it can be used \
 on a wide variety of supported network cards."
 
 HOMEPAGE = "https://fedorahosted.org/iptraf-ng/"
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e2b3850593b899b1a17594ed4cc4c731"
 DEPENDS = "ncurses"
 

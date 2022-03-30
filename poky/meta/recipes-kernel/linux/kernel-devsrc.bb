@@ -72,7 +72,9 @@ do_install() {
     (
 	cd ${B}
 
-	cp Module.symvers $kerneldir/build
+	if [ -s Module.symvers ]; then
+	    cp Module.symvers $kerneldir/build
+	fi
 	cp System.map* $kerneldir/build
 	if [ -s Module.markers ]; then
 	    cp Module.markers $kerneldir/build

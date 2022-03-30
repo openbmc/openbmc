@@ -1,6 +1,6 @@
 DESCRIPTION = "Xfce4 Window Manager"
 SECTION = "x11/wm"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d791728a073bc009b4ffaf00b7599855"
 DEPENDS = "virtual/libx11 libxfce4ui libwnck3 libxinerama"
 

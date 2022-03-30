@@ -1,5 +1,5 @@
 SUMMARY = "XSL stylesheets for the yelp help browser"
-LICENSE = "LGPLv2.1 & GPLv2 & BSD-3-Clause"
+LICENSE = "LGPL-2.1-only & GPL-2.0-only & BSD-3-Clause"
 LIC_FILES_CHKSUM = " \
     file://COPYING;md5=8ca13a5a6972ac1620a1e42a3dacd774 \
     file://COPYING.GPL;md5=eb723b61539feef013de476e68b5c50a \

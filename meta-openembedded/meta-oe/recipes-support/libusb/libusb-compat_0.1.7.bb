@@ -5,7 +5,7 @@ HOMEPAGE = "http://www.libusb.org/"
 BUGTRACKER = "http://www.libusb.org/report"
 SECTION = "libs"
 
-LICENSE = "LGPLv2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f2ac5f3ac4835e8f91324a26a590a423"
 DEPENDS = "libusb1"
 

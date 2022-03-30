@@ -1,6 +1,6 @@
 SUMMARY = "Threaded I/O tester"
 HOMEPAGE = "http://sourceforge.net/projects/tiobench/"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c93c0550bd3173f4504b2cbd8991e50b"
 
 PR = "r1"

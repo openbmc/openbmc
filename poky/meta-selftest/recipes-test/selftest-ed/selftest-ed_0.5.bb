@@ -1,4 +1,4 @@
-SUMMARY = "Line-oriented text editor -- selftest GPLv2 version"
+SUMMARY = "Line-oriented text editor -- selftest GPL-2.0-or-later version"
 HOMEPAGE = "http://www.gnu.org/software/ed/"
 SECTION = "base"
 LICENSE = "GPL-2.0-or-later"

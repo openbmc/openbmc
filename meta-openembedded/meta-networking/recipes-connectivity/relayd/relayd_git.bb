@@ -1,6 +1,6 @@
 DESCRIPTION = "Layer 3 relay daemon"
 SECTION = "console/network"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://main.c;endline=17;md5=86aad799085683e0a2e1c2684a20bab2"
 
 DEPENDS = "libubox"

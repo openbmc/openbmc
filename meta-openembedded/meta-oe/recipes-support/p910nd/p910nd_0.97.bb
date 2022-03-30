@@ -1,7 +1,7 @@
 DESCRIPTION = "A small network printer daemon for embedded situations that passes the job directly to the printer"
 HOMEPAGE = "http://p910nd.sourceforge.net/"
 SECTION = "console/utils"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8ca43cbc842c2336e835926c2166c28b"
 
 PR = "r2"

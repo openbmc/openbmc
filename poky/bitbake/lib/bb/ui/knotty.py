@@ -228,7 +228,9 @@ class TerminalFilter(object):
 
     def keepAlive(self, t):
         if not self.cuu:
-            print("Bitbake still alive (%ds)" % t)
+            print("Bitbake still alive (no events for %ds). Active tasks:" % t)
+            for t in self.helper.running_tasks:
+                print(t)
             sys.stdout.flush()
 
     def updateFooter(self):
@@ -272,29 +274,39 @@ class TerminalFilter(object):
                     tasks.append("%s (pid %s)" % (activetasks[t]["title"], activetasks[t]["pid"]))
 
         if self.main.shutdown:
-            content = "Waiting for %s running tasks to finish:" % len(activetasks)
+            content = pluralise("Waiting for %s running task to finish",
+                                "Waiting for %s running tasks to finish", len(activetasks))
+            if not self.quiet:
+                content += ':'
             print(content)
         else:
+            scene_tasks = "%s of %s" % (self.helper.setscene_current, self.helper.setscene_total)
+            cur_tasks = "%s of %s" % (self.helper.tasknumber_current, self.helper.tasknumber_total)
+
+            content = ''
+            if not self.quiet:
+                msg = "Setscene tasks: %s" % scene_tasks
+                content += msg + "\n"
+                print(msg)
+
             if self.quiet:
-                content = "Running tasks (%s of %s/%s of %s)" % (self.helper.setscene_current, self.helper.setscene_total, self.helper.tasknumber_current, self.helper.tasknumber_total)
+                msg = "Running tasks (%s, %s)" % (scene_tasks, cur_tasks)
             elif not len(activetasks):
-                content = "No currently running tasks (%s of %s/%s of %s)" % (self.helper.setscene_current, self.helper.setscene_total, self.helper.tasknumber_current, self.helper.tasknumber_total)
+                msg = "No currently running tasks (%s)" % cur_tasks
             else:
-                content = "Currently %2s running tasks (%s of %s/%s of %s)" % (len(activetasks), self.helper.setscene_current, self.helper.setscene_total, self.helper.tasknumber_current, self.helper.tasknumber_total)
+                msg = "Currently %2s running tasks (%s)" % (len(activetasks), cur_tasks)
             maxtask = self.helper.tasknumber_total
             if not self.main_progress or self.main_progress.maxval != maxtask:
                 widgets = [' ', progressbar.Percentage(), ' ', progressbar.Bar()]
                 self.main_progress = BBProgress("Running tasks", maxtask, widgets=widgets, resize_handler=self.sigwinch_handle)
                 self.main_progress.start(False)
-            self.main_progress.setmessage(content)
-            progress = self.helper.tasknumber_current - 1
-            if progress < 0:
-                progress = 0
-            content = self.main_progress.update(progress)
+            self.main_progress.setmessage(msg)
+            progress = max(0, self.helper.tasknumber_current - 1)
+            content += self.main_progress.update(progress)
             print('')
-        lines = 1 + int(len(content) / (self.columns + 1))
-        if self.quiet == 0:
-            for tasknum, task in enumerate(tasks[:(self.rows - 2)]):
+        lines = self.getlines(content)
+        if not self.quiet:
+            for tasknum, task in enumerate(tasks[:(self.rows - 1 - lines)]):
                 if isinstance(task, tuple):
                     pbar, progress, rate, start_time = task
                     if not pbar.start_time:
@@ -311,10 +323,16 @@ class TerminalFilter(object):
                 else:
                     content = "%s: %s" % (tasknum, task)
                     print(content)
-                lines = lines + 1 + int(len(content) / (self.columns + 1))
+                lines = lines + self.getlines(content)
         self.footer_present = lines
         self.lastpids = runningpids[:]
         self.lastcount = self.helper.tasknumber_current
+
+    def getlines(self, content):
+        lines = 0
+        for line in content.split("\n"):
+            lines = lines + 1 + int(len(line) / (self.columns + 1))
+        return lines
 
     def finish(self):
         if self.stdinbackup:
@@ -605,7 +623,8 @@ def main(server, eventHandler, params, tf = TerminalFilter):
     warnings = 0
     taskfailures = []
 
-    printinterval = 5000
+    printintervaldelta = 10 * 60 # 10 minutes
+    printinterval = printintervaldelta
     lastprint = time.time()
 
     termfilter = tf(main, helper, console_handlers, params.options.quiet)
@@ -615,7 +634,7 @@ def main(server, eventHandler, params, tf = TerminalFilter):
         try:
             if (lastprint + printinterval) <= time.time():
                 termfilter.keepAlive(printinterval)
-                printinterval += 5000
+                printinterval += printintervaldelta
             event = eventHandler.waitEvent(0)
             if event is None:
                 if main.shutdown > 1:
@@ -646,7 +665,7 @@ def main(server, eventHandler, params, tf = TerminalFilter):
 
             if isinstance(event, logging.LogRecord):
                 lastprint = time.time()
-                printinterval = 5000
+                printinterval = printintervaldelta
                 if event.levelno >= bb.msg.BBLogFormatter.ERRORONCE:
                     errors = errors + 1
                     return_value = 1

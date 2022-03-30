@@ -44,7 +44,7 @@ class BBUIEventQueue:
         for count_tries in range(5):
             ret = self.BBServer.registerEventHandler(self.host, self.port)
 
-            if isinstance(ret, collections.Iterable):
+            if isinstance(ret, collections.abc.Iterable):
                 self.EventHandle, error = ret
             else:
                 self.EventHandle = ret

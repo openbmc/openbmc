@@ -13,8 +13,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/lib/src/fwts_uefi.c | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/src/lib/src/fwts_uefi.c b/src/lib/src/fwts_uefi.c
-index 138f1164..13d9e36c 100644
 --- a/src/lib/src/fwts_uefi.c
 +++ b/src/lib/src/fwts_uefi.c
 @@ -63,6 +63,10 @@ typedef struct {
@@ -28,6 +26,3 @@ index 138f1164..13d9e36c 100644
  /* File system magic numbers */
  #define PSTOREFS_MAGIC          ((__SWORD_TYPE)0x6165676C)
  #define EFIVARFS_MAGIC          ((__SWORD_TYPE)0xde5e81e4)
--- 
-2.25.1
-

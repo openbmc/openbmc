@@ -1,0 +1,29 @@
+From ed8969a233adb6bf701de96d0fd0570e5ddcc787 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 21 Mar 2022 19:35:48 -0700
+Subject: [PATCH] cmake: Pass PROBE_NAME via CFLAGS
+
+This helps compliation of driver code where its calling modprobe on the
+given kernel module via system() API
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7dceb7ae..e156c36f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -149,6 +149,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+ 	if(NOT DEFINED PROBE_NAME)
+ 		set(PROBE_NAME "scap")
+ 	endif()
++	add_definitions(-DPROBE_NAME="${PROBE_NAME}")
+ 
+ 	set(DRIVERS_REPO "https://download.sysdig.com/scap-drivers")
+ 	
+-- 
+2.35.1
+

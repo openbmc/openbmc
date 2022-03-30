@@ -1,6 +1,6 @@
 SUMMARY = "DTS Coherent Acoustics decoder with support for HD extensions"
 
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING.LGPLv2.1;md5=4fbd65380cdd255951079008b364516c"
 
 SRCREV = "b93deed1a231dd6dd7e39b9fe7d2abe05aa00158"

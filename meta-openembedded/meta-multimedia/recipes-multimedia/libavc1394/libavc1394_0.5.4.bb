@@ -6,7 +6,7 @@ SECTION = "libs/multimedia"
 DEPENDS = "libraw1394"
 DEPENDS:append:libc-musl = " argp-standalone"
 
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=dcf3c825659e82539645da41a7908589"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BP}.tar.gz"

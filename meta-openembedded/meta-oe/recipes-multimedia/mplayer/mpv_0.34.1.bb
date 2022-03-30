@@ -15,7 +15,7 @@ DEPENDS += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', ' virtual/libx11 xsp libxv libxscrnsaver libxinerama', '', d)} \
 "
 
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE.GPL;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRCREV_mpv = "349e437466163cb52f7d0aa227d4606edd9db501"

@@ -2,7 +2,7 @@ DESCRIPTION = "The XForms graphical interface widget library	"
 HOMEPAGE = "http://savannah.nongnu.org/projects/xforms/"
 PR = "r0"
 
-LICENSE = "LGPLv2.1+"
+LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=ade9a053df81f5b9408d2f4f5546df86"
 
 SRC_URI = "http://download.savannah.nongnu.org/releases/xforms/xforms-${PV}.tar.gz \

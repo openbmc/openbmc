@@ -2,7 +2,7 @@ SUMMARY = "Dynamic firewall daemon with a D-Bus interface"
 HOMEPAGE = "https://firewalld.org/"
 BUGTRACKER = "https://github.com/firewalld/firewalld/issues"
 UPSTREAM_CHECK_URI = "https://github.com/firewalld/firewalld/releases"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "https://github.com/${BPN}/${BPN}/releases/download/v${PV}/${BP}.tar.gz \

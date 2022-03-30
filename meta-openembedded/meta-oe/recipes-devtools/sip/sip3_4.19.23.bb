@@ -1,7 +1,7 @@
 SUMMARY = "SIP is a C++/Python Wrapper Generator"
 HOMEPAGE = "https://riverbankcomputing.com/software/sip/"
 SECTION = "devel"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE-GPL2;md5=e91355d8a6f8bd8f7c699d62863c7303"
 
 SRC_URI = "https://www.riverbankcomputing.com/static/Downloads/sip/${PV}/sip-${PV}.tar.gz \

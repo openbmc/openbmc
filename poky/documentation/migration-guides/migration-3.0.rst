@@ -148,7 +148,7 @@ XML feeds that ``cve-check-tool`` was using, supports CVSSv3 scoring,
 and makes other improvements.
 
 Additionally, the ``CVE_CHECK_CVE_WHITELIST`` variable has been replaced
-by ``CVE_CHECK_WHITELIST``.
+by ``CVE_CHECK_WHITELIST`` (replaced by :term:`CVE_CHECK_IGNORE` in version 3.5).
 
 .. _migration-3.0-bitbake-changes:
 

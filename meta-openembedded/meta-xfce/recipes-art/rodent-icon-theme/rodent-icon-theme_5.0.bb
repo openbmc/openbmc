@@ -1,5 +1,5 @@
 SUMMARY = "Rodent-icon-theme (was xfce4-icon-theme) is a svg icon theme"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8ca43cbc842c2336e835926c2166c28b"
 
 inherit allarch autotools gtk-icon-cache

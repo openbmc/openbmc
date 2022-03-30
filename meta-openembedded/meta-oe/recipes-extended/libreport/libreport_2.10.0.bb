@@ -2,7 +2,7 @@ DESCRIPTION = "Libraries providing API for reporting different problems in appli
 to different bug targets like Bugzilla, ftp, trac, etc..."
 SUMMARY = "Generic library for reporting various problems"
 HOMEPAGE = "https://abrt.readthedocs.org/"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 DEPENDS = "xmlrpc-c xmlrpc-c-native intltool-native \
         json-c libtar libnewt libproxy rpm \
         augeas satyr systemd \

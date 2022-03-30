@@ -282,8 +282,8 @@ python copy_buildsystem () {
         bb.utils.mkdirhier(uninative_outdir)
         shutil.copy(uninative_file, uninative_outdir)
 
-    env_whitelist = (d.getVar('BB_ENV_PASSTHROUGH_ADDITIONS') or '').split()
-    env_whitelist_values = {}
+    env_passthrough = (d.getVar('BB_ENV_PASSTHROUGH_ADDITIONS') or '').split()
+    env_passthrough_values = {}
 
     # Create local.conf
     builddir = d.getVar('TOPDIR')
@@ -294,15 +294,15 @@ python copy_buildsystem () {
     if derivative:
         shutil.copyfile(builddir + '/conf/local.conf', baseoutpath + '/conf/local.conf')
     else:
-        local_conf_whitelist = (d.getVar('ESDK_LOCALCONF_ALLOW') or '').split()
-        local_conf_blacklist = (d.getVar('ESDK_LOCALCONF_REMOVE') or '').split()
+        local_conf_allowed = (d.getVar('ESDK_LOCALCONF_ALLOW') or '').split()
+        local_conf_remove = (d.getVar('ESDK_LOCALCONF_REMOVE') or '').split()
         def handle_var(varname, origvalue, op, newlines):
-            if varname in local_conf_blacklist or (origvalue.strip().startswith('/') and not varname in local_conf_whitelist):
+            if varname in local_conf_remove or (origvalue.strip().startswith('/') and not varname in local_conf_allowed):
                 newlines.append('# Removed original setting of %s\n' % varname)
                 return None, op, 0, True
             else:
-                if varname in env_whitelist:
-                    env_whitelist_values[varname] = origvalue
+                if varname in env_passthrough:
+                    env_passthrough_values[varname] = origvalue
                 return origvalue, op, 0, True
         varlist = ['[^#=+ ]*']
         oldlines = []
@@ -356,7 +356,7 @@ python copy_buildsystem () {
             # We want to be able to set this without a full reparse
             f.write('BB_HASHCONFIG_IGNORE_VARS:append = " SIGGEN_UNLOCKED_RECIPES"\n\n')
 
-            # Set up whitelist for run on install
+            # Set up which tasks are ignored for run on install
             f.write('BB_SETSCENE_ENFORCE_IGNORE_TASKS = "%:* *:do_shared_workdir *:do_rm_work wic-tools:* *:do_addto_recipe_sysroot"\n\n')
 
             # Hide the config information from bitbake output (since it's fixed within the SDK)
@@ -438,7 +438,7 @@ python copy_buildsystem () {
     # Ensure any variables set from the external environment (by way of
     # BB_ENV_PASSTHROUGH_ADDITIONS) are set in the SDK's configuration
     extralines = []
-    for name, value in env_whitelist_values.items():
+    for name, value in env_passthrough_values.items():
         actualvalue = d.getVar(name) or ''
         if value != actualvalue:
             extralines.append('%s = "%s"\n' % (name, actualvalue))

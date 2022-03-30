@@ -3,6 +3,7 @@
 #
 
 from oe.manifest import Manifest
+import re
 
 class PkgManifest(Manifest):
     """
@@ -61,7 +62,7 @@ class PkgManifest(Manifest):
         if len(pkgs_to_install) == 0:
             return
 
-        output = pm.dummy_install(pkgs_to_install)
+        output = pm.dummy_install(pkgs_to_install).decode('utf-8')
 
         with open(self.full_manifest, 'w+') as manifest:
             pkg_re = re.compile('^Installing ([^ ]+) [^ ].*')

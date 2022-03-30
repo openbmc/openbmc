@@ -8,7 +8,7 @@ kconfig infrastructure, ready for use by third-party projects. \
 The kconfig-frontends package provides the kconfig parser, as well as all \
 the frontends"
 HOMEPAGE = "https://gitlab.com/ymorin/kconfig-frontends"
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=9b8cf60ff39767ff04b671fca8302408"
 SECTION = "devel"
 DEPENDS += "ncurses flex-native gperf-native bison-native"

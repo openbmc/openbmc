@@ -23,11 +23,9 @@ Signed-off-by: Silcet <camorga1@gmail.com>
  setup.py | 65 ++++++++++++++++++++++++++++++++------------------------
  1 file changed, 37 insertions(+), 28 deletions(-)
 
-diff --git a/setup.py b/setup.py
-index 09204d3..2343bc9 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -246,41 +246,50 @@ shutil.copytree('src', 'staging')
+@@ -245,45 +245,50 @@ shutil.copytree('src', 'staging')
  os.unlink(os.path.join('staging', 'ufw-init'))
  os.unlink(os.path.join('staging', 'ufw-init-functions'))
  
@@ -36,7 +34,11 @@ index 09204d3..2343bc9 100644
  iptables_dir = ''
  
 -for e in ['iptables']:
--    for dir in ['/sbin', '/bin', '/usr/sbin', '/usr/bin', '/usr/local/sbin', \
+-    # Historically iptables was in /sbin, then later also symlinked from
+-    # /usr/sbin/iptables to /sbin/iptables. Debian bullseye moves iptables
+-    # to /usr/sbin with no symlink in /sbin except on upgrades. To accomodate
+-    # buildds that may still have the old iptables, search /usr/sbin first
+-    for dir in ['/usr/sbin', '/sbin', '/usr/bin', '/bin', '/usr/local/sbin', \
 -                '/usr/local/bin']:
 -        if e == "iptables":
 -            if os.path.exists(os.path.join(dir, e)):
@@ -49,6 +51,14 @@ index 09204d3..2343bc9 100644
 -        if iptables_exe != "":
 -            break
 -
+-
+-if iptables_exe == '':
+-    print("ERROR: could not find required binary 'iptables'", file=sys.stderr)
+-    sys.exit(1)
+-
+-for e in ['ip6tables', 'iptables-restore', 'ip6tables-restore']:
+-    if not os.path.exists(os.path.join(iptables_dir, e)):
+-        print("ERROR: could not find required binary '%s'" % (e), file=sys.stderr)
 +if "--iptables-dir" in sys.argv:
 +    iptables_dir = sys.argv[sys.argv.index("--iptables-dir") + 1]
 +    iptables_exe = os.path.join(iptables_dir, "iptables")
@@ -59,7 +69,7 @@ index 09204d3..2343bc9 100644
 +
 +if not iptables_set:
 +    for e in ['iptables']:
-+        for dir in ['/sbin', '/bin', '/usr/sbin', '/usr/bin', '/usr/local/sbin', \
++        for dir in ['/usr/sbin', '/sbin', '/usr/bin', '/bin', '/usr/local/sbin', \
 +                    '/usr/local/bin']:
 +            if e == "iptables":
 +                if os.path.exists(os.path.join(dir, e)):
@@ -68,16 +78,10 @@ index 09204d3..2343bc9 100644
 +                    print("Found '%s'" % iptables_exe)
 +                else:
 +                    continue
- 
--if iptables_exe == '':
--    print("ERROR: could not find required binary 'iptables'", file=sys.stderr)
--    sys.exit(1)
++
 +            if iptables_exe != "":
 +                break
- 
--for e in ['ip6tables', 'iptables-restore', 'ip6tables-restore']:
--    if not os.path.exists(os.path.join(iptables_dir, e)):
--        print("ERROR: could not find required binary '%s'" % (e), file=sys.stderr)
++
 +    if iptables_exe == '':
 +        print("ERROR: could not find required binary 'iptables'", file=sys.stderr)
          sys.exit(1)

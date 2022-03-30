@@ -8,7 +8,6 @@ ac_cv_sizeof_int=${ac_cv_sizeof_int=4}
 ac_cv_sizeof_int_p=${ac_cv_sizeof_int_p=4}
 ac_cv_sizeof_long=${ac_cv_sizeof_long=4}
 ac_cv_sizeof_long_p=${ac_cv_sizeof_long_p=4}
-ac_cv_sizeof_long_double=${ac_cv_sizeof_long_double=16}
 ac_cv_sizeof_long_int=${ac_cv_sizeof_long_int=4}
 ac_cv_sizeof_long_long=${ac_cv_sizeof_long_long=8}
 ac_cv_sizeof_long_long_int=${ac_cv_sizeof_long_long_int=8}
@@ -241,10 +240,3 @@ samba_cv_have_setresuid=${samba_cv_have_setresuid=yes}
 # mysql
 mysql_cv_func_atomic_sub=${mysql_cv_func_atomic_sub=no}
 mysql_cv_func_atomic_add=${mysql_cv_func_atomic_add=no}
-
-
-# libc
-libc_cv_ppc_machine=${libc_cv_ppc_machine=yes}
-libc_cv_mlong_double_128ibm=${libc_cv_mlong_double_128ibm=yes}
-libc_cv_mabi_ibmlongdouble=${libc_cv_mabi_ibmlongdouble=yes}
-libc_cv_mlong_double_128=${libc_cv_mlong_double_128=yes}

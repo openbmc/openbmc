@@ -14,6 +14,16 @@ def license_ok(license, dont_want_licenses):
             return False
     return True
 
+def obsolete_license_list():
+    return ["AGPL-3", "AGPL-3+", "AGPLv3", "AGPLv3+", "AGPLv3.0", "AGPLv3.0+", "AGPL-3.0", "AGPL-3.0+", "BSD-0-Clause",
+            "GPL-1", "GPL-1+", "GPLv1", "GPLv1+", "GPLv1.0", "GPLv1.0+", "GPL-1.0", "GPL-1.0+", "GPL-2", "GPL-2+", "GPLv2",
+            "GPLv2+", "GPLv2.0", "GPLv2.0+", "GPL-2.0", "GPL-2.0+", "GPL-3", "GPL-3+", "GPLv3", "GPLv3+", "GPLv3.0", "GPLv3.0+",
+            "GPL-3.0", "GPL-3.0+", "LGPLv2", "LGPLv2+", "LGPLv2.0", "LGPLv2.0+", "LGPL-2.0", "LGPL-2.0+", "LGPL2.1", "LGPL2.1+",
+            "LGPLv2.1", "LGPLv2.1+", "LGPL-2.1", "LGPL-2.1+", "LGPLv3", "LGPLv3+", "LGPL-3.0", "LGPL-3.0+", "MPL-1", "MPLv1",
+            "MPLv1.1", "MPLv2", "MIT-X", "MIT-style", "openssl", "PSF", "PSFv2", "Python-2", "Apachev2", "Apache-2", "Artisticv1",
+            "Artistic-1", "AFL-2", "AFL-1", "AFLv2", "AFLv1", "CDDLv1", "CDDL-1", "EPLv1.0", "FreeType", "Nauman",
+            "tcl", "vim", "SGIv1"]
+
 class LicenseError(Exception):
     pass
 
@@ -100,16 +110,13 @@ def flattened_licenses(licensestr, choose_licenses):
     return flatten.licenses
 
 def is_included(licensestr, include_licenses=None, exclude_licenses=None):
-    """Given a license a list of list to include and a list of
-        licenses to exclude, determine if the license string
-        matches the an include list and does not match the 
-        exclude list.
+    """Given a license string, a list of licenses to include and a list of
+    licenses to exclude, determine if the license string matches the include
+    list and does not match the exclude list.
 
-        Returns a tuple holding the boolean state and a list of
-        the applicable licenses that were excluded if state is
-        False, or the licenses that were included if the state
-        is True.
-    """
+    Returns a tuple holding the boolean state and a list of the applicable
+    licenses that were excluded if state is False, or the licenses that were
+    included if the state is True."""
 
     def include_license(license):
         return any(fnmatch(license, pattern) for pattern in include_licenses)
@@ -245,3 +252,8 @@ def list_licenses(licensestr):
     except SyntaxError as exc:
         raise LicenseSyntaxError(licensestr, exc)
     return visitor.licenses
+
+def apply_pkg_license_exception(pkg, bad_licenses, exceptions):
+    """Return remaining bad licenses after removing any package exceptions"""
+
+    return [lic for lic in bad_licenses if pkg + ':' + lic not in exceptions]

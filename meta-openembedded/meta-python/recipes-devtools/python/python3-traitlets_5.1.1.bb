@@ -13,4 +13,4 @@ RDEPENDS:${PN} = "\
     ${PYTHON_PN}-decorator \
 "
 
-inherit setuptools3 pypi
+inherit pypi python_setuptools_build_meta

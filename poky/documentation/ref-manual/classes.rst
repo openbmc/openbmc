@@ -170,8 +170,7 @@ example use for this class.
    are extracted into the subdirectory expected by the default value of
    :term:`S`::
 
-           SRC_URI = "git://example.com/downloads/somepackage.rpm;subpath=${BP}"
-
+      SRC_URI = "git://example.com/downloads/somepackage.rpm;branch=main;subpath=${BP}"
 
    See the ":ref:`bitbake-user-manual/bitbake-user-manual-fetching:fetchers`" section in the BitBake User Manual for
    more information on supported BitBake Fetchers.
@@ -207,23 +206,6 @@ an error in favor of using ``pkg-config`` to query the information. The
 scripts to be disabled should be specified using the
 :term:`BINCONFIG` variable within the recipe inheriting
 the class.
-
-.. _ref-classes-blacklist:
-
-``blacklist.bbclass``
-=====================
-
-The ``blacklist`` class prevents the OpenEmbedded build system from
-building specific recipes. To use this class, inherit
-the class globally and set :term:`PNBLACKLIST` for
-each recipe you wish to ignore. Specify the :term:`PN`
-value as a variable flag (varflag) and provide a reason, which is
-reported, if the package is requested to be built as the value. For
-example, if you want to ignore a recipe called "exoticware", you
-add the following to your ``local.conf`` or distribution configuration::
-
-   INHERIT += "blacklist"
-   PNBLACKLIST[exoticware] = "Not supported by our organization."
 
 .. _ref-classes-buildhistory:
 
@@ -477,7 +459,7 @@ recipe that fetches from an alternative URI (e.g. Git) instead of a
 tarball. Following is an example::
 
    BBCLASSEXTEND = "devupstream:target"
-   SRC_URI:class-devupstream = "git://git.example.com/example"
+   SRC_URI:class-devupstream = "git://git.example.com/example;branch=main"
    SRCREV:class-devupstream = "abcd1234"
 
 Adding the above statements to your recipe creates a variant that has
@@ -502,35 +484,6 @@ functionality can be added in a future release.
 Support for other version control systems such as Subversion is limited
 due to BitBake's automatic fetch dependencies (e.g.
 ``subversion-native``).
-
-.. _ref-classes-distutils3:
-
-``distutils3*.bbclass``
-=======================
-
-The ``distutils3*`` classes support recipes for Python version 3.x
-extensions, which are simple. These recipes usually only need to point
-to the source's archive and then inherit the proper class. Building is
-split into three methods depending on which method the module authors
-used.
-
--  Extensions that use an Autotools-based build system require Autotools
-   and ``distutils``-based classes in their recipes.
-
--  Extensions that use ``distutils``-based build systems require the
-   ``distutils`` class in their recipes.
-
-   .. note::
-
-      ``distutils`` has been deprecated in Python 3.10 and will be removed
-      in Python 3.12. For this reason the ``distutils3*`` classes are now
-      deprecated and will be removed from core in the near future. Instead,
-      use the ``setuptools3*`` classes.
-
-
--  Extensions that use build systems based on ``setuptools3`` require
-   the :ref:`setuptools3 <ref-classes-setuptools3>` class in their
-   recipes.
 
 .. _ref-classes-externalsrc:
 
@@ -603,12 +556,11 @@ Here is an example that uses this class in an image recipe::
        "
 
 Here is an example that adds two users named "tester-jim" and "tester-sue" and assigns
-passwords. First on host, create the password hash::
+passwords. First on host, create the (escaped) password hash::
 
-   mkpasswd -m sha256crypt tester01
+   printf "%q" $(mkpasswd -m sha256crypt tester01)
 
-The resulting hash is set to a variable and used in ``useradd`` command parameters.
-Remember to escape the character ``$``::
+The resulting hash is set to a variable and used in ``useradd`` command parameters::
 
    inherit extrausers
    PASSWD = "\$X\$ABC123\$A-Long-Hash"
@@ -649,6 +601,22 @@ If any conditions specified in the recipe using the above
 variables are not met, the recipe will be skipped, and if the
 build system attempts to build the recipe then an error will be
 triggered.
+
+.. _ref-classes-flit_core:
+
+``flit_core.bbclass``
+=====================
+
+The ``flit_core`` class enables building Python modules which declare
+the  `PEP-517 <https://www.python.org/dev/peps/pep-0517/>`__ compliant
+``flit_core.buildapi`` ``build-backend`` in the ``[build-system]``
+section of ``pyproject.toml`` (See `PEP-518 <https://www.python.org/dev/peps/pep-0518/>`__).
+
+Python modules built with ``flit_core.buildapi`` are pure Python (no
+``C`` or ``Rust`` extensions).
+
+The resulting ``wheel`` (See `PEP-427 <https://www.python.org/dev/peps/pep-0427/>`__)
+is installed with the :ref:`python_pep517 <ref-classes-python_pep517>` class.
 
 .. _ref-classes-fontcache:
 
@@ -860,13 +828,13 @@ provided by the recipe ``icecc-create-env-native.bb``.
 If you do not want the Icecream distributed compile support to apply to
 specific recipes or classes, you can ask them to be ignored by Icecream
 by listing the recipes and classes using the
-:term:`ICECC_USER_PACKAGE_BL` and
-:term:`ICECC_USER_CLASS_BL` variables,
+:term:`ICECC_RECIPE_DISABLE` and
+:term:`ICECC_CLASS_DISABLE` variables,
 respectively, in your ``local.conf`` file. Doing so causes the
 OpenEmbedded build system to handle these compilations locally.
 
 Additionally, you can list recipes using the
-:term:`ICECC_USER_PACKAGE_WL` variable in
+:term:`ICECC_RECIPE_ENABLE` variable in
 your ``local.conf`` file to force ``icecc`` to be enabled for recipes
 using an empty :term:`PARALLEL_MAKE` variable.
 
@@ -966,21 +934,6 @@ specified by :term:`EFI_PROVIDER` if
 
 Normally, you do not use this class directly. Instead, you add "live" to
 :term:`IMAGE_FSTYPES`.
-
-.. _ref-classes-image-prelink:
-
-``image-prelink.bbclass``
-=========================
-
-The ``image-prelink`` class enables the use of the ``prelink`` utility
-during the :ref:`ref-tasks-rootfs` task, which optimizes
-the dynamic linking of shared libraries to reduce executable startup
-time.
-
-By default, the class is enabled in the ``local.conf.template`` using
-the :term:`USER_CLASSES` variable as follows::
-
-   USER_CLASSES ?= "buildstats image-prelink"
 
 .. _ref-classes-insane:
 
@@ -2025,6 +1978,21 @@ When inherited by a recipe, the ``perlnative`` class supports using the
 native version of Perl built by the build system rather than using the
 version provided by the build host.
 
+.. _ref-classes-python_pep517:
+
+``python_pep517.bbclass``
+=============================
+
+The ``python_pep517`` class installs a Python ``wheel`` binary archive (see
+`PEP-517 <https://peps.python.org/pep-0517/>`__).
+
+The Python ``wheel`` can be built with several classes, including :ref:`flit_core <ref-classes-flit_core>`,
+:ref:`setuptools_build_meta <ref-classes-setuptools_build_meta>`, and :ref:`setuptools3 <ref-classes-setuptools3>`.
+
+The path to the wheel to be installed is defined by :term:`PEP517_WHEEL_PATH`.
+This defaults to ``${D}/dist`` and should be respected by the builder class
+(such as :ref:`flit_core <ref-classes-flit_core>`).
+
 .. _ref-classes-pixbufcache:
 
 ``pixbufcache.bbclass``
@@ -2380,14 +2348,65 @@ additional configuration options you want to pass SCons command line.
 The ``sdl`` class supports recipes that need to build software that uses
 the Simple DirectMedia Layer (SDL) library.
 
+.. _ref-classes-setuptools_build_meta:
+
+``setuptools_build_meta.bbclass``
+=================================
+
+The ``setuptools_build_meta`` class enables building Python modules which
+declare the
+`PEP-517 <https://www.python.org/dev/peps/pep-0517/>`__ compliant
+``setuptools.build_meta`` ``build-backend`` in the ``[build-system]``
+section of ``pyproject.toml`` (See `PEP-518 <https://www.python.org/dev/peps/pep-0518/>`__).
+
+Python modules built with ``setuptools.build_meta`` can be pure Python or
+include ``C`` or ``Rust`` extensions).
+
+The resulting ``wheel`` (See `PEP-427 <https://www.python.org/dev/peps/pep-0427/>`__)
+is installed with the :ref:`python_pep517 <ref-classes-python_pep517>` class.
+
 .. _ref-classes-setuptools3:
 
 ``setuptools3.bbclass``
 =======================
 
 The ``setuptools3`` class supports Python version 3.x extensions that
-use build systems based on ``setuptools``. If your recipe uses these
-build systems, the recipe needs to inherit the ``setuptools3`` class.
+use build systems based on ``setuptools`` (e.g. only have a ``setup.py`` and
+have not migrated to the official ``pyproject.toml`` format). If your recipe
+uses these build systems, the recipe needs to inherit the ``setuptools3`` class.
+
+   .. note::
+
+      The ``setuptools3`` class ``do_compile()`` task now calls
+      ``setup.py bdist_wheel`` to build the ``wheel`` binary archive format
+      (See `PEP-427 <https://www.python.org/dev/peps/pep-0427/>`__).
+
+      A consequence of this is that legacy software still using deprecated
+      ``distutils`` from the Python standard library cannot be packaged as
+      ``wheels``. A common solution is the replace
+      ``from distutils.core import setup`` with ``from setuptools import setup``.
+
+   .. note::
+
+     The ``setuptools3`` class ``do_install()`` task now installs the ``wheel``
+     binary archive. In current versions of ``setuptools`` the legacy ``setup.py
+     install`` method is deprecated. If the ``setup.py`` cannot be used with
+     wheels, for example it creates files outside of the Python module or
+     standard entry points, then :ref:`setuptools3_legacy
+     <ref-classes-setuptools3_legacy>` should be used.
+
+.. _ref-classes-setuptools3_legacy:
+
+``setuptools3_legacy.bbclass``
+==============================
+
+The ``setuptools3_legacy`` class supports Python version 3.x extensions that use
+build systems based on ``setuptools`` (e.g. only have a ``setup.py`` and have
+not migrated to the official ``pyproject.toml`` format). Unlike
+``setuptools3.bbclass``, this uses the traditional ``setup.py`` ``build`` and
+``install`` commands and not wheels. This use of ``setuptools`` like this is
+`deprecated <https://github.com/pypa/setuptools/blob/main/CHANGES.rst#v5830>`_
+but still relatively common.
 
 .. _ref-classes-setuptools3-base:
 
@@ -2489,7 +2508,7 @@ stages:
    subset of files is controlled by the
    :term:`SYSROOT_DIRS`,
    :term:`SYSROOT_DIRS_NATIVE`, and
-   :term:`SYSROOT_DIRS_BLACKLIST`
+   :term:`SYSROOT_DIRS_IGNORE`
    variables.
 
    .. note::

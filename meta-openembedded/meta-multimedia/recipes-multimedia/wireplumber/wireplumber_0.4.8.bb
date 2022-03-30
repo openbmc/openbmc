@@ -14,6 +14,7 @@ DEPENDS = "glib-2.0 glib-2.0-native lua pipewire \
 SRCREV = "e14bb72dcc85e2130d0ea96768e5ae3b375a041e"
 SRC_URI = "git://gitlab.freedesktop.org/pipewire/wireplumber.git;branch=master;protocol=https \
            file://90-OE-disable-session-dbus-dependent-features.lua \
+           file://0001-spa-json-fix-va_list-APIs-for-different-architecture.patch \
           "
 
 S = "${WORKDIR}/git"

@@ -28,11 +28,9 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  src/python/grpcio/commands.py | 5 ++++-
  2 files changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/setup.py b/setup.py
-index 4b8c9d4..271b7b1 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -172,8 +172,11 @@ def check_linker_need_libatomic():
+@@ -199,8 +199,11 @@ def check_linker_need_libatomic():
      """Test if linker on system needs libatomic."""
      code_test = (b'#include <atomic>\n' +
                   b'int main() { return std::atomic<int64_t>{}; }')
@@ -46,20 +44,18 @@ index 4b8c9d4..271b7b1 100644
                                  stdin=PIPE,
                                  stdout=PIPE,
                                  stderr=PIPE)
-@@ -183,7 +186,7 @@ def check_linker_need_libatomic():
+@@ -210,7 +213,7 @@ def check_linker_need_libatomic():
      # Double-check to see if -latomic actually can solve the problem.
      # https://github.com/grpc/grpc/issues/22491
      cpp_test = subprocess.Popen(
--        [cxx, '-x', 'c++', '-std=c++11', '-latomic', '-'],
-+        [cxx, cxx_args, '-x', 'c++', '-std=c++11', '-latomic', '-'],
+-        [cxx, '-x', 'c++', '-std=c++11', '-', '-latomic'],
++        [cxx, cxx_args, '-x', 'c++', '-std=c++11', '-', '-latomic'],
          stdin=PIPE,
          stdout=PIPE,
          stderr=PIPE)
-diff --git a/src/python/grpcio/commands.py b/src/python/grpcio/commands.py
-index a8b2ff5..b928201 100644
 --- a/src/python/grpcio/commands.py
 +++ b/src/python/grpcio/commands.py
-@@ -219,7 +219,10 @@ class BuildExt(build_ext.build_ext):
+@@ -228,7 +228,10 @@ class BuildExt(build_ext.build_ext):
              """
              try:
                  # TODO(lidiz) Remove the generated a.out for success tests.
@@ -71,6 +67,3 @@ index a8b2ff5..b928201 100644
                                             stdin=subprocess.PIPE,
                                             stdout=subprocess.PIPE,
                                             stderr=subprocess.PIPE)
--- 
-2.30.1
-

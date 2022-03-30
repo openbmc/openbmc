@@ -227,6 +227,12 @@ class ORMWrapper(object):
         build.completed_on = timezone.now()
         build.outcome = outcome
         build.save()
+
+        # We force a sync point here to force the outcome status commit,
+        # which resolves a race condition with the build completion takedown
+        transaction.set_autocommit(True)
+        transaction.set_autocommit(False)
+
         signal_runbuilds()
 
     def update_target_set_license_manifest(self, target, license_manifest_path):
@@ -893,9 +899,6 @@ class BuildInfoHelper(object):
         self.task_order = 0
         self.autocommit_step = 1
         self.server = server
-        # we use manual transactions if the database doesn't autocommit on us
-        if not connection.features.autocommits_when_autocommit_is_off:
-            transaction.set_autocommit(False)
         self.orm_wrapper = ORMWrapper()
         self.has_build_history = has_build_history
         self.tmp_dir = self.server.runCommand(["getVariable", "TMPDIR"])[0]
@@ -1313,12 +1316,11 @@ class BuildInfoHelper(object):
                 task_information['outcome'] = Task.OUTCOME_FAILED
                 del self.internal_state['taskdata'][identifier]
 
-        if not connection.features.autocommits_when_autocommit_is_off:
-            # we force a sync point here, to get the progress bar to show
-            if self.autocommit_step % 3 == 0:
-                transaction.set_autocommit(True)
-                transaction.set_autocommit(False)
-            self.autocommit_step += 1
+        # we force a sync point here, to get the progress bar to show
+        if self.autocommit_step % 3 == 0:
+            transaction.set_autocommit(True)
+            transaction.set_autocommit(False)
+        self.autocommit_step += 1
 
         self.orm_wrapper.get_update_task_object(task_information, True) # must exist
 
@@ -1990,8 +1992,6 @@ class BuildInfoHelper(object):
             # Do not skip command line build events
             self.store_log_event(tempevent,False)
 
-        if not connection.features.autocommits_when_autocommit_is_off:
-            transaction.set_autocommit(True)
 
         # unset the brbe; this is to prevent subsequent command-line builds
         # being incorrectly attached to the previous Toaster-triggered build;

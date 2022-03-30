@@ -1,0 +1,8 @@
+ac_cv_sizeof_long_double=${ac_cv_sizeof_long_double=16}
+
+# libc
+libc_cv_ppc_machine=${libc_cv_ppc_machine=yes}
+libc_cv_mlong_double_128ibm=${libc_cv_mlong_double_128ibm=yes}
+libc_cv_mabi_ibmlongdouble=${libc_cv_mabi_ibmlongdouble=yes}
+libc_cv_mlong_double_128=${libc_cv_mlong_double_128=yes}
+

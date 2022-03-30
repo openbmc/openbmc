@@ -3,7 +3,7 @@ DESCRIPTION = "adduser, addgroup - add a user or group to the system"
 HOMEPAGE = "https://salsa.debian.org/debian/adduser"
 SECTION = "base/utils"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://debian/copyright;md5=caed49ab166f22ef31bf1127f558d0ef"
 
 SRC_URI = "https://launchpad.net/debian/+archive/primary/+sourcefiles/adduser/${PV}/${BPN}_${PV}.tar.xz \

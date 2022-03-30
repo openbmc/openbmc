@@ -2,7 +2,7 @@ SUMMARY = "Openbox configuration tool"
 AUTHOR = "Dana Jansens & Tim Riley & Javeed Shaikh"
 HOMEPAGE = "http://openbox.org/wiki/ObConf:About"
 SECTION = "x11/wm"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 DEPENDS = " \
     openbox \

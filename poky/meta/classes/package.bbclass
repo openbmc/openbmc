@@ -2464,7 +2464,7 @@ python do_package () {
     oe.qa.exit_if_errors(d)
 }
 
-do_package[dirs] = "${SHLIBSWORKDIR} ${PKGDESTWORK} ${D}"
+do_package[dirs] = "${SHLIBSWORKDIR} ${D}"
 do_package[vardeps] += "${PACKAGEBUILDPKGD} ${PACKAGESPLITFUNCS} ${PACKAGEFUNCS} ${@gen_packagevar(d)}"
 addtask package after do_install
 

@@ -6,7 +6,7 @@ DESCRIPTION = "The xfsdump package contains xfsdump, xfsrestore and a \
                specified disk, tape or other storage medium."
 HOMEPAGE = "http://oss.sgi.com/projects/xfs"
 SECTION = "base"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://doc/COPYING;md5=15c832894d10ddd00dfcf57bee490ecc"
 DEPENDS = "xfsprogs attr"
 

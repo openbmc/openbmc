@@ -5,7 +5,8 @@ HOMEPAGE = "http://www.pulseaudio.org"
 AUTHOR = "Lennart Poettering"
 SECTION = "libs/multimedia"
 
-# Most of PulseAudio code is under LGPLv2.1+. There are a few exceptions:
+# Most of PulseAudio code is under LGPL-2.1-or-later. There are a few
+# exceptions:
 #
 # The "adrian" echo canceller variant has code under a non-standard permissive
 # license. See src/modules/echo-cancel/adrian-license.txt for details. This
@@ -39,11 +40,12 @@ SECTION = "libs/multimedia"
 # The dependency with the most complicated licensing considerations is libdbus.
 # When PACKAGECONFIG[dbus] is enabled (like it is by default), libdbus will be
 # used by both the server and the client library (libpulse). Does this affect
-# applications that use libpulse? It should be also noted that libdbus is
-# dual-licensed: either GPLv2+ or AFL-2 terms apply. Whose decision is it which
-# of the licenses apply? What a mess. Some people hold the view that libdbus is
-# a system library that is covered by the "special exception" in GPLv2's
-# section 3, and therefore libdbus's GPL license doesn't affect PulseAudio.
+# applications that use libpulse? It should also be noted that libdbus is
+# dual-licensed: either GPL-2.0-or-later or AFL-2.0 terms apply. Whose decision
+# is it which of the licenses apply? What a mess. Some people hold the view that
+# libdbus is a system library that is covered by the "special exception" in
+# GPLv2's section 3, and therefore libdbus's GPL license doesn't affect
+# PulseAudio.
 LICENSE = "LGPL-2.1-or-later & MIT & BSD-3-Clause"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=0e5cd938de1a7a53ea5adac38cc10c39 \

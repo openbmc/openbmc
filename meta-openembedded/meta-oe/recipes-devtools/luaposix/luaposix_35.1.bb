@@ -20,7 +20,7 @@ do_compile() {
 }
 
 do_install() {
-    ${S}/build-aux/luke PREFIX=${D}${prefix} install
+    ${S}/build-aux/luke PREFIX=${D}${prefix} INST_LIBDIR=${D}${libdir}/lua/${LUA_VERSION} install
 }
 
 FILES:${PN} = "${datadir}/lua/${LUA_VERSION} \

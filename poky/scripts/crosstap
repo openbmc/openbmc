@@ -353,7 +353,7 @@ bitbake workspace.
 
 Anything after -- option is passed directly to stap.
 
-Legacy script invocation style supported but depreciated:
+Legacy script invocation style supported but deprecated:
   %prog <user@hostname> <sytemtap-script> [systemtap options]
 
 To enable most out of systemtap the following site.conf or local.conf

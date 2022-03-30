@@ -7,14 +7,10 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1373274bc8d8001edc54933919f36f68"
 DEPENDS += "util-linux"
 
-SRCREV = "5b45cdd9a56ca9da35ee0f8845cb4e2603d245dc"
+SRCREV = "ca1bf4b810e2d188d04cb6286f957008ee1b7681"
 SRC_URI = "git://github.com/graeme-hill/crossguid;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"
 
 inherit cmake
 
-do_install() {
-	install -D -m 0644 ${B}/libxg.a ${D}${libdir}/libxg.a
-	install -D -m 0644 ${S}/Guid.hpp ${D}${includedir}/Guid.hpp
-}

@@ -1,6 +1,6 @@
 SUMMARY = "Hardware health monitoring applications"
 HOMEPAGE = "https://hwmon.wiki.kernel.org/"
-LICENSE = "GPLv2+ & LGPLv2.1+"
+LICENSE = "GPL-2.0-or-later & LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe \
                     file://COPYING.LGPL;md5=4fbd65380cdd255951079008b364516c"
 

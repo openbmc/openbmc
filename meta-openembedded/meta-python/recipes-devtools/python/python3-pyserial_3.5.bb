@@ -9,6 +9,7 @@ inherit pypi setuptools3 ptest
 do_install:append() {
     rm -f ${D}${bindir}/pyserial-miniterm
     rm -f ${D}${bindir}/pyserial-ports
+    rm -rf ${D}${bindir}/__pycache__
     rmdir ${D}${bindir}
 }
 

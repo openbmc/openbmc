@@ -9,7 +9,7 @@ logging facility providing: \
 - the DLT test applications"
 HOMEPAGE = "https://www.genivi.org/"
 SECTION = "console/utils"
-LICENSE = "MPLv2"
+LICENSE = "MPL-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=8184208060df880fe3137b93eb88aeea"
 
 DEPENDS = "zlib gzip-native json-c"

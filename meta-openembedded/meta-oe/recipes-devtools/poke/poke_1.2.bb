@@ -2,7 +2,7 @@ SUMMARY = "GNU poke is an extensible editor for structured binary data"
 HOMEPAGE = "https://pokology.org"
 DESCRIPTION = "GNU poke is an interactive, extensible editor for binary data. Not limited to editing basic entities such as bits and bytes, it provides a full-fledged procedural, interactive programming language designed to describe data structures and to operate on them."
 SECTION = "console/utils"
-LICENSE = "GPL-3.0+"
+LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 SRC_URI = "${GNU_MIRROR}/poke/poke-${PV}.tar.gz \

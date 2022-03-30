@@ -1,0 +1,44 @@
+From 7b3bc1de0c79a1b410105ce36bbe9f774438d263 Mon Sep 17 00:00:00 2001
+From: Ross Schulman <ross@rbs.io>
+Date: Tue, 1 Feb 2022 09:13:16 -0500
+Subject: [PATCH] Add 400-series syscalls to musl riscv64 definitions
+
+Upstream-Status: Backport [https://github.com/rust-lang/libc/commit/7b3bc1de0c79a1b410105ce36bbe9f774438d263]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ .../linux_like/linux/musl/b64/riscv64/mod.rs  | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/vendor/libc-0.2.108/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs b/vendor/libc-0.2.108/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
+index 6b17621c7..2036583d5 100644
+--- a/vendor/libc-0.2.108/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
++++ b/vendor/libc-0.2.108/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
+@@ -465,6 +465,25 @@ pub const SYS_pkey_mprotect: ::c_long = 288;
+ pub const SYS_pkey_alloc: ::c_long = 289;
+ pub const SYS_pkey_free: ::c_long = 290;
+ pub const SYS_statx: ::c_long = 291;
++pub const SYS_pidfd_send_signal: ::c_long = 424;
++pub const SYS_io_uring_setup: ::c_long = 425;
++pub const SYS_io_uring_enter: ::c_long = 426;
++pub const SYS_io_uring_register: ::c_long = 427;
++pub const SYS_open_tree: ::c_long = 428;
++pub const SYS_move_mount: ::c_long = 429;
++pub const SYS_fsopen: ::c_long = 430;
++pub const SYS_fsconfig: ::c_long = 431;
++pub const SYS_fsmount: ::c_long = 432;
++pub const SYS_fspick: ::c_long = 433;
++pub const SYS_pidfd_open: ::c_long = 434;
++pub const SYS_clone3: ::c_long = 435;
++pub const SYS_close_range: ::c_long = 436;
++pub const SYS_openat2: ::c_long = 437;
++pub const SYS_pidfd_getfd: ::c_long = 438;
++pub const SYS_faccessat2: ::c_long = 439;
++pub const SYS_process_madvise: ::c_long = 440;
++pub const SYS_epoll_pwait2: ::c_long = 441;
++pub const SYS_mount_setattr: ::c_long = 442;
+ 
+ pub const O_APPEND: ::c_int = 1024;
+ pub const O_DIRECT: ::c_int = 0x4000;
+-- 
+2.35.1
+

@@ -1,0 +1,55 @@
+We don't have opus in OE-Core which causes all the external libs to be disabled 
+silently. The silent issue is discussed in the link below and hints a patch
+to make things configurable may be accepted.
+
+This patch removing the opus piece at least gets most of the functionality
+we previously used back whilst the issue is discussed.
+
+Upstream-Status: Pending [https://github.com/libsndfile/libsndfile/pull/812]
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: libsndfile-1.0.31/configure.ac
+===================================================================
+--- libsndfile-1.0.31.orig/configure.ac
++++ libsndfile-1.0.31/configure.ac
+@@ -361,13 +361,13 @@ AS_IF([test -n "$PKG_CONFIG"], [
+ 				enable_external_libs=yes
+ 			])
+ 
+-			AS_IF([test "x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc$ac_cv_opus" = "xyesyesyesyesyes"], [
++			AS_IF([test "x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc" = "xyesyesyesyes"], [
+ 					HAVE_EXTERNAL_XIPH_LIBS=1
+ 					enable_external_libs=yes
+ 
+-					EXTERNAL_XIPH_CFLAGS="$FLAC_CFLAGS $VORBIS_CFLAGS $VORBISENC_CFLAGS $SPEEX_CFLAGS $OPUS_CFLAGS $OGG_CFLAGS "
+-					EXTERNAL_XIPH_LIBS="$FLAC_LIBS $VORBIS_LIBS $VORBISENC_LIBS $SPEEX_LIBS $OPUS_LIBS $OGG_LIBS "
+-					EXTERNAL_XIPH_REQUIRE="flac ogg vorbis vorbisenc opus"
++					EXTERNAL_XIPH_CFLAGS="$FLAC_CFLAGS $VORBIS_CFLAGS $VORBISENC_CFLAGS $SPEEX_CFLAGS $OGG_CFLAGS "
++					EXTERNAL_XIPH_LIBS="$FLAC_LIBS $VORBIS_LIBS $VORBISENC_LIBS $SPEEX_LIBS $OGG_LIBS "
++					EXTERNAL_XIPH_REQUIRE="flac ogg vorbis vorbisenc"
+ 
+ 					if test x$ac_cv_speex = "xyes" ; then
+ 						EXTERNAL_XIPH_REQUIRE="$EXTERNAL_XIPH_REQUIRE speex"
+@@ -716,7 +716,7 @@ AC_MSG_RESULT([
+ 
+     Experimental code : ................... ${enable_experimental:-no}
+     Using ALSA in example programs : ...... ${enable_alsa:-no}
+-    External FLAC/Ogg/Vorbis/Opus : ....... ${enable_external_libs:-no}
++    External FLAC/Ogg/Vorbis : ....... ${enable_external_libs:-no}
+     Building Octave interface : ........... ${OCTAVE_BUILD}
+ 
+   Tools :
+Index: libsndfile-1.0.31/src/ogg_opus.c
+===================================================================
+--- libsndfile-1.0.31.orig/src/ogg_opus.c
++++ libsndfile-1.0.31/src/ogg_opus.c
+@@ -159,7 +159,7 @@
+ #include "sfendian.h"
+ #include "common.h"
+ 
+-#if HAVE_EXTERNAL_XIPH_LIBS
++#if 0
+ 
+ #include <ogg/ogg.h>
+ #include <opus/opus.h>

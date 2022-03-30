@@ -1,5 +1,5 @@
 SECTION = "shadow"
-LICENSE = "MIT-X"
+LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=04c3ca13a702147c62db90f556c5b3ca"
 SRC_URI = "http://dl.suckless.org/${BPN}/${BP}.tar.gz"
 

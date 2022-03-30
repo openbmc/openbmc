@@ -21,7 +21,7 @@ image you want.
    image::
 
            1. Comment out the EXTRA_IMAGE_FEATURES line
-           2. Set INCOMPATIBLE_LICENSE = "GPL-3.0 LGPL-3.0 AGPL-3.0"
+           2. Set INCOMPATIBLE_LICENSE = "GPL-3.0* LGPL-3.0* AGPL-3.0*"
 
 
 From within the ``poky`` Git repository, you can use the following

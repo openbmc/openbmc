@@ -11,7 +11,7 @@ Foundation was founded on January 22nd 2008 with Emerson Network Power, \
 Ericsson, Nokia Siemens Networks, HP and Sun Microsystems as founding members."
 HOMEPAGE = "http://www.opensaf.org"
 SECTION = "admin"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=a916467b91076e631dd8edb7424769c7"
 
 DEPENDS = "libxml2 python3"

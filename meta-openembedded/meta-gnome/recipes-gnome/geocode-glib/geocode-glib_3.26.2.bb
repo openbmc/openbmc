@@ -1,6 +1,6 @@
 SUMMARY = "A convenience library for the geocoding"
 
-LICENSE = "LGPLv2"
+LICENSE = "LGPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=55ca817ccb7d5b5b66355690e9abc605"
 
 GNOMEBASEBUILDCLASS = "meson"

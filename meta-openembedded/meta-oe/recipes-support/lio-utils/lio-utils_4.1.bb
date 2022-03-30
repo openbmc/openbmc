@@ -1,7 +1,7 @@
 SUMMARY = "lio-utils"
 DESCRIPTION = "a simple low-level configuration tool set for the Target+iSCSI (LIO)"
 HOMEPAGE = "http://linux-iscsi.org/index.php/Lio-utils"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://debian/copyright;md5=c3ea231a32635cbb5debedf3e88aa3df"
 
 PV = "4.1+git${SRCPV}"

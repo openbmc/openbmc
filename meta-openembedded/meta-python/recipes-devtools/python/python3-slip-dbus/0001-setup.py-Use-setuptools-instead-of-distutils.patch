@@ -1,0 +1,38 @@
+From 4309ce76351b1685d08b3ba55d4f62b3e53ef76b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 1 Mar 2022 19:06:35 -0800
+Subject: [PATCH] setup.py: Use setuptools instead of distutils
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ setup.py.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/setup.py.in
++++ b/setup.py.in
+@@ -2,20 +2,17 @@
+ # -*- coding: utf-8 -*-
+ 
+ import sys
+-from distutils.core import setup
++from setuptools import setup, find_packages
+ 
+ setup(name="slip", version="@VERSION@",
+         py_modules=["slip.__init__", "slip.util.__init__",
+             "slip.util.hookable", "slip.util.files",
+-            "slip._wrappers.__init__", "slip._wrappers._glib"],
+-        requires=["selinux"])
+-
+-setup(name="slip.dbus", version="@VERSION@",
+-        py_modules=["slip.dbus.__init__", "slip.dbus.bus",
++            "slip._wrappers.__init__", "slip._wrappers._glib",
++            "slip.dbus.__init__", "slip.dbus.bus",
+             "slip.dbus.constants", "slip.dbus.introspection",
+             "slip.dbus.mainloop", "slip.dbus.polkit", "slip.dbus.proxies",
+             "slip.dbus.service"],
+-        requires=["dbus", "decorator", "StringIO", "xml.etree.ElementTree"])
++      requires=["dbus", "decorator", "selinux", "StringIO", "xml.etree.ElementTree"])
+ 
+ if sys.version_info.major == 2:
+     setup(name="slip.gtk", version="@VERSION@",

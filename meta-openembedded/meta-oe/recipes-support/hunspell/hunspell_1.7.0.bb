@@ -1,6 +1,6 @@
 SUMMARY = "A spell checker and morphological analyzer library"
 HOMEPAGE = "http://hunspell.github.io/"
-LICENSE = "GPLv2 | LGPLv2.1"
+LICENSE = "GPL-2.0-only | LGPL-2.1-only"
 LIC_FILES_CHKSUM = " \
     file://COPYING;md5=75859989545e37968a99b631ef42722e \
     file://COPYING.LESSER;md5=c96ca6c1de8adc025adfada81d06fba5 \

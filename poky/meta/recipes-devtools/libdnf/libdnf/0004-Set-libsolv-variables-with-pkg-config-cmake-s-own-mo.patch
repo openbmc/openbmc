@@ -7,22 +7,24 @@ Subject: [PATCH] Set libsolv variables with pkg-config (cmake's own module
 
 Upstream-Status: Submitted [https://github.com/rpm-software-management/libdnf/pull/312]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  CMakeLists.txt | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 16b63308..b722d4fb 100644
+index fd6e3f0..5383744 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -45,7 +45,8 @@ endif()
+@@ -52,7 +52,8 @@ endif()
  
  # build dependencies
  find_package(Gpgme REQUIRED)
 -find_package(LibSolv 0.6.30 REQUIRED COMPONENTS ext)
 +PKG_CHECK_MODULES (LIBSOLV REQUIRED libsolv)
 +set(LIBSOLV_LIBRARY ${LIBSOLV_LIBRARIES})
- find_package(OpenSSL REQUIRED)
  
  
+ # build dependencies via pkg-config
+-- 
+2.25.1
+

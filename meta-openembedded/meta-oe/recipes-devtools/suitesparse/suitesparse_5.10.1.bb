@@ -1,4 +1,4 @@
-LICENSE = "GPLv2 & GPLv3 & BSD-3-Clause & LGPL-2.0 & Apache-2.0"
+LICENSE = "GPL-2.0-only & GPL-3.0-only & BSD-3-Clause & LGPL-2.0-only & Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=5fa987762101f748a6cdd951b64ffc6b"
 SRC_URI = "git://github.com/DrTimothyAldenDavis/SuiteSparse;protocol=https;branch=master \
            file://0001-Preserve-CXXFLAGS-from-environment-in-Mongoose.patch \

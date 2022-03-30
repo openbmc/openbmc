@@ -38,11 +38,11 @@ python set_gstreamer10_metapkg_rdepends () {
     metapkg =  pn + '-meta'
     d.setVar('ALLOW_EMPTY:' + metapkg, "1")
     d.setVar('FILES:' + metapkg, "")
-    blacklist = [ pn, pn + '-meta' ]
+    exclude = [ pn, pn + '-meta' ]
     metapkg_rdepends = []
     pkgdest = d.getVar('PKGDEST')
     for pkg in oe.utils.packages_filter_out_system(d):
-        if pkg not in blacklist and pkg not in metapkg_rdepends:
+        if pkg not in exclude and pkg not in metapkg_rdepends:
             # See if the package is empty by looking at the contents of its PKGDEST subdirectory.
             # If this subdirectory is empty, then the package is.
             # Empty packages do not get added to the meta package's RDEPENDS

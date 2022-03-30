@@ -13,7 +13,7 @@
 
 DESCRIPTION = "Gutenprint printer drivers"
 HOMEPAGE = "http://gimp-print.sourceforge.net/"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 
 SRC_URI = "git://git.code.sf.net/p/gimp-print/source;protocol=https;branch=master"
 SRCREV = "8e47dc44dd7738302ba9e8fbc1f918461fed0236"

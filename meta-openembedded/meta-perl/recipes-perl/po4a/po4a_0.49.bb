@@ -3,7 +3,7 @@ DESCRIPTION = "The po4a (PO for anything) project goal is to ease translations \
 (and more interestingly, the maintenance of translations) using gettext tools \
 on areas where they were not expected like documentation."
 HOMEPAGE = "https://po4a.alioth.debian.org"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=a96fc9b4cc36d80659e694ea109f0325"
 
 SRC_URI = "git://github.com/mquinson/po4a.git;protocol=https;branch=master"

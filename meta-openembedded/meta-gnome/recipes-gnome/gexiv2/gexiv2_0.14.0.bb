@@ -1,5 +1,5 @@
 SUMMARY = "A GObject-based Exiv2 wrapper"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=625f055f41728f84a8d7938acc35bdc2"
 
 DEPENDS = "exiv2 python3-pygobject-native"

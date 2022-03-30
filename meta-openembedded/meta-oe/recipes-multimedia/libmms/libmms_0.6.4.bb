@@ -2,7 +2,7 @@ SUMMARY = "MMS stream protocol library"
 HOMEPAGE = "http://sourceforge.net/projects/libmms/"
 SECTION = "libs/multimedia"
 
-LICENSE = "LGPLv2+"
+LICENSE = "LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=fad9b3332be894bab9bc501572864b29"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/project/${BPN}/${BPN}/${PV}/${BP}.tar.gz"

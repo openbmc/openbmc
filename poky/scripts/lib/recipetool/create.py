@@ -1080,7 +1080,7 @@ def crunch_license(licfile):
 
     # common licenses
     crunched_md5sums['89f3bf322f30a1dcfe952e09945842f0'] = 'Apache-2.0'
-    crunched_md5sums['13b6fe3075f8f42f2270a748965bf3a1'] = 'BSD-0-Clause'
+    crunched_md5sums['13b6fe3075f8f42f2270a748965bf3a1'] = '0BSD'
     crunched_md5sums['ba87a7d7c20719c8df4b8beed9b78c43'] = 'BSD-2-Clause'
     crunched_md5sums['7f8892c03b72de419c27be4ebfa253f8'] = 'BSD-3-Clause'
     crunched_md5sums['21128c0790b23a8a9f9e260d5f6b3619'] = 'BSL-1.0'
@@ -1108,15 +1108,15 @@ def crunch_license(licfile):
     # https://github.com/waffle-gl/waffle/blob/master/LICENSE.txt
     crunched_md5sums['50fab24ce589d69af8964fdbfe414c60'] = 'BSD-2-Clause'
     # https://github.com/spigwitmer/fakeds1963s/blob/master/LICENSE
-    crunched_md5sums['88a4355858a1433fea99fae34a44da88'] = 'GPLv2'
+    crunched_md5sums['88a4355858a1433fea99fae34a44da88'] = 'GPL-2.0-only'
     # http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
-    crunched_md5sums['063b5c3ebb5f3aa4c85a2ed18a31fbe7'] = 'GPLv2'
+    crunched_md5sums['063b5c3ebb5f3aa4c85a2ed18a31fbe7'] = 'GPL-2.0-only'
     # https://github.com/FFmpeg/FFmpeg/blob/master/COPYING.LGPLv2.1
-    crunched_md5sums['7f5202f4d44ed15dcd4915f5210417d8'] = 'LGPLv2.1'
+    crunched_md5sums['7f5202f4d44ed15dcd4915f5210417d8'] = 'LGPL-2.1-only'
     # unixODBC-2.3.4 COPYING
-    crunched_md5sums['3debde09238a8c8e1f6a847e1ec9055b'] = 'LGPLv2.1'
+    crunched_md5sums['3debde09238a8c8e1f6a847e1ec9055b'] = 'LGPL-2.1-only'
     # https://github.com/FFmpeg/FFmpeg/blob/master/COPYING.LGPLv3
-    crunched_md5sums['f90c613c51aa35da4d79dd55fc724ceb'] = 'LGPLv3'
+    crunched_md5sums['f90c613c51aa35da4d79dd55fc724ceb'] = 'LGPL-3.0-only'
     # https://raw.githubusercontent.com/eclipse/mosquitto/v1.4.14/epl-v10
     crunched_md5sums['efe2cb9a35826992b9df68224e3c2628'] = 'EPL-1.0'
 

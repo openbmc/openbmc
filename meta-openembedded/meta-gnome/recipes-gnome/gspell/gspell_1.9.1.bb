@@ -1,6 +1,6 @@
 SUMMARY = "gspell adds spell-checking to a GTK+ applications"
 HOMEPAGE = "https://wiki.gnome.org/Projects/gspell"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8c2e1ec1540fb3e0beb68361344cba7e"
 
 DEPENDS = "gtk+3 iso-codes enchant2"

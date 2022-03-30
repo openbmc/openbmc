@@ -523,7 +523,7 @@ it cannot figure out dependencies.
 Thus far, this section has limited discussion to the direct inputs into
 a task. Information based on direct inputs is referred to as the
 "basehash" in the code. However, there is still the question of a task's
-indirect inputs - the things that were already built and present in the
+indirect inputs --- the things that were already built and present in the
 build directory. The checksum (or signature) for a particular task needs
 to add the hashes of all the tasks on which the particular task depends.
 Choosing which dependencies to add is a policy decision. However, the
@@ -534,7 +534,7 @@ At the code level, there are a variety of ways both the basehash and the
 dependent task hashes can be influenced. Within the BitBake
 configuration file, we can give BitBake some extra information to help
 it construct the basehash. The following statement effectively results
-in a list of global variable dependency excludes - variables never
+in a list of global variable dependency excludes --- variables never
 included in any checksum. This example uses variables from OpenEmbedded
 to help illustrate the concept::
 

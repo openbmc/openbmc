@@ -3,7 +3,7 @@
 
 DESCRIPTION = "C library implementing OAuth Core RFC 5849"
 HOMEPAGE = "http://liboauth.sourceforge.net"
-LICENSE = "MIT|GPL-2.0"
+LICENSE = "MIT|GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING.MIT;md5=6266718a5241c045c8099d9be48817df \
                     file://COPYING.GPL;md5=0636e73ff0215e8d672dc4c32c317bb3"
 SECTION = "libs"

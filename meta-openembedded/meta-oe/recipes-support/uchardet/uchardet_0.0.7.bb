@@ -1,5 +1,5 @@
 SUMMARY = "uchardet is an encoding detector library"
-LICENSE = "MPLv1.1"
+LICENSE = "MPL-1.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6ecda54f6f525388d71d6b3cd92f7474"
 
 inherit cmake

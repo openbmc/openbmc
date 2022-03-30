@@ -11,7 +11,7 @@ SRC_URI = "git://sourceware.org/git/systemtap.git;branch=master \
            file://0001-PR28804-tune-default-stap-s-buffer-size-on-small-RAM.patch \
            "
 
-COMPATIBLE_HOST = '(x86_64|i.86|powerpc|arm|aarch64|microblazeel|mips).*-linux'
+COMPATIBLE_HOST = '(x86_64|i.86|powerpc|arm|aarch64|microblazeel|mips|riscv64).*-linux'
 COMPATIBLE_HOST:libc-musl = 'null'
 
 S = "${WORKDIR}/git"

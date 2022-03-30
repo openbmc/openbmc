@@ -5,7 +5,7 @@ export SKIP_UNIT=1
 
 cd regress
 sed -i "/\t\tagent-ptrace /d" Makefile
-make -k .OBJDIR=`pwd` .CURDIR=`pwd` SUDO="sudo" tests \
+make -k BUILDDIR=`pwd`/.. .OBJDIR=`pwd` .CURDIR=`pwd` SUDO="sudo" tests \
         | sed -u -e 's/^skipped/SKIP: /g' -e 's/^ok /PASS: /g' -e 's/^failed/FAIL: /g'
 
 SSHAGENT=`which ssh-agent`

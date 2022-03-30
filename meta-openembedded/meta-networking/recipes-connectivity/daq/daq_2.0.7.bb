@@ -1,7 +1,7 @@
 SUMMARY = "The dump DAQ test the various inline mode features "
 HOMEPAGE = "http://www.snort.org"
 SECTION = "libs"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=f9ce51a65dd738dc1ae631d8b21c40e0"
 
 PARALLEL_MAKE = ""

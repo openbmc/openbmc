@@ -1,0 +1,30 @@
+From 6ca1b224032355521b35471d222d0b09c08369a0 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 27 May 2021 11:38:36 +0800
+Subject: [PATCH] bind/Makefile.in: regenerate configure
+
+Run autogen.sh to regenerate configure.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ bind/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/bind/Makefile.in b/bind/Makefile.in
+index 533d55c..fdffe15 100644
+--- a/bind/Makefile.in
++++ b/bind/Makefile.in
+@@ -55,7 +55,7 @@ bind1:
+ 	else                                                            \
+ 		echo Configuring BIND libraries for DHCP. ;             \
+ 		rm -rf ${cleandirs} ${cleanfiles} ;                     \
+-		(cd ${bindsrcdir} &&                                    \
++		(cd ${bindsrcdir} && ./autogen.sh &&                    \
+                  ./configure ${bindconfig} > ${binddir}/configure.log); \
+ 	fi
+ 
+-- 
+2.25.1
+
