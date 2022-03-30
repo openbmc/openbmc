@@ -33,27 +33,34 @@ machine() {
     local cfg name tmpl
     local configs
 
-    # zsh requires wordsplit so that variable expansion behaves like bash
-    if [ -n "$ZSH_NAME" ]; then
-        setopt local_options shwordsplit
-    fi
-    if which find > /dev/null 2>&1; then
-        configs=$(find meta-* -path "*/conf/machine/*.conf")
-    else
-        configs=$(ls -1 meta-*/meta-*/conf/machine/*.conf meta-*/conf/machine/*.conf)
-    fi
+	# zsh requires wordsplit so that variable expansion behaves like bash
+	if [ -n "$ZSH_NAME" ]; then
+		setopt local_options shwordsplit
+	fi
+	if which find > /dev/null 2>&1; then
+        configs="$(find meta-* -path "*/conf/machine/*.conf")"
+	else
+		configs=$(ls -1 meta-*/meta-*/conf/machine/*.conf meta-*/conf/machine/*.conf)
+	fi
+    # Add qemu machines.
+    configs="$configs $(ls -1 poky/meta/conf/machine/qemu*.conf)"
 
     for cfg in $configs; do
         name=${cfg##*/}
         name=${name%.conf}
         tmpl=${cfg%/machine/*.conf}
 
-        # Skip any machines that don't support meta-phosphor.
-        if [ ! -e "$tmpl/bblayers.conf.sample" ]; then
-            continue
-        fi
-        if ! grep -q "##OEROOT##/meta-phosphor" "$tmpl/bblayers.conf.sample"; then
-            continue
+        if [ "$tmpl" = "poky/meta/conf" ]; then
+            # This is a QEMU machine, use phosphor defaults.
+            tmpl="meta-phosphor/conf"
+        else
+            # Skip any machines that don't support meta-phosphor.
+            if [ ! -e "$tmpl/bblayers.conf.sample" ]; then
+                continue
+            fi
+            if ! grep -q "##OEROOT##/meta-phosphor" "$tmpl/bblayers.conf.sample"; then
+                continue
+            fi
         fi
 
         # If a target is specified, then check for a match,
@@ -80,11 +87,9 @@ machine() {
 }
 
 if [ -z "$1" ]; then
-    echo Target machine must be specified. Use one of:
-    echo
-    (echo qemuarm; machine) | sort | $COLUMN
-elif [ "$1" = "qemuarm" ]; then
-    source openbmc-env
+	echo Target machine must be specified. Use one of:
+	echo
+	machine | sort | $COLUMN
 else
     bld_dir=$2
     if [ -z "$2" ]; then
