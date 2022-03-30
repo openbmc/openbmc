@@ -22,6 +22,7 @@ do_prepare_bootloaders() {
 }
 
 do_prepare_bootloaders[depends] += " \
+    u-boot:do_deploy \
     npcm7xx-bootblock:do_deploy \
     npcm7xx-bingo-native:do_populate_sysroot \
     npcm7xx-igps-native:do_populate_sysroot \
