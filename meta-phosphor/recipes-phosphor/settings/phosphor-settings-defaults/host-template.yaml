@@ -19,6 +19,10 @@
       Properties:
           BootMode:
               Default: Mode::Modes::Regular
+    - Interface: xyz.openbmc_project.Control.Boot.Type
+      Properties:
+          BootType:
+              Default: Type::Types::EFI
     - Interface: xyz.openbmc_project.Object.Enable
       Properties:
           Enabled:
