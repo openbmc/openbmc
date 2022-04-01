@@ -1,0 +1,214 @@
+#!/bin/bash
+#
+# mdio-util - MDIO Utility for AST2600
+#
+# This shell script provides the ability to access MDIO bus over devmem
+#
+# TODO: A read/write action contains multiple MDIO operations, it needs a 
+#       lock to protect entire action.
+
+
+RETRY_CNT=30
+RETRY_DEALY_SEC="0.1"
+
+MDIO_BASE_REG=$((16#1e650000))
+C22_READ_CMD=$((16#98000000))
+C22_WRITE_CMD=$((16#94000000))
+
+C45_ADDR_CMD=$((16#80000000))
+C45_WRITE_CMD=$((16#84000000))
+C45_PREAD_CMD=$((16#88000000))
+C45_READ_CMD=$((16#8C000000))
+
+PHY_ADDR_STEP=$((16#200000))
+DEV_ADDR_STEP=$((16#10000))
+REG_ADDR_STEP=$((16#10000))
+
+aspeed_mdio_c22_read() {
+    BUS=$1
+    PHY_ADDR=$2
+    REG_ADDR=$3
+
+    MDIO_CTRL_REG=$((MDIO_BASE_REG+BUS*8))
+    MDIO_DATA_REG=$((MDIO_CTRL_REG+4))
+
+    CMD=$((C22_READ_CMD+PHY_ADDR*PHY_ADDR_STEP+REG_ADDR*REG_ADDR_STEP))
+
+    # write control register
+    devmem $MDIO_CTRL_REG 32 $CMD
+    for i in $(seq 1 1 $RETRY_CNT)
+    do
+        CHECK_STR=$(devmem $MDIO_CTRL_REG)
+        CHECK_VAL=$((16#${CHECK_STR#"0x"}))
+        if [ $((CHECK_VAL&16#80000000)) -eq 0 ]; then
+            break
+        elif [ "$i" -eq "${RETRY_CNT}" ]; then
+            echo "[c22] read operation timeout"
+            return 1
+        fi        
+        sleep "$RETRY_DEALY_SEC"
+    done
+
+    # read data register
+    for i in $(seq 1 1 $RETRY_CNT)
+    do
+        DATA_STR=$(devmem $MDIO_DATA_REG)
+        DATA_VAL=$((16#${DATA_STR#"0x"}))
+        if [ $((DATA_VAL&16#00010000)) -ne 0 ]; then
+            DATA_VAL=$((DATA_VAL&16#0000FFFF))
+            echo "0x$(printf %04x $DATA_VAL)"
+            break
+        elif [ "$i" -eq "$RETRY_CNT" ]; then
+            echo "[c22] read data timeout"
+            return 1
+        fi
+        sleep "$RETRY_DEALY_SEC"
+    done
+
+    return 0
+}
+
+aspeed_mdio_c22_write() {
+    BUS=$1
+    PHY_ADDR=$2
+    REG_ADDR=$3
+    WR_DATA=$4
+
+    MDIO_CTRL_REG=$((MDIO_BASE_REG+BUS*8))
+    MDIO_DATA_REG=$((MDIO_CTRL_REG+4))
+    CMD=$((C22_WRITE_CMD+PHY_ADDR*PHY_ADDR_STEP+REG_ADDR*REG_ADDR_STEP+WR_DATA))
+
+    # write control register
+    devmem $MDIO_CTRL_REG 32 $CMD
+    for i in $(seq 1 1 $RETRY_CNT)
+    do
+        CHECK_STR=$(devmem $MDIO_CTRL_REG)
+        CHECK_VAL=$((16#${CHECK_STR#"0x"}))
+        if [ $((CHECK_VAL&16#80000000)) -eq 0 ]; then
+            break
+        elif [ "$i" -eq "$RETRY_CNT" ]; then
+            echo "[c22] write operation timeout"
+            return 1
+        fi
+        sleep "$RETRY_DEALY_SEC"
+    done
+
+    return 0
+}
+
+aspeed_mdio_c45_ctrl() {
+    BUS=$1
+    C45_OP=$2
+    PHY_ADDR=$3
+    DEV_ADDR=$4
+    CMD_DATA=$5
+    
+    MDIO_CTRL_REG=$((MDIO_BASE_REG+BUS*8))
+
+    case "$C45_OP" in
+        0)
+            CMD=$C45_ADDR_CMD
+            ;;
+        1)
+            CMD=$C45_WRITE_CMD
+            ;;
+        2)
+            CMD=$C45_PREAD_CMD
+            ;;
+        3)
+            CMD=$C45_READ_CMD
+            ;;
+        *)
+            echo "[c45] unknow operator $C45_OP"
+            return 1
+            ;;
+    esac
+
+    CMD=$((CMD+PHY_ADDR*PHY_ADDR_STEP+DEV_ADDR*DEV_ADDR_STEP+CMD_DATA))
+
+    # write control register
+    devmem $MDIO_CTRL_REG 32 $CMD
+    for i in $(seq 1 1 $RETRY_CNT)
+    do
+        CHECK_STR=$(devmem $MDIO_CTRL_REG)
+        CHECK_VAL=$((16#${CHECK_STR#"0x"}))
+        if [ $((CHECK_VAL&16#80000000)) -eq 0 ]; then
+            break
+        elif [ "$i" -eq "$RETRY_CNT" ]; then
+            echo "[c45] operation timeout, op: $C45_OP"
+            return 1
+        fi
+        sleep "$RETRY_DEALY_SEC"
+    done
+
+    return 0
+}
+
+aspeed_mdio_c45_data() {
+    BUS=$1
+    PHY_ADDR=$2
+    DEV_ADDR=$3
+
+    MDIO_CTRL_REG=$((MDIO_BASE_REG+BUS*8))
+    MDIO_DATA_REG=$((MDIO_CTRL_REG+4))
+
+    # read data register
+    for i in $(seq 1 1 $RETRY_CNT)
+    do
+        DATA_STR=$(devmem $MDIO_DATA_REG)
+        DATA_VAL=$((16#${DATA_STR#"0x"}))
+        if [ $((DATA_VAL&16#00010000)) -ne 0 ]; then
+            DATA_VAL=$((DATA_VAL&16#0000FFFF))
+            echo "0x$(printf %04x $DATA_VAL)"
+            break
+        elif [ "$i" -eq "$RETRY_CNT" ]; then
+            echo "[c45] read data timeout"
+            return 1
+        fi
+        sleep "$RETRY_DEALY_SEC"
+    done
+
+    return 0
+}
+
+print_usage() {
+    echo "Usage:"
+    echo "    [clause 22]"
+    echo "        $0 c22 r <BUS> <PHY_ADDR> <REG_ADDR>"
+    echo "        $0 c22 w <BUS> <PHY_ADDR> <REG_ADDR> <DATA>"
+    echo "    [clause 45]"
+    echo "        $0 c45 r <BUS> <PHY_ADDR> <DEV_ADDR> <REG_ADDR>"
+    echo "        $0 c45 w <BUS> <PHY_ADDR> <DEV_ADDR> <REG_ADDR> <DATA>"
+}
+
+CLAUSE_VER=${1}
+CMD_TYPE=${2}
+BUS=$3
+PHY_ADDR=$4
+
+if [ ! -c /dev/mem ]; then
+    mknod /dev/mem c 1 1
+fi
+
+if [ "$CLAUSE_VER" == "c22" ] && [ "$CMD_TYPE" == "r" ] && [ "$#" -eq 5 ]; then
+    REG_ADDR=${5}
+    aspeed_mdio_c22_read "$BUS" "$PHY_ADDR" "$REG_ADDR" || exit 1
+elif [ "$CLAUSE_VER" == "c22" ] && [ "$CMD_TYPE" == "w" ] && [ "$#" -eq 6 ]; then
+    REG_ADDR=${5}
+    DATA=${6}
+    aspeed_mdio_c22_write "$BUS" "$PHY_ADDR $REG_ADDR $DATA" || exit 1
+elif [ "$CLAUSE_VER" == "c45" ] && [ "$CMD_TYPE" == "r" ] && [ "$#" -eq 6 ]; then
+    DEV_ADDR=${5}
+    REG_ADDR=${6}
+    aspeed_mdio_c45_ctrl "$BUS" 0 "$PHY_ADDR" "$DEV_ADDR" "$REG_ADDR" || exit 1
+    aspeed_mdio_c45_ctrl "$BUS" 3 "$PHY_ADDR" "$DEV_ADDR" "$REG_ADDR" || exit 1
+    aspeed_mdio_c45_data "$BUS" "$PHY_ADDR" "$DEV_ADDR" || exit 1
+elif [ "$CLAUSE_VER" == "c45" ] && [ "$CMD_TYPE" == "w" ] && [ "$#" -eq 7 ]; then
+    DEV_ADDR=${5}
+    REG_ADDR=${6}
+    DATA=${7}
+    aspeed_mdio_c45_ctrl "$BUS" 0 "$PHY_ADDR" "$DEV_ADDR" "$REG_ADDR" || exit 1
+    aspeed_mdio_c45_ctrl "$BUS" 1 "$PHY_ADDR" "$DEV_ADDR" "$DATA" || exit 1
+else
+    print_usage
+fi
