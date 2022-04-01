@@ -89,6 +89,8 @@ EOF
     ln -s "${func_dir}" "${config_dir}"
 
     echo "${BIND_DEVICE}" > ${gadget_dir}/UDC
+    ip link set dev "$(<"${func_dir}"/ifname)" down
+    ip link set dev "$(<"${func_dir}"/ifname)" name "${IFACE_NAME}"
 }
 
 gadget_stop() {
