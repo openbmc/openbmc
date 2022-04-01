@@ -185,5 +185,8 @@ done
 if [[ $ACTION == "stop" ]]; then
     gadget_stop
 else
-    gadget_start
+    rc=0
+    gadget_start || rc=$?
+    (( rc == 0 )) || gadget_stop || true
+    exit $rc
 fi
