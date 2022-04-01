@@ -159,6 +159,78 @@ function get_ac_status(){
     fi
 }
 
+function get_host_status()
+{
+    SLED_NUM=$1
+    MDIO_BUS=0
+    HOST_ST_UNKNOW="Unknow"
+    HOST_ST_ON="On"
+    HOST_ST_OFF="Off"
+    declare -a PORT_MAP=(0 3 2 1 7 6 5)
+
+    # check /dev/mem
+    if ! create_dev_mem; then
+        return 1
+    fi
+
+    CHECK_CNT=0
+    MDIO_ERR_CNT=0
+    CUR_HOST_ST=$HOST_ST_UNKNOW
+
+    while true
+    do
+        if POST_ST_VAL=$(mdio-util c22 r $MDIO_BUS "${PORT_MAP[SLED_NUM]}" 0); then
+            if [ $((POST_ST_VAL&16#0800)) -eq $((16#0800)) ]; then
+                TMP_HOST_ST="$HOST_ST_ON"
+            else
+                TMP_HOST_ST="$HOST_ST_OFF"
+            fi
+
+            if [ "$CUR_HOST_ST" == "$TMP_HOST_ST" ]; then
+                CHECK_CNT=$((CHECK_CNT+1))
+            else
+                CUR_HOST_ST=$TMP_HOST_ST
+                CHECK_CNT=0
+            fi
+
+            if [ "$CHECK_CNT" -ge 5 ]; then
+                echo "$CUR_HOST_ST"
+                break
+            fi
+        else
+            MDIO_ERR_CNT=$((MDIO_ERR_CNT+1))
+            if [ "$MDIO_ERR_CNT" -ge 5 ]; then
+                echo "$HOST_ST_UNKNOW"
+                return 1
+            fi
+        fi
+    done
+
+    return 0
+}
+
+function create_dev_mem()
+{
+    CHECK_CNT=0
+    while true
+    do
+        CHECK_CNT=$((CHECK_CNT+1))
+        if [ -c /dev/mem ]; then
+            # /dev/mem already exist
+            return 0
+        elif mknod /dev/mem c 1 1; then
+            # mknod success
+            return 0
+        elif [ "$CHECK_CNT" -ge 5 ]; then
+            break
+        fi
+        sleep 1
+    done
+
+    echo "create /dev/mem failed"
+    return 1
+}
+
 function show_usage(){
     echo "Usage: power-ctrl [sled1 | sled2 | sled3 | sled4 | sled5 | sled6]  [on off ac-on ac-off status]"
     echo "       power-ctrl chassis-cycle"
@@ -201,23 +273,45 @@ fi
 
 if [[ "$ACTION" == "on" ]]; then
     if [ "$(get_ac_status "$SLED_NUM")" == "AC on" ];then
-        echo "Power on ${SLED}"
-        trigger_power_button  "$SLED_NUM"  "$DELAY_POWER_ON"
+        host_power_st=$(get_host_status "$SLED_NUM")
+        if [ "$host_power_st" == "On" ]; then
+            echo "${SLED} is already On"
+        elif [ "$host_power_st" == "Off" ]; then
+            echo "Power on ${SLED}"
+            trigger_power_button  "$SLED_NUM"  "$DELAY_POWER_ON"
+        else
+            echo "${SLED} power state is $host_power_st"
+            exit 1
+        fi
     else
         echo "${SLED} is ac-off, please turn on ac before power on"
         exit 1
     fi
 elif [[ "$ACTION" == "off" ]];then
     if [ "$(get_ac_status "$SLED_NUM")" == "AC on" ];then
-        echo "Power off ${SLED}"
-        trigger_power_button  "$SLED_NUM"  "$DELAY_POWER_OFF"
+        host_power_st=$(get_host_status "$SLED_NUM")
+        if [ "$host_power_st" == "On" ]; then
+            echo "Power off ${SLED}"
+            trigger_power_button  "$SLED_NUM"  "$DELAY_POWER_OFF"
+        elif [ "$host_power_st" == "Off" ]; then
+            echo "${SLED} is already Off"
+        else
+            echo "${SLED} power state is $host_power_st"
+            exit 1
+        fi
     else
         echo "${SLED} is already ac-off"
         exit 1
     fi
 elif [[ "$ACTION" == "status" ]];then
-    get_ac_status "$SLED_NUM"
-    #TODO : check or record Host(DC) power status
+    AC_ST=$(get_ac_status "$SLED_NUM")
+    if [ "$AC_ST" == "AC on" ]; then
+        # check host power status if AC is on
+        get_host_status "$SLED_NUM" || exit 1
+    else
+        # AC off
+        echo "$AC_ST"
+    fi
 elif [[ "$ACTION" == "ac-on" ]];then
     set_gpio "power-host${SLED_NUM}" 1
 elif [[ "$ACTION" == "ac-off" ]];then
