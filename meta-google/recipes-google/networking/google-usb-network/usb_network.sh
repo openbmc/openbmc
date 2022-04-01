@@ -96,11 +96,11 @@ EOF
 gadget_stop() {
     local gadget_dir="${CONFIGFS_HOME}/usb_gadget/${GADGET_DIR_NAME}"
     rm -f ${gadget_dir}/configs/c.1/${DEV_TYPE}.${IFACE_NAME}
-    rm -rf ${gadget_dir}/configs/c.1/strings/0x409
-    rm -rf ${gadget_dir}/configs/c.1
-    rm -rf ${gadget_dir}/strings/0x409
-    rm -rf ${gadget_dir}/functions/${DEV_TYPE}.${IFACE_NAME}
-    rm -rf ${gadget_dir}
+    rmdir ${gadget_dir}/functions/${DEV_TYPE}.${IFACE_NAME} \
+      ${gadget_dir}/configs/c.1/strings/0x409 \
+      ${gadget_dir}/configs/c.1 \
+      ${gadget_dir}/strings/0x409 \
+      ${gadget_dir} || true
 
     rm -f /run/systemd/network/+-bmc-"${IFACE_NAME}".network
     networkctl reload
