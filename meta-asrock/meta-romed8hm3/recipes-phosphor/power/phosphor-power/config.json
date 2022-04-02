@@ -1,0 +1,32 @@
+{
+  "comments": [ "Config file for ASRock Rack ROMED8HM3" ],
+  "chassis": [
+    {
+      "comments": [ "Chassis number 1 containing CPUs and memory" ],
+      "number": 1,
+      "inventory_path": "system/chassis",
+      "devices": [
+        {
+          "comments": [ "ISL96147 regulator producing the VDDCR_CPU rail" ],
+          "id": "vddcr_cpu_regulator",
+          "is_regulator": true,
+          "fru": "system/board/ASRock_ROMED8HM3",
+          "i2c_interface": {
+            "bus": 6,
+            "address": "0x60"
+          },
+          "configuration": {
+            "actions": [
+              {
+                "i2c_write_bytes": {
+                  "register": "0xf0",
+                  "values": [ "0x07", "0x31" ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
