@@ -427,7 +427,7 @@ other branches represent offshoots of the "master" branch.
 When you create a local copy of a Git repository, the copy has the same
 set of branches as the original. This means you can use Git to create a
 local working area (also called a branch) that tracks a specific
-development branch from the upstream source Git repository. in other
+development branch from the upstream source Git repository. In other
 words, you can define your local Git environment to work on any
 development branch in the repository. To help illustrate, consider the
 following example Git commands::
@@ -550,11 +550,11 @@ descriptions and strategies on how to use these commands:
    You need to be in a local branch other than the one you are deleting
    in order to delete branch-name.
 
--  *git pull --rebase:* Retrieves information from an upstream Git
+-  *git pull \-\-rebase*: Retrieves information from an upstream Git
    repository and places it in your local Git repository. You use this
    command to make sure you are synchronized with the repository from
    which you are basing changes (e.g. the "&DISTRO_NAME_NO_CAP;"
-   branch). The "--rebase" option ensures that any local commits you
+   branch). The ``--rebase`` option ensures that any local commits you
    have in your branch are preserved at the top of your local branch.
 
 -  *git push repo-name local-branch:upstream-branch:* Sends

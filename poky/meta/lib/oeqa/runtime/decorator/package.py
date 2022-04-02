@@ -5,7 +5,6 @@
 #
 
 from oeqa.core.decorator import OETestDecorator, registerDecorator
-from oeqa.core.utils.misc import strToSet
 
 @registerDecorator
 class OEHasPackage(OETestDecorator):
@@ -34,8 +33,12 @@ class OEHasPackage(OETestDecorator):
     def setUpDecorator(self):
         need_pkgs = set()
         unneed_pkgs = set()
-        pkgs = strToSet(self.need_pkgs)
-        for pkg in pkgs:
+
+        # Turn literal strings into a list so we can just iterate over it
+        if isinstance(self.need_pkgs, str):
+            self.need_pkgs = [self.need_pkgs,]
+
+        for pkg in self.need_pkgs:
             if pkg.startswith('!'):
                 unneed_pkgs.add(pkg[1:])
             else:

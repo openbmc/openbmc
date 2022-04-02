@@ -2,14 +2,10 @@
 # SPDX-License-Identifier: MIT
 #
 
-import os
-import re
-import time
-import logging
 import bb.tinfoil
 
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import runCmd, get_test_layer
+from oeqa.utils.commands import get_test_layer
 
 
 def setUpModule():

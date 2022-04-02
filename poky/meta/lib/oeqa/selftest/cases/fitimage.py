@@ -3,9 +3,8 @@
 #
 
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import runCmd, bitbake, get_bb_var, runqemu
+from oeqa.utils.commands import runCmd, bitbake, get_bb_var
 import os
-import json
 import re
 
 class FitImageTests(OESelftestTestCase):

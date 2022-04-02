@@ -187,9 +187,9 @@ that either directly or indirectly depend on the installed files (e.g.
 
    -  The ``install`` utility. This utility is the preferred method.
 
-   -  The ``cp`` command with the "--no-preserve=ownership" option.
+   -  The ``cp`` command with the ``--no-preserve=ownership`` option.
 
-   -  The ``tar`` command with the "--no-same-owner" option. See the
+   -  The ``tar`` command with the ``--no-same-owner`` option. See the
       ``bin_package.bbclass`` file in the ``meta/classes`` directory of
       the :term:`Source Directory` for an example.
 

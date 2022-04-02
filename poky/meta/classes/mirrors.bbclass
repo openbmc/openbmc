@@ -42,6 +42,7 @@ ftp://sourceware.org/pub http://ftp.gwdg.de/pub/linux/sources.redhat.com/sourcew
 cvs://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \
 svn://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \
 git://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \
+gitsm://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \
 hg://.*/.*      http://downloads.yoctoproject.org/mirror/sources/ \
 bzr://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \
 p4://.*/.*      http://downloads.yoctoproject.org/mirror/sources/ \
@@ -52,6 +53,7 @@ npm://.*/?.*    http://downloads.yoctoproject.org/mirror/sources/ \
 cvs://.*/.*     http://sources.openembedded.org/ \
 svn://.*/.*     http://sources.openembedded.org/ \
 git://.*/.*     http://sources.openembedded.org/ \
+gitsm://.*/.*   http://sources.openembedded.org/ \
 hg://.*/.*      http://sources.openembedded.org/ \
 bzr://.*/.*     http://sources.openembedded.org/ \
 p4://.*/.*      http://sources.openembedded.org/ \

@@ -13,7 +13,7 @@ from oeqa.core.decorator.data import skipIfQemu
 class BootTest(OERuntimeTestCase):
 
     @OETimeout(120)
-    @skipIfQemu('qemuall', 'Test only runs on real hardware')
+    @skipIfQemu()
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     def test_reboot(self):
         output = ''

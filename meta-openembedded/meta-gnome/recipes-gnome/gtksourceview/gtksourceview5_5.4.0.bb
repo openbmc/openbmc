@@ -24,8 +24,8 @@ inherit gnomebase lib_package gettext features_check gtk-doc gtk-icon-cache gobj
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
-SRC_URI = "https://download.gnome.org/sources/gtksourceview/5.2/${PNAME}-${PV}.tar.xz"
-SRC_URI[sha256sum] = "c9b34fa02654f56ce22fa08827d89db4ba81631b2e6d7d31ea65d13c729430e9"
+SRC_URI = "https://download.gnome.org/sources/gtksourceview/5.4/${PNAME}-${PV}.tar.xz"
+SRC_URI[sha256sum] = "003bc217e670a8ec8aa3aece994b70e70b7d6b8074938adda21718555d84e637"
 
 GIR_MESON_ENABLE_FLAG = 'enabled'
 GIR_MESON_DISABLE_FLAG = 'disabled'

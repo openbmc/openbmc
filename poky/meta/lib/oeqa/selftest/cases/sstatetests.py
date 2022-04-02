@@ -8,8 +8,7 @@ import glob
 import subprocess
 import tempfile
 
-from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_test_layer, create_temp_layer
+from oeqa.utils.commands import runCmd, bitbake, get_bb_var, create_temp_layer
 from oeqa.selftest.cases.sstate import SStateBase
 import oe
 

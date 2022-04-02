@@ -5,8 +5,7 @@
 #
 
 from functools import wraps
-from abc import abstractmethod, ABCMeta
-from oeqa.core.utils.misc import strToList
+from abc import ABCMeta
 
 decoratorClasses = set()
 
@@ -65,15 +64,11 @@ class OETestDiscover(OETestDecorator):
         return registry['cases']
 
 def OETestTag(*tags):
-    expandedtags = []
-    for tag in tags:
-        expandedtags += strToList(tag)
     def decorator(item):
         if hasattr(item, "__oeqa_testtags"):
             # do not append, create a new list (to handle classes with inheritance)
-            item.__oeqa_testtags = list(item.__oeqa_testtags) + expandedtags
+            item.__oeqa_testtags = list(item.__oeqa_testtags) + list(tags)
         else:
-            item.__oeqa_testtags = expandedtags
+            item.__oeqa_testtags = tags
         return item
     return decorator
-

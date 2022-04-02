@@ -1,0 +1,53 @@
+Fix issues in build scripts:
+
+* remove hardcode lib path from buildtools/config.py which is not suitable for
+  cross build
+* only build target 'build_py' in setup.py
+* do not override self.install_lib with self.install_platlib which causes
+  package issue when multilib is enabled.
+
+Upstream-Status: Pending [cross build specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ buildtools/config.py | 4 ++--
+ setup.py             | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/buildtools/config.py b/buildtools/config.py
+index c837e5d..d426005 100644
+--- a/buildtools/config.py
++++ b/buildtools/config.py
+@@ -312,8 +312,8 @@ class Configuration(object):
+                 # wx-config doesn't output that for some reason.  For now, just
+                 # add it unconditionally but we should really check if the lib is
+                 # really found there or wx-config should be fixed.
+-                if self.WXPORT != 'msw':
+-                    self.libdirs.append("/usr/X11R6/lib")
++                #if self.WXPORT != 'msw':
++                #    self.libdirs.append("/usr/X11R6/lib")
+ 
+             # Move the various -I, -D, etc. flags we got from the config scripts
+             # into the distutils lists.
+diff --git a/setup.py b/setup.py
+index 64bec4b..fb29253 100644
+--- a/setup.py
++++ b/setup.py
+@@ -130,7 +130,7 @@ class wx_build(orig_build):
+                 'message and the wxWidgets and Phoenix build steps in the future.\n')
+ 
+             # Use the same Python that is running this script.
+-            cmd = ['"{}"'.format(sys.executable), '-u', 'build.py', 'build']
++            cmd = ['"{}"'.format(sys.executable), '-u', 'build.py', 'build_py']
+             cmd = ' '.join(cmd)
+             runcmd(cmd)
+ 
+@@ -233,7 +233,7 @@ if haveWheel:
+ class wx_install(orig_install):
+     def finalize_options(self):
+         orig_install.finalize_options(self)
+-        self.install_lib = self.install_platlib
++        #self.install_lib = self.install_platlib
+ 
+     def run(self):
+         self.run_command("build")

@@ -151,7 +151,7 @@ Here are challenges you might encounter when developing using the Yocto Project:
    ":ref:`transitioning-to-a-custom-environment:transitioning to a custom environment for systems development`"
    documents on the Yocto Project website.
 
--  *Project Workflow Could Be Confusing:* The `Yocto Project
+-  *Project Workflow Could Be Confusing:* The :ref:`Yocto Project
    workflow <overview-manual/development-environment:the yocto project development environment>`
    could be confusing if you are used to traditional desktop and server
    software development.

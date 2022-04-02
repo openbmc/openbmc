@@ -1,4 +1,8 @@
 #!/bin/sh
+#
+# SPDX-License-Identifier: MIT
+#
+
 ### BEGIN INIT INFO
 # Provides:          module-init-tools
 # Required-Start:    

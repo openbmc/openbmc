@@ -1,6 +1,9 @@
 #!/bin/sh
 #
 # load keymap, if existing
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 
 KERNEL_MAJMIN=`uname -r | cut -d '.' -f 1,2`
 if [ -e /etc/keymap-$KERNEL_MAJMIN.map ]; then

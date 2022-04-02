@@ -64,12 +64,6 @@ do_install_ptest() {
     install -m 0644 ${S}/libopenmpt/libopenmpt_version.mk ${D}${PTEST_PATH}/libopenmpt
 }
 
-python __anonymous() {
-    packageconfig = (d.getVar("PACKAGECONFIG") or "").split()
-    if ("sdl" in packageconfig) and ("sdl2" in packageconfig):
-        bb.error("sdl and sdl2 packageconfigs cannot be both enabled")
-}
-
 PACKAGES =+ "${PN}-openmpt123 ${PN}-openmpt123-doc"
 FILES:${PN}-openmpt123 = "${bindir}/openmpt123"
 FILES:${PN}-openmpt123-doc = "${mandir}/man1/openmpt123*"

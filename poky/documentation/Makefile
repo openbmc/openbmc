@@ -44,7 +44,7 @@ PNGs := $(foreach dir, $(IMAGEDIRS), $(patsubst %.svg,%.png,$(wildcard $(SOURCED
 	$(SVG2PNG) --export-filename=$@ $<
 
 clean:
-	@rm -rf $(BUILDDIR) $(PNGs) $(PDFs)
+	@rm -rf $(BUILDDIR) $(PNGs) $(PDFs) poky.yaml sphinx-static/switchers.js
 
 epub: $(PNGs)
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)

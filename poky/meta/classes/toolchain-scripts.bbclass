@@ -109,6 +109,7 @@ toolchain_shared_env_script () {
 	echo 'export OECORE_SDK_VERSION="${SDK_VERSION}"' >> $script
 	echo 'export ARCH=${ARCH}' >> $script
 	echo 'export CROSS_COMPILE=${TARGET_PREFIX}' >> $script
+	echo 'export OECORE_TUNE_CCARGS="${TUNE_CCARGS}"' >> $script
 
     cat >> $script <<EOF
 

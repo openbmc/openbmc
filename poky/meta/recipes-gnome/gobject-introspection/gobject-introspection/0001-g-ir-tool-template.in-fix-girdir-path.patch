@@ -1,0 +1,33 @@
+From b01b448613b76f9acefdfd89ee01686dc7a67df4 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Tue, 13 Jul 2021 02:05:11 -0700
+Subject: [PATCH] g-ir-tool-template.in: fix girdir path
+
+In case gir_dir_prefix is set, it's possible that g-ir-scanner
+cannot find the .gir files. This is because that the girdir
+is set to gir_dir_prefix, which is wrong. It's not a prefix,
+it the actual gir dir.
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gobject-introspection/-/merge_requests/329]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ tools/g-ir-tool-template.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/g-ir-tool-template.in b/tools/g-ir-tool-template.in
+index 6e98f52e..62c07c31 100755
+--- a/tools/g-ir-tool-template.in
++++ b/tools/g-ir-tool-template.in
+@@ -55,7 +55,7 @@ builtins.__dict__['DATADIR'] = datadir
+ 
+ # Respect gir_dir_prefix
+ girdir = ''
+-girdir = os.path.abspath(os.path.join(filedir, '..', '@gir_dir_prefix@'))
++girdir = os.path.abspath(os.path.join(filedir, '..', '@gir_dir_prefix@', 'gir-1.0'))
+ builtins.__dict__['GIRDIR'] = [girdir]
+ 
+ # Again, relative paths first so that the installation prefix is relocatable
+-- 
+2.30.2
+

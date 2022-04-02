@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Conversion script to rename variables to versions with improved terminology.
-# Also highlights potentially problematic langage and removed variables.
+# Also highlights potentially problematic language and removed variables.
 #
 # Copyright (C) 2021 Richard Purdie
 # Copyright (C) 2022 Wind River Systems, Inc.

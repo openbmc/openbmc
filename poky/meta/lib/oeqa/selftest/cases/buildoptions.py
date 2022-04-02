@@ -9,7 +9,7 @@ import shutil
 import tempfile
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.selftest.cases.buildhistory import BuildhistoryBase
-from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars
+from oeqa.utils.commands import bitbake, get_bb_var, get_bb_vars
 import oeqa.utils.ftools as ftools
 
 class ImageOptionsTests(OESelftestTestCase):
@@ -177,7 +177,12 @@ class ArchiverTest(OESelftestTestCase):
         """
         Test for archiving the work directory and exporting the source files.
         """
-        self.write_config("INHERIT += \"archiver\"\nARCHIVER_MODE[src] = \"original\"\nARCHIVER_MODE[srpm] = \"1\"")
+        self.write_config("""
+INHERIT += "archiver"
+PACKAGE_CLASSES = "package_rpm"
+ARCHIVER_MODE[src] = "original"
+ARCHIVER_MODE[srpm] = "1"
+""")
         res = bitbake("xcursor-transparent-theme", ignore_status=True)
         self.assertEqual(res.status, 0, "\nCouldn't build xcursortransparenttheme.\nbitbake output %s" % res.output)
         deploy_dir_src = get_bb_var('DEPLOY_DIR_SRC')

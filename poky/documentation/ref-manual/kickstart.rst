@@ -125,6 +125,8 @@ the ``part`` and ``partition`` commands:
 
    -  ``swap``
 
+   -  ``vfat``
+
 -  ``--fsoptions``: Specifies a free-form string of options to be used
    when mounting the filesystem. This string is copied into the
    ``/etc/fstab`` file of the installed system and should be enclosed in

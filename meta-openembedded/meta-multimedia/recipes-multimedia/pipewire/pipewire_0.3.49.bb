@@ -13,8 +13,10 @@ LIC_FILES_CHKSUM = " \
 
 DEPENDS = "dbus ncurses"
 
-SRCREV = "bdd407fe66cc9e46d4bc4dcc989d50679000482b"
-SRC_URI = "git://gitlab.freedesktop.org/pipewire/pipewire.git;branch=master;protocol=https"
+SRCREV = "075e7b266876802eab0077afd13ea8e1cee5e1fd"
+SRC_URI = "git://gitlab.freedesktop.org/pipewire/pipewire.git;branch=master;protocol=https \
+           file://0001-meson-Add-option-to-enable-disable-legacy-RTKit-modu.patch \
+           "
 
 S = "${WORKDIR}/git"
 
@@ -49,6 +51,10 @@ SYSTEMD_PACKAGES = "${PN}"
 #
 # AptX and LDAC are not available in OE. Currently, neither
 # are lv2 and ROC.
+#
+# The RTKit module is deprecated in favor of the newer RT module.
+# It still exists for legacy setups that still include it in
+# their PipeWire configuration files.
 EXTRA_OEMESON += " \
     -Devl=disabled \
     -Dtests=disabled \
@@ -62,6 +68,7 @@ EXTRA_OEMESON += " \
     -Droc=disabled \
     -Dbluez5-codec-aptx=disabled \
     -Dbluez5-codec-ldac=disabled \
+    -Dlegacy-rtkit=false \
 "
 
 PACKAGECONFIG ??= "\
@@ -306,8 +313,8 @@ FILES:${PN}-spa-tools = " \
 FILES:${PN}-modules = ""
 RRECOMMENDS:${PN}-modules += "${PN}-modules-meta"
 
-CONFFILES:${PN}-modules-rtkit = "${datadir}/pipewire/client-rt.conf"
-FILES:${PN}-modules-rtkit += " \
+CONFFILES:${PN}-modules-rt = "${datadir}/pipewire/client-rt.conf"
+FILES:${PN}-modules-rt += " \
     ${datadir}/pipewire/client-rt.conf \
     "
 

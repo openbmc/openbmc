@@ -13,7 +13,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=c434e8128a68bedd59b80b2ac1eb1c4a \
                     file://girepository/giregisteredtypeinfo.c;endline=21;md5=661847611ae6979465415f31a759ba27 \
                     "
 
-SRC_URI = "${GNOME_MIRROR}/${BPN}/${@oe.utils.trim_version("${PV}", 2)}/${BPN}-${PV}.tar.xz"
+SRC_URI = "${GNOME_MIRROR}/${BPN}/${@oe.utils.trim_version("${PV}", 2)}/${BPN}-${PV}.tar.xz \
+           file://0001-g-ir-tool-template.in-fix-girdir-path.patch \
+           "
 
 SRC_URI[sha256sum] = "02fe8e590861d88f83060dd39cda5ccaa60b2da1d21d0f95499301b186beaabc"
 

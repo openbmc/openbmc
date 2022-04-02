@@ -9,8 +9,6 @@ import bb.utils
 import functools
 import multiprocessing
 import textwrap
-import json
-import unittest
 import tempfile
 import shutil
 import stat

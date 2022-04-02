@@ -5,7 +5,7 @@
 import uuid
 
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import  bitbake
+from oeqa.utils.commands import bitbake
 
 class SysrootTests(OESelftestTestCase):
     def test_sysroot_cleanup(self):

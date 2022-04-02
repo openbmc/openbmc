@@ -205,7 +205,6 @@ def testimage_main(d):
     import shutil
 
     from bb.utils import export_proxies
-    from oeqa.core.utils.misc import updateTestData
     from oeqa.runtime.context import OERuntimeTestContext
     from oeqa.runtime.context import OERuntimeTestContextExecutor
     from oeqa.core.target.qemu import supported_fstypes
@@ -245,7 +244,8 @@ def testimage_main(d):
 
     # Some variables need to be updates (mostly paths) with the
     # ones of the current environment because some tests require them.
-    updateTestData(d, td, d.getVar('TESTIMAGE_UPDATE_VARS').split())
+    for var in d.getVar('TESTIMAGE_UPDATE_VARS').split():
+        td[var] = d.getVar(var)
 
     image_manifest = "%s.manifest" % image_name
     image_packages = OERuntimeTestContextExecutor.readPackagesManifest(image_manifest)

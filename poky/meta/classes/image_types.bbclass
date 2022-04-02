@@ -264,8 +264,6 @@ IMAGE_TYPES = " \
     ext3 ext3.gz \
     ext4 ext4.gz \
     btrfs \
-    iso \
-    hddimg \
     squashfs squashfs-xz squashfs-lzo squashfs-lz4 squashfs-zst \
     ubi ubifs multiubi \
     tar tar.gz tar.bz2 tar.xz tar.lz4 tar.zst \
@@ -275,6 +273,9 @@ IMAGE_TYPES = " \
     f2fs \
     erofs erofs-lz4 erofs-lz4hc \
 "
+# These image types are x86 specific as they need syslinux
+IMAGE_TYPES:append:x86 = " hddimg iso"
+IMAGE_TYPES:append:x86-64 = " hddimg iso"
 
 # Compression is a special case of conversion. The old variable
 # names are still supported for backward-compatibility. When defining

@@ -1,0 +1,44 @@
+From b311f9e75f13205fd0738f7e89fd2062b9e7b237 Mon Sep 17 00:00:00 2001
+From: Carlos Rafael Giani <crg7475@mailbox.org>
+Date: Wed, 30 Mar 2022 19:44:38 +0200
+Subject: [PATCH] meson: Add option to enable/disable legacy RTKit module
+
+The RTKit module is being replaced by the RT module. Currently, it is
+always built if D-Bus is present. For packagers, it can be beneficial to
+be able to disable the legacy module. Add a Meson option to allow for
+exactly that. Make it enabled by default to not change default behavior.
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/pipewire/pipewire/-/merge_requests/1204]
+---
+ meson_options.txt       | 4 ++++
+ src/modules/meson.build | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/meson_options.txt b/meson_options.txt
+index 49d5b2203..2687bfe7e 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -237,3 +237,7 @@ option('libcanberra',
+        description: 'Enable code that depends on libcanberra',
+        type: 'feature',
+        value: 'auto')
++option('legacy-rtkit',
++       description: 'Build legacy rtkit module',
++       type: 'boolean',
++       value: 'true')
+diff --git a/src/modules/meson.build b/src/modules/meson.build
+index ee724bf52..2d26cc459 100644
+--- a/src/modules/meson.build
++++ b/src/modules/meson.build
+@@ -139,7 +139,7 @@ pipewire_module_rt = shared_library('pipewire-module-rt', [ 'module-rt.c' ],
+   dependencies : [dbus_dep, mathlib, dl_lib, pipewire_dep],
+ )
+ 
+-build_module_rtkit = dbus_dep.found()
++build_module_rtkit = dbus_dep.found() and (get_option('legacy-rtkit') == true)
+ if build_module_rtkit
+ # TODO: This serves as a temporary alias to prevent breaking existing setups
+ #       while `module-rtkit` is being migrated to `module-rt`
+-- 
+2.32.0
+

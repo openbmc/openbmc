@@ -3,10 +3,10 @@ DESCRIPTION = "wxWidgets is a free and open source cross-platform C++ framework 
 HOMEPAGE = "https://www.wxwidgets.org/"
 BUGTRACKER = "https://trac.wxwidgets.org/"
 
-# wxWidgets licence is a modified version of LGPL explicitly allowing not
+# WXwindows licence is a modified version of LGPL explicitly allowing not
 # distributing the sources of an application using the library even in the
 # case of static linking.
-LICENSE = "wxWidgets"
+LICENSE = "WXwindows"
 LIC_FILES_CHKSUM = "file://docs/licence.txt;md5=981f50a934828620b08f44d75db557c6"
 
 inherit ${@bb.utils.contains('PACKAGECONFIG', 'qt', 'cmake_qt5', 'cmake', d)}
@@ -26,15 +26,16 @@ SRC_URI = " \
     file://0001-wx-config.in-Disable-cross-magic-it-does-not-work-fo.patch \
     file://fix-libdir-for-multilib.patch \
     file://respect-DESTDIR-when-create-link.patch \
+    file://not-append-system-name-to-lib-name.patch \
 "
-PV = "3.1.4"
-SRCREV= "6cdaedd42ba59331b3dc4ead50e0bac76ae14c19"
+SRCREV= "9c0a8be1dc32063d91ed1901fd5fcd54f4f955a1"
 S = "${WORKDIR}/git"
 
 # These can be either 'builtin' or 'sys' and builtin means cloned soures are
 # build. So these cannot be PACKAGECONFIGs and let's use libs where we can (see
 # DEPENDS)
 EXTRA_OECMAKE += " \
+    -DwxUSE_GLCANVAS_EGL=OFF \
     -DwxUSE_LIBJPEG=sys \
     -DwxUSE_LIBPNG=sys \
     -DwxUSE_LIBTIFF=sys \
@@ -46,6 +47,7 @@ EXTRA_OECMAKE:append:libc-musl = " \
 "
 
 PACKAGECONFIG ?= "gtk ${@bb.utils.filter('DISTRO_FEATURES', 'opengl', d)}"
+PACKAGECONFIG:remove:class-native = "opengl"
 
 # Note on toolkit-PACKAGECONFIGs: select exactly one of 'no_gui' / 'gtk' / 'qt'
 PACKAGECONFIG[no_gui] = "-DwxUSE_GUI=OFF,,,,,qt gtk opengl"
@@ -69,9 +71,10 @@ PACKAGECONFIG[gstreamer] = "-DwxUSE_MEDIACTRL=ON,-DwxUSE_MEDIACTRL=OFF,gstreamer
 PACKAGECONFIG[libsecret] = "-DwxUSE_SECRETSTORE=ON,-DwxUSE_SECRETSTORE=OFF,libsecret,,,no_gui"
 PACKAGECONFIG[lzma] = "-DwxUSE_LIBLZMA=ON,-DwxUSE_LIBLZMA=OFF,xz"
 PACKAGECONFIG[mspack] = "-DwxUSE_LIBMSPACK=ON,-DwxUSE_LIBMSPACK=OFF,libmspack"
-PACKAGECONFIG[opengl] = ",,libglu"
+PACKAGECONFIG[opengl] = "-DwxUSE_OPENGL=ON,-DwxUSE_OPENGL=OFF,libglu"
 PACKAGECONFIG[sdl_audio] = "-DwxUSE_LIBSDL=ON,-DwxUSE_LIBSDL=OFF,libsdl2"
 PACKAGECONFIG[webkit] = "-DwxUSE_WEBVIEW_WEBKIT=ON,-DwxUSE_WEBVIEW_WEBKIT=OFF,webkitgtk,,,no_gui"
+PACKAGECONFIG[curl] = "-DwxUSE_WEBREQUEST_CURL=ON,-DwxUSE_WEBREQUEST_CURL=OFF,curl"
 
 do_compile:append() {
     # if not at re-compile
@@ -108,3 +111,5 @@ FILES:${PN}-dev += " \
     ${libdir}/wx/include/ \
     ${libdir}/wx/config/ \
 "
+
+BBCLASSEXTEND = "native"

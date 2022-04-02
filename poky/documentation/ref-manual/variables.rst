@@ -231,17 +231,6 @@ system and gives an overview of their function and contents.
       must set this variable in your recipe. The
       :ref:`syslinux <ref-classes-syslinux>` class checks this variable.
 
-   :term:`AVAILABLE_LICENSES`
-      List of licenses found in the directories specified by
-      :term:`COMMON_LICENSE_DIR` and
-      :term:`LICENSE_PATH`.
-
-      .. note::
-
-         It is assumed that all changes to :term:`COMMON_LICENSE_DIR` and
-         :term:`LICENSE_PATH` have been done before :term:`AVAILABLE_LICENSES`
-         is defined (in :ref:`ref-classes-license`).
-
    :term:`AVAILTUNES`
       The list of defined CPU and Application Binary Interface (ABI)
       tunings (i.e. "tunes") available for use by the OpenEmbedded build
@@ -3508,21 +3497,6 @@ system and gives an overview of their function and contents.
          remove dependencies on or provide alternatives to components that
          are required to produce a functional system image.
 
-      .. note::
-
-         It is possible to define a list of licenses that are allowed to be
-         used instead of the licenses that are excluded. To do this, define
-         a variable ``COMPATIBLE_LICENSES`` with the names of the licenses
-         that are allowed. Then define :term:`INCOMPATIBLE_LICENSE` as::
-
-                 INCOMPATIBLE_LICENSE = "${@' '.join(sorted(set(d.getVar('AVAILABLE_LICENSES').split()) - set(d.getVar('COMPATIBLE_LICENSES').split())))}"
-
-
-         This will result in :term:`INCOMPATIBLE_LICENSE` containing the names of
-         all licenses from :term:`AVAILABLE_LICENSES` except the ones specified
-         in ``COMPATIBLE_LICENSES``, thus only allowing the latter licenses to
-         be used.
-
    :term:`INHERIT`
       Causes the named class or classes to be inherited globally. Anonymous
       functions in the class or classes are not executed for the base
@@ -5632,6 +5606,11 @@ system and gives an overview of their function and contents.
 
       :term:`PE` is the default value of the :term:`PKGE` variable.
 
+   :term:`PEP517_BUILD_API`
+      When used by recipes that inherit the :ref:`python_pep517
+      <ref-classes-python_pep517>` class, specifies the entry point to the
+      PEP-517 compliant build API (such as ``flit_core.buildapi``).
+
    :term:`PEP517_WHEEL_PATH`
       When used by recipes that inherit the
       :ref:`python_pep517 <ref-classes-python_pep517>` class,
@@ -5643,12 +5622,6 @@ system and gives an overview of their function and contents.
       revision numbers (i.e. ``glibc-2.13-r20+svnr15508/`` and
       ``bash-4.2-r1/``). This variable is comprised of the following:
       ${:term:`PN`}-${:term:`EXTENDPE`}${:term:`PV`}-${:term:`PR`}
-
-   :term:`PIP_INSTALL_ARGS`
-      When used by recipes that inherit the
-      :ref:`python_pep517 <ref-classes-python_pep517>` class,
-      denotes the arguments passed to ``pip install`` to adjust the
-      behavior of how the ``wheel`` is installed.
 
    :term:`PIXBUF_PACKAGES`
       When inheriting the :ref:`pixbufcache <ref-classes-pixbufcache>`

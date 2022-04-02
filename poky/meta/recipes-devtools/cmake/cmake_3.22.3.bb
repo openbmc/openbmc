@@ -6,6 +6,8 @@ DEPENDS += "curl expat zlib libarchive xz ncurses bzip2"
 
 SRC_URI:append:class-nativesdk = " \
     file://OEToolchainConfig.cmake \
+    file://SDKToolchainConfig.cmake.template \
+    file://cmake-setup.py \
     file://environment.d-cmake.sh \
     file://0001-CMakeDetermineSystem-use-oe-environment-vars-to-load.patch \
 "
@@ -42,6 +44,11 @@ do_install:append:class-nativesdk() {
 
     mkdir -p ${D}${SDKPATHNATIVE}/environment-setup.d
     install -m 644 ${WORKDIR}/environment.d-cmake.sh ${D}${SDKPATHNATIVE}/environment-setup.d/cmake.sh
+
+    # install cmake-setup.py to create arch-specific toolchain cmake file from template
+    install -m 0644 ${WORKDIR}/SDKToolchainConfig.cmake.template ${D}${datadir}/cmake/
+    install -d ${D}${SDKPATHNATIVE}/post-relocate-setup.d
+    install -m 0755 ${WORKDIR}/cmake-setup.py ${D}${SDKPATHNATIVE}/post-relocate-setup.d/
 }
 
 FILES:${PN}:append:class-nativesdk = " ${SDKPATHNATIVE}"

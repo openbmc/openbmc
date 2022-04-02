@@ -3,7 +3,7 @@ HOMEPAGE = "https://github.com/fedora-sysv/initscripts"
 DESCRIPTION = "Initscripts provide the basic system startup initialization scripts for the system.  These scripts include actions such as filesystem mounting, fsck, RTC manipulation and other actions routinely performed at system startup.  In addition, the scripts are also used during system shutdown to reverse the actions performed at startup."
 SECTION = "base"
 LICENSE = "GPL-2.0-only"
-LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
+LIC_FILES_CHKSUM = "file://functions;beginline=7;endline=7;md5=829e563511c9a1d6d41f17a7a4989d6a"
 PR = "r155"
 
 INHIBIT_DEFAULT_DEPS = "1"
@@ -31,7 +31,6 @@ SRC_URI = "file://functions \
            file://read-only-rootfs-hook.sh \
            file://volatiles \
            file://save-rtc.sh \
-           file://GPLv2.patch \
            file://dmesg.sh \
            file://logrotate-dmesg.conf \
            ${@bb.utils.contains('DISTRO_FEATURES','selinux','file://sushell','',d)} \

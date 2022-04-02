@@ -281,7 +281,7 @@ The following changes have been made for the Poky distribution:
    using the Poky distribution can easily include to enable the same
    functionality.
 
-   Any recipe that needs to opt-out of having the "--disable-static"
+   Any recipe that needs to opt-out of having the ``--disable-static``
    option specified on the configure command line either because it is
    not a supported option for the configure script or because static
    libraries are needed should set the following variable::
@@ -384,9 +384,9 @@ These additional changes exist:
 -  The
    :ref:`devtool modify <sdk-manual/extensible:use \`\`devtool modify\`\` to modify the source of an existing component>`
    command now defaults to extracting the source since that is most
-   commonly expected. The "-x" or "--extract" options are now no-ops. If
+   commonly expected. The ``-x`` or ``--extract`` options are now no-ops. If
    you wish to provide your own existing source tree, you will now need
-   to specify either the "-n" or "--no-extract" options when running
+   to specify either the ``-n`` or ``--no-extract`` options when running
    ``devtool modify``.
 
 -  If the formfactor for a machine is either not supplied or does not

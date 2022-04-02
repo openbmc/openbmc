@@ -5,8 +5,10 @@ and should run on all Linux systems that need error handling."
 HOMEPAGE = "https://mcelog.org/"
 SECTION = "System Environment/Base"
 
-SRC_URI = "git://git.kernel.org/pub/scm/utils/cpu/mce/mcelog.git;protocol=http;;branch=master \
+SRC_URI = "\
+    git://git.kernel.org/pub/scm/utils/cpu/mce/mcelog.git;protocol=http;;branch=master \
     file://run-ptest \
+    file://0001-genconfig.py-update-shebang.patch \
 "
 
 SRCREV = "4146c9296a0cbd26f1c5e411cb44877f350053bd"

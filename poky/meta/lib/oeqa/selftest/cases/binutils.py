@@ -1,12 +1,9 @@
 # SPDX-License-Identifier: MIT
 import os
-import sys
-import re
-import logging
 from oeqa.core.decorator import OETestTag
 from oeqa.core.case import OEPTestResultTestCase
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import bitbake, get_bb_var, get_bb_vars
+from oeqa.utils.commands import bitbake, get_bb_vars
 
 def parse_values(content):
     for i in content:

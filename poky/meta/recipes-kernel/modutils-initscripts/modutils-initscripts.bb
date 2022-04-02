@@ -1,9 +1,8 @@
 SUMMARY = "Initscript for auto-loading kernel modules on boot"
 SECTION = "base"
-LICENSE = "PD"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=7bf87fc37976e93ec66ad84fac58c098"
-SRC_URI = "file://modutils.sh \
-	   file://PD.patch"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://modutils.sh;beginline=3;endline=3;md5=b2dccaa94b3629a08bfb4f983cad6f89"
+SRC_URI = "file://modutils.sh"
 
 PR = "r7"
 

@@ -1,0 +1,22 @@
+Add back default user options for cross build.
+
+Upstream-Status: Pending [oe specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index a215da7..dccfeb3 100644
+--- a/setup.py
++++ b/setup.py
+@@ -105,7 +105,7 @@ class wx_build(orig_build):
+     Delegate to build.py for doing the actual build, (including wxWidgets)
+     instead of letting distutils do it all.
+     """
+-    user_options = [
++    user_options = orig_build.user_options + [
+         ('skip-build', None, 'skip building the C/C++ code (assumes it has already been done)'),
+         ]
+     boolean_options = ['skip-build']

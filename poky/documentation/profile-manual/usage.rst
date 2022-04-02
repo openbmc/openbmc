@@ -171,7 +171,7 @@ understand what's going on in a way that we can act on in a useful way.
 
 To dive down into a next level of detail, we can use 'perf record'/'perf
 report' which will collect profiling data and present it to use using an
-interactive text-based UI (or simply as text if we specify --stdio to
+interactive text-based UI (or simply as text if we specify ``--stdio`` to
 'perf report').
 
 As our first attempt at profiling this workload, we'll simply run 'perf

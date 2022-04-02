@@ -8,7 +8,7 @@ import os
 import glob
 import time
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars
+from oeqa.utils.commands import runCmd, bitbake, get_bb_vars
 
 class oeSDKExtSelfTest(OESelftestTestCase):
     """

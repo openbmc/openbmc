@@ -4,7 +4,6 @@
 
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake, get_bb_vars, get_bb_var, runqemu
-import stat
 import subprocess, os
 import oe.path
 import re

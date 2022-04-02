@@ -3,6 +3,7 @@
 #
 
 from oeqa.selftest.case import OESelftestTestCase
+from oeqa.core.decorator import OETestTag
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var, runqemu
 from oeqa.utils.sshcontrol import SSHControl
 import glob
@@ -14,6 +15,7 @@ class ImageFeatures(OESelftestTestCase):
     test_user = 'tester'
     root_user = 'root'
 
+    @OETestTag("runqemu")
     def test_non_root_user_can_connect_via_ssh_without_password(self):
         """
         Summary: Check if non root user can connect via ssh without password
@@ -39,6 +41,7 @@ class ImageFeatures(OESelftestTestCase):
                 status, output = ssh.run("true")
                 self.assertEqual(status, 0, 'ssh to user %s failed with %s' % (user, output))
 
+    @OETestTag("runqemu")
     def test_all_users_can_connect_via_ssh_without_password(self):
         """
         Summary:     Check if all users can connect via ssh without password

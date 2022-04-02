@@ -9,10 +9,10 @@ import tempfile
 import glob
 import fnmatch
 
-import oeqa.utils.ftools as ftools
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var, create_temp_layer
 from oeqa.utils.commands import get_bb_vars, runqemu, get_test_layer
+from oeqa.core.decorator import OETestTag
 
 oldmetapath = None
 
@@ -1351,6 +1351,7 @@ class DevtoolExtractTests(DevtoolBase):
         matches2 = glob.glob(stampprefix2 + '*')
         self.assertFalse(matches2, 'Stamp files exist for recipe %s that should have been cleaned' % testrecipe2)
 
+    @OETestTag("runqemu")
     def test_devtool_deploy_target(self):
         # NOTE: Whilst this test would seemingly be better placed as a runtime test,
         # unfortunately the runtime tests run under bitbake and you can't run
@@ -1470,6 +1471,14 @@ class DevtoolExtractTests(DevtoolBase):
             self.fail('The following packages were not present in the image as expected: %s' % ', '.join(reqpkgs))
 
 class DevtoolUpgradeTests(DevtoolBase):
+
+    def setUp(self):
+        super().setUp()
+        try:
+            runCmd("git config --global user.name")
+            runCmd("git config --global user.email")
+        except:
+            self.skip("Git user.name and user.email must be set")
 
     def test_devtool_upgrade(self):
         # Check preconditions
@@ -1866,8 +1875,9 @@ class DevtoolUpgradeTests(DevtoolBase):
          Expected:       devtool modify is able to checkout the source of the kernel
                          and modification to the source and configurations are reflected
                          when building the kernel.
-         """
-        kernel_provider = get_bb_var('PREFERRED_PROVIDER_virtual/kernel')
+        """
+        kernel_provider = self.td['PREFERRED_PROVIDER_virtual/kernel']
+
         # Clean up the environment
         bitbake('%s -c clean' % kernel_provider)
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
@@ -1894,33 +1904,28 @@ class DevtoolUpgradeTests(DevtoolBase):
         self.assertExists(os.path.join(tempdir, 'Makefile'), 'Extracted source could not be found')
         #Step 4.2
         configfile = os.path.join(tempdir,'.config')
-        diff = runCmd('diff %s %s' % (tmpconfig, configfile))
-        self.assertEqual(0,diff.status,'Kernel .config file is not the same using bitbake and devtool')
+        runCmd('diff %s %s' % (tmpconfig, configfile))
+
         #Step 4.3
         #NOTE: virtual/kernel is mapped to kernel_provider
-        result = runCmd('devtool build %s' % kernel_provider)
-        self.assertEqual(0,result.status,'Cannot build kernel using `devtool build`')
+        runCmd('devtool build %s' % kernel_provider)
         kernelfile = os.path.join(get_bb_var('KBUILD_OUTPUT', kernel_provider), 'vmlinux')
         self.assertExists(kernelfile, 'Kernel was not build correctly')
 
         #Modify the kernel source
-        modfile = os.path.join(tempdir,'arch/x86/boot/header.S')
-        modstring = "Use a boot loader. Devtool testing."
-        modapplied = runCmd("sed -i 's/Use a boot loader./%s/' %s" % (modstring, modfile))
-        self.assertEqual(0,modapplied.status,'Modification to %s on kernel source failed' % modfile)
+        modfile = os.path.join(tempdir, 'init/version.c')
+        runCmd("sed -i 's/Linux/LiNuX/g' %s" % (modfile))
+
         #Modify the configuration
-        codeconfigfile = os.path.join(tempdir,'.config.new')
+        codeconfigfile = os.path.join(tempdir, '.config.new')
         modconfopt = "CONFIG_SG_POOL=n"
-        modconf = runCmd("sed -i 's/CONFIG_SG_POOL=y/%s/' %s" % (modconfopt, codeconfigfile))
-        self.assertEqual(0,modconf.status,'Modification to %s failed' % codeconfigfile)
+        runCmd("sed -i 's/CONFIG_SG_POOL=y/%s/' %s" % (modconfopt, codeconfigfile))
+
         #Build again kernel with devtool
-        rebuild = runCmd('devtool build %s' % kernel_provider)
-        self.assertEqual(0,rebuild.status,'Fail to build kernel after modification of source and config')
+        runCmd('devtool build %s' % kernel_provider)
+
         #Step 4.4
-        bzimagename = 'bzImage-' + get_bb_var('KERNEL_VERSION_NAME', kernel_provider)
-        bzimagefile = os.path.join(get_bb_var('D', kernel_provider),'boot', bzimagename)
-        checkmodcode = runCmd("grep '%s' %s" % (modstring, bzimagefile))
-        self.assertEqual(0,checkmodcode.status,'Modification on kernel source failed')
+        runCmd("grep '%s' %s" % ('LiNuX', kernelfile))
+
         #Step 4.5
-        checkmodconfg = runCmd("grep %s %s" % (modconfopt, codeconfigfile))
-        self.assertEqual(0,checkmodconfg.status,'Modification to configuration file failed')
+        runCmd("grep %s %s" % (modconfopt, codeconfigfile))

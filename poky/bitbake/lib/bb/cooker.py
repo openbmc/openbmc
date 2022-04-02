@@ -159,6 +159,9 @@ class BBCooker:
             for f in featureSet:
                 self.featureset.setFeature(f)
 
+        self.orig_syspath = sys.path.copy()
+        self.orig_sysmodules = [*sys.modules]
+
         self.configuration = bb.cookerdata.CookerConfiguration()
 
         self.idleCallBackRegister = idleCallBackRegister
@@ -254,9 +257,14 @@ class BBCooker:
         if not event.pathname in self.configwatcher.bbwatchedfiles:
             return
         if "IN_ISDIR" in event.maskname:
+            if "IN_CREATE" in event.maskname or "IN_DELETE" in event.maskname:
+                if event.pathname in self.configwatcher.bbseen:
+                    self.configwatcher.bbseen.remove(event.pathname)
+                # Could remove all entries starting with the directory but for now...
+                bb.parse.clear_cache()
             if "IN_CREATE" in event.maskname:
                 self.add_filewatch([[event.pathname]], watcher=self.configwatcher, dirs=True)
-            elif "IN_DELETE" in event.maskname and event.pathname in self.watcher.bbseen:
+            elif "IN_DELETE" in event.maskname and event.pathname in self.configwatcher.bbseen:
                 self.configwatcher.bbseen.remove(event.pathname)
         if not event.pathname in self.inotify_modified_files:
             self.inotify_modified_files.append(event.pathname)
@@ -272,6 +280,11 @@ class BBCooker:
                 or event.pathname.endswith("bitbake.lock"):
             return
         if "IN_ISDIR" in event.maskname:
+            if "IN_CREATE" in event.maskname or "IN_DELETE" in event.maskname:
+                if event.pathname in self.watcher.bbseen:
+                    self.watcher.bbseen.remove(event.pathname)
+                # Could remove all entries starting with the directory but for now...
+                bb.parse.clear_cache()
             if "IN_CREATE" in event.maskname:
                 self.add_filewatch([[event.pathname]], dirs=True)
             elif "IN_DELETE" in event.maskname and event.pathname in self.watcher.bbseen:
@@ -339,6 +352,11 @@ class BBCooker:
 
         self.state = state.initial
         self.caches_array = []
+
+        sys.path = self.orig_syspath.copy()
+        for mod in [*sys.modules]:
+            if mod not in self.orig_sysmodules:
+                del sys.modules[mod]
 
         # Need to preserve BB_CONSOLELOG over resets
         consolelog = None
@@ -1727,7 +1745,8 @@ class BBCooker:
     def post_serve(self):
         self.shutdown(force=True)
         prserv.serv.auto_shutdown()
-        bb.parse.siggen.exit()
+        if hasattr(bb.parse, "siggen"):
+            bb.parse.siggen.exit()
         if self.hashserv:
             self.hashserv.process.terminate()
             self.hashserv.process.join()
@@ -1748,6 +1767,8 @@ class BBCooker:
         self.state = state.initial
 
     def reset(self):
+        if hasattr(bb.parse, "siggen"):
+            bb.parse.siggen.exit()
         self.initConfigurationData()
         self.handlePRServ()
 

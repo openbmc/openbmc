@@ -11,7 +11,7 @@ do_compile:prepend() {
     rm -rf ${S}/evdev/ecodes.c
 }
 
-DISTUTILS_BUILD_ARGS = "build_ecodes --evdev-headers ${STAGING_DIR_TARGET}/usr/include/linux/input.h:${STAGING_DIR_TARGET}/usr/include/linux/input-event-codes.h"
+SETUPTOOLS_BUILD_ARGS = "build_ecodes --evdev-headers ${STAGING_DIR_TARGET}/usr/include/linux/input.h:${STAGING_DIR_TARGET}/usr/include/linux/input-event-codes.h"
 
 RDEPENDS:${PN} += "\
     ${PYTHON_PN}-ctypes \

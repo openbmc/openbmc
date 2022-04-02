@@ -14,7 +14,6 @@ DEPENDS = " \
     gnome-autoar \
     tracker \
     libhandy \
-    libportal \
 "
 
 inherit gnomebase gsettings gobject-introspection gtk-doc gettext features_check mime-xdg
@@ -32,6 +31,7 @@ EXTRA_OEMESON += " \
 
 PACKAGECONFIG = "extensions"
 PACKAGECONFIG[extensions] = "-Dextensions=true,-Dextensions=false, gexiv2 gstreamer1.0-plugins-base"
+PACKAGECONFIG[libportal] = "-Dlibportal=true,-Dlibportal=false, libportal"
 
 FILES:${PN} += " \
     ${datadir}/dbus-1 \

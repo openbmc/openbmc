@@ -1,0 +1,33 @@
+From b09ff147e9383d33e6adbcb356b52236610fceda Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Fri, 1 Apr 2022 10:00:00 +0800
+Subject: [PATCH] genconfig.py: update shebang
+
+It fails to call genconfig.py if no /usr/bin/python on build machine:
+
+| ./genconfig.py mcelog.conf config-intro.man > mcelog.conf.5
+| /bin/sh: ./genconfig.py: /usr/bin/python: bad interpreter: No such file or directory
+| Makefile:71: recipe for target 'mcelog.conf.5' failed
+
+Update shebang with 'env python3' instead.
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ genconfig.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/genconfig.py b/genconfig.py
+index ce9987f..982cac6 100755
+--- a/genconfig.py
++++ b/genconfig.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # generate man config documentation from mcelog.conf example
+ # genconfig.py mcelog.conf intro.html
+ from __future__ import print_function
+-- 
+2.17.1
+

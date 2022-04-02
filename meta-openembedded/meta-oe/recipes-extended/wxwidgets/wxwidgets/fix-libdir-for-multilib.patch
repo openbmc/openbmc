@@ -12,10 +12,10 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  4 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index e30d3db934..8f93c57108 100644
+index 4063020552..253d415210 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -37,7 +37,7 @@ include(build/cmake/policies.cmake NO_POLICY_SCOPE)
+@@ -43,7 +43,7 @@ include(build/cmake/policies.cmake NO_POLICY_SCOPE)
  # Initialize variables for quick access to wx root dir in sub dirs
  set(wxSOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
  set(wxBINARY_DIR ${CMAKE_BINARY_DIR})
@@ -25,10 +25,10 @@ index e30d3db934..8f93c57108 100644
  # parse the version number from wx/version.h and include in wxMAJOR_VERSION and wxMINOR_VERSION
  file(READ include/wx/version.h WX_VERSION_H_CONTENTS)
 diff --git a/build/cmake/config.cmake b/build/cmake/config.cmake
-index 6978cc2725..ed16ee5635 100644
+index 91d11acba2..f361d50a27 100644
 --- a/build/cmake/config.cmake
 +++ b/build/cmake/config.cmake
-@@ -52,7 +52,7 @@ function(wx_write_config_inplace)
+@@ -57,7 +57,7 @@ function(wx_write_config_inplace)
      execute_process(
          COMMAND
          ${CMAKE_COMMAND} -E create_symlink
@@ -53,7 +53,7 @@ index c33dd3946c..51e47e05b3 100644
 +        RUNTIME_OUTPUT_DIRECTORY "${wxOUTPUT_DIR}"
          )
  
-     if(MSVC)
+     if(wxBUILD_PIC)
 diff --git a/build/cmake/install.cmake b/build/cmake/install.cmake
 index 968dff859e..c850c51844 100644
 --- a/build/cmake/install.cmake

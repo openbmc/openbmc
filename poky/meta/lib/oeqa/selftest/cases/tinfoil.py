@@ -9,7 +9,6 @@ import logging
 import bb.tinfoil
 
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import runCmd
 
 class TinfoilTests(OESelftestTestCase):
     """ Basic tests for the tinfoil API """

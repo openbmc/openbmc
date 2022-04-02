@@ -1,4 +1,8 @@
 #!/bin/sh
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 ### BEGIN INIT INFO
 # Provides:          bootmisc
 # Required-Start:    $local_fs mountvirtfs

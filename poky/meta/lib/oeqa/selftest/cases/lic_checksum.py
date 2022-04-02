@@ -7,7 +7,6 @@ import tempfile
 
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake
-from oeqa.utils import CommandError
 
 class LicenseTests(OESelftestTestCase):
 

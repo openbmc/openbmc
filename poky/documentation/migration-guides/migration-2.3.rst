@@ -370,7 +370,7 @@ The following changes have been made to Wic:
    now the current directory by default instead of the unusual
    ``/var/tmp/wic``.
 
-   The "-o" and "--outdir" options remain unchanged and are used to
+   The ``-o`` and ``--outdir`` options remain unchanged and are used to
    specify your preferred output directory if you do not want to use the
    default directory.
 

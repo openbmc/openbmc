@@ -602,22 +602,6 @@ variables are not met, the recipe will be skipped, and if the
 build system attempts to build the recipe then an error will be
 triggered.
 
-.. _ref-classes-flit_core:
-
-``flit_core.bbclass``
-=====================
-
-The ``flit_core`` class enables building Python modules which declare
-the  `PEP-517 <https://www.python.org/dev/peps/pep-0517/>`__ compliant
-``flit_core.buildapi`` ``build-backend`` in the ``[build-system]``
-section of ``pyproject.toml`` (See `PEP-518 <https://www.python.org/dev/peps/pep-0518/>`__).
-
-Python modules built with ``flit_core.buildapi`` are pure Python (no
-``C`` or ``Rust`` extensions).
-
-The resulting ``wheel`` (See `PEP-427 <https://www.python.org/dev/peps/pep-0427/>`__)
-is installed with the :ref:`python_pep517 <ref-classes-python_pep517>` class.
-
 .. _ref-classes-fontcache:
 
 ``fontcache.bbclass``
@@ -1978,20 +1962,48 @@ When inherited by a recipe, the ``perlnative`` class supports using the
 native version of Perl built by the build system rather than using the
 version provided by the build host.
 
+.. _ref-classes-python_flit_core:
+
+``python_flit_core.bbclass``
+============================
+
+The ``python_flit_core`` class enables building Python modules which declare
+the  `PEP-517 <https://www.python.org/dev/peps/pep-0517/>`__ compliant
+``flit_core.buildapi`` ``build-backend`` in the ``[build-system]``
+section of ``pyproject.toml`` (See `PEP-518 <https://www.python.org/dev/peps/pep-0518/>`__).
+
+Python modules built with ``flit_core.buildapi`` are pure Python (no
+``C`` or ``Rust`` extensions).
+
+Internally this uses the :ref:`python_pep517 <ref-classes-python_pep517>` class.
+
 .. _ref-classes-python_pep517:
 
 ``python_pep517.bbclass``
-=============================
+=========================
 
-The ``python_pep517`` class installs a Python ``wheel`` binary archive (see
-`PEP-517 <https://peps.python.org/pep-0517/>`__).
+The ``python_pep517`` class builds and installs a Python ``wheel`` binary
+archive (see `PEP-517 <https://peps.python.org/pep-0517/>`__).
 
-The Python ``wheel`` can be built with several classes, including :ref:`flit_core <ref-classes-flit_core>`,
-:ref:`setuptools_build_meta <ref-classes-setuptools_build_meta>`, and :ref:`setuptools3 <ref-classes-setuptools3>`.
+Recipes wouldn't inherit this directly, instead typically another class will
+inherit this, add the relevant native dependencies, and set
+:term:`PEP517_BUILD_API` to the Python class which implements the PEP-517 build
+API.
 
-The path to the wheel to be installed is defined by :term:`PEP517_WHEEL_PATH`.
-This defaults to ``${D}/dist`` and should be respected by the builder class
-(such as :ref:`flit_core <ref-classes-flit_core>`).
+Examples of classes which do this are :ref:`python_flit_core
+<ref-classes-python_flit_core>`, :ref:`python_setuptools_build_meta
+<ref-classes-python_setuptools_build_meta>`, and :ref:`python_poetry_core
+<ref-classes-python_poetry_core>`.
+
+.. _ref-classes-python_poetry_core:
+
+``python_poetry_core.bbclass``
+==============================
+
+The ``python_poetry_core`` class enables building Python modules which use the
+`Poetry Core <https://python-poetry.org>`__ build system.
+
+Internally this uses the :ref:`python_pep517 <ref-classes-python_pep517>` class.
 
 .. _ref-classes-pixbufcache:
 
@@ -2348,12 +2360,12 @@ additional configuration options you want to pass SCons command line.
 The ``sdl`` class supports recipes that need to build software that uses
 the Simple DirectMedia Layer (SDL) library.
 
-.. _ref-classes-setuptools_build_meta:
+.. _ref-classes-python_setuptools_build_meta:
 
-``setuptools_build_meta.bbclass``
-=================================
+``python_setuptools_build_meta.bbclass``
+========================================
 
-The ``setuptools_build_meta`` class enables building Python modules which
+The ``python_setuptools_build_meta`` class enables building Python modules which
 declare the
 `PEP-517 <https://www.python.org/dev/peps/pep-0517/>`__ compliant
 ``setuptools.build_meta`` ``build-backend`` in the ``[build-system]``
@@ -2362,8 +2374,7 @@ section of ``pyproject.toml`` (See `PEP-518 <https://www.python.org/dev/peps/pep
 Python modules built with ``setuptools.build_meta`` can be pure Python or
 include ``C`` or ``Rust`` extensions).
 
-The resulting ``wheel`` (See `PEP-427 <https://www.python.org/dev/peps/pep-0427/>`__)
-is installed with the :ref:`python_pep517 <ref-classes-python_pep517>` class.
+Internally this uses the :ref:`python_pep517 <ref-classes-python_pep517>` class.
 
 .. _ref-classes-setuptools3:
 

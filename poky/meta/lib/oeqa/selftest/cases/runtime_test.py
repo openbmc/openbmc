@@ -4,16 +4,15 @@
 
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars, runqemu
-from oeqa.utils.sshcontrol import SSHControl
+from oeqa.core.decorator import OETestTag
 import os
-import re
 import tempfile
-import shutil
 import oe.lsb
 from oeqa.core.decorator.data import skipIfNotQemu
 
 class TestExport(OESelftestTestCase):
 
+    @OETestTag("runqemu")
     def test_testexport_basic(self):
         """
         Summary: Check basic testexport functionality with only ping test enabled.
@@ -106,6 +105,7 @@ class TestExport(OESelftestTestCase):
             self.assertEqual(0, result.status, "Couldn't run tar from SDK")
 
 
+@OETestTag("runqemu")
 class TestImage(OESelftestTestCase):
 
     def test_testimage_install(self):
@@ -240,6 +240,7 @@ class TestImage(OESelftestTestCase):
         bitbake('core-image-minimal')
         bitbake('-c testimage core-image-minimal')
 
+@OETestTag("runqemu")
 class Postinst(OESelftestTestCase):
 
     def init_manager_loop(self, init_manager):
@@ -280,7 +281,7 @@ class Postinst(OESelftestTestCase):
 
 
 
-    @skipIfNotQemu('qemuall', 'Test only runs in qemu')
+    @skipIfNotQemu()
     def test_postinst_rootfs_and_boot_sysvinit(self):
         """
         Summary:        The purpose of this test case is to verify Post-installation
@@ -301,7 +302,7 @@ class Postinst(OESelftestTestCase):
         self.init_manager_loop("sysvinit")
 
 
-    @skipIfNotQemu('qemuall', 'Test only runs in qemu')
+    @skipIfNotQemu()
     def test_postinst_rootfs_and_boot_systemd(self):
         """
         Summary:        The purpose of this test case is to verify Post-installation
@@ -357,6 +358,7 @@ class Postinst(OESelftestTestCase):
                 self.assertFalse(os.path.isfile(os.path.join(hosttestdir, "rootfs-after-failure")),
                                     "rootfs-after-failure file was created")
 
+@OETestTag("runqemu")
 class SystemTap(OESelftestTestCase):
         """
         Summary:        The purpose of this test case is to verify native crosstap
@@ -433,4 +435,3 @@ IMAGE_INSTALL:append = " systemtap-runtime"
                 cmd = "crosstap -r root@192.168.7.2 -s %s/process/ syscalls_by_pid.stp" % systemtap_examples
                 result = runCmd(cmd)
                 self.assertEqual(0, result.status, 'crosstap  syscalls_by_pid returned a non 0 status:%s' % result.output)
-

@@ -3,7 +3,8 @@
 #
 
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import runCmd, bitbake, get_bb_var, runqemu
+from oeqa.utils.commands import bitbake, runqemu
+from oeqa.core.decorator import OETestTag
 
 def getline_qemu(out, line):
     for l in out.split('\n'):
@@ -185,6 +186,7 @@ EOT
             line = getline_qemu(output, "upperdir=/mnt/overlay/upper/usr/share/another-overlay-mount")
             self.assertTrue(line and line.startswith("overlay"), msg=output)
 
+    @OETestTag("runqemu")
     def test_correct_image_fstab(self):
         """
         Summary:   Check that we can create an image when all parameters are
@@ -203,6 +205,7 @@ EOT
 
         self._test_correct_image('base-files', base_files_append)
 
+    @OETestTag("runqemu")
     def test_correct_image_unit(self):
         """
         Summary:   Check that we can create an image when all parameters are
@@ -238,6 +241,7 @@ EOT
 
         self._test_correct_image('systemd-machine-units', systemd_machine_unit_append)
 
+@OETestTag("runqemu")
 class OverlayFSEtcRunTimeTests(OESelftestTestCase):
     """overlayfs-etc class tests"""
 

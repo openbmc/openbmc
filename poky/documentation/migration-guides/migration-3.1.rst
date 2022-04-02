@@ -260,7 +260,7 @@ Miscellaneous changes
 ---------------------
 
 -  The undocumented ``SRC_DISTRIBUTE_LICENSES`` variable has now been
-   removed in favour of a new :term:`AVAILABLE_LICENSES` variable which is
+   removed in favour of a new ``AVAILABLE_LICENSES`` variable which is
    dynamically set based upon license files found in
    ``${COMMON_LICENSE_DIR}`` and ``${LICENSE_PATH}``.
 

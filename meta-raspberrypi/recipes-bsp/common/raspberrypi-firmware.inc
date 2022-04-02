@@ -1,9 +1,9 @@
-RPIFW_DATE ?= "20211007"
+RPIFW_DATE ?= "20220328"
 
 RPIFW_SRC_URI ?= "https://archive.raspberrypi.com/debian/pool/main/r/raspberrypi-firmware/raspberrypi-firmware_1.${RPIFW_DATE}.orig.tar.xz"
 RPIFW_S ?= "${WORKDIR}/raspberrypi-firmware-1.${RPIFW_DATE}"
 
 SRC_URI = "${RPIFW_SRC_URI}"
-SRC_URI[sha256sum] = "cb08f4679ab9928f89b2b73bbd92dace84dd692e1e1722f373eebd350f0c058f"
+SRC_URI[sha256sum] = "8ab5949b9da1e2a2da18acc203946698737efe3e5d98286dcb7a8b0d0e92564e"
 
 PV = "${RPIFW_DATE}"

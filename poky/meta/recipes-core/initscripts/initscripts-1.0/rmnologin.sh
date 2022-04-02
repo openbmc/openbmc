@@ -1,4 +1,8 @@
 #!/bin/sh
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 ### BEGIN INIT INFO
 # Provides:          rmnologin
 # Required-Start:    $remote_fs $all

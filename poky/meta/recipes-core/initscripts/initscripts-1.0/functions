@@ -3,6 +3,9 @@
 # functions     This file contains functions to be used by most or all
 #               shell scripts in the /etc/init.d directory.
 #
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 
 NORMAL="\\033[0;39m"         # Standard console grey
 SUCCESS="\\033[1;32m"        # Success is green

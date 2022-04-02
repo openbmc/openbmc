@@ -60,8 +60,8 @@ New Features / Enhancements in 3.4
 -  wic enhancements:
 
    -  Added erofs filesystem support
-   -  Added --extra-space argument to leave extra space after last partition
-   -  Added --no-fstab-update part option to allow using the stock fstab
+   -  Added ``--extra-space argument`` to leave extra space after last partition
+   -  Added ``--no-fstab-update`` part option to allow using the stock fstab
    -  bootimg-efi: added Unified Kernel Image option
    -  bootimg-pcbios: use label provided when formatting a DOS partition
 
@@ -75,7 +75,7 @@ New Features / Enhancements in 3.4
 -  BitBake enhancements:
 
    -  New bitbake-getvar helper command to query a variable value (with history)
-   -  bitbake-layers: layerindex-fetch: add --fetchdir parameter
+   -  bitbake-layers: layerindex-fetch: add ``--fetchdir`` parameter
    -  bitbake-layers: show-recipes: add skip reason to output
    -  bitbake-diffsigs: sort diff output for consistency
    -  Allow setting upstream for local hash equivalence server

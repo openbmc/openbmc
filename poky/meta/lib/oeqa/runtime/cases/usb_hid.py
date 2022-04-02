@@ -14,7 +14,7 @@ class USB_HID_Test(OERuntimeTestCase):
         return self.assertEqual(status, 0,  msg = 'Failed to suspends your system to RAM, output : %s' % output)
     
     @OEHasPackage(['xdotool'])
-    @skipIfQemu('qemuall', 'Test only runs on real hardware')
+    @skipIfQemu()
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     def test_USB_Hid_input(self):
         self.keyboard_mouse_simulation()

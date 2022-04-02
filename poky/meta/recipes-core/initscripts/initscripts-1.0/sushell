@@ -1,4 +1,7 @@
 #!/bin/sh
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 
 [ -z "$SUSHELL" ] && SUSHELL=/bin/sh
 

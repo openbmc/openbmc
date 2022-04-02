@@ -8,7 +8,7 @@ import importlib
 import unittest
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.selftest.cases.buildhistory import BuildhistoryBase
-from oeqa.utils.commands import Command, runCmd, bitbake, get_bb_var, get_test_layer
+from oeqa.utils.commands import runCmd, bitbake, get_bb_var
 from oeqa.utils import CommandError
 
 class BuildhistoryDiffTests(BuildhistoryBase):
@@ -34,20 +34,18 @@ class BuildhistoryDiffTests(BuildhistoryBase):
         if expected_endlines:
             self.fail('Missing expected line endings:\n  %s' % '\n  '.join(expected_endlines))
 
-@unittest.skipUnless(importlib.util.find_spec("cairo"), "Python cairo module is not present")
 class OEScriptTests(OESelftestTestCase):
+    scripts_dir = os.path.join(get_bb_var('COREBASE'), 'scripts')
+
+@unittest.skipUnless(importlib.util.find_spec("cairo"), "Python cairo module is not present")
+class OEPybootchartguyTests(OEScriptTests):
 
     @classmethod
     def setUpClass(cls):
         super(OEScriptTests, cls).setUpClass()
-        import cairo
         bitbake("core-image-minimal -c rootfs -f")
         cls.tmpdir = get_bb_var('TMPDIR')
         cls.buildstats = cls.tmpdir + "/buildstats/" + sorted(os.listdir(cls.tmpdir + "/buildstats"))[-1]
-
-    scripts_dir = os.path.join(get_bb_var('COREBASE'), 'scripts')
-
-class OEPybootchartguyTests(OEScriptTests):
 
     def test_pybootchartguy_help(self):
         runCmd('%s/pybootchartgui/pybootchartgui.py  --help' % self.scripts_dir)
@@ -65,9 +63,7 @@ class OEPybootchartguyTests(OEScriptTests):
         self.assertTrue(os.path.exists(self.tmpdir + "/charts.pdf"))
 
 
-class OEGitproxyTests(OESelftestTestCase):
-
-    scripts_dir = os.path.join(get_bb_var('COREBASE'), 'scripts')
+class OEGitproxyTests(OEScriptTests):
 
     def test_oegitproxy_help(self):
         try:

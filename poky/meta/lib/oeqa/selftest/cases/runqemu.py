@@ -12,6 +12,7 @@ from oeqa.core.decorator import OETestTag
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake, runqemu, get_bb_var, runCmd
 
+@OETestTag("runqemu")
 class RunqemuTests(OESelftestTestCase):
     """Runqemu test class"""
 
@@ -149,6 +150,7 @@ SYSLINUX_TIMEOUT = "10"
 # bootup various filesystem types, including live image(iso and hddimg)
 # where live image was not supported on all qemu architecture.
 @OETestTag("machine")
+@OETestTag("runqemu")
 class QemuTest(OESelftestTestCase):
 
     @classmethod

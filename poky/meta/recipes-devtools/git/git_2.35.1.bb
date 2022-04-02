@@ -3,7 +3,7 @@ HOMEPAGE = "http://git-scm.com"
 DESCRIPTION = "Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency."
 SECTION = "console/utils"
 LICENSE = "GPL-2.0-only"
-DEPENDS = "openssl curl zlib expat"
+DEPENDS = "openssl zlib"
 
 PROVIDES:append:class-native = " git-replacement-native"
 
@@ -18,10 +18,12 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=7c0d7ef03a7eb04ce795b0f60e68e7e1"
 
 CVE_PRODUCT = "git-scm:git"
 
-PACKAGECONFIG ??= ""
+PACKAGECONFIG ??= "expat curl"
 PACKAGECONFIG[cvsserver] = ""
 PACKAGECONFIG[svn] = ""
 PACKAGECONFIG[manpages] = ",,asciidoc-native xmlto-native"
+PACKAGECONFIG[curl] = "--with-curl,--without-curl,curl"
+PACKAGECONFIG[expat] = "--with-expat,--without-expat,expat"
 
 EXTRA_OECONF = "--with-perl=${STAGING_BINDIR_NATIVE}/perl-native/perl \
 		--without-tcltk \

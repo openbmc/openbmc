@@ -7,13 +7,12 @@ TOOLCHAIN_TARGET_TASK ?= ""
 
 TOOLCHAIN_HOST_TASK ?= "\
     nativesdk-sdk-provides-dummy \
-    nativesdk-python3-core \
-    nativesdk-python3-modules \
-    nativesdk-python3-misc \
+    nativesdk-python3 \
     nativesdk-python3-git \
     nativesdk-python3-jinja2 \
     nativesdk-python3-testtools \
     nativesdk-python3-subunit \
+    nativesdk-python3-pyyaml \
     nativesdk-ncurses-terminfo-base \
     nativesdk-chrpath \
     nativesdk-tar \

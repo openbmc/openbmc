@@ -15,6 +15,7 @@ SRC_URI = "https://github.com/mesonbuild/meson/releases/download/${PV}/meson-${P
            file://0001-Make-CPU-family-warnings-fatal.patch \
            file://0002-Support-building-allarch-recipes-again.patch \
            file://0001-is_debianlike-always-return-False.patch \
+           file://0001-Check-for-clang-before-guessing-gcc-or-lcc.patch \
            "
 SRC_URI[sha256sum] = "9c884434469471f3fe0cbbceb9b9ea0c8047f19e792940e1df6595741aae251b"
 

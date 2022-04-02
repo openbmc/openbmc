@@ -5,7 +5,7 @@ SECTION = "base"
 RDEPENDS:${PN} = "kbd"
 
 LICENSE = "GPL-2.0-only"
-LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
+LIC_FILES_CHKSUM = "file://keymap.sh;beginline=5;endline=5;md5=829e563511c9a1d6d41f17a7a4989d6a"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 PR = "r31"
 
@@ -20,8 +20,7 @@ python __anonymous() {
 
 inherit update-rc.d
 
-SRC_URI = "file://keymap.sh \
-	   file://GPLv2.patch"
+SRC_URI = "file://keymap.sh"
 
 INITSCRIPT_NAME = "keymap.sh"
 INITSCRIPT_PARAMS = "start 01 S ."
