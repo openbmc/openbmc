@@ -16,7 +16,7 @@ RDEPENDS:${PN} += "bash"
 FILES:${PN} += "${datadir}/phosphor-ipmi-flash/config-scp.json"
 FILES:${PN} += "${datadir}/phosphor-ipmi-flash/config-scpback.json"
 
-SRC_URI:append:kudo = " \
+SRC_URI += " \
     file://phosphor-ipmi-flash-scp-update.service \
     file://phosphor-ipmi-flash-scpback-update.service \
     file://config-scp.json \
@@ -24,7 +24,7 @@ SRC_URI:append:kudo = " \
     "
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE:${PN}:append:kudo = " \
+SYSTEMD_SERVICE:${PN} += " \
     phosphor-ipmi-flash-scp-update.service \
     phosphor-ipmi-flash-scpback-update.service \
     "
