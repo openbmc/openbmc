@@ -51,7 +51,7 @@ gbmc_upgrade_fetch() (
   done
 
   local sig
-  sig="$(find "$tmpdir" -name 'image-*.sig')" || return
+  sig="$(find "$tmpdir" -name 'image-*.sig' | head -n 1)" || return
   local img="${sig%.sig}"
   mv "$sig" "$GBMC_UPGRADE_SIG" || return
   mv "$img" "$GBMC_UPGRADE_IMG" || return
