@@ -46,8 +46,7 @@ gbmc_upgrade_fetch() (
     local st=(0)
     wget -q -O - "$bootfile_url" | tar -xC "$tmpdir" || st=("${PIPESTATUS[@]}")
     (( st[0] != 0 )) || break
-    shopt -s nullglob
-    rm -rf -- "${tmpdir:?}"/* "${tmpdir:?}"/.*
+    (shopt -s nullglob dotglob; rm -rf -- "${tmpdir:?}"/*)
     sleep 5
   done
 
