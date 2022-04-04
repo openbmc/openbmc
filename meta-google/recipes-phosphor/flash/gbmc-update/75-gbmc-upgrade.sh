@@ -60,13 +60,17 @@ gbmc_upgrade_fetch() (
   local imgdir="${sig%/*}"
   if [ -f "$imgdir/VERSION" ]; then
     cat "$imgdir/VERSION" || return
+    return 0
   fi
 
   # Staging packages have a directory named after the version
   local vdir="${imgdir##*/}"
   if [[ "$vdir" =~ ([0-9]+[.]){3}[0-9]+ ]]; then
     echo "$vdir"
+    return 0
   fi
+
+  return 1
 )
 
 GBMC_BR_DHCP_HOOKS+=(gbmc_upgrade_hook)
