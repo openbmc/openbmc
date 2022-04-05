@@ -90,9 +90,13 @@ EOF
     ln -s "${func_dir}" "${config_dir}" || return
 
     echo "${BIND_DEVICE}" >${gadget_dir}/UDC || return
-    # We don't care if downing the interface fails, only the rename
-    ip link set dev "$(<"${func_dir}"/ifname)" down || true
-    ip link set dev "$(<"${func_dir}"/ifname)" name "${IFACE_NAME}" || return
+    local ifname
+    ifname="$(<"${func_dir}"/ifname)" || return
+    if [ "${IFACE_NAME}" != "$ifname" ]; then
+        # We don't care if downing the interface fails, only the rename
+        ip link set dev "$ifname" down || true
+        ip link set dev "$ifname" name "${IFACE_NAME}" || return
+    fi
 }
 
 gadget_stop() {
