@@ -39,7 +39,7 @@ $0 [OPTIONS] [stop|start]
         --dev-type Type of gadget to instantiate. Default: "eem"
         --bind-device Name of the device to bind, as listed in /sys/class/udc/
         --gadget-dir-name Optional base name for gadget directory. Default: iface-name
-        --iface-name Optional name of the network interface. Default: "usb0"
+        --iface-name name of the network interface.
         --help  Print this help and exit.
 HELP
 }
@@ -133,7 +133,7 @@ HOST_MAC_ADDR=""
 BIND_DEVICE=""
 ACTION="start"
 GADGET_DIR_NAME=""
-IFACE_NAME="usb0"
+IFACE_NAME=""
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --product-id)
@@ -198,6 +198,21 @@ fi
 if [[ $ACTION == "stop" ]]; then
     gadget_stop
 else
+    if [ -z "$ID_PRODUCT" ]; then
+        echo "Product ID is missing" >&2
+        exit 1
+    fi
+
+    if [ -z "$IFACE_NAME" ]; then
+        echo "Interface name is missing" >&2
+        exit 1
+    fi
+
+    if [ -z "$BIND_DEVICE" ]; then
+        echo "Bind device is missing" >&2
+        exit 1
+    fi
+
     rc=0
     gadget_start || rc=$?
     (( rc == 0 )) || gadget_stop || true
