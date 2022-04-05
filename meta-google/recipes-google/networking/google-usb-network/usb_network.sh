@@ -38,7 +38,7 @@ $0 [OPTIONS] [stop|start]
         --dev-mac MAC address of the device (gadget) part of the connection. Optional.
         --dev-type Type of gadget to instantiate. Default: "eem"
         --bind-device Name of the device to bind, as listed in /sys/class/udc/
-        --gadget-dir-name Optional base name for gadget directory. Default: "g1"
+        --gadget-dir-name Optional base name for gadget directory. Default: iface-name
         --iface-name Optional name of the network interface. Default: "usb0"
         --help  Print this help and exit.
 HELP
@@ -132,7 +132,7 @@ DEV_TYPE="eem"
 HOST_MAC_ADDR=""
 BIND_DEVICE=""
 ACTION="start"
-GADGET_DIR_NAME="g1"
+GADGET_DIR_NAME=""
 IFACE_NAME="usb0"
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -190,6 +190,10 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+if [ -z "$GADGET_DIR_NAME" ]; then
+    GADGET_DIR_NAME="$IFACE_NAME"
+fi
 
 if [[ $ACTION == "stop" ]]; then
     gadget_stop
