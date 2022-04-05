@@ -45,20 +45,25 @@ HELP
 }
 
 gadget_start() {
-    # Add the gbmcbr configuration if this is a relevant device
-    if (( ID_VENDOR == 0x18d1 && ID_PRODUCT == 0x22b )); then
-        mkdir -p /run/systemd/network || return
-        cat >/run/systemd/network/+-bmc-"${IFACE_NAME}".network <<EOF
+    # Always provide a basic network configuration
+    mkdir -p /run/systemd/network || return
+    cat >/run/systemd/network/+-bmc-"${IFACE_NAME}".network <<EOF
 [Match]
 Name=${IFACE_NAME}
+EOF
+
+    # Add the gbmcbr configuration if this is a relevant device
+    if (( ID_VENDOR == 0x18d1 && ID_PRODUCT == 0x22b )); then
+        cat >>/run/systemd/network/+-bmc-"${IFACE_NAME}".network <<EOF
 [Network]
 Bridge=gbmcbr
 [Bridge]
 Cost=85
 EOF
-        # Ignore any failures due to systemd being unavailable at boot
-        networkctl reload || true
     fi
+
+    # Ignore any failures due to systemd being unavailable at boot
+    networkctl reload || true
 
     local gadget_dir="${CONFIGFS_HOME}/usb_gadget/${GADGET_DIR_NAME}"
     mkdir -p "${gadget_dir}" || return
