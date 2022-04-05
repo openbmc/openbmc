@@ -47,7 +47,7 @@ HELP
 gadget_start() {
     # Add the gbmcbr configuration if this is a relevant device
     if (( ID_VENDOR == 0x18d1 && ID_PRODUCT == 0x22b )); then
-        mkdir -p /run/systemd/network
+        mkdir -p /run/systemd/network || return
         cat >/run/systemd/network/+-bmc-"${IFACE_NAME}".network <<EOF
 [Match]
 Name=${IFACE_NAME}
@@ -56,41 +56,43 @@ Bridge=gbmcbr
 [Bridge]
 Cost=85
 EOF
+        # Ignore any failures due to systemd being unavailable at boot
         networkctl reload || true
     fi
 
     local gadget_dir="${CONFIGFS_HOME}/usb_gadget/${GADGET_DIR_NAME}"
-    mkdir -p "${gadget_dir}"
-    echo ${ID_VENDOR} > "${gadget_dir}/idVendor"
-    echo ${ID_PRODUCT} > "${gadget_dir}/idProduct"
+    mkdir -p "${gadget_dir}" || return
+    echo ${ID_VENDOR} > "${gadget_dir}/idVendor" || return
+    echo ${ID_PRODUCT} > "${gadget_dir}/idProduct" || return
 
     local str_en_dir="${gadget_dir}/strings/0x409"
-    mkdir -p "${str_en_dir}"
-    echo ${STR_EN_VENDOR} > "${str_en_dir}/manufacturer"
-    echo ${STR_EN_PRODUCT} > "${str_en_dir}/product"
+    mkdir -p "${str_en_dir}" || return
+    echo ${STR_EN_VENDOR} > "${str_en_dir}/manufacturer" || return
+    echo ${STR_EN_PRODUCT} > "${str_en_dir}/product" || return
 
     local config_dir="${gadget_dir}/configs/c.1"
-    mkdir -p "${config_dir}"
-    echo 100 > "${config_dir}/MaxPower"
-    mkdir -p "${config_dir}/strings/0x409"
-    echo "${DEV_TYPE^^}" > "${config_dir}/strings/0x409/configuration"
+    mkdir -p "${config_dir}" || return
+    echo 100 > "${config_dir}/MaxPower" || return
+    mkdir -p "${config_dir}/strings/0x409" || return
+    echo "${DEV_TYPE^^}" > "${config_dir}/strings/0x409/configuration" || return
 
     local func_dir="${gadget_dir}/functions/${DEV_TYPE}.${IFACE_NAME}"
-    mkdir -p "${func_dir}"
+    mkdir -p "${func_dir}" || return
 
     if [[ -n $HOST_MAC_ADDR ]]; then
-        echo ${HOST_MAC_ADDR} > ${func_dir}/host_addr
+        echo ${HOST_MAC_ADDR} >${func_dir}/host_addr || return
     fi
 
     if [[ -n $DEV_MAC_ADDR ]]; then
-        echo ${DEV_MAC_ADDR} > ${func_dir}/dev_addr
+        echo ${DEV_MAC_ADDR} >${func_dir}/dev_addr || return
     fi
 
-    ln -s "${func_dir}" "${config_dir}"
+    ln -s "${func_dir}" "${config_dir}" || return
 
-    echo "${BIND_DEVICE}" > ${gadget_dir}/UDC
-    ip link set dev "$(<"${func_dir}"/ifname)" down
-    ip link set dev "$(<"${func_dir}"/ifname)" name "${IFACE_NAME}"
+    echo "${BIND_DEVICE}" >${gadget_dir}/UDC || return
+    # We don't care if downing the interface fails, only the rename
+    ip link set dev "$(<"${func_dir}"/ifname)" down || true
+    ip link set dev "$(<"${func_dir}"/ifname)" name "${IFACE_NAME}" || return
 }
 
 gadget_stop() {
@@ -103,7 +105,7 @@ gadget_stop() {
       ${gadget_dir} || true
 
     rm -f /run/systemd/network/+-bmc-"${IFACE_NAME}".network
-    networkctl reload
+    networkctl reload || true
 }
 
 opts=$(getopt \
