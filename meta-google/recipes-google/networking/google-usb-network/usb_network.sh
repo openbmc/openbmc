@@ -97,6 +97,7 @@ EOF
         ip link set dev "$ifname" down || true
         ip link set dev "$ifname" name "${IFACE_NAME}" || return
     fi
+    ip link set dev "$IFACE_NAME" up || return
 }
 
 gadget_stop() {
