@@ -33,6 +33,7 @@ EXTRA_OEMESON:append = " \
     -Dsnoop-device=${SNOOP_DEVICE} \
     -Dpost-code-bytes=${POST_CODE_BYTES} \
     -Dsystemd-target=multi-user.target \
+    -Dtests=disabled \
 "
 
 POSTCODE_SEVENSEG_DEVICE ?= "seven_seg_disp_val"
