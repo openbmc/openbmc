@@ -12,5 +12,19 @@
         "EventMon": "FALLING",
         "Target": "ampere-host-shutdown-ack@0.service",
         "Continue": true
+    },
+    {
+        "Name": "S0_OVERTEMP",
+        "LineName": "s0-overtemp-n",
+        "EventMon": "FALLING",
+        "Target": "ampere_overtemp@0.service",
+        "Continue": true
+    },
+    {
+        "Name": "S1_OVERTEMP",
+        "LineName": "s1-overtemp-n",
+        "EventMon": "FALLING",
+        "Target": "ampere_overtemp@1.service",
+        "Continue": true
     }
 ]
