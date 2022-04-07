@@ -1,9 +1,9 @@
 [Unit]
 Description=Power Cycle by Hotswap Controller
+After=gbmc-psu-hardreset.target
 
 [Service]
 Type=oneshot
-EnvironmentFile=-/run/psu_timedelay
 ExecStart=/usr/bin/tray_powercycle.sh
 
 [Install]

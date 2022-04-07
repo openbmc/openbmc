@@ -25,13 +25,6 @@ stop_phosphor_hwmon() {
 }
 
 main() {
-  # Sleep PSU_HARDRESET_DELAY seconds
-  local psu_delay=$((PSU_HARDRESET_DELAY))
-  if ((psu_delay > 0)); then
-    echo "Sleeping ${psu_delay} seconds before PSU hard reset!"
-    sleep "${psu_delay}"
-  fi
-
   # Stop phosphor-hwmon so that ADM1272 powercycle doesn't happen
   # in the middle of an i2c transaction and stuck the bus low
   stop_phosphor_hwmon
