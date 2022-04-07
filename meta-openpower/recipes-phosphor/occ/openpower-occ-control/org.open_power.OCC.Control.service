@@ -6,8 +6,7 @@ Wants=obmc-host-reset-running@0.target
 After=obmc-host-reset-running@0.target
 
 [Service]
-ExecStart=/usr/bin/env openpower-occ-control
-SyslogIdentifier=openpower-occ-control
+ExecStart=/usr/bin/openpower-occ-control
 Restart=always
 Type=dbus
 BusName={BUSNAME}

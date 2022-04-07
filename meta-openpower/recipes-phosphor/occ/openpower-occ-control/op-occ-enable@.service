@@ -9,8 +9,7 @@ After=fsi-scan@%i.service
 ConditionPathExists=/run/openbmc/host@%i-on
 
 [Service]
-ExecStart=/usr/bin/env occ-active.sh enable
-SyslogIdentifier=occ-active.sh
+ExecStart=/usr/bin/occ-active.sh enable
 Type=oneshot
 
 [Install]

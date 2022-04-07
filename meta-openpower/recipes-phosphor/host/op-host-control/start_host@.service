@@ -12,8 +12,7 @@ ConditionPathExists=!/run/openbmc/host@%i-on
 ConditionPathExists=!/run/openbmc/mpreboot@%i
 
 [Service]
-ExecStart=/usr/bin/env openpower-proc-control startHost
-SyslogIdentifier=openpower-proc-control
+ExecStart=/usr/bin/openpower-proc-control startHost
 Type=oneshot
 RemainAfterExit=yes
 

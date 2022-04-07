@@ -7,7 +7,6 @@ Before=obmc-host-quiesce@%i.target
 # before processing checkstop. OCC has to wait 5 seconds
 # for our driver to stop using the SBEFIFO.
 ExecStart={base_bindir}/sleep 10
-ExecStart=/usr/bin/env checkstop_app
-SyslogIdentifier=checkstop_app
+ExecStart=/usr/bin/checkstop_app
 Type=oneshot
 Restart=no

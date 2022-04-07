@@ -6,8 +6,7 @@ Before=op-enter-mpreboot@%i.service
 Conflicts=op-occ-enable@%i.service
 
 [Service]
-ExecStart=/usr/bin/env occ-active.sh disable
-SyslogIdentifier=occ-active.sh
+ExecStart=/usr/bin/occ-active.sh disable
 Type=oneshot
 
 [Install]

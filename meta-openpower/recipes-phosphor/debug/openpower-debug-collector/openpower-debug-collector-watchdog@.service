@@ -4,7 +4,6 @@ Before=obmc-host-quiesce@%i.target
 After=op-stop-instructions@%i.service
 
 [Service]
-ExecStart=/usr/bin/env watchdog_timeout
-SyslogIdentifier=watchdog_timeout
+ExecStart=/usr/bin/watchdog_timeout
 Type=oneshot
 Restart=no
