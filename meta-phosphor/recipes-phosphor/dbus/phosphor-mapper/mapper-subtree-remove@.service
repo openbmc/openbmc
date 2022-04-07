@@ -8,5 +8,4 @@ Type=oneshot
 RemainAfterExit=no
 Restart=on-failure
 TimeoutStartSec=infinity
-ExecStart=/usr/bin/env mapper subtree-remove %I
-SyslogIdentifier=mapper
+ExecStart=/usr/bin/mapper subtree-remove %I

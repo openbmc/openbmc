@@ -8,5 +8,4 @@ Type=oneshot
 RemainAfterExit=yes
 Restart=on-failure
 TimeoutStartSec=infinity
-ExecStart=/usr/bin/env mapper wait %I
-SyslogIdentifier=mapper
+ExecStart=/usr/bin/mapper wait %I
