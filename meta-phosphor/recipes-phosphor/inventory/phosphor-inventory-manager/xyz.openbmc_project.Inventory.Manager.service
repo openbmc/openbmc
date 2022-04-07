@@ -5,8 +5,7 @@ Before=mapper-wait@-xyz-openbmc_project-inventory.service
 [Service]
 Restart=always
 Type=dbus
-ExecStart=/usr/bin/env phosphor-inventory
-SyslogIdentifier=phosphor-inventory
+ExecStart=/usr/bin/phosphor-inventory
 BusName={BUSNAME}
 
 [Install]
