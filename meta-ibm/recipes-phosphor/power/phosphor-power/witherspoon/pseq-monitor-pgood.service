@@ -9,5 +9,4 @@ ConditionPathExists=!/run/openbmc/chassis@0-on
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/env pseq-monitor -a pgood-monitor -i 5000
-SyslogIdentifier=pseq-monitor
+ExecStart=/usr/bin/pseq-monitor -a pgood-monitor -i 5000

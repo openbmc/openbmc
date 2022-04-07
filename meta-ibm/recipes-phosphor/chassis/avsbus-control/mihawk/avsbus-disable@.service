@@ -7,8 +7,7 @@ Conflicts=obmc-chassis-poweroff@%i.target
 ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
-ExecStart=/usr/bin/env avsbus-disable.sh
-SyslogIdentifier=avsbus-disable.sh
+ExecStart=/usr/bin/avsbus-disable.sh
 Type=oneshot
 RemainAfterExit=yes
 

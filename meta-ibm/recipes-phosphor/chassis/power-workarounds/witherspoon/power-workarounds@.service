@@ -8,8 +8,7 @@ Conflicts=obmc-chassis-poweroff@%i.target
 ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
-ExecStart=/usr/bin/env power-workarounds.sh
-SyslogIdentifier=power-workarounds.sh
+ExecStart=/usr/bin/power-workarounds.sh
 Type=oneshot
 RemainAfterExit=yes
 
