@@ -1,15 +1,17 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
-SRC_URI += "file://plugins.d/guard"
 
 install_openpower_plugins() {
-    install -m 0755 ${WORKDIR}/plugins.d/guard ${D}${dreport_plugin_dir}
+    install ${S}/tools/dreport.d/openpower.d/plugins.d/* ${D}${dreport_plugin_dir}
 }
 
-#Link in the plugins so dreport run them at the appropriate time
+#Link the plugins so that dreport can run them based on dump type
 python link_openpower_plugins() {
-    workdir = d.getVar('WORKDIR', True)
-    script = os.path.join(workdir, 'plugins.d', 'guard')
-    install_dreport_user_script(script, d)
+    source = d.getVar('S', True)
+    source_path = os.path.join(source, "tools", "dreport.d", "openpower.d", "plugins.d")
+    op_plugins = os.listdir(source_path)
+    for op_plugin in op_plugins:
+        op_plugin_name = os.path.join(source_path, op_plugin)
+        install_dreport_user_script(op_plugin_name, d)
 }
 
 DEBUG_COLLECTOR_INSTALL_POSTFUNCS ?= ""
