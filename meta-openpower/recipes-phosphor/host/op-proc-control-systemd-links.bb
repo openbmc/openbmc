@@ -49,6 +49,15 @@ pkg_postinst:${PN}() {
 
 	# Only install certain units if phal enabled
 	if [ "${@bb.utils.filter('MACHINE_FEATURES', 'phal', d)}" = phal ]; then
+		LINK="$D$systemd_system_unitdir/obmc-host-stop@0.target.wants/op-clear-sys-dump-active@0.service"
+		TARGET="../op-clear-sys-dump-active@.service"
+		ln -s $TARGET $LINK
+
+		mkdir -p $D$systemd_system_unitdir/multi-user.target.wants
+		LINK="$D$systemd_system_unitdir/multi-user.target.wants/op-clear-sys-dump-active@0.service"
+		TARGET="../op-clear-sys-dump-active@.service"
+		ln -s $TARGET $LINK
+
 		mkdir -p $D$systemd_system_unitdir/obmc-host-start@0.target.requires
 		LINK="$D$systemd_system_unitdir/obmc-host-start@0.target.requires/phal-reinit-devtree.service"
 		TARGET="../phal-reinit-devtree.service"
@@ -62,7 +71,6 @@ pkg_postinst:${PN}() {
 		TARGET="../op-reset-host-check@.service"
 		ln -s $TARGET $LINK
 
-		mkdir -p $D$systemd_system_unitdir/multi-user.target.wants
 		LINK="$D$systemd_system_unitdir/multi-user.target.wants/phal-import-devtree@0.service"
 		TARGET="../phal-import-devtree@.service"
 		ln -s $TARGET $LINK
