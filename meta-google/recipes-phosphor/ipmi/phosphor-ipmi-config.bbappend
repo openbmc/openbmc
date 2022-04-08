@@ -6,6 +6,8 @@ DEPENDS:append:gbmc = " jq-native"
 
 GBMCBR_IPMI_CHANNEL ?= "11"
 
+ENTITY_MAPPING ?= "default"
+
 # Replace a channel in config.json to add gbmcbr reporting
 do_install:append:gbmc() {
   chjson=${D}${datadir}/ipmi-providers/channel_config.json
@@ -21,6 +23,8 @@ do_install:append:gbmc() {
 
   # Set entity-map.json to empty json for gBMC by default.
   # Each system will override it if needed.
-  echo "[]" > ${D}${datadir}/ipmi-providers/entity-map.json
+  if [[ "${ENTITY_MAPPING}" != "default" ]]; then
+    echo "[]" > ${D}${datadir}/ipmi-providers/entity-map.json
+  fi
 }
 
