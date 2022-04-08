@@ -23,7 +23,8 @@ DEPENDS:append = " python3 cmake-native"
 # stack.
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'glx x11-egl', '', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland', '', d)} \
-                   surfaceless-egl gbm"
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'gbm surfaceless-egl', '', d)} \
+"
 
 # virtual/libgl requires opengl in DISTRO_FEATURES.
 REQUIRED_DISTRO_FEATURES += "${@bb.utils.contains('DEPENDS', 'virtual/${MLPREFIX}libgl', 'opengl', '', d)}"

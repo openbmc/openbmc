@@ -48,6 +48,7 @@ PTESTS_FAST = "\
     opkg-ptest \
     pango-ptest \
     parted-ptest \
+    popt-ptest \
     python3-atomicwrites-ptest \
     python3-bcrypt-ptest \
     python3-hypothesis-ptest \

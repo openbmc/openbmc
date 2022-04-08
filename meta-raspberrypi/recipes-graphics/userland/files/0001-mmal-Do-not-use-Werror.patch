@@ -1,0 +1,33 @@
+From 15fbe266af3dcc5b7660397204b06d04364a953a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 2 Apr 2022 21:37:42 -0700
+Subject: [PATCH] mmal: Do not use -Werror
+
+Clang warns about unused-but-set variables
+interface/mmal/vc/mmal_vc_api.c:395:18: error: variable 'status' set but not used [-We
+rror,-Wunused-but-set-variable]
+|    MMAL_STATUS_T status;
+|                  ^
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ interface/mmal/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/interface/mmal/CMakeLists.txt b/interface/mmal/CMakeLists.txt
+index 46f149d..c5c1642 100644
+--- a/interface/mmal/CMakeLists.txt
++++ b/interface/mmal/CMakeLists.txt
+@@ -3,7 +3,7 @@ if (NOT DEFINED LIBRARY_TYPE)
+ set(LIBRARY_TYPE SHARED)
+ endif (NOT DEFINED LIBRARY_TYPE)
+ 
+-add_definitions(-Wall -Werror)
++add_definitions(-Wall)
+ 
+ add_library(mmal SHARED util/mmal_util.c)
+ 
+-- 
+2.35.1
+

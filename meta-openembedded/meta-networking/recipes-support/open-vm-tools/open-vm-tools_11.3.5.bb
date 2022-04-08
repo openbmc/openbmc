@@ -17,9 +17,9 @@ for better management of and seamless user interactions with guests.\
 "
 SECTION = "vmware-tools"
 
-LICENSE = "LGPL-2.0-only & GPL-2.0-only & BSD & CDDL-1.0"
+LICENSE = "LGPL-2.0-only & GPL-2.0-only & BSD-2-Clause & CDDL-1.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=559317809c5444fb39ceaf6ac45c43ac"
-LICENSE:modules/freebsd/vmblock = "BSD"
+LICENSE:modules/freebsd/vmblock = "BSD-2-Clause"
 LICENSE:modules/freebsd/vmmemctl = "GPL-2.0-only"
 LICENSE:modules/freebsd/vmxnet = "GPL-2.0-only"
 LICENSE:modules/linux = "GPL-2.0-only"

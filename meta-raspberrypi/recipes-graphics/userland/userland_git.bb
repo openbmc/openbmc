@@ -13,14 +13,15 @@ COMPATIBLE_MACHINE = "^rpi$"
 
 SRCBRANCH = "master"
 SRCFORK = "raspberrypi"
-SRCREV = "97bc8180ad682b004ea224d1db7b8e108eda4397"
+SRCREV = "c4fd1b8986c6d6d4ae5cd51e65a8bbeb495dfa4e"
 
 # Use the date of the above commit as the package version. Update this when
 # SRCREV is changed.
-PV = "20210623"
+PV = "20220323"
 
 SRC_URI = "\
     git://github.com/${SRCFORK}/userland.git;protocol=https;branch=${SRCBRANCH} \
+    file://0001-mmal-Do-not-use-Werror.patch \
     file://0001-Allow-applications-to-set-next-resource-handle.patch \
     file://0002-wayland-Add-support-for-the-Wayland-winsys.patch \
     file://0003-wayland-Add-Wayland-example.patch \
@@ -67,7 +68,7 @@ PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland', 
 PACKAGECONFIG[wayland] = "-DBUILD_WAYLAND=TRUE -DWAYLAND_SCANNER_EXECUTABLE:FILEPATH=${STAGING_BINDIR_NATIVE}/wayland-scanner,,wayland-native wayland"
 PACKAGECONFIG[allapps] = "-DALL_APPS=true,,,"
 
-CFLAGS:append = " -fPIC"
+CFLAGS:append = " -fPIC -Wno-unused-but-set-variable"
 
 do_install:append () {
 	for f in `find ${D}${includedir}/interface/vcos/ -name "*.h"`; do

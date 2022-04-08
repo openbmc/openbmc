@@ -1117,6 +1117,7 @@ python do_package_qa () {
 # binutils is used for most checks, so need to set as dependency
 # POPULATESYSROOTDEPS is defined in staging class.
 do_package_qa[depends] += "${POPULATESYSROOTDEPS}"
+do_package_qa[vardeps] = "${@bb.utils.contains('ERROR_QA', 'empty-dirs', 'QA_EMPTY_DIRS', '', d)}"
 do_package_qa[vardepsexclude] = "BB_TASKDEPDATA"
 do_package_qa[rdeptask] = "do_packagedata"
 addtask do_package_qa after do_packagedata do_package before do_build
@@ -1182,9 +1183,9 @@ python do_qa_patch() {
             msg += "    devtool modify %s\n" % d.getVar('PN')
             msg += "    devtool finish --force-patch-refresh %s <layer_path>\n\n" % d.getVar('PN')
             msg += "Don't forget to review changes done by devtool!\n"
-            if 'patch-fuzz' in d.getVar('ERROR_QA'):
+            if bb.utils.filter('ERROR_QA', 'patch-fuzz', d):
                 bb.error(msg)
-            elif 'patch-fuzz' in d.getVar('WARN_QA'):
+            elif bb.utils.filter('WARN_QA', 'patch-fuzz', d):
                 bb.warn(msg)
             msg = "Patch log indicates that patches do not apply cleanly."
             oe.qa.handle_error("patch-fuzz", msg, d)

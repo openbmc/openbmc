@@ -7,7 +7,7 @@ SECTION = "console/utils"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=00a27da7ac0f9bcd17320ec29ef4bbf6"
 
-DEPENDS = "libpcre libav virtual/egl boost freetype dbus openssl libssh virtual/libomxil coreutils-native curl-native userland"
+DEPENDS = "alsa-lib libpcre virtual/egl boost freetype dbus openssl libssh virtual/libomxil coreutils-native curl-native userland"
 
 PR = "r5"
 

@@ -10,7 +10,7 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI[sha256sum] = "934ba5affecff21e62d9fac1dd50c50cd94b3a807fefa5f5bff59f3d6f155bae"
 
-PACKAGECONFIG ??= ""
+PACKAGECONFIG ??= "notify"
 PACKAGECONFIG[notify] = "--enable-notifications,--disable-notifications,libnotify"
 
 FILES:${PN} += "${datadir}/backgrounds"

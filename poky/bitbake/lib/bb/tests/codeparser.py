@@ -318,7 +318,7 @@ d.getVar(a(), False)
             "filename": "example.bb",
         })
 
-        deps, values = bb.data.build_dependencies("FOO", set(self.d.keys()), set(), set(), self.d)
+        deps, values = bb.data.build_dependencies("FOO", set(self.d.keys()), set(), set(), set(), self.d)
 
         self.assertEqual(deps, set(["somevar", "bar", "something", "inexpand", "test", "test2", "a"]))
 
@@ -365,7 +365,7 @@ esac
         self.d.setVarFlags("FOO", {"func": True})
         self.setEmptyVars(execs)
 
-        deps, values = bb.data.build_dependencies("FOO", set(self.d.keys()), set(), set(), self.d)
+        deps, values = bb.data.build_dependencies("FOO", set(self.d.keys()), set(), set(), set(), self.d)
 
         self.assertEqual(deps, set(["somevar", "inverted"] + execs))
 
@@ -375,7 +375,7 @@ esac
         self.d.setVar("FOO", "foo=oe_libinstall; eval $foo")
         self.d.setVarFlag("FOO", "vardeps", "oe_libinstall")
 
-        deps, values = bb.data.build_dependencies("FOO", set(self.d.keys()), set(), set(), self.d)
+        deps, values = bb.data.build_dependencies("FOO", set(self.d.keys()), set(), set(), set(), self.d)
 
         self.assertEqual(deps, set(["oe_libinstall"]))
 
@@ -384,7 +384,7 @@ esac
         self.d.setVar("FOO", "foo=oe_libinstall; eval $foo")
         self.d.setVarFlag("FOO", "vardeps", "${@'oe_libinstall'}")
 
-        deps, values = bb.data.build_dependencies("FOO", set(self.d.keys()), set(), set(), self.d)
+        deps, values = bb.data.build_dependencies("FOO", set(self.d.keys()), set(), set(), set(), self.d)
 
         self.assertEqual(deps, set(["oe_libinstall"]))
 
@@ -399,7 +399,7 @@ esac
         # Check dependencies
         self.d.setVar('ANOTHERVAR', expr)
         self.d.setVar('TESTVAR', 'anothervalue testval testval2')
-        deps, values = bb.data.build_dependencies("ANOTHERVAR", set(self.d.keys()), set(), set(), self.d)
+        deps, values = bb.data.build_dependencies("ANOTHERVAR", set(self.d.keys()), set(), set(), set(), self.d)
         self.assertEqual(sorted(values.splitlines()),
                          sorted([expr,
                           'TESTVAR{anothervalue} = Set',
@@ -411,6 +411,24 @@ esac
                           ]))
         # Check final value
         self.assertEqual(self.d.getVar('ANOTHERVAR').split(), ['anothervalue', 'yetanothervalue', 'lastone'])
+
+    def test_contains_vardeps_excluded(self):
+        # Check the ignored_vars option to build_dependencies is handled by contains functionality
+        varval = '${TESTVAR2} ${@bb.utils.filter("TESTVAR", "somevalue anothervalue", d)}'
+        self.d.setVar('ANOTHERVAR', varval)
+        self.d.setVar('TESTVAR', 'anothervalue testval testval2')
+        self.d.setVar('TESTVAR2', 'testval3')
+        deps, values = bb.data.build_dependencies("ANOTHERVAR", set(self.d.keys()), set(), set(), set(["TESTVAR"]), self.d)
+        self.assertEqual(sorted(values.splitlines()), sorted([varval]))
+        self.assertEqual(deps, set(["TESTVAR2"]))
+        self.assertEqual(self.d.getVar('ANOTHERVAR').split(), ['testval3', 'anothervalue'])
+
+        # Check the vardepsexclude flag is handled by contains functionality
+        self.d.setVarFlag('ANOTHERVAR', 'vardepsexclude', 'TESTVAR')
+        deps, values = bb.data.build_dependencies("ANOTHERVAR", set(self.d.keys()), set(), set(), set(), self.d)
+        self.assertEqual(sorted(values.splitlines()), sorted([varval]))
+        self.assertEqual(deps, set(["TESTVAR2"]))
+        self.assertEqual(self.d.getVar('ANOTHERVAR').split(), ['testval3', 'anothervalue'])
 
     #Currently no wildcard support
     #def test_vardeps_wildcards(self):

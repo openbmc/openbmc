@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://opt/vc/LICENCE;md5=86e53f5f5909ee66900418028de11780"
 
 include recipes-bsp/common/raspberrypi-firmware.inc
 
-S = "${WORKDIR}/firmware-${SRCREV}"
+S = "${WORKDIR}/raspberrypi-firmware-1.${PV}"
 
 do_install(){
     install -m 0755 -d ${D}${libdir}

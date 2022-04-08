@@ -2,7 +2,7 @@ SUMMARY = "Dynamic hash table implementation"
 DESCRIPTION = "Dynamic hash table implementation"
 HOMEPAGE = "https://fedorahosted.org/released/ding-libs"
 SECTION = "base"
-LICENSE = "GPLv3+"
+LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 SRC_URI = "https://fedorahosted.org/released/${BPN}/${BP}.tar.gz"

@@ -4,6 +4,10 @@ HOMEPAGE = "http://www.wxpython.org"
 LICENSE = "WXwindows"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=fce1d18e2d633d41786c0a8dfbc80917"
 
+inherit features_check
+
+REQUIRED_DISTRO_FEATURES = "${@bb.utils.contains('PACKAGECONFIG', 'no_gui', '', 'x11', d)}"
+
 DEPENDS = "wxwidgets-native wxwidgets"
 
 PYPI_PACKAGE = "wxPython"

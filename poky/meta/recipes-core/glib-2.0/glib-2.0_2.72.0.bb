@@ -16,6 +16,8 @@ SRC_URI = "${GNOME_MIRROR}/glib/${SHRT_VER}/glib-${PV}.tar.xz \
            file://0001-Do-not-write-bindir-into-pkg-config-files.patch \
            file://0001-meson-Run-atomics-test-on-clang-as-well.patch \
            file://0001-gio-tests-resources.c-comment-out-a-build-host-only-.patch \
+           file://0001-tests-Add-C-tests-for-typechecking-with-atomic-compa.patch \
+           file://0002-gatomic-Add-a-C-variant-of-g_atomic_int_compare_and_.patch \
            "
 SRC_URI:append:class-native = " file://relocate-modules.patch"
 

@@ -1,0 +1,70 @@
+From 2668390454bc0efe52a262eb2faa4a2bd5a062e2 Mon Sep 17 00:00:00 2001
+From: Philip Withnall <pwithnall@endlessos.org>
+Date: Fri, 1 Apr 2022 13:47:19 +0100
+Subject: [PATCH 2/2] gatomic: Add a C++ variant of
+ g_atomic_int_compare_and_exchange()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The C++ variant implements type safety differently, to avoid warnings
+from C++ compilers about:
+```
+../../../gnome-commander-1.14.2/src/intviewer/searcher.cc:303:5: error: cannot initialize a parameter of type 'gint *' (aka 'int *') with an rvalue of type 'void *'
+    g_atomic_int_compare_and_exchange ((gint*)&src->priv->progress_value, oldval, (gint)d);
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/mnt/b/yoe/master/build/tmp/work/cortexa72-yoe-linux/gnome-commander/1.14.2-r0/recipe-sysroot/usr/include/glib-2.0/glib/gatomic.h:160:44: note: expanded from macro 'g_atomic_int_compare_and_exchange'
+    __atomic_compare_exchange_n ((atomic), (void *) (&(gaicae_oldval)), (newval), FALSE, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST) ? TRUE : FALSE; \
+                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
+This complements the existing C++ variant for
+`g_atomic_pointer_compare_and_exchange()`, and fixes a regression on C++
+from https://gitlab.gnome.org/GNOME/glib/-/merge_requests/2114.
+
+With the addition of the unit tests in the previous commit, this is
+effectively tested by the FreeBSD and macOS CI jobs, as they use
+`clang++` in C++ mode. `g++` doesn’t seem to emit a warning about this.
+
+Signed-off-by: Philip Withnall <pwithnall@endlessos.org>
+
+Fixes: #2625
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/glib/-/merge_requests/2578]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ glib/gatomic.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/glib/gatomic.h b/glib/gatomic.h
+index 5eba1dbc7..8b2b880c8 100644
+--- a/glib/gatomic.h
++++ b/glib/gatomic.h
+@@ -152,6 +152,17 @@ G_END_DECLS
+     (void) (0 ? *(atomic) ^ *(atomic) : 1);                                  \
+     __atomic_fetch_sub ((atomic), 1, __ATOMIC_SEQ_CST) == 1;                 \
+   }))
++#if defined(glib_typeof) && defined(__cplusplus) && __cplusplus >= 201103L
++/* See comments below about equivalent g_atomic_pointer_compare_and_exchange()
++ * shenanigans for type-safety when compiling in C++ mode. */
++#define g_atomic_int_compare_and_exchange(atomic, oldval, newval) \
++  (G_GNUC_EXTENSION ({                                                       \
++    glib_typeof (*(atomic)) gaicae_oldval = (oldval);                        \
++    G_STATIC_ASSERT (sizeof *(atomic) == sizeof (gint));                     \
++    (void) (0 ? *(atomic) ^ (newval) ^ (oldval) : 1);                        \
++    __atomic_compare_exchange_n ((atomic), &gaicae_oldval, (newval), FALSE, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST) ? TRUE : FALSE; \
++  }))
++#else /* if !(defined(glib_typeof) && defined(__cplusplus) && __cplusplus >= 201103L) */
+ #define g_atomic_int_compare_and_exchange(atomic, oldval, newval) \
+   (G_GNUC_EXTENSION ({                                                       \
+     gint gaicae_oldval = (oldval);                                           \
+@@ -159,6 +170,7 @@ G_END_DECLS
+     (void) (0 ? *(atomic) ^ (newval) ^ (oldval) : 1);                        \
+     __atomic_compare_exchange_n ((atomic), (void *) (&(gaicae_oldval)), (newval), FALSE, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST) ? TRUE : FALSE; \
+   }))
++#endif /* defined(glib_typeof) */
+ #define g_atomic_int_add(atomic, val) \
+   (G_GNUC_EXTENSION ({                                                       \
+     G_STATIC_ASSERT (sizeof *(atomic) == sizeof (gint));                     \
+-- 
+2.35.1
+

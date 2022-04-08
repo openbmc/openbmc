@@ -2,10 +2,12 @@ SUMMARY = "ClamAV anti-virus utility for Unix - command-line interface"
 DESCRIPTION = "ClamAV is an open source antivirus engine for detecting trojans, viruses, malware & other malicious threats."
 HOMEPAGE = "http://www.clamav.net/index.html"
 SECTION = "security"
-LICENSE = "LGPL-2.1"
+LICENSE = "LGPL-2.1-only"
 
 DEPENDS = "glibc llvm libtool db openssl zlib curl libxml2 bison pcre2 json-c libcheck"
  
+COMPATIBLE_HOST:libc-musl:class-target = "null"
+
 LIC_FILES_CHKSUM = "file://COPYING.txt;beginline=2;endline=3;md5=f7029fbbc5898b273d5902896f7bbe17"
 
 # July 27th

@@ -4,19 +4,20 @@ Date: Sun, 8 Dec 2019 23:42:00 +0100
 Subject: [PATCH] musl: Hack to fix configure
 
 ---
- meson.build | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ meson.build | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 4465a26..726c9fe 100644
+index 075776f..dfd7421 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -82,8 +82,14 @@ if cc.has_header_symbol('utmpx.h', 'WTMPX_FILENAME', prefix: '#define _GNU_SOURC
- elif cc.has_header_symbol('paths.h', '_PATH_WTMPX')
+@@ -101,9 +101,14 @@ elif cc.has_header_symbol('paths.h', '_PATH_WTMPX')
+ 
    config_h.set('PATH_WTMP', '_PATH_WTMPX')
  else
--  assert(run_command('test', '-e', '/var/log/utx.log').returncode() == 0, 'Do not know which filename to watch for wtmp changes')
--  config_h.set_quoted('PATH_WTMP', '/var/log/utx.log')
+-  path_wtmp = '/var/log/utx.log'
+-  assert(run_command('test', '-e', path_wtmp).returncode() == 0, 'Do not know which filename to watch for wtmp changes')
+-  config_h.set_quoted('PATH_WTMP', path_wtmp)
 +  # musl: This is just a build fix hack.
 +  # As usual they know better, consider all other projects crap and offer zero
 +  # alternatives: So wtmp is a dead stub only [1] (= /dev/null/wtmp - taken
@@ -28,3 +29,6 @@ index 4465a26..726c9fe 100644
  endif
  
  # compiler flags
+-- 
+2.34.1
+

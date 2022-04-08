@@ -13,25 +13,11 @@ Upstream-Status: Submitted
 Signed-off-by: Tim Orling <ticotimo@gmail.com>
 
 ---
- .dir-locals.el       | 2 +-
  configure.ac         | 2 +-
  gfbgraph/Makefile.am | 2 +-
  libgfbgraph.pc.in    | 2 +-
  4 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/.dir-locals.el b/.dir-locals.el
-index 77abbf0..d39cdf2 100644
---- a/.dir-locals.el
-+++ b/.dir-locals.el
-@@ -3,7 +3,7 @@
-                                "/usr/include/json-glib-1.0"
-                                "/usr/include/goa-1.0"
-                                "/usr/lib64/goa-1.0/include"
--                               "/usr/include/rest-0.7"
-+                               "/usr/include/rest-1.0"
-                                "/usr/include/dbus-1.0"
-                                "/usr/lib64/dbus-1.0/include"
-                                "/usr/include/gio-unix-2.0/"
 diff --git a/configure.ac b/configure.ac
 index fd1231f..9b49f3f 100644
 --- a/configure.ac

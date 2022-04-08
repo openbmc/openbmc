@@ -18,10 +18,10 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
  1 file changed, 1 insertion(+), 6 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index cceefe0..df3fdd9 100644
+index 1dc8a73..87d72fe 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -59,12 +59,7 @@ udev_dep = dependency('libudev', required: get_option('udev'))
+@@ -65,12 +65,7 @@ udev_dep = dependency('libudev', required: get_option('udev'))
  host_os = host_machine.system()
  host_cpu = host_machine.cpu()
  supported_os = ['linux']
@@ -32,9 +32,9 @@ index cceefe0..df3fdd9 100644
 -  seccomp_dep = dependency('', required: false)
 -endif
 +seccomp_dep = dependency('', required: false)
- fontconfig_cache_path = fontconfig_dep.get_pkgconfig_variable('cachedir')
  
- xkb_base = xkb_config_dep.get_pkgconfig_variable('xkb_base')
+ fontconfig_cache_path = fontconfig_dep.get_variable(pkgconfig: 'cachedir')
+ xkb_base = xkb_config_dep.get_variable(pkgconfig: 'xkb_base')
 -- 
-2.31.1
+2.34.1
 

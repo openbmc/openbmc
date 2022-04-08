@@ -1,0 +1,172 @@
+From f50e2d67575ac5f256fb853ca9d29aeac92d9a57 Mon Sep 17 00:00:00 2001
+From: Saul Wold <saul.wold@windriver.com>
+Date: Thu, 31 Mar 2022 14:56:28 -0700
+Subject: [PATCH] depmod: Add support for excluding a directory
+
+This adds support to depmod to enable a new exclude directive in
+the depmod.d/*.conf configuration file. Currently depmod
+already excludes directories named source or build. This change
+will allow additional directories like .debug to be excluded also
+via a new exclude directive.
+
+depmod.d/exclude.conf example:
+exclude	.debug
+
+Upstream-Status: Accepted
+
+Signed-off-by: Saul Wold <saul.wold@windriver.com>
+[ Fix warnings and make should_exclude_dir() return bool ]
+Signed-off-by: Lucas De Marchi <lucas.demarchi@intel.com>
+---
+ man/depmod.d.xml | 14 ++++++++++
+ tools/depmod.c   | 66 +++++++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 76 insertions(+), 4 deletions(-)
+
+diff --git a/man/depmod.d.xml b/man/depmod.d.xml
+index b315e93..76548e9 100644
+--- a/man/depmod.d.xml
++++ b/man/depmod.d.xml
+@@ -131,6 +131,20 @@
+           </para>
+         </listitem>
+       </varlistentry>
++      <varlistentry>
++        <term>exclude <replaceable>excludedir</replaceable>
++        </term>
++        <listitem>
++          <para>
++            This specifies the trailing directories that will be excluded
++            during the search for kernel modules.
++          </para>
++          <para>
++	    The <replaceable>excludedir</replaceable> is the trailing directory
++	    to exclude
++          </para>
++        </listitem>
++      </varlistentry>
+     </variablelist>
+   </refsect1>
+ 
+diff --git a/tools/depmod.c b/tools/depmod.c
+index 07a35ba..4117dd1 100644
+--- a/tools/depmod.c
++++ b/tools/depmod.c
+@@ -458,6 +458,11 @@ struct cfg_external {
+ 	char path[];
+ };
+ 
++struct cfg_exclude {
++	struct cfg_exclude *next;
++	char exclude_dir[];
++};
++
+ struct cfg {
+ 	const char *kversion;
+ 	char dirname[PATH_MAX];
+@@ -469,6 +474,7 @@ struct cfg {
+ 	struct cfg_override *overrides;
+ 	struct cfg_search *searches;
+ 	struct cfg_external *externals;
++	struct cfg_exclude *excludes;
+ };
+ 
+ static enum search_type cfg_define_search_type(const char *path)
+@@ -580,6 +586,30 @@ static void cfg_external_free(struct cfg_external *ext)
+ 	free(ext);
+ }
+ 
++static int cfg_exclude_add(struct cfg *cfg, const char *path)
++{
++	struct cfg_exclude *exc;
++	size_t len = strlen(path);
++
++	exc = malloc(sizeof(struct cfg_exclude) + len + 1);
++	if (exc == NULL) {
++		ERR("exclude add: out of memory\n");
++		return -ENOMEM;
++	}
++	memcpy(exc->exclude_dir, path, len + 1);
++
++	DBG("exclude add: %s\n", path);
++
++	exc->next = cfg->excludes;
++	cfg->excludes = exc;
++	return 0;
++}
++
++static void cfg_exclude_free(struct cfg_exclude *exc)
++{
++	free(exc);
++}
++
+ static int cfg_kernel_matches(const struct cfg *cfg, const char *pattern)
+ {
+ 	regex_t re;
+@@ -657,6 +687,11 @@ static int cfg_file_parse(struct cfg *cfg, const char *filename)
+ 			}
+ 
+ 			cfg_external_add(cfg, dir);
++		} else if (streq(cmd, "exclude")) {
++			const char *sp;
++			while ((sp = strtok_r(NULL, "\t ", &saveptr)) != NULL) {
++				cfg_exclude_add(cfg, sp);
++			}
+ 		} else if (streq(cmd, "include")
+ 				|| streq(cmd, "make_map_files")) {
+ 			INF("%s:%u: command %s not implemented yet\n",
+@@ -857,6 +892,12 @@ static void cfg_free(struct cfg *cfg)
+ 		cfg->externals = cfg->externals->next;
+ 		cfg_external_free(tmp);
+ 	}
++
++	while (cfg->excludes) {
++		struct cfg_exclude *tmp = cfg->excludes;
++		cfg->excludes = cfg->excludes->next;
++		cfg_exclude_free(tmp);
++	}
+ }
+ 
+ 
+@@ -1229,6 +1270,25 @@ add:
+ 	return 0;
+ }
+ 
++static bool should_exclude_dir(const struct cfg *cfg, const char *name)
++{
++	struct cfg_exclude *exc;
++
++	if (name[0] == '.' && (name[1] == '\0' ||
++			(name[1] == '.' && name[2] == '\0')))
++		return true;
++
++	if (streq(name, "build") || streq(name, "source"))
++		return true;
++
++	for (exc = cfg->excludes; exc != NULL; exc = exc->next) {
++		if (streq(name, exc->exclude_dir))
++			return true;
++	}
++
++	return false;
++}
++
+ static int depmod_modules_search_dir(struct depmod *depmod, DIR *d, size_t baselen, struct scratchbuf *s_path)
+ {
+ 	struct dirent *de;
+@@ -1240,11 +1300,9 @@ static int depmod_modules_search_dir(struct depmod *depmod, DIR *d, size_t basel
+ 		size_t namelen;
+ 		uint8_t is_dir;
+ 
+-		if (name[0] == '.' && (name[1] == '\0' ||
+-				       (name[1] == '.' && name[2] == '\0')))
+-			continue;
+-		if (streq(name, "build") || streq(name, "source"))
++		if (should_exclude_dir(depmod->cfg, name))
+ 			continue;
++
+ 		namelen = strlen(name);
+ 		if (scratchbuf_alloc(s_path, baselen + namelen + 2) < 0) {
+ 			err = -ENOMEM;
+-- 
+2.31.1
+

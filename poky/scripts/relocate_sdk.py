@@ -30,9 +30,16 @@ else:
 old_prefix = re.compile(b("##DEFAULT_INSTALL_DIR##"))
 
 def get_arch():
+    global endian_prefix
     f.seek(0)
     e_ident =f.read(16)
-    ei_mag0,ei_mag1_3,ei_class = struct.unpack("<B3sB11x", e_ident)
+    ei_mag0,ei_mag1_3,ei_class,ei_data,ei_version = struct.unpack("<B3sBBB9x", e_ident)
+
+    # ei_data = 1 for little-endian & 0 for big-endian
+    if ei_data == 1:
+        endian_prefix = '<'
+    else:
+        endian_prefix = '>'
 
     if (ei_mag0 != 0x7f and ei_mag1_3 != "ELF") or ei_class == 0:
         return 0
@@ -51,11 +58,11 @@ def parse_elf_header():
 
     if arch == 32:
         # 32bit
-        hdr_fmt = "<HHILLLIHHHHHH"
+        hdr_fmt = endian_prefix + "HHILLLIHHHHHH"
         hdr_size = 52
     else:
         # 64bit
-        hdr_fmt = "<HHIQQQIHHHHHH"
+        hdr_fmt = endian_prefix + "HHIQQQIHHHHHH"
         hdr_size = 64
 
     e_type, e_machine, e_version, e_entry, e_phoff, e_shoff, e_flags,\
@@ -64,9 +71,9 @@ def parse_elf_header():
 
 def change_interpreter(elf_file_name):
     if arch == 32:
-        ph_fmt = "<IIIIIIII"
+        ph_fmt = endian_prefix + "IIIIIIII"
     else:
-        ph_fmt = "<IIQQQQQQ"
+        ph_fmt = endian_prefix + "IIQQQQQQ"
 
     """ look for PT_INTERP section """
     for i in range(0,e_phnum):
@@ -105,17 +112,17 @@ def change_interpreter(elf_file_name):
 
 def change_dl_sysdirs(elf_file_name):
     if arch == 32:
-        sh_fmt = "<IIIIIIIIII"
+        sh_fmt = endian_prefix + "IIIIIIIIII"
     else:
-        sh_fmt = "<IIQQQQIIQQ"
+        sh_fmt = endian_prefix + "IIQQQQIIQQ"
 
     """ read section string table """
     f.seek(e_shoff + e_shstrndx * e_shentsize)
     sh_hdr = f.read(e_shentsize)
     if arch == 32:
-        sh_offset, sh_size = struct.unpack("<16xII16x", sh_hdr)
+        sh_offset, sh_size = struct.unpack(endian_prefix + "16xII16x", sh_hdr)
     else:
-        sh_offset, sh_size = struct.unpack("<24xQQ24x", sh_hdr)
+        sh_offset, sh_size = struct.unpack(endian_prefix + "24xQQ24x", sh_hdr)
 
     f.seek(sh_offset)
     sh_strtab = f.read(sh_size)

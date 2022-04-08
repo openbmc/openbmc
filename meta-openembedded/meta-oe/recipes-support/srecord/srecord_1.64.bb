@@ -21,7 +21,7 @@ inherit autotools-brokensep
 do_configure:prepend() {
     # To autoreconf we need the script in ${S}, we can't tell autotools to use
     # etc/ because then it can't find the Makefile.in
-    ln -s ${S}/etc/configure.ac ${S}
+    ln -sf ${S}/etc/configure.ac ${S}
 }
 
 PACKAGECONFIG ??= "gcrypt"

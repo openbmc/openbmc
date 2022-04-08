@@ -4,10 +4,10 @@ This needs more work. Its my starting point.
 
 Signed-off-by: Armin Kuster <akuster808@gmail.com>
 
-Index: lkrg-0.9.2/Makefile
+Index: git/Makefile
 ===================================================================
---- lkrg-0.9.2.orig/Makefile
-+++ lkrg-0.9.2/Makefile
+--- git.orig/Makefile
++++ git/Makefile
 @@ -4,28 +4,10 @@
  # Author:
  #  - Adam 'pi3' Zabrocki (http://pi3.com.pl)

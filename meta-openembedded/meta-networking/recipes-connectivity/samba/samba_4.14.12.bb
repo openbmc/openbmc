@@ -340,3 +340,8 @@ RDEPENDS:${PN}-test = "\
     "
 
 ALLOW_EMPTY:${PN}-test = "1"
+
+# Patch for CVE-2018-1050 is applied in version 4.5.15, 4.6.13, 4.7.5.
+# Patch for CVE-2018-1057 is applied in version 4.3.13, 4.4.16.
+CVE_CHECK_IGNORE += "CVE-2018-1050"
+CVE_CHECK_IGNORE += "CVE-2018-1057"

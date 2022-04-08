@@ -16,7 +16,7 @@ fi
 DNSMASQ_CONF="/etc/dnsmasq.conf"
 test "/etc/dnsmasq.d/*" != '/etc/dnsmasq.d/*' && DNSMASQ_CONF="${DNSMASQ_CONF} /etc/dnsmasq.d/*"
 
-test -z "${PIDFILE}" && PIFILE="/run/dnsmasq.pid"
+test -z "${PIDFILE}" && PIDFILE="/run/dnsmasq.pid"
 
 if [ -z "$IGNORE_RESOLVCONF" ]
 then

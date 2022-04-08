@@ -1,5 +1,5 @@
 HOMEPAGE = "http://suricata-ids.org/"
 SECTION = "security Monitor/Admin"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 
 COMPATIBLE_HOST:powerpc = 'null'

@@ -10,10 +10,11 @@ SRC_URI = " \
     https://github.com/blueman-project/blueman/releases/download/${PV}/blueman-${PV}.tar.xz \
     file://0001-Search-for-cython3.patch \
     file://0002-fix-fail-to-enable-bluetooth.patch \
+    file://0001-meson-add-pythoninstalldir-option.patch \
 "
 SRC_URI[sha256sum] = "55d639feeda0b43b18a659e65985213a54b47dcb1348f3b4effb5238db242602"
 
-EXTRA_OEMESON = "-Druntime_deps_check=false -Dappindicator=false"
+EXTRA_OEMESON = "-Druntime_deps_check=false -Dappindicator=false -Dpythoninstalldir=${@noprefix('PYTHON_SITEPACKAGES_DIR', d)}"
 
 SYSTEMD_SERVICE:${PN} = "${BPN}-mechanism.service"
 SYSTEMD_AUTO_ENABLE:${PN} = "disable"

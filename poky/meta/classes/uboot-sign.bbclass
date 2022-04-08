@@ -250,7 +250,7 @@ do_install:append() {
 					[ -n "${UBOOT_DTB_BINARY}" ]; then
 					install_helper
 				fi
-				if [ "${SPL_SIGN_ENABLE}" = "1" -a -n "${SPL_DTB_BINARY}" ]; then
+				if [ "${UBOOT_FITIMAGE_ENABLE}" = "1" -a -n "${SPL_DTB_BINARY}" ]; then
 					install_spl_helper
 				fi
 			done

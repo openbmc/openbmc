@@ -1,0 +1,32 @@
+From 5f6ed003f10ee0bd4a508d5f59129a29f0920dfc Mon Sep 17 00:00:00 2001
+From: Saul Wold <saul.wold@windriver.com>
+Date: Thu, 31 Mar 2022 11:21:45 -0700
+Subject: [PATCH] depmod: Ignore .debug directories
+
+The .debug/<module>.ko files do not have the correct symbol information
+since it's split away from the actual <module>.ko file. Just ignore it.
+
+Upstream-Status: Pending
+
+Signed-off-by: Saul Wold <saul.wold@windriver.com>
+---
+ modutils/depmod.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/modutils/depmod.c b/modutils/depmod.c
+index bb42bbe..aa5a2de 100644
+--- a/modutils/depmod.c
++++ b/modutils/depmod.c
+@@ -43,6 +43,9 @@ static int FAST_FUNC parse_module(struct recursive_state *state,
+ 	/* Arbitrary. Was sb->st_size, but that breaks .gz etc */
+ 	size_t len = (64*1024*1024 - 4096);
+ 
++	if (strstr(fname, ".debug") == NULL)
++		return TRUE;
++
+ 	if (strrstr(fname, ".ko") == NULL)
+ 		return TRUE;
+ 
+-- 
+2.31.1
+

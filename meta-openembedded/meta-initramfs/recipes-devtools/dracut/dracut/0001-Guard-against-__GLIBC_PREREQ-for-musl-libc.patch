@@ -1,0 +1,35 @@
+From ff5e1a662ba93ba79e2aeaaaec48a2a8ec4b4701 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 31 Mar 2022 22:22:44 +0800
+Subject: [PATCH] Guard against __GLIBC_PREREQ for musl libc
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ src/install/util.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/install/util.c b/src/install/util.c
+index 5721de89..784aec48 100644
+--- a/src/install/util.c
++++ b/src/install/util.c
+@@ -27,6 +27,7 @@
+ 
+ #include "util.h"
+ 
++#if defined(__GLIBC__)
+ #if __GLIBC_PREREQ(2, 30) == 0
+ #include <sys/syscall.h>
+ #ifndef SYS_gettid
+@@ -35,6 +36,7 @@
+ 
+ #define gettid()    ((pid_t) syscall(SYS_gettid))
+ #endif /*__GLIBC_PREREQ */
++#endif /*__GLIBC__*/
+ 
+ size_t page_size(void)
+ {
+-- 
+2.25.1
+

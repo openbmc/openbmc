@@ -113,6 +113,8 @@ def init(fn, data):
             return h['init'](data)
 
 def init_parser(d):
+    if hasattr(bb.parse, "siggen"):
+        bb.parse.siggen.exit()
     bb.parse.siggen = bb.siggen.init(d)
 
 def resolve_file(fn, d):

@@ -1,0 +1,64 @@
+From 44b4bcd56d7ac2bd8ebf00e9fa433ad897d68216 Mon Sep 17 00:00:00 2001
+From: Philip Withnall <pwithnall@endlessos.org>
+Date: Fri, 1 Apr 2022 13:44:45 +0100
+Subject: [PATCH 1/2] tests: Add C++ tests for typechecking with atomic compare
+ and exchanges
+
+Signed-off-by: Philip Withnall <pwithnall@endlessos.org>
+
+Helps: #2625
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/glib/-/merge_requests/2578]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ glib/tests/cxx.cpp | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/glib/tests/cxx.cpp b/glib/tests/cxx.cpp
+index be0a6bfa1..7d7f27c91 100644
+--- a/glib/tests/cxx.cpp
++++ b/glib/tests/cxx.cpp
+@@ -53,6 +53,32 @@ test_typeof (void)
+ #endif
+ }
+ 
++static void
++test_atomic_pointer_compare_and_exchange (void)
++{
++  const gchar *str1 = "str1";
++  const gchar *str2 = "str2";
++  const gchar *atomic_string = str1;
++
++  g_test_message ("Test that g_atomic_pointer_compare_and_exchange() with a "
++                  "non-void* pointer doesn’t have any compiler warnings in C++ mode");
++
++  g_assert_true (g_atomic_pointer_compare_and_exchange (&atomic_string, str1, str2));
++  g_assert_true (atomic_string == str2);
++}
++
++static void
++test_atomic_int_compare_and_exchange (void)
++{
++  gint atomic_int = 5;
++
++  g_test_message ("Test that g_atomic_int_compare_and_exchange() doesn’t have "
++                  "any compiler warnings in C++ mode");
++
++  g_assert_true (g_atomic_int_compare_and_exchange (&atomic_int, 5, 50));
++  g_assert_cmpint (atomic_int, ==, 50);
++}
++
+ int
+ main (int argc, char *argv[])
+ {
+@@ -63,6 +89,8 @@ main (int argc, char *argv[])
+ #endif
+ 
+   g_test_add_func ("/C++/typeof", test_typeof);
++  g_test_add_func ("/C++/atomic-pointer-compare-and-exchange", test_atomic_pointer_compare_and_exchange);
++  g_test_add_func ("/C++/atomic-int-compare-and-exchange", test_atomic_int_compare_and_exchange);
+ 
+   return g_test_run ();
+ }
+-- 
+2.35.1
+

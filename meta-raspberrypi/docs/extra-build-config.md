@@ -278,6 +278,18 @@ the header extension should set the following in local.conf:
 
     ENABLE_DWC2_HOST = "1"
 
+## Set CPUs to be isolated from the standard Linux scheduler
+
+By default Linux will use all available CPUs for scheduling tasks. For real time
+purposes there can be an advantage to isolating one or more CPUs from the
+standard scheduler. It should be noted that CPU 0 is special, it is the only CPU
+available during the early stages of the boot process and cannot be isolated.
+
+The string assigned to this variable may be a single CPU number, a comma
+separated list ("1,2"), a range("1-3"), or a mixture of these ("1,3-5")
+
+    ISOLATED_CPUS = "1-2"
+
 ## Enable Openlabs 802.15.4 radio module
 
 When using device tree kernels, set this variable to enable the 802.15.4 hat:
@@ -290,13 +302,13 @@ See: <https://openlabs.co/OSHW/Raspberry-Pi-802.15.4-radio>
 
 In order to use CAN with an MCP2515-based module, set the following variables:
 
-	ENABLE_SPI_BUS = "1"
-	ENABLE_CAN = "1"
+    ENABLE_SPI_BUS = "1"
+    ENABLE_CAN = "1"
 
 In case of dual CAN module (e.g. PiCAN2 Duo), set following variables instead:
 
     ENABLE_SPI_BUS = "1"
-	ENABLE_DUAL_CAN = "1"
+    ENABLE_DUAL_CAN = "1"
 
 Some modules may require setting the frequency of the crystal oscillator used on the particular board. The frequency is usually marked on the package of the crystal. By default, it is set to 16 MHz. To change that to 8 MHz, the following variable also has to be set:
 
@@ -388,3 +400,23 @@ You may need to adjust volume and toggle switches that are off by default
     ```
 
 Audio capture on ReSpeaker 2 / 4 / 6 Mics Pi HAT from Seeed Studio is very noisy.
+
+## Support for RTC devices
+
+The RaspberryPi boards don't feature an RTC module and the machine
+configurations provided in this BSP layer have this assumption (until, if at
+all, some later boards will come with one).
+
+`rtc` is handled as a `MACHINE_FEATURES` in the context of the build system
+which means that if an attached device is provided for which support is needed,
+the recommended way forward is to write a new machine configuration based on an
+existing one. Check the documentation for
+`MACHINE_FEATURES_BACKFILL_CONSIDERED` for how this is disabled for the
+relevant machines.
+
+Even when `MACHINE_FEATURES` is tweaked to include the needed `rtc` string,
+make sure that your kernel configuration is supporting the attached device and
+the device tree is properly tweaked. Also, mind the runtime components that
+take advantage of your RTC device. You can do that by checking what is
+included/configured in the build system based on the inclusion of `rtc` in
+`MACHINE_FEATURES`.

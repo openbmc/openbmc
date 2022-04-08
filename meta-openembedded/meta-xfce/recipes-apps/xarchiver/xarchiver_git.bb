@@ -3,13 +3,13 @@ HOMEPAGE = "http://xarchiver.sourceforge.net"
 SECTION = "x11"
 
 LICENSE = "GPL-2.0-or-later"
-LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
+LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS = "gtk+3 glib-2.0 xfce4-dev-tools-native intltool-native"
 
 SRC_URI = "git://github.com/ib/xarchiver.git;branch=master;protocol=https"
-SRCREV = "9ab958a4023b62b43972c55a3143ff0722bd88a6"
-PV = "0.5.4.14"
+SRCREV = "2f6c91e756678f0723305d8636e8e393c1eef32c"
+PV = "0.5.4.17"
 S = "${WORKDIR}/git"
 
 inherit gettext pkgconfig autotools gtk-icon-cache features_check mime-xdg

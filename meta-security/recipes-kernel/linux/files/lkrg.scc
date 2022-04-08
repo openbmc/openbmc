@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: MIT
+define KFEATURE_DESCRIPTION "Enable Support for LKRG"
+define KFEATURE_COMPATIBILITY board
+
+kconf hardware lkrg.cfg

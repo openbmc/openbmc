@@ -1,0 +1,68 @@
+From 330b77081c3a4c7ae76cb08602db385b40fa7ff7 Mon Sep 17 00:00:00 2001
+From: Simone Weiss <simone.weiss@elektrobit.com>
+Date: Mon, 13 Dec 2021 09:29:53 +0000
+Subject: [PATCH] popt test output format for ptest
+
+patch test output format to match simple-test as it is used in ptests.
+
+Upstream-Status: Pending
+    
+Signed-off-by: Simone Weiss <simone.weiss@elektrobit.com>
+Signed-off-by: David Niederpruem <david.niederpruem@elektrobit.com>
+---
+ tests/testit.sh | 20 ++++++++------------
+ 1 file changed, 8 insertions(+), 12 deletions(-)
+
+diff --git a/tests/testit.sh b/tests/testit.sh
+index 2a7b4aa..50b42e2 100755
+--- a/tests/testit.sh
++++ b/tests/testit.sh
+@@ -5,12 +5,11 @@ run() {
+     name=$1; shift
+     answer=$1; shift
+ 
+-    echo Running test $name.
+-
+     result=`HOME=$builddir $builddir/$prog $*`
+     if [ "$answer" != "$result" ]; then
+-	echo "Test \"$prog $*\" failed with: \"$result\" != \"$answer\" "
+-	exit 2
++        echo "FAIL: $name"
++    else
++        echo "PASS: $name"
+     fi
+ }
+ 
+@@ -23,17 +22,17 @@ run_diff() {
+     out=$builddir/tmp.out
+     diff_file=$builddir/tmp.diff
+ 
+-    echo Running test $name.
+-
+     $builddir/$prog $in_file > $out
+     ret=$?
+     diff $out $answer_file > $diff_file
+     diff_ret=$?
+ 
+     if [ "$diff_ret" != "0" ]; then
+-       echo "Test \"$name\" failed output is in $out, diff is:"
+-       cat $diff_file
+-       exit 2
++        echo "FAIL: $name"
++        echo "diff is:"
++        cat $diff_file
++    else
++        echo "PASS: $name"
+     fi
+     rm $out $diff_file
+ }
+@@ -174,6 +173,3 @@ Help options:
+ #run_diff test3 "test3 - 51" test3-data/01.input test3-data/01.answer
+ #run_diff test3 "test3 - 52" test3-data/02.input test3-data/02.answer
+ #run_diff test3 "test3 - 53" test3-data/03.input test3-data/03.answer
+-
+-echo ""
+-echo "Passed."
+-- 
+2.17.1
+

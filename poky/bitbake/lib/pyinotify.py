@@ -603,6 +603,17 @@ class _ProcessEvent:
                                   unknown event.
         """
         stripped_mask = event.mask - (event.mask & IN_ISDIR)
+        # Bitbake hack - we see event masks of 0x6, IN_MODIFY & IN_ATTRIB
+        # The kernel inotify code can set more than one of the bits in the mask,
+        # fsnotify_change() in linux/fsnotify.h is quite clear that IN_ATTRIB,
+        # IN_MODIFY and IN_ACCESS can arrive together.
+        # This breaks the code below which assume only one mask bit is ever
+        # set in an event. We don't care about attrib or access in bitbake so drop those
+        if (stripped_mask & IN_MODIFY) and (stripped_mask & IN_ATTRIB):
+            stripped_mask = stripped_mask - (stripped_mask & IN_ATTRIB)
+        if (stripped_mask & IN_MODIFY) and (stripped_mask & IN_ACCESS):
+            stripped_mask = stripped_mask - (stripped_mask & IN_ACCESS)
+
         maskname = EventsCodes.ALL_VALUES.get(stripped_mask)
         if maskname is None:
             raise ProcessEventError("Unknown mask 0x%08x" % stripped_mask)

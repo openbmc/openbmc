@@ -50,6 +50,11 @@ do_install () {
     install -d ${D}${nonarch_libdir} ${D}${sysconfdir}
     install -m 0644 os-release ${D}${nonarch_libdir}/
     ln -rs ${D}${nonarch_libdir}/os-release ${D}${sysconfdir}/os-release
+    ln -rs ${D}${nonarch_libdir}/os-release ${D}${sysconfdir}/initrd-release
 }
 
-FILES:${PN} += "${nonarch_libdir}/os-release"
+FILES:${PN} = "${sysconfdir}/os-release ${nonarch_libdir}/os-release"
+
+PACKAGES += "${PN}-initrd"
+FILES:${PN}-initrd = "${sysconfdir}/initrd-release"
+RDEPENDS:${PN}-initrd += "${PN}"

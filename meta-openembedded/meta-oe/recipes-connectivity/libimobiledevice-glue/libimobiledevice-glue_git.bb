@@ -10,11 +10,8 @@ DEPENDS = "libplist"
 
 PV = "1.0.0+git${SRCPV}"
 
-SRCREV = "ecb0996fd2a3b0539153dd3ef901d137bf498ffe"
-SRC_URI = "\
-    git://github.com/libimobiledevice/libimobiledevice-glue;protocol=https;branch=master \
-    file://0001-fix-undefined-bswap32-and-bswap64-errors-for-MIPS-ma.patch \
-"
+SRCREV = "bc6c44b92091c9587a9bed0ed3f2c3248bfd13b3"
+SRC_URI = "git://github.com/libimobiledevice/libimobiledevice-glue;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"
 inherit autotools pkgconfig

@@ -2,7 +2,7 @@ SUMMARY = "system security services daemon"
 DESCRIPTION = "SSSD is a system security services daemon"
 HOMEPAGE = "https://pagure.io/SSSD/sssd/"
 SECTION = "base"
-LICENSE = "GPLv3+"
+LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 DEPENDS = "acl attr openldap cyrus-sasl libtdb ding-libs libpam c-ares krb5 autoconf-archive"

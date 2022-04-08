@@ -13,7 +13,7 @@ SRC_URI = "git://github.com/OpenSCAP/openscap-daemon.git;branch=master;protocol=
            file://0001-Renamed-module-and-variables-to-get-rid-of-async.patch \
           "
 
-inherit setuptools_build_meta
+inherit python_setuptools_build_meta
 
 S = "${WORKDIR}/git"
 
