@@ -45,3 +45,4 @@ RDEPENDS:${PN}-leds:remove:witherspoon-tacoma = "phosphor-led-manager-faultmonit
 
 ${PN}-software-extras:append:ibm-ac-server = " phosphor-software-manager-sync"
 ${PN}-software-extras:append:p10bmc = " phosphor-software-manager-usb"
+${PN}-software-extras:append:p10bmc = " phosphor-software-manager-side-switch"

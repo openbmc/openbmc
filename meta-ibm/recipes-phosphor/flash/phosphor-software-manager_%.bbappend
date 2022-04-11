@@ -19,3 +19,7 @@ PACKAGECONFIG:append:mihawk = " sync_bmc_files"
 
 # Enable USB code update
 PACKAGECONFIG:append:p10bmc = " usb_code_update"
+
+# Enable Side Switch Boot
+PACKAGECONFIG:append:p10bmc = " side_switch_on_boot"
+
