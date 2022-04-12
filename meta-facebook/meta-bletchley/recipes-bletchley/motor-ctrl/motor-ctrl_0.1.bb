@@ -28,8 +28,8 @@ do_install() {
 
 TGT = "${SYSTEMD_DEFAULT_TARGET}"
 MOTOR_INIT_INSTFMT="../motor-init-calibration@.service:${TGT}.wants/motor-init-calibration@{0}.service"
-PWR_ON_INSTFMT="host-poweron@.service:host-poweron@{0}.service"
-PWR_OFF_INSTFMT="host-poweroff@.service:host-poweroff@{0}.service"
+PWR_ON_INSTFMT="../host-poweron@.service:obmc-host-startmin@{0}.target.wants/host-poweron@{0}.service"
+PWR_OFF_INSTFMT="../host-poweroff@.service:obmc-host-shutdown@{0}.target.wants/host-poweroff@{0}.service"
 AC_ON_INSTFMT="../host-ac-on@.service:${TGT}.wants/host-ac-on@{0}.service"
 AC_OFF_INSTFMT="host-ac-off@.service:host-ac-off@{0}.service"
 
