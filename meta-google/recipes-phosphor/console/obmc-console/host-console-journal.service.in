@@ -1,0 +1,11 @@
+[Unit]
+Requires=obmc-console@@HOST_TTY@.service
+After=obmc-console@@HOST_TTY@.service
+
+[Service]
+Type=simple
+SyslogIdentifier=host-console
+ExecStart=/usr/bin/host-console-filtered.sh
+
+[Install]
+WantedBy=multi-user.target

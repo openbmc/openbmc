@@ -1,0 +1,22 @@
+[Unit]
+Description=BMC Serial Getty on %I
+BindsTo=dev-%i.device
+After=dev-%i.device systemd-user-sessions.service
+After=rc-local.service
+Before=getty.target
+IgnoreOnIsolate=yes
+
+Conflicts=serial-to-host@%i.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=no
+RestartSec=0
+ExecStart=-/sbin/agetty -8 -n -o '-f root' -i -N -R -L %I 115200 xterm
+ExecStopPost=-/bin/sh -c 'systemctl start --no-block serial-to-host@%i'
+UtmpIdentifier=%I
+TTYPath=/dev/%I
+KillMode=process
+IgnoreSIGPIPE=no
+SendSIGHUP=yes
