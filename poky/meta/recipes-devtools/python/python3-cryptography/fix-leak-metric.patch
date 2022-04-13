@@ -1,0 +1,36 @@
+Trigger hashlib initialisation so that the test_create_certificate_with_extensions
+test doesn't fail.
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From dc989d563ab6a078651160e5e6d4ee3df8cb08d7 Mon Sep 17 00:00:00 2001
+From: Alex Gaynor <alex.gaynor@gmail.com>
+Date: Thu, 7 Apr 2022 03:15:09 -0400
+Subject: [PATCH] Added Ubuntu Jammy to CI (#7047)
+
+* Added Ubuntu Jammy to CI
+
+* try thing
+---
+ .github/workflows/ci.yml                      | 1 +
+ docs/installation.rst                         | 2 +-
+ tests/hazmat/backends/test_openssl_memleak.py | 3 +++
+ 3 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/tests/hazmat/backends/test_openssl_memleak.py b/tests/hazmat/backends/test_openssl_memleak.py
+index 835c9256a6..2605566bd5 100644
+--- a/tests/hazmat/backends/test_openssl_memleak.py
++++ b/tests/hazmat/backends/test_openssl_memleak.py
+@@ -82,8 +82,11 @@ def free(ptr, path, line):
+     assert result == 1
+ 
+     # Trigger a bunch of initialization stuff.
++    import hashlib
+     from cryptography.hazmat.backends.openssl.backend import backend
+ 
++    hashlib.sha256()
++
+     start_heap = set(heap)
+ 
+     try:

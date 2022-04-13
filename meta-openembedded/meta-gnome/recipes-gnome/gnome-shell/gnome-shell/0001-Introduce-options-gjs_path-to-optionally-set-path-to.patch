@@ -19,25 +19,25 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
  6 files changed, 25 insertions(+), 4 deletions(-)
 
 diff --git a/js/dbusServices/meson.build b/js/dbusServices/meson.build
-index 68e8bd12d..16efaebe5 100644
+index eb941ed..16efaeb 100644
 --- a/js/dbusServices/meson.build
 +++ b/js/dbusServices/meson.build
 @@ -27,7 +27,7 @@ foreach service, dir : dbus_services
  
    serviceconf = configuration_data()
    serviceconf.set('service', service)
--  serviceconf.set('gjs', gjs.path())
+-  serviceconf.set('gjs', gjs.full_path())
 +  serviceconf.set('gjs', gjs)
    serviceconf.set('pkgdatadir', pkgdatadir)
  
    configure_file(
 diff --git a/meson.build b/meson.build
-index d4583ecf2..3448c6312 100644
+index 8d7478f..7c9cc6a 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -138,7 +138,11 @@ endif
  
- mutter_typelibdir = mutter_dep.get_pkgconfig_variable('typelibdir')
+ mutter_typelibdir = mutter_dep.get_variable('typelibdir')
  python = find_program('python3')
 -gjs = find_program('gjs')
 +if get_option('gjs_path') == ''
@@ -49,7 +49,7 @@ index d4583ecf2..3448c6312 100644
  cc = meson.get_compiler('c')
  
 diff --git a/meson_options.txt b/meson_options.txt
-index f0f2ecf6c..a45f2e453 100644
+index f0f2ecf..a45f2e4 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
 @@ -45,3 +45,9 @@ option('soup2',
@@ -63,20 +63,20 @@ index f0f2ecf6c..a45f2e453 100644
 +  description: 'Instead of searching gjs executable, configure path'
 +)
 diff --git a/subprojects/extensions-app/js/meson.build b/subprojects/extensions-app/js/meson.build
-index f311db6e0..8f7bba4e4 100644
+index ce2a776..8f7bba4 100644
 --- a/subprojects/extensions-app/js/meson.build
 +++ b/subprojects/extensions-app/js/meson.build
 @@ -9,7 +9,7 @@ endif
  launcherconf.set('prefix', prefix)
  launcherconf.set('libdir', libdir)
  launcherconf.set('pkgdatadir', pkgdatadir)
--launcherconf.set('gjs', gjs.path())
+-launcherconf.set('gjs', gjs.full_path())
 +launcherconf.set('gjs', gjs)
  
  configure_file(
    input: prgname + '.in',
 diff --git a/subprojects/extensions-app/meson.build b/subprojects/extensions-app/meson.build
-index f9ccfc24d..bdf118975 100644
+index c260d7a..c5b7554 100644
 --- a/subprojects/extensions-app/meson.build
 +++ b/subprojects/extensions-app/meson.build
 @@ -44,7 +44,12 @@ localedir = join_paths(datadir, 'locale')
@@ -94,7 +94,7 @@ index f9ccfc24d..bdf118975 100644
  desktop_file_validate = find_program('desktop-file-validate', required: false)
  
 diff --git a/subprojects/extensions-app/meson_options.txt b/subprojects/extensions-app/meson_options.txt
-index ca2eb4115..2787785bf 100644
+index ca2eb41..2787785 100644
 --- a/subprojects/extensions-app/meson_options.txt
 +++ b/subprojects/extensions-app/meson_options.txt
 @@ -10,3 +10,9 @@ option('profile',
@@ -108,5 +108,5 @@ index ca2eb4115..2787785bf 100644
 +  description: 'Instead of searching gjs executable, configure path'
 +)
 -- 
-2.31.1
+2.34.1
 

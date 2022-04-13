@@ -16,7 +16,7 @@ SRC_URI += " \
     file://check-memfree.py \
     file://0001-Cargo.toml-specify-pem-version.patch \
     file://0002-Cargo.toml-edition-2018-2021.patch \
-    file://skip-leaky-test.patch \
+    file://fix-leak-metric.patch \
 "
 
 inherit pypi python_setuptools3_rust

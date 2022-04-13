@@ -21,10 +21,9 @@ COMPATIBLE_HOST:armv5 = "null"
 COMPATIBLE_HOST:riscv64 = "null"
 
 # Main dependencies
-inherit cmake pkgconfig lib_package binconfig-disabled ptest
+inherit cmake pkgconfig lib_package ptest
 DEPENDS = "libpcre2"
 DEPENDS += "${@bb.utils.contains('PTEST_ENABLED', '1', 'cmocka', '', d)}"
-BINCONFIG = "${bindir}/pcre2-config"
 
 # Ptest dependencies
 RDEPENDS:${PN}-ptest += "valgrind"

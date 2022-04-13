@@ -48,6 +48,9 @@ PACKAGECONFIG[openldap] = "-DWITH_OPENLDAP=ON,-DWITH_OPENLDAP=OFF,openldap"
 # -ldb needs this on some platforms
 LDFLAGS += "-lpthread -lgmodule-2.0 -lgthread-2.0"
 
+# invokes libraries from build host
+GI_DATA_ENABLED:libc-musl="False"
+
 do_configure:append () {
     cp ${WORKDIR}/iconv-detect.h ${S}/src
     # avoid writing perl-native path into csv2vcard shebang

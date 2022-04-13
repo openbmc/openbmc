@@ -45,7 +45,8 @@ PACKAGECONFIG[qt5] = "--with-qt --with-qt5nativesysroot=${STAGING_DIR_NATIVE},--
 
 EXTRA_OECONF = " \
     --with-readline=${STAGING_LIBDIR}/.. \
-    -disable-wxwidgets \
+    --disable-wxwidgets \
+    --without-libcerf \
 "
 
 do_compile:prepend() {

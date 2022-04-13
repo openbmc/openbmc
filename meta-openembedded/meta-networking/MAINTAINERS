@@ -37,3 +37,7 @@ F:      recipes-*
 NETKIT
 M:      Armin Kuster <akuster808@gmail.com>
 F:      recipes-netkit
+
+OPENTHREAD
+M:      Stefan Schmidt <stefan@datenfreihafen.org>
+F:      recipes-connectivity/openthread/

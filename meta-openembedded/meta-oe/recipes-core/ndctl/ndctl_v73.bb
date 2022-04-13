@@ -13,7 +13,8 @@ inherit meson pkgconfig bash-completion systemd
 SRCREV = "dd58d43458943d20ff063850670bf54a5242c9c5"
 SRC_URI = "git://github.com/pmem/ndctl.git;branch=main;protocol=https \
            file://0001-util-Correct-path-to-iniparser.h.patch \
-           file://0001-meson-Use-pkg-config-to-detect-iniparser.patch"
+           file://0001-meson-Use-pkg-config-to-detect-iniparser.patch \
+           file://0001-build-set-HAVE_STATEMENT_EXPR-var.patch"
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>v\d+(\.\d+)*)"
 

@@ -1,0 +1,131 @@
+From: Stefan Schmidt <stefan.schmidt@huawei.com>
+Subject: Turn off sign compare for musl libc
+
+When building with musl and clang the usage of CMSG_NXTHDR results in
+sign-compare error. Disable the check only in this specific part of the
+code with a #pragma.
+
+| /home/stefan/huawei/yocto-upstream/yoe/workspace/sources/ot-br-posix/third_party/openthread/repo/src/posix/platform/udp.cpp:147:28: fatal error: comparison of integers of different signs: 'unsigned long' and 'long' [-Wsign-compare]
+|         cmsg             = CMSG_NXTHDR(&msg, cmsg);
+|                            ^~~~~~~~~~~~~~~~~~~~~~~
+| /home/stefan/huawei/yocto-upstream/yoe/build/tmp/work/cortexa57-yoe-linux-musl/ot-br-posix/0.3.0+git999-r0/recipe-sysroot/usr/include/sys/socket.h:358:44: note: expanded from macro 'CMSG_NXTHDR'
+|         __CMSG_LEN(cmsg) + sizeof(struct cmsghdr) >= __MHDR_END(mhdr) - (unsigned char *)(cmsg) \
+|         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+| 1 error generated.
+
+Idea and fix taken from
+recipes-devtools/breakpad/breakpad/0001-Turn-off-sign-compare-for-musl-libc.patch
+by Khem Raj.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Stefan Schmidt <stefan.schmidt@huawei.com>
+
+diff --git a/src/backbone_router/nd_proxy.cpp b/src/backbone_router/nd_proxy.cpp
+index 7136878c3d..8a223c95c7 100644
+--- a/src/backbone_router/nd_proxy.cpp
++++ b/src/backbone_router/nd_proxy.cpp
+@@ -185,9 +185,18 @@ void NdProxyManager::ProcessMulticastNeighborSolicition()
+         VerifyOrExit(icmp6header->icmp6_type == ND_NEIGHBOR_SOLICIT, error = OTBR_ERROR_PARSE);
+ 
+         otbrLogDebug("NdProxyManager: Received ND-NS from %s", src.ToString().c_str());
+-
++#ifndef __GLIBC__
++  // In musl-libc, CMSG_NXTHDR typecasts char* to cmsghdr* which causes
++  // clang to throw sign-compare warning. This is to suppress the warning
++  // inline.
++  #pragma clang diagnostic push
++  #pragma clang diagnostic ignored "-Wsign-compare"
++#endif
+         for (cmsghdr = CMSG_FIRSTHDR(&msghdr); cmsghdr; cmsghdr = CMSG_NXTHDR(&msghdr, cmsghdr))
+-        {
++#ifndef __GLIBC__
++  #pragma clang diagnostic pop
++#endif
++	{
+             if (cmsghdr->cmsg_level != IPPROTO_IPV6)
+             {
+                 continue;
+Submodule third_party/openthread/repo contains modified content
+diff --git a/third_party/openthread/repo/src/posix/platform/infra_if.cpp b/third_party/openthread/repo/src/posix/platform/infra_if.cpp
+index 9f93d2b1c..1ed40fe50 100644
+--- a/third_party/openthread/repo/src/posix/platform/infra_if.cpp
++++ b/third_party/openthread/repo/src/posix/platform/infra_if.cpp
+@@ -228,7 +228,17 @@ otError InfraNetif::SendIcmp6Nd(uint32_t            aInfraIfIndex,
+     packetInfo->ipi6_ifindex = mInfraIfIndex;
+ 
+     // Per section 6.1.2 of RFC 4861, we need to send the ICMPv6 message with IP Hop Limit 255.
++#ifndef __GLIBC__
++  // In musl-libc, CMSG_NXTHDR typecasts char* to cmsghdr* which causes
++  // clang to throw sign-compare warning. This is to suppress the warning
++  // inline.
++  #pragma clang diagnostic push
++  #pragma clang diagnostic ignored "-Wsign-compare"
++#endif
+     cmsgPointer             = CMSG_NXTHDR(&msgHeader, cmsgPointer);
++#ifndef __GLIBC__
++  #pragma clang diagnostic pop
++#endif
+     cmsgPointer->cmsg_level = IPPROTO_IPV6;
+     cmsgPointer->cmsg_type  = IPV6_HOPLIMIT;
+     cmsgPointer->cmsg_len   = CMSG_LEN(sizeof(hopLimit));
+@@ -481,7 +491,17 @@ void InfraNetif::ReceiveIcmp6Message(void)
+ 
+     bufferLength = static_cast<uint16_t>(rval);
+ 
++#ifndef __GLIBC__
++  // In musl-libc, CMSG_NXTHDR typecasts char* to cmsghdr* which causes
++  // clang to throw sign-compare warning. This is to suppress the warning
++  // inline.
++  #pragma clang diagnostic push
++  #pragma clang diagnostic ignored "-Wsign-compare"
++#endif
+     for (cmh = CMSG_FIRSTHDR(&msg); cmh; cmh = CMSG_NXTHDR(&msg, cmh))
++#ifndef __GLIBC__
++  #pragma clang diagnostic pop
++#endif
+     {
+         if (cmh->cmsg_level == IPPROTO_IPV6 && cmh->cmsg_type == IPV6_PKTINFO &&
+             cmh->cmsg_len == CMSG_LEN(sizeof(struct in6_pktinfo)))
+diff --git a/third_party/openthread/repo/src/posix/platform/udp.cpp b/third_party/openthread/repo/src/posix/platform/udp.cpp
+index b7aacc5fa..a814fea70 100644
+--- a/third_party/openthread/repo/src/posix/platform/udp.cpp
++++ b/third_party/openthread/repo/src/posix/platform/udp.cpp
+@@ -144,8 +144,18 @@ otError transmitPacket(int aFd, uint8_t *aPayload, uint16_t aLength, const otMes
+     {
+         struct in6_pktinfo pktinfo;
+ 
++#ifndef __GLIBC__
++  // In musl-libc, CMSG_NXTHDR typecasts char* to cmsghdr* which causes
++  // clang to throw sign-compare warning. This is to suppress the warning
++  // inline.
++  #pragma clang diagnostic push
++  #pragma clang diagnostic ignored "-Wsign-compare"
++#endif
+         cmsg             = CMSG_NXTHDR(&msg, cmsg);
+-        cmsg->cmsg_level = IPPROTO_IPV6;
++#ifndef __GLIBC__
++  #pragma clang diagnostic pop
++#endif
++	cmsg->cmsg_level = IPPROTO_IPV6;
+         cmsg->cmsg_type  = IPV6_PKTINFO;
+         cmsg->cmsg_len   = CMSG_LEN(sizeof(pktinfo));
+ 
+@@ -200,7 +210,17 @@ otError receivePacket(int aFd, uint8_t *aPayload, uint16_t &aLength, otMessageIn
+     VerifyOrExit(rval > 0, perror("recvmsg"));
+     aLength = static_cast<uint16_t>(rval);
+ 
++#ifndef __GLIBC__
++  // In musl-libc, CMSG_NXTHDR typecasts char* to cmsghdr* which causes
++  // clang to throw sign-compare warning. This is to suppress the warning
++  // inline.
++  #pragma clang diagnostic push
++  #pragma clang diagnostic ignored "-Wsign-compare"
++#endif
+     for (struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg); cmsg != nullptr; cmsg = CMSG_NXTHDR(&msg, cmsg))
++#ifndef __GLIBC__
++  #pragma clang diagnostic pop
++#endif
+     {
+         if (cmsg->cmsg_level == IPPROTO_IPV6)
+         {

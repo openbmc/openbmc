@@ -1,0 +1,31 @@
+From aa2362e50d54fce8464d85766f5b230bf453c1f0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 8 Apr 2022 20:15:03 -0700
+Subject: [PATCH] tests: Include missing sys/socket.h header
+
+Helps define
+| ../../../../libotr-4.1.1/tests/regression/client/client.c:979:21: error: use of undeclared identifier 'PF_UNIX'
+| ../../../../libotr-4.1.1/tests/regression/client/client.c:979:30: error: use of undeclared identifier 'SOCK_STREAM'
+| ../../../../libotr-4.1.1/tests/regression/client/client.c:986:20: error: use of undeclared identifier 'AF_UNIX'
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/regression/client/client.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/regression/client/client.c b/tests/regression/client/client.c
+index e72b661..e0b3453 100644
+--- a/tests/regression/client/client.c
++++ b/tests/regression/client/client.c
+@@ -26,6 +26,7 @@
+ #include <stdlib.h>
+ #include <syscall.h>
+ #include <sys/epoll.h>
++#include <sys/socket.h>
+ #include <sys/types.h>
+ #include <sys/un.h>
+ #include <unistd.h>
+-- 
+2.35.1
+

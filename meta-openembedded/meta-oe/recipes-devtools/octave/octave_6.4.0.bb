@@ -34,6 +34,10 @@ SRC_URI = " \
 "
 SRC_URI[sha256sum] = "b48f33d4fceaf394cfbea73a8c850000936d83a41739a24f7568b5b0a7b39acd"
 
+# Note: Qt5Help is required for gui -> qttools(-native) must be build with
+# clang in PACKAGECONFIG
+PACKAGECONFIG[gui] = "--with-qt=yes,--with-qt=no,qttools-native qttools qtbase"
+
 EXTRA_OECONF = " \
     --disable-java \
     --disable-docs \

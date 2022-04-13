@@ -24,6 +24,7 @@ SRC_URI = " \
     file://fix-libdir-for-multilib.patch \
     file://respect-DESTDIR-when-create-link.patch \
     file://not-append-system-name-to-lib-name.patch \
+    file://wx-config-fix-libdir-for-multilib.patch \
 "
 SRCREV= "9c0a8be1dc32063d91ed1901fd5fcd54f4f955a1"
 S = "${WORKDIR}/git"
@@ -42,10 +43,11 @@ EXTRA_OECMAKE += " \
 EXTRA_OECMAKE:append:libc-musl = " \
     -DHAVE_LOCALE_T=OFF \
 "
+EXTRA_OECMAKE:append:class-target = ' -DEGREP="/bin/grep -E"'
 
-# All toolkit-configs except 'no_gui' require x11 explicitly (see toolkit.cmake)
-PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'gtk', 'no_gui', d)} \
-    ${@bb.utils.filter('DISTRO_FEATURES', 'opengl', d)} \
+# OpenGL support currently seems tied to using libglu, which requires x11
+PACKAGECONFIG ?= "${@bb.utils.contains_any('DISTRO_FEATURES', 'x11 wayland', 'gtk', 'no_gui', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'x11 opengl', 'opengl', '', d)} \
 "
 
 PACKAGECONFIG:remove:class-native = "opengl"
@@ -112,5 +114,7 @@ FILES:${PN}-dev += " \
     ${libdir}/wx/include/ \
     ${libdir}/wx/config/ \
 "
+
+RDEPENDS:${PN}-dev += "grep"
 
 BBCLASSEXTEND = "native"
