@@ -1,0 +1,5 @@
+/xyz/openbmc_project/control/host{}/restriction_mode:
+    - Interface: xyz.openbmc_project.Control.Security.RestrictionMode
+      Properties:
+          RestrictionMode:
+              Default: RestrictionMode::Modes::Whitelist
