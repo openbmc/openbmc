@@ -11,6 +11,8 @@ SRC_URI += "file://host-template.yaml"
 
 PROVIDES += "virtual/phosphor-settings-defaults"
 
+SETTINGS_HOST_TEMPLATES:append = " host-template.yaml"
+
 S = "${WORKDIR}"
 
 do_install() {
@@ -20,7 +22,9 @@ do_install() {
 
         for i in ${OBMC_HOST_INSTANCES};
         do
-                cat host-template.yaml | sed "s/{}/${i}/g" >> ${DEST}/defaults.yaml
-
+            for f in ${SETTINGS_HOST_TEMPLATES};
+            do
+                cat ${f} | sed "s/{}/${i}/g" >> ${DEST}/defaults.yaml
+            done
         done
 }
