@@ -8,6 +8,8 @@ DEFAULT_TARGETS = " \
     obmc-host-stop@{}.target.wants/phosphor-set-host-transition-to-off@{}.service \
     obmc-host-reset@{}.target.requires/phosphor-reset-host-running@{}.service \
     obmc-host-stop@{}.target.wants/phosphor-reset-sensor-states@{}.service \
+    obmc-host-graceful-quiesce@{}.target.wants/obmc-host-quiesce@{}.target \
+    obmc-host-graceful-quiesce@{}.target.wants/pldmSoftPowerOff.service \
     obmc-host-quiesce@{}.target.wants/phosphor-reset-sensor-states@{}.service \
     obmc-host-shutdown@{}.target.requires/obmc-chassis-poweroff@{}.target \
     obmc-host-reboot@{}.target.requires/obmc-host-shutdown@{}.target \
