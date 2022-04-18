@@ -2,6 +2,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append:ibm-ac-server = " mboxd max31785-msl phosphor-ms
 OBMC_IMAGE_EXTRA_INSTALL:append:p10bmc = " mboxd"
 OBMC_IMAGE_EXTRA_INSTALL:append:mihawk = " mboxd liberation-fonts uart-render-controller "
 
+IMAGE_FEATURES:append = " obmc-dbus-monitor"
+
 # remove so things fit in available flash space
 IMAGE_FEATURES:remove:witherspoon = "obmc-user-mgmt-ldap"
 IMAGE_FEATURES:remove:witherspoon = "obmc-telemetry"
