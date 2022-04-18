@@ -4,7 +4,7 @@ inherit useradd
 USERADD_PACKAGES = "${PN}"
 
 # add a user called httpd for the server to assume
-USERADD_PARAM:${PN} = "-r -s /usr/sbin/nologin bmcweb"
+USERADD_PARAM:${PN} = "-r -s /sbin/nologin bmcweb"
 GROUPADD_PARAM:${PN} = "web; redfish"
 
 LICENSE = "Apache-2.0"
