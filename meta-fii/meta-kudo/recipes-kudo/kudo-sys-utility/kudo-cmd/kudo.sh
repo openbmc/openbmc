@@ -100,15 +100,15 @@ function fw_rev() {
 
   #Save Major Version value between v and . "vXX." then convert Hex to Decimal
   MajorVersion=${StringVersion#*v}
-  MajorVersion=$(( 16#${MajorVersion%.*}))
+  MajorVersion=$(( 10#${MajorVersion%.*}))
 
   #Save SubMajor Version valeu between . and - ".XX-" then convert  Hex to Decimal
   SubMajorVersion=${StringVersion##*.}
-  SubMajorVersion=$(( 16#${SubMajorVersion%%-*}))
+  SubMajorVersion=$(( 10#${SubMajorVersion%%-*}))
 
   #Save Minor Version value between - and - "-XX-" then convert  Hex to Decimal
   MinorVersion=${StringVersion#*-}
-  MinorVersion=$(( 16#${MinorVersion%-*}))
+  MinorVersion=$(( 10#${MinorVersion%-*}))
 
   echo " BMC: " ${MajorVersion}.${SubMajorVersion}.${MinorVersion}
 
