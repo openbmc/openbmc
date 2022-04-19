@@ -7,14 +7,14 @@ DEPENDS += "systemd"
 RDEPENDS:${PN} += "libsystemd"
 RDEPENDS:${PN} += "bash"
 
-SRC_URI:append = " \
+SRC_URI +=" \
     file://usb_network.sh \
     file://usb_network.service \
     file://00-bmc-usb0.network \
     "
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE:${PN}:append = " usb_network.service"
+SYSTEMD_SERVICE:${PN} += " usb_network.service"
 FILES:${PN} += "${sysconfdir_native}/systemd/network/00-bmc-usb0.network"
 
 do_install() {
