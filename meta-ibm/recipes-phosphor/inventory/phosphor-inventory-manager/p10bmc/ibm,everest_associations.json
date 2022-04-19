@@ -4637,6 +4637,193 @@
                     ]
                 }
             ]
+        },
+        {
+            "path": "/system/chassis/motherboard/pcieslot1",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/system/chassis/motherboard/pcieslot2",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm2/cpu1"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/system/chassis/motherboard/pcieslot3",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm2/cpu1"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/system/chassis/motherboard/pcieslot4",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm2/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/system/chassis/motherboard/pcieslot5",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm2/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/system/chassis/motherboard/pcieslot6",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm1/cpu1"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/system/chassis/motherboard/pcieslot7",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm1/cpu1"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/system/chassis/motherboard/pcieslot8",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm1/cpu1"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/system/chassis/motherboard/pcieslot9",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm1/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/system/chassis/motherboard/pcieslot10",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm1/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/system/chassis/motherboard/pcieslot11",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm1/cpu0"
+                    ]
+                }
+            ]
         }
     ]
 }

@@ -1881,6 +1881,17 @@
                     [
                         "/xyz/openbmc_project/inventory/system/chassis"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm1/cpu1"
+                    ]
                 }
             ]
         },
@@ -1919,6 +1930,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm1/cpu1"
                     ]
                 }
             ]
@@ -1959,6 +1981,17 @@
                     [
                         "/xyz/openbmc_project/inventory/system/chassis"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm1/cpu1"
+                    ]
                 }
             ]
         },
@@ -1998,6 +2031,17 @@
                     [
                         "/xyz/openbmc_project/inventory/system/chassis"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm1/cpu0"
+                    ]
                 }
             ]
         },
@@ -2036,6 +2080,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm1/cpu0"
                     ]
                 }
             ]
@@ -2115,6 +2170,17 @@
                     [
                         "/xyz/openbmc_project/inventory/system/chassis"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu1"
+                    ]
                 }
             ]
         },
@@ -2153,6 +2219,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu1"
                     ]
                 }
             ]
@@ -2193,6 +2270,17 @@
                     [
                         "/xyz/openbmc_project/inventory/system/chassis"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu1"
+                    ]
                 }
             ]
         },
@@ -2232,6 +2320,17 @@
                     [
                         "/xyz/openbmc_project/inventory/system/chassis"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
                 }
             ]
         },
@@ -2270,6 +2369,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
                     ]
                 }
             ]
