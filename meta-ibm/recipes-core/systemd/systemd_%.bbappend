@@ -9,6 +9,7 @@ SRC_URI:append:p10bmc = " file://journald-size-policy-16MB.conf"
 SRC_URI:append:p10bmc = " file://vm.conf"
 SRC_URI:append:p10bmc = " file://network.conf"
 SRC_URI:append:p10bmc = " file://systemd-networkd-only-wait-for-one.conf"
+SRC_URI:append:p10bmc = " file://systemd-sulogin-force.conf"
 
 SRC_URI:append:genesis3 = " file://systemd-networkd-only-wait-for-one.conf"
 SRC_URI:append:sbp1 = " file://systemd-networkd-only-wait-for-one.conf"
@@ -24,6 +25,8 @@ FILES:${PN}:append:p10bmc = " ${systemd_unitdir}/journald.conf.d/journald-size-p
 FILES:${PN}:append:p10bmc = " ${sysconfdir}/sysctl.d/vm.conf"
 FILES:${PN}:append:p10bmc = " ${sysconfdir}/sysctl.d/network.conf"
 FILES:${PN}:append:p10bmc = " ${systemd_system_unitdir}/systemd-networkd-wait-online.service.d/systemd-networkd-only-wait-for-one.conf"
+FILES:${PN}:append:p10bmc = " ${systemd_system_unitdir}/emergency.service.d/systemd-sulogin-force.conf"
+FILES:${PN}:append:p10bmc = " ${systemd_system_unitdir}/rescue.service.d/systemd-sulogin-force.conf"
 
 FILES:${PN}:append:genesis3 = " ${systemd_system_unitdir}/systemd-networkd-wait-online.service.d/systemd-networkd-only-wait-for-one.conf"
 FILES:${PN}:append:sbp1 = " ${systemd_system_unitdir}/systemd-networkd-wait-online.service.d/systemd-networkd-only-wait-for-one.conf"
@@ -41,6 +44,8 @@ do_install:append:p10bmc() {
         install -m 644 -D ${WORKDIR}/vm.conf ${D}${sysconfdir}/sysctl.d/vm.conf
         install -m 644 -D ${WORKDIR}/network.conf ${D}${sysconfdir}/sysctl.d/network.conf
         install -m 644 -D ${WORKDIR}/systemd-networkd-only-wait-for-one.conf ${D}${systemd_system_unitdir}/systemd-networkd-wait-online.service.d/systemd-networkd-only-wait-for-one.conf
+        install -m 644 -D ${WORKDIR}/systemd-sulogin-force.conf ${D}${systemd_system_unitdir}/emergency.service.d/systemd-sulogin-force.conf
+        install -m 644 -D ${WORKDIR}/systemd-sulogin-force.conf ${D}${systemd_system_unitdir}/rescue.service.d/systemd-sulogin-force.conf
 }
 
 # Genesis3 and SBP1 uses both BMC's RGMII MACs, so wait for only one to be online
