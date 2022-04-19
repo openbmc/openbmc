@@ -11,11 +11,11 @@ function fw_rev() {
     case $1 in
     cpldb)
         rsp=($(i2cget -y -f -a "${I2C_BMC_CPLD[0]}" 0x"${I2C_BMC_CPLD[1]}" 0x00 i 5))
-        ver=$(printf '%d.%d.%d.%d' "${rsp[5]}" "${rsp[4]}" "${rsp[3]}" "${rsp[2]}")
+        ver=$(printf '%d.%d.%d.%d' "${rsp[4]}" "${rsp[3]}" "${rsp[2]}" "${rsp[1]}")
         ;;
     cpldm)
         rsp=($(i2cget -y -f -a "${I2C_MB_CPLD[0]}" 0x"${I2C_MB_CPLD[1]}" 0x00 i 5))
-        ver=$(printf '%d.%d.%d.%d' "${rsp[5]}" "${rsp[4]}" "${rsp[3]}" "${rsp[2]}")
+        ver=$(printf '%d.%d.%d.%d' "${rsp[4]}" "${rsp[3]}" "${rsp[2]}" "${rsp[1]}")
         ;;
     *)
         ;;
