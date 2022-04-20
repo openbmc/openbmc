@@ -12,10 +12,6 @@ pkg_postinst:${PN}-obmc-targets:append() {
         TARGET="../xyz.openbmc_project.State.Host@.service"
         ln -s $TARGET $LINK
 
-        LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Chassis@${i}.service"
-        TARGET="../xyz.openbmc_project.State.Chassis@.service"
-        ln -s $TARGET $LINK
-
         LINK="$D$systemd_system_unitdir/multi-user.target.requires/obmc-host-reset@${i}.target"
         TARGET="../obmc-host-reset@.target"
         ln -s $TARGET $LINK
@@ -106,6 +102,17 @@ pkg_postinst:${PN}-obmc-targets:append() {
     done
 }
 
+pkg_postinst:${PN}-chassis:append() {
+    for i in ${OBMC_HOST_INSTANCES};
+    do
+        mkdir -p $D$systemd_system_unitdir/multi-user.target.requires
+
+        LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Chassis@${i}.service"
+        TARGET="../xyz.openbmc_project.State.Chassis@.service"
+        ln -s $TARGET $LINK
+    done
+}
+
 pkg_postinst:${PN}-chassis-check-power-status:append() {
 
     for i in ${OBMC_HOST_INSTANCES};
@@ -180,6 +187,16 @@ pkg_prerm:${PN}-obmc-targets:append() {
         rm $LINK
 
         LINK="$D$systemd_system_unitdir/obmc-chassis-poweroff@${i}.target.wants/phosphor-clear-one-time@${i}.service"
+        rm $LINK
+
+    done
+}
+
+pkg_prerm:${PN}-chassis:append() {
+    for i in ${OBMC_HOST_INSTANCES};
+    do
+
+        LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Chassis@${i}.service"
         rm $LINK
 
     done
