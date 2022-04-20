@@ -103,13 +103,14 @@ pkg_postinst:${PN}-obmc-targets:append() {
 }
 
 pkg_postinst:${PN}-chassis:append() {
-    for i in ${OBMC_HOST_INSTANCES};
+    for i in ${OBMC_CHASSIS_INSTANCES};
     do
         mkdir -p $D$systemd_system_unitdir/multi-user.target.requires
 
         LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Chassis@${i}.service"
         TARGET="../xyz.openbmc_project.State.Chassis@.service"
         ln -s $TARGET $LINK
+
     done
 }
 
@@ -193,7 +194,7 @@ pkg_prerm:${PN}-obmc-targets:append() {
 }
 
 pkg_prerm:${PN}-chassis:append() {
-    for i in ${OBMC_HOST_INSTANCES};
+    for i in ${OBMC_CHASSIS_INSTANCES};
     do
 
         LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Chassis@${i}.service"
