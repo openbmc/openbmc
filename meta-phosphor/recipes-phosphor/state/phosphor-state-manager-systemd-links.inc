@@ -1,5 +1,4 @@
 DEFAULT_TARGETS = " \
-    multi-user.target.requires/xyz.openbmc_project.State.Host@{}.service \
     multi-user.target.requires/obmc-host-reset@{}.target \
     multi-user.target.requires/phosphor-discover-system-state@{}.service \
     obmc-chassis-poweron@{}.target.wants/phosphor-reset-host-recovery@{}.service \
@@ -62,6 +61,18 @@ pkg_postinst:${PN}-chassis-check-power-status:append() {
     done
 }
 
+pkg_postinst:${PN}-host:append() {
+    for i in ${OBMC_HOST_INSTANCES};
+    do
+        mkdir -p $D$systemd_system_unitdir/multi-user.target.requires
+
+        LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Host@${i}.service"
+        TARGET="../xyz.openbmc_project.State.Host@.service"
+        ln -s $TARGET $LINK
+
+    done
+}
+
 pkg_prerm:${PN}-obmc-targets:append() {
 
     for i in ${OBMC_HOST_INSTANCES};
@@ -91,6 +102,16 @@ pkg_prerm:${PN}-chassis-check-power-status:append() {
     do
 
         LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@${i}.target.requires/phosphor-chassis-check-power-status@${i}.service"
+        rm $LINK
+
+    done
+}
+
+pkg_prerm:${PN}-host:append() {
+    for i in ${OBMC_HOST_INSTANCES};
+    do
+
+        LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Host@${i}.service"
         rm $LINK
 
     done
