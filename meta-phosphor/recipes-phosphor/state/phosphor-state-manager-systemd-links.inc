@@ -24,7 +24,6 @@ DEFAULT_TARGETS = " \
 #       currently that there is a 1-to-1 relationship between the two.
 
 pkg_postinst:${PN}-obmc-targets:append() {
-
     for i in ${OBMC_HOST_INSTANCES};
     do
         for j in ${DEFAULT_TARGETS};
@@ -38,43 +37,7 @@ pkg_postinst:${PN}-obmc-targets:append() {
     done
 }
 
-pkg_postinst:${PN}-chassis:append() {
-    for i in ${OBMC_CHASSIS_INSTANCES};
-    do
-        mkdir -p $D$systemd_system_unitdir/multi-user.target.requires
-
-        LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Chassis@${i}.service"
-        TARGET="../xyz.openbmc_project.State.Chassis@.service"
-        ln -s $TARGET $LINK
-
-    done
-}
-
-pkg_postinst:${PN}-chassis-check-power-status:append() {
-
-    for i in ${OBMC_HOST_INSTANCES};
-    do
-        mkdir -p $D$systemd_system_unitdir/obmc-chassis-poweron@${i}.target.requires
-        LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@${i}.target.requires/phosphor-chassis-check-power-status@${i}.service"
-        TARGET="../phosphor-chassis-check-power-status@.service"
-        ln -s $TARGET $LINK
-    done
-}
-
-pkg_postinst:${PN}-host:append() {
-    for i in ${OBMC_HOST_INSTANCES};
-    do
-        mkdir -p $D$systemd_system_unitdir/multi-user.target.requires
-
-        LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Host@${i}.service"
-        TARGET="../xyz.openbmc_project.State.Host@.service"
-        ln -s $TARGET $LINK
-
-    done
-}
-
 pkg_prerm:${PN}-obmc-targets:append() {
-
     for i in ${OBMC_HOST_INSTANCES};
     do
         for j in ${DEFAULT_TARGETS};
@@ -86,33 +49,56 @@ pkg_prerm:${PN}-obmc-targets:append() {
     done
 }
 
+pkg_postinst:${PN}-chassis:append() {
+    for i in ${OBMC_CHASSIS_INSTANCES};
+    do
+        mkdir -p $D$systemd_system_unitdir/multi-user.target.requires
+        LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Chassis@${i}.service"
+        TARGET="../xyz.openbmc_project.State.Chassis@.service"
+        ln -s $TARGET $LINK
+    done
+}
+
 pkg_prerm:${PN}-chassis:append() {
     for i in ${OBMC_CHASSIS_INSTANCES};
     do
-
         LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Chassis@${i}.service"
         rm $LINK
+    done
+}
 
+pkg_postinst:${PN}-chassis-check-power-status:append() {
+    for i in ${OBMC_HOST_INSTANCES};
+    do
+        mkdir -p $D$systemd_system_unitdir/obmc-chassis-poweron@${i}.target.requires
+        LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@${i}.target.requires/phosphor-chassis-check-power-status@${i}.service"
+        TARGET="../phosphor-chassis-check-power-status@.service"
+        ln -s $TARGET $LINK
     done
 }
 
 pkg_prerm:${PN}-chassis-check-power-status:append() {
-
     for i in ${OBMC_HOST_INSTANCES};
     do
-
         LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@${i}.target.requires/phosphor-chassis-check-power-status@${i}.service"
         rm $LINK
+    done
+}
 
+pkg_postinst:${PN}-host:append() {
+    for i in ${OBMC_HOST_INSTANCES};
+    do
+        mkdir -p $D$systemd_system_unitdir/multi-user.target.requires
+        LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Host@${i}.service"
+        TARGET="../xyz.openbmc_project.State.Host@.service"
+        ln -s $TARGET $LINK
     done
 }
 
 pkg_prerm:${PN}-host:append() {
     for i in ${OBMC_HOST_INSTANCES};
     do
-
         LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Host@${i}.service"
         rm $LINK
-
     done
 }
