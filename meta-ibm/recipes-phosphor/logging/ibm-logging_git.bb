@@ -6,7 +6,7 @@ HOMEPAGE = "https://github.com/openbmc/ibm-logging"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 SRC_URI += "git://github.com/openbmc/ibm-logging;branch=master;protocol=https"
-SRCREV = "c07636205e9b2110d6e9e4d28ae246834f143939"
+SRCREV = "d5b6fd18c8ec161067565e17527537bd236efc4f"
 
 inherit autotools
 inherit pkgconfig
