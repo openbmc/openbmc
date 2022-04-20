@@ -17,4 +17,4 @@ RDEPENDS:${PN} += "e2fsprogs"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/estoraged.git;branch=master;protocol=https"
-SRCREV = "2b5454d316b564e63b6f5afa5e0018a014d81365"
+SRCREV = "fa5cb6f7186851db5b3a77bfb07452d440827eee"
