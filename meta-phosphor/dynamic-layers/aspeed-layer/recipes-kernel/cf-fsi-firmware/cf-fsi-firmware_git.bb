@@ -1,7 +1,7 @@
 SUMMARY = "Firmware for using the ASPEED ColdFire FSI master"
 SECTION = "kernel"
 
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 SRCREV = "bae32e353a3641b5164211f6bf06c5620f6e384d"

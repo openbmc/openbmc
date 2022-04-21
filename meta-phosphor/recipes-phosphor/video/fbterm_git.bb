@@ -1,5 +1,5 @@
 HOMEPAGE = "https://github.com/jk-ozlabs/fbterm"
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 
 SRC_URI += "git://github.com/jk-ozlabs/fbterm.git;nobranch=1;protocol=https"
 SRC_URI += "file://fb.modes"
