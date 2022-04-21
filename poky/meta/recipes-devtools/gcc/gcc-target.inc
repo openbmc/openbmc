@@ -193,7 +193,7 @@ do_install () {
 	rm -f *c++*
 
 	# We don't care about the gcc-<version> ones for this
-	rm -f *gcc-?.?*
+	rm -f *gcc-?*.?*
 
 	# Not sure why we end up with these but we don't want them...
 	rm -f ${TARGET_PREFIX}${TARGET_PREFIX}*

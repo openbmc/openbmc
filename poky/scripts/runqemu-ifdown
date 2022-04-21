@@ -64,3 +64,4 @@ n=$[ (`echo $TAP | sed 's/tap//'` * 2) + 1 ]
 dest=$[ (`echo $TAP | sed 's/tap//'` * 2) + 2 ]
 $IPTABLES -D POSTROUTING -t nat -j MASQUERADE -s 192.168.7.$n/32
 $IPTABLES -D POSTROUTING -t nat -j MASQUERADE -s 192.168.7.$dest/32
+true

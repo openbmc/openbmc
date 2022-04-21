@@ -1,4 +1,4 @@
-From dfa834ebd449df299f54e98f0fb3a7bb4008fb03 Mon Sep 17 00:00:00 2001
+From 37699e9be04d83c5923644e298f400e077f76e85 Mon Sep 17 00:00:00 2001
 From: Paul Eggleton <paul.eggleton@linux.intel.com>
 Date: Tue, 17 Jul 2012 11:27:39 +0100
 Subject: [PATCH] Log the SELinux context at startup.
@@ -8,17 +8,16 @@ Log the SELinux context at startup.
 Upstream-Status: Inappropriate [other]
 
 Note: unlikely to be any interest in this upstream
-
 ---
  configure.in  |  5 +++++
  server/core.c | 26 ++++++++++++++++++++++++++
  2 files changed, 31 insertions(+)
 
 diff --git a/configure.in b/configure.in
-index dc6ea15..caa6f54 100644
+index c799aec..76811e7 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -466,6 +466,11 @@ getloadavg
+@@ -491,6 +491,11 @@ getloadavg
  dnl confirm that a void pointer is large enough to store a long integer
  APACHE_CHECK_VOID_PTR_LEN
  
@@ -31,10 +30,10 @@ index dc6ea15..caa6f54 100644
  [AC_TRY_RUN(#define _GNU_SOURCE
  #include <unistd.h>
 diff --git a/server/core.c b/server/core.c
-index 7aa841f..79f34db 100644
+index 3020090..8fef5fd 100644
 --- a/server/core.c
 +++ b/server/core.c
-@@ -59,6 +59,10 @@
+@@ -65,6 +65,10 @@
  #include <unistd.h>
  #endif
  
@@ -45,7 +44,7 @@ index 7aa841f..79f34db 100644
  /* LimitRequestBody handling */
  #define AP_LIMIT_REQ_BODY_UNSET         ((apr_off_t) -1)
  #define AP_DEFAULT_LIMIT_REQ_BODY       ((apr_off_t) 0)
-@@ -4984,6 +4988,28 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
+@@ -5126,6 +5130,28 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
      }
  #endif
  
@@ -75,5 +74,5 @@ index 7aa841f..79f34db 100644
  }
  
 -- 
-2.7.4
+2.25.1
 

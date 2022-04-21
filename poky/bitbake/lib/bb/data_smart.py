@@ -494,10 +494,10 @@ class DataSmart(MutableMapping):
 
         if not var.startswith("__anon_") and ("_append" in var or "_prepend" in var or "_remove" in var):
             info = "%s" % var
-            if "filename" in loginfo:
-                info += " file: %s" % loginfo[filename]
-            if "lineno" in loginfo:
-                info += " line: %s" % loginfo[lineno]
+            if "file" in loginfo:
+                info += " file: %s" % loginfo["file"]
+            if "line" in loginfo:
+                info += " line: %s" % loginfo["line"]
             bb.fatal("Variable %s contains an operation using the old override syntax. Please convert this layer/metadata before attempting to use with a newer bitbake." % info)
 
         self.expand_cache = {}

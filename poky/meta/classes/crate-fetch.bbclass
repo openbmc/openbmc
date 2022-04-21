@@ -22,6 +22,9 @@ crate_import_handler[eventmask] = "bb.event.RecipePreFinalise"
 
 def crate_get_srcrev(d):
     import_crate(d)
+    srcuri = d.getVar("SRC_URI")
+    if "crate://" not in srcuri and "git://" not in srcuri:
+        return "Invalid"
     return bb.fetch2.get_srcrev(d)
 
 # Override SRCPV to make sure it imports the fetcher first

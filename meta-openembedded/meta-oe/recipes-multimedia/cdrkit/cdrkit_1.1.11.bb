@@ -23,6 +23,8 @@ inherit cmake
 DEPENDS = "libcap file bzip2"
 RDEPENDS:dirsplit = "perl"
 
+RDEPENDS:${PN}-dev = ""
+
 PACKAGES =+ "dirsplit genisoimage icedax wodim"
 
 FILES:dirsplit = " \

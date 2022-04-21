@@ -1,8 +1,8 @@
-From ddd560024a6d526187fd126f306b59533ca3f7e2 Mon Sep 17 00:00:00 2001
+From 9c03ed909b8da0e1a288f53fda535a3f15bcf791 Mon Sep 17 00:00:00 2001
 From: Paul Eggleton <paul.eggleton@linux.intel.com>
 Date: Tue, 17 Jul 2012 11:27:39 +0100
-Subject: [PATCH] apache2: do not export apr/apr-util symbols when using
- shared libapr
+Subject: [PATCH] apache2: do not export apr/apr-util symbols when using shared
+ libapr
 
 There is no need to "suck in" the apr/apr-util symbols when using
 a shared libapr{,util}, it just bloats the symbol table; so don't.
@@ -10,13 +10,12 @@ a shared libapr{,util}, it just bloats the symbol table; so don't.
 Upstream-Status: Pending
 
 Note: EXPORT_DIRS change is conditional on using shared apr
-
 ---
  server/Makefile.in | 3 ---
  1 file changed, 3 deletions(-)
 
 diff --git a/server/Makefile.in b/server/Makefile.in
-index 1fa3344..f635d76 100644
+index 8111877..8c0c396 100644
 --- a/server/Makefile.in
 +++ b/server/Makefile.in
 @@ -60,9 +60,6 @@ export_files:
@@ -30,5 +29,5 @@ index 1fa3344..f635d76 100644
  
  exports.c: export_files
 -- 
-2.7.4
+2.25.1
 

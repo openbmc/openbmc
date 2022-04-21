@@ -1,0 +1,9 @@
+diff --git a/Makefile.am b/Makefile.am
+index 432a9b4..bbf7c74 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,3 +1,4 @@
++## This is useless comment to test if patch works
+ ACLOCAL_AMFLAGS = -I m4
+ 
+ SUBDIRS = matchbox-panel applets data po

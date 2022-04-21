@@ -101,11 +101,11 @@ def _toaster_load_pkgdatafile(dirpath, filepath):
         for line in fin:
             try:
                 kn, kv = line.strip().split(": ", 1)
-                m = re.match(r"^PKG_([^A-Z:]*)", kn)
+                m = re.match(r"^PKG:([^A-Z:]*)", kn)
                 if m:
                     pkgdata['OPKGN'] = m.group(1)
-                kn = "_".join([x for x in kn.split("_") if x.isupper()])
-                pkgdata[kn] = kv.strip()
+                kn = kn.split(":")[0]
+                pkgdata[kn] = kv
                 if kn.startswith('FILES_INFO'):
                     pkgdata[kn] = json.loads(kv)
 

@@ -19,7 +19,7 @@
     <field type="CharField" name="value">${TOPDIR}/../sstate-cache</field>
   </object>
   <object model="orm.toastersetting" pk="6">
-    <field type="CharField" name="name">DEFCONF_IMAGE_INSTALL_append</field>
+    <field type="CharField" name="name">DEFCONF_IMAGE_INSTALL:append</field>
     <field type="CharField" name="value"></field>
   </object>
   <object model="orm.toastersetting" pk="7">

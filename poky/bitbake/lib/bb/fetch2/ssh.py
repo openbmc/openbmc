@@ -40,9 +40,9 @@ __pattern__ = re.compile(r'''
  (                   # Optional username/password block
   (?P<user>\S+)      # username
   (:(?P<pass>\S+))?  # colon followed by the password (optional)
- )?
  (?P<cparam>(;[^;]+)*)?  # connection parameters block (optional)
  @
+ )?
  (?P<host>\S+?)          # non-greedy match of the host
  (:(?P<port>[0-9]+))?    # colon followed by the port (optional)
  /

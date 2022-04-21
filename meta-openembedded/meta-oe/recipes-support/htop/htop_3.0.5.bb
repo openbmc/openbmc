@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4099d367cd5e59b6d4fc1ee33accb891"
 
 DEPENDS = "ncurses"
 
-SRC_URI = "git://github.com/htop-dev/htop.git;branch=master;protocol=https \
+SRC_URI = "git://github.com/htop-dev/htop.git;branch=main;protocol=https \
            file://0001-Use-pkg-config.patch \
            "
 SRCREV = "ce6d60e7def146c13d0b8bca4642e7401a0a8995"

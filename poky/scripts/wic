@@ -159,6 +159,9 @@ def wic_create_subcommand(options, usage_str):
                            "(Use -e/--image-name to specify it)")
         native_sysroot = options.native_sysroot
 
+    if options.kernel_dir:
+        kernel_dir = options.kernel_dir
+
     if not options.vars_dir and (not native_sysroot or not os.path.isdir(native_sysroot)):
         logger.info("Building wic-tools...\n")
         subprocess.check_call(["bitbake", "wic-tools"])

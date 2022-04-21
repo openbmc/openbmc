@@ -19,10 +19,11 @@ BINCONFIG = "${bindir}/pcap-config"
 
 # Explicitly disable dag support. We don't have recipe for it and if enabled here,
 # configure script poisons the include dirs with /usr/local/include even when the
-# support hasn't been detected.
+# support hasn't been detected. Do the same thing for DPDK.
 EXTRA_OECONF = " \
                  --with-pcap=linux \
                  --without-dag \
+                 --without-dpdk \
                  "
 EXTRA_AUTORECONF += "--exclude=aclocal"
 

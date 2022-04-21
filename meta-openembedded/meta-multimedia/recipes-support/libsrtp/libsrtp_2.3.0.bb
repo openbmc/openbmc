@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=2909fcf6f09ffff8430463d91c08c4e1"
 
 S = "${WORKDIR}/git"
 SRCREV = "d02d21111e379c297e93a9033d7b653135f732ee"
-SRC_URI = "git://github.com/cisco/libsrtp.git;branch=master;protocol=https"
+SRC_URI = "git://github.com/cisco/libsrtp.git;branch=main;protocol=https"
 
 inherit autotools pkgconfig
 

@@ -192,14 +192,15 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, srcbranch, branch, kee
             get_branch = [x.strip() for x in check_branch.splitlines()]
             # Remove HEAD reference point and drop remote prefix
             get_branch = [x.split('/', 1)[1] for x in get_branch if not x.startswith('origin/HEAD')]
-            if 'master' in get_branch:
-                # If it is master, we do not need to append 'branch=master' as this is default.
-                # Even with the case where get_branch has multiple objects, if 'master' is one
-                # of them, we should default take from 'master'
-                srcbranch = ''
-            elif len(get_branch) == 1:
-                # If 'master' isn't in get_branch and get_branch contains only ONE object, then store result into 'srcbranch'
+            if len(get_branch) == 1:
+                # If srcrev is on only ONE branch, then use that branch
                 srcbranch = get_branch[0]
+            elif 'main' in get_branch:
+                # If srcrev is on multiple branches, then choose 'main' if it is one of them
+                srcbranch = 'main'
+            elif 'master' in get_branch:
+                # Otherwise choose 'master' if it is one of the branches
+                srcbranch = 'master'
             else:
                 # If get_branch contains more than one objects, then display error and exit.
                 mbrch = '\n  ' + '\n  '.join(get_branch)

@@ -26,6 +26,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 SRC_URI = "https://cdn.zabbix.com/zabbix/sources/stable/5.2/${BPN}-${PV}.tar.gz \
     file://0001-Fix-configure.ac.patch \
     file://zabbix-agent.service \
+    file://0001-.F.-DEV-2077-fixed-reflected-XSS-issues.patch \
 "
 
 SRC_URI[md5sum] = "31dab3535a1fa212f5724902727f6d4d"

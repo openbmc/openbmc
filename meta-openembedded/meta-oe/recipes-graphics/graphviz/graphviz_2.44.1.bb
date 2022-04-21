@@ -74,6 +74,17 @@ do_install:append:class-nativesdk() {
 }
 FILES:${PN}:class-nativesdk += "${SDKPATHNATIVE}"
 
+# create /usr/lib/graphviz/config6
+graphviz_sstate_postinst() {
+    mkdir -p ${SYSROOT_DESTDIR}${bindir}
+    dest=${SYSROOT_DESTDIR}${bindir}/postinst-${PN}
+    echo '#!/bin/sh' > $dest
+    echo '' >> $dest
+    echo 'dot -c' >> $dest
+    chmod 0755 $dest
+}
+SYSROOT_PREPROCESS_FUNCS:append:class-native = " graphviz_sstate_postinst"
+
 PACKAGES =+ "${PN}-python ${PN}-perl ${PN}-demo"
 
 FILES:${PN}-python += "${libdir}/python*/site-packages/ ${libdir}/graphviz/python/"

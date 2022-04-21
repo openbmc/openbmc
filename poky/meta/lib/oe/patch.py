@@ -304,14 +304,19 @@ class GitApplyTree(PatchTree):
 
     def _isInitialized(self):
         cmd = "git rev-parse --show-toplevel"
-        (status, output) = subprocess.getstatusoutput(cmd.split())
+        try:
+            output = runcmd(cmd.split(), self.dir).strip()
+        except CmdError as err:
+            ## runcmd returned non-zero which most likely means 128
+            ## Not a git directory
+            return False
         ## Make sure repo is in builddir to not break top-level git repos
-        return status == 0 and os.path.samedir(output, self.dir)
+        return os.path.samefile(output, self.dir)
 
     def _initRepo(self):
         runcmd("git init".split(), self.dir)
         runcmd("git add .".split(), self.dir)
-        runcmd("git commit -a --allow-empty -m Patching_started".split(), self.dir)
+        runcmd("git commit -a --allow-empty -m bitbake_patching_started".split(), self.dir)
 
     @staticmethod
     def extractPatchHeader(patchfile):

@@ -1,0 +1,93 @@
+CVE: CVE-2022-0907
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From a139191cc86f4dc44c74a0f22928e0fb38ed2485 Mon Sep 17 00:00:00 2001
+From: Augustus <wangdw.augustus@qq.com>
+Date: Mon, 7 Mar 2022 18:21:49 +0800
+Subject: [PATCH 3/6] add checks for return value of limitMalloc (#392)
+
+---
+ tools/tiffcrop.c | 33 +++++++++++++++++++++------------
+ 1 file changed, 21 insertions(+), 12 deletions(-)
+
+diff --git a/tools/tiffcrop.c b/tools/tiffcrop.c
+index 302a7e91..e407bf51 100644
+--- a/tools/tiffcrop.c
++++ b/tools/tiffcrop.c
+@@ -7357,7 +7357,11 @@ createImageSection(uint32_t sectsize, unsigned char **sect_buff_ptr)
+   if (!sect_buff)
+     {
+     sect_buff = (unsigned char *)limitMalloc(sectsize);
+-    *sect_buff_ptr = sect_buff;
++    if (!sect_buff)
++    {
++        TIFFError("createImageSection", "Unable to allocate/reallocate section buffer");
++        return (-1);
++    }
+     _TIFFmemset(sect_buff, 0, sectsize);
+     }
+   else
+@@ -7373,15 +7377,15 @@ createImageSection(uint32_t sectsize, unsigned char **sect_buff_ptr)
+       else
+         sect_buff = new_buff;
+ 
++      if (!sect_buff)
++      {
++          TIFFError("createImageSection", "Unable to allocate/reallocate section buffer");
++          return (-1);
++      }
+       _TIFFmemset(sect_buff, 0, sectsize);
+       }
+     }
+ 
+-  if (!sect_buff)
+-    {
+-    TIFFError("createImageSection", "Unable to allocate/reallocate section buffer");
+-    return (-1);
+-    }
+   prev_sectsize = sectsize;
+   *sect_buff_ptr = sect_buff;
+ 
+@@ -7648,7 +7652,11 @@ createCroppedImage(struct image_data *image, struct crop_mask *crop,
+   if (!crop_buff)
+     {
+     crop_buff = (unsigned char *)limitMalloc(cropsize);
+-    *crop_buff_ptr = crop_buff;
++    if (!crop_buff)
++    {
++        TIFFError("createCroppedImage", "Unable to allocate/reallocate crop buffer");
++        return (-1);
++    }
+     _TIFFmemset(crop_buff, 0, cropsize);
+     prev_cropsize = cropsize;
+     }
+@@ -7664,15 +7672,15 @@ createCroppedImage(struct image_data *image, struct crop_mask *crop,
+         }
+       else
+         crop_buff = new_buff;
++      if (!crop_buff)
++      {
++          TIFFError("createCroppedImage", "Unable to allocate/reallocate crop buffer");
++          return (-1);
++      }
+       _TIFFmemset(crop_buff, 0, cropsize);
+       }
+     }
+ 
+-  if (!crop_buff)
+-    {
+-    TIFFError("createCroppedImage", "Unable to allocate/reallocate crop buffer");
+-    return (-1);
+-    }
+   *crop_buff_ptr = crop_buff;
+ 
+   if (crop->crop_mode & CROP_INVERT)
+@@ -9231,3 +9239,4 @@ invertImage(uint16_t photometric, uint16_t spp, uint16_t bps, uint32_t width, ui
+  * fill-column: 78
+  * End:
+  */
++
+-- 
+2.25.1
+

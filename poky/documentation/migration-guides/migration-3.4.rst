@@ -140,7 +140,7 @@ configuration provided and tested by the Yocto Project, there is
 simply no sense in continuing to enable prelink.
 
 There's also a concern that no one is maintaining the code, and there
-are open bugs (including `this serious one <https://bugzilla.yoctoproject.org/show_bug.cgi?id=14429>`__).
+are open bugs (including :yocto_bugs:`this serious one </show_bug.cgi?id=14429>`).
 Given that prelink does intricate address arithmetic and rewriting
 of binaries the best option is to disable the feature. It is recommended
 that you consider disabling this feature in your own configuration if

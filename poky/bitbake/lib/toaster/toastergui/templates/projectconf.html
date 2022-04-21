@@ -73,7 +73,7 @@
 
     {% if image_install_append_defined %}
     <dt>
-    <span class="js-config-var-name js-config-var-managed-name">IMAGE_INSTALL_append</span>
+    <span class="js-config-var-name js-config-var-managed-name">IMAGE_INSTALL:append</span>
     <span class="glyphicon glyphicon-question-sign get-help" title="Specifies additional packages to install into an image. If your build creates more than one image, the packages will be installed in all of them"></span>
     </dt>
     <dd class="variable-list">
@@ -83,7 +83,7 @@
     <form id="change-image_install-form" class="form-inline" style="display:none;">
       <div class="row">
         <div class="col-md-4">
-          <span class="help-block">To set IMAGE_INSTALL_append to more than one package, type the package names separated by a space.</span>
+          <span class="help-block">To set IMAGE_INSTALL:append to more than one package, type the package names separated by a space.</span>
         </div>
       </div>
       <div class="form-group">
@@ -771,10 +771,10 @@ $(document).ready(function() {
 
   {% if image_install_append_defined %}
 
-  // init IMAGE_INSTALL_append trash icon
+  // init IMAGE_INSTALL:append trash icon
   setDeleteTooltip($('#delete-image_install-icon'));
 
-  // change IMAGE_INSTALL_append variable
+  // change IMAGE_INSTALL:append variable
   $('#change-image_install-icon').click(function() {
     // preset the edit value
     var current_val = $("span#image_install").text().trim();
@@ -814,7 +814,7 @@ $(document).ready(function() {
   $('#apply-change-image_install').click(function(){
     // insure these non-empty values have single space prefix
     var value = " " + $('#new-image_install').val().trim();
-    postEditAjaxRequest({"configvarChange" : 'IMAGE_INSTALL_append:'+value});
+    postEditAjaxRequest({"configvarChange" : 'IMAGE_INSTALL:append:'+value});
     $('#image_install').text(value);
     $('#image_install').removeClass('text-muted');
     $("#change-image_install-form").slideUp(function () {
@@ -826,10 +826,10 @@ $(document).ready(function() {
     });
   });
 
-  // delete IMAGE_INSTALL_append variable value
+  // delete IMAGE_INSTALL:append variable value
   $('#delete-image_install-icon').click(function(){
     $(this).tooltip('hide');
-    postEditAjaxRequest({"configvarChange" : 'IMAGE_INSTALL_append:'+''});
+    postEditAjaxRequest({"configvarChange" : 'IMAGE_INSTALL:append:'+''});
     $('#image_install').parent().fadeOut(1000, function(){
       $('#image_install').addClass('text-muted');
       $('#image_install').text('Not set');
@@ -1011,7 +1011,7 @@ $(document).ready(function() {
     $(".save").attr("disabled","disabled");
 
     // Reload page if admin-removed core managed value is manually added back in
-    if (0 <= " DISTRO DL_DIR IMAGE_FSTYPES IMAGE_INSTALL_append PACKAGE_CLASSES SSTATE_DIR ".indexOf( " "+variable+" " )) {
+    if (0 <= " DISTRO DL_DIR IMAGE_FSTYPES IMAGE_INSTALL:append PACKAGE_CLASSES SSTATE_DIR ".indexOf( " "+variable+" " )) {
       // delayed reload to avoid race condition with postEditAjaxRequest
       do_reload=true;
     }

@@ -310,8 +310,22 @@ INHERIT:remove = \"report-error\"
         src = get_bb_var("SRC_URI",test_recipe)
         gitscm = re.search("git://", src)
         self.assertFalse(gitscm, "test_git_patchtool pre-condition failed: {} test recipe contains git repo!".format(test_recipe))
-        result = bitbake('man-db -c patch', ignore_status=False)
+        result = bitbake('{} -c patch'.format(test_recipe), ignore_status=False)
         fatal = re.search("fatal: not a git repository (or any of the parent directories)", result.output)
         self.assertFalse(fatal, "Failed to patch using PATCHTOOL=\"git\"")
         self.delete_recipeinc(test_recipe)
-        bitbake('-cclean man-db')
+        bitbake('-cclean {}'.format(test_recipe))
+
+    def test_git_patchtool2(self):
+        """ Test if PATCHTOOL=git works with git repo and doesn't reinitialize it
+        """
+        test_recipe = "gitrepotest"
+        src = get_bb_var("SRC_URI",test_recipe)
+        gitscm = re.search("git://", src)
+        self.assertTrue(gitscm, "test_git_patchtool pre-condition failed: {} test recipe doesn't contains git repo!".format(test_recipe))
+        result = bitbake('{} -c patch'.format(test_recipe), ignore_status=False)
+        srcdir = get_bb_var('S', test_recipe)
+        result = runCmd("git log", cwd = srcdir)
+        self.assertFalse("bitbake_patching_started" in result.output, msg = "Repository has been reinitialized. {}".format(srcdir))
+        self.delete_recipeinc(test_recipe)
+        bitbake('-cclean {}'.format(test_recipe))
