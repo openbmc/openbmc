@@ -1,0 +1,121 @@
+#!/bin/bash
+
+set_gpio()
+{
+    local pin_info
+    read -r -a pin_info < <(gpiofind "$1")
+    gpioset "${pin_info[0]}" "${pin_info[1]}"="$2"
+}
+
+bind_flash()
+{
+    local sled_index=$1
+
+    if [ "$sled_index" -eq 1 ]; then
+        set_gpio SEL_SPI2_MUX 0
+        set_gpio SPI2_MUX1 0
+        set_gpio SPI2_MUX2 1
+        set_gpio SPI2_MUX3 1
+    elif [ "$sled_index" -eq 2 ]; then
+        set_gpio SEL_SPI2_MUX 1
+        set_gpio SPI2_MUX1 0
+        set_gpio SPI2_MUX2 1
+        set_gpio SPI2_MUX3 1
+    elif [ "$sled_index" -eq 3 ]; then
+        set_gpio SEL_SPI2_MUX 0
+        set_gpio SPI2_MUX1 1
+        set_gpio SPI2_MUX2 0
+        set_gpio SPI2_MUX3 1
+    elif [ "$sled_index" -eq 4 ]; then
+        set_gpio SEL_SPI2_MUX 1
+        set_gpio SPI2_MUX1 1
+        set_gpio SPI2_MUX2 0
+        set_gpio SPI2_MUX3 1
+    elif [ "$sled_index" -eq 5 ]; then
+        set_gpio SEL_SPI2_MUX 0
+        set_gpio SPI2_MUX1 1
+        set_gpio SPI2_MUX2 1
+        set_gpio SPI2_MUX3 0
+    elif [ "$sled_index" -eq 6 ]; then
+        set_gpio SEL_SPI2_MUX 1
+        set_gpio SPI2_MUX1 1
+        set_gpio SPI2_MUX2 1
+        set_gpio SPI2_MUX3 0
+    else
+        echo "Error: Invalid sled index $sled_index"
+        return 1
+    fi
+
+    if ! echo -n 1e631000.spi > /sys/bus/platform/drivers/aspeed-smc/bind; then
+        echo "Error: flash bind failed"
+        return 1
+    fi
+    return 0
+}
+
+unbind_flash()
+{
+    echo -n 1e631000.spi > /sys/bus/platform/drivers/aspeed-smc/unbind
+    set_gpio SEL_SPI2_MUX 1
+    set_gpio SPI2_MUX1 1
+    set_gpio SPI2_MUX2 1
+    set_gpio SPI2_MUX3 1
+    return 0
+}
+
+findmtd()
+{
+    m=$(grep -xl "$1" /sys/class/mtd/*/name)
+    m=${m%/name}
+    m=${m##*/}
+    echo "$m"
+}
+
+error_cleanup()
+{
+    unbind_flash
+    exit 1
+}
+
+
+SLED_INDEX=$1
+IMAGE_FILE="/run/initramfs/image-usb"
+MTD_NAME="pnor"
+FLASH_CP_CMD="/usr/sbin/flashcp"
+FLASH_ERASEALL_CMD="/usr/sbin/flash_eraseall"
+
+
+if ! bind_flash "$SLED_INDEX"; then
+    error_cleanup
+fi
+
+sleep 1
+
+pnormtd="$(findmtd $MTD_NAME)"
+if test -z "$pnormtd"; then
+    echo "Error: can not find pnor mtd device"
+    error_cleanup
+fi
+
+sleep 1
+
+MTD_NODE_PATH="/dev/$pnormtd"
+if [ ! -c  "$MTD_NODE_PATH" ]; then
+    echo "Error: /dev/$pnormtd device node not exist"
+    error_cleanup
+fi
+
+echo "Bind mtd node success, path: $MTD_NODE_PATH"
+sleep 1
+
+$FLASH_ERASEALL_CMD "$MTD_NODE_PATH" || error_cleanup
+echo "Erase flash block done"
+sleep 1
+
+$FLASH_CP_CMD -v $IMAGE_FILE "$MTD_NODE_PATH" || error_cleanup
+echo "Write firmware image done"
+sync
+sleep 1
+
+unbind_flash
+exit 0

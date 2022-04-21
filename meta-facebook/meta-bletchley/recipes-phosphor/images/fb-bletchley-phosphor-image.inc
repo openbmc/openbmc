@@ -5,4 +5,5 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-virtual-sensor \
     usbutils \
     idevicerestore \
+    fw-update \
 "

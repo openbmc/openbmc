@@ -1,0 +1,7 @@
+[Unit]
+Description=Flash usb controller image on SLED %i
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/sbin/usb-controller-update %i
