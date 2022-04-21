@@ -11,6 +11,14 @@ SRC_URI = "git://github.com/libexpat/libexpat.git;protocol=https;branch=master \
            file://CVE-2021-45960.patch \
            file://CVE-2021-46143.patch \
            file://CVE-2022-22822-27.patch \
+           file://CVE-2022-23852.patch \
+           file://CVE-2022-23990.patch \
+           file://CVE-2022-25235.patch \
+           file://CVE-2022-25236.patch \
+           file://CVE-2022-25313.patch \
+           file://CVE-2022-25313-regression.patch \
+           file://CVE-2022-25314.patch \
+           file://CVE-2022-25315.patch \
            file://libtool-tag.patch \
          "
 

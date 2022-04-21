@@ -116,10 +116,17 @@ SYSTEMD_SERVICE_${PN} = " \
 "
 SYSTEMD_AUTO_ENABLE = "disable"
 
-FILES_${PN} += "${libdir} ${datadir} ${base_libdir}/security/pam_sss.so"
-FILES_${PN}-dev = " ${includedir}/* ${libdir}/*la ${libdir}/*/*la"
+PACKAGES =+ "libsss-sudo libsss-autofs"
+ALLOW_EMPTY_libsss-sudo = "1"
+ALLOW_EMPTY_libsss-autofs = "1"
 
-# The package contains symlinks that trip up insane
-INSANE_SKIP_${PN} = "dev-so"
+FILES_${PN}-dev += "${libdir}/sssd/modules/lib*.so"
+FILES_${PN} += "${base_libdir}/security/pam_sss*.so  \
+                ${datadir}/dbus-1/system-services/*.service \
+                ${libdir}/krb5/* \
+                ${libdir}/ldb/* \
+                "
+FILES_libsss-autofs = "${libdir}/sssd/modules/libsss_autofs.so"
+FILES_libsss-sudo = "${libdir}/libsss_sudo.so"
 
-RDEPENDS_${PN} = "bind dbus libldb libpam"
+RDEPENDS_${PN} = "bind dbus libldb libpam libsss-sudo libsss-autofs"

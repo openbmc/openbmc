@@ -1,4 +1,4 @@
-From 7db1b650bb4b01a5194a34cd7573f915656a595b Mon Sep 17 00:00:00 2001
+From e59aab44a28c654e518080693d573ca472ca5a08 Mon Sep 17 00:00:00 2001
 From: Yulong Pei <Yulong.pei@windriver.com>
 Date: Thu, 1 Sep 2011 01:03:14 +0800
 Subject: [PATCH] replace lynx to curl in apachectl script
@@ -48,5 +48,5 @@ index 3281c2e..6ab4ba5 100644
  *)
      $HTTPD "$@"
 -- 
-2.7.4
+2.25.1
 

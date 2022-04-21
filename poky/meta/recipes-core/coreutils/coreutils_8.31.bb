@@ -206,6 +206,3 @@ do_install_ptest () {
 }
 
 FILES_${PN}-ptest += "${bindir}/getlimits"
-
-# These are specific to Opensuse
-CVE_WHITELIST += "CVE-2013-0221 CVE-2013-0222 CVE-2013-0223"

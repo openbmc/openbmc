@@ -42,6 +42,7 @@ SRC_URI = "\
      file://0015-sync-with-OE-libtool-changes.patch \
      file://0016-Check-for-clang-before-checking-gcc-version.patch \
      file://0017-binutils-drop-redundant-program_name-definition-fno-.patch \
+     file://0018-Include-members-in-the-variable-table-used-when-reso.patch \
      file://CVE-2020-0551.patch \
      file://0001-gas-improve-reproducibility-for-stabs-debugging-data.patch \
      file://CVE-2020-16592.patch \
@@ -50,5 +51,6 @@ SRC_URI = "\
      file://CVE-2021-3487.patch \
      file://CVE-2021-3549.patch \
      file://CVE-2020-16593.patch \
+     file://0001-CVE-2021-45078.patch \
 "
 S  = "${WORKDIR}/git"

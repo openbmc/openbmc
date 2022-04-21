@@ -8,8 +8,10 @@ SRC_URI[sha256sum] = "f3c5fd51747d450d4dcf6f923c81f78f811aab8205fda64b0aba34a4e4
 
 inherit pypi setuptools3
 
-SRC_URI += "file://CVE-2020-7212.patch"
-
+SRC_URI += "file://CVE-2020-7212.patch \
+            file://CVE-2020-26137.patch \
+            file://CVE-2021-33503.patch \
+           "
 RDEPENDS_${PN} += "\
     ${PYTHON_PN}-certifi \
     ${PYTHON_PN}-cryptography \

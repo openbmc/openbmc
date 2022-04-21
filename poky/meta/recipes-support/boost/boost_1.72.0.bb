@@ -9,4 +9,6 @@ SRC_URI += " \
            file://0001-dont-setup-compiler-flags-m32-m64.patch \
            file://0001-revert-cease-dependence-on-range.patch \
            file://0001-added-typedef-executor_type.patch \
+           file://0001-Revert-change-to-elide-a-warning-that-caused-Solaris.patch \
+           file://0001-Fix-Wsign-compare-warning-with-glibc-2.34-on-Linux-p.patch \
            "

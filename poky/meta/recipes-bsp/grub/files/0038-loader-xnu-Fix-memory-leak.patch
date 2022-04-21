@@ -1,0 +1,38 @@
+From 0a4aa7c16f65cdfaa1013f0796afa929f8d6dc1a Mon Sep 17 00:00:00 2001
+From: Darren Kenny <darren.kenny@oracle.com>
+Date: Thu, 26 Nov 2020 12:53:10 +0000
+Subject: [PATCH] loader/xnu: Fix memory leak
+
+The code here is finished with the memory stored in name, but it only
+frees it if there curvalue is valid, while it could actually free it
+regardless.
+
+The fix is a simple relocation of the grub_free() to before the test
+of curvalue.
+
+Fixes: CID 96646
+
+Signed-off-by: Darren Kenny <darren.kenny@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/grub.git/commit/?id=bcb59ece3263d118510c4440c4da0950f224bb7f]
+Signed-off-by: Marta Rybczynska <marta.rybczynska@huawei.com>
+---
+ grub-core/loader/xnu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/loader/xnu.c b/grub-core/loader/xnu.c
+index 07232d2..b3029a8 100644
+--- a/grub-core/loader/xnu.c
++++ b/grub-core/loader/xnu.c
+@@ -1388,9 +1388,9 @@ grub_xnu_fill_devicetree (void)
+     name[len] = 0;
+ 
+     curvalue = grub_xnu_create_value (curkey, name);
++    grub_free (name);
+     if (!curvalue)
+       return grub_errno;
+-    grub_free (name);
+    
+     data = grub_malloc (grub_strlen (var->value) + 1);
+     if (!data)

@@ -1,0 +1,43 @@
+From 7c1813eeec78892fa651046cc224ae4e80d0c94d Mon Sep 17 00:00:00 2001
+From: Darren Kenny <darren.kenny@oracle.com>
+Date: Fri, 23 Oct 2020 17:09:31 +0000
+Subject: [PATCH] hfsplus: Check that the volume name length is valid
+
+HFS+ documentation suggests that the maximum filename and volume name is
+255 Unicode characters in length.
+
+So, when converting from big-endian to little-endian, we should ensure
+that the name of the volume has a length that is between 0 and 255,
+inclusive.
+
+Fixes: CID 73641
+
+Signed-off-by: Darren Kenny <darren.kenny@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/grub.git/commit/?id=2298f6e0d951251bb9ca97d891d1bc8b74515f8c]
+Signed-off-by: Marta Rybczynska <marta.rybczynska@huawei.com>
+---
+ grub-core/fs/hfsplus.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/grub-core/fs/hfsplus.c b/grub-core/fs/hfsplus.c
+index dae43be..03c3c4c 100644
+--- a/grub-core/fs/hfsplus.c
++++ b/grub-core/fs/hfsplus.c
+@@ -1007,6 +1007,15 @@ grub_hfsplus_label (grub_device_t device, char **label)
+     grub_hfsplus_btree_recptr (&data->catalog_tree, node, ptr);
+ 
+   label_len = grub_be_to_cpu16 (catkey->namelen);
++
++  /* Ensure that the length is >= 0. */
++  if (label_len < 0)
++    label_len = 0;
++
++  /* Ensure label length is at most 255 Unicode characters. */
++  if (label_len > 255)
++    label_len = 255;
++
+   label_name = grub_calloc (label_len, sizeof (*label_name));
+   if (!label_name)
+     {

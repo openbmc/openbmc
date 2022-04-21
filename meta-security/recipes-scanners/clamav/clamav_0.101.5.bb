@@ -29,7 +29,7 @@ inherit autotools pkgconfig useradd systemd multilib_header multilib_script
 
 CLAMAV_UID ?= "clamav"
 CLAMAV_GID ?= "clamav"
-INSTALL_CLAMAV_CVD ?= "1"
+INSTALL_CLAMAV_CVD ?= "0"
 
 CLAMAV_USR_DIR = "${STAGING_DIR_NATIVE}/usr"
 CLAMAV_USR_DIR_class-target = "${STAGING_DIR_HOST}/usr"
@@ -45,7 +45,7 @@ PACKAGECONFIG[bz2] = "--with-libbz2-prefix=${CLAMAV_USR_DIR}, --disable-bzip2, b
 PACKAGECONFIG[ncurses] = "--with-libncurses-prefix=${CLAMAV_USR_DIR}, --without-libncurses-prefix, ncurses, "
 PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_unitdir}/system/, --without-systemdsystemunitdir, "
 
-MULTILIB_SCRIPTS = "${PN}-dev:${bindir}/clamav-config ${PN}-cvd:${localstatedir}/lib/clamav/mirrors.dat"
+MULTILIB_SCRIPTS = "${PN}-dev:${bindir}/clamav-config"
 
 EXTRA_OECONF_CLAMAV = "--without-libcheck-prefix --disable-unrar \
             --disable-mempool \
@@ -69,14 +69,6 @@ do_configure () {
 
 do_configure_class-native () {
     ${S}/configure ${CONFIGUREOPTS} ${EXTRA_OECONF} 
-}
-
-do_compile_append_class-target() {
-    if [ "${INSTALL_CLAMAV_CVD}" = "1" ]; then
-        bbnote "CLAMAV creating cvd"
-        install -d ${S}/clamav_db
-        ${STAGING_BINDIR_NATIVE}/freshclam --datadir=${S}/clamav_db --config=${WORKDIR}/freshclam-native.conf
-    fi
 }
 
 do_install_append_class-target () {
@@ -111,7 +103,7 @@ pkg_postinst_ontarget_${PN} () {
 }
 
 
-PACKAGES = "${PN} ${PN}-dev ${PN}-dbg ${PN}-daemon ${PN}-doc ${PN}-cvd \
+PACKAGES = "${PN} ${PN}-dev ${PN}-dbg ${PN}-daemon ${PN}-doc \
             ${PN}-clamdscan ${PN}-freshclam ${PN}-libclamav ${PN}-staticdev"
 
 FILES_${PN} = "${bindir}/clambc ${bindir}/clamscan ${bindir}/clamsubmit \
@@ -154,8 +146,6 @@ FILES_${PN}-libclamav = "${libdir}/libclamav.so* ${libdir}/libclammspack.so*\
 FILES_${PN}-doc = "${mandir}/man/* \
                    ${datadir}/man/* \
                    ${docdir}/* "
-
-FILES_${PN}-cvd =  "${localstatedir}/lib/clamav/*.cvd ${localstatedir}/lib/clamav/*.dat"
 
 USERADD_PACKAGES = "${PN}"
 GROUPADD_PARAM_${PN} = "--system ${CLAMAV_UID}"

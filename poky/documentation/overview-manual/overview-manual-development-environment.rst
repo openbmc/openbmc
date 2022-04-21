@@ -422,7 +422,7 @@ files. Git uses "branches" to organize different development efforts.
 For example, the ``poky`` repository has several branches that include
 the current "&DISTRO_NAME_NO_CAP;" branch, the "master" branch, and many
 branches for past Yocto Project releases. You can see all the branches
-by going to https://git.yoctoproject.org/cgit.cgi/poky/ and clicking on the
+by going to :yocto_git:`/cgit.cgi/poky/` and clicking on the
 ``[...]`` link beneath the "Branch" heading.
 
 Each of these branches represents a specific area of development. The
@@ -468,7 +468,7 @@ Git uses "tags" to mark specific changes in a repository branch
 structure. Typically, a tag is used to mark a special point such as the
 final change (or commit) before a project is released. You can see the
 tags used with the ``poky`` Git repository by going to
-https://git.yoctoproject.org/cgit.cgi/poky/ and clicking on the ``[...]`` link
+:yocto_git:`/cgit.cgi/poky/` and clicking on the ``[...]`` link
 beneath the "Tag" heading.
 
 Some key tags for the ``poky`` repository are ``jethro-14.0.3``,

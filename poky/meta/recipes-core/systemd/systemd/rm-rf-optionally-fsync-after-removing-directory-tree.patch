@@ -1,0 +1,35 @@
+Backport of the following upstream commit:
+From bdfe7ada0d4d66e6d6e65f2822acbb1ec230f9c2 Mon Sep 17 00:00:00 2001
+From: Lennart Poettering <lennart@poettering.net>
+Date: Tue, 5 Oct 2021 10:32:56 +0200
+Subject: [PATCH] rm-rf: optionally fsync() after removing directory tree
+
+Upstream-Status: Backport [http://archive.ubuntu.com/ubuntu/pool/main/s/systemd/systemd_245.4-4ubuntu3.15.debian.tar.xz]
+Signed-off-by: Purushottam Choudhary <Purushottam.Choudhary@kpit.com>
+---
+ src/basic/rm-rf.c | 3 +++
+ src/basic/rm-rf.h | 1 +
+ 2 files changed, 4 insertions(+)
+
+--- a/src/basic/rm-rf.c
++++ b/src/basic/rm-rf.c
+@@ -161,6 +161,9 @@
+                         ret = r;
+         }
+ 
++        if (FLAGS_SET(flags, REMOVE_SYNCFS) && syncfs(dirfd(d)) < 0 && ret >= 0)
++                ret = -errno;
++
+         return ret;
+ }
+ 
+--- a/src/basic/rm-rf.h
++++ b/src/basic/rm-rf.h
+@@ -11,6 +11,7 @@
+         REMOVE_PHYSICAL         = 1 << 2, /* If not set, only removes files on tmpfs, never physical file systems */
+         REMOVE_SUBVOLUME        = 1 << 3, /* Drop btrfs subvolumes in the tree too */
+         REMOVE_MISSING_OK       = 1 << 4, /* If the top-level directory is missing, ignore the ENOENT for it */
++        REMOVE_SYNCFS           = 1 << 7, /* syncfs() the root of the specified directory after removing everything in it */
+ } RemoveFlags;
+ 
+ int rm_rf_children(int fd, RemoveFlags flags, const struct stat *root_dev);

@@ -18,6 +18,7 @@ RDEPENDS_${PN} = "acl"
 
 SRC_URI = " \
     git://github.com/storaged-project/udisks.git;branch=master;protocol=https \
+    file://CVE-2021-3802.patch \
 "
 PV = "2.8.4+git${SRCREV}"
 SRCREV = "db5f487345da2eaa87976450ea51c2c465d9b82e"

@@ -56,6 +56,8 @@ EXTRA_OESCONS = "--prefix=${D}${prefix} \
                  LINKFLAGS='${LDFLAGS}' \
                  CXXFLAGS='${CXXFLAGS}' \
                  TARGET_ARCH=${TARGET_ARCH} \
+                 MONGO_VERSION=${PV} \
+                 OBJCOPY=${OBJCOPY} \
                  --ssl \
                  --disable-warnings-as-errors \
                  --use-system-zlib \

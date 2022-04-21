@@ -1,0 +1,32 @@
+From bf2252dca8c76e4c1f1c2dbf98dab7ffc9f5e5af Mon Sep 17 00:00:00 2001
+From: Nick Clifton <nickc@redhat.com>
+Date: Sat, 29 Aug 2020 08:03:15 +0100
+Subject: [PATCH] Include members in the variable table used when resolving
+ DW_AT_specification tags.
+
+	PR 26520
+	* dwarf2.c (scan_unit_for_symbols): Add member entries to the
+	variable table.
+
+Upstream-Status: Backport [https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;h=e6f04d55f681149a69102a73937d0987719c3f16]
+---
+ bfd/dwarf2.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/bfd/dwarf2.c b/bfd/dwarf2.c
+index dd3568a8532..ef2f6a3c63c 100644
+--- a/bfd/dwarf2.c
++++ b/bfd/dwarf2.c
+@@ -3248,7 +3248,8 @@ scan_unit_for_symbols (struct comp_unit *unit)
+       else
+ 	{
+ 	  func = NULL;
+-	  if (abbrev->tag == DW_TAG_variable)
++	  if (abbrev->tag == DW_TAG_variable
++	      || abbrev->tag == DW_TAG_member)
+ 	    {
+ 	      bfd_size_type amt = sizeof (struct varinfo);
+ 	      var = (struct varinfo *) bfd_zalloc (abfd, amt);
+-- 
+2.34.1
+

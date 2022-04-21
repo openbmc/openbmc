@@ -15,12 +15,10 @@ SRC_URI = "https://downloads.mariadb.org/interstitial/${BP}/source/${BP}.tar.gz 
            file://support-files-CMakeLists.txt-fix-do_populate_sysroot.patch \
            file://sql-CMakeLists.txt-fix-gen_lex_hash-not-found.patch \
            file://0001-disable-ucontext-on-musl.patch \
-           file://c11_atomics.patch \
-           file://clang_version_header_conflict.patch \
            file://fix-arm-atomic.patch \
           "
-SRC_URI[md5sum] = "c3bc7a3eca3b0bbae5748f7b22a55c0c"
-SRC_URI[sha256sum] = "87d5e29ee1f18de153266ec658138607703ed2a05b3ffb1f89091d33f4abf545"
+SRC_URI[md5sum] = "af39316a6803d13f84fb586635598036"
+SRC_URI[sha256sum] = "fe975551b37f095640ea5e380eb896a37e331caf113dbe5d05564714338df846"
 
 UPSTREAM_CHECK_URI = "https://github.com/MariaDB/server/releases"
 

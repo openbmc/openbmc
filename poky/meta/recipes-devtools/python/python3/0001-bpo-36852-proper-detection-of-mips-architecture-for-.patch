@@ -14,17 +14,21 @@ Upstream-Status: Submitted [https://github.com/python/cpython/pull/13196]
 Signed-off-by: Matthias Schoepfer <matthias.schoepfer@ithinx.io>
 
 %% original patch: 0001-bpo-36852-proper-detection-of-mips-architecture-for-.patch
+
+Updated to apply after dea270a2a80214de22afadaaca2043d0d782eb7d
+
+Signed-off-by: Tim Orling <tim.orling@konsulko.com>
 ---
  configure.ac | 175 +++++++--------------------------------------------
  1 file changed, 21 insertions(+), 154 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index ede710e..bc81b0b 100644
+index de83332dd3..16b02d0798 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -710,160 +710,27 @@ fi
- MULTIARCH=$($CC --print-multiarch 2>/dev/null)
- AC_SUBST(MULTIARCH)
+@@ -719,160 +719,27 @@ then
+ fi
+ 
  
 -AC_MSG_CHECKING([for the platform triplet based on compiler characteristics])
 -cat >> conftest.c <<EOF
@@ -185,25 +189,25 @@ index ede710e..bc81b0b 100644
 +## Need to handle macos, vxworks and hurd special (?) :-/
 +case ${target_os} in
 +     darwin*)
-+     	PLATFORM_TRIPLET=darwin
-+	;;
++       PLATFORM_TRIPLET=darwin
++       ;;
 +     hurd*)
-+     	PLATFORM_TRIPLET=i386-gnu
-+	;;
++       PLATFORM_TRIPLET=i386-gnu
++       ;;
 +     vxworks*)
-+     	PLATFORM_TRIPLET=vxworks
-+	;;
++       PLATFORM_TRIPLET=vxworks
++       ;;
 +     *)
 +        if test "${target_cpu}" != "i686"; then
-+		PLATFORM_TRIPLET=${target_cpu}-${target_os}
-+	else
-+		PLATFORM_TRIPLET=i386-${target_os}
-+	fi
-+	;;
-+esac	
++               PLATFORM_TRIPLET=${target_cpu}-${target_os}
++       else
++               PLATFORM_TRIPLET=i386-${target_os}
++       fi
++       ;;
++esac
  
- if test x$PLATFORM_TRIPLET != x && test x$MULTIARCH != x; then
-   if test x$PLATFORM_TRIPLET != x$MULTIARCH; then
+ if test x$PLATFORM_TRIPLET != xdarwin; then
+   MULTIARCH=$($CC --print-multiarch 2>/dev/null)
 -- 
-2.24.1
+2.32.0
 

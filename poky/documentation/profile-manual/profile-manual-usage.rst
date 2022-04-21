@@ -1169,9 +1169,8 @@ e.g. 'perf help' or 'perf help record'.
 
 However, by default Yocto doesn't install man pages, but perf invokes
 the man pages for most help functionality. This is a bug and is being
-addressed by a Yocto bug: `Bug 3388 - perf: enable man pages for basic
-'help'
-functionality <https://bugzilla.yoctoproject.org/show_bug.cgi?id=3388>`__.
+addressed by a Yocto bug: :yocto_bugs:`Bug 3388 - perf: enable man pages for basic
+'help' functionality </show_bug.cgi?id=3388>`.
 
 The man pages in text form, along with some other files, such as a set
 of examples, can be found in the 'perf' directory of the kernel tree: ::

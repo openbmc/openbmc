@@ -15,6 +15,9 @@ SRC_URI = "http://download.osgeo.org/libtiff/tiff-${PV}.tar.gz \
            file://001_support_patch_for_CVE-2020-35521_and_CVE-2020-35522.patch \
            file://002_support_patch_for_CVE-2020-35521_and_CVE-2020-35522.patch \
            file://CVE-2020-35521_and_CVE-2020-35522.patch \
+           file://0001-tiffset-fix-global-buffer-overflow-for-ASCII-tags-wh.patch \
+           file://561599c99f987dc32ae110370cfdd7df7975586b.patch \
+           file://eecb0712f4c3a5b449f70c57988260a667ddbdef.patch \
           "
 SRC_URI[md5sum] = "2165e7aba557463acc0664e71a3ed424"
 SRC_URI[sha256sum] = "5d29f32517dadb6dbcd1255ea5bbc93a2b54b94fbf83653b4d65c7d6775b8634"

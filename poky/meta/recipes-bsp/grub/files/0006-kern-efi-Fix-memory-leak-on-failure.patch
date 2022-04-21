@@ -1,0 +1,30 @@
+From d4fd0243920b71cc6e03cc0cadf23b4fe03c352f Mon Sep 17 00:00:00 2001
+From: Darren Kenny <darren.kenny@oracle.com>
+Date: Thu, 5 Nov 2020 10:15:25 +0000
+Subject: [PATCH] kern/efi: Fix memory leak on failure
+
+Free the memory allocated to name before returning on failure.
+
+Fixes: CID 296222
+
+Signed-off-by: Darren Kenny <darren.kenny@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/grub.git/commit/?id=ed286ceba6015d37a9304f04602451c47bf195d7]
+Signed-off-by: Marta Rybczynska <marta.rybczynska@huawei.com>
+---
+ grub-core/kern/efi/efi.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/grub-core/kern/efi/efi.c b/grub-core/kern/efi/efi.c
+index 6a38080..baeeef0 100644
+--- a/grub-core/kern/efi/efi.c
++++ b/grub-core/kern/efi/efi.c
+@@ -415,6 +415,7 @@ grub_efi_get_filename (grub_efi_device_path_t *dp0)
+ 	    {
+ 	      grub_error (GRUB_ERR_OUT_OF_RANGE,
+ 			  "malformed EFI Device Path node has length=%d", len);
++	      grub_free (name);
+ 	      return NULL;
+ 	    }
+ 

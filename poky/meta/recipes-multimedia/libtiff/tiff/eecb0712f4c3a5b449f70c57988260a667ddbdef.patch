@@ -1,0 +1,30 @@
+From eecb0712f4c3a5b449f70c57988260a667ddbdef Mon Sep 17 00:00:00 2001
+From: Even Rouault <even.rouault@spatialys.com>
+Date: Sun, 6 Feb 2022 13:08:38 +0100
+Subject: [PATCH] TIFFFetchStripThing(): avoid calling memcpy() with a null
+ source pointer and size of zero (fixes #362)
+
+Upstream-Status: Backport
+CVE: CVE-2022-0561
+Signed-off-by: Sana Kazi <Sana.Kazi@kpit.com>
+Comment: Refreshed patch
+---
+ libtiff/tif_dirread.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/libtiff/tif_dirread.c b/libtiff/tif_dirread.c
+index 23194ced..50ebf8ac 100644
+--- a/libtiff/tif_dirread.c
++++ b/libtiff/tif_dirread.c
+@@ -5683,8 +5682,9 @@
+ 			_TIFFfree(data);
+ 			return(0);
+ 		}
+-                _TIFFmemcpy(resizeddata,data,(uint32)dir->tdir_count*sizeof(uint64));
+-                _TIFFmemset(resizeddata+(uint32)dir->tdir_count,0,(nstrips-(uint32)dir->tdir_count)*sizeof(uint64));
++               if( dir->tdir_count )
++                       _TIFFmemcpy(resizeddata,data, (uint32)dir->tdir_count * sizeof(uint64));
++               _TIFFmemset(resizeddata+(uint32)dir->tdir_count, 0, (nstrips - (uint32)dir->tdir_count) * sizeof(uint64));
+ 		_TIFFfree(data);
+ 		data=resizeddata;
+ 	}

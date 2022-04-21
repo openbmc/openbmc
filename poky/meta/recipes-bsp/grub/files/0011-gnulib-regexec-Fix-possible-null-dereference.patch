@@ -1,0 +1,53 @@
+From 244dc2b1f518635069a556c424b2e7627f0cf036 Mon Sep 17 00:00:00 2001
+From: Darren Kenny <darren.kenny@oracle.com>
+Date: Thu, 5 Nov 2020 10:57:14 +0000
+Subject: [PATCH] gnulib/regexec: Fix possible null-dereference
+
+It appears to be possible that the mctx->state_log field may be NULL,
+and the name of this function, clean_state_log_if_needed(), suggests
+that it should be checking that it is valid to be cleaned before
+assuming that it does.
+
+Fixes: CID 86720
+
+Signed-off-by: Darren Kenny <darren.kenny@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/grub.git/commit/?id=0b7f347638153e403ee2dd518af3ce26f4f99647]
+Signed-off-by: Marta Rybczynska <marta.rybczynska@huawei.com>
+---
+ conf/Makefile.extra-dist                             |  1 +
+ .../lib/gnulib-patches/fix-regexec-null-deref.patch  | 12 ++++++++++++
+ 2 files changed, 13 insertions(+)
+ create mode 100644 grub-core/lib/gnulib-patches/fix-regexec-null-deref.patch
+
+diff --git a/conf/Makefile.extra-dist b/conf/Makefile.extra-dist
+index 96d7e69..d27d3a9 100644
+--- a/conf/Makefile.extra-dist
++++ b/conf/Makefile.extra-dist
+@@ -30,6 +30,7 @@ EXTRA_DIST += grub-core/genemuinitheader.sh
+ 
+ EXTRA_DIST += grub-core/lib/gnulib-patches/fix-null-deref.patch
+ EXTRA_DIST += grub-core/lib/gnulib-patches/fix-null-state-deref.patch
++EXTRA_DIST += grub-core/lib/gnulib-patches/fix-regexec-null-deref.patch
+ EXTRA_DIST += grub-core/lib/gnulib-patches/fix-uninit-structure.patch
+ EXTRA_DIST += grub-core/lib/gnulib-patches/fix-unused-value.patch
+ EXTRA_DIST += grub-core/lib/gnulib-patches/fix-width.patch
+diff --git a/grub-core/lib/gnulib-patches/fix-regexec-null-deref.patch b/grub-core/lib/gnulib-patches/fix-regexec-null-deref.patch
+new file mode 100644
+index 0000000..db6dac9
+--- /dev/null
++++ b/grub-core/lib/gnulib-patches/fix-regexec-null-deref.patch
+@@ -0,0 +1,12 @@
++--- a/lib/regexec.c	2020-10-21 14:25:35.310195912 +0000
+++++ b/lib/regexec.c	2020-11-05 10:55:09.621542984 +0000
++@@ -1692,6 +1692,9 @@
++ {
++   Idx top = mctx->state_log_top;
++
+++  if (mctx->state_log == NULL)
+++    return REG_NOERROR;
+++
++   if ((next_state_log_idx >= mctx->input.bufs_len
++        && mctx->input.bufs_len < mctx->input.len)
++       || (next_state_log_idx >= mctx->input.valid_len

@@ -271,8 +271,8 @@ with the string ``meta-``.
    , but it is a commonly accepted standard in the Yocto Project
    community.
 
-For example, if you were to examine the `tree
-view <https://git.yoctoproject.org/cgit/cgit.cgi/poky/tree/>`__ of the
+For example, if you were to examine the :yocto_git:`tree
+view </cgit/cgit.cgi/poky/tree/>` of the
 ``poky`` repository, you will see several layers: ``meta``,
 ``meta-skeleton``, ``meta-selftest``, ``meta-poky``, and
 ``meta-yocto-bsp``. Each of these repositories represents a distinct

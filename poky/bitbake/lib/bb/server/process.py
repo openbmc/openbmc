@@ -25,6 +25,7 @@ import subprocess
 import errno
 import re
 import datetime
+import gc
 import bb.server.xmlrpcserver
 from bb import daemonize
 from multiprocessing import queues
@@ -221,6 +222,7 @@ class ProcessServer(multiprocessing.Process):
                 try:
                     print("Running command %s" % command)
                     self.command_channel_reply.send(self.cooker.command.runCommand(command))
+                    print("Command Completed")
                 except Exception as e:
                    logger.exception('Exception in server main event loop running command %s (%s)' % (command, str(e)))
 
@@ -670,8 +672,10 @@ class ConnectionWriter(object):
 
     def send(self, obj):
         obj = multiprocessing.reduction.ForkingPickler.dumps(obj)
+        gc.disable()
         with self.wlock:
             self.writer.send_bytes(obj)
+        gc.enable()
 
     def fileno(self):
         return self.writer.fileno()

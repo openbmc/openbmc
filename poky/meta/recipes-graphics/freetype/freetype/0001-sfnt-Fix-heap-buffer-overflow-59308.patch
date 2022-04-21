@@ -6,10 +6,13 @@ Subject: [PATCH] [sfnt] Fix heap buffer overflow (#59308).
 This is CVE-2020-15999.
 
 * src/sfnt/pngshim.c (Load_SBit_Png): Test bitmap size earlier.
+CVE: CVE-2020-15999
 
 Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/freetype/freetype2.git/commit/?id=a3bab162b2ae616074c8877a04556932998aeacd]
 
 Signed-off-by: Diego Santa Cruz <Diego.SantaCruz@spinetix.com>
+Signed-off-by: Purushottam Choudhary <purushottam.choudhary@kpit.com>
+Signed-off-by: Purushottam Choudhary <purushottamchoudhary29@gmail.com>
 ---
  src/sfnt/pngshim.c | 14 +++++++-------
  1 file changed, 7 insertions(+), 7 deletions(-)

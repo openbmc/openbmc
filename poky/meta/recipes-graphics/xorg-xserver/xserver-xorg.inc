@@ -16,7 +16,7 @@ PE = "2"
 INC_PR = "r8"
 
 XORG_PN = "xorg-server"
-SRC_URI = "${XORG_MIRROR}/individual/xserver/${XORG_PN}-${PV}.tar.bz2"
+SRC_URI = "${XORG_MIRROR}/individual/xserver/${XORG_PN}-${PV}.tar.gz"
 
 CVE_PRODUCT = "xorg-server x_server"
 # This is specific to Debian's xserver-wrapper.c

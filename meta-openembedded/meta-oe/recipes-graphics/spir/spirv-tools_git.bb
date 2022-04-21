@@ -12,7 +12,7 @@ SRC_URI = "git://github.com/KhronosGroup/SPIRV-Tools.git;name=spirv-tools;branch
 	git://github.com/KhronosGroup/SPIRV-Headers.git;name=spirv-headers;destsuffix=${DEST_DIR}/spirv-headers;branch=master;protocol=https \
 	git://github.com/google/effcee.git;name=effcee;destsuffix=${DEST_DIR}/effcee;branch=master;protocol=https \
 	git://github.com/google/re2.git;name=re2;destsuffix=${DEST_DIR}/re2;branch=master;protocol=https \
-	git://github.com/google/googletest.git;name=googletest;destsuffix=${DEST_DIR}/googletest;branch=master;protocol=https \
+	git://github.com/google/googletest.git;name=googletest;destsuffix=${DEST_DIR}/googletest;branch=main;protocol=https \
         file://0001-Respect-CMAKE_INSTALL_LIBDIR-in-installed-CMake-file.patch \
         file://0001-Avoid-pessimizing-std-move-3124.patch \
 "

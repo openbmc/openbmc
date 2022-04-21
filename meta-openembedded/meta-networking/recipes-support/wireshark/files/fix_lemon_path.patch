@@ -1,0 +1,22 @@
+Fix update to build for alt arch machine.
+
+Commit 9ca6e39c7ee26570e29dc87332ffb0f6c1d0e4a4 changed the UseLemon to use
+the target lemon built by the target wireshark. Revert to use the one built by 
+wireshark-native.
+
+Upstream-Status: Inappropriate [configuration]
+Signed-off: Armin Kuster <akuster@mvista.com>
+
+Index: wireshark-3.2.18/cmake/modules/UseLemon.cmake
+===================================================================
+--- wireshark-3.2.18.orig/cmake/modules/UseLemon.cmake
++++ wireshark-3.2.18/cmake/modules/UseLemon.cmake
+@@ -13,7 +13,7 @@ MACRO(ADD_LEMON_FILES _source _generated
+           # These files are generated as side-effect
+           ${_out}.h
+           ${_out}.out
+-         COMMAND $<TARGET_FILE:lemon>
++         COMMAND lemon
+            -T${_lemonpardir}/lempar.c
+            -d.
+            ${_in}

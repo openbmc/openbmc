@@ -1,0 +1,34 @@
+From 405fc8998181353bd510864ca251dc233afec276 Mon Sep 17 00:00:00 2001
+From: Vitaly Chikunov <vt@altlinux.org>
+Date: Wed, 6 Jan 2021 23:43:41 +0300
+Subject: [PATCH] rpmio: Fix lzopen_internal mode parsing when 'Tn' is used
+
+When there is number after "T" (suggested number of threads or "0" for
+getncpus), lzopen_internal() mode parser would skip one byte, and when
+it's at the end of the string it would then parse undesired garbage from
+the memory, making intermittent compression failures.
+
+Fixes: 7740d1098 ("Add support for multithreaded xz compression")
+Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+
+Upstream-Status: Backport [https://github.com/rpm-software-management/rpm/commit/405fc8998181353bd510864ca251dc233afec276]
+
+---
+ rpmio/rpmio.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/rpmio/rpmio.c b/rpmio/rpmio.c
+index ed1e25140..9d32ec6d9 100644
+--- a/rpmio/rpmio.c
++++ b/rpmio/rpmio.c
+@@ -798,6 +798,7 @@ static LZFILE *lzopen_internal(const char *mode, int fd, int xz)
+ 		 * should've processed
+ 		 * */
+ 		while (isdigit(*++mode));
++		--mode;
+ 	    }
+ #ifdef HAVE_LZMA_MT
+ 	    else
+-- 
+2.25.1
+

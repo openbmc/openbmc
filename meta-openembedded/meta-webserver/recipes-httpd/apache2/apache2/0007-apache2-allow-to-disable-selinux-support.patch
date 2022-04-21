@@ -1,4 +1,4 @@
-From 964ef2c1af74984602f46e7db938d3b95b148385 Mon Sep 17 00:00:00 2001
+From 0686564f64130f230870db8b4846973e3edbd646 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Mon, 1 Dec 2014 02:08:27 -0500
 Subject: [PATCH] apache2: allow to disable selinux support
@@ -11,10 +11,10 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  1 file changed, 10 insertions(+), 4 deletions(-)
 
 diff --git a/configure.in b/configure.in
-index caa6f54..eab2090 100644
+index 76811e7..4df3ff3 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -466,10 +466,16 @@ getloadavg
+@@ -491,10 +491,16 @@ getloadavg
  dnl confirm that a void pointer is large enough to store a long integer
  APACHE_CHECK_VOID_PTR_LEN
  
@@ -36,5 +36,5 @@ index caa6f54..eab2090 100644
  AC_CACHE_CHECK([for gettid()], ac_cv_gettid,
  [AC_TRY_RUN(#define _GNU_SOURCE
 -- 
-2.7.4
+2.25.1
 

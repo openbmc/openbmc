@@ -1,0 +1,49 @@
+From 43a4ad04e0d8771267a73f98b5918bcd10b167ec Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <trevor.gamblin@windriver.com>
+Date: Fri, 17 Apr 2020 06:31:35 -0700
+Subject: [PATCH] support/apxs.in: force destdir to be empty string
+
+If destdir is assigned to anything other than the empty string, the
+search path for apache2 config files is appended to itself, and
+related packages like apache-websocket will be unable to locate them:
+
+| cannot open
+/ala-lpggp31/tgamblin/yocto/poky.git/build/tmp/work/core2-64-poky-linux/apache-websocket/0.1.1+gitAUTOINC+6968083264-r0/recipe-sysroot/ala-lpggp31/tgamblin/yocto/poky.git/build/tmp/work/core2-64-poky-linux/apache-websocket/0.1.1+gitAUTOINC+6968083264-r0/recipe-sysroot//usr/share/apache2/build/config_vars.mk:
+No such file or directory at
+/ala-lpggp31/tgamblin/yocto/poky.git/build/tmp/work/core2-64-poky-linux/apache-websocket/0.1.1+gitAUTOINC+6968083264-r0/recipe-sysroot/usr/bin/crossscripts/apxs
+line 213.
+
+Ensure that it is always the empty string so that apache-websocket
+is able to find the required config files.
+
+Upstream-Status: Inappropriate (embedded-specific)
+
+Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
+---
+ support/apxs.in | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/support/apxs.in b/support/apxs.in
+index b2705fa..781f2ab 100644
+--- a/support/apxs.in
++++ b/support/apxs.in
+@@ -28,10 +28,12 @@ package apxs;
+ #   is the empty string.
+ 
+ my $destdir = "";
+-my $ddi = rindex($0, "@exp_bindir@");
+-if ($ddi >= 0) {
+-  $destdir = substr($0, 0, $ddi);
+-}
++# Comment out assignment of destdir so that it doesn't affect bitbake
++# cross-compilation setup
++#my $ddi = rindex($0, "@exp_bindir@");
++#if ($ddi >= 0) {
++#  $destdir = substr($0, 0, $ddi);
++#}
+ 
+ my %config_vars = ();
+ 
+-- 
+2.25.1
+

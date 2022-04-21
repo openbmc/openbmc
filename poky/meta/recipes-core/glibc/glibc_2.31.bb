@@ -3,6 +3,7 @@ require glibc-version.inc
 
 CVE_CHECK_WHITELIST += "CVE-2020-10029 CVE-2020-6096 CVE-2016-10228 CVE-2020-1751 CVE-2020-1752 \
                         CVE-2021-27645 CVE-2021-3326 CVE-2020-27618 CVE-2020-29562 CVE-2019-25013 \
+                        CVE-2022-23218 CVE-2022-23219 \
 "
 
 # glibc https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-1010022
