@@ -1,4 +1,6 @@
 # Required for IPMI
+OBMC_IMAGE_EXTRA_INSTALL:append:mori = " phosphor-ipmi-blobs"
+OBMC_IMAGE_EXTRA_INSTALL:append:mori = " phosphor-ipmi-blobs-binarystore"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " phosphor-ipmi-ethstats"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " phosphor-ipmi-net"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " phosphor-ipmi-host"
