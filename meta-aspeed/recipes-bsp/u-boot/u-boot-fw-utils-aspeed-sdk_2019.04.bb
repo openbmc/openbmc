@@ -10,10 +10,13 @@ RPROVIDES:${PN} += "u-boot-fw-utils"
 
 SRC_URI += "file://fw_env_ast2600_nor.config"
 SRC_URI += "file://fw_env_ast2600_mmc.config"
+SRC_URI += "file://fw_env_flash_32M_nor.config"
 SRC_URI += "file://fw_env_flash_64M_nor.config"
+SRC_URI:append:uboot-flash-32768 = " file://u-boot_flash_32M.cfg"
 
 ENV_CONFIG_FILE = "fw_env_ast2600_nor.config"
 ENV_CONFIG_FILE:df-phosphor-mmc = "fw_env_ast2600_mmc.config"
+ENV_CONFIG_FILE:uboot-flash-32768 = "fw_env_flash_32M_nor.config"
 ENV_CONFIG_FILE:uboot-flash-65536 = "fw_env_flash_64M_nor.config"
 
 INSANE_SKIP:${PN} = "already-stripped"
