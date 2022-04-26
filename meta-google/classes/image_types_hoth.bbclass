@@ -1,13 +1,8 @@
 # The offsets of the partitions that change when Hoth is enabled
 # From the device tree, in kB
-# Nuvoton NPCM7XX family
-FLASH_IMAGE_DESC_OFFSET:npcm7xx:hoth = "${@960 if FLASH_SIZE == '65536' else 7232}"
-FLASH_HOTH_UPDATE_OFFSET:npcm7xx:hoth = "${@1024 if FLASH_SIZE == '65536' else 31744}"
-FLASH_HOTH_MAILBOX_OFFSET:npcm7xx:hoth = "${@65472 if FLASH_SIZE == '65536' else 7168}"
-# Aspeed 26XX family
-FLASH_IMAGE_DESC_OFFSET:aspeed-g6:hoth = "${@960 if FLASH_SIZE == '65536' else 7232}"
-FLASH_HOTH_UPDATE_OFFSET:aspeed-g6:hoth = "${@1024 if FLASH_SIZE == '65536' else 31744}"
-FLASH_HOTH_MAILBOX_OFFSET:aspeed-g6:hoth = "${@65472 if FLASH_SIZE == '65536' else 7168}"
+FLASH_IMAGE_DESC_OFFSET:hoth = "${@960 if FLASH_SIZE == '65536' else 7232}"
+FLASH_HOTH_UPDATE_OFFSET:hoth = "${@1024 if FLASH_SIZE == '65536' else 31744}"
+FLASH_HOTH_MAILBOX_OFFSET:hoth = "${@65472 if FLASH_SIZE == '65536' else 7168}"
 unset FLASH_UBOOT_ENV_OFFSET
 
 python do_generate_static:append() {
