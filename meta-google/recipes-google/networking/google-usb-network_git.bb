@@ -26,7 +26,7 @@ SRC_URI += "file://usb_network.service.m4"
 SRC_URI += "file://usb_network.sh"
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE:${PN} = "${@"usb_network.service" if d.getVar(BMC_USB_ECM_PRODUCT_ID) else ""}"
+SYSTEMD_SERVICE:${PN} = "${@'usb_network.service' if d.getVar('BMC_USB_ECM_PRODUCT_ID') else ''}"
 
 do_compile:append() {
   if [ -n "${BMC_USB_ECM_PRODUCT_ID}" ]; then
