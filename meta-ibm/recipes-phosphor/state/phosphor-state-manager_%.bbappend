@@ -3,21 +3,21 @@ EXTRA_OEMESON:append:witherspoon = " -Dwarm-reboot=disabled"
 # The scheduled-host-transition package provides support to
 # schedule power on and off operations for the host at some
 # time in the future. IBM systems will utilize this feature
-RRECOMMENDS:${PN}-host += "${PN}-scheduled-host-transition"
+RRECOMMENDS:${PN}-host:append = " ${PN}-scheduled-host-transition"
 
 # IBM systems track the state of the hypervisor so bring
 # in the needed package when the host state package is
 # included
-RRECOMMENDS:${PN}-host += "${PN}-hypervisor"
+RRECOMMENDS:${PN}-host:append = " ${PN}-hypervisor"
 
 # IBM p10 machines want the optional secure-check
 # feature enabled. This will verify all security
 # settings in manufacturing mode.
-RRECOMMENDS:${PN}-host:p10bmc += "${PN}-secure-check"
+RRECOMMENDS:${PN}-host:append:p10bmc = " ${PN}-secure-check"
 
 # IBM systems want the chassis package to not allow a
 # system power on if chassis power is in a bad state
-RRECOMMENDS:${PN}-chassis = "${PN}-chassis-check-power-status"
+RRECOMMENDS:${PN}-chassis:append = " ${PN}-chassis-check-power-status"
 
 # Override critical services to monitor with IBM file
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
