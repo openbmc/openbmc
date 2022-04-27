@@ -1,2 +1,8 @@
 Common targets are:
-     obmc-phosphor-image
+
+     obmc-phosphor-image: Includes OpenBMC Phosphor userspace and Web UI
+
+     core-image-minimal: A small image just capable of allowing a device to boot
+
+     core-image-full-cmdline: A small image with more Linux functionality
+                              installed, including a ssh server.
