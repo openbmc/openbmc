@@ -22,6 +22,7 @@ STATE_MGR_PACKAGES = " \
     ${PN}-obmc-targets \
     ${PN}-scheduled-host-transition \
     ${PN}-chassis-check-power-status \
+    ${PN}-secure-check \
 "
 PACKAGE_BEFORE_PN += "${STATE_MGR_PACKAGES}"
 ALLOW_EMPTY:${PN} = "1"
@@ -78,6 +79,9 @@ FILES:${PN}-bmc = "${bindir}/phosphor-bmc-state-manager"
 FILES:${PN}-bmc += "${sysconfdir}/phosphor-systemd-target-monitor/phosphor-service-monitor-default.json"
 DBUS_SERVICE:${PN}-bmc += "xyz.openbmc_project.State.BMC.service"
 DBUS_SERVICE:${PN}-bmc += "obmc-bmc-service-quiesce@.target"
+
+FILES:${PN}-secure-check = "${bindir}/phosphor-secure-boot-check"
+SYSTEMD_SERVICE:${PN}-secure-check += "phosphor-bmc-security-check.service"
 
 FILES:${PN}-hypervisor = "${bindir}/phosphor-hypervisor-state-manager"
 DBUS_SERVICE:${PN}-hypervisor += "xyz.openbmc_project.State.Hypervisor.service"
@@ -194,6 +198,6 @@ SYSTEMD_LINK:${PN}-obmc-targets += "${@compose_list(d, 'QUIESCE_FMT', 'HOST_ERRO
 
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager;branch=master;protocol=https"
-SRCREV = "aaa8d3466b931b9cf5a64e3a972cd23c2b5b90c6"
+SRCREV = "1662ba6bec808437a7aeb3689c9ed185cabd5351"
 
 S = "${WORKDIR}/git"
