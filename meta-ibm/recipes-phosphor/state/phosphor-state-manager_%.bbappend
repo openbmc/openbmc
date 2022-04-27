@@ -10,6 +10,11 @@ RRECOMMENDS:${PN}-host += "${PN}-scheduled-host-transition"
 # included
 RRECOMMENDS:${PN}-host += "${PN}-hypervisor"
 
+# IBM p10 machines want the optional secure-check
+# feature enabled. This will verify all security
+# settings in manufacturing mode.
+RRECOMMENDS:${PN}-host:p10bmc += "${PN}-secure-check"
+
 # IBM systems want the chassis package to not allow a
 # system power on if chassis power is in a bad state
 RRECOMMENDS:${PN}-chassis = "${PN}-chassis-check-power-status"
