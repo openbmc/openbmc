@@ -6,4 +6,5 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
     usbutils \
     idevicerestore \
     fw-update \
+    phosphor-sel-logger \
 "
