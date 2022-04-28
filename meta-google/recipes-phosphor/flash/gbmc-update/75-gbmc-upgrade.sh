@@ -45,7 +45,9 @@ gbmc_upgrade_fetch() (
 
   # Ensure some sane output file limit
   # Currently no BMC image is larger than 64M
-  ulimit -H -f $((96 * 1024 * 1024)) || return
+  # We want to allow 2 images and a small amount of metadata (2*64+2)M
+  local max_mb=$((2*64 + 2))
+  ulimit -f $((max_mb * 1024 * 1024 / 512)) || return
   timeout=$((SECONDS + 300))
   while (( SECONDS < timeout )); do
     local st=(0)
