@@ -1,0 +1,32 @@
+bmc_booted:
+    power:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+        Priority: 'On'
+
+power_on:
+    power:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+systemFault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'Blink'
+
+enclosure_identify:
+    identify:
+        Action: 'On'
+        DutyOn: 50
+        Period: 1000
+
+enclosure_identify_blink:
+    identify:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000

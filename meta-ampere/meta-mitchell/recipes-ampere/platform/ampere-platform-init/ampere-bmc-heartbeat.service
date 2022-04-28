@@ -1,0 +1,14 @@
+[Unit]
+Description=Ampere BMC heartbeat service
+Wants=obmc-mapper.target
+After=obmc-mapper.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/bin/env ampere_bmc_heartbeat.sh
+SyslogIdentifier = "ampere-bmc-heartbeat"
+
+[Install]
+WantedBy=multi-user.target
+

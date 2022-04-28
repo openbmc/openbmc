@@ -1,0 +1,11 @@
+[Unit]
+Description = Ampere Platform Initialization
+
+[Service]
+Restart=no
+RemainAfterExit=true
+Type=oneshot
+ExecStart=/usr/sbin/ampere_platform_init.sh
+
+[Install]
+WantedBy=sysinit.target
