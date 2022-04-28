@@ -126,5 +126,6 @@ do_install:append () {
 }
 
 CONFFILES:${PN} += " ${sysconfdir}/issue ${sysconfdir}/issue.net"
+FILES:${PN} += " ${sysconfdir}/issue ${sysconfdir}/issue.net"
 OS_RELEASE_FIELDS:append = " RELEASE PATCH_LEVEL"
 BB_DONT_CACHE = "1"
