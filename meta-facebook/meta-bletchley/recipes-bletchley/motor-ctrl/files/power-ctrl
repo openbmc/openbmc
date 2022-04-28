@@ -309,7 +309,7 @@ function create_dev_mem()
 }
 
 function show_usage(){
-    echo "Usage: power-ctrl [sled1 | sled2 | sled3 | sled4 | sled5 | sled6]  [on off ac-on ac-off status dfu]"
+    echo "Usage: power-ctrl [sled1 | sled2 | sled3 | sled4 | sled5 | sled6]  [on off ac-on ac-off status dfu recovery]"
     echo "       power-ctrl chassis-cycle"
 }
 
@@ -415,6 +415,29 @@ elif [[ "$ACTION" == "dfu" ]]; then
     echo "SLED$SLED_NUM: turn ac-on"
     set_gpio "power-host${SLED_NUM}" 1
     sleep 3
+
+    # release power button
+    echo "SLED$SLED_NUM: releasing host power button"
+    if ! release_power_button "$SLED_NUM"; then
+        echo "SLED$SLED_NUM: release power button failed"
+        exit 1
+    fi
+elif [[ "$ACTION" == "recovery" ]]; then
+    if [ "$(get_ac_status "$SLED_NUM")" != "$HOST_AC_OFF" ]; then
+        echo "Please turn off host before trigger recovery mode"
+        exit 1
+    fi
+    echo "Set host$SLED_NUM Recovery mode"
+
+    # press power button
+    echo "SLED$SLED_NUM: pressing power button"
+    if ! press_power_button "$SLED_NUM"; then
+        echo "SLED$SLED_NUM: press power button failed"
+        echo "SLED$SLED_NUM: releasing power button"
+        release_power_button "$SLED_NUM"
+        exit 1
+    fi
+    sleep 10
 
     # release power button
     echo "SLED$SLED_NUM: releasing host power button"
