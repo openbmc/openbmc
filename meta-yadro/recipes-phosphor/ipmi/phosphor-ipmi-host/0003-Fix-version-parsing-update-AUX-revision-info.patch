@@ -1,4 +1,4 @@
-From 605210dca3d6803839a8bcea4b5b83866c01f2da Mon Sep 17 00:00:00 2001
+From 9b91e2ace1c127344e5e7d32ebb866ca636387fd Mon Sep 17 00:00:00 2001
 From: Alexander Amelkin <alexander@amelkin.msk.ru>
 Date: Wed, 11 Jul 2018 13:16:01 +0300
 Subject: [PATCH] Fix version parsing, update AUX revision info
@@ -31,14 +31,15 @@ Resolves SRV-775
 End-user-impact: Version info is properly represented in the
                  AUX Revision Info fields in response to the
                  IPMI Get Device ID command (ipmitool mc info)
-Signed-off-by: Alexander Amelkin <a.filippov@yadro.com>
+Signed-off-by: Alexander Amelkin <a.amelkin@yadro.com>
+Signed-off-by: Alexander Filippov <a.filippov@yadro.com>
 
 ---
- apphandler.cpp | 228 +++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 165 insertions(+), 63 deletions(-)
+ apphandler.cpp | 226 +++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 163 insertions(+), 63 deletions(-)
 
 diff --git a/apphandler.cpp b/apphandler.cpp
-index 90818a9..93e3b6c 100644
+index 6cdd78f..c62cd35 100644
 --- a/apphandler.cpp
 +++ b/apphandler.cpp
 @@ -1,4 +1,5 @@
@@ -179,7 +180,7 @@ index 90818a9..93e3b6c 100644
      auto location = s.find_first_of('v');
      if (location != std::string::npos)
      {
-@@ -494,64 +576,77 @@ int convertVersion(std::string s, Revision& rev)
+@@ -494,64 +574,77 @@ int convertVersion(std::string s, Revision& rev)
  
      if (!s.empty())
      {
@@ -190,7 +191,7 @@ index 90818a9..93e3b6c 100644
 +        if (s.find("dirty") != std::string::npos)
          {
 -            rev.major =
--                static_cast<char>(std::stoi(s.substr(0, location), 0, 16));
+-                static_cast<char>(std::stoi(s.substr(0, location), 0, 10));
 -            token = s.substr(location + 1);
 +            dirty = true;
          }
@@ -217,7 +218,7 @@ index 90818a9..93e3b6c 100644
 +            if (minortok.size() > TOKEN_MINOR_HASH)
              {
 -                rev.minor = static_cast<char>(
--                    std::stoi(token.substr(0, location), 0, 16));
+-                    std::stoi(token.substr(0, location), 0, 10));
 -                token = token.substr(location + 1);
 +                // hash is plain hex
 +                hash= std::stoi(minortok[TOKEN_MINOR_HASH], 0, 16);
@@ -299,16 +300,16 @@ index 90818a9..93e3b6c 100644
  }
  
  /* @brief: Implement the Get Device ID IPMI command per the IPMI spec
-@@ -623,7 +718,7 @@ ipmi::RspType<uint8_t,  // Device ID
+@@ -623,7 +716,7 @@ ipmi::RspType<uint8_t,  // Device ID
  
              rev.minor = (rev.minor > 99 ? 99 : rev.minor);
              devId.fw[1] = rev.minor % 10 + (rev.minor / 10) * 16;
 -            std::memcpy(&devId.aux, rev.d, 4);
 +            std::memcpy(&devId.aux, rev.aux, 4);
+             haveBMCVersion = true;
          }
- 
-         // IPMI Spec version 2.0
-@@ -640,7 +735,14 @@ ipmi::RspType<uint8_t,  // Device ID
+     }
+@@ -643,7 +736,14 @@ ipmi::RspType<uint8_t,  // Device ID
                  devId.addnDevSupport = data.value("addn_dev_support", 0);
                  devId.manufId = data.value("manuf_id", 0);
                  devId.prodId = data.value("prod_id", 0);
@@ -324,6 +325,3 @@ index 90818a9..93e3b6c 100644
  
                  // Set the availablitity of the BMC.
                  defaultActivationSetting = data.value("availability", true);
--- 
-2.28.0
-
