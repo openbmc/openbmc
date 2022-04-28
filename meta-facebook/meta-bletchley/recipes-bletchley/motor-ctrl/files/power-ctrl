@@ -10,6 +10,46 @@ DELAY_POWER_ON="0.5"
 DELAY_POWER_OFF="5"
 POWER_BTN_TIMEOUT_CNT=60
 
+REV_EVT="EVT"
+REV_DVT="DVT"
+REV_UNKNOW="UNKNOW"
+
+DBUS_HOST_ST_ON="xyz.openbmc_project.State.Host.HostState.Running"
+DBUS_HOST_ST_OFF="xyz.openbmc_project.State.Host.HostState.Off"
+
+HOST_ST_UNKNOW="Unknow"
+HOST_ST_ON="On"
+HOST_ST_OFF="Off"
+HOST_AC_ON="AC On"
+HOST_AC_OFF="AC Off"
+
+function get_board_rev() {
+    local rev_id0
+    local rev_id1
+    local rev_id2
+    local rev_val
+
+    rev_id0=$(get_gpio "REV_ID0")
+    rev_id1=$(get_gpio "REV_ID1")
+    rev_id2=$(get_gpio "REV_ID2")
+    rev_val=$((rev_id0+(rev_id1<<1)+(rev_id2<<2)))
+
+    case $rev_val in
+        0)
+            echo "$REV_EVT"
+            ;;
+        1)
+            echo "$REV_DVT"
+            ;;
+        *)
+            echo "$REV_UNKNOW"
+            return 1
+            ;;
+    esac
+
+    return 0
+}
+
 #Switch pull low while it be touched
 function wait_for_switch() {
     TARGET_PIN=$1
@@ -153,19 +193,40 @@ function get_ac_status(){
     is_output="$(( (~p1_config_reg & 0x80)>>7 ))"
 
     if [ "$(( host_pwr & is_output ))" -eq 1 ];then
-        echo "AC on"
+        echo "$HOST_AC_ON"
     else
-        echo "AC off"
+        echo "$HOST_AC_OFF"
     fi
 }
 
-function get_host_status()
+function get_host_status_dbus()
+{
+    local sled_num=$1
+    local object="/xyz/openbmc_project/state/host${sled_num}"
+    local service="xyz.openbmc_project.State.Host${sled_num}"
+    local interface="xyz.openbmc_project.State.Host"
+    local property="CurrentHostState"
+    local host_state
+
+    host_state=$(busctl get-property "$service" "$object" "$interface" "$property" | cut -d '"' -f2)
+
+    if [ "$host_state" = "$DBUS_HOST_ST_ON" ]; then
+        echo "$HOST_ST_ON"
+    elif [ "$host_state" = "$DBUS_HOST_ST_OFF" ]; then
+        echo "$HOST_ST_OFF"
+    else
+        echo "$HOST_ST_UNKNOW"
+        return 1
+    fi
+
+    return 0
+}
+
+function get_host_status_mdio()
 {
     SLED_NUM=$1
     MDIO_BUS=0
-    HOST_ST_UNKNOW="Unknow"
-    HOST_ST_ON="On"
-    HOST_ST_OFF="Off"
+
     declare -a PORT_MAP=(0 3 2 1 7 6 5)
 
     # check /dev/mem
@@ -209,6 +270,22 @@ function get_host_status()
     return 0
 }
 
+function get_host_status()
+{
+    local sled_num=$1
+    local board_rev
+
+    board_rev=$(get_board_rev)
+
+    if [ "$board_rev" = "$REV_EVT" ]; then
+        get_host_status_dbus "$sled_num"
+    else
+        get_host_status_mdio "$sled_num"
+    fi
+
+    return $?
+}
+
 function create_dev_mem()
 {
     CHECK_CNT=0
@@ -232,7 +309,7 @@ function create_dev_mem()
 }
 
 function show_usage(){
-    echo "Usage: power-ctrl [sled1 | sled2 | sled3 | sled4 | sled5 | sled6]  [on off ac-on ac-off status]"
+    echo "Usage: power-ctrl [sled1 | sled2 | sled3 | sled4 | sled5 | sled6]  [on off ac-on ac-off status dfu]"
     echo "       power-ctrl chassis-cycle"
 }
 
@@ -272,11 +349,11 @@ if [ "$SLED_PRESENT" != 0 ];then
 fi
 
 if [[ "$ACTION" == "on" ]]; then
-    if [ "$(get_ac_status "$SLED_NUM")" == "AC on" ];then
+    if [ "$(get_ac_status "$SLED_NUM")" == "$HOST_AC_ON" ];then
         host_power_st=$(get_host_status "$SLED_NUM")
-        if [ "$host_power_st" == "On" ]; then
+        if [ "$host_power_st" == "$HOST_ST_ON" ]; then
             echo "${SLED} is already On"
-        elif [ "$host_power_st" == "Off" ]; then
+        elif [ "$host_power_st" == "$HOST_ST_OFF" ]; then
             echo "Power on ${SLED}"
             trigger_power_button  "$SLED_NUM"  "$DELAY_POWER_ON"
         else
@@ -288,12 +365,12 @@ if [[ "$ACTION" == "on" ]]; then
         exit 1
     fi
 elif [[ "$ACTION" == "off" ]];then
-    if [ "$(get_ac_status "$SLED_NUM")" == "AC on" ];then
+    if [ "$(get_ac_status "$SLED_NUM")" == "$HOST_AC_ON" ];then
         host_power_st=$(get_host_status "$SLED_NUM")
-        if [ "$host_power_st" == "On" ]; then
+        if [ "$host_power_st" == "$HOST_ST_ON" ]; then
             echo "Power off ${SLED}"
             trigger_power_button  "$SLED_NUM"  "$DELAY_POWER_OFF"
-        elif [ "$host_power_st" == "Off" ]; then
+        elif [ "$host_power_st" == "$HOST_ST_OFF" ]; then
             echo "${SLED} is already Off"
         else
             echo "${SLED} power state is $host_power_st"
@@ -305,12 +382,12 @@ elif [[ "$ACTION" == "off" ]];then
     fi
 elif [[ "$ACTION" == "status" ]];then
     AC_ST=$(get_ac_status "$SLED_NUM")
-    if [ "$AC_ST" == "AC on" ]; then
+    if [ "$AC_ST" == "$HOST_AC_ON" ]; then
         # check host power status if AC is on
         get_host_status "$SLED_NUM" || exit 1
     else
         # AC off
-        echo "$AC_ST"
+        echo "$HOST_AC_OFF"
     fi
 elif [[ "$ACTION" == "ac-on" ]];then
     set_gpio "power-host${SLED_NUM}" 1
