@@ -9,7 +9,6 @@ BBLAYERS ?= " \
   ##OEROOT##/meta \
   ##OEROOT##/meta-openembedded/meta-oe \
   ##OEROOT##/meta-openembedded/meta-networking \
-  ##OEROOT##/meta-openembedded/meta-perl \
   ##OEROOT##/meta-openembedded/meta-python \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-aspeed \
