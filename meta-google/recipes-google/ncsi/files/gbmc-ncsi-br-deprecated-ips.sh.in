@@ -20,6 +20,25 @@ gbmc_ncsi_br_deprecated_ips_init=
 gbmc_ncsi_br_deprecated_ips_confip=
 gbmc_ncsi_br_deprecated_ips_lastip=
 
+gbmc_ncsi_br_deprecated_ips_addr_contents() {
+  local addr="$1"
+
+  # If our address is assigned explicitly, don't mark it deprecated
+  local line
+  for line in $(grep '^Address=' /etc/systemd/network/*-bmc-@NCSI_IF@.network); do
+    # Remove `Address=` on the input line
+    local apfx="$(echo "$line" | sed 's,^[^=]*=,,')"
+    # ip_pfx_concat is used to normalize the address string for comparison
+    [[ "$addr/128" == "$(ip_pfx_concat "$apfx" ::)" ]] && return
+  done
+
+  cat <<EOF
+[Address]
+Address=$addr/128
+PreferredLifetime=0
+EOF
+}
+
 gbmc_ncsi_br_deprecated_ips_update() {
   [ -n "$gbmc_ncsi_br_deprecated_ips_init" ] || return
   [ "$gbmc_ncsi_br_deprecated_ips_confip" != "$gbmc_ncsi_br_deprecated_ips_lastip" ] || return
@@ -44,20 +63,10 @@ gbmc_ncsi_br_deprecated_ips_update() {
     pfx_bytes[8]=0
     pfx_bytes[9]=0
     local host_pfx="$(ip_bytes_to_str pfx_bytes)"
-    read -r -d '' contents <<EOF
-[Address]
-Address=$pfx/128
-PreferredLifetime=0
-[Address]
-Address=$stateless_pfx/128
-PreferredLifetime=0
-[Address]
-Address=$stateless_ip/128
-PreferredLifetime=0
-[Address]
-Address=$host_pfx/128
-PreferredLifetime=0
-EOF
+    contents+="$(gbmc_ncsi_br_deprecated_ips_addr_contents "$pfx")"$'\n'
+    contents+="$(gbmc_ncsi_br_deprecated_ips_addr_contents "$stateless_pfx")"$'\n'
+    contents+="$(gbmc_ncsi_br_deprecated_ips_addr_contents "$stateless_ip")"$'\n'
+    contents+="$(gbmc_ncsi_br_deprecated_ips_addr_contents "$host_pfx")"$'\n'
     read -r -d '' nfcontents <<EOF
 table inet filter {
   chain ncsi_input {
