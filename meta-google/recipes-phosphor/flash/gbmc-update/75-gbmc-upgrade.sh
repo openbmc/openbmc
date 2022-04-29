@@ -38,13 +38,18 @@ gbmc_upgrade_fetch() (
     return 1
   fi
 
+  # Determine the path of the image file for the correct machine
+  # Our netboot can serve us images for multiple models
+  local machine
+  machine="$(source /etc/os-release && echo "$OPENBMC_TARGET_MACHINE")" || return
+
   # Ensure some sane output file limit
   # Currently no BMC image is larger than 64M
   ulimit -H -f $((96 * 1024 * 1024)) || return
   timeout=$((SECONDS + 120))
   while (( SECONDS < timeout )); do
     local st=(0)
-    wget -q -O - "$bootfile_url" | tar -xC "$tmpdir" || st=("${PIPESTATUS[@]}")
+    wget -q -O - "$bootfile_url" | tar -xC "$tmpdir" "firmware-gbmc/$machine" || st=("${PIPESTATUS[@]}")
     (( st[0] != 0 )) || break
     (shopt -s nullglob dotglob; rm -rf -- "${tmpdir:?}"/*)
     sleep 5
