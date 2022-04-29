@@ -25,6 +25,9 @@ OBMC_IMAGE_EXTRA_INSTALL:append:mori = " bmcweb"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " phosphor-certificate-manager"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " phosphor-user-manager"
 
+# Required for the front port. Part of obmc-console
+OBMC_IMAGE_EXTRA_INSTALL:append:mori = " obmc-console"
+
 # Required from packagegroup-mori-apps
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " obmc-phosphor-buttons-signals"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " obmc-phosphor-buttons-handler"
