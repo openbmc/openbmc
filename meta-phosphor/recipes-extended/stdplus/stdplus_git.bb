@@ -11,7 +11,6 @@ inherit meson pkgconfig
 DEPENDS += " \
   fmt \
   liburing \
-  span-lite \
   "
 
 EXTRA_OEMESON = " \
