@@ -33,6 +33,7 @@ OBMC_IMAGE_EXTRA_INSTALL:append:mori = " dbus-sensors"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " estoraged"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " phosphor-pid-control"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " phosphor-logging"
+OBMC_IMAGE_EXTRA_INSTALL:append:mori = " mori-fw"
 
 # Required for phosphor-ipmi-ssif
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " virtual-obmc-host-ipmi-hw"
