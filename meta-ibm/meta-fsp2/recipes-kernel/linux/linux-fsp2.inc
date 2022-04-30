@@ -1,6 +1,6 @@
 DESCRIPTION = "Linux kernel for the FSP2 system on a chip"
 SECTION = "kernel"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 
 KCONFIG_MODE="--alldefconfig"
 

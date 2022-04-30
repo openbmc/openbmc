@@ -1,6 +1,6 @@
 PR = "r1"
 PV = "0.1+git${SRCPV}"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=4325afd396febcb659c36b49533135d4"
 
 SRC_URI = "git://github.com/mstpd/mstpd;branch=master;protocol=https"

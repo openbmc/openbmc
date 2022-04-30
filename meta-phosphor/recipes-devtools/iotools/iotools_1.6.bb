@@ -1,6 +1,6 @@
 DESCRIPTION = "Command line tools for hardware device registers"
 HOMEPAGE = "https://github.com/jonmayergoogle/iotools"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 SRCREV = "8d928b3360246b8ead95b442ca3887ce8b8f942f"
 SRC_URI = "git://git@github.com/jonmayergoogle/iotools.git;protocol=https;branch=master"
