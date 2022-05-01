@@ -51,11 +51,7 @@ EXTRA_OECONF = "--disable-python \
                 --disable-check-update \
                 --without-wmf"
 
-EXTRA_OECONF:append:toolchain-clang:arm = " --disable-vector-icons"
-EXTRA_OECONF:append:toolchain-clang:riscv32 = " --disable-vector-icons"
-EXTRA_OECONF:append:toolchain-clang:mips = " --disable-vector-icons"
-EXTRA_OECONF:append:toolchain-clang:x86 = " --disable-vector-icons"
-EXTRA_OECONF:append:powerpc = " --disable-vector-icons"
+EXTRA_OECONF += "${@oe.utils.conditional('SITEINFO_BITS', '32', ' --disable-vector-icons', '', d)}"
 
 do_configure:append() {
     find ${B} -name Makefile | xargs sed -i s:'-I$(includedir)':'-I.':g

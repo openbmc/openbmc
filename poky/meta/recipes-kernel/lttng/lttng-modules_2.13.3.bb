@@ -9,7 +9,19 @@ inherit module
 
 include lttng-platforms.inc
 
-SRC_URI = "https://lttng.org/files/${BPN}/${BPN}-${PV}.tar.bz2"
+SRC_URI = "https://lttng.org/files/${BPN}/${BPN}-${PV}.tar.bz2 \
+           file://0001-Fix-compaction-migratepages-event-name.patch \
+           file://0002-Fix-tracepoint-event-allow-same-provider-and-event-n.patch \
+           file://0003-fix-sched-tracing-Don-t-re-read-p-state-when-emittin.patch \
+           file://0004-fix-block-remove-genhd.h-v5.18.patch \
+           file://0005-fix-scsi-block-Remove-REQ_OP_WRITE_SAME-support-v5.1.patch \
+           file://0006-fix-random-remove-unused-tracepoints-v5.18.patch \
+           file://0007-fix-kprobes-Use-rethook-for-kretprobe-if-possible-v5.patch \
+           file://0008-fix-scsi-core-Remove-scsi-scsi_request.h-v5.18.patch \
+           file://0009-Rename-genhd-wrapper-to-blkdev.patch \
+           file://0010-fix-mm-compaction-cleanup-the-compaction-trace-event.patch \
+          "
+
 # Use :append here so that the patch is applied also when using devupstream
 SRC_URI:append = " file://0001-src-Kbuild-change-missing-CONFIG_TRACEPOINTS-to-warn.patch"
 

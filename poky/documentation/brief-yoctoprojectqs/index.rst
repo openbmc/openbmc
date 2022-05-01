@@ -250,7 +250,7 @@ an entire Linux distribution, including the toolchain, from source.
       This is relevant only when your network and the server that you use
       can download these artifacts faster than you would be able to build them.
 
-      To use such mirrors, uncomment the below lines in your ``local.conf``
+      To use such mirrors, uncomment the below lines in your ``conf/local.conf``
       file in the :term:`Build Directory`::
 
          BB_SIGNATURE_HANDLER = "OEEquivHash"

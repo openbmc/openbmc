@@ -28,6 +28,8 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/releases/${BPN}-${PV}.tar.gz \
            file://0001-immom_python-convert-to-python3.patch \
            file://0001-Fix-build-with-fno-common.patch \
            file://0001-Use-correct-printf-format-for-__fsblkcnt_t.patch \
+           file://0001-include-missing-array-header.patch \
+           file://0002-configure-Disable-selected-warnings.patch \
            "
 SRC_URI[sha256sum] = "f008d53c83087ce2014c6089bc4ef08e14c1b4091298b943f4ceade1aa6bf61e"
 
@@ -48,8 +50,8 @@ PACKAGECONFIG[plm] = "--enable-ais-plm,--disable-ais-plm,libvirt openhpi"
 
 PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', ' systemd', '', d)}"
 
-CPPFLAGS += "-Wno-error=stringop-overflow= -Wno-error=stringop-truncation"
-CXXFLAGS += "-Wno-error=stringop-overflow= -Wno-error=stringop-truncation -Wno-error=format-truncation="
+CPPFLAGS += "-Wno-error"
+CXXFLAGS += "-Wno-error"
 LDFLAGS += "-Wl,--as-needed -latomic -Wl,--no-as-needed"
 
 do_install:append() {

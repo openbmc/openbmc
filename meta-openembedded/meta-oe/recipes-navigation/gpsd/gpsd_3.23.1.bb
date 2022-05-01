@@ -73,11 +73,13 @@ do_install:append() {
     install -m 0644 ${S}/packaging/deb/etc_default_gpsd ${D}${sysconfdir}/default/gpsd.default
 
     # Support for python
-    install -d ${D}${PYTHON_SITEPACKAGES_DIR}/gps
-    install -m 755 ${D}${libdir}/gps/*.py ${D}${PYTHON_SITEPACKAGES_DIR}/gps
+    if [ -d ${D}${libdir}/gps ]; then
+        install -d ${D}${PYTHON_SITEPACKAGES_DIR}/gps
+        install -m 755 ${D}${libdir}/gps/*.py ${D}${PYTHON_SITEPACKAGES_DIR}/gps
+    fi
 }
 
-PACKAGES =+ "libgps python3-pygps gpsd-udev gpsd-conf gpsd-gpsctl gps-utils"
+PACKAGES =+ "libgps python3-pygps gpsd-udev gpsd-conf gpsd-gpsctl gps-utils gps-utils-python"
 
 RPROVIDES:${PN}-dbg += "python-pygps-dbg"
 
@@ -103,34 +105,38 @@ SUMMARY:gpsd-gpsctl = "Tool for tweaking GPS modes"
 FILES:gpsd-gpsctl = "${bindir}/gpsctl"
 
 SUMMARY:gps-utils = "Utils used for simulating, monitoring,... a GPS"
-# Python files are required for gps/fake, required for gpsfake.
 FILES:gps-utils = "\
     ${bindir}/cgps         \
-    ${bindir}/gegps        \
     ${bindir}/gps2udp      \
-    ${bindir}/gpscat       \
-    ${bindir}/gpscsv       \
     ${bindir}/gpsctl       \
     ${bindir}/gpsdebuginfo \
     ${bindir}/gpsdecode    \
-    ${bindir}/gpsfake      \
     ${bindir}/gpsmon       \
     ${bindir}/gpspipe      \
-    ${bindir}/gpsplot      \
-    ${bindir}/gpsprof      \
     ${bindir}/gpsrinex     \
     ${bindir}/gpssnmp      \
-    ${bindir}/gpssubframe  \
     ${bindir}/gpxlogger    \
     ${bindir}/lcdgps       \
     ${bindir}/ntpshmmon    \
     ${bindir}/ppscheck     \
+"
+RRECOMMENDS:gps-utils = "gps-utils-python"
+
+SUMMARY:gps-utils-python = "Python utils used for simulating, monitoring,... a GPS"
+FILES:gps-utils-python = "\
+    ${bindir}/gegps        \
+    ${bindir}/gpscat       \
+    ${bindir}/gpscsv       \
+    ${bindir}/gpsfake      \
+    ${bindir}/gpsplot      \
+    ${bindir}/gpsprof      \
+    ${bindir}/gpssubframe  \
     ${bindir}/ubxtool      \
     ${bindir}/xgps         \
     ${bindir}/xgpsspeed    \
     ${bindir}/zerk         \
 "
-RDEPENDS:gps-utils = "python3-pygps"
+RDEPENDS:gps-utils-python = "python3-pygps"
 
 SUMMARY:python3-pygps = "Python bindings to gpsd"
 FILES:python3-pygps = "${PYTHON_SITEPACKAGES_DIR}/* ${libdir}/gps/*.py ${libdir}/*.egg-info"

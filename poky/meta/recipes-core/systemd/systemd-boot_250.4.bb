@@ -19,7 +19,6 @@ objcopy = ${@meson_array('OBJCOPY', d)}
 EOF
 }
 
-# need to use ${HOST_PREFIX} here, otherwise ld.bfd could be used from HOSTTOOLS_NONFATAL
 EFI_LD = "bfd"
 
 EXTRA_OEMESON += "-Defi=true \

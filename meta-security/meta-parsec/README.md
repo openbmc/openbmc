@@ -43,20 +43,34 @@ local.conf:
     IMAGE_INSTALL:append = " parsec-service"
 
   By default the Parsec service will be deployed into the image with
-TPM, PKCS11, MBED-CRYPTO and CRYPTOAUTHLIB providers build in
-and with the default config file from the Parsec repository:
+PKCS11 and MBED-CRYPTO providers build-in.
+  The TPM provider will also be built by default if:
+- DISTRO_FEATURES contains "tmp2" and
+- "tpm-layer" (meta-tpm) is included in BBLAYERS
+
+
+You can use PACKAGECONFIG for Parsec servic recipe to define
+what providers should be built in. For example:
+
+    PACKAGECONFIG:pn-parsec-service = "TS"
+
+
+The default Parsec service config file is taken from the Parsec repository:
 https://github.com/parallaxsecond/parsec/blob/main/config.toml
+This config file contains the MbedCrypto provider enabled.
+The config needs to be updated to use the Parsec service
+with other providers like TPM or PKCS11. The required changes are
+covered in Parsec documentation https://parallaxsecond.github.io/parsec-book/
 
-  You can use PACKAGECONFIG for Parsec servic recipe to define
-what providers should be built in. For example,
+  PARSEC_CONFIG can be used in a bbappend file to replace the default config.
+For example:
 
-    PACKAGECONFIG:pn-parsec-service = "TPM"
-
-  The default Parsec service config file contains the MbedCrypto provider
-enabled. The config file needs to be updated to use the Parsec service
-with other providers like TPM or PKCS11. The required procedures are
-covered in Parsec documentation.
-https://parallaxsecond.github.io/parsec-book/
+```
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+SRC_URI += "file://config-TS.toml \
+           "
+PARSEC_CONFIG = "${WORKDIR}/config-TS.toml"
+```
 
 Updating recipes
 ================

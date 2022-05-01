@@ -1,0 +1,37 @@
+From 25f54c3359a0fa34890030662e9b02e0a9745f4f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 13 Apr 2022 20:57:38 -0700
+Subject: [PATCH] utils: Use name of the first prerequisite in rule
+
+Use $< instead of $^ because the latter will specify both pre-requisite
+inputattach.c serio-ids.h files on same compiler cmdline and clang does
+not like that and errors out like below
+
+clang-14: error: cannot specify -o when generating multiple output files
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ utils/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/utils/Makefile b/utils/Makefile
+index 1fc51ab..a7434a9 100644
+--- a/utils/Makefile
++++ b/utils/Makefile
+@@ -46,10 +46,10 @@ endif
+ evdev-joystick: evdev-joystick.c
+ 
+ inputattach: inputattach.c serio-ids.h
+-	$(CC) $(CFLAGS) $(CPPFLAGS) -funsigned-char $^ $(LDFLAGS) $(SYSTEMDFLAGS) -lm -o $@
++	$(CC) $(CFLAGS) $(CPPFLAGS) -funsigned-char $< $(LDFLAGS) $(SYSTEMDFLAGS) -lm -o $@
+ 
+ ffcfstress: ffcfstress.c bitmaskros.h
+-	$(CC) $(CFLAGS) $(CPPFLAGS) -funsigned-char $^ $(LDFLAGS) -lm -o $@
++	$(CC) $(CFLAGS) $(CPPFLAGS) -funsigned-char $< $(LDFLAGS) -lm -o $@
+ 
+ ffmvforce.o: ffmvforce.c
+ 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $@ `$(PKG_CONFIG) --cflags sdl2`
+-- 
+2.35.2
+

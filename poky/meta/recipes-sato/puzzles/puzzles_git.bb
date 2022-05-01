@@ -23,6 +23,7 @@ DEPENDS += "gtk+3"
 do_install:append () {
     # net conflicts with Samba, so rename it
     mv ${D}${bindir}/net ${D}${bindir}/puzzles-net
+    rm ${D}/${datadir}/applications/net.desktop
 
     # Create desktop shortcuts
     install -d ${D}/${datadir}/applications/

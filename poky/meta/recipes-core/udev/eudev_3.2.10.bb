@@ -51,10 +51,6 @@ do_install:append() {
 
 	# hid2hci has moved to bluez4. removed in udev as of version 169
 	rm -f ${D}${base_libdir}/udev/hid2hci
-
-	# duplicate udevadm for postinst script
-	install -d ${D}${libexecdir}
-	ln ${D}${bindir}/udevadm ${D}${libexecdir}/${MLPREFIX}udevadm
 }
 
 do_install:prepend:class-target () {

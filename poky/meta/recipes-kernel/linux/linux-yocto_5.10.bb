@@ -25,9 +25,6 @@ SRCREV_machine:qemumips64 ?= "279f142932679a8ba212ebae4b9db851636a1fab"
 SRCREV_machine ?= "d2f7a595bf0b752275d503046494b668549cb151"
 SRCREV_meta ?= "2278ed571c14df6e87d8e01ac26f649d98020623"
 
-# remap qemuarm to qemuarma15 for the 5.8 kernel
-# KMACHINE:qemuarm ?= "qemuarma15"
-
 SRC_URI = "git://git.yoctoproject.org/linux-yocto.git;name=machine;branch=${KBRANCH}; \
            git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-5.10;destsuffix=${KMETA}"
 

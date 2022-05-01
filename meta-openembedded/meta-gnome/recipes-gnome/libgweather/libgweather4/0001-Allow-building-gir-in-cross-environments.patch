@@ -1,0 +1,33 @@
+From 179102310e9a3729fb5b00f2a7bf24b12f4a7a83 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Sat, 16 Apr 2022 20:04:14 +0200
+Subject: [PATCH] Allow building gir in cross environments
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+For us this works perfectly fine
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ libgweather/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libgweather/meson.build b/libgweather/meson.build
+index 08311af..ef554f2 100644
+--- a/libgweather/meson.build
++++ b/libgweather/meson.build
+@@ -208,7 +208,7 @@ lib_libgweather = library('gweather-4',
+ )
+ 
+ g_ir_scanner = find_program('g-ir-scanner', required: get_option('introspection'))
+-build_gir = get_option('introspection') and g_ir_scanner.found() and not meson.is_cross_build()
++build_gir = get_option('introspection') and g_ir_scanner.found()
+ 
+ enable_vala = get_option('enable_vala')
+ vapigen = find_program('vapigen', required: enable_vala == 'true')
+-- 
+2.34.1
+

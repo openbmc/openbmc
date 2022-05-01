@@ -3,7 +3,7 @@
 
 SUMMARY = "Lynis is a free and open source security and auditing tool."
 HOMEDIR = "https://cisofy.com/"
-LICENSE = "GPL-3.0"
+LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3edd6782854304fd11da4975ab9799c1"
 
 SRC_URI = "https://cisofy.com/files/${BPN}-${PV}.tar.gz"

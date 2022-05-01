@@ -1,0 +1,28 @@
+From fe654d5340d18f04e4689ba19f843554909a0c00 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 12 Apr 2022 17:16:37 -0700
+Subject: [PATCH 2/2] configure: Disable selected warnings
+
+These warnings are emitted when compiling with gcc 11 and gcc 12
+Do not treat them as errors
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -601,7 +601,10 @@ if test -z "$OSAF_HARDEN_FLAGS"; then
+ fi
+ AC_SUBST(OSAF_HARDEN_FLAGS)
+ 
+-AX_CHECK_COMPILE_FLAG([-Werror=format-overflow],[NOWARNINGS=-Wno-error=format-overflow])
++AX_CHECK_COMPILE_FLAG([-Werror=format-overflow],[NOWARNINGS='-Wno-error=format-overflow'])
++AX_CHECK_COMPILE_FLAG([-Wuse-after-free],[NOWARNINGS+=' -Wno-error=use-after-free'])
++AX_CHECK_COMPILE_FLAG([-Wstringop-truncation],[NOWARNINGS+=' -Wno-error=stringop-truncation'])
++AX_CHECK_COMPILE_FLAG([-Warray-bounds],[NOWARNINGS+=' -Wno-error=array-bounds'])
+ AC_SUBST(NOWARNINGS)
+ #############################################
+ # List the output Makefiles

@@ -4,16 +4,25 @@ Run the Parsec service as parsec user in /var/lib/parsec/ working directory.
 Signed-off-by: Anton Antonov <Anton.Antonov@arm.com>
 Upstream-Status: Inappropriate [deployment configuration]
 
---- a/systemd-daemon/parsec.service	2021-03-28 18:34:18.703196235 +0100
-+++ b/systemd-daemon/parsec.service	2021-03-28 18:35:14.279830299 +0100
-@@ -3,7 +3,9 @@
+diff --git a/systemd-daemon/parsec.service b/systemd-daemon/parsec.service
+index c07c3b9..a6fe6a3 100644
+--- a/systemd-daemon/parsec.service
++++ b/systemd-daemon/parsec.service
+@@ -3,13 +3,15 @@ Description=Parsec Service
  Documentation=https://parallaxsecond.github.io/parsec-book/parsec_service/install_parsec_linux.html
- 
+
  [Service]
 -WorkingDirectory=/home/parsec/
 +User=parsec
 +Group=parsec
 +WorkingDirectory=/var/lib/parsec/
  ExecStart=/usr/libexec/parsec/parsec --config /etc/parsec/config.toml
- 
- [Install]
+ # Systemd hardening
+ ProtectSystem=full
+ ProtectHome=true
+ ProtectHostname=true
+-ProtectKernelTunables=true
++#ProtectKernelTunables=true
+ ProtectKernelModules=true
+ ProtectKernelLogs=true
+ ProtectControlGroups=true

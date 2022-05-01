@@ -1,0 +1,28 @@
+From a6ba15048bbb660abfa094b581862b4936ac4005 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@fujitsu.com>
+Date: Mon, 18 Apr 2022 12:19:35 +0900
+Subject: [PATCH] Fix build error as following:
+
+flit_core.config.ConfigError: description must be specified under [project] or listed as a dynamic field.
+
+Upstream-Status: Pending
+Signed-off-by: Lei Maohui <leimaohui@fujitsu.com>
+---
+ pyproject.toml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 2d2ac74..66fcee0 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -8,6 +8,7 @@
+ 
+ [project]
+ name = "cppy"
++description = "A small C++ header library"
+ readme = "README.rst"
+ requires-python = ">=3.7"
+ license = {file = "LICENSE"}
+-- 
+2.25.1
+

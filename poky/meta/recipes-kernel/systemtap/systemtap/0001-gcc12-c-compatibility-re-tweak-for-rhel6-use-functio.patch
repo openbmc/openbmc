@@ -1,0 +1,49 @@
+From f199d1982ef8a6c6d5c06c082d057b8793bcc6aa Mon Sep 17 00:00:00 2001
+From: Serhei Makarov <serhei@serhei.io>
+Date: Fri, 21 Jan 2022 18:21:46 -0500
+Subject: [PATCH] gcc12 c++ compatibility re-tweak for rhel6: use function
+ pointer instead of lambdas instead of ptr_fun<>
+
+Saving 2 lines in ltrim/rtrim is probably not a good reason to drop
+compatibility with the RHEL6 system compiler.  Actually declaring a
+named function and passing the function pointer is compatible with
+everything.
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=systemtap.git;a=commit;h=f199d1982ef8a6c6d5c06c082d057b8793bcc6aa]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ util.cxx | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+--- a/util.cxx
++++ b/util.cxx
+@@ -1757,21 +1757,24 @@ flush_to_stream (const string &fname, os
+   return 1; // Failure
+ }
+ 
++int
++not_isspace(unsigned char c)
++{
++  return !std::isspace(c);
++}
++
+ // trim from start (in place)
+ void
+ ltrim(std::string &s)
+ {
+-  s.erase(s.begin(),
+-	  std::find_if(s.begin(), s.end(),
+-		       std::not1(std::ptr_fun<int, int>(std::isspace))));
++  s.erase(s.begin(), std::find_if(s.begin(), s.end(), not_isspace));
+ }
+ 
+ // trim from end (in place)
+ void
+ rtrim(std::string &s)
+ {
+-  s.erase(std::find_if(s.rbegin(), s.rend(),
+-	  std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
++  s.erase(std::find_if(s.rbegin(), s.rend(), not_isspace).base(), s.end());
+ }
+ 
+ // trim from both ends (in place)

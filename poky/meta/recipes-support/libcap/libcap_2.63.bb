@@ -5,7 +5,11 @@ users, without giving them full root permissions."
 HOMEPAGE = "http://sites.google.com/site/fullycapable/"
 # no specific GPL version required
 LICENSE = "BSD-3-Clause | GPL-2.0-only"
-LIC_FILES_CHKSUM = "file://License;md5=e2370ba375efe9e1a095c26d37e483b8"
+LIC_FILES_CHKSUM_PAM = "file://pam_cap/License;md5=0ad4c9c052b9719ee4fce1bfc7c7dee4"
+LIC_FILES_CHKSUM = "\
+    file://License;md5=e2370ba375efe9e1a095c26d37e483b8 \
+    ${@bb.utils.contains('PACKAGECONFIG', 'pam', '${LIC_FILES_CHKSUM_PAM}', '', d)} \
+"
 
 DEPENDS = "hostperl-runtime-native gperf-native"
 

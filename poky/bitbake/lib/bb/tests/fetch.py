@@ -653,8 +653,10 @@ class CleanTarballTest(FetcherTest):
         archive = tarfile.open(os.path.join(self.dldir, self.recipe_tarball))
         self.assertNotEqual(len(archive.members), 0)
         for member in archive.members:
-            self.assertEqual(member.uname, 'pokybuild')
-            self.assertEqual(member.gname, 'users')
+            self.assertEqual(member.uname, 'oe')
+            self.assertEqual(member.uid, 0)
+            self.assertEqual(member.gname, 'oe')
+            self.assertEqual(member.gid, 0)
             self.assertEqual(member.mtime, mtime)
 
 

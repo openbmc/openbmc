@@ -1,0 +1,35 @@
+From a815ac8ee16b344d9e24b445957f32bf2aafa532 Mon Sep 17 00:00:00 2001
+From: Mark Asselstine <mark.asselstine@windriver.com>
+Date: Thu, 5 Jan 2017 11:07:51 -0500
+Subject: [PATCH] usr/Makefile: apply LDFLAGS to all executables
+
+Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+---
+ usr/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/usr/Makefile b/usr/Makefile
+index cc8df11..c55fd68 100644
+--- a/usr/Makefile
++++ b/usr/Makefile
+@@ -78,7 +78,7 @@ TGTADM_OBJS = tgtadm.o concat_buf.o
+ TGTADM_DEP = $(TGTADM_OBJS:.o=.d)
+ 
+ tgtadm: $(TGTADM_OBJS)
+-	$(CC) $^ -o $@
++	$(CC) $^ -o $@ $(LDFLAGS)
+ 
+ -include $(TGTADM_DEP)
+ 
+@@ -86,7 +86,7 @@ TGTIMG_OBJS = tgtimg.o libssc.o libcrc32c.o
+ TGTIMG_DEP = $(TGTIMG_OBJS:.o=.d)
+ 
+ tgtimg: $(TGTIMG_OBJS)
+-	$(CC) $^ -o $@
++	$(CC) $^ -o $@ $(LDFLAGS)
+ 
+ -include $(TGTIMG_DEP)
+ 
+-- 
+2.7.4
+

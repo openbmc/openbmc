@@ -230,7 +230,7 @@ BB_DISKMON_DIRS ??= "\
 # Note: For this to work you also need hash-equivalence passthrough to the matching server
 #
 #BB_HASHSERVE_UPSTREAM = "typhoon.yocto.io:8687"
-#SSTATE_MIRRORS ?= "file://.* http://sstate.yoctoproject.org/3.4/PATH;downloadfilename=PATH"
+#SSTATE_MIRRORS ?= "file://.* http://sstate.yoctoproject.org/4.0/PATH;downloadfilename=PATH"
 
 #
 # Qemu configuration

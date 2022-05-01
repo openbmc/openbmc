@@ -30,6 +30,7 @@ SRC_URI = "git://github.com/sparkleholic/ltrace.git;branch=master;protocol=http;
            file://0001-ensure-the-struct-pointers-are-null-initilized.patch \
            file://0001-ppc-Remove-unused-host_powerpc64-function.patch \
            file://0001-mips-Use-hardcodes-values-for-ABI-syscall-bases.patch \
+           file://0001-ppc-plt-do-not-free-symbol-libsym.patch \
            "
 SRC_URI:append:libc-musl = " file://add_ppc64le.patch"
 

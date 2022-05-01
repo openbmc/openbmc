@@ -68,7 +68,7 @@ local_conf_header:
 To configure the machine, you have to update the `machine` variable.
 And the same for the `distro`.
 
-For further information, you can read more at <https://kas.readthedocs.io/en/1.0/index.html>
+For further information, you can read more at <https://kas.readthedocs.io/en/latest/index.html>
 
 ## Contributing
 

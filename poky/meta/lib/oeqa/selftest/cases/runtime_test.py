@@ -162,6 +162,44 @@ class TestImage(OESelftestTestCase):
         bitbake('core-image-full-cmdline socat')
         bitbake('-c testimage core-image-full-cmdline')
 
+    def test_testimage_apt(self):
+        """
+        Summary: Check package feeds functionality for apt
+        Expected: 1. Check that remote package feeds can be accessed
+        Product: oe-core
+        Author: Ferry Toth <fntoth@gmail.com>
+        """
+        if get_bb_var('DISTRO') == 'poky-tiny':
+            self.skipTest('core-image-full-cmdline not buildable for poky-tiny')
+
+        features = 'INHERIT += "testimage"\n'
+        features += 'TEST_SUITES = "ping ssh apt.AptRepoTest.test_apt_install_from_repo"\n'
+        # We don't yet know what the server ip and port will be - they will be patched
+        # in at the start of the on-image test
+        features += 'PACKAGE_FEED_URIS = "http://bogus_ip:bogus_port"\n'
+        features += 'EXTRA_IMAGE_FEATURES += "package-management"\n'
+        features += 'PACKAGE_CLASSES = "package_deb"\n'
+        # We need  gnupg on the target to install keys
+        features += 'IMAGE_INSTALL:append:pn-core-image-full-cmdline = " gnupg"\n'
+
+        bitbake('gnupg-native -c addto_recipe_sysroot')
+
+        # Enable package feed signing
+        self.gpg_home = tempfile.mkdtemp(prefix="oeqa-feed-sign-")
+        self.track_for_cleanup(self.gpg_home)
+        signing_key_dir = os.path.join(self.testlayer_path, 'files', 'signing')
+        runCmd('gpgconf --list-dirs --homedir %s; gpg -v --batch --homedir %s --import %s' % (self.gpg_home, self.gpg_home, os.path.join(signing_key_dir, 'key.secret')), native_sysroot=get_bb_var("RECIPE_SYSROOT_NATIVE", "gnupg-native"), shell=True)
+        features += 'INHERIT += "sign_package_feed"\n'
+        features += 'PACKAGE_FEED_GPG_NAME = "testuser"\n'
+        features += 'PACKAGE_FEED_GPG_PASSPHRASE_FILE = "%s"\n' % os.path.join(signing_key_dir, 'key.passphrase')
+        features += 'GPG_PATH = "%s"\n' % self.gpg_home
+        features += 'PSEUDO_IGNORE_PATHS .= ",%s"\n' % self.gpg_home
+        self.write_config(features)
+
+        # Build core-image-sato and testimage
+        bitbake('core-image-full-cmdline socat')
+        bitbake('-c testimage core-image-full-cmdline')
+
     def test_testimage_virgl_gtk_sdl(self):
         """
         Summary: Check host-assisted accelerate OpenGL functionality in qemu with gtk and SDL frontends

@@ -1485,6 +1485,13 @@ system and gives an overview of their function and contents.
 
          CVE_PRODUCT = "oracle_berkeley_db berkeley_db"
 
+      Sometimes the product name is not specific enough, for example
+      "tar" has been matching CVEs for the GNU ``tar`` package and also
+      the ``node-tar`` node.js extension. To avoid this problem, use the
+      vendor name as a prefix. The syntax for this is::
+
+         CVE_PRODUCT = "vendor:package"
+
    :term:`CVSDIR`
       The directory in which files checked out under the CVS system are
       stored.
@@ -2330,6 +2337,37 @@ system and gives an overview of their function and contents.
          # groupmod -g 1020 developers; \
          # usermod -s /bin/sh tester; \
          # "
+
+      Hardcoded passwords are supported via the ``-p`` parameters for
+      ``useradd`` or ``usermod``, but only hashed.
+
+      Here is an example that adds two users named "tester-jim" and "tester-sue" and assigns
+      passwords. First on host, create the (escaped) password hash::
+
+         printf "%q" $(mkpasswd -m sha256crypt tester01)
+
+      The resulting hash is set to a variable and used in ``useradd`` command parameters::
+
+         inherit extrausers
+         PASSWD = "\$X\$ABC123\$A-Long-Hash"
+         EXTRA_USERS_PARAMS = "\
+             useradd -p '${PASSWD}' tester-jim; \
+             useradd -p '${PASSWD}' tester-sue; \
+             "
+
+      Finally, here is an example that sets the root password::
+
+         inherit extrausers
+         EXTRA_USERS_PARAMS = "\
+             usermod -p '${PASSWD}' root; \
+             "
+
+      .. note::
+
+         From a security perspective, hardcoding a default password is not
+         generally a good idea or even legal in some jurisdictions. It is 
+         recommended that you do not do this if you are building a production 
+         image.
 
       Additionally there is a special ``passwd-expire`` command that will
       cause the password for a user to be expired and thus force changing it
@@ -3485,6 +3523,14 @@ system and gives an overview of their function and contents.
       incompatible licenses are not built. Packages that are individually
       licensed with the specified incompatible licenses will be deleted.
 
+      There is some support for wildcards in this variable's value,
+      however it is restricted to specific licenses. Currently only
+      these wildcards are allowed and expand as follows:
+
+      - ``AGPL-3.0*"``: ``AGPL-3.0-only``, ``AGPL-3.0-or-later``
+      - ``GPL-3.0*``: ``GPL-3.0-only``, ``GPL-3.0-or-later``
+      - ``LGPL-3.0*``: ``LGPL-3.0-only``, ``LGPL-3.0-or-later``
+
       .. note::
 
          This functionality is only regularly tested using the following
@@ -3937,6 +3983,11 @@ system and gives an overview of their function and contents.
       resides in ``meta/classes/kernel-fitimage.bbclass``. You can register
       custom kernel image types with the :ref:`kernel <ref-classes-kernel>` class using this
       variable.
+
+   :term:`KERNEL_DEBUG_TIMESTAMPS`
+      If set to "1", enables timestamping functionality during building
+      the kernel. The default is "0" to disable this for reproducibility
+      reasons.
 
    :term:`KERNEL_DEVICETREE`
       Specifies the name of the generated Linux kernel device tree (i.e.
@@ -6063,6 +6114,28 @@ system and gives an overview of their function and contents.
 
       In the previous example,
       the version of the dependency is :term:`PYTHON_PN`.
+
+   :term:`QA_EMPTY_DIRS`
+      Specifies a list of directories that are expected to be empty when
+      packaging; if ``empty-dirs`` appears in :term:`ERROR_QA` or
+      :term:`WARN_QA` these will be checked and an error or warning
+      (respectively) will be produced.
+
+      The default :term:`QA_EMPTY_DIRS` value is set in
+      :ref:`insane.bbclass <ref-classes-insane>`.
+
+   :term:`QA_EMPTY_DIRS_RECOMMENDATION`
+      Specifies a recommendation for why a directory must be empty,
+      which will be included in the error message if a specific directory
+      is found to contain files. Must be overridden with the directory
+      path to match on.
+
+      If no recommendation is specified for a directory, then the default
+      "but it is expected to be empty" will be used.
+
+      An example message shows if files were present in '/dev'::
+
+         QA_EMPTY_DIRS_RECOMMENDATION:/dev = "but all devices must be created at runtime"
 
    :term:`RANLIB`
       The minimal command and arguments to run ``ranlib``.
@@ -8717,4 +8790,36 @@ system and gives an overview of their function and contents.
 
       The default value of :term:`XSERVER`, if not specified in the machine
       configuration, is "xserver-xorg xf86-video-fbdev xf86-input-evdev".
-   
+
+   :term:`XZ_THREADS`
+      Specifies the number of parallel threads that should be used when
+      using xz compression.
+
+      By default this scales with core count, but is never set less than 2
+      to ensure that multi-threaded mode is always used so that the output
+      file contents are deterministic. Builds will work with a value of 1
+      but the output will differ compared to the output from the compression
+      generated when more than one thread is used.
+
+      On systems where many tasks run in parallel, setting a limit to this
+      can be helpful in controlling system resource usage.
+
+    :term:`XZ_MEMLIMIT`
+      Specifies the maximum memory the xz compression should use as a percentage
+      of system memory. If unconstrained the xz compressor can use large amounts of
+      memory and become problematic with parallelism elsewhere in the build.
+      "50%" has been found to be a good value.
+
+   :term:`ZSTD_THREADS`
+      Specifies the number of parallel threads that should be used when
+      using ZStandard compression.
+
+      By default this scales with core count, but is never set less than 2
+      to ensure that multi-threaded mode is always used so that the output
+      file contents are deterministic. Builds will work with a value of 1
+      but the output will differ compared to the output from the compression
+      generated when more than one thread is used.
+
+      On systems where many tasks run in parallel, setting a limit to this
+      can be helpful in controlling system resource usage.
+

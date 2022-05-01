@@ -59,6 +59,8 @@ EXTRA_OEMESON += "-Dstatic-libsystemd=pic"
 
 S = "${WORKDIR}/git"
 
+RDEPENDS:${PN}-dev = ""
+
 do_compile() {
     ninja -v ${PARALLEL_MAKE} version.h
     ninja -v ${PARALLEL_MAKE} libsystemd.a

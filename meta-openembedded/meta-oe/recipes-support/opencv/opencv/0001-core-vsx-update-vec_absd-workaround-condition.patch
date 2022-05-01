@@ -1,0 +1,28 @@
+From c7ce902eed0eb7926c0973b1127037fdd27b99ca Mon Sep 17 00:00:00 2001
+From: Alexander Alekhin <alexander.a.alekhin@gmail.com>
+Date: Tue, 15 Feb 2022 07:23:32 +0300
+Subject: [PATCH] core(vsx): update vec_absd() workaround condition
+
+Upstream-Status: Backport [https://github.com/opencv/opencv/commit/8d88bb06b230b5c4b5bca78d84102f5d1adf48cf]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ modules/core/include/opencv2/core/vsx_utils.hpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/modules/core/include/opencv2/core/vsx_utils.hpp b/modules/core/include/opencv2/core/vsx_utils.hpp
+index 68863ffb36..5cbc066784 100644
+--- a/modules/core/include/opencv2/core/vsx_utils.hpp
++++ b/modules/core/include/opencv2/core/vsx_utils.hpp
+@@ -684,7 +684,8 @@ VSX_IMPL_LOAD_L8(vec_double2, double)
+ #endif
+ 
+ // absolute difference
+-#ifndef vec_absd
++#ifndef _ARCH_PWR9
++#   undef vec_absd
+ #   define vec_absd(a, b) vec_sub(vec_max(a, b), vec_min(a, b))
+ #endif
+ 
+-- 
+2.36.0
+

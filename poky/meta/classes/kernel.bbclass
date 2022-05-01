@@ -221,8 +221,6 @@ export CMDLINE_CONSOLE = "console=${@d.getVar("KERNEL_CONSOLE") or "ttyS0"}"
 
 KERNEL_VERSION = "${@get_kernelversion_headers('${B}')}"
 
-KERNEL_LOCALVERSION ?= ""
-
 # kernels are generally machine specific
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 

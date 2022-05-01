@@ -7,13 +7,10 @@ GNOMEBASEBUILDCLASS = "meson"
 GNOMEBN = "libgweather"
 S = "${WORKDIR}/${GNOMEBN}-${PV}"
 
-inherit gnomebase gsettings gobject-introspection gettext gtk-doc vala features_check upstream-version-is-even
+inherit gnomebase gsettings gobject-introspection gettext gtk-doc vala
 
+SRC_URI += "file://0001-Allow-building-gir-in-cross-environments.patch"
 SRC_URI[archive.sha256sum] = "440d44801b6f72b48c676e5e37f9109cfee1394fd74cc92725e1b1ba4fae834c"
-
-# gobject-introspection is mandatory and cannot be configured
-REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
-GIR_MESON_OPTION = ""
 
 GTKDOC_MESON_OPTION = "gtk_doc"
 

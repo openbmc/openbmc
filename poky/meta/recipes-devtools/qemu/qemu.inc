@@ -32,6 +32,7 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0001-Define-MAP_SYNC-and-MAP_SHARED_VALIDATE-on-needed-li.patch \
            file://0001-vhost-vsock-detach-the-virqueue-element-in-case-of-e.patch \
            file://0002-virtio-net-fix-map-leaking-on-error-during-receive.patch \
+           file://pvrdma.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 

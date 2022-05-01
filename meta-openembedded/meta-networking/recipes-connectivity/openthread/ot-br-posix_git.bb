@@ -16,13 +16,15 @@ PV = "0.3.0+git${SRCPV}"
 
 SRC_URI = "gitsm://github.com/openthread/ot-br-posix.git;protocol=https;branch=main \
            file://0001-otbr-agent.service.in-remove-pre-exec-hook-for-mdns-.patch \
-           file://Turn-off-sign-compare-for-musl-libc.patch \
+           file://0001-cmake-Disable-nonnull-compare-warning-on-gcc.patch \
            "
 
 S = "${WORKDIR}/git"
 SYSTEMD_SERVICE:${PN} = "otbr-agent.service"
 
 inherit pkgconfig cmake systemd
+
+CXXFLAGS:append:libc-musl:toolchain-clang = " -Wno-error=sign-compare"
 
 EXTRA_OECMAKE = "-DBUILD_TESTING=OFF \
                  -DOTBR_DBUS=ON \

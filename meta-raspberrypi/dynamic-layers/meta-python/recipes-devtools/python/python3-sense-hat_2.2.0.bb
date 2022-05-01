@@ -1,7 +1,7 @@
 SUMMARY = "Python module to control the Raspberry Pi Sense HAT used in the Astro Pi mission"
 HOMEPAGE = "https://github.com/RPi-Distro/python-sense-hat"
 SECTION = "devel/python"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENCE.txt;md5=d80fe312e1ff5fbd97369b093bf21cda"
 
 inherit setuptools3 pypi

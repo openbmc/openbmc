@@ -337,10 +337,6 @@ do_install() {
 	# create link for existing udev rules
 	ln -s ${base_bindir}/udevadm ${D}${base_sbindir}/udevadm
 
-	# duplicate udevadm for postinst script
-	install -d ${D}${libexecdir}
-	ln ${D}${base_bindir}/udevadm ${D}${libexecdir}/${MLPREFIX}udevadm
-
 	# install default policy for presets
 	# https://www.freedesktop.org/wiki/Software/systemd/Preset/#howto
 	install -Dm 0644 ${WORKDIR}/99-default.preset ${D}${systemd_unitdir}/system-preset/99-default.preset
@@ -718,7 +714,6 @@ FILES:udev += "${base_sbindir}/udevd \
                ${base_bindir}/systemd-hwdb \
                ${base_bindir}/udevadm \
                ${base_sbindir}/udevadm \
-               ${libexecdir}/${MLPREFIX}udevadm \
                ${datadir}/bash-completion/completions/udevadm \
                ${systemd_system_unitdir}/systemd-hwdb-update.service \
               "

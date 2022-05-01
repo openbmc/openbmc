@@ -7,8 +7,13 @@ BUGTRACKER = "http://bugzilla.libsdl.org/"
 
 SECTION = "libs"
 
-LICENSE = "Zlib"
-LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=68a088513da90254b2fbe664f42af315"
+LICENSE = "Zlib & BSD-2-Clause"
+LIC_FILES_CHKSUM = "\
+    file://LICENSE.txt;md5=68a088513da90254b2fbe664f42af315 \
+    file://src/hidapi/LICENSE.txt;md5=7c3949a631240cb6c31c50f3eb696077 \
+    file://src/hidapi/LICENSE-bsd.txt;md5=b5fa085ce0926bb50d0621620a82361f \
+    file://src/video/yuv2rgb/LICENSE;md5=79f8f3418d91531e05f0fc94ca67e071 \
+"
 
 # arm-neon adds MIT license
 LICENSE:append = " ${@bb.utils.contains('PACKAGECONFIG', 'arm-neon', '& MIT', '', d)}"

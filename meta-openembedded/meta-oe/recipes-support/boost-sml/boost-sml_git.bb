@@ -19,7 +19,8 @@ S = "${WORKDIR}/git"
 inherit cmake
 
 # Building benchmarks takes a lot of time and requires additional headers (euml2.hpp)
-EXTRA_OECMAKE:append = " -DSML_BUILD_BENCHMARKS:bool=OFF"
+# Building examples fail with gcc-12
+EXTRA_OECMAKE:append = " -DSML_BUILD_BENCHMARKS:bool=OFF -DSML_BUILD_EXAMPLES=OFF"
 
 # [boost::ext].XML is a header only C++ library, so the main package will be empty.
 ALLOW_EMPTY:${PN} = "1"

@@ -9,7 +9,11 @@ by https://git.yoctoproject.org/yocto-autobuilder-helper/tree/scripts/run-docs-b
 (function() {
   'use strict';
 
-  var all_versions = {
+  var all_releases =
+	ALL_RELEASES_PLACEHOLDER
+  ;
+
+  var switcher_versions = {
     VERSIONS_PLACEHOLDER
   };
 
@@ -65,18 +69,15 @@ by https://git.yoctoproject.org/yocto-autobuilder-helper/tree/scripts/run-docs-b
   function build_version_select(current_series, current_version) {
     var buf = ['<select>'];
 
-    $.each(all_versions, function(version, title) {
+    $.each(switcher_versions, function(version, vers_data) {
       var series = version.substr(0, 3);
       if (series == current_series) {
         if (version == current_version)
-            buf.push('<option value="' + version + '" selected="selected">' + title + '</option>');
-        else
-            buf.push('<option value="' + version + '">' + title + '</option>');
-
-        if (version != current_version)
-            buf.push('<option value="' + current_version + '" selected="selected">' + current_version + '</option>');
+            buf.push('<option value="' + version + '" selected="selected">' + vers_data["title"] + '</option>');
+	      else
+            buf.push('<option value="' + version + '">' + vers_data["title"] + '</option>');
       } else {
-        buf.push('<option value="' + version + '">' + title + '</option>');
+        buf.push('<option value="' + version + '">' + vers_data["title"] + '</option>');
       }
     });
 
@@ -152,14 +153,20 @@ by https://git.yoctoproject.org/yocto-autobuilder-helper/tree/scripts/run-docs-b
     var docroot = get_docroot_url()
 
     var new_versionpath = selected_version + '/';
-    if (selected_version == "dev")
-        new_versionpath = '';
 
-    // dev versions have no version prefix
-    if (current_version == "dev") {
+    // latest tag is also the default page (without version information)
+    if (docroot.endsWith(current_version + '/') == false) {
         var new_url = docroot + new_versionpath + url.replace(docroot, "");
         var fallback_url = docroot + new_versionpath;
     } else {
+	// check for named releases (e.g. dunfell) in the subpath
+        $.each(all_releases, function(idx, release) {
+		if (docroot.endsWith('/' + release + '/')) {
+			current_version = release;
+			return false;
+		}
+	});
+
         var new_url = url.replace('/' + current_version + '/', '/' + new_versionpath);
         var fallback_url = new_url.replace(url.replace(docroot, ""), "");
     }
@@ -222,15 +229,20 @@ by https://git.yoctoproject.org/yocto-autobuilder-helper/tree/scripts/run-docs-b
     $('.doctype_switcher_placeholder').html(doctype_select);
     $('.doctype_switcher_placeholder select').bind('change', on_doctype_switch);
 
-    if (ver_compare(release, "3.1") < 0) {
-      $('#outdated-warning').html('Version ' + release + ' of the project is now considered obsolete, please select and use a more recent version');
-      $('#outdated-warning').css('padding', '.5em');
-    } else if (release != "dev") {
-      $.each(all_versions, function(version, title) {
+    if (release != "dev") {
+      $.each(switcher_versions, function(version, vers_data) {
         var series = version.substr(0, 3);
-        if (series == current_series && version != release) {
-          $('#outdated-warning').html('This document is for outdated version ' + release + ', you should select the latest release version in this series, ' + version + '.');
-          $('#outdated-warning').css('padding', '.5em');
+        if (series == current_series) {
+          if (version != release && release.endsWith('.999') == false) {
+            $('#outdated-warning').html('This document is for outdated version ' + release + ', you should select the latest release version in this series, ' + version + '.');
+            $('#outdated-warning').css('padding', '.5em');
+            return false;
+          }
+          if (vers_data["obsolete"]) {
+            $('#outdated-warning').html('Version ' + release + ' of the project is now considered obsolete, please select and use a more recent version');
+            $('#outdated-warning').css('padding', '.5em');
+            return false;
+          }
         }
       });
     }

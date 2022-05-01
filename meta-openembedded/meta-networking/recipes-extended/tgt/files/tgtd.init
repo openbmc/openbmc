@@ -1,0 +1,116 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides: tgtd
+# Required-Start: $remote_fs $network $syslog
+# Required-Stop: $remote_fs $syslog
+# Default-Start:     3 5
+# Default-Stop:      0 1 2 6
+# Short-Description: SCSI target daemon
+# Description: Linux SCSI target framework (tgt)
+### END INIT INFO
+
+DESC="tgtd"
+DAEMON="/usr/sbin/tgtd"
+TGTD_CONFIG=/etc/tgt/targets.conf
+
+start ()
+{
+    echo -n "Starting $DESC..."
+
+    # Ensure service isn't running
+    tgt-admin -s >/dev/null 2>&1
+    RETVAL=$?
+    if [ "$RETVAL" -ne 107 ] ; then
+        echo "$DESC is already running."
+        exit 1
+    fi
+
+    # Start tgtd first
+    $DAEMON &>/dev/null
+    RETVAL=$?
+    if [ "$RETVAL" -ne 0 ]; then
+        echo "failed."
+        exit 1
+    fi
+
+    # Put tgtd into "offline" state until all the targets are configured.
+    # We don't want initiators to (re)connect and fail the connection
+    # if it's not ready.
+    tgtadm --op update --mode sys --name State -v offline
+    # Configure the targets.
+    tgt-admin -f -e -c $TGTD_CONFIG
+    # Put tgtd into "ready" state.
+    tgtadm --op update --mode sys --name State -v ready
+
+    echo "done."
+}
+
+stop ()
+{
+    echo -n "Stopping $DESC..."
+
+    # Remove all targets. It only removes targets which are not in use.
+    tgt-admin --update ALL -c /dev/null &>/dev/null
+    # tgtd will exit if all targets were removed
+    tgtadm --op delete --mode system &>/dev/null
+    RETVAL=$?
+    if [ "$RETVAL" -eq 107 ] ; then
+        if [ "$TASK" != "restart" ] ; then
+            return 1
+        fi
+    elif [ "$RETVAL" -ne 0 ] ; then
+        echo "Some initiators are still connected - could not stop tgtd"
+        return 2
+    fi
+    echo -n
+}
+
+reload()
+{
+        echo "Reloading configuration of $DESC" "$NAME"
+        # Update configuration for targets. Only targets which
+        # are not in use will be updated.
+        tgt-admin --update ALL -c $TGTD_CONFIG &>/dev/null
+        RETVAL=$?
+        if [ "$RETVAL" -eq 107 ] ; then
+                echo "tgtd is not running"
+                exit 1
+        fi
+}
+
+status()
+{
+        tgt-admin -s >/dev/null 2>&1
+	RETVAL=$?
+        if [ "$RETVAL" -eq 107 ] ; then
+                echo "tgtd is not running"
+        else
+                echo "tgtd is running"
+        fi
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart|force-reload)
+        stop
+        start
+        ;;
+    reload)
+        reload
+        ;;
+    status)
+        status
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|force-reload|restart|status|reload}"
+        exit 1
+        ;;
+esac
+
+exit 0

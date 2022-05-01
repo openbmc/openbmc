@@ -1,0 +1,45 @@
+From 98bef35c010a9c7891634fe9bcc4b560abbcb4e9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 12 Apr 2022 11:29:50 -0700
+Subject: [PATCH] memmove and memchr are C APIs not C++ std namespace
+
+Fixes build error
+../git/src/deqp-runner.cc: In member function 'Line_reader::read_status Line_reader::read(char**, double)':
+../git/src/deqp-runner.cc:249:10: error: 'memmove' is not a member of 'std'; did you mean 'wmemmove'?
+  249 |     std::memmove(buf_.data(), buf_.data() + skip_sz_, valid_sz_);
+      |          ^~~~~~~
+      |          wmemmove
+../git/src/deqp-runner.cc:255:35: error: 'memchr' is not a member of 'std'; did you mean 'wmemchr'?
+  255 |   while (!(newline = (char *)std::memchr(buf_.data(), '\n', valid_sz_)) &&
+      |                                   ^~~~~~
+      |                                   wmemchr
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/parallel-deqp-runner/-/merge_requests/17]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/deqp-runner.cc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/deqp-runner.cc b/src/deqp-runner.cc
+index 1cc8a55..55a15f9 100644
+--- a/src/deqp-runner.cc
++++ b/src/deqp-runner.cc
+@@ -246,13 +246,13 @@ Line_reader::read_status Line_reader::read(char **text, double timeout) {
+ 
+   if (skip_sz_) {
+     valid_sz_ -= skip_sz_;
+-    std::memmove(buf_.data(), buf_.data() + skip_sz_, valid_sz_);
++    memmove(buf_.data(), buf_.data() + skip_sz_, valid_sz_);
+     skip_sz_ = 0;
+   }
+ 
+   char *newline;
+   bool end = false;
+-  while (!(newline = (char *)std::memchr(buf_.data(), '\n', valid_sz_)) &&
++  while (!(newline = (char *)memchr(buf_.data(), '\n', valid_sz_)) &&
+          !end && valid_sz_ + 1 < (int)buf_.size()) {
+     for (;;) {
+       struct pollfd p = {};
+-- 
+2.35.1
+

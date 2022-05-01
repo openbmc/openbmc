@@ -27,6 +27,7 @@ S = "${WORKDIR}/firefox-${@d.getVar("PV").replace("esr", "")}"
 DEPENDS = " \
     autoconf-2.13-native \
     icu-native \
+    icu \
     cargo-native \
     zlib \
     python3-six \
@@ -48,6 +49,7 @@ EXTRA_OECONF = " \
     --without-system-icu \
     --disable-tests --disable-strip --disable-optimize \
     --disable-jemalloc \
+    --with-system-icu \
     ${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', "--enable-gold", '--disable-gold', d)} \
     ${JIT} \
 "

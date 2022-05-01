@@ -464,7 +464,7 @@ class Git(FetchMethod):
             with create_atomic(ud.fullmirror) as tfile:
                 mtime = runfetchcmd("git log --all -1 --format=%cD", d,
                         quiet=True, workdir=ud.clonedir)
-                runfetchcmd("tar -czf %s --owner pokybuild --group users --mtime \"%s\" ."
+                runfetchcmd("tar -czf %s --owner oe:0 --group oe:0 --mtime \"%s\" ."
                         % (tfile, mtime), d, workdir=ud.clonedir)
             runfetchcmd("touch %s.done" % ud.fullmirror, d)
 

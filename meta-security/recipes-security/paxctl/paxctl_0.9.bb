@@ -3,7 +3,7 @@ DESCRIPTION = "paxctl  is  a tool that allows PaX flags to be modified on a \
                kernel  patches  and secure distributions, such as \
                GrSecurity or Adamantix and Hardened Gen-too, respectively."
 HOMEPAGE = "https://pax.grsecurity.net/"	       
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://paxctl.c;beginline=1;endline=5;md5=0ddd065c61020dda79729e6bedaed2c7 \
                     file://paxctl-elf.c;beginline=1;endline=5;md5=99f453ce7f6d1687ee808982e2924813 \
 		   "

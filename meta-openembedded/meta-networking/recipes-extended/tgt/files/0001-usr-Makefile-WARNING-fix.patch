@@ -1,0 +1,29 @@
+From 6f4e3b11c7dccf83e2d18635c84837b212dfcc1c Mon Sep 17 00:00:00 2001
+From: Li xin <lixin.fnst@cn.fujitsu.com>
+Date: Sun, 26 Jul 2015 04:23:51 +0900
+Subject: [PATCH] usr/Makefile: WARNING fix WARNING: QA Issue: tgt:
+ /work/i586-oe-linux/tgt/1.0.60+gitAUTOINC+ab51727a36-r0/
+ packages-split/tgt/usr/sbin/tgtd contains probably-redundant RPATH /usr/lib
+ [useless-rpaths]
+
+Upstream-Status: pending
+
+Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
+
+---
+ usr/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usr/Makefile b/usr/Makefile
+index 9ff8f15..cc8df11 100644
+--- a/usr/Makefile
++++ b/usr/Makefile
+@@ -63,7 +63,7 @@ TGTD_OBJS += tgtd.o mgmt.o target.o scsi.o log.o driver.o util.o work.o \
+ 
+ TGTD_DEP = $(TGTD_OBJS:.o=.d)
+ 
+-LDFLAGS = -Wl,-E,-rpath=$(libdir)
++LDFLAGS += -Wl,-E
+ 
+ .PHONY:all
+ all: $(PROGRAMS) $(MODULES)

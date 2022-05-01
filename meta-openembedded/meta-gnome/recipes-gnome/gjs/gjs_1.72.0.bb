@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=8dcea832f6acf45d856abfeb2d51ec48"
 
 GNOMEBASEBUILDCLASS = "meson"
 
-DEPENDS = "mozjs-91"
+DEPENDS = "mozjs-91 cairo"
 
 inherit gnomebase gsettings gobject-introspection vala gettext features_check upstream-version-is-even pkgconfig
 

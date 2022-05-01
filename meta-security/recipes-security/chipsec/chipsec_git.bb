@@ -4,7 +4,7 @@ DESCRIPTION = "CHIPSEC is a framework for analyzing the security \
                of PC platforms including hardware, system firmware \
                (BIOS/UEFI), and platform components."
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=bc2d1f9b427be5fb63f6af9da56f7c5d"
 
 SRC_URI = "git://github.com/chipsec/chipsec.git;branch=master;protocol=https \

@@ -10595,7 +10595,8 @@ Preparing Changes for Submission
    following these accepted conventions:
 
    -  Be sure to include a "Signed-off-by:" line in the same style as
-      required by the Linux kernel. Adding this line signifies that you,
+      required by the Linux kernel. This can be done by using the
+      ``git commit -s`` command. Adding this line signifies that you,
       the submitter, have agreed to the Developer's Certificate of
       Origin 1.1 as follows:
 

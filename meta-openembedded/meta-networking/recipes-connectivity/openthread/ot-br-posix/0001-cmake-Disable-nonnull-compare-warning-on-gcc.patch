@@ -1,0 +1,40 @@
+From aa706d714294b83db696de2beca9a722a512796f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 19 Apr 2022 14:04:40 -0700
+Subject: [PATCH] cmake: Disable nonnull-compare warning on gcc
+
+GCC finds a legit warning which clang does not on code like this
+
+class Message;
+void SendResponse(Message & aMessage)
+{
+    if ((&aMessage) != nullptr) { return; }
+}
+
+Perhaps it should be fixed upstream but for now disable treating this
+warning as error when using gcc
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 59a567e729..3134740ff6 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -57,6 +57,10 @@ endif()
+ 
+ set(CMAKE_CXX_EXTENSIONS OFF)
+ 
++if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
++	add_compile_options(-Wno-error=nonnull-compare)
++endif()
++
+ if (OTBR_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+     message(STATUS "Coverage: ON")
+     target_compile_options(otbr-config INTERFACE -g -O0 --coverage)
+-- 
+2.36.0
+

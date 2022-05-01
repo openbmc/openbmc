@@ -47,6 +47,8 @@ SRC_URI = "https://busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            file://0001-testsuite-use-www.example.org-for-wget-test-cases.patch \
            file://0001-du-l-works-fix-to-use-145-instead-of-144.patch \
            file://0001-sysctl-ignore-EIO-of-stable_secret-below-proc-sys-ne.patch \
+           file://0001-libbb-sockaddr2str-ensure-only-printable-characters-.patch \
+           file://0002-nslookup-sanitize-all-printed-strings-with-printable.patch \
            "
 SRC_URI:append:libc-musl = " file://musl.cfg "
 
