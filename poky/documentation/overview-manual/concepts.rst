@@ -109,10 +109,10 @@ Classes
 Class files (``.bbclass``) contain information that is useful to share
 between recipes files. An example is the
 :ref:`autotools <ref-classes-autotools>` class,
-which contains common settings for any application that Autotools uses.
-The ":ref:`ref-manual/classes:Classes`" chapter in the
-Yocto Project Reference Manual provides details about classes and how to
-use them.
+which contains common settings for any application that is built with
+the `GNU Autotools <https://en.wikipedia.org/wiki/GNU_Autotools>`__.
+The ":ref:`ref-manual/classes:Classes`" chapter in the Yocto Project
+Reference Manual provides details about classes and how to use them.
 
 Configurations
 --------------
@@ -140,7 +140,7 @@ using a different layer where that metadata might be common across
 several pieces of hardware.
 
 There are many layers working in the Yocto Project development environment. The
-:yocto_home:`Yocto Project Curated Layer Index </software-overview/layers/>`
+:yocto_home:`Yocto Project Compatible Layer Index </software-overview/layers/>`
 and :oe_layerindex:`OpenEmbedded Layer Index <>` both contain layers from
 which you can use or leverage.
 

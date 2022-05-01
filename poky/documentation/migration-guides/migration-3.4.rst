@@ -1,6 +1,3 @@
-Release 3.4 (honister)
-======================
-
 Migration notes for 3.4 (honister)
 ----------------------------------
 
@@ -265,6 +262,12 @@ Miscellaneous
   built-in override support in the fetcher or overrides in general
   instead.
 
-.. include:: release-notes-3.4.rst
-.. include:: release-notes-3.4.1.rst
-.. include:: release-notes-3.4.2.rst
+- The ``-P`` (``--clear-password``) option can no longer be used with
+  ``useradd`` and ``usermod`` entries in :term:`EXTRA_USERS_PARAMS`.
+  It was being implemented using a custom patch to the ``shadow`` recipe
+  which clashed with a ``-P`` option that was added upstream in
+  ``shadow`` version 4.9, and in any case is fundamentally insecure.
+  Hardcoded passwords are still supported but they need to be hashed, see
+  examples in :term:`EXTRA_USERS_PARAMS`.
+
+

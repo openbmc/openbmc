@@ -5,9 +5,11 @@ Subject: [PATCH] Add 'install-ptest' rule.
 
 Print a standard result line for each test.
 
+The patch needs a rework according to comments in the merge request.
+
 Signed-off-by: Mihaela Sendrea <mihaela.sendrea@enea.com>
 Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
-Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/libxml2/-/merge_requests/137]
+Upstream-Status: Inappropriate [https://gitlab.gnome.org/GNOME/libxml2/-/merge_requests/137]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Signed-off-by: Tony Tascioglu <tony.tascioglu@windriver.com>

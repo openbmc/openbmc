@@ -182,6 +182,7 @@ class BaseConfig(object):
         self.gl = False
         self.gl_es = False
         self.egl_headless = False
+        self.publicvnc = False
         self.novga = False
         self.cleantap = False
         self.saved_stty = ''
@@ -521,6 +522,7 @@ class BaseConfig(object):
             elif arg == 'snapshot':
                 self.snapshot = True
             elif arg == 'publicvnc':
+                self.publicvnc = True
                 self.qemu_opt_script += ' -vnc :0'
             elif arg.startswith('tcpserial='):
                 self.tcpserial_portnum = '%s' % arg[len('tcpserial='):]
@@ -1363,13 +1365,27 @@ class BaseConfig(object):
         if (self.gl_es == True or self.gl == True) and (self.sdl == False and self.gtk == False):
             raise RunQemuError('Option gl/gl-es needs gtk or sdl option.')
 
-        if self.sdl == True or self.gtk == True or self.egl_headless == True:
-            if self.gl or self.gl_es or self.egl_headless:
-                self.qemu_opt += ' -device virtio-vga-gl '
+        # If we have no display option, we autodetect based upon what qemu supports. We
+        # need our font setup and show-cusor below so we need to see what qemu --help says
+        # is supported so we can pass our correct config in.
+        if not self.nographic and not self.sdl and not self.gtk and not self.publicvnc and not self.egl_headless == True:
+            output = subprocess.check_output([self.qemu_bin, "--help"], universal_newlines=True)
+            if "-display gtk" in output:
+                self.gtk = True
+            elif "-display sdl" in output:
+                self.sdl = True
             else:
-                self.qemu_opt += ' -device virtio-vga '
+                self.qemu_opt += '-display none'
 
-            self.qemu_opt += '-display '
+        if self.sdl == True or self.gtk == True or self.egl_headless == True:
+
+            if self.qemu_system.endswith(('i386', 'x86_64')):
+                if self.gl or self.gl_es or self.egl_headless:
+                    self.qemu_opt += ' -device virtio-vga-gl '
+                else:
+                    self.qemu_opt += ' -device virtio-vga '
+
+            self.qemu_opt += ' -display '
             if self.egl_headless == True:
                 self.set_dri_path()
                 self.qemu_opt += 'egl-headless,'
@@ -1415,7 +1431,7 @@ class BaseConfig(object):
         if serial_num < 2:
             self.qemu_opt += " -serial null"
 
-    def setup_final(self):
+    def find_qemu(self):
         qemu_bin = os.path.join(self.bindir_native, self.qemu_system)
 
         # It is possible to have qemu-native in ASSUME_PROVIDED, and it won't
@@ -1434,8 +1450,13 @@ class BaseConfig(object):
 
         if not os.access(qemu_bin, os.X_OK):
             raise OEPathError("No QEMU binary '%s' could be found" % qemu_bin)
+        self.qemu_bin = qemu_bin
 
-        self.qemu_opt = "%s %s %s %s %s" % (qemu_bin, self.get('NETWORK_CMD'), self.get('QB_RNG'), self.get('ROOTFS_OPTIONS'), self.get('QB_OPT_APPEND').replace('@DEPLOY_DIR_IMAGE@', self.get('DEPLOY_DIR_IMAGE')))
+    def setup_final(self):
+
+        self.find_qemu()
+
+        self.qemu_opt = "%s %s %s %s %s" % (self.qemu_bin, self.get('NETWORK_CMD'), self.get('QB_RNG'), self.get('ROOTFS_OPTIONS'), self.get('QB_OPT_APPEND').replace('@DEPLOY_DIR_IMAGE@', self.get('DEPLOY_DIR_IMAGE')))
 
         for ovmf in self.ovmf_bios:
             format = ovmf.rsplit('.', 1)[-1]

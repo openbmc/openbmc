@@ -1,0 +1,76 @@
+From 82fbf9d383ff9069808fb0f5f75c660098dbae52 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Tue, 5 Apr 2022 14:57:41 -0400
+Subject: [PATCH 09/10] Rename genhd wrapper to blkdev
+
+The genhd.h header was folded into blkdev.h in v5.18, rename our wrapper
+to follow upstream.
+
+Upstream-Status: Backport
+
+Change-Id: I4ec94fb94d11712dd20f0680aea1de77fbfa9d17
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/wrapper/{genhd.h => blkdev.h} | 10 +++++-----
+ src/lttng-statedump-impl.c            |  2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+ rename include/wrapper/{genhd.h => blkdev.h} (93%)
+
+diff --git a/include/wrapper/genhd.h b/include/wrapper/blkdev.h
+similarity index 93%
+rename from include/wrapper/genhd.h
+rename to include/wrapper/blkdev.h
+index 4a59b68e..0d5ad90f 100644
+--- a/include/wrapper/genhd.h
++++ b/include/wrapper/blkdev.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: (GPL-2.0-only or LGPL-2.1-only)
+  *
+- * wrapper/genhd.h
++ * wrapper/blkdev.h
+  *
+  * wrapper around block layer functions and data structures. Using
+  * KALLSYMS to get its address when available, else we need to have a
+@@ -9,8 +9,8 @@
+  * Copyright (C) 2011-2014 Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+  */
+ 
+-#ifndef _LTTNG_WRAPPER_GENHD_H
+-#define _LTTNG_WRAPPER_GENHD_H
++#ifndef _LTTNG_WRAPPER_BLKDEV_H
++#define _LTTNG_WRAPPER_BLKDEV_H
+ 
+ #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,18,0))
+ #include <linux/blkdev.h>
+@@ -45,7 +45,7 @@ struct class *wrapper_get_block_class(void)
+ /*
+  * Canary function to check for 'block_class' at compile time.
+  *
+- * From 'include/linux/genhd.h':
++ * From 'include/linux/blkdev.h':
+  *
+  *   extern struct class block_class;
+  */
+@@ -104,4 +104,4 @@ struct device_type *wrapper_get_disk_type(void)
+ 
+ #endif
+ 
+-#endif /* _LTTNG_WRAPPER_GENHD_H */
++#endif /* _LTTNG_WRAPPER_BLKDEV_H */
+diff --git a/src/lttng-statedump-impl.c b/src/lttng-statedump-impl.c
+index 4d7b2921..0e753090 100644
+--- a/src/lttng-statedump-impl.c
++++ b/src/lttng-statedump-impl.c
+@@ -41,7 +41,7 @@
+ #include <wrapper/namespace.h>
+ #include <wrapper/irq.h>
+ #include <wrapper/tracepoint.h>
+-#include <wrapper/genhd.h>
++#include <wrapper/blkdev.h>
+ #include <wrapper/file.h>
+ #include <wrapper/fdtable.h>
+ #include <wrapper/sched.h>
+-- 
+2.19.1
+

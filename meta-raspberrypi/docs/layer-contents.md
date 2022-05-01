@@ -23,8 +23,7 @@ Note: The raspberrypi3 machines include support for Raspberry Pi 3B+.
     layer and some media samples.
 
 For other uses it's recommended to base images on `core-image-minimal` or
-`core-image-base` as appropriate. The old image names (`rpi-hwup-image` and
-`rpi-basic-image`) are deprecated.
+`core-image-base` as appropriate.
 
 ## WiFi and Bluetooth Firmware
 

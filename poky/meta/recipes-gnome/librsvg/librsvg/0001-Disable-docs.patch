@@ -1,0 +1,24 @@
+From e62887dfa36812d5b8bc1c2c2fec69ba985309d8 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 5 Apr 2022 09:21:14 +0200
+Subject: [PATCH] Disable docs
+
+Upstream has replaced gtk-doc with rst2man and gi-docgen in a way
+that is not possible to disable and requires g-i. There's a
+pull request to address this, until then let's patch it out:
+https://gitlab.gnome.org/GNOME/librsvg/-/merge_requests/687
+
+Upstream-Status: Inappropriate [see above]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+
+diff --git a/Makefile.am b/Makefile.am
+index e380bc9..5b3fbb5 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,4 +1,4 @@
+-SUBDIRS = . gdk-pixbuf-loader tests doc win32
++SUBDIRS = . gdk-pixbuf-loader tests win32
+ 
+ NULL =
+ 

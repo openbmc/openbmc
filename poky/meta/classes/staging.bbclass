@@ -651,7 +651,7 @@ python target_add_sysroot_deps () {
     taskdepdata = d.getVar("BB_TASKDEPDATA", False)
     deps = {}
     for dep in taskdepdata.values():
-        if dep[1] == "do_populate_sysroot" and not dep[0].endswith(("-native", "-initial")) and "-cross-" not in dep[0]:
+        if dep[1] == "do_populate_sysroot" and not dep[0].endswith(("-native", "-initial")) and "-cross-" not in dep[0] and dep[0] != pn:
             deps[dep[0]] = dep[6]
 
     d.setVar("HASHEQUIV_EXTRA_SIGDATA", "\n".join("%s: %s" % (k, deps[k]) for k in sorted(deps.keys())))

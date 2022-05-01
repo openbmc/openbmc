@@ -17,12 +17,15 @@ DEPENDS = "zlib gzip-native json-c"
 SRC_URI = "git://github.com/GENIVI/${BPN}.git;protocol=https;branch=master \
            file://0002-Don-t-execute-processes-as-a-specific-user.patch \
            file://0004-Modify-systemd-config-directory.patch \
+           file://0001-cmake-Link-with-libatomic-on-rv32-rv64.patch \
            "
 SRCREV = "0138c00811c86eab4ff6bff3c6528163885ade19"
 
 PV .= "+2.18.9git${SRCPV}"
 
 S = "${WORKDIR}/git"
+
+LDFLAGS:append:riscv64 = " -latomic"
 
 PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', ' systemd systemd-watchdog systemd-journal dlt-examples dlt-adaptor dlt-console ', '', d)} \
  udp-connection dlt-system dlt-filetransfer "

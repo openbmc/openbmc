@@ -25,7 +25,7 @@ jobs:
           - raspberrypi4
           - raspberrypi-cm3
           - raspberrypi-cm
-        image: [core-image-base]
+        image: [rpi-test-image]
         distro: [poky]
     runs-on: [self-hosted, Linux]
     name: ${{ matrix.machine }}/${{ matrix.image }}/poky/systemd

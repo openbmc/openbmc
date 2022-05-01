@@ -9,27 +9,23 @@ and we want to support the stong algorithms.
 
 Upstream-Status: Inappropriate [configuration]
 Signed-off-by: Joseph Reynolds <joseph.reynolds1@ibm.com>
-
 ---
- default_options.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ default_options.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/default_options.h b/default_options.h
-index 1aa2297..7ff1394 100644
+index d417588..bc5200f 100644
 --- a/default_options.h
 +++ b/default_options.h
-@@ -163,12 +163,12 @@ IMPORTANT: Some options will require "make clean" after changes */
+@@ -180,7 +180,7 @@ IMPORTANT: Some options will require "make clean" after changes */
   * Small systems should generally include either curve25519 or ecdh for performance.
   * curve25519 is less widely supported but is faster
-  */ 
+  */
 -#define DROPBEAR_DH_GROUP14_SHA1 1
 +#define DROPBEAR_DH_GROUP14_SHA1 0
  #define DROPBEAR_DH_GROUP14_SHA256 1
  #define DROPBEAR_DH_GROUP16 0
  #define DROPBEAR_CURVE25519 1
- #define DROPBEAR_ECDH 1
--#define DROPBEAR_DH_GROUP1 1
-+#define DROPBEAR_DH_GROUP1 0
- 
- /* When group1 is enabled it will only be allowed by Dropbear client
- not as a server, due to concerns over its strength. Set to 0 to allow
+-- 
+2.25.1
+

@@ -1,0 +1,25 @@
+Subject: LLVM_INCLUDE_BENCHMARKS with llvm 14.0.1 failing to build
+
+https://github.com/llvm/llvm-project/issues/54941
+
+The LLVM_INCLUDE_BENCHMARKS is turned OFF to fix the build error as
+per the discussions in the above link. We will work on the issue and
+replace the workaround with actual fix once committed in LLVM.
+
+Please refer the following link for more discussions on the issue:-
+https://github.com/rust-lang/rust/issues/96054
+
+Upstream-Status: Pending
+Signed-off-by: Pgowda <pgowda.cve@gmail.com>
+
+--- a/llvm/CMakeLists.txt	2022-04-22 00:45:30.543445478 -0700
++++ b/llvm/CMakeLists.txt	2022-04-22 00:45:42.095232974 -0700
+@@ -615,7 +615,7 @@ option(LLVM_INCLUDE_GO_TESTS "Include th
+ 
+ option(LLVM_BUILD_BENCHMARKS "Add LLVM benchmark targets to the list of default
+ targets. If OFF, benchmarks still could be built using Benchmarks target." OFF)
+-option(LLVM_INCLUDE_BENCHMARKS "Generate benchmark targets. If OFF, benchmarks can't be built." ON)
++option(LLVM_INCLUDE_BENCHMARKS "Generate benchmark targets. If OFF, benchmarks can't be built." OFF)
+ 
+ option (LLVM_BUILD_DOCS "Build the llvm documentation." OFF)
+ option (LLVM_INCLUDE_DOCS "Generate build targets for llvm documentation." ON)

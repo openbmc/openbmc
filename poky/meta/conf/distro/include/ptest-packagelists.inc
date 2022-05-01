@@ -25,6 +25,7 @@ PTESTS_FAST = "\
     json-glib-ptest \
     libconvert-asn1-perl-ptest \
     liberror-perl-ptest \
+    libgpg-error-ptest\
     libnl-ptest \
     libmodule-build-perl-ptest \
     libpcre-ptest \

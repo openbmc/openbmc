@@ -78,7 +78,8 @@ about the variable flags (varflags) that help control archive creation.
 ``autotools*.bbclass``
 ======================
 
-The ``autotools*`` classes support Autotooled packages.
+The ``autotools*`` classes support packages built with the
+`GNU Autotools <https://en.wikipedia.org/wiki/GNU_Autotools>`__.
 
 The ``autoconf``, ``automake``, and ``libtool`` packages bring
 standardization. This class defines a set of tasks (e.g. ``configure``,
@@ -576,6 +577,14 @@ Finally, here is an example that sets the root password::
        usermod -p '${PASSWD}' root; \
        "
 
+.. note::
+
+   From a security perspective, hardcoding a default password is not
+   generally a good idea or even legal in some jurisdictions. It is 
+   recommended that you do not do this if you are building a production 
+   image.
+
+
 .. _ref-classes-features_check:
 
 ``features_check.bbclass``
@@ -1031,6 +1040,11 @@ Here are the tests you can list with the :term:`WARN_QA` and
    ``-dev`` package is the correct location for them. In very rare
    cases, such as dynamically loaded modules, these symlinks
    are needed instead in the main package.
+
+-  ``empty-dirs:`` Checks that packages are not installing files to
+   directories that are normally expected to be empty (such as ``/tmp``)
+   The list of directories that are checked is specified by the
+   :term:`QA_EMPTY_DIRS` variable.
 
 -  ``file-rdeps:`` Checks that file-level dependencies identified by
    the OpenEmbedded build system at packaging time are satisfied. For

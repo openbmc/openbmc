@@ -8,11 +8,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS = "libxml2 itstool-native glib-2.0 shared-mime-info-native xmlto-native"
 
-SRC_URI = "git://gitlab.freedesktop.org/xdg/shared-mime-info.git;protocol=https;branch=master \
-           file://0001-migrate-from-custom-itstool-to-builtin-msgfmt-for-cr.patch \
-           "
-SRCREV = "18e558fa1c8b90b86757ade09a4ba4d6a6cf8f70"
-PV = "2.1"
+SRC_URI = "git://gitlab.freedesktop.org/xdg/shared-mime-info.git;protocol=https;branch=master"
+SRCREV = "13695c7225c2f525a435e72739c33ac32bbfbbb9"
+PV = "2.2"
 S = "${WORKDIR}/git"
 
 inherit meson pkgconfig gettext python3native mime

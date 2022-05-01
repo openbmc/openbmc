@@ -9,12 +9,12 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b2beded7103a3d8a442a2a0391d607b0"
 SRC_URI = "git://gitlab.freedesktop.org/mesa/piglit.git;protocol=https;branch=main \
            file://0001-cmake-install-bash-completions-in-the-right-place.patch \
            file://0001-cmake-use-proper-WAYLAND_INCLUDE_DIRS-variable.patch \
-           file://0001-Add-a-missing-include-for-htobe32-definition.patch \
            file://0002-tests-util-piglit-shader.c-do-not-hardcode-build-pat.patch \
+           file://0001-CMakeLists.txt-add-missing-endian.h-check.patch \
            "
 UPSTREAM_CHECK_COMMITS = "1"
 
-SRCREV = "2f80c7cc9c02d37574dc8ba3140b7dd8eb3cbf82"
+SRCREV = "0d7481136080ffed96a33d31a04547012903ba25"
 # (when PV goes above 1.0 remove the trailing r)
 PV = "1.0+gitr${SRCPV}"
 

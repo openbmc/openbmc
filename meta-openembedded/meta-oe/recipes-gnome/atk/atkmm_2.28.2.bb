@@ -11,7 +11,7 @@ GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase features_check
 
-REQUIRED_DISTRO_FEATURES = "x11"
+ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
 SRC_URI[archive.sha256sum] = "a0bb49765ceccc293ab2c6735ba100431807d384ffa14c2ebd30e07993fd2fa4"
 

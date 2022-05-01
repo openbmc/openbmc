@@ -13,7 +13,6 @@ BitBake 'Fetch' implementation for crates.io
 import hashlib
 import json
 import os
-import shutil
 import subprocess
 import bb
 from   bb.fetch2 import logger, subprocess_setup, UnpackError
@@ -72,7 +71,7 @@ class Crate(Wget):
         ud.parm['downloadfilename'] = "%s-%s.crate" % (name, version)
         ud.parm['name'] = name
 
-        logger.debug(2, "Fetching %s to %s" % (ud.url, ud.parm['downloadfilename']))
+        logger.debug("Fetching %s to %s" % (ud.url, ud.parm['downloadfilename']))
 
     def unpack(self, ud, rootdir, d):
         """

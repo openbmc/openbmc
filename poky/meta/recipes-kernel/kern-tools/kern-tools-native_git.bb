@@ -3,12 +3,15 @@ DESCRIPTION = "Powerful set of tools or managing Yocto Linux kernel sources \
 and configuration data. You can use these tools to make a single configuration \
 change, apply multiple patches, or work with your own kernel sources."
 HOMEPAGE = "https://www.yoctoproject.org/"
-LICENSE = "GPL-2.0-only"
-LIC_FILES_CHKSUM = "file://tools/kgit;beginline=5;endline=9;md5=9c30e971d435e249624278c3e343e501"
+LICENSE = "GPL-2.0-only & MIT"
+LIC_FILES_CHKSUM = "\
+	file://tools/kgit;beginline=5;endline=9;md5=9c30e971d435e249624278c3e343e501 \
+	file://Kconfiglib/LICENSE.txt;md5=712177a72a3937909543eda3ad1bfb7c \
+"
 
 DEPENDS = "git-native"
 
-SRCREV = "90598a5fae1172e3f7782a1b02f7b7518efd32c8"
+SRCREV = "f70b1d52f4706a263ae22e2c61039ccd875e97b6"
 PV = "0.3+git${SRCPV}"
 
 inherit native

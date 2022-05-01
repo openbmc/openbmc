@@ -27,6 +27,7 @@ inherit sanity
 PACKAGE_FEED_SIGN = '1'
 PACKAGE_FEED_GPG_BACKEND ?= 'local'
 PACKAGE_FEED_GPG_SIGNATURE_TYPE ?= 'ASC'
+PACKAGEINDEXDEPS += "gnupg-native:do_populate_sysroot"
 
 # Make feed signing key to be present in rootfs
 FEATURE_PACKAGES_package-management:append = " signing-keys-packagefeed"

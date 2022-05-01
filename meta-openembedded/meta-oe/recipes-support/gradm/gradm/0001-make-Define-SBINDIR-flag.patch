@@ -1,0 +1,69 @@
+From 12bc62ac26df012fc143913b6e046a3cf5127db2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 23 Apr 2022 09:20:49 -0700
+Subject: [PATCH] make: Define SBINDIR flag
+
+Provides a facility to control install locations of /sbin elements from
+environment
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index deed94c..9190fe9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -25,6 +25,7 @@ MKNOD=/bin/mknod
+ CC=/usr/bin/gcc
+ FIND=/usr/bin/find
+ LIBS := $(shell if [ "`uname -m`" != "sparc64" -a "`uname -m`" != "x86_64" ]; then echo "-lfl" ; else echo "" ; fi)
++SBINDIR=/sbin
+ OPT_FLAGS := -O2
+ # for older versions of grsecurity, comment the above line and uncomment the below:
+ #OPT_FLAGS := $(shell if [ "`uname -m`" != "sparc64" ] && [ "`uname -m`" != "x86_64" ]; then echo "-O2" ; else echo "-O2 -m64" ; fi)
+@@ -136,15 +137,15 @@ lex.learn_pass1.o: lex.learn_pass1.c learn_pass1.tab.h
+ lex.learn_pass2.o: lex.learn_pass2.c learn_pass2.tab.h
+ 
+ install: $(GRADM_BIN) gradm.8 policy grlearn
+-	@mkdir -p $(DESTDIR)/sbin
++	@mkdir -p $(DESTDIR)$(SBINDIR)
+ 	@echo "Installing gradm..."
+-	@$(INSTALL) -m 0755 $(GRADM_BIN) $(DESTDIR)/sbin
++	@$(INSTALL) -m 0755 $(GRADM_BIN) $(DESTDIR)$(SBINDIR)
+ 	@if [ -f $(GRADM_PAM) ] ; then \
+ 		echo "Installing gradm_pam..." ; \
+-		$(INSTALL) -m 4755 $(GRADM_PAM) $(DESTDIR)/sbin ; \
++		$(INSTALL) -m 4755 $(GRADM_PAM) $(DESTDIR)$(SBINDIR) ; \
+ 	fi
+ 	@echo "Installing grlearn..."
+-	@$(INSTALL) -m 0700 grlearn $(DESTDIR)/sbin
++	@$(INSTALL) -m 0700 grlearn $(DESTDIR)$(SBINDIR)
+ 	@mkdir -p -m 700 $(DESTDIR)$(GRSEC_DIR)
+ 	@if [ ! -f $(DESTDIR)$(GRSEC_DIR)/policy ] ; then \
+ 		if [ -f $(DESTDIR)$(GRSEC_DIR)/acl ] ; then \
+@@ -170,15 +171,15 @@ install: $(GRADM_BIN) gradm.8 policy grlearn
+ 		echo "KERNEL==\"grsec\",          MODE=\"0622\"" >> $(DESTDIR)/etc/udev/rules.d/80-grsec.rules ; \
+ 		echo "LABEL=\"permissions_end\"" >> $(DESTDIR)/etc/udev/rules.d/80-grsec.rules ; \
+ 	fi
+-	@if [ -f $(DESTDIR)/sbin/udevadm ] ; then \
+-		$(DESTDIR)/sbin/udevadm trigger --action=change ; \
++	@if [ -f $(DESTDIR)$(SBINDIR)/udevadm ] ; then \
++		$(DESTDIR)$(SBINDIR)/udevadm trigger --action=change ; \
+ 	fi
+ 	@echo "Installing gradm manpage..."
+ 	@mkdir -p $(DESTDIR)$(MANDIR)/man8
+ 	@$(INSTALL) -m 0644 gradm.8 $(DESTDIR)$(MANDIR)/man8/$(GRADM_BIN).8
+-	@if [ -x /sbin/$(GRADM_BIN) ] ; then \
++	@if [ -x $(SBINDIR)/$(GRADM_BIN) ] ; then \
+ 		if [ -z $(DESTDIR) ] && [ ! -f $(GRSEC_DIR)/pw ] ; then \
+-			/sbin/$(GRADM_BIN) -P ; \
++			$(SBINDIR)/$(GRADM_BIN) -P ; \
+ 		fi \
+ 	fi
+ 	@true
+-- 
+2.36.0
+

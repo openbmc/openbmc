@@ -36,7 +36,7 @@ NEEDED_PERL_MODULES = "\
 # mosh uses SSH to authenticate and the client uses OpenSSH-specific features
 RDEPENDS:${PN} += "openssh-ssh ${NEEDED_PERL_MODULES}"
 # The server seemed not to work with dropbear either
-RDEPENDS:${PN}-server += "openssh-sshd ${NEEDED_PERL_MODULES}"
+RDEPENDS:${PN}-server += "openssh-sshd"
 
 # Fails to build with thumb-1 (qemuarm)
 #| {standard input}: Assembler messages:

@@ -1,0 +1,32 @@
+From 6168d43ddd353b92ad8bcd5c49dc68f18caa8a00 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 12 Apr 2022 17:07:49 -0700
+Subject: [PATCH 1/2] include missing <array> header
+
+Fixes
+src/osaf/consensus/key_value.cc:25:30: error: aggregate 'std::array<char, 128> buffer' has incomplete type and cannot be defined
+   25 |   std::array<char, buf_size> buffer;
+      |                              ^~~~~~
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/osaf/consensus/key_value.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/osaf/consensus/key_value.cc b/src/osaf/consensus/key_value.cc
+index 692dd3f..6e16cbf 100644
+--- a/src/osaf/consensus/key_value.cc
++++ b/src/osaf/consensus/key_value.cc
+@@ -18,7 +18,7 @@
+ #include "base/getenv.h"
+ #include "base/logtrace.h"
+ #include "osaf/consensus/consensus.h"
+-
++#include <array>
+ int KeyValue::Execute(const std::string& command, std::string& output) {
+   TRACE_ENTER();
+   constexpr size_t buf_size = 128;
+-- 
+2.35.1
+

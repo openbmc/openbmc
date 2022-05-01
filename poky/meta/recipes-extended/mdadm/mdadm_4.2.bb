@@ -35,8 +35,6 @@ DEPENDS = "udev"
 SYSTEMD_SERVICE:${PN} = "mdmonitor.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
-CFLAGS:append:toolchain-clang = " -Wno-error=address-of-packed-member"
-
 # PPC64 and MIPS64 uses long long for u64 in the kernel, but powerpc's asm/types.h
 # prevents 64-bit userland from seeing this definition, instead defaulting
 # to u64 == long in userspace. Define __SANE_USERSPACE_TYPES__ to get

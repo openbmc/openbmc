@@ -33,8 +33,8 @@ NO_GENERIC_LICENSE[Firmware-broadcom_bcm43xx-rpidistro] = "debian/config/brcm802
 
 SRC_URI = "git://github.com/RPi-Distro/firmware-nonfree;branch=bullseye;protocol=https"
 
-SRCREV = "b3eec612566ca08913f0830d299f4df70297428f"
-PV = "20210315-3+rpt3"
+SRCREV = "99d5c588e95ec9c9b86d7e88d3cf85b4f729d2bc"
+PV = "20210315-3+rpt4"
 
 S = "${WORKDIR}/git"
 
@@ -58,6 +58,7 @@ do_install() {
         cp -R --no-dereference --preserve=mode,links -v debian/config/brcm80211/brcm/${fw}.* ${D}${nonarch_base_libdir}/firmware/brcm/
     done
     cp -R --no-dereference --preserve=mode,links -v debian/config/brcm80211/cypress/* ${D}${nonarch_base_libdir}/firmware/cypress/
+    rm ${D}${nonarch_base_libdir}/firmware/cypress/README.txt
     # add compat links. Fixes errors like
     # brcmfmac mmc1:0001:1: Direct firmware load for brcm/brcmfmac43455-sdio.raspberrypi,4-model-compute-module.txt failed with error -2
     ln -s brcmfmac43455-sdio.txt ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.raspberrypi,4-compute-module.txt
@@ -79,10 +80,10 @@ LICENSE:${PN}-bcm43455 = "Firmware-broadcom_bcm43xx-rpidistro"
 LICENSE:${PN}-bcm43456 = "Firmware-broadcom_bcm43xx-rpidistro"
 LICENSE:${PN}-broadcom-license = "Firmware-broadcom_bcm43xx-rpidistro"
 FILES:${PN}-broadcom-license = "${nonarch_base_libdir}/firmware/LICENSE.broadcom_bcm43xx-rpidistro"
-FILES:${PN}-bcm43430 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43430* ${nonarch_base_libdir}/firmware/cypress/cyfmac43430-sdio.bin"
+FILES:${PN}-bcm43430 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43430* ${nonarch_base_libdir}/firmware/cypress/cyfmac43430-sdio.bin ${nonarch_base_libdir}/firmware/cypress/cyfmac43430-sdio.clm_blob"
 FILES:${PN}-bcm43436 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43436-*"
 FILES:${PN}-bcm43436s = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43436s*"
-FILES:${PN}-bcm43455 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43455* ${nonarch_base_libdir}/firmware/cypress/cyfmac43455-sdio.*"
+FILES:${PN}-bcm43455 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43455* ${nonarch_base_libdir}/firmware/cypress/cyfmac43455-sdio*"
 FILES:${PN}-bcm43456 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43456*"
 RDEPENDS:${PN}-bcm43430 += "${PN}-broadcom-license"
 RDEPENDS:${PN}-bcm43436 += "${PN}-broadcom-license"

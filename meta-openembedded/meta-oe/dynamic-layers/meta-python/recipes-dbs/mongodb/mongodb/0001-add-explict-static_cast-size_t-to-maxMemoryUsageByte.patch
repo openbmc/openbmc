@@ -1,0 +1,38 @@
+From ad37ee80b32a1f740a3197105174d74dff11e4e8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 13 Apr 2022 13:56:32 -0700
+Subject: [PATCH] add explict static_cast<size_t> to maxMemoryUsageBytes
+
+Fixes
+src/mongo/db/pipeline/document_source_group.cpp:377:22: error: non-constant-expression cannot be narrowed from type 'long long' to 'size_t' (aka 'unsigned int') in initializer list [-Wc++11-narrowing]
+                     maxMemoryUsageBytes ? *maxMemoryUsageBytes
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/mongo/db/pipeline/document_source_group.cpp:377:22: note: insert an explicit cast to silence this issue
+                     maxMemoryUsageBytes ? *maxMemoryUsageBytes
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/mongo/db/pipeline/document_source_group.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/mongo/db/pipeline/document_source_group.cpp b/src/mongo/db/pipeline/document_source_group.cpp
+index 4a7b48d6cd2..9a6076c6041 100644
+--- a/src/mongo/db/pipeline/document_source_group.cpp
++++ b/src/mongo/db/pipeline/document_source_group.cpp
+@@ -374,8 +374,8 @@ DocumentSourceGroup::DocumentSourceGroup(const intrusive_ptr<ExpressionContext>&
+       _usedDisk(false),
+       _doingMerge(false),
+       _memoryTracker{pExpCtx->allowDiskUse && !pExpCtx->inMongos,
+-                     maxMemoryUsageBytes ? *maxMemoryUsageBytes
+-                                         : internalDocumentSourceGroupMaxMemoryBytes.load()},
++                     static_cast<size_t>(maxMemoryUsageBytes ? *maxMemoryUsageBytes
++                                         : internalDocumentSourceGroupMaxMemoryBytes.load())},
+       // We spill to disk in debug mode, regardless of allowDiskUse, to stress the system.
+       _file(!pExpCtx->inMongos && (pExpCtx->allowDiskUse || kDebugBuild)
+                 ? std::make_shared<Sorter<Value, Value>::File>(pExpCtx->tempDir + "/" +
+-- 
+2.35.2
+

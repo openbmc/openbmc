@@ -39,7 +39,7 @@ do_extract_lic() {
 }
 # Must be before both do_install and do_populate_lic.  Putting it before
 # their common ancestor works; other approaches do not.
-addtask extract_lic after do_unpack before do_patch
+addtask extract_lic after do_unpack before do_patch do_create_spdx
 
 do_compile() {
     :

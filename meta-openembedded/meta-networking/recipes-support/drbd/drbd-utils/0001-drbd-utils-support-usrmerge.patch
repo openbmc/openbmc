@@ -1,18 +1,24 @@
-From 83764f5d57b3370e0b04a70f814ca49237a66eea Mon Sep 17 00:00:00 2001
+From 69011c7227ad1aaf08d5ab28e46f85dac951c597 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
-Date: Thu, 5 Sep 2019 18:57:39 +0800
-Subject: [PATCH] drbd-utils: support usrmerge
+Date: Thu, 21 Apr 2022 17:22:35 +0800
+Subject: [PATCH] drbd-utils: support usermerge
 
 Upstream-Status: Inappropriate[oe-specific]
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
 ---
- configure.ac         |  2 +-
- scripts/Makefile.in  | 10 +++++-----
- user/v83/Makefile.in | 14 +++++++-------
- user/v84/Makefile.in | 14 +++++++-------
- 4 files changed, 20 insertions(+), 20 deletions(-)
+ configure.ac                             |  2 +-
+ scripts/Makefile.in                      | 10 +++++-----
+ scripts/drbd-demote-or-escalate@.service |  2 +-
+ scripts/drbd-promote@.service            |  4 ++--
+ scripts/drbd-wait-promotable@.service    |  2 +-
+ scripts/drbd.service                     |  6 +++---
+ scripts/drbd@.service                    |  6 +++---
+ scripts/ocf.ra@.service                  |  4 ++--
+ user/v83/Makefile.in                     | 14 +++++++-------
+ user/v84/Makefile.in                     | 14 +++++++-------
+ 10 files changed, 32 insertions(+), 32 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
 index ae575586..3d7deeae 100644
@@ -28,7 +34,7 @@ index ae575586..3d7deeae 100644
     test x"$with_udev" = xyes ; then
  	if test x"$PKG_CONFIG" != x; then
 diff --git a/scripts/Makefile.in b/scripts/Makefile.in
-index fcd298e9..2521fb08 100644
+index fcd298e9..bab441a5 100644
 --- a/scripts/Makefile.in
 +++ b/scripts/Makefile.in
 @@ -88,11 +88,11 @@ ifeq ($(subst both,systemd,$(initscripttype)),systemd)
@@ -40,14 +46,97 @@ index fcd298e9..2521fb08 100644
 -	install -m 755 drbd-service-shim.sh $(DESTDIR)/lib/drbd/scripts
 -	install -m 755 drbd-wait-promotable.sh $(DESTDIR)/lib/drbd/scripts
 -	install -m 755 ocf.ra.wrapper.sh $(DESTDIR)/lib/drbd/scripts
-+	install -d $(DESTDIR)/${nonarch_libdir}/drbdscripts
-+	install -m 755 drbd $(DESTDIR)/${nonarch_libdir}/drbdscripts
-+	install -m 755 drbd-service-shim.sh $(DESTDIR)/${nonarch_libdir}/drbdscripts
-+	install -m 755 drbd-wait-promotable.sh $(DESTDIR)/${nonarch_libdir}/drbdscripts
-+	install -m 755 ocf.ra.wrapper.sh $(DESTDIR)/${nonarch_libdir}/drbdscripts
++	install -d $(DESTDIR)/${nonarch_libdir}/drbd/scripts
++	install -m 755 drbd $(DESTDIR)/${nonarch_libdir}/drbd/scripts
++	install -m 755 drbd-service-shim.sh $(DESTDIR)/${nonarch_libdir}/drbd/scripts
++	install -m 755 drbd-wait-promotable.sh $(DESTDIR)/${nonarch_libdir}/drbd/scripts
++	install -m 755 ocf.ra.wrapper.sh $(DESTDIR)/${nonarch_libdir}/drbd/scripts
  	install -d $(DESTDIR)$(tmpfilesdir)/
  	install -m 444 drbd.tmpfiles.conf $(DESTDIR)$(tmpfilesdir)/drbd.conf
  endif
+diff --git a/scripts/drbd-demote-or-escalate@.service b/scripts/drbd-demote-or-escalate@.service
+index 20932238..8b5ce4a2 100644
+--- a/scripts/drbd-demote-or-escalate@.service
++++ b/scripts/drbd-demote-or-escalate@.service
+@@ -28,5 +28,5 @@ TimeoutSec=60
+ # "Type=forking" would be an option to have it retry a number of times,
+ # and then only escalate to FailureAction if that did not help.
+ Type=oneshot
+-ExecStart=/lib/drbd/scripts/drbd-service-shim.sh secondary-or-escalate %I
++ExecStart=@nonarch_libdir@/drbd/scripts/drbd-service-shim.sh secondary-or-escalate %I
+ ExecStopPost=-/bin/journalctl --sync
+diff --git a/scripts/drbd-promote@.service b/scripts/drbd-promote@.service
+index 71345d9b..678e0703 100644
+--- a/scripts/drbd-promote@.service
++++ b/scripts/drbd-promote@.service
+@@ -24,5 +24,5 @@ RemainAfterExit=yes
+ # (ab)using systemd features
+ # if we cannot configure and promote, that's a condition, not a failure
+ # See the comment above wrt. FailureAction vs OnFailure
+-ExecCondition=/lib/drbd/scripts/drbd-service-shim.sh primary %I
+-ExecStop=/lib/drbd/scripts/drbd-service-shim.sh secondary %I
++ExecCondition=@nonarch_libdir@/drbd/scripts/drbd-service-shim.sh primary %I
++ExecStop=@nonarch_libdir@/drbd/scripts/drbd-service-shim.sh secondary %I
+diff --git a/scripts/drbd-wait-promotable@.service b/scripts/drbd-wait-promotable@.service
+index 81c3789f..3416abc6 100644
+--- a/scripts/drbd-wait-promotable@.service
++++ b/scripts/drbd-wait-promotable@.service
+@@ -10,7 +10,7 @@ Type=oneshot
+ 
+ # on first start, wait for access to "good data"
+ # let systemd handle timeouts
+-ExecStart=/lib/drbd/scripts/drbd-wait-promotable.sh %I
++ExecStart=@nonarch_libdir@/drbd/scripts/drbd-wait-promotable.sh %I
+ RemainAfterExit=yes
+ 
+ [Install]
+diff --git a/scripts/drbd.service b/scripts/drbd.service
+index 96c599e7..c81e95a6 100644
+--- a/scripts/drbd.service
++++ b/scripts/drbd.service
+@@ -12,11 +12,11 @@ RemainAfterExit=yes
+ # A check for INIT_VERSION already exists, just set it to something.
+ Environment=INIT_VERSION=systemd
+ 
+-ExecStart=/lib/drbd/scripts/drbd start
+-ExecStop=/lib/drbd/scripts/drbd stop
++ExecStart=@nonarch_libdir@/drbd/scripts/drbd start
++ExecStop=@nonarch_libdir@/drbd/scripts/drbd stop
+ 
+ # Re-adjust everything on reload
+-ExecReload=/lib/drbd/scripts/drbd reload
++ExecReload=@nonarch_libdir@/drbd/scripts/drbd reload
+ 
+ [Install]
+ WantedBy=multi-user.target
+diff --git a/scripts/drbd@.service b/scripts/drbd@.service
+index 76514c5b..e2e500ba 100644
+--- a/scripts/drbd@.service
++++ b/scripts/drbd@.service
+@@ -35,8 +35,8 @@ RemainAfterExit=yes
+ 
+ # depends... do we want this as ExecCondition or as ExecStart
+ # failed start is "failed", failed condition is just "not startable yet"
+-ExecStart=/lib/drbd/scripts/drbd-service-shim.sh adjust %I
+-ExecReload=/lib/drbd/scripts/drbd-service-shim.sh adjust %I
++ExecStart=@nonarch_libdir@/drbd/scripts/drbd-service-shim.sh adjust %I
++ExecReload=@nonarch_libdir@/drbd/scripts/drbd-service-shim.sh adjust %I
+ 
+ # can only succeed, if you first stop all depending services
+-ExecStopPost=/lib/drbd/scripts/drbd-service-shim.sh down %I
++ExecStopPost=@nonarch_libdir@/drbd/scripts/drbd-service-shim.sh down %I
+diff --git a/scripts/ocf.ra@.service b/scripts/ocf.ra@.service
+index 9c2268a6..1666c482 100644
+--- a/scripts/ocf.ra@.service
++++ b/scripts/ocf.ra@.service
+@@ -22,5 +22,5 @@ Environment=monitor_inverval=30
+ # Only the first argument is used by the wrapper,
+ # the %n is just to identify which is which in the process list.
+ # All parameterization is done via Environment= in per instance override.conf
+-ExecStart=/lib/drbd/scripts/ocf.ra.wrapper.sh start-and-monitor %n
+-ExecStopPost=/lib/drbd/scripts/ocf.ra.wrapper.sh stop %n
++ExecStart=@nonarch_libdir@/drbd/scripts/ocf.ra.wrapper.sh start-and-monitor %n
++ExecStopPost=@nonarch_libdir@/drbd/scripts/ocf.ra.wrapper.sh stop %n
 diff --git a/user/v83/Makefile.in b/user/v83/Makefile.in
 index 08cfe574..4c4971b6 100644
 --- a/user/v83/Makefile.in
@@ -111,5 +200,5 @@ index 0fcefc5f..81f7d5ec 100644
  spell:
  	for f in drbdadm_adjust.c drbdadm_main.c drbdadm_parser.c drbdadm_usage_cnt.c drbdsetup.c drbdtool_common.c; do \
 -- 
-2.33.0
+2.25.1
 

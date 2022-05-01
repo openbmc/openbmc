@@ -2,7 +2,7 @@ DESCRIPTION = "OpenSSL secure engine based on TPM hardware"
 HOMEPAGE = "https://github.com/mgerstner/openssl_tpm_engine"
 SECTION = "security/tpm"
 
-LICENSE = "openssl"
+LICENSE = "OpenSSL"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=11f0ee3af475c85b907426e285c9bb52"
 
 DEPENDS += "openssl trousers"

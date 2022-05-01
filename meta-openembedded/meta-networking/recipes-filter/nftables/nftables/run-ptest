@@ -1,0 +1,2 @@
+#!/bin/sh
+tests/shell/run-tests.sh -v

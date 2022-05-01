@@ -32,6 +32,7 @@ IETF secsh internet draft:
 
 import re, os
 from bb.fetch2 import check_network_access, FetchMethod, ParameterError, runfetchcmd
+import urllib
 
 
 __pattern__ = re.compile(r'''
@@ -70,6 +71,7 @@ class SSH(FetchMethod):
                 "git:// prefix with protocol=ssh", urldata.url)
         m = __pattern__.match(urldata.url)
         path = m.group('path')
+        path = urllib.parse.unquote(path)
         host = m.group('host')
         urldata.localpath = os.path.join(d.getVar('DL_DIR'),
                 os.path.basename(os.path.normpath(path)))
@@ -99,7 +101,7 @@ class SSH(FetchMethod):
 
         if path[0] != '~':
             path = '/%s' % path
-        path = path.replace("%3A", ":")
+        path = urllib.parse.unquote(path)
 
         fr += ':%s' % path
 
@@ -139,7 +141,7 @@ class SSH(FetchMethod):
 
         if path[0] != '~':
             path = '/%s' % path
-        path = path.replace("%3A", ":")
+        path = urllib.parse.unquote(path)
 
         cmd = 'ssh -o BatchMode=true %s %s [ -f %s ]' % (
             portarg,

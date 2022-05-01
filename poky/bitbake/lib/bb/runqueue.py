@@ -1674,7 +1674,7 @@ class RunQueue:
             (mc, fn, taskname, taskfn) = split_tid_mcfn(tid)
             pn = self.rqdata.dataCaches[mc].pkg_fn[taskfn]
             h = self.rqdata.runtaskentries[tid].hash
-            matches = bb.siggen.find_siginfo(pn, taskname, [], self.cfgData)
+            matches = bb.siggen.find_siginfo(pn, taskname, [], self.cooker.databuilder.mcdata[mc])
             match = None
             for m in matches:
                 if h in m:
@@ -2664,7 +2664,6 @@ def build_scenequeue_data(sqdata, rqdata, rq, cooker, stampcache, sqrq):
             sq_revdeps_squash[point] = set()
             if point in rqdata.runq_setscene_tids:
                 sq_revdeps_squash[point] = tasks
-                tasks = set()
                 continue
             for dep in rqdata.runtaskentries[point].depends:
                 if point in sq_revdeps[dep]:

@@ -2,4 +2,4 @@
 
 chown nobody testsuite
 chown nobody ../ptest
-su nobody -c "make test-suite.log"
+su nobody -s /bin/sh -c "make test-suite.log"

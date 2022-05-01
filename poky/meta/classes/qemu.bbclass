@@ -64,4 +64,8 @@ QEMU_EXTRAOPTIONS_ppc64e5500 = " -cpu e500mc"
 QEMU_EXTRAOPTIONS_ppce6500 = " -cpu e500mc"
 QEMU_EXTRAOPTIONS_ppc64e6500 = " -cpu e500mc"
 QEMU_EXTRAOPTIONS_ppc7400 = " -cpu 7400"
-QEMU_EXTRAOPTIONS:powerpc64le = " -cpu POWER8"
+QEMU_EXTRAOPTIONS_powerpc64le = " -cpu POWER9"
+# Some packages e.g. fwupd sets PACKAGE_ARCH = MACHINE_ARCH and uses meson which
+# needs right options to usermode qemu
+QEMU_EXTRAOPTIONS_qemuppc = " -cpu 7400"
+QEMU_EXTRAOPTIONS_qemuppc64 = " -cpu POWER9"

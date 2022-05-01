@@ -1,0 +1,52 @@
+From 8a8305c78143438e2bd497d55188a0da3442db08 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 27 Apr 2022 09:11:38 -0700
+Subject: [PATCH] scripts: Do not check for files on build host
+
+This will result in varied behaviour depending upon what kind of host is
+used to build it. We dont want that. Instead check for these files and
+dirs in staging area and create these markers in recipe via a
+do_install_prepend to aide install piece a bit here ( systemd vs
+sysvinit ) etc.
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ client/scripts/Makefile.am | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/client/scripts/Makefile.am b/client/scripts/Makefile.am
+index 2a53203d84..62a0defa93 100644
+--- a/client/scripts/Makefile.am
++++ b/client/scripts/Makefile.am
+@@ -2,21 +2,21 @@
+ 
+ install-exec-hook:
+ 	chmod +x boinc-client
+-	if [ -d /etc/init.d ] ; then \
++	if [ -d $(DESTDIR)/etc/init.d ] ; then \
+ 		$(INSTALL) -d $(DESTDIR)$(sysconfdir)/init.d ; \
+ 		$(INSTALL) -b boinc-client $(DESTDIR)$(sysconfdir)/init.d/boinc-client ; \
+ 	fi
+-	if [ -d /usr/lib/systemd/system ] ; then \
++	if [ -d $(DESTDIR)/usr/lib/systemd/system ] ; then \
+ 		$(INSTALL) -d $(DESTDIR)/usr/lib/systemd/system/ ; \
+ 		$(INSTALL_DATA) boinc-client.service $(DESTDIR)/usr/lib/systemd/system/boinc-client.service ; \
+-	elif [ -d /lib/systemd/system ] ; then \
++	elif [ -d $(DESTDIR)/lib/systemd/system ] ; then \
+ 		$(INSTALL) -d $(DESTDIR)/lib/systemd/system/ ; \
+ 		$(INSTALL_DATA) boinc-client.service $(DESTDIR)/lib/systemd/system/boinc-client.service ; \
+ 	fi
+-	if [ -d /etc/sysconfig ] ; then \
++	if [ -d $(DESTDIR)/etc/sysconfig ] ; then \
+ 	  $(INSTALL) -d $(DESTDIR)$(sysconfdir)/sysconfig ; \
+ 	  $(INSTALL_DATA) $(srcdir)/boinc-client.conf $(DESTDIR)$(sysconfdir)/sysconfig/boinc-client ; \
+-	elif [ -d /etc/default ] ; then \
++	elif [ -d $(DESTDIR)/etc/default ] ; then \
+ 	  $(INSTALL) -d $(DESTDIR)$(sysconfdir)/default ; \
+ 	  $(INSTALL_DATA) $(srcdir)/boinc-client.conf $(DESTDIR)$(sysconfdir)/default/boinc-client ; \
+ 	else \
+-- 
+2.36.0
+

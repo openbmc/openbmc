@@ -37,14 +37,14 @@ do_compile () {
 }
 
 do_install () {
-	oe_runmake install 'DESTDIR=${D}'
+	oe_runmake install 'DESTDIR=${D}${root_prefix}'
 	if [ "${SITEINFO_BITS}" = "64" ]; then
-		install -d ${D}/lib64
-		ln -rs ${D}${GLIBC_LDSO} ${D}/lib64/`basename ${GLIBC_LDSO}`
+		install -d ${D}${nonarch_base_libdir}${SITEINFO_BITS}
+		ln -rs ${D}${GLIBC_LDSO} ${D}${nonarch_base_libdir}${SITEINFO_BITS}/`basename ${GLIBC_LDSO}`
 	fi
 }
 
-FILES:${PN} += "/lib64"
+FILES:${PN} += "${nonarch_base_libdir}${SITEINFO_BITS}"
 
 INSANE_SKIP:${PN} = "libdir"
 

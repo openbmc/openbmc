@@ -23,13 +23,17 @@ ourversion = None
 if len(sys.argv) == 2:
     ourversion = sys.argv[1]
 
-activereleases = ["honister", "hardknott", "dunfell"]
-#devbranch = "langdale"
-devbranch = "kirkstone"
+activereleases = ["kirkstone", "honister", "hardknott", "dunfell"]
+devbranch = "langdale"
 ltsseries = ["kirkstone", "dunfell"]
 
+# used by run-docs-builds to get the default page
+if ourversion == "getlatest":
+    print(activereleases[0])
+    sys.exit(0)
+
 release_series = collections.OrderedDict()
-#release_series["langdale"] = "4.1"
+release_series["langdale"] = "4.1"
 release_series["kirkstone"] = "4.0"
 release_series["honister"] = "3.4"
 release_series["hardknott"] = "3.3"
@@ -57,8 +61,8 @@ release_series["bernard"] = "1.0"
 release_series["laverne"] = "0.9"
 
 
-#    "langdale" : "2.2",
 bitbake_mapping = {
+    "langdale" : "2.2",
     "kirkstone" : "2.0",
     "honister" : "1.52",
     "hardknott" : "1.50",
@@ -128,7 +132,7 @@ else:
     if branch == "master":
         ourseries = devbranch
         docconfver = "dev"
-        bitbakeversion = ""
+        bitbakeversion = "dev"
     elif branch in release_series:
         ourseries = branch
         if branch in bitbake_mapping:
@@ -199,29 +203,29 @@ if os.path.exists("poky.yaml.in"):
 #  - current doc version
 # (with duplicates removed)
 
-if ourseries not in activereleases:
-    activereleases.append(ourseries)
-
 versions = []
 with open("sphinx-static/switchers.js.in", "r") as r, open("sphinx-static/switchers.js", "w") as w:
     lines = r.readlines()
     for line in lines:
+        if "ALL_RELEASES_PLACEHOLDER" in line:
+            w.write(str(list(release_series.keys())))
+            continue
         if "VERSIONS_PLACEHOLDER" in line:
-            w.write("    'dev': 'dev (%s)',\n" % release_series[devbranch])
-            for branch in activereleases:
+            w.write("    'dev': { 'title': 'dev (%s)', 'obsolete': false,},\n" % release_series[devbranch])
+            for branch in activereleases + ([ourseries] if ourseries not in activereleases else []):
                 if branch == devbranch:
                     continue
-                versions = subprocess.run('git tag --list yocto-%s*' % (release_series[branch]), shell=True, capture_output=True, text=True).stdout.split()
-                versions = sorted([v.replace("yocto-" +  release_series[branch] + ".", "").replace("yocto-" +  release_series[branch], "0") for v in versions], key=int)
-                if not versions:
+                branch_versions = subprocess.run('git tag --list yocto-%s*' % (release_series[branch]), shell=True, capture_output=True, text=True).stdout.split()
+                branch_versions = sorted([v.replace("yocto-" +  release_series[branch] + ".", "").replace("yocto-" +  release_series[branch], "0") for v in branch_versions], key=int)
+                if not branch_versions:
                     continue
                 version = release_series[branch]
-                if versions[-1] != "0":
-                    version = version + "." + versions[-1]
+                if branch_versions[-1] != "0":
+                    version = version + "." + branch_versions[-1]
                 versions.append(version)
-                w.write("    '%s': '%s',\n" % (version, version))
+                w.write("    '%s': {'title': '%s', 'obsolete': %s,},\n" % (version, version, str(branch not in activereleases).lower()))
             if ourversion not in versions and ourseries != devbranch:
-                w.write("    '%s': '%s',\n" % (ourversion, ourversion))
+                w.write("    '%s': {'title': '%s', 'obsolete': %s,},\n" % (ourversion, ourversion, str(ourseries not in activereleases).lower()))
         else:
             w.write(line)
 

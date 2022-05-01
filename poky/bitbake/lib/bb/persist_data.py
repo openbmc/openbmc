@@ -208,7 +208,7 @@ class SQLTable(collections.abc.MutableMapping):
 
     def __lt__(self, other):
         if not isinstance(other, Mapping):
-            raise NotImplemented
+            raise NotImplementedError()
 
         return len(self) < len(other)
 

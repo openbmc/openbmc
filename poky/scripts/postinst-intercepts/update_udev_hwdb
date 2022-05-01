@@ -9,14 +9,17 @@ case "${PREFERRED_PROVIDER_udev}" in
 	systemd)
 		UDEV_EXTRA_ARGS="--usr"
 		UDEVLIBDIR="${rootlibexecdir}"
+		UDEVADM="${base_bindir}/udevadm"
 		;;
 
 	*)
 		UDEV_EXTRA_ARGS=""
 		UDEVLIBDIR="${sysconfdir}"
+		UDEVADM="${bindir}/udevadm"
 		;;
 esac
 
 rm -f $D${UDEVLIBDIR}/udev/hwdb.bin
-PSEUDO_UNLOAD=1 ${binprefix}qemuwrapper -L $D $D${libexecdir}/${binprefix}udevadm hwdb --update --root $D ${UDEV_EXTRA_ARGS}
+PSEUDO_UNLOAD=1 ${binprefix}qemuwrapper -L $D $D${UDEVADM} hwdb --update --root $D ${UDEV_EXTRA_ARGS} ||
+	PSEUDO_UNLOAD=1 qemuwrapper -L $D $D${UDEVADM} hwdb --update --root $D ${UDEV_EXTRA_ARGS}
 chown root:root $D${UDEVLIBDIR}/udev/hwdb.bin

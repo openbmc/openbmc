@@ -3,7 +3,7 @@ DESCRIPTION = "Open Source Tripwire® software is a security and data \
 integrity tool useful for monitoring and alerting on specific file change(s) on a range of systems"
 HOMEPAGE="http://sourceforge.net/projects/tripwire"
 SECTION = "security Monitor/Admin"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1c069be8dbbe48e89b580ab4ed86c127"
 
 SRCREV = "6e64a9e5b70a909ec439bc5a099e3fcf38c614b0"

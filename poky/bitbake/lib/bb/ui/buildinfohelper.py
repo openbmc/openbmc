@@ -45,7 +45,7 @@ from pprint import pformat
 import logging
 from datetime import datetime, timedelta
 
-from django.db import transaction, connection
+from django.db import transaction
 
 
 # pylint: disable=invalid-name
@@ -496,7 +496,7 @@ class ORMWrapper(object):
             if not parent_path:
                 parent_path = "/"
             parent_obj = self._cached_get(Target_File, target = target_obj, path = parent_path, inodetype = Target_File.ITYPE_DIRECTORY)
-            tf_obj = Target_File.objects.create(
+            Target_File.objects.create(
                         target = target_obj,
                         path = path,
                         size = size,
@@ -561,7 +561,7 @@ class ORMWrapper(object):
 
             parent_obj = Target_File.objects.get(target = target_obj, path = parent_path, inodetype = Target_File.ITYPE_DIRECTORY)
 
-            tf_obj = Target_File.objects.create(
+            Target_File.objects.create(
                         target = target_obj,
                         path = path,
                         size = size,
@@ -1061,27 +1061,6 @@ class BuildInfoHelper(object):
             raise RuntimeError("Recipe file path %s is not under layer version at %s" % (recipe_info['file_path'], recipe_info['layer_version'].local_path))
 
         return recipe_info
-
-    def _get_path_information(self, task_object):
-        self._ensure_build()
-
-        assert isinstance(task_object, Task)
-        build_stats_format = "{tmpdir}/buildstats/{buildname}/{package}/"
-        build_stats_path = []
-
-        for t in self.internal_state['targets']:
-            buildname = self.internal_state['build'].build_name
-            pe, pv = task_object.recipe.version.split(":",1)
-            if pe:
-                package = task_object.recipe.name + "-" + pe + "_" + pv
-            else:
-                package = task_object.recipe.name + "-" + pv
-
-            build_stats_path.append(build_stats_format.format(tmpdir=self.tmp_dir,
-                                                     buildname=buildname,
-                                                     package=package))
-
-        return build_stats_path
 
 
     ################################

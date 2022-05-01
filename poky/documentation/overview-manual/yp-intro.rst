@@ -218,8 +218,8 @@ your Metadata, the easier it is to cope with future changes.
       possible.
 
    -  Familiarize yourself with the
-      :yocto_home:`Yocto Project curated layer index</software-overview/layers/>`
-      or the :oe_layerindex:`OpenEmbedded layer index <>`.
+      :yocto_home:`Yocto Project Compatible Layers </software-overview/layers/>`
+      or the :oe_layerindex:`OpenEmbedded Layer Index <>`.
       The latter contains more layers but they are less universally
       validated.
 

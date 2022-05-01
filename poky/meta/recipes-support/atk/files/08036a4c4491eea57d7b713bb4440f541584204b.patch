@@ -1,0 +1,40 @@
+From 08036a4c4491eea57d7b713bb4440f541584204b Mon Sep 17 00:00:00 2001
+From: Mike Gorse <mgorse@suse.com>
+Date: Mon, 21 Mar 2022 10:19:03 -0500
+Subject: [PATCH] Fix build with X11 disabled
+
+Closes #51
+Upstream-Status: Backport
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ registryd/deviceeventcontroller.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/registryd/deviceeventcontroller.c b/registryd/deviceeventcontroller.c
+index 8a321adc..3068ec4b 100644
+--- a/registryd/deviceeventcontroller.c
++++ b/registryd/deviceeventcontroller.c
+@@ -1720,16 +1720,16 @@ spi_dec_synth_keysym (SpiDEController *controller, long keysym)
+ 	if (synth_mods != modifiers) {
+ 		lock_mods = synth_mods & ~modifiers;
+ 		spi_dec_plat_lock_modifiers (controller, lock_mods);
+-		if (modifiers & LockMask)
+-			spi_dec_plat_unlock_modifiers (controller, LockMask);
++		if (modifiers & SPI_KEYMASK_SHIFTLOCK)
++			spi_dec_plat_unlock_modifiers (controller, SPI_KEYMASK_SHIFTLOCK);
+ 	}
+ 	spi_dec_plat_synth_keycode_press (controller, key_synth_code);
+ 	spi_dec_plat_synth_keycode_release (controller, key_synth_code);
+ 
+ 	if (synth_mods != modifiers) {
+ 		spi_dec_plat_unlock_modifiers (controller, lock_mods);
+-		if (modifiers & LockMask)
+-			spi_dec_plat_lock_modifiers (controller, LockMask);
++		if (modifiers & SPI_KEYMASK_SHIFTLOCK)
++			spi_dec_plat_lock_modifiers (controller, SPI_KEYMASK_SHIFTLOCK);
+ 	}
+ 	return TRUE;
+ }
+-- 
+GitLab
+

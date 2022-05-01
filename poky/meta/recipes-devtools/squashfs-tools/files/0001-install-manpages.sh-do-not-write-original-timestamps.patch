@@ -1,0 +1,30 @@
+From b44b00dae195d8587857c7e8054e9be4eaa1f8b3 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Thu, 7 Apr 2022 09:26:09 +0200
+Subject: [PATCH] install-manpages.sh: do not write original timestamps into
+ .gz metadata
+
+This helps binary reproducibility.
+
+Upstream-Status: Submitted [https://github.com/plougher/squashfs-tools/pull/177]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ generate-manpages/install-manpages.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/generate-manpages/install-manpages.sh b/generate-manpages/install-manpages.sh
+index d4c9e91..6a43b89 100755
+--- a/generate-manpages/install-manpages.sh
++++ b/generate-manpages/install-manpages.sh
+@@ -56,7 +56,7 @@ for i in mksquashfs unsquashfs sqfstar sqfscat; do
+ 		exit 1
+ 	fi
+ 
+-	if ! gzip -f9 $2/$i.1; then
++	if ! gzip -n -f9 $2/$i.1; then
+ 		echo "$0: Compressing installed manpage failed.  Aborting" >&2
+ 		exit 1
+ 	fi
+-- 
+2.30.2
+

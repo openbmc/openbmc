@@ -8,6 +8,15 @@ SECTION = "libs"
 LICENSE = "GPL-3.0-or-later & LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c678957b0c8e964aa6c70fd77641a71e"
 
+# without libxml in PACKAGECONFIG vendor copy of the lib will be used
+LICENSE:append = " ${@bb.utils.contains('PACKAGECONFIG', 'libxml', '', '& MIT', d)}"
+LIC_FILES_CHKSUM:append = " ${@bb.utils.contains('PACKAGECONFIG', 'libxml', '', 'file://libtextstyle/lib/libxml/COPYING;md5=2044417e2e5006b65a8b9067b683fcf1', d)}"
+# without croco in PACKAGECONFIG vendor copy of the lib will be used
+LIC_FILES_CHKSUM:append = " ${@bb.utils.contains('PACKAGECONFIG', 'croco', '', 'file://libtextstyle/lib/libcroco/libcroco.h;md5=915a46e7307c2f7f8d2b9c503fc434ed;beginline=10;endline=28', d)}"
+# without glib in PACKAGECONFIG vendor copy of the lib will be used
+LIC_FILES_CHKSUM:append = " ${@bb.utils.contains('PACKAGECONFIG', 'glib', '', 'file://libtextstyle/lib/glib/ghash.c;md5=af89a160226edf0b276b6183888037d0;beginline=10;endline=27', d)}"
+
+
 DEPENDS = "gettext-native virtual/libiconv"
 DEPENDS:class-native = "gettext-minimal-native"
 PROVIDES = "virtual/libintl virtual/gettext"

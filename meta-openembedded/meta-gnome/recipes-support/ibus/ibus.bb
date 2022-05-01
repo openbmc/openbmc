@@ -15,8 +15,8 @@ EXTRA_OECONF += "--with-ucd-dir=${STAGING_DATADIR}/unicode/ucd"
 
 PACKAGECONFIG ??= " \
     dconf vala \
-    ${@bb.utils.contains_any('DISTRO_FEATURES', [ 'wayland', 'x11' ], 'gtk3', '', d)} \
-    ${@bb.utils.filter('DISTRO_FEATURES', 'wayland x11', d)} \
+    ${@bb.utils.contains_any('DISTRO_FEATURES', [ 'wayland', 'x11' ], 'gtk3 gtk4', '', d)} \
+    ${@bb.utils.filter('DISTRO_FEATURES', 'systemd wayland x11', d)} \
 "
 
 do_configure:prepend() {
@@ -29,6 +29,8 @@ FILES:${PN} += " \
     ${datadir}/GConf \
     ${datadir}/glib-2.0 \
     ${libdir}/gtk-3.0 \
+    ${libdir}/gtk-4.0 \
+    ${systemd_user_unitdir} \
 "
 
 FILES:${PN}-dev += " \

@@ -104,8 +104,8 @@ DISTRO ?= "poky"
 #  - 'package_ipk' for ipk files are used by opkg (a debian style embedded package manager)
 #  - 'package_rpm' for rpm style packages
 # E.g.: PACKAGE_CLASSES ?= "package_rpm package_deb package_ipk"
-# We default to rpm:
-PACKAGE_CLASSES ?= "package_rpm"
+# OE-Core defaults to ipkg, whilst Poky defaults to rpm:
+# PACKAGE_CLASSES ?= "package_rpm"
 
 #
 # SDK target architecture
@@ -230,7 +230,7 @@ BB_DISKMON_DIRS ??= "\
 # Note: For this to work you also need hash-equivalence passthrough to the matching server
 #
 #BB_HASHSERVE_UPSTREAM = "typhoon.yocto.io:8687"
-#SSTATE_MIRRORS ?= "file://.* http://sstate.yoctoproject.org/3.4/PATH;downloadfilename=PATH"
+#SSTATE_MIRRORS ?= "file://.* http://sstate.yoctoproject.org/4.0/PATH;downloadfilename=PATH"
 
 #
 # Qemu configuration

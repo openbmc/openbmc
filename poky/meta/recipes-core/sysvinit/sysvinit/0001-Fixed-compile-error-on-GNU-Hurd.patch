@@ -1,0 +1,28 @@
+From d595594506e6fd2247f7984c276f822ea626434c Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Thu, 7 Apr 2022 11:57:19 +0900
+Subject: [PATCH] Fixed compile error on GNU Hurd
+
+Fixed compile error on GNU Hurd due to missing MAX_PATH definition.
+
+Upstream-Status: Backport [https://github.com/slicer69/sysvinit/commit/14d8d25269016b26965b428a855dd084cc88994d]
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ src/bootlogd.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/bootlogd.h b/src/bootlogd.h
+index b47bc9d..ba17f0c 100644
+--- a/src/bootlogd.h
++++ b/src/bootlogd.h
+@@ -10,3 +10,6 @@
+ #define FALSE 0
+ #endif
+ 
++#ifndef PATH_MAX
++#define PATH_MAX 2048
++#endif
+-- 
+2.25.1
+

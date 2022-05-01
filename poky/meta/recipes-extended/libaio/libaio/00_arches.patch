@@ -1,4 +1,4 @@
-From ceba1e03e5b57cdae0b3b2d2c9afebc085c986d8 Mon Sep 17 00:00:00 2001
+From 546f2708ffa1aa44018be65172013289cf896710 Mon Sep 17 00:00:00 2001
 From: Qing He <qing.he@intel.com>
 Date: Fri, 27 Aug 2010 10:15:31 +0800
 Subject: [PATCH] libaio: add new recipe
@@ -8,9 +8,9 @@ Upstream-Status: Inappropriate [embedded specific]
 from openembedded, added by Qing He <qing.he@intel.com>
 
 ---
- src/syscall-m68k.h   |  78 ++++++++++++++++++
- src/syscall-mips.h   | 223 +++++++++++++++++++++++++++++++++++++++++++++++++++
- src/syscall-parisc.h | 146 +++++++++++++++++++++++++++++++++
+ src/syscall-m68k.h   |  78 +++++++++++++++
+ src/syscall-mips.h   | 223 +++++++++++++++++++++++++++++++++++++++++++
+ src/syscall-parisc.h | 146 ++++++++++++++++++++++++++++
  src/syscall.h        |   6 ++
  4 files changed, 453 insertions(+)
  create mode 100644 src/syscall-m68k.h
@@ -483,12 +483,12 @@ index 0000000..ff61746
 +}
 +
 diff --git a/src/syscall.h b/src/syscall.h
-index 9b9e9c1..9ecd3b4 100644
+index d2a117b..8cf8470 100644
 --- a/src/syscall.h
 +++ b/src/syscall.h
 @@ -29,6 +29,12 @@
  #include "syscall-sparc.h"
- #elif defined(__aarch64__) || defined(__riscv)
+ #elif defined(__aarch64__) || defined(__loongarch__) || defined(__riscv)
  #include "syscall-generic.h"
 +#elif defined(__m68k__)
 +#include "syscall-m68k.h"

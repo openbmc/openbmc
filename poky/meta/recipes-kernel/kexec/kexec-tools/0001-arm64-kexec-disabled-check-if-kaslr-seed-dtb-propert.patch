@@ -33,20 +33,20 @@ Upstream-Status: Submitted [http://lists.infradead.org/pipermail/kexec/2020-Nove
  kexec/arch/arm64/kexec-arm64.c | 14 +-------------
  1 file changed, 1 insertion(+), 13 deletions(-)
 
-Index: kexec-tools-2.0.20/kexec/arch/arm64/kexec-arm64.c
-===================================================================
---- kexec-tools-2.0.20.orig/kexec/arch/arm64/kexec-arm64.c
-+++ kexec-tools-2.0.20/kexec/arch/arm64/kexec-arm64.c
-@@ -428,7 +428,7 @@ static int setup_2nd_dtb(struct dtb *dtb
+diff --git a/kexec/arch/arm64/kexec-arm64.c b/kexec/arch/arm64/kexec-arm64.c
+index ec6df4b..10238d9 100644
+--- a/kexec/arch/arm64/kexec-arm64.c
++++ b/kexec/arch/arm64/kexec-arm64.c
+@@ -503,7 +503,7 @@ static int setup_2nd_dtb(struct dtb *dtb, char *command_line, int on_crash)
  	int len, range_len;
  	int nodeoffset;
  	int new_size;
--	int result, kaslr_seed;
-+	int result;
+-	int i, result, kaslr_seed;
++	int i, result;
  
  	result = fdt_check_header(dtb->buf);
  
-@@ -499,18 +499,6 @@ static int setup_2nd_dtb(struct dtb *dtb
+@@ -576,18 +576,6 @@ static int setup_2nd_dtb(struct dtb *dtb, char *command_line, int on_crash)
  			return result;
  		}
  	} else {
@@ -65,3 +65,6 @@ Index: kexec-tools-2.0.20/kexec/arch/arm64/kexec-arm64.c
  		/*
  		 * Invoke the getrandom system call with
  		 * GRND_NONBLOCK, to make sure we
+-- 
+2.25.1
+

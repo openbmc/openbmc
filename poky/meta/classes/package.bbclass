@@ -422,7 +422,6 @@ def splitstaticdebuginfo(file, dvar, dv, d):
     # return a mapping of files:debugsources
 
     import stat
-    import shutil
 
     src = file[len(dvar):]
     dest = dv["staticlibdir"] + os.path.dirname(src) + dv["staticdir"] + "/" + os.path.basename(src) + dv["staticappend"]
@@ -807,15 +806,10 @@ python perform_packagecopy () {
     dest = d.getVar('D')
     dvar = d.getVar('PKGD')
 
-    # Remove ${D}/sysroot-only if present
-    sysroot_only = os.path.join(dest, 'sysroot-only')
-    if cpath.exists(sysroot_only) and cpath.isdir(sysroot_only):
-        shutil.rmtree(sysroot_only)
-
     # Start by package population by taking a copy of the installed
     # files to operate on
     # Preserve sparse files and hard links
-    cmd = 'tar -cf - -C %s -p -S . | tar -xf - -C %s' % (dest, dvar)
+    cmd = 'tar --exclude=./sysroot-only -cf - -C %s -p -S . | tar -xf - -C %s' % (dest, dvar)
     subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
 
     # replace RPATHs for the nativesdk binaries, to make them relocatable

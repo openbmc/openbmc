@@ -32,6 +32,7 @@ SRC_URI = "http://www.python.org/ftp/python/${PV}/Python-${PV}.tar.xz \
            file://makerace.patch \
            file://0001-sysconfig.py-use-platlibdir-also-for-purelib.patch \
            file://0001-Lib-pty.py-handle-stdin-I-O-errors-same-way-as-maste.patch \
+           file://0001-setup.py-Do-not-detect-multiarch-paths-when-cross-co.patch \
            "
 
 SRC_URI:append:class-native = " \
@@ -54,6 +55,9 @@ CVE_CHECK_IGNORE += "CVE-2007-4559"
 CVE_CHECK_IGNORE += "CVE-2019-18348"
 # These are specific to Microsoft Windows
 CVE_CHECK_IGNORE += "CVE-2020-15523 CVE-2022-26488"
+# The mailcap module is insecure by design, so this can't be fixed in a meaningful way.
+# The module will be removed in the future and flaws documented.
+CVE_CHECK_IGNORE += "CVE-2015-20107"
 
 PYTHON_MAJMIN = "3.10"
 

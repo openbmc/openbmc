@@ -50,7 +50,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'meta-raspberrypi'
-copyright = '2021, meta-raspberrypi contributors'
+copyright = '2022, meta-raspberrypi contributors'
 author = 'meta-raspberrypi contributors'
 
 # The version info for the project you're documenting, acts as replacement for

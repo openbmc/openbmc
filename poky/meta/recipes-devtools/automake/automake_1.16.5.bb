@@ -25,6 +25,7 @@ SRC_URI += "\
            file://new_rt_path_for_test-driver.patch \
            file://0001-automake-Add-default-libtool_tag-to-cppasm.patch \
            file://0001-build-fix-race-in-parallel-builds.patch \
+           file://0001-Drop-ar-u-argument.patch \
            "
 
 SRC_URI[sha256sum] = "07bd24ad08a64bc17250ce09ec56e921d6343903943e99ccf63bbf0705e34605"

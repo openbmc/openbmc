@@ -28,9 +28,9 @@ Transitioning to a custom environment for systems development
    for you to get comfortable with project concepts.
 
 #. **Find and acquire the best BSP for your target**.
-   Use the :yocto_home:`Yocto Project curated layer index
+   Use the :yocto_home:`Yocto Project Compatible Layers
    </software-overview/layers/>` or even the :oe_layerindex:`OpenEmbedded
-   layer index <>` to find and acquire the best BSP for your
+   Layer Index <>` to find and acquire the best BSP for your
    target board. The Yocto Project layer index BSPs are regularly validated. The
    best place to get your first BSP is from your silicon manufacturer or board
    vendor – they can point you to their most qualified efforts. In general, for

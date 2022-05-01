@@ -119,7 +119,7 @@ EXTRA_OECONF:class-target = "b"
 EXTRA_OECONF:append = " c"
 """
 
-    def test_parse_overrides(self):
+    def test_parse_overrides2(self):
         f = self.parsehelper(self.overridetest2)
         d = bb.parse.handle(f.name, self.d)['']
         d.appendVar("EXTRA_OECONF", " d")

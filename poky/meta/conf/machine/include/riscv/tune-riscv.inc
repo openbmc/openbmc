@@ -6,6 +6,8 @@ TUNEVALID[riscv32] = "Enable 32-bit RISC-V optimizations"
 TUNEVALID[riscv64nf] = "Enable 64-bit RISC-V optimizations no floating point"
 TUNEVALID[riscv32nf] = "Enable 32-bit RISC-V optimizations no floating point"
 
+TUNEVALID[riscv64nc] = "Enable 64-bit RISC-V optimizations without compressed instructions"
+
 TUNEVALID[bigendian] = "Big endian mode"
 
 AVAILTUNES += "riscv64 riscv32 riscv64nf riscv32nf"
@@ -31,3 +33,9 @@ TUNE_FEATURES:tune-riscv32nf = "${TUNE_FEATURES:tune-riscv32} riscv32nf"
 TUNE_ARCH:tune-riscv32nf = "riscv32"
 TUNE_PKGARCH:tune-riscv32nf = "riscv32nf"
 PACKAGE_EXTRA_ARCHS:tune-riscv32nf = "riscv32nf"
+
+# no compressed
+TUNE_FEATURES:tune-riscv64nc = "${TUNE_FEATURES:tune-riscv64} riscv64nc"
+TUNE_ARCH:tune-riscv64nc = "riscv64"
+TUNE_PKGARCH:tune-riscv64nc = "riscv64nc"
+PACKAGE_EXTRA_ARCHS:tune-riscv64nc = "riscv64nc"

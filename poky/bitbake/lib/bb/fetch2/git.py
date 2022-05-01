@@ -74,6 +74,9 @@ from   bb.fetch2 import runfetchcmd
 from   bb.fetch2 import logger
 
 
+sha1_re = re.compile(r'^[0-9a-f]{40}$')
+slash_re = re.compile(r"/+")
+
 class GitProgressHandler(bb.progress.LineFilterProgressHandler):
     """Extract progress information from git output"""
     def __init__(self, d):
@@ -249,8 +252,8 @@ class Git(FetchMethod):
         ud.setup_revisions(d)
 
         for name in ud.names:
-            # Ensure anything that doesn't look like a sha256 checksum/revision is translated into one
-            if not ud.revisions[name] or len(ud.revisions[name]) != 40  or (False in [c in "abcdef0123456789" for c in ud.revisions[name]]):
+            # Ensure any revision that doesn't look like a SHA-1 is translated into one
+            if not sha1_re.match(ud.revisions[name] or ''):
                 if ud.revisions[name]:
                     ud.unresolvedrev[name] = ud.revisions[name]
                 ud.revisions[name] = self.latest_revision(ud, d, name)
@@ -259,10 +262,10 @@ class Git(FetchMethod):
         if gitsrcname.startswith('.'):
             gitsrcname = gitsrcname[1:]
 
-        # for rebaseable git repo, it is necessary to keep mirror tar ball
-        # per revision, so that even the revision disappears from the
+        # For a rebaseable git repo, it is necessary to keep a mirror tar ball
+        # per revision, so that even if the revision disappears from the
         # upstream repo in the future, the mirror will remain intact and still
-        # contains the revision
+        # contain the revision
         if ud.rebaseable:
             for name in ud.names:
                 gitsrcname = gitsrcname + '_' + ud.revisions[name]
@@ -464,7 +467,7 @@ class Git(FetchMethod):
             with create_atomic(ud.fullmirror) as tfile:
                 mtime = runfetchcmd("git log --all -1 --format=%cD", d,
                         quiet=True, workdir=ud.clonedir)
-                runfetchcmd("tar -czf %s --owner pokybuild --group users --mtime \"%s\" ."
+                runfetchcmd("tar -czf %s --owner oe:0 --group oe:0 --mtime \"%s\" ."
                         % (tfile, mtime), d, workdir=ud.clonedir)
             runfetchcmd("touch %s.done" % ud.fullmirror, d)
 
@@ -697,7 +700,6 @@ class Git(FetchMethod):
         Return a unique key for the url
         """
         # Collapse adjacent slashes
-        slash_re = re.compile(r"/+")
         return "git:" + ud.host + slash_re.sub(".", ud.path) + ud.unresolvedrev[name]
 
     def _lsremote(self, ud, d, search):

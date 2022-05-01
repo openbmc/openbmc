@@ -1,0 +1,33 @@
+[Unit]
+Description=tgtd iSCSI target daemon
+After=network.target
+
+[Service]
+EnvironmentFile=@SYSCONFDIR@/sysconfig/tgtd
+
+ExecStart=@SBINDIR@/tgtd -f $TGTD_OPTS
+# see bz 848942. workaround for a race for now.
+ExecStartPost=@BASE_BINDIR@/sleep 5
+# Put tgtd into "offline" state until all the targets are configured.
+# We don't want initiators to (re)connect and fail the connection
+# if it's not ready.
+ExecStartPost=@SBINDIR@/tgtadm --op update --mode sys --name State -v offline
+# Configure the targets.
+ExecStartPost=@SBINDIR@/tgt-admin -e -c $TGTD_CONFIG
+# Put tgtd into "ready" state.
+ExecStartPost=@SBINDIR@/tgtadm --op update --mode sys --name State -v ready
+
+# Update configuration for targets. Only targets which
+# are not in use will be updated.
+ExecReload=@SBINDIR@/tgt-admin --update ALL -c $TGTD_CONFIG
+
+# NOTE: Shutdown of the iscsi target may cause data corruption
+# for initiators that are connected.
+ExecStop=@SBINDIR@/tgtadm --op update --mode sys --name State -v offline
+# Remove all targets. It only removes targets which are not in use.
+ExecStop=@SBINDIR@/tgt-admin --update ALL -c /dev/null
+# tgtd will exit if all targets were removed
+ExecStop=@SBINDIR@/tgtadm --op delete --mode system
+
+[Install]
+WantedBy=multi-user.target

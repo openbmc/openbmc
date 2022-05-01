@@ -1,7 +1,8 @@
 require glibc_${PV}.bb
 require glibc-tests.inc
 
-inherit ptest
+inherit ptest features_check
+REQUIRED_DISTRO_FEATURES = "ptest"
 
 SRC_URI:append = " \
 	file://run-ptest \

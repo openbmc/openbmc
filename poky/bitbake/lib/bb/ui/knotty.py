@@ -877,7 +877,6 @@ def main(server, eventHandler, params, tf = TerminalFilter):
                     state_force_shutdown()
 
             main.shutdown = main.shutdown + 1
-            pass
         except Exception as e:
             import traceback
             sys.stderr.write(traceback.format_exc())

@@ -1,4 +1,4 @@
-From 52aae746760ce5b88e61ce994f5055e4ce809821 Mon Sep 17 00:00:00 2001
+From 0214d886d0153f7288f81213c47dc50f3b9fde20 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Thu, 29 Mar 2018 15:12:17 +0800
 Subject: [PATCH] support pkgconfig
@@ -14,14 +14,14 @@ Signed-off-by: Armin Kuster <akuster808@gmail.com>
 Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 
 ---
- src/gpg-error.m4 | 160 +----------------------------------------------
- 1 file changed, 3 insertions(+), 157 deletions(-)
+ src/gpg-error.m4 | 161 +----------------------------------------------
+ 1 file changed, 3 insertions(+), 158 deletions(-)
 
 diff --git a/src/gpg-error.m4 b/src/gpg-error.m4
-index 56a5d07..28920ae 100644
+index 4b5cd40..c9978d6 100644
 --- a/src/gpg-error.m4
 +++ b/src/gpg-error.m4
-@@ -27,157 +27,12 @@ dnl is added to the gpg_config_script_warn variable.
+@@ -27,158 +27,12 @@ dnl is added to the gpg_config_script_warn variable.
  dnl
  AC_DEFUN([AM_PATH_GPG_ERROR],
  [ AC_REQUIRE([AC_CANONICAL_HOST])
@@ -137,6 +137,7 @@ index 56a5d07..28920ae 100644
 -    fi
 -  elif test "$GPG_ERROR_CONFIG" != "no"; then
 -    gpg_error_config_version=`$GPG_ERROR_CONFIG --version`
+-    unset GPGRT_CONFIG
 -  fi
 -  if test "$GPG_ERROR_CONFIG" != "no"; then
 -    req_major=`echo $min_gpg_error_version | \
@@ -182,7 +183,7 @@ index 56a5d07..28920ae 100644
      fi
      if test x"$gpg_error_config_host" != xnone ; then
        if test x"$gpg_error_config_host" != x"$host" ; then
-@@ -193,15 +48,6 @@ AC_DEFUN([AM_PATH_GPG_ERROR],
+@@ -194,15 +48,6 @@ AC_DEFUN([AM_PATH_GPG_ERROR],
        fi
      fi
    else

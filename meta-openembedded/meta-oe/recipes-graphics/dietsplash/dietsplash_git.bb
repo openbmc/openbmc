@@ -17,6 +17,6 @@ inherit autotools
 S = "${WORKDIR}/git"
 
 EXTRA_OECONF = " --with-systemdsystemunitdir=${systemd_unitdir}/system \
-                 --disable-staticimages"
+                 --disable-staticimages --with-rootdir=${root_prefix}"
 
 FILES:${PN} += "${systemd_unitdir}/system/"

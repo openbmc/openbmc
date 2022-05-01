@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e7820bc7f7d1638a6b54fc2e8d7fb103 \
                     file://third_party/openthread/LICENSE;md5=543b6fe90ec5901a683320a36390c65f \
                     file://third_party/pt/LICENSE;md5=dcd598b69cad786beea33da7b1ae14b7 \
                     "
-DEPENDS = "autoconf-archive dbus readline"
+DEPENDS = "autoconf-archive dbus readline boost"
 SRCREV = "0fb1f57e4224e2df3e630e146702bfcf63fbf07a"
 PV = "0.07.01+git${SRCPV}"
 

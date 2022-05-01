@@ -27,8 +27,10 @@ do_install:append () {
     oe_runmake install.man DESTDIR=${D}
 
     install -d ${D}${base_bindir}
-    ln -s /usr/bin/tcsh ${D}${base_bindir}/tcsh
-    ln -s /usr/bin/tcsh ${D}${base_bindir}/csh
+    if ! ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','true','false',d)}; then
+        ln -s /usr/bin/tcsh ${D}${base_bindir}/tcsh
+        ln -s /usr/bin/tcsh ${D}${base_bindir}/csh
+    fi
     install -d ${D}${sysconfdir}/csh/login.d
     install -m 0644 ${S}/csh.cshrc ${S}/csh.login ${S}/csh.logout ${S}/complete.tcsh ${D}${sysconfdir}
     install -D -m 0644 ${S}/csh-mode.el ${D}${datadir}/emacs/site-lisp/csh-mode.el

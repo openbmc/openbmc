@@ -146,12 +146,12 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
    /* Failed */
 --- a/src/epggrab/module/opentv.c
 +++ b/src/epggrab/module/opentv.c
-@@ -486,7 +486,7 @@ opentv_parse_event_section_one
+@@ -497,7 +497,7 @@ opentv_parse_event_section_one
                                         1, &save, &changes);
        tvhdebug(LS_OPENTV, "find by time start %"PRItime_t " stop "
-                "%"PRItime_t " eid %d = %p",
--               ev.start, ev.stop, ev.eid, ebc);
-+               (intmax_t)ev.start, (intmax_t)ev.stop, ev.eid, ebc);
+                "%"PRItime_t " ch %"PRId64" eid %d = %p",
+-               ev.start, ev.stop, ch->ch_number, ev.eid, ebc);
++               (intmax_t)ev.start, (intmax_t)ev.stop, ch->ch_number, ev.eid, ebc);
        save |= epg_broadcast_set_dvb_eid(ebc, ev.eid, &changes);
      } else {
        ebc = epg_broadcast_find_by_eid(ch, ev.eid);

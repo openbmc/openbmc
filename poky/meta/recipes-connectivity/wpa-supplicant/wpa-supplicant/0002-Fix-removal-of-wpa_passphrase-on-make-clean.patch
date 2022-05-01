@@ -1,0 +1,26 @@
+From d001b301ba7987f4b39453a211631b85c48f2ff8 Mon Sep 17 00:00:00 2001
+From: Jouni Malinen <quic_jouni@quicinc.com>
+Date: Thu, 3 Mar 2022 13:26:42 +0200
+Subject: [PATCH 2/2] Fix removal of wpa_passphrase on 'make clean'
+
+Fixes: 0430bc8267b4 ("build: Add a common-clean target")
+Signed-off-by: Jouni Malinen <quic_jouni@quicinc.com>
+Upstream-Status: Backport
+Signed-off-by: Alex Kiernan <alexk@zuma.ai>
+Signed-off-by: Alex Kiernan <alexk@gmail.com>
+---
+ wpa_supplicant/Makefile | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/wpa_supplicant/Makefile b/wpa_supplicant/Makefile
+index c456825ae75f..4b4688931b1d 100644
+--- a/wpa_supplicant/Makefile
++++ b/wpa_supplicant/Makefile
+@@ -2077,3 +2077,4 @@ clean: common-clean
+ 	rm -f libwpa_client.a
+ 	rm -f libwpa_client.so
+ 	rm -f libwpa_test1 libwpa_test2
++	rm -f wpa_passphrase
+-- 
+2.35.1
+

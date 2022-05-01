@@ -1,0 +1,42 @@
+From dc966f1278c1077938626d682666767d2c8d0c72 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 9 Apr 2022 18:29:47 +0000
+Subject: [PATCH] setup.py: Do not detect multiarch paths when cross-compiling
+
+add_multiarch_paths() function relies on host tools like dpkg-configure
+to operate, which is not good when cross compiling, since it ends up
+adding native paths in includes in certain cases, e.g. when building
+for aarch64 targets using aarch64 build hosts running debian-like
+distributions e.g. ubuntu, it ends up adding native multiarch paths
+-I/usr/include/aarch64-linux-gnu during cross compile and since arches
+are so similar, cross compiler (epecially clang) is inhererently configured
+with multiarch ends up adding these paths to compiler cmdline which
+works ok with gcc since headers are similar but clang barfs on some gcc
+extentions and build fails due to missing gnu extentions but it silently
+compiles when using cross gcc.
+
+Fixes python3 cross build by not running this funciton when cross compiling
+
+Upstream-Status: Inappropriate [OE-Specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ setup.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 2e7f263..f7a3d39 100644
+--- a/setup.py
++++ b/setup.py
+@@ -840,7 +840,8 @@ class PyBuildExt(build_ext):
+         # only change this for cross builds for 3.3, issues on Mageia
+         if CROSS_COMPILING:
+             self.add_cross_compiling_paths()
+-        self.add_multiarch_paths()
++        if not CROSS_COMPILING:
++            self.add_multiarch_paths()
+         self.add_ldflags_cppflags()
+ 
+     def init_inc_lib_dirs(self):
+-- 
+2.25.1
+

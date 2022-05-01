@@ -1,0 +1,28 @@
+From 11c78232aa589d5ed43eea3683e6e3de0362ffdc Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 26 Apr 2022 10:00:32 -0700
+Subject: [PATCH] lockdev: Define MAJOR/MINOR for non-glibc case
+
+gnu_dev_major and gnu_dev_minor are glibc extensions but we do have
+major/minor macros on musl too, so use them to define MINOR/MAJOR here
+
+Upstream-Status: Inappropriate [No active upstream]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lockdev.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+--- a/src/lockdev.c
++++ b/src/lockdev.c
+@@ -125,8 +125,8 @@
+ #include <sys/file.h>
+ #if defined (__GNU_LIBRARY__)
+ # include <sys/sysmacros.h>
+-# define MAJOR(dev) gnu_dev_major (dev)
+-# define MINOR(dev) gnu_dev_minor (dev)
++# define MAJOR(dev) major (dev)
++# define MINOR(dev) minor (dev)
+ #else
+ #  error "put here a define for MAJOR and MINOR"
+ #endif

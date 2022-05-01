@@ -35,8 +35,6 @@ SPDX_SUPPLIER[doc] = "The SPDX PackageSupplier field for SPDX packages created f
     is the contact information for the person or organization who is doing the \
     build."
 
-do_image_complete[depends] = "virtual/kernel:do_create_spdx"
-
 def extract_licenses(filename):
     import re
 
@@ -835,16 +833,14 @@ python image_combine_spdx() {
 
     combine_spdx(d, image_name, imgdeploydir, img_spdxid, packages)
 
-    if image_link_name:
-        image_spdx_path = imgdeploydir / (image_name + ".spdx.json")
-        image_spdx_link = imgdeploydir / (image_link_name + ".spdx.json")
-        image_spdx_link.symlink_to(os.path.relpath(image_spdx_path, image_spdx_link.parent))
-
     def make_image_link(target_path, suffix):
         if image_link_name:
             link = imgdeploydir / (image_link_name + suffix)
-            link.symlink_to(os.path.relpath(target_path, link.parent))
+            if link != target_path:
+                link.symlink_to(os.path.relpath(target_path, link.parent))
 
+    image_spdx_path = imgdeploydir / (image_name + ".spdx.json")
+    make_image_link(image_spdx_path, ".spdx.json")
     spdx_tar_path = imgdeploydir / (image_name + ".spdx.tar.zst")
     make_image_link(spdx_tar_path, ".spdx.tar.zst")
     spdx_index_path = imgdeploydir / (image_name + ".spdx.index.json")

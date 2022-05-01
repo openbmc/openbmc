@@ -15,10 +15,10 @@ Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/default_options.h b/default_options.h
-index 3b75eb8..8617cd0 100644
+index 0e3d027..349338c 100644
 --- a/default_options.h
 +++ b/default_options.h
-@@ -179,7 +179,7 @@ group1 in Dropbear server too */
+@@ -210,7 +210,7 @@ group1 in Dropbear server too */
  
  /* Authentication Types - at least one required.
     RFC Draft requires pubkey auth, and recommends password */
@@ -27,16 +27,15 @@ index 3b75eb8..8617cd0 100644
  
  /* Note: PAM auth is quite simple and only works for PAM modules which just do
   * a simple "Login: " "Password: " (you can edit the strings in svr-authpam.c).
-@@ -187,7 +187,7 @@ group1 in Dropbear server too */
+@@ -218,7 +218,7 @@ group1 in Dropbear server too */
   * but there's an interface via a PAM module. It won't work for more complex
   * PAM challenge/response.
   * You can't enable both PASSWORD and PAM. */
 -#define DROPBEAR_SVR_PAM_AUTH 0
 +#define DROPBEAR_SVR_PAM_AUTH 1
  
- /* ~/.ssh/authorized_keys authentication */
- #define DROPBEAR_SVR_PUBKEY_AUTH 1
- 
+ /* ~/.ssh/authorized_keys authentication.
+  * You must define DROPBEAR_SVR_PUBKEY_AUTH in order to use plugins. */
 -- 
-2.1.4
+2.25.1
 

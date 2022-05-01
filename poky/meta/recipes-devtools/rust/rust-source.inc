@@ -1,5 +1,5 @@
 SRC_URI += "https://static.rust-lang.org/dist/rustc-${PV}-src.tar.xz;name=rust"
-SRC_URI[rust.sha256sum] = "375996ead731cab2203ec10a66a3c4568ab6997d7e5d3ae597658164fe27be3d"
+SRC_URI[rust.sha256sum] = "a025876deccbcb3f288d8e02623ea321f94623f31305d3c5c6f17855bb9685db"
 
 RUSTSRC = "${WORKDIR}/rustc-${PV}-src"
 

@@ -17,6 +17,7 @@ SRC_URI = " \
     git://github.com/glmark2/glmark2.git;protocol=https;branch=master \
     file://0001-fix-dispmanx-build.patch \
     file://0002-run-dispmanx-fullscreen.patch \
+    file://0001-libmatrix-Include-missing-utility-header.patch \
     "
 SRCREV = "0858b450cd88c84a15b99dda9698d44e7f7e8c70"
 

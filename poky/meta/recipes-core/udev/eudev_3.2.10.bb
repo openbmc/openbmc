@@ -12,13 +12,8 @@ PROVIDES = "udev"
 SRC_URI = "https://dev.gentoo.org/~blueness/${BPN}/${BP}.tar.gz \
            file://0014-Revert-rules-remove-firmware-loading-rules.patch \
            file://Revert-udev-remove-userspace-firmware-loading-suppor.patch \
-           file://devfs-udev.rules \
            file://init \
-           file://links.conf \
            file://local.rules \
-           file://permissions.rules \
-           file://run.rules \
-           file://udev.rules \
 "
 
 SRC_URI[md5sum] = "60b135a189523f333cea5f71a3345c8d"
@@ -51,10 +46,6 @@ do_install:append() {
 
 	# hid2hci has moved to bluez4. removed in udev as of version 169
 	rm -f ${D}${base_libdir}/udev/hid2hci
-
-	# duplicate udevadm for postinst script
-	install -d ${D}${libexecdir}
-	ln ${D}${bindir}/udevadm ${D}${libexecdir}/${MLPREFIX}udevadm
 }
 
 do_install:prepend:class-target () {

@@ -1,0 +1,85 @@
+From 1c304e7886a08fb56485e41614ff3f8685afb59d Mon Sep 17 00:00:00 2001
+From: Jiaqing Zhao <jiaqing.zhao@intel.com>
+Date: Tue, 8 Mar 2022 15:05:32 +0000
+Subject: [PATCH] Add build option for NTLM support
+
+Currently, NTLM plugin is built by default when openssl is available
+and STARTTLS is enabled. But in libesmtp 1.0.6, there is a separate
+build option. This commits adds the 'ntlm' option back. It's also
+disabled by default.
+
+Like 1.0.6, it will check openssl MD4 algorithm support as MD4 is
+insecure and modern systems may drop MD4 support.
+
+Upstream-Status: Accepted [https://github.com/libesmtp/libESMTP/commit/1c304e7886a08fb56485e41614ff3f8685afb59d]
+Signed-off-by: Jiaqing Zhao <jiaqing.zhao@intel.com>
+---
+ meson.build       | 13 ++++++++++---
+ meson_options.txt |  1 +
+ ntlm/meson.build  |  2 +-
+ 3 files changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 11d6ed8..d2a0e06 100644
+--- a/meson.build
++++ b/meson.build
+@@ -61,6 +61,7 @@ add_project_arguments(cc.get_supported_arguments(cflags), language: 'c')
+ ################################################################################
+ dldep = cc.find_library('dl')
+ ssldep = dependency('openssl', version : '>=1.1.0', required : get_option('tls'))
++ntlmdep = dependency('openssl', version : '>=1.1.0', required : get_option('ntlm'))
+ threaddep = dependency('threads', required : get_option('pthreads'))
+ 
+ #XXX add test for libbind9.so
+@@ -69,6 +70,7 @@ lwresdep = cc.find_library('lwres', required : get_option('lwres'))
+ deps = [
+   dldep,
+   ssldep,
++  ntlmdep,
+   threaddep,
+   lwresdep,
+ ]
+@@ -237,8 +239,12 @@ include_dir = include_directories('.')
+ subdir('login')
+ subdir('plain')
+ subdir('crammd5')
+-if ssldep.found()
+-  subdir('ntlm')
++if ntlmdep.found()
++  if cc.has_header('openssl/md4.h') and cc.has_function('MD4_Init', dependencies : ntlmdep)
++    subdir('ntlm')
++  else
++    error('MD4 is not supported in current openssl, unable to build NTLM plugin')
++  endif
+ endif
+ 
+ ################################################################################
+@@ -264,4 +270,5 @@ summary({'current:revision:age': libesmtp_cra,
+ 	 'STARTTLS': ssldep.found(),
+ 	 'CHUNKING': get_option('bdat'),
+ 	 'ETRN': get_option('etrn'),
+-	 'XUSR': get_option('xusr')})
++	 'XUSR': get_option('xusr'),
++	 'NTLM': ntlmdep.found()})
+diff --git a/meson_options.txt b/meson_options.txt
+index 8375e2c..158f38f 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -5,3 +5,4 @@ option('lwres', type : 'feature', value : 'disabled', description : 'use lwres l
+ option('bdat', type : 'boolean', value : 'true', description : 'enable SMTP BDAT extension')
+ option('etrn', type : 'boolean', value : 'true', description : 'enable SMTP ETRN extension')
+ option('xusr', type : 'boolean', value : 'true', description : 'enable sendmail XUSR extension')
++option('ntlm', type : 'feature', value : 'disabled', description : 'build with support for NTLM authentication')
+diff --git a/ntlm/meson.build b/ntlm/meson.build
+index e0eef58..11d7f58 100644
+--- a/ntlm/meson.build
++++ b/ntlm/meson.build
+@@ -5,7 +5,7 @@ sasl_ntlm_sources = [
+   'ntlmstruct.c',
+ ]
+ 
+-ntlm_deps = [ ssldep, ]
++ntlm_deps = [ ntlmdep, ]
+ 
+ sasl_ntlm = shared_module('ntlm', sasl_ntlm_sources,
+ 			  name_prefix : 'sasl-',

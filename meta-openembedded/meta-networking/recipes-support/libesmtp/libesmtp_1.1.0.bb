@@ -8,7 +8,8 @@ SECTION = "libs"
 
 DEPENDS = "openssl"
 
-SRC_URI = "git://github.com/libesmtp/libESMTP.git;branch=master;protocol=https"
+SRC_URI = "git://github.com/libesmtp/libESMTP.git;branch=master;protocol=https \
+           file://0001-Add-build-option-for-NTLM-support.patch"
 SRCREV = "1d0af244310a66943ab400be56b15a9087f181eb"
 
 S = "${WORKDIR}/git"
@@ -26,6 +27,7 @@ EXTRA_OEMESON = " \
     -Dbdat=true \
     -Detrn=true \
     -Dxusr=true \
+    -Dntlm=disabled \
 "
 
 FILES:${PN} = "${libdir}/lib*${SOLIBS} \

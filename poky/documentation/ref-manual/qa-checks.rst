@@ -154,7 +154,16 @@ Errors and Warnings
    ``FILES:${PN}-dbg``. See :term:`FILES` for additional
    information on :term:`FILES`.
 
-    
+.. _qa-check-empty-dirs:
+
+-  ``<packagename> installs files in <path>, but it is expected to be empty [empty-dirs]``
+
+   The specified package is installing files into a directory that is
+   normally expected to be empty (such as ``/tmp``). These files may
+   be more appropriately installed to a different location, or
+   perhaps alternatively not installed at all, usually by updating the
+   ``do_install`` task/function.
+
 .. _qa-check-arch:
 
 -  ``Architecture did not match (<file_arch>, expected <machine_arch>) in <file> [arch]``

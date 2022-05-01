@@ -33,9 +33,11 @@ EXTRA_OECMAKE += " \
     -DENABLE_UNSTABLE_API_ABI_HEADERS=ON \
     -DBUILD_GTK_TESTS=OFF \
     -DENABLE_ZLIB=ON \
+    -DRUN_GPERF_IF_PRESENT=OFF \
     -DCMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES:PATH='${STAGING_INCDIR}' \
     ${@bb.utils.contains('GI_DATA_ENABLED', 'True', '-DENABLE_GOBJECT_INTROSPECTION=ON', '-DENABLE_GOBJECT_INTROSPECTION=OFF', d)} \
 "
+EXTRA_OECMAKE:append:class-native = " -DENABLE_CPP=OFF"
 
 do_configure:append() {
     # poppler macro uses pkg-config to check for g-ir runtimes. Something
@@ -49,3 +51,5 @@ FILES:libpoppler = "${libdir}/libpoppler.so.*"
 FILES:libpoppler-glib = "${libdir}/libpoppler-glib.so.*"
 
 RDEPENDS:libpoppler = "poppler-data"
+
+BBCLASSEXTEND = "native"

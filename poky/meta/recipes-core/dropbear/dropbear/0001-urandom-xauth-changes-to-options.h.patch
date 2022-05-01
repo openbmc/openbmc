@@ -6,10 +6,10 @@ Upstream-Status: Inappropriate [configuration]
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/default_options.h b/default_options.h
-index 3b75eb8..1fd8082 100644
+index 349338c..5ffac25 100644
 --- a/default_options.h
 +++ b/default_options.h
-@@ -243,7 +243,7 @@ Homedir is prepended unless path begins with / */
+@@ -289,7 +289,7 @@ group1 in Dropbear server too */
  
  /* The command to invoke for xauth when using X11 forwarding.
   * "-q" for quiet */
@@ -17,7 +17,7 @@ index 3b75eb8..1fd8082 100644
 +#define XAUTH_COMMAND "xauth -q"
  
  
- /* if you want to enable running an sftp server (such as the one included with
+ /* If you want to enable running an sftp server (such as the one included with
 -- 
-1.7.11.7
+2.25.1
 

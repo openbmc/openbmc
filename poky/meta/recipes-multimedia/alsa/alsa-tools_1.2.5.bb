@@ -71,6 +71,7 @@ python do_compile() {
 }
 
 python do_install() {
+    d.delVarFlag("autotools_do_install", "cleandirs")
     for subdir in d.getVar("PACKAGECONFIG").split():
         subdir = subdir.replace("--", "/")
         bb.note("Installing %s" % subdir)

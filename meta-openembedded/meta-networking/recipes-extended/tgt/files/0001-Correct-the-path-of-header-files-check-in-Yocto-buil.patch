@@ -1,0 +1,47 @@
+From 93fea40915d01be6d02587a0b8be85a642e6a8d5 Mon Sep 17 00:00:00 2001
+From: Zhenhua Luo <zhenhua.luo@freescale.com>
+Date: Thu, 10 Apr 2014 11:26:39 +0800
+Subject: [PATCH] Correct the path of header files check in Yocto build env
+
+Upstream-Status: Inappropriate [the fix is specific to Yocto build env]
+
+Current Makefile will check headers on host instead of Yocto sysroot, following
+error appears. Change the path of header check.
+| bs_aio.c:34:20: fatal error: libaio.h: No such file or directory
+| #include <libaio.h>
+|                     ^
+| compilation terminated.
+
+Signed-off-by: Zhenhua Luo <zhenhua.luo@freescale.com>
+
+---
+ usr/Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/usr/Makefile b/usr/Makefile
+index decf13c..9ff8f15 100644
+--- a/usr/Makefile
++++ b/usr/Makefile
+@@ -1,11 +1,11 @@
+ sbindir ?= $(PREFIX)/sbin
+ libdir ?= $(PREFIX)/lib/tgt
+ 
+-ifneq ($(shell test -e /usr/include/linux/signalfd.h && echo 1),)
++ifneq ($(shell test -e $(SYSROOT)/usr/include/linux/signalfd.h && echo 1),)
+ CFLAGS += -DUSE_SIGNALFD
+ endif
+ 
+-ifneq ($(shell test -n $(shell find /usr/include -name "timerfd.h" | head -n1) && echo 1),)
++ifneq ($(shell test -n $(shell find $(SYSROOT)/usr/include -name "timerfd.h" | head -n1) && echo 1),)
+ CFLAGS += -DUSE_TIMERFD
+ endif
+ 
+@@ -25,7 +25,7 @@ ifneq ($(SD_NOTIFY),)
+ CFLAGS += -DUSE_SYSTEMD
+ endif
+ 
+-ifneq ($(shell test -e /usr/include/sys/eventfd.h && test -e /usr/include/libaio.h && echo 1),)
++ifneq ($(shell test -e $(SYSROOT)/usr/include/sys/eventfd.h && test -e $(SYSROOT)/usr/include/libaio.h && echo 1),)
+ CFLAGS += -DUSE_EVENTFD
+ TGTD_OBJS += bs_aio.o
+ LIBS += -laio

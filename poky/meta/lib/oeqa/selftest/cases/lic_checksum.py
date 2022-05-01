@@ -4,11 +4,29 @@
 
 import os
 import tempfile
+import urllib
 
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake
 
 class LicenseTests(OESelftestTestCase):
+
+    def test_checksum_with_space(self):
+        bitbake_cmd = '-c populate_lic emptytest'
+
+        lic_file, lic_path = tempfile.mkstemp(" -afterspace")
+        os.close(lic_file)
+        #self.track_for_cleanup(lic_path)
+
+        self.write_config("INHERIT:remove = \"report-error\"")
+
+        self.write_recipeinc('emptytest', """
+INHIBIT_DEFAULT_DEPS = "1"
+LIC_FILES_CHKSUM = "file://%s;md5=d41d8cd98f00b204e9800998ecf8427e"
+SRC_URI = "file://%s;md5=d41d8cd98f00b204e9800998ecf8427e"
+""" % (urllib.parse.quote(lic_path), urllib.parse.quote(lic_path)))
+        result = bitbake(bitbake_cmd)
+
 
     # Verify that changing a license file that has an absolute path causes
     # the license qa to fail due to a mismatched md5sum.

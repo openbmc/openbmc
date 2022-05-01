@@ -1,0 +1,101 @@
+From 49008eeedc97014f44e12afe179d3785e4438372 Mon Sep 17 00:00:00 2001
+From: Richard Biener <rguenther@suse.de>
+Date: Tue, 20 Jul 2021 11:00:33 +0200
+Subject: [PATCH] debug/101473 - apply debug prefix maps before checksumming
+ DIEs
+
+The following makes sure to apply the debug prefix maps to filenames
+before checksumming DIEs to create the global symbol for the CU DIE
+used by LTO to link the late debug to the early debug.  This avoids
+binary differences (in said symbol) when compiling with toolchains
+installed under a different path and that compensated with appropriate
+-fdebug-prefix-map options.
+
+The easiest and most scalable way is to record both the unmapped
+and the remapped filename in the dwarf_file_data so the remapping
+process takes place at a single point and only once (otherwise it
+creates GC garbage at each point doing that).
+
+2021-07-20  Richard Biener  <rguenther@suse.de>
+
+	PR debug/101473
+	* dwarf2out.h (dwarf_file_data): Add key member.
+	* dwarf2out.c (dwarf_file_hasher::equal): Compare key.
+	(dwarf_file_hasher::hash): Hash key.
+	(lookup_filename): Remap the filename and store it in the
+	filename member of dwarf_file_data when creating a new
+	dwarf_file_data.
+	(file_name_acquire): Do not remap the filename again.
+	(maybe_emit_file): Likewise.
+
+[YOCTO #14481]
+
+Upstream-Status: Backport [https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=7cc2df084b7977653a9b59cbc34a9ad500ae619c]
+
+The upstream patch was modified to compensate for the definition of
+"struct dwarf_file_data" being in dwarf2out.c rather than dwarf2out.h in
+this version of gcc.
+
+Signed-off-by: Tony Battersby <tonyb@cybernetics.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gcc/dwarf2out.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/gcc/dwarf2out.c b/gcc/dwarf2out.c
+index e5d3ce4966d..41ac3008507 100644
+--- a/gcc/dwarf2out.c
++++ b/gcc/dwarf2out.c
+@@ -1283,6 +1283,7 @@ dwarf2out_switch_text_section (void)
+ 
+ /* Data about a single source file.  */
+ struct GTY((for_user)) dwarf_file_data {
++  const char * key;
+   const char * filename;
+   int emitted_number;
+ };
+@@ -12335,7 +12336,7 @@ file_name_acquire (dwarf_file_data **slot, file_name_acquire_data *fnad)
+ 
+   fi = fnad->files + fnad->used_files++;
+ 
+-  f = remap_debug_filename (d->filename);
++  f = d->filename;
+ 
+   /* Skip all leading "./".  */
+   while (f[0] == '.' && IS_DIR_SEPARATOR (f[1]))
+@@ -27259,13 +27260,13 @@ dwarf2out_ignore_block (const_tree block)
+ bool
+ dwarf_file_hasher::equal (dwarf_file_data *p1, const char *p2)
+ {
+-  return filename_cmp (p1->filename, p2) == 0;
++  return filename_cmp (p1->key, p2) == 0;
+ }
+ 
+ hashval_t
+ dwarf_file_hasher::hash (dwarf_file_data *p)
+ {
+-  return htab_hash_string (p->filename);
++  return htab_hash_string (p->key);
+ }
+ 
+ /* Lookup FILE_NAME (in the list of filenames that we know about here in
+@@ -27295,7 +27296,8 @@ lookup_filename (const char *file_name)
+     return *slot;
+ 
+   created = ggc_alloc<dwarf_file_data> ();
+-  created->filename = file_name;
++  created->key = file_name;
++  created->filename = remap_debug_filename (file_name);
+   created->emitted_number = 0;
+   *slot = created;
+   return created;
+@@ -27321,8 +27323,7 @@ maybe_emit_file (struct dwarf_file_data * fd)
+       if (output_asm_line_debug_info ())
+ 	{
+ 	  fprintf (asm_out_file, "\t.file %u ", fd->emitted_number);
+-	  output_quoted_string (asm_out_file,
+-				remap_debug_filename (fd->filename));
++	  output_quoted_string (asm_out_file, fd->filename);
+ 	  fputc ('\n', asm_out_file);
+ 	}
+     }

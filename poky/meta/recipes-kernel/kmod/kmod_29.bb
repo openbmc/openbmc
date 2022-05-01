@@ -27,7 +27,7 @@ S = "${WORKDIR}/git"
 
 EXTRA_OECONF += "--enable-tools"
 
-PACKAGECONFIG ??= "zlib"
+PACKAGECONFIG ??= "zlib xz"
 PACKAGECONFIG[debug] = "--enable-debug,--disable-debug"
 PACKAGECONFIG[logging] = " --enable-logging,--disable-logging"
 PACKAGECONFIG[manpages] = "--enable-manpages, --disable-manpages, libxslt-native xmlto-native"

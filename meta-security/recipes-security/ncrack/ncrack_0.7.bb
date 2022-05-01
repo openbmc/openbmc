@@ -3,7 +3,7 @@ DESCRIPTION = "Ncrack is designed for high-speed parallel testing of network dev
 HOMEPAGE = "https://nmap.org/ncrack"
 SECTION = "security"
 
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;beginline=7;endline=12;md5=66938a7e5b4c118eda78271de14874c2"
 
 SRCREV = "dc570e7e3cec1fb176c0168eaedc723084bd0426"

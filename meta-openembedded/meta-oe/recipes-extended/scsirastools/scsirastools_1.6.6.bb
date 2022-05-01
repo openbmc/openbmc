@@ -20,7 +20,7 @@ SRC_URI[sha256sum] = "e7b997e75decb06a650c42c35cd63d0c94c34e39cf133c723337b0eeab
 inherit autotools update-rc.d
 
 # mdadm Makefile has CC set to gcc, hence override CC to ${CC}
-EXTRA_OEMAKE += "CC='${CC}'"
+EXTRA_OEMAKE += "CC='${CC}' sbindir=${base_sbindir}"
 
 
 do_configure:append() {

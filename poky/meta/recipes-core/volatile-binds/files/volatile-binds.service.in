@@ -1,6 +1,6 @@
 [Unit]
 Description=Bind mount volatile @where@
-DefaultDependencies=false
+DefaultDependencies=no
 Before=local-fs.target
 RequiresMountsFor=@whatparent@ @whereparent@
 ConditionPathIsReadWrite=@whatparent@
@@ -10,7 +10,6 @@ ConditionPathIsReadWrite=!@where@
 [Service]
 Type=oneshot
 RemainAfterExit=Yes
-TimeoutSec=0
 Environment=MOUNT_COPYBIND_AVOID_OVERLAYFS=@avoid_overlayfs@
 ExecStart=/sbin/mount-copybind @what@ @where@
 ExecStop=/bin/umount @where@

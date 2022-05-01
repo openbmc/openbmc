@@ -32,3 +32,8 @@ do_install:append() {
     sed -i 's!/var/!${localstatedir}/!g' ${D}/${sysconfdir}/init.d/conntrack-failover ${D}/${sysconfdir}/init.d/conntrackd ${D}/${sysconfdir}/conntrackd/conntrackd.conf.sample
     sed -i 's!^export PATH=.*!export PATH=${base_sbindir}:${base_bindir}:${sbindir}:${bindir}!' ${D}/${sysconfdir}/init.d/conntrackd
 }
+
+# fix error message: Do not forget that you need *root* or CAP_NET_ADMIN capabilities ;-)
+pkg_postinst:${PN} () {
+    setcap cap_net_admin+ep $D/${sbindir}/conntrack"
+}

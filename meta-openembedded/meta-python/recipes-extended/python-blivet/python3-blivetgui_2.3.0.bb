@@ -11,7 +11,8 @@ B = "${S}"
 SRCREV = "42512ee48494cee71febf04078d9774f0146a085"
 SRC_URI = "git://github.com/storaged-project/blivet-gui.git;branch=master;protocol=https \
            file://0001-Use-setuptools-instead-of-distutils-in-setup.py.patch \
-          "
+           file://0002-Use-symbolic-list-add-and-edit-icons.patch \
+           "
 
 inherit features_check
 REQUIRED_DISTRO_FEATURES = "x11 systemd"
