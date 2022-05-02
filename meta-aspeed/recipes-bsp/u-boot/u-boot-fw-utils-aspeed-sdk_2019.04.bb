@@ -8,16 +8,12 @@ DEPENDS += "mtd-utils"
 PROVIDES += "u-boot-fw-utils"
 RPROVIDES:${PN} += "u-boot-fw-utils"
 
-SRC_URI += "file://fw_env_ast2600_nor.config"
+# The 32MB NOR and 64MB NOR layouts use the same configuration
+SRC_URI += "file://fw_env_flash_nor.config"
 SRC_URI += "file://fw_env_ast2600_mmc.config"
-SRC_URI += "file://fw_env_flash_32M_nor.config"
-SRC_URI += "file://fw_env_flash_64M_nor.config"
-SRC_URI:append:uboot-flash-32768 = " file://u-boot_flash_32M.cfg"
 
-ENV_CONFIG_FILE = "fw_env_ast2600_nor.config"
+ENV_CONFIG_FILE = "fw_env_flash_nor.config"
 ENV_CONFIG_FILE:df-phosphor-mmc = "fw_env_ast2600_mmc.config"
-ENV_CONFIG_FILE:uboot-flash-32768 = "fw_env_flash_32M_nor.config"
-ENV_CONFIG_FILE:uboot-flash-65536 = "fw_env_flash_64M_nor.config"
 
 INSANE_SKIP:${PN} = "already-stripped"
 EXTRA_OEMAKE:class-target = 'CROSS_COMPILE=${TARGET_PREFIX} CC="${CC} ${CFLAGS} ${LDFLAGS}" HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}" V=1'
