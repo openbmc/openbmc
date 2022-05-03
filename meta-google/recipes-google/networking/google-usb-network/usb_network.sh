@@ -94,6 +94,9 @@ EOF
 
     ln -s "${func_dir}" "${config_dir}" || return
 
+    # This only works on kernel 5.12+, we have to ignore failures for now
+    echo "$IFACE_NAME" >"${func_dir}"/ifname || true
+
     echo "${BIND_DEVICE}" >${gadget_dir}/UDC || return
     # Try to reconfigure a few times in case we race with systemd-networkd
     local start=$SECONDS
