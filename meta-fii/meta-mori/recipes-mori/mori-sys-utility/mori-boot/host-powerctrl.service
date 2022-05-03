@@ -1,0 +1,16 @@
+[Unit]
+Description = Host Power Control Sequence
+Wants=ssifbridge.service
+After=ssifbridge.service
+Wants=mori-bios-verify.service
+After=mori-bios-verify.service
+
+[Service]
+Restart=no
+RemainAfterExit=true
+Type=oneshot
+ExecStart=/usr/libexec/mori-boot/init_once.sh
+StandardOutput=syslog
+
+[Install]
+WantedBy=sysinit.target
