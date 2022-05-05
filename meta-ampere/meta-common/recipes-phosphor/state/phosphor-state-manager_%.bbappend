@@ -2,7 +2,10 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 DEPENDS += "gpioplus libgpiod"
 
-EXTRA_OEMESON:append = " -Dhost-gpios=enabled"
+EXTRA_OEMESON:append = " \
+                         -Dhost-gpios=enabled \
+                         -Dboot-count-max-allowed=1 \
+                       "
 
 FILES:${PN} += "${systemd_system_unitdir}/*"
 FILES:${PN}-host += "${bindir}/phosphor-host-condition-gpio"
