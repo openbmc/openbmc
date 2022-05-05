@@ -177,11 +177,11 @@
           "Name":"CPU0_MEM_PW",
           "SensorType":"power",
           "MinValue":0,
-          "MaxValue":80
+          "MaxValue":200
        },
        "Threshold":
        {
-          "CriticalHigh":29.987
+          "CriticalHigh":100
        },
        "Associations":[
           [
