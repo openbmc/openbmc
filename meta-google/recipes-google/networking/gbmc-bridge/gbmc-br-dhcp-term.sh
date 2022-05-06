@@ -25,7 +25,9 @@ sleep $((60 * wait_min))
 # If the DHCP configuration process is running, wait for it to finish
 if pid="$(cat /run/gbmc-br-dhcp.pid 2>/dev/null)"; then
   echo "DHCP still running ($pid), waiting" >&2
-  wait "$pid"
+  while [[ -e /proc/$pid ]]; do
+    sleep 1
+  done
 fi
 echo "Stopping DHCP processing" >&2
 systemctl stop --no-block gbmc-br-dhcp
