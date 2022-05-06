@@ -14,6 +14,7 @@ DEPENDS:append:p10bmc = " power-sequencer"
 PACKAGECONFIG:append:ibm-ac-server = " monitor"
 PACKAGECONFIG:append:swift = " monitor"
 PACKAGECONFIG:append:mihawk = " monitor"
+PACKAGECONFIG:append:p10bmc = " monitor-ng"
 
 do_install:append(){
     install -D ${WORKDIR}/psu.json ${D}${datadir}/phosphor-power/psu.json
