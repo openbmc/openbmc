@@ -38,6 +38,13 @@ RRECOMMENDS:${PN} = " \
                      kernel-module-nf-recent \
 "
 
+
+do_configure:prepend() {
+    if ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','true','false',d)}; then
+        sed -i -e 's|/lib|${nonarch_base_libdir}|' ${S}/setup.py
+    fi
+}
+
 do_install:append() {
     install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${S}/doc/systemd.example ${D}${systemd_unitdir}/system/ufw.service

@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 LICENSE = "GPL-2.0-only"
 
 SRCBRANCH ?= "master"
-SRCREV = "06ef8e2b814feb08a668b7a3783c86674e49a7b1"
+SRCREV = "74bbdd14ec861552ace1ca63953eb2ef73e1f965"
 
 DEPENDS = "bzip2 zlib elfutils xz"
 RDEPENDS:${PN}-tools = "perl ${PN}"
@@ -51,12 +51,6 @@ do_install () {
     mkdir -p ${D}/usr/bin
     install -m 755 ${S}/makedumpfile ${D}/usr/bin
     install -m 755 ${S}/makedumpfile-R.pl ${D}/usr/bin
-
-    mkdir -p ${D}/usr/share/man/man8
-    install -m 644 ${S}/makedumpfile.8.gz ${D}/usr/share/man/man8
-
-    mkdir -p ${D}/usr/share/man/man5
-    install -m 644 ${S}/makedumpfile.conf.5.gz ${D}/usr/share/man/man5
 
     mkdir -p ${D}/etc/
     install -m 644 ${S}/makedumpfile.conf ${D}/etc/makedumpfile.conf.sample

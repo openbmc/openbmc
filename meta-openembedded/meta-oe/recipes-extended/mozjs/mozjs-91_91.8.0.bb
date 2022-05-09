@@ -24,6 +24,7 @@ inherit pkgconfig perlnative python3native rust
 
 DEPENDS += "zlib cargo-native python3 icu"
 DEPENDS:remove:mipsarch = "icu"
+DEPENDS:remove:powerpc:toolchain-clang = "icu"
 
 B = "${WORKDIR}/build"
 
@@ -43,6 +44,7 @@ JIT ?= ""
 JIT:mipsarch = "--disable-jit"
 ICU ?= "--with-system-icu"
 ICU:mipsarch = ""
+ICU:powerpc:toolchain-clang = ""
 
 do_configure() {
     cd ${B}

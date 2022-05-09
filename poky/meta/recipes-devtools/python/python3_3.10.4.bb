@@ -55,6 +55,9 @@ CVE_CHECK_IGNORE += "CVE-2007-4559"
 CVE_CHECK_IGNORE += "CVE-2019-18348"
 # These are specific to Microsoft Windows
 CVE_CHECK_IGNORE += "CVE-2020-15523 CVE-2022-26488"
+# The mailcap module is insecure by design, so this can't be fixed in a meaningful way.
+# The module will be removed in the future and flaws documented.
+CVE_CHECK_IGNORE += "CVE-2015-20107"
 
 PYTHON_MAJMIN = "3.10"
 

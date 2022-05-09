@@ -35,6 +35,7 @@ SRC_URI = "git://github.com/BOINC/boinc;protocol=https;branch=${BRANCH} \
            file://boinc-AM_CONDITIONAL.patch \
            file://gtk-configure.patch \
            file://4563.patch \
+           file://0001-scripts-Do-not-check-for-files-on-build-host.patch \
 "
 
 inherit gettext autotools pkgconfig features_check systemd
@@ -75,16 +76,14 @@ do_compile:prepend () {
 	sed -i -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' ${B}/libtool
 }
 
-do_install:append() {
-	if [ -e ${D}${nonarch_libdir}/systemd/system/boinc-client.service ]; then
-		install -d ${D}${systemd_system_unitdir}
-		mv \
-		${D}${nonarch_libdir}/systemd/system/boinc-client.service \
-		${D}${systemd_system_unitdir}/boinc-client.service
-		rmdir --ignore-fail-on-non-empty ${D}${nonarch_libdir}/systemd/system \
-		${D}${nonarch_libdir}/systemd \
-		${D}${nonarch_libdir}
+do_install:prepend() {
+	# help script install a bit to do right thing for OE
+	if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+		mkdir -p ${D}${systemd_system_unitdir}
+	else
+		mkdir -p ${D}${sysconfdir}/init.d
 	fi
+	mkdir -p ${D}${sysconfdir}/default
 }
 
 SYSTEMD_SERVICE:${PN} = "boinc-client.service"

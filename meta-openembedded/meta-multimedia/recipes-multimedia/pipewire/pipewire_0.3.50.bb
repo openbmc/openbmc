@@ -13,10 +13,8 @@ LIC_FILES_CHKSUM = " \
 
 DEPENDS = "dbus ncurses"
 
-SRCREV = "075e7b266876802eab0077afd13ea8e1cee5e1fd"
-SRC_URI = "git://gitlab.freedesktop.org/pipewire/pipewire.git;branch=master;protocol=https \
-           file://0001-meson-Add-option-to-enable-disable-legacy-RTKit-modu.patch \
-           "
+SRCREV = "64cf5e80e6240284e6b757907b900507fe56f1b5"
+SRC_URI = "git://gitlab.freedesktop.org/pipewire/pipewire.git;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

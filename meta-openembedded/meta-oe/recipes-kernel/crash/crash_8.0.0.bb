@@ -14,22 +14,16 @@ DEPENDS = "zlib readline coreutils-native ncurses-native"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/crash-utility/${BPN}.git;branch=master;protocol=https \
-           ${GNU_MIRROR}/gdb/gdb-7.6.tar.gz;name=gdb;subdir=git \
+           ${GNU_MIRROR}/gdb/gdb-10.2.tar.gz;name=gdb;subdir=git \
            file://7001force_define_architecture.patch \
            file://7003cross_ranlib.patch \
            file://0001-cross_add_configure_option.patch \
-           file://sim-ppc-drop-LIBS-from-psim-dependency.patch \
-           file://sim-common-sim-arange-fix-extern-inline-handling.patch \
            file://donnot-extract-gdb-during-do-compile.patch \
            file://gdb_build_jobs_and_not_write_crash_target.patch \
-           file://remove-unrecognized-gcc-option-m32-for-mips.patch \
-           file://0002-crash-fix-build-error-unknown-type-name-gdb_fpregset.patch \
-           file://0003-crash-detect-the-sysroot-s-glibc-header-file.patch \
            "
-SRCREV = "2a3e546942ab560f050ab77e8c7828b06513b3f0"
+SRCREV = "ec568e2ea515b66343d3488d5d4b9a625d55b7ae"
 
-SRC_URI[gdb.md5sum] = "a9836707337e5f7bf76a009a8904f470"
-SRC_URI[gdb.sha256sum] = "8070389a5dcc104eb0be483d582729f98ed4d761ad19cedd3f17b5d2502faa36"
+SRC_URI[gdb.sha256sum] = "b33ad58d687487a821ec8d878daab0f716be60d0936f2e3ac5cf08419ce70350"
 
 UPSTREAM_CHECK_URI = "https://github.com/crash-utility/crash/releases"
 
@@ -78,6 +72,7 @@ do_compile:prepend() {
 
     sed -i s/FORCE_DEFINE_ARCH/"${ARCH}"/g ${S}/configure.c
     sed -i -e 's/#define TARGET_CFLAGS_ARM_ON_X86_64.*/#define TARGET_CFLAGS_ARM_ON_X86_64\t\"TARGET_CFLAGS=-D_FILE_OFFSET_BITS=64\"/g' ${S}/configure.c
+    sed -i -e 's/#define TARGET_CFLAGS_MIPS_ON_X86_64.*/#define TARGET_CFLAGS_MIPS_ON_X86_64\t\"TARGET_CFLAGS=-D_FILE_OFFSET_BITS=64\"/g' ${S}/configure.c
     sed -i 's/&gt;/>/g' ${S}/Makefile
 }
 

@@ -68,3 +68,14 @@ FILES:pyldb = "${libdir}/python${PYTHON_BASEVERSION}/site-packages/* \
 FILES:pyldb-dbg = "${libdir}/python${PYTHON_BASEVERSION}/site-packages/.debug \
                    ${libdir}/.debug/libpyldb-util.*.so.*"
 FILES:pyldb-dev = "${libdir}/libpyldb-util.*.so"
+
+# Prevent third_party/waf/waflib/Configure.py checking host's path which is
+# incorrect for cross building.
+export PREFIX = "/"
+export LIBDIR = "${libdir}"
+export BINDIR = "${bindir}"
+
+do_configure:prepend() {
+    # For a clean rebuild
+    rm -fr bin/
+}

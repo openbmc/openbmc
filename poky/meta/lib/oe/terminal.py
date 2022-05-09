@@ -30,9 +30,10 @@ class Registry(oe.classutils.ClassRegistry):
 
 class Terminal(Popen, metaclass=Registry):
     def __init__(self, sh_cmd, title=None, env=None, d=None):
+        from subprocess import STDOUT
         fmt_sh_cmd = self.format_command(sh_cmd, title)
         try:
-            Popen.__init__(self, fmt_sh_cmd, env=env)
+            Popen.__init__(self, fmt_sh_cmd, env=env, stderr=STDOUT)
         except OSError as exc:
             import errno
             if exc.errno == errno.ENOENT:

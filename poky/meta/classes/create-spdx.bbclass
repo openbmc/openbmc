@@ -35,8 +35,6 @@ SPDX_SUPPLIER[doc] = "The SPDX PackageSupplier field for SPDX packages created f
     is the contact information for the person or organization who is doing the \
     build."
 
-do_image_complete[depends] = "virtual/kernel:do_create_spdx"
-
 def extract_licenses(filename):
     import re
 

@@ -3,8 +3,9 @@ HOMEPAGE = "http://gparted.org/index.php"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
-inherit autotools pkgconfig python3native gnome-help gtk-icon-cache
+inherit autotools pkgconfig python3native gnome-help gtk-icon-cache features_check
 
+ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
 SRC_URI = " \
     ${SOURCEFORGE_MIRROR}/project/${BPN}/${BPN}/${BPN}-${PV}/${BPN}-${PV}.tar.gz \

@@ -12,7 +12,7 @@ GNOMEBN = "atkmm"
 
 inherit gnomebase features_check
 
-REQUIRED_DISTRO_FEATURES = "x11"
+ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
 SRC_URI[archive.sha256sum] = "e11324bfed1b6e330a02db25cecc145dca03fb0dff47f0710c85e317687da458"
 

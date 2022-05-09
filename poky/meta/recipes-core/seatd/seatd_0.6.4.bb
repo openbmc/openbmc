@@ -13,6 +13,9 @@ S = "${WORKDIR}/git"
 
 inherit meson pkgconfig update-rc.d
 
+# https://www.openwall.com/lists/musl/2020/01/20/3
+CFLAGS:append:libc-musl:powerpc64le = " -Wno-error=overflow"
+
 PACKAGECONFIG ?= " \
 	${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} \
 	libseat-builtin \

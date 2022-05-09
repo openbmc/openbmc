@@ -10,8 +10,9 @@ GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase features_check
 
+ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
+
 SRC_URI[archive.sha256sum] = "57442ab4dc043877bfe3839915731ab2d693fc6634a71614422fb530c9eaa6f4"
-REQUIRED_DISTRO_FEATURES = "x11"
 
 FILES:${PN} = "${libdir}/lib*.so.*"
 FILES:${PN}-dev += "${libdir}/*/include/ ${libdir}/pangomm-*/"

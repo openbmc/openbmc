@@ -89,9 +89,10 @@ def get_patched_cves(d):
     for url in oe.patch.src_patches(d):
         patch_file = bb.fetch.decodeurl(url)[2]
 
+        # Remote compressed patches may not be unpacked, so silently ignore them
         if not os.path.isfile(patch_file):
-            bb.error("File Not found: %s" % patch_file)
-            raise FileNotFoundError
+            bb.warn("%s does not exist, cannot extract CVE list" % patch_file)
+            continue
 
         # Check patch file name for CVE ID
         fname_match = cve_file_name_match.search(patch_file)
