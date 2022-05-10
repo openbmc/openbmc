@@ -1,0 +1,32 @@
+# short-description: Create an image for eMMC
+# long-description: Creates an eMMC card image for the User Data Area that can
+# be used with the Aspeed SoC family.
+#
+# Assumes a minimum flash size of 8GB.
+# Assumes U-Boot is stored elsewhere, such as an eMMC boot volume or NOR flash.
+#
+#  --- - ----- -------- -------- -------- -------- ------ -------
+# |GPT| | env | boot-a | boot-b | rofs-a | rofs-b | rwfs |GPT-sec|
+#  --- - ----- -------- -------- -------- -------- ------ -------
+#       ^ 1MB    64MB     64MB     1GB      1GB     5GB
+#       |
+#       0x5000
+#
+# Primary GPT size (Beginning of image):
+# 512B (Protective MBR) + 512B (Primary Header) + 16KB (Primary Table)
+# First partition (u-boot-env) is 4K-aligned, which puts it at offset 0x5000
+#
+# Secondary GPT size (End of image):
+# 16KB (Secondary Table) + 512B (Secondary Header)
+
+bootloader --ptable gpt
+
+# Hint: bootimg-partition size must be same as MMC_BOOT_PARTITION_SIZE
+#part --align 4 --fixed-size 1M --source rawcopy --sourceparams="file=${DEPLOY_DIR_IMAGE}/u-boot-env.bin"
+part --align 4 --fixed-size 1M
+part --fstype=ext4 --fixed-size 64M --source bootimg-partition --label boot-a
+part --fstype=ext4 --fixed-size 64M --source bootimg-partition --label boot-b
+part --fstype=ext4 --fixed-size 128M --source rootfs --label rofs-a
+part --fstype=ext4 --fixed-size 128M --source rootfs --label rofs-b
+part --fstype=ext4 --fixed-size 256M --label rwfs
+#part --fstype=ext4 --fixed-size ${WKS_HOSTFW_SIZE} --source rootfs --rootfs-dir=${DEPLOY_DIR_IMAGE}/hostfw/image/ --label hostfw

@@ -1,0 +1,36 @@
+From 3259c1ebb70d9b7fde9291482cc2f9e24bb7eca4 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Tue, 26 Oct 2021 15:20:42 +0800
+Subject: [PATCH 2/2] dts: nuvoton: evb-npcm845: boot from fiu0 cs1
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
+index 8be09d21f60a..099fe7e68864 100644
+--- a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
++++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
+@@ -194,15 +194,15 @@ aes: aes@f0858000 {
+ 
+ 		fiu0: spi@fb000000 {
+ 			status = "okay";
+-			spi-nor@0 {
++			spi-nor@1 {
+ 				compatible = "jedec,spi-nor";
+ 				#address-cells = <1>;
+ 				#size-cells = <1>;
+ 				spi-rx-bus-width = <2>;
+ 				spi-tx-bus-width = <2>;
+-				reg = <0>;
++				reg = <1>;
+ 				spi-max-frequency = <5000000>;
+-				partitions@80000000 {
++				partitions@88000000 {
+ 					compatible = "fixed-partitions";
+ 					#address-cells = <1>;
+ 					#size-cells = <1>;
+-- 
+2.25.1
+

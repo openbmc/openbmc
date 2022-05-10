@@ -1,0 +1,209 @@
+{
+    "sensors" : [
+        {
+            "name": "Fan1",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan1",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/pwm1",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "Fan2",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan2",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/pwm2",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "Fan3",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan3",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/pwm3",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "Fan4",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan4",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/pwm4",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "BMC_CPU_Temp0",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/BMC_CPU_Temp0",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "EVB_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/EVB_Temp",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        }
+    ],
+    "zones" : [
+        {
+            "id": 0,
+            "minThermalOutput": 0.0,
+            "failsafePercent": 100.0,
+            "pids": [
+                {
+                    "name": "Fan1",
+                    "type": "fan",
+                    "inputs": ["Fan1"],
+                    "setpoint": 40.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 1.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 10.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0
+                    }
+                },
+                {
+                    "name": "BMC_CPU_Temp0",
+                    "type": "stepwise",
+                    "inputs": ["BMC_CPU_Temp0"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0,
+                        "isCeiling": false,
+                        "reading": {
+                            "0": 25,
+                            "1": 28,
+                            "2": 31,
+                            "3": 34,
+                            "4": 37,
+                            "5": 40,
+                            "6": 43,
+                            "7": 46,
+                            "8": 49,
+                            "9": 52,
+                            "10": 55,
+                            "11": 58,
+                            "12": 61,
+                            "13": 64,
+                            "14": 67,
+                            "15": 70
+                        },
+                        "output": {
+                            "0": 10,
+                            "1": 10,
+                            "2": 20,
+                            "3": 20,
+                            "4": 20,
+                            "5": 30,
+                            "6": 30,
+                            "7": 30,
+                            "8": 40,
+                            "9": 50,
+                            "10": 60,
+                            "11": 70,
+                            "12": 80,
+                            "13": 90,
+                            "14": 100,
+                            "15": 100
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": 1,
+            "minThermalOutput": 0.0,
+            "failsafePercent": 100.0,
+            "pids": [
+                {
+                    "name": "Fan4",
+                    "type": "fan",
+                    "inputs": ["Fan4"],
+                    "setpoint": 90.0,
+                    "pid": {
+                        "samplePeriod": 0.1,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 1.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 10.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0
+                    }
+                },
+                 {
+                    "name": "EVB_Temp",
+                    "type": "stepwise",
+                    "inputs": ["EVB_Temp"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0,
+                        "isCeiling": false,
+                        "reading": {
+                            "0": 25,
+                            "1": 28,
+                            "2": 31,
+                            "3": 34,
+                            "4": 37,
+                            "5": 40,
+                            "6": 43,
+                            "7": 46,
+                            "8": 49,
+                            "9": 52,
+                            "10": 55,
+                            "11": 58,
+                            "12": 61,
+                            "13": 64,
+                            "14": 67,
+                            "15": 70
+                        },
+                        "output": {
+                            "0": 10,
+                            "1": 10,
+                            "2": 20,
+                            "3": 20,
+                            "4": 20,
+                            "5": 30,
+                            "6": 30,
+                            "7": 30,
+                            "8": 40,
+                            "9": 50,
+                            "10": 60,
+                            "11": 70,
+                            "12": 80,
+                            "13": 90,
+                            "14": 100,
+                            "15": 100
+                        }
+
+
+                    }
+                }
+
+            ]
+        }
+    ]
+}

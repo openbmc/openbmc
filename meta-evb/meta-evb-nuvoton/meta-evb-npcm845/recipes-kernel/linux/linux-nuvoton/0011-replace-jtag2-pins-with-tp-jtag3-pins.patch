@@ -1,0 +1,26 @@
+diff -Nur a/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi b/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi
+--- a/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi	2022-03-28 21:41:07.529345785 +0300
++++ b/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi	2022-03-28 21:38:59.124189900 +0300
+@@ -1800,6 +1800,10 @@
+ 			groups = "hgpio7";
+ 			function = "hgpio7";
+ 		};
++		tp_jtag3_pins: tp_jtag3-pins {
++			groups = "tp_jtag3";
++			function = "tp_jtag3";
++		};
+ 	};
+ };
+ 
+diff -Nur a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
+--- a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts	2022-03-27 15:24:21.289194800 +0300
++++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts	2022-03-28 21:40:32.128150935 +0300
+@@ -586,7 +586,7 @@
+  	pinctrl: pinctrl@f0800000 {
+ 		pinctrl-names = "default";
+ 		pinctrl-0 = <
+-				&jtag2_pins
++				&tp_jtag3_pins
+ 				&lpc_pins
+ 				&pin70_o
+ 				&pin108_slew
