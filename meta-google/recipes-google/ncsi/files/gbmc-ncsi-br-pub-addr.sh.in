@@ -29,21 +29,30 @@ gbmc_ncsi_br_pub_addr_update() {
   local pfx_bytes=()
   if [ -n "$gbmc_ncsi_br_pub_addr_lastip" ]; then
     ip_to_bytes pfx_bytes "$gbmc_ncsi_br_pub_addr_lastip"
-    # Ensure we don't have more than a /64 address
-    local i
-    for (( i = 8; i < 16; ++i )); do
-      if (( pfx_bytes[$i] != 0 )); then
-        pfx_bytes=()
-        break
-      fi
-    done
+    # Ensure we have a /64 or an fdxx address
+    if (( pfx_bytes[8] != 0xfd || pfx_bytes[9] == 0 )); then
+      local i
+      for (( i = 8; i < 16; ++i )); do
+        if (( pfx_bytes[$i] != 0 )); then
+          pfx_bytes=()
+          break
+        fi
+      done
+    fi
   fi
 
   local contents=
   if (( ${#pfx_bytes[@]} != 0 )); then
     pfx_bytes[8]=0xfd
+    # Save our old prefix assuming we have one
+    local old_offset="${pfx_bytes[9]}"
+    if (( old_offset == 0 )); then
+      old_offset=0x01
+    else
+      pfx_bytes[9]=0x00
+    fi
     local stateless_pfx="$(ip_bytes_to_str pfx_bytes)"
-    pfx_bytes[9]=0x01
+    pfx_bytes[9]="$old_offset"
     local ncsi_pfx="$(ip_bytes_to_str pfx_bytes)"
     read -r -d '' contents <<EOF
 [Network]

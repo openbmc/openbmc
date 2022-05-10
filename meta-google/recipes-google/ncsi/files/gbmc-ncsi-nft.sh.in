@@ -36,6 +36,13 @@ gbmc_ncsi_nft_update() {
 
   local ip6="$gbmc_ncsi_nft_lastip6"
   if [ -n "$ip6" ]; then
+    # Normalize the provided ipv6 address to the impersonated ipv6 address
+    local ip6_bytes=()
+    ip_to_bytes ip6_bytes "$ip6"
+    for (( i=8; i<16; ++i )); do
+      ip6_bytes[$i]=0
+    done
+    ip6="$(ip_bytes_to_str ip6_bytes)"
     contents+="        ip6 daddr $ip6/128 goto ncsi_legacy_input"$'\n'
   fi
 
