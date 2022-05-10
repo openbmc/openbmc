@@ -1,0 +1,34 @@
+diff --git a/include/ipmid/message/pack.hpp b/include/ipmid/message/pack.hpp
+index 00750007..9c45d514 100644
+--- a/include/ipmid/message/pack.hpp
++++ b/include/ipmid/message/pack.hpp
+@@ -77,7 +77,7 @@ struct PackSingle
+      */
+     static int op(Payload& p, const T& t)
+     {
+-        static_assert(std::is_integral_v<T>,
++        static_assert(std::numeric_limits<T>::is_integer,
+                       "Attempt to pack a type that has no IPMI pack operation");
+         // if not on a byte boundary, must pack values LSbit/LSByte first
+         if (p.bitCount)
+diff --git a/include/ipmid/message/unpack.hpp b/include/ipmid/message/unpack.hpp
+index 4ac49165..3f9c6832 100644
+--- a/include/ipmid/message/unpack.hpp
++++ b/include/ipmid/message/unpack.hpp
+@@ -16,6 +16,7 @@
+ #pragma once
+ 
+ #include <array>
++#include <boost/type_traits/is_fundamental.hpp>
+ #include <ipmid/message/types.hpp>
+ #include <optional>
+ #include <string>
+@@ -74,7 +75,7 @@ struct UnpackSingle
+      */
+     static int op(Payload& p, T& t)
+     {
+-        if constexpr (std::is_fundamental<T>::value)
++        if constexpr (std::numeric_limits<T>::is_integer)
+         {
+             t = 0;
+             if (p.bitCount)
