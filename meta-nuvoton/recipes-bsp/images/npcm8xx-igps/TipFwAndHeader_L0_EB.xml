@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-2.0
+#
+# Nuvoton IGPS: Image Generation And Programming Scripts For Arbel BMC
+#
+# Copyright (C) 2022 Nuvoton Technologies, All Rights Reserved
+#======================================== -->
+
+<Bin_Ecc_Map>
+
+	<!-- BMC mandatory fields -->
+	<ImageProperties>
+		<BinSize>0</BinSize> <!-- If 0 the binary size will be calculated by the tool -->
+		<PadValue>0xFF</PadValue>	<!-- Byte value to pad the empty areas, default is 0 -->
+	</ImageProperties>
+
+	<BinField>
+		<name>Anchor</name> <!-- name of field -->
+		<config>
+			<offset>0</offset>
+			<size>4</size>
+		</config>
+		<content format='bytes'>0x5E 0x4D 0x7A 0x9B</content>  <!-- content the user should fill -->
+	</BinField>
+
+	<BinField>
+		<!-- CRC Enabled  (0x1E 0xAB 0xF2 0x57) or
+		     CRC Disabled (0xE1 0x54 0xF2 0x57) -->
+		<name>ExendedAnchor_CrcEn</name>         <!-- name of field -->
+		<config>
+			<offset>4</offset>
+			<size>4</size>
+		</config>
+		<content format='bytes'>0xE1 0x54 0xF2 0x57</content>  <!-- content the user should fill -->
+	</BinField>
+
+	<BinField>
+		<name>FWCrc</name>  <!-- name of field -->
+		<config>
+			<offset>12</offset>
+			<size>4</size>
+		</config>
+		<content format='bytes'>0x00 0x00 0x00 0x00</content>     <!-- will be calculated by IGPS -->
+	</BinField>
+
+	<BinField>
+		<!-- Code destination address, 32-bit aligned -->
+		<name>FwStartAddr</name>         <!-- name of field -->
+		<config>
+			<offset>120</offset>
+			<size>4</size>
+		</config>
+		<content format='32bit'>0x00020000</content>     <!-- content the user should fill -->
+	</BinField>
+
+	<BinField>
+		<!-- Code size -->
+		<name>FwLength</name>         <!-- name of field -->
+		<config>
+			<offset>132</offset>
+			<size>4</size>
+		</config>
+		<content format='FileSize'>arbel_tip_fw_L0.bin</content>	<!-- content the user should fill -->
+	</BinField>
+
+	<BinField>
+		<name>KeyIndex</name>  <!-- name of field -->
+		<config>
+			<offset>140</offset>
+			<size>4</size>
+		</config>
+		<content format='32bit'>0x0</content>               <!-- content the user should fill -->
+	</BinField>
+
+	<BinField>
+		<name>OtpFwVersion</name>  <!-- name of field -->
+		<config>
+			<offset>152</offset>
+			<size>2</size>
+		</config>
+		<content format='bytes'>0x00 0x00</content>               <!-- content the user should fill -->
+	</BinField>
+
+	<BinField>
+		<name>AesCbcIV</name>  <!-- name of field -->
+		<config>
+			<offset>172</offset>
+			<size>16</size>
+		</config>
+		<content format='bytes'>0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00</content>               <!-- content the user should fill -->
+	</BinField>
+
+	<BinField>
+		<name>TipFW</name>             <!-- name of field -->
+		<config>
+			<offset>256</offset>
+			<size format='FileSize'>arbel_tip_fw_L0.bin</size>                 <!-- size in the header calculated by tool-->
+		</config>
+		<content format='FileContent'>arbel_tip_fw_L0.bin</content>  <!-- content the user should fill -->
+	</BinField>
+
+</Bin_Ecc_Map>

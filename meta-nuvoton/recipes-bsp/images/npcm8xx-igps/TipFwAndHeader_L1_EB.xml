@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-2.0
+#
+# Nuvoton IGPS: Image Generation And Programming Scripts For Arbel BMC
+#
+# Copyright (C) 2022 Nuvoton Technologies, All Rights Reserved
+#======================================== -->
+
+<Bin_Ecc_Map>
+
+	<!-- BMC mandatory fields -->
+	<ImageProperties>
+		<BinSize>0</BinSize> <!-- If 0 the binary size will be calculated by the tool -->
+		<PadValue>0xFF</PadValue>	<!-- Byte value to pad the empty areas, default is 0 -->
+	</ImageProperties>
+		
+	<BinField>
+		<!-- tip_fw_L1 tag (0x0A 0x54 0x49 0x50 0x5F 0x4C 0x31 0x0A) -->
+		<name>StartTag</name>         <!-- name of field -->
+		<config>
+			<offset>0</offset>            <!-- offset in the header -->
+			<size>0x8</size>              <!-- size in the header -->
+		</config>
+		<content format='bytes'>0x0A 0x54 0x49 0x50 0x5F 0x4C 0x31 0x0A</content>
+	</BinField>
+	
+
+
+
+
+	<BinField>
+		<name>FWCrc</name>  <!-- name of field -->
+		<config>
+			<offset>12</offset>
+			<size>4</size>
+		</config>
+		<content format='bytes'>0x00 0x00 0x00 0x00</content>     <!-- will be calculated by IGPS -->
+	</BinField>
+
+
+	<BinField>
+		<name>KeyIndex</name>  <!-- name of field -->
+		<config>
+			<offset>140</offset>
+			<size>4</size>
+		</config>
+		<content format='32bit'>0x0</content>               <!-- content the user should fill -->
+	</BinField>
+
+	<BinField>
+		<name>OtpFwVersion</name>  <!-- name of field -->
+		<config>
+			<offset>152</offset>
+			<size>2</size>
+		</config>
+		<content format='bytes'>0x00 0x00</content>               <!-- content the user should fill -->
+	</BinField>
+
+	<BinField>
+		<!-- Code destination address, 32-bit aligned -->
+		<name>DestAddr_L1</name>         <!-- name of field -->
+		<config>
+			<offset>0x1F8</offset>        <!-- offset in the header -->
+			<size>0x4</size>              <!-- size in the header -->
+		</config>
+		<content format='32bit'>0x40000</content>  <!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- BootBlock or u-boot Code size -->
+		<name>CodeSize_L1</name>         <!-- name of field -->
+		<config>
+			<offset>0x1FC</offset>        <!-- offset in the header -->
+			<size>0x4</size>              <!-- size in the header -->
+		</config>
+		<content format='FileSize'>arbel_tip_fw_L1.bin</content>	<!-- content the user should fill -->
+	</BinField>
+
+	<BinField>
+		<name>TipFW_L1</name>             <!-- name of field -->
+		<config>
+			<offset>0x200</offset>
+			<size format='FileSize'>arbel_tip_fw_L1.bin</size>                 <!-- size in the header calculated by tool-->
+		</config>
+		<content format='FileContent'>arbel_tip_fw_L1.bin</content>  <!-- content the user should fill -->
+	</BinField>
+
+</Bin_Ecc_Map>

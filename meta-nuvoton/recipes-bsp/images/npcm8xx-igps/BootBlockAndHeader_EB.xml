@@ -1,0 +1,515 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-2.0
+#
+# Nuvoton IGPS: Image Generation And Programming Scripts For Arbel BMC
+#
+# Copyright (C) 2022 Nuvoton Technologies, All Rights Reserved
+#======================================== -->
+
+<Bin_Ecc_Map>
+	<!-- BMC mandatory fields -->
+	<ImageProperties>
+		<BinSize>0</BinSize>         <!-- If 0 the binary size will be calculated by the tool -->
+		<PadValue>0xFF</PadValue>	<!-- Byte value to pad the empty areas, default is 0 -->
+	</ImageProperties>
+		
+	<BinField>
+		<!-- BootBlock tag (0x0A 0x50 0x08 0x55 0xAA 0x54 0x4F 0x4F) -->
+		<name>StartTag</name>         
+		<config>
+			<offset>0</offset>           
+			<size>0x8</size> 
+		</config>
+		<content format='bytes'>0x0A 0x50 0x08 0x55 0xAA 0x54 0x4F 0x4F</content>
+	</BinField>
+	
+	<BinField>
+		<!-- Version (Major.Minor) -->
+		<name>version</name>          
+		<config>
+			<offset>0x100</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0</content>               <!-- content the user should fill -->
+	</BinField>
+		
+	<BinField>
+		<!-- Board manufaturer ( Dell = 0, Nuvoton = 100, Google = 1, MS = 2) -->
+		<name>vendor</name>          
+		<config>
+			<offset>0x104</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>100</content>                              <!--Board_manufacturer: Nuvoton-->
+	</BinField>
+	<BinField>
+		<!-- Board type ( DRB = 0, SVB = 1, EB = 2 RunBMC = 10) -->
+		<!-- WARNING: Currently this value is only printed to serial. -->
+		<name>board_type</name>          
+		<config>
+			<offset>0x108</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0x02</content>                                   <!--Board_type: SVB-->
+	</BinField>
+	
+	<BinField>
+		<!-- supported values: 300, 500, 666, 700, 720, 750, 775, 787.5 800, 850, 900, 950, 975, 1000, 1037, 1050, 1062.5 1066, 1100, 1150, 1200.  
+		     Recommended: 1066 or 800. Note: not all values are tested  -->
+		<name>MC_FREQ_IN_MHZ</name>          
+		<config>
+			<offset>0x10C</offset>       
+			<size>0x2</size> 
+		</config>
+		<content format='32bit'>1066</content> 
+	</BinField>
+	<BinField>
+		<!-- supporeted values: 333,500,600,666,700,720,750,800,825,850,900,950,1000. 
+		     Recommended: 1000. Note: not all values are tested -->
+		<name>CPU_FREQ_IN_MHZ</name>          
+		<config>
+			<offset>0x10E</offset>       
+			<size>0x2</size> 
+		</config>
+		<content format='32bit'>1000</content>
+	</BinField>
+
+	<BinField>
+		<!-- DDR: SOC (BMC) drive -->
+		<name>ddr_soc_drive</name>
+		<config>
+			<offset>0x110</offset>
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>48</content>     <!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- DDR: SOC (BMC) termination in ohm-->
+		<name>ddr_soc_odt</name>
+		<config>
+			<offset>0x114</offset>
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>48</content>     <!-- content the user should fill -->
+	</BinField>
+
+	<BinField>
+		<!-- DDR: DRAM  drive -->
+		<name>ddr_dram_drive</name>
+		<config>
+			<offset>0x118</offset>
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>48</content>     <!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- DDR: DRAM termination in ohm -->
+		<name>ddr_dram_odt</name>
+		<config>
+			<offset>0x11C</offset>
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>48</content>     <!-- content the user should fill -->
+	</BinField>
+
+	<BinField>
+		<!--  -->
+		<name>NoECC_Region_0_Start</name>
+		<config>
+			<offset>0x120</offset>
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0</content>     <!-- content the user should fill -->
+	</BinField>
+	
+	
+	<BinField>
+		<!--  -->
+		<name>NoECC_Region_0_End</name>
+		<config>
+			<offset>0x124</offset>
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0</content>     <!-- content the user should fill -->
+	</BinField>
+	
+	
+	<BinField>
+		<!--  -->
+		<name>NoECC_Region_1_Start</name>
+		<config>
+			<offset>0x128</offset>
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0</content>     <!-- content the user should fill -->
+	</BinField>
+	
+	
+	<BinField>
+		<!--  -->
+		<name>NoECC_Region_1_End</name>
+		<config>
+			<offset>0x12C</offset>
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0</content>     <!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!--  -->
+		<name>dram_max_size</name>
+		<config>
+			<offset>0x130</offset>
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0x40000000</content>     <!-- content the user should fill -->
+	</BinField>
+
+	<BinField>
+		<!-- MC_CONFIG. 
+			Bit 0: MC_CAPABILITY_ECC_EN (0x01)
+			Bit 2: Select DRAM type. 
+				0: 1600 DRAM type clk.
+				1: 2133 DRAM type clk.
+			Bit 3: enable 3 seconds delay.
+			Bit 4: enable debug sweeps (in addition to sweep_debug)
+			 -->
+		<name>MC_CONFIG</name>          
+		<config>
+			<offset>0x134</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0x04</content>  
+	</BinField>
+	
+
+	<BinField>
+		<!-- HOST_IF.
+			0xFF: LPC backward compatible
+			0x00: LPC. 
+			0x01: eSPI
+			0x02: GPIOs TRIS.  -->
+		<name>HOST_IF</name>          
+		<config>
+			<offset>0x135</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0x00</content>
+	</BinField>
+	
+	
+	
+	
+	<BinField>
+		<!-- bit 7 : pos\neg
+             bits [6:0] DQS0 in value		-->
+		<name>MC_DQS_IN_LANE0</name>          
+		<config>
+			<offset>0x136</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+	<BinField>
+		<!-- bit 7 : pos\neg
+             bits [6:0] DQS1 in value		-->
+		<name>MC_DQS_IN_LANE1</name>          
+		<config>
+			<offset>0x137</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+	
+	<BinField>
+		<!-- bit 7 : pos\neg
+             bits [6:0] DQS0 out value		-->
+		<name>MC_DQS_OUT_LANE0</name>          
+		<config>
+			<offset>0x138</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+	<BinField>
+		<!-- bit 7 : pos\neg
+             bits [6:0] DQS1 out value		-->
+		<name>MC_DQS_OUT_LANE1</name>          
+		<config>
+			<offset>0x139</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+	<BinField>
+		<!-- bit 6 : incr\dec
+             bits [5:0] TRIM value		-->
+		<name>MC_DLLS_TRIM_ADRCTL</name>          
+		<config>
+			<offset>0x13A</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+
+	<BinField>
+		<!-- bit 6 : incr\dec
+             bits [5:0] TRIM value		-->
+		<name>MC_DLLS_TRIM_ADRCTRL_MA</name>          
+		<config>
+			<offset>0x13B</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+	<BinField>
+		<!-- bit 6 : incr\dec
+             bits [5:0] TRIM value		-->
+		<name>MC_DLLS_TRIM_CLK</name>          
+		<config>
+			<offset>0x13C</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+	
+	
+	<BinField>
+		<!-- mc_dlls_trim_clk_sqew: not implemented -->
+		<name>mc_dlls_trim_clk_sqew</name>          
+		<config>
+			<offset>0x13D</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+	<BinField>
+		<!-- PHASE1 lane 0 -->
+		<name>PHASE1_LANE0</name>          
+		<config>
+			<offset>0x13E</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+	<BinField>
+		<!-- PHASE1 lane 1 -->
+		<name>PHASE1_LANE1</name>          
+		<config>
+			<offset>0x13F</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+	<BinField>
+		<!-- PHASE2 lane 0 -->
+		<name>PHASE2_LANE0</name>          
+		<config>
+			<offset>0x140</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+	<BinField>
+		<!-- PHASE2 lane 1 -->
+		<name>PHASE2_LANE1</name>          
+		<config>
+			<offset>0x141</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+
+
+
+	<BinField>
+		<!-- DLLS_TRIM_1 lane 0 -->
+		<name>DLLS_TRIM_1_LANE0</name>          
+		<config>
+			<offset>0x142</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+	<BinField>
+		<!-- DLLS_TRIM_1 lane 1 -->
+		<name>DLLS_TRIM_1_LANE1</name>          
+		<config>
+			<offset>0x143</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+
+
+	<BinField>
+		<!-- DLLS_TRIM_2 lane 0 -->
+		<name>DLLS_TRIM_2_LANE0</name>          
+		<config>
+			<offset>0x144</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+	<BinField>
+		<!-- DLLS_TRIM_2 lane 1 -->
+		<name>DLLS_TRIM_2_LANE1</name>          
+		<config>
+			<offset>0x145</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+	
+	<BinField>
+		<!-- DLLS_TRIM_3 lane 0 -->
+		<name>DLLS_TRIM_3_LANE0</name>          
+		<config>
+			<offset>0x146</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+	<BinField>
+		<!-- DLLS_TRIM_3 lane 1 -->
+		<name>DLLS_TRIM_3_LANE1</name>          
+		<config>
+			<offset>0x147</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+
+
+	<BinField>
+		<!-- DLLS_TRIM_2 OFFSET lane 0 
+			msb: 1 incr, 0 decr
+			[1:7] offset value added\decremented to trim2 after SCL.
+		-->
+		<name>DLLS_TRIM_2_OFFSET_LANE0</name>          
+		<config>
+			<offset>0x148</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+	<BinField>
+		<!-- DLLS_TRIM_2 OFFSET lane 1 
+			msb: 1 incr, 0 decr
+			[1:7] offset value added\decremented to trim2 after SCL.
+		-->
+		<name>DLLS_TRIM_2_OFFSET_LANE1</name>          
+		<config>
+			<offset>0x149</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+	
+	<BinField>
+		<!-- VREF_SOC lane 0 -->
+		<name>VREF_SOC_LANE0</name>          
+		<config>
+			<offset>0x14A</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+	<BinField>
+		<!-- VREF_SOC lane 1 -->
+		<name>VREF_SOC_LANE1</name>          
+		<config>
+			<offset>0x14B</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+	
+	
+	<BinField>
+		<!-- VREF_DRAM -->
+		<name>VREF_DRAM</name>          
+		<config>
+			<offset>0x14C</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+	
+
+	<BinField>
+		<!-- SWEEP_DEBUG: enable running charectarization sweeps. bitwise:
+				ADRCTL_MA_SWEEP       BIT(0)
+				ADRCTL_SWEEP          BIT(1)
+				TRIM_2_LANE0_SWEEP    BIT(2)
+				TRIM_2_LANE1_SWEEP    BIT(3)
+				VREF_SWEEP            BIT(4)
+				DRAM_SWEEP            BIT(5)
+				OP_DQS_SWEEP          BIT(6)
+				IP_DQS_SWEEP          BIT(7)
+		-->
+		<name>SWEEP_DEBUG</name>          
+		<config>
+			<offset>0x14D</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0x00</content>
+	</BinField>
+	
+	
+	
+	
+	<BinField>
+		<!-- Code destination address, 32-bit aligned: for BootBlock should be 0xFFFD0000 so code will run in 0xFFFB0200 as linked for -->
+		<name>DestAddr</name>         
+		<config>
+			<offset>0x1F8</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0xFFFD0000</content>     <!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- BootBlock or u-boot Code size -->
+		<name>CodeSize</name>         
+		<config>
+			<offset>0x1FC</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='FileSize'>arbel_a35_bootblock.bin</content>	<!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- The BootBlock or u-boot binary file -->
+		<name>Code</name>             
+		<config>
+			<offset>0x200</offset>       
+			<size format='FileSize'>arbel_a35_bootblock.bin</size>                 <!-- size in the header calculated by tool-->
+		</config>
+		<content format='FileContent'>arbel_a35_bootblock.bin</content>  <!-- content the user should fill -->
+	</BinField>
+	
+</Bin_Ecc_Map>

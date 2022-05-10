@@ -1,0 +1,39 @@
+From 50067a3307193c39ed559e49b0cff3f56cbc9cee Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Thu, 14 Apr 2022 15:45:43 +0800
+Subject: [PATCH] plat: nuvoton: npcm845x: fix build warning
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ plat/nuvoton/npcm845x/npcm845x_psci.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/plat/nuvoton/npcm845x/npcm845x_psci.c b/plat/nuvoton/npcm845x/npcm845x_psci.c
+index f4ac3ac22..f6db31132 100644
+--- a/plat/nuvoton/npcm845x/npcm845x_psci.c
++++ b/plat/nuvoton/npcm845x/npcm845x_psci.c
+@@ -219,8 +219,8 @@ void npcm845x_pwr_domain_on_finish(const psci_power_state_t *target_state)
+ 		INFO("%s: target_state->pwr_domain_state[%lu]=%x\n",
+ 			__func__, i, target_state->pwr_domain_state[i]);
+ 			
+-		assert(target_state->pwr_domain_state[MPIDR_AFFLVL0] ==
+-					PLAT_LOCAL_STATE_OFF);
++	assert(target_state->pwr_domain_state[MPIDR_AFFLVL0] ==
++			PLAT_LOCAL_STATE_OFF);
+ 
+ 
+ 	gicv2_pcpu_distif_init();
+@@ -244,8 +244,8 @@ void npcm845x_pwr_domain_suspend_finish(const psci_power_state_t *target_state)
+ 			__func__, i, target_state->pwr_domain_state[i]);
+ 			
+ 			
+-		assert(target_state->pwr_domain_state[MPIDR_AFFLVL0] ==
+-					PLAT_LOCAL_STATE_OFF);
++	assert(target_state->pwr_domain_state[MPIDR_AFFLVL0] ==
++			PLAT_LOCAL_STATE_OFF);
+ 
+ 
+ 	gicv2_pcpu_distif_init();
+-- 
+2.25.1
+

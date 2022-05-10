@@ -1,0 +1,214 @@
+From fcae4930d0f6a24eca27509e0acbc9da533ed64c Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Mon, 30 Nov 2020 14:33:04 +0800
+Subject: [PATCH] driver: misc: nuvoton: vdm: support openbmc libmctp
+
+---
+ drivers/misc/npcm-vdm/vdm_common.c | 87 +++---------------------------
+ drivers/misc/npcm-vdm/vdm_module.c | 26 +++++++--
+ 2 files changed, 31 insertions(+), 82 deletions(-)
+
+diff --git a/drivers/misc/npcm-vdm/vdm_common.c b/drivers/misc/npcm-vdm/vdm_common.c
+index b622da52dda7..cbf536301fb4 100644
+--- a/drivers/misc/npcm-vdm/vdm_common.c
++++ b/drivers/misc/npcm-vdm/vdm_common.c
+@@ -262,95 +262,24 @@ int vdm_SendMessage(uint8_t route_type, uint16_t aBDF,uint8_t  *apData,uint32_t
+ 	uint8_t     idx;
+ 	uint8_t 	tag,paddingBytesNum;
+ 	uint8_t 	currLength;
+-	uint32_t pci_message_header[4]={0};
+ 
+ 	ready_for_transmit=0;
+ 
+-	pci_message_header[0]=
+-			// ( ( ((1) << 5)+ ( (0x13/*1 0011 (broadcasting) */) << 0)) << 0) + // fmt + type . filled dynamically
+-			( ( ( PCIe_TC0 << 4)+  (PCIe_NO_IDO << 2) +  	// TC + atr[2]
+-					(PCIe_NO_TH << 0) ) << 8   ) + 			// TH
+-			( ( (PCIe_NO_TD << 7) + (PCIe_NO_EP << 6) +     // TD  + EP
+-					(PCIe_NO_RLX_ORDER_NO_SNOOP << 4) +     // atr[1,0]
+-					(PCIe_NO_AT << 2)  ) << 16); 			// AT
+-			//+ ( (0) << 24) ;// length . filled dynamically
+-
+-	pci_message_header[1]=
+-			( (0) << 0) + //  request ID filled automatically by HW
+-			( ( PCIe_TAG ) << 8) + // defult tag
+-			( (PCIe_MSG_VDM_TYPE1) << 24 ) ;//message code (vd type1)
+-
+-
+-	pci_message_header[2]=
+-			// ( (0) << 0) + // bus_num (reserved in broadcasting) . filled dynamically
+-			// ( ( (0 << 3) + (0 << 0) ) << 8) + // dev_num + func_num (reserved in broadcasting) . filled dynamically
+-			( ( (VDM_VENDOR_ID >> 8) & 0xff) << 16) +// vendor id msb
+-			( ( VDM_VENDOR_ID & 0xff ) << 24 ) ;// vendor id lsb
+-
+-//	PRINTF("<1>vdm:vdm_SendMessage \n"  );
+-
+ 	// data will be split by PCIe_MAX_PAYLOAD_SIZE_BYTES
+ 	while(aLength)
+ 	{
+-		if(aLength>PCIe_MAX_PAYLOAD_SIZE_BYTES)
+-		{
+-			currLength=PCIe_MAX_PAYLOAD_SIZE_BYTES;
+-		}
++		if (aLength > PCIe_MAX_PAYLOAD_SIZE_BYTES)
++			currLength = PCIe_MAX_PAYLOAD_SIZE_BYTES;
+ 		else
+-		{
+-			currLength=aLength;
+-		}
++			currLength = aLength;
++
+ 		aLength-=currLength;
+ 
+-		paddingBytesNum =  ( currLength % 4);
+-		if ( 0 != paddingBytesNum )
+-		{
++		paddingBytesNum =  (currLength % 4);
++		if (0 != paddingBytesNum )
+ 			paddingBytesNum = 4 - paddingBytesNum;
+-		}
+-
+-		/*********** fill first U32 of TLP :  ***************/
+-		pci_message_header[0] &= (~PCIe_HEADER_FMT_FIELD_MASK);
+-		pci_message_header[0] &= (~PCIe_HEADER_LENGTH_FIELD_MASK);
+-		if(currLength > 4)
+-		{
+-			pci_message_header[0] |= PCIe_HEADER_FMT_MSG_WITH_PAYLOAD;
+-			pci_message_header[0] |= ((    ((currLength-1)/4) & 0xff) << 24);
+-			pci_message_header[0] |= ( ((  ((currLength-1)/4) >> 8) & 0x3) << 16);
+-		}
+-		else
+-		{
+-			pci_message_header[0] |= PCIe_HEADER_FMT_MSG_NO_PAYLOAD;
+-		}
+-
+-		/* route_type icludes tlp type and route mechanism*/
+-		pci_message_header[0] &= (~PCIe_HEADER_ROUTE_FIELD_MASK);
+-		pci_message_header[0] |= route_type;
+-
+-		pci_message_header[0] &= (~PCIe_HEADER_ATTR_MASK);
+-		pci_message_header[0] |= PCIe_HEADER_ATTR_TEST;
+-
+-
+-		/*********** fill second U32 of TLP :  ***************/
+-		pci_message_header[1] &= (~PCIe_HEADER_TAG_FIELD_MASK);
+-		tag = (paddingBytesNum & 3 ) << 4 ;
+-		pci_message_header[1] |= (tag << 16);
+-
+-
+-		/*********** fill third U32 of TLP :  ***************/
+-		pci_message_header[2] &= (~PCIe_HEADER_DEST_BDF_FIELD_MASK);
+-
+-		if(PCIe_HEADER_ROUTE_BY_ID == route_type)
+-		{
+-			pci_message_header[2] |=
+-					( ( (aBDF >> 8) & 0xff) ) +
+-					( ( aBDF & 0xff ) << 8 ) ;
+-		}
+-
+-		iowrite32(pci_message_header[0], vdm_virt_addr + VDM_TXF_REG);
+-		iowrite32(pci_message_header[1], vdm_virt_addr + VDM_TXF_REG);
+-		iowrite32(pci_message_header[2], vdm_virt_addr + VDM_TXF_REG);
+ 
+-		while(currLength >3 )
++		while (currLength >3 )
+ 		{
+ 			txData=(apData[3]<<24) + (apData[2]<<16) + (apData[1]<<8) + (apData[0]) ;
+ 			iowrite32(txData, vdm_virt_addr + VDM_TXF_REG);
+@@ -401,7 +330,7 @@ int vdm_SendMessage(uint8_t route_type, uint16_t aBDF,uint8_t  *apData,uint32_t
+ 		// test VDM_CNT_REG_VDM_ENABLE_BIT_POS to see that PCIe bus was not reset
+ 		for (i=0 ; i< SEND_TIMEOUT; i++)
+ 		{
+-			if((read_reg_bit(VDM_TX_DONE_BIT_POS, vdm_virt_addr + VDM_STAT_REG) == 1) || vdm_is_in_reset())
++			if((read_reg_bit(VDM_CNT_REG_START_TX_BIT, vdm_virt_addr + VDM_CNT_REG) == 0) || vdm_is_in_reset())
+ 				break;
+ 			else
+ 				nano_delay(100);
+diff --git a/drivers/misc/npcm-vdm/vdm_module.c b/drivers/misc/npcm-vdm/vdm_module.c
+index 1cdcab95e8ae..b9f319fbe8d6 100644
+--- a/drivers/misc/npcm-vdm/vdm_module.c
++++ b/drivers/misc/npcm-vdm/vdm_module.c
+@@ -279,13 +279,14 @@ static ssize_t vdm_read(struct file *filp, char *buf, size_t count, loff_t *f_po
+ 	while(1)
+ 	{
+ 		spin_lock_irqsave(&lock, flags);
++#if 0
+ 		if(0 == pVDM_Instance->BDF_is_set)
+ 		{
+ 			ret = -ENOENT  ;
+ 			VDM_DEBUG_LOG(tBDF,"BDF was not set for given pVDM Instance\n");
+ 			goto unlock_and_exit;
+ 		}
+-
++#endif
+ 		if (vdm_is_in_reset())
+ 		{
+ 			pVDM_Instance->last_errors |= PCIE_VDM_ERR_BUS_RESET_OCCURED;
+@@ -380,13 +381,21 @@ static ssize_t vdm_write( struct file *filp, const char *buf, size_t count, loff
+ 		goto failed;
+ 	}
+ 	//pr_debug("<1> vdm module write start  \n");
+-
++#if 0
+ 	if((count-1) > pVDM_Instance->mptxBufferLength)
+ 	{
+ 		VDM_DEBUG_LOG(tBDF,"vdm module data length is too big\n");
+ 		ret = -EINVAL;
+ 		goto failed;
+ 	}
++#endif
++	if(count > pVDM_Instance->mptxBufferLength)
++	{
++		VDM_DEBUG_LOG(tBDF,"vdm module data length is too big\n");
++		ret = -EINVAL;
++		goto failed;
++	}
++
+ 	if(count < 2)
+ 	{
+ 		VDM_DEBUG_LOG(tBDF,"vdm module : wrong buffer\n");
+@@ -394,6 +403,14 @@ static ssize_t vdm_write( struct file *filp, const char *buf, size_t count, loff
+ 		goto failed;
+ 	}
+ 
++	if(copy_from_user( pVDM_Instance->mptxBuffer , &buf[0] , count))
++	{
++		ret = -EFAULT;
++                VDM_DEBUG_LOG(tBDF,"Failed for copying data from user\n");
++		goto failed;
++	}
++
++#if 0
+ 	if(copy_from_user( pVDM_Instance->mptxBuffer , &buf[1] , count-1))
+ 	{
+ 		ret = -EFAULT;
+@@ -407,6 +424,7 @@ static ssize_t vdm_write( struct file *filp, const char *buf, size_t count, loff
+ 		VDM_DEBUG_LOG(tBDF,"BDF was not set\n");
+ 		goto failed;
+ 	}
++
+ 	if (copy_from_user(&route_type, &buf[0], sizeof(route_type)))
+ 	{
+ 		ret = -EFAULT;
+@@ -420,8 +438,9 @@ static ssize_t vdm_write( struct file *filp, const char *buf, size_t count, loff
+ 	{
+ 		route_type=PCIe_HEADER_ROUTE_FROM_RC;
+ 	}
++#endif
+ 
+-        VDM_DEBUG_LOG(tBDF,"Before writing data route_type %d BDF 0x%X and count %d\n",route_type,pVDM_Instance->mBDF,count );
++	VDM_DEBUG_LOG(tBDF,"Before writing data route_type %d BDF 0x%X and count %d\n",route_type,pVDM_Instance->mBDF,count );
+ 
+ 	if (0 == vdm_SendMessage(route_type , pVDM_Instance->mBDF , pVDM_Instance->mptxBuffer,count-1))
+ 		ret = count;
+@@ -608,6 +627,7 @@ static int vdm_open(struct inode *inode, struct file *filp)
+ 	}
+ 
+ 	memset(pVDM_Instance,0,sizeof(vdm_instance_t));
++	pVDM_Instance_Default = pVDM_Instance;
+ 	pVDM_Instance->BDF_is_set = 0;
+ 	pVDM_Instance->last_errors = 0;
+ 	pVDM_Instance->dbg_counter = 0;
+-- 
+2.17.1
+

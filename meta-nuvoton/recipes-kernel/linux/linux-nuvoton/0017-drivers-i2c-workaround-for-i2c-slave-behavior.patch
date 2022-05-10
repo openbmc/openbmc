@@ -1,0 +1,44 @@
+From 12744251cc8ceeb3f4bb16fccb70ff0200b13dbf Mon Sep 17 00:00:00 2001
+From: kfting <kfting@nuvoton.com>
+Date: Thu, 1 Jul 2021 15:29:45 +0800
+Subject: [PATCH] drivers: i2c: workaround for i2c slave behavior
+
+1. Not verified yet.
+
+Signed-off-by: kfting <kfting@nuvoton.com>
+---
+ drivers/i2c/busses/i2c-npcm7xx.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/i2c/busses/i2c-npcm7xx.c b/drivers/i2c/busses/i2c-npcm7xx.c
+index 78dc9eeb83a2..0753cf4c41aa 100644
+--- a/drivers/i2c/busses/i2c-npcm7xx.c
++++ b/drivers/i2c/busses/i2c-npcm7xx.c
+@@ -1166,13 +1166,13 @@ static irqreturn_t npcm_i2c_int_slave_handler(struct npcm_i2c *bus)
+ 		bus->stop_ind = I2C_SLAVE_RESTART_IND;
+ 		bus->master_or_slave = I2C_SLAVE;
+ 		if (bus->operation == I2C_READ_OPER)
+-			npcm_i2c_read_fifo_slave(bus, npcm_i2c_fifo_usage(bus));
++		  npcm_i2c_slave_rd_wr(bus);
+ 		bus->operation = I2C_WRITE_OPER;
+ 		iowrite8(0, bus->reg + NPCM_I2CRXF_CTL);
+ 		val = NPCM_I2CFIF_CTS_CLR_FIFO | NPCM_I2CFIF_CTS_SLVRSTR |
+ 		      NPCM_I2CFIF_CTS_RXF_TXE;
+ 		iowrite8(val, bus->reg + NPCM_I2CFIF_CTS);
+-		npcm_i2c_slave_rd_wr(bus);
++		//npcm_i2c_slave_rd_wr(bus);
+ 		ret = IRQ_HANDLED;
+ 	}
+ 
+@@ -1511,7 +1511,7 @@ static void npcm_i2c_irq_handle_nack(struct npcm_i2c *bus)
+ 		npcm_i2c_master_stop(bus);
+ 
+ 		/* Clear SDA Status bit (by reading dummy byte) */
+-		npcm_i2c_rd_byte(bus);
++		//npcm_i2c_rd_byte(bus);
+ 
+ 		/*
+ 		 * The bus is released from stall only after the SW clears
+-- 
+2.17.1
+

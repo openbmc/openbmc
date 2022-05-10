@@ -1,0 +1,143 @@
+From 155799c9bd45e80fee3c260dcbba36fa84dabefd Mon Sep 17 00:00:00 2001
+From: Brian Ma <chma0@nuvoton.com>
+Date: Tue, 29 Jun 2021 10:34:23 +0800
+Subject: [PATCH 1/2] Add Nuvoton MCU firmware support
+
+Signed-off-by: Brian Ma <chma0@nuvoton.com>
+---
+ src/locales/en-US.json                        |  1 +
+ .../modules/Configuration/FirmwareStore.js    |  9 +++++
+ src/views/Configuration/Firmware/Firmware.vue |  5 +++
+ .../Firmware/FirmwareCardsMcu.vue             | 37 +++++++++++++++++++
+ 4 files changed, 52 insertions(+)
+ create mode 100644 src/views/Configuration/Firmware/FirmwareCardsMcu.vue
+
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index 437ce03..c087f82 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -310,6 +310,7 @@
+     "sectionTitleBmcCards": "BMC",
+     "sectionTitleBmcCardsCombined": "BMC and server",
+     "sectionTitleHostCards": "Host",
++    "sectionTitleMcuCards": "MCU",
+     "sectionTitleUpdateFirmware": "Update firmware",
+     "alert": {
+       "operationInProgress": "Server power operation in progress.",
+diff --git a/src/store/modules/Configuration/FirmwareStore.js b/src/store/modules/Configuration/FirmwareStore.js
+index c6639ff..79f8638 100644
+--- a/src/store/modules/Configuration/FirmwareStore.js
++++ b/src/store/modules/Configuration/FirmwareStore.js
+@@ -6,6 +6,7 @@ const FirmwareStore = {
+   state: {
+     bmcFirmware: [],
+     hostFirmware: [],
++    mcuFirmware: null,
+     bmcActiveFirmwareId: null,
+     hostActiveFirmwareId: null,
+     applyTime: null,
+@@ -24,6 +25,7 @@ const FirmwareStore = {
+         (firmware) => firmware.id === state.hostActiveFirmwareId
+       );
+     },
++    mcuFirmware: (state) => state.mcuFirmware,
+     backupBmcFirmware: (state) => {
+       return state.bmcFirmware.find(
+         (firmware) => firmware.id !== state.bmcActiveFirmwareId
+@@ -40,6 +42,7 @@ const FirmwareStore = {
+     setActiveHostFirmwareId: (state, id) => (state.hostActiveFirmwareId = id),
+     setBmcFirmware: (state, firmware) => (state.bmcFirmware = firmware),
+     setHostFirmware: (state, firmware) => (state.hostFirmware = firmware),
++    setMcuFirmware: (state, firmware) => (state.mcuFirmware = firmware),
+     setApplyTime: (state, applyTime) => (state.applyTime = applyTime),
+     setTftpUploadAvailable: (state, tftpAvailable) =>
+       (state.tftpAvailable = tftpAvailable),
+@@ -81,6 +84,12 @@ const FirmwareStore = {
+           const bmcFirmware = [];
+           const hostFirmware = [];
+           response.forEach(({ data }) => {
++            const Description = data?.Description;
++            if (Description === 'MCU image') {
++              // there is only one MCU firmware, and we just care version
++              const mcuFirmware = data?.Version;
++              commit('setMcuFirmware', mcuFirmware);
++            }
+             const firmwareType = data?.RelatedItem?.[0]?.['@odata.id']
+               .split('/')
+               .pop();
+diff --git a/src/views/Configuration/Firmware/Firmware.vue b/src/views/Configuration/Firmware/Firmware.vue
+index a2acb9b..bfb9b78 100644
+--- a/src/views/Configuration/Firmware/Firmware.vue
++++ b/src/views/Configuration/Firmware/Firmware.vue
+@@ -14,6 +14,9 @@
+ 
+         <!-- Host Firmware -->
+         <host-cards v-if="!isSingleFileUploadEnabled" />
++
++        <!-- MCU Firmware -->
++        <mcu-cards />
+       </b-col>
+     </b-row>
+ 
+@@ -39,6 +42,7 @@ import AlertsServerPower from './FirmwareAlertServerPower';
+ import BmcCards from './FirmwareCardsBmc';
+ import FormUpdate from './FirmwareFormUpdate';
+ import HostCards from './FirmwareCardsHost';
++import McuCards from './FirmwareCardsMcu';
+ import PageSection from '@/components/Global/PageSection';
+ import PageTitle from '@/components/Global/PageTitle';
+ 
+@@ -51,6 +55,7 @@ export default {
+     BmcCards,
+     FormUpdate,
+     HostCards,
++    McuCards,
+     PageSection,
+     PageTitle,
+   },
+diff --git a/src/views/Configuration/Firmware/FirmwareCardsMcu.vue b/src/views/Configuration/Firmware/FirmwareCardsMcu.vue
+new file mode 100644
+index 0000000..3d5641e
+--- /dev/null
++++ b/src/views/Configuration/Firmware/FirmwareCardsMcu.vue
+@@ -0,0 +1,37 @@
++<template>
++  <page-section :section-title="$t('pageFirmware.sectionTitleMcuCards')">
++    <b-card-group deck>
++      <!-- Running image -->
++      <b-card>
++        <template #header>
++          <p class="font-weight-bold m-0">
++            {{ $t('pageFirmware.cardTitleRunning') }}
++          </p>
++        </template>
++        <dl class="mb-0">
++          <dt>{{ $t('pageFirmware.cardBodyVersion') }}</dt>
++          <dd class="mb-0">{{ runningVersion }}</dd>
++        </dl>
++      </b-card>
++    </b-card-group>
++  </page-section>
++</template>
++
++<script>
++import PageSection from '@/components/Global/PageSection';
++
++export default {
++  components: { PageSection },
++  computed: {
++    runningVersion() {
++      return this.$store.getters['firmware/mcuFirmware'] || '--';
++    },
++  },
++};
++</script>
++
++<style lang="scss" scoped>
++.page-section {
++  margin-top: -$spacer * 1.5;
++}
++</style>
+-- 
+2.17.1
+

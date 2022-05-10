@@ -1,0 +1,847 @@
+From eee53b269f70fbf2e016b60f911043e5a35a3a17 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Tue, 8 Jun 2021 12:12:30 +0800
+Subject: [PATCH] driver: misc: add nuvoton vdmx/vdma driver
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ .../dts/nuvoton-npcm750-runbmc-olympus.dts    |   5 +
+ drivers/misc/Kconfig                          |   7 +
+ drivers/misc/Makefile                         |   1 +
+ drivers/misc/npcm-vdm/Kconfig                 |   2 +-
+ drivers/misc/npcm7xx-pci-vdm.c                | 760 ++++++++++++++++++
+ 5 files changed, 774 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/misc/npcm7xx-pci-vdm.c
+
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+index e08f8fb13792..693e6d311995 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+@@ -31,6 +31,7 @@
+ 		udc8 = &udc8;
+ 		udc9 = &udc9;
+ 		emmc0 = &sdhci0;
++		vdma = &vdma;
+ 		i2c0 = &i2c0;
+ 		i2c1 = &i2c1;
+ 		i2c2 = &i2c2;
+@@ -976,6 +977,10 @@
+ 	status = "okay";
+ };
+ 
++&vdma {
++	status = "okay";
++};
++
+ &vcd {
+ 	status = "okay";
+ 	memory-region = <&vcd_memory>;
+diff --git a/drivers/misc/Kconfig b/drivers/misc/Kconfig
+index 82f10fd5c0ab..4a6b6fe9c11e 100644
+--- a/drivers/misc/Kconfig
++++ b/drivers/misc/Kconfig
+@@ -506,6 +506,13 @@ config NPCM8XX_JTAG_MASTER
+ 	help
+ 	  NPCM8xx JTAG Master Interfaces.
+ 
++config NPCM7XX_PCI_VDM
++	tristate "NPCM7xx PCI VDM/VDMA Controller"
++	depends on (ARCH_NPCM || COMPILE_TEST) && REGMAP && MFD_SYSCON
++	help
++	  Expose the NPCM8xx/7xx PCI VDM/VDMA registers found on
++	  Nuvoton SOCs to userspace.
++
+ source "drivers/misc/c2port/Kconfig"
+ source "drivers/misc/eeprom/Kconfig"
+ source "drivers/misc/cb710/Kconfig"
+diff --git a/drivers/misc/Makefile b/drivers/misc/Makefile
+index 1079cd2f62d4..8ce25e00d01f 100644
+--- a/drivers/misc/Makefile
++++ b/drivers/misc/Makefile
+@@ -64,3 +64,4 @@ obj-$(CONFIG_NPCM7XX_JTAG_MASTER)	+= npcm7xx-jtag-master.o
+ obj-$(CONFIG_NPCM8XX_JTAG_MASTER)	+= npcm8xx-jtag-master.o
+ obj-$(CONFIG_MCTP_LPC)		+= mctp-lpc.o
+ obj-$(CONFIG_NPCM7XX_MCU_FLASH) += npcm7xx-mcu-flash.o
++obj-$(CONFIG_NPCM7XX_PCI_VDM)  += npcm7xx-pci-vdm.o
+diff --git a/drivers/misc/npcm-vdm/Kconfig b/drivers/misc/npcm-vdm/Kconfig
+index 3cb4b173f835..e53c4be3bd58 100644
+--- a/drivers/misc/npcm-vdm/Kconfig
++++ b/drivers/misc/npcm-vdm/Kconfig
+@@ -6,7 +6,7 @@ menu "Nuvoton Miscellaneous optional drivers"
+ config NPCM_VDM
+ 	tristate "support npcmx50 VDM on PCIe"
+ 	depends on ARCH_NPCM
+-	default y
++	default n
+ 	help
+ 	  Say Y here if you want ioctl npcmx50 VDM on PCIe.
+ 
+diff --git a/drivers/misc/npcm7xx-pci-vdm.c b/drivers/misc/npcm7xx-pci-vdm.c
+new file mode 100644
+index 000000000000..c27f2b695a94
+--- /dev/null
++++ b/drivers/misc/npcm7xx-pci-vdm.c
+@@ -0,0 +1,760 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (c) 2014-2018 Nuvoton Technology corporation.
++
++#include <linux/module.h>
++#include <linux/platform_device.h>
++#include <linux/gpio.h>
++#include <linux/of.h>
++#include <linux/of_irq.h>
++#include <linux/of_address.h>
++#include <linux/clk.h>
++#include <linux/uaccess.h>
++#include <linux/regmap.h>
++#include <linux/mfd/syscon.h>
++#include <linux/cdev.h>
++#include <linux/miscdevice.h>
++#include <linux/interrupt.h>
++#include <linux/dma-mapping.h>
++#include <linux/kfifo.h>
++#include <linux/poll.h>
++#include <linux/ptr_ring.h>
++
++#define ENABLE_VDMA 1
++
++#define DEVICE_NAME	"vdm"
++#define TX_TIMEOUT			100
++
++#ifdef CONFIG_ARCH_NPCM7XX
++/* GCR  Register */
++#define MFSEL3 0x64
++#define  MFSEL3_PCIE_PUSE BIT(17)
++#define INTCR3 0x9C
++#define  INTCR3_PCIRREL BIT(30)
++#endif
++
++/* VDM  Register */
++#define VDMX_BA 0xE0800000
++#define VDMX_STATR 0x0000
++
++#ifdef CONFIG_ARCH_NPCM7XX
++#define VDMX_IEN 0x0004
++#define VDMX_RXF 0x0008
++#define VDMX_TXF 0x000C
++#define VDMX_CNT 0x0010
++#define VDMX_RXFILT	0x0014
++#else
++#define VDMX_IEN 0x0100
++#define VDMX_RXF 0x0200
++#define VDMX_TXF 0x0300
++#define VDMX_CNT 0x0400
++#define VDMX_RXFILT	0x0500
++#endif
++
++/* VDMX_STATR */
++#define VDMX_STATR_RXNDW   GENMASK(23, 16)
++#define VDMX_STATR_RXNDW_OFFSET    16
++#define VDMX_STATR_RXDR BIT(2)
++#define VDMX_STATR_RXF BIT(1)
++#define VDMX_STATR_TXS BIT(0)
++
++/* VDMX_IEN */
++#define VDMX_IEN_RXDREN BIT(2)
++#define VDMX_IEN_RXFEN BIT(1)
++#define VDMX_IEN_TXSEN BIT(0)
++
++/* VDMX_CNT */
++#define VDMX_CNT_RXTO_05US BIT(4)
++#define VDMX_CNT_RXTO_1US  BIT(5)
++#define VDMX_CNT_RXTO_2US  (BIT(5) | BIT(4))
++#define VDMX_CNT_RXTO_4US  BIT(6)
++#define VDMX_CNT_RXTO_8US  (BIT(6) | BIT(4))
++#define VDMX_CNT_VDMXEN    BIT(1)
++#define VDMX_CNT_TXP   BIT(0)
++
++/* VDMX_RXFILT */
++#define VDMX_RXFILT_FEN    BIT(31)
++
++#define VDMX_VENDOR_ID     0xb4a1
++#define VDMX_RX_LEN	1024
++#define VDMX_TX_LEN	4
++#define VDMA_BUFFER_SIZE SZ_16K
++
++/* VDMA  Register */
++#define VDMA_CTL	0x0000
++#define  VDMA_CTL_BLOCK_BIT_POS BIT(17)
++#define  VDMA_CTL_BME BIT(9)
++#define  VDMA_CTL_VDMAEN BIT(0)
++
++#define VDMA_SRCB	0x0004
++#define VDMA_DSTB	0x0008
++#define VDMA_CDST	0x0014
++#define VDMA_CTCNT	0x0018
++#define VDMA_ECTL	0x0040
++#define  VDMA_ECTL_DRDYEN   BIT(29)
++#define  VDMA_ECTL_DRDY BIT(28)
++#define  VDMA_ECTL_NRTGIEN  BIT(27)
++#define  VDMA_ECTL_NORTG  BIT(26)
++#define  VDMA_ECTL_HALTINTEN  BIT(25)
++#define  VDMA_ECTL_DMAHALT  BIT(24)
++#define  VDMA_ECTL_BUFFSIZE_POS 16
++#define  VDMA_ECTL_RTRGREQ  BIT(12)
++#define  VDMA_ECTL_RTRGSZ	BIT(11)
++#define  VDMA_ECTL_ENSTSUP1	BIT(10)
++#define  VDMA_ECTL_ENSTSUP0	BIT(9)
++#define  VDMA_ECTL_SZOFS_POS 7
++#define  VDMA_ECTL_SZMOD_BIT23_16 (BIT(5) | BIT(4))
++#define  VDMA_ECTL_STAMPP BIT(2)
++#define  VDMA_ECTL_CYCBUF BIT(1)
++
++#define VDMA_ESRCSZ	0x0044
++#define VDMA_ERDPNT	0x0048
++#define VDMA_EST0AD	0x0050
++#define VDMA_EST0MK	0x0054
++#define VDMA_EST0DT	0x0058
++#define VDMA_EST1AD	0x0060
++#define VDMA_EST1MK	0x0064
++#define VDMA_EST1DT	0x0068
++
++#define VDMA_TX_DONE BIT(0)
++#define VDMA_RX_DONE BIT(1)
++#define VDMA_RX_FULL BIT(2)
++
++typedef void *(*copy_func_t)(void *dest, const void *src, size_t n);
++
++struct mctp_pcie_packet {
++	struct {
++		u32 hdr[4];
++		u32 payload[16];
++	} data;
++	u32 size;
++};
++
++struct npcm7xx_vdm {
++	struct device *dev;
++	struct miscdevice miscdev;
++	spinlock_t lock;
++	int is_open;
++	int irq;
++	struct regmap *vdmx_base;
++	struct regmap *vdma_base;
++	dma_addr_t  dma;
++	void *virt;
++	struct regmap *gcr_base;
++	wait_queue_head_t	wait_queue;
++	struct tasklet_struct tasklet;
++	struct ptr_ring rx_queue;
++	u32 wrap;
++};
++
++static atomic_t npcm7xx_vdm_open_count = ATOMIC_INIT(0);
++
++struct kmem_cache *packet_cache;
++
++static void *packet_alloc(gfp_t flags)
++{
++	return kmem_cache_alloc(packet_cache, flags);
++}
++
++static void packet_free(void *packet)
++{
++	kmem_cache_free(packet_cache, packet);
++}
++
++static void npcm7xx_vdm_rx_tasklet(unsigned long data)
++{
++	struct npcm7xx_vdm *priv = (struct npcm7xx_vdm *)data;
++	struct mctp_pcie_packet *rx_packet;
++	int ret;
++	u32 rdpnt = 0;
++	u32 curdst = 0;
++	u32 size = 0;
++
++	regmap_read(priv->vdma_base, VDMA_CDST, &curdst);
++	regmap_read(priv->vdma_base, VDMA_ERDPNT, &rdpnt);
++
++	dev_dbg(priv->dev, "curdst 0x%x\n", curdst);
++	dev_dbg(priv->dev, "rdpnt 0x%x\n", rdpnt);
++
++	// handle wrapped around
++	while (rdpnt > curdst) {
++		priv->wrap++;
++
++		rx_packet = packet_alloc(GFP_ATOMIC);
++		if (!rx_packet) {
++			dev_err(priv->dev, "Failed to allocate RX packet\n");
++			goto out_skip;
++		}
++
++		size = (priv->dma + VDMA_BUFFER_SIZE) - rdpnt;
++
++		if (size > sizeof(rx_packet->data))
++			size = sizeof(rx_packet->data);
++
++		memcpy(&rx_packet->data,
++		       (void *)(priv->virt + (rdpnt - priv->dma)),
++		size);
++
++		rx_packet->size = size;
++
++		ret = ptr_ring_produce(&priv->rx_queue, rx_packet);
++		if (ret) {
++			dev_warn(priv->dev, "Failed to produce RX packet: %d\n",
++				 ret);
++			packet_free(rx_packet);
++			continue;
++		}
++
++		rdpnt += size;
++
++		if (rdpnt == (priv->dma + VDMA_BUFFER_SIZE)) {
++			int left = curdst - priv->dma;
++			int free = sizeof(rx_packet->data) - size;
++
++			if (left <= free) {
++				memcpy(((void *)&rx_packet->data) + size, (void *)(priv->virt), left);
++				rx_packet->size += left;
++				rdpnt = priv->dma + left;
++			} else {
++				rdpnt = priv->dma;
++			}
++			break;
++		}
++	}
++
++	while (rdpnt < curdst) {
++		rx_packet = packet_alloc(GFP_ATOMIC);
++		if (!rx_packet) {
++			dev_err(priv->dev, "Failed to allocate RX packet\n");
++			goto out_skip;
++		}
++
++		size = curdst - rdpnt;
++		if (size > sizeof(rx_packet->data))
++			size = sizeof(rx_packet->data);
++
++		memcpy(&rx_packet->data,
++		       (void *)(priv->virt + (rdpnt - priv->dma)),
++			size);
++
++		rx_packet->size = size;
++
++		ret = ptr_ring_produce(&priv->rx_queue, rx_packet);
++		if (ret) {
++			dev_warn(priv->dev, "Failed to produce RX packet: %d\n",
++				 ret);
++			packet_free(rx_packet);
++			continue;
++		}
++
++		rdpnt += size;
++	}
++
++out_skip:
++	dev_dbg(priv->dev, "wrap count %d\n", priv->wrap);
++	dev_dbg(priv->dev, "update rdpnt to 0x%x\n", rdpnt);
++	regmap_write(priv->vdma_base, VDMA_ERDPNT, rdpnt);
++
++	wake_up_all(&priv->wait_queue);
++}
++
++static irqreturn_t npcm7xx_vdm_irq(int irq, void *arg)
++{
++	struct npcm7xx_vdm *priv = arg;
++	u32 status = 0;
++
++	regmap_read(priv->vdma_base, VDMA_ECTL, &status);
++	dev_dbg(priv->dev, "status 0x%x\n", status);
++
++	if (status & VDMA_ECTL_DRDY) {
++		dev_dbg(priv->dev, "VDMA_ECTL_DRDY\n");
++		tasklet_hi_schedule(&priv->tasklet);
++	}
++
++	if (status & VDMA_ECTL_DMAHALT) {
++		/*to do: we should reinit dam buffer if dma halt*/
++		dev_dbg(priv->dev, "VDMA_ECTL_DMAHALT\n");
++	}
++
++	if (status & VDMA_ECTL_NORTG) {
++		dev_dbg(priv->dev, "VDMA_ECTL_NORTG\n");
++	}
++
++	regmap_write(priv->vdma_base, VDMA_ECTL, status);
++
++	return IRQ_HANDLED;
++}
++
++static void npcm7xx_vdm_hw_finit(struct npcm7xx_vdm *priv)
++{
++	/* VDM RESET */
++	regmap_write(priv->vdmx_base, VDMX_CNT, 0);
++
++	/* Disable Interrupt */
++	regmap_write(priv->vdmx_base, VDMX_IEN, 0);
++
++	/* Clear VDM STAT */
++	regmap_write(priv->vdmx_base, VDMX_STATR,
++		     VDMX_STATR_RXDR | VDMX_STATR_RXF | VDMX_STATR_TXS);
++
++	/* VDMA Disable */
++	regmap_write(priv->vdma_base, VDMA_CTL, 0);
++
++	/* VDMA Disable Interrupt */
++	regmap_update_bits(priv->vdma_base, VDMA_ECTL, VDMA_ECTL_DRDYEN, ~VDMA_ECTL_DRDYEN);
++	regmap_update_bits(priv->vdma_base, VDMA_ECTL, VDMA_ECTL_HALTINTEN, ~VDMA_ECTL_HALTINTEN);
++	regmap_update_bits(priv->vdma_base, VDMA_ECTL, VDMA_ECTL_NRTGIEN, ~VDMA_ECTL_NRTGIEN);
++
++	/* Clear VDMA State*/
++	regmap_write(priv->vdma_base, VDMA_ECTL,
++		     VDMA_ECTL_DRDY | VDMA_ECTL_NORTG | VDMA_ECTL_DMAHALT);
++}
++
++static int npcm7xx_vdm_hw_init(struct npcm7xx_vdm *priv)
++{
++	int ret = 0;
++	u32 reg_val = 0;
++#ifdef CONFIG_ARCH_NPCM7XX
++	struct regmap *gcr = priv->gcr_base;
++
++	/* Configure PCIE phy selection for bridge */
++	regmap_update_bits(gcr, MFSEL3, MFSEL3_PCIE_PUSE, ~MFSEL3_PCIE_PUSE);
++#endif
++	/* Clear VDM STAT */
++	regmap_write(priv->vdmx_base, VDMX_STATR,
++		     VDMX_STATR_RXDR | VDMX_STATR_RXF | VDMX_STATR_TXS);
++
++	/* VDM RESET */
++	regmap_write(priv->vdmx_base, VDMX_CNT, 0);
++	reg_val = VDMX_CNT_RXTO_8US | VDMX_CNT_VDMXEN;
++	regmap_write(priv->vdmx_base, VDMX_CNT, reg_val);
++
++	/* VDM Filter */
++	reg_val = 0;//VDMX_RXFILT_FEN | VDMX_VENDOR_ID;
++	regmap_write(priv->vdmx_base, VDMX_RXFILT, reg_val);
++
++	/* Enable RX int */
++	regmap_write(priv->vdmx_base, VDMX_IEN, VDMX_IEN_RXFEN);
++
++	/* VDMA Disable */
++	regmap_write(priv->vdma_base, VDMA_CTL, 0);
++
++	regmap_write(priv->vdma_base, VDMA_SRCB, VDMX_BA | VDMX_RXF); // src_addr
++	regmap_write(priv->vdma_base, VDMA_DSTB, priv->dma); // dst_addr
++
++	regmap_write(priv->vdma_base, VDMA_ESRCSZ, VDMX_BA | VDMX_STATR);	// size_addr
++	regmap_write(priv->vdma_base, VDMA_ERDPNT, priv->dma);	// read pointer
++
++	regmap_write(priv->vdma_base, VDMA_EST0AD, VDMX_BA | VDMX_STATR);	// address of clear bit
++	regmap_write(priv->vdma_base, VDMA_EST0MK, 0xffffffff);
++	regmap_write(priv->vdma_base, VDMA_EST0DT, VDMX_IEN_RXFEN);
++
++	reg_val = VDMA_ECTL_DRDYEN | VDMA_ECTL_DRDY | VDMA_ECTL_HALTINTEN | VDMA_ECTL_DMAHALT |
++		VDMA_ECTL_RTRGSZ | VDMA_ECTL_ENSTSUP0 | VDMA_ECTL_CYCBUF | VDMA_ECTL_SZMOD_BIT23_16 |
++		((VDMA_BUFFER_SIZE / SZ_16K) << VDMA_ECTL_BUFFSIZE_POS);
++	regmap_write(priv->vdma_base, VDMA_ECTL, reg_val);
++
++	reg_val = VDMA_CTL_BLOCK_BIT_POS | VDMA_CTL_VDMAEN;
++	regmap_write(priv->vdma_base, VDMA_CTL, reg_val);
++
++	return ret;
++}
++
++static ssize_t npcm7xx_vdm_read(struct file *file, char __user *buf,
++				size_t count, loff_t *ppos)
++{
++	struct miscdevice *misc = file->private_data;
++	struct platform_device *pdev = to_platform_device(misc->parent);
++	struct npcm7xx_vdm *priv = platform_get_drvdata(pdev);
++	struct mctp_pcie_packet *rx_packet;
++
++	if (buf && count > 0) {
++		rx_packet = ptr_ring_consume_bh(&priv->rx_queue);
++		if (!rx_packet)
++			return -EAGAIN;
++
++		if (count > rx_packet->size)
++			count = rx_packet->size;
++
++		if (copy_to_user(buf, &rx_packet->data, count)) {
++			dev_err(priv->dev, "copy to user failed\n");
++			packet_free(rx_packet);
++			return -EFAULT;
++		}
++
++		packet_free(rx_packet);
++	}
++
++	return count;
++}
++
++static int
++npcm7xx_vdm_send(struct npcm7xx_vdm *priv, u8 *txbuf, int size)
++{
++	u32 timeout, stat;
++	int i, ret = -EIO;
++
++	regmap_read(priv->vdmx_base, VDMX_CNT, &stat);
++	if (stat & VDMX_CNT_VDMXEN) {
++		ret = size;
++
++		for (i = 0; i < size; i += VDMX_TX_LEN)
++			regmap_write(priv->vdmx_base, VDMX_TXF, readl(txbuf + i));
++
++		regmap_update_bits(priv->vdmx_base, VDMX_CNT, VDMX_CNT_TXP, VDMX_CNT_TXP);
++
++		timeout = wait_event_interruptible_timeout(priv->wait_queue,
++							   !regmap_read(priv->vdmx_base, VDMX_CNT, &stat) &
++							!(stat & VDMX_CNT_TXP),
++							msecs_to_jiffies(TX_TIMEOUT));
++		if (!timeout) {
++			dev_err(priv->dev, "vdm send timeout 0x%x\n", stat);
++			ret = -EIO;
++		}
++
++		regmap_update_bits(priv->vdmx_base, VDMX_STATR, VDMX_STATR_TXS, VDMX_STATR_TXS);
++	}
++
++	return ret;
++}
++
++static ssize_t npcm7xx_vdm_write(struct file *file, const char __user *buf,
++				 size_t count, loff_t *ppos)
++{
++	struct miscdevice *misc = file->private_data;
++	struct platform_device *pdev = to_platform_device(misc->parent);
++	struct npcm7xx_vdm *priv = platform_get_drvdata(pdev);
++	struct mctp_pcie_packet *tx_packet;
++	int ret;
++
++	if (!access_ok(buf, count)) {
++		ret = -EFAULT;
++		goto out;
++	}
++
++	tx_packet = packet_alloc(GFP_KERNEL);
++	if (!tx_packet) {
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	if (buf && count > 0) {
++		if (count > sizeof(tx_packet->data)) {
++			ret = -ENOSPC;
++			goto out_packet;
++		}
++
++		if (copy_from_user(&tx_packet->data, buf, count)) {
++			dev_err(priv->dev, "copy from user failed\n");
++			ret = -EFAULT;
++			goto out_packet;
++		}
++		tx_packet->size = count;
++
++		ret = npcm7xx_vdm_send(priv, (u8 *)&tx_packet->data, tx_packet->size);
++	}
++
++out_packet:
++	packet_free(tx_packet);
++out:
++	return ret;
++}
++
++static int npcm7xx_vdm_open(struct inode *inode, struct file *file)
++{
++	struct miscdevice *misc = file->private_data;
++	struct platform_device *pdev = to_platform_device(misc->parent);
++	struct npcm7xx_vdm *priv = platform_get_drvdata(pdev);
++
++	if (atomic_inc_return(&npcm7xx_vdm_open_count) == 1) {
++		if (npcm7xx_vdm_hw_init(priv)) {
++			dev_err(priv->dev, "Failed to init VDM\n");
++			return -EBUSY;
++		}
++
++		local_bh_disable();
++		tasklet_hi_schedule(&priv->tasklet);
++		local_bh_enable();
++
++		return 0;
++	}
++
++	atomic_dec(&npcm7xx_vdm_open_count);
++	return -EBUSY;
++}
++
++static int npcm7xx_vdm_release(struct inode *inode, struct file *file)
++{
++	struct miscdevice *misc = file->private_data;
++	struct platform_device *pdev = to_platform_device(misc->parent);
++	struct npcm7xx_vdm *priv = platform_get_drvdata(pdev);
++
++	if (atomic_dec_return(&npcm7xx_vdm_open_count) == 0)
++		npcm7xx_vdm_hw_finit(priv);
++
++	return 0;
++}
++
++static __poll_t npcm7xx_vdm_poll(struct file *file,
++				 struct poll_table_struct *pt)
++{
++	struct miscdevice *misc = file->private_data;
++	struct platform_device *pdev = to_platform_device(misc->parent);
++	struct npcm7xx_vdm *priv = platform_get_drvdata(pdev);
++
++	__poll_t ret = 0;
++
++	poll_wait(file, &priv->wait_queue, pt);
++
++	if (__ptr_ring_peek(&priv->rx_queue))
++		ret |= EPOLLIN;
++
++	return ret;
++}
++
++const struct file_operations npcm7xx_vdm_fops = {
++	.llseek = noop_llseek,
++	.open = npcm7xx_vdm_open,
++	.read = npcm7xx_vdm_read,
++	.write = npcm7xx_vdm_write,
++	.release = npcm7xx_vdm_release,
++	.poll = npcm7xx_vdm_poll,
++};
++
++static int npcm7xx_vdm_config_irq(struct npcm7xx_vdm *priv)
++{
++	struct platform_device *pdev = to_platform_device(priv->dev);
++	int irq, ret;
++
++	irq = platform_get_irq(pdev, 0);
++	if (!irq)
++		return -ENODEV;
++
++	ret = devm_request_irq(priv->dev, irq, npcm7xx_vdm_irq, IRQF_SHARED, DEVICE_NAME, priv);
++	if (ret < 0) {
++		dev_err(priv->dev, "Unable to request IRQ %d\n", irq);
++		return ret;
++	}
++
++	return 0;
++}
++
++static void npcm7xx_vdm_tsk_init(struct npcm7xx_vdm *priv)
++{
++	spin_lock_init(&priv->lock);
++	init_waitqueue_head(&priv->wait_queue);
++
++	ptr_ring_init(&priv->rx_queue, VDMX_RX_LEN, GFP_ATOMIC);
++
++	tasklet_init(&priv->tasklet, npcm7xx_vdm_rx_tasklet,
++		     (unsigned long)priv);
++}
++
++static void npcm7xx_vdm_tsk_fini(struct npcm7xx_vdm *priv)
++{
++	tasklet_disable(&priv->tasklet);
++	tasklet_kill(&priv->tasklet);
++}
++
++static const struct regmap_config npcm7xx_vdmx_regmap_cfg = {
++	.reg_bits       = 32,
++	.reg_stride     = 4,
++	.val_bits       = 32,
++	.max_register   = VDMX_RXFILT,
++};
++
++static const struct regmap_config npcm7xx_vdma_regmap_cfg = {
++	.reg_bits       = 32,
++	.reg_stride     = 4,
++	.val_bits       = 32,
++	.max_register   = VDMA_EST1DT,
++};
++
++static int npcm7xx_vdm_resources_init(struct npcm7xx_vdm *priv)
++{
++	struct platform_device *pdev = to_platform_device(priv->dev);
++
++	void __iomem *regs;
++
++	regs = devm_platform_ioremap_resource(pdev, 0);
++	if (IS_ERR(regs)) {
++		dev_err(priv->dev, "Failed to get regmap!\n");
++		return PTR_ERR(regs);
++	}
++
++	priv->vdmx_base = devm_regmap_init_mmio(priv->dev, regs,
++						&npcm7xx_vdmx_regmap_cfg);
++	if (IS_ERR(priv->vdmx_base))
++		return PTR_ERR(priv->vdmx_base);
++
++	regs = devm_platform_ioremap_resource(pdev, 1);
++	if (IS_ERR(regs)) {
++		dev_err(priv->dev, "Failed to get regmap!\n");
++		return PTR_ERR(regs);
++	}
++
++	priv->vdma_base = devm_regmap_init_mmio(priv->dev, regs,
++						&npcm7xx_vdma_regmap_cfg);
++	if (IS_ERR(priv->vdma_base))
++		return PTR_ERR(priv->vdma_base);
++
++#ifdef CONFIG_ARCH_NPCM7XX
++	priv->gcr_base =
++		syscon_regmap_lookup_by_compatible("nuvoton,npcm750-gcr");
++	if (IS_ERR(priv->gcr_base)) {
++		dev_err(priv->dev, "failed to find nuvoton,npcm750-gcr\n");
++		return PTR_ERR(priv->gcr_base);
++	}
++#endif
++	platform_set_drvdata(pdev, priv);
++
++	return 0;
++}
++
++static int npcm7xx_vdm_dma_init(struct npcm7xx_vdm *priv)
++{
++	priv->virt = dma_alloc_coherent(priv->dev, VDMA_BUFFER_SIZE,
++					&priv->dma, GFP_KERNEL);
++	if (!priv->virt)
++		return -ENOMEM;
++
++	return 0;
++}
++
++static void npcm7xx_vdm_dma_fini(struct npcm7xx_vdm *priv)
++{
++	dma_free_coherent(priv->dev, VDMA_BUFFER_SIZE,
++			  priv->virt, priv->dma);
++}
++
++struct device_type npcm7xx_vdm_type = {
++	.name		= DEVICE_NAME,
++};
++
++static struct miscdevice npcm7xx_vdm_miscdev = {
++	.minor = MISC_DYNAMIC_MINOR,
++	.name = DEVICE_NAME,
++	.fops = &npcm7xx_vdm_fops,
++};
++
++static int npcm_vdm_probe(struct platform_device *pdev)
++{
++	struct npcm7xx_vdm *priv;
++	int ret;
++
++	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
++	if (!priv) {
++		ret = -ENOMEM;
++		goto out;
++	}
++	priv->dev = &pdev->dev;
++	dev_set_drvdata(&pdev->dev, priv);
++
++	ret = npcm7xx_vdm_resources_init(priv);
++	if (ret) {
++		dev_err(priv->dev, "Failed to init resources\n");
++		goto out_drv;
++	}
++
++	ret = npcm7xx_vdm_dma_init(priv);
++	if (ret) {
++		dev_err(priv->dev, "Failed to init DMA\n");
++		goto out_drv;
++	}
++
++	/* register miscdev */
++	npcm7xx_vdm_miscdev.parent = priv->dev;
++	ret = misc_register(&npcm7xx_vdm_miscdev);
++	if (ret) {
++		dev_err(priv->dev, "Failed to register miscdev\n");
++		goto out_dma;
++	}
++	npcm7xx_vdm_miscdev.this_device->type = &npcm7xx_vdm_type;
++
++	npcm7xx_vdm_hw_finit(priv);
++
++	npcm7xx_vdm_tsk_init(priv);
++
++	ret = npcm7xx_vdm_config_irq(priv);
++	if (ret) {
++		dev_err(priv->dev, "Failed to configure IRQ\n");
++		goto out_dma;
++	}
++
++	pr_info("NPCM7XX VDM Driver probed\n");
++
++	return 0;
++
++out_dma:
++	npcm7xx_vdm_dma_fini(priv);
++out_drv:
++	npcm7xx_vdm_tsk_fini(priv);
++out:
++	dev_err(priv->dev, "Failed to probe Nuvoton VDM: %d\n", ret);
++	return ret;
++}
++
++static int npcm_vdm_remove(struct platform_device *pdev)
++{
++	struct npcm7xx_vdm *priv = platform_get_drvdata(pdev);
++
++	if (!priv)
++		return 0;
++
++	misc_deregister(&npcm7xx_vdm_miscdev);
++
++	ptr_ring_cleanup(&priv->rx_queue, &packet_free);
++
++	npcm7xx_vdm_hw_finit(priv);
++
++	npcm7xx_vdm_dma_fini(priv);
++
++	npcm7xx_vdm_tsk_fini(priv);
++
++	kfree(priv);
++
++	return 0;
++}
++
++static const struct of_device_id npcm7xx_vdm_match[] = {
++	{ .compatible = "nuvoton,npcm750-vdm", },
++	{ .compatible = "nuvoton,npcm845-vdm", },
++	{},
++};
++
++static struct platform_driver npcm_vdm_driver = {
++	.probe          = npcm_vdm_probe,
++	.remove			= npcm_vdm_remove,
++	.driver         = {
++		.name   = DEVICE_NAME,
++		.owner	= THIS_MODULE,
++		.of_match_table = npcm7xx_vdm_match,
++	},
++};
++
++static int __init npcm_vdm_init(void)
++{
++	packet_cache =
++		kmem_cache_create_usercopy("mctp-packet",
++					   sizeof(struct mctp_pcie_packet),
++					   0, 0, 0,
++					   sizeof(struct mctp_pcie_packet),
++					   NULL);
++	if (!packet_cache)
++		return -ENOMEM;
++
++	return platform_driver_register(&npcm_vdm_driver);
++}
++
++static void __exit npcm_vdm_exit(void)
++{
++	platform_driver_unregister(&npcm_vdm_driver);
++	kmem_cache_destroy(packet_cache);
++}
++
++module_init(npcm_vdm_init)
++module_exit(npcm_vdm_exit)
++
++MODULE_DEVICE_TABLE(of, npcm7xx_vdm_match);
++MODULE_AUTHOR("Nuvoton Technology Corp.");
++MODULE_DESCRIPTION("VDM Master Driver");
++MODULE_LICENSE("GPL");
+-- 
+2.17.1
+

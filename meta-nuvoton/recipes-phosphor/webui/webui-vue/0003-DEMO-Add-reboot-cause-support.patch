@@ -1,0 +1,105 @@
+From a9a54e019f0423d583794b71e47ff4248febe7c8 Mon Sep 17 00:00:00 2001
+From: Brian Ma <chma0@nuvoton.com>
+Date: Tue, 29 Jun 2021 10:42:42 +0800
+Subject: [PATCH 2/2] [DEMO]Add reboot cause support
+
+---
+ src/locales/en-US.json                    |  1 +
+ src/store/modules/Control/ControlStore.js | 24 +++++++++++++++++++++++
+ src/views/Control/RebootBmc/RebootBmc.vue |  7 +++++++
+ 3 files changed, 32 insertions(+)
+
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index c087f82..1bc7704 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -635,6 +635,7 @@
+   "pageRebootBmc": {
+     "lastReboot": "Last BMC reboot",
+     "rebootBmc": "Reboot BMC",
++    "rebootCause": "Reboot cause:",
+     "rebootInformation": "When you reboot the BMC, your web browser loses contact with the BMC for several minutes. When the BMC is back online, you may need to log in again.",
+     "modal": {
+       "confirmMessage": "Are you sure you want to reboot the BMC?",
+diff --git a/src/store/modules/Control/ControlStore.js b/src/store/modules/Control/ControlStore.js
+index 9b8bf73..09e8b95 100644
+--- a/src/store/modules/Control/ControlStore.js
++++ b/src/store/modules/Control/ControlStore.js
+@@ -34,11 +34,13 @@ const ControlStore = {
+     isOperationInProgress: false,
+     lastPowerOperationTime: null,
+     lastBmcRebootTime: null,
++    lastBmcRebootCause: null,
+   },
+   getters: {
+     isOperationInProgress: (state) => state.isOperationInProgress,
+     lastPowerOperationTime: (state) => state.lastPowerOperationTime,
+     lastBmcRebootTime: (state) => state.lastBmcRebootTime,
++    lastBmcRebootCause: (state) => state.lastBmcRebootCause,
+   },
+   mutations: {
+     setOperationInProgress: (state, inProgress) =>
+@@ -47,6 +49,8 @@ const ControlStore = {
+       (state.lastPowerOperationTime = lastPowerOperationTime),
+     setLastBmcRebootTime: (state, lastBmcRebootTime) =>
+       (state.lastBmcRebootTime = lastBmcRebootTime),
++    setLastBmcRebootCause: (state, lastBmcRebootCause) =>
++      (state.lastBmcRebootCause = lastBmcRebootCause),
+   },
+   actions: {
+     async getLastPowerOperationTime({ commit }) {
+@@ -62,6 +66,26 @@ const ControlStore = {
+         .catch((error) => console.log(error));
+     },
+     getLastBmcRebootTime({ commit }) {
++      // get reboot cause first
++      api
++        .get('/xyz/openbmc_project/state/bmc0/attr/LastRebootCause')
++        .then((response) => {
++          const lastRebootCause = response.data.data;
++          console.log(lastRebootCause);
++          if (
++            lastRebootCause === 'xyz.openbmc_project.State.BMC.RebootCause.POR'
++          ) {
++            commit('setLastBmcRebootCause', 'Power-On-Reset');
++          } else if (
++            lastRebootCause ===
++            'xyz.openbmc_project.State.BMC.RebootCause.Watchdog'
++          ) {
++            commit('setLastBmcRebootCause', 'Watchdog');
++          } else {
++            commit('setLastBmcRebootCause', 'Unknown');
++          }
++        })
++        .catch((error) => console.log(error));
+       return api
+         .get('/redfish/v1/Managers/bmc')
+         .then((response) => {
+diff --git a/src/views/Control/RebootBmc/RebootBmc.vue b/src/views/Control/RebootBmc/RebootBmc.vue
+index 900619c..910188e 100644
+--- a/src/views/Control/RebootBmc/RebootBmc.vue
++++ b/src/views/Control/RebootBmc/RebootBmc.vue
+@@ -15,6 +15,10 @@
+                   {{ lastBmcRebootTime | formatTime }}
+                 </dd>
+                 <dd v-else>--</dd>
++                <dd>
++                  {{ $t('pageRebootBmc.rebootCause') }}
++                  {{ lastBmcRebootCause }}
++                </dd>
+               </dl>
+             </b-col>
+           </b-row>
+@@ -51,6 +55,9 @@ export default {
+     lastBmcRebootTime() {
+       return this.$store.getters['controls/lastBmcRebootTime'];
+     },
++    lastBmcRebootCause() {
++      return this.$store.getters['controls/lastBmcRebootCause'] || '--';
++    },
+   },
+   created() {
+     this.startLoader();
+-- 
+2.17.1
+

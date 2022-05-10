@@ -1,0 +1,12 @@
+diff -Nur a/mk/gcc.mk b/mk/gcc.mk
+--- a/mk/gcc.mk	2022-03-06 10:30:27.518860700 +0200
++++ b/mk/gcc.mk	2022-03-07 10:42:04.764306171 +0200
+@@ -13,7 +13,7 @@
+ 			-print-file-name=include 2> /dev/null)
+ 
+ # Get location of libgcc from gcc
+-libgcc$(sm)  	:= $(shell $(CC$(sm)) $(CFLAGS$(arch-bits-$(sm))) \
++libgcc$(sm)  	:= $(shell $(CC$(sm)) $(LIBGCC_LOCATE_CFLAGS) $(CFLAGS$(arch-bits-$(sm))) $(comp-cflags$(sm)) \
+ 			-print-libgcc-file-name 2> /dev/null)
+ libstdc++$(sm)	:= $(shell $(CXX$(sm)) $(CXXFLAGS$(arch-bits-$(sm))) $(comp-cxxflags$(sm)) \
+ 			-print-file-name=libstdc++.a 2> /dev/null)

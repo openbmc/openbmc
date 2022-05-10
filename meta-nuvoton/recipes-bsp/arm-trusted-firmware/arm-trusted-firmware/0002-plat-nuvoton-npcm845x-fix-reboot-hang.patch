@@ -1,0 +1,27 @@
+From a62ae26bdc74acca92acfcd129e8c84dabc15941 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Mon, 18 Apr 2022 14:27:51 +0800
+Subject: [PATCH] plat: nuvoton: npcm845x: fix reboot hang
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ plat/nuvoton/npcm845x/npcm845x_psci.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/plat/nuvoton/npcm845x/npcm845x_psci.c b/plat/nuvoton/npcm845x/npcm845x_psci.c
+index f6db31132..a8b919d85 100644
+--- a/plat/nuvoton/npcm845x/npcm845x_psci.c
++++ b/plat/nuvoton/npcm845x/npcm845x_psci.c
+@@ -266,7 +266,8 @@ void __dead2 npcm845x_system_reset(void)
+ 	 * In future - support all reset types. For now, SW1 reset
+ 	 * Enable software reset 1 to reboot the BMC
+ 	 */ 
+-	mmio_write_32(SWRSTR, SWRSTR_SWRST1);
++	//mmio_write_32(SWRSTR, SWRSTR_SWRST1);
++	mmio_write_32(0xf000801c, 0x83);
+ 	while (1);
+ }
+ 
+-- 
+2.17.1
+

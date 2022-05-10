@@ -1,0 +1,888 @@
+commit 61623e4129178233eeaf5a0f0e7013271f5a88d2
+Author: Medad CChien <ctcchien@nuvoton.com>
+Date:   Mon Mar 15 09:38:57 2021 +0800
+
+    support pldm sensors and effecters
+    
+    Signed-off-by: Medad CChien <ctcchien@nuvoton.com>
+
+diff --git a/app/common/directives/app-navigation.html b/app/common/directives/app-navigation.html
+index 41441e27..04fa60eb 100644
+--- a/app/common/directives/app-navigation.html
++++ b/app/common/directives/app-navigation.html
+@@ -27,6 +27,11 @@
+             <span>Sensors</span>
+           </a>
+         </li>
++        <li ng-class="{'active': (path == '/server-health/pldm-overview' || path == '/server-health/pldm')}">
++          <a href="#/server-health/pldm-overview" tabindex="{{(showHealthMenu) ? 0 : -1}}">
++            <span>PLDM</span>
++          </a>
++        </li>
+       </ul>
+     </li>
+     <li ng-class="{opened: showControlMenu}">
+@@ -116,4 +121,4 @@
+       </ul>
+     </li>
+   </ul>
+-</nav>
+\ No newline at end of file
++</nav>
+diff --git a/app/common/services/api-utils.js b/app/common/services/api-utils.js
+index f10476d8..2a1fd1f8 100644
+--- a/app/common/services/api-utils.js
++++ b/app/common/services/api-utils.js
+@@ -1051,6 +1051,359 @@ window.angular && (function(angular) {
+                     console.log(error);
+                   });
+         },
++        getAllNumericSensorStatus: function(callback) {
++          $http({
++            method: 'GET',
++            url: DataService.getHost() +
++                '/xyz/openbmc_project/numericsensors/enumerate',
++            withCredentials: true
++          })
++              .then(
++                  function(response) {
++                    var json = JSON.stringify(response.data);
++                    var content = JSON.parse(json);
++                    var dataClone = JSON.parse(JSON.stringify(content.data));
++                    var sensorData = [];
++                    var severity = {};
++                    var title = '';
++                    var tempKeyParts = [];
++                    var order = 0;
++                    var customOrder = 0;
++
++                    function getSensorStatus(reading) {
++                      var severityFlags = {
++                        critical: false,
++                        warning: false,
++                        normal: false
++                      },
++                          severityText = '', order = 0;
++
++                      if (reading.hasOwnProperty('CriticalLow') &&
++                          reading.Value < reading.CriticalLow) {
++                        severityFlags.critical = true;
++                        severityText = 'critical';
++                        order = 2;
++                      } else if (
++                          reading.hasOwnProperty('CriticalHigh') &&
++                          reading.Value > reading.CriticalHigh) {
++                        severityFlags.critical = true;
++                        severityText = 'critical';
++                        order = 2;
++                      } else if (
++                          reading.hasOwnProperty('CriticalLow') &&
++                          reading.hasOwnProperty('WarningLow') &&
++                          reading.Value >= reading.CriticalLow &&
++                          reading.Value <= reading.WarningLow) {
++                        severityFlags.warning = true;
++                        severityText = 'warning';
++                        order = 1;
++                      } else if (
++                          reading.hasOwnProperty('WarningHigh') &&
++                          reading.hasOwnProperty('CriticalHigh') &&
++                          reading.Value >= reading.WarningHigh &&
++                          reading.Value <= reading.CriticalHigh) {
++                        severityFlags.warning = true;
++                        severityText = 'warning';
++                        order = 1;
++                      } else {
++                        severityFlags.normal = true;
++                        severityText = 'normal';
++                      }
++                      return {
++                        flags: severityFlags,
++                        severityText: severityText,
++                        order: order
++                      };
++                    }
++
++                    for (var key in content.data) {
++                      if (content.data.hasOwnProperty(key) &&
++                          content.data[key].hasOwnProperty('Unit')) {
++                        severity = getSensorStatus(content.data[key]);
++
++                        if (!content.data[key].hasOwnProperty('CriticalLow')) {
++                          content.data[key].CriticalLow = '--';
++                          content.data[key].CriticalHigh = '--';
++                        }
++
++                        if (!content.data[key].hasOwnProperty('WarningLow')) {
++                          content.data[key].WarningLow = '--';
++                          content.data[key].WarningHigh = '--';
++                        }
++
++                        tempKeyParts = key.split('/');
++                        title = tempKeyParts.pop();
++                        title = tempKeyParts.pop() + '_' + title;
++                        title = title.split('_')
++                                    .map(function(item) {
++                                      return item.toLowerCase()
++                                                 .charAt(0)
++                                                 .toUpperCase() +
++                                          item.slice(1);
++                                    })
++                                    .reduce(function(prev, el) {
++                                      return prev + ' ' + el;
++                                    });
++
++                        if (Constants.SENSOR_SORT_ORDER.indexOf(
++                                content.data[key].Unit) > -1) {
++                          customOrder = Constants.SENSOR_SORT_ORDER.indexOf(
++                              content.data[key].Unit);
++                        } else {
++                          customOrder = Constants.SENSOR_SORT_ORDER_DEFAULT;
++                        }
++
++                        sensorData.push(Object.assign(
++                            {
++                              path: key,
++                              selected: false,
++                              confirm: false,
++                              copied: false,
++                              title: title,
++                              unit:
++                                  Constants
++                                      .SENSOR_UNIT_MAP[content.data[key].Unit],
++                              severity_flags: severity.flags,
++                              status: severity.severityText,
++                              order: severity.order,
++                              custom_order: customOrder,
++                              search_text:
++                                  (title + ' ' + content.data[key].Value + ' ' +
++                                   Constants.SENSOR_UNIT_MAP[content.data[key]
++                                                                 .Unit] +
++                                   ' ' + severity.severityText + ' ' +
++                                   content.data[key].CriticalLow + ' ' +
++                                   content.data[key].CriticalHigh + ' ' +
++                                   content.data[key].WarningLow + ' ' +
++                                   content.data[key].WarningHigh + ' ')
++                                      .toLowerCase(),
++                              original_data:
++                                  {key: key, value: content.data[key]}
++                            },
++                            content.data[key]));
++                      }
++                    }
++
++                    sensorData.sort(function(a, b) {
++                      return a.title.localeCompare(
++                          b.title, 'en', {numeric: true});
++                    });
++
++                    callback(sensorData, dataClone);
++                  },
++                  function(error) {
++                    console.log(error);
++                  });
++        },
++        toggleEffecterState: function(path, state) {
++          return $http({
++                   method: 'PUT',
++                   url: DataService.getHost() + path + '/attr/setDeviceState',
++                   //url: DataService.getHost() + '/xyz/openbmc_project/effecters/GPIO/PLDM_GPIO91' + '/attr/setDeviceState',
++                   //url: DataService.getHost() + '/xyz/openbmc_project/numericeffecters/FAN_PWM/PLDM_FAN_PWM1' + '/attr/setNumericValue',
++                   withCredentials: true,
++                   data: JSON.stringify({'data': state})
++                 })
++              .then(function(response) {
++                return response.data;
++              });
++        },
++        setEffecterValue: function(path, value) {
++          return $http({
++                   method: 'PUT',
++                   url: DataService.getHost() + path + '/attr/setNumericValue',
++                   //url: DataService.getHost() + '/xyz/openbmc_project/numericeffecters/FAN_PWM/PLDM_FAN_PWM1' + '/attr/setNumericValue',
++                   //url: DataService.getHost() + '/xyz/openbmc_project/numericeffecters/FAN_PWM/PLDM_FAN_PWM1' + '/attr/setDeviceState',
++                   withCredentials: true,
++                   data: JSON.stringify({'data': value})
++                 })
++              .then(function(response) {
++                return response.data;
++              });
++        },
++        getAllEffecterStatus: function(callback) {
++          $http({
++            method: 'GET',
++            url: DataService.getHost() +
++                '/xyz/openbmc_project/stateeffecters/enumerate',
++            withCredentials: true
++          })
++              .then(
++                  function(response) {
++                    var json = JSON.stringify(response.data);
++                    var content = JSON.parse(json);
++                    var dataClone = JSON.parse(JSON.stringify(content.data));
++                    var effecterData = [];
++                    var title = '';
++                    var tempKeyParts = [];
++ 
++                    for (var key in content.data) {
++                      if (content.data.hasOwnProperty(key)) {
++
++                        tempKeyParts = key.split('/');
++                        title = tempKeyParts.pop();
++                        title = tempKeyParts.pop() + '_' + title;
++                        title = title.split('_')
++                                    .map(function(item) {
++                                      return item.toLowerCase()
++                                                 .charAt(0)
++                                                 .toUpperCase() +
++                                          item.slice(1);
++                                    })
++                                    .reduce(function(prev, el) {
++                                      return prev + ' ' + el;
++                                    });
++
++                        effecterData.push(Object.assign(
++                            {
++                              path: key,
++                              selected: false,
++                              confirm: false,
++                              copied: false,
++                              title: title,
++                              search_text:
++                                  (title + ' ' + content.data[key].Value + ' ')
++                                      .toLowerCase(),
++                              original_data:
++                                  {key: key, value: content.data[key]}
++                            },
++                            content.data[key]));
++                      }
++                    }
++
++                    effecterData.sort(function(a, b) {
++                      return a.title.localeCompare(
++                          b.title, 'en', {numeric: true});
++                    });
++
++                    callback(effecterData, dataClone);
++                  },
++                  function(error) {
++                    console.log(error);
++                  });
++        },
++        getAllNumericEffecterStatus: function(callback) {
++          $http({
++            method: 'GET',
++            url: DataService.getHost() +
++                '/xyz/openbmc_project/numericeffecters/enumerate',
++            withCredentials: true
++          })
++              .then(
++                  function(response) {
++                    var json = JSON.stringify(response.data);
++                    var content = JSON.parse(json);
++                    var dataClone = JSON.parse(JSON.stringify(content.data));
++                    var statesensorData = [];
++                    var title = '';
++                    var tempKeyParts = [];
++ 
++                    for (var key in content.data) {
++                      if (content.data.hasOwnProperty(key)) {
++
++                        tempKeyParts = key.split('/');
++                        title = tempKeyParts.pop();
++                        title = tempKeyParts.pop() + '_' + title;
++                        title = title.split('_')
++                                    .map(function(item) {
++                                      return item.toLowerCase()
++                                                 .charAt(0)
++                                                 .toUpperCase() +
++                                          item.slice(1);
++                                    })
++                                    .reduce(function(prev, el) {
++                                      return prev + ' ' + el;
++                                    });
++
++                        statesensorData.push(Object.assign(
++                            {
++                              path: key,
++                              selected: false,
++                              confirm: false,
++                              copied: false,
++                              title: title,
++                              search_text:
++                                  (title + ' ' + content.data[key].Value + ' ')
++                                      .toLowerCase(),
++                              original_data:
++                                  {key: key, value: content.data[key]}
++                            },
++                            content.data[key]));
++                      }
++                    }
++
++                    statesensorData.sort(function(a, b) {
++                      return a.title.localeCompare(
++                          b.title, 'en', {numeric: true});
++                    });
++
++                    callback(statesensorData, dataClone);
++                  },
++                  function(error) {
++                    console.log(error);
++                  });
++        },
++        getAllStateSensorStatus: function(callback) {
++          $http({
++            method: 'GET',
++            url: DataService.getHost() +
++                '/xyz/openbmc_project/statesensors/enumerate',
++            withCredentials: true
++          })
++              .then(
++                  function(response) {
++                    var json = JSON.stringify(response.data);
++                    var content = JSON.parse(json);
++                    var dataClone = JSON.parse(JSON.stringify(content.data));
++                    var statesensorData = [];
++                    var title = '';
++                    var tempKeyParts = [];
++ 
++                    for (var key in content.data) {
++                      if (content.data.hasOwnProperty(key)) {
++
++                        tempKeyParts = key.split('/');
++                        title = tempKeyParts.pop();
++                        title = tempKeyParts.pop() + '_' + title;
++                        title = title.split('_')
++                                    .map(function(item) {
++                                      return item.toLowerCase()
++                                                 .charAt(0)
++                                                 .toUpperCase() +
++                                          item.slice(1);
++                                    })
++                                    .reduce(function(prev, el) {
++                                      return prev + ' ' + el;
++                                    });
++
++                        statesensorData.push(Object.assign(
++                            {
++                              path: key,
++                              selected: false,
++                              confirm: false,
++                              copied: false,
++                              title: title,
++                              search_text:
++                                  (title + ' ' + content.data[key].Value + ' ')
++                                      .toLowerCase(),
++                              original_data:
++                                  {key: key, value: content.data[key]}
++                            },
++                            content.data[key]));
++                      }
++                    }
++
++                    statesensorData.sort(function(a, b) {
++                      return a.title.localeCompare(
++                          b.title, 'en', {numeric: true});
++                    });
++
++                    callback(statesensorData, dataClone);
++                  },
++                  function(error) {
++                    console.log(error);
++                  });
++        },
+         getActivation: function(imageId) {
+           return $http({
+                    method: 'GET',
+diff --git a/app/index.js b/app/index.js
+index 156fab6b..fa0d9e6f 100644
+--- a/app/index.js
++++ b/app/index.js
+@@ -98,6 +98,7 @@ import server_health_index from './server-health/index.js';
+ import inventory_overview_controller from './server-health/controllers/inventory-overview-controller.js';
+ import log_controller from './server-health/controllers/log-controller.js';
+ import sensors_overview_controller from './server-health/controllers/sensors-overview-controller.js';
++import pldm_overview_controller from './server-health/controllers/pldm-overview-controller.js';
+ import syslog_controller from './server-health/controllers/syslog-controller.js';
+ import syslog_filter from './common/directives/syslog-filter.js';
+ import remote_logging_server from './server-health/directives/remote-logging-server.js';
+diff --git a/app/server-health/controllers/pldm-overview-controller.html b/app/server-health/controllers/pldm-overview-controller.html
+new file mode 100644
+index 00000000..1c55677b
+--- /dev/null
++++ b/app/server-health/controllers/pldm-overview-controller.html
+@@ -0,0 +1,274 @@
++<loader loading="loading"></loader>
++<div id="stateeffecters" class="sensors">
++  <h1>State Effecters</h1>
++  <div class="page-header">
++    <h2 class="inline">All state effecters present in the system</h2>
++      <a ng-href="data_state_effecter:text/json;charset=utf-8,{{export_data_state_effecter}}" class="btn btn-tertiary float-right" download="{{export_name_state_effecter}}"><icon file="icon-export.svg"></icon>Export</a>
++  </div>
++  <table id="sensor-categories" class="sensors__table" cellpadding="0" cellspacing="0" ng-show="filteredStateEffecterData.length">
++    <thead class="sensors__thead fixed-table-header">
++      <tr class="sensors__thead-row">
++        <th class="sensors__thead-cell">State Effecters ({{filteredStateEffecterData.length}})<th>
++        <th class="sensors__thead-cell">Previous State<th>
++        <th class="sensors__thead-cell sensor__heading-current">Present State<th>
++        <th class="sensors__thead-cell">Operational State<th>
++        <th class="sensors__thead-cell">Event State<th>
++        <th class="sensors__thead-cell">Toggle State<th>
++      </tr>
++    </thead>
++    <tbody class="sensors__tbody">
++      <tr class="sensors__tbody-row" ng-repeat="state_effecter in data_state_effecter as filteredStateEffecterData">
++        <th class="sensors__tbody-header">
++          <span>{{state_effecter.title}}</span>
++        </th>
++
++        <td class="sensors__tbody-cell">
++          <span class="sensors__tbody-cell__title">Previous State</span>
++          <span class="sensors__tbody-cell__content">
++              <span class="sensors__tbody-info">{{state_effecter.previous_state}}</span>
++          </span>
++        </td>
++
++        <td class="sensors__tbody-cell sensors__tbody-current" ng-class="{'sensors__tbody-current--normal': state_effecter.status == 'normal'}">
++          <span class="sensors__tbody-cell__title">Present State</span>
++          <span class="sensors__tbody-cell__content">
++              <span class="sensors__tbody-info">{{state_effecter.present_state}}</span>
++          </span>
++        </td>
++
++        <td class="sensors__tbody-cell">
++          <span class="sensors__tbody-cell__title">Operational State</span>
++          <span class="sensors__tbody-cell__content">
++            <span class="sensors__tbody-info">{{state_effecter.effecterOperationalState}}</span>
++          </span>
++        </td>
++        <td class="sensors__tbody-cell">
++          <span class="sensors__tbody-cell__title">Event State</span>
++          <span class="sensors__tbody-cell__content">
++            <span class="sensors__tbody-info">{{state_effecter.event_state}}</span>
++          </span>
++        </td>
++        <td class="sensors__tbody-cell">
++          <span class="sensors__tbody-cell__title">Toggle State</span>
++          <span class="sensors__tbody-cell__content">
++            <button class="btn" ng-class="state_effecter.present_state == state_effecter.effecterOperationalState ? 'btn-primary' : 'btn-secondary'"  ng-click="toggleEffecterState(state_effecter)">Toggle
++          </button>
++          </span>
++        </td>
++      </tr>
++    </tbody>
++  </table>
++</div>
++<div id="numericeffecters" class="sensors">
++  <h1>Numeric Effecters</h1>
++  <div class="page-header">
++    <h2 class="inline">All Numeric effecters present in the system</h2>
++      <a ng-href="data_numeric_effecter:text/json;charset=utf-8,{{export_data_numeric_effecter}}" class="btn btn-tertiary float-right" download="{{export_name_numeric_effecter}}"><icon file="icon-export.svg"></icon>Export</a>
++  </div>
++  <table id="sensor-categories" class="sensors__table" cellpadding="0" cellspacing="0" ng-show="filteredNumericStateData.length">
++    <thead class="sensors__thead fixed-table-header">
++      <tr class="sensors__thead-row">
++        <th class="sensors__thead-cell">Numeric Effecters ({{filteredNumericStateData.length}})<th>
++        <th class="sensors__thead-cell sensor__heading-current">Present Value<th>
++        <th class="sensors__thead-cell">Operational State<th>
++        <th class="sensors__thead-cell">Pending value<th>
++        <th class="sensors__thead-cell">Set Value<th>
++      </tr>
++    </thead>
++    <tbody class="sensors__tbody">
++      <tr class="sensors__tbody-row" ng-repeat="numeric_effecter in data_numeric_effecter as filteredNumericStateData">
++        <th class="sensors__tbody-header">
++          <span>{{numeric_effecter.title}}</span>
++        </th>
++
++        <td class="sensors__tbody-cell sensors__tbody-current" ng-class="{'sensors__tbody-current--normal': numeric_effecter.status == 'normal'}">
++          <span class="sensors__tbody-cell__title">Present Value</span>
++          <span class="sensors__tbody-cell__content">
++              <span class="sensors__tbody-info">{{numeric_effecter.presentValue}}</span>
++          </span>
++        </td>
++
++        <td class="sensors__tbody-cell">
++          <span class="sensors__tbody-cell__title">Operational State</span>
++          <span class="sensors__tbody-cell__content">
++            <span class="sensors__tbody-info">{{numeric_effecter.effecterOperationalState}}</span>
++          </span>
++        </td>
++        <td class="sensors__tbody-cell">
++          <span class="sensors__tbody-cell__title">Pending Value</span>
++          <span class="sensors__tbody-cell__content">
++            <span class="sensors__tbody-info">{{numeric_effecter.presentValue}}</span>
++          </span>
++        </td>
++        <td class="sensors__tbody-cell">
++          <input id="net-config__mac" type="text" ng-model="setvalue" />
++          <span class="sensors__tbody-cell__title">Set Value</span>
++          <span class="sensors__tbody-cell__content">
++            <button class="btn btn-primary"  ng-click="setEffecterValue(numeric_effecter,setvalue)">Set
++          </button>
++          </span>
++        </td>
++      </tr>
++    </tbody>
++  </table>
++</div>
++<div id="statesensors" class="sensors">
++  <h1>State Sensors</h1>
++  <div class="page-header">
++    <h2 class="inline">All state sensors present in the system</h2>
++      <a ng-href="data_state_sensor:text/json;charset=utf-8,{{export_data_state_sensor}}" class="btn btn-tertiary float-right" download="{{export_name_state_sensor}}"><icon file="icon-export.svg"></icon>Export</a>
++  </div>
++  <table id="sensor-categories" class="sensors__table" cellpadding="0" cellspacing="0" ng-show="filteredStateSensorData.length">
++    <thead class="sensors__thead fixed-table-header">
++      <tr class="sensors__thead-row">
++        <th class="sensors__thead-cell">Sensors ({{filteredStateSensorData.length}})<th>
++        <th class="sensors__thead-cell">Previous State<th>
++        <th class="sensors__thead-cell sensor__heading-current">Present State<th>
++        <th class="sensors__thead-cell">Operational State<th>
++        <th class="sensors__thead-cell">Event State<th>
++      </tr>
++    </thead>
++    <tbody class="sensors__tbody">
++      <tr class="sensors__tbody-row" ng-repeat="state_sensor in data_state_sensor as filteredStateSensorData">
++        <th class="sensors__tbody-header">
++          <span>{{state_sensor.title}}</span>
++        </th>
++
++        <td class="sensors__tbody-cell">
++          <span class="sensors__tbody-cell__title">Previous State</span>
++          <span class="sensors__tbody-cell__content">
++              <span class="sensors__tbody-info">{{state_sensor.previous_state}}</span>
++          </span>
++        </td>
++
++        <td class="sensors__tbody-cell sensors__tbody-current" ng-class="{'sensors__tbody-current--normal': state_sensor.status == 'normal'}">
++          <span class="sensors__tbody-cell__title">Present State</span>
++          <span class="sensors__tbody-cell__content">
++              <span class="sensors__tbody-info">{{state_sensor.present_state}}</span>
++          </span>
++        </td>
++
++        <td class="sensors__tbody-cell">
++          <span class="sensors__tbody-cell__title">Operational State</span>
++          <span class="sensors__tbody-cell__content">
++            <span class="sensors__tbody-info">{{state_sensor.sensorOperationalState}}</span>
++          </span>
++        </td>
++        <td class="sensors__tbody-cell">
++          <span class="sensors__tbody-cell__title">Event State</span>
++          <span class="sensors__tbody-cell__content">
++            <span class="sensors__tbody-info">{{state_sensor.event_state}}</span>
++          </span>
++        </td>
++      </tr>
++    </tbody>
++  </table>
++</div>
++<div id="numericsensors" class="sensors">
++  <h1>Numeric Sensors</h1>
++  <div class="page-header">
++    <h2 class="inline">All numeric sensors present in the system</h2>
++      <a ng-href="data_numeric_sensor:text/json;charset=utf-8,{{export_data_numeric_sensor}}" class="btn btn-tertiary float-right" download="{{export_name_numeric_sensor}}"><icon file="icon-export.svg"></icon>Export</a>
++  </div>
++
++  <div>
++    <p class="content-label" aria-label="sensors filter">Filter sensors</p>
++    <div class="content__search">
++      <label for="content__search-input">Sensors Search</label>
++      <input id="content__search-input" type="text" ng-model="customSearch" ng-keydown="doSearchOnEnter($event)"/>
++      <div class="search-submit__wrapper">
++        <button class="btn" type="button" aria-label="clear filter" ng-click="clear()">
++            <icon file="icon-close.svg" aria-hidden="true"></icon>
++        </button>
++        <input id="content__search-submit" type="submit" class="btn btn-primary content__search-submit" value="Filter" ng-click="doSearchOnClick()"/>
++      </div>
++    </div>
++
++    <div class="toggle-filter">
++      <p class="content-label">FILTER BY SEVERITY</p>
++      <button class="btn" ng-click="toggleSeverityAll()"
++          ng-class="selectedSeverity.all ? 'btn-primary' : 'btn-secondary'">All
++      </button>
++      <button class="btn" ng-click="toggleSeverity('critical')"
++          ng-class="selectedSeverity.critical ? 'btn-primary' : 'btn-secondary'">Critical
++      </button>
++      <button class="btn" ng-click="toggleSeverity('warning')"
++          ng-class="selectedSeverity.warning ? 'btn-primary' : 'btn-secondary'">Warning
++      </button>
++      <button class="btn" ng-click="toggleSeverity('normal')"
++          ng-class="selectedSeverity.normal ? 'btn-primary' : 'btn-secondary'">Normal
++      </button>
++    </div>
++  </div>
++
++  <div ng-show="filteredSensorData.length == 0">
++    <span ng-if="selectedSeverity.all">{{messages.NO_SENSOR_DATA}}</span>
++    <span ng-if="selectedSeverity.critical">{{messages.CRITICAL_NO_SENSOR_DATA}}</span>
++    <span ng-if="selectedSeverity.warning">{{messages.WARNING_NO_SENSOR_DATA}}</span>
++    <span ng-if="selectedSeverity.normal">{{messages.NORMAL_NO_SENSOR_DATA}}</span>
++  </div>
++
++  <table id="sensor-categories" class="sensors__table" cellpadding="0" cellspacing="0" ng-show="filteredSensorData.length">
++    <thead class="sensors__thead fixed-table-header">
++      <tr class="sensors__thead-row">
++        <th class="sensors__thead-cell">Sensors ({{filteredSensorData.length}})<th>
++        <th class="sensors__thead-cell">Low critical<th>
++        <th class="sensors__thead-cell">Low warning<th>
++        <th class="sensors__thead-cell sensor__heading-current">Current<th>
++        <th class="sensors__thead-cell">High warning<th>
++        <th class="sensors__thead-cell">High critical<th>
++      </tr>
++    </thead>
++    <tbody class="sensors__tbody">
++      <tr class="sensors__tbody-row" ng-repeat="sensor in data_numeric_sensor|filter:filterBySeverity|filter:filterBySearchTerms|orderBy:'+custom_order' as filteredSensorData">
++        <th class="sensors__tbody-header">
++          <status-icon status="{{ sensor.status == 'critical' ? 'error' :
++                                  sensor.status == 'warning' ? 'warn' : null }}"
++                       aria-label="Sensor status: {{sensor.status}}">
++          </status-icon>
++          <span>{{sensor.title}}</span>
++        </th>
++        <td class="sensors__tbody-cell">
++          <span class="sensors__tbody-cell__title">Low critical</span>
++          <span class="sensors__tbody-cell__content">
++              <span class="sensors__tbody-info">{{sensor.CriticalLow}}</span>
++              <span class="sensors__tbody-degree" ng-if="sensor.unit == 'C'">&deg;</span>
++            <span class="sensors__tbody-unit">{{sensor.unit}}</span>
++          </span>
++        </td>
++        <td class="sensors__tbody-cell">
++          <span class="sensors__tbody-cell__title">Low warning</span>
++          <span class="sensors__tbody-cell__content">
++              <span class="sensors__tbody-info">{{sensor.WarningLow}}</span>
++              <span class="sensors__tbody-degree" ng-if="sensor.unit == 'C'">&deg;</span>
++            <span class="sensors__tbody-unit">{{sensor.unit}}</span>
++          </span>
++        </td>
++        <td class="sensors__tbody-cell sensors__tbody-current" ng-class="{'sensors__tbody-current--critical': sensor.status == 'critical', 'sensors__tbody-current--warn': sensor.status == 'warning', 'sensors__tbody-current--normal': sensor.status == 'normal'}">
++          <span class="sensors__tbody-cell__title">Current</span>
++          <span class="sensors__tbody-cell__content">
++              <span class="sensors__tbody-info">{{sensor.Value}}</span>
++              <span class="sensors__tbody-degree" ng-if="sensor.unit == 'C'">&deg;</span>
++            <span class="sensors__tbody-unit">{{sensor.unit}}</span>
++          </span>
++        </td>
++        <td class="sensors__tbody-cell">
++          <span class="sensors__tbody-cell__title">High warning</span>
++          <span class="sensors__tbody-cell__content">
++            <span class="sensors__tbody-info">{{sensor.WarningHigh}}</span>
++            <span class="sensors__tbody-degree" ng-if="sensor.unit == 'C'">&deg;</span>
++            <span class="sensors__tbody-unit">{{sensor.unit}}</span>
++          </span>
++        </td>
++        <td class="sensors__tbody-cell">
++          <span class="sensors__tbody-cell__title">High critical</span>
++          <span class="sensors__tbody-cell__content">
++            <span class="sensors__tbody-info">{{sensor.CriticalHigh}}</span>
++            <span class="sensors__tbody-degree" ng-if="sensor.unit == 'C'">&deg;</span>
++            <span class="sensors__tbody-unit">{{sensor.unit}}</span>
++          </span>
++        </td>
++      </tr>
++    </tbody>
++  </table>
++</div>
+\ No newline at end of file
+diff --git a/app/server-health/controllers/pldm-overview-controller.js b/app/server-health/controllers/pldm-overview-controller.js
+new file mode 100644
+index 00000000..134a6cac
+--- /dev/null
++++ b/app/server-health/controllers/pldm-overview-controller.js
+@@ -0,0 +1,177 @@
++/**
++ * Controller for sensors-overview
++ *
++ * @module app/serverHealth
++ * @exports sensorsOverviewController
++ * @name sensorsOverviewController
++ */
++
++window.angular && (function(angular) {
++  'use strict';
++  angular.module('app.overview').controller('pldmOverviewController', [
++    '$scope', '$log', '$window', 'APIUtils', 'dataService', 'Constants',
++    function($scope, $log, $window, APIUtils, dataService, Constants) {
++      $scope.dataService = dataService;
++
++      $scope.dropdown_selected = false;
++
++      $scope.$log = $log;
++      $scope.customSearch = '';
++      $scope.searchTerms = [];
++      $scope.messages = Constants.MESSAGES.SENSOR;
++      $scope.selectedSeverity =
++          {all: true, normal: false, warning: false, critical: false};
++      $scope.export_name_state_effecter = 'state_effecters.json';
++      $scope.export_name_numeric_effecter = 'numeric_effecters.json';
++      $scope.export_name_state_sensor = 'state_sensors.json';
++      $scope.export_name_numeric_sensor = 'numeric_sensors.json';
++      $scope.loading = false;
++
++      $scope.jsonData = function(data) {
++        var dt = {};
++        data.data.forEach(function(item) {
++          dt[item.original_data.key] = item.original_data.value;
++        });
++        return JSON.stringify(dt);
++      };
++
++      $scope.clear = function() {
++        $scope.customSearch = '';
++        $scope.searchTerms = [];
++      };
++
++      $scope.doSearchOnEnter = function(event) {
++        var search =
++            $scope.customSearch.replace(/^\s+/g, '').replace(/\s+$/g, '');
++        if (event.keyCode === 13 && search.length >= 2) {
++          $scope.searchTerms = $scope.customSearch.split(' ');
++        } else {
++          if (search.length == 0) {
++            $scope.searchTerms = [];
++          }
++        }
++      };
++
++      $scope.doSearchOnClick = function() {
++        var search =
++            $scope.customSearch.replace(/^\s+/g, '').replace(/\s+$/g, '');
++        if (search.length >= 2) {
++          $scope.searchTerms = $scope.customSearch.split(' ');
++        } else {
++          if (search.length == 0) {
++            $scope.searchTerms = [];
++          }
++        }
++      };
++
++      $scope.toggleSeverityAll = function() {
++        $scope.selectedSeverity.all = !$scope.selectedSeverity.all;
++
++        if ($scope.selectedSeverity.all) {
++          $scope.selectedSeverity.normal = false;
++          $scope.selectedSeverity.warning = false;
++          $scope.selectedSeverity.critical = false;
++        }
++      };
++
++      $scope.toggleSeverity = function(severity) {
++        $scope.selectedSeverity[severity] = !$scope.selectedSeverity[severity];
++
++        if (['normal', 'warning', 'critical'].indexOf(severity) > -1) {
++          if ($scope.selectedSeverity[severity] == false &&
++              (!$scope.selectedSeverity.normal &&
++               !$scope.selectedSeverity.warning &&
++               !$scope.selectedSeverity.critical)) {
++            $scope.selectedSeverity.all = true;
++            return;
++          }
++        }
++
++        if ($scope.selectedSeverity.normal && $scope.selectedSeverity.warning &&
++            $scope.selectedSeverity.critical) {
++          $scope.selectedSeverity.all = true;
++          $scope.selectedSeverity.normal = false;
++          $scope.selectedSeverity.warning = false;
++          $scope.selectedSeverity.critical = false;
++        } else {
++          $scope.selectedSeverity.all = false;
++        }
++      };
++
++      $scope.filterBySeverity = function(sensor) {
++        if ($scope.selectedSeverity.all) return true;
++
++        return (
++            (sensor.severity_flags.normal && $scope.selectedSeverity.normal) ||
++            (sensor.severity_flags.warning &&
++             $scope.selectedSeverity.warning) ||
++            (sensor.severity_flags.critical &&
++             $scope.selectedSeverity.critical));
++      };
++      $scope.filterBySearchTerms = function(sensor) {
++        if (!$scope.searchTerms.length) return true;
++
++        for (var i = 0, length = $scope.searchTerms.length; i < length; i++) {
++          if (sensor.search_text.indexOf($scope.searchTerms[i].toLowerCase()) ==
++              -1)
++            return false;
++        }
++        return true;
++      };
++
++      $scope.toggleEffecterState = function(sensor) {
++        if(sensor.effecterOperationalState != sensor.present_state) {
++          APIUtils.toggleEffecterState(sensor.path, '1');
++          sensor.present_state = '1';
++          sensor.previous_state = '2';
++          //$scope.loadEffecterData();
++          return;
++        }
++        else {
++          APIUtils.toggleEffecterState(sensor.path, '2');
++          sensor.present_state = '2';
++          sensor.previous_state = '1';
++          //$scope.loadEffecterData();
++          return;
++        }
++      };
++
++      $scope.setEffecterValue = function(sensor, setvalue) {
++        APIUtils.setEffecterValue(sensor.path, setvalue);
++        $scope.loadEffecterData();
++      };
++
++      $scope.loadEffecterData = function() {
++        $scope.loading = true;
++        APIUtils.getAllEffecterStatus(function(data, originalData) {
++          $scope.data_state_effecter = data;
++          $scope.originalData_state_effecter = originalData;
++          $scope.export_data_state_effecter = JSON.stringify(originalData);
++          $scope.loading = false;
++        });
++        $scope.loading = true;
++        APIUtils.getAllNumericEffecterStatus(function(data, originalData) {
++          $scope.data_numeric_effecter = data;
++          $scope.originalData_numeric_effecter = originalData;
++          $scope.export_data_numeric_effecter = JSON.stringify(originalData);
++          $scope.loading = false;
++        });
++        $scope.loading = true;
++        APIUtils.getAllStateSensorStatus(function(data, originalData) {
++          $scope.data_state_sensor = data;
++          $scope.originalData_state_sensor = originalData;
++          $scope.export_data_state_sensor = JSON.stringify(originalData);
++          $scope.loading = false;
++        });
++        $scope.loading = true;
++        APIUtils.getAllNumericSensorStatus(function(data, originalData) {
++          $scope.data_numeric_sensor = data;
++          $scope.originalData_numeric_sensor = originalData;
++          $scope.export_data_numeric_sensor = JSON.stringify(originalData);
++          $scope.loading = false;
++        });
++      };
++      $scope.loadEffecterData();
++    }
++  ]);
++})(angular);
+diff --git a/app/server-health/index.js b/app/server-health/index.js
+index 96172d86..173eb9cb 100644
+--- a/app/server-health/index.js
++++ b/app/server-health/index.js
+@@ -42,6 +42,12 @@ window.angular && (function(angular) {
+                 'controller': 'sensorsOverviewController',
+                 authenticated: true
+               })
++              .when('/server-health/pldm-overview', {
++                'template':
++                    require('./controllers/pldm-overview-controller.html'),
++                'controller': 'pldmOverviewController',
++                authenticated: true
++              })
+               .when('/server-health/sys-log', {
+                 'template': require('./controllers/syslog-controller.html'),
+                 'controller': 'sysLogController',

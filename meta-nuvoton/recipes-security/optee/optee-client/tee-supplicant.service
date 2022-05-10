@@ -1,0 +1,10 @@
+[Unit]
+Description=TEE Supplicant
+
+[Service]
+User=root
+EnvironmentFile=-/etc/default/tee-supplicant
+ExecStart=/usr/bin/tee-supplicant $OPTARGS /dev/teepriv0
+
+[Install]
+WantedBy=basic.target

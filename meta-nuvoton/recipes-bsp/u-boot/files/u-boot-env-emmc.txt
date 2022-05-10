@@ -1,0 +1,12 @@
+autoload=no
+autostart=no
+bootargs=earlycon=uart8250,mmio32,0xf0001000 console=ttyS0,115200n8 mem=464M
+bootcmd=setenv origbootargs ${bootargs}; run mmc_bootargs; run bootsidecmd
+setmmcargs=setenv bootargs ${bootargs} rootwait root=PARTLABEL=${rootfs}
+mmc_bootargs=setenv bootargs earlycon=${earlycon} console=${console} mem=${mem}
+boota=setenv bootpart 2; setenv rootfs rofs-a; run bootmmc
+bootb=setenv bootpart 3; setenv rootfs rofs-b; run bootmmc
+bootmmc=run setmmcargs; ext4load mmc 1:${bootpart} ${loadaddr} fitImage && bootm; echo Error loading kernel FIT image
+bootsidecmd=if test ${bootside} = b; then run bootb; run boota; else run boota; run bootb; fi
+bootside=a
+loadaddr=0x1200000

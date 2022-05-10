@@ -1,0 +1,42 @@
+From 1c23639acdbc68b36b30ed0ef9d3922142985975 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Tue, 12 May 2020 17:01:29 +0800
+Subject: [PATCH] novnc: add 16-bit hextile support for nuvoton ece engine
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ package-lock.json | 4 ++--
+ package.json      | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index 47b22a2e..054ca32f 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -935,8 +935,8 @@
+       }
+     },
+     "@novnc/novnc": {
+-      "version": "git+https://github.com/novnc/noVNC.git#25b3d49d322b0a7c9ee1e071d93042d70f5176b7",
+-      "from": "@novnc/novnc@git+https://github.com/novnc/noVNC.git#25b3d49d322b0a7c9ee1e071d93042d70f5176b7"
++      "version": "Nuvoton-Israel/noVNC.git#openbmc-v1.2.0",
++      "from": "@novnc/novnc@Nuvoton-Israel/noVNC.git#openbmc-v1.2.0"
+     },
+     "@types/anymatch": {
+       "version": "1.3.1",
+diff --git a/package.json b/package.json
+index 7e808df4..517f86e0 100644
+--- a/package.json
++++ b/package.json
+@@ -35,7 +35,7 @@
+     "node"
+   ],
+   "dependencies": {
+-    "@novnc/novnc": "git+https://github.com/novnc/noVNC.git#25b3d49d322b0a7c9ee1e071d93042d70f5176b7",
++    "@novnc/novnc": "Nuvoton-Israel/noVNC.git#openbmc-v1.1.0",
+     "angular": "1.7.9",
+     "angular-animate": "1.7.9",
+     "angular-clipboard": "1.7.0",
+-- 
+2.17.1
+

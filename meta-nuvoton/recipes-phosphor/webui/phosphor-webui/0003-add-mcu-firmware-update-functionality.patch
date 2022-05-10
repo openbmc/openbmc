@@ -1,0 +1,138 @@
+From 4a3aedb671ad65c56e0e638453f7a8f713b4a653 Mon Sep 17 00:00:00 2001
+From: Tim Lee <timlee660101@gmail.com>
+Date: Wed, 23 Sep 2020 15:55:33 +0800
+Subject: [PATCH 5/5] add mcu firmware update functionality
+
+Signed-off-by: Tim Lee <timlee660101@gmail.com>
+---
+ app/common/services/api-utils.js              |  9 ++++++++-
+ .../controllers/firmware-controller.html      | 19 ++++++++++++++++++-
+ .../controllers/firmware-controller.js        | 15 ++++++++++++++-
+ 3 files changed, 40 insertions(+), 3 deletions(-)
+
+diff --git a/app/common/services/api-utils.js b/app/common/services/api-utils.js
+index cc1122f3..fd1c5dac 100644
+--- a/app/common/services/api-utils.js
++++ b/app/common/services/api-utils.js
+@@ -1111,6 +1111,7 @@ window.angular && (function(angular) {
+                     var isExtended = false;
+                     var bmcActiveVersion = '';
+                     var hostActiveVersion = '';
++                    var mcuActiveVersion = '';
+                     var imageType = '';
+                     var extendedVersions = [];
+                     var functionalImages = [];
+@@ -1197,13 +1198,19 @@ window.angular && (function(angular) {
+                             imageType == 'Host') {
+                           hostActiveVersion = content.data[key].Version;
+                         }
++
++                         if (activationStatus == 'Functional' &&
++                             imageType == 'MCU') {
++                           mcuActiveVersion = content.data[key].Version;
++                        }
+                       }
+                     }
+ 
+                     deferred.resolve({
+                       data: data,
+                       bmcActiveVersion: bmcActiveVersion,
+-                      hostActiveVersion: hostActiveVersion
++                      hostActiveVersion: hostActiveVersion,
++                      mcuActiveVersion: mcuActiveVersion
+                     });
+                   },
+                   function(error) {
+diff --git a/app/configuration/controllers/firmware-controller.html b/app/configuration/controllers/firmware-controller.html
+index d2ff89dc..3c6c11a0 100644
+--- a/app/configuration/controllers/firmware-controller.html
++++ b/app/configuration/controllers/firmware-controller.html
+@@ -2,7 +2,7 @@
+ <div class="row column">
+   <h1>Firmware</h1>
+   <div class="column small-12 page-header">
+-    <h2 class="inline">Manage BMC and server firmware</h2>
++    <h2 class="inline">Manage BMC, server and MCU firmware</h2>
+   </div>
+ </div>
+ <div class="row column">
+@@ -11,6 +11,7 @@
+ </div>
+ <firmware-list title="BMC images" version="bmcActiveVersion" firmwares="firmwares" filter-by="filters.bmc"></firmware-list>
+ <firmware-list title="Server images" version="hostActiveVersion" firmwares="firmwares" filter-by="filters.host"></firmware-list>
++<firmware-list title="MCU images" version="mcuActiveVersion" firmwares="firmwares" filter-by="filters.mcu"></firmware-list>
+ <div class="row column" id="upload">
+   <div class="column small-12 page-header">
+     <h2 class="inline bold">Specify image file location</h2>
+@@ -134,6 +135,22 @@
+           </div>
+         </fieldset>
+       </form>
++      <form ng-if="activate_image_type == 'MCU'">
++        <fieldset>
++          <div class="row column">
++            <label class="control-radio bold" for="activate-without-reboot">Activate MCU file without rebooting BMC
++              <input type="radio" name="activate-without-reboot" id="activate-without-reboot" ng-model="activate.reboot" ng-value="false"/>
++              <span class="control__indicator control__indicator-on"></span>
++            </label>
++          </div>
++          <div class="row column">
++            <label class="control-radio bold" for="activate-with-reboot">Activate MCU file and automatically reboot BMC
++              <input type="radio" name="activate-with-reboot" id="activate-with-reboot" ng-model="activate.reboot" ng-value="true"/>
++              <span class="control__indicator control__indicator-on"></span>
++            </label>
++          </div>
++        </fieldset>
++      </form>
+     </div>
+     <div class="modal__button-wrapper">
+       <button class="btn  btn-secondary" ng-click="activate_confirm=false;">Cancel</button>
+diff --git a/app/configuration/controllers/firmware-controller.js b/app/configuration/controllers/firmware-controller.js
+index 451c16ce..b208ab74 100644
+--- a/app/configuration/controllers/firmware-controller.js
++++ b/app/configuration/controllers/firmware-controller.js
+@@ -26,6 +26,7 @@ window.angular && (function(angular) {
+       $scope.firmwares = [];
+       $scope.bmcActiveVersion = '';
+       $scope.hostActiveVersion = '';
++      $scope.mcuActiveVersion = '';
+       $scope.activate_confirm = false;
+       $scope.delete_image_id = '';
+       $scope.delete_image_version = '';
+@@ -136,6 +137,17 @@ window.angular && (function(angular) {
+                         warmReboot();
+                       }
+                     }
++                    if ($scope.activate.reboot &&
++                        ($scope.activate_image_type == 'MCU')) {
++                      APIUtils.bmcReboot().then(
++                          function(response) {
++                            toastService.success('BMC is rebooting.')
++                          },
++                          function(error) {
++                            console.log(JSON.stringify(error));
++                            toastService.error('Unable to reboot BMC.');
++                          });
++                    }
+                   });
+             });
+         $scope.activate_confirm = false;
+@@ -308,13 +320,14 @@ window.angular && (function(angular) {
+         $scope.confirm_delete = false;
+       };
+ 
+-      $scope.filters = {bmc: {imageType: 'BMC'}, host: {imageType: 'Host'}};
++      $scope.filters = {bmc: {imageType: 'BMC'}, host: {imageType: 'Host'}, mcu: {imageType: 'MCU'}};
+ 
+       $scope.loadFirmwares = function() {
+         APIUtils.getFirmwares().then(function(result) {
+           $scope.firmwares = result.data;
+           $scope.bmcActiveVersion = result.bmcActiveVersion;
+           $scope.hostActiveVersion = result.hostActiveVersion;
++          $scope.mcuActiveVersion = result.mcuActiveVersion;
+         });
+       };
+ 
+-- 
+2.17.1
+
