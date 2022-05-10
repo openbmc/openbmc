@@ -1,5 +1,16 @@
 #!/bin/bash
 
+is_valid_sled_num()
+{
+    var=$1
+    if [[ $var =~ ^-?[0-9]+$ ]]; then
+        if [ "$var" -ge 1 ] && [ "$var" -le 6 ]; then
+            return 0
+        fi
+    fi
+    return 1
+}
+
 set_gpio()
 {
     local pin_info
@@ -46,7 +57,7 @@ bind_flash()
         return 1
     fi
 
-    if ! echo -n 1e631000.spi > /sys/bus/platform/drivers/aspeed-smc/bind; then
+    if ! echo -n spi1.0 > /sys/bus/spi/drivers/spi-nor/bind; then
         echo "Error: flash bind failed"
         return 1
     fi
@@ -55,7 +66,7 @@ bind_flash()
 
 unbind_flash()
 {
-    echo -n 1e631000.spi > /sys/bus/platform/drivers/aspeed-smc/unbind
+    echo -n spi1.0 > /sys/bus/spi/drivers/spi-nor/unbind
     set_gpio SEL_SPI2_MUX 1
     set_gpio SPI2_MUX1 1
     set_gpio SPI2_MUX2 1
@@ -84,6 +95,14 @@ MTD_NAME="pnor"
 FLASH_CP_CMD="/usr/sbin/flashcp"
 FLASH_ERASEALL_CMD="/usr/sbin/flash_eraseall"
 
+if ! is_valid_sled_num "$SLED_INDEX"; then
+    echo "Invalid sled number: $SLED_INDEX"
+    echo "Usage: usb-controller-update <SLED_NUM>"
+    echo ""
+    echo "  SLED_NUM [1-6]"
+    echo ""
+    exit 1
+fi
 
 if ! bind_flash "$SLED_INDEX"; then
     error_cleanup
