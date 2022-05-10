@@ -39,6 +39,16 @@ PreferredLifetime=0
 EOF
 }
 
+gbmc_ncsi_br_deprecated_ips_host_contents() {
+  local addr="$1"
+
+  cat <<EOF
+[Network]
+IPv6ProxyNDP=yes
+IPv6ProxyNDPAddress=$addr
+EOF
+}
+
 gbmc_ncsi_br_deprecated_ips_update() {
   [ -n "$gbmc_ncsi_br_deprecated_ips_init" ] || return
   [ "$gbmc_ncsi_br_deprecated_ips_confip" != "$gbmc_ncsi_br_deprecated_ips_lastip" ] || return
@@ -66,7 +76,7 @@ gbmc_ncsi_br_deprecated_ips_update() {
     contents+="$(gbmc_ncsi_br_deprecated_ips_addr_contents "$pfx")"$'\n'
     contents+="$(gbmc_ncsi_br_deprecated_ips_addr_contents "$stateless_pfx")"$'\n'
     contents+="$(gbmc_ncsi_br_deprecated_ips_addr_contents "$stateless_ip")"$'\n'
-    contents+="$(gbmc_ncsi_br_deprecated_ips_addr_contents "$host_pfx")"$'\n'
+    contents+="$(gbmc_ncsi_br_deprecated_ips_host_contents "$host_pfx")"$'\n'
     read -r -d '' nfcontents <<EOF
 table inet filter {
   chain ncsi_input {
