@@ -64,14 +64,14 @@ set_gpio SPI2_MUX2          1
 set_gpio SPI2_MUX3          1
 set_gpio SWITCH_FRU_MUX     1
 set_gpio BAT_DETECT         1
-set_gpio BMC_BT_WP0         1
-set_gpio BMC_BT_WP1         1
+set_gpio BMC_BT_WP0_N       1
+set_gpio BMC_BT_WP1_N       1
 set_gpio USB2_SEL0_A        1
 set_gpio USB2_SEL1_A        1
 set_gpio USB2_SEL0_B        1
 set_gpio USB2_SEL1_B        1
-set_gpio RST_FRONT_IOEXP    1
-set_gpio BSM_FLASH_LATCH    1
+set_gpio RST_FRONT_IOEXP_N  1
+set_gpio BSM_FLASH_LATCH_N  1
 
 # set initial duty value for each fan
 set_fan 0   70
