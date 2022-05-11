@@ -3,7 +3,7 @@ FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
 RRECOMMENDS:${PN} += "ipmitool"
 RDEPENDS:${PN} += "bash"
 
-PACKAGECONFIG[dynamic-sensors] = "--enable-dynamic-sensors"
+PACKAGECONFIG:append = " dynamic-sensors"
 HOSTIPMI_PROVIDER_LIBRARY += "libdynamiccmds.so"
 
 SRC_URI += "\
