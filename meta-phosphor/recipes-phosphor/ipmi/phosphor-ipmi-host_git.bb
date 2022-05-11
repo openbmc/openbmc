@@ -21,10 +21,11 @@ def ipmi_whitelists(d):
     whitelists = [ '{}-whitelist-native'.format(x) for x in whitelists ]
     return ' '.join(whitelists)
 
-PACKAGECONFIG ??= ""
+PACKAGECONFIG ??= "allowlist"
 PACKAGECONFIG[dynamic-sensors] = "--enable-dynamic-sensors,--disable-dynamic-sensors"
 PACKAGECONFIG[hybrid-sensors] = "--enable-hybrid-sensors,--disable-hybrid-sensors"
 PACKAGECONFIG[sel-logger-clears-sel] = "--enable-sel-logger-clears-sel,--disable-sel-logger-clears-sel"
+PACKAGECONFIG[allowlist] = "--enable-ipmi-whitelist,--disable-ipmi-whitelist"
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "nlohmann-json"
