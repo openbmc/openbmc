@@ -21,11 +21,19 @@ def ipmi_whitelists(d):
     whitelists = [ '{}-whitelist-native'.format(x) for x in whitelists ]
     return ' '.join(whitelists)
 
-PACKAGECONFIG ??= "allowlist"
+PACKAGECONFIG ??= "allowlist i2c-allowlist boot-flag-safe-mode softoff libuserlayer"
 PACKAGECONFIG[dynamic-sensors] = "--enable-dynamic-sensors,--disable-dynamic-sensors"
 PACKAGECONFIG[hybrid-sensors] = "--enable-hybrid-sensors,--disable-hybrid-sensors"
 PACKAGECONFIG[sel-logger-clears-sel] = "--enable-sel-logger-clears-sel,--disable-sel-logger-clears-sel"
 PACKAGECONFIG[allowlist] = "--enable-ipmi-whitelist,--disable-ipmi-whitelist"
+PACKAGECONFIG[i2c-allowlist] = "--enable-i2c-whitelist-check,--disable-i2c-whitelist-check"
+PACKAGECONFIG[transport-oem] = "--enable-transport-oem,--disable-transport-oem"
+PACKAGECONFIG[boot-flag-safe-mode] = "--enable-boot-flag-safe-mode-support,--disable-boot-flag-safe-mode-support"
+PACKAGECONFIG[softoff] = "--enable-softoff,--disable-softoff"
+PACKAGECONFIG[update-functional-on-fail] = "--enable-update-functional-on-fail,--disable-update-functional-on-fail"
+PACKAGECONFIG[libuserlayer] = "--enable-libuserlayer,--disable-libuserlayer"
+PACKAGECONFIG[sensors-cache] = "--enable-sensors-cache,--disable-sensors-cache"
+
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "nlohmann-json"
