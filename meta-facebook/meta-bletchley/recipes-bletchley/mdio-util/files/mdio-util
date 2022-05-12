@@ -196,7 +196,7 @@ if [ "$CLAUSE_VER" == "c22" ] && [ "$CMD_TYPE" == "r" ] && [ "$#" -eq 5 ]; then
 elif [ "$CLAUSE_VER" == "c22" ] && [ "$CMD_TYPE" == "w" ] && [ "$#" -eq 6 ]; then
     REG_ADDR=${5}
     DATA=${6}
-    aspeed_mdio_c22_write "$BUS" "$PHY_ADDR $REG_ADDR $DATA" || exit 1
+    aspeed_mdio_c22_write "$BUS" "$PHY_ADDR" "$REG_ADDR" "$DATA" || exit 1
 elif [ "$CLAUSE_VER" == "c45" ] && [ "$CMD_TYPE" == "r" ] && [ "$#" -eq 6 ]; then
     DEV_ADDR=${5}
     REG_ADDR=${6}
