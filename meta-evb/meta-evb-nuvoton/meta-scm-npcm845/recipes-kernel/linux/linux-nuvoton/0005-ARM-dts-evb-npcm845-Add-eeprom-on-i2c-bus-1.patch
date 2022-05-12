@@ -1,0 +1,28 @@
+From 8bc99c8445a6b2c5ee758c7b7daf631a6b2847a5 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Wed, 19 Jan 2022 08:31:37 +0800
+Subject: [PATCH] ARM: dts: evb-npcm845: Add eeprom on i2c bus 1
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
+index ac3a05c6e0ac..482591ea9646 100644
+--- a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
++++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
+@@ -619,6 +619,10 @@
+ 
+ &i2c1 {
+ 	status = "okay";
++	eeprom@50 {
++		compatible = "atmel,24c256";
++		reg = <0x50>;
++	};
+ };
+ 
+ &i2c2 {
+-- 
+2.17.1
+

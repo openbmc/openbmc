@@ -1,0 +1,43 @@
+From d474ca3bb748ecbaede08d26efc6ecc32de0b841 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Mon, 27 Dec 2021 11:49:40 +0800
+Subject: [PATCH] dts: nuvoton: evb-npcm845: add SPD i3c devices on bus2
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ .../boot/dts/nuvoton/nuvoton-npcm845-evb.dts  | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
+index 01979829ca70..00670ba00844 100644
+--- a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
++++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
+@@ -523,6 +523,25 @@
+ 				i2c-scl-hz = <400000>;
+ 				i3c-scl-hz = <4000000>;
+ 			};
++
++			i3c2: i3c@fff12000 {
++				status = "okay";
++				i2c-scl-hz = <400000>;
++				i3c-scl-hz = <4000000>;
++				static-address;
++				hub@0x57 {
++					reg = <0x57 0x4CC 0x51180000>;
++				};
++				ts0@0x17 {
++					reg = <0x17 0x4CC 0x51110000>;
++				};
++				ts1@0x37 {
++					reg = <0x37 0x4CC 0x51110001>;
++				};
++				pmic@0x4f {
++					reg = <0x4F 0x4CC 0x89000000>;
++				};
++			};
+ 		};
+ 	};
+ 
+-- 
+2.17.1
+

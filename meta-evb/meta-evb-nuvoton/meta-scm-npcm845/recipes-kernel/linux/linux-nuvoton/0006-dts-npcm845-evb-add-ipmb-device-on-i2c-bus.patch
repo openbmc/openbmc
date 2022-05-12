@@ -1,0 +1,38 @@
+From fd0afeecddf3233837a5a8bc825582cb15ff659c Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Thu, 20 Jan 2022 10:01:05 +0800
+Subject: [PATCH] arm: dts: npcm845-evb: add ipmb device on i2c bus
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
+index 482591ea9646..aebd717a0830 100644
+--- a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
++++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
+@@ -627,10 +627,20 @@
+ 
+ &i2c2 {
+ 	status = "okay";
++	ipmb@10 {
++		compatible = "ipmb-dev";
++		reg = <0x10>;
++		i2c-protocol;
++	};
+ };
+ 
+ &i2c3 {
+ 	status = "okay";
++	ipmb@11 {
++		compatible = "ipmb-dev";
++		reg = <0x11>;
++		i2c-protocol;
++	};
+ };
+ 
+ &i2c4 {
+-- 
+2.17.1
+
