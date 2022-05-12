@@ -56,9 +56,6 @@ RDEPENDS:${PN}-system = " \
         loadsvf \
         pciutils \
         cpfw \
-        dhrystone \
-        ent \
-        rw-perf \
         phosphor-ecc \
         i3c-tools \
         phosphor-ipmi-blobs \
