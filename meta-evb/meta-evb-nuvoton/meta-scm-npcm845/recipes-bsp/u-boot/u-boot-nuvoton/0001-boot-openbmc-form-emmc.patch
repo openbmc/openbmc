@@ -1,0 +1,39 @@
+From f5a339e55e1a19061c5ab9c74a4b0a0b80764f7b Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Fri, 13 May 2022 16:43:18 +0800
+Subject: [PATCH] boot openbmc from emmc
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ include/configs/arbel.h | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/include/configs/arbel.h b/include/configs/arbel.h
+index b4ebc54641..db6b46e943 100644
+--- a/include/configs/arbel.h
++++ b/include/configs/arbel.h
+@@ -37,7 +37,7 @@
+ #define SPI3_END_ADDR			0xBFFFFFFF
+ 
+ /* Default environemnt variables */
+-#define CONFIG_BOOTCOMMAND "run common_bootargs; run romboot"
++#define CONFIG_BOOTCOMMAND "run emmc_bootargs; run emmcboot"
+ #define CONFIG_EXTRA_ENV_SETTINGS   "uimage_flash_addr=80200000\0"   \
+ 		"stdin=serial\0"   \
+ 		"stdout=serial\0"   \
+@@ -59,6 +59,12 @@
+ 		"console=ttyS0,115200n8\0" \
+ 		"common_bootargs=setenv bootargs earlycon=${earlycon} root=/dev/ram " \
+ 		"console=${console} mem=${mem} ramdisk_size=48000 oops=panic panic=20\0" \
++		"emmc_bootargs=setenv bootargs earlycon=${earlycon} console=${console} " \
++		"rootwait root=PARTLABEL=rofs-a\0" \
++		"emmcboot=echo Booting Kernel from eMMC; echo Using bootargs: ${bootargs};" \
++		"setenv loadaddr 0x10000000; setenv bootpart 2; " \
++		"ext4load mmc 0:${bootpart} ${loadaddr} fitImage && bootm; " \
++		"echo Error loading kernel FIT image\0" \
+ 		"ftp_prog=setenv ethact eth${eth_num}; dhcp; tftp 10000000 image-bmc; cp.b 10000000 80000000 ${filesize}\0"   \
+ 		"ftp_run=setenv ethact eth${eth_num}; dhcp; tftp 10000000 image-bmc; bootm 10200000\0"   \
+ 		"usb_prog=usb start; fatload usb 0 10000000 image-bmc; cp.b 10000000 80000000 ${filesize}\0"    \
+-- 
+2.17.1
+
