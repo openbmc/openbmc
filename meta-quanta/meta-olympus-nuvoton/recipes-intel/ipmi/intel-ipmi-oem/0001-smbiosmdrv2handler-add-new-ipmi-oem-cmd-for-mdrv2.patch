@@ -1,0 +1,200 @@
+From 74a9036c26f8dd85fc97c54e25941c9a4e78008c Mon Sep 17 00:00:00 2001
+From: Tim Lee <timlee660101@gmail.com>
+Date: Mon, 8 Jun 2020 10:52:40 +0800
+Subject: [PATCH] smbiosmdrv2handler: add new ipmi oem cmd for mdrv2
+
+Signed-off-by: Tim Lee <timlee660101@gmail.com>
+---
+ include/oemcommands.hpp        |  1 +
+ include/smbiosmdrv2handler.hpp | 10 +++-
+ ipmi-whitelist.conf            |  1 +
+ src/smbiosmdrv2handler.cpp     | 94 +++++++++++++++++++++++++++++++++-
+ 4 files changed, 102 insertions(+), 4 deletions(-)
+
+diff --git a/include/oemcommands.hpp b/include/oemcommands.hpp
+index 6a5578a..8dc53fd 100644
+--- a/include/oemcommands.hpp
++++ b/include/oemcommands.hpp
+@@ -115,6 +115,7 @@ static constexpr Cmd cmdMdrIISendDataInfo = 0x3a;
+ static constexpr Cmd cmdMdrIIDataStart = 0x3b;
+ static constexpr Cmd cmdMdrIIDataDone = 0x3c;
+ static constexpr Cmd cmdMdrIISendDataBlock = 0x3d;
++static constexpr Cmd cmdMdrIIGetMboxSharedMem = 0x3e;
+ static constexpr Cmd cmdSlotIpmb = 0x51;
+ } // namespace app
+ 
+diff --git a/include/smbiosmdrv2handler.hpp b/include/smbiosmdrv2handler.hpp
+index b83e2d4..44c8a63 100644
+--- a/include/smbiosmdrv2handler.hpp
++++ b/include/smbiosmdrv2handler.hpp
+@@ -21,6 +21,10 @@
+ #include <oemcommands.hpp>
+ #include <sdbusplus/timer.hpp>
+ 
++// Nuvoton PCI mailbox implementaion
++static constexpr const uint32_t MboxAddress = 0xF0848000;
++static constexpr const uint32_t MboxLength  = 0x4000;
++
+ static constexpr const char* mdrType2File = "/var/lib/smbios/smbios2";
+ static constexpr const char* smbiosPath = "/var/lib/smbios";
+ static constexpr const size_t msgPayloadSize =
+@@ -54,9 +58,11 @@ static constexpr const uint32_t smbiosTableTimestamp =
+ static constexpr const size_t smbiosSMMemoryOffset =
+     0; // Offset of VGA share memory
+ static constexpr const size_t smbiosSMMemorySize =
+-    1024 * 1024; // Total size of VGA share memory
++//    1024 * 1024; // Total size of VGA share memory
++    16 * 1024; // Total size of PCI mailbox memory
+ static constexpr const size_t smbiosTableStorageSize =
+-    64 * 1024; // Total size of smbios table
++//    64 * 1024; // Total size of smbios table
++    16 * 1024; // Total size of smbios table
+ static constexpr const uint32_t defaultTimeout = 4000;
+ static constexpr const uint16_t sysClock = 1000;
+ static constexpr const int lastAgentIndex = -1;
+diff --git a/ipmi-whitelist.conf b/ipmi-whitelist.conf
+index 4be1de3..b0cb742 100644
+--- a/ipmi-whitelist.conf
++++ b/ipmi-whitelist.conf
+@@ -333,6 +333,7 @@
+ 0x3e:0x3b:0x7f7f   //<Intel Managed Data Region>:<MDR2 Data Start>
+ 0x3e:0x3c:0x7f7f   //<Intel Managed Data Region>:<MDR2 Data Done>
+ 0x3e:0x3d:0x7f7f   //<Intel Managed Data Region>:<MDR2 Data Block>
++0x3e:0x3e:0x7f7f   //<Intel Managed Data Region>:<MDR2 Data Send via Mailbox>
+ 0x3e:0x40:0x7f7f   //<Intel Managed Data Region>:<Set Get LAN Failover>
+ 0x3e:0x41:0xff7f   //<Intel Managed Data Region>:<Enter Platform Debug Log file transfer mode>
+ 0x3e:0x42:0xff7f   //<Intel Managed Data Region>:<Read Platform Debug Log file>
+diff --git a/src/smbiosmdrv2handler.cpp b/src/smbiosmdrv2handler.cpp
+index e782d7c..8207b0d 100644
+--- a/src/smbiosmdrv2handler.cpp
++++ b/src/smbiosmdrv2handler.cpp
+@@ -42,6 +42,7 @@ static constexpr const uint8_t ccStorageLeak = 0xC4;
+ 
+ static void register_netfn_smbiosmdrv2_functions() __attribute__((constructor));
+ 
++
+ int MDRV2::agentLookup(const uint16_t& agentId)
+ {
+     int agentIndex = -1;
+@@ -843,7 +844,8 @@ void SharedMemoryArea::Initialize(uint32_t addr, uint32_t areaSize)
+     int memDriver = 0;
+ 
+     // open mem driver for the system memory access
+-    memDriver = open("/dev/vgasharedmem", O_RDONLY);
++//    memDriver = open("/dev/vgasharedmem", O_RDONLY);
++    memDriver = open("/dev/mem", O_RDONLY);
+     if (memDriver < 0)
+     {
+         phosphor::logging::log<phosphor::logging::level::ERR>(
+@@ -857,7 +859,8 @@ void SharedMemoryArea::Initialize(uint32_t addr, uint32_t areaSize)
+                 PROT_READ,                  // want to read and write
+                 MAP_SHARED,                 // no copy on write
+                 memDriver,                  // handle to /dev/mem
+-                (physicalAddr & pageMask)); // hopefully the Text-buffer :-)
++//                (physicalAddr & pageMask)); // hopefully the Text-buffer :-)
++                physicalAddr);              // hopefully the Text-buffer :-)
+ 
+     close(memDriver);
+     if (vPtr == MAP_FAILED)
+@@ -1264,6 +1267,88 @@ ipmi::RspType<> cmd_mdr2_data_done(uint16_t agentId, uint16_t lockHandle)
+     return ipmi::responseSuccess();
+ }
+ 
++/** @brief implements mdr2 get mbox shared mem command
++ *
++ *  @returns IPMI completion code
++ */
++ipmi::RspType<> cmd_mdr2_get_mbox_shared_mem(uint32_t dataLength)
++{
++    std::string msg = "data len: " +  std::to_string(dataLength);
++    phosphor::logging::log<phosphor::logging::level::INFO>(msg.c_str());
++
++    if (mdrv2 == nullptr)
++    {
++        mdrv2 = std::make_unique<MDRV2>();
++    }
++
++    try
++    {
++        mdrv2->area =
++            std::make_unique<SharedMemoryArea>(MboxAddress, MboxLength);
++    }
++    catch (const std::system_error &e)
++    {
++        return ipmi::responseUnspecifiedError();
++    }
++
++    std::vector<std::uint8_t> results(MboxLength);
++    std::memcpy(results.data(), mdrv2->area->vPtr, dataLength);
++    mdrv2->smbiosDir.dir[0].common.size = dataLength;
++
++    mdrv2->area.reset(nullptr);
++    MDRSMBIOSHeader mdr2Smbios;
++    mdr2Smbios.mdrType = mdrTypeII;
++    mdr2Smbios.dirVer = mdrv2->smbiosDir.dir[0].common.dataVersion;
++    mdr2Smbios.timestamp = mdrv2->smbiosDir.dir[0].common.timestamp;
++    mdr2Smbios.dataSize = mdrv2->smbiosDir.dir[0].common.size;
++
++    if (access(smbiosPath, 0) == -1)
++    {
++        int flag = mkdir(smbiosPath, S_IRWXU);
++        if (flag != 0)
++        {
++            phosphor::logging::log<phosphor::logging::level::ERR>(
++                "create folder failed for writting smbios file");
++        }
++    }
++    if (!mdrv2->storeDatatoFlash(&mdr2Smbios, results.data()))
++    {
++        phosphor::logging::log<phosphor::logging::level::ERR>(
++            "MDR2 Store data to flash failed");
++        return ipmi::responseDestinationUnavailable();
++    }
++
++    // copy from cmd_mdr2_data_done, trigger mdr2 sync data
++    bool status = false;
++    std::shared_ptr<sdbusplus::asio::connection> bus = getSdBus();
++    std::string service = ipmi::getService(*bus, mdrv2Interface, mdrv2Path);
++    sdbusplus::message::message method = bus->new_method_call(
++        service.c_str(), mdrv2Path, mdrv2Interface, "AgentSynchronizeData");
++
++    try
++    {
++        sdbusplus::message::message reply = bus->call(method);
++        reply.read(status);
++    }
++    catch (const sdbusplus::exception_t& e)
++    {
++        phosphor::logging::log<phosphor::logging::level::ERR>(
++            "Error Sync data with service",
++            phosphor::logging::entry("ERROR=%s", e.what()),
++            phosphor::logging::entry("SERVICE=%s", service.c_str()),
++            phosphor::logging::entry("PATH=%s", mdrv2Path));
++        return ipmi::responseResponseError();
++    }
++
++    if (!status)
++    {
++        phosphor::logging::log<phosphor::logging::level::ERR>(
++            "Sync data with service failure");
++        return ipmi::responseUnspecifiedError();
++    }
++    return ipmi::responseSuccess();
++}
++
+ static void register_netfn_smbiosmdrv2_functions(void)
+ {
+     // MDR V2 Command
+@@ -1326,4 +1411,9 @@ static void register_netfn_smbiosmdrv2_functions(void)
+     ipmi::registerHandler(ipmi::prioOemBase, ipmi::intel::netFnApp,
+                           ipmi::intel::app::cmdMdrIIDataDone,
+                           ipmi::Privilege::Operator, cmd_mdr2_data_done);
++
++    // <Get Mailbox Shared Memory>
++    ipmi::registerHandler(ipmi::prioOemBase, ipmi::intel::netFnApp,
++                          ipmi::intel::app::cmdMdrIIGetMboxSharedMem,
++                          ipmi::Privilege::Operator, cmd_mdr2_get_mbox_shared_mem);
+ }
+-- 
+2.17.1
+

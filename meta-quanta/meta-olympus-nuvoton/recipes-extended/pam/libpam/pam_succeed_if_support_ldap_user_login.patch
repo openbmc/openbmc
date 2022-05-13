@@ -1,0 +1,64 @@
+Index: Linux-PAM-1.3.1/libpam/pam_modutil_ingroup.c
+===================================================================
+--- Linux-PAM-1.3.1.orig/libpam/pam_modutil_ingroup.c
++++ Linux-PAM-1.3.1/libpam/pam_modutil_ingroup.c
+@@ -41,6 +41,42 @@ static int checkgrouplist(const char *us
+ }
+ #endif
+ 
++static int checkgrouplistEx(const char *user, gid_t primary, const char *group)
++{
++	gid_t *grouplist = NULL;
++	int agroups, ngroups, i;
++	ngroups = agroups = 3;
++  struct group *gp = NULL;
++	do {
++		grouplist = malloc(sizeof(gid_t) * agroups);
++		if (grouplist == NULL) {
++			return 0;
++		}
++		ngroups = agroups;
++		i = getgrouplist(user, primary, grouplist, &ngroups);
++		if ((i < 0) || (ngroups < 1)) {
++			agroups *= 2;
++			free(grouplist);
++		} else {
++			for (i = 0; i < ngroups; i++) {
++        setgrent();
++        while ((gp = getgrent()) != NULL)
++        {
++          if ( (gp->gr_gid == grouplist[i]) && (0 == strcmp(gp->gr_name, group)) )
++          {
++			    	free(grouplist);
++            endgrent();
++			    	return 1;
++          }
++        }
++        endgrent();
++			}
++			free(grouplist);
++		}
++	} while (((i < 0) || (ngroups < 1)) && (agroups < 10000));
++	return 0;
++}
++
+ static int
+ pam_modutil_user_in_group_common(pam_handle_t *pamh UNUSED,
+ 				 struct passwd *pwd,
+@@ -79,12 +115,15 @@ pam_modutil_user_in_group_nam_nam(pam_ha
+ 				 const char *user, const char *group)
+ {
+ 	struct passwd *pwd;
+-	struct group *grp;
++	//struct group *grp;
+ 
+ 	pwd = pam_modutil_getpwnam(pamh, user);
++#if 0
+ 	grp = pam_modutil_getgrnam(pamh, group);
+ 
+ 	return pam_modutil_user_in_group_common(pamh, pwd, grp);
++#endif
++  return checkgrouplistEx(pwd->pw_name, pwd->pw_gid, group);
+ }
+ 
+ int

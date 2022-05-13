@@ -1,0 +1,209 @@
+From f4eddacc871c6bb759e6e355a89ccaaa12c63396 Mon Sep 17 00:00:00 2001
+From: Zhikui Ren <zhikui.ren@intel.com>
+Date: Tue, 8 Dec 2020 15:16:25 -0800
+Subject: [PATCH] update meson build for MCTP interfaces
+
+Signed-off-by: Zhikui Ren <zhikui.ren@intel.com>
+---
+ gen/xyz/openbmc_project/MCTP/Base/meson.build | 13 ++++++
+ .../MCTP/Binding/PCIe/meson.build             | 13 ++++++
+ .../MCTP/Binding/SMBus/meson.build            | 13 ++++++
+ .../openbmc_project/MCTP/Binding/meson.build  | 30 +++++++++++++
+ .../openbmc_project/MCTP/BusOwner/meson.build | 13 ++++++
+ .../MCTP/SupportedMessageTypes/meson.build    | 13 ++++++
+ gen/xyz/openbmc_project/MCTP/meson.build      | 42 +++++++++++++++++++
+ 7 files changed, 137 insertions(+)
+ create mode 100644 gen/xyz/openbmc_project/MCTP/Base/meson.build
+ create mode 100644 gen/xyz/openbmc_project/MCTP/Binding/PCIe/meson.build
+ create mode 100644 gen/xyz/openbmc_project/MCTP/Binding/SMBus/meson.build
+ create mode 100644 gen/xyz/openbmc_project/MCTP/Binding/meson.build
+ create mode 100644 gen/xyz/openbmc_project/MCTP/BusOwner/meson.build
+ create mode 100644 gen/xyz/openbmc_project/MCTP/SupportedMessageTypes/meson.build
+
+diff --git a/gen/xyz/openbmc_project/MCTP/Base/meson.build b/gen/xyz/openbmc_project/MCTP/Base/meson.build
+new file mode 100644
+index 000000000000..c605b2d496ac
+--- /dev/null
++++ b/gen/xyz/openbmc_project/MCTP/Base/meson.build
+@@ -0,0 +1,13 @@
++# Generated file; do not modify.
++generated_sources += custom_target(
++    'xyz/openbmc_project/MCTP/Base__cpp'.underscorify(),
++    input: [ '../../../../../yaml/xyz/openbmc_project/MCTP/Base.interface.yaml',  ],
++    output: [ 'server.cpp', 'server.hpp', 'client.hpp',  ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'cpp',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.current_source_dir() / '../../../../../yaml',
++        'xyz/openbmc_project/MCTP/Base',
++    ],
++)
+diff --git a/gen/xyz/openbmc_project/MCTP/Binding/PCIe/meson.build b/gen/xyz/openbmc_project/MCTP/Binding/PCIe/meson.build
+new file mode 100644
+index 000000000000..4573a64f4099
+--- /dev/null
++++ b/gen/xyz/openbmc_project/MCTP/Binding/PCIe/meson.build
+@@ -0,0 +1,13 @@
++# Generated file; do not modify.
++generated_sources += custom_target(
++    'xyz/openbmc_project/MCTP/Binding/PCIe__cpp'.underscorify(),
++    input: [ '../../../../../../yaml/xyz/openbmc_project/MCTP/Binding/PCIe.interface.yaml',  ],
++    output: [ 'server.cpp', 'server.hpp', 'client.hpp',  ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'cpp',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.current_source_dir() / '../../../../../../yaml',
++        'xyz/openbmc_project/MCTP/Binding/PCIe',
++    ],
++)
+diff --git a/gen/xyz/openbmc_project/MCTP/Binding/SMBus/meson.build b/gen/xyz/openbmc_project/MCTP/Binding/SMBus/meson.build
+new file mode 100644
+index 000000000000..bfb4d040a54c
+--- /dev/null
++++ b/gen/xyz/openbmc_project/MCTP/Binding/SMBus/meson.build
+@@ -0,0 +1,13 @@
++# Generated file; do not modify.
++generated_sources += custom_target(
++    'xyz/openbmc_project/MCTP/Binding/SMBus__cpp'.underscorify(),
++    input: [ '../../../../../../yaml/xyz/openbmc_project/MCTP/Binding/SMBus.interface.yaml',  ],
++    output: [ 'server.cpp', 'server.hpp', 'client.hpp',  ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'cpp',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.current_source_dir() / '../../../../../../yaml',
++        'xyz/openbmc_project/MCTP/Binding/SMBus',
++    ],
++)
+diff --git a/gen/xyz/openbmc_project/MCTP/Binding/meson.build b/gen/xyz/openbmc_project/MCTP/Binding/meson.build
+new file mode 100644
+index 000000000000..36a74ddac294
+--- /dev/null
++++ b/gen/xyz/openbmc_project/MCTP/Binding/meson.build
+@@ -0,0 +1,28 @@
++# Generated file; do not modify.
++subdir('PCIe')
++generated_others += custom_target(
++    'xyz/openbmc_project/MCTP/Binding/PCIe__markdown'.underscorify(),
++    input: [ '../../../../../yaml/xyz/openbmc_project/MCTP/Binding/PCIe.interface.yaml',  ],
++    output: [ 'PCIe.md' ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'markdown',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.current_source_dir() / '../../../../../yaml',
++        'xyz/openbmc_project/MCTP/Binding/PCIe',
++    ],
++)
++
++subdir('SMBus')
++generated_others += custom_target(
++    'xyz/openbmc_project/MCTP/Binding/SMBus__markdown'.underscorify(),
++    input: [ '../../../../../yaml/xyz/openbmc_project/MCTP/Binding/SMBus.interface.yaml',  ],
++    output: [ 'SMBus.md' ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'markdown',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.current_source_dir() / '../../../../../yaml',
++        'xyz/openbmc_project/MCTP/Binding/SMBus',
++    ],
++)
+diff --git a/gen/xyz/openbmc_project/MCTP/BusOwner/meson.build b/gen/xyz/openbmc_project/MCTP/BusOwner/meson.build
+new file mode 100644
+index 000000000000..4b28bd6b34e7
+--- /dev/null
++++ b/gen/xyz/openbmc_project/MCTP/BusOwner/meson.build
+@@ -0,0 +1,13 @@
++# Generated file; do not modify.
++generated_sources += custom_target(
++    'xyz/openbmc_project/MCTP/BusOwner__cpp'.underscorify(),
++    input: [ '../../../../../yaml/xyz/openbmc_project/MCTP/BusOwner.interface.yaml',  ],
++    output: [ 'server.cpp', 'server.hpp', 'client.hpp',  ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'cpp',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.current_source_dir() / '../../../../../yaml',
++        'xyz/openbmc_project/MCTP/BusOwner',
++    ],
++)
+diff --git a/gen/xyz/openbmc_project/MCTP/SupportedMessageTypes/meson.build b/gen/xyz/openbmc_project/MCTP/SupportedMessageTypes/meson.build
+new file mode 100644
+index 000000000000..4fd46823ed17
+--- /dev/null
++++ b/gen/xyz/openbmc_project/MCTP/SupportedMessageTypes/meson.build
+@@ -0,0 +1,13 @@
++# Generated file; do not modify.
++generated_sources += custom_target(
++    'xyz/openbmc_project/MCTP/SupportedMessageTypes__cpp'.underscorify(),
++    input: [ '../../../../../yaml/xyz/openbmc_project/MCTP/SupportedMessageTypes.interface.yaml',  ],
++    output: [ 'server.cpp', 'server.hpp', 'client.hpp',  ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'cpp',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.current_source_dir() / '../../../../../yaml',
++        'xyz/openbmc_project/MCTP/SupportedMessageTypes',
++    ],
++)
+diff --git a/gen/xyz/openbmc_project/MCTP/meson.build b/gen/xyz/openbmc_project/MCTP/meson.build
+index b9598adf6fa7..6b6d00b833d2 100644
+--- a/gen/xyz/openbmc_project/MCTP/meson.build
++++ b/gen/xyz/openbmc_project/MCTP/meson.build
+@@ -1,4 +1,33 @@
+ # Generated file; do not modify.
++subdir('Base')
++generated_others += custom_target(
++    'xyz/openbmc_project/MCTP/Base__markdown'.underscorify(),
++    input: [ '../../../../yaml/xyz/openbmc_project/MCTP/Base.interface.yaml',  ],
++    output: [ 'Base.md' ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'markdown',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.current_source_dir() / '../../../../yaml',
++        'xyz/openbmc_project/MCTP/Base',
++    ],
++)
++
++subdir('Binding')
++subdir('BusOwner')
++generated_others += custom_target(
++    'xyz/openbmc_project/MCTP/BusOwner__markdown'.underscorify(),
++    input: [ '../../../../yaml/xyz/openbmc_project/MCTP/BusOwner.interface.yaml',  ],
++    output: [ 'BusOwner.md' ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'markdown',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.current_source_dir() / '../../../../yaml',
++        'xyz/openbmc_project/MCTP/BusOwner',
++    ],
++)
++
+ subdir('Endpoint')
+ generated_others += custom_target(
+     'xyz/openbmc_project/MCTP/Endpoint__markdown'.underscorify(),
+@@ -13,3 +42,16 @@ generated_others += custom_target(
+     ],
+ )
+ 
++subdir('SupportedMessageTypes')
++generated_others += custom_target(
++    'xyz/openbmc_project/MCTP/SupportedMessageTypes__markdown'.underscorify(),
++    input: [ '../../../../yaml/xyz/openbmc_project/MCTP/SupportedMessageTypes.interface.yaml',  ],
++    output: [ 'SupportedMessageTypes.md' ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'markdown',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.current_source_dir() / '../../../../yaml',
++        'xyz/openbmc_project/MCTP/SupportedMessageTypes',
++    ],
++)
+-- 
+2.17.1
+

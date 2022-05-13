@@ -1,0 +1,99 @@
+From d3185acb1d7c11603ba06d58d04e0a6dc790451f Mon Sep 17 00:00:00 2001
+From: Tim Lee <timlee660101@gmail.com>
+Date: Fri, 29 Oct 2021 13:58:04 +0800
+Subject: [PATCH 2/5] Redfish Add power metrics support
+
+Signed-off-by: Tim Lee <timlee660101@gmail.com>
+---
+ redfish-core/lib/power.hpp | 75 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 75 insertions(+)
+
+diff --git a/redfish-core/lib/power.hpp b/redfish-core/lib/power.hpp
+index 118f3976b..b59c854d9 100644
+--- a/redfish-core/lib/power.hpp
++++ b/redfish-core/lib/power.hpp
+@@ -291,6 +291,81 @@ inline void requestRoutesPower(App& app)
+                             // be null if the limit is not enabled.
+                             value = powerCap * std::pow(10, scale);
+                         }
++
++                        auto PowerMetricHandler =
++                        [sensorAsyncResp](
++                            const boost::system::error_code ec,
++                            const std::vector<std::pair<std::string, dbus::utility::DbusVariantType>>&
++                                properties) {
++                            if (ec)
++                            {
++                                messages::internalError(sensorAsyncResp->asyncResp->res);
++                                BMCWEB_LOG_ERROR
++                                    << "Power Metric GetAll handler: Dbus error " << ec;
++                                return;
++                            }
++                            nlohmann::json& tempArray =
++                                sensorAsyncResp->asyncResp->res.jsonValue["PowerControl"];
++                            nlohmann::json& sensorJson = tempArray.back();
++                            for (const std::pair<std::string, dbus::utility::DbusVariantType>& property :
++                                properties)
++                            {
++                                if (!property.first.compare("IntervalInMin"))
++                                {
++                                    const uint64_t* i =
++                                    std::get_if<uint64_t>(
++                                        &property.second);
++
++                                    if (i)
++                                    {
++                                        nlohmann::json& value =
++                                            sensorJson["PowerMetrics"]["IntervalInMin"];
++                                        value = *i;
++                                    }
++                                }
++                                else if (!property.first.compare("MinConsumedWatts"))
++                                {
++                                    const uint16_t* i =
++                                    std::get_if<uint16_t>(
++                                        &property.second);
++                                    if (i)
++                                    {
++                                        nlohmann::json& value =
++                                            sensorJson["PowerMetrics"]["MinConsumedWatts"];
++                                        value = *i;
++                                    }
++                                }
++                                else if (!property.first.compare("MaxConsumedWatts"))
++                                {
++                                    const uint16_t* i =
++                                    std::get_if<uint16_t>(
++                                        &property.second);
++                                    if (i)
++                                    {
++                                        nlohmann::json& value =
++                                            sensorJson["PowerMetrics"]["MaxConsumedWatts"];
++                                        value = *i;
++                                    }
++                                }
++                                else if (!property.first.compare("AverageConsumedWatts"))
++                                {
++                                    const uint16_t* i =
++                                    std::get_if<uint16_t>(
++                                        &property.second);
++                                    if (i)
++                                    {
++                                        nlohmann::json& value =
++                                            sensorJson["PowerMetrics"]["AverageConsumedWatts"];
++                                        value = *i;
++                                    }
++                                }
++                            }
++                        };
++                        crow::connections::systemBus->async_method_call(
++                            std::move(PowerMetricHandler), "xyz.openbmc_project.NodeManagerProxy",
++                            "/xyz/openbmc_project/Power/PowerMetric",
++                            "org.freedesktop.DBus.Properties", "GetAll",
++                            "xyz.openbmc_project.Power.PowerMetric");
+                     };
+ 
+                 crow::connections::systemBus->async_method_call(
+-- 
+2.17.1
+

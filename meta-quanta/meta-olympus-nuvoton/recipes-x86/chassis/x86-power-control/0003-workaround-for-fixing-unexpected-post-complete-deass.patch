@@ -1,0 +1,29 @@
+From 54de24a0e13065a078404cc03060ab197e96848d Mon Sep 17 00:00:00 2001
+From: Tim Lee <timlee660101@gmail.com>
+Date: Mon, 10 Jan 2022 09:22:17 +0800
+Subject: [PATCH 3/3] workaround for fixing unexpected post complete deassert
+ event in olympus
+
+Signed-off-by: Tim Lee <timlee660101@gmail.com>
+---
+ src/power_control.cpp | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/src/power_control.cpp b/src/power_control.cpp
+index 5398468..a462ad8 100644
+--- a/src/power_control.cpp
++++ b/src/power_control.cpp
+@@ -1688,9 +1688,7 @@ static void powerStateOn(const Event event)
+ #else
+         case Event::postCompleteDeAssert:
+ #endif
+-            setPowerState(PowerState::checkForWarmReset);
+-            addRestartCause(RestartCause::softReset);
+-            warmResetCheckTimerStart();
++            lg2::info("postCompleteDeAssert: No action taken.");
+             break;
+         case Event::powerButtonPressed:
+             setPowerState(PowerState::gracefulTransitionToOff);
+-- 
+2.17.1
+

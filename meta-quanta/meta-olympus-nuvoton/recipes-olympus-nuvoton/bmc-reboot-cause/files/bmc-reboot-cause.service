@@ -1,0 +1,13 @@
+[Unit]
+Description=BMC Reboot Cause service
+
+[Service]
+Restart=no
+Type=oneshot
+ExecStartPre=/usr/bin/env mapper wait /xyz/openbmc_project/object_mapper
+ExecStartPre=/usr/bin/env mapper wait /xyz/openbmc_project/state/bmc0
+ExecStart=/usr/bin/reboot-cause.sh
+SyslogIdentifier=reboot-cause.sh
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

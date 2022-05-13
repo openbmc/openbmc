@@ -1,0 +1,28 @@
+[Unit]
+Description=Phosphor Inband IPMI
+# TODO openbmc/openbmc#2059 - The wants/after below should be based on providers
+Wants=mapper-wait@-xyz-openbmc_project-control-host0-boot.service
+After=mapper-wait@-xyz-openbmc_project-control-host0-boot.service
+Wants=mapper-wait@-xyz-openbmc_project-control-host0-boot-one_time.service
+After=mapper-wait@-xyz-openbmc_project-control-host0-boot-one_time.service
+Wants=mapper-wait@-xyz-openbmc_project-control-host0-power_restore_policy.service
+After=mapper-wait@-xyz-openbmc_project-control-host0-power_restore_policy.service
+Wants=mapper-wait@-xyz-openbmc_project-control-host0-restriction_mode.service
+After=mapper-wait@-xyz-openbmc_project-control-host0-restriction_mode.service
+Wants=clear-once.service
+After=clear-once.service
+After=phosphor-ipmi-kcs@.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/env ipmid
+SyslogIdentifier=ipmid
+RuntimeDirectory = ipmi
+RuntimeDirectoryPreserve = yes
+StateDirectory = ipmi
+Type=dbus
+BusName=xyz.openbmc_project.Control.Host
+
+[Install]
+WantedBy=multi-user.target
+Alias=xyz.openbmc_project.Control.Host.service

@@ -1,0 +1,43 @@
+From f71a7e0068eed7e61a18a618521e7cd3274000fb Mon Sep 17 00:00:00 2001
+From: Brian Ma <chma0@nuvoton.com>
+Date: Tue, 29 Mar 2022 10:13:24 +0800
+Subject: [PATCH 3/5] Create new user without SSH group
+
+Remove SSH group permission from default groups when create new user.
+---
+ redfish-core/lib/account_service.hpp | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/redfish-core/lib/account_service.hpp b/redfish-core/lib/account_service.hpp
+index b3687af78..6f183d6ca 100644
+--- a/redfish-core/lib/account_service.hpp
++++ b/redfish-core/lib/account_service.hpp
+@@ -1643,6 +1643,16 @@ inline void requestAccountServiceRoutes(App& app)
+                         messages::internalError(asyncResp->res);
+                         return;
+                     }
++                    // Remove ssh from all group list
++                    std::vector<std::string> nonSshGroups;
++                    for (auto group = allGroupsList.begin();
++                         group != allGroupsList.end(); ++group)
++                    {
++                        if (*group != "ssh")
++                        {
++                            nonSshGroups.push_back(*group);
++                        }
++                    }
+ 
+                     crow::connections::systemBus->async_method_call(
+                         [asyncResp, username,
+@@ -1700,7 +1710,7 @@ inline void requestAccountServiceRoutes(App& app)
+                         "xyz.openbmc_project.User.Manager",
+                         "/xyz/openbmc_project/user",
+                         "xyz.openbmc_project.User.Manager", "CreateUser",
+-                        username, allGroupsList, *roleId, *enabled);
++                        username, nonSshGroups, *roleId, *enabled);
+                 });
+         });
+ 
+-- 
+2.17.1
+

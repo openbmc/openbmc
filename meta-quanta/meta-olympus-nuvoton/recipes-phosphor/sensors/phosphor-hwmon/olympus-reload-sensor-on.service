@@ -1,0 +1,6 @@
+[Unit]
+Description=Reload Sensor On Configuration
+
+[Service]
+ExecStart=/bin/sh -c "olympus-reload-sensor.sh 1"
+SyslogIdentifier=obmc-power-start

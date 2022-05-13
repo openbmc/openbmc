@@ -1,0 +1,146 @@
+From 4c73d7116d9c2013446031c4b39d4b6ded90d9cd Mon Sep 17 00:00:00 2001
+From: Tim Lee <timlee660101@gmail.com>
+Date: Fri, 13 Dec 2019 16:13:50 +0800
+Subject: [PATCH 2/3] Add support for enabling/disabling network IPMI
+
+Signed-off-by: Tim Lee <timlee660101@gmail.com>
+---
+ user_channel/channel_mgmt.cpp | 98 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 98 insertions(+)
+
+diff --git a/user_channel/channel_mgmt.cpp b/user_channel/channel_mgmt.cpp
+index aa746fd3..059d41b8 100644
+--- a/user_channel/channel_mgmt.cpp
++++ b/user_channel/channel_mgmt.cpp
+@@ -25,6 +25,7 @@
+ #include <unistd.h>
+ 
+ #include <boost/interprocess/sync/scoped_lock.hpp>
++#include <boost/process/child.hpp>
+ #include <cerrno>
+ #include <exception>
+ #include <experimental/filesystem>
+@@ -149,6 +150,91 @@ const std::array<std::string, PRIVILEGE_OEM + 1> privList = {
+     "priv-reserved", "priv-callback", "priv-user",
+     "priv-operator", "priv-admin",    "priv-oem"};
+ 
++template <typename... ArgTypes>
++static int executeCmd(const char* path, ArgTypes&&... tArgs)
++{
++    boost::process::child execProg(path, const_cast<char*>(tArgs)...);
++    execProg.wait();
++    return execProg.exit_code();
++}
++
++/** @brief Enable the network IPMI service on the specified ethernet interface.
++ *
++ *  @param[in] intf - ethernet interface on which to enable IPMI
++ */
++void enableNetworkIPMI(const std::string& intf)
++{
++    // Check if there is a iptable filter to drop IPMI packets for the
++    // interface.
++    auto retCode =
++        executeCmd("/usr/sbin/iptables", "-C", "INPUT", "-p", "udp", "-i",
++                   intf.c_str(), "--dport", "623", "-j", "DROP");
++
++    // If the iptable filter exists, delete the filter.
++    if (!retCode)
++    {
++        auto response =
++            executeCmd("/usr/sbin/iptables", "-D", "INPUT", "-p", "udp", "-i",
++                       intf.c_str(), "--dport", "623", "-j", "DROP");
++        if (response)
++        {
++            log<level::ERR>("Dropping the iptables filter failed",
++                            entry("INTF=%s", intf.c_str()),
++                            entry("RETURN_CODE:%d", response));
++            return;
++        }
++
++        response =
++            std::system("/usr/sbin/iptables-save > /var/lib/iptables_rules");
++        if (response)
++        {
++            log<level::ERR>("Persisting the iptables failed",
++                            entry("INTF=%s", intf.c_str()),
++                            entry("RETURN_CODE=%d", response));
++        }
++    }
++}
++
++/** @brief Disable the network IPMI service on the specified ethernet interface.
++ *
++ *  @param[in] intf - ethernet interface on which to disable IPMI
++ */
++void disableNetworkIPMI(const std::string& intf)
++{
++    // Check if there is a iptable filter to drop IPMI packets for the
++    // interface.
++    auto retCode =
++        executeCmd("/usr/sbin/iptables", "-C", "INPUT", "-p", "udp", "-i",
++                   intf.c_str(), "--dport", "623", "-j", "DROP");
++
++    // If the iptable filter does not exist, add filter to drop network IPMI
++    // packets
++    if (retCode)
++    {
++        auto response =
++            executeCmd("/usr/sbin/iptables", "-I", "INPUT", "-p", "udp", "-i",
++                       intf.c_str(), "--dport", "623", "-j", "DROP");
++
++        if (response)
++        {
++            log<level::ERR>("Inserting iptables filter failed",
++                            entry("INTF=%s", intf.c_str()),
++                            entry("RETURN_CODE:%d", response));
++            return;
++        }
++
++        response =
++            std::system("/usr/sbin/iptables-save > /var/lib/iptables_rules");
++
++        if (response)
++        {
++            log<level::ERR>("Persisting the iptables failed",
++                            entry("INTF=%s", intf.c_str()),
++                            entry("RETURN_CODE=%d", response));
++        }
++    }
++}
++
+ std::string ChannelConfig::getChannelName(const uint8_t chNum)
+ {
+     if (!isValidChannel(chNum))
+@@ -619,6 +705,16 @@ Cc ChannelConfig::setChannelAccessPersistData(const uint8_t chNum,
+     {
+         channelData[chNum].chAccess.chNonVolatileData.accessMode =
+             chAccessData.accessMode;
++
++        if (convertToAccessModeString(chAccessData.accessMode) == "disabled")
++        {
++            disableNetworkIPMI(channelData[chNum].chName);
++        }
++        else if (convertToAccessModeString(chAccessData.accessMode) ==
++                "always_available")
++        {
++            enableNetworkIPMI(channelData[chNum].chName);
++        }
+     }
+     if (setFlag & setUserAuthEnabled)
+     {
+@@ -1324,9 +1420,11 @@ int ChannelConfig::setDbusProperty(const std::string& service,
+         method.append(interface, property, value);
+ 
+         auto reply = bus.call(method);
++
+     }
+     catch (const sdbusplus::exception::exception& e)
+     {
++        log<level::ERR>("Exception: ", entry("MSG=%s", e.what()));
+         log<level::DEBUG>("set-property failed",
+                           entry("SERVICE=%s", service.c_str()),
+                           entry("OBJPATH=%s", objPath.c_str()),
+-- 
+2.17.1
+

@@ -1,0 +1,35 @@
+From 46ac668b4fb56aaa4c3ce0392db7d098efeeca38 Mon Sep 17 00:00:00 2001
+From: Tim Lee <timlee660101@gmail.com>
+Date: Thu, 8 Jul 2021 08:22:15 +0800
+Subject: [PATCH] build: meson fix python command parameter
+
+Signed-off-by: Tim Lee <timlee660101@gmail.com>
+---
+ meson.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index b2fe71e0..36c78e39 100644
+--- a/meson.build
++++ b/meson.build
+@@ -96,7 +96,7 @@ elog_lookup_gen = custom_target('elog-lookup.cpp'.underscorify(),
+         '-t', '',
+         '-m', '@INPUT1@',
+         '-y', yamldir,
+-        '-u', meson.current_source_dir() / '../tools/',
++        '-u', meson.current_source_dir() / 'tools/',
+         '-o', '@OUTPUT0@',
+     ],
+ )
+@@ -112,7 +112,7 @@ elog_process_gen = custom_target('elog-process-metadata.cpp'.underscorify(),
+         '-t', '',
+         '-m', '@INPUT1@',
+         '-y', yamldir,
+-        '-u', meson.current_source_dir() / '../tools/',
++        '-u', meson.current_source_dir() / 'tools/',
+         '-o', '@OUTPUT0@',
+     ],
+ )
+-- 
+2.17.1
+

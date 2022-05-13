@@ -1,0 +1,6 @@
+[Unit]
+Description=OpenBMC Fan Control Daemon (Stop)
+
+[Service]
+Type=oneshot
+ExecStart=-/bin/systemctl stop phosphor-pid-control.service

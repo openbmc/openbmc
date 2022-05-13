@@ -1,0 +1,9 @@
+[Unit]
+Description=OpenPOWER debug data collector for host watchdog timeout
+Before=obmc-host-quiesce@%i.target
+
+[Service]
+ExecStart=/usr/bin/env watchdog_timeout
+SyslogIdentifier=watchdog_timeout
+Type=oneshot
+Restart=no

@@ -1,0 +1,41 @@
+From ae07d5e055d795bad3cf3353c71f2097b88ebc51 Mon Sep 17 00:00:00 2001
+From: Tim Lee <timlee660101@gmail.com>
+Date: Wed, 23 Jun 2021 13:53:43 +0800
+Subject: [PATCH] adjust current size of dump directory to near linux du
+ command
+
+Signed-off-by: Tim Lee <timlee660101@gmail.com>
+---
+ dump_manager_bmc.cpp | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/dump_manager_bmc.cpp b/dump_manager_bmc.cpp
+index 931c0eb..d5bff09 100644
+--- a/dump_manager_bmc.cpp
++++ b/dump_manager_bmc.cpp
+@@ -15,6 +15,7 @@
+ 
+ #include <ctime>
+ #include <regex>
++#include <cmath>
+ 
+ namespace phosphor
+ {
+@@ -249,13 +250,10 @@ size_t Manager::getAllowedSize()
+     {
+         if (!std::filesystem::is_directory(p))
+         {
+-            size += std::filesystem::file_size(p);
++            size += std::ceil((std::filesystem::file_size(p) / 1024.0));
+         }
+     }
+ 
+-    // Convert size into KB
+-    size = size / 1024;
+-
+     // Set the Dump size to Maximum  if the free space is greater than
+     // Dump max size otherwise return the available size.
+ 
+-- 
+2.17.1
+

@@ -1,0 +1,112 @@
+From a79690132728407f4605dccd1d65c9253279126a Mon Sep 17 00:00:00 2001
+From: kfting <kfting@nuvoton.com>
+Date: Fri, 27 Dec 2019 13:14:38 +0800
+Subject: [PATCH] meta-quanta:meta-olympus-nuvoton:phosphor-user-manager pass
+ test_ldap_configuration.robot
+
+1. Deal with the group id and name consistency
+
+Signed-off-by: kfting <kfting@nuvoton.com>
+---
+ user_mgr.cpp | 65 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ user_mgr.hpp |  1 +
+ 2 files changed, 65 insertions(+), 1 deletion(-)
+
+diff --git a/user_mgr.cpp b/user_mgr.cpp
+index c65a822..4bba149 100644
+--- a/user_mgr.cpp
++++ b/user_mgr.cpp
+@@ -915,6 +915,54 @@ DbusUserObj UserMgr::getPrivilegeMapperObject(void)
+     return objects;
+ }
+ 
++std::string UserMgr::getLdapGroupNameEx(const std::string &userName, const std::string &grpName)
++{
++    struct passwd pwd
++    {
++    };
++    struct passwd *pwdPtr = nullptr;
++    auto buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
++    if (buflen < -1)
++    {
++        // Use a default size if there is no hard limit suggested by sysconf()
++        buflen = 1024;
++    }
++    std::vector<char> buffer(buflen);
++    gid_t gid = 0;
++
++    auto status =
++        getpwnam_r(userName.c_str(), &pwd, buffer.data(), buflen, &pwdPtr);
++    // On success, getpwnam_r() returns zero, and set *pwdPtr to pwd.
++    // If no matching password record was found, these functions return 0
++    // and store NULL in *pwdPtr
++    if (!status && (&pwd == pwdPtr))
++    {
++        gid = pwd.pw_gid;
++    }
++    else
++    {
++        log<level::ERR>("User does not exist",
++                        entry("USER_NAME=%s", userName.c_str()));
++        elog<UserNameDoesNotExist>();
++    }
++
++    struct group *groups = nullptr;
++    std::string ldapGroupName;
++
++    while ((groups = getgrent()) != NULL)
++    {
++        if ( (groups->gr_gid == gid) && (0 == strcmp(groups->gr_name, grpName.c_str())) )
++        {
++            ldapGroupName = groups->gr_name;
++            break;
++        }
++    }
++    // Call endgrent() to close the group database.
++    endgrent();
++
++    return ldapGroupName;
++}
++
+ std::string UserMgr::getLdapGroupName(const std::string& userName)
+ {
+     struct passwd pwd
+@@ -1087,7 +1135,22 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
+ 
+             if (priv.empty())
+             {
+-                log<level::ERR>("LDAP group privilege mapping does not exist");
++                if(!groupName.empty())
++                {
++                    std::string ldapGroupName = getLdapGroupNameEx(userName, groupName);
++                    if(!ldapGroupName.empty())
++                    {
++                        userInfo["UserPrivilege"] = privilege;
++                    }
++                    else
++                    {
++                        log<level::ERR>("LDAP group privilege mapping does not exist");
++                    }
++                }
++                else
++                {
++                    log<level::ERR>("LDAP group privilege mapping does not exist");
++                }
+             }
+         }
+         catch (const std::bad_variant_access& e)
+diff --git a/user_mgr.hpp b/user_mgr.hpp
+index f5aac22..23c33f0 100644
+--- a/user_mgr.hpp
++++ b/user_mgr.hpp
+@@ -339,6 +339,7 @@ class UserMgr : public Ifaces
+      *  @return - group name
+      */
+     virtual std::string getLdapGroupName(const std::string& userName);
++    virtual std::string getLdapGroupNameEx(const std::string& userName, const std::string& grpName);
+ 
+     /** @brief get privilege mapper object
+      *  method to get dbus privilege mapper object
+-- 
+2.17.1
+

@@ -1,0 +1,179 @@
+From de343a99a59343d98cfb6584e05fe09312e404d2 Mon Sep 17 00:00:00 2001
+From: Brian Ma <chma0@nuvoton.com>
+Date: Thu, 6 Feb 2020 12:00:51 +0800
+Subject: [PATCH] add force recovery functions
+
+---
+ NodeManagerProxy.cpp | 107 +++++++++++++++++++++++++++++++++++++++++++
+ NodeManagerProxy.hpp |  21 +++++++++
+ 2 files changed, 128 insertions(+)
+
+diff --git a/NodeManagerProxy.cpp b/NodeManagerProxy.cpp
+index ae5f992..571c39c 100644
+--- a/NodeManagerProxy.cpp
++++ b/NodeManagerProxy.cpp
+@@ -206,6 +206,9 @@ int main(int argc, char *argv[])
+         [&healthData](const std::string &type, const std::string &level) {
+             healthData.set(type, level);
+         });
++    healthInterface->register_method("EnableForceRecovery", RecoveryMode);
++    healthInterface->register_method("GetSelfTestResults", GetSelfTestResults);
++
+     healthInterface->initialize();
+ 
+     sdbusplus::bus::match::match configurationMatch(
+@@ -239,3 +242,107 @@ int main(int argc, char *argv[])
+     io.run();
+     return 0;
+ }
++void printData(std::vector<uint8_t> data)
++{
++    std::string data_str="";
++    char hex[2];
++    for (int i = 0 ; i < data.size() ; i++)
++    {
++        if (i > 0) data_str += " ";
++        sprintf(hex, "%02X", data[i]);
++        data_str += hex;
++    }
++    std::string msg = "respond data: " + data_str +
++            ", size: " + std::to_string(data.size());
++    phosphor::logging::log<phosphor::logging::level::INFO>(msg.c_str());
++}
++
++int ColdReset()
++{
++    IpmbDbusRspType ipmbResponse;
++    std::vector<uint8_t> dataToSend;
++    int sendStatus = ipmbSendRequest(
++        *conn, ipmbResponse, dataToSend, ipmiColdResetNetFn,
++        ipmiColdResetLun, ipmiColdResetCmd);
++    return sendStatus;
++}
++
++int RecoveryMode(bool enable)
++{
++    std::string msg = enable?"True":"False";
++    msg = "EnableForceRecovery: " + msg;
++    phosphor::logging::log<phosphor::logging::level::INFO>(msg.c_str());
++    if (!enable)
++    {
++        return ColdReset();
++    }
++    // prepare data to be sent
++    std::vector<uint8_t> dataToSend;
++    dataToSend.resize(sizeof(nmIpmiForceMERecoveryReq));
++
++    auto nmIpmiForceMERecovery =
++        reinterpret_cast<nmIpmiForceMERecoveryReq *>(dataToSend.data());
++
++    uint8_t command = 0x1; // Restart using Recovery Firmware
++
++    ipmiSetIntelIanaNumber(nmIpmiForceMERecovery->iana);
++    nmIpmiForceMERecovery->command = command;
++
++    IpmbDbusRspType ipmbResponse;
++    int sendStatus = ipmbSendRequest(
++        *conn, ipmbResponse, dataToSend, ipmiForceMERecoveryNetFn,
++        ipmiForceMERecoveryLun, ipmiForceMERecoveryCmd);
++
++    if (sendStatus != 0)
++        return sendStatus;
++
++    const auto &[status, netfn, lun, cmd, cc, dataReceived] = ipmbResponse;
++
++    if (status)
++    {
++        phosphor::logging::log<phosphor::logging::level::ERR>(
++            "forceRecovery: non-zero response status ",
++            phosphor::logging::entry("%d", status));
++        return -1;
++    }
++    if (cc)
++    {
++        phosphor::logging::log<phosphor::logging::level::WARNING>(
++            "forceRecovery: unsupported command parameter.",
++            phosphor::logging::entry("%d", cc));
++    }
++    return cc;
++}
++// return string for script using
++std::string GetSelfTestResults()
++{
++    IpmbDbusRspType ipmbResponse;
++    std::vector<uint8_t> dataToSend;
++    int sendStatus = ipmbSendRequest(
++        *conn, ipmbResponse, dataToSend, ipmiGetDevIdNetFn,
++        ipmiGetDevIdLun, ipmiGetTestResults);
++
++    char result[4*2] = {0};
++    const auto &[status, netfn, lun, cmd, cc, dataReceived] = ipmbResponse;
++    if (status)
++    {
++        phosphor::logging::log<phosphor::logging::level::ERR>(
++            "GetSelfTestResults: send request failed. ",
++            phosphor::logging::entry("%d", status));
++        sprintf(result, "%02X", status);
++    }
++    else if(dataReceived.size() != 2)
++    {
++        phosphor::logging::log<phosphor::logging::level::ERR>(
++            "GetSelfTestResults: return data error! ",
++            phosphor::logging::entry("%d", status));
++        sprintf(result, "%02X%02X", status, cc);
++    }
++    else
++    {
++        // in normal case, return [ipmb return], [complete code(byte 1)],
++        // [btye 2 data], [byte 3 data], for each data convert to 2 char as hex
++        sprintf(result, "%02X%02X%02X%02X", status, cc, dataReceived[0], dataReceived[1]);
++    }
++    return std::string(result);
++}
+diff --git a/NodeManagerProxy.hpp b/NodeManagerProxy.hpp
+index 154c033..d84237c 100644
+--- a/NodeManagerProxy.hpp
++++ b/NodeManagerProxy.hpp
+@@ -139,6 +139,15 @@ constexpr uint8_t highPowerIOsubsystem = 0x4;
+ constexpr uint8_t ipmiGetDevIdNetFn = 0x6;
+ constexpr uint8_t ipmiGetDevIdLun = 0;
+ constexpr uint8_t ipmiGetDevIdCmd = 0x1;
++constexpr uint8_t ipmiGetTestResults = 0x4;
++
++// Recovery mode
++constexpr uint8_t ipmiColdResetNetFn = 0x6;
++constexpr uint8_t ipmiColdResetLun = 0;
++constexpr uint8_t ipmiColdResetCmd = 0x2;
++constexpr uint8_t ipmiForceMERecoveryNetFn = 0x2E;
++constexpr uint8_t ipmiForceMERecoveryLun = 0;
++constexpr uint8_t ipmiForceMERecoveryCmd = 0xDF;
+ 
+ /**
+  * @brief Part of Get Device ID Command Response Payload
+@@ -242,6 +251,14 @@ typedef struct
+     uint16_t statsPeriod;
+ } __attribute__((packed)) nmIpmiSetNmPolicyReq;
+ 
++// recovery request format
++typedef struct
++{
++    ipmiIana iana;
++    uint8_t command;
++} __attribute__((packed)) nmIpmiForceMERecoveryReq;
++
++
+ /**
+  * @brief Enable/Disable NM Policy Control request format
+  */
+@@ -800,4 +817,8 @@ struct HealthData
+     boost::container::flat_set<std::string> warning;
+ };
+ 
++int ColdReset();
++int RecoveryMode(bool enable);
++std::string GetSelfTestResults();
++
+ #endif
+-- 
+2.17.1
+

@@ -1,0 +1,70 @@
+From baae9b9d1393002eb627f4c403927a0716c940b7 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Fri, 31 Jan 2020 16:42:03 +0800
+Subject: [PATCH] watch for propery change of PowerCap
+
+---
+ NodeManagerProxy.hpp | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/NodeManagerProxy.hpp b/NodeManagerProxy.hpp
+index 1a93dbd..dedf4ef 100644
+--- a/NodeManagerProxy.hpp
++++ b/NodeManagerProxy.hpp
+@@ -53,6 +53,9 @@ const static constexpr char *busname = "xyz.openbmc_project.State.Host";
+ const static constexpr char *interface = "xyz.openbmc_project.State.Host";
+ const static constexpr char *path = "/xyz/openbmc_project/state/host0";
+ const static constexpr char *property = "CurrentHostState";
++const static constexpr char *PowerCapInterface = "xyz.openbmc_project.Control.Power.Cap";
++const static constexpr char *PowerCapPath = "/xyz/openbmc_project/control/host0/power_cap";
++const static constexpr char *PowerCapProperty = "PowerCap";
+ } // namespace power
+ 
+ /**
+@@ -288,6 +291,7 @@ class PowerCap
+              sdbusplus::asio::object_server &server) :
+         conn(conn)
+     {
++#if 0
+         iface = server.add_interface(
+             "/xyz/openbmc_project/control/host0/power_cap", nmdPowerCapIntf);
+         iface->register_property(
+@@ -310,6 +314,27 @@ class PowerCap
+                                      return 1;
+                                  });
+         iface->initialize();
++#endif
++        powerMatch = std::make_unique<sdbusplus::bus::match::match>(
++            static_cast<sdbusplus::bus::bus &>(*conn),
++                "type='signal',member='PropertiesChanged',path='" +
++                std::string(power::PowerCapPath) + "',arg0='" +
++                std::string(power::PowerCapInterface) + "'",
++                [this](sdbusplus::message::message &message) {
++                    std::string objectName;
++                    boost::container::flat_map<std::string, std::variant<uint32_t>>
++                        values;
++                    message.read(objectName, values);
++                    auto Prop = values.find(power::PowerCapProperty);
++                    if (Prop != values.end())
++                    {
++                        auto val = std::get<uint32_t>(Prop->second);
++                        phosphor::logging::log<phosphor::logging::level::INFO>(
++                            "PowerCap Changed",
++                            phosphor::logging::entry("POWERCAP=%u", val));
++                        setPolicy(val);
++                    }
++                });
+     }
+ 
+     int setPolicy(uint32_t limitInWatts)
+@@ -405,6 +430,7 @@ class PowerCap
+   private:
+     std::shared_ptr<sdbusplus::asio::dbus_interface> iface;
+     std::shared_ptr<sdbusplus::asio::connection> conn;
++    std::unique_ptr<sdbusplus::bus::match::match> powerMatch;
+ };
+ 
+ /**
+-- 
+2.17.1
+

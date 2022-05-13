@@ -1,0 +1,11 @@
+[Unit]
+Description=OpenBMC Fan Control Daemon (Bootcheck)
+After=op-reset-chassis-running@0.service
+ConditionPathExists=/run/openbmc/chassis@0-on
+
+[Service]
+Type=oneshot
+ExecStart=/bin/systemctl start phosphor-pid-control.service
+
+[Install]
+WantedBy=basic.target

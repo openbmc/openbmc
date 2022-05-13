@@ -1,0 +1,16 @@
+diff --git a/item_updater.cpp b/item_updater.cpp
+index 35ffb39..cb1b5b7 100644
+--- a/item_updater.cpp
++++ b/item_updater.cpp
+@@ -371,7 +371,10 @@ void ItemUpdater::erase(std::string entryId)
+     if (it != versions.end())
+     {
+         // Delete ReadOnly partitions if it's not active
+-        removeReadOnlyPartition(entryId);
++        if (it->second->purpose == VersionPurpose::BMC)
++        {
++            removeReadOnlyPartition(entryId);
++        }
+         removePersistDataDirectory(entryId);
+ 
+         // Removing entry in versions map

@@ -1,0 +1,12 @@
+[Unit]
+Description=Restore iptable rules
+DefaultDependencies=no
+ConditionPathExists=/var/lib/iptables_rules
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/bin/sh -c "iptables-restore < /var/lib/iptables_rules"
+
+[Install]
+WantedBy=multi-user.target

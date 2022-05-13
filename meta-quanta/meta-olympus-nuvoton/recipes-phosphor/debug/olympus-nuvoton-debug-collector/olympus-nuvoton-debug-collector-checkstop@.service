@@ -1,0 +1,13 @@
+[Unit]
+Description=OpenPOWER debug data collector for host checkstop
+Before=obmc-host-quiesce@%i.target
+
+[Service]
+# Adding 10 seconds to allow OCC to collect debug data
+# before processing checkstop. OCC has to wait 5 seconds
+# for our driver to stop using the SBEFIFO.
+ExecStart={base_bindir}/sleep 10
+ExecStart=/usr/bin/env checkstop_app
+SyslogIdentifier=checkstop_app
+Type=oneshot
+Restart=no

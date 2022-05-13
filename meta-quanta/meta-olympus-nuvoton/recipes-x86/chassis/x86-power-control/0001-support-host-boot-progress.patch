@@ -1,0 +1,177 @@
+From ddd9c93022197409540b4b007e3e3aa1d4688f4e Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Mon, 11 Jan 2021 18:24:09 +0800
+Subject: [PATCH 1/2] support host boot progress
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ src/power_control.cpp | 99 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 97 insertions(+), 2 deletions(-)
+
+diff --git a/src/power_control.cpp b/src/power_control.cpp
+index 05aa45c..0371aa9 100644
+--- a/src/power_control.cpp
++++ b/src/power_control.cpp
+@@ -110,6 +110,7 @@ static std::string buttonDbusName = "xyz.openbmc_project.Chassis.Buttons";
+ static std::string nmiDbusName = "xyz.openbmc_project.Control.Host.NMI";
+ static std::string rstCauseDbusName =
+     "xyz.openbmc_project.Control.Host.RestartCause";
++static std::shared_ptr<sdbusplus::asio::dbus_interface> bootIface;
+ static std::shared_ptr<sdbusplus::asio::dbus_interface> hostIface;
+ static std::shared_ptr<sdbusplus::asio::dbus_interface> chassisIface;
+ #ifdef CHASSIS_SYSTEM_RESET
+@@ -238,6 +239,16 @@ static void setOperatingSystemState(const OperatingSystemStateStage stage)
+               getOperatingSystemStateStage(stage));
+ }
+ 
++enum class BootProgressStage
++{
++    Unspecified,
++    MemoryInit,
++    SecondaryProcInit,
++    PCIInit,
++    OSStart,
++    MotherboardInit,
++};
++
+ enum class PowerState
+ {
+     on,
+@@ -485,6 +496,40 @@ static uint64_t getCurrentTimeMs()
+     return currentTimeMs;
+ }
+ 
++static constexpr std::string_view getBootProgressStage(const BootProgressStage stage)
++{
++    switch (stage)
++    {
++        case BootProgressStage::MemoryInit:
++            return "xyz.openbmc_project.State.Boot.Progress.ProgressStages.MemoryInit";
++            break;
++        case BootProgressStage::SecondaryProcInit:
++            return "xyz.openbmc_project.State.Boot.Progress.ProgressStages.SecondaryProcInit";
++            break;
++        case BootProgressStage::PCIInit:
++            return "xyz.openbmc_project.State.Boot.Progress.ProgressStages.PCIInit";
++            break;
++        case BootProgressStage::OSStart:
++            return "xyz.openbmc_project.State.Boot.Progress.ProgressStages.OSStart";
++            break;
++        case BootProgressStage::MotherboardInit:
++            return "xyz.openbmc_project.State.Boot.Progress.ProgressStages.MotherboardInit";
++            break;
++        case BootProgressStage::Unspecified:
++        default:
++            return "xyz.openbmc_project.State.Boot.Progress.ProgressStages.Unspecified";
++            break;
++    }
++};
++static void setBootProgress(const BootProgressStage stage)
++{
++    bootIface->set_property("BootProgress",
++                            std::string(getBootProgressStage(stage)));
++    std::cerr << "Moving boot progress to \""
++            << std::string(getBootProgressStage(stage)) << "\" stage.\n";
++}
++
++
+ static constexpr std::string_view getHostState(const PowerState state)
+ {
+     switch (state)
+@@ -1558,6 +1603,11 @@ static void currentHostStateMonitor()
+     else
+     {
+         pohCounterTimer.cancel();
++
++        // If HostState is trurned to OFF, Set 'OperatingSystemState' to 'Inactive'
++        osIface->set_property("OperatingSystemState", std::string("Inactive"));
++        setBootProgress(BootProgressStage::Unspecified);
++
+         // Set the restart cause set for this restart
+         setRestartCause();
+     }
+@@ -1621,6 +1671,8 @@ static void currentHostStateMonitor()
+                 // if HostState is trurned to OFF.
+                 setOperatingSystemState(OperatingSystemStateStage::Inactive);
+ 
++                setBootProgress(BootProgressStage::Unspecified);
++
+                 // Set the restart cause set for this restart
+                 setRestartCause();
+ #ifdef USE_ACBOOT
+@@ -2238,11 +2290,13 @@ static void postCompleteHandler(bool state)
+     {
+         sendPowerControlEvent(Event::postCompleteAssert);
+         setOperatingSystemState(OperatingSystemStateStage::Standby);
++        setBootProgress(BootProgressStage::OSStart);
+     }
+     else
+     {
+         sendPowerControlEvent(Event::postCompleteDeAssert);
+         setOperatingSystemState(OperatingSystemStateStage::Inactive);
++        setBootProgress(BootProgressStage::Unspecified);
+     }
+ }
+ 
+@@ -2784,6 +2838,47 @@ int main(int argc, char* argv[])
+     lg2::info("Initializing power state.");
+     logStateTransition(powerState);
+ 
++    // Boot Progress Service
++    sdbusplus::asio::object_server bootServer =
++        sdbusplus::asio::object_server(power_control::conn);
++
++    // Boot Progress Interface
++    power_control::bootIface = bootServer.add_interface(
++        "/xyz/openbmc_project/state/host0", "xyz.openbmc_project.State.Boot.Progress");
++
++    std::string bootProgress = power_control::postCompleteLine.get_value() > 0
++                              ? "xyz.openbmc_project.State.Boot.Progress.ProgressStages.Unspecified"
++                              : "xyz.openbmc_project.State.Boot.Progress.ProgressStages.OSStart";
++
++
++    power_control::bootIface->register_property(
++        "BootProgress",
++        bootProgress,
++        [](const std::string& requested, std::string& resp) {
++            if (requested == "xyz.openbmc_project.State.Boot.Progress.ProgressStages.MemoryInit")
++            {
++            }
++            else if (requested == "xyz.openbmc_project.State.Boot.Progress.ProgressStages.SecondaryProcInit")
++            {
++            }
++            else if (requested == "xyz.openbmc_project.State.Boot.Progress.ProgressStages.PCIInit")
++            {
++            }
++            else if (requested == "xyz.openbmc_project.State.Boot.Progress.ProgressStages.OSStart")
++            {
++            }
++            else if (requested == "xyz.openbmc_project.State.Boot.Progress.ProgressStages.MotherboardInit")
++            {
++            }
++            else
++            {
++            }
++            resp = requested;
++            return 1;
++        });
++
++    power_control::bootIface->initialize();
++
+     // Power Control Service
+     sdbusplus::asio::object_server hostServer =
+         sdbusplus::asio::object_server(conn);
+@@ -3260,8 +3355,8 @@ int main(int argc, char* argv[])
+         sdbusplus::asio::object_server(conn);
+ 
+     // OS State Interface
+-    osIface = osServer.add_interface(
+-        "/xyz/openbmc_project/state/os",
++    power_control::osIface = osServer.add_interface(
++        "/xyz/openbmc_project/state/host0",
+         "xyz.openbmc_project.State.OperatingSystem.Status");
+ 
+     // Get the initial OS state based on POST complete
+-- 
+2.17.1
+

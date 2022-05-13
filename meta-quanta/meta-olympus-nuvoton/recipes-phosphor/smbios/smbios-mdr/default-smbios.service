@@ -1,0 +1,10 @@
+[Unit]
+Description=Copy Default SMBIOS data for SMBIOS MDR V2
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/mkdir -p /var/lib/smbios
+ExecStart=/bin/cp -uv /usr/share/smbios/smbios2 /var/lib/smbios/smbios2
+
+[Install]
+WantedBy=multi-user.target

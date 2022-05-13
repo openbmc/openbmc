@@ -1,0 +1,18 @@
+diff --git a/src/network/networkd-manager.c b/src/network/networkd-manager.c
+index a365bcbde7..85676bfb6a 100644
+--- a/src/network/networkd-manager.c
++++ b/src/network/networkd-manager.c
+@@ -1156,11 +1156,11 @@ static int manager_connect_genl(Manager *m) {
+ }
+ 
+ static int manager_connect_rtnl(Manager *m) {
+-        int fd, r;
++        int fd=-1, r;
+ 
+         assert(m);
+ 
+-        fd = systemd_netlink_fd();
++        //fd = systemd_netlink_fd();
+         if (fd < 0)
+                 r = sd_netlink_open(&m->rtnl);
+         else

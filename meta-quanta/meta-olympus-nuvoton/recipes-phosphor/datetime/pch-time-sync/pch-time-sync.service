@@ -1,0 +1,13 @@
+[Unit]
+Description=PCH BMC time sync service
+Conflicts=systemd-timesyncd.service
+
+[Service]
+Restart=always
+RestartSec=10
+ExecStart=/usr/bin/pch-time-sync
+StartLimitInterval=0
+Type=simple
+
+[Install]
+WantedBy=sysinit.target

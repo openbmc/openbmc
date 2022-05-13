@@ -1,0 +1,39 @@
+From 6fc55bb689272d34ff6616cdd4b24367ea39c749 Mon Sep 17 00:00:00 2001
+From: Kuiying Wang <kuiying.wang@intel.com>
+Date: Mon, 2 Jul 2018 15:51:52 +0800
+Subject: [PATCH] Modify dbus namespace of chassis control for guid.cpp
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Switch chassis control service namespace for guid.cpp from “org” to “xyz”,
+to compatible with new intel-chassis services
+
+Signed-off-by: Kuiying Wang <kuiying.wang@intel.com>
+---
+ command/guid.cpp | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+Index: phosphor-net-ipmid.clean/command/guid.cpp
+===================================================================
+--- phosphor-net-ipmid.clean.orig/command/guid.cpp
++++ phosphor-net-ipmid.clean/command/guid.cpp
+@@ -21,7 +21,8 @@ namespace command
+ 
+ std::unique_ptr<sdbusplus::bus::match_t> matchPtr(nullptr);
+ 
+-static constexpr auto guidObjPath = "/org/openbmc/control/chassis0";
++static constexpr auto guidObjPath =
++    "/xyz/openbmc_project/Chassis/Control/Chassis0";
+ static constexpr auto propInterface = "org.freedesktop.DBus.Properties";
+ 
+ Guid getSystemGUID()
+@@ -31,7 +32,7 @@ Guid getSystemGUID()
+     Guid guid = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+                  0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10};
+ 
+-    constexpr auto chassisIntf = "org.openbmc.control.Chassis";
++    constexpr auto chassisIntf = "xyz.openbmc_project.Chassis.Control.Chassis";
+ 
+     sd_bus_message* reply = nullptr;
+     sd_bus_error error = SD_BUS_ERROR_NULL;

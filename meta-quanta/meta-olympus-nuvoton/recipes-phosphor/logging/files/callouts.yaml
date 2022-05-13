@@ -1,0 +1,3 @@
+# TODO: Add i2c devices like
+# /sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a100.i2c-bus/i2c-3/3-0052: /system/chassis/motherboard
+/sys/devices/platform/ahb/ahb:apb/f0082000.i2c/i2c-2/2-0058: /system/chassis/motherboard/powersupply0

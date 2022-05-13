@@ -1,0 +1,169 @@
+diff --git a/checkstop_app.cpp b/checkstop_app.cpp
+index 5673284..262ae58 100644
+--- a/checkstop_app.cpp
++++ b/checkstop_app.cpp
+@@ -1,4 +1,4 @@
+-#include "org/open_power/Host/Boot/error.hpp"
++#include <xyz/openbmc_project/Control/Boot/error.hpp>
+ #include "phosphor-logging/elog-errors.hpp"
+ 
+ #include <phosphor-logging/elog.hpp>
+@@ -6,7 +6,7 @@
+ int main(int argc, char* argv[])
+ {
+     using namespace phosphor::logging;
+-    using error = sdbusplus::org::open_power::Host::Boot::Error::Checkstop;
++    using error = sdbusplus::xyz::openbmc_project::Control::Boot::Error::Checkstop;
+     report<error>();
+ 
+     return 0;
+diff --git a/watchdog_timeout.cpp b/watchdog_timeout.cpp
+index c479b35..a696e25 100644
+--- a/watchdog_timeout.cpp
++++ b/watchdog_timeout.cpp
+@@ -1,14 +1,140 @@
+-#include "org/open_power/Host/Boot/error.hpp"
++#include <xyz/openbmc_project/Control/Boot/error.hpp>
++#include <sdbusplus/bus.hpp>
+ #include "phosphor-logging/elog-errors.hpp"
+-
+ #include <phosphor-logging/elog.hpp>
++#include <map>
++#include <systemd/sd-journal.h>
++
++using DbusProperty = std::string;
++using Value = std::variant<bool, uint8_t, int16_t, uint16_t, int32_t,
++                           uint32_t, int64_t, uint64_t, double, std::string>;
++using PropertyMap = std::map<DbusProperty, Value>;
++using namespace phosphor::logging;
++
++static constexpr auto WATCHDOG_MESSAGE = "watchdog: Timed out";
++
++static int getJournalMetadata(sd_journal* journal,
++                              const std::string_view& field,
++                              std::string& contents)
++{
++    const char* data = nullptr;
++    size_t length = 0;
++
++    // Get the metadata from the requested field of the journal entry
++    if (int ret = sd_journal_get_data(journal, field.data(),
++                                      (const void**)&data, &length);
++        ret < 0)
++    {
++        return ret;
++    }
++    std::string_view metadata(data, length);
++    // Only use the content after the "=" character.
++    metadata.remove_prefix(std::min(metadata.find("=") + 1, metadata.size()));
++    contents = std::string(metadata);
++    return 0;
++}
++
++// TODO: should not get elder watchdog log
++void getJournalInfo(std::string& action,
++                        std::string& timerUse)
++{
++    sd_journal* journalTmp;
++    if (int ret = sd_journal_open(&journalTmp, SD_JOURNAL_LOCAL_ONLY); ret < 0)
++    {
++        log<level::ERR>("Failed to open journal: ",
++                        entry("ERRNO=%s", strerror(-ret)));
++        return;
++    }
++    std::unique_ptr<sd_journal, decltype(&sd_journal_close)> journal(
++        journalTmp, sd_journal_close);
++    journalTmp = nullptr;
++
++    std::string match = "MESSAGE=" + std::string(WATCHDOG_MESSAGE);
++    sd_journal_add_match(journal.get(), match.c_str(), 0);
++
++	// get last log info
++    int r = 1;
++    SD_JOURNAL_FOREACH_BACKWARDS(journal.get())
++    {
++        r = getJournalMetadata(journal.get(), "ACTION", action);
++        if (r < 0)
++        {
++            log<level::ERR>("Cannot find watchdog log meta in journal",
++                            entry("ERRNO=%s", strerror(-r)));
++            return;
++        }
++        if(getJournalMetadata(journal.get(), "TIMER_USE", timerUse) < 0)
++        {
++            log<level::ERR>("Watchdog log metadata error");
++            return;
++        }
++        // only need the last one
++        break;
++    }
++    if (r > 0)
++    {
++        log<level::ERR>("Cannot find watchdog log in journal");
++        return;
++    }
++    auto msg = "Successful get watchdog info from journal, Action:" +
++                action + ", Timer Use: " + timerUse;
++    log<level::INFO>(msg.c_str());
++}
++
++void handleWatchdogInfo(std::string& action,
++                        std::string& timerUse, uint64_t* interval)
++{
++    PropertyMap properties;
++    log<level::INFO>("handleWatchdogInfo");
++    auto bus = sdbusplus::bus::new_default_system();
++    auto method = bus.new_method_call("xyz.openbmc_project.Watchdog",
++            "/xyz/openbmc_project/watchdog/host0",
++            "org.freedesktop.DBus.Properties", "GetAll");
++    method.append("xyz.openbmc_project.State.Watchdog");
++
++	// set default value
++    action = "xyz.openbmc_project.State.Watchdog.Action.None";
++    timerUse = "xyz.openbmc_project.State.Watchdog.TimerUse.Reserved";
++    *interval = 18000;
++
++    try
++    {
++        // read watch dog parameters
++        auto reply = bus.call(method);
++        if (reply.is_method_error())
++        {
++            log<level::ERR>("Failed to get watch dog property");
++        }
++        else
++        {
++            reply.read(properties);
++            action = std::get<std::string>(properties["ExpireAction"]);
++            timerUse = std::get<std::string>(properties["ExpiredTimerUse"]);
++            *interval = std::get<uint64_t>(properties["Interval"]);
++
++        }
++    }
++    catch (const std::exception& e)
++    {
++        log<level::ERR>("Failed to get watch dog service",
++            entry("WHAT=%s", e.what()));
++        // try to get info from journal log
++        getJournalInfo(action, timerUse);
++    }
++}
+ 
+ int main(int argc, char* argv[])
+ {
+-    using namespace phosphor::logging;
+     using error =
+-        sdbusplus::org::open_power::Host::Boot::Error::WatchdogTimedOut;
+-    report<error>();
++        sdbusplus::xyz::openbmc_project::Control::Boot::Error::WatchdogTimedOut;
++    using namespace xyz::openbmc_project::Control::Boot;
++    std::string action;
++    std::string timerUse;
++    uint64_t interval;
++    handleWatchdogInfo(action, timerUse, &interval);
++    report<error>(WatchdogTimedOut::WATCHDOG_ACTION(action.c_str()),
++                  WatchdogTimedOut::WATCHDOG_TIMER_USE(timerUse.c_str()),
++                  WatchdogTimedOut::WATCHDOG_INTERVAL(interval));
+ 
+     return 0;
+ }

@@ -1,0 +1,17 @@
+---
+/xyz/openbmc_project/control/host0/chassis_capability:
+    - Interface: xyz.openbmc_project.Control.ChassisCapabilities
+      Properties:
+          CapabilitiesFlags:
+              Default: 0
+          FRUDeviceAddress:
+              Default: 0
+          SDRDeviceAddress:
+              Default: 0
+          SELDeviceAddress:
+              Default: 0
+          SMDeviceAddress:
+              Default: 0
+          BridgeDeviceAddress:
+              Default: 0
+

@@ -1,0 +1,411 @@
+From 970ba4738f30bc965c28a8fe4d01b6b359f412ea Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Thu, 11 Nov 2021 16:03:31 +0800
+Subject: [PATCH 2/2] Adding channel specific privilege to network
+
+- Adding the channel access information to the network
+   interface object. This privilege will be used in
+   channel specific authorization.
+ - Get supported priv from user manager service dynamically.
+ - Signal handling for capturing the supported priv list
+   changes from user managerment.
+
+Tested-by:
+Verified channel access through ipmitool get/set channel
+access command
+
+Change-Id: I3b592a19363eef684e31d5f7c34dad8f2f9211df
+Signed-off-by: AppaRao Puli <apparao.puli@linux.intel.com>
+Signed-off-by: Yong Li <yong.b.li@linux.intel.com>
+Signed-off-by: Johnathan Mantey <johnathanx.mantey@intel.com>
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ src/ethernet_interface.cpp | 124 +++++++++++++++++++++++++++++++++++++
+ src/ethernet_interface.hpp |  36 ++++++++++-
+ src/network_manager.cpp    | 102 ++++++++++++++++++++++++++++++
+ src/network_manager.hpp    |   9 +++
+ 4 files changed, 270 insertions(+), 1 deletion(-)
+
+diff --git a/src/ethernet_interface.cpp b/src/ethernet_interface.cpp
+index 52f68d1..0173119 100644
+--- a/src/ethernet_interface.cpp
++++ b/src/ethernet_interface.cpp
+@@ -45,6 +45,10 @@ constexpr auto PROPERTY_INTERFACE = "org.freedesktop.DBus.Properties";
+ constexpr auto RESOLVED_SERVICE_PATH = "/org/freedesktop/resolve1/link/";
+ constexpr auto METHOD_GET = "Get";
+ 
++static constexpr const char* networkChannelCfgFile =
++    "/var/channel_intf_data.json";
++static constexpr const char* defaultChannelPriv = "priv-admin";
++
+ std::map<EthernetInterface::DHCPConf, std::string> mapDHCPToSystemd = {
+     {EthernetInterface::DHCPConf::both, "true"},
+     {EthernetInterface::DHCPConf::v4, "ipv4"},
+@@ -117,6 +121,7 @@ EthernetInterface::EthernetInterface(sdbusplus::bus::bus& bus,
+     EthernetInterfaceIntf::autoNeg(std::get<2>(ifInfo));
+     EthernetInterfaceIntf::speed(std::get<0>(ifInfo));
+ #endif
++    getChannelPrivilege(intfName);
+ 
+     // Emit deferred signal.
+     if (emitSignal)
+@@ -1271,5 +1276,124 @@ std::string EthernetInterface::defaultGateway6(std::string gateway)
+ 
+     return gw;
+ }
++
++nlohmann::json EthernetInterface::readJsonFile(const std::string& configFile)
++{
++    std::ifstream jsonFile(configFile);
++    if (!jsonFile.good())
++    {
++        log<level::ERR>("JSON file not found");
++        return nullptr;
++    }
++
++    nlohmann::json data = nullptr;
++    try
++    {
++        data = nlohmann::json::parse(jsonFile, nullptr, false);
++    }
++    catch (nlohmann::json::parse_error& e)
++    {
++        log<level::DEBUG>("Corrupted channel config.",
++                          entry("MSG: %s", e.what()));
++        throw std::runtime_error("Corrupted channel config file");
++    }
++
++    return data;
++}
++
++int EthernetInterface::writeJsonFile(const std::string& configFile,
++                                     const nlohmann::json& jsonData)
++{
++    std::ofstream jsonFile(configFile);
++    if (!jsonFile.good())
++    {
++        log<level::ERR>("JSON file open failed",
++                        entry("FILE=%s", networkChannelCfgFile));
++        return -1;
++    }
++
++    // Write JSON to file
++    jsonFile << jsonData;
++
++    jsonFile.flush();
++    return 0;
++}
++
++std::string
++    EthernetInterface::getChannelPrivilege(const std::string& interfaceName)
++{
++    std::string priv(defaultChannelPriv);
++    std::string retPriv;
++
++    nlohmann::json jsonData = readJsonFile(networkChannelCfgFile);
++    if (jsonData != nullptr)
++    {
++        try
++        {
++            priv = jsonData[interfaceName].get<std::string>();
++            retPriv = ChannelAccessIntf::maxPrivilege(std::move(priv));
++            return retPriv;
++        }
++        catch (const nlohmann::json::exception& e)
++        {
++            jsonData[interfaceName] = priv;
++        }
++    }
++    else
++    {
++        jsonData[interfaceName] = priv;
++    }
++
++    if (writeJsonFile(networkChannelCfgFile, jsonData) != 0)
++    {
++        log<level::DEBUG>("Error in write JSON data to file",
++                          entry("FILE=%s", networkChannelCfgFile));
++        elog<InternalFailure>();
++    }
++
++    retPriv = ChannelAccessIntf::maxPrivilege(std::move(priv));
++
++    return retPriv;
++}
++
++std::string EthernetInterface::maxPrivilege(std::string priv)
++{
++    std::string intfName = interfaceName();
++
++    if (manager.supportedPrivList.empty())
++    {
++        // Populate the supported privilege list
++        manager.initSupportedPrivilges();
++    }
++
++    if (!priv.empty() && (std::find(manager.supportedPrivList.begin(),
++                                    manager.supportedPrivList.end(),
++                                    priv) == manager.supportedPrivList.end()))
++    {
++        log<level::ERR>("Invalid privilege");
++        elog<InvalidArgument>(Argument::ARGUMENT_NAME("Privilege"),
++                              Argument::ARGUMENT_VALUE(priv.c_str()));
++    }
++
++    if (ChannelAccessIntf::maxPrivilege() == priv)
++    {
++        // No change in privilege so just return.
++        return priv;
++    }
++
++    nlohmann::json jsonData = readJsonFile(networkChannelCfgFile);
++    jsonData[intfName] = priv;
++
++    if (writeJsonFile(networkChannelCfgFile, jsonData) != 0)
++    {
++        log<level::DEBUG>("Error in write JSON data to file",
++                          entry("FILE=%s", networkChannelCfgFile));
++        elog<InternalFailure>();
++    }
++
++    // Property change signal will be sent
++    return ChannelAccessIntf::maxPrivilege(std::move(priv));
++}
++
+ } // namespace network
+ } // namespace phosphor
+diff --git a/src/ethernet_interface.hpp b/src/ethernet_interface.hpp
+index 8928455..a3e33e3 100644
+--- a/src/ethernet_interface.hpp
++++ b/src/ethernet_interface.hpp
+@@ -2,11 +2,14 @@
+ 
+ #include "types.hpp"
+ #include "util.hpp"
++#include "xyz/openbmc_project/Channel/ChannelAccess/server.hpp"
+ #include "xyz/openbmc_project/Network/IP/Create/server.hpp"
+ #include "xyz/openbmc_project/Network/Neighbor/CreateStatic/server.hpp"
+ 
+ #include <filesystem>
++#include <nlohmann/json.hpp>
+ #include <sdbusplus/bus.hpp>
++#include <sdbusplus/bus/match.hpp>
+ #include <sdbusplus/server/object.hpp>
+ #include <string>
+ #include <xyz/openbmc_project/Collection/DeleteAll/server.hpp>
+@@ -23,7 +26,8 @@ using Ifaces = sdbusplus::server::object::object<
+     sdbusplus::xyz::openbmc_project::Network::server::MACAddress,
+     sdbusplus::xyz::openbmc_project::Network::IP::server::Create,
+     sdbusplus::xyz::openbmc_project::Network::Neighbor::server::CreateStatic,
+-    sdbusplus::xyz::openbmc_project::Collection::server::DeleteAll>;
++    sdbusplus::xyz::openbmc_project::Collection::server::DeleteAll,
++    sdbusplus::xyz::openbmc_project::Channel::server::ChannelAccess>;
+ 
+ using IP = sdbusplus::xyz::openbmc_project::Network::server::IP;
+ 
+@@ -31,11 +35,14 @@ using EthernetInterfaceIntf =
+     sdbusplus::xyz::openbmc_project::Network::server::EthernetInterface;
+ using MacAddressIntf =
+     sdbusplus::xyz::openbmc_project::Network::server::MACAddress;
++using ChannelAccessIntf =
++    sdbusplus::xyz::openbmc_project::Channel::server::ChannelAccess;
+ 
+ using ServerList = std::vector<std::string>;
+ using ObjectPath = sdbusplus::message::object_path;
+ 
+ namespace fs = std::filesystem;
++using DbusVariant = std::variant<std::string, std::vector<std::string>>;
+ 
+ class Manager; // forward declaration of network manager.
+ 
+@@ -240,6 +247,14 @@ class EthernetInterface : public Ifaces
+     std::string defaultGateway6(std::string gateway) override;
+ 
+     using EthernetInterfaceIntf::dhcpEnabled;
++    /** @brief sets the channel maxium privilege.
++     *  @param[in] value - Channel privilege which needs to be set on the
++     * system.
++     *  @returns privilege of the interface or throws an error.
++     */
++    std::string maxPrivilege(std::string value) override;
++
++    using ChannelAccessIntf::maxPrivilege;
+     using EthernetInterfaceIntf::interfaceName;
+     using EthernetInterfaceIntf::linkUp;
+     using EthernetInterfaceIntf::mtu;
+@@ -363,6 +378,25 @@ class EthernetInterface : public Ifaces
+      *  @returns true/false value if the NIC is enabled
+      */
+     bool queryNicEnabled() const;
++    /** @brief gets the channel privilege.
++     *  @param[in] interfaceName - Network interface name.
++     *  @returns privilege of the interface
++     */
++    std::string getChannelPrivilege(const std::string& interfaceName);
++
++    /** @brief reads the channel access info from file.
++     *  @param[in] configFile - channel access filename
++     *  @returns json file data
++     */
++    nlohmann::json readJsonFile(const std::string& configFile);
++
++    /** @brief writes the channel access info to file.
++     *  @param[in] configFile - channel access filename
++     *  @param[in] jsonData - json data to write
++     *  @returns success or failure
++     */
++    int writeJsonFile(const std::string& configFile,
++                      const nlohmann::json& jsonData);
+ };
+ 
+ } // namespace network
+diff --git a/src/network_manager.cpp b/src/network_manager.cpp
+index b2ca45d..22997cb 100644
+--- a/src/network_manager.cpp
++++ b/src/network_manager.cpp
+@@ -39,6 +39,13 @@ extern std::unique_ptr<Timer> reloadTimer;
+ using namespace phosphor::logging;
+ using namespace sdbusplus::xyz::openbmc_project::Common::Error;
+ 
++static constexpr const char* userMgrObjBasePath = "/xyz/openbmc_project/user";
++static constexpr const char* userMgrInterface =
++    "xyz.openbmc_project.User.Manager";
++static constexpr const char* propNameAllPrivileges = "AllPrivileges";
++
++std::unique_ptr<sdbusplus::bus::match_t> usrMgmtSignal(nullptr);
++
+ Manager::Manager(sdbusplus::bus::bus& bus, const char* objPath,
+                  const std::string& path) :
+     details::VLANCreateIface(bus, objPath,
+@@ -47,6 +54,101 @@ Manager::Manager(sdbusplus::bus::bus& bus, const char* objPath,
+ {
+     fs::path confDir(path);
+     setConfDir(confDir);
++    initSupportedPrivilges();
++}
++
++std::string getUserService(sdbusplus::bus::bus& bus, const std::string& intf,
++                           const std::string& path)
++{
++    auto mapperCall =
++        bus.new_method_call("xyz.openbmc_project.ObjectMapper",
++                            "/xyz/openbmc_project/object_mapper",
++                            "xyz.openbmc_project.ObjectMapper", "GetObject");
++
++    mapperCall.append(path);
++    mapperCall.append(std::vector<std::string>({intf}));
++
++    auto mapperResponseMsg = bus.call(mapperCall);
++
++    std::map<std::string, std::vector<std::string>> mapperResponse;
++    mapperResponseMsg.read(mapperResponse);
++
++    if (mapperResponse.begin() == mapperResponse.end())
++    {
++        throw std::runtime_error("ERROR in reading the mapper response");
++    }
++
++    return mapperResponse.begin()->first;
++}
++
++std::string Manager::getUserServiceName()
++{
++    static std::string userMgmtService;
++    if (userMgmtService.empty())
++    {
++        try
++        {
++            userMgmtService =
++                getUserService(bus, userMgrInterface, userMgrObjBasePath);
++        }
++        catch (const std::exception& e)
++        {
++            log<level::ERR>("Exception caught in getUserServiceName.");
++            userMgmtService.clear();
++        }
++    }
++    return userMgmtService;
++}
++
++void Manager::initSupportedPrivilges()
++{
++    std::string userServiceName = getUserServiceName();
++    if (!userServiceName.empty())
++    {
++        auto method = bus.new_method_call(
++            getUserServiceName().c_str(), userMgrObjBasePath,
++            "org.freedesktop.DBus.Properties", "Get");
++        method.append(userMgrInterface, propNameAllPrivileges);
++
++        auto reply = bus.call(method);
++        if (reply.is_method_error())
++        {
++            log<level::DEBUG>("get-property AllPrivileges failed",
++                              entry("OBJPATH:%s", userMgrObjBasePath),
++                              entry("INTERFACE:%s", userMgrInterface));
++            return;
++        }
++
++        std::variant<std::vector<std::string>> result;
++        reply.read(result);
++
++        supportedPrivList = std::get<std::vector<std::string>>(result);
++    }
++
++    // Resgister the signal
++    if (usrMgmtSignal == nullptr)
++    {
++        log<level::DEBUG>("Registering User.Manager propertychange signal.");
++        usrMgmtSignal = std::make_unique<sdbusplus::bus::match_t>(
++            bus,
++            sdbusplus::bus::match::rules::propertiesChanged(userMgrObjBasePath,
++                                                            userMgrInterface),
++            [&](sdbusplus::message::message& msg) {
++                log<level::DEBUG>("UserMgr properties changed signal");
++                std::map<std::string, DbusVariant> props;
++                std::string iface;
++                msg.read(iface, props);
++                for (const auto& t : props)
++                {
++                    if (t.first == propNameAllPrivileges)
++                    {
++                        supportedPrivList =
++                            std::get<std::vector<std::string>>(t.second);
++                    }
++                }
++            });
++    }
++    return;
+ }
+ 
+ bool Manager::createDefaultNetworkFiles(bool force)
+diff --git a/src/network_manager.hpp b/src/network_manager.hpp
+index f574891..1a4cc46 100644
+--- a/src/network_manager.hpp
++++ b/src/network_manager.hpp
+@@ -171,6 +171,12 @@ class Manager : public details::VLANCreateIface
+         reloadPreHooks.push_back(std::move(hook));
+     }
+ 
++    /** supported privilege list **/
++    std::vector<std::string> supportedPrivList;
++
++    /** @brief initializes the supportedPrivilege List */
++    void initSupportedPrivilges();
++
+   protected:
+     /** @brief Persistent sdbusplus DBus bus connection. */
+     sdbusplus::bus::bus& bus;
+@@ -199,6 +205,9 @@ class Manager : public details::VLANCreateIface
+ 
+     /** @brief List of hooks to execute during the next reload */
+     std::vector<fu2::unique_function<void()>> reloadPreHooks;
++
++    /** Get the user management service name dynamically **/
++    std::string getUserServiceName();
+ };
+ 
+ } // namespace network
+-- 
+2.17.1
+

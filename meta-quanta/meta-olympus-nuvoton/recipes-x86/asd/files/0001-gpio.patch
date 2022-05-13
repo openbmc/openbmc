@@ -1,0 +1,53 @@
+diff --git a/jtag_handler.h b/jtag_handler.h
+index 5cca2b6..cc2421b 100644
+--- a/jtag_handler.h
++++ b/jtag_handler.h
+@@ -77,7 +77,7 @@ typedef unsigned long long __u64;
+ #define IRMAXPADSIZE 2000
+ #define DIV_ROUND_UP(n, d) (((n) + (d)-1) / (d))
+ #define BITS_PER_BYTE 8
+-#define APB_FREQ 24740000
++#define APB_FREQ 10000000
+ 
+ typedef enum
+ {
+diff --git a/target_handler.c b/target_handler.c
+index 1c7ad17..33678ea 100644
+--- a/target_handler.c
++++ b/target_handler.c
+@@ -621,25 +621,25 @@ STATUS find_gpio(char* gpio_name, int* gpio_number)
+     if (result != ST_OK)
+         return result;
+     if (strcmp(gpio_name, "TCK_MUX_SEL") == 0)
+-        *gpio_number = gpio_base + 213;
++        *gpio_number = gpio_base + 22;
+     else if (strcmp(gpio_name, "PREQ_N") == 0)
+-        *gpio_number = gpio_base + 212;
++        *gpio_number = gpio_base + 78;
+     else if (strcmp(gpio_name, "PRDY_N") == 0)
+-        *gpio_number = gpio_base + 47;
++        *gpio_number = gpio_base + 79;
+     else if (strcmp(gpio_name, "RSMRST_N") == 0)
+-        *gpio_number = gpio_base + 146;
++        *gpio_number = gpio_base + 155;
+     else if (strcmp(gpio_name, "SIO_POWER_GOOD") == 0)
+-        *gpio_number = gpio_base + 201;
++        *gpio_number = gpio_base + 506;
+     else if (strcmp(gpio_name, "PLTRST_N") == 0)
+-        *gpio_number = gpio_base + 46;
++        *gpio_number = gpio_base + 95;
+     else if (strcmp(gpio_name, "SYSPWROK") == 0)
+-        *gpio_number = gpio_base + 145;
++        *gpio_number = gpio_base + 229;
+     else if (strcmp(gpio_name, "PWR_DEBUG_N") == 0)
+-        *gpio_number = gpio_base + 135;
++        *gpio_number = gpio_base + 153;
+     else if (strcmp(gpio_name, "DEBUG_EN_N") == 0)
+-        *gpio_number = gpio_base + 37;
++        *gpio_number = gpio_base + 231;
+     else if (strcmp(gpio_name, "XDP_PRST_N") == 0)
+-        *gpio_number = gpio_base + 137;
++        *gpio_number = gpio_base + 59;
+     else
+         result = ST_ERR;
+ 

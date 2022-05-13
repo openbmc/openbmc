@@ -153,17 +153,23 @@
                     "/xyz/openbmc_project/sensors/power/cpu_power",
                     "/xyz/openbmc_project/sensors/power/memory_power",
                     "/xyz/openbmc_project/sensors/current/p0_dimm_vr0_current",
-                    "/xyz/openbmc_project/sensors/current/p0_dimm_vr0_lin",
+                    "/xyz/openbmc_project/sensors/current/p0_dimm_vr0_iin",
                     "/xyz/openbmc_project/sensors/current/p0_dimm_vr1_current",
-                    "/xyz/openbmc_project/sensors/current/p0_dimm_vr1_lin",
+                    "/xyz/openbmc_project/sensors/current/p0_dimm_vr1_iin",
                     "/xyz/openbmc_project/sensors/current/p0_vccin_vr_current",
                     "/xyz/openbmc_project/sensors/current/p0_vccio_vr_current",
                     "/xyz/openbmc_project/sensors/current/p1_dimm_vr0_current",
-                    "/xyz/openbmc_project/sensors/current/p1_dimm_vr0_lin",
+                    "/xyz/openbmc_project/sensors/current/p1_dimm_vr0_iin",
                     "/xyz/openbmc_project/sensors/current/p1_dimm_vr1_current",
-                    "/xyz/openbmc_project/sensors/current/p1_dimm_vr1_lin",
+                    "/xyz/openbmc_project/sensors/current/p1_dimm_vr1_iin",
                     "/xyz/openbmc_project/sensors/current/p1_vccin_vr_current",
-                    "/xyz/openbmc_project/sensors/current/p1_vccio_vr_current"
+                    "/xyz/openbmc_project/sensors/current/p1_vccio_vr_current",
+                    "/xyz/openbmc_project/sensors/current/hotswap_iout",
+                    "/xyz/openbmc_project/sensors/power/hotswap_pout",
+                    "/xyz/openbmc_project/sensors/temperature/hotswap_temp",
+                    "/xyz/openbmc_project/sensors/voltage/hotswap_vin",
+                    "/xyz/openbmc_project/sensors/voltage/hotswap_vout"
+
                 ]
             }
         ]
@@ -180,13 +186,13 @@
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/sensors/temperature/Core_0_CPU0",
-                    "/xyz/openbmc_project/sensors/temperature/Core_1_CPU0",
-                    "/xyz/openbmc_project/sensors/temperature/Core_2_CPU0",
-                    "/xyz/openbmc_project/sensors/temperature/Core_3_CPU0",
-                    "/xyz/openbmc_project/sensors/temperature/Core_4_CPU0",
-                    "/xyz/openbmc_project/sensors/temperature/Core_5_CPU0",
-                    "/xyz/openbmc_project/sensors/temperature/Die_CPU0"
+                    "/xyz/openbmc_project/sensors/temperature/cpu0_core0_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu0_core1_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu0_core2_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu0_core3_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu0_core4_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu0_core5_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu0_die_temp"
                 ]
             }
         ]
@@ -203,13 +209,421 @@
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/sensors/temperature/Core_0_CPU1",
-                    "/xyz/openbmc_project/sensors/temperature/Core_1_CPU1",
-                    "/xyz/openbmc_project/sensors/temperature/Core_2_CPU1",
-                    "/xyz/openbmc_project/sensors/temperature/Core_3_CPU1",
-                    "/xyz/openbmc_project/sensors/temperature/Core_4_CPU1",
-                    "/xyz/openbmc_project/sensors/temperature/Core_5_CPU1",
-                    "/xyz/openbmc_project/sensors/temperature/Die_CPU0"
+                    "/xyz/openbmc_project/sensors/temperature/cpu1_core0_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu1_core1_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu1_core2_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu1_core3_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu1_core4_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu1_core5_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu1_die_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm0",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm0_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm1",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm1_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm2",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm2_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm3",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm3_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm4",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm4_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm5",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm5_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm6",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm6_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm7",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm7_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm8",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm8_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm9",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm9_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm10",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm10_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm11",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm11_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm12",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm12_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm13",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm13_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm14",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm14_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm15",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm15_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm16",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm16_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm17",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm17_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm18",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm18_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm19",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm19_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm20",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm20_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm21",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm21_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm22",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm22_temp"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/dimm23",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm23_temp"
                 ]
             }
         ]
@@ -272,15 +686,15 @@
                     "/xyz/openbmc_project/sensors/power/p1_vccio_vr_pin",
                     "/xyz/openbmc_project/sensors/power/p1_vccio_vr_pout",
                     "/xyz/openbmc_project/sensors/current/p0_dimm_vr0_current",
-                    "/xyz/openbmc_project/sensors/current/p0_dimm_vr0_lin",
+                    "/xyz/openbmc_project/sensors/current/p0_dimm_vr0_iin",
                     "/xyz/openbmc_project/sensors/current/p0_dimm_vr1_current",
-                    "/xyz/openbmc_project/sensors/current/p0_dimm_vr1_lin",
+                    "/xyz/openbmc_project/sensors/current/p0_dimm_vr1_iin",
                     "/xyz/openbmc_project/sensors/current/p0_vccin_vr_current",
                     "/xyz/openbmc_project/sensors/current/p0_vccio_vr_current",
                     "/xyz/openbmc_project/sensors/current/p1_dimm_vr0_current",
-                    "/xyz/openbmc_project/sensors/current/p1_dimm_vr0_lin",
+                    "/xyz/openbmc_project/sensors/current/p1_dimm_vr0_iin",
                     "/xyz/openbmc_project/sensors/current/p1_dimm_vr1_current",
-                    "/xyz/openbmc_project/sensors/current/p1_dimm_vr1_lin",
+                    "/xyz/openbmc_project/sensors/current/p1_dimm_vr1_iin",
                     "/xyz/openbmc_project/sensors/current/p1_vccin_vr_current",
                     "/xyz/openbmc_project/sensors/current/p1_vccio_vr_current",
                     "/xyz/openbmc_project/sensors/fan_tach/fan1",
@@ -308,21 +722,49 @@
                     "/xyz/openbmc_project/sensors/voltage/ps1_input_voltage",
                     "/xyz/openbmc_project/sensors/current/ps1_output_current",
                     "/xyz/openbmc_project/sensors/voltage/ps1_output_voltage",
-                    "/xyz/openbmc_project/sensors/temperature/Core_0_CPU1",
-                    "/xyz/openbmc_project/sensors/temperature/Core_1_CPU1",
-                    "/xyz/openbmc_project/sensors/temperature/Core_2_CPU1",
-                    "/xyz/openbmc_project/sensors/temperature/Core_3_CPU1",
-                    "/xyz/openbmc_project/sensors/temperature/Core_4_CPU1",
-                    "/xyz/openbmc_project/sensors/temperature/Core_5_CPU1",
-                    "/xyz/openbmc_project/sensors/temperature/Core_0_CPU0",
-                    "/xyz/openbmc_project/sensors/temperature/Core_1_CPU0",
-                    "/xyz/openbmc_project/sensors/temperature/Core_2_CPU0",
-                    "/xyz/openbmc_project/sensors/temperature/Core_3_CPU0",
-                    "/xyz/openbmc_project/sensors/temperature/Core_4_CPU0",
-                    "/xyz/openbmc_project/sensors/temperature/Core_5_CPU0",
-                    "/xyz/openbmc_project/sensors/temperature/DIMM_C1_CPU0",
-                    "/xyz/openbmc_project/sensors/temperature/Die_CPU0",
-                    "/xyz/openbmc_project/sensors/temperature/Die_CPU1"
+                    "/xyz/openbmc_project/sensors/temperature/cpu1_core0_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu1_core1_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu1_core2_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu1_core3_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu1_core4_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu1_core5_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu0_core0_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu0_core1_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu0_core2_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu0_core3_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu0_core4_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu0_core5_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm0_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm1_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm2_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm3_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm4_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm5_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm6_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm7_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm8_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm9_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm10_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm11_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm12_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm13_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm14_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm15_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm16_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm17_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm18_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm19_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm20_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm21_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm22_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm23_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu0_die_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cpu1_die_temp",
+                    "/xyz/openbmc_project/sensors/current/hotswap_iout",
+                    "/xyz/openbmc_project/sensors/power/hotswap_pout",
+                    "/xyz/openbmc_project/sensors/temperature/hotswap_temp",
+                    "/xyz/openbmc_project/sensors/voltage/hotswap_vin",
+                    "/xyz/openbmc_project/sensors/voltage/hotswap_vout"
                 ]
             }
         ]

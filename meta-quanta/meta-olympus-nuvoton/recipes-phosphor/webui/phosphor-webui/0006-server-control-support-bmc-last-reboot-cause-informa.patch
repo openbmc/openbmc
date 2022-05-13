@@ -1,0 +1,89 @@
+From 2c469f6d39c7c515cc529ff8ef81acde29b503b5 Mon Sep 17 00:00:00 2001
+From: Tim Lee <timlee660101@gmail.com>
+Date: Tue, 23 Feb 2021 11:39:34 +0800
+Subject: [PATCH 6/6] server-control: support bmc last reboot cause information
+
+Signed-off-by: Tim Lee <timlee660101@gmail.com>
+---
+ app/common/services/api-utils.js              | 20 +++++++++++++++++++
+ .../controllers/bmc-reboot-controller.html    |  5 +++--
+ .../controllers/bmc-reboot-controller.js      | 16 +++++++++++++++
+ 3 files changed, 39 insertions(+), 2 deletions(-)
+
+diff --git a/app/common/services/api-utils.js b/app/common/services/api-utils.js
+index 1b8c175d..eb1148a7 100644
+--- a/app/common/services/api-utils.js
++++ b/app/common/services/api-utils.js
+@@ -748,6 +748,26 @@ window.angular && (function(angular) {
+                 return response.data;
+               });
+         },
++        getLastRebootCause: function() {
++          var deferred = $q.defer();
++          $http({
++            method: 'GET',
++            url: DataService.getHost() +
++                '/xyz/openbmc_project/state/bmc0/attr/LastRebootCause',
++            withCredentials: true
++          })
++              .then(
++                  function(response) {
++                    var json = JSON.stringify(response.data);
++                    var content = JSON.parse(json);
++                    deferred.resolve(content.data);
++                  },
++                  function(error) {
++                    console.log(error);
++                    deferred.reject(error);
++                  });
++          return deferred.promise;
++        },
+         hostPowerOn: function() {
+           var deferred = $q.defer();
+           $http({
+diff --git a/app/server-control/controllers/bmc-reboot-controller.html b/app/server-control/controllers/bmc-reboot-controller.html
+index 24988bc2..dfb24bd8 100644
+--- a/app/server-control/controllers/bmc-reboot-controller.html
++++ b/app/server-control/controllers/bmc-reboot-controller.html
+@@ -5,8 +5,9 @@
+   <div class="row column">
+     <div class="page-header">
+       <h2 class="inline">Current BMC boot status</h2>
+-      <div class="float-right bmc-reboot__status-log inline">BMC last reboot at
+-        <span class="courier-bold">{{reboot_time | localeDate}}</span></div>
++      <div class="float-right bmc-reboot__status-log inline">Last reboot cause is
++        <span class="courier-bold">{{reboot_cause}}</span> at <span class="courier-bold">{{reboot_time | localeDate}}</span>
++      </div>
+     </div>
+   </div>
+   <div class="row column">
+diff --git a/app/server-control/controllers/bmc-reboot-controller.js b/app/server-control/controllers/bmc-reboot-controller.js
+index 2282627d..8ed6a69b 100644
+--- a/app/server-control/controllers/bmc-reboot-controller.js
++++ b/app/server-control/controllers/bmc-reboot-controller.js
+@@ -14,6 +14,22 @@ window.angular && (function(angular) {
+     function($scope, $window, APIUtils, dataService, toastService) {
+       $scope.dataService = dataService;
+       $scope.confirm = false;
++      APIUtils.getLastRebootCause().then(
++          function(status) {
++            if (status ==
++                'xyz.openbmc_project.State.BMC.RebootCause.POR') {
++              $scope.reboot_cause = 'Power-On-Reset';
++            } else if (
++                status ==
++                'xyz.openbmc_project.State.BMC.RebootCause.Watchdog') {
++              $scope.reboot_cause = 'Watchdog';
++            } else {
++              $scope.reboot_cause = 'Unknown';
++            }
++          },
++          function(error) {
++            console.log(error);
++          });
+       APIUtils.getLastRebootTime().then(
+           function(data) {
+             $scope.reboot_time = data.data;
+-- 
+2.17.1
+

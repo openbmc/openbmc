@@ -1,0 +1,82 @@
+From 29a34839fe0404cf83600ee45fbccbc0fe1f12dc Mon Sep 17 00:00:00 2001
+From: Tim Lee <timlee660101@gmail.com>
+Date: Fri, 7 Jan 2022 13:36:07 +0800
+Subject: [PATCH 5/5] redfish: log_services: fix createDump functionality
+
+Signed-off-by: Tim Lee <timlee660101@gmail.com>
+---
+ redfish-core/lib/log_services.hpp | 46 ++++++++++++++++++++++++++++---
+ 1 file changed, 42 insertions(+), 4 deletions(-)
+
+diff --git a/redfish-core/lib/log_services.hpp b/redfish-core/lib/log_services.hpp
+index 3a8ce1090..cfb5f1c52 100644
+--- a/redfish-core/lib/log_services.hpp
++++ b/redfish-core/lib/log_services.hpp
+@@ -797,22 +797,60 @@ inline void createDump(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
+     crow::connections::systemBus->async_method_call(
+         [asyncResp, payload(task::Payload(req)), dumpPath,
+          dumpType](const boost::system::error_code ec,
+-                   const uint32_t& dumpId) mutable {
++                   const sdbusplus::message::object_path& objPath) mutable {
+             if (ec)
+             {
+                 BMCWEB_LOG_ERROR << "CreateDump resp_handler got error " << ec;
+                 messages::internalError(asyncResp->res);
+                 return;
+             }
++
++            std::string path(objPath.str);
++            auto pos = path.rfind("/");
++            if (pos == std::string::npos)
++            {
++                return;
++            }
++
++            auto idString = path.substr(pos + 1);
++            auto dumpId = std::stoul(idString);
+             BMCWEB_LOG_DEBUG << "Dump Created. Id: " << dumpId;
+ 
+-            createDumpTaskCallback(std::move(payload), asyncResp, dumpId,
+-                                   dumpPath, dumpType);
++            //createDumpTaskCallback(std::move(payload), asyncResp, dumpId,
++            //                       dumpPath, dumpType);
++            std::shared_ptr<task::TaskData> task = task::TaskData::createTask(
++                [dumpPath, dumpId](boost::system::error_code err, sdbusplus::message::message&,
++                    const std::shared_ptr<task::TaskData>& taskData) {
++                    if (err)
++                    {
++                        BMCWEB_LOG_ERROR << "CreateDump createTask got error" << err;
++                        taskData->state = "Cancelled";
++                        return task::completed;
++                    }
++
++                    nlohmann::json retMessage = messages::success();
++                    taskData->messages.emplace_back(retMessage);
++
++                    std::string headerLoc =
++                        "Location: " + dumpPath + std::to_string(dumpId);
++                    taskData->payload->httpHeaders.emplace_back(
++                        std::move(headerLoc));
++
++                    taskData->state = "Completed";
++                    return task::completed;
++                },
++                "type='signal',interface='org.freedesktop.DBus."
++                "Properties',"
++                "member='PropertiesChanged',path='" +
++                objPath.str + "'");
++            task->startTimer(std::chrono::minutes(5));
++            task->populateResp(asyncResp->res);
++            task->payload.emplace(std::move(payload));
+         },
+         "xyz.openbmc_project.Dump.Manager",
+         "/xyz/openbmc_project/dump/" +
+             std::string(boost::algorithm::to_lower_copy(dumpType)),
+-        "xyz.openbmc_project.Dump.Create", "CreateDump");
++        "xyz.openbmc_project.Dump.Create", "CreateDump", std::array<std::pair<std::string, std::variant<std::string, uint64_t>>, 0>());
+ }
+ 
+ inline void clearDump(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
+-- 
+2.17.1
+

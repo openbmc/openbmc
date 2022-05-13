@@ -1,0 +1,9 @@
+[Unit]
+Description=Phosphor-ipmi-flash bmc verify service
+
+[Service]
+ExecStart=/usr/bin/bmc-verify.sh
+Type=oneshot
+
+[Install]
+WantedBy=phosphor-ipmi-flash-bmc-verify.target

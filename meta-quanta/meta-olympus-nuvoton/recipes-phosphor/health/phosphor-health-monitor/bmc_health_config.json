@@ -1,0 +1,60 @@
+{
+    "CPU" : {
+      "Frequency" : 1,
+      "Window_size": 120,
+      "Threshold":
+      {
+          "Critical":
+          {
+              "Value": 95.0,
+              "Log": true,
+              "Target": "reboot.target"
+          },
+          "Warning":
+          {
+            "Value": 90.0,
+            "Log": false,
+            "Target": "systemd unit file"
+          }
+      }
+    },
+    "Memory" : {
+      "Frequency" : 1,
+      "Window_size": 120,
+      "Threshold":
+      {
+          "Critical":
+          {
+              "Value": 95.0,
+              "Log": true,
+              "Target": "reboot.target"
+          },
+          "Warning":
+          {
+            "Value": 90.0,
+            "Log": false,
+            "Target": "systemd unit file"
+          }
+      }
+    },
+    "Storage_RW" : {
+      "Path" : "/run/initramfs/rw",
+      "Frequency" : 1,
+      "Window_size": 120,
+      "Threshold":
+      {
+          "Critical":
+          {
+              "Value": 95.0,
+              "Log": true,
+              "Target": "reboot.target"
+          },
+          "Warning":
+          {
+            "Value": 90.0,
+            "Log": false,
+            "Target": "systemd unit file"
+          }
+      }
+    }
+  }

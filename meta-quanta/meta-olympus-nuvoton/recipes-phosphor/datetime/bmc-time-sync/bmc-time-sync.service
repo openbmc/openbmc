@@ -1,0 +1,12 @@
+[Unit]
+Description=Time sync script service
+Wants=mapper-wait@-xyz-openbmc_project-Ipmi-Channel-Ipmb.service
+After=mapper-wait@-xyz-openbmc_project-Ipmi-Channel-Ipmb.service
+
+[Service]
+Restart=on-failure
+Type=simple
+ExecStart=/usr/bin/env bash /usr/bin/get_host_date.sh
+
+[Install]
+WantedBy=multi-user.target

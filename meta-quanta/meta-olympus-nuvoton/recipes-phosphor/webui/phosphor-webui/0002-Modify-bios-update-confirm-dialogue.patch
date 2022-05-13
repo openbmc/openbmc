@@ -1,0 +1,23 @@
+diff --git a/app/configuration/controllers/firmware-controller.html b/app/configuration/controllers/firmware-controller.html
+index 98f9c008..08b87579 100644
+--- a/app/configuration/controllers/firmware-controller.html
++++ b/app/configuration/controllers/firmware-controller.html
+@@ -121,17 +121,11 @@
+       <form ng-if="activate_image_type == 'Host'">
+         <fieldset>
+           <div class="row column">
+-            <label class="control-radio bold" for="activate-host-without-reboot">Activate firmware file without {{isServerOff() ? "booting" : "rebooting"}} server
++            <label class="control-radio bold" for="activate-host-without-reboot">Activate firmware file and automatically {{isServerOff() ? "boot" : "reboot"}} server
+               <input type="radio" name="activate-host-without-reboot" id="activate-host-without-reboot" ng-model="activate.reboot" ng-value="false"/>
+               <span class="control__indicator control__indicator-on"></span>
+             </label>
+           </div>
+-          <div class="row column">
+-            <label class="control-radio bold" for="activate-host-with-reboot">Activate firmware file and automatically {{isServerOff() ? "boot" : "reboot"}} server
+-              <input type="radio" name="activate-host-with-reboot" id="activate-host-with-reboot" ng-model="activate.reboot" ng-value="true"/>
+-              <span class="control__indicator control__indicator-on"></span>
+-            </label>
+-          </div>
+         </fieldset>
+       </form>
+     </div>

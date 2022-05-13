@@ -1,0 +1,25 @@
+From ca5ae001915190b5495a679b9fb92dcb7b3b9b95 Mon Sep 17 00:00:00 2001
+From: CH Li <chli30@nuvoton.com>
+Date: Tue, 17 Sep 2019 09:20:21 +0800
+Subject: [PATCH] set watchdog Interval value to three minutes
+
+---
+ yaml/xyz/openbmc_project/State/Watchdog.interface.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/yaml/xyz/openbmc_project/State/Watchdog.interface.yaml b/yaml/xyz/openbmc_project/State/Watchdog.interface.yaml
+index da95d4c..e8809ed 100644
+--- a/yaml/xyz/openbmc_project/State/Watchdog.interface.yaml
++++ b/yaml/xyz/openbmc_project/State/Watchdog.interface.yaml
+@@ -37,7 +37,7 @@ properties:
+       type: uint64
+       description: >
+           Time interval to arm the watchdog, in milli-second.
+-      default: 30000
++      default: 180000
+     - name: TimeRemaining
+       type: uint64
+       description: >
+-- 
+2.17.1
+

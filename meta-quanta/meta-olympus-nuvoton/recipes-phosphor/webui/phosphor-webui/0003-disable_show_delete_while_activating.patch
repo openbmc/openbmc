@@ -1,0 +1,13 @@
+diff --git a/app/common/directives/firmware-list.html b/app/common/directives/firmware-list.html
+index 4ebf117..5f18d91 100644
+--- a/app/common/directives/firmware-list.html
++++ b/app/common/directives/firmware-list.html
+@@ -52,7 +52,7 @@
+         <div class="table__cell firmware__action">
+             <span class="table__cell-label">Action:</span>
+             <button class="firmware__action-link" ng-show="firmware.activationStatus == 'Ready' || firmware.activationStatus == 'Failed'" ng-click="activate(firmware.imageId, firmware.Version, firmware.imageType)">Activate</button>
+-            <button class="firmware__action-link" ng-show="firmware.activationStatus != 'Functional'" ng-click="delete(firmware.imageId, firmware.Version)">Delete</button>
++            <button class="firmware__action-link" ng-show="firmware.activationStatus != 'Functional' && firmware.activationStatus != 'Activating'" ng-click="delete(firmware.imageId, firmware.Version)">Delete</button>
+         </div>
+       </div>
+     </div>

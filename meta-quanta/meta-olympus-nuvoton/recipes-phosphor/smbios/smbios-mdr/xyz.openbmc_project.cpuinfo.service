@@ -1,0 +1,14 @@
+[Unit]
+Description=Intel BMC CPU Info
+Requires=smbios-mdrv2.service
+After=smbios-mdrv2.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/cpuinfoapp
+Type=dbus
+BusName=xyz.openbmc_project.CPUInfo
+Nice=19
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,20 @@
+{
+    "bios_definitions": [
+        {
+            "name": "POST_CODE_BOARD_INIT",
+            "num": 25
+        },
+        {
+            "name": "POST_CODE_MEM_INIT",
+            "num": 191
+        },
+        {
+            "name": "POST_CODE_PCI_INIT",
+            "num": 231
+        },
+        {
+            "name": "POST_CODE_OS_START",
+            "num": 173
+        }
+    ]
+}

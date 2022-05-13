@@ -1,0 +1,24 @@
+From 98c0a70476af3265d00efe1324cc066662b561cf Mon Sep 17 00:00:00 2001
+From: Brian Ma <chma0@nuvoton.com>
+Date: Tue, 16 Nov 2021 13:36:59 +0800
+Subject: [PATCH] dts remove mtd uboot read only
+
+---
+ arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+index 7a4df2761dd7..696e3627ba83 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+@@ -139,7 +139,6 @@
+ 			u-boot@0 {
+ 				label = "u-boot";
+ 				reg = <0x0000000 0xC0000>;
+-				read-only;
+ 			};
+ 			u-boot-env@100000{
+ 				label = "u-boot-env";
+-- 
+2.17.1
+

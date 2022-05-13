@@ -1,12 +1,12 @@
 [Unit]
-Description=Set Fan to Full Speed as Rebooting
+Description=Set Fan to Default Speed as Rebooting
 DefaultDependencies=no
 After=shutdown.target
 
 [Service]
 Type=oneshot
 RemainAfterExit=true
-ExecStart=/usr/bin/fan-full-speed.sh
+ExecStart=/usr/bin/fan-default-speed.sh
 
 [Install]
 WantedBy=shutdown.target

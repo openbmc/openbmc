@@ -1,0 +1,12 @@
+[Unit]
+Description=OpenBMC Fan Control Daemon
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/env mapper wait /xyz/openbmc_project/sensors/temperature/cpu0_core0_temp
+ExecStartPre=/usr/bin/env mapper wait /xyz/openbmc_project/sensors/fan_tach/fan1
+ExecStart=/usr/bin/swampd
+Restart=always
+RestartSec=5
+StartLimitInterval=0
+ExecStopPost=/usr/bin/fan-default-speed.sh

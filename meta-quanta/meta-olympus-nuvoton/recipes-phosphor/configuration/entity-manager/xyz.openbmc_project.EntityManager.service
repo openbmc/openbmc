@@ -1,0 +1,16 @@
+[Unit]
+Description=Entity Manager
+Wants=xyz.openbmc_project.FruDevice.service
+After=xyz.openbmc_project.FruDevice.service
+
+[Service]
+ExecStartPre=/bin/mkdir -p /var/configuration
+ExecStartPre=/bin/mkdir -p /tmp/overlays
+ExecStart=/usr/bin/entity-manager
+Restart=always
+Type=dbus
+BusName=xyz.openbmc_project.EntityManager
+
+[Install]
+WantedBy=basic.target
+Alias=dbus-xyz.openbmc_project.EntityManager.service

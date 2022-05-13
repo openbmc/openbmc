@@ -1,0 +1,25 @@
+From abbb98e4fcf0d4a44bb67ad203101315ba3afdc9 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Fri, 31 Jul 2020 17:38:07 +0800
+Subject: [PATCH] support type uint64 uint16 uint8 for smbios
+
+---
+ types.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/types.hpp b/types.hpp
+index 7cb2e9d..e83e2d0 100644
+--- a/types.hpp
++++ b/types.hpp
+@@ -29,7 +29,7 @@ class Manager;
+ 
+ /** @brief Inventory manager supported property types. */
+ using InterfaceVariantType =
+-    std::variant<bool, size_t, int64_t, std::string, std::vector<uint8_t>>;
++    std::variant<bool, size_t, int64_t, std::string, uint64_t, uint16_t, uint8_t, std::vector<uint8_t>>;
+ 
+ template <typename T>
+ using InterfaceType = std::map<std::string, T>;
+-- 
+2.25.1
+

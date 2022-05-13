@@ -1,0 +1,35 @@
+From 441137f9d310dc2f92e3293af6026a0274d80d5b Mon Sep 17 00:00:00 2001
+From: kwliu <kwliu@nuvoton.com>
+Date: Mon, 19 Aug 2019 13:48:00 +0800
+Subject: [PATCH] Fixed cannot show warning high and critical high
+
+Change-Id: I6ba1dd33703f7ad48111f3de4330afa18e76c43c
+---
+ app/common/services/api-utils.js | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/app/common/services/api-utils.js b/app/common/services/api-utils.js
+index d485016..766a2e8 100644
+--- a/app/common/services/api-utils.js
++++ b/app/common/services/api-utils.js
+@@ -943,11 +943,17 @@ window.angular && (function(angular) {
+ 
+                         if (!content.data[key].hasOwnProperty('CriticalLow')) {
+                           content.data[key].CriticalLow = '--';
++                        }
++
++                        if (!content.data[key].hasOwnProperty('CriticalHigh')) {
+                           content.data[key].CriticalHigh = '--';
+                         }
+ 
+                         if (!content.data[key].hasOwnProperty('WarningLow')) {
+                           content.data[key].WarningLow = '--';
++                        }
++
++                        if (!content.data[key].hasOwnProperty('WarningHigh')) {
+                           content.data[key].WarningHigh = '--';
+                         }
+ 
+-- 
+2.17.1
+

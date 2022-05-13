@@ -1,0 +1,24 @@
+From c1c54f75fe7edcaa9ea21ac2fd2969fb8ad6efee Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Fri, 31 Jul 2020 17:39:53 +0800
+Subject: [PATCH] support type uint8 uint16 uint64 for inventory manager
+
+---
+ yaml/xyz/openbmc_project/Inventory/Manager.interface.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/yaml/xyz/openbmc_project/Inventory/Manager.interface.yaml b/yaml/xyz/openbmc_project/Inventory/Manager.interface.yaml
+index 6c791eec..1442e0ee 100644
+--- a/yaml/xyz/openbmc_project/Inventory/Manager.interface.yaml
++++ b/yaml/xyz/openbmc_project/Inventory/Manager.interface.yaml
+@@ -12,6 +12,6 @@ methods:
+           state managed.
+       parameters:
+           - name: object
+-            type: dict[path,dict[string,dict[string,variant[boolean,size,int64,string,array[byte]]]]]
++            type: dict[path,dict[string,dict[string,variant[boolean,size,int64,string,uint64,uint16,byte,array[byte]]]]]
+             description: >
+                 A dictionary of fully enumerated items to be managed.
+-- 
+2.17.1
+

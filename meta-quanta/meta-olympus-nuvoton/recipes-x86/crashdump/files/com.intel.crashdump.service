@@ -1,0 +1,10 @@
+[Unit]
+Description=Intel BMC CPU Crashdump
+
+[Service]
+Restart=always
+ExecStart={bindir}/crashdump
+Type=simple
+
+[Install]
+WantedBy=multi-user.target

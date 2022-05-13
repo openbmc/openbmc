@@ -1,0 +1,151 @@
+
+- name: example path group
+  description: >
+    'A path group is a named collection of D-Bus object
+    paths and associated metadata.  These collections
+    serve only to be referenced by other configuration
+    directives.
+
+    The metadata element has different uses depending
+    on the referencing directive.
+
+    Within a single configuration file path group names
+    must be unique.  The same name can appear in multiple
+    configuration files; however, the referencing directive
+    will only search for the group in the same configuration
+    file.'
+  class: group
+  group: path
+  members:
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/bmc_card
+
+- name: example property group
+  description: >
+    'Like path groups, a property group is a named collection
+    of D-Bus property names and associated metadata.
+
+    Properties in a group must all have the same D-Bus type signature
+    and must be explicitly declared.'
+  class: group
+  group: property
+  type: boolean
+  members:
+    - interface: xyz.openbmc_project.Sensor.Threshold.Critical
+      meta: PROPERTY
+      property: CriticalAlarmHigh
+
+- name: example property watch
+  description: >
+    'A property watch instructs PDM to maintain a cache of the state
+    of the specified properties on the specified D-Bus objects.
+
+    An optional callback can be triggered when property values change.'
+  class: watch
+  watch: property
+  paths: example path group
+  properties: example property group
+  callback: example count condition
+
+- name: example callback group
+  description: >
+    'callback group'
+
+  class: callback
+  callback: group
+  members:
+    - example journal callback
+    - example method callback
+
+- name: example count condition
+  description: >
+    'Conditions or conditional callbacks apply a test prior to invoking
+    the callback function.
+
+    All conditional callbacks must specify the callback to issue if
+    the condition evaluates.
+
+    The count condition applies the op comparison operator to the value of each
+    property in the specified groups.  It then counts the number of properties
+    that pass the comparison, and applies another comparison on the result
+    against the specified bound.
+
+    For example, a callback that requires at least three temperature sensors
+    in the group to be higher than 115 degrees might use a count condition
+    with an op of >, a count op of >=, a bound of 115, and a countbound of 3.
+
+    The optional oneshot parameter defaults to false.  If it is specified and
+    set to true, then the callback will only be called once for as long as the
+    condition is repeatedly passing.  The condition needs to fail at least
+    once to rearm the callback.'
+  class: condition
+  condition: count
+  paths: example path group
+  properties: example property group
+  callback: example callback group
+  countop: '>='
+  countbound: 1
+  op: '=='
+  bound: true
+  oneshot: false
+
+- name: example method callback
+  description: >
+    'The method callback invokes the specified D-Bus method.'
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+    - value: obmc-chassis-hard-poweroff@0.target
+      type: string
+    - value: replace
+      type: string
+
+- name: example journal callback
+  description: >
+    'Callbacks are actions PDM should take when instructed to do so.
+
+    Some callback types refer to a group of paths and group of properties
+    in a similar fashion as the property watch directive.
+
+    The journal callback logs the specified message to the systemd journal
+    with the specified severity.
+
+    Additionally, the journal callback will add to the journal key value
+    pair metadata for each property in the specified property group with
+    the key being the property element metadata and the value being the
+    property value.'
+  class: callback
+  callback: journal
+  paths: example path group
+  properties: example property group
+  severity: INFO
+  message: Sensor Alarm!
+
+- name: errorlog path group
+  class: group
+  group: path
+  members:
+    - meta: PATH
+      path: /xyz/openbmc_project/logging
+
+- name: pathwatch errorlog
+  description: >
+    'A pathwatch watches on the specified object path goup.
+    pathcallback are actions PDM should take when instructed to do so.'
+
+  class: pathwatch
+  pathwatch: path
+  paths: errorlog path group
+  pathcallback: create errorlog event
+
+- name: create errorlog event
+  description: >
+    'eventType specifies the type of the SNMP notification.'
+  class: pathcallback
+  pathcallback: eventpath
+  paths: errorlog path group
+  eventType: ErrorTrap

@@ -1,0 +1,11 @@
+- name: WatchdogTimedOut
+  level: ERR
+  meta:
+    - str: WATCHDOG_ACTION=%s
+      type: string
+
+    - str: WATCHDOG_TIMER_USE=%s
+      type: string
+
+    - str: WATCHDOG_INTERVAL=%llu
+      type: uint64

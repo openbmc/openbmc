@@ -1,0 +1,6 @@
+# xyz.openbmc_project.Control.Boot.Error.Checkstop
+ - name: Checkstop
+   description: Host boot hang.
+# xyz.openbmc_project.Control.Boot.Error.WatchdogTimedOut
+ - name: WatchdogTimedOut
+   description: Watchdog time out triggered while Host booting.

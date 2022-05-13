@@ -1,0 +1,14 @@
+[Unit]
+Description=Soft power off of the host
+Wants=mapper-wait@-xyz-openbmc_project-Ipmi-Channel-kcs1.service
+After=mapper-wait@-xyz-openbmc_project-Ipmi-Channel-kcs1.service
+Wants=obmc-host-stopping@0.target
+Before=obmc-host-stopping@0.target
+Conflicts=obmc-host-start@0.target
+ConditionPathExists=!/run/openbmc/host@0-request
+
+[Service]
+Restart=no
+ExecStart=/usr/bin/env phosphor-softpoweroff
+SyslogIdentifier=phosphor-softpoweroff
+Type=oneshot

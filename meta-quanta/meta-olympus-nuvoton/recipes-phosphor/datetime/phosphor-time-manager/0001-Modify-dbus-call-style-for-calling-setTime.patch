@@ -1,0 +1,42 @@
+From f57bb803bc9e1cb1f477446b3d9039f3d13684f3 Mon Sep 17 00:00:00 2001
+From: kfting <kfting@nuvoton.com>
+Date: Thu, 16 Jul 2020 14:22:53 +0800
+Subject: [PATCH] Modify dbus call style for calling setTime
+
+Signed-off-by: kfting <kfting@nuvoton.com>
+---
+ epoch_base.cpp | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/epoch_base.cpp b/epoch_base.cpp
+index 507c5ff..8b97da1 100644
+--- a/epoch_base.cpp
++++ b/epoch_base.cpp
+@@ -41,7 +41,7 @@ bool EpochBase::setTime(const microseconds& usec)
+     method.append(static_cast<int64_t>(usec.count()),
+                   false,  // relative
+                   false); // user_interaction
+-
++#if 0
+     try
+     {
+         bus.call_noreply(method);
+@@ -52,6 +52,15 @@ bool EpochBase::setTime(const microseconds& usec)
+         using namespace xyz::openbmc_project::Time;
+         elog<FailedError>(Failed::REASON(ex.what()));
+     }
++#endif
++    auto reply = bus.call(method);
++    if (reply.is_method_error())
++    {
++        log<level::ERR>("Error in setting system time");
++        using namespace xyz::openbmc_project::Time;
++        //elog<InternalFailure>();
++        elog<FailedError>(Failed::REASON("Error in setting system time"));
++    }
+     return true;
+ }
+ 
+-- 
+2.17.1
+

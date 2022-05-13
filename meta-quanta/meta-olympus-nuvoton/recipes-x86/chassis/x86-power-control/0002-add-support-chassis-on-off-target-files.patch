@@ -1,0 +1,108 @@
+From dd70ad381a2831fbd86c945a8a181d41d51cdde0 Mon Sep 17 00:00:00 2001
+From: Tim Lee <timlee660101@gmail.com>
+Date: Wed, 10 Mar 2021 17:22:26 +0800
+Subject: [PATCH 2/2] add support chassis on/off target files
+
+Signed-off-by: Tim Lee <timlee660101@gmail.com>
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ src/power_control.cpp | 47 +++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 43 insertions(+), 4 deletions(-)
+
+diff --git a/src/power_control.cpp b/src/power_control.cpp
+index 0371aa9..0296f81 100644
+--- a/src/power_control.cpp
++++ b/src/power_control.cpp
+@@ -525,10 +525,45 @@ static void setBootProgress(const BootProgressStage stage)
+ {
+     bootIface->set_property("BootProgress",
+                             std::string(getBootProgressStage(stage)));
+-    std::cerr << "Moving boot progress to \""
+-            << std::string(getBootProgressStage(stage)) << "\" stage.\n";
++    lg2::info("Moving boot progress to {BOOT_STAGE} stage.",
++             "BOOT_STAGE", std::string(getBootProgressStage(stage)));
+ }
+ 
++static constexpr auto systemdBusname = "org.freedesktop.systemd1";
++static constexpr auto systemdPath = "/org/freedesktop/systemd1";
++static constexpr auto systemdInterface = "org.freedesktop.systemd1.Manager";
++static constexpr auto chassisOnTargetName = "obmc-chassis-poweron.target";
++static constexpr auto chassisOffTargetName = "obmc-chassis-poweroff.target";
++
++void chassisPowerOn()
++{
++    conn->async_method_call(
++        [](boost::system::error_code ec) {
++            if (ec)
++            {
++                lg2::error("Failed to call chassisPowerOn (ec = {ERROR_MSG})",
++                    "ERROR_MSG", ec.message());
++            }
++        },
++        systemdBusname, systemdPath, systemdInterface, "StartUnit",
++        chassisOnTargetName, "replace");
++    return;
++}
++
++void chassisPowerOff()
++{
++    conn->async_method_call(
++        [](boost::system::error_code ec) {
++            if (ec)
++            {
++                lg2::error("Failed to call chassisPowerOff (ec = {ERROR_MSG})",
++                    "ERROR_MSG", ec.message());
++            }
++        },
++        systemdBusname, systemdPath, systemdInterface, "StartUnit",
++        chassisOffTargetName, "replace");
++    return;
++}
+ 
+ static constexpr std::string_view getHostState(const PowerState state)
+ {
+@@ -1599,6 +1634,8 @@ static void currentHostStateMonitor()
+         pohCounterTimerStart();
+         // Clear the restart cause set for the next restart
+         clearRestartCause();
++
++        power_control::chassisPowerOn();
+     }
+     else
+     {
+@@ -1607,7 +1644,7 @@ static void currentHostStateMonitor()
+         // If HostState is trurned to OFF, Set 'OperatingSystemState' to 'Inactive'
+         osIface->set_property("OperatingSystemState", std::string("Inactive"));
+         setBootProgress(BootProgressStage::Unspecified);
+-
++        power_control::chassisPowerOff();
+         // Set the restart cause set for this restart
+         setRestartCause();
+     }
+@@ -1672,7 +1709,7 @@ static void currentHostStateMonitor()
+                 setOperatingSystemState(OperatingSystemStateStage::Inactive);
+ 
+                 setBootProgress(BootProgressStage::Unspecified);
+-
++                power_control::chassisPowerOff();
+                 // Set the restart cause set for this restart
+                 setRestartCause();
+ #ifdef USE_ACBOOT
+@@ -2291,12 +2328,14 @@ static void postCompleteHandler(bool state)
+         sendPowerControlEvent(Event::postCompleteAssert);
+         setOperatingSystemState(OperatingSystemStateStage::Standby);
+         setBootProgress(BootProgressStage::OSStart);
++        power_control::chassisPowerOn();
+     }
+     else
+     {
+         sendPowerControlEvent(Event::postCompleteDeAssert);
+         setOperatingSystemState(OperatingSystemStateStage::Inactive);
+         setBootProgress(BootProgressStage::Unspecified);
++        power_control::chassisPowerOff();
+     }
+ }
+ 
+-- 
+2.17.1
+

@@ -1,0 +1,37 @@
+From 7102d499a612bd203e3a725296c7e8995dcac437 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Tue, 20 Apr 2021 18:30:38 +0800
+Subject: [PATCH] fixed build break
+
+---
+ item_updater.cpp | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/item_updater.cpp b/item_updater.cpp
+index 81666e1..5027989 100644
+--- a/item_updater.cpp
++++ b/item_updater.cpp
+@@ -743,7 +743,9 @@ bool ItemUpdater::fieldModeEnabled(bool value)
+ 
+ void ItemUpdater::restoreFieldModeStatus()
+ {
+-    std::system("fw_printenv > /tmp/env");
++
++    if (std::system("fw_printenv > /tmp/env") < 0)
++        return;
+     std::ifstream input("/tmp/env");
+ 
+     for (std::string envVar; getline(input, envVar); )
+@@ -753,7 +755,8 @@ void ItemUpdater::restoreFieldModeStatus()
+             ItemUpdater::fieldModeEnabled(true);
+         }
+     }
+-    std::system("rm /tmp/env");
++    if (std::system("rm /tmp/env") < 0)
++        return;
+ }
+ 
+ void ItemUpdater::setHostInventoryPath()
+-- 
+2.17.1
+

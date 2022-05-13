@@ -9,7 +9,7 @@ pmbus_read() {
         exit 1
     fi
 
-	arry=$(echo ${data} | sed -e "s/$4\: //" | sed -e "s/\0x00//g" | sed -e "s/\0xff//g" | sed -e "s/\0x7f//g" | sed -e "s/\0x0f//g" | sed -e "s/\0x14//g")
+	arry=$(echo ${data} | sed -e "s/$4\: //" | sed -e "s/\0x00//g" | sed -e "s/\0xff//g" | sed -e "s/\0x7f//g" | sed -e "s/\0x0f//g" | sed -e "s/\0x14//g" | sed -e "s/\0xfe//g")
 
     string=''
     for d in ${arry}
@@ -19,7 +19,7 @@ pmbus_read() {
     done
 }
 
-update_inventory() {
+updaet_inventory() {
       INVENTORY_SERVICE='xyz.openbmc_project.Inventory.Manager'
       INVENTORY_OBJECT='/xyz/openbmc_project/inventory'
       INVENTORY_PATH='xyz.openbmc_project.Inventory.Manager'
@@ -43,19 +43,19 @@ arr=(${input// / });
 
 
 pmbus_read ${arr[1]} ${arr[2]} 0x99 11
-update_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Asset" 1 "Manufacturer" "s" $string
+updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Asset" 1 "Manufacturer" "s" $string
 
 pmbus_read ${arr[1]} ${arr[2]} 0x9a 11
-update_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Asset" 1 "Model" "s" $string
+updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Asset" 1 "Model" "s" $string
 
 pmbus_read ${arr[1]} ${arr[2]} 0xad 21
-update_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Asset" 1 "PartNumber" "s" $string
+updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Asset" 1 "PartNumber" "s" $string
 
-pmbus_read ${arr[1]} ${arr[2]} 0x9e 18
-update_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Asset" 1 "SerialNumber" "s" $string
+pmbus_read ${arr[1]} ${arr[2]} 0x9e 16
+updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Asset" 1 "SerialNumber" "s" $string
 
-update_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Cacheable" 1 "Cached" "b" "true"
-update_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Replaceable" 1 "FieldReplaceable" "b" "true"
-update_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Item" 1 "Present" "b" "true"
-update_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Item" 1 "PrettyName" "s" "powersupply${arr[0]}"
-update_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Item.PowerSupply" 0
+updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Cacheable" 1 "Cached" "b" "true"
+updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Replaceable" 1 "FieldReplaceable" "b" "true"
+updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Item" 1 "Present" "b" "true"
+updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Item" 1 "PrettyName" "s" "powersupply${arr[0]}"
+updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Item.PowerSupply" 0

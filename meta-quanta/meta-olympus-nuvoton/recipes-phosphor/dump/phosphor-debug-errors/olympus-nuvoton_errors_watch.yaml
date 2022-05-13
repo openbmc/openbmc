@@ -1,0 +1,3 @@
+elog:
+    - xyz.openbmc_project.Common.Error.InternalFailure
+    - xyz.openbmc_project.Control.Boot.Error.WatchdogTimedOut

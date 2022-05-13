@@ -1,0 +1,40 @@
+From 9d0f415d7e2590440bcba828b158674e6f351ad4 Mon Sep 17 00:00:00 2001
+From: Brian Ma <chma0@nuvoton.com>
+Date: Thu, 19 Aug 2021 16:53:33 +0800
+Subject: [PATCH] logging test: report a redfish event success when add event
+ log
+
+Signed-off-by: Brian Ma <chma0@nuvoton.com>
+---
+ logging_test.cpp | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/logging_test.cpp b/logging_test.cpp
+index d7d82cee..7d4a0b98 100644
+--- a/logging_test.cpp
++++ b/logging_test.cpp
+@@ -201,6 +201,13 @@ int elog_test()
+     return 0;
+ }
+ 
++void redfish_event_log(){
++    sd_journal_send(
++        "MESSAGE=Create redfish base event log test",
++        "PRIORITY=%i", LOG_INFO, "REDFISH_MESSAGE_ID=%s",
++        "Base.1.10.Success", NULL);
++}
++
+ void commitError(const char* text)
+ {
+     if (std::strcmp(text, "AutoTestSimple") == 0)
+@@ -216,6 +223,7 @@ void commitError(const char* text)
+             std::cout << "elog exception caught: " << e.what() << std::endl;
+             commit(e.name());
+         }
++        redfish_event_log();
+     }
+     else if (std::strcmp(text, "AutoTestCreateAndCommit") == 0)
+     {
+-- 
+2.17.1
+

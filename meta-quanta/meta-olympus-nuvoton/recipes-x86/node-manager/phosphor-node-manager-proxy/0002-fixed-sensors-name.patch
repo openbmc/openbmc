@@ -1,0 +1,33 @@
+From f7b7ef760f904cec7f026ba9fdbc96c49b0e7936 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Mon, 3 Feb 2020 18:36:32 +0800
+Subject: [PATCH] fixed sensors name
+
+---
+ NodeManagerProxy.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/NodeManagerProxy.cpp b/NodeManagerProxy.cpp
+index c875ee4..ebf9932 100644
+--- a/NodeManagerProxy.cpp
++++ b/NodeManagerProxy.cpp
+@@ -121,13 +121,13 @@ void createSensors()
+     // Global power statistics
+     configuredSensors.push_back(std::make_unique<PowerMetric>(server));
+     configuredSensors.push_back(std::make_unique<GlobalPowerPlatform>(
+-        server, 0, 2040, "power", "Total_Power", globalPowerStats,
++        server, 0, 2040, "power", "total_power", globalPowerStats,
+         entirePlatform, 0));
+     configuredSensors.push_back(
+-        std::make_unique<GlobalPowerCpu>(server, 0, 510, "power", "CPU_Power",
++        std::make_unique<GlobalPowerCpu>(server, 0, 510, "power", "cpu_power",
+                                          globalPowerStats, cpuSubsystem, 0));
+     configuredSensors.push_back(std::make_unique<GlobalPowerMemory>(
+-        server, 0, 255, "power", "Memory_Power", globalPowerStats,
++        server, 0, 255, "power", "memory_power", globalPowerStats,
+         memorySubsystem, 0));
+ }
+ 
+-- 
+2.17.1
+

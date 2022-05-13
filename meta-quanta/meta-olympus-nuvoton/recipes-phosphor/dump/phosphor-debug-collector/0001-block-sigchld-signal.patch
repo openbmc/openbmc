@@ -1,0 +1,24 @@
+diff --git a/dump_manager_main.cpp b/dump_manager_main.cpp
+index fe1a147..59c2ed6 100644
+--- a/dump_manager_main.cpp
++++ b/dump_manager_main.cpp
+@@ -28,6 +28,19 @@ int main(int argc, char* argv[])
+     phosphor::dump::EventPtr eventP{event};
+     event = nullptr;
+ 
++    /* Block SIGCHLD so that sd_event_add_child() can work */
++    sigset_t ss{};
++    if (sigemptyset(&ss) < 0 || sigaddset(&ss, SIGCHLD) < 0)
++    {
++        log<level::ERR>("Fail to set sigset");
++        elog<InternalFailure>();
++    }
++    if (sigprocmask(SIG_BLOCK, &ss, NULL) < 0)
++    {
++        log<level::ERR>("Fail to block SIGCHLD");
++        elog<InternalFailure>();
++    }
++
+     // Add sdbusplus ObjectManager for the 'root' path of the DUMP manager.
+     sdbusplus::server::manager::manager objManager(bus, DUMP_OBJPATH);
+     bus.request_name(DUMP_BUSNAME);
