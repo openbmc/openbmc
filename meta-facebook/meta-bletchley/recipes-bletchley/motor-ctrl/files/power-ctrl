@@ -423,7 +423,7 @@ elif [[ "$ACTION" == "dfu" ]]; then
         exit 1
     fi
 elif [[ "$ACTION" == "recovery" ]]; then
-    if [ "$(get_ac_status "$SLED_NUM")" != "$HOST_AC_OFF" ]; then
+    if [ "$(get_host_status "$SLED_NUM")" != "$HOST_ST_OFF" ]; then
         echo "Please turn off host before trigger recovery mode"
         exit 1
     fi
