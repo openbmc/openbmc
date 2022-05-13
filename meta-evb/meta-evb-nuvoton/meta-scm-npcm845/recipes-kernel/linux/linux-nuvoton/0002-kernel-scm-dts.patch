@@ -1,4 +1,4 @@
-From 1a38c511dc039fd8fa2ea5725236eaf5d0e62707 Mon Sep 17 00:00:00 2001
+From df43f79b301e287d238e9ce980516d14e14e83cb Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Mon, 7 Mar 2022 16:26:54 +0800
 Subject: [PATCH] kernel: scm dts
@@ -6,8 +6,8 @@ Subject: [PATCH] kernel: scm dts
 Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
  arch/arm64/boot/dts/nuvoton/Makefile          |   1 +
- .../boot/dts/nuvoton/nuvoton-npcm845-scm.dts  | 669 ++++++++++++++++++
- 2 files changed, 670 insertions(+)
+ .../boot/dts/nuvoton/nuvoton-npcm845-scm.dts  | 697 ++++++++++++++++++
+ 2 files changed, 698 insertions(+)
  create mode 100644 arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts
 
 diff --git a/arch/arm64/boot/dts/nuvoton/Makefile b/arch/arm64/boot/dts/nuvoton/Makefile
@@ -21,10 +21,10 @@ index a99dab90472a..94e0a37c994c 100644
 \ No newline at end of file
 diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts
 new file mode 100644
-index 000000000000..8a9146d22e50
+index 000000000000..692c67574d07
 --- /dev/null
 +++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts
-@@ -0,0 +1,669 @@
+@@ -0,0 +1,697 @@
 +// SPDX-License-Identifier: GPL-2.0
 +// Copyright (c) 2018 Nuvoton Technology tomer.maimon@nuvoton.com
 +// Copyright 2018 Google, Inc.
@@ -517,6 +517,34 @@ index 000000000000..8a9146d22e50
 +				&pin5_slew
 +				&pin6_slew
 +				&pin7_slew>;
++
++		gpio3: gpio@f0013000 {
++			/* NMI_BUTTON=gpio96 */
++			gpio-line-names =
++			/*96-127*/
++			"NMI_BUTTON","","","","","","","",
++			"","","","","","","","",
++			"","","","","","","","",
++			"","","","","","","","";
++		};
++		gpio5: gpio@f0015000 {
++			/* POWER_OUT=gpio190 */
++			gpio-line-names =
++			/*160-191*/
++			"","","","","","","","",
++			"","","","","","","","",
++			"","","","","","","","",
++			"","","","","","","POWER_OUT","";
++		};
++		gpio7: gpio@f0017000 {
++			/* PS_PWROK=gpio233, RESET_BUTTON=gpio234, RESET_OUT=gpio235 */
++			gpio-line-names =
++			/*224-255*/
++			"","","","","","","","",
++			"","PS_PWROK","RESET_BUTTON","RESET_OUT","","","","",
++			"","","","","","","","",
++			"","","","","","","","";
++		};
 +	};
 +
 +	spi_gpio: spi-gpio {
@@ -695,5 +723,5 @@ index 000000000000..8a9146d22e50
 +	status = "okay";
 +};
 -- 
-2.25.1
+2.17.1
 

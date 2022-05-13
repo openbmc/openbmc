@@ -1,6 +1,18 @@
-diff -ruN a/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi b/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi
---- a/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi	2022-03-08 17:18:12.988432200 +0200
-+++ b/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi	2022-03-10 09:05:38.358208484 +0200
+From 021e513277ee39f525f69a3985ae38053059c1a0 Mon Sep 17 00:00:00 2001
+From: invalid_git config <unknown@unknown>
+Date: Thu, 12 May 2022 02:26:41 +0000
+Subject: [PATCH 2/2] dts: npcm8xx: add psci smp method tz
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ .../dts/nuvoton/nuvoton-common-npcm8xx.dtsi   |  5 +++
+ .../boot/dts/nuvoton/nuvoton-npcm845.dtsi     | 41 +++++++++++++++----
+ 2 files changed, 38 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi b/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi
+index afe20ac97ad3..871b69833b92 100644
+--- a/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi
++++ b/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi
 @@ -109,6 +109,11 @@
  			#interrupt-cells = <3>;
  			interrupt-controller;
@@ -13,9 +25,10 @@ diff -ruN a/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi b/arch/arm64
  		};
  	};
  
-diff -ruN a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845.dtsi b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845.dtsi
---- a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845.dtsi	2022-03-08 17:17:59.516256200 +0200
-+++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845.dtsi	2022-03-10 09:06:07.479967026 +0200
+diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845.dtsi b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845.dtsi
+index 8a2969761b04..2559c1378648 100644
+--- a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845.dtsi
++++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845.dtsi
 @@ -19,8 +19,8 @@
  			clocks = <&clk NPCM8XX_CLK_CPU>;
  			reg = <0x0 0x0>;
@@ -92,3 +105,6 @@ diff -ruN a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845.dtsi b/arch/arm64/boot/d
  	timer {
  		compatible = "arm,armv8-timer";
  		interrupts = <GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_LOW)>,
+-- 
+2.17.1
+
