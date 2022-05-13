@@ -25,10 +25,10 @@ RDEPENDS:${PN}-chassis = " \
         x86-power-control \
         "
 
-SUMMARY:${PN}-fans = "EVB NPCM845 Fans"
-RDEPENDS:${PN}-fans = " \
-        phosphor-pid-control \
-        "
+#SUMMARY:${PN}-fans = "EVB NPCM845 Fans"
+#RDEPENDS:${PN}-fans = " \
+#        phosphor-pid-control \
+#        "
 
 SUMMARY:${PN}-flash = "EVB NPCM845 Flash"
 RDEPENDS:${PN}-flash = " \
