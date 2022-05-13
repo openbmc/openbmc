@@ -1,0 +1,16 @@
+diff --git a/ipmi-whitelist.conf b/ipmi-whitelist.conf
+index 4be1de3..e17101e 100644
+--- a/ipmi-whitelist.conf
++++ b/ipmi-whitelist.conf
+@@ -313,6 +313,11 @@
+ 0x32:0x8d:0xff7f   //<Intel OEM Platform>:<Get SSD Power>
+ 0x32:0x90:0x7f7f   //<Intel OEM Platform>:<Get-Set Serial Port Speed>
+ 0x32:0x91:0x7f7f   //<Intel OEM Platform>:<Clear CMOS>
++0x34:0x0b:0xffff   //<Nuvoton OEM>:<Get Firmware Version>
++0x34:0x73:0xffff   //<Nuvoton OEM>:<Get BIOS Post Code>
++0x34:0x90:0xffff   //<Nuvoton OEM>:<Set All PID Zone Manual Mode>
++0x34:0x91:0xffff   //<Nuvoton OEM>:<Set PWM Value>
++0x34:0x92:0xffff   //<Nuvoton OEM>:<Get PWM Value>
+ 0x3e:0x02:0xff7f   //<Intel Managed Data Region>:<BMC Data Region Update Event Message>
+ 0x3e:0x20:0x7f7f   //<Intel Managed Data Region>:<BMC Region Status>
+ 0x3e:0x21:0x7f7f   //<Intel Managed Data Region>:<BMC Region Update Complete>

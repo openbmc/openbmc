@@ -1,0 +1,100 @@
+/xyz/openbmc_project/sensors/temperature/BMC_Temp:
+  sensorID: 0x01
+  sensorType: 1
+  eventReadingType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/temperature/BUV_Temp:
+  sensorID: 0x02
+  sensorType: 1
+  eventReadingType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC1:
+  sensorID: 0x03
+  sensorType: 2
+  eventReadingType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC2:
+  sensorID: 0x04
+  sensorType: 2
+  eventReadingType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC3:
+  sensorID: 0x05
+  sensorType: 2 
+  eventReadingType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC4:
+  sensorID: 0x06
+  sensorType: 2
+  eventReadingType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC5:
+  sensorID: 0x07
+  sensorType: 2
+  eventReadingType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC6:
+  sensorID: 0x08
+  sensorType: 2
+  eventReadingType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC7:
+  sensorID: 0x09
+  sensorType: 2
+  eventReadingType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC8:
+  sensorID: 0x0A
+  sensorType: 2
+  eventReadingType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/MB_P12V_INA219_Output_Voltage:
+  sensorID: 0x0B
+  sensorType: 2
+  eventReadingType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/MB_P3V3_INA219_Output_Voltage:
+  sensorID: 0x0C
+  sensorType: 2
+  eventReadingType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/fan_tach/Fan1:
+  sensorID: 0x0D
+  sensorType: 4
+  eventReadingType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/fan_tach/Fan2:
+  sensorID: 0x0E
+  sensorType: 4
+  eventReadingType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/fan_tach/Fan3:
+  sensorID: 0x0F
+  sensorType: 4
+  eventReadingType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/fan_tach/Fan4:
+  sensorID: 0x10
+  sensorType: 4
+  eventReadingType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/power/MB_P12V_INA219_Output_Power:
+  sensorID: 0x11
+  sensorType: 11
+  eventReadingType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/power/MB_P3V3_INA219_Output_Power:
+  sensorID: 0x12
+  sensorType: 11
+  eventReadingType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/current/MB_P12V_INA219_Output_Current:
+  sensorID: 0x13
+  sensorType: 3
+  eventReadingType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/current/MB_P3V3_INA219_Output_Current:
+  sensorID: 0x14
+  sensorType: 3
+  eventReadingType: 1
+  offset: 0xff

@@ -1,0 +1,34 @@
+From 1598837c4bffdd8905f7b61aa1d54cc4553fdd77 Mon Sep 17 00:00:00 2001
+From: Brian Ma <chma0@nuvoton.com>
+Date: Mon, 20 Jul 2020 16:54:00 +0800
+Subject: [PATCH 2/2] move emc debug message to dev_dbg
+
+---
+ drivers/net/ethernet/nuvoton/npcm7xx_emc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/nuvoton/npcm7xx_emc.c b/drivers/net/ethernet/nuvoton/npcm7xx_emc.c
+index acf6cfdca339..639cdf17888e 100644
+--- a/drivers/net/ethernet/nuvoton/npcm7xx_emc.c
++++ b/drivers/net/ethernet/nuvoton/npcm7xx_emc.c
+@@ -1739,7 +1739,7 @@ static int npcm7xx_get_settings(struct net_device *netdev,
+ 	if (!phydev)
+ 		return -ENODEV;
+ 
+-	dev_info(&ether->pdev->dev, "\n\nnpcm7xx_get_settings\n");
++	dev_dbg(&ether->pdev->dev, "\n\nnpcm7xx_get_settings\n");
+ 	phy_ethtool_ksettings_get(phydev, cmd);
+ 
+ 	return 0;
+@@ -1755,7 +1755,7 @@ static int npcm7xx_set_settings(struct net_device *netdev,
+ 	if (!phydev)
+ 		return -ENODEV;
+ 
+-	dev_info(&ether->pdev->dev, "\n\nnpcm7xx_set_settings\n");
++	dev_dbg(&ether->pdev->dev, "\n\nnpcm7xx_set_settings\n");
+ 	ret =  phy_ethtool_ksettings_set(phydev, cmd);
+ 
+ 	return ret;
+-- 
+2.17.1
+

@@ -1,0 +1,11 @@
+[Unit]
+Description=SevenSeg POSTcode daemon
+After=lpcsnoop.service
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/bin/postcode_7seg /dev/seven_seg_disp_val
+
+[Install]
+WantedBy=multi-user.target

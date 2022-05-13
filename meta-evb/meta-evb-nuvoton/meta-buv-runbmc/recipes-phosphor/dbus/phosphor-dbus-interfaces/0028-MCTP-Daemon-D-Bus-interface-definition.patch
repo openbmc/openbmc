@@ -1,0 +1,703 @@
+From 81efd68e3cf58e14018da0ef039c435f07d02a01 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Mon, 19 Oct 2020 15:28:46 +0800
+Subject: [PATCH] MCTP Daemon D-Bus interface definition
+
+---
+ gen/xyz/openbmc_project/MCTP/Base/meson.build |  14 ++
+ .../MCTP/Binding/PCIe/meson.build             |  14 ++
+ .../MCTP/Binding/SMBus/meson.build            |  14 ++
+ .../openbmc_project/MCTP/Binding/meson.build  |  31 +++
+ .../openbmc_project/MCTP/BusOwner/meson.build |  14 ++
+ .../openbmc_project/MCTP/Endpoint/meson.build |  14 ++
+ .../MCTP/SupportedMessageTypes/meson.build    |  14 ++
+ gen/xyz/openbmc_project/MCTP/meson.build      |  62 +++++
+ gen/xyz/openbmc_project/meson.build           |   1 +
+ xyz/openbmc_project/MCTP/Base.interface.yaml  | 227 ++++++++++++++++++
+ .../MCTP/Binding/PCIe.interface.yaml          |  29 +++
+ .../MCTP/Binding/SMBus.interface.yaml         |  17 ++
+ .../MCTP/BusOwner.interface.yaml              |  17 ++
+ .../MCTP/Endpoint.interface.yaml              |  13 +
+ xyz/openbmc_project/MCTP/README.md            |  43 ++++
+ .../MCTP/SupportedMessageTypes.interface.yaml |  36 +++
+ 16 files changed, 560 insertions(+)
+ create mode 100644 gen/xyz/openbmc_project/MCTP/Base/meson.build
+ create mode 100644 gen/xyz/openbmc_project/MCTP/Binding/PCIe/meson.build
+ create mode 100644 gen/xyz/openbmc_project/MCTP/Binding/SMBus/meson.build
+ create mode 100644 gen/xyz/openbmc_project/MCTP/Binding/meson.build
+ create mode 100644 gen/xyz/openbmc_project/MCTP/BusOwner/meson.build
+ create mode 100644 gen/xyz/openbmc_project/MCTP/Endpoint/meson.build
+ create mode 100644 gen/xyz/openbmc_project/MCTP/SupportedMessageTypes/meson.build
+ create mode 100644 gen/xyz/openbmc_project/MCTP/meson.build
+ create mode 100644 xyz/openbmc_project/MCTP/Base.interface.yaml
+ create mode 100644 xyz/openbmc_project/MCTP/Binding/PCIe.interface.yaml
+ create mode 100644 xyz/openbmc_project/MCTP/Binding/SMBus.interface.yaml
+ create mode 100644 xyz/openbmc_project/MCTP/BusOwner.interface.yaml
+ create mode 100644 xyz/openbmc_project/MCTP/Endpoint.interface.yaml
+ create mode 100644 xyz/openbmc_project/MCTP/README.md
+ create mode 100644 xyz/openbmc_project/MCTP/SupportedMessageTypes.interface.yaml
+
+diff --git a/gen/xyz/openbmc_project/MCTP/Base/meson.build b/gen/xyz/openbmc_project/MCTP/Base/meson.build
+new file mode 100644
+index 0000000..81aeb86
+--- /dev/null
++++ b/gen/xyz/openbmc_project/MCTP/Base/meson.build
+@@ -0,0 +1,14 @@
++# Generated file; do not modify.
++generated_sources += custom_target(
++    'xyz/openbmc_project/MCTP/Base__cpp'.underscorify(),
++    input: [ meson.source_root() / 'xyz/openbmc_project/MCTP/Base.interface.yaml',  ],
++    output: [ 'server.cpp', 'server.hpp', 'client.hpp',  ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'cpp',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.source_root(),
++        'xyz/openbmc_project/MCTP/Base',
++    ],
++)
++
+diff --git a/gen/xyz/openbmc_project/MCTP/Binding/PCIe/meson.build b/gen/xyz/openbmc_project/MCTP/Binding/PCIe/meson.build
+new file mode 100644
+index 0000000..0da866c
+--- /dev/null
++++ b/gen/xyz/openbmc_project/MCTP/Binding/PCIe/meson.build
+@@ -0,0 +1,14 @@
++# Generated file; do not modify.
++generated_sources += custom_target(
++    'xyz/openbmc_project/MCTP/Binding/PCIe__cpp'.underscorify(),
++    input: [ meson.source_root() / 'xyz/openbmc_project/MCTP/Binding/PCIe.interface.yaml',  ],
++    output: [ 'server.cpp', 'server.hpp', 'client.hpp',  ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'cpp',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.source_root(),
++        'xyz/openbmc_project/MCTP/Binding/PCIe',
++    ],
++)
++
+diff --git a/gen/xyz/openbmc_project/MCTP/Binding/SMBus/meson.build b/gen/xyz/openbmc_project/MCTP/Binding/SMBus/meson.build
+new file mode 100644
+index 0000000..a0f97bd
+--- /dev/null
++++ b/gen/xyz/openbmc_project/MCTP/Binding/SMBus/meson.build
+@@ -0,0 +1,14 @@
++# Generated file; do not modify.
++generated_sources += custom_target(
++    'xyz/openbmc_project/MCTP/Binding/SMBus__cpp'.underscorify(),
++    input: [ meson.source_root() / 'xyz/openbmc_project/MCTP/Binding/SMBus.interface.yaml',  ],
++    output: [ 'server.cpp', 'server.hpp', 'client.hpp',  ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'cpp',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.source_root(),
++        'xyz/openbmc_project/MCTP/Binding/SMBus',
++    ],
++)
++
+diff --git a/gen/xyz/openbmc_project/MCTP/Binding/meson.build b/gen/xyz/openbmc_project/MCTP/Binding/meson.build
+new file mode 100644
+index 0000000..6e3407c
+--- /dev/null
++++ b/gen/xyz/openbmc_project/MCTP/Binding/meson.build
+@@ -0,0 +1,31 @@
++# Generated file; do not modify.
++subdir('PCIe')
++generated_others += custom_target(
++    'xyz/openbmc_project/MCTP/Binding/PCIe__markdown'.underscorify(),
++    input: [ meson.source_root() / 'xyz/openbmc_project/MCTP/Binding/PCIe.interface.yaml',  ],
++    output: [ 'PCIe.md' ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'markdown',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.source_root(),
++        'xyz/openbmc_project/MCTP/Binding/PCIe',
++    ],
++    build_by_default: true,
++)
++
++subdir('SMBus')
++generated_others += custom_target(
++    'xyz/openbmc_project/MCTP/Binding/SMBus__markdown'.underscorify(),
++    input: [ meson.source_root() / 'xyz/openbmc_project/MCTP/Binding/SMBus.interface.yaml',  ],
++    output: [ 'SMBus.md' ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'markdown',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.source_root(),
++        'xyz/openbmc_project/MCTP/Binding/SMBus',
++    ],
++    build_by_default: true,
++)
++
+diff --git a/gen/xyz/openbmc_project/MCTP/BusOwner/meson.build b/gen/xyz/openbmc_project/MCTP/BusOwner/meson.build
+new file mode 100644
+index 0000000..190a640
+--- /dev/null
++++ b/gen/xyz/openbmc_project/MCTP/BusOwner/meson.build
+@@ -0,0 +1,14 @@
++# Generated file; do not modify.
++generated_sources += custom_target(
++    'xyz/openbmc_project/MCTP/BusOwner__cpp'.underscorify(),
++    input: [ meson.source_root() / 'xyz/openbmc_project/MCTP/BusOwner.interface.yaml',  ],
++    output: [ 'server.cpp', 'server.hpp', 'client.hpp',  ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'cpp',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.source_root(),
++        'xyz/openbmc_project/MCTP/BusOwner',
++    ],
++)
++
+diff --git a/gen/xyz/openbmc_project/MCTP/Endpoint/meson.build b/gen/xyz/openbmc_project/MCTP/Endpoint/meson.build
+new file mode 100644
+index 0000000..cababfb
+--- /dev/null
++++ b/gen/xyz/openbmc_project/MCTP/Endpoint/meson.build
+@@ -0,0 +1,14 @@
++# Generated file; do not modify.
++generated_sources += custom_target(
++    'xyz/openbmc_project/MCTP/Endpoint__cpp'.underscorify(),
++    input: [ meson.source_root() / 'xyz/openbmc_project/MCTP/Endpoint.interface.yaml',  ],
++    output: [ 'server.cpp', 'server.hpp', 'client.hpp',  ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'cpp',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.source_root(),
++        'xyz/openbmc_project/MCTP/Endpoint',
++    ],
++)
++
+diff --git a/gen/xyz/openbmc_project/MCTP/SupportedMessageTypes/meson.build b/gen/xyz/openbmc_project/MCTP/SupportedMessageTypes/meson.build
+new file mode 100644
+index 0000000..f58fa44
+--- /dev/null
++++ b/gen/xyz/openbmc_project/MCTP/SupportedMessageTypes/meson.build
+@@ -0,0 +1,14 @@
++# Generated file; do not modify.
++generated_sources += custom_target(
++    'xyz/openbmc_project/MCTP/SupportedMessageTypes__cpp'.underscorify(),
++    input: [ meson.source_root() / 'xyz/openbmc_project/MCTP/SupportedMessageTypes.interface.yaml',  ],
++    output: [ 'server.cpp', 'server.hpp', 'client.hpp',  ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'cpp',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.source_root(),
++        'xyz/openbmc_project/MCTP/SupportedMessageTypes',
++    ],
++)
++
+diff --git a/gen/xyz/openbmc_project/MCTP/meson.build b/gen/xyz/openbmc_project/MCTP/meson.build
+new file mode 100644
+index 0000000..94ab2c2
+--- /dev/null
++++ b/gen/xyz/openbmc_project/MCTP/meson.build
+@@ -0,0 +1,62 @@
++# Generated file; do not modify.
++subdir('Base')
++generated_others += custom_target(
++    'xyz/openbmc_project/MCTP/Base__markdown'.underscorify(),
++    input: [ meson.source_root() / 'xyz/openbmc_project/MCTP/Base.interface.yaml',  ],
++    output: [ 'Base.md' ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'markdown',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.source_root(),
++        'xyz/openbmc_project/MCTP/Base',
++    ],
++    build_by_default: true,
++)
++
++subdir('Binding')
++subdir('BusOwner')
++generated_others += custom_target(
++    'xyz/openbmc_project/MCTP/BusOwner__markdown'.underscorify(),
++    input: [ meson.source_root() / 'xyz/openbmc_project/MCTP/BusOwner.interface.yaml',  ],
++    output: [ 'BusOwner.md' ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'markdown',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.source_root(),
++        'xyz/openbmc_project/MCTP/BusOwner',
++    ],
++    build_by_default: true,
++)
++
++subdir('Endpoint')
++generated_others += custom_target(
++    'xyz/openbmc_project/MCTP/Endpoint__markdown'.underscorify(),
++    input: [ meson.source_root() / 'xyz/openbmc_project/MCTP/Endpoint.interface.yaml',  ],
++    output: [ 'Endpoint.md' ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'markdown',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.source_root(),
++        'xyz/openbmc_project/MCTP/Endpoint',
++    ],
++    build_by_default: true,
++)
++
++subdir('SupportedMessageTypes')
++generated_others += custom_target(
++    'xyz/openbmc_project/MCTP/SupportedMessageTypes__markdown'.underscorify(),
++    input: [ meson.source_root() / 'xyz/openbmc_project/MCTP/SupportedMessageTypes.interface.yaml',  ],
++    output: [ 'SupportedMessageTypes.md' ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'markdown',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.source_root(),
++        'xyz/openbmc_project/MCTP/SupportedMessageTypes',
++    ],
++    build_by_default: true,
++)
++
+diff --git a/gen/xyz/openbmc_project/meson.build b/gen/xyz/openbmc_project/meson.build
+index 0f50a9d..46802bb 100644
+--- a/gen/xyz/openbmc_project/meson.build
++++ b/gen/xyz/openbmc_project/meson.build
+@@ -68,6 +68,7 @@ generated_others += custom_target(
+ subdir('Ipmi')
+ subdir('Led')
+ subdir('Logging')
++subdir('MCTP')
+ subdir('Memory')
+ subdir('Network')
+ subdir('Nvme')
+diff --git a/xyz/openbmc_project/MCTP/Base.interface.yaml b/xyz/openbmc_project/MCTP/Base.interface.yaml
+new file mode 100644
+index 0000000..9438551
+--- /dev/null
++++ b/xyz/openbmc_project/MCTP/Base.interface.yaml
+@@ -0,0 +1,227 @@
++description: >
++  Mandatory interface for each instance of the MCTP Daemon to expose
++  the base MCTP daemon and medium type interfaces.
++
++methods:
++    - name: SendMctpMessagePayload
++      description: >
++        Sends message over MCTP interface
++      parameters:
++        - name: DestinationEID
++          type: byte
++          description: >
++            Destination Endpoint ID. The logical address used to route MCTP
++            messages to a specific MCTP endpoint.
++        - name: MsgTag
++          type: byte
++          description: >
++            Message tag. Field that, along with the Source Endpoint IDs and the
++            Tag Owner (TO) field, identifies a unique message at the MCTP
++            transport level.
++        - name: TagOwner
++          type: boolean
++          description: >
++            Tag Owner bit identifies whether the message tag was originated by
++            the endpoint that is the source of the message or by the endpoint
++            that is the destination of the message.
++        - name: Payload
++          type: array[byte]
++          description: Payload of message.
++      returns:
++        - name: Status
++          type: byte
++          description: 0 - if success
++      errors:
++        - xyz.openbmc_project.Common.Error.Timeout
++        - xyz.openbmc_project.Common.Error.InvalidArgument
++        - xyz.openbmc_project.Common.Error.InternalFailure
++
++    - name: SendMctpMessageFileDescriptor
++      description: >
++        Sends message over MCTP interface
++      parameters:
++        - name: DestinationEID
++          type: byte
++          description: >
++            Destination Endpoint ID. The logical address used to route MCTP
++            messages to a specific MCTP endpoint.
++        - name: MsgTag
++          type: byte
++          description: >
++            Message tag. Field that, along with the Source Endpoint IDs and the
++            Tag Owner (TO) field, identifies a unique message at the MCTP
++            transport level.
++        - name: TagOwner
++          type: boolean
++          description: >
++            Tag Owner bit identifies whether the message tag was originated by
++            the endpoint that is the source of the message or by the endpoint
++            that is the destination of the message.
++        - name: FileDescriptor
++          type: unixfd
++          description: File descriptor of message.
++      returns:
++        - name: Status
++          type: byte
++          description: 0 - if success
++      errors:
++        - xyz.openbmc_project.Common.Error.Timeout
++        - xyz.openbmc_project.Common.Error.InvalidArgument
++        - xyz.openbmc_project.Common.Error.InternalFailure
++
++signals:
++    - name: MessageReceivedSignal
++      description: >
++        Signal indicating upper layers about arrival of a MCTP message.
++      properties:
++        - name: MessageType
++          type: enum[self.MessageTypes]
++          description: >
++            Defines the values for the Message Type field for different message
++            types transported through MCTP.
++        - name: SrcEid
++          type: byte
++          description: >
++            Source Endpoint ID. The logical address used to route MCTP messages
++            to a specific MCTP endpoint.
++        - name: MsgTag
++          type: byte
++          description: >
++            Message tag. Field that, along with the Source Endpoint IDs and the
++            Tag Owner (TO) field, identifies a unique message at the MCTP
++            transport level.
++        - name: TagOwner
++          type: boolean
++          description: >
++            Tag Owner bit identifies whether the message tag was originated by
++            the endpoint that is the source of the message or by the endpoint
++            that is the destination of the message.
++        - name: Payload
++          type: array[byte]
++          description: Payload of message.
++
++properties:
++    - name: Eid
++      type: byte
++      description: >
++        Endpoint ID. The logical address used to route MCTP messages to a
++        specific MCTP endpoint.
++
++    - name: BindingID
++      type: enum[self.BindingTypes]
++
++    - name: BindingMediumID
++      type: enum[self.MctpPhysicalMediumIdentifiers]
++
++    - name: StaticEid
++      type: boolean
++      description: Support for statically/dynamicly allocated IDs
++
++    - name: BindingMode
++      type: enum[self.BindingModeTypes]
++      description: Bus Owner / Endpoint / Bridge
++
++enumerations:
++  - name: BindingTypes
++    description: >
++      All other values than described are reserved.
++    values:
++      - name: MctpOverSmbus
++      - name: MctpOverPcieVdm
++      - name: MctpOverUsb
++        description: Reserved for MCTP over USB
++      - name: MctpOverKcs
++      - name: MctpOverSerial
++      - name: VendorDefined
++
++  - name: MctpPhysicalMediumIdentifiers
++    description: >
++      Identifies MCTP physical medium identifiers. see DSP0239.
++    values:
++        - name: Smbus
++          descritpion: SMBus 2.0 100 kHz compatible
++        - name: SmbusI2c
++          descritpion: SMBus 2.0 + I2C 100 kHz compatible
++        - name: I2cCompatible
++          description: I2C 100 kHz compatible (Standard-mode)
++        - name: Smbus3OrI2c400khzCompatible
++          description: SMBus 3.0 or I2C 400 kHz compatible (Fast-mode)
++        - name: Smbus3OrI2c1MhzCompatible
++          description: SMBus 3.0 or I2C 1 MHz compatible (Fast-mode Plus)
++        - name: I2c3Mhz4Compatible
++          description: I2C 3.4 MHz compatible (High-speed mode)
++        - name: Pcie11
++          description: PCIe revision 1.1 compatible
++        - name: Pcie2
++          description: PCIe revision 2.0 compatible
++        - name: Pcie21
++          description: PCIe revision 2.1 compatible
++        - name: Pcie3
++          description: PCIe revision 3.0 compatible
++        - name: Pcie4
++          description: PCIe revision 4.0 compatible
++        - name: Pcie5
++          description: PCIe revision 4.0 compatible
++        - name:  PciCompatible
++          description: >
++            PCI compatible (PCI 1.0,2.0,2.1,2.2,2.3,3.0,PCI-X 1.0, PCI-X 2.0)
++        - name: Usb11Compatible
++          description: USB 1.1 compatible
++        - name: Usb20Compatible
++          description: USB 2.0 compatible
++        - name: Usb30Compatible
++          description: USB 3.0 compatible
++        - name: NcSiOverRbt
++          description: >
++            NC-SI over RBT (A physical interface based on RMII as defined in
++            DSP0222)
++        - name: KcsLegacy
++          description: KCS1 / Legacy (Fixed Address Decoding)
++        - name: KcsPci
++          description: KCS1 / PCI (Base Class 0xC0 Subclass 0x01)
++        - name: SerialHostLegacy
++          description: Serial Host2 / Legacy (Fixed Address Decoding)
++        - name: SerialHostPci
++          description: Serial Host2 / PCI (Base Class 0x07 Subclass 0x00)
++        - name: AsynchronousSerial
++          description: Asynchronous Serial (Between MCs and IMDs)
++        - name: I3cSDR
++          description: I3C 12.5 MHz compatible (SDR)
++        - name: I3cHDRDDR
++          description: I3C 25 MHz compatible (HDR-DDR)
++
++  - name: BindingModeTypes
++    values:
++        - name: Endpoint
++          description: >
++            An MCTP communication terminus. An MCTP endpoint is a terminus or
++            origin of MCTP packets or messages. That is, the combined
++            functionality within a physical device that communicates using the
++            MCTP transport protocol and handles MCTP control commands. This
++            includes MCTP-capable management controllers and managed devices.
++            Also referred to in this document as "endpoint".
++        - name: BusOwner
++          description: >
++            The party responsible for managing address assignments (can be
++            logical or physical addresses) on a bus (for example, in MCTP, the
++            bus owner is the party responsible for managing EID assignments for
++            a given bus). A bus owner may also have additional media-specific
++            responsibilities, such as assignment of physical addresses.
++        - name: Bridge
++          description: >
++            An MCTP endpoint that can route MCTP messages not destined for
++            itself that it receives on one interconnect onto another without
++            interpreting them. The ingress and egress media at the bridge may
++            be either homogeneous or heterogeneous. Also referred to in this
++            document as a "bridge".
++
++  - name: MessageTypes
++    values:
++    - name: MctpControl
++    - name: PLDM
++    - name: NCSI
++    - name: Ethernet
++    - name: NVMeMgmtMsg
++    - name: SPDM
++    - name: VDPCI
++    - name: VDIANA
+diff --git a/xyz/openbmc_project/MCTP/Binding/PCIe.interface.yaml b/xyz/openbmc_project/MCTP/Binding/PCIe.interface.yaml
+new file mode 100644
+index 0000000..1bd2881
+--- /dev/null
++++ b/xyz/openbmc_project/MCTP/Binding/PCIe.interface.yaml
+@@ -0,0 +1,29 @@
++description: >
++    Interface exposed by MCTP daemon for PCIe binding
++
++properties:
++    - name: DiscoveredFlag
++      type: enum[self.DiscoveryFlags]
++      description: >
++        Each endpoint (except the bus owner) on the PCIe bus maintains an
++        internal flag called the Discovered flag. The flag is set to the
++        discovered state when the Set Endpoint ID command is received.
++
++    - name: BDF
++      type: uint16
++      description: >
++        Byte 1 [7:0] Bus number
++        Byte 2 [7:3] Device number [2:0] Function Number
++
++enumerations:
++    - name: DiscoveryFlags
++      description: >
++          The Prepare for Endpoint Discovery message causes each recipient
++          endpoint on the PCIe bus to set their respective Discovered flag to
++          the undiscovered state. For the Prepare for Endpoint Discovery request
++          message, the routing in the physical transport header should be set to
++          011b (Broadcast from Root Complex).
++      values:
++        - name: Discovered
++        - name: Undiscovered
++        - name: NotApplicable
+diff --git a/xyz/openbmc_project/MCTP/Binding/SMBus.interface.yaml b/xyz/openbmc_project/MCTP/Binding/SMBus.interface.yaml
+new file mode 100644
+index 0000000..8a6ccc6
+--- /dev/null
++++ b/xyz/openbmc_project/MCTP/Binding/SMBus.interface.yaml
+@@ -0,0 +1,17 @@
++description: >
++  Interface exposed by MCTP daemon for SMBus binding
++
++properties:
++    - name: ArpMasterSupport
++      type: boolean
++      description: >
++        The SMBus binding can also run ARP Master protocol and
++        assign SMBus addresses to the devices on the bus.
++
++    - name: BusPath
++      type: byte
++      description: I2C bus number of the medium used
++
++    - name: SlaveAddress
++      type: byte
++      description: Slave address to be used for this medium
+diff --git a/xyz/openbmc_project/MCTP/BusOwner.interface.yaml b/xyz/openbmc_project/MCTP/BusOwner.interface.yaml
+new file mode 100644
+index 0000000..d46298e
+--- /dev/null
++++ b/xyz/openbmc_project/MCTP/BusOwner.interface.yaml
+@@ -0,0 +1,17 @@
++description: >
++    Interface exposed by MCTP root object, when executing in Bus Owner mode.
++
++properties:
++    - name: EidPool
++      type: array[struct[byte, byte]]
++      description: >
++        Pool of allowed EIDs to be used.
++        EID pool of 10-100 can be specified as {{10,100}}.
++
++    - name: TopMostBusOwner
++      type: boolean
++      description: To indicate whether BMC is topmost Bus Owner
++
++    - name: OwnEidPool
++      type: boolean
++      description: Indicates Eid pool is managed by self
+diff --git a/xyz/openbmc_project/MCTP/Endpoint.interface.yaml b/xyz/openbmc_project/MCTP/Endpoint.interface.yaml
+new file mode 100644
+index 0000000..e4ba4d0
+--- /dev/null
++++ b/xyz/openbmc_project/MCTP/Endpoint.interface.yaml
+@@ -0,0 +1,13 @@
++description:
++  Interface exposed by discovered MCTP endpoints.
++
++properties:
++    - name: Mode
++      type: enum[xyz.openbmc_project.MCTP.Base.BindingModeTypes]
++      description: Endpoint / BusOwner / Bridge
++
++    - name: NetworkId
++      type: uint16
++      description: >
++        MCTP network ID a unique identifier to distinguish each independent
++        MCTP network within a platform.
+diff --git a/xyz/openbmc_project/MCTP/README.md b/xyz/openbmc_project/MCTP/README.md
+new file mode 100644
+index 0000000..c819dbb
+--- /dev/null
++++ b/xyz/openbmc_project/MCTP/README.md
+@@ -0,0 +1,43 @@
++# MCTP Daemon
++
++## Overview
++MCTP service exposes D-Bus methods / properties / signals for managing
++MCTP devices or work as MCTP Endpoint. MCTP daemon will either
++work in Bus Owner or Endpoint mode for the specified physical medium.
++
++### MCTP service
++MCTP service can be started either in Bus Owner mode or Endpoint mode.
++It will expose following objects.
++1. Base object
++2. MCTP Endpoints (discovered in case of Bus Owner mode, queried using
++routing table in case of Endpoint mode)
++Please refer individual yaml file for details about the
++methods / signals / properties exposed in the interfaces.
++
++#### Base object
++Exposed under the path `/xyz/openbmc_project/mctp` with the following
++interfaces.
++1. `xyz.openbmc_project.MCTP.Base` which exposes all the common properties
++needed for MCTP Daemon.
++2. `xyz.openbmc_project.MCTP.BusOwner` available only in Bus Owner mode
++which exposes the properties needed by Bus Owner MCTP Daemon.
++3. `xyz.openbmc_project.MCTP.SupportedMessageTypes` which exposes the message
++types supported.
++4. Binding interface `xyz.openbmc_project.MCTP.Binding.PCIe` or
++`xyz.openbmc_project.MCTP.Binding.SMBus` as per the physical medium in which
++this MCTP Daemon is instantiated.
++5. Common UUID interface `xyz.openbmc_project.Common.UUID` which exposes UUID
++in RFC4122 format.
++
++#### Endpoint object
++Exposed under the path `/xyz/openbmc_project/mctp/device/<eid>` with the
++following interfaces.
++1. `xyz.openbmc_project.MCTP.SupportedMessageTypes` which exposes supported MCTP
++message types for the discovered MCTP Endpoint.
++2. `xyz.openbmc_project.MCTP.Endpoint` which exposes properties like Network ID
++and endpoint mode (to identify Bus Owner or Bridge or Endpoint) for the discovered
++MCTP Endpoint.
++3. `xyz.openbmc_project.MCTP.Bridge` available only for discovered MCTP Bridges to
++expose properties like EID pool. (TBD)
++4. Common UUID interface `xyz.openbmc_project.Common.UUID` which exposes UUID
++in RFC4122 format.
+diff --git a/xyz/openbmc_project/MCTP/SupportedMessageTypes.interface.yaml b/xyz/openbmc_project/MCTP/SupportedMessageTypes.interface.yaml
+new file mode 100644
+index 0000000..fa447ee
+--- /dev/null
++++ b/xyz/openbmc_project/MCTP/SupportedMessageTypes.interface.yaml
+@@ -0,0 +1,36 @@
++description:
++  Interface used to represent the supported MCTP message types.
++  This will be exposed by all MCTP endpoints.
++
++properties:
++    - name: MctpControl
++      type: boolean
++      description: Indicates support availability
++
++    - name: PLDM
++      type: boolean
++      description: Indicates support availability
++
++    - name: NCSI
++      type: boolean
++      description: Indicates support availability
++
++    - name: Ethernet
++      type: boolean
++      description: Indicates support availability
++
++    - name: NVMeMgmtMsg
++      type: boolean
++      description: Indicates support availability
++
++    - name: SPDM
++      type: boolean
++      description: Indicates support availability
++
++    - name: VDPCI
++      type: boolean
++      description: Indicates support availability
++
++    - name: VDIANA
++      type: boolean
++      description: Indicates support availability
+-- 
+2.17.1
+

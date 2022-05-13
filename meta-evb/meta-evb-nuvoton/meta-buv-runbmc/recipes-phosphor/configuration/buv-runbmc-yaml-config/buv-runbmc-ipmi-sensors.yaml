@@ -1,0 +1,198 @@
+# y = L[(M*x + (B * 10^K1)) * 10^K2]units
+# x: raw value
+# y: real value
+# M: multiplierM
+# B: offsetB
+# K1: bExp
+# K2: rExp
+
+1: &temperature
+  entityID: 0x07
+  entityInstance: 1
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/BMC_Temp
+  sensorReadingType: 0x01
+  multiplierM: 1
+  offsetB: 0
+  bExp: 0
+  rExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+2:
+  <<: *temperature
+  entityInstance: 2
+  path: /xyz/openbmc_project/sensors/temperature/BUV_Temp
+
+3: &voltage
+  entityID: 0x07
+  entityInstance: 3
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/ADC1
+  sensorReadingType: 0x01
+  multiplierM: 157
+  offsetB: 0
+  bExp: 0
+  rExp: -4
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+4:
+  <<: *voltage
+  entityInstance: 4
+  path: /xyz/openbmc_project/sensors/voltage/ADC2
+
+5:
+  <<: *voltage
+  entityInstance: 5
+  path: /xyz/openbmc_project/sensors/voltage/ADC3
+
+6:
+  <<: *voltage
+  entityInstance: 6
+  path: /xyz/openbmc_project/sensors/voltage/ADC4
+
+7:
+  <<: *voltage
+  entityInstance: 7
+  path: /xyz/openbmc_project/sensors/voltage/ADC5
+
+8:
+  <<: *voltage
+  entityInstance: 8
+  path: /xyz/openbmc_project/sensors/voltage/ADC6
+
+9:
+  <<: *voltage
+  entityInstance: 9
+  path: /xyz/openbmc_project/sensors/voltage/ADC7
+
+10:
+  <<: *voltage
+  entityInstance: 10
+  path: /xyz/openbmc_project/sensors/voltage/ADC8
+
+11:
+  <<: *voltage
+  entityInstance: 11
+  path: /xyz/openbmc_project/sensors/voltage/MB_P12V_INA219_Output_Voltage
+  multiplierM: 51
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+
+12:
+  <<: *voltage
+  entityInstance: 12
+  path: /xyz/openbmc_project/sensors/voltage/MB_P3V3_INA219_Output_Voltage
+
+13: &fan_tach
+  entityID: 0x1D
+  entityInstance: 1
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/Fan1
+  sensorReadingType: 0x01
+  multiplierM: 80
+  offsetB: 0
+  bExp: 0
+  rExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+14:
+  <<: *fan_tach
+  entityInstance: 2
+  path: /xyz/openbmc_project/sensors/fan_tach/Fan2
+
+15:
+  <<: *fan_tach
+  entityInstance: 3
+  path: /xyz/openbmc_project/sensors/fan_tach/Fan3
+
+16:
+  <<: *fan_tach
+  entityInstance: 4
+  path: /xyz/openbmc_project/sensors/fan_tach/Fan4
+
+17: &power
+  entityID: 0x07
+  entityInstance: 13
+  sensorType: 0x0B
+  path: /xyz/openbmc_project/sensors/power/MB_P12V_INA219_Output_Power
+  sensorReadingType: 0x01
+  multiplierM: 94
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Watts
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+18:
+  <<: *power
+  entityInstance: 14
+  path: /xyz/openbmc_project/sensors/power/MB_P3V3_INA219_Output_Power
+  multiplierM: 16
+  offsetB: 0
+  rExp: -3
+
+19: &current
+  entityID: 0x07
+  entityInstance: 15
+  sensorType: 0x03
+  path: /xyz/openbmc_project/sensors/current/MB_P12V_INA219_Output_Current
+  sensorReadingType: 0x01
+  multiplierM: 12
+  offsetB: 0
+  rExp: -3
+  bExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
+  mutability: Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+20:
+  <<: *current
+  entityInstance: 16
+  path: /xyz/openbmc_project/sensors/current/MB_P3V3_INA219_Output_Current
+  multiplierM: 4
+  offsetB: 0
+  rExp: -3
