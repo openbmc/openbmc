@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:append:mtjade := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
 
 #
 # Ampere Mt. Jade power control involves different action during

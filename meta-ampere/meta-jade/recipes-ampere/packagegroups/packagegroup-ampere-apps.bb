@@ -35,6 +35,5 @@ RDEPENDS:${PN}-system = " \
 
 SUMMARY:${PN}-flash = "Ampere Flash"
 RDEPENDS:${PN}-flash = " \
-        ampere-flash-utils \
         phosphor-software-manager \
         "
