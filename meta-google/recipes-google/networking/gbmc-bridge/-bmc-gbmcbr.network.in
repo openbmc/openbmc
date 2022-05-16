@@ -7,5 +7,8 @@ IPv6AcceptRA=true
 LLMNR=true
 MulticastDNS=true
 LinkLocalAddressing=ipv6
+IPv6PrefixDelegation=yes
 [IPv6AcceptRA]
 DHCPv6Client=false
+[IPv6PrefixDelegation]
+RouterLifetimeSec=30

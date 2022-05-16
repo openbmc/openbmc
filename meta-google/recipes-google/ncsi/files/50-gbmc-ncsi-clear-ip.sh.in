@@ -12,15 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-[ -z "${gbmc_ncsi_clear_ip-}" ] || exit
+[ -n "${gbmc_ncsi_clear_ip-}" ] && return
 
 source /usr/libexec/ncsid_lib.sh || exit
 
 gbmc_ncsi_clear_ip_hook() {
-  UpdateIP xyz.openbmc_project.Network '@NCSI_IF@' '0.0.0.0' '0' || true
-  UpdateIP xyz.openbmc_project.Network '@NCSI_IF@' '::' '0' || true
+  local ip="${1-}"
+
+  # We only want to clear our IPs if we are assigning a new IP
+  [ -z "$ip" ] && return
+
+  echo "Removing Persistent NCSI IPs" >&2
+  SetStatic xyz.openbmc_project.Network '@NCSI_IF@' 2>/dev/null || true
+  UpdateIP xyz.openbmc_project.Network '@NCSI_IF@' '0.0.0.0' '0' 2>/dev/null || true
+  UpdateIP xyz.openbmc_project.Network '@NCSI_IF@' '::' '0' 2>/dev/null || true
 }
 
-GBMC_BR_DHCP_HOOKS+=(gbmc_ncsi_clear_ip_hook)
+GBMC_BR_LIB_SET_IP_HOOKS+=(gbmc_ncsi_clear_ip_hook)
 
 gbmc_ncsi_clear_ip=1

@@ -13,8 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+[ ! -e /usr/share/gbmc-br-lib.sh ] && exit
+
 source /usr/share/network/lib.sh || exit
-source /usr/libexec/ncsid_lib.sh || exit
+source /usr/share/gbmc-br-lib.sh || exit
 
 NCSI_IF='@NCSI_IF@'
 
@@ -44,45 +46,8 @@ set_net() {
   # We no longer need NCSId if we are in this configuration
   systemctl stop --no-block ncsid@"$NCSI_IF" || true
 
-  # Delete any stale IP Addresses from the primary interface as we won't use them
-  UpdateIP xyz.openbmc_project.Network "$NCSI_IF" '0.0.0.0' '0' || true
-  UpdateIP xyz.openbmc_project.Network "$NCSI_IF" '::' '0' || true
-
-  read -r -d '' contents <<EOF
-[Network]
-Address=$pfx/128
-IPv6PrefixDelegation=yes
-[IPv6PrefixDelegation]
-RouterLifetimeSec=60
-[IPv6Prefix]
-Prefix=$stateless_pfx/80
-PreferredLifetimeSec=60
-ValidLifetimeSec=60
-[IPv6RoutePrefix]
-Route=$pfx/80
-LifetimeSec=60
-[Route]
-Destination=$stateless_pfx/76
-Type=unreachable
-Metric=1024
-EOF
-  for file in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/49-public-ra.conf; do
-    mkdir -p -m 755 "$(dirname "$file")"
-    printf '%s' "$contents" >"$file"
-  done
-  touch -c /lib/systemd/network/*-bmc-gbmcbr.network || true
-
-  contents='[Network]'$'\n'
-  contents+="Gateway=$rtr"$'\n'
-  for file in /run/systemd/network/{00,}-bmc-"$NCSI_IF".network.d/49-public-ra.conf; do
-    mkdir -p -m 755 "$(dirname "$file")"
-    printf '%s' "$contents" >"$file"
-  done
-  touch -c /etc/systemd/network/*-bmc-"$NCSI_IF".network || true
-
-  if [ "$(systemctl is-active systemd-networkd)" != 'inactive' ]; then
-    networkctl reload && networkctl reconfigure gbmcbr "$NCSI_IF" || true
-  fi
+  # Save the IP address for the interface
+  gbmc_br_set_ip "$pfx" || true
 
   # DHCP Relay workaround until alternate source port is supported
   # TODO: Remove this once internal relaying cleanups land
@@ -106,8 +71,6 @@ while true; do
       (( t_pfx_b[9] |= 1 ))
       hextet="fd$(printf '%02x' ${t_pfx_b[9]})"
       pfx="$(ip_bytes_to_str t_pfx_b)"
-      (( t_pfx_b[9] &= 0xf0 ))
-      stateless_pfx="$(ip_bytes_to_str t_pfx_b)"
     elif [[ "$line" =~ ^'DNS search list'' '*:' '*([a-z]+[0-9]+)[^.]*[.](.*.google.com)$ ]]; then
       host="${BASH_REMATCH[1]}"
       domain="${BASH_REMATCH[2]}"
