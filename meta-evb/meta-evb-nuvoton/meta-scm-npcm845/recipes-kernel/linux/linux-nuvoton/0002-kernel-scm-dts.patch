@@ -1,4 +1,4 @@
-From df43f79b301e287d238e9ce980516d14e14e83cb Mon Sep 17 00:00:00 2001
+From b13359dc245702df219154c6589a83eda7713fca Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Mon, 7 Mar 2022 16:26:54 +0800
 Subject: [PATCH] kernel: scm dts
@@ -6,8 +6,8 @@ Subject: [PATCH] kernel: scm dts
 Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
  arch/arm64/boot/dts/nuvoton/Makefile          |   1 +
- .../boot/dts/nuvoton/nuvoton-npcm845-scm.dts  | 697 ++++++++++++++++++
- 2 files changed, 698 insertions(+)
+ .../boot/dts/nuvoton/nuvoton-npcm845-scm.dts  | 711 ++++++++++++++++++
+ 2 files changed, 712 insertions(+)
  create mode 100644 arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts
 
 diff --git a/arch/arm64/boot/dts/nuvoton/Makefile b/arch/arm64/boot/dts/nuvoton/Makefile
@@ -21,10 +21,10 @@ index a99dab90472a..94e0a37c994c 100644
 \ No newline at end of file
 diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts
 new file mode 100644
-index 000000000000..692c67574d07
+index 000000000000..627b687343bb
 --- /dev/null
 +++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts
-@@ -0,0 +1,697 @@
+@@ -0,0 +1,711 @@
 +// SPDX-License-Identifier: GPL-2.0
 +// Copyright (c) 2018 Nuvoton Technology tomer.maimon@nuvoton.com
 +// Copyright 2018 Google, Inc.
@@ -111,6 +111,20 @@ index 000000000000..692c67574d07
 +		ece_memory: framebuffer@0x35600000 {
 +			reg = <0x0 0x35600000 0x0 0x600000>;
 +			no-map;
++		};
++	};
++
++	regulators {
++		compatible = "simple-bus";
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		reg_vref_1_8: regulator@0 {
++			compatible = "regulator-fixed";
++			reg = <0>;
++			regulator-name = "vref_1_8v";
++			regulator-min-microvolt = <1800000>;
++			regulator-max-microvolt = <1800000>;
 +		};
 +	};
 +
@@ -379,7 +393,7 @@ index 000000000000..692c67574d07
 +
 +			adc: adc@c000 {
 +				/* enable external vref */
-+				/*vref-supply = <&reg_vref_1_225>;*/
++				vref-supply = <&reg_vref_1_8>;
 +				#io-channel-cells = <1>;
 +				status = "okay";
 +			};
@@ -599,7 +613,7 @@ index 000000000000..692c67574d07
 +		compatible = "ti,tmp75";
 +		reg = <0x4b>;
 +	};
-+	tmp75@4c {
++	tmp75@4d {
 +		compatible = "ti,tmp75";
 +		reg = <0x4d>;
 +	};
@@ -627,9 +641,9 @@ index 000000000000..692c67574d07
 +
 +&i2c6 {
 +	status = "okay";
-+	adc128d818@37 {
++	adc128d818@33 {
 +		compatible = "ti,adc128d818";
-+		reg = <0x37>;
++		reg = <0x33>;
 +	};
 +	gpioex3: pca9557@1b {
 +		compatible = "nxp,pca9557";
