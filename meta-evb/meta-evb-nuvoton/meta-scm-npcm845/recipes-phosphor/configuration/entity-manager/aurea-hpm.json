@@ -1,0 +1,185 @@
+{
+    "Exposes": [
+        {
+            "Address": "0x4B",
+            "Bus": 4,
+            "EntityId": 7,
+            "EntityInstance": 3,
+            "Name": "Outlet_Temp1",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 65.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 50.000
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 15.000
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "TMP75"
+        },
+        {
+            "Address": "0x4D",
+            "Bus": 4,
+            "EntityId": 7,
+            "EntityInstance": 3,
+            "Name": "Outlet_Temp2",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 65.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 50.000
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 15.000
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "TMP75"
+        },
+        {
+            "Address": "0x48",
+            "Bus": 6,
+            "EntityId": 7,
+            "EntityInstance": 3,
+            "Name": "HPM_Inlet_Temp1",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 65.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 50.000
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 15.000
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "TMP75"
+        },
+        {
+            "Address": "0x49",
+            "Bus": 6,
+            "EntityId": 7,
+            "EntityInstance": 3,
+            "Name": "HPM_Inlet_Temp2",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 65.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 50.000
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 15.000
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "TMP75"
+        },
+        {
+            "Address": "0x4A",
+            "Bus": 6,
+            "EntityId": 7,
+            "EntityInstance": 3,
+            "Name": "HPM_Inlet_Temp3",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 65.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 50.000
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 15.000
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "TMP75"
+        }
+    ],
+    "Name": "AUREA_HPM",
+    "Probe": "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': 'C2012'})",
+    "Type": "Board",
+    "xyz.openbmc_project.Inventory.Decorator.Ipmi": {
+        "EntityId": 7,
+        "EntityInstance": 1
+    },
+    "xyz.openbmc_project.Inventory.Item.Bmc": {},
+    "xyz.openbmc_project.Common.UUID": {
+        "UUID": "$BOARD_INFO_AM1"
+    }
+}
