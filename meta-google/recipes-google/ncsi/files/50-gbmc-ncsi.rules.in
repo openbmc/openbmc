@@ -12,6 +12,7 @@ table inet filter {
         reject
     }
     chain gbmc_br_pub_input {
+      ip6 nexthdr icmpv6 accept
     }
     chain ncsi_legacy_input {
         jump ncsi_any_input
