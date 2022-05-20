@@ -1,4 +1,4 @@
-From 83b180ddbd9b506448176170a72190c29997a970 Mon Sep 17 00:00:00 2001
+From d2f0d31a489669d5cbd6f3f6d97df307e34409e7 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Mon, 7 Mar 2022 16:26:54 +0800
 Subject: [PATCH] kernel: scm dts
@@ -6,8 +6,8 @@ Subject: [PATCH] kernel: scm dts
 Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
  arch/arm64/boot/dts/nuvoton/Makefile          |   1 +
- .../boot/dts/nuvoton/nuvoton-npcm845-scm.dts  | 719 ++++++++++++++++++
- 2 files changed, 720 insertions(+)
+ .../boot/dts/nuvoton/nuvoton-npcm845-scm.dts  | 857 ++++++++++++++++++
+ 2 files changed, 858 insertions(+)
  create mode 100644 arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts
 
 diff --git a/arch/arm64/boot/dts/nuvoton/Makefile b/arch/arm64/boot/dts/nuvoton/Makefile
@@ -21,10 +21,10 @@ index a99dab90472a..94e0a37c994c 100644
 \ No newline at end of file
 diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts
 new file mode 100644
-index 000000000000..1dc08d73d4c5
+index 000000000000..88ee10dea1a8
 --- /dev/null
 +++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts
-@@ -0,0 +1,719 @@
+@@ -0,0 +1,857 @@
 +// SPDX-License-Identifier: GPL-2.0
 +// Copyright (c) 2018 Nuvoton Technology tomer.maimon@nuvoton.com
 +// Copyright 2018 Google, Inc.
@@ -629,12 +629,102 @@ index 000000000000..1dc08d73d4c5
 +		reg = <0x19>;
 +		gpio-controller;
 +		#gpio-cells = <2>;
++		Ex1_P0 {
++			gpio-hog;
++			gpios = <0 0>;
++			input;
++			line-name = "CPU_VR_MAIN_2ND_1";
++		};
++		Ex1_P1 {
++			gpio-hog;
++			gpios = <1 0>;
++			input;
++			line-name = "SMB_M2_S2_ALERT_N";
++		};
++		Ex1_P2 {
++			gpio-hog;
++			gpios = <2 0>;
++			input;
++			line-name = "SMB_M2_S1_ALERT_N";
++		};
++		Ex1_P3 {
++			gpio-hog;
++			gpios = <3 0>;
++			output-low;
++			line-name = "P3V3_M2_S2_BMC_EN_N";
++		};
++		Ex1_P4 {
++			gpio-hog;
++			gpios = <4 0>;
++			output-low;
++			line-name = "P3V3_M2_S1_BMC_EN_N";
++		};
++		Ex1_P5 {
++			gpio-hog;
++			gpios = <5 0>;
++			input;
++			line-name = "RTM1_INT_N";
++		};
++		Ex1_P6 {
++			gpio-hog;
++			gpios = <6 0>;
++			input;
++			line-name = "RTM2_INT_N";
++		};
++		Ex1_P7 {
++			gpio-hog;
++			gpios = <7 0>;
++			input;
++			line-name = "CPU_VR_MAIN_2ND_2";
++		};
 +	};
 +	gpioex2: pca9557@1a {
 +		compatible = "nxp,pca9557";
 +		reg = <0x1a>;
 +		gpio-controller;
 +		#gpio-cells = <2>;
++		Ex2_P1 {
++			gpio-hog;
++			gpios = <1 0>;
++			output-high;
++			line-name = "SMB_ES1_RST_N";
++		};
++		Ex2_P2 {
++			gpio-hog;
++			gpios = <2 0>;
++			output-high;
++			line-name = "SMB_ES2_RST_N";
++		};
++		Ex2_P3 {
++			gpio-hog;
++			gpios = <3 0>;
++			output-high;
++			line-name = "SMB_ES3_RST_N";
++		};
++		Ex2_P4 {
++			gpio-hog;
++			gpios = <4 0>;
++			output-high;
++			line-name = "SMB_ES4_RST_N";
++		};
++		Ex2_P5 {
++			gpio-hog;
++			gpios = <5 0>;
++			output-high;
++			line-name = "SMB_ES5_RST_N";
++		};
++		Ex2_P6 {
++			gpio-hog;
++			gpios = <6 0>;
++			output-high;
++			line-name = "P5V_USB_INT1_EN_N";
++		};
++		Ex2_P7 {
++			gpio-hog;
++			gpios = <7 0>;
++			input;
++			line-name = "FM_USB_INT1_LVC3_OC_N";
++		};
 +	};
 +	eeprom@50 {
 +		compatible = "atmel,24c64";
@@ -654,6 +744,54 @@ index 000000000000..1dc08d73d4c5
 +		reg = <0x1b>;
 +		gpio-controller;
 +		#gpio-cells = <2>;
++		Ex3_P0 {
++			gpio-hog;
++			gpios = <0 0>;
++			output-high;
++			line-name = "NIC_POWER_EN";
++		};
++		Ex3_P1 {
++			gpio-hog;
++			gpios = <1 0>;
++			output-high;
++			line-name = "SMB_ES6_RST_N";
++		};
++		Ex3_P2 {
++			gpio-hog;
++			gpios = <2 0>;
++			output-high;
++			line-name = "SMB_ES7_RST_N";
++		};
++		Ex3_P3 {
++			gpio-hog;
++			gpios = <3 0>;
++			output-high;
++			line-name = "SMB_ES8_RST_N";
++		};
++		Ex3_P4 {
++			gpio-hog;
++			gpios = <4 0>;
++			output-high;
++			line-name = "SMB_ES9_RST_N";
++		};
++		Ex3_P5 {
++			gpio-hog;
++			gpios = <5 0>;
++			output-high;
++			line-name = "SMB_ES10_RST_N";
++		};
++		Ex3_P6 {
++			gpio-hog;
++			gpios = <6 0>;
++			output-high;
++			line-name = "SMB_NIC_RST_N";
++		};
++		Ex3_P7 {
++			gpio-hog;
++			gpios = <7 0>;
++			output-high;
++			line-name = "SMB_SLOT3X16_RST_N";
++		};
 +	};
 +	tmp75@48 {
 +		compatible = "ti,tmp75";
