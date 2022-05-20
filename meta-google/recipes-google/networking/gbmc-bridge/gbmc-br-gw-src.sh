@@ -55,8 +55,8 @@ gbmc_br_gw_src_update() {
   for route in "${!gbmc_br_gw_src_routes[@]}"; do
     [[ "$route" != *" src $gbmc_br_gw_src_ip "* ]] || continue
     echo "gBMC Bridge Updating GW source [$gbmc_br_gw_src_ip]: $route" >&2
-    ip route change $route src "$gbmc_br_gw_src_ip"
-    unset 'gbmc_br_gw_src_routes[$route]'
+    ip route change $route src "$gbmc_br_gw_src_ip" && \
+      unset 'gbmc_br_gw_src_routes[$route]'
   done
 }
 
