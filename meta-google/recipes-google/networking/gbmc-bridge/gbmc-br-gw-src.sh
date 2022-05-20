@@ -12,12 +12,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-[ -z "${gbmc_br_gw_src_lib-}" ] || return
+[ -n "${gbmc_br_gw_src_lib-}" ] && return
 
 source /usr/share/network/lib.sh || exit
 
 gbmc_br_gw_src_ip=
 declare -A gbmc_br_gw_src_routes=()
+gbmc_br_gw_defgw=
+
+gbmc_br_set_router() {
+  local defgw=
+  local route
+  for route in "${!gbmc_br_gw_src_routes[@]}"; do
+    if [[ "$route" != *' dev gbmcbr '* ]]; then
+      defgw=1
+      break
+    fi
+  done
+  [ "$defgw" = "$gbmc_br_gw_defgw" ] && return
+  gbmc_br_gw_defgw="$defgw"
+
+  local files=(/run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-defgw.conf)
+  if [ -n "$defgw" ]; then
+    local file
+    for file in "${files[@]}"; do
+      mkdir -p "$(dirname "$file")"
+      printf '[IPv6PrefixDelegation]\nRouterLifetimeSec=30\n' >"$file"
+    done
+  else
+    rm -f "${files[@]}"
+  fi
+
+  if [ "$(systemctl is-active systemd-networkd)" != 'inactive' ]; then
+    networkctl reload && networkctl reconfigure gbmcbr
+  fi
+}
 
 gbmc_br_gw_src_update() {
   [ -n "$gbmc_br_gw_src_ip" ] || return
@@ -42,9 +71,11 @@ gbmc_br_gw_src_hook() {
     if [ "$action" = 'add' -a -z "${gbmc_br_gw_src_routes["$route"]}" ]; then
       gbmc_br_gw_src_routes["$route"]=1
       gbmc_br_gw_src_update
+      gbmc_br_set_router
     elif [ "$action" = 'del' -a -n "${gbmc_br_gw_src_routes["$route"]}" ]; then
       unset 'gbmc_br_gw_src_routes[$route]'
       gbmc_br_gw_src_update
+      gbmc_br_set_router
     fi
   # Match only global IP addresses on the bridge that match the BMC stateless
   # prefix (<mpfx>:fd00:). So 2002:af4:3480:2248:fd00:6345:3069:9186 would be

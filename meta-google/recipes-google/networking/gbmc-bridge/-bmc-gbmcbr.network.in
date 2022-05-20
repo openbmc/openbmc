@@ -11,4 +11,4 @@ IPv6PrefixDelegation=yes
 [IPv6AcceptRA]
 DHCPv6Client=false
 [IPv6PrefixDelegation]
-RouterLifetimeSec=30
+RouterLifetimeSec=0
