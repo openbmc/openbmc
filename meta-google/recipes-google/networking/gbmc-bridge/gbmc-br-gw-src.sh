@@ -16,7 +16,8 @@
 
 source /usr/share/network/lib.sh || exit
 
-gbmc_br_gw_src_ip=
+gbmc_br_gw_src_ip_stateful=
+gbmc_br_gw_src_ip_stateless=
 declare -A gbmc_br_gw_src_routes=()
 gbmc_br_gw_defgw=
 
@@ -49,6 +50,7 @@ gbmc_br_set_router() {
 }
 
 gbmc_br_gw_src_update() {
+  local gbmc_br_gw_src_ip="${gbmc_br_gw_src_ip_stateful:-$gbmc_br_gw_src_ip_stateless}"
   [ -n "$gbmc_br_gw_src_ip" ] || return
 
   local route
@@ -87,8 +89,14 @@ gbmc_br_gw_src_hook() {
       echo "gBMC Bridge Ensure RA Invalid IP: $ip" >&2
       return 1
     fi
-    if (( ip_bytes[8] != 0xfd || ip_bytes[9] != 0 )); then
+    # Ignore ULAs and non-gBMC addresses
+    if (( ip_bytes[0] & 0xfe == 0xfc || ip_bytes[8] != 0xfd )); then
       return 0
+    fi
+    if (( ip_bytes[9] != 0 )); then
+      local -n gbmc_br_gw_src_ip=gbmc_br_gw_src_ip_stateful
+    else
+      local -n gbmc_br_gw_src_ip=gbmc_br_gw_src_ip_stateless
     fi
     if [ "$action" = 'add' -a "$ip" != "$gbmc_br_gw_src_ip" ]; then
       gbmc_br_gw_src_ip="$ip"
