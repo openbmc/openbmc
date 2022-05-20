@@ -10,5 +10,6 @@ LinkLocalAddressing=ipv6
 IPv6PrefixDelegation=yes
 [IPv6AcceptRA]
 DHCPv6Client=false
+RouteMetric=1056
 [IPv6PrefixDelegation]
 RouterLifetimeSec=0
