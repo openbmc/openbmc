@@ -125,7 +125,7 @@ testParseInit() {
 }
 
 testParseAddrAdd() {
-  expect_err 0 gbmc_ip_monitor_parse_line '[ADDR]2: eno2 inet6 fd01:ff2:5687:4:cf03:45f3:983a:96eb/128 scope global temporary dynamic'
+  expect_err 0 gbmc_ip_monitor_parse_line '[ADDR]2: eno2 inet6 fd01:ff2:5687:4:cf03:45f3:983a:96eb/128 metric 1024 scope global temporary dynamic'
   expect_streq "$change" 'addr'
   expect_streq "$action" 'add'
   expect_streq "$intf" 'eno2'
