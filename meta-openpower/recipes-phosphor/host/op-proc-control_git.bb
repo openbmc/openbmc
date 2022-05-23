@@ -24,6 +24,13 @@ EXTRA_OEMESON += "-Dtests=disabled"
 # For libpdbg, provided by the pdbg package
 DEPENDS += "pdbg"
 
+PACKAGECONFIG ??= "${@bb.utils.filter('OBMC_MACHINE_FEATURES', 'phal op-fsi', d)}"
+PACKAGECONFIG[phal] = "-Dphal=enabled, -Dphal=disabled -Dp9=enabled, ipl pdata"
+PACKAGECONFIG[op-fsi] = "-Dopenfsi=enabled, -Dopenfsi=disabled"
+
+# By default all openpower systems support op-fsi
+PACKAGECONFIG = " op-fsi"
+
 TEMPLATE = "pcie-poweroff@.service"
 INSTANCE_FORMAT = "pcie-poweroff@{}.service"
 INSTANCES = "${@compose_list(d, 'INSTANCE_FORMAT', 'OBMC_CHASSIS_INSTANCES')}"
