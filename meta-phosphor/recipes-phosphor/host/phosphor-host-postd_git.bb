@@ -34,7 +34,6 @@ SYSTEMD_SERVICE:${PN} += "${SERVICE_FILE}"
 EXTRA_OEMESON:append = " \
     -Dsnoop-device=${SNOOP_DEVICE} \
     -Dpost-code-bytes=${POST_CODE_BYTES} \
-    -Dsystemd-target=multi-user.target \
     -Dtests=disabled \
 "
 
