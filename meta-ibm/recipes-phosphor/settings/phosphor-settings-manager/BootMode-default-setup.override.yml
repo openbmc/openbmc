@@ -1,0 +1,13 @@
+/xyz/openbmc_project/control/host0/boot:
+    - Interface: xyz.openbmc_project.Control.Boot.Source
+      Properties:
+          BootSource:
+              Default: Source::Sources::Default
+    - Interface: xyz.openbmc_project.Control.Boot.Mode
+      Properties:
+          BootMode:
+              Default: Mode::Modes::Regular
+    - Interface: xyz.openbmc_project.Object.Enable
+      Properties:
+          Enabled:
+              Default: 'false'
