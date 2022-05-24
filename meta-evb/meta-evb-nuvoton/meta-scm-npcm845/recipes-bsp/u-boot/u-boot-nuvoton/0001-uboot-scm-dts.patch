@@ -1,16 +1,15 @@
-From e40811ac8adc5d05eb53183542290eed55fb27cf Mon Sep 17 00:00:00 2001
+From a83bef45ac9bcf279f3a607017ae1ec4b4fff624 Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
-Date: Thu, 12 May 2022 17:26:07 +0800
+Date: Tue, 24 May 2022 09:00:18 +0800
 Subject: [PATCH] uboot scm dts
 
 Signed-off-by: Stanley Chu <yschu@nuvoton.com>
 ---
  arch/arm/dts/Makefile                        |   3 +-
  arch/arm/dts/nuvoton-common-npcm8xx.dtsi     |   4 +
- arch/arm/dts/nuvoton-npcm845-scm-pincfg.dtsi | 690 +++++++++++++++++++
- arch/arm/dts/nuvoton-npcm845-scm.dts         | 338 +++++++++
- board/nuvoton/arbel/arbel.c                  |  17 +
- 5 files changed, 1051 insertions(+), 1 deletion(-)
+ arch/arm/dts/nuvoton-npcm845-scm-pincfg.dtsi | 700 +++++++++++++++++++
+ arch/arm/dts/nuvoton-npcm845-scm.dts         | 339 +++++++++
+ 4 files changed, 1045 insertions(+), 1 deletion(-)
  create mode 100644 arch/arm/dts/nuvoton-npcm845-scm-pincfg.dtsi
  create mode 100644 arch/arm/dts/nuvoton-npcm845-scm.dts
 
@@ -44,10 +43,10 @@ index 126a34e27c..6dfea9750a 100644
  };
 diff --git a/arch/arm/dts/nuvoton-npcm845-scm-pincfg.dtsi b/arch/arm/dts/nuvoton-npcm845-scm-pincfg.dtsi
 new file mode 100644
-index 0000000000..1b858c9259
+index 0000000000..1881c91e2d
 --- /dev/null
 +++ b/arch/arm/dts/nuvoton-npcm845-scm-pincfg.dtsi
-@@ -0,0 +1,690 @@
+@@ -0,0 +1,700 @@
 +// SPDX-License-Identifier: GPL-2.0
 +// Copyright (c) 2018 Nuvoton Technology
 +
@@ -521,6 +520,12 @@ index 0000000000..1b858c9259
 +			input-enable;
 +			persist-enable;
 +		};
++		gpio188oh_pins: gpio188oh-pins {
++			pins = "GPIO188/SPI3_D2/SPI3_nCS2";
++			bias-disable;
++			output-high;
++			persist-enable;
++		};
 +		gpio189i_pins: gpio189i-pins {
 +			pins = "GPIO189/SPI3_D3/SPI3_nCS3";
 +			bias-disable;
@@ -600,6 +605,10 @@ index 0000000000..1b858c9259
 +			persist-enable;
 +		};
 +
++		fm0cso_slew: fm0cso-slew {
++			pins = "GPIO199/SMB0D_SCL/FM0_CSO";
++			slew-rate = <1>;
++		};
 +		pin108_slew: pin108-slew {
 +			pins = "GPIO108/SG1_MDC";
 +			slew-rate = <1>;
@@ -740,10 +749,10 @@ index 0000000000..1b858c9259
 +};
 diff --git a/arch/arm/dts/nuvoton-npcm845-scm.dts b/arch/arm/dts/nuvoton-npcm845-scm.dts
 new file mode 100644
-index 0000000000..64f5b38d22
+index 0000000000..9812161e78
 --- /dev/null
 +++ b/arch/arm/dts/nuvoton-npcm845-scm.dts
-@@ -0,0 +1,338 @@
+@@ -0,0 +1,339 @@
 +// SPDX-License-Identifier: GPL-2.0
 +
 +/dts-v1/;
@@ -989,6 +998,7 @@ index 0000000000..64f5b38d22
 +&pinctrl {
 +        pinctrl-names = "default";
 +        pinctrl-0 = <
++			&fm0cso_slew
 +			&fm0_pins
 +			&bu4_pins
 +			&bu5_pins
@@ -1082,34 +1092,6 @@ index 0000000000..64f5b38d22
 +			&gpio235oh_pins
 +        >;
 +};
-diff --git a/board/nuvoton/arbel/arbel.c b/board/nuvoton/arbel/arbel.c
-index a674757064..32a45fcdc3 100644
---- a/board/nuvoton/arbel/arbel.c
-+++ b/board/nuvoton/arbel/arbel.c
-@@ -77,6 +77,23 @@ int board_init(void)
- 	arbel_clk_init();
- 	arbel_eth_init();
- 
-+	/* Do not reset FLM moudule in watchdog reset */
-+	clrbits_le32(0xF0801080, BIT(6));
-+#if 0
-+	/* UART0 to Pin 41/42, UART Switch to SI2 */
-+	clrbits_le32(0xf080026c, BIT(1)); // Clear MFSEL4.BSPASEL
-+
-+	/* Set Pin 41/42 as UART0 function */
-+	setbits_le32(0xf0800260, BIT(9)); // Set MFSEL1.BSPSEL
-+
-+	/* Set SI2 as Serial Interface function */
-+	setbits_le32(0xf0800260, BIT(11)); // Set MFSEL1.HSI2ASEL
-+	/* Set UART switch mode 1 */
-+	clrbits_le32(0xf0800038, 0x7);
-+#endif
-+	/* clear VGAIOEN */
-+	clrbits_le32(0xF080003C, BIT(6));
-+
- 	return 0;
- }
- 
 -- 
 2.17.1
 
