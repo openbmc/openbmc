@@ -13,23 +13,16 @@
             },
             {
                 "types": "rsa_pub_oem",
-                "key_pem": "P10BMCAspeedSBPubKey_1.pem",
+                "key_pem": "P10BMCAspeedSBPubKey_2.pem",
                 "offset": "0x240",
                 "number_id": 1,
                 "sha_mode": "SHA512"
             },
             {
                 "types": "rsa_pub_oem",
-                "key_pem": "P10BMCAspeedSBPubKey_2.pem",
+                "key_pem": "P10BMCAspeedSBPubKey_3.pem",
                 "offset": "0x440",
                 "number_id": 2,
-                "sha_mode": "SHA512"
-            },
-            {
-                "types": "rsa_pub_oem",
-                "key_pem": "P10BMCAspeedSBPubKey_3.pem",
-                "offset": "0x640",
-                "number_id": 3,
                 "sha_mode": "SHA512"
             }
         ]
