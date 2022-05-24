@@ -7,4 +7,5 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
     idevicerestore \
     fw-update \
     phosphor-sel-logger \
+    phosphor-gpio-monitor-presence \
 "
