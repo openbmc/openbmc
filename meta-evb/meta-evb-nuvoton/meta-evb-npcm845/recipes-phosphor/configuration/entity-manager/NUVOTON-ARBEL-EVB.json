@@ -459,8 +459,7 @@
             "Type": "TMP100"
         },
         {
-            "Address": "0",
-            "Bus": "0",
+            "Index": "0",
             "EntityId": 7,
             "EntityInstance": 4,
             "Name": "BMC_CPU_Temp0",
@@ -490,11 +489,10 @@
                     "Value": 0
                 }
             ],
-            "Type": "THERMALZONE"
+            "Type": "BMCOnDieThermalSensor"
         },
         {
-            "Address": "1",
-            "Bus": "0",
+            "Index": "1",
             "EntityId": 7,
             "EntityInstance": 5,
             "Name": "BMC_CPU_Temp1",
@@ -524,7 +522,7 @@
                     "Value": 0
                 }
             ],
-            "Type": "THERMALZONE"
+            "Type": "BMCOnDieThermalSensor"
         }
     ],
     "Name": "EVB_ARBEL_NUVOTON",
