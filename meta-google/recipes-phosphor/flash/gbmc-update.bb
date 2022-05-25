@@ -11,6 +11,8 @@ SRC_URI += " \
 
 FILES:${PN} += "${datadir}/gbmc-br-dhcp"
 
+RDEPENDS:${PN} += "curl"
+
 do_install() {
     install -d ${D}${datadir}/gbmc-br-dhcp
     install -m 0644 ${WORKDIR}/75-gbmc-upgrade.sh ${D}${datadir}/gbmc-br-dhcp/
