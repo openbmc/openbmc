@@ -1,0 +1,13 @@
+[Unit]
+Description=SLED%i Present Manager
+After=phosphor-gpio-presence@presence-sled%i.service
+Wants=phosphor-gpio-presence@presence-sled%i.service
+After=mapper-wait@-xyz-openbmc_project-inventory-system-chassis-presence-presence_sled%i.service
+Wants=mapper-wait@-xyz-openbmc_project-inventory-system-chassis-presence-presence_sled%i.service
+
+[Service]
+ExecStart=/usr/bin/detect-sled-present %i
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
