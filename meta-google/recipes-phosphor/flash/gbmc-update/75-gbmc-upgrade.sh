@@ -33,7 +33,11 @@ gbmc_upgrade_fetch() (
 
   # We only support tarballs at the moment, our URLs will always denote
   # this with a URI query param of `format=TAR`.
-  if ! [[ "$bootfile_url" =~ [\&?]format=TAR(&|$) ]]; then
+  local tflags=()
+  if [[ "$bootfile_url" =~ [\&?]format=TAR(_GZIP)?(&|$) ]]; then
+    local t="${BASH_REMATCH[1]}"
+    [ "$t" = '_GZIP' ] && tflags+=('-z')
+  else
     echo "Unknown upgrade unpack method: $bootfile_url" >&2
     return 1
   fi
@@ -53,7 +57,7 @@ gbmc_upgrade_fetch() (
   while true; do
     local st=()
     curl -LSsk --max-time $((timeout - SECONDS)) "$bootfile_url" |
-      tar -xC "$tmpdir" "firmware-gbmc/$machine" \
+      tar "${tflags[@]}" -xC "$tmpdir" "firmware-gbmc/$machine" \
       && st=("${PIPESTATUS[@]}") || st=("${PIPESTATUS[@]}")
     # Curl failures should continue
     if (( st[0] == 0 )); then
