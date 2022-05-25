@@ -49,13 +49,28 @@ gbmc_upgrade_fetch() (
   local max_mb=$((2*64 + 2))
   ulimit -f $((max_mb * 1024 * 1024 / 512)) || return
   timeout=$((SECONDS + 300))
-  while (( SECONDS < timeout )); do
-    local st=(0)
+  stime=5
+  while true; do
+    local st=()
     curl -LSsk --max-time $((timeout - SECONDS)) "$bootfile_url" |
-      tar -xC "$tmpdir" "firmware-gbmc/$machine" || st=("${PIPESTATUS[@]}")
-    (( st[0] != 0 )) || break
+      tar -xC "$tmpdir" "firmware-gbmc/$machine" \
+      && st=("${PIPESTATUS[@]}") || st=("${PIPESTATUS[@]}")
+    # Curl failures should continue
+    if (( st[0] == 0 )); then
+      # Tar failures when curl succeeds are hard errors to start over.
+      if (( st[1] != 0 )); then
+        echo 'Unpacking failed' >&2
+        return 1
+      fi
+      # Success should continue without retry
+      break
+    fi
+    if (( SECONDS + stime >= timeout )); then
+      echo 'Timed out fetching image' >&2
+      return 1
+    fi
     (shopt -s nullglob dotglob; rm -rf -- "${tmpdir:?}"/*)
-    sleep 5
+    sleep $stime
   done
 
   local sig
