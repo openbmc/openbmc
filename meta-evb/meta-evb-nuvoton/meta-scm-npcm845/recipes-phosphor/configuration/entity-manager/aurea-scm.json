@@ -138,10 +138,76 @@
                 }
             ],
             "Type": "TMP75"
+        },
+        {
+            "Index": "0",
+            "EntityId": 6,
+            "EntityInstance": 5,
+            "Name": "BMC_CPU_Temp0",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 75.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 60.000
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 15.000
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "BMCOnDieThermalSensor"
+        },
+        {
+            "Index": "1",
+            "EntityId": 6,
+            "EntityInstance": 6,
+            "Name": "BMC_CPU_Temp1",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 75.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 60.000
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 15.000
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "BMCOnDieThermalSensor"
         }
     ],
-    "Name": "AUREA_SCM",
-    "Probe": "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': 'AUREA-SCM'})",
+    "Name": "Aurea",
+    "Probe": "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': 'Aurea'})",
     "Type": "Board",
     "xyz.openbmc_project.Inventory.Decorator.Ipmi": {
         "EntityId": 6,
