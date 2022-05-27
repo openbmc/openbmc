@@ -40,13 +40,10 @@ RDEPENDS:${PN}-system = " \
         webui-vue \
         obmc-ikvm \
         iperf3 \
-        usb-emmc-storage \
-        usb-network \
         nmon \
         memtester \
         htop \
         ipmitool \
-        phosphor-ipmi-ipmb \
         nuvoton-ipmi-oem \
         openssl-bin \
         openssl-engines \
@@ -60,7 +57,6 @@ RDEPENDS:${PN}-system = " \
         i3c-tools \
         phosphor-ipmi-blobs \
         phosphor-image-signing \
-        program-vbios \
         optee-client \
         optee-test \
 	tcpdump \
