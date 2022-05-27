@@ -23,7 +23,7 @@ ourversion = None
 if len(sys.argv) == 2:
     ourversion = sys.argv[1]
 
-activereleases = ["kirkstone", "honister", "hardknott", "dunfell"]
+activereleases = ["kirkstone", "honister", "dunfell"]
 devbranch = "langdale"
 ltsseries = ["kirkstone", "dunfell"]
 
@@ -211,7 +211,7 @@ with open("sphinx-static/switchers.js.in", "r") as r, open("sphinx-static/switch
             w.write(str(list(release_series.keys())))
             continue
         if "VERSIONS_PLACEHOLDER" in line:
-            w.write("    'dev': { 'title': 'dev (%s)', 'obsolete': false,},\n" % release_series[devbranch])
+            w.write("    'dev': { 'title': 'Unstable (dev)', 'obsolete': false,},\n")
             for branch in activereleases + ([ourseries] if ourseries not in activereleases else []):
                 if branch == devbranch:
                     continue
@@ -223,9 +223,9 @@ with open("sphinx-static/switchers.js.in", "r") as r, open("sphinx-static/switch
                 if branch_versions[-1] != "0":
                     version = version + "." + branch_versions[-1]
                 versions.append(version)
-                w.write("    '%s': {'title': '%s', 'obsolete': %s,},\n" % (version, version, str(branch not in activereleases).lower()))
+                w.write("    '%s': {'title': '%s (%s)', 'obsolete': %s,},\n" % (version, branch.capitalize(), version, str(branch not in activereleases).lower()))
             if ourversion not in versions and ourseries != devbranch:
-                w.write("    '%s': {'title': '%s', 'obsolete': %s,},\n" % (ourversion, ourversion, str(ourseries not in activereleases).lower()))
+                w.write("    '%s': {'title': '%s (%s)', 'obsolete': %s,},\n" % (ourversion, ourseries.capitalize(), ourversion, str(ourseries not in activereleases).lower()))
         else:
             w.write(line)
 

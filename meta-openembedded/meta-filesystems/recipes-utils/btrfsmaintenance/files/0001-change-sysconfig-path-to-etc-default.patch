@@ -1,0 +1,47 @@
+From b49dbe17e0d9ae463e5a34e6991aa2d3c70d2fb1 Mon Sep 17 00:00:00 2001
+From: Claudius Heine <ch@denx.de>
+Date: Wed, 11 May 2022 14:33:13 +0200
+Subject: [PATCH] change sysconfig path to /etc/default
+
+OE uses /etc/default for service configuration, not /etc/sysconfig which
+is used by SUSE and RedHat based distributions.
+
+Change the files accordingly
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Claudius Heine <ch@denx.de>
+---
+ btrfsmaintenance-refresh.path    | 4 ++--
+ btrfsmaintenance-refresh.service | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/btrfsmaintenance-refresh.path b/btrfsmaintenance-refresh.path
+index d56ad11..f0b4132 100644
+--- a/btrfsmaintenance-refresh.path
++++ b/btrfsmaintenance-refresh.path
+@@ -1,8 +1,8 @@
+ [Unit]
+-Description=Watch /etc/sysconfig/btrfsmaintenance
++Description=Watch /etc/default/btrfsmaintenance
+ 
+ [Path]
+-PathChanged=/etc/sysconfig/btrfsmaintenance
++PathChanged=/etc/default/btrfsmaintenance
+ 
+ [Install]
+ WantedBy=multi-user.target
+diff --git a/btrfsmaintenance-refresh.service b/btrfsmaintenance-refresh.service
+index 4ed1eb4..d6225a6 100644
+--- a/btrfsmaintenance-refresh.service
++++ b/btrfsmaintenance-refresh.service
+@@ -1,5 +1,5 @@
+ [Unit]
+-Description=Update cron periods from /etc/sysconfig/btrfsmaintenance
++Description=Update cron periods from /etc/default/btrfsmaintenance
+ 
+ [Service]
+ ExecStart=/usr/share/btrfsmaintenance/btrfsmaintenance-refresh-cron.sh systemd-timer
+-- 
+2.33.3
+

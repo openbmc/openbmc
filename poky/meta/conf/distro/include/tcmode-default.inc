@@ -16,17 +16,17 @@ PREFERRED_PROVIDER_virtual/${SDK_PREFIX}compilerlibs = "nativesdk-gcc-runtime"
 # Default libc config
 PREFERRED_PROVIDER_virtual/gettext ??= "gettext"
 
-GCCVERSION ?= "11.%"
+GCCVERSION ?= "12.%"
 SDKGCCVERSION ?= "${GCCVERSION}"
 BINUVERSION ?= "2.38%"
-GDBVERSION ?= "11.%"
+GDBVERSION ?= "12.%"
 GLIBCVERSION ?= "2.35"
 LINUXLIBCVERSION ?= "5.16%"
-QEMUVERSION ?= "6.2%"
+QEMUVERSION ?= "7.0%"
 GOVERSION ?= "1.18%"
 # This can not use wildcards like 8.0.% since it is also used in mesa to denote
 # llvm version being used, so always bump it with llvm recipe version bump
-LLVMVERSION ?= "14.0.1"
+LLVMVERSION ?= "14.0.3"
 RUSTVERSION ?= "1.60%"
 
 PREFERRED_VERSION_gcc ?= "${GCCVERSION}"

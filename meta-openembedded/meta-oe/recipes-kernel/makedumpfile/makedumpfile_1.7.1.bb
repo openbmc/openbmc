@@ -36,9 +36,13 @@ SECTION = "base"
 # If we do not specify TARGET, makedumpfile will build for the host but use the
 # target gcc.
 #
+
+MAKEDUMPFILE_TARGET ?= "${TARGET_ARCH}"
+MAKEDUMPFILE_TARGET:powerpc = "ppc"
+
 EXTRA_OEMAKE = "\
     LINKTYPE=static \
-    TARGET=${TARGET_ARCH} \
+    TARGET=${MAKEDUMPFILE_TARGET} \
     ${PACKAGECONFIG_CONFARGS} \
 "
 

@@ -81,6 +81,7 @@ python npm_do_configure() {
     import json
     import re
     import shlex
+    import stat
     import tempfile
     from bb.fetch2.npm import NpmEnvironment
     from bb.fetch2.npm import npm_unpack
@@ -202,6 +203,7 @@ python npm_do_configure() {
         if has_shrinkwrap_file:
             _update_manifest("devDependencies")
 
+    os.chmod(cached_manifest_file, os.stat(cached_manifest_file).st_mode | stat.S_IWUSR)
     with open(cached_manifest_file, "w") as f:
         json.dump(cached_manifest, f, indent=2)
 
@@ -305,10 +307,6 @@ npm_do_install() {
     # Remove the shrinkwrap file which does not need to be packed
     rm -f ${D}/${nonarch_libdir}/node_modules/*/npm-shrinkwrap.json
     rm -f ${D}/${nonarch_libdir}/node_modules/@*/*/npm-shrinkwrap.json
-
-    # node(1) is using /usr/lib/node as default include directory and npm(1) is
-    # using /usr/lib/node_modules as install directory. Let's make both happy.
-    ln -fs node_modules ${D}/${nonarch_libdir}/node
 }
 
 FILES:${PN} += " \

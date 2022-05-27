@@ -1,7 +1,7 @@
-From fbc10748c7c59d82024a4d35146b8dfef8d52927 Mon Sep 17 00:00:00 2001
+From 8c8899b4641125cfe8e7baee32e5c5f452545d2c Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 21 Jan 2022 15:15:11 -0800
-Subject: [PATCH 1/2] pass correct parameters to getdents64
+Subject: [PATCH] pass correct parameters to getdents64
 
 Fixes
 ../git/src/basic/recurse-dir.c:57:40: error: incompatible pointer types passing 'uint8_t *' (aka 'unsigned char *') to parameter of type 'struct dirent *' [-Werror,-Wincompatible-pointer-types]
@@ -14,6 +14,7 @@ Fixes
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  src/basic/recurse-dir.c | 2 +-
  src/basic/stat-util.c   | 2 +-
@@ -33,7 +34,7 @@ index efa1797b7b..797285e3be 100644
                          return -errno;
                  if (n == 0)
 diff --git a/src/basic/stat-util.c b/src/basic/stat-util.c
-index efac7b002e..9e1fe7f5a0 100644
+index c2269844f8..7cd6c7fa42 100644
 --- a/src/basic/stat-util.c
 +++ b/src/basic/stat-util.c
 @@ -99,7 +99,7 @@ int dir_is_empty_at(int dir_fd, const char *path) {
@@ -45,6 +46,3 @@ index efac7b002e..9e1fe7f5a0 100644
          if (n < 0)
                  return -errno;
  
--- 
-2.34.1
-

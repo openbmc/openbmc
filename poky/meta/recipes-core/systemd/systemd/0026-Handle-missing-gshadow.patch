@@ -1,4 +1,4 @@
-From 66a926cf906260c2fb5ea851e55efe03edd444dc Mon Sep 17 00:00:00 2001
+From ec519727bb1ceda6e7787ccf86237a6aad07137c Mon Sep 17 00:00:00 2001
 From: Alex Kiernan <alex.kiernan@gmail.com>
 Date: Tue, 10 Mar 2020 11:05:20 +0000
 Subject: [PATCH] Handle missing gshadow
@@ -17,6 +17,8 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  src/shared/userdb.c          |  7 ++++++-
  3 files changed, 30 insertions(+), 1 deletion(-)
 
+diff --git a/src/shared/user-record-nss.c b/src/shared/user-record-nss.c
+index 88b8fc2f8f..a819d41bac 100644
 --- a/src/shared/user-record-nss.c
 +++ b/src/shared/user-record-nss.c
 @@ -331,8 +331,10 @@ int nss_group_to_group_record(
@@ -46,7 +48,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  
          r = json_build(&g->json, JSON_BUILD_OBJECT(
                                         JSON_BUILD_PAIR("groupName", JSON_BUILD_STRING(g->group_name)),
-@@ -388,6 +392,7 @@ int nss_sgrp_for_group(const struct grou
+@@ -388,6 +392,7 @@ int nss_sgrp_for_group(const struct group *grp, struct sgrp *ret_sgrp, char **re
          assert(ret_sgrp);
          assert(ret_buffer);
  
@@ -54,7 +56,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
          for (;;) {
                  _cleanup_free_ char *buf = NULL;
                  struct sgrp sgrp, *result;
-@@ -416,6 +421,9 @@ int nss_sgrp_for_group(const struct grou
+@@ -416,6 +421,9 @@ int nss_sgrp_for_group(const struct group *grp, struct sgrp *ret_sgrp, char **re
                  buflen *= 2;
                  buf = mfree(buf);
          }
@@ -120,6 +122,8 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
          if (r < 0)
                  return r;
  
+diff --git a/src/shared/user-record-nss.h b/src/shared/user-record-nss.h
+index 22ab04d6ee..4e52e7a911 100644
 --- a/src/shared/user-record-nss.h
 +++ b/src/shared/user-record-nss.h
 @@ -2,7 +2,11 @@
@@ -134,9 +138,11 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include <pwd.h>
  #include <shadow.h>
  
+diff --git a/src/shared/userdb.c b/src/shared/userdb.c
+index 0eddd382e6..d506b8e263 100644
 --- a/src/shared/userdb.c
 +++ b/src/shared/userdb.c
-@@ -1046,13 +1046,15 @@ int groupdb_iterator_get(UserDBIterator
+@@ -1046,13 +1046,15 @@ int groupdb_iterator_get(UserDBIterator *iterator, GroupRecord **ret) {
                  if (gr) {
                          _cleanup_free_ char *buffer = NULL;
                          bool incomplete = false;
@@ -153,7 +159,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
                          if (!FLAGS_SET(iterator->flags, USERDB_SUPPRESS_SHADOW)) {
                                  r = nss_sgrp_for_group(gr, &sgrp, &buffer);
                                  if (r < 0) {
-@@ -1065,6 +1067,9 @@ int groupdb_iterator_get(UserDBIterator
+@@ -1065,6 +1067,9 @@ int groupdb_iterator_get(UserDBIterator *iterator, GroupRecord **ret) {
                          }
  
                          r = nss_group_to_group_record(gr, r >= 0 ? &sgrp : NULL, ret);

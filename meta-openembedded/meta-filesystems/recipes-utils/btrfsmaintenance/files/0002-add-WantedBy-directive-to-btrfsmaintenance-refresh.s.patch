@@ -1,0 +1,33 @@
+From 420ae0f395838b852ae8b8fe5528056c36dc0919 Mon Sep 17 00:00:00 2001
+From: Claudius Heine <ch@denx.de>
+Date: Wed, 11 May 2022 15:14:22 +0200
+Subject: [PATCH] add WantedBy directive to btrfsmaintenance-refresh.service
+
+Just trigger the service on the first boot, to configure services to the
+configuration file deployed in the package, afterwards disable the
+service, so that is only triggered when the configuration file has
+changed.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Claudius Heine <ch@denx.de>
+---
+ btrfsmaintenance-refresh.service | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/btrfsmaintenance-refresh.service b/btrfsmaintenance-refresh.service
+index d6225a6..58d0e09 100644
+--- a/btrfsmaintenance-refresh.service
++++ b/btrfsmaintenance-refresh.service
+@@ -3,4 +3,8 @@ Description=Update cron periods from /etc/default/btrfsmaintenance
+ 
+ [Service]
+ ExecStart=/usr/share/btrfsmaintenance/btrfsmaintenance-refresh-cron.sh systemd-timer
++ExecStart=systemctl disable btrfsmaintenance-refresh.service
+ Type=oneshot
++
++[Install]
++WantedBy=multi-user.target
+-- 
+2.33.3
+

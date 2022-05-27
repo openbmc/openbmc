@@ -19,6 +19,7 @@ The following figure presents a simple Autotools workflow.
 
 .. image:: figures/sdk-autotools-flow.png
    :align: center
+   :width: 70%
 
 Follow these steps to create a simple Autotools-based "Hello World"
 project:
@@ -168,6 +169,7 @@ variables and Makefile variables during development.
 
 .. image:: figures/sdk-makefile-flow.png
    :align: center
+   :width: 70%
 
 The main point of this section is to explain the following three cases
 regarding variable behavior:

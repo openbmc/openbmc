@@ -725,6 +725,7 @@ workflow.
 
 .. image:: figures/bsp-dev-flow.png
    :align: center
+   :width: 70%
 
 #. *Set up Your Host Development System to Support Development Using the
    Yocto Project*: See the ":ref:`dev-manual/start:preparing the build host`"

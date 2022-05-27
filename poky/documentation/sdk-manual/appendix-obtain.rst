@@ -265,8 +265,7 @@ install the Standard SDK by running the ``*.sh`` SDK installation
 script:
 
 .. image:: figures/sdk-installed-standard-sdk-directory.png
-   :scale: 80%
-   :align: center
+   :scale: 100%
 
 The installed SDK consists of an environment setup script for the SDK, a
 configuration file for the target, a version file for the target, and

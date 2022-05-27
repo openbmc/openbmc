@@ -122,6 +122,7 @@ RDEPENDS:packagegroup-meta-oe-bsp:remove:riscv64 = "efivar efibootmgr fwupd fwup
 RDEPENDS:packagegroup-meta-oe-bsp:remove:riscv32 = "efivar efibootmgr fwupd fwupd-efi"
 
 RDEPENDS:packagegroup-meta-oe-connectivity ="\
+    cyrus-sasl \
     gammu \
     gattlib \
     gensio \

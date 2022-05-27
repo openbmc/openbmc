@@ -11,6 +11,8 @@ inherit pypi python_setuptools_build_meta
 
 UPSTREAM_CHECK_REGEX = "setuptools_scm-(?P<pver>.*)\.tar"
 
+DEPENDS += "python3-tomli-native"
+
 RDEPENDS:${PN} = "\
     ${PYTHON_PN}-packaging \
     ${PYTHON_PN}-pyparsing \

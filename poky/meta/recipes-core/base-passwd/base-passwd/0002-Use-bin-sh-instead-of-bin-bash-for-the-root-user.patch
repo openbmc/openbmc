@@ -1,0 +1,23 @@
+From 4411fc0df77566d52bee11ec0bad4be30a96e99e Mon Sep 17 00:00:00 2001
+From: Scott Garman <scott.a.garman@intel.com>
+Date: Fri, 29 Apr 2022 13:32:27 +0000
+Subject: [PATCH] Use /bin/sh instead of /bin/bash for the root user
+
+/bin/bash may not be included in some images such as minimal.
+
+Upstream-Status: Inappropriate [configuration]
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+---
+ passwd.master | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/passwd.master b/passwd.master
+index 7cd4e24..041685a 100644
+--- a/passwd.master
++++ b/passwd.master
+@@ -1,4 +1,4 @@
+-root:*:0:0:root:/root:/bin/bash
++root:*:0:0:root:/root:/bin/sh
+ daemon:*:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+ bin:*:2:2:bin:/bin:/usr/sbin/nologin
+ sys:*:3:3:sys:/dev:/usr/sbin/nologin

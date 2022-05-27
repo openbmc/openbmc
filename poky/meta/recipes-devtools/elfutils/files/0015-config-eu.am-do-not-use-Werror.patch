@@ -1,4 +1,4 @@
-From 5e39da062929a60a07ddfc8b6d435ea65ea3e31f Mon Sep 17 00:00:00 2001
+From ff6ab57ba5dd37947ef1ffe5de7af5dbebfeb4e9 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 22 Jun 2020 21:35:16 +0000
 Subject: [PATCH] config/eu.am: do not use -Werror

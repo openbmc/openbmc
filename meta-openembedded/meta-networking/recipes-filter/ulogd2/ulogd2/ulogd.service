@@ -1,0 +1,11 @@
+[Unit]
+Description=Netfilter Ulogd daemon
+Before=network-pre.target
+Wants=network-pre.target
+
+[Service]
+ExecStart=@SBINDIR@/ulogd
+ExecReload=kill -HUP ${MAINPID}
+
+[Install]
+WantedBy=multi-user.target

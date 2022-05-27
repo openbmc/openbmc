@@ -166,7 +166,7 @@ remainder of this section expands on the fundamental input, output,
 process, and metadata logical blocks that make up the workflow.
 
 .. image:: figures/YP-flow-diagram.png
-   :align: center
+   :width: 100%
 
 In general, the build's workflow consists of several functional areas:
 
@@ -209,7 +209,7 @@ Configuration" box of the :ref:`general workflow
 figure <overview-manual/concepts:openembedded build system concepts>`:
 
 .. image:: figures/user-configuration.png
-   :align: center
+   :width: 100%
 
 BitBake needs some basic configuration files in order to complete a
 build. These files are ``*.conf`` files. The minimally necessary ones
@@ -313,7 +313,7 @@ section in the Yocto Project Development Tasks Manual.
 
 The files ``site.conf`` and ``auto.conf`` are not created by the
 environment initialization script. If you want the ``site.conf`` file,
-you need to create that yourself. The ``auto.conf`` file is typically
+you need to create it yourself. The ``auto.conf`` file is typically
 created by an autobuilder:
 
 -  *site.conf:* You can use the ``conf/site.conf`` configuration
@@ -321,17 +321,7 @@ created by an autobuilder:
    you had several build environments and they shared some common
    features. You can set these default build properties here. A good
    example is perhaps the packaging format to use through the
-   :term:`PACKAGE_CLASSES`
-   variable.
-
-   One useful scenario for using the ``conf/site.conf`` file is to
-   extend your :term:`BBPATH` variable
-   to include the path to a ``conf/site.conf``. Then, when BitBake looks
-   for Metadata using :term:`BBPATH`, it finds the ``conf/site.conf`` file
-   and applies your common configurations found in the file. To override
-   configurations in a particular build directory, alter the similar
-   configurations within that build directory's ``conf/local.conf``
-   file.
+   :term:`PACKAGE_CLASSES` variable.
 
 -  *auto.conf:* The file is usually created and written to by an
    autobuilder. The settings put into the file are typically the same as
@@ -401,6 +391,7 @@ layers from the :ref:`general workflow figure
 
 .. image:: figures/layer-input.png
    :align: center
+   :width: 70%
 
 In general, all layers have a similar structure. They all contain a
 licensing file (e.g. ``COPYING.MIT``) if the layer is to be distributed,
@@ -551,6 +542,7 @@ area of the :ref:`general workflow figure <overview-manual/concepts:openembedded
 
 .. image:: figures/source-input.png
    :align: center
+   :width: 70%
 
 Upstream Project Releases
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -629,7 +621,7 @@ This section looks a little closer into the package feeds area used by
 the build system. Here is a more detailed look at the area:
 
 .. image:: figures/package-feeds.png
-   :align: center
+   :width: 100%
 
 Package feeds are an intermediary step in the build process. The
 OpenEmbedded build system provides classes to generate different package
@@ -702,7 +694,7 @@ The first stages of building a recipe are to fetch and unpack the source
 code:
 
 .. image:: figures/source-fetching.png
-   :align: center
+   :width: 100%
 
 The :ref:`ref-tasks-fetch` and
 :ref:`ref-tasks-unpack` tasks fetch
@@ -790,7 +782,7 @@ Once source code is fetched and unpacked, BitBake locates patch files
 and applies them to the source files:
 
 .. image:: figures/patching.png
-   :align: center
+   :width: 100%
 
 The :ref:`ref-tasks-patch` task uses a
 recipe's :term:`SRC_URI` statements
@@ -831,7 +823,7 @@ compile the source code. Once compilation occurs, the files are copied
 to a holding area (staged) in preparation for packaging:
 
 .. image:: figures/configuration-compile-autoreconf.png
-   :align: center
+   :width: 100%
 
 This step in the build process consists of the following tasks:
 
@@ -889,7 +881,7 @@ After source code is configured, compiled, and staged, the build system
 analyzes the results and splits the output into packages:
 
 .. image:: figures/analysis-for-package-splitting.png
-   :align: center
+   :width: 100%
 
 The :ref:`ref-tasks-package` and
 :ref:`ref-tasks-packagedata`
@@ -968,7 +960,7 @@ Once packages are split and stored in the Package Feeds area, the build
 system uses BitBake to generate the root filesystem image:
 
 .. image:: figures/image-generation.png
-   :align: center
+   :width: 100%
 
 The image generation process consists of several stages and depends on
 several tasks and variables. The
@@ -1086,7 +1078,7 @@ Development Kit (SDK) installer scripts for both the standard SDK and
 the extensible SDK (eSDK):
 
 .. image:: figures/sdk-generation.png
-   :align: center
+   :width: 100%
 
 .. note::
 
@@ -1262,6 +1254,7 @@ this output:
 
 .. image:: figures/images.png
    :align: center
+   :width: 75%
 
 .. note::
 
@@ -1321,7 +1314,7 @@ SDK (e.g. ``bitbake -c populate_sdk_ext`` imagename) or a standard SDK
 closer look at this output:
 
 .. image:: figures/sdk.png
-   :align: center
+   :width: 100%
 
 The specific form of this output is a set of files that includes a
 self-extracting SDK installer (``*.sh``), host and target manifest
@@ -1439,7 +1432,7 @@ The following figure shows a high-level build environment regarding
 toolchain construction and use.
 
 .. image:: figures/cross-development-toolchains.png
-   :align: center
+   :width: 100%
 
 Most of the work occurs on the Build Host. This is the machine used to
 build images and generally work within the the Yocto Project
@@ -2146,7 +2139,7 @@ dependencies, you must manually declare the dependencies.
 
       By default, ``foo-dev`` also has an :term:`RDEPENDS`-style dependency on
       ``foo``, because the default value of ``RDEPENDS:${PN}-dev`` (set in
-      bitbake.conf) includes "${PN}".
+      ``bitbake.conf``) includes "${PN}".
 
    To ensure that the dependency chain is never broken, ``-dev`` and
    ``-dbg`` packages are always generated by default, even if the

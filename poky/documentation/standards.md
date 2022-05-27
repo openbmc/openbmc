@@ -7,7 +7,29 @@ It is currently a work in progress.
 
 ## Text standards
 
-This section has not been filled yet
+### Project names
+
+Project names should be capitalized in the same
+way they are on Wikipedia, in particular:
+
+* BitBake
+* OpenEmbedded
+
+There are exceptions in which such names can be used
+in lower case:
+
+* When referring to a package name
+* When referring to the corresponding command name
+* When used in a cross-reference title. Such
+  titles are usually in lower case.
+
+### File names
+
+File names should be quoted as in the below example:
+
+     ``conf/local.conf``
+
+Using "conf/local/conf" would be wrong.
 
 ## ReStructured Text Syntax standards
 
@@ -26,8 +48,14 @@ To include a screenshot in PNG format:
     .. image:: figures/user-configuration.png
        :align: center
 
-Depending on the size of the image, you may also shrink it
-to prevent it from filling the whole page width:
+A diagram with many details usually needs to use
+the whole page width to be readable on all media.
+In this case, the `:align:` directive is unnecessary:
+
+       :scale: 100%
+
+Conversely, you may also shrink some images to
+to prevent them from filling the whole page width:
 
        :scale: 50%
 

@@ -1,0 +1,41 @@
+From 41cfba0840f58555593fd4bee07db77221043e0b Mon Sep 17 00:00:00 2001
+From: Portia <stephensportia@gmail.com>
+Date: Sun, 1 May 2022 12:43:35 +1000
+Subject: [PATCH] Remove sys/sysctl.h and add missing libgen.h include
+
+- sys/sysctl.h has been deprecated and should be removed
+- Adds missing libgen.h include when calling basename()
+
+Upstream-Status: Inactive-Upstream [2015]
+Signed-off-by: Portia <stephensportia@gmail.com>
+---
+ src/cpulimit.c      | 1 -
+ src/process_group.c | 1 +
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/cpulimit.c b/src/cpulimit.c
+index 50eabea..5b0ec49 100644
+--- a/src/cpulimit.c
++++ b/src/cpulimit.c
+@@ -38,7 +38,6 @@
+ #include <string.h>
+ #include <sys/stat.h>
+ #include <sys/time.h>
+-#include <sys/sysctl.h>
+ #include <sys/resource.h>
+ #include <sys/types.h>
+ #include <sys/wait.h>
+diff --git a/src/process_group.c b/src/process_group.c
+index 06d73a6..d4f6fab 100644
+--- a/src/process_group.c
++++ b/src/process_group.c
+@@ -24,6 +24,7 @@
+ #include <limits.h>
+ #include <sys/time.h>
+ #include <signal.h>
++#include <libgen.h>
+
+ #include <assert.h>
+
+--
+2.25.1

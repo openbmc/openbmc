@@ -1,0 +1,23 @@
+From 6cf19461fb31d7a7a3010629aae9aab49c26a01b Mon Sep 17 00:00:00 2001
+From: Jacob Kroon <jacob.kroon@gmail.com>
+Date: Wed, 30 Jan 2019 04:53:48 +0000
+Subject: [PATCH] Add kvm group
+
+Upstream-Status: Pending
+Signed-off-by: Jacob Kroon <jacob.kroon@gmail.com>
+---
+ group.master | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/group.master b/group.master
+index cea9d60..5b62284 100644
+--- a/group.master
++++ b/group.master
+@@ -34,6 +34,7 @@ utmp:*:43:
+ video:*:44:
+ sasl:*:45:
+ plugdev:*:46:
++kvm:*:47:
+ staff:*:50:
+ games:*:60:
+ shutdown:*:70:

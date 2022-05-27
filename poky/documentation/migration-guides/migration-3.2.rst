@@ -86,7 +86,7 @@ value to be explicitly prepended to package names being added as
 dependencies (e.g. in :term:`RDEPENDS` and :term:`RRECOMMENDS` values)
 where the dependency is conditionally added.
 
-If you have anonymous python or in-line python conditionally adding
+If you have anonymous Python or in-line Python conditionally adding
 dependencies in your custom recipes, and you intend for those recipes to
 work with multilib, then you will need to ensure that ``${MLPREFIX}``
 is prefixed on the package names in the dependencies, for example
@@ -149,7 +149,7 @@ the upstream documentation for ``dhcpcd`` and ``kea`` for further details.
 Packaging changes
 -----------------
 
-- ``python3``: the ``urllib`` python package has now moved into the core package, as it is used more commonly than just netclient (e.g. email, xml, mimetypes, pydoc). In addition, the ``pathlib`` module is now also part of the core package.
+- ``python3``: the ``urllib`` Python package has now moved into the core package, as it is used more commonly than just netclient (e.g. email, xml, mimetypes, pydoc). In addition, the ``pathlib`` module is now also part of the core package.
 
 - ``iptables``: ``iptables-apply`` and ``ip6tables-apply`` have been split out to their own package to avoid a bash dependency in the main ``iptables`` package
 
@@ -283,7 +283,7 @@ Image artifact name variables now centralised in image-artifact-names class
 ---------------------------------------------------------------------------
 
 The defaults for the following image artifact name variables have been moved
-from bitbake.conf to a new ``image-artifact-names`` class:
+from ``bitbake.conf`` to a new ``image-artifact-names`` class:
 
 - :term:`IMAGE_BASENAME`
 - :term:`IMAGE_LINK_NAME`

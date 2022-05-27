@@ -3,7 +3,7 @@ LICENSE = "BSD-4-Clause"
 HOME_PAGE = "http://ee.lbl.gov/"
 LIC_FILES_CHKSUM = "file://configure;md5=74ca964ed34fda7b46c6fe3e50bded9d"
 
-DEPENDS += "libpcap postfix"
+DEPENDS += "libpcap"
 
 SRC_URI = "https://ee.lbl.gov/downloads/arpwatch/${BP}.tar.gz \
            file://arpwatch.conf \
@@ -21,7 +21,11 @@ ARPWATCH_GID ?= "arpwatch"
 APRWATCH_FROM ?= "root "
 ARPWATH_REPLY ?= "${ARPWATCH_UID}"
 
-EXTRA_OECONF = " --srcdir=${S} --with-watcher=email=${APRWATCH_FROM} --with-watchee=email=${ARPWATH_REPLY}"
+PACKAGECONFIG ??= ""
+
+PACKACONFIG[email] = "-with-watcher=email=${APRWATCH_FROM} --with-watchee=email=${ARPWATH_REPLY}, , postfix, postfix postfix-cfg"
+
+EXTRA_OECONF:append = " --srcdir=${S}"
 
 CONFIGUREOPTS = " --build=${BUILD_SYS} \
           --host=${HOST_SYS} \
@@ -76,4 +80,4 @@ CONFFILE_FILES = "${sysconfdir}/${PN}.conf"
 FILES:${PN} = "${bindir} ${sbindir} ${prefix}/etc/rc.d \
                ${sysconfdir} /var/lib/arpwatch"
 
-RDEPENDS:${PN} = "libpcap postfix postfix-cfg"
+RDEPENDS:${PN} = "libpcap"

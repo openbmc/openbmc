@@ -126,8 +126,7 @@ common working area used across the tool.
 The following figure shows the workspace structure:
 
 .. image:: figures/build-workspace-directory.png
-   :align: center
-   :scale: 70%
+   :scale: 100%
 
 .. code-block:: none
 

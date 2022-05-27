@@ -277,6 +277,8 @@ def build_dependencies(key, keys, shelldeps, varflagsexcl, ignored_vars, d):
     try:
         if key[-1] == ']':
             vf = key[:-1].split('[')
+            if vf[1] == "vardepvalueexclude":
+                return deps, ""
             value, parser = d.getVarFlag(vf[0], vf[1], False, retparser=True)
             deps |= parser.references
             deps = deps | (keys & parser.execs)

@@ -11,10 +11,13 @@ inherit kernelsrc
 COMPATIBLE_HOST = '(x86_64|i.86).*-linux'
 COMPATIBLE_HOST:libc-musl = 'null'
 
+DEPENDS = "libnl"
+
 do_populate_lic[depends] += "virtual/kernel:do_patch"
 
 B = "${WORKDIR}/${BPN}-${PV}"
 
+CFLAGS += "-I${STAGING_INCDIR}/libnl3"
 EXTRA_OEMAKE = "-C ${S}/tools/power/x86/intel-speed-select O=${B} CROSS=${TARGET_PREFIX} CC="${CC}" LD="${LD}" AR=${AR} ARCH=${ARCH}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

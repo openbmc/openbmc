@@ -31,7 +31,6 @@ RDEPENDS:packagegroup-meta-networking = "\
     "
 
 RDEPENDS:packagegroup-meta-networking-connectivity = "\
-    crda \
     daq \
     adcli \
     ${@bb.utils.contains("DISTRO_FEATURES", "bluetooth x11", "blueman", "", d)} \
@@ -49,14 +48,13 @@ RDEPENDS:packagegroup-meta-networking-connectivity = "\
     vlan \
     vpnc \
     ez-ipupdate \
-    firewalld \
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python", "firewalld", "", d)} \
     freeradius \
     mbedtls \
     miniupnpd \
     mosquitto \
     nanomsg \
     nng \
-    netplan \
     networkmanager-openvpn \
     networkmanager \
     openconnect \
@@ -100,7 +98,6 @@ RDEPENDS:packagegroup-meta-networking-daemons = "\
 RDEPENDS:packagegroup-meta-networking-daemons:remove:libc-musl = "opensaf"
 
 RDEPENDS:packagegroup-meta-networking-devtools = "\
-    python3-ldap \
     python3-scapy \
 "
 
@@ -241,7 +238,6 @@ RDEPENDS:packagegroup-meta-networking-support = "\
     ndpi \
     ntopng \
     nuttcp \
-    nvmetcli \
     open-isns \
     openipmi \
     phytool \

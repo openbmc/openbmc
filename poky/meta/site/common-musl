@@ -28,6 +28,9 @@ glib_cv_have_qsort_r=${glib_cv_have_qsort_r=yes}
 #dbus-glib
 ac_cv_have_abstract_sockets=${ac_cv_have_abstract_sockets=yes}
 
+# bash
+bash_cv_getcwd_malloc=${bash_cv_getcwd_malloc=yes}
+
 # coreutils
 fu_cv_sys_stat_statfs2_bsize=${fu_cv_sys_stat_statfs2_bsize=yes}
 gl_cv_func_getcwd_abort_bug=${gl_cv_func_getcwd_abort_bug=no}

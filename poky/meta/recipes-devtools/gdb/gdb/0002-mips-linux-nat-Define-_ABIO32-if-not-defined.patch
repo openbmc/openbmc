@@ -1,7 +1,7 @@
-From 7f1f25eaaace289bc33c5aaa1c5fe9e04e719651 Mon Sep 17 00:00:00 2001
+From 37d3afd2eaa95c89ad7cb5d0079b017752e4d0ea Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 23 Mar 2016 06:30:09 +0000
-Subject: [PATCH 02/10] mips-linux-nat: Define _ABIO32 if not defined
+Subject: [PATCH 2/9] mips-linux-nat: Define _ABIO32 if not defined
 
 This helps building gdb on mips64 on musl, since
 musl does not provide sgidefs.h this define is
@@ -16,7 +16,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/gdb/mips-linux-nat.c b/gdb/mips-linux-nat.c
-index b21c7cb2ea6..6614b4de31e 100644
+index 20e12b6889e..6adc61235aa 100644
 --- a/gdb/mips-linux-nat.c
 +++ b/gdb/mips-linux-nat.c
 @@ -41,6 +41,10 @@
@@ -31,5 +31,5 @@ index b21c7cb2ea6..6614b4de31e 100644
  class mips_linux_nat_target final : public linux_nat_trad_target
  {
 -- 
-2.33.1
+2.36.1
 

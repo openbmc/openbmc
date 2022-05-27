@@ -63,7 +63,7 @@ INITSCRIPT_PARAMS = "defaults"
 FILES:${PN} += " \
                 ${sbindir}/* \
                 ${datadir}/ufw/* \
-                /lib/ufw/* \
+                ${nonarch_base_libdir}/ufw/* \
                 ${sysconfdir}/ufw/* \
                 ${sysconfdir}/default/ufw \
 "

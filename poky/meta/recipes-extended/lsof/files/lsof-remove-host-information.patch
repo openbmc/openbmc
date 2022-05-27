@@ -1,4 +1,4 @@
-From 95b8a13c1ea4274f58304bf5c4f7ca3d036b10f3 Mon Sep 17 00:00:00 2001
+From 4233b5ac1629c225a7a80f33efc0eff527a95851 Mon Sep 17 00:00:00 2001
 From: Li Wang <li.wang@windriver.com>
 Date: Wed, 30 Aug 2017 15:05:16 +0800
 Subject: [PATCH] Remove host information from version.h
@@ -10,24 +10,22 @@ Upstream-Status: Inappropriate [embedded specific]
 Signed-off-by: Li Wang <li.wang@windriver.com>
 
 ---
- dialects/linux/Makefile | 50 ++++++++---------------------------------
- 1 file changed, 9 insertions(+), 41 deletions(-)
+ dialects/linux/Makefile | 48 +++++++----------------------------------
+ 1 file changed, 8 insertions(+), 40 deletions(-)
 
 diff --git a/dialects/linux/Makefile b/dialects/linux/Makefile
-index 61e8643..5458a0a 100644
+index 46c83c2..50f03cc 100644
 --- a/dialects/linux/Makefile
 +++ b/dialects/linux/Makefile
-@@ -95,48 +95,16 @@ version.h:	FRC
+@@ -84,47 +84,15 @@ version.h:	FRC
  	@echo Constructing version.h
  	@rm -f version.h
  	@echo '#define	LSOF_BLDCMT	"${LSOF_BLDCMT}"' > version.h;
 -	@echo '#define	LSOF_CC		"${CC}"' >> version.h
 -	@echo '#define	LSOF_CCV	"${CCV}"' >> version.h
--	@echo '#define	LSOF_CCDATE	"$(BUILD_DATE)"' >> version.h
 -	@echo '#define	LSOF_CCFLAGS	"'`echo ${CFLAGS} | sed 's/\\\\(/\\(/g' | sed 's/\\\\)/\\)/g' | sed 's/"/\\\\"/g'`'"' >> version.h
 +	@echo '#define	LSOF_CC		""' >> version.h
 +	@echo '#define	LSOF_CCV	""' >> version.h
-+	@echo '#define	LSOF_CCDATE	""' >> version.h
 +	@echo '#define	LSOF_CCFLAGS	""' >> version.h
  	@echo '#define	LSOF_CINFO	"${CINFO}"' >> version.h
 -	@if [ "X${LSOF_HOST}" = "X" ]; then \

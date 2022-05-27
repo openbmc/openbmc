@@ -940,6 +940,12 @@ DESCRIPTION
                       quotes.  If not specified, the default string is
                       "defaults".
 
+         --fspassno: Specifies the order in which filesystem checks are done
+                     at boot time by fsck.  See fs_passno parameter of
+                     fstab(5).  This parameter will be copied into the
+                     /etc/fstab file of the installed system.  If not
+                     specified the default value of "0" will be used.
+
          --label label: Specifies the label to give to the filesystem
                         to be made on the partition. If the given
                         label is already in use by another filesystem,

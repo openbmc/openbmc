@@ -29,6 +29,7 @@ SRC_URI = " \
     file://enable-dhcpcd.conf \
     file://enable-iwd.conf \
     file://0001-do-not-ask-host-for-ifcfg-defaults.patch \
+    file://0001-libnm-client-test-add-dependency-libnm_client_public.patch \
 "
 SRC_URI[sha256sum] = "ab855cbe3b41832e9a3b003810e7c7313dfe19e630d29806d14d87fdd1470cab"
 

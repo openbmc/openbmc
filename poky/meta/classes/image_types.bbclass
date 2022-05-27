@@ -81,7 +81,7 @@ oe_mkext234fs () {
 	bbdebug 1 Executing "dd if=/dev/zero of=${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.$fstype seek=$ROOTFS_SIZE count=$COUNT bs=1024"
 	dd if=/dev/zero of=${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.$fstype seek=$ROOTFS_SIZE count=$COUNT bs=1024
 	bbdebug 1 "Actual Rootfs size:  `du -s ${IMAGE_ROOTFS}`"
-	bbdebug 1 "Actual Partion size: `stat -c '%s' ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.$fstype`"
+	bbdebug 1 "Actual Partition size: `stat -c '%s' ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.$fstype`"
 	bbdebug 1 Executing "mkfs.$fstype -F $extra_imagecmd ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.$fstype -d ${IMAGE_ROOTFS}"
 	mkfs.$fstype -F $extra_imagecmd ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.$fstype -d ${IMAGE_ROOTFS}
 	# Error codes 0-3 indicate successfull operation of fsck (no errors or errors corrected)
@@ -142,6 +142,24 @@ UBI_VOLNAME ?= "${MACHINE}-rootfs"
 UBI_VOLTYPE ?= "dynamic"
 UBI_IMGTYPE ?= "ubifs"
 
+write_ubi_config() {
+	if [ -z "$1" ]; then
+		local vname=""
+	else
+		local vname="_$1"
+	fi
+
+	cat <<EOF > ubinize${vname}-${IMAGE_NAME}.cfg
+[ubifs]
+mode=ubi
+image=${IMGDEPLOYDIR}/${IMAGE_NAME}${vname}${IMAGE_NAME_SUFFIX}.${UBI_IMGTYPE}
+vol_id=0
+vol_type=${UBI_VOLTYPE}
+vol_name=${UBI_VOLNAME}
+vol_flags=autoresize
+EOF
+}
+
 multiubi_mkfs() {
 	local mkubifs_args="$1"
 	local ubinize_args="$2"
@@ -151,19 +169,8 @@ multiubi_mkfs() {
             bbfatal "MKUBIFS_ARGS and UBINIZE_ARGS have to be set, see http://www.linux-mtd.infradead.org/faq/ubifs.html for details"
         fi
 
-	if [ -z "$3" ]; then
-		local vname=""
-	else
-		local vname="_$3"
-	fi
+	write_ubi_config "$3"
 
-	echo \[ubifs\] > ubinize${vname}-${IMAGE_NAME}.cfg
-	echo mode=ubi >> ubinize${vname}-${IMAGE_NAME}.cfg
-	echo image=${IMGDEPLOYDIR}/${IMAGE_NAME}${vname}${IMAGE_NAME_SUFFIX}.${UBI_IMGTYPE} >> ubinize${vname}-${IMAGE_NAME}.cfg
-	echo vol_id=0 >> ubinize${vname}-${IMAGE_NAME}.cfg
-	echo vol_type=${UBI_VOLTYPE} >> ubinize${vname}-${IMAGE_NAME}.cfg
-	echo vol_name=${UBI_VOLNAME} >> ubinize${vname}-${IMAGE_NAME}.cfg
-	echo vol_flags=autoresize >> ubinize${vname}-${IMAGE_NAME}.cfg
 	if [ -n "$vname" ]; then
 		mkfs.ubifs -r ${IMAGE_ROOTFS} -o ${IMGDEPLOYDIR}/${IMAGE_NAME}${vname}${IMAGE_NAME_SUFFIX}.ubifs ${mkubifs_args}
 	fi

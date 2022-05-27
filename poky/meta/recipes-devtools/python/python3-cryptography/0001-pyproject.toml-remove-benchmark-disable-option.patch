@@ -1,0 +1,40 @@
+From ce972ea92d724f232323a9a6265a8b44d913d4d8 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Tue, 17 May 2022 17:22:48 +0800
+Subject: [PATCH] pyproject.toml: remove --benchmark-disable option
+
+The new version introduced below change, so remove the option
+to avoid python3-pytest-benchmark rdepends to fix the gap.
+496703c8 Refs #7079 -- added basic scaffholding for benchmarks (#7087)
+
+Fixes:
+  # ./run-ptest
+  Free memory: 31.283 GB
+  ERROR: usage: pytest [options] [file_or_dir] [file_or_dir] [...]
+  pytest: error: unrecognized arguments: --benchmark-disable
+  inifile: /usr/lib/python3-cryptography/ptest/pyproject.toml
+  rootdir: /usr/lib/python3-cryptography/ptest
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 4d58129..b011fca 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -15,7 +15,7 @@ line-length = 79
+ target-version = ["py36"]
+ 
+ [tool.pytest.ini_options]
+-addopts = "-r s --capture=no --strict-markers --benchmark-disable"
++addopts = "-r s --capture=no --strict-markers"
+ markers = [
+     "skip_fips: this test is not executed in FIPS mode",
+     "supported: parametrized test requiring only_if and skip_message",
+-- 
+2.25.1
+

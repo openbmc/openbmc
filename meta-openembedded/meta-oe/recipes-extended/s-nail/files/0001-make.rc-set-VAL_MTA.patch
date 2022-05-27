@@ -1,0 +1,48 @@
+From da8c7a027390de7828d4272a3c8bcdbffbac25ad Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Thu, 5 May 2022 16:57:48 +0800
+Subject: [PATCH] make.rc: set VAL_MTA
+
+Some build server may provide sendmail like /usr/lib/sendmail which
+may result the VAL_MTA to be /usr/lib/sendmail, but the sendmail
+is actually /usr/sbin/sendmail on the target.
+
+Fixes:
+  # echo "invalide address email" | s-nail -s "test mail" -r test@test.com tester@test.com
+  s-nail: Cannot start /usr/lib/sendmail: executable not found (adjust *mta* variable)
+  /home/root/dead.letter 10/234
+  s-nail: ... message not sent
+
+  # which sendmail
+  /usr/sbin/sendmail
+
+Upstream-Status: Inappropriate[oe-specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ make.rc | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/make.rc b/make.rc
+index 98bd968..45ac0d4 100644
+--- a/make.rc
++++ b/make.rc
+@@ -96,14 +96,7 @@ VAL_MAIL=`\
+ 
+ # Path to the local MTA (Mail-Transfer-Agent).
+ # MTA aliases (aliases(5)) are optionally supported via OPT_MTA_ALIASES.
+-VAL_MTA=`\
+-   if [ -x /usr/bin/sendmail ]; then \
+-      echo /usr/bin/sendmail;\
+-   elif [ -x /usr/lib/sendmail ]; then \
+-      echo /usr/lib/sendmail;\
+-   else \
+-      echo /usr/sbin/sendmail;\
+-   fi`
++VAL_MTA=/usr/sbin/sendmail
+ 
+ # Today a lot of systems no longer use sendmail(1), but a different MTA.
+ # To ensure compatibility with sendmail(1), a system called
+-- 
+2.25.1
+

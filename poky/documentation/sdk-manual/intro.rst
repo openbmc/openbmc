@@ -149,7 +149,7 @@ SDK Development Model
 Fundamentally, the SDK fits into the development process as follows:
 
 .. image:: figures/sdk-environment.png
-   :align: center
+   :width: 100%
 
 The SDK is installed on any machine and can be used to develop applications,
 images, and kernels. An SDK can even be used by a QA Engineer or Release

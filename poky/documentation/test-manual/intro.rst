@@ -72,7 +72,7 @@ simple JSON files.
 .. note::
 
    The project uses Buildbot for historical reasons but also because
-   many of the project developers have knowledge of python. It is
+   many of the project developers have knowledge of Python. It is
    possible to use the outer layers from another Continuous Integration
    (CI) system such as
    `Jenkins <https://en.wikipedia.org/wiki/Jenkins_(software)>`__
@@ -83,6 +83,7 @@ topology that includes a controller and a cluster of workers:
 
 .. image:: figures/ab-test-cluster.png
    :align: center
+   :width: 70%
 
 Yocto Project Tests - Types of Testing Overview
 ===============================================
@@ -335,12 +336,12 @@ A simple test example from ``lib/bb/tests/data.py`` is::
             self.assertEqual(str(val), "value_of_foo")
 
 In this example, a ``DataExpansions`` class of tests is created,
-derived from standard python unittest. The class has a common ``setUp``
+derived from standard Python unittest. The class has a common ``setUp``
 function which is shared by all the tests in the class. A simple test is
 then added to test that when a variable is expanded, the correct value
 is found.
 
-Bitbake selftests are straightforward python unittest. Refer to the
+BitBake selftests are straightforward Python unittest. Refer to the
 Python unittest documentation for additional information on writing
 these tests at: https://docs.python.org/3/library/unittest.html.
 
@@ -468,7 +469,7 @@ following::
 
 In this example, if nativesdk-python3-core has been installed into the SDK, the code runs
 the python3 interpreter with a basic command to check it is working
-correctly. The test would only run if python3 is installed in the SDK.
+correctly. The test would only run if Python3 is installed in the SDK.
 
 ``oe-build-perf-test``
 ----------------------

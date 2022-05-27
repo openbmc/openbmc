@@ -106,7 +106,7 @@ modification workflow. The illustration and accompanying list provide
 general information and references for further information.
 
 .. image:: figures/kernel-dev-flow.png
-   :align: center
+   :width: 100%
 
 1. *Set up Your Host Development System to Support Development Using the
    Yocto Project*: See the ":doc:`/dev-manual/start`" section in

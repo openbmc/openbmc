@@ -70,6 +70,7 @@ PACKAGECONFIG[kernel] = "--with-crypto_backend=kernel"
 PACKAGECONFIG[nettle] = "--with-crypto_backend=nettle,,nettle"
 PACKAGECONFIG[luks2] = "--with-default-luks-format=LUKS2,--with-default-luks-format=LUKS1"
 
+
 EXTRA_OECONF = "--enable-static"
 # Building without largefile is not supported by upstream
 EXTRA_OECONF += "--enable-largefile"
@@ -77,6 +78,17 @@ EXTRA_OECONF += "--enable-largefile"
 EXTRA_OECONF += "--disable-static-cryptsetup"
 # There's no recipe for libargon2 yet
 EXTRA_OECONF += "--disable-libargon2"
+
+# libcryptsetup default PBKDF algorithm, Argon2 memory cost (KB), parallel threads and iteration time (ms)
+LUKS2_PBKDF ?= "argon2i"
+LUKS2_MEMORYKB ?= "1048576"
+LUKS2_PARALLEL_THREADS ?= "4"
+LUKS2_ITERTIME ?= "2000"
+
+EXTRA_OECONF += "--with-luks2-pbkdf=${LUKS2_PBKDF} \
+    --with-luks2-memory-kb=${LUKS2_MEMORYKB} \
+    --with-luks2-parallel-threads=${LUKS2_PARALLEL_THREADS} \
+    --with-luks2-iter-time=${LUKS2_ITERTIME}"
 
 FILES:${PN} += "${@bb.utils.contains('DISTRO_FEATURES','systemd','${exec_prefix}/lib/tmpfiles.d/cryptsetup.conf', '', d)}"
 

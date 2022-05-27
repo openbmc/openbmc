@@ -248,7 +248,7 @@ class CookerDataBuilder(object):
         for k in cookercfg.env:
             self.savedenv.setVar(k, cookercfg.env[k])
             if k in bb.data_smart.bitbake_renamed_vars:
-                bb.error('Variable %s from the shell environment has been renamed to %s' % (k, bb.data_smart.bitbake_renamed_vars[k]))
+                bb.error('Shell environment variable %s has been renamed to %s' % (k, bb.data_smart.bitbake_renamed_vars[k]))
                 bb.fatal("Exiting to allow enviroment variables to be corrected")
 
         filtered_keys = bb.utils.approved_variables()

@@ -16,6 +16,7 @@ Release Series 4.0 (kirkstone)
 ******************************
 
 - :yocto_docs:`4.0 Documentation </4.0>`
+- :yocto_docs:`4.0.1 Documentation </4.0.1>`
 
 ******************************
 Release Series 3.4 (honister)
@@ -25,6 +26,7 @@ Release Series 3.4 (honister)
 - :yocto_docs:`3.4.1 Documentation </3.4.1>`
 - :yocto_docs:`3.4.2 Documentation </3.4.2>`
 - :yocto_docs:`3.4.3 Documentation </3.4.3>`
+- :yocto_docs:`3.4.4 Documentation </3.4.4>`
 
 ******************************
 Release Series 3.3 (hardknott)
@@ -58,6 +60,7 @@ Release Series 3.1 (dunfell)
 - :yocto_docs:`3.1.13 Documentation </3.1.13>`
 - :yocto_docs:`3.1.14 Documentation </3.1.14>`
 - :yocto_docs:`3.1.15 Documentation </3.1.15>`
+- :yocto_docs:`3.1.16 Documentation </3.1.16>`
 
 ==========================
  Outdated Release Manuals

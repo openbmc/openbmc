@@ -1,4 +1,4 @@
-From 50c691e83f81b235bb96ef996dd4568ffaae256f Mon Sep 17 00:00:00 2001
+From 0234c546d86174fafe9ab280cf5f44de50b73676 Mon Sep 17 00:00:00 2001
 From: Carlos Rafael Giani <crg7475@mailbox.org>
 Date: Fri, 18 Mar 2022 12:06:23 +0100
 Subject: [PATCH] Disable libunwind in native OE builds by not looking for
@@ -16,15 +16,16 @@ By not looking for the libunwind header, the rest of the libunwind
 specific bits in the CMake build script are disabled.
 
 Upstream-Status: Inappropriate [OE specific]
+
 ---
  CMakeLists.txt | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 64f9fbf..12a4d8f 100644
+index 644715a..bbf2e28 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -862,7 +862,7 @@ if(SDL_LIBC)
+@@ -869,7 +869,7 @@ if(SDL_LIBC)
      check_include_file(sys/types.h HAVE_SYS_TYPES_H)
      foreach(_HEADER
              stdio.h stdlib.h stddef.h stdarg.h malloc.h memory.h string.h limits.h float.h
@@ -33,6 +34,3 @@ index 64f9fbf..12a4d8f 100644
        string(TOUPPER "HAVE_${_HEADER}" _UPPER)
        string(REPLACE "." "_" _HAVE_H ${_UPPER})
        check_include_file("${_HEADER}" ${_HAVE_H})
--- 
-2.32.0
-

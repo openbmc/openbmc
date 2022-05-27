@@ -1,4 +1,4 @@
-From 863f1f9dc78839ecd021b2cb01d501e8c9e00ef7 Mon Sep 17 00:00:00 2001
+From e1dbdcd0ea667bab4b551294354e04c6fe288ab6 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 8 Mar 2021 16:04:20 -0800
 Subject: [PATCH] gcc: poison-system-directories
@@ -20,15 +20,15 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  gcc/configure       | 19 +++++++++++++++++++
  gcc/configure.ac    | 16 ++++++++++++++++
  gcc/doc/invoke.texi |  9 +++++++++
- gcc/gcc.c           |  9 +++++++--
- gcc/incpath.c       | 21 +++++++++++++++++++++
+ gcc/gcc.cc          |  9 +++++++--
+ gcc/incpath.cc      | 21 +++++++++++++++++++++
  7 files changed, 86 insertions(+), 2 deletions(-)
 
 diff --git a/gcc/common.opt b/gcc/common.opt
-index a75b44ee47e..d15105a73f3 100644
+index 8a0dafc522d..0357868e22c 100644
 --- a/gcc/common.opt
 +++ b/gcc/common.opt
-@@ -683,6 +683,10 @@ Wreturn-local-addr
+@@ -710,6 +710,10 @@ Wreturn-local-addr
  Common Var(warn_return_local_addr) Init(1) Warning
  Warn about returning a pointer/reference to a local or temporary variable.
  
@@ -40,7 +40,7 @@ index a75b44ee47e..d15105a73f3 100644
  Common Var(warn_shadow) Warning
  Warn when one variable shadows another.  Same as -Wshadow=global.
 diff --git a/gcc/config.in b/gcc/config.in
-index 048bf52e8c2..4f973f7906a 100644
+index 64c27c9cfac..a693cb8a886 100644
 --- a/gcc/config.in
 +++ b/gcc/config.in
 @@ -230,6 +230,16 @@
@@ -61,10 +61,10 @@ index 048bf52e8c2..4f973f7906a 100644
     optimizer and back end) to be checked for dynamic type safety at runtime.
     This is quite expensive. */
 diff --git a/gcc/configure b/gcc/configure
-index 7218b0c331a..d7445339f9a 100755
+index 5ce0557719a..dc2d59701ad 100755
 --- a/gcc/configure
 +++ b/gcc/configure
-@@ -1019,6 +1019,7 @@ enable_maintainer_mode
+@@ -1023,6 +1023,7 @@ enable_maintainer_mode
  enable_link_mutex
  enable_link_serialization
  enable_version_specific_runtime_libs
@@ -72,7 +72,7 @@ index 7218b0c331a..d7445339f9a 100755
  enable_plugin
  enable_host_shared
  enable_libquadmath_support
-@@ -1781,6 +1782,8 @@ Optional Features:
+@@ -1785,6 +1786,8 @@ Optional Features:
    --enable-version-specific-runtime-libs
                            specify that runtime libraries should be installed
                            in a compiler-specific directory
@@ -81,7 +81,7 @@ index 7218b0c331a..d7445339f9a 100755
    --enable-plugin         enable plugin support
    --enable-host-shared    build host code as shared libraries
    --disable-libquadmath-support
-@@ -31932,6 +31935,22 @@ if test "${enable_version_specific_runtime_libs+set}" = set; then :
+@@ -31982,6 +31985,22 @@ if test "${enable_version_specific_runtime_libs+set}" = set; then :
  fi
  
  
@@ -105,10 +105,10 @@ index 7218b0c331a..d7445339f9a 100755
  
  
 diff --git a/gcc/configure.ac b/gcc/configure.ac
-index 49f043ed29b..fe488f2232b 100644
+index 23bee7010a3..36ce78924de 100644
 --- a/gcc/configure.ac
 +++ b/gcc/configure.ac
-@@ -7393,6 +7393,22 @@ AC_ARG_ENABLE(version-specific-runtime-libs,
+@@ -7421,6 +7421,22 @@ AC_ARG_ENABLE(version-specific-runtime-libs,
                  [specify that runtime libraries should be
                   installed in a compiler-specific directory])])
  
@@ -132,10 +132,10 @@ index 49f043ed29b..fe488f2232b 100644
  AC_SUBST(subdirs)
  AC_SUBST(srcdir)
 diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
-index 35508efb4ef..40f798eac78 100644
+index 07b440190c3..b2de464798a 100644
 --- a/gcc/doc/invoke.texi
 +++ b/gcc/doc/invoke.texi
-@@ -369,6 +369,7 @@ Objective-C and Objective-C++ Dialects}.
+@@ -379,6 +379,7 @@ Objective-C and Objective-C++ Dialects}.
  -Wpacked  -Wno-packed-bitfield-compat  -Wpacked-not-aligned  -Wpadded @gol
  -Wparentheses  -Wno-pedantic-ms-format @gol
  -Wpointer-arith  -Wno-pointer-compare  -Wno-pointer-to-int-cast @gol
@@ -143,7 +143,7 @@ index 35508efb4ef..40f798eac78 100644
  -Wno-pragmas  -Wno-prio-ctor-dtor  -Wredundant-decls @gol
  -Wrestrict  -Wno-return-local-addr  -Wreturn-type @gol
  -Wno-scalar-storage-order  -Wsequence-point @gol
-@@ -7728,6 +7729,14 @@ made up of data only and thus requires no special treatment.  But, for
+@@ -8029,6 +8030,14 @@ made up of data only and thus requires no special treatment.  But, for
  most targets, it is made up of code and thus requires the stack to be
  made executable in order for the program to work properly.
  
@@ -158,11 +158,11 @@ index 35508efb4ef..40f798eac78 100644
  @item -Wfloat-equal
  @opindex Wfloat-equal
  @opindex Wno-float-equal
-diff --git a/gcc/gcc.c b/gcc/gcc.c
-index 0af888c7d78..b047fc31c2f 100644
---- a/gcc/gcc.c
-+++ b/gcc/gcc.c
-@@ -1152,6 +1152,8 @@ proper position among the other output files.  */
+diff --git a/gcc/gcc.cc b/gcc/gcc.cc
+index bb07cc244e3..ce161d3c853 100644
+--- a/gcc/gcc.cc
++++ b/gcc/gcc.cc
+@@ -1159,6 +1159,8 @@ proper position among the other output files.  */
     "%{fuse-ld=*:-fuse-ld=%*} " LINK_COMPRESS_DEBUG_SPEC \
     "%X %{o*} %{e*} %{N} %{n} %{r}\
      %{s} %{t} %{u*} %{z} %{Z} %{!nostdlib:%{!r:%{!nostartfiles:%S}}} \
@@ -171,7 +171,7 @@ index 0af888c7d78..b047fc31c2f 100644
      %{static|no-pie|static-pie:} %@{L*} %(mfwrap) %(link_libgcc) " \
      VTABLE_VERIFICATION_SPEC " " SANITIZER_EARLY_SPEC " %o "" \
      %{fopenacc|fopenmp|%:gt(%{ftree-parallelize-loops=*:%*} 1):\
-@@ -1247,8 +1249,11 @@ static const char *cpp_unique_options =
+@@ -1254,8 +1256,11 @@ static const char *cpp_unique_options =
  static const char *cpp_options =
  "%(cpp_unique_options) %1 %{m*} %{std*&ansi&trigraphs} %{W*&pedantic*} %{w}\
   %{f*} %{g*:%{%:debug-level-gt(0):%{g*}\
@@ -185,10 +185,10 @@ index 0af888c7d78..b047fc31c2f 100644
  
  /* Pass -d* flags, possibly modifying -dumpdir, -dumpbase et al.
  
-diff --git a/gcc/incpath.c b/gcc/incpath.c
-index 446d280321d..fbfc0ce03b8 100644
---- a/gcc/incpath.c
-+++ b/gcc/incpath.c
+diff --git a/gcc/incpath.cc b/gcc/incpath.cc
+index bd2a97938eb..c80f100f476 100644
+--- a/gcc/incpath.cc
++++ b/gcc/incpath.cc
 @@ -26,6 +26,7 @@
  #include "intl.h"
  #include "incpath.h"
@@ -197,7 +197,7 @@ index 446d280321d..fbfc0ce03b8 100644
  
  /* Microsoft Windows does not natively support inodes.
     VMS has non-numeric inodes.  */
-@@ -395,6 +396,26 @@ merge_include_chains (const char *sysroot, cpp_reader *pfile, int verbose)
+@@ -399,6 +400,26 @@ merge_include_chains (const char *sysroot, cpp_reader *pfile, int verbose)
  	}
        fprintf (stderr, _("End of search list.\n"));
      }

@@ -40,7 +40,7 @@ command::
    $ pip3 install --user -r bitbake/toaster-requirements.txt
 
 The previous command installs the necessary Toaster modules into a local
-python 3 cache in your ``$HOME`` directory. The caches is actually
+Python 3 cache in your ``$HOME`` directory. The caches is actually
 located in ``$HOME/.local``. To see what packages have been installed
 into your ``$HOME`` directory, do the following::
 

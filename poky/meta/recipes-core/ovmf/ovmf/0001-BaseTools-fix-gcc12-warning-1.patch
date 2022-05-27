@@ -1,0 +1,51 @@
+From b0a0b7b605aeb8106e7b50d1efeb746f401498cc Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 24 Mar 2022 20:04:35 +0800
+Subject: [PATCH] BaseTools: fix gcc12 warning
+
+Sdk/C/LzmaEnc.c: In function ?LzmaEnc_CodeOneMemBlock?:
+Sdk/C/LzmaEnc.c:2828:19: error: storing the address of local variable ?outStream? in ?*p.rc.outStream? [-Werror=dangling-pointer=]
+ 2828 |   p->rc.outStream = &outStream.vt;
+      |   ~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
+Sdk/C/LzmaEnc.c:2811:28: note: ?outStream? declared here
+ 2811 |   CLzmaEnc_SeqOutStreamBuf outStream;
+      |                            ^~~~~~~~~
+Sdk/C/LzmaEnc.c:2811:28: note: ?pp? declared here
+Sdk/C/LzmaEnc.c:2828:19: error: storing the address of local variable ?outStream? in ?*(CLzmaEnc *)pp.rc.outStream? [-Werror=dangling-pointer=]
+ 2828 |   p->rc.outStream = &outStream.vt;
+      |   ~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
+Sdk/C/LzmaEnc.c:2811:28: note: ?outStream? declared here
+ 2811 |   CLzmaEnc_SeqOutStreamBuf outStream;
+      |                            ^~~~~~~~~
+Sdk/C/LzmaEnc.c:2811:28: note: ?pp? declared here
+cc1: all warnings being treated as errors
+
+Upstream-Status: Backport [https://github.com/tianocore/edk2/commit/85021f8cf22d1bd4114803c6c610dea5ef0059f1]
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Bob Feng <bob.c.feng@intel.com>
+---
+ BaseTools/Source/C/LzmaCompress/Sdk/C/LzmaEnc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/BaseTools/Source/C/LzmaCompress/Sdk/C/LzmaEnc.c b/BaseTools/Source/C/LzmaCompress/Sdk/C/LzmaEnc.c
+index 4e9b499f8d..4b9f5fa692 100644
+--- a/BaseTools/Source/C/LzmaCompress/Sdk/C/LzmaEnc.c
++++ b/BaseTools/Source/C/LzmaCompress/Sdk/C/LzmaEnc.c
+@@ -2825,12 +2825,13 @@ SRes LzmaEnc_CodeOneMemBlock(CLzmaEncHandle pp, BoolInt reInit,
+ 
+   nowPos64 = p->nowPos64;
+   RangeEnc_Init(&p->rc);
+-  p->rc.outStream = &outStream.vt;
+ 
+   if (desiredPackSize == 0)
+     return SZ_ERROR_OUTPUT_EOF;
+ 
++  p->rc.outStream = &outStream.vt;
+   res = LzmaEnc_CodeOneBlock(p, desiredPackSize, *unpackSize);
++  p->rc.outStream = NULL;
+ 
+   *unpackSize = (UInt32)(p->nowPos64 - nowPos64);
+   *destLen -= outStream.rem;
+-- 
+2.36.1
+

@@ -35,5 +35,5 @@ do_install:append() {
 
 # fix error message: Do not forget that you need *root* or CAP_NET_ADMIN capabilities ;-)
 pkg_postinst:${PN} () {
-    setcap cap_net_admin+ep $D/${sbindir}/conntrack"
+    setcap cap_net_admin+ep "$D/${sbindir}/conntrack"
 }

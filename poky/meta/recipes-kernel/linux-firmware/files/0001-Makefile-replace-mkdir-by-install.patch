@@ -1,0 +1,84 @@
+From 71514e74f35f2b51ca24062573d6d913525b30db Mon Sep 17 00:00:00 2001
+From: Konrad Weihmann <kweihmann@outlook.com>
+Date: Mon, 9 May 2022 12:57:57 +0200
+Subject: [PATCH] Makefile: replace mkdir by install
+
+mkdir -p creates paths that are bound to user's settings and therefore
+can lead to different file mode bits of the base paths accross different
+machines.
+Use install instead, as this tool is not prone to such behavior.
+
+Signed-off-by: Konrad Weihmann <kweihmann@outlook.com>
+Upstream-Status: Submitted [https://lore.kernel.org/linux-firmware/PR2PR09MB310088EA719E6D7CA5C268F1A8C69@PR2PR09MB3100.eurprd09.prod.outlook.com/]
+---
+ Makefile                      | 2 +-
+ carl9170fw/toolchain/Makefile | 4 ++--
+ copy-firmware.sh              | 6 +++---
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index e1c362f..83a0ec6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -9,5 +9,5 @@ check:
+ 	@./check_whence.py
+ 
+ install:
+-	mkdir -p $(DESTDIR)$(FIRMWAREDIR)
++	install -d $(DESTDIR)$(FIRMWAREDIR)
+ 	./copy-firmware.sh $(DESTDIR)$(FIRMWAREDIR)
+diff --git a/carl9170fw/toolchain/Makefile b/carl9170fw/toolchain/Makefile
+index 2b25ffe..aaea8e8 100644
+--- a/carl9170fw/toolchain/Makefile
++++ b/carl9170fw/toolchain/Makefile
+@@ -46,14 +46,14 @@ src/gcc-$(GCC_VER): src/$(GCC_TAR) src/newlib-$(NEWLIB_VER)
+ 	ln -s $(BASEDIR)/src/newlib-$(NEWLIB_VER)/libgloss $@
+ 
+ binutils: src/binutils-$(BINUTILS_VER)
+-	mkdir -p build/binutils
++	install -d build/binutils
+ 	cd build/binutils; \
+ 	$(BASEDIR)/$</configure --target=sh-elf --prefix=$(BASEDIR)/inst; \
+ 	$(MAKE) -j3; \
+ 	$(MAKE) install
+ 
+ gcc: src/gcc-$(GCC_VER) binutils
+-	mkdir -p build/gcc
++	install -d build/gcc
+ 	cd build/gcc; \
+ 	$(BASEDIR)/$</configure --target=sh-elf --prefix=$(BASEDIR)/inst -enable-languages=c --without-pkgversion --with-newlib; \
+ 	$(MAKE) -j3; \
+diff --git a/copy-firmware.sh b/copy-firmware.sh
+index 9b46b63..bbacb92 100755
+--- a/copy-firmware.sh
++++ b/copy-firmware.sh
+@@ -34,7 +34,7 @@ done
+ grep '^File:' WHENCE | sed -e's/^File: *//g' -e's/"//g' | while read f; do
+     test -f "$f" || continue
+     $verbose "copying file $f"
+-    mkdir -p $destdir/$(dirname "$f")
++    install -d $destdir/$(dirname "$f")
+     cp -d "$f" $destdir/"$f"
+ done
+ 
+@@ -42,7 +42,7 @@ grep -E '^Link:' WHENCE | sed -e's/^Link: *//g' -e's/-> //g' | while read f d; d
+     if test -L "$f"; then
+         test -f "$destdir/$f" && continue
+         $verbose "copying link $f"
+-        mkdir -p $destdir/$(dirname "$f")
++        install -d $destdir/$(dirname "$f")
+         cp -d "$f" $destdir/"$f"
+ 
+         if test "x$d" != "x"; then
+@@ -63,7 +63,7 @@ grep -E '^Link:' WHENCE | sed -e's/^Link: *//g' -e's/-> //g' | while read f d; d
+         fi
+     else
+         $verbose "creating link $f -> $d"
+-        mkdir -p $destdir/$(dirname "$f")
++        install -d $destdir/$(dirname "$f")
+         ln -sf "$d" "$destdir/$f"
+     fi
+ done
+-- 
+2.25.1
+

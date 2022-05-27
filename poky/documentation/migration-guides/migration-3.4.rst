@@ -233,7 +233,7 @@ Image / SDK generation changes
 Miscellaneous
 ~~~~~~~~~~~~~
 
-- Certificates are now properly checked when bitbake fetches sources
+- Certificates are now properly checked when BitBake fetches sources
   over HTTPS. If you receive errors as a result for your custom recipes,
   you will need to use a mirror or address the issue with the operators
   of the server in question.

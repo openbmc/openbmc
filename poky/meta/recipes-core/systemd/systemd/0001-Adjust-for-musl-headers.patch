@@ -1,4 +1,4 @@
-From 4c2e932664ec67662f4a0306cca4a7cd82853bda Mon Sep 17 00:00:00 2001
+From 9a1841402ce3ef21a10a7314a07a615f8196d406 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 21 Jan 2022 22:19:37 -0800
 Subject: [PATCH] Adjust for musl headers
@@ -6,6 +6,7 @@ Subject: [PATCH] Adjust for musl headers
 Upstream-Status: Inappropriate [musl specific]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  src/libsystemd-network/sd-dhcp6-client.c      | 2 +-
  src/network/netdev/bareudp.c                  | 2 +-
@@ -29,6 +30,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/network/netdev/vrf.c                      | 2 +-
  src/network/netdev/vxcan.c                    | 2 +-
  src/network/netdev/vxlan.c                    | 2 +-
+ src/network/netdev/wireguard.c                | 2 +-
  src/network/netdev/xfrm.c                     | 2 +-
  src/network/networkd-bridge-mdb.c             | 4 ++--
  src/network/networkd-dhcp-common.c            | 3 ++-
@@ -41,8 +43,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/shared/linux/ethtool.h                    | 3 ++-
  src/shared/netif-util.c                       | 2 +-
  src/udev/udev-builtin-net_id.c                | 2 +-
- 34 files changed, 41 insertions(+), 39 deletions(-)
+ 35 files changed, 42 insertions(+), 40 deletions(-)
 
+diff --git a/src/libsystemd-network/sd-dhcp6-client.c b/src/libsystemd-network/sd-dhcp6-client.c
+index 84bc739bba..ff8cb6bf9d 100644
 --- a/src/libsystemd-network/sd-dhcp6-client.c
 +++ b/src/libsystemd-network/sd-dhcp6-client.c
 @@ -5,7 +5,7 @@
@@ -54,6 +58,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #include <linux/if_infiniband.h>
  
  #include "sd-dhcp6-client.h"
+diff --git a/src/network/netdev/bareudp.c b/src/network/netdev/bareudp.c
+index 8ff0eb1360..7e06b8d57d 100644
 --- a/src/network/netdev/bareudp.c
 +++ b/src/network/netdev/bareudp.c
 @@ -2,7 +2,7 @@
@@ -65,6 +71,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #include "bareudp.h"
  #include "netlink-util.h"
+diff --git a/src/network/netdev/batadv.c b/src/network/netdev/batadv.c
+index 15f3aee3a6..ec76428436 100644
 --- a/src/network/netdev/batadv.c
 +++ b/src/network/netdev/batadv.c
 @@ -3,7 +3,7 @@
@@ -76,6 +84,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #include "batadv.h"
  #include "fileio.h"
+diff --git a/src/network/netdev/bond.c b/src/network/netdev/bond.c
+index 5d94aa1d68..4e379a326d 100644
 --- a/src/network/netdev/bond.c
 +++ b/src/network/netdev/bond.c
 @@ -1,7 +1,7 @@
@@ -87,6 +97,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #include "alloc-util.h"
  #include "bond.h"
+diff --git a/src/network/netdev/bridge.c b/src/network/netdev/bridge.c
+index b974f2ae0a..9a5f18d556 100644
 --- a/src/network/netdev/bridge.c
 +++ b/src/network/netdev/bridge.c
 @@ -2,7 +2,7 @@
@@ -98,6 +110,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #include <linux/if_bridge.h>
  
  #include "bridge.h"
+diff --git a/src/network/netdev/dummy.c b/src/network/netdev/dummy.c
+index 00df1d2787..77b506b422 100644
 --- a/src/network/netdev/dummy.c
 +++ b/src/network/netdev/dummy.c
 @@ -1,6 +1,6 @@
@@ -108,6 +122,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #include "dummy.h"
  
+diff --git a/src/network/netdev/geneve.c b/src/network/netdev/geneve.c
+index 224c17e979..fb79cc13f6 100644
 --- a/src/network/netdev/geneve.c
 +++ b/src/network/netdev/geneve.c
 @@ -2,7 +2,7 @@
@@ -119,6 +135,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #include "alloc-util.h"
  #include "conf-parser.h"
+diff --git a/src/network/netdev/ifb.c b/src/network/netdev/ifb.c
+index d7ff44cb9e..e037629ae4 100644
 --- a/src/network/netdev/ifb.c
 +++ b/src/network/netdev/ifb.c
 @@ -1,7 +1,7 @@
@@ -130,6 +148,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #include "ifb.h"
  
+diff --git a/src/network/netdev/ipoib.c b/src/network/netdev/ipoib.c
+index e0ff9e8c62..ab085c1f6d 100644
 --- a/src/network/netdev/ipoib.c
 +++ b/src/network/netdev/ipoib.c
 @@ -1,6 +1,6 @@
@@ -140,6 +160,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #include <linux/if_link.h>
  
  #include "ipoib.h"
+diff --git a/src/network/netdev/ipvlan.c b/src/network/netdev/ipvlan.c
+index d15766cd7b..60728b4f94 100644
 --- a/src/network/netdev/ipvlan.c
 +++ b/src/network/netdev/ipvlan.c
 @@ -2,7 +2,7 @@
@@ -151,6 +173,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #include "conf-parser.h"
  #include "ipvlan.h"
+diff --git a/src/network/netdev/macsec.c b/src/network/netdev/macsec.c
+index f1a566a9ca..1f37927a83 100644
 --- a/src/network/netdev/macsec.c
 +++ b/src/network/netdev/macsec.c
 @@ -1,7 +1,7 @@
@@ -162,6 +186,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #include <linux/if_ether.h>
  #include <linux/if_macsec.h>
  #include <linux/genetlink.h>
+diff --git a/src/network/netdev/macvlan.c b/src/network/netdev/macvlan.c
+index c41be6e78f..ee2660c5bf 100644
 --- a/src/network/netdev/macvlan.c
 +++ b/src/network/netdev/macvlan.c
 @@ -2,7 +2,7 @@
@@ -173,6 +199,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #include "conf-parser.h"
  #include "macvlan.h"
+diff --git a/src/network/netdev/netdev.c b/src/network/netdev/netdev.c
+index 8e7fe11c18..701ab2bd69 100644
 --- a/src/network/netdev/netdev.c
 +++ b/src/network/netdev/netdev.c
 @@ -2,7 +2,7 @@
@@ -184,6 +212,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #include <unistd.h>
  
  #include "alloc-util.h"
+diff --git a/src/network/netdev/netdevsim.c b/src/network/netdev/netdevsim.c
+index 15d5c132f9..a3ffa48b15 100644
 --- a/src/network/netdev/netdevsim.c
 +++ b/src/network/netdev/netdevsim.c
 @@ -1,6 +1,6 @@
@@ -194,6 +224,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #include "netdevsim.h"
  
+diff --git a/src/network/netdev/nlmon.c b/src/network/netdev/nlmon.c
+index ff372092e6..eef66811f4 100644
 --- a/src/network/netdev/nlmon.c
 +++ b/src/network/netdev/nlmon.c
 @@ -1,6 +1,6 @@
@@ -204,6 +236,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #include "nlmon.h"
  
+diff --git a/src/network/netdev/tunnel.c b/src/network/netdev/tunnel.c
+index 97e534fe99..0302c1cb94 100644
 --- a/src/network/netdev/tunnel.c
 +++ b/src/network/netdev/tunnel.c
 @@ -2,7 +2,7 @@
@@ -215,6 +249,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #include <linux/if_tunnel.h>
  #include <linux/ip.h>
  #include <linux/ip6_tunnel.h>
+diff --git a/src/network/netdev/vcan.c b/src/network/netdev/vcan.c
+index 380547ee1e..137c1adf8a 100644
 --- a/src/network/netdev/vcan.c
 +++ b/src/network/netdev/vcan.c
 @@ -1,6 +1,6 @@
@@ -225,6 +261,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #include "vcan.h"
  
+diff --git a/src/network/netdev/veth.c b/src/network/netdev/veth.c
+index c946e81fc0..d1a6be73f9 100644
 --- a/src/network/netdev/veth.c
 +++ b/src/network/netdev/veth.c
 @@ -3,7 +3,7 @@
@@ -236,6 +274,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #include <linux/veth.h>
  
  #include "netlink-util.h"
+diff --git a/src/network/netdev/vlan.c b/src/network/netdev/vlan.c
+index af3e77963e..efa4b0a164 100644
 --- a/src/network/netdev/vlan.c
 +++ b/src/network/netdev/vlan.c
 @@ -2,7 +2,7 @@
@@ -247,6 +287,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #include <linux/if_vlan.h>
  
  #include "parse-util.h"
+diff --git a/src/network/netdev/vrf.c b/src/network/netdev/vrf.c
+index b1b6707441..1c6d1982e1 100644
 --- a/src/network/netdev/vrf.c
 +++ b/src/network/netdev/vrf.c
 @@ -2,7 +2,7 @@
@@ -258,6 +300,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #include "vrf.h"
  
+diff --git a/src/network/netdev/vxcan.c b/src/network/netdev/vxcan.c
+index a0ba048eb1..875f2e5901 100644
 --- a/src/network/netdev/vxcan.c
 +++ b/src/network/netdev/vxcan.c
 @@ -1,7 +1,7 @@
@@ -269,6 +313,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #include "vxcan.h"
  
+diff --git a/src/network/netdev/vxlan.c b/src/network/netdev/vxlan.c
+index 30b0855598..a065158801 100644
 --- a/src/network/netdev/vxlan.c
 +++ b/src/network/netdev/vxlan.c
 @@ -2,7 +2,7 @@
@@ -280,6 +326,21 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #include "conf-parser.h"
  #include "alloc-util.h"
+diff --git a/src/network/netdev/wireguard.c b/src/network/netdev/wireguard.c
+index 88f668753a..5fc753384b 100644
+--- a/src/network/netdev/wireguard.c
++++ b/src/network/netdev/wireguard.c
+@@ -6,7 +6,7 @@
+ #include <sys/ioctl.h>
+ #include <net/if.h>
+ #include <netinet/in.h>
+-#include <linux/if_arp.h>
++//#include <linux/if_arp.h>
+ #include <linux/ipv6_route.h>
+ 
+ #include "sd-resolve.h"
+diff --git a/src/network/netdev/xfrm.c b/src/network/netdev/xfrm.c
+index ef5e735b2b..419afd75f2 100644
 --- a/src/network/netdev/xfrm.c
 +++ b/src/network/netdev/xfrm.c
 @@ -1,6 +1,6 @@
@@ -290,6 +351,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #include "missing_network.h"
  #include "xfrm.h"
+diff --git a/src/network/networkd-bridge-mdb.c b/src/network/networkd-bridge-mdb.c
+index 10025a97ae..a0239ea83a 100644
 --- a/src/network/networkd-bridge-mdb.c
 +++ b/src/network/networkd-bridge-mdb.c
 @@ -1,7 +1,5 @@
@@ -309,6 +372,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #define STATIC_BRIDGE_MDB_ENTRIES_PER_NETWORK_MAX 1024U
  
+diff --git a/src/network/networkd-dhcp-common.c b/src/network/networkd-dhcp-common.c
+index 7996960bd1..e870b9ba26 100644
 --- a/src/network/networkd-dhcp-common.c
 +++ b/src/network/networkd-dhcp-common.c
 @@ -1,7 +1,8 @@
@@ -321,6 +386,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #include "bus-error.h"
  #include "dhcp-identifier.h"
+diff --git a/src/network/networkd-dhcp-prefix-delegation.c b/src/network/networkd-dhcp-prefix-delegation.c
+index 7be9713d46..e830fcd575 100644
 --- a/src/network/networkd-dhcp-prefix-delegation.c
 +++ b/src/network/networkd-dhcp-prefix-delegation.c
 @@ -1,7 +1,5 @@
@@ -340,6 +407,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  bool link_dhcp_pd_is_enabled(Link *link) {
          assert(link);
  
+diff --git a/src/network/networkd-dhcp-server.c b/src/network/networkd-dhcp-server.c
+index 9acfd17d49..3108289602 100644
 --- a/src/network/networkd-dhcp-server.c
 +++ b/src/network/networkd-dhcp-server.c
 @@ -1,7 +1,7 @@
@@ -351,6 +420,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #include <linux/if.h>
  
  #include "sd-dhcp-server.h"
+diff --git a/src/network/networkd-dhcp4.c b/src/network/networkd-dhcp4.c
+index cb9c428ae9..a35d58f3f1 100644
 --- a/src/network/networkd-dhcp4.c
 +++ b/src/network/networkd-dhcp4.c
 @@ -3,7 +3,7 @@
@@ -362,6 +433,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #include "alloc-util.h"
  #include "dhcp-client-internal.h"
+diff --git a/src/network/networkd-link.c b/src/network/networkd-link.c
+index b62a154828..75949e6094 100644
 --- a/src/network/networkd-link.c
 +++ b/src/network/networkd-link.c
 @@ -3,7 +3,7 @@
@@ -373,6 +446,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #include <linux/if_link.h>
  #include <linux/netdevice.h>
  #include <sys/socket.h>
+diff --git a/src/network/networkd-route.c b/src/network/networkd-route.c
+index ee7a535075..ce6ed64133 100644
 --- a/src/network/networkd-route.c
 +++ b/src/network/networkd-route.c
 @@ -1,9 +1,5 @@
@@ -396,6 +471,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  int route_new(Route **ret) {
          _cleanup_(route_freep) Route *route = NULL;
  
+diff --git a/src/network/networkd-setlink.c b/src/network/networkd-setlink.c
+index e00cc1e589..e392c7e1a2 100644
 --- a/src/network/networkd-setlink.c
 +++ b/src/network/networkd-setlink.c
 @@ -2,7 +2,7 @@
@@ -407,6 +484,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #include <linux/if_bridge.h>
  
  #include "missing_network.h"
+diff --git a/src/shared/linux/ethtool.h b/src/shared/linux/ethtool.h
+index 974d4292e7..fe9b8a9e07 100644
 --- a/src/shared/linux/ethtool.h
 +++ b/src/shared/linux/ethtool.h
 @@ -16,7 +16,8 @@
@@ -419,6 +498,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #ifndef __KERNEL__
  #include <limits.h> /* for INT_MAX */
+diff --git a/src/shared/netif-util.c b/src/shared/netif-util.c
+index 603d4de109..7e3531808a 100644
 --- a/src/shared/netif-util.c
 +++ b/src/shared/netif-util.c
 @@ -1,6 +1,6 @@
@@ -429,6 +510,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  #include "arphrd-util.h"
  #include "device-util.h"
+diff --git a/src/udev/udev-builtin-net_id.c b/src/udev/udev-builtin-net_id.c
+index 65e003eb15..0b3dc04be0 100644
 --- a/src/udev/udev-builtin-net_id.c
 +++ b/src/udev/udev-builtin-net_id.c
 @@ -18,7 +18,7 @@
@@ -440,14 +523,3 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #include <linux/netdevice.h>
  #include <linux/pci_regs.h>
  
---- a/src/network/netdev/wireguard.c
-+++ b/src/network/netdev/wireguard.c
-@@ -6,7 +6,7 @@
- #include <sys/ioctl.h>
- #include <net/if.h>
- #include <netinet/in.h>
--#include <linux/if_arp.h>
-+//#include <linux/if_arp.h>
- #include <linux/ipv6_route.h>
- 
- #include "sd-resolve.h"

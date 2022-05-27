@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Add a partion table to an ext2 image file
+# Add a partition table to an ext2 image file
 #
 # Copyright (C) 2006-2007 OpenedHand Ltd.
 #
