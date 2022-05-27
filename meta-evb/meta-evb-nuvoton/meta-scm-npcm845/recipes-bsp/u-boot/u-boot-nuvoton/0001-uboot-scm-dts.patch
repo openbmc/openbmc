@@ -1,6 +1,6 @@
-From a83bef45ac9bcf279f3a607017ae1ec4b4fff624 Mon Sep 17 00:00:00 2001
+From 17e5d2e3840d5b688bd2fdb0ba1020e47e836da1 Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
-Date: Tue, 24 May 2022 09:00:18 +0800
+Date: Fri, 27 May 2022 18:57:30 +0800
 Subject: [PATCH] uboot scm dts
 
 Signed-off-by: Stanley Chu <yschu@nuvoton.com>
@@ -8,13 +8,13 @@ Signed-off-by: Stanley Chu <yschu@nuvoton.com>
  arch/arm/dts/Makefile                        |   3 +-
  arch/arm/dts/nuvoton-common-npcm8xx.dtsi     |   4 +
  arch/arm/dts/nuvoton-npcm845-scm-pincfg.dtsi | 700 +++++++++++++++++++
- arch/arm/dts/nuvoton-npcm845-scm.dts         | 339 +++++++++
- 4 files changed, 1045 insertions(+), 1 deletion(-)
+ arch/arm/dts/nuvoton-npcm845-scm.dts         | 341 +++++++++
+ 4 files changed, 1047 insertions(+), 1 deletion(-)
  create mode 100644 arch/arm/dts/nuvoton-npcm845-scm-pincfg.dtsi
  create mode 100644 arch/arm/dts/nuvoton-npcm845-scm.dts
 
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index 2c5d2d9fac..bf4c2f8d57 100644
+index 40ff9042f9..ced4709bbb 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
 @@ -1033,7 +1033,8 @@ dtb-$(CONFIG_TARGET_DURIAN) += phytium-durian.dtb
@@ -749,10 +749,10 @@ index 0000000000..1881c91e2d
 +};
 diff --git a/arch/arm/dts/nuvoton-npcm845-scm.dts b/arch/arm/dts/nuvoton-npcm845-scm.dts
 new file mode 100644
-index 0000000000..9812161e78
+index 0000000000..ec56b1f711
 --- /dev/null
 +++ b/arch/arm/dts/nuvoton-npcm845-scm.dts
-@@ -0,0 +1,339 @@
+@@ -0,0 +1,341 @@
 +// SPDX-License-Identifier: GPL-2.0
 +
 +/dts-v1/;
@@ -842,10 +842,12 @@ index 0000000000..9812161e78
 +	spi-nor@0 {
 +		compatible = "jedec,spi-nor";
 +		reg = <0>;
++		spi-max-frequency = <25000000>;
 +	};
 +	spi-nor@1 {
 +		compatible = "jedec,spi-nor";
 +		reg = <1>;
++		spi-max-frequency = <25000000>;
 +	};
 +};
 +
