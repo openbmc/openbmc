@@ -1,0 +1,58 @@
+From 55abd2cd1e412c9f704c64407996015610ce0cac Mon Sep 17 00:00:00 2001
+From: Brian Ma <chma0@nuvoton.com>
+Date: Thu, 17 Feb 2022 08:55:45 +0800
+Subject: [PATCH 3/3] Add support report same version error
+
+Signed-off-by: Brian Ma <chma0@nuvoton.com>
+---
+ image_manager.cpp | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/image_manager.cpp b/image_manager.cpp
+index a9a5a69..f4dadee 100644
+--- a/image_manager.cpp
++++ b/image_manager.cpp
+@@ -11,10 +11,11 @@
+ #include <sys/wait.h>
+ #include <unistd.h>
+ 
+-#include <elog-errors.hpp>
++#include <phosphor-logging/elog-errors.hpp>
+ #include <phosphor-logging/elog.hpp>
+ #include <phosphor-logging/lg2.hpp>
+ #include <xyz/openbmc_project/Software/Image/error.hpp>
++#include <xyz/openbmc_project/Software/Version/error.hpp>
+ 
+ #include <algorithm>
+ #include <cstring>
+@@ -31,11 +32,14 @@ namespace manager
+ PHOSPHOR_LOG2_USING;
+ using namespace phosphor::logging;
+ using namespace sdbusplus::xyz::openbmc_project::Software::Image::Error;
++using namespace sdbusplus::xyz::openbmc_project::Software::Version::Error;
++using ExitFail = xyz::openbmc_project::Software::Version::AlreadyExists;
+ namespace Software = phosphor::logging::xyz::openbmc_project::Software;
+ using ManifestFail = Software::Image::ManifestFileFailure;
+ using UnTarFail = Software::Image::UnTarFailure;
+ using InternalFail = Software::Image::InternalFailure;
+ using ImageFail = Software::Image::ImageFailure;
++using ExitFail = Software::Version::AlreadyExists;
+ namespace fs = std::filesystem;
+ 
+ struct RemovablePath
+@@ -219,8 +223,10 @@ int Manager::processImage(const std::string& tarFilePath)
+     }
+     else
+     {
+-        info("Software Object with the same version ({VERSION}) already exists",
+-             "VERSION", id);
++        error("Software Object with the same version ({VERSION}) already exists",
++              "VERSION", id);
++        report<AlreadyExists>(
++               ExitFail::IMAGE_VERSION(version.c_str()));
+     }
+     return 0;
+ }
+-- 
+2.17.1
+

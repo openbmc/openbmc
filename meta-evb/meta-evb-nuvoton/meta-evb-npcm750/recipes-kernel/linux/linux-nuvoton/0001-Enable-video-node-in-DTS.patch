@@ -1,0 +1,25 @@
+From e644de176467d9697fc60da15aefcaa873f0609e Mon Sep 17 00:00:00 2001
+From: Marvin Lin <milkfafa@gmail.com>
+Date: Tue, 24 May 2022 15:21:31 +0800
+Subject: [PATCH] Enable video node in DTS
+
+---
+ arch/arm/boot/dts/nuvoton-npcm750-evb.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-evb.dts b/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
+index b14b2b64d4e0..7f9e0bfc02f7 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
+@@ -334,7 +334,7 @@
+ 
+ &video {
+ 	memory-region = <&video_memory>;
+-	//status = "okay";
++	status = "okay";
+ };
+ 
+ &watchdog1 {
+-- 
+2.17.1
+

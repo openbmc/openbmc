@@ -1,0 +1,98 @@
+{
+    "sensors" : [
+           {
+            "name": "fan0",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/fan0",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/pwm1",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "lm75",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/lm75",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        }
+    ],
+    "zones" : [
+        {
+            "id": 0,
+            "minThermalOutput": 0.0,
+            "failsafePercent": 100.0,
+            "pids": [
+                {
+                    "name": "Fan0",
+                    "type": "fan",
+                    "inputs": ["fan0"],
+                    "setpoint": 40.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 1.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 10.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0
+                    }
+                },
+                {
+                    "name": "lm75",
+                    "type": "stepwise",
+                    "inputs": ["lm75"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0,
+                        "isCeiling": false,
+                        "reading": {
+                            "0": 25,
+                            "1": 28,
+                            "2": 31,
+                            "3": 34,
+                            "4": 37,
+                            "5": 40,
+                            "6": 43,
+                            "7": 46,
+                            "8": 49,
+                            "9": 52,
+                            "10": 55,
+                            "11": 58,
+                            "12": 61,
+                            "13": 64,
+                            "14": 67,
+                            "15": 70
+                        },
+                        "output": {
+                            "0": 10,
+                            "1": 14,
+                            "2": 21,
+                            "3": 23,
+                            "4": 25,
+                            "5": 30,
+                            "6": 33,
+                            "7": 36,
+                            "8": 40,
+                            "9": 50,
+                            "10": 60,
+                            "11": 70,
+                            "12": 80,
+                            "13": 90,
+                            "14": 95,
+                            "15": 100
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

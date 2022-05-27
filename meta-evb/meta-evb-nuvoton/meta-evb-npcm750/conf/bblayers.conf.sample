@@ -17,3 +17,16 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-evb/meta-evb-nuvoton \
   ##OEROOT##/meta-evb/meta-evb-nuvoton/meta-evb-npcm750 \
   "
+
+BBLAYERS_NON_REMOVABLE ?= " \
+  ##OEROOT##/meta \
+  ##OEROOT##/meta-poky \
+  ##OEROOT##/meta-openembedded/meta-oe \
+  ##OEROOT##/meta-openembedded/meta-networking \
+  ##OEROOT##/meta-openembedded/meta-python \
+  ##OEROOT##/meta-phosphor \
+  ##OEROOT##/meta-nuvoton \
+  ##OEROOT##/meta-evb \
+  ##OEROOT##/meta-evb/meta-evb-nuvoton \
+  ##OEROOT##/meta-evb/meta-evb-nuvoton/meta-evb-npcm750 \
+  "

@@ -1,0 +1,883 @@
+{
+    "Exposes": [
+        {
+            "Index": 0,
+            "EntityId": 23,
+            "EntityInstance": 1,
+            "Name": "ADC1",
+            "PowerState": "Always",
+            "ScaleFactor": 1,
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 2.100
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 2.050
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1.950
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 1.900
+                }
+            ],
+            "Type": "ADC"
+        },
+        {
+            "Index": 1,
+            "EntityId": 23,
+            "EntityInstance": 2,
+            "Name": "ADC2",
+            "PowerState": "Always",
+            "ScaleFactor": 1,
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 1.700
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 1.680
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1.550
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 1.500
+                }
+            ],
+            "Type": "ADC"
+        },
+        {
+            "Index": 2,
+            "EntityId": 23,
+            "EntityInstance": 3,
+            "Name": "ADC3",
+            "PowerState": "Always",
+            "ScaleFactor": 1,
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 1.200
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 1.150
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1.080
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 1.000
+                }
+            ],
+            "Type": "ADC"
+        },
+        {
+            "Index": 3,
+            "EntityId": 23,
+            "EntityInstance": 4,
+            "Name": "ADC4",
+            "PowerState": "Always",
+            "ScaleFactor": 1,
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 0.950
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 0.900
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 0.800
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0.750
+                }
+            ],
+            "Type": "ADC"
+        },
+        {
+            "Index": 4,
+            "EntityId": 23,
+            "EntityInstance": 5,
+            "Name": "ADC5",
+            "PowerState": "Always",
+            "ScaleFactor": 1,
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 1.500
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 1.300
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 0.900
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0.800
+                }
+            ],
+            "Type": "ADC"
+        },
+        {
+            "Index": 5,
+            "EntityId": 23,
+            "EntityInstance": 6,
+            "Name": "ADC6",
+            "PowerState": "Always",
+            "ScaleFactor": 1,
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 1.500
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 1.300
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 0.900
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0.800
+                }
+            ],
+            "Type": "ADC"
+        },
+        {
+            "Index": 6,
+            "EntityId": 23,
+            "EntityInstance": 7,
+            "Name": "ADC7",
+            "PowerState": "Always",
+            "ScaleFactor": 1,
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 1.500
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 1.300
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 0.900
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0.800
+                }
+            ],
+            "Type": "ADC"
+        },
+        {
+            "Index": 7,
+            "EntityId": 23,
+            "EntityInstance": 8,
+            "Name": "ADC8",
+            "PowerState": "Always",
+            "ScaleFactor": 1,
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 1.500
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 1.300
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 0.900
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0.800
+                }
+            ],
+            "Type": "ADC"
+        },
+        {
+            "Connector": {
+                "Name": "BMC Fan connector 1",
+                "Pwm": 0,
+                "Tachs": [
+                    0
+                ]
+            },
+            "Index": 0,
+            "Name": "Fan1",
+            "PowerState": "Always",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 500
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 8500
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 11500
+                }
+            ],
+            "MaxReading": 14000,
+            "EntityId": 29,
+            "EntityInstance": 1,
+            "Type": "NuvotonFan"
+        },
+        {
+            "Connector": {
+                "Name": "BMC Fan connector 2",
+                "Pwm": 1,
+                "Tachs": [
+                    1
+                ]
+            },
+            "Index": 1,
+            "Name": "Fan2",
+            "PowerState": "Always",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 500
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 8500
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 11500
+                }
+            ],
+            "MaxReading": 14000,
+            "EntityId": 29,
+            "EntityInstance": 2,
+            "Type": "NuvotonFan"
+        },
+        {
+            "Connector": {
+                "Name": "BMC Fan connector 3",
+                "Pwm": 2,
+                "Tachs": [
+                    2
+                ]
+            },
+            "Index": 2,
+            "Name": "Fan3",
+            "PowerState": "Always",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 500
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 8500
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 11500
+                }
+            ],
+            "MaxReading": 14000,
+            "EntityId": 29,
+            "EntityInstance": 3,
+            "Type": "NuvotonFan"
+        },
+        {
+            "Connector": {
+                "Name": "BMC Fan connector 4",
+                "Pwm": 3,
+                "Tachs": [
+                    3
+                ]
+            },
+            "Index": 3,
+            "Name": "Fan4",
+            "PowerState": "Always",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 500
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 8500
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 11500
+                }
+            ],
+            "MaxReading": 14000,
+            "EntityId": 29,
+            "EntityInstance": 4,
+            "Type": "NuvotonFan"
+        },
+        {
+            "Address": "0x48",
+            "Bus": 12,
+            "EntityId": 7,
+            "EntityInstance": 3,
+            "Name": "BUV_Temp",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 65.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 50.000
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 15.000
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "TMP75"
+        },
+        {
+            "Address": "0x4A",
+            "Bus": 13,
+            "EntityId": 7,
+            "EntityInstance": 2,
+            "Name": "BMC_Temp",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 75.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 60.000
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 15.000
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "TMP75"
+        },
+        {
+            "Address": "0x40",
+            "Bus": 11,
+            "EntityId": 19,
+            "EntityInstance": 1,
+            "Name": "MB_P12V_INA219",
+            "CurrScaleFactor": 200,
+            "Labels": [
+                "in1",
+                "curr1",
+                "power1"
+            ],
+            "PowerScaleFactor": 200000,
+            "power1_Max": 300.0,
+            "in1_Max": 20.0,
+            "curr1_Max": 25.0,
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Label": "in1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 12.96
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "in1",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 12.56
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "in1",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 11.44
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "in1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 11.04
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "curr1",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 1.5
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "curr1",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "power1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 24.0
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "power1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "pmbus"
+        },
+        {
+            "Address": "0x41",
+            "Bus": 11,
+            "EntityId": 19,
+            "EntityInstance": 2,
+            "Name": "MB_P3V_INA219",
+            "CurrScaleFactor": 200,
+            "Labels": [
+                "in1",
+                "curr1",
+                "power1"
+            ],
+            "PowerScaleFactor": 200000,
+            "power1_Max": 300.0,
+            "in1_Max": 20.0,
+            "curr1_Max": 100.0,
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Label": "in1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 3.95
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "in1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 2.64
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "curr1",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 4.5
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "curr1",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "power1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 12.0
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "power1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "pmbus"
+        },
+        {
+            "Class": "fan",
+            "FFGainCoefficient": 1.0,
+            "FFOffCoefficient": 0.0,
+            "ICoefficient": 0.0,
+            "ILimitMax": 0.0,
+            "ILimitMin": 0.0,
+            "Inputs": [
+                "Fan1"
+            ],
+            "EntityId": 30,
+            "EntityInstance": 1,
+            "Name": "PID1",
+            "OutLimitMax": 100.0,
+            "OutLimitMin": 10.0,
+            "Outputs": [
+                "Pwm_1"
+            ],
+            "PCoefficient": 0.0,
+            "SlewNeg": 0.0,
+            "SlewPos": 0.0,
+            "Type": "Pid",
+            "Zones": [
+                "Zone1"
+            ]
+        },
+        {
+            "Class": "fan",
+            "FFGainCoefficient": 1.0,
+            "FFOffCoefficient": 0.0,
+            "ICoefficient": 0.0,
+            "ILimitMax": 0.0,
+            "ILimitMin": 0.0,
+            "Inputs": [
+                "Fan3"
+            ],
+            "EntityId": 30,
+            "EntityInstance": 3,
+            "Name": "PID3",
+            "OutLimitMax": 100.0,
+            "OutLimitMin": 10.0,
+            "Outputs": [
+                "Pwm_3"
+            ],
+            "PCoefficient": 0.0,
+            "SlewNeg": 0.0,
+            "SlewPos": 0.0,
+            "Type": "Pid",
+            "Zones": [
+                "Zone3"
+            ]
+        },
+        {
+            "Class": "fan",
+            "FFGainCoefficient": 1.0,
+            "FFOffCoefficient": 0.0,
+            "ICoefficient": 0.0,
+            "ILimitMax": 0.0,
+            "ILimitMin": 0.0,
+            "Inputs": [
+                "Fan2"
+            ],
+            "EntityId": 30,
+            "EntityInstance": 2,
+            "Name": "PID2",
+            "OutLimitMax": 100.0,
+            "OutLimitMin": 10.0,
+            "Outputs": [
+                "Pwm_2"
+            ],
+            "PCoefficient": 0.0,
+            "SlewNeg": 0.0,
+            "SlewPos": 0.0,
+            "Type": "Pid",
+            "Zones": [
+                "Zone2"
+            ]
+        },
+        {
+            "Class": "fan",
+            "FFGainCoefficient": 1.0,
+            "FFOffCoefficient": 0.0,
+            "ICoefficient": 0.0,
+            "ILimitMax": 0.0,
+            "ILimitMin": 0.0,
+            "Inputs": [
+                "Fan4"
+            ],
+            "EntityId": 30,
+            "EntityInstance": 4,
+            "Name": "PID4",
+            "OutLimitMax": 100.0,
+            "OutLimitMin": 10.0,
+            "Outputs": [
+                "Pwm_4"
+            ],
+            "PCoefficient": 0.0,
+            "SlewNeg": 0.0,
+            "SlewPos": 0.0,
+            "Type": "Pid",
+            "Zones": [
+                "Zone4"
+            ]
+        },
+        {
+            "FailSafePercent": 100,
+            "MinThermalOutput": 10,
+            "EntityId": 30,
+            "EntityInstance": 5,
+            "Name": "Zone1",
+            "Type": "Pid.Zone"
+        },
+        {
+            "FailSafePercent": 100,
+            "MinThermalOutput": 0,
+            "EntityId": 30,
+            "EntityInstance": 6,
+            "Name": "Zone2",
+            "Type": "Pid.Zone"
+        },
+        {
+            "FailSafePercent": 100,
+            "MinThermalOutput": 0,
+            "EntityId": 30,
+            "EntityInstance": 7,
+            "Name": "Zone3",
+            "Type": "Pid.Zone"
+        },
+        {
+            "FailSafePercent": 100,
+            "MinThermalOutput": 0,
+            "EntityId": 30,
+            "EntityInstance": 8,
+            "Name": "Zone4",
+            "Type": "Pid.Zone"
+        },
+        {
+            "Class": "temp",
+            "Inputs": [
+                "BUV_Temp"
+            ],
+            "EntityId": 30,
+            "EntityInstance": 9,
+            "Name": "MB_BUV_Temp_STP",
+            "NegativeHysteresis": 0,
+            "Output": [
+                10.0,
+                10.0,
+                20.0,
+                20.0,
+                20.0,
+                30.0,
+                30.0,
+                30.0,
+                40.0,
+                50.0,
+                60.0,
+                70.0,
+                80.0,
+                90.0,
+                100.0,
+                100.0
+            ],
+            "PositiveHysteresis": 0,
+            "Reading": [
+                25.0,
+                28.0,
+                31.0,
+                34.0,
+                37.0,
+                40.0,
+                43.0,
+                46.0,
+                49.0,
+                52.0,
+                55.0,
+                58.0,
+                61.0,
+                64.0,
+                67.0,
+                70.0
+            ],
+            "Type": "Stepwise",
+            "Zones": [
+                "Zone1", "Zone2"
+            ]
+        },
+        {
+            "Class": "temp",
+            "Inputs": [
+                "BMC_Temp"
+            ],
+            "EntityId": 30,
+            "EntityInstance": 10,
+            "Name": "BMC_TEMP_STP",
+            "NegativeHysteresis": 0,
+            "Output": [
+                10.0,
+                10.0,
+                20.0,
+                20.0,
+                20.0,
+                30.0,
+                30.0,
+                30.0,
+                40.0,
+                50.0,
+                60.0,
+                70.0,
+                80.0,
+                90.0,
+                100.0,
+                100.0
+            ],
+            "PositiveHysteresis": 0,
+            "Reading": [
+                25.0,
+                28.0,
+                31.0,
+                34.0,
+                37.0,
+                40.0,
+                43.0,
+                46.0,
+                49.0,
+                52.0,
+                55.0,
+                58.0,
+                61.0,
+                64.0,
+                67.0,
+                70.0
+            ],
+            "Type": "Stepwise",
+            "Zones": [
+                "Zone3", "Zone4"
+            ]
+        }
+    ],
+    "Name": "BUV_RUNBMC_NUVOTON",
+    "Probe": "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': 'F0B-BMC-BMC'})",
+    "Type": "Board",
+    "xyz.openbmc_project.Inventory.Decorator.Ipmi": {
+        "EntityId": 7,
+        "EntityInstance": 1
+    },
+    "xyz.openbmc_project.Inventory.Item.Bmc": {},
+    "xyz.openbmc_project.Common.UUID": {
+        "UUID": "$BOARD_INFO_AM1"
+    }
+}

@@ -1,0 +1,25 @@
+From 844bd4368ec529ef16eb2e13e404af6bccc98be0 Mon Sep 17 00:00:00 2001
+From: Tim Lee <timlee660101@gmail.com>
+Date: Thu, 3 Sep 2020 17:09:43 +0800
+Subject: [PATCH] Software: Add MCU VersionPurpose
+
+Signed-off-by: Tim Lee <timlee660101@gmail.com>
+---
+ yaml/xyz/openbmc_project/Software/Version.interface.yaml | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/yaml/xyz/openbmc_project/Software/Version.interface.yaml b/yaml/xyz/openbmc_project/Software/Version.interface.yaml
+index 61760102..e13594f4 100644
+
+--- a/yaml/xyz/openbmc_project/Software/Version.interface.yaml
++++ b/yaml/xyz/openbmc_project/Software/Version.interface.yaml
+@@ -41,3 +41,6 @@ enumerations:
+           - name: PSU
+             description: >
+                 The version is a version for a PSU.
++          - name: MCU
++            description: >
++                The version is a version for a MCU.
+-- 
+2.17.1
+

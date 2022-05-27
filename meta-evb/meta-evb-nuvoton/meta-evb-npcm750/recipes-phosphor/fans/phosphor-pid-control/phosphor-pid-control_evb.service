@@ -1,0 +1,16 @@
+[Unit]
+Description=OpenBMC Fan Control Daemon
+After=xyz.openbmc_project.Hwmon@.service
+Requires=xyz.openbmc_project.Hwmon@.service
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/env mapper wait /xyz/openbmc_project/sensors/temperature/lm75
+ExecStart=/usr/bin/swampd
+Restart=always
+RestartSec=5
+StartLimitInterval=0
+ExecStopPost=/usr/bin/fan-default-speed.sh
+
+[Install]
+WantedBy=basic.target

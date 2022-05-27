@@ -1,0 +1,85 @@
+From d4ab9847af724c5757c5a86c339716d346d7805a Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Wed, 7 Apr 2021 13:53:51 +0800
+Subject: [PATCH] dts: npcm750-evb: support openbmc partition
+
+---
+ arch/arm/boot/dts/nuvoton-npcm750-evb.dts | 58 ++++++++---------------
+ 1 file changed, 20 insertions(+), 38 deletions(-)
+
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-evb.dts b/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
+index c96f192c900b..1f6477a7c070 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
+@@ -114,48 +114,30 @@
+ 			compatible = "fixed-partitions";
+ 			#address-cells = <1>;
+ 			#size-cells = <1>;
+-			bbuboot1@0 {
+-				label = "bb-uboot-1";
++			bmc@0{
++				label = "bmc";
++				reg = <0x000000 0x2000000>;
++			};
++			u-boot@0 {
++				label = "u-boot";
+ 				reg = <0x0000000 0x80000>;
+ 				read-only;
+-				};
+-			bbuboot2@80000 {
+-				label = "bb-uboot-2";
+-				reg = <0x0080000 0x80000>;
+-				read-only;
+-				};
+-			envparam@100000 {
+-				label = "env-param";
+-				reg = <0x0100000 0x40000>;
+-				read-only;
+-				};
+-			spare@140000 {
+-				label = "spare";
+-				reg = <0x0140000 0xC0000>;
+-				};
++			};
++			u-boot-env@100000{
++				label = "u-boot-env";
++				reg = <0x00100000 0x40000>;
++			};
+ 			kernel@200000 {
+ 				label = "kernel";
+-				reg = <0x0200000 0x400000>;
+-				};
+-			rootfs@600000 {
+-				label = "rootfs";
+-				reg = <0x0600000 0x700000>;
+-				};
+-			spare1@D00000 {
+-				label = "spare1";
+-				reg = <0x0D00000 0x200000>;
+-				};
+-			spare2@0F00000 {
+-				label = "spare2";
+-				reg = <0x0F00000 0x200000>;
+-				};
+-			spare3@1100000 {
+-				label = "spare3";
+-				reg = <0x1100000 0x200000>;
+-				};
+-			spare4@1300000 {
+-				label = "spare4";
+-				reg = <0x1300000 0x0>;
++				reg = <0x0200000 0x580000>;
++			};
++			rofs@800000 {
++				label = "rofs";
++				reg = <0x0780000 0x1680000>;
++			};
++			rwfs@1d00000 {
++				label = "rwfs";
++				reg = <0x1e00000 0x200000>;
+ 			};
+ 		};
+ 	};
+-- 
+2.17.1
+

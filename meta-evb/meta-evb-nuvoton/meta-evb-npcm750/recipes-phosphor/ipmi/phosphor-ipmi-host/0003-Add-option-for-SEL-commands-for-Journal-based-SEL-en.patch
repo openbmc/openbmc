@@ -1,0 +1,1336 @@
+From df7d2b1c9f83f1dad33105f763e71234c803606e Mon Sep 17 00:00:00 2001
+From: "Jason M. Bills" <jason.m.bills@linux.intel.com>
+Date: Tue, 10 Dec 2019 12:28:00 +0800
+Subject: [PATCH 3/3] Add option for SEL commands for Journal-based SEL entries
+
+This change is to add support in the SEL IPMI commands to use
+journal-based SEL entries.
+
+It adds an option for Get SEL Info, Get SEL Entry, Add SEL
+Entry, and Clear SEL, to get and add entries using the journal.
+
+Signed-off-by: Jason M. Bills <jason.m.bills@linux.intel.com>
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ configure.ac       |   8 +
+ sdrutils.hpp       | 183 ++++++++++++
+ selutility.hpp     | 109 ++++++++
+ sensorhandler.hpp  |   9 +
+ sensorutils.hpp    | 186 +++++++++++++
+ storagehandler.cpp | 679 ++++++++++++++++++++++++++++++++++++++++++++-
+ 6 files changed, 1169 insertions(+), 5 deletions(-)
+ create mode 100644 sdrutils.hpp
+ create mode 100644 sensorutils.hpp
+
+diff --git a/configure.ac b/configure.ac
+index f7f69a0b..c29be6e5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -56,6 +56,14 @@ AS_IF([test "x$enable_softoff" != "xno"],
+     [AC_CHECK_PROG([DIRNAME], dirname, dirname)]
+ )
+ 
++# build with journal-based SEL
++AC_ARG_WITH([journal-sel],
++    AS_HELP_STRING([--with-journal-sel], [Builds with journal-based SEL commands instead of D-Bus-based])
++)
++AS_IF([test "x$with_journal_sel" = "xyes"], [
++    AX_APPEND_COMPILE_FLAGS([-DJOURNAL_SEL], [CXXFLAGS])
++])
++
+ # Make sure the pkgconfigdata is configured for automake
+ PKG_INSTALLDIR
+ 
+diff --git a/sdrutils.hpp b/sdrutils.hpp
+new file mode 100644
+index 00000000..7297467e
+--- /dev/null
++++ b/sdrutils.hpp
+@@ -0,0 +1,183 @@
++/*
++// Copyright (c) 2018 Intel Corporation
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//      http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++*/
++
++#include "sensorhandler.hpp"
++
++#include <boost/algorithm/string.hpp>
++#include <boost/container/flat_map.hpp>
++#include <cstring>
++#include <phosphor-logging/log.hpp>
++
++#pragma once
++
++#ifdef JOURNAL_SEL
++namespace ipmi
++{
++namespace sensor
++{
++extern const IdInfoMap sensors;
++} // namespace sensor
++} // namespace ipmi
++
++struct CmpStrVersion
++{
++    bool operator()(std::string a, std::string b) const
++    {
++        return strverscmp(a.c_str(), b.c_str()) < 0;
++    }
++};
++
++using SensorSubTree = boost::container::flat_map<
++    std::string,
++    boost::container::flat_map<std::string, std::vector<std::string>>,
++    CmpStrVersion>;
++
++inline static bool getSensorSubtree(SensorSubTree& subtree)
++{
++    sdbusplus::bus::bus dbus = sdbusplus::bus::new_default_system();
++
++    auto mapperCall =
++        dbus.new_method_call("xyz.openbmc_project.ObjectMapper",
++                             "/xyz/openbmc_project/object_mapper",
++                             "xyz.openbmc_project.ObjectMapper", "GetSubTree");
++    static constexpr const auto depth = 2;
++    static constexpr std::array<const char*, 3> interfaces = {
++        "xyz.openbmc_project.Sensor.Value",
++        "xyz.openbmc_project.Sensor.Threshold.Warning",
++        "xyz.openbmc_project.Sensor.Threshold.Critical"};
++    mapperCall.append("/xyz/openbmc_project/sensors", depth, interfaces);
++
++    try
++    {
++        auto mapperReply = dbus.call(mapperCall);
++        subtree.clear();
++        mapperReply.read(subtree);
++    }
++    catch (sdbusplus::exception_t& e)
++    {
++        phosphor::logging::log<phosphor::logging::level::ERR>(e.what());
++        return false;
++    }
++    return true;
++}
++
++struct CmpStr
++{
++    bool operator()(const char* a, const char* b) const
++    {
++        return std::strcmp(a, b) < 0;
++    }
++};
++
++const static boost::container::flat_map<
++    const char*, std::pair<ipmi_sensor_types, ipmi_event_types>, CmpStr>
++    sensorAndEventType{
++        {{"temperature", std::make_pair(IPMI_SENSOR_TEMP, THRESHOLD)},
++         {"voltage", std::make_pair(IPMI_SENSOR_VOLTAGE, THRESHOLD)},
++         {"current", std::make_pair(IPMI_SENSOR_CURRENT, THRESHOLD)},
++         {"fan_tach", std::make_pair(IPMI_SENSOR_FAN, THRESHOLD)},
++         {"fan_pwm", std::make_pair(IPMI_SENSOR_FAN, THRESHOLD)},
++         {"power", std::make_pair(IPMI_SENSOR_OTHER, THRESHOLD)},
++         {"memory", std::make_pair(IPMI_SENSOR_MEMORY, SENSOR_SPECIFIC)}}};
++
++inline static std::string getSensorTypeStringFromPath(const std::string& path)
++{
++    // get sensor type string from path, path is defined as
++    // /xyz/openbmc_project/sensors/<type>/label
++    size_t typeEnd = path.rfind("/");
++    if (typeEnd == std::string::npos)
++    {
++        return path;
++    }
++    size_t typeStart = path.rfind("/", typeEnd - 1);
++    if (typeStart == std::string::npos)
++    {
++        return path;
++    }
++    // Start at the character after the '/'
++    typeStart++;
++    return path.substr(typeStart, typeEnd - typeStart);
++}
++
++inline static uint8_t getSensorTypeFromPath(const std::string& path)
++{
++    uint8_t sensorType = 0;
++    std::string type = getSensorTypeStringFromPath(path);
++    auto findSensor = sensorAndEventType.find(type.c_str());
++    if (findSensor != sensorAndEventType.end())
++    {
++        sensorType = findSensor->second.first;
++    } // elselse default 0x0 RESERVED
++
++    return sensorType;
++}
++
++inline static uint8_t getSensorNumberFromPath(const std::string& path)
++{
++    uint8_t sensorNum = 0xFF;
++
++    // Refer to sensor.yaml
++    for (auto sensor = ipmi::sensor::sensors.begin();
++         sensor != ipmi::sensor::sensors.end(); sensor++)
++    {
++        if (sensor->second.sensorPath == path)
++        {
++            sensorNum = sensor->first;
++            break;
++        }
++    }
++
++    return sensorNum;
++}
++
++inline static uint8_t getSensorEventTypeFromPath(const std::string& path)
++{
++    uint8_t eventType = 0x00;
++    std::string type = getSensorTypeStringFromPath(path);
++    auto findSensor = sensorAndEventType.find(type.c_str());
++    if (findSensor != sensorAndEventType.end())
++    {
++        eventType = findSensor->second.second;
++    }
++
++    return eventType;
++}
++
++inline static std::string getPathFromSensorNumber(uint8_t sensorNum)
++{
++    SensorSubTree sensorTree;
++    std::string path;
++    if (!getSensorSubtree(sensorTree))
++        return path;
++
++    if (sensorTree.size() < sensorNum)
++    {
++        return path;
++    }
++
++    uint8_t sensorIndex = sensorNum;
++    for (const auto& sensor : sensorTree)
++    {
++        if (sensorIndex-- == 0)
++        {
++            path = sensor.first;
++            break;
++        }
++    }
++
++    return path;
++}
++#endif // JOURNAL_SEL
+\ No newline at end of file
+diff --git a/selutility.hpp b/selutility.hpp
+index fa28fb19..44cbbc4d 100644
+--- a/selutility.hpp
++++ b/selutility.hpp
+@@ -46,6 +46,114 @@ static constexpr auto lastEntry = 0xFFFF;
+ static constexpr auto entireRecord = 0xFF;
+ static constexpr auto selRecordSize = 16;
+ 
++#ifdef JOURNAL_SEL
++// ID string generated using journalctl to include in the MESSAGE_ID field for
++// SEL entries.  Helps with filtering SEL entries in the journal.
++static constexpr const char* selMessageId = "b370836ccf2f4850ac5bee185b77893a";
++static constexpr uint8_t selOperationSupport = 0x02;
++static constexpr uint8_t systemEvent = 0x02;
++static constexpr size_t systemEventSize = 3;
++static constexpr uint8_t oemTsEventFirst = 0xC0;
++static constexpr uint8_t oemTsEventLast = 0xDF;
++static constexpr size_t oemTsEventSize = 9;
++static constexpr uint8_t oemEventFirst = 0xE0;
++static constexpr uint8_t oemEventLast = 0xFF;
++static constexpr size_t oemEventSize = 13;
++static constexpr uint8_t eventMsgRev = 0x04;
++static constexpr auto operationSupport = 0x0A;
++
++constexpr static const uint8_t deassertionEvent = 0x80;
++
++/** @struct GetSELInfoResponse
++ *
++ *  IPMI payload for Get SEL Info command response.
++ */
++struct GetSELInfoResponse
++{
++    uint8_t selVersion;       //!< SEL revision.
++    uint16_t entries;         //!< Number of log entries in SEL.
++    uint16_t freeSpace;       //!< Free Space in bytes.
++    uint32_t addTimeStamp;    //!< Most recent addition timestamp.
++    uint32_t eraseTimeStamp;  //!< Most recent erase timestamp.
++    uint8_t operationSupport; //!< Operation support.
++} __attribute__((packed));
++
++/** @struct GetSELEntryResponseOEMTimestamped
++ *
++ *  IPMI payload for Get SEL Entry command response for OEM Timestamped types.
++ */
++struct GetSELEntryResponseOEMTimestamped
++{
++    uint16_t nextRecordID;
++    uint16_t recordID;
++    uint8_t recordType;
++    uint32_t timestamp;
++    uint8_t eventData[ipmi::sel::oemTsEventSize];
++} __attribute__((packed));
++
++/** @struct GetSELEntryResponseOEM
++ *
++ *  IPMI payload for Get SEL Entry command response for OEM types.
++ */
++struct GetSELEntryResponseOEM
++{
++    uint16_t nextRecordID;
++    uint16_t recordID;
++    uint8_t recordType;
++    uint8_t eventData[ipmi::sel::oemEventSize];
++} __attribute__((packed));
++
++/** @struct AddSELEntryRequest
++ *
++ *  IPMI payload for Add SEL Entry command request.
++ */
++struct AddSELEntryRequest
++{
++    uint16_t recordID;
++    uint8_t recordType;
++    uint32_t timestamp;
++    uint16_t generatorID;
++    uint8_t eventMsgRevision;
++    uint8_t sensorType;
++    uint8_t sensorNum;
++    uint8_t eventType;
++    uint8_t eventData[ipmi::sel::systemEventSize];
++} __attribute__((packed));
++
++/** @struct AddSELEntryRequestOEMTimestamped
++ *
++ *  IPMI payload for Add SEL Entry command request for OEM Timestamped types.
++ */
++struct AddSELEntryRequestOEMTimestamped
++{
++    uint16_t recordID;
++    uint8_t recordType;
++    uint32_t timestamp;
++    uint8_t eventData[ipmi::sel::oemTsEventSize];
++} __attribute__((packed));
++
++/** @struct AddSELEntryRequestOEM
++ *
++ *  IPMI payload for Add SEL Entry command request for OEM types.
++ */
++struct AddSELEntryRequestOEM
++{
++    uint16_t recordID;
++    uint8_t recordType;
++    uint8_t eventData[ipmi::sel::oemEventSize];
++} __attribute__((packed));
++
++/** @struct DeleteSELEntryRequest
++ *
++ *  IPMI payload for Delete SEL Entry command request.
++ */
++struct DeleteSELEntryRequest
++{
++    uint16_t reservationID; //!< Reservation ID.
++    uint16_t selRecordID;   //!< SEL Record ID.
++} __attribute__((packed));
++
++#else  // JOURNAL_SEL
+ namespace operationSupport
+ {
+ static constexpr bool overflow = false;
+@@ -54,6 +162,7 @@ static constexpr bool partialAddSelEntry = false;
+ static constexpr bool reserveSel = true;
+ static constexpr bool getSelAllocationInfo = false;
+ } // namespace operationSupport
++#endif // JOURNAL_SEL
+ 
+ /** @struct GetSELEntryRequest
+  *
+diff --git a/sensorhandler.hpp b/sensorhandler.hpp
+index ea9fa3c0..92d7f244 100644
+--- a/sensorhandler.hpp
++++ b/sensorhandler.hpp
+@@ -36,7 +36,16 @@ enum ipmi_sensor_types
+     IPMI_SENSOR_VOLTAGE = 0x02,
+     IPMI_SENSOR_CURRENT = 0x03,
+     IPMI_SENSOR_FAN = 0x04,
++    IPMI_SENSOR_OTHER = 0x0B,
+     IPMI_SENSOR_TPM = 0xCC,
++    IPMI_SENSOR_MEMORY = 0x0C,
++};
++
++enum ipmi_event_types
++{
++    UNSPECIFIED = 0x00,
++    THRESHOLD = 0x01,
++    SENSOR_SPECIFIC = 0x6f,
+ };
+ 
+ /** @brief Custom exception for reading sensors that are not funcitonal.
+diff --git a/sensorutils.hpp b/sensorutils.hpp
+new file mode 100644
+index 00000000..4f9466f8
+--- /dev/null
++++ b/sensorutils.hpp
+@@ -0,0 +1,186 @@
++/*
++// Copyright (c) 2018 Intel Corporation
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//      http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++*/
++
++#pragma once
++#include <host-ipmid/ipmid-api.h>
++
++#include <cmath>
++#include <iostream>
++#include <phosphor-logging/log.hpp>
++
++#ifdef JOURNAL_SEL
++namespace ipmi
++{
++static constexpr int16_t maxInt10 = 0x1FF;
++static constexpr int16_t minInt10 = -0x200;
++static constexpr int8_t maxInt4 = 7;
++static constexpr int8_t minInt4 = -8;
++
++static inline bool getSensorAttributes(const double max, const double min,
++                                       int16_t& mValue, int8_t& rExp,
++                                       int16_t& bValue, int8_t& bExp,
++                                       bool& bSigned)
++{
++    // computing y = (10^rRexp) * (Mx + (B*(10^Bexp)))
++    // check for 0, assume always positive
++    double mDouble;
++    double bDouble;
++    if (max <= min)
++    {
++        phosphor::logging::log<phosphor::logging::level::DEBUG>(
++            "getSensorAttributes: Max must be greater than min");
++        return false;
++    }
++
++    mDouble = (max - min) / 0xFF;
++
++    if (min < 0)
++    {
++        bSigned = true;
++        bDouble = floor(0.5 + ((max + min) / 2));
++    }
++    else
++    {
++        bSigned = false;
++        bDouble = min;
++    }
++
++    rExp = 0;
++
++    // M too big for 10 bit variable
++    while (mDouble > maxInt10)
++    {
++        if (rExp >= maxInt4)
++        {
++            phosphor::logging::log<phosphor::logging::level::DEBUG>(
++                "rExp Too big, Max and Min range too far",
++                phosphor::logging::entry("REXP=%d", rExp));
++            return false;
++        }
++        mDouble /= 10;
++        rExp++;
++    }
++
++    // M too small, loop until we lose less than 1 eight bit count of precision
++    while (((mDouble - floor(mDouble)) / mDouble) > (1.0 / 255))
++    {
++        if (rExp <= minInt4)
++        {
++            phosphor::logging::log<phosphor::logging::level::DEBUG>(
++                "rExp Too Small, Max and Min range too close");
++            return false;
++        }
++        // check to see if we reached the limit of where we can adjust back the
++        // B value
++        if (bDouble / std::pow(10, rExp + minInt4 - 1) > bDouble)
++        {
++            if (mDouble < 1.0)
++            {
++                phosphor::logging::log<phosphor::logging::level::DEBUG>(
++                    "Could not find mValue and B value with enough "
++                    "precision.");
++                return false;
++            }
++            break;
++        }
++        // can't multiply M any more, max precision reached
++        else if (mDouble * 10 > maxInt10)
++        {
++            break;
++        }
++        mDouble *= 10;
++        rExp--;
++    }
++
++    bDouble /= std::pow(10, rExp);
++    bExp = 0;
++
++    // B too big for 10 bit variable
++    while (bDouble > maxInt10 || bDouble < minInt10)
++    {
++        if (bExp >= maxInt4)
++        {
++            phosphor::logging::log<phosphor::logging::level::DEBUG>(
++                "bExp Too Big, Max and Min range need to be adjusted");
++            return false;
++        }
++        bDouble /= 10;
++        bExp++;
++    }
++
++    while (((fabs(bDouble) - floor(fabs(bDouble))) / fabs(bDouble)) >
++           (1.0 / 255))
++    {
++        if (bExp <= minInt4)
++        {
++            phosphor::logging::log<phosphor::logging::level::DEBUG>(
++                "bExp Too Small, Max and Min range need to be adjusted");
++            return false;
++        }
++        bDouble *= 10;
++        bExp -= 1;
++    }
++
++    mValue = static_cast<int16_t>(mDouble) & maxInt10;
++    bValue = static_cast<int16_t>(bDouble) & maxInt10;
++
++    return true;
++}
++
++static inline uint8_t
++    scaleIPMIValueFromDouble(const double value, const uint16_t mValue,
++                             const int8_t rExp, const uint16_t bValue,
++                             const int8_t bExp, const bool bSigned)
++{
++    uint32_t scaledValue =
++        (value - (bValue * std::pow(10, bExp) * std::pow(10, rExp))) /
++        (mValue * std::pow(10, rExp));
++
++    if (scaledValue > std::numeric_limits<uint8_t>::max() ||
++        scaledValue < std::numeric_limits<uint8_t>::lowest())
++    {
++        throw std::out_of_range("Value out of range");
++    }
++    if (bSigned)
++    {
++        return static_cast<int8_t>(scaledValue);
++    }
++    else
++    {
++        return static_cast<uint8_t>(scaledValue);
++    }
++}
++
++static inline uint8_t getScaledIPMIValue(const double value, const double max,
++                                         const double min)
++{
++    int16_t mValue = 0;
++    int8_t rExp = 0;
++    int16_t bValue = 0;
++    int8_t bExp = 0;
++    bool bSigned = 0;
++    bool result = 0;
++
++    result = getSensorAttributes(max, min, mValue, rExp, bValue, bExp, bSigned);
++    if (!result)
++    {
++        throw std::runtime_error("Illegal sensor attributes");
++    }
++    return scaleIPMIValueFromDouble(value, mValue, rExp, bValue, bExp, bSigned);
++}
++
++} // namespace ipmi
++#endif // JOURNAL_SEL
+diff --git a/storagehandler.cpp b/storagehandler.cpp
+index 0b1a4e4d..a4dab20b 100644
+--- a/storagehandler.cpp
++++ b/storagehandler.cpp
+@@ -12,10 +12,13 @@
+ #include <systemd/sd-bus.h>
+ 
+ #include <algorithm>
++#include <boost/beast/core/span.hpp>
++#include <boost/process.hpp>
+ #include <chrono>
+ #include <cstdio>
+ #include <cstring>
+ #include <filesystem>
++#include <fstream>
+ #include <ipmid/api.hpp>
+ #include <ipmid/utils.hpp>
+ #include <optional>
+@@ -23,7 +26,9 @@
+ #include <phosphor-logging/elog.hpp>
+ #include <phosphor-logging/log.hpp>
+ #include <sdbusplus/server.hpp>
++#include <sdrutils.hpp>
+ #include <string>
++#include <string_view>
+ #include <variant>
+ #include <xyz/openbmc_project/Common/error.hpp>
+ #include <xyz/openbmc_project/Logging/SEL/error.hpp>
+@@ -221,6 +226,509 @@ enum class AccessMode
+     words  ///< Device is accessed by words
+ };
+ 
++#ifdef JOURNAL_SEL
++namespace ipmi::sel::erase_time
++{
++static constexpr const char* selEraseTimestamp = "/var/lib/ipmi/sel_erase_time";
++
++void save()
++{
++    // open the file, creating it if necessary
++    int fd = open(selEraseTimestamp, O_WRONLY | O_CREAT | O_CLOEXEC, 0644);
++    if (fd < 0)
++    {
++        std::cerr << "Failed to open file\n";
++        return;
++    }
++
++    // update the file timestamp to the current time
++    if (futimens(fd, NULL) < 0)
++    {
++        std::cerr << "Failed to update timestamp: "
++                  << std::string(strerror(errno));
++    }
++    close(fd);
++}
++
++int get()
++{
++    struct stat st;
++    // default to an invalid timestamp
++    int timestamp = ::ipmi::sel::invalidTimeStamp;
++
++    int fd = open(selEraseTimestamp, O_RDWR | O_CLOEXEC, 0644);
++    if (fd < 0)
++    {
++        return timestamp;
++    }
++
++    if (fstat(fd, &st) >= 0)
++    {
++        timestamp = st.st_mtime;
++    }
++
++    return timestamp;
++}
++} // namespace ipmi::sel::erase_time
++
++static int fromHexStr(const std::string hexStr, std::vector<uint8_t>& data)
++{
++    for (unsigned int i = 0; i < hexStr.size(); i += 2)
++    {
++        try
++        {
++            data.push_back(static_cast<uint8_t>(
++                std::stoul(hexStr.substr(i, 2), nullptr, 16)));
++        }
++        catch (std::invalid_argument& e)
++        {
++            phosphor::logging::log<phosphor::logging::level::ERR>(e.what());
++            return -1;
++        }
++        catch (std::out_of_range& e)
++        {
++            phosphor::logging::log<phosphor::logging::level::ERR>(e.what());
++            return -1;
++        }
++    }
++    return 0;
++}
++
++static const std::filesystem::path selLogDir = "/var/log";
++static const std::string selLogFilename = "ipmi_sel";
++
++static bool getSELLogFiles(std::vector<std::filesystem::path>& selLogFiles)
++{
++    // Loop through the directory looking for ipmi_sel log files
++    for (const std::filesystem::directory_entry& dirEnt :
++         std::filesystem::directory_iterator(selLogDir))
++    {
++        std::string filename = dirEnt.path().filename();
++        if (boost::starts_with(filename, selLogFilename))
++        {
++            // If we find an ipmi_sel log file, save the path
++            selLogFiles.emplace_back(selLogDir /
++                                     filename);
++        }
++    }
++    // As the log files rotate, they are appended with a ".#" that is higher for
++    // the older logs. Since we don't expect more than 10 log files, we
++    // can just sort the list to get them in order from newest to oldest
++    std::sort(selLogFiles.begin(), selLogFiles.end());
++
++    return !selLogFiles.empty();
++}
++
++static int countSELEntries()
++{
++    // Get the list of ipmi_sel log files
++    std::vector<std::filesystem::path> selLogFiles;
++    if (!getSELLogFiles(selLogFiles))
++    {
++        return 0;
++    }
++    int numSELEntries = 0;
++    // Loop through each log file and count the number of logs
++    for (const std::filesystem::path& file : selLogFiles)
++    {
++        std::ifstream logStream(file);
++        if (!logStream.is_open())
++        {
++            continue;
++        }
++
++        std::string line;
++        while (std::getline(logStream, line))
++        {
++            numSELEntries++;
++        }
++    }
++    return numSELEntries;
++}
++
++static bool findSELEntry(const int recordID,
++                         const std::vector<std::filesystem::path>& selLogFiles,
++                         std::string& entry)
++{
++    // Record ID is the first entry field following the timestamp. It is
++    // preceded by a space and followed by a comma
++    std::string search = " " + std::to_string(recordID) + ",";
++
++    // Loop through the ipmi_sel log entries
++    for (const std::filesystem::path& file : selLogFiles)
++    {
++        std::ifstream logStream(file);
++        if (!logStream.is_open())
++        {
++            continue;
++        }
++
++        while (std::getline(logStream, entry))
++        {
++            // Check if the record ID matches
++            if (entry.find(search) != std::string::npos)
++            {
++                return true;
++            }
++        }
++    }
++    return false;
++}
++
++static uint16_t
++    getNextRecordID(const uint16_t recordID,
++                    const std::vector<std::filesystem::path>& selLogFiles)
++{
++    uint16_t nextRecordID = recordID + 1;
++    std::string entry;
++    if (findSELEntry(nextRecordID, selLogFiles, entry))
++    {
++        return nextRecordID;
++    }
++    else
++    {
++        return ipmi::sel::lastEntry;
++    }
++}
++
++static int getFileTimestamp(const std::filesystem::path& file)
++{
++    struct stat st;
++
++    if (stat(file.c_str(), &st) >= 0)
++    {
++        return st.st_mtime;
++    }
++    return ::ipmi::sel::invalidTimeStamp;
++}
++
++using systemEventType = std::tuple<
++    uint32_t, // Timestamp
++    uint16_t, // Generator ID
++    uint8_t,  // EvM Rev
++    uint8_t,  // Sensor Type
++    uint8_t,  // Sensor Number
++    uint7_t,  // Event Type
++    bool,     // Event Direction
++    std::array<uint8_t, ipmi::sel::systemEventSize>>; // Event Data
++using oemTsEventType = std::tuple<
++    uint32_t,                                                   // Timestamp
++    std::array<uint8_t, ipmi::sel::oemTsEventSize>>; // Event Data
++using oemEventType =
++    std::array<uint8_t, ipmi::sel::oemEventSize>; // Event Data
++
++ipmi::RspType<uint16_t, // Next Record ID
++              uint16_t, // Record ID
++              uint8_t,  // Record Type
++              std::variant<systemEventType, oemTsEventType,
++                           oemEventType>> // Record Content
++    ipmiStorageGetSELEntry(uint16_t reservationID, uint16_t targetID,
++                           uint8_t offset, uint8_t size)
++{
++    // Only support getting the entire SEL record. If a partial size or non-zero
++    // offset is requested, return an error
++    if (offset != 0 || size != ipmi::sel::entireRecord)
++    {
++        return ipmi::responseRetBytesUnavailable();
++    }
++
++    // Check the reservation ID if one is provided or required (only if the
++    // offset is non-zero)
++    if (reservationID != 0 || offset != 0)
++    {
++        if (!checkSELReservation(reservationID))
++        {
++            return ipmi::responseInvalidReservationId();
++        }
++    }
++
++    // Get the ipmi_sel log files
++    std::vector<std::filesystem::path> selLogFiles;
++    if (!getSELLogFiles(selLogFiles))
++    {
++        return ipmi::responseSensorInvalid();
++    }
++
++    std::string targetEntry;
++
++    if (targetID == ipmi::sel::firstEntry)
++    {
++        // The first entry will be at the top of the oldest log file
++        std::ifstream logStream(selLogFiles.back());
++        if (!logStream.is_open())
++        {
++            return ipmi::responseUnspecifiedError();
++        }
++
++        if (!std::getline(logStream, targetEntry))
++        {
++            return ipmi::responseUnspecifiedError();
++        }
++    }
++    else if (targetID == ipmi::sel::lastEntry)
++    {
++        // The last entry will be at the bottom of the newest log file
++        std::ifstream logStream(selLogFiles.front());
++        if (!logStream.is_open())
++        {
++            return ipmi::responseUnspecifiedError();
++        }
++
++        std::string line;
++        while (std::getline(logStream, line))
++        {
++            targetEntry = line;
++        }
++    }
++    else
++    {
++        if (!findSELEntry(targetID, selLogFiles, targetEntry))
++        {
++            return ipmi::responseSensorInvalid();
++        }
++    }
++
++    // The format of the ipmi_sel message is "<Timestamp>
++    // <ID>,<Type>,<EventData>,[<Generator ID>,<Path>,<Direction>]".
++    // First get the Timestamp
++    size_t space = targetEntry.find_first_of(" ");
++    if (space == std::string::npos)
++    {
++        return ipmi::responseUnspecifiedError();
++    }
++    std::string entryTimestamp = targetEntry.substr(0, space);
++    // Then get the log contents
++    size_t entryStart = targetEntry.find_first_not_of(" ", space);
++    if (entryStart == std::string::npos)
++    {
++        return ipmi::responseUnspecifiedError();
++    }
++    std::string_view entry(targetEntry);
++    entry.remove_prefix(entryStart);
++    // Use split to separate the entry into its fields
++    std::vector<std::string> targetEntryFields;
++    boost::split(targetEntryFields, entry, boost::is_any_of(","),
++                 boost::token_compress_on);
++    if (targetEntryFields.size() < 3)
++    {
++        return ipmi::responseUnspecifiedError();
++    }
++    std::string& recordIDStr = targetEntryFields[0];
++    std::string& recordTypeStr = targetEntryFields[1];
++    std::string& eventDataStr = targetEntryFields[2];
++
++    uint16_t recordID;
++    uint8_t recordType;
++    try
++    {
++        recordID = std::stoul(recordIDStr);
++        recordType = std::stoul(recordTypeStr, nullptr, 16);
++    }
++    catch (const std::invalid_argument&)
++    {
++        return ipmi::responseUnspecifiedError();
++    }
++    uint16_t nextRecordID = getNextRecordID(recordID, selLogFiles);
++    std::vector<uint8_t> eventDataBytes;
++    if (fromHexStr(eventDataStr, eventDataBytes) < 0)
++    {
++        return ipmi::responseUnspecifiedError();
++    }
++
++    if (recordType == ipmi::sel::systemEvent)
++    {
++        // Get the timestamp
++        std::tm timeStruct = {};
++        std::istringstream entryStream(entryTimestamp);
++
++        uint32_t timestamp = ipmi::sel::invalidTimeStamp;
++        if (entryStream >> std::get_time(&timeStruct, "%Y-%m-%dT%H:%M:%S"))
++        {
++            timestamp = std::mktime(&timeStruct);
++        }
++
++        // Set the event message revision
++        uint8_t evmRev = ipmi::sel::eventMsgRev;
++
++        uint16_t generatorID = 0;
++        uint8_t sensorType = 0;
++        uint16_t sensorAndLun = 0;
++        uint8_t sensorNum = 0xFF;
++        uint7_t eventType = 0;
++        bool eventDir = 0;
++        // System type events should have six fields
++        if (targetEntryFields.size() >= 6)
++        {
++            std::string& generatorIDStr = targetEntryFields[3];
++            std::string& sensorPath = targetEntryFields[4];
++            std::string& eventDirStr = targetEntryFields[5];
++
++            // Get the generator ID
++            try
++            {
++                generatorID = std::stoul(generatorIDStr, nullptr, 16);
++            }
++            catch (const std::invalid_argument&)
++            {
++                std::cerr << "Invalid Generator ID\n";
++            }
++
++            // Get the sensor type, sensor number, and event type for the sensor
++            sensorType = getSensorTypeFromPath(sensorPath);
++            sensorAndLun = getSensorNumberFromPath(sensorPath);
++            sensorNum = static_cast<uint8_t>(sensorAndLun);
++            generatorID |= sensorAndLun >> 8;
++            eventType = getSensorEventTypeFromPath(sensorPath);
++
++            // Get the event direction
++            try
++            {
++                eventDir = std::stoul(eventDirStr) ? 0 : 1;
++            }
++            catch (const std::invalid_argument&)
++            {
++                std::cerr << "Invalid Event Direction\n";
++            }
++        }
++
++        // Only keep the eventData bytes that fit in the record
++        std::array<uint8_t, ipmi::sel::systemEventSize> eventData{};
++        std::copy_n(eventDataBytes.begin(),
++                    std::min(eventDataBytes.size(), eventData.size()),
++                    eventData.begin());
++
++        return ipmi::responseSuccess(
++            nextRecordID, recordID, recordType,
++            systemEventType{timestamp, generatorID, evmRev, sensorType,
++                            sensorNum, eventType, eventDir, eventData});
++    }
++    else if (recordType >= ipmi::sel::oemTsEventFirst &&
++             recordType <= ipmi::sel::oemTsEventLast)
++    {
++        // Get the timestamp
++        std::tm timeStruct = {};
++        std::istringstream entryStream(entryTimestamp);
++
++        uint32_t timestamp = ipmi::sel::invalidTimeStamp;
++        if (entryStream >> std::get_time(&timeStruct, "%Y-%m-%dT%H:%M:%S"))
++        {
++            timestamp = std::mktime(&timeStruct);
++        }
++
++        // Only keep the bytes that fit in the record
++        std::array<uint8_t, ipmi::sel::oemTsEventSize> eventData{};
++        std::copy_n(eventDataBytes.begin(),
++                    std::min(eventDataBytes.size(), eventData.size()),
++                    eventData.begin());
++
++        return ipmi::responseSuccess(nextRecordID, recordID, recordType,
++                                     oemTsEventType{timestamp, eventData});
++    }
++    else if (recordType >= ipmi::sel::oemEventFirst)
++    {
++        // Only keep the bytes that fit in the record
++        std::array<uint8_t, ipmi::sel::oemEventSize> eventData{};
++        std::copy_n(eventDataBytes.begin(),
++                    std::min(eventDataBytes.size(), eventData.size()),
++                    eventData.begin());
++
++        return ipmi::responseSuccess(nextRecordID, recordID, recordType,
++                                     eventData);
++    }
++
++    return ipmi::responseUnspecifiedError();
++}
++
++
++ipmi::RspType<uint8_t> ipmiStorageClearSEL(ipmi::Context::ptr ctx,
++                                           uint16_t reservationID,
++                                           const std::array<uint8_t, 3>& clr,
++                                           uint8_t eraseOperation)
++{
++    if (!checkSELReservation(reservationID))
++    {
++        return ipmi::responseInvalidReservationId();
++    }
++
++    static constexpr std::array<uint8_t, 3> clrExpected = {'C', 'L', 'R'};
++    if (clr != clrExpected)
++    {
++        return ipmi::responseInvalidFieldRequest();
++    }
++
++    // Erasure status cannot be fetched, so always return erasure status as
++    // `erase completed`.
++    if (eraseOperation == ipmi::sel::getEraseStatus)
++    {
++        return ipmi::responseSuccess(ipmi::sel::eraseComplete);
++    }
++
++    // Check that initiate erase is correct
++    if (eraseOperation != ipmi::sel::initiateErase)
++    {
++        return ipmi::responseInvalidFieldRequest();
++    }
++
++    // Per the IPMI spec, need to cancel any reservation when the SEL is
++    // cleared
++    cancelSELReservation();
++
++    // Save the erase time
++    ipmi::sel::erase_time::save();
++
++    // Clear the SEL by deleting the log files
++    std::vector<std::filesystem::path> selLogFiles;
++    if (getSELLogFiles(selLogFiles))
++    {
++        for (const std::filesystem::path& file : selLogFiles)
++        {
++            std::error_code ec;
++            std::filesystem::remove(file, ec);
++        }
++    }
++
++    // Reload rsyslog so it knows to start new log files
++    std::shared_ptr<sdbusplus::asio::connection> dbus = getSdBus();
++    sdbusplus::message::message rsyslogReload = dbus->new_method_call(
++        "org.freedesktop.systemd1", "/org/freedesktop/systemd1",
++        "org.freedesktop.systemd1.Manager", "ReloadUnit");
++    rsyslogReload.append("rsyslog.service", "replace");
++    try
++    {
++        sdbusplus::message::message reloadResponse = dbus->call(rsyslogReload);
++    }
++    catch (sdbusplus::exception_t& e)
++    {
++        phosphor::logging::log<phosphor::logging::level::ERR>(e.what());
++    }
++
++    return ipmi::responseSuccess(ipmi::sel::eraseComplete);
++}
++
++
++
++ipmi::RspType<uint8_t,  // SEL version
++              uint16_t, // SEL entry count
++              uint16_t, // free space
++              uint32_t, // last add timestamp
++              uint32_t, // last erase timestamp
++              uint8_t>  // operation support
++    ipmiStorageGetSelInfo()
++{
++    constexpr uint8_t selVersion = ipmi::sel::selVersion;
++    uint16_t entries = countSELEntries();
++    uint32_t addTimeStamp = getFileTimestamp(
++        selLogDir / selLogFilename);
++    uint32_t eraseTimeStamp = ipmi::sel::erase_time::get();
++    constexpr uint8_t operationSupport =
++        ipmi::sel::selOperationSupport;
++    constexpr uint16_t freeSpace =
++        0xffff; // Spec indicates that more than 64kB is free
++
++    return ipmi::responseSuccess(selVersion, entries, freeSpace, addTimeStamp,
++                                 eraseTimeStamp, operationSupport);
++}
++#else // JOURNAL_SEL not used
+ /** @brief implements the get SEL Info command
+  *  @returns IPMI completion code plus response data
+  *   - selVersion - SEL revision
+@@ -533,6 +1041,7 @@ ipmi::RspType<uint8_t // erase status
+     return ipmi::responseSuccess(
+         static_cast<uint8_t>(ipmi::sel::eraseComplete));
+ }
++#endif
+ 
+ /** @brief implements the get SEL time command
+  *  @returns IPMI completion code plus response data
+@@ -650,6 +1159,156 @@ ipmi::RspType<uint16_t> ipmiStorageReserveSel()
+     return ipmi::responseSuccess(reserveSel());
+ }
+ 
++#ifdef JOURNAL_SEL
++#if 0
++static void toHexStr(const boost::beast::span<uint8_t> bytes,
++                     std::string& hexStr)
++{
++    std::stringstream stream;
++    stream << std::hex << std::uppercase << std::setfill('0');
++    for (const uint8_t& byte : bytes)
++    {
++        stream << std::setw(2) << static_cast<int>(byte);
++    }
++    hexStr = stream.str();
++}
++
++static inline bool defaultMessageHook(uint16_t recordID, uint8_t recordType,
++                       uint32_t timestamp, uint16_t generatorID, uint8_t evmRev,
++                       uint8_t sensorType, uint8_t sensorNum, uint8_t eventType,
++                       std::array<uint8_t, eventDataSize> eventData)
++{
++    // Log the record as a default Redfish message instead of a SEL record
++
++    // Save the raw IPMI string of the request
++    std::string ipmiRaw;
++    std::array selBytes = {static_cast<uint8_t>(recordID),
++                           static_cast<uint8_t>(recordID >> 8),
++                           recordType,
++                           static_cast<uint8_t>(timestamp),
++                           static_cast<uint8_t>(timestamp >> 8),
++                           static_cast<uint8_t>(timestamp >> 16),
++                           static_cast<uint8_t>(timestamp >> 24),
++                           static_cast<uint8_t>(generatorID),
++                           static_cast<uint8_t>(generatorID >> 8),
++                           evmRev,
++                           sensorType,
++                           sensorNum,
++                           eventType,
++                           eventData[0],
++                           eventData[1],
++                           eventData[2]};
++
++    toHexStr(boost::beast::span<uint8_t>(selBytes), ipmiRaw);
++
++    static const std::string openBMCMessageRegistryVersion("0.1");
++    std::string messageID =
++        "OpenBMC." + openBMCMessageRegistryVersion + ".SELEntryAdded";
++
++    std::vector<std::string> messageArgs;
++    messageArgs.push_back(ipmiRaw);
++
++    // Log the Redfish message to the journal with the appropriate metadata
++    std::string journalMsg = "SEL Entry Added: " + ipmiRaw;
++    std::string messageArgsString = boost::algorithm::join(messageArgs, ",");
++    phosphor::logging::log<phosphor::logging::level::INFO>(
++        journalMsg.c_str(),
++        phosphor::logging::entry("REDFISH_MESSAGE_ID=%s", messageID.c_str()),
++        phosphor::logging::entry("REDFISH_MESSAGE_ARGS=%s",
++                                 messageArgsString.c_str()));
++
++    return true;
++}
++#endif
++
++ipmi::RspType<uint16_t> ipmiStorageAddSEL(
++    uint16_t recordID, uint8_t recordType, uint32_t timestamp,
++    uint16_t generatorID, uint8_t evmRev, uint8_t sensorType, uint8_t sensorNum,
++    uint8_t eventType, std::array<uint8_t, eventDataSize> eventData)
++{
++    // Per the IPMI spec, need to cancel any reservation when a SEL entry is
++    // added
++    cancelSELReservation();
++#if 0
++    // Send this request to the Redfish hooks to log it as a Redfish message
++    // instead.  There is no need to add it to the SEL, so just return success.
++    defaultMessageHook(
++        recordID, recordType, timestamp, generatorID, evmRev, sensorType,
++        sensorNum, eventType, eventData);
++#endif
++    static constexpr char const* ipmiSELObject =
++        "xyz.openbmc_project.Logging.IPMI";
++    static constexpr char const* ipmiSELPath =
++        "/xyz/openbmc_project/Logging/IPMI";
++    static constexpr char const* ipmiSELAddInterface =
++        "xyz.openbmc_project.Logging.IPMI";
++    static const std::string ipmiSELAddMessage =
++        "IPMI SEL entry logged using IPMI Add SEL Entry command.";
++
++    sdbusplus::bus::bus bus{ipmid_get_sd_bus_connection()};
++
++    if (recordType == ipmi::sel::systemEvent)
++    {
++        std::string sensorPath;
++
++        for (const auto& it : invSensors)
++        {
++            if (it.second.sensorID == sensorNum)
++            {
++                sensorPath = it.first;
++                break;
++            }
++        }
++
++        if(sensorPath.length() == 0)
++        {
++            return ipmi::responseSensorInvalid();
++        }
++
++        bool assert =
++            (eventType & ipmi::sel::deassertionEvent) ? false : true;
++        uint16_t genId = generatorID;
++        sdbusplus::message::message writeSEL = bus.new_method_call(
++            ipmiSELObject, ipmiSELPath, ipmiSELAddInterface, "IpmiSelAdd");
++        writeSEL.append(ipmiSELAddMessage, sensorPath, eventData, assert,
++                        genId);
++        try
++        {
++            sdbusplus::message::message writeSELResp = bus.call(writeSEL);
++            writeSELResp.read(recordID);
++        }
++        catch (sdbusplus::exception_t& e)
++        {
++            log<level::ERR>(e.what());
++            return ipmi::responseUnspecifiedError();
++        }
++    }
++    else if (recordType >= ipmi::sel::oemTsEventFirst &&
++             recordType <= ipmi::sel::oemEventLast)
++    {
++        sdbusplus::message::message writeSEL = bus.new_method_call(
++            ipmiSELObject, ipmiSELPath, ipmiSELAddInterface, "IpmiSelAddOem");
++        writeSEL.append(ipmiSELAddMessage, eventData, recordType);
++        try
++        {
++            sdbusplus::message::message writeSELResp = bus.call(writeSEL);
++            writeSELResp.read(recordID);
++        }
++        catch (sdbusplus::exception_t& e)
++        {
++            log<level::ERR>(e.what());
++            return ipmi::responseUnspecifiedError();
++        }
++    }
++    else
++    {
++        return ipmi::responseUnspecifiedError();
++    }
++
++   // uint16_t responseID = 0xFFFF;
++    return ipmi::responseSuccess(recordID);
++}
++#else  // JOURNAL_SEL not used
+ /** @brief implements the Add SEL entry command
+  * @request
+  *
+@@ -711,6 +1370,7 @@ ipmi::RspType<uint16_t // recordID of the Added SEL entry
+ 
+     return ipmi::responseSuccess(recordID);
+ }
++#endif // JOURNAL_SEL
+ 
+ bool isFruPresent(ipmi::Context::ptr& ctx, const std::string& fruPath)
+ {
+@@ -879,7 +1539,6 @@ void register_netfn_storage_functions()
+     ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnStorage,
+                           ipmi::storage::cmdGetSelInfo, ipmi::Privilege::User,
+                           ipmiStorageGetSelInfo);
+-
+     // <Get SEL Time>
+     ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnStorage,
+                           ipmi::storage::cmdGetSelTime, ipmi::Privilege::User,
+@@ -889,26 +1548,36 @@ void register_netfn_storage_functions()
+     ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnStorage,
+                           ipmi::storage::cmdSetSelTime,
+                           ipmi::Privilege::Operator, ipmiStorageSetSelTime);
+-
++#ifndef JOURNAL_SEL
+     // <Get SEL Entry>
+     ipmi_register_callback(NETFUN_STORAGE, IPMI_CMD_GET_SEL_ENTRY, NULL,
+                            getSELEntry, PRIVILEGE_USER);
++#else
++    ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnStorage,
++                          ipmi::storage::cmdGetSelEntry, ipmi::Privilege::User,
++                          ipmiStorageGetSELEntry);
++#endif
+ 
++#ifndef JOURNAL_SEL
+     // <Delete SEL Entry>
+     ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnStorage,
+                           ipmi::storage::cmdDeleteSelEntry,
+                           ipmi::Privilege::Operator, deleteSELEntry);
+-
++#endif
+     // <Add SEL Entry>
+     ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnStorage,
+                           ipmi::storage::cmdAddSelEntry,
+                           ipmi::Privilege::Operator, ipmiStorageAddSEL);
+-
++#ifndef JOURNAL_SEL
+     // <Clear SEL>
+     ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnStorage,
+                           ipmi::storage::cmdClearSel, ipmi::Privilege::Operator,
+                           clearSEL);
+-
++#else
++    ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnStorage,
++                          ipmi::storage::cmdClearSel, ipmi::Privilege::Operator,
++                          ipmiStorageClearSEL);
++#endif
+     // <Get FRU Inventory Area Info>
+     ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnStorage,
+                           ipmi::storage::cmdGetFruInventoryAreaInfo,
+-- 
+2.17.1
+
