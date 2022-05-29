@@ -1,18 +1,17 @@
-From 27394b71d80efdb0e6f8f5e6c0ea67821f6b9868 Mon Sep 17 00:00:00 2001
-From: Stanley Chu <yschu@nuvoton.com>
-Date: Thu, 19 May 2022 16:33:46 +0800
-Subject: [PATCH] scm-npcm845 board setting
+From 46f9f2d2f573f77ebed735db16f7dc9936b9c8c3 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Sat, 28 May 2022 00:33:41 +0800
+Subject: [PATCH] scm npcm845 board setting
 
-Signed-off-by: Stanley Chu <yschu@nuvoton.com>
 ---
- board/nuvoton/arbel/arbel.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ board/nuvoton/arbel/arbel.c | 38 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
 diff --git a/board/nuvoton/arbel/arbel.c b/board/nuvoton/arbel/arbel.c
-index a674757064..32a45fcdc3 100644
+index a674757064..dbb7ecbfaf 100644
 --- a/board/nuvoton/arbel/arbel.c
 +++ b/board/nuvoton/arbel/arbel.c
-@@ -77,6 +77,23 @@ int board_init(void)
+@@ -77,6 +77,44 @@ int board_init(void)
  	arbel_clk_init();
  	arbel_eth_init();
  
@@ -33,9 +32,30 @@ index a674757064..32a45fcdc3 100644
 +	/* clear VGAIOEN */
 +	clrbits_le32(0xF080003C, BIT(6));
 +
++	/*set PCIRREL*/
++	setbits_le32(0xf08000a0, BIT(0));
++
++	clrbits_le32(0xf0801080, BIT(7) | BIT(8) | BIT(9) | BIT(5));
++	clrbits_le32(0xf0801084, BIT(7) | BIT(8) | BIT(9) | BIT(5));
++	clrbits_le32(0xf0801088, BIT(7) | BIT(8) | BIT(9) | BIT(5));
++	clrbits_le32(0xf080108c, BIT(7) | BIT(8) | BIT(9) | BIT(5));
++	clrbits_le32(0xf0801090, BIT(7) | BIT(8) | BIT(9) | BIT(5));
++	clrbits_le32(0xf0801094, BIT(7) | BIT(8) | BIT(9) | BIT(5));
++	clrbits_le32(0xf0801098, BIT(7) | BIT(8) | BIT(9) | BIT(5));
++	clrbits_le32(0xf080109c, BIT(7) | BIT(8) | BIT(9) | BIT(5));
++
++	clrbits_le32(0xf0801038, BIT(31) | BIT(24) | BIT(25));
++	clrbits_le32(0xf080103c, BIT(31) | BIT(24) | BIT(25));
++	clrbits_le32(0xf0801040, BIT(31) | BIT(24) | BIT(25));
++	clrbits_le32(0xf0801044, BIT(31) | BIT(24) | BIT(25));
++	clrbits_le32(0xf0801048, BIT(31) | BIT(24) | BIT(25));
++	clrbits_le32(0xf080104c, BIT(31) | BIT(24) | BIT(25));
++	clrbits_le32(0xf0801050, BIT(31) | BIT(24) | BIT(25));
++	clrbits_le32(0xf080105c, BIT(31) | BIT(24) | BIT(25));
++
  	return 0;
  }
  
 -- 
-2.17.1
+2.34.1
 
