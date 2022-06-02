@@ -8,6 +8,7 @@ export PATH=$PATH:/usr/sbin:/usr/libexec
 
 DELAY_POWER_ON="0.5"
 DELAY_POWER_OFF="5"
+DELAY_POWER_RECOVERY_MODE="10"
 POWER_BTN_TIMEOUT_CNT=60
 
 REV_EVT="EVT"
@@ -20,10 +21,44 @@ DBUS_HOST_ST_OFF="xyz.openbmc_project.State.Host.HostState.Off"
 HOST_ST_UNKNOW="Unknow"
 HOST_ST_ON="On"
 HOST_ST_OFF="Off"
+HOST_ST_SLEEP="Sleep"
+HOST_ST_DFU="DFU"
+HOST_ST_RECOVERY="Recovery"
 HOST_AC_ON="AC On"
 HOST_AC_OFF="AC Off"
 
-function get_board_rev() {
+ACTION_ON="on"
+ACTION_OFF="off"
+ACTION_DFU="dfu"
+ACTION_RECOVERY="recovery"
+ACTION_AC_ON="ac-on"
+ACTION_AC_OFF="ac-off"
+ACTION_STATUS="status"
+
+VALID_SLED_ACTIONS="
+    $ACTION_ON
+    $ACTION_OFF
+    $ACTION_AC_ON
+    $ACTION_AC_OFF
+    $ACTION_STATUS
+    $ACTION_DFU
+    $ACTION_RECOVERY
+"
+
+function is_valid_sled_action()
+{
+    local ACTION=$1
+    for i in $VALID_SLED_ACTIONS
+    do
+        if [ "$i" = "$ACTION" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+function get_board_rev()
+{
     local rev_id0
     local rev_id1
     local rev_id2
@@ -51,7 +86,8 @@ function get_board_rev() {
 }
 
 #Switch pull low while it be touched
-function wait_for_switch() {
+function wait_for_switch()
+{
     TARGET_PIN=$1
     TARGET_SWITCH=1
     TIME_CNT=0
@@ -66,7 +102,8 @@ function wait_for_switch() {
     done
 }
 
-function trigger_power_button() {
+function trigger_power_button()
+{
     local sled_num=$1
     local delay_time=$2
 
@@ -98,7 +135,8 @@ function trigger_power_button() {
     fi
 }
 
-function release_power_button() {
+function release_power_button()
+{
     local sled_num=$1
     GPIO_DETECT_PIN1="SLED${sled_num}_MS_DETECT1"
 
@@ -119,7 +157,8 @@ function release_power_button() {
     return 1
 }
 
-function press_power_button() {
+function press_power_button()
+{
     local sled_num=$1
 
     GPIO_DETECT_PIN0="SLED${sled_num}_MS_DETECT0"
@@ -139,7 +178,8 @@ function press_power_button() {
 }
 
 #Get i2c bus number for sledN
-function get_bus_num() {
+function get_bus_num()
+{
     SLED_NUM=$1
     local bus=0
     #Mapping Sled number 1~6 to i2c bus number 0~5
@@ -185,7 +225,8 @@ function get_gpio()
     return 0
 }
 
-function get_ac_status(){
+function get_ac_status()
+{
     i2c_bus=$(get_bus_num "$1")
     p1_output_reg=$(i2cget -f -y "$i2c_bus" 0x76 0x03)
     p1_config_reg=$(i2cget -f -y "$i2c_bus" 0x76 0x07)
@@ -224,8 +265,8 @@ function get_host_status_dbus()
 
 function get_host_status_mdio()
 {
-    SLED_NUM=$1
-    MDIO_BUS=0
+    local SLED_NUM=$1
+    local MDIO_BUS=0
 
     declare -a PORT_MAP=(0 3 2 1 7 6 5)
 
@@ -234,17 +275,41 @@ function get_host_status_mdio()
         return 1
     fi
 
-    CHECK_CNT=0
-    MDIO_ERR_CNT=0
-    CUR_HOST_ST=$HOST_ST_UNKNOW
+    local CHECK_CNT=0
+    local MDIO_ERR_CNT=0
+    local CUR_HOST_ST=$HOST_ST_UNKNOW
+    local SLED_LAST_ACTION
+
+    if [ -f /tmp/sled"${SLED_NUM}"-last-action ]; then
+        SLED_LAST_ACTION=$(cat /tmp/sled"${SLED_NUM}"-last-action)
+    fi
 
     while true
     do
         if POST_ST_VAL=$(mdio-util c22 r $MDIO_BUS "${PORT_MAP[SLED_NUM]}" 0); then
-            if [ $((POST_ST_VAL&16#0800)) -eq $((16#0800)) ]; then
+            if [ $((POST_ST_VAL&16#0800)) -eq $((16#0000)) ]; then
+                case $SLED_LAST_ACTION in
+                    "$ACTION_DFU")
+                        TMP_HOST_ST="$HOST_ST_DFU"
+                        ;;
+                    *)
+                        TMP_HOST_ST="$HOST_ST_OFF"
+                        ;;
+                esac
+            elif [ $((POST_ST_VAL&16#0A00)) -eq $((16#0A00)) ]; then
                 TMP_HOST_ST="$HOST_ST_ON"
+                case $SLED_LAST_ACTION in
+                    "$ACTION_RECOVERY")
+                        TMP_HOST_ST="$HOST_ST_RECOVERY"
+                        ;;
+                    *)
+                        TMP_HOST_ST="$HOST_ST_ON"
+                        ;;
+                esac
+            elif [ $((POST_ST_VAL&16#0900)) -eq $((16#0900)) ]; then
+                TMP_HOST_ST="$HOST_ST_SLEEP"
             else
-                TMP_HOST_ST="$HOST_ST_OFF"
+                TMP_HOST_ST="$HOST_ST_UNKNOW"
             fi
 
             if [ "$CUR_HOST_ST" == "$TMP_HOST_ST" ]; then
@@ -273,17 +338,228 @@ function get_host_status_mdio()
 function get_host_status()
 {
     local sled_num=$1
-    local board_rev
 
-    board_rev=$(get_board_rev)
+    if [ "$(get_ac_status "$SLED_NUM")" == "$HOST_AC_OFF" ];then
+        echo "$HOST_AC_OFF"
+        return 0
+    fi
 
-    if [ "$board_rev" = "$REV_EVT" ]; then
+    if [ "$(get_board_rev)" = "$REV_EVT" ]; then
         get_host_status_dbus "$sled_num"
     else
         get_host_status_mdio "$sled_num"
     fi
-
     return $?
+}
+
+function do_action_ac_on()
+{
+    local SLED_NUM=$1
+    echo "sled${SLED_NUM}: turn on AC"
+    set_gpio "power-host${SLED_NUM}" 1
+    echo "$ACTION_AC_ON" > "/tmp/sled${SLED_NUM}-last-action"
+}
+
+function do_action_ac_off()
+{
+    local SLED_NUM=$1
+    echo "sled${SLED_NUM}: turn off AC"
+    set_gpio "power-host${SLED_NUM}" 0
+    echo "$ACTION_AC_OFF" > "/tmp/sled${SLED_NUM}-last-action"
+}
+
+function do_action_on()
+{
+    local SLED_NUM=$1
+    echo "sled${SLED_NUM}: power on host"
+    trigger_power_button  "$SLED_NUM"  "$DELAY_POWER_ON"
+    echo "$ACTION_ON" > "/tmp/sled${SLED_NUM}-last-action"
+}
+
+function do_action_off()
+{
+    local SLED_NUM=$1
+    echo "sled${SLED_NUM}: power off host"
+    trigger_power_button  "$SLED_NUM"  "$DELAY_POWER_OFF"
+    echo "$ACTION_OFF" > "/tmp/sled${SLED_NUM}-last-action"
+}
+
+function do_action_recovery()
+{
+    local SLED_NUM=$1
+    echo "sled${SLED_NUM}: trigger host recovery mode"
+    trigger_power_button  "$SLED_NUM"  "$DELAY_POWER_RECOVERY_MODE"
+    echo "$ACTION_RECOVERY" > "/tmp/sled${SLED_NUM}-last-action"
+}
+
+function do_action_dfu()
+{
+    local SLED_NUM=$1
+    echo "sled${SLED_NUM}: trigger host dfu mode"
+
+    # turn ac off, and hold for 25 seconds
+    do_action_ac_off "$SLED_NUM"
+    sleep 25
+
+    # press power button
+    echo "SLED$SLED_NUM: pressing power button"
+    if ! press_power_button "$SLED_NUM"; then
+        echo "SLED$SLED_NUM: press power button failed"
+        echo "SLED$SLED_NUM: releasing power button"
+        release_power_button "$SLED_NUM"
+        exit 1
+    fi
+    sleep 1
+
+    # turn ac on
+    echo "SLED$SLED_NUM: turn ac-on"
+    do_action_ac_on "$SLED_NUM"
+    sleep 3
+
+    # release power button
+    echo "SLED$SLED_NUM: releasing host power button"
+    if ! release_power_button "$SLED_NUM"; then
+        echo "SLED$SLED_NUM: release power button failed"
+        exit 1
+    fi
+    echo "$ACTION_DFU" > "/tmp/sled${SLED_NUM}-last-action"
+}
+
+function host_state_on_action_handler()
+{
+    local SLED_NUM=$1
+    local ACTION=$2
+
+    case $ACTION in
+        "$ACTION_OFF")
+            do_action_off "$SLED_NUM"
+            ;;
+        "$ACTION_AC_OFF")
+            do_action_ac_off "$SLED_NUM"
+            ;;
+        *)
+            echo "Invalid action ($ACTION) for current host state (On)"
+            return 1
+            ;;
+    esac
+}
+
+function host_state_sleep_action_handler()
+{
+    local SLED_NUM=$1
+    local ACTION=$2
+
+    case $ACTION in
+        "$ACTION_ON")
+            do_action_on "$SLED_NUM"
+            ;;
+        "$ACTION_OFF")
+            do_action_off "$SLED_NUM"
+            ;;
+        "$ACTION_AC_OFF")
+            do_action_ac_off "$SLED_NUM"
+            ;;
+        *)
+            echo "Invalid action ($ACTION) for current host state (Sleep)"
+            return 1
+            ;;
+    esac
+}
+
+function host_state_off_action_handler()
+{
+    local SLED_NUM=$1
+    local ACTION=$2
+
+    case $ACTION in
+        "$ACTION_ON")
+            do_action_on "$SLED_NUM"
+            ;;
+        "$ACTION_RECOVERY")
+            do_action_recovery "$SLED_NUM"
+            ;;
+        "$ACTION_AC_OFF")
+            do_action_ac_off "$SLED_NUM"
+            ;;
+        *)
+            echo "Invalid action ($ACTION) for current host state (Off)"
+            return 1
+            ;;
+    esac
+}
+
+function host_state_ac_off_action_handler()
+{
+    local SLED_NUM=$1
+    local ACTION=$2
+
+    case $ACTION in
+        "$ACTION_AC_ON")
+            do_action_ac_on "$SLED_NUM"
+            ;;
+        "$ACTION_DFU")
+            do_action_dfu "$SLED_NUM"
+            ;;
+        "$ACTION_AC_OFF")
+            echo "sled${SLED_NUM}: already ac off"
+            return 1
+            ;;
+        *)
+            echo "Invalid action ($ACTION) for current host state (AC Off)"
+            return 1
+            ;;
+    esac
+}
+
+function host_state_ac_on_action_handler()
+{
+    local SLED_NUM=$1
+    local ACTION=$2
+
+    case $ACTION in
+        "$ACTION_AC_OFF")
+            do_action_ac_off "$SLED_NUM"
+            ;;
+        *)
+            echo "sled${SLED_NUM}: already ac on"
+            return 1
+            ;;
+    esac
+}
+
+function host_state_recovery_action_handler()
+{
+    local SLED_NUM=$1
+    local ACTION=$2
+
+    case $ACTION in
+        "$ACTION_OFF")
+            do_action_off "$SLED_NUM"
+            ;;
+        "$ACTION_AC_OFF")
+            do_action_ac_off "$SLED_NUM"
+            ;;
+        *)
+            echo "Invalid action ($ACTION) for current host state (Recovery)"
+            return 1
+            ;;
+    esac
+}
+
+function host_state_dfu_action_handler()
+{
+    local SLED_NUM=$1
+    local ACTION=$2
+
+    case $ACTION in
+        "$ACTION_AC_OFF")
+            do_action_ac_off "$SLED_NUM"
+            ;;
+        *)
+            echo "Invalid action ($ACTION) for current host state (DFU)"
+            return 1
+            ;;
+    esac
 }
 
 function create_dev_mem()
@@ -309,9 +585,10 @@ function create_dev_mem()
 }
 
 function show_usage(){
-    echo "Usage: power-ctrl [sled1 | sled2 | sled3 | sled4 | sled5 | sled6]  [on off ac-on ac-off status dfu recovery]"
+    echo "Usage: power-ctrl [sled1 | sled2 | sled3 | sled4 | sled5 | sled6]  [$VALID_SLED_ACTIONS]"
     echo "       power-ctrl chassis-cycle"
 }
+
 
 if [ $# -eq 1 ]; then
     if [ "$1" = "chassis-cycle" ];then
@@ -346,106 +623,37 @@ SLED_PRESENT=$(get_gpio "presence-sled${SLED_NUM}")
 if [ "$SLED_PRESENT" != 0 ];then
     echo "${SLED} is not present!"
     exit 1
+elif ! is_valid_sled_action "$ACTION"; then
+    echo "Unknown action: $ACTION"
+    show_usage
+    exit 1
 fi
 
-if [[ "$ACTION" == "on" ]]; then
-    if [ "$(get_ac_status "$SLED_NUM")" == "$HOST_AC_ON" ];then
-        host_power_st=$(get_host_status "$SLED_NUM")
-        if [ "$host_power_st" == "$HOST_ST_ON" ]; then
-            echo "${SLED} is already On"
-        elif [ "$host_power_st" == "$HOST_ST_OFF" ]; then
-            echo "Power on ${SLED}"
-            trigger_power_button  "$SLED_NUM"  "$DELAY_POWER_ON"
-        else
-            echo "${SLED} power state is $host_power_st"
-            exit 1
-        fi
-    else
-        echo "${SLED} is ac-off, please turn on ac before power on"
-        exit 1
-    fi
-elif [[ "$ACTION" == "off" ]];then
-    if [ "$(get_ac_status "$SLED_NUM")" == "$HOST_AC_ON" ];then
-        host_power_st=$(get_host_status "$SLED_NUM")
-        if [ "$host_power_st" == "$HOST_ST_ON" ]; then
-            echo "Power off ${SLED}"
-            trigger_power_button  "$SLED_NUM"  "$DELAY_POWER_OFF"
-        elif [ "$host_power_st" == "$HOST_ST_OFF" ]; then
-            echo "${SLED} is already Off"
-        else
-            echo "${SLED} power state is $host_power_st"
-            exit 1
-        fi
-    else
-        echo "${SLED} is already ac-off"
-        exit 1
-    fi
-elif [[ "$ACTION" == "status" ]];then
-    AC_ST=$(get_ac_status "$SLED_NUM")
-    if [ "$AC_ST" == "$HOST_AC_ON" ]; then
-        # check host power status if AC is on
-        get_host_status "$SLED_NUM" || exit 1
-    else
-        # AC off
-        echo "$HOST_AC_OFF"
-    fi
-elif [[ "$ACTION" == "ac-on" ]];then
-    set_gpio "power-host${SLED_NUM}" 1
-elif [[ "$ACTION" == "ac-off" ]];then
-    set_gpio "power-host${SLED_NUM}" 0
-elif [[ "$ACTION" == "dfu" ]]; then
-    echo "Set host$SLED_NUM DFU mode"
-
-    # turn ac off, and hold for 25 seconds
-    echo "SLED$SLED_NUM: turn ac-off"
-    set_gpio "power-host${SLED_NUM}" 0
-    sleep 25
-
-    # press power button
-    echo "SLED$SLED_NUM: pressing power button"
-    if ! press_power_button "$SLED_NUM"; then
-        echo "SLED$SLED_NUM: press power button failed"
-        echo "SLED$SLED_NUM: releasing power button"
-        release_power_button "$SLED_NUM"
-        exit 1
-    fi
-    sleep 1
-
-    # turn ac on
-    echo "SLED$SLED_NUM: turn ac-on"
-    set_gpio "power-host${SLED_NUM}" 1
-    sleep 3
-
-    # release power button
-    echo "SLED$SLED_NUM: releasing host power button"
-    if ! release_power_button "$SLED_NUM"; then
-        echo "SLED$SLED_NUM: release power button failed"
-        exit 1
-    fi
-elif [[ "$ACTION" == "recovery" ]]; then
-    if [ "$(get_host_status "$SLED_NUM")" != "$HOST_ST_OFF" ]; then
-        echo "Please turn off host before trigger recovery mode"
-        exit 1
-    fi
-    echo "Set host$SLED_NUM Recovery mode"
-
-    # press power button
-    echo "SLED$SLED_NUM: pressing power button"
-    if ! press_power_button "$SLED_NUM"; then
-        echo "SLED$SLED_NUM: press power button failed"
-        echo "SLED$SLED_NUM: releasing power button"
-        release_power_button "$SLED_NUM"
-        exit 1
-    fi
-    sleep 10
-
-    # release power button
-    echo "SLED$SLED_NUM: releasing host power button"
-    if ! release_power_button "$SLED_NUM"; then
-        echo "SLED$SLED_NUM: release power button failed"
-        exit 1
-    fi
+HOST_CURR_STATUS=$(get_host_status "$SLED_NUM")
+if [ "$ACTION" = "$ACTION_STATUS" ];then
+    echo "$HOST_CURR_STATUS"
 else
-    echo "Unknown action: [ ${ACTION} ]"
-    show_usage
+    case $HOST_CURR_STATUS in
+        "$HOST_AC_OFF")
+            host_state_ac_off_action_handler "$SLED_NUM" "$ACTION"
+            ;;
+        "$HOST_AC_ON")
+            host_state_ac_on_action_handler "$SLED_NUM" "$ACTION"
+            ;;
+        "$HOST_ST_OFF")
+            host_state_off_action_handler "$SLED_NUM" "$ACTION"
+            ;;
+        "$HOST_ST_ON")
+            host_state_on_action_handler "$SLED_NUM" "$ACTION"
+            ;;
+        "$HOST_ST_SLEEP")
+            host_state_sleep_action_handler "$SLED_NUM" "$ACTION"
+            ;;
+        "$HOST_ST_DFU")
+            host_state_dfu_action_handler "$SLED_NUM" "$ACTION"
+            ;;
+        "$HOST_ST_RECOVERY")
+            host_state_recovery_action_handler "$SLED_NUM" "$ACTION"
+            ;;
+    esac
 fi
