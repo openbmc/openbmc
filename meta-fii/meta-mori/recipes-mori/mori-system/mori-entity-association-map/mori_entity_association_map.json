@@ -1,0 +1,24 @@
+{
+    "system_board": [
+        {"instance": 1, "name": "/"}
+    ],
+    "system_internal_expansion_board": [
+        {"instance": 1, "name": "/"}
+    ],
+    "power_system_board": [
+        {"instance": 1, "name": "/"}
+    ],
+    "add_in_card": [
+        {"instance": 3, "name": "/PE0"},
+        {"instance": 5, "name": "/PE1"},
+        {"instance": 6, "name": "/PE2"},
+        {"instance": 7, "name": "/PE3"}
+    ],
+    "fan": [
+        {"instance": 0, "name": "/fan0"},
+        {"instance": 1, "name": "/fan1"}
+    ],
+    "cooling_unit": [
+        {"instance": 0, "name": "/ZONE0"}
+    ]
+}
