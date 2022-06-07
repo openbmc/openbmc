@@ -1,0 +1,28 @@
+From babceed326dca507a20161897b663f0e5c694952 Mon Sep 17 00:00:00 2001
+From: Medad CChien <ctcchien@nuvoton.com>
+Date: Tue, 15 Feb 2022 10:07:29 +0800
+Subject: [PATCH] hwmon temp: add tmp100 support
+
+Signed-off-by: Medad CChien <ctcchien@nuvoton.com>
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ src/HwmonTempMain.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/HwmonTempMain.cpp b/src/HwmonTempMain.cpp
+index c6843d4e..ff59fdcd 100644
+--- a/src/HwmonTempMain.cpp
++++ b/src/HwmonTempMain.cpp
+@@ -50,7 +50,8 @@ static constexpr double minValueTemperature = -128; // DegreesC
+ 
+ namespace fs = std::filesystem;
+ static auto sensorTypes{std::to_array<const char*>(
+-    {"xyz.openbmc_project.Configuration.BMCOnDieThermalSensor",
++    {"xyz.openbmc_project.Configuration.TMP100",
++     "xyz.openbmc_project.Configuration.BMCOnDieThermalSensor",
+      "xyz.openbmc_project.Configuration.DPS310",
+      "xyz.openbmc_project.Configuration.EMC1412",
+      "xyz.openbmc_project.Configuration.EMC1413",
+-- 
+2.34.1
+
