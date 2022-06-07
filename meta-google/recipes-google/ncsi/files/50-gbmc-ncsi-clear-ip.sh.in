@@ -1,0 +1,33 @@
+# Copyright 2021 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+[ -n "${gbmc_ncsi_clear_ip-}" ] && return
+
+source /usr/libexec/ncsid_lib.sh || exit
+
+gbmc_ncsi_clear_ip_hook() {
+  local ip="${1-}"
+
+  # We only want to clear our IPs if we are assigning a new IP
+  [ -z "$ip" ] && return
+
+  echo "Removing Persistent NCSI IPs" >&2
+  SetStatic xyz.openbmc_project.Network '@NCSI_IF@' 2>/dev/null || true
+  UpdateIP xyz.openbmc_project.Network '@NCSI_IF@' '0.0.0.0' '0' 2>/dev/null || true
+  UpdateIP xyz.openbmc_project.Network '@NCSI_IF@' '::' '0' 2>/dev/null || true
+}
+
+GBMC_BR_LIB_SET_IP_HOOKS+=(gbmc_ncsi_clear_ip_hook)
+
+gbmc_ncsi_clear_ip=1

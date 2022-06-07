@@ -7,8 +7,7 @@ Conflicts=obmc-chassis-poweroff@%i.target
 ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
-ExecStart=/usr/bin/env vrm.sh
-SyslogIdentifier=vrm.sh
+ExecStart=/usr/bin/vrm.sh
 Type=oneshot
 RemainAfterExit=yes
 

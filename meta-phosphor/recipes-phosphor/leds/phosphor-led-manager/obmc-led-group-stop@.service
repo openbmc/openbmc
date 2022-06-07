@@ -1,5 +1,5 @@
 [Unit]
-Description=Assert %i LED
+Description=Deassert %i LED
 Wants=mapper-wait@-xyz-openbmc_project-led-groups-%i.service
 After=mapper-wait@-xyz-openbmc_project-led-groups-%i.service
 Conflicts=obmc-led-group-start@%i.service

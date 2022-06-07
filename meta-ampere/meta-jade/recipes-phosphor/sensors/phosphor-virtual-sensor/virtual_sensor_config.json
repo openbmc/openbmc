@@ -43,18 +43,54 @@
                 }
             ]
         },
-        "Expression": "(P0 + P1) >= 0 ? (P0 + P1) : NULL"
+        "Expression": "((P0 == P0) ? P0 : 0) + ((P1 == P1) ? P1 : 0)"
+    },
+    {
+        "Desc": {
+            "Name": "S1_CPU_Pwr",
+            "SensorType": "power"
+        },
+        "Threshold" :
+        {
+            "CriticalHigh": 500
+        },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade"
+            ],
+            [
+                "inventory",
+                "sensors",
+                "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "P1",
+                    "Desc": {
+                        "Name": "S1_Core_VRD_Pwr",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "P2",
+                    "Desc": {
+                        "Name": "S1_SOC_VRD_Pwr",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "(P1 + P2) >= 0 ? (P1 + P2) : NULL"
     },
     {
         "Desc":{
-            "Name":"nvme_max",
+            "Name":"nvme_bp_max",
             "SensorType":"temperature"
-        },
-        "Threshold":{
-            "CriticalHigh": 80,
-            "CriticalLow": 0,
-            "WarningHigh": 70,
-            "WarningLow": 5
         },
         "Params":{
             "DbusParam": [
@@ -225,7 +261,18 @@
                         "Name": "nvme23",
                         "SensorType": "temperature"
                     }
-                },
+                }
+            ]
+        },
+        "Expression": "max(0,(n0 == n0) ? n0 : NULL,(n1 == n1) ? n1 : NULL,(n2 == n2) ? n2 : NULL,(n3 == n3) ? n3 : NULL,(n4 == n4) ? n4 : NULL,(n5 == n5) ? n5 : NULL,(n6 == n6) ? n6 : NULL,(n7 == n7) ? n7 : NULL,(n8 == n8) ? n8 : NULL,(n9 == n9) ? n9 : NULL,(n10 == n10) ? n10 : NULL,(n11 == n11) ? n11 : NULL,(n12 == n12) ? n12 : NULL,(n13 == n13) ? n13 : NULL,(n14 == n14) ? n14 : NULL,(n15 == n15) ? n15 : NULL,(n16 == n16) ? n16 : NULL,(n17 == n17) ? n17 : NULL,(n18 == n18) ? n18 : NULL,(n19 == n19) ? n19 : NULL,(n20 == n20) ? n20 : NULL,(n21 == n21) ? n21 : NULL,(n22 == n22) ? n22 : NULL,(n23 == n23) ? n23 : NULL)"
+    },
+    {
+        "Desc":{
+            "Name":"nvme_m2_max",
+            "SensorType":"temperature"
+        },
+        "Params":{
+            "DbusParam": [
                 {
                     "ParamName": "n24",
                     "Desc": {
@@ -242,7 +289,7 @@
                 }
             ]
         },
-        "Expression": "max(0,(n0 == n0) ? n0 : NULL,(n1 == n1) ? n1 : NULL,(n2 == n2) ? n2 : NULL,(n3 == n3) ? n3 : NULL,(n4 == n4) ? n4 : NULL,(n5 == n5) ? n5 : NULL,(n6 == n6) ? n6 : NULL,(n7 == n7) ? n7 : NULL,(n8 == n8) ? n8 : NULL,(n9 == n9) ? n9 : NULL,(n10 == n10) ? n10 : NULL,(n11 == n11) ? n11 : NULL,(n12 == n12) ? n12 : NULL,(n13 == n13) ? n13 : NULL,(n14 == n14) ? n14 : NULL,(n15 == n15) ? n15 : NULL,(n16 == n16) ? n16 : NULL,(n17 == n17) ? n17 : NULL,(n18 == n18) ? n18 : NULL,(n19 == n19) ? n19 : NULL,(n20 == n20) ? n20 : NULL,(n21 == n21) ? n21 : NULL,(n22 == n22) ? n22 : NULL,(n23 == n23) ? n23 : NULL,(n24 == n24) ? n24 : NULL,(n25 == n25) ? n25 : NULL)"
+        "Expression": "max(0,(n24 == n24) ? n24 : NULL,(n25 == n25) ? n25 : NULL)"
     }
 ]
 

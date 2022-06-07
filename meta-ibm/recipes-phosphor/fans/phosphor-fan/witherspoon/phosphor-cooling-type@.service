@@ -8,8 +8,7 @@ ConditionPathExists={envfiledir}/obmc/phosphor-fan/phosphor-cooling-type-%i.conf
 Type=oneshot
 RemainAfterExit=yes
 EnvironmentFile={envfiledir}/obmc/phosphor-fan/phosphor-cooling-type-%i.conf
-ExecStart=/usr/bin/env phosphor-cooling-type ${{OBJPATH}} ${{AIR}} ${{WATER}} ${{DEVICE}} ${{CODE}}
-SyslogIdentifier=phosphor-cooling-type
+ExecStart=/usr/bin/phosphor-cooling-type ${{OBJPATH}} ${{AIR}} ${{WATER}} ${{DEVICE}} ${{CODE}}
 
 [Install]
 RequiredBy=multi-user.target

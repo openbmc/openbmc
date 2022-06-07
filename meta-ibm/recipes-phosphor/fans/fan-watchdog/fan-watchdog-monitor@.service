@@ -6,5 +6,4 @@ StartLimitIntervalSec=0
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/env phosphor-unit-failure-monitor --source %i --target obmc-fan-watchdog-takeover.target --action start
-SyslogIdentifier=phosphor-unit-failure-monitor
+ExecStart=/usr/bin/phosphor-unit-failure-monitor --source %i --target obmc-fan-watchdog-takeover.target --action start

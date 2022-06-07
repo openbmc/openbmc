@@ -1,0 +1,9 @@
+[Unit]
+Before=gbmc-ip-monitor.service
+Before=systemd-networkd.service
+
+[Service]
+ExecStart=/bin/bash -c 'source /usr/share/gbmc-br-lib.sh && gbmc_br_reload_ip'
+
+[Install]
+WantedBy=multi-user.target

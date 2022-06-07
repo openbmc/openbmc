@@ -4,8 +4,7 @@ After=xyz.openbmc_project.Logging.service
 BindsTo=xyz.openbmc_project.Logging.service
 
 [Service]
-ExecStart=/usr/bin/env ibm-log-manager
-SyslogIdentifier=ibm-log-manager
+ExecStart=/usr/bin/ibm-log-manager
 Restart=always
 Type=dbus
 BusName={BUSNAME}

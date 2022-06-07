@@ -13,23 +13,25 @@ customization for your platform.
 ## Setting up your OpenBMC project
 
 ### 1) Prerequisite
-- Ubuntu 14.04
 
+See the [Yocto documentation](https://docs.yoctoproject.org/ref-manual/system-requirements.html#required-packages-for-the-build-host)
+for the latest requirements
+
+#### Ubuntu
 ```
-sudo apt-get install -y git build-essential libsdl1.2-dev texinfo gawk chrpath diffstat \
-    zstd pigz
+$ sudo apt install git python3-distutils gcc g++ make file wget \
+    gawk diffstat bzip2 cpio chrpath zstd lz4 bzip2
 ```
 
-- Fedora 28
+#### Fedora
+```
+$ sudo dnf install git python3 gcc g++ gawk which bzip2 chrpath cpio
+hostname file diffutils diffstat lz4 wget zstd rpcgen patch
+```
 
-```
-sudo dnf install -y git patch diffstat texinfo chrpath SDL-devel bitbake \
-    rpcgen perl-Thread-Queue perl-bignum perl-Crypt-OpenSSL-Bignum perl-FindBin
-sudo dnf groupinstall "C Development Tools and Libraries"
-```
 ### 2) Download the source
 ```
-git clone git@github.com:openbmc/openbmc.git
+git clone https://github.com/openbmc/openbmc
 cd openbmc
 ```
 

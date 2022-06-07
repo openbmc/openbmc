@@ -14,7 +14,7 @@ This layer depends on:
 Patches
 =======
 
-Please submit any patches against the meta-google layer to the OpenBMC gerrit https://gerrit.openbmc-project.xyz/
+Please submit any patches against the meta-google layer to the OpenBMC gerrit https://gerrit.openbmc.org/
 
 Layer maintainer: Patrick Venture <venture@google.com>
 

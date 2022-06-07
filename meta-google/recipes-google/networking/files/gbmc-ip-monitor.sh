@@ -66,9 +66,11 @@ gbmc_ip_monitor_parse_line() {
     pfx_re='^\[ADDR\](Deleted )?[0-9]+:[[:space:]]*'
     intf_re='([^ ]+)[[:space:]]+'
     fam_re='([^ ]+)[[:space:]]+'
-    addr_re='([^/]+)/[0-9]+[[:space:]]+(brd[[:space:]]+[^ ]+[[:space:]]+)?'
+    addr_re='([^/]+)/[0-9]+[[:space:]]+'
+    metric_re='(metric[[:space:]]+[^ ]+[[:space:]]+)?'
+    brd_re='(brd[[:space:]]+[^ ]+[[:space:]]+)?'
     scope_re='scope[[:space:]]+([^ ]+)[[:space:]]*(.*)'
-    combined_re="${pfx_re}${intf_re}${fam_re}${addr_re}${scope_re}"
+    combined_re="${pfx_re}${intf_re}${fam_re}${addr_re}${metric_re}${brd_re}${scope_re}"
     if ! [[ "$line" =~ ${combined_re} ]]; then
       echo "Failed to parse addr: $line" >&2
       return 1
@@ -79,8 +81,8 @@ gbmc_ip_monitor_parse_line() {
     intf="${BASH_REMATCH[2]}"
     fam="${BASH_REMATCH[3]}"
     ip="${BASH_REMATCH[4]}"
-    scope="${BASH_REMATCH[6]}"
-    flags="${BASH_REMATCH[7]}"
+    scope="${BASH_REMATCH[7]}"
+    flags="${BASH_REMATCH[8]}"
   elif [[ "$line" == '[ROUTE]'* ]]; then
     line="${line#[ROUTE]}"
     change=route

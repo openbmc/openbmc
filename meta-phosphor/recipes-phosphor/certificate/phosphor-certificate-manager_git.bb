@@ -9,7 +9,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 SRC_URI = "git://github.com/openbmc/phosphor-certificate-manager;branch=master;protocol=https"
-SRCREV = "ebd21ba4fc36577a70cad207e42d66594b73ed13"
+SRCREV = "332ce8b0a3d100638fd62f26f8a23f2804b7bb52"
 
 inherit meson pkgconfig systemd
 

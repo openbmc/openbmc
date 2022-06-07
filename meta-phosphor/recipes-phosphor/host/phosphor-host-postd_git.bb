@@ -21,7 +21,7 @@ DEPENDS += "libgpiod"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-host-postd;branch=master;protocol=https"
-SRCREV = "60b8995627c8018bfc8b7b761a68d4403de47570"
+SRCREV = "d309da4e3a005c1f2ba479b94cb297e037451e2a"
 
 SNOOP_DEVICE ?= "aspeed-lpc-snoop0"
 POST_CODE_BYTES ?= "1"

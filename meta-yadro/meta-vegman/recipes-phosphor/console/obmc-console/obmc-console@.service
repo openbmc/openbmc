@@ -1,0 +1,14 @@
+[Unit]
+Description=Phosphor Console Muxer listening on device /dev/%I
+BindsTo=dev-%i.device
+After=dev-%i.device
+
+[Service]
+ExecStartPre=/usr/sbin/uart-remapping.sh init
+ExecStart=obmc-console-server --config {sysconfdir}/obmc-console.conf %i
+ExecStopPost=/usr/sbin/uart-remapping.sh reset
+SyslogIdentifier=obmc-console-server
+Restart=always
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

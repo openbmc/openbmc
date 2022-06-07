@@ -3,7 +3,6 @@ POWER_SERVICE_PACKAGES_FP5280G2 = " \
                                     phosphor-power-systemd-links-monitor \
                                     phosphor-power-utils \
                                     phosphor-power \
-                                    phosphor-power-psu-monitor \
                                   "
 
 RDEPENDS:${PN}-inventory:append:fp5280g2 = " \

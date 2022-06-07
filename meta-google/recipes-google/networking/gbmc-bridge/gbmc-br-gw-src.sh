@@ -12,22 +12,53 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-[ -z "${gbmc_br_gw_src_lib-}" ] || return
+[ -n "${gbmc_br_gw_src_lib-}" ] && return
 
 source /usr/share/network/lib.sh || exit
 
-gbmc_br_gw_src_ip=
+gbmc_br_gw_src_ip_stateful=
+gbmc_br_gw_src_ip_stateless=
 declare -A gbmc_br_gw_src_routes=()
+gbmc_br_gw_defgw=
+
+gbmc_br_set_router() {
+  local defgw=
+  local route
+  for route in "${!gbmc_br_gw_src_routes[@]}"; do
+    if [[ "$route" != *' dev gbmcbr '* ]]; then
+      defgw=1
+      break
+    fi
+  done
+  [ "$defgw" = "$gbmc_br_gw_defgw" ] && return
+  gbmc_br_gw_defgw="$defgw"
+
+  local files=(/run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-defgw.conf)
+  if [ -n "$defgw" ]; then
+    local file
+    for file in "${files[@]}"; do
+      mkdir -p "$(dirname "$file")"
+      printf '[IPv6PrefixDelegation]\nRouterLifetimeSec=30\n' >"$file"
+    done
+  else
+    rm -f "${files[@]}"
+  fi
+
+  if [ "$(systemctl is-active systemd-networkd)" != 'inactive' ]; then
+    networkctl reload && networkctl reconfigure gbmcbr
+  fi
+}
 
 gbmc_br_gw_src_update() {
+  local gbmc_br_gw_src_ip="${gbmc_br_gw_src_ip_stateful:-$gbmc_br_gw_src_ip_stateless}"
   [ -n "$gbmc_br_gw_src_ip" ] || return
 
   local route
   for route in "${!gbmc_br_gw_src_routes[@]}"; do
     [[ "$route" != *" src $gbmc_br_gw_src_ip "* ]] || continue
     echo "gBMC Bridge Updating GW source [$gbmc_br_gw_src_ip]: $route" >&2
-    ip route change $route src "$gbmc_br_gw_src_ip"
-    unset 'gbmc_br_gw_src_routes[$route]'
+    ip route change $route src "$gbmc_br_gw_src_ip" && \
+      unset 'gbmc_br_gw_src_routes[$route]'
   done
 }
 
@@ -42,9 +73,11 @@ gbmc_br_gw_src_hook() {
     if [ "$action" = 'add' -a -z "${gbmc_br_gw_src_routes["$route"]}" ]; then
       gbmc_br_gw_src_routes["$route"]=1
       gbmc_br_gw_src_update
+      gbmc_br_set_router
     elif [ "$action" = 'del' -a -n "${gbmc_br_gw_src_routes["$route"]}" ]; then
       unset 'gbmc_br_gw_src_routes[$route]'
       gbmc_br_gw_src_update
+      gbmc_br_set_router
     fi
   # Match only global IP addresses on the bridge that match the BMC stateless
   # prefix (<mpfx>:fd00:). So 2002:af4:3480:2248:fd00:6345:3069:9186 would be
@@ -56,8 +89,14 @@ gbmc_br_gw_src_hook() {
       echo "gBMC Bridge Ensure RA Invalid IP: $ip" >&2
       return 1
     fi
-    if (( ip_bytes[8] != 0xfd || ip_bytes[9] != 0 )); then
+    # Ignore ULAs and non-gBMC addresses
+    if (( ip_bytes[0] & 0xfe == 0xfc || ip_bytes[8] != 0xfd )); then
       return 0
+    fi
+    if (( ip_bytes[9] != 0 )); then
+      local -n gbmc_br_gw_src_ip=gbmc_br_gw_src_ip_stateful
+    else
+      local -n gbmc_br_gw_src_ip=gbmc_br_gw_src_ip_stateless
     fi
     if [ "$action" = 'add' -a "$ip" != "$gbmc_br_gw_src_ip" ]; then
       gbmc_br_gw_src_ip="$ip"

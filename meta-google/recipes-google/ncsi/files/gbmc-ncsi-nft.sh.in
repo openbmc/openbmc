@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-[ -z "${gbmc_ncsi_nft_lib-}" ] || return
+[ -n "${gbmc_ncsi_nft_lib-}" ] && return
+
+source /usr/share/network/lib.sh || exit
 
 gbmc_ncsi_nft_init=
 gbmc_ncsi_nft_lastip4=
@@ -36,20 +38,13 @@ gbmc_ncsi_nft_update() {
 
   local ip6="$gbmc_ncsi_nft_lastip6"
   if [ -n "$ip6" ]; then
-    # Normalize the provided ipv6 address to the impersonated ipv6 address
-    local ip6_bytes=()
-    ip_to_bytes ip6_bytes "$ip6"
-    for (( i=8; i<16; ++i )); do
-      ip6_bytes[$i]=0
-    done
-    ip6="$(ip_bytes_to_str ip6_bytes)"
-    contents+="        ip6 daddr $ip6/128 goto ncsi_legacy_input"$'\n'
+    contents+="        ip6 daddr $ip6 goto ncsi_legacy_input"$'\n'
   fi
 
   contents+='    }'$'\n'
   contents+='}'$'\n'
 
-  local rfile=/run/nftables/40-gbmc-ncsi-in.rules
+  local rfile=/run/nftables/30-gbmc-ncsi-in.rules
   mkdir -p -m 755 "$(dirname "$rfile")"
   printf '%s' "$contents" >"$rfile"
 
@@ -60,10 +55,17 @@ gbmc_ncsi_nft_hook() {
   if [ "$change" = 'init' ]; then
     gbmc_ncsi_nft_init=1
     gbmc_ncsi_nft_update
-  elif [ "$change" = 'addr' -a "$intf" = '@NCSI_IF@' -a "$scope" = 'global' ] &&
-     [[ "$flags" != *deprecated* ]]; then
+  elif [ "$change" = 'addr' -a "$intf" = '@NCSI_IF@' -a "$scope" = 'global' ]; then
     if [ "$fam" = 'inet6' ]; then
       local -n lastip='gbmc_ncsi_nft_lastip6'
+      local pfx_bytes=()
+      ip_to_bytes pfx_bytes "$ip" || return
+      # We only want to allow a <pfx>:: address
+      for (( i = 8; i < 16; ++i )); do
+        if (( pfx_bytes[i] != 0 )); then
+          return
+        fi
+      done
     else
       local -n lastip='gbmc_ncsi_nft_lastip4'
     fi

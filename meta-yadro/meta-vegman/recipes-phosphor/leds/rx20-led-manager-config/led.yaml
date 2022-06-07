@@ -1,0 +1,123 @@
+bmc_booted:
+    # No LED required.
+
+# Status LED indication
+# Managed by callback-manager
+status_ok:
+    platform_status_green:
+        Action: 'On'
+    platform_status_red:
+        Action: 'Off'
+
+status_degraded:
+    platform_status_green:
+        Action: 'Blink'
+    platform_status_red:
+        Action: 'Blink'
+
+status_non_critical:
+    platform_status_green:
+        Action: 'Off'
+    platform_status_red:
+        Action: 'Blink'
+
+status_critical:
+    platform_status_green:
+        Action: 'Off'
+    platform_status_red:
+        Action: 'On'
+
+
+enclosure_identify:
+    platform_indicator_blue:
+        Action: 'On'
+
+#
+# May be asserted through IPMI or RedFish.
+# We decided that it should be the same as enclosure_identify.
+enclosure_identify_blink:
+    platform_indicator_blue:
+        Action: 'On'
+
+#
+# Asserted while firmware is flashing
+firmware_flashing:
+    platform_indicator_blue:
+        Action: 'Blink'
+
+#
+# Power button indication
+# Managed by phosphor-dbus-monitor
+power_standby:
+    platform_power_green:
+        Action: 'On'
+    platform_power_red:
+        Action: 'On'
+
+power_sequence:
+    platform_power_green:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+    platform_power_red:
+        Action: 'Off'
+
+power_on:
+    platform_power_green:
+        Action: 'On'
+    platform_power_red:
+        Action: 'Off'
+
+power_failure:
+    platform_power_green:
+        Action: 'Off'
+    platform_power_red:
+        Action: 'On'
+
+#
+# Temperature status
+# Managed by phosphor-dbus-monitor
+temp_ok:
+    temp_status_green:
+        Action: 'On'
+    temp_status_red:
+        Action: 'Off'
+
+temp_failure:
+    temp_status_green:
+        Action: 'Blink'
+    temp_status_red:
+        Action: 'Blink'
+
+temp_warn:
+    temp_status_green:
+        Action: 'On'
+    temp_status_red:
+        Action: 'On'
+
+temp_crit:
+    temp_status_green:
+        Action: 'Off'
+    temp_status_red:
+        Action: 'On'
+
+#
+# PSU status
+# Managed by phosphor-dbus-monitor
+psu_ok:
+    psu_status_green:
+        Action: 'On'
+    psu_status_red:
+        Action: 'Off'
+
+psu_warn:
+    psu_status_green:
+        Action: 'Blink'
+    psu_status_red:
+        Action: 'Blink'
+
+psu_crit:
+    psu_status_green:
+        Action: 'Off'
+    psu_status_red:
+        Action: 'Blink'
