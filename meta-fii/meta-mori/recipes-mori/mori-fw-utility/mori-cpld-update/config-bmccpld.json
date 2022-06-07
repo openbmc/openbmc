@@ -1,0 +1,19 @@
+[{
+    "blob": "/flash/bmccpld",
+    "handler": {
+        "type": "file",
+        "path": "/run/initramfs/bmc-cpld.svf"
+    },
+    "actions": {
+        "preparation": {
+            "type": "skip"
+        },
+        "verification": {
+            "type": "skip"
+        },
+        "update": {
+            "type": "systemd",
+            "unit": "phosphor-ipmi-flash-bmccpld-update.service"
+        }
+    }
+}]

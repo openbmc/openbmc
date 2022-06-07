@@ -1,0 +1,9 @@
+[Unit]
+Description=Phosphor-ipmi-flash update MB CPLD firmware service
+
+[Service]
+ExecStart=mori-fw.sh mbcpld /run/initramfs/mb-cpld.svf
+Type=oneshot
+
+[Install]
+WantedBy=phosphor-ipmi-flash-mbcpld-update.target
