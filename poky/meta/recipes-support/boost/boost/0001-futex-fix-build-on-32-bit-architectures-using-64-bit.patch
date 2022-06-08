@@ -1,0 +1,36 @@
+From b15d8d0754bb545ba10d0cfba8bbfdfb22a62c38 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 20 Feb 2022 22:03:14 -0800
+Subject: [PATCH] futex: fix build on 32-bit architectures using 64-bit time_t
+
+Fix the following build failure on 32-bit architectures using 64-bit
+time_t (e.g. riscv32):
+| ./boost/fiber/detail/futex.hpp:31:23: error: use of undeclared identifier 'SYS_futex'
+|     return ::syscall( SYS_futex, addr, op, x, nullptr, nullptr, 0);
+|                       ^
+| 1 error generated.
+
+Upstream-Status: Submitted [https://github.com/boostorg/fiber/pull/292]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ boost/fiber/detail/futex.hpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/boost/fiber/detail/futex.hpp b/boost/fiber/detail/futex.hpp
+index e64bd5990..d0353e9e5 100644
+--- a/boost/fiber/detail/futex.hpp
++++ b/boost/fiber/detail/futex.hpp
+@@ -12,6 +12,10 @@
+ 
+ #include <boost/fiber/detail/config.hpp>
+ 
++#ifndef SYS_futex
++#define SYS_futex SYS_futex_time64
++#endif
++
+ #if BOOST_OS_LINUX
+ extern "C" {
+ #include <linux/futex.h>
+-- 
+2.35.1
+
