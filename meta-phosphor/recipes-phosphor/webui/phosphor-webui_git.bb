@@ -16,6 +16,7 @@ inherit allarch
 FILES:${PN} += "${datadir}/www/*"
 
 do_compile () {
+    bbwarn "phosphor-webui is deprecated and has been replaced with webui-vue"
     cd ${S}
     rm -rf node_modules
     npm --loglevel info --proxy=${http_proxy} --https-proxy=${https_proxy} install
