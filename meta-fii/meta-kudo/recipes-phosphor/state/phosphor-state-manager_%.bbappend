@@ -5,7 +5,6 @@ DEPENDS:append:kudo = " gpioplus"
 STATE_MGR_PACKAGES:remove:kudo = " ${PN}-host-check"
 RRECOMMENDS:${PN}-host:remove:kudo = " ${PN}-host-check"
 EXTRA_OEMESON:append:kudo = " -Dhost-gpios=enabled"
-CHASSIS_ACTION_TARGETS:append:kudo = " powercycle"
 
 FILES:${PN}:append:kudo = " ${systemd_system_unitdir}/*"
 FILES:${PN}-host:append:kudo = " ${bindir}/phosphor-host-condition-gpio"
