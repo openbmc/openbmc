@@ -41,3 +41,36 @@ do_install:append:gbmc() {
     echo "[]" > ${D}${datadir}/ipmi-providers/entity-map.json
   fi
 }
+
+python do_gbmc_version () {
+  import json
+
+  if d.getVar('GBMC_VERSION') is None:
+    return
+
+  version = d.getVar('GBMC_VERSION').split('.')
+  major = min(int(version[0]), 0x7F) & 0x7F
+  minor = min(int(version[1]), 99)
+  minor = int(minor / 10) * 16 + minor % 10;
+  point = int(version[2])
+  subpoint = int(version[3])
+
+  dir = d.getVar('D') + d.getVar('datadir') + '/ipmi-providers'
+  path = os.path.join(dir, 'dev_id.json')
+
+  dev_id = {}
+
+  # Open existing dev_id and override the fields not needed for version.
+  with open(path, 'r') as f:
+    dev_id = json.load(f)
+    dev_id["firmware_revision"] = {
+      "major": major,
+      "minor": minor
+    }
+    dev_id["aux"] =  subpoint << 16 | (0xFFFF & point)
+
+  with open(path, 'w') as f:
+    json.dump(dev_id, f, sort_keys=True, indent=4)
+}
+
+addtask gbmc_version after do_install before do_package
