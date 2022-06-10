@@ -12,6 +12,7 @@ SRC_URI += " \
 FILES:${PN} += "${datadir}/gbmc-br-dhcp"
 
 RDEPENDS:${PN} += "curl"
+RDEPENDS:${PN} += "tar"
 
 do_install() {
     install -d ${D}${datadir}/gbmc-br-dhcp

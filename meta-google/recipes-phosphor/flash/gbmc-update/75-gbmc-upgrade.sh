@@ -57,7 +57,7 @@ gbmc_upgrade_fetch() (
   while true; do
     local st=()
     curl -LSsk --max-time $((timeout - SECONDS)) "$bootfile_url" |
-      tar "${tflags[@]}" -xC "$tmpdir" "firmware-gbmc/$machine" \
+      tar "${tflags[@]}" --wildcards -xC "$tmpdir" "*/firmware-gbmc/$machine" \
       && st=("${PIPESTATUS[@]}") || st=("${PIPESTATUS[@]}")
     # Curl failures should continue
     if (( st[0] == 0 )); then
