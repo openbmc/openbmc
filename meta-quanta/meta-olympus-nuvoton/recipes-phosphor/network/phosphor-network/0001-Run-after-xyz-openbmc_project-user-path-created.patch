@@ -1,6 +1,6 @@
-From 9dcded5e79bb163a95bbb0edb8f05318460de8f2 Mon Sep 17 00:00:00 2001
-From: Joseph Liu <kwliu@nuvoton.com>
-Date: Fri, 17 Apr 2020 09:32:24 +0800
+From 2326f14019248c2d4b159df2be2a5171394c816b Mon Sep 17 00:00:00 2001
+From: Tim Lee <timlee660101@gmail.com>
+Date: Fri, 10 Jun 2022 14:18:52 +0800
 Subject: [PATCH] Run after /xyz/openbmc_project/user path created
 
 ---
@@ -8,7 +8,7 @@ Subject: [PATCH] Run after /xyz/openbmc_project/user path created
  1 file changed, 1 insertion(+)
 
 diff --git a/xyz.openbmc_project.Network.service.in b/xyz.openbmc_project.Network.service.in
-index 5b8ae01..2000049 100644
+index 044b78f..9954784 100644
 --- a/xyz.openbmc_project.Network.service.in
 +++ b/xyz.openbmc_project.Network.service.in
 @@ -4,6 +4,7 @@ After=obmc-mapper.target
@@ -16,7 +16,7 @@ index 5b8ae01..2000049 100644
  
  [Service]
 +ExecStartPre=/bin/sh -c "mapper wait /xyz/openbmc_project/user"
- ExecStart=/usr/bin/env phosphor-network-manager
+ ExecStart=/usr/bin/phosphor-network-manager
  SyslogIdentifier=phosphor-network-manager
  Restart=always
 -- 
