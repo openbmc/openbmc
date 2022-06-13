@@ -5,6 +5,7 @@ inherit allarch systemd obmc-phosphor-systemd
 
 RDEPENDS:${PN} += "bash"
 RDEPENDS:${PN} += "libgpiod-tools"
+RDEPENDS:${PN} += "bletchley-common-functions"
 
 SRC_URI += " \
     file://bletchley-early-sys-init \

@@ -9,6 +9,7 @@ RDEPENDS:${PN} += "bash"
 RDEPENDS:${PN} += "i2c-tools"
 RDEPENDS:${PN} += "libgpiod-tools"
 RDEPENDS:${PN} += "mdio-util"
+RDEPENDS:${PN} += "bletchley-common-functions"
 
 S = "${WORKDIR}"
 SRC_URI += " \
