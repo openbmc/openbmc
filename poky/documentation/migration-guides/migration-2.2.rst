@@ -70,7 +70,7 @@ Metadata Must Now Use Python 3 Syntax
 
 The metadata is now required to use Python 3 syntax. For help preparing
 metadata, see any of the many Python 3 porting guides available.
-Alternatively, you can reference the conversion commits for Bitbake and
+Alternatively, you can reference the conversion commits for BitBake and
 you can use :term:`OpenEmbedded-Core (OE-Core)` as a guide for changes. Following are
 particular areas of interest:
 

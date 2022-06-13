@@ -424,9 +424,9 @@ information including the website, wiki pages, and user manuals:
    development documentation, and access to a rich Yocto Project
    Development Community into which you can tap.
 
--  **Video Seminar:** The `Introduction to the Yocto Project and Bitbake, Part 1
+-  **Video Seminar:** The `Introduction to the Yocto Project and BitBake, Part 1
    <https://youtu.be/yuE7my3KOpo>`__ and
-   `Introduction to the Yocto Project and Bitbake, Part 2
+   `Introduction to the Yocto Project and BitBake, Part 2
    <https://youtu.be/iZ05TTyzGHk>`__ videos offer a video seminar
    introducing you to the most important aspects of developing a
    custom embedded Linux distribution with the Yocto Project.

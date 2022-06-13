@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if /usr/lib/libcoap/ptest/testdriver; then
+	echo "PASS: libcoap"
+else
+	echo "FAIL: libcoap"
+fi

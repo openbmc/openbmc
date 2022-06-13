@@ -261,7 +261,7 @@ OpenEmbedded build system creates it from ``local.conf.sample`` when you
 :ref:`structure-core-script`.
 
 The source ``local.conf.sample`` file used depends on the
-``$TEMPLATECONF`` script variable, which defaults to ``meta-poky/conf/``
+:term:`TEMPLATECONF` script variable, which defaults to ``meta-poky/conf/``
 when you are building from the Yocto Project development environment,
 and to ``meta/conf/`` when you are building from the OpenEmbedded-Core
 environment. Because the script variable points to the source of the
@@ -278,7 +278,7 @@ file, it uses ``sed`` to substitute final
 
 .. note::
 
-   You can see how the ``TEMPLATECONF`` variable is used by looking at the
+   You can see how the :term:`TEMPLATECONF` variable is used by looking at the
    ``scripts/oe-setup-builddir`` script in the :term:`Source Directory`.
    You can find the Yocto Project version of the ``local.conf.sample`` file in
    the ``meta-poky/conf`` directory.
@@ -300,7 +300,7 @@ you ``source`` the top-level build environment setup script (i.e.
 :ref:`structure-core-script`).
 
 As with the ``local.conf`` file, the source ``bblayers.conf.sample``
-file used depends on the ``$TEMPLATECONF`` script variable, which
+file used depends on the :term:`TEMPLATECONF` script variable, which
 defaults to ``meta-poky/conf/`` when you are building from the Yocto
 Project development environment, and to ``meta/conf/`` when you are
 building from the OpenEmbedded-Core environment. Because the script
@@ -315,7 +315,7 @@ Once the build process gets the sample file, it uses ``sed`` to substitute final
 
 .. note::
 
-   You can see how the ``TEMPLATECONF`` variable ``scripts/oe-setup-builddir``
+   You can see how the :term:`TEMPLATECONF` variable is defined by the ``scripts/oe-setup-builddir``
    script in the :term:`Source Directory`. You can find the Yocto Project
    version of the ``bblayers.conf.sample`` file in the ``meta-poky/conf/``
    directory.

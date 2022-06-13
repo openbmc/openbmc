@@ -19,7 +19,7 @@ try:
     import yaml
 except ImportError:
     sys.stderr.write("The Yocto Project Sphinx documentation requires PyYAML.\
-    \nPlease make sure to install pyyaml python package.\n")
+    \nPlease make sure to install pyyaml Python package.\n")
     sys.exit(1)
 
 # current_version = "dev"
@@ -108,7 +108,7 @@ extlinks = {
     'oe_layer': ('https://layers.openembedded.org/layerindex/branch/master/layer%s', None),
 }
 
-# Intersphinx config to use cross reference with Bitbake user manual
+# Intersphinx config to use cross reference with BitBake user manual
 intersphinx_mapping = {
     'bitbake': ('https://docs.yoctoproject.org/bitbake/' + bitbake_version, None)
 }
@@ -129,7 +129,7 @@ try:
     }
 except ImportError:
     sys.stderr.write("The Sphinx sphinx_rtd_theme HTML theme was not found.\
-    \nPlease make sure to install the sphinx_rtd_theme python package.\n")
+    \nPlease make sure to install the sphinx_rtd_theme Python package.\n")
     sys.exit(1)
 
 html_logo = 'sphinx-static/YoctoProject_Logo_RGB.jpg'

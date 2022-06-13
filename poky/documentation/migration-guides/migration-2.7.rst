@@ -15,7 +15,7 @@ The following changes have been made to BitBake:
    functions (e.g. ``def funcname:``) in the metadata for tab
    indentation. If found, BitBake produces a warning.
 
--  Bitbake now checks
+-  BitBake now checks
    :term:`BBFILE_COLLECTIONS` for duplicate
    entries and triggers an error if any are found.
 

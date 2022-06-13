@@ -10,7 +10,6 @@ PACKAGES = "\
     packagegroup-security-utils \
     packagegroup-security-scanners \
     packagegroup-security-audit \
-    packagegroup-security-hardening \
     packagegroup-security-ids  \
     packagegroup-security-mac  \
     ${@bb.utils.contains("DISTRO_FEATURES", "ptest", "packagegroup-meta-security-ptest-packages", "", d)} \
@@ -20,7 +19,6 @@ RDEPENDS:packagegroup-core-security = "\
     packagegroup-security-utils \
     packagegroup-security-scanners \
     packagegroup-security-audit \
-    packagegroup-security-hardening \
     packagegroup-security-ids  \
     packagegroup-security-mac  \
     ${@bb.utils.contains("DISTRO_FEATURES", "ptest", "packagegroup-meta-security-ptest-packages", "", d)} \
@@ -35,8 +33,6 @@ RDEPENDS:packagegroup-security-utils = "\
     keyutils \
     nmap \
     pinentry \
-    python3-privacyidea \
-    python3-fail2ban \
     softhsm \
     sshguard \
     ${@bb.utils.contains_any("TUNE_FEATURES", "riscv32 ", "", " libseccomp",d)} \
@@ -47,8 +43,6 @@ RDEPENDS:packagegroup-security-utils = "\
 SUMMARY:packagegroup-security-scanners = "Security scanners"
 RDEPENDS:packagegroup-security-scanners = "\
     isic \
-    nikto \
-    checksecurity \
     ${@bb.utils.contains_any("TUNE_FEATURES", "riscv32 riscv64", "", " clamav clamav-daemon clamav-freshclam",d)} \
     "
 RDEPENDS:packagegroup-security-scanners:remove:libc-musl = "clamav clamav-daemon clamav-freshclam"
@@ -59,15 +53,10 @@ RDEPENDS:packagegroup-security-audit = " \
     redhat-security \
     "
 
-SUMMARY:packagegroup-security-hardening = "Security Hardening tools"
-RDEPENDS:packagegroup-security-hardening = " \
-    bastille \
-    "
-
 SUMMARY:packagegroup-security-ids = "Security Intrusion Detection systems"
 RDEPENDS:packagegroup-security-ids = " \
     samhain-standalone \
-    ${@bb.utils.contains("BBLAYERS", "meta-rust", "suricata","", d)} \
+    suricata \
     ossec-hids \
     aide \
     "
@@ -92,7 +81,6 @@ RDEPENDS:packagegroup-meta-security-ptest-packages = "\
     ptest-runner \
     samhain-standalone-ptest \
     ${@bb.utils.contains("BBLAYERS", "meta-rust", "suricata-ptest","", d)} \
-    python3-fail2ban-ptest \
     ${@bb.utils.contains("DISTRO_FEATURES", "smack", "smack-ptest", "",d)} \
 "
 

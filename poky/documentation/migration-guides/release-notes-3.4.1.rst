@@ -46,7 +46,7 @@ Fixes in 3.4.1
 -  bitbake: tests/fetch: Update pcre.org address after github changes
 -  bitbake: tests/runqueue: Ensure hashserv exits before deleting files
 -  bitbake: utils: Handle lockfile filenames that are too long for filesystems
--  bootchart2: Don't compile python modules
+-  bootchart2: Don't compile Python modules
 -  build-appliance-image: Update to honister head revision
 -  buildhistory: Fix package output files for SDKs
 -  busybox: 1.34.0 -> 1.34.1

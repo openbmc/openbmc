@@ -404,7 +404,9 @@ python extend_recipe_sysroot() {
     # All files that we're going to be installing, to find conflicts.
     fileset = {}
 
+    invalidate_tasks = set()
     for f in os.listdir(depdir):
+        removed = []
         if not f.endswith(".complete"):
             continue
         f = depdir + "/" + f
@@ -414,6 +416,28 @@ python extend_recipe_sysroot() {
             sstate_clean_manifest(depdir + "/" + lnk, d, canrace=True, prefix=workdir)
             os.unlink(f)
             os.unlink(f.replace(".complete", ""))
+            removed.append(os.path.basename(f.replace(".complete", "")))
+
+        # If we've removed files from the sysroot above, the task that installed them may still
+        # have a stamp file present for the task. This is probably invalid right now but may become
+        # valid again if the user were to change configuration back for example. Since we've removed
+        # the files a task might need, remove the stamp file too to force it to rerun.
+        # YOCTO #14790
+        if removed:
+            for i in glob.glob(depdir + "/index.*"):
+                if i.endswith("." + mytaskname):
+                    continue
+                with open(i, "r") as f:
+                    for l in f:
+                        if l.startswith("TaskDeps:"):
+                            continue
+                        l = l.strip()
+                        if l in removed:
+                            invalidate_tasks.add(i.rsplit(".", 1)[1])
+                            break
+    for t in invalidate_tasks:
+        bb.note("Invalidating stamps for task %s" % t)
+        bb.build.clean_stamp(t, d)
 
     installed = []
     for dep in configuredeps:

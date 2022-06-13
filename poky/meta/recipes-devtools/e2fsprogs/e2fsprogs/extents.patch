@@ -1,5 +1,5 @@
 CVE: CVE-2022-1304
-Upstream-Status: Submitted [https://lore.kernel.org/linux-ext4/20220421173148.20193-1-lczerner@redhat.com/]
+Upstream-Status: Backport [ ab51d587bb9b229b1fade1afd02e1574c1ba5c76 ]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 
 From 347084c9c1ad20f47dae16f5a3dcd8628d5fc7b0 Mon Sep 17 00:00:00 2001

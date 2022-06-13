@@ -63,7 +63,7 @@ verity_setup() {
     veritysetup --data-block-size=${DM_VERITY_IMAGE_DATA_BLOCK_SIZE} --hash-offset=$SIZE format $OUTPUT $OUTPUT | tail -n +2 | process_verity
 }
 
-VERITY_TYPES = "ext2.verity ext3.verity ext4.verity btrfs.verity"
+VERITY_TYPES = "ext2.verity ext3.verity ext4.verity btrfs.verity erofs.verity erofs-lz4.verity erofs-lz4hc.verity"
 IMAGE_TYPES += "${VERITY_TYPES}"
 CONVERSIONTYPES += "verity"
 CONVERSION_CMD:verity = "verity_setup ${type}"
@@ -90,6 +90,6 @@ python __anonymous() {
     # If we're using wic: we'll have to use partition images and not the rootfs
     # source plugin so add the appropriate dependency.
     if 'wic' in image_fstypes:
-        dep = ' %s:do_image_%s' % (pn, verity_type)
+        dep = ' %s:do_image_%s' % (pn, verity_type.replace("-", "_"))
         d.appendVarFlag('do_image_wic', 'depends', dep)
 }

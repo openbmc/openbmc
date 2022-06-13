@@ -55,24 +55,22 @@ python do_gbmc_version () {
   point = int(version[2])
   subpoint = int(version[3])
 
-  dev_id = {
-    "id": 0,
-    "revision": 0,
-    "addn_dev_support": 0,
-    "firmware_revision": {
+  dir = d.getVar('D') + d.getVar('datadir') + '/ipmi-providers'
+  path = os.path.join(dir, 'dev_id.json')
+
+  dev_id = {}
+
+  # Open existing dev_id and override the fields not needed for version.
+  with open(path, 'r') as f:
+    dev_id = json.load(f)
+    dev_id["firmware_revision"] = {
       "major": major,
       "minor": minor
-    },
-    "manuf_id": 11129,
-    "prod_id": 14426,
-    "aux": subpoint << 16 | (0xFFFF & point)
-  }
+    }
+    dev_id["aux"] =  subpoint << 16 | (0xFFFF & point)
 
-  dir = d.getVar('WORKDIR')
-  os.makedirs(dir, exist_ok=True)
-  path = os.path.join(dir, 'dev_id.json')
   with open(path, 'w') as f:
     json.dump(dev_id, f, sort_keys=True, indent=4)
 }
 
-addtask gbmc_version before do_install
+addtask gbmc_version after do_install before do_package

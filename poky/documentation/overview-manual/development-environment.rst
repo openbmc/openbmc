@@ -176,7 +176,7 @@ development:
    repositories for each of these areas.
 
    .. image:: figures/source-repos.png
-      :align: center
+      :width: 100%
 
    For steps on how to view and access these upstream Git repositories,
    see the ":ref:`dev-manual/start:accessing source repositories`"
@@ -191,6 +191,7 @@ development:
 
    .. image:: figures/index-downloads.png
       :align: center
+      :width: 50%
 
    For steps on how to view and access these files, see the
    ":ref:`dev-manual/start:accessing index of releases`"
@@ -205,7 +206,7 @@ development:
    :yocto_dl:`Index of /releases: </releases>` area.
 
    .. image:: figures/yp-download.png
-      :align: center
+      :width: 100%
 
    For steps on how to use the "DOWNLOADS" page, see the
    ":ref:`dev-manual/start:using the downloads page`"

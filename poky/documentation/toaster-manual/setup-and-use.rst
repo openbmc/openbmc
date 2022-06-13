@@ -311,7 +311,7 @@ Perform the following steps to install Toaster:
     migrations). The next line sets the Toaster root directory
     ``TOASTER_DIR`` and the location of the Toaster configuration file
     ``TOASTER_CONF``, which is relative to ``TOASTER_DIR``. The
-    ``TEMPLATECONF`` value reflects the contents of
+    :term:`TEMPLATECONF` value reflects the contents of
     ``poky/.templateconf``, and by default, should include the string
     "poky". For more information on the Toaster configuration file, see
     the ":ref:`toaster-manual/reference:Configuring Toaster`" section.

@@ -1,0 +1,70 @@
+From 1360a907879dd24041797a3b709d49aeac2ab444 Mon Sep 17 00:00:00 2001
+From: Denys Dmytriyenko <denys@ti.com>
+Date: Tue, 29 May 2018 16:55:42 -0400
+Subject: [PATCH] devmem.c: ensure word is 32-bit and add support for 64-bit
+ long
+
+Signed-off-by: Denys Dmytriyenko <denys@ti.com>
+---
+ devmem2.c | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
+
+diff --git a/devmem2.c b/devmem2.c
+index 5845381..68131b2 100644
+--- a/devmem2.c
++++ b/devmem2.c
+@@ -39,6 +39,7 @@
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <stdint.h>
+ #include <unistd.h>
+ #include <string.h>
+ #include <errno.h>
+@@ -69,7 +70,7 @@ int main(int argc, char **argv) {
+ 	if(argc < 2) {
+ 		fprintf(stderr, "\nUsage:\t%s { address } [ type [ data ] ]\n"
+ 			"\taddress : memory address to act upon\n"
+-			"\ttype    : access operation type : [b]yte, [h]alfword, [w]ord\n"
++			"\ttype    : access operation type : [b]yte, [h]alfword, [w]ord, [l]ong\n"
+ 			"\tdata    : data to be written\n\n",
+ 			argv[0]);
+ 		exit(1);
+@@ -103,9 +104,14 @@ int main(int argc, char **argv) {
+ 			read_result = *((unsigned short *) virt_addr);
+ 			break;
+ 		case 'w':
+-			data_size = sizeof(unsigned long);
++			data_size = sizeof(uint32_t);
+ 			virt_addr = fixup_addr(virt_addr, data_size);
+-			read_result = *((unsigned long *) virt_addr);
++			read_result = *((uint32_t *) virt_addr);
++			break;
++		case 'l':
++			data_size = sizeof(uint64_t);
++			virt_addr = fixup_addr(virt_addr, data_size);
++			read_result = *((uint64_t *) virt_addr);
+ 			break;
+ 		default:
+ 			fprintf(stderr, "Illegal data type '%c'.\n", access_type);
+@@ -129,9 +135,14 @@ int main(int argc, char **argv) {
+ 				read_result = *((unsigned short *) virt_addr);
+ 				break;
+ 			case 'w':
+-				virt_addr = fixup_addr(virt_addr, sizeof(unsigned long));
+-				*((unsigned long *) virt_addr) = write_val;
+-				read_result = *((unsigned long *) virt_addr);
++				virt_addr = fixup_addr(virt_addr, sizeof(uint32_t));
++				*((uint32_t *) virt_addr) = write_val;
++				read_result = *((uint32_t *) virt_addr);
++				break;
++			case 'l':
++				virt_addr = fixup_addr(virt_addr, sizeof(uint64_t));
++				*((uint64_t *) virt_addr) = write_val;
++				read_result = *((uint64_t *) virt_addr);
+ 				break;
+ 		}
+ 		sprintf(fmt_str, "Write at address 0x%%08lX (%%p): 0x%%0%dlX, "
+-- 
+2.7.4
+

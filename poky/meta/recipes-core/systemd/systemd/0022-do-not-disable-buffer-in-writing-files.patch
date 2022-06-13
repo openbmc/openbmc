@@ -1,4 +1,4 @@
-From 0f9422780a569c79a4b28e44c79c70b4a354bd92 Mon Sep 17 00:00:00 2001
+From 414e2f97008a1f3c26a260a6dc4d51a8c1fa6900 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Fri, 1 Mar 2019 15:22:15 +0800
 Subject: [PATCH] do not disable buffer in writing files
@@ -20,27 +20,34 @@ Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
 Signed-off-by: Scott Murray <scott.murray@konsulko.com>
 
 ---
- src/basic/cgroup-util.c                 | 10 +++++-----
+ src/basic/cgroup-util.c                 | 12 ++++++------
+ src/basic/namespace-util.c              |  4 ++--
  src/basic/procfs-util.c                 |  4 ++--
  src/basic/sysctl-util.c                 |  2 +-
  src/basic/util.c                        |  2 +-
  src/binfmt/binfmt.c                     |  6 +++---
+ src/core/cgroup.c                       |  2 +-
  src/core/main.c                         |  4 ++--
  src/core/smack-setup.c                  |  8 ++++----
  src/hibernate-resume/hibernate-resume.c |  2 +-
+ src/home/homework.c                     |  2 +-
  src/libsystemd/sd-device/sd-device.c    |  2 +-
  src/nspawn/nspawn-cgroup.c              |  2 +-
  src/nspawn/nspawn.c                     |  6 +++---
+ src/shared/binfmt-util.c                |  2 +-
  src/shared/cgroup-setup.c               |  4 ++--
- src/shared/mount-util.c                 |  4 ++--
+ src/shared/coredump-util.c              |  2 +-
  src/shared/smack-util.c                 |  2 +-
  src/sleep/sleep.c                       |  8 ++++----
+ src/udev/udev-rules.c                   |  1 -
  src/vconsole/vconsole-setup.c           |  2 +-
- 16 files changed, 34 insertions(+), 34 deletions(-)
+ 21 files changed, 39 insertions(+), 40 deletions(-)
 
+diff --git a/src/basic/cgroup-util.c b/src/basic/cgroup-util.c
+index f7dc6c8421..5f7a27c2c4 100644
 --- a/src/basic/cgroup-util.c
 +++ b/src/basic/cgroup-util.c
-@@ -390,7 +390,7 @@ int cg_kill_kernel_sigkill(const char *c
+@@ -390,7 +390,7 @@ int cg_kill_kernel_sigkill(const char *controller, const char *path) {
          if (r < 0)
                  return r;
  
@@ -49,7 +56,7 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
          if (r < 0)
                  return r;
  
-@@ -803,7 +803,7 @@ int cg_install_release_agent(const char
+@@ -803,7 +803,7 @@ int cg_install_release_agent(const char *controller, const char *agent) {
  
          sc = strstrip(contents);
          if (isempty(sc)) {
@@ -58,7 +65,7 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
                  if (r < 0)
                          return r;
          } else if (!path_equal(sc, agent))
-@@ -821,7 +821,7 @@ int cg_install_release_agent(const char
+@@ -821,7 +821,7 @@ int cg_install_release_agent(const char *controller, const char *agent) {
  
          sc = strstrip(contents);
          if (streq(sc, "0")) {
@@ -67,7 +74,7 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
                  if (r < 0)
                          return r;
  
-@@ -848,7 +848,7 @@ int cg_uninstall_release_agent(const cha
+@@ -848,7 +848,7 @@ int cg_uninstall_release_agent(const char *controller) {
          if (r < 0)
                  return r;
  
@@ -76,7 +83,7 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
          if (r < 0)
                  return r;
  
-@@ -858,7 +858,7 @@ int cg_uninstall_release_agent(const cha
+@@ -858,7 +858,7 @@ int cg_uninstall_release_agent(const char *controller) {
          if (r < 0)
                  return r;
  
@@ -85,7 +92,7 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
          if (r < 0)
                  return r;
  
-@@ -1704,7 +1704,7 @@ int cg_set_attribute(const char *control
+@@ -1704,7 +1704,7 @@ int cg_set_attribute(const char *controller, const char *path, const char *attri
          if (r < 0)
                  return r;
  
@@ -94,9 +101,30 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  }
  
  int cg_get_attribute(const char *controller, const char *path, const char *attribute, char **ret) {
+diff --git a/src/basic/namespace-util.c b/src/basic/namespace-util.c
+index b9120a5ed0..78e460b75f 100644
+--- a/src/basic/namespace-util.c
++++ b/src/basic/namespace-util.c
+@@ -202,12 +202,12 @@ int userns_acquire(const char *uid_map, const char *gid_map) {
+                 freeze();
+ 
+         xsprintf(path, "/proc/" PID_FMT "/uid_map", pid);
+-        r = write_string_file(path, uid_map, WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file(path, uid_map, 0);
+         if (r < 0)
+                 return log_error_errno(r, "Failed to write UID map: %m");
+ 
+         xsprintf(path, "/proc/" PID_FMT "/gid_map", pid);
+-        r = write_string_file(path, gid_map, WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file(path, gid_map, 0);
+         if (r < 0)
+                 return log_error_errno(r, "Failed to write GID map: %m");
+ 
+diff --git a/src/basic/procfs-util.c b/src/basic/procfs-util.c
+index e485a0196b..8bff210356 100644
 --- a/src/basic/procfs-util.c
 +++ b/src/basic/procfs-util.c
-@@ -64,13 +64,13 @@ int procfs_tasks_set_limit(uint64_t limi
+@@ -64,13 +64,13 @@ int procfs_tasks_set_limit(uint64_t limit) {
           * decrease it, as threads-max is the much more relevant sysctl. */
          if (limit > pid_max-1) {
                  sprintf(buffer, "%" PRIu64, limit+1); /* Add one, since PID 0 is not a valid PID */
@@ -112,9 +140,11 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
          if (r < 0) {
                  uint64_t threads_max;
  
+diff --git a/src/basic/sysctl-util.c b/src/basic/sysctl-util.c
+index b66a6622ae..8d1c93008a 100644
 --- a/src/basic/sysctl-util.c
 +++ b/src/basic/sysctl-util.c
-@@ -58,7 +58,7 @@ int sysctl_write(const char *property, c
+@@ -58,7 +58,7 @@ int sysctl_write(const char *property, const char *value) {
  
          log_debug("Setting '%s' to '%s'", p, value);
  
@@ -123,6 +153,8 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  }
  
  int sysctl_writef(const char *property, const char *format, ...) {
+diff --git a/src/basic/util.c b/src/basic/util.c
+index d7ef382737..31c35118d1 100644
 --- a/src/basic/util.c
 +++ b/src/basic/util.c
 @@ -168,7 +168,7 @@ void disable_coredumps(void) {
@@ -134,6 +166,8 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
          if (r < 0)
                  log_debug_errno(r, "Failed to turn off coredumps, ignoring: %m");
  }
+diff --git a/src/binfmt/binfmt.c b/src/binfmt/binfmt.c
+index 18231c2618..6c598d55c8 100644
 --- a/src/binfmt/binfmt.c
 +++ b/src/binfmt/binfmt.c
 @@ -29,7 +29,7 @@ static bool arg_unregister = false;
@@ -145,7 +179,7 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  }
  
  static int apply_rule(const char *filename, unsigned line, const char *rule) {
-@@ -59,7 +59,7 @@ static int apply_rule(const char *filena
+@@ -59,7 +59,7 @@ static int apply_rule(const char *filename, unsigned line, const char *rule) {
          if (r >= 0)
                  log_debug("%s:%u: Rule '%s' deleted.", filename, line, rulename);
  
@@ -163,9 +197,24 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
                  if (r < 0)
                          log_warning_errno(r, "Failed to flush binfmt_misc rules, ignoring: %m");
                  else
+diff --git a/src/core/cgroup.c b/src/core/cgroup.c
+index f58de95a49..7a97ab6f99 100644
+--- a/src/core/cgroup.c
++++ b/src/core/cgroup.c
+@@ -4140,7 +4140,7 @@ int unit_cgroup_freezer_action(Unit *u, FreezerAction action) {
+         else
+                 u->freezer_state = FREEZER_THAWING;
+ 
+-        r = write_string_file(path, one_zero(action == FREEZER_FREEZE), WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file(path, one_zero(action == FREEZER_FREEZE), 0);
+         if (r < 0)
+                 return r;
+ 
+diff --git a/src/core/main.c b/src/core/main.c
+index 57aedb9b93..7ef36d22f5 100644
 --- a/src/core/main.c
 +++ b/src/core/main.c
-@@ -1466,7 +1466,7 @@ static int bump_unix_max_dgram_qlen(void
+@@ -1466,7 +1466,7 @@ static int bump_unix_max_dgram_qlen(void) {
          if (v >= DEFAULT_UNIX_MAX_DGRAM_QLEN)
                  return 0;
  
@@ -174,7 +223,7 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
                                 "%lu", DEFAULT_UNIX_MAX_DGRAM_QLEN);
          if (r < 0)
                  return log_full_errno(IN_SET(r, -EROFS, -EPERM, -EACCES) ? LOG_DEBUG : LOG_WARNING, r,
-@@ -1737,7 +1737,7 @@ static void initialize_core_pattern(bool
+@@ -1737,7 +1737,7 @@ static void initialize_core_pattern(bool skip_setup) {
          if (getpid_cached() != 1)
                  return;
  
@@ -183,9 +232,11 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
          if (r < 0)
                  log_warning_errno(r, "Failed to write '%s' to /proc/sys/kernel/core_pattern, ignoring: %m",
                                    arg_early_core_pattern);
+diff --git a/src/core/smack-setup.c b/src/core/smack-setup.c
+index f88cb80834..68055fb64a 100644
 --- a/src/core/smack-setup.c
 +++ b/src/core/smack-setup.c
-@@ -320,17 +320,17 @@ int mac_smack_setup(bool *loaded_policy)
+@@ -320,17 +320,17 @@ int mac_smack_setup(bool *loaded_policy) {
          }
  
  #if HAVE_SMACK_RUN_LABEL
@@ -207,6 +258,8 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
          if (r < 0)
                  log_warning_errno(r, "Failed to set SMACK netlabel rule \"127.0.0.1 -CIPSO\": %m");
  #endif
+diff --git a/src/hibernate-resume/hibernate-resume.c b/src/hibernate-resume/hibernate-resume.c
+index 58e35e403e..1d0beb4008 100644
 --- a/src/hibernate-resume/hibernate-resume.c
 +++ b/src/hibernate-resume/hibernate-resume.c
 @@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
@@ -218,9 +271,24 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
          if (r < 0) {
                  log_error_errno(r, "Failed to write '%s' to /sys/power/resume: %m", major_minor);
                  return EXIT_FAILURE;
+diff --git a/src/home/homework.c b/src/home/homework.c
+index 9fdc74b775..9858a2b415 100644
+--- a/src/home/homework.c
++++ b/src/home/homework.c
+@@ -284,7 +284,7 @@ static void drop_caches_now(void) {
+          * details. We write "2" into /proc/sys/vm/drop_caches to ensure dentries/inodes are flushed, but not
+          * more. */
+ 
+-        r = write_string_file("/proc/sys/vm/drop_caches", "2\n", WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file("/proc/sys/vm/drop_caches", "2\n", 0);
+         if (r < 0)
+                 log_warning_errno(r, "Failed to drop caches, ignoring: %m");
+         else
+diff --git a/src/libsystemd/sd-device/sd-device.c b/src/libsystemd/sd-device/sd-device.c
+index b163a0fb6b..fd6c5301d6 100644
 --- a/src/libsystemd/sd-device/sd-device.c
 +++ b/src/libsystemd/sd-device/sd-device.c
-@@ -2108,7 +2108,7 @@ _public_ int sd_device_set_sysattr_value
+@@ -2108,7 +2108,7 @@ _public_ int sd_device_set_sysattr_value(sd_device *device, const char *sysattr,
          if (!value)
                  return -ENOMEM;
  
@@ -229,9 +297,11 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
          if (r < 0) {
                  /* On failure, clear cache entry, as we do not know how it fails. */
                  device_remove_cached_sysattr_value(device, sysattr);
+diff --git a/src/nspawn/nspawn-cgroup.c b/src/nspawn/nspawn-cgroup.c
+index d472e80c03..c7780c7fc6 100644
 --- a/src/nspawn/nspawn-cgroup.c
 +++ b/src/nspawn/nspawn-cgroup.c
-@@ -124,7 +124,7 @@ int sync_cgroup(pid_t pid, CGroupUnified
+@@ -124,7 +124,7 @@ int sync_cgroup(pid_t pid, CGroupUnified unified_requested, uid_t uid_shift) {
          fn = strjoina(tree, cgroup, "/cgroup.procs");
  
          sprintf(pid_string, PID_FMT, pid);
@@ -240,9 +310,11 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
          if (r < 0) {
                  log_error_errno(r, "Failed to move process: %m");
                  goto finish;
+diff --git a/src/nspawn/nspawn.c b/src/nspawn/nspawn.c
+index fb6af295b5..0d83f1e4d2 100644
 --- a/src/nspawn/nspawn.c
 +++ b/src/nspawn/nspawn.c
-@@ -2757,7 +2757,7 @@ static int reset_audit_loginuid(void) {
+@@ -2759,7 +2759,7 @@ static int reset_audit_loginuid(void) {
          if (streq(p, "4294967295"))
                  return 0;
  
@@ -251,7 +323,7 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
          if (r < 0) {
                  log_error_errno(r,
                                  "Failed to reset audit login UID. This probably means that your kernel is too\n"
-@@ -4163,7 +4163,7 @@ static int setup_uid_map(
+@@ -4175,7 +4175,7 @@ static int setup_uid_map(
                  return log_oom();
  
          xsprintf(uid_map, "/proc/" PID_FMT "/uid_map", pid);
@@ -260,7 +332,7 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
          if (r < 0)
                  return log_error_errno(r, "Failed to write UID map: %m");
  
-@@ -4173,7 +4173,7 @@ static int setup_uid_map(
+@@ -4185,7 +4185,7 @@ static int setup_uid_map(
                  return log_oom();
  
          xsprintf(uid_map, "/proc/" PID_FMT "/gid_map", pid);
@@ -269,9 +341,24 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
          if (r < 0)
                  return log_error_errno(r, "Failed to write GID map: %m");
  
+diff --git a/src/shared/binfmt-util.c b/src/shared/binfmt-util.c
+index 724d7f27d9..dd725cff92 100644
+--- a/src/shared/binfmt-util.c
++++ b/src/shared/binfmt-util.c
+@@ -26,7 +26,7 @@ int disable_binfmt(void) {
+         if (r < 0)
+                 return log_warning_errno(r, "Failed to determine whether binfmt_misc is mounted: %m");
+ 
+-        r = write_string_file("/proc/sys/fs/binfmt_misc/status", "-1", WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file("/proc/sys/fs/binfmt_misc/status", "-1", 0);
+         if (r < 0)
+                 return log_warning_errno(r, "Failed to unregister binfmt_misc entries: %m");
+ 
+diff --git a/src/shared/cgroup-setup.c b/src/shared/cgroup-setup.c
+index 8bda66ca36..4e1e9943ee 100644
 --- a/src/shared/cgroup-setup.c
 +++ b/src/shared/cgroup-setup.c
-@@ -345,7 +345,7 @@ int cg_attach(const char *controller, co
+@@ -345,7 +345,7 @@ int cg_attach(const char *controller, const char *path, pid_t pid) {
  
          xsprintf(c, PID_FMT "\n", pid);
  
@@ -289,9 +376,22 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
                          if (r < 0) {
                                  log_debug_errno(r, "Failed to %s controller %s for %s (%s): %m",
                                                  FLAGS_SET(mask, bit) ? "enable" : "disable", n, p, fs);
+diff --git a/src/shared/coredump-util.c b/src/shared/coredump-util.c
+index a0b648bf79..13f921390d 100644
+--- a/src/shared/coredump-util.c
++++ b/src/shared/coredump-util.c
+@@ -70,5 +70,5 @@ int set_coredump_filter(uint64_t value) {
+         sprintf(t, "0x%"PRIx64, value);
+ 
+         return write_string_file("/proc/self/coredump_filter", t,
+-                                 WRITE_STRING_FILE_VERIFY_ON_FAILURE|WRITE_STRING_FILE_DISABLE_BUFFER);
++                                 WRITE_STRING_FILE_VERIFY_ON_FAILURE);
+ }
+diff --git a/src/shared/smack-util.c b/src/shared/smack-util.c
+index 0df1778cb2..3b9a0c934e 100644
 --- a/src/shared/smack-util.c
 +++ b/src/shared/smack-util.c
-@@ -114,7 +114,7 @@ int mac_smack_apply_pid(pid_t pid, const
+@@ -114,7 +114,7 @@ int mac_smack_apply_pid(pid_t pid, const char *label) {
                  return 0;
  
          p = procfs_file_alloca(pid, "attr/current");
@@ -300,9 +400,11 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
          if (r < 0)
                  return r;
  
+diff --git a/src/sleep/sleep.c b/src/sleep/sleep.c
+index 7064f3a905..8f2a7d9da2 100644
 --- a/src/sleep/sleep.c
 +++ b/src/sleep/sleep.c
-@@ -46,7 +46,7 @@ static int write_hibernate_location_info
+@@ -46,7 +46,7 @@ static int write_hibernate_location_info(const HibernateLocation *hibernate_loca
          assert(hibernate_location->swap);
  
          xsprintf(resume_str, "%u:%u", major(hibernate_location->devno), minor(hibernate_location->devno));
@@ -311,7 +413,7 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
          if (r < 0)
                  return log_debug_errno(r, "Failed to write partition device to /sys/power/resume for '%s': '%s': %m",
                                         hibernate_location->swap->device, resume_str);
-@@ -73,7 +73,7 @@ static int write_hibernate_location_info
+@@ -73,7 +73,7 @@ static int write_hibernate_location_info(const HibernateLocation *hibernate_loca
          }
  
          xsprintf(offset_str, "%" PRIu64, hibernate_location->offset);
@@ -329,7 +431,7 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
                  if (k >= 0)
                          return 0;
  
-@@ -112,7 +112,7 @@ static int write_state(FILE **f, char **
+@@ -112,7 +112,7 @@ static int write_state(FILE **f, char **states) {
          STRV_FOREACH(state, states) {
                  int k;
  
@@ -338,9 +440,23 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
                  if (k >= 0)
                          return 0;
                  log_debug_errno(k, "Failed to write '%s' to /sys/power/state: %m", *state);
+diff --git a/src/udev/udev-rules.c b/src/udev/udev-rules.c
+index 0089833e3f..0a6a3abbb4 100644
+--- a/src/udev/udev-rules.c
++++ b/src/udev/udev-rules.c
+@@ -2181,7 +2181,6 @@ static int udev_rule_apply_token_to_event(
+                 log_rule_debug(dev, rules, "ATTR '%s' writing '%s'", buf, value);
+                 r = write_string_file(buf, value,
+                                       WRITE_STRING_FILE_VERIFY_ON_FAILURE |
+-                                      WRITE_STRING_FILE_DISABLE_BUFFER |
+                                       WRITE_STRING_FILE_AVOID_NEWLINE |
+                                       WRITE_STRING_FILE_VERIFY_IGNORE_NEWLINE);
+                 if (r < 0)
+diff --git a/src/vconsole/vconsole-setup.c b/src/vconsole/vconsole-setup.c
+index 50930d4af3..5efd5d3728 100644
 --- a/src/vconsole/vconsole-setup.c
 +++ b/src/vconsole/vconsole-setup.c
-@@ -108,7 +108,7 @@ static int toggle_utf8_vc(const char *na
+@@ -108,7 +108,7 @@ static int toggle_utf8_vc(const char *name, int fd, bool utf8) {
  static int toggle_utf8_sysfs(bool utf8) {
          int r;
  
@@ -349,72 +465,3 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
          if (r < 0)
                  return log_warning_errno(r, "Failed to %s sysfs UTF-8 flag: %m", enable_disable(utf8));
  
---- a/src/basic/namespace-util.c
-+++ b/src/basic/namespace-util.c
-@@ -202,12 +202,12 @@ int userns_acquire(const char *uid_map,
-                 freeze();
- 
-         xsprintf(path, "/proc/" PID_FMT "/uid_map", pid);
--        r = write_string_file(path, uid_map, WRITE_STRING_FILE_DISABLE_BUFFER);
-+        r = write_string_file(path, uid_map, 0);
-         if (r < 0)
-                 return log_error_errno(r, "Failed to write UID map: %m");
- 
-         xsprintf(path, "/proc/" PID_FMT "/gid_map", pid);
--        r = write_string_file(path, gid_map, WRITE_STRING_FILE_DISABLE_BUFFER);
-+        r = write_string_file(path, gid_map, 0);
-         if (r < 0)
-                 return log_error_errno(r, "Failed to write GID map: %m");
- 
---- a/src/core/cgroup.c
-+++ b/src/core/cgroup.c
-@@ -4140,7 +4140,7 @@ int unit_cgroup_freezer_action(Unit *u,
-         else
-                 u->freezer_state = FREEZER_THAWING;
- 
--        r = write_string_file(path, one_zero(action == FREEZER_FREEZE), WRITE_STRING_FILE_DISABLE_BUFFER);
-+        r = write_string_file(path, one_zero(action == FREEZER_FREEZE), 0);
-         if (r < 0)
-                 return r;
- 
---- a/src/home/homework.c
-+++ b/src/home/homework.c
-@@ -284,7 +284,7 @@ static void drop_caches_now(void) {
-          * details. We write "2" into /proc/sys/vm/drop_caches to ensure dentries/inodes are flushed, but not
-          * more. */
- 
--        r = write_string_file("/proc/sys/vm/drop_caches", "2\n", WRITE_STRING_FILE_DISABLE_BUFFER);
-+        r = write_string_file("/proc/sys/vm/drop_caches", "2\n", 0);
-         if (r < 0)
-                 log_warning_errno(r, "Failed to drop caches, ignoring: %m");
-         else
---- a/src/shared/binfmt-util.c
-+++ b/src/shared/binfmt-util.c
-@@ -26,7 +26,7 @@ int disable_binfmt(void) {
-         if (r < 0)
-                 return log_warning_errno(r, "Failed to determine whether binfmt_misc is mounted: %m");
- 
--        r = write_string_file("/proc/sys/fs/binfmt_misc/status", "-1", WRITE_STRING_FILE_DISABLE_BUFFER);
-+        r = write_string_file("/proc/sys/fs/binfmt_misc/status", "-1", 0);
-         if (r < 0)
-                 return log_warning_errno(r, "Failed to unregister binfmt_misc entries: %m");
- 
---- a/src/shared/coredump-util.c
-+++ b/src/shared/coredump-util.c
-@@ -70,5 +70,5 @@ int set_coredump_filter(uint64_t value)
-         sprintf(t, "0x%"PRIx64, value);
- 
-         return write_string_file("/proc/self/coredump_filter", t,
--                                 WRITE_STRING_FILE_VERIFY_ON_FAILURE|WRITE_STRING_FILE_DISABLE_BUFFER);
-+                                 WRITE_STRING_FILE_VERIFY_ON_FAILURE);
- }
---- a/src/udev/udev-rules.c
-+++ b/src/udev/udev-rules.c
-@@ -2181,7 +2181,6 @@ static int udev_rule_apply_token_to_even
-                 log_rule_debug(dev, rules, "ATTR '%s' writing '%s'", buf, value);
-                 r = write_string_file(buf, value,
-                                       WRITE_STRING_FILE_VERIFY_ON_FAILURE |
--                                      WRITE_STRING_FILE_DISABLE_BUFFER |
-                                       WRITE_STRING_FILE_AVOID_NEWLINE |
-                                       WRITE_STRING_FILE_VERIFY_IGNORE_NEWLINE);
-                 if (r < 0)

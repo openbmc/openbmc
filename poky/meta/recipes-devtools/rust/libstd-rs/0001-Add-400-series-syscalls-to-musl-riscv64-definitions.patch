@@ -9,10 +9,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  .../linux_like/linux/musl/b64/riscv64/mod.rs  | 19 +++++++++++++++++++
  1 file changed, 19 insertions(+)
 
-diff --git a/vendor/libc-0.2.112/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs b/vendor/libc-0.2.112/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
+diff --git a/vendor/libc-0.2.116/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs b/vendor/libc-0.2.116/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
 index 6b17621c7..2036583d5 100644
---- a/vendor/libc-0.2.112/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
-+++ b/vendor/libc-0.2.112/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
+--- a/vendor/libc-0.2.116/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
++++ b/vendor/libc-0.2.116/src/unix/linux_like/linux/musl/b64/riscv64/mod.rs
 @@ -465,6 +465,25 @@ pub const SYS_pkey_mprotect: ::c_long = 288;
  pub const SYS_pkey_alloc: ::c_long = 289;
  pub const SYS_pkey_free: ::c_long = 290;

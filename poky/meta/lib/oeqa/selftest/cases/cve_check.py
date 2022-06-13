@@ -1,9 +1,13 @@
-from oe.cve_check import Version
+import json
+import os
 from oeqa.selftest.case import OESelftestTestCase
+from oeqa.utils.commands import bitbake, get_bb_vars
 
 class CVECheck(OESelftestTestCase):
 
     def test_version_compare(self):
+        from oe.cve_check import Version
+
         result = Version("100") > Version("99")
         self.assertTrue( result, msg="Failed to compare version '100' > '99'")
         result = Version("2.3.1") > Version("2.2.3")
@@ -42,3 +46,74 @@ class CVECheck(OESelftestTestCase):
         self.assertTrue( result ,msg="Failed to compare version with suffix '1.0p2' > '1.0p1'")
         result = Version("1.0_patch2","patch") < Version("1.0_patch3","patch")
         self.assertTrue( result ,msg="Failed to compare version with suffix '1.0_patch2' < '1.0_patch3'")
+
+
+    def test_recipe_report_json(self):
+        config = """
+INHERIT += "cve-check"
+CVE_CHECK_FORMAT_JSON = "1"
+"""
+        self.write_config(config)
+
+        vars = get_bb_vars(["CVE_CHECK_SUMMARY_DIR", "CVE_CHECK_SUMMARY_FILE_NAME_JSON"])
+        summary_json = os.path.join(vars["CVE_CHECK_SUMMARY_DIR"], vars["CVE_CHECK_SUMMARY_FILE_NAME_JSON"])
+        recipe_json = os.path.join(vars["CVE_CHECK_SUMMARY_DIR"], "m4-native_cve.json")
+
+        try:
+            os.remove(summary_json)
+            os.remove(recipe_json)
+        except FileNotFoundError:
+            pass
+
+        bitbake("m4-native -c cve_check")
+
+        def check_m4_json(filename):
+            with open(filename) as f:
+                report = json.load(f)
+            self.assertEqual(report["version"], "1")
+            self.assertEqual(len(report["package"]), 1)
+            package = report["package"][0]
+            self.assertEqual(package["name"], "m4-native")
+            found_cves = { issue["id"]: issue["status"] for issue in package["issue"]}
+            self.assertIn("CVE-2008-1687", found_cves)
+            self.assertEqual(found_cves["CVE-2008-1687"], "Patched")
+
+        self.assertExists(summary_json)
+        check_m4_json(summary_json)
+        self.assertExists(recipe_json)
+        check_m4_json(recipe_json)
+
+
+    def test_image_json(self):
+        config = """
+INHERIT += "cve-check"
+CVE_CHECK_FORMAT_JSON = "1"
+"""
+        self.write_config(config)
+
+        vars = get_bb_vars(["CVE_CHECK_DIR", "CVE_CHECK_SUMMARY_DIR", "CVE_CHECK_SUMMARY_FILE_NAME_JSON"])
+        report_json = os.path.join(vars["CVE_CHECK_SUMMARY_DIR"], vars["CVE_CHECK_SUMMARY_FILE_NAME_JSON"])
+        print(report_json)
+        try:
+            os.remove(report_json)
+        except FileNotFoundError:
+            pass
+
+        bitbake("core-image-minimal-initramfs")
+        self.assertExists(report_json)
+
+        # Check that the summary report lists at least one package
+        with open(report_json) as f:
+            report = json.load(f)
+        self.assertEqual(report["version"], "1")
+        self.assertGreater(len(report["package"]), 1)
+
+        # Check that a random recipe wrote a recipe report to deploy/cve/
+        recipename = report["package"][0]["name"]
+        recipe_report = os.path.join(vars["CVE_CHECK_DIR"], recipename + "_cve.json")
+        self.assertExists(recipe_report)
+        with open(recipe_report) as f:
+            report = json.load(f)
+        self.assertEqual(report["version"], "1")
+        self.assertEqual(len(report["package"]), 1)
+        self.assertEqual(report["package"][0]["name"], recipename)

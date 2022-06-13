@@ -33,7 +33,11 @@ gbmc_upgrade_fetch() (
 
   # We only support tarballs at the moment, our URLs will always denote
   # this with a URI query param of `format=TAR`.
-  if ! [[ "$bootfile_url" =~ [\&?]format=TAR(&|$) ]]; then
+  local tflags=()
+  if [[ "$bootfile_url" =~ [\&?]format=TAR(_GZIP)?(&|$) ]]; then
+    local t="${BASH_REMATCH[1]}"
+    [ "$t" = '_GZIP' ] && tflags+=('-z')
+  else
     echo "Unknown upgrade unpack method: $bootfile_url" >&2
     return 1
   fi
@@ -45,15 +49,32 @@ gbmc_upgrade_fetch() (
 
   # Ensure some sane output file limit
   # Currently no BMC image is larger than 64M
-  ulimit -H -f $((96 * 1024 * 1024)) || return
+  # We want to allow 2 images and a small amount of metadata (2*64+2)M
+  local max_mb=$((2*64 + 2))
+  ulimit -f $((max_mb * 1024 * 1024 / 512)) || return
   timeout=$((SECONDS + 300))
-  while (( SECONDS < timeout )); do
-    local st=(0)
+  stime=5
+  while true; do
+    local st=()
     curl -LSsk --max-time $((timeout - SECONDS)) "$bootfile_url" |
-      tar -xC "$tmpdir" "firmware-gbmc/$machine" || st=("${PIPESTATUS[@]}")
-    (( st[0] != 0 )) || break
+      tar "${tflags[@]}" --wildcards -xC "$tmpdir" "*/firmware-gbmc/$machine" \
+      && st=("${PIPESTATUS[@]}") || st=("${PIPESTATUS[@]}")
+    # Curl failures should continue
+    if (( st[0] == 0 )); then
+      # Tar failures when curl succeeds are hard errors to start over.
+      if (( st[1] != 0 )); then
+        echo 'Unpacking failed' >&2
+        return 1
+      fi
+      # Success should continue without retry
+      break
+    fi
+    if (( SECONDS + stime >= timeout )); then
+      echo 'Timed out fetching image' >&2
+      return 1
+    fi
     (shopt -s nullglob dotglob; rm -rf -- "${tmpdir:?}"/*)
-    sleep 5
+    sleep $stime
   done
 
   local sig

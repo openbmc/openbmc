@@ -290,6 +290,12 @@ do_deploy() {
         echo "# Enable WM8960" >> $CONFIG
         echo "dtoverlay=wm8960-soundcard" >> $CONFIG
     fi
+
+    # W1-GPIO - One-Wire Interface
+    if [ "${ENABLE_W1}" = "1" ]; then
+        echo "# Enable One-Wire Interface" >> $CONFIG
+        echo "dtoverlay=w1-gpio" >> $CONFIG
+    fi
 }
 
 do_deploy:append:raspberrypi3-64() {

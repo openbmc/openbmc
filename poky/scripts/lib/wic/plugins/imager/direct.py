@@ -138,8 +138,9 @@ class DirectPlugin(ImagerPlugin):
                 device_name = "/dev/%s%s%d" % (part.disk, prefix, part.realnum)
 
             opts = part.fsopts if part.fsopts else "defaults"
+            passno = part.fspassno if part.fspassno else "0"
             line = "\t".join([device_name, part.mountpoint, part.fstype,
-                              opts, "0", "0"]) + "\n"
+                              opts, "0", passno]) + "\n"
 
             fstab_lines.append(line)
             updated = True

@@ -1062,7 +1062,7 @@ Section.
    contents::
 
       FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
-      SRC_URI:append = "file://0001-calibrate.c-Added-some-printk-statements.patch"
+      SRC_URI:append = " file://0001-calibrate.c-Added-some-printk-statements.patch"
 
    The :term:`FILESEXTRAPATHS` and :term:`SRC_URI` statements
    enable the OpenEmbedded build system to find the patch file.
@@ -1560,7 +1560,7 @@ source directory. Follow these steps to clean up the version string:
    on building the kernel image when using ``devtool``, see the
    ":ref:`kernel-dev/common:using \`\`devtool\`\` to patch the kernel`"
    section. For
-   information on building the kernel image when using Bitbake, see the
+   information on building the kernel image when using BitBake, see the
    ":ref:`kernel-dev/common:using traditional kernel development to patch the kernel`"
    section.
 

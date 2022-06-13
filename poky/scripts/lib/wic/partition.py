@@ -33,6 +33,7 @@ class Partition():
         self.include_path = args.include_path
         self.change_directory = args.change_directory
         self.fsopts = args.fsopts
+        self.fspassno = args.fspassno
         self.fstype = args.fstype
         self.label = args.label
         self.use_label = args.use_label

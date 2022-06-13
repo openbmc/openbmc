@@ -152,7 +152,7 @@ by ``CVE_CHECK_WHITELIST`` (replaced by :term:`CVE_CHECK_IGNORE` in version 3.5)
 
 .. _migration-3.0-bitbake-changes:
 
-Bitbake Changes
+BitBake Changes
 ---------------
 
 The following BitBake changes have occurred.

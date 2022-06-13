@@ -197,6 +197,7 @@ in an interactive UI::
 
 .. image:: figures/perf-wget-flat-stripped.png
    :align: center
+   :width: 70%
 
 The above screenshot displays a 'flat' profile, one entry for each
 'bucket' corresponding to the functions that were profiled during the
@@ -230,6 +231,7 @@ but the entire callchain to the sampled function as well::
 
 .. image:: figures/perf-wget-g-copy-to-user-expanded-stripped.png
    :align: center
+   :width: 70%
 
 Using the callgraph view, we can actually see not only which functions
 took the most time, but we can also see a summary of how those functions
@@ -266,6 +268,7 @@ busybox.
 
 .. image:: figures/perf-wget-g-copy-from-user-expanded-stripped.png
    :align: center
+   :width: 70%
 
 The above screenshot shows the other half of the journey for the data -
 from the wget program's userspace buffers to disk. To get the buffers to
@@ -283,6 +286,7 @@ let's expand the first entry containing BusyBox:
 
 .. image:: figures/perf-wget-busybox-expanded-stripped.png
    :align: center
+   :width: 70%
 
 Again, before we expanded we saw that the function was labeled with a
 hex value instead of a symbol as with most of the kernel entries.
@@ -330,6 +334,7 @@ their functions symbolically:
 
 .. image:: figures/perf-wget-busybox-debuginfo.png
    :align: center
+   :width: 70%
 
 If we expand one of the entries and press 'enter' on a leaf node, we're
 presented with a menu of actions we can take to get more information
@@ -337,6 +342,7 @@ related to that entry:
 
 .. image:: figures/perf-wget-busybox-dso-zoom-menu.png
    :align: center
+   :width: 70%
 
 One of these actions allows us to show a view that displays a
 busybox-centric view of the profiled functions (in this case we've also
@@ -344,6 +350,7 @@ expanded all the nodes using the 'E' key):
 
 .. image:: figures/perf-wget-busybox-dso-zoom.png
    :align: center
+   :width: 70%
 
 Finally, we can see that now that the BusyBox debuginfo is installed,
 the previously unresolved symbol in the ``sys_clock_gettime()`` entry
@@ -354,6 +361,7 @@ function:
 
 .. image:: figures/perf-wget-g-copy-to-user-expanded-debuginfo.png
    :align: center
+   :width: 70%
 
 At the lowest level of detail, we can dive down to the assembly level
 and see which instructions caused the most overhead in a function.
@@ -362,6 +370,7 @@ with a menu:
 
 .. image:: figures/perf-wget-busybox-annotate-menu.png
    :align: center
+   :width: 70%
 
 Selecting 'Annotate udhcpc_main', we get a detailed listing of
 percentages by instruction for the udhcpc_main function. From the
@@ -370,6 +379,7 @@ taken up by a couple tests and the move of a constant (1) to a register:
 
 .. image:: figures/perf-wget-busybox-annotate-udhcpc.png
    :align: center
+   :width: 70%
 
 As a segue into tracing, let's try another profile using a different
 counter, something other than the default 'cycles'.
@@ -593,6 +603,7 @@ and tell perf to do a profile using it as the sampling event::
 
 .. image:: figures/sched-wakeup-profile.png
    :align: center
+   :width: 70%
 
 The screenshot above shows the results of running a profile using
 sched:sched_switch tracepoint, which shows the relative costs of various
@@ -740,7 +751,7 @@ entry/exit events we recorded::
    root@crownbay:~# perf script -g python
    generated Python script: perf-script.py
 
-The skeleton script simply creates a python function for each event type in the
+The skeleton script simply creates a Python function for each event type in the
 perf.data file. The body of each function simply prints the event name along
 with its parameters. For example:
 
@@ -859,7 +870,7 @@ goes a little way to support the idea mentioned previously that given
 the right kind of trace data, higher-level profiling-type summaries can
 be derived from it.
 
-Documentation on using the `'perf script' python
+Documentation on using the `'perf script' Python
 binding <https://linux.die.net/man/1/perf-script-python>`__.
 
 System-Wide Tracing and Profiling
@@ -894,6 +905,7 @@ other processes running on the system as well:
 
 .. image:: figures/perf-systemwide.png
    :align: center
+   :width: 70%
 
 In the snapshot above, we can see callchains that originate in libc, and
 a callchain from Xorg that demonstrates that we're using a proprietary X
@@ -911,6 +923,7 @@ record a profile::
 
 .. image:: figures/perf-report-cycles-u.png
    :align: center
+   :width: 70%
 
 Notice in the screenshot above, we see only userspace entries ([.])
 
@@ -921,6 +934,7 @@ the entries associated with the libc-xxx.so DSO.
 
 .. image:: figures/perf-systemwide-libc.png
    :align: center
+   :width: 70%
 
 We can also use the system-wide -a switch to do system-wide tracing.
 Here we'll trace a couple of scheduler events::
@@ -1116,6 +1130,7 @@ callgraphs from starting a few programs during those 30 seconds:
 
 .. image:: figures/perf-probe-do_fork-profile.png
    :align: center
+   :width: 70%
 
 .. admonition:: Tying it Together
 
@@ -1149,7 +1164,7 @@ section can be found here:
 -  The `'perf script'
    manpage <https://linux.die.net/man/1/perf-script>`__.
 
--  Documentation on using the `'perf script' python
+-  Documentation on using the `'perf script' Python
    binding <https://linux.die.net/man/1/perf-script-python>`__.
 
 -  The top-level `perf(1) manpage <https://linux.die.net/man/1/perf>`__.
@@ -1684,6 +1699,7 @@ events (or even one or more complete subsystems) to trace:
 
 .. image:: figures/kernelshark-choose-events.png
    :align: center
+   :width: 70%
 
 Note that these are exactly the same sets of events described in the
 previous trace events subsystem section, and in fact is where trace-cmd
@@ -1699,6 +1715,7 @@ will turn into the 'Stop' button after the trace has started):
 
 .. image:: figures/kernelshark-output-display.png
    :align: center
+   :width: 70%
 
 Notice that the right-hand pane shows the exact trace-cmd command-line
 that's used to run the trace, along with the results of the trace-cmd
@@ -1710,12 +1727,14 @@ detailed event listing below that:
 
 .. image:: figures/kernelshark-i915-display.png
    :align: center
+   :width: 70%
 
 Here's another example, this time a display resulting from tracing 'all
 events':
 
 .. image:: figures/kernelshark-all.png
    :align: center
+   :width: 70%
 
 The tool is pretty self-explanatory, but for more detailed information
 on navigating through the data, see the `kernelshark
@@ -1974,6 +1993,7 @@ with profiling data:
 
 .. image:: figures/sysprof-copy-to-user.png
    :align: center
+   :width: 70%
 
 The left pane shows a list of functions and processes. Selecting one of
 those expands that function in the right pane, showing all its callees.
@@ -1988,6 +2008,7 @@ in the perf display shown in the perf section of this page.
 
 .. image:: figures/sysprof-copy-from-user.png
    :align: center
+   :width: 70%
 
 Similarly, the above is a snapshot of the Sysprof display of a
 copy-from-user callchain.
@@ -1999,6 +2020,7 @@ left pane. In this case, the lower pane is showing all the callers of
 
 .. image:: figures/sysprof-callers.png
    :align: center
+   :width: 70%
 
 Double-clicking on one of those functions will in turn change the focus
 to the selected function, and so on.

@@ -1,0 +1,21 @@
+From 13a1a284a134d18a454625a5b4485c0d99079ae9 Mon Sep 17 00:00:00 2001
+From: Scott Garman <scott.a.garman@intel.com>
+Date: Fri, 29 Apr 2022 13:32:28 +0000
+Subject: [PATCH] Remove "*" for root since we do not have an /etc/shadow
+
+Upstream-Status: Inappropriate [configuration]
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+---
+ passwd.master | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/passwd.master b/passwd.master
+index 041685a..31a84d4 100644
+--- a/passwd.master
++++ b/passwd.master
+@@ -1,4 +1,4 @@
+-root:*:0:0:root:/root:/bin/sh
++root::0:0:root:/root:/bin/sh
+ daemon:*:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+ bin:*:2:2:bin:/bin:/usr/sbin/nologin
+ sys:*:3:3:sys:/dev:/usr/sbin/nologin

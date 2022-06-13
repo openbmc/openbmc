@@ -350,6 +350,20 @@ to `1` or enabled `PiTFT` support, or otherwise want to use another pin, use
 
      GPIO_SHUTDOWN_PIN = "25"
 
+## Enable One-Wire Interface
+
+One-wire is a single-wire communication bus typically used to connect sensors
+to the RaspberryPi. The Raspberry Pi supports one-wire on any GPIO pin, but
+the default is GPIO 4. To enable the one-wire interface explicitly set it in
+`local.conf`
+
+    ENABLE_W1 = "1"
+
+Once discovery is complete you can list the devices that your Raspberry Pi has
+discovered via all 1-Wire busses check the interface with this command
+
+`ls /sys/bus/w1/devices/`
+
 ## Manual additions to config.txt
 
 The `RPI_EXTRA_CONFIG` variable can be used to manually add additional lines to

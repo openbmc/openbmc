@@ -1,0 +1,26 @@
+From 8f3ace87df3aaad85946c22cae240532ea3e73b8 Mon Sep 17 00:00:00 2001
+From: Saul Wold <sgw@linux.intel.com>
+Date: Fri, 29 Apr 2022 13:32:27 +0000
+Subject: [PATCH] Add a shutdown group
+
+We need to have a shutdown group to allow the shutdown icon to work
+correctly. Any users that want to use shutdown like the xuser should
+be added to this group.
+
+Upstream-Status: Inappropriate [Embedded]
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+---
+ group.master | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/group.master b/group.master
+index ad1dd2d..1b5e2fb 100644
+--- a/group.master
++++ b/group.master
+@@ -35,5 +35,6 @@ sasl:*:45:
+ plugdev:*:46:
+ staff:*:50:
+ games:*:60:
++shutdown:*:70:
+ users:*:100:
+ nogroup:*:65534:

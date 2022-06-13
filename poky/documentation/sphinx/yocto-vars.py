@@ -13,7 +13,7 @@ try:
     import yaml
 except ImportError:
     sys.stderr.write("The Yocto Project Sphinx documentation requires PyYAML.\
-    \nPlease make sure to install pyyaml python package.\n")
+    \nPlease make sure to install pyyaml Python package.\n")
     sys.exit(1)
 
 __version__  = '1.0'

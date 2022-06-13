@@ -14,6 +14,7 @@ RDEPENDS:packagegroup-meta-oe-extended += "\
     mozjs \
 "
 RDEPENDS:packagegroup-meta-oe-support += "\
+    nvmetcli \
     smem \
 "
 RDEPENDS:packagegroup-meta-oe-extended:remove:libc-musl = "lcdproc"

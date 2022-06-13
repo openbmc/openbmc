@@ -53,7 +53,6 @@ Maintainers needed
 * wic
 * Patchwork
 * Patchtest
-* Prelink-cross
 * Matchbox
 * Sato
 * Autobuilder

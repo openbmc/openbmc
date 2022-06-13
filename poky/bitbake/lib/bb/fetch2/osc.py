@@ -9,6 +9,7 @@ Based on the svn "Fetch" implementation.
 
 import logging
 import os
+import re
 import  bb
 from    bb.fetch2 import FetchMethod
 from    bb.fetch2 import FetchError
@@ -36,6 +37,7 @@ class Osc(FetchMethod):
         # Create paths to osc checkouts
         oscdir = d.getVar("OSCDIR") or (d.getVar("DL_DIR") + "/osc")
         relpath = self._strip_leading_slashes(ud.path)
+        ud.oscdir = oscdir
         ud.pkgdir = os.path.join(oscdir, ud.host)
         ud.moddir = os.path.join(ud.pkgdir, relpath, ud.module)
 
@@ -49,7 +51,7 @@ class Osc(FetchMethod):
             else:
                 ud.revision = ""
 
-        ud.localfile = d.expand('%s_%s_%s.tar.gz' % (ud.module.replace('/', '.'), ud.path.replace('/', '.'), ud.revision))
+        ud.localfile = d.expand('%s_%s_%s.tar.gz' % (ud.module.replace('/', '.'), relpath.replace('/', '.'), ud.revision))
 
     def _buildosccommand(self, ud, d, command):
         """
@@ -59,25 +61,48 @@ class Osc(FetchMethod):
 
         basecmd = d.getVar("FETCHCMD_osc") or "/usr/bin/env osc"
 
-        proto = ud.parm.get('protocol', 'ocs')
+        proto = ud.parm.get('protocol', 'https')
 
         options = []
 
         config = "-c %s" % self.generate_config(ud, d)
 
-        if ud.revision:
+        if getattr(ud, 'revision', ''):
             options.append("-r %s" % ud.revision)
 
         coroot = self._strip_leading_slashes(ud.path)
 
         if command == "fetch":
-            osccmd = "%s %s co %s/%s %s" % (basecmd, config, coroot, ud.module, " ".join(options))
+            osccmd = "%s %s -A %s://%s co %s/%s %s" % (basecmd, config, proto, ud.host, coroot, ud.module, " ".join(options))
         elif command == "update":
-            osccmd = "%s %s up %s" % (basecmd, config, " ".join(options))
+            osccmd = "%s %s -A %s://%s up %s" % (basecmd, config, proto, ud.host, " ".join(options))
+        elif command == "api_source":
+            osccmd = "%s %s -A %s://%s api source/%s/%s" % (basecmd, config, proto, ud.host, coroot, ud.module)
         else:
             raise FetchError("Invalid osc command %s" % command, ud.url)
 
         return osccmd
+
+    def _latest_revision(self, ud, d, name):
+        """
+        Fetch latest revision for the given package
+        """
+        api_source_cmd = self._buildosccommand(ud, d, "api_source")
+
+        output = runfetchcmd(api_source_cmd, d)
+        match = re.match(r'<directory ?.* rev="(\d+)".*>', output)
+        if match is None:
+            raise FetchError("Unable to parse osc response", ud.url)
+        return match.groups()[0]
+
+    def _revision_key(self, ud, d, name):
+        """
+        Return a unique key for the url
+        """
+        # Collapse adjacent slashes
+        slash_re = re.compile(r"/+")
+        rev = getattr(ud, 'revision', "latest")
+        return "osc:%s%s.%s.%s" % (ud.host, slash_re.sub(".", ud.path), name, rev)
 
     def download(self, ud, d):
         """
@@ -86,7 +111,7 @@ class Osc(FetchMethod):
 
         logger.debug2("Fetch: checking for module directory '" + ud.moddir + "'")
 
-        if os.access(os.path.join(d.getVar('OSCDIR'), ud.path, ud.module), os.R_OK):
+        if os.access(ud.moddir, os.R_OK):
             oscupdatecmd = self._buildosccommand(ud, d, "update")
             logger.info("Update "+ ud.url)
             # update sources there
@@ -114,20 +139,23 @@ class Osc(FetchMethod):
         Generate a .oscrc to be used for this run.
         """
 
-        config_path = os.path.join(d.getVar('OSCDIR'), "oscrc")
+        config_path = os.path.join(ud.oscdir, "oscrc")
+        if not os.path.exists(ud.oscdir):
+            bb.utils.mkdirhier(ud.oscdir)
+
         if (os.path.exists(config_path)):
             os.remove(config_path)
 
         f = open(config_path, 'w')
+        proto = ud.parm.get('protocol', 'https')
         f.write("[general]\n")
-        f.write("apisrv = %s\n" % ud.host)
-        f.write("scheme = http\n")
+        f.write("apiurl = %s://%s\n" % (proto, ud.host))
         f.write("su-wrapper = su -c\n")
         f.write("build-root = %s\n" % d.getVar('WORKDIR'))
         f.write("urllist = %s\n" % d.getVar("OSCURLLIST"))
         f.write("extra-pkgs = gzip\n")
         f.write("\n")
-        f.write("[%s]\n" % ud.host)
+        f.write("[%s://%s]\n" % (proto, ud.host))
         f.write("user = %s\n" % ud.parm["user"])
         f.write("pass = %s\n" % ud.parm["pswd"])
         f.close()

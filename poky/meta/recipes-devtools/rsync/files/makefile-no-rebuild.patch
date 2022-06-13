@@ -1,4 +1,4 @@
-From 1f29584e57f5fda09970c66f3b94f4720e09c1bb Mon Sep 17 00:00:00 2001
+From 81700d1a0e51391028c761cc8ef1cd660084d114 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Tue, 12 Apr 2016 15:51:54 +0100
 Subject: [PATCH] rsync: remove upstream's rebuild logic
@@ -14,12 +14,12 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
  1 file changed, 54 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index 672fcc4..c12d8d4 100644
+index 3cde955..d963a70 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -168,60 +168,6 @@ gen: conf proto.h man
- gensend: gen
- 	rsync -aic $(GENFILES) $${SAMBA_HOST-samba.org}:/home/ftp/pub/rsync/generated-files/
+@@ -190,60 +190,6 @@ gensend: gen
+ 	fi
+ 	rsync -aic $(GENFILES) git-version.h $${SAMBA_HOST-samba.org}:/home/ftp/pub/rsync/generated-files/ || true
  
 -aclocal.m4: $(srcdir)/m4/*.m4
 -	aclocal -I $(srcdir)/m4
@@ -41,7 +41,7 @@ index 672fcc4..c12d8d4 100644
 -	else \
 -	    echo "config.h.in has CHANGED."; \
 -	fi
--	@if test -f configure.sh.old -o -f config.h.in.old; then \
+-	@if test -f configure.sh.old || test -f config.h.in.old; then \
 -	    if test "$(MAKECMDGOALS)" = reconfigure; then \
 -		echo 'Continuing with "make reconfigure".'; \
 -	    else \
