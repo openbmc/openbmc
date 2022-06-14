@@ -2,8 +2,10 @@
 Description=Motor Initialize for sled%i
 StartLimitIntervalSec=90
 StartLimitBurst=5
-After=mapper-wait@-xyz-openbmc_project-inventory-system-chassis-presence-presence_sled%i
-Wants=mapper-wait@-xyz-openbmc_project-inventory-system-chassis-presence-presence_sled%i
+Requires=phosphor-gpio-presence@presence-sled%i.service
+After=phosphor-gpio-presence@presence-sled%i.service
+Wants=mapper-wait@-xyz-openbmc_project-inventory-system-chassis-presence-presence_sled%i.service
+After=mapper-wait@-xyz-openbmc_project-inventory-system-chassis-presence-presence_sled%i.service
 
 [Service]
 ExecStart=/usr/libexec/motor-init sled%i

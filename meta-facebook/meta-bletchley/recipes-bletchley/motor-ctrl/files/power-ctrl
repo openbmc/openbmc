@@ -595,10 +595,19 @@ elif ! is_valid_sled_action "$ACTION"; then
     exit 1
 fi
 
-HOST_CURR_STATUS=$(get_host_status "$SLED_NUM")
-if [ "$ACTION" = "$ACTION_STATUS" ];then
+if [ "$ACTION" = "$ACTION_AC_ON" ]; then
+    if [ "$(get_ac_status "$SLED_NUM")" = "$HOST_AC_OFF" ]; then
+        do_action_ac_on "$SLED_NUM"
+    fi
+elif [ "$ACTION" = "$ACTION_AC_OFF" ]; then
+    if [ "$(get_ac_status "$SLED_NUM")" != "$HOST_AC_OFF" ]; then
+        do_action_ac_off "$SLED_NUM"
+    fi
+elif [ "$ACTION" = "$ACTION_STATUS" ];then
+    HOST_CURR_STATUS=$(get_host_status "$SLED_NUM")
     echo "$HOST_CURR_STATUS"
 else
+    HOST_CURR_STATUS=$(get_host_status "$SLED_NUM")
     case $HOST_CURR_STATUS in
         "$HOST_AC_OFF")
             host_state_ac_off_action_handler "$SLED_NUM" "$ACTION"
