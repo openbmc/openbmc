@@ -53,6 +53,9 @@ sled_insert_action()
 
     # 0054: 24c64
     bind_i2c_driver "${I2C_BUS_NUM}-0054" "at24"
+
+    # start bletchley-sled-insertion target
+    /bin/systemctl start bletchley-sled-insertion@"${SLED_ID}".target
 }
 
 sled_remove_action()
@@ -83,6 +86,9 @@ sled_remove_action()
 
     # # 0054: 24c64
     # unbind_i2c_driver "${I2C_BUS_NUM}-0054" "at24"
+
+    # start bletchley-sled-removal target
+    /bin/systemctl start bletchley-sled-removal@"${SLED_ID}".target
 }
 
 
