@@ -49,3 +49,5 @@ FILES:jack-server = " \
 FILES:jack-utils = "${bindir}/*"
 
 FILES:${PN}-doc += " ${datadir}/jack-audio-connection-kit/reference/html/*"
+
+BBCLASSEXTEND = "native nativesdk"

@@ -164,14 +164,14 @@ class ImageFeatures(OESelftestTestCase):
         """
         Summary:     Check for chaining many CONVERSION_CMDs together
         Expected:    1. core-image-minimal can be built with
-                        ext4.bmap.gz.bz2.lzo.xz.u-boot and also create a
+                        ext4.bmap.gz.bz2.zst.xz.u-boot and also create a
                         sha256sum
                      2. The above image has a valid sha256sum
         Product:     oe-core
         Author:      Tom Rini <trini@konsulko.com>
         """
 
-        conv = "ext4.bmap.gz.bz2.lzo.xz.u-boot"
+        conv = "ext4.bmap.gz.bz2.zst.xz.u-boot"
         features = 'IMAGE_FSTYPES += "%s %s.sha256sum"' % (conv, conv)
         self.write_config(features)
 
@@ -201,7 +201,7 @@ class ImageFeatures(OESelftestTestCase):
         image_name = 'core-image-minimal'
 
         all_image_types = set(get_bb_var("IMAGE_TYPES", image_name).split())
-        skip_image_types = set(('container', 'elf', 'f2fs', 'multiubi', 'tar.zst', 'wic.zst'))
+        skip_image_types = set(('container', 'elf', 'f2fs', 'multiubi', 'tar.zst', 'wic.zst', 'squashfs-lzo'))
         img_types = all_image_types - skip_image_types
 
         config = 'IMAGE_FSTYPES += "%s"\n'\

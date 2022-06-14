@@ -134,6 +134,8 @@ concat_dtb_helper() {
 
 			if [ -n "${UBOOT_CONFIG}" ]
 			then
+				i=0
+				j=0
 				for config in ${UBOOT_MACHINE}; do
 					i=$(expr $i + 1);
 					for type in ${UBOOT_CONFIG}; do

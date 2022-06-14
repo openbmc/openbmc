@@ -51,6 +51,7 @@ do_install () {
 	oe_multilib_header ext2fs/ext2_types.h
 	install -d ${D}${base_bindir}
 	mv ${D}${bindir}/chattr ${D}${base_bindir}/chattr.e2fsprogs
+	mv ${D}${bindir}/lsattr ${D}${base_bindir}/lsattr.e2fsprogs
 
 	install -v -m 755 ${S}/contrib/populate-extfs.sh ${D}${base_sbindir}/
 
@@ -99,10 +100,12 @@ FILES:libe2p = "${base_libdir}/libe2p.so.*"
 FILES:libext2fs = "${libdir}/e2initrd_helper ${base_libdir}/libext2fs.so.*"
 FILES:${PN}-dev += "${datadir}/*/*.awk ${datadir}/*/*.sed ${base_libdir}/*.so ${bindir}/compile_et ${bindir}/mk_cmds"
 
-ALTERNATIVE:${PN} = "chattr"
+ALTERNATIVE:${PN} = "chattr lsattr"
 ALTERNATIVE_PRIORITY = "100"
 ALTERNATIVE_LINK_NAME[chattr] = "${base_bindir}/chattr"
 ALTERNATIVE_TARGET[chattr] = "${base_bindir}/chattr.e2fsprogs"
+ALTERNATIVE_LINK_NAME[lsattr] = "${base_bindir}/lsattr"
+ALTERNATIVE_TARGET[lsattr] = "${base_bindir}/lsattr.e2fsprogs"
 
 ALTERNATIVE:${PN}-doc = "fsck.8"
 ALTERNATIVE_LINK_NAME[fsck.8] = "${mandir}/man8/fsck.8"

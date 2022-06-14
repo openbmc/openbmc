@@ -25,15 +25,6 @@ do_compile:append() {
 }
 
 do_install:append() {
-    install -d ${D}${libdir}/pkcs11
-    install -d ${D}${datadir}/p11-kit
-
-    # remove symlinks
-    rm -f ${D}${libdir}/pkcs11/libtpm2_pkcs11.so
-
-    #install lib
-    install -m 755 ${B}/src/.libs/libtpm2_pkcs11.so ${D}${libdir}/pkcs11/libtpm2_pkcs11.so
-
     cd ${S}/tools
     export PYTHONPATH="${D}${PYTHON_SITEPACKAGES_DIR}"
     ${PYTHON_PN} setup.py install --root="${D}" --prefix="${prefix}" --install-lib="${PYTHON_SITEPACKAGES_DIR}" --optimize=1 --skip-build
@@ -52,6 +43,8 @@ FILES:${PN} += "\
     ${libdir}/pkcs11/* \
     ${datadir}/p11-kit/* \
     "
+
+INSANE_SKIP:${PN}   += "dev-so"
 
 RDEPENDS:${PN} = "p11-kit tpm2-tools "
 RDEPENDS:${PN}-tools = "${PYTHON_PN}-pyyaml ${PYTHON_PN}-cryptography ${PYTHON_PN}-pyasn1-modules"

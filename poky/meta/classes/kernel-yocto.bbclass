@@ -310,6 +310,8 @@ do_kernel_metadata() {
 		bbnote "KERNEL_FEATURES: $KERNEL_FEATURES_FINAL"
 		bbnote "Final scc/cfg list: $sccs_defconfig $bsp_definition $sccs $KERNEL_FEATURES_FINAL"
 	fi
+
+	set -e
 }
 
 do_patch() {
@@ -343,6 +345,8 @@ do_patch() {
 			fi
 		done
 	fi
+
+	set -e
 }
 
 do_kernel_checkout() {
@@ -401,6 +405,8 @@ do_kernel_checkout() {
 		git commit -q -m "baseline commit: creating repo for ${PN}-${PV}"
 		git clean -d -f
 	fi
+
+	set -e
 }
 do_kernel_checkout[dirs] = "${S} ${WORKDIR}"
 
@@ -695,6 +701,8 @@ do_validate_branches() {
 			kgit-s2q --clean
 		fi
 	fi
+
+	set -e
 }
 
 OE_TERMINAL_EXPORTS += "KBUILD_OUTPUT"

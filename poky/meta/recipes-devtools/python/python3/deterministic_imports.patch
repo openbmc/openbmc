@@ -1,0 +1,32 @@
+There are two issues here. Firstly, the modules are accessed in on disk order. This
+means behaviour seen on one system might not reproduce on another and is a real headache.
+
+Secondly, empty directories left behind by previous modules might be looked at. This
+has caused a long string of different issues for us.
+
+As a result, patch this to a behaviour which works for us.
+
+Upstream-Status: Pending [need to talk to upstream to see if they'll take one or both fixes]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+
+Index: Python-3.10.4/Lib/importlib/metadata/__init__.py
+===================================================================
+--- Python-3.10.4.orig/Lib/importlib/metadata/__init__.py
++++ Python-3.10.4/Lib/importlib/metadata/__init__.py
+@@ -819,7 +819,14 @@ class Lookup:
+         self.infos = FreezableDefaultDict(list)
+         self.eggs = FreezableDefaultDict(list)
+ 
+-        for child in path.children():
++        for child in sorted(path.children()):
++            childpath = pathlib.Path(path.root, child)
++            try:
++                if childpath.is_dir() and not any(childpath.iterdir()):
++                    # Empty directories aren't interesting
++                    continue
++            except PermissionError:
++                continue
+             low = child.lower()
+             if low.endswith((".dist-info", ".egg-info")):
+                 # rpartition is faster than splitext and suitable for this purpose.

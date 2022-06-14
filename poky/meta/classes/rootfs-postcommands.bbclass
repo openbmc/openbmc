@@ -39,7 +39,7 @@ ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains("DISTRO_FEATURES", "systemd"
 
 ROOTFS_POSTPROCESS_COMMAND += 'empty_var_volatile;'
 
-ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains("DISTRO_FEATURES", "overlayfs", "overlayfs_qa_check;", "", d)}'
+ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains("DISTRO_FEATURES", "overlayfs", "overlayfs_qa_check; overlayfs_postprocess;", "", d)}'
 
 inherit image-artifact-names
 
@@ -421,4 +421,15 @@ python overlayfs_qa_check() {
 
     if not allUnitExist:
         bb.fatal('Not all mount paths and units are installed in the image')
+}
+
+python overlayfs_postprocess() {
+    import shutil
+
+    # install helper script
+    helperScriptName = "overlayfs-create-dirs.sh"
+    helperScriptSource = oe.path.join(d.getVar("COREBASE"), "meta/files", helperScriptName)
+    helperScriptDest = oe.path.join(d.getVar("IMAGE_ROOTFS"), "/usr/sbin/", helperScriptName)
+    shutil.copyfile(helperScriptSource, helperScriptDest)
+    os.chmod(helperScriptDest, 0o755)
 }

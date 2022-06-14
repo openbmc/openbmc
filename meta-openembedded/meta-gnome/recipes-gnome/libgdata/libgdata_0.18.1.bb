@@ -14,8 +14,7 @@ GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase pkgconfig gettext gtk-doc vala gobject-introspection manpages features_check
 
-# gcr
-REQUIRED_DISTRO_FEATURES = "x11"
+ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
 do_compile:prepend() {
     export GIR_EXTRA_LIBS_PATH="${B}/gdata/.libs"

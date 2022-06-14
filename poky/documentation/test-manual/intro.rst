@@ -175,19 +175,25 @@ Tests map into the codebase as follows:
    which include the fetchers. The tests are located in
    ``bitbake/lib/*/tests``.
 
+   Some of these tests run the ``bitbake`` command, so ``bitbake/bin``
+   must be added to the ``PATH`` before running ``bitbake-selftest``.
    From within the BitBake repository, run the following::
 
+      $ export PATH=$PWD/bin:$PATH
+
+   After that, you can run the selftest script::
+
       $ bitbake-selftest
-
-   To skip tests that access the Internet, use the ``BB_SKIP_NETTESTS``
-   variable when running "bitbake-selftest" as follows::
-
-      $ BB_SKIP_NETTESTS=yes bitbake-selftest
 
    The default output is quiet and just prints a summary of what was
    run. To see more information, there is a verbose option::
 
       $ bitbake-selftest -v
+
+   To skip tests that access the Internet, use the ``BB_SKIP_NETTESTS``
+   variable when running "bitbake-selftest" as follows::
+
+      $ BB_SKIP_NETTESTS=yes bitbake-selftest
 
    Use this option when you wish to skip tests that access the network,
    which are mostly necessary to test the fetcher modules. To specify

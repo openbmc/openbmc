@@ -1201,18 +1201,20 @@ python do_qa_patch() {
        if '/meta/' not in fullpath:
            continue
 
-       content = open(fullpath, encoding='utf-8', errors='ignore').read()
        kinda_status_re = re.compile(r"^.*upstream.*status.*$", re.IGNORECASE | re.MULTILINE)
        strict_status_re = re.compile(r"^Upstream-Status: (Pending|Submitted|Denied|Accepted|Inappropriate|Backport|Inactive-Upstream)( .+)?$", re.MULTILINE)
-       match_kinda = kinda_status_re.search(content)
-       match_strict = strict_status_re.search(content)
        guidelines = "https://www.openembedded.org/wiki/Commit_Patch_Message_Guidelines#Patch_Header_Recommendations:_Upstream-Status"
 
-       if not match_strict:
-           if match_kinda:
-               bb.error("Malformed Upstream-Status in patch\n%s\nPlease correct according to %s :\n%s" % (fullpath, guidelines, match_kinda.group(0)))
-           else:
-               bb.error("Missing Upstream-Status in patch\n%s\nPlease add according to %s ." % (fullpath, guidelines))
+       with open(fullpath, encoding='utf-8', errors='ignore') as f:
+           file_content = f.read()
+           match_kinda = kinda_status_re.search(file_content)
+           match_strict = strict_status_re.search(file_content)
+
+           if not match_strict:
+               if match_kinda:
+                   bb.error("Malformed Upstream-Status in patch\n%s\nPlease correct according to %s :\n%s" % (fullpath, guidelines, match_kinda.group(0)))
+               else:
+                   bb.error("Missing Upstream-Status in patch\n%s\nPlease add according to %s ." % (fullpath, guidelines))
 }
 
 python do_qa_configure() {

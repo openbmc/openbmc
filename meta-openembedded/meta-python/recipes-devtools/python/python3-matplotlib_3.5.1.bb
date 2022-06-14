@@ -50,6 +50,7 @@ RDEPENDS:${PN} = "\
     ${PYTHON_PN}-dateutil \
     ${PYTHON_PN}-kiwisolver \
     ${PYTHON_PN}-pytz \
+    ${PYTHON_PN}-pillow \
 "
 
 ENABLELTO:toolchain-clang:riscv64 = "echo enable_lto = False >> ${S}/mplsetup.cfg"

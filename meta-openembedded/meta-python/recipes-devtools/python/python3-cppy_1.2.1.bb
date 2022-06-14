@@ -7,11 +7,11 @@ SRC_URI[sha256sum] = "83b43bf17b1085ac15c5debdb42154f138b928234b21447358981f69d0
 
 RDEPENDS:${PN} += "python3-setuptools python3-distutils"
 
-inherit pypi python_flit_core 
+inherit pypi python_setuptools_build_meta
 
 SRC_URI += " file://0001-Fix-build-error-as-following.patch \
            "
 
-DEPENDS += "python3-setuptools-native"
+DEPENDS += "python3-setuptools-scm-native"
 
 BBCLASSEXTEND = "native nativesdk"

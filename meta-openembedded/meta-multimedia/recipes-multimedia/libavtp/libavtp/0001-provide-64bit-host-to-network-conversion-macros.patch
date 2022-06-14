@@ -1,0 +1,43 @@
+From cdbbe227594665145e9309a9ecb7d90aad070aab Mon Sep 17 00:00:00 2001
+From: Max Krummenacher <max.krummenacher@toradex.com>
+Date: Wed, 1 Jun 2022 15:53:55 +0000
+Subject: [PATCH] provide 64bit host to network conversion macros
+
+musl dosn't include the macros which convert 64-bit integers
+between host and network endianness from arpa/inet.h as glibc does.
+
+Use this patch to include endian.h in util.h if compiling for musl.
+
+Prevents:
+| [2/8] aarch64-tdx-linux-musl-gcc ... -o libavtp.so.0.2.0.p/src_avtp_stream.c.o -c ../git/src/avtp_stream.c
+| ../git/src/avtp_stream.c: In function 'avtp_stream_pdu_get':
+| ../git/src/avtp_stream.c:116:24: warning: implicit declaration of function 'be64toh' [-Wimplicit-function-declaration]
+|   116 |                 *val = be64toh(pdu->stream_id);
+|       |                        ^~~~~~~
+| ../git/src/avtp_stream.c: In function 'avtp_stream_pdu_set':
+| ../git/src/avtp_stream.c:199:34: warning: implicit declaration of function 'htobe64' [-Wimplicit-function-declaration]
+|   199 |                 pdu->stream_id = htobe64(value);
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Max Krummenacher <max.krummenacher@toradex.com>
+---
+ src/util.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/util.h b/src/util.h
+index 8b50625..e6fd2ef 100644
+--- a/src/util.h
++++ b/src/util.h
+@@ -27,6 +27,8 @@
+ 
+ #pragma once
+ 
++#include <endian.h>
++
+ #define BIT(n)				(1ULL << n)
+ 
+ #define BITMASK(len)			(BIT(len) - 1)
+-- 
+2.20.1
+

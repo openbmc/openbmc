@@ -1,7 +1,7 @@
 SUMMARY = "UBI utils statically compiled against klibc"
 DESCRIPTION = "Small sized tools from mtd-utils for use with initramfs."
 SECTION = "base"
-DEPENDS = "zlib lzo e2fsprogs util-linux"
+DEPENDS = "zlib e2fsprogs util-linux"
 HOMEPAGE = "http://www.linux-mtd.infradead.org/"
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3 \
@@ -25,6 +25,7 @@ EXTRA_OECONF += "--disable-tests --without-jffs --without-ubifs"
 
 PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'xattr', d)}"
 PACKAGECONFIG[xattr] = ",,acl,"
+PACKAGECONFIG[lzo] = "--with-lzo,--without-lzo,lzo"
 
 EXTRA_OEMAKE = "'CC=${CC}' 'RANLIB=${RANLIB}' 'AR=${AR}' 'CFLAGS=${CFLAGS} ${@bb.utils.contains('PACKAGECONFIG', 'xattr', '', '-DWITHOUT_XATTR', d)} -I${S}/include' 'BUILDDIR=${S}'"
 

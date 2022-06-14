@@ -22,4 +22,4 @@ do_install() {
     install -m 0755 *.sh ${D}${sbindir}
 }
 
-RDEPENDS:${PN} = "smack python mmap-smack-test tcp-smack-test udp-smack-test"
+RDEPENDS:${PN} = "smack python3-core mmap-smack-test tcp-smack-test udp-smack-test"

@@ -353,10 +353,15 @@ class Git(FetchMethod):
         if ud.shallow and os.path.exists(ud.fullshallow) and self.need_update(ud, d):
             ud.localpath = ud.fullshallow
             return
-        elif os.path.exists(ud.fullmirror) and not os.path.exists(ud.clonedir):
-            bb.utils.mkdirhier(ud.clonedir)
-            runfetchcmd("tar -xzf %s" % ud.fullmirror, d, workdir=ud.clonedir)
-
+        elif os.path.exists(ud.fullmirror) and self.need_update(ud, d):
+            if not os.path.exists(ud.clonedir):
+                bb.utils.mkdirhier(ud.clonedir)
+                runfetchcmd("tar -xzf %s" % ud.fullmirror, d, workdir=ud.clonedir)
+            else:
+                tmpdir = tempfile.mkdtemp(dir=d.getVar('DL_DIR'))
+                runfetchcmd("tar -xzf %s" % ud.fullmirror, d, workdir=tmpdir)
+                fetch_cmd = "LANG=C %s fetch -f --progress %s " % (ud.basecmd, shlex.quote(tmpdir))
+                runfetchcmd(fetch_cmd, d, workdir=ud.clonedir)
         repourl = self._get_repo_url(ud)
 
         # If the repo still doesn't exist, fallback to cloning it

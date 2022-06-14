@@ -24,6 +24,7 @@ from collections.abc import Mapping
 import bb.utils
 from bb import PrefixLoggerAdapter
 import re
+import shutil
 
 logger = logging.getLogger("BitBake.Cache")
 
@@ -997,4 +998,12 @@ class SimpleCache(object):
             p = pickle.Pickler(f, -1)
             p.dump([data, self.cacheversion])
 
+        bb.utils.unlockfile(glf)
+
+    def copyfile(self, target):
+        if not self.cachefile:
+            return
+
+        glf = bb.utils.lockfile(self.cachefile + ".lock")
+        shutil.copy(self.cachefile, target)
         bb.utils.unlockfile(glf)

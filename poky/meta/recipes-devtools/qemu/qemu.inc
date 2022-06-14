@@ -9,7 +9,7 @@ LICENSE = "GPL-2.0-only & LGPL-2.1-only"
 RDEPENDS:${PN}-ptest = "bash"
 
 require qemu-targets.inc
-inherit pkgconfig ptest python3-dir
+inherit pkgconfig ptest
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=441c28d2cf86e15a37fa47e15a72fbac \
                     file://COPYING.LIB;endline=24;md5=8c5efda6cf1e1b03dcfd0e6c0d271c7f"
@@ -111,11 +111,7 @@ do_configure:prepend:class-native() {
 }
 
 do_configure() {
-	# This is taken from meson.bbclass to avoid errors when updating to a
-	# new version of meson.
-	rmdir ${STAGING_LIBDIR_NATIVE}/${PYTHON_DIR}/site-packages/*.egg-info 2>/dev/null || :
-
-	${S}/configure ${EXTRA_OECONF}
+    ${S}/configure ${EXTRA_OECONF}
 }
 do_configure[cleandirs] += "${B}"
 

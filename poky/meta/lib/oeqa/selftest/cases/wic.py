@@ -853,7 +853,7 @@ class Wic2(WicTestCase):
             status, output = qemu.run_serial(cmd)
             self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
             self.assertEqual(output, '4')
-            cmd = "grep UUID= /etc/fstab"
+            cmd = "grep UUID=2c71ef06-a81d-4735-9d3a-379b69c6bdba /etc/fstab"
             status, output = qemu.run_serial(cmd)
             self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
             self.assertEqual(output, 'UUID=2c71ef06-a81d-4735-9d3a-379b69c6bdba\t/media\text4\tdefaults\t0\t0')

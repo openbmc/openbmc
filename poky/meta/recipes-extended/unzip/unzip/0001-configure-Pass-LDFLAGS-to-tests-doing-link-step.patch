@@ -6,7 +6,7 @@ Subject: [PATCH] configure: Pass LDFLAGS to tests doing link step
 Ensures that right flags from recipes are honored, otherwise tests fail
 which otherwise should not.
 
-Upstream-Status: Pending
+Upstream-Status: Inactive-Upstream
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  unix/configure | 28 ++++++++++++++--------------

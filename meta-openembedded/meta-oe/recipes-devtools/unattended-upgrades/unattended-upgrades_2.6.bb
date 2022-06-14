@@ -7,6 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe \
 
 SRC_URI = "git://github.com/mvo5/unattended-upgrades.git;protocol=https;branch=master \
            file://0001-unattended-upgrade-Remove-distro_info-usage-to-check.patch \
+           file://0001-setup.py-Disable-autodection-of-modules.patch \
            "
 
 SRCREV = "c6db6fad26a2b83ba301b52ff5dee98cef7558ca"

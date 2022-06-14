@@ -4,11 +4,11 @@ Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Armin Kuster <akuster808@gmail.com>
 
-Index: arpwatch-3.0/configure
+Index: arpwatch-3.3/configure
 ===================================================================
---- arpwatch-3.0.orig/configure
-+++ arpwatch-3.0/configure
-@@ -4349,8 +4349,8 @@ fi
+--- arpwatch-3.3.orig/configure
++++ arpwatch-3.3/configure
+@@ -4353,8 +4353,8 @@ fi
  	    CC=cc
  	    export CC
      fi

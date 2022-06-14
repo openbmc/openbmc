@@ -5,10 +5,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=5f30f0716dfdd0d91eb439ebec522ec2"
 BPN = "libwnck"
 
 SECTION = "x11/libs"
-DEPENDS = "intltool-native gnome-common-native gtk+3 gdk-pixbuf-native libxres"
+DEPENDS = "intltool-native gnome-common-native gtk+3 gdk-pixbuf-native"
 
-PACKAGECONFIG ??= "startup-notification"
-PACKAGECONFIG[startup-notification] = "-Dstartup_notification=enabled,-Dstartup_notification=disabled,startup-notification"
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)}"
+PACKAGECONFIG[x11] = "-Dstartup_notification=enabled,-Dstartup_notification=disabled,startup-notification libxres"
 
 GNOMEBASEBUILDCLASS = "meson"
 GTKDOC_MESON_OPTION = "gtk_doc"
@@ -22,5 +22,6 @@ def gnome_verdir(v):
 
 SRC_URI[archive.sha256sum] = "03134fa114ef3fbe34075aa83678f58aa2debe9fcef4ea23c0779e28601d6611"
 
-# libxres means x11 only
-REQUIRED_DISTRO_FEATURES = "x11"
+# gtk+3 and libepoxy need to be built with x11 PACKAGECONFIG.
+# cairo would at least needed to be built with xlib.
+ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"

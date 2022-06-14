@@ -129,7 +129,6 @@ RDEPENDS:packagegroup-self-hosted-extended = "\
     libusb1 \
     libxml2 \
     lsof \
-    lzo \
     man \
     man-pages \
     mdadm \

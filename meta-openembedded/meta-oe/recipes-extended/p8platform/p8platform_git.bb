@@ -17,3 +17,5 @@ inherit cmake pkgconfig
 EXTRA_OECMAKE += "-DCMAKE_INSTALL_LIBDIR=${libdir} -DCMAKE_INSTALL_LIBDIR_NOARCH=${libdir}"
 
 FILES:${PN}-dev += "${libdir}/p8-platform"
+
+RDEPENDS:${PN}-dev = ""

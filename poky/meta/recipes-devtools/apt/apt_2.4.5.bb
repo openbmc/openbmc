@@ -31,8 +31,14 @@ LIC_FILES_CHKSUM = "file://COPYING.GPL;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 # the package is taken from snapshots.debian.org; that source is static and goes stale
 # so we check the latest upstream from a directory that does get updated
 UPSTREAM_CHECK_URI = "${DEBIAN_MIRROR}/main/a/apt/"
+# apt seems to follow a peculiar version policy, where every *other* even version
+# is considered stable, e.g. 1.0, 1.4, 1.8, 2.2, 2.6, etc. As there is no way
+# to express 'divisible by 4 plus 2' in regex (that I know of), let's hardcode a few.
+UPSTREAM_CHECK_REGEX = "[^\d\.](?P<pver>((2\.2)|(2\.6)|(3\.0)|(3\.4)|(3\.8)|(4\.2))(\.\d+)+)\.tar"
+# needs be marked as unknown until 2.6 is out
+UPSTREAM_VERSION_UNKNOWN = "1"
 
-inherit cmake perlnative bash-completion upstream-version-is-even useradd
+inherit cmake perlnative bash-completion useradd
 
 # User is added to allow apt to drop privs, will runtime warn without
 USERADD_PACKAGES = "${PN}"

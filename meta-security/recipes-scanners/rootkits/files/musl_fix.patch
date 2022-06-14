@@ -1,0 +1,58 @@
+chkrootkit: Fix missing includes for musl
+
+
+Upstream-Status: Backport
+https://gitweb.gentoo.org/repo/gentoo.git/commit/?id=07737b95af2452c0055e1ed0660590c1487befdb
+https://bugs.gentoo.org/715552
+
+Signed-off-by: Armin Kuster <akuster808@gamil.com>
+
+Index: chkrootkit-0.55/chkdirs.c
+===================================================================
+--- chkrootkit-0.55.orig/chkdirs.c
++++ chkrootkit-0.55/chkdirs.c
+@@ -33,7 +33,7 @@
+ #elif defined(__APPLE__) && defined(__MACH__)
+ #include <sys/syslimits.h>
+ #endif
+-
++#include <limits.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <sys/types.h>
+Index: chkrootkit-0.55/chklastlog.c
+===================================================================
+--- chkrootkit-0.55.orig/chklastlog.c
++++ chkrootkit-0.55/chklastlog.c
+@@ -41,6 +41,7 @@ int main () { return 0; }
+ #include <stdlib.h>
+ #endif
+ #include <sys/stat.h>
++#include <fcntl.h>
+ #include <unistd.h>
+ #include <string.h>
+ #include <signal.h>
+Index: chkrootkit-0.55/chkproc.c
+===================================================================
+--- chkrootkit-0.55.orig/chkproc.c
++++ chkrootkit-0.55/chkproc.c
+@@ -65,6 +65,7 @@ int main (){ return 0; }
+ #include <string.h>
+ #include <errno.h>
+ #include <sys/types.h>
++#include <fcntl.h>
+ #include <dirent.h>
+ #include <ctype.h>
+ #include <stdlib.h>
+Index: chkrootkit-0.55/chkwtmp.c
+===================================================================
+--- chkrootkit-0.55.orig/chkwtmp.c
++++ chkrootkit-0.55/chkwtmp.c
+@@ -25,6 +25,7 @@ int main () { return 0; }
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
++#include <fcntl.h>
+ #include <string.h>
+ #include <utmp.h>
+ #include <time.h>

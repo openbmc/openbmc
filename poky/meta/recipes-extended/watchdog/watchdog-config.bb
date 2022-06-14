@@ -13,8 +13,15 @@ SRC_URI = " \
     file://watchdog.conf \
 "
 
+# The default value is 60 seconds when null.
+WATCHDOG_TIMEOUT ??= ""
+
 do_install() {
     install -Dm 0644 ${WORKDIR}/watchdog.default ${D}${sysconfdir}/default/watchdog
     install -Dm 0644 ${WORKDIR}/watchdog.conf ${D}${sysconfdir}/watchdog.conf
+
+    if [ -n "${WATCHDOG_TIMEOUT}" ]; then
+        echo "watchdog-timeout = ${WATCHDOG_TIMEOUT}" >> ${D}/etc/watchdog.conf
+    fi
 }
 

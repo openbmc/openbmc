@@ -41,8 +41,8 @@ SRC_URI = " \
 S = "${WORKDIR}/git"
 SRCREV = "e561775c1580a9f60a726355b2b897bfc9cb3382"
 
-# for gnome-online-accounts
-REQUIRED_DISTRO_FEATURES = "gobject-introspection-data x11"
+ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
+REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
 
 GIR_MESON_OPTION = ""
 EXTRA_OEMESON = "-Dprofile=release"

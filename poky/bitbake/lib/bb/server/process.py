@@ -437,6 +437,7 @@ class BitBakeProcessServerConnection(object):
         self.socket_connection = sock
 
     def terminate(self):
+        self.events.close()
         self.socket_connection.close()
         self.connection.connection.close()
         self.connection.recv.close()
@@ -662,23 +663,18 @@ class BBUIEventQueue:
         self.reader = ConnectionReader(readfd)
 
         self.t = threading.Thread()
-        self.t.daemon = True
         self.t.run = self.startCallbackHandler
         self.t.start()
 
     def getEvent(self):
-        self.eventQueueLock.acquire()
+        with self.eventQueueLock:
+            if len(self.eventQueue) == 0:
+                return None
 
-        if len(self.eventQueue) == 0:
-            self.eventQueueLock.release()
-            return None
+            item = self.eventQueue.pop(0)
+            if len(self.eventQueue) == 0:
+                self.eventQueueNotify.clear()
 
-        item = self.eventQueue.pop(0)
-
-        if len(self.eventQueue) == 0:
-            self.eventQueueNotify.clear()
-
-        self.eventQueueLock.release()
         return item
 
     def waitEvent(self, delay):
@@ -686,10 +682,9 @@ class BBUIEventQueue:
         return self.getEvent()
 
     def queue_event(self, event):
-        self.eventQueueLock.acquire()
-        self.eventQueue.append(event)
-        self.eventQueueNotify.set()
-        self.eventQueueLock.release()
+        with self.eventQueueLock:
+            self.eventQueue.append(event)
+            self.eventQueueNotify.set()
 
     def send_event(self, event):
         self.queue_event(pickle.loads(event))
@@ -698,13 +693,17 @@ class BBUIEventQueue:
         bb.utils.set_process_name("UIEventQueue")
         while True:
             try:
-                self.reader.wait()
-                event = self.reader.get()
-                self.queue_event(event)
-            except EOFError:
+                ready = self.reader.wait(0.25)
+                if ready:
+                    event = self.reader.get()
+                    self.queue_event(event)
+            except (EOFError, OSError, TypeError):
                 # Easiest way to exit is to close the file descriptor to cause an exit
                 break
+
+    def close(self):
         self.reader.close()
+        self.t.join()
 
 class ConnectionReader(object):
 

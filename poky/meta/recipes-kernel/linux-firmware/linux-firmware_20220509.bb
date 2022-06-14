@@ -69,6 +69,7 @@ LICENSE = "\
     & WHENCE \
 "
 
+WHENCE_CHKSUM = "d3eb82686904888f8bbbe8d865371404"
 LIC_FILES_CHKSUM = "file://LICENCE.Abilis;md5=b5ee3f410780e56711ad48eadc22b8bc \
                     file://LICENCE.adsp_sst;md5=615c45b91a5a4a9fe046d6ab9a2df728 \
                     file://LICENCE.agere;md5=af0133de6b4a9b2522defd5f188afd31 \
@@ -132,7 +133,7 @@ LIC_FILES_CHKSUM = "file://LICENCE.Abilis;md5=b5ee3f410780e56711ad48eadc22b8bc \
                     file://LICENCE.xc4000;md5=0ff51d2dc49fce04814c9155081092f0 \
                     file://LICENCE.xc5000;md5=1e170c13175323c32c7f4d0998d53f66 \
                     file://LICENCE.xc5000c;md5=12b02efa3049db65d524aeb418dd87ca \
-                    file://WHENCE;md5=d3eb82686904888f8bbbe8d865371404 \
+                    file://WHENCE;md5=${WHENCE_CHKSUM} \
                     "
 
 # These are not common licenses, set NO_GENERIC_LICENSE for them
@@ -207,6 +208,11 @@ SRC_URI = "\
   ${KERNELORG_MIRROR}/linux/kernel/firmware/${BPN}-${PV}.tar.xz \
   file://0001-Makefile-replace-mkdir-by-install.patch \
 "
+
+BBCLASSEXTEND = "devupstream:target"
+SRC_URI:class-devupstream = "git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git;protocol=https;branch=main"
+# Pin this to the 20220509 release, override this in local.conf
+SRCREV:class-devupstream ?= "b19cbdca78ab2adfd210c91be15a22568e8b8cae"
 
 SRC_URI[sha256sum] = "376e0b3d7b4f8aaa2abf7f5ab74803dcf14b06b94e3d841b1467cd9a2848255e"
 

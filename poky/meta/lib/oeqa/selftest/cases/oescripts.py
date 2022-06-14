@@ -129,7 +129,8 @@ class OEListPackageconfigTests(OEScriptTests):
     def check_endlines(self, results,  expected_endlines): 
         for line in results.output.splitlines():
             for el in expected_endlines:
-                if line.split() == el.split():
+                if line and line.split()[0] == el.split()[0] and \
+                   ' '.join(sorted(el.split())) in ' '.join(sorted(line.split())):
                     expected_endlines.remove(el)
                     break
 

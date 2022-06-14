@@ -598,6 +598,8 @@ class QuiltTree(PatchSet):
 
     def Clean(self):
         try:
+            # make sure that patches/series file exists before quilt pop to keep quilt-0.67 happy
+            open(os.path.join(self.dir, "patches","series"), 'a').close()
             self._runcmd(["pop", "-a", "-f"])
             oe.path.remove(os.path.join(self.dir, "patches","series"))
         except Exception:

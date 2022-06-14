@@ -35,6 +35,7 @@ PACKAGECONFIG ??= " \
 
 PACKAGECONFIG[aom]             = "-Daom=enabled,-Daom=disabled,aom"
 PACKAGECONFIG[assrender]       = "-Dassrender=enabled,-Dassrender=disabled,libass"
+PACKAGECONFIG[avtp]            = "-Davtp=enabled,-Davtp=disabled,libavtp"
 PACKAGECONFIG[bluez]           = "-Dbluez=enabled,-Dbluez=disabled,bluez5"
 PACKAGECONFIG[bz2]             = "-Dbz2=enabled,-Dbz2=disabled,bzip2"
 PACKAGECONFIG[closedcaption]   = "-Dclosedcaption=enabled,-Dclosedcaption=disabled,pango cairo"
@@ -112,7 +113,6 @@ EXTRA_OEMESON += " \
     -Dandroidmedia=disabled \
     -Dapplemedia=disabled \
     -Dasio=disabled \
-    -Davtp=disabled \
     -Dbs2b=disabled \
     -Dchromaprint=disabled \
     -Dd3dvideosink=disabled \

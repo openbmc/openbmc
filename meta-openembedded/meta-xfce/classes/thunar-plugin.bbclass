@@ -1,6 +1,8 @@
 inherit xfce features_check
 
-REQUIRED_DISTRO_FEATURES = "x11"
+# xfce4 depends on libwnck3, gtk+3 and libepoxy need to be built with x11 PACKAGECONFIG.
+# cairo would at least needed to be built with xlib.
+ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
 DEPENDS += "thunar"
 

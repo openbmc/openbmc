@@ -104,6 +104,9 @@ do_install_ptest() {
     install -D ${WORKDIR}/check-memfree.py ${D}${PTEST_PATH}/
     install -d ${D}${PTEST_PATH}/tests
     cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
+    # remove test_x509.py as it needs benchmark and we don't
+    # want to introduce the benchmark dependency
+    rm -rf ${D}${PTEST_PATH}/tests/bench/test_x509.py
     install -d ${D}${PTEST_PATH}/tests/hazmat
     cp -rf ${S}/tests/hazmat/* ${D}${PTEST_PATH}/tests/hazmat/
     cp -r ${S}/pyproject.toml ${D}${PTEST_PATH}/

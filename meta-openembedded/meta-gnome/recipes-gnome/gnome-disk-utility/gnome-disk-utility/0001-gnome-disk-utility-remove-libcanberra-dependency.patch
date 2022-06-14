@@ -1,0 +1,135 @@
+From 36cbdd82f21e4ef37da9f05c1c5e770b6cd66df2 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Sun, 29 May 2022 06:35:26 +0200
+Subject: [PATCH] gnome-disk-utility: remove libcanberra dependency
+
+libcanberra-gtk3 module isn't buildable for wayland.
+Remove its dpendency.
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+
+Upstream-Status: Inappropriate
+---
+ meson.build                           |  1 -
+ src/disks/gducreatediskimagedialog.c  | 27 ++-------------------------
+ src/disks/gdurestorediskimagedialog.c | 20 +-------------------
+ src/disks/meson.build                 |  1 -
+ 4 files changed, 3 insertions(+), 46 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 0daf7f82..cba6c74b 100644
+--- a/meson.build
++++ b/meson.build
+@@ -72,7 +72,6 @@ dvdread_dep = dependency('dvdread', version: '>= 4.2.0')
+ gio_unix_dep = dependency('gio-unix-2.0', version: '>= 2.31.0')
+ gmodule_dep = dependency('gmodule-2.0')
+ gtk_dep = dependency('gtk+-3.0', version: '>= 3.16.0')
+-libcanberra_dep = dependency('libcanberra-gtk3', version: '>= 0.1')
+ # Keep the version here synchronised with subprojects/libhandy.wrap
+ libhandy_dep = dependency('libhandy-1', version: '>= 1.5.0', fallback: ['libhandy', 'libhandy_dep'])
+ liblzma_dep = dependency('liblzma', version: '>= 5.0.5')
+diff --git a/src/disks/gducreatediskimagedialog.c b/src/disks/gducreatediskimagedialog.c
+index 181b2892..a22004cf 100644
+--- a/src/disks/gducreatediskimagedialog.c
++++ b/src/disks/gducreatediskimagedialog.c
+@@ -21,8 +21,6 @@
+ #include <sys/ioctl.h>
+ #include <linux/fs.h>
+ 
+-#include <canberra-gtk.h>
+-
+ #include "gduapplication.h"
+ #include "gduwindow.h"
+ #include "gducreatediskimagedialog.h"
+@@ -297,19 +295,7 @@ create_disk_image_populate (DialogData *data)
+ 
+ static void
+ play_read_error_sound (DialogData *data)
+-{
+-  const gchar *sound_message;
+-
+-  /* Translators: A descriptive string for the sound played when
+-   * there's a read error that's being ignored, see
+-   * CA_PROP_EVENT_DESCRIPTION
+-   */
+-  sound_message = _("Disk image read error");
+-  ca_gtk_play_for_widget (GTK_WIDGET (data->window), 0,
+-                          CA_PROP_EVENT_ID, "dialog-warning",
+-                          CA_PROP_EVENT_DESCRIPTION, sound_message,
+-                          NULL);
+-}
++{}
+ 
+ /* ---------------------------------------------------------------------------------------------------- */
+ 
+@@ -403,16 +389,7 @@ update_job (DialogData *data,
+ 
+ static void
+ play_complete_sound (DialogData *data)
+-{
+-  const gchar *sound_message;
+-
+-  /* Translators: A descriptive string for the 'complete' sound, see CA_PROP_EVENT_DESCRIPTION */
+-  sound_message = _("Disk image copying complete");
+-  ca_gtk_play_for_widget (GTK_WIDGET (data->window), 0,
+-                          CA_PROP_EVENT_ID, "complete",
+-                          CA_PROP_EVENT_DESCRIPTION, sound_message,
+-                          NULL);
+-}
++{}
+ 
+ /* ---------------------------------------------------------------------------------------------------- */
+ 
+diff --git a/src/disks/gdurestorediskimagedialog.c b/src/disks/gdurestorediskimagedialog.c
+index bccf97e9..e7ec81cb 100644
+--- a/src/disks/gdurestorediskimagedialog.c
++++ b/src/disks/gdurestorediskimagedialog.c
+@@ -17,8 +17,6 @@
+ #include <sys/ioctl.h>
+ #include <linux/fs.h>
+ 
+-#include <canberra-gtk.h>
+-
+ #include "gduapplication.h"
+ #include "gduwindow.h"
+ #include "gdurestorediskimagedialog.h"
+@@ -606,23 +604,7 @@ update_job (DialogData *data,
+ 
+ static void
+ play_complete_sound (DialogData *data)
+-{
+-  const gchar *sound_message;
+-
+-  /* Translators: A descriptive string for the 'complete' sound, see CA_PROP_EVENT_DESCRIPTION */
+-  sound_message = _("Disk image copying complete");
+-  ca_gtk_play_for_widget (GTK_WIDGET (data->dialog), 0,
+-                          CA_PROP_EVENT_ID, "complete",
+-                          CA_PROP_EVENT_DESCRIPTION, sound_message,
+-                          NULL);
+-
+-  if (data->inhibit_cookie > 0)
+-    {
+-      gtk_application_uninhibit (GTK_APPLICATION (gdu_window_get_application (data->window)),
+-                                 data->inhibit_cookie);
+-      data->inhibit_cookie = 0;
+-    }
+-}
++{}
+ 
+ /* ---------------------------------------------------------------------------------------------------- */
+ 
+diff --git a/src/disks/meson.build b/src/disks/meson.build
+index 35b2f103..6fc367b4 100644
+--- a/src/disks/meson.build
++++ b/src/disks/meson.build
+@@ -85,7 +85,6 @@ deps = [
+   dvdread_dep,
+   gio_unix_dep,
+   gmodule_dep,
+-  libcanberra_dep,
+   libgdu_dep,
+   libhandy_dep,
+   liblzma_dep,
+-- 
+2.25.1
+

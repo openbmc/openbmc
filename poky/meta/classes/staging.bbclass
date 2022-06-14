@@ -352,7 +352,7 @@ python extend_recipe_sysroot() {
     #bb.note(" start is %s" % str(start))
 
     # Direct dependencies should be present and can be depended upon
-    for dep in set(start):
+    for dep in sorted(set(start)):
         if setscenedeps[dep][1] == "do_populate_sysroot":
             if dep not in configuredeps:
                 configuredeps.append(dep)
