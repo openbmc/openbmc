@@ -1,0 +1,718 @@
+[
+  {
+    // Hold fans at the given target when a number of fans are missing.
+    "name": "fan(s) missing",
+    "groups": [
+      {
+        "name": "fan inventory",
+        "interface": "xyz.openbmc_project.Inventory.Item",
+        "property": { "name": "Present" }
+      }
+    ],
+    "triggers": [
+      {
+        "class": "init",
+        "method": "get_properties"
+      },
+      {
+        "class": "signal",
+        "signal": "properties_changed"
+      },
+      {
+        "class": "signal",
+        "signal": "interfaces_added"
+      }
+    ],
+    "actions": [
+      {
+        "name": "count_state_before_target",
+        "count": 1,
+        "state": false,
+        "target": 255
+      }
+    ]
+  },
+  {
+    // Hold fans at the given target when a number of rotors are nonfunctional.
+    "name": "fan rotor(s) faulted",
+    "groups": [
+      {
+        "name": "fan0 rotor inventory",
+        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+        "property": { "name": "Functional" }
+      },
+      {
+        "name": "fan1 rotor inventory",
+        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+        "property": { "name": "Functional" }
+      },
+      {
+        "name": "fan2 rotor inventory",
+        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+        "property": { "name": "Functional" }
+      },
+      {
+        "name": "fan3 rotor inventory",
+        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+        "property": { "name": "Functional" }
+      },
+      {
+        "name": "fan4 rotor inventory",
+        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+        "property": { "name": "Functional" }
+      },
+      {
+        "name": "fan5 rotor inventory",
+        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+        "property": { "name": "Functional" }
+      }
+    ],
+    "triggers": [
+      {
+        "class": "init",
+        "method": "get_properties"
+      },
+      {
+        "class": "signal",
+        "signal": "properties_changed"
+      },
+      {
+        "class": "signal",
+        "signal": "interfaces_added"
+      }
+    ],
+    "actions": [
+      {
+        "name": "count_state_before_target",
+        "count": 1,
+        "state": false,
+        "target": 255
+      }
+    ]
+  },
+  {
+    // Set a raised fan floor when any PLDM temperature sensor is nonfunctional
+    "name": "Nonfunctional PLDM sensors",
+    "groups": [
+      {
+        "name": "PLDM Sensors",
+        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+        "property": { "name": "Functional" }
+      }
+    ],
+    "triggers": [
+      {
+        "class": "init",
+        "method": "get_properties"
+      },
+      {
+        "class": "signal",
+        "signal": "properties_changed"
+      },
+      {
+        "class": "signal",
+        "signal": "interfaces_added"
+      }
+    ],
+    "actions": [
+      {
+        "name": "count_state_before_target",
+        "groups": [
+          {
+            "name": "PLDM Sensors",
+            "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+            "property": { "name": "Functional" }
+          }
+        ],
+        "count": 1,
+        "state": false,
+        "target": 255
+      }
+    ]
+  },
+  {
+    // Set a raised fan floor when any temperature sensor is nonfunctional
+    "name": "Nonfunctional temperature sensors",
+    "groups": [
+      {
+        "name": "Sys Inlet Temp Components",
+        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+        "property": { "name": "Functional" }
+      },
+      {
+        "name": "CPU Temps",
+        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+        "property": { "name": "Functional" }
+      },
+      {
+        "name": "PSU Max Temps",
+        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+        "property": { "name": "Functional" }
+      },
+      {
+        "name": "PCIE Zone Temps",
+        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+        "property": { "name": "Functional" }
+      }
+    ],
+    "triggers": [
+      {
+        "class": "init",
+        "method": "get_properties"
+      },
+      {
+        "class": "timer",
+        "type": "repeating",
+        "interval": 6000000,
+        "preload_groups": true
+      }
+    ],
+    "actions": [
+      {
+        "name": "count_state_before_target",
+        "groups": [
+          {
+            "name": "Sys Inlet Temp Components",
+            "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+            "property": { "name": "Functional" }
+          },
+          {
+            "name": "CPU Temps",
+            "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+            "property": { "name": "Functional" }
+          },
+          {
+            "name": "PSU Max Temps",
+            "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+            "property": { "name": "Functional" }
+          },
+          {
+            "name": "PCIE Zone Temps",
+            "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+            "property": { "name": "Functional" }
+          }
+        ],
+        "count": 10,
+        "state": false,
+        "target": 255
+      }
+    ]
+  },
+  {
+    "name": "Target mapping from CPU Temps",
+    "groups": [
+      {
+        "name": "CPU Temps",
+        "interface": "xyz.openbmc_project.Sensor.Value",
+        "property": { "name": "Value" }
+      }
+    ],
+    "triggers": [
+      {
+        "class": "poweron",
+        "method": "get_properties"
+      },
+      {
+        "class": "init",
+        "method": "get_properties"
+      },
+      {
+        "class": "signal",
+        "signal": "properties_changed"
+      },
+      {
+        "class": "timer",
+        "type": "repeating",
+        "interval": 5000000,
+        "preload_groups": true
+      }
+    ],
+    "actions": [
+      {
+        "name": "target_from_group_max",
+        "groups": [
+          {
+            "name": "CPU Temps",
+            "interface": "xyz.openbmc_project.Sensor.Value",
+            "property": { "name": "Value" }
+          }
+        ],
+        "neg_hysteresis": 2,
+        "pos_hysteresis": 0,
+        "map": [
+                { "value": 1.0, "target": 77.0 },
+                { "value": 50.0, "target": 89.0 },
+                { "value": 60.0, "target": 102.0 },
+                { "value": 65.0, "target": 115.0 },
+                { "value": 70.0, "target": 122.0 },
+                { "value": 76.0, "target": 128.0 },
+                { "value": 77.0, "target": 130.0 },
+                { "value": 78.0, "target": 133.0 },
+                { "value": 79.0, "target": 135.0 },
+                { "value": 80.0, "target": 138.0 },
+                { "value": 81.0, "target": 140.0 },
+                { "value": 82.0, "target": 143.0 },
+                { "value": 83.0, "target": 145.0 },
+                { "value": 84.0, "target": 148.0 },
+                { "value": 85.0, "target": 161.0 },
+                { "value": 86.0, "target": 173.0 },
+                { "value": 87.0, "target": 181.0 },
+                { "value": 88.0, "target": 189.0 },
+                { "value": 89.0, "target": 196.0 },
+                { "value": 90.0, "target": 204.0 },
+                { "value": 91.0, "target": 207.0 },
+                { "value": 92.0, "target": 232.0 },
+                { "value": 93.0, "target": 237.0 },
+                { "value": 94.0, "target": 242.0 },
+                { "value": 95.0, "target": 247.0 },
+                { "value": 96.0, "target": 252.0 },
+                { "value": 97.0, "target": 255.0 },
+                { "value": 98.0, "target": 255.0 },
+                { "value": 99.0, "target": 255.0 }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Target mapping from CPU DIMM Temps",
+    "groups": [
+      {
+        "name": "CPU DIMM Temps",
+        "interface": "xyz.openbmc_project.Sensor.Value",
+        "property": { "name": "Value" }
+      }
+    ],
+    "triggers": [
+      {
+        "class": "poweron",
+        "method": "get_properties"
+      },
+      {
+        "class": "init",
+        "method": "get_properties"
+      },
+      {
+        "class": "signal",
+        "signal": "properties_changed"
+      },
+      {
+        "class": "timer",
+        "type": "repeating",
+        "interval": 5000000,
+        "preload_groups": true
+      }
+    ],
+    "actions": [
+      {
+        "name": "target_from_group_max",
+        "groups": [
+          {
+            "name": "CPU DIMM Temps",
+            "interface": "xyz.openbmc_project.Sensor.Value",
+            "property": { "name": "Value" }
+          }
+        ],
+        "neg_hysteresis": 2,
+        "pos_hysteresis": 0,
+        "map": [
+                { "value": 1.0, "target": 26.0 },
+                { "value": 20.0, "target": 51.0 },
+                { "value": 30.0, "target": 64.0 },
+                { "value": 35.0, "target": 77.0 },
+                { "value": 38.0, "target": 89.0 },
+                { "value": 40.0, "target": 102.0 },
+                { "value": 45.0, "target": 115.0 },
+                { "value": 50.0, "target": 128.0 },
+                { "value": 54.0, "target": 140.0 },
+                { "value": 58.0, "target": 153.0 },
+                { "value": 63.0, "target": 166.0 },
+                { "value": 67.0, "target": 179.0 },
+                { "value": 70.0, "target": 191.0 },
+                { "value": 73.0, "target": 204.0 },
+                { "value": 75.0, "target": 230.0 },
+                { "value": 80.0, "target": 242.0 },
+                { "value": 85.0, "target": 255.0 }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Target mapping from NVMeM2 Max Temp",
+    "groups": [
+      {
+        "name": "NVMeM2 Max Temp",
+        "interface": "xyz.openbmc_project.Sensor.Value",
+        "property": { "name": "Value" }
+      }
+    ],
+    "triggers": [
+      {
+        "class": "poweron",
+        "method": "get_properties"
+      },
+      {
+        "class": "init",
+        "method": "get_properties"
+      },
+      {
+        "class": "signal",
+        "signal": "properties_changed"
+      },
+      {
+        "class": "timer",
+        "type": "repeating",
+        "interval": 5000000,
+        "preload_groups": true
+      }
+    ],
+    "actions": [
+      {
+        "name": "target_from_group_max",
+        "groups": [
+          {
+            "name": "NVMeM2 Max Temp",
+            "interface": "xyz.openbmc_project.Sensor.Value",
+            "property": { "name": "Value" }
+          }
+        ],
+        "neg_hysteresis": 2,
+        "pos_hysteresis": 0,
+        "map": [
+                { "value": 1.0, "target": 51.0 },
+                { "value": 25.0, "target": 77.0 },
+                { "value": 30.0, "target": 82.0 },
+                { "value": 34.0, "target": 87.0 },
+                { "value": 35.0, "target": 92.0 },
+                { "value": 36.0, "target": 97.0 },
+                { "value": 37.0, "target": 102.0 },
+                { "value": 38.0, "target": 115.0 },
+                { "value": 39.0, "target": 128.0 },
+                { "value": 40.0, "target": 140.0 },
+                { "value": 41.0, "target": 153.0 },
+                { "value": 42.0, "target": 166.0 },
+                { "value": 45.0, "target": 179.0 },
+                { "value": 50.0, "target": 191.0 },
+                { "value": 55.0, "target": 204.0 },
+                { "value": 60.0, "target": 217.0 },
+                { "value": 63.0, "target": 230.0 },
+                { "value": 65.0, "target": 242.0 },
+                { "value": 70.0, "target": 245.0 },
+                { "value": 85.0, "target": 250.0 },
+                { "value": 87.0, "target": 255.0 }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Target mapping from NVMeFBP Max Temp",
+    "groups": [
+      {
+        "name": "NVMeFBP Max Temp",
+        "interface": "xyz.openbmc_project.Sensor.Value",
+        "property": { "name": "Value" }
+      }
+    ],
+    "triggers": [
+      {
+        "class": "poweron",
+        "method": "get_properties"
+      },
+      {
+        "class": "init",
+        "method": "get_properties"
+      },
+      {
+        "class": "signal",
+        "signal": "properties_changed"
+      },
+      {
+        "class": "timer",
+        "type": "repeating",
+        "interval": 5000000,
+        "preload_groups": true
+      }
+    ],
+    "actions": [
+      {
+        "name": "target_from_group_max",
+        "groups": [
+          {
+            "name": "NVMeFBP Max Temp",
+            "interface": "xyz.openbmc_project.Sensor.Value",
+            "property": { "name": "Value" }
+          }
+        ],
+        "neg_hysteresis": 2,
+        "pos_hysteresis": 0,
+        "map": [
+                { "value": 1.0, "target": 26.0 },
+                { "value": 10.0, "target": 38.0 },
+                { "value": 20.0, "target": 51.0 },
+                { "value": 30.0, "target": 77.0 },
+                { "value": 35.0, "target": 89.0 },
+                { "value": 38.0, "target": 102.0 },
+                { "value": 40.0, "target": 128.0 },
+                { "value": 43.0, "target": 153.0 },
+                { "value": 45.0, "target": 179.0 },
+                { "value": 47.0, "target": 204.0 },
+                { "value": 50.0, "target": 217.0 },
+                { "value": 65.0, "target": 230.0 },
+                { "value": 68.0, "target": 242.0 },
+                { "value": 70.0, "target": 255.0 }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Target mapping from OCP Max Temp",
+    "groups": [
+      {
+        "name": "OCP Max Temp",
+        "interface": "xyz.openbmc_project.Sensor.Value",
+        "property": { "name": "Value" }
+      }
+    ],
+    "triggers": [
+      {
+        "class": "poweron",
+        "method": "get_properties"
+      },
+      {
+        "class": "init",
+        "method": "get_properties"
+      },
+      {
+        "class": "signal",
+        "signal": "properties_changed"
+      },
+      {
+        "class": "timer",
+        "type": "repeating",
+        "interval": 5000000,
+        "preload_groups": true
+      }
+    ],
+    "actions": [
+      {
+        "name": "target_from_group_max",
+        "groups": [
+          {
+            "name": "OCP Max Temp",
+            "interface": "xyz.openbmc_project.Sensor.Value",
+            "property": { "name": "Value" }
+          }
+        ],
+        "neg_hysteresis": 2,
+        "pos_hysteresis": 0,
+        "map": [
+                { "value": 1.0, "target": 26.0 },
+                { "value": 30.0, "target": 38.0 },
+                { "value": 40.0, "target": 51.0 },
+                { "value": 45.0, "target": 64.0 },
+                { "value": 50.0, "target": 77.0 },
+                { "value": 55.0, "target": 89.0 },
+                { "value": 60.0, "target": 102.0 },
+                { "value": 64.0, "target": 115.0 },
+                { "value": 67.0, "target": 122.0 },
+                { "value": 70.0, "target": 128.0 },
+                { "value": 75.0, "target": 140.0 },
+                { "value": 77.0, "target": 145.0 },
+                { "value": 79.0, "target": 150.0 },
+                { "value": 80.0, "target": 153.0 },
+                { "value": 81.0, "target": 179.0 },
+                { "value": 82.0, "target": 184.0 },
+                { "value": 84.0, "target": 194.0 },
+                { "value": 85.0, "target": 199.0 },
+                { "value": 86.0, "target": 212.0 },
+                { "value": 87.0, "target": 224.0 },
+                { "value": 88.0, "target": 232.0 },
+                { "value": 89.0, "target": 240.0 },
+                { "value": 90.0, "target": 247.0 },
+                { "value": 100.0, "target": 255.0 },
+                { "value": 105.0, "target": 255.0 }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Target mapping from PSU Max Temps",
+    "groups": [
+      {
+        "name": "PSU Max Temps",
+        "interface": "xyz.openbmc_project.Sensor.Value",
+        "property": { "name": "Value" }
+      }
+    ],
+    "triggers": [
+      {
+        "class": "poweron",
+        "method": "get_properties"
+      },
+      {
+        "class": "init",
+        "method": "get_properties"
+      },
+      {
+        "class": "signal",
+        "signal": "properties_changed"
+      },
+      {
+        "class": "timer",
+        "type": "repeating",
+        "interval": 5000000,
+        "preload_groups": true
+      }
+    ],
+    "actions": [
+      {
+        "name": "target_from_group_max",
+        "groups": [
+          {
+            "name": "PSU Max Temps",
+            "interface": "xyz.openbmc_project.Sensor.Value",
+            "property": { "name": "Value" }
+          }
+        ],
+        "neg_hysteresis": 2,
+        "pos_hysteresis": 0,
+        "map": [
+                { "value": 1.0, "target": 26.0 },
+                { "value": 10.0, "target": 51.0 },
+                { "value": 20.0, "target": 77.0 },
+                { "value": 25.0, "target": 89.0 },
+                { "value": 30.0, "target": 102.0 },
+                { "value": 35.0, "target": 115.0 },
+                { "value": 38.0, "target": 128.0 },
+                { "value": 40.0, "target": 140.0 },
+                { "value": 43.0, "target": 153.0 },
+                { "value": 45.0, "target": 166.0 },
+                { "value": 47.0, "target": 179.0 },
+                { "value": 49.0, "target": 191.0 },
+                { "value": 52.0, "target": 204.0 },
+                { "value": 54.0, "target": 242.0 },
+                { "value": 55.0, "target": 255.0 }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Target mapping from PCIE Zone Temps",
+    "groups": [
+      {
+        "name": "PCIE Zone Temps",
+        "interface": "xyz.openbmc_project.Sensor.Value",
+        "property": { "name": "Value" }
+      }
+    ],
+    "triggers": [
+      {
+        "class": "poweron",
+        "method": "get_properties"
+      },
+      {
+        "class": "init",
+        "method": "get_properties"
+      },
+      {
+        "class": "signal",
+        "signal": "properties_changed"
+      },
+      {
+        "class": "timer",
+        "type": "repeating",
+        "interval": 5000000,
+        "preload_groups": true
+      }
+    ],
+    "actions": [
+      {
+        "name": "target_from_group_max",
+        "groups": [
+          {
+            "name": "PCIE Zone Temps",
+            "interface": "xyz.openbmc_project.Sensor.Value",
+            "property": { "name": "Value" }
+          }
+        ],
+        "neg_hysteresis": 2,
+        "pos_hysteresis": 0,
+        "map": [
+                { "value": 1.0, "target": 26.0 },
+                { "value": 25.0, "target": 38.0 },
+                { "value": 35.0, "target": 51.0 },
+                { "value": 37.0, "target": 56.0 },
+                { "value": 38.0, "target": 64.0 },
+                { "value": 40.0, "target": 77.0 },
+                { "value": 42.0, "target": 89.0 },
+                { "value": 43.0, "target": 102.0 },
+                { "value": 44.0, "target": 115.0 },
+                { "value": 45.0, "target": 128.0 },
+                { "value": 46.0, "target": 140.0 },
+                { "value": 47.0, "target": 153.0 },
+                { "value": 48.0, "target": 166.0 },
+                { "value": 49.0, "target": 179.0 },
+                { "value": 50.0, "target": 191.0 },
+                { "value": 51.0, "target": 204.0 },
+                { "value": 52.0, "target": 217.0 },
+                { "value": 53.0, "target": 230.0 },
+                { "value": 54.0, "target": 242.0 },
+                { "value": 55.0, "target": 255.0 }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Target mapping from Sys Inlet Temp",
+    "groups": [
+      {
+        "name": "Sys Inlet Temp",
+        "interface": "xyz.openbmc_project.Sensor.Value",
+        "property": { "name": "Value" }
+      }
+    ],
+    "triggers": [
+      {
+        "class": "poweron",
+        "method": "get_properties"
+      },
+      {
+        "class": "init",
+        "method": "get_properties"
+      },
+      {
+        "class": "signal",
+        "signal": "properties_changed"
+      },
+      {
+        "class": "timer",
+        "type": "repeating",
+        "interval": 5000000,
+        "preload_groups": true
+      }
+    ],
+    "actions": [
+      {
+        "name": "target_from_group_max",
+        "groups": [
+          {
+            "name": "Sys Inlet Temp",
+            "interface": "xyz.openbmc_project.Sensor.Value",
+            "property": { "name": "Value" }
+          }
+        ],
+        "neg_hysteresis": 2,
+        "pos_hysteresis": 0,
+        "map": [
+                { "value": 1.0, "target": 26.0 },
+                { "value": 10.0, "target": 51.0 },
+                { "value": 20.0, "target": 64.0 },
+                { "value": 25.0, "target": 77.0 },
+                { "value": 30.0, "target": 89.0 },
+                { "value": 35.0, "target": 102.0 },
+                { "value": 38.0, "target": 179.0 },
+                { "value": 40.0, "target": 255.0 }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,160 @@
+{
+    "fans": [
+       {
+          "inventory": "/system/board/Mt_Mitchell_Motherboard/FAN0",
+          "allowed_out_of_range_time": 12,
+          "deviation": 25,
+          "num_sensors_nonfunc_for_fan_nonfunc": 1,
+          "monitor_start_delay": 30,
+          "set_func_on_present": false,
+          "sensors": [
+             {
+                "name": "FAN0_F",
+                "has_target": true,
+                "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                "target_path": "/xyz/openbmc_project/control/fanpwm/PWM7",
+                "factor": 90,
+                "offset": 0
+             },
+             {
+                "name": "FAN0_R",
+                "has_target": false,
+                "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                "target_path": "/xyz/openbmc_project/control/fanpwm/PWM7",
+                "factor": 86,
+                "offset": 0
+             }
+          ]
+       },
+       {
+          "inventory": "/system/board/Mt_Mitchell_Motherboard/FAN1",
+          "allowed_out_of_range_time": 12,
+          "deviation": 25,
+          "num_sensors_nonfunc_for_fan_nonfunc": 1,
+          "monitor_start_delay": 30,
+          "set_func_on_present": false,
+          "sensors": [
+             {
+                "name": "FAN1_F",
+                "has_target": true,
+                "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                "target_path": "/xyz/openbmc_project/control/fanpwm/PWM5",
+                "factor": 90,
+                "offset": 0
+             },
+             {
+                "name": "FAN1_R",
+                "has_target": false,
+                "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                "target_path": "/xyz/openbmc_project/control/fanpwm/PWM5",
+                "factor": 86,
+                "offset": 0
+             }
+          ]
+       },
+       {
+          "inventory": "/system/board/Mt_Mitchell_Motherboard/FAN2",
+          "allowed_out_of_range_time": 12,
+          "deviation": 25,
+          "num_sensors_nonfunc_for_fan_nonfunc": 1,
+          "monitor_start_delay": 30,
+          "set_func_on_present": false,
+          "sensors": [
+             {
+                "name": "FAN2_F",
+                "has_target": true,
+                "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                "target_path": "/xyz/openbmc_project/control/fanpwm/PWM4",
+                "factor": 90,
+                "offset": 0
+             },
+             {
+                "name": "FAN2_R",
+                "has_target": false,
+                "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                "target_path": "/xyz/openbmc_project/control/fanpwm/PWM4",
+                "factor": 86,
+                "offset": 0
+             }
+          ]
+       },
+       {
+          "inventory": "/system/board/Mt_Mitchell_Motherboard/FAN3",
+          "allowed_out_of_range_time": 12,
+          "deviation": 25,
+          "num_sensors_nonfunc_for_fan_nonfunc": 1,
+          "monitor_start_delay": 30,
+          "set_func_on_present": false,
+          "sensors": [
+             {
+                "name": "FAN3_F",
+                "has_target": true,
+                "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                "target_path": "/xyz/openbmc_project/control/fanpwm/PWM3",
+                "factor": 90,
+                "offset": 0
+             },
+             {
+                "name": "FAN3_R",
+                "has_target": false,
+                "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                "target_path": "/xyz/openbmc_project/control/fanpwm/PWM3",
+                "factor": 86,
+                "offset": 0
+             }
+          ]
+       },
+       {
+          "inventory": "/system/board/Mt_Mitchell_Motherboard/FAN4",
+          "allowed_out_of_range_time": 12,
+          "deviation": 25,
+          "num_sensors_nonfunc_for_fan_nonfunc": 1,
+          "monitor_start_delay": 30,
+          "set_func_on_present": false,
+          "sensors": [
+             {
+                "name": "FAN4_F",
+                "has_target": true,
+                "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                "target_path": "/xyz/openbmc_project/control/fanpwm/PWM1",
+                "factor": 90,
+                "offset": 0
+             },
+             {
+                "name": "FAN4_R",
+                "has_target": false,
+                "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                "target_path": "/xyz/openbmc_project/control/fanpwm/PWM1",
+                "factor": 86,
+                "offset": 0
+             }
+          ]
+       },
+       {
+          "inventory": "/system/board/Mt_Mitchell_Motherboard/FAN5",
+          "allowed_out_of_range_time": 12,
+          "deviation": 25,
+          "num_sensors_nonfunc_for_fan_nonfunc": 1,
+          "monitor_start_delay": 30,
+          "set_func_on_present": false,
+          "sensors": [
+             {
+                "name": "FAN5_F",
+                "has_target": true,
+                "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                "target_path": "/xyz/openbmc_project/control/fanpwm/PWM0",
+                "factor": 90,
+                "offset": 0
+             },
+             {
+                "name": "FAN5_R",
+                "has_target": false,
+                "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                "target_path": "/xyz/openbmc_project/control/fanpwm/PWM0",
+                "factor": 86,
+                "offset": 0
+             }
+          ]
+       }
+    ]
+ }

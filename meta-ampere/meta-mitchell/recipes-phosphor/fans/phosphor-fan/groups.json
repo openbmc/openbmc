@@ -1,0 +1,134 @@
+[
+ {
+   "name": "fan inventory",
+   "members": [
+     "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard/FAN0",
+     "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard/FAN1",
+     "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard/FAN2",
+     "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard/FAN3",
+     "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard/FAN4",
+     "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard/FAN5"
+   ]
+  },
+  {
+    "name": "fan0 rotor inventory",
+    "members": [
+      "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard/FAN0/FAN0_F",
+      "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard/FAN0/FAN0_R"
+    ]
+  },
+  {
+    "name": "fan1 rotor inventory",
+    "members": [
+      "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard/FAN1/FAN1_F",
+      "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard/FAN1/FAN1_R"
+    ]
+  },
+  {
+    "name": "fan2 rotor inventory",
+    "members": [
+      "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard/FAN2/FAN2_F",
+      "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard/FAN2/FAN2_R"
+    ]
+  },
+  {
+    "name": "fan3 rotor inventory",
+    "members": [
+      "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard/FAN3/FAN3_F",
+      "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard/FAN3/FAN3_R"
+    ]
+  },
+  {
+    "name": "fan4 rotor inventory",
+    "members": [
+      "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard/FAN4/FAN4_F",
+      "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard/FAN4/FAN4_R"
+    ]
+  },
+  {
+    "name": "fan5 rotor inventory",
+    "members": [
+      "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard/FAN5/FAN5_F",
+      "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard/FAN5/FAN5_R"
+    ]
+  },
+  {
+    "name": "CPU Temps",
+    "service": "xyz.openbmc_project.PLDM",
+    "members": [
+      "/xyz/openbmc_project/sensors/temperature/S0_SOC_Pkg_Temp",
+      "/xyz/openbmc_project/sensors/temperature/S1_SOC_Pkg_Temp"
+    ]
+  },
+  {
+    "name": "PLDM Sensors",
+    "service": "xyz.openbmc_project.PLDM",
+    "members": [
+      "/xyz/openbmc_project/sensors/temperature/S0_ThrotOff_Temp",
+      "/xyz/openbmc_project/sensors/temperature/S1_ThrotOff_Temp"
+    ]
+  },
+  {
+    "name": "CPU DIMM Temps",
+    "service": "xyz.openbmc_project.VirtualSensor",
+    "members": [
+      "/xyz/openbmc_project/sensors/temperature/S0_DIMMG0_Temp",
+      "/xyz/openbmc_project/sensors/temperature/S1_DIMMG0_Temp"
+    ]
+  },
+  {
+    "name": "NVMeM2 Max Temp",
+    "service": "xyz.openbmc_project.VirtualSensor",
+    "members": [
+      "/xyz/openbmc_project/sensors/temperature/NVMeM2_MaxTemp"
+    ]
+  },
+  {
+    "name": "NVMeFBP Max Temp",
+    "service": "xyz.openbmc_project.VirtualSensor",
+    "members": [
+      "/xyz/openbmc_project/sensors/temperature/NVMeFBP_MaxTemp"
+    ]
+  },
+  {
+    "name": "OCP Max Temp",
+    "service": "xyz.openbmc_project.VirtualSensor",
+    "members": [
+      "/xyz/openbmc_project/sensors/temperature/OCP_MaxTemp"
+    ]
+  },
+  {
+    "name": "PSU Max Temps",
+    "service": "xyz.openbmc_project.PSUSensor",
+    "members": [
+      "/xyz/openbmc_project/sensors/temperature/PSU0_TEMP",
+      "/xyz/openbmc_project/sensors/temperature/PSU1_TEMP"
+    ]
+  },
+  {
+    "name": "PCIE Zone Temps",
+    "service": "xyz.openbmc_project.HwmonTempSensor",
+    "members": [
+      "/xyz/openbmc_project/sensors/temperature/PcieZoneTemp1",
+      "/xyz/openbmc_project/sensors/temperature/PcieZoneTemp2"
+    ]
+  },
+  {
+    "name": "Sys Inlet Temp",
+    "service": "xyz.openbmc_project.VirtualSensor",
+    "members": [
+      "/xyz/openbmc_project/sensors/temperature/SysInletTemp"
+    ]
+  },
+  {
+    "name": "Sys Inlet Temp Components",
+    "service": "xyz.openbmc_project.HwmonTempSensor",
+    "members": [
+      "/xyz/openbmc_project/sensors/temperature/SysCabInletTemp",
+      "/xyz/openbmc_project/sensors/temperature/MBInletTemp1",
+      "/xyz/openbmc_project/sensors/temperature/MBInletTemp2",
+      "/xyz/openbmc_project/sensors/temperature/InletTemp"
+    ]
+  }
+
+]

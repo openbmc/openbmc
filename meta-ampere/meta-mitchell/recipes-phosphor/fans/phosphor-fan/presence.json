@@ -1,0 +1,98 @@
+[
+    {
+       "name": "FAN0",
+       "path": "/system/board/Mt_Mitchell_Motherboard/FAN0",
+       "methods": [
+          {
+             "type": "tach",
+             "sensors": [
+                "FAN0_F",
+                "FAN0_R"
+             ]
+          }
+       ],
+       "rpolicy": {
+          "type": "anyof"
+       }
+    },
+    {
+       "name": "FAN1",
+       "path": "/system/board/Mt_Mitchell_Motherboard/FAN1",
+       "methods": [
+          {
+             "type": "tach",
+             "sensors": [
+                "FAN1_F",
+                "FAN1_R"
+             ]
+          }
+       ],
+       "rpolicy": {
+          "type": "anyof"
+       }
+    },
+     {
+       "name": "FAN2",
+       "path": "/system/board/Mt_Mitchell_Motherboard/FAN2",
+       "methods": [
+          {
+             "type": "tach",
+             "sensors": [
+                "FAN2_F",
+                "FAN2_R"
+             ]
+          }
+       ],
+       "rpolicy": {
+          "type": "anyof"
+       }
+    },
+    {
+       "name": "FAN3",
+       "path": "/system/board/Mt_Mitchell_Motherboard/FAN3",
+       "methods": [
+          {
+             "type": "tach",
+             "sensors": [
+                "FAN3_F",
+                "FAN3_R"
+             ]
+          }
+       ],
+       "rpolicy": {
+          "type": "anyof"
+       }
+    },
+    {
+       "name": "FAN4",
+       "path": "/system/board/Mt_Mitchell_Motherboard/FAN4",
+       "methods": [
+          {
+             "type": "tach",
+             "sensors": [
+                "FAN4_F",
+                "FAN4_R"
+             ]
+          }
+       ],
+       "rpolicy": {
+          "type": "anyof"
+       }
+    },
+    {
+       "name": "FAN5",
+       "path": "/system/board/Mt_Mitchell_Motherboard/FAN5",
+       "methods": [
+          {
+             "type": "tach",
+             "sensors": [
+                "FAN5_F",
+                "FAN5_R"
+             ]
+          }
+       ],
+       "rpolicy": {
+          "type": "anyof"
+       }
+    }
+ ]
