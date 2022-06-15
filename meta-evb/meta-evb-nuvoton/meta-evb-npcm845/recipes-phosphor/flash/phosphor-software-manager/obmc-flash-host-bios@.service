@@ -1,0 +1,10 @@
+[Unit]
+Description=Flash Host Bios image %I to Host
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStartPre=/bin/mv /tmp/images/%i/image-bios /tmp/image-bios
+ExecStartPre=/usr/bin/obmc-flash-bmc rebootguardenable
+ExecStart=/usr/bin/bios-update.sh
+ExecStopPost=/usr/bin/obmc-flash-bmc rebootguarddisable

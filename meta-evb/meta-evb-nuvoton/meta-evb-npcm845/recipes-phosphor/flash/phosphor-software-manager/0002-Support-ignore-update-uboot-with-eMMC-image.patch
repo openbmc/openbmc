@@ -1,0 +1,119 @@
+From 57fcbef2b50e8373c504fa8f2570aded34960dd7 Mon Sep 17 00:00:00 2001
+From: Brian Ma <chma0@nuvoton.com>
+Date: Thu, 17 Feb 2022 08:50:52 +0800
+Subject: [PATCH 2/2] Support ignore update uboot with eMMC image
+
+Signed-off-by: Brian Ma <chma0@nuvoton.com>
+---
+ obmc-flash-bmc | 41 +++++++++++++++++++++++++++++------------
+ 1 file changed, 29 insertions(+), 12 deletions(-)
+
+diff --git a/obmc-flash-bmc b/obmc-flash-bmc
+index 67e3a88..a024c8a 100644
+--- a/obmc-flash-bmc
++++ b/obmc-flash-bmc
+@@ -1,6 +1,8 @@
+ #!/bin/bash
+ set -eo pipefail
+ 
++ulog="/var/log/update.log"
++
+ # Get the root mtd device number (mtdX) from "/dev/ubiblockX_Y on /"
+ findrootmtd() {
+   rootmatch=" on / "
+@@ -387,7 +389,7 @@ ubi_setenv() {
+ mtd_write() {
+   flashmtd="$(findmtd "${reqmtd}")"
+   img="/tmp/images/${version}/${imgfile}"
+-  flashcp -v "${img}" /dev/"${flashmtd}"
++  flashcp -v "${img}" /dev/"${flashmtd}" >> "${ulog}"
+ }
+ 
+ backup_env_vars() {
+@@ -491,6 +493,13 @@ cmp_uboot() {
+   device="$1"
+   image="$2"
+ 
++  # if no uboot image need to update
++  if [ ! -f "${image}" ];then
++    echo "no uboot file for update" >> "${ulog}"
++    echo 0
++    return
++  fi
++
+   # Since the image file can be smaller than the device, copy the device to a
+   # tmp file and write the image file on top, then compare the sum of each.
+   # Use cat / redirection since busybox does not have the conv=notrunc option.
+@@ -501,6 +510,9 @@ cmp_uboot() {
+   imgSum="$(sha256sum "${tmpFile}")"
+   rm -f "${tmpFile}"
+ 
++  echo "image checksum: ${imgSum}" >> "${ulog}"
++  echo "mtd device checksum: ${devSum}" >> "${ulog}"
++
+   if [ "${imgSum}" == "${devSum}" ]; then
+     echo "0";
+   else
+@@ -555,35 +567,33 @@ mmc_mount() {
+ }
+ 
+ mmc_update() {
+-  # Update u-boot if needed
+-  bootPartition="mmcblk0boot0"
+-  devUBoot="/dev/${bootPartition}"
+-  imgUBoot="${imgpath}/${version}/image-u-boot"
+-  if [ "$(cmp_uboot "${devUBoot}" "${imgUBoot}")" != "0" ]; then
+-    echo 0 > "/sys/block/${bootPartition}/force_ro"
+-    dd if="${imgUBoot}" of="${devUBoot}"
+-    echo 1 > "/sys/block/${bootPartition}/force_ro"
+-  fi
++  echo "start mmc update, version: ${version}" >> "${ulog}"
++  echo $(date) >> "${ulog}"
+ 
+   # Update the secondary (non-running) boot and rofs partitions.
+   label="$(mmc_get_secondary_label)"
+ 
+   # Update the boot and rootfs partitions, restore their labels after the update
+   # by getting the partition number mmcblk0pX from their label.
++  echo "start update kernel: boot-${label}" >> "${ulog}"
+   zstd -d -c "${imgpath}"/"${version}"/image-kernel | dd of="/dev/disk/by-partlabel/boot-${label}"
+   number="$(readlink -f /dev/disk/by-partlabel/boot-"${label}")"
+   number="${number##*mmcblk0p}"
+   sgdisk --change-name="${number}":boot-"${label}" /dev/mmcblk0 1>/dev/null
+ 
++  echo "start update rofs: rofs-${label}" >> "${ulog}"
+   zstd -d -c "${imgpath}"/"${version}"/image-rofs | dd of="/dev/disk/by-partlabel/rofs-${label}"
+   number="$(readlink -f /dev/disk/by-partlabel/rofs-"${label}")"
+   number="${number##*mmcblk0p}"
+   sgdisk --change-name="${number}":rofs-"${label}" /dev/mmcblk0 1>/dev/null
+ 
+   # Run this after sgdisk for labels to take effect.
+-  partprobe
++  echo "start partprobe" >> "${ulog}"
++  # fix some mtd device get Invalid partition table
++  partprobe /dev/mmcblk0
+ 
+   # Update hostfw
++  echo "start try to update hostfw" >> "${ulog}"
+   if [ -f "${imgpath}"/"${version}"/image-hostfw ]; then
+     # Remove patches
+     patchdir="/usr/local/share/hostfw/alternate"
+@@ -596,7 +606,14 @@ mmc_update() {
+     mount "${hostfwdir}"/hostfw-"${label}" "${hostfwdir}"/alternate -o ro
+   fi
+ 
+-  set_flashid "${label}"
++  # handle the ipmi flash bmc update
++  if [ "${version}" == "bmc-image" ]; then
++    echo "directly update bootside for ipmi flash bmc" >> "${ulog}"
++    fw_setenv bootside "${label}"
++  else
++    set_flashid "${label}"
++  fi
++  echo "end of mmc update" >> "${ulog}"
+ }
+ 
+ mmc_remove() {
+-- 
+2.17.1
+
