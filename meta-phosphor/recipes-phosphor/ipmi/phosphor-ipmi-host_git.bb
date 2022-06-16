@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 RRECOMMENDS:${PN} += "packagegroup-obmc-ipmid-providers-libs"
 
-inherit autotools pkgconfig
+inherit meson pkgconfig
 inherit obmc-phosphor-ipmiprovider-symlink
 inherit obmc-phosphor-sdbus-service
 inherit obmc-phosphor-systemd
@@ -22,20 +22,19 @@ def ipmi_whitelists(d):
     return ' '.join(whitelists)
 
 PACKAGECONFIG ??= "allowlist i2c-allowlist boot-flag-safe-mode softoff libuserlayer"
-PACKAGECONFIG[dynamic-sensors] = "--enable-dynamic-sensors,--disable-dynamic-sensors"
-PACKAGECONFIG[hybrid-sensors] = "--enable-hybrid-sensors,--disable-hybrid-sensors"
-PACKAGECONFIG[sel-logger-clears-sel] = "--enable-sel-logger-clears-sel,--disable-sel-logger-clears-sel"
-PACKAGECONFIG[allowlist] = "--enable-ipmi-whitelist,--disable-ipmi-whitelist"
-PACKAGECONFIG[i2c-allowlist] = "--enable-i2c-whitelist-check,--disable-i2c-whitelist-check"
-PACKAGECONFIG[transport-oem] = "--enable-transport-oem,--disable-transport-oem"
-PACKAGECONFIG[boot-flag-safe-mode] = "--enable-boot-flag-safe-mode-support,--disable-boot-flag-safe-mode-support"
-PACKAGECONFIG[softoff] = "--enable-softoff,--disable-softoff"
-PACKAGECONFIG[update-functional-on-fail] = "--enable-update-functional-on-fail,--disable-update-functional-on-fail"
-PACKAGECONFIG[libuserlayer] = "--enable-libuserlayer,--disable-libuserlayer"
-PACKAGECONFIG[sensors-cache] = "--enable-sensors-cache,--disable-sensors-cache"
+PACKAGECONFIG[dynamic-sensors] = "-Ddynamic-sensors=enabled,-Ddynamic-sensors=disabled"
+PACKAGECONFIG[hybrid-sensors] = "-Dhybrid-sensors=enabled,-Dhybrid-sensors=disabled"
+PACKAGECONFIG[sel-logger-clears-sel] = "-Dsel-logger-clears-sel=enabled,-Dsel-logger-clears-sel=disabled"
+PACKAGECONFIG[allowlist] = "-Dipmi-whitelist=enabled,-Dipmi-whitelist=disabled"
+PACKAGECONFIG[i2c-allowlist] = "-Di2c-whitelist-check=enabled,-Di2c-whitelist-check=disabled"
+PACKAGECONFIG[transport-oem] = "-Dtransport-oem=enabled,-Dtransport-oem=disabled"
+PACKAGECONFIG[boot-flag-safe-mode] = "-Dboot-flag-safe-mode-support=enabled,-Dboot-flag-safe-mode-support=disabled"
+PACKAGECONFIG[softoff] = "-Dsoftoff=enabled,-Dsoftoff=disabled"
+PACKAGECONFIG[update-functional-on-fail] = "-Dupdate-functional-on-fail=enabled,-Dupdate-functional-on-fail=disabled"
+PACKAGECONFIG[libuserlayer] = "-Dlibuserlayer=enabled,-Dlibuserlayer=disabled"
+PACKAGECONFIG[sensors-cache] = "-Dsensors-cache=enabled,-Dsensors-cache=disabled"
 
 
-DEPENDS += "autoconf-archive-native"
 DEPENDS += "nlohmann-json"
 DEPENDS += "phosphor-state-manager"
 DEPENDS += "${@ipmi_whitelists(d)}"
@@ -55,8 +54,6 @@ DEPENDS += "${PYTHON_PN}-mako-native"
 
 VIRTUAL-RUNTIME_ipmi-config ?= "phosphor-ipmi-config"
 
-RDEPENDS:${PN}-dev += "phosphor-logging"
-RDEPENDS:${PN}-dev += "phosphor-mapper-dev"
 RDEPENDS:${PN} += "clear-once"
 RDEPENDS:${PN} += "phosphor-network"
 RDEPENDS:${PN} += "phosphor-time-manager"
@@ -84,14 +81,16 @@ WHITELIST_CONF = " \
         ${STAGING_DATADIR_NATIVE}/phosphor-ipmi-host/*.conf \
         ${S}/host-ipmid-whitelist.conf \
         "
-EXTRA_OECONF = " \
-        SENSOR_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/sensor.yaml \
-        INVSENSOR_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/invsensor.yaml \
-        FRU_YAML_GEN=${STAGING_DIR_NATIVE}${config_datadir}/fru_config.yaml \
+EXTRA_OEMESON = " \
+        -Dsensor-yaml-gen=${STAGING_DIR_NATIVE}${sensor_datadir}/sensor.yaml \
+        -Dinvsensor-yaml-gen=${STAGING_DIR_NATIVE}${sensor_datadir}/invsensor.yaml \
+        -Dfru-yaml-gen=${STAGING_DIR_NATIVE}${config_datadir}/fru_config.yaml \
         "
-EXTRA_OECONF:append = " \
-        WHITELIST_CONF="${WHITELIST_CONF}" \
+EXTRA_OEMESON:append = " \
+        -Dwhitelist-conf="${WHITELIST_CONF}" \
         "
+
+EXTRA_OEMESON:append = " -Dtests=disabled"
 
 S = "${WORKDIR}/git"
 
