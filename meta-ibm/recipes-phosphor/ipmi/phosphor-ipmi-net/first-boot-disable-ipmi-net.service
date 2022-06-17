@@ -1,0 +1,26 @@
+[Unit]
+Description=First Boot Disable IPMI Network
+After=phosphor-ipmi-net@eth0.service
+After=phosphor-ipmi-net@eth1.service
+After=phosphor-ipmi-net@eth0.socket
+After=phosphor-ipmi-net@eth1.socket
+Before=srvcfg-manager.service
+ConditionFileNotEmpty=!/var/lib/ipmi-net-disable-one-time
+
+[Service]
+ExecStart=/bin/systemctl stop phosphor-ipmi-net@eth0.socket
+ExecStart=/bin/systemctl disable phosphor-ipmi-net@eth0.socket
+ExecStart=/bin/systemctl stop phosphor-ipmi-net@eth0.service
+ExecStart=/bin/systemctl disable phosphor-ipmi-net@eth0.service
+ExecStart=/bin/systemctl stop phosphor-ipmi-net@eth1.socket
+ExecStart=/bin/systemctl disable phosphor-ipmi-net@eth1.socket
+ExecStart=/bin/systemctl stop phosphor-ipmi-net@eth1.service
+ExecStart=/bin/systemctl disable phosphor-ipmi-net@eth1.service
+ExecStart=/bin/systemctl --no-reload disable first-boot-disable-ipmi-net.service
+ExecStart=/bin/touch /var/lib/ipmi-net-disable-one-time
+SyslogIdentifier=first-boot-disable-ipmi-net
+Type=oneshot
+RemainAfterExit=Yes
+
+[Install]
+WantedBy=multi-user.target
