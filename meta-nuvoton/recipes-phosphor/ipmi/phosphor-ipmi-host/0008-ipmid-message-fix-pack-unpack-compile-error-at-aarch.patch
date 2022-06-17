@@ -1,0 +1,100 @@
+From c0a2c3ed3092be7c728654185e3c383cdc3492b8 Mon Sep 17 00:00:00 2001
+From: Tim Lee <timlee660101@gmail.com>
+Date: Fri, 17 Jun 2022 10:41:31 +0800
+Subject: [PATCH 8/8] ipmid: message: fix pack/unpack compile error at aarch64
+ platform
+
+Change all usage of unsigned for bitcounts to a new typedef bitcount_t
+which is size_t for Boost-1.79 and later, and unsigned for Boost-1.78 and earlier.
+
+Signed-off-by: Tim Lee <timlee660101@gmail.com>
+---
+ include/ipmid/message/pack.hpp   |  2 +-
+ include/ipmid/message/types.hpp  | 21 ++++++++++++++-------
+ include/ipmid/message/unpack.hpp |  2 +-
+ 3 files changed, 16 insertions(+), 9 deletions(-)
+
+diff --git a/include/ipmid/message/pack.hpp b/include/ipmid/message/pack.hpp
+index 00750007..86a12be5 100644
+--- a/include/ipmid/message/pack.hpp
++++ b/include/ipmid/message/pack.hpp
+@@ -131,7 +131,7 @@ struct PackSingle<std::string>
+ 
+ /** @brief Specialization of PackSingle for fixed_uint_t types
+  */
+-template <unsigned N>
++template <bitcount_t N>
+ struct PackSingle<fixed_uint_t<N>>
+ {
+     static int op(Payload& p, const fixed_uint_t<N>& t)
+diff --git a/include/ipmid/message/types.hpp b/include/ipmid/message/types.hpp
+index 7a2168ec..4a8ab991 100644
+--- a/include/ipmid/message/types.hpp
++++ b/include/ipmid/message/types.hpp
+@@ -16,18 +16,25 @@
+ #pragma once
+ 
+ #include <bitset>
++#include <boost/version.hpp>
+ #include <boost/multiprecision/cpp_int.hpp>
+ #include <ipmid/utility.hpp>
+ #include <tuple>
+ 
++#if BOOST_VERSION < 107900
++using bitcount_t = unsigned;
++#else
++using bitcount_t = std::size_t;
++#endif
++
+ // unsigned fixed-bit sizes
+-template <unsigned N>
++template <bitcount_t N>
+ using fixed_uint_t =
+     boost::multiprecision::number<boost::multiprecision::cpp_int_backend<
+         N, N, boost::multiprecision::unsigned_magnitude,
+         boost::multiprecision::unchecked, void>>;
+ // signed fixed-bit sizes
+-template <unsigned N>
++template <bitcount_t N>
+ using fixed_int_t =
+     boost::multiprecision::number<boost::multiprecision::cpp_int_backend<
+         N, N, boost::multiprecision::signed_magnitude,
+@@ -79,17 +86,17 @@ namespace types
+ namespace details
+ {
+ 
+-template <size_t N>
++template <bitcount_t N>
+ struct Size
+ {
+-    static constexpr size_t value = N;
++    static constexpr bitcount_t value = N;
+ };
+ 
+-template <unsigned Bits>
++template <bitcount_t Bits>
+ constexpr auto getNrBits(const fixed_int_t<Bits>&) -> Size<Bits>;
+-template <unsigned Bits>
++template <bitcount_t Bits>
+ constexpr auto getNrBits(const fixed_uint_t<Bits>&) -> Size<Bits>;
+-template <size_t Bits>
++template <bitcount_t Bits>
+ constexpr auto getNrBits(const std::bitset<Bits>&) -> Size<Bits>;
+ 
+ template <typename U>
+diff --git a/include/ipmid/message/unpack.hpp b/include/ipmid/message/unpack.hpp
+index 4ac49165..3a80c3f5 100644
+--- a/include/ipmid/message/unpack.hpp
++++ b/include/ipmid/message/unpack.hpp
+@@ -157,7 +157,7 @@ struct UnpackSingle<std::string>
+ 
+ /** @brief Specialization of UnpackSingle for fixed_uint_t types
+  */
+-template <unsigned N>
++template <bitcount_t N>
+ struct UnpackSingle<fixed_uint_t<N>>
+ {
+     static int op(Payload& p, fixed_uint_t<N>& t)
+-- 
+2.17.1
+
