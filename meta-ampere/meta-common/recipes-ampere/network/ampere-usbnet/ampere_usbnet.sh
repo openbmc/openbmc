@@ -1,9 +1,6 @@
 #!/bin/bash
 
-ENV_MAC_ADDR=$(fw_printenv eth1addr)
-if [ -z "$ENV_MAC_ADDR" ]; then
-	ENV_MAC_ADDR=$(fw_printenv ethaddr)
-fi
+ENV_MAC_ADDR=$(fw_printenv bmc_macaddr)
 
 MAC_ADDR=$(echo "$ENV_MAC_ADDR" | cut -d "=" -f 2)
 
