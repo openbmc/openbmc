@@ -1,66 +1,42 @@
-From 11cf8f4e7ed71dd42f14e2941b64fa44a0a1affd Mon Sep 17 00:00:00 2001
-From: Brian Ma <chma0@nuvoton.com>
-Date: Fri, 25 Mar 2022 16:42:57 +0800
+From d5ae0acddfb62dce663acc9b3f5687579923bb53 Mon Sep 17 00:00:00 2001
+From: Tim Lee <timlee660101@gmail.com>
+Date: Mon, 20 Jun 2022 14:46:47 +0800
 Subject: [PATCH 1/5] Handle now allow execption in account service
 
 Return message resourceCannotBeDeleted when get NowAllowed execption
 during delete user instead of resourceNotFound.
 
 Signed-off-by: Brian Ma <chma0@nuvoton.com>
+Signed-off-by: Tim Lee <timlee660101@gmail.com>
 ---
- redfish-core/lib/account_service.hpp | 35 ++++++++++++++++++----------
- 1 file changed, 23 insertions(+), 12 deletions(-)
+ redfish-core/lib/account_service.hpp | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/redfish-core/lib/account_service.hpp b/redfish-core/lib/account_service.hpp
-index 8d537995b..b3687af78 100644
+index 3d1401570..898040c53 100644
 --- a/redfish-core/lib/account_service.hpp
 +++ b/redfish-core/lib/account_service.hpp
-@@ -1999,22 +1999,33 @@ inline void requestAccountServiceRoutes(App& app)
-                 tempObjPath /= username;
+@@ -1962,9 +1962,19 @@ inline void requestAccountServiceRoutes(App& app)
                  const std::string userPath(tempObjPath);
  
--                crow::connections::systemBus->async_method_call(
+                 crow::connections::systemBus->async_method_call(
 -                    [asyncResp, username](const boost::system::error_code ec) {
--                        if (ec)
-+            crow::connections::systemBus->async_method_call(
-+                [asyncResp, username](const boost::system::error_code ec,
-+                                      const sdbusplus::message::message& msg) {
-+                    if (ec)
-+                    {
-+                        const sd_bus_error* dbusErr = msg.get_error();
-+                        if (dbusErr != nullptr &&
-+                            strcmp(
-+                                dbusErr->name,
-+                                "xyz.openbmc_project.Common.Error.NotAllowed") ==
-+                                0)
-                         {
--                            messages::resourceNotFound(
--                                asyncResp->res,
--                                "#ManagerAccount.v1_4_0.ManagerAccount",
--                                username);
-+                            messages::resourceCannotBeDeleted(asyncResp->res);
-                             return;
-                         }
- 
--                        messages::accountRemoved(asyncResp->res);
--                    },
--                    "xyz.openbmc_project.User.Manager", userPath,
--                    "xyz.openbmc_project.Object.Delete", "Delete");
--            });
-+                        messages::resourceNotFound(
-+                            asyncResp->res,
-+                            "#ManagerAccount.v1_4_0.ManagerAccount", username);
-+                        return;
-+                    }
++                    [asyncResp, username](const boost::system::error_code ec,
++                                          const sdbusplus::message::message& msg) {
+             if (ec)
+             {
++                const sd_bus_error* dbusErr = msg.get_error();
++                if (dbusErr != nullptr &&
++                    strcmp(dbusErr->name,
++                           "xyz.openbmc_project.Common.Error.NotAllowed") == 0)
++                {
++                    messages::resourceCannotBeDeleted(asyncResp->res);
++                    return;
++                }
 +
-+                    messages::accountRemoved(asyncResp->res);
-+                },
-+                "xyz.openbmc_project.User.Manager", userPath,
-+                "xyz.openbmc_project.Object.Delete", "Delete");
-+        });
- }
- 
- } // namespace redfish
+                 messages::resourceNotFound(
+                     asyncResp->res, "#ManagerAccount.v1_4_0.ManagerAccount",
+                     username);
 -- 
 2.17.1
 
