@@ -16,15 +16,14 @@ inherit meson pkgconfig obmc-phosphor-ipmiprovider-symlink
 
 EXTRA_OEMESON="-Dtests=disabled -Dbic=enabled -Dhost-instances='${OBMC_HOST_INSTANCES}'"
 EXTRA_OEMESON:remove:yosemitev2 = "-Dbic=enabled"
+EXTRA_OEMESON="-Dmachine='${MACHINE}'"
 
 LIBRARY_NAMES = "libzfboemcmds.so"
 
 HOSTIPMI_PROVIDER_LIBRARY += "${LIBRARY_NAMES}"
 NETIPMI_PROVIDER_LIBRARY += "${LIBRARY_NAMES}"
 
-FILES:${PN}:append = " ${datadir}/lcd-debug/post_desc.json"
-FILES:${PN}:append = " ${datadir}/lcd-debug/gpio_desc.json"
-FILES:${PN}:append = " ${datadir}/lcd-debug/cri_sensors.json"
+FILES:${PN}:append = " ${datadir}/lcd-debug/*.json"
 
 FILES:${PN}:append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
 FILES:${PN}:append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
