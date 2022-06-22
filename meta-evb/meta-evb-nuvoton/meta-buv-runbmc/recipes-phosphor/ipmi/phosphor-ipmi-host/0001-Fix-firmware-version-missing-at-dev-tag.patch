@@ -1,0 +1,30 @@
+From 3f2952b42b8806558c2a0184914f5545433b5c76 Mon Sep 17 00:00:00 2001
+From: Brian Ma <chma0@nuvoton.com>
+Date: Fri, 17 Jun 2022 10:46:34 +0800
+Subject: [PATCH] Fix firmware version missing at dev tag
+
+The firmware version "v" must at the first character, wwe should not
+handle other "v" (like "dev") to avoid parsing string error.
+
+Signed-off-by: Brian Ma <chma0@nuvoton.com>
+Change-Id: I274e7158b44f2c5dd566e47940bfc1fd7e5ebe83
+---
+ apphandler.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/apphandler.cpp b/apphandler.cpp
+index 0577c07..7aa5c54 100644
+--- a/apphandler.cpp
++++ b/apphandler.cpp
+@@ -486,7 +486,7 @@ int convertVersion(std::string s, Revision& rev)
+     std::string token;
+     uint16_t commits;
+ 
+-    auto location = s.find_first_of('v');
++    auto location = s.find_last_of('v', 0);
+     if (location != std::string::npos)
+     {
+         s = s.substr(location + 1);
+-- 
+2.17.1
+
