@@ -3,7 +3,7 @@ DESCRIPTION = "Allows BIOS in SMM to log errors to the BMC"
 PR = "r1"
 PV = "0.1+git${SRCPV}"
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=d20ffc39dca1d714c75b4b6f0113be10"
 inherit meson pkgconfig systemd
 
 DEPENDS += " \
@@ -11,7 +11,12 @@ DEPENDS += " \
   stdplus \
   systemd \
   nlohmann-json \
+  libbej \
   "
+
+EXTRA_OEMESON = " \
+        -Dtests=disabled \
+        "
 
 S = "${WORKDIR}/git"
 
