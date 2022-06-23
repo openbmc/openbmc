@@ -1,6 +1,7 @@
 /etc/dropbear/dropbear_rsa_host_key
 /etc/group
 /etc/gshadow
+/etc/ipmi_pass
 /etc/machine-id
 /etc/passwd
 /etc/resolv.conf
