@@ -12,11 +12,11 @@ DEPENDS += " \
   systemd \
   nlohmann-json \
   libbej \
-  "
+"
 
 EXTRA_OEMESON = " \
-        -Dtests=disabled \
-        "
+  -Dtests=disabled \
+"
 
 S = "${WORKDIR}/git"
 
@@ -24,4 +24,3 @@ SRC_URI = "git://github.com/openbmc/bios-bmc-smm-error-logger;branch=main;protoc
 SRCREV = "1a3dc60db5f8764ea8b97fda5973ccbb894596df"
 
 SYSTEMD_SERVICE:${PN} += "xyz.openbmc_project.bios_bmc_smm_error_logger.service"
-
