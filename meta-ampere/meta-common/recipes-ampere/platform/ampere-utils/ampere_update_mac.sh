@@ -52,6 +52,23 @@ then
 	exit
 fi
 
+# Check eth port
+case ${ETHERNET_INTERFACE} in
+	"eth0")
+		ENV_PORT="1"
+		;;
+	"eth1")
+		ENV_PORT="2"
+		;;
+	"eth2")
+		ENV_PORT="3"
+		;;
+	*)
+		Usage
+		exit
+		;;
+esac
+
 # Read FRU Board Custom Field 1 to get the MAC address
 for i in {1..10}; do
 	MAC_ADDR=$(read_mac_address "$BMC_FRU_BUS" "$BMC_FRU_ADDR")
@@ -81,12 +98,18 @@ fi
 # Request to restart the service
 ifconfig "${ETHERNET_INTERFACE}" down
 fw_setenv bmc_macaddr "${MAC_ADDR}"
+
 ifconfig "${ETHERNET_INTERFACE}" hw ether "${MAC_ADDR}"
 retval=$?
 if [[ $retval -ne 0 ]]; then
 	echo "ERROR: Can not update MAC ADDR to ${ETHERNET_INTERFACE}"
 	exit 1
 fi
+# Setting LAN MAC Address to xx:xx:xx:xx:xx:xx
+ipmitool lan set "${ENV_PORT}" macaddr "${ETHERNET_INTERFACE}"
+# Enableing BMC-generated ARP responses & Setting SNMP Community String to public
+ipmitool lan set "${ENV_PORT}" arp respond on
+ipmitool lan set "${ENV_PORT}" snmp public
 ifconfig "${ETHERNET_INTERFACE}" up
 
 echo "Successfully update the MAC address ${MAC_ADDR} to ${ETHERNET_INTERFACE}"
