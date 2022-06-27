@@ -2,6 +2,13 @@
     {
         "Desc":
         {
+            "Config": "D-Bus",
+            "Type": "Maximum"
+        }
+    },
+    {
+        "Desc":
+        {
             "Name": "total_power",
             "SensorType": "power"
         },
@@ -43,7 +50,7 @@
                 }
             ]
         },
-        "Expression": "(P0 == P0) ? ((P1 == P1) ? P0+P1 : P0 ) : P1"
+        "Expression": "sumIgnoreNaN(P0, P1)"
     },
     {
         "Desc":
@@ -90,11 +97,11 @@
                 }
             ]
         },
-        "Expression": "(P0 + P1) >= 0 ? (P0 + P1) / 2 : NULL"
+        "Expression": "sumIgnoreNaN(P0, P1) / 2"
     },
     {
         "Desc":{
-            "Name":"NVMeM2_MaxTemp",
+            "Name":"NVMeFBP_MaxTemp",
             "SensorType":"temperature"
         },
         "Threshold" :
@@ -119,29 +126,183 @@
                 {
                     "ParamName": "n0",
                     "Desc": {
-                        "Name": "m2nvme0",
+                        "Name": "nvme0",
                         "SensorType": "temperature"
                     }
                 },
                 {
                     "ParamName": "n1",
                     "Desc": {
-                        "Name": "m2nvme1",
+                        "Name": "nvme1",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n2",
+                    "Desc": {
+                        "Name": "nvme2",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n3",
+                    "Desc": {
+                        "Name": "nvme3",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n4",
+                    "Desc": {
+                        "Name": "nvme4",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n5",
+                    "Desc": {
+                        "Name": "nvme5",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n6",
+                    "Desc": {
+                        "Name": "nvme6",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n7",
+                    "Desc": {
+                        "Name": "nvme7",
+                        "SensorType": "temperature"
+                    }
+                },
+                                {
+                    "ParamName": "n8",
+                    "Desc": {
+                        "Name": "nvme8",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n9",
+                    "Desc": {
+                        "Name": "nvme9",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n10",
+                    "Desc": {
+                        "Name": "nvme10",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n11",
+                    "Desc": {
+                        "Name": "nvme11",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n12",
+                    "Desc": {
+                        "Name": "nvme12",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n13",
+                    "Desc": {
+                        "Name": "nvme13",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n14",
+                    "Desc": {
+                        "Name": "nvme14",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n15",
+                    "Desc": {
+                        "Name": "nvme15",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n16",
+                    "Desc": {
+                        "Name": "nvme16",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n17",
+                    "Desc": {
+                        "Name": "nvme17",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n18",
+                    "Desc": {
+                        "Name": "nvme18",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n19",
+                    "Desc": {
+                        "Name": "nvme19",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n20",
+                    "Desc": {
+                        "Name": "nvme20",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n21",
+                    "Desc": {
+                        "Name": "nvme21",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n22",
+                    "Desc": {
+                        "Name": "nvme22",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n23",
+                    "Desc": {
+                        "Name": "nvme23",
                         "SensorType": "temperature"
                     }
                 }
             ]
         },
-        "Expression": "max((n0 == n0) ? n0 : 0,(n1 == n1) ? n1 : 0)"
+        "Expression": "maxIgnoreNaN(n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, n17, n18, n19, n20, n21, n22, n23)"
     },
     {
         "Desc":{
-            "Name":"OCP_MaxTemp",
+            "Name":"FrontBP_MaxTemp",
             "SensorType":"temperature"
         },
         "Threshold" :
         {
-            "CriticalHigh": 105
+            "CriticalHigh": 70
         },
         "Associations":
         [
@@ -161,19 +322,26 @@
                 {
                     "ParamName": "n1",
                     "Desc": {
-                        "Name": "OCP1_Temp",
+                        "Name": "FrontBPTemp1",
                         "SensorType": "temperature"
                     }
                 },
                 {
                     "ParamName": "n2",
                     "Desc": {
-                        "Name": "OCP2_Temp",
+                        "Name": "FrontBPTemp2",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n3",
+                    "Desc": {
+                        "Name": "FrontBPTemp3",
                         "SensorType": "temperature"
                     }
                 }
             ]
         },
-        "Expression": "max((n1 == n1) ? n1 : 0,(n2 == n2) ? n2 : 0)"
+        "Expression": "maxIgnoreNaN(n1, n2, n3)"
     }
 ]
