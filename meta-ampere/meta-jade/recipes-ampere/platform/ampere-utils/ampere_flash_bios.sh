@@ -21,7 +21,7 @@ do_flash () {
 	then
 		# If the PNOR partition is not available, then bind again driver
 		echo "--- Bind the ASpeed SMC driver"
-		echo 1e630000.spi > /sys/bus/platform/drivers/aspeed-smc/bind
+		echo 1e630000.spi > /sys/bus/platform/drivers/spi-aspeed-smc/bind
 		sleep 2
 
 		HOST_MTD=$(< /proc/mtd grep "pnor-uefi" | sed -n 's/^\(.*\):.*/\1/p')
