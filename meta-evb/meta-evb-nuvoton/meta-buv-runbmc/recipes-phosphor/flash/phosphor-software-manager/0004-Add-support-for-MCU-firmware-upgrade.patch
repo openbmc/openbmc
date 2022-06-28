@@ -1,0 +1,377 @@
+From fd179d29d479011a4cf7f449fa391b065a423930 Mon Sep 17 00:00:00 2001
+From: jhkang <jhkang@nuvoton.com>
+Date: Fri, 24 Jun 2022 04:02:23 -0700
+Subject: [PATCH 4/4] Add support for MCU firmware upgrade
+
+---
+ activation.cpp    | 97 ++++++++++++++++++++++++++++++++++++++++++++++-
+ activation.hpp    |  8 ++++
+ item_updater.cpp  | 60 ++++++++++++++++++++++++++++-
+ item_updater.hpp  | 20 ++++++++++
+ meson.build       |  8 ++++
+ meson_options.txt | 15 ++++++++
+ 6 files changed, 205 insertions(+), 3 deletions(-)
+
+diff --git a/activation.cpp b/activation.cpp
+index e057814..4a19222 100644
+--- a/activation.cpp
++++ b/activation.cpp
+@@ -135,8 +135,8 @@ auto Activation::activation(Activations value) -> Activations
+                 std::make_unique<ActivationBlocksTransition>(bus, path);
+         }
+ 
+-#ifdef HOST_BIOS_UPGRADE
+         auto purpose = parent.versions.find(versionId)->second->purpose();
++#ifdef HOST_BIOS_UPGRADE
+         if (purpose == VersionPurpose::Host)
+         {
+             // Enable systemd signals
+@@ -152,6 +152,22 @@ auto Activation::activation(Activations value) -> Activations
+         }
+ #endif
+ 
++#ifdef MCU_UPGRADE
++        if (purpose == VersionPurpose::MCU)
++        {
++            // Enable systemd signals
++            subscribeToSystemdSignals();
++
++            // Set initial progress
++            activationProgress->progress(20);
++
++            // Initiate image writing to flash
++            flashWriteMCU();
++
++            return softwareServer::Activation::activation(value);
++        }
++#endif
++
+         activationProgress->progress(10);
+ 
+         parent.freeSpace(*this);
+@@ -319,8 +335,8 @@ void Activation::unitStateChange(sdbusplus::message::message& msg)
+         return;
+     }
+ 
+-#ifdef HOST_BIOS_UPGRADE
+     auto purpose = parent.versions.find(versionId)->second->purpose();
++#ifdef HOST_BIOS_UPGRADE
+     if (purpose == VersionPurpose::Host)
+     {
+         onStateChangesBios(msg);
+@@ -328,6 +344,14 @@ void Activation::unitStateChange(sdbusplus::message::message& msg)
+     }
+ #endif
+ 
++#ifdef MCU_UPGRADE
++    if (purpose == VersionPurpose::MCU)
++    {
++        onStateChangesMcu(msg);
++        return;
++    }
++#endif
++
+     onStateChanges(msg);
+ 
+     return;
+@@ -467,6 +491,75 @@ void Activation::onStateChangesBios(sdbusplus::message::message& msg)
+ 
+ #endif
+ 
++#ifdef MCU_UPGRADE
++void Activation::flashWriteMCU()
++{
++    fs::path uploadDir(IMG_UPLOAD_DIR);
++    fs::path toPath(IMG_TMP_DIR);
++    auto mcuImage = "image-mcu";
++    try
++    {
++        fs::copy_file(uploadDir / versionId / mcuImage, toPath / mcuImage,
++                      fs::copy_options::overwrite_existing);
++    }
++    catch (const std::exception& e)
++    {
++        error("Error when copying image-mcu from /tmp/<versionID>/ to /tmp/.");
++    }
++}
++
++void Activation::onStateChangesMcu(sdbusplus::message::message& msg)
++{
++    uint32_t newStateID{};
++    sdbusplus::message::object_path newStateObjPath;
++    std::string newStateUnit{};
++    std::string newStateResult{};
++
++    // Read the msg and populate each variable
++    msg.read(newStateID, newStateObjPath, newStateUnit, newStateResult);
++
++    auto mcuServiceFile = "mcu-update.service";
++
++    if (newStateResult == "done")
++    {
++        // unsubscribe to systemd signals
++        unsubscribeFromSystemdSignals();
++        auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
++                                      SYSTEMD_INTERFACE, "StartUnit");
++        method.append(mcuServiceFile, "replace");
++        try
++        {
++            auto reply = bus.call(method);
++
++            // Set activation progress to 100
++            activationProgress->progress(100);
++
++            // Set Activation value to active
++            activation(softwareServer::Activation::Activations::Active);
++
++            info("MCU upgrade completed successfully.");
++            parent.mcuVersion->version(
++                parent.versions.find(versionId)->second->version());
++
++            // Delete the uploaded activation
++            boost::asio::post(getIOContext(), [this]() {
++                this->parent.erase(this->versionId);
++            });
++        }
++        catch (const sdbusplus::exception::exception& e)
++        {
++            // Set Activation value to Failed
++            activation(softwareServer::Activation::Activations::Failed);
++
++            error("MCU upgrade failed.");
++        }
++    }
++
++    return;
++}
++
++#endif
++
+ void Activation::rebootBmc()
+ {
+     auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
+diff --git a/activation.hpp b/activation.hpp
+index 7425a54..d71734c 100644
+--- a/activation.hpp
++++ b/activation.hpp
+@@ -248,6 +248,14 @@ class Activation : public ActivationInherit, public Flash
+     void onStateChangesBios(sdbusplus::message::message&);
+ #endif
+ 
++#ifdef MCU_UPGRADE
++    /* @brief write to MCU flash function */
++    void flashWriteMCU();
++
++    /** @brief Function that acts on MCU upgrade service file state changes */
++    void onStateChangesMcu(sdbusplus::message::message&);
++#endif
++
+     /** @brief Overloaded function that acts on service file state changes */
+     void onStateChanges(sdbusplus::message::message&) override;
+ 
+diff --git a/item_updater.cpp b/item_updater.cpp
+index 6128e50..dbeacd4 100644
+--- a/item_updater.cpp
++++ b/item_updater.cpp
+@@ -40,7 +40,6 @@ using NotAllowed = sdbusplus::xyz::openbmc_project::Common::Error::NotAllowed;
+ 
+ void ItemUpdater::createActivation(sdbusplus::message::message& msg)
+ {
+-
+     using SVersion = server::Version;
+     using VersionPurpose = SVersion::VersionPurpose;
+     using VersionClass = phosphor::software::manager::Version;
+@@ -71,6 +70,9 @@ void ItemUpdater::createActivation(sdbusplus::message::message& msg)
+                     if (value == VersionPurpose::BMC ||
+ #ifdef HOST_BIOS_UPGRADE
+                         value == VersionPurpose::Host ||
++#endif
++#ifdef MCU_UPGRADE
++                        value == VersionPurpose::MCU ||
+ #endif
+                         value == VersionPurpose::System)
+                     {
+@@ -889,6 +891,62 @@ void ItemUpdater::createBIOSObject()
+ }
+ #endif
+ 
++#ifdef MCU_UPGRADE
++std::string restoreMCUVersion()
++{
++    std::string version = "null";
++    fs::path release = fs::path(PERSIST_DIR) / MCU_RELEASE_FILE;
++    if (fs::exists(release))
++    {
++        try
++        {
++            version = VersionClass::getBMCVersion(release.string());
++        }
++        catch (const std::exception& e)
++        {
++            warning("Failed to parse MCU version: {ERROR}", "ERROR", e);
++        }
++    }
++    else
++    {
++        info("No mcu version file exist");
++    }
++    return version;
++}
++
++void ItemUpdater::createMCUObject()
++{
++    std::string path = MCU_OBJPATH;
++    // Get version id from last item in the path
++    auto pos = path.rfind("/");
++    if (pos == std::string::npos)
++    {
++        error("No MCU version id found in object path {PATH}", "PATH", path);
++        return;
++    }
++
++    createActiveAssociation(path);
++    createFunctionalAssociation(path);
++
++    std::string versionId = path.substr(pos + 1);
++    auto version = restoreMCUVersion();
++    AssociationList assocs = {};
++    mcuActivation = std::make_unique<Activation>(
++        bus, path, *this, versionId, server::Activation::Activations::Active,
++        assocs);
++    auto dummyErase = [](std::string /*entryId*/) {
++        // Do nothing;
++    };
++    mcuVersion = std::make_unique<VersionClass>(
++        bus, path, version, VersionPurpose::MCU, "", "",
++        std::vector<std::string>(),
++        std::bind(dummyErase, std::placeholders::_1), "");
++    mcuVersion->deleteObject =
++        std::make_unique<phosphor::software::manager::Delete>(bus, path,
++                                                              *mcuVersion);
++}
++#endif
++
+ void ItemUpdater::getRunningSlot()
+ {
+     // Check /run/media/slot to get the slot number
+diff --git a/item_updater.hpp b/item_updater.hpp
+index ccacd28..d980deb 100644
+--- a/item_updater.hpp
++++ b/item_updater.hpp
+@@ -68,6 +68,9 @@ class ItemUpdater : public ItemUpdaterInherit
+ #ifdef HOST_BIOS_UPGRADE
+         createBIOSObject();
+ #endif
++#ifdef MCU_UPGRADE
++        createMCUObject();
++ #endif
+         emit_object_added();
+     };
+ 
+@@ -280,6 +283,23 @@ class ItemUpdater : public ItemUpdaterInherit
+     std::unique_ptr<VersionClass> biosVersion;
+ #endif
+ 
++#ifdef MCU_UPGRADE
++    /** @brief Create the MCU object without knowing the version.
++     *
++     *  The object is created only to provide the DBus access so that an
++     *  external service could set the correct MCU version.
++     *  On MCU code update, the version is updated accordingly.
++     */
++    void createMCUObject();
++
++    /** @brief Persistent Activation D-Bus object for MCU */
++    std::unique_ptr<Activation> mcuActivation;
++
++  public:
++    /** @brief Persistent Version D-Bus object for MCU */
++    std::unique_ptr<VersionClass> mcuVersion;
++#endif
++
+     /** @brief Get the slot number of running image */
+     void getRunningSlot();
+ };
+diff --git a/meson.build b/meson.build
+index 2bf7700..b27b6f2 100644
+--- a/meson.build
++++ b/meson.build
+@@ -59,6 +59,8 @@ conf.set_quoted('BMC_ROFS_PREFIX', get_option('media-dir') + '/rofs-')
+ conf.set_quoted('OS_RELEASE_FILE', '/etc/os-release')
+ # The name of the host firmware version file
+ conf.set_quoted('HOST_RELEASE_FILE', 'bios-release')
++# The name of the mcu firmware version file
++conf.set_quoted('MCU_RELEASE_FILE', 'mcu-release')
+ # The dir where activation data is stored in files
+ conf.set_quoted('PERSIST_DIR', '/var/lib/phosphor-bmc-code-mgmt/')
+ 
+@@ -69,6 +71,7 @@ conf.set('MMC_LAYOUT', get_option('bmc-layout').contains('mmc'))
+ 
+ # Configurable features
+ conf.set('HOST_BIOS_UPGRADE', get_option('host-bios-upgrade').enabled())
++conf.set('MCU_UPGRADE', get_option('mcu-upgrade').enabled())
+ conf.set('WANT_SIGNATURE_VERIFY', \
+     get_option('verify-signature').enabled() or \
+     get_option('verify-full-signature').enabled())
+@@ -78,6 +81,7 @@ conf.set('WANT_SIGNATURE_FULL_VERIFY', get_option('verify-full-signature').enabl
+ conf.set('ACTIVE_BMC_MAX_ALLOWED', get_option('active-bmc-max-allowed'))
+ conf.set_quoted('HASH_FILE_NAME', get_option('hash-file-name'))
+ conf.set_quoted('IMG_UPLOAD_DIR', get_option('img-upload-dir'))
++conf.set_quoted('IMG_TMP_DIR', get_option('img-tmp-dir'))
+ conf.set_quoted('MANIFEST_FILE_NAME', get_option('manifest-file-name'))
+ conf.set_quoted('MEDIA_DIR', get_option('media-dir'))
+ optional_array = get_option('optional-images')
+@@ -98,6 +102,10 @@ if get_option('host-bios-upgrade').enabled()
+     conf.set_quoted('BIOS_OBJPATH', get_option('bios-object-path'))
+ endif
+ 
++if get_option('mcu-upgrade').enabled()
++    conf.set_quoted('MCU_OBJPATH', get_option('mcu-object-path'))
++endif
++
+ if get_option('bmc-static-dual-image').enabled()
+   conf.set('BMC_STATIC_DUAL_IMAGE', get_option('bmc-static-dual-image').enabled())
+   conf.set_quoted('ALT_ROFS_DIR', get_option('alt-rofs-dir'))
+diff --git a/meson_options.txt b/meson_options.txt
+index e9eecff..198d4de 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -12,6 +12,9 @@ option('bmc-layout', type: 'combo',
+ option('host-bios-upgrade', type: 'feature', value: 'enabled',
+     description: 'Enable host bios upgrade support.')
+ 
++option('mcu-upgrade', type: 'feature', value: 'enabled',
++    description: 'Enable mcu upgrade support.')
++
+ option('sync-bmc-files', type: 'feature', value: 'enabled',
+     description: 'Enable sync of filesystem files.')
+ 
+@@ -54,6 +57,12 @@ option(
+     description: 'Directory where downloaded software images are placed.',
+ )
+ 
++option(
++    'img-tmp-dir', type: 'string',
++    value: '/tmp',
++    description: 'Directory where downloaded software images are placed.',
++)
++
+ option(
+     'manifest-file-name', type: 'string',
+     value: 'MANIFEST',
+@@ -120,6 +129,12 @@ option(
+     description: 'The BIOS DBus object path.',
+ )
+ 
++option(
++    'mcu-object-path', type: 'string',
++    value: '/xyz/openbmc_project/software/mcu_active',
++    description: 'The MCU DBus object path.',
++)
++
+ option('bmc-static-dual-image', type: 'feature', value: 'enabled',
+     description: 'Enable the dual image support for static layout.')
+ 
+-- 
+2.17.1
+
