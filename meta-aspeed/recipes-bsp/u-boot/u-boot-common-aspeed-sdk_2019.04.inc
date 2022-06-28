@@ -1,3 +1,5 @@
+require conf/machine/distro/include/uboot-distrovars.inc
+
 HOMEPAGE = "https://github.com/AspeedTech-BMC/u-boot"
 SECTION = "bootloaders"
 DEPENDS += "flex-native bison-native xxd-native"

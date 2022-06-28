@@ -1,5 +1,4 @@
 require u-boot-common-aspeed-sdk_${PV}.inc
-require conf/machine/distro/include/uboot-distrovars.inc
 
 UBOOT_MAKE_TARGET ?= "DEVICE_TREE=${UBOOT_DEVICETREE}"
 
