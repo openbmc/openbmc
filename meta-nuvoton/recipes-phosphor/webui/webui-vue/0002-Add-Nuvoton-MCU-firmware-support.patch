@@ -1,22 +1,22 @@
-From 155799c9bd45e80fee3c260dcbba36fa84dabefd Mon Sep 17 00:00:00 2001
+From 5edbc8d1a2a787b8d8c7197cf07a74f4074a2234 Mon Sep 17 00:00:00 2001
 From: Brian Ma <chma0@nuvoton.com>
 Date: Tue, 29 Jun 2021 10:34:23 +0800
-Subject: [PATCH 1/2] Add Nuvoton MCU firmware support
+Subject: [PATCH 2/2] Add Nuvoton MCU firmware support
 
 Signed-off-by: Brian Ma <chma0@nuvoton.com>
 ---
  src/locales/en-US.json                        |  1 +
- .../modules/Configuration/FirmwareStore.js    |  9 +++++
- src/views/Configuration/Firmware/Firmware.vue |  5 +++
- .../Firmware/FirmwareCardsMcu.vue             | 37 +++++++++++++++++++
+ src/store/modules/Operations/FirmwareStore.js |  9 +++++
+ src/views/Operations/Firmware/Firmware.vue    |  5 +++
+ .../Operations/Firmware/FirmwareCardsMcu.vue  | 37 +++++++++++++++++++
  4 files changed, 52 insertions(+)
- create mode 100644 src/views/Configuration/Firmware/FirmwareCardsMcu.vue
+ create mode 100644 src/views/Operations/Firmware/FirmwareCardsMcu.vue
 
 diff --git a/src/locales/en-US.json b/src/locales/en-US.json
-index 437ce03..c087f82 100644
+index e43167c6..689bff9e 100644
 --- a/src/locales/en-US.json
 +++ b/src/locales/en-US.json
-@@ -310,6 +310,7 @@
+@@ -325,6 +325,7 @@
      "sectionTitleBmcCards": "BMC",
      "sectionTitleBmcCardsCombined": "BMC and server",
      "sectionTitleHostCards": "Host",
@@ -24,10 +24,10 @@ index 437ce03..c087f82 100644
      "sectionTitleUpdateFirmware": "Update firmware",
      "alert": {
        "operationInProgress": "Server power operation in progress.",
-diff --git a/src/store/modules/Configuration/FirmwareStore.js b/src/store/modules/Configuration/FirmwareStore.js
-index c6639ff..79f8638 100644
---- a/src/store/modules/Configuration/FirmwareStore.js
-+++ b/src/store/modules/Configuration/FirmwareStore.js
+diff --git a/src/store/modules/Operations/FirmwareStore.js b/src/store/modules/Operations/FirmwareStore.js
+index c6639ff7..79f8638f 100644
+--- a/src/store/modules/Operations/FirmwareStore.js
++++ b/src/store/modules/Operations/FirmwareStore.js
 @@ -6,6 +6,7 @@ const FirmwareStore = {
    state: {
      bmcFirmware: [],
@@ -65,10 +65,10 @@ index c6639ff..79f8638 100644
              const firmwareType = data?.RelatedItem?.[0]?.['@odata.id']
                .split('/')
                .pop();
-diff --git a/src/views/Configuration/Firmware/Firmware.vue b/src/views/Configuration/Firmware/Firmware.vue
-index a2acb9b..bfb9b78 100644
---- a/src/views/Configuration/Firmware/Firmware.vue
-+++ b/src/views/Configuration/Firmware/Firmware.vue
+diff --git a/src/views/Operations/Firmware/Firmware.vue b/src/views/Operations/Firmware/Firmware.vue
+index a2acb9b0..bfb9b785 100644
+--- a/src/views/Operations/Firmware/Firmware.vue
++++ b/src/views/Operations/Firmware/Firmware.vue
 @@ -14,6 +14,9 @@
  
          <!-- Host Firmware -->
@@ -95,11 +95,11 @@ index a2acb9b..bfb9b78 100644
      PageSection,
      PageTitle,
    },
-diff --git a/src/views/Configuration/Firmware/FirmwareCardsMcu.vue b/src/views/Configuration/Firmware/FirmwareCardsMcu.vue
+diff --git a/src/views/Operations/Firmware/FirmwareCardsMcu.vue b/src/views/Operations/Firmware/FirmwareCardsMcu.vue
 new file mode 100644
-index 0000000..3d5641e
+index 00000000..3d5641e1
 --- /dev/null
-+++ b/src/views/Configuration/Firmware/FirmwareCardsMcu.vue
++++ b/src/views/Operations/Firmware/FirmwareCardsMcu.vue
 @@ -0,0 +1,37 @@
 +<template>
 +  <page-section :section-title="$t('pageFirmware.sectionTitleMcuCards')">
