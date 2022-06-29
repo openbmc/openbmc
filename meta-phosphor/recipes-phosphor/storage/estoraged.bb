@@ -20,7 +20,7 @@ EXTRA_OEMESON = "-Dtests=disabled"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/estoraged.git;branch=master;protocol=https"
-SRCREV = "740e94bd36c0971cda9fbb5d9c3e11c650d35dbc"
+SRCREV = "6771c6917ed410a21cbcfa658c63c014a5b2e52a"
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} += "xyz.openbmc_project.eStoraged.service"
