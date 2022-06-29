@@ -1,0 +1,23 @@
+From 80edbd9f4af75e92718a9ca90e4c23846070eb63 Mon Sep 17 00:00:00 2001
+From: jhkang <jhkang@nuvoton.com>
+Date: Wed, 29 Jun 2022 01:01:39 -0700
+Subject: [PATCH] Software: Add CPLD VersionPurpose
+
+---
+ yaml/xyz/openbmc_project/Software/Version.interface.yaml | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/yaml/xyz/openbmc_project/Software/Version.interface.yaml b/yaml/xyz/openbmc_project/Software/Version.interface.yaml
+index e13594f4..3b366147 100644
+--- a/yaml/xyz/openbmc_project/Software/Version.interface.yaml
++++ b/yaml/xyz/openbmc_project/Software/Version.interface.yaml
+@@ -44,3 +44,6 @@ enumerations:
+           - name: MCU
+             description: >
+                 The version is a version for a MCU.
++          - name: CPLD
++            description: >
++                The version is a version for a CPLD.
+-- 
+2.17.1
+
