@@ -13,6 +13,8 @@ python do_patch:buv-runbmc() {
 
     # count from the commit version
     count = re.findall("-(\d{1,4})-", version_id)
+    if len(count) == 0:
+        count.append("0")
 
     release = re.findall("-r(\d{1,4})", version_id)
     if release:
