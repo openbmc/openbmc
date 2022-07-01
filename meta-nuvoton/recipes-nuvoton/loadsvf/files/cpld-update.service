@@ -1,0 +1,8 @@
+[Unit]
+Description=NPCM7xx CPLD F/W update service
+
+[Service]
+Restart=no
+Type=oneshot
+ExecStart=/usr/bin/cpld-update.sh
+SyslogIdentifier=cpld-update.sh
