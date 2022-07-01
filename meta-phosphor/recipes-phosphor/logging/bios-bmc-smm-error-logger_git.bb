@@ -8,10 +8,13 @@ inherit meson pkgconfig systemd
 
 DEPENDS += " \
   boost \
+  fmt \
   stdplus \
   systemd \
   nlohmann-json \
   libbej \
+  sdbusplus \
+  phosphor-dbus-interfaces \
 "
 
 EXTRA_OEMESON = " \
