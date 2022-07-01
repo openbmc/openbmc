@@ -38,7 +38,3 @@ pkg_postinst:${PN}:append:gbmc () {
     systemctl --root=$D enable serial-to-host@${OBMC_CONSOLE_FRONT_TTY}.service
   fi
 }
-
-pkg_postinst:${PN}:append:gbmc:dev () {
-  systemctl --root=$D enable host-console-journal.service
-}
