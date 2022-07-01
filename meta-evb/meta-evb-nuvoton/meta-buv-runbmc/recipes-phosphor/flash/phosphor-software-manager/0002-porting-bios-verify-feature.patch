@@ -11,22 +11,22 @@ Signed-off-by: Brian Ma <chma0@nuvoton.com>
  3 files changed, 26 insertions(+), 1 deletion(-)
 
 diff --git a/image_verify.cpp b/image_verify.cpp
-index d67cfac..071e124 100644
+index 9551e4e..01836e0 100644
 --- a/image_verify.cpp
 +++ b/image_verify.cpp
-@@ -93,6 +93,7 @@ bool Signature::verifyFullImage()
-     bool ret = true;
- #ifdef WANT_SIGNATURE_FULL_VERIFY
+@@ -105,6 +105,7 @@ bool Signature::verifyFullImage()
+     }
+
      std::vector<std::string> fullImages = {
 +        fs::path(imageDirPath) / "image-bios.sig",
          fs::path(imageDirPath) / "image-bmc.sig",
          fs::path(imageDirPath) / "image-hostfw.sig",
          fs::path(imageDirPath) / "image-kernel.sig",
 diff --git a/item_updater.cpp b/item_updater.cpp
-index fe9c808..730b9f7 100644
+index c8fda76..6128e50 100644
 --- a/item_updater.cpp
 +++ b/item_updater.cpp
-@@ -749,6 +749,28 @@ bool ItemUpdater::checkImage(const std::string& filePath,
+@@ -834,6 +834,28 @@ bool ItemUpdater::checkImage(const std::string& filePath,
  }
  
  #ifdef HOST_BIOS_UPGRADE
@@ -55,7 +55,7 @@ index fe9c808..730b9f7 100644
  void ItemUpdater::createBIOSObject()
  {
      std::string path = BIOS_OBJPATH;
-@@ -764,7 +786,7 @@ void ItemUpdater::createBIOSObject()
+@@ -849,7 +871,7 @@ void ItemUpdater::createBIOSObject()
      createFunctionalAssociation(path);
  
      auto versionId = path.substr(pos + 1);
@@ -65,10 +65,10 @@ index fe9c808..730b9f7 100644
      biosActivation = std::make_unique<Activation>(
          bus, path, *this, versionId, server::Activation::Activations::Active,
 diff --git a/meson.build b/meson.build
-index 1367a72..0d16964 100644
+index 0dca8c0..2bf7700 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -58,6 +58,8 @@ conf.set_quoted('ALT_RWFS', '/media/alt/var/persist')
+@@ -57,6 +57,8 @@ conf.set_quoted('UPDATEABLE_REV_ASSOCIATION', 'software_version')
  conf.set_quoted('BMC_ROFS_PREFIX', get_option('media-dir') + '/rofs-')
  # The name of the BMC table of contents file
  conf.set_quoted('OS_RELEASE_FILE', '/etc/os-release')
@@ -79,4 +79,3 @@ index 1367a72..0d16964 100644
  
 -- 
 2.17.1
-

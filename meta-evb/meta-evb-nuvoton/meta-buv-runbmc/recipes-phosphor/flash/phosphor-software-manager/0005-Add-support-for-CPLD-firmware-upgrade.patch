@@ -1,0 +1,313 @@
+From 494a1379116b8f0af4d0fe923167b81a5de82fc7 Mon Sep 17 00:00:00 2001
+From: jhkang <jhkang@nuvoton.com>
+Date: Wed, 29 Jun 2022 20:26:42 -0700
+Subject: [PATCH 5/5] Add support for CPLD firmware upgrade
+
+---
+ activation.cpp    | 79 +++++++++++++++++++++++++++++++++++++++++++++++
+ activation.hpp    |  5 +++
+ item_updater.cpp  | 61 ++++++++++++++++++++++++++++++++++++
+ item_updater.hpp  | 20 ++++++++++++
+ meson.build       |  7 +++++
+ meson_options.txt |  9 ++++++
+ 6 files changed, 181 insertions(+)
+
+diff --git a/activation.cpp b/activation.cpp
+index 4a19222..d064376 100644
+--- a/activation.cpp
++++ b/activation.cpp
+@@ -168,6 +168,19 @@ auto Activation::activation(Activations value) -> Activations
+         }
+ #endif
+ 
++#ifdef CPLD_UPGRADE
++        if (purpose == VersionPurpose::CPLD)
++        {
++            // Enable systemd signals
++            subscribeToSystemdSignals();
++
++            // Set initial progress
++            activationProgress->progress(20);
++
++            return softwareServer::Activation::activation(value);
++        }
++#endif
++
+         activationProgress->progress(10);
+ 
+         parent.freeSpace(*this);
+@@ -352,6 +365,14 @@ void Activation::unitStateChange(sdbusplus::message::message& msg)
+     }
+ #endif
+ 
++#ifdef CPLD_UPGRADE
++    if (purpose == VersionPurpose::CPLD)
++    {
++        onStateChangesCpld(msg);
++        return;
++    }
++#endif
++
+     onStateChanges(msg);
+ 
+     return;
+@@ -560,6 +581,64 @@ void Activation::onStateChangesMcu(sdbusplus::message::message& msg)
+ 
+ #endif
+ 
++#ifdef CPLD_UPGRADE
++void Activation::onStateChangesCpld(sdbusplus::message::message& msg)
++{
++    uint32_t newStateID{};
++    sdbusplus::message::object_path newStateObjPath;
++    std::string newStateUnit{};
++    std::string newStateResult{};
++
++    // Read the msg and populate each variable
++    msg.read(newStateID, newStateObjPath, newStateUnit, newStateResult);
++
++    auto cpldServiceFile = "cpld-update.service";
++
++    if (newStateResult == "done")
++    {
++        // unsubscribe to systemd signals
++        unsubscribeFromSystemdSignals();
++        auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
++                                      SYSTEMD_INTERFACE, "StartUnit");
++        method.append(cpldServiceFile, "replace");
++        try
++        {
++            auto reply = bus.call(method);
++
++            // Wait a few seconds for the service file to finish, 
++            // otherwise the CPLD FW might be deleted before upgrading finished.
++            constexpr auto removeWait = std::chrono::seconds(10);
++            std::this_thread::sleep_for(removeWait);
++
++            // Set activation progress to 100
++            activationProgress->progress(100);
++
++            // Set Activation value to active
++            activation(softwareServer::Activation::Activations::Active);
++
++            info("CPLD upgrade completed successfully.");
++            parent.cpldVersion->version(
++                parent.versions.find(versionId)->second->version());
++
++            // Delete the uploaded activation
++            boost::asio::post(getIOContext(), [this]() {
++                this->parent.erase(this->versionId);
++            });
++        }
++        catch (const sdbusplus::exception::exception& e)
++        {
++            // Set Activation value to Failed
++            activation(softwareServer::Activation::Activations::Failed);
++
++            error("CPLD upgrade failed.");
++        }
++    }
++
++    return;
++}
++
++#endif
++
+ void Activation::rebootBmc()
+ {
+     auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
+diff --git a/activation.hpp b/activation.hpp
+index d71734c..d835475 100644
+--- a/activation.hpp
++++ b/activation.hpp
+@@ -256,6 +256,11 @@ class Activation : public ActivationInherit, public Flash
+     void onStateChangesMcu(sdbusplus::message::message&);
+ #endif
+ 
++#ifdef CPLD_UPGRADE
++    /** @brief Function that acts on CPLD upgrade service file state changes */
++    void onStateChangesCpld(sdbusplus::message::message&);
++#endif
++
+     /** @brief Overloaded function that acts on service file state changes */
+     void onStateChanges(sdbusplus::message::message&) override;
+ 
+diff --git a/item_updater.cpp b/item_updater.cpp
+index dbeacd4..7758ca4 100644
+--- a/item_updater.cpp
++++ b/item_updater.cpp
+@@ -73,6 +73,9 @@ void ItemUpdater::createActivation(sdbusplus::message::message& msg)
+ #endif
+ #ifdef MCU_UPGRADE
+                         value == VersionPurpose::MCU ||
++#endif
++#ifdef CPLD_UPGRADE
++                        value == VersionPurpose::CPLD ||
+ #endif
+                         value == VersionPurpose::System)
+                     {
+@@ -947,6 +950,64 @@ void ItemUpdater::createMCUObject()
+ }
+ #endif
+ 
++#ifdef CPLD_UPGRADE
++std::string restoreCPLDVersion()
++{
++    std::string version = "null";
++
++    fs::path release = fs::path(PERSIST_DIR) / CPLD_RELEASE_FILE;
++    if (fs::exists(release))
++    {
++        try
++        {
++            version = VersionClass::getBMCVersion(release.string());
++        }
++        catch (const std::exception& e)
++        {
++            warning("Failed to parse CPLD version: {ERROR}", "ERROR", e);
++        }
++    }
++    else
++    {
++        info("No cpld version file exist");
++    }
++
++    return version;
++}
++
++void ItemUpdater::createCPLDObject()
++{
++    std::string path = CPLD_OBJPATH;
++    // Get version id from last item in the path
++    auto pos = path.rfind("/");
++    if (pos == std::string::npos)
++    {
++        error("No CPLD version id found in object path {PATH}", "PATH", path);
++        return;
++    }
++
++    createActiveAssociation(path);
++    createFunctionalAssociation(path);
++
++    std::string versionId = path.substr(pos + 1);
++    auto version = restoreCPLDVersion();
++    AssociationList assocs = {};
++    cpldActivation = std::make_unique<Activation>(
++        bus, path, *this, versionId, server::Activation::Activations::Active,
++        assocs);
++    auto dummyErase = [](std::string /*entryId*/) {
++        // Do nothing;
++    };
++    cpldVersion = std::make_unique<VersionClass>(
++        bus, path, version, VersionPurpose::CPLD, "", "",
++        std::vector<std::string>(),
++        std::bind(dummyErase, std::placeholders::_1), "");
++    cpldVersion->deleteObject =
++        std::make_unique<phosphor::software::manager::Delete>(bus, path,
++                                                              *cpldVersion);
++}
++#endif
++
+ void ItemUpdater::getRunningSlot()
+ {
+     // Check /run/media/slot to get the slot number
+diff --git a/item_updater.hpp b/item_updater.hpp
+index d980deb..4be179c 100644
+--- a/item_updater.hpp
++++ b/item_updater.hpp
+@@ -70,6 +70,9 @@ class ItemUpdater : public ItemUpdaterInherit
+ #endif
+ #ifdef MCU_UPGRADE
+         createMCUObject();
++ #endif
++#ifdef CPLD_UPGRADE
++        createCPLDObject();
+  #endif
+         emit_object_added();
+     };
+@@ -300,6 +303,23 @@ class ItemUpdater : public ItemUpdaterInherit
+     std::unique_ptr<VersionClass> mcuVersion;
+ #endif
+ 
++#ifdef CPLD_UPGRADE
++    /** @brief Create the CPLD object without knowing the version.
++     *
++     *  The object is created only to provide the DBus access so that an
++     *  external service could set the correct CPLD version.
++     *  On CPLD code update, the version is updated accordingly.
++     */
++    void createCPLDObject();
++
++    /** @brief Persistent Activation D-Bus object for CPLD */
++    std::unique_ptr<Activation> cpldActivation;
++
++  public:
++    /** @brief Persistent Version D-Bus object for CPLD */
++    std::unique_ptr<VersionClass> cpldVersion;
++#endif
++
+     /** @brief Get the slot number of running image */
+     void getRunningSlot();
+ };
+diff --git a/meson.build b/meson.build
+index b27b6f2..27bf01e 100644
+--- a/meson.build
++++ b/meson.build
+@@ -61,6 +61,8 @@ conf.set_quoted('OS_RELEASE_FILE', '/etc/os-release')
+ conf.set_quoted('HOST_RELEASE_FILE', 'bios-release')
+ # The name of the mcu firmware version file
+ conf.set_quoted('MCU_RELEASE_FILE', 'mcu-release')
++# The name of the cpld firmware version file
++conf.set_quoted('CPLD_RELEASE_FILE', 'cpld-release')
+ # The dir where activation data is stored in files
+ conf.set_quoted('PERSIST_DIR', '/var/lib/phosphor-bmc-code-mgmt/')
+ 
+@@ -72,6 +74,7 @@ conf.set('MMC_LAYOUT', get_option('bmc-layout').contains('mmc'))
+ # Configurable features
+ conf.set('HOST_BIOS_UPGRADE', get_option('host-bios-upgrade').enabled())
+ conf.set('MCU_UPGRADE', get_option('mcu-upgrade').enabled())
++conf.set('CPLD_UPGRADE', get_option('cpld-upgrade').enabled())
+ conf.set('WANT_SIGNATURE_VERIFY', \
+     get_option('verify-signature').enabled() or \
+     get_option('verify-full-signature').enabled())
+@@ -106,6 +109,10 @@ if get_option('mcu-upgrade').enabled()
+     conf.set_quoted('MCU_OBJPATH', get_option('mcu-object-path'))
+ endif
+ 
++if get_option('cpld-upgrade').enabled()
++    conf.set_quoted('CPLD_OBJPATH', get_option('cpld-object-path'))
++endif
++
+ if get_option('bmc-static-dual-image').enabled()
+   conf.set('BMC_STATIC_DUAL_IMAGE', get_option('bmc-static-dual-image').enabled())
+   conf.set_quoted('ALT_ROFS_DIR', get_option('alt-rofs-dir'))
+diff --git a/meson_options.txt b/meson_options.txt
+index 198d4de..ae00709 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -15,6 +15,9 @@ option('host-bios-upgrade', type: 'feature', value: 'enabled',
+ option('mcu-upgrade', type: 'feature', value: 'enabled',
+     description: 'Enable mcu upgrade support.')
+ 
++option('cpld-upgrade', type: 'feature', value: 'enabled',
++    description: 'Enable cpld upgrade support.')
++
+ option('sync-bmc-files', type: 'feature', value: 'enabled',
+     description: 'Enable sync of filesystem files.')
+ 
+@@ -135,6 +138,12 @@ option(
+     description: 'The MCU DBus object path.',
+ )
+ 
++option(
++    'cpld-object-path', type: 'string',
++    value: '/xyz/openbmc_project/software/cpld_active',
++    description: 'The CPLD DBus object path.',
++)
++
+ option('bmc-static-dual-image', type: 'feature', value: 'enabled',
+     description: 'Enable the dual image support for static layout.')
+ 
+-- 
+2.17.1
+
