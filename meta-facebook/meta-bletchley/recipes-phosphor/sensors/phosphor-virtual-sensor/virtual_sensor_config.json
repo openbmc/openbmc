@@ -36,7 +36,7 @@
         }
       ]
     },
-    "Expression": "max(0, (avg(fan0, fan1, fan2, fan3) * 0.0478) - 11.467)"
+    "Expression": "max(0, (avg(fan0, fan1, fan2, fan3) * 0.0448) - 9.5042)"
   },
   {
     "Desc": {
