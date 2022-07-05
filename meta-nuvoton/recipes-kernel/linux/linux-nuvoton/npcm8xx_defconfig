@@ -151,9 +151,9 @@ CONFIG_EXPERT=y
 
 CONFIG_WATCHDOG_SYSFS=y
 
-# Enable KVM Support
-CONFIG_NPCM750_VCD=y
-CONFIG_NPCM750_ECE=y
+# Enable misc VCD/ECE driver for KVM
+# CONFIG_NPCM750_VCD is not set
+# CONFIG_NPCM750_ECE is not set
 
 # Enable JTAG Master Support
 CONFIG_NPCM8XX_JTAG_MASTER=y
