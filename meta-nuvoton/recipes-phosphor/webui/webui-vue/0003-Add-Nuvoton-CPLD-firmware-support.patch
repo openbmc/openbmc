@@ -1,0 +1,140 @@
+From 669553d40651790cc33c3cfed6299c913775c397 Mon Sep 17 00:00:00 2001
+From: jhkang <jhkang@nuvoton.com>
+Date: Wed, 29 Jun 2022 02:30:36 -0700
+Subject: [PATCH 3/3] Add Nuvoton CPLD firmware support
+
+---
+ src/locales/en-US.json                        |  1 +
+ src/store/modules/Operations/FirmwareStore.js |  7 ++++
+ src/views/Operations/Firmware/Firmware.vue    |  5 +++
+ .../Operations/Firmware/FirmwareCardsCpld.vue | 37 +++++++++++++++++++
+ 4 files changed, 50 insertions(+)
+ create mode 100644 src/views/Operations/Firmware/FirmwareCardsCpld.vue
+
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index 689bff9e..e29a685b 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -326,6 +326,7 @@
+     "sectionTitleBmcCardsCombined": "BMC and server",
+     "sectionTitleHostCards": "Host",
+     "sectionTitleMcuCards": "MCU",
++    "sectionTitleCpldCards": "CPLD",
+     "sectionTitleUpdateFirmware": "Update firmware",
+     "alert": {
+       "operationInProgress": "Server power operation in progress.",
+diff --git a/src/store/modules/Operations/FirmwareStore.js b/src/store/modules/Operations/FirmwareStore.js
+index 79f8638f..bc1ece4a 100644
+--- a/src/store/modules/Operations/FirmwareStore.js
++++ b/src/store/modules/Operations/FirmwareStore.js
+@@ -7,6 +7,7 @@ const FirmwareStore = {
+     bmcFirmware: [],
+     hostFirmware: [],
+     mcuFirmware: null,
++    cpldFirmware: null,
+     bmcActiveFirmwareId: null,
+     hostActiveFirmwareId: null,
+     applyTime: null,
+@@ -26,6 +27,7 @@ const FirmwareStore = {
+       );
+     },
+     mcuFirmware: (state) => state.mcuFirmware,
++    cpldFirmware: (state) => state.cpldFirmware,
+     backupBmcFirmware: (state) => {
+       return state.bmcFirmware.find(
+         (firmware) => firmware.id !== state.bmcActiveFirmwareId
+@@ -43,6 +45,7 @@ const FirmwareStore = {
+     setBmcFirmware: (state, firmware) => (state.bmcFirmware = firmware),
+     setHostFirmware: (state, firmware) => (state.hostFirmware = firmware),
+     setMcuFirmware: (state, firmware) => (state.mcuFirmware = firmware),
++    setCpldFirmware: (state, firmware) => (state.cpldFirmware = firmware),
+     setApplyTime: (state, applyTime) => (state.applyTime = applyTime),
+     setTftpUploadAvailable: (state, tftpAvailable) =>
+       (state.tftpAvailable = tftpAvailable),
+@@ -90,6 +93,10 @@ const FirmwareStore = {
+               const mcuFirmware = data?.Version;
+               commit('setMcuFirmware', mcuFirmware);
+             }
++            if (Description === 'CPLD image') {
++              const cpldFirmware = data?.Version;
++              commit('setCpldFirmware', cpldFirmware);
++            }
+             const firmwareType = data?.RelatedItem?.[0]?.['@odata.id']
+               .split('/')
+               .pop();
+diff --git a/src/views/Operations/Firmware/Firmware.vue b/src/views/Operations/Firmware/Firmware.vue
+index bfb9b785..dce1becc 100644
+--- a/src/views/Operations/Firmware/Firmware.vue
++++ b/src/views/Operations/Firmware/Firmware.vue
+@@ -17,6 +17,9 @@
+ 
+         <!-- MCU Firmware -->
+         <mcu-cards />
++
++        <!-- CPLD Firmware -->
++        <cpld-cards />
+       </b-col>
+     </b-row>
+ 
+@@ -43,6 +46,7 @@ import BmcCards from './FirmwareCardsBmc';
+ import FormUpdate from './FirmwareFormUpdate';
+ import HostCards from './FirmwareCardsHost';
+ import McuCards from './FirmwareCardsMcu';
++import CpldCards from './FirmwareCardsCpld';
+ import PageSection from '@/components/Global/PageSection';
+ import PageTitle from '@/components/Global/PageTitle';
+ 
+@@ -56,6 +60,7 @@ export default {
+     FormUpdate,
+     HostCards,
+     McuCards,
++    CpldCards,
+     PageSection,
+     PageTitle,
+   },
+diff --git a/src/views/Operations/Firmware/FirmwareCardsCpld.vue b/src/views/Operations/Firmware/FirmwareCardsCpld.vue
+new file mode 100644
+index 00000000..f5789265
+--- /dev/null
++++ b/src/views/Operations/Firmware/FirmwareCardsCpld.vue
+@@ -0,0 +1,37 @@
++<template>
++  <page-section :section-title="$t('pageFirmware.sectionTitleCpldCards')">
++    <b-card-group deck>
++      <!-- Running image -->
++      <b-card>
++        <template #header>
++          <p class="font-weight-bold m-0">
++            {{ $t('pageFirmware.cardTitleRunning') }}
++          </p>
++        </template>
++        <dl class="mb-0">
++          <dt>{{ $t('pageFirmware.cardBodyVersion') }}</dt>
++          <dd class="mb-0">{{ runningVersion }}</dd>
++        </dl>
++      </b-card>
++    </b-card-group>
++  </page-section>
++</template>
++
++<script>
++import PageSection from '@/components/Global/PageSection';
++
++export default {
++  components: { PageSection },
++  computed: {
++    runningVersion() {
++      return this.$store.getters['firmware/cpldFirmware'] || '--';
++    },
++  },
++};
++</script>
++
++<style lang="scss" scoped>
++.page-section {
++  margin-top: -$spacer * 1.5;
++}
++</style>
+-- 
+2.17.1
+
