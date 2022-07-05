@@ -1,1 +1,1 @@
-EXTRA_OECMAKE += "-DLONG_PRESS_TIME_MS=5000"
+EXTRA_OEMESON:append = "-Dlong-press-time-ms=5000"

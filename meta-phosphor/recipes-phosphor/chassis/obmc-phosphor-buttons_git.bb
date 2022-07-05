@@ -7,9 +7,9 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 S = "${WORKDIR}/git"
 SRC_URI += "git://github.com/openbmc/phosphor-buttons.git;branch=master;protocol=https"
-SRCREV = "1efa3e2969262594457441acc612216dd1e2e7e7"
+SRCREV = "ba33275d9fbf89bdaa75c241b87b5520bb54c440"
 
-inherit cmake pkgconfig systemd
+inherit meson pkgconfig systemd
 
 BUTTON_PACKAGES="${PN}-signals ${PN}-handler"
 
