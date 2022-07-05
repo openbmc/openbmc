@@ -48,6 +48,7 @@ meta-google/recipes-extended/libconfig/files/0001-makefile-Add-missing-LDFLAGS.p
 meta-google/recipes-phosphor/initrdscripts/obmc-phosphor-initfs/rwfs-clean-dev.patch
 meta-ingrasys/meta-zaius/recipes-bsp/u-boot/u-boot-aspeed/0001-board-aspeed-Add-reset_phy-for-Zaius.patch
 meta-nuvoton/recipes-bsp/images/npcm7xx-igps/0001-Adjust-paths-for-use-with-Bitbake.patch
+meta-nuvoton/recipes-bsp/images/npcm8xx-igps/0001-Adjust-paths-for-use-with-Bitbake.patch
 meta-yadro/meta-nicole/recipes-bsp/u-boot/files/0001-Add-system-reset-status-support.patch
 meta-yadro/meta-nicole/recipes-bsp/u-boot/files/0002-config-ast-common-set-fieldmode-to-true.patch
 meta-yadro/meta-nicole/recipes-bsp/u-boot/files/0003-aspeed-add-gpio-support.patch
