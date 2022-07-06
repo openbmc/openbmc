@@ -123,7 +123,8 @@ CHASSIS_SYNCH_TARGETS = "start-pre start on stop-pre stop off reset-on"
 # - powered-off: Services to run once chassis power is off
 # - reset: Services to check chassis power state and update chassis "on" target
 # - hard-off: Services to force an immediate power off of the chassis
-CHASSIS_ACTION_TARGETS = "poweron poweroff powered-off powerreset hard-poweroff"
+# - blackout: Target to enter when chassis experiences blackout
+CHASSIS_ACTION_TARGETS = "poweron poweroff powered-off powerreset hard-poweroff blackout"
 
 # Track all host synchronization point targets
 # - start-pre:                 Services to run before we start host boot
@@ -198,6 +199,6 @@ SYSTEMD_LINK:${PN}-obmc-targets += "${@compose_list(d, 'QUIESCE_FMT', 'HOST_ERRO
 
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager;branch=master;protocol=https"
-SRCREV = "1e91dc63570d03c2c239acaa3db0965f210bd98f"
+SRCREV = "b4cbfac10b490cd2a8ca83bfd139fe07bf1fe5a7"
 
 S = "${WORKDIR}/git"
