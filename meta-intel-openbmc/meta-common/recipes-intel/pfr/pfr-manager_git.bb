@@ -3,7 +3,7 @@ DESCRIPTION = "Daemon to handle all PFR functionalities"
 
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=7becf906c8f8d03c237bad13bc3dac53"
-inherit cmake systemd
+inherit cmake systemd pkgconfig
 
 SRC_URI = "git://github.com/openbmc/pfr-manager;branch=master;protocol=https"
 
