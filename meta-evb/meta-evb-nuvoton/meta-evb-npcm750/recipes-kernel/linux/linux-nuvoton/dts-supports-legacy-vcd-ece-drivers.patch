@@ -1,0 +1,177 @@
+From b4b14f8c1ce6ae619f8bed48a2973052a0f2e537 Mon Sep 17 00:00:00 2001
+From: Marvin Lin <milkfafa@gmail.com>
+Date: Fri, 8 Jul 2022 15:40:48 +0800
+Subject: [PATCH] dts supports legacy vcd ece drivers
+
+---
+ arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi | 18 ++++++++++++
+ .../boot/dts/nuvoton-npcm750-buv-runbmc.dts   | 22 +++++++++++++-
+ arch/arm/boot/dts/nuvoton-npcm750-evb.dts     | 22 +++++++++++++-
+ .../dts/nuvoton-npcm750-runbmc-olympus.dts    | 29 ++++++++++++++++++-
+ 4 files changed, 88 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi b/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
+index cb5eabf93146..a18f63221fa8 100644
+--- a/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
++++ b/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
+@@ -291,6 +291,24 @@
+ 			interrupts = <0 23 4>;
+ 		};
+ 
++		vcd: vcd@f0810000 {
++			compatible = "nuvoton,npcm750-vcd";
++			reg = <0xf0810000 0x10000>;
++			interrupts = <GIC_SPI 22 IRQ_TYPE_LEVEL_HIGH>;
++			resets = <&rstc NPCM7XX_RESET_IPSRST2 NPCM7XX_RESET_VCD>;
++			status = "disabled";
++			gcr-syscon = <&gcr>;
++			gfxi-syscon = <&gfxi>;
++		};
++
++		ece: ece@f0820000 {
++			compatible = "nuvoton,npcm750-ece";
++			reg = <0xf0820000 0x2000>;
++			interrupts = <GIC_SPI 24 IRQ_TYPE_LEVEL_HIGH>;
++			resets = <&rstc NPCM7XX_RESET_IPSRST2 NPCM7XX_RESET_ECE>;
++			status = "disabled";
++		};
++
+ 		video: video@f0810000 {
+ 			compatible = "nuvoton,npcm750-video";
+ 			reg = <0xf0810000 0x10000>, <0xf0820000 0x2000>;
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts b/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts
+index 41647efd543c..febde8c04af8 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts
+@@ -64,6 +64,16 @@
+ 		#size-cells = <1>;
+ 		ranges;
+ 
++		vcd_memory: framebuffer@0x1e200000 {
++			reg = <0x1e200000 0x600000>;
++			no-map;
++		};
++
++		ece_memory: framebuffer@0x1e800000 {
++			reg = <0x1e800000 0x600000>;
++			no-map;
++		};
++
+ 		video_memory: framebuffer@0x1b000000 {
+ 			compatible = "shared-dma-pool";
+ 			reg = <0x1b000000 0x02000000>;
+@@ -576,9 +586,19 @@
+ 	status = "okay";
+ };
+ 
++&vcd {
++	status = "okay";
++	memory-region = <&vcd_memory>;
++};
++
++&ece {
++	status = "okay";
++	memory-region = <&ece_memory>;
++};
++
+ &video {
+ 	memory-region = <&video_memory>;
+-	status = "okay";
++	status = "disabled";
+ };
+ 
+ &watchdog1 {
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-evb.dts b/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
+index 24550c772aff..3640cee339aa 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
+@@ -69,6 +69,16 @@
+ 		#size-cells = <1>;
+ 		ranges;
+ 
++		vcd_memory: framebuffer@0x1e200000 {
++			reg = <0x1e200000 0x600000>;
++			no-map;
++		};
++
++		ece_memory: framebuffer@0x1e800000 {
++			reg = <0x1e800000 0x600000>;
++			no-map;
++		};
++
+ 		video_memory: framebuffer@0x1b000000 {
+ 			compatible = "shared-dma-pool";
+ 			reg = <0x1b000000 0x02000000>;
+@@ -337,9 +347,19 @@
+ 	status = "okay";
+ };
+ 
++&vcd {
++	status = "okay";
++	memory-region = <&vcd_memory>;
++};
++
++&ece {
++	status = "okay";
++	memory-region = <&ece_memory>;
++};
++
+ &video {
+ 	memory-region = <&video_memory>;
+-	status = "okay";
++	status = "disabled";
+ };
+ 
+ &watchdog1 {
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+index fa64763e8182..1e77ffe650e0 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+@@ -64,6 +64,23 @@
+ 		#size-cells = <1>;
+ 		ranges;
+ 
++		vcd_memory: framebuffer@0x1e200000 {
++			reg = <0x1e200000 0x600000>;
++			no-map;
++		};
++
++		gfx_memory: framebuffer@0x1f000000 {
++			reg = <0x07000000 0xc00000>, <0x0f000000 0xc00000>,
++			<0x1f000000 0xc00000>, <0x3f000000 0xc00000>,
++			<0x7f000000 0xc00000>;
++			no-map;
++		};
++
++		ece_memory: framebuffer@0x1e800000 {
++			reg = <0x1e800000 0x600000>;
++			no-map;
++		};
++
+ 		video_memory: framebuffer@0x1b000000 {
+ 			compatible = "shared-dma-pool";
+ 			reg = <0x1b000000 0x02000000>;
+@@ -977,9 +994,19 @@
+ 	status = "okay";
+ };
+ 
++&vcd {
++	status = "okay";
++	memory-region = <&vcd_memory>, <&gfx_memory>;
++};
++
++&ece {
++	status = "okay";
++	memory-region = <&ece_memory>;
++};
++
+ &video {
+ 	memory-region = <&video_memory>;
+-	status = "okay";
++	status = "disabled";
+ };
+ 
+ &watchdog1 {
+-- 
+2.17.1
+

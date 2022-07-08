@@ -12,4 +12,4 @@ SRC_URI:append:evb-npcm845 = " file://0008-dts-npcm845-evb-add-spi-gpio-node-to-
 SRC_URI:append:evb-npcm845 = " file://0009-dts-npcm8xx-add-psci-smp-method-tz.patch"
 SRC_URI:append:evb-npcm845 = " file://0010-device-tree-optee-enable.patch"
 SRC_URI:append:evb-npcm845 = " file://0011-replace-jtag2-pins-with-tp-jtag3-pins.patch"
-SRC_URI:append:evb-npcm845 = " file://enable-v4l2-kvm.cfg"
+SRC_URI:append:evb-npcm845 = " file://enable-v4l2.cfg"
