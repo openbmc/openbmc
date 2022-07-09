@@ -5,7 +5,7 @@ and configures system sensors"
 SRC_URI = "git://github.com/openbmc/entity-manager.git;branch=master;protocol=https \
            file://blocklist.json \
           "
-SRCREV = "c492ab868fcc2f9b2ce9af45f2dc7b8e1210a618"
+SRCREV = "aa36ad9b0e124b4f9311b01a1a1146651bdc727b"
 PV = "0.1+git${SRCPV}"
 
 LICENSE = "Apache-2.0"
