@@ -120,10 +120,6 @@ To enable memory ECC function, please enable [MC_CAPABILITY_ECC_EN](https://gith
 
 - If you are using Red EVB board, please enable the [dts patch](https://github.com/Nuvoton-Israel/openbmc/blob/npcm-master/meta-evb/meta-evb-nuvoton/meta-evb-npcm845/recipes-kernel/linux/linux-nuvoton_%25.bbappend#L5)
 
-- If secure boot is enabled, please make sure [SECURED TIPFW](https://github.com/Nuvoton-Israel/openbmc/blob/npcm-master/meta-evb/meta-evb-nuvoton/meta-evb-npcm845/conf/machine/evb-npcm845.conf#L8) is enabled.
-```ruby
-SECURED_TIPFW = "True"
-```
 ### Build
 1. Target EVB NPCM845
 Source the setup script as follows:

@@ -24,17 +24,6 @@ do_prepare_bootloaders() {
     local olddir="$(pwd)"
     cd ${DEPLOY_DIR_IMAGE}
 
-    if [ "${SECURED_TIPFW}" = "False" ]; then
-        bingo ${IGPS_DIR}/KmtAndHeader_${IGPS_MACHINE}.xml \
-                -o ${DEPLOY_DIR_IMAGE}/${KMT_BINARY}
-
-        bingo ${IGPS_DIR}/TipFwAndHeader_L0_${IGPS_MACHINE}.xml \
-                -o ${DEPLOY_DIR_IMAGE}/${TIPFWL0_BINARY}
-
-        bingo ${IGPS_DIR}/TipFwAndHeader_L1_${IGPS_MACHINE}.xml \
-                -o ${DEPLOY_DIR_IMAGE}/${TIPFWL1_BINARY}
-    fi
-
     if [ "${SECURED_OS}" = "True" ]; then
         bingo ${IGPS_DIR}/BL31_AndHeader_${IGPS_MACHINE}.xml \
                 -o ${DEPLOY_DIR_IMAGE}/${ATF_BINARY}
@@ -135,42 +124,12 @@ python do_merge_bootloaders() {
         file2.close()
         file3.close()
 
-    if d.getVar('SECURED_TIPFW', True) == "True":
-        d.setVar('KMT_TIPFW_BINARY', "Kmt_TipFwL0_TipFwL1.bin")
+    d.setVar('KMT_TIPFW_BINARY', "Kmt_TipFwL0_Skmt_TipFwL1.bin")
 
-        Merge_bin_files_and_pad(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFW_BINARY',True)),
-            os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('BOOTBLOCK',True)),
-            os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFW_BB_BINARY',True)),
-            0x1000, 0x20)
-    else:
-        CRC32_binary(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_BINARY',True)),
-            112, 12,
-            os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_BINARY',True)))
-
-        CRC32_binary(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('TIPFWL0_BINARY',True)),
-            112, 12,
-            os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('TIPFWL0_BINARY',True)))
-
-        CRC32_binary(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('TIPFWL1_BINARY',True)),
-            112, 12,
-            os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('TIPFWL1_BINARY',True)))
-
-        Merge_bin_files_and_pad(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_BINARY',True)),
-            os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('TIPFWL0_BINARY',True)),
-            os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFWL0_BINARY',True)),
-            0x1000, 0x20)
-
-        Merge_bin_files_and_pad(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFWL0_BINARY',True)),
-            os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('TIPFWL1_BINARY',True)),
-            os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFWL0L1_BINARY',True)),
-            0x1000, 0x20)
-
-        os.remove(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFWL0_BINARY',True)))
-
-        Merge_bin_files_and_pad(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFWL0L1_BINARY',True)),
-            os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('BOOTBLOCK',True)),
-            os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFW_BB_BINARY',True)),
-            0x1000, 0x20)
+    Merge_bin_files_and_pad(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFW_BINARY',True)),
+        os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('BOOTBLOCK',True)),
+        os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFW_BB_BINARY',True)),
+        0x1000, 0x20)
 
     if d.getVar('SECURED_OS', True) == "True":
         Merge_bin_files_and_pad(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFW_BB_BINARY',True)),
@@ -197,10 +156,7 @@ python do_merge_bootloaders() {
 prepare_secureos = "${@ "arm-trusted-firmware:do_deploy optee-os:do_deploy" if bb.utils.to_boolean(d.getVar('SECURED_OS')) else "" }"
 
 do_prepare_bootloaders[depends] += " \
-    npcm8xx-kmt:do_deploy \
-    npcm8xx-kmt-tipfwl0l1:do_deploy \
-    npcm8xx-tipfw-l0:do_deploy \
-    npcm8xx-tipfw-l1:do_deploy \
+    npcm8xx-kmt-tipfwl0-skmt-l1:do_deploy \
     npcm8xx-bootblock:do_deploy \
     ${prepare_secureos} \
     npcm7xx-bingo-native:do_populate_sysroot \

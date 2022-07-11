@@ -6,6 +6,7 @@
 # Copyright (C) 2022 Nuvoton Technologies, All Rights Reserved
 #======================================== -->
 
+
 <Bin_Ecc_Map>
 	<!-- BMC mandatory fields -->
 	<ImageProperties>
@@ -169,12 +170,13 @@
 
 	<BinField>
 		<!-- MC_CONFIG. 
-			Bit 0: MC_CAPABILITY_ECC_EN (0x01)
+			Bit 0: ECC enable (0x01)
 			Bit 2: Select DRAM type. 
 				0: 1600 DRAM type clk.
 				1: 2133 DRAM type clk.
 			Bit 3: enable 3 seconds delay.
 			Bit 4: enable debug sweeps (in addition to sweep_debug)
+			Bit 5: enable prints during MC training
 			 -->
 		<name>MC_CONFIG</name>          
 		<config>
@@ -479,7 +481,22 @@
 		<content format='32bit'>0x00</content>
 	</BinField>
 	
-	
+	<BinField>
+		<!-- SWEEP_MAIN_FLOW: enable running main flow sweeps. bitwise:
+				SWEEP_OUT_DQ    BIT(0)      // ber bit param;  negative/positive -63 to 63
+				SWEEP_IN_DQ     BIT(1)      // ber bit param;  negative/positive -63 to 63
+				SWEEP_OUT_DM    BIT(2)      // ber lane param; negative/positive -63 to 63
+				SWEEP_OUT_DQS   BIT(3)      // ber lane param; positive
+				SWEEP_IN_DQS    BIT(4)      // ber lane param; positive
+				SWEEP_OUT_LANE  BIT(5)      // ber lane param (TRIM2); positive
+		-->
+		<name>SWEEP_MAIN_FLOW</name>          
+		<config>
+			<offset>0x14E</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0x37</content>
+	</BinField>
 	
 	
 	<BinField>
