@@ -5,3 +5,11 @@
               Default: 0
           PowerCapEnable:
                Default: 'false'
+
+/xyz/openbmc_project/control/host{}/power_restore_policy:
+    - Interface: xyz.openbmc_project.Control.Power.RestorePolicy
+      Properties:
+          PowerRestorePolicy:
+              Default: RestorePolicy::Policy::Restore
+          PowerRestoreDelay:
+              Default: 30
