@@ -54,6 +54,12 @@ INSTFMT = "obmc-led-group-{1}@power_on.service"
 FMT = "../${TMPLFMT}:${TGTFMT}.wants/${INSTFMT}"
 SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'FMT', 'CHASSIS_TARGETS', 'STATES')}"
 
+CHASSIS_BLACKOUT_TGT = "obmc-chassis-blackout@{0}.target"
+LED_STOP_SVC = "obmc-led-group-stop@.service"
+LED_POWER_STOP_SVC = "obmc-led-group-stop@power_on.service"
+CHASSIS_LED_BLACKOUT_FMT = "../${LED_STOP_SVC}:${CHASSIS_BLACKOUT_TGT}.wants/${LED_POWER_STOP_SVC}"
+SYSTEMD_LINK:${PN} += "${@compose_list(d, 'CHASSIS_LED_BLACKOUT_FMT', 'OBMC_CHASSIS_INSTANCES' )}"
+
 # Install the override to set up a Conflicts relation
 SYSTEMD_OVERRIDE:${PN} += "bmc_booted.conf:obmc-led-group-start@bmc_booted.service.d/bmc_booted.conf"
 
