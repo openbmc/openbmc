@@ -6,7 +6,7 @@ SRC_URI += " \
 
 PACKAGECONFIG[flash_bios] = "-Dhost-bios-upgrade=enabled, -Dhost-bios-upgrade=disabled"
 
-PACKAGECONFIG:append = " flash_bios"
+PACKAGECONFIG:append = " flash_bios static-dual-image"
 
 SYSTEMD_SERVICE:${PN}:updater += "${@bb.utils.contains('PACKAGECONFIG', 'flash_bios', 'obmc-flash-host-bios@.service', '', d)}"
 
