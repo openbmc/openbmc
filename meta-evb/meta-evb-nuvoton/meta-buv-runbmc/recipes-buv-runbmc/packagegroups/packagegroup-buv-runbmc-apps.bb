@@ -50,9 +50,9 @@ RDEPENDS:${PN}-system = " \
     "
 
 SUMMARY:${PN}-entity = "BUV RunBMC entity"
-RDEPENDS:${PN}-entity = " \
-    intel-ipmi-oem \
-    "
+#RDEPENDS:${PN}-entity = " \
+#    intel-ipmi-oem \
+#    "
 
 SUMMARY:${PN}-dev = "BUV RunBMC development tools"
 RDEPENDS:${PN}-dev = " \
