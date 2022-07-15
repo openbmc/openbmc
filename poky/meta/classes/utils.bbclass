@@ -184,6 +184,43 @@ END
 	chmod +x $cmd
 }
 
+create_cmdline_shebang_wrapper () {
+	# Create a wrapper script where commandline options are needed
+	#
+	# These are useful to work around shebang relocation issues, where shebangs are too
+	# long or have arguments in them, thus preventing them from using the /usr/bin/env
+	# shebang
+	#
+	# Usage: create_cmdline_wrapper FILENAME <extra-options>
+
+	cmd=$1
+	shift
+
+	echo "Generating wrapper script for $cmd"
+
+	# Strip #! and get remaining interpreter + arg
+	argument="$(sed -ne 's/^#! *//p;q' $cmd)"
+	# strip the shebang from the real script as we do not want it to be usable anyway
+	tail -n +2 $cmd > $cmd.real
+	chown --reference=$cmd $cmd.real
+	chmod --reference=$cmd $cmd.real
+	rm -f $cmd
+	cmdname=$(basename $cmd)
+	dirname=$(dirname $cmd)
+	cmdoptions=$@
+	if [ "${base_prefix}" != "" ]; then
+		relpath=`python3 -c "import os; print(os.path.relpath('${D}${base_prefix}', '$dirname'))"`
+		cmdoptions=`echo $@ | sed -e "s:${base_prefix}:\\$realdir/$relpath:g"`
+	fi
+	cat <<END >$cmd
+#!/usr/bin/env bash
+realpath=\`readlink -fn \$0\`
+realdir=\`dirname \$realpath\`
+exec -a \$realdir/$cmdname $argument \$realdir/$cmdname.real $cmdoptions "\$@"
+END
+	chmod +x $cmd
+}
+
 create_wrapper () {
 	# Create a wrapper script where extra environment variables are needed
 	#

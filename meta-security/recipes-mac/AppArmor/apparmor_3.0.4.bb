@@ -101,6 +101,8 @@ do_install () {
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         oe_runmake -C ${B}/parser DESTDIR="${D}" install-systemd
     fi
+    chown root:root -R ${D}/${sysconfdir}/apparmor.d
+    chown root:root -R ${D}/${datadir}/apparmor
 }
 
 #Building ptest on arm fails.

@@ -252,7 +252,7 @@ command:
    -  *Left*: The left scenario in the figure represents a common
       situation where the source code does not exist locally and needs
       to be extracted. In this situation, the source code is extracted
-      to the default workspace - you do not want the files in some
+      to the default workspace --- you do not want the files in some
       specific location outside of the workspace. Thus, everything you
       need will be located in the workspace::
 
@@ -267,7 +267,7 @@ command:
    -  *Middle*: The middle scenario in the figure also represents a
       situation where the source code does not exist locally. In this
       case, the code is again upstream and needs to be extracted to some
-      local area - this time outside of the default workspace.
+      local area --- this time outside of the default workspace.
 
       .. note::
 
@@ -302,7 +302,7 @@ command:
       recipe for the code and places the recipe into the workspace.
 
       Because the extracted source code already exists, ``devtool`` does
-      not try to relocate the source code into the workspace - only the
+      not try to relocate the source code into the workspace --- only the
       new recipe is placed in the workspace.
 
       Aside from a recipe folder, the command also creates an associated

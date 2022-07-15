@@ -18,6 +18,8 @@ FILES:${PN}-rpm = "${sysconfdir}/pki/rpm-gpg"
 FILES:${PN}-ipk = "${sysconfdir}/pki/ipk-gpg"
 FILES:${PN}-packagefeed = "${sysconfdir}/pki/packagefeed-gpg"
 
+RDEPENDS:${PN}-dev = ""
+
 python do_get_public_keys () {
     from oe.gpg_sign import get_signer
 

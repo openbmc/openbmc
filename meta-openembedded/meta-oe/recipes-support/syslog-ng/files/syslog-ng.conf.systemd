@@ -1,4 +1,4 @@
-@version: 3.31
+@version: 3.36
 #
 # Syslog-ng configuration file, compatible with default Debian syslogd
 # installation. Originally written by anonymous (I can't find his name)

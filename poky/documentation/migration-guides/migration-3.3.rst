@@ -13,10 +13,9 @@ Minimum system requirements
 You will now need at least Python 3.6 installed on your build host. Most recent
 distributions provide this, but should you be building on a distribution that
 does not have it, you can use the ``buildtools-tarball`` (easily installable
-using ``scripts/install-buildtools``) - see
-:ref:`ref-manual/system-requirements:required git, tar, python and gcc versions`
+using ``scripts/install-buildtools``) --- see
+:ref:`ref-manual/system-requirements:required git, tar, python, make and gcc versions`
 for details.
-
 
 .. _migration-3.3-removed-recipes:
 

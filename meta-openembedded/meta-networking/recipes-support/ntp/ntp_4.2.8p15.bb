@@ -29,7 +29,31 @@ SRC_URI = "http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-${PV}.tar.g
 SRC_URI[sha256sum] = "f65840deab68614d5d7ceb2d0bb9304ff70dcdedd09abb79754a87536b849c19"
 
 # CVE-2016-9312 is only for windows.
-CVE_CHECK_IGNORE += "CVE-2016-9312"
+# The other CVEs are not correctly identified because cve-check
+# is not able to check the version correctly (it only checks for 4.2.8 omitting p15 that makes the difference)
+CVE_CHECK_IGNORE += "\
+    CVE-2016-9312 \
+    CVE-2015-5146 \
+    CVE-2015-5300 \
+    CVE-2015-7975 \
+    CVE-2015-7976 \
+    CVE-2015-7977 \
+    CVE-2015-7978 \
+    CVE-2015-7979 \
+    CVE-2015-8138 \
+    CVE-2015-8139 \
+    CVE-2015-8140 \
+    CVE-2015-8158 \
+    CVE-2016-1547 \
+    CVE-2016-2516 \
+    CVE-2016-2517 \
+    CVE-2016-2519 \
+    CVE-2016-7429 \
+    CVE-2016-7433 \
+    CVE-2016-9310 \
+    CVE-2016-9311 \
+"
+
 
 inherit autotools update-rc.d useradd systemd pkgconfig
 

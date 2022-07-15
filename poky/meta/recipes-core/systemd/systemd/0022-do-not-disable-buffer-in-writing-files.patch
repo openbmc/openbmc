@@ -44,10 +44,10 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  21 files changed, 39 insertions(+), 40 deletions(-)
 
 diff --git a/src/basic/cgroup-util.c b/src/basic/cgroup-util.c
-index f7dc6c8421..5f7a27c2c4 100644
+index f4615ffce1..07cb8ed669 100644
 --- a/src/basic/cgroup-util.c
 +++ b/src/basic/cgroup-util.c
-@@ -390,7 +390,7 @@ int cg_kill_kernel_sigkill(const char *controller, const char *path) {
+@@ -399,7 +399,7 @@ int cg_kill_kernel_sigkill(const char *controller, const char *path) {
          if (r < 0)
                  return r;
  
@@ -56,7 +56,7 @@ index f7dc6c8421..5f7a27c2c4 100644
          if (r < 0)
                  return r;
  
-@@ -803,7 +803,7 @@ int cg_install_release_agent(const char *controller, const char *agent) {
+@@ -805,7 +805,7 @@ int cg_install_release_agent(const char *controller, const char *agent) {
  
          sc = strstrip(contents);
          if (isempty(sc)) {
@@ -65,7 +65,7 @@ index f7dc6c8421..5f7a27c2c4 100644
                  if (r < 0)
                          return r;
          } else if (!path_equal(sc, agent))
-@@ -821,7 +821,7 @@ int cg_install_release_agent(const char *controller, const char *agent) {
+@@ -823,7 +823,7 @@ int cg_install_release_agent(const char *controller, const char *agent) {
  
          sc = strstrip(contents);
          if (streq(sc, "0")) {
@@ -74,7 +74,7 @@ index f7dc6c8421..5f7a27c2c4 100644
                  if (r < 0)
                          return r;
  
-@@ -848,7 +848,7 @@ int cg_uninstall_release_agent(const char *controller) {
+@@ -850,7 +850,7 @@ int cg_uninstall_release_agent(const char *controller) {
          if (r < 0)
                  return r;
  
@@ -83,7 +83,7 @@ index f7dc6c8421..5f7a27c2c4 100644
          if (r < 0)
                  return r;
  
-@@ -858,7 +858,7 @@ int cg_uninstall_release_agent(const char *controller) {
+@@ -860,7 +860,7 @@ int cg_uninstall_release_agent(const char *controller) {
          if (r < 0)
                  return r;
  
@@ -92,7 +92,7 @@ index f7dc6c8421..5f7a27c2c4 100644
          if (r < 0)
                  return r;
  
-@@ -1704,7 +1704,7 @@ int cg_set_attribute(const char *controller, const char *path, const char *attri
+@@ -1730,7 +1730,7 @@ int cg_set_attribute(const char *controller, const char *path, const char *attri
          if (r < 0)
                  return r;
  
@@ -188,7 +188,7 @@ index 18231c2618..6c598d55c8 100644
          if (r < 0)
                  return log_error_errno(r, "%s:%u: Failed to add binary format '%s': %m",
                                         filename, line, rulename);
-@@ -226,7 +226,7 @@ static int run(int argc, char *argv[]) {
+@@ -225,7 +225,7 @@ static int run(int argc, char *argv[]) {
                  }
  
                  /* Flush out all rules */
@@ -198,10 +198,10 @@ index 18231c2618..6c598d55c8 100644
                          log_warning_errno(r, "Failed to flush binfmt_misc rules, ignoring: %m");
                  else
 diff --git a/src/core/cgroup.c b/src/core/cgroup.c
-index f58de95a49..7a97ab6f99 100644
+index 9282b1ff20..7781e0f8eb 100644
 --- a/src/core/cgroup.c
 +++ b/src/core/cgroup.c
-@@ -4140,7 +4140,7 @@ int unit_cgroup_freezer_action(Unit *u, FreezerAction action) {
+@@ -4182,7 +4182,7 @@ int unit_cgroup_freezer_action(Unit *u, FreezerAction action) {
          else
                  u->freezer_state = FREEZER_THAWING;
  
@@ -211,10 +211,10 @@ index f58de95a49..7a97ab6f99 100644
                  return r;
  
 diff --git a/src/core/main.c b/src/core/main.c
-index 57aedb9b93..7ef36d22f5 100644
+index 409b84a006..b1631e57ce 100644
 --- a/src/core/main.c
 +++ b/src/core/main.c
-@@ -1466,7 +1466,7 @@ static int bump_unix_max_dgram_qlen(void) {
+@@ -1374,7 +1374,7 @@ static int bump_unix_max_dgram_qlen(void) {
          if (v >= DEFAULT_UNIX_MAX_DGRAM_QLEN)
                  return 0;
  
@@ -223,7 +223,7 @@ index 57aedb9b93..7ef36d22f5 100644
                                 "%lu", DEFAULT_UNIX_MAX_DGRAM_QLEN);
          if (r < 0)
                  return log_full_errno(IN_SET(r, -EROFS, -EPERM, -EACCES) ? LOG_DEBUG : LOG_WARNING, r,
-@@ -1737,7 +1737,7 @@ static void initialize_core_pattern(bool skip_setup) {
+@@ -1646,7 +1646,7 @@ static void initialize_core_pattern(bool skip_setup) {
          if (getpid_cached() != 1)
                  return;
  
@@ -259,23 +259,23 @@ index f88cb80834..68055fb64a 100644
                  log_warning_errno(r, "Failed to set SMACK netlabel rule \"127.0.0.1 -CIPSO\": %m");
  #endif
 diff --git a/src/hibernate-resume/hibernate-resume.c b/src/hibernate-resume/hibernate-resume.c
-index 58e35e403e..1d0beb4008 100644
+index 1c7d9179d8..3ae78ee580 100644
 --- a/src/hibernate-resume/hibernate-resume.c
 +++ b/src/hibernate-resume/hibernate-resume.c
-@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
+@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
                  return EXIT_FAILURE;
          }
  
--        r = write_string_file("/sys/power/resume", major_minor, WRITE_STRING_FILE_DISABLE_BUFFER);
-+        r = write_string_file("/sys/power/resume", major_minor, 0);
+-        r = write_string_file("/sys/power/resume", FORMAT_DEVNUM(st.st_rdev), WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file("/sys/power/resume", FORMAT_DEVNUM(st.st_rdev), 0);
          if (r < 0) {
-                 log_error_errno(r, "Failed to write '%s' to /sys/power/resume: %m", major_minor);
+                 log_error_errno(r, "Failed to write '" DEVNUM_FORMAT_STR "' to /sys/power/resume: %m", DEVNUM_FORMAT_VAL(st.st_rdev));
                  return EXIT_FAILURE;
 diff --git a/src/home/homework.c b/src/home/homework.c
-index 9fdc74b775..9858a2b415 100644
+index 0014a7f598..ec3e9caa1c 100644
 --- a/src/home/homework.c
 +++ b/src/home/homework.c
-@@ -284,7 +284,7 @@ static void drop_caches_now(void) {
+@@ -278,7 +278,7 @@ static void drop_caches_now(void) {
           * details. We write "2" into /proc/sys/vm/drop_caches to ensure dentries/inodes are flushed, but not
           * more. */
  
@@ -285,10 +285,10 @@ index 9fdc74b775..9858a2b415 100644
                  log_warning_errno(r, "Failed to drop caches, ignoring: %m");
          else
 diff --git a/src/libsystemd/sd-device/sd-device.c b/src/libsystemd/sd-device/sd-device.c
-index b163a0fb6b..fd6c5301d6 100644
+index aaf951ced8..45a9d70f0d 100644
 --- a/src/libsystemd/sd-device/sd-device.c
 +++ b/src/libsystemd/sd-device/sd-device.c
-@@ -2108,7 +2108,7 @@ _public_ int sd_device_set_sysattr_value(sd_device *device, const char *sysattr,
+@@ -2215,7 +2215,7 @@ _public_ int sd_device_set_sysattr_value(sd_device *device, const char *sysattr,
          if (!value)
                  return -ENOMEM;
  
@@ -298,10 +298,10 @@ index b163a0fb6b..fd6c5301d6 100644
                  /* On failure, clear cache entry, as we do not know how it fails. */
                  device_remove_cached_sysattr_value(device, sysattr);
 diff --git a/src/nspawn/nspawn-cgroup.c b/src/nspawn/nspawn-cgroup.c
-index d472e80c03..c7780c7fc6 100644
+index 9e6379ae7b..546a03a7f5 100644
 --- a/src/nspawn/nspawn-cgroup.c
 +++ b/src/nspawn/nspawn-cgroup.c
-@@ -124,7 +124,7 @@ int sync_cgroup(pid_t pid, CGroupUnified unified_requested, uid_t uid_shift) {
+@@ -123,7 +123,7 @@ int sync_cgroup(pid_t pid, CGroupUnified unified_requested, uid_t uid_shift) {
          fn = strjoina(tree, cgroup, "/cgroup.procs");
  
          sprintf(pid_string, PID_FMT, pid);
@@ -311,7 +311,7 @@ index d472e80c03..c7780c7fc6 100644
                  log_error_errno(r, "Failed to move process: %m");
                  goto finish;
 diff --git a/src/nspawn/nspawn.c b/src/nspawn/nspawn.c
-index fb6af295b5..0d83f1e4d2 100644
+index c5fd978395..fefe8a21e5 100644
 --- a/src/nspawn/nspawn.c
 +++ b/src/nspawn/nspawn.c
 @@ -2759,7 +2759,7 @@ static int reset_audit_loginuid(void) {
@@ -323,7 +323,7 @@ index fb6af295b5..0d83f1e4d2 100644
          if (r < 0) {
                  log_error_errno(r,
                                  "Failed to reset audit login UID. This probably means that your kernel is too\n"
-@@ -4175,7 +4175,7 @@ static int setup_uid_map(
+@@ -4187,7 +4187,7 @@ static int setup_uid_map(
                  return log_oom();
  
          xsprintf(uid_map, "/proc/" PID_FMT "/uid_map", pid);
@@ -332,7 +332,7 @@ index fb6af295b5..0d83f1e4d2 100644
          if (r < 0)
                  return log_error_errno(r, "Failed to write UID map: %m");
  
-@@ -4185,7 +4185,7 @@ static int setup_uid_map(
+@@ -4197,7 +4197,7 @@ static int setup_uid_map(
                  return log_oom();
  
          xsprintf(uid_map, "/proc/" PID_FMT "/gid_map", pid);
@@ -355,19 +355,19 @@ index 724d7f27d9..dd725cff92 100644
                  return log_warning_errno(r, "Failed to unregister binfmt_misc entries: %m");
  
 diff --git a/src/shared/cgroup-setup.c b/src/shared/cgroup-setup.c
-index 8bda66ca36..4e1e9943ee 100644
+index a1fabc73c1..c5c8fc417e 100644
 --- a/src/shared/cgroup-setup.c
 +++ b/src/shared/cgroup-setup.c
-@@ -345,7 +345,7 @@ int cg_attach(const char *controller, const char *path, pid_t pid) {
+@@ -344,7 +344,7 @@ int cg_attach(const char *controller, const char *path, pid_t pid) {
  
          xsprintf(c, PID_FMT "\n", pid);
  
 -        r = write_string_file(fs, c, WRITE_STRING_FILE_DISABLE_BUFFER);
 +        r = write_string_file(fs, c, 0);
-         if (r < 0)
-                 return r;
- 
-@@ -877,7 +877,7 @@ int cg_enable_everywhere(
+         if (r == -EOPNOTSUPP && cg_is_threaded(controller, path) > 0)
+                 /* When the threaded mode is used, we cannot read/write the file. Let's return recognizable error. */
+                 return -EUCLEAN;
+@@ -879,7 +879,7 @@ int cg_enable_everywhere(
                                          return log_debug_errno(errno, "Failed to open cgroup.subtree_control file of %s: %m", p);
                          }
  
@@ -422,7 +422,7 @@ index 7064f3a905..8f2a7d9da2 100644
          if (r < 0)
                  return log_debug_errno(r, "Failed to write swap file offset to /sys/power/resume_offset for '%s': '%s': %m",
                                         hibernate_location->swap->device, offset_str);
-@@ -90,7 +90,7 @@ static int write_mode(char **modes) {
+@@ -89,7 +89,7 @@ static int write_mode(char **modes) {
          STRV_FOREACH(mode, modes) {
                  int k;
  
@@ -431,7 +431,7 @@ index 7064f3a905..8f2a7d9da2 100644
                  if (k >= 0)
                          return 0;
  
-@@ -112,7 +112,7 @@ static int write_state(FILE **f, char **states) {
+@@ -110,7 +110,7 @@ static int write_state(FILE **f, char **states) {
          STRV_FOREACH(state, states) {
                  int k;
  
@@ -441,10 +441,10 @@ index 7064f3a905..8f2a7d9da2 100644
                          return 0;
                  log_debug_errno(k, "Failed to write '%s' to /sys/power/state: %m", *state);
 diff --git a/src/udev/udev-rules.c b/src/udev/udev-rules.c
-index 0089833e3f..0a6a3abbb4 100644
+index cd858c9cca..0feb9669a0 100644
 --- a/src/udev/udev-rules.c
 +++ b/src/udev/udev-rules.c
-@@ -2181,7 +2181,6 @@ static int udev_rule_apply_token_to_event(
+@@ -2335,7 +2335,6 @@ static int udev_rule_apply_token_to_event(
                  log_rule_debug(dev, rules, "ATTR '%s' writing '%s'", buf, value);
                  r = write_string_file(buf, value,
                                        WRITE_STRING_FILE_VERIFY_ON_FAILURE |

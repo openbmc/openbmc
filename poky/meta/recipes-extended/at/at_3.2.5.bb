@@ -22,7 +22,7 @@ PAM_DEPS = "libpam libpam-runtime pam-plugin-env pam-plugin-limits"
 RCONFLICTS:${PN} = "atd"
 RREPLACES:${PN} = "atd"
 
-SRC_URI = "http://software.calhariz.com/at/${BPN}_${PV}.orig.tar.gz \
+SRC_URI = "${DEBIAN_MIRROR}/main/a/at/${BPN}_${PV}.orig.tar.gz \
            file://posixtm.c \
            file://posixtm.h \
            file://file_replacement_with_gplv2.patch \

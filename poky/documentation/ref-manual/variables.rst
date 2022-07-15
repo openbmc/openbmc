@@ -591,7 +591,7 @@ system and gives an overview of their function and contents.
       This variable is useful in situations where the same recipe appears
       in more than one layer. Setting this variable allows you to
       prioritize a layer against other layers that contain the same recipe
-      - effectively letting you control the precedence for the multiple
+      --- effectively letting you control the precedence for the multiple
       layers. The precedence established through this variable stands
       regardless of a recipe's version (:term:`PV` variable). For
       example, a layer that has a recipe with a higher :term:`PV` value but for
@@ -718,10 +718,11 @@ system and gives an overview of their function and contents.
 
          BBMULTICONFIG = "configA configB configC"
 
-      Each configuration file you
-      use must reside in the :term:`Build Directory`
-      ``conf/multiconfig`` directory (e.g.
-      ``build_directory/conf/multiconfig/configA.conf``).
+      Each configuration file you use must reside in a ``multiconfig``
+      subdirectory of a configuration directory within a layer, or
+      within the :term:`Build Directory` (e.g.
+      ``build_directory/conf/multiconfig/configA.conf`` or
+      ``mylayer/conf/multiconfig/configB.conf``).
 
       For information on how to use :term:`BBMULTICONFIG` in an environment
       that supports building targets with multiple configurations, see the
@@ -888,7 +889,7 @@ system and gives an overview of their function and contents.
    :term:`BUILD_OS`
       Specifies the operating system in use on the build host (e.g.
       "linux"). The OpenEmbedded build system sets the value of
-      :term:`BUILD_OS` from the OS reported by the ``uname`` command - the
+      :term:`BUILD_OS` from the OS reported by the ``uname`` command --- the
       first word, converted to lower-case characters.
 
    :term:`BUILD_PREFIX`
@@ -1296,6 +1297,19 @@ system and gives an overview of their function and contents.
       the recipe will be skipped, and if the build system attempts to build
       the recipe then an error will be triggered.
 
+   :term:`CONVERSION_CMD`
+      This variable is used for storing image conversion commands.
+      Image conversion can convert an image into different objects like:
+
+      -   Compressed version of the image
+
+      -   Checksums for the image
+
+      An example of :term:`CONVERSION_CMD` from :ref:`image-types
+      <ref-classes-image_types>` class is::
+
+         CONVERSION_CMD:lzo = "lzop -9 ${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}"
+
    :term:`COPY_LIC_DIRS`
       If set to "1" along with the
       :term:`COPY_LIC_MANIFEST` variable, the
@@ -1688,7 +1702,7 @@ system and gives an overview of their function and contents.
       ``${TMPDIR}/deploy``.
 
       For more information on the structure of the Build Directory, see
-      ":ref:`ref-manual/structure:the build directory - \`\`build/\`\``" section.
+      ":ref:`ref-manual/structure:the build directory --- \`\`build/\`\``" section.
       For more detail on the contents of the ``deploy`` directory, see the
       ":ref:`overview-manual/concepts:images`",
       ":ref:`overview-manual/concepts:package feeds`", and
@@ -1732,7 +1746,7 @@ system and gives an overview of their function and contents.
       <ref-classes-image>` class.
 
       For more information on the structure of the Build Directory, see
-      ":ref:`ref-manual/structure:the build directory - \`\`build/\`\``" section.
+      ":ref:`ref-manual/structure:the build directory --- \`\`build/\`\``" section.
       For more detail on the contents of the ``deploy`` directory, see the
       ":ref:`overview-manual/concepts:images`" and
       ":ref:`overview-manual/concepts:application development sdk`" sections both in
@@ -1872,7 +1886,10 @@ system and gives an overview of their function and contents.
       optionally support the feature. For example, specifying "x11" in
       :term:`DISTRO_FEATURES`, causes every piece of software built for the
       target that can optionally support X11 to have its X11 support
-      enabled.
+      enabled. Note: just enabling :term:`DISTRO_FEATURES` alone doesn't
+      enable feature support for packages, mechanisms such as making
+      :term:`PACKAGECONFIG` track :term:`DISTRO_FEATURES` are used
+      to enable/disable package features.
 
       Two more examples are Bluetooth and NFS support. For a more complete
       list of features that ships with the Yocto Project and that you can
@@ -2244,24 +2261,24 @@ system and gives an overview of their function and contents.
 
       Here are some examples of features you can add:
 
-        - "dbg-pkgs" - Adds -dbg packages for all installed packages including
+        - "dbg-pkgs" --- adds -dbg packages for all installed packages including
           symbol information for debugging and profiling.
 
-        - "debug-tweaks" - Makes an image suitable for debugging. For example, allows root logins without passwords and
+        - "debug-tweaks" --- makes an image suitable for debugging. For example, allows root logins without passwords and
           enables post-installation logging. See the 'allow-empty-password' and
           'post-install-logging' features in the ":ref:`ref-features-image`"
           section for more information.
-        - "dev-pkgs" - Adds -dev packages for all installed packages. This is
+        - "dev-pkgs" --- adds -dev packages for all installed packages. This is
           useful if you want to develop against the libraries in the image.
-        - "read-only-rootfs" - Creates an image whose root filesystem is
+        - "read-only-rootfs" --- creates an image whose root filesystem is
           read-only. See the
           ":ref:`dev-manual/common-tasks:creating a read-only root filesystem`"
           section in the Yocto Project Development Tasks Manual for more
           information
-        - "tools-debug" - Adds debugging tools such as gdb and strace.
-        - "tools-sdk" - Adds development tools such as gcc, make,
+        - "tools-debug" --- adds debugging tools such as gdb and strace.
+        - "tools-sdk" --- adds development tools such as gcc, make,
           pkgconfig and so forth.
-        - "tools-testapps" - Adds useful testing tools
+        - "tools-testapps" --- adds useful testing tools
           such as ts_print, aplay, arecord and so forth.
 
       For a complete list of image features that ships with the Yocto
@@ -3255,7 +3272,7 @@ system and gives an overview of their function and contents.
          IMAGE_NAME ?= "${IMAGE_BASENAME}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
    :term:`IMAGE_NAME_SUFFIX`
-      Suffix used for the image output filename - defaults to ``".rootfs"``
+      Suffix used for the image output filename --- defaults to ``".rootfs"``
       to distinguish the image file from other files created during image
       building; however if this suffix is redundant or not desired you can
       clear the value of this variable (set the value to ""). For example,
@@ -3542,6 +3559,14 @@ system and gives an overview of their function and contents.
          Although you can use other settings, you might be required to
          remove dependencies on or provide alternatives to components that
          are required to produce a functional system image.
+
+   :term:`INCOMPATIBLE_LICENSE_EXCEPTIONS`
+      Specifies a space-separated list of package and license pairs that
+      are allowed to be used even if the license is specified in
+      :term:`INCOMPATIBLE_LICENSE`. The package and license pairs are
+      separated using a colon. Example::
+
+         INCOMPATIBLE_LICENSE_EXCEPTIONS = "gdbserver:GPL-3.0-only gdbserver:LGPL-3.0-only"
 
    :term:`INHERIT`
       Causes the named class or classes to be inherited globally. Anonymous
@@ -5657,11 +5682,6 @@ system and gives an overview of their function and contents.
 
       :term:`PE` is the default value of the :term:`PKGE` variable.
 
-   :term:`PEP517_BUILD_API`
-      When used by recipes that inherit the :ref:`python_pep517
-      <ref-classes-python_pep517>` class, specifies the entry point to the
-      PEP-517 compliant build API (such as ``flit_core.buildapi``).
-
    :term:`PEP517_WHEEL_PATH`
       When used by recipes that inherit the
       :ref:`python_pep517 <ref-classes-python_pep517>` class,
@@ -6205,7 +6225,7 @@ system and gives an overview of their function and contents.
       ``baz``.
 
       The names of the packages you list within :term:`RDEPENDS` must be the
-      names of other packages - they cannot be recipe names. Although
+      names of other packages --- they cannot be recipe names. Although
       package names and recipe names usually match, the important point
       here is that you are providing package names within the :term:`RDEPENDS`
       variable. For an example of the default list of packages created from
@@ -7108,35 +7128,35 @@ system and gives an overview of their function and contents.
 
       There are standard and recipe-specific options. Here are standard ones:
 
-      -  ``apply`` - Whether to apply the patch or not. The default
+      -  ``apply`` --- whether to apply the patch or not. The default
          action is to apply the patch.
 
-      -  ``striplevel`` - Which striplevel to use when applying the
+      -  ``striplevel`` --- which striplevel to use when applying the
          patch. The default level is 1.
 
-      -  ``patchdir`` - Specifies the directory in which the patch should
+      -  ``patchdir`` --- specifies the directory in which the patch should
          be applied. The default is ``${``\ :term:`S`\ ``}``.
 
       Here are options specific to recipes building code from a revision
       control system:
 
-      -  ``mindate`` - Apply the patch only if
+      -  ``mindate`` --- apply the patch only if
          :term:`SRCDATE` is equal to or greater than
          ``mindate``.
 
-      -  ``maxdate`` - Apply the patch only if :term:`SRCDATE` is not later
+      -  ``maxdate`` --- apply the patch only if :term:`SRCDATE` is not later
          than ``maxdate``.
 
-      -  ``minrev`` - Apply the patch only if :term:`SRCREV` is equal to or
+      -  ``minrev`` --- apply the patch only if :term:`SRCREV` is equal to or
          greater than ``minrev``.
 
-      -  ``maxrev`` - Apply the patch only if :term:`SRCREV` is not later
+      -  ``maxrev`` --- apply the patch only if :term:`SRCREV` is not later
          than ``maxrev``.
 
-      -  ``rev`` - Apply the patch only if :term:`SRCREV` is equal to
+      -  ``rev`` --- apply the patch only if :term:`SRCREV` is equal to
          ``rev``.
 
-      -  ``notrev`` - Apply the patch only if :term:`SRCREV` is not equal to
+      -  ``notrev`` --- apply the patch only if :term:`SRCREV` is not equal to
          ``rev``.
 
       .. note::
@@ -7216,6 +7236,32 @@ system and gives an overview of their function and contents.
 
    :term:`SSTATE_DIR`
       The directory for the shared state cache.
+
+   :term:`SSTATE_EXCLUDEDEPS_SYSROOT`
+      This variable allows to specify indirect dependencies to exclude
+      from sysroots, for example to avoid the situations when a dependency on
+      any ``-native`` recipe will pull in all dependencies of that recipe
+      in the recipe sysroot. This behaviour might not always be wanted,
+      for example when that ``-native`` recipe depends on build tools
+      that are not relevant for the current recipe.
+
+      This way, irrelevant dependencies are ignored, which could have
+      prevented the reuse of prebuilt artifacts stored in the Shared
+      State Cache.
+
+      ``SSTATE_EXCLUDEDEPS_SYSROOT`` is evaluated as two regular
+      expressions of recipe and dependency to ignore. An example
+      is the rule in :oe_git:`meta/conf/layer.conf </meta/conf/layer.conf>`::
+
+         # Nothing needs to depend on libc-initial
+         # base-passwd/shadow-sysroot don't need their dependencies
+         SSTATE_EXCLUDEDEPS_SYSROOT += "\
+             .*->.*-initial.* \
+             .*(base-passwd|shadow-sysroot)->.* \
+         "
+
+      The ``->`` substring represents the dependency between
+      the two regular expressions.
 
    :term:`SSTATE_MIRROR_ALLOW_NETWORK`
       If set to "1", allows fetches from mirrors that are specified in
@@ -7639,6 +7685,24 @@ system and gives an overview of their function and contents.
       For information on Systemd-boot, see the `Systemd-boot
       documentation <https://www.freedesktop.org/wiki/Software/systemd/systemd-boot/>`__.
 
+   :term:`SYSTEMD_DEFAULT_TARGET`
+
+      This variable allows to set the default unit that systemd starts at bootup.
+      Usually, this is either ``multi-user.target`` or ``graphical.target``.
+      This works by creating a ``default.target`` symbolic link to the chosen systemd
+      target file.
+
+      See `systemd's documentation
+      <https://www.freedesktop.org/software/systemd/man/systemd.special.html>`__
+      for details.
+
+      For example, this variable is used in the
+      `core-image-minimal-xfce.bb
+      <https://git.openembedded.org/meta-openembedded/tree/meta-xfce/recipes-core/images/core-image-minimal-xfce.bb>`__
+      recipe::
+
+          SYSTEMD_DEFAULT_TARGET = "graphical.target"
+
    :term:`SYSTEMD_PACKAGES`
       When inheriting the :ref:`systemd <ref-classes-systemd>` class,
       this variable locates the systemd unit files when they are not found
@@ -7656,11 +7720,17 @@ system and gives an overview of their function and contents.
       When inheriting the :ref:`systemd <ref-classes-systemd>` class,
       this variable specifies the systemd service name for a package.
 
+      Multiple services can be specified, each one separated by a space.
+
       When you specify this file in your recipe, use a package name
       override to indicate the package to which the value applies. Here is
       an example from the connman recipe::
 
          SYSTEMD_SERVICE:${PN} = "connman.service"
+
+      The package overrides that can be specified are directly related to the value of
+      term:`SYSTEMD_PACKAGES`. Overrides not included in term:`SYSTEMD_PACKAGES`
+      will be silently ignored.
 
    :term:`SYSVINIT_ENABLED_GETTYS`
       When using
@@ -8795,8 +8865,8 @@ system and gives an overview of their function and contents.
       -  :term:`TMPDIR`: The top-level build output directory
       -  :term:`MULTIMACH_TARGET_SYS`: The target system identifier
       -  :term:`PN`: The recipe name
-      -  :term:`EXTENDPE`: The epoch - (if :term:`PE` is not specified, which
-         is usually the case for most recipes, then `EXTENDPE` is blank)
+      -  :term:`EXTENDPE`: The epoch --- if :term:`PE` is not specified, which
+         is usually the case for most recipes, then `EXTENDPE` is blank.
       -  :term:`PV`: The recipe version
       -  :term:`PR`: The recipe revision
 

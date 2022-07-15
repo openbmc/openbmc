@@ -1,5 +1,6 @@
 #!/bin/sh
 
 if type Xwayland  >/dev/null 2>/dev/null; then
-	mkdir -p /tmp/.X11-unix
+	mkdir -m 775 -p /tmp/.X11-unix
+	chown root:video /tmp/.X11-unix
 fi

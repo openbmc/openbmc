@@ -213,8 +213,8 @@ These files are standard top-level files.
 
 .. _structure-build:
 
-The Build Directory - ``build/``
-================================
+The Build Directory --- ``build/``
+==================================
 
 The OpenEmbedded build system creates the :term:`Build Directory`
 when you run the build environment setup
@@ -589,7 +589,7 @@ install" places its output that is then split into sub-packages within
 ``build/tmp/work/tunearch/recipename/version/``
 -----------------------------------------------
 
-The recipe work directory - ``${WORKDIR}``.
+The recipe work directory --- ``${WORKDIR}``.
 
 As described earlier in the
 ":ref:`structure-build-tmp-sysroots`" section,
@@ -654,8 +654,8 @@ recipes. In practice, this is only used for ``gcc`` and its variants
 
 .. _structure-meta:
 
-The Metadata - ``meta/``
-========================
+The Metadata --- ``meta/``
+==========================
 
 As mentioned previously, :term:`Metadata` is the core of the
 Yocto Project. Metadata has several important subdivisions:

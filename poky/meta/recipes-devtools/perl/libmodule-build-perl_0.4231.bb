@@ -37,6 +37,7 @@ EXTRA_CPAN_BUILD_FLAGS = "--create_packlist=0"
 
 do_install:append () {
         rm -rf ${D}${docdir}/perl/html
+        sed -i "s:^#!.*:#!/usr/bin/env perl:" ${D}${bindir}/config_data
 }
 
 do_install_ptest() {

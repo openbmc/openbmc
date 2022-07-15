@@ -37,6 +37,10 @@
 # This sets the default machine to be qemux86-64 if no other machine is selected:
 MACHINE ??= "qemux86-64"
 
+# These are some of the more commonly used values. Looking at the files in the
+# meta/conf/machine directory, or the conf/machine directory of any additional layers
+# you add in will show all the available machines.
+
 #
 # Where to place downloads
 #
@@ -230,7 +234,7 @@ BB_DISKMON_DIRS ??= "\
 # Note: For this to work you also need hash-equivalence passthrough to the matching server
 #
 #BB_HASHSERVE_UPSTREAM = "typhoon.yocto.io:8687"
-#SSTATE_MIRRORS ?= "file://.* http://sstate.yoctoproject.org/4.0/PATH;downloadfilename=PATH"
+#SSTATE_MIRRORS ?= "file://.* http://sstate.yoctoproject.org/all/PATH;downloadfilename=PATH"
 
 #
 # Qemu configuration

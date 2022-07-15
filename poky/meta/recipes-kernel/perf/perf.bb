@@ -228,6 +228,12 @@ do_configure:prepend () {
         sed -i -e 's,$(call get-executable-or-default\,PYTHON\,$(PYTHON_AUTO)),$(notdir $(call get-executable-or-default\,PYTHON\,$(PYTHON_AUTO))),g' \
             ${S}/tools/perf/Makefile.config
 
+	# likewise with this substitution. Kernels with commit 18f2967418d031a39
+	# [perf tools: Use Python devtools for version autodetection rather than runtime]
+	# need this substitution for reproducibility.
+	sed -i -e 's,$(call get-executable-or-default\,PYTHON\,$(subst -config\,\,$(PYTHON_AUTO))),$(notdir $(call get-executable-or-default\,PYTHON\,$(subst -config\,\,$(PYTHON_AUTO)))),g' \
+	    ${S}/tools/perf/Makefile.config
+
         # The following line:
         #     srcdir_SQ = $(patsubst %tools/perf,tools/perf,$(subst ','\'',$(srcdir))),
         # Captures the full src path of perf, which of course makes it not

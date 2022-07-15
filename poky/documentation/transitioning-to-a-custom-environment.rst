@@ -84,7 +84,7 @@ Transitioning to a custom environment for systems development
 
 #. **Now you're ready to create an image recipe**.
    There are a number of ways to do this. However, it is strongly recommended
-   that you have your own image recipe - don't try appending to existing image
+   that you have your own image recipe --- don't try appending to existing image
    recipes. Recipes for images are trivial to create and you usually want to
    fully customize their contents.
 

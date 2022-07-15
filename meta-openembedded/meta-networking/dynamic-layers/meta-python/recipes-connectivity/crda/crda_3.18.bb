@@ -36,4 +36,4 @@ do_install() {
     oe_runmake SBINDIR=${sbindir}/ install
 }
 
-RDEPENDS:${PN} = "udev wireless-regdb-static"
+RDEPENDS:${PN} = "udev wireless-regdb"

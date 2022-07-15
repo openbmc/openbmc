@@ -1486,7 +1486,12 @@ class BaseConfig(object):
     def start_qemu(self):
         import shlex
         if self.kernel:
-            kernel_opts = "-kernel %s -append '%s %s %s %s'" % (self.kernel, self.kernel_cmdline,
+            kernel_opts = "-kernel %s" % (self.kernel)
+            if self.get('QB_KERNEL_CMDLINE') == "none":
+                if self.bootparams:
+                    kernel_opts += " -append '%s'" % (self.bootparams)
+            else:
+                kernel_opts += " -append '%s %s %s %s'" % (self.kernel_cmdline,
                                                                 self.kernel_cmdline_script, self.get('QB_KERNEL_CMDLINE_APPEND'),
                                                                 self.bootparams)
             if self.dtb:

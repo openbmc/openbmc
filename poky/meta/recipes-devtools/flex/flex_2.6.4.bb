@@ -60,6 +60,7 @@ RDEPENDS:${PN}-ptest += "bash gawk make"
 do_compile_ptest() {
 	oe_runmake -C ${B}/tests -f ${B}/tests/Makefile top_builddir=${B} INCLUDES=-I${S}/src buildtests
 }
+PTEST_PARALLEL_MAKE = ""
 
 do_install_ptest() {
 	mkdir -p ${D}${PTEST_PATH}/build-aux/

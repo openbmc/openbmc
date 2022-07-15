@@ -29,6 +29,11 @@ do_install:prepend() {
 	rm -rf ${B}/t/z*.t
 }
 
+do_install:append() {
+	sed -i "s:^#!.*:#!/usr/bin/env perl:" ${D}${bindir}/dbiproxy \
+		${D}${bindir}/dbiprof ${D}${bindir}/dbilogstrip
+}
+
 RDEPENDS:${PN}:class-target = " \
     perl \
     perl-module-carp \

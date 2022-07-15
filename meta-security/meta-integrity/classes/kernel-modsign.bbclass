@@ -13,7 +13,9 @@ MODSIGN_PRIVKEY ?= "${MODSIGN_KEY_DIR}/privkey_modsign.pem"
 MODSIGN_X509 ?= "${MODSIGN_KEY_DIR}/x509_modsign.crt"
 
 # If this class is enabled, disable stripping signatures from modules
+# as well disable the debug symbols split
 INHIBIT_PACKAGE_STRIP = "1"
+INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
 
 kernel_do_configure:prepend() {
     if [ -f "${MODSIGN_PRIVKEY}" -a -f "${MODSIGN_X509}" ]; then

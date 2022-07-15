@@ -7,7 +7,7 @@ Yocto Project Profiling and Tracing Manual
 Introduction
 ============
 
-Yocto bundles a number of tracing and profiling tools - this 'HOWTO'
+Yocto bundles a number of tracing and profiling tools --- this 'HOWTO'
 describes their basic usage and shows by example how to make use of them
 to examine application and system behavior.
 
@@ -26,7 +26,7 @@ please see the documentation and/or websites listed for each tool.
 
 The final section of this 'HOWTO' is a collection of real-world examples
 which we'll be continually adding to as we solve more problems using the
-tools - feel free to add your own examples to the list!
+tools --- feel free to add your own examples to the list!
 
 General Setup
 =============

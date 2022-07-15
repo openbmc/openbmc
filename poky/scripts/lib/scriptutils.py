@@ -5,7 +5,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-import argparse
 import glob
 import logging
 import os
@@ -25,7 +24,7 @@ class KeepAliveStreamHandler(logging.StreamHandler):
     def __init__(self, keepalive=True, **kwargs):
         super().__init__(**kwargs)
         if keepalive is True:
-            keepalive = 5000 # default timeout
+            keepalive = 5000  # default timeout
         self._timeout = threading.Condition()
         self._stop = False
 
@@ -36,9 +35,9 @@ class KeepAliveStreamHandler(logging.StreamHandler):
                 with self._timeout:
                     if not self._timeout.wait(keepalive):
                         self.emit(logging.LogRecord("keepalive", logging.INFO,
-                            None, None, "Keepalive message", None, None))
+                                                    None, None, "Keepalive message", None, None))
 
-        self._thread = threading.Thread(target = thread, daemon = True)
+        self._thread = threading.Thread(target=thread, daemon=True)
         self._thread.start()
 
     def close(self):
@@ -72,16 +71,15 @@ def logger_setup_color(logger, color='auto'):
 
     for handler in logger.handlers:
         if (isinstance(handler, logging.StreamHandler) and
-            isinstance(handler.formatter, BBLogFormatter)):
+                isinstance(handler.formatter, BBLogFormatter)):
             if color == 'always' or (color == 'auto' and handler.stream.isatty()):
                 handler.formatter.enable_color()
 
 
 def load_plugins(logger, plugins, pluginpath):
-
     def load_plugin(name):
         logger.debug('Loading plugin %s' % name)
-        spec = importlib.machinery.PathFinder.find_spec(name, path=[pluginpath] )
+        spec = importlib.machinery.PathFinder.find_spec(name, path=[pluginpath])
         if spec:
             mod = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(mod)

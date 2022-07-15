@@ -15,6 +15,8 @@ GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase gi-docgen ptest-gnome upstream-version-is-even gobject-introspection
 
+UPSTREAM_CHECK_REGEX = "pango-(?P<pver>\d+\.(?!9\d+)\d+\.\d+)"
+
 GIR_MESON_ENABLE_FLAG = "enabled"
 GIR_MESON_DISABLE_FLAG = "disabled"
 

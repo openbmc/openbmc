@@ -1,0 +1,21 @@
+#!/bin/sh
+
+ret_val=0
+
+# Check if all the kernel modules are available
+FIREWALLD_KERNEL_MODULES="@@FIREWALLD_KERNEL_MODULES@@"
+for m in $FIREWALLD_KERNEL_MODULES; do
+    if modprobe $m; then
+        echo "PASS: loading $m"
+    else
+        echo "FAIL: loading $m"
+        ret_val=1
+    fi
+done
+
+# Run the test suite from firewalld
+# Failing testsuites: 203 226 241 250 270 280 281 282 285 286
+# Problem icmpv6 compared against ipv6-icmptype?
+/usr/share/firewalld/testsuite/testsuite -C /tmp -A || ret_val=1
+
+exit $ret_val

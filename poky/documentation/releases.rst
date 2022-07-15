@@ -17,28 +17,7 @@ Release Series 4.0 (kirkstone)
 
 - :yocto_docs:`4.0 Documentation </4.0>`
 - :yocto_docs:`4.0.1 Documentation </4.0.1>`
-
-******************************
-Release Series 3.4 (honister)
-******************************
-
-- :yocto_docs:`3.4 Documentation </3.4>`
-- :yocto_docs:`3.4.1 Documentation </3.4.1>`
-- :yocto_docs:`3.4.2 Documentation </3.4.2>`
-- :yocto_docs:`3.4.3 Documentation </3.4.3>`
-- :yocto_docs:`3.4.4 Documentation </3.4.4>`
-
-******************************
-Release Series 3.3 (hardknott)
-******************************
-
-- :yocto_docs:`3.3 Documentation </3.3>`
-- :yocto_docs:`3.3.1 Documentation </3.3.1>`
-- :yocto_docs:`3.3.2 Documentation </3.3.2>`
-- :yocto_docs:`3.3.3 Documentation </3.3.3>`
-- :yocto_docs:`3.3.4 Documentation </3.3.4>`
-- :yocto_docs:`3.3.5 Documentation </3.3.5>`
-- :yocto_docs:`3.3.6 Documentation </3.3.6>`
+- :yocto_docs:`4.0.2 Documentation </4.0.2>`
 
 ****************************
 Release Series 3.1 (dunfell)
@@ -61,10 +40,33 @@ Release Series 3.1 (dunfell)
 - :yocto_docs:`3.1.14 Documentation </3.1.14>`
 - :yocto_docs:`3.1.15 Documentation </3.1.15>`
 - :yocto_docs:`3.1.16 Documentation </3.1.16>`
+- :yocto_docs:`3.1.17 Documentation </3.1.17>`
 
 ==========================
  Outdated Release Manuals
 ==========================
+
+******************************
+Release Series 3.4 (honister)
+******************************
+
+- :yocto_docs:`3.4 Documentation </3.4>`
+- :yocto_docs:`3.4.1 Documentation </3.4.1>`
+- :yocto_docs:`3.4.2 Documentation </3.4.2>`
+- :yocto_docs:`3.4.3 Documentation </3.4.3>`
+- :yocto_docs:`3.4.4 Documentation </3.4.4>`
+
+******************************
+Release Series 3.3 (hardknott)
+******************************
+
+- :yocto_docs:`3.3 Documentation </3.3>`
+- :yocto_docs:`3.3.1 Documentation </3.3.1>`
+- :yocto_docs:`3.3.2 Documentation </3.3.2>`
+- :yocto_docs:`3.3.3 Documentation </3.3.3>`
+- :yocto_docs:`3.3.4 Documentation </3.3.4>`
+- :yocto_docs:`3.3.5 Documentation </3.3.5>`
+- :yocto_docs:`3.3.6 Documentation </3.3.6>`
 
 *******************************
 Release Series 3.2 (gatesgarth)

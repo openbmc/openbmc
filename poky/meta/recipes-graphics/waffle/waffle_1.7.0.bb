@@ -11,6 +11,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=4c5154407c2490750dd461c50ad94797 \
 
 SRC_URI = "git://gitlab.freedesktop.org/mesa/waffle.git;protocol=https;branch=master \
            file://0001-waffle-do-not-make-core-protocol-into-the-library.patch \
+           file://0001-meson.build-request-native-wayland-scanner.patch \
            "
 SRCREV = "905c6c10f2483adf0cbfa024e2d3c2ed541fb300"
 S = "${WORKDIR}/git"

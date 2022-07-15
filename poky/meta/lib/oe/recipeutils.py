@@ -666,7 +666,7 @@ def get_bbappend_path(d, destlayerdir, wildcardver=False):
     return (appendpath, pathok)
 
 
-def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False, machine=None, extralines=None, removevalues=None, redirect_output=None):
+def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False, machine=None, extralines=None, removevalues=None, redirect_output=None, params=None):
     """
     Writes a bbappend file for a recipe
     Parameters:
@@ -696,6 +696,9 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
         redirect_output:
             If specified, redirects writing the output file to the
             specified directory (for dry-run purposes)
+        params:
+            Parameters to use when adding entries to SRC_URI. If specified,
+            should be a list of dicts with the same length as srcfiles.
     """
 
     if not removevalues:
@@ -762,12 +765,14 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
     copyfiles = {}
     if srcfiles:
         instfunclines = []
-        for newfile, origsrcfile in srcfiles.items():
+        for i, (newfile, origsrcfile) in enumerate(srcfiles.items()):
             srcfile = origsrcfile
             srcurientry = None
             if not srcfile:
                 srcfile = os.path.basename(newfile)
                 srcurientry = 'file://%s' % srcfile
+                if params and params[i]:
+                    srcurientry = '%s;%s' % (srcurientry, ';'.join('%s=%s' % (k,v) for k,v in params[i].items()))
                 # Double-check it's not there already
                 # FIXME do we care if the entry is added by another bbappend that might go away?
                 if not srcurientry in rd.getVar('SRC_URI').split():

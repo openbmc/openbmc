@@ -557,7 +557,7 @@ Local Projects
 ~~~~~~~~~~~~~~
 
 Local projects are custom bits of software the user provides. These bits
-reside somewhere local to a project - perhaps a directory into which the
+reside somewhere local to a project --- perhaps a directory into which the
 user checks in items (e.g. a local directory containing a development
 source tree used by the group).
 
@@ -1641,7 +1641,7 @@ you a good idea of when the task's data changes.
 
 To complicate the problem, there are things that should not be included
 in the checksum. First, there is the actual specific build path of a
-given task - the :term:`WORKDIR`. It
+given task --- the :term:`WORKDIR`. It
 does not matter if the work directory changes because it should not
 affect the output for target packages. Also, the build process has the
 objective of making native or cross packages relocatable.
@@ -1700,7 +1700,7 @@ need to fix this situation.
 Thus far, this section has limited discussion to the direct inputs into
 a task. Information based on direct inputs is referred to as the
 "basehash" in the code. However, the question of a task's indirect
-inputs still exits - items already built and present in the
+inputs still exits --- items already built and present in the
 :term:`Build Directory`. The checksum (or
 signature) for a particular task needs to add the hashes of all the
 tasks on which the particular task depends. Choosing which dependencies

@@ -9,4 +9,4 @@ SRC_URI[sha256sum] = "d3a63a039c82b08a1171b003eafa62c6f128aa4eaa1ce7a55a9401b48f
 
 inherit pypi setuptools3
 
-RDEPENDS:${PN} = "connman python3-dbus python3-pprint"
+RDEPENDS:${PN} = "connman python3-dbus python3-pprint python3-future"

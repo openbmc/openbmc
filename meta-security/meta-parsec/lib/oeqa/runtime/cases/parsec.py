@@ -12,7 +12,12 @@ from oeqa.core.decorator.data import skipIfNotFeature
 class ParsecTest(OERuntimeTestCase):
     @classmethod
     def setUpClass(cls):
+        cls.tc.target.run('swtpm_ioctl -s --tcp :2322')
         cls.toml_file = '/etc/parsec/config.toml'
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tc.target.run('swtpm_ioctl -s --tcp :2322')
 
     def setUp(self):
         super(ParsecTest, self).setUp()

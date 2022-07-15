@@ -23,10 +23,10 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  create mode 100644 src/basic/parse-printf-format.h
 
 diff --git a/meson.build b/meson.build
-index cb9936ee8b..ae53345260 100644
+index 36cbfa4893..30b5305b89 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -686,6 +686,7 @@ endif
+@@ -694,6 +694,7 @@ endif
  foreach header : ['crypt.h',
                    'linux/memfd.h',
                    'linux/vm_sockets.h',
@@ -35,10 +35,10 @@ index cb9936ee8b..ae53345260 100644
                    'valgrind/memcheck.h',
                    'valgrind/valgrind.h',
 diff --git a/src/basic/meson.build b/src/basic/meson.build
-index 49e1e7f43e..4131494bfa 100644
+index 9b89fdcdea..0b1ef91016 100644
 --- a/src/basic/meson.build
 +++ b/src/basic/meson.build
-@@ -334,6 +334,11 @@ endforeach
+@@ -336,6 +336,11 @@ endforeach
  
  basic_sources += generated_gperf_headers
  

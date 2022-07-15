@@ -1,73 +1,53 @@
-Upstream-Status: Pending
-
-This needs more work. Its my starting point.
-
+Upstream-Status: Inappropriate [embedded specific]
+  
 Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
 
 Index: git/Makefile
 ===================================================================
 --- git.orig/Makefile
 +++ git/Makefile
-@@ -4,28 +4,10 @@
- # Author:
- #  - Adam 'pi3' Zabrocki (http://pi3.com.pl)
- ##
--
--P_OUTPUT = output
+@@ -7,15 +7,8 @@
+ 
+ P_OUTPUT = output
  P_PWD ?= $(shell pwd)
 -P_KVER ?= $(shell uname -r)
--P_BOOTUP_SCRIPT ?= scripts/bootup/lkrg-bootup.sh
--TARGET := p_lkrg
+ P_BOOTUP_SCRIPT ?= scripts/bootup/lkrg-bootup.sh
+ TARGET := p_lkrg
 -ifneq ($(KERNELRELEASE),)
 -    KERNEL := /lib/modules/$(KERNELRELEASE)/build
 -else
 -    ## KERNELRELEASE not set.
 -    KERNEL := /lib/modules/$(P_KVER)/build
 -endif
--
--#
--# Uncomment for debug compilation
--#
--# ccflags-m := -ggdb -DP_LKRG_DEBUG_BUILD -finstrument-functions
--# ccflags-y := ${ccflags-m}
--# p_lkrg-objs += src/modules/print_log/p_lkrg_debug_log.o
  
--obj-m += $(TARGET).o
--$(TARGET)-objs += src/modules/ksyms/p_resolve_ksym.o \
-+obj-m := p_lkrg.o
-+p_lkrg-y := src/modules/ksyms/p_resolve_ksym.o \
-                   src/modules/hashing/p_lkrg_fast_hash.o \
-                   src/modules/comm_channel/p_comm_channel.o \
-                   src/modules/integrity_timer/p_integrity_timer.o \
-@@ -92,23 +74,14 @@ $(TARGET)-objs += src/modules/ksyms/p_re
+ #
+ # Use DEBUG=on for debug build.
+@@ -94,14 +87,13 @@ $(TARGET)-objs += src/modules/ksyms/p_re
                    src/p_lkrg_main.o
  
  
 -all:
 -#	$(MAKE) -C $(KERNEL) M=$(P_PWD) modules CONFIG_DEBUG_SECTION_MISMATCH=y
 -	$(MAKE) -C $(KERNEL) M=$(P_PWD) modules
--	mkdir -p $(P_OUTPUT)
--	cp $(P_PWD)/$(TARGET).ko $(P_OUTPUT)
--
--install:
--	$(MAKE) -C $(KERNEL) M=$(P_PWD) modules_install
--	depmod -a
--	$(P_PWD)/$(P_BOOTUP_SCRIPT) install
- 
--uninstall:
--	$(P_PWD)/$(P_BOOTUP_SCRIPT) uninstall
 +modules:
 +	$(MAKE) -C $(KERNEL_SRC) M=$(P_PWD) modules
-+
-+modules_install:
+ 	mkdir -p $(P_OUTPUT)
+ 	cp $(P_PWD)/$(TARGET).ko $(P_OUTPUT)
+ 
+-install:
+-	$(MAKE) -C $(KERNEL) M=$(P_PWD) modules_install
++moduled_install:
 +	$(MAKE) -C $(KERNEL_SRC) M=$(P_PWD) modules_install
+ 	depmod -a
+ 	$(P_PWD)/$(P_BOOTUP_SCRIPT) install
+ 
+@@ -109,7 +101,7 @@ uninstall:
+ 	$(P_PWD)/$(P_BOOTUP_SCRIPT) uninstall
  
  clean:
 -	$(MAKE) -C $(KERNEL) M=$(P_PWD) clean
--	$(RM) Module.markers modules.order
--	$(RM) $(P_PWD)/src/modules/kmod/client/kmod/Module.markers
--	$(RM) $(P_PWD)/src/modules/kmod/client/kmod/modules.order
--	$(RM) -rf $(P_OUTPUT)
-+	rm -f *.o *~ core .depend .*.cmd *.ko *.mod.c
-+	rm -f Module.markers Module.symvers modules.order
-+	rm -rf .tmp_versions Modules.symvers
++	$(MAKE) -C $(KERNEL_SRC) M=$(P_PWD) clean
+ 	$(RM) Module.markers modules.order
+ 	$(RM) $(P_PWD)/src/modules/kmod/client/kmod/Module.markers
+ 	$(RM) $(P_PWD)/src/modules/kmod/client/kmod/modules.order

@@ -309,10 +309,7 @@ def rust_gen_target(d, thing, wd, features, cpu, arch, abi=""):
 
     # build tspec
     tspec = {}
-    if bb.data.inherits_class('cross-canadian', d):
-        tspec['llvm-target'] = d.getVar('RUST_HOST_SYS', arch_abi)
-    else:
-        tspec['llvm-target'] = d.getVar('RUST_TARGET_SYS', arch_abi)
+    tspec['llvm-target'] = d.getVar('RUST_TARGET_SYS', arch_abi)
     tspec['data-layout'] = d.getVarFlag('DATA_LAYOUT', arch_abi)
     tspec['max-atomic-width'] = int(d.getVarFlag('MAX_ATOMIC_WIDTH', arch_abi))
     tspec['target-pointer-width'] = d.getVarFlag('TARGET_POINTER_WIDTH', arch_abi)

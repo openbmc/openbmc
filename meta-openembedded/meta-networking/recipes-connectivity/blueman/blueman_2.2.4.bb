@@ -19,7 +19,7 @@ EXTRA_OEMESON = "-Druntime_deps_check=false -Dappindicator=false -Dpythoninstall
 SYSTEMD_SERVICE:${PN} = "${BPN}-mechanism.service"
 SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 
-RRECOMENDS_${PN} += "adwaita-icon-theme"
+RRECOMMENDS:${PN} += "adwaita-icon-theme"
 RDEPENDS:${PN} += " \
     python3-core \
     python3-dbus \

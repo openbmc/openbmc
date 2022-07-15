@@ -1,6 +1,6 @@
 SUMMARY = "Simple DirectMedia Layer mixer library"
 SECTION = "libs"
-DEPENDS = "virtual/libsdl flac libmikmod libvorbis"
+DEPENDS = "libsdl flac libmikmod libvorbis"
 LICENSE = "Zlib"
 LIC_FILES_CHKSUM = "file://COPYING;md5=a37a47a0e579e461474cd03b9e05199d"
 

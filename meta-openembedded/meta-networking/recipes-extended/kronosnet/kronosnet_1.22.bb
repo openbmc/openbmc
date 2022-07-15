@@ -14,6 +14,7 @@ DEPENDS = "doxygen-native libqb-native libxml2-native bzip2 libqb libxml2 libnl 
 SRCREV = "0123ecebce0ad6aba3cdb320027192e15fd71e23"
 SRC_URI = "git://github.com/kronosnet/kronosnet;protocol=https;branch=stable1 \
            file://0001-libknet-tests-Correct-include-path-for-poll.h.patch \
+           file://0001-links.c-Fix-build-with-gcc-12.patch \
            "
 
 UPSTREAM_CHECK_URI = "https://github.com/kronosnet/kronosnet/releases"

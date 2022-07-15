@@ -56,6 +56,10 @@ def get_llvm_arch(bb, d, arch_var):
 def get_llvm_host_arch(bb, d):
     return get_llvm_arch(bb, d, 'HOST_ARCH')
 
+PACKAGECONFIG ??= ""
+# if optviewer OFF, force the modules to be not found or the ones on the host would be found
+PACKAGECONFIG[optviewer] = ",-DPY_PYGMENTS_FOUND=OFF -DPY_PYGMENTS_LEXERS_C_CPP_FOUND=OFF -DPY_YAML_FOUND=OFF,python3-pygments python3-pyyaml,python3-pygments python3-pyyaml"
+
 #
 # Default to build all OE-Core supported target arches (user overridable).
 #

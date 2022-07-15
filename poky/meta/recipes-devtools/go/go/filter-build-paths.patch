@@ -1,0 +1,48 @@
+Filter out build time paths from ldflags and other flags variables when they're
+embedded in the go binary so that builds are reproducible regardless of build
+location. This codepath is hit for statically linked go binaries such as those
+on mips/ppc.
+
+Upstream-Status: Pending
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: go/src/cmd/go/internal/load/pkg.go
+===================================================================
+--- go.orig/src/cmd/go/internal/load/pkg.go
++++ go/src/cmd/go/internal/load/pkg.go
+@@ -2225,6 +2225,17 @@ func (p *Package) collectDeps() {
+ // to their VCS information (vcsStatusError).
+ var vcsStatusCache par.Cache
+ 
++func filterCompilerFlags(flags string) string {
++	var newflags []string
++	for _, flag := range strings.Fields(flags) {
++		if strings.HasPrefix(flag, "--sysroot") || strings.HasPrefix(flag, "-fmacro-prefix-map") || strings.HasPrefix(flag, "-fdebug-prefix-map") {
++			continue
++		}
++		newflags = append(newflags, flag)
++	}
++	return strings.Join(newflags, " ")
++}
++
+ // setBuildInfo gathers build information, formats it as a string to be
+ // embedded in the binary, then sets p.Internal.BuildInfo to that string.
+ // setBuildInfo should only be called on a main package with no errors.
+@@ -2329,7 +2340,7 @@ func (p *Package) setBuildInfo(includeVC
+ 			appendSetting("-gcflags", BuildGcflags.String())
+ 		}
+ 		if BuildLdflags.present {
+-			appendSetting("-ldflags", BuildLdflags.String())
++			appendSetting("-ldflags", filterCompilerFlags(BuildLdflags.String()))
+ 		}
+ 		if cfg.BuildMSan {
+ 			appendSetting("-msan", "true")
+@@ -2347,7 +2358,7 @@ func (p *Package) setBuildInfo(includeVC
+ 		appendSetting("CGO_ENABLED", cgo)
+ 		if cfg.BuildContext.CgoEnabled {
+ 			for _, name := range []string{"CGO_CFLAGS", "CGO_CPPFLAGS", "CGO_CXXFLAGS", "CGO_LDFLAGS"} {
+-				appendSetting(name, cfg.Getenv(name))
++				appendSetting(name, filterCompilerFlags(cfg.Getenv(name)))
+ 			}
+ 		}
+ 		appendSetting("GOARCH", cfg.BuildContext.GOARCH)

@@ -52,8 +52,8 @@ do_install:append:libc-newlib () {
 }
 
 # No rpm package is actually created but -dev depends on it, avoid dnf error
-RDEPENDS:${PN}-dev:libc-baremetal = ""
-RDEPENDS:${PN}-dev:libc-newlib = ""
+DEV_PKG_DEPENDENCY:libc-baremetal = ""
+DEV_PKG_DEPENDENCY:libc-newlib = ""
 
 BBCLASSEXTEND = "nativesdk"
 

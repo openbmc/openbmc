@@ -98,6 +98,10 @@ python do_configure() {
     config.set(target_section, "cxx", e(d.expand("${RUST_BUILD_CXX}")))
     config.set(target_section, "cc", e(d.expand("${RUST_BUILD_CC}")))
 
+    # [llvm]
+    config.add_section("llvm")
+    config.set("llvm", "static-libstdcpp", e(False))
+
     # [rust]
     config.add_section("rust")
     config.set("rust", "rpath", e(True))

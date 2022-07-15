@@ -209,7 +209,7 @@ def wic_create_subcommand(options, usage_str):
             logger.info("  (Please check that the build artifacts for the machine")
             logger.info("   selected in local.conf actually exist and that they")
             logger.info("   are the correct artifacts for the image (.wks file)).\n")
-            raise WicError("The artifact that couldn't be found was %s:\n  %s", not_found, not_found_dir)
+            raise WicError("The artifact that couldn't be found was %s:\n  %s" % (not_found, not_found_dir))
 
     krootfs_dir = options.rootfs_dir
     if krootfs_dir is None:

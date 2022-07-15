@@ -1,0 +1,27 @@
+from ../sssd-2.5.0/src/util/sss_pam_data.c:27:
+| ../sssd-2.5.0/src/util/debug.h:88:44: error: unknown type name 'uid_t'; did you mean 'uint_t'?
+|    88 | int chown_debug_file(const char *filename, uid_t uid, gid_t gid);
+|       |                                            ^~~~~
+|       |                                            uint_t
+| ../sssd-2.5.0/src/util/debug.h:88:55: error: unknown type name 'gid_t'
+|    88 | int chown_debug_file(const char *filename, uid_t uid, gid_t gid);
+|       |                                                       ^~~~~
+| make[2]: *** [Makefile:22529: src/util/libsss_iface_la-sss_pam_data.lo] Error 1
+| make[2]: *** Waiting for unfinished jobs....
+
+Upstream-Status: Pending
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: sssd-2.7.1/src/util/debug.h
+===================================================================
+--- sssd-2.7.1.orig/src/util/debug.h
++++ sssd-2.7.1/src/util/debug.h
+@@ -24,6 +24,8 @@
+ #include "config.h"
+ 
+ #include <stdio.h>
++#include <unistd.h>
++#include <sys/types.h>
+ #include <stdbool.h>
+ #include <sys/types.h>
+ 

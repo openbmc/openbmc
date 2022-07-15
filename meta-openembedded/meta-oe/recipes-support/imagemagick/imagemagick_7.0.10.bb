@@ -4,15 +4,15 @@ HOMEPAGE = "https://www.imagemagick.org/"
 DESCRIPTION = "ImageMagick is a collection of tools for displaying, converting, and \
 editing raster and vector image files. It can read and write over 200 image file formats."
 LICENSE = "ImageMagick"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=41b4fa9af60c88e61484b02c0561181a \
-                    file://NOTICE;md5=a2aa6e41f8a40700196a9ce301693e34"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=b97c12a9213df1499565d69b92c73dd7 \
+                    file://NOTICE;md5=d8b9d2ccf273687ad12ebd06e5d8478f"
 # FIXME: There are many more checked libraries. All should be added or explicitly disabled to get consistent results.
 DEPENDS = "lcms bzip2 jpeg libpng tiff zlib fftw freetype libtool"
 
 BASE_PV := "${PV}"
-PV .= "_25"
+PV .= "-62"
 SRC_URI = "git://github.com/ImageMagick/ImageMagick.git;branch=main;protocol=https"
-SRCREV = "8b4e00829eb84d4e7b4da11acf1f98f1e8166e5b"
+SRCREV = "35b4991eb0939a327f3489988c366e21068b0178"
 
 S = "${WORKDIR}/git"
 

@@ -1,0 +1,29 @@
+From 78c9ae7d9a6735575bc72dd28a19b2bc3a251981 Mon Sep 17 00:00:00 2001
+From: Andrew Elble <aweits@rit.edu>
+Date: Mon, 8 Oct 2018 14:31:20 -0400
+Subject: [PATCH] netserver: don't change permissions on /dev/null
+
+the (now default) suppress_debug=1 changes permissions on /dev/null
+to 0644. Don't do this.
+
+Upstream-Status: Pending [https://github.com/HewlettPackard/netperf/pull/27/commits/78c9ae7d9a6735575bc72dd28a19b2bc3a251981]
+Signed-off-by: Ashish Sharma <asharma@mvista.com>
+
+---
+ src/netserver.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/netserver.c b/src/netserver.c
+index 00c8d23..86a1c45 100644
+--- a/src/netserver.c
++++ b/src/netserver.c
+@@ -278,7 +278,8 @@ open_debug_file()
+ 
+ #if !defined(WIN32)
+ 
+-  chmod(FileName,0644);
++  if (!suppress_debug)
++    chmod(FileName,0644);
+ 
+   /* redirect stdin to "/dev/null" */
+   rd_null_fp = fopen(NETPERF_NULL,"r");

@@ -27,6 +27,8 @@ do_compile_ptest() {
   oe_runmake -C examples buildtest
 }
 
+PTEST_PARALLEL_MAKE = ""
+
 FILES:${PN}-doc += "${datadir}/devhelp"
 FILES:${PN}-dev += "${libdir}/libxml++-2.6/include/libxml++config.h"
 

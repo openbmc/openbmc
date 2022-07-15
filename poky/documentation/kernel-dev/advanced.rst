@@ -183,7 +183,7 @@ the structure:
    order to define a base kernel policy or major kernel type to be
    reused across multiple BSPs, place the file in ``ktypes`` directory.
 
-These distinctions can easily become blurred - especially as out-of-tree
+These distinctions can easily become blurred --- especially as out-of-tree
 features slowly merge upstream over time. Also, remember that how the
 description files are placed is a purely logical organization and has no
 impact on the functionality of the kernel Metadata. There is no impact

@@ -11,19 +11,14 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  gdraw/gdraw.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/gdraw/gdraw.c b/gdraw/gdraw.c
-index 24591b778..217c63140 100644
 --- a/gdraw/gdraw.c
 +++ b/gdraw/gdraw.c
-@@ -32,7 +32,7 @@
+@@ -33,7 +33,7 @@
  #include "gkeysym.h"
  #include "ustring.h"
  
--#if __Mac || __FreeBSD__ || __NetBSD__ || __OpenBSD__ || __DragonFly__
-+#if __Mac || __FreeBSD__ || __NetBSD__ || __OpenBSD__ || __DragonFly__ || !defined(__GLIBC__)
+-#if __Mac
++#if __Mac || (defined(__linux__) && !defined(__GLIBC__))
  #  include <sys/select.h>
  #endif
  
--- 
-2.23.0
-

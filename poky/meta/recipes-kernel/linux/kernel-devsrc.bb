@@ -128,8 +128,12 @@ do_install() {
 	# breaks workflows.
 	cp -a --parents include/generated/autoconf.h $kerneldir/build 2>/dev/null || :
 
-	if [ -e $kerneldir/include/generated/.vdso-offsets.h.cmd ]; then
-	    rm $kerneldir/include/generated/.vdso-offsets.h.cmd
+	if [ -e $kerneldir/include/generated/.vdso-offsets.h.cmd ] ||
+	     [ -e $kerneldir/build/include/generated/.vdso-offsets.h.cmd ] ||
+	     [ -e $kerneldir/build/include/generated/.vdso32-offsets.h.cmd ] ; then
+	    rm -f $kerneldir/include/generated/.vdso-offsets.h.cmd
+	    rm -f $kerneldir/build/include/generated/.vdso-offsets.h.cmd
+	    rm -f $kerneldir/build/include/generated/.vdso32-offsets.h.cmd
 	fi
     )
 

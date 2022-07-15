@@ -1,0 +1,35 @@
+From c976c32e5249cb8a2433e7abfa095c1fe8dc4f8e Mon Sep 17 00:00:00 2001
+From: Alex Fabijanic <alex@pocoproject.org>
+Date: Wed, 13 Jul 2022 12:53:52 +0200
+Subject: [PATCH] fix(OpenSSLInitializer): remove providers unitialization
+ #3562 #3567
+
+Upstream-Status: Backport [https://github.com/pocoproject/poco/issues/3562]
+
+---
+ Crypto/src/OpenSSLInitializer.cpp | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+diff --git a/Crypto/src/OpenSSLInitializer.cpp b/Crypto/src/OpenSSLInitializer.cpp
+index 4678d22299..c537c3f9c2 100644
+--- a/Crypto/src/OpenSSLInitializer.cpp
++++ b/Crypto/src/OpenSSLInitializer.cpp
+@@ -157,18 +157,6 @@ void OpenSSLInitializer::uninitialize()
+ #endif
+ 		delete [] _mutexes;
+ #endif
+-
+-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+-		OSSL_PROVIDER* provider = nullptr;
+-		if ((provider = _defaultProvider.exchange(nullptr)))
+-		{
+-			OSSL_PROVIDER_unload(provider);
+-		}
+-		if ((provider = _legacyProvider.exchange(nullptr)))
+-		{
+-			OSSL_PROVIDER_unload(provider);
+-		}
+-#endif
+ 	}
+ }
+ 

@@ -164,7 +164,7 @@ Adding a New Recipe to the Workspace Layer
 ==========================================
 
 Use the ``devtool add`` command to add a new recipe to the workspace
-layer. The recipe you add should not exist - ``devtool`` creates it for
+layer. The recipe you add should not exist --- ``devtool`` creates it for
 you. The source files the recipe uses should exist in an external area.
 
 The following example creates and adds a new recipe named ``jackson`` to

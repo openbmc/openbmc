@@ -62,7 +62,10 @@ for struct in re.findall( struct_block_regex, data ):
             #print( "    name found: %s" % name.group(1) )
             entry_dict[struct[2]]['fields'][name.group(1)] = entry
 
-        if not entry_dict[struct[2]]['fields']:
+        # unmatched entries are most likely array terminators and
+        # should end up as the last element in the sorted list, which
+        # is achieved by using '0' as the key
+        if not cpuid and not name:
             entry_dict[struct[2]]['fields']['0'] = entry
 
 # created ordered dictionaries from the captured values. These are ordered by

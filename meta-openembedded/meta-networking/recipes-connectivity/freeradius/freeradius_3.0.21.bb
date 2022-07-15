@@ -34,6 +34,8 @@ SRC_URI = "git://github.com/FreeRADIUS/freeradius-server.git;branch=v3.0.x;lfs=0
     file://check-openssl-cmds-in-script-bootstrap.patch \
 "
 
+raddbdir="${sysconfdir}/${MLPREFIX}raddb"
+
 SRCREV = "af428abda249b2279ba0582180985a9f6f4a144a"
 
 PARALLEL_MAKE = ""
@@ -48,6 +50,7 @@ EXTRA_OECONF = " --enable-strict-dependencies \
         --with-docdir=${docdir}/freeradius-${PV} \
         --with-openssl-includes=${STAGING_INCDIR} \
         --with-openssl-libraries=${STAGING_LIBDIR} \
+        --with-raddbdir=${raddbdir} \
         --without-rlm_ippool \
         --without-rlm_cache_memcached \
         --without-rlm_counter \
@@ -98,7 +101,9 @@ PACKAGECONFIG[openssl] = "--with-openssl, --without-openssl"
 PACKAGECONFIG[rlm-eap-fast] = "--with-rlm_eap_fast, --without-rlm_eap_fast"
 PACKAGECONFIG[rlm-eap-pwd] = "--with-rlm_eap_pwd, --without-rlm_eap_pwd"
 
-inherit useradd autotools-brokensep update-rc.d systemd
+inherit useradd autotools-brokensep update-rc.d systemd multilib_script multilib_header
+
+MULTILIB_SCRIPTS = "${PN}:${sbindir}/checkrad"
 
 # This is not a cpan or python based package, but it needs some definitions
 # from cpan-base and python3-dir bbclasses for building rlm_perl and rlm_python
@@ -141,7 +146,7 @@ do_install() {
     oe_runmake install R=${D} INSTALLSTRIP=""
 
     # remove unsupported config files
-    rm -f ${D}/${sysconfdir}/raddb/experimental.conf
+    rm -f ${D}/${raddbdir}/experimental.conf
 
     # remove scripts that required Perl(DBI)
     rm -rf ${D}/${bindir}/radsqlrelay
@@ -153,7 +158,7 @@ do_install() {
     rm -rf ${D}/${localstatedir}/log/
     install -m 0644 ${WORKDIR}/volatiles.58_radiusd  ${D}${sysconfdir}/default/volatiles/58_radiusd
 
-    chown -R radiusd:radiusd ${D}/${sysconfdir}/raddb/
+    chown -R radiusd:radiusd ${D}/${raddbdir}
     chown -R radiusd:radiusd ${D}/${localstatedir}/lib/radiusd
 
     # For systemd
@@ -169,6 +174,9 @@ do_install() {
         install -d ${D}${sysconfdir}/tmpfiles.d/
         install -m 0644 ${WORKDIR}/radiusd-volatiles.conf ${D}${sysconfdir}/tmpfiles.d/radiusd.conf
     fi
+    oe_multilib_header freeradius/autoconf.h 
+    oe_multilib_header freeradius/missing.h
+    oe_multilib_header freeradius/radpaths.h
 }
 
 # This is only needed when we install/update on a running target.
@@ -183,7 +191,7 @@ pkg_postinst:${PN} () {
         fi
 
         # Fix ownership for /etc/raddb/*, /var/lib/radiusd
-        chown -R radiusd:radiusd ${sysconfdir}/raddb
+        chown -R radiusd:radiusd ${raddbdir}
         chown -R radiusd:radiusd ${localstatedir}/lib/radiusd
     fi
 }
@@ -204,30 +212,30 @@ PACKAGES =+ "${PN}-utils ${PN}-ldap ${PN}-krb5 ${PN}-perl \
 FILES:${PN}-utils = "${bindir}/*"
 
 FILES:${PN}-ldap = "${libdir}/rlm_ldap.so* \
-    ${sysconfdir}/raddb/mods-available/ldap \
+    ${raddbdir}/mods-available/ldap \
 "
 
 FILES:${PN}-krb5 = "${libdir}/rlm_krb5.so* \
-    ${sysconfdir}/raddb/mods-available/krb5 \
+    ${raddbdir}/mods-available/krb5 \
 "
 
 FILES:${PN}-perl = "${libdir}/rlm_perl.so* \
-    ${sysconfdir}/raddb/mods-config/perl \
-    ${sysconfdir}/raddb/mods-available/perl \
+    ${raddbdir}/mods-config/perl \
+    ${raddbdir}/mods-available/perl \
 "
 
 FILES:${PN}-python = "${libdir}/rlm_python3.so* \
-    ${sysconfdir}/raddb/mods-config/python3 \
-    ${sysconfdir}/raddb/mods-available/python3 \
+    ${raddbdir}/mods-config/python3 \
+    ${raddbdir}/mods-available/python3 \
 "
 
 FILES:${PN}-mysql = "${libdir}/rlm_sql_mysql.so* \
-    ${sysconfdir}/raddb/mods-config/sql/*/mysql \
-    ${sysconfdir}/raddb/mods-available/sql \
+    ${raddbdir}/mods-config/sql/*/mysql \
+    ${raddbdir}/mods-available/sql \
 "
 
 FILES:${PN}-postgresql = "${libdir}/rlm_sql_postgresql.so* \
-    ${sysconfdir}/raddb/mods-config/sql/*/postgresql \
+    ${raddbdir}/mods-config/sql/*/postgresql \
 "
 
 FILES:${PN}-unixodbc = "${libdir}/rlm_sql_unixodbc.so*"

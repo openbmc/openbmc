@@ -9,6 +9,8 @@ SRC_URI = "http://download.osgeo.org/geos/geos-${PV}.tar.bz2"
 
 inherit autotools pkgconfig binconfig
 
+EXTRA_OECONF += "--enable-inline=no"
+
 PACKAGES =+ "geoslib ${PN}-c1"
 
 DESCRIPTION:${PN}lib = "Geometry engine for Geographic Information Systems - C++ Library"

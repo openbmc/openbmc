@@ -22,15 +22,16 @@ Content-Transfer-Encoding: 8bit
 
 Upstream-Status: Backport
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
 ---
  src/fundamental/sha256.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/fundamental/sha256.c b/src/fundamental/sha256.c
-index 67d83b5f1cd6..f08959479643 100644
+index cd16aec4dd..58b1a80d33 100644
 --- a/src/fundamental/sha256.c
 +++ b/src/fundamental/sha256.c
-@@ -60,7 +60,7 @@
+@@ -58,7 +58,7 @@
  #  define UNALIGNED_P(p) (((size_t) p) % sizeof(uint32_t) != 0)
  # endif
  #else

@@ -21,6 +21,7 @@ RDEPENDS:${PN}:class-target += "\
     ${PYTHON_PN}-sqlite3 \
     ${PYTHON_PN}-wrapt \
     ${PYTHON_PN}-pkg-resources \
+    ${PYTHON_PN}-typing-extensions \
 "
 
 BBCLASSEXTEND = "native nativesdk"

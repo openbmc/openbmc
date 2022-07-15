@@ -357,7 +357,7 @@ These additional changes exist:
 -  The minimum Git version has been increased to 1.8.3.1. If your host
    distribution does not provide a sufficiently recent version, you can
    install the buildtools, which will provide it. See the
-   :ref:`ref-manual/system-requirements:required git, tar, python and gcc versions`
+   :ref:`ref-manual/system-requirements:required git, tar, python, make and gcc versions`
    section for more information on the buildtools tarball.
 
 -  The buggy and incomplete support for the RPM version 4 package

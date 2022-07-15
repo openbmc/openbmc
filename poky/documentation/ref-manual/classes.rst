@@ -108,18 +108,18 @@ support is either not present or is broken.
 It's useful to have some idea of how the tasks defined by the
 ``autotools*`` classes work and what they do behind the scenes.
 
--  :ref:`ref-tasks-configure` - Regenerates the
+-  :ref:`ref-tasks-configure` --- regenerates the
    configure script (using ``autoreconf``) and then launches it with a
    standard set of arguments used during cross-compilation. You can pass
    additional parameters to ``configure`` through the :term:`EXTRA_OECONF`
    or :term:`PACKAGECONFIG_CONFARGS`
    variables.
 
--  :ref:`ref-tasks-compile` - Runs ``make`` with
+-  :ref:`ref-tasks-compile` --- runs ``make`` with
    arguments that specify the compiler and linker. You can pass
    additional arguments through the :term:`EXTRA_OEMAKE` variable.
 
--  :ref:`ref-tasks-install` - Runs ``make install`` and
+-  :ref:`ref-tasks-install` --- runs ``make install`` and
    passes in ``${``\ :term:`D`\ ``}`` as ``DESTDIR``.
 
 .. _ref-classes-base:
@@ -2000,9 +2000,7 @@ The ``python_pep517`` class builds and installs a Python ``wheel`` binary
 archive (see `PEP-517 <https://peps.python.org/pep-0517/>`__).
 
 Recipes wouldn't inherit this directly, instead typically another class will
-inherit this, add the relevant native dependencies, and set
-:term:`PEP517_BUILD_API` to the Python class which implements the PEP-517 build
-API.
+inherit this and add the relevant native dependencies.
 
 Examples of classes which do this are :ref:`python_flit_core
 <ref-classes-python_flit_core>`, :ref:`python_setuptools_build_meta

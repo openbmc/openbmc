@@ -216,11 +216,11 @@ The following sanity check changes occurred.
 -  :term:`SRC_URI` is now checked for usage of two
    problematic items:
 
-   -  "${PN}" prefix/suffix use - Warnings always appear if ${PN} is
+   -  "${PN}" prefix/suffix use --- warnings always appear if ${PN} is
       used. You must fix the issue regardless of whether multiconfig or
       anything else that would cause prefixing/suffixing to happen.
 
-   -  Github archive tarballs - these are not guaranteed to be stable.
+   -  Github archive tarballs --- these are not guaranteed to be stable.
       Consequently, it is likely that the tarballs will be refreshed and
       thus the SRC_URI checksums will fail to apply. It is recommended
       that you fetch either an official release tarball or a specific

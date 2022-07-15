@@ -1,0 +1,19 @@
+don't run generate-sbus-code
+
+Upstream-Status: Inappropriate [OE Specific]
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: sssd-2.7.1/Makefile.am
+===================================================================
+--- sssd-2.7.1.orig/Makefile.am
++++ sssd-2.7.1/Makefile.am
+@@ -1023,8 +1023,6 @@ generate-sbus-code:
+ 
+ .PHONY: generate-sbus-code
+ 
+-BUILT_SOURCES += generate-sbus-code
+-
+ EXTRA_DIST += \
+     sbus_generate.sh.in \
+     src/sbus/codegen/dbus.xml \

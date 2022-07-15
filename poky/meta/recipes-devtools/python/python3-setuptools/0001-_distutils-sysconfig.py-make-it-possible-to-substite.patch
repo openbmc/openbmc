@@ -1,4 +1,4 @@
-From 41f78746cbe88d263400ee948abef5b3f89cce29 Mon Sep 17 00:00:00 2001
+From 3fd8fcd33d2b0f3ac2fc043eac8641ab4432967d Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Wed, 11 May 2022 21:41:14 +0200
 Subject: [PATCH] _distutils/sysconfig.py: make it possible to substite the
@@ -15,26 +15,25 @@ would happen to this module in light of distutils deprecation.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
 ---
- setuptools/_distutils/sysconfig.py | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ setuptools/_distutils/sysconfig.py | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/setuptools/_distutils/sysconfig.py b/setuptools/_distutils/sysconfig.py
-index 55a42e1..ead63b9 100644
+index e41d51e..c17a79a 100644
 --- a/setuptools/_distutils/sysconfig.py
 +++ b/setuptools/_distutils/sysconfig.py
-@@ -102,7 +102,9 @@ def get_python_inc(plat_specific=0, prefix=None):
-     If 'prefix' is supplied, use it instead of sys.base_prefix or
+@@ -119,6 +119,8 @@ def get_python_inc(plat_specific=0, prefix=None):
      sys.base_exec_prefix -- i.e., ignore 'plat_specific'.
      """
--    if prefix is None:
-+    if prefix is None and os.environ.get('STAGING_INCDIR', ""):
-+        prefix = os.environ['STAGING_INCDIR'].rstrip('include')
-+    elif prefix is None:
-         prefix = plat_specific and BASE_EXEC_PREFIX or BASE_PREFIX
-     if os.name == "posix":
-         if IS_PYPY and sys.version_info < (3, 8):
-@@ -167,7 +169,13 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
+     default_prefix = BASE_EXEC_PREFIX if plat_specific else BASE_PREFIX
++    if os.environ.get('STAGING_INCDIR', ""):
++        default_prefix = os.environ['STAGING_INCDIR'].rstrip('include')
+     resolved_prefix = prefix if prefix is not None else default_prefix
+     try:
+         getter = globals()[f'_get_python_inc_{os.name}']
+@@ -221,7 +223,13 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
  
      early_prefix = prefix
  
@@ -49,12 +48,12 @@ index 55a42e1..ead63b9 100644
          if standard_lib:
              prefix = plat_specific and BASE_EXEC_PREFIX or BASE_PREFIX
          else:
-@@ -182,7 +190,7 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
+@@ -236,7 +244,7 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
              # Pure Python
              libdir = "lib"
          implementation = 'pypy' if IS_PYPY else 'python'
--        libpython = os.path.join(prefix, libdir,
-+        libpython = os.path.join(prefix, lib_basename,
-                                  implementation + get_python_version())
+-        libpython = os.path.join(prefix, libdir, implementation + get_python_version())
++        libpython = os.path.join(prefix, lib_basename, implementation + get_python_version())
          return _posix_lib(standard_lib, libpython, early_prefix, prefix)
      elif os.name == "nt":
+         if standard_lib:

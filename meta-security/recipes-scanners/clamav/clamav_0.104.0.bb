@@ -56,7 +56,7 @@ export OECMAKE_C_FLAGS += " -I${STAGING_INCDIR} -L ${RECIPE_SYSROOT}${nonarch_li
 
 do_install:append () {
     install -d ${D}/${sysconfdir}
-    install -d -o ${CLAMAV_UID} -g ${CLAMAV_GID} ${D}/${localstatedir}/lib/clamav
+    install -d -o ${PN} -g ${CLAMAV_GID} ${D}/${localstatedir}/lib/clamav
     install -d ${D}${sysconfdir}/clamav ${D}${sysconfdir}/default/volatiles
 
     install -m 644 ${WORKDIR}/clamd.conf ${D}/${prefix}/${sysconfdir}

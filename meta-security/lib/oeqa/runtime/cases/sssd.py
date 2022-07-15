@@ -28,10 +28,10 @@ class SSSDTest(OERuntimeTestCase):
 
     @OETestDepends(['sssd.SSSDTest.test_sssd_sssctl_conf_perms_chk'])
     def test_sssd_sssctl_deamon(self):
-        status, output = self.target.run('sssctl domain-status')
+        status, output = self.target.run('sssctl domain-list')
         match = re.search('No domains configured, fatal error!', output)
         if match:
-            msg = ('sssctl domain-status failed, sssd.conf not setup correctly. '
+            msg = ('sssctl domain-list failed, sssd.conf not setup correctly. '
                'Status and output:%s and %s' % (status, output))
             self.assertEqual(status, 0, msg = msg)
 

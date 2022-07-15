@@ -39,7 +39,7 @@ RDEPENDS:${PN} += "bash"
 RDEPENDS:${PN}-ptest = "util-linux-getopt bash"
 
 inherit update-alternatives
-ALTERNATIVE_${PN} = "installkernel"
+ALTERNATIVE:${PN} = "installkernel"
 ALTERNATIVE_LINK_NAME[installkernel] = "${sbindir}/installkernel"
 
 COMPATIBLE_HOST = '(x86_64.*|i.86.*)-(linux|freebsd.*)'

@@ -12,11 +12,17 @@ SRC_URI[sha256sum] = "f970995ec2bb815e2fdaf7977b26b2091e1e386f0f42eafd5ac811953d
 
 inherit pypi python_flit_core
 
-DEPENDS:remove:class-native = "python3-installer-native"
-DEPENDS:append:class-native = " unzip-native"
+# Bootstrap the native build
+DEPENDS:remove:class-native = "python3-picobuild-native python3-installer-native"
 
-do_install:class-native () {
-    python_pep517_do_bootstrap_install
+INSTALL_WHEEL_COMPILE_BYTECODE:class-native = "--no-compile-bytecode"
+
+do_compile:class-native () {
+    python_flit_core_do_manual_build
+}
+
+do_install:prepend:class-native() {
+    export PYTHONPATH="${S}/src"
 }
 
 BBCLASSEXTEND = "native nativesdk"

@@ -594,6 +594,7 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
         copy_layer_2 = self.topdir + "/meta-copy2/meta"
 
         oe.path.copytree(core_layer, copy_layer_1)
+        os.symlink(os.path.dirname(core_layer) + "/scripts", self.topdir + "/meta-copy1/scripts")
         self.write_config("""
 TMPDIR = "${TOPDIR}/tmp-sstatesamehash"
 """)
@@ -603,6 +604,7 @@ TMPDIR = "${TOPDIR}/tmp-sstatesamehash"
         bitbake("bash -S none")
 
         oe.path.copytree(core_layer, copy_layer_2)
+        os.symlink(os.path.dirname(core_layer) + "/scripts", self.topdir + "/meta-copy2/scripts")
         self.write_config("""
 TMPDIR = "${TOPDIR}/tmp-sstatesamehash2"
 """)

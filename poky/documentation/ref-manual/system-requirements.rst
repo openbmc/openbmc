@@ -234,8 +234,8 @@ supported CentOS-8 Linux distribution:
       $ sudo dnf install make python3-pip which
       &PIP3_HOST_PACKAGES_DOC;
 
-Required Git, tar, Python and gcc Versions
-==========================================
+Required Git, tar, Python, make and gcc Versions
+================================================
 
 In order to use the build system, your host development system must meet
 the following version requirements for Git, tar, and Python:
@@ -245,6 +245,8 @@ the following version requirements for Git, tar, and Python:
 -  tar &MIN_TAR_VERSION; or greater
 
 -  Python &MIN_PYTHON_VERSION; or greater
+
+-  GNU make &MIN_MAKE_VERSION; or greater
 
 If your host development system does not meet all these requirements,
 you can resolve this by installing a ``buildtools`` tarball that

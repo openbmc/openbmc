@@ -285,7 +285,8 @@ python runqueue_stats () {
     if system_stats:
         # Ensure that we sample at important events.
         done = isinstance(e, bb.event.BuildCompleted)
-        system_stats.sample(e, force=done)
+        if system_stats.sample(e, force=done):
+            d.setVar('_buildstats_system_stats', system_stats)
         if done:
             system_stats.close()
             d.delVar('_buildstats_system_stats')

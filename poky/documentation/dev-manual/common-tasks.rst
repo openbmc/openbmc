@@ -2306,7 +2306,7 @@ under ``files``) requires a recipe that has the file listed in the
 :term:`SRC_URI` variable. Additionally, you need to manually write the
 ``do_compile`` and ``do_install`` tasks. The :term:`S` variable defines the
 directory containing the source code, which is set to
-:term:`WORKDIR` in this case - the
+:term:`WORKDIR` in this case --- the
 directory BitBake uses for the build.
 ::
 
@@ -2563,7 +2563,7 @@ Recipe Syntax
 Understanding recipe file syntax is important for writing recipes. The
 following list overviews the basic items that make up a BitBake recipe
 file. For more complete BitBake syntax descriptions, see the
-":doc:`bitbake-user-manual/bitbake-user-manual-metadata`"
+":doc:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata`"
 chapter of the BitBake User Manual.
 
 -  *Variable Assignments and Manipulations:* Variable assignments allow
@@ -2621,7 +2621,7 @@ chapter of the BitBake User Manual.
 This next list summarizes the most important and most commonly used
 parts of the recipe syntax. For more information on these parts of the
 syntax, you can reference the
-:doc:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata` chapter
+":doc:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata`" chapter
 in the BitBake User Manual.
 
 -  *Line Continuation (\\):* Use the backward slash (``\``) character to
@@ -2780,7 +2780,7 @@ in the BitBake User Manual.
    functionality. The same considerations apply to various system
    utilities (e.g. ``sed``, ``grep``, ``awk``, and so forth) that you
    might wish to use. If in doubt, you should check with multiple
-   implementations - including those from BusyBox.
+   implementations --- including those from BusyBox.
 
 Adding a New Machine
 ====================
@@ -3348,9 +3348,9 @@ The actual directory depends on several things:
 
 -  :term:`PN`: The recipe name.
 
--  :term:`EXTENDPE`: The epoch - (if
+-  :term:`EXTENDPE`: The epoch --- if
    :term:`PE` is not specified, which is
-   usually the case for most recipes, then :term:`EXTENDPE` is blank).
+   usually the case for most recipes, then :term:`EXTENDPE` is blank.
 
 -  :term:`PV`: The recipe version.
 
@@ -3704,7 +3704,7 @@ Setting Up and Running a Multiple Configuration Build
 
 To accomplish a multiple configuration build, you must define each
 target's configuration separately using a parallel configuration file in
-the :term:`Build Directory`, and you
+the :term:`Build Directory` or configuration directory within a layer, and you
 must follow a required file hierarchy. Additionally, you must enable the
 multiple configuration builds in your ``local.conf`` file.
 
@@ -3712,16 +3712,19 @@ Follow these steps to set up and execute multiple configuration builds:
 
 -  *Create Separate Configuration Files*: You need to create a single
    configuration file for each build target (each multiconfig).
-   Minimally, each configuration file must define the machine and the
-   temporary directory BitBake uses for the build. Suggested practice
-   dictates that you do not overlap the temporary directories used
-   during the builds. However, it is possible that you can share the
-   temporary directory
-   (:term:`TMPDIR`). For example,
-   consider a scenario with two different multiconfigs for the same
+   The configuration definitions are implementation dependent but often
+   each configuration file will define the machine and the
+   temporary directory BitBake uses for the build. Whether the same
+   temporary directory (:term:`TMPDIR`) can be shared will depend on what is
+   similar and what is different between the configurations. Multiple MACHINE
+   targets can share the same (:term:`TMPDIR`) as long as the rest of the
+   configuration is the same, multiple DISTRO settings would need separate
+   (:term:`TMPDIR`) directories.
+
+   For example, consider a scenario with two different multiconfigs for the same
    :term:`MACHINE`: "qemux86" built
    for two distributions such as "poky" and "poky-lsb". In this case,
-   you might want to use the same :term:`TMPDIR`.
+   you would need to use the different :term:`TMPDIR`.
 
    Here is an example showing the minimal statements needed in a
    configuration file for a "qemux86" target whose temporary build
@@ -3732,18 +3735,16 @@ Follow these steps to set up and execute multiple configuration builds:
 
    The location for these multiconfig configuration files is specific.
    They must reside in the current build directory in a sub-directory of
-   ``conf`` named ``multiconfig``. Following is an example that defines
+   ``conf`` named ``multiconfig`` or within a layer's ``conf`` directory
+   under a directory named ``multiconfig``. Following is an example that defines
    two configuration files for the "x86" and "arm" multiconfigs:
 
    .. image:: figures/multiconfig_files.png
       :align: center
       :width: 50%
 
-   The reason for this required file hierarchy is because the :term:`BBPATH`
-   variable is not constructed until the layers are parsed.
-   Consequently, using the configuration file as a pre-configuration
-   file is not possible unless it is located in the current working
-   directory.
+   The usual :term:`BBPATH` search path is used to locate multiconfig files in
+   a similar way to other conf files.
 
 -  *Add the BitBake Multi-configuration Variable to the Local
    Configuration File*: Use the
@@ -6601,7 +6602,7 @@ the following:
    installed into an image.
 
 -  Binary Package Version: The binary package version is composed of two
-   components - a version and a revision.
+   components --- a version and a revision.
 
    .. note::
 
@@ -6938,7 +6939,7 @@ optional arguments::
       Postinstall script to use for all packages
       (as a string)
    recursive
-      True to perform a recursive search - default
+      True to perform a recursive search --- default
       False
    hook
       A hook function to be called for every match.
@@ -6959,7 +6960,7 @@ optional arguments::
       Extra runtime dependencies (RDEPENDS) to be
       set for all packages. The default value of None
       causes a dependency on the main package
-      (${PN}) - if you do not want this, pass empty
+      (${PN}) --- if you do not want this, pass empty
       string '' for this parameter.
    aux_files_pattern
       Extra item(s) to be added to FILES for each
@@ -6985,7 +6986,7 @@ optional arguments::
       or a list of strings for multiple items. Must
       include %s.
    allow_links
-      True to allow symlinks to be matched - default
+      True to allow symlinks to be matched --- default
       False
    summary
       Summary to set for each package. Must include %s;
@@ -7430,7 +7431,7 @@ A Package Test (ptest) runs tests against packages built by the
 OpenEmbedded build system on the target machine. A ptest contains at
 least two items: the actual test, and a shell script (``run-ptest``)
 that starts the test. The shell script that starts the test must not
-contain the actual test - the script only starts the test. On the other
+contain the actual test --- the script only starts the test. On the other
 hand, the test can be anything from a simple shell script that runs a
 binary and checks the output to an elaborate system of test binaries and
 data files.
@@ -7613,6 +7614,11 @@ The
 fetch URI to download each dependency and capture license details where
 possible. The result is a generated recipe.
 
+After running for quite a long time, in particular building the
+``nodejs-native`` package, the command should end as follows::
+
+   INFO: Recipe /home/.../build/workspace/recipes/cute-files/cute-files_1.0.2.bb has been automatically created; further editing may be required to make it fully functional
+
 The recipe file is fairly simple and contains every license that
 ``recipetool`` finds and includes the licenses in the recipe's
 :term:`LIC_FILES_CHKSUM`
@@ -7623,7 +7629,7 @@ modules and manually add the information to the recipe.
 
 ``recipetool`` creates a "shrinkwrap" file for your recipe. Shrinkwrap
 files capture the version of all dependent modules. Many packages do not
-provide shrinkwrap files. ``recipetool`` create a shrinkwrap file as it
+provide shrinkwrap files but ``recipetool`` will create a shrinkwrap file as it
 runs.
 
 .. note::
@@ -7635,18 +7641,38 @@ runs.
 The ``devtool edit-recipe`` command lets you take a look at the recipe::
 
    $ devtool edit-recipe cute-files
+   # Recipe created by recipetool
+   # This is the basis of a recipe and may need further editing in order to be fully functional.
+   # (Feel free to remove these comments when editing.)
+
    SUMMARY = "Turn any folder on your computer into a cute file browser, available on the local network."
-   LICENSE = "MIT & ISC & Unknown"
+   # WARNING: the following LICENSE and LIC_FILES_CHKSUM values are best guesses - it is
+   # your responsibility to verify that the values are complete and correct.
+   #
+   # NOTE: multiple licenses have been detected; they have been separated with &
+   # in the LICENSE value for now since it is a reasonable assumption that all
+   # of the licenses apply. If instead there is a choice between the multiple
+   # licenses then you should change the value to separate the licenses with |
+   # instead of &. If there is any doubt, check the accompanying documentation
+   # to determine which situation is applicable.
+
+   SUMMARY = "Turn any folder on your computer into a cute file browser, available on the local network."
+   LICENSE = "BSD-3-Clause & ISC & MIT"
    LIC_FILES_CHKSUM = "file://LICENSE;md5=71d98c0a1db42956787b1909c74a86ca \
-       file://node_modules/toidentifier/LICENSE;md5=1a261071a044d02eb6f2bb47f51a3502 \
-       file://node_modules/debug/LICENSE;md5=ddd815a475e7338b0be7a14d8ee35a99 \
-       ...
+                       file://node_modules/accepts/LICENSE;md5=bf1f9ad1e2e1d507aef4883fff7103de \
+                       file://node_modules/array-flatten/LICENSE;md5=44088ba57cb871a58add36ce51b8de08 \
+   ...
+                       file://node_modules/cookie-signature/Readme.md;md5=57ae8b42de3dd0c1f22d5f4cf191e15a"
+
    SRC_URI = " \
        npm://registry.npmjs.org/;package=cute-files;version=${PV} \
        npmsw://${THISDIR}/${BPN}/npm-shrinkwrap.json \
        "
+
    S = "${WORKDIR}/npm"
+
    inherit npm
+
    LICENSE:${PN} = "MIT"
    LICENSE:${PN}-accepts = "MIT"
    LICENSE:${PN}-array-flatten = "MIT"
@@ -7679,17 +7705,10 @@ command to deploy your package::
    $ devtool deploy-target -s cute-files root@192.168.7.2
 
 Once the package is installed on the target, you can
-test the application:
-
-.. note::
-
-   Because of a known issue, you cannot simply run ``cute-files`` as you would
-   if you had run ``npm install``.
-
-::
+test the application to show the contents of any directory::
 
   $ cd /usr/lib/node_modules/cute-files
-  $ node cute-files.js
+  $ cute-files
 
 On a browser,
 go to ``http://192.168.7.2:3000`` and you see the following:
@@ -7717,12 +7736,11 @@ command::
 
    $ devtool add https://github.com/martinaglv/cute-files.git
 
-The
-recipe this command generates is very similar to the recipe created in
+The recipe this command generates is very similar to the recipe created in
 the previous section. However, the :term:`SRC_URI` looks like the following::
 
    SRC_URI = " \
-       git://github.com/martinaglv/cute-files.git;protocol=https \
+       git://github.com/martinaglv/cute-files.git;protocol=https;branch=master \
        npmsw://${THISDIR}/${BPN}/npm-shrinkwrap.json \
        "
 
@@ -9131,13 +9149,13 @@ The JSON file must include an object with the test name as keys of an
 object or an array. This object (or array of objects) uses the following
 data:
 
--  "pkg" - A mandatory string that is the name of the package to be
+-  "pkg" --- a mandatory string that is the name of the package to be
    installed.
 
--  "rm" - An optional boolean, which defaults to "false", that specifies
+-  "rm" --- an optional boolean, which defaults to "false", that specifies
    to remove the package after the test.
 
--  "extract" - An optional boolean, which defaults to "false", that
+-  "extract" --- an optional boolean, which defaults to "false", that
    specifies if the package must be extracted from the package format.
    When set to "true", the package is not automatically installed into
    the DUT.
@@ -9802,7 +9820,7 @@ Logging With Bash
 ~~~~~~~~~~~~~~~~~
 
 When creating recipes using Bash and inserting code that handles build
-logs, you have the same goals - informative with minimal console output.
+logs, you have the same goals --- informative with minimal console output.
 The syntax you use for recipes written in Bash is similar to that of
 recipes written in Python described in the previous section.
 
@@ -10075,7 +10093,7 @@ to use GDB directly on the remote target to debug applications. These
 constraints arise because GDB needs to load the debugging information
 and the binaries of the process being debugged. Additionally, GDB needs
 to perform many computations to locate information such as function
-names, variable names and values, stack traces and so forth - even
+names, variable names and values, stack traces and so forth --- even
 before starting the debugging process. These extra computations place
 more load on the target system and can alter the characteristics of the
 program being debugged.
@@ -10652,7 +10670,7 @@ Preparing Changes for Submission
    -  If the change addresses a specific bug or issue that is associated
       with a bug-tracking ID, include a reference to that ID in your
       detailed description. For example, the Yocto Project uses a
-      specific convention for bug references - any commit that addresses
+      specific convention for bug references --- any commit that addresses
       a specific bug should use the following form for the detailed
       description. Be sure to use the actual bug-tracking ID from
       Bugzilla for bug-id::
@@ -10915,20 +10933,20 @@ follows:
    result in the most straightforward path into the stable branch for the
    fix.
 
-   a. *If the fix is present in the master branch - Submit a backport request
+   a. *If the fix is present in the master branch --- submit a backport request
       by email:* You should send an email to the relevant stable branch
       maintainer and the mailing list with details of the bug or CVE to be
       fixed, the commit hash on the master branch that fixes the issue and
       the stable branches which you would like this fix to be backported to.
 
-   b. *If the fix is not present in the master branch - Submit the fix to the
+   b. *If the fix is not present in the master branch --- submit the fix to the
       master branch first:* This will ensure that the fix passes through the
       project's usual patch review and test processes before being accepted.
       It will also ensure that bugs are not left unresolved in the master
       branch itself. Once the fix is accepted in the master branch a backport
       request can be submitted as above.
 
-   c. *If the fix is unsuitable for the master branch - Submit a patch
+   c. *If the fix is unsuitable for the master branch --- submit a patch
       directly for the stable branch:* This method should be considered as a
       last resort. It is typically necessary when the master branch is using
       a newer version of the software which includes an upstream fix for the
@@ -11259,7 +11277,7 @@ Providing the Source Code
 
 Compliance activities should begin before you generate the final image.
 The first thing you should look at is the requirement that tops the list
-for most compliance groups - providing the source. The Yocto Project has
+for most compliance groups --- providing the source. The Yocto Project has
 a few ways of meeting this requirement.
 
 One of the easiest ways to meet this requirement is to provide the
@@ -11507,8 +11525,15 @@ known security vulnerabilities, as tracked by the public
 `Common Vulnerabilities and Exposures (CVE) <https://en.wikipedia.org/wiki/Common_Vulnerabilities_and_Exposures>`__
 database.
 
-To know which packages are vulnerable to known security vulnerabilities,
-add the following setting to your configuration::
+The Yocto Project maintains a `list of known vulnerabilities
+<https://autobuilder.yocto.io/pub/non-release/patchmetrics/>`__
+for packages in Poky and OE-Core, tracking the evolution of the number of
+unpatched CVEs and the status of patches. Such information is available for
+the current development version and for each supported release.
+
+To know which packages are vulnerable to known security vulnerabilities
+in the specific image you are building, add the following setting to your
+configuration::
 
    INHERIT += "cve-check"
 

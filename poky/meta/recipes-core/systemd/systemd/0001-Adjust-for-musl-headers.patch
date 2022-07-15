@@ -37,16 +37,18 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/network/networkd-dhcp-prefix-delegation.c | 4 ++--
  src/network/networkd-dhcp-server.c            | 2 +-
  src/network/networkd-dhcp4.c                  | 2 +-
+ src/network/networkd-ipv6ll.c                 | 2 +-
  src/network/networkd-link.c                   | 2 +-
+ src/network/networkd-ndisc.c                  | 2 +-
  src/network/networkd-route.c                  | 8 ++++----
  src/network/networkd-setlink.c                | 2 +-
  src/shared/linux/ethtool.h                    | 3 ++-
  src/shared/netif-util.c                       | 2 +-
  src/udev/udev-builtin-net_id.c                | 2 +-
- 35 files changed, 42 insertions(+), 40 deletions(-)
+ 37 files changed, 44 insertions(+), 42 deletions(-)
 
 diff --git a/src/libsystemd-network/sd-dhcp6-client.c b/src/libsystemd-network/sd-dhcp6-client.c
-index 84bc739bba..ff8cb6bf9d 100644
+index b346a50d78..7884d4c1cd 100644
 --- a/src/libsystemd-network/sd-dhcp6-client.c
 +++ b/src/libsystemd-network/sd-dhcp6-client.c
 @@ -5,7 +5,7 @@
@@ -433,8 +435,21 @@ index cb9c428ae9..a35d58f3f1 100644
  
  #include "alloc-util.h"
  #include "dhcp-client-internal.h"
+diff --git a/src/network/networkd-ipv6ll.c b/src/network/networkd-ipv6ll.c
+index dc09171afe..5b93ef3dd4 100644
+--- a/src/network/networkd-ipv6ll.c
++++ b/src/network/networkd-ipv6ll.c
+@@ -1,7 +1,7 @@
+ /* SPDX-License-Identifier: LGPL-2.1-or-later */
+
+ #include <linux/if.h>
+-#include <linux/if_arp.h>
++//#include <linux/if_arp.h>
+
+ #include "in-addr-util.h"
+ #include "networkd-address.h"
 diff --git a/src/network/networkd-link.c b/src/network/networkd-link.c
-index b62a154828..75949e6094 100644
+index 63679505f7..825ea76ff2 100644
 --- a/src/network/networkd-link.c
 +++ b/src/network/networkd-link.c
 @@ -3,7 +3,7 @@
@@ -446,8 +461,21 @@ index b62a154828..75949e6094 100644
  #include <linux/if_link.h>
  #include <linux/netdevice.h>
  #include <sys/socket.h>
+diff --git a/src/network/networkd-ndisc.c b/src/network/networkd-ndisc.c
+index efe407fedb..46a086cdf5 100644
+--- a/src/network/networkd-ndisc.c
++++ b/src/network/networkd-ndisc.c
+@@ -6,7 +6,7 @@
+ #include <arpa/inet.h>
+ #include <netinet/icmp6.h>
+ #include <linux/if.h>
+-#include <linux/if_arp.h>
++//#include <linux/if_arp.h>
+
+ #include "sd-ndisc.h"
+
 diff --git a/src/network/networkd-route.c b/src/network/networkd-route.c
-index ee7a535075..ce6ed64133 100644
+index 934fed3b7f..fdb89313dd 100644
 --- a/src/network/networkd-route.c
 +++ b/src/network/networkd-route.c
 @@ -1,9 +1,5 @@
@@ -485,12 +513,12 @@ index e00cc1e589..e392c7e1a2 100644
  
  #include "missing_network.h"
 diff --git a/src/shared/linux/ethtool.h b/src/shared/linux/ethtool.h
-index 974d4292e7..fe9b8a9e07 100644
+index cf20b6dba5..c3a46dda11 100644
 --- a/src/shared/linux/ethtool.h
 +++ b/src/shared/linux/ethtool.h
 @@ -16,7 +16,8 @@
  
- #include <linux/kernel.h>
+ #include <linux/const.h>
  #include <linux/types.h>
 -#include <linux/if_ether.h>
 +#include <netinet/if_ether.h>
@@ -499,19 +527,20 @@ index 974d4292e7..fe9b8a9e07 100644
  #ifndef __KERNEL__
  #include <limits.h> /* for INT_MAX */
 diff --git a/src/shared/netif-util.c b/src/shared/netif-util.c
-index 603d4de109..7e3531808a 100644
+index f56c5646c1..5af28ff119 100644
 --- a/src/shared/netif-util.c
 +++ b/src/shared/netif-util.c
-@@ -1,6 +1,6 @@
+@@ -1,7 +1,7 @@
  /* SPDX-License-Identifier: LGPL-2.1-or-later */
  
+ #include <linux/if.h>
 -#include <linux/if_arp.h>
 +//#include <linux/if_arp.h>
  
  #include "arphrd-util.h"
  #include "device-util.h"
 diff --git a/src/udev/udev-builtin-net_id.c b/src/udev/udev-builtin-net_id.c
-index 65e003eb15..0b3dc04be0 100644
+index f2ea2a7cd5..fe60a0744d 100644
 --- a/src/udev/udev-builtin-net_id.c
 +++ b/src/udev/udev-builtin-net_id.c
 @@ -18,7 +18,7 @@

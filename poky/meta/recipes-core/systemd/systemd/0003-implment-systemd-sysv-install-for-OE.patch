@@ -15,10 +15,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/systemctl/systemd-sysv-install.SKELETON b/src/systemctl/systemd-sysv-install.SKELETON
-index 8c16cf99913f..9f078a121469 100755
+index a2a0059fef..7f95791d9b 100755
 --- a/src/systemctl/systemd-sysv-install.SKELETON
 +++ b/src/systemctl/systemd-sysv-install.SKELETON
-@@ -32,17 +32,17 @@ case "$1" in
+@@ -34,17 +34,17 @@ case "$1" in
      enable)
          # call the command to enable SysV init script $NAME here
          # (consider optional $ROOT)

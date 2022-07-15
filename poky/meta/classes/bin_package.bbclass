@@ -30,8 +30,9 @@ bin_package_do_install () {
         bbfatal bin_package has nothing to install. Be sure the SRC_URI unpacks into S.
     fi
     cd ${S}
+    install -d ${D}${base_prefix}
     tar --no-same-owner --exclude='./patches' --exclude='./.pc' -cpf - . \
-        | tar --no-same-owner -xpf - -C ${D}
+        | tar --no-same-owner -xpf - -C ${D}${base_prefix}
 }
 
 FILES:${PN} = "/"

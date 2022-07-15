@@ -18,4 +18,8 @@ S = "${WORKDIR}/Parse-Yapp-${PV}"
 
 inherit cpan
 
+do_install:append() {
+    sed -i "s:^#!.*:#!/usr/bin/env perl:" ${D}${bindir}/yapp
+}
+
 BBCLASSEXTEND = "native"

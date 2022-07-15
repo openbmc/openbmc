@@ -131,7 +131,7 @@ index fcab51c208..fdef1807ae 100644
  /* This reads all files listed in /etc/tmpfiles.d/?*.conf and creates
   * them in the file system. This is intended to be used to create
   * properly owned directories beneath /tmp, /var/tmp, /run, which are
-@@ -1961,7 +1967,9 @@ finish:
+@@ -1934,7 +1940,9 @@ finish:
  
  static int glob_item(Item *i, action_t action) {
          _cleanup_globfree_ glob_t g = {
@@ -140,8 +140,8 @@ index fcab51c208..fdef1807ae 100644
 +#endif
          };
          int r = 0, k;
-         char **fn;
-@@ -1981,7 +1989,9 @@ static int glob_item(Item *i, action_t action) {
+
+@@ -1953,7 +1961,9 @@ static int glob_item(Item *i, action_t action) {
  
  static int glob_item_recursively(Item *i, fdaction_t action) {
          _cleanup_globfree_ glob_t g = {
@@ -150,4 +150,3 @@ index fcab51c208..fdef1807ae 100644
 +#endif
          };
          int r = 0, k;
-         char **fn;

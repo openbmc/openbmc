@@ -56,6 +56,7 @@ do_compile_ptest() {
 	cd ${B}/tests
 	oe_runmake buildtest-TESTS oecheck
 }
+PTEST_PARALLEL_MAKE = ""
 
 do_install_ptest() {
 	if [ ${PTEST_ENABLED} = "1" ]; then

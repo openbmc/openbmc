@@ -20,7 +20,7 @@
 
 # Elect whether a given type of error is a warning or error, they may
 # have been set by other files.
-WARN_QA ?= " libdir xorg-driver-abi \
+WARN_QA ?= " libdir xorg-driver-abi buildpaths \
             textrel incompatible-license files-invalid \
             infodir build-deps src-uri-bad symlink-to-sysroot multilib \
             invalid-packageconfig host-user-contaminated uppercase-pn patch-fuzz \
@@ -444,12 +444,11 @@ def package_qa_check_buildpaths(path, name, d, elf, messages):
     Check for build paths inside target files and error if paths are not
     explicitly ignored.
     """
-    # Ignore .debug files, not interesting
-    if path.find(".debug") != -1:
-        return
+    import stat
 
-    # Ignore symlinks
-    if os.path.islink(path):
+    # Ignore symlinks/devs/fifos
+    mode = os.lstat(path).st_mode
+    if stat.S_ISLNK(mode) or stat.S_ISBLK(mode) or stat.S_ISFIFO(mode) or stat.S_ISCHR(mode) or stat.S_ISSOCK(mode):
         return
 
     tmpdir = bytes(d.getVar('TMPDIR'), encoding="utf-8")
@@ -630,6 +629,11 @@ def qa_check_staged(path,d):
         bb.note("Recipe %s skipping qa checking: pkgconfig" % d.getVar('PN'))
         skip_pkgconfig = True
 
+    skip_shebang_size = False
+    if 'shebang-size' in skip:
+        bb.note("Recipe %s skipping qa checkking: shebang-size" % d.getVar('PN'))
+        skip_shebang_size = True
+
     # find all .la and .pc files
     # read the content
     # and check for stuff that looks wrong
@@ -650,6 +654,13 @@ def qa_check_staged(path,d):
                     if pkgconfigcheck in file_content:
                         error_msg = "%s failed sanity test (tmpdir) in path %s" % (file,root)
                         oe.qa.handle_error("pkgconfig", error_msg, d)
+
+            if not skip_shebang_size:
+                errors = {}
+                package_qa_check_shebang_size(path, "", d, None, errors)
+                for e in errors:
+                    oe.qa.handle_error(e, errors[e], d)
+
 
 # Run all package-wide warnfuncs and errorfuncs
 def package_qa_package(warnfuncs, errorfuncs, package, d):
@@ -970,7 +981,7 @@ def package_qa_check_host_user(path, name, d, elf, messages):
 
     dest = d.getVar('PKGDEST')
     pn = d.getVar('PN')
-    home = os.path.join(dest, 'home')
+    home = os.path.join(dest, name, 'home')
     if path == home or path.startswith(home + os.sep):
         return
 
@@ -1137,11 +1148,14 @@ python do_package_qa_setscene () {
 }
 addtask do_package_qa_setscene
 
-python do_qa_staging() {
-    bb.note("QA checking staging")
-    qa_check_staged(d.expand('${SYSROOT_DESTDIR}${libdir}'), d)
-    oe.qa.exit_with_message_if_errors("QA staging was broken by the package built above", d)
+python do_qa_sysroot() {
+    bb.note("QA checking do_populate_sysroot")
+    sysroot_destdir = d.expand('${SYSROOT_DESTDIR}')
+    for sysroot_dir in d.expand('${SYSROOT_DIRS}').split():
+        qa_check_staged(sysroot_destdir + sysroot_dir, d)
+    oe.qa.exit_with_message_if_errors("do_populate_sysroot for this recipe installed files with QA issues", d)
 }
+do_populate_sysroot[postfuncs] += "do_qa_sysroot"
 
 python do_qa_patch() {
     import subprocess
@@ -1332,10 +1346,6 @@ python do_qa_unpack() {
 
     unpack_check_src_uri(d.getVar('PN'), d)
 }
-
-# The Staging Func, to check all staging
-#addtask qa_staging after do_populate_sysroot before do_build
-do_populate_sysroot[postfuncs] += "do_qa_staging "
 
 # Check for patch fuzz
 do_patch[postfuncs] += "do_qa_patch "

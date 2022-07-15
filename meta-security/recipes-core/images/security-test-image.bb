@@ -4,7 +4,16 @@ require security-build-image.bb
 
 IMAGE_FEATURES += "ssh-server-openssh"
 
-TEST_SUITES = "ssh ping ptest apparmor clamav samhain sssd tripwire checksec smack suricata"
+IMAGE_INSTALL:append = "\
+    ${@bb.utils.contains("DISTRO_FEATURES", "smack", "smack-test", "",d)} \
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "tpm-layer", "packagegroup-security-tpm","", d)} \
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "tpm-layer", "packagegroup-security-tpm2","", d)} \
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "parsec-layer", "packagegroup-security-parsec","", d)} \
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "integrity", "packagegroup-ima-evm-utils","", d)} \
+"
+
+TEST_SUITES = "ssh ping apparmor clamav samhain sssd checksec smack suricata aide firejail"
+TEST_SUITES:append = " parsec tpm2 swtpm ima"
 
 INSTALL_CLAMAV_CVD = "1"
 

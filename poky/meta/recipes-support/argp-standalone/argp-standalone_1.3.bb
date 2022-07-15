@@ -20,7 +20,7 @@ inherit autotools
 
 CFLAGS += "-fPIC -U__OPTIMIZE__"
 
-RDEPENDS:${PN}-dev = ""
+DEV_PKG_DEPENDENCY = ""
 RDEPENDS:${PN}-staticdev = ""
 
 do_install() {

@@ -26,6 +26,8 @@ CVE_CHECK_IGNORE += "CVE-2008-1033"
 CVE_CHECK_IGNORE += "CVE-2009-0032"
 # This is an Ubuntu only issue.
 CVE_CHECK_IGNORE += "CVE-2018-6553"
+# This is fixed in 2.4.2 but the cve-check class still reports it
+CVE_CHECK_IGNORE += "CVE-2022-26691"
 
 LEAD_SONAME = "libcupsdriver.so"
 

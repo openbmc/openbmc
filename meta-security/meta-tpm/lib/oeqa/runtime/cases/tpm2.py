@@ -8,10 +8,12 @@ from oeqa.core.decorator.data import skipIfNotFeature
 class Tpm2Test(OERuntimeTestCase):
     @classmethod
     def setUpClass(cls):
+        cls.tc.target.run('swtpm_ioctl -s --tcp :2322')
         cls.tc.target.run('mkdir /tmp/myvtpm2')
 
     @classmethod
     def tearDownClass(cls):
+        cls.tc.target.run('swtpm_ioctl -s --tcp :2322')
         cls.tc.target.run('rm -fr /tmp/myvtpm2')
 
     def check_endlines(self, results,  expected_endlines): 

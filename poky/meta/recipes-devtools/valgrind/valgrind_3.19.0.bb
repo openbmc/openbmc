@@ -141,7 +141,7 @@ SKIP_FILEDEPS:${PN}-ptest = '1'
 INSANE_SKIP:${PN}-ptest = "debug-deps"
 
 do_compile_ptest() {
-    oe_runmake ${PARALLEL_MAKE} check
+    oe_runmake check
 }
 
 

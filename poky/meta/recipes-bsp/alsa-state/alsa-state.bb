@@ -8,8 +8,11 @@ SUMMARY = "Alsa scenario files to enable alsa state restoration"
 HOMEPAGE = "http://www.alsa-project.org/"
 DESCRIPTION = "Alsa Scenario Files - an init script and state files to restore \
 sound state at system boot and save it at system shut down."
-LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+LICENSE = "MIT & GPL-2.0-or-later"
+LIC_FILES_CHKSUM = " \
+    file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420 \
+    file://alsa-state-init;beginline=3;endline=4;md5=3ff7ecbf534d7d503941abe8e268ef50 \
+"
 PV = "0.2.0"
 PR = "r5"
 

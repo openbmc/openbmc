@@ -131,7 +131,7 @@ PACKAGES += "${PN}-overlay-proxycache"
 # Append URANDOM_DEVICE='/dev/urandom' to CPPFLAGS:
 # This allows tls to obtain random bits from /dev/urandom, by default
 # it was disabled for cross-compiling.
-CPPFLAGS:append = " -D_GNU_SOURCE -DURANDOM_DEVICE=\'/dev/urandom\' -fPIC"
+CPPFLAGS:append = " -D_GNU_SOURCE -DURANDOM_DEVICE=\\"/dev/urandom\\" -fPIC"
 
 LDFLAGS:append = " -pthread"
 

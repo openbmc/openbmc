@@ -60,3 +60,9 @@ vapigen_sysroot_preprocess() {
 }
 
 SSTATE_SCAN_FILES += "vapigen-wrapper"
+
+PACKAGE_PREPROCESS_FUNCS += "vala_package_preprocess"
+
+vala_package_preprocess () {
+	sed -i -e 's:${RECIPE_SYSROOT}::g;' ${PKGD}${bindir}/vapigen-wrapper
+}

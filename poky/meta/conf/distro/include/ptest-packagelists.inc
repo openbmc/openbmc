@@ -81,6 +81,7 @@ PTESTS_SLOW = "\
     babeltrace2-ptest \
     busybox-ptest \
     coreutils-ptest \
+    curl-ptest \
     dbus-ptest \
     e2fsprogs-ptest \
     findutils-ptest \

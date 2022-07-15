@@ -28,7 +28,7 @@ Maintenance
 Send pull requests, patches, comments or questions to yocto@yoctoproject.org
 
 When sending single patches, please using something like:
-'git send-email -1 --to yocto@yoctoproject.org --subject-prefix=meta-security-compliance][PATCH'
+'git send-email -1 --to yocto@lists.yoctoproject.org  --subject-prefix=meta-security-compliance][PATCH'
 
 Layer Maintainer: Armin Kuster <akuster808@gmail.com>
 

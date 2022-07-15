@@ -200,7 +200,7 @@ Packaging changes
 -----------------
 
 -  ``intltool`` has been removed from ``packagegroup-core-sdk`` as it is
-   rarely needed to build modern software - gettext can do most of the
+   rarely needed to build modern software --- gettext can do most of the
    things it used to be needed for. ``intltool`` has also been removed
    from ``packagegroup-core-self-hosted`` as it is not needed to for
    standard builds.

@@ -100,7 +100,9 @@ packages, and they can go beyond simply controlling the installation of
 a package or packages. In most cases, the presence or absence of a
 feature translates to the appropriate option supplied to the configure
 script during the :ref:`ref-tasks-configure` task for
-the recipes that optionally support the feature.
+the recipes that optionally support the feature. Appropriate options
+must be supplied, and enabling/disabling :term:`PACKAGECONFIG` for the
+concerned packages is one way of supplying such options.
 
 Some distro features are also machine features. These select features
 make sense to be controlled both at the machine and distribution
@@ -198,17 +200,19 @@ application problems or profile applications.
 
 Here are the image features available for all images:
 
--  *allow-empty-password:* Allows Dropbear and OpenSSH to accept root
-   logins and logins from accounts having an empty password string.
+-  *allow-empty-password:* Allows Dropbear and OpenSSH to accept
+   logins from accounts having an empty password string.
+
+-  *allow-root-login:* Allows Dropbear and OpenSSH to accept root logins.
 
 -  *dbg-pkgs:* Installs debug symbol packages for all packages installed
    in a given image.
 
 -  *debug-tweaks:* Makes an image suitable for development (e.g. allows
-   root logins without passwords and enables post-installation logging).
-   See the 'allow-empty-password', 'empty-root-password', and
-   'post-install-logging' features in this list for additional
-   information.
+   root logins, logins without passwords ---including root ones, and enables
+   post-installation logging). See the ``allow-empty-password``,
+   ``allow-root-login``, ``empty-root-password``, and ``post-install-logging``
+   features in this list for additional information.
 
 -  *dev-pkgs:* Installs development packages (headers and extra library
    links) for all packages installed in a given image.
@@ -216,8 +220,19 @@ Here are the image features available for all images:
 -  *doc-pkgs:* Installs documentation packages for all packages
    installed in a given image.
 
--  *empty-root-password:* Sets the root password to an empty string,
-   which allows logins with a blank password.
+-  *empty-root-password:* This feature or ``debug-tweaks`` is required if
+   you want to allow root login with an empty password. If these features
+   are not present in :term:`IMAGE_FEATURES`, a non-empty password is
+   forced in ``/etc/passwd`` and ``/etc/shadow`` if such files exist.
+
+   .. note::
+       ``empty-root-passwd`` doesn't set an empty root password by itself.
+       You get an initial empty root password thanks to the
+       :oe_git:`base-passwd </openembedded-core/tree/meta/recipes-core/base-passwd/>`
+       and :oe_git:`shadow </openembedded-core/tree/meta/recipes-extended/shadow/>`
+       recipes, and the presence of ``empty-root-passwd`` or ``debug-tweaks``
+       just disables the mechanism which forces an non-empty password for the
+       root user.
 
 -  *overlayfs-etc:* Configures the ``/etc`` directory to be in ``overlayfs``.
    This allows to store device specific information elsewhere, especially

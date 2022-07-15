@@ -1,0 +1,29 @@
+From f5a19ad9b2aea85dab28e7c61ac39404631fad2d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 6 Jul 2022 04:54:23 -0700
+Subject: [PATCH] fontforgeexe: Use env to find fontforge
+
+This helps in avoiding to encode build paths into interpeter
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ fontforgeexe/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fontforgeexe/CMakeLists.txt b/fontforgeexe/CMakeLists.txt
+index b2d663b88..e2a8fee54 100644
+--- a/fontforgeexe/CMakeLists.txt
++++ b/fontforgeexe/CMakeLists.txt
+@@ -118,7 +118,7 @@ if(UNIX)
+     foreach(_script fontimage.pe fontlint.pe sfddiff.pe)
+       get_filename_component(_output \"\${_script}\" NAME_WE)
+       file(READ \"${CMAKE_CURRENT_SOURCE_DIR}/\${_script}\" _input)
+-      file(WRITE \"${CMAKE_CURRENT_BINARY_DIR}/\${_output}\" \"#!\${CMAKE_INSTALL_PREFIX}/bin/fontforge -lang=ff\\n\${_input}\")
++      file(WRITE \"${CMAKE_CURRENT_BINARY_DIR}/\${_output}\" \"#!/usr/bin/env fontforge -lang=ff\\n\${_input}\")
+     endforeach()
+   " COMPONENT nativescripts)
+   install(FILES "${CMAKE_CURRENT_BINARY_DIR}/fontimage" "${CMAKE_CURRENT_BINARY_DIR}/fontlint" "${CMAKE_CURRENT_BINARY_DIR}/sfddiff"
+-- 
+2.37.0
+

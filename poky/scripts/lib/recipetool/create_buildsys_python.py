@@ -209,6 +209,18 @@ class PythonRecipeHandler(RecipeHandler):
                             continue
 
                         if line.startswith('['):
+                            # PACKAGECONFIG must not contain expressions or whitespace
+                            line = line.replace(" ", "")
+                            line = line.replace(':', "")
+                            line = line.replace('.', "-dot-")
+                            line = line.replace('"', "")
+                            line = line.replace('<', "-smaller-")
+                            line = line.replace('>', "-bigger-")
+                            line = line.replace('_', "-")
+                            line = line.replace('(', "")
+                            line = line.replace(')', "")
+                            line = line.replace('!', "-not-")
+                            line = line.replace('=', "-equals-")
                             current_feature = line[1:-1]
                         elif current_feature:
                             extras_req[current_feature].append(line)
@@ -297,6 +309,7 @@ class PythonRecipeHandler(RecipeHandler):
                 lines_after.append('# The following configs & dependencies are from setuptools extras_require.')
                 lines_after.append('# These dependencies are optional, hence can be controlled via PACKAGECONFIG.')
                 lines_after.append('# The upstream names may not correspond exactly to bitbake package names.')
+                lines_after.append('# The configs are might not correct, since PACKAGECONFIG does not support expressions as may used in requires.txt - they are just replaced by text.')
                 lines_after.append('#')
                 lines_after.append('# Uncomment this line to enable all the optional features.')
                 lines_after.append('#PACKAGECONFIG ?= "{}"'.format(' '.join(k.lower() for k in extras_req)))

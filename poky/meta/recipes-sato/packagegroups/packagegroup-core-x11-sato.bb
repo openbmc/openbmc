@@ -31,7 +31,7 @@ RDEPENDS:${PN}-base = "\
     matchbox-keyboard-im \
     matchbox-config-gtk \
     xcursor-transparent-theme \
-    adwaita-icon-theme \
+    sato-icon-theme \
     settings-daemon \
     shutdown-desktop \
     ${NETWORK_MANAGER} \

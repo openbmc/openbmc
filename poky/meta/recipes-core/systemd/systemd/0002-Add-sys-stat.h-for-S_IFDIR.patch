@@ -6,7 +6,7 @@ Subject: [PATCH] Add sys/stat.h for S_IFDIR
 ../git/src/shared/mkdir-label.c:13:61: error: use of undeclared identifier 'S_IFDIR'
         r = mac_selinux_create_file_prepare_at(dirfd, path, S_IFDIR);
 
-Upstream-Status: Submitted [https://github.com/systemd/systemd/pull/23441]
+Upstream-Status: Backport [29b7114c5d9624002aa7c17748d960cd1e45362d]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
@@ -14,10 +14,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/src/shared/mkdir-label.c b/src/shared/mkdir-label.c
-index d36a6466d7..63b764cd83 100644
+index 5b1ac5d1e0..fa5802b894 100644
 --- a/src/shared/mkdir-label.c
 +++ b/src/shared/mkdir-label.c
-@@ -4,6 +4,7 @@
+@@ -6,6 +6,7 @@
  #include "selinux-util.h"
  #include "smack-util.h"
  #include "user-util.h"

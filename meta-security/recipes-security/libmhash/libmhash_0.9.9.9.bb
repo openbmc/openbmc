@@ -35,3 +35,5 @@ do_compile_ptest() {
 do_install_ptest() {
     install -m 0755 ${S}/demo/mhash ${D}${PTEST_PATH}
 }
+
+BBCLASSEXTEND = "native"

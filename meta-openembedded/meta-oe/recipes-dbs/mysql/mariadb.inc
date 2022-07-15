@@ -19,11 +19,10 @@ SRC_URI = "https://archive.mariadb.org/${BP}/source/${BP}.tar.gz \
            file://ssize_t.patch \
            file://mm_malloc.patch \
            file://sys_futex.patch \
-           file://mariadb-openssl3.patch \
           "
 SRC_URI:append:libc-musl = " file://ppc-remove-glibc-dep.patch"
 
-SRC_URI[sha256sum] = "73dd9c9d325520f20ca5e0ef16f94b7be1146bed7e4a78e735c20daebf3a4173"
+SRC_URI[sha256sum] = "887eadc55176ac1ead1fccfc89ade4b5990ef192745ad4dcd879acb41c050892"
 
 UPSTREAM_CHECK_URI = "https://github.com/MariaDB/server/releases"
 
@@ -66,7 +65,6 @@ PACKAGECONFIG:class-native = ""
 PACKAGECONFIG[pam] = ",-DWITHOUT_AUTH_PAM=TRUE,libpam"
 PACKAGECONFIG[valgrind] = "-DWITH_VALGRIND=TRUE,-DWITH_VALGRIND=FALSE,valgrind"
 PACKAGECONFIG[krb5] = ", ,krb5"
-PACKAGECONFIG[zstd] = "-DWITH_ROCKSDB_ZSTD=ON,-DWITH_ROCKSDB_ZSTD=OFF,zstd"
 PACKAGECONFIG[openssl] = "-DWITH_SSL='system',-DWITH_SSL='bundled',openssl"
 
 # MariaDB doesn't link properly with gold
@@ -175,6 +173,13 @@ do_install() {
     install -d ${D}${datadir}/doc/${PN}
     if [ -f ${D}${datadir}/doc/README ]; then
         mv ${D}${datadir}/doc/README ${D}${datadir}/doc/${PN}/
+    fi
+
+    # mini-benchmark used for Gitlab-CI to run on every commit to catch
+    # if there are severe performance regressions.
+    # remove it to avoid introducing bash dependency
+    if [ -f ${D}${datadir}/mysql/mini-benchmark ]; then
+        rm -rf ${D}${datadir}/mysql/mini-benchmark
     fi
     if ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'true', 'false', d)}; then
         pam_so=$(find ${D} -name pam_user_map.so)
