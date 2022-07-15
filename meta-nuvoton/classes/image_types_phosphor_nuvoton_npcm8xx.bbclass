@@ -2,15 +2,10 @@ UBOOT_BINARY := "u-boot.${UBOOT_SUFFIX}"
 BOOTBLOCK = "BootBlockAndHeader.bin"
 ATF_BINARY := "bl31AndHeader.bin"
 OPTEE_BINARY := "teeAndHeader.bin"
-KMT_BINARY = "KmtAndHeader.bin"
-TIPFWL0_BINARY = "TipFwAndHeader_L0.bin"
-TIPFWL1_BINARY = "TipFwAndHeader_L1.bin"
-KMT_TIPFWL0_BINARY = "Kmt_TipFwL0.bin"
-KMT_TIPFWL0L1_BINARY = "Kmt_TipFwL0L1.bin"
+KMT_TIPFW_BINARY := "Kmt_TipFwL0_Skmt_TipFwL1.bin"
 KMT_TIPFW_BB_BINARY = "Kmt_TipFw_BootBlock.bin"
 KMT_TIPFW_BB_BL31_BINARY = "Kmt_TipFw_BootBlock_BL31.bin"
 KMT_TIPFW_BB_BL31_TEE_BINARY = "Kmt_TipFw_BootBlock_BL31_Tee.bin"
-KMT_TIPFW_BB_BL31_TEE_UBOOT_BINARY = "Kmt_TipFw_BootBlock_BL31_Tee_uboot.bin"
 KMT_TIPFW_BB_UBOOT_BINARY = "u-boot.bin.merged"
 FULL_SUFFIX = "full"
 MERGED_SUFFIX = "merged"
@@ -123,8 +118,6 @@ python do_merge_bootloaders() {
         file1.close()
         file2.close()
         file3.close()
-
-    d.setVar('KMT_TIPFW_BINARY', "Kmt_TipFwL0_Skmt_TipFwL1.bin")
 
     Merge_bin_files_and_pad(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFW_BINARY',True)),
         os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('BOOTBLOCK',True)),
