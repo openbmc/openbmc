@@ -21,7 +21,7 @@ DEPENDS += "phosphor-logging"
 DEPENDS += "libnl"
 DEPENDS += "stdplus"
 
-PACKAGECONFIG ??= "uboot-env default-link-local-autoconf default-ipv6-accept-ra"
+PACKAGECONFIG ??= "uboot-env default-link-local-autoconf default-ipv6-accept-ra persist-mac"
 
 UBOOT_ENV_RDEPENDS = "${@d.getVar('PREFERRED_PROVIDER_u-boot-fw-utils', True) or 'u-boot-fw-utils'}"
 PACKAGECONFIG[uboot-env] = "-Duboot-env=true,-Duboot-env=false,,${UBOOT_ENV_RDEPENDS}"
@@ -30,6 +30,7 @@ PACKAGECONFIG[default-ipv6-accept-ra] = "-Ddefault-ipv6-accept-ra=true,-Ddefault
 PACKAGECONFIG[nic-ethtool] = "-Dnic-ethtool=true,-Dnic-ethtool=false,,"
 PACKAGECONFIG[sync-mac] = "-Dsync-mac=true,-Dsync-mac=false,nlohmann-json,"
 PACKAGECONFIG[hyp-nw-config] = "-Dhyp-nw-config=true, -Dhyp-nw-config=false,,"
+PACKAGECONFIG[persist-mac] = "-Dpersist-mac=true, -persist-mac=false,,"
 
 S = "${WORKDIR}/git"
 
