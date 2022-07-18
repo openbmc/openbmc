@@ -70,3 +70,16 @@ TMPDIR = "${TOPDIR}/tmp-mc-tiny"
 
         result = bitbake('mc:test:multiconfig-test-parse -c showvar')
         self.assertIn('MCTESTVAR=test2', result.output.splitlines())
+
+    def test_multiconfig_inlayer(self):
+        """
+        Test that a multiconfig from meta-selftest works.
+        """
+
+        config = """
+BBMULTICONFIG = "muslmc"
+"""
+        self.write_config(config)
+
+        # Build a core-image-minimal, only dry run needed to check config is present
+        bitbake('mc:muslmc:bash -n')

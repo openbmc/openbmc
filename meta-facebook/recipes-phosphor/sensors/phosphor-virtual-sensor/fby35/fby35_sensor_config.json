@@ -1,0 +1,64 @@
+[
+  {
+    "Desc": {
+      "Name": "BMC_SENSOR_FAN_IOUT",
+      "SensorType": "current"
+    },
+
+    "Threshold": {
+      "CriticalHigh": 14.52
+    },
+
+    "Params": {
+      "ConstParam": [
+        {
+          "ParamName": "P1",
+          "Value": 0.665
+        }
+      ],
+
+      "DbusParam": [
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "BMC_SENSOR_FAN_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+
+    "Expression": "P2 / P1"
+  },
+  {
+    "Desc": {
+      "Name": "BMC_SENSOR_NIC_IOUT",
+      "SensorType": "current"
+    },
+
+    "Threshold": {
+      "CriticalHigh": 6.6
+    },
+
+    "Params": {
+      "ConstParam": [
+        {
+          "ParamName": "P1",
+          "Value": 1.2
+        }
+      ],
+
+      "DbusParam": [
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "BMC_SENSOR_NIC_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+
+    "Expression": "P2 / P1"
+  }
+]

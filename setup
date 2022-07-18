@@ -21,10 +21,17 @@ if [ -z "$ZSH_NAME" ] && [ "$(basename -- "$0")" = "setup" ]; then
 fi
 
 # Check if 'column' command is present
-COLUMN=$(which column || true)
-if [ -z "$COLUMN" ]; then
+COLUMN_CMD=$(which column || true)
+if [ -z "$COLUMN_CMD" ]; then
     # If it is not, use 'cat'
-    COLUMN=$(which cat)
+    COLUMN=( "$(which cat)" )
+else
+    EXPAND_CMD=$(which expand || true)
+    if [ -n "$EXPAND_CMD" ]; then
+        COLUMN=( "sh" "-c" "$COLUMN_CMD | $EXPAND_CMD" )
+    else
+        COLUMN=( "$COLUMN_CMD" )
+    fi
 fi
 
 machine() {
@@ -89,7 +96,7 @@ machine() {
 if [ -z "$1" ]; then
 	echo Target machine must be specified. Use one of:
 	echo
-	machine | sort | $COLUMN
+	machine | sort | sed "s/qemu[^[:space:]]*//" | "${COLUMN[@]}"
 else
     bld_dir=$2
     if [ -z "$2" ]; then

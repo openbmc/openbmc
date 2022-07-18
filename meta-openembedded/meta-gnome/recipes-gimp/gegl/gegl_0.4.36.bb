@@ -17,7 +17,7 @@ GNOMEBASEBUILDCLASS = "meson"
 
 inherit features_check gnomebase vala gobject-introspection
 
-REQUIRED_DISTRO_FEATURES = "x11"
+ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
 SHPV = "${@gnome_verdir("${PV}")}"
 

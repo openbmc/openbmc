@@ -59,10 +59,12 @@ DEPENDS += "cli11"
 DEPENDS += "libgpiod"
 
 RDEPENDS:${PN}-chassis += "bash"
+RDEPENDS:${PN}-host += "bash"
 
 EXTRA_OEMESON:append = " -Dtests=disabled"
 
 FILES:${PN}-host = "${bindir}/phosphor-host-state-manager"
+FILES:${PN}-host += "${libexecdir}/host-reboot"
 DBUS_SERVICE:${PN}-host += "xyz.openbmc_project.State.Host@.service"
 DBUS_SERVICE:${PN}-host += "phosphor-reboot-host@.service"
 SYSTEMD_SERVICE:${PN}-host += "phosphor-reset-host-reboot-attempts@.service"
@@ -123,7 +125,8 @@ CHASSIS_SYNCH_TARGETS = "start-pre start on stop-pre stop off reset-on"
 # - powered-off: Services to run once chassis power is off
 # - reset: Services to check chassis power state and update chassis "on" target
 # - hard-off: Services to force an immediate power off of the chassis
-CHASSIS_ACTION_TARGETS = "poweron poweroff powered-off powerreset hard-poweroff"
+# - blackout: Target to enter when chassis experiences blackout
+CHASSIS_ACTION_TARGETS = "poweron poweroff powered-off powerreset hard-poweroff blackout"
 
 # Track all host synchronization point targets
 # - start-pre:                 Services to run before we start host boot
@@ -198,6 +201,6 @@ SYSTEMD_LINK:${PN}-obmc-targets += "${@compose_list(d, 'QUIESCE_FMT', 'HOST_ERRO
 
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager;branch=master;protocol=https"
-SRCREV = "1e91dc63570d03c2c239acaa3db0965f210bd98f"
+SRCREV = "128ea8e3f1c56af1f7aa615a6f3b94088c9ba978"
 
 S = "${WORKDIR}/git"

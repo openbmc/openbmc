@@ -114,4 +114,6 @@ INSANE_SKIP:${PN}-python = "dev-so"
 
 FILES_SOLIBSDEV:append = " ${libdir}/graphviz/lib*${SOLIBSDEV}"
 
+RRECOMMENDS:${PN} = "liberation-fonts"
+
 BBCLASSEXTEND = "native nativesdk"

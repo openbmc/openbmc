@@ -28,20 +28,10 @@ Dependencies
 This layer depends on:
 
   URI: git://git.openembedded.org/openembedded-core
-  branch: master
+  branch: [same one as checked out for this layer]
 
   URI: git://git.openembedded.org/meta-openembedded/meta-oe
-  branch: master
-
-  URI: git://git.openembedded.org/meta-openembedded/meta-perl
-  branch: master
-
-  URI: git://git.openembedded.org/meta-openembedded/meta-python
-  branch: master
-
-  URI: git://git.openembedded.org/meta-openembedded/meta-networking
-  branch: master
-
+  branch: [same one as checked out for this layer]
 
 Adding the security layer to your build
 ========================================
@@ -57,21 +47,22 @@ other layers needed. e.g.:
   BBLAYERS ?= " \
     /path/to/oe-core/meta \
     /path/to/meta-openembedded/meta-oe \
-    /path/to/meta-openembedded/meta-perl \
-    /path/to/meta-openembedded/meta-python \
-    /path/to/meta-openembedded/meta-networking \
     /path/to/layer/meta-security "
 
-Optional Rust dependancy
+Optional Dynamic layer dependancy
 ======================================
-If you want to use the latest Suricata that needs rust, you will need to clone
 
-  URI: https://github.com/meta-rust/meta-rust.git
-  branch: master
+  URI: git://git.openembedded.org/meta-openembedded/meta-oe
 
-  BBLAYERS += "/path/to/layer/meta-rust"
+  URI: git://git.openembedded.org/meta-openembedded/meta-perl
 
-This will activate the dynamic-layer mechanism and pull in the newer suricata
+  URI: git://git.openembedded.org/meta-openembedded/meta-python
+
+  BBLAYERS += "/path/to/layer/meta-openembedded/meta-oe"
+  BBLAYERS += "/path/to/layer/meta-openembedded/meta-perl"
+  BBLAYERS += "/path/to/layer/meta-openembedded/meta-python"
+
+This will activate the dynamic-layer mechanism.
 
 
 

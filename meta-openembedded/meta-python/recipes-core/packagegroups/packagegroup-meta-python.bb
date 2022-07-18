@@ -106,6 +106,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-dominate \
     python3-dynamic-dispatch \
     python3-ecdsa \
+    python3-editables \
     python3-editor \
     python3-email-validator \
     python3-engineio \
@@ -167,6 +168,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-h11 \
     python3-h2 \
     python3-h5py \
+    python3-hatchling \
     python3-haversine \
     python3-hpack \
     python3-html2text \
@@ -269,6 +271,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-parso \
     python3-passlib \
     python3-pastedeploy \
+    python3-pathspec \
     python3-pathtools3 \
     python3-pep8 \
     python3-periphery \
@@ -389,6 +392,8 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-send2trash \
     python3-sentry-sdk \
     python3-serpent \
+    python3-setuptools-declarative-requirements \
+    python3-setuptools-scm-git-archive \
     python3-sh \
     python3-sijax \
     python3-simpleeval \
@@ -436,6 +441,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-typeguard \
     python3-tzlocal \
     python3-u-msgpack-python \
+    python3-uinput \
     python3-ujson \
     python3-unidiff \
     python3-uritemplate \

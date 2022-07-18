@@ -16,7 +16,7 @@ SRC_URI = "${KERNELORG_MIRROR}/software/utils/pciutils/pciutils-${PV}.tar.xz \
 
 SRC_URI[sha256sum] = "91edbd0429a84705c9ad156d4ff38ccc724d41ea54c4c5b88e38e996f8a34f05"
 
-inherit multilib_header pkgconfig
+inherit multilib_header pkgconfig update-alternatives
 
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'hwdb', '', d)}"
 PACKAGECONFIG[hwdb] = "HWDB=yes,HWDB=no,udev"
@@ -59,3 +59,6 @@ FILES:libpci = "${libdir}/libpci.so.*"
 SUMMARY:${PN}-ids = "PCI utilities - device ID database"
 DESCRIPTION:${PN}-ids = "Package providing the PCI device ID database for pciutils."
 RDEPENDS:${PN} += "${PN}-ids"
+
+ALTERNATIVE:${PN} = "lspci"
+ALTERNATIVE_PRIORITY = "100"

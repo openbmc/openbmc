@@ -40,6 +40,9 @@ RDEPENDS:${PN}-flash = " \
 SUMMARY:${PN}-system = "System software"
 RDEPENDS:${PN}-system = " \
     vegman-fru-handler \
+    fru-device \
+    entity-manager \
+    smbios-mdr \
     ${PN}-interface \
     ${PN}-cli \
 "
@@ -53,4 +56,8 @@ RDEPENDS:${PN}-interface = " \
 SUMMARY:${PN}-cli = "CLI utils"
 RDEPENDS:${PN}-cli = " \
     ipmitool \
+    obmc-yadro-cli \
+    obmc-yadro-lssensors \
+    obmc-yadro-lsinventory \
+    obmc-yadro-netconfig \
 "

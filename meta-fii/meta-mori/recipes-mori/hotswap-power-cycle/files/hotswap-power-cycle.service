@@ -1,0 +1,11 @@
+[Unit]
+Description=Power Cycle by Hotswap Controller
+After=gbmc-psu-hardreset.target
+
+[Service]
+Type=oneshot
+ExecStart=gpioset 2 30=1
+StandardOutput=syslog
+
+[Install]
+WantedBy=gbmc-psu-hardreset.target

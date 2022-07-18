@@ -6,8 +6,7 @@ GNOMEBASEBUILDCLASS = "autotools"
 
 inherit gnomebase gsettings gobject-introspection gsettings gtk-doc vala gettext features_check
 
-# for webkitgtk
-REQUIRED_DISTRO_FEATURES = "x11"
+ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
 DEPENDS = "glib-2.0"
 

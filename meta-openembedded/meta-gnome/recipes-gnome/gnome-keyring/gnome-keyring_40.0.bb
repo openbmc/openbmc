@@ -19,7 +19,7 @@ DEPENDS = " \
 
 inherit gnomebase gsettings features_check remove-libtool gettext
 
-REQUIRED_DISTRO_FEATURES = "x11"
+ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
 SRC_URI[archive.sha256sum] = "a3d24db08ee2fdf240fbbf0971a98c8ee295aa0e1a774537f4ea938038a3b931"
 SRC_URI += " \

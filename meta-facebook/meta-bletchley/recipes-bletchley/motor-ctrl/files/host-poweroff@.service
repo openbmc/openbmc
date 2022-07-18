@@ -2,6 +2,7 @@
 Description=Power off System in Sled%i by Step Motor
 Requires=motor-init-calibration@%i.service
 After=motor-init-calibration@%i.service
+Conflicts=host-poweron@%i.service
 
 [Service]
 Type=oneshot

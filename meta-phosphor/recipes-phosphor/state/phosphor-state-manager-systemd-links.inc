@@ -19,6 +19,7 @@ DEFAULT_TARGETS = " \
     obmc-host-force-warm-reboot@{}.target.requires/phosphor-reboot-host@{}.service \
     obmc-host-warm-reboot@{}.target.requires/obmc-host-force-warm-reboot@{}.target \
     obmc-chassis-poweroff@{}.target.wants/phosphor-clear-one-time@{}.service \
+    obmc-chassis-blackout@{}.target.wants/phosphor-reset-sensor-states@{}.service \
 "
 
 # TODO: There are some targets that are chassis oriented, but there is no

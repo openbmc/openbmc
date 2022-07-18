@@ -21,6 +21,8 @@ RPROVIDES:${PN}-system += "virtual-obmc-system-mgmt"
 
 SUMMARY:${PN}-chassis = "Ampere Chassis"
 RDEPENDS:${PN}-chassis = " \
+        obmc-phosphor-buttons-signals \
+        obmc-phosphor-buttons-handler \
         obmc-op-control-power \
         ampere-hostctrl \
         phosphor-hostlogger \

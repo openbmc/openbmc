@@ -29,8 +29,6 @@ class SmackBasicTest(OERuntimeTestCase):
         status,output = self.target.run("cat /proc/self/attr/current")
         self.current_label = output.strip()
 
-class SmackAccessLabel(SmackBasicTest):
-
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_add_access_label(self):
         ''' Test if chsmack can correctly set a SMACK label '''
@@ -53,8 +51,6 @@ class SmackAccessLabel(SmackBasicTest):
                 "label not set correctly. expected and gotten: "
                 "%s %s" %(LABEL,label_retrieved))
 
-
-class SmackExecLabel(SmackBasicTest):
 
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_add_exec_label(self):
@@ -79,8 +75,6 @@ class SmackExecLabel(SmackBasicTest):
                 "%s %s" %(LABEL,label_retrieved))
 
 
-class SmackMmapLabel(SmackBasicTest):
-
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_add_mmap_label(self):
         '''Test if chsmack can correctly set a SMACK mmap label'''
@@ -104,8 +98,6 @@ class SmackMmapLabel(SmackBasicTest):
                 "%s %s" %(LABEL,label_retrieved))
 
 
-class SmackTransmutable(SmackBasicTest):
-
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_add_transmutable(self):
         '''Test if chsmack can correctly set a SMACK transmutable mode'''
@@ -128,8 +120,6 @@ class SmackTransmutable(SmackBasicTest):
                 "%s %s" %(LABEL,label_retrieved))
 
 
-class SmackChangeSelfLabelPrivilege(SmackBasicTest):
-
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_privileged_change_self_label(self):
         '''Test if privileged process (with CAP_MAC_ADMIN privilege)
@@ -144,8 +134,6 @@ class SmackChangeSelfLabelPrivilege(SmackBasicTest):
 
         self.assertIn("PRIVILEGED", output,
                     "Privilege process did not change label.Output: %s" %output)
-
-class SmackChangeSelfLabelUnprivilege(SmackBasicTest):
 
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_unprivileged_change_self_label(self):
@@ -162,8 +150,6 @@ class SmackChangeSelfLabelUnprivilege(SmackBasicTest):
             status, 0,
             "Unprivileged process should not be able to change its label")
 
-
-class SmackChangeFileLabelPrivilege(SmackBasicTest):
 
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_unprivileged_change_file_label(self):
@@ -182,8 +168,6 @@ class SmackChangeFileLabelPrivilege(SmackBasicTest):
 
         self.target.run("rm %s" % filename)
         self.assertEqual( status, 0, "Unprivileged process changed label for %s" %filename)
-
-class SmackLoadRule(SmackBasicTest):
 
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_load_smack_rule(self):
@@ -211,8 +195,6 @@ class SmackLoadRule(SmackBasicTest):
         self.target.run('echo -n "%s" > %s/load' %(clean, self.smack_path))
 
 
-class SmackOnlycap(SmackBasicTest):
-
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_smack_onlycap(self):
         '''Test if smack onlycap label can be set
@@ -223,7 +205,6 @@ class SmackOnlycap(SmackBasicTest):
         status, output = self.target.run("sh /usr/sbin/test_smack_onlycap.sh")
         self.assertEqual(status, 0, output)
 
-class SmackNetlabel(SmackBasicTest):
 
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_smack_netlabel(self):
@@ -246,7 +227,6 @@ class SmackNetlabel(SmackBasicTest):
             test_label, output,
             "Did not find expected label in output: %s" %output)
 
-class SmackCipso(SmackBasicTest):
 
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_smack_cipso(self):
@@ -287,7 +267,6 @@ class SmackCipso(SmackBasicTest):
         self.assertEqual(status, 0, "Cipso rule C was not set")
         self.assertIn("/17,33", output, "Rule C was not set correctly")
 
-class SmackDirect(SmackBasicTest):
 
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_smack_direct(self):
@@ -307,8 +286,6 @@ class SmackDirect(SmackBasicTest):
             test_direct, new_direct.strip(),
             "Smack direct label does not match.")
 
-
-class SmackAmbient(SmackBasicTest):
 
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_smack_ambient(self):
@@ -330,8 +307,6 @@ class SmackAmbient(SmackBasicTest):
             "Ambient label does not match")
 
 
-class SmackloadBinary(SmackBasicTest):
-
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_smackload(self):
         '''Test if smackload command works'''
@@ -344,8 +319,6 @@ class SmackloadBinary(SmackBasicTest):
         status, output = self.target.run( "cat %s/load | grep '%s'" %(self.smack_path, rule))
         self.assertEqual(status, 0, "Smackload rule was loaded correctly")
 
-
-class SmackcipsoBinary(SmackBasicTest):
 
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_smackcipso(self):
@@ -362,8 +335,6 @@ class SmackcipsoBinary(SmackBasicTest):
         self.assertIn( "2/2", output, "Rule was not set correctly. Got: %s" %output)
 
 
-class SmackEnforceFileAccess(SmackBasicTest):
-
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_smack_enforce_file_access(self):
         '''Test if smack file access is enforced (rwx)
@@ -374,8 +345,6 @@ class SmackEnforceFileAccess(SmackBasicTest):
         status, output = self.target.run("sh /usr/sbin/smack_test_file_access.sh")
         self.assertEqual(status, 0, output)
 
-
-class SmackEnforceMmap(SmackBasicTest):
 
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_smack_mmap_enforced(self):
@@ -449,8 +418,6 @@ class SmackEnforceMmap(SmackBasicTest):
             "Output: %s" %output)
 
 
-class SmackEnforceTransmutable(SmackBasicTest):
-
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_smack_transmute_dir(self):
         '''Test if smack transmute attribute works
@@ -473,8 +440,6 @@ class SmackEnforceTransmutable(SmackBasicTest):
             "Did not get expected label. Output: %s" % output)
 
 
-class SmackTcpSockets(SmackBasicTest):
-
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_smack_tcp_sockets(self):
         '''Test if smack is enforced on tcp sockets
@@ -485,8 +450,6 @@ class SmackTcpSockets(SmackBasicTest):
         self.assertEqual(status, 0, output)
 
 
-class SmackUdpSockets(SmackBasicTest):
-
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_smack_udp_sockets(self):
         '''Test if smack is enforced on udp sockets
@@ -496,8 +459,6 @@ class SmackUdpSockets(SmackBasicTest):
         status, output = self.target.run("sh /usr/sbin/test_smack_udp_sockets.sh")
         self.assertEqual(status, 0, output)
 
-
-class SmackFileLabels(SmackBasicTest):
 
     @OETestDepends(['smack.SmackBasicTest.test_smack_basic'])
     def test_smack_labels(self):

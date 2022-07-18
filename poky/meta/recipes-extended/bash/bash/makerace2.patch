@@ -11,7 +11,7 @@ moved or are being rewritten.
 
 See [YOCTO #14227]
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://savannah.gnu.org/patch/index.php?10210]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
 Index: bash-5.1.8/builtins/Makefile.in

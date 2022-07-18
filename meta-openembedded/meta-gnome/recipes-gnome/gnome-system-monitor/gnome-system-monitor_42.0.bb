@@ -17,7 +17,8 @@ GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase gsettings gnome-help itstool gtk-icon-cache features_check gettext
 
-REQUIRED_DISTRO_FEATURES = "x11 polkit"
+ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
+REQUIRED_DISTRO_FEATURES = "polkit"
 
 def gnome_verdir(v):
     return oe.utils.trim_version(v, 1)

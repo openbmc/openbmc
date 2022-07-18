@@ -1,0 +1,14 @@
+[Unit]
+Description=Shutdown Host Server
+After=xyz.openbmc_project.Chassis.Power.service
+
+[Service]
+ExecStart=/usr/bin/busctl set-property \
+            xyz.openbmc_project.State.Chassis \
+            /xyz/openbmc_project/state/chassis0 \
+            xyz.openbmc_project.State.Chassis \
+            RequestedPowerTransition s \
+            xyz.openbmc_project.State.Chassis.Transition.Off
+
+Type=oneshot
+SyslogIdentifier=phosphor-watchdog

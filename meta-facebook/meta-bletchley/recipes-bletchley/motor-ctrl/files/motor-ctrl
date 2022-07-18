@@ -2,41 +2,9 @@
 #
 # Control step motor rotate of sled
 
-function set_gpio()
-{
-    NET_NAME=$1
-    OUT_VAL=$2
-    mapfile -t -d " " GPIO_INFO < <(gpiofind "$NET_NAME")
-    if [ "${#GPIO_INFO[@]}" -ne 2 ]; then
-        echo "set_gpio: can not find gpio, $NET_NAME"
-        return 1
-    fi
-    echo -n "set_gpio: set $NET_NAME = $OUT_VAL"
-    if ! gpioset "${GPIO_INFO[0]}" "${GPIO_INFO[1]%$'\n'}"="$OUT_VAL"; then
-        echo " failed"
-        return 1
-    fi
-    echo " success"
-    return 0
-}
+# shellcheck source=meta-facebook/meta-bletchley/recipes-bletchley/plat-tools/files/bletchley-common-functions
+source /usr/libexec/bletchley-common-functions
 
-function get_gpio()
-{
-    NET_NAME=$1
-    RET_VAL=2
-
-    mapfile -t -d " " GPIO_INFO < <(gpiofind "$NET_NAME")
-    if [ "${#GPIO_INFO[@]}" -ne 2 ]; then
-        echo "get_gpio: can not find gpio, $NET_NAME" >&2
-        return 1
-    fi
-    if ! RET_VAL=$(gpioget "${GPIO_INFO[0]}" "${GPIO_INFO[1]%$'\n'}") ; then
-        echo "get_gpio: get ${NET_NAME} failed" >&2
-        return 1
-    fi
-    echo "${RET_VAL}"
-    return 0
-}
 #######################################
 # Setting step motor control pins to start/stop motor
 # Arguments:
@@ -79,8 +47,7 @@ else
 fi
 
 #Check if sled is present
-SLED_PRESENT=$(get_gpio "presence-sled${SLED_NUM}")
-if [ "$SLED_PRESENT" != 0 ];then
+if ! is_sled_present "${SLED_NUM}"; then
     echo "${SLED} is not present!"
     exit 1
 fi

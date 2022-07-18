@@ -37,3 +37,4 @@ do_install:append() {
 pkg_postinst:${PN} () {
     setcap cap_net_admin+ep "$D/${sbindir}/conntrack"
 }
+PACKAGE_WRITE_DEPS += "libcap-native"

@@ -1,5 +1,4 @@
 require u-boot-common-aspeed-sdk_${PV}.inc
-require conf/machine/distro/include/uboot-distrovars.inc
 
 UBOOT_MAKE_TARGET ?= "DEVICE_TREE=${UBOOT_DEVICETREE}"
 
@@ -8,8 +7,6 @@ require recipes-bsp/u-boot/u-boot.inc
 PROVIDES += "u-boot"
 DEPENDS += "bc-native dtc-native"
 
-SRC_URI:append:uboot-flash-32768 = " file://u-boot_flash_32M.cfg"
-SRC_URI:append:uboot-flash-65536 = " file://u-boot_flash_64M.cfg"
 SRC_URI:append:df-phosphor-mmc = " file://u-boot-env-ast2600.txt"
 SRC_URI += " \
             file://rsa_oem_dss_key.pem;sha256sum=64a379979200d39949d3e5b0038e3fdd5548600b2f7077a17e35422336075ad4 \

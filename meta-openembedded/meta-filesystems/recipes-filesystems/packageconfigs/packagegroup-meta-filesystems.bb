@@ -1,5 +1,6 @@
 SUMMARY = "Meta-filesystem packagegroups"
 
+PACKAGE_ARCH = "${TUNE_PKGARCH}"
 inherit packagegroup
 
 PROVIDES = "${PACKAGES}"

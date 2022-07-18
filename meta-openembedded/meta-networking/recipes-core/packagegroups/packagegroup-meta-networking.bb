@@ -218,6 +218,7 @@ RDEPENDS:packagegroup-meta-networking-support = "\
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "ntpsec", "", d)} \
     nbd-client \
     nbd-server \
+    nbd-trplay \
     nbd-trdump \
     openvpn \
     macchanger \

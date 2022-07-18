@@ -20,14 +20,15 @@ inherit autotools pkgconfig perlnative
 TSS_USER="tss"
 TSS_GROUP="tss"
 
-PACKAGECONFIG ?= "openssl"
+PACKAGECONFIG ?= "openssl gnutls"
 PACKAGECONFIG += "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux', '', d)}"
+PACKAGECONFIG += "${@bb.utils.contains('DISTRO_FEATURES', 'seccomp', 'seccomp', '', d)}"
 PACKAGECONFIG += "${@bb.utils.contains('BBFILE_COLLECTIONS', 'filesystems-layer', 'cuse', '', d)}"
 PACKAGECONFIG[openssl] = "--with-openssl, --without-openssl, openssl"
 # expect, bash, tpm2-pkcs11-tools (tpm2_ptool), tpmtool and certtool is
 # used by swtpm-create-tpmca (the last two is provided by gnutls)
 # gnutls is required by: swtpm-create-tpmca, swtpm-localca and swtpm_cert
-PACKAGECONFIG[gnutls] = "--with-gnutls, --without-gnutls, gnutls, gnutls, expect bash tpm2-pkcs11-tools"
+PACKAGECONFIG[gnutls] = "--with-gnutls, --without-gnutls, gnutls-native gnutls, gnutls-bin expect bash tpm2-pkcs11-tools"
 PACKAGECONFIG[selinux] = "--with-selinux, --without-selinux, libselinux"
 PACKAGECONFIG[cuse] = "--with-cuse, --without-cuse, fuse"
 PACKAGECONFIG[seccomp] = "--with-seccomp, --without-seccomp, libseccomp"

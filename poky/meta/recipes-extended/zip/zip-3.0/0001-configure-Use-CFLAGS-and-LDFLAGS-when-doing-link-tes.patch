@@ -8,7 +8,7 @@ linking, link fails otherwise without them, which can result in
 configure detection go wrong, ensure these flags are used along with CC
 when tests involve linking
 
-Upstream-Status: Pending
+Upstream-Status: Inactive-Upstream
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  unix/configure | 16 ++++++++--------

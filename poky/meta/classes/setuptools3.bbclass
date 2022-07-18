@@ -1,7 +1,6 @@
 inherit setuptools3-base python_pep517
 
-# bdist_wheel builds in ./dist
-#B = "${WORKDIR}/build"
+DEPENDS += "python3-setuptools-native python3-wheel-native"
 
 SETUPTOOLS_BUILD_ARGS ?= ""
 
@@ -23,6 +22,7 @@ setuptools3_do_compile() {
 setuptools3_do_compile[vardepsexclude] = "MACHINE"
 do_compile[cleandirs] += "${PEP517_WHEEL_PATH}"
 
+# This could be removed in the future but some recipes in meta-oe still use it
 setuptools3_do_install() {
         python_pep517_do_install
 }
@@ -30,4 +30,3 @@ setuptools3_do_install() {
 EXPORT_FUNCTIONS do_configure do_compile do_install
 
 export LDSHARED="${CCLD} -shared"
-DEPENDS += "python3-setuptools-native python3-wheel-native"

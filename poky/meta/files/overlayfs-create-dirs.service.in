@@ -6,8 +6,7 @@ DefaultDependencies=no
 
 [Service]
 Type=oneshot
-ExecStart=mkdir -p {DATA_MOUNT_POINT}/upper{LOWERDIR}
-ExecStart=mkdir -p {DATA_MOUNT_POINT}/workdir{LOWERDIR}
+ExecStart=/usr/sbin/overlayfs-create-dirs.sh {LOWERDIR} {DATA_MOUNT_POINT}
 RemainAfterExit=true
 StandardOutput=journal
 

@@ -1,5 +1,6 @@
 [Unit]
 Description=Turn off AC at Sled%i
+Conflicts=host-ac-on@%i.service
 
 [Service]
 Type=oneshot

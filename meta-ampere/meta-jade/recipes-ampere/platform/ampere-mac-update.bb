@@ -14,13 +14,5 @@ RDEPENDS:${PN} = "bash"
 
 FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
 
-SRC_URI += " \
-            file://ampere_update_mac.sh \
-           "
-
 SYSTEMD_SERVICE:${PN} = "ampere_update_mac.service"
 
-do_install:append() {
-    install -d ${D}/${sbindir}
-    install -m 755 ${WORKDIR}/ampere_update_mac.sh ${D}/${sbindir}
-}

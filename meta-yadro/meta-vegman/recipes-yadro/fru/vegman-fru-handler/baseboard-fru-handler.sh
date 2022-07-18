@@ -165,7 +165,7 @@ if [ "${OPENBMC_TARGET_MACHINE}" = "${hostname}" ] ; then
     hostname="${modelName,,}-${serialNumber}"
     log_msg "Changing hostname to ${hostname}"
 
-    if ! hostnamectl set-hostname "${hostname}-${SN}"; then
+    if ! hostnamectl set-hostname "${hostname}"; then
         log_err "Failed to set new hostname"
         exit 1
     fi

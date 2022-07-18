@@ -1,4 +1,4 @@
-From fa57c78c33d26084f85f1a6b4c29378631dc9395 Mon Sep 17 00:00:00 2001
+From 490f5b6cd788692d989f07180a5714c76872911e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 30 Nov 2019 11:58:58 -0800
 Subject: [PATCH] Fix build on 32bit arches with 64bit time_t
@@ -10,17 +10,18 @@ input.h [1]
 
 Upstream-Status: Submitted [https://gitlab.freedesktop.org/libevdev/evtest/merge_requests/6]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
- evtest.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ evtest.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/evtest.c b/evtest.c
-index 548c203..93063cd 100644
+index ba7a161..8fc2e5a 100644
 --- a/evtest.c
 +++ b/evtest.c
-@@ -61,6 +61,11 @@
- #include <sys/types.h>
- #include <unistd.h>
+@@ -63,6 +63,11 @@
+ #define input_event_usec time.tv_usec
+ #endif
  
 +#ifndef input_event_sec
 +#define input_event_sec time.tv_sec
@@ -30,12 +31,3 @@ index 548c203..93063cd 100644
  #define BITS_PER_LONG (sizeof(long) * 8)
  #define NBITS(x) ((((x)-1)/BITS_PER_LONG)+1)
  #define OFF(x)  ((x)%BITS_PER_LONG)
-@@ -1140,7 +1145,7 @@ static int print_events(int fd)
- 			type = ev[i].type;
- 			code = ev[i].code;
- 
--			printf("Event: time %ld.%06ld, ", ev[i].time.tv_sec, ev[i].time.tv_usec);
-+			printf("Event: time %ld.%06ld, ", ev[i].input_event_sec, ev[i].input_event_usec);
- 
- 			if (type == EV_SYN) {
- 				if (code == SYN_MT_REPORT)

@@ -1,0 +1,17 @@
+0x01:
+  entityID: 0x07
+  entityInstance: 1
+  sensorType: 0x21
+  path: /xyz/openbmc_project/led/groups/enclosure_identify_blink
+  sensorReadingType: 0x6F
+  mutability: Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: assertion
+  sensorNamePattern: nameLeaf
+  interfaces:
+    xyz.openbmc_project.Led.Group:
+      Asserted:
+        Offsets:
+          0x00:
+            type: bool
+            assert: true

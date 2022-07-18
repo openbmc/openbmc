@@ -1,7 +1,7 @@
 DEPENDS:append:bletchley = " bletchley-yaml-config"
 
-EXTRA_OECONF:bletchley = " \
-    FRU_YAML_GEN=${STAGING_DIR_HOST}${datadir}/bletchley-yaml-config/ipmi-fru-read.yaml \
+EXTRA_OEMESON:bletchley = " \
+    -Dfru-yaml-gen=${STAGING_DIR_HOST}${datadir}/bletchley-yaml-config/ipmi-fru-read.yaml \
     "
 
 # host watchdog does not support on bletchley

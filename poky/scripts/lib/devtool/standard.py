@@ -353,7 +353,7 @@ def _move_file(src, dst, dry_run_outdir=None, base_outdir=None):
             bb.utils.mkdirhier(dst_d)
         shutil.move(src, dst)
 
-def _copy_file(src, dst, dry_run_outdir=None):
+def _copy_file(src, dst, dry_run_outdir=None, base_outdir=None):
     """Copy a file. Creates all the directory components of destination path."""
     dry_run_suffix = ' (dry-run)' if dry_run_outdir else ''
     logger.debug('Copying %s to %s%s' % (src, dst, dry_run_suffix))

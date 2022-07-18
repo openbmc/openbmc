@@ -6,7 +6,9 @@ DEPENDS = "xfce4-dev-tools-native libxfce4ui intltool-native"
 
 inherit xfce gtk-doc gobject-introspection features_check
 
-REQUIRED_DISTRO_FEATURES = "x11"
+# xfce4 depends on libwnck3, gtk+3 and libepoxy need to be built with x11 PACKAGECONFIG.
+# cairo would at least needed to be built with xlib.
+ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
 SRC_URI += "file://0001-xfce-applications.menu-don-t-bloat-settings-menu-by-.patch"
 SRC_URI[sha256sum] = "84914927a2c1fda167f67af26a6640630a744a22940df508aa6c752cdbd3d21d"

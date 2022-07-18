@@ -1,5 +1,5 @@
 #
-# Writes build information to target filesystem on /etc/build
+# Writes build information to target filesystem on /etc/buildinfo
 #
 # Copyright (C) 2014 Intel Corporation
 # Author: Alejandro Enedino Hernandez Samaniego <alejandro.hernandez@intel.com>
@@ -13,7 +13,8 @@
 IMAGE_BUILDINFO_VARS ?= "DISTRO DISTRO_VERSION"
 
 # Desired location of the output file in the image.
-IMAGE_BUILDINFO_FILE ??= "${sysconfdir}/build"
+IMAGE_BUILDINFO_FILE ??= "${sysconfdir}/buildinfo"
+SDK_BUILDINFO_FILE ??= "/buildinfo"
 
 # From buildhistory.bbclass
 def image_buildinfo_outputvars(vars, d):
@@ -26,30 +27,10 @@ def image_buildinfo_outputvars(vars, d):
         ret += "%s = %s\n" % (var, value)
     return ret.rstrip('\n')
 
-# Gets git branch's status (clean or dirty)
-def get_layer_git_status(path):
-    import subprocess
-    try:
-        subprocess.check_output("""cd %s; export PSEUDO_UNLOAD=1; set -e;
-                                git diff --quiet --no-ext-diff
-                                git diff --quiet --no-ext-diff --cached""" % path,
-                                shell=True,
-                                stderr=subprocess.STDOUT)
-        return ""
-    except subprocess.CalledProcessError as ex:
-        # Silently treat errors as "modified", without checking for the
-        # (expected) return code 1 in a modified git repo. For example, we get
-        # output and a 129 return code when a layer isn't a git repo at all.
-        return "-- modified"
-
 # Returns layer revisions along with their respective status
 def get_layer_revs(d):
-    layers = (d.getVar("BBLAYERS") or "").split()
-    medadata_revs = ["%-17s = %s:%s %s" % (os.path.basename(i), \
-        base_get_metadata_git_branch(i, None).strip(), \
-        base_get_metadata_git_revision(i, None), \
-        get_layer_git_status(i)) \
-            for i in layers]
+    revisions = oe.buildcfg.get_layer_revisions(d)
+    medadata_revs = ["%-17s = %s:%s%s" % (r[1], r[2], r[3], r[4]) for r in revisions]
     return '\n'.join(medadata_revs)
 
 def buildinfo_target(d):
@@ -60,11 +41,12 @@ def buildinfo_target(d):
         vars = (d.getVar("IMAGE_BUILDINFO_VARS") or "")
         return image_buildinfo_outputvars(vars, d)
 
-# Write build information to target filesystem
-python buildinfo () {
+python buildinfo() {
     if not d.getVar('IMAGE_BUILDINFO_FILE'):
         return
-    with open(d.expand('${IMAGE_ROOTFS}${IMAGE_BUILDINFO_FILE}'), 'w') as build:
+    destfile = d.expand('${BUILDINFODEST}${IMAGE_BUILDINFO_FILE}')
+    bb.utils.mkdirhier(os.path.dirname(destfile))
+    with open(destfile, 'w') as build:
         build.writelines((
             '''-----------------------
 Build Configuration:  |
@@ -82,4 +64,18 @@ Layer Revisions:      |
        ))
 }
 
-IMAGE_PREPROCESS_COMMAND += "buildinfo;"
+# Write build information to target filesystem
+python buildinfo_image () {
+    d.setVar("BUILDINFODEST", "${IMAGE_ROOTFS}")
+    bb.build.exec_func("buildinfo", d)
+}
+
+python buildinfo_sdk () {
+    d.setVar("BUILDINFODEST", "${SDK_OUTPUT}/${SDKPATH}")
+    d.setVar("IMAGE_BUILDINFO_FILE", d.getVar("SDK_BUILDINFO_FILE"))
+    bb.build.exec_func("buildinfo", d)
+}
+
+IMAGE_PREPROCESS_COMMAND += "buildinfo_image;"
+POPULATE_SDK_PRE_TARGET_COMMAND += "buildinfo_sdk;"
+

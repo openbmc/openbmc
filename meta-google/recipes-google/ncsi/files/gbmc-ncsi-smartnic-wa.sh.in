@@ -20,7 +20,8 @@ echo 'ExecStart=' >>"$override"
 # Remove the source relay port from the relay, bringing it back to run on
 # the default port 547. Our relays don't support the source port option needed
 # to run on 3967 for our legacy NICs.
-systemctl cat gbmc-ncsi-dhcrelay | grep '^ExecStart=' | sed 's, -rp 3967,,' >>"$override"
+grep '^ExecStart=' /lib/systemd/system/gbmc-ncsi-dhcrelay.service | \
+  sed 's, -rp 3967,,' >>"$override"
 
 override=/run/systemd/system/gbmc-br-dhcp.service.d/10-direct.conf
 mkdir -p "$(dirname "$override")"
@@ -28,7 +29,8 @@ echo '[Service]' >"$override"
 echo 'ExecStart=' >>"$override"
 # Switch the gbmcbr interface for the NCSI one to avoid passing the SOLICIT
 # message through the BMC relay.
-systemctl cat gbmc-br-dhcp | grep '^ExecStart=' | sed 's, -i gbmcbr, -i @NCSI_IF@,' >>"$override"
+grep '^ExecStart=' /lib/systemd/system/gbmc-br-dhcp.service | \
+  sed 's, -i gbmcbr, -i @NCSI_IF@,' >>"$override"
 
 systemctl daemon-reload
 systemctl reset-failed gbmc-ncsi-dhcrelay

@@ -7,6 +7,7 @@ IMAGE_INSTALL = "\
     packagegroup-core-boot \
     packagegroup-security-tpm2 \
     os-release \
+    swtpm \
 "
 
 IMAGE_LINGUAS ?= " "

@@ -42,10 +42,13 @@ RDEPENDS:packagegroup-security-utils = "\
 
 SUMMARY:packagegroup-security-scanners = "Security scanners"
 RDEPENDS:packagegroup-security-scanners = "\
+    ${@bb.utils.contains_any("TUNE_FEATURES", "riscv32 riscv64", "", " arpwatch",d)} \
+    chkrootkit \
     isic \
     ${@bb.utils.contains_any("TUNE_FEATURES", "riscv32 riscv64", "", " clamav clamav-daemon clamav-freshclam",d)} \
     "
 RDEPENDS:packagegroup-security-scanners:remove:libc-musl = "clamav clamav-daemon clamav-freshclam"
+RDEPENDS:packagegroup-security-scanners:remove:libc-musl = "arpwatch"
 
 SUMMARY:packagegroup-security-audit = "Security Audit tools "
 RDEPENDS:packagegroup-security-audit = " \

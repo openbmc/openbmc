@@ -1,10 +1,9 @@
 SUMMARY = "Tool for creating device nodes"
 DESCRIPTION = "${SUMMARY}"
 LICENSE = "GPL-2.0-only"
-LIC_FILES_CHKSUM = "file://COPYING;md5=393a5ca445f6965873eca0259a17f833"
+LIC_FILES_CHKSUM = "file://makedevs.c;beginline=2;endline=2;md5=c3817b10013a30076c68a90e40a55570"
 SECTION = "base"
-SRC_URI = "file://makedevs.c \
-           file://COPYING.patch"
+SRC_URI = "file://makedevs.c"
 
 S = "${WORKDIR}"
 

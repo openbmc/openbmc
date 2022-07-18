@@ -22,7 +22,10 @@ SRC_URI += "file://0001-gcr-meson.build-fix-one-parallel-build-failure.patch \
 
 SRC_URI[archive.sha256sum] = "b9d3645a5fd953a54285cc64d4fc046736463dbd4dcc25caf5c7b59bed3027f5"
 
-PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'gtk', '', d)}"
+PACKAGECONFIG ??= " \
+	${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'gtk', '', d)} \
+	${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'gtk', '', d)} \
+"
 PACKAGECONFIG[gtk] = "-Dgtk=true,-Dgtk=false,gtk+3"
 
 FILES:${PN} += " \

@@ -1,8 +1,9 @@
 FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
 
-DEPENDS:append = " ${MACHINE}-yaml-config"
+DEPENDS:append = " mtjade-yaml-config"
 
-EXTRA_OECONF = " \
-                SENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/${MACHINE}-yaml-config/ipmi-sensors.yaml \
+EXTRA_OEMESON = " \
+                -Dsensor-yaml-gen=${STAGING_DIR_HOST}${datadir}/mtjade-yaml-config/ipmi-sensors.yaml \
+                -Dfru-yaml-gen=${STAGING_DIR_HOST}${datadir}/mtjade-yaml-config/ipmi-fru-read.yaml \
                "
 

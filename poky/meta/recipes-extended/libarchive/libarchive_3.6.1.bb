@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d499814247adaee08d88080841cb5665"
 
 DEPENDS = "e2fsprogs-native"
 
-PACKAGECONFIG ?= "zlib bz2 xz lzo zstd"
+PACKAGECONFIG ?= "zlib bz2 xz zstd"
 
 PACKAGECONFIG:append:class-target = "\
 	${@bb.utils.filter('DISTRO_FEATURES', 'acl xattr', d)} \

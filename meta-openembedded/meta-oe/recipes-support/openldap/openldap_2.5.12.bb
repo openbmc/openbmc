@@ -15,7 +15,6 @@ SECTION = "libs"
 LDAP_VER = "${@'.'.join(d.getVar('PV').split('.')[0:2])}"
 
 SRC_URI = "http://www.openldap.org/software/download/OpenLDAP/openldap-release/${BP}.tgz \
-    file://use-urandom.patch \
     file://initscript \
     file://slapd.service \
     file://remove-user-host-pwd-from-version.patch \

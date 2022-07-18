@@ -6,6 +6,7 @@ inherit allarch
 
 SRC_URI = " \
     file://mtjade-ipmi-sensors.yaml \
+    file://mtjade-ipmi-fru.yaml \
     "
 
 S = "${WORKDIR}"
@@ -13,10 +14,13 @@ S = "${WORKDIR}"
 do_install() {
     install -m 0644 -D mtjade-ipmi-sensors.yaml \
         ${D}${datadir}/${BPN}/ipmi-sensors.yaml
+    install -m 0644 -D mtjade-ipmi-fru.yaml \
+        ${D}${datadir}/${BPN}/ipmi-fru-read.yaml
 }
 
 FILES:${PN}-dev = " \
                    ${datadir}/${BPN}/ipmi-sensors.yaml \
+                   ${datadir}/${BPN}/ipmi-fru-read.yaml \
                   "
 
 ALLOW_EMPTY:${PN} = "1"

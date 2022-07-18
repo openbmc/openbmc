@@ -14,7 +14,10 @@ LIC_FILES_CHKSUM = " \
 DEPENDS = "dbus ncurses"
 
 SRCREV = "64cf5e80e6240284e6b757907b900507fe56f1b5"
-SRC_URI = "git://gitlab.freedesktop.org/pipewire/pipewire.git;branch=master;protocol=https"
+SRC_URI = " \
+	git://gitlab.freedesktop.org/pipewire/pipewire.git;branch=master;protocol=https \
+	file://0001-spa-fix-c90-header-include.patch \
+"
 
 S = "${WORKDIR}/git"
 
@@ -69,7 +72,7 @@ EXTRA_OEMESON += " \
     -Dlegacy-rtkit=false \
 "
 
-PACKAGECONFIG ??= "\
+PACKAGECONFIG:class-target ??= "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'zeroconf', 'avahi', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd systemd-system-service', '', d)} \
@@ -335,3 +338,5 @@ FILES:${PN}-v4l2 += " \
 FILES:gstreamer1.0-pipewire = " \
     ${libdir}/gstreamer-1.0/* \
 "
+
+BBCLASSEXTEND = "native nativesdk"
