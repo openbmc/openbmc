@@ -3,8 +3,6 @@
       Properties:
           HostName:
               Default: '""'
-          DefaultGateway:
-              Default: '"0.0.0.0"'
 
 /xyz/openbmc_project/network/hypervisor/eth0:
     - Interface: xyz.openbmc_project.Network.MACAddress
