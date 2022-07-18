@@ -10,15 +10,20 @@ RDEPENDS:${PN} += "i2c-tools"
 
 S = "${WORKDIR}"
 
-SRC_URI += "file://avsbus-enable.sh"
+SRC_URI:append:witherspoon = " file://avsbus-enable.sh"
 SRC_URI:append:witherspoon = " file://avsbus-disable.sh"
+SRC_URI:append:mihawk = " file://avsbus-enable.sh"
+SRC_URI:append:mihawk = " file://avsbus-disable.sh"
 
-do_install() {
+do_install:witherspoon() {
         install -d ${D}${bindir}
         install -m 0755 ${S}/avsbus-enable.sh ${D}${bindir}/avsbus-enable.sh
+        install -m 0755 ${S}/avsbus-disable.sh ${D}${bindir}/avsbus-disable.sh
 }
 
-do_install:append:witherspoon() {
+do_install:mihawk() {
+        install -d ${D}${bindir}
+        install -m 0755 ${S}/avsbus-enable.sh ${D}${bindir}/avsbus-enable.sh
         install -m 0755 ${S}/avsbus-disable.sh ${D}${bindir}/avsbus-disable.sh
 }
 
@@ -30,7 +35,12 @@ TGTFMT = "obmc-chassis-poweron@{0}.target"
 FMT_EN = "../${TMPL_EN}:${TGTFMT}.requires/${INSTFMT_EN}"
 FMT_DIS = "../${TMPL_DIS}:${TGTFMT}.requires/${INSTFMT_DIS}"
 
-SYSTEMD_SERVICE:${PN} += "${TMPL_EN}"
-SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT_EN', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_SERVICE:${PN}:append:witherspoon = " ${TMPL_EN}"
 SYSTEMD_SERVICE:${PN}:append:witherspoon = " ${TMPL_DIS}"
 SYSTEMD_LINK:${PN}:append:witherspoon = " ${@compose_list(d, 'FMT_DIS', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK:${PN}:append:witherspoon = " ${@compose_list(d, 'FMT_EN', 'OBMC_CHASSIS_INSTANCES')}"
+
+SYSTEMD_SERVICE:${PN}:append:mihawk = " ${TMPL_EN}"
+SYSTEMD_SERVICE:${PN}:append:mihawk = " ${TMPL_DIS}"
+SYSTEMD_LINK:${PN}:append:mihawk = " ${@compose_list(d, 'FMT_DIS', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK:${PN}:append:mihawk = " ${@compose_list(d, 'FMT_EN', 'OBMC_CHASSIS_INSTANCES')}"
