@@ -32,3 +32,11 @@ ALLOW_EMPTY:${PN} = "1"
 BUTTON_PACKAGES = "${PN}-signals ${PN}-handler"
 
 PACKAGE_BEFORE_PN += "${BUTTON_PACKAGES}"
+
+do_install:append() {
+  if [ -e "${WORKDIR}/gpio_defs.json" ]; then
+     install -m 0755 -d ${D}/etc/default/obmc/gpio
+     install -m 0644 -D ${WORKDIR}/gpio_defs.json \
+                   ${D}/etc/default/obmc/gpio
+  fi
+}
