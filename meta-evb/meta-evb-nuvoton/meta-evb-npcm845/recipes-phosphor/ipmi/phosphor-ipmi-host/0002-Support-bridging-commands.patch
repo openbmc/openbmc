@@ -1,18 +1,20 @@
-diff --git a/Makefile.am b/Makefile.am
-index fbeb3793..bf5eab89 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -112,6 +112,7 @@ libipmi20_la_SOURCES = \
- 	read_fru_data.cpp \
- 	sensordatahandler.cpp \
- 	user_channel/channelcommands.cpp \
-+	bridgingcommands.cpp \
- 	$(libipmi20_la_TRANSPORTOEM) \
- 	$(libipmi20_BUILT_LIST)
- 
+From 17392c831bb9aebca564f9e3ef32a0f0a7e62680 Mon Sep 17 00:00:00 2001
+From: Tim Lee <timlee660101@gmail.com>
+Date: Tue, 19 Jul 2022 10:54:08 +0800
+Subject: [PATCH 2/2] Support bridging commands
+
+Signed-off-by: Tim Lee <timlee660101@gmail.com>
+---
+ bridgingcommands.cpp | 542 +++++++++++++++++++++++++++++++++++++++++++
+ bridgingcommands.hpp | 212 +++++++++++++++++
+ meson.build          |   1 +
+ 3 files changed, 755 insertions(+)
+ create mode 100644 bridgingcommands.cpp
+ create mode 100644 bridgingcommands.hpp
+
 diff --git a/bridgingcommands.cpp b/bridgingcommands.cpp
 new file mode 100644
-index 00000000..b3ce11bb
+index 00000000..3152212d
 --- /dev/null
 +++ b/bridgingcommands.cpp
 @@ -0,0 +1,542 @@
@@ -428,7 +430,7 @@ index 00000000..b3ce11bb
 +    std::vector<uint8_t> rspData(ipmbMaxFrameLength);
 +    std::vector<uint8_t> unpackMsg;
 +
-+    auto channelNo = static_cast<const uint8_t>(channelNumber);
++    auto channelNo = static_cast<uint8_t>(channelNumber);
 +    // Get the channel number
 +    switch (channelNo)
 +    {
@@ -441,7 +443,7 @@ index 00000000..b3ce11bb
 +            }
 +
 +            returnVal = bridging.handleIpmbChannel(
-+                ctx, static_cast<const uint8_t>(tracking), unpackMsg, rspData);
++                ctx, static_cast<uint8_t>(tracking), unpackMsg, rspData);
 +            break;
 +        // fall through to default
 +        case targetChannelIcmb10:
@@ -776,3 +778,18 @@ index 00000000..545d24a4
 +  private:
 +    std::vector<IpmbResponse> responseQueue;
 +};
+diff --git a/meson.build b/meson.build
+index 3ecd4441..696919cc 100644
+--- a/meson.build
++++ b/meson.build
+@@ -221,6 +221,7 @@ libipmi20_src = [
+   'read_fru_data.cpp',
+   'sensordatahandler.cpp',
+   'user_channel/channelcommands.cpp',
++  'bridgingcommands.cpp',
+   generated_src,
+   transportoem_src,
+   conf_h,
+-- 
+2.17.1
+
