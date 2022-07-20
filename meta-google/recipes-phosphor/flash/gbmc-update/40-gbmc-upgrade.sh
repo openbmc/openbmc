@@ -18,7 +18,7 @@
 : "${GBMC_UPGRADE_SIG=/tmp/bmc.sig}"
 
 gbmc_upgrade_hook() {
-  [ -n "${bootfile_url-}" ] || return
+  [ -n "${bootfile_url-}" ] || return 0
 
   local tmpdir
   tmpdir="$(mktemp -d)" || return
