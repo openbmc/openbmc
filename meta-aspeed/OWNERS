@@ -3,7 +3,7 @@ owners:
 - joel@jms.id.au
 
 matchers:
-- exact: recipes-bsp/u-boot
+- partial_regex: recipes-bsp/u-boot
   reviewers:
    - chiawei_wang@aspeedtech.com
    - zweiss@equinix.com
