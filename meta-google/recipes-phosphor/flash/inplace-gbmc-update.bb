@@ -22,7 +22,7 @@ SRC_URI += " \
  file://inplace-gbmc-verify.sh \
  file://inplace-gbmc-version.service \
  file://inplace-gbmc-version.sh \
- file://75-inplace-gbmc-upgrade.sh \
+ file://40-inplace-gbmc-upgrade.sh \
 "
 
 SYSTEMD_SERVICE:${PN} += "inplace-gbmc-verify.service"
@@ -44,7 +44,7 @@ do_install() {
     install -m 0644 ${WORKDIR}/config-bmc.json ${D}${datadir}/phosphor-ipmi-flash
 
     install -d ${D}${datadir}/gbmc-br-dhcp
-    install -m 0644 ${WORKDIR}/75-inplace-gbmc-upgrade.sh ${D}${datadir}/gbmc-br-dhcp/
+    install -m 0644 ${WORKDIR}/40-inplace-gbmc-upgrade.sh ${D}${datadir}/gbmc-br-dhcp/
 }
 
 do_install:prepend:dev() {
