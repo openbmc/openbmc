@@ -45,10 +45,10 @@ mac_to_eui64() {
   mac_to_bytes mac_bytes "$1" || return
 
   # Using EUI-64 conversion rules, create the suffix bytes from MAC bytes
-  # Invert bit-0 of the first byte, and insert 0xfffe in the middle.
+  # Invert bit-1 of the first byte, and insert 0xfffe in the middle.
   local suffix_bytes=(
     0 0 0 0 0 0 0 0
-    $((mac_bytes[0] ^ 1))
+    $((mac_bytes[0] ^ 2))
     ${mac_bytes[@]:1:2}
     $((0xff)) $((0xfe))
     ${mac_bytes[@]:3:3}
