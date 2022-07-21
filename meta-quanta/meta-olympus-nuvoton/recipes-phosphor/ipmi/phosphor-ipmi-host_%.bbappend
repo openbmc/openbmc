@@ -13,9 +13,9 @@ DEPENDS:append:olympus-nuvoton = " \
 
 EXTRA_OEMESON:append:olympus-nuvoton = " \
     -Dboot-flag-safe-mode-support=enabled \
-    -Dsensor-yaml-gen=${@entity_enabled(d, '', '${STAGING_DIR_HOST}${datadir}/olympus-nuvoton-yaml-config/ipmi-sensors.yaml')} \
-    -Dfru-yaml-gen=${@entity_enabled(d, '', '${STAGING_DIR_HOST}${datadir}/olympus-nuvoton-yaml-config/ipmi-fru-read.yaml')} \
-    -Dinvsensor-yaml-gen=${@entity_enabled(d, '', '${STAGING_DIR_HOST}${datadir}/olympus-nuvoton-yaml-config/ipmi-inventory-sensors.yaml')} \
+    ${@entity_enabled(d, '', '-Dsensor-yaml-gen=${STAGING_DIR_HOST}${datadir}/olympus-nuvoton-yaml-config/ipmi-sensors.yaml')} \
+    ${@entity_enabled(d, '', '-Dfru-yaml-gen=${STAGING_DIR_HOST}${datadir}/olympus-nuvoton-yaml-config/ipmi-fru-read.yaml')} \
+    ${@entity_enabled(d, '', '-Dinvsensor-yaml-gen=${STAGING_DIR_HOST}${datadir}/olympus-nuvoton-yaml-config/ipmi-inventory-sensors.yaml')} \
     "
 PACKAGECONFIG:append:olympus-entity = " dynamic-sensors"
 
