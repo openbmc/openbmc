@@ -4,12 +4,12 @@ FILESEXTRAPATHS:append:evb-npcm845 := "${THISDIR}/${PN}:"
 
 DEPENDS:append:evb-npcm845 = " ${@entity_enabled(d, '', ' evb-npcm845-yaml-config')}"
 
-EXTRA_OEMESON:append:olympus-nuvoton = " \
+EXTRA_OEMESON:append:evb-npcm845 = " \
     -Di2c-whitelist-check=disabled \
-    -Dsel_logger_clears_sel=enabled \
-    -Dsensor-yaml-gen=${@entity_enabled(d, '', 'SENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/olympus-nuvoton-yaml-config/ipmi-sensors.yaml')} \
-    -Dfru-yaml-gen=${@entity_enabled(d, '', 'FRU_YAML_GEN=${STAGING_DIR_HOST}${datadir}/olympus-nuvoton-yaml-config/ipmi-fru-read.yaml')} \
-    -Dinvsensor-yaml-gen=${@entity_enabled(d, '', 'INVSENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/olympus-nuvoton-yaml-config/ipmi-inventory-sensors.yaml')} \
+    -Dsel-logger-clears-sel=enabled \
+    -Dsensor-yaml-gen=${@entity_enabled(d, '', '${STAGING_DIR_HOST}${datadir}/evb-npcm845-yaml-config/ipmi-sensors.yaml')} \
+    -Dfru-yaml-gen=${@entity_enabled(d, '', '${STAGING_DIR_HOST}${datadir}/evb-npcm845-yaml-config/ipmi-fru-read.yaml')} \
+    -Dinvsensor-yaml-gen=${@entity_enabled(d, '', '${STAGING_DIR_HOST}${datadir}/evb-npcm845-yaml-config/ipmi-inventory-sensors.yaml')} \
     "
 
 # Add send/get message support
