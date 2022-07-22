@@ -8,7 +8,7 @@ inherit cmake pkgconfig systemd
 SRC_URI = "git://github.com/openbmc/libpeci;branch=master;protocol=https"
 
 PV = "0.1+git${SRCPV}"
-SRCREV = "7b11280d8e3113aecc4b9ce6e5d818268eb2122c"
+SRCREV = "517c3e86d3232ee209b8203cfff56a7eec8c70e6"
 
 S = "${WORKDIR}/git"
 
