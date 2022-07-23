@@ -24,6 +24,6 @@ EXTRA_OEMESON = " \
         "
 
 SRC_URI += "git://github.com/openbmc/stdplus;branch=master;protocol=https"
-SRCREV = "ee53ad33323285955f23a7ef9ab8daa18c3c76b8"
+SRCREV = "462799829b2952f185ee2fcc7c75bc49a027dd8f"
 
 S = "${WORKDIR}/git"
