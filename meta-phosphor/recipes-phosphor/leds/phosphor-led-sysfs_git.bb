@@ -20,7 +20,7 @@ EXTRA_OEMESON:append = " -Dtests=disabled"
 
 SRC_URI += "git://github.com/openbmc/phosphor-led-sysfs;branch=master;protocol=https"
 SRC_URI += "file://70-leds.rules"
-SRCREV = "97db22fd8fc5abad784aa662407e05d1f11893ae"
+SRCREV = "ff3d538b81043adf0bc8a57ec28255b2595e08bb"
 S = "${WORKDIR}/git"
 
 do_install:append() {
