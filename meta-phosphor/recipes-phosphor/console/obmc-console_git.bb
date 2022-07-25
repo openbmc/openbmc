@@ -26,7 +26,7 @@ DEPENDS += "autoconf-archive-native \
 SRC_URI += "git://github.com/openbmc/obmc-console;branch=master;protocol=https"
 SRC_URI += "file://${BPN}.conf"
 
-SRCREV = "93fd8a39d8d20cdf965490f594a2d6f6d90f506c"
+SRCREV = "191006287b5fb403d81c9a55e96d03d6f7bfa80d"
 PV = "1.0+git${SRCPV}"
 
 REGISTERED_SERVICES:${PN} += "obmc_console:tcp:2200:"
