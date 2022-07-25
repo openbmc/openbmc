@@ -19,21 +19,21 @@ index 7b2a47ac7..03d3f83af 100644
 +
 +                auto PowerMetricHandler =
 +                [sensorAsyncResp](
-+                    const boost::system::error_code ec,
++                    const boost::system::error_code ec2,
 +                    const std::vector<std::pair<std::string, dbus::utility::DbusVariantType>>&
-+                        properties) {
-+                    if (ec)
++                        properties2) {
++                    if (ec2)
 +                    {
 +                        messages::internalError(sensorAsyncResp->asyncResp->res);
 +                        BMCWEB_LOG_ERROR
-+                            << "Power Metric GetAll handler: Dbus error " << ec;
++                            << "Power Metric GetAll handler: Dbus error " << ec2;
 +                        return;
 +                    }
-+                    nlohmann::json& tempArray =
++                    nlohmann::json& tempArray2 =
 +                        sensorAsyncResp->asyncResp->res.jsonValue["PowerControl"];
-+                    nlohmann::json& sensorJson = tempArray.back();
++                    nlohmann::json& sensorJson2 = tempArray2.back();
 +                    for (const std::pair<std::string, dbus::utility::DbusVariantType>& property :
-+                        properties)
++                        properties2)
 +                    {
 +                        if (!property.first.compare("IntervalInMin"))
 +                        {
@@ -43,9 +43,9 @@ index 7b2a47ac7..03d3f83af 100644
 +
 +                            if (i)
 +                            {
-+                                nlohmann::json& value =
-+                                    sensorJson["PowerMetrics"]["IntervalInMin"];
-+                                value = *i;
++                                nlohmann::json& value2 =
++                                    sensorJson2["PowerMetrics"]["IntervalInMin"];
++                                value2 = *i;
 +                            }
 +                        }
 +                        else if (!property.first.compare("MinConsumedWatts"))
@@ -55,9 +55,9 @@ index 7b2a47ac7..03d3f83af 100644
 +                                &property.second);
 +                            if (i)
 +                            {
-+                                nlohmann::json& value =
-+                                    sensorJson["PowerMetrics"]["MinConsumedWatts"];
-+                                value = *i;
++                                nlohmann::json& value2 =
++                                    sensorJson2["PowerMetrics"]["MinConsumedWatts"];
++                                value2 = *i;
 +                            }
 +                        }
 +                        else if (!property.first.compare("MaxConsumedWatts"))
@@ -67,9 +67,9 @@ index 7b2a47ac7..03d3f83af 100644
 +                                &property.second);
 +                            if (i)
 +                            {
-+                                nlohmann::json& value =
-+                                    sensorJson["PowerMetrics"]["MaxConsumedWatts"];
-+                                value = *i;
++                                nlohmann::json& value2 =
++                                    sensorJson2["PowerMetrics"]["MaxConsumedWatts"];
++                                value2 = *i;
 +                            }
 +                        }
 +                        else if (!property.first.compare("AverageConsumedWatts"))
@@ -79,9 +79,9 @@ index 7b2a47ac7..03d3f83af 100644
 +                                &property.second);
 +                            if (i)
 +                            {
-+                                nlohmann::json& value =
-+                                    sensorJson["PowerMetrics"]["AverageConsumedWatts"];
-+                                value = *i;
++                                nlohmann::json& value2 =
++                                    sensorJson2["PowerMetrics"]["AverageConsumedWatts"];
++                                value2 = *i;
 +                            }
 +                        }
 +                    }

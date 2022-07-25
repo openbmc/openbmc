@@ -99,9 +99,9 @@ index f92a7d821..eff3b047f 100644
 +                for (const std::string& sensorPath : sensorPaths)
 +                {
 +                    crow::connections::systemBus->async_method_call(
-+                        [health](const boost::system::error_code ec,
++                        [health](const boost::system::error_code ec3,
 +                                std::variant<std::vector<std::string>> &resp) {
-+                            if (ec)
++                            if (ec3)
 +                            {
 +                                return; // no sensors = no failures
 +                            }
