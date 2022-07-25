@@ -25,7 +25,7 @@ SYSTEMD_SERVICE:${PN} += " \
         "
 SRC_URI += "git://github.com/openbmc/phosphor-objmgr;branch=master;protocol=https"
 
-SRCREV = "26ed4a1ee54f77e5476cb8cfa1c1543eb66e51e7"
+SRCREV = "cc8070bad869fc871bcbd3675d6ba6b32716c7f8"
 
 S = "${WORKDIR}/git"
 
