@@ -1,6 +1,6 @@
-From 231ea2db5d774bea375e0fe85894126631eb45e9 Mon Sep 17 00:00:00 2001
-From: Brian Ma <chma0@nuvoton.com>
-Date: Tue, 22 Feb 2022 14:06:45 +0800
+From b9341319c12e68152ed9e1b555edba53e7862271 Mon Sep 17 00:00:00 2001
+From: Tim Lee <timlee660101@gmail.com>
+Date: Tue, 26 Jul 2022 16:02:13 +0800
 Subject: [PATCH] HwmonTempSensor: Add BMCOnDieThermalSensor type
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -41,70 +41,26 @@ root@evb-npcm845:~# busctl tree xyz.openbmc_project.HwmonTempSensor
         └─ ...
 
 Signed-off-by: Brian Ma <chma0@nuvoton.com>
-Change-Id: I9a7c996a17dfdab257bb83cfea5122e7857aeab8
+Signed-off-by: Tim Lee <timlee660101@gmail.com>
 ---
- src/HwmonTempMain.cpp | 137 +++++++++++++++++++++++++++---------------
- 1 file changed, 88 insertions(+), 49 deletions(-)
+ src/HwmonTempMain.cpp | 92 ++++++++++++++++++++++++++++++-------------
+ 1 file changed, 65 insertions(+), 27 deletions(-)
 
 diff --git a/src/HwmonTempMain.cpp b/src/HwmonTempMain.cpp
-index a9d47481..c6843d4e 100644
+index 988e8b9c..565ab7cb 100644
 --- a/src/HwmonTempMain.cpp
 +++ b/src/HwmonTempMain.cpp
-@@ -49,29 +49,30 @@ static constexpr double maxValueTemperature = 127;  // DegreesC
- static constexpr double minValueTemperature = -128; // DegreesC
- 
- namespace fs = std::filesystem;
--static auto sensorTypes{
--    std::to_array<const char*>({"xyz.openbmc_project.Configuration.DPS310",
--                                "xyz.openbmc_project.Configuration.EMC1412",
--                                "xyz.openbmc_project.Configuration.EMC1413",
--                                "xyz.openbmc_project.Configuration.EMC1414",
--                                "xyz.openbmc_project.Configuration.HDC1080",
--                                "xyz.openbmc_project.Configuration.JC42",
--                                "xyz.openbmc_project.Configuration.LM75A",
--                                "xyz.openbmc_project.Configuration.LM95234",
--                                "xyz.openbmc_project.Configuration.MAX31725",
--                                "xyz.openbmc_project.Configuration.MAX31730",
--                                "xyz.openbmc_project.Configuration.MAX6581",
--                                "xyz.openbmc_project.Configuration.MAX6654",
--                                "xyz.openbmc_project.Configuration.NCT7802",
--                                "xyz.openbmc_project.Configuration.NCT6779",
--                                "xyz.openbmc_project.Configuration.SBTSI",
--                                "xyz.openbmc_project.Configuration.SI7020",
--                                "xyz.openbmc_project.Configuration.TMP112",
--                                "xyz.openbmc_project.Configuration.TMP175",
--                                "xyz.openbmc_project.Configuration.TMP421",
--                                "xyz.openbmc_project.Configuration.TMP441",
--                                "xyz.openbmc_project.Configuration.TMP75",
+@@ -71,7 +71,8 @@ static auto sensorTypes{
+                                 "xyz.openbmc_project.Configuration.TMP421",
+                                 "xyz.openbmc_project.Configuration.TMP441",
+                                 "xyz.openbmc_project.Configuration.TMP75",
 -                                "xyz.openbmc_project.Configuration.W83773G"})};
-+static auto sensorTypes{std::to_array<const char*>(
-+    {"xyz.openbmc_project.Configuration.BMCOnDieThermalSensor",
-+     "xyz.openbmc_project.Configuration.DPS310",
-+     "xyz.openbmc_project.Configuration.EMC1412",
-+     "xyz.openbmc_project.Configuration.EMC1413",
-+     "xyz.openbmc_project.Configuration.EMC1414",
-+     "xyz.openbmc_project.Configuration.HDC1080",
-+     "xyz.openbmc_project.Configuration.JC42",
-+     "xyz.openbmc_project.Configuration.LM75A",
-+     "xyz.openbmc_project.Configuration.LM95234",
-+     "xyz.openbmc_project.Configuration.MAX31725",
-+     "xyz.openbmc_project.Configuration.MAX31730",
-+     "xyz.openbmc_project.Configuration.MAX6581",
-+     "xyz.openbmc_project.Configuration.MAX6654",
-+     "xyz.openbmc_project.Configuration.NCT6779",
-+     "xyz.openbmc_project.Configuration.NCT7802",
-+     "xyz.openbmc_project.Configuration.SBTSI",
-+     "xyz.openbmc_project.Configuration.SI7020",
-+     "xyz.openbmc_project.Configuration.TMP112",
-+     "xyz.openbmc_project.Configuration.TMP175",
-+     "xyz.openbmc_project.Configuration.TMP421",
-+     "xyz.openbmc_project.Configuration.TMP441",
-+     "xyz.openbmc_project.Configuration.TMP75",
-+     "xyz.openbmc_project.Configuration.W83773G"})};
++                                "xyz.openbmc_project.Configuration.W83773G",
++                                "xyz.openbmc_project.Configuration.BMCOnDieThermalSensor"})};
  
  static struct SensorParams
      getSensorParameters(const std::filesystem::path& path)
-@@ -194,16 +195,33 @@ static SensorConfigMap
+@@ -194,16 +195,32 @@ static SensorConfigMap
              const SensorBaseConfigMap& cfg = cfgmap.second;
              auto busCfg = cfg.find("Bus");
              auto addrCfg = cfg.find("Address");
@@ -114,14 +70,10 @@ index a9d47481..c6843d4e 100644
 +            if (indexCfg == cfg.end())
              {
 -                continue;
--            }
 +                if ((busCfg == cfg.end()) || (addrCfg == cfg.end()))
 +                {
 +                    continue;
 +                }
- 
--            if ((!std::get_if<uint64_t>(&busCfg->second)) ||
--                (!std::get_if<uint64_t>(&addrCfg->second)))
 +                if ((!std::get_if<uint64_t>(&busCfg->second)) ||
 +                    (!std::get_if<uint64_t>(&addrCfg->second)))
 +                {
@@ -131,7 +83,10 @@ index a9d47481..c6843d4e 100644
 +                }
 +                key = {.bus = std::get<uint64_t>(busCfg->second),
 +                       .addr = std::get<uint64_t>(addrCfg->second)};
-+            }
+             }
+-
+-            if ((std::get_if<uint64_t>(&busCfg->second) == nullptr) ||
+-                (std::get_if<uint64_t>(&addrCfg->second) == nullptr))
 +            else
              {
 -                std::cerr << sensor.first.str << " Bus or Address invalid\n";
@@ -145,7 +100,7 @@ index a9d47481..c6843d4e 100644
              }
  
              std::vector<std::string> hwmonNames;
-@@ -225,8 +243,6 @@ static SensorConfigMap
+@@ -225,8 +242,6 @@ static SensorConfigMap
                  }
              }
  
@@ -154,7 +109,7 @@ index a9d47481..c6843d4e 100644
              SensorConfig val = {sensor.first.str, sensor.second, cfgmap.first,
                                  cfg, hwmonNames};
  
-@@ -299,29 +315,52 @@ void createSensors(
+@@ -299,29 +314,52 @@ void createSensors(
                  device = directory / "device";
                  deviceName = fs::canonical(device).stem();
              }
@@ -169,7 +124,7 @@ index a9d47481..c6843d4e 100644
  
              uint64_t bus = 0;
              uint64_t addr = 0;
--            std::from_chars_result res;
+-            std::from_chars_result res{};
 -            res = std::from_chars(busStr.data(), busStr.data() + busStr.size(),
 -                                  bus);
 -            if (res.ec != std::errc{})
@@ -225,5 +180,5 @@ index a9d47481..c6843d4e 100644
  
              auto thisSensorParameters = getSensorParameters(path);
 -- 
-2.34.1
+2.17.1
 
