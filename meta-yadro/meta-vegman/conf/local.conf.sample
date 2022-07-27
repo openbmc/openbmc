@@ -254,8 +254,6 @@ PACKAGECONFIG:append:pn-qemu-system-native = " sdl"
 # this doesn't mean anything to you.
 CONF_VERSION = "2"
 
-INHERIT += "extrausers"
-
 EXTRA_USERS_PARAMS:append:pn-obmc-phosphor-image = " \
   useradd -g users -G priv-admin,web,redfish,ipmi -N admin; \
   "

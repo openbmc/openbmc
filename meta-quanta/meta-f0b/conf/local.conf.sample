@@ -15,4 +15,3 @@ BB_DISKMON_DIRS ??= "\
     HALT,${SSTATE_DIR},100M,1K \
     HALT,/tmp,10M,1K"
 CONF_VERSION = "2"
-INHERIT += "extrausers"

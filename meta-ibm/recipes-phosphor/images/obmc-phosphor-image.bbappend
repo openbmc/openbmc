@@ -39,7 +39,6 @@ IMAGE_FEATURES:remove:p10bmc = "obmc-fru-ipmi"
 #     set to / (the root directory) to allow dropbear ssh connections.
 
 # Override defaults from meta-phosphor/conf/distro/include/phosphor-defaults.inc
-inherit extrausers
 
 #IBM_EXTRA_USERS_PARAMS += " \
 #  usermod -p ${DEFAULT_OPENBMC_PASSWORD} root; \
