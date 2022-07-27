@@ -20,17 +20,17 @@ do_prepare_bootloaders() {
     cd ${DEPLOY_DIR_IMAGE}
 
     if [ "${SECURED_OS}" = "True" ]; then
-        bingo ${IGPS_DIR}/BL31_AndHeader_${IGPS_MACHINE}.xml \
+        bingo ${IGPS_DIR}/BL31_AndHeader.xml \
                 -o ${DEPLOY_DIR_IMAGE}/${ATF_BINARY}
 
-        bingo ${IGPS_DIR}/OpTeeAndHeader_${IGPS_MACHINE}.xml \
+        bingo ${IGPS_DIR}/OpTeeAndHeader.xml \
                 -o ${DEPLOY_DIR_IMAGE}/${OPTEE_BINARY}
     fi
 
-    bingo ${IGPS_DIR}/BootBlockAndHeader_${IGPS_MACHINE}.xml \
+    bingo ${IGPS_DIR}/BootBlockAndHeader_${DEVICE_GEN}_${IGPS_MACHINE}.xml \
             -o ${DEPLOY_DIR_IMAGE}/${BOOTBLOCK}
 
-    bingo ${IGPS_DIR}/UbootHeader_${IGPS_MACHINE}.xml \
+    bingo ${IGPS_DIR}/UbootHeader_${DEVICE_GEN}.xml \
             -o ${UBOOT_BINARY}.${FULL_SUFFIX}
              
     cd "$olddir"
@@ -149,8 +149,6 @@ python do_merge_bootloaders() {
 prepare_secureos = "${@ "arm-trusted-firmware:do_deploy optee-os:do_deploy" if bb.utils.to_boolean(d.getVar('SECURED_OS')) else "" }"
 
 do_prepare_bootloaders[depends] += " \
-    npcm8xx-kmt-tipfwl0-skmt-l1:do_deploy \
-    npcm8xx-bootblock:do_deploy \
     ${prepare_secureos} \
     npcm7xx-bingo-native:do_populate_sysroot \
     npcm8xx-igps-native:do_populate_sysroot \
