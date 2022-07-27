@@ -42,6 +42,7 @@ RDEPENDS:${PN} += "phosphor-state-manager-obmc-targets"
 EXTRA_OEMESON = " \
              -Dyamldir=${STAGING_DATADIR_NATIVE}/${PN} \
              -Dps-derating-factor=${POWER_SUPPLY_DERATING_FACTOR} \
+             -Dtests=disabled \
              "
 EXTRA_OEMESON:append = "${@bb.utils.contains('MACHINE_FEATURES', 'i2c-occ', ' -Di2c-occ=enabled', '', d)}"
 
