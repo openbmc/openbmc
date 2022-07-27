@@ -1,0 +1,27 @@
+From 69306767d2cedd961e8cd1329f0e46df4d2dcf2f Mon Sep 17 00:00:00 2001
+From: Tim Lee <timlee660101@gmail.com>
+Date: Wed, 27 Jul 2022 09:55:45 +0800
+Subject: [PATCH 8/8] dbus-sdr: fix build error when enable
+ sel-logger-clears-sel
+
+Signed-off-by: Tim Lee <timlee660101@gmail.com>
+---
+ dbus-sdr/storagecommands.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dbus-sdr/storagecommands.cpp b/dbus-sdr/storagecommands.cpp
+index b0849ce3..9928e6ad 100644
+--- a/dbus-sdr/storagecommands.cpp
++++ b/dbus-sdr/storagecommands.cpp
+@@ -1114,7 +1114,7 @@ ipmi::RspType<uint16_t> ipmiStorageAddSELEntry(uint16_t, uint8_t, uint32_t,
+     return ipmi::responseSuccess(responseID);
+ }
+ 
+-ipmi::RspType<uint8_t> ipmiStorageClearSEL(ipmi::Context::ptr,
++ipmi::RspType<uint8_t> ipmiStorageClearSEL(ipmi::Context::ptr ctx,
+                                            uint16_t reservationID,
+                                            const std::array<uint8_t, 3>& clr,
+                                            uint8_t eraseOperation)
+-- 
+2.17.1
+

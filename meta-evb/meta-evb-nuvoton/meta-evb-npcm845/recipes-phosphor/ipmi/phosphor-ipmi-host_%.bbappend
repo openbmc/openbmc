@@ -16,9 +16,9 @@ EXTRA_OEMESON:append:evb-npcm845 = " \
 # ipmid <-> ipmb <-> i2c
 SRC_URI:append:evb-npcm845 = " file://0002-Support-bridging-commands.patch"
 
-# Get sel events from journal logs, the build opetion should with "--with-journal-sel"
-# EXTRA_OECONF:append:evb-npcm845 = " --with-journal-sel"
-# SRC_URI:append:evb-npcm845 = " file://0004-Add-option-for-SEL-commands-for-Journal-based-SEL-en.patch"
+# Fix build error when enable sel-logger-clears-sel
+# EXTRA_OEMESON:append:evb-npcm845 = "-Dsel-logger-clears-sel=enabled"
+SRC_URI:append:evb-npcm845 = " file://0008-dbus-sdr-fix-build-error-when-enable-sel-logger-clea.patch"
 
 PACKAGECONFIG:append:evb-npcm845 = " ${@entity_enabled(d, 'dynamic-sensors', '')}"
 
