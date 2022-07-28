@@ -6,10 +6,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = " \
     git://github.com/Nuvoton-Israel/igps-npcm8xx;branch=main;protocol=https \
-	file://0001-ImageGeneration-correct-binary-files-existing-path.patch \
+    file://0001-Adjust-paths-for-use-with-Bitbake.patch \
 "
 
-# IGPS_3.6.2
+# tag IGPS_03.06.02
 SRCREV = "6e6fbeb36a9a4652300560659fe695780b4ae71b"
 
 S = "${WORKDIR}/git"
