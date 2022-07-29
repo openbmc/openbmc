@@ -23,9 +23,7 @@ PHOSPHOR_MISC_PACKAGES = " \
     ${@bb.utils.contains('PACKAGECONFIG', 'usb-ctrl', '${PN}-usb-ctrl', '', d)} \
     "
 
-PACKAGES:remove = "${PN}"
-RDEPENDS:${PN}-dev = ""
-
+PACKAGES = "${PHOSPHOR_MISC_PACKAGES}"
 PACKAGE_BEFORE_PN += "${PHOSPHOR_MISC_PACKAGES}"
 SYSTEMD_PACKAGES = "${PHOSPHOR_MISC_PACKAGES}"
 
