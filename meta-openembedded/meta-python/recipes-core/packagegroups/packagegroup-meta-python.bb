@@ -12,9 +12,9 @@ PACKAGES = ' \
 # FORTRAN:forcevariable = ",fortran"
 RDEPENDS:packagegroup-meta-python3 = "\
     ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "python3-systemd", "", d)} \
-    ${@bb.utils.contains("DISTRO_FEATURES", "x11", "python3-blivetgui", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "x11 systemd", "python3-blivetgui", "", d)} \
     gyp \
-    pamela \
+    ${@bb.utils.contains("DISTRO_FEATURES", "pam", "pamela", "", d)} \
     pyrtm \
     python3-absl \
     python3-aenum \
@@ -52,7 +52,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-bitstring \
     python3-bitstruct \
     python3-blinker \
-    python3-blivet \
+    ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "python3-blivet", "", d)} \
     python3-booleanpy \
     python3-cachecontrol \
     python3-cached-property \
@@ -84,7 +84,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-croniter \
     python3-cson \
     python3-custom-inherit \
-    python3-cvxopt \
+    ${@bb.utils.contains_any('FORTRAN', [',fortran',',f77'], 'python3-cvxopt', '', d)} \
     python3-cycler \
     python3-dateparser \
     python3-dateutil \
@@ -327,7 +327,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-pyscaffold \
     python3-pyserial \
     python3-pysonos \
-    python3-pystemd \
+    ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "python3-pystemd", "", d)} \
     python3-pytest-asyncio \
     python3-pytest-benchmark \
     python3-pytest-cache \

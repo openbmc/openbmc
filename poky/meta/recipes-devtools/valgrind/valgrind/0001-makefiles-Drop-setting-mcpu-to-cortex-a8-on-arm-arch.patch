@@ -10,7 +10,7 @@ implementation.
 Fixes
 | cc1: warning: switch -mcpu=cortex-a8 conflicts with -march=armv7ve switch
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://bugs.kde.org/show_bug.cgi?id=454346]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---

@@ -1,6 +1,6 @@
 DESCRIPTION = "MiniDLNA (aka ReadyDLNA) is server software with the aim of \
 being fully compliant with DLNA/UPnP-AV clients."
-LICENSE = "GPL-2.0|BSD-3-Clause"
+LICENSE = "GPL-2.0-only|BSD-3-Clause"
 DEPENDS = "ffmpeg flac libav jpeg sqlite3 libexif libogg libid3tag libvorbis"
 
 # because it depends on libav which has commercial flag

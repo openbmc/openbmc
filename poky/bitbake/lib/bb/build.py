@@ -835,11 +835,7 @@ def stamp_cleanmask_internal(taskname, d, file_name):
 
     return [cleanmask, cleanmask.replace(taskflagname, taskflagname + "_setscene")]
 
-def make_stamp(task, d, file_name = None):
-    """
-    Creates/updates a stamp for a given task
-    (d can be a data dict or dataCache)
-    """
+def clean_stamp(task, d, file_name = None):
     cleanmask = stamp_cleanmask_internal(task, d, file_name)
     for mask in cleanmask:
         for name in glob.glob(mask):
@@ -850,6 +846,14 @@ def make_stamp(task, d, file_name = None):
             if name.endswith('.taint'):
                 continue
             os.unlink(name)
+    return
+
+def make_stamp(task, d, file_name = None):
+    """
+    Creates/updates a stamp for a given task
+    (d can be a data dict or dataCache)
+    """
+    clean_stamp(task, d, file_name)
 
     stamp = stamp_internal(task, d, file_name)
     # Remove the file and recreate to force timestamp

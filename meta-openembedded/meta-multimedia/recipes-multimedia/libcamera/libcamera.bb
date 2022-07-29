@@ -64,10 +64,10 @@ do_recalculate_ipa_signatures_package() {
 
 FILES:${PN}-dev = "${includedir} ${libdir}/pkgconfig"
 FILES:${PN}-dev += " ${libdir}/libcamera.so"
-FILES:${PN}-dev += " ${libdir}/libcamera.so.0"
+FILES:${PN} += " ${libdir}/libcamera.so.0"
 FILES:${PN} += " ${libdir}/libcamera.so.0.0.0"
 FILES:${PN}-dev += " ${libdir}/libcamera-base.so"
-FILES:${PN}-dev += " ${libdir}/libcamera-base.so.0"
+FILES:${PN} += " ${libdir}/libcamera-base.so.0"
 FILES:${PN} += " ${libdir}/libcamera-base.so.0.0.0"
 FILES:${PN} += " ${libdir}/v4l2-compat.so"
 FILES:${PN}-gst = "${libdir}/gstreamer-1.0/libgstlibcamera.so"

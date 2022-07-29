@@ -1,0 +1,23 @@
+Avoid hardcoded build time paths in the output binaries by replacing the compile
+definitions with the output locations.
+
+Upstream-Status: Inappropriate [would need reworking somehow to be acceptable upstream]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: git/support/Makefile
+===================================================================
+--- git.orig/support/Makefile
++++ git/support/Makefile
+@@ -216,9 +216,9 @@ libsupport-inhibit-o += .o
+ endif
+ 
+ CFLAGS-support_paths.c = \
+-		-DSRCDIR_PATH=\"`cd .. ; pwd`\" \
+-		-DOBJDIR_PATH=\"`cd $(objpfx)/..; pwd`\" \
+-		-DOBJDIR_ELF_LDSO_PATH=\"`cd $(objpfx)/..; pwd`/elf/$(rtld-installed-name)\" \
++		-DSRCDIR_PATH=\"$(oe_srcdir)\" \
++		-DOBJDIR_PATH=\"$(libdir)/glibc-tests/ptest/tests/glibc-ptest\" \
++		-DOBJDIR_ELF_LDSO_PATH=\"$(slibdir)/$(rtld-installed-name)\" \
+ 		-DINSTDIR_PATH=\"$(prefix)\" \
+ 		-DLIBDIR_PATH=\"$(libdir)\" \
+ 		-DBINDIR_PATH=\"$(bindir)\" \

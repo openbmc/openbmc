@@ -6,6 +6,7 @@
 
 BASE_INIT="`readlink -f "@base_sbindir@/init"`"
 INIT_SYSTEMD="@systemd_unitdir@/systemd"
+MOUNT_BASE="@MOUNT_BASE@"
 
 if [ "x$BASE_INIT" = "x$INIT_SYSTEMD" ];then
     # systemd as init uses systemd-mount to mount block devices
@@ -26,11 +27,11 @@ fi
 
 PMOUNT="/usr/bin/pmount"
 
-for line in `grep -h -v ^# /etc/udev/mount.blacklist /etc/udev/mount.blacklist.d/*`
+for line in `grep -h -v ^# /etc/udev/mount.ignorelist /etc/udev/mount.ignorelist.d/*`
 do
 	if [ ` expr match "$DEVNAME" "$line" ` -gt 0 ];
 	then
-		logger "udev/mount.sh" "[$DEVNAME] is blacklisted, ignoring"
+		logger "udev/mount.sh" "[$DEVNAME] is marked to ignore"
 		exit 0
 	fi
 done
@@ -39,9 +40,19 @@ automount_systemd() {
     name="`basename "$DEVNAME"`"
 
     # Skip already mounted partitions
-    if [ -f /run/systemd/transient/run-media-$name.mount ]; then
-        logger "mount.sh/automount" "/run/media/$name already mounted"
+    if [ -f /run/systemd/transient/$(echo $MOUNT_BASE | cut -d '/' -f 2- | sed 's#/#-#g')-*$name.mount ]; then
+        logger "mount.sh/automount" "$MOUNT_BASE/$name already mounted"
         return
+    fi
+
+    # Get the unique name for mount point
+    get_label_name "${DEVNAME}"
+
+    # Only go for auto-mounting when the device has been cleaned up in remove
+    # or has not been identified yet
+    if [ -e "/tmp/.automount-$name" ]; then
+            logger "mount.sh/automount" "[$MOUNT_BASE/$name] is already cached"
+            return
     fi
 
     # Skip the partition which are already in /etc/fstab
@@ -53,7 +64,7 @@ automount_systemd() {
         grep "^[[:space:]]*$tmp" /etc/fstab && return
     done
 
-    [ -d "/run/media/$name" ] || mkdir -p "/run/media/$name"
+    [ -d "$MOUNT_BASE/$name" ] || mkdir -p "$MOUNT_BASE/$name"
 
     MOUNT="$MOUNT -o silent"
 
@@ -65,17 +76,19 @@ automount_systemd() {
         ;;
     swap)
         return ;;
+    lvm*|LVM*)
+        return ;;
     # TODO
     *)
         ;;
     esac
 
-    if ! $MOUNT --no-block -t auto $DEVNAME "/run/media/$name"
+    if ! $MOUNT --no-block -t auto $DEVNAME "$MOUNT_BASE/$name"
     then
-        #logger "mount.sh/automount" "$MOUNT -t auto $DEVNAME \"/run/media/$name\" failed!"
-        rm_dir "/run/media/$name"
+        #logger "mount.sh/automount" "$MOUNT -t auto $DEVNAME \"$MOUNT_BASE/$name\" failed!"
+        rm_dir "$MOUNT_BASE/$name"
     else
-        logger "mount.sh/automount" "Auto-mount of [/run/media/$name] successful"
+        logger "mount.sh/automount" "Auto-mount of [$MOUNT_BASE/$name] successful"
         touch "/tmp/.automount-$name"
     fi
 }
@@ -93,7 +106,17 @@ automount() {
 	# configured in fstab
 	grep -q "^$DEVNAME " /proc/mounts && return
 
-	! test -d "/run/media/$name" && mkdir -p "/run/media/$name"
+	# Get the unique name for mount point
+	get_label_name "${DEVNAME}"
+
+        # Only go for auto-mounting when the device has been cleaned up in remove
+        # or has not been identified yet
+        if [ -e "/tmp/.automount-$name" ]; then
+                logger "mount.sh/automount" "[$MOUNT_BASE/$name] is already cached"
+                return
+        fi
+
+	! test -d "$MOUNT_BASE/$name" && mkdir -p "$MOUNT_BASE/$name"
 	# Silent util-linux's version of mounting auto
 	if [ "x`readlink $MOUNT`" = "x/bin/mount.util-linux" ] ;
 	then
@@ -108,18 +131,23 @@ automount() {
 		;;
 	swap)
 		return ;;
+	lvm*|LVM*)
+                return ;;
 	# TODO
 	*)
 		;;
 	esac
 
-	if ! $MOUNT -t auto $DEVNAME "/run/media/$name"
+	if ! $MOUNT -t auto $DEVNAME "$MOUNT_BASE/$name"
 	then
-		#logger "mount.sh/automount" "$MOUNT -t auto $DEVNAME \"/run/media/$name\" failed!"
-		rm_dir "/run/media/$name"
+		#logger "mount.sh/automount" "$MOUNT -t auto $DEVNAME \"$MOUNT_BASE/$name\" failed!"
+		rm_dir "$MOUNT_BASE/$name"
 	else
-		logger "mount.sh/automount" "Auto-mount of [/run/media/$name] successful"
-		touch "/tmp/.automount-$name"
+		logger "mount.sh/automount" "Auto-mount of [$MOUNT_BASE/$name] successful"
+		# The actual device might not be present in the remove event so blkid cannot
+		# be used to calculate what name was generated here. Simply save the mount
+		# name in our tmp file.
+		echo "$name" > "/tmp/.automount-$name"
 	fi
 }
 	
@@ -130,6 +158,18 @@ rm_dir() {
 		! test -z "$1" && rm -r "$1"
 	else
 		logger "mount.sh/automount" "Not removing non-empty directory [$1]"
+	fi
+}
+
+get_label_name() {
+	# Get the LABEL or PARTLABEL
+	LABEL=`/sbin/blkid | grep "$1:" | grep -o 'LABEL=".*"' | cut -d '"' -f2`
+	# If the $DEVNAME has a LABEL or a PARTLABEL
+	if [ -n "$LABEL" ]; then
+	        # Set the mount location dir name to LABEL appended
+        	# with $name e.g. label-sda. That would avoid overlapping
+	        # mounts in case two devices have same LABEL
+        	name="${LABEL}-${name}"
 	fi
 }
 
@@ -150,12 +190,18 @@ if [ "$ACTION" = "add" ] && [ -n "$DEVNAME" ] && [ -n "$ID_FS_TYPE" -o "$media_t
 fi
 
 if [ "$ACTION" = "remove" ] || [ "$ACTION" = "change" ] && [ -x "$UMOUNT" ] && [ -n "$DEVNAME" ]; then
-    for mnt in `cat /proc/mounts | grep "$DEVNAME" | cut -f 2 -d " " `
-    do
-        $UMOUNT $mnt
-    done
-
-    # Remove empty directories from auto-mounter
     name="`basename "$DEVNAME"`"
-    test -e "/tmp/.automount-$name" && rm_dir "/run/media/$name"
+    tmpfile=`find /tmp | grep "\.automount-.*${name}$"`
+    if [ ! -e "/sys/$DEVPATH" -a -e "$tmpfile" ]; then
+        logger "mount.sh/remove" "cleaning up $DEVNAME, was mounted by the auto-mounter"
+        for mnt in `cat /proc/mounts | grep "$DEVNAME" | cut -f 2 -d " " `
+        do
+                $UMOUNT $mnt
+        done
+        # Remove mount directory created by the auto-mounter
+        # and clean up our tmp cache file
+        mntdir=`cat "$tmpfile"`
+        rm_dir "$MOUNT_BASE/$mntdir"
+        rm "$tmpfile"
+    fi
 fi

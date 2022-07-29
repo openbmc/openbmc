@@ -1,0 +1,28 @@
+From 8fd80ead718ffc53d7182b9df6f49974113ff8fc Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 23 May 2022 11:23:58 -0700
+Subject: [PATCH] setup.py: Disable autodection of modules
+
+This helps to fix build with latest setuptools
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ setup.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/setup.py b/setup.py
+index 932bf01..fd5a092 100755
+--- a/setup.py
++++ b/setup.py
+@@ -12,6 +12,7 @@ if __name__ == "__main__":
+         name='unattended-upgrades',
+         version='0.1',
+         scripts=['unattended-upgrade'],
++        py_modules=[],
+         data_files=[
+             ('../etc/logrotate.d/',
+                 ["data/logrotate.d/unattended-upgrades"]),
+-- 
+2.36.1
+

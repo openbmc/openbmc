@@ -117,8 +117,11 @@ RUST_BUILD_ARCH = "${@oe.rust.arch_to_rust_arch(d.getVar('BUILD_ARCH'))}"
 # its likely best to not use the triple suffix due to potential confusion.
 
 RUST_BUILD_SYS = "${@rust_base_triple(d, 'BUILD')}"
+RUST_BUILD_SYS[vardepvalue] = "${RUST_BUILD_SYS}"
 RUST_HOST_SYS = "${@rust_base_triple(d, 'HOST')}"
+RUST_HOST_SYS[vardepvalue] = "${RUST_HOST_SYS}"
 RUST_TARGET_SYS = "${@rust_base_triple(d, 'TARGET')}"
+RUST_TARGET_SYS[vardepvalue] = "${RUST_TARGET_SYS}"
 
 # wrappers to get around the fact that Rust needs a single
 # binary but Yocto's compiler and linker commands have

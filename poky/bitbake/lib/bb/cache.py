@@ -619,7 +619,7 @@ class Cache(NoCache):
                 for f in flist:
                     if not f:
                         continue
-                    f, exist = f.split(":")
+                    f, exist = f.rsplit(":", 1)
                     if (exist == "True" and not os.path.exists(f)) or (exist == "False" and os.path.exists(f)):
                         self.logger.debug2("%s's file checksum list file %s changed",
                                              fn, f)

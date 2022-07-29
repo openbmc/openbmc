@@ -4,7 +4,7 @@ https://bugs.archlinux.org/task/47713
 
 Signed-off-by: Jate Sujjavanich <jatedev@gmail.com>
 
-Upstream-Status: Inappropriate [no upstream]
+Upstream-Status: Inactive-Upstream [no upstream]
 
 diff --git a/zipnote.c b/zipnote.c
 index 5e02cb6..996f012 100644

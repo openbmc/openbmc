@@ -1,5 +1,5 @@
 
-# Zap the root password if debug-tweaks feature is not enabled
+# Zap the root password if debug-tweaks and empty-root-password features are not enabled
 ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains_any("IMAGE_FEATURES", [ 'debug-tweaks', 'empty-root-password' ], "", "zap_empty_root_password; ",d)}'
 
 # Allow dropbear/openssh to accept logins from accounts with an empty password string if debug-tweaks or allow-empty-password is enabled
@@ -8,7 +8,7 @@ ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains_any("IMAGE_FEATURES", [ 'deb
 # Allow dropbear/openssh to accept root logins if debug-tweaks or allow-root-login is enabled
 ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains_any("IMAGE_FEATURES", [ 'debug-tweaks', 'allow-root-login' ], "ssh_allow_root_login; ", "",d)}'
 
-# Enable postinst logging if debug-tweaks is enabled
+# Enable postinst logging if debug-tweaks or post-install-logging is enabled
 ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains_any("IMAGE_FEATURES", [ 'debug-tweaks', 'post-install-logging' ], "postinst_enable_logging; ", "",d)}'
 
 # Create /etc/timestamp during image construction to give a reasonably sane default time setting
@@ -140,7 +140,7 @@ read_only_rootfs_hook () {
 }
 
 #
-# This function is intended to disallow empty root password if 'debug-tweaks' is not in IMAGE_FEATURES.
+# This function disallows empty root passwords
 #
 zap_empty_root_password () {
 	if [ -e ${IMAGE_ROOTFS}/etc/shadow ]; then
@@ -202,7 +202,7 @@ python sort_passwd () {
 }
 
 #
-# Enable postinst logging if debug-tweaks is enabled
+# Enable postinst logging
 #
 postinst_enable_logging () {
 	mkdir -p ${IMAGE_ROOTFS}${sysconfdir}/default
@@ -267,9 +267,10 @@ python write_image_manifest () {
 
     if os.path.exists(manifest_name) and link_name:
         manifest_link = deploy_dir + "/" + link_name + ".manifest"
-        if os.path.lexists(manifest_link):
-            os.remove(manifest_link)
-        os.symlink(os.path.basename(manifest_name), manifest_link)
+        if manifest_link != manifest_name:
+            if os.path.lexists(manifest_link):
+                os.remove(manifest_link)
+            os.symlink(os.path.basename(manifest_name), manifest_link)
 }
 
 # Can be used to create /etc/timestamp during image construction to give a reasonably
@@ -339,9 +340,10 @@ python write_image_test_data() {
 
     if os.path.exists(testdata_name) and link_name:
         testdata_link = os.path.join(deploy_dir, "%s.testdata.json" % link_name)
-        if os.path.lexists(testdata_link):
-            os.remove(testdata_link)
-        os.symlink(os.path.basename(testdata_name), testdata_link)
+        if testdata_link != testdata_name:
+            if os.path.lexists(testdata_link):
+                os.remove(testdata_link)
+            os.symlink(os.path.basename(testdata_name), testdata_link)
 }
 write_image_test_data[vardepsexclude] += "TOPDIR"
 
@@ -398,6 +400,10 @@ python overlayfs_qa_check() {
 
     allUnitExist = True;
     for mountPoint in overlayMountPoints:
+        qaSkip = (d.getVarFlag("OVERLAYFS_QA_SKIP", mountPoint) or "").split()
+        if "mount-configured" in qaSkip:
+            continue
+
         mountPath = d.getVarFlag('OVERLAYFS_MOUNT_POINT', mountPoint)
         if mountPath in fstabDevices:
             continue
@@ -407,8 +413,10 @@ python overlayfs_qa_check() {
                for dirpath in searchpaths):
             continue
 
-        bb.warn('Mount path %s not found in fstat and unit %s not found '
-                'in systemd unit directories' % (mountPath, mountUnit))
+        bb.warn(f'Mount path {mountPath} not found in fstab and unit '
+                f'{mountUnit} not found in systemd unit directories.')
+        bb.warn(f'Skip this check by setting OVERLAYFS_QA_SKIP[{mountPoint}] = '
+                '"mount-configured"')
         allUnitExist = False;
 
     if not allUnitExist:

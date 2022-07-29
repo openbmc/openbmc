@@ -59,6 +59,7 @@ do_write_config() {
 [binaries]
 c = ${@meson_array('CC', d)}
 cpp = ${@meson_array('CXX', d)}
+cython = 'cython3'
 ar = ${@meson_array('AR', d)}
 nm = ${@meson_array('NM', d)}
 strip = ${@meson_array('STRIP', d)}
@@ -98,6 +99,7 @@ EOF
 [binaries]
 c = ${@meson_array('BUILD_CC', d)}
 cpp = ${@meson_array('BUILD_CXX', d)}
+cython = 'cython3'
 ar = ${@meson_array('BUILD_AR', d)}
 nm = ${@meson_array('BUILD_NM', d)}
 strip = ${@meson_array('BUILD_STRIP', d)}

@@ -14,7 +14,7 @@ DEPENDS = " \
     orc \
     adwaita-icon-theme \
     libhandy \
-    ${@bb.utils.contains('DISTRO_FEATURES','x11','gnome-desktop','',d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES','x11','gnome-desktop','dbus',d)} \
 "
 
 GNOMEBASEBUILDCLASS = "meson"

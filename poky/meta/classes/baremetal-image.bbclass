@@ -47,9 +47,10 @@ python do_rootfs(){
     Path(manifest_name).touch()
     if os.path.exists(manifest_name) and link_name:
         manifest_link = deploy_dir + "/" + link_name + ".manifest"
-        if os.path.lexists(manifest_link):
-            os.remove(manifest_link)
-        os.symlink(os.path.basename(manifest_name), manifest_link)
+        if manifest_link != manifest_name:
+            if os.path.lexists(manifest_link):
+                os.remove(manifest_link)
+            os.symlink(os.path.basename(manifest_name), manifest_link)
     # A lot of postprocess commands assume the existence of rootfs/etc
     sysconfdir = d.getVar("IMAGE_ROOTFS") + d.getVar('sysconfdir')
     bb.utils.mkdirhier(sysconfdir)

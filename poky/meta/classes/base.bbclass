@@ -115,6 +115,10 @@ def setup_hosttools_dir(dest, toolsvar, d, fatal=True):
     tools = d.getVar(toolsvar).split()
     origbbenv = d.getVar("BB_ORIGENV", False)
     path = origbbenv.getVar("PATH")
+    # Need to ignore our own scripts directories to avoid circular links
+    for p in path.split(":"):
+        if p.endswith("/scripts"):
+            path = path.replace(p, "/ignoreme")
     bb.utils.mkdirhier(dest)
     notfound = []
     for tool in tools:
@@ -592,9 +596,9 @@ python () {
 
             for lic_exception in exceptions:
                 if ":" in lic_exception:
-                    lic_exception.split(":")[0]
+                    lic_exception = lic_exception.split(":")[1]
                 if lic_exception in oe.license.obsolete_license_list():
-                    bb.fatal("Invalid license %s used in INCOMPATIBLE_LICENSE_EXCEPTIONS" % lic_exception)
+                    bb.fatal("Obsolete license %s used in INCOMPATIBLE_LICENSE_EXCEPTIONS" % lic_exception)
 
             pkgs = d.getVar('PACKAGES').split()
             skipped_pkgs = {}

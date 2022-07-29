@@ -23,3 +23,5 @@ PACKAGECONFIG[inet] = "--enable-inet,--disable-inet,"
 PACKAGECONFIG[inet6] = "--enable-inet6,--disable-inet6,"
 
 EXTRA_OECONF += "--disable-debug"
+
+CVE_VERSION = "0.9.3.0"

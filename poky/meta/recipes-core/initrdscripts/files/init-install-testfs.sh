@@ -164,7 +164,7 @@ if [ -d /tgt_root/etc/ ] ; then
     echo "$bootfs              /boot            ext3       defaults              1  2" >> /tgt_root/etc/fstab
     # We dont want udev to mount our root device while we're booting...
     if [ -d /tgt_root/etc/udev/ ] ; then
-	echo "/dev/${device}" >> /tgt_root/etc/udev/mount.blacklist
+	echo "/dev/${device}" >> /tgt_root/etc/udev/mount.ignorelist
     fi
 fi
 umount /tgt_root

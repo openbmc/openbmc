@@ -1,4 +1,4 @@
-From 6f0dd2ba75b68036d7b4ebfe47ac5eaf44d26f06 Mon Sep 17 00:00:00 2001
+From 754a16eeb255c06dbdd4655632276573f0f075ec Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 12 Apr 2021 23:44:53 -0700
 Subject: [PATCH] missing_syscall.h: Define MIPS ABI defines for musl
@@ -12,9 +12,12 @@ Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
- src/basic/missing_syscall.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ src/basic/missing_syscall.h  | 6 ++++++
+ src/shared/base-filesystem.c | 1 +
+ 2 files changed, 7 insertions(+)
 
+diff --git a/src/basic/missing_syscall.h b/src/basic/missing_syscall.h
+index 793d111c55..9665848b88 100644
 --- a/src/basic/missing_syscall.h
 +++ b/src/basic/missing_syscall.h
 @@ -20,6 +20,12 @@
@@ -30,6 +33,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #include "macro.h"
  #include "missing_keyctl.h"
  #include "missing_stat.h"
+diff --git a/src/shared/base-filesystem.c b/src/shared/base-filesystem.c
+index d396bc99fe..7e9c0c3412 100644
 --- a/src/shared/base-filesystem.c
 +++ b/src/shared/base-filesystem.c
 @@ -19,6 +19,7 @@

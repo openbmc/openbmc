@@ -13,7 +13,6 @@ BitBake 'Fetch' implementation for crates.io
 import hashlib
 import json
 import os
-import shutil
 import subprocess
 import bb
 from   bb.fetch2 import logger, subprocess_setup, UnpackError

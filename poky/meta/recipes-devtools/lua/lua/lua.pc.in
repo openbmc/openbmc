@@ -1,6 +1,5 @@
-prefix=/usr
-libdir=${prefix}/lib
-includedir=${prefix}/include
+libdir=@LIBDIR@
+includedir=@INCLUDEDIR@
 
 Name: Lua
 Description: Lua language engine

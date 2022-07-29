@@ -28,6 +28,10 @@ SRC_URI = "https://github.com/SSSD/sssd/releases/download/${PV}/sssd-${PV}.tar.g
 
 SRC_URI[sha256sum] = "5e21b3c7b4a2f1063d0fbdd3216d29886b6eaba153b44fb5961698367f399a0f"
 
+CVE_CHECK_IGNORE += "\
+    CVE-2018-16838 \
+"
+
 inherit autotools pkgconfig gettext python3-dir features_check systemd
 
 REQUIRED_DISTRO_FEATURES = "pam"

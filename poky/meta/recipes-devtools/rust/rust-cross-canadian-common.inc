@@ -25,7 +25,6 @@ DEBUG_PREFIX_MAP = "-fdebug-prefix-map=${WORKDIR}=/usr/src/debug/${PN}/${EXTENDP
                     -fdebug-prefix-map=${STAGING_DIR_NATIVE}= \
                     "
 
-LLVM_TARGET[x86_64] = "${RUST_HOST_SYS}"
 python do_rust_gen_targets () {
     wd = d.getVar('WORKDIR') + '/targets/'
     rust_gen_target(d, 'TARGET', wd, d.getVar('TARGET_LLVM_FEATURES') or "", d.getVar('TARGET_LLVM_CPU'), d.getVar('TARGET_ARCH'))

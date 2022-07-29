@@ -15,8 +15,8 @@ PACKAGECONFIG ??= "PKCS11 MBED-CRYPTO"
 have_TPM = "${@bb.utils.contains('DISTRO_FEATURES', 'tpm2', 'TPM', '', d)}"
 PACKAGECONFIG:append = " ${@bb.utils.contains('BBFILE_COLLECTIONS', 'tpm-layer', '${have_TPM}', '', d)}"
 
-PACKAGECONFIG[ALL] = "all-providers cryptoki/generate-bindings tss-esapi/generate-bindings,,tpm2-tss libts,libts"
-PACKAGECONFIG[TPM] = "tpm-provider tss-esapi/generate-bindings,,tpm2-tss"
+PACKAGECONFIG[ALL] = "all-providers cryptoki/generate-bindings tss-esapi/generate-bindings,,tpm2-tss libts,tpm2-tss libtss2-tcti-device libts"
+PACKAGECONFIG[TPM] = "tpm-provider tss-esapi/generate-bindings,,tpm2-tss,tpm2-tss libtss2-tcti-device"
 PACKAGECONFIG[PKCS11] = "pkcs11-provider cryptoki/generate-bindings,"
 PACKAGECONFIG[MBED-CRYPTO] = "mbed-crypto-provider,"
 PACKAGECONFIG[CRYPTOAUTHLIB] = "cryptoauthlib-provider,"
@@ -24,6 +24,9 @@ PACKAGECONFIG[TS] = "trusted-service-provider,,libts,libts"
 
 PARSEC_FEATURES = "${@d.getVar('PACKAGECONFIG_CONFARGS',True).strip().replace(' ', ',')}"
 CARGO_BUILD_FLAGS += " --features ${PARSEC_FEATURES}"
+
+export BINDGEN_EXTRA_CLANG_ARGS
+BINDGEN_EXTRA_CLANG_ARGS = "--sysroot=${WORKDIR}/recipe-sysroot -I${WORKDIR}/recipe-sysroot/usr/include"
 
 inherit systemd
 SYSTEMD_SERVICE:${PN} = "parsec.service"
@@ -35,7 +38,7 @@ INITSCRIPT_NAME = "parsec"
 # The file should also be included into SRC_URI then
 PARSEC_CONFIG ?= "${S}/config.toml"
 
-do_install:append () {
+do_install () {
     # Binaries
     install -d -m 700 -o parsec -g parsec "${D}${libexecdir}/parsec"
     install -m 700 -o parsec -g parsec "${WORKDIR}/build/target/${CARGO_TARGET_SUBDIR}/parsec" ${D}${libexecdir}/parsec/parsec
@@ -43,9 +46,6 @@ do_install:append () {
     # Config file
     install -d -m 700 -o parsec -g parsec "${D}${sysconfdir}/parsec"
     install -m 400 -o parsec -g parsec "${PARSEC_CONFIG}" ${D}${sysconfdir}/parsec/config.toml
-
-    # Data dir
-    install -d -m 700 -o parsec -g parsec "${D}${localstatedir}/lib/parsec"
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -d ${D}${systemd_unitdir}/system
@@ -58,6 +58,8 @@ do_install:append () {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
         install -d ${D}${sysconfdir}/init.d
         install -m 755 ${WORKDIR}/parsec_init ${D}${sysconfdir}/init.d/parsec
+        # Data dir
+        install -d -m 700 -o parsec -g parsec "${D}${localstatedir}/lib/parsec"
     fi
 }
 
@@ -65,12 +67,12 @@ inherit useradd
 USERADD_PACKAGES = "${PN}"
 USERADD_PARAM:${PN} = "-r -g parsec -s /bin/false -d ${localstatedir}/lib/parsec parsec"
 GROUPADD_PARAM:${PN} = "-r parsec"
+GROUPMEMS_PARAM:${PN} = "${@bb.utils.contains('PACKAGECONFIG_CONFARGS', 'tpm-provider', '-a parsec -g tss', '', d)}"
 
 FILES:${PN} += " \
     ${sysconfdir}/parsec/config.toml \
     ${libexecdir}/parsec/parsec \
     ${systemd_unitdir}/system/parsec.service \
-    ${localstatedir}/lib/parsec \
     ${libdir}/tmpfiles.d/parsec-tmpfiles.conf \
     ${sysconfdir}/init.d/parsec \
 "

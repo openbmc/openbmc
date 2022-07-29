@@ -1,0 +1,25 @@
+From e421613e8f825508afa9a0b54d33085557c37441 Mon Sep 17 00:00:00 2001
+From: Behdad Esfahbod <behdad@behdad.org>
+Date: Wed, 1 Jun 2022 09:07:57 -0600
+Subject: [PATCH] [sbix] Fix conditional
+
+Signed-off: Pavel Zhukov <pavel.zhukov@huawei.com>
+Upstream-Status: Backport [e421613e8f825508afa9a0b54d33085557c37441]
+
+---
+ src/hb-ot-color-sbix-table.hh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/hb-ot-color-sbix-table.hh b/src/hb-ot-color-sbix-table.hh
+index 6efae43cda..d0e2235fb2 100644
+--- a/src/hb-ot-color-sbix-table.hh
++++ b/src/hb-ot-color-sbix-table.hh
+@@ -298,7 +298,7 @@ struct sbix
+ 
+       const PNGHeader &png = *blob->as<PNGHeader>();
+ 
+-      if (png.IHDR.height >= 65536 | png.IHDR.width >= 65536)
++      if (png.IHDR.height >= 65536 || png.IHDR.width >= 65536)
+       {
+ 	hb_blob_destroy (blob);
+ 	return false;

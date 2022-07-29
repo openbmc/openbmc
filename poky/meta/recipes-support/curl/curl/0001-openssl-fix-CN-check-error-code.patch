@@ -1,0 +1,38 @@
+From 0677924c6ec7e0d68964553fb760f6d407242c54 Mon Sep 17 00:00:00 2001
+From: Daniel Stenberg <daniel@haxx.se>
+Date: Tue, 8 Mar 2022 13:38:13 +0100
+Subject: [PATCH] openssl: fix CN check error code
+
+Due to a missing 'else' this returns error too easily.
+
+Regressed in: d15692ebb
+
+Reported-by: Kristoffer Gleditsch
+Fixes #8559
+Closes #8560
+
+Upstream-Status: Backport [https://github.com/curl/curl/commit/911714d617c106ed5d553bf003e34ec94ab6a136]
+
+Signed-off-by: Jose Quaresma <jose.quaresma@foundries.io>
+
+---
+ lib/vtls/openssl.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/lib/vtls/openssl.c b/lib/vtls/openssl.c
+index 616a510..1bafe96 100644
+--- a/lib/vtls/openssl.c
++++ b/lib/vtls/openssl.c
+@@ -1808,7 +1808,8 @@ CURLcode Curl_ossl_verifyhost(struct Curl_easy *data, struct connectdata *conn,
+               memcpy(peer_CN, ASN1_STRING_get0_data(tmp), peerlen);
+               peer_CN[peerlen] = '\0';
+             }
+-            result = CURLE_OUT_OF_MEMORY;
++            else
++              result = CURLE_OUT_OF_MEMORY;
+           }
+         }
+         else /* not a UTF8 name */
+-- 
+2.34.1
+

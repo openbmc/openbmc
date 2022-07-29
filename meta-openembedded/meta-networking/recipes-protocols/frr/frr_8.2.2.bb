@@ -26,7 +26,7 @@ COMPATIBLE_HOST:armv5 = "null"
 # Error: PC-relative reference to a different section
 COMPATIBLE_HOST:mips64 = "null"
 
-inherit autotools python3native pkgconfig useradd systemd
+inherit autotools-brokensep python3native pkgconfig useradd systemd
 
 DEPENDS:class-native = "bison-native elfutils-native"
 DEPENDS:class-target = "bison-native json-c readline c-ares libyang frr-native"
@@ -63,6 +63,8 @@ EXTRA_OECONF:class-target = "--sbindir=${libdir}/frr \
                              --with-clippy=${RECIPE_SYSROOT_NATIVE}/usr/lib/clippy \
                             "
 
+CACHED_CONFIGUREVARS += "ac_cv_path_PERL='/usr/bin/env perl'"
+
 LDFLAGS:append:mips = " -latomic"
 LDFLAGS:append:mipsel = " -latomic"
 LDFLAGS:append:powerpc = " -latomic"
@@ -77,7 +79,7 @@ do_compile:class-native () {
 
 do_install:class-native () {
     install -d ${D}${libdir}
-    install -m 755 ${WORKDIR}/build/lib/clippy ${D}${libdir}/clippy
+    install -m 755 ${S}/lib/clippy ${D}${libdir}/clippy
 }
 
 do_install:append:class-target () {

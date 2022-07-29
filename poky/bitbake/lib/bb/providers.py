@@ -396,8 +396,8 @@ def getRuntimeProviders(dataCache, rdepend):
         return rproviders
 
     # Only search dynamic packages if we can't find anything in other variables
-    for pattern in dataCache.packages_dynamic:
-        pattern = pattern.replace(r'+', r"\+")
+    for pat_key in dataCache.packages_dynamic:
+        pattern = pat_key.replace(r'+', r"\+")
         if pattern in regexp_cache:
             regexp = regexp_cache[pattern]
         else:
@@ -408,7 +408,7 @@ def getRuntimeProviders(dataCache, rdepend):
                 raise
             regexp_cache[pattern] = regexp
         if regexp.match(rdepend):
-            rproviders += dataCache.packages_dynamic[pattern]
+            rproviders += dataCache.packages_dynamic[pat_key]
             logger.debug("Assuming %s is a dynamic package, but it may not exist" % rdepend)
 
     return rproviders

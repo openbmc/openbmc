@@ -132,7 +132,12 @@ def rootfs_variables(d):
 
 do_rootfs[vardeps] += "${@rootfs_variables(d)}"
 
-do_build[depends] += "virtual/kernel:do_deploy"
+# This is needed to have kernel image in DEPLOY_DIR.
+# This follows many common usecases and user expectations.
+# But if you are building an image which doesn't need the kernel image at all,
+# you can unset this variable manually.
+KERNEL_DEPLOY_DEPEND ?= "virtual/kernel:do_deploy"
+do_build[depends] += "${KERNEL_DEPLOY_DEPEND}"
 
 
 python () {

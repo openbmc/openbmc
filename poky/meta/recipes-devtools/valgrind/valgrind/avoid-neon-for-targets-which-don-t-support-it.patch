@@ -8,7 +8,7 @@ test 64-bit float copies when building for ARM. Allow it to do so if
 possible, but fallback to C when building for ARM targets which don't
 support neon.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://bugs.kde.org/show_bug.cgi?id=454346]
 
 Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
 ---

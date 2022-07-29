@@ -7,3 +7,18 @@ INHIBIT_DEFAULT_DEPS = "1"
 
 SRC_URI = "gitsm://git.yoctoproject.org/git-submodule-test;branch=master"
 SRCREV = "a2885dd7d25380d23627e7544b7bbb55014b16ee"
+
+S = "${WORKDIR}/git"
+
+do_test_git_as_user() {
+    cd ${S}
+    git status
+}
+addtask test_git_as_user after do_unpack
+
+fakeroot do_test_git_as_root() {
+    cd ${S}
+    git status
+}
+do_test_git_as_root[depends] += "virtual/fakeroot-native:do_populate_sysroot"
+addtask test_git_as_root after do_unpack

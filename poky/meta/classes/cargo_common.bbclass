@@ -45,7 +45,7 @@ cargo_common_do_configure () {
 	directory = "${CARGO_VENDORING_DIRECTORY}"
 	EOF
 
-	if [ -z "${EXTERNALSRC}" ] && [ ${CARGO_DISABLE_BITBAKE_VENDORING} = "0" ]; then
+	if [ ${CARGO_DISABLE_BITBAKE_VENDORING} = "0" ]; then
 		cat <<- EOF >> ${CARGO_HOME}/config
 
 		[source.crates-io]

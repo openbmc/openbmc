@@ -7,7 +7,7 @@ SECTION = "multimedia"
 LICENSE = "MIT & \
            PD & \
            CMU-Tex & \
-           BSD & \
+           rateconv & \
            BSD-2-Clause & \
            BSD-3-Clause & \
            flite & \

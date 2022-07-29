@@ -20,6 +20,8 @@ SRC_URI = "https://lttng.org/files/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://0008-fix-scsi-core-Remove-scsi-scsi_request.h-v5.18.patch \
            file://0009-Rename-genhd-wrapper-to-blkdev.patch \
            file://0010-fix-mm-compaction-cleanup-the-compaction-trace-event.patch \
+           file://0001-fix-sched-tracing-Append-prev_state-to-tp-args-inste.patch \
+           file://0001-fix-random-remove-unused-tracepoints-v5.10-v5.15.patch \
           "
 
 # Use :append here so that the patch is applied also when using devupstream

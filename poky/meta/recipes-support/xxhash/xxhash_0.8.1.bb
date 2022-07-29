@@ -14,6 +14,8 @@ SRCREV = "35b0373c697b5f160d3db26b1cbb45a0d5ba788c"
 
 S = "${WORKDIR}/git"
 
+CFLAGS += "${@bb.utils.contains('SELECTED_OPTIMIZATION', '-Og', '-DXXH_NO_INLINE_HINTS', '', d)}"
+
 do_compile () {
 	oe_runmake all
 }

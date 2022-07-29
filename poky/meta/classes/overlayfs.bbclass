@@ -16,10 +16,18 @@
 #
 #   OVERLAYFS_MOUNT_POINT[data] ?= "/data"
 #
-# The class assumes you have a data.mount systemd unit defined in your
-# systemd-machine-units recipe and installed to the image.
+# Per default the class assumes you have a corresponding fstab entry or systemd
+# mount unit (data.mount in this case) for this mount point installed on the
+# image, for instance via a wks script or the systemd-machine-units recipe.
 #
-# Then you can specify writable directories on a recipe base
+# If the mount point is handled somewhere else, e.g. custom boot or preinit
+# scripts or in a initramfs, then this QA check can be skipped by adding
+# mount-configured to the related OVERLAYFS_QA_SKIP flag:
+#
+#   OVERLAYFS_QA_SKIP[data] = "mount-configured"
+#
+# To use the overlayfs, you just have to specify writable directories inside
+# their recipe:
 #
 #   OVERLAYFS_WRITABLE_PATHS[data] = "/usr/share/my-custom-application"
 #
@@ -29,6 +37,10 @@
 #
 #   OVERLAYFS_MOUNT_POINT[mnt-overlay] = "/mnt/overlay"
 #   OVERLAYFS_WRITABLE_PATHS[mnt-overlay] = "/usr/share/another-application"
+#
+# If your recipe deploys a systemd service, then it should require and be
+# started after the ${PN}-overlays.service to make sure that all overlays are
+# mounted beforehand.
 #
 # Note: the class does not support /etc directory itself, because systemd depends on it
 # For /etc directory use overlayfs-etc class

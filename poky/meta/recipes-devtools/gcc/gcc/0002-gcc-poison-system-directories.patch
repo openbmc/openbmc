@@ -1,4 +1,4 @@
-From 118c6f054711d437167ff125a88c9236bfc8099c Mon Sep 17 00:00:00 2001
+From 863f1f9dc78839ecd021b2cb01d501e8c9e00ef7 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 8 Mar 2021 16:04:20 -0800
 Subject: [PATCH] gcc: poison-system-directories
@@ -25,7 +25,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  7 files changed, 86 insertions(+), 2 deletions(-)
 
 diff --git a/gcc/common.opt b/gcc/common.opt
-index c75dd36843e..49acbd6ed44 100644
+index a75b44ee47e..d15105a73f3 100644
 --- a/gcc/common.opt
 +++ b/gcc/common.opt
 @@ -683,6 +683,10 @@ Wreturn-local-addr
@@ -40,10 +40,10 @@ index c75dd36843e..49acbd6ed44 100644
  Common Var(warn_shadow) Warning
  Warn when one variable shadows another.  Same as -Wshadow=global.
 diff --git a/gcc/config.in b/gcc/config.in
-index 10a13cde586..8848284da41 100644
+index 048bf52e8c2..4f973f7906a 100644
 --- a/gcc/config.in
 +++ b/gcc/config.in
-@@ -218,6 +218,16 @@
+@@ -230,6 +230,16 @@
  #endif
  
  
@@ -61,10 +61,10 @@ index 10a13cde586..8848284da41 100644
     optimizer and back end) to be checked for dynamic type safety at runtime.
     This is quite expensive. */
 diff --git a/gcc/configure b/gcc/configure
-index 9bb436ce7bd..3f0734bff11 100755
+index 7218b0c331a..d7445339f9a 100755
 --- a/gcc/configure
 +++ b/gcc/configure
-@@ -1020,6 +1020,7 @@ enable_maintainer_mode
+@@ -1019,6 +1019,7 @@ enable_maintainer_mode
  enable_link_mutex
  enable_link_serialization
  enable_version_specific_runtime_libs
@@ -72,7 +72,7 @@ index 9bb436ce7bd..3f0734bff11 100755
  enable_plugin
  enable_host_shared
  enable_libquadmath_support
-@@ -1782,6 +1783,8 @@ Optional Features:
+@@ -1781,6 +1782,8 @@ Optional Features:
    --enable-version-specific-runtime-libs
                            specify that runtime libraries should be installed
                            in a compiler-specific directory
@@ -81,7 +81,7 @@ index 9bb436ce7bd..3f0734bff11 100755
    --enable-plugin         enable plugin support
    --enable-host-shared    build host code as shared libraries
    --disable-libquadmath-support
-@@ -31325,6 +31328,22 @@ if test "${enable_version_specific_runtime_libs+set}" = set; then :
+@@ -31932,6 +31935,22 @@ if test "${enable_version_specific_runtime_libs+set}" = set; then :
  fi
  
  
@@ -105,10 +105,10 @@ index 9bb436ce7bd..3f0734bff11 100755
  
  
 diff --git a/gcc/configure.ac b/gcc/configure.ac
-index caa611933df..54e21764b3e 100644
+index 49f043ed29b..fe488f2232b 100644
 --- a/gcc/configure.ac
 +++ b/gcc/configure.ac
-@@ -7123,6 +7123,22 @@ AC_ARG_ENABLE(version-specific-runtime-libs,
+@@ -7393,6 +7393,22 @@ AC_ARG_ENABLE(version-specific-runtime-libs,
                  [specify that runtime libraries should be
                   installed in a compiler-specific directory])])
  
@@ -132,7 +132,7 @@ index caa611933df..54e21764b3e 100644
  AC_SUBST(subdirs)
  AC_SUBST(srcdir)
 diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
-index 7a368959e5e..6659a903bf0 100644
+index 35508efb4ef..40f798eac78 100644
 --- a/gcc/doc/invoke.texi
 +++ b/gcc/doc/invoke.texi
 @@ -369,6 +369,7 @@ Objective-C and Objective-C++ Dialects}.
@@ -143,7 +143,7 @@ index 7a368959e5e..6659a903bf0 100644
  -Wno-pragmas  -Wno-prio-ctor-dtor  -Wredundant-decls @gol
  -Wrestrict  -Wno-return-local-addr  -Wreturn-type @gol
  -Wno-scalar-storage-order  -Wsequence-point @gol
-@@ -7735,6 +7736,14 @@ made up of data only and thus requires no special treatment.  But, for
+@@ -7728,6 +7729,14 @@ made up of data only and thus requires no special treatment.  But, for
  most targets, it is made up of code and thus requires the stack to be
  made executable in order for the program to work properly.
  
@@ -159,7 +159,7 @@ index 7a368959e5e..6659a903bf0 100644
  @opindex Wfloat-equal
  @opindex Wno-float-equal
 diff --git a/gcc/gcc.c b/gcc/gcc.c
-index 7837553958b..19c75b6e20d 100644
+index 0af888c7d78..b047fc31c2f 100644
 --- a/gcc/gcc.c
 +++ b/gcc/gcc.c
 @@ -1152,6 +1152,8 @@ proper position among the other output files.  */

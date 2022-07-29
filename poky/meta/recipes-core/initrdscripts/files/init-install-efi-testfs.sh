@@ -138,7 +138,7 @@ touch /ssd/etc/controllerimage
 if [ -d /ssd/etc/ ] ; then
     # We dont want udev to mount our root device while we're booting...
     if [ -d /ssd/etc/udev/ ] ; then
-        echo "/dev/${device}" >> /ssd/etc/udev/mount.blacklist
+        echo "/dev/${device}" >> /ssd/etc/udev/mount.ignorelist
     fi
 fi
 

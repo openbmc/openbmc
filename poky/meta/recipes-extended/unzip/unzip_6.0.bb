@@ -29,6 +29,8 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/infozip/UnZip%206.x%20%28latest%29/UnZip%206.0/
 	file://unzip_optimization.patch \
         file://0001-configure-Pass-LDFLAGS-to-tests-doing-link-step.patch \
         file://CVE-2021-4217.patch \
+        file://CVE-2022-0529.patch \
+        file://CVE-2022-0530.patch \
 "
 UPSTREAM_VERSION_UNKNOWN = "1"
 

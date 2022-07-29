@@ -50,7 +50,7 @@ class RootfsPlugin(SourcePlugin):
 
     @staticmethod
     def __get_rootfs_dir(rootfs_dir):
-        if os.path.isdir(rootfs_dir):
+        if rootfs_dir and os.path.isdir(rootfs_dir):
             return os.path.realpath(rootfs_dir)
 
         image_rootfs_dir = get_bitbake_var("IMAGE_ROOTFS", rootfs_dir)
@@ -96,6 +96,9 @@ class RootfsPlugin(SourcePlugin):
         part.rootfs_dir = cls.__get_rootfs_dir(rootfs_dir)
         part.has_fstab = os.path.exists(os.path.join(part.rootfs_dir, "etc/fstab"))
         pseudo_dir = os.path.join(part.rootfs_dir, "../pseudo")
+        if not os.path.lexists(pseudo_dir):
+            pseudo_dir = os.path.join(cls.__get_rootfs_dir(None), '../pseudo')
+
         if not os.path.lexists(pseudo_dir):
             logger.warn("%s folder does not exist. "
                         "Usernames and permissions will be invalid " % pseudo_dir)

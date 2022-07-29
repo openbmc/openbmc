@@ -16,3 +16,6 @@ do_configure:prepend() {
     # do not extract the version number from git
     sed -i -e 's/m4_esyscmd_s(\[git describe --tags --always --dirty\])/${PV}/' ${S}/configure.ac
 }
+
+# need tss-esys
+RDEPENDS:${PN} = "libtss2 tpm2-abrmd"

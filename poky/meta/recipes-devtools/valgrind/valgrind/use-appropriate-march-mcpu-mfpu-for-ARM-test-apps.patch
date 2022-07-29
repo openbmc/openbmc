@@ -15,7 +15,7 @@ over-ride that).
 
 See similar cases in none/tests/arm/Makefile.am
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://bugs.kde.org/show_bug.cgi?id=454346]
 
 Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
 ---

@@ -2,7 +2,7 @@ From: Santiago Vila <sanvila@debian.org>
 Subject: Remove (optional) build date to make the build reproducible
 Bug-Debian: http://bugs.debian.org/779042
 
-Upstream-Status: Inappropriate [no upstream]
+Upstream-Status: Inactive-Upstream [no upstream]
 
 Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
 

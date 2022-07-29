@@ -26,3 +26,10 @@ do_compile() {
 	export LIBC="$(find ${STAGING_DIR_TARGET}/${base_libdir}/ -name 'libc-*.so')"
 	cpan_do_compile
 }
+
+do_install:append() {
+   # Man pages here conflict wtih the main perl documentation
+   for page in ${D}${mandir}/man*/*; do
+        mv $page $(dirname $page)/${BPN}-$(basename $page)
+    done
+}

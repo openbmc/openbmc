@@ -28,8 +28,6 @@ inherit cross-canadian
 
 PN = "cargo-cross-canadian-${TRANSLATED_TARGET_ARCH}"
 
-LLVM_TARGET[x86_64] = "${RUST_HOST_SYS}"
-
 python do_rust_gen_targets () {
     wd = d.getVar('WORKDIR') + '/targets/'
 

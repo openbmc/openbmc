@@ -30,7 +30,7 @@ EXTRA_OECONF += " \
 "
 
 PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'largefile', d)}"
-PACKAGECONFIG[doxygen] = "--enable-doxygen,--disable-doxygen"
+PACKAGECONFIG[doxygen] = "--enable-doxygen,--disable-doxygen,doxygen-native"
 PACKAGECONFIG[largefile] = "--enable-largefile,--disable-largefile"
 PACKAGECONFIG[mtpz] = "--enable-mtpz,--disable-mtpz,libgcrypt"
 

@@ -30,6 +30,12 @@ SRC_URI = " \
 
 S = "${WORKDIR}/git"
 
+CVE_CHECK_IGNORE += "\
+    CVE-2016-0749 \
+    CVE-2016-2150 \
+    CVE-2018-10893 \
+"
+
 inherit autotools gettext python3native python3-dir pkgconfig
 
 DEPENDS += "spice-protocol jpeg pixman alsa-lib glib-2.0 python3-pyparsing-native python3-six-native glib-2.0-native"

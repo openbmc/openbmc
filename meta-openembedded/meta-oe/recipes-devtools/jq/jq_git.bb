@@ -21,7 +21,7 @@ PACKAGECONFIG[docs] = "--enable-docs,--disable-docs,ruby-native"
 PACKAGECONFIG[maintainer-mode] = "--enable-maintainer-mode,--disable-maintainer-mode,flex-native bison-native"
 PACKAGECONFIG[oniguruma] = "--with-oniguruma,--without-oniguruma,onig"
 
-OE_EXTRACONF += " \
+EXTRA_OECONF += " \
     --disable-valgrind \
 "
 

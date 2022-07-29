@@ -1,0 +1,73 @@
+From beb0219b71510bc63aed81d2a970a04349d6c616 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 29 Sep 2020 18:01:41 -0700
+Subject: [PATCH] Move sysusers.d/sysctl.d/binfmt.d/modules-load.d to /usr
+
+These directories are moved to /lib since systemd v246, commit
+4a56315a990b ("path: use ROOTPREFIX properly"), but in oe-core/yocto,
+the old /usr/lib is still being used.
+
+Upstream-Status: Inappropriate (OE-specific)
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Jiaqing Zhao <jiaqing.zhao@linux.intel.com>
+---
+ src/core/systemd.pc.in           | 8 ++++----
+ src/libsystemd/sd-path/sd-path.c | 8 ++++----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/src/core/systemd.pc.in b/src/core/systemd.pc.in
+index fc0f8c34fa..65996bbed8 100644
+--- a/src/core/systemd.pc.in
++++ b/src/core/systemd.pc.in
+@@ -65,16 +65,16 @@ systemdshutdowndir=${systemd_shutdown_dir}
+ tmpfiles_dir=${prefix}/lib/tmpfiles.d
+ tmpfilesdir=${tmpfiles_dir}
+ 
+-sysusers_dir=${rootprefix}/lib/sysusers.d
++sysusers_dir=${prefix}/lib/sysusers.d
+ sysusersdir=${sysusers_dir}
+ 
+-sysctl_dir=${rootprefix}/lib/sysctl.d
++sysctl_dir=${prefix}/lib/sysctl.d
+ sysctldir=${sysctl_dir}
+ 
+-binfmt_dir=${rootprefix}/lib/binfmt.d
++binfmt_dir=${prefix}/lib/binfmt.d
+ binfmtdir=${binfmt_dir}
+ 
+-modules_load_dir=${rootprefix}/lib/modules-load.d
++modules_load_dir=${prefix}/lib/modules-load.d
+ modulesloaddir=${modules_load_dir}
+ 
+ catalog_dir=${prefix}/lib/systemd/catalog
+diff --git a/src/libsystemd/sd-path/sd-path.c b/src/libsystemd/sd-path/sd-path.c
+index ff1e0d5f8e..19a001f47e 100644
+--- a/src/libsystemd/sd-path/sd-path.c
++++ b/src/libsystemd/sd-path/sd-path.c
+@@ -362,19 +362,19 @@ static int get_path(uint64_t type, char **buffer, const char **ret) {
+                 return 0;
+ 
+         case SD_PATH_SYSUSERS:
+-                *ret = ROOTPREFIX_NOSLASH "/lib/sysusers.d";
++                *ret = "/usr/lib/sysusers.d";
+                 return 0;
+ 
+         case SD_PATH_SYSCTL:
+-                *ret = ROOTPREFIX_NOSLASH "/lib/sysctl.d";
++                *ret = "/usr/lib/sysctl.d";
+                 return 0;
+ 
+         case SD_PATH_BINFMT:
+-                *ret = ROOTPREFIX_NOSLASH "/lib/binfmt.d";
++                *ret = "/usr/lib/binfmt.d";
+                 return 0;
+ 
+         case SD_PATH_MODULES_LOAD:
+-                *ret = ROOTPREFIX_NOSLASH "/lib/modules-load.d";
++                *ret = "/usr/lib/modules-load.d";
+                 return 0;
+ 
+         case SD_PATH_CATALOG:
+-- 
+2.34.1
+

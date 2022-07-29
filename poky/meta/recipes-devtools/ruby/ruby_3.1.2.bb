@@ -25,6 +25,7 @@ PACKAGECONFIG[ipv6] = "--enable-ipv6, --disable-ipv6,"
 # rdoc is off by default due to non-reproducibility reported in
 # https://bugs.ruby-lang.org/issues/18456
 PACKAGECONFIG[rdoc] = "--enable-install-rdoc,--disable-install-rdoc,"
+PACKAGECONFIG[capstone] = "--with-capstone=yes, --with-capstone=no"
 
 EXTRA_OECONF = "\
     --disable-versioned-paths \

@@ -16,7 +16,7 @@ CVE_CHECK_IGNORE += "CVE-2019-1010022 CVE-2019-1010023 CVE-2019-1010024"
 # Potential patch at https://sourceware.org/bugzilla/show_bug.cgi?id=22853
 CVE_CHECK_IGNORE += "CVE-2019-1010025"
 
-DEPENDS += "gperf-native bison-native make-native"
+DEPENDS += "gperf-native bison-native"
 
 NATIVESDKFIXES ?= ""
 NATIVESDKFIXES:class-nativesdk = "\

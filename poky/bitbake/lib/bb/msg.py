@@ -133,7 +133,6 @@ class LogFilterShowOnce(logging.Filter):
         self.seen_errors = set()
 
     def filter(self, record):
-        msg = record.msg
         if record.levelno == bb.msg.BBLogFormatter.WARNONCE:
             if record.msg in self.seen_warnings:
                 return False

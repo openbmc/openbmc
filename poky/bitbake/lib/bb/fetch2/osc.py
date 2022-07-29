@@ -36,6 +36,7 @@ class Osc(FetchMethod):
         # Create paths to osc checkouts
         oscdir = d.getVar("OSCDIR") or (d.getVar("DL_DIR") + "/osc")
         relpath = self._strip_leading_slashes(ud.path)
+        ud.oscdir = oscdir
         ud.pkgdir = os.path.join(oscdir, ud.host)
         ud.moddir = os.path.join(ud.pkgdir, relpath, ud.module)
 
@@ -43,13 +44,13 @@ class Osc(FetchMethod):
             ud.revision = ud.parm['rev']
         else:
             pv = d.getVar("PV", False)
-            rev = bb.fetch2.srcrev_internal_helper(ud, d)
+            rev = bb.fetch2.srcrev_internal_helper(ud, d, '')
             if rev:
                 ud.revision = rev
             else:
                 ud.revision = ""
 
-        ud.localfile = d.expand('%s_%s_%s.tar.gz' % (ud.module.replace('/', '.'), ud.path.replace('/', '.'), ud.revision))
+        ud.localfile = d.expand('%s_%s_%s.tar.gz' % (ud.module.replace('/', '.'), relpath.replace('/', '.'), ud.revision))
 
     def _buildosccommand(self, ud, d, command):
         """
@@ -86,7 +87,7 @@ class Osc(FetchMethod):
 
         logger.debug2("Fetch: checking for module directory '" + ud.moddir + "'")
 
-        if os.access(os.path.join(d.getVar('OSCDIR'), ud.path, ud.module), os.R_OK):
+        if os.access(ud.moddir, os.R_OK):
             oscupdatecmd = self._buildosccommand(ud, d, "update")
             logger.info("Update "+ ud.url)
             # update sources there
@@ -114,20 +115,23 @@ class Osc(FetchMethod):
         Generate a .oscrc to be used for this run.
         """
 
-        config_path = os.path.join(d.getVar('OSCDIR'), "oscrc")
+        config_path = os.path.join(ud.oscdir, "oscrc")
+        if not os.path.exists(ud.oscdir):
+            bb.utils.mkdirhier(ud.oscdir)
+
         if (os.path.exists(config_path)):
             os.remove(config_path)
 
         f = open(config_path, 'w')
+        proto = ud.parm.get('proto', 'https')
         f.write("[general]\n")
-        f.write("apisrv = %s\n" % ud.host)
-        f.write("scheme = http\n")
+        f.write("apiurl = %s://%s\n" % (proto, ud.host))
         f.write("su-wrapper = su -c\n")
         f.write("build-root = %s\n" % d.getVar('WORKDIR'))
         f.write("urllist = %s\n" % d.getVar("OSCURLLIST"))
         f.write("extra-pkgs = gzip\n")
         f.write("\n")
-        f.write("[%s]\n" % ud.host)
+        f.write("[%s://%s]\n" % (proto, ud.host))
         f.write("user = %s\n" % ud.parm["user"])
         f.write("pass = %s\n" % ud.parm["pswd"])
         f.close()

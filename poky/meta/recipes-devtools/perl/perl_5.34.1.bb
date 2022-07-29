@@ -17,6 +17,7 @@ SRC_URI = "https://www.cpan.org/src/5.0/perl-${PV}.tar.gz;name=perl \
            file://0002-Constant-Fix-up-shebang.patch \
            file://determinism.patch \
            file://0001-cpan-Sys-Syslog-Makefile.PL-Fix-_PATH_LOG-for-determ.patch \
+           file://0001-Fix-build-with-gcc-12.patch \
            "
 SRC_URI:append:class-native = " \
            file://perl-configpm-switch.patch \
@@ -32,6 +33,8 @@ S = "${WORKDIR}/perl-${PV}"
 inherit upstream-version-is-even update-alternatives
 
 DEPENDS += "perlcross-native zlib virtual/crypt"
+# make 4.1 has race issues with the double-colon usage of MakeMaker, see #14096
+DEPENDS += "make-native"
 
 PERL_LIB_VER = "${@'.'.join(d.getVar('PV').split('.')[0:2])}.0"
 

@@ -1,0 +1,54 @@
+From 178a238f25ab8aff7689d7a09d66dc1583ecd6cb Mon Sep 17 00:00:00 2001
+From: "Miss Islington (bot)"
+ <31488909+miss-islington@users.noreply.github.com>
+Date: Wed, 4 May 2022 03:23:29 -0700
+Subject: [PATCH 01/40] gh-92036: Fix gc_fini_untrack() (GH-92037)
+
+Fix a crash in subinterpreters related to the garbage collector. When
+a subinterpreter is deleted, untrack all objects tracked by its GC.
+To prevent a crash in deallocator functions expecting objects to be
+tracked by the GC, leak a strong reference to these objects on
+purpose, so they are never deleted and their deallocator functions
+are not called.
+(cherry picked from commit 14243369b5f80613628a565c224bba7fb3fcacd8)
+
+Co-authored-by: Victor Stinner <vstinner@python.org>
+
+Upstream-Status: Backport
+---
+ .../2022-04-28-23-37-30.gh-issue-92036.GZJAC9.rst           | 5 +++++
+ Modules/gcmodule.c                                          | 6 ++++++
+ 2 files changed, 11 insertions(+)
+ create mode 100644 Misc/NEWS.d/next/Core and Builtins/2022-04-28-23-37-30.gh-issue-92036.GZJAC9.rst
+
+diff --git a/Misc/NEWS.d/next/Core and Builtins/2022-04-28-23-37-30.gh-issue-92036.GZJAC9.rst b/Misc/NEWS.d/next/Core and Builtins/2022-04-28-23-37-30.gh-issue-92036.GZJAC9.rst
+new file mode 100644
+index 0000000000..78094c5e4f
+--- /dev/null
++++ b/Misc/NEWS.d/next/Core and Builtins/2022-04-28-23-37-30.gh-issue-92036.GZJAC9.rst	
+@@ -0,0 +1,5 @@
++Fix a crash in subinterpreters related to the garbage collector. When a
++subinterpreter is deleted, untrack all objects tracked by its GC. To prevent a
++crash in deallocator functions expecting objects to be tracked by the GC, leak
++a strong reference to these objects on purpose, so they are never deleted and
++their deallocator functions are not called. Patch by Victor Stinner.
+diff --git a/Modules/gcmodule.c b/Modules/gcmodule.c
+index 805a159d53..43ae6fa98b 100644
+--- a/Modules/gcmodule.c
++++ b/Modules/gcmodule.c
+@@ -2170,6 +2170,12 @@ gc_fini_untrack(PyGC_Head *list)
+     for (gc = GC_NEXT(list); gc != list; gc = GC_NEXT(list)) {
+         PyObject *op = FROM_GC(gc);
+         _PyObject_GC_UNTRACK(op);
++        // gh-92036: If a deallocator function expect the object to be tracked
++        // by the GC (ex: func_dealloc()), it can crash if called on an object
++        // which is no longer tracked by the GC. Leak one strong reference on
++        // purpose so the object is never deleted and its deallocator is not
++        // called.
++        Py_INCREF(op);
+     }
+ }
+ 
+-- 
+2.25.1
+

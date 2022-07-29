@@ -96,7 +96,7 @@ RDEPENDS:packagegroup-meta-oe-bsp ="\
     acpitool \
     cpufrequtils \
     edac-utils \
-    firmwared \
+    ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "firmwared", "", d)} \
     flashrom \
     fwupd \
     fwupd-efi \
@@ -611,12 +611,12 @@ RDEPENDS:packagegroup-meta-oe-graphics ="\
     surf \
     tesseract-lang \
     tesseract \
-    tigervnc \
+    ${@bb.utils.contains("DISTRO_FEATURES", "x11 pam", "tigervnc", "", d)} \
     tslib \
     unclutter-xfixes \
     libvdpau \
     xcursorgen \
-    xscreensaver \
+    ${@bb.utils.contains("DISTRO_FEATURES", "x11 pam", "xscreensaver", "", d)} \
     yad \
     parallel-deqp-runner \
     ${@bb.utils.contains("DISTRO_FEATURES", "opengl", "opengl-es-cts", "", d)} \
@@ -729,7 +729,7 @@ RDEPENDS:packagegroup-meta-oe-support ="\
     anthy \
     atop \
     ace-cloud-editor \
-    driverctl \
+    ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "driverctl", "", d)} \
     frame \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "geis", "", d)} \
     grail \

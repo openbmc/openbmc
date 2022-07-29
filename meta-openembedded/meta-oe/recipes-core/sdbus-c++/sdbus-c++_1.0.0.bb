@@ -27,6 +27,12 @@ EXTRA_OECMAKE = "-DBUILD_CODE_GEN=OFF \
 
 S = "${WORKDIR}/git"
 
+# Link libatomic on architectures without 64bit atomics fixes
+# libsdbus-c++.so.1.1.0: undefined reference to `__atomic_load_8'
+LDFLAGS:append:mips = " -Wl,--no-as-needed -latomic -Wl,--as-needed"
+LDFLAGS:append:powerpc = " -Wl,--no-as-needed -latomic -Wl,--as-needed"
+LDFLAGS:append:riscv32 = " -Wl,--no-as-needed -latomic -Wl,--as-needed"
+
 do_install:append() {
     if ! ${@bb.utils.contains('PTEST_ENABLED', '1', 'true', 'false', d)}; then
         rm -rf ${D}${sysconfdir}/dbus-1

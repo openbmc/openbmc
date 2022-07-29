@@ -508,7 +508,7 @@ buildhistory_get_installed() {
 
 	# Set correct pkgdatadir
 	pkgdatadir=${PKGDATA_DIR}
-	if [ "$2" == "sdk" ] && [ "$3" == "host" ]; then
+	if [ "$2" = "sdk" ] && [ "$3" = "host" ] ; then
 		pkgdatadir="${PKGDATA_DIR_SDK}"
 	fi
 

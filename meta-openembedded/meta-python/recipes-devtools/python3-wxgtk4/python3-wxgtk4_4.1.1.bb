@@ -11,6 +11,7 @@ PYPI_PACKAGE = "wxPython"
 SRC_URI += "file://add-back-option-build-base.patch \
             file://wxgtk-fixup-build-scripts.patch \
             file://sip-fix-override-functions.patch \
+            file://0001-Update-Cython-version-to-fix-NanoSVG-issues-with-Pyt.patch \
             "
 SRC_URI[sha256sum] = "00e5e3180ac7f2852f342ad341d57c44e7e4326de0b550b9a5c4a8361b6c3528"
 
@@ -18,7 +19,7 @@ S = "${WORKDIR}/wxPython-${PV}"
 
 inherit pypi setuptools3 pkgconfig features_check
 
-ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
+REQUIRED_DISTRO_FEATURES = "x11"
 
 export WX_CONFIG = "'${RECIPE_SYSROOT_NATIVE}${bindir}/wx-config --prefix=${STAGING_EXECPREFIXDIR} --baselib=${baselib}'"
 

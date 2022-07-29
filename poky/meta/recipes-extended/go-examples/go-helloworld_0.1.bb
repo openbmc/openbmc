@@ -11,7 +11,7 @@ UPSTREAM_CHECK_COMMITS = "1"
 
 GO_IMPORT = "golang.org/x/example"
 GO_INSTALL = "${GO_IMPORT}/hello"
-GO_WORKDIR = "${GO_INSTALL}"
+
 export GO111MODULE="off"
 
 inherit go

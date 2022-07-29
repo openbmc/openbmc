@@ -10,7 +10,15 @@ Change suggested by Julian Taylor.
 
 Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=757037
 
-Upstream-Status: Pending
+RP: Patch is still in debian as of 20220524 in a revised form:
+https://sources.debian.org/patches/lzo2/2.10-2/
+https://sources.debian.org/patches/lzo2/2.10-2/0001-Conditionally-replace-reinvention-of-memcpy-with-cal.patch/
+It was submitted in 2015, no reply to an email from RP in 2022 either.
+
+We likely need this in OE to prevent against unaligned accesses
+on systems such as armv5.
+
+Upstream-Status: Inactive-Upstream
 Signed-off-by: Saul Wold <sgw@linux.intel.com>
 ---
  minilzo/minilzo.c | 14 ++++++++++++++

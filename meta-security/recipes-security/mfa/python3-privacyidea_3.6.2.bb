@@ -19,7 +19,7 @@ GROUPADD_PARAM:${PN} = "--system privacyidea"
 USERADD_PARAM:${PN} = "--system -g privacyidea -o -r -d /opt/${BPN}  \
     --shell /bin/false privacyidea"
 
-FILES:${PN} += " ${prefix}/etc/privacyidea/* ${datadir}/lib/privacyidea/*"
+FILES:${PN} += " ${prefix}/etc/privacyidea/* ${prefix}/lib/privacyidea/*"
 
 RDEPENDS:${PN} += " bash perl freeradius-mysql freeradius-utils"
 

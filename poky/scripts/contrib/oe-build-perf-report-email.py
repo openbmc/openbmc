@@ -27,17 +27,6 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger('oe-build-perf-report')
 
 
-def check_utils():
-    """Check that all needed utils are installed in the system"""
-    missing = []
-    for cmd in ('phantomjs', 'optipng'):
-        if not shutil.which(cmd):
-            missing.append(cmd)
-    if missing:
-        log.error("The following tools are missing: %s", ' '.join(missing))
-        sys.exit(1)
-
-
 def parse_args(argv):
     """Parse command line arguments"""
     description = """Email build perf test report"""
@@ -100,8 +89,6 @@ def main(argv=None):
         log.setLevel(logging.ERROR)
     if args.debug:
         log.setLevel(logging.DEBUG)
-
-    check_utils()
 
     if args.outdir:
         outdir = args.outdir

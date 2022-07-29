@@ -8,19 +8,19 @@ SECTION = "base"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://src/${GO_IMPORT}/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-BBCLASSEXTEND = "native nativesdk"
-
 # fscrypt depends on go and libpam
 DEPENDS += "go-native libpam"
 
 SRCREV = "92b1e9a8670ccd3916a7d24a06cab1e4c9815bc4"
 SRC_URI = "git://github.com/google/fscrypt.git;branch=master;protocol=https"
+
 GO_IMPORT = "import"
 
-S = "${WORKDIR}/git"
+inherit go goarch features_check
 
-inherit go
-inherit goarch
+REQUIRED_DISTRO_FEATURES = "pam"
+
+S = "${WORKDIR}/git"
 
 do_compile() {
 	export GOARCH=${TARGET_GOARCH}
@@ -47,3 +47,5 @@ do_install() {
 	install -d ${D}/${bindir}
 	install ${S}/src/${GO_IMPORT}/bin/fscrypt ${D}/${bindir}/fscrypt
 }
+
+BBCLASSEXTEND = "native nativesdk"

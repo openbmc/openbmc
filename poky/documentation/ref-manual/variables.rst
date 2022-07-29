@@ -7609,7 +7609,7 @@ system and gives an overview of their function and contents.
       :ref:`systemd-boot <ref-classes-systemd-boot>` class sets the
       :term:`SYSTEMD_BOOT_CFG` as follows::
 
-         SYSTEMD_BOOT_CFG ?= "${:term:`S`}/loader.conf"
+         SYSTEMD_BOOT_CFG ?= "${S}/loader.conf"
 
       For information on Systemd-boot, see the `Systemd-boot
       documentation <https://www.freedesktop.org/wiki/Software/systemd/systemd-boot/>`__.
