@@ -55,41 +55,6 @@ python do_merge_bootloaders() {
         crc = crc  % (1<<32)
         return crc;
 
-    def CalcCRC32(bin_filename, begin_offset, embed_ecc, output_filename):
-        try:
-            input_size = os.path.getsize(bin_filename)
-            if (begin_offset >= input_size):
-                print("\nfile too small\n")
-
-            crc = 0
-            with open(bin_filename, "rb") as binary_file:
-                tmp = binary_file.read(begin_offset)
-                while True:
-                    va = binary_file.read(1)
-                    if va:
-                        crc = update_crc(crc, ord(va))
-                    else:
-                        break
-
-            crc = crc  & 0xffffffff
-            with open(bin_filename, "rb") as binary_file:
-                input = binary_file.read()
-            crc_arr = bytearray(4)
-            for ind in range(4):
-                crc_arr[ind] = (crc >> (ind*8) ) & 255
-            output = input[:embed_ecc] + crc_arr + input[(embed_ecc + 4):]
-            output_file = open(output_filename, "w+b")
-            output_file.write(output)
-            output_file.close()
-
-        except:
-            raise
-        finally:
-            return
-
-    def CRC32_binary(binfile, begin_offset, embed_ecc, outputFile):
-        CalcCRC32(binfile, begin_offset, embed_ecc, outputFile)
-
     def Merge_bin_files_and_pad(inF1, inF2, outF, align, padding_at_end):
         padding_size = 0
         padding_size_end = 0
