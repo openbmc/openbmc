@@ -57,7 +57,7 @@ MULTI_USR_TGT = "multi-user.target"
 TMPL_TACH = "phosphor-fan-presence-tach@.service"
 INSTFMT_TACH = "phosphor-fan-presence-tach@{0}.service"
 POWERON_TGT = "obmc-chassis-poweron@{0}.target"
-FMT_TACH = "../${TMPL_TACH}:${POWERON_TGT}.requires/${INSTFMT_TACH}"
+FMT_TACH = "../${TMPL_TACH}:${POWERON_TGT}.wants/${INSTFMT_TACH}"
 FMT_TACH_MUSR = "../${TMPL_TACH}:${MULTI_USR_TGT}.wants/${INSTFMT_TACH}"
 
 FILES:${PN}-presence-tach = "${bindir}/phosphor-fan-presence-tach"
