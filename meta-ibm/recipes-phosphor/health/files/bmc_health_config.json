@@ -1,0 +1,63 @@
+{
+  "CPU" : {
+    "Frequency" : 1,
+    "Window_size": 120,
+    "Threshold":
+    {
+        "Critical":
+        {
+            "Value": 90.0,
+            "Log": true,
+            "Target": ""
+        },
+        "Warning":
+        {
+            "Value": 80.0,
+            "Log": false,
+            "Target": ""
+        }
+    }
+  },
+  "Memory" : {
+    "Frequency" : 1,
+    "Window_size": 120,
+    "Threshold":
+    {
+        "Critical":
+        {
+            "Value": 85.0,
+            "Log": true,
+            "Target": ""
+        }
+    }
+  },
+  "Storage_VAR" : {
+    "Path" : "/var",
+    "Frequency" : 1,
+    "Window_size": 120,
+    "Threshold":
+    {
+         "Critical":
+         {
+             "Value": 85.0,
+             "Log": true,
+             "Target": ""
+          }
+    }
+  },
+  "Storage_TMP" : {
+    "Path" : "/tmp",
+    "Frequency" : 1,
+    "Window_size":120,
+    "Threshold":
+    {
+        "Critical":
+        {
+            "Value": 85.0,
+            "Log": true,
+            "Target": ""
+         }
+    }
+  }
+}
+
