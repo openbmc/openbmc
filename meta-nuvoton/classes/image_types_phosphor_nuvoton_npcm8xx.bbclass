@@ -38,23 +38,6 @@ do_prepare_bootloaders() {
 
 python do_merge_bootloaders() {
 
-    def crc32_tab_val( c ):
-        crc = c  % (1<<32)
-        for x in range(0, 8):
-            if ( crc & 0x00000001 ):
-                crc = ( (crc >> 1)  % (1<<32) ) ^ 0xEDB88320
-            else:
-                crc =   crc >> 1
-            crc = crc  % (1<<32)
-        return crc
-
-    def update_crc( crc, c ):
-        long_c = (0x000000ff & c)   % (1<<32)
-        tmp = (crc ^ long_c)    % (1<<32)
-        crc = ((crc >> 8) ^ crc32_tab_val( tmp & 0xff ))   % (1<<32)
-        crc = crc  % (1<<32)
-        return crc;
-
     def Merge_bin_files_and_pad(inF1, inF2, outF, align, padding_at_end):
         padding_size = 0
         padding_size_end = 0
