@@ -153,8 +153,25 @@ image-rofs    |  OpenBMC Root Filesystem                                        
 
 ### IGPS
 
+#### Image Generation before flashing through IGPS
+Currently, Arbel support A1/Z1 devices and EB/SVB boards. Default configuration is using A1 device and EB board.<br/>
+You need to make sure which one is your device and board. Then execute correct batch file as below to generate image.
+
+* UpdateInputsBinaries_A1_EB.bat
+* UpdateInputsBinaries_A1_SVB.bat
+* UpdateInputsBinaries_Z1_EB.bat
+* UpdateInputsBinaries_Z1_SVB.bat
+
+Note: UpdateInputBinaries*.bat resets all the images and xml files inside **py_scripts/ImageGeneration/inputs**<br/>
+After that users can override the existing files in inputs folder, or use as is.
+
+In OpenBMC, there is one variable for configure Arbel A1/Z1 device in file [evb-npcm845.conf](https://github.com/Nuvoton-Israel/openbmc/blob/npcm-master/meta-evb/meta-evb-nuvoton/meta-evb-npcm845/conf/machine/evb-npcm845.conf )<br/>
+If you are using Z1 device, please modify variable **DEVICE_GEN = "Z1"**, before bitbake obmc-phosphor-image.<br/>
+
+
 #### Flashing through IGPS
 Python 2.7 is required.<br/>
+Note: FUP is means using internal UART of the Arbel. This feature is only supported in Z1. For A1 device, please use ISP.<br/>
 
 1. BMC enter to FUP Mode :
 * Connect a Mini-USB cable to J_USB_TO_UART 
