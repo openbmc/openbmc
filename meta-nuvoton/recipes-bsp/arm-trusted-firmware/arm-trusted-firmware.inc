@@ -9,10 +9,9 @@ inherit deploy
 
 S = "${WORKDIR}/git"
 
-BRANCH ?= ""
-REPO ?= "git://github.com/Nuvoton-Israel/arm-trusted-firmware.git;protocol=https"
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
-SRC_URI = "${REPO};${BRANCHARG}"
+SRC_URI = " \
+    git://github.com/Nuvoton-Israel/arm-trusted-firmware.git;branch=nuvoton;protocol=https \
+"
 
 inherit image-artifact-names
 
