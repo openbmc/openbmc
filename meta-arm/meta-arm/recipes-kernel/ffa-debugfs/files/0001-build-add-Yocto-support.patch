@@ -1,0 +1,79 @@
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Arpita S.K <arpita.s.k@arm.com>
+
+From 8a7bea4e7d08395036ffc2fde57c4fb44315e181 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Mon, 25 Oct 2021 13:12:11 +0100
+Subject: [PATCH 1/2] build: add Yocto support
+
+This commit allows to build the driver under Yocto
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+---
+ Kbuild   |  4 ----
+ Makefile | 40 +++++++++++-----------------------------
+ 2 files changed, 11 insertions(+), 33 deletions(-)
+ delete mode 100644 Kbuild
+
+diff --git a/Kbuild b/Kbuild
+deleted file mode 100644
+index 330b019..0000000
+--- a/Kbuild
++++ /dev/null
+@@ -1,4 +0,0 @@
+-# SPDX-License-Identifier: GPL-2.0-only
+-
+-arm-ffa-user-objs := arm_ffa_user.o
+-obj-m := arm-ffa-user.o
+diff --git a/Makefile b/Makefile
+index 62dbfb1..90dfaef 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,33 +1,15 @@
+-# SPDX-License-Identifier: GPL-2.0-only
++arm-ffa-user-objs := arm_ffa_user.o
++obj-m := arm-ffa-user.o
+ 
+-ARCH			:= arm64
+-CROSS_COMPILE		?= aarch64-linux-gnu-
++SRC := $(shell pwd)
+ 
+-ROOT			?= $(CURDIR)/..
+-KDIR			?= $(ROOT)/linux
+-TARGET_DIR		?= $(ROOT)/shared
+-BUILD_DIR		?= $(CURDIR)/build
+-BUILD_DIR_MAKEFILE 	?= $(BUILD_DIR)/Makefile
++all:
++	$(MAKE) -C $(KERNEL_SRC) M=$(SRC)
+ 
+-all: module
++modules_install:
++	$(MAKE) -C $(KERNEL_SRC) M=$(SRC) modules_install
+ 
+-clean: module-clean
+-
+-install: all
+-	cp $(BUILD_DIR)/arm-ffa-user.ko $(TARGET_DIR)/
+-	cp load_module.sh $(TARGET_DIR)/
+-
+-module: $(BUILD_DIR_MAKEFILE)
+-	$(MAKE) -C $(KDIR) M=$(BUILD_DIR) src=$(CURDIR) modules \
+-		ARCH=$(ARCH) CROSS_COMPILE="$(CROSS_COMPILE)"
+-
+-module-clean:
+-	$(MAKE) -C $(KDIR) M=$(BUILD_DIR) src=$(CURDIR) clean \
+-		ARCH=$(ARCH) CROSS_COMPILE="$(CROSS_COMPILE)"
+-	rm $(BUILD_DIR_MAKEFILE)
+-
+-$(BUILD_DIR):
+-	mkdir -p "$@"
+-
+-$(BUILD_DIR_MAKEFILE): $(BUILD_DIR)
+-	touch "$@"
++clean:
++	rm -f *.o *~ core .depend .*.cmd *.ko *.mod.c
++	rm -f Module.markers Module.symvers modules.order
++	rm -rf .tmp_versions Modules.symvers
+-- 
+2.17.1
+

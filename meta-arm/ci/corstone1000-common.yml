@@ -1,0 +1,13 @@
+header:
+  version: 11
+  includes:
+    - ci/base.yml
+    - ci/meta-openembedded.yml
+local_conf_header:
+    perf: |
+
+distro: poky-tiny
+
+target:
+  - perf
+  - corstone1000-image

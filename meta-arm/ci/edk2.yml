@@ -1,0 +1,17 @@
+header:
+  version: 11
+
+local_conf_header:
+  bootfirmware: |
+    PREFERRED_PROVIDER_virtual/bootloader = "edk2-firmware"
+    MACHINE_FEATURES += "efi"
+    TFA_UBOOT = "0"
+    TFA_UEFI = "1"
+
+    EXTRA_IMAGEDEPENDS += "edk2-firmware"
+    EFI_PROVIDER ?= "grub-efi"
+
+    QB_DEFAULT_BIOS = "QEMU_EFI.fd"
+    WKS_FILE ?= "efi-disk.wks.in"
+  failing_tests: |
+    TEST_SUITES:remove = "xorg"

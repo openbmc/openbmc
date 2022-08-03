@@ -1,0 +1,53 @@
+header:
+  version: 11
+
+distro: poky
+
+defaults:
+  repos:
+    refspec: master
+
+repos:
+  meta-arm:
+    layers:
+      meta-arm:
+      meta-arm-bsp:
+      meta-arm-toolchain:
+
+  poky:
+    url: https://git.yoctoproject.org/git/poky
+    layers:
+      meta:
+      meta-poky:
+
+env:
+  BB_LOGCONFIG: ""
+  TOOLCHAIN_DIR: ""
+
+local_conf_header:
+  base: |
+    BB_SERVER_TIMEOUT = "60"
+    CONF_VERSION = "2"
+    BB_NUMBER_THREADS = "16"
+    PARALLEL_MAKE = "-j16"
+    LICENSE_FLAGS_ACCEPTED += "Arm-FVP-EULA"
+  setup: |
+    PACKAGE_CLASSES = "package_ipk"
+    PACKAGECONFIG:remove:pn-qemu-system-native = "gtk+ sdl"
+    EXTRA_IMAGE_FEATURES:append = " debug-tweaks"
+    PACKAGECONFIG:append:pn-perf = " coresight"
+    INHERIT += "rm_work"
+    DISTRO_FEATURES:remove = "ptest"
+  kvm: |
+    QEMU_USE_KVM = ""
+  perf: |
+    CORE_IMAGE_EXTRA_INSTALL += "perf"
+  sshkeys: |
+    CORE_IMAGE_EXTRA_INSTALL += "ssh-pregen-hostkeys"
+  universally_failing_tests: |
+    TEST_SUITES:remove = "opkg"
+
+machine: unset
+
+target:
+  - core-image-sato

@@ -1,0 +1,20 @@
+# Simple target to build the FVPs that are publically available
+
+header:
+  version: 11
+  includes:
+    - ci/base.yml
+
+machine: qemuarm64
+
+local_conf_header:
+  sdk: |
+    SDKMACHINE = "x86_64"
+
+target:
+  - nativesdk-fvp-base-a-aem
+  - nativesdk-fvp-n1-edge
+  - nativesdk-fvp-sgi575
+  - nativesdk-fvp-corstone500
+  - nativesdk-fvp-corstone1000
+  - nativesdk-fvp-tc0

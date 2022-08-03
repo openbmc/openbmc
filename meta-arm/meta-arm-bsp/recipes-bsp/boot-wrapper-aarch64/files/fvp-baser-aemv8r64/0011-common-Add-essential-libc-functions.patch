@@ -1,0 +1,101 @@
+From 0f2c7ca446063be6b193fbf870d38c0af19e15c5 Mon Sep 17 00:00:00 2001
+From: Jaxson Han <jaxson.han@arm.com>
+Date: Tue, 28 Dec 2021 17:28:25 +0800
+Subject: [PATCH] common: Add essential libc functions
+
+The libfdt uses some of the libc functions, e.g. memcmp, memmove,
+strlen .etc. Add them in lib.c.
+
+The code is copied from TF-A (v2.5) [1] project, which is under the
+terms of BSD license. It is the same with boot-wrapper.
+
+[1]: https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git
+
+Issue-Id: SCM-3814
+Upstream-Status: Inappropriate [other]
+  Implementation pending further discussion
+Signed-off-by: Jaxson Han <jaxson.han@arm.com>
+Change-Id: If3b55b00afa8694c7522df989a41e0b38eda1d38
+---
+ common/lib.c | 71 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 70 insertions(+), 1 deletion(-)
+
+diff --git a/common/lib.c b/common/lib.c
+index fcf5f69..0be1c4a 100644
+--- a/common/lib.c
++++ b/common/lib.c
+@@ -32,4 +32,73 @@ void *memset(void *s, int c, size_t n)
+ 	return s;
+ }
+ 
+-/* TODO: memmove and memcmp could also be called */
++int memcmp(const void *s1, const void *s2, size_t len)
++{
++	const unsigned char *s = s1;
++	const unsigned char *d = s2;
++	unsigned char sc;
++	unsigned char dc;
++
++	while (len--) {
++		sc = *s++;
++		dc = *d++;
++		if (sc - dc)
++			return (sc - dc);
++	}
++
++	return 0;
++}
++
++void *memmove(void *dst, const void *src, size_t len)
++{
++	if ((size_t)dst - (size_t)src >= len) {
++		/* destination not in source data, so can safely use memcpy */
++		return memcpy(dst, src, len);
++	} else {
++		/* copy backwards... */
++		const char *end = dst;
++		const char *s = (const char *)src + len;
++		char *d = (char *)dst + len;
++		while (d != end)
++			*--d = *--s;
++	}
++	return dst;
++}
++
++void *memchr(const void *src, int c, size_t len)
++{
++	const unsigned char *s = src;
++
++	while (len--) {
++		if (*s == (unsigned char)c)
++			return (void *) s;
++		s++;
++	}
++
++	return NULL;
++}
++
++char *strrchr(const char *p, int ch)
++{
++	char *save;
++	char c;
++
++	c = ch;
++	for (save = NULL;; ++p) {
++		if (*p == c)
++			save = (char *)p;
++		if (*p == '\0')
++			return (save);
++	}
++	/* NOTREACHED */
++}
++
++size_t strlen(const char *s)
++{
++	const char *cursor = s;
++
++	while (*cursor)
++		cursor++;
++
++	return cursor - s;
++}

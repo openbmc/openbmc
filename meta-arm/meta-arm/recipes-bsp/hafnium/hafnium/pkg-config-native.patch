@@ -1,0 +1,20 @@
+Use pkg-config-native to find the libssl headers.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/scripts/Makefile b/scripts/Makefile
+index b4b7d8b58..26a5160ee 100644
+--- a/third_party/linux/scripts/Makefile
++++ b/third_party/linux/scripts/Makefile
+@@ -10,8 +10,8 @@
+
+ HOST_EXTRACFLAGS += -I$(srctree)/tools/include
+
+-CRYPTO_LIBS = $(shell pkg-config --libs libcrypto 2> /dev/null || echo -lcrypto)
+-CRYPTO_CFLAGS = $(shell pkg-config --cflags libcrypto 2> /dev/null)
++CRYPTO_LIBS = $(shell pkg-config-native --libs libcrypto 2> /dev/null || echo -lcrypto)
++CRYPTO_CFLAGS = $(shell pkg-config-native --cflags libcrypto 2> /dev/null)
+
+ hostprogs-$(CONFIG_BUILD_BIN2C)  += bin2c
+ hostprogs-$(CONFIG_KALLSYMS)     += kallsyms

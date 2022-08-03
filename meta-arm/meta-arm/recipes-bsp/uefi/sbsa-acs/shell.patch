@@ -1,0 +1,18 @@
+Patch in the paths to the SBSA test suite
+
+Upstream-Status: Inappropriate (required action)
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/ShellPkg/ShellPkg.dsc b/ShellPkg/ShellPkg.dsc
+index c42bc9464a..ea21f07a31 100644
+--- a/ShellPkg/ShellPkg.dsc
++++ b/ShellPkg/ShellPkg.dsc
+@@ -24,2 +24,4 @@
+ [LibraryClasses.common]
++  SbsaValLib|ShellPkg/Application/sbsa-acs/val/SbsaValLib.inf
++  SbsaPalLib|ShellPkg/Application/sbsa-acs/platform/pal_uefi/SbsaPalLib.inf
+   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
+@@ -88,2 +90,3 @@
+   #
++  ShellPkg/Application/sbsa-acs/uefi_app/SbsaAvs.inf
+   ShellPkg/Library/UefiShellLib/UefiShellLib.inf

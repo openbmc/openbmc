@@ -1,0 +1,32 @@
+From db7d4cc91ae19d0cbd05c0ff1b9bf6a55ac0d04a Mon Sep 17 00:00:00 2001
+From: Qi Feng <qi.feng@arm.com>
+Date: Thu, 28 Jul 2022 17:47:18 +0800
+Subject: [PATCH 6/9] vexpress64: Do not set COUNTER_FREQUENCY
+
+VExpress boards normally run as a second-stage bootloader so should not
+need to modify CNTFRQ_EL0. On the BASER_FVP, U-Boot can modify it if
+running at EL2, but shouldn't because it might be different from the
+value being used by the first-stage bootloader (which might be
+providing PSCI services).
+
+Upstream-Status: Inappropriate [other]
+  Implementation pending further discussion
+Signed-off-by: Peter Hoyes <Peter.Hoyes@arm.com>
+Signed-off-by: Qi Feng <qi.feng@arm.com>
+---
+ configs/vexpress_aemv8r_defconfig | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/configs/vexpress_aemv8r_defconfig b/configs/vexpress_aemv8r_defconfig
+index 605a724a61..153fa14efc 100644
+--- a/configs/vexpress_aemv8r_defconfig
++++ b/configs/vexpress_aemv8r_defconfig
+@@ -1,5 +1,4 @@
+ CONFIG_ARM=y
+-CONFIG_COUNTER_FREQUENCY=24000000
+ CONFIG_ARCH_VEXPRESS64=y
+ CONFIG_NR_DRAM_BANKS=2
+ CONFIG_DEFAULT_DEVICE_TREE="arm_fvp"
+-- 
+2.25.1
+

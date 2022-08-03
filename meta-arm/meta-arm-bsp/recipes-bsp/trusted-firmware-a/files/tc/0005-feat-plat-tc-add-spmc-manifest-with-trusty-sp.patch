@@ -1,0 +1,169 @@
+From a04466ceb81a04c5179e8064837c34a89c2b11bd Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Mon, 11 Apr 2022 14:43:15 +0100
+Subject: [PATCH 5/7] feat(plat/tc): add spmc manifest with trusty sp
+
+Add SPMC manifest with Trusty SP. Define Trusty's load address,
+vcpu count, memory size.
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Change-Id: If4363580a478776d233f7f391a30e1cb345453c2
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ .../tc/fdts/tc_spmc_trusty_sp_manifest.dts    | 120 ++++++++++++++++++
+ plat/arm/board/tc/fdts/tc_tb_fw_config.dts    |   7 +-
+ 2 files changed, 126 insertions(+), 1 deletion(-)
+ create mode 100644 plat/arm/board/tc/fdts/tc_spmc_trusty_sp_manifest.dts
+
+diff --git a/plat/arm/board/tc/fdts/tc_spmc_trusty_sp_manifest.dts b/plat/arm/board/tc/fdts/tc_spmc_trusty_sp_manifest.dts
+new file mode 100644
+index 000000000..e2ea7b811
+--- /dev/null
++++ b/plat/arm/board/tc/fdts/tc_spmc_trusty_sp_manifest.dts
+@@ -0,0 +1,120 @@
++/*
++ * Copyright (c) 2022, Arm Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++/dts-v1/;
++
++/ {
++	compatible = "arm,ffa-core-manifest-1.0";
++	#address-cells = <2>;
++	#size-cells = <1>;
++
++	attribute {
++		spmc_id = <0x8000>;
++		maj_ver = <0x1>;
++		min_ver = <0x1>;
++		exec_state = <0x0>;
++		load_address = <0x0 0xfd000000>;
++		entrypoint = <0x0 0xfd000000>;
++		binary_size = <0x80000>;
++	};
++
++	hypervisor {
++		compatible = "hafnium,hafnium";
++		vm1 {
++			is_ffa_partition;
++			debug_name = "trusty";
++			load_address = <0xf901f000>;
++			vcpu_count = <8>;
++			mem_size = <0x3f00000>; /* 64MB TZC DRAM - 1MB align */
++		};
++#ifdef TS_SP_FW_CONFIG
++		vm2 {
++			is_ffa_partition;
++			debug_name = "internal-trusted-storage";
++			load_address = <0xfee00000>;
++			vcpu_count = <1>;
++			mem_size = <2097152>; /* 2MB TZC DRAM */
++		};
++		vm3 {
++			is_ffa_partition;
++			debug_name = "crypto";
++			load_address = <0xfec00000>;
++			vcpu_count = <1>;
++			mem_size = <2097152>; /* 2MB TZC DRAM */
++		};
++#endif
++	};
++
++	cpus {
++		#address-cells = <0x2>;
++		#size-cells = <0x0>;
++
++		CPU0:cpu@0 {
++			device_type = "cpu";
++			compatible = "arm,armv8";
++			reg = <0x0 0x0>;
++			enable-method = "psci";
++		};
++
++		/*
++		 * SPMC (Hafnium) requires secondary cpu nodes are declared in
++		 * descending order
++		 */
++		CPU7:cpu@700 {
++			device_type = "cpu";
++			compatible = "arm,armv8";
++			reg = <0x0 0x700>;
++			enable-method = "psci";
++		};
++
++		CPU6:cpu@600 {
++			device_type = "cpu";
++			compatible = "arm,armv8";
++			reg = <0x0 0x600>;
++			enable-method = "psci";
++		};
++
++		CPU5:cpu@500 {
++			device_type = "cpu";
++			compatible = "arm,armv8";
++			reg = <0x0 0x500>;
++			enable-method = "psci";
++		};
++
++		CPU4:cpu@400 {
++			device_type = "cpu";
++			compatible = "arm,armv8";
++			reg = <0x0 0x400>;
++			enable-method = "psci";
++		};
++
++		CPU3:cpu@300 {
++			device_type = "cpu";
++			compatible = "arm,armv8";
++			reg = <0x0 0x300>;
++			enable-method = "psci";
++		};
++
++		CPU2:cpu@200 {
++			device_type = "cpu";
++			compatible = "arm,armv8";
++			reg = <0x0 0x200>;
++			enable-method = "psci";
++		};
++
++		CPU1:cpu@100 {
++			device_type = "cpu";
++			compatible = "arm,armv8";
++			reg = <0x0 0x100>;
++			enable-method = "psci";
++		};
++	};
++
++	/* 96MB of TC_TZC_DRAM1_BASE */
++	memory@f9000000 {
++		device_type = "memory";
++		reg = <0x0 0xf9000000 0x6000000>;
++	};
++};
+diff --git a/plat/arm/board/tc/fdts/tc_tb_fw_config.dts b/plat/arm/board/tc/fdts/tc_tb_fw_config.dts
+index 4c6ccef25..a72772fb3 100644
+--- a/plat/arm/board/tc/fdts/tc_tb_fw_config.dts
++++ b/plat/arm/board/tc/fdts/tc_tb_fw_config.dts
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2020-2021, Arm Limited. All rights reserved.
++ * Copyright (c) 2020-2022, Arm Limited. All rights reserved.
+  *
+  * SPDX-License-Identifier: BSD-3-Clause
+  */
+@@ -47,6 +47,11 @@
+ 		       uuid = "486178e0-e7f8-11e3-bc5e-0002a5d5c51b";
+ 		       load-address = <0xfd280000>;
+ 		};
++#elif TRUSTY_SP_FW_CONFIG
++		trusty {
++		       uuid = "40ee25f0-a2bc-304c-8c4c-a173c57d8af1";
++		       load-address = <0xf901f000>;
++		};
+ #else
+ 		cactus-primary {
+ 			uuid = "b4b5671e-4a90-4fe1-b81f-fb13dae1dacb";
+-- 
+2.30.2
+

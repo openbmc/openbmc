@@ -1,0 +1,12 @@
+header:
+  version: 11
+  includes:
+    - ci/base.yml
+
+machine: qemuarm-secureboot
+
+target:
+  - core-image-base
+  - optee-examples
+  - optee-test
+  - optee-os-tadevkit

@@ -1,0 +1,27 @@
+From f4986ed954ffad36abfa27db5520e702cba2531e Mon Sep 17 00:00:00 2001
+From: Peter Hoyes <Peter.Hoyes@arm.com>
+Date: Tue, 22 Feb 2022 15:32:51 +0000
+Subject: [PATCH 7/9] vexpress64: Enable LIBFDT_OVERLAY in the vexpress_aemv8r
+ defconfig
+
+Issue-Id: SCM-3874
+Upstream-Status: Inappropriate [other]
+  Implementation pending further discussion
+Signed-off-by: Peter Hoyes <Peter.Hoyes@arm.com>
+Change-Id: Ide0532cf2de89f1bca9c8d4bd2ed0c1a1c57599f
+---
+ configs/vexpress_aemv8r_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configs/vexpress_aemv8r_defconfig b/configs/vexpress_aemv8r_defconfig
+index 153fa14efc..94651768b3 100644
+--- a/configs/vexpress_aemv8r_defconfig
++++ b/configs/vexpress_aemv8r_defconfig
+@@ -15,3 +15,4 @@ CONFIG_VIRTIO_MMIO=y
+ CONFIG_ARMV8_EXCEPTION_VECTORS=n
+ CONFIG_ARMV8_SWITCH_TO_EL1=y
+ CONFIG_ARMV8_DISABLE_HVC=n
++CONFIG_OF_LIBFDT_OVERLAY=y
+-- 
+2.25.1
+

@@ -1,0 +1,34 @@
+From dd3e3f414d0e6ed1643c2e2ccac676b7fc1dc7a9 Mon Sep 17 00:00:00 2001
+From: Peter Hoyes <Peter.Hoyes@arm.com>
+Date: Tue, 1 Feb 2022 11:28:46 +0000
+Subject: [PATCH] Makefile: Change COUNTER_FREQ to 100 MHz
+
+Older Arm Fast Models (AEM < RevC) had a base frequency of 24 MHz. but
+the RevC base models use 100 MHz. There is not a robust method of
+determining the configured base frequency at runtime, so update
+COUNTER_FREQ to be 100 MHz.
+
+Issue-Id: SCM-3871
+Upstream-Status: Pending
+Signed-off-by: Peter Hoyes <Peter.Hoyes@arm.com>
+Change-Id: Ia9ad0f8ee488d1a887791f1fa1d8f3bf9c5887fd
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 40bc5d6..b48173c 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -13,7 +13,7 @@ SCRIPT_DIR	:= $(top_srcdir)/scripts
+ PHYS_OFFSET	:= $(shell perl -I $(SCRIPT_DIR) $(SCRIPT_DIR)/findmem.pl $(KERNEL_DTB))
+ UART_BASE	:= $(shell perl -I $(SCRIPT_DIR) $(SCRIPT_DIR)/findbase.pl $(KERNEL_DTB) 0 'arm,pl011')
+ SYSREGS_BASE	:= $(shell perl -I $(SCRIPT_DIR) $(SCRIPT_DIR)/findbase.pl $(KERNEL_DTB) 0 'arm,vexpress-sysreg' 2> /dev/null)
+-COUNTER_FREQ	:= 24000000
++COUNTER_FREQ	:= 100000000
+ 
+ CPU_IDS		:= $(shell perl -I $(SCRIPT_DIR) $(SCRIPT_DIR)/findcpuids.pl $(KERNEL_DTB))
+ NR_CPUS         := $(shell echo $(CPU_IDS) | tr ',' ' ' | wc -w)
+-- 
+2.25.1
+

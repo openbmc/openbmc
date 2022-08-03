@@ -1,0 +1,16 @@
+header:
+  version: 11
+  includes:
+    - kas/corstone1000-base.yml
+
+machine: corstone1000-fvp
+
+local_conf_header:
+    fvp-config: |
+        # Remove Dropbear SSH as it will not fit into the corstone1000 image.
+        IMAGE_FEATURES:remove = " ssh-server-dropbear"
+        INHERIT = " ${@bb.utils.contains('BUILD_ARCH', 'x86_64', 'fvpboot', '', d)}"
+        LICENSE_FLAGS_ACCEPTED:append = " Arm-FVP-EULA"
+
+target:
+  - corstone1000-image

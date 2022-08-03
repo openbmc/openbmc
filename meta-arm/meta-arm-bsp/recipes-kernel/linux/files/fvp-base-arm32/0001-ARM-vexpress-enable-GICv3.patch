@@ -1,0 +1,31 @@
+From 5dbb6c4267b1e46ed08359be363d8bc9b6a79397 Mon Sep 17 00:00:00 2001
+From: Ryan Harkin <ryan.harkin@linaro.org>
+Date: Wed, 16 Nov 2016 14:43:02 +0000
+Subject: [PATCH] ARM: vexpress: enable GICv3
+
+Upstream-Status: Pending
+
+ARMv8 targets such as ARM's FVP Cortex-A32 model can run the 32-bit
+ARMv7 kernel.  And these targets often contain GICv3.
+
+Signed-off-by: Ryan Harkin <ryan.harkin@linaro.org>
+Signed-off-by: Jon Medhurst <tixy@linaro.org>
+---
+ arch/arm/mach-vexpress/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm/mach-vexpress/Kconfig b/arch/arm/mach-vexpress/Kconfig
+index 7c728ebc0b33..ed579382d41f 100644
+--- a/arch/arm/mach-vexpress/Kconfig
++++ b/arch/arm/mach-vexpress/Kconfig
+@@ -4,6 +4,7 @@ menuconfig ARCH_VEXPRESS
+ 	select ARCH_SUPPORTS_BIG_ENDIAN
+ 	select ARM_AMBA
+ 	select ARM_GIC
++	select ARM_GIC_V3
+ 	select ARM_GLOBAL_TIMER
+ 	select ARM_TIMER_SP804
+ 	select COMMON_CLK_VERSATILE
+-- 
+2.17.1
+

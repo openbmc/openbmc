@@ -1,0 +1,14 @@
+include features/input/input.scc
+include features/net/net.scc
+include cfg/timer/no_hz.scc
+
+kconf hardware gem5-arm64/gem5-arm64-board.cfg
+kconf hardware gem5-arm64/gem5-arm64-drm.cfg
+kconf hardware gem5-arm64/gem5-arm64-net.cfg
+kconf hardware gem5-arm64/gem5-arm64-rtc.cfg
+kconf hardware gem5-arm64/gem5-arm64-serial.cfg
+kconf hardware gem5-arm64/gem5-arm64-virtio.cfg
+kconf hardware gem5-arm64/gem5-arm64-cfi.cfg
+kconf hardware gem5-arm64/gem5-arm64-virtio.cfg
+kconf hardware gem5-arm64/gem5-arm64-pci.cfg
+kconf hardware gem5-arm64/gem5-arm64-pata.cfg

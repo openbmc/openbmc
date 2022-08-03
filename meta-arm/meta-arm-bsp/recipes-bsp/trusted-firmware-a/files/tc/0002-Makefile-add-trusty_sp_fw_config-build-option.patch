@@ -1,0 +1,46 @@
+From 2f8b0cc6be3787717247d1c02a45181a5ac6f125 Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Mon, 11 Apr 2022 14:36:54 +0100
+Subject: [PATCH 2/7] Makefile: add trusty_sp_fw_config build option
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Change-Id: Ief90ae9113d32265ee2200f35f3e517b7b9a4bea
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ Makefile                            | 4 ++++
+ docs/plat/arm/arm-build-options.rst | 4 ++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 3941f8698..a20d647a2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -531,6 +531,10 @@ ifneq (${SPD},none)
+             DTC_CPPFLAGS	+=	-DOPTEE_SP_FW_CONFIG
+         endif
+ 
++        ifeq ($(findstring trusty_sp,$(ARM_SPMC_MANIFEST_DTS)),trusty_sp)
++            DTC_CPPFLAGS	+=	-DTRUSTY_SP_FW_CONFIG
++        endif
++
+         ifeq ($(TS_SP_FW_CONFIG),1)
+             DTC_CPPFLAGS	+=	-DTS_SP_FW_CONFIG
+         endif
+diff --git a/docs/plat/arm/arm-build-options.rst b/docs/plat/arm/arm-build-options.rst
+index 339ebbe33..3c9a41fb8 100644
+--- a/docs/plat/arm/arm-build-options.rst
++++ b/docs/plat/arm/arm-build-options.rst
+@@ -107,6 +107,10 @@ Arm Platform Build Options
+    device tree. This flag is defined only when ``ARM_SPMC_MANIFEST_DTS`` manifest
+    file name contains pattern optee_sp.
+ 
++-  ``TRUSTY_SP_FW_CONFIG``: DTC build flag to include Trusty as SP in
++   tb_fw_config device tree. This flag is defined only when
++   ``ARM_SPMC_MANIFEST_DTS`` manifest file name contains pattern trusty_sp.
++
+ -  ``TS_SP_FW_CONFIG``: DTC build flag to include Trusted Services (Crypto and
+    internal-trusted-storage) as SP in tb_fw_config device tree.
+ 
+-- 
+2.30.2
+

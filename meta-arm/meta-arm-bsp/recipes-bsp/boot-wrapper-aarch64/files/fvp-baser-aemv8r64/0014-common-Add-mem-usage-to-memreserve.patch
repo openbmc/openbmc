@@ -1,0 +1,96 @@
+From b447242cd2457bec20d47fe6a8a5758d97a3bde3 Mon Sep 17 00:00:00 2001
+From: Jaxson Han <jaxson.han@arm.com>
+Date: Wed, 19 Jan 2022 16:19:02 +0800
+Subject: [PATCH] common: Add mem usage to /memreserve/
+
+Set /memreserve/ to prevent next boot stages from overrding PSCI
+services with libfdt.
+
+Issue-Id: SCM-3815
+Upstream-Status: Inappropriate [other]
+  Implementation pending further discussion
+Signed-off-by: Jaxson Han <jaxson.han@arm.com>
+Change-Id: I2ea80cdf736a910fa2c3deb622e21d50f04be960
+---
+ Makefile.am          |  2 +-
+ common/boot.c        |  1 +
+ common/device_tree.c | 34 ++++++++++++++++++++++++++++++++++
+ include/boot.h       |  1 +
+ 4 files changed, 37 insertions(+), 1 deletion(-)
+ create mode 100644 common/device_tree.c
+
+diff --git a/Makefile.am b/Makefile.am
+index 5e8668a..734de92 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -34,7 +34,7 @@ endif
+ PSCI_CPU_OFF	:= 0x84000002
+ 
+ COMMON_SRC	:= common/
+-COMMON_OBJ	:= boot.o bakery_lock.o platform.o lib.o
++COMMON_OBJ	:= boot.o bakery_lock.o platform.o lib.o device_tree.o
+ 
+ LIBFDT_SRC	:= common/libfdt/
+ LIBFDT_OBJS	:= fdt.o fdt_ro.o fdt_rw.o
+diff --git a/common/boot.c b/common/boot.c
+index c74d34c..ee2bea0 100644
+--- a/common/boot.c
++++ b/common/boot.c
+@@ -63,6 +63,7 @@ void __noreturn first_spin(unsigned int cpu, unsigned long *mbox,
+ {
+ 	if (cpu == 0) {
+ 		init_platform();
++		dt_add_memreserve();
+ 
+ 		*mbox = (unsigned long)&entrypoint;
+ 		sevl();
+diff --git a/common/device_tree.c b/common/device_tree.c
+new file mode 100644
+index 0000000..4d0876c
+--- /dev/null
++++ b/common/device_tree.c
+@@ -0,0 +1,34 @@
++/*
++ * device_tree.c - Basic device tree node handler
++ *
++ * Copyright (C) 2021 ARM Limited. All rights reserved.
++ *
++ * Use of this source code is governed by a BSD-style license that can be
++ * found in the LICENSE.txt file.
++ */
++#include <libfdt.h>
++
++extern unsigned long dtb;
++extern char firmware_start[], firmware_end[];
++
++extern void print_string(const char *str);
++
++static void *blob;
++
++
++void dt_add_memreserve(void)
++{
++	int ret;
++
++	blob = (void*)&dtb;
++	print_string("Add /memreserve/\n\r");
++
++	fdt_open_into(blob, blob, fdt_totalsize(blob) +
++		      sizeof(struct fdt_reserve_entry));
++	ret = fdt_add_mem_rsv(blob, (uint64_t)firmware_start,
++			      (uint64_t)(firmware_end - firmware_start));
++
++	if(ret < 0) {
++		print_string("reserve mem add err\n\r");
++	}
++}
+diff --git a/include/boot.h b/include/boot.h
+index d75e013..c3e2ec1 100644
+--- a/include/boot.h
++++ b/include/boot.h
+@@ -16,4 +16,5 @@ void __noreturn spin(unsigned long *mbox, unsigned long invalid, int is_entry);
+ void __noreturn first_spin(unsigned int cpu, unsigned long *mbox,
+ 			   unsigned long invalid_addr);
+ 
++void dt_add_memreserve(void);
+ #endif

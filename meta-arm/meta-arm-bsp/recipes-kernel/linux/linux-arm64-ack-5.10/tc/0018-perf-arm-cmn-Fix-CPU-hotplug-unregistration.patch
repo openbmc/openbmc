@@ -1,0 +1,46 @@
+From 249304c3517a38863c8e45e63d509d01bd67dead Mon Sep 17 00:00:00 2001
+From: Robin Murphy <robin.murphy@arm.com>
+Date: Fri, 3 Dec 2021 11:44:50 +0000
+Subject: [PATCH 02/14] perf/arm-cmn: Fix CPU hotplug unregistration
+
+Attempting to migrate the PMU context after we've unregistered the PMU
+device, or especially if we never successfully registered it in the
+first place, is a woefully bad idea. It's also fundamentally pointless
+anyway. Make sure to unregister an instance from the hotplug handler
+*without* invoking the teardown callback.
+
+Fixes: 0ba64770a2f2 ("perf: Add Arm CMN-600 PMU driver")
+Signed-off-by: Robin Murphy <robin.murphy@arm.com>
+
+Upstream-Status: Backport [https://lore.kernel.org/r/2c221d745544774e4b07583b65b5d4d94f7e0fe4.1638530442.git.robin.murphy@arm.com]
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com>
+---
+ drivers/perf/arm-cmn.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/perf/arm-cmn.c b/drivers/perf/arm-cmn.c
+index 38fa6f89d0bc..fe7f3e945481 100644
+--- a/drivers/perf/arm-cmn.c
++++ b/drivers/perf/arm-cmn.c
+@@ -1561,7 +1561,8 @@ static int arm_cmn_probe(struct platform_device *pdev)
+ 
+ 	err = perf_pmu_register(&cmn->pmu, name, -1);
+ 	if (err)
+-		cpuhp_state_remove_instance(arm_cmn_hp_state, &cmn->cpuhp_node);
++		cpuhp_state_remove_instance_nocalls(arm_cmn_hp_state, &cmn->cpuhp_node);
++
+ 	return err;
+ }
+ 
+@@ -1572,7 +1573,7 @@ static int arm_cmn_remove(struct platform_device *pdev)
+ 	writel_relaxed(0, cmn->dtc[0].base + CMN_DT_DTC_CTL);
+ 
+ 	perf_pmu_unregister(&cmn->pmu);
+-	cpuhp_state_remove_instance(arm_cmn_hp_state, &cmn->cpuhp_node);
++	cpuhp_state_remove_instance_nocalls(arm_cmn_hp_state, &cmn->cpuhp_node);
+ 	return 0;
+ }
+ 
+-- 
+2.25.1
+

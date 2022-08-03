@@ -1,0 +1,18 @@
+header:
+  version: 11
+  includes:
+    - ci/base.yml
+
+local_conf_header:
+  testimagefvp: |
+    INHERIT += "fvpboot"
+    IMAGE_FEATURES:remove = " ssh-server-dropbear"
+  perf: |
+
+machine: corstone500
+
+distro: poky-tiny
+
+target:
+  - core-image-minimal
+  - perf

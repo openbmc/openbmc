@@ -1,0 +1,63 @@
+From 0f15f6b02825b042ddc1d753f62cf87f30b1fe12 Mon Sep 17 00:00:00 2001
+From: Peter Hoyes <Peter.Hoyes@arm.com>
+Date: Thu, 19 May 2022 09:02:32 +0100
+Subject: [PATCH 9/9] armv8: Enable icache when switching exception levels in
+ bootefi
+
+bootefi calls the function switch_to_non_secure_mode before calling the
+UEFI payload to handle the case where U-Boot is running at EL3.
+
+For AArch64, the UEFI specification states that:
+   The core will be configured as follows:
+     * MMU enabled
+     * Instruction and data caches enabled
+
+These requirements should be followed when switching exception levels
+for EFI applications.
+
+This function already disables and re-enables the data cache prior to
+switching exception levels, but omits the instruction cache, meaning
+the function returns with the instruction cache disabled at the new
+exception level. Fix this by calling icache_disable prior to switching
+exception levels and icache_enable afterwards.
+
+Issue-Id: SCM-4641
+Signed-off-by: Peter Hoyes <Peter.Hoyes@arm.com>
+Upstream-Status: Inappropriate [other]
+  Implementation pending further discussion
+Change-Id: I678cd5ba39b56e124ab7854608289cd14651ce65
+---
+ arch/arm/cpu/armv8/exception_level.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm/cpu/armv8/exception_level.c b/arch/arm/cpu/armv8/exception_level.c
+index 4aad1550f4..0a3e5428e7 100644
+--- a/arch/arm/cpu/armv8/exception_level.c
++++ b/arch/arm/cpu/armv8/exception_level.c
+@@ -27,6 +27,7 @@
+ static void entry_non_secure(struct jmp_buf_data *non_secure_jmp)
+ {
+ 	dcache_enable();
++	icache_enable();
+ 	debug("Reached non-secure mode\n");
+ 
+ 	/* Restore stack and registers saved in switch_to_non_secure_mode() */
+@@ -61,6 +62,7 @@ void switch_to_non_secure_mode(void)
+ 		if (setjmp(&non_secure_jmp))
+ 			return;
+ 		dcache_disable();	/* flush cache before switch to EL2 */
++		icache_disable();
+ 		/* Move into EL2 and keep running there */
+ 		armv8_switch_to_el2((uintptr_t)&non_secure_jmp, 0, 0, 0,
+ 				    (uintptr_t)entry_non_secure, ES_TO_AARCH64);
+@@ -68,6 +70,7 @@ void switch_to_non_secure_mode(void)
+ 		if (setjmp(&non_secure_jmp))
+ 			return;
+ 		dcache_disable();	/* flush cache before switch to EL1 */
++		icache_disable();
+ 		/* Move into EL1 and keep running there */
+ 		armv8_switch_to_el1((uintptr_t)&non_secure_jmp, 0, 0, 0,
+ 				    (uintptr_t)entry_non_secure, ES_TO_AARCH64);
+-- 
+2.25.1
+

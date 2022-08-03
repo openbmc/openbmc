@@ -1,0 +1,32 @@
+From 6f62c77f0a51de17b7f81f225ef483ed8214640e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 26 Jun 2021 14:19:10 -0700
+Subject: [PATCH] Sources.mk: Remove xml/PmuXMLParser.h header from
+ GATORD_CXX_SRC_FILES
+
+This otherwise appears in final linker cmdline and clang is not happy
+since it sees this as an output file along with the real output file
+specified with -o and bails out
+
+| clang-13: error: cannot specify -o when generating multiple output files
+
+Upstream-Status: Backport [https://github.com/ARM-software/gator/commit/6ef311882a56e14c189d70c4d72945dd95e9b88e]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ daemon/Sources.mk | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/daemon/Sources.mk b/daemon/Sources.mk
+index 60d15ef..3e679f5 100644
+--- a/daemon/Sources.mk
++++ b/daemon/Sources.mk
+@@ -147,5 +147,4 @@ GATORD_CXX_SRC_FILES := \
+     xml/EventsXMLProcessor.cpp \
+     xml/MxmlUtils.cpp \
+     xml/PmuXML.cpp \
+-    xml/PmuXMLParser.cpp \
+-    xml/PmuXMLParser.h
++    xml/PmuXMLParser.cpp
+-- 
+2.32.0
+

@@ -1,0 +1,6 @@
+define KMACHINE fvp-baser-aemv8r64
+define KTYPE preempt-rt
+define KARCH arm64
+
+include ktypes/preempt-rt/preempt-rt.scc
+include fvp-baser-aemv8r64.scc

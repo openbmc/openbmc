@@ -1,0 +1,111 @@
+From e896d48c57d272327410416887f34ac0db550390 Mon Sep 17 00:00:00 2001
+From: Jon Mason <jdmason@kudzu.us>
+Date: Mon, 13 Jun 2022 10:59:53 -0400
+Subject: [PATCH 2/2] Revert "vexpress64: Enable OF_CONTROL and OF_BOARD for
+ VExpress64"
+
+This patch only works for aarch64 (as the 'x' registers are not
+available for ARMv7). Since this platform is ARMv7 in the previous
+patch, this either needs to be changed or removed.  I opted to remove
+it, as it doesn't seem to be necessary to boot the virtual hardware.
+Given that the previous patch was rejected upstream, it is not
+appropriate to fix this upstream.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+
+This reverts commit 2661397464e47d45cd25bbc5e6b9de7594b3268d.
+---
+ board/armltd/vexpress64/Makefile        |  2 +-
+ board/armltd/vexpress64/lowlevel_init.S | 12 ------------
+ board/armltd/vexpress64/vexpress64.c    | 26 -------------------------
+ 3 files changed, 1 insertion(+), 39 deletions(-)
+ delete mode 100644 board/armltd/vexpress64/lowlevel_init.S
+
+diff --git a/board/armltd/vexpress64/Makefile b/board/armltd/vexpress64/Makefile
+index 1878fbed4ec9..868dc4f629f2 100644
+--- a/board/armltd/vexpress64/Makefile
++++ b/board/armltd/vexpress64/Makefile
+@@ -3,5 +3,5 @@
+ # (C) Copyright 2000-2004
+ # Wolfgang Denk, DENX Software Engineering, wd@denx.de.
+ 
+-obj-y	:= vexpress64.o lowlevel_init.o
++obj-y	:= vexpress64.o
+ obj-$(CONFIG_TARGET_VEXPRESS64_JUNO)	+= pcie.o
+diff --git a/board/armltd/vexpress64/lowlevel_init.S b/board/armltd/vexpress64/lowlevel_init.S
+deleted file mode 100644
+index 3dcfb85d0e9a..000000000000
+--- a/board/armltd/vexpress64/lowlevel_init.S
++++ /dev/null
+@@ -1,12 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-/*
+- * (C) Copyright 2021 Arm Limited
+- */
+-
+-.global save_boot_params
+-save_boot_params:
+-
+-	adr	x8, prior_stage_fdt_address
+-	str	x0, [x8]
+-
+-	b	save_boot_params_ret
+diff --git a/board/armltd/vexpress64/vexpress64.c b/board/armltd/vexpress64/vexpress64.c
+index 5e22e89824ee..cedab86d984b 100644
+--- a/board/armltd/vexpress64/vexpress64.c
++++ b/board/armltd/vexpress64/vexpress64.c
+@@ -92,15 +92,7 @@ int dram_init_banksize(void)
+ 	return 0;
+ }
+ 
+-/* Assigned in lowlevel_init.S
+- * Push the variable into the .data section so that it
+- * does not get cleared later.
+- */
+-unsigned long __section(".data") prior_stage_fdt_address;
+-
+ #ifdef CONFIG_OF_BOARD
+-
+-#ifdef CONFIG_TARGET_VEXPRESS64_JUNO
+ #define JUNO_FLASH_SEC_SIZE	(256 * 1024)
+ static phys_addr_t find_dtb_in_nor_flash(const char *partname)
+ {
+@@ -145,11 +137,9 @@ static phys_addr_t find_dtb_in_nor_flash(const char *partname)
+ 
+ 	return ~0;
+ }
+-#endif
+ 
+ void *board_fdt_blob_setup(int *err)
+ {
+-#ifdef CONFIG_TARGET_VEXPRESS64_JUNO
+ 	phys_addr_t fdt_rom_addr = find_dtb_in_nor_flash(CONFIG_JUNO_DTB_PART);
+ 
+ 	*err = 0;
+@@ -159,22 +149,6 @@ void *board_fdt_blob_setup(int *err)
+ 	}
+ 
+ 	return (void *)fdt_rom_addr;
+-#endif
+-
+-#ifdef VEXPRESS_FDT_ADDR
+-	if (fdt_magic(VEXPRESS_FDT_ADDR) == FDT_MAGIC) {
+-		*err = 0;
+-		return (void *)VEXPRESS_FDT_ADDR;
+-	}
+-#endif
+-
+-	if (fdt_magic(prior_stage_fdt_address) == FDT_MAGIC) {
+-		*err = 0;
+-		return (void *)prior_stage_fdt_address;
+-	}
+-
+-	*err = -ENXIO;
+-	return NULL;
+ }
+ #endif
+ 
+-- 
+2.30.2
+

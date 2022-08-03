@@ -1,0 +1,11 @@
+define KMACHINE gem5-arm64
+define KTYPE standard
+define KARCH arm64
+
+include ktypes/standard/standard.scc
+
+include gem5-arm64.scc
+
+# default policy for standard kernels
+#include features/latencytop/latencytop.scc
+#include features/profiling/profiling.scc

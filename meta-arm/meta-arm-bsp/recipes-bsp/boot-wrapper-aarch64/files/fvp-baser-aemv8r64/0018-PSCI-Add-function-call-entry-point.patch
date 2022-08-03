@@ -1,0 +1,74 @@
+From ed46e83df2400b1b3f3364169aacf787bd91bd45 Mon Sep 17 00:00:00 2001
+From: Jaxson Han <jaxson.han@arm.com>
+Date: Tue, 25 Jan 2022 14:56:36 +0800
+Subject: [PATCH] PSCI: Add function call entry point
+
+The max exception level of Armv8R AArch64 is EL2, which means it has no
+exclusive EL for firmware. That is, firmware and hypervisors have to share
+the EL2. Also, hypervisors cannot call firmware services via a 'smc'
+instruction. Thus, boot-wrapper has to provide a function entry point
+for Armv8R AArch64.
+
+Issue-Id: SCM-3816
+Upstream-Status: Inappropriate [other]
+  Implementation pending further discussion
+Signed-off-by: Jaxson Han <jaxson.han@arm.com>
+Change-Id: I06ec8e50298603155c6d8ae2330e71db2f111182
+---
+ common/psci.c | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
+
+diff --git a/common/psci.c b/common/psci.c
+index 6efc695..8fdefb5 100644
+--- a/common/psci.c
++++ b/common/psci.c
+@@ -20,6 +20,8 @@
+ 
+ extern unsigned int spsr_to_elx;
+ 
++unsigned long flag_from_smc_fn[NR_CPUS];
++
+ static unsigned long branch_table[NR_CPUS];
+ 
+ bakery_ticket_t branch_table_lock[NR_CPUS];
+@@ -49,12 +51,14 @@ static int psci_cpu_on(unsigned long target_mpidr, unsigned long address)
+ 		return PSCI_RET_INVALID_PARAMETERS;
+ 
+ 	bakery_lock(branch_table_lock, this_cpu);
+-	ret = psci_store_address(cpu, address);
+-	bakery_unlock(branch_table_lock, this_cpu);
+-
+ #ifdef KEEP_EL
+-	spsr_to_elx = SPSR_KERNEL_EL1;
++	if (!flag_from_smc_fn[this_cpu]) {
++		spsr_to_elx = SPSR_KERNEL_EL1;
++		flush_per_cpu_data((void*)&(spsr_to_elx));
++	}
+ #endif
++	ret = psci_store_address(cpu, address);
++	bakery_unlock(branch_table_lock, this_cpu);
+ 
+ 	return ret;
+ }
+@@ -90,6 +94,18 @@ long psci_call(unsigned long fid, unsigned long arg1, unsigned long arg2)
+ 	}
+ }
+ 
++long smc_fn_entry(unsigned long fid, unsigned long arg1, unsigned long arg2)
++{
++	long ret;
++	unsigned int this_cpu = this_cpu_logical_id();
++
++	flag_from_smc_fn[this_cpu] = 1;
++	ret = psci_call(fid, arg1, arg2);
++	flag_from_smc_fn[this_cpu] = 0;
++
++	return ret;
++}
++
+ void __noreturn psci_first_spin(unsigned int cpu)
+ {
+ 	if (cpu == MPIDR_INVALID)
+-- 
+2.25.1
+

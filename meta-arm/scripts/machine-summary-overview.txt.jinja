@@ -1,0 +1,12 @@
+Machine Overview
+Generated at {{ timestamp }}.
+{% for machine, data in data|dictsort %}
+
+MACHINE: {{ machine }}
+{% for recipe in recipes|sort %}
+{% if recipe in data %}
+{% set details = data[recipe] %}
+{{ details.recipe }}: {{ details.version }}
+{% endif %}
+{% endfor %}
+{% endfor %}

@@ -1,0 +1,28 @@
+#! /usr/bin/env python3
+
+from pathlib import Path
+import sys
+from listmachines import list_machines
+
+metaarm = Path.cwd()
+
+if metaarm.name != "meta-arm":
+    print("Not running inside meta-arm")
+    sys.exit(1)
+
+# Find all layers
+layers = (p.name for p in metaarm.glob("meta-*") if p.is_dir())
+# All machine configurations
+machines = list_machines(layers)
+
+# All kas files
+kas = metaarm.glob("ci/*.yml")
+kas = set(p.stem for p in kas)
+
+missing = machines - kas
+print(f"The following machines are missing: {', '.join(sorted(missing))}.")
+
+covered = len(machines) - len(missing)
+total = len(machines)
+percent = int(covered / total * 100)
+print(f"Coverage: {percent}%")

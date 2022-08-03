@@ -1,0 +1,7 @@
+header:
+  version: 9
+
+local_conf_header:
+  tftf: |
+    TFA_UBOOT = "0"
+    TFTF_TESTS = "1"

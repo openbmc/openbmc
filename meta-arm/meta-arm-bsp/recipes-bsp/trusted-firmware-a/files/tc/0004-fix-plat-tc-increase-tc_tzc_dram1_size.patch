@@ -1,0 +1,69 @@
+From 000e19d360a5ad9abd7d823af86a364bac2afc58 Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Mon, 11 Apr 2022 17:38:17 +0100
+Subject: [PATCH 4/7] fix(plat/tc): increase tc_tzc_dram1_size
+
+Increase TC_TZC_DRAM1_SIZE for Trusty image and its memory size.
+Update OP-TEE reserved memory range in DTS
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Change-Id: Iad433c3c155f28860b15bde2398df653487189dd
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ fdts/tc.dts                              |  4 ++--
+ plat/arm/board/tc/include/platform_def.h | 10 ++++++----
+ 2 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/fdts/tc.dts b/fdts/tc.dts
+index 20992294b..af64504a4 100644
+--- a/fdts/tc.dts
++++ b/fdts/tc.dts
+@@ -213,8 +213,8 @@
+ 			linux,cma-default;
+ 		};
+ 
+-		optee@0xfce00000 {
+-			reg = <0x00000000 0xfce00000 0 0x00200000>;
++		optee@0xf8e00000 {
++			reg = <0x00000000 0xf8e00000 0 0x00200000>;
+ 			no-map;
+ 		};
+ 	};
+diff --git a/plat/arm/board/tc/include/platform_def.h b/plat/arm/board/tc/include/platform_def.h
+index cd77773aa..35d8fd24e 100644
+--- a/plat/arm/board/tc/include/platform_def.h
++++ b/plat/arm/board/tc/include/platform_def.h
+@@ -31,7 +31,7 @@
+  */
+ #define TC_TZC_DRAM1_BASE		(ARM_AP_TZC_DRAM1_BASE -	\
+ 					 TC_TZC_DRAM1_SIZE)
+-#define TC_TZC_DRAM1_SIZE		UL(0x02000000)	/* 32 MB */
++#define TC_TZC_DRAM1_SIZE		UL(0x06000000)	/* 96 MB */
+ #define TC_TZC_DRAM1_END		(TC_TZC_DRAM1_BASE +		\
+ 					 TC_TZC_DRAM1_SIZE - 1)
+ 
+@@ -68,7 +68,9 @@
+  * max size of BL32 image.
+  */
+ #if defined(SPD_spmd)
+-#define PLAT_ARM_SPMC_BASE		TC_TZC_DRAM1_BASE
++#define TC_EL2SPMC_LOAD_ADDR		(TC_TZC_DRAM1_BASE + 0x04000000)
++
++#define PLAT_ARM_SPMC_BASE		TC_EL2SPMC_LOAD_ADDR
+ #define PLAT_ARM_SPMC_SIZE		UL(0x200000)  /* 2 MB */
+ #endif
+ 
+@@ -259,8 +261,8 @@
+ 		(TZC_REGION_ACCESS_RDWR(TZC_NSAID_DEFAULT))
+ 
+ /*
+- * The first region below, TC_TZC_DRAM1_BASE (0xfd000000) to
+- * ARM_SCP_TZC_DRAM1_END (0xffffffff) will mark the last 48 MB of DRAM as
++ * The first region below, TC_TZC_DRAM1_BASE (0xf9000000) to
++ * ARM_SCP_TZC_DRAM1_END (0xffffffff) will mark the last 112 MB of DRAM as
+  * secure. The second and third regions gives non secure access to rest of DRAM.
+  */
+ #define TC_TZC_REGIONS_DEF	\
+-- 
+2.30.2
+

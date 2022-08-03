@@ -1,0 +1,22 @@
+include features/input/input.scc
+include features/net/net.scc
+include cfg/timer/no_hz.scc
+include cfg/usb-mass-storage.scc
+
+kconf hardware juno/juno-board.cfg
+kconf hardware juno/juno-devfreq.cfg
+kconf hardware juno/juno-dma.cfg
+kconf hardware juno/juno-drm.cfg
+kconf hardware juno/juno-fb.cfg
+kconf hardware juno/juno-i2c.cfg
+# kconf hardware juno/juno-mali-midgard.cfg
+kconf hardware juno/juno-mmc.cfg
+kconf hardware juno/juno-net.cfg
+kconf hardware juno/juno-pci.cfg
+kconf hardware juno/juno-rtc.cfg
+kconf hardware juno/juno-sata.cfg
+kconf hardware juno/juno-serial.cfg
+kconf hardware juno/juno-sound.cfg
+kconf hardware juno/juno-thermal.cfg
+kconf hardware juno/juno-usb.cfg
+

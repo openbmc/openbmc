@@ -1,0 +1,1 @@
+require optee-os_corstone1000_common.inc

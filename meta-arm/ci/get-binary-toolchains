@@ -1,0 +1,46 @@
+#!/bin/bash
+set -u
+
+HOST_ARCH=$(uname -m)
+VER="11.2-2022.02"
+
+DOWNLOAD_DIR=$1
+TOOLCHAIN_DIR=$2
+TOOLCHAIN_LINK_DIR=$3
+
+# These should be already created by .gitlab-ci.yml, but do here if run outside of that env
+mkdir -p $DOWNLOAD_DIR $TOOLCHAIN_DIR $TOOLCHAIN_LINK_DIR
+
+if [ $HOST_ARCH = "aarch64" ]; then
+	#AArch64 Linux hosted cross compilers
+
+	#AArch32 target with hard float (arm-none-linux-gnueabihf)
+	wget -P $DOWNLOAD_DIR -nc https://developer.arm.com/-/media/Files/downloads/gnu/$VER/binrel/gcc-arm-$VER-$HOST_ARCH-arm-none-linux-gnueabihf.tar.xz
+elif [ $HOST_ARCH = "x86_64" ]; then
+	#x86_64 Linux hosted cross compilers
+
+	#AArch32 target with hard float (arm-linux-none-gnueabihf)
+	wget -P $DOWNLOAD_DIR -nc https://developer.arm.com/-/media/Files/downloads/gnu/$VER/binrel/gcc-arm-$VER-$HOST_ARCH-arm-none-linux-gnueabihf.tar.xz
+
+	#AArch64 GNU/Linux target (aarch64-none-linux-gnu)
+	wget -P $DOWNLOAD_DIR -nc https://developer.arm.com/-/media/Files/downloads/gnu/$VER/binrel/gcc-arm-$VER-$HOST_ARCH-aarch64-none-linux-gnu.tar.xz
+
+	#AArch64 GNU/Linux target (aarch64_be-none-linux-gnu)
+	wget -P $DOWNLOAD_DIR -nc https://developer.arm.com/-/media/Files/downloads/gnu/$VER/binrel/gcc-arm-$VER-$HOST_ARCH-aarch64_be-none-linux-gnu.tar.xz
+else
+	echo "ERROR - Unknown build arch of $HOST_ARCH"
+	exit 1
+fi
+
+for i in arm aarch64 aarch64_be; do
+	if [ ! -d $TOOLCHAIN_DIR/gcc-arm-$VER-$HOST_ARCH-$i-none-linux-gnu*/ ]; then
+		if [ ! -f $DOWNLOAD_DIR/gcc-arm-$VER-$HOST_ARCH-$i-none-linux-gnu*.tar.xz ]; then
+			continue
+		fi
+
+		tar -C $TOOLCHAIN_DIR -axvf $DOWNLOAD_DIR/gcc-arm-$VER-$HOST_ARCH-$i-none-linux-gnu*.tar.xz
+	fi
+
+	# Setup a link for the toolchain to use local to the building machine (e.g., not in a shared location)
+	ln -s $TOOLCHAIN_DIR/gcc-arm-$VER-$HOST_ARCH-$i-none-linux-gnu* $TOOLCHAIN_LINK_DIR/$i
+done

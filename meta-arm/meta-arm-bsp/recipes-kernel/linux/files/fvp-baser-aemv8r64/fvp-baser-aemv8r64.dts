@@ -1,0 +1,212 @@
+/dts-v1/;
+
+/ {
+
+        #address-cells = <0x2>;
+        #size-cells = <0x2>;
+        interrupt-parent = <0x1>;
+        model = "Generated";
+        compatible = "arm,base";
+
+        memory@0 {
+                #address-cells = <0x2>;
+                #size-cells = <0x2>;
+                device_type = "memory";
+                reg = <0x0        0x0        0x0 0x80000000>,
+                      <0x00000008 0x80000000 0x0 0x80000000>;
+        };
+
+        cpus {
+                #address-cells = <0x2>;
+                #size-cells = <0x0>;
+
+                cpu-map {
+                        cluster0 {
+                                core0 { thread0 { cpu = <&CPU_0>; }; };
+                                core1 { thread0 { cpu = <&CPU_1>; }; };
+                                core2 { thread0 { cpu = <&CPU_2>; }; };
+                                core3 { thread0 { cpu = <&CPU_3>; }; };
+                        };
+                };
+
+                CPU_0: cpu@0 {
+                        device_type = "cpu";
+                        compatible = "arm,armv8";
+                        reg = <0x0 0x0>;
+                        enable-method = "spin-table";
+                        cpu-release-addr = <0x0 0x7f800>;
+                };
+
+                CPU_1: cpu@1 {
+                        device_type = "cpu";
+                        compatible = "arm,armv8";
+                        reg = <0x0 0x1>;
+                        enable-method = "spin-table";
+                        cpu-release-addr = <0x0 0x7f808>;
+                };
+
+                CPU_2: cpu@2 {
+                        device_type = "cpu";
+                        compatible = "arm,armv8";
+                        reg = <0x0 0x2>;
+                        enable-method = "spin-table";
+                        cpu-release-addr = <0x0 0x7f810>;
+                };
+
+                CPU_3: cpu@3 {
+                        device_type = "cpu";
+                        compatible = "arm,armv8";
+                        reg = <0x0 0x3>;
+                        enable-method = "spin-table";
+                        cpu-release-addr = <0x0 0x7f818>;
+                };
+        };
+
+        interrupt-controller@af000000 {
+                compatible = "arm,gic-v3";
+                #interrupt-cells = <0x3>;
+                #address-cells = <0x2>;
+                #size-cells = <0x2>;
+                ranges;
+                interrupt-controller;
+                #redistributor-regions = <0x1>;
+                reg = <0x0 0xaf000000 0x0 0x10000>,     // GICD
+                      <0x0 0xaf100000 0x0 0x100000>,    // GICR
+                      <0x0 0xac000000 0x0 0x2000>,      // GICC
+                      <0x0 0xac010000 0x0 0x2000>,      // GICH
+                      <0x0 0xac02f000 0x0 0x2000>;      // GICV
+                interrupts = <0x1 9 0x4>;
+                linux,phandle = <0x1>;
+                phandle = <0x1>;
+
+                its: msi-controller@2f020000 {
+                        #msi-cells = <1>;
+                        compatible = "arm,gic-v3-its";
+                        reg = <0x0 0xaf020000 0x0 0x20000>; // GITS
+                        msi-controller;
+                };
+
+        };
+
+        refclk100mhz: refclk100mhz {
+                compatible = "fixed-clock";
+                #clock-cells = <0>;
+                clock-frequency = <100000000>;
+                clock-output-names = "apb_pclk";
+        };
+
+        refclk24mhz: refclk24mhz {
+                compatible = "fixed-clock";
+                #clock-cells = <0>;
+                clock-frequency = <24000000>;
+                clock-output-names = "refclk24mhz";
+        };
+
+        refclk1hz: refclk1hz {
+                compatible = "fixed-clock";
+                #clock-cells = <0>;
+                clock-frequency = <1>;
+                clock-output-names = "refclk1hz";
+        };
+
+        uart@9c090000 {
+                compatible = "arm,pl011", "arm,primecell";
+                reg = <0x0 0x9c090000 0x0 0x1000>;
+                interrupts = <0x0 5 0x4>;
+                clocks = <&refclk24mhz>, <&refclk100mhz>;
+                clock-names = "uartclk", "apb_pclk";
+        };
+
+        uart@9c0a0000 {
+                compatible = "arm,pl011", "arm,primecell";
+                reg = <0x0 0x9c0a0000 0x0 0x1000>;
+                interrupts = <0x0 6 0x4>;
+                clocks = <&refclk24mhz>, <&refclk100mhz>;
+                clock-names = "uartclk", "apb_pclk";
+        };
+
+        uart@9c0b0000 {
+                compatible = "arm,pl011", "arm,primecell";
+                reg = <0x0 0x9c0b0000 0x0 0x1000>;
+                interrupts = <0x0 7 0x4>;
+                clocks = <&refclk24mhz>, <&refclk100mhz>;
+                clock-names = "uartclk", "apb_pclk";
+        };
+
+        uart@9c0c0000 {
+                compatible = "arm,pl011", "arm,primecell";
+                reg = <0x0 0x9c0c0000 0x0 0x1000>;
+                interrupts = <0x0 8 0x4>;
+                clocks = <&refclk24mhz>, <&refclk100mhz>;
+                clock-names = "uartclk", "apb_pclk";
+        };
+
+        wdt@9c0f0000 {
+                compatible = "arm,sp805", "arm,primecell";
+                reg = <0x0 0x9c0f0000 0x0 0x1000>;
+                interrupts = <0x0 0 0x4>;
+                clocks = <&refclk24mhz>, <&refclk100mhz>;
+                clock-names = "wdog_clk", "apb_pclk";
+        };
+
+        rtc@9c170000 {
+                compatible = "arm,pl031", "arm,primecell";
+                reg = <0x0 0x9c170000 0x0 0x1000>;
+                interrupts = <0x0 4 0x4>;
+                clocks = <&refclk1hz>;
+                clock-names = "apb_pclk";
+        };
+
+        virtio-block@9c130000 {
+                compatible = "virtio,mmio";
+                reg = <0 0x9c130000 0 0x200>;
+                interrupts = <0x0 42 0x4>;
+        };
+
+        virtio-p9@9c140000{
+                compatible = "virtio,mmio";
+                reg = <0x0 0x9c140000 0x0 0x1000>;
+                interrupts = <0x0 43 0x4>;
+        };
+
+        virtio-net@9c150000 {
+                compatible = "virtio,mmio";
+                reg = <0 0x9c150000 0 0x200>;
+                interrupts = <0x0 44 0x4>;
+        };
+
+        virtio-rng@9c200000 {
+                compatible = "virtio,mmio";
+                reg = <0 0x9c200000 0 0x200>;
+                interrupts = <0x0 46 0x4>;
+        };
+
+        timer {
+                compatible = "arm,armv8-timer";
+                interrupts = <0x1 13 0xff08>,
+                             <0x1 14 0xff08>,
+                             <0x1 11 0xff08>,
+                             <0x1  4 0xff08>;
+                clock-frequency = <100000000>;
+        };
+
+        aliases {
+                serial0 = "/uart@9c090000";
+                serial1 = "/uart@9c0a0000";
+                serial2 = "/uart@9c0b0000";
+                serial3 = "/uart@9c0c0000";
+        };
+
+        pmu {
+                compatible = "arm,armv8-pmuv3";
+                interrupts = <0 60 4>,
+                             <0 61 4>,
+                             <0 62 4>,
+                             <0 63 4>;
+        };
+
+        chosen {
+                bootargs = "earlycon console=ttyAMA0 loglevel=8 rootfstype=ext4 root=/dev/vda1 rw";
+                stdout-path = "serial0";
+        };
+};

@@ -1,0 +1,11 @@
+header:
+  version: 11
+  includes:
+    - ci/meta-virtualization.yml
+
+local_conf_header:
+  meta-virt: |
+    DISTRO_FEATURES:append = " virtualization xen"
+
+target:
+  - xen-image-minimal

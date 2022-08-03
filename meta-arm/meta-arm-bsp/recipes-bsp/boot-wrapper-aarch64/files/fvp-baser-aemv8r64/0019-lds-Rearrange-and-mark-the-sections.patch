@@ -1,0 +1,61 @@
+From 36b5fa3f4db49ac7aef42ff1d58a895226c7e96c Mon Sep 17 00:00:00 2001
+From: Jaxson Han <jaxson.han@arm.com>
+Date: Tue, 2 Nov 2021 15:10:28 +0800
+Subject: [PATCH] lds: Rearrange and mark the sections
+
+To make it possible for the next stage to protect sections with MPU,
+boot-wrapper needs to provide the text and data section information.
+By rearranging the .data .rodata and .vector sections, all sections
+can be split into 2 big sections:
+ - RO and Executable
+ - RW and Non-Executable
+Add firmware_data to mark the boundry, thus:
+firmware_start to firmware_data - 1 indicates RO and Executable section,
+firmware_data to firmware_end - 1 indicates RW and Non-Executable
+section.
+
+Also, the firmware_data and firmware_end should align with 64 bytes,
+since Armv8R AArch64 MPU requires it.
+
+Issue-ID: SCM-3816
+Upstream-Status: Inappropriate [other]
+  Implementation pending further discussion
+Signed-off-by: Jaxson Han <jaxson.han@arm.com>
+Change-Id: I55342aa7492f2c7b5c16ab9a6472c8cb45cff8fd
+---
+ model.lds.S | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/model.lds.S b/model.lds.S
+index ab98ddf..85451f9 100644
+--- a/model.lds.S
++++ b/model.lds.S
+@@ -63,12 +63,16 @@ SECTIONS
+ 	}
+ #endif
+ 
++#define FIRMWARE_ALIGN . = ALIGN(1 << 6)
+ 	.boot PHYS_OFFSET: {
+ 		PROVIDE(firmware_start = .);
+ 		*(.init)
+ 		*(.text*)
+-		*(.data* .rodata* .bss* COMMON)
+ 		*(.vectors)
++		*(.rodata*)
++		FIRMWARE_ALIGN;
++		PROVIDE(firmware_data = .);
++		*(.data* .bss* COMMON)
+ 		*(.stack)
+ 		PROVIDE(etext = .);
+ 	}
+@@ -77,6 +81,7 @@ SECTIONS
+ 		mbox = .;
+ 		QUAD(0x0)
+ 	}
++	FIRMWARE_ALIGN;
+ 	PROVIDE(firmware_end = .);
+ 
+ 	ASSERT(etext <= (PHYS_OFFSET + TEXT_LIMIT), ".text overflow!")
+-- 
+2.25.1
+

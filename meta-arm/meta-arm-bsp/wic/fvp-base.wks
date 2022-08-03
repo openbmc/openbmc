@@ -1,0 +1,3 @@
+# For fvp-base* machines we just need to populate the rootfs partition
+
+part / --source rootfs --ondisk sda --fstype=ext4 --label root --align 1024 --extra-space 100

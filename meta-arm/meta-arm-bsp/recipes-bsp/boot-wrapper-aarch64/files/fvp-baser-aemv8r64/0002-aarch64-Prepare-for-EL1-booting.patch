@@ -1,0 +1,48 @@
+From 26f9b5354c2de9cc052531096ff92b04c3a3846f Mon Sep 17 00:00:00 2001
+From: Jaxson Han <jaxson.han@arm.com>
+Date: Tue, 25 May 2021 07:25:00 +0100
+Subject: [PATCH] aarch64: Prepare for EL1 booting
+
+When booting from EL1, add a check and skip the init of
+sctlr_el2 in jump_kernel
+
+Upstream-Status: Pending
+Signed-off-by: Jaxson Han <jaxson.han@arm.com>
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+---
+ arch/aarch64/boot.S            | 6 +++++-
+ arch/aarch64/include/asm/cpu.h | 1 +
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/arch/aarch64/boot.S b/arch/aarch64/boot.S
+index 84e1646..b589744 100644
+--- a/arch/aarch64/boot.S
++++ b/arch/aarch64/boot.S
+@@ -156,10 +156,14 @@ ASM_FUNC(jump_kernel)
+ 	ldr	x0, =SCTLR_EL1_KERNEL
+ 	msr	sctlr_el1, x0
+ 
++	mrs	x0, CurrentEL
++	cmp	x0, #CURRENTEL_EL2
++	b.lt	1f
++
+ 	ldr	x0, =SCTLR_EL2_KERNEL
+ 	msr	sctlr_el2, x0
+ 
+-	cpuid	x0, x1
++1:	cpuid	x0, x1
+ 	bl	find_logical_id
+ 	bl	setup_stack		// Reset stack pointer
+ 
+diff --git a/arch/aarch64/include/asm/cpu.h b/arch/aarch64/include/asm/cpu.h
+index 63eb1c3..b1003f4 100644
+--- a/arch/aarch64/include/asm/cpu.h
++++ b/arch/aarch64/include/asm/cpu.h
+@@ -11,6 +11,7 @@
+ 
+ #define MPIDR_ID_BITS		0xff00ffffff
+ 
++#define CURRENTEL_EL2		(2 << 2)
+ #define CURRENTEL_EL3		(3 << 2)
+ 
+ /*

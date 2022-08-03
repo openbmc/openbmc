@@ -1,0 +1,252 @@
+From c8bd941579fb062359b683b184b851eea2ddb761 Mon Sep 17 00:00:00 2001
+From: Ben Horgan <ben.horgan@arm.com>
+Date: Fri, 4 Mar 2022 16:48:14 +0000
+Subject: [PATCH 1/5] feat: emulate cntp timer register accesses using cnthps
+
+Upstream-Status: Inappropriate [Experimental feature]
+Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+Change-Id: I67508203273baf3bd8e6be2d99717028db945715
+---
+ Makefile                                |   3 +-
+ src/arch/aarch64/hypervisor/BUILD.gn    |   1 +
+ src/arch/aarch64/hypervisor/cpu.c       |  11 ++-
+ src/arch/aarch64/hypervisor/handler.c   |   6 ++
+ src/arch/aarch64/hypervisor/timer_el1.c | 104 ++++++++++++++++++++++++
+ src/arch/aarch64/hypervisor/timer_el1.h |  20 +++++
+ src/arch/aarch64/msr.h                  |   8 ++
+ 7 files changed, 150 insertions(+), 3 deletions(-)
+ create mode 100644 src/arch/aarch64/hypervisor/timer_el1.c
+ create mode 100644 src/arch/aarch64/hypervisor/timer_el1.h
+
+diff --git a/Makefile b/Makefile
+index c9fb16f..6371a8a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -59,7 +59,8 @@ CHECKPATCH := $(CURDIR)/third_party/linux/scripts/checkpatch.pl \
+ # debug_el1.c : uses XMACROS, which checkpatch doesn't understand.
+ # perfmon.c : uses XMACROS, which checkpatch doesn't understand.
+ # feature_id.c : uses XMACROS, which checkpatch doesn't understand.
+-CHECKPATCH_IGNORE := "src/arch/aarch64/hypervisor/debug_el1.c\|src/arch/aarch64/hypervisor/perfmon.c\|src/arch/aarch64/hypervisor/feature_id.c"
++# timer_el1.c : uses XMACROS, which checkpatch doesn't understand.
++CHECKPATCH_IGNORE := "src/arch/aarch64/hypervisor/debug_el1.c\|src/arch/aarch64/hypervisor/perfmon.c\|src/arch/aarch64/hypervisor/feature_id.c\|src/arch/aarch64/hypervisor/timer_el1.c"
+ 
+ OUT ?= out/$(PROJECT)
+ OUT_DIR = out/$(PROJECT)
+diff --git a/src/arch/aarch64/hypervisor/BUILD.gn b/src/arch/aarch64/hypervisor/BUILD.gn
+index 6068d1e..de1a414 100644
+--- a/src/arch/aarch64/hypervisor/BUILD.gn
++++ b/src/arch/aarch64/hypervisor/BUILD.gn
+@@ -45,6 +45,7 @@ source_set("hypervisor") {
+     "handler.c",
+     "perfmon.c",
+     "psci_handler.c",
++    "timer_el1.c",
+     "vm.c",
+   ]
+ 
+diff --git a/src/arch/aarch64/hypervisor/cpu.c b/src/arch/aarch64/hypervisor/cpu.c
+index c6cebdd..cb41e6e 100644
+--- a/src/arch/aarch64/hypervisor/cpu.c
++++ b/src/arch/aarch64/hypervisor/cpu.c
+@@ -91,13 +91,20 @@ void arch_regs_reset(struct vcpu *vcpu)
+ 	if (is_primary) {
+ 		/*
+ 		 * cnthctl_el2 is redefined when VHE is enabled.
+-		 * EL1PCTEN, don't trap phys cnt access.
+-		 * EL1PCEN, don't trap phys timer access.
++		 * EL1PCTEN, don't trap phys cnt access. Except when in
++		 * secure world without vhe.
++		 * EL1PCEN, don't trap phys timer access. Except when in
++		 * secure world without vhe.
+ 		 */
+ 		if (has_vhe_support()) {
+ 			cnthctl |= (1U << 10) | (1U << 11);
+ 		} else {
++#if SECURE_WORLD == 1
++			cnthctl &= ~(1U << 0);
++			cnthctl &= ~(1U << 1);
++#else
+ 			cnthctl |= (1U << 0) | (1U << 1);
++#endif
+ 		}
+ 	}
+ 
+diff --git a/src/arch/aarch64/hypervisor/handler.c b/src/arch/aarch64/hypervisor/handler.c
+index cd64d68..c9068c5 100644
+--- a/src/arch/aarch64/hypervisor/handler.c
++++ b/src/arch/aarch64/hypervisor/handler.c
+@@ -34,6 +34,7 @@
+ #include "psci_handler.h"
+ #include "smc.h"
+ #include "sysregs.h"
++#include "timer_el1.h"
+ 
+ /**
+  * Hypervisor Fault Address Register Non-Secure.
+@@ -1276,6 +1277,11 @@ void handle_system_register_access(uintreg_t esr_el2)
+ 			inject_el1_unknown_exception(vcpu, esr_el2);
+ 			return;
+ 		}
++	} else if (timer_el1_is_register_access(esr_el2)) {
++		if (!timer_el1_process_access(vcpu, vm_id, esr_el2)) {
++			inject_el1_unknown_exception(vcpu, esr_el2);
++			return;
++		}
+ 	} else {
+ 		inject_el1_unknown_exception(vcpu, esr_el2);
+ 		return;
+diff --git a/src/arch/aarch64/hypervisor/timer_el1.c b/src/arch/aarch64/hypervisor/timer_el1.c
+new file mode 100644
+index 0000000..c30e554
+--- /dev/null
++++ b/src/arch/aarch64/hypervisor/timer_el1.c
+@@ -0,0 +1,104 @@
++/*
++ * Copyright 2022 The Hafnium Authors.
++ *
++ * Use of this source code is governed by a BSD-style
++ * license that can be found in the LICENSE file or at
++ * https://opensource.org/licenses/BSD-3-Clause.
++ */
++
++#include "timer_el1.h"
++
++#include "hf/dlog.h"
++
++#include "msr.h"
++#include "sysregs.h"
++
++/*
++ * Physical timer (CNTP) register encodings as defined in
++ * table D13-8 of the ARMv8 ARM (DDI0487F).
++ * TYPE, op0, op1, crn, crm, op2
++ * The register names are the concatenation of
++ * "CNTP_", TYPE and "_EL2".
++ */
++#define CNTP_REGISTERS          \
++	X(CTL,  3, 3, 14, 2, 1) \
++	X(CVAL, 3, 3, 14, 2, 2) \
++	X(TVAL, 3, 3, 14, 2, 0) \
++
++bool timer_el1_is_register_access(uintreg_t esr)
++{
++	uintreg_t sys_register = GET_ISS_SYSREG(esr);
++	bool is_timer_access;
++	switch (sys_register) {
++#define X(type, op0, op1, crn, crm, op2)                  \
++	case (GET_ISS_ENCODING(op0, op1, crn, crm, op2)): \
++		is_timer_access = true;                   \
++		break;
++			CNTP_REGISTERS
++#undef X
++	case (GET_ISS_ENCODING(3, 3, 14, 0, 1)):
++		is_timer_access = true;
++		break;
++	default:
++		is_timer_access = false;
++	}
++
++	return is_timer_access;
++}
++
++/* Accesses to CNTP timer emulated with CNTHPS */
++bool timer_el1_process_access(struct vcpu *vcpu, ffa_vm_id_t vm_id,
++			      uintreg_t esr)
++{
++	uintreg_t sys_register = GET_ISS_SYSREG(esr);
++	uintreg_t rt_register = GET_ISS_RT(esr);
++	uintreg_t value;
++
++	if (ISS_IS_READ(esr)) {
++		switch (sys_register) {
++#define X(type, op0, op1, crn, crm, op2)                           \
++		case (GET_ISS_ENCODING(op0, op1, crn, crm, op2)):  \
++			value = read_msr(MSR_CNTHPS_##type##_EL2); \
++			vcpu->regs.r[rt_register] = value;         \
++			break;
++				CNTP_REGISTERS
++#undef X
++		case (GET_ISS_ENCODING(3, 3, 14, 0, 1)):
++			value = read_msr(cntpct_el0);
++			vcpu->regs.r[rt_register] = value;
++			break;
++		default:
++			dlog_notice(
++				"Unsupported timer register "
++				"read: "
++				"op0=%d, op1=%d, crn=%d, crm=%d, op2=%d, "
++				"rt=%d.\n",
++				GET_ISS_OP0(esr), GET_ISS_OP1(esr),
++				GET_ISS_CRN(esr), GET_ISS_CRM(esr),
++				GET_ISS_OP2(esr), GET_ISS_RT(esr));
++			break;
++		}
++	} else {
++		value = vcpu->regs.r[rt_register];
++		switch (sys_register) {
++#define X(type, op0, op1, crn, crm, op2)                           \
++		case (GET_ISS_ENCODING(op0, op1, crn, crm, op2)):  \
++			write_msr(MSR_CNTHPS_##type##_EL2, value); \
++			break;
++				CNTP_REGISTERS
++#undef X
++		default:
++			dlog_notice(
++				"Unsupported timer register "
++				"write: "
++				"op0=%d, op1=%d, crn=%d, crm=%d, op2=%d, "
++				"rt=%d, value=%d.\n",
++				GET_ISS_OP0(esr), GET_ISS_OP1(esr),
++				GET_ISS_CRN(esr), GET_ISS_CRM(esr),
++				GET_ISS_OP2(esr), GET_ISS_RT(esr), value);
++			break;
++		}
++	}
++
++	return true;
++}
+diff --git a/src/arch/aarch64/hypervisor/timer_el1.h b/src/arch/aarch64/hypervisor/timer_el1.h
+new file mode 100644
+index 0000000..04a43b6
+--- /dev/null
++++ b/src/arch/aarch64/hypervisor/timer_el1.h
+@@ -0,0 +1,20 @@
++/*
++ * Copyright 2022 The Hafnium Authors.
++ *
++ * Use of this source code is governed by a BSD-style
++ * license that can be found in the LICENSE file or at
++ * https://opensource.org/licenses/BSD-3-Clause.
++ */
++
++#pragma once
++
++#include "hf/arch/types.h"
++
++#include "hf/cpu.h"
++
++#include "vmapi/hf/ffa.h"
++
++bool timer_el1_is_register_access(uintreg_t esr);
++
++bool timer_el1_process_access(struct vcpu *vcpu, ffa_vm_id_t vm_id,
++			      uintreg_t esr);
+diff --git a/src/arch/aarch64/msr.h b/src/arch/aarch64/msr.h
+index cd6778b..55e7833 100644
+--- a/src/arch/aarch64/msr.h
++++ b/src/arch/aarch64/msr.h
+@@ -126,3 +126,11 @@
+ #define MSR_ELR_EL12 S3_5_C4_C0_1
+ 
+ #endif
++
++/*
++ * Secure EL2 Physical timer (CNTHPS) register encodings as defined in
++ * table D13-8 of the ARMv8 ARM (DDI0487F).
++ */
++#define MSR_CNTHPS_CTL_EL2 S3_4_C14_C5_1
++#define MSR_CNTHPS_CVAL_EL2 S3_4_C14_C5_2
++#define MSR_CNTHPS_TVAL_EL2 S3_4_C14_C5_0
+-- 
+2.17.1
+

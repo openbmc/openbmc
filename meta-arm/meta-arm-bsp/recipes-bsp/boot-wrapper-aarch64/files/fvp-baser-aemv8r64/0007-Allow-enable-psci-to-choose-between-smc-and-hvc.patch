@@ -1,0 +1,89 @@
+From f5a31b4f4ea8daaa0d337d5a2322ddb1912083fc Mon Sep 17 00:00:00 2001
+From: Qi Feng <qi.feng@arm.com>
+Date: Wed, 26 May 2021 17:52:01 +0800
+Subject: [PATCH] Allow --enable-psci to choose between smc and hvc
+
+According to Armv8-R AArch64 manual [1], Armv8-R AArch64 does not
+support smc:
+
+- Pseudocode for AArch64.CheckForSMCUndefOrTrap has this snippet:
+
+      if !HaveEL(EL3) || PSTATE.EL == EL0 then
+          UNDEFINED;
+
+  And Armv8-R AArch64 does not have EL3.
+
+- In the document of HCR_EL2 TSC bit:
+  If EL3 is not implemented and HCR_EL2.NV is 0, it is IMPLEMENTATION
+  DEFINED whether this bit is:
+  - RES0.
+  - Implemented with the functionality as described in HCR_EL2.TSC.
+
+So hvc is needed in this situation. And due to the lack of libfdt, the
+psci method cannot be modified at runtime.
+
+To use smc, use --enable-psci or --enable-psci=smc.
+To use hvc, use --enable-psci=hvc.
+
+[1]: https://developer.arm.com/documentation/ddi0600/latest/
+
+Issue-Id: SCM-2654
+Upstream-Status: Pending
+Signed-off-by: Qi Feng <qi.feng@arm.com>
+Change-Id: Ib8afabdad2d98bc37371d165bbb6f1f9b88bfc87
+
+Upstream-Status: Pending
+Signed-off-by: Huifeng Zhang <Huifeng.Zhang@arm.com>
+---
+ Makefile.am  | 10 +++++-----
+ configure.ac | 14 +++++++++-----
+ 2 files changed, 14 insertions(+), 10 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index f941b07..88a27de 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -50,11 +50,11 @@ endif
+ if PSCI
+ ARCH_OBJ	+= psci.o
+ COMMON_OBJ	+= psci.o
+-PSCI_NODE	:= psci {				\
+-			compatible = \"arm,psci\";	\
+-			method = \"smc\";		\
+-			cpu_on = <$(PSCI_CPU_ON)>;	\
+-			cpu_off = <$(PSCI_CPU_OFF)>;	\
++PSCI_NODE	:= psci {						\
++			compatible = \"arm,psci\";			\
++			method = \"$(PSCI_METHOD)\";			\
++			cpu_on = <$(PSCI_CPU_ON)>;			\
++			cpu_off = <$(PSCI_CPU_OFF)>;			\
+ 		   };
+ CPU_NODES	:= $(shell perl -I $(SCRIPT_DIR) $(SCRIPT_DIR)/addpsci.pl $(KERNEL_DTB))
+ else
+diff --git a/configure.ac b/configure.ac
+index 9e3b722..53e51be 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -83,13 +83,17 @@ AS_IF([test "x$X_IMAGE" != "x"],
+ # Allow a user to pass --enable-psci
+ AC_ARG_ENABLE([psci],
+ 	AS_HELP_STRING([--disable-psci], [disable the psci boot method]),
+-	[USE_PSCI=$enableval], [USE_PSCI="yes"])
+-AM_CONDITIONAL([PSCI], [test "x$USE_PSCI" = "xyes"])
+-AS_IF([test "x$USE_PSCI" = "xyes"], [], [USE_PSCI=no])
+-
+-AS_IF([test "x$USE_PSCI" != "xyes" -a "x$KERNEL_ES" = "x32"],
++	[case "${enableval}" in
++		yes|smc) USE_PSCI=smc ;;
++		hvc) USE_PSCI=hvc ;;
++		*) AC_MSG_ERROR([Bad value "${enableval}" for --enable-psci. Use "smc" or "hvc"]) ;;
++	esac], [USE_PSCI="yes"])
++AM_CONDITIONAL([PSCI], [test "x$USE_PSCI" = "xyes" -o "x$USE_PSCI" = "xsmc" -o "x$USE_PSCI" = "xhvc"])
++
++AS_IF([test "x$USE_PSCI" = "xno" -a "x$KERNEL_ES" = "x32"],
+ 	[AC_MSG_ERROR([With an AArch32 kernel, boot method must be PSCI.])]
+ )
++AC_SUBST([PSCI_METHOD], [$USE_PSCI])
+ 
+ # Allow a user to pass --with-initrd
+ AC_ARG_WITH([initrd],

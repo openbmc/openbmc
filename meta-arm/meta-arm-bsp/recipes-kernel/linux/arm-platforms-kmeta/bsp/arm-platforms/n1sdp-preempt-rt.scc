@@ -1,0 +1,6 @@
+define KMACHINE n1sdp
+define KTYPE preempt-rt
+define KARCH arm64
+
+include ktypes/preempt-rt/preempt-rt.scc
+include n1sdp/disable-kvm.cfg

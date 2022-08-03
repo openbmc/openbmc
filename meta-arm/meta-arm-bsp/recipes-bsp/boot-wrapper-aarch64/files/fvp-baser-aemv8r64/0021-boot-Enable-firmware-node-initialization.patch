@@ -1,0 +1,98 @@
+From 6dfc937d1ae54d2ae9f8c60ca29ba73ca14dc8c4 Mon Sep 17 00:00:00 2001
+From: Jaxson Han <jaxson.han@arm.com>
+Date: Wed, 29 Dec 2021 15:33:17 +0800
+Subject: [PATCH] boot: Enable firmware node initialization
+
+Enable the firmware node initialization, so that the next stage
+(hypervisor) could share the EL2 with firmware (boot-wrapper). The next
+stage (hypervisor) get the smccc entry point, code/data sections, the
+sections attrs and firmware node version and so on.
+It is worth noting that this EL2 sharing mechanism is only for Armv8R
+AArch64, thus add flag_v8r to record if the arch is Armv8R AArch64.
+Enable the firmware node initialization only if it is Armv8R AArch64.
+Also, we increase the stack size to 1024 to fix the stack overflow issue
+when using the libfdt.
+
+Add -fno-builtin options to CFLAGS to avoid the issue that the 'memset'
+in common/lib.c conflicts with builtin 'memset' function. GCC version
+>= 10 will have an incorrect compilation without -fno-builtin;
+
+Issue-Id: SCM-3816
+Upstream-Status: Inappropriate [other]
+  Implementation pending further discussion
+Signed-off-by: Jaxson Han <jaxson.han@arm.com>
+Change-Id: Ib274485a34d26215595fd0cd737be86610289817
+---
+ Makefile.am         | 4 ++--
+ arch/aarch64/boot.S | 6 ++++++
+ common/boot.c       | 4 ++++
+ 3 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 054becd..b01809c 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -23,7 +23,7 @@ DEFINES		+= -DCPU_IDS=$(CPU_IDS)
+ DEFINES		+= -DNR_CPUS=$(NR_CPUS)
+ DEFINES		+= $(if $(SYSREGS_BASE), -DSYSREGS_BASE=$(SYSREGS_BASE), )
+ DEFINES		+= -DUART_BASE=$(UART_BASE)
+-DEFINES		+= -DSTACK_SIZE=256
++DEFINES		+= -DSTACK_SIZE=1024
+ 
+ if KERNEL_32
+ DEFINES		+= -DKERNEL_32
+@@ -132,7 +132,7 @@ CHOSEN_NODE	:= chosen {						\
+ CPPFLAGS	+= $(INITRD_FLAGS)
+ CFLAGS		+= -I$(top_srcdir)/include/ -I$(top_srcdir)/$(ARCH_SRC)/include/
+ CFLAGS		+= -Wall -fomit-frame-pointer
+-CFLAGS 		+= -fno-stack-protector
++CFLAGS 		+= -fno-stack-protector -fno-builtin
+ CFLAGS		+= -ffunction-sections -fdata-sections
+ CFLAGS		+= -fno-pic -fno-pie
+ LDFLAGS		+= --gc-sections
+diff --git a/arch/aarch64/boot.S b/arch/aarch64/boot.S
+index 157c097..f310387 100644
+--- a/arch/aarch64/boot.S
++++ b/arch/aarch64/boot.S
+@@ -240,6 +240,10 @@ el2_init:
+ #endif
+ 	ldr	x1, =spsr_to_elx
+ 	str	w0, [x1]
++
++	mov	w0, #1
++	ldr	x1, =flag_v8r
++	str	w0, [x1]
+ 	// fall through
+ 
+ el_max_init:
+@@ -319,3 +323,5 @@ flag_keep_el:
+ 	.long 0
+ ASM_DATA(spsr_to_elx)
+ 	.long 0
++ASM_DATA(flag_v8r)
++	.long 0
+diff --git a/common/boot.c b/common/boot.c
+index ee2bea0..38b2dca 100644
+--- a/common/boot.c
++++ b/common/boot.c
+@@ -11,6 +11,9 @@
+ 
+ extern unsigned long entrypoint;
+ extern unsigned long dtb;
++extern unsigned int  flag_v8r;
++
++extern void dt_fw_node_init(int enable);
+ 
+ void init_platform(void);
+ 
+@@ -64,6 +67,7 @@ void __noreturn first_spin(unsigned int cpu, unsigned long *mbox,
+ 	if (cpu == 0) {
+ 		init_platform();
+ 		dt_add_memreserve();
++		dt_fw_node_init(flag_v8r == 1);
+ 
+ 		*mbox = (unsigned long)&entrypoint;
+ 		sevl();
+-- 
+2.25.1
+

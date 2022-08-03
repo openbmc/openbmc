@@ -1,0 +1,61 @@
+From de5d2b6c200ae5dd8113751e58bf7cf5844eec5a Mon Sep 17 00:00:00 2001
+From: Jaxson Han <jaxson.han@arm.com>
+Date: Tue, 28 Dec 2021 17:42:48 +0800
+Subject: [PATCH] Makefile: Add the libfdt to the Makefile system
+
+Add the libfdt into Makefile system. The libfdt uses const value and
+thus gcc will enable the stack guard. The stack guard will fail the
+compile. Add -fno-stack-protector to fix it.
+
+Issue-Id: SCM-3814
+Upstream-Status: Inappropriate [other]
+  Implementation pending further discussion
+Signed-off-by: Jaxson Han <jaxson.han@arm.com>
+Change-Id: I472bc28cdc5cde3b22461a4b7d7a3752ae382b4b
+---
+ Makefile.am | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 88a27de..5e8668a 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -36,6 +36,9 @@ PSCI_CPU_OFF	:= 0x84000002
+ COMMON_SRC	:= common/
+ COMMON_OBJ	:= boot.o bakery_lock.o platform.o lib.o
+ 
++LIBFDT_SRC	:= common/libfdt/
++LIBFDT_OBJS	:= fdt.o fdt_ro.o fdt_rw.o
++
+ ARCH_OBJ	:= boot.o stack.o utils.o
+ 
+ if BOOTWRAPPER_32
+@@ -125,11 +128,12 @@ CHOSEN_NODE	:= chosen {						\
+ CPPFLAGS	+= $(INITRD_FLAGS)
+ CFLAGS		+= -I$(top_srcdir)/include/ -I$(top_srcdir)/$(ARCH_SRC)/include/
+ CFLAGS		+= -Wall -fomit-frame-pointer
++CFLAGS 		+= -fno-stack-protector
+ CFLAGS		+= -ffunction-sections -fdata-sections
+ CFLAGS		+= -fno-pic -fno-pie
+ LDFLAGS		+= --gc-sections
+ 
+-OBJ		:= $(addprefix $(ARCH_SRC),$(ARCH_OBJ)) $(addprefix $(COMMON_SRC),$(COMMON_OBJ))
++OBJ		:= $(addprefix $(ARCH_SRC),$(ARCH_OBJ)) $(addprefix $(COMMON_SRC),$(COMMON_OBJ)) $(addprefix $(LIBFDT_SRC),$(LIBFDT_OBJS))
+ 
+ # Don't lookup all prerequisites in $(top_srcdir), only the source files. When
+ # building outside the source tree $(ARCH_SRC) needs to be created.
+@@ -150,10 +154,13 @@ $(ARCH_SRC):
+ $(COMMON_SRC):
+ 	$(MKDIR_P) $@
+ 
++$(LIBFDT_SRC):
++	$(MKDIR_P) $@
++
+ %.o: %.S Makefile | $(ARCH_SRC)
+ 	$(CC) $(CPPFLAGS) -D__ASSEMBLY__ $(CFLAGS) $(DEFINES) -c -o $@ $<
+ 
+-%.o: %.c Makefile | $(COMMON_SRC)
++%.o: %.c Makefile | $(COMMON_SRC) $(LIBFDT_SRC)
+ 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c -o $@ $<
+ 
+ model.lds: $(LD_SCRIPT) Makefile

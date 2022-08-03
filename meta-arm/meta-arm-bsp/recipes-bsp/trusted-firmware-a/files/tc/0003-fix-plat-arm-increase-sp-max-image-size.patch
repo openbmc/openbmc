@@ -1,0 +1,30 @@
+From 0060b1a4fbe3bc9992f59a2d4cb986821f7bcf13 Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Mon, 11 Apr 2022 18:31:01 +0100
+Subject: [PATCH 3/7] fix(plat/arm): increase sp max image size
+
+Increase ARM_SP_MAX_SIZE to support Trusty image.
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Change-Id: I9ef9e755769445aee998062a7fba508fad50b33e
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ include/plat/arm/common/fconf_arm_sp_getter.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/plat/arm/common/fconf_arm_sp_getter.h b/include/plat/arm/common/fconf_arm_sp_getter.h
+index aa628dfd3..3ed953d1c 100644
+--- a/include/plat/arm/common/fconf_arm_sp_getter.h
++++ b/include/plat/arm/common/fconf_arm_sp_getter.h
+@@ -13,7 +13,7 @@
+ /* arm_sp getter */
+ #define arm__sp_getter(prop)	arm_sp.prop
+ 
+-#define ARM_SP_MAX_SIZE		U(0xb0000)
++#define ARM_SP_MAX_SIZE		U(0x2000000)
+ #define ARM_SP_OWNER_NAME_LEN	U(8)
+ 
+ struct arm_sp_t {
+-- 
+2.30.2
+

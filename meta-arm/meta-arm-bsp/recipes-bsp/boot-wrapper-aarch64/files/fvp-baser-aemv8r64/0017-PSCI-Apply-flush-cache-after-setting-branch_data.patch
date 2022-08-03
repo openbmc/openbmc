@@ -1,0 +1,52 @@
+From 6923f2a0c59cf92ba5ad50ec1d658a357b4ba5d7 Mon Sep 17 00:00:00 2001
+From: Jaxson Han <jaxson.han@arm.com>
+Date: Tue, 2 Nov 2021 10:48:39 +0800
+Subject: [PATCH] PSCI: Apply flush cache after setting branch_data
+
+For v8-R64, Hypervisor calls boot-wrapper's PSCI service using simple
+function call (instead of hvc).
+
+In this case, hypervisor's main core has enabled MPU and cache, but
+the secondary cores which are spinning have not enabled cache.
+That means if the main core set the branch_data to 1 to boot other
+cores, the secondary cores cannot see the change of branch_data and
+also cannot break the spin.
+
+Thus, the PSCI service in boot-wrapper needs a cache flush after
+setting branch_data in order to let other cores see the change.
+
+Issue-ID: SCM-3816
+Upstream-Status: Inappropriate [other]
+  Implementation pending further discussion
+Signed-off-by: Jaxson Han <jaxson.han@arm.com>
+Change-Id: Ifc282091c54d8fb2ffdb8cfa7fd3ffc1f4be717e
+---
+ common/psci.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/common/psci.c b/common/psci.c
+index 945780b..6efc695 100644
+--- a/common/psci.c
++++ b/common/psci.c
+@@ -24,12 +24,18 @@ static unsigned long branch_table[NR_CPUS];
+ 
+ bakery_ticket_t branch_table_lock[NR_CPUS];
+ 
++static inline void flush_per_cpu_data(void *data)
++{
++	asm volatile ("dc cvac, %0" : : "r" (data));
++}
++
+ static int psci_store_address(unsigned int cpu, unsigned long address)
+ {
+ 	if (branch_table[cpu] != PSCI_ADDR_INVALID)
+ 		return PSCI_RET_ALREADY_ON;
+ 
+ 	branch_table[cpu] = address;
++	flush_per_cpu_data((void*)&(branch_table[cpu]));
+ 	return PSCI_RET_SUCCESS;
+ }
+ 
+-- 
+2.25.1
+

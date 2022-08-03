@@ -18,6 +18,7 @@ trap 'rm $patch_files_tmp $allowed_patches_tmp' exit
 git ls-files -- \
   '*.patch' \
   ':!:poky/**' \
+  ':!:meta-arm/**' \
   ':!:meta-security/**' \
   ':!:meta-raspberrypi/**' \
   ':!:meta-openembedded/**' \
@@ -82,6 +83,7 @@ trap 'rm $dts_files_tmp $allowed_dts_tmp' exit
 git ls-files -- \
   '*.dts' \
   ':!:poky/**' \
+  ':!:meta-arm/**' \
   ':!:meta-security/**' \
   ':!:meta-raspberrypi/**' \
   ':!:meta-openembedded/**' \
@@ -203,6 +205,7 @@ done
 
 non_bbfiles=$(git ls-files -- \
   ':!:poky/**' \
+  ':!:meta-arm/**' \
   ':!:meta-security/**' \
   ':!:meta-raspberrypi/**' \
   ':!:meta-openembedded/**' \

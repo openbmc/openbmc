@@ -1,0 +1,107 @@
+From 61a2df4467c13bbc83bff8a3429e9ebb4b957b56 Mon Sep 17 00:00:00 2001
+From: Peter Hoyes <Peter.Hoyes@arm.com>
+Date: Fri, 10 Dec 2021 11:41:19 +0000
+Subject: [PATCH 3/9] armv8: Allow disabling exception vectors on non-SPL
+ builds
+
+On the BASER_FVP, U-Boot shares EL2 with another bootloader, so we do
+not wish to overide the exception vector, but we are also not using an
+SPL build.
+
+Therefore, add ARMV8_EXCEPTION_VECTORS, which disables exception vectors
+in a similar way to ARMV8_SPL_EXCEPTION_VECTORS.
+
+Rename ARMV8_SPL_EXCEPTION_VECTORS -> SPL_ARMV8_EXCEPTION_VECTORS so
+that both config flags be be targeted using CONFIG_IS_ENABLED.
+
+Issue-Id: SCM-3728
+Upstream-Status: Inappropriate [other]
+  Implementation pending further discussion
+Signed-off-by: Peter Hoyes <Peter.Hoyes@arm.com>
+Change-Id: I0cf0fc6d7ef4d45791411cf1f67c65e198cc8b2b
+---
+ arch/arm/cpu/armv8/Kconfig        | 10 ++++++++--
+ arch/arm/cpu/armv8/Makefile       |  6 ++----
+ arch/arm/cpu/armv8/start.S        |  4 ++--
+ configs/vexpress_aemv8r_defconfig |  1 +
+ 4 files changed, 13 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm/cpu/armv8/Kconfig b/arch/arm/cpu/armv8/Kconfig
+index 09f3f50fa2..031faa909c 100644
+--- a/arch/arm/cpu/armv8/Kconfig
++++ b/arch/arm/cpu/armv8/Kconfig
+@@ -1,8 +1,8 @@
+ if ARM64
+ 
+-config ARMV8_SPL_EXCEPTION_VECTORS
++config ARMV8_EXCEPTION_VECTORS
+ 	bool "Install crash dump exception vectors"
+-	depends on SPL
++	default y
+ 	help
+ 	  The default exception vector table is only used for the crash
+ 	  dump, but still takes quite a lot of space in the image size.
+@@ -10,6 +10,12 @@ config ARMV8_SPL_EXCEPTION_VECTORS
+ 	  Say N here if you are running out of code space in the image
+ 	  and want to save some space at the cost of less debugging info.
+ 
++config SPL_ARMV8_EXCEPTION_VECTORS
++	bool "Install crash dump exception vectors in the SPL"
++	depends on SPL
++	help
++	  Same as ARMV8_EXCEPTION_VECTORS, but for SPL builds
++
+ config ARMV8_MULTIENTRY
+         bool "Enable multiple CPUs to enter into U-Boot"
+ 
+diff --git a/arch/arm/cpu/armv8/Makefile b/arch/arm/cpu/armv8/Makefile
+index 85fe0475c8..8b3f695835 100644
+--- a/arch/arm/cpu/armv8/Makefile
++++ b/arch/arm/cpu/armv8/Makefile
+@@ -13,10 +13,8 @@ ifndef CONFIG_$(SPL_)SYS_DCACHE_OFF
+ obj-y	+= cache_v8.o
+ obj-y	+= cache.o
+ endif
+-ifdef CONFIG_SPL_BUILD
+-obj-$(CONFIG_ARMV8_SPL_EXCEPTION_VECTORS) += exceptions.o
+-else
+-obj-y	+= exceptions.o
++obj-$(CONFIG_$(SPL_)ARMV8_EXCEPTION_VECTORS) += exceptions.o
++ifndef CONFIG_SPL_BUILD
+ obj-y	+= exception_level.o
+ endif
+ obj-y	+= tlb.o
+diff --git a/arch/arm/cpu/armv8/start.S b/arch/arm/cpu/armv8/start.S
+index 28f0df13f0..f831e77af3 100644
+--- a/arch/arm/cpu/armv8/start.S
++++ b/arch/arm/cpu/armv8/start.S
+@@ -104,7 +104,7 @@ pie_skip_reloc:
+ pie_fixup_done:
+ #endif
+ 
+-#if defined(CONFIG_ARMV8_SPL_EXCEPTION_VECTORS) || !defined(CONFIG_SPL_BUILD)
++#if CONFIG_IS_ENABLED(ARMV8_EXCEPTION_VECTORS)
+ .macro	set_vbar, regname, reg
+ 	msr	\regname, \reg
+ .endm
+@@ -354,7 +354,7 @@ ENDPROC(smp_kick_all_cpus)
+ /*-----------------------------------------------------------------------*/
+ 
+ ENTRY(c_runtime_cpu_setup)
+-#if defined(CONFIG_ARMV8_SPL_EXCEPTION_VECTORS) || !defined(CONFIG_SPL_BUILD)
++#if CONFIG_IS_ENABLED(ARMV8_EXCEPTION_VECTORS)
+ 	/* Relocate vBAR */
+ 	adr	x0, vectors
+ 	switch_el x1, 3f, 2f, 1f
+diff --git a/configs/vexpress_aemv8r_defconfig b/configs/vexpress_aemv8r_defconfig
+index a1c5d88717..1d5b7411f0 100644
+--- a/configs/vexpress_aemv8r_defconfig
++++ b/configs/vexpress_aemv8r_defconfig
+@@ -13,3 +13,4 @@ CONFIG_BOOTARGS="console=ttyAMA0 earlycon=pl011,0x9c090000 rootfstype=ext4 root=
+ CONFIG_SYS_PROMPT="VExpress64# "
+ # CONFIG_MMC is not set
+ CONFIG_VIRTIO_MMIO=y
++CONFIG_ARMV8_EXCEPTION_VECTORS=n
+-- 
+2.25.1
+

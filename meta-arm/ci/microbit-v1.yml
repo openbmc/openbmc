@@ -1,0 +1,7 @@
+header:
+  version: 11
+  includes:
+    - ci/base.yml
+    - ci/meta-zephyr.yml
+
+machine: microbit-v1

@@ -1,0 +1,38 @@
+From 2851f0e6c1216894b9498d7b91256bb1ef49e544 Mon Sep 17 00:00:00 2001
+From: Jaxson Han <jaxson.han@arm.com>
+Date: Tue, 2 Nov 2021 15:10:28 +0800
+Subject: [PATCH] lds: Mark the mem range
+
+Add firmware_start and firmware_end, so that we can use them to
+calculate the mem range of boot-wrapper and then set the range to
+/memreserve/ of dtb.
+
+Issue-ID: SCM-3815
+Upstream-Status: Inappropriate [other]
+  Implementation pending further discussion
+Signed-off-by: Jaxson Han <jaxson.han@arm.com>
+Change-Id: Idc5a2894e193c75381049a0f359b4b2a51c567ee
+---
+ model.lds.S | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/model.lds.S b/model.lds.S
+index d4e7e13..ab98ddf 100644
+--- a/model.lds.S
++++ b/model.lds.S
+@@ -64,6 +64,7 @@ SECTIONS
+ #endif
+ 
+ 	.boot PHYS_OFFSET: {
++		PROVIDE(firmware_start = .);
+ 		*(.init)
+ 		*(.text*)
+ 		*(.data* .rodata* .bss* COMMON)
+@@ -76,6 +77,7 @@ SECTIONS
+ 		mbox = .;
+ 		QUAD(0x0)
+ 	}
++	PROVIDE(firmware_end = .);
+ 
+ 	ASSERT(etext <= (PHYS_OFFSET + TEXT_LIMIT), ".text overflow!")
+ }

@@ -1,0 +1,55 @@
+From ce628de7699dd6401ddf713efaa49872e2733619 Mon Sep 17 00:00:00 2001
+From: Jaxson Han <jaxson.han@arm.com>
+Date: Tue, 25 May 2021 07:25:00 +0100
+Subject: [PATCH] aarch64: Prepare for lower EL booting
+
+Save SPSR_KERNEL into spsr_to_elx during el3_init.
+The jump_kernel will load spsr_to_elx into spsr_el3.
+
+This change will make it easier to control whether drop to lower EL
+before jumping to the kernel.
+
+Upstream-Status: Pending
+Signed-off-by: Jaxson Han <jaxson.han@arm.com>
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+---
+ arch/aarch64/boot.S | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/arch/aarch64/boot.S b/arch/aarch64/boot.S
+index b589744..6b45afc 100644
+--- a/arch/aarch64/boot.S
++++ b/arch/aarch64/boot.S
+@@ -130,7 +130,16 @@ el3_init:
+ 	mov	x0, #ZCR_EL3_LEN_MASK		// SVE: Enable full vector len
+ 	msr	ZCR_EL3, x0			// for EL2.
+ 
+-1:
++	/*
++	 * Save SPSR_KERNEL into spsr_to_elx.
++	 * The jump_kernel will load spsr_to_elx into spsr_el3
++	 */
++1:	mov	w0, #SPSR_KERNEL
++	ldr	x1, =spsr_to_elx
++	str	w0, [x1]
++	b	el_max_init
++
++el_max_init:
+ 	ldr	x0, =COUNTER_FREQ
+ 	msr	cntfrq_el0, x0
+ 
+@@ -178,7 +187,7 @@ ASM_FUNC(jump_kernel)
+ 	b.eq	1f
+ 	br	x19			// Keep current EL
+ 
+-1:	mov	x4, #SPSR_KERNEL
++1:	ldr	w4, spsr_to_elx
+ 
+ 	/*
+ 	 * If bit 0 of the kernel address is set, we're entering in AArch32
+@@ -196,3 +205,5 @@ ASM_FUNC(jump_kernel)
+ 	.align 3
+ flag_keep_el:
+ 	.long 0
++spsr_to_elx:
++	.long 0

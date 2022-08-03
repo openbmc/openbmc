@@ -1,0 +1,62 @@
+/*
+* Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+*
+* SPDX-License-Identifier: BSD-3-Clause
+*/
+
+/dts-v1/;
+
+/ {
+    se-proxy{
+        compatible = "arm,ffa-manifest-1.0";
+        ffa-version = <0x00010000>; /* 31:16 - Major, 15:0 - Minor */
+        uuid = <0x46bb39d1 0xb4d945b5 0x88ff0400 0x27dab249>;
+        description = "SE Proxy";
+        execution-ctx-count = <1>;
+        exception-level = <1>; /* S-EL0 */
+        execution-state = <0>; /* AArch64 */
+        xlat-granule = <0>; /* 4KiB */
+        messaging-method = <0>; /* Direct messaging only */
+	device-regions {
+		compatible = "arm,ffa-manifest-device-regions";
+		mhu-sender {
+			/* Armv8 A Foundation Platform values */
+			base-address = <0x00000000 0x1b820000>;
+			pages-count = <16>;
+			attributes = <0x3>; /* read-write */
+		};
+		mhu-receiver {
+			/* Armv8 A Foundation Platform values */
+			base-address = <0x00000000 0x1b830000>;
+			pages-count = <16>;
+			attributes = <0x3>; /* read-write */
+		};
+		openamp-virtio {
+			/* Armv8 A Foundation Platform values */
+			base-address = <0x00000000 0x88000000>;
+			pages-count = <256>;
+			attributes = <0x3>; /* read-write */
+		};
+	};
+    };
+    smm-gateway{
+        compatible = "arm,ffa-manifest-1.0";
+        ffa-version = <0x00010000>; /* 31:16 - Major, 15:0 - Minor */
+        uuid = <0xed32d533 0x99e64209 0x9cc02d72 0xcdd998a7>;
+        description = "SMM Gateway";
+        execution-ctx-count = <1>;
+        exception-level = <1>; /* S-EL0 */
+        execution-state = <0>; /* AArch64 */
+        xlat-granule = <0>; /* 4KiB */
+        messaging-method = <0>; /* Direct messaging only */
+		device-regions {
+          compatible = "arm,ffa-manifest-device-regions";
+          mm-comm-buffer {
+              /* Armv8 A Foundation Platform values */
+              base-address = <0x00000000 0x02000000>;
+              pages-count = <1>;
+              attributes = <0x3>; /* read-write */
+              };
+		};
+    };
+};

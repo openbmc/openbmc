@@ -1,0 +1,41 @@
+header:
+  version: 9
+
+distro: poky
+machine: fvp-baser-aemv8r64
+
+defaults:
+  repos:
+    refspec: master
+
+repos:
+  meta-arm:
+    url: https://git.yoctoproject.org/git/meta-arm
+    path: layers/meta-arm
+    layers:
+      meta-arm:
+      meta-arm-bsp:
+      meta-arm-toolchain:
+
+  poky:
+    url: https://git.yoctoproject.org/git/poky
+    path: layers/poky
+    layers:
+      meta:
+      meta-poky:
+
+env:
+  FVP_BASE_R_ARM_EULA_ACCEPT: "False"
+
+local_conf_header:
+  base: |
+    CONF_VERSION = "2"
+    PACKAGE_CLASSES = "package_ipk"
+    PACKAGECONFIG:remove:pn-qemu-system-native = "gtk+ sdl"
+    EXTRA_IMAGE_FEATURES:append = " debug-tweaks ssh-server-openssh"
+    CORE_IMAGE_EXTRA_INSTALL:append = " ssh-pregen-hostkeys"
+    LICENSE_FLAGS_ACCEPTED:append = " ${@oe.utils.vartrue('FVP_BASE_R_ARM_EULA_ACCEPT', 'Arm-FVP-EULA', '', d)}"
+    IMAGE_CLASSES:append = " testimage"
+
+target:
+  - core-image-minimal
