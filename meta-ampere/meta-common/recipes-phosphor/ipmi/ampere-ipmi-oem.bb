@@ -6,11 +6,9 @@ S = "${WORKDIR}"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
-DEPENDS = "boost phosphor-ipmi-host phosphor-logging systemd libgpiod"
+DEPENDS = "boost phosphor-ipmi-host phosphor-logging systemd"
 
-inherit cmake pkgconfig obmc-phosphor-ipmiprovider-symlink
-
-EXTRA_OECMAKE="-DENABLE_TEST=0 -DYOCTO=1"
+inherit meson pkgconfig obmc-phosphor-ipmiprovider-symlink
 
 LIBRARY_NAMES = "libzampoemcmds.so"
 
