@@ -31,7 +31,7 @@ FILES:phosphor-ldap += " \
         ${bindir}/phosphor-ldap-conf \
 "
 FILES:${PN} += " \
-        ${base_libdir}/systemd \
+        ${systemd_unitdir} \
         ${datadir}/dbus-1 \
         ${datadir}/phosphor-certificate-manager \
 "
