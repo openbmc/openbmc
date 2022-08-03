@@ -19,7 +19,8 @@ DEPENDS = "pdbg \
            libxml-simple-perl-native \
            libxml-libxml-perl-native \
            ekb-native \
-           autoconf-archive"
+           autoconf-archive \
+           dtc-native"
 
 PDATA_CONFARG = "CHIP=p10"
 EXTRA_OECONF = "--enable-gen_attrsinfo ${PDATA_CONFARG}"
