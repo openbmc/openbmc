@@ -10,13 +10,12 @@ inherit deploy python3native
 DEPENDS = "python3-pycryptodome-native python3-pyelftools-native python3-pycryptodomex-native python3-cryptography-native"
 
 S = "${WORKDIR}/git"
-BRANCH ?= "nuvoton"
-REPO ?= "git://github.com/Nuvoton-Israel/optee_os.git;branch=nuvoton;protocol=https"
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
-SRC_URI = "${REPO};${BRANCHARG} \           
-	   file://0001-allow-sysroot-for-libgcc-lookup.patch \
-          "
-SRCREV = "6d2cdcf8e9c660751fc656b45ee631ade8d956e4"
+
+SRC_URI = " \
+    git://github.com/Nuvoton-Israel/optee_os.git;branch=nuvoton;protocol=https \
+"
+
+SRCREV = "3d57bd8e2faa21fc0ab7064156a0376a5e2fdd51"
 
 OPTEEMACHINE ?= "nuvoton"
 MACHINE_SOC ?= "npcm8xx"
