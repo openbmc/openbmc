@@ -25,6 +25,7 @@ def run_git(d, cmd):
 # indirection via PHOSPHOR_OS_RELEASE_DISTRO_VERSION.
 PHOSPHOR_OS_RELEASE_DISTRO_VERSION := "${@run_git(d, 'describe --dirty')}"
 DISTRO_VERSION ??= "${PHOSPHOR_OS_RELEASE_DISTRO_VERSION}"
+EXTENDED_VERSION ??= "${PHOSPHOR_OS_RELEASE_DISTRO_VERSION}"
 
 VERSION = "${@'-'.join(d.getVar('VERSION_ID').split('-')[0:2])}"
 

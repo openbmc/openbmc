@@ -34,3 +34,7 @@ def do_get_versionID(d):
 def do_get_buildID(d):
     build_id = do_get_os_release_value(d, 'BUILD_ID')
     return build_id
+
+def do_get_extended_version(d):
+    extended_version = do_get_os_release_value(d, 'EXTENDED_VERSION')
+    return extended_version
