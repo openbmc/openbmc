@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 S = "${WORKDIR}/git"
 SRC_URI += "git://github.com/openbmc/phosphor-buttons.git;branch=master;protocol=https"
-SRCREV = "ab8dac5102fdacec33076055854cb5b3047d9c72"
+SRCREV = "7897dc6f1a591814c2b73df958e6862cafeddeb2"
 
 inherit meson pkgconfig systemd
 
