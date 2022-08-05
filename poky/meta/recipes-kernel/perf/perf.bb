@@ -227,6 +227,9 @@ do_configure:prepend () {
         # reproducible.
         sed -i -e 's,$(call get-executable-or-default\,PYTHON\,$(PYTHON_AUTO)),$(notdir $(call get-executable-or-default\,PYTHON\,$(PYTHON_AUTO))),g' \
             ${S}/tools/perf/Makefile.config
+        # The same line is in older releases, but looking explicitly for Python 2
+        sed -i -e 's,$(call get-executable-or-default\,PYTHON\,$(PYTHON2)),$(notdir $(call get-executable-or-default\,PYTHON\,$(PYTHON2))),g' \
+            ${S}/tools/perf/Makefile.config
 
 	# likewise with this substitution. Kernels with commit 18f2967418d031a39
 	# [perf tools: Use Python devtools for version autodetection rather than runtime]

@@ -1,0 +1,32 @@
+From d9f118a3408a8a2530f0f60e8072f4323911530f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 27 Jul 2022 01:08:20 +0000
+Subject: [PATCH] device-utils.c: Use linux mount.h instead of sys/mount.h
+
+This file includes linucx/fs.h which includes linux/mount.h and with
+glibc 2.36 linux/mount.h and glibc mount.h are not compatible [1]
+therefore try to avoid including both headers
+
+[1] https://sourceware.org/glibc/wiki/Release/2.36
+
+Upstream-Status: Submitted [https://www.spinics.net/lists/linux-btrfs/msg126918.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ common/device-utils.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/common/device-utils.c b/common/device-utils.c
+index 617b6746..25a4fb8c 100644
+--- a/common/device-utils.c
++++ b/common/device-utils.c
+@@ -15,7 +15,6 @@
+  */
+ 
+ #include <sys/ioctl.h>
+-#include <sys/mount.h>
+ #include <sys/statfs.h>
+ #include <sys/types.h>
+ #include <stdio.h>
+-- 
+2.25.1
+

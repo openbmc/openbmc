@@ -11,7 +11,7 @@ inherit pypi python_setuptools_build_meta
 
 DEPENDS += " \
 	${PYTHON_PN}-setuptools-scm-native \
-	${PYTHON_PN}-toml-native \
+	${PYTHON_PN}-setuptools-scm-git-archive-native \
 "
 
 RDEPENDS:${PN} = " \

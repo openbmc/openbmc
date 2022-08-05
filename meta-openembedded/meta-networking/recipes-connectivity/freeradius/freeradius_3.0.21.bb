@@ -38,6 +38,11 @@ raddbdir="${sysconfdir}/${MLPREFIX}raddb"
 
 SRCREV = "af428abda249b2279ba0582180985a9f6f4a144a"
 
+CVE_CHECK_IGNORE = "\
+    CVE-2002-0318 \
+    CVE-2011-4966 \
+"
+
 PARALLEL_MAKE = ""
 
 S = "${WORKDIR}/git"

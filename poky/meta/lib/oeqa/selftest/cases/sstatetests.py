@@ -444,7 +444,7 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
             f = []
             for root, dirs, files in os.walk(d):
                 for name in files:
-                    if "meta-environment" in root or "cross-canadian" in root:
+                    if "meta-environment" in root or "cross-canadian" in root or 'meta-ide-support' in root:
                         continue
                     if "qemux86copy-" in root or "qemux86-" in root:
                         continue

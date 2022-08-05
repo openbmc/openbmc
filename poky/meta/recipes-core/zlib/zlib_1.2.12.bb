@@ -39,16 +39,4 @@ do_install_ptest() {
 	install ${B}/examplesh ${D}${PTEST_PATH}
 }
 
-# Move zlib shared libraries for target builds to $base_libdir so the library
-# can be used in early boot before $prefix is mounted.
-do_install:append:class-target() {
-	if [ ${base_libdir} != ${libdir} ]
-	then
-		mkdir -p ${D}/${base_libdir}
-		mv ${D}/${libdir}/libz.so.* ${D}/${base_libdir}
-		libname=`readlink ${D}/${libdir}/libz.so`
-		ln -sf ${@oe.path.relative("${libdir}", "${base_libdir}")}/$libname ${D}${libdir}/libz.so
-	fi
-}
-
 BBCLASSEXTEND = "native nativesdk"

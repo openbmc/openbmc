@@ -18,6 +18,9 @@ SRC_URI[sha256sum] = "60293ea79ac9253d600cdc9be077ad2988ca22284a439c9e66be5150db
 
 inherit autotools ptest
 
+# Not yet ported to rv32
+COMPATIBLE_HOST:riscv32 = "null"
+
 PACKAGECONFIG:class-target ??= "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez', '', d)} \
 "

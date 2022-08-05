@@ -63,24 +63,46 @@ toolchain_create_sdk_env_script () {
 	toolchain_shared_env_script
 }
 
-# This function creates an environment-setup-script in the TMPDIR which enables
+# This function creates an environment-setup-script in B which enables
 # a OE-core IDE to integrate with the build tree
 # Caller must ensure CONFIG_SITE is setup
 toolchain_create_tree_env_script () {
-	script=${TMPDIR}/environment-setup-${REAL_MULTIMACH_TARGET_SYS}
+	script=${B}/environment-setup-${REAL_MULTIMACH_TARGET_SYS}
 	rm -f $script
 	touch $script
+	echo 'standalone_sysroot_target="${STAGING_DIR}/${MACHINE}"' >> $script
+	echo 'standalone_sysroot_native="${STAGING_DIR}/${BUILD_ARCH}"' >> $script
 	echo 'orig=`pwd`; cd ${COREBASE}; . ./oe-init-build-env ${TOPDIR}; cd $orig' >> $script
-	echo 'export PATH=${STAGING_DIR_NATIVE}/usr/bin:${STAGING_BINDIR_TOOLCHAIN}:$PATH' >> $script
-	echo 'export PKG_CONFIG_SYSROOT_DIR=${PKG_CONFIG_SYSROOT_DIR}' >> $script
-	echo 'export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}' >> $script
+	echo 'export PATH=$standalone_sysroot_native/${bindir_native}:$standalone_sysroot_native/${bindir_native}/${TARGET_SYS}:$PATH' >> $script
+	echo 'export PKG_CONFIG_SYSROOT_DIR=$standalone_sysroot_target' >> $script
+	echo 'export PKG_CONFIG_PATH=$standalone_sysroot_target'"$libdir"'/pkgconfig:$standalone_sysroot_target'"$prefix"'/share/pkgconfig' >> $script
 	echo 'export CONFIG_SITE="${CONFIG_SITE}"' >> $script
-	echo 'export SDKTARGETSYSROOT=${STAGING_DIR_TARGET}' >> $script
-	echo 'export OECORE_NATIVE_SYSROOT="${STAGING_DIR_NATIVE}"' >> $script
-	echo 'export OECORE_TARGET_SYSROOT="${STAGING_DIR_TARGET}"' >> $script
-	echo 'export OECORE_ACLOCAL_OPTS="-I ${STAGING_DIR_NATIVE}/usr/share/aclocal"' >> $script
+	echo 'export SDKTARGETSYSROOT=$standalone_sysroot_target' >> $script
+	echo 'export OECORE_NATIVE_SYSROOT=$standalone_sysroot_native' >> $script
+	echo 'export OECORE_TARGET_SYSROOT=$standalone_sysroot_target' >> $script
+	echo 'export OECORE_ACLOCAL_OPTS="-I $standalone_sysroot_native/usr/share/aclocal"' >> $script
+	echo 'export OECORE_BASELIB="${baselib}"' >> $script
+	echo 'export OECORE_TARGET_ARCH="${TARGET_ARCH}"' >>$script
+	echo 'export OECORE_TARGET_OS="${TARGET_OS}"' >>$script
 
 	toolchain_shared_env_script
+
+	cat >> $script <<EOF
+
+if [ -d "\$OECORE_NATIVE_SYSROOT/${datadir}/post-relocate-setup.d/" ]; then
+	for s in \$OECORE_NATIVE_SYSROOT/${datadir}/post-relocate-setup.d/*; do
+		if [ ! -x \$s ]; then
+			continue
+		fi
+		\$s "\$1"
+		status=\$?
+		if [ \$status != 0 ]; then
+			echo "post-relocate command \"\$s \$1\" failed with status \$status" >&2
+			exit \$status
+		fi
+	done
+fi
+EOF
 }
 
 toolchain_shared_env_script () {

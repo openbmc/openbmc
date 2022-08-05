@@ -12,11 +12,11 @@ concurrency:
 jobs:
   yocto-mirror:
     name: Yocto Git Mirror
-    runs-on: [self-hosted, Linux]
+    runs-on: ubuntu-latest
     steps:
-      - uses: agherzan/git-mirror-me-action@v1.0.0
+      - uses: agherzan/git-mirror-me-action@11f54c7186724daafbe5303b5075954f1a19a63e
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.YOCTO_META_RASPBERRYPI_SSH_PRIVATE_KEY }}
-          SSH_KNOWN_HOSTS: ${{ secrets.YOCTO_META_RASPBERRYPI_SSH_KNOWN_HOSTS }}
-        with:
-          destination-repository: "git@push.yoctoproject.org:meta-raspberrypi"
+          GMM_SSH_PRIVATE_KEY: ${{ secrets.YOCTO_META_RASPBERRYPI_SSH_PRIVATE_KEY }}
+          GMM_SSH_KNOWN_HOSTS: ${{ secrets.YOCTO_META_RASPBERRYPI_SSH_KNOWN_HOSTS }}
+          GMM_DST_REPO: "ssh://git@push.yoctoproject.org/meta-raspberrypi"
+          GMM_DEBUG: "1"

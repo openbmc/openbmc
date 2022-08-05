@@ -22,7 +22,7 @@ New Features / Enhancements in 4.0
 
      BB_SIGNATURE_HANDLER = "OEEquivHash"
      BB_HASHSERVE = "auto"
-     BB_HASHSERVE_UPSTREAM = "typhoon.yocto.io:8687"
+     BB_HASHSERVE_UPSTREAM = "hashserv.yocto.io:8687"
      SSTATE_MIRRORS ?= "file://.* https://sstate.yoctoproject.org/all/PATH;downloadfilename=PATH"
 
 - The Python package build process is now based on `wheels <https://pythonwheels.com/>`__

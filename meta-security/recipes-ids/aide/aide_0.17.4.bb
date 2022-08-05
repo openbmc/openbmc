@@ -10,6 +10,8 @@ SRC_URI = "https://github.com/aide/aide/releases/download/v${PV}/${BPN}-${PV}.ta
 
 SRC_URI[sha256sum] = "c81505246f3ffc2e76036d43a77212ae82895b5881d9b9e25c1361b1a9b7a846"
 
+UPSTREAM_CHECK_URI = "https://github.com/${BPN}/${BPN}/releases"
+
 inherit autotools pkgconfig aide-base
 
 PACKAGECONFIG ??=" mhash zlib e2fsattrs posix capabilities curl \

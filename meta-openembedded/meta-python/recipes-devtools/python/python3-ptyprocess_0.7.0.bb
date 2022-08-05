@@ -34,6 +34,7 @@ RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-fcntl \
 	${PYTHON_PN}-terminal \
 	${PYTHON_PN}-resource \
+	bash \
 "
 
 do_install_ptest() {

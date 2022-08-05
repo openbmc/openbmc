@@ -49,6 +49,9 @@ RDEPENDS:${PN}-ptest += "libasm libelf bash make coreutils ${PN}-binutils iprout
 
 EXTRA_OECONF:append:class-target = " --disable-tests-rpath"
 
+# symver functions not currently supported on microblaze
+EXTRA_OECONF:append:class-target:microblaze = " --disable-symbol-versioning"
+
 RDEPENDS:${PN}-ptest:append:libc-glibc = " glibc-utils glibc-dbg glibc-dev"
 INSANE_SKIP:${PN}-ptest = "debug-deps dev-deps"
 

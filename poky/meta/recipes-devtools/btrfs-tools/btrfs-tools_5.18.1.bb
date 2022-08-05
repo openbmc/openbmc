@@ -17,6 +17,7 @@ DEPENDS = "util-linux zlib"
 
 SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/kdave/btrfs-progs.git;branch=master \
            file://0001-Add-a-possibility-to-specify-where-python-modules-ar.patch \
+           file://0001-device-utils.c-Use-linux-mount.h-instead-of-sys-moun.patch \
            "
 SRCREV = "47b5cf867fc37411ef51eb5c09893a95f7f6c3b7"
 S = "${WORKDIR}/git"

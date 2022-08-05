@@ -43,8 +43,6 @@ SRCREV:pn-xf86-input-evdev = "${AUTOREV}"
 #PREFERRED_VERSION_xf86-input-evdev ?= "2.0.4"
 SRCREV:pn-xf86-input-mouse = "${AUTOREV}"
 #PREFERRED_VERSION_xf86-input-mouse ?= "1.3.0+git%"
-SRCREV:pn-xf86-input-keyboard = "${AUTOREV}"
-#PREFERRED_VERSION_xf86-input-keyboard ?= "1.3.1+git%"
 SRCREV:pn-xf86-input-synaptics = "${AUTOREV}"
 #PREFERRED_VERSION_xf86-input-synaptics ?= "0.15.2+git%"
 

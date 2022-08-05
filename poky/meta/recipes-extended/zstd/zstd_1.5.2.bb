@@ -26,6 +26,8 @@ PACKAGECONFIG[zlib] = "HAVE_ZLIB=1,HAVE_ZLIB=0,zlib"
 # See programs/README.md for how to use this
 ZSTD_LEGACY_SUPPORT ??= "4"
 
+EXTRA_OEMAKE += "V=1"
+
 do_compile () {
     oe_runmake ${PACKAGECONFIG_CONFARGS} ZSTD_LEGACY_SUPPORT=${ZSTD_LEGACY_SUPPORT}
     oe_runmake ${PACKAGECONFIG_CONFARGS} ZSTD_LEGACY_SUPPORT=${ZSTD_LEGACY_SUPPORT} -C contrib/pzstd

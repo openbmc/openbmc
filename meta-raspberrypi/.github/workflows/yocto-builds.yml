@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+---
+
 name: Builds
 
 on:
@@ -30,18 +32,35 @@ jobs:
     runs-on: [self-hosted, Linux]
     name: ${{ matrix.machine }}/${{ matrix.image }}/poky/systemd
     env:
-        DL_DIR: /var/lib/ci/yocto/downloads
-        SSTATE_DIR: /var/lib/ci/yocto/sstate
+      DL_DIR: /var/lib/ci/yocto/downloads
+      SSTATE_DIR: /var/lib/ci/yocto/sstate
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: Define Yocto build files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v24
+        with:
+          files: |
+            .github/actions/**
+            .github/workflows/docker-images/yocto-builder/**
+            .github/workflows/docker-images/*.sh
+            .github/workflows/yocto-builds.yml
+            classes/**'
+            conf/**
+            dynamic-layers/**
+            files/**
+            lib/**
+            recipes-**
+            wic/**
       - name: Build a temporary yocto-builder image
         uses: ./.github/actions/docker-build
         with:
           docker_image: yocto-builder
           id: ${{ github.event.number }}
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
       - name: Build the image
         run: |
           docker run --rm \
@@ -56,6 +75,7 @@ jobs:
             --env "SSTATE_DIR=$SSTATE_DIR" \
             "yocto-builder-${{ github.event.number }}" \
             /entrypoint-build.sh
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
       - name: Cleanup temporary docker image
         uses: ./.github/actions/docker-clean-image
         with:

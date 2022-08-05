@@ -1375,7 +1375,7 @@ class BaseConfig(object):
             elif "-display sdl" in output:
                 self.sdl = True
             else:
-                self.qemu_opt += '-display none'
+                self.qemu_opt += ' -display none'
 
         if self.sdl == True or self.gtk == True or self.egl_headless == True:
 

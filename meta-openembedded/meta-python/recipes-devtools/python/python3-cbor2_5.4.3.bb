@@ -8,6 +8,8 @@ SRC_URI[sha256sum] = "62b863c5ee6ced4032afe948f3c1484f375550995d3b8498145237fe28
 
 inherit pypi python_setuptools_build_meta ptest
 
+DEPENDS += "python3-setuptools-scm-native"
+
 SRC_URI += " \
         file://run-ptest \
 "

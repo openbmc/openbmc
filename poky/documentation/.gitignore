@@ -2,6 +2,7 @@ _build/
 Pipfile.lock
 poky.yaml
 sphinx-static/switchers.js
+releases.rst
 .vscode/
 */svg/*.png
 */svg/*.pdf

@@ -46,8 +46,6 @@ EXTRA_OECONF = " --disable-devpoll --disable-auto-validation --enable-epoll \
                "
 LDFLAGS:append = " -lz"
 
-inherit ${@bb.utils.contains('PACKAGECONFIG', 'python3', 'python3native setuptools3-base', '', d)}
-
 # dhcp needs .la so keep them
 REMOVE_LIBTOOL_LA = "0"
 
@@ -67,12 +65,6 @@ do_install:append() {
 	install -d "${D}${sysconfdir}/init.d"
 	install -m 644 ${S}/conf/* "${D}${sysconfdir}/bind/"
 	install -m 755 "${S}/init.d" "${D}${sysconfdir}/init.d/bind"
-        if ${@bb.utils.contains('PACKAGECONFIG', 'python3', 'true', 'false', d)}; then
-		sed -i -e '1s,#!.*python3,#! /usr/bin/python3,' \
-		${D}${sbindir}/dnssec-coverage \
-		${D}${sbindir}/dnssec-checkds \
-		${D}${sbindir}/dnssec-keymgr
-	fi
 
 	# Install systemd related files
 	install -d ${D}${sbindir}
@@ -119,9 +111,4 @@ FILES_SOLIBSDEV = "${libdir}/*[!0-9].so ${libdir}/libbind9.so"
 FILES:${PN}-libs = "${libdir}/named/*.so* ${libdir}/*-${PV}.so"
 FILES:${PN}-staticdev += "${libdir}/*.la"
 
-PACKAGE_BEFORE_PN += "${@bb.utils.contains('PACKAGECONFIG', 'python3', 'python3-bind', '', d)}"
-FILES:python3-bind = "${sbindir}/dnssec-coverage ${sbindir}/dnssec-checkds \
-                ${sbindir}/dnssec-keymgr ${PYTHON_SITEPACKAGES_DIR}"
-
 DEV_PKG_DEPENDENCY = ""
-RDEPENDS:python3-bind = "python3-core python3-ply"

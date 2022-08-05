@@ -151,6 +151,13 @@ class AsyncServer(object):
                 s.setsockopt(socket.SOL_TCP, socket.TCP_NODELAY, 1)
                 s.setsockopt(socket.SOL_TCP, socket.TCP_QUICKACK, 1)
 
+                # Enable keep alives. This prevents broken client connections
+                # from persisting on the server for long periods of time.
+                s.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                s.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 30)
+                s.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 15)
+                s.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 4)
+
             name = self.server.sockets[0].getsockname()
             if self.server.sockets[0].family == socket.AF_INET6:
                 self.address = "[%s]:%d" % (name[0], name[1])

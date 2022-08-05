@@ -123,4 +123,6 @@ pkg_postrm:${PN} () {
   fi
 }
 
+CONFFILES:${PN} = "${sysconfdir}/default/dropbear"
+
 FILES:${PN} += "${bindir}"

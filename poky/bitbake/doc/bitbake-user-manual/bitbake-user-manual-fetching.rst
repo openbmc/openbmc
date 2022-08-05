@@ -717,7 +717,7 @@ Javascript package registry.
 
 The format for the :term:`SRC_URI` setting must be::
 
-   SRC_URI = "npm://some.registry.url;OptionA=xxx;OptionB=xxx;..."
+   SRC_URI = "npm://some.registry.url;ParameterA=xxx;ParameterB=xxx;..."
 
 This fetcher supports the following parameters:
 
@@ -757,7 +757,7 @@ of an NPM package while locking their versions.
 
 The format for the :term:`SRC_URI` setting must be::
 
-   SRC_URI = "npmsw://some.registry.url;OptionA=xxx;OptionB=xxx;..."
+   SRC_URI = "npmsw://some.registry.url;ParameterA=xxx;ParameterB=xxx;..."
 
 This fetcher supports the following parameters:
 

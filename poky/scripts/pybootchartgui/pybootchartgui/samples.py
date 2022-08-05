@@ -53,6 +53,14 @@ class IOPressureSample:
         self.avg300 = avg300
         self.deltaTotal = deltaTotal
 
+class MemPressureSample:
+    def __init__(self, time, avg10, avg60, avg300, deltaTotal):
+        self.time = time
+        self.avg10 = avg10
+        self.avg60 = avg60
+        self.avg300 = avg300
+        self.deltaTotal = deltaTotal
+
 
 class MemSample:
     used_values = ('MemTotal', 'MemFree', 'Buffers', 'Cached', 'SwapTotal', 'SwapFree',)

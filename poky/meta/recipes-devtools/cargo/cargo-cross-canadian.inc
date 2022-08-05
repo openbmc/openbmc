@@ -5,7 +5,7 @@ RUST_ALTERNATE_EXE_PATH = "${STAGING_LIBDIR_NATIVE}/llvm-rust/bin/llvm-config"
 HOST_SYS = "${HOST_ARCH}-unknown-linux-gnu"
 CARGO_RUST_TARGET_CCLD = "${RUST_BUILD_CCLD}"
 
-require recipes-devtools/rust/rust-common.inc
+inherit rust-target-config
 require cargo.inc
 
 CARGO = "${WORKDIR}/${CARGO_SNAPSHOT}/bin/cargo"
@@ -28,15 +28,22 @@ inherit cross-canadian
 
 PN = "cargo-cross-canadian-${TRANSLATED_TARGET_ARCH}"
 
-python do_rust_gen_targets () {
-    wd = d.getVar('WORKDIR') + '/targets/'
-
-    rust_gen_target(d, 'BUILD', wd, "", "generic", d.getVar('BUILD_ARCH'))
-    rust_gen_target(d, 'HOST', wd, "", "generic", d.getVar('HOST_ARCH'))
-}
+RUST_TARGETGENS = "BUILD HOST"
 
 do_compile:prepend () {
 	PKG_CONFIG_PATH="${RECIPE_SYSROOT_NATIVE}/usr/lib/pkgconfig:${PKG_CONFIG_PATH}"
+}
+
+create_sdk_wrapper () {
+        file="$1"
+        shift
+
+        cat <<- EOF > "${file}"
+		#!/bin/sh
+		\$$1 \$@
+		EOF
+
+        chmod +x "$file"
 }
 
 do_install () {
@@ -46,6 +53,9 @@ do_install () {
     for i in ${SYS_BINDIR}/*; do
 	chrpath -r "\$ORIGIN/../lib" ${i}
     done
+
+    # Uses SDK's CC as linker so linked binaries works out of box.
+    create_sdk_wrapper "${SYS_BINDIR}/target-rust-ccld" "CC"
 
     ENV_SETUP_DIR=${D}${base_prefix}/environment-setup.d
     mkdir "${ENV_SETUP_DIR}"
@@ -58,7 +68,10 @@ do_install () {
 		touch "\$CARGO_HOME/config"
 		echo "[build]" >> "\$CARGO_HOME/config"
 		echo 'target = "'${TARGET_SYS}'"' >> "\$CARGO_HOME/config"
-        fi
+		echo '# TARGET_SYS' >> "\$CARGO_HOME/config"
+		echo '[target.'${TARGET_SYS}']' >> "\$CARGO_HOME/config"
+		echo 'linker = "target-rust-ccld"' >> "\$CARGO_HOME/config"
+    fi
 
 	# Keep the below off as long as HTTP/2 is disabled.
 	export CARGO_HTTP_MULTIPLEXING=false

@@ -104,6 +104,7 @@ def read_workspace():
     for fn in glob.glob(os.path.join(config.workspace_path, 'appends', '*.bbappend')):
         with open(fn, 'r') as f:
             pnvalues = {}
+            pn = None
             for line in f:
                 res = externalsrc_re.match(line.rstrip())
                 if res:
@@ -123,6 +124,9 @@ def read_workspace():
                 elif line.startswith('# srctreebase: '):
                     pnvalues['srctreebase'] = line.split(':', 1)[1].strip()
             if pnvalues:
+                if not pn:
+                    raise DevtoolError("Found *.bbappend in %s, but could not determine EXTERNALSRC:pn-*. "
+                            "Maybe still using old syntax?" % config.workspace_path)
                 if not pnvalues.get('srctreebase', None):
                     pnvalues['srctreebase'] = pnvalues['srctree']
                 logger.debug('Found recipe %s' % pnvalues)
@@ -314,10 +318,10 @@ def main():
 
     args = parser.parse_args(unparsed_args, namespace=global_args)
 
-    if not getattr(args, 'no_workspace', False):
-        read_workspace()
-
     try:
+        if not getattr(args, 'no_workspace', False):
+            read_workspace()
+
         ret = args.func(args, config, basepath, workspace)
     except DevtoolError as err:
         if str(err):

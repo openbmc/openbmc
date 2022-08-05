@@ -1,5 +1,5 @@
 SUMMARY = "Library to process JSON-RPC requests"
-HOMEPAGE = "https://github.com/bcb/jsonrpcserver"
+HOMEPAGE = "https://github.com/explodinglabs/jsonrpcserver"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=61b63ea9d36f6fb63ddaaaac8265304f"
 
@@ -16,6 +16,7 @@ RDEPENDS:${PN} += "\
     python3-logging \
     python3-netclient \
     python3-pkgutil \
+    python3-oslash \
 "
 
 BBCLASSEXTEND = "native nativesdk"

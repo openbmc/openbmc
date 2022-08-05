@@ -39,7 +39,7 @@ setup_cargo_environment () {
     printf "linker = '%s'\n" "${RUST_BUILD_CCLD}" >> ${CARGO_HOME}/config
 }
 
-include rust-common.inc
+inherit rust-target-config
 
 do_rust_setup_snapshot () {
     for installer in "${WORKDIR}/rust-snapshot-components/"*"/install.sh"; do

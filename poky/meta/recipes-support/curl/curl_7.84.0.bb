@@ -93,9 +93,10 @@ do_compile_ptest() {
 
 do_install_ptest() {
 	cat  ${WORKDIR}/disable-tests >> ${S}/tests/data/DISABLED
-	rm  ${B}/tests/configurehelp.pm
+	rm -f ${B}/tests/configurehelp.pm
 	cp -rf ${B}/tests ${D}${PTEST_PATH}
 	cp -rf ${S}/tests ${D}${PTEST_PATH}
+	find ${D}${PTEST_PATH}/ -type f -name Makefile.am -o -name Makefile.in -o -name Makefile -delete
 	install -d ${D}${PTEST_PATH}/src
 	ln -sf ${bindir}/curl   ${D}${PTEST_PATH}/src/curl
 	cp -rf ${D}${bindir}/curl-config ${D}${PTEST_PATH}

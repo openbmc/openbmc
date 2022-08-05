@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 #
 # Add version information to poky.yaml based upon current git branch/tags
+# Also generate the list of available manuals (releases.rst file)
 #
 # Copyright Linux Foundation
 # Author: Richard Purdie <richard.purdie@linuxfoundation.org>
+# Author: Quentin Schulz <foss@0leil.net>
 #
 # SPDX-License-Identifier: MIT
 #
@@ -14,6 +16,7 @@ import collections
 import sys
 import os
 import itertools
+import re
 
 ourversion = None
 if len(sys.argv) == 2:
@@ -231,3 +234,77 @@ with open("sphinx-static/switchers.js.in", "r") as r, open("sphinx-static/switch
 
 print("switchers.js generated from switchers.js.in")
 
+# generate releases.rst
+
+# list missing tags in yocto-docs
+missing_tags = [
+        'yocto-0.9',
+        'yocto-1.0', 'yocto-1.0.1',
+        'yocto-1.1', 'yocto-1.1.1',
+        'yocto-1.2',
+        'yocto-1.4.4', 'yocto-1.4.5',
+        'yocto-1.5', 'yocto-1.5.2', 'yocto-1.5.3', 'yocto-1.5.4',
+        'yocto-1.6', 'yocto-1.6.1', 'yocto-1.6.2',
+        'yocto-1.7', 'yocto-1.7.1',
+        'yocto-1.9',
+        'yocto-2.5.3',
+        'yocto-3.1', 'yocto-3.1.1', 'yocto-3.1.2', 'yocto-3.1.3',
+        ]
+
+semver = re.compile(r'yocto-(\d+)\.(\d+)(?:\.)?(\d*)')
+
+# git is able to properly order semver versions but not python
+# instead of adding a dependency on semver module, let's convert the version
+# into a decimal number, e.g. 11.23.1 will be 112301 and 1.5 will be 010500 so
+# it can be used as a key for the sorting algorithm.
+# This can be removed once all the old tags are re-created.
+def tag_to_semver_like(v):
+    v_semver = semver.search(v)
+    v_maj, v_min, v_patch = v_semver.groups('0')
+    return int("{:0>2}{:0>2}{:0>2}".format(v_maj, v_min, v_patch), 10)
+
+yocto_tags = subprocess.run(["git", "tag", "--list", "--sort=version:refname", "yocto-*"], capture_output=True, text=True).stdout
+yocto_tags = sorted(yocto_tags.split() + missing_tags, key=tag_to_semver_like)
+tags = [tag[6:] for tag in yocto_tags]
+
+with open('releases.rst', 'w') as f:
+    f.write('===========================\n')
+    f.write(' Supported Release Manuals\n')
+    f.write('===========================\n')
+    f.write('\n')
+
+    for activerelease in activereleases:
+        title = "Release Series %s (%s)" % (release_series[activerelease], activerelease)
+        f.write('*' * len(title) + '\n')
+        f.write(title + '\n')
+        f.write('*' * len(title) + '\n')
+        f.write('\n')
+
+        for tag in tags:
+            if tag == release_series[activerelease] or tag.startswith('%s.' % release_series[activerelease]):
+                f.write('- :yocto_docs:`%s Documentation </%s>`\n' % (tag, tag))
+        f.write('\n')
+
+    f.write('==========================\n')
+    f.write(' Outdated Release Manuals\n')
+    f.write('==========================\n')
+    f.write('\n')
+
+    for series in release_series:
+        if series == devbranch or series in activereleases:
+            continue
+
+        if series == "jethro-pre":
+            continue
+
+        title = "Release Series %s (%s)" % (release_series[series], series)
+        f.write('*' * len(title) + '\n')
+        f.write(title + '\n')
+        f.write('*' * len(title) + '\n')
+        f.write('\n')
+        if series == "jethro":
+            f.write('- :yocto_docs:`1.9 Documentation </1.9>`\n')
+        for tag in tags:
+            if tag == release_series[series] or tag.startswith('%s.' % release_series[series]):
+                f.write('- :yocto_docs:`%s Documentation </%s>`\n' % (tag, tag))
+        f.write('\n')

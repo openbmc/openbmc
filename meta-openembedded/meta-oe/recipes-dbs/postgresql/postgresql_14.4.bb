@@ -11,3 +11,7 @@ SRC_URI += "\
 "
 
 SRC_URI[sha256sum] = "c23b6237c5231c791511bdc79098617d6852e9e3bdf360efd8b5d15a1a3d8f6a"
+
+CVE_CHECK_IGNORE += "\
+   CVE-2017-8806 \
+"

@@ -10,6 +10,7 @@ DEPENDS = "icon-naming-utils-native libxml-simple-perl-native"
 
 SRC_URI = "git://git.yoctoproject.org/sato-icon-theme.git;protocol=https;branch=master"
 SRCREV = "d23f04ecb0328f655bf195df8eb04c1b734d53a9"
+UPSTREAM_CHECK_COMMITS = "1"
 
 S = "${WORKDIR}/git"
 

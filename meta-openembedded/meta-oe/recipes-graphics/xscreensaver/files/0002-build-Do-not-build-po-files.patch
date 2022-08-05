@@ -1,0 +1,53 @@
+From 6b5d022f6dd9848a2d5ca08a1968929b8c140981 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 16 Jul 2022 09:59:40 -0700
+Subject: [PATCH 2/2] build: Do not build po files
+
+Fixes
+| make[1]: Entering directory '/mnt/b/yoe/master/build/tmp/work/cortexa57-yoe-linux/xscreensaver/6.01-r0/xscreensaver-6.01/po'
+| make[1]: *** No rule to make target 'default'.  Stop.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile.in        | 5 ++---
+ driver/Makefile.in | 2 +-
+ 2 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 9de79b2..1c1d16c 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -6,8 +6,8 @@ srcdir		= @srcdir@
+ VPATH		= @srcdir@
+ 
+ SHELL		= /bin/sh
+-SUBDIRS 	= utils jwxyz hacks/images hacks hacks/glx hacks/fonts \
+-		  driver po
++SUBDIRS 	= utils jwxyz hacks/images hacks hacks/fonts \
++		  driver
+ SUBDIRS2	= $(SUBDIRS) OSX android
+ TARFILES	= README README.hacking INSTALL \
+ 		  configure configure.ac Makefile.in config.h.in \
+@@ -461,4 +461,3 @@ cerebrum::
+ 	--include 'ad2c' \
+ 	--include '*/' \
+ 	--exclude '*'
+-
+diff --git a/driver/Makefile.in b/driver/Makefile.in
+index e1fa1b2..feca6fc 100644
+--- a/driver/Makefile.in
++++ b/driver/Makefile.in
+@@ -211,7 +211,7 @@ TEST_EXES	= test-passwd   test-uid        test-xdpms      test-grab     \
+ 		  xdpyinfo      test-screens    test-yarandom   test-xinput   \
+ 	          test-xkb
+ 
+-EXES		= xscreensaver xscreensaver-command xscreensaver-settings
++EXES		= xscreensaver xscreensaver-command
+ UTIL_EXES	= xscreensaver-gfx @EXES_SYSTEMD@
+ SETUID_EXES	= xscreensaver-auth
+ DEMO_EXES	= @ALL_DEMO_PROGRAMS@
+-- 
+2.37.1
+

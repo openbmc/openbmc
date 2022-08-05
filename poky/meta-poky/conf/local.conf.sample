@@ -5,7 +5,8 @@
 # be set in this file. More adventurous users can look at
 # local.conf.sample.extended which contains other examples of configuration which
 # can be placed in this file but new users likely won't need any of them
-# initially.
+# initially. There's also site.conf.sample which contains examples of site specific
+# information such as proxy server addresses.
 #
 # Lines starting with the '#' character are commented out and in some cases the
 # default values are provided as comments to show people example syntax. Enabling

@@ -74,9 +74,10 @@ fi
 if [ ! -r "$BUILDDIR/conf/local.conf" ]; then
     cat <<EOM
 You had no conf/local.conf file. This configuration file has therefore been
-created for you with some default values. You may wish to edit it to, for
-example, select a different MACHINE (target hardware). See conf/local.conf
-for more information as common configuration options are commented.
+created for you from $OECORELOCALCONF
+You may wish to edit it to, for example, select a different MACHINE (target
+hardware). See conf/local.conf for more information as common configuration
+options are commented.
 
 EOM
     cp -f "$OECORELOCALCONF" "$BUILDDIR/conf/local.conf"
@@ -89,8 +90,9 @@ fi
 if [ ! -r "$BUILDDIR/conf/bblayers.conf" ]; then
     cat <<EOM
 You had no conf/bblayers.conf file. This configuration file has therefore been
-created for you with some default values. To add additional metadata layers
-into your configuration please add entries to conf/bblayers.conf.
+created for you from $OECORELAYERCONF
+To add additional metadata layers into your configuration please add entries
+to conf/bblayers.conf.
 
 EOM
 

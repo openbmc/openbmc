@@ -1,0 +1,97 @@
+From b0933e76c6f0594c10cf8a9a70b34e15b68066d1 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Sat, 23 Jul 2022 10:38:49 +0000
+Subject: [PATCH] glibc: Remove #include <linux/fs.h> to resolve fsconfig_command/mount_attr conflict with glibc 2.36
+
+Upstream-Status: Backport [https://github.com/systemd/systemd/pull/23992/commits/21c03ad5e9d8d0350e30dae92a5e15da318a1539]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ meson.build             | 13 ++++++++++++-
+ src/basic/fd-util.c     |  2 ++
+ src/core/namespace.c    |  2 ++
+ src/shared/mount-util.c |  2 ++
+ 4 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 9c170acc0a..a2e4d5054e 100644
+--- a/meson.build
++++ b/meson.build
+@@ -481,7 +481,6 @@ decl_headers = '''
+ #include <uchar.h>
+ #include <sys/mount.h>
+ #include <sys/stat.h>
+-#include <linux/fs.h>
+ '''
+ 
+ foreach decl : ['char16_t',
+@@ -493,6 +492,17 @@ foreach decl : ['char16_t',
+         # We get -1 if the size cannot be determined
+         have = cc.sizeof(decl, prefix : decl_headers, args : '-D_GNU_SOURCE') > 0
+ 
++        if decl == 'struct mount_attr'
++                if have
++                        want_linux_fs_h = false
++                else
++                        have = cc.sizeof(decl,
++                                         prefix : decl_headers + '#include <linux/fs.h>',
++                                         args : '-D_GNU_SOURCE') > 0
++                        want_linux_fs_h = have
++                endif
++        endif
++
+         if decl == 'struct statx'
+                 if have
+                         want_linux_stat_h = false
+@@ -508,6 +518,7 @@ foreach decl : ['char16_t',
+ endforeach
+ 
+ conf.set10('WANT_LINUX_STAT_H', want_linux_stat_h)
++conf.set10('WANT_LINUX_FS_H', want_linux_fs_h)
+ 
+ foreach ident : ['secure_getenv', '__secure_getenv']
+         conf.set10('HAVE_' + ident.to_upper(), cc.has_function(ident))
+diff --git a/src/basic/fd-util.c b/src/basic/fd-util.c
+index 6c1de92a26..00591d6c2d 100644
+--- a/src/basic/fd-util.c
++++ b/src/basic/fd-util.c
+@@ -3,7 +3,9 @@
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <linux/btrfs.h>
++#if WANT_LINUX_FS_H
+ #include <linux/fs.h>
++#endif
+ #include <linux/magic.h>
+ #include <sys/ioctl.h>
+ #include <sys/resource.h>
+diff --git a/src/core/namespace.c b/src/core/namespace.c
+index 3256871803..2eafe43290 100644
+--- a/src/core/namespace.c
++++ b/src/core/namespace.c
+@@ -7,7 +7,9 @@
+ #include <sys/file.h>
+ #include <sys/mount.h>
+ #include <unistd.h>
++#if WANT_LINUX_FS_H
+ #include <linux/fs.h>
++#endif
+ 
+ #include "alloc-util.h"
+ #include "base-filesystem.h"
+diff --git a/src/shared/mount-util.c b/src/shared/mount-util.c
+index e76e4a0b38..0c8dec7688 100644
+--- a/src/shared/mount-util.c
++++ b/src/shared/mount-util.c
+@@ -7,7 +7,9 @@
+ #include <sys/statvfs.h>
+ #include <unistd.h>
+ #include <linux/loop.h>
++#if WANT_LINUX_FS_H
+ #include <linux/fs.h>
++#endif
+ 
+ #include "alloc-util.h"
+ #include "chase-symlinks.h"
+-- 
+2.25.1
+

@@ -8,6 +8,8 @@ SRC_URI = "https://github.com/tpm2-software/${BPN}/releases/download/${PV}/${BPN
 
 SRC_URI[sha256sum] = "eedcc0b72ad6d232e6f9f55a780290c4d33a4d06efca9314f8a36d7384eb1dfc"
 
+UPSTREAM_CHECK_URI = "https://github.com/tpm2-software/${BPN}/releases"
+
 inherit autotools pkgconfig
 
 do_configure:prepend() {

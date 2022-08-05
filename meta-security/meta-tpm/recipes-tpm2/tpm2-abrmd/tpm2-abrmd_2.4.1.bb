@@ -20,6 +20,8 @@ SRC_URI = "\
 
 SRC_URI[sha256sum] = "a7844a257eaf5176f612fe9620018edc0880cca7036465ad2593f83ae0ad6673"
 
+UPSTREAM_CHECK_URI = "https://github.com/tpm2-software/${BPN}/releases"
+
 inherit autotools pkgconfig systemd update-rc.d useradd
 
 SYSTEMD_PACKAGES += "${PN}"

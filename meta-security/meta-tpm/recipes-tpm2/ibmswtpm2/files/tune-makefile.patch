@@ -20,7 +20,7 @@ Index: src/makefile
 ===================================================================
 --- src.orig/makefile
 +++ src/makefile
-@@ -38,12 +38,10 @@
+@@ -38,13 +38,11 @@
  #################################################################################
  
  
@@ -29,12 +29,13 @@ Index: src/makefile
  CCFLAGS = -Wall  			\
  	-Wmissing-declarations -Wmissing-prototypes -Wnested-externs \
  	-Werror -Wsign-compare \
+ 	-Wno-deprecated-declarations	\
 -	 -c -ggdb -O0 			\
 +	 -c -ggdb -O 			\
  	-DTPM_POSIX			\
  	-D_POSIX_			\
  	-DTPM_NUVOTON
-@@ -79,11 +77,11 @@
+@@ -80,11 +78,11 @@ TcpServerPosix.o	: $(HEADERS)
  .PRECIOUS:	%.o
  
  tpm_server:	$(OBJFILES)

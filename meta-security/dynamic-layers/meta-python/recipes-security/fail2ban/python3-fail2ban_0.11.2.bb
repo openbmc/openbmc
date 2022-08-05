@@ -17,6 +17,8 @@ SRC_URI = " git://github.com/fail2ban/fail2ban.git;branch=0.11;protocol=https \
         file://run-ptest \
 "
 
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"
+
 inherit update-rc.d ptest setuptools3_legacy
 
 S = "${WORKDIR}/git"

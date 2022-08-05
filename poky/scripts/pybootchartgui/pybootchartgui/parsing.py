@@ -51,6 +51,7 @@ class Trace:
         self.monitor_disk = None
         self.cpu_pressure = []
         self.io_pressure = []
+        self.mem_pressure = []
         self.times = [] # Always empty, but expected by draw.py when drawing system charts.
 
         if len(paths):
@@ -564,6 +565,8 @@ def _parse_pressure_logs(file, filename):
     pressure_stats = []
     if filename == "cpu.log":
         SamplingClass = CPUPressureSample
+    elif filename == "memory.log":
+        SamplingClass = MemPressureSample
     else:
         SamplingClass = IOPressureSample
     for time, lines in _parse_timed_blocks(file):
@@ -769,6 +772,8 @@ def _do_parse(writer, state, filename, file):
         state.cpu_pressure = _parse_pressure_logs(file, name)
     elif name == "io.log":
         state.io_pressure = _parse_pressure_logs(file, name)
+    elif name == "memory.log":
+        state.mem_pressure = _parse_pressure_logs(file, name)
     elif not filename.endswith('.log'):
         _parse_bitbake_buildstats(writer, state, filename, file)
     t2 = time.process_time()

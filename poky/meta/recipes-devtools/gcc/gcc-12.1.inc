@@ -64,6 +64,7 @@ SRC_URI = "${BASEURI} \
            file://0024-Fix-install-path-of-linux64.h.patch \
            file://0025-Move-sched.h-include-ahead-of-user-headers.patch \
            file://0026-rust-recursion-limit.patch \
+           file://0001-libsanitizer-cherry-pick-9cf13067cb5088626ba7-from-u.patch \
 "
 SRC_URI[sha256sum] = "62fd634889f31c02b64af2c468f064b47ad1ca78411c45abe6ac4b5f8dd19c7b"
 

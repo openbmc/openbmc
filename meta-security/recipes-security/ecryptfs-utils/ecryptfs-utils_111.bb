@@ -22,6 +22,8 @@ SRC_URI = "\
 SRC_URI[md5sum] = "83513228984f671930752c3518cac6fd"
 SRC_URI[sha256sum] = "112cb3e37e81a1ecd8e39516725dec0ce55c5f3df6284e0f4cc0f118750a987f"
 
+UPSTREAM_CHECK_URI = "https://launchpad.net/ecryptfs/+download"
+
 inherit autotools pkgconfig systemd
 
 SYSTEMD_PACKAGES = "${PN}"

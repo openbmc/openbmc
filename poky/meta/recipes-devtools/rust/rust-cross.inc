@@ -1,23 +1,4 @@
-python do_rust_gen_targets () {
-    wd = d.getVar('WORKDIR') + '/targets/'
-    # It is important 'TARGET' is last here so that it overrides our less
-    # informed choices for BUILD & HOST if TARGET happens to be the same as
-    # either of them.
-    for thing in ['BUILD', 'HOST', 'TARGET']:
-        bb.debug(1, "rust_gen_target for " + thing)
-        features = ""
-        cpu = "generic"
-        arch = d.getVar('{}_ARCH'.format(thing))
-        abi = ""
-        if thing is "TARGET":
-            abi = d.getVar('ABIEXTENSION')
-            # arm and armv7 have different targets in llvm
-            if arch == "arm" and target_is_armv7(d):
-                arch = 'armv7'
-            features = d.getVar('TARGET_LLVM_FEATURES') or ""
-            cpu = d.getVar('TARGET_LLVM_CPU')
-        rust_gen_target(d, thing, wd, features, cpu, arch, abi)
-}
+RUST_TARGETGENS = "BUILD HOST TARGET"
 
 # Otherwise we'll depend on what we provide
 INHIBIT_DEFAULT_RUST_DEPS = "1"

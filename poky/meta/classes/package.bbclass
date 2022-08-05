@@ -566,7 +566,7 @@ def copydebugsources(debugsrcdir, sources, d):
 
         # If S isnt based on WORKDIR we can infer our sources are located elsewhere,
         # e.g. using externalsrc; use S as base for our dirs
-        if workdir in sdir:
+        if workdir in sdir or 'work-shared' in sdir:
             basedir = workbasedir
             parentdir = workparentdir
         else:

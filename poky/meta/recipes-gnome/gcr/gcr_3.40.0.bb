@@ -16,6 +16,7 @@ CACHED_CONFIGUREVARS += "ac_cv_path_GPG='gpg2'"
 GNOMEBASEBUILDCLASS = "meson"
 GTKDOC_MESON_OPTION = "gtk_doc"
 inherit gnomebase gtk-icon-cache gtk-doc features_check upstream-version-is-even vala gobject-introspection gettext mime mime-xdg
+UPSTREAM_CHECK_REGEX = "[^\d\.](?P<pver>\d+\.(?!9\d+)(\d*[02468])+(\.\d+)+)\.tar"
 
 SRC_URI += "file://0001-gcr-meson.build-fix-one-parallel-build-failure.patch \ 
             file://b3ca1d02bb0148ca787ac4aead164d7c8ce2c4d8.patch"

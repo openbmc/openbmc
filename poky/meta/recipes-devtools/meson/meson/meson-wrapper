@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ -z "$OECORE_NATIVE_SYSROOT" ]; then
-    echo "OECORE_NATIVE_SYSROOT not set; are you in a Yocto SDK environment?" >&2
+    exec "meson.real" "$@"
 fi
 
 if [ -z "$SSL_CERT_DIR" ]; then

@@ -1,7 +1,9 @@
 # Copyright (C) 2021 Khem Raj <raj.khem@gmail.com>
 # Released under the MIT license (see COPYING.MIT for the terms)
 
-SUMMARY = "``aspectlib`` is an aspect-oriented programming, monkey-patch and decorators library. It is useful when changing"
+SUMMARY = "An aspect-oriented programming, monkey-patch and decorators library."
+DESCRIPTION = " It is useful when changing behavior in existing code is desired. \
+It includes tools for debugging and testing: simple mock/record and a complete capture/replay framework."
 HOMEPAGE = "https://github.com/ionelmc/python-aspectlib"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=d58b3f20fd10347a9458b8a03793b62e"

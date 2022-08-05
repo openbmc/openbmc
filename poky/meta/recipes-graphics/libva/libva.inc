@@ -18,7 +18,7 @@ LICENSE = "MIT"
 
 SRC_URI = "https://github.com/intel/libva/releases/download/${PV}/libva-${PV}.tar.bz2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2e48940f94acb0af582e5ef03537800f"
-SRC_URI[sha256sum] = "511e9a74d1ccfb548bc192290603082c11074ac59b17aadfd5d56a3f93e58454"
+SRC_URI[sha256sum] = "258ed409458d3e7a000e1908bc852619615ee6a933359c745fcd93eb3e461eca"
 
 S = "${WORKDIR}/libva-${PV}"
 

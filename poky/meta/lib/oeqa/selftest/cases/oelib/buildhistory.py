@@ -3,6 +3,7 @@
 #
 
 import os
+import sys
 from oeqa.selftest.case import OESelftestTestCase
 import tempfile
 import operator
@@ -11,15 +12,14 @@ from oeqa.utils.commands import get_bb_var
 class TestBlobParsing(OESelftestTestCase):
 
     def setUp(self):
-        import time
         self.repo_path = tempfile.mkdtemp(prefix='selftest-buildhistory',
             dir=get_bb_var('TOPDIR'))
 
         try:
             from git import Repo
             self.repo = Repo.init(self.repo_path)
-        except ImportError:
-            self.skipTest('Python module GitPython is not present')
+        except ImportError as e:
+            self.skipTest('Python module GitPython is not present (%s)  (%s)' % (e, sys.path))
 
         self.test_file = "test"
         self.var_map = {}

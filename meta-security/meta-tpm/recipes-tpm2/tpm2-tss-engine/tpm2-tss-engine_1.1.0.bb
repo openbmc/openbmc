@@ -12,6 +12,8 @@ SRC_URI = "https://github.com/tpm2-software/${BPN}/releases/download/v${PV}/${BP
 
 SRC_URI[sha256sum] = "ea2941695ac221d23a7f3e1321140e75b1495ae6ade876f2f4c2ed807c65e2a5"
 
+UPSTREAM_CHECK_URI = "https://github.com/tpm2-software/${BPN}/releases"
+
 inherit autotools-brokensep pkgconfig systemd
 
 # It uses the API deprecated since the OpenSSL 3.0

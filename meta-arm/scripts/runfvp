@@ -64,8 +64,8 @@ async def start_fvp(args, config, extra_args):
             logger.debug(f"Telnet quit, cancelling tasks")
         else:
             fvp.add_line_callback(lambda line: print(line))
+            await fvp.run()
 
-        await fvp.run()
     finally:
         await fvp.stop()
 

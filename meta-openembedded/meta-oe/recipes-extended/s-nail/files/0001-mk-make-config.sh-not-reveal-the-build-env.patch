@@ -1,0 +1,43 @@
+From fa93dab6393527673e642f26b6ea2c4413dd3cfe Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Wed, 27 Jul 2022 13:40:12 +0800
+Subject: [PATCH] make-config.sh: hidden the build info
+
+Use the CC as placeholder to replace the real build information which
+will be collected via src/mx/accmacvar.c and then added in the final
+binary s-nail, so hidden the build info to avoid revealing the detailed
+build info.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ mk/make-config.sh | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/mk/make-config.sh b/mk/make-config.sh
+index 2d7c619..9146004 100644
+--- a/mk/make-config.sh
++++ b/mk/make-config.sh
+@@ -3637,15 +3637,15 @@ LIBS=`squeeze_ws "${LIBS}"`
+ COMMLINE=`printf '%s\n' "${COMMLINE}" | ${sed} -e 's/.*--\(.*\)/\1/'`
+ COMMLINE=`squeeze_ws "${COMMLINE}"`
+ 
+-i=`printf '%s %s %s\n' "${CC}" "${CFLAGS}" "${i}"`
++i="CC"
+    printf '#define VAL_BUILD_CC "%s"\n' "$i" >> ${h}
+    i=`string_to_char_array "${i}"`
+    printf '#define VAL_BUILD_CC_ARRAY %s\n' "$i" >> ${h}
+-i=`printf '%s %s %s\n' "${CC}" "${LDFLAGS}" "${LIBS}"`
++i="CC"
+    printf '#define VAL_BUILD_LD "%s"\n' "$i" >> ${h}
+    i=`string_to_char_array "${i}"`
+    printf '#define VAL_BUILD_LD_ARRAY %s\n' "$i" >> ${h}
+-i=${COMMLINE}
++i="CC"
+    printf '#define VAL_BUILD_REST "%s"\n' "$i" >> ${h}
+    i=`string_to_char_array "${i}"`
+    printf '#define VAL_BUILD_REST_ARRAY %s\n' "$i" >> ${h}
+-- 
+2.25.1
+

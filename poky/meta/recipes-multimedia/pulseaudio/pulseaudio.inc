@@ -61,7 +61,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=0e5cd938de1a7a53ea5adac38cc10c39 \
 "
 
 # libtool is needed for libltdl, used in module loading.
-DEPENDS = "libatomic-ops libsndfile1 libtool"
+DEPENDS = "m4-native libatomic-ops libsndfile1 libtool"
 # optional
 DEPENDS += "udev alsa-lib glib-2.0"
 DEPENDS += "speexdsp libxml-parser-perl-native libcap"

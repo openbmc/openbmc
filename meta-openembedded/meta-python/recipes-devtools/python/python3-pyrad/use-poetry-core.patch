@@ -1,0 +1,26 @@
+Upstream-Status: Backport [https://github.com/pyradius/pyrad/commit/ffe182a44909e8f8278fb3e2ea052ddc097b48b9]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From a4b70067dd6269e14a2f9530d820390a8a454231 Mon Sep 17 00:00:00 2001
+From: Martin Weinelt <hexa@darmstadt.ccc.de>
+Date: Thu, 14 Apr 2022 22:07:37 +0200
+Subject: [PATCH] Use poetry-core for pyproject based builds
+
+https://github.com/python-poetry/poetry-core#why-is-this-required
+---
+ pyproject.toml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 87b1df3..711c52f 100755
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,6 +1,6 @@
+ [build-system]
+-requires = ["poetry>=1.0"]
+-build-backend = "poetry.masonry.api"
++requires = ["poetry-core>=1.0.0"]
++build-backend = "poetry.core.masonry.api"
+ 
+ [tool.poetry]
+ name = "pyrad"

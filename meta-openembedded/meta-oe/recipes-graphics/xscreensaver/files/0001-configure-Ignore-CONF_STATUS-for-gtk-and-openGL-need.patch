@@ -1,0 +1,47 @@
+From 516fbcdcfe6343b1d64d35957ddb768346713ff6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 17 Jul 2022 09:47:35 -0700
+Subject: [PATCH] configure: Ignore CONF_STATUS for gtk and openGL needs
+
+These are just warnings
+
+Upstream-Status: Inappropriate [OE-Specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index c4fd38f..d7463cf 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -4522,7 +4522,6 @@ fi
+ if test "$gtk_halfassed" != no ; then
+   warnL "GTK was found, but $gtk_halfassed_lib was not, so GTK"
+   warn2 "can't be used."
+-  CONF_STATUS=1
+ 
+   if ( echo $gtk_halfassed_lib | grep -qi pixbuf-xlib ); then
+     echo ''
+@@ -4549,7 +4548,6 @@ if test "$have_motif" = no -a "$have_gtk" = no; then
+   else
+     warnL "The GTK libraries do not seem to be available; the"
+     warn2 "\`xscreensaver-settings' program requires them."
+-    CONF_STATUS=1
+ #   echo ''
+ #   warn2 'You can use Motif or Lesstif instead of GTK (use the'
+ #   warn2 "\`--with-motif' option) but that is NOT recommended."
+@@ -4735,10 +4733,8 @@ if test "$have_gl" = no ; then
+     CONF_STATUS=1
+   elif test "$with_gl_req" = no ; then
+     noteL 'The OpenGL 3D library is not being used.'
+-    CONF_STATUS=1
+   else
+     noteL 'The OpenGL 3D library was not found.'
+-    CONF_STATUS=1
+   fi
+ 
+   if test "$gl_halfassed" = yes ; then
+-- 
+2.37.1
+

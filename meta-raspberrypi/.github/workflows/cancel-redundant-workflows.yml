@@ -15,9 +15,9 @@ on:
 
 jobs:
   cancel-redundant-workflows:
-    runs-on: [self-hosted, Linux]
+    runs-on: ubuntu-latest
     steps:
-    - uses: styfle/cancel-workflow-action@0.9.1
+    - uses: styfle/cancel-workflow-action@0.10.0
       with:
         all_but_latest: true
         workflow_id: ${{ github.event.workflow.id }}

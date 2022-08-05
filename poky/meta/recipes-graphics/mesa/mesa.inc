@@ -22,6 +22,7 @@ SRC_URI = "https://mesa.freedesktop.org/archive/mesa-${PV}.tar.xz \
            file://0001-util-format-Check-for-NEON-before-using-it.patch \
            file://0001-Revert-egl-wayland-deprecate-drm_handle_format-and-d.patch \
            file://0001-swrast_kms-use-swkmsDRI2Extension-instead-of-driDRI2.patch \
+           file://0001-nir-nir_opt_move-fix-ALWAYS_INLINE-compiler-error.patch \
            "
 
 SRC_URI[sha256sum] = "b98f32ba7aa2a1ff5725fb36eb999c693079f0ca16f70aa2f103e2b6c3f093e3"
