@@ -282,12 +282,12 @@ function ledtoggle() {
 }
 
 function usblist() {
-  for i in {0..8}
+  for i in {5..9}
   do
     cmd=$(devmem 0xf083"${i}"154)
-    printf "udc%d : 0xF803%d154-" "${i}" "${i}"
-    $cmd
-   done
+    printf "udc%d : 0xF083%d154-" "${i}" "${i}"
+    echo "$cmd"
+  done
 }
 
 case $1 in
