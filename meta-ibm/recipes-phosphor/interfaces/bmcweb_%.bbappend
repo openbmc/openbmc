@@ -3,6 +3,7 @@ EXTRA_OEMESON:append = " \
     -Dibm-management-console=enabled \
     -Dredfish-new-powersubsystem-thermalsubsystem=enabled \
     -Dredfish-dump-log=enabled \
+    -Dredfish-oem-manager-fan-data=disabled \
 "
 
 EXTRA_OEMESON:append:p10bmc += " \
