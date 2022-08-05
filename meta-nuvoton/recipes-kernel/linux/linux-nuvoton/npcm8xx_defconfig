@@ -170,7 +170,7 @@ CONFIG_DEBUG_FS=y
 # Enable EDAC support
 CONFIG_EDAC_SUPPORT=y
 CONFIG_EDAC=y
-CONFIG_EDAC_NPCM8XX=y
+CONFIG_EDAC_NPCM=y
 CONFIG_RAS=y
 
 # Enable RemotePorc driver support
