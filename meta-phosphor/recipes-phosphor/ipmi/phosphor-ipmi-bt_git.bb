@@ -19,4 +19,4 @@ DEPENDS += "systemd"
 
 S = "${WORKDIR}/git"
 SRC_URI += "git://github.com/openbmc/btbridge;branch=master;protocol=https"
-SRCREV="bcd47acdd8327920f63b5a37a794a1980eee31da"
+SRCREV="b6f263ac208dc3a86ad7ddd93531a32229dfd8e9"
