@@ -61,13 +61,15 @@ sign_spl() {
 }
 
 verify_spl_otp() {
-    socsec verify \
-        --sec_image ${DEPLOYDIR}/${SPL_IMAGE} \
-        --otp_image ${DEPLOYDIR}/"$(basename ${OTPTOOL_CONFIG} .json)"-otp-all.image
+    for otptool_config in ${OTPTOOL_CONFIGS} ; do
+        socsec verify \
+            --sec_image ${DEPLOYDIR}/${SPL_IMAGE} \
+            --otp_image ${DEPLOYDIR}/"$(basename ${otptool_config} .json)"-otp-all.image
 
-    if [ $? -ne 0 ]; then
-        bbfatal "Verified OTP image failed."
-    fi
+        if [ $? -ne 0 ]; then
+            bbfatal "Verified OTP image failed."
+        fi
+    done
 }
 
 do_deploy:append() {
