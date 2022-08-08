@@ -6,10 +6,9 @@ PV = "1.0+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
-inherit autotools pkgconfig
+inherit meson pkgconfig
 inherit systemd
 
-DEPENDS += "autoconf-archive-native"
 DEPENDS += "cli11"
 DEPENDS += "phosphor-mapper"
 DEPENDS += "systemd"
@@ -21,6 +20,10 @@ SRC_URI += "git://github.com/openbmc/phosphor-net-ipmid;branch=master;protocol=h
 SRCREV = "7b7f25f70cdef22e626a41abe5bd8d950e14eff9"
 
 S = "${WORKDIR}/git"
+
+EXTRA_OEMESON = " \
+        -Dtests=disabled \
+        "
 
 FILES:${PN} += " \
         ${systemd_system_unitdir}/${PN}@.service \
