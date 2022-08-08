@@ -145,7 +145,10 @@ function fwmb_pwr_seq(){
   fi
   echo ${I2C_MB_PWRSEQ1[0]}-00${I2C_MB_PWRSEQ1[1]} > /sys/bus/i2c/drivers/adm1266/unbind
   echo ${I2C_MB_PWRSEQ2[0]}-00${I2C_MB_PWRSEQ2[1]} > /sys/bus/i2c/drivers/adm1266/unbind
-  if [ "$(adm1266_fw_fx $1 $2)" -ne  0 ]; then
+  #Parameters passed to adm1266_fw_fx to be used to flash PS
+  #1st I2C bus number of PS's
+  #2nd/3rd PS seq config file
+  if [ "$(adm1266_fw_fx ${I2C_MB_PWRSEQ1[0]} $1 $2)" -ne  0 ]; then
     echo "The power seq flash failed" >&2
     return 1
   fi
