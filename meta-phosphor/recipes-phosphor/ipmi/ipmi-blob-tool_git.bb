@@ -12,5 +12,5 @@ EXTRA_OEMESON = "-Dtests=disabled"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/ipmi-blob-tool;branch=master;protocol=https"
-SRCREV = "66862b87fd491ec2fd784dd452520521b0becc88"
+SRCREV = "ee975086169fce82413c27fefb871b779ea6b657"
 
