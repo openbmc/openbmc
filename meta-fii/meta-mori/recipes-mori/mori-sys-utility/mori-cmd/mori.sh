@@ -115,7 +115,7 @@ function fw_rev() {
     echo " Bios: $cmd"
   fi
 
-  adm1266_ver  | grep REVISION
+  adm1266_ver "${I2C_MB_PWRSEQ[0]}" | grep REVISION
 
 }
 
