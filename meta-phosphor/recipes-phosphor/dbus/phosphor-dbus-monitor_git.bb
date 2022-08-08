@@ -7,7 +7,7 @@ HOMEPAGE = "http://github.com/openbmc/phosphor-dbus-monitor"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 SRC_URI = "git://github.com/openbmc/phosphor-dbus-monitor;branch=master;protocol=https"
-SRCREV = "413a4857157f0c34bbfcc0cfee5db6756e2f3b91"
+SRCREV = "2f2ba6cec5cae8a02ab8811df8ad5db86592637f"
 
 inherit meson \
         pkgconfig \
