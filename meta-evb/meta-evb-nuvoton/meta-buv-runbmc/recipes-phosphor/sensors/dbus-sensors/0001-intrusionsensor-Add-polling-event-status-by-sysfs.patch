@@ -1,6 +1,6 @@
-From b13a446b4d6ce9da7ca2c8d05cd1368399b938eb Mon Sep 17 00:00:00 2001
+From 95e87f88ac446e0c54d906a4904793b2b2ea7288 Mon Sep 17 00:00:00 2001
 From: Mia Lin <mimi05633@gmail.com>
-Date: Tue, 26 Jul 2022 14:47:00 +0800
+Date: Mon, 8 Aug 2022 10:15:06 +0800
 Subject: [PATCH 1/1] intrusionsensor: Add polling event status by sysfs.
 
 E.g. the json config as below.
@@ -14,12 +14,12 @@ E.g. the json config as below.
 Signed-off-by: Mia Lin <mimi05633@gmail.com>
 ---
  include/ChassisIntrusionSensor.hpp | 13 +++-
- src/ChassisIntrusionSensor.cpp     | 95 ++++++++++++++++++++++++++++--
+ src/ChassisIntrusionSensor.cpp     | 96 ++++++++++++++++++++++++++++--
  src/IntrusionSensorMain.cpp        | 49 +++++++++++++--
- 3 files changed, 145 insertions(+), 12 deletions(-)
+ 3 files changed, 146 insertions(+), 12 deletions(-)
 
 diff --git a/include/ChassisIntrusionSensor.hpp b/include/ChassisIntrusionSensor.hpp
-index 142ced33..eb3a8c83 100644
+index 56affca8..445beab7 100644
 --- a/include/ChassisIntrusionSensor.hpp
 +++ b/include/ChassisIntrusionSensor.hpp
 @@ -11,7 +11,8 @@
@@ -63,7 +63,7 @@ index 142ced33..eb3a8c83 100644
      int setSensorValue(const std::string& req, std::string& propertyValue);
  };
 diff --git a/src/ChassisIntrusionSensor.cpp b/src/ChassisIntrusionSensor.cpp
-index d4800555..7d0b7d52 100644
+index 6c407170..5a813535 100644
 --- a/src/ChassisIntrusionSensor.cpp
 +++ b/src/ChassisIntrusionSensor.cpp
 @@ -16,6 +16,7 @@
@@ -74,7 +74,7 @@ index d4800555..7d0b7d52 100644
  #include <unistd.h>
  
  #include <ChassisIntrusionSensor.hpp>
-@@ -257,6 +258,66 @@ void ChassisIntrusionSensor::initGpioDeviceFile()
+@@ -258,6 +259,66 @@ void ChassisIntrusionSensor::initGpioDeviceFile()
      }
  }
  
@@ -141,7 +141,7 @@ index d4800555..7d0b7d52 100644
  int ChassisIntrusionSensor::setSensorValue(const std::string& req,
                                             std::string& propertyValue)
  {
-@@ -273,7 +334,7 @@ int ChassisIntrusionSensor::setSensorValue(const std::string& req,
+@@ -274,7 +335,7 @@ int ChassisIntrusionSensor::setSensorValue(const std::string& req,
  }
  
  void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
@@ -150,7 +150,7 @@ index d4800555..7d0b7d52 100644
  {
      if (debug)
      {
-@@ -289,12 +350,17 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
+@@ -290,12 +351,17 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
              std::cerr << "gpio pinName = " << mPinName
                        << ", gpioInverted = " << gpioInverted << "\n";
          }
@@ -169,7 +169,7 @@ index d4800555..7d0b7d52 100644
      {
          return;
      }
-@@ -303,9 +369,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
+@@ -304,9 +370,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
      mBusId = busId;
      mSlaveAddr = slaveAddr;
      mGpioInverted = gpioInverted;
@@ -182,7 +182,7 @@ index d4800555..7d0b7d52 100644
      {
          // initialize first if not initialized before
          if (!mInitialized)
-@@ -321,6 +389,10 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
+@@ -322,6 +390,10 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
              {
                  initGpioDeviceFile();
              }
@@ -193,7 +193,7 @@ index d4800555..7d0b7d52 100644
  
              mInitialized = true;
          }
-@@ -335,6 +407,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
+@@ -336,6 +408,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
              std::cerr << "Start polling intrusion sensors\n";
              pollSensorStatusByGpio();
          }
@@ -205,7 +205,7 @@ index d4800555..7d0b7d52 100644
      }
  
      // invalid para, release resource
-@@ -354,6 +431,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
+@@ -355,6 +432,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
                      mGpioLine.release();
                  }
              }
@@ -217,16 +217,17 @@ index d4800555..7d0b7d52 100644
              mInitialized = false;
          }
      }
-@@ -365,7 +447,7 @@ ChassisIntrusionSensor::ChassisIntrusionSensor(
+@@ -364,7 +446,8 @@ ChassisIntrusionSensor::ChassisIntrusionSensor(
+     boost::asio::io_service& io,
+     std::shared_ptr<sdbusplus::asio::dbus_interface> iface) :
      mIface(std::move(iface)),
-     mType(IntrusionSensorType::gpio), mValue("unknown"), mOldValue("unknown"),
-     mBusId(-1), mSlaveAddr(-1), mPollTimer(io), mGpioInverted(false),
--    mGpioFd(io)
-+    mGpioFd(io), mFilePath(nullptr), inotifyConn(io)
+-    mValue("unknown"), mOldValue("unknown"), mPollTimer(io), mGpioFd(io)
++    mValue("unknown"), mOldValue("unknown"), mPollTimer(io), mGpioFd(io),
++    mFilePath(nullptr), inotifyConn(io)
  {}
  
  ChassisIntrusionSensor::~ChassisIntrusionSensor()
-@@ -382,4 +464,9 @@ ChassisIntrusionSensor::~ChassisIntrusionSensor()
+@@ -381,4 +464,9 @@ ChassisIntrusionSensor::~ChassisIntrusionSensor()
              mGpioLine.release();
          }
      }
@@ -237,7 +238,7 @@ index d4800555..7d0b7d52 100644
 +    }
  }
 diff --git a/src/IntrusionSensorMain.cpp b/src/IntrusionSensorMain.cpp
-index 2f737afe..95951221 100644
+index c4c4cd87..4034dd11 100644
 --- a/src/IntrusionSensorMain.cpp
 +++ b/src/IntrusionSensorMain.cpp
 @@ -54,7 +54,7 @@ namespace fs = std::filesystem;
@@ -307,7 +308,7 @@ index 2f737afe..95951221 100644
          // case to find I2C info
          if (*pType == IntrusionSensorType::pch)
          {
-@@ -419,6 +455,7 @@ int main()
+@@ -420,6 +456,7 @@ int main()
      int busId = -1;
      int slaveAddr = -1;
      bool gpioInverted = false;
@@ -315,7 +316,7 @@ index 2f737afe..95951221 100644
      IntrusionSensorType type = IntrusionSensorType::gpio;
  
      // setup connection to dbus
-@@ -437,9 +474,9 @@ int main()
+@@ -438,9 +475,9 @@ int main()
      ChassisIntrusionSensor chassisIntrusionSensor(io, ifaceChassis);
  
      if (getIntrusionSensorConfig(systemBus, &type, &busId, &slaveAddr,
@@ -327,7 +328,7 @@ index 2f737afe..95951221 100644
      }
  
      // callback to handle configuration change
-@@ -453,9 +490,9 @@ int main()
+@@ -454,9 +491,9 @@ int main()
  
          std::cout << "rescan due to configuration change \n";
          if (getIntrusionSensorConfig(systemBus, &type, &busId, &slaveAddr,
