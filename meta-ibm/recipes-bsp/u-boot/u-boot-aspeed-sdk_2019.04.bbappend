@@ -1,8 +1,8 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI:append:p10bmc = " file://ibm.json file://keys/"
+SRC_URI:append:p10bmc = " file://ibm.json file://ips.json file://keys/"
 
-OTPTOOL_CONFIGS:p10bmc = "${WORKDIR}/ibm.json"
+OTPTOOL_CONFIGS:p10bmc = "${WORKDIR}/ibm.json ${WORKDIR}/ips.json"
 OTPTOOL_KEY_DIR:p10bmc = "${WORKDIR}/keys/"
 
 # !!! Do not copy p10bmc's use of little-endian key ordering !!!
