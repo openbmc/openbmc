@@ -1,0 +1,99 @@
+#!/bin/bash
+
+add_i2c_device()
+{
+    local I2C_BUS=$1
+    local DEV_ADDR=$2
+    local DEVICE_COMP=$3
+    local I2C_BUS_DIR="/sys/bus/i2c/devices/i2c-$I2C_BUS"
+    local NEW_DEVIVE="$I2C_BUS_DIR/new_device"
+
+    echo "$DEVICE_COMP" "$DEV_ADDR" > "$NEW_DEVIVE"
+}
+
+delete_i2c_device()
+{
+    local I2C_BUS=$1
+    local DEV_ADDR=$2
+    local I2C_BUS_DIR="/sys/bus/i2c/devices/i2c-$I2C_BUS"
+    local DEL_DEVIVE="$I2C_BUS_DIR/delete_device"
+
+    echo "$DEV_ADDR" > "$DEL_DEVIVE"
+}
+
+is_valid_hdc1080()
+{
+    local I2C_BUS=$1
+    local DEV_ADDR=$2
+
+    MFR_ID=$(i2ctransfer -y -f "${I2C_BUS}" w1@"${DEV_ADDR}" 0xfe r2)
+    if [ "$MFR_ID" != "0x54 0x49" ]; then
+        return 1;
+    fi
+
+    DEV_ID=$(i2ctransfer -y -f "${I2C_BUS}" w1@"${DEV_ADDR}" 0xff r2)
+    if [ "$DEV_ID" != "0x10 0x50" ]; then
+        return 1;
+    fi
+
+    return 0;
+}
+
+
+I2C_BUS=10
+DEV_ADDR=0x40
+I2C_BUS_DIR="/sys/bus/i2c/devices/i2c-$I2C_BUS"
+DEV_ADDR_HEXSTR="$(printf %04X $DEV_ADDR)"
+DEV_DIR="$I2C_BUS_DIR/$I2C_BUS-$DEV_ADDR_HEXSTR"
+DEV_NAME_FILE="$DEV_DIR/name"
+
+# Check chip type
+if is_valid_hdc1080 "$I2C_BUS" "$DEV_ADDR"; then
+    CHIP_TYPE="HDC1080"
+    DEVICE_COMP="ti,hdc1080"
+else
+    CHIP_TYPE="SI7021"
+    DEVICE_COMP="silabs,si7020"
+fi
+
+# Check and probe i2c device
+if [ ! -f "$DEV_NAME_FILE" ]; then
+    # i2c device not porbed yet
+    add_i2c_device "$I2C_BUS" "$DEV_ADDR" "$DEVICE_COMP"
+else
+    DEV_NAME=$(cat "$DEV_NAME_FILE")
+    if [ "$DEV_NAME" != "$DEVICE_COMP" ]; then
+        # incorrect driver probed, delete and add again
+        delete_i2c_device "$I2C_BUS" "$DEV_ADDR"
+        add_i2c_device "$I2C_BUS" "$DEV_ADDR" "$DEVICE_COMP"
+    fi
+fi
+
+
+VIRT_SNR_CONF="/usr/share/phosphor-virtual-sensor/virtual_sensor_config.json"
+HDC1080_VIRT_SNR_CONF="/usr/share/phosphor-virtual-sensor/virtual_sensor_config_hdc1080.json"
+SI7021_VIRT_SNR_CONF="/usr/share/phosphor-virtual-sensor/virtual_sensor_config_si7021.json"
+
+
+# Setup virtual_sensor_config.json for phosphor-virtual-sensor
+case "$CHIP_TYPE" in
+"HDC1080")
+    REQUIRED_CONF_PATH="$HDC1080_VIRT_SNR_CONF"
+    ;;
+"SI7021")
+    REQUIRED_CONF_PATH="$SI7021_VIRT_SNR_CONF"
+    ;;
+*)
+    REQUIRED_CONF_PATH="$HDC1080_VIRT_SNR_CONF"
+    ;;
+esac
+
+if [ ! -e "$VIRT_SNR_CONF" ]; then
+    ln -s "$REQUIRED_CONF_PATH" "$VIRT_SNR_CONF"
+else
+    REAL_CONF_PATH="$(realpath $VIRT_SNR_CONF)"
+    if [ "$REAL_CONF_PATH" != "$REQUIRED_CONF_PATH" ]; then
+        rm "$VIRT_SNR_CONF"
+        ln -s "$REQUIRED_CONF_PATH" "$VIRT_SNR_CONF"
+    fi
+fi

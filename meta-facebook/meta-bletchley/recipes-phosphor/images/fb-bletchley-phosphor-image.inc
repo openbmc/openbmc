@@ -11,4 +11,5 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
     detect-sled-present \
     phosphor-ipmi-ipmb \
     fb-ipmi-oem \
+    board-type-checker \
 "

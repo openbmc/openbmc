@@ -1,0 +1,17 @@
+[Unit]
+Description=Front Panel Board Checker
+StartLimitIntervalSec=90
+StartLimitBurst=5
+Before=phosphor-virtual-sensor.service
+Before=xyz.openbmc_project.EntityManager.service
+
+[Service]
+ExecStart=/usr/libexec/board-type-checker-fpb
+SyslogIdentifier=Front Panel Board Checker
+Type=oneshot
+RemainAfterExit=yes
+Restart=on-failure
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target
