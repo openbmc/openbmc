@@ -1,6 +1,6 @@
-From 95e87f88ac446e0c54d906a4904793b2b2ea7288 Mon Sep 17 00:00:00 2001
+From a91f16c7b60ac13b67f7d21ebde3e8857c2181dc Mon Sep 17 00:00:00 2001
 From: Mia Lin <mimi05633@gmail.com>
-Date: Mon, 8 Aug 2022 10:15:06 +0800
+Date: Wed, 10 Aug 2022 10:37:59 +0800
 Subject: [PATCH 1/1] intrusionsensor: Add polling event status by sysfs.
 
 E.g. the json config as below.
@@ -13,13 +13,13 @@ E.g. the json config as below.
 
 Signed-off-by: Mia Lin <mimi05633@gmail.com>
 ---
- include/ChassisIntrusionSensor.hpp | 13 +++-
- src/ChassisIntrusionSensor.cpp     | 96 ++++++++++++++++++++++++++++--
- src/IntrusionSensorMain.cpp        | 49 +++++++++++++--
- 3 files changed, 146 insertions(+), 12 deletions(-)
+ include/ChassisIntrusionSensor.hpp |  14 +++-
+ src/ChassisIntrusionSensor.cpp     | 120 ++++++++++++++++++++++++++++-
+ src/IntrusionSensorMain.cpp        |  49 ++++++++++--
+ 3 files changed, 171 insertions(+), 12 deletions(-)
 
 diff --git a/include/ChassisIntrusionSensor.hpp b/include/ChassisIntrusionSensor.hpp
-index 56affca8..445beab7 100644
+index 56affca8..35f9e5c6 100644
 --- a/include/ChassisIntrusionSensor.hpp
 +++ b/include/ChassisIntrusionSensor.hpp
 @@ -11,7 +11,8 @@
@@ -46,7 +46,7 @@ index 56affca8..445beab7 100644
      boost::asio::posix::stream_descriptor mGpioFd;
  
 +    // valid if it is via sysfs
-+    const char* mFilePath;
++    std::string mFilePath = "";
 +    boost::asio::posix::stream_descriptor inotifyConn;
 +    int mInotifyFd{-1};
 +    int mFileWatchDesc{-1};
@@ -54,16 +54,17 @@ index 56affca8..445beab7 100644
      // common members
      bool mOverridenState = false;
      bool mInternalSet = false;
-@@ -59,5 +66,7 @@ class ChassisIntrusionSensor
+@@ -59,5 +66,8 @@ class ChassisIntrusionSensor
      void readGpio();
      void pollSensorStatusByGpio();
      void initGpioDeviceFile();
 +    void pollSensorStatusBySysfs();
 +    void initInotifyFile();
++    void checkIntrusionTimestamp();
      int setSensorValue(const std::string& req, std::string& propertyValue);
  };
 diff --git a/src/ChassisIntrusionSensor.cpp b/src/ChassisIntrusionSensor.cpp
-index 6c407170..5a813535 100644
+index 6c407170..214a45ea 100644
 --- a/src/ChassisIntrusionSensor.cpp
 +++ b/src/ChassisIntrusionSensor.cpp
 @@ -16,6 +16,7 @@
@@ -74,13 +75,21 @@ index 6c407170..5a813535 100644
  #include <unistd.h>
  
  #include <ChassisIntrusionSensor.hpp>
-@@ -258,6 +259,66 @@ void ChassisIntrusionSensor::initGpioDeviceFile()
+@@ -25,6 +26,7 @@
+ #include <cerrno>
+ #include <chrono>
+ #include <iostream>
++#include <fstream>
+ #include <memory>
+ #include <string>
+ #include <thread>
+@@ -258,6 +260,88 @@ void ChassisIntrusionSensor::initGpioDeviceFile()
      }
  }
  
-+void ChassisIntrusionSensor::pollSensorStatusBySysfs(void)
++void ChassisIntrusionSensor::pollSensorStatusBySysfs()
 +{
-+    static std::array<char, 256> readBuffer;
++    static std::array<char, 1024> readBuffer;
 +    const size_t iEventSize = sizeof(inotify_event);
 +
 +    inotifyConn.async_read_some(boost::asio::buffer(readBuffer),
@@ -101,15 +110,8 @@ index 6c407170..5a813535 100644
 +            {
 +                if (event.mask == IN_MODIFY)
 +                {
-+                    // set string defined in chassis redfish schema
-+                    std::string newValue = "HardwareIntrusion";
-+                    mValue = "Normal";
-+                    if (newValue != "unknown" && mValue != newValue)
-+                    {
-+                        std::cerr << "update value from " << mValue << " to " << newValue
-+                                  << "\n";
-+                        updateValue(newValue);
-+                    }
++                    // check timestamp and set string defined in chassis redfish schema
++                    checkIntrusionTimestamp();
 +                }
 +            }
 +            index += (iEventSize + event.len);
@@ -120,7 +122,7 @@ index 6c407170..5a813535 100644
 +
 +void ChassisIntrusionSensor::initInotifyFile()
 +{
-+    mInotifyFd = inotify_init();
++    mInotifyFd = inotify_init1(IN_NONBLOCK);
 +    if (mInotifyFd == -1)
 +    {
 +        std::cerr << "inotify_init1 failed.\n";
@@ -128,7 +130,7 @@ index 6c407170..5a813535 100644
 +    }
 +
 +    // Add watch on a file to handle modifications.
-+    mFileWatchDesc = inotify_add_watch(mInotifyFd, mFilePath, IN_MODIFY);
++    mFileWatchDesc = inotify_add_watch(mInotifyFd, mFilePath.c_str(), IN_MODIFY);
 +    if (mFileWatchDesc == -1)
 +    {
 +        std::cerr << "inotify_add_watch failed for " << mFilePath << ".\n";
@@ -138,10 +140,39 @@ index 6c407170..5a813535 100644
 +    inotifyConn.assign(mInotifyFd);
 +}
 +
++void ChassisIntrusionSensor::checkIntrusionTimestamp()
++{
++    // check timestamp and set string defined in chassis redfish schema
++    std::string defaultTimestamp = "2000-00-00T00:00:00 UTC";
++    std::ifstream sysFile(mFilePath.c_str());
++    std::string timestamp;
++    mValue = "Normal";
++
++    if (!sysFile.good())
++    {
++        std::cerr << "Failure reading " << mFilePath << "(" << strerror(errno) << ")\n";
++        return;
++    }
++
++    getline(sysFile, timestamp);
++    if (timestamp != defaultTimestamp)
++    {
++        std::string newValue = "HardwareIntrusion";
++        if (newValue != "unknown" && mValue != newValue)
++        {
++            std::cerr << "update value from " << mValue << " to " << newValue
++                      << "\n";
++            updateValue(newValue);
++            std::cerr << "Intrusion timestamp: " << timestamp << "\n";
++        }
++    }
++    sysFile.close();
++}
++
  int ChassisIntrusionSensor::setSensorValue(const std::string& req,
                                             std::string& propertyValue)
  {
-@@ -274,7 +335,7 @@ int ChassisIntrusionSensor::setSensorValue(const std::string& req,
+@@ -274,7 +358,7 @@ int ChassisIntrusionSensor::setSensorValue(const std::string& req,
  }
  
  void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
@@ -150,7 +181,7 @@ index 6c407170..5a813535 100644
  {
      if (debug)
      {
-@@ -290,12 +351,17 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
+@@ -290,12 +374,17 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
              std::cerr << "gpio pinName = " << mPinName
                        << ", gpioInverted = " << gpioInverted << "\n";
          }
@@ -165,35 +196,36 @@ index 6c407170..5a813535 100644
          (type == IntrusionSensorType::gpio && gpioInverted == mGpioInverted &&
 -         mInitialized))
 +         mInitialized) || (type == IntrusionSensorType::sysfs &&
-+         mFilePath != nullptr && !strncmp(filePath.c_str(), mFilePath, filePath.size())))
++         mFilePath != "" && mFilePath == filePath.c_str()))
      {
          return;
      }
-@@ -304,9 +370,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
+@@ -304,9 +393,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
      mBusId = busId;
      mSlaveAddr = slaveAddr;
      mGpioInverted = gpioInverted;
-+    mFilePath = filePath.c_str();
++    mFilePath = filePath;
  
      if ((mType == IntrusionSensorType::pch && mBusId > 0 && mSlaveAddr > 0) ||
 -        (mType == IntrusionSensorType::gpio))
 +        (mType == IntrusionSensorType::gpio) ||
-+        (mType == IntrusionSensorType::sysfs && mFilePath != nullptr))
++        (mType == IntrusionSensorType::sysfs && mFilePath != ""))
      {
          // initialize first if not initialized before
          if (!mInitialized)
-@@ -322,6 +390,10 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
+@@ -322,6 +413,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
              {
                  initGpioDeviceFile();
              }
 +            else if (mType == IntrusionSensorType::sysfs)
 +            {
++                checkIntrusionTimestamp();
 +                initInotifyFile();
 +            }
  
              mInitialized = true;
          }
-@@ -336,6 +408,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
+@@ -336,6 +432,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
              std::cerr << "Start polling intrusion sensors\n";
              pollSensorStatusByGpio();
          }
@@ -205,7 +237,7 @@ index 6c407170..5a813535 100644
      }
  
      // invalid para, release resource
-@@ -355,6 +432,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
+@@ -355,6 +456,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
                      mGpioLine.release();
                  }
              }
@@ -217,17 +249,17 @@ index 6c407170..5a813535 100644
              mInitialized = false;
          }
      }
-@@ -364,7 +446,8 @@ ChassisIntrusionSensor::ChassisIntrusionSensor(
+@@ -364,7 +470,8 @@ ChassisIntrusionSensor::ChassisIntrusionSensor(
      boost::asio::io_service& io,
      std::shared_ptr<sdbusplus::asio::dbus_interface> iface) :
      mIface(std::move(iface)),
 -    mValue("unknown"), mOldValue("unknown"), mPollTimer(io), mGpioFd(io)
 +    mValue("unknown"), mOldValue("unknown"), mPollTimer(io), mGpioFd(io),
-+    mFilePath(nullptr), inotifyConn(io)
++    mFilePath(""), inotifyConn(io)
  {}
  
  ChassisIntrusionSensor::~ChassisIntrusionSensor()
-@@ -381,4 +464,9 @@ ChassisIntrusionSensor::~ChassisIntrusionSensor()
+@@ -381,4 +488,9 @@ ChassisIntrusionSensor::~ChassisIntrusionSensor()
              mGpioLine.release();
          }
      }
