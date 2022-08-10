@@ -9,4 +9,6 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-sel-logger \
     phosphor-gpio-monitor-presence \
     detect-sled-present \
+    phosphor-ipmi-ipmb \
+    fb-ipmi-oem \
 "
