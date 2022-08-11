@@ -14,9 +14,16 @@ DEPENDS = "boost phosphor-ipmi-host phosphor-logging systemd "
 
 inherit meson pkgconfig obmc-phosphor-ipmiprovider-symlink
 
-EXTRA_OEMESON="-Dtests=disabled -Dbic=enabled -Dhost-instances='${OBMC_HOST_INSTANCES}'"
-EXTRA_OEMESON:remove:yosemitev2 = "-Dbic=enabled"
-EXTRA_OEMESON="-Dmachine='${MACHINE}'"
+PACKAGECONFIG ??= ""
+PACKAGECONFIG:fb-compute-multihost ??= "bic"
+
+PACKAGECONFIG[bic] = "-Dbic=enabled,-Dbic=disabled"
+
+EXTRA_OEMESON="\
+    -Dtests=disabled \
+    -Dmachine='${MACHINE}' \
+    -Dhost-instances='${OBMC_HOST_INSTANCES}' \
+    "
 
 LIBRARY_NAMES = "libzfboemcmds.so"
 
