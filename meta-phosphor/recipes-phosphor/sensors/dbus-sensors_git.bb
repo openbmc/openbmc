@@ -2,7 +2,7 @@ SUMMARY = "dbus-sensors"
 DESCRIPTION = "Dbus Sensor Services Configured from D-Bus"
 
 SRC_URI = "git://github.com/openbmc/dbus-sensors.git;branch=master;protocol=https"
-SRCREV = "0fe0229497e2029901b9c807cff624013e0f1a58"
+SRCREV = "255da6b419082ec1f18046e818c5c3ca678fd607"
 
 PV = "0.1+git${SRCPV}"
 
@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 PACKAGECONFIG ??= " \
     adcsensor \
-    cpusensor \
+    intelcpusensor \
     exitairtempsensor \
     fansensor \
     hwmontempsensor \
@@ -23,7 +23,7 @@ PACKAGECONFIG ??= " \
     "
 
 PACKAGECONFIG[adcsensor] = "-Dadc=enabled, -Dadc=disabled"
-PACKAGECONFIG[cpusensor] = "-Dcpu=enabled, -Dcpu=disabled"
+PACKAGECONFIG[intelcpusensor] = "-Dintel-cpu=enabled, -Dintel-cpu=disabled"
 PACKAGECONFIG[exitairtempsensor] = "-Dexit-air=enabled, -Dexit-air=disabled"
 PACKAGECONFIG[fansensor] = "-Dfan=enabled, -Dfan=disabled"
 PACKAGECONFIG[hwmontempsensor] = "-Dhwmon-temp=enabled, -Dhwmon-temp=disabled"
@@ -37,8 +37,8 @@ PACKAGECONFIG[external] = "-Dexternal=enabled, -Dexternal=disabled"
 SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'adcsensor', \
                                                'xyz.openbmc_project.adcsensor.service', \
                                                '', d)}"
-SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'cpusensor', \
-                                               'xyz.openbmc_project.cpusensor.service', \
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'intelcpusensor', \
+                                               'xyz.openbmc_project.intelcpusensor.service', \
                                                '', d)}"
 SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'exitairtempsensor', \
                                                'xyz.openbmc_project.exitairsensor.service', \
