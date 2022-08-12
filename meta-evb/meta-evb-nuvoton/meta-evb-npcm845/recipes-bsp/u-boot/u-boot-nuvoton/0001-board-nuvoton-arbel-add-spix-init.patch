@@ -1,0 +1,51 @@
+From 29e01cd035119ccd5285bd8185c9d986f5032c45 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Fri, 10 Feb 2023 13:26:49 +0800
+Subject: [PATCH] board: nuvoton: arbel: add spix init
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ board/nuvoton/arbel/arbel.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/board/nuvoton/arbel/arbel.c b/board/nuvoton/arbel/arbel.c
+index a674757064..4bcf2f8c47 100644
+--- a/board/nuvoton/arbel/arbel.c
++++ b/board/nuvoton/arbel/arbel.c
+@@ -19,6 +19,8 @@
+ DECLARE_GLOBAL_DATA_PTR;
+ 
+ #define CLKSEL	0x4
++#define CLKDIV3	0x58
++#define CLKDIV3_SPIXCKDIV GENMASK(5, 1)
+ #define PIXCKSEL_GFX	0
+ #define PIXCKSEL_MASK	GENMASK(5, 4)
+ #define SR_MII_CTRL_SWR_BIT15   15
+@@ -72,10 +74,24 @@ static void arbel_clk_init(void)
+ 	writel(val, NPCM_CLK_BA + CLKSEL);
+ }
+ 
++static void arbel_spix_init(void)
++{
++	u32 val;
++	val = readl(NPCM_CLK_BA + CLKDIV3);
++	val &= ~CLKDIV3_SPIXCKDIV;
++	val |= FIELD_PREP(CLKDIV3_SPIXCKDIV, 4); //50Mhz
++	writel(val, NPCM_CLK_BA + CLKDIV3);
++
++	writel(0x00002300, 0xFB001000); // Enable SPIX mode
++	writel(0x03000002, 0xFB001004);
++}
++
++
+ int board_init(void)
+ {
+ 	arbel_clk_init();
+ 	arbel_eth_init();
++	arbel_spix_init();
+ 
+ 	return 0;
+ }
+-- 
+2.34.1
+
