@@ -32,4 +32,3 @@ MACHINEOVERRIDES .= ":npcm8xx"
 require conf/machine/include/arm/armv8a/tune-cortexa35.inc
 
 IMAGE_CLASSES:append:npcm8xx = " image_types_phosphor_nuvoton_npcm8xx"
-KERNEL_CLASSES:append:npcm8xx = " fitimage_nuvoton_npcm8xx"
