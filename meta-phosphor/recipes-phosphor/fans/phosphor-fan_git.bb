@@ -5,15 +5,13 @@ PR = "r1"
 PV = "1.0+git${SRCPV}"
 
 require ${BPN}.inc
-
-inherit autotools pkgconfig python3native
+inherit meson pkgconfig python3native
 inherit obmc-phosphor-systemd
 inherit phosphor-fan
 
 S = "${WORKDIR}/git"
 
 # Common build dependencies
-DEPENDS += "autoconf-archive-native"
 DEPENDS += "${PYTHON_PN}-pyyaml-native"
 DEPENDS += "${PYTHON_PN}-mako-native"
 DEPENDS += "sdbusplus"
@@ -37,18 +35,19 @@ ALLOW_EMPTY:${PN} = "1"
 PACKAGE_BEFORE_PN += "${FAN_PACKAGES}"
 PACKAGECONFIG ?= "presence control monitor sensor-monitor"
 SYSTEMD_PACKAGES = "${FAN_PACKAGES}"
+EXTRA_OEMESON:append = " -Dtests=disabled"
 PKG_DEFAULT_MACHINE ??= "${MACHINE}"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 # The control, monitor, and presence apps can either be JSON or YAML driven.
-PACKAGECONFIG[json] = "--enable-json, --disable-json"
+PACKAGECONFIG[json] = "-Djson-config=enabled, -Djson-config=disabled"
 
 # --------------------------------------
 # ${PN}-presence-tach specific configuration
-PACKAGECONFIG[presence] = "--enable-presence \
-    MACHINE=${PKG_DEFAULT_MACHINE} \
-    PRESENCE_CONFIG=${STAGING_DIR_HOST}${presence_datadir}/config.yaml, \
-    --disable-presence, \
+PACKAGECONFIG[presence] = "-Dpresence-service=enabled \
+    -Dmachine-name=${PKG_DEFAULT_MACHINE} \
+    -Dpresence-config=${STAGING_DIR_HOST}${presence_datadir}/config.yaml, \
+    -Dpresence-service=disabled, \
     virtual/phosphor-fan-presence-config \
     , \
 "
@@ -74,13 +73,13 @@ FILES:${PN}-presence-tach += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
 
 # --------------------------------------
 # ${PN}-control specific configuration
-PACKAGECONFIG[control] = "--enable-control \
-    MACHINE=${PKG_DEFAULT_MACHINE} \
-    FAN_DEF_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/fans.yaml \
-    FAN_ZONE_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/zones.yaml \
-    ZONE_EVENTS_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/events.yaml \
-    ZONE_CONDITIONS_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/zone_conditions.yaml, \
-    --disable-control, \
+PACKAGECONFIG[control] = "-Dcontrol-service=enabled \
+    -Dmachine-name=${PKG_DEFAULT_MACHINE} \
+    -Dfan-def-yaml-file=${STAGING_DIR_HOST}${control_datadir}/fans.yaml \
+    -Dfan-zone-yaml-file=${STAGING_DIR_HOST}${control_datadir}/zones.yaml \
+    -Dzone-events-yaml-file=${STAGING_DIR_HOST}${control_datadir}/events.yaml \
+    -Dzone-conditions-yaml-file=${STAGING_DIR_HOST}${control_datadir}/zone_conditions.yaml, \
+    -Dcontrol-service=disabled, \
     virtual/phosphor-fan-control-fan-config \
     phosphor-fan-control-zone-config \
     phosphor-fan-control-events-config \
@@ -120,10 +119,10 @@ FILES:${PN}-control += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
 
 # --------------------------------------
 # ${PN}-monitor specific configuration
-PACKAGECONFIG[monitor] = "--enable-monitor \
-    MACHINE=${PKG_DEFAULT_MACHINE} \
-    FAN_MONITOR_YAML_FILE=${STAGING_DIR_HOST}${monitor_datadir}/monitor.yaml, \
-    --disable-monitor, \
+PACKAGECONFIG[monitor] = "-Dmonitor-service=enabled \
+    -Dmachine-name=${PKG_DEFAULT_MACHINE} \
+    -Dfan-monitor-yaml-file=${STAGING_DIR_HOST}${monitor_datadir}/monitor.yaml, \
+    -Dmonitor-service=disabled, \
     phosphor-fan-monitor-config \
     , \
 "
@@ -157,11 +156,10 @@ FILES:${PN}-monitor += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
 
 # --------------------------------------
 # phosphor-cooling-type specific configuration
-PACKAGECONFIG[cooling-type] = "--enable-cooling-type,--disable-cooling-type,,"
-
+PACKAGECONFIG[cooling-type] = "-Dcooling-type-service=enabled,-Dcooling-type-service=disabled,,"
 # --------------------------------------
 # ${PN}-sensor-monitor specific configuration
-PACKAGECONFIG[sensor-monitor] = "--enable-sensor-monitor, --disable-sensor-monitor"
+PACKAGECONFIG[sensor-monitor] = "-Dsensor-monitor-service=enabled,-Dsensor-monitor-service=disabled"
 
 FAN_PACKAGES:append = "${@bb.utils.contains('PACKAGECONFIG', 'sensor-monitor', ' sensor-monitor', '', d)}"
 
