@@ -30,5 +30,3 @@ include conf/machine/include/soc-family.inc
 MACHINEOVERRIDES .= ":npcm8xx"
 
 require conf/machine/include/arm/armv8a/tune-cortexa35.inc
-
-IMAGE_CLASSES:append:npcm8xx = " image_types_phosphor_nuvoton_npcm8xx"
