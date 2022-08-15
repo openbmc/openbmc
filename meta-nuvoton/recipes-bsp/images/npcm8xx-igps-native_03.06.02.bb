@@ -20,7 +20,6 @@ inherit deploy
 
 do_deploy () {
 	install -D -m 644 ${S}/py_scripts/ImageGeneration/output_binaries/Secure/Kmt_TipFwL0_Skmt_TipFwL1.bin ${DEPLOYDIR}/Kmt_TipFwL0_Skmt_TipFwL1.bin
-	install -D -m 644 ${S}/py_scripts/ImageGeneration/versions/arbel_a35_bootblock.0.2.2.bin ${DEPLOYDIR}/arbel_a35_bootblock.bin
 }
 
 addtask deploy before do_build after do_compile
