@@ -14,7 +14,7 @@
 #
 # Machine Selection
 #
-MACHINE ??= "fby35"
+MACHINE ??= "greatlakes"
 
 #
 # Where to place downloads

@@ -15,5 +15,5 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-aspeed \
   ##OEROOT##/meta-facebook \
-  ##OEROOT##/meta-facebook/meta-fby35 \
+  ##OEROOT##/meta-facebook/meta-greatlakes \
   "
