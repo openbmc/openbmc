@@ -10,7 +10,7 @@ SRC_URI = " \
 "
 
 # tag IGPS_03.06.04
-SRCREV = "e4bf449d68b316323a4ea8d9f3b81aac5ec235b0"
+SRCREV = "6b056bb97a8f0e677d196afb6704372cae8bdd5b"
 
 S = "${WORKDIR}/git"
 
