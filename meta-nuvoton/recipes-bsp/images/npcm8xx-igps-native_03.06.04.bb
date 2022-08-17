@@ -16,14 +16,6 @@ S = "${WORKDIR}/git"
 
 DEST = "${D}${datadir}/${BPN}"
 
-inherit deploy
-
-do_deploy () {
-	install -D -m 644 ${S}/py_scripts/ImageGeneration/output_binaries/Secure/Kmt_TipFwL0_Skmt_TipFwL1.bin ${DEPLOYDIR}/Kmt_TipFwL0_Skmt_TipFwL1.bin
-}
-
-addtask deploy before do_build after do_compile
-
 do_install() {
 	install -d ${DEST}
 	install py_scripts/ImageGeneration/references/BootBlockAndHeader_${DEVICE_GEN}_${IGPS_MACHINE}.xml ${DEST}
