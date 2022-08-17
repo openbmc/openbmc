@@ -1,6 +1,6 @@
-From b76adadc995bbb10e2b990dcda6bc4ff68fe2788 Mon Sep 17 00:00:00 2001
+From 169933e61ac0334a522e7bb570edc1c80700cd90 Mon Sep 17 00:00:00 2001
 From: Tim Lee <timlee660101@gmail.com>
-Date: Thu, 28 Jul 2022 14:57:30 +0800
+Date: Wed, 17 Aug 2022 14:25:58 +0800
 Subject: [PATCH] Adjust paths for use with Bitbake
 
 Signed-off-by: Tim Lee <timlee660101@gmail.com>
@@ -16,7 +16,7 @@ Signed-off-by: Tim Lee <timlee660101@gmail.com>
  8 files changed, 24 insertions(+), 24 deletions(-)
 
 diff --git a/py_scripts/ImageGeneration/inputs/BL31_AndHeader.xml b/py_scripts/ImageGeneration/inputs/BL31_AndHeader.xml
-index 9f5be3d..dc6a33a 100755
+index 4ab84c9..d9d277e 100644
 --- a/py_scripts/ImageGeneration/inputs/BL31_AndHeader.xml
 +++ b/py_scripts/ImageGeneration/inputs/BL31_AndHeader.xml
 @@ -52,7 +52,7 @@
@@ -41,10 +41,10 @@ index 9f5be3d..dc6a33a 100755
  
  </Bin_Ecc_Map>
 diff --git a/py_scripts/ImageGeneration/inputs/OpTeeAndHeader.xml b/py_scripts/ImageGeneration/inputs/OpTeeAndHeader.xml
-index 5302604..043dc2c 100755
+index 683d647..6ac9535 100644
 --- a/py_scripts/ImageGeneration/inputs/OpTeeAndHeader.xml
 +++ b/py_scripts/ImageGeneration/inputs/OpTeeAndHeader.xml
-@@ -52,7 +52,7 @@
+@@ -53,7 +53,7 @@
  			<offset>0x1FC</offset>       
  			<size>0x4</size> 
  		</config>
@@ -53,7 +53,7 @@ index 5302604..043dc2c 100755
  	</BinField>
  	
  	<BinField>
-@@ -60,9 +60,9 @@
+@@ -61,9 +61,9 @@
  		<name>Code</name>             
  		<config>
  			<offset>0x200</offset>       
@@ -66,10 +66,10 @@ index 5302604..043dc2c 100755
  	
  </Bin_Ecc_Map>
 diff --git a/py_scripts/ImageGeneration/references/BootBlockAndHeader_A1_EB.xml b/py_scripts/ImageGeneration/references/BootBlockAndHeader_A1_EB.xml
-index 0228373..ef5007a 100755
+index 6bddc9d..036980b 100644
 --- a/py_scripts/ImageGeneration/references/BootBlockAndHeader_A1_EB.xml
 +++ b/py_scripts/ImageGeneration/references/BootBlockAndHeader_A1_EB.xml
-@@ -545,7 +545,7 @@
+@@ -548,7 +548,7 @@
  			<offset>0x1FC</offset>       
  			<size>0x4</size> 
  		</config>
@@ -78,7 +78,7 @@ index 0228373..ef5007a 100755
  	</BinField>
  	
  	<BinField>
-@@ -553,9 +553,9 @@
+@@ -556,9 +556,9 @@
  		<name>Code</name>             
  		<config>
  			<offset>0x200</offset>       
@@ -91,10 +91,10 @@ index 0228373..ef5007a 100755
  	
  </Bin_Ecc_Map>
 diff --git a/py_scripts/ImageGeneration/references/BootBlockAndHeader_A1_SVB.xml b/py_scripts/ImageGeneration/references/BootBlockAndHeader_A1_SVB.xml
-index 1462cfb..772a167 100755
+index e22a1f8..02968f2 100644
 --- a/py_scripts/ImageGeneration/references/BootBlockAndHeader_A1_SVB.xml
 +++ b/py_scripts/ImageGeneration/references/BootBlockAndHeader_A1_SVB.xml
-@@ -547,7 +547,7 @@
+@@ -548,7 +548,7 @@
  			<offset>0x1FC</offset>       
  			<size>0x4</size> 
  		</config>
@@ -103,7 +103,7 @@ index 1462cfb..772a167 100755
  	</BinField>
  	
  	<BinField>
-@@ -555,9 +555,9 @@
+@@ -556,9 +556,9 @@
  		<name>Code</name>             
  		<config>
  			<offset>0x200</offset>       
@@ -116,9 +116,34 @@ index 1462cfb..772a167 100755
  	
  </Bin_Ecc_Map>
 diff --git a/py_scripts/ImageGeneration/references/BootBlockAndHeader_Z1_EB.xml b/py_scripts/ImageGeneration/references/BootBlockAndHeader_Z1_EB.xml
-index f75bf22..2a9f2be 100755
+index c751b76..621d456 100644
 --- a/py_scripts/ImageGeneration/references/BootBlockAndHeader_Z1_EB.xml
 +++ b/py_scripts/ImageGeneration/references/BootBlockAndHeader_Z1_EB.xml
+@@ -548,7 +548,7 @@
+ 			<offset>0x1FC</offset>       
+ 			<size>0x4</size> 
+ 		</config>
+-		<content format='FileSize'>inputs/arbel_a35_bootblock.bin</content>	<!-- content the user should fill -->
++		<content format='FileSize'>arbel_a35_bootblock.bin</content>	<!-- content the user should fill -->
+ 	</BinField>
+ 	
+ 	<BinField>
+@@ -556,9 +556,9 @@
+ 		<name>Code</name>             
+ 		<config>
+ 			<offset>0x200</offset>       
+-			<size format='FileSize'>inputs/arbel_a35_bootblock.bin</size>                 <!-- size in the header calculated by tool-->
++			<size format='FileSize'>arbel_a35_bootblock.bin</size>                 <!-- size in the header calculated by tool-->
+ 		</config>
+-		<content format='FileContent'>inputs/arbel_a35_bootblock.bin</content>  <!-- content the user should fill -->
++		<content format='FileContent'>arbel_a35_bootblock.bin</content>  <!-- content the user should fill -->
+ 	</BinField>
+ 	
+ </Bin_Ecc_Map>
+diff --git a/py_scripts/ImageGeneration/references/BootBlockAndHeader_Z1_SVB.xml b/py_scripts/ImageGeneration/references/BootBlockAndHeader_Z1_SVB.xml
+index 0b77249..6086e66 100644
+--- a/py_scripts/ImageGeneration/references/BootBlockAndHeader_Z1_SVB.xml
++++ b/py_scripts/ImageGeneration/references/BootBlockAndHeader_Z1_SVB.xml
 @@ -547,7 +547,7 @@
  			<offset>0x1FC</offset>       
  			<size>0x4</size> 
@@ -140,36 +165,11 @@ index f75bf22..2a9f2be 100755
  	</BinField>
  	
  </Bin_Ecc_Map>
-diff --git a/py_scripts/ImageGeneration/references/BootBlockAndHeader_Z1_SVB.xml b/py_scripts/ImageGeneration/references/BootBlockAndHeader_Z1_SVB.xml
-index 5178ca9..1583c4d 100755
---- a/py_scripts/ImageGeneration/references/BootBlockAndHeader_Z1_SVB.xml
-+++ b/py_scripts/ImageGeneration/references/BootBlockAndHeader_Z1_SVB.xml
-@@ -546,7 +546,7 @@
- 			<offset>0x1FC</offset>       
- 			<size>0x4</size> 
- 		</config>
--		<content format='FileSize'>inputs/arbel_a35_bootblock.bin</content>	<!-- content the user should fill -->
-+		<content format='FileSize'>arbel_a35_bootblock.bin</content>	<!-- content the user should fill -->
- 	</BinField>
- 	
- 	<BinField>
-@@ -554,9 +554,9 @@
- 		<name>Code</name>             
- 		<config>
- 			<offset>0x200</offset>       
--			<size format='FileSize'>inputs/arbel_a35_bootblock.bin</size>                 <!-- size in the header calculated by tool-->
-+			<size format='FileSize'>arbel_a35_bootblock.bin</size>                 <!-- size in the header calculated by tool-->
- 		</config>
--		<content format='FileContent'>inputs/arbel_a35_bootblock.bin</content>  <!-- content the user should fill -->
-+		<content format='FileContent'>arbel_a35_bootblock.bin</content>  <!-- content the user should fill -->
- 	</BinField>
- 	
- </Bin_Ecc_Map>
 diff --git a/py_scripts/ImageGeneration/references/UbootHeader_A1.xml b/py_scripts/ImageGeneration/references/UbootHeader_A1.xml
-index 54593db..bbfa015 100755
+index 685365a..96a5de9 100644
 --- a/py_scripts/ImageGeneration/references/UbootHeader_A1.xml
 +++ b/py_scripts/ImageGeneration/references/UbootHeader_A1.xml
-@@ -176,7 +176,7 @@
+@@ -53,7 +53,7 @@
  			<offset>0x1FC</offset>        <!-- offset in the header -->
  			<size>0x4</size>              <!-- size in the header -->
  		</config>
@@ -178,8 +178,8 @@ index 54593db..bbfa015 100755
  	</BinField>
  	
  	<BinField>
-@@ -184,9 +184,9 @@
- 		<name>Code</name>             <!-- name of field -->
+@@ -61,9 +61,9 @@
+ 		<name>Code</name>             
  		<config>
  			<offset>0x200</offset>        <!-- offset in the header -->
 -			<size format='FileSize'>inputs/u-boot.bin</size>                 <!-- size in the header calculated by tool-->
@@ -191,10 +191,10 @@ index 54593db..bbfa015 100755
  	
  	
 diff --git a/py_scripts/ImageGeneration/references/UbootHeader_Z1.xml b/py_scripts/ImageGeneration/references/UbootHeader_Z1.xml
-index 54593db..bbfa015 100755
+index 685365a..96a5de9 100644
 --- a/py_scripts/ImageGeneration/references/UbootHeader_Z1.xml
 +++ b/py_scripts/ImageGeneration/references/UbootHeader_Z1.xml
-@@ -176,7 +176,7 @@
+@@ -53,7 +53,7 @@
  			<offset>0x1FC</offset>        <!-- offset in the header -->
  			<size>0x4</size>              <!-- size in the header -->
  		</config>
@@ -203,8 +203,8 @@ index 54593db..bbfa015 100755
  	</BinField>
  	
  	<BinField>
-@@ -184,9 +184,9 @@
- 		<name>Code</name>             <!-- name of field -->
+@@ -61,9 +61,9 @@
+ 		<name>Code</name>             
  		<config>
  			<offset>0x200</offset>        <!-- offset in the header -->
 -			<size format='FileSize'>inputs/u-boot.bin</size>                 <!-- size in the header calculated by tool-->
