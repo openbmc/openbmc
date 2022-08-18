@@ -20,7 +20,7 @@ RDEPENDS:${PN} += "phosphor-network"
 RDEPENDS:${PN} += "phosphor-mapper"
 
 SRC_URI += "git://github.com/openbmc/phosphor-time-manager;branch=master;protocol=https"
-SRCREV = "723068069aa58423e64ad0276db3a63d8f9e4d5d"
+SRCREV = "5b38e644d80436963003a5826eeb475a49106ccd"
 PV = "1.0+git${SRCPV}"
 S = "${WORKDIR}/git"
 
