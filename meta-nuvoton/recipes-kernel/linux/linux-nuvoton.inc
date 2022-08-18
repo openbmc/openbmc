@@ -15,9 +15,6 @@ LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
-OFFSET = "600"
-UBOOT_MKIMAGE:append:npcm8xx = " -E -p ${OFFSET}"
-
 inherit kernel
 require recipes-kernel/linux/linux-yocto.inc
 
