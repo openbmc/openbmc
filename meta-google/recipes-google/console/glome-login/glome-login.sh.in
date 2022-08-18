@@ -1,0 +1,42 @@
+#!/bin/bash
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+set -eo pipefail
+
+HOSTNAME="$(hostname)"
+USER="${1?Missing first param: USER (Usually passed by agetty via \\u)}"
+
+if [[ "$HOSTNAME" =~ ^([^-.]+)[^.]*(.*[.]corp[.]google[.]com)$ ]]; then
+  # for google corp address the suffix must be removed from the name
+  HOSTNAME="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
+fi
+
+if [[ "${HOSTNAME}" == *"@HOSTNAME_SUFFIX@" ]];  then
+  # Valid hostname is already set, invoke normal glome
+  exec /usr/sbin/glome-login -M "${HOSTNAME}" "${USER}"
+fi
+
+# Get the board serial number from the FRU EEPROM
+# Service passed in as a parameter would be either inventory-manager or
+# entity-manager depending on platforms
+# Path to the FRU EEPROM object has to be passed in as a parameter
+# If the target platform has neither of them, the fallback mechanism is useless
+INT="xyz.openbmc_project.Inventory.Decorator.Asset"
+PART="SerialNumber"
+BOARDSN="$(busctl get-property -j "@INV_SERV@" "@INV_OBJ@" "${INT}" "${PART}" | jq -r '.data')"
+
+WARN_MSG="WARNING: Hostname is not set, using Board Serial Number"
+echo "${WARN_MSG}"
+echo "${WARN_MSG}" | systemd-cat -t gbmc-glome -p warning
+exec /usr/sbin/glome-login -M "@BOARDSN_KEY@:${BOARDSN}" "${USER}"

@@ -1,0 +1,8 @@
+# This is the configuration file for serial console authentication with glome.
+# /usr/sbin/glome-login tries to read this file on startup at its canonical
+# location /etc/glome/config.
+
+[service]
+key = @PUBLIC_KEY@
+key-version = @KEY_VERSION@
+url-prefix = @URL_PREFIX@
