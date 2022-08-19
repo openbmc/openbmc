@@ -6,7 +6,7 @@ PR = "r1"
 PV = "1.0+git${SRCPV}"
 
 SRC_URI = "git://github.com/openbmc/phosphor-misc;branch=master;protocol=https"
-SRCREV = "746d56c3888ec8f86aa1442780845e3f247ab5a0"
+SRCREV = "8ae2fcd1cad309c607671dd83a94aa13cc2fbdc6"
 
 S = "${WORKDIR}/git"
 
