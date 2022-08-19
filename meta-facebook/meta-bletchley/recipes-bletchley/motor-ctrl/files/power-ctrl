@@ -377,6 +377,7 @@ function do_action_on()
     local SLED_NUM=$1
     echo "sled${SLED_NUM}: power on host"
     trigger_power_button  "$SLED_NUM"  "$DELAY_POWER_ON"
+    sleep 10 # Mac mini need about 10 second to stable link status
     echo "$ACTION_ON" > "/tmp/sled${SLED_NUM}-last-action"
 }
 
