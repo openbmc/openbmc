@@ -1,2 +1,11 @@
-Common targets are:
-     obmc-phosphor-image
+Make olympus inventory-manager image by following command:
+     bitbake obmc-phosphor-image
+
+Make olympus entity-manager image by following command:
+     DISTRO=olympus-entity bitbake obmc-phosphor-image
+
+Make emmc image with inventory-manager (boot linux/openbmc from emmc)
+     DISTRO=olympus-emmc bitbake obmc-phosphor-image
+
+Make emmc image with entity-manager (boot linux/openbmc from emmc)
+     DISTRO=olympus-emmc-entity  bitbake obmc-phosphor-image
