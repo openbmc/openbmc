@@ -29,12 +29,12 @@ do_install() {
 
 TGT = "${SYSTEMD_DEFAULT_TARGET}"
 MOTOR_INIT_INSTFMT="../motor-init-calibration@.service:${TGT}.wants/motor-init-calibration@{0}.service"
-PWR_ON_INSTFMT="../host-poweron@.service:obmc-host-startmin@{0}.target.wants/host-poweron@{0}.service"
-PWR_OFF_INSTFMT="../host-poweroff@.service:obmc-host-shutdown@{0}.target.wants/host-poweroff@{0}.service"
+PWR_ON_INSTFMT="../host-poweron@.service:obmc-host-starting@{0}.target.wants/host-poweron@{0}.service"
+PWR_OFF_INSTFMT="../host-poweroff@.service:obmc-host-stopping@{0}.target.wants/host-poweroff@{0}.service"
 PWR_RESET_INSTFMT="host-reset@.service:host-reset@{0}.service"
 PWR_CYCLE_INSTFMT="host-cycle@.service:host-cycle@{0}.service"
-AC_ON_INSTFMT="../host-ac-on@.service:${TGT}.wants/host-ac-on@{0}.service"
-AC_OFF_INSTFMT="host-ac-off@.service:host-ac-off@{0}.service"
+AC_ON_INSTFMT="../host-ac-on@.service:obmc-chassis-poweron@{0}.target.requires/host-ac-on@{0}.service"
+AC_OFF_INSTFMT="../host-ac-off@.service:obmc-chassis-poweroff@{0}.target.requires/host-ac-off@{0}.service"
 
 SYSTEMD_SERVICE:${PN} += "motor-init-calibration@.service"
 SYSTEMD_LINK:${PN} += "${@compose_list(d, 'MOTOR_INIT_INSTFMT', 'OBMC_HOST_INSTANCES')}"
@@ -85,4 +85,3 @@ SYSTEMD_OVERRIDE:${PN}:bletchley += "${@compose_list_zip(d, 'HOST_ON_OVERRIDE_CO
 # Host off unit configurations
 HOST_OFF_OVERRIDE_CONF_FMT = "host-poweroff.conf:host-poweroff@{0}.service.d/host-poweroff.conf"
 SYSTEMD_OVERRIDE:${PN}:bletchley += "${@compose_list_zip(d, 'HOST_OFF_OVERRIDE_CONF_FMT', 'OBMC_HOST_INSTANCES')}"
-
