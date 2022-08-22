@@ -24,9 +24,18 @@ def sstate_rundepfilter(siggen, fn, recipename, task, dep, depname, dataCaches):
         return "/allarch.bbclass" in inherits
     def isImage(mc, fn):
         return "/image.bbclass" in " ".join(dataCaches[mc].inherits[fn])
+    def isSPDXTask(task):
+        return task in ("do_create_spdx", "do_create_runtime_spdx")
 
     depmc, _, deptaskname, depmcfn = bb.runqueue.split_tid_mcfn(dep)
     mc, _ = bb.runqueue.split_mc(fn)
+
+    # Keep all dependencies between SPDX tasks in the signature. SPDX documents
+    # are linked together by hashes, which means if a dependent document changes,
+    # all downstream documents must be re-written (even if they are "safe"
+    # dependencies).
+    if isSPDXTask(task) and isSPDXTask(deptaskname):
+        return True
 
     # (Almost) always include our own inter-task dependencies (unless it comes
     # from a mcdepends). The exception is the special

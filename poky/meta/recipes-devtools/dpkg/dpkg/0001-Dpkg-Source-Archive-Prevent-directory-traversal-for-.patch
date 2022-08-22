@@ -1,0 +1,328 @@
+From 6d8a6799639f8853a2af1f9036bc70fddbfdd2a2 Mon Sep 17 00:00:00 2001
+From: Guillem Jover <guillem@debian.org>
+Date: Tue, 3 May 2022 02:09:32 +0200
+Subject: [PATCH] Dpkg::Source::Archive: Prevent directory traversal for
+ in-place extracts
+
+For untrusted v2 and v3 source package formats that include a debian.tar
+archive, when we are extracting it, we do that as an in-place extraction,
+which can lead to directory traversal situations on specially crafted
+orig.tar and debian.tar tarballs.
+
+GNU tar replaces entries on the filesystem by the entries present on
+the tarball, but it will follow symlinks when the symlink pathname
+itself is not present as an actual directory on the tarball.
+
+This means we can create an orig.tar where there's a symlink pointing
+out of the source tree root directory, and then a debian.tar that
+contains an entry within that symlink as if it was a directory, without
+a directory entry for the symlink pathname itself, which will be
+extracted following the symlink outside the source tree root.
+
+This is currently noted as expected in GNU tar documentation. But even
+if there was a new extraction mode avoiding this problem we'd need such
+new version. Using perl's Archive::Tar would solve the problem, but
+switching to such different pure perl implementation, could cause
+compatibility or performance issues.
+
+What we do is when we are requested to perform an in-place extract, we
+instead still use a temporary directory, then walk that directory and
+remove any matching entry in the destination directory, replicating what
+GNU tar would do, but in addition avoiding the directory traversal issue
+for symlinks. Which should work with any tar implementation and be safe.
+
+Reported-by: Max Justicz <max@justi.cz>
+Stable-Candidates: 1.18.x 1.19.x 1.20.x
+Fixes: commit 0c0057a27fecccab77d2b3cffa9a7d172846f0b4 (1.14.17)
+Fixes: CVE-2022-1664
+
+CVE: CVE-2022-1664
+Upstream-Status: Backport [7a6c03cb34d4a09f35df2f10779cbf1b70a5200b]
+
+Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
+---
+ scripts/Dpkg/Source/Archive.pm  | 122 +++++++++++++++++++++++++-------
+ scripts/t/Dpkg_Source_Archive.t | 110 +++++++++++++++++++++++++++-
+ 2 files changed, 204 insertions(+), 28 deletions(-)
+
+diff --git a/scripts/Dpkg/Source/Archive.pm b/scripts/Dpkg/Source/Archive.pm
+index 33c181b20..2ddd04af8 100644
+--- a/scripts/Dpkg/Source/Archive.pm
++++ b/scripts/Dpkg/Source/Archive.pm
+@@ -21,9 +21,11 @@ use warnings;
+ our $VERSION = '0.01';
+ 
+ use Carp;
++use Errno qw(ENOENT);
+ use File::Temp qw(tempdir);
+ use File::Basename qw(basename);
+ use File::Spec;
++use File::Find;
+ use Cwd;
+ 
+ use Dpkg ();
+@@ -110,19 +112,13 @@ sub extract {
+     my %spawn_opts = (wait_child => 1);
+ 
+     # Prepare destination
+-    my $tmp;
+-    if ($opts{in_place}) {
+-        $spawn_opts{chdir} = $dest;
+-        $tmp = $dest; # So that fixperms call works
+-    } else {
+-        my $template = basename($self->get_filename()) .  '.tmp-extract.XXXXX';
+-        unless (-e $dest) {
+-            # Kludge so that realpath works
+-            mkdir($dest) or syserr(g_('cannot create directory %s'), $dest);
+-        }
+-        $tmp = tempdir($template, DIR => Cwd::realpath("$dest/.."), CLEANUP => 1);
+-        $spawn_opts{chdir} = $tmp;
++    my $template = basename($self->get_filename()) .  '.tmp-extract.XXXXX';
++    unless (-e $dest) {
++        # Kludge so that realpath works
++        mkdir($dest) or syserr(g_('cannot create directory %s'), $dest);
+     }
++    my $tmp = tempdir($template, DIR => Cwd::realpath("$dest/.."), CLEANUP => 1);
++    $spawn_opts{chdir} = $tmp;
+ 
+     # Prepare stuff that handles the input of tar
+     $self->ensure_open('r', delete_sig => [ 'PIPE' ]);
+@@ -145,22 +141,94 @@ sub extract {
+     # have to be calculated using mount options and other madness.
+     fixperms($tmp) unless $opts{no_fixperms};
+ 
+-    # Stop here if we extracted in-place as there's nothing to move around
+-    return if $opts{in_place};
+-
+-    # Rename extracted directory
+-    opendir(my $dir_dh, $tmp) or syserr(g_('cannot opendir %s'), $tmp);
+-    my @entries = grep { $_ ne '.' && $_ ne '..' } readdir($dir_dh);
+-    closedir($dir_dh);
+-    my $done = 0;
+-    erasedir($dest);
+-    if (scalar(@entries) == 1 && ! -l "$tmp/$entries[0]" && -d _) {
+-	rename("$tmp/$entries[0]", $dest)
+-	    or syserr(g_('unable to rename %s to %s'),
+-	              "$tmp/$entries[0]", $dest);
++    # If we are extracting "in-place" do not remove the destination directory.
++    if ($opts{in_place}) {
++        my $canon_basedir = Cwd::realpath($dest);
++        # On Solaris /dev/null points to /devices/pseudo/mm@0:null.
++        my $canon_devnull = Cwd::realpath('/dev/null');
++        my $check_symlink = sub {
++            my $pathname = shift;
++            my $canon_pathname = Cwd::realpath($pathname);
++            if (not defined $canon_pathname) {
++                return if $! == ENOENT;
++
++                syserr(g_("pathname '%s' cannot be canonicalized"), $pathname);
++            }
++            return if $canon_pathname eq $canon_devnull;
++            return if $canon_pathname eq $canon_basedir;
++            return if $canon_pathname =~ m{^\Q$canon_basedir/\E};
++            warning(g_("pathname '%s' points outside source root (to '%s')"),
++                    $pathname, $canon_pathname);
++        };
++
++        my $move_in_place = sub {
++            my $relpath = File::Spec->abs2rel($File::Find::name, $tmp);
++            my $destpath = File::Spec->catfile($dest, $relpath);
++
++            my ($mode, $atime, $mtime);
++            lstat $File::Find::name
++                or syserr(g_('cannot get source pathname %s metadata'), $File::Find::name);
++            ((undef) x 2, $mode, (undef) x 5, $atime, $mtime) = lstat _;
++            my $src_is_dir = -d _;
++
++            my $dest_exists = 1;
++            if (not lstat $destpath) {
++                if ($! == ENOENT) {
++                    $dest_exists = 0;
++                } else {
++                    syserr(g_('cannot get target pathname %s metadata'), $destpath);
++                }
++            }
++            my $dest_is_dir = -d _;
++            if ($dest_exists) {
++                if ($dest_is_dir && $src_is_dir) {
++                    # Refresh the destination directory attributes with the
++                    # ones from the tarball.
++                    chmod $mode, $destpath
++                        or syserr(g_('cannot change directory %s mode'), $File::Find::name);
++                    utime $atime, $mtime, $destpath
++                        or syserr(g_('cannot change directory %s times'), $File::Find::name);
++
++                    # We should do nothing, and just walk further tree.
++                    return;
++                } elsif ($dest_is_dir) {
++                    rmdir $destpath
++                        or syserr(g_('cannot remove destination directory %s'), $destpath);
++                } else {
++                    $check_symlink->($destpath);
++                    unlink $destpath
++                        or syserr(g_('cannot remove destination file %s'), $destpath);
++                }
++            }
++            # If we are moving a directory, we do not need to walk it.
++            if ($src_is_dir) {
++                $File::Find::prune = 1;
++            }
++            rename $File::Find::name, $destpath
++                or syserr(g_('cannot move %s to %s'), $File::Find::name, $destpath);
++        };
++
++        find({
++            wanted => $move_in_place,
++            no_chdir => 1,
++            dangling_symlinks => 0,
++        }, $tmp);
+     } else {
+-	rename($tmp, $dest)
+-	    or syserr(g_('unable to rename %s to %s'), $tmp, $dest);
++        # Rename extracted directory
++        opendir(my $dir_dh, $tmp) or syserr(g_('cannot opendir %s'), $tmp);
++        my @entries = grep { $_ ne '.' && $_ ne '..' } readdir($dir_dh);
++        closedir($dir_dh);
++
++        erasedir($dest);
++
++        if (scalar(@entries) == 1 && ! -l "$tmp/$entries[0]" && -d _) {
++            rename("$tmp/$entries[0]", $dest)
++                or syserr(g_('unable to rename %s to %s'),
++                          "$tmp/$entries[0]", $dest);
++        } else {
++            rename($tmp, $dest)
++                or syserr(g_('unable to rename %s to %s'), $tmp, $dest);
++        }
+     }
+     erasedir($tmp);
+ }
+diff --git a/scripts/t/Dpkg_Source_Archive.t b/scripts/t/Dpkg_Source_Archive.t
+index 7b70da68e..504fbe1d4 100644
+--- a/scripts/t/Dpkg_Source_Archive.t
++++ b/scripts/t/Dpkg_Source_Archive.t
+@@ -16,12 +16,120 @@
+ use strict;
+ use warnings;
+ 
+-use Test::More tests => 1;
++use Test::More tests => 4;
++use Test::Dpkg qw(:paths);
++
++use File::Spec;
++use File::Path qw(make_path rmtree);
+ 
+ BEGIN {
+     use_ok('Dpkg::Source::Archive');
+ }
+ 
++use Dpkg;
++
++my $tmpdir = test_get_temp_path();
++
++rmtree($tmpdir);
++
++sub test_touch
++{
++    my ($name, $data) = @_;
++
++    open my $fh, '>', $name
++        or die "cannot touch file $name\n";
++    print { $fh } $data if $data;
++    close $fh;
++}
++
++sub test_path_escape
++{
++    my $name = shift;
++
++    my $treedir = File::Spec->rel2abs("$tmpdir/$name-tree");
++    my $overdir = File::Spec->rel2abs("$tmpdir/$name-overlay");
++    my $outdir = "$tmpdir/$name-out";
++    my $expdir = "$tmpdir/$name-exp";
++
++    # This is the base directory, where we are going to be extracting stuff
++    # into, which include traps.
++    make_path("$treedir/subdir-a");
++    test_touch("$treedir/subdir-a/file-a");
++    test_touch("$treedir/subdir-a/file-pre-a");
++    make_path("$treedir/subdir-b");
++    test_touch("$treedir/subdir-b/file-b");
++    test_touch("$treedir/subdir-b/file-pre-b");
++    symlink File::Spec->abs2rel($outdir, $treedir), "$treedir/symlink-escape";
++    symlink File::Spec->abs2rel("$outdir/nonexistent", $treedir), "$treedir/symlink-nonexistent";
++    symlink "$treedir/file", "$treedir/symlink-within";
++    test_touch("$treedir/supposed-dir");
++
++    # This is the overlay directory, which we'll pack and extract over the
++    # base directory.
++    make_path($overdir);
++    make_path("$overdir/subdir-a/aa");
++    test_touch("$overdir/subdir-a/aa/file-aa", 'aa');
++    test_touch("$overdir/subdir-a/file-a", 'a');
++    make_path("$overdir/subdir-b/bb");
++    test_touch("$overdir/subdir-b/bb/file-bb", 'bb');
++    test_touch("$overdir/subdir-b/file-b", 'b');
++    make_path("$overdir/symlink-escape");
++    test_touch("$overdir/symlink-escape/escaped-file", 'escaped');
++    test_touch("$overdir/symlink-nonexistent", 'nonexistent');
++    make_path("$overdir/symlink-within");
++    make_path("$overdir/supposed-dir");
++    test_touch("$overdir/supposed-dir/supposed-file", 'something');
++
++    # Generate overlay tar.
++    system($Dpkg::PROGTAR, '-cf', "$overdir.tar", '-C', $overdir, qw(
++        subdir-a subdir-b
++        symlink-escape/escaped-file symlink-nonexistent symlink-within
++        supposed-dir
++        )) == 0
++        or die "cannot create overlay tar archive\n";
++
++   # This is the expected directory, which we'll be comparing against.
++    make_path($expdir);
++    system('cp', '-a', $overdir, $expdir) == 0
++        or die "cannot copy overlay hierarchy into expected directory\n";
++
++    # Store the expected and out reference directories into a tar to compare
++    # its structure against the result reference.
++    system($Dpkg::PROGTAR, '-cf', "$expdir.tar", '-C', $overdir, qw(
++        subdir-a subdir-b
++        symlink-escape/escaped-file symlink-nonexistent symlink-within
++        supposed-dir
++        ), '-C', $treedir, qw(
++        subdir-a/file-pre-a
++        subdir-b/file-pre-b
++        )) == 0
++        or die "cannot create expected tar archive\n";
++
++    # This directory is supposed to remain empty, anything inside implies a
++    # directory traversal.
++    make_path($outdir);
++
++    my $warnseen;
++    local $SIG{__WARN__} = sub { $warnseen = $_[0] };
++
++    # Perform the extraction.
++    my $tar = Dpkg::Source::Archive->new(filename => "$overdir.tar");
++    $tar->extract($treedir, in_place => 1);
++
++    # Store the result into a tar to compare its structure against a reference.
++    system($Dpkg::PROGTAR, '-cf', "$treedir.tar", '-C', $treedir, '.');
++
++    # Check results
++    ok(length $warnseen && $warnseen =~ m/points outside source root/,
++       'expected warning seen');
++    ok(system($Dpkg::PROGTAR, '--compare', '-f', "$expdir.tar", '-C', $treedir) == 0,
++       'expected directory matches');
++    ok(! -e "$outdir/escaped-file",
++       'expected output directory is empty, directory traversal');
++}
++
++test_path_escape('in-place');
++
+ # TODO: Add actual test cases.
+ 
+ 1;
+-- 
+2.33.0
+

@@ -15,6 +15,10 @@ SRC_URI = " \
 SRCREV = "37ac30ceff6640bbab502388c5e0fa0bff23f505"
 S = "${WORKDIR}/git"
 
+CVE_CHECK_IGNORE += "\
+    CVE-2015-1239 \
+"
+
 inherit cmake
 
 # for multilib

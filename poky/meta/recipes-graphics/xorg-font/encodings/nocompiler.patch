@@ -1,4 +1,4 @@
-From b08c43a0842076e0a94e88ad6456a9326cd7ffc9 Mon Sep 17 00:00:00 2001
+From 0c0790e90a68bf8290da5c0e57142bf7c620f039 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Tue, 17 May 2011 23:03:02 +0000
 Subject: [PATCH] Improve handling of 'all' architecture recipes and their
@@ -21,12 +21,12 @@ RP 17/5/2011
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 622c27b..5ee84ed 100644
+index b80e3de..80208bb 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -3,12 +3,12 @@ AC_INIT([encodings], [1.0.5],
+@@ -3,12 +3,12 @@ AC_INIT([encodings], [1.0.6],
          [https://gitlab.freedesktop.org/xorg/font/encodings/issues])
- AM_INIT_AUTOMAKE([foreign dist-bzip2])
+ AM_INIT_AUTOMAKE([foreign dist-xz])
  
 -# Require xorg-macros: XORG_DEFAULT_OPTIONS
  m4_ifndef([XORG_MACROS_VERSION],

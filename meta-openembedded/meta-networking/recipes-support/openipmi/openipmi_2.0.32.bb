@@ -85,6 +85,10 @@ do_configure () {
     done
 }
 
+do_compile:append () {
+    sed -i -e 's#${RECIPE_SYSROOT_NATIVE}##g' ${S}/swig/perl/OpenIPMI_wrap.c
+}
+
 do_install:append () {
     echo "SAL: D = $D"
     echo "SAL: libdir = $libdir"

@@ -45,6 +45,12 @@ SRC_URI:append:toolchain-clang = "\
 
 S = "${WORKDIR}/git"
 
+CVE_CHECK_IGNORE += "\
+    CVE-2014-8180 \
+    CVE-2017-18381 \
+    CVE-2017-2665 \
+"
+
 COMPATIBLE_HOST ?= '(x86_64|i.86|powerpc64|arm|aarch64).*-linux'
 
 PACKAGECONFIG ??= "tcmalloc system-pcre"

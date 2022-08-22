@@ -20,7 +20,8 @@ DEPENDS += "libxml2 libxslt"
 
 SRC_URI[sha256sum] = "f63f62fc60e6228a4ca9abae28228f35e1bd3ce675013d1dfb828688d50c6e23"
 
-SRC_URI += "${PYPI_SRC_URI}"
+SRC_URI += "${PYPI_SRC_URI} \
+            file://CVE-2022-2309.patch "
 inherit pkgconfig pypi setuptools3
 
 # {standard input}: Assembler messages:

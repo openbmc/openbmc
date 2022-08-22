@@ -18,7 +18,8 @@ SRC_URI = " \
     file://0001-fix-dispmanx-build.patch \
     file://0002-run-dispmanx-fullscreen.patch \
     file://0001-libmatrix-Include-missing-utility-header.patch \
-    "
+    file://0001-waflib-fix-compatibility-with-python-3.11.patch \
+"
 SRCREV = "0858b450cd88c84a15b99dda9698d44e7f7e8c70"
 
 S = "${WORKDIR}/git"

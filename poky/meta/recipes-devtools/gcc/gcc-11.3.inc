@@ -59,7 +59,7 @@ SRC_URI = "\
            file://0027-libatomic-Do-not-enforce-march-on-aarch64.patch \
            file://0028-debug-101473-apply-debug-prefix-maps-before-checksum.patch \
            file://0029-Fix-install-path-of-linux64.h.patch \
-           \
+           file://0030-rust-recursion-limit.patch \
            file://0001-CVE-2021-42574.patch \
            file://0002-CVE-2021-42574.patch \
            file://0003-CVE-2021-42574.patch \

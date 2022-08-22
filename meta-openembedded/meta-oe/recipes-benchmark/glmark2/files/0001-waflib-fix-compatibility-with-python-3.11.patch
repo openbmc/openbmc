@@ -1,0 +1,76 @@
+From b85ba8c3ff3fb9ae708576ccef03434d2ef73054 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Tue, 14 Jun 2022 09:54:18 +0000
+Subject: [PATCH] waflib: fix compatibility with python-3.11
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+* https://docs.python.org/3.11/whatsnew/3.11.html#changes-in-the-python-api
+
+  open(), io.open(), codecs.open() and fileinput.FileInput no longer
+  accept 'U' (“universal newline”) in the file mode. This flag was
+  deprecated since Python 3.3. In Python 3, the “universal newline” is
+  used by default when a file is open in text mode. The newline parameter
+  of open() controls how universal newlines works. (Contributed by Victor
+  Stinner in bpo-37330.)
+
+* fixes:
+Waf: The wscript in '/OE/build/luneos-langdale/webos-ports/tmp-glibc/work/core2-64-webos-linux/glmark2/2021.12-r0/git' is unreadable
+Traceback (most recent call last):
+  File "/OE/build/luneos-langdale/webos-ports/tmp-glibc/work/core2-64-webos-linux/glmark2/2021.12-r0/git/waflib/Scripting.py", line 104, in waf_entry_point
+    set_main_module(os.path.normpath(os.path.join(Context.run_dir,Context.WSCRIPT_FILE)))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/OE/build/luneos-langdale/webos-ports/tmp-glibc/work/core2-64-webos-linux/glmark2/2021.12-r0/git/waflib/Scripting.py", line 135, in set_main_module
+    Context.g_module=Context.load_module(file_path)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/OE/build/luneos-langdale/webos-ports/tmp-glibc/work/core2-64-webos-linux/glmark2/2021.12-r0/git/waflib/Context.py", line 343, in load_module
+    code=Utils.readf(path,m='rU',encoding=encoding)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/OE/build/luneos-langdale/webos-ports/tmp-glibc/work/core2-64-webos-linux/glmark2/2021.12-r0/git/waflib/Utils.py", line 117, in readf
+    f=open(fname,m)
+      ^^^^^^^^^^^^^
+ValueError: invalid mode: 'rUb'
+
+Upstream-Status: Submitted [https://github.com/glmark2/glmark2/pull/178]
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ waflib/ConfigSet.py | 2 +-
+ waflib/Context.py   | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/waflib/ConfigSet.py b/waflib/ConfigSet.py
+index 16142a2..87de4ad 100644
+--- a/waflib/ConfigSet.py
++++ b/waflib/ConfigSet.py
+@@ -140,7 +140,7 @@ class ConfigSet(object):
+ 		Utils.writef(filename,''.join(buf))
+ 	def load(self,filename):
+ 		tbl=self.table
+-		code=Utils.readf(filename,m='rU')
++		code=Utils.readf(filename,m='r')
+ 		for m in re_imp.finditer(code):
+ 			g=m.group
+ 			tbl[g(2)]=eval(g(3))
+diff --git a/waflib/Context.py b/waflib/Context.py
+index 8f2cbfb..f3e35ae 100644
+--- a/waflib/Context.py
++++ b/waflib/Context.py
+@@ -109,7 +109,7 @@ class Context(ctx):
+ 				cache[node]=True
+ 				self.pre_recurse(node)
+ 				try:
+-					function_code=node.read('rU',encoding)
++					function_code=node.read('r',encoding)
+ 					exec(compile(function_code,node.abspath(),'exec'),self.exec_dict)
+ 				finally:
+ 					self.post_recurse(node)
+@@ -340,7 +340,7 @@ def load_module(path,encoding=None):
+ 		pass
+ 	module=imp.new_module(WSCRIPT_FILE)
+ 	try:
+-		code=Utils.readf(path,m='rU',encoding=encoding)
++		code=Utils.readf(path,encoding=encoding)
+ 	except EnvironmentError:
+ 		raise Errors.WafError('Could not read the file %r'%path)
+ 	module_dir=os.path.dirname(path)

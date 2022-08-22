@@ -14,7 +14,6 @@ DEPENDS = " \
     libdevmapper \
     popt \
     util-linux-libuuid \
-    libssh \
 "
 
 DEPENDS:append:libc-musl = " argp-standalone"
@@ -39,6 +38,7 @@ PACKAGECONFIG ??= " \
     blkid \
     luks-adjust-xts-keysize \
     openssl \
+    ssh-token \
 "
 PACKAGECONFIG:append:class-target = " \
     udev \
@@ -69,6 +69,7 @@ PACKAGECONFIG[nss] = "--with-crypto_backend=nss,,nss"
 PACKAGECONFIG[kernel] = "--with-crypto_backend=kernel"
 PACKAGECONFIG[nettle] = "--with-crypto_backend=nettle,,nettle"
 PACKAGECONFIG[luks2] = "--with-default-luks-format=LUKS2,--with-default-luks-format=LUKS1"
+PACKAGECONFIG[ssh-token] = "--enable-ssh-token,--disable-ssh-token,libssh"
 
 EXTRA_OECONF = "--enable-static"
 # Building without largefile is not supported by upstream
@@ -77,6 +78,14 @@ EXTRA_OECONF += "--enable-largefile"
 EXTRA_OECONF += "--disable-static-cryptsetup"
 # There's no recipe for libargon2 yet
 EXTRA_OECONF += "--disable-libargon2"
+
+do_install:append() {
+    # The /usr/lib/cryptsetup directory is always created, even when ssh-token
+    # is disabled. In that case it is empty and causes a packaging error. Since
+    # there is no reason to distribute the empty directory, the easiest solution
+    # is to remove it if it is empty.
+    rmdir -p --ignore-fail-on-non-empty ${D}${libdir}/${BPN}
+}
 
 FILES:${PN} += "${@bb.utils.contains('DISTRO_FEATURES','systemd','${exec_prefix}/lib/tmpfiles.d/cryptsetup.conf', '', d)}"
 

@@ -89,7 +89,7 @@ automount_systemd() {
         rm_dir "$MOUNT_BASE/$name"
     else
         logger "mount.sh/automount" "Auto-mount of [$MOUNT_BASE/$name] successful"
-        touch "/tmp/.automount-$name"
+        echo "$name" > "/tmp/.automount-$name"
     fi
 }
 

@@ -1,9 +1,13 @@
-The creation of the LINGUAS file is duplicated for each desktop file
-which can lead the commands to race against each other. Rework
-the makefile to avoid this as the expense of leaving the file on disk.
+po/Makefile: Avoid race over LINGUAS file
 
-Upstream-Status: Pending
-RP 2021/2/15
+The creation of the LINGUAS file is duplicated for each desktop file
+which can lead the commands to race against each other. One target might
+remove it before another has been able to use it. Rework the makefile to
+avoid this as the expense of leaving the file on disk.
+
+Signed-off-by: Richard Purdie richard.purdie@linuxfoundation.org
+
+Upstream-Status: Submitted [https://github.com/vim/vim/pull/10776]
 
 Index: git/src/po/Makefile
 ===================================================================

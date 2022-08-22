@@ -22,3 +22,8 @@ CACHED_CONFIGUREVARS = "CCLD_FOR_BUILD='${CC_FOR_BUILD}'"
 BBCLASSEXTEND = "native"
 
 PARALLEL_MAKE = ""
+
+do_configure:prepend() {
+     # Don't include $CC (which includes path to sysroot) in generated header.
+     sed -i -e "s/^echo \"\/\* generated \$ac_cv_stdint_message \*\/\" >>\$ac_stdint$"// ${S}/m4/ax_create_stdint_h.m4
+}

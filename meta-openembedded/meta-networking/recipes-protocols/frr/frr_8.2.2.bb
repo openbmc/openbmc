@@ -73,6 +73,11 @@ SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} = "frr.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
+do_compile:prepend () {
+   sed -i -e 's#${RECIPE_SYSROOT_NATIVE}##g' \
+          -e 's#${RECIPE_SYSROOT}##g' ${S}/lib/version.h
+}
+
 do_compile:class-native () {
     oe_runmake clippy-only
 }

@@ -8,7 +8,8 @@ DEPENDS = "util-macros-native virtual/libx11"
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 
-SRC_URI = "${XORG_MIRROR}/individual/app/${BPN}-${PV}.tar.bz2"
+SRC_URI_EXT = "bz2"
+SRC_URI = "${XORG_MIRROR}/individual/app/${BPN}-${PV}.tar.${SRC_URI_EXT}"
 
 inherit autotools pkgconfig features_check
 

@@ -15,6 +15,11 @@ SRC_URI = "\
 
 SRC_URI[sha256sum] = "19654ad276b149646371fbdac21bc7620742f2975f7399fed0ffc1a18fbaf603"
 
+CVE_CHECK_IGNORE += "\
+    CVE-2010-1624 \
+    CVE-2011-3594 \
+"
+
 PACKAGECONFIG ??= "gnutls consoleui avahi dbus idn nss \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11 gtk startup-notification', '', d)} \
 "

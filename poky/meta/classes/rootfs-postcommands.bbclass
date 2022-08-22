@@ -305,7 +305,7 @@ rootfs_trim_schemas () {
 }
 
 rootfs_check_host_user_contaminated () {
-	contaminated="${WORKDIR}/host-user-contaminated.txt"
+	contaminated="${S}/host-user-contaminated.txt"
 	HOST_USER_UID="$(PSEUDO_UNLOAD=1 id -u)"
 	HOST_USER_GID="$(PSEUDO_UNLOAD=1 id -g)"
 

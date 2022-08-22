@@ -31,6 +31,10 @@ SRC_URI:append:class-nativesdk = "\
 
 SRC_URI[sha256sum] = "6b16bf990df114195be669773a1dae975dbbffada45e1de2849ddeb5851bb9a8"
 
+CVE_CHECK_IGNORE += "\
+    CVE-2014-9157 \
+"
+
 PACKAGECONFIG ??= "librsvg"
 PACKAGECONFIG[librsvg] = "--with-librsvg,--without-librsvg,librsvg"
 

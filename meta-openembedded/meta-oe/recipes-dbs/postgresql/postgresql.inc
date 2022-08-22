@@ -215,6 +215,14 @@ do_install:append() {
     install -m 0644 ${WORKDIR}/postgresql.service ${D}${systemd_unitdir}/system
     sed -i -e 's,@BINDIR@,${bindir},g' \
         ${D}${systemd_unitdir}/system/postgresql.service
+    # Remove the build path
+    if [ -f ${D}${libdir}/${BPN}/pgxs/src/Makefile.global ]; then
+        sed -i -e 's#${RECIPE_SYSROOT}##g' \
+               -e 's#${RECIPE_SYSROOT_NATIVE}##g' \
+               -e 's#${WORKDIR}##g' \
+               -e 's#${TMPDIR}##g' \
+             ${D}${libdir}/${BPN}/pgxs/src/Makefile.global
+    fi
 }
 
 SSTATE_SCAN_FILES += "Makefile.global"
