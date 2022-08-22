@@ -1,0 +1,51 @@
+From 2c98e0cd03eba0aa935796bc7413c51b5e4b055c Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Tue, 31 May 2022 15:24:48 -0400
+Subject: [PATCH 19/19] fix: 'random' tracepoints removed in stable kernels
+
+The upstream commit 14c174633f349cb41ea90c2c0aaddac157012f74 removing
+the 'random' tracepoints is being backported to multiple stable kernel
+branches, I don't see how that qualifies as a fix but here we are.
+
+Use the presence of 'include/trace/events/random.h' in the kernel source
+tree instead of the rather tortuous version check to determine if we
+need to build 'lttng-probe-random.ko'.
+
+Upstream-Status: Backport [ed1149ef88fb62c365ac66cf62c58ac6abd8d7e8]
+Change-Id: I8f5f2f4c9e09c61127c49c7949b22dd3fab0460d
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ probes/Kbuild | 16 ++++------------
+ 1 file changed, 4 insertions(+), 12 deletions(-)
+
+diff --git a/probes/Kbuild b/probes/Kbuild
+index 87f2d681..f09d6b65 100644
+--- a/probes/Kbuild
++++ b/probes/Kbuild
+@@ -216,18 +216,10 @@ ifneq ($(CONFIG_FRAME_WARN),0)
+ endif
+ 
+ # Introduced in v3.6, remove in v5.18
+-obj-$(CONFIG_LTTNG) +=  $(shell \
+-    if [ \( ! \( $(VERSION) -ge 6 \
+-      -o \( $(VERSION) -eq 5 -a $(PATCHLEVEL) -ge 18 \) \
+-      -o \( $(VERSION) -eq 5 -a $(PATCHLEVEL) -eq 15 -a $(SUBLEVEL) -ge 44 \) \
+-      -o \( $(VERSION) -eq 5 -a $(PATCHLEVEL) -eq 10 -a $(SUBLEVEL) -ge 119\) \) \) \
+-      -a \
+-      $(VERSION) -ge 4 \
+-      -o \( $(VERSION) -eq 3 -a $(PATCHLEVEL) -ge 6 \) \
+-      -o \( $(VERSION) -eq 3 -a $(PATCHLEVEL) -eq 5 -a $(SUBLEVEL) -ge 2 \) \
+-      -o \( $(VERSION) -eq 3 -a $(PATCHLEVEL) -eq 4 -a $(SUBLEVEL) -ge 9 \) \
+-      -o \( $(VERSION) -eq 3 -a $(PATCHLEVEL) -eq 0 -a $(SUBLEVEL) -ge 41 \) ] ; then \
+-      echo "lttng-probe-random.o" ; fi;)
++random_dep = $(srctree)/include/trace/events/random.h
++ifneq ($(wildcard $(random_dep)),)
++  obj-$(CONFIG_LTTNG) += lttng-probe-random.o
++endif
+ 
+ obj-$(CONFIG_LTTNG) +=  $(shell \
+   if [ $(VERSION) -ge 4 \
+-- 
+2.35.1
+

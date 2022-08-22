@@ -32,7 +32,7 @@ BBCLASSEXTEND = "native"
 DEPENDS_class-native = "readline-native"
 PACKAGECONFIG_class-native = ""
 
-SRC_URI_append_class-native = "file://0001-reduce-build-to-conversion-tools-for-native-build.patch"
+SRC_URI_append_class-native = " file://0001-reduce-build-to-conversion-tools-for-native-build.patch"
 
 do_install_class-native() {
     install -d ${D}${bindir}

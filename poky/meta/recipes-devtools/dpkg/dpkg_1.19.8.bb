@@ -18,5 +18,5 @@ SRC_URI_append_class-native = " \
                                 file://tweak-options-require-tar-1.27.patch \
 "
 
-SRC_URI[md5sum] = "60f57c5494e6dfa177504d47bfa0e383"
-SRC_URI[sha256sum] = "4c27fededf620c0aa522fff1a48577ba08144445341257502e7730f2b1a296e8"
+SRC_URI[md5sum] = "9d170c8baa1aa36b09698c909f304508"
+SRC_URI[sha256sum] = "2632c00b0cf0ea19ed7bd6700e6ec5faca93f0045af629d356dc03ad74ae6f10"

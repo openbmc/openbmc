@@ -1,0 +1,46 @@
+From 25b70c486bb96de0caf7cea1da42ed07801cca84 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 4 Apr 2022 14:33:42 -0400
+Subject: [PATCH 17/19] fix: random: remove unused tracepoints (v5.18)
+
+See upstream commit :
+
+  commit 14c174633f349cb41ea90c2c0aaddac157012f74
+  Author: Jason A. Donenfeld <Jason@zx2c4.com>
+  Date:   Thu Feb 10 16:40:44 2022 +0100
+
+    random: remove unused tracepoints
+
+    These explicit tracepoints aren't really used and show sign of aging.
+    It's work to keep these up to date, and before I attempted to keep them
+    up to date, they weren't up to date, which indicates that they're not
+    really used. These days there are better ways of introspecting anyway.
+
+Upstream-Status: Backport [369d82bb1746447514c877088d7c5fd0f39140f8]
+Change-Id: I3b8c3e2732e7efdd76ce63204ac53a48784d0df6
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ probes/Kbuild | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/probes/Kbuild b/probes/Kbuild
+index 3ae2d39e..58da82b8 100644
+--- a/probes/Kbuild
++++ b/probes/Kbuild
+@@ -215,8 +215,11 @@ ifneq ($(CONFIG_FRAME_WARN),0)
+   CFLAGS_lttng-probe-printk.o += -Wframe-larger-than=2200
+ endif
+ 
++# Introduced in v3.6, remove in v5.18
+ obj-$(CONFIG_LTTNG) +=  $(shell \
+-    if [ $(VERSION) -ge 4 \
++    if [ \( ! \( $(VERSION) -ge 6 -o \( $(VERSION) -eq 5 -a $(PATCHLEVEL) -ge 18 \) \) \) \
++      -a \
++      $(VERSION) -ge 4 \
+       -o \( $(VERSION) -eq 3 -a $(PATCHLEVEL) -ge 6 \) \
+       -o \( $(VERSION) -eq 3 -a $(PATCHLEVEL) -eq 5 -a $(SUBLEVEL) -ge 2 \) \
+       -o \( $(VERSION) -eq 3 -a $(PATCHLEVEL) -eq 4 -a $(SUBLEVEL) -ge 9 \) \
+-- 
+2.35.1
+

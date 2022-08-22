@@ -27,6 +27,8 @@ CVE_CHECK_WHITELIST += "CVE-2019-14860"
 UPSTREAM_CHECK_URI = "https://github.com/libfuse/libfuse/releases"
 UPSTREAM_CHECK_REGEX = "fuse\-(?P<pver>2(\.\d+)+).tar.gz"
 
+CVE_PRODUCT = "fuse_project:fuse"
+
 inherit autotools pkgconfig update-rc.d systemd
 
 INITSCRIPT_NAME = "fuse"

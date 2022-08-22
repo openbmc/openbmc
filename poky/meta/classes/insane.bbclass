@@ -452,12 +452,14 @@ def package_qa_check_buildpaths(path, name, d, elf, messages):
     """
     Check for build paths inside target files and error if not found in the whitelist
     """
+    import stat
     # Ignore .debug files, not interesting
     if path.find(".debug") != -1:
         return
 
-    # Ignore symlinks
-    if os.path.islink(path):
+    # Ignore symlinks/devs/fifos
+    mode = os.lstat(path).st_mode
+    if stat.S_ISLNK(mode) or stat.S_ISBLK(mode) or stat.S_ISFIFO(mode) or stat.S_ISCHR(mode) or stat.S_ISSOCK(mode):
         return
 
     tmpdir = bytes(d.getVar('TMPDIR'), encoding="utf-8")
@@ -945,7 +947,7 @@ def package_qa_check_host_user(path, name, d, elf, messages):
 
     dest = d.getVar('PKGDEST')
     pn = d.getVar('PN')
-    home = os.path.join(dest, 'home')
+    home = os.path.join(dest, name, 'home')
     if path == home or path.startswith(home + os.sep):
         return
 

@@ -1,0 +1,99 @@
+From 7dee5927eb528f7ddebd62fbab31232d505acc22 Mon Sep 17 00:00:00 2001
+From: Paul Kehrer <paul.l.kehrer@gmail.com>
+Date: Sun, 23 Aug 2020 23:41:33 -0500
+Subject: [PATCH] chunked update_into (#5419)
+
+* chunked update_into
+
+* all pointer arithmetic all the time
+
+* review feedback
+
+Upstream-Status: Backport [https://github.com/pyca/cryptography/commit/f90ba1808ee9bd9a13c5673b776484644f29d7ba]
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ .../hazmat/backends/openssl/ciphers.py        | 31 +++++++++++++------
+ tests/hazmat/primitives/test_ciphers.py       | 17 ++++++++++
+ 2 files changed, 38 insertions(+), 10 deletions(-)
+
+diff --git a/src/cryptography/hazmat/backends/openssl/ciphers.py b/src/cryptography/hazmat/backends/openssl/ciphers.py
+index 94b48f52..86bc94b3 100644
+--- a/src/cryptography/hazmat/backends/openssl/ciphers.py
++++ b/src/cryptography/hazmat/backends/openssl/ciphers.py
+@@ -17,6 +17,7 @@ from cryptography.hazmat.primitives.ciphers import modes
+ class _CipherContext(object):
+     _ENCRYPT = 1
+     _DECRYPT = 0
++    _MAX_CHUNK_SIZE = 2 ** 31
+ 
+     def __init__(self, backend, cipher, mode, operation):
+         self._backend = backend
+@@ -125,22 +126,32 @@ class _CipherContext(object):
+         return bytes(buf[:n])
+ 
+     def update_into(self, data, buf):
+-        if len(buf) < (len(data) + self._block_size_bytes - 1):
++        total_data_len = len(data)
++        if len(buf) < (total_data_len + self._block_size_bytes - 1):
+             raise ValueError(
+                 "buffer must be at least {} bytes for this "
+                 "payload".format(len(data) + self._block_size_bytes - 1)
+             )
+ 
+-        buf = self._backend._ffi.cast(
+-            "unsigned char *", self._backend._ffi.from_buffer(buf)
+-        )
++        data_processed = 0
++        total_out = 0
+         outlen = self._backend._ffi.new("int *")
+-        res = self._backend._lib.EVP_CipherUpdate(
+-            self._ctx, buf, outlen,
+-            self._backend._ffi.from_buffer(data), len(data)
+-        )
+-        self._backend.openssl_assert(res != 0)
+-        return outlen[0]
++        baseoutbuf = self._backend._ffi.from_buffer(buf)
++        baseinbuf = self._backend._ffi.from_buffer(data)
++
++        while data_processed != total_data_len:
++            outbuf = baseoutbuf + total_out
++            inbuf = baseinbuf + data_processed
++            inlen = min(self._MAX_CHUNK_SIZE, total_data_len - data_processed)
++
++            res = self._backend._lib.EVP_CipherUpdate(
++                self._ctx, outbuf, outlen, inbuf, inlen
++            )
++            self._backend.openssl_assert(res != 0)
++            data_processed += inlen
++            total_out += outlen[0]
++
++        return total_out
+ 
+     def finalize(self):
+         # OpenSSL 1.0.1 on Ubuntu 12.04 (and possibly other distributions)
+diff --git a/tests/hazmat/primitives/test_ciphers.py b/tests/hazmat/primitives/test_ciphers.py
+index f29ba9a9..b88610e7 100644
+--- a/tests/hazmat/primitives/test_ciphers.py
++++ b/tests/hazmat/primitives/test_ciphers.py
+@@ -309,3 +309,20 @@ class TestCipherUpdateInto(object):
+         buf = bytearray(5)
+         with pytest.raises(ValueError):
+             encryptor.update_into(b"testing", buf)
++
++    def test_update_into_auto_chunking(self, backend, monkeypatch):
++        key = b"\x00" * 16
++        c = ciphers.Cipher(AES(key), modes.ECB(), backend)
++        encryptor = c.encryptor()
++        # Lower max chunk size so we can test chunking
++        monkeypatch.setattr(encryptor._ctx, "_MAX_CHUNK_SIZE", 40)
++        buf = bytearray(527)
++        pt = b"abcdefghijklmnopqrstuvwxyz012345" * 16  # 512 bytes
++        processed = encryptor.update_into(pt, buf)
++        assert processed == 512
++        decryptor = c.decryptor()
++        # Change max chunk size to verify alternate boundaries don't matter
++        monkeypatch.setattr(decryptor._ctx, "_MAX_CHUNK_SIZE", 73)
++        decbuf = bytearray(527)
++        decprocessed = decryptor.update_into(buf[:processed], decbuf)
++        assert decbuf[:decprocessed] == pt

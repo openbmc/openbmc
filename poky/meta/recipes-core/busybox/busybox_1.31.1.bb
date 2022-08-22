@@ -55,6 +55,8 @@ SRC_URI = "https://busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            file://CVE-2021-42374.patch \
            file://CVE-2021-42376.patch \
            file://CVE-2021-423xx-awk.patch \
+           file://0001-libbb-sockaddr2str-ensure-only-printable-characters-.patch \
+           file://0002-nslookup-sanitize-all-printed-strings-with-printable.patch \
            "
 SRC_URI_append_libc-musl = " file://musl.cfg "
 

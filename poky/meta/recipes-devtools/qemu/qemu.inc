@@ -98,6 +98,8 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://CVE-2020-13253_4.patch \
            file://CVE-2020-13253_5.patch \
            file://CVE-2020-13791.patch \
+           file://CVE-2022-35414.patch \
+           file://CVE-2020-27821.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 
@@ -254,6 +256,7 @@ PACKAGECONFIG[xkbcommon] = "--enable-xkbcommon,--disable-xkbcommon,libxkbcommon"
 PACKAGECONFIG[libudev] = "--enable-libudev,--disable-libudev,eudev"
 PACKAGECONFIG[libxml2] = "--enable-libxml2,--disable-libxml2,libxml2"
 PACKAGECONFIG[seccomp] = "--enable-seccomp,--disable-seccomp,libseccomp"
+PACKAGECONFIG[capstone] = "--enable-capstone,--disable-capstone"
 
 INSANE_SKIP_${PN} = "arch"
 

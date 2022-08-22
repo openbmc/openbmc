@@ -1,0 +1,64 @@
+From f8ad7c331b25ba90fd296b37c443b4114cb196e2 Mon Sep 17 00:00:00 2001
+From: Ariadne Conill <ariadne@dereferenced.org>
+Date: Sun, 3 Apr 2022 12:16:45 +0000
+Subject: [PATCH] nslookup: sanitize all printed strings with printable_string
+
+Otherwise, terminal sequences can be injected, which enables various terminal injection
+attacks from DNS results.
+
+MJ: One chunk wasn't applicable on 1.31.1 version, because parsing of
+SRV records was added only in newer 1.32.0 with:
+  commit 6b4960155e94076bf25518e4e268a7a5f849308e
+  Author: Jo-Philipp Wich <jo@mein.io>
+  Date:   Thu Jun 27 17:27:29 2019 +0200
+
+    nslookup: implement support for SRV records
+
+CVE: CVE-2022-28391
+Upstream-Status: Pending
+Signed-off-by: Ariadne Conill <ariadne@dereferenced.org>
+Signed-off-by: Steve Sakoman <steve@sakoman.com>
+---
+ networking/nslookup.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/networking/nslookup.c b/networking/nslookup.c
+index 24e09d4f0..89b9c8a13 100644
+--- a/networking/nslookup.c
++++ b/networking/nslookup.c
+@@ -404,7 +404,7 @@ static int parse_reply(const unsigned char *msg, size_t len)
+ 				//printf("Unable to uncompress domain: %s\n", strerror(errno));
+ 				return -1;
+ 			}
+-			printf(format, ns_rr_name(rr), dname);
++			printf(format, ns_rr_name(rr), printable_string(dname));
+ 			break;
+ 
+ 		case ns_t_mx:
+@@ -419,7 +419,7 @@ static int parse_reply(const unsigned char *msg, size_t len)
+ 				//printf("Cannot uncompress MX domain: %s\n", strerror(errno));
+ 				return -1;
+ 			}
+-			printf("%s\tmail exchanger = %d %s\n", ns_rr_name(rr), n, dname);
++			printf("%s\tmail exchanger = %d %s\n", ns_rr_name(rr), n, printable_string(dname));
+ 			break;
+ 
+ 		case ns_t_txt:
+@@ -431,7 +431,7 @@ static int parse_reply(const unsigned char *msg, size_t len)
+ 			if (n > 0) {
+ 				memset(dname, 0, sizeof(dname));
+ 				memcpy(dname, ns_rr_rdata(rr) + 1, n);
+-				printf("%s\ttext = \"%s\"\n", ns_rr_name(rr), dname);
++				printf("%s\ttext = \"%s\"\n", ns_rr_name(rr), printable_string(dname));
+ 			}
+ 			break;
+ 
+@@ -461,7 +461,7 @@ static int parse_reply(const unsigned char *msg, size_t len)
+ 				return -1;
+ 			}
+ 
+-			printf("\tmail addr = %s\n", dname);
++			printf("\tmail addr = %s\n", printable_string(dname));
+ 			cp += n;
+ 
+ 			printf("\tserial = %lu\n", ns_get32(cp));

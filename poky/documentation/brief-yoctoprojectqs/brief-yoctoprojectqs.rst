@@ -222,19 +222,10 @@ an entire Linux distribution, including the toolchain, from source.
    .. tip::
 
       You can significantly speed up your build and guard against fetcher
-      failures by using mirrors. To use mirrors, add these lines to your
-      local.conf file in the Build directory: ::
+      failures by using mirrors. To use mirrors, add this line to your
+      ``local.conf`` file in the :term:`Build Directory`: ::
 
-         SSTATE_MIRRORS = "\
-         file://.* http://sstate.yoctoproject.org/dev/PATH;downloadfilename=PATH \n \
-         file://.* http://sstate.yoctoproject.org/&YOCTO_DOC_VERSION_MINUS_ONE;/PATH;downloadfilename=PATH \n \
-         file://.* http://sstate.yoctoproject.org/&YOCTO_DOC_VERSION;/PATH;downloadfilename=PATH \n \
-         "
-
-
-      The previous examples showed how to add sstate paths for Yocto Project
-      &YOCTO_DOC_VERSION_MINUS_ONE;, &YOCTO_DOC_VERSION;, and a development
-      area. For a complete index of sstate locations, see http://sstate.yoctoproject.org/.
+         SSTATE_MIRRORS ?= "file://.* https://sstate.yoctoproject.org/all/PATH;downloadfilename=PATH"
 
 #. **Start the Build:** Continue with the following command to build an OS
    image for the target, which is ``core-image-sato`` in this example:

@@ -60,6 +60,13 @@ CVE_CHECK_WHITELIST += "CVE-2008-3844"
 # https://ubuntu.com/security/CVE-2016-20012
 CVE_CHECK_WHITELIST += "CVE-2016-20012"
 
+# As per debian, the issue is fixed by a feature called "agent restriction" in openssh 8.9
+# Urgency is unimportant as per debian, Hence this CVE is whitelisting.
+# https://security-tracker.debian.org/tracker/CVE-2021-36368
+# https://bugzilla.mindrot.org/show_bug.cgi?id=3316#c2
+# https://docs.ssh-mitm.at/trivialauth.html
+CVE_CHECK_WHITELIST += "CVE-2021-36368"
+
 PAM_SRC_URI = "file://sshd"
 
 inherit manpages useradd update-rc.d update-alternatives systemd
@@ -183,11 +190,16 @@ FILES_${PN}-sftp-server = "${libexecdir}/sftp-server"
 FILES_${PN}-misc = "${bindir}/ssh* ${libexecdir}/ssh*"
 FILES_${PN}-keygen = "${bindir}/ssh-keygen"
 
-RDEPENDS_${PN} += "${PN}-scp ${PN}-ssh ${PN}-sshd ${PN}-keygen"
+RDEPENDS_${PN} += "${PN}-scp ${PN}-ssh ${PN}-sshd ${PN}-keygen ${PN}-sftp-server"
 RDEPENDS_${PN}-sshd += "${PN}-keygen ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam-plugin-keyinit pam-plugin-loginuid', '', d)}"
 RRECOMMENDS_${PN}-sshd_append_class-target = "\
     ${@bb.utils.filter('PACKAGECONFIG', 'rng-tools', d)} \
 "
+
+# break dependency on base package for -dev package
+# otherwise SDK fails to build as the main openssh and dropbear packages
+# conflict with each other
+RDEPENDS:${PN}-dev = ""
 
 # gdb would make attach-ptrace test pass rather than skip but not worth the build dependencies
 RDEPENDS_${PN}-ptest += "${PN}-sftp ${PN}-misc ${PN}-sftp-server make sed sudo coreutils"

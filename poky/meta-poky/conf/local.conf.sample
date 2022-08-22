@@ -231,7 +231,7 @@ BB_DISKMON_DIRS ??= "\
 # present in the cache. It assumes you can download something faster than you can build it
 # which will depend on your network.
 #
-#SSTATE_MIRRORS ?= "file://.* http://sstate.yoctoproject.org/2.5/PATH;downloadfilename=PATH"
+#SSTATE_MIRRORS ?= "file://.* http://sstate.yoctoproject.org/all/PATH;downloadfilename=PATH"
 
 #
 # Qemu configuration

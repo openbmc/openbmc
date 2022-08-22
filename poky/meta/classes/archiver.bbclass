@@ -54,9 +54,10 @@ ARCHIVER_MODE[mirror] ?= "split"
 
 DEPLOY_DIR_SRC ?= "${DEPLOY_DIR}/sources"
 ARCHIVER_TOPDIR ?= "${WORKDIR}/archiver-sources"
-ARCHIVER_OUTDIR = "${ARCHIVER_TOPDIR}/${TARGET_SYS}/${PF}/"
+ARCHIVER_ARCH = "${TARGET_SYS}"
+ARCHIVER_OUTDIR = "${ARCHIVER_TOPDIR}/${ARCHIVER_ARCH}/${PF}/"
 ARCHIVER_RPMTOPDIR ?= "${WORKDIR}/deploy-sources-rpm"
-ARCHIVER_RPMOUTDIR = "${ARCHIVER_RPMTOPDIR}/${TARGET_SYS}/${PF}/"
+ARCHIVER_RPMOUTDIR = "${ARCHIVER_RPMTOPDIR}/${ARCHIVER_ARCH}/${PF}/"
 ARCHIVER_WORKDIR = "${WORKDIR}/archiver-work/"
 
 # When producing a combined mirror directory, allow duplicates for the case
@@ -99,6 +100,10 @@ python () {
             and not pn.startswith('gcc-source'):
         bb.debug(1, 'archiver: %s is excluded, covered by gcc-source' % pn)
         return
+
+    # TARGET_SYS in ARCHIVER_ARCH will break the stamp for gcc-source in multiconfig
+    if pn.startswith('gcc-source'):
+        d.setVar('ARCHIVER_ARCH', "allarch")
 
     def hasTask(task):
         return bool(d.getVarFlag(task, "task", False)) and not bool(d.getVarFlag(task, "noexec", False))
@@ -578,7 +583,7 @@ python do_dumpdata () {
 
 SSTATETASKS += "do_deploy_archives"
 do_deploy_archives () {
-    echo "Deploying source archive files from ${ARCHIVER_TOPDIR} to ${DEPLOY_DIR_SRC}."
+    bbnote "Deploying source archive files from ${ARCHIVER_TOPDIR} to ${DEPLOY_DIR_SRC}."
 }
 python do_deploy_archives_setscene () {
     sstate_setscene(d)

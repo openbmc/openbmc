@@ -321,7 +321,9 @@ class Rootfs(object, metaclass=ABCMeta):
         if not os.path.exists(kernel_abi_ver_file):
             bb.fatal("No kernel-abiversion file found (%s), cannot run depmod, aborting" % kernel_abi_ver_file)
 
-        kernel_ver = open(kernel_abi_ver_file).read().strip(' \n')
+        with open(kernel_abi_ver_file) as f:
+            kernel_ver = f.read().strip(' \n')
+
         versioned_modules_dir = os.path.join(self.image_rootfs, modules_dir, kernel_ver)
 
         bb.utils.mkdirhier(versioned_modules_dir)

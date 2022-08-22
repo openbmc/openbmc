@@ -18,6 +18,7 @@ SRC_URI = " \
     file://add-ptest.patch \
     file://run-ptest \
     file://0001-PPP-When-un-escaping-don-t-allocate-a-too-large-buff.patch \
+    file://CVE-2018-16301.patch \
 "
 
 SRC_URI[md5sum] = "a4ead41d371f91aa0a2287f589958bae"

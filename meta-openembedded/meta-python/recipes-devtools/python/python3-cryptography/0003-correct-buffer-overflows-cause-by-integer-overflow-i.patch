@@ -1,0 +1,37 @@
+From 6d0a76521abe287f5ddb5cd1cfbc799d35f08cf9 Mon Sep 17 00:00:00 2001
+From: Alex Gaynor <alex.gaynor@gmail.com>
+Date: Sun, 7 Feb 2021 11:36:56 -0500
+Subject: [PATCH] correct buffer overflows cause by integer overflow in openssl
+ (#5747)
+
+* correct buffer overflows cause by integer overflow in openssl
+
+frustratingly, there is no test for this -- that's because testing this
+requires allocating more memory than is available in CI.
+
+fixes #5615.
+
+* backport CI fixes
+
+* another CI backport
+
+Upstream-Status: Backport [https://github.com/pyca/cryptography/commit/82b6ce28389f0a317bc55ba2091a74b346db7cae]
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ src/cryptography/hazmat/backends/openssl/ciphers.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/cryptography/hazmat/backends/openssl/ciphers.py b/src/cryptography/hazmat/backends/openssl/ciphers.py
+index 2b7da80c..7ef5f1ea 100644
+--- a/src/cryptography/hazmat/backends/openssl/ciphers.py
++++ b/src/cryptography/hazmat/backends/openssl/ciphers.py
+@@ -17,7 +17,7 @@ from cryptography.hazmat.primitives.ciphers import modes
+ class _CipherContext(object):
+     _ENCRYPT = 1
+     _DECRYPT = 0
+-    _MAX_CHUNK_SIZE = 2 ** 31 - 1
++    _MAX_CHUNK_SIZE = 2 ** 30 - 1
+ 
+     def __init__(self, backend, cipher, mode, operation):
+         self._backend = backend

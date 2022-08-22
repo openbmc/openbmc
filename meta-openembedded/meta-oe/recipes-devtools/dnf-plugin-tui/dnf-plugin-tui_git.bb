@@ -7,7 +7,7 @@ SRC_URI = "git://github.com/ubinux/dnf-plugin-tui.git;branch=master;protocol=htt
 SRCREV = "c5416adeb210154dc4ccc4c3e1c5297d83ebd41e"
 PV = "1.1"
 
-SRC_URI_append_class-target = "file://oe-remote.repo.sample"
+SRC_URI_append_class-target = " file://oe-remote.repo.sample"
 
 inherit distutils3-base
 

@@ -27,7 +27,6 @@ LICENSE = "\
     & Firmware-go7007 \
     & Firmware-GPLv2 \
     & Firmware-hfi1_firmware \
-    & Firmware-i2400m \
     & Firmware-i915 \
     & Firmware-ibt_firmware \
     & Firmware-ice \
@@ -57,7 +56,6 @@ LICENSE = "\
     & Firmware-rtlwifi_firmware \
     & Firmware-imx-sdma_firmware \
     & Firmware-siano \
-    & Firmware-tda7706-firmware \
     & Firmware-ti-connectivity \
     & Firmware-ti-keystone \
     & Firmware-ueagle-atm4-firmware \
@@ -91,7 +89,6 @@ LIC_FILES_CHKSUM = "file://LICENCE.Abilis;md5=b5ee3f410780e56711ad48eadc22b8bc \
                     file://LICENCE.go7007;md5=c0bb9f6aaaba55b0529ee9b30aa66beb \
                     file://GPL-2;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://LICENSE.hfi1_firmware;md5=5e7b6e586ce7339d12689e49931ad444 \
-                    file://LICENCE.i2400m;md5=14b901969e23c41881327c0d9e4b7d36 \
                     file://LICENSE.i915;md5=2b0b2e0d20984affd4490ba2cba02570 \
                     file://LICENCE.ibt_firmware;md5=fdbee1ddfe0fb7ab0b2fcd6b454a366b \
                     file://LICENSE.ice;md5=742ab4850f2670792940e6d15c974b2f \
@@ -123,7 +120,6 @@ LIC_FILES_CHKSUM = "file://LICENCE.Abilis;md5=b5ee3f410780e56711ad48eadc22b8bc \
                     file://LICENCE.rtlwifi_firmware.txt;md5=00d06cfd3eddd5a2698948ead2ad54a5 \
                     file://LICENSE.sdma_firmware;md5=51e8c19ecc2270f4b8ea30341ad63ce9 \
                     file://LICENCE.siano;md5=4556c1bf830067f12ca151ad953ec2a5 \
-                    file://LICENCE.tda7706-firmware.txt;md5=835997cf5e3c131d0dddd695c7d9103e \
                     file://LICENCE.ti-connectivity;md5=c5e02be633f1499c109d1652514d85ec \
                     file://LICENCE.ti-keystone;md5=3a86335d32864b0bef996bee26cc0f2c \
                     file://LICENCE.ueagle-atm4-firmware;md5=4ed7ea6b507ccc583b9d594417714118 \
@@ -132,8 +128,11 @@ LIC_FILES_CHKSUM = "file://LICENCE.Abilis;md5=b5ee3f410780e56711ad48eadc22b8bc \
                     file://LICENCE.xc4000;md5=0ff51d2dc49fce04814c9155081092f0 \
                     file://LICENCE.xc5000;md5=1e170c13175323c32c7f4d0998d53f66 \
                     file://LICENCE.xc5000c;md5=12b02efa3049db65d524aeb418dd87ca \
-                    file://WHENCE;md5=45a9c4a92d152e9495db81e1192f2bdc \
+                    file://WHENCE;md5=${WHENCE_CHKSUM} \
                     "
+# WHENCE checksum is defined separately to ease overriding it if
+# class-devupstream is selected.
+WHENCE_CHKSUM  = "def08711eb23ba967fb7e1f8cff66178"
 
 # These are not common licenses, set NO_GENERIC_LICENSE for them
 # so that the license files will be copied from fetched source
@@ -159,7 +158,6 @@ NO_GENERIC_LICENSE[Firmware-fw_sst_0f28] = "LICENCE.fw_sst_0f28"
 NO_GENERIC_LICENSE[Firmware-go7007] = "LICENCE.go7007"
 NO_GENERIC_LICENSE[Firmware-GPLv2] = "GPL-2"
 NO_GENERIC_LICENSE[Firmware-hfi1_firmware] = "LICENSE.hfi1_firmware"
-NO_GENERIC_LICENSE[Firmware-i2400m] = "LICENCE.i2400m"
 NO_GENERIC_LICENSE[Firmware-i915] = "LICENSE.i915"
 NO_GENERIC_LICENSE[Firmware-ibt_firmware] = "LICENCE.ibt_firmware"
 NO_GENERIC_LICENSE[Firmware-ice] = "LICENSE.ice"
@@ -190,7 +188,6 @@ NO_GENERIC_LICENSE[Firmware-ralink-firmware] = "LICENCE.ralink-firmware.txt"
 NO_GENERIC_LICENSE[Firmware-rtlwifi_firmware] = "LICENCE.rtlwifi_firmware.txt"
 NO_GENERIC_LICENSE[Firmware-siano] = "LICENCE.siano"
 NO_GENERIC_LICENSE[Firmware-imx-sdma_firmware] = "LICENSE.sdma_firmware"
-NO_GENERIC_LICENSE[Firmware-tda7706-firmware] = "LICENCE.tda7706-firmware.txt"
 NO_GENERIC_LICENSE[Firmware-ti-connectivity] = "LICENCE.ti-connectivity"
 NO_GENERIC_LICENSE[Firmware-ti-keystone] = "LICENCE.ti-keystone"
 NO_GENERIC_LICENSE[Firmware-ueagle-atm4-firmware] = "LICENCE.ueagle-atm4-firmware"
@@ -203,9 +200,16 @@ NO_GENERIC_LICENSE[WHENCE] = "WHENCE"
 
 PE = "1"
 
-SRC_URI = "${KERNELORG_MIRROR}/linux/kernel/firmware/${BPN}-${PV}.tar.xz"
+SRC_URI = "\
+  ${KERNELORG_MIRROR}/linux/kernel/firmware/${BPN}-${PV}.tar.xz \
+"
 
-SRC_URI[sha256sum] = "5938ee717b2023b48f6bfcf344b40ddc947e3e22c0bc36d4c3418f90fea68182"
+BBCLASSEXTEND = "devupstream:target"
+SRC_URI:class-devupstream = "git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git;protocol=https;branch=main"
+# Pin this to the 20220509 release, override this in local.conf
+SRCREV:class-devupstream ?= "b19cbdca78ab2adfd210c91be15a22568e8b8cae"
+
+SRC_URI[sha256sum] = "0abec827a035c82bdcabdf82aa37ded247bc682ef05861bd409ea6f477bab81d"
 
 inherit allarch
 
@@ -352,7 +356,7 @@ FILES_${PN}-carl9170 = " \
 RDEPENDS_${PN}-carl9170 += "${PN}-gplv2-license"
 
 # For QualCommAthos
-LICENSE_${PN}-ar3k = "Firmware-qualcommAthos_ar3k"
+LICENSE_${PN}-ar3k = "Firmware-qualcommAthos_ar3k & Firmware-atheros_firmware"
 LICENSE_${PN}-ar3k-license = "Firmware-qualcommAthos_ar3k"
 LICENSE_${PN}-ath10k = "Firmware-qualcommAthos_ath10k"
 LICENSE_${PN}-ath10k-license = "Firmware-qualcommAthos_ath10k"
@@ -376,7 +380,7 @@ FILES_${PN}-qca = " \
   ${nonarch_base_libdir}/firmware/qca \
 "
 
-RDEPENDS_${PN}-ar3k += "${PN}-ar3k-license"
+RDEPENDS_${PN}-ar3k += "${PN}-ar3k-license ${PN}-atheros-license"
 RDEPENDS_${PN}-ath10k += "${PN}-ath10k-license"
 RDEPENDS_${PN}-ath11k += "${PN}-ath10k-license"
 RDEPENDS_${PN}-qca += "${PN}-ath10k-license"
@@ -1012,7 +1016,6 @@ LICENSE_${PN} = "\
     & Firmware-fw_sst_0f28 \
     & Firmware-go7007 \
     & Firmware-hfi1_firmware \
-    & Firmware-i2400m \
     & Firmware-ibt_firmware \
     & Firmware-it913x \
     & Firmware-IntcSST2 \
@@ -1033,7 +1036,6 @@ LICENSE_${PN} = "\
     & Firmware-ralink-firmware \
     & Firmware-imx-sdma_firmware \
     & Firmware-siano \
-    & Firmware-tda7706-firmware \
     & Firmware-ti-connectivity \
     & Firmware-ti-keystone \
     & Firmware-ueagle-atm4-firmware \

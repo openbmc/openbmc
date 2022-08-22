@@ -11,6 +11,9 @@ SRC_URI[sha256sum] = "3cda1f0ed8747339bbdf71b9f38ca74c7b592f24f65cdb3ab3765e4b02
 
 SRC_URI += " \
     file://run-ptest \
+    file://0001-chunked-update_into-5419.patch \
+    file://0002-chunking-didn-t-actually-work-5499.patch \
+    file://0003-correct-buffer-overflows-cause-by-integer-overflow-i.patch \
 "
 
 inherit pypi setuptools3

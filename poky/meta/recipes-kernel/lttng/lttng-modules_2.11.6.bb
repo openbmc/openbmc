@@ -28,6 +28,9 @@ SRC_URI = "https://lttng.org/files/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://0014-Revert-fix-include-order-for-older-kernels.patch \
            file://0015-fix-backport-of-fix-tracepoint-Optimize-using-static.patch \
            file://0016-fix-adjust-version-range-for-trace_find_free_extent.patch \
+           file://0017-fix-random-remove-unused-tracepoints-v5.18.patch \
+           file://0018-fix-random-remove-unused-tracepoints-v5.10-v5.15.patch \
+           file://0019-fix-random-tracepoints-removed-in-stable-kernels.patch \
            "
 
 SRC_URI[md5sum] = "8ef09fdfcdec669d33f7fc1c1c80f2c4"

@@ -56,6 +56,9 @@ FIT_HASH_ALG ?= "sha256"
 # fitImage Signature Algo
 FIT_SIGN_ALG ?= "rsa2048"
 
+# fitImage Padding Algo
+FIT_PAD_ALG ?= "pkcs-1.5"
+
 #
 # Emit the fitImage ITS header
 #
@@ -250,6 +253,7 @@ fitimage_emit_section_config() {
 
 	conf_csum="${FIT_HASH_ALG}"
 	conf_sign_algo="${FIT_SIGN_ALG}"
+	conf_padding_algo="${FIT_PAD_ALG}"
 	if [ "${UBOOT_SIGN_ENABLE}" = "1" ] ; then
 		conf_sign_keyname="${UBOOT_SIGN_KEYNAME}"
 	fi
@@ -333,6 +337,7 @@ EOF
                         signature-1 {
                                 algo = "${conf_csum},${conf_sign_algo}";
                                 key-name-hint = "${conf_sign_keyname}";
+                                padding = "${conf_padding_algo}";
 				${sign_line}
                         };
 EOF

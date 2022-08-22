@@ -33,3 +33,17 @@ inherit cmake
 EXTRA_OECMAKE += "-DOPENJPEG_INSTALL_LIB_DIR=${@d.getVar('baselib').replace('/', '')}"
 
 FILES_${PN} += "${libdir}/openjpeg*"
+
+# This flaw is introduced by
+# https://github.com/uclouvain/openjpeg/commit/4edb8c83374f52cd6a8f2c7c875e8ffacccb5fa5
+# but the contents of this patch is not present in openjpeg_2.3.1
+# Hence, it can be whitelisted.
+# https://security-tracker.debian.org/tracker/CVE-2020-27844
+
+CVE_CHECK_WHITELIST += "CVE-2020-27844"
+
+# The CVE description clearly states that j2k_read_ppm_v3 function in openjpeg
+# is affected due to CVE-2015-1239 but in openjpeg_2.3.1 this function is not present.
+# Hence, CVE-2015-1239 does not affect openjpeg_2.3.1
+
+CVE_CHECK_WHITELIST += "CVE-2015-1239"

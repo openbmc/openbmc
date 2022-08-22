@@ -1,0 +1,43 @@
+From 7c72190620c3ccaeeab53fdd93547ca4d37b2f6b Mon Sep 17 00:00:00 2001
+From: Paul Kehrer <paul.l.kehrer@gmail.com>
+Date: Sun, 25 Oct 2020 06:15:18 -0700
+Subject: [PATCH] chunking didn't actually work (#5499)
+
+Upstream-Status: Backport [https://github.com/pyca/cryptography/commit/836a92a28fbe9df8c37121e340b91ed9cd519ddd]
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ src/cryptography/hazmat/backends/openssl/ciphers.py | 2 +-
+ tests/hazmat/primitives/test_ciphers.py             | 9 +++++++++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/src/cryptography/hazmat/backends/openssl/ciphers.py b/src/cryptography/hazmat/backends/openssl/ciphers.py
+index 86bc94b3..2b7da80c 100644
+--- a/src/cryptography/hazmat/backends/openssl/ciphers.py
++++ b/src/cryptography/hazmat/backends/openssl/ciphers.py
+@@ -17,7 +17,7 @@ from cryptography.hazmat.primitives.ciphers import modes
+ class _CipherContext(object):
+     _ENCRYPT = 1
+     _DECRYPT = 0
+-    _MAX_CHUNK_SIZE = 2 ** 31
++    _MAX_CHUNK_SIZE = 2 ** 31 - 1
+ 
+     def __init__(self, backend, cipher, mode, operation):
+         self._backend = backend
+diff --git a/tests/hazmat/primitives/test_ciphers.py b/tests/hazmat/primitives/test_ciphers.py
+index b88610e7..fd9048b7 100644
+--- a/tests/hazmat/primitives/test_ciphers.py
++++ b/tests/hazmat/primitives/test_ciphers.py
+@@ -326,3 +326,12 @@ class TestCipherUpdateInto(object):
+         decbuf = bytearray(527)
+         decprocessed = decryptor.update_into(buf[:processed], decbuf)
+         assert decbuf[:decprocessed] == pt
++
++    def test_max_chunk_size_fits_in_int32(self, backend):
++        # max chunk must fit in signed int32 or else a call large enough to
++        # cause chunking will result in the very OverflowError we want to
++        # avoid with chunking.
++        key = b"\x00" * 16
++        c = ciphers.Cipher(AES(key), modes.ECB(), backend)
++        encryptor = c.encryptor()
++        backend._ffi.new("int *", encryptor._ctx._MAX_CHUNK_SIZE)

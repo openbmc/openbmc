@@ -17,8 +17,8 @@ SRC_URI = "https://downloads.mariadb.org/interstitial/${BP}/source/${BP}.tar.gz 
            file://0001-disable-ucontext-on-musl.patch \
            file://fix-arm-atomic.patch \
           "
-SRC_URI[md5sum] = "af39316a6803d13f84fb586635598036"
-SRC_URI[sha256sum] = "fe975551b37f095640ea5e380eb896a37e331caf113dbe5d05564714338df846"
+
+SRC_URI[sha256sum] = "ff963c4e11bc06b775f66f2b1ddef184996208fb4b23cfdb50d95fb02eaa7ef8"
 
 UPSTREAM_CHECK_URI = "https://github.com/MariaDB/server/releases"
 

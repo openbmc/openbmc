@@ -9,8 +9,12 @@ SRC_URI += " \
            file://0001-template-Makefile.in-do-not-write-host-cross-cc-item.patch \
            "
 
-SRC_URI[md5sum] = "ede247b56fb862f1f67f9471189b04d4"
-SRC_URI[sha256sum] = "2755b900a21235b443bb16dadd9032f784d4a88f143d852bc5d154f22b8781f1"
+SRC_URI[md5sum] = "f972fb0cce662966bec10d5c5f32d042"
+SRC_URI[sha256sum] = "e7203b0cc09442ed2c08936d483f8ac140ec1c72e37bb5c401646b7866cb5d10"
+
+# CVE-2021-28966 is Windows specific and not affects Linux OS
+# https://security-tracker.debian.org/tracker/CVE-2021-28966
+CVE_CHECK_WHITELIST += "CVE-2021-28966"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG += "${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"

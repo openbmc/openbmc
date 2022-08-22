@@ -12,6 +12,11 @@ DEPENDS = "zlib virtual/crypt"
 RPROVIDES_${PN} = "ssh sshd"
 RCONFLICTS_${PN} = "openssh-sshd openssh"
 
+# break dependency on base package for -dev package
+# otherwise SDK fails to build as the main openssh and dropbear packages
+# conflict with each other
+RDEPENDS:${PN}-dev = ""
+
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'libpam', '', d)}"
 
 SRC_URI = "http://matt.ucc.asn.au/dropbear/releases/dropbear-${PV}.tar.bz2 \

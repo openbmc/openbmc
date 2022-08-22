@@ -227,7 +227,9 @@ class TerminalFilter(object):
 
     def keepAlive(self, t):
         if not self.cuu:
-            print("Bitbake still alive (%ds)" % t)
+            print("Bitbake still alive (no events for %ds). Active tasks:" % t)
+            for t in self.helper.running_tasks:
+                print(t)
             sys.stdout.flush()
 
     def updateFooter(self):
@@ -597,7 +599,8 @@ def main(server, eventHandler, params, tf = TerminalFilter):
     warnings = 0
     taskfailures = []
 
-    printinterval = 5000
+    printintervaldelta = 10 * 60 # 10 minutes
+    printinterval = printintervaldelta
     lastprint = time.time()
 
     termfilter = tf(main, helper, console_handlers, params.options.quiet)
@@ -607,7 +610,7 @@ def main(server, eventHandler, params, tf = TerminalFilter):
         try:
             if (lastprint + printinterval) <= time.time():
                 termfilter.keepAlive(printinterval)
-                printinterval += 5000
+                printinterval += printintervaldelta
             event = eventHandler.waitEvent(0)
             if event is None:
                 if main.shutdown > 1:
@@ -638,7 +641,7 @@ def main(server, eventHandler, params, tf = TerminalFilter):
 
             if isinstance(event, logging.LogRecord):
                 lastprint = time.time()
-                printinterval = 5000
+                printinterval = printintervaldelta
                 if event.levelno >= bb.msg.BBLogFormatter.ERROR:
                     errors = errors + 1
                     return_value = 1

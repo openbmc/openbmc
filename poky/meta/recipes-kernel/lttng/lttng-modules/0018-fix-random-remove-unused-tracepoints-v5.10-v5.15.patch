@@ -1,0 +1,45 @@
+From da956d1444139883f5d01078d945078738ffade4 Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Thu, 2 Jun 2022 06:36:08 +0000
+Subject: [PATCH 18/19] fix: random: remove unused tracepoints (v5.10, v5.15)
+
+The following kernel commit has been back ported to v5.10.119 and v5.15.44.
+
+commit 14c174633f349cb41ea90c2c0aaddac157012f74
+Author: Jason A. Donenfeld <Jason@zx2c4.com>
+Date:   Thu Feb 10 16:40:44 2022 +0100
+
+  random: remove unused tracepoints
+
+  These explicit tracepoints aren't really used and show sign of aging.
+  It's work to keep these up to date, and before I attempted to keep them
+  up to date, they weren't up to date, which indicates that they're not
+  really used. These days there are better ways of introspecting anyway.
+
+Upstream-Status: Backport [1901e0eb58795e850e8fdcb5e1c235e4397b470d]
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Change-Id: I0b7eb8aa78b5bd2039e20ae3e1da4c5eb9018789
+---
+ probes/Kbuild | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/probes/Kbuild b/probes/Kbuild
+index 58da82b8..87f2d681 100644
+--- a/probes/Kbuild
++++ b/probes/Kbuild
+@@ -217,7 +217,10 @@ endif
+ 
+ # Introduced in v3.6, remove in v5.18
+ obj-$(CONFIG_LTTNG) +=  $(shell \
+-    if [ \( ! \( $(VERSION) -ge 6 -o \( $(VERSION) -eq 5 -a $(PATCHLEVEL) -ge 18 \) \) \) \
++    if [ \( ! \( $(VERSION) -ge 6 \
++      -o \( $(VERSION) -eq 5 -a $(PATCHLEVEL) -ge 18 \) \
++      -o \( $(VERSION) -eq 5 -a $(PATCHLEVEL) -eq 15 -a $(SUBLEVEL) -ge 44 \) \
++      -o \( $(VERSION) -eq 5 -a $(PATCHLEVEL) -eq 10 -a $(SUBLEVEL) -ge 119\) \) \) \
+       -a \
+       $(VERSION) -ge 4 \
+       -o \( $(VERSION) -eq 3 -a $(PATCHLEVEL) -ge 6 \) \
+-- 
+2.35.1
+

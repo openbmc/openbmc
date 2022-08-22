@@ -17,6 +17,7 @@ SRC_URI = "git://github.com/cyrusimap/cyrus-sasl;protocol=https;branch=master \
            file://0001-Allow-saslauthd-to-be-built-outside-of-source-tree-w.patch \
            file://0001-makeinit.sh-fix-parallel-build-issue.patch \
            file://CVE-2019-19906.patch \
+           file://CVE-2022-24407.patch \
            "
 
 UPSTREAM_CHECK_URI = "https://github.com/cyrusimap/cyrus-sasl/archives"

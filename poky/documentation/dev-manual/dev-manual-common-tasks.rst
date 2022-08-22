@@ -4967,7 +4967,7 @@ configuration would be as follows:
    require conf/multilib.conf
    MULTILIBS = "multilib:lib32"
    DEFAULTTUNE_virtclass-multilib-lib32 = "x86"
-   IMAGE_INSTALL_append = "lib32-glib-2.0"
+   IMAGE_INSTALL_append = " lib32-glib-2.0"
 
 This example enables an additional library named
 ``lib32`` alongside the normal target packages. When combining these

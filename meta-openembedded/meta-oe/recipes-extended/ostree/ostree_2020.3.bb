@@ -181,7 +181,7 @@ RDEPENDS_${PN}-ptest += " \
 "
 RDEPENDS_${PN}-ptest_append_libc-glibc = " glibc-utils glibc-localedata-en-us"
 
-RRECOMMENDS_${PN} += "kernel-module-overlay"
+RRECOMMENDS_${PN}_append_class-target = " kernel-module-overlay"
 
 SYSTEMD_SERVICE_${PN} = "ostree-remount.service ostree-finalize-staged.path"
 SYSTEMD_SERVICE_${PN}-switchroot = "ostree-prepare-root.service"

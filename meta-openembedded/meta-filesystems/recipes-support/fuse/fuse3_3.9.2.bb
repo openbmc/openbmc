@@ -22,6 +22,8 @@ UPSTREAM_CHECK_REGEX = "fuse\-(?P<pver>3(\.\d+)+).tar.xz"
 
 inherit meson pkgconfig
 
+CVE_PRODUCT = "fuse_project:fuse"
+
 DEPENDS = "udev"
 
 PACKAGES =+ "fuse3-utils"

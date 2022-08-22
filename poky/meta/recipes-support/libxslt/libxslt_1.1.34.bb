@@ -14,12 +14,17 @@ SECTION = "libs"
 DEPENDS = "libxml2"
 
 SRC_URI = "http://xmlsoft.org/sources/libxslt-${PV}.tar.gz \
+           file://CVE-2021-30560.patch \
           "
 
 SRC_URI[md5sum] = "db8765c8d076f1b6caafd9f2542a304a"
 SRC_URI[sha256sum] = "98b1bd46d6792925ad2dfe9a87452ea2adebf69dcb9919ffd55bf926a7f93f7f"
 
 UPSTREAM_CHECK_REGEX = "libxslt-(?P<pver>\d+(\.\d+)+)\.tar"
+
+# We have libxml2 2.9.10 and we don't link statically with it anyway
+# so this isn't an issue.
+CVE_CHECK_WHITELIST += "CVE-2022-29824"
 
 S = "${WORKDIR}/libxslt-${PV}"
 

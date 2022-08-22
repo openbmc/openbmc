@@ -3846,10 +3846,10 @@ system and gives an overview of their function and contents.
       ::
 
          KERNEL_EXTRA_FEATURES ?= "features/netfilter/netfilter.scc features/taskstats/taskstats.scc"
-         KERNEL_FEATURES_append = "${KERNEL_EXTRA_FEATURES}"
-         KERNEL_FEATURES_append_qemuall = "cfg/virtio.scc"
+         KERNEL_FEATURES_append = " ${KERNEL_EXTRA_FEATURES}"
+         KERNEL_FEATURES_append_qemuall = " cfg/virtio.scc"
          KERNEL_FEATURES_append_qemux86 = " cfg/sound.scc cfg/paravirt_kvm.scc"
-         KERNEL_FEATURES_append_qemux86-64 = "cfg/sound.scc"
+         KERNEL_FEATURES_append_qemux86-64 = " cfg/sound.scc"
 
    :term:`KERNEL_FIT_LINK_NAME`
       The link name of the kernel flattened image tree (FIT) image. This
@@ -4048,7 +4048,7 @@ system and gives an overview of their function and contents.
          SRCREV_machine_core2-32-intel-common = "43b9eced9ba8a57add36af07736344dcc383f711"
          KMACHINE_core2-32-intel-common = "intel-core2-32"
          KBRANCH_core2-32-intel-common = "standard/base"
-         KERNEL_FEATURES_append_core2-32-intel-common = "${KERNEL_FEATURES_INTEL_COMMON}"
+         KERNEL_FEATURES_append_core2-32-intel-common = " ${KERNEL_FEATURES_INTEL_COMMON}"
 
       The ``KMACHINE`` statement says
       that the kernel understands the machine name as "intel-core2-32".
@@ -7542,7 +7542,7 @@ system and gives an overview of their function and contents.
       ``SYSTEMD_BOOT_CFG`` as follows:
       ::
 
-         SYSTEMD_BOOT_CFG ?= "${:term:`S`}/loader.conf"
+         SYSTEMD_BOOT_CFG ?= "${S}/loader.conf"
 
       For information on Systemd-boot, see the `Systemd-boot
       documentation <http://www.freedesktop.org/wiki/Software/systemd/systemd-boot/>`__.
@@ -8745,4 +8745,22 @@ system and gives an overview of their function and contents.
 
       The default value of ``XSERVER``, if not specified in the machine
       configuration, is "xserver-xorg xf86-video-fbdev xf86-input-evdev".
-   
+
+   :term:`XZ_THREADS`
+      Specifies the number of parallel threads that should be used when
+      using xz compression.
+
+      By default this scales with core count, but is never set less than 2
+      to ensure that multi-threaded mode is always used so that the output
+      file contents are deterministic. Builds will work with a value of 1
+      but the output will differ compared to the output from the compression
+      generated when more than one thread is used.
+
+      On systems where many tasks run in parallel, setting a limit to this
+      can be helpful in controlling system resource usage.
+
+    :term:`XZ_MEMLIMIT`
+      Specifies the maximum memory the xz compression should use as a percentage
+      of system memory. If unconstrained the xz compressor can use large amounts of
+      memory and become problematic with parallelism elsewhere in the build.
+      "50%" has been found to be a good value.

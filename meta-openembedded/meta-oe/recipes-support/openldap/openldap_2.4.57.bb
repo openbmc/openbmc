@@ -23,8 +23,8 @@ SRC_URI = "http://www.openldap.org/software/download/OpenLDAP/openldap-release/$
     file://thread_stub.patch \
     file://openldap-CVE-2015-3276.patch \
     file://remove-user-host-pwd-from-version.patch \
+    file://CVE-2022-29155.patch \
 "
-
 SRC_URI[md5sum] = "e3349456c3a66e5e6155be7ddc3f042c"
 SRC_URI[sha256sum] = "c7ba47e1e6ecb5b436f3d43281df57abeffa99262141aec822628bc220f6b45a"
 

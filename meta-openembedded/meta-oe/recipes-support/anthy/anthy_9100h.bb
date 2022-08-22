@@ -10,8 +10,8 @@ SRC_URI = "http://osdn.dl.sourceforge.jp/anthy/37536/anthy-9100h.tar.gz \
     file://2ch_t.patch \
 "
 
-SRC_URI_append_class-target = "file://target-helpers.patch"
-SRC_URI_append_class-native = "file://native-helpers.patch"
+SRC_URI_append_class-target = " file://target-helpers.patch"
+SRC_URI_append_class-native = " file://native-helpers.patch"
 
 SRC_URI[md5sum] = "1f558ff7ed296787b55bb1c6cf131108"
 SRC_URI[sha256sum] = "d256f075f018b4a3cb0d165ed6151fda4ba7db1621727e0eb54569b6e2275547"

@@ -175,6 +175,8 @@ class TestImage(OESelftestTestCase):
         if "DISPLAY" not in os.environ:
             self.skipTest("virgl gtk test must be run inside a X session")
         distro = oe.lsb.distro_identifier()
+        if distro and distro == 'almalinux-8.6':
+            self.skipTest('virgl isn\'t working with Alma 8')
         if distro and distro == 'debian-8':
             self.skipTest('virgl isn\'t working with Debian 8')
         if distro and distro == 'centos-7':
@@ -185,6 +187,8 @@ class TestImage(OESelftestTestCase):
             self.skipTest('virgl isn\'t working with Fedora 34')
         if distro and distro == 'fedora-35':
             self.skipTest('virgl isn\'t working with Fedora 35')
+        if distro and distro == 'fedora-36':
+            self.skipTest('virgl isn\'t working with Fedora 36')
         if distro and distro == 'opensuseleap-15.0':
             self.skipTest('virgl isn\'t working with Opensuse 15.0')
 

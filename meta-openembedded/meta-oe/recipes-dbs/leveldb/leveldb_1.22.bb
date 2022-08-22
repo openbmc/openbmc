@@ -4,7 +4,7 @@ HOMEPAGE = "https://github.com/google/leveldb"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=92d1b128950b11ba8495b64938fc164d"
 
-SRC_URI = "git://github.com/google/${BPN}.git;branch=master;protocol=https \
+SRC_URI = "git://github.com/google/${BPN}.git;branch=main;protocol=https \
            file://run-ptest"
 
 SRCREV = "78b39d68c15ba020c0d60a3906fb66dbf1697595"

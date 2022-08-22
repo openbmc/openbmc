@@ -37,5 +37,9 @@ do_configure_prepend() {
     rm -rf ${S}/buildlib/config.guess
 }
 
+# there are code generation issues with some compilers in the SHA256 implementation
+# turn off strict-aliasing to avoid these issues
+CXXFLAGS:append = " -fno-strict-aliasing"
+
 USERADD_PACKAGES = "${PN}"
 USERADD_PARAM_${PN} = "--system --no-create-home --home-dir /nonexistent --shell /bin/false --user-group _apt"

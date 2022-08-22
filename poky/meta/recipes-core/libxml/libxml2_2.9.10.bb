@@ -30,6 +30,9 @@ SRC_URI += "http://www.w3.org/XML/Test/xmlts20080827.tar.gz;subdir=${BP};name=te
            file://CVE-2021-3541.patch \
            file://CVE-2022-23308.patch \
            file://CVE-2022-23308-fix-regression.patch \
+           file://CVE-2022-29824-dependent.patch \
+           file://CVE-2022-29824.patch \
+           file://0001-Port-gentest.py-to-Python-3.patch \
            "
 
 SRC_URI[archive.sha256sum] = "593b7b751dd18c2d6abcd0c4bcb29efc203d0b4373a6df98e3a455ea74ae2813"
@@ -87,6 +90,16 @@ do_configure_prepend () {
 }
 
 do_compile_ptest() {
+        # Make sure that testapi.c is newer than gentests.py, because
+        # with reproducible builds, they will both get e.g. Jan  1  1970
+        # modification time from SOURCE_DATE_EPOCH and then check-am
+        # might try to rebuild_testapi, which will fail even with
+        # 0001-Port-gentest.py-to-Python-3.patch, because it needs
+        # libxml2 module (libxml2-native dependency and correctly
+        # set PYTHON_SITE_PACKAGES), it's easier to
+        # just rely on pre-generated testapi.c from the release
+        touch ${S}/testapi.c
+
 	oe_runmake check-am
 }
 
