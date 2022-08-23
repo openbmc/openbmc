@@ -10,7 +10,7 @@ S = "${WORKDIR}"
 
 SRCREV = "4002b2f086f6d2177ec36bed507241386d604f6b"
 SRC_URI = " \
-    https://github.com/Nuvoton-Israel/npcm8xx-bootblock/${SRCREV}/LICENSE;name=lic \
+    https://github.com/Nuvoton-Israel/npcm8xx-bootblock/blob/${SRCREV}/LICENSE;name=lic \
     https://github.com/Nuvoton-Israel/npcm8xx-bootblock/releases/download/A35_BootBlock_${PV}/arbel_a35_bootblock.bin;downloadfilename=${FILENAME};name=bin \
 "
 
