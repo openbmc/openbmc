@@ -24,7 +24,7 @@ do_install() {
         do
             for f in ${SETTINGS_HOST_TEMPLATES};
             do
-                cat ${f} | sed "s/{}/${i}/g" >> ${DEST}/defaults.yaml
+                sed "s/{}/${i}/g" ${f} >> ${DEST}/defaults.yaml
             done
         done
 }
