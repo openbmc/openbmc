@@ -1,4 +1,4 @@
-From dc332d837778e3b6fc845ff4364a329182cde31e Mon Sep 17 00:00:00 2001
+From 464f6ab925be8421a5c58509e351d1ad18247695 Mon Sep 17 00:00:00 2001
 From: invalid_git config <unknown@unknown>
 Date: Mon, 22 Aug 2022 03:35:19 +0000
 Subject: [PATCH] npcm8xx: support NCSI
@@ -7,16 +7,16 @@ Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
  .../boot/dts/nuvoton/nuvoton-npcm845-evb.dts  |   4 +-
  drivers/net/ethernet/stmicro/stmmac/stmmac.h  |   2 +
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 133 +++++++++++++-----
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 136 +++++++++++++-----
  .../ethernet/stmicro/stmmac/stmmac_platform.c |  29 +++-
  include/linux/stmmac.h                        |   1 +
- 5 files changed, 121 insertions(+), 48 deletions(-)
+ 5 files changed, 124 insertions(+), 48 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
-index 43228a738060..7ba9ac36cedf 100644
+index 1fb364b4c302..fa5c7bb97bb9 100644
 --- a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
 +++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
-@@ -158,12 +158,12 @@ phy0: ethernet-phy@1 {
+@@ -166,12 +166,12 @@ phy0: ethernet-phy@1 {
  		};
  
  		gmac2: eth@f0806000 {
@@ -45,7 +45,7 @@ index 727e68dfaf1c..8026eb490ab1 100644
  
  enum stmmac_state {
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 11ddfd58a9e8..3f632a7f05f1 100644
+index 11ddfd58a9e8..76693adc80d3 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 @@ -45,6 +45,7 @@
@@ -108,15 +108,18 @@ index 11ddfd58a9e8..3f632a7f05f1 100644
  	}
  
  	/* Extra statistics */
-@@ -2859,9 +2879,12 @@ static int stmmac_open(struct net_device *dev)
+@@ -2859,9 +2879,15 @@ static int stmmac_open(struct net_device *dev)
  
  	stmmac_init_coalesce(priv);
  
 -	phylink_start(priv->phylink);
 -	/* We may have called phylink_speed_down before */
 -	phylink_speed_up(priv->phylink);
-+	if (!priv->plat->use_ncsi) {
-+		//printk("Not NCSI,call phylink_start and phylink_speed_up\n");
++	if (priv->plat->use_ncsi) {
++		priv->speed = SPEED_100;
++		/* If using NC-SI subsystem, set our carrier on and start the stack */
++		netif_carrier_on(dev);
++	} else {
 +		phylink_start(priv->phylink);
 +		/* We may have called phylink_speed_down before */
 +		phylink_speed_up(priv->phylink);
@@ -124,7 +127,7 @@ index 11ddfd58a9e8..3f632a7f05f1 100644
  
  	/* Request the IRQ lines */
  	ret = request_irq(dev->irq, stmmac_interrupt,
-@@ -2900,15 +2923,27 @@ static int stmmac_open(struct net_device *dev)
+@@ -2900,15 +2926,27 @@ static int stmmac_open(struct net_device *dev)
  	stmmac_enable_all_queues(priv);
  	netif_tx_start_all_queues(priv->dev);
  
@@ -154,7 +157,7 @@ index 11ddfd58a9e8..3f632a7f05f1 100644
  
  	for (chan = 0; chan < priv->plat->tx_queues_to_use; chan++)
  		del_timer_sync(&priv->tx_queue[chan].txtimer);
-@@ -2917,7 +2952,8 @@ static int stmmac_open(struct net_device *dev)
+@@ -2917,7 +2955,8 @@ static int stmmac_open(struct net_device *dev)
  init_error:
  	free_dma_desc_resources(priv);
  dma_desc_error:
@@ -164,7 +167,7 @@ index 11ddfd58a9e8..3f632a7f05f1 100644
  	return ret;
  }
  
-@@ -2932,11 +2968,15 @@ static int stmmac_release(struct net_device *dev)
+@@ -2932,11 +2971,15 @@ static int stmmac_release(struct net_device *dev)
  	struct stmmac_priv *priv = netdev_priv(dev);
  	u32 chan;
  
@@ -185,7 +188,7 @@ index 11ddfd58a9e8..3f632a7f05f1 100644
  
  	stmmac_disable_all_queues(priv);
  
-@@ -3493,7 +3533,6 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+@@ -3493,7 +3536,6 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
  	}
  
  	dev->stats.tx_bytes += skb->len;
@@ -193,7 +196,7 @@ index 11ddfd58a9e8..3f632a7f05f1 100644
  	if (priv->sarc_type)
  		stmmac_set_desc_sarc(priv, first, priv->sarc_type);
  
-@@ -5069,22 +5108,36 @@ int stmmac_dvr_probe(struct device *device,
+@@ -5069,22 +5111,36 @@ int stmmac_dvr_probe(struct device *device,
  
  	stmmac_check_pcs_mode(priv);
  
@@ -244,7 +247,7 @@ index 11ddfd58a9e8..3f632a7f05f1 100644
  	}
  
  	ret = register_netdev(ndev);
-@@ -5111,11 +5164,13 @@ int stmmac_dvr_probe(struct device *device,
+@@ -5111,11 +5167,13 @@ int stmmac_dvr_probe(struct device *device,
  error_serdes_powerup:
  	unregister_netdev(ndev);
  error_netdev_register:
