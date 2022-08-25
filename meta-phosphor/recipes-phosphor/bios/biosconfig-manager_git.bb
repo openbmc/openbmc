@@ -22,6 +22,7 @@ SYSTEMD_SERVICE:${PN} = "xyz.openbmc_project.biosconfig_manager.service \
                          xyz.openbmc_project.biosconfig_password.service"
 
 DEPENDS = " boost \
+            openssl \
             phosphor-dbus-interfaces \
             phosphor-logging \
             sdbusplus \
