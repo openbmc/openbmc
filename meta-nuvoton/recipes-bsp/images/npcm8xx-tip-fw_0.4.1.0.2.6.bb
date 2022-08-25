@@ -10,7 +10,7 @@ S = "${WORKDIR}"
 
 SRCREV = "04e43fbacdc55860153444e04672097e3f2b29fa"
 SRC_URI = " \
-    https://github.com/Nuvoton-Israel/npcm8xx-tip-fw/${SRCREV}/LICENSE;name=lic \
+    https://github.com/Nuvoton-Israel/npcm8xx-tip-fw/blob/${SRCREV}/LICENSE;name=lic \
     https://github.com/Nuvoton-Israel/npcm8xx-tip-fw/releases/download/TIP_FW_L0_0.4.1_L1_0.2.6/Kmt_TipFwL0_Skmt_TipFwL1.bin;downloadfilename=${FILENAME};name=bin \
 "
 
