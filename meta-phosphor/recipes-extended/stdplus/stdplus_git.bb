@@ -13,8 +13,9 @@ DEPENDS += " \
   liburing \
   "
 
-PACKAGES =+ "libstdplus libstdplus-io_uring"
+PACKAGES =+ "libstdplus libstdplus-dl libstdplus-io_uring"
 FILES:libstdplus = "${libdir}/libstdplus.so.*"
+FILES:libstdplus-dl = "${libdir}/libstdplus-dl.so.*"
 FILES:libstdplus-io_uring = "${libdir}/libstdplus-io_uring.so.*"
 
 EXTRA_OEMESON = " \
@@ -24,6 +25,6 @@ EXTRA_OEMESON = " \
         "
 
 SRC_URI += "git://github.com/openbmc/stdplus;branch=master;protocol=https"
-SRCREV = "74755ce0b5d17031cbcfedcd29725bc4af97a065"
+SRCREV = "aa4fcfc208c45511aa9788a08c969425e440fda0"
 
 S = "${WORKDIR}/git"
