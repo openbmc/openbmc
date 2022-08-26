@@ -62,6 +62,8 @@ while true; do
 
   # If the process is running, give it at least 5 minutes from when it started
   cur_s="$(cut -d' ' -f1 /proc/uptime)"
+  # Remove floating point if applied since bash can't perform float arithmetic
+  cur_s="${cur_s%.*}"
   if [[ "$activestr" == 'active' ]]; then
     active_ms="$(echo "$json" | jq -r '.data[0].ActiveEnterTimestampMonotonic.data')"
   else
