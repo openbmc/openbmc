@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Provide source directive to shellcheck.
+# shellcheck source=meta-facebook/recipes-phosphor/state/phosphor-state-manager/greatlakes/power-cmd
+source /usr/libexec/power-cmd
+
+POWER_OK_SLOT=$(( $1+9 ))
+slot=$(( $1-1 ))
+OFFSET=$(( 0x9 + slot ))
+
+# Server 12v power on
+chassis-power-on()
+{
+       result=$(i2cset -y $BUS_NUM $CPLD_PWR_CTRL_ADDR $OFFSET $POW_ON_SLOT)
+       echo "$result"
+       sleep 1
+       chassis_status=$(gpioget 0 $POWER_OK_SLOT)
+       if [ "$chassis_status" == 1 ]
+       then
+               echo "Chassis is power on"
+       else
+               echo "Chassis is already on"
+               exit 1;
+       fi
+}
+chassis-power-gpio-status()
+{
+        if [ "$slot" -le 4  ]
+        then
+                status=$(gpioget 0 $POWER_OK_SLOT)
+                if [ "$status" == 0 ]
+                then
+                        chassis-power-on
+                        exit 0;
+                else
+                        echo "Chassis is already on"
+                        exit 1;
+                fi
+        fi
+        echo "Invalid slot id"
+        exit 1;
+}
+chassis-power-gpio-status

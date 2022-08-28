@@ -26,7 +26,7 @@ RPROVIDES:${PN}-flash += "virtual-obmc-flash-mgmt"
 RPROVIDES:${PN}-system += "virtual-obmc-system-mgmt"
 
 SUMMARY:${PN}-chassis = "Facebook Chassis"
-RDEPENDS:${PN}-chassis = " \
+RDEPENDS:remove:greatlakes:${PN}-chassis = " \
         x86-power-control \
         "
 
@@ -54,6 +54,7 @@ RDEPENDS_PN_SYSTEM_EXTRAS:fb-withhost = " \
         phosphor-post-code-manager \
         phosphor-host-postd \
         tzdata-core \
+        phosphor-state-manager \
         "
 
 SUMMARY:${PN}-system = "Facebook System"
