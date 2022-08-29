@@ -1,0 +1,6 @@
+[Unit]
+Description=Ampere Host %i already on target
+Conflicts=obmc-chassis-poweroff@%i.target
+Conflicts=obmc-host-quiesce@%i.target
+Conflicts=ampere-host-force-reset@%i.service
+Conflicts=ampere-host-shutdown-ack@%i.service
