@@ -7,7 +7,7 @@ SRC_URI = "git://github.com/openbmc/host-error-monitor;branch=master;protocol=ht
 DEPENDS = "boost sdbusplus libgpiod libpeci"
 
 PV = "0.1+git${SRCPV}"
-SRCREV = "c99b8c905e03f945e7fb45239ded2aa17c64629d"
+SRCREV = "1a0811728807517b2206de964e5146f844666d0c"
 
 S = "${WORKDIR}/git"
 
