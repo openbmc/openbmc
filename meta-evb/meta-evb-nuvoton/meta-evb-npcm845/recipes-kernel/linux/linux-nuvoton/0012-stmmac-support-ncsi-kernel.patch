@@ -1,5 +1,5 @@
-From 464f6ab925be8421a5c58509e351d1ad18247695 Mon Sep 17 00:00:00 2001
-From: invalid_git config <unknown@unknown>
+From de704e52c20544accf6e5f803840d6204c36c3e3 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
 Date: Mon, 22 Aug 2022 03:35:19 +0000
 Subject: [PATCH] npcm8xx: support NCSI
 
@@ -7,13 +7,13 @@ Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
  .../boot/dts/nuvoton/nuvoton-npcm845-evb.dts  |   4 +-
  drivers/net/ethernet/stmicro/stmmac/stmmac.h  |   2 +
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 136 +++++++++++++-----
- .../ethernet/stmicro/stmmac/stmmac_platform.c |  29 +++-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 168 ++++++++++++------
+ .../ethernet/stmicro/stmmac/stmmac_platform.c |  29 ++-
  include/linux/stmmac.h                        |   1 +
- 5 files changed, 124 insertions(+), 48 deletions(-)
+ 5 files changed, 143 insertions(+), 61 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
-index 1fb364b4c302..fa5c7bb97bb9 100644
+index 6188acee08bb..906fc747b303 100644
 --- a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
 +++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
 @@ -166,12 +166,12 @@ phy0: ethernet-phy@1 {
@@ -45,7 +45,7 @@ index 727e68dfaf1c..8026eb490ab1 100644
  
  enum stmmac_state {
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 11ddfd58a9e8..76693adc80d3 100644
+index 11ddfd58a9e8..57d80c9466b5 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 @@ -45,6 +45,7 @@
@@ -56,7 +56,24 @@ index 11ddfd58a9e8..76693adc80d3 100644
  
  #define	STMMAC_ALIGN(x)		ALIGN(ALIGN(x, SMP_CACHE_BYTES), 16)
  #define	TSO_MAX_BUFF_SIZE	(SZ_16K - 1)
-@@ -2779,6 +2780,15 @@ static void stmmac_hw_teardown(struct net_device *dev)
+@@ -2317,10 +2318,12 @@ static int stmmac_init_dma_engine(struct stmmac_priv *priv)
+ 	if (priv->extend_desc && (priv->mode == STMMAC_RING_MODE))
+ 		atds = 1;
+ 
+-	ret = stmmac_reset(priv, priv->ioaddr);
+-	if (ret) {
+-		dev_err(priv->device, "Failed to reset the dma\n");
+-		return ret;
++	if (!priv->plat->use_ncsi) {
++		ret = stmmac_reset(priv, priv->ioaddr);
++		if (ret) {
++			dev_err(priv->device, "Failed to reset the dma\n");
++			return ret;
++		}
+ 	}
+ 
+ 	/* DMA Configuration */
+@@ -2779,6 +2782,15 @@ static void stmmac_hw_teardown(struct net_device *dev)
  	clk_disable_unprepare(priv->plat->clk_ptp_ref);
  }
  
@@ -72,7 +89,7 @@ index 11ddfd58a9e8..76693adc80d3 100644
  /**
   *  stmmac_open - open entry point of the driver
   *  @dev : pointer to the device structure.
-@@ -2795,16 +2805,26 @@ static int stmmac_open(struct net_device *dev)
+@@ -2795,15 +2807,17 @@ static int stmmac_open(struct net_device *dev)
  	u32 chan;
  	int ret;
  
@@ -97,18 +114,9 @@ index 11ddfd58a9e8..76693adc80d3 100644
 +				return ret;
 +			}
  		}
-+	} else {
-+		u32 ctrl;
-+		stmmac_mac_flow_ctrl(priv, DUPLEX_FULL);
-+		ctrl = readl(priv->ioaddr + MAC_CTRL_REG);
-+		ctrl &= ~priv->hw->link.speed_mask;
-+		ctrl |= priv->hw->link.speed100;
-+		ctrl |= priv->hw->link.duplex;
-+		writel(ctrl, priv->ioaddr + MAC_CTRL_REG);
  	}
  
- 	/* Extra statistics */
-@@ -2859,9 +2879,15 @@ static int stmmac_open(struct net_device *dev)
+@@ -2859,9 +2873,23 @@ static int stmmac_open(struct net_device *dev)
  
  	stmmac_init_coalesce(priv);
  
@@ -116,6 +124,14 @@ index 11ddfd58a9e8..76693adc80d3 100644
 -	/* We may have called phylink_speed_down before */
 -	phylink_speed_up(priv->phylink);
 +	if (priv->plat->use_ncsi) {
++		u32 ctrl;
++		stmmac_mac_flow_ctrl(priv, DUPLEX_FULL);
++		ctrl = readl(priv->ioaddr + MAC_CTRL_REG);
++		ctrl &= ~priv->hw->link.speed_mask;
++		ctrl |= priv->hw->link.speed100;
++		ctrl |= priv->hw->link.duplex;
++		writel(ctrl, priv->ioaddr + MAC_CTRL_REG);
++
 +		priv->speed = SPEED_100;
 +		/* If using NC-SI subsystem, set our carrier on and start the stack */
 +		netif_carrier_on(dev);
@@ -127,14 +143,13 @@ index 11ddfd58a9e8..76693adc80d3 100644
  
  	/* Request the IRQ lines */
  	ret = request_irq(dev->irq, stmmac_interrupt,
-@@ -2900,15 +2926,27 @@ static int stmmac_open(struct net_device *dev)
+@@ -2900,15 +2928,26 @@ static int stmmac_open(struct net_device *dev)
  	stmmac_enable_all_queues(priv);
  	netif_tx_start_all_queues(priv->dev);
  
 -	return 0;
 +	/* Start the NCSI device */
 +	if (priv->plat->use_ncsi) {
-+		printk("start ncsi dev\n");
 +		ret = ncsi_start_dev(priv->ncsidev);
 +		if (ret) {
 +			netdev_err(priv->dev, "ERROR: start the ncsi device(%d)\n",ret);
@@ -157,7 +172,7 @@ index 11ddfd58a9e8..76693adc80d3 100644
  
  	for (chan = 0; chan < priv->plat->tx_queues_to_use; chan++)
  		del_timer_sync(&priv->tx_queue[chan].txtimer);
-@@ -2917,7 +2955,8 @@ static int stmmac_open(struct net_device *dev)
+@@ -2917,7 +2956,8 @@ static int stmmac_open(struct net_device *dev)
  init_error:
  	free_dma_desc_resources(priv);
  dma_desc_error:
@@ -167,7 +182,7 @@ index 11ddfd58a9e8..76693adc80d3 100644
  	return ret;
  }
  
-@@ -2932,11 +2971,15 @@ static int stmmac_release(struct net_device *dev)
+@@ -2932,11 +2972,15 @@ static int stmmac_release(struct net_device *dev)
  	struct stmmac_priv *priv = netdev_priv(dev);
  	u32 chan;
  
@@ -188,15 +203,28 @@ index 11ddfd58a9e8..76693adc80d3 100644
  
  	stmmac_disable_all_queues(priv);
  
-@@ -3493,7 +3536,6 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 	}
+@@ -4206,7 +4250,8 @@ static int stmmac_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
+ 	case SIOCGMIIPHY:
+ 	case SIOCGMIIREG:
+ 	case SIOCSMIIREG:
+-		ret = phylink_mii_ioctl(priv->phylink, rq, cmd);
++		if (!priv->plat->use_ncsi)
++			ret = phylink_mii_ioctl(priv->phylink, rq, cmd);
+ 		break;
+ 	case SIOCSHWTSTAMP:
+ 		ret = stmmac_hwtstamp_set(dev, rq);
+@@ -4897,7 +4942,9 @@ int stmmac_dvr_probe(struct device *device,
+ 	priv->device = device;
+ 	priv->dev = ndev;
  
- 	dev->stats.tx_bytes += skb->len;
--
- 	if (priv->sarc_type)
- 		stmmac_set_desc_sarc(priv, first, priv->sarc_type);
- 
-@@ -5069,22 +5111,36 @@ int stmmac_dvr_probe(struct device *device,
+-	stmmac_set_ethtool_ops(ndev);
++	if (!plat_dat->use_ncsi)
++		stmmac_set_ethtool_ops(ndev);
++
+ 	priv->pause = pause;
+ 	priv->plat = plat_dat;
+ 	priv->ioaddr = res->addr;
+@@ -5069,22 +5116,36 @@ int stmmac_dvr_probe(struct device *device,
  
  	stmmac_check_pcs_mode(priv);
  
@@ -247,7 +275,7 @@ index 11ddfd58a9e8..76693adc80d3 100644
  	}
  
  	ret = register_netdev(ndev);
-@@ -5111,11 +5167,13 @@ int stmmac_dvr_probe(struct device *device,
+@@ -5111,11 +5172,13 @@ int stmmac_dvr_probe(struct device *device,
  error_serdes_powerup:
  	unregister_netdev(ndev);
  error_netdev_register:
@@ -265,6 +293,30 @@ index 11ddfd58a9e8..76693adc80d3 100644
  error_mdio_register:
  	stmmac_napi_del(ndev);
  error_hw_init:
+@@ -5210,14 +5273,15 @@ int stmmac_suspend(struct device *dev)
+ 		stmmac_pmt(priv, priv->hw, priv->wolopts);
+ 		priv->irq_wake = 1;
+ 	} else {
+-		mutex_unlock(&priv->lock);
+-		rtnl_lock();
+-		if (device_may_wakeup(priv->device))
+-			phylink_speed_down(priv->phylink, false);
+-		phylink_stop(priv->phylink);
+-		rtnl_unlock();
+-		mutex_lock(&priv->lock);
+-
++		if (!priv->plat->use_ncsi) {
++			mutex_unlock(&priv->lock);
++			rtnl_lock();
++			if (device_may_wakeup(priv->device))
++				phylink_speed_down(priv->phylink, false);
++			phylink_stop(priv->phylink);
++			rtnl_unlock();
++			mutex_lock(&priv->lock);
++		}
+ 		stmmac_mac_set(priv, priv->ioaddr, false);
+ 		pinctrl_pm_select_sleep_state(priv->device);
+ 		/* Disable clock in case of PWM is off */
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
 index b9dff3bccd89..0bb641f6f9a1 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
