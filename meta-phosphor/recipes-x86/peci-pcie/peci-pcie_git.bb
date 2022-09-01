@@ -11,7 +11,7 @@ SRC_URI = "git://github.com/openbmc/peci-pcie;branch=master;protocol=https"
 DEPENDS = "boost sdbusplus libpeci"
 
 PV = "0.1+git${SRCPV}"
-SRCREV = "59b87e60c8fcb3883d4683b9b986b30c72be554d"
+SRCREV = "be1fdbfddb8f753132e781109e72b5f2c64140a2"
 
 S = "${WORKDIR}/git"
 
