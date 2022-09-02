@@ -1,0 +1,45 @@
+{
+    "name": "evb",
+    "version": "A3",
+    "data_region": {
+        "patch": true,
+        "ecc_region": true,
+        "user_data": [
+            {
+                // dw_hex
+                // bin
+                "types": "dw_hex",
+                "file": "emmc_patch.hex",
+                "offset": "0x1B80"
+            }
+        ]
+    },
+    "config_region": {
+        // OTPCFG0[14]
+        // false: Enable patch code
+        // true : Disable patch code
+        "Disable patch code": false,
+        // OTPCFG14[10-0]
+        "Patch code location": "0x6E0",
+        // OTPCFG14[16-11] 24 DW
+        "Patch code size": "0x18"
+    },
+    "otp_strap": {
+        // OTPSTRAP[1]
+        "Enable boot from eMMC": {
+            // false: Disable boot from eMMC
+            // true : Enable boot from eMMC
+            "value": true,
+            "otp_protect": false,
+            "ignore": false
+        },
+        // OTPSTRAP[43]
+        "Enable boot SPI or eMMC ABR": {
+            // false: Disable boot SPI or eMMC ABR
+            // true : Enable boot SPI or eMMC ABR
+            "value": true,
+            "otp_protect": false,
+            "ignore": false
+        }
+    }
+}
