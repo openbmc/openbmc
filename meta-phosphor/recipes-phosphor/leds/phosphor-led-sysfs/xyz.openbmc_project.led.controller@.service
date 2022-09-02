@@ -1,7 +1,0 @@
-[Unit]
-Description=Phosphor sysfs LED controller
-
-[Service]
-Restart=always
-ExecStart=/usr/bin/env phosphor-ledcontroller -p %f
-SyslogIdentifier=phosphor-ledcontroller
