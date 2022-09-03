@@ -1,4 +1,4 @@
-From 8512964c0bfdfc3c9c3805743ea7de551a1d476a Mon Sep 17 00:00:00 2001
+From 7e0136a882757da0a374ab8592209586eced0e1c Mon Sep 17 00:00:00 2001
 From: Alex Kube <alexander.j.kube@gmail.com>
 Date: Wed, 23 Oct 2019 21:15:37 +0430
 Subject: [PATCH] cmd/go: Allow GOTOOLDIR to be overridden in the environment
@@ -18,9 +18,11 @@ Signed-off-by: Alexander J Kube <alexander.j.kube@gmail.com>
  src/cmd/go/internal/cfg/cfg.go | 6 +++++-
  2 files changed, 8 insertions(+), 2 deletions(-)
 
+diff --git a/src/cmd/dist/build.go b/src/cmd/dist/build.go
+index 7c44c4a..3024d0c 100644
 --- a/src/cmd/dist/build.go
 +++ b/src/cmd/dist/build.go
-@@ -251,7 +251,9 @@ func xinit() {
+@@ -264,7 +264,9 @@ func xinit() {
  	}
  	xatexit(rmworkdir)
  
@@ -31,18 +33,20 @@ Signed-off-by: Alexander J Kube <alexander.j.kube@gmail.com>
  }
  
  // compilerEnv returns a map from "goos/goarch" to the
+diff --git a/src/cmd/go/internal/cfg/cfg.go b/src/cmd/go/internal/cfg/cfg.go
+index c6ddfe5..605adb1 100644
 --- a/src/cmd/go/internal/cfg/cfg.go
 +++ b/src/cmd/go/internal/cfg/cfg.go
-@@ -76,7 +76,11 @@ func defaultContext() build.Context {
+@@ -162,7 +162,11 @@ func SetGOROOT(goroot string) {
  		// variables. This matches the initialization of ToolDir in
- 		// go/build, except for using ctxt.GOROOT rather than
+ 		// go/build, except for using BuildContext.GOROOT rather than
  		// runtime.GOROOT.
--		build.ToolDir = filepath.Join(ctxt.GOROOT, "pkg/tool/"+runtime.GOOS+"_"+runtime.GOARCH)
+-		build.ToolDir = filepath.Join(goroot, "pkg/tool/"+runtime.GOOS+"_"+runtime.GOARCH)
 +		if s := os.Getenv("GOTOOLDIR"); s != "" {
 +			build.ToolDir = filepath.Clean(s)
 +		} else {
-+			build.ToolDir = filepath.Join(ctxt.GOROOT, "pkg/tool/"+runtime.GOOS+"_"+runtime.GOARCH)
++			build.ToolDir = filepath.Join(goroot, "pkg/tool/"+runtime.GOOS+"_"+runtime.GOARCH)
 +		}
  	}
+ }
  
- 	ctxt.GOPATH = envOr("GOPATH", gopath(ctxt))

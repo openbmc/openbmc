@@ -9,7 +9,9 @@ LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=34da3db46fab7501992f9615d7e158cf"
 CVE_PRODUCT = "libtiff"
 
 SRC_URI = "http://download.osgeo.org/libtiff/tiff-${PV}.tar.gz \
-           file://0001-fix-the-FPE-in-tiffcrop-415-427-and-428.patch"
+           file://0001-fix-the-FPE-in-tiffcrop-415-427-and-428.patch \
+           file://CVE-2022-34526.patch \
+           "
 
 SRC_URI[sha256sum] = "917223b37538959aca3b790d2d73aa6e626b688e02dcda272aec24c2f498abed"
 

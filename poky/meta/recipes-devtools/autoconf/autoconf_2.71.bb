@@ -18,6 +18,7 @@ SRC_URI = "${GNU_MIRROR}/autoconf/${BP}.tar.gz \
            file://preferbash.patch \
            file://autotest-automake-result-format.patch \
            file://man-host-perl.patch \
+           file://0001-specify-void-prototype-for-functions-with-no-paramet.patch \
            "
 SRC_URI:append:class-native = " file://no-man.patch"
 

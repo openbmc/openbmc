@@ -402,6 +402,7 @@ class BBCooker:
         for mc in self.databuilder.mcdata.values():
             mc.renameVar("__depends", "__base_depends")
             self.add_filewatch(mc.getVar("__base_depends", False), self.configwatcher)
+            mc.setVar("__bbclasstype", "recipe")
 
         self.baseconfig_valid = True
         self.parsecache_valid = False

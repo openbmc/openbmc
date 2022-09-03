@@ -1,0 +1,40 @@
+From 263381ddd46eea2293c70bc811273b66bc52087b Mon Sep 17 00:00:00 2001
+From: Mateusz Marciniec <mateuszmar2@gmail.com>
+Date: Fri, 19 Aug 2022 14:47:49 +0200
+Subject: [PATCH] configure.ac: Improve check for magic
+
+Check whether magic.h header exists before defining HAVE_MAGIC.
+
+Despite library availability there still can be missing header.
+Current test doesn't cover that possibility which will lead compilation
+to fail in case of separate sysroot.
+
+Upstream-Status: Backport
+[https://github.com/util-linux/util-linux/commit/263381ddd46eea2293c70bc811273b66bc52087b]
+
+Signed-off-by: Mateusz Marciniec <mateuszmar2@gmail.com>
+Signed-off-by: Tomasz Dziendzielski <tomasz.dziendzielski@gmail.com>
+---
+ configure.ac | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index daa8f0dca..968a0daf0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1570,8 +1570,10 @@ AC_ARG_WITH([libmagic],
+ )
+ AS_IF([test "x$with_libmagic" = xno], [have_magic=no], [
+   AC_CHECK_LIB([magic], [magic_open], [
+-    AC_DEFINE([HAVE_MAGIC], [1], [Define to 1 if you have the libmagic present.])
+-    MAGIC_LIBS="-lmagic"
++    AC_CHECK_HEADER(magic.h, [
++      AC_DEFINE([HAVE_MAGIC], [1], [Define to 1 if you have the libmagic present.])
++      MAGIC_LIBS="-lmagic"
++    ])
+   ])
+ ])
+ AC_SUBST([MAGIC_LIBS])
+-- 
+2.37.1
+

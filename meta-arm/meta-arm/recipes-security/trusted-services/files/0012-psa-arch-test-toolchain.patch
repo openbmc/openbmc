@@ -1,0 +1,40 @@
+From 1ce8fcde17a6d2c5cb2e00901d485c91eda776fd Mon Sep 17 00:00:00 2001
+From: Anton Antonov <Anton.Antonov@arm.com>
+Date: Wed, 31 Aug 2022 17:09:17 +0100
+Subject: [PATCH 4/4] Pass Yocto build settings to psa-arch-tests native build
+
+PSA-arch-tests need to build a native executable as a part of target build.
+The patch defines correct toolchain settings for native builds.
+
+Upstream-Status: Inappropriate [Yocto build specific change]
+Signed-off-by: Anton Antonov <Anton.Antonov@arm.com>
+---
+ .../psa_arch_tests/modify_attest_config.patch     | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/external/psa_arch_tests/modify_attest_config.patch b/external/psa_arch_tests/modify_attest_config.patch
+index ebe8c44..b5d5e88 100644
+--- a/external/psa_arch_tests/modify_attest_config.patch
++++ b/external/psa_arch_tests/modify_attest_config.patch
+@@ -11,3 +11,18 @@ index 6112ba7..1cdf581 100755
+  
+  /*
+   * Include of PSA defined Header files
++diff --git a/api-tests/tools/scripts/target_cfg/CMakeLists.txt b/api-tests/tools/scripts/target_cfg/CMakeLists.txt
++index 259eb9c..fec1fb8 100644
++--- a/api-tests/tools/scripts/target_cfg/CMakeLists.txt
+++++ b/api-tests/tools/scripts/target_cfg/CMakeLists.txt
++@@ -26,7 +26,9 @@ include("common/CMakeSettings")
++ include("common/Utils")
++ 
++ # Causes toolchain to be re-evaluated
++-unset(ENV{CC})
+++set(ENV{CC} $ENV{BUILD_CC})
+++set(ENV{CFLAGS} $ENV{BUILD_CFLAGS})
+++set(ENV{LDFLAGS} $ENV{BUILD_LDFLAGS})
++ 
++ # Let the CMake look for C compiler
++ project(TargetConfigGen LANGUAGES C)
+-- 
+2.25.1
+

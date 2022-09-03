@@ -1,5 +1,5 @@
 require gem5-source_20.inc
-inherit scons package
+inherit scons
 
 HOMEPAGE = "https://www.gem5.org/documentation/general_docs/m5ops"
 SUMMARY = "m5ops provide pseudo-instructions to trigger gem5 functionality"

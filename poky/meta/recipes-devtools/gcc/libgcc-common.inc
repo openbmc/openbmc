@@ -10,8 +10,7 @@ do_configure () {
 	mkdir -p ${B}/${TARGET_SYS}/${BPN}/
 	cd ${B}/${BPN}
 	chmod a+x ${S}/${BPN}/configure
-	relpath=${@os.path.relpath("${S}/${BPN}", "${B}/${BPN}")}
-	$relpath/configure ${CONFIGUREOPTS} ${EXTRA_OECONF}
+	${S}/${BPN}/configure ${CONFIGUREOPTS} ${EXTRA_OECONF}
 }
 EXTRACONFFUNCS += "extract_stashed_builddir"
 do_configure[depends] += "${COMPILERDEP}"

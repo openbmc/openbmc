@@ -114,13 +114,13 @@ general information and references for further information.
    a build host ready to use the Yocto Project.
 
 2. *Set Up Your Host Development System for Kernel Development:* It is
-   recommended that you use ``devtool`` and an extensible SDK for kernel
+   recommended that you use ``devtool`` for kernel
    development. Alternatively, you can use traditional kernel
    development methods with the Yocto Project. Either way, there are
    steps you need to take to get the development environment ready.
 
-   Using ``devtool`` and the eSDK requires that you have a clean build
-   of the image and that you are set up with the appropriate eSDK. For
+   Using ``devtool`` requires that you have a clean build
+   of the image. For
    more information, see the
    ":ref:`kernel-dev/common:getting ready to develop using \`\`devtool\`\``"
    section.
@@ -134,7 +134,7 @@ general information and references for further information.
 3. *Make Changes to the Kernel Source Code if applicable:* Modifying the
    kernel does not always mean directly changing source files. However,
    if you have to do this, you make the changes to the files in the
-   eSDK's Build Directory if you are using ``devtool``. For more
+   Yocto's Build Directory if you are using ``devtool``. For more
    information, see the
    ":ref:`kernel-dev/common:using \`\`devtool\`\` to patch the kernel`"
    section.

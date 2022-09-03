@@ -1,0 +1,99 @@
+From 1b2013986271de39360cf79e62ed9b7d2cc59f9b Mon Sep 17 00:00:00 2001
+From: Andres Freund <andres@anarazel.de>
+Date: Wed, 22 Jun 2022 11:19:18 -0700
+Subject: [PATCH] init_disassemble_info() signature changes causes compile
+ failures
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Hi,
+
+binutils changed the signature of init_disassemble_info(), which now causes
+perf and bpftool to fail to compile (e.g. on debian unstable).
+
+Relevant binutils commit: https://sourceware.org/git/?p=binutils-gdb.git;a=commitdiff;h=60a3da00bd5407f07d64dff82a4dae98230dfaac
+
+util/annotate.c: In function ‘symbol__disassemble_bpf’:
+util/annotate.c:1765:9: error: too few arguments to function ‘init_disassemble_info’
+ 1765 |         init_disassemble_info(&info, s,
+      |         ^~~~~~~~~~~~~~~~~~~~~
+In file included from util/annotate.c:1718:
+/usr/include/dis-asm.h:472:13: note: declared here
+  472 | extern void init_disassemble_info (struct disassemble_info *dinfo, void *stream,
+      |             ^~~~~~~~~~~~~~~~~~~~~
+
+with equivalent failures in
+
+tools/bpf/bpf_jit_disasm.c
+tools/bpf/bpftool/jit_disasm.c
+
+The fix is easy enough, add a wrapper around fprintf() that conforms to the
+new signature.
+
+However I assume the necessary feature test and wrapper should only be added
+once? I don't know the kernel stuff well enough to choose the right structure
+here.
+
+Attached is my local fix for perf. Obviously would need work to be a real
+solution.
+
+Greetings,
+
+Andres Freund
+---
+
+binutils 2.39 changed the signature of init_disassemble_info(),
+which now causes perf and bpftool to fail to compile.
+
+Relevant binutils commit: [1]
+
+There is a proper fix in development upstream[2].
+This is a work-around for older kernels.
+
+[1] https://sourceware.org/git/?p=binutils-gdb.git;a=commitdiff;h=60a3da00bd5407f07d64dff82a4dae98230dfaac
+[2] https://patchwork.kernel.org/project/netdevbpf/cover/20220801013834.156015-1-andres@anarazel.de/
+
+Upstream-Status: Pending
+Signed-off-by: Anton Antonov <Anton.Antonov@arm.com>
+
+
+ tools/perf/util/annotate.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/tools/perf/util/annotate.c b/tools/perf/util/annotate.c
+index 6c8575e182ed..466a3a68f5cd 100644
+--- a/tools/perf/util/annotate.c
++++ b/tools/perf/util/annotate.c
+@@ -1677,6 +1677,18 @@ static int dso__disassemble_filename(struct dso *dso, char *filename, size_t fil
+ #include <bfd.h>
+ #include <dis-asm.h>
+ 
++static int fprintf_styled(void *, enum disassembler_style, const char* fmt, ...)
++{
++  va_list args;
++  int r;
++
++  va_start(args, fmt);
++  r = vprintf(fmt, args);
++  va_end(args);
++
++  return r;
++}
++
+ static int symbol__disassemble_bpf(struct symbol *sym,
+ 				   struct annotate_args *args)
+ {
+@@ -1719,7 +1731,8 @@ static int symbol__disassemble_bpf(struct symbol *sym,
+ 		goto out;
+ 	}
+ 	init_disassemble_info(&info, s,
+-			      (fprintf_ftype) fprintf);
++			      (fprintf_ftype) fprintf,
++			      fprintf_styled);
+ 
+ 	info.arch = bfd_get_arch(bfdf);
+ 	info.mach = bfd_get_mach(bfdf);
+-- 
+2.30.2
+

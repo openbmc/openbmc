@@ -8,6 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=2ee41112a44fe7014dce33e26468ba93"
 SECTION = "net"
 
 SRC_URI = "http://monkey-project.com/releases/1.6/monkey-${PV}.tar.gz \
+           file://0001-fastcgi-Use-value-instead-of-address-of-sin6_port.patch \
            file://monkey.service \
            file://monkey.init"
 

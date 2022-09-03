@@ -3,6 +3,8 @@
 # Copyright (C) 2018 Xilinx
 # Written by: Chandana Kalluri <ckalluri@xilinx.com>
 #
+# SPDX-License-Identifier: MIT
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
 # published by the Free Software Foundation.

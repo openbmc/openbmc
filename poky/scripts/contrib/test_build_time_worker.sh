@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: GPL-2.0-only
 #
 # This is an example script to be used in conjunction with test_build_time.sh

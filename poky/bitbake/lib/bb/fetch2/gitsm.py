@@ -115,6 +115,9 @@ class GitSM(Git):
                     # This has to be a file reference
                     proto = "file"
                     url = "gitsm://" + uris[module]
+            if "{}{}".format(ud.host, ud.path) in url:
+                raise bb.fetch2.FetchError("Submodule refers to the parent repository. This will cause deadlock situation in current version of Bitbake." \
+                                           "Consider using git fetcher instead.")
 
             url += ';protocol=%s' % proto
             url += ";name=%s" % module

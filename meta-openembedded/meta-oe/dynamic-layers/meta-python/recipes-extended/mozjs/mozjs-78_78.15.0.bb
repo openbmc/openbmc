@@ -40,7 +40,7 @@ JIT ?= ""
 JIT:mipsarch = "--disable-jit"
 
 EXTRA_OECONF = " \
-    --target=${TARGET_SYS} \
+    --target=${RUST_TARGET_SYS} \
     --host=${BUILD_SYS} \
     --prefix=${prefix} \
     --libdir=${libdir} \

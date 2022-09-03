@@ -1,7 +1,7 @@
-From 60f3833ab2b5899771b4eab654e88f9888b99501 Mon Sep 17 00:00:00 2001
+From a469ce05055c44fdca1ca094ff3a735cc059480d Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Wed, 31 Dec 2014 16:01:55 +0800
-Subject: [PATCH 1/9] linux/syslinux: support ext2/3/4 device
+Subject: [PATCH] linux/syslinux: support ext2/3/4 device
 
 * Support ext2/3/4 deivce.
 * The open_ext2_fs() checks whether it is an ext2/3/4 device,
@@ -19,10 +19,10 @@ Tested-by: Du Dolpher <dolpher.du@intel.com>
  1 file changed, 36 insertions(+)
 
 diff --git a/linux/syslinux.c b/linux/syslinux.c
-index 912de71..36fc202 100755
+index 46d5624..1cc276b 100755
 --- a/linux/syslinux.c
 +++ b/linux/syslinux.c
-@@ -256,6 +256,23 @@ int do_open_file(char *name)
+@@ -257,6 +257,23 @@ int do_open_file(char *name)
      return fd;
  }
  
@@ -46,7 +46,7 @@ index 912de71..36fc202 100755
  int main(int argc, char *argv[])
  {
      static unsigned char sectbuf[SECTOR_SIZE];
-@@ -313,6 +330,24 @@ int main(int argc, char *argv[])
+@@ -314,6 +331,24 @@ int main(int argc, char *argv[])
  	die("can't combine an offset with a block device");
      }
  
@@ -71,7 +71,7 @@ index 912de71..36fc202 100755
      xpread(dev_fd, sectbuf, SECTOR_SIZE, opt.offset);
      fsync(dev_fd);
  
-@@ -322,6 +357,7 @@ int main(int argc, char *argv[])
+@@ -323,6 +358,7 @@ int main(int argc, char *argv[])
       */
      if ((errmsg = syslinux_check_bootsect(sectbuf, &fs_type))) {
  	fprintf(stderr, "%s: %s\n", opt.device, errmsg);
@@ -79,6 +79,3 @@ index 912de71..36fc202 100755
  	exit(1);
      }
  
--- 
-1.9.1
-

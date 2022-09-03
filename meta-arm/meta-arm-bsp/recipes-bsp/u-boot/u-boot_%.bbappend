@@ -36,15 +36,13 @@ SRC_URI:append:corstone1000 = " \
         file://0016-efi_boottime-corstone1000-pass-interface-id-and-kern.patch \
         file://0017-efi_loader-corstone1000-remove-guid-check-from-corst.patch \
         file://0018-arm_ffa-removing-the-cast-when-using-binary-OR-on-FI.patch \
-        file://0019-Return-proper-error-code-when-rx-buffer-is-larger.patch \
-        file://0020-Use-correct-buffer-size.patch \
-        file://0021-Update-comm_buf-when-EFI_BUFFER_TOO_SMALL.patch \
-        file://0022-efi_loader-populate-ESRT-table-if-EFI_ESRT-config-op.patch \
-        file://0023-efi_firmware-add-get_image_info-for-corstone1000.patch \
-        file://0024-Comment-mm_communicate-failure-log.patch \
-        file://0025-efi_loader-send-bootcomplete-message-to-secure-encla.patch \
-        file://0026-efi_loader-fix-null-pointer-exception-with-get_image.patch \
-        file://0027-arm-corstone1000-add-mmc-for-fvp.patch \
+        file://0019-Use-correct-buffer-size.patch \
+        file://0020-efi_loader-populate-ESRT-table-if-EFI_ESRT-config-op.patch \
+        file://0021-efi_firmware-add-get_image_info-for-corstone1000.patch \
+        file://0022-efi_loader-send-bootcomplete-message-to-secure-encla.patch \
+        file://0023-efi_loader-fix-null-pointer-exception-with-get_image.patch \
+        file://0024-arm-corstone1000-add-mmc-for-fvp.patch \
+        file://0025-corstone1000-use-a-compressed-kernel.patch \
       "
 
 #

@@ -1975,9 +1975,19 @@ def _reset(recipes, no_clean, remove_work, config, basepath, workspace):
                         shutil.rmtree(srctreebase)
                     else:
                         # We don't want to risk wiping out any work in progress
-                        logger.info('Leaving source tree %s as-is; if you no '
-                                    'longer need it then please delete it manually'
-                                    % srctreebase)
+                        if srctreebase.startswith(os.path.join(config.workspace_path, 'sources')):
+                            from datetime import datetime
+                            preservesrc = os.path.join(config.workspace_path, 'attic', 'sources', "{}.{}".format(pn,datetime.now().strftime("%Y%m%d%H%M%S")))
+                            logger.info('Preserving source tree in %s\nIf you no '
+                                        'longer need it then please delete it manually.\n'
+                                        'It is also possible to reuse it via devtool source tree argument.'
+                                        % preservesrc)
+                            bb.utils.mkdirhier(os.path.dirname(preservesrc))
+                            shutil.move(srctreebase, preservesrc)
+                        else:
+                            logger.info('Leaving source tree %s as-is; if you no '
+                                        'longer need it then please delete it manually'
+                                        % srctreebase)
             else:
                 # This is unlikely, but if it's empty we can just remove it
                 os.rmdir(srctreebase)

@@ -1,7 +1,7 @@
-From 35d3842cc4b930c5102eed2921e0189b7f4fd069 Mon Sep 17 00:00:00 2001
+From 1957fc6c069493c6789557936adb675f5e7e51ba Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Wed, 31 Dec 2014 16:43:37 +0800
-Subject: [PATCH 4/9] linux/syslinux: add ext_file_read() and ext_file_write()
+Subject: [PATCH] linux/syslinux: add ext_file_read() and ext_file_write()
 
 Will use them to read and write on the extX device.
 
@@ -10,14 +10,14 @@ Upstream-Status: Submitted
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 Tested-by: Du Dolpher <dolpher.du@intel.com>
 ---
- linux/syslinux.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ linux/syslinux.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 62 insertions(+)
 
 diff --git a/linux/syslinux.c b/linux/syslinux.c
-index 45f080d..247c86a 100755
+index fc5edb1..c7c1994 100755
 --- a/linux/syslinux.c
 +++ b/linux/syslinux.c
-@@ -349,6 +349,68 @@ fail:
+@@ -350,6 +350,68 @@ fail:
  
  }
  
@@ -86,6 +86,3 @@ index 45f080d..247c86a 100755
  /*
   * Install the boot block on the specified device.
   * Must be run AFTER file installed.
--- 
-1.9.1
-

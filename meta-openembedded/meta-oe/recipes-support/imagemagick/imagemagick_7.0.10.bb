@@ -24,6 +24,7 @@ EXTRA_OECONF = "--program-prefix= --program-suffix=.im7 --without-perl --disable
 
 CACHED_CONFIGUREVARS = "ac_cv_sys_file_offset_bits=yes"
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)}"
+PACKAGECONFIG[cxx] = "--with-magick-plus-plus,--without-magick-plus-plus"
 PACKAGECONFIG[graphviz] = "--with-gvc,--without-gvc,graphviz"
 PACKAGECONFIG[jp2] = "--with-jp2,,jasper"
 PACKAGECONFIG[lzma] = "--with-lzma,--without-lzma,xz"

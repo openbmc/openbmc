@@ -1,7 +1,7 @@
-From 541b2b51dc77832ab5845cab4762d29976838d36 Mon Sep 17 00:00:00 2001
+From 58358f79d9f8abbdc8bcfc7d08bd0c7c4c90ec84 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Tue, 16 Nov 2021 12:36:27 +0000
-Subject: [PATCH 07/27] arm_ffa: introducing armffa command
+Subject: [PATCH 07/24] arm_ffa: introducing armffa command
 
 A new armffa command is provided as an example of how to use
 the FF-A helper functions to communicate with secure world.
@@ -20,10 +20,10 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  create mode 100644 cmd/armffa.c
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 14307e6da644..f3fd559da54a 100644
+index d29d7e040764..32fc267fcf13 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -235,6 +235,7 @@ F:	include/configs/turris_*.h
+@@ -247,6 +247,7 @@ F:	include/configs/turris_*.h
  ARM FF-A
  M:	Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
  S:	Maintained
@@ -32,10 +32,10 @@ index 14307e6da644..f3fd559da54a 100644
  F:	include/arm_ffa.h
  F:	include/arm_ffa_helper.h
 diff --git a/cmd/Kconfig b/cmd/Kconfig
-index ff50102a89c7..ff124bf4bad0 100644
+index ba2f321ae989..090e668125d5 100644
 --- a/cmd/Kconfig
 +++ b/cmd/Kconfig
-@@ -813,6 +813,16 @@ endmenu
+@@ -873,6 +873,16 @@ endmenu
  
  menu "Device access commands"
  
@@ -53,7 +53,7 @@ index ff50102a89c7..ff124bf4bad0 100644
  	#depends on FLASH_CFI_DRIVER
  	bool "armflash"
 diff --git a/cmd/Makefile b/cmd/Makefile
-index 166c652d9825..770b846c44e0 100644
+index 5e43a1e022e8..e40f52f1e416 100644
 --- a/cmd/Makefile
 +++ b/cmd/Makefile
 @@ -12,6 +12,8 @@ obj-y += panic.o
@@ -338,5 +338,5 @@ index 000000000000..71a6ebb656d1
 +	   "devlist\n"
 +	   "	 - displays the arm_ffa device info\n");
 -- 
-2.30.2
+2.37.1
 

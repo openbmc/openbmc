@@ -1,4 +1,4 @@
-From b2ccd25828b40310caeb094c0413e3a30a4dc0a5 Mon Sep 17 00:00:00 2001
+From 67735b3647f98ce0f010ff8b4f9b5c5da576cb17 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 19 Feb 2020 09:51:16 -0800
 Subject: [PATCH] binutils-nativesdk: Search for alternative ld.so.conf in SDK
@@ -29,7 +29,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  5 files changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/ld/Makefile.am b/ld/Makefile.am
-index b55a873d927..61db131fb0d 100644
+index d31021c13e2..29782385ca4 100644
 --- a/ld/Makefile.am
 +++ b/ld/Makefile.am
 @@ -42,7 +42,8 @@ ZLIBINC = @zlibinc@
@@ -41,12 +41,12 @@ index b55a873d927..61db131fb0d 100644
 +           -DSYSCONFDIR="\"$(sysconfdir)\""
  WARN_CFLAGS = @WARN_CFLAGS@
  NO_WERROR = @NO_WERROR@
- AM_CFLAGS = $(WARN_CFLAGS) $(ELF_CLFAGS)
+ AM_CFLAGS = $(WARN_CFLAGS) $(ELF_CLFAGS) $(JANSSON_CFLAGS)
 diff --git a/ld/Makefile.in b/ld/Makefile.in
-index 61e93eeaf1e..860eb21a785 100644
+index ee0c98f65b0..04ee68a2c67 100644
 --- a/ld/Makefile.in
 +++ b/ld/Makefile.in
-@@ -556,7 +556,8 @@ ZLIB = @zlibdir@ -lz
+@@ -562,7 +562,8 @@ ZLIB = @zlibdir@ -lz
  ZLIBINC = @zlibinc@
  ELF_CLFAGS = -DELF_LIST_OPTIONS=@elf_list_options@ \
  	   -DELF_SHLIB_LIST_OPTIONS=@elf_shlib_list_options@ \
@@ -54,13 +54,13 @@ index 61e93eeaf1e..860eb21a785 100644
 +	   -DELF_PLT_UNWIND_LIST_OPTIONS=@elf_plt_unwind_list_options@ \
 +           -DSYSCONFDIR="\"$(sysconfdir)\""
  
- AM_CFLAGS = $(WARN_CFLAGS) $(ELF_CLFAGS)
+ AM_CFLAGS = $(WARN_CFLAGS) $(ELF_CLFAGS) $(JANSSON_CFLAGS)
  
 diff --git a/ld/ldelf.c b/ld/ldelf.c
-index 121c25d948f..34cbc60e5e9 100644
+index bfa0d54753a..0d61a3209ec 100644
 --- a/ld/ldelf.c
 +++ b/ld/ldelf.c
-@@ -930,7 +930,7 @@ ldelf_check_ld_so_conf (const struct bfd_link_needed_list *l, int force,
+@@ -936,7 +936,7 @@ ldelf_check_ld_so_conf (const struct bfd_link_needed_list *l, int force,
  
        info.path = NULL;
        info.len = info.alloc = 0;

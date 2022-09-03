@@ -12,12 +12,8 @@ from oeqa.core.decorator.data import skipIfNotFeature
 class ParsecTest(OERuntimeTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.tc.target.run('swtpm_ioctl -s --tcp :2322')
         cls.toml_file = '/etc/parsec/config.toml'
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.tc.target.run('swtpm_ioctl -s --tcp :2322')
+        cls.tc.target.run('cp -p %s %s-original' % (cls.toml_file, cls.toml_file))
 
     def setUp(self):
         super(ParsecTest, self).setUp()
@@ -40,6 +36,11 @@ class ParsecTest(OERuntimeTestCase):
         status, output = self.target.run('cat %s-%s >>%s' % (self.toml_file, provider, self.toml_file))
         os.remove(tmp_path)
 
+    def restore_parsec_config(self):
+        """ Restore original Parsec config """
+        self.target.run('cp -p %s-original %s' % (self.toml_file, self.toml_file))
+        self.target.run(self.parsec_reload)
+
     def check_parsec_providers(self, provider=None, prov_id=None):
         """ Get Parsec providers list and check for one if defined """
 
@@ -57,6 +58,23 @@ class ParsecTest(OERuntimeTestCase):
 
         status, output = self.target.run('parsec-cli-tests.sh %s' % ("-%d" % prov_id if prov_id else ""))
         self.assertEqual(status, 0, msg='Parsec CLI tests failed.\n %s' % output)
+
+    def check_packageconfig(self, prov):
+        """ Check that the require provider is included in Parsec """
+        if prov not in self.tc.td['PACKAGECONFIG:pn-parsec-service']:
+            self.skipTest('%s provider is not included in Parsec. Parsec PACKAGECONFIG: "%s"' % \
+                          (prov, self.tc.td['PACKAGECONFIG:pn-parsec-service']))
+
+    def check_packages(self, prov, packages):
+        """ Check for the required packages for Parsec providers software backends """
+        if isinstance(packages, str):
+            need_pkgs = set([packages,])
+        else:
+            need_pkgs = set(packages)
+
+        if not self.tc.image_packages.issuperset(need_pkgs):
+            self.skipTest('%s provider is not configured and packages "%s" are not included into the image' % \
+                          (prov, need_pkgs))
 
     @OEHasPackage(['parsec-service'])
     @OETestDepends(['ssh.SSHTest.test_ssh'])
@@ -84,7 +102,9 @@ class ParsecTest(OERuntimeTestCase):
                 'mkdir /tmp/myvtpm',
                 'swtpm socket -d --tpmstate dir=/tmp/myvtpm --tpm2 --ctrl type=tcp,port=2322 --server type=tcp,port=2321 --flags not-need-init',
                 'tpm2_startup -c -T "swtpm:port=2321"',
+                'chown -R parsec /tmp/myvtpm',
                 self.parsec_reload,
+                'sleep 5',
                ]
 
         for cmd in cmds:
@@ -92,16 +112,30 @@ class ParsecTest(OERuntimeTestCase):
             self.assertEqual(status, 0, msg='\n'.join([cmd, output]))
 
     @OEHasPackage(['parsec-service'])
-    @OEHasPackage(['swtpm'])
     @skipIfNotFeature('tpm2','Test parsec_tpm_provider requires tpm2 to be in DISTRO_FEATURES')
-    @OETestDepends(['ssh.SSHTest.test_ssh', 'parsec.ParsecTest.test_all_providers'])
+    @OETestDepends(['ssh.SSHTest.test_ssh'])
     def test_tpm_provider(self):
         """ Configure and test Parsec TPM provider with swtpm as a backend """
 
+        self.check_packageconfig("TPM")
+
+        reconfigure = False
         prov_id = 3
-        self.configure_tpm_provider()
-        self.check_parsec_providers("TPM", prov_id)
+        try:
+            # Chech if the provider is already configured
+            self.check_parsec_providers("TPM", prov_id)
+        except:
+            # Try to test the provider with a software backend
+            self.check_packages("TPM", ['swtpm', 'tpm2-tools'])
+            reconfigure = True
+            self.configure_tpm_provider()
+            self.check_parsec_providers("TPM", prov_id)
+
         self.run_cli_tests(prov_id)
+        self.restore_parsec_config()
+
+        if reconfigure:
+            self.target.run('swtpm_ioctl -s --tcp :2322')
 
     def configure_pkcs11_provider(self):
         """ Create Parsec PKCS11 provider configuration """
@@ -132,12 +166,52 @@ class ParsecTest(OERuntimeTestCase):
         self.assertEqual(status, 0, msg='Failed to reload Parsec.\n%s' % output)
 
     @OEHasPackage(['parsec-service'])
-    @OEHasPackage(['softhsm'])
-    @OETestDepends(['ssh.SSHTest.test_ssh', 'parsec.ParsecTest.test_all_providers'])
+    @OETestDepends(['ssh.SSHTest.test_ssh'])
     def test_pkcs11_provider(self):
         """ Configure and test Parsec PKCS11 provider with softhsm as a backend """
 
+        self.check_packageconfig("PKCS11")
         prov_id = 2
-        self.configure_pkcs11_provider()
-        self.check_parsec_providers("PKCS #11", prov_id)
+        try:
+            # Chech if the provider is already configured
+            self.check_parsec_providers("PKCS #11", prov_id)
+        except:
+            # Try to test the provider with a software backend
+            self.check_packages("PKCS11", 'softhsm')
+            self.configure_pkcs11_provider()
+            self.check_parsec_providers("PKCS #11", prov_id)
+
         self.run_cli_tests(prov_id)
+        self.restore_parsec_config()
+
+    def configure_TS_provider(self):
+        """ Create Trusted Services provider configuration """
+
+        cfg = [
+                '',
+                '[[provider]]',
+                'name = "trusted-service-provider"',
+                'provider_type = "TrustedService"',
+                'key_info_manager = "sqlite-manager"',
+              ]
+        self.copy_subconfig(cfg, "TS")
+
+        status, output = self.target.run(self.parsec_reload)
+        self.assertEqual(status, 0, msg='Failed to reload Parsec.\n%s' % output)
+
+    @OEHasPackage(['parsec-service'])
+    @OETestDepends(['ssh.SSHTest.test_ssh'])
+    def test_TS_provider(self):
+        """ Configure and test Parsec PKCS11 provider with softhsm as a backend """
+
+        self.check_packageconfig("TS")
+        prov_id = 4
+        try:
+            # Chech if the provider is already configured
+            self.check_parsec_providers("Trusted Service", prov_id)
+        except:
+            self.configure_TS_provider()
+            self.check_parsec_providers("Trusted Service", prov_id)
+
+        self.run_cli_tests(prov_id)
+        self.restore_parsec_config()

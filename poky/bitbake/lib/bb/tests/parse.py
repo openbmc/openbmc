@@ -164,6 +164,7 @@ python () {
     # become unset/disappear.
     #
     def test_parse_classextend_contamination(self):
+        self.d.setVar("__bbclasstype", "recipe")
         cls = self.parsehelper(self.classextend_bbclass, suffix=".bbclass")
         #clsname = os.path.basename(cls.name).replace(".bbclass", "")
         self.classextend = self.classextend.replace("###CLASS###", cls.name)

@@ -1,7 +1,7 @@
-From b7fb62e512e00a5fdbb4321bb0b4109261518481 Mon Sep 17 00:00:00 2001
+From 5031fea320bb4ccc1ce7470193d8f4402ae819c9 Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Thu, 3 Mar 2022 16:52:02 +0000
-Subject: [PATCH 05/27] corstone1000: enable isp1763 usb controller
+Subject: [PATCH 05/24] corstone1000: enable isp1763 usb controller
 
 MPS3 board have a ISP1763 usb controller, add the
 correspondent mmio area and enable it to be used for mass
@@ -44,5 +44,5 @@ index cf166f107efd..8ba0effb0ab2 100644
  				"boot_bank_flag=0x08002000\0"				\
  				"kernel_addr_bank_0=0x083EE000\0"			\
 -- 
-2.30.2
+2.37.1
 

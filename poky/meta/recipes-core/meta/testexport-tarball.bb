@@ -4,7 +4,7 @@ DESCRIPTION = "SDK type target for standalone tarball containing packages define
 SUMMARY = "Standalone tarball for test systems with missing software"
 LICENSE = "MIT"
 
-TEST_EXPORT_SDK_PACKAGES ??= ""
+require conf/testexport.conf
 
 TOOLCHAIN_TARGET_TASK ?= ""
 

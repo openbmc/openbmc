@@ -1,7 +1,7 @@
-From 0ec74744a4cba7c5fdfaa2685995119a4fca0260 Mon Sep 17 00:00:00 2001
+From f95b6fd0475a95c00e886219271cb5c93838e3c3 Mon Sep 17 00:00:00 2001
 From: Amarnath Valluri <amarnath.valluri@intel.com>
 Date: Wed, 18 Jan 2017 16:14:37 +0200
-Subject: [PATCH] Make dynamic linker a relative symlink to libc
+Subject: [PATCH 1/2] Make dynamic linker a relative symlink to libc
 
 absolute symlink into $(libdir) fails to load in a cross build
 environment, especially when executing qemu in usermode to run target
@@ -13,18 +13,19 @@ V2:
  Make use of 'ln -r' to create relative symlinks, as most fo the distros
  shipping coreutils 8.16+
 
+Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
----
-Upstream-Status: Pending
 ---
  Makefile         | 2 +-
  tools/install.sh | 8 +++++---
  2 files changed, 6 insertions(+), 4 deletions(-)
 
+diff --git a/Makefile b/Makefile
+index e8cc4436..466d9afd 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -210,7 +210,7 @@ $(DESTDIR)$(includedir)/%: $(srcdir)/inc
+@@ -210,7 +210,7 @@ $(DESTDIR)$(includedir)/%: $(srcdir)/include/%
  	$(INSTALL) -D -m 644 $< $@
  
  $(DESTDIR)$(LDSO_PATHNAME): $(DESTDIR)$(libdir)/libc.so
@@ -33,6 +34,8 @@ Upstream-Status: Pending
  
  install-libs: $(ALL_LIBS:lib/%=$(DESTDIR)$(libdir)/%) $(if $(SHARED_LIBS),$(DESTDIR)$(LDSO_PATHNAME),)
  
+diff --git a/tools/install.sh b/tools/install.sh
+index d913b60b..b6a7f797 100755
 --- a/tools/install.sh
 +++ b/tools/install.sh
 @@ -6,18 +6,20 @@
@@ -58,7 +61,7 @@ Upstream-Status: Pending
  m) mode=$OPTARG ;;
  ?) usage ;;
  esac
-@@ -48,7 +50,7 @@ trap 'rm -f "$tmp"' EXIT INT QUIT TERM H
+@@ -48,7 +50,7 @@ trap 'rm -f "$tmp"' EXIT INT QUIT TERM HUP
  umask 077
  
  if test "$symlink" ; then
@@ -67,3 +70,6 @@ Upstream-Status: Pending
  else
  cat < "$1" > "$tmp"
  chmod "$mode" "$tmp"
+-- 
+2.37.2
+

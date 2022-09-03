@@ -1,0 +1,56 @@
+From 821d31148c07a8318277be32bc6a943c7fd2ba3f Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Sat, 6 Aug 2022 11:53:55 +0000
+Subject: [PATCH] libinstaller: Fix build with glibc-2.36
+
+* add only necessary definitions from linux/fs.h, because including whole
+  causes conflicts with sys/mount.h:
+  http://errors.yoctoproject.org/Errors/Details/664535/
+
+In file included from TOPDIR/tmp-glibc/work/core2-64-oe-linux/syslinux/6.04-pre2-r1/recipe-sysroot/usr/include/linux/fs.h:19,
+                 from TOPDIR/tmp-glibc/work/core2-64-oe-linux/syslinux/6.04-pre2-r1/syslinux-6.04-pre2/linux/../libinstaller/linuxioctl.h:19,
+                 from TOPDIR/tmp-glibc/work/core2-64-oe-linux/syslinux/6.04-pre2-r1/syslinux-6.04-pre2/linux/../libinstaller/syslxcom.c:34:
+TOPDIR/tmp-glibc/work/core2-64-oe-linux/syslinux/6.04-pre2-r1/recipe-sysroot/usr/include/linux/mount.h:95:6: error: redeclaration of 'enum fsconfig_command'
+   95 | enum fsconfig_command {
+      |      ^~~~~~~~~~~~~~~~
+In file included from TOPDIR/tmp-glibc/work/core2-64-oe-linux/syslinux/6.04-pre2-r1/syslinux-6.04-pre2/linux/../libinstaller/syslxcom.c:31:
+TOPDIR/tmp-glibc/work/core2-64-oe-linux/syslinux/6.04-pre2-r1/recipe-sysroot/usr/include/sys/mount.h:189:6: note: originally defined here
+  189 | enum fsconfig_command
+      |      ^~~~~~~~~~~~~~~~
+TOPDIR/tmp-glibc/work/core2-64-oe-linux/syslinux/6.04-pre2-r1/recipe-sysroot/usr/include/linux/mount.h:96:9: error: redeclaration of enumerator 'FSCONFIG_SET_FLAG'
+   96 |         FSCONFIG_SET_FLAG       = 0,    /* Set parameter, supplying no value */
+      |         ^~~~~~~~~~~~~~~~~
+...
+
+Upstream-Status: Inactive-Upstream
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ libinstaller/linuxioctl.h | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/libinstaller/linuxioctl.h b/libinstaller/linuxioctl.h
+index e2731c7..f4a6703 100644
+--- a/libinstaller/linuxioctl.h
++++ b/libinstaller/linuxioctl.h
+@@ -16,7 +16,20 @@
+ #include <linux/fd.h>		/* Floppy geometry */
+ #include <linux/hdreg.h>	/* Hard disk geometry */
+ 
+-#include <linux/fs.h>		/* FIGETBSZ, FIBMAP, FS_IOC_* */
++// #include <linux/fs.h>		/* FIGETBSZ, FIBMAP, FS_IOC_* */
++// linux/fs.h unfortunately causes conflict with sys/mount.h since glibc-2.36
++// https://sourceware.org/glibc/wiki/Release/2.36#Usage_of_.3Clinux.2Fmount.h.3E_and_.3Csys.2Fmount.h.3E
++// add the necessary definitions
++
++#define FS_IOC_GETFLAGS                 _IOR('f', 1, long)
++#define FS_IOC_SETFLAGS                 _IOW('f', 2, long)
++#define FIBMAP	   _IO(0x00,1)	/* bmap access */
++#define FIGETBSZ   _IO(0x00,2)	/* get the block size used for bmap */
++#define FS_IMMUTABLE_FL			0x00000010 /* Immutable file */
++#define BLKGETSIZE _IO(0x12,96)	/* return device size /512 (long *arg) */
++
++// for musl we also need limits.h for PATH_MAX
++#include <linux/limits.h>
+ 
+ #undef SECTOR_SIZE		/* Defined in msdos_fs.h for no good reason */
+ #undef SECTOR_BITS

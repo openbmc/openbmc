@@ -1,4 +1,4 @@
-From cfde5ba7d10ae1e9d0c259dd1e7027e9bad8f83c Mon Sep 17 00:00:00 2001
+From 550834a3ec2e05e379be63b084e7fa06a1723f84 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Mon, 6 Jun 2022 17:53:20 +0800
 Subject: [PATCH] xxhash.h: Fix build with gcc-12
@@ -14,9 +14,10 @@ Remove inline attribute to fix below build failure:
        |                  ~~~
   4371 |                  secret + n*XXH_SECRET_CONSUME_RATE);
 
-Upstream-Status: Submitted [https://github.com/ccache/ccache/pull/1089]
+Upstream-Status: Submitted [https://github.com/Cyan4973/xxHash/pull/720]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+
 ---
  src/third_party/xxhash.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -34,6 +35,3 @@ index 08ab794..c754e99 100644
  #  define XXH_NO_INLINE static __attribute__((noinline))
  #elif defined(_MSC_VER)  /* Visual Studio */
  #  define XXH_FORCE_INLINE static __forceinline
--- 
-2.25.1
-

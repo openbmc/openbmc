@@ -5,6 +5,7 @@ SRC_URI[sha256sum] = "110fb58fb12eca59e072ad59fc42d771cd642dd7a2f2416582aa9da7a8
 
 RDEPENDS:${PN} += "\
     ${PYTHON_PN}-sqlparse \
+    ${PYTHON_PN}-asgiref \
 "
 
 # Set DEFAULT_PREFERENCE so that the LTS version of django is built by

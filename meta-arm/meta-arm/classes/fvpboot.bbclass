@@ -26,7 +26,7 @@ FVP_EXTRA_ARGS ?= ""
 
 EXTRA_IMAGEDEPENDS += "${FVP_PROVIDER}"
 
-inherit image-artifact-names
+IMAGE_CLASSES += "image-artifact-names"
 
 IMAGE_POSTPROCESS_COMMAND += "do_write_fvpboot_conf;"
 python do_write_fvpboot_conf() {

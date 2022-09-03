@@ -1,5 +1,4 @@
 require recipes-devtools/atp/atp-source_3.1.inc
-inherit package
 
 SUMMARY = "End-to-end tests evaluating ATP kernel modules service correctness"
 SECTION = "kernel/userland"

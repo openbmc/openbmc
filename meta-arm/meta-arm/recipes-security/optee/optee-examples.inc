@@ -12,7 +12,7 @@ inherit python3native
 require optee.inc
 
 SRC_URI = "git://github.com/linaro-swg/optee_examples.git;branch=master;protocol=https \
-           file://0001-Makefile-Fix-non-portable-sh-check-for-plugins.patch"
+           "
 
 EXTRA_OEMAKE += "TA_DEV_KIT_DIR=${TA_DEV_KIT_DIR} \
                  HOST_CROSS_COMPILE=${HOST_PREFIX} \

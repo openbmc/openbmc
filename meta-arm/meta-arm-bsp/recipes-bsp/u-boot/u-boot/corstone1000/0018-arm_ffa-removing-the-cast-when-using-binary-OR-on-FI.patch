@@ -1,7 +1,7 @@
-From 1cfca60850727448bdbfe720d98d9e0d4523f6aa Mon Sep 17 00:00:00 2001
+From 460406b46b51b6c585788001147a8961c95cc73c Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Sat, 11 Dec 2021 21:05:10 +0000
-Subject: [PATCH 18/27] arm_ffa: removing the cast when using binary OR on
+Subject: [PATCH 18/24] arm_ffa: removing the cast when using binary OR on
  FIELD_PREP macros
 
 When the GENMASK used is above 16-bits wide a u16 cast will cause
@@ -36,5 +36,5 @@ index 38ea4ba83efc..d0db3ef508a1 100644
  /* The FF-A SMC function prototype definition */
  
 -- 
-2.30.2
+2.37.1
 

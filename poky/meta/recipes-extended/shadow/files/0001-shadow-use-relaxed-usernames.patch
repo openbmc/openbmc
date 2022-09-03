@@ -1,0 +1,104 @@
+From b182c52d63bea0f08e1befcec5c3797dd97cdef5 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 16 Aug 2022 13:46:22 +0200
+Subject: [PATCH] shadow: use relaxed usernames
+
+The groupadd from shadow does not allow upper case group names, the
+same is true for the upstream shadow. But distributions like
+Debian/Ubuntu/CentOS has their own way to cope with this problem,
+this patch is picked up from CentOS release 7.0 to relax the usernames
+restrictions to allow the upper case group names, and the relaxation is
+POSIX compliant because POSIX indicate that usernames are composed of
+characters from the portable filename character set [A-Za-z0-9._-].
+
+Upstream-Status: Submitted [https://github.com/shadow-maint/shadow/pull/551]
+
+Signed-off-by: Shan Hai <shan.hai@windriver.com>
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ libmisc/chkname.c  | 29 ++++++++++++++++++-----------
+ man/groupadd.8.xml |  6 ------
+ man/useradd.8.xml  |  6 ------
+ 3 files changed, 18 insertions(+), 23 deletions(-)
+
+diff --git a/libmisc/chkname.c b/libmisc/chkname.c
+index cb002a14..c0306c5a 100644
+--- a/libmisc/chkname.c
++++ b/libmisc/chkname.c
+@@ -32,21 +32,28 @@ static bool is_valid_name (const char *name)
+ 	}
+ 
+ 	/*
+-	 * User/group names must match [a-z_][a-z0-9_-]*[$]
+-	 */
+-
+-	if (('\0' == *name) ||
+-	    !((('a' <= *name) && ('z' >= *name)) || ('_' == *name))) {
++         * User/group names must match gnu e-regex:
++         *    [a-zA-Z0-9_.][a-zA-Z0-9_.-]{0,30}[a-zA-Z0-9_.$-]?
++         *
++         * as a non-POSIX, extension, allow "$" as the last char for
++         * sake of Samba 3.x "add machine script"
++         */
++	if ( ('\0' == *name) ||
++             !((*name >= 'a' && *name <= 'z') ||
++               (*name >= 'A' && *name <= 'Z') ||
++               (*name >= '0' && *name <= '9') ||
++               (*name == '_') || (*name == '.') 
++	      )) {
+ 		return false;
+ 	}
+ 
+ 	while ('\0' != *++name) {
+-		if (!(( ('a' <= *name) && ('z' >= *name) ) ||
+-		      ( ('0' <= *name) && ('9' >= *name) ) ||
+-		      ('_' == *name) ||
+-		      ('-' == *name) ||
+-		      ( ('$' == *name) && ('\0' == *(name + 1)) )
+-		     )) {
++                if (!(  (*name >= 'a' && *name <= 'z') ||
++                        (*name >= 'A' && *name <= 'Z') ||
++                        (*name >= '0' && *name <= '9') ||
++                        (*name == '_') || (*name == '.') || (*name == '-') ||
++                        (*name == '$' && *(name + 1) == '\0') 
++                     )) {
+ 			return false;
+ 		}
+ 	}
+diff --git a/man/groupadd.8.xml b/man/groupadd.8.xml
+index 26671f92..3eacaa09 100644
+--- a/man/groupadd.8.xml
++++ b/man/groupadd.8.xml
+@@ -63,12 +63,6 @@
+       values from the system. The new group will be entered into the system
+       files as needed.
+     </para>
+-     <para>
+-       Groupnames must start with a lower case letter or an underscore,
+-       followed by lower case letters, digits, underscores, or dashes.
+-       They can end with a dollar sign.
+-       In regular expression terms: [a-z_][a-z0-9_-]*[$]?
+-     </para>
+      <para>
+        Groupnames may only be up to &GROUP_NAME_MAX_LENGTH; characters long.
+      </para>
+diff --git a/man/useradd.8.xml b/man/useradd.8.xml
+index c7f95b47..e056d141 100644
+--- a/man/useradd.8.xml
++++ b/man/useradd.8.xml
+@@ -691,12 +691,6 @@
+       the user account creation request.
+     </para>
+ 
+-    <para>
+-      Usernames must start with a lower case letter or an underscore,
+-      followed by lower case letters, digits, underscores, or dashes.
+-      They can end with a dollar sign.
+-      In regular expression terms: [a-z_][a-z0-9_-]*[$]?
+-    </para>
+     <para>
+       Usernames may only be up to 32 characters long.
+     </para>
+-- 
+2.30.2
+

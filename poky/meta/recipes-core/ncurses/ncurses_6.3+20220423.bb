@@ -3,6 +3,7 @@ require ncurses.inc
 SRC_URI += "file://0001-tic-hang.patch \
            file://0002-configure-reproducible.patch \
            file://0003-gen-pkgconfig.in-Do-not-include-LDFLAGS-in-generated.patch \
+           file://exit_prototype.patch \
            "
 # commit id corresponds to the revision in package version
 SRCREV = "20db1fb41ec91cd8a1f528e770362092c5403378"

@@ -1,7 +1,7 @@
-From e70d0128090158872847b82b82cdbcf0e2f13885 Mon Sep 17 00:00:00 2001
+From 652259af2f795a5d69c628ae7b1e79d33c234abd Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Thu, 11 Nov 2021 16:27:59 +0000
-Subject: [PATCH 11/27] efi: corstone1000: introduce EFI capsule update
+Subject: [PATCH 11/24] efi: corstone1000: introduce EFI capsule update
 
 This commit provides capsule update feature for Corstone1000.
 
@@ -58,10 +58,10 @@ index afc9ccfc192b..a400cdef69d0 100644
  #define MM_SP_UUID_DATA	\
  	0xed, 0x32, 0xd5, 0x33,	\
 diff --git a/include/efi_loader.h b/include/efi_loader.h
-index 126db279dd3e..01b432e6184b 100644
+index 5b41985244e2..796419b69b40 100644
 --- a/include/efi_loader.h
 +++ b/include/efi_loader.h
-@@ -965,11 +965,11 @@ extern const struct efi_firmware_management_protocol efi_fmp_fit;
+@@ -984,11 +984,11 @@ extern const struct efi_firmware_management_protocol efi_fmp_fit;
  extern const struct efi_firmware_management_protocol efi_fmp_raw;
  
  /* Capsule update */
@@ -76,10 +76,10 @@ index 126db279dd3e..01b432e6184b 100644
  		efi_uintn_t capsule_count,
  		u64 *maximum_capsule_size,
 diff --git a/lib/efi_loader/efi_boottime.c b/lib/efi_loader/efi_boottime.c
-index cffa2c69d621..5c77a40c3ebe 100644
+index c68d9ed4f0bd..f2b5c7834c01 100644
 --- a/lib/efi_loader/efi_boottime.c
 +++ b/lib/efi_loader/efi_boottime.c
-@@ -2096,6 +2096,44 @@ static void efi_exit_caches(void)
+@@ -2095,6 +2095,44 @@ static void efi_exit_caches(void)
  #endif
  }
  
@@ -124,7 +124,7 @@ index cffa2c69d621..5c77a40c3ebe 100644
  /**
   * efi_exit_boot_services() - stop all boot services
   * @image_handle: handle of the loaded image
-@@ -2209,6 +2247,15 @@ static efi_status_t EFIAPI efi_exit_boot_services(efi_handle_t image_handle,
+@@ -2208,6 +2246,15 @@ static efi_status_t EFIAPI efi_exit_boot_services(efi_handle_t image_handle,
  	/* Recalculate CRC32 */
  	efi_update_table_header_crc32(&systab.hdr);
  
@@ -141,10 +141,10 @@ index cffa2c69d621..5c77a40c3ebe 100644
  	efi_set_watchdog(0);
  	WATCHDOG_RESET();
 diff --git a/lib/efi_loader/efi_capsule.c b/lib/efi_loader/efi_capsule.c
-index f00440163d41..c100c1b95298 100644
+index a6b98f066a0b..a0689ba912fc 100644
 --- a/lib/efi_loader/efi_capsule.c
 +++ b/lib/efi_loader/efi_capsule.c
-@@ -24,6 +24,14 @@
+@@ -25,6 +25,14 @@
  #include <crypto/pkcs7_parser.h>
  #include <linux/err.h>
  
@@ -159,7 +159,7 @@ index f00440163d41..c100c1b95298 100644
  DECLARE_GLOBAL_DATA_PTR;
  
  const efi_guid_t efi_guid_capsule_report = EFI_CAPSULE_REPORT_GUID;
-@@ -509,6 +517,89 @@ static efi_status_t efi_capsule_update_firmware(
+@@ -512,6 +520,89 @@ static efi_status_t efi_capsule_update_firmware(
  }
  #endif /* CONFIG_EFI_CAPSULE_FIRMWARE_MANAGEMENT */
  
@@ -249,7 +249,7 @@ index f00440163d41..c100c1b95298 100644
  /**
   * efi_update_capsule() - process information from operating system
   * @capsule_header_array:	Array of virtual address pointers
-@@ -522,7 +613,7 @@ static efi_status_t efi_capsule_update_firmware(
+@@ -525,7 +616,7 @@ static efi_status_t efi_capsule_update_firmware(
   *
   * Return:			status code
   */
@@ -258,7 +258,7 @@ index f00440163d41..c100c1b95298 100644
  		struct efi_capsule_header **capsule_header_array,
  		efi_uintn_t capsule_count,
  		u64 scatter_gather_list)
-@@ -539,6 +630,13 @@ efi_status_t EFIAPI efi_update_capsule(
+@@ -542,6 +633,13 @@ efi_status_t EFIAPI efi_update_capsule(
  		goto out;
  	}
  
@@ -272,7 +272,7 @@ index f00440163d41..c100c1b95298 100644
  	ret = EFI_SUCCESS;
  	for (i = 0, capsule = *capsule_header_array; i < capsule_count;
  	     i++, capsule = *(++capsule_header_array)) {
-@@ -551,6 +649,39 @@ efi_status_t EFIAPI efi_update_capsule(
+@@ -554,6 +652,39 @@ efi_status_t EFIAPI efi_update_capsule(
  
  		log_debug("Capsule[%d] (guid:%pUs)\n",
  			  i, &capsule->capsule_guid);
@@ -312,7 +312,7 @@ index f00440163d41..c100c1b95298 100644
  		if (!guidcmp(&capsule->capsule_guid,
  			     &efi_guid_firmware_management_capsule_id)) {
  			ret  = efi_capsule_update_firmware(capsule);
-@@ -589,7 +720,7 @@ out:
+@@ -592,7 +723,7 @@ out:
   *
   * Return:			status code
   */
@@ -322,7 +322,7 @@ index f00440163d41..c100c1b95298 100644
  		efi_uintn_t capsule_count,
  		u64 *maximum_capsule_size,
 diff --git a/lib/efi_loader/efi_setup.c b/lib/efi_loader/efi_setup.c
-index eee54e48784f..989380d4f8cd 100644
+index 492ecf4cb15c..bfd4687e10b5 100644
 --- a/lib/efi_loader/efi_setup.c
 +++ b/lib/efi_loader/efi_setup.c
 @@ -16,6 +16,13 @@
@@ -355,5 +355,5 @@ index eee54e48784f..989380d4f8cd 100644
  		ret = efi_set_variable_int(u"CapsuleMax",
  					   &efi_guid_capsule_report,
 -- 
-2.30.2
+2.37.1
 

@@ -59,6 +59,7 @@ SRC_URI:append = " \
 		  file://0046-Fix-update-psa_set_key_usage_flags-definition-to-the.patch \
 		  file://0047-Fixes-in-AEAD-for-psa-arch-test-54-and-58.patch \
 		  file://0003-corstone1000-port-crypto-config.patch;patchdir=../psa-arch-tests \
+                  file://0048-Fix-UEFI-get_variable-with-small-buffer.patch \
                   "
 
 SRC_URI_MBEDTLS = "git://github.com/ARMmbed/mbedtls.git;protocol=https;branch=development;name=mbedtls;destsuffix=git/mbedtls"

@@ -17,6 +17,9 @@ SRCREV = "32b062a33352e05771dcc01b981ebe961bf2e42f"
 SRC_URI = "git://github.com/Reference-LAPACK/lapack.git;protocol=https;branch=master"
 S = "${WORKDIR}/git"
 
+PACKAGECONFIG ?= ""
+PACKAGECONFIG[lapacke] = "-DLAPACKE=ON,-DLAPACKE=OFF"
+
 EXTRA_OECMAKE = " -DBUILD_SHARED_LIBS=ON "
 OECMAKE_GENERATOR = "Unix Makefiles"
 

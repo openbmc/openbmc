@@ -1,7 +1,7 @@
-From 62a666a83766f5517e90464638455286bb33f433 Mon Sep 17 00:00:00 2001
+From 8abb9c6a342d750a3a3a66e674c3be6597fc9f66 Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Mon, 28 Jun 2021 23:31:25 +0100
-Subject: [PATCH 04/27] usb: add isp1760 family driver
+Subject: [PATCH 04/24] usb: add isp1760 family driver
 
 ISP1760/61/63 are a family of usb controllers, blah, blah, more info
 here.
@@ -34,10 +34,10 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  create mode 100644 drivers/usb/isp1760/isp1760-uboot.h
 
 diff --git a/Makefile b/Makefile
-index ad83d60dc39d..2c857c1fe2cc 100644
+index 98867fbe06b4..67851020f5c1 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -834,6 +834,7 @@ libs-y += drivers/usb/host/
+@@ -841,6 +841,7 @@ libs-y += drivers/usb/host/
  libs-y += drivers/usb/mtu3/
  libs-y += drivers/usb/musb/
  libs-y += drivers/usb/musb-new/
@@ -3801,5 +3801,5 @@ index 000000000000..2486de6f9e27
 +
 +#endif
 -- 
-2.30.2
+2.37.1
 

@@ -1,7 +1,6 @@
 # Copyright (C) 2016 Intel Corporation
 #
-# Released under the MIT license (see COPYING.MIT)
-#
+# SPDX-License-Identifier: MIT
 #
 # testexport.bbclass allows to execute runtime test outside OE environment.
 # Most of the tests are commands run on target image over ssh.
@@ -23,10 +22,9 @@ TEST_TARGET ?= "simpleremote"
 TEST_TARGET_IP ?= ""
 TEST_SERVER_IP ?= ""
 
-TEST_EXPORT_SDK_PACKAGES ?= ""
+require conf/testexport.conf
+
 TEST_EXPORT_SDK_ENABLED ?= "0"
-TEST_EXPORT_SDK_NAME ?= "testexport-tools-nativesdk"
-TEST_EXPORT_SDK_DIR ?= "sdk"
 
 TEST_EXPORT_DEPENDS = ""
 TEST_EXPORT_DEPENDS += "${@bb.utils.contains('IMAGE_PKGTYPE', 'rpm', 'cpio-native:do_populate_sysroot', '', d)}"
@@ -179,4 +177,4 @@ def testexport_create_tarball(d, tar_name, src_dir):
     tar.close()
     os.chdir(current_dir)
 
-inherit testimage
+IMAGE_CLASSES += "testimage"

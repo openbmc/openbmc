@@ -29,6 +29,10 @@ SRC_URI[testtar.sha256sum] = "96151685cec997e1f9f3387e3626d61e6284d4d6e66e0e440c
 
 BINCONFIG = "${bindir}/xml2-config"
 
+# Fixed since 2.9.11 via
+# https://gitlab.gnome.org/GNOME/libxml2/-/commit/c1ba6f54d32b707ca6d91cb3257ce9de82876b6f
+CVE_CHECK_IGNORE += "CVE-2016-3709"
+
 PACKAGECONFIG ??= "python \
     ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)} \
 "
@@ -105,6 +109,8 @@ do_install_ptest () {
 do_install:append:class-native () {
 	# Docs are not needed in the native case
 	rm ${D}${datadir}/gtk-doc -rf
+
+	create_wrapper ${D}${bindir}/xmllint XML_CATALOG_FILES=${sysconfdir}/xml/catalog
 }
 
 BBCLASSEXTEND = "native nativesdk"

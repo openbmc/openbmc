@@ -1,4 +1,4 @@
-From 73c319a1096259652853fa2538a733a8ebea96a8 Mon Sep 17 00:00:00 2001
+From 3566cf4ab79ca78acd69cfb87e74587394e5aeb2 Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Wed, 8 Jan 2020 09:48:11 +0000
 Subject: [PATCH 2/2] board: arm: add corstone500 board
@@ -13,6 +13,8 @@ makefile for this system.
 Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 
 %% original patch: 0002-board-arm-add-corstone500-board.patch
+
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 ---
  arch/arm/Kconfig                       |  10 +++
  board/armltd/corstone500/Kconfig       |  12 +++
@@ -28,10 +30,10 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  create mode 100644 include/configs/corstone500.h
 
 diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index 4567c183fb..66f99fdf4f 100644
+index 9898c7d68e1b..8c60ed39712e 100644
 --- a/arch/arm/Kconfig
 +++ b/arch/arm/Kconfig
-@@ -641,6 +641,15 @@ config ARCH_BCMSTB
+@@ -718,6 +718,15 @@ config ARCH_BCMSTB
  	  This enables support for Broadcom ARM-based set-top box
  	  chipsets, including the 7445 family of chips.
  
@@ -47,7 +49,7 @@ index 4567c183fb..66f99fdf4f 100644
  config TARGET_VEXPRESS_CA9X4
  	bool "Support vexpress_ca9x4"
  	select CPU_V7A
-@@ -2202,6 +2211,7 @@ source "board/bosch/shc/Kconfig"
+@@ -2299,6 +2308,7 @@ source "board/bosch/shc/Kconfig"
  source "board/bosch/guardian/Kconfig"
  source "board/Marvell/octeontx/Kconfig"
  source "board/Marvell/octeontx2/Kconfig"
@@ -57,7 +59,7 @@ index 4567c183fb..66f99fdf4f 100644
  source "board/cortina/presidio-asic/Kconfig"
 diff --git a/board/armltd/corstone500/Kconfig b/board/armltd/corstone500/Kconfig
 new file mode 100644
-index 0000000000..8e689bd1fd
+index 000000000000..8e689bd1fdc8
 --- /dev/null
 +++ b/board/armltd/corstone500/Kconfig
 @@ -0,0 +1,12 @@
@@ -75,7 +77,7 @@ index 0000000000..8e689bd1fd
 +endif
 diff --git a/board/armltd/corstone500/Makefile b/board/armltd/corstone500/Makefile
 new file mode 100644
-index 0000000000..6598fdd3ae
+index 000000000000..6598fdd3ae0d
 --- /dev/null
 +++ b/board/armltd/corstone500/Makefile
 @@ -0,0 +1,8 @@
@@ -89,7 +91,7 @@ index 0000000000..6598fdd3ae
 +obj-y := corstone500.o
 diff --git a/board/armltd/corstone500/corstone500.c b/board/armltd/corstone500/corstone500.c
 new file mode 100644
-index 0000000000..e878f5c6a5
+index 000000000000..e878f5c6a521
 --- /dev/null
 +++ b/board/armltd/corstone500/corstone500.c
 @@ -0,0 +1,48 @@
@@ -143,7 +145,7 @@ index 0000000000..e878f5c6a5
 +
 diff --git a/configs/corstone500_defconfig b/configs/corstone500_defconfig
 new file mode 100644
-index 0000000000..d3161a4b40
+index 000000000000..d3161a4b40d8
 --- /dev/null
 +++ b/configs/corstone500_defconfig
 @@ -0,0 +1,40 @@
@@ -189,7 +191,7 @@ index 0000000000..d3161a4b40
 +CONFIG_OF_LIBFDT=y
 diff --git a/include/configs/corstone500.h b/include/configs/corstone500.h
 new file mode 100644
-index 0000000000..93c397d2f5
+index 000000000000..93c397d2f515
 --- /dev/null
 +++ b/include/configs/corstone500.h
 @@ -0,0 +1,109 @@
@@ -303,5 +305,5 @@ index 0000000000..93c397d2f5
 +#define CONFIG_ENV_IS_IN_FLASH		1
 +#endif
 -- 
-2.30.2
+2.37.1
 

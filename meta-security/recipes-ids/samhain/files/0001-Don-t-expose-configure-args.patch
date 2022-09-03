@@ -1,0 +1,44 @@
+From 111b1e8f35e989513d8961a45a806767109f6e1e Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Thu, 11 Aug 2022 17:15:30 +0800
+Subject: [PATCH] Don't expose configure args
+
+Don't expost configure args to fix buildpath issue.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ scripts/samhain.ebuild-light.in | 2 +-
+ scripts/samhain.ebuild.in       | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/samhain.ebuild-light.in b/scripts/samhain.ebuild-light.in
+index 2b09cdb..b7f7062 100644
+--- a/scripts/samhain.ebuild-light.in
++++ b/scripts/samhain.ebuild-light.in
+@@ -55,7 +55,7 @@ src_compile() {
+ #	      --with-state-dir=/var/lib/${PN} \
+ #	      --with-log-file=/var/log/${PN}.log \
+ 
+-	./configure ${myconf} @mydefargs@ || die
++	./configure ${myconf} mydefargs || die
+         emake || die
+ 
+ 	echo '#!/bin/sh' > ./sstrip
+diff --git a/scripts/samhain.ebuild.in b/scripts/samhain.ebuild.in
+index 635a746..b9a42e7 100644
+--- a/scripts/samhain.ebuild.in
++++ b/scripts/samhain.ebuild.in
+@@ -55,7 +55,7 @@ src_compile() {
+ #	      --with-state-dir=/var/lib/${PN} \
+ #	      --with-log-file=/var/log/${PN}.log \
+ 
+-	./configure ${myconf} @mydefargs@ || die
++	./configure ${myconf} mydefargs || die
+         emake || die
+ 
+ 	echo '#!/bin/sh' > ./sstrip
+-- 
+2.25.1
+

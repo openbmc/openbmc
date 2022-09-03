@@ -1,0 +1,27 @@
+From 98eaf510f40e384b32c01ad4bd5c3a697fdd8560 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 24 Aug 2022 14:34:38 -0700
+Subject: [PATCH] examples: Use proper function prototype for main
+
+Upstream-Status: Submitted [https://github.com/libb64/libb64/pull/10]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ examples/c-example1.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/examples/c-example1.c b/examples/c-example1.c
+index a0001df..34585dd 100644
+--- a/examples/c-example1.c
++++ b/examples/c-example1.c
+@@ -83,7 +83,7 @@ char* decode(const char* input)
+ }
+ 
+ 
+-int main()
++int main(int argc, char** argv)
+ {
+ 	const char* input = "hello world";
+ 	char* encoded;
+-- 
+2.37.2
+

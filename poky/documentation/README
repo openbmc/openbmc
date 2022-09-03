@@ -129,6 +129,10 @@ Also install the "inkscape" package from your distribution.
 Inkscape is need to convert SVG graphics to PNG (for EPUB
 export) and to PDF (for PDF export).
 
+Additionally install "fncychap.sty" TeX font if you want to build PDFs. Debian
+and Ubuntu have it in "texlive-latex-extra" package while RedHat distributions
+and OpenSUSE have it in "texlive-fncychap" package for example.
+
 To build the documentation locally, run:
 
  $ cd documentation

@@ -15,14 +15,12 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  usr/include/sys/sysinfo.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/usr/include/sys/sysinfo.h b/usr/include/sys/sysinfo.h
-index dba68dc..d145c0b 100644
 --- a/usr/include/sys/sysinfo.h
 +++ b/usr/include/sys/sysinfo.h
-@@ -5,7 +5,7 @@
- #ifndef _SYS_SYSINFO_H
+@@ -6,7 +6,7 @@
  #define _SYS_SYSINFO_H
  
+ #include <sys/types.h>
 -#include <linux/kernel.h>
 +#include <linux/sysinfo.h>
  

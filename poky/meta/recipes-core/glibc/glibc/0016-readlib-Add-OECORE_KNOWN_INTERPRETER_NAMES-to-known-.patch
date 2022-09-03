@@ -1,0 +1,29 @@
+From 58dd1336c1c32716f4f0938bf18f2ddfbe9305ca Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 18 Mar 2015 00:11:22 +0000
+Subject: [PATCH] readlib: Add OECORE_KNOWN_INTERPRETER_NAMES to known names
+
+This bolts in a hook for OE to pass its own version of interpreter
+names into glibc especially for multilib case, where it differs from any
+other distros
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Lianhao Lu <lianhao.lu@intel.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ elf/readlib.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/elf/readlib.c b/elf/readlib.c
+index ed42fbd48e..777f6c80be 100644
+--- a/elf/readlib.c
++++ b/elf/readlib.c
+@@ -49,6 +49,7 @@ static struct known_names interpreters[] =
+ #ifdef SYSDEP_KNOWN_INTERPRETER_NAMES
+   SYSDEP_KNOWN_INTERPRETER_NAMES
+ #endif
++  OECORE_KNOWN_INTERPRETER_NAMES
+ };
+ 
+ static struct known_names known_libs[] =

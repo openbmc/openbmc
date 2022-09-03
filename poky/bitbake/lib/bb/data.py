@@ -441,7 +441,7 @@ def generate_dependency_hash(tasklist, gendeps, lookupcache, ignored_vars, fn):
 
 def inherits_class(klass, d):
     val = d.getVar('__inherit_cache', False) or []
-    needle = os.path.join('classes', '%s.bbclass' % klass)
+    needle = '/%s.bbclass' % klass
     for v in val:
         if v.endswith(needle):
             return True

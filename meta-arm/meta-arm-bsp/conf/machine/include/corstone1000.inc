@@ -22,7 +22,7 @@ TFM_SIGN_PRIVATE_KEY = "${S}/bl2/ext/mcuboot/root-RSA-3072_1.pem"
 RE_IMAGE_OFFSET = "0x1000"
 
 # u-boot
-PREFERRED_VERSION_u-boot ?= "2022.04"
+PREFERRED_VERSION_u-boot ?= "2022.07"
 EXTRA_IMAGEDEPENDS += "u-boot"
 
 UBOOT_CONFIG ??= "EFI"
@@ -46,7 +46,7 @@ EXTRA_IMAGEDEPENDS += "secure-partitions"
 # Linux kernel
 PREFERRED_PROVIDER_virtual/kernel:forcevariable = "linux-yocto"
 PREFERRED_VERSION_linux-yocto = "5.15%"
-KERNEL_IMAGETYPE = "Image"
+KERNEL_IMAGETYPE = "Image.gz"
 
 INITRAMFS_IMAGE_BUNDLE ?= "1"
 

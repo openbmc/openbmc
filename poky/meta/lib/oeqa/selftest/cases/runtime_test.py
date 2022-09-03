@@ -1,4 +1,6 @@
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: MIT
 #
 
@@ -23,7 +25,7 @@ class TestExport(OESelftestTestCase):
         Author: Mariano Lopez <mariano.lopez@intel.com>
         """
 
-        features = 'INHERIT += "testexport"\n'
+        features = 'IMAGE_CLASSES += "testexport"\n'
         # These aren't the actual IP addresses but testexport class needs something defined
         features += 'TEST_SERVER_IP = "192.168.7.1"\n'
         features += 'TEST_TARGET_IP = "192.168.7.1"\n'
@@ -64,7 +66,7 @@ class TestExport(OESelftestTestCase):
         Author: Mariano Lopez <mariano.lopez@intel.com>
         """
 
-        features = 'INHERIT += "testexport"\n'
+        features = 'IMAGE_CLASSES += "testexport"\n'
         # These aren't the actual IP addresses but testexport class needs something defined
         features += 'TEST_SERVER_IP = "192.168.7.1"\n'
         features += 'TEST_TARGET_IP = "192.168.7.1"\n'
@@ -119,7 +121,7 @@ class TestImage(OESelftestTestCase):
         if get_bb_var('DISTRO') == 'poky-tiny':
             self.skipTest('core-image-full-cmdline not buildable for poky-tiny')
 
-        features = 'INHERIT += "testimage"\n'
+        features = 'IMAGE_CLASSES += "testimage"\n'
         features += 'IMAGE_INSTALL:append = " libssl"\n'
         features += 'TEST_SUITES = "ping ssh selftest"\n'
         self.write_config(features)
@@ -137,7 +139,7 @@ class TestImage(OESelftestTestCase):
         if get_bb_var('DISTRO') == 'poky-tiny':
             self.skipTest('core-image-full-cmdline not buildable for poky-tiny')
 
-        features = 'INHERIT += "testimage"\n'
+        features = 'IMAGE_CLASSES += "testimage"\n'
         features += 'TEST_SUITES = "ping ssh dnf_runtime dnf.DnfBasicTest.test_dnf_help"\n'
         # We don't yet know what the server ip and port will be - they will be patched
         # in at the start of the on-image test
@@ -172,7 +174,7 @@ class TestImage(OESelftestTestCase):
         if get_bb_var('DISTRO') == 'poky-tiny':
             self.skipTest('core-image-full-cmdline not buildable for poky-tiny')
 
-        features = 'INHERIT += "testimage"\n'
+        features = 'IMAGE_CLASSES += "testimage"\n'
         features += 'TEST_SUITES = "ping ssh apt.AptRepoTest.test_apt_install_from_repo"\n'
         # We don't yet know what the server ip and port will be - they will be patched
         # in at the start of the on-image test
@@ -222,7 +224,7 @@ class TestImage(OESelftestTestCase):
 
         qemu_packageconfig = get_bb_var('PACKAGECONFIG', 'qemu-system-native')
         qemu_distrofeatures = get_bb_var('DISTRO_FEATURES', 'qemu-system-native')
-        features = 'INHERIT += "testimage"\n'
+        features = 'IMAGE_CLASSES += "testimage"\n'
         if 'gtk+' not in qemu_packageconfig:
             features += 'PACKAGECONFIG:append:pn-qemu-system-native = " gtk+"\n'
         if 'sdl' not in qemu_packageconfig:
@@ -267,7 +269,7 @@ class TestImage(OESelftestTestCase):
         except subprocess.CalledProcessError as e:
             self.fail("Could not determine the path to dri drivers on the host via pkg-config.\nPlease install Mesa development files (particularly, dri.pc) on the host machine.")
         qemu_distrofeatures = get_bb_var('DISTRO_FEATURES', 'qemu-system-native')
-        features = 'INHERIT += "testimage"\n'
+        features = 'IMAGE_CLASSES += "testimage"\n'
         if 'opengl' not in qemu_distrofeatures:
             features += 'DISTRO_FEATURES:append = " opengl"\n'
         features += 'TEST_SUITES = "ping ssh virgl"\n'

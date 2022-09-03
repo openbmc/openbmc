@@ -1,3 +1,9 @@
+#
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
+
 inherit useradd_base
 
 # base-passwd-cross provides the default passwd and group files in the

@@ -1,7 +1,7 @@
-From c047b15fba9da36616bc9a346d9fe4d76e7ca4b2 Mon Sep 17 00:00:00 2001
+From 7a1a84ea74fdd06a7f5f239f4c5f4b727d6cd232 Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Thu, 24 Jun 2021 09:25:00 +0100
-Subject: [PATCH 01/27] cmd: load: add load command for memory mapped
+Subject: [PATCH 01/24] cmd: load: add load command for memory mapped
 
 cp.b is used a lot as a way to load binaries to memory and execute
 them, however we may need to integrate this with the efi subsystem to
@@ -26,10 +26,10 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  6 files changed, 78 insertions(+)
 
 diff --git a/README b/README
-index f51f392111f9..049bcd108980 100644
+index b7ab6e50708d..cd76f95e74c1 100644
 --- a/README
 +++ b/README
-@@ -2760,6 +2760,7 @@ rarpboot- boot image via network using RARP/TFTP protocol
+@@ -2578,6 +2578,7 @@ rarpboot- boot image via network using RARP/TFTP protocol
  diskboot- boot from IDE devicebootd   - boot default, i.e., run 'bootcmd'
  loads	- load S-Record file over serial line
  loadb	- load binary file over serial line (kermit mode)
@@ -38,10 +38,10 @@ index f51f392111f9..049bcd108980 100644
  mm	- memory modify (auto-incrementing)
  nm	- memory modify (constant address)
 diff --git a/cmd/Kconfig b/cmd/Kconfig
-index 5e25e45fd288..ff50102a89c7 100644
+index 09193b61b95f..ba2f321ae989 100644
 --- a/cmd/Kconfig
 +++ b/cmd/Kconfig
-@@ -1076,6 +1076,12 @@ config CMD_LOADB
+@@ -1143,6 +1143,12 @@ config CMD_LOADB
  	help
  	  Load a binary file over serial line.
  
@@ -55,7 +55,7 @@ index 5e25e45fd288..ff50102a89c7 100644
  	bool "loads"
  	default y
 diff --git a/cmd/bootefi.c b/cmd/bootefi.c
-index 53d9f0e0dcca..8d492ea9e70c 100644
+index 827fcd97dfd8..37ce659fa123 100644
 --- a/cmd/bootefi.c
 +++ b/cmd/bootefi.c
 @@ -34,6 +34,18 @@ static struct efi_device_path *bootefi_device_path;
@@ -141,10 +141,10 @@ index 7e4a552d90ef..1224a7f85bb3 100644
 +);
 +#endif /* CONFIG_CMD_LOADM */
 diff --git a/include/efi_loader.h b/include/efi_loader.h
-index af36639ec6a7..126db279dd3e 100644
+index 11930fbea838..5b41985244e2 100644
 --- a/include/efi_loader.h
 +++ b/include/efi_loader.h
-@@ -585,6 +585,8 @@ efi_status_t efi_load_pe(struct efi_loaded_image_obj *handle,
+@@ -591,6 +591,8 @@ efi_status_t efi_load_pe(struct efi_loaded_image_obj *handle,
  void efi_save_gd(void);
  /* Call this to relocate the runtime section to an address space */
  void efi_runtime_relocate(ulong offset, struct efi_mem_desc *map);
@@ -154,10 +154,10 @@ index af36639ec6a7..126db279dd3e 100644
  void efi_add_handle(efi_handle_t obj);
  /* Create handle */
 diff --git a/lib/efi_loader/efi_device_path.c b/lib/efi_loader/efi_device_path.c
-index 0542aaae16c7..d8dc59b2c95c 100644
+index 171661b89727..2493d7432613 100644
 --- a/lib/efi_loader/efi_device_path.c
 +++ b/lib/efi_loader/efi_device_path.c
-@@ -1138,6 +1138,8 @@ efi_status_t efi_dp_from_name(const char *dev, const char *devnr,
+@@ -1158,6 +1158,8 @@ efi_status_t efi_dp_from_name(const char *dev, const char *devnr,
  {
  	struct blk_desc *desc = NULL;
  	struct disk_partition fs_partition;
@@ -166,7 +166,7 @@ index 0542aaae16c7..d8dc59b2c95c 100644
  	int part = 0;
  	char *filename;
  	char *s;
-@@ -1153,6 +1155,13 @@ efi_status_t efi_dp_from_name(const char *dev, const char *devnr,
+@@ -1173,6 +1175,13 @@ efi_status_t efi_dp_from_name(const char *dev, const char *devnr,
  	} else if (!strcmp(dev, "Uart")) {
  		if (device)
  			*device = efi_dp_from_uart();
@@ -181,5 +181,5 @@ index 0542aaae16c7..d8dc59b2c95c 100644
  		part = blk_get_device_part_str(dev, devnr, &desc, &fs_partition,
  					       1);
 -- 
-2.30.2
+2.37.1
 

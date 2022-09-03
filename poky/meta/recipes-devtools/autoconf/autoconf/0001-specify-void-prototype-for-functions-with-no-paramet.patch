@@ -1,0 +1,64 @@
+From 7ccfea413216bddd988823acf4e93421ea0f7f9f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 16 Aug 2022 18:35:45 -0700
+Subject: [PATCH] specify void prototype for functions with no parameters
+
+Compilers defaulting to C99 flag such functions as warning which fails
+to compile when using -Werror
+
+Fixes
+error: a function declaration without a prototype is deprecated in all versions of C [-Werror,-Wstrict-prototypes]
+
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/autoconf-patches/2022-08/msg00003.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/autoconf/c.m4 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/lib/autoconf/c.m4
++++ b/lib/autoconf/c.m4
+@@ -127,7 +127,7 @@ m4_if([$2], [main], ,
+ [/* Override any GCC internal prototype to avoid an error.
+    Use char because int might match the return type of a GCC
+    builtin and then its argument prototype would still apply.  */
+-char $2 ();])], [return $2 ();])])
++char $2 (void);])], [return $2 ();])])
+ 
+ 
+ # AC_LANG_FUNC_LINK_TRY(C)(FUNCTION)
+@@ -151,7 +151,7 @@ m4_define([AC_LANG_FUNC_LINK_TRY(C)],
+ #define $1 innocuous_$1
+ 
+ /* System header to define __stub macros and hopefully few prototypes,
+-   which can conflict with char $1 (); below.  */
++   which can conflict with char $1 (void); below.  */
+ 
+ #include <limits.h>
+ #undef $1
+@@ -162,7 +162,7 @@ m4_define([AC_LANG_FUNC_LINK_TRY(C)],
+ #ifdef __cplusplus
+ extern "C"
+ #endif
+-char $1 ();
++char $1 (void);
+ /* The GNU C library defines this for functions which it implements
+     to always fail with ENOSYS.  Some functions are actually named
+     something starting with __ and the normal name is an alias.  */
+@@ -252,7 +252,7 @@ dnl other built-in extern "C" functions,
+ dnl when it actually happens.
+ [AC_LANG_PROGRAM([[$1
+ namespace conftest {
+-  extern "C" int $2 ();
++  extern "C" int $2 (void);
+ }]],
+ [[return conftest::$2 ();]])])
+ 
+@@ -2457,7 +2457,7 @@ using std::strcmp;
+ 
+ namespace {
+ 
+-void test_exception_syntax()
++void test_exception_syntax(void)
+ {
+   try {
+     throw "test";

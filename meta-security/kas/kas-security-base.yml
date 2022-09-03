@@ -39,8 +39,7 @@ local_conf_header:
     BB_SIGNATURE_HANDLER = "OEEquivHash"
     INHERIT += "buildstats buildstats-summary buildhistory"
     INHERIT += "report-error"
-    INHERIT += "testimage"
-    INHERIT += "rm_work"
+    IMAGE_CLASSES += "testimage"
     BB_NUMBER_THREADS="24"
     BB_NUMBER_PARSE_THREADS="12"
     BB_TASK_NICE_LEVEL = '5'

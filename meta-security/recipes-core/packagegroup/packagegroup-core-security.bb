@@ -28,9 +28,11 @@ SUMMARY:packagegroup-security-utils = "Security utilities"
 RDEPENDS:packagegroup-security-utils = "\
     bubblewrap \
     checksec \
+    cryptmount \
     ding-libs \
     ecryptfs-utils \
     fscryptctl \
+    glome \
     keyutils \
     nmap \
     pinentry \
@@ -42,8 +44,8 @@ RDEPENDS:packagegroup-security-utils = "\
     ${@bb.utils.contains("DISTRO_FEATURES", "pax", "pax-utils packctl", "",d)} \
     "
 
-RDEPENDS:packagegroup-security-utils:append:x86 = "chipsec"
-RDEPENDS:packagegroup-security-utils:append:x86-64 = "chipsec"
+RDEPENDS:packagegroup-security-utils:append:x86 = " chipsec"
+RDEPENDS:packagegroup-security-utils:append:x86-64 = " chipsec"
 RDEPENDS:packagegroup-security-utils:remove:mipsarch = "firejail krill"
 RDEPENDS:packagegroup-security-utils:remove:libc-musl = "krill"
 RDEPENDS:packagegroup-security-utils:remove:riscv64 = "krill"

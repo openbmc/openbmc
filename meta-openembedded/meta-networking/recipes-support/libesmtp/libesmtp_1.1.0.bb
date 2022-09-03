@@ -30,5 +30,7 @@ EXTRA_OEMESON = " \
     -Dntlm=disabled \
 "
 
+CFLAGS += "-D_GNU_SOURCE"
+
 FILES:${PN} = "${libdir}/lib*${SOLIBS} \
                ${libdir}/esmtp-plugins-6.2.0/*${SOLIBSDEV}"

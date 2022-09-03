@@ -1,0 +1,46 @@
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
+
+From 0c3ce4c09cd7d2ff4cd2e62acab899dd88dc9514 Mon Sep 17 00:00:00 2001
+From: Vishnu Banavath <vishnu.banavath@arm.com>
+Date: Wed, 20 Jul 2022 16:45:59 +0100
+Subject: [PATCH] HACK: disable instruction cache and data cache.
+
+For some reason, n1sdp fails to boot with instruction cache and
+data cache enabled. This is a temporary change to disable I cache
+and D cache until a proper fix is found.
+
+Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
+
+%% original patch: 0003-HACK-disable-instruction-cache-and-data-cache.patch
+
+diff --git a/core/arch/arm/kernel/entry_a64.S b/core/arch/arm/kernel/entry_a64.S
+index 875b6e69..594d6928 100644
+--- a/core/arch/arm/kernel/entry_a64.S
++++ b/core/arch/arm/kernel/entry_a64.S
+@@ -52,7 +52,7 @@
+ 
+ 	.macro set_sctlr_el1
+ 		mrs	x0, sctlr_el1
+-		orr	x0, x0, #SCTLR_I
++		bic	x0, x0, #SCTLR_I
+ 		orr	x0, x0, #SCTLR_SA
+ 		orr	x0, x0, #SCTLR_SPAN
+ #if defined(CFG_CORE_RWDATA_NOEXEC)
+@@ -490,11 +490,11 @@ LOCAL_FUNC enable_mmu , : , .identity_map
+ 	isb
+ 
+ 	/* Enable I and D cache */
+-	mrs	x1, sctlr_el1
++	/* mrs	x1, sctlr_el1
+ 	orr	x1, x1, #SCTLR_I
+ 	orr	x1, x1, #SCTLR_C
+ 	msr	sctlr_el1, x1
+-	isb
++	isb */
+ 
+ 	/* Adjust stack pointers and return address */
+ 	msr	spsel, #1
+-- 
+2.17.1
+

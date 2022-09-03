@@ -156,7 +156,7 @@ class Npm(FetchMethod):
             raise ParameterError("Invalid 'version' parameter", ud.url)
 
         # Extract the 'registry' part of the url
-        ud.registry = re.sub(r"^npm://", "http://", ud.url.split(";")[0])
+        ud.registry = re.sub(r"^npm://", "https://", ud.url.split(";")[0])
 
         # Using the 'downloadfilename' parameter as local filename
         # or the npm package name.

@@ -11,6 +11,7 @@ import hashlib
 import tempfile
 import collections
 import os
+import signal
 import tarfile
 from bb.fetch2 import URI
 from bb.fetch2 import FetchMethod
@@ -21,6 +22,24 @@ def skipIfNoNetwork():
     if os.environ.get("BB_SKIP_NETTESTS") == "yes":
         return unittest.skip("network test")
     return lambda f: f
+
+class TestTimeout(Exception):
+    pass
+
+class Timeout():
+
+    def __init__(self, seconds):
+        self.seconds = seconds
+
+    def handle_timeout(self, signum, frame):
+        raise TestTimeout("Test failed: timeout reached")
+
+    def __enter__(self):
+        signal.signal(signal.SIGALRM, self.handle_timeout)
+        signal.alarm(self.seconds)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        signal.alarm(0)
 
 class URITest(unittest.TestCase):
     test_uris = {
@@ -1171,6 +1190,15 @@ class FetcherNetworkTest(FetcherTest):
         self.assertTrue(os.path.exists(os.path.join(repo_path, 'edgelet/hsm-sys/azure-iot-hsm-c/deps/utpm/deps/c-utility/testtools/umock-c/readme.md')), msg='Missing submodule checkout')
         self.assertTrue(os.path.exists(os.path.join(repo_path, 'edgelet/hsm-sys/azure-iot-hsm-c/deps/utpm/deps/c-utility/testtools/umock-c/deps/ctest/README.md')), msg='Missing submodule checkout')
         self.assertTrue(os.path.exists(os.path.join(repo_path, 'edgelet/hsm-sys/azure-iot-hsm-c/deps/utpm/deps/c-utility/testtools/umock-c/deps/testrunner/readme.md')), msg='Missing submodule checkout')
+
+    @skipIfNoNetwork()
+    def test_git_submodule_reference_to_parent(self):
+        self.recipe_url = "gitsm://github.com/gflags/gflags.git;protocol=https;branch=master"
+        self.d.setVar("SRCREV", "14e1138441bbbb584160cb1c0a0426ec1bac35f1")
+        with Timeout(60):
+            fetcher = bb.fetch.Fetch([self.recipe_url], self.d)
+            with self.assertRaises(bb.fetch2.FetchError):
+                fetcher.download()
 
 class SVNTest(FetcherTest):
     def skipIfNoSvn():

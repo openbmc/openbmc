@@ -1,0 +1,46 @@
+From cbe8bd2948f522062c6170f581e1e265692a9a55 Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <slyich@gmail.com>
+Date: Sun, 24 Oct 2021 18:53:04 +0100
+Subject: [PATCH] Makefile: fix parallel build of examples
+
+Without the change examples fails to build as:
+
+    $ LANG=C make -j
+    make -C src
+    make -C examples
+    make[1]: Entering directory 'libb64/src'
+    cc -O3 -Werror -pedantic -I../include   -c -o cencode.o cencode.c
+    make[1]: Entering directory 'libb64/examples'
+    make[1]: *** No rule to make target 'libb64.a', needed by 'c-example1'.  Stop.
+    make[1]: Leaving directory 'libb64/examples'
+    make: *** [Makefile:8: all_examples] Error 2
+    make: *** Waiting for unfinished jobs....
+    cc -O3 -Werror -pedantic -I../include   -c -o cdecode.o cdecode.c
+    ar rv libb64.a cencode.o cdecode.o
+    ar: creating libb64.a
+    a - cencode.o
+    a - cdecode.o
+    make[1]: Leaving directory 'libb64/src'
+
+Upstream-Status: Submitted [https://github.com/libb64/libb64/pull/9]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index db40356..aa48c76 100644
+--- a/Makefile
++++ b/Makefile
+@@ -4,7 +4,7 @@ all_src:
+ 	$(MAKE) -C src
+ all_base64: all_src
+ 	$(MAKE) -C base64
+-all_examples:
++all_examples: all_src
+ 	$(MAKE) -C examples
+ 	
+ clean: clean_src clean_base64 clean_include clean_examples
+-- 
+2.37.2
+

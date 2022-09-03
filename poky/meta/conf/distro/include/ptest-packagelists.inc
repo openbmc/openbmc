@@ -22,6 +22,7 @@ PTESTS_FAST = "\
     gettext-ptest \
     glib-networking-ptest \
     gzip-ptest \
+    json-c-ptest \
     json-glib-ptest \
     libconvert-asn1-perl-ptest \
     liberror-perl-ptest \

@@ -16,6 +16,7 @@ SRC_URI = "https://www.kernel.org/pub/software/network/${BPN}/${BP}.tar.xz \
            file://fix-issues-when-USE_OPENSSL-1.patch \
            file://crda-4.14-python-3.patch \
            file://0001-Make-alpha2-to-be-3-characters-long.patch \
+           file://0001-reglib-Remove-unused-variables.patch \
 "
 SRC_URI[md5sum] = "0431fef3067bf503dfb464069f06163a"
 SRC_URI[sha256sum] = "43fcb9679f8b75ed87ad10944a506292def13e4afb194afa7aa921b01e8ecdbf"

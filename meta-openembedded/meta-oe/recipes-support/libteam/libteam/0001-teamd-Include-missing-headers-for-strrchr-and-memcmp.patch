@@ -1,0 +1,46 @@
+From 49693cac37ee35ff673240c8060201efe0d999c2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 24 Aug 2022 22:27:03 -0700
+Subject: [PATCH] teamd: Include missing headers for strrchr and memcmp
+
+Compiler does not see the prototype for these functions otherwise and
+build fails e.g.
+
+| ../../git/teamd/teamd_phys_port_check.c:52:10: error: call to undeclared library function 'strrchr' with type 'char *(const char *, int)'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+|         start = strrchr(link, '/');
+|                 ^
+
+Upstream-Status: Submitted [https://github.com/jpirko/libteam/pull/68]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ teamd/teamd_phys_port_check.c    | 1 +
+ teamd/teamd_runner_loadbalance.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/teamd/teamd_phys_port_check.c b/teamd/teamd_phys_port_check.c
+index 1eec129..c2454ab 100644
+--- a/teamd/teamd_phys_port_check.c
++++ b/teamd/teamd_phys_port_check.c
+@@ -19,6 +19,7 @@
+ 
+ #include <stdio.h>
+ #include <errno.h>
++#include <string.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <unistd.h>
+diff --git a/teamd/teamd_runner_loadbalance.c b/teamd/teamd_runner_loadbalance.c
+index a581472..421a7c6 100644
+--- a/teamd/teamd_runner_loadbalance.c
++++ b/teamd/teamd_runner_loadbalance.c
+@@ -17,6 +17,7 @@
+  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#include <string.h>
+ #include <sys/socket.h>
+ #include <linux/netdevice.h>
+ #include <team.h>
+-- 
+2.37.2
+

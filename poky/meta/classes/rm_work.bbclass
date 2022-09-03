@@ -1,4 +1,10 @@
 #
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
+
+#
 # Removes source after build
 #
 # To use it add that line to conf/local.conf:

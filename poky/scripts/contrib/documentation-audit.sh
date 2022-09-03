@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: GPL-2.0-only
 #
 # Perform an audit of which packages provide documentation and which

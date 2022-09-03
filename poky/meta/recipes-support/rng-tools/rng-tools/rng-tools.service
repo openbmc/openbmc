@@ -1,10 +1,9 @@
 [Unit]
 Description=Hardware RNG Entropy Gatherer Daemon
 DefaultDependencies=no
-After=systemd-udev-settle.service
-Before=sysinit.target shutdown.target
-Wants=systemd-udev-settle.service
 Conflicts=shutdown.target
+Before=sysinit.target shutdown.target
+ConditionVirtualization=!container
 
 [Service]
 EnvironmentFile=-@SYSCONFDIR@/default/rng-tools

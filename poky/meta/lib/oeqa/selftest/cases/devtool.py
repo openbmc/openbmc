@@ -1,4 +1,6 @@
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: MIT
 #
 
@@ -246,6 +248,22 @@ class DevtoolTestCase(OESelftestTestCase):
         if remaining_removelines:
             self.fail('Expected removed lines not found: %s' % remaining_removelines)
 
+    def _test_devtool_add_git_url(self, git_url, version, pn, resulting_src_uri):
+        self.track_for_cleanup(self.workspacedir)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
+        result = runCmd('devtool add --version %s %s %s' % (version, pn, git_url))
+        self.assertExists(os.path.join(self.workspacedir, 'conf', 'layer.conf'), 'Workspace directory not created')
+        # Check the recipe name is correct
+        recipefile = get_bb_var('FILE', pn)
+        self.assertIn('%s_git.bb' % pn, recipefile, 'Recipe file incorrectly named')
+        self.assertIn(recipefile, result.output)
+        # Test devtool status
+        result = runCmd('devtool status')
+        self.assertIn(pn, result.output)
+        self.assertIn(recipefile, result.output)
+        checkvars = {}
+        checkvars['SRC_URI'] = resulting_src_uri
+        self._test_recipe_contents(recipefile, checkvars, [])
 
 class DevtoolBase(DevtoolTestCase):
 
@@ -379,6 +397,22 @@ class DevtoolAddTests(DevtoolBase):
         checkvars['SRCREV'] = srcrev
         checkvars['DEPENDS'] = set(['dbus'])
         self._test_recipe_contents(recipefile, checkvars, [])
+
+    def test_devtool_add_git_style1(self):
+        version = 'v3.1.0'
+        pn = 'mbedtls'
+        # this will trigger reformat_git_uri with branch parameter in url
+        git_url = "'git://git@github.com/ARMmbed/mbedtls.git;branch=mbedtls-2.28;protocol=https'"
+        resulting_src_uri = "git://git@github.com/ARMmbed/mbedtls.git;branch=mbedtls-2.28;protocol=https"
+        self._test_devtool_add_git_url(git_url, version, pn, resulting_src_uri)
+
+    def test_devtool_add_git_style2(self):
+        version = 'v3.1.0'
+        pn = 'mbedtls'
+        # this will trigger reformat_git_uri with branch parameter in url
+        git_url = "'git://git@github.com/ARMmbed/mbedtls.git;protocol=https'"
+        resulting_src_uri = "git://git@github.com/ARMmbed/mbedtls.git;protocol=https;branch=master"
+        self._test_devtool_add_git_url(git_url, version, pn, resulting_src_uri)
 
     def test_devtool_add_library(self):
         # Fetch source
@@ -540,7 +574,7 @@ class DevtoolAddTests(DevtoolBase):
         result = runCmd('devtool status')
         self.assertIn(testrecipe, result.output)
         self.assertIn(srcdir, result.output)
-        # Check recipe
+        # Check recipedevtool add
         recipefile = get_bb_var('FILE', testrecipe)
         self.assertIn('%s_%s.bb' % (testrecipe, testver), recipefile, 'Recipe file incorrectly named')
         checkvars = {}
@@ -1923,7 +1957,6 @@ class DevtoolUpgradeTests(DevtoolBase):
         self._test_recipe_contents(newrecipefile, checkvars, [])
         # Try again - change just name this time
         result = runCmd('devtool reset -n %s' % newrecipename)
-        shutil.rmtree(newsrctree)
         add_recipe()
         newrecipefile = os.path.join(self.workspacedir, 'recipes', newrecipename, '%s_%s.bb' % (newrecipename, recipever))
         result = runCmd('devtool rename %s %s' % (recipename, newrecipename))
@@ -1936,7 +1969,6 @@ class DevtoolUpgradeTests(DevtoolBase):
         self._test_recipe_contents(newrecipefile, checkvars, [])
         # Try again - change just version this time
         result = runCmd('devtool reset -n %s' % newrecipename)
-        shutil.rmtree(newsrctree)
         add_recipe()
         newrecipefile = os.path.join(self.workspacedir, 'recipes', recipename, '%s_%s.bb' % (recipename, newrecipever))
         result = runCmd('devtool rename %s -V %s' % (recipename, newrecipever))

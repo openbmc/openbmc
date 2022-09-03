@@ -1,0 +1,27 @@
+From 8c10181547c93438fc10f753e7164ee004add6d1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 27 Aug 2022 10:28:47 -0700
+Subject: [PATCH] ogginfo: Include utf8.h for missing utf8_decode
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ogginfo/codec_skeleton.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/ogginfo/codec_skeleton.c b/ogginfo/codec_skeleton.c
+index a27f8da..3ac13f6 100644
+--- a/ogginfo/codec_skeleton.c
++++ b/ogginfo/codec_skeleton.c
+@@ -25,6 +25,7 @@
+ #include <ogg/ogg.h>
+ 
+ #include "i18n.h"
++#include "utf8.h" /* utf8_decode */
+ 
+ #include "private.h"
+ 
+-- 
+2.37.2
+

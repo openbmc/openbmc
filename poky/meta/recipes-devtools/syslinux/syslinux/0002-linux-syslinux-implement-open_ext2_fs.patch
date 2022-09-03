@@ -1,7 +1,7 @@
-From 07fb737fb60c08eaaa41989d531fc23009523546 Mon Sep 17 00:00:00 2001
+From c6ddb179577dd4c4ea4d1d154f979e90e53d6bf1 Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Wed, 31 Dec 2014 16:09:18 +0800
-Subject: [PATCH 2/9] linux/syslinux: implement open_ext2_fs()
+Subject: [PATCH] linux/syslinux: implement open_ext2_fs()
 
 The open_ext2_fs() checks whether it is an ext2/ext3/ext4 device, and
 return:
@@ -15,14 +15,14 @@ Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 Tested-by: Du Dolpher <dolpher.du@intel.com>
 ---
  linux/Makefile   |  2 +-
- linux/syslinux.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ linux/syslinux.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++
  2 files changed, 81 insertions(+), 1 deletion(-)
 
 diff --git a/linux/Makefile b/linux/Makefile
-index 11667e1..ac1ac58 100644
+index 5a49d81..67cbbb4 100644
 --- a/linux/Makefile
 +++ b/linux/Makefile
-@@ -51,7 +51,7 @@ spotless: clean
+@@ -52,7 +52,7 @@ spotless: clean
  installer: syslinux syslinux-nomtools
  
  syslinux: $(OBJS)
@@ -32,10 +32,10 @@ index 11667e1..ac1ac58 100644
  syslinux-nomtools: syslinux
  	ln -f $< $@
 diff --git a/linux/syslinux.c b/linux/syslinux.c
-index 36fc202..cc4e7da 100755
+index 1cc276b..f3727ea 100755
 --- a/linux/syslinux.c
 +++ b/linux/syslinux.c
-@@ -72,6 +72,7 @@
+@@ -73,6 +73,7 @@
  #include "syslxfs.h"
  #include "setadv.h"
  #include "syslxopt.h" /* unified options */
@@ -43,7 +43,7 @@ index 36fc202..cc4e7da 100755
  
  extern const char *program;	/* Name of program */
  
-@@ -82,6 +83,9 @@ char *mntpath = NULL;		/* Path on which to mount */
+@@ -83,6 +84,9 @@ char *mntpath = NULL;		/* Path on which to mount */
  int loop_fd = -1;		/* Loop device */
  #endif
  
@@ -53,7 +53,7 @@ index 36fc202..cc4e7da 100755
  void __attribute__ ((noreturn)) die(const char *msg)
  {
      fprintf(stderr, "%s: %s\n", program, msg);
-@@ -266,6 +270,82 @@ int do_open_file(char *name)
+@@ -267,6 +271,82 @@ int do_open_file(char *name)
   */
  static int open_ext2_fs(const char *device, const char *subdir)
  {
@@ -136,6 +136,3 @@ index 36fc202..cc4e7da 100755
  }
  
  /* The install func for ext2, ext3 and ext4 */
--- 
-1.9.1
-

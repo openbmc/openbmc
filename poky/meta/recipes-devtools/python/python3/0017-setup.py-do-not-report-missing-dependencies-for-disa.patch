@@ -1,4 +1,4 @@
-From 246c5ffe75a2d494e415d8a7522df9fe22056d41 Mon Sep 17 00:00:00 2001
+From 311cf9abc213fcd76795cc3a25814a15fb552065 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 7 Oct 2019 13:22:14 +0200
 Subject: [PATCH] setup.py: do not report missing dependencies for disabled
@@ -18,7 +18,7 @@ Signed-off-by: Alejandro Hernandez Samaniego <alejandro@enedino.org>
  1 file changed, 8 insertions(+)
 
 diff --git a/setup.py b/setup.py
-index 2be4738..62f0e18 100644
+index 934cf2e..ccf83b4 100644
 --- a/setup.py
 +++ b/setup.py
 @@ -517,6 +517,14 @@ class PyBuildExt(build_ext):
@@ -35,4 +35,4 @@ index 2be4738..62f0e18 100644
 +
          if self.missing:
              print()
-             print("Python build finished successfully!")
+             print("The necessary bits to build these optional modules were not "

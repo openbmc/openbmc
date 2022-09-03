@@ -13,13 +13,10 @@ inherit autotools lib_package pkgconfig gettext
 
 CFLAGS += "-pthread -D_REENTRANT"
 
-EXTRA_OECONF += "--disable-static --with-gnutls=${STAGING_LIBDIR}/../"
+EXTRA_OECONF += "--disable-static --with-gnutls=${STAGING_LIBDIR}/../ --enable-largefile"
 
 PACKAGECONFIG ?= "curl https"
-PACKAGECONFIG:append:class-target = "\
-        ${@bb.utils.filter('DISTRO_FEATURES', 'largefile', d)} \
-"
-PACKAGECONFIG[largefile] = "--enable-largefile,--disable-largefile,,"
+
 PACKAGECONFIG[curl] = "--enable-curl,--disable-curl,curl,"
 PACKAGECONFIG[https] = "--enable-https,--disable-https,libgcrypt gnutls,"
 

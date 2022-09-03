@@ -28,8 +28,7 @@ CFLAGS:append = " -DDO_UNIX -DDO_IPV6 -D_GNU_SOURCE"
 
 # set the "_FILE_OFFSET_BITS" preprocessor symbol to 64 to support files
 # larger than 2GB
-CFLAGS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'largefile', \
-    ' -D_FILE_OFFSET_BITS=64', '', d)}"
+CFLAGS:append = " -D_FILE_OFFSET_BITS=64"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[sctp] = "--enable-sctp,--disable-sctp,lksctp-tools,"

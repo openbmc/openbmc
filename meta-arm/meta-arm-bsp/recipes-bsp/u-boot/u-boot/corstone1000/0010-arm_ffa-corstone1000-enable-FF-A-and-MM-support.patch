@@ -1,7 +1,7 @@
-From ce6598d255113458fd5c9d19bb7469b721e37f6f Mon Sep 17 00:00:00 2001
+From c0b01dff84d74f1b5aaff0d9b594e0aaec16c744 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Tue, 2 Nov 2021 16:44:39 +0000
-Subject: [PATCH 10/27] arm_ffa: corstone1000: enable FF-A and MM support
+Subject: [PATCH 10/24] arm_ffa: corstone1000: enable FF-A and MM support
 
 This commit allows corstone1000 platform to perform
 MM communication between u-boot and the secure world
@@ -53,5 +53,5 @@ index 8ba0effb0ab2..afc9ccfc192b 100644
  #define CONFIG_SKIP_LOWLEVEL_INIT
  
 -- 
-2.30.2
+2.37.1
 

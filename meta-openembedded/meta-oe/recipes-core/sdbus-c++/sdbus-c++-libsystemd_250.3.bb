@@ -14,6 +14,7 @@ SRCREV = "73be9643910c3f7f3ff84765d63060846c110016"
 SRCBRANCH = "v250-stable"
 SRC_URI = "git://github.com/systemd/systemd-stable.git;protocol=https;branch=${SRCBRANCH} \
            file://static-libsystemd-pkgconfig.patch \
+           file://0001-glibc-Remove-include-linux-fs.h-to-resolve-fsconfig_.patch \
            "
 
 # patches needed by musl

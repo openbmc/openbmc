@@ -1,7 +1,7 @@
-From 5cc889db3279ef4944ab64e36db3dbab1bf9ffa5 Mon Sep 17 00:00:00 2001
+From c9a9a467bb335047812004dd022dcadf9514101f Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Tue, 15 Feb 2022 09:44:10 +0000
-Subject: [PATCH 02/27] arm: add support to corstone1000 platform
+Subject: [PATCH 02/24] arm: add support to corstone1000 platform
 
 Corstone1000 is a platform from arm, which includes pre
 verified Corstone SSE710 sub-system that combines Cortex-A and
@@ -27,10 +27,10 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  board/armltd/corstone1000/Kconfig        |  12 ++
  board/armltd/corstone1000/MAINTAINERS    |   7 +
  board/armltd/corstone1000/Makefile       |   7 +
- board/armltd/corstone1000/corstone1000.c | 121 ++++++++++++++++
+ board/armltd/corstone1000/corstone1000.c | 125 +++++++++++++++++
  configs/corstone1000_defconfig           |  80 +++++++++++
  include/configs/corstone1000.h           |  86 ++++++++++++
- 11 files changed, 548 insertions(+)
+ 11 files changed, 552 insertions(+)
  create mode 100644 arch/arm/dts/corstone1000-fvp.dts
  create mode 100644 arch/arm/dts/corstone1000-mps3.dts
  create mode 100644 arch/arm/dts/corstone1000.dtsi
@@ -42,12 +42,12 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  create mode 100644 include/configs/corstone1000.h
 
 diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index 4567c183fb84..d64051b533a7 100644
+index 9898c7d68e1b..2fc2b7d20f12 100644
 --- a/arch/arm/Kconfig
 +++ b/arch/arm/Kconfig
-@@ -1266,6 +1266,12 @@ config TARGET_VEXPRESS64_JUNO
- 	select USB
- 	imply OF_HAS_PRIOR_STAGE
+@@ -1347,6 +1347,12 @@ config ARCH_VEXPRESS64
+ 	select ENV_IS_IN_FLASH if MTD
+ 	imply DISTRO_DEFAULTS
  
 +config TARGET_CORSTONE1000
 +	bool "Support Corstone1000 Platform"
@@ -58,7 +58,7 @@ index 4567c183fb84..d64051b533a7 100644
  config TARGET_TOTAL_COMPUTE
  	bool "Support Total Compute Platform"
  	select ARM64
-@@ -2198,6 +2204,8 @@ source "arch/arm/mach-nexell/Kconfig"
+@@ -2295,6 +2301,8 @@ source "arch/arm/mach-npcm/Kconfig"
  
  source "board/armltd/total_compute/Kconfig"
  
@@ -68,10 +68,10 @@ index 4567c183fb84..d64051b533a7 100644
  source "board/bosch/guardian/Kconfig"
  source "board/Marvell/octeontx/Kconfig"
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index 644ba961a223..7de25d09c9fe 100644
+index a7e0d9f6c0e8..8c8f15b6a813 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
-@@ -1215,6 +1215,9 @@ dtb-$(CONFIG_TARGET_EA_LPC3250DEVKITV2) += lpc3250-ea3250.dtb
+@@ -1265,6 +1265,9 @@ dtb-$(CONFIG_TARGET_EA_LPC3250DEVKITV2) += lpc3250-ea3250.dtb
  
  dtb-$(CONFIG_ARCH_QEMU) += qemu-arm.dtb qemu-arm64.dtb
  
@@ -369,10 +369,10 @@ index 000000000000..77a82c28929b
 +obj-y	:= corstone1000.o
 diff --git a/board/armltd/corstone1000/corstone1000.c b/board/armltd/corstone1000/corstone1000.c
 new file mode 100644
-index 000000000000..eff1739f0b02
+index 000000000000..2fa485ff3799
 --- /dev/null
 +++ b/board/armltd/corstone1000/corstone1000.c
-@@ -0,0 +1,121 @@
+@@ -0,0 +1,125 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * (C) Copyright 2022 ARM Limited
@@ -451,6 +451,10 @@ index 000000000000..eff1739f0b02
 +};
 +
 +struct mm_region *mem_map = corstone1000_mem_map;
++
++void set_dfu_alt_info(char *interface, char *devstr)
++{
++}
 +
 +int board_init(void)
 +{
@@ -673,5 +677,5 @@ index 000000000000..cf166f107efd
 +				"bootefi $kernel_addr_r $fdtcontroladdr;"
 +#endif
 -- 
-2.30.2
+2.37.1
 

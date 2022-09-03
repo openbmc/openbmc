@@ -1,3 +1,8 @@
+#
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake
 
@@ -134,7 +139,7 @@ INCOMPATIBLE_LICENSE:pn-core-image-minimal = "GPL-3.0* LGPL-3.0*"
 
     def test_core_image_full_cmdline_weston(self):
         self.write_config("""
-INHERIT += "testimage"
+IMAGE_CLASSES += "testimage"
 INCOMPATIBLE_LICENSE:pn-core-image-full-cmdline = "GPL-3.0* LGPL-3.0*"
 INCOMPATIBLE_LICENSE:pn-core-image-weston = "GPL-3.0* LGPL-3.0*"
 # Settings for full-cmdline

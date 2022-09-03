@@ -1,4 +1,4 @@
-From bf1603b3d73f64de777be00f7e55f2cfef596102 Mon Sep 17 00:00:00 2001
+From ce4e796fa8bd2df962cf7a0e4bc69ab6181e4ebf Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 3 Aug 2018 09:55:12 -0700
 Subject: [PATCH] nativesdk-glibc: Make relocatable install for locales
@@ -19,7 +19,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  4 files changed, 8 insertions(+), 7 deletions(-)
 
 diff --git a/locale/findlocale.c b/locale/findlocale.c
-index 5986373edd..856ba9afc0 100644
+index fc433b61d8..d6f030f13c 100644
 --- a/locale/findlocale.c
 +++ b/locale/findlocale.c
 @@ -55,7 +55,7 @@ struct __locale_data *const _nl_C[] attribute_hidden =
@@ -41,7 +41,7 @@ index 5986373edd..856ba9afc0 100644
    else
      /* We really have to load some data.  First see whether the name is
 diff --git a/locale/loadarchive.c b/locale/loadarchive.c
-index 512769eaec..436619091b 100644
+index fcc4913319..62cae8c6c0 100644
 --- a/locale/loadarchive.c
 +++ b/locale/loadarchive.c
 @@ -42,7 +42,7 @@
@@ -54,10 +54,10 @@ index 512769eaec..436619091b 100644
  /* Size of initial mapping window, optimal if large enough to
     cover the header plus the initial locale.  */
 diff --git a/locale/localeinfo.h b/locale/localeinfo.h
-index b3d4da0185..22f9dc1140 100644
+index fd43033a19..3dc26272a0 100644
 --- a/locale/localeinfo.h
 +++ b/locale/localeinfo.h
-@@ -331,7 +331,7 @@ _nl_lookup_word (locale_t l, int category, int item)
+@@ -347,7 +347,7 @@ _nl_lookup_word (locale_t l, int category, int item)
  }
  
  /* Default search path if no LOCPATH environment variable.  */
@@ -67,7 +67,7 @@ index b3d4da0185..22f9dc1140 100644
  /* Load the locale data for CATEGORY from the file specified by *NAME.
     If *NAME is "", use environment variables as specified by POSIX, and
 diff --git a/locale/programs/locale.c b/locale/programs/locale.c
-index e9275d6b83..a9109155e5 100644
+index 1b51b50d68..87c9049444 100644
 --- a/locale/programs/locale.c
 +++ b/locale/programs/locale.c
 @@ -631,6 +631,7 @@ nameentcmp (const void *a, const void *b)

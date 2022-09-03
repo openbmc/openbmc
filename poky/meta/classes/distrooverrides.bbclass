@@ -1,3 +1,9 @@
+#
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
+
 # Turns certain DISTRO_FEATURES into overrides with the same
 # name plus a df- prefix. Ensures that these special
 # distro features remain set also for native and nativesdk

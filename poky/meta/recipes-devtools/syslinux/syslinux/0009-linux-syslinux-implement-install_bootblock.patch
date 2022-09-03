@@ -1,7 +1,7 @@
-From 76c465e87312dbc6cffd05427f1f4d2ebdee4f13 Mon Sep 17 00:00:00 2001
+From c28aae8bd381f77e66e6bac79761df7a484b054c Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Fri, 2 Jan 2015 12:28:35 +0800
-Subject: [PATCH 9/9] linux/syslinux: implement install_bootblock()
+Subject: [PATCH] linux/syslinux: implement install_bootblock()
 
 Refer to the install_bootblock() in extlinux/main.c to make
 linux/syslinux.c's install_bootblock() which only supports ext2/3/4.
@@ -15,10 +15,10 @@ Tested-by: Du Dolpher <dolpher.du@intel.com>
  1 file changed, 20 insertions(+)
 
 diff --git a/linux/syslinux.c b/linux/syslinux.c
-index c741750..917f83a 100755
+index 4e43921..93ed880 100755
 --- a/linux/syslinux.c
 +++ b/linux/syslinux.c
-@@ -419,6 +419,26 @@ static int ext_file_write(ext2_file_t e2_file, const void *buf, size_t count,
+@@ -420,6 +420,26 @@ static int ext_file_write(ext2_file_t e2_file, const void *buf, size_t count,
   */
  int install_bootblock(int fd, const char *device)
  {
@@ -45,6 +45,3 @@ index c741750..917f83a 100755
  }
  
  /* The file's block count */
--- 
-1.9.1
-

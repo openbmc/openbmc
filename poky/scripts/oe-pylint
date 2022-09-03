@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: GPL-2.0-only
 #
 # Run the pylint3 against our common python module spaces and print a report of potential issues

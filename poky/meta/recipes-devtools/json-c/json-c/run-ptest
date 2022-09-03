@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# This script is used to run json-c test suites
+cd tests
+
+ret_val=0
+for i in test*.test; do
+    # test_basic is not an own testcase, just
+    # contains common code of other tests
+    if [ "$i" != "test_basic.test" ]; then
+        if ./$i > json-c_test.log 2>&1 ; then
+            echo PASS: $i
+        else
+            ret_val=1
+            echo FAIL: $i
+        fi
+    fi
+done
+
+exit $ret_val

@@ -1,0 +1,26 @@
+Binutils 2.39 now warns when a segment has RXW permissions[1]:
+
+aarch64-poky-linux-musl-ld: tftf.elf has a LOAD segment with RWX permissions
+
+There is a ticket filed upstream[2], so until that is resolved just
+disable the warning
+
+[1] https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=ba951afb99912da01a6e8434126b8fac7aa75107
+[2] https://developer.trustedfirmware.org/T996
+
+Upstream-Status: Inappropriate
+Signed-off-by: Anton Antonov <anrton.antonov@arm.com>
+
+diff --git a/Makefile b/Makefile
+index 6d0774e1..be3f84ce 100644
+--- a/Makefile
++++ b/Makefile
+@@ -238,7 +238,7 @@ TFTF_SOURCES		:= ${FRAMEWORK_SOURCES}	${TESTS_SOURCES} ${PLAT_SOURCES} ${LIBC_SR
+ TFTF_INCLUDES		+= ${PLAT_INCLUDES}
+ TFTF_CFLAGS		+= ${COMMON_CFLAGS}
+ TFTF_ASFLAGS		+= ${COMMON_ASFLAGS}
+-TFTF_LDFLAGS		+= ${COMMON_LDFLAGS}
++TFTF_LDFLAGS		+= ${COMMON_LDFLAGS} --no-warn-rwx-segments
+ TFTF_EXTRA_OBJS 	:=
+ 
+ ifneq (${BP_OPTION},none)

@@ -1,0 +1,26 @@
+From 71dab751a27a2e582b711de22873065dd28f4b65 Mon Sep 17 00:00:00 2001
+From: Paulo Neves <ptsneves@gmail.com>
+Date: Thu, 28 Jul 2022 11:42:31 +0200
+Subject: [PATCH] flb_info.h.in: Do not hardcode compilation directories
+
+Including the source dir in the header makes the header not
+reproducible and contaminates it with host builder paths. Instead
+make it take CMAKE_DEBUG_SRCDIR that can be set to a known
+reproducible value
+---
+ include/fluent-bit/flb_info.h.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/fluent-bit/flb_info.h.in b/include/fluent-bit/flb_info.h.in
+index a89485c..2579afc 100644
+--- a/include/fluent-bit/flb_info.h.in
++++ b/include/fluent-bit/flb_info.h.in
+@@ -23,7 +23,7 @@
+ #define STR_HELPER(s)      #s
+ #define STR(s)             STR_HELPER(s)
+ 
+-#define FLB_SOURCE_DIR "@CMAKE_SOURCE_DIR@"
++#define FLB_SOURCE_DIR "@CMAKE_DEBUG_SRCDIR@"
+ 
+ /* General flags set by CMakeLists.txt */
+ @FLB_BUILD_FLAGS@

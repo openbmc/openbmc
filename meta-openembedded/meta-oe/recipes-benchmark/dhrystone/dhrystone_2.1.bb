@@ -22,5 +22,6 @@ do_install() {
 
 # Prevent procedure merging as required by dhrystone.c:
 CFLAGS += "-fno-lto"
+CFLAGS:append:toolchain-clang = " -Wno-error=implicit-function-declaration -Wno-error=deprecated-non-prototype -Wno-error=implicit-int"
 
 LDFLAGS += "-fno-lto"

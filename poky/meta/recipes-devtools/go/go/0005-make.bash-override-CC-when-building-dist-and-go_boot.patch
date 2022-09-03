@@ -1,4 +1,4 @@
-From 153e2dda6103fd9dd871be4bb495a8da5328301e Mon Sep 17 00:00:00 2001
+From 8f020921c464e95ded850950382115154448580a Mon Sep 17 00:00:00 2001
 From: Alex Kube <alexander.j.kube@gmail.com>
 Date: Wed, 23 Oct 2019 21:17:16 +0430
 Subject: [PATCH] make.bash: override CC when building dist and go_bootstrap
@@ -17,18 +17,20 @@ Signed-off-by: Alexander J Kube <alexander.j.kube@gmail.com>
  src/make.bash | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/src/make.bash b/src/make.bash
+index ab2ce19..37ec1fb 100755
 --- a/src/make.bash
 +++ b/src/make.bash
-@@ -195,7 +195,7 @@ if [ "$GOROOT_BOOTSTRAP" = "$GOROOT" ];
+@@ -198,7 +198,7 @@ if [ "$GOROOT_BOOTSTRAP" = "$GOROOT" ]; then
  	exit 1
  fi
  rm -f cmd/dist/dist
--GOROOT="$GOROOT_BOOTSTRAP" GOOS="" GOARCH="" GO111MODULE=off "$GOROOT_BOOTSTRAP/bin/go" build -o cmd/dist/dist ./cmd/dist
-+CC="${BUILD_CC:-${CC}}" GOROOT="$GOROOT_BOOTSTRAP" GOOS="" GOARCH="" GO111MODULE=off "$GOROOT_BOOTSTRAP/bin/go" build -o cmd/dist/dist ./cmd/dist
+-GOROOT="$GOROOT_BOOTSTRAP" GOOS="" GOARCH="" GO111MODULE=off GOEXPERIMENT="" GOENV=off GOFLAGS="" "$GOROOT_BOOTSTRAP/bin/go" build -o cmd/dist/dist ./cmd/dist
++CC="${BUILD_CC:-${CC}}" GOROOT="$GOROOT_BOOTSTRAP" GOOS="" GOARCH="" GO111MODULE=off GOEXPERIMENT="" GOENV=off GOFLAGS="" "$GOROOT_BOOTSTRAP/bin/go" build -o cmd/dist/dist ./cmd/dist
  
  # -e doesn't propagate out of eval, so check success by hand.
  eval $(./cmd/dist/dist env -p || echo FAIL=true)
-@@ -220,7 +220,7 @@ fi
+@@ -223,7 +223,7 @@ fi
  # Run dist bootstrap to complete make.bash.
  # Bootstrap installs a proper cmd/dist, built with the new toolchain.
  # Throw ours, built with Go 1.4, away after bootstrap.

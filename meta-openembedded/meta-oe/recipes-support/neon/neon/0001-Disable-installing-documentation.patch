@@ -1,0 +1,28 @@
+From f477408f1c24ce6e5589e5a99d369279916c7c6e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 24 Aug 2022 13:11:12 -0700
+Subject: [PATCH] Disable installing documentation
+
+It does not build
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index ed87a69..c32405c 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -125,7 +125,7 @@ Makefile: $(srcdir)/Makefile.in
+ neon-config: $(srcdir)/neon-config.in
+ 	@./config.status neon-config
+ 
+-install-docs: install-man install-html
++install-docs:
+ 
+ install-html:
+ 	$(INSTALL) -d $(DESTDIR)$(docdir)/html
+-- 
+2.37.2
+

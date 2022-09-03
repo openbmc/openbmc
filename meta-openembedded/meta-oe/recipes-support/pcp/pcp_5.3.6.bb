@@ -34,7 +34,7 @@ USERADD_PACKAGES = "${PN}"
 USERADD_PARAM:${PN} = "--system --home ${localstatedir}/lib/pcp --no-create-home \
                        --user-group pcp"
 
-USERADD_PACKAGES = "${PN}-testsuite"
+USERADD_PACKAGES += "${PN}-testsuite"
 USERADD_PARAM:${PN}-testsuite = "--system --home ${localstatedir}/lib/pcp/testsuite --no-create-home \
                        --user-group pcpqa"
 

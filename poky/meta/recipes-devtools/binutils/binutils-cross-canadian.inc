@@ -27,4 +27,6 @@ do_install () {
 	cross_canadian_bindirlinks
 }
 
+FILES:${PN} += "${sysconfdir}/gprofng.rc"
+
 BBCLASSEXTEND = ""

@@ -171,6 +171,13 @@ qemuarm64-secureboot:
         TCLIBC: [glibc, musl]
         TESTING: testimage
 
+qemuarm64-secureboot-ts:
+  extends: .build
+  parallel:
+    matrix:
+      - TCLIBC: [glibc, musl]
+        TESTING: testimage
+
 qemuarm64:
   extends: .build
   parallel:

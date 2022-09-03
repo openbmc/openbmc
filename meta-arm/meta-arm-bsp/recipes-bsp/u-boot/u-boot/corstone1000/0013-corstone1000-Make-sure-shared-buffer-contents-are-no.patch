@@ -1,7 +1,7 @@
-From 67a755f74716068cfd44a8897c31151fe9ee4328 Mon Sep 17 00:00:00 2001
+From 370422921b2a3f4f7b73ce5b08820c24e82bba19 Mon Sep 17 00:00:00 2001
 From: Gowtham Suresh Kumar <gowtham.sureshkumar@arm.com>
 Date: Thu, 18 Nov 2021 16:42:59 +0000
-Subject: [PATCH 13/27] corstone1000: Make sure shared buffer contents are not
+Subject: [PATCH 13/24] corstone1000: Make sure shared buffer contents are not
  cached
 
 After updating the shared buffer, it is required to flush the cache
@@ -48,5 +48,5 @@ index 9cb8cfb9c779..b6be2b54a030 100644
  
  	ffa_ret = ffa_notify_mm_sp();
 -- 
-2.30.2
+2.37.1
 

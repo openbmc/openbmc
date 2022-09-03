@@ -13,6 +13,7 @@ SRC_URI = "git://github.com/jpirko/libteam;branch=master;protocol=https \
            file://0001-team_basic_test.py-disable-RedHat-specific-test.patch \
            file://0001-team_basic_test.py-switch-to-python3.patch \
            file://0001-team_basic_test.py-check-the-return-value.patch \
+           file://0001-teamd-Include-missing-headers-for-strrchr-and-memcmp.patch \
            file://run-ptest \
            "
 SRCREV = "3ee12c6d569977cf1cd30d0da77807a07aa77158"

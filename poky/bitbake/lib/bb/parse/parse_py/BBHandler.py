@@ -44,23 +44,36 @@ def inherit(files, fn, lineno, d):
     __inherit_cache = d.getVar('__inherit_cache', False) or []
     files = d.expand(files).split()
     for file in files:
-        if not os.path.isabs(file) and not file.endswith(".bbclass"):
-            file = os.path.join('classes', '%s.bbclass' % file)
+        classtype = d.getVar("__bbclasstype", False)
+        origfile = file
+        for t in ["classes-" + classtype, "classes"]:
+            file = origfile
+            if not os.path.isabs(file) and not file.endswith(".bbclass"):
+                file = os.path.join(t, '%s.bbclass' % file)
 
-        if not os.path.isabs(file):
-            bbpath = d.getVar("BBPATH")
-            abs_fn, attempts = bb.utils.which(bbpath, file, history=True)
-            for af in attempts:
-                if af != abs_fn:
-                    bb.parse.mark_dependency(d, af)
-            if abs_fn:
-                file = abs_fn
+            if not os.path.isabs(file):
+                bbpath = d.getVar("BBPATH")
+                abs_fn, attempts = bb.utils.which(bbpath, file, history=True)
+                for af in attempts:
+                    if af != abs_fn:
+                        bb.parse.mark_dependency(d, af)
+                if abs_fn:
+                    file = abs_fn
+
+            if os.path.exists(file):
+                break
+
+        if not os.path.exists(file):
+            raise ParseError("Could not inherit file %s" % (file), fn, lineno)
 
         if not file in __inherit_cache:
             logger.debug("Inheriting %s (from %s:%d)" % (file, fn, lineno))
             __inherit_cache.append( file )
             d.setVar('__inherit_cache', __inherit_cache)
-            include(fn, file, lineno, d, "inherit")
+            try:
+                bb.parse.handle(file, d, True)
+            except (IOError, OSError) as exc:
+                raise ParseError("Could not inherit file %s: %s" % (fn, exc.strerror), fn, lineno)
             __inherit_cache = d.getVar('__inherit_cache', False) or []
 
 def get_statements(filename, absolute_filename, base_name):

@@ -1,0 +1,49 @@
+From cbcd19f38ae4b31c57c57ce3619b8d2674defb68 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 28 Aug 2022 08:11:27 -0700
+Subject: [PATCH] netifaces: initialize msghdr in a portable way
+
+musl has padding bytes inside the msghdr struct which means initializing
+full structure will cause wrong assignments, doing partial assignment is
+more portable and assign the elements after that
+
+Fixes
+netifaces.c:1808:9: error: incompatible pointer to integer conversion initializing 'int' with an expression of type 'void *' [-Wint-conversion]
+        NULL,
+        ^~~~
+
+Upstream-Status: Inappropriate [Upstream Repo is read-only]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ netifaces.c | 15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
+
+diff --git a/netifaces.c b/netifaces.c
+index 839c42c..7da78e7 100644
+--- a/netifaces.c
++++ b/netifaces.c
+@@ -1800,15 +1800,12 @@ gateways (PyObject *self)
+     do {
+       struct sockaddr_nl sanl_from;
+       struct iovec iov = { msgbuf, bufsize };
+-      struct msghdr msghdr = {
+-        &sanl_from,
+-        sizeof(sanl_from),
+-        &iov,
+-        1,
+-        NULL,
+-        0,
+-        0
+-      };
++      struct msghdr msghdr = { 0 };
++
++      msghdr.msg_name = &sanl_from;
++      msghdr.msg_namelen = sizeof(sanl_from);
++      msghdr.msg_iov = &iov;
++      msghdr.msg_iovlen = 1;
+       int nllen;
+ 
+       ret = recvmsg (s, &msghdr, 0);
+-- 
+2.37.2
+

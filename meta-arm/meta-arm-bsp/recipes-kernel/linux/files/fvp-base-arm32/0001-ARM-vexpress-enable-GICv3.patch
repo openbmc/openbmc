@@ -1,4 +1,4 @@
-From 5dbb6c4267b1e46ed08359be363d8bc9b6a79397 Mon Sep 17 00:00:00 2001
+From 9fe529a146f4528ec80a3d04588e387f3651dc22 Mon Sep 17 00:00:00 2001
 From: Ryan Harkin <ryan.harkin@linaro.org>
 Date: Wed, 16 Nov 2016 14:43:02 +0000
 Subject: [PATCH] ARM: vexpress: enable GICv3
@@ -11,21 +11,21 @@ ARMv7 kernel.  And these targets often contain GICv3.
 Signed-off-by: Ryan Harkin <ryan.harkin@linaro.org>
 Signed-off-by: Jon Medhurst <tixy@linaro.org>
 ---
- arch/arm/mach-vexpress/Kconfig | 1 +
+ arch/arm/mach-versatile/Kconfig | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm/mach-vexpress/Kconfig b/arch/arm/mach-vexpress/Kconfig
-index 7c728ebc0b33..ed579382d41f 100644
---- a/arch/arm/mach-vexpress/Kconfig
-+++ b/arch/arm/mach-vexpress/Kconfig
-@@ -4,6 +4,7 @@ menuconfig ARCH_VEXPRESS
- 	select ARCH_SUPPORTS_BIG_ENDIAN
+diff --git a/arch/arm/mach-versatile/Kconfig b/arch/arm/mach-versatile/Kconfig
+index 2ef226194c3a..3d54877fe339 100644
+--- a/arch/arm/mach-versatile/Kconfig
++++ b/arch/arm/mach-versatile/Kconfig
+@@ -251,6 +251,7 @@ menuconfig ARCH_VEXPRESS
+ 	depends on ARCH_MULTI_V7
  	select ARM_AMBA
  	select ARM_GIC
 +	select ARM_GIC_V3
  	select ARM_GLOBAL_TIMER
  	select ARM_TIMER_SP804
- 	select COMMON_CLK_VERSATILE
+ 	select GPIOLIB
 -- 
-2.17.1
+2.30.2
 

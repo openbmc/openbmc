@@ -20,6 +20,7 @@ EXTRA_OECONF:append:libc-musl = " LIBS=-lfts "
 # earlier in CFLAGS, etc.
 CFLAGS:append:x86-64 = " -fomit-frame-pointer"
 TUNE_CCARGS:remove:x86 = "-mfpmath=sse"
+TUNE_CCARGS:remove:x86-64 = "-mfpmath=sse"
 
 CFLAGS:append:powerpc64 = " -D__SANE_USERSPACE_TYPES__"
 CFLAGS:append:mipsarchn64 = " -D__SANE_USERSPACE_TYPES__"
@@ -37,6 +38,9 @@ SRC_URI = "git://github.com/linux-test-project/ltp.git;branch=master;protocol=ht
            file://0001-netstress-Restore-runtime-to-5m.patch \
            file://0001-net_stress-Fix-usage-of-variables-from-tst_net.sh.patch \
            file://0001-memcg-functional-Fix-usage-of-PAGESIZE-from-memcg_li.patch \
+           file://0001-lapi-pidfd-adding-pidfd-header-file.patch \
+           file://0001-lapi-fsmount-resolve-conflict-in-different-header-fi.patch \
+           file://0001-rt-migrate-Use-int-instead-of-pthread_t-for-thread-I.patch \
            "
 
 S = "${WORKDIR}/git"

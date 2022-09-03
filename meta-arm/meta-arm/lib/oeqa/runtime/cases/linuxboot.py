@@ -12,7 +12,8 @@ class LinuxBootTest(OERuntimeTestCase):
 
     def setUp(self):
         self.console = self.target.DEFAULT_CONSOLE
+        self.timeout = int(self.td.get('TEST_FVP_LINUX_BOOT_TIMEOUT') or 10*60)
 
     def test_linux_boot(self):
         self.logger.info(f"{self.console}: Waiting for login prompt")
-        self.target.expect(self.console, r"login\:", timeout=10*60)
+        self.target.expect(self.console, r"login\:", self.timeout)

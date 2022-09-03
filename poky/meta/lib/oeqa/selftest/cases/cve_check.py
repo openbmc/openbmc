@@ -1,3 +1,9 @@
+#
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
+
 import json
 import os
 from oeqa.selftest.case import OESelftestTestCase

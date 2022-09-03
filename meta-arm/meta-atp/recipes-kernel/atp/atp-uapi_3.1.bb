@@ -1,5 +1,4 @@
 require recipes-devtools/atp/atp-source_3.1.inc
-inherit package
 
 SUMMARY = "User API for accessing services from ATP kernel modules"
 SECTION = "kernel/userland"

@@ -1,7 +1,7 @@
-From 81bf9ed7e8e858cef13cfc3d1435c44445e523df Mon Sep 17 00:00:00 2001
+From 4c249de0915750b328e456c34f18546f92850afd Mon Sep 17 00:00:00 2001
 From: Vishnu Banavath <vishnu.banavath@arm.com>
 Date: Fri, 10 Dec 2021 20:03:35 +0000
-Subject: [PATCH 15/27] efi_capsule: corstone1000: pass interface id and buffer
+Subject: [PATCH 15/24] efi_capsule: corstone1000: pass interface id and buffer
  event id using register w4
 
 Initially the interface/event IDs are passed to the SP using register
@@ -39,10 +39,10 @@ index db0f91335cef..a7445e61348b 100644
  #define CORSTONE1000_CAPSULE_BUFFER_SIZE	(8192) /* 32 MB */
  
 diff --git a/lib/efi_loader/efi_capsule.c b/lib/efi_loader/efi_capsule.c
-index c100c1b95298..17d769803b2a 100644
+index a0689ba912fc..e08e97cf3fb7 100644
 --- a/lib/efi_loader/efi_capsule.c
 +++ b/lib/efi_loader/efi_capsule.c
-@@ -27,6 +27,8 @@
+@@ -28,6 +28,8 @@
  #ifdef CONFIG_TARGET_CORSTONE1000
  #include <arm_ffa_helper.h>
  #include <cpu_func.h>
@@ -51,7 +51,7 @@ index c100c1b95298..17d769803b2a 100644
  
  void *__efi_runtime_data corstone1000_capsule_buf; /* capsule shared buffer virtual address */
  efi_guid_t corstone1000_capsule_guid = EFI_CORSTONE1000_CAPSULE_ID_GUID;
-@@ -587,11 +589,12 @@ static int __efi_runtime efi_corstone1000_buffer_ready_event(u32 capsule_image_s
+@@ -590,11 +592,12 @@ static int __efi_runtime efi_corstone1000_buffer_ready_event(u32 capsule_image_s
  	func_data.data0 = &part_id;
  
  	/*
@@ -69,5 +69,5 @@ index c100c1b95298..17d769803b2a 100644
  	func_data.data1_size = sizeof(msg);
  	func_data.data1 = &msg;
 -- 
-2.30.2
+2.37.1
 

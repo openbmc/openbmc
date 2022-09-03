@@ -8,7 +8,9 @@ DEPENDS = "expat libxml2 libxml2-native neon neon-native libmusicbrainz-native"
 PV = "5.1.0+git${SRCPV}"
 
 SRCREV = "8be45b12a86bc0e46f2f836c8ac88e1e98d82aee"
-SRC_URI = "git://github.com/metabrainz/libmusicbrainz.git;branch=master;protocol=https"
+SRC_URI = "git://github.com/metabrainz/libmusicbrainz.git;branch=master;protocol=https \
+           file://0001-http-fetch-Pass-a-non-null-buffer-to-ne_set_request_.patch \
+           "
 
 S = "${WORKDIR}/git"
 

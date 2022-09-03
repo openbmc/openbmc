@@ -12,4 +12,4 @@ part --source rawcopy --sourceparams="file=tfm_s_signed.bin" --align 1 --no-tabl
 part --source rawcopy --sourceparams="file=signed_fip-corstone1000.bin" --align 1 --no-table --fixed-size 2
 
 # Rawcopy of kernel with initramfs
-part --source rawcopy --sourceparams="file=Image-initramfs-${MACHINE}.bin" --no-table --fixed-size 12
+part --source rawcopy --sourceparams="file=Image.gz-initramfs-${MACHINE}.bin" --no-table --fixed-size 12

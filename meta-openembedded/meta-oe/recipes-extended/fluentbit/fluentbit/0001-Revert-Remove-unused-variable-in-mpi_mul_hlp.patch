@@ -1,0 +1,42 @@
+From af6cefba8c2675f58b75f93785337ab23054568c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 18 Aug 2022 23:35:23 -0700
+Subject: [PATCH] Revert Remove unused variable in mpi_mul_hlp()
+
+This reverts
+https://github.com/Mbed-TLS/mbedtls/commit/e7f14a3090e6595eb3c8d821704ad9c90f6d3712
+
+Which helps in compiling the x86 asm code.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/mbedtls-2.28.0/library/bignum.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/lib/mbedtls-2.28.0/library/bignum.c b/lib/mbedtls-2.28.0/library/bignum.c
+index 9c256ae..62e7f76 100644
+--- a/lib/mbedtls-2.28.0/library/bignum.c
++++ b/lib/mbedtls-2.28.0/library/bignum.c
+@@ -1392,7 +1392,7 @@ void mpi_mul_hlp( size_t i,
+                   mbedtls_mpi_uint *d,
+                   mbedtls_mpi_uint b )
+ {
+-    mbedtls_mpi_uint c = 0;
++    mbedtls_mpi_uint c = 0, t = 0;
+ 
+ #if defined(MULADDC_HUIT)
+     for( ; i >= 8; i -= 8 )
+@@ -1443,6 +1443,8 @@ void mpi_mul_hlp( size_t i,
+     }
+ #endif /* MULADDC_HUIT */
+ 
++    t++;
++
+     while( c != 0 )
+     {
+         *d += c; c = ( *d < c ); d++;
+-- 
+2.37.2
+

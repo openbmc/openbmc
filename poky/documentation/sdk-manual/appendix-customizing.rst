@@ -1,11 +1,17 @@
 .. SPDX-License-Identifier: CC-BY-SA-2.0-UK
 
-******************************
-Customizing the Extensible SDK
-******************************
+***************************************************
+Customizing the Extensible SDK standalone installer
+***************************************************
 
 This appendix describes customizations you can apply to the extensible
-SDK.
+SDK when using in the standalone installer version.
+
+.. note::
+
+   It is also possible to use the Extensible SDK functionality directly in a
+   Yocto build, avoiding separate installer artefacts. Please refer to
+   ":ref:`sdk-manual/extensible:Installing the Extensible SDK`"
 
 Configuring the Extensible SDK
 ==============================

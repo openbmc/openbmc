@@ -1,0 +1,151 @@
+From 4e102de2e6204c1d8e8be00bb5ffd4587e70350c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 15 Aug 2022 10:35:53 -0700
+Subject: [PATCH] configure: Add needed system headers in checks
+
+Newer compilers throw warnings when a funciton is used with implicit
+declaration and enabling -Werror can silently fail these tests and
+result in wrong configure results. Therefore add the needed headers in
+the AC_TRY_LINK macros
+
+	* configure.ac: Add missing system headers in AC_TRY_LINK.
+
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/screen-devel/2022-08/msg00000.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 57 +++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 43 insertions(+), 14 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index c0f02df..d308079 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -233,6 +233,7 @@ AC_CHECKING(BSD job jontrol)
+ AC_TRY_LINK(
+ [#include <sys/types.h>
+ #include <sys/ioctl.h>
++#include <unistd.h>
+ ], [
+ #ifdef POSIX
+ tcsetpgrp(0, 0);
+@@ -250,12 +251,16 @@ dnl
+ dnl    ****  setresuid(), setreuid(), seteuid()  ****
+ dnl
+ AC_CHECKING(setresuid)
+-AC_TRY_LINK(,[
+-setresuid(0, 0, 0);
++AC_TRY_LINK([
++#include <unistd.h>
++],[
++return setresuid(0, 0, 0);
+ ], AC_DEFINE(HAVE_SETRESUID))
+ AC_CHECKING(setreuid)
+-AC_TRY_LINK(,[
+-setreuid(0, 0);
++AC_TRY_LINK([
++#include <unistd.h>
++],[
++return setreuid(0, 0);
+ ], AC_DEFINE(HAVE_SETREUID))
+ dnl
+ dnl seteuid() check:
+@@ -274,7 +279,9 @@ seteuid(0);
+ 
+ dnl execvpe
+ AC_CHECKING(execvpe)
+-AC_TRY_LINK(,[
++AC_TRY_LINK([
++    #include <unistd.h>
++],[
+     execvpe(0, 0, 0);
+ ], AC_DEFINE(HAVE_EXECVPE)
+ CFLAGS="$CFLAGS -D_GNU_SOURCE")
+@@ -284,10 +291,18 @@ dnl    ****  select()  ****
+ dnl
+ 
+ AC_CHECKING(select)
+-AC_TRY_LINK(,[select(0, 0, 0, 0, 0);],, 
++AC_TRY_LINK([
++    #include <sys/select.h>
++],[
++    select(0, 0, 0, 0, 0);
++],, 
+ LIBS="$LIBS -lnet -lnsl"
+ AC_CHECKING(select with $LIBS)
+-AC_TRY_LINK(,[select(0, 0, 0, 0, 0);],, 
++AC_TRY_LINK([
++    #include <sys/select.h>
++],[
++    select(0, 0, 0, 0, 0);
++],, 
+ AC_MSG_ERROR(!!! no select - no screen))
+ )
+ dnl
+@@ -624,11 +639,19 @@ dnl
+ dnl    ****  termcap or terminfo  ****
+ dnl
+ AC_CHECKING(for tgetent)
+-AC_TRY_LINK(,tgetent((char *)0, (char *)0);,,
++AC_TRY_LINK([
++    #include <curses.h>
++    #include <term.h>
++],[
++    tgetent((char *)0, (char *)0);
++],,
+ olibs="$LIBS"
+ LIBS="-lcurses $olibs"
+ AC_CHECKING(libcurses)
+-AC_TRY_LINK(,[
++AC_TRY_LINK([
++    #include <curses.h>
++    #include <term.h>
++],[
+ #ifdef __hpux
+ __sorry_hpux_libcurses_is_totally_broken_in_10_10();
+ #else
+@@ -871,7 +894,7 @@ test -f /usr/lib/libutil.a && LIBS="$LIBS -lutil"
+ fi
+ 
+ AC_CHECKING(getloadavg)
+-AC_TRY_LINK(,[getloadavg((double *)0, 0);],
++AC_TRY_LINK([#include <stdlib.h>],[getloadavg((double *)0, 0);],
+ AC_DEFINE(LOADAV_GETLOADAVG) load=1,
+ if test "$cross_compiling" = no && test -f /usr/lib/libkvm.a ; then
+ olibs="$LIBS"
+@@ -1109,10 +1132,10 @@ AC_CHECKING(IRIX sun library)
+ AC_TRY_LINK(,,,LIBS="$oldlibs")
+ 
+ AC_CHECKING(syslog)
+-AC_TRY_LINK(,[closelog();], , [oldlibs="$LIBS"
++AC_TRY_LINK([#include <syslog.h>],[closelog();], , [oldlibs="$LIBS"
+ LIBS="$LIBS -lbsd"
+ AC_CHECKING(syslog in libbsd.a)
+-AC_TRY_LINK(, [closelog();], AC_NOTE(- found.), [LIBS="$oldlibs"
++AC_TRY_LINK([#include <syslog.h>], [closelog();], AC_NOTE(- found.), [LIBS="$oldlibs"
+ AC_NOTE(- bad news: syslog missing.) AC_DEFINE(NOSYSLOG)])])
+ 
+ AC_EGREP_CPP(YES_IS_DEFINED,
+@@ -1149,7 +1172,7 @@ AC_CHECKING(getspnam)
+ AC_TRY_LINK([#include <shadow.h>], [getspnam("x");],AC_DEFINE(SHADOWPW))
+ 
+ AC_CHECKING(getttyent)
+-AC_TRY_LINK(,[getttyent();], AC_DEFINE(GETTTYENT))
++AC_TRY_LINK([#include <ttyent.h>],[getttyent();], AC_DEFINE(GETTTYENT))
+ 
+ AC_CHECKING(fdwalk)
+ AC_TRY_LINK([#include <stdlib.h>], [fdwalk(NULL, NULL);],AC_DEFINE(HAVE_FDWALK))
+@@ -1204,7 +1227,13 @@ main() {
+ AC_SYS_LONG_FILE_NAMES
+ 
+ AC_MSG_CHECKING(for vsprintf)
+-AC_TRY_LINK([#include <stdarg.h>],[va_list valist; vsprintf(0,0,valist);], AC_MSG_RESULT(yes);AC_DEFINE(USEVARARGS), AC_MSG_RESULT(no))
++AC_TRY_LINK([
++    #include <stdarg.h>
++    #include <stdio.h>
++],[
++   va_list valist;
++   vsprintf(0,0,valist);
++], AC_MSG_RESULT(yes);AC_DEFINE(USEVARARGS), AC_MSG_RESULT(no))
+ 
+ AC_HEADER_DIRENT
+ 

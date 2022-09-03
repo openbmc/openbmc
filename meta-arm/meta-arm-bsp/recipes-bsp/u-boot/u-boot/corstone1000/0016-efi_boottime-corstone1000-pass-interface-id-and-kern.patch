@@ -1,7 +1,7 @@
-From 10d0ffc26ddcecd83921c2b3b37cb4eff54a154f Mon Sep 17 00:00:00 2001
+From e5e1cf36cb7b77a5bb526f1744c0c77164374ca3 Mon Sep 17 00:00:00 2001
 From: Vishnu Banavath <vishnu.banavath@arm.com>
 Date: Fri, 10 Dec 2021 20:10:41 +0000
-Subject: [PATCH 16/27] efi_boottime: corstone1000: pass interface id and
+Subject: [PATCH 16/24] efi_boottime: corstone1000: pass interface id and
  kernel event id using register w4
 
 Initially the interface/event IDs are passed to the SP using register
@@ -21,7 +21,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  1 file changed, 10 insertions(+), 3 deletions(-)
 
 diff --git a/lib/efi_loader/efi_boottime.c b/lib/efi_loader/efi_boottime.c
-index 5c77a40c3ebe..b58a8c98fd05 100644
+index f2b5c7834c01..140d0f4f71da 100644
 --- a/lib/efi_loader/efi_boottime.c
 +++ b/lib/efi_loader/efi_boottime.c
 @@ -27,6 +27,11 @@
@@ -36,7 +36,7 @@ index 5c77a40c3ebe..b58a8c98fd05 100644
  DECLARE_GLOBAL_DATA_PTR;
  
  /* Task priority level */
-@@ -2121,10 +2126,12 @@ static int efi_corstone1000_kernel_started_event(void)
+@@ -2120,10 +2125,12 @@ static int efi_corstone1000_kernel_started_event(void)
  	func_data.data0 = &part_id;
  
  	/*
@@ -53,5 +53,5 @@ index 5c77a40c3ebe..b58a8c98fd05 100644
  	func_data.data1_size = sizeof(msg);
  	func_data.data1 = &msg;
 -- 
-2.30.2
+2.37.1
 

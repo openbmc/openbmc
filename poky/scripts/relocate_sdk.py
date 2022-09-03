@@ -104,11 +104,12 @@ def change_interpreter(elf_file_name):
             if (len(new_dl_path) >= p_filesz):
                 print("ERROR: could not relocate %s, interp size = %i and %i is needed." \
                     % (elf_file_name, p_memsz, len(new_dl_path) + 1))
-                break
+                return False
             dl_path = new_dl_path + b("\0") * (p_filesz - len(new_dl_path))
             f.seek(p_offset)
             f.write(dl_path)
             break
+    return True
 
 def change_dl_sysdirs(elf_file_name):
     if arch == 32:
@@ -222,6 +223,7 @@ else:
 
 executables_list = sys.argv[3:]
 
+errors = False
 for e in executables_list:
     perms = os.stat(e)[stat.ST_MODE]
     if os.access(e, os.W_OK|os.R_OK):
@@ -247,7 +249,8 @@ for e in executables_list:
         arch = get_arch()
         if arch:
             parse_elf_header()
-            change_interpreter(e)
+            if not change_interpreter(e):
+                errors = True
             change_dl_sysdirs(e)
 
     """ change permissions back """
@@ -260,3 +263,6 @@ for e in executables_list:
         print("New file size for %s is different. Looks like a relocation error!", e)
         sys.exit(-1)
 
+if errors:
+    print("Relocation of one or more executables failed.")
+    sys.exit(-1)

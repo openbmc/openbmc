@@ -41,6 +41,42 @@ functionality.
 Installing the Extensible SDK
 =============================
 
+Two ways to install the Extensible SDK
+--------------------------------------
+
+Extensible SDK can be installed in two different ways, and both have
+their own pros and cons:
+
+1. *Setting up the Extensible SDK environment directly in a Yocto build*. This
+avoids having to produce, test, distribute and maintain separate SDK installer
+archives, which can get very large. There is only one environment for the regular
+Yocto build and the SDK and less code paths where things can go not according to plan.
+It's easier to update the SDK: it simply means updating the Yocto layers with
+git fetch or layer management tooling. The SDK extensibility is better than in the
+second option: just run ``bitbake`` again to add more things to the sysroot, or add layers
+if even more things are required.
+
+2. *Setting up the Extensible SDK from a standalone installer*. This has the benefit of
+having a single, self-contained archive that includes all the needed binary artifacts.
+So nothing needs to be rebuilt, and there is no need to provide a well-functioning
+binary artefact cache over the network for developers with underpowered laptops.
+
+Setting up the Extensible SDK environment directly in a Yocto build
+-------------------------------------------------------------------
+
+1. Set up all the needed layers and a Yocto build directory, e.g. a regular Yocto
+   build where ``bitbake`` can be executed.
+
+2. Run:
+    $ bitbake meta-ide-support
+    $ bitbake -c populate_sysroot gtk+3
+    (or any other target or native item that the application developer would need)
+    $ bitbake populate-sysroots
+
+
+Setting up the Extensible SDK from a standalone installer
+---------------------------------------------------------
+
 The first thing you need to do is install the SDK on your :term:`Build
 Host` by running the ``*.sh`` installation script.
 
@@ -136,7 +172,12 @@ Running the Extensible SDK Environment Setup Script
 ===================================================
 
 Once you have the SDK installed, you must run the SDK environment setup
-script before you can actually use the SDK. This setup script resides in
+script before you can actually use the SDK.
+
+When using a SDK directly in a Yocto build, you will find the script in
+``tmp/deploy/images/qemux86-64/`` in your build directory.
+
+When using a standalone SDK installer, this setup script resides in
 the directory you chose when you installed the SDK, which is either the
 default ``poky_sdk`` directory or the directory you chose during
 installation.
@@ -153,6 +194,11 @@ script is for an IA-based target machine using i586 tuning::
    $ source environment-setup-core2-64-poky-linux
    SDK environment now set up; additionally you may now run devtool to perform development tasks.
    Run devtool --help for further details.
+
+When using the environment script directly in a Yocto build, it can
+be run similarly:
+
+   $ source tmp/deploy/images/qemux86-64/environment-setup-core2-64-poky-linux
 
 Running the setup script defines many environment variables needed in
 order to use the SDK (e.g. ``PATH``,
@@ -1215,9 +1261,23 @@ need to link to libGL but you are not sure which recipe provides libGL.
 You can use the following command to find out::
 
    $ devtool search libGL mesa
+   A free implementation of the OpenGL API
 
-A free implementation of the OpenGL API Once you know the recipe
-(i.e. ``mesa`` in this example), you can install it::
+Once you know the recipe
+(i.e. ``mesa`` in this example), you can install it.
+
+When using the extensible SDK directly in a Yocto build
+-------------------------------------------------------
+
+In this scenario, the Yocto build tooling, e.g. ``bitbake``
+is directly accessible to build additional items, and it
+can simply be executed directly:
+
+   $ bitbake mesa
+   $ bitbake populate-sysroots
+
+When using a standalone installer for the Extensible SDK
+--------------------------------------------------------
 
    $ devtool sdk-install mesa
 

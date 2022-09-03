@@ -3,7 +3,7 @@ From: Qing He <qing.he@intel.com>
 Date: Fri, 18 Jun 2010 09:40:30 +0800
 Subject: [PATCH] sysvinit: upgrade to version 2.88dsf
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://github.com/slicer69/sysvinit/pull/13]
 
 ---
  src/Makefile | 53 +++++++++++++++++++++++++++++-----------------------

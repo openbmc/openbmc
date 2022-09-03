@@ -28,7 +28,7 @@ SRC_URI:append:class-target = " \
 
 SRC_URI[perl.sha256sum] = "e26085af8ac396f62add8a533c3a0ea8c8497d836f0689347ac5abd7b7a4e00a"
 
-S = "${WORKDIR}/perl-${PV}"
+B = "${WORKDIR}/perl-${PV}-build"
 
 inherit upstream-version-is-even update-alternatives
 
@@ -45,8 +45,13 @@ PACKAGECONFIG[gdbm] = ",-Ui_gdbm,gdbm"
 # Don't generate comments in enc2xs output files. They are not reproducible
 export ENC2XS_NO_COMMENTS = "1"
 
+CFLAGS += "-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+
 do_configure:prepend() {
-    cp -rfp ${STAGING_DATADIR_NATIVE}/perl-cross/* ${S}
+    rm -rf ${B}
+    cp -rfp ${S} ${B}
+    cp -rfp ${STAGING_DATADIR_NATIVE}/perl-cross/* ${B}
+    cd ${B}
 }
 
 do_configure:class-target() {
@@ -114,7 +119,6 @@ print(datetime.fromtimestamp($SOURCE_DATE_EPOCH, timezone.utc).strftime('%a %b %
             ")"
         echo "#define PERL_BUILD_DATE \"$PERL_BUILD_DATE\"" >> config.h
     fi
-    oe_runmake clean
 }
 
 do_compile() {

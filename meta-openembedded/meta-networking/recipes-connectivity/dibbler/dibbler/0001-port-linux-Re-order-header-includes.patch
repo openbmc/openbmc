@@ -1,0 +1,33 @@
+From cbb33e1548fe526c3e7dead294617bde1f087ae3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 24 Aug 2022 16:40:38 -0700
+Subject: [PATCH] port-linux: Re-order header includes
+
+linux/if.h when included before net/if.h casues duplicate definitions
+
+Upstream-Status: Iappropriate [Upstream is Dead] 
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Port-linux/interface.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Port-linux/interface.c b/Port-linux/interface.c
+index 18777e91..19aefb2b 100644
+--- a/Port-linux/interface.c
++++ b/Port-linux/interface.c
+@@ -25,7 +25,6 @@
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #include <sys/ioctl.h>
+-#include <linux/if.h>
+ #include <syslog.h>
+ #include <string.h>
+ #include <errno.h>
+@@ -42,6 +41,7 @@
+ #include <stdarg.h>
+ #include <linux/sockios.h>
+ #include <linux/if_ether.h>
++#include <linux/if.h>
+ 
+ int interface_auto_up = 0;
+ int interface_do_message = 0;

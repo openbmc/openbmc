@@ -4,7 +4,8 @@
 # Copyright (C) 2013 Intel Corporation
 # Author: Andreea Brandusa Proca <andreea.b.proca@intel.com>
 #
-# Licensed under the MIT license, see COPYING.MIT for details
+# SPDX-License-Identifier: MIT
+#
 
 ERR_REPORT_DIR ?= "${LOG_DIR}/error-report"
 

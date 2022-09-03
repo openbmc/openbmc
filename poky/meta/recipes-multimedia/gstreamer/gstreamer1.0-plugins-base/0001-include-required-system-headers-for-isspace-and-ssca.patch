@@ -1,0 +1,35 @@
+From c85a53a41d4e6bfc49c377217ece12a1f330a690 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 12 Aug 2022 22:50:06 -0700
+Subject: [PATCH] include required system headers for isspace() and sscanf()
+ functions
+
+Newer compilers ( clang 15 ) has turned stricter and errors out instead
+of warning on implicit function declations
+Fixes
+gstssaparse.c:297:12: error: call to undeclared library function 'isspace' with type 'int (int)'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+while (isspace(*t))
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/2879]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gst/subparse/gstssaparse.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/gst/subparse/gstssaparse.c b/gst/subparse/gstssaparse.c
+index ff802fa..5ebe678 100755
+--- a/gst/subparse/gstssaparse.c
++++ b/gst/subparse/gstssaparse.c
+@@ -24,6 +24,8 @@
+ #include "config.h"
+ #endif
+ 
++#include <ctype.h>              /* isspace() */
++#include <stdio.h>              /* sscanf() */
+ #include <stdlib.h>             /* atoi() */
+ #include <string.h>
+ 
+-- 
+2.37.1
+

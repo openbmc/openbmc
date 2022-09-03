@@ -21,6 +21,8 @@ S = "${WORKDIR}/git"
 
 inherit autotools-brokensep useradd update-rc.d systemd multilib_script
 
+EXTRA_OECONF += "--enable-largefile"
+
 PACKAGECONFIG ??= "shadow \
                    ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6 pam', d)} \
                    static \
@@ -58,7 +60,6 @@ PACKAGECONFIG[nls] = "--enable-nls, --disable-nls"
 
 #add mod_dso to core modules
 PACKAGECONFIG[dso] = "--enable-dso, --disable-dso"
-PACKAGECONFIG[largefile] = "--enable-largefile, --disable-largefile"
 
 #omit mod_auth_file from core modules
 PACKAGECONFIG[auth] = "--enable-auth-file, --disable-auth-file"

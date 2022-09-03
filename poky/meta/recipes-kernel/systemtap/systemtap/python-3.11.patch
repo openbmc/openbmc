@@ -1,0 +1,37 @@
+From 069e109c95d1afca17cd3781b39f220cf8b39978 Mon Sep 17 00:00:00 2001
+From: Stan Cox <scox@redhat.com>
+Date: Wed, 13 Jul 2022 09:49:51 -0400
+Subject: [PATCH 1/1] python 3.11 removed direct access to PyFrameObject
+ members
+
+Take into account the change in PyFrameObject definition to allow
+building systemtap with python 3.11.  Additional support for python
+3.11 is forthcoming.
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=systemtap.git;a=commit;h=069e109c95d1afca17cd3781b39f220cf8b39978]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ python/HelperSDT/_HelperSDT.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/python/HelperSDT/_HelperSDT.c b/python/HelperSDT/_HelperSDT.c
+index 967cb6077..4d287132e 100644
+--- a/python/HelperSDT/_HelperSDT.c
++++ b/python/HelperSDT/_HelperSDT.c
+@@ -14,7 +14,13 @@
+ // PR25841: ensure that the libHelperSDT.so file contains debuginfo
+ // for the tapset helper functions, so they don't have to look into libpython*
+ #include <frameobject.h>
++// python 3.11 removed direct access to PyFrameObject members
++// https://docs.python.org/3.11/whatsnew/3.11.html#c-api-changes
++#if PY_MAJOR_VERSION <= 3 && PY_MINOR_VERSION < 11
+ PyFrameObject _dummy_frame;
++#else
++//PyFrameObject *_dummy_frame;
++#endif
+ #include <object.h>
+ PyVarObject _dummy_var;
+ #include <dictobject.h>
+-- 
+2.31.1
+

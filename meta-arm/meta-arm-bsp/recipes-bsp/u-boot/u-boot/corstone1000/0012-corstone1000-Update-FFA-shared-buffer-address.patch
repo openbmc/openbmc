@@ -1,7 +1,7 @@
-From b2d752b4bbd5b2dc4cb22d2d652a261287505926 Mon Sep 17 00:00:00 2001
+From 1ff229c8e02bdd3c859d581787636cfdf674eec1 Mon Sep 17 00:00:00 2001
 From: Gowtham Suresh Kumar <gowtham.sureshkumar@arm.com>
 Date: Wed, 17 Nov 2021 15:28:06 +0000
-Subject: [PATCH 12/27] corstone1000: Update FFA shared buffer address
+Subject: [PATCH 12/24] corstone1000: Update FFA shared buffer address
 
 FFA shared buffer address changed to 0x02000000.
 
@@ -33,5 +33,5 @@ index a400cdef69d0..db0f91335cef 100644
  #define CONFIG_SYS_INIT_SP_ADDR		(CONFIG_SYS_SDRAM_BASE + 0x03f00000)
  #define CONFIG_SKIP_LOWLEVEL_INIT
 -- 
-2.30.2
+2.37.1
 

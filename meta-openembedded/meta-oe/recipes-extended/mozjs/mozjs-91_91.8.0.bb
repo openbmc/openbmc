@@ -50,7 +50,7 @@ do_configure() {
     cd ${B}
     python3 ${S}/configure.py \
         --enable-project=js \
-        --target=${HOST_SYS} \
+        --target=${RUST_HOST_SYS} \
         --host=${BUILD_SYS} \
         --prefix=${prefix} \
         --libdir=${libdir} \

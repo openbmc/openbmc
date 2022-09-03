@@ -618,6 +618,8 @@ class QemuRunner:
                 return self.qmp.cmd(command)
 
     def run_serial(self, command, raw=False, timeout=60):
+        # Returns (status, output) where status is 1 on success and 0 on error
+
         # We assume target system have echo to get command status
         if not raw:
             command = "%s; echo $?\n" % command

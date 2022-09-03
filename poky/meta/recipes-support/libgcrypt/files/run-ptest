@@ -1,3 +1,9 @@
 #!/bin/sh
 
-make -C build/tests runtest-TESTS
+# Run the tests in regression mode so they are quicker
+export GCRYPT_IN_REGRESSION_TEST=1
+# The 'random' test invokes itself, so we need to be sure that the test
+# directory is on PATH.
+export PATH=$PATH:.
+
+./testdrv --verbose

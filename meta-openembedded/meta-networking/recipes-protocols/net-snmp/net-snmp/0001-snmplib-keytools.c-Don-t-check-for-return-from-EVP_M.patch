@@ -1,4 +1,4 @@
-From f3ff99736b8cccbba77349b0d10a3cee366a4c87 Mon Sep 17 00:00:00 2001
+From f4e1acd4f509dd26cf88da872bd5adcf884f4a5f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 18 Sep 2015 00:28:45 -0400
 Subject: [PATCH] snmplib/keytools.c: Don't check for return from
@@ -17,7 +17,7 @@ Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
  1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/snmplib/keytools.c b/snmplib/keytools.c
-index 129a7c0..2fc1efc 100644
+index 14a452a..fb1694b 100644
 --- a/snmplib/keytools.c
 +++ b/snmplib/keytools.c
 @@ -183,10 +183,7 @@ generate_Ku(const oid * hashtype, u_int hashtype_len,

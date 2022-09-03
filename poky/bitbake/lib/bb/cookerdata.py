@@ -254,6 +254,7 @@ class CookerDataBuilder(object):
         filtered_keys = bb.utils.approved_variables()
         bb.data.inheritFromOS(self.basedata, self.savedenv, filtered_keys)
         self.basedata.setVar("BB_ORIGENV", self.savedenv)
+        self.basedata.setVar("__bbclasstype", "global")
 
         if worker:
             self.basedata.setVar("BB_WORKERCONTEXT", "1")

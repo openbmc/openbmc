@@ -1,0 +1,32 @@
+From 13ff43fe760ac343b33d8e8c84b89886aac07116 Mon Sep 17 00:00:00 2001
+From: Tom Hochstein <tom.hochstein@nxp.com>
+Date: Fri, 3 Jun 2022 10:44:29 -0500
+Subject: [PATCH] cmake: Don't enable GLX if tests are disabled
+
+Allow building for systems that don't support GLX.
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/piglit/-/merge_requests/720]
+Signed-off-by: Tom Hochstein <tom.hochstein@nxp.com>
+---
+ CMakeLists.txt | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e1aeb5ddf..85e171aba 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -134,10 +134,7 @@ if(PIGLIT_BUILD_CL_TESTS)
+ endif(PIGLIT_BUILD_CL_TESTS)
+ 
+ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+-	if(X11_FOUND AND OPENGL_gl_LIBRARY)
+-		# Assume the system has GLX. In the future, systems may exist
+-		# with libGL and libX11 but no GLX, but that world hasn't
+-		# arrived yet.
++	if(X11_FOUND AND OPENGL_gl_LIBRARY AND PIGLIT_BUILD_GLX_TESTS)
+ 		set(PIGLIT_HAS_GLX True)
+ 		add_definitions(-DPIGLIT_HAS_GLX)
+ 	endif()
+-- 
+2.17.1
+

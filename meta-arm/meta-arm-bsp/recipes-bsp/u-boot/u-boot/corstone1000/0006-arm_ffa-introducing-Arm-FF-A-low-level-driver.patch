@@ -1,7 +1,7 @@
-From ede21dc1ca75132698cc81e88357c5789ccf67c7 Mon Sep 17 00:00:00 2001
+From 968c86e8a6ed3e9e6621f0ae44977b5b13d90bfd Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Tue, 16 Nov 2021 12:34:52 +0000
-Subject: [PATCH 06/27] arm_ffa: introducing Arm FF-A low-level driver
+Subject: [PATCH 06/24] arm_ffa: introducing Arm FF-A low-level driver
 
 This driver implements Arm Firmware Framework for Armv8-A on u-boot
 
@@ -58,10 +58,10 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  create mode 100644 lib/arm-ffa/arm_ffa_helper.c
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 96582fc67777..14307e6da644 100644
+index 7f27ff4c20fc..d29d7e040764 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -232,6 +232,14 @@ F:	board/CZ.NIC/
+@@ -244,6 +244,14 @@ F:	board/CZ.NIC/
  F:	configs/turris_*_defconfig
  F:	include/configs/turris_*.h
  
@@ -143,20 +143,20 @@ index 22fd541f9a28..45eca83a473c 100644
  	DEFINE(ARM_SMCCC_QUIRK_STATE_OFFS, offsetof(struct arm_smccc_quirk, state));
  #endif
 diff --git a/common/board_r.c b/common/board_r.c
-index c24d9b4e220b..af20f38b104c 100644
+index 6f4aca2077d6..412a0ea9fac3 100644
 --- a/common/board_r.c
 +++ b/common/board_r.c
-@@ -61,6 +61,9 @@
- #include <wdt.h>
+@@ -62,6 +62,9 @@
  #include <asm-generic/gpio.h>
  #include <efi_loader.h>
+ #include <relocate.h>
 +#ifdef CONFIG_ARM_FFA_TRANSPORT
 +#include <arm_ffa_helper.h>
 +#endif
  
  DECLARE_GLOBAL_DATA_PTR;
  
-@@ -770,6 +773,9 @@ static init_fnc_t init_sequence_r[] = {
+@@ -779,6 +782,9 @@ static init_fnc_t init_sequence_r[] = {
  	INIT_FUNC_WATCHDOG_RESET
  	initr_net,
  #endif
@@ -180,10 +180,10 @@ index b26ca8cf70c9..e83c23789d1b 100644
  
  source "drivers/axi/Kconfig"
 diff --git a/drivers/Makefile b/drivers/Makefile
-index 4e7cf284405a..6671d2a604ab 100644
+index 67c8af74424e..1be687b55d13 100644
 --- a/drivers/Makefile
 +++ b/drivers/Makefile
-@@ -107,6 +107,7 @@ obj-y += iommu/
+@@ -109,6 +109,7 @@ obj-y += iommu/
  obj-y += smem/
  obj-y += thermal/
  obj-$(CONFIG_TEE) += tee/
@@ -2249,10 +2249,10 @@ index 000000000000..0e143e54511e
 +int ffa_uuid_str_to_bin(const char *uuid_str, unsigned char *uuid_bin);
 +#endif
 diff --git a/include/dm/uclass-id.h b/include/dm/uclass-id.h
-index 0e26e1d13824..a1181b8f48e7 100644
+index 3ba69ad9a084..732441824557 100644
 --- a/include/dm/uclass-id.h
 +++ b/include/dm/uclass-id.h
-@@ -52,6 +52,7 @@ enum uclass_id {
+@@ -55,6 +55,7 @@ enum uclass_id {
  	UCLASS_EFI_MEDIA,	/* Devices provided by UEFI firmware */
  	UCLASS_ETH,		/* Ethernet device */
  	UCLASS_ETH_PHY,		/* Ethernet PHY device */
@@ -2320,10 +2320,10 @@ index 7f2be2339475..54980a130fdb 100644
  
  #define arm_smccc_smc_quirk(...) __arm_smccc_smc(__VA_ARGS__)
 diff --git a/lib/Kconfig b/lib/Kconfig
-index 3c6fa99b1a6a..473821b882e2 100644
+index acc0ac081a44..65db65c3c4cd 100644
 --- a/lib/Kconfig
 +++ b/lib/Kconfig
-@@ -810,6 +810,7 @@ config SMBIOS_PARSER
+@@ -902,6 +902,7 @@ config SMBIOS_PARSER
  source lib/efi/Kconfig
  source lib/efi_loader/Kconfig
  source lib/optee/Kconfig
@@ -2332,7 +2332,7 @@ index 3c6fa99b1a6a..473821b882e2 100644
  config TEST_FDTDEC
  	bool "enable fdtdec test"
 diff --git a/lib/Makefile b/lib/Makefile
-index 11b03d1cbec8..8e6fad613067 100644
+index d9b1811f7506..4aa3e2ed2a7e 100644
 --- a/lib/Makefile
 +++ b/lib/Makefile
 @@ -9,6 +9,7 @@ obj-$(CONFIG_EFI) += efi/
@@ -2564,7 +2564,7 @@ index 000000000000..623899d38044
 +	return 0;
 +}
 diff --git a/lib/efi_loader/efi_boottime.c b/lib/efi_loader/efi_boottime.c
-index 5bcb8253edba..cffa2c69d621 100644
+index 4da64b5d2962..c68d9ed4f0bd 100644
 --- a/lib/efi_loader/efi_boottime.c
 +++ b/lib/efi_loader/efi_boottime.c
 @@ -23,6 +23,10 @@
@@ -2578,7 +2578,7 @@ index 5bcb8253edba..cffa2c69d621 100644
  DECLARE_GLOBAL_DATA_PTR;
  
  /* Task priority level */
-@@ -2114,6 +2118,10 @@ static efi_status_t EFIAPI efi_exit_boot_services(efi_handle_t image_handle,
+@@ -2113,6 +2117,10 @@ static efi_status_t EFIAPI efi_exit_boot_services(efi_handle_t image_handle,
  	struct efi_event *evt, *next_event;
  	efi_status_t ret = EFI_SUCCESS;
  
@@ -2589,7 +2589,7 @@ index 5bcb8253edba..cffa2c69d621 100644
  	EFI_ENTRY("%p, %zx", image_handle, map_key);
  
  	/* Check that the caller has read the current memory map */
-@@ -2174,6 +2182,15 @@ static efi_status_t EFIAPI efi_exit_boot_services(efi_handle_t image_handle,
+@@ -2173,6 +2181,15 @@ static efi_status_t EFIAPI efi_exit_boot_services(efi_handle_t image_handle,
  		dm_remove_devices_flags(DM_REMOVE_ACTIVE_ALL);
  	}
  
@@ -2606,5 +2606,5 @@ index 5bcb8253edba..cffa2c69d621 100644
  	efi_runtime_detach();
  
 -- 
-2.30.2
+2.37.1
 

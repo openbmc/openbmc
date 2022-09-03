@@ -1,0 +1,161 @@
+From 89000d9cb226cd864fa247f2428c9eaf7f414882 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 14 Aug 2022 10:02:15 -0700
+Subject: [PATCH] portability: Avoid glibc and linux mount.h conflict
+
+With glibc 2.36+ linux/mount.h> and <sys/mount.h> headers are
+no longer directly compatible
+
+Upstream-Status: Submitted [https://github.com/landley/toybox/pull/364]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/portability.h | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+--- a/lib/portability.h
++++ b/lib/portability.h
+@@ -180,11 +180,29 @@ void *memmem(const void *haystack, size_
+ #endif
+ 
+ // Linux headers not listed by POSIX or LSB
+-#include <sys/mount.h>
+ #ifdef __linux__
+ #include <sys/statfs.h>
+ #include <sys/swap.h>
+ #include <sys/sysinfo.h>
++
++#ifndef BLKDISCARD
++#define BLKDISCARD _IO(0x12,119)
++#endif
++#ifndef BLKSECDISCARD
++#define BLKSECDISCARD _IO(0x12,125)
++#endif
++#ifndef BLKZEROOUT
++#define BLKZEROOUT _IO(0x12,127)
++#endif
++#ifndef FIFREEZE
++#define FIFREEZE        _IOWR('X', 119, int)    /* Freeze */
++#endif
++#ifndef FITHAW
++#define FITHAW          _IOWR('X', 120, int)    /* Thaw */
++#endif
++
++#else
++#include <sys/mount.h>
+ #endif
+ 
+ #ifdef __APPLE__
+--- a/toys/other/switch_root.c
++++ b/toys/other/switch_root.c
+@@ -19,6 +19,7 @@ config SWITCH_ROOT
+ 
+ #define FOR_switch_root
+ #include "toys.h"
++#include <sys/mount.h>
+ #include <sys/vfs.h>
+ 
+ GLOBALS(
+--- a/toys/other/blkdiscard.c
++++ b/toys/other/blkdiscard.c
+@@ -31,8 +31,7 @@ config BLKDISCARD
+ 
+ #define FOR_blkdiscard
+ #include "toys.h"
+-
+-#include <linux/fs.h>
++#include <sys/mount.h>
+ 
+ GLOBALS(
+   long o, l;
+--- a/toys/other/blockdev.c
++++ b/toys/other/blockdev.c
+@@ -31,7 +31,7 @@ config BLOCKDEV
+ 
+ #define FOR_blockdev
+ #include "toys.h"
+-#include <linux/fs.h>
++#include <sys/mount.h>
+ 
+ GLOBALS(
+   long setbsz, setra;
+--- a/toys/other/fsfreeze.c
++++ b/toys/other/fsfreeze.c
+@@ -18,7 +18,6 @@ config FSFREEZE
+ 
+ #define FOR_fsfreeze
+ #include "toys.h"
+-#include <linux/fs.h>
+ 
+ void fsfreeze_main(void)
+ {
+--- a/lib/portability.c
++++ b/lib/portability.c
+@@ -5,7 +5,7 @@
+  */
+ 
+ #include "toys.h"
+-
++#include <sys/mount.h>
+ // We can't fork() on nommu systems, and vfork() requires an exec() or exit()
+ // before resuming the parent (because they share a heap until then). And no,
+ // we can't implement our own clone() call that does the equivalent of fork()
+--- a/toys/lsb/mount.c
++++ b/toys/lsb/mount.c
+@@ -58,6 +58,7 @@ config MOUNT
+ 
+ #define FOR_mount
+ #include "toys.h"
++#include <sys/mount.h>
+ 
+ GLOBALS(
+   struct arg_list *o;
+--- a/toys/lsb/umount.c
++++ b/toys/lsb/umount.c
+@@ -30,6 +30,7 @@ config UMOUNT
+ 
+ #define FOR_umount
+ #include "toys.h"
++#include <sys/mount.h>
+ 
+ GLOBALS(
+   struct arg_list *t;
+--- a/toys/other/eject.c
++++ b/toys/other/eject.c
+@@ -22,6 +22,7 @@ config EJECT
+ 
+ #define FOR_eject
+ #include "toys.h"
++#include <sys/mount.h>
+ #include <scsi/sg.h>
+ #include <scsi/scsi.h>
+ #include <linux/cdrom.h>
+--- a/toys/other/freeramdisk.c
++++ b/toys/other/freeramdisk.c
+@@ -16,6 +16,7 @@ config FREERAMDISK
+ */
+ 
+ #include "toys.h"
++#include <sys/mount.h>
+ 
+ void freeramdisk_main(void)
+ {
+--- a/toys/other/nbd_client.c
++++ b/toys/other/nbd_client.c
+@@ -36,6 +36,7 @@ config NBD_CLIENT
+ #define FOR_nbd_client
+ #include "toys.h"
+ #include <linux/nbd.h>
++#include <linux/fs.h>
+ 
+ void nbd_client_main(void)
+ {
+--- a/toys/other/partprobe.c
++++ b/toys/other/partprobe.c
+@@ -18,6 +18,7 @@ config PARTPROBE
+ */
+ 
+ #include "toys.h"
++#include <sys/mount.h>
+ 
+ static void do_partprobe(int fd, char *name)
+ {

@@ -68,11 +68,11 @@ def main():
 
         registered = False
         for plugin in plugins:
+            if hasattr(plugin, 'tinfoil_init'):
+                plugin.tinfoil_init(tinfoil)
             if hasattr(plugin, 'register_commands'):
                 registered = True
                 plugin.register_commands(subparsers)
-            if hasattr(plugin, 'tinfoil_init'):
-                plugin.tinfoil_init(tinfoil)
 
         if not registered:
             logger.error("No commands registered - missing plugins?")

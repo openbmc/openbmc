@@ -1,0 +1,30 @@
+From 1b9c8d4a7c9519c6085827da8be6546ce80ee711 Mon Sep 17 00:00:00 2001
+From: Anton Antonov <Anton.Antonov@arm.com>
+Date: Wed, 31 Aug 2022 17:05:14 +0100
+Subject: [PATCH 1/4] Allow to find libgcc headers
+
+Upstream-Status: Pending
+Signed-off-by: Anton Antonov <Anton.Antonov@arm.com>
+---
+ external/newlib/newlib.cmake | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/external/newlib/newlib.cmake b/external/newlib/newlib.cmake
+index fff5e2a..13eb78c 100644
+--- a/external/newlib/newlib.cmake
++++ b/external/newlib/newlib.cmake
+@@ -82,7 +82,10 @@ message(STATUS "libgcc.a is used from ${LIBGCC_PATH}")
+ # Moreover the GCC specific header file include directory is also required.
+ # Specify LIBGCC_INCLUDE_DIRS in the command line to manually override the libgcc relative location below.
+ if(NOT DEFINED LIBGCC_INCLUDE_DIRS)
+-	get_filename_component(_TMP_VAR "${LIBGCC_PATH}" DIRECTORY)
++
++	# "libgcc.a" lib location in ${LIBGCC_PATH} might not contain a correct path to headers
++	# We can get the correct path if we ask for a location without a library name
++	gcc_get_lib_location(LIBRARY_NAME "" RES _TMP_VAR)
+ 	set(LIBGCC_INCLUDE_DIRS
+ 		"${_TMP_VAR}/include"
+ 		"${_TMP_VAR}/include-fixed" CACHE STRING "GCC specific include PATHs")
+-- 
+2.25.1
+

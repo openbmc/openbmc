@@ -10,7 +10,14 @@ TFA_PLATFORM:qemuarm64-secureboot = "qemu"
 TFA_PLATFORM:qemu-generic-arm64 = "qemu_sbsa"
 TFA_PLATFORM:qemuarm-secureboot = "qemu"
 
-TFA_SPD:qemuarm64-secureboot = "opteed"
+# Trusted Services secure partitions require arm-ffa machine feature.
+# Enabling Secure-EL1 Payload Dispatcher (SPD) in this case
+TFA_SPD:qemuarm64-secureboot = "${@bb.utils.contains('MACHINE_FEATURES', 'arm-ffa', 'spmd', 'opteed', d)}"
+# Configure tf-a accordingly to TS requirements if included
+EXTRA_OEMAKE:append:qemuarm64-secureboot = "${@bb.utils.contains('MACHINE_FEATURES', 'arm-ffa', ' CTX_INCLUDE_EL2_REGS=0 SPMC_OPTEE=1 ', '' , d)}"
+# Cortex-A57 supports Armv8.0 (no S-EL2 execution state).
+# The SPD SPMC component should run at the S-EL1 execution state.
+TFA_SPMD_SPM_AT_SEL2:qemuarm64-secureboot = "0"
 
 TFA_UBOOT:qemuarm64-secureboot = "1"
 TFA_UBOOT:qemuarm-secureboot = "1"

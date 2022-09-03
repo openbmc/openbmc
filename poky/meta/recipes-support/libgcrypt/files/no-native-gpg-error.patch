@@ -1,0 +1,18 @@
+Don't depend on a native libgpg-error to build the test driver, as it's
+an optional dependency for some C annotations.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/tests/testdrv.c b/tests/testdrv.c
+index 0ccde326..6d6abd57 100644
+--- a/tests/testdrv.c
++++ b/tests/testdrv.c
+@@ -32,7 +32,6 @@
+ # include <fcntl.h>
+ # include <sys/wait.h>
+ #endif
+-#include <gpg-error.h> /* For some macros.  */
+ 
+ #include "stopwatch.h"
+ 

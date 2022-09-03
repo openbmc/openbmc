@@ -4,7 +4,9 @@ In yocto it obey the way with Debian/Ubuntu, and the names are common-auth, comm
 common-password and common-session.
 So update them with oe way.
 
-Upstream-Status: Pending
+See meta/recipes-extended/pam/libpam/pam.d/common-password
+
+Upstream-Status: Inappropriate [oe-core specific]
 
 Signed-off-by: Kang Kai <kai.kang@windriver.com>
 

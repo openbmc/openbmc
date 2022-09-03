@@ -25,12 +25,12 @@ inherit autotools pkgconfig lib_package
 
 EXTRA_OECONF += " \
     --disable-rpath \
+    --enable-largefile \
     --with-udev=${nonarch_base_libdir}/udev \
 "
 
-PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'largefile', d)}"
+PACKAGECONFIG ?= ""
 PACKAGECONFIG[doxygen] = "--enable-doxygen,--disable-doxygen,doxygen-native"
-PACKAGECONFIG[largefile] = "--enable-largefile,--disable-largefile"
 PACKAGECONFIG[mtpz] = "--enable-mtpz,--disable-mtpz,libgcrypt"
 
 PACKAGES =+ "${BPN}-common ${BPN}-runtime"

@@ -1,0 +1,36 @@
+From 5c57ef351882afebde479de430acf2c4f8fdefc8 Mon Sep 17 00:00:00 2001
+From: Vishnu Banavath <vishnu.banavath@arm.com>
+Date: Fri, 17 Dec 2021 19:49:02 +0000
+Subject: [PATCH 20/24] efi_loader: populate ESRT table if EFI_ESRT config
+ option is set
+
+This change is to call efi_esrt_populate function if CONFIG_EFI_ESRT
+is set. This will populte esrt table with firmware image info
+
+Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+---
+ lib/efi_loader/efi_capsule.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/lib/efi_loader/efi_capsule.c b/lib/efi_loader/efi_capsule.c
+index 891143c33909..7db78f1f7648 100644
+--- a/lib/efi_loader/efi_capsule.c
++++ b/lib/efi_loader/efi_capsule.c
+@@ -679,6 +679,13 @@ efi_status_t __efi_runtime EFIAPI efi_update_capsule(
+ 			ret = EFI_SUCCESS;
+ 		}
+ 
++		if (IS_ENABLED(CONFIG_EFI_ESRT)) {
++			/* Rebuild the ESRT to reflect any updated FW images. */
++			ret = efi_esrt_populate();
++	               if (ret != EFI_SUCCESS)
++				log_warning("EFI Capsule: failed to update ESRT\n");
++	       }
++
+ 		goto out;
+ #endif
+ 
+-- 
+2.37.1
+

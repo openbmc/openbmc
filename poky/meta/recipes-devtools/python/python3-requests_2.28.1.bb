@@ -18,6 +18,7 @@ RDEPENDS:${PN} += " \
     ${PYTHON_PN}-urllib3 \
     ${PYTHON_PN}-chardet \
     ${PYTHON_PN}-idna \
+    ${PYTHON_PN}-compression \
 "
 
 CVE_PRODUCT = "requests"

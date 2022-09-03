@@ -12,6 +12,7 @@ DEPENDS = "libogg libvorbis"
 
 SRC_URI = "http://downloads.xiph.org/releases/vorbis/${BP}.tar.gz \
            file://gettext.patch \
+           file://0001-ogginfo-Include-utf8.h-for-missing-utf8_decode.patch \
           "
 
 SRC_URI[md5sum] = "998fca293bd4e4bdc2b96fb70f952f4e"

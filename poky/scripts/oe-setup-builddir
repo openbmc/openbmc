@@ -38,15 +38,17 @@ chmod -st "$BUILDDIR/conf" 2>/dev/null || echo "WARNING: unable to chmod $BUILDD
 
 cd "$BUILDDIR"
 
-if [ -f "$BUILDDIR/conf/templateconf.cfg" ]; then
+if [ -f "$BUILDDIR/conf/templateconf.cfg" -a -z "$TEMPLATECONF" ]; then
     TEMPLATECONF=$(cat "$BUILDDIR/conf/templateconf.cfg")
+    # The following two are no longer valid; unsetting them will automatically get them replaced
+    # with correct ones.
+    if [ $TEMPLATECONF = "meta/conf" -o $TEMPLATECONF = "meta-poky/conf" ]; then
+        unset TEMPLATECONF
+        rm $BUILDDIR/conf/templateconf.cfg
+    fi
 fi
 
 . "$OEROOT"/.templateconf
-
-if [ ! -f "$BUILDDIR/conf/templateconf.cfg" ]; then
-    echo "$TEMPLATECONF" >"$BUILDDIR/conf/templateconf.cfg"
-fi
 
 # 
 # $TEMPLATECONF can point to a directory for the template local.conf & bblayers.conf
@@ -59,6 +61,11 @@ if [ -n "$TEMPLATECONF" ]; then
         fi
         if [ ! -d "$TEMPLATECONF" ]; then
             echo >&2 "Error: TEMPLATECONF value points to nonexistent directory '$TEMPLATECONF'"
+            exit 1
+        fi
+        templatesdir=$(python3 -c "import sys; print(sys.argv[1].strip('/').split('/')[-2])" $TEMPLATECONF)
+        if [ ! -f "$TEMPLATECONF/../../layer.conf" -o $templatesdir != "templates" ]; then
+            echo >&2 "Error: TEMPLATECONF value (which is $TEMPLATECONF) must point to meta-some-layer/conf/templates/template-name"
             exit 1
         fi
     fi
@@ -129,3 +136,7 @@ if [ -z "$OECORENOTESCONF" ]; then
 fi
 [ ! -r "$OECORENOTESCONF" ] || cat "$OECORENOTESCONF"
 unset OECORENOTESCONF
+
+if [ ! -f "$BUILDDIR/conf/templateconf.cfg" ]; then
+    echo "$TEMPLATECONF" >"$BUILDDIR/conf/templateconf.cfg"
+fi

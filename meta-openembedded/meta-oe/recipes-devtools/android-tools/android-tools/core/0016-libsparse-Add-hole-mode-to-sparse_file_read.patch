@@ -1,0 +1,188 @@
+From 41574b628ec4229c24dfe289af7b6978edcca4ed Mon Sep 17 00:00:00 2001
+From: Sean Anderson <sean.anderson@seco.com>
+Date: Thu, 30 Dec 2021 15:19:41 -0500
+Subject: [PATCH] libsparse: Add "hole" mode to sparse_file_read
+
+This adds support for filesystem-level sparse files. These files have
+holes which are not stored in the filesystem and when read are full of
+zeros. While these zeros may be significant in some types of files,
+other types of files may not care about the contents of holes. For
+example, most filesystem creation tools write to all the blocks they
+care about. Those blocks not written to will remain holes, and can be
+safely represented by "don't care" chunks. Using "don't care" chunks
+instead of fill chunks can result in a substantial reduction of the time
+it takes to program a sparse image.
+
+To accomplish this, we extend the existing "sparse" boolean parameter to
+be an enum of mode types. This enum represents the strategy we take when
+reading in a file. For the most part the implementation is
+straightforward. We use lseek to determine where the holes in the file
+are, and then use do_sparse_file_read_normal to create chunks for the
+data section. Note that every file has an implicit hole at its end.
+
+Change-Id: I0cfbf08886fca9a91cb753ec8734c84fcbe52c9f
+Upstream-Status: Backport [f96466b05543b984ef7315d830bab4a409228d35]
+Signed-off-by: Sean Anderson <sean.anderson@seco.com>
+---
+ libsparse/img2simg.c              |  2 +-
+ libsparse/include/sparse/sparse.h | 32 +++++++++++---
+ libsparse/sparse_read.c           | 71 +++++++++++++++++++++++++++++--
+ 3 files changed, 93 insertions(+), 12 deletions(-)
+
+diff --git a/libsparse/img2simg.c b/libsparse/img2simg.c
+index a0db36f45..2e171b613 100644
+--- a/libsparse/img2simg.c
++++ b/libsparse/img2simg.c
+@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
+ 	}
+ 
+ 	sparse_file_verbose(s);
+-	ret = sparse_file_read(s, in, false, false);
++	ret = sparse_file_read(s, in, SPARSE_READ_MODE_NORMAL, false);
+ 	if (ret) {
+ 		fprintf(stderr, "Failed to read file\n");
+ 		exit(-1);
+diff --git a/libsparse/include/sparse/sparse.h b/libsparse/include/sparse/sparse.h
+index 8b757d22a..b68aa21a8 100644
+--- a/libsparse/include/sparse/sparse.h
++++ b/libsparse/include/sparse/sparse.h
+@@ -196,23 +196,41 @@ int64_t sparse_file_len(struct sparse_file *s, bool sparse, bool crc);
+ int sparse_file_callback(struct sparse_file *s, bool sparse, bool crc,
+ 		int (*write)(void *priv, const void *data, int len), void *priv);
+ 
++/**
++ * enum sparse_read_mode - The method to use when reading in files
++ * @SPARSE_READ_MODE_NORMAL: The input is a regular file. Constant chunks of
++ *                           data (including holes) will be be converted to
++ *                           fill chunks.
++ * @SPARSE_READ_MODE_SPARSE: The input is an Android sparse file.
++ * @SPARSE_READ_MODE_HOLE: The input is a regular file. Holes will be converted
++ *                         to "don't care" chunks. Other constant chunks will
++ *                         be converted to fill chunks.
++ */
++enum sparse_read_mode {
++	SPARSE_READ_MODE_NORMAL = false,
++	SPARSE_READ_MODE_SPARSE = true,
++	SPARSE_READ_MODE_HOLE,
++};
++
+ /**
+  * sparse_file_read - read a file into a sparse file cookie
+  *
+  * @s - sparse file cookie
+  * @fd - file descriptor to read from
+- * @sparse - read a file in the Android sparse file format
++ * @mode - mode to use when reading the input file
+  * @crc - verify the crc of a file in the Android sparse file format
+  *
+- * Reads a file into a sparse file cookie.  If sparse is true, the file is
+- * assumed to be in the Android sparse file format.  If sparse is false, the
+- * file will be sparsed by looking for block aligned chunks of all zeros or
+- * another 32 bit value.  If crc is true, the crc of the sparse file will be
+- * verified.
++ * Reads a file into a sparse file cookie. If @mode is
++ * %SPARSE_READ_MODE_SPARSE, the file is assumed to be in the Android sparse
++ * file format. If @mode is %SPARSE_READ_MODE_NORMAL, the file will be sparsed
++ * by looking for block aligned chunks of all zeros or another 32 bit value. If
++ * @mode is %SPARSE_READ_MODE_HOLE, the file will be sparsed like
++ * %SPARSE_READ_MODE_NORMAL, but holes in the file will be converted to "don't
++ * care" chunks. If crc is true, the crc of the sparse file will be verified.
+  *
+  * Returns 0 on success, negative errno on error.
+  */
+-int sparse_file_read(struct sparse_file *s, int fd, bool sparse, bool crc);
++int sparse_file_read(struct sparse_file *s, int fd, enum sparse_read_mode mode, bool crc);
+ 
+ /**
+  * sparse_file_import - import an existing sparse file
+diff --git a/libsparse/sparse_read.c b/libsparse/sparse_read.c
+index ee4abd86a..81f48cc13 100644
+--- a/libsparse/sparse_read.c
++++ b/libsparse/sparse_read.c
+@@ -414,16 +414,79 @@ static int sparse_file_read_normal(struct sparse_file* s, int fd)
+ 	return ret;
+ }
+ 
+-int sparse_file_read(struct sparse_file *s, int fd, bool sparse, bool crc)
++#ifdef __linux__
++static int sparse_file_read_hole(struct sparse_file* s, int fd)
+ {
+-	if (crc && !sparse) {
++	int ret;
++	uint32_t* buf = (uint32_t*)malloc(s->block_size);
++	int64_t end = 0;
++	int64_t start = 0;
++
++	if (!buf) {
++		return -ENOMEM;
++	}
++
++	do {
++		start = lseek(fd, end, SEEK_DATA);
++		if (start < 0) {
++			if (errno == ENXIO)
++				/* The rest of the file is a hole */
++				break;
++
++			error("could not seek to data");
++			free(buf);
++			return -errno;
++		} else if (start > s->len) {
++			break;
++		}
++
++		end = lseek(fd, start, SEEK_HOLE);
++		if (end < 0) {
++			error("could not seek to end");
++			free(buf);
++			return -errno;
++		}
++		end = min(end, s->len);
++
++		start = ALIGN_DOWN(start, s->block_size);
++		end = ALIGN(end, s->block_size);
++		if (lseek(fd, start, SEEK_SET) < 0) {
++			free(buf);
++			return -errno;
++		}
++
++		ret = do_sparse_file_read_normal(s, fd, buf, start, end - start);
++		if (ret) {
++			free(buf);
++			return ret;
++		}
++	} while (end < s->len);
++
++	free(buf);
++	return 0;
++}
++#else
++static int sparse_file_read_hole(struct sparse_file* s __unused, int fd __unused)
++{
++	return -ENOTSUP;
++}
++#endif
++
++int sparse_file_read(struct sparse_file *s, int fd, enum sparse_read_mode mode, bool crc)
++{
++	if (crc && mode != SPARSE_READ_MODE_SPARSE) {
+ 		return -EINVAL;
+ 	}
+ 
+-	if (sparse) {
++	switch (mode) {
++	case SPARSE_READ_MODE_SPARSE:
+ 		return sparse_file_read_sparse(s, fd, crc);
+-	} else {
++	case SPARSE_READ_MODE_NORMAL:
+ 		return sparse_file_read_normal(s, fd);
++	case SPARSE_READ_MODE_HOLE:
++		return sparse_file_read_hole(s, fd);
++	default:
++		return -EINVAL;
+ 	}
+ }
+ 
+-- 
+2.35.1.1320.gc452695387.dirty
+

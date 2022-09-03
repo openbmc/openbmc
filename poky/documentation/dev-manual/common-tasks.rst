@@ -6527,7 +6527,7 @@ newest sstate cache file for each package::
 
 This command will ask you to confirm the deletions it identifies.
 
-Note::
+.. note::
 
    The duplicated sstate cache files of one package must have the same
    architecture, which means that sstate cache files with multiple

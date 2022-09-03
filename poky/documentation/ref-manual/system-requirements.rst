@@ -45,13 +45,7 @@ distributions:
 
 -  Fedora 35
 
--  CentOS 7.x
-
--  CentOS 8.x
-
 -  AlmaLinux 8.5
-
--  Debian GNU/Linux 9.x (Stretch)
 
 -  Debian GNU/Linux 10.x (Buster)
 
@@ -120,12 +114,6 @@ supported Ubuntu or Debian Linux distribution:
          $ sudo apt build-dep qemu
          $ sudo apt remove oss4-dev
 
-   -  For Debian-8, ``python3-git`` and ``pylint3`` are no longer
-      available via ``apt``.
-      ::
-
-         $ sudo pip3 install GitPython pylint==1.9.5
-
 -  *Essentials:* Packages needed to build an image on a headless system::
 
       $ sudo apt install &UBUNTU_HOST_PACKAGES_ESSENTIAL;
@@ -133,14 +121,8 @@ supported Ubuntu or Debian Linux distribution:
 -  *Documentation:* Packages needed if you are going to build out the
    Yocto Project documentation manuals::
 
-      $ sudo apt install make python3-pip
+      $ sudo apt install make python3-pip inkscape texlive-latex-extra
       &PIP3_HOST_PACKAGES_DOC;
-
-   .. note::
-
-      It is currently not possible to build out documentation from Debian 8
-      (Jessie) because of outdated ``pip3`` and ``python3``. ``python3-sphinx``
-      is too outdated.
 
 Fedora Packages
 ---------------
@@ -156,7 +138,7 @@ supported Fedora Linux distribution:
 -  *Documentation:* Packages needed if you are going to build out the
    Yocto Project documentation manuals::
 
-      $ sudo dnf install make python3-pip which
+      $ sudo dnf install make python3-pip which inkscape texlive-fncychap
       &PIP3_HOST_PACKAGES_DOC;
 
 openSUSE Packages
@@ -173,42 +155,15 @@ supported openSUSE Linux distribution:
 -  *Documentation:* Packages needed if you are going to build out the
    Yocto Project documentation manuals::
 
-      $ sudo zypper install make python3-pip which
+      $ sudo zypper install make python3-pip which inkscape texlive-fncychap
       &PIP3_HOST_PACKAGES_DOC;
 
 
-CentOS-7 Packages
------------------
+AlmaLinux-8 Packages
+--------------------
 
 Here are the required packages by function given a
-supported CentOS-7 Linux distribution:
-
--  *Essentials:* Packages needed to build an image for a headless
-   system::
-
-      $ sudo yum install &CENTOS7_HOST_PACKAGES_ESSENTIAL;
-
-   .. note::
-
-      -  Extra Packages for Enterprise Linux (i.e. ``epel-release``) is
-         a collection of packages from Fedora built on RHEL/CentOS for
-         easy installation of packages not included in enterprise Linux
-         by default. You need to install these packages separately.
-
-      -  The ``makecache`` command consumes additional Metadata from
-         ``epel-release``.
-
--  *Documentation:* Packages needed if you are going to build out the
-   Yocto Project documentation manuals::
-
-      $ sudo yum install make python3-pip which
-      &PIP3_HOST_PACKAGES_DOC;
-
-CentOS-8 Packages
------------------
-
-Here are the required packages by function given a
-supported CentOS-8 Linux distribution:
+supported AlmaLinux-8 Linux distribution:
 
 -  *Essentials:* Packages needed to build an image for a headless
    system::
@@ -231,7 +186,7 @@ supported CentOS-8 Linux distribution:
 -  *Documentation:* Packages needed if you are going to build out the
    Yocto Project documentation manuals::
 
-      $ sudo dnf install make python3-pip which
+      $ sudo dnf install make python3-pip which inkscape texlive-fncychap
       &PIP3_HOST_PACKAGES_DOC;
 
 Required Git, tar, Python, make and gcc Versions

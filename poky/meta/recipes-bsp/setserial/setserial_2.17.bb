@@ -15,7 +15,8 @@ inherit autotools-brokensep
 SRC_URI = "${SOURCEFORGE_MIRROR}/setserial/${BPN}-${PV}.tar.gz \
            file://add_stdlib.patch \
            file://ldflags.patch \
-          "
+           file://0001-setserial.c-Add-needed-system-headers-for-ioctl-and-.patch \
+           "
 
 SRC_URI[md5sum] = "c4867d72c41564318e0107745eb7a0f2"
 SRC_URI[sha256sum] = "7e4487d320ac31558563424189435d396ddf77953bb23111a17a3d1487b5794a"

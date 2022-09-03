@@ -239,8 +239,8 @@ do_install_ptest() {
 
     # As the binary isn't stripped or debug-splitted, the source file isn't fetched
     # via dwarfsrcfiles either, so it needs to be installed manually.
-    mkdir -p ${D}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/${BP}/none/tests/
-    install ${S}/none/tests/tls.c ${D}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/${BP}/none/tests/
+    mkdir -p ${D}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/none/tests/
+    install ${S}/none/tests/tls.c ${D}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/none/tests/
 }
 
 # avoid stripping some generated binaries otherwise some of the tests will fail

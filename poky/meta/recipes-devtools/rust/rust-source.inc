@@ -1,5 +1,11 @@
 SRC_URI += "https://static.rust-lang.org/dist/rustc-${PV}-src.tar.xz;name=rust"
-SRC_URI[rust.sha256sum] = "6c00ef115c894c2645e60b5049a4f5dacf1dc0c993f3074f7ae4fdf4c755dd5e"
+SRC_URI[rust.sha256sum] = "8f44af6dc44cc4146634a4dd5e4cc5470b3052a2337019b870c0e025e8987e0c"
+
+SRC_URI:append:class-target:pn-rust = " \
+    file://hardcodepaths.patch \
+    file://crossbeam_atomic.patch \
+    file://0001-Add-ENOTSUP-constant-for-riscv32-musl.patch"
+SRC_URI:append:class-nativesdk:pn-nativesdk-rust = " file://hardcodepaths.patch"
 
 RUSTSRC = "${WORKDIR}/rustc-${PV}-src"
 

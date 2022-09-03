@@ -10,7 +10,7 @@ DEPENDS = "libplist"
 
 PV = "1.0.0+git${SRCPV}"
 
-SRCREV = "bc6c44b92091c9587a9bed0ed3f2c3248bfd13b3"
+SRCREV = "d2ff7969dcd0a12e4f18f63dab03e6cd03054fcb"
 SRC_URI = "git://github.com/libimobiledevice/libimobiledevice-glue;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"

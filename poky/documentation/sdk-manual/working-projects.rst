@@ -88,9 +88,13 @@ project:
 
       $ source /opt/poky/&DISTRO;/environment-setup-i586-poky-linux
 
+   Another example is sourcing the environment setup directly in a Yocto
+   build::
+
+      $ source tmp/deploy/images/qemux86-64/environment-setup-core2-64-poky-linux
+
 3. *Create the configure Script:* Use the ``autoreconf`` command to
-   generate the ``configure`` script.
-   ::
+   generate the ``configure`` script::
 
       $ autoreconf
 
@@ -278,6 +282,11 @@ example:
    Project release::
 
       $ source /opt/poky/&DISTRO;/environment-setup-i586-poky-linux
+
+   Another example is sourcing the environment setup directly in a Yocto
+   build::
+
+      $ source tmp/deploy/images/qemux86-64/environment-setup-core2-64-poky-linux
 
 3. *Create the Makefile:* For this example, the Makefile contains
    two lines that can be used to set the :term:`CC` variable. One line is

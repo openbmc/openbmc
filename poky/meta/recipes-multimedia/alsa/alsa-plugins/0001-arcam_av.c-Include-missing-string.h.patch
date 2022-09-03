@@ -1,0 +1,25 @@
+From b01b176a665ba65979d74922955f51dc4888a713 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 23 Aug 2022 15:21:16 -0700
+Subject: [PATCH] arcam_av.c: Include missing string.h
+
+bzero() function needs this header to be included
+
+Upstream-Status: Submitted [https://github.com/alsa-project/alsa-plugins/pull/47]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ arcam-av/arcam_av.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arcam-av/arcam_av.c b/arcam-av/arcam_av.c
+index 63f9b4e..29fc537 100644
+--- a/arcam-av/arcam_av.c
++++ b/arcam-av/arcam_av.c
+@@ -27,6 +27,7 @@
+ #include <signal.h>
+ #include <stddef.h>
+ #include <stdio.h>
++#include <string.h>
+ #include <termios.h>
+ #include <unistd.h>
+ 

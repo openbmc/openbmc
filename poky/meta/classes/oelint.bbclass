@@ -1,3 +1,9 @@
+#
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
+
 addtask lint before do_build
 do_lint[nostamp] = "1"
 python do_lint() {

@@ -34,14 +34,16 @@ MOZJS_PATCHES = "\
     file://0003-jsauthority-ensure-to-call-JS_Init-and-JS_ShutDown-e.patch \
 "
 DUKTAPE_PATCHES = "file://0003-Added-support-for-duktape-as-JS-engine.patch"
+DUKTAPE_NG_PATCHES = "file://0005-Make-netgroup-support-optional-duktape.patch"
 PAM_SRC_URI = "file://polkit-1_pam.patch"
 SRC_URI = "http://www.freedesktop.org/software/polkit/releases/polkit-${PV}.tar.gz \
            ${@bb.utils.contains('DISTRO_FEATURES', 'pam', '${PAM_SRC_URI}', '', d)} \
            ${@bb.utils.contains('PACKAGECONFIG', 'mozjs', '${MOZJS_PATCHES}', '', d)} \
            ${@bb.utils.contains('PACKAGECONFIG', 'duktape', '${DUKTAPE_PATCHES}', '', d)} \
-           file://0003-make-netgroup-support-optional.patch \
            file://0001-pkexec-local-privilege-escalation-CVE-2021-4034.patch \
            file://0002-CVE-2021-4115-GHSL-2021-077-fix.patch \
+           file://0004-Make-netgroup-support-optional.patch \
+           ${@bb.utils.contains('PACKAGECONFIG', 'duktape', '${DUKTAPE_NG_PATCHES}', '', d)} \
            "
 SRC_URI[sha256sum] = "c8579fdb86e94295404211285fee0722ad04893f0213e571bd75c00972fd1f5c"
 
@@ -71,7 +73,7 @@ FILES:${PN}:append = " \
 FILES:${PN}-examples = "${bindir}/*example*"
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM:${PN} = "--system --no-create-home --user-group --home-dir ${sysconfdir}/${BPN}-1 polkitd"
+USERADD_PARAM:${PN} = "--system --no-create-home --user-group --home-dir ${sysconfdir}/${BPN}-1 --shell /bin/nologin polkitd"
 
 SYSTEMD_SERVICE:${PN} = "${BPN}.service"
 SYSTEMD_AUTO_ENABLE = "disable"

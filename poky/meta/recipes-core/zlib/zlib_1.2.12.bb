@@ -12,6 +12,8 @@ SRC_URI = "https://zlib.net/${BP}.tar.xz \
            file://0001-configure-Pass-LDFLAGS-to-link-tests.patch \
            file://run-ptest \
            file://0001-Correct-incorrect-inputs-provided-to-the-CRC-functio.patch \
+           file://0001-Fix-a-bug-when-getting-a-gzip-header-extra-field-wit.patch \
+           file://0001-Fix-extra-field-processing-bug-that-dereferences-NUL.patch \
            "
 UPSTREAM_CHECK_URI = "http://zlib.net/"
 

@@ -1,4 +1,4 @@
-From 7bc891e00be4263311d75aa2b2ee6a3b7b75355f Mon Sep 17 00:00:00 2001
+From ef5fddafdec78cab9963d21736e64d71ca520bcc Mon Sep 17 00:00:00 2001
 From: Alex Kube <alexander.j.kube@gmail.com>
 Date: Wed, 23 Oct 2019 21:18:12 +0430
 Subject: [PATCH] cmd/dist: separate host and target builds
@@ -36,12 +36,14 @@ Matt Madison <matt@madison.systems>.
 Signed-off-by: Alexander J Kube <alexander.j.kube@gmail.com>
 
 ---
- src/cmd/dist/build.go | 156 ++++++++++++++++++++++++++++++------------
- 1 file changed, 113 insertions(+), 43 deletions(-)
+ src/cmd/dist/build.go | 154 ++++++++++++++++++++++++++++++------------
+ 1 file changed, 112 insertions(+), 42 deletions(-)
 
+diff --git a/src/cmd/dist/build.go b/src/cmd/dist/build.go
+index 3024d0c..45ebee0 100644
 --- a/src/cmd/dist/build.go
 +++ b/src/cmd/dist/build.go
-@@ -44,6 +44,7 @@ var (
+@@ -45,6 +45,7 @@ var (
  	goexperiment     string
  	workdir          string
  	tooldir          string
@@ -49,7 +51,7 @@ Signed-off-by: Alexander J Kube <alexander.j.kube@gmail.com>
  	oldgoos          string
  	oldgoarch        string
  	exe              string
-@@ -54,6 +55,7 @@ var (
+@@ -55,6 +56,7 @@ var (
  
  	rebuildall   bool
  	defaultclang bool
@@ -57,7 +59,7 @@ Signed-off-by: Alexander J Kube <alexander.j.kube@gmail.com>
  
  	vflag int // verbosity
  )
-@@ -254,6 +256,8 @@ func xinit() {
+@@ -267,6 +269,8 @@ func xinit() {
  	if tooldir = os.Getenv("GOTOOLDIR"); tooldir == "" {
  		tooldir = pathf("%s/pkg/tool/%s_%s", goroot, gohostos, gohostarch)
  	}
@@ -66,7 +68,7 @@ Signed-off-by: Alexander J Kube <alexander.j.kube@gmail.com>
  }
  
  // compilerEnv returns a map from "goos/goarch" to the
-@@ -499,8 +503,10 @@ func setup() {
+@@ -468,8 +472,10 @@ func setup() {
  	p := pathf("%s/pkg/%s_%s", goroot, gohostos, gohostarch)
  	if rebuildall {
  		xremoveall(p)
@@ -77,7 +79,7 @@ Signed-off-by: Alexander J Kube <alexander.j.kube@gmail.com>
  
  	if goos != gohostos || goarch != gohostarch {
  		p := pathf("%s/pkg/%s_%s", goroot, goos, goarch)
-@@ -1252,17 +1258,35 @@ func cmdbootstrap() {
+@@ -1248,17 +1254,35 @@ func cmdbootstrap() {
  
  	var noBanner, noClean bool
  	var debug bool
@@ -114,7 +116,7 @@ Signed-off-by: Alexander J Kube <alexander.j.kube@gmail.com>
  	// Set GOPATH to an internal directory. We shouldn't actually
  	// need to store files here, since the toolchain won't
  	// depend on modules outside of vendor directories, but if
-@@ -1330,8 +1354,13 @@ func cmdbootstrap() {
+@@ -1326,8 +1350,13 @@ func cmdbootstrap() {
  		xprintf("\n")
  	}
  
@@ -128,9 +130,9 @@ Signed-off-by: Alexander J Kube <alexander.j.kube@gmail.com>
 +		goldflags = os.Getenv("GO_LDFLAGS") // we were using $BOOT_GO_LDFLAGS until now
 +	}
  	goBootstrap := pathf("%s/go_bootstrap", tooldir)
- 	cmdGo := pathf("%s/go", gobin)
+ 	cmdGo := pathf("%s/go", gorootBin)
  	if debug {
-@@ -1360,7 +1389,11 @@ func cmdbootstrap() {
+@@ -1356,7 +1385,11 @@ func cmdbootstrap() {
  		xprintf("\n")
  	}
  	xprintf("Building Go toolchain2 using go_bootstrap and Go toolchain1.\n")
@@ -143,7 +145,7 @@ Signed-off-by: Alexander J Kube <alexander.j.kube@gmail.com>
  	// Now that cmd/go is in charge of the build process, enable GOEXPERIMENT.
  	os.Setenv("GOEXPERIMENT", goexperiment)
  	goInstall(goBootstrap, append([]string{"-i"}, toolchain...)...)
-@@ -1399,50 +1432,84 @@ func cmdbootstrap() {
+@@ -1395,50 +1428,84 @@ func cmdbootstrap() {
  	}
  	checkNotStale(goBootstrap, append(toolchain, "runtime/internal/sys")...)
  
@@ -235,7 +237,12 @@ Signed-off-by: Alexander J Kube <alexander.j.kube@gmail.com>
 -		timelog("build", "target toolchain")
 -		if vflag > 0 {
 -			xprintf("\n")
--		}
++		if debug {
++			run("", ShowOutput|CheckExit, pathf("%s/compile", tooldir), "-V=full")
++			run("", ShowOutput|CheckExit, pathf("%s/buildid", tooldir), pathf("%s/pkg/%s_%s/runtime/internal/sys.a", goroot, goos, goarch))
++			checkNotStale(goBootstrap, append(toolchain, "runtime/internal/sys")...)
++			copyfile(pathf("%s/compile4", tooldir), pathf("%s/compile", tooldir), writeExec)
+ 		}
 -		goos = oldgoos
 -		goarch = oldgoarch
 -		os.Setenv("GOOS", goos)
@@ -256,16 +263,10 @@ Signed-off-by: Alexander J Kube <alexander.j.kube@gmail.com>
 -		run("", ShowOutput|CheckExit, pathf("%s/buildid", tooldir), pathf("%s/pkg/%s_%s/runtime/internal/sys.a", goroot, goos, goarch))
 -		checkNotStale(goBootstrap, append(toolchain, "runtime/internal/sys")...)
 -		copyfile(pathf("%s/compile4", tooldir), pathf("%s/compile", tooldir), writeExec)
-+		if debug {
-+			run("", ShowOutput|CheckExit, pathf("%s/compile", tooldir), "-V=full")
-+			run("", ShowOutput|CheckExit, pathf("%s/buildid", tooldir), pathf("%s/pkg/%s_%s/runtime/internal/sys.a", goroot, goos, goarch))
-+			checkNotStale(goBootstrap, append(toolchain, "runtime/internal/sys")...)
-+			copyfile(pathf("%s/compile4", tooldir), pathf("%s/compile", tooldir), writeExec)
-+		}
  	}
  
  	// Check that there are no new files in $GOROOT/bin other than
-@@ -1459,8 +1526,11 @@ func cmdbootstrap() {
+@@ -1455,8 +1522,11 @@ func cmdbootstrap() {
  		}
  	}
  

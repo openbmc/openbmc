@@ -55,6 +55,8 @@ EXTRA_OEMESON = "\
     -Dconfig_dns_rc_manager_default=${NETWORKMANAGER_DNS_RC_MANAGER_DEFAULT} \
     -Dconfig_dhcp_default=${NETWORKMANAGER_DHCP_DEFAULT} \
     -Ddhcpcanon=false \
+    -Diptables=${sbindir}/iptables \
+    -Dnft=${sbindir}/nft \
 "
 
 # stolen from https://github.com/void-linux/void-packages/blob/master/srcpkgs/NetworkManager/template

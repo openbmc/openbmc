@@ -1,0 +1,31 @@
+From 8591c1e3edaea8f17396e3d2819d9064b2818cfb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 6 Aug 2022 20:39:01 -0700
+Subject: [PATCH] Do not include linux/fs.h
+
+This header is not needed to be included anymore, moreover it conflicts
+with sys/mount.h from glibc 2.36+ see [1]
+
+[1] https://sourceware.org/glibc/wiki/Release/2.36
+
+Upstream-Status: Submitted [https://github.com/xrmx/bootchart/pull/99]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ collector/collector.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/collector/collector.c b/collector/collector.c
+index 5055181..12738ff 100644
+--- a/collector/collector.c
++++ b/collector/collector.c
+@@ -34,7 +34,6 @@
+ 
+ #include <sys/mount.h>
+ #include <sys/sysmacros.h>
+-#include <linux/fs.h>
+ #include <linux/genetlink.h>
+ #include <linux/taskstats.h>
+ #include <linux/cgroupstats.h>
+-- 
+2.37.1
+

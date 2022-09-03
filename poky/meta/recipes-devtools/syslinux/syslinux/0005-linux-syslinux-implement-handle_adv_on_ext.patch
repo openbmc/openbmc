@@ -1,7 +1,7 @@
-From cdb980b37f40dc2c41891434c7736e49da53756e Mon Sep 17 00:00:00 2001
+From ee3a60829edc9d3344dc872fb0158e7b006f02be Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Wed, 31 Dec 2014 16:47:52 +0800
-Subject: [PATCH 5/9] linux/syslinux: implement handle_adv_on_ext()
+Subject: [PATCH] linux/syslinux: implement handle_adv_on_ext()
 
 It reads adv if found on the device, or resets syslinux_adv, or update
 the adv if update adv only.
@@ -11,14 +11,14 @@ Upstream-Status: Submitted
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 Tested-by: Du Dolpher <dolpher.du@intel.com>
 ---
- linux/syslinux.c | 97 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ linux/syslinux.c | 97 ++++++++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 97 insertions(+)
 
 diff --git a/linux/syslinux.c b/linux/syslinux.c
-index 247c86a..de5d272 100755
+index c7c1994..90b8edd 100755
 --- a/linux/syslinux.c
 +++ b/linux/syslinux.c
-@@ -421,6 +421,103 @@ int install_bootblock(int fd, const char *device)
+@@ -422,6 +422,103 @@ int install_bootblock(int fd, const char *device)
  
  static int handle_adv_on_ext(void)
  {
@@ -122,6 +122,3 @@ index 247c86a..de5d272 100755
  }
  
  /* Write files, adv, boot sector */
--- 
-1.9.1
-

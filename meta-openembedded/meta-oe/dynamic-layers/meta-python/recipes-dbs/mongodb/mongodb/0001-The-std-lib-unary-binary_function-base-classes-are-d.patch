@@ -1,0 +1,40 @@
+From f9b55f5a1fab85bf73c95e6372779d6f50f75e84 Mon Sep 17 00:00:00 2001
+From: jzmaddock <john@johnmaddock.co.uk>
+Date: Mon, 11 Jul 2022 18:26:07 +0100
+Subject: [PATCH] The std lib unary/binary_function base classes are
+ deprecated/removed from libcpp15. Fixes
+ https://github.com/boostorg/container_hash/issues/24.
+
+Upstream-Status: Backport [https://github.com/boostorg/config/pull/440/commits/f0af4a9184457939b89110795ae2d293582c5f66]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/third_party/boost-1.70.0/boost/config/stdlib/libcpp.hpp | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+--- a/src/third_party/boost-1.70.0/boost/config/stdlib/libcpp.hpp
++++ b/src/third_party/boost-1.70.0/boost/config/stdlib/libcpp.hpp
+@@ -140,4 +140,13 @@
+ #  define BOOST_NO_CXX14_HDR_SHARED_MUTEX
+ #endif
+ 
++#if _LIBCPP_VERSION >= 15000
++//
++// Unary function is now deprecated in C++11 and later:
++//
++#if __cplusplus >= 201103L
++#define BOOST_NO_CXX98_FUNCTION_BASE
++#endif
++#endif
++
+ //  --- end ---
+--- a/src/third_party/boost-1.70.0/boost/container_hash/hash.hpp
++++ b/src/third_party/boost-1.70.0/boost/container_hash/hash.hpp
+@@ -118,7 +118,7 @@ namespace boost
+ {
+     namespace hash_detail
+     {
+-#if defined(_HAS_AUTO_PTR_ETC) && !_HAS_AUTO_PTR_ETC
++#if defined(BOOST_NO_CXX98_FUNCTION_BASE)
+         template <typename T>
+         struct hash_base
+         {

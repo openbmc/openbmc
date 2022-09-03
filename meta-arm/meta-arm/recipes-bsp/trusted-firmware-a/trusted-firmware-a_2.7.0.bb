@@ -3,6 +3,8 @@ require trusted-firmware-a.inc
 # TF-A v2.7
 SRCREV_tfa = "35f4c7295bafeb32c8bcbdfb6a3f2e74a57e732b"
 
+SRC_URI += "file://rwx-segments.patch"
+
 LIC_FILES_CHKSUM += "file://docs/license.rst;md5=b2c740efedc159745b9b31f88ff03dde"
 
 # mbed TLS v2.28.0

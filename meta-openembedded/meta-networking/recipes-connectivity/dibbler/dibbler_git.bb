@@ -9,6 +9,7 @@ SRCREV = "a7c6cf58a88a510cb00841351e75030ce78d36bf"
 
 SRC_URI = "git://github.com/tomaszmrugalski/dibbler;branch=master;protocol=https \
            file://dibbler_fix_getSize_crash.patch \
+           file://0001-port-linux-Re-order-header-includes.patch \
            "
 PV = "1.0.1+1.0.2RC1+git${SRCREV}"
 
@@ -29,6 +30,7 @@ inherit autotools
 
 DEPENDS += "flex-native"
 
+CFLAGS += "-D_GNU_SOURCE"
 LDFLAGS += "-pthread"
 
 PACKAGES =+ "${PN}-requestor ${PN}-client ${PN}-relay ${PN}-server"

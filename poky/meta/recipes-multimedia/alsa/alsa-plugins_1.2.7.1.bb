@@ -22,7 +22,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=a916467b91076e631dd8edb7424769c7 \
                     file://rate/rate_samplerate.c;endline=35;md5=fd77bce85f4a338c0e8ab18430b69fae \
                     "
 
-SRC_URI = "https://www.alsa-project.org/files/pub/plugins/${BP}.tar.bz2"
+SRC_URI = "https://www.alsa-project.org/files/pub/plugins/${BP}.tar.bz2 \
+           file://0001-arcam_av.c-Include-missing-string.h.patch \
+           "
 SRC_URI[sha256sum] = "8c337814954bb7c167456733a6046142a2931f12eccba3ec2a4ae618a3432511"
 
 DEPENDS += "alsa-lib"

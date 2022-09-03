@@ -1,7 +1,7 @@
-From b8f4f76e135ff2061d0032292f5209ac911dba16 Mon Sep 17 00:00:00 2001
+From 61c5fe3758a0febdee33429f5be16f69279045cc Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Mon, 28 Jun 2021 23:20:55 +0100
-Subject: [PATCH 03/27] usb: common: move urb code to common
+Subject: [PATCH 03/24] usb: common: move urb code to common
 
 Move urb code from musb only use to a more common scope, so other
 drivers in the future can use the handling of urb in usb.
@@ -493,5 +493,5 @@ index 6dd2c997f9b3..ec00161710a5 100644
  /*
   * Hub Status & Hub Change bit masks
 -- 
-2.30.2
+2.37.1
 

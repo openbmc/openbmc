@@ -18,6 +18,8 @@ DISABLE_STATIC:pn-nativesdk-openssl = ""
 DISABLE_STATIC:pn-gcc-runtime = ""
 # libusb1-native is used to build static dfu-util-native
 DISABLE_STATIC:pn-libusb1-native = ""
+# needed by rust
+DISABLE_STATIC:pn-musl = ""
 
 EXTRA_OECONF:append = "${DISABLE_STATIC}"
 

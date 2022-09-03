@@ -1,0 +1,114 @@
+From 00cce57eff1a0de3b93efa5da225e9eb33d19659 Mon Sep 17 00:00:00 2001
+From: Sean Anderson <sean.anderson@seco.com>
+Date: Thu, 30 Dec 2021 15:34:28 -0500
+Subject: [PATCH] img2simg: Add support for converting holes to "don't care"
+ chunks
+
+This adds support for converting files with holes to "don't care"
+chunks. This can result in a substantial reduction in the time it takes
+to program an image if it has many holes.
+
+Generally, constants compared to argc have been reduced by one, since we
+no longer have the program name as the first argument.
+
+Change-Id: I00750edc07d6415dcc07ae0351e9397b0222b7ba
+Upstream-Status: Backport [6150b00b6025918da8c28e5c2f929ecdf480a9d6]
+Signed-off-by: Sean Anderson <sean.anderson@seco.com>
+---
+ libsparse/img2simg.c | 41 ++++++++++++++++++++++++++++++-----------
+ 1 file changed, 30 insertions(+), 11 deletions(-)
+
+diff --git a/libsparse/img2simg.c b/libsparse/img2simg.c
+index 2e171b613..c985d5449 100644
+--- a/libsparse/img2simg.c
++++ b/libsparse/img2simg.c
+@@ -40,25 +40,42 @@
+ 
+ void usage()
+ {
+-    fprintf(stderr, "Usage: img2simg <raw_image_file> <sparse_image_file> [<block_size>]\n");
++    fprintf(stderr, "Usage: img2simg [-s] <raw_image_file> <sparse_image_file> [<block_size>]\n");
+ }
+ 
+ int main(int argc, char *argv[])
+ {
++	char *arg_in;
++	char *arg_out;
++	enum sparse_read_mode mode = SPARSE_READ_MODE_NORMAL;
++	int extra;
+ 	int in;
++	int opt;
+ 	int out;
+ 	int ret;
+ 	struct sparse_file *s;
+ 	unsigned int block_size = 4096;
+ 	off64_t len;
+ 
+-	if (argc < 3 || argc > 4) {
++	while ((opt = getopt(argc, argv, "s")) != -1) {
++		switch (opt) {
++		case 's':
++			mode = SPARSE_READ_MODE_HOLE;
++			break;
++		default:
++			usage();
++			exit(-1);
++		}
++	}
++
++	extra = argc - optind;
++	if (extra < 2 || extra > 3) {
+ 		usage();
+ 		exit(-1);
+ 	}
+ 
+-	if (argc == 4) {
+-		block_size = atoi(argv[3]);
++	if (extra == 3) {
++		block_size = atoi(argv[optind + 2]);
+ 	}
+ 
+ 	if (block_size < 1024 || block_size % 4 != 0) {
+@@ -66,22 +83,24 @@ int main(int argc, char *argv[])
+ 		exit(-1);
+ 	}
+ 
+-	if (strcmp(argv[1], "-") == 0) {
++	arg_in = argv[optind];
++	if (strcmp(arg_in, "-") == 0) {
+ 		in = STDIN_FILENO;
+ 	} else {
+-		in = open(argv[1], O_RDONLY | O_BINARY);
++		in = open(arg_in, O_RDONLY | O_BINARY);
+ 		if (in < 0) {
+-			fprintf(stderr, "Cannot open input file %s\n", argv[1]);
++			fprintf(stderr, "Cannot open input file %s\n", arg_in);
+ 			exit(-1);
+ 		}
+ 	}
+ 
+-	if (strcmp(argv[2], "-") == 0) {
++	arg_out = argv[optind + 1];
++	if (strcmp(arg_out, "-") == 0) {
+ 		out = STDOUT_FILENO;
+ 	} else {
+-		out = open(argv[2], O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0664);
++		out = open(arg_out, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0664);
+ 		if (out < 0) {
+-			fprintf(stderr, "Cannot open output file %s\n", argv[2]);
++			fprintf(stderr, "Cannot open output file %s\n", arg_out);
+ 			exit(-1);
+ 		}
+ 	}
+@@ -96,7 +115,7 @@ int main(int argc, char *argv[])
+ 	}
+ 
+ 	sparse_file_verbose(s);
+-	ret = sparse_file_read(s, in, SPARSE_READ_MODE_NORMAL, false);
++	ret = sparse_file_read(s, in, mode, false);
+ 	if (ret) {
+ 		fprintf(stderr, "Failed to read file\n");
+ 		exit(-1);
+-- 
+2.35.1.1320.gc452695387.dirty
+

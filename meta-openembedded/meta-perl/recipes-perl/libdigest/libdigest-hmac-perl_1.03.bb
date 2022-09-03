@@ -3,7 +3,7 @@ DESCRIPTION = "Keyed-Hashing for Message Authentication"
 HOMEPAGE = "http://search.cpan.org/~gaas/Digest-HMAC-1.03/"
 SECTION = "libs"
 
-LICENSE = "Artistic-1.0|GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://README;beginline=13;endline=17;md5=da980cdc026faa065e5d5004115334e6"
 
 RDEPENDS:${PN} = "libdigest-sha1-perl perl-module-extutils-makemaker perl-module-digest-md5"

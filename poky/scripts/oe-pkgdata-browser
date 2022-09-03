@@ -1,4 +1,9 @@
 #! /usr/bin/env python3
+#
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
 
 import os, sys, enum, ast
 

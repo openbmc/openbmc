@@ -17,7 +17,7 @@ So replace "perl -w" with "use warnings" to make it work.
 
 The man2hlp.in already has "use warnings;", so just remove '-w' is OK.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://github.com/MidnightCommander/mc/pull/174]
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 ---

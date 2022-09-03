@@ -50,6 +50,7 @@ SRC_URI = "http://ftp.porcupine.org/pub/security/tcp_wrappers_${PV}.tar.gz \
            file://fix_warnings.patch \
            file://fix_warnings2.patch \
            file://0001-Remove-fgets-extern-declaration.patch \
+           file://0001-Fix-implicit-function-declaration-warnings.patch \
            "
 
 SRC_URI[md5sum] = "e6fa25f71226d090f34de3f6b122fb5a"

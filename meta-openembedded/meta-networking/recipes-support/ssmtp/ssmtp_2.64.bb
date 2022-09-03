@@ -7,7 +7,8 @@ SRC_URI = "${DEBIAN_MIRROR}/main/s/${BPN}/${BPN}_${PV}.orig.tar.bz2 \
            file://ssmtp-bug584162-fix.patch \
            file://build-ouside_srcdir.patch \
            file://use-DESTDIR.patch \
-"
+           file://0001-ssmtp-Correct-the-null-pointer-assignment-to-char-po.patch \
+           "
 
 SRC_URI[md5sum] = "65b4e0df4934a6cd08c506cabcbe584f"
 SRC_URI[sha256sum] = "22c37dc90c871e8e052b2cab0ad219d010fa938608cd66b21c8f3c759046fa36"

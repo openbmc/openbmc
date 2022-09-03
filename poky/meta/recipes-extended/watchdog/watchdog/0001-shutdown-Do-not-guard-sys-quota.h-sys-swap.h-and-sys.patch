@@ -1,0 +1,37 @@
+From ca1d379fa13c4055d42d2ff3a647b4397768efcd Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 23 Aug 2022 19:23:26 -0700
+Subject: [PATCH] shutdown: Do not guard sys/quota.h sys/swap.h and
+ sys/reboot.h with __GLIBC__
+
+These headers are provided by uclibc/musl/glibc and bionic so we can
+assume they are not needed to be glibc specific includes. This also
+ensures that we get proper declaration of reboot() API
+
+Upstream-Status: Submitted [https://sourceforge.net/p/watchdog/patches/12/]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/shutdown.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/src/shutdown.c b/src/shutdown.c
+index 1d9a857..6aea0d0 100644
+--- a/src/shutdown.c
++++ b/src/shutdown.c
+@@ -29,13 +29,9 @@
+ #include "extern.h"
+ #include "ext2_mnt.h"
+ 
+-#if defined __GLIBC__
+ #include <sys/quota.h>
+ #include <sys/swap.h>
+ #include <sys/reboot.h>
+-#else				/* __GLIBC__ */
+-#include <linux/quota.h>
+-#endif				/* __GLIBC__ */
+ 
+ #include <unistd.h>
+ 
+-- 
+2.37.2
+

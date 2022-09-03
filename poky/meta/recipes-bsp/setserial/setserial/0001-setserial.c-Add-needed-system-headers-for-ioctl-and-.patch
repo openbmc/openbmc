@@ -1,0 +1,41 @@
+From 9bbb342f5d9ad5dc75486fd35ada8e287ba19299 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 15 Aug 2022 13:03:17 -0700
+Subject: [PATCH] setserial.c: Add needed system headers for ioctl() and
+ close() calls
+
+Add int return type for main() function
+
+Fixes
+error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
+error: call to undeclared function 'close'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declarat
+ion]
+
+Upstream-Status: Submitted [https://sourceforge.net/p/setserial/discussion/7060/thread/95d874c12c/]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ setserial.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/setserial.c b/setserial.c
+index bfda8fd..6a95513 100644
+--- a/setserial.c
++++ b/setserial.c
+@@ -16,6 +16,8 @@
+ #include <termios.h>
+ #include <string.h>
+ #include <errno.h>
++#include <unistd.h>
++#include <sys/ioctl.h>
+ 
+ #ifdef HAVE_ASM_IOCTLS_H
+ #include <asm/ioctls.h>
+@@ -715,7 +717,7 @@ fprintf(stderr, "\t* port\t\tset the I/O port\n");
+ 	exit(1);
+ }
+ 
+-main(int argc, char **argv)
++int main(int argc, char **argv)
+ {
+ 	int	get_flag = 0, wild_intr_flag = 0;
+ 	int	c;

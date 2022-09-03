@@ -1,4 +1,8 @@
+#
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: MIT
+#
 import os
 import contextlib
 from oeqa.core.decorator import OETestTag

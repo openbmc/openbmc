@@ -1,3 +1,8 @@
+From 2a75095638002d37a2f9c7aeb0ec54f271b0a1c4 Mon Sep 17 00:00:00 2001
+From: Joe Slater <joe.slater@windriver.com>
+Date: Tue, 1 Aug 2017 12:36:53 -0700
+Subject: [PATCH] slang: fix terminfo related problems
+
 Do not use the JD_TERMCAP macro since we cannot get the terminfo from
 ncurses pkg-config, but fix the macro to not reference host directories.
 Also add src/test/Makefile.in so that we can use -ltermcap if we want to.
@@ -8,10 +13,18 @@ Upstream-Status: Inappropriate [see above]
 
 Signed-off-by: Joe Slater <joe.slater@windriver.com>
 
+---
+ autoconf/aclocal.m4   |  8 +---
+ autoconf/configure.ac | 11 +++++-
+ src/test/Makefile.in  | 90 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 100 insertions(+), 9 deletions(-)
+ create mode 100644 src/test/Makefile.in
 
+diff --git a/autoconf/aclocal.m4 b/autoconf/aclocal.m4
+index b2dfcd3..5f94ed3 100644
 --- a/autoconf/aclocal.m4
 +++ b/autoconf/aclocal.m4
-@@ -506,14 +506,10 @@ then
+@@ -509,15 +509,9 @@ then
  else
     MISC_TERMINFO_DIRS=""
  fi
@@ -19,8 +32,8 @@ Signed-off-by: Joe Slater <joe.slater@windriver.com>
 -                  /usr/lib/terminfo \
 -                  /usr/share/terminfo \
 -                  /usr/share/lib/terminfo \
--		  /usr/local/lib/terminfo"
-+
+-		  /usr/local/lib/terminfo \
+-                  /etc/terminfo /lib/terminfo"
  TERMCAP=-ltermcap
  
 -for terminfo_dir in $JD_Terminfo_Dirs
@@ -28,9 +41,11 @@ Signed-off-by: Joe Slater <joe.slater@windriver.com>
  do
     if test -d $terminfo_dir
     then
+diff --git a/autoconf/configure.ac b/autoconf/configure.ac
+index 8e11e13..9e6402c 100644
 --- a/autoconf/configure.ac
 +++ b/autoconf/configure.ac
-@@ -249,7 +249,14 @@ AC_CHECK_SIZEOF(size_t)
+@@ -250,7 +250,14 @@ AC_CHECK_SIZEOF(size_t)
  JD_CHECK_LONG_LONG
  JD_LARGE_FILE_SUPPORT
  
@@ -46,7 +61,7 @@ Signed-off-by: Joe Slater <joe.slater@windriver.com>
  JD_GCC_WARNINGS
  
  JD_SET_OBJ_SRC_DIR(src)
-@@ -364,7 +371,7 @@ AC_CONFIG_HEADER(src/sysconf.h:src/confi
+@@ -365,7 +372,7 @@ AC_CONFIG_HEADER(src/sysconf.h:src/config.hin)
  dnl AC_CONFIG_SUBDIRS(demo)
  
  AC_OUTPUT(Makefile:autoconf/Makefile.in \
@@ -55,6 +70,9 @@ Signed-off-by: Joe Slater <joe.slater@windriver.com>
    slang.pc:autoconf/slangpc.in \
  )
  
+diff --git a/src/test/Makefile.in b/src/test/Makefile.in
+new file mode 100644
+index 0000000..4b7307f
 --- /dev/null
 +++ b/src/test/Makefile.in
 @@ -0,0 +1,90 @@

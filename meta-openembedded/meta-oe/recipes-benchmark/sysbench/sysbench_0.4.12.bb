@@ -15,8 +15,8 @@ SRC_URI = "https://launchpad.net/ubuntu/+archive/primary/+files/${BPN}_${PV}.ori
 SRC_URI[md5sum] = "3a6d54fdd3fe002328e4458206392b9d"
 SRC_URI[sha256sum] = "83fa7464193e012c91254e595a89894d8e35b4a38324b52a5974777e3823ea9e"
 
-PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'largefile', d)}"
-PACKAGECONFIG[largefile] = "--enable-largefile,--disable-largefile,,"
+EXTRA_OECONF += "--enable-largefile"
+PACKAGECONFIG ??= ""
 PACKAGECONFIG[aio] = "--enable-aio,--disable-aio,libaio,"
 PACKAGECONFIG[mysql] = "--with-mysql \
                         --with-mysql-includes=${STAGING_INCDIR}/mysql \

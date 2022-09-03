@@ -91,7 +91,6 @@ COMPATIBLE_MACHINE:juno = "juno"
 KBUILD_DEFCONFIG:juno = "defconfig"
 KCONFIG_MODE:juno = "--alldefconfig"
 FILESEXTRAPATHS:prepend:juno := "${ARMBSPFILESPATHS}"
-SRC_URI:append:juno = " file://juno-dts-mhu-doorbell.patch"
 
 #
 # Musca B1/S2 can't run Linux
@@ -180,6 +179,7 @@ SRC_URI:append:tc = " \
     file://0042-ANDROID-trusty-ffa-Add-support-for-FFA-memory-operat.patch \
     file://0043-ANDROID-trusty-ffa-Enable-FFA-transport-for-both-mem.patch \
     file://0044-ANDROID-trusty-Make-trusty-transports-configurable.patch \
+    file://init_disassemble_info-signature-changes-causes-compile-failures.patch \
     "
 KERNEL_FEATURES:append:tc = " bsp/arm-platforms/tc.scc"
 KERNEL_FEATURES:append:tc1 = " bsp/arm-platforms/tc-autofdo.scc"
