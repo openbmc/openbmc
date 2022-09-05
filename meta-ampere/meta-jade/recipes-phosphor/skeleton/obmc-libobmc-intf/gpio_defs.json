@@ -49,6 +49,11 @@
             "name": "RESET_BUTTON",
             "pin": "R5",
             "direction": "both"
+        },
+        {
+            "name": "ID_BTN",
+            "pin": "Q5",
+            "direction": "both"
         }
     ]
 }
