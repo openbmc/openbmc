@@ -12,7 +12,6 @@ DEPENDS += " \
   openssl \
   glome-config \
   "
-RDEPENDS:${PN} += "glome-config"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/google/glome.git;branch=master;protocol=https"
