@@ -2,7 +2,11 @@ bmc_booted:
     sys_log_id:
         Action: 'On'
 
-sys_identify:
+enclosure_identify:
+    sys_log_id:
+        Action: 'On'
+
+enclosure_identify_blink:
     sys_log_id:
         Action: 'Blink'
         DutyOn: 50

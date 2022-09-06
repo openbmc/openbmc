@@ -26,6 +26,7 @@
           IPMIFruSection: Board
       xyz.openbmc_project.Inventory.Item.Board:
       xyz.openbmc_project.Inventory.Item.Bmc:
+      xyz.openbmc_project.Inventory.Item.Panel:
 
   /system/chassis/bmc/ethernet:
     entityID: 7
