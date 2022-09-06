@@ -64,6 +64,7 @@ Please submit any patches against the meta-evb-npcm845 layer to the maintainer o
   * [ECC](#ecc)
   * [Host Serial Port](#host-serial-port)
   * [PECI](#peci)
+  * [FLM](#flm)
 - [Troubleshooting](#troubleshooting)
   * [Failed to probe SPI0 CS0 in u-boot](#failed-to-probe-SPI0-CS0-in-u-boot)
 
@@ -1101,7 +1102,7 @@ sgpio2: sgpio@102000 {
 ```
 - Enable Kernel config
 ```
-CONFIG_GPIO_NUVOTON_SGPIO=y
+CONFIG_GPIO_NPCM_SGPIO=y
 ```
 - Boot EVB to Openbmc, you can check gpiochip8 information
 ```
@@ -1946,6 +1947,56 @@ The client address under test is 0x30.
   ```
   root@evb-npcm845:~# peci_cmds raw 0x30 0x5 0x9 0xb1
    0x40 0x65 0x7a 0xc4 0x3f 0x65 0x7a 0xc4 0x3f
+  ```
+
+## FLM
+
+Arbel SOC provides four SPI flash monitoring(FLM).
+
+- The FLM is connected in parallel to a flash interface, with only the chip-select in series connection. The flash controller is connected to the flash device via six signals and supports up to quad data bus.
+
+- Arbel evb can enable FLM mode and test.
+  ```
+  SPI3.CS0 master via FM1 to XU_SPI3 & SPI3.CS1 master to XU_SPI1 (SPI1 Hi-Z or FM).
+  ```
+
+
+### uboot test
+
+Select SW1.6 to on to enable FLM feature.
+
+- Compare command only: using FLM_CMB
+  ```
+  mw f0800274 20000      //Set PinMux for FLM1: set MFSEL6.17
+  mw f0211014 4000a901   //enable FLM1
+  md a0000000            //incorrect data
+  mw f0211014 a901       //disable FLM1
+  mw F0211280 B          //Configure FLM_CMB0 , accept FastRead command
+  mw f0211064 1          //enable CMB0
+  mw f0211014 4000a901   //enable FLM1
+  md a0000000            //correct data
+  mw f0211064 0          //disable CMB0
+  mw f0211014 4000a903   //apply the dynamic parameter change
+  md a0000000            //incorrect data
+  ```
+- Compare command  and address: using FLM_CMD
+  ```
+  mw f0800274 20000      //Set PinMux for FLM1: set MFSEL6.17
+  mw f0211014 4000a901   //enable FLM1
+  md a0000000            //incorrect data
+  mw f0211014 a901       //disable FLM1
+  mw F0211080 0114000B   //Configure FLM_CMD0
+  mw f0211060 1          //enable CMD0
+  mw f0211014 4000a901   //enable FLM1
+  md a0000000            //correct data
+  md a0001000            //incorrect data
+  mw f0211014 a901       //disable FLM1
+  mw F0211084 0214000B   //configure FLM_CMD1
+  mw f0211024 10001      //range: 1000~1fffh
+  mw f0211060 3          //Set corresponding bit in FLM_CMDEN, enable CMD0 and CMD1
+  mw f0211014 4000a901   //enable FLM1
+  md a0000000            //correct data
+  md a0001000            //correct data
   ```
 
 # Troubleshooting
