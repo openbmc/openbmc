@@ -1,0 +1,13 @@
+[Unit]
+Description=Ampere host on driver binder %i
+After=obmc-host-already-on@%i.target
+BindTo=obmc-host-already-on@%i.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c "if command -v ampere_host_on_driver_binder.sh; then echo 'Try to bind driver after host on if does not' && ampere_host_on_driver_binder.sh; fi && exit 0;"
+SyslogIdentifier=host_on_binder
+RemainAfterExit=no
+
+[Install]
+WantedBy=obmc-host-already-on@%i.target
