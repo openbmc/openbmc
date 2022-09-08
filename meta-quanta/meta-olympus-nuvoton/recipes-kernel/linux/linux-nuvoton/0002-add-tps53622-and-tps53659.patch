@@ -1,4 +1,4 @@
-From f718ec1e14968a189981b2d5ddc20a236f1a1d61 Mon Sep 17 00:00:00 2001
+From 2821f8c47176d447b9e8a2384525aa67de5ffe27 Mon Sep 17 00:00:00 2001
 From: kwliu <kwliu@nuvoton.com>
 Date: Mon, 8 Jul 2019 10:05:09 +0800
 Subject: [PATCH] add tps53622 and tps53659
@@ -7,17 +7,17 @@ Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
  drivers/hwmon/pmbus/Kconfig    |  17 +++++
  drivers/hwmon/pmbus/Makefile   |   2 +
- drivers/hwmon/pmbus/tps53622.c | 110 +++++++++++++++++++++++++++++++++
- drivers/hwmon/pmbus/tps53659.c | 110 +++++++++++++++++++++++++++++++++
- 4 files changed, 239 insertions(+)
+ drivers/hwmon/pmbus/tps53622.c | 109 +++++++++++++++++++++++++++++++++
+ drivers/hwmon/pmbus/tps53659.c | 109 +++++++++++++++++++++++++++++++++
+ 4 files changed, 237 insertions(+)
  create mode 100644 drivers/hwmon/pmbus/tps53622.c
  create mode 100644 drivers/hwmon/pmbus/tps53659.c
 
 diff --git a/drivers/hwmon/pmbus/Kconfig b/drivers/hwmon/pmbus/Kconfig
-index a25faf69fce3..2ace002bb45e 100644
+index b56bd8542864..5da12da52b40 100644
 --- a/drivers/hwmon/pmbus/Kconfig
 +++ b/drivers/hwmon/pmbus/Kconfig
-@@ -287,4 +287,21 @@ config SENSORS_ZL6100
+@@ -389,4 +389,21 @@ config SENSORS_ZL6100
  	  This driver can also be built as a module. If so, the module will
  	  be called zl6100.
  
@@ -40,21 +40,22 @@ index a25faf69fce3..2ace002bb45e 100644
 +
  endif # PMBUS
 diff --git a/drivers/hwmon/pmbus/Makefile b/drivers/hwmon/pmbus/Makefile
-index 4c97ad0bd791..bea4347f8542 100644
+index 61cdc24b1309..887ba58e1f73 100644
 --- a/drivers/hwmon/pmbus/Makefile
 +++ b/drivers/hwmon/pmbus/Makefile
-@@ -32,3 +32,5 @@ obj-$(CONFIG_SENSORS_UCD9000)	+= ucd9000.o
+@@ -42,4 +42,6 @@ obj-$(CONFIG_SENSORS_UCD9000)	+= ucd9000.o
  obj-$(CONFIG_SENSORS_UCD9200)	+= ucd9200.o
  obj-$(CONFIG_SENSORS_XDPE122)	+= xdpe12284.o
  obj-$(CONFIG_SENSORS_ZL6100)	+= zl6100.o
 +obj-$(CONFIG_SENSORS_TPS53622)  += tps53622.o
 +obj-$(CONFIG_SENSORS_TPS53659)  += tps53659.o
+ obj-$(CONFIG_SENSORS_PIM4328)	+= pim4328.o
 diff --git a/drivers/hwmon/pmbus/tps53622.c b/drivers/hwmon/pmbus/tps53622.c
 new file mode 100644
-index 000000000000..77fb7318446e
+index 000000000000..04ef41359a72
 --- /dev/null
 +++ b/drivers/hwmon/pmbus/tps53622.c
-@@ -0,0 +1,110 @@
+@@ -0,0 +1,109 @@
 +/*
 + * Hardware monitoring driver for Texas Instruments TPS53622
 + *
@@ -156,7 +157,6 @@ index 000000000000..77fb7318446e
 +		.of_match_table = of_match_ptr(tps53622_of_match),
 +	},
 +	.probe_new = tps53622_probe,
-+	.remove = pmbus_do_remove,
 +	.id_table = tps53622_id,
 +};
 +
@@ -167,10 +167,10 @@ index 000000000000..77fb7318446e
 +MODULE_LICENSE("GPL");
 diff --git a/drivers/hwmon/pmbus/tps53659.c b/drivers/hwmon/pmbus/tps53659.c
 new file mode 100644
-index 000000000000..3bd7230300e4
+index 000000000000..a13d2e4c3243
 --- /dev/null
 +++ b/drivers/hwmon/pmbus/tps53659.c
-@@ -0,0 +1,110 @@
+@@ -0,0 +1,109 @@
 +/*
 + * Hardware monitoring driver for Texas Instruments TPS53659
 + *
@@ -272,7 +272,6 @@ index 000000000000..3bd7230300e4
 +		.of_match_table = of_match_ptr(tps53659_of_match),
 +	},
 +	.probe_new = tps53659_probe,
-+	.remove = pmbus_do_remove,
 +	.id_table = tps53659_id,
 +};
 +
