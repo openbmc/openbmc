@@ -1,1 +1,2 @@
-EXTRA_OECONF:append:scm-npcm845 = " --disable-link-local-autoconfiguration --with-uboot-env"
+PACKAGECONFIG:append:evb-npcm845 = " nic-ethtool"
+PACKAGECONFIG:remove:evb-npcm845 = "default-link-local-autoconf"
