@@ -17,7 +17,7 @@ DEPENDS:append = "\
 "
 
 SRC_URI = "git://github.com/openbmc/phosphor-virtual-sensor.git;protocol=https;branch=master"
-SRCREV = "e667239d5a57ee3599c6378839e7858a545ae275"
+SRCREV = "dc7770153b8fdfca26f1e7fd038033dff6b20456"
 S = "${WORKDIR}/git"
 
 SYSTEMD_SERVICE:${PN} = "phosphor-virtual-sensor.service"
