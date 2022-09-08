@@ -1,0 +1,30 @@
+From 15594c2b43b1689443cb3e38d9b4cb341b420e7a Mon Sep 17 00:00:00 2001
+From: Mia Lin <mimi05633@gmail.com>
+Date: Thu, 8 Sep 2022 15:43:39 +0800
+Subject: [PATCH] dts: npcm750-evb: fix u-boot image and flash issues
+
+Fix image-u-boot too big and flash permission denied issues
+
+Signed-off-by: Mia Lin <mimi05633@gmail.com>
+---
+ arch/arm/boot/dts/nuvoton-npcm750-evb.dts | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-evb.dts b/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
+index 08dca0958ba1..5e5e492e7938 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
+@@ -243,8 +243,8 @@
+ 			};
+ 			u-boot@0 {
+ 				label = "u-boot";
+-				reg = <0x0000000 0x80000>;
+-				read-only;
++				reg = <0x0000000 0xC0000>;
++				/* read-only; */
+ 			};
+ 			u-boot-env@100000{
+ 				label = "u-boot-env";
+-- 
+2.17.1
+
