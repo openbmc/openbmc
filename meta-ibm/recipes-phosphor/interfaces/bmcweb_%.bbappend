@@ -6,13 +6,13 @@ EXTRA_OEMESON:append = " \
     -Dredfish-oem-manager-fan-data=disabled \
 "
 
-EXTRA_OEMESON:append:p10bmc += " \
+EXTRA_OEMESON:append:p10bmc = " \
     -Dmutual-tls-auth=disabled \
     -Dkvm=disabled \
     -Dvm-websocket=disabled \
 "
 
-EXTRA_OEMESON:append:witherspoon-tacoma += " \
+EXTRA_OEMESON:append:witherspoon-tacoma = " \
     -Dmutual-tls-auth=disabled \
     -Dkvm=disabled \
     -Dvm-websocket=disabled \
