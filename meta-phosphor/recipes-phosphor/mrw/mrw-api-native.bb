@@ -11,7 +11,7 @@ inherit perlnative
 inherit cpan-base
 inherit mrw-rev
 
-DEPENDS += "libxml-simple-perl-native json-perl-native"
+DEPENDS += "libxml-simple-perl-native libjson-perl-native"
 
 SRC_URI += "${MRW_API_SRC_URI}"
 SRCREV = "${MRW_API_SRCREV}"
