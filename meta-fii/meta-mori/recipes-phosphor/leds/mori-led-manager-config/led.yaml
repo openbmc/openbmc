@@ -1,4 +1,6 @@
 bmc_booted:
+    BMC_ALIVE:
+        Action: 'On'
 
 boot_status_inactive:
     boot_status_led:
