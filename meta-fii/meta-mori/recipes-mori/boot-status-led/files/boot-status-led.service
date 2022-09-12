@@ -1,0 +1,12 @@
+[Unit]
+Description=Boot Status LED Manager
+After=xyz.openbmc_project.LED.GroupManager.service
+Wants=xyz.openbmc_project.LED.GroupManager.service
+
+[Service]
+ExecStart=/usr/bin/boot-status-led.sh
+Type=simple
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+bmc_booted:
+
+boot_status_inactive:
+    boot_status_led:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+
+boot_status_standby:
+    boot_status_led:
+        Action: 'On'
