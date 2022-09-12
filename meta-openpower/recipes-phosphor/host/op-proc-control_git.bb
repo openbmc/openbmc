@@ -11,7 +11,7 @@ inherit meson obmc-phosphor-utils pkgconfig
 inherit systemd
 
 SRC_URI += "git://github.com/openbmc/openpower-proc-control;branch=master;protocol=https"
-SRCREV = "ed7fb7aee34661d65dc0455316e68d90a36d75fb"
+SRCREV = "1af14431aab1193c2ec636989aa7db7ef283c8b7"
 
 DEPENDS += " \
         phosphor-logging \
@@ -52,4 +52,5 @@ SYSTEMD_SERVICE:${PN} +=  " \
         ${@bb.utils.contains('MACHINE_FEATURES', 'phal', 'set-spi-mux.service', '', d)} \
         ${@bb.utils.contains('MACHINE_FEATURES', 'phal', 'phal-create-boottime-guard-indicator.service', '', d)} \
         ${@bb.utils.contains('MACHINE_FEATURES', 'phal', 'op-clear-sys-dump-active@.service', '', d)} \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'phal', 'op-clock-data-logger@.service', '', d)} \
         "
