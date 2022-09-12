@@ -1,0 +1,179 @@
+[
+    {
+        "Desc":
+        {
+            "Name": "total_power",
+            "SensorType": "power"
+        },
+        "Threshold" :
+        {
+        },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard"
+            ],
+            [
+                "inventory",
+                "sensors",
+                "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard"
+            ]
+        ],
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "P0",
+                    "Desc":
+                    {
+                        "Name": "PSU0_POUTPUT",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "P1",
+                    "Desc":
+                    {
+                        "Name": "PSU1_POUTPUT",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "(P0 == P0) ? ((P1 == P1) ? P0+P1 : P0 ) : P1"
+    },
+    {
+        "Desc":
+        {
+            "Name": "OutletTemp",
+            "SensorType": "temperature"
+        },
+        "Threshold" :
+        {
+            "CriticalHigh": 70
+        },
+        "Associations":
+        [
+            [
+                "board",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard"
+            ],
+            [
+                "inventory",
+                "sensors",
+                "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard"
+            ]
+        ],
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "P0",
+                    "Desc":
+                    {
+                        "Name": "OutletTemp1",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "P1",
+                    "Desc":
+                    {
+                        "Name": "OutletTemp2",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "(P0 + P1) >= 0 ? (P0 + P1) / 2 : NULL"
+    },
+    {
+        "Desc":{
+            "Name":"NVMeM2_MaxTemp",
+            "SensorType":"temperature"
+        },
+        "Threshold" :
+        {
+            "CriticalHigh": 70
+        },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard"
+            ],
+            [
+                "inventory",
+                "sensors",
+                "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard"
+            ]
+        ],
+        "Params":{
+            "DbusParam": [
+                {
+                    "ParamName": "n0",
+                    "Desc": {
+                        "Name": "m2nvme0",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n1",
+                    "Desc": {
+                        "Name": "m2nvme1",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "max((n0 == n0) ? n0 : 0,(n1 == n1) ? n1 : 0)"
+    },
+    {
+        "Desc":{
+            "Name":"OCP_MaxTemp",
+            "SensorType":"temperature"
+        },
+        "Threshold" :
+        {
+            "CriticalHigh": 105
+        },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard"
+            ],
+            [
+                "inventory",
+                "sensors",
+                "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard"
+            ]
+        ],
+        "Params":{
+            "DbusParam": [
+                {
+                    "ParamName": "n1",
+                    "Desc": {
+                        "Name": "OCP1_Temp",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n2",
+                    "Desc": {
+                        "Name": "OCP2_Temp",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "max((n1 == n1) ? n1 : 0,(n2 == n2) ? n2 : 0)"
+    }
+]
