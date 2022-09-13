@@ -9,21 +9,12 @@ SRC_URI = " \
     file://0001-Adjust-paths-for-use-with-Bitbake.patch \
 "
 
-# tag IGPS_03.06.02
-SRCREV = "6e6fbeb36a9a4652300560659fe695780b4ae71b"
+# tag IGPS_03.06.04
+SRCREV = "6b056bb97a8f0e677d196afb6704372cae8bdd5b"
 
 S = "${WORKDIR}/git"
 
 DEST = "${D}${datadir}/${BPN}"
-
-inherit deploy
-
-do_deploy () {
-	install -D -m 644 ${S}/py_scripts/ImageGeneration/output_binaries/Secure/Kmt_TipFwL0_Skmt_TipFwL1.bin ${DEPLOYDIR}/Kmt_TipFwL0_Skmt_TipFwL1.bin
-	install -D -m 644 ${S}/py_scripts/ImageGeneration/versions/arbel_a35_bootblock.0.2.2.bin ${DEPLOYDIR}/arbel_a35_bootblock.bin
-}
-
-addtask deploy before do_build after do_compile
 
 do_install() {
 	install -d ${DEST}
