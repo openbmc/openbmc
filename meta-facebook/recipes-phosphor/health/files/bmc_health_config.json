@@ -28,6 +28,12 @@
             "Value": 85.0,
             "Log": true,
             "Target": "reboot.target"
+        },
+        "Warning":
+        {
+            "Value": 70.0,
+            "Log": true,
+            "Target": ""
         }
     }
   },
