@@ -24,6 +24,6 @@ EXTRA_OEMESON = " \
 S = "${WORKDIR}/git"
 
 SRC_URI = "git://github.com/openbmc/bios-bmc-smm-error-logger;branch=main;protocol=https"
-SRCREV = "a3b64fb63eb86e554657168133804db5db271f5e"
+SRCREV = "613ba537eba3b61c8ecbde2fd82d66a3591fe035"
 
 SYSTEMD_SERVICE:${PN} += "xyz.openbmc_project.bios_bmc_smm_error_logger.service"
