@@ -1,0 +1,53 @@
+[
+    {
+        "Name": "REBOOT_ACK",
+	"ChipId": "0",
+	"GpioNum": 75,
+        "EventMon": "FALLING",
+        "Target": "obmc-host-force-warm-reboot@0.target",
+        "Continue": true
+    },
+    {
+        "Name": "SHUTDOWN_ACK",
+	"ChipId": "0",
+	"GpioNum": 50,
+        "EventMon": "FALLING",
+        "Target": "ampere-host-shutdown-ack@0.service",
+        "Continue": true
+    },
+    {
+        "Name": "S0_OVERTEMP",
+        "LineName": "S0_OVERTEMP_L",
+        "EventMon": "FALLING",
+        "Target": "ampere_overtemp@0.service",
+        "Continue": true
+    },
+    {
+        "Name": "S1_OVERTEMP",
+        "LineName": "S1_OVERTEMP_L",
+        "EventMon": "FALLING",
+        "Target": "ampere_overtemp@1.service",
+        "Continue": true
+    },
+    {
+        "Name": "S0_SCP_AUTH_FAIL",
+        "LineName": "S0_SCP_AUTH_FAIL_L",
+        "EventMon": "FALLING",
+        "Target": "ampere_scp_failover.service",
+        "Continue": true
+    },
+    {
+        "Name": "PSU1_VIN_GOOD",
+        "LineName": "PSU1_VIN_GOOD",
+        "EventMon": "RISING",
+        "Target": "psu_hotswap_reset@0.service",
+        "Continue": true
+    },
+    {
+        "Name": "PSU2_VIN_GOOD",
+        "LineName": "PSU2_VIN_GOOD",
+        "EventMon": "RISING",
+        "Target": "psu_hotswap_reset@1.service",
+        "Continue": true
+    }
+]

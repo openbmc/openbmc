@@ -1,4 +1,0 @@
-DEVPATH=/dev/input/by-path/platform-gpio-keys-event
-KEY=74
-POLARITY=1
-TARGET=ampere_scp_failover.service
