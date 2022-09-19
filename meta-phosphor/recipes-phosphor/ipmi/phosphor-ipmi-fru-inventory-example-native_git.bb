@@ -1,15 +1,12 @@
 SUMMARY = "Sample inventory map for phosphor-ipmi-fru"
-PR = "r1"
+PROVIDES += "virtual/phosphor-ipmi-fru-inventory"
 PV = "1.0+git${SRCPV}"
+PR = "r1"
+
+S = "${WORKDIR}/git"
 
 inherit phosphor-ipmi-fru
 inherit native
-
-require phosphor-ipmi-fru.inc
-
-PROVIDES += "virtual/phosphor-ipmi-fru-inventory"
-
-S = "${WORKDIR}/git"
 
 do_install() {
         # TODO: install this to inventory_datadir
@@ -19,3 +16,5 @@ do_install() {
         install -d ${DEST}
         install scripts/example.yaml ${DEST}/config.yaml
 }
+
+require phosphor-ipmi-fru.inc

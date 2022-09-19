@@ -1,59 +1,41 @@
 SUMMARY = "OpenBMC console daemon"
 DESCRIPTION = "Daemon to handle UART console connections"
 HOMEPAGE = "http://github.com/openbmc/obmc-console"
-PR = "r1"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=fa818a259cbed7ce8bc2a22d35a464fc"
-
-inherit autotools pkgconfig
-inherit obmc-phosphor-discovery-service
-inherit systemd
-
-S = "${WORKDIR}/git"
-
-TARGET_CFLAGS += "-fpic -O2"
-
+DEPENDS += "autoconf-archive-native \
+            systemd \
+           "
+SRCREV = "bbc95526c6b612ec42f45e3d554d01324477c4e7"
 PACKAGECONFIG ??= "udev ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 PACKAGECONFIG[udev] = "--with-udevdir=`pkg-config --variable=udevdir udev`,\
                        --without-udevdir,udev"
 PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_system_unitdir}, \
                           --without-systemdsystemunitdir"
-
-DEPENDS += "autoconf-archive-native \
-            systemd \
-           "
+PV = "1.0+git${SRCPV}"
+PR = "r1"
 
 SRC_URI += "git://github.com/openbmc/obmc-console;branch=master;protocol=https"
 SRC_URI += "file://${BPN}.conf"
 
-SRCREV = "bbc95526c6b612ec42f45e3d554d01324477c4e7"
-PV = "1.0+git${SRCPV}"
-
-REGISTERED_SERVICES:${PN} += "obmc_console:tcp:2200:"
-
+S = "${WORKDIR}/git"
 SYSTEMD_SERVICE:${PN} += "obmc-console-ssh@.service \
                 obmc-console-ssh.socket \
                 obmc-console@.service \
                 "
 
-FILES:${PN} += "${systemd_system_unitdir}/obmc-console-ssh@.service.d/use-socket.conf"
-
-OBMC_CONSOLE_HOST_TTY ?= "ttyVUART0"
-
-# Support multiple TTY ports using space separated list.
-# Ex. OBMC_CONSOLE_TTYS = "ttyS1 ttyS2"
-OBMC_CONSOLE_TTYS ?= "${OBMC_CONSOLE_HOST_TTY}"
+inherit autotools pkgconfig
+inherit obmc-phosphor-discovery-service
+inherit systemd
 
 do_install:append() {
         # Install the server configuration
         install -m 0755 -d ${D}${sysconfdir}/${BPN}
-
         # If the OBMC_CONSOLE_TTYS variable is used without the default OBMC_CONSOLE_HOST_TTY
         # the port specific config file should be provided. If it is just OBMC_CONSOLE_HOST_TTY,
         # use the old style which supports both port specific or obmc-console.conf method.
         if [ "${OBMC_CONSOLE_TTYS}" !=  "${OBMC_CONSOLE_HOST_TTY}" ]; then
                 rm -f ${D}${sysconfdir}/${BPN}/server.ttyVUART0.conf
-
                 for CONSOLE in ${OBMC_CONSOLE_TTYS}
                 do
                         if test -f "${WORKDIR}/server.${CONSOLE}.conf" ; then
@@ -85,5 +67,14 @@ do_install:append() {
                         sed -ri '/^socket-id =/d' ${D}${sysconfdir}/${BPN}/server.${OBMC_CONSOLE_TTYS}.conf
                 fi
         fi
-
 }
+
+FILES:${PN} += "${systemd_system_unitdir}/obmc-console-ssh@.service.d/use-socket.conf"
+
+TARGET_CFLAGS += "-fpic -O2"
+
+REGISTERED_SERVICES:${PN} += "obmc_console:tcp:2200:"
+OBMC_CONSOLE_HOST_TTY ?= "ttyVUART0"
+# Support multiple TTY ports using space separated list.
+# Ex. OBMC_CONSOLE_TTYS = "ttyS1 ttyS2"
+OBMC_CONSOLE_TTYS ?= "${OBMC_CONSOLE_HOST_TTY}"

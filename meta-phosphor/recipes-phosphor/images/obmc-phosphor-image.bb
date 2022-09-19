@@ -1,9 +1,15 @@
 DESCRIPTION = "Image with Phosphor, a software stack for hardware management \
 in devices with baseboard management controllers.  The image supports the \
 full OpenBMC feature set for devices of all types."
+LICENSE = "Apache-2.0"
+
+inherit obmc-phosphor-image
+
+# The /etc/version file is misleading and not useful.  Remove it.
+# Users should instead rely on /etc/os-release.
+ROOTFS_POSTPROCESS_COMMAND += "remove_etc_version ; "
 
 IMAGE_LINGUAS = ""
-
 IMAGE_FEATURES += " \
         obmc-bmc-state-mgmt \
         obmc-bmcweb \
@@ -39,15 +45,6 @@ IMAGE_FEATURES += " \
         obmc-settings-mgmt \
         obmc-telemetry \
         "
-
-LICENSE = "Apache-2.0"
-
-inherit obmc-phosphor-image
-
-# The /etc/version file is misleading and not useful.  Remove it.
-# Users should instead rely on /etc/os-release.
-ROOTFS_POSTPROCESS_COMMAND += "remove_etc_version ; "
-
 # The shadow recipe provides the binaries(like useradd, usermod) needed by the
 # phosphor-user-manager.
 ROOTFS_RO_UNNEEDED:remove = "shadow"

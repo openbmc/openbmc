@@ -1,28 +1,5 @@
-inherit systemd
-inherit useradd
-
-USERADD_PACKAGES = "${PN}"
-
-# add a user called httpd for the server to assume
-USERADD_PARAM:${PN} = "-r -s /sbin/nologin bmcweb"
-GROUPADD_PARAM:${PN} = "web; redfish"
-
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=175792518e4ac015ab6696d16c4f607e"
-
-SRC_URI = "git://github.com/openbmc/bmcweb.git;branch=master;protocol=https;nobranch=1"
-
-PV = "1.0+git${SRCPV}"
-SRCREV = "894744945e8f40a93fbcd6c100c92e0cf5b0ef67"
-
-S = "${WORKDIR}/git"
-
-inherit pkgconfig meson ptest
-
-SRC_URI += " \
-    file://run-ptest \
-"
-
 DEPENDS = " \
     openssl \
     zlib \
@@ -36,19 +13,20 @@ DEPENDS = " \
     ${@bb.utils.contains('PTEST_ENABLED', '1', 'gtest', '', d)} \
     ${@bb.utils.contains('PTEST_ENABLED', '1', 'gmock', '', d)} \
 "
+SRCREV = "894744945e8f40a93fbcd6c100c92e0cf5b0ef67"
+PV = "1.0+git${SRCPV}"
 
-RDEPENDS:${PN} += " \
-    jsnbd \
-    phosphor-mapper \
+SRC_URI = "git://github.com/openbmc/bmcweb.git;branch=master;protocol=https;nobranch=1"
+SRC_URI += " \
+    file://run-ptest \
 "
 
-do_install_ptest() {
-        install -d ${D}${PTEST_PATH}/test
-        cp -rf ${B}/*_test ${D}${PTEST_PATH}/test/
-}
+S = "${WORKDIR}/git"
+SYSTEMD_SERVICE:${PN} += "bmcweb.service bmcweb.socket"
 
-FILES:${PN} += "${datadir}/** "
-
+inherit systemd
+inherit useradd
+inherit pkgconfig meson ptest
 
 EXTRA_OEMESON = " \
     --buildtype=minsize \
@@ -56,6 +34,21 @@ EXTRA_OEMESON = " \
     -Dyocto-deps=enabled \
 "
 
-SYSTEMD_SERVICE:${PN} += "bmcweb.service bmcweb.socket"
+do_install_ptest() {
+        install -d ${D}${PTEST_PATH}/test
+        cp -rf ${B}/*_test ${D}${PTEST_PATH}/test/
+}
 
+RDEPENDS:${PN} += " \
+    jsnbd \
+    phosphor-mapper \
+"
+
+FILES:${PN} += "${datadir}/** "
+
+USERADD_PACKAGES = "${PN}"
+# add a user called httpd for the server to assume
+USERADD_PARAM:${PN} = "-r -s /sbin/nologin bmcweb"
+
+GROUPADD_PARAM:${PN} = "web; redfish"
 FULL_OPTIMIZATION = "-Os "

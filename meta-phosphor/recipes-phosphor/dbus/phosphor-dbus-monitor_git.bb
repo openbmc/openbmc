@@ -1,24 +1,9 @@
 SUMMARY = "Phosphor DBus Monitor"
 DESCRIPTION = "Phosphor DBus Monitor is a general purpose DBus application \
 that watches DBus traffic for events and takes actions based on those events."
-PR = "r1"
-PV = "1.0+git${SRCPV}"
 HOMEPAGE = "http://github.com/openbmc/phosphor-dbus-monitor"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
-SRC_URI = "git://github.com/openbmc/phosphor-dbus-monitor;branch=master;protocol=https"
-SRCREV = "04267b4ff02aeb9a7cc15676c38fd760575c53bd"
-
-inherit meson \
-        pkgconfig \
-        python3native \
-        phosphor-dbus-monitor \
-        obmc-phosphor-systemd
-
-PACKAGE_BEFORE_PN = "phosphor-msl-verify"
-SYSTEMD_PACKAGES = "${PN} phosphor-msl-verify"
-SYSTEMD_SERVICE:phosphor-msl-verify = "phosphor-msl-verify.service"
-
 DEPENDS += " \
         ${PN}-config \
         phosphor-logging \
@@ -31,11 +16,26 @@ DEPENDS += " \
         ${PYTHON_PN}-setuptools-native \
         ${PYTHON_PN}-mako-native \
         "
+SRCREV = "04267b4ff02aeb9a7cc15676c38fd760575c53bd"
+PV = "1.0+git${SRCPV}"
+PR = "r1"
 
-FILES:phosphor-msl-verify = "${bindir}/phosphor-msl-verify"
+SRC_URI = "git://github.com/openbmc/phosphor-dbus-monitor;branch=master;protocol=https"
 
+SYSTEMD_PACKAGES = "${PN} phosphor-msl-verify"
+SYSTEMD_SERVICE:phosphor-msl-verify = "phosphor-msl-verify.service"
 S = "${WORKDIR}/git"
+
+inherit meson \
+        pkgconfig \
+        python3native \
+        phosphor-dbus-monitor \
+        obmc-phosphor-systemd
 
 EXTRA_OEMESON = " \
         -DYAML_PATH=${STAGING_DIR_HOST}${config_dir} \
         "
+
+FILES:phosphor-msl-verify = "${bindir}/phosphor-msl-verify"
+
+PACKAGE_BEFORE_PN = "phosphor-msl-verify"

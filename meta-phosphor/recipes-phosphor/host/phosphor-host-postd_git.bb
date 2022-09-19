@@ -1,35 +1,35 @@
 SUMMARY = "Phosphor OpenBMC Post Code Daemon"
 DESCRIPTION = "Phosphor OpenBMC Post Code Daemon"
 HOMEPAGE = "http://github.com/openbmc/phosphor-host-postd"
-PR = "r1"
-PV = "0.1+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
-
-inherit meson
-inherit pkgconfig
-inherit systemd
-
-PACKAGECONFIG ?= ""
-PACKAGECONFIG[7seg] = "-D7seg=enabled,-D7seg=disabled,,udev"
-
 DEPENDS += "sdbusplus"
 DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "systemd"
 DEPENDS += "libgpiod"
+SRCREV = "aee6540154f2ac8ea510efacd2785868c1898a7d"
+PACKAGECONFIG ?= ""
+PACKAGECONFIG[7seg] = "-D7seg=enabled,-D7seg=disabled,,udev"
+PV = "0.1+git${SRCPV}"
+PR = "r1"
+
+SRC_URI = "git://github.com/openbmc/phosphor-host-postd;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/openbmc/phosphor-host-postd;branch=master;protocol=https"
-SRCREV = "aee6540154f2ac8ea510efacd2785868c1898a7d"
-
 SNOOP_DEVICE ?= "aspeed-lpc-snoop0"
-POST_CODE_BYTES ?= "1"
-7SEG_GPIO ?= "0"
-
 SERVICE_FILE = "lpcsnoop.service"
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} += "${SERVICE_FILE}"
+SERVICE_FILE_7SEG = " \
+  postcode-7seg@.service \
+  postcode-7seg@${POSTCODE_SEVENSEG_DEVICE}.service \
+"
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', '7seg', '${SERVICE_FILE_7SEG}', '', d)}"
+
+inherit meson
+inherit pkgconfig
+inherit systemd
 
 EXTRA_OEMESON:append = " \
     -Dsnoop-device=${SNOOP_DEVICE} \
@@ -37,9 +37,6 @@ EXTRA_OEMESON:append = " \
     -Dtests=disabled \
 "
 
+POST_CODE_BYTES ?= "1"
+7SEG_GPIO ?= "0"
 POSTCODE_SEVENSEG_DEVICE ?= "seven_seg_disp_val"
-SERVICE_FILE_7SEG = " \
-  postcode-7seg@.service \
-  postcode-7seg@${POSTCODE_SEVENSEG_DEVICE}.service \
-"
-SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', '7seg', '${SERVICE_FILE_7SEG}', '', d)}"
