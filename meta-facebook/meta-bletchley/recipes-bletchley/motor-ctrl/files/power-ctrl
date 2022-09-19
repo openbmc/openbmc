@@ -234,10 +234,19 @@ function get_host_status_dbus()
     return 0
 }
 
+function get_addr_from_dts_aliases()
+{
+    local node_address
+    node_address=$(awk -F '@' '{printf $2}' /sys/firmware/devicetree/base/aliases/"$1")
+    echo "$node_address"
+}
+
 function get_host_status_mdio()
 {
     local SLED_NUM=$1
-    local MDIO_BUS=0
+    local MDIO_BUS
+
+    MDIO_BUS="$(get_addr_from_dts_aliases mdio0).mdio-1"
 
     declare -a PORT_MAP=(0 3 2 1 7 6 5)
 
@@ -257,7 +266,7 @@ function get_host_status_mdio()
 
     while true
     do
-        if POST_ST_VAL=$(mdio-util c22 r $MDIO_BUS "${PORT_MAP[SLED_NUM]}" 0); then
+        if POST_ST_VAL=$(mdio "$MDIO_BUS" phy "${PORT_MAP[SLED_NUM]}" 0); then
             if [ $((POST_ST_VAL&16#0800)) -eq $((16#0000)) ]; then
                 case $SLED_LAST_ACTION in
                     "$ACTION_DFU")

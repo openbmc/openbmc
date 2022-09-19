@@ -8,7 +8,7 @@ inherit obmc-phosphor-systemd
 RDEPENDS:${PN} += "bash"
 RDEPENDS:${PN} += "i2c-tools"
 RDEPENDS:${PN} += "libgpiod-tools"
-RDEPENDS:${PN} += "mdio-util"
+RDEPENDS:${PN} += "mdio-tools"
 RDEPENDS:${PN} += "bletchley-common-functions"
 
 S = "${WORKDIR}"
