@@ -39,12 +39,12 @@ SYSTEMD_ENVIRONMENT_FILE:${PN}:append:olympus-nuvoton = " ${@compose_list(d, 'EN
 
 # PECI
 PECINAMES = " \
-        peci-0/0-30/peci-cputemp.0 \
-        peci-0/0-31/peci-cputemp.1\
-        peci-0/0-30/peci-dimmtemp.0 \
-        peci-0/0-31/peci-dimmtemp.1 \
+        peci-0/0-30/peci_cpu.cputemp.skx.48 \
+        peci-0/0-31/peci_cpu.cputemp.skx.49\
+        peci-0/0-30/peci_cpu.dimmtemp.skx.48 \
+        peci-0/0-31/peci_cpu.dimmtemp.skx.49 \
         "
-PECIITEMSFMT = "devices/platform/ahb/ahb--apb/f0100000.peci-bus/{0}.conf"
+PECIITEMSFMT = "devices/platform/ahb/ahb--apb/ahb--apb--peci-bus@100000/f0100000.peci-bus/{0}.conf"
 PECIITEMS = "${@compose_list(d, 'PECIITEMSFMT', 'PECINAMES')}"
 PECIENVS = "obmc/hwmon/{0}"
 SYSTEMD_ENVIRONMENT_FILE:${PN}:append:olympus-nuvoton = " ${@compose_list(d, 'PECIENVS', 'PECIITEMS')}"
