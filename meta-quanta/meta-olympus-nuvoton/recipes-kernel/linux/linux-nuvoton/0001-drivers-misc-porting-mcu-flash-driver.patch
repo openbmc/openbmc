@@ -1,41 +1,16 @@
-From 7e2cf22f9ad4ec911a0f58cc11ee8eab0bf95ca2 Mon Sep 17 00:00:00 2001
+From 85ee857e686f576a10830f62ac30ded09541426e Mon Sep 17 00:00:00 2001
 From: Allen <jhkang@nuvoton.com>
 Date: Tue, 20 Sep 2022 14:34:25 +0800
 Subject: [PATCH] drivers: misc: porting mcu flash driver
 
 Signed-off-by: Allen <jhkang@nuvoton.com>
 ---
- .../dts/nuvoton-npcm750-runbmc-olympus.dts    |  13 +
- drivers/misc/Kconfig                          |   6 +
- drivers/misc/Makefile                         |   1 +
- drivers/misc/npcm7xx-mcu-flash.c              | 583 ++++++++++++++++++
- 4 files changed, 603 insertions(+)
+ drivers/misc/Kconfig             |   6 +
+ drivers/misc/Makefile            |   1 +
+ drivers/misc/npcm7xx-mcu-flash.c | 583 +++++++++++++++++++++++++++++++
+ 3 files changed, 590 insertions(+)
  create mode 100644 drivers/misc/npcm7xx-mcu-flash.c
 
-diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
-index c5bbcda2e62d..1fca68e0a21e 100644
---- a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
-+++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
-@@ -91,6 +91,19 @@ identify {
- 		};
- 	};
- 
-+	mcu_flash {
-+		compatible = "nuvoton,npcm750-mcu-flash";
-+		status = "okay";
-+		#address-cells = <1>;
-+		#size-cells = <1>;
-+		dev-num = <0>;    /* /dev/mcu0 */
-+		smb-offset = <6>; /* SMBSEL offset of MFSEL3 */
-+		mcu-gpios = <&gpio6 30 GPIO_ACTIVE_HIGH>,     /* GPIO222/PROG_CLK, Output */
-+			<&gpio6 31 GPIO_ACTIVE_HIGH>,     /* GPIO223/PROG_MOSI Output */
-+			<&gpio1 6 GPIO_ACTIVE_HIGH>,      /* GPIO38/PROG_MISO, Input  */
-+			<&gpio1 5 GPIO_ACTIVE_HIGH>;       /* GPIO37/RESET#, Output    */
-+    };
-+
- 	jtag {
- 		compatible = "nuvoton,npcm750-jtag";
- 		enable_pspi_jtag = <1>;
 diff --git a/drivers/misc/Kconfig b/drivers/misc/Kconfig
 index 9c6f40440914..768b8e90ab75 100644
 --- a/drivers/misc/Kconfig
