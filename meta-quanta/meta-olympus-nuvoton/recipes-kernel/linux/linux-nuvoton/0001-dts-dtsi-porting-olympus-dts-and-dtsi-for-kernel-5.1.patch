@@ -1,0 +1,291 @@
+From 313c7c848b1d7016ad77a4273a81f9fda5993711 Mon Sep 17 00:00:00 2001
+From: Allen <jhkang@nuvoton.com>
+Date: Tue, 20 Sep 2022 09:49:01 +0800
+Subject: [PATCH] dts: dtsi: porting olympus dts and dtsi for kernel 5.15
+ upgrading
+
+Signed-off-by: Allen Kang <jhkang@nuvoton.com>
+---
+ ...nuvoton-npcm750-runbmc-olympus-pincfg.dtsi |  29 +++-
+ .../dts/nuvoton-npcm750-runbmc-olympus.dts    | 128 ++++++++++++++----
+ 2 files changed, 120 insertions(+), 37 deletions(-)
+
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus-pincfg.dtsi b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus-pincfg.dtsi
+index 230cb344b2e1..3336af1377d1 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus-pincfg.dtsi
++++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus-pincfg.dtsi
+@@ -78,33 +78,48 @@ gpio15ol_pins: gpio15ol-pins {
+ 			bias-disable;
+ 			output-low;
+ 		};
++		gpio17_pins: gpio17-pins {
++			pins = "GPIO17/PSPI2DI/SMB4DEN";
++			bias-disable;
++			input-enable;
++		};
++		gpio18o_pins: gpio18o-pins {
++			pins = "GPIO18/PSPI2D0/SMB4BSDA";
++			bias-disable;
++			output-high;
++		};
++		gpio19ol_pins: gpio19ol-pins {
++			pins = "GPIO19/PSPI2CK/SMB4BSCL";
++			bias-disable;
++			output-low;
++		};
+ 		gpio20_pins: gpio20-pins {
+-			pins = "GPIO20/SMB4CSDA/SMB15SDA";
++			pins = "GPIO20/HGPIO0/SMB4CSDA/SMB15SDA";
+ 			bias-disable;
+ 			input-enable;
+ 		};
+ 		gpio21_pins: gpio21-pins {
+-			pins = "GPIO21/SMB4CSCL/SMB15SCL";
++			pins = "GPIO21/HGPIO1/SMB4CSCL/SMB15SCL";
+ 			bias-disable;
+ 			input-enable;
+ 		};
+ 		gpio22o_pins: gpio22o-pins {
+-			pins = "GPIO22/SMB4DSDA/SMB14SDA";
++			pins = "GPIO22/HGPIO2/SMB4DSDA/SMB14SDA";
+ 			bias-disable;
+ 			output-high;
+ 		};
+ 		gpio23_pins: gpio23-pins {
+-			pins = "GPIO23/SMB4DSCL/SMB14SCL";
++			pins = "GPIO23/HGPIO3/SMB4DSCL/SMB14SCL";
+ 			bias-disable;
+ 			input-enable;
+ 		};
+ 		gpio24_pins: gpio24-pins {
+-			pins = "GPIO24/IOXHDO";
++			pins = "GPIO24/HGPIO4/IOXHDO";
+ 			bias-disable;
+ 			input-enable;
+ 		};
+ 		gpio25_pins: gpio25-pins {
+-			pins = "GPIO25/IOXHDI";
++			pins = "GPIO25/HGPIO5/IOXHDI";
+ 			bias-disable;
+ 			input-enable;
+ 		};
+@@ -139,7 +154,7 @@ gpio40o_pins: gpio40o-pins {
+ 			output-high;
+ 		};
+ 		gpio59_pins: gpio59-pins {
+-			pins = "GPIO59/SMB3DSDA";
++			pins = "GPIO59/HGPIO6/SMB3DSDA";
+ 			bias-disable;
+ 			input-enable;
+ 		};
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+index 24e894208ab7..c5bbcda2e62d 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+@@ -202,13 +202,9 @@ partitions@A0000000 {
+ 			compatible = "fixed-partitions";
+ 			#address-cells = <1>;
+ 			#size-cells = <1>;
+-			system1@0 {
+-				label = "spi3-system1";
+-				reg = <0x0 0x800000>;
+-			};
+-			system2@800000 {
+-				label = "spi3-system2";
+-				reg = <0x800000 0x0>;
++			bios@0 {
++				label = "bios";
++				reg = <0x0 0x2000000>;
+ 			};
+ 		};
+ 	};
+@@ -351,9 +347,10 @@ eeprom@54 {
+ &i2c5 {
+ 	status = "okay";
+ 
+-	i2c-slave-mqueue@10 {
+-		compatible = "i2c-slave-mqueue";
+-		reg = <(I2C_OWN_SLAVE_ADDRESS | 0x10)>;
++	ipmb@40000010 {
++		compatible = "ipmb-dev";
++		reg = <0x40000010>;
++		i2c-protocol;
+ 	};
+ };
+ 
+@@ -446,6 +443,8 @@ gpio: pca9555@27 {
+ 
+ 		gpio-controller;
+ 		#gpio-cells = <2>;
++		gpio-line-names="","","","","","","","",
++						"","","SIO_POWER_GOOD","","","","","";
+ 	};
+ };
+ 
+@@ -657,6 +656,10 @@ pca9539_g2a: pca9539-g2a@74 {
+ 		gpio-controller;
+ 		#gpio-cells = <2>;
+ 		reset-gpios = <&gpio5 28 GPIO_ACTIVE_LOW>;
++		interrupt-parent = <&gpio5>;
++		interrupts = <29 IRQ_TYPE_LEVEL_LOW>;
++		gpio-line-names="","","","POWER_OUT","RESET_OUT","","","",
++						"","","","","","","POST_COMPLETE","";
+ 		G2A_P0_0 {
+ 			gpio-hog;
+ 			gpios = <0 0>;
+@@ -675,18 +678,7 @@ G2A_P0_2 {
+ 			input;
+ 			line-name = "RST_BMC_RTCRST";
+ 		};
+-		G2A_P0_3 {
+-			gpio-hog;
+-			gpios = <3 0>;
+-			output-high;
+-			line-name = "FM_BMC_PWRBTN_OUT_N";
+-		};
+-		G2A_P0_4 {
+-			gpio-hog;
+-			gpios = <4 0>;
+-			output-high;
+-			line-name = "RST_BMC_SYSRST_BTN_OUT_N";
+-		};
++
+ 		G2A_P0_5 {
+ 			gpio-hog;
+ 			gpios = <5 0>;
+@@ -741,12 +733,7 @@ G2A_P1_5 {
+ 			input;
+ 			line-name = "FM_SOL_UART_CH_SEL";
+ 		};
+-		G2A_P1_6 {
+-			gpio-hog;
+-			gpios = <14 0>;
+-			input;
+-			line-name = "FM_BIOS_POST_CMPLT_N";
+-		};
++
+ 	};
+ 
+ 	pca9539_g2b: pca9539-g2b@75 {
+@@ -754,6 +741,12 @@ pca9539_g2b: pca9539-g2b@75 {
+ 		reg = <0x75>;
+ 		gpio-controller;
+ 		#gpio-cells = <2>;
++		interrupt-parent = <&gpio5>;
++		interrupts = <29 IRQ_TYPE_LEVEL_LOW>;
++		#interrupt-cells = <2>;
++		interrupt-controller;
++		gpio-line-names="","","","","","","","",
++						"","","","","","","","";
+ 		G2B_P0_0 {
+ 			gpio-hog;
+ 			gpios = <0 0>;
+@@ -918,8 +911,8 @@ fan@7 {
+ 
+ &peci0 {
+ 	cmd-timeout-ms = <1000>;
+-	pull-down = <0>;
+-	host-neg-bit-rate = <15>;
++	npcm,pull-down = <0>;
++	npcm,host-neg-bit-rate = <15>;
+ 	status = "okay";
+ 
+ 	intel-peci-dimmtemp@30 {
+@@ -1003,6 +996,7 @@ &video {
+ };
+ 
+ &watchdog1 {
++	nuvoton,ext1-reset-type = "wd1";
+ 	status = "okay";
+ };
+ 
+@@ -1058,7 +1052,27 @@ &spi0 {
+ };
+ 
+ &spi1 {
++	cs-gpios = <&gpio6 0 GPIO_ACTIVE_HIGH>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&gpio17_pins &gpio18o_pins
++				&gpio19ol_pins>;
+ 	status = "okay";
++	jtag_master {
++		compatible = "nuvoton,npcm750-jtag-master";
++		spi-max-frequency = <25000000>;
++		reg = <0>;
++
++		pinctrl-names = "pspi", "gpio";
++		pinctrl-0 = <&pspi2_pins>;
++		pinctrl-1 = <&gpio17_pins &gpio18o_pins
++				&gpio19ol_pins>;
++
++		tck-gpios = <&gpio0 19 GPIO_ACTIVE_HIGH>;
++		tdi-gpios = <&gpio0 18 GPIO_ACTIVE_HIGH>;
++		tdo-gpios = <&gpio0 17 GPIO_ACTIVE_HIGH>;
++		tms-gpios = <&gpio0 16 GPIO_ACTIVE_HIGH>;
++		status = "okay";
++	};
+ };
+ 
+ &pinctrl {
+@@ -1171,4 +1185,58 @@ &ddc_pins
+ 			&wdog1_pins
+ 			&wdog2_pins
+ 			>;
++		gpio0: gpio@f0010000 {
++			/* TCK_MUX_SEL=gpio22 */
++			gpio-line-names =
++			/*0-31*/
++			"","","","","","","","",
++			"","","","","","","","",
++			"","","","","","","TCK_MUX_SEL","",
++			"","","","","","","","";
++		};
++		gpio1: gpio@f0011000 {
++			/* XDP_PRST_N=gpio59 */
++			gpio-line-names =
++			/*32-63*/
++			"","","","","","","","",
++			"","","","","","","","",
++			"","","","","","","","",
++			"","","","XDP_PRST_N","","","","";
++		};
++		gpio2: gpio@f0012000 {
++			/* PREQ_N=gpio78, PRDY_N=gpio79, PLTRST_N=gpio95 */
++			gpio-line-names =
++			/*64-95*/
++			"","","","","","","","",
++			"","","","","","","PREQ_N","PRDY_N",
++			"","","","POWER_BUTTON","","","","",
++			"","","","","","","","PLTRST_N";
++		};
++		gpio4: gpio@f0014000 {
++			/* PWR_DEBUG_N=gpio153, RSMRST_N=gpio155 */
++			gpio-line-names =
++			/*128-159*/
++			"","","","","","","","",
++			"","PS_PWROK","","","","","","",
++			"","RESET_BUTTON","","","","","","",
++			"","PWR_DEBUG_N","","RSMRST_N","","","","";
++		};
++		gpio5: gpio@f0015000 {
++			interrupt-controller;
++			#interrupt-cells = <2>;
++			gpio-line-names =
++				"","","","","","","","",
++				"","","","","","","","",
++				"","","","","","","","",
++				"","","","","","","","";
++		};
++		gpio7: gpio@f0017000 {
++			/* SYSPWROK=gpio229, DEBUG_EN_N=gpio231 */
++			gpio-line-names =
++				/*224-255*/
++				"","","","","","SYSPWROK","","DEBUG_EN_N",
++				"","","","","","","","",
++				"","","","","","","","",
++				"","","","","","","","";
++		};
+ };
+-- 
+2.34.1
+
