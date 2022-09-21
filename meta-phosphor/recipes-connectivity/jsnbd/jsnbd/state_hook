@@ -27,6 +27,21 @@ esac
 
 set -ex
 
+GADGET_BASE=/sys/kernel/config/usb_gadget
+
+which_dev()
+{
+       in_use="$(cat $GADGET_BASE/*/UDC)"
+       cd /sys/class/udc
+       for dev in *; do
+               case "$in_use" in
+                       *"$dev"*) ;;
+                       *) echo "$dev"; return 0;;
+               esac
+       done
+       return 1
+}
+
 case "$action" in
 start)
     mkdir -p $gadget_dir
@@ -48,7 +63,8 @@ start)
     echo 1 > functions/mass_storage.usb0/lun.0/ro
     echo 0 > functions/mass_storage.usb0/lun.0/cdrom
     echo $nbd_device > functions/mass_storage.usb0/lun.0/file
-    echo "1e6a0000.usb-vhub:p4" > UDC
+    device=$(which_dev)
+    echo "$device" > UDC
     )
     ;;
 stop)
