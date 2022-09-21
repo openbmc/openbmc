@@ -4,11 +4,10 @@ HOMEPAGE = "http://github.com/openbmc/sdeventplus"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 DEPENDS += " \
-        function2 \
         stdplus \
         systemd \
         "
-SRCREV = "13afebfaa6a2bbb0bc03f4382eb6ba1c50fa6d4d"
+SRCREV = "209d834118e611be0f1d4b8f35a2c46629b8054b"
 PV = "0.1+git${SRCPV}"
 PR = "r1"
 
