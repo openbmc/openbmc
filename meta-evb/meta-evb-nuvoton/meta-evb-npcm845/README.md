@@ -1700,8 +1700,103 @@ md.b 0xf000704a 1
 
 ### Linux test
 ```
-openssl aes-256-cbc -pbkdf2 -e -kfile /tmp/aes.key -in /tmp/plaintext -out /tmp/encrypted -engine afalg
-openssl aes-256-cbc -pbkdf2 -d -kfile /tmp/aes.key -in /tmp/encrypted -out /tmp/plaintext2 -engine afalg
+Please add to the kernel configuration:
+CONFIG_CRYPTO_TEST=m
+And copy tcrypt.ko to npcm845 EVB
+
+root@evb-npcm845:~# insmod ./tcrypt.ko mode=500
+tcrypt:
+testing speed of async ecb(aes) (Nuvoton-ecb-aes) encryption
+tcrypt: test 0 (128 bit key, 16 byte blocks): 1 operation in 6948 cycles (16 bytes)
+tcrypt: test 1 (128 bit key, 64 byte blocks): 1 operation in 7169 cycles (64 bytes)
+tcrypt: test 2 (128 bit key, 128 byte blocks): 1 operation in 7187 cycles (128 bytes)
+tcrypt: test 3 (128 bit key, 256 byte blocks): 1 operation in 7845 cycles (256 bytes)
+tcrypt: test 4 (128 bit key, 1024 byte blocks): 1 operation in 11456 cycles (1024 bytes)
+tcrypt: test 5 (128 bit key, 1424 byte blocks): 1 operation in 13156 cycles (1424 bytes)
+tcrypt: test 6 (128 bit key, 4096 byte blocks): 1 operation in 31718 cycles (4096 bytes)
+tcrypt: test 7 (192 bit key, 16 byte blocks): 1 operation in 6887 cycles (16 bytes)
+tcrypt: test 8 (192 bit key, 64 byte blocks): 1 operation in 6967 cycles (64 bytes)
+tcrypt: test 9 (192 bit key, 128 byte blocks): 1 operation in 7360 cycles (128 bytes)
+tcrypt: test 10 (192 bit key, 256 byte blocks): 1 operation in 7999 cycles (256 bytes)
+tcrypt: test 11 (192 bit key, 1024 byte blocks): 1 operation in 12020 cycles (1024 bytes)
+tcrypt: test 12 (192 bit key, 1424 byte blocks): 1 operation in 14139 cycles (1424 bytes)
+tcrypt: test 13 (192 bit key, 4096 byte blocks): 1 operation in 41733 cycles (4096 bytes)
+tcrypt: test 14 (256 bit key, 16 byte blocks): 1 operation in 6768 cycles (16 bytes)
+tcrypt: test 15 (256 bit key, 64 byte blocks): 1 operation in 6971 cycles (64 bytes)
+tcrypt: test 16 (256 bit key, 128 byte blocks): 1 operation in 7317 cycles (128 bytes)
+tcrypt: test 17 (256 bit key, 256 byte blocks): 1 operation in 8060 cycles (256 bytes)
+tcrypt: test 18 (256 bit key, 1024 byte blocks): 1 operation in 12331 cycles (1024 bytes)
+tcrypt: test 19 (256 bit key, 1424 byte blocks): 1 operation in 14455 cycles (1424 bytes)
+tcrypt: test 20 (256 bit key, 4096 byte blocks): 1 operation in 35507 cycles (4096 bytes)
+tcrypt:
+testing speed of async ecb(aes) (Nuvoton-ecb-aes) decryption
+tcrypt: test 0 (128 bit key, 16 byte blocks): 1 operation in 6700 cycles (16 bytes)
+tcrypt: test 1 (128 bit key, 64 byte blocks): 1 operation in 6967 cycles (64 bytes)
+tcrypt: test 2 (128 bit key, 128 byte blocks): 1 operation in 7307 cycles (128 bytes)
+tcrypt: test 3 (128 bit key, 256 byte blocks): 1 operation in 8042 cycles (256 bytes)
+tcrypt: test 4 (128 bit key, 1024 byte blocks): 1 operation in 12257 cycles (1024 bytes)
+tcrypt: test 5 (128 bit key, 1424 byte blocks): 1 operation in 14411 cycles (1424 bytes)
+tcrypt: test 6 (128 bit key, 4096 byte blocks): 1 operation in 36638 cycles (4096 bytes)
+tcrypt: test 7 (192 bit key, 16 byte blocks): 1 operation in 6747 cycles (16 bytes)
+tcrypt: test 8 (192 bit key, 64 byte blocks): 1 operation in 7799 cycles (64 bytes)
+tcrypt: test 9 (192 bit key, 128 byte blocks): 1 operation in 7300 cycles (128 bytes)
+tcrypt: test 10 (192 bit key, 256 byte blocks): 1 operation in 8146 cycles (256 bytes)
+tcrypt: test 11 (192 bit key, 1024 byte blocks): 1 operation in 13644 cycles (1024 bytes)
+tcrypt: test 12 (192 bit key, 1424 byte blocks): 1 operation in 15090 cycles (1424 bytes)
+tcrypt: test 13 (192 bit key, 4096 byte blocks): 1 operation in 43614 cycles (4096 bytes)
+tcrypt: test 14 (256 bit key, 16 byte blocks): 1 operation in 6737 cycles (16 bytes)
+tcrypt: test 15 (256 bit key, 64 byte blocks): 1 operation in 7038 cycles (64 bytes)
+tcrypt: test 16 (256 bit key, 128 byte blocks): 1 operation in 7404 cycles (128 bytes)
+tcrypt: test 17 (256 bit key, 256 byte blocks): 1 operation in 8098 cycles (256 bytes)
+tcrypt: test 18 (256 bit key, 1024 byte blocks): 1 operation in 12318 cycles (1024 bytes)
+tcrypt: test 19 (256 bit key, 1424 byte blocks): 1 operation in 14505 cycles (1424 bytes)
+tcrypt: test 20 (256 bit key, 4096 byte blocks): 1 operation in 35526 cycles (4096 bytes)
+tcrypt:
+testing speed of async cbc(aes) (Nuvoton-cbc-aes) encryption
+tcrypt: test 0 (128 bit key, 16 byte blocks): 1 operation in 7930 cycles (16 bytes)
+tcrypt: test 1 (128 bit key, 64 byte blocks): 1 operation in 6935 cycles (64 bytes)
+tcrypt: test 2 (128 bit key, 128 byte blocks): 1 operation in 7241 cycles (128 bytes)
+tcrypt: test 3 (128 bit key, 256 byte blocks): 1 operation in 8009 cycles (256 bytes)
+tcrypt: test 4 (128 bit key, 1024 byte blocks): 1 operation in 12280 cycles (1024 bytes)
+tcrypt: test 5 (128 bit key, 1424 byte blocks): 1 operation in 15350 cycles (1424 bytes)
+tcrypt: test 6 (128 bit key, 4096 byte blocks): 1 operation in 35391 cycles (4096 bytes)
+tcrypt: test 7 (192 bit key, 16 byte blocks): 1 operation in 6746 cycles (16 bytes)
+tcrypt: test 8 (192 bit key, 64 byte blocks): 1 operation in 6953 cycles (64 bytes)
+tcrypt: test 9 (192 bit key, 128 byte blocks): 1 operation in 7330 cycles (128 bytes)
+tcrypt: test 10 (192 bit key, 256 byte blocks): 1 operation in 8084 cycles (256 bytes)
+tcrypt: test 11 (192 bit key, 1024 byte blocks): 1 operation in 12670 cycles (1024 bytes)
+tcrypt: test 12 (192 bit key, 1424 byte blocks): 1 operation in 15068 cycles (1424 bytes)
+tcrypt: test 13 (192 bit key, 4096 byte blocks): 1 operation in 44312 cycles (4096 bytes)
+tcrypt: test 14 (256 bit key, 16 byte blocks): 1 operation in 6702 cycles (16 bytes)
+tcrypt: test 15 (256 bit key, 64 byte blocks): 1 operation in 6954 cycles (64 bytes)
+tcrypt: test 16 (256 bit key, 128 byte blocks): 1 operation in 7315 cycles (128 bytes)
+tcrypt: test 17 (256 bit key, 256 byte blocks): 1 operation in 8040 cycles (256 bytes)
+tcrypt: test 18 (256 bit key, 1024 byte blocks): 1 operation in 12308 cycles (1024 bytes)
+tcrypt: test 19 (256 bit key, 1424 byte blocks): 1 operation in 14426 cycles (1424 bytes)
+tcrypt: test 20 (256 bit key, 4096 byte blocks): 1 operation in 35657 cycles (4096 bytes)
+tcrypt:
+testing speed of async cbc(aes) (Nuvoton-cbc-aes) decryption
+tcrypt: test 0 (128 bit key, 16 byte blocks): 1 operation in 6765 cycles (16 bytes)
+tcrypt: test 1 (128 bit key, 64 byte blocks): 1 operation in 6973 cycles (64 bytes)
+tcrypt: test 2 (128 bit key, 128 byte blocks): 1 operation in 7297 cycles (128 bytes)
+tcrypt: test 3 (128 bit key, 256 byte blocks): 1 operation in 8032 cycles (256 bytes)
+tcrypt: test 4 (128 bit key, 1024 byte blocks): 1 operation in 12273 cycles (1024 bytes)
+tcrypt: test 5 (128 bit key, 1424 byte blocks): 1 operation in 14414 cycles (1424 bytes)
+tcrypt: test 6 (128 bit key, 4096 byte blocks): 1 operation in 35394 cycles (4096 bytes)
+tcrypt: test 7 (192 bit key, 16 byte blocks): 1 operation in 6714 cycles (16 bytes)
+tcrypt: test 8 (192 bit key, 64 byte blocks): 1 operation in 6961 cycles (64 bytes)
+tcrypt: test 9 (192 bit key, 128 byte blocks): 1 operation in 7346 cycles (128 bytes)
+tcrypt: test 10 (192 bit key, 256 byte blocks): 1 operation in 8136 cycles (256 bytes)
+tcrypt: test 11 (192 bit key, 1024 byte blocks): 1 operation in 12661 cycles (1024 bytes)
+tcrypt: test 12 (192 bit key, 1424 byte blocks): 1 operation in 16046 cycles (1424 bytes)
+tcrypt: test 13 (192 bit key, 4096 byte blocks): 1 operation in 43601 cycles (4096 bytes)
+tcrypt: test 14 (256 bit key, 16 byte blocks): 1 operation in 6740 cycles (16 bytes)
+tcrypt: test 15 (256 bit key, 64 byte blocks): 1 operation in 6980 cycles (64 bytes)
+tcrypt: test 16 (256 bit key, 128 byte blocks): 1 operation in 7322 cycles (128 bytes)
+tcrypt: test 17 (256 bit key, 256 byte blocks): 1 operation in 8102 cycles (256 bytes)
+tcrypt: test 18 (256 bit key, 1024 byte blocks): 1 operation in 12311 cycles (1024 bytes)
+tcrypt: test 19 (256 bit key, 1424 byte blocks): 1 operation in 14503 cycles (1424 bytes)
+tcrypt: test 20 (256 bit key, 4096 byte blocks): 1 operation in 35615 cycles (4096 bytes)
 ```
 
 ### U-boot test
@@ -1718,6 +1813,42 @@ md.b 600050 10
 ```
 
 ## SHA
+
+
+### Linux test
+```
+Please add to the kernel configuration:
+CONFIG_CRYPTO_TEST=m
+And copy tcrypt.ko to npcm845 EVB
+test mode: 403(sha1), 404(sha256), 405(sha384), 406(sha512)
+
+root@evb-npcm845:~# insmod ./tcrypt.ko mode=403
+
+testing speed of async sha1 (nuvoton_sha)
+tcrypt: test  0 (   16 byte blocks,   16 bytes per update,   1 updates):    782 cycles/operation,   48 cycles/byte
+tcrypt: test  1 (   64 byte blocks,   16 bytes per update,   4 updates):   1855 cycles/operation,   28 cycles/byte
+tcrypt: test  2 (   64 byte blocks,   64 bytes per update,   1 updates):   1422 cycles/operation,   22 cycles/byte
+tcrypt: test  3 (  256 byte blocks,   16 bytes per update,  16 updates):   5309 cycles/operation,   20 cycles/byte
+tcrypt: test  4 (  256 byte blocks,   64 bytes per update,   4 updates):   3796 cycles/operation,   14 cycles/byte
+tcrypt: test  5 (  256 byte blocks,  256 bytes per update,   1 updates):   2567 cycles/operation,   10 cycles/byte
+tcrypt: test  6 ( 1024 byte blocks,   16 bytes per update,  64 updates):  19218 cycles/operation,   18 cycles/byte
+tcrypt: test  7 ( 1024 byte blocks,  256 bytes per update,   4 updates):   8368 cycles/operation,    8 cycles/byte
+tcrypt: test  8 ( 1024 byte blocks, 1024 bytes per update,   1 updates):   7151 cycles/operation,    6 cycles/byte
+tcrypt: test  9 ( 2048 byte blocks,   16 bytes per update, 128 updates):  37773 cycles/operation,   18 cycles/byte
+tcrypt: test 10 ( 2048 byte blocks,  256 bytes per update,   8 updates):  16093 cycles/operation,    7 cycles/byte
+tcrypt: test 11 ( 2048 byte blocks, 1024 bytes per update,   2 updates):  13659 cycles/operation,    6 cycles/byte
+tcrypt: test 12 ( 2048 byte blocks, 2048 bytes per update,   1 updates):  13226 cycles/operation,    6 cycles/byte
+tcrypt: test 13 ( 4096 byte blocks,   16 bytes per update, 256 updates):  76011 cycles/operation,   18 cycles/byte
+tcrypt: test 14 ( 4096 byte blocks,  256 bytes per update,  16 updates):  31500 cycles/operation,    7 cycles/byte
+tcrypt: test 15 ( 4096 byte blocks, 1024 bytes per update,   4 updates):  26636 cycles/operation,    6 cycles/byte
+tcrypt: test 16 ( 4096 byte blocks, 4096 bytes per update,   1 updates):  25436 cycles/operation,    6 cycles/byte
+tcrypt: test 17 ( 8192 byte blocks,   16 bytes per update, 512 updates): 275240 cycles/operation,   33 cycles/byte
+tcrypt: test 18 ( 8192 byte blocks,  256 bytes per update,  32 updates):  62349 cycles/operation,    7 cycles/byte
+tcrypt: test 19 ( 8192 byte blocks, 1024 bytes per update,   8 updates):  52646 cycles/operation,    6 cycles/byte
+tcrypt: test 20 ( 8192 byte blocks, 4096 bytes per update,   2 updates):  50230 cycles/operation,    6 cycles/byte
+tcrypt: test 21 ( 8192 byte blocks, 8192 bytes per update,   1 updates):  50190 cycles/operation,    6 cycles/byte
+
+```
 
 ### U-boot test
 ```
