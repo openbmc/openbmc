@@ -8,24 +8,10 @@ When BMC sends clear fault cmd to this psu, the i2c bus will be hanged up due to
 
 Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
- arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts | 2 +-
  drivers/hwmon/pmbus/pmbus.c                          | 1 +
  drivers/hwmon/pmbus/pmbus_core.c                     | 3 +++
  3 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
-index 65da31492452..dc0cc3724caa 100644
---- a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
-+++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
-@@ -297,7 +297,7 @@
- 	};
- 
- 	power-supply@58 {
--		compatible = "delta,dps800";
-+		compatible = "flexpower";
- 		reg = <0x58>;
- 	};
- };
 diff --git a/drivers/hwmon/pmbus/pmbus.c b/drivers/hwmon/pmbus/pmbus.c
 index 20f1af9165c2..29bf24ca7fd4 100644
 --- a/drivers/hwmon/pmbus/pmbus.c
