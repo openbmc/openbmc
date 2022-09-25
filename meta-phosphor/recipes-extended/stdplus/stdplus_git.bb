@@ -4,10 +4,11 @@ HOMEPAGE = "http://github.com/openbmc/stdplus"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 DEPENDS += " \
+  function2 \
   fmt \
   liburing \
   "
-SRCREV = "aa4fcfc208c45511aa9788a08c969425e440fda0"
+SRCREV = "7df61dfc07361f8e653ae8f4153838a6310b469a"
 PV = "0.1+git${SRCPV}"
 PR = "r1"
 
