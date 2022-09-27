@@ -9,9 +9,9 @@ KMT_TIPFW_BB_BL31_TEE_BINARY = "Kmt_TipFw_BootBlock_BL31_Tee.bin"
 KMT_TIPFW_BB_UBOOT_BINARY = "u-boot.bin.merged"
 FULL_SUFFIX = "full"
 MERGED_SUFFIX = "merged"
+UBOOT_SUFFIX:append = ".${MERGED_SUFFIX}"
 
 IGPS_DIR = "${STAGING_DIR_NATIVE}/${datadir}/npcm8xx-igps"
-inherit logging
 
 # Prepare the Bootblock and U-Boot images using npcm8xx-bingo
 do_prepare_bootloaders() {
@@ -84,6 +84,7 @@ python do_merge_bootloaders() {
 do_prepare_bootloaders[depends] += " \
     npcm8xx-tip-fw:do_deploy \
     npcm8xx-bootblock:do_deploy \
+    u-boot-nuvoton:do_deploy \
     trusted-firmware-a:do_deploy \
     optee-os:do_deploy \
     npcm7xx-bingo-native:do_populate_sysroot \
