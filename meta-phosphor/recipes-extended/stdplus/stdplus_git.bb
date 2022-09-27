@@ -8,7 +8,7 @@ DEPENDS += " \
   fmt \
   liburing \
   "
-SRCREV = "7df61dfc07361f8e653ae8f4153838a6310b469a"
+SRCREV = "aaa8e0dd01c86958b440debb0d94dfa11e8258ee"
 PV = "0.1+git${SRCPV}"
 PR = "r1"
 
