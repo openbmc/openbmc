@@ -20,7 +20,7 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[openpower-pels] = " \
         -Dopenpower-pel-extension=enabled, \
         -Dopenpower-pel-extension=disabled, \
-        nlohmann-json cli11 pldm python3, \
+        nlohmann-json cli11 libpldm python3, \
         python3, \
         "
 PV = "1.0+git${SRCPV}"

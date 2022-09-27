@@ -6,6 +6,7 @@ DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "nlohmann-json"
 DEPENDS += "cli11"
+DEPENDS += "libpldm"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
@@ -19,6 +20,7 @@ inherit systemd
 EXTRA_OEMESON = " \
         -Dtests=disabled \
         -Doem-ibm=disabled \
+        -Dlibpldm-only=disabled \
         "
 
 pkg_prerm:${PN} () {
