@@ -1,4 +1,4 @@
-From efce87e5ab98664c57e5f4e3955a2f3747df5737 Mon Sep 17 00:00:00 2001
+From acfc8214d3d60b7e251ae66a59b81cdd1ff7a6dc Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Fri, 2 Jan 2015 12:26:46 +0800
 Subject: [PATCH] libinstaller/syslinuxext: implement syslinux_patch_bootsect()
@@ -22,7 +22,7 @@ Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
  3 files changed, 176 insertions(+), 165 deletions(-)
 
 diff --git a/extlinux/Makefile b/extlinux/Makefile
-index 1721ee54..62a49728 100644
+index 1721ee5..62a4972 100644
 --- a/extlinux/Makefile
 +++ b/extlinux/Makefile
 @@ -32,7 +32,8 @@ SRCS     = main.c \
@@ -36,7 +36,7 @@ index 1721ee54..62a49728 100644
  
  .SUFFIXES: .c .o .i .s .S
 diff --git a/extlinux/main.c b/extlinux/main.c
-index ebff7eae..9add50fb 100644
+index ebff7ea..9add50f 100644
 --- a/extlinux/main.c
 +++ b/extlinux/main.c
 @@ -62,6 +62,7 @@
@@ -244,7 +244,7 @@ index ebff7eae..9add50fb 100644
      /* Construct the boot file map */
  
 diff --git a/libinstaller/syslinuxext.c b/libinstaller/syslinuxext.c
-index bb54cefc..9ae82884 100644
+index bb54cef..9ae8288 100644
 --- a/libinstaller/syslinuxext.c
 +++ b/libinstaller/syslinuxext.c
 @@ -1,7 +1,178 @@
@@ -426,6 +426,3 @@ index bb54cefc..9ae82884 100644
 +    set_32(&sbs->bsHiddenSecs, geo.start);
  }
  
--- 
-2.17.1
-

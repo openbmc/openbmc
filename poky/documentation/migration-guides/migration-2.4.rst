@@ -301,7 +301,7 @@ The following are additional changes:
    likely be removed in the next Yocto Project release.
 
 -  The ``vmdk``, ``vdi``, and ``qcow2`` image file types are now used in
-   conjunction with the "wic" image type through ``CONVERSION_CMD``.
+   conjunction with the "wic" image type through :term:`CONVERSION_CMD`.
    Consequently, the equivalent image types are now ``wic.vmdk``,
    ``wic.vdi``, and ``wic.qcow2``, respectively.
 

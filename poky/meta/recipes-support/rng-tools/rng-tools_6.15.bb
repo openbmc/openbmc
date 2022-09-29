@@ -11,7 +11,7 @@ DEPENDS = "sysfsutils openssl"
 SRC_URI = "git://github.com/nhorman/rng-tools.git;branch=master;protocol=https \
            file://init \
            file://default \
-           file://rngd.service \
+           file://rng-tools.service \
            "
 SRCREV = "381f69828b782afda574f259c1b7549f48f9bb77"
 
@@ -32,7 +32,7 @@ PACKAGECONFIG[nistbeacon] = "--with-nistbeacon,--without-nistbeacon,curl libxml2
 INITSCRIPT_NAME = "rng-tools"
 INITSCRIPT_PARAMS = "start 03 2 3 4 5 . stop 30 0 6 1 ."
 
-SYSTEMD_SERVICE:${PN} = "rngd.service"
+SYSTEMD_SERVICE:${PN} = "rng-tools.service"
 
 CFLAGS += " -DJENT_CONF_ENABLE_INTERNAL_TIMER "
 
@@ -44,18 +44,18 @@ do_configure:prepend() {
 do_install:append() {
     install -Dm 0644 ${WORKDIR}/default ${D}${sysconfdir}/default/rng-tools
     install -Dm 0755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/rng-tools
-    install -Dm 0644 ${WORKDIR}/rngd.service \
-                     ${D}${systemd_system_unitdir}/rngd.service
+    install -Dm 0644 ${WORKDIR}/rng-tools.service \
+                     ${D}${systemd_system_unitdir}/rng-tools.service
     sed -i \
         -e 's,@SYSCONFDIR@,${sysconfdir},g' \
         -e 's,@SBINDIR@,${sbindir},g' \
         ${D}${sysconfdir}/init.d/rng-tools \
-        ${D}${systemd_system_unitdir}/rngd.service
+        ${D}${systemd_system_unitdir}/rng-tools.service
 
     if [ "${@bb.utils.contains('PACKAGECONFIG', 'nistbeacon', 'yes', 'no', d)}" = "yes" ]; then
         sed -i \
             -e '/^IPAddressDeny=any/d' \
             -e '/^RestrictAddressFamilies=/ s/$/ AF_INET AF_INET6/' \
-            ${D}${systemd_system_unitdir}/rngd.service
+            ${D}${systemd_system_unitdir}/rng-tools.service
     fi
 }

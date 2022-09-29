@@ -1,4 +1,6 @@
 #
+# Copyright BitBake Contributors
+#
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
@@ -55,11 +57,12 @@ are overlayed will also be listed, with a " (skipped)" suffix.
         # Check for overlayed .bbclass files
         classes = collections.defaultdict(list)
         for layerdir in self.bblayers:
-            classdir = os.path.join(layerdir, 'classes')
-            if os.path.exists(classdir):
-                for classfile in os.listdir(classdir):
-                    if os.path.splitext(classfile)[1] == '.bbclass':
-                        classes[classfile].append(classdir)
+            for c in ["classes-global", "classes-recipe", "classes"]:
+                classdir = os.path.join(layerdir, c)
+                if os.path.exists(classdir):
+                    for classfile in os.listdir(classdir):
+                        if os.path.splitext(classfile)[1] == '.bbclass':
+                            classes[classfile].append(classdir)
 
         # Locating classes and other files is a bit more complicated than recipes -
         # layer priority is not a factor; instead BitBake uses the first matching
@@ -122,9 +125,14 @@ skipped recipes will also be listed, with a " (skipped)" suffix.
         if inherits:
             bbpath = str(self.tinfoil.config_data.getVar('BBPATH'))
             for classname in inherits:
-                classfile = 'classes/%s.bbclass' % classname
-                if not bb.utils.which(bbpath, classfile, history=False):
-                    logger.error('No class named %s found in BBPATH', classfile)
+                found = False
+                for c in ["classes-global", "classes-recipe", "classes"]:
+                    cfile = c + '/%s.bbclass' % classname
+                    if bb.utils.which(bbpath, cfile, history=False):
+                        found = True
+                        break
+                if not found:
+                    logger.error('No class named %s found in BBPATH', classname)
                     sys.exit(1)
 
         pkg_pn = self.tinfoil.cooker.recipecaches[mc].pkg_pn
@@ -172,7 +180,7 @@ skipped recipes will also be listed, with a " (skipped)" suffix.
                     logger.plain("  %s %s%s", layer.ljust(20), ver, skipped)
 
         global_inherit = (self.tinfoil.config_data.getVar('INHERIT') or "").split()
-        cls_re = re.compile('classes/')
+        cls_re = re.compile('classes.*/')
 
         preffiles = []
         show_unique_pn = []
@@ -405,7 +413,7 @@ NOTE: .bbappend files can impact the dependencies.
                     self.check_cross_depends("RRECOMMENDS", layername, f, best, args.filenames, ignore_layers)
 
             # The inherit class
-            cls_re = re.compile('classes/')
+            cls_re = re.compile('classes.*/')
             if f in self.tinfoil.cooker_data.inherits:
                 inherits = self.tinfoil.cooker_data.inherits[f]
                 for cls in inherits:

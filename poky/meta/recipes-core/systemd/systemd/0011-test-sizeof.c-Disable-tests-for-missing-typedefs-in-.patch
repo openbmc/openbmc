@@ -18,8 +18,8 @@ index f349852553..602772227e 100644
 +++ b/src/test/test-sizeof.c
 @@ -55,8 +55,10 @@ int main(void) {
          info(unsigned);
-         info(long unsigned);
-         info(long long unsigned);
+         info(unsigned long);
+         info(unsigned long long);
 +#ifdef __GLIBC__
          info(__syscall_ulong_t);
          info(__syscall_slong_t);

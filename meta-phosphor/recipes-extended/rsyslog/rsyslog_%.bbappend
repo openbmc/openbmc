@@ -1,13 +1,12 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+PACKAGECONFIG ??= " \
+    rsyslogd rsyslogrt inet regexp uuid \
+    ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} \
+"
 
 SRC_URI += " \
     file://rsyslog.conf \
     file://server.conf \
-"
-
-PACKAGECONFIG ??= " \
-    rsyslogd rsyslogrt inet regexp uuid \
-    ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} \
 "
 
 do_install:append(){

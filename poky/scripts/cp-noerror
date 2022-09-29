@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: GPL-2.0-only
 #
 # Allow copying of $1 to $2 but if files in $1 disappear during the copy operation,

@@ -1,0 +1,92 @@
+From 935fcac46e2790e0e297ca855b8033895c1b8941 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Wed, 24 Aug 2022 13:45:32 +0800
+Subject: [PATCH] tests: use EXTENSIONS_DIR
+
+Use EXTENSIONS_DIR to replace BUILD_DIR as the BUILD_DIR is meanlingless
+on target and also fix buildpaths issue.
+
+Upstream-Status: Inappropriate [OE ptest specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ tests/CMakeLists.txt    |  1 +
+ tests/testloadext.c     | 12 ++++++------
+ tests/testmesg_stress.c | 12 ++++++------
+ 3 files changed, 13 insertions(+), 12 deletions(-)
+
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 8b698ce..2c83cbb 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -37,6 +37,7 @@ SET(TEST_LIST
+ 
+ ADD_DEFINITIONS(-DTEST_DEBUG)
+ ADD_DEFINITIONS(-DBUILD_DIR="${CMAKE_BINARY_DIR}")
++ADD_DEFINITIONS(-DEXTENSIONS_DIR="${EXTENSIONS_DIR}")
+ 
+ INCLUDE_DIRECTORIES( "../libfdproto" )
+ INCLUDE_DIRECTORIES( "../libfdcore" )
+diff --git a/tests/testloadext.c b/tests/testloadext.c
+index 452737f..3fffef5 100644
+--- a/tests/testloadext.c
++++ b/tests/testloadext.c
+@@ -35,9 +35,9 @@
+ 
+ #include "tests.h"
+ 
+-#ifndef BUILD_DIR
+-#error "Missing BUILD_DIR information"
+-#endif /* BUILD_DIR */
++#ifndef EXTENSIONS_DIR
++#error "Missing EXTENSIONS_DIR information"
++#endif /* EXTENSIONS_DIR */
+ 
+ #include <sys/types.h>
+ #include <dirent.h>
+@@ -59,9 +59,9 @@ int main(int argc, char *argv[])
+ 	CHECK( 0, fd_rtdisp_init()  );
+ 	
+ 	/* Find all extensions which have been compiled along the test */
+-	TRACE_DEBUG(INFO, "Loading from: '%s'", BUILD_DIR "/extensions");
+-	CHECK( 0, (dir = opendir (BUILD_DIR "/extensions")) == NULL ? 1 : 0 );
+-	pathlen = snprintf(fullname, sizeof(fullname), BUILD_DIR "/extensions/");
++	TRACE_DEBUG(INFO, "Loading from: '%s'", EXTENSIONS_DIR);
++	CHECK( 0, (dir = opendir (EXTENSIONS_DIR)) == NULL ? 1 : 0 );
++	pathlen = snprintf(fullname, sizeof(fullname), EXTENSIONS_DIR "/");
+ 	
+ 	while ((dp = readdir (dir)) != NULL) {
+ 		char * dot = strrchr(dp->d_name, '.');
+diff --git a/tests/testmesg_stress.c b/tests/testmesg_stress.c
+index 310a9d2..97dfe07 100644
+--- a/tests/testmesg_stress.c
++++ b/tests/testmesg_stress.c
+@@ -38,9 +38,9 @@
+ #include <libgen.h>
+ #include <dlfcn.h>
+ 
+-#ifndef BUILD_DIR
+-#error "Missing BUILD_DIR information"
+-#endif /* BUILD_DIR */
++#ifndef EXTENSIONS_DIR
++#error "Missing EXTENSIONS_DIR information"
++#endif /* EXTENSIONS_DIR */
+ 
+ 
+ /* The number of times each operation is repeated to measure the average operation time */
+@@ -73,9 +73,9 @@ static void load_all_extensions(char * prefix)
+ 	struct fd_list ext_with_depends = FD_LIST_INITIALIZER(ext_with_depends);
+ 
+ 	/* Find all extensions which have been compiled along the test */
+-	LOG_D("Loading %s*.fdx from: '%s'", BUILD_DIR "/extensions", prefix ?: "");
+-	CHECK( 0, (dir = opendir (BUILD_DIR "/extensions")) == NULL ? 1 : 0 );
+-	pathlen = snprintf(fullname, sizeof(fullname), BUILD_DIR "/extensions/");
++	LOG_D("Loading %s*.fdx from: '%s'", EXTENSIONS_DIR, prefix ?: "");
++	CHECK( 0, (dir = opendir (EXTENSIONS_DIR)) == NULL ? 1 : 0 );
++	pathlen = snprintf(fullname, sizeof(fullname), EXTENSIONS_DIR "/");
+ 	
+ 	while ((dp = readdir (dir)) != NULL) {
+ 		char * dot = strrchr(dp->d_name, '.');
+-- 
+2.25.1
+

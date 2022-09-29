@@ -18,11 +18,9 @@ Signed-off-by: Claude Bing <cbing@cybernetics.com>
  ext/phar/Makefile.frag | 17 +++--------------
  1 file changed, 3 insertions(+), 14 deletions(-)
 
-diff --git a/ext/phar/Makefile.frag b/ext/phar/Makefile.frag
-index 58789cae25..c02af1b186 100644
 --- a/ext/phar/Makefile.frag
 +++ b/ext/phar/Makefile.frag
-@@ -10,20 +10,9 @@ pharcmd: $(builddir)/phar.php $(builddir)/phar.phar
+@@ -10,20 +10,9 @@ pharcmd: $(builddir)/phar.php $(builddir
  
  PHP_PHARCMD_SETTINGS = -n -d 'open_basedir=' -d 'output_buffering=0' -d 'memory_limit=-1' -d phar.readonly=0
  PHP_PHARCMD_EXECUTABLE = ` \
@@ -42,10 +40,7 @@ index 58789cae25..c02af1b186 100644
 -PHP_PHARCMD_BANG = `$(top_srcdir)/build/shtool echo -n -- "$(INSTALL_ROOT)$(bindir)/$(program_prefix)php$(program_suffix)$(EXEEXT)";`
 +               $(top_srcdir)/build/shtool echo -n -- "$(PHP_EXECUTABLE)"; `
 +
-+PHP_PHARCMD_BANG = `$(top_srcdir)/build/shtool echo -n -- "$(bindir)/$(program_prefix)php$(program_suffix)$(EXEEXT)";`
++PHP_PHARCMD_BANG = `$(top_srcdir)/build/shtool echo -n -- "/usr/bin/env $(program_prefix)php$(program_suffix)$(EXEEXT)";`
  
  $(builddir)/phar/phar.inc: $(srcdir)/phar/phar.inc
  	-@test -d $(builddir)/phar || mkdir $(builddir)/phar
--- 
-2.25.1
-

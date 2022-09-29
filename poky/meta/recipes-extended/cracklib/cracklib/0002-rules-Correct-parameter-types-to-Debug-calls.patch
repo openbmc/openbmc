@@ -1,0 +1,40 @@
+From 793921a8ee4ae7f20e1fd2bbec5196bc83176b01 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 7 Aug 2022 12:25:24 -0700
+Subject: [PATCH 2/2] rules: Correct parameter types to Debug() calls
+
+Fixes
+src/lib/rules.c:346:45: error: incompatible integer to pointer conversion passing 'char' to parameter of type 'char *'; take the address with & [-Wint-conversion]
+src/lib/rules.c:804:53: error: incompatible integer to pointer conversion passing 'char' to parameter of type 'char *'; remove * [-Wint-conversion]                                           Debug(1, "Mangle: unknown command %c in %s\n", *ptr, control);
+                                                           ^~~~
+Upstream-Status: Submitted [https://github.com/cracklib/cracklib/pull/48]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lib/rules.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/rules.c b/lib/rules.c
+index 6e7a12a..4a34f91 100644
+--- a/lib/rules.c
++++ b/lib/rules.c
+@@ -343,7 +343,7 @@ MatchClass(class, input)
+ 	break;
+ 
+     default:
+-	Debug(1, "MatchClass: unknown class %c\n", class);
++	Debug(1, "MatchClass: unknown class %c\n", &class);
+ 	return (0);
+ 	break;
+     }
+@@ -801,7 +801,7 @@ Mangle(input, control)		/* returns a pointer to a controlled Mangle */
+ 	    }
+ 
+ 	default:
+-	    Debug(1, "Mangle: unknown command %c in %s\n", *ptr, control);
++	    Debug(1, "Mangle: unknown command %c in %s\n", ptr, control);
+ 	    return NULL;
+ 	    break;
+ 	}
+-- 
+2.37.1
+

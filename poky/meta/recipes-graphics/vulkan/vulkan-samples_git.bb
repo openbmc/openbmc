@@ -8,10 +8,11 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=48aa35cefb768436223a6e7f18dc2a2a"
 SRC_URI = "gitsm://github.com/KhronosGroup/Vulkan-Samples.git;branch=master;protocol=https \
            file://0001-CMakeLists.txt-do-not-hardcode-lib-as-installation-t.patch \
            file://debugfix.patch \
+           file://0001-Qualify-move-as-std-move.patch;patchdir=third_party/spirv-cross \
            "
 
 UPSTREAM_CHECK_COMMITS = "1"
-SRCREV = "0cc04a63583769bd13bcc51229a5a263d59343df"
+SRCREV = "74d45aace02d99d766126711a8aaa0978276ca00"
 
 UPSTREAM_CHECK_GITTAGREGEX = "These are not the releases you're looking for"
 S = "${WORKDIR}/git"

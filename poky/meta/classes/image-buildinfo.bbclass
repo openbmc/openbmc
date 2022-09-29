@@ -4,7 +4,7 @@
 # Copyright (C) 2014 Intel Corporation
 # Author: Alejandro Enedino Hernandez Samaniego <alejandro.hernandez@intel.com>
 #
-# Licensed under the MIT license, see COPYING.MIT for details
+# SPDX-License-Identifier: MIT
 #
 # Usage: add INHERIT += "image-buildinfo" to your conf file
 #

@@ -1,0 +1,34 @@
+Upstream-Status: Inappropriate
+Signed-off-by: Emekcan Aras <Emekcan.Aras@arm.com>
+
+From a31aee0988ef64724ec5866f10709f51f8cb3237 Mon Sep 17 00:00:00 2001
+From: emeara01 <emekcan.aras@arm.com>
+Date: Wed, 11 May 2022 14:37:06 +0100
+Subject: [PATCH] Fix FF-A version in SPMC manifest
+
+OPTEE does not support FF-A version 1.1 in SPMC at the moment.
+This commit corrects the FF-A version in corstone1000_spmc_manifest.dts.
+This patch will not be upstreamed and will be dropped once
+OPTEE version is updated for Corstone1000.
+
+Signed-off-by: Emekcan Aras <Emekcan.Aras@arm.com>
+---
+ .../corstone1000/common/fdts/corstone1000_spmc_manifest.dts     | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plat/arm/board/corstone1000/common/fdts/corstone1000_spmc_manifest.dts b/plat/arm/board/corstone1000/common/fdts/corstone1000_spmc_manifest.dts
+index 8e49ab83f..5baa1b115 100644
+--- a/plat/arm/board/corstone1000/common/fdts/corstone1000_spmc_manifest.dts
++++ b/plat/arm/board/corstone1000/common/fdts/corstone1000_spmc_manifest.dts
+@@ -20,7 +20,7 @@
+ 	attribute {
+ 		spmc_id = <0x8000>;
+ 		maj_ver = <0x1>;
+-		min_ver = <0x1>;
++		min_ver = <0x0>;
+ 		exec_state = <0x0>;
+ 		load_address = <0x0 0x2002000>;
+ 		entrypoint = <0x0 0x2002000>;
+-- 
+2.17.1
+

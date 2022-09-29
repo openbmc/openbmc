@@ -1,0 +1,32 @@
+From 5b5eae9cdf3bae91756c717349f2f33a31888f24 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Wed, 3 Aug 2022 12:35:16 +0800
+Subject: [PATCH] make_exports.awk: not expose the path
+
+Don't print the full path in the comment line.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ build/make_exports.awk | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/build/make_exports.awk b/build/make_exports.awk
+index 1cf0568..44d93c5 100644
+--- a/build/make_exports.awk
++++ b/build/make_exports.awk
+@@ -47,7 +47,9 @@ function push(line) {
+ 
+ function do_output() {
+     printf("/*\n")
+-    printf(" * %s\n", FILENAME)
++    file = FILENAME
++    sub("([^/]*[/])*", "", file)
++    printf(" * %s\n", file)
+     printf(" */\n")
+     
+     for (i = 0; i < stackptr; i++) {
+-- 
+2.25.1
+

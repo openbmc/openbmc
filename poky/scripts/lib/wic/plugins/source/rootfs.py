@@ -35,7 +35,7 @@ class RootfsPlugin(SourcePlugin):
     @staticmethod
     def __validate_path(cmd, rootfs_dir, path):
         if os.path.isabs(path):
-            logger.error("%s: Must be relative: %s" % (cmd, orig_path))
+            logger.error("%s: Must be relative: %s" % (cmd, path))
             sys.exit(1)
 
         # Disallow climbing outside of parent directory using '..',

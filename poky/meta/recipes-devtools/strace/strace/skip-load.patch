@@ -4,6 +4,12 @@ care about timing.
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 
+---
+ tests/clock_nanosleep.gen.test | 1 +
+ tests/delay.test               | 1 +
+ tests/strace-r.test            | 1 +
+ 3 files changed, 3 insertions(+)
+
 diff --git a/tests/clock_nanosleep.gen.test b/tests/clock_nanosleep.gen.test
 index 7a6025b..f0e6dbb 100755
 --- a/tests/clock_nanosleep.gen.test
@@ -15,41 +21,29 @@ index 7a6025b..f0e6dbb 100755
 +skip_ "Test not reliable under load"
  run_strace_match_diff -e trace=clock_nanosleep,clock_gettime
 diff --git a/tests/delay.test b/tests/delay.test
-index f74e27f..328087e 100755
+index f74e27f..6172c04 100755
 --- a/tests/delay.test
 +++ b/tests/delay.test
-@@ -9,6 +9,8 @@
+@@ -8,6 +8,7 @@
+ # SPDX-License-Identifier: GPL-2.0-or-later
  
  . "${srcdir=.}/init.sh"
- 
 +skip_ "Test not reliable under load"
-+
+ 
  while read -r denter dexit denter_us dexit_us; do
  	[ -n "$denter" ] || continue
- 
-diff --git a/tests/strace-T.test b/tests/strace-T.test
-index adca3e8..d4acfe9 100755
---- a/tests/strace-T.test
-+++ b/tests/strace-T.test
-@@ -9,6 +9,8 @@
- 
- . "${srcdir=.}/init.sh"
- 
-+skip_ "Test not reliable under load"
-+
- T_opt="${1:--T}"
- 
- run_prog ../sleep 0
 diff --git a/tests/strace-r.test b/tests/strace-r.test
-index 8299737..c360344 100755
+index 8299737..d89c7df 100755
 --- a/tests/strace-r.test
 +++ b/tests/strace-r.test
-@@ -9,6 +9,8 @@
+@@ -8,6 +8,7 @@
+ # SPDX-License-Identifier: GPL-2.0-or-later
  
  . "${srcdir=.}/init.sh"
- 
 +skip_ "Test not reliable under load"
-+
+ 
  r_opt="${1:--r}"
  
- run_prog ../sleep 0
+-- 
+2.25.1
+

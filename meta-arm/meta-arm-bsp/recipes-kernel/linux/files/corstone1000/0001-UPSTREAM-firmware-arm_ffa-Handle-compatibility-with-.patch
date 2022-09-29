@@ -1,0 +1,90 @@
+Upstream-Status: Backport [https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=8e3f9da608f14cfebac2659d8dd8737b79d01308]
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+
+From a8f3e351c07c48774be2a45e184b9f08dc92f1db Mon Sep 17 00:00:00 2001
+From: Sudeep Holla <sudeep.holla@arm.com>
+Date: Wed, 13 Apr 2022 15:43:19 +0100
+Subject: [PATCH] UPSTREAM: firmware: arm_ffa: Handle compatibility with
+ different firmware versions
+
+The driver currently just support v1.0 of Arm FFA specification. It also
+expects the firmware implementation to match the same and bail out if it
+doesn't match. This is causing issue when running with higher version of
+firmware implementation(e.g. v1.1 which will released soon).
+
+In order to support compatibility with different firmware versions, let
+us add additional checks and find the compatible version the driver can
+work with.
+
+Link: https://lore.kernel.org/r/20211013091127.990992-1-sudeep.holla@arm.com
+Reviewed-by: Jens Wiklander <jens.wiklander@linaro.org>
+Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+(cherry picked from commit 8e3f9da608f14cfebac2659d8dd8737b79d01308)
+Change-Id: I7bc9a3b172a9067bfd4e9bb9d50b4729e915b5a5
+Bug: 168585974
+---
+ drivers/firmware/arm_ffa/driver.c | 37 ++++++++++++++++++++++++++-----
+ 1 file changed, 32 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/firmware/arm_ffa/driver.c b/drivers/firmware/arm_ffa/driver.c
+index c9fb56afbcb4..6e0c883ab708 100644
+--- a/drivers/firmware/arm_ffa/driver.c
++++ b/drivers/firmware/arm_ffa/driver.c
+@@ -167,6 +167,28 @@ struct ffa_drv_info {
+ 
+ static struct ffa_drv_info *drv_info;
+ 
++/*
++ * The driver must be able to support all the versions from the earliest
++ * supported FFA_MIN_VERSION to the latest supported FFA_DRIVER_VERSION.
++ * The specification states that if firmware supports a FFA implementation
++ * that is incompatible with and at a greater version number than specified
++ * by the caller(FFA_DRIVER_VERSION passed as parameter to FFA_VERSION),
++ * it must return the NOT_SUPPORTED error code.
++ */
++static u32 ffa_compatible_version_find(u32 version)
++{
++	u32 compat_version;
++	u16 major = MAJOR_VERSION(version), minor = MINOR_VERSION(version);
++	u16 drv_major = MAJOR_VERSION(FFA_DRIVER_VERSION);
++	u16 drv_minor = MINOR_VERSION(FFA_DRIVER_VERSION);
++
++	if ((major < drv_major) || (major == drv_major && minor <= drv_minor))
++		return version;
++
++	pr_info("Firmware version higher than driver version, downgrading\n");
++	return FFA_DRIVER_VERSION;
++}
++
+ static int ffa_version_check(u32 *version)
+ {
+ 	ffa_value_t ver;
+@@ -180,15 +202,20 @@ static int ffa_version_check(u32 *version)
+ 		return -EOPNOTSUPP;
+ 	}
+ 
+-	if (ver.a0 < FFA_MIN_VERSION || ver.a0 > FFA_DRIVER_VERSION) {
+-		pr_err("Incompatible version %d.%d found\n",
+-		       MAJOR_VERSION(ver.a0), MINOR_VERSION(ver.a0));
++	if (ver.a0 < FFA_MIN_VERSION) {
++		pr_err("Incompatible v%d.%d! Earliest supported v%d.%d\n",
++		       MAJOR_VERSION(ver.a0), MINOR_VERSION(ver.a0),
++		       MAJOR_VERSION(FFA_MIN_VERSION),
++		       MINOR_VERSION(FFA_MIN_VERSION));
+ 		return -EINVAL;
+ 	}
+ 
+-	*version = ver.a0;
+-	pr_info("Version %d.%d found\n", MAJOR_VERSION(ver.a0),
++	pr_info("Driver version %d.%d\n", MAJOR_VERSION(FFA_DRIVER_VERSION),
++		MINOR_VERSION(FFA_DRIVER_VERSION));
++	pr_info("Firmware version %d.%d found\n", MAJOR_VERSION(ver.a0),
+ 		MINOR_VERSION(ver.a0));
++	*version = ffa_compatible_version_find(ver.a0);
++
+ 	return 0;
+ }
+ 
+-- 
+2.17.1
+

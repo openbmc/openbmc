@@ -1,17 +1,22 @@
 SUMMARY = "Common C++ functions"
 DESCRIPTION = "Common C++ functions."
 HOMEPAGE = "http://github.com/openbmc/stdplus"
-PR = "r1"
-PV = "0.1+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
-
-inherit meson pkgconfig
-
 DEPENDS += " \
+  function2 \
   fmt \
   liburing \
   "
+SRCREV = "aaa8e0dd01c86958b440debb0d94dfa11e8258ee"
+PV = "0.1+git${SRCPV}"
+PR = "r1"
+
+SRC_URI += "git://github.com/openbmc/stdplus;branch=master;protocol=https"
+
+S = "${WORKDIR}/git"
+
+inherit meson pkgconfig
 
 EXTRA_OEMESON = " \
         -Dexamples=false \
@@ -19,7 +24,8 @@ EXTRA_OEMESON = " \
         -Dgtest=disabled \
         "
 
-SRC_URI += "git://github.com/openbmc/stdplus;branch=master;protocol=https"
-SRCREV = "953de366a53064546768bf370cb73563ca537c5f"
+PACKAGES =+ "libstdplus libstdplus-dl libstdplus-io_uring"
 
-S = "${WORKDIR}/git"
+FILES:libstdplus = "${libdir}/libstdplus.so.*"
+FILES:libstdplus-dl = "${libdir}/libstdplus-dl.so.*"
+FILES:libstdplus-io_uring = "${libdir}/libstdplus-io_uring.so.*"

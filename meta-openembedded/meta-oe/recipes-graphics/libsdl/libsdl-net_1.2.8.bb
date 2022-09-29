@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=9cf3de2d872bf510f88eb20d06d700b5"
 
 inherit autotools pkgconfig
 
-DEPENDS = "virtual/libsdl"
+DEPENDS = "libsdl"
 
 SRC_URI = " \
   https://www.libsdl.org/projects/SDL_net/release/SDL_net-${PV}.tar.gz \

@@ -88,9 +88,13 @@ project:
 
       $ source /opt/poky/&DISTRO;/environment-setup-i586-poky-linux
 
+   Another example is sourcing the environment setup directly in a Yocto
+   build::
+
+      $ source tmp/deploy/images/qemux86-64/environment-setup-core2-64-poky-linux
+
 3. *Create the configure Script:* Use the ``autoreconf`` command to
-   generate the ``configure`` script.
-   ::
+   generate the ``configure`` script::
 
       $ autoreconf
 
@@ -174,19 +178,19 @@ variables and Makefile variables during development.
 The main point of this section is to explain the following three cases
 regarding variable behavior:
 
--  *Case 1 - No Variables Set in the Makefile Map to Equivalent
+-  *Case 1 --- No Variables Set in the Makefile Map to Equivalent
    Environment Variables Set in the SDK Setup Script:* Because matching
    variables are not specifically set in the ``Makefile``, the variables
    retain their values based on the environment setup script.
 
--  *Case 2 - Variables Are Set in the Makefile that Map to Equivalent
+-  *Case 2 --- Variables Are Set in the Makefile that Map to Equivalent
    Environment Variables from the SDK Setup Script:* Specifically
    setting matching variables in the ``Makefile`` during the build
    results in the environment settings of the variables being
    overwritten. In this case, the variables you set in the ``Makefile``
    are used.
 
--  *Case 3 - Variables Are Set Using the Command Line that Map to
+-  *Case 3 --- Variables Are Set Using the Command Line that Map to
    Equivalent Environment Variables from the SDK Setup Script:*
    Executing the ``Makefile`` from the command line results in the
    environment variables being overwritten. In this case, the
@@ -278,6 +282,11 @@ example:
    Project release::
 
       $ source /opt/poky/&DISTRO;/environment-setup-i586-poky-linux
+
+   Another example is sourcing the environment setup directly in a Yocto
+   build::
+
+      $ source tmp/deploy/images/qemux86-64/environment-setup-core2-64-poky-linux
 
 3. *Create the Makefile:* For this example, the Makefile contains
    two lines that can be used to set the :term:`CC` variable. One line is

@@ -1,6 +1,6 @@
 RDEPENDS:${PN}-logging += "phosphor-logging"
 RDEPENDS:${PN}-extras += " bmcweb \
-                           phosphor-webui \
+                           webui-vue \
                            phosphor-image-signing \
                            phosphor-pid-control \
 "

@@ -62,10 +62,10 @@ machine() {
             tmpl="meta-phosphor/conf"
         else
             # Skip any machines that don't support meta-phosphor.
-            if [ ! -e "$tmpl/bblayers.conf.sample" ]; then
+            if [ ! -e "$tmpl/templates/default/bblayers.conf.sample" ]; then
                 continue
             fi
-            if ! grep -q "##OEROOT##/meta-phosphor" "$tmpl/bblayers.conf.sample"; then
+            if ! grep -q "##OEROOT##/meta-phosphor" "$tmpl/templates/default/bblayers.conf.sample"; then
                 continue
             fi
         fi
@@ -76,7 +76,7 @@ machine() {
             if [ "${name}" = "${target}" ]; then
                 echo "Machine ${target} found in ${tmpl%/conf}"
                 mkdir -p "${build_dir}"
-                TEMPLATECONF="${tmpl}" source \
+                TEMPLATECONF="${tmpl}/templates/default" source \
                         oe-init-build-env "${build_dir}"
 
                 if [ "$(cat conf/templateconf.cfg)" = "${tmpl}" ]; then

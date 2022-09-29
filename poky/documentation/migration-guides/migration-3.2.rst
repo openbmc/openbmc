@@ -23,7 +23,7 @@ Removed recipes
 The following recipes have been removed:
 
 - ``bjam-native``: replaced by ``boost-build-native``
-- ``avahi-ui``: folded into the main ``avahi`` recipe - the GTK UI can be disabled using :term:`PACKAGECONFIG` for ``avahi``.
+- ``avahi-ui``: folded into the main ``avahi`` recipe --- the GTK UI can be disabled using :term:`PACKAGECONFIG` for ``avahi``.
 - ``build-compare``: no longer needed with the removal of the ``packagefeed-stability`` class
 - ``dhcp``: obsolete, functionally replaced by ``dhcpcd`` and ``kea``
 - ``libmodulemd-v1``: replaced by ``libmodulemd``
@@ -37,7 +37,7 @@ Removed classes
 
 The following classes (.bbclass files) have been removed:
 
--  ``spdx``: obsolete - the Yocto Project is a strong supporter of SPDX, but this class was old code using a dated approach and had the potential to be misleading. The ``meta-sdpxscanner`` layer is a much more modern and active approach to handling this and is recommended as a replacement.
+-  ``spdx``: obsolete --- the Yocto Project is a strong supporter of SPDX, but this class was old code using a dated approach and had the potential to be misleading. The ``meta-sdpxscanner`` layer is a much more modern and active approach to handling this and is recommended as a replacement.
 
 - ``packagefeed-stability``: this class had become obsolete with the advent of hash equivalence and reproducible builds.
 
@@ -46,7 +46,7 @@ pseudo path filtering and mismatch behaviour
 --------------------------------------------
 
 pseudo now operates on a filtered subset of files. This is a significant change
-to the way pseudo operates within OpenEmbedded - by default, pseudo monitors and
+to the way pseudo operates within OpenEmbedded --- by default, pseudo monitors and
 logs (adds to its database) any file created or modified whilst in a ``fakeroot``
 environment. However, there are large numbers of files that we simply don't care
 about the permissions of whilst in that ``fakeroot`` context, for example ${:term:`S`}, ${:term:`B`}, ${:term:`T`},
@@ -68,7 +68,7 @@ structure above that subdirectory. For these types of cases in your own recipes,
 extend :term:`PSEUDO_IGNORE_PATHS` to cover additional paths that pseudo should not
 be monitoring.
 
-In addition, pseudo's behaviour on mismatches has now been changed - rather
+In addition, pseudo's behaviour on mismatches has now been changed --- rather
 than doing what turns out to be a rather dangerous "fixup" if it sees a file
 with a different path but the same inode as another file it has previously seen,
 pseudo will throw an ``abort()`` and direct you to a :yocto_wiki:`wiki page </Pseudo_Abort>`
@@ -137,10 +137,10 @@ DHCP server/client replaced
 
 The ``dhcp`` software package has become unmaintained and thus has been
 functionally replaced by ``dhcpcd`` (client) and ``kea`` (server). You will
-need to replace references to the recipe/package names as appropriate - most
+need to replace references to the recipe/package names as appropriate --- most
 commonly, at the package level ``dhcp-client`` should be replaced by
 ``dhcpcd`` and ``dhcp-server`` should be replaced by ``kea``. If you have any
-custom configuration files for these they will need to be adapted - refer to
+custom configuration files for these they will need to be adapted --- refer to
 the upstream documentation for ``dhcpcd`` and ``kea`` for further details.
 
 
@@ -181,7 +181,7 @@ In addition, the following new checks were added and default to triggering an er
 
 - :ref:`missing-update-alternatives <qa-check-missing-update-alternatives>`: Check if the recipe sets the :term:`ALTERNATIVE` variable for any of its packages, and does not inherit the :ref:`update-alternatives <ref-classes-update-alternatives>` class.
 
-- A trailing slash or duplicated slashes in the value of :term:`S` or :term:`B` will now trigger a warning so that they can be removed and path comparisons can be more reliable - remove any instances of these in your recipes if the warning is displayed.
+- A trailing slash or duplicated slashes in the value of :term:`S` or :term:`B` will now trigger a warning so that they can be removed and path comparisons can be more reliable --- remove any instances of these in your recipes if the warning is displayed.
 
 
 .. _migration-3.2-src-uri-file-globbing:
@@ -209,7 +209,7 @@ deploy class now cleans ``DEPLOYDIR`` before ``do_deploy``
 
 ``do_deploy`` as implemented in the :ref:`deploy <ref-classes-deploy>` class now cleans up ${:term:`DEPLOYDIR`} before running, just as ``do_install`` cleans up ${:term:`D`} before running. This reduces the risk of :term:`DEPLOYDIR` being accidentally contaminated by files from previous runs, possibly even with different config, in case of incremental builds.
 
-Most recipes and classes that inherit the :ref:`deploy <ref-classes-deploy>` class or interact with ``do_deploy`` are unlikely to be affected by this unless they add ``prefuncs`` to ``do_deploy`` *which also* put files into ``${DEPLOYDIR}`` - these should be refactored to use ``do_deploy_prepend`` instead.
+Most recipes and classes that inherit the :ref:`deploy <ref-classes-deploy>` class or interact with ``do_deploy`` are unlikely to be affected by this unless they add ``prefuncs`` to ``do_deploy`` *which also* put files into ``${DEPLOYDIR}`` --- these should be refactored to use ``do_deploy_prepend`` instead.
 
 
 .. _migration-3.2-nativesdk-sdk-provides-dummy:
@@ -303,7 +303,7 @@ now need to be changed to ``inherit image-artifact-names``.
 Miscellaneous changes
 ---------------------
 
-- Support for the long-deprecated ``PACKAGE_GROUP`` variable has now been removed - replace any remaining instances with :term:`FEATURE_PACKAGES`.
+- Support for the long-deprecated ``PACKAGE_GROUP`` variable has now been removed --- replace any remaining instances with :term:`FEATURE_PACKAGES`.
 - The ``FILESPATHPKG`` variable, having been previously deprecated, has now been removed. Replace any remaining references with appropriate use of :term:`FILESEXTRAPATHS`.
 - Erroneous use of ``inherit +=`` (instead of ``INHERIT +=``) in a configuration file now triggers an error instead of silently being ignored.
 - ptest support has been removed from the ``kbd`` recipe, as upstream has moved to autotest which is difficult to work with in a cross-compilation environment.

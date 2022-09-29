@@ -195,22 +195,45 @@ value. However, if ``A`` is not set, the variable is set to "aval".
 Setting a weak default value (??=)
 ----------------------------------
 
-It is possible to use a "weaker" assignment than in the previous section
-by using the "??=" operator. This assignment behaves identical to "?="
-except that the assignment is made at the end of the parsing process
-rather than immediately. Consequently, when multiple "??=" assignments
-exist, the last one is used. Also, any "=" or "?=" assignment will
-override the value set with "??=". Here is an example::
+The weak default value of a variable is the value which that variable
+will expand to if no value has been assigned to it via any of the other
+assignment operators. The "??=" operator takes effect immediately, replacing
+any previously defined weak default value. Here is an example::
 
-   A ??= "somevalue"
-   A ??= "someothervalue"
+   W ??= "x"
+   A := "${W}" # Immediate variable expansion
+   W ??= "y"
+   B := "${W}" # Immediate variable expansion
+   W ??= "z"
+   C = "${W}"
+   W ?= "i"
 
-If ``A`` is set before the above statements are
-parsed, the variable retains its value. If ``A`` is not set, the
-variable is set to "someothervalue".
+After parsing we will have::
 
-Again, this assignment is a "lazy" or "weak" assignment because it does
-not occur until the end of the parsing process.
+   A = "x"
+   B = "y"
+   C = "i"
+   W = "i"
+
+Appending and prepending non-override style will not substitute the weak
+default value, which means that after parsing::
+
+   W ??= "x"
+   W += "y"
+
+we will have::
+
+   W = " y"
+
+On the other hand, override-style appends/prepends/removes are applied after
+any active weak default value has been substituted::
+
+   W ??= "x"
+   W:append = "y"
+
+After parsing we will have::
+
+   W = "xy"
 
 Immediate variable expansion (:=)
 ---------------------------------

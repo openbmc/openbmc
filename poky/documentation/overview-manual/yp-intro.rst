@@ -842,7 +842,7 @@ helpful for getting started:
    distribution.
 
    Another point worth noting is that historically within the Yocto
-   Project, recipes were referred to as packages - thus, the existence
+   Project, recipes were referred to as packages --- thus, the existence
    of several BitBake variables that are seemingly mis-named, (e.g.
    :term:`PR`,
    :term:`PV`, and

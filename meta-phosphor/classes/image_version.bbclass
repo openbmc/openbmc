@@ -2,22 +2,26 @@
 
 DEPENDS:append = " os-release"
 
-def do_get_version(d):
+def do_get_os_release_value(d, key):
     import configparser
     import io
     path = d.getVar('STAGING_DIR_TARGET', True) + d.getVar('sysconfdir', True)
     path = os.path.join(path, 'os-release')
     parser = configparser.ConfigParser(strict=False)
     parser.optionxform = str
-    version = ''
+    value = ''
     try:
         with open(path, 'r') as fd:
             buf = '[root]\n' + fd.read()
             fd = io.StringIO(buf)
             parser.readfp(fd)
-            version = parser['root']['VERSION_ID']
+            value = parser['root'][key]
     except:
         pass
+    return value
+
+def do_get_version(d):
+    version = do_get_os_release_value(d, 'VERSION_ID')
     return version
 
 def do_get_versionID(d):
@@ -28,19 +32,9 @@ def do_get_versionID(d):
     return version_id
 
 def do_get_buildID(d):
-    import configparser
-    import io
-    path = d.getVar('STAGING_DIR_TARGET', True) + d.getVar('sysconfdir', True)
-    path = os.path.join(path, 'os-release')
-    parser = configparser.ConfigParser(strict=False)
-    parser.optionxform = str
-    build_id = ''
-    try:
-        with open(path, 'r') as fd:
-            buf = '[root]\n' + fd.read()
-            fd = io.StringIO(buf)
-            parser.readfp(fd)
-            build_id = parser['root']['BUILD_ID']
-    except:
-        pass
+    build_id = do_get_os_release_value(d, 'BUILD_ID')
     return build_id
+
+def do_get_extended_version(d):
+    extended_version = do_get_os_release_value(d, 'EXTENDED_VERSION')
+    return extended_version

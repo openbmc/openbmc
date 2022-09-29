@@ -1,0 +1,19 @@
+[{
+    "blob": "/flash/bios",
+    "handler": {
+        "type": "file",
+        "path": "/run/initramfs/bios-image"
+    },
+    "actions": {
+        "preparation": {
+            "type": "skip"
+        },
+        "verification": {
+            "type": "skip"
+        },
+        "update": {
+            "type": "systemd",
+            "unit": "phosphor-ipmi-flash-bios-update.service"
+        }
+    }
+}]

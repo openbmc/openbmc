@@ -58,10 +58,9 @@ SYSTEMD_LINK:${PN}-control:witherspoon += "${@compose_list(d, 'FMT_CONTROL_PWRON
 
 # Enable the use of JSON on the fan applications that support it
 PACKAGECONFIG:append:witherspoon = " json"
-EXTRA_OECONF:append:witherspoon = " --disable-json-control"
+EXTRA_OEMESON:append:witherspoon = " -Djson-control=disabled"
 
 PACKAGECONFIG:append:p10bmc = " json sensor-monitor"
-FAN_PACKAGES:append:p10bmc = " sensor-monitor"
 
 # Set the appropriate i2c address used within the overridden phosphor-fan-control@.service
 # file that's used for witherspoon type(including witherspoon-tacoma) machines

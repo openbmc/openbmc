@@ -1,4 +1,6 @@
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: GPL-2.0-only
 #
 import os
@@ -152,7 +154,6 @@ def fixed_source_date_epoch(d):
 def get_source_date_epoch(d, sourcedir):
     return (
         get_source_date_epoch_from_git(d, sourcedir) or
-        get_source_date_epoch_from_known_files(d, sourcedir) or
         get_source_date_epoch_from_youngest_file(d, sourcedir) or
         fixed_source_date_epoch(d)       # Last resort
     )

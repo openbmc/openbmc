@@ -1,0 +1,7 @@
+[Unit]
+Description=power off host
+
+[Service]
+RemainAfterExit=no
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-fan-sensor-monitor/host-poweroff

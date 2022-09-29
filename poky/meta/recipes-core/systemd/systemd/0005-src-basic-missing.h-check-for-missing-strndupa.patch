@@ -73,10 +73,10 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  52 files changed, 63 insertions(+)
 
 diff --git a/meson.build b/meson.build
-index cb9936ee8b..7ab201c6d9 100644
+index 30b5305b89..0189ef8ce6 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -507,6 +507,7 @@ foreach ident : ['secure_getenv', '__secure_getenv']
+@@ -512,6 +512,7 @@ foreach ident : ['secure_getenv', '__secure_getenv']
  endforeach
  
  foreach ident : [
@@ -85,19 +85,19 @@ index cb9936ee8b..7ab201c6d9 100644
          ['gettid',            '''#include <sys/types.h>
                                   #include <unistd.h>'''],
 diff --git a/src/backlight/backlight.c b/src/backlight/backlight.c
-index 5a3095cbba..22cfa4d526 100644
+index a4e5d77f6c..fc12da4c53 100644
 --- a/src/backlight/backlight.c
 +++ b/src/backlight/backlight.c
-@@ -19,6 +19,7 @@
- #include "string-util.h"
+@@ -20,6 +20,7 @@
  #include "strv.h"
+ #include "terminal-util.h"
  #include "util.h"
 +#include "missing_stdlib.h"
  
  static int help(void) {
          _cleanup_free_ char *link = NULL;
 diff --git a/src/basic/cgroup-util.c b/src/basic/cgroup-util.c
-index a626ecf2e2..f7dc6c8421 100644
+index b03cc70e2e..f4615ffce1 100644
 --- a/src/basic/cgroup-util.c
 +++ b/src/basic/cgroup-util.c
 @@ -37,6 +37,7 @@
@@ -249,10 +249,10 @@ index b659d6905d..020112be24 100644
  static clockid_t map_clock_id(clockid_t c) {
  
 diff --git a/src/boot/bless-boot.c b/src/boot/bless-boot.c
-index 9e4b0d1f72..d640316ff7 100644
+index d9c901d73b..79a035274c 100644
 --- a/src/boot/bless-boot.c
 +++ b/src/boot/bless-boot.c
-@@ -19,6 +19,7 @@
+@@ -22,6 +22,7 @@
  #include "util.h"
  #include "verbs.h"
  #include "virt.h"
@@ -297,10 +297,10 @@ index 32a2ec0ff9..36be2511e4 100644
  int bus_property_get_triggered_unit(
                  sd_bus *bus,
 diff --git a/src/core/execute.c b/src/core/execute.c
-index 0b20d386d3..fccfb9268c 100644
+index 2762b10287..a8aeec7f6e 100644
 --- a/src/core/execute.c
 +++ b/src/core/execute.c
-@@ -102,6 +102,7 @@
+@@ -103,6 +103,7 @@
  #include "unit-serialize.h"
  #include "user-util.h"
  #include "utmp-wtmp.h"
@@ -309,19 +309,19 @@ index 0b20d386d3..fccfb9268c 100644
  #define IDLE_TIMEOUT_USEC (5*USEC_PER_SEC)
  #define IDLE_TIMEOUT2_USEC (1*USEC_PER_SEC)
 diff --git a/src/core/kmod-setup.c b/src/core/kmod-setup.c
-index d054668b8e..9b4caa7651 100644
+index f4488dd692..1d331a7ee2 100644
 --- a/src/core/kmod-setup.c
 +++ b/src/core/kmod-setup.c
-@@ -10,6 +10,7 @@
- #include "macro.h"
+@@ -11,6 +11,7 @@
  #include "recurse-dir.h"
  #include "string-util.h"
+ #include "virt.h"
 +#include "missing_stdlib.h"
  
  #if HAVE_KMOD
  #include "module-util.h"
 diff --git a/src/core/service.c b/src/core/service.c
-index 87f0d34c8c..ccda3feb29 100644
+index 9f7af9dffb..3ec5e30c8b 100644
 --- a/src/core/service.c
 +++ b/src/core/service.c
 @@ -42,6 +42,7 @@
@@ -330,13 +330,13 @@ index 87f0d34c8c..ccda3feb29 100644
  #include "util.h"
 +#include "missing_stdlib.h"
  
- static const UnitActiveState state_translation_table[_SERVICE_STATE_MAX] = {
-         [SERVICE_DEAD] = UNIT_INACTIVE,
+ #define service_spawn(...) service_spawn_internal(__func__, __VA_ARGS__)
+
 diff --git a/src/coredump/coredump-vacuum.c b/src/coredump/coredump-vacuum.c
-index dcf9cc03cd..8f8d992ec2 100644
+index c6e201ecf2..ab034475e2 100644
 --- a/src/coredump/coredump-vacuum.c
 +++ b/src/coredump/coredump-vacuum.c
-@@ -16,6 +16,7 @@
+@@ -17,6 +17,7 @@
  #include "string-util.h"
  #include "time-util.h"
  #include "user-util.h"
@@ -369,10 +369,10 @@ index 3e3646e45f..6a8fc60f6d 100644
  #define PRIV_KEY_FILE CERTIFICATE_ROOT "/private/journal-remote.pem"
  #define CERT_FILE     CERTIFICATE_ROOT "/certs/journal-remote.pem"
 diff --git a/src/journal/journalctl.c b/src/journal/journalctl.c
-index 3c4a7c0a7a..6a792404f2 100644
+index cff34fd585..a5003e47e9 100644
 --- a/src/journal/journalctl.c
 +++ b/src/journal/journalctl.c
-@@ -73,6 +73,7 @@
+@@ -74,6 +74,7 @@
  #include "unit-name.h"
  #include "user-util.h"
  #include "varlink.h"
@@ -393,11 +393,11 @@ index 96529b422b..ddb5e9c698 100644
  static int message_append_basic(sd_bus_message *m, char type, const void *p, const void **stored);
  
 diff --git a/src/libsystemd/sd-bus/bus-objects.c b/src/libsystemd/sd-bus/bus-objects.c
-index 28d8336718..5d3ce88a53 100644
+index 909dfe4d3a..254b7ce866 100644
 --- a/src/libsystemd/sd-bus/bus-objects.c
 +++ b/src/libsystemd/sd-bus/bus-objects.c
-@@ -12,6 +12,7 @@
- #include "set.h"
+@@ -11,6 +11,7 @@
+ #include "missing_capability.h"
  #include "string-util.h"
  #include "strv.h"
 +#include "missing_stdlib.h"
@@ -633,11 +633,11 @@ index f75ef62d2d..530001a821 100644
  static pid_t pager_pid = 0;
  
 diff --git a/src/shared/uid-range.c b/src/shared/uid-range.c
-index 2c07a1b7a8..2a9d6ef4ab 100644
+index 1b4396a34c..c2f72b185f 100644
 --- a/src/shared/uid-range.c
 +++ b/src/shared/uid-range.c
-@@ -9,6 +9,7 @@
- #include "sort-util.h"
+@@ -14,6 +14,7 @@
+ #include "stat-util.h"
  #include "uid-range.h"
  #include "user-util.h"
 +#include "missing_stdlib.h"
@@ -704,6 +704,3 @@ index 1a384d6b38..0089833e3f 100644
  
  #define RULES_DIRS (const char* const*) CONF_PATHS_STRV("udev/rules.d")
  
--- 
-2.34.1
-

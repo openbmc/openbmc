@@ -1,0 +1,55 @@
+From d190c0c548b3219b75e4c399aa89186e77bbe270 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 23 Aug 2022 20:03:09 -0700
+Subject: [PATCH] api: Use GNU strerror_r when available
+
+GNU strerror_r is only available in glibc, musl impelents the XSI
+version which is slightly different, therefore check if GNU version is
+available before using it, otherwise use the XSI compliant version.
+
+Upstream-Status: Submitted [https://github.com/libcgroup/libcgroup/pull/236]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 5 +++++
+ src/api.c    | 8 ++++++--
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b68c655..831866d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -183,6 +183,11 @@ AC_FUNC_REALLOC
+ AC_FUNC_STAT
+ AC_CHECK_FUNCS([getmntent hasmntopt memset mkdir rmdir strdup])
+ 
++orig_CFLAGS="$CFLAGS"
++CFLAGS="$CFLAGS -D_GNU_SOURCE"
++AC_FUNC_STRERROR_R
++CFLAGS="$orig_CFLAGS"
++
+ AC_SEARCH_LIBS(
+ 	[fts_open],
+ 	[fts],
+diff --git a/src/api.c b/src/api.c
+index 5c6de11..06aa1d6 100644
+--- a/src/api.c
++++ b/src/api.c
+@@ -4571,9 +4571,13 @@ const char *cgroup_strerror(int code)
+ {
+ 	int idx = code % ECGROUPNOTCOMPILED;
+ 
+-	if (code == ECGOTHER)
++	if (code == ECGOTHER) {
++#ifdef STRERROR_R_CHAR_P
+ 		return strerror_r(cgroup_get_last_errno(), errtext, MAXLEN);
+-
++#else
++		return strerror_r(cgroup_get_last_errno(), errtext, sizeof (errtext)) ? "unknown error" : errtext;
++#endif
++	}
+ 	if (idx >= sizeof(cgroup_strerror_codes)/sizeof(cgroup_strerror_codes[0]))
+ 		return "Invalid error code";
+ 
+-- 
+2.37.2
+

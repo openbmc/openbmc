@@ -3,7 +3,7 @@
 #
 # Copyright (C) 2013 Intel Corporation
 #
-# Released under the MIT license (see COPYING.MIT)
+# SPDX-License-Identifier: MIT
 #
 # This bbclass is designed to extract data used by OE-Core during the build process,
 # for recording in the Toaster system.

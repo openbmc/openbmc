@@ -18,7 +18,7 @@ SRC_URI:append:evb-npcm845 = " file://0002-Support-bridging-commands.patch"
 
 # Fix build error when enable sel-logger-clears-sel
 # EXTRA_OEMESON:append:evb-npcm845 = "-Dsel-logger-clears-sel=enabled"
-SRC_URI:append:evb-npcm845 = " file://0008-dbus-sdr-fix-build-error-when-enable-sel-logger-clea.patch"
+#SRC_URI:append:evb-npcm845 = " file://0008-dbus-sdr-fix-build-error-when-enable-sel-logger-clea.patch"
 
 PACKAGECONFIG:append:evb-npcm845 = " ${@entity_enabled(d, 'dynamic-sensors', '')}"
 

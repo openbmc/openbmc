@@ -1,4 +1,6 @@
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: MIT
 #
 
@@ -16,7 +18,8 @@ class EpoxyTest(OESDKTestCase):
     Test that Meson builds correctly.
     """
     def setUp(self):
-        if not (self.tc.hasHostPackage("nativesdk-meson")):
+        if not (self.tc.hasHostPackage("nativesdk-meson") or
+                self.tc.hasHostPackage("meson-native")):
             raise unittest.SkipTest("EpoxyTest class: SDK doesn't contain Meson")
 
     def test_epoxy(self):

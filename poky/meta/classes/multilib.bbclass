@@ -1,3 +1,9 @@
+#
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
+
 python multilib_virtclass_handler () {
     cls = e.data.getVar("BBEXTENDCURR")
     variant = e.data.getVar("BBEXTENDVARIANT")

@@ -1,0 +1,17 @@
+# From glibc 2.36, <linux/mount.h> (included from <linux/fs.h>) and 
+# <sys/mount.h> (included from glibc) are no longer compatible:
+# https://sourceware.org/glibc/wiki/Release/2.36#Usage_of_.3Clinux.2Fmount.h.3E_and_.3Csys.2Fmount.h.3E
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- sysvinit-3.04/src/sulogin.c.orig	2022-08-07 23:07:42.952576274 +0200
++++ sysvinit-3.04/src/sulogin.c	2022-08-07 23:08:26.511470983 +0200
+@@ -51,7 +51,6 @@
+ #ifdef __linux__
+ #  include <sys/statfs.h>
+ #  include <sys/mount.h>
+-#  include <linux/fs.h>
+ #  include <linux/magic.h>
+ #  include <linux/major.h>
+ #  ifndef TMPFS_MAGIC

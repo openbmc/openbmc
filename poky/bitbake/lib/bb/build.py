@@ -20,6 +20,7 @@ import itertools
 import time
 import re
 import stat
+import datetime
 import bb
 import bb.msg
 import bb.process
@@ -618,7 +619,8 @@ def _exec_task(fn, task, d, quieterr):
     logorder = os.path.join(tempdir, 'log.task_order')
     try:
         with open(logorder, 'a') as logorderfile:
-            logorderfile.write('{0} ({1}): {2}\n'.format(task, os.getpid(), logbase))
+            timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S.%f")
+            logorderfile.write('{0} {1} ({2}): {3}\n'.format(timestamp, task, os.getpid(), logbase))
     except OSError:
         logger.exception("Opening log file '%s'", logorder)
         pass

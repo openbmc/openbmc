@@ -18,7 +18,7 @@ SRC_URI = "\
     file://Replace-murmurhash-algorithm-with-Robert-Jenkin-s-ha.patch \
     file://freediameter.service \
     file://freediameter.init \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'file://install_test.patch file://run-ptest file://pass-ptest-env.patch', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'file://install_test.patch file://run-ptest file://0001-tests-use-EXTENSIONS_DIR.patch', '', d)} \
     file://freeDiameter.conf \
     file://0001-libfdcore-sctp.c-update-the-old-sctp-api-check.patch \
     "
@@ -46,6 +46,7 @@ EXTRA_OECMAKE = " \
     -DBUILD_TEST_RT_ANY:BOOL=ON \
     -DINSTALL_LIBRARY_SUFFIX:PATH=${baselib} \
     -DINSTALL_EXTENSIONS_SUFFIX:PATH=${baselib}/${fd_pkgname} \
+    -DEXTENSIONS_DIR:PATH=${libdir}/${fd_pkgname} \
     -DINSTALL_TEST_SUFFIX:PATH=${PTEST_PATH}-tests \
     -DCMAKE_SKIP_RPATH:BOOL=ON \
 "
@@ -107,13 +108,15 @@ EOF
     openssl req -x509 -config ${STAGING_DIR_NATIVE}/etc/ssl/openssl.cnf -newkey rsa:4096 -sha256 -nodes -out ${D}${sysconfdir}/freeDiameter/${FD_PEM} -keyout ${D}${sysconfdir}/freeDiameter/${FD_KEY} -days 3650 -subj '/CN=${FD_HOSTNAME}.${FD_REALM}'
     openssl dhparam -out ${D}${sysconfdir}/freeDiameter/${FD_DH_PEM} 1024
 
+    find ${B} \( -name "*.c" -o -name "*.h" \) -exec sed -i -e 's#${WORKDIR}##g' {} \;
 }
 
 do_install_ptest() {
-    sed -i "s#\(EXTENSIONS_DIR=\).*\$#\1${libdir}/${fd_pkgname}/#" ${D}${PTEST_PATH}/run-ptest
     mv ${D}${PTEST_PATH}-tests/* ${D}${PTEST_PATH}/
     rmdir ${D}${PTEST_PATH}-tests
     install -m 0644 ${B}/tests/CTestTestfile.cmake ${D}${PTEST_PATH}/
+    sed -i -e 's#${WORKDIR}##g' ${D}${PTEST_PATH}/CTestTestfile.cmake
+    sed -i "/^set_tests_properties/d" ${D}${PTEST_PATH}/CTestTestfile.cmake
 }
 
 FILES:${PN}-dbg += "${libdir}/${fd_pkgname}/.debug/*"

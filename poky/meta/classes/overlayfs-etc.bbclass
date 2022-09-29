@@ -1,3 +1,9 @@
+#
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
+
 # Class for setting up /etc in overlayfs
 #
 # In order to have /etc directory in overlayfs a special handling at early boot stage is required

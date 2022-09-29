@@ -1,4 +1,6 @@
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: MIT
 #
 
@@ -47,8 +49,8 @@ class OePkgdataUtilTests(OESelftestTestCase):
         self.assertGreater(pkgsize, 1, "Size should be greater than 1. %s" % result.output)
 
     def test_find_path(self):
-        result = runCmd('oe-pkgdata-util find-path /lib/libz.so.1')
-        self.assertEqual(result.output, 'zlib: /lib/libz.so.1')
+        result = runCmd('oe-pkgdata-util find-path /usr/lib/libz.so.1')
+        self.assertEqual(result.output, 'zlib: /usr/lib/libz.so.1')
         result = runCmd('oe-pkgdata-util find-path /usr/bin/m4')
         self.assertEqual(result.output, 'm4: /usr/bin/m4')
         result = runCmd('oe-pkgdata-util find-path /not/exist', ignore_status=True)
@@ -120,8 +122,7 @@ class OePkgdataUtilTests(OESelftestTestCase):
                     curpkg = line.split(':')[0]
                     files[curpkg] = []
             return files
-        bb_vars = get_bb_vars(['base_libdir', 'libdir', 'includedir', 'mandir'])
-        base_libdir = bb_vars['base_libdir']
+        bb_vars = get_bb_vars(['libdir', 'includedir', 'mandir'])
         libdir = bb_vars['libdir']
         includedir = bb_vars['includedir']
         mandir = bb_vars['mandir']
@@ -138,7 +139,7 @@ class OePkgdataUtilTests(OESelftestTestCase):
         self.assertIn('libz1', list(files.keys()), "listed pkgs. files: %s" %result.output)
         self.assertIn('libz-dev', list(files.keys()), "listed pkgs. files: %s" %result.output)
         self.assertGreater(len(files['libz1']), 1)
-        libspec = os.path.join(base_libdir, 'libz.so.1.*')
+        libspec = os.path.join(libdir, 'libz.so.1.*')
         found = False
         for fileitem in files['libz1']:
             if fnmatch.fnmatchcase(fileitem, libspec):

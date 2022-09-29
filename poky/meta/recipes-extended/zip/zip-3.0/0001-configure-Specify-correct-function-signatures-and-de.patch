@@ -1,0 +1,134 @@
+From 8810f2643c9372a8083272dc1fc157427646d961 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 10 Aug 2022 17:16:23 -0700
+Subject: [PATCH 1/2] configure: Specify correct function signatures and
+ declarations
+
+Include needed system headers in configure tests, this is needed because
+newer compilers are getting stricter about the C99 specs and turning
+-Wimplicit-function-declaration into hard error e.g. clang-15+
+
+Upstream-Status: Inactive-Upstream
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ unix/configure | 79 +++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 66 insertions(+), 13 deletions(-)
+
+diff --git a/unix/configure b/unix/configure
+index 1d9a9bb..f2b3d02 100644
+--- a/unix/configure
++++ b/unix/configure
+@@ -513,21 +513,70 @@ $CC $CFLAGS -c conftest.c >/dev/null 2>/dev/null
+ # Check for missing functions
+ # add NO_'function_name' to flags if missing
+ 
+-for func in rmdir strchr strrchr rename mktemp mktime mkstemp
+-do
+-  echo Check for $func
+-  echo "int main(){ $func(); return 0; }" > conftest.c
+-  $CC $CFLAGS $LDFLAGS $BFLAG -o conftest conftest.c >/dev/null 2>/dev/null
+-  [ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNO_`echo $func | tr '[a-z]' '[A-Z]'`"
+-done
++echo Check for rmdir
++cat > conftest.c << _EOF_
++#include <unistd.h>
++int main(){ rmdir(NULL); return 0; }
++_EOF_
++$CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
++[ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNO_RMDIR"
++
++echo Check for strchr
++cat > conftest.c << _EOF_
++#include <string.h>
++int main(){ strchr(NULL,0); return 0; }
++_EOF_
++$CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
++[ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNO_STRCHR"
+ 
++echo Check for strrchr
++cat > conftest.c << _EOF_
++#include <string.h>
++int main(){ strrchr(NULL,0); return 0; }
++_EOF_
++$CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
++[ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNO_STRRCHR"
++
++echo Check for rename
++cat > conftest.c << _EOF_
++#include <stdio.h>
++int main(){ rename(NULL,NULL); return 0; }
++_EOF_
++$CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
++[ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNO_RENAME"
++
++echo Check for mktemp
++cat > conftest.c << _EOF_
++#include <stdlib.h>
++int main(){ mktemp(NULL); return 0; }
++_EOF_
++$CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
++[ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNO_MKTEMP"
++
++echo Check for mktime
++cat > conftest.c << _EOF_
++#include <time.h>
++int main(){ mktime(NULL); return 0; }
++_EOF_
++$CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
++[ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNO_MKTIME"
++
++echo Check for mkstemp
++cat > conftest.c << _EOF_
++#include <stdlib.h>
++int main(){ return mkstemp(NULL); }
++_EOF_
++$CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
++[ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNO_MKSTEMP"
+ 
+ echo Check for memset
+-echo "int main(){ char k; memset(&k,0,0); return 0; }" > conftest.c
++cat > conftest.c << _EOF_
++#include <string.h>
++int main(){ char k; memset(&k,0,0); return 0; }
++_EOF_
+ $CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
+ [ $? -ne 0 ] && CFLAGS="${CFLAGS} -DZMEM"
+ 
+-
+ echo Check for memmove
+ cat > conftest.c << _EOF_
+ #include <string.h>
+@@ -548,7 +597,7 @@ $CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
+ echo Check for errno declaration
+ cat > conftest.c << _EOF_
+ #include <errno.h>
+-main()
++int main()
+ {
+   errno = 0;
+   return 0;
+@@ -625,14 +674,18 @@ CFLAGS="${CFLAGS} ${OPT}"
+ 
+ echo Check for valloc
+ cat > conftest.c << _EOF_
+-main()
++#include <stdlib.h>
++int main()
+ {
+ #ifdef MMAP
+-    valloc();
++    valloc(0);
+ #endif
++    return 0;
+ }
+ _EOF_
+-$CC ${CFLAGS} -c conftest.c > /dev/null 2>/dev/null
++#$CC ${CFLAGS} -c conftest.c > /dev/null 2>/dev/null
++$CC ${CFLAGS} -c conftest.c
++echo "==========================================="
+ [ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNO_VALLOC"
+ 
+ 
+-- 
+2.37.1
+

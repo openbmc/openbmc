@@ -1,4 +1,4 @@
-From 61de6067f5ad127d246543527947a357647f95e5 Mon Sep 17 00:00:00 2001
+From a3db4da51df37d163ff9e8c1e1057280c648c545 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 28 Mar 2022 10:59:03 -0700
 Subject: [PATCH] cmd/go: make content-based hash generation less pedantic
@@ -25,14 +25,17 @@ Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Alex Kube <alexander.j.kube@gmail.com>
 Signed-off-by: Matt Madison <matt@madison.systems>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  src/cmd/go/internal/envcmd/env.go |  2 +-
- src/cmd/go/internal/work/exec.go  | 42 +++++++++++++++++++++++++------
- 2 files changed, 35 insertions(+), 9 deletions(-)
+ src/cmd/go/internal/work/exec.go  | 42 ++++++++++++++++++++++++-------
+ 2 files changed, 34 insertions(+), 10 deletions(-)
 
+diff --git a/src/cmd/go/internal/envcmd/env.go b/src/cmd/go/internal/envcmd/env.go
+index 529351d..df791b0 100644
 --- a/src/cmd/go/internal/envcmd/env.go
 +++ b/src/cmd/go/internal/envcmd/env.go
-@@ -169,7 +169,7 @@ func ExtraEnvVars() []cfg.EnvVar {
+@@ -176,7 +176,7 @@ func ExtraEnvVars() []cfg.EnvVar {
  func ExtraEnvVarsCostly() []cfg.EnvVar {
  	var b work.Builder
  	b.Init()
@@ -41,9 +44,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  	if err != nil {
  		// Should not happen - b.CFlags was given an empty package.
  		fmt.Fprintf(os.Stderr, "go: invalid cflags: %v\n", err)
+diff --git a/src/cmd/go/internal/work/exec.go b/src/cmd/go/internal/work/exec.go
+index c88b315..a06455c 100644
 --- a/src/cmd/go/internal/work/exec.go
 +++ b/src/cmd/go/internal/work/exec.go
-@@ -213,6 +213,8 @@ func (b *Builder) Do(ctx context.Context
+@@ -213,6 +213,8 @@ func (b *Builder) Do(ctx context.Context, root *Action) {
  	writeActionGraph()
  }
  
@@ -52,7 +57,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  // buildActionID computes the action ID for a build action.
  func (b *Builder) buildActionID(a *Action) cache.ActionID {
  	p := a.Package
-@@ -234,7 +236,7 @@ func (b *Builder) buildActionID(a *Actio
+@@ -234,7 +236,7 @@ func (b *Builder) buildActionID(a *Action) cache.ActionID {
  		if p.Module != nil {
  			fmt.Fprintf(h, "module %s@%s\n", p.Module.Path, p.Module.Version)
  		}
@@ -61,7 +66,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  		// The Go compiler always hides the exact value of $GOROOT
  		// when building things in GOROOT.
  		//
-@@ -266,9 +268,9 @@ func (b *Builder) buildActionID(a *Actio
+@@ -266,9 +268,9 @@ func (b *Builder) buildActionID(a *Action) cache.ActionID {
  	}
  	if len(p.CgoFiles)+len(p.SwigFiles)+len(p.SwigCXXFiles) > 0 {
  		fmt.Fprintf(h, "cgo %q\n", b.toolID("cgo"))
@@ -73,7 +78,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  		fmt.Fprintf(h, "CC=%q %q %q %q\n", ccExe, cppflags, cflags, ldflags)
  		// Include the C compiler tool ID so that if the C
  		// compiler changes we rebuild the package.
-@@ -281,14 +283,14 @@ func (b *Builder) buildActionID(a *Actio
+@@ -281,14 +283,14 @@ func (b *Builder) buildActionID(a *Action) cache.ActionID {
  			}
  		}
  		if len(p.CXXFiles)+len(p.SwigCXXFiles) > 0 {
@@ -90,16 +95,16 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  			fmt.Fprintf(h, "FC=%q %q\n", fcExe, fflags)
  			if fcID, err := b.gccToolID(fcExe[0], "f95"); err == nil {
  				fmt.Fprintf(h, "FC ID=%q\n", fcID)
-@@ -304,7 +306,7 @@ func (b *Builder) buildActionID(a *Actio
- 			fmt.Fprintf(h, "fuzz %q\n", fuzzFlags)
+@@ -305,7 +307,7 @@ func (b *Builder) buildActionID(a *Action) cache.ActionID {
  		}
  	}
--	fmt.Fprintf(h, "modinfo %q\n", p.Internal.BuildInfo)
-+	//fmt.Fprintf(h, "modinfo %q\n", p.Internal.BuildInfo)
+ 	if p.Internal.BuildInfo != "" {
+-		fmt.Fprintf(h, "modinfo %q\n", p.Internal.BuildInfo)
++		//fmt.Fprintf(h, "modinfo %q\n", p.Internal.BuildInfo)
+ 	}
  
  	// Configuration specific to compiler toolchain.
- 	switch cfg.BuildToolchainName {
-@@ -2679,8 +2681,23 @@ func envList(key, def string) []string {
+@@ -2705,8 +2707,23 @@ func envList(key, def string) []string {
  	return args
  }
  
@@ -124,7 +129,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  	defaults := "-g -O2"
  
  	if cppflags, err = buildFlags("CPPFLAGS", "", p.CgoCPPFLAGS, checkCompilerFlags); err != nil {
-@@ -2698,6 +2715,13 @@ func (b *Builder) CFlags(p *load.Package
+@@ -2724,6 +2741,13 @@ func (b *Builder) CFlags(p *load.Package) (cppflags, cflags, cxxflags, fflags, l
  	if ldflags, err = buildFlags("LDFLAGS", defaults, p.CgoLDFLAGS, checkLinkerFlags); err != nil {
  		return
  	}
@@ -138,7 +143,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  	return
  }
-@@ -2713,7 +2737,7 @@ var cgoRe = lazyregexp.New(`[/\\:]`)
+@@ -2739,7 +2763,7 @@ var cgoRe = lazyregexp.New(`[/\\:]`)
  
  func (b *Builder) cgo(a *Action, cgoExe, objdir string, pcCFLAGS, pcLDFLAGS, cgofiles, gccfiles, gxxfiles, mfiles, ffiles []string) (outGo, outObj []string, err error) {
  	p := a.Package
@@ -147,7 +152,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  	if err != nil {
  		return nil, nil, err
  	}
-@@ -3174,7 +3198,7 @@ func (b *Builder) swigIntSize(objdir str
+@@ -3246,7 +3270,7 @@ func (b *Builder) swigIntSize(objdir string) (intsize string, err error) {
  
  // Run SWIG on one SWIG input file.
  func (b *Builder) swigOne(a *Action, p *load.Package, file, objdir string, pcCFLAGS []string, cxx bool, intgosize string) (outGo, outC string, err error) {

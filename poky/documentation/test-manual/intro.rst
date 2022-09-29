@@ -85,8 +85,8 @@ topology that includes a controller and a cluster of workers:
    :align: center
    :width: 70%
 
-Yocto Project Tests - Types of Testing Overview
-===============================================
+Yocto Project Tests --- Types of Testing Overview
+=================================================
 
 The Autobuilder tests different elements of the project by using
 the following types of tests:

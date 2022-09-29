@@ -1,6 +1,6 @@
 PACKAGECONFIG = " \
     adcsensor \
-    cpusensor \
+    intelcpusensor \
     fansensor \
     hwmontempsensor \
     intrusionsensor \

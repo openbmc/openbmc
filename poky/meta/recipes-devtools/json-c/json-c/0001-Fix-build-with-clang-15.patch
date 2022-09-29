@@ -1,0 +1,34 @@
+From 0145b575ac1fe6a77e00d639864f26fc91ceb12f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 13 Aug 2022 20:37:03 -0700
+Subject: [PATCH] Fix build with clang-15+
+
+Fixes
+json_util.c:63:35: error: a function declaration without a prototype is deprecated in all versions of C [-We
+rror,-Wstrict-prototypes]
+const char *json_util_get_last_err()
+                                  ^
+                                   void
+
+Upstream-Status: Backport [https://github.com/json-c/json-c/pull/783]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ json_util.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/json_util.c b/json_util.c
+index 952770a..83d9c68 100644
+--- a/json_util.c
++++ b/json_util.c
+@@ -60,7 +60,7 @@ static int _json_object_to_fd(int fd, struct json_object *obj, int flags, const
+ 
+ static char _last_err[256] = "";
+ 
+-const char *json_util_get_last_err()
++const char *json_util_get_last_err(void)
+ {
+ 	if (_last_err[0] == '\0')
+ 		return NULL;
+-- 
+2.37.2
+

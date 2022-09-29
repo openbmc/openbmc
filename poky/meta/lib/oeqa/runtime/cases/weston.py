@@ -1,4 +1,6 @@
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: MIT
 #
 
@@ -77,3 +79,11 @@ class WestonTest(OERuntimeTestCase):
                 self.target.run('kill -9 %s' % w)
         __, weston_log = self.target.run('cat %s' % self.weston_log_file)
         self.assertTrue(new_wl_processes, msg='Could not get new weston-desktop-shell processes (%s, try_cnt:%s) weston log: %s' % (new_wl_processes, try_cnt, weston_log))
+
+    @skipIfNotFeature('x11', 'Test requires x11 to be in DISTRO_FEATURES')
+    @OEHasPackage(['weston'])
+    def test_weston_supports_xwayland(self):
+        cmd ='cat %s | grep "xserver listening on display"' % self.weston_log_file
+        status, output = self.target.run(cmd)
+        msg = ('xwayland does not appear to be running')
+        self.assertEqual(status, 0, msg=msg)

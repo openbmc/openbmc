@@ -1,0 +1,48 @@
+From ea179d83b0aa62719d90748cd1fb260f40055f15 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Mon, 13 Jun 2022 22:44:28 +0800
+Subject: [PATCH] configure.ac: eliminate build path from openvpn --version
+ option
+
+Before the patch:
+$ openvpn  --version
+OpenVPN 2.5.7 x86_64-poky-linux-gnu [SSL (OpenSSL)] [LZO] [LZ4] [EPOLL]
+[snip]
+Compile time defines: enable_async_push=no enable_comp_stub=no
+[snip]
+with_crypto_library=openssl with_gnu_ld=yes
+with_libtool_sysroot=/buildarea/build/tmp/work/core2-64-poky-linux/openvpn/2.5.7-r0/recipe-sysroot
+with_mem_check=no with_openssl_engine=auto
+
+After the patch:
+$ openvpn  --version
+OpenVPN 2.5.7 x86_64-poky-linux-gnu [SSL (OpenSSL)] [LZO] [LZ4] [EPOLL]
+[snip]
+Compile time defines: enable_async_push=no enable_comp_stub=no
+[snip]
+with_crypto_library=openssl with_gnu_ld=yes with_mem_check=no
+with_openssl_engine=auto
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 2f5f6bc..eddcbc5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1377,7 +1377,7 @@ if test "${enable_async_push}" = "yes"; then
+ 	esac
+ fi
+ 
+-CONFIGURE_DEFINES="`set | grep '^enable_.*=' ; set | grep '^with_.*='`"
++CONFIGURE_DEFINES="`set | grep '^enable_.*=' ; set | grep '^with_.*=' | grep -v 'libtool_sysroot'`"
+ AC_DEFINE_UNQUOTED([CONFIGURE_DEFINES], ["`echo ${CONFIGURE_DEFINES}`"], [Configuration settings])
+ 
+ TAP_WIN_COMPONENT_ID="PRODUCT_TAP_WIN_COMPONENT_ID"
+-- 
+2.25.1
+

@@ -5,7 +5,7 @@ protocols should be able to share."
 HOMEPAGE = "http://search.cpan.org/dist/Authen-SASL/"
 SECTION = "libs"
 
-LICENSE = "Artistic-1.0|GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://lib/Authen/SASL/Perl.pm;beginline=1;endline=3;md5=17123315bbcda19f484c07227594a609"
 
 DEPENDS = "perl"

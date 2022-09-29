@@ -311,7 +311,7 @@ Project Build Host:
 
 3. *Meet Minimal Version Requirements:* The OpenEmbedded build system
    should be able to run on any modern distribution that has the
-   following versions for Git, tar, Python and gcc.
+   following versions for Git, tar, Python, gcc and make.
 
    -  Git &MIN_GIT_VERSION; or greater
 
@@ -321,10 +321,12 @@ Project Build Host:
 
    -  gcc &MIN_GCC_VERSION; or greater.
 
+   -  GNU make &MIN_MAKE_VERSION; or greater
+
    If your build host does not meet any of these listed version
    requirements, you can take steps to prepare the system so that you
    can still use the Yocto Project. See the
-   ":ref:`ref-manual/system-requirements:required git, tar, python and gcc versions`"
+   ":ref:`ref-manual/system-requirements:required git, tar, python, make and gcc versions`"
    section in the Yocto Project Reference Manual for information.
 
 4. *Install Development Host Packages:* Required development host

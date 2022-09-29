@@ -8,7 +8,7 @@ SOCSEC_SIGN_SOC ?= "2600"
 SOCSEC_SIGN_ALGO ?= "RSA4096_SHA512"
 SOCSEC_SIGN_HELPER ?= ""
 # u-boot-aspeed-sdk commit '2c3b53489c ast2600: Modify SPL SRAM layout'
-# changes the SDRAM layout so that the verification region does NOT
+# changes the SRAM layout so that the verification region does NOT
 # intersects the stack. The parameter below can be used to instruct
 # socsec to work in either mode (ommitting it throws a warning), but
 # newer (post v00.03.03) u-boot-aspeed-sdk need this set to false
@@ -61,13 +61,15 @@ sign_spl() {
 }
 
 verify_spl_otp() {
-    socsec verify \
-        --sec_image ${DEPLOYDIR}/${SPL_IMAGE} \
-        --otp_image ${DEPLOYDIR}/otp-all.image
+    for otptool_config in ${OTPTOOL_CONFIGS} ; do
+        socsec verify \
+            --sec_image ${DEPLOYDIR}/${SPL_IMAGE} \
+            --otp_image ${DEPLOYDIR}/"$(basename ${otptool_config} .json)"-otp-all.image
 
-    if [ $? -ne 0 ]; then
-        bbfatal "Verified OTP image failed."
-    fi
+        if [ $? -ne 0 ]; then
+            bbfatal "Verified OTP image failed."
+        fi
+    done
 }
 
 do_deploy:append() {

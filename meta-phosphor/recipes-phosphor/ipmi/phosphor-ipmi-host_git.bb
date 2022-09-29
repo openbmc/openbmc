@@ -36,6 +36,7 @@ PACKAGECONFIG[sensors-cache] = "-Dsensors-cache=enabled,-Dsensors-cache=disabled
 
 
 DEPENDS += "nlohmann-json"
+DEPENDS += "openssl"
 DEPENDS += "phosphor-state-manager"
 DEPENDS += "${@ipmi_whitelists(d)}"
 DEPENDS += "phosphor-dbus-interfaces"

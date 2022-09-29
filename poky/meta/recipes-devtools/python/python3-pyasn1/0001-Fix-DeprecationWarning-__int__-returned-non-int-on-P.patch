@@ -1,0 +1,28 @@
+From db8f1a7930c6b5826357646746337dafc983f953 Mon Sep 17 00:00:00 2001
+From: Ilya Etingof <etingof@gmail.com>
+Date: Sat, 21 Mar 2020 19:05:03 +0100
+Subject: [PATCH] Fix `DeprecationWarning: __int__ returned non-int` on Py3
+
+In `BitString.__int__()`
+Upstream-Status: Backport
+Signed-off-by: Yulong Liu <yulong.liu@windriver.com>
+---
+ pyasn1/type/univ.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyasn1/type/univ.py b/pyasn1/type/univ.py
+index 10924c3..488241f 100644
+--- a/pyasn1/type/univ.py
++++ b/pyasn1/type/univ.py
+@@ -551,7 +551,7 @@ class BitString(base.SimpleAsn1Type):
+         return self.clone(SizedInteger(self._value >> count).setBitLength(max(0, len(self._value) - count)))
+ 
+     def __int__(self):
+-        return self._value
++        return int(self._value)
+ 
+     def __float__(self):
+         return float(self._value)
+-- 
+2.25.1
+

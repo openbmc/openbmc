@@ -1,0 +1,63 @@
+From be814863cdd5f61d9a16eec012d500550053c8c6 Mon Sep 17 00:00:00 2001
+From: Jaxson Han <jaxson.han@arm.com>
+Date: Tue, 25 May 2021 07:25:00 +0100
+Subject: [PATCH] aarch64: Prepare for booting with EL2
+
+Prepare for allowing boot-wrapper to be entered in EL2.
+Detect current EL and set the corresponding EL registers.
+
+Upstream-Status: Pending
+Signed-off-by: Jaxson Han <jaxson.han@arm.com>
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+---
+ arch/aarch64/boot.S  |  8 ++++++++
+ arch/aarch64/utils.S | 10 +++++++++-
+ 2 files changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/arch/aarch64/boot.S b/arch/aarch64/boot.S
+index 6b45afc..908764a 100644
+--- a/arch/aarch64/boot.S
++++ b/arch/aarch64/boot.S
+@@ -195,10 +195,18 @@ ASM_FUNC(jump_kernel)
+ 	 */
+ 	bfi	x4, x19, #5, #1
+ 
++	mrs	x5, CurrentEL
++	cmp	x5, #CURRENTEL_EL2
++	b.eq	1f
++
+ 	msr	elr_el3, x19
+ 	msr	spsr_el3, x4
+ 	eret
+ 
++1:	msr	elr_el2, x19
++	msr	spsr_el2, x4
++	eret
++
+ 	.ltorg
+ 
+ 	.data
+diff --git a/arch/aarch64/utils.S b/arch/aarch64/utils.S
+index 85c7f8a..f02a249 100644
+--- a/arch/aarch64/utils.S
++++ b/arch/aarch64/utils.S
+@@ -34,10 +34,18 @@ ASM_FUNC(find_logical_id)
+ 	ret
+ 
+ /*
+- * Setup EL3 vectors
++ * Setup EL3/EL2 vectors
+  * x0: vector address
+  */
+ ASM_FUNC(setup_vector)
++	mrs	x1, CurrentEL
++	cmp	x1, #CURRENTEL_EL2
++	b.eq    1f
++
+ 	msr	VBAR_EL3, x0
+ 	isb
+ 	ret
++
++1:	msr	VBAR_EL2, x0
++	isb
++	ret

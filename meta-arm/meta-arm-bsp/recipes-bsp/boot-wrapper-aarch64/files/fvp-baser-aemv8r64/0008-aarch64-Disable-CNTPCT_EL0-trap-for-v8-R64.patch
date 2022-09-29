@@ -1,0 +1,48 @@
+From 3f4614e02f0f8d2522510578da2752f8e3511bb3 Mon Sep 17 00:00:00 2001
+From: Jaxson Han <jaxson.han@arm.com>
+Date: Mon, 25 Oct 2021 17:09:13 +0800
+Subject: [PATCH] aarch64: Disable CNTPCT_EL0 trap for v8-R64
+
+To allow EL1 to access CNTPCT_EL0 without traping into EL2, we need to
+set CNTHCTL_EL2.EL1PCTEN to 1.
+
+For v8-R64, the CNTHCTL_EL2 register follows the v8-A architecture.
+However, as described in the v8-A architecture profile, the
+CNTHCTL_EL2's bit assignments are different according to whether the
+FEAT_VHE is implemented.
+
+Since v8-R64 does not support FEAT_VHE, we do not need to detect
+FEAT_VHE. We can simply set CNTHCTL_EL2.EL1PCTEN to 1.
+
+Issue-ID: SCM-3508
+Upstream-Status: Inappropriate [other]
+  Implementation pending further discussion
+Signed-off-by: Jaxson Han <jaxson.han@arm.com>
+Change-Id: I4147e66341c8153312021e6f2ab67d0037246da1
+---
+ arch/aarch64/boot.S | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/arch/aarch64/boot.S b/arch/aarch64/boot.S
+index def9192..6dbd5cc 100644
+--- a/arch/aarch64/boot.S
++++ b/arch/aarch64/boot.S
+@@ -219,6 +219,18 @@ el2_init:
+ 	orr	x0, x0, #(1 << 41)		// HCR_EL2.API
+ 
+ 1:	msr	hcr_el2, x0
++
++	/*
++	 * To disable trap when accessing CNTPCT_EL0, we need to set
++	 * CNTHCTL_EL2.EL1PCTEN to 1. However, the CNTHCTL_EL2 bit assignments
++	 * are different according to whether the FEAT_VHE is implemented.
++	 *
++	 * For Armv8-R AArch64, FEAT_VHE is not supported, so we do not need to
++	 * detect FEAT_VHE(ID_AA64MMFR1_EL1.VH) and simply set
++	 * CNTHCTL_EL2.EL1PCTEN to 1.
++	 */
++	mov	x0, #1				// CNTHCTL_EL2.EL1PCTEN
++	msr	cnthctl_el2, x0
+ 	isb
+ 
+ 	mov	w0, #SPSR_KERNEL_EL1

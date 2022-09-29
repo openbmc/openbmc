@@ -1,4 +1,4 @@
-From e5340f816aa273cfda36998466739ca0748caafb Mon Sep 17 00:00:00 2001
+From e3fa241637ab5a7fa78c0d474802134cff75f91e Mon Sep 17 00:00:00 2001
 From: Martin Jansa <Martin.Jansa@gmail.com>
 Date: Fri, 28 Jun 2019 13:50:52 +0000
 Subject: [PATCH] examples/Makefile: respect CXX,LDFLAGS variables, fix build
@@ -24,12 +24,13 @@ Subject: [PATCH] examples/Makefile: respect CXX,LDFLAGS variables, fix build
 Upstream-Status: Pending
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
 Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+
 ---
  examples/Makefile | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/examples/Makefile b/examples/Makefile
-index e9f9635ae..b2fbe2de1 100644
+index 1c7ec8d63..85f591231 100644
 --- a/examples/Makefile
 +++ b/examples/Makefile
 @@ -2,6 +2,8 @@
@@ -41,7 +42,7 @@ index e9f9635ae..b2fbe2de1 100644
  all: cpp java python
  
  cpp:    add_person_cpp    list_people_cpp
-@@ -41,11 +43,11 @@ protoc_middleman_dart: addressbook.proto
+@@ -40,11 +42,11 @@ protoc_middleman_dart: addressbook.proto
  
  add_person_cpp: add_person.cc protoc_middleman
  	pkg-config --cflags protobuf  # fails if protobuf is not installed
@@ -55,6 +56,3 @@ index e9f9635ae..b2fbe2de1 100644
  
  add_person_dart: add_person.dart protoc_middleman_dart
  
--- 
-2.17.1
-

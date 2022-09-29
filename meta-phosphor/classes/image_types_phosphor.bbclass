@@ -504,7 +504,7 @@ python do_generate_phosphor_manifest() {
     version = do_get_version(d)
     build_id = do_get_buildID(d)
     target_machine = d.getVar('MACHINE', True)
-    extended_version = d.getVar('EXTENDED_VERSION', True)
+    extended_version = do_get_extended_version(d)
     compatible_names = d.getVar('OBMC_COMPATIBLE_NAMES', True)
     with open('MANIFEST', 'w') as fd:
         fd.write('purpose={}\n'.format(purpose))

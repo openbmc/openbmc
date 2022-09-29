@@ -18,6 +18,10 @@ SRC_URI = "git://gitlab.com/procps-ng/procps.git;protocol=https;branch=master \
            file://0002-proc-escape.c-add-missing-include.patch \
            "
 SRCREV = "19a508ea121c0c4ac6d0224575a036de745eaaf8"
+# 4.x version is an API incompatible rewrite
+# until procps consumers are transitioned to it we need to stick with 3.x
+# https://gitlab.com/procps-ng/procps/-/issues/239
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>3(\.\d+)+)"
 
 S = "${WORKDIR}/git"
 

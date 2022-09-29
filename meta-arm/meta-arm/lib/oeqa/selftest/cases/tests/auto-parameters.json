@@ -1,0 +1,7 @@
+{
+    "exe": "test-parameters.py",
+    "parameters": {
+        "board.cow": "moo",
+        "board.dog": "woof"
+    }
+}

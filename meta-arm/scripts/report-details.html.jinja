@@ -1,0 +1,64 @@
+{% extends "report-base.html.jinja" %}
+{% block title %}Recipe Report for {{ machine }}{% endblock %}
+
+{# Write a tag element using the Upstream-Status to determine the class. #}
+{% macro make_patch_tag(status) -%}
+  {% set status = status.split()[0] %}
+  {% if status in ("Unknown", "Pending") %}
+    {% set class = "is-danger" %}
+  {% elif status in ("Backport", "Accepted", "Inappropriate", "Denied") %}
+    {% set class = "is-success" %}
+  {% elif status in ("Submitted",) %}
+    {% set class = "is-info" %}
+  {% else %}
+    {% set class = "is-info" %}
+  {% endif %}
+  <span class="tag {{ class }}">{{ status }}</span>
+{%- endmacro %}
+
+{% block content %}
+  <!-- TODO table of contents -->
+
+  {% for name, data in data|dictsort if data.needs_update or data.patched %}
+  <h2 class="title is-4">
+    {{ data.recipe }} {{ data.fullversion }}
+    {% if name != data.recipe %}
+      (provides {{ name }})
+    {% endif %}
+    {% if data.needs_update %}<span class="tag is-danger">Upgrade Needed</span>{% endif %}
+    <a id="recipe-{{ data.recipe }}" class="has-text-grey-lighter">#</a>
+  </h2>
+
+  {% if data.needs_update %}
+  <p>
+    Recipe is version {{ data.fullversion }}, latest upstream release is <strong>{{ data.upstream }}</strong>.
+  </p>
+  {% endif%}
+
+  {% if data.patched %}
+  <table class="table is-striped is-bordered">
+    <thead>
+      <tr>
+        <th>Patch</th>
+        <th style="width: 20em">Layer</th>
+        <th style="width: 10em">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for pinfo in data.patches %}
+      <tr>
+        <td>
+          {% if pinfo.url %}<a href="{{pinfo.url}}">{% endif %}
+          {{ pinfo.name }}
+          {% if pinfo.url %}</a>{% endif %}
+        </td>
+        <td>{{ pinfo.layer }}</td>
+        <!-- TODO: tooltip with full status? -->
+        <td class="has-text-centered">{{ make_patch_tag(pinfo.status)}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+  {% endfor %}
+{% endblock %}

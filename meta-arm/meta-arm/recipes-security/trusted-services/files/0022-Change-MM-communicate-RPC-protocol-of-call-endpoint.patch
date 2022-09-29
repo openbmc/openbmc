@@ -1,0 +1,497 @@
+From 0f02f04c7f0a7130874dc4bc1a500604d580c4dc Mon Sep 17 00:00:00 2001
+From: Imre Kis <imre.kis@arm.com>
+Date: Wed, 20 Jul 2022 15:19:17 +0200
+Subject: [PATCH 22/24] Change MM communicate RPC protocol of call endpoint
+
+Replace buffer address and size parameter by offset in buffer parameter
+and move to 64 bit FF-A direct message call. Deny all 32 bit direct
+messages in SMM gateway.
+
+Signed-off-by: Imre Kis <imre.kis@arm.com>
+Change-Id: I7a69b440ff9842960229b2bfdd1b5ae5318d9c26
+
+Upstream-Status: Pending [In review]
+Signed-off-by: Anton Antonov <Anton.Antonov@arm.com>
+
+---
+ .../common/mm_communicate_call_args.h         |  15 ++-
+ .../endpoint/sp/mm_communicate_call_ep.c      |  58 ++++-----
+ .../endpoint/sp/test/mock_mm_service.cpp      |   6 +-
+ .../endpoint/sp/test/mock_mm_service.h        |   4 +-
+ .../sp/test/test_mm_communicate_call_ep.cpp   | 110 +++++++++++-------
+ .../endpoint/sp/test/test_mock_mm_service.cpp |   4 +-
+ .../smm-gateway/common/smm_gateway_sp.c       |  17 ++-
+ 7 files changed, 123 insertions(+), 91 deletions(-)
+
+diff --git a/components/rpc/mm_communicate/common/mm_communicate_call_args.h b/components/rpc/mm_communicate/common/mm_communicate_call_args.h
+index 7d7311d..280c04d 100644
+--- a/components/rpc/mm_communicate/common/mm_communicate_call_args.h
++++ b/components/rpc/mm_communicate/common/mm_communicate_call_args.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: BSD-3-Clause */
+ /*
+- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+  */
+ 
+ #ifndef MM_COMMUNICATE_CALL_ARGS_H_
+@@ -12,13 +12,12 @@
+  */
+ 
+ /* SP message arg indexes */
+-#define MM_COMMUNICATE_CALL_ARGS_COMM_BUFFER_ADDRESS	0
+-#define MM_COMMUNICATE_CALL_ARGS_COMM_BUFFER_SIZE	1
++#define MM_COMMUNICATE_CALL_ARGS_COMM_BUFFER_OFFSET	0
+ 
+-#define MM_COMMUNICATE_CALL_ARGS_RETURN_ID		0
+-#define MM_COMMUNICATE_CALL_ARGS_RETURN_CODE		1
+-#define MM_COMMUNICATE_CALL_ARGS_MBZ0			2
+-#define MM_COMMUNICATE_CALL_ARGS_MBZ1			3
+-#define MM_COMMUNICATE_CALL_ARGS_MBZ2			4
++#define MM_COMMUNICATE_CALL_ARGS_RETURN_CODE		0
++#define MM_COMMUNICATE_CALL_ARGS_MBZ0			1
++#define MM_COMMUNICATE_CALL_ARGS_MBZ1			2
++#define MM_COMMUNICATE_CALL_ARGS_MBZ2			3
++#define MM_COMMUNICATE_CALL_ARGS_MBZ3			4
+ 
+ #endif /* MM_COMMUNICATE_CALL_ARGS_H_ */
+diff --git a/components/rpc/mm_communicate/endpoint/sp/mm_communicate_call_ep.c b/components/rpc/mm_communicate/endpoint/sp/mm_communicate_call_ep.c
+index dc49e64..93aa0f4 100644
+--- a/components/rpc/mm_communicate/endpoint/sp/mm_communicate_call_ep.c
++++ b/components/rpc/mm_communicate/endpoint/sp/mm_communicate_call_ep.c
+@@ -35,7 +35,8 @@ bool mm_communicate_call_ep_init(struct mm_communicate_ep *call_ep, uint8_t *com
+ 
+ static int32_t invoke_mm_service(struct mm_communicate_ep *call_ep, uint16_t source_id,
+ 				 struct mm_service_interface *iface,
+-				 EFI_MM_COMMUNICATE_HEADER *header)
++				 EFI_MM_COMMUNICATE_HEADER *header,
++				 size_t buffer_size)
+ {
+ 	rpc_status_t rpc_status = TS_RPC_ERROR_INTERNAL;
+ 	struct mm_service_call_req call_req = { 0 };
+@@ -49,11 +50,11 @@ static int32_t invoke_mm_service(struct mm_communicate_ep *call_ep, uint16_t sou
+ 	 */
+ 	call_req.req_buf.data = header->Data;
+ 	call_req.req_buf.data_len = header->MessageLength;
+-	call_req.req_buf.size = call_ep->comm_buffer_size - EFI_MM_COMMUNICATE_HEADER_SIZE;
++	call_req.req_buf.size = buffer_size;
+ 
+ 	call_req.resp_buf.data = header->Data;
+ 	call_req.resp_buf.data_len = 0;
+-	call_req.resp_buf.size = call_ep->comm_buffer_size - EFI_MM_COMMUNICATE_HEADER_SIZE;
++	call_req.resp_buf.size = buffer_size;
+ 
+ 	result = iface->receive(iface, &call_req);
+ 
+@@ -63,32 +64,38 @@ static int32_t invoke_mm_service(struct mm_communicate_ep *call_ep, uint16_t sou
+ }
+ 
+ static int32_t handle_mm_communicate(struct mm_communicate_ep *call_ep, uint16_t source_id,
+-				     uintptr_t buffer_addr, size_t buffer_size)
++				     size_t buffer_offset)
+ {
+-	uintptr_t buffer_arg = 0;
+-	size_t request_size = 0;
++	size_t header_end_offset = 0;
++	size_t request_end_offset = 0;
++	size_t buffer_size = 0;
+ 	EFI_MM_COMMUNICATE_HEADER *header = NULL;
+ 	unsigned int i = 0;
+ 
+-	/* Validating call args according to ARM MM spec 3.2.4 */
+-	if (buffer_addr == 0)
++	if (ADD_OVERFLOW(buffer_offset, EFI_MM_COMMUNICATE_HEADER_SIZE, &header_end_offset))
++		return MM_RETURN_CODE_INVALID_PARAMETER;
++
++	if (call_ep->comm_buffer_size < header_end_offset)
+ 		return MM_RETURN_CODE_INVALID_PARAMETER;
+ 
+ 	/* Validating comm buffer contents */
+-	header = (EFI_MM_COMMUNICATE_HEADER *)call_ep->comm_buffer;
+-	if (ADD_OVERFLOW(header->MessageLength, EFI_MM_COMMUNICATE_HEADER_SIZE, &request_size))
++	header = (EFI_MM_COMMUNICATE_HEADER *)(call_ep->comm_buffer + buffer_offset);
++	if (ADD_OVERFLOW(header_end_offset, header->MessageLength, &request_end_offset))
+ 		return MM_RETURN_CODE_INVALID_PARAMETER;
+ 
+-	if (call_ep->comm_buffer_size < request_size)
++	if (call_ep->comm_buffer_size < request_end_offset)
+ 		return MM_RETURN_CODE_INVALID_PARAMETER;
+ 
++	buffer_size = call_ep->comm_buffer_size - header_end_offset;
++
+ 	/* Finding iface_id by GUID */
+ 	for (i = 0; i < ARRAY_SIZE(call_ep->service_table); i++) {
+ 		const struct mm_service_entry *entry = &call_ep->service_table[i];
+ 
+ 		if (entry->iface != NULL &&
+ 		    memcmp(&header->HeaderGuid, &entry->guid, sizeof(entry->guid)) == 0)
+-			return invoke_mm_service(call_ep, source_id, entry->iface, header);
++			return invoke_mm_service(call_ep, source_id, entry->iface, header,
++						 buffer_size);
+ 	}
+ 
+ 	return MM_RETURN_CODE_NOT_SUPPORTED;
+@@ -123,19 +130,16 @@ void mm_communicate_call_ep_receive(struct mm_communicate_ep *mm_communicate_cal
+ 				    const struct ffa_direct_msg *req_msg,
+ 				    struct ffa_direct_msg *resp_msg)
+ {
+-	int32_t return_value = 0;
+-	uintptr_t buffer_address = 0;
+-	size_t buffer_size = 0;
+-
+-	buffer_address = req_msg->args.args32[MM_COMMUNICATE_CALL_ARGS_COMM_BUFFER_ADDRESS];
+-	buffer_size = req_msg->args.args32[MM_COMMUNICATE_CALL_ARGS_COMM_BUFFER_SIZE];
+-
+-	return_value = handle_mm_communicate(mm_communicate_call_ep, req_msg->source_id,
+-					     buffer_address, buffer_size);
+-
+-	resp_msg->args.args32[MM_COMMUNICATE_CALL_ARGS_RETURN_ID] = ARM_SVC_ID_SP_EVENT_COMPLETE;
+-	resp_msg->args.args32[MM_COMMUNICATE_CALL_ARGS_RETURN_CODE] = return_value;
+-	resp_msg->args.args32[MM_COMMUNICATE_CALL_ARGS_MBZ0] = 0;
+-	resp_msg->args.args32[MM_COMMUNICATE_CALL_ARGS_MBZ1] = 0;
+-	resp_msg->args.args32[MM_COMMUNICATE_CALL_ARGS_MBZ2] = 0;
++	int32_t return_value = MM_RETURN_CODE_NOT_SUPPORTED;
++	size_t buffer_offset = req_msg->args.args64[MM_COMMUNICATE_CALL_ARGS_COMM_BUFFER_OFFSET];
++
++	return_value = handle_mm_communicate(mm_communicate_call_ep,
++						req_msg->source_id,
++						buffer_offset);
++
++	resp_msg->args.args64[MM_COMMUNICATE_CALL_ARGS_RETURN_CODE] = return_value;
++	resp_msg->args.args64[MM_COMMUNICATE_CALL_ARGS_MBZ0] = 0;
++	resp_msg->args.args64[MM_COMMUNICATE_CALL_ARGS_MBZ1] = 0;
++	resp_msg->args.args64[MM_COMMUNICATE_CALL_ARGS_MBZ2] = 0;
++	resp_msg->args.args64[MM_COMMUNICATE_CALL_ARGS_MBZ3] = 0;
+ }
+diff --git a/components/rpc/mm_communicate/endpoint/sp/test/mock_mm_service.cpp b/components/rpc/mm_communicate/endpoint/sp/test/mock_mm_service.cpp
+index a58c33a..0ae2a80 100644
+--- a/components/rpc/mm_communicate/endpoint/sp/test/mock_mm_service.cpp
++++ b/components/rpc/mm_communicate/endpoint/sp/test/mock_mm_service.cpp
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: BSD-3-Clause
+ /*
+- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+  */
+ 
+ #include <CppUTestExt/MockSupport.h>
+@@ -16,7 +16,7 @@ void mock_mm_service_init(void)
+ 
+ void expect_mock_mm_service_receive(struct mm_service_interface *iface,
+ 				    const struct mm_service_call_req *req,
+-				    int32_t result)
++				    int64_t result)
+ {
+ 	mock().expectOneCall("mm_service_receive").onObject(iface).
+ 		withOutputParameterReturning("resp_buf_data_len", &req->resp_buf.data_len,
+@@ -31,5 +31,5 @@ int32_t mock_mm_service_receive(struct mm_service_interface *iface,
+ 	return mock().actualCall("mm_service_receive").onObject(iface).
+ 		withOutputParameter("resp_buf_data_len", &req->resp_buf.data_len).
+ 		withParameterOfType("mm_service_call_req", "req", req).
+-		returnIntValue();
++		returnLongIntValue();
+ }
+diff --git a/components/rpc/mm_communicate/endpoint/sp/test/mock_mm_service.h b/components/rpc/mm_communicate/endpoint/sp/test/mock_mm_service.h
+index 768022d..56c8a26 100644
+--- a/components/rpc/mm_communicate/endpoint/sp/test/mock_mm_service.h
++++ b/components/rpc/mm_communicate/endpoint/sp/test/mock_mm_service.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: BSD-3-Clause */
+ /*
+- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+  */
+ 
+ #ifndef MOCK_MM_SERVICE_H_
+@@ -16,7 +16,7 @@ void mock_mm_service_init(void);
+ 
+ void expect_mock_mm_service_receive(struct mm_service_interface *iface,
+ 				    const struct mm_service_call_req *req,
+-				    int32_t result);
++				    int64_t result);
+ 
+ int32_t mock_mm_service_receive(struct mm_service_interface *iface,
+ 				struct mm_service_call_req *req);
+diff --git a/components/rpc/mm_communicate/endpoint/sp/test/test_mm_communicate_call_ep.cpp b/components/rpc/mm_communicate/endpoint/sp/test/test_mm_communicate_call_ep.cpp
+index 55a61fb..5aaa3a6 100644
+--- a/components/rpc/mm_communicate/endpoint/sp/test/test_mm_communicate_call_ep.cpp
++++ b/components/rpc/mm_communicate/endpoint/sp/test/test_mm_communicate_call_ep.cpp
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: BSD-3-Clause
+ /*
+- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+  */
+ 
+ #include <CppUTest/TestHarness.h>
+@@ -32,14 +32,14 @@ TEST_GROUP(mm_communicate_call_ep)
+ 		mock().clear();
+ 	}
+ 
+-	void check_sp_msg(const struct ffa_direct_msg *msg, uint32_t arg0,
+-			  uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4)
++	void check_sp_msg(const struct ffa_direct_msg *msg, uint64_t arg0,
++			  uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4)
+ 	{
+-		UNSIGNED_LONGLONGS_EQUAL(arg0, msg->args[0]);
+-		UNSIGNED_LONGLONGS_EQUAL(arg1, msg->args[1]);
+-		UNSIGNED_LONGLONGS_EQUAL(arg2, msg->args[2]);
+-		UNSIGNED_LONGLONGS_EQUAL(arg3, msg->args[3]);
+-		UNSIGNED_LONGLONGS_EQUAL(arg4,  msg->args[4]);
++		UNSIGNED_LONGLONGS_EQUAL(arg0, msg->args.args64[0]);
++		UNSIGNED_LONGLONGS_EQUAL(arg1, msg->args.args64[1]);
++		UNSIGNED_LONGLONGS_EQUAL(arg2, msg->args.args64[2]);
++		UNSIGNED_LONGLONGS_EQUAL(arg3, msg->args.args64[3]);
++		UNSIGNED_LONGLONGS_EQUAL(arg4,  msg->args.args64[4]);
+ 	}
+ 
+ 	struct mm_communicate_ep call_ep;
+@@ -114,59 +114,54 @@ TEST(mm_communicate_call_ep, attach_do_not_fit)
+ 	}
+ }
+ 
+-TEST(mm_communicate_call_ep, mm_communicate_no_buffer_arg)
++TEST(mm_communicate_call_ep, mm_communicate_offset_int_overflow)
+ {
+ 	CHECK_TRUE(mm_communicate_call_ep_init(&call_ep, comm_buffer, sizeof(comm_buffer)));
++	req_msg.args.args64[0] = 0xffffffffffffffff;
+ 
+ 	mm_communicate_call_ep_receive(&call_ep, &req_msg, &resp_msg);
+ 
+-	check_sp_msg(&resp_msg, ARM_SVC_ID_SP_EVENT_COMPLETE, MM_RETURN_CODE_INVALID_PARAMETER,
+-		     0, 0, 0);
++	check_sp_msg(&resp_msg, MM_RETURN_CODE_INVALID_PARAMETER, 0, 0, 0, 0);
+ }
+ 
+-TEST(mm_communicate_call_ep, mm_communicate_length_overflow)
++TEST(mm_communicate_call_ep, mm_communicate_offset_overflow)
+ {
+ 	CHECK_TRUE(mm_communicate_call_ep_init(&call_ep, comm_buffer, sizeof(comm_buffer)));
++	req_msg.args.args64[0] = sizeof(comm_buffer) - EFI_MM_COMMUNICATE_HEADER_SIZE + 1;
++
++	mm_communicate_call_ep_receive(&call_ep, &req_msg, &resp_msg);
+ 
+-	req_msg.args[0] = (uintptr_t)comm_buffer;
+-	req_msg.args[1] = sizeof(comm_buffer);
++	check_sp_msg(&resp_msg, MM_RETURN_CODE_INVALID_PARAMETER, 0, 0, 0, 0);
++}
+ 
++TEST(mm_communicate_call_ep, mm_communicate_length_overflow)
++{
++	CHECK_TRUE(mm_communicate_call_ep_init(&call_ep, comm_buffer, sizeof(comm_buffer)));
+ 	header->MessageLength = UINT64_MAX - EFI_MM_COMMUNICATE_HEADER_SIZE + 1;
+ 
+ 	mm_communicate_call_ep_receive(&call_ep, &req_msg, &resp_msg);
+ 
+-	check_sp_msg(&resp_msg, ARM_SVC_ID_SP_EVENT_COMPLETE, MM_RETURN_CODE_INVALID_PARAMETER,
+-		     0, 0, 0);
++	check_sp_msg(&resp_msg, MM_RETURN_CODE_INVALID_PARAMETER, 0, 0, 0, 0);
+ }
+ 
+ TEST(mm_communicate_call_ep, mm_communicate_too_large)
+ {
+ 	CHECK_TRUE(mm_communicate_call_ep_init(&call_ep, comm_buffer, sizeof(comm_buffer)));
+-
+-	req_msg.args[0] = (uintptr_t)comm_buffer;
+-	req_msg.args[1] = sizeof(comm_buffer);
+-
+ 	header->MessageLength = sizeof(comm_buffer) - EFI_MM_COMMUNICATE_HEADER_SIZE + 1;
+ 
+ 	mm_communicate_call_ep_receive(&call_ep, &req_msg, &resp_msg);
+ 
+-	check_sp_msg(&resp_msg, ARM_SVC_ID_SP_EVENT_COMPLETE, MM_RETURN_CODE_INVALID_PARAMETER,
+-		     0, 0, 0);
++	check_sp_msg(&resp_msg, MM_RETURN_CODE_INVALID_PARAMETER, 0, 0, 0, 0);
+ }
+ 
+ TEST(mm_communicate_call_ep, mm_communicate_no_handler)
+ {
+ 	CHECK_TRUE(mm_communicate_call_ep_init(&call_ep, comm_buffer, sizeof(comm_buffer)));
+-
+-	req_msg.args[0] = (uintptr_t)comm_buffer;
+-	req_msg.args[1] = sizeof(comm_buffer);
+-
+ 	header->MessageLength = 0;
+ 
+ 	mm_communicate_call_ep_receive(&call_ep, &req_msg, &resp_msg);
+ 
+-	check_sp_msg(&resp_msg, ARM_SVC_ID_SP_EVENT_COMPLETE, MM_RETURN_CODE_NOT_SUPPORTED,
+-		     0, 0, 0);
++	check_sp_msg(&resp_msg, MM_RETURN_CODE_NOT_SUPPORTED, 0, 0, 0, 0);
+ }
+ 
+ TEST(mm_communicate_call_ep, mm_communicate_single_handler_not_matching)
+@@ -175,16 +170,11 @@ TEST(mm_communicate_call_ep, mm_communicate_single_handler_not_matching)
+ 
+ 	CHECK_TRUE(mm_communicate_call_ep_init(&call_ep, comm_buffer, sizeof(comm_buffer)));
+ 	mm_communicate_call_ep_attach_service(&call_ep, &guid0, &iface);
+-
+-	req_msg.args[0] = (uintptr_t)comm_buffer;
+-	req_msg.args[1] = sizeof(comm_buffer);
+-
+ 	header->MessageLength = 0;
+ 
+ 	mm_communicate_call_ep_receive(&call_ep, &req_msg, &resp_msg);
+ 
+-	check_sp_msg(&resp_msg, ARM_SVC_ID_SP_EVENT_COMPLETE, MM_RETURN_CODE_NOT_SUPPORTED,
+-		     0, 0, 0);
++	check_sp_msg(&resp_msg, MM_RETURN_CODE_NOT_SUPPORTED, 0, 0, 0, 0);
+ }
+ 
+ TEST(mm_communicate_call_ep, mm_communicate_single_handler_matching)
+@@ -211,19 +201,55 @@ TEST(mm_communicate_call_ep, mm_communicate_single_handler_matching)
+ 	CHECK_TRUE(mm_communicate_call_ep_init(&call_ep, comm_buffer, sizeof(comm_buffer)));
+ 	mm_communicate_call_ep_attach_service(&call_ep, &guid0, &iface);
+ 
+-	req_msg.args[0] = (uintptr_t)comm_buffer;
+-	req_msg.args[1] = sizeof(comm_buffer);
++	memcpy(&header->HeaderGuid, &guid0, sizeof(guid0));
++	header->MessageLength = req_len;
++
++	expect_mock_mm_service_receive(&iface, &req, MM_RETURN_CODE_SUCCESS);
++
++	mm_communicate_call_ep_receive(&call_ep, &req_msg, &resp_msg);
++
++	check_sp_msg(&resp_msg, MM_RETURN_CODE_SUCCESS, 0, 0, 0, 0);
++}
++
++TEST(mm_communicate_call_ep, mm_communicate_single_handler_matching_with_offset)
++{
++	const size_t offset = 0x10;
++	EFI_MM_COMMUNICATE_HEADER *header = (EFI_MM_COMMUNICATE_HEADER *)(comm_buffer + offset);
++
++	const size_t req_len = 16;
++	struct mm_service_interface iface = {
++		.context = (void *)0x1234,
++		.receive = mock_mm_service_receive
++	};
++	struct mm_service_call_req req = {
++		.guid = &guid0,
++		.req_buf = {
++			.size = sizeof(comm_buffer) - EFI_MM_COMMUNICATE_HEADER_SIZE - offset,
++			.data_len = req_len,
++			.data = header->Data
++		},
++		.resp_buf = {
++			.size = sizeof(comm_buffer) - EFI_MM_COMMUNICATE_HEADER_SIZE - offset,
++			.data_len = 0,
++			.data = header->Data
++		},
++	};
++
++	CHECK_TRUE(mm_communicate_call_ep_init(&call_ep, comm_buffer, sizeof(comm_buffer)));
++	mm_communicate_call_ep_attach_service(&call_ep, &guid0, &iface);
+ 
+ 	memcpy(&header->HeaderGuid, &guid0, sizeof(guid0));
+ 	header->MessageLength = req_len;
++	req_msg.args.args64[0] = offset;
+ 
+ 	expect_mock_mm_service_receive(&iface, &req, MM_RETURN_CODE_SUCCESS);
+ 
+ 	mm_communicate_call_ep_receive(&call_ep, &req_msg, &resp_msg);
+ 
+-	check_sp_msg(&resp_msg, ARM_SVC_ID_SP_EVENT_COMPLETE, MM_RETURN_CODE_SUCCESS, 0, 0, 0);
++	check_sp_msg(&resp_msg, MM_RETURN_CODE_SUCCESS, 0, 0, 0, 0);
+ }
+ 
++
+ TEST(mm_communicate_call_ep, mm_communicate_single_handler_matching_error)
+ {
+ 	const size_t req_len = 16;
+@@ -248,9 +274,6 @@ TEST(mm_communicate_call_ep, mm_communicate_single_handler_matching_error)
+ 	CHECK_TRUE(mm_communicate_call_ep_init(&call_ep, comm_buffer, sizeof(comm_buffer)));
+ 	mm_communicate_call_ep_attach_service(&call_ep, &guid0, &iface);
+ 
+-	req_msg.args[0] = (uintptr_t)comm_buffer;
+-	req_msg.args[1] = sizeof(comm_buffer);
+-
+ 	memcpy(&header->HeaderGuid, &guid0, sizeof(guid0));
+ 	header->MessageLength = req_len;
+ 
+@@ -258,7 +281,7 @@ TEST(mm_communicate_call_ep, mm_communicate_single_handler_matching_error)
+ 
+ 	mm_communicate_call_ep_receive(&call_ep, &req_msg, &resp_msg);
+ 
+-	check_sp_msg(&resp_msg, ARM_SVC_ID_SP_EVENT_COMPLETE, MM_RETURN_CODE_NO_MEMORY, 0, 0, 0);
++	check_sp_msg(&resp_msg, MM_RETURN_CODE_NO_MEMORY, 0, 0, 0, 0);
+ }
+ 
+ TEST(mm_communicate_call_ep, mm_communicate_two_handlers)
+@@ -290,9 +313,6 @@ TEST(mm_communicate_call_ep, mm_communicate_two_handlers)
+ 	mm_communicate_call_ep_attach_service(&call_ep, &guid0, &iface0);
+ 	mm_communicate_call_ep_attach_service(&call_ep, &guid1, &iface1);
+ 
+-	req_msg.args[0] = (uintptr_t)comm_buffer;
+-	req_msg.args[1] = sizeof(comm_buffer);
+-
+ 	memcpy(&header->HeaderGuid, &guid1, sizeof(guid0));
+ 	header->MessageLength = req_len;
+ 
+@@ -300,5 +320,5 @@ TEST(mm_communicate_call_ep, mm_communicate_two_handlers)
+ 
+ 	mm_communicate_call_ep_receive(&call_ep, &req_msg, &resp_msg);
+ 
+-	check_sp_msg(&resp_msg, ARM_SVC_ID_SP_EVENT_COMPLETE, MM_RETURN_CODE_SUCCESS, 0, 0, 0);
++	check_sp_msg(&resp_msg, MM_RETURN_CODE_SUCCESS, 0, 0, 0, 0);
+ }
+diff --git a/components/rpc/mm_communicate/endpoint/sp/test/test_mock_mm_service.cpp b/components/rpc/mm_communicate/endpoint/sp/test/test_mock_mm_service.cpp
+index 360a8fa..600386e 100644
+--- a/components/rpc/mm_communicate/endpoint/sp/test/test_mock_mm_service.cpp
++++ b/components/rpc/mm_communicate/endpoint/sp/test/test_mock_mm_service.cpp
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: BSD-3-Clause
+ /*
+- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+  */
+ 
+ #include <CppUTest/TestHarness.h>
+@@ -44,7 +44,7 @@ TEST(mock_mm_service, receive)
+ 			.data = (void *)0x2345
+ 		}
+ 	};
+-	int32_t result = -123456;
++	int64_t result = -123456;
+ 
+ 	expect_mock_mm_service_receive(&iface, &req, result);
+ 	LONGS_EQUAL(result, mock_mm_service_receive(&iface, &req));
+diff --git a/deployments/smm-gateway/common/smm_gateway_sp.c b/deployments/smm-gateway/common/smm_gateway_sp.c
+index 3697b7f..3062877 100644
+--- a/deployments/smm-gateway/common/smm_gateway_sp.c
++++ b/deployments/smm-gateway/common/smm_gateway_sp.c
+@@ -11,6 +11,7 @@
+ #include "components/rpc/mm_communicate/endpoint/sp/mm_communicate_call_ep.h"
+ #include "components/service/smm_variable/frontend/mm_communicate/smm_variable_mm_service.h"
+ #include "platform/interface/memory_region.h"
++#include "protocols/common/mm/mm_smc.h"
+ #include <ffa_api.h>
+ #include <sp_api.h>
+ #include <sp_messaging.h>
+@@ -68,12 +69,20 @@ void __noreturn sp_main(struct ffa_init_info *init_info)
+ 	ffa_msg_wait(&req_msg);
+ 
+ 	while (1) {
++		if (FFA_IS_32_BIT_FUNC(req_msg.function_id)) {
++			EMSG("MM communicate over 32 bit FF-A messages is not supported");
++			ffa_msg_send_direct_resp_32(req_msg.destination_id, req_msg.source_id,
++						    MM_RETURN_CODE_NOT_SUPPORTED, 0, 0, 0, 0,
++						    &req_msg);
++			continue;
++		}
++
+ 		mm_communicate_call_ep_receive(&mm_communicate_call_ep, &req_msg, &resp_msg);
+ 
+-		ffa_msg_send_direct_resp_32(req_msg.destination_id,
+-					 req_msg.source_id, resp_msg.args.args32[0],
+-					 resp_msg.args.args32[1], resp_msg.args.args32[2],
+-					 resp_msg.args.args32[3], resp_msg.args.args32[4],
++		ffa_msg_send_direct_resp_64(req_msg.destination_id,
++					 req_msg.source_id, resp_msg.args.args64[0],
++					 resp_msg.args.args64[1], resp_msg.args.args64[2],
++					 resp_msg.args.args64[3], resp_msg.args.args64[4],
+ 					 &req_msg);
+ 	}
+ 
+-- 
+2.17.1
+

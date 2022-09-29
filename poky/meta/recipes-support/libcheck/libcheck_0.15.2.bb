@@ -23,6 +23,9 @@ CACHED_CONFIGUREVARS += "ac_cv_path_AWK_PATH=${bindir}/gawk"
 
 RREPLACES:${PN} = "check (<= 0.9.5)"
 
+do_install:append:class-native() {
+    create_cmdline_shebang_wrapper ${D}${bindir}/checkmk
+}
 BBCLASSEXTEND = "native nativesdk"
 
 PACKAGES =+ "checkmk"

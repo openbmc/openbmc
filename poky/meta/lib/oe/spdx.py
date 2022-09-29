@@ -1,4 +1,6 @@
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
@@ -218,7 +220,7 @@ class SPDXPackage(SPDXObject):
     SPDXID = _String()
     versionInfo = _String()
     downloadLocation = _String(default="NOASSERTION")
-    packageSupplier = _String(default="NOASSERTION")
+    supplier = _String(default="NOASSERTION")
     homepage = _String()
     licenseConcluded = _String(default="NOASSERTION")
     licenseDeclared = _String(default="NOASSERTION")

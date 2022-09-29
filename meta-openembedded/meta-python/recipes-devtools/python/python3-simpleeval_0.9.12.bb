@@ -10,6 +10,7 @@ inherit pypi python_setuptools_build_meta ptest
 BBCLASSEXTEND = "native nativesdk"
 
 SRC_URI += " \
+	file://no-build.patch \
 	file://run-ptest \
 "
 

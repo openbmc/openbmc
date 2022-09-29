@@ -23,10 +23,26 @@ FLASH_UBI_RWFS_TXT_SIZE ?= "6MiB"
 
 SERIAL_CONSOLES ?= "115200;ttyS0"
 
-SECURED_OS ?= "True"
-
 SOC_FAMILY = "npcm8xx"
 include conf/machine/include/soc-family.inc
 MACHINEOVERRIDES .= ":npcm8xx"
 
 require conf/machine/include/arm/armv8a/tune-cortexa35.inc
+
+PREFERRED_VERSION_trusted-firmware-a = "2.6.0"
+
+UBOOT_MKIMAGE:append:npcm8xx = " -E -B 8"
+
+COMPATIBLE_MACHINE:npcm8xx = "npcm8xx"
+TFA_PLATFORM = "npcm845x"
+
+# Nuvoton prefers optee for BL32.
+TFA_SPD = "opteed"
+
+# Nuvoton prefers u-boot as BL33.
+TFA_UBOOT = "1"
+
+# Nuvoton prefers TFA default build is BL31.
+TFA_BUILD_TARGET = "bl31"
+
+OPTEEMACHINE ?= "nuvoton"

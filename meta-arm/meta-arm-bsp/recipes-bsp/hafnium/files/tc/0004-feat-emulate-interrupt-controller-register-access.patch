@@ -1,0 +1,159 @@
+From 380f2cf944dd5db36c168a11d31a46ad14cdcb6d Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Tue, 26 Apr 2022 14:43:58 +0100
+Subject: [PATCH 4/5] feat: emulate interrupt controller register access
+
+This emulates ICC_SGI1R_EL1 and ICC_IGRPEN1_EL1 register
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Change-Id: I0c11f034f3676067597461a183a341c809adcaa4
+Upstream-Status: Inappropriate [Experimental feature]
+---
+ src/arch/aarch64/hypervisor/handler.c |  5 ++
+ src/arch/aarch64/hypervisor/perfmon.c | 84 +++++++++++++++++++++++++++
+ src/arch/aarch64/hypervisor/perfmon.h |  5 ++
+ src/arch/aarch64/msr.h                |  3 +
+ 4 files changed, 97 insertions(+)
+
+diff --git a/src/arch/aarch64/hypervisor/handler.c b/src/arch/aarch64/hypervisor/handler.c
+index c9068c5..b9aa5d8 100644
+--- a/src/arch/aarch64/hypervisor/handler.c
++++ b/src/arch/aarch64/hypervisor/handler.c
+@@ -1282,6 +1282,11 @@ void handle_system_register_access(uintreg_t esr_el2)
+ 			inject_el1_unknown_exception(vcpu, esr_el2);
+ 			return;
+ 		}
++	} else if (intr_ctrl_is_register_access(esr_el2)) {
++		if (!intr_ctrl_el1_process_access(vcpu, vm_id, esr_el2)) {
++			inject_el1_unknown_exception(vcpu, esr_el2);
++			return;
++		}
+ 	} else {
+ 		inject_el1_unknown_exception(vcpu, esr_el2);
+ 		return;
+diff --git a/src/arch/aarch64/hypervisor/perfmon.c b/src/arch/aarch64/hypervisor/perfmon.c
+index f13b035..05e216c 100644
+--- a/src/arch/aarch64/hypervisor/perfmon.c
++++ b/src/arch/aarch64/hypervisor/perfmon.c
+@@ -116,6 +116,10 @@
+ 	X(PMEVTYPER30_EL0   , 3, 3, 14, 15, 6) \
+ 	X(PMCCFILTR_EL0     , 3, 3, 14, 15, 7)
+ 
++#define INTR_CTRL_REGISTERS                    \
++	X(ICC_IGRPEN1_EL1   , 3, 0, 12, 12, 7) \
++	X(ICC_SGI1R_EL1     , 3, 0, 12, 11, 5) \
++
+ /* clang-format on */
+ 
+ /**
+@@ -232,3 +236,83 @@ uintreg_t perfmon_get_pmccfiltr_el0_init_value(ffa_vm_id_t vm_id)
+ 
+ 	return 0;
+ }
++
++bool intr_ctrl_is_register_access(uintreg_t esr)
++{
++	uintreg_t op0 = GET_ISS_OP0(esr);
++	uintreg_t op1 = GET_ISS_OP1(esr);
++	uintreg_t crn = GET_ISS_CRN(esr);
++	uintreg_t crm = GET_ISS_CRM(esr);
++
++	if (op0 == 3 && op1 == 0 && crn == 12 && crm == 12) {
++		return true;
++	}
++
++	if (op0 == 3 && op1 == 0 && crn == 12 && crm == 11) {
++		return true;
++	}
++
++	return false;
++}
++
++bool intr_ctrl_el1_process_access(struct vcpu *vcpu, ffa_vm_id_t vm_id,
++				  uintreg_t esr)
++{
++	uintreg_t sys_register = GET_ISS_SYSREG(esr);
++	uintreg_t rt_register = GET_ISS_RT(esr);
++	uintreg_t value;
++
++	/* +1 because Rt can access register XZR */
++	CHECK(rt_register < NUM_GP_REGS + 1);
++
++	if (ISS_IS_READ(esr)) {
++		switch (sys_register) {
++#define X(reg_name, op0, op1, crn, crm, op2)              \
++	case (GET_ISS_ENCODING(op0, op1, crn, crm, op2)): \
++		value = read_msr(reg_name);               \
++		break;
++			INTR_CTRL_REGISTERS
++#undef X
++		default:
++			value = vcpu->regs.r[rt_register];
++			dlog_notice(
++				"Unsupported interrupt control register "
++				"read: "
++				"op0=%d, op1=%d, crn=%d, crm=%d, op2=%d, "
++				"rt=%d.\n",
++				GET_ISS_OP0(esr), GET_ISS_OP1(esr),
++				GET_ISS_CRN(esr), GET_ISS_CRM(esr),
++				GET_ISS_OP2(esr), GET_ISS_RT(esr));
++			break;
++		}
++		if (rt_register != RT_REG_XZR) {
++			vcpu->regs.r[rt_register] = value;
++		}
++	} else {
++		if (rt_register != RT_REG_XZR) {
++			value = vcpu->regs.r[rt_register];
++		} else {
++			value = 0;
++		}
++		switch (sys_register) {
++#define X(reg_name, op0, op1, crn, crm, op2)              \
++	case (GET_ISS_ENCODING(op0, op1, crn, crm, op2)): \
++		write_msr(reg_name, value);               \
++		break;
++			INTR_CTRL_REGISTERS
++#undef X
++		default:
++			dlog_notice(
++				"Unsupported interrupt control register "
++				"write: "
++				"op0=%d, op1=%d, crn=%d, crm=%d, op2=%d, "
++				"rt=%d.\n",
++				GET_ISS_OP0(esr), GET_ISS_OP1(esr),
++				GET_ISS_CRN(esr), GET_ISS_CRM(esr),
++				GET_ISS_OP2(esr), GET_ISS_RT(esr));
++			break;
++		}
++	}
++
++	return true;
++}
+diff --git a/src/arch/aarch64/hypervisor/perfmon.h b/src/arch/aarch64/hypervisor/perfmon.h
+index 81669ba..c90d45b 100644
+--- a/src/arch/aarch64/hypervisor/perfmon.h
++++ b/src/arch/aarch64/hypervisor/perfmon.h
+@@ -70,3 +70,8 @@ bool perfmon_process_access(struct vcpu *vcpu, ffa_vm_id_t vm_id,
+ 			    uintreg_t esr_el2);
+ 
+ uintreg_t perfmon_get_pmccfiltr_el0_init_value(ffa_vm_id_t vm_id);
++
++bool intr_ctrl_is_register_access(uintreg_t esr);
++
++bool intr_ctrl_el1_process_access(struct vcpu *vcpu, ffa_vm_id_t vm_id,
++				  uintreg_t esr);
+diff --git a/src/arch/aarch64/msr.h b/src/arch/aarch64/msr.h
+index 55e7833..82aa884 100644
+--- a/src/arch/aarch64/msr.h
++++ b/src/arch/aarch64/msr.h
+@@ -134,3 +134,6 @@
+ #define MSR_CNTHPS_CTL_EL2 S3_4_C14_C5_1
+ #define MSR_CNTHPS_CVAL_EL2 S3_4_C14_C5_2
+ #define MSR_CNTHPS_TVAL_EL2 S3_4_C14_C5_0
++
++#define ICC_IGRPEN1_EL1 S3_0_C12_C12_7
++#define ICC_SGI1R_EL1 S3_0_C12_C11_5
+-- 
+2.17.1
+

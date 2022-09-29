@@ -1,0 +1,21 @@
+We need to be sure that the host linker flags are passed to the kernel build,
+as otherwise it is possible that binaries are incorrectly linked. For example:
+
+HOSTCC scripts/extract-cert
+ld: .../recipe-sysroot-native/usr/lib/pkgconfig/../../../usr/lib/libcrypto.so: undefined reference to `pthread_once@GLIBC_2.34'
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/build/linux/linux.gni b/build/linux/linux.gni
+index 65cc9df..19adbfb 100644
+--- a/build/linux/linux.gni
++++ b/build/linux/linux.gni
+@@ -60,6 +60,7 @@ template("linux_kernel") {
+     "LLVM=1",
+     "LLVM_IAS=1",
+     "CROSS_COMPILE=aarch64-linux-gnu-",
++    "HOSTLDFLAGS=" + getenv("BUILD_LDFLAGS"),
+
+     # Build out-of-tree in `target_out_dir`.
+     "O=" + rebase_path(target_out_dir),

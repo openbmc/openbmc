@@ -1,5 +1,8 @@
 SUMMARY = "U-Boot bootloader tools"
-DEPENDS += "gnutls openssl util-linux"
+DEPENDS += "gnutls openssl util-linux swig-native"
+
+inherit python3native
+export STAGING_INCDIR="${STAGING_INCDIR_NATIVE}"
 
 PROVIDES = "${MLPREFIX}u-boot-mkimage ${MLPREFIX}u-boot-mkenvimage"
 PROVIDES:class-native = "u-boot-mkimage-native u-boot-mkenvimage-native"

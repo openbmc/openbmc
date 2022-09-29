@@ -1,4 +1,6 @@
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
@@ -472,70 +474,6 @@ def get_multilib_datastore(variant, d):
         localdata.setVar("OVERRIDES", overrides)
         localdata.setVar("MLPREFIX", "")
     return localdata
-
-#
-# Python 2.7 doesn't have threaded pools (just multiprocessing)
-# so implement a version here
-#
-
-from queue import Queue
-from threading import Thread
-
-class ThreadedWorker(Thread):
-    """Thread executing tasks from a given tasks queue"""
-    def __init__(self, tasks, worker_init, worker_end, name=None):
-        Thread.__init__(self, name=name)
-        self.tasks = tasks
-        self.daemon = True
-
-        self.worker_init = worker_init
-        self.worker_end = worker_end
-
-    def run(self):
-        from queue import Empty
-
-        if self.worker_init is not None:
-            self.worker_init(self)
-
-        while True:
-            try:
-                func, args, kargs = self.tasks.get(block=False)
-            except Empty:
-                if self.worker_end is not None:
-                    self.worker_end(self)
-                break
-
-            try:
-                func(self, *args, **kargs)
-            except Exception as e:
-                # Eat all exceptions
-                bb.mainlogger.debug("Worker task raised %s" % e, exc_info=e)
-            finally:
-                self.tasks.task_done()
-
-class ThreadedPool:
-    """Pool of threads consuming tasks from a queue"""
-    def __init__(self, num_workers, num_tasks, worker_init=None, worker_end=None, name="ThreadedPool-"):
-        self.tasks = Queue(num_tasks)
-        self.workers = []
-
-        for i in range(num_workers):
-            worker = ThreadedWorker(self.tasks, worker_init, worker_end, name=name + str(i))
-            self.workers.append(worker)
-
-    def start(self):
-        for worker in self.workers:
-            worker.start()
-
-    def add_task(self, func, *args, **kargs):
-        """Add a task to the queue"""
-        self.tasks.put((func, args, kargs))
-
-    def wait_completion(self):
-        """Wait for completion of all the tasks in the queue"""
-        self.tasks.join()
-        for worker in self.workers:
-            worker.join()
 
 class ImageQAFailed(Exception):
     def __init__(self, description, name=None, logfile=None):

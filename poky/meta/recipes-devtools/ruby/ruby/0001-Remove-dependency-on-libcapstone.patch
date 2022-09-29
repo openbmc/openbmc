@@ -1,0 +1,36 @@
+From 222203297966f312109e8eaa2520f2cf2f59c09d Mon Sep 17 00:00:00 2001
+From: Alan Wu <XrXr@users.noreply.github.com>
+Date: Thu, 31 Mar 2022 17:26:28 -0400
+Subject: [PATCH] Remove dependency on libcapstone
+
+We have received reports of build failures due to this configuration
+check modifying compile flags. Since only YJIT devs use this library
+we can remove it to make Ruby easier to build for users.
+
+See: https://github.com/rbenv/ruby-build/discussions/1933
+
+Upstream-Status: Backport
+---
+ configure.ac | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+Index: ruby-3.1.2/configure.ac
+===================================================================
+--- ruby-3.1.2.orig/configure.ac
++++ ruby-3.1.2/configure.ac
+@@ -1244,15 +1244,6 @@ AC_CHECK_LIB(dl, dlopen)	# Dynamic linki
+ AC_CHECK_LIB(dld, shl_load)	# Dynamic linking for HP-UX
+ AC_CHECK_LIB(socket, shutdown)  # SunOS/Solaris
+ 
+-if pkg-config --exists capstone; then
+-   CAPSTONE_CFLAGS=`pkg-config --cflags capstone`
+-   CAPSTONE_LIB_L=`pkg-config --libs-only-L capstone`
+-   LDFLAGS="$LDFLAGS $CAPSTONE_LIB_L"
+-   CFLAGS="$CFLAGS $CAPSTONE_CFLAGS"
+-fi
+-
+-AC_CHECK_LIB(capstone, cs_open) # Capstone disassembler for debugging YJIT
+-
+ dnl Checks for header files.
+ AC_HEADER_DIRENT
+ dnl AC_HEADER_STDC has been checked in AC_USE_SYSTEM_EXTENSIONS

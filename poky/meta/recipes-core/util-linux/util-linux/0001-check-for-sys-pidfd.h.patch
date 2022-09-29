@@ -1,0 +1,53 @@
+From 548bc568f3c735e53fb5b0a5ab6473a3f1457b91 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 7 Aug 2022 14:39:19 -0700
+Subject: [PATCH] check for sys/pidfd.h
+
+This header in newer glibc defines the signatures of functions
+pidfd_send_signal() and pidfd_open() and when these functions are
+defined by libc then we need to include the relevant header to get
+the definitions. Clang 15+ has started to error out when function
+signatures are missing.
+
+Fixes errors like
+misc-utils/kill.c:402:6: error: call to undeclared function 'pidfd_send_signal'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+        if (pidfd_send_signal(pfd, ctl->numsig, &info, 0) < 0)
+
+Upstream-Status: Submitted [https://github.com/util-linux/util-linux/pull/1769]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac          | 1 +
+ include/pidfd-utils.h | 4 +++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index a511e93de..fd7d9245f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -342,6 +342,7 @@ AC_CHECK_HEADERS([ \
+ 	sys/mkdev.h \
+ 	sys/mount.h \
+ 	sys/param.h \
++	sys/pidfd.h \
+ 	sys/prctl.h \
+ 	sys/resource.h \
+ 	sys/sendfile.h \
+diff --git a/include/pidfd-utils.h b/include/pidfd-utils.h
+index eddede976..d9e33cbc5 100644
+--- a/include/pidfd-utils.h
++++ b/include/pidfd-utils.h
+@@ -4,8 +4,10 @@
+ #ifdef HAVE_SYS_SYSCALL_H
+ # include <sys/syscall.h>
+ # if defined(SYS_pidfd_send_signal) && defined(SYS_pidfd_open)
++#  ifdef HAVE_SYS_PIDFD_H
++#   include <sys/pidfd.h>
++#  endif
+ #  include <sys/types.h>
+-
+ #  ifndef HAVE_PIDFD_SEND_SIGNAL
+ static inline int pidfd_send_signal(int pidfd, int sig, siginfo_t *info,
+ 				    unsigned int flags)
+-- 
+2.37.1
+

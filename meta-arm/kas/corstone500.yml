@@ -1,0 +1,47 @@
+header:
+  version: 11
+
+distro: poky-tiny
+
+defaults:
+  repos:
+    refspec: master
+
+repos:
+  meta-arm:
+    layers:
+      meta-arm:
+      meta-arm-bsp:
+      meta-arm-toolchain:
+
+  poky:
+    url: https://git.yoctoproject.org/git/poky
+    refspec: master
+    layers:
+      meta:
+      meta-poky:
+      meta-yocto-bsp:
+
+  meta-openembedded:
+    url: https://git.openembedded.org/meta-openembedded
+    refspec: master
+    layers:
+      meta-oe:
+      meta-python:
+
+local_conf_header:
+  base: |
+    CONF_VERSION = "2"
+    PACKAGE_CLASSES = "package_ipk"
+    LICENSE_FLAGS_ACCEPTED += "armcompiler"
+    BB_NUMBER_THREADS ?= "16"
+    PARALLEL_MAKE ?= "-j16"
+    PACKAGECONFIG:append:pn-perf = " coresight"
+  fvp-config: |
+    IMAGE_CLASSES:append = " ${@bb.utils.contains('BUILD_ARCH', 'x86_64', 'fvpboot', '', d)}"
+    LICENSE_FLAGS_ACCEPTED:append = " Arm-FVP-EULA"
+
+machine: corstone500
+
+target:
+  - core-image-minimal

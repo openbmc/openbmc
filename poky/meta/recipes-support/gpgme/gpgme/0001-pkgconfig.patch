@@ -1,4 +1,4 @@
-From 98ce65902b197faa8f660564613ca2e504c2f8f8 Mon Sep 17 00:00:00 2001
+From 0d7ec5b98dc6cbd35f56deaecec5ecfdaa944aee Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Fri, 10 May 2019 14:23:55 +0800
 Subject: [PATCH] pkgconfig
@@ -15,6 +15,7 @@ Rebase to 1.13.0
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Rebase to 1.17.0
 Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+
 ---
  configure.ac            |   1 +
  src/Makefile.am         |   4 +-
@@ -25,10 +26,10 @@ Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
  create mode 100644 src/gpgme-pthread.pc.in
 
 diff --git a/configure.ac b/configure.ac
-index 80ce79c..d7c0ac1 100644
+index 9d696b9..5b4e730 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -905,6 +905,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
+@@ -926,6 +926,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
                  src/gpgme-glib.pc
                  src/gpgme.h)
  AC_CONFIG_FILES(src/gpgme-config, chmod +x src/gpgme-config)
@@ -37,7 +38,7 @@ index 80ce79c..d7c0ac1 100644
  AC_CONFIG_FILES(lang/cpp/tests/Makefile)
  AC_CONFIG_FILES(lang/cpp/src/GpgmeppConfig-w32.cmake.in)
 diff --git a/src/Makefile.am b/src/Makefile.am
-index 39c341f..3aca716 100644
+index 67805a8..d38ba02 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
 @@ -20,11 +20,11 @@
@@ -52,8 +53,8 @@ index 39c341f..3aca716 100644
 -	     gpgme.pc.in gpgme-glib.pc.in
 +	     gpgme.pc.in gpgme-glib.pc.in gpgme-pthread.pc.in
  
- bin_SCRIPTS = gpgme-config
- m4datadir = $(datadir)/aclocal
+ if USE_GPGRT_CONFIG
+ noinst_SCRIPTS = gpgme-config
 diff --git a/src/gpgme-pthread.pc.in b/src/gpgme-pthread.pc.in
 new file mode 100644
 index 0000000..074bbf6
@@ -76,7 +77,7 @@ index 0000000..074bbf6
 +Cflags: -I${includedir}
 +Requires: libassuan gpg-error
 diff --git a/src/gpgme.m4 b/src/gpgme.m4
-index 71b0010..30ec151 100644
+index 71b0010..5821895 100644
 --- a/src/gpgme.m4
 +++ b/src/gpgme.m4
 @@ -79,7 +79,7 @@ dnl config script does not match the host specification the script
@@ -287,6 +288,3 @@ index 80d59de..932645b 100644
 +Cflags: -I${includedir}
 +Libs: -L${libdir} -lgpgme
  URL: https://www.gnupg.org/software/gpgme/index.html
--- 
-2.25.1
-

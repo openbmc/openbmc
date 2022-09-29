@@ -113,9 +113,6 @@ EOF
 }
 
 do_compile:prepend() {
-        # This prevents g-ir-scanner from writing cache data to $HOME
-        export GI_SCANNER_DISABLE_CACHE=1
-
         # Needed to run g-ir unit tests, which won't be able to find the built libraries otherwise
         export GIR_EXTRA_LIBS_PATH=$B/.libs
 }

@@ -1,4 +1,6 @@
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: MIT
 #
 
@@ -145,12 +147,10 @@ INHERIT:remove = \"report-error\"
 """)
         self.track_for_cleanup(os.path.join(self.builddir, "download-selftest"))
 
-        bitbake('-ccleanall man-db')
         result = bitbake('-c fetch man-db', ignore_status=True)
-        bitbake('-ccleanall man-db')
         self.delete_recipeinc('man-db')
         self.assertEqual(result.status, 1, msg="Command succeded when it should have failed. bitbake output: %s" % result.output)
-        self.assertIn('Fetcher failure: Unable to find file file://invalid anywhere. The paths that were searched were:', result.output)
+        self.assertIn('Unable to get checksum for man-db SRC_URI entry invalid: file could not be found', result.output)
 
     def test_rename_downloaded_file(self):
         # TODO unique dldir instead of using cleanall
@@ -350,4 +350,4 @@ INHERIT:remove = \"report-error\"
         self.write_config("DISTROOVERRIDES .= \":gitunpack-enable-recipe\"")
 
         result = bitbake('gitunpackoffline-fail -c fetch', ignore_status=True)
-        self.assertTrue("Recipe uses a floating tag/branch without a fixed SRCREV" in result.output, msg = "Recipe without PV set to SRCPV should have failed: %s" % result.output)
+        self.assertTrue(re.search("Recipe uses a floating tag/branch .* for repo .* without a fixed SRCREV yet doesn't call bb.fetch2.get_srcrev()", result.output), msg = "Recipe without PV set to SRCPV should have failed: %s" % result.output)

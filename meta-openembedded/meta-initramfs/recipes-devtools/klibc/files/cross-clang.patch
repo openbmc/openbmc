@@ -6,7 +6,7 @@
                      -I$(KLIBCOBJ)/../include		\
 -                    -I$(KLIBCINC)
 -ifeq ($(cc-name),clang)
--KLIBCCPPFLAGS    += -I$(shell $(KLIBCCC) $(KLIBCCFLAGS) --print-file-name=include)
+-KLIBCCPPFLAGS    += -isystem $(shell $(KLIBCCC) $(KLIBCCFLAGS) --print-file-name=include)
 -endif
 +                    -I$(KLIBCINC) \
 +                    -I$(shell $(KLIBCCC) $(KLIBCCFLAGS) --print-file-name=include)

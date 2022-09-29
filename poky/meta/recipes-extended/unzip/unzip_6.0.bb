@@ -29,6 +29,9 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/infozip/UnZip%206.x%20%28latest%29/UnZip%206.0/
 	file://unzip_optimization.patch \
         file://0001-configure-Pass-LDFLAGS-to-tests-doing-link-step.patch \
         file://CVE-2021-4217.patch \
+        file://CVE-2022-0529.patch \
+        file://CVE-2022-0530.patch \
+        file://0001-configure-Add-correct-system-headers-and-prototypes-.patch \
 "
 UPSTREAM_VERSION_UNKNOWN = "1"
 
@@ -42,6 +45,9 @@ CVE_CHECK_IGNORE += "CVE-2008-0888"
 UPSTREAM_CHECK_REGEX = "unzip(?P<pver>(?!552).+)\.tgz"
 
 S = "${WORKDIR}/unzip60"
+
+# Enable largefile support
+CFLAGS += "-DLARGE_FILE_SUPPORT"
 
 # Makefile uses CF_NOOPT instead of CFLAGS.  We lifted the values from
 # Makefile and add CFLAGS.  Optimization will be overriden by unzip

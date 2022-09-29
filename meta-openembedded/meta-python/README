@@ -19,11 +19,6 @@ The meta-python layer depends on:
 	layers: meta-oe
 	branch: master
 
-Please follow the recommended setup procedures of your OE distribution.
-For Angstrom that is:
-        http://www.angstrom-distribution.org/building-angstrom,
-other distros should have similar online resources.
-
 Contributing
 -------------------------
 
@@ -44,4 +39,3 @@ Maintenance
 Layer maintainers:
         Tim "moto-timo" Orling <TicoTimo@gmail.com>
         Derek Straka <derek@asterius.io>
-        Trevor Gamblin <trevor.gamblin@windriver.com>

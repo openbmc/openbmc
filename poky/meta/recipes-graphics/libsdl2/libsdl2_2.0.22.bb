@@ -30,7 +30,7 @@ S = "${WORKDIR}/SDL2-${PV}"
 
 SRC_URI[sha256sum] = "fe7cbf3127882e3fc7259a75a0cb585620272c51745d3852ab9dd87960697f2e"
 
-inherit cmake lib_package binconfig-disabled pkgconfig
+inherit cmake lib_package binconfig-disabled pkgconfig upstream-version-is-even
 
 BINCONFIG = "${bindir}/sdl2-config"
 

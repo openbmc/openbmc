@@ -30,6 +30,8 @@ INITSCRIPT_PARAMS = "defaults"
 PACKAGECONFIG ??= "tcp-wrappers"
 PACKAGECONFIG[tcp-wrappers] = "--with-libwrap,,tcp-wrappers"
 
+CFLAGS += "-D_GNU_SOURCE"
+
 CONFFILES:${PN} = "${sysconfdir}/xinetd.conf"
 
 do_install:append() {

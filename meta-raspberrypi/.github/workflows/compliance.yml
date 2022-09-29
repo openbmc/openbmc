@@ -10,7 +10,7 @@ on:
 jobs:
   dco:
     name: DCO
-    runs-on: [self-hosted, Linux]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2
@@ -36,7 +36,7 @@ jobs:
         if: always()
   reuse:
     name: reuse
-    runs-on: [self-hosted, Linux]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2

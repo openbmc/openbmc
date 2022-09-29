@@ -22,7 +22,7 @@ Can I still use the Yocto Project?
 **A:** You can get the required tools on your host development system a
 couple different ways (i.e. building a tarball or downloading a
 tarball). See the
-":ref:`ref-manual/system-requirements:required git, tar, python and gcc versions`"
+":ref:`ref-manual/system-requirements:required git, tar, python, make and gcc versions`"
 section for steps on how to update your build tools.
 
 **Q:** How can you claim Poky / OpenEmbedded-Core is stable?
@@ -364,7 +364,7 @@ redirect requests through proxy servers.
 
 **Q:** Can I get rid of build output so I can start over?
 
-**A:** Yes - you can easily do this. When you use BitBake to build an
+**A:** Yes --- you can easily do this. When you use BitBake to build an
 image, all the build output goes into the directory created when you run
 the build environment setup script (i.e.
 :ref:`structure-core-script`). By default, this :term:`Build Directory`
@@ -428,7 +428,7 @@ relatively normal and the second is not:
       build/tmp/sysroots/x86_64-linux/usr/bin
 
 Even if the paths look unusual,
-they both are correct - the first for a target and the second for a
+they both are correct --- the first for a target and the second for a
 native recipe. These paths are a consequence of the ``DESTDIR``
 mechanism and while they appear strange, they are correct and in
 practice very effective.

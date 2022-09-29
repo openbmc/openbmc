@@ -8,7 +8,16 @@ An all-in-one patch that fixes several issues:
 Sourced from void linux
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Xu Huan <xuhuan.fnst@fujitsu.com>
+---
+ absl/base/internal/unscaledcycleclock.cc    | 4 ++--
+ absl/base/internal/unscaledcycleclock.h     | 3 ++-
+ absl/debugging/internal/examine_stack.cc    | 8 +++++++-
+ absl/debugging/internal/stacktrace_config.h | 2 +-
+ 4 files changed, 12 insertions(+), 5 deletions(-)
 
+diff --git a/absl/base/internal/unscaledcycleclock.cc b/absl/base/internal/unscaledcycleclock.cc
+index b1c396c..d62bfd6 100644
 --- a/absl/base/internal/unscaledcycleclock.cc
 +++ b/absl/base/internal/unscaledcycleclock.cc
 @@ -20,7 +20,7 @@
@@ -20,7 +29,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #ifdef __GLIBC__
  #include <sys/platform/ppc.h>
  #elif defined(__FreeBSD__)
-@@ -59,7 +59,7 @@ double UnscaledCycleClock::Frequency() {
+@@ -58,7 +58,7 @@ double UnscaledCycleClock::Frequency() {
    return base_internal::NominalCPUFrequency();
  }
  
@@ -29,6 +38,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  int64_t UnscaledCycleClock::Now() {
  #ifdef __GLIBC__
+diff --git a/absl/base/internal/unscaledcycleclock.h b/absl/base/internal/unscaledcycleclock.h
+index 2cbeae3..683a5ef 100644
 --- a/absl/base/internal/unscaledcycleclock.h
 +++ b/absl/base/internal/unscaledcycleclock.h
 @@ -46,7 +46,8 @@
@@ -38,12 +49,14 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 -    defined(__powerpc__) || defined(__ppc__) || defined(__riscv) ||     \
 +    ((defined(__powerpc__) || defined(__ppc__)) && defined(__GLIBC__)) || \
 +    defined(__riscv) ||     \
-     defined(_M_IX86) || defined(_M_X64)
+     defined(_M_IX86) || (defined(_M_X64) && !defined(_M_ARM64EC))
  #define ABSL_HAVE_UNSCALED_CYCLECLOCK_IMPLEMENTATION 1
  #else
+diff --git a/absl/debugging/internal/examine_stack.cc b/absl/debugging/internal/examine_stack.cc
+index 5bdd341..a784e0d 100644
 --- a/absl/debugging/internal/examine_stack.cc
 +++ b/absl/debugging/internal/examine_stack.cc
-@@ -27,6 +27,10 @@
+@@ -33,6 +33,10 @@
  #include <csignal>
  #include <cstdio>
  
@@ -54,7 +67,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #include "absl/base/attributes.h"
  #include "absl/base/internal/raw_logging.h"
  #include "absl/base/macros.h"
-@@ -63,8 +67,10 @@ void* GetProgramCounter(void* vuc) {
+@@ -174,8 +178,10 @@ void* GetProgramCounter(void* const vuc) {
      return reinterpret_cast<void*>(context->uc_mcontext.pc);
  #elif defined(__powerpc64__)
      return reinterpret_cast<void*>(context->uc_mcontext.gp_regs[32]);
@@ -66,9 +79,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #elif defined(__riscv)
      return reinterpret_cast<void*>(context->uc_mcontext.__gregs[REG_PC]);
  #elif defined(__s390__) && !defined(__s390x__)
+diff --git a/absl/debugging/internal/stacktrace_config.h b/absl/debugging/internal/stacktrace_config.h
+index 3929b1b..23d5e50 100644
 --- a/absl/debugging/internal/stacktrace_config.h
 +++ b/absl/debugging/internal/stacktrace_config.h
-@@ -59,7 +59,7 @@
+@@ -60,7 +60,7 @@
  #elif defined(__i386__) || defined(__x86_64__)
  #define ABSL_STACKTRACE_INL_HEADER \
    "absl/debugging/internal/stacktrace_x86-inl.inc"
@@ -77,3 +92,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #define ABSL_STACKTRACE_INL_HEADER \
    "absl/debugging/internal/stacktrace_powerpc-inl.inc"
  #elif defined(__aarch64__)
+-- 
+2.25.1
+

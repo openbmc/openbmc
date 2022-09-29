@@ -93,3 +93,80 @@ is_sled_present()
     # present
     return 0
 }
+
+spi2_mux_select()
+{
+    local SLED_INDEX="$1"
+    if [ "$SLED_INDEX" = "0" ]; then
+        set_gpio SEL_SPI2_MUX 1
+        set_gpio SPI2_MUX1 1
+        set_gpio SPI2_MUX2 1
+        set_gpio SPI2_MUX3 1
+    elif [ "$SLED_INDEX" = "1" ]; then
+        set_gpio SEL_SPI2_MUX 0
+        set_gpio SPI2_MUX1 0
+        set_gpio SPI2_MUX2 1
+        set_gpio SPI2_MUX3 1
+    elif [ "$SLED_INDEX" = "2" ]; then
+        set_gpio SEL_SPI2_MUX 1
+        set_gpio SPI2_MUX1 0
+        set_gpio SPI2_MUX2 1
+        set_gpio SPI2_MUX3 1
+    elif [ "$SLED_INDEX" = "3" ]; then
+        set_gpio SEL_SPI2_MUX 0
+        set_gpio SPI2_MUX1 1
+        set_gpio SPI2_MUX2 0
+        set_gpio SPI2_MUX3 1
+    elif [ "$SLED_INDEX" = "4" ]; then
+        set_gpio SEL_SPI2_MUX 1
+        set_gpio SPI2_MUX1 1
+        set_gpio SPI2_MUX2 0
+        set_gpio SPI2_MUX3 1
+    elif [ "$SLED_INDEX" = "5" ]; then
+        set_gpio SEL_SPI2_MUX 0
+        set_gpio SPI2_MUX1 1
+        set_gpio SPI2_MUX2 1
+        set_gpio SPI2_MUX3 0
+    elif [ "$SLED_INDEX" = "6" ]; then
+        set_gpio SEL_SPI2_MUX 1
+        set_gpio SPI2_MUX1 1
+        set_gpio SPI2_MUX2 1
+        set_gpio SPI2_MUX3 0
+    else
+        echo "set_spi2_mux: unknow sled index ($SLED_INDEX)"
+        return 1
+    fi
+
+    return 0
+}
+
+bind_spi2_pnor()
+{
+    local SLED_INDEX="$1"
+
+    if ! spi2_mux_select "$SLED_INDEX"; then
+        return 1
+    fi
+
+    if ! echo -n spi1.0 > /sys/bus/spi/drivers/spi-nor/bind; then
+        echo "Error: flash bind failed"
+        return 1
+    fi
+
+    return 0
+}
+
+unbind_spi2_pnor()
+{
+    echo -n spi1.0 > /sys/bus/spi/drivers/spi-nor/unbind
+    spi2_mux_select 0
+    return 0
+}
+
+find_mtd()
+{
+    m=$(grep -xl "$1" /sys/class/mtd/*/name)
+    m=${m%/name}
+    m=${m##*/}
+    echo "$m"
+}

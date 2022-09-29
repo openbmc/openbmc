@@ -3,6 +3,7 @@ DESCRIPTION = "A small image for building meta-security packages"
 IMAGE_FEATURES += "ssh-server-openssh"
 
 IMAGE_INSTALL = "\
+    ${@bb.utils.contains("DISTRO_FEATURES", "lkrg", "lkrg-module", "",d)} \
     packagegroup-base \
     packagegroup-core-boot \
     packagegroup-core-security \

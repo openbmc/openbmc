@@ -11,15 +11,14 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=153d07ef052c4a37a8fac23bc6031972"
 SRC_URI = "git://github.com/LMDB/lmdb.git;nobranch=1;protocol=https \
            file://run-ptest \
            file://0001-Makefile-use-libprefix-instead-of-libdir.patch \
+           file://0001-make-set-soname-on-liblmdb.patch;patchdir=../.. \
            "
 
 SRCREV = "8ad7be2510414b9506ec9f9e24f24d04d9b04a1a"
 
-inherit base ptest
+inherit ptest
 
 S = "${WORKDIR}/git/libraries/liblmdb"
-
-LDFLAGS += "-Wl,-soname,lib${PN}.so.${PV}"
 
 do_compile() {
     oe_runmake CC="${CC}" SOEXT=".so.${PV}" LDFLAGS="${LDFLAGS}"

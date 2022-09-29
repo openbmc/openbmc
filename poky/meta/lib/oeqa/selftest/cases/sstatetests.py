@@ -1,4 +1,6 @@
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: MIT
 #
 
@@ -384,8 +386,7 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
         self.track_for_cleanup(self.topdir + "/tmp-sstatesamehash2")
         bitbake("world meta-toolchain -S none")
 
-        def get_files(d):
-            f = {}
+        def get_files(d, result):
             for root, dirs, files in os.walk(d):
                 for name in files:
                     if "meta-environment" in root or "cross-canadian" in root:
@@ -393,22 +394,21 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
                     if "do_build" not in name:
                         # 1.4.1+gitAUTOINC+302fca9f4c-r0.do_package_write_ipk.sigdata.f3a2a38697da743f0dbed8b56aafcf79
                         (_, task, _, shash) = name.rsplit(".", 3)
-                        f[os.path.join(os.path.basename(root), task)] = shash
-            return f
+                        result[os.path.join(os.path.basename(root), task)] = shash
 
-        nativesdkdir = os.path.basename(glob.glob(self.topdir + "/tmp-sstatesamehash/stamps/*-nativesdk*-linux")[0])
+        files1 = {}
+        files2 = {}
+        subdirs = sorted(glob.glob(self.topdir + "/tmp-sstatesamehash/stamps/*-nativesdk*-linux"))
+        if allarch:
+            subdirs.extend(sorted(glob.glob(self.topdir + "/tmp-sstatesamehash/stamps/all-*-linux")))
 
-        files1 = get_files(self.topdir + "/tmp-sstatesamehash/stamps/" + nativesdkdir)
-        files2 = get_files(self.topdir + "/tmp-sstatesamehash2/stamps/" + nativesdkdir)
+        for subdir in subdirs:
+            nativesdkdir = os.path.basename(subdir)
+            get_files(self.topdir + "/tmp-sstatesamehash/stamps/" + nativesdkdir, files1)
+            get_files(self.topdir + "/tmp-sstatesamehash2/stamps/" + nativesdkdir, files2)
+
         self.maxDiff = None
         self.assertEqual(files1, files2)
-
-        if allarch:
-            allarchdir = os.path.basename(glob.glob(self.topdir + "/tmp-sstatesamehash/stamps/all-*-linux")[0])
-
-            files1 = get_files(self.topdir + "/tmp-sstatesamehash/stamps/" + allarchdir)
-            files2 = get_files(self.topdir + "/tmp-sstatesamehash2/stamps/" + allarchdir)
-            self.assertEqual(files1, files2)
 
     def test_sstate_sametune_samesigs(self):
         """
@@ -444,7 +444,7 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
             f = []
             for root, dirs, files in os.walk(d):
                 for name in files:
-                    if "meta-environment" in root or "cross-canadian" in root:
+                    if "meta-environment" in root or "cross-canadian" in root or 'meta-ide-support' in root:
                         continue
                     if "qemux86copy-" in root or "qemux86-" in root:
                         continue
@@ -594,6 +594,7 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
         copy_layer_2 = self.topdir + "/meta-copy2/meta"
 
         oe.path.copytree(core_layer, copy_layer_1)
+        os.symlink(os.path.dirname(core_layer) + "/scripts", self.topdir + "/meta-copy1/scripts")
         self.write_config("""
 TMPDIR = "${TOPDIR}/tmp-sstatesamehash"
 """)
@@ -603,6 +604,7 @@ TMPDIR = "${TOPDIR}/tmp-sstatesamehash"
         bitbake("bash -S none")
 
         oe.path.copytree(core_layer, copy_layer_2)
+        os.symlink(os.path.dirname(core_layer) + "/scripts", self.topdir + "/meta-copy2/scripts")
         self.write_config("""
 TMPDIR = "${TOPDIR}/tmp-sstatesamehash2"
 """)

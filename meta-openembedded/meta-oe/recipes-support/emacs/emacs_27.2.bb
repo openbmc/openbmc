@@ -11,6 +11,10 @@ SRC_URI:append:class-target = " file://usemake-docfile-native.patch"
 
 SRC_URI[sha256sum] = "b4a7cc4e78e63f378624e0919215b910af5bb2a0afc819fad298272e9f40c1b9"
 
+CVE_CHECK_IGNORE = "\
+    CVE-2007-6109 \
+"
+
 PACKAGECONFIG[gnutls] = "--with-gnutls=yes,--with-gnutls=no,gnutls"
 PACKAGECONFIG[kerberos] = "--with-kerberos=yes,--with-kerberos=no,krb5"
 PACKAGECONFIG[libgmp] = "--with-libgmp=yes,--with-libgmp=no,gmp"

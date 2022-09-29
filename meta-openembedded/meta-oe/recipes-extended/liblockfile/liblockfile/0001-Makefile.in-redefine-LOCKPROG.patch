@@ -1,0 +1,33 @@
+From 9beb650712d448ad9c0899de9d98e9b623f9c249 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Fri, 12 Aug 2022 11:18:15 +0800
+Subject: [PATCH] Makefile.in: redefine LOCKPROG
+
+By default the LOCKPROG will be expanded as below:
+LOCKPROG="/build/tmp-glibc/work/core2-32-wrs-linux/liblockfile/1.14-r0/image/usr/bin/dotlockfile"
+
+And it should be "/usr/bin/dotlockfile" on the target.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 6e53179..bfa0acb 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -42,7 +42,7 @@ dotlockfile:	dotlockfile.o xlockfile.o
+ 		$(CC) $(LDFLAGS) -o dotlockfile dotlockfile.o xlockfile.o
+ 
+ lockfile.o:	lockfile.c
+-		$(CC) $(CFLAGS) -DLIB -DLOCKPROG=\"$(bindir)/dotlockfile\" \
++		$(CC) $(CFLAGS) -DLIB -DLOCKPROG=\"/usr/bin/dotlockfile\" \
+ 			-c lockfile.c
+ 
+ xlockfile.o:	lockfile.c
+-- 
+2.25.1
+

@@ -1,0 +1,10 @@
+[Unit]
+Description = UART Activation Sequence
+Before=host-powerctrl.service
+
+[Service]
+ExecStart=/usr/libexec/obmc-console/mori_uart_mux_ctrl.sh
+Type=oneshot
+
+[Install]
+RequiredBy=multi-user.target

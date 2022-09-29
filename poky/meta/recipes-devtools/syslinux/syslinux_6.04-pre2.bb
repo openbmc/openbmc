@@ -8,7 +8,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3 \
 DEPENDS = "nasm-native util-linux e2fsprogs"
 
 SRC_URI = "https://www.zytor.com/pub/syslinux/Testing/6.04/syslinux-${PV}.tar.xz \
-           file://syslinux-remove-clean-script.patch \
            file://0001-linux-syslinux-support-ext2-3-4-device.patch \
            file://0002-linux-syslinux-implement-open_ext2_fs.patch \
            file://0003-linux-syslinux-implement-install_to_ext2.patch \
@@ -19,9 +18,11 @@ SRC_URI = "https://www.zytor.com/pub/syslinux/Testing/6.04/syslinux-${PV}.tar.xz
            file://0008-libinstaller-syslinuxext-implement-syslinux_patch_bo.patch \
            file://0009-linux-syslinux-implement-install_bootblock.patch \
            file://0010-Workaround-multiple-definition-of-symbol-errors.patch \
-           file://0001-install-don-t-install-obsolete-file-com32.ld.patch \
-           file://determinism.patch \
-           "
+           file://0011-install-don-t-install-obsolete-file-com32.ld.patch \
+           file://0012-libinstaller-Fix-build-with-glibc-2.36.patch \
+           file://0013-remove-clean-script.patch \
+           file://0014-Fix-reproducibility-issues.patch \
+"
 
 SRC_URI[md5sum] = "2b31c78f087f99179feb357da312d7ec"
 SRC_URI[sha256sum] = "4441a5d593f85bb6e8d578cf6653fb4ec30f9e8f4a2315a3d8f2d0a8b3fadf94"

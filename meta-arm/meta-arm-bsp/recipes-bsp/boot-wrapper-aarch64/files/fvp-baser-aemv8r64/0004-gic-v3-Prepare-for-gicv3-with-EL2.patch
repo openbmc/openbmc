@@ -1,0 +1,105 @@
+From 483d363bf825082b6db6de3c57d169e741861891 Mon Sep 17 00:00:00 2001
+From: Jaxson Han <jaxson.han@arm.com>
+Date: Tue, 25 May 2021 07:25:00 +0100
+Subject: [PATCH] gic-v3: Prepare for gicv3 with EL2
+
+This is a preparation for allowing boot-wrapper configuring the gicv3
+with EL2.
+
+When confiuring with EL2, since there is no ICC_CTLR_EL2, the
+ICC_CTLR_EL3 cannot be replaced with ICC_CTLR_EL2 simply.
+See [https://developer.arm.com/documentation/ihi0069/latest/].
+
+As the caller, gic_secure_init expects the ICC_CTLR to be written,
+we change the function into gic_init_icc_ctlr(). In the GIC spec,
+the r/w bits in this register ([6:0]) either affect EL3 IRQ routing
+(not applicable since no EL3), non-secure IRQ handling (not applicable
+since only secure state in Armv8-R aarch64), or are aliased to
+ICC_CTLR_EL1 bits.
+So, based on this, the new gic_init_icc_ctlr() would be:
+When currentEL is EL3, init ICC_CTLR_EL3 as before.
+When currentEL is not EL3, init ICC_CTLR_EL1 with ICC_CTLR_EL1_RESET.
+
+Upstream-Status: Pending
+Signed-off-by: Jaxson Han <jaxson.han@arm.com>
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+---
+ arch/aarch32/include/asm/gic-v3.h |  7 +++++++
+ arch/aarch64/include/asm/gic-v3.h | 23 ++++++++++++++++++++---
+ common/gic-v3.c                   |  2 +-
+ 3 files changed, 28 insertions(+), 4 deletions(-)
+
+diff --git a/arch/aarch32/include/asm/gic-v3.h b/arch/aarch32/include/asm/gic-v3.h
+index 65f38de..11e7bc7 100644
+--- a/arch/aarch32/include/asm/gic-v3.h
++++ b/arch/aarch32/include/asm/gic-v3.h
+@@ -9,6 +9,8 @@
+ #ifndef __ASM_AARCH32_GICV3_H
+ #define __ASM_AARCH32_GICV3_H
+ 
++#define ICC_CTLR_RESET (0UL)
++
+ static inline void gic_write_icc_sre(uint32_t val)
+ {
+ 	asm volatile ("mcr p15, 6, %0, c12, c12, 5" : : "r" (val));
+@@ -19,4 +21,9 @@ static inline void gic_write_icc_ctlr(uint32_t val)
+ 	asm volatile ("mcr p15, 6, %0, c12, c12, 4" : : "r" (val));
+ }
+ 
++static inline void gic_init_icc_ctlr()
++{
++	gic_write_icc_ctlr(ICC_CTLR_RESET);
++}
++
+ #endif
+diff --git a/arch/aarch64/include/asm/gic-v3.h b/arch/aarch64/include/asm/gic-v3.h
+index 5b32380..090ab0b 100644
+--- a/arch/aarch64/include/asm/gic-v3.h
++++ b/arch/aarch64/include/asm/gic-v3.h
+@@ -15,14 +15,31 @@
+ #define ICC_CTLR_EL3	"S3_6_C12_C12_4"
+ #define ICC_PMR_EL1	"S3_0_C4_C6_0"
+ 
++#define ICC_CTLR_EL3_RESET     (0UL)
++#define ICC_CTLR_EL1_RESET     (0UL)
++
++static inline uint32_t current_el(void)
++{
++	uint32_t val;
++
++	asm volatile ("mrs %0, CurrentEL" : "=r" (val));
++	return val;
++}
++
+ static inline void gic_write_icc_sre(uint32_t val)
+ {
+-	asm volatile ("msr " ICC_SRE_EL3 ", %0" : : "r" (val));
++	if (current_el() == CURRENTEL_EL3)
++		asm volatile ("msr " ICC_SRE_EL3 ", %0" : : "r" (val));
++	else
++		asm volatile ("msr " ICC_SRE_EL2 ", %0" : : "r" (val));
+ }
+ 
+-static inline void gic_write_icc_ctlr(uint32_t val)
++static inline void gic_init_icc_ctlr()
+ {
+-	asm volatile ("msr " ICC_CTLR_EL3 ", %0" : : "r" (val));
++	if (current_el() == CURRENTEL_EL3)
++		asm volatile ("msr " ICC_CTLR_EL3 ", %0" : : "r" (ICC_CTLR_EL3_RESET));
++	else
++		asm volatile ("msr " ICC_CTLR_EL1 ", %0" : : "r" (ICC_CTLR_EL1_RESET));
+ }
+ 
+ #endif
+diff --git a/common/gic-v3.c b/common/gic-v3.c
+index 6207007..a0fe564 100644
+--- a/common/gic-v3.c
++++ b/common/gic-v3.c
+@@ -117,6 +117,6 @@ void gic_secure_init(void)
+ 	gic_write_icc_sre(ICC_SRE_Enable | ICC_SRE_DIB | ICC_SRE_DFB | ICC_SRE_SRE);
+ 	isb();
+ 
+-	gic_write_icc_ctlr(0);
++	gic_init_icc_ctlr();
+ 	isb();
+ }

@@ -1,0 +1,56 @@
+From a63878c01597e21451c2b3f239cbf0a2fbdeeadf Mon Sep 17 00:00:00 2001
+From: Robin Murphy <robin.murphy@arm.com>
+Date: Fri, 3 Dec 2021 11:44:56 +0000
+Subject: [PATCH 09/14] perf/arm-cmn: Optimise DTM counter reads
+
+When multiple nodes of the same type are connected to the same XP
+(particularly in CAL configurations), it seems that they are likely
+to be consecutive in logical ID. Therefore, we're likely to gain a
+small benefit from an easy tweak to optimise out consecutive reads
+of the same set of DTM counters for an aggregated event.
+
+Signed-off-by: Robin Murphy <robin.murphy@arm.com>
+Link: https://lore.kernel.org/r/7777d77c2df17693cd3dabb6e268906e15238d82.1638530442.git.robin.murphy@arm.com
+Signed-off-by: Will Deacon <will@kernel.org>
+
+Upstream-Status: Backport [https://lore.kernel.org/r/7777d77c2df17693cd3dabb6e268906e15238d82.1638530442.git.robin.murphy@arm.com]
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com>
+---
+ drivers/perf/arm-cmn.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/perf/arm-cmn.c b/drivers/perf/arm-cmn.c
+index 2ae3e92690a7..5fa31ebc1fce 100644
+--- a/drivers/perf/arm-cmn.c
++++ b/drivers/perf/arm-cmn.c
+@@ -690,18 +690,19 @@ static void arm_cmn_pmu_disable(struct pmu *pmu)
+ static u64 arm_cmn_read_dtm(struct arm_cmn *cmn, struct arm_cmn_hw_event *hw,
+ 			    bool snapshot)
+ {
++	struct arm_cmn_dtm *dtm = NULL;
+ 	struct arm_cmn_node *dn;
+-	unsigned int i, offset;
+-	u64 count = 0;
++	unsigned int i, offset, dtm_idx;
++	u64 reg, count = 0;
+ 
+ 	offset = snapshot ? CMN_DTM_PMEVCNTSR : CMN_DTM_PMEVCNT;
+ 	for_each_hw_dn(hw, dn, i) {
+-		struct arm_cmn_dtm *dtm = &cmn->dtms[dn->dtm];
+-		int dtm_idx = arm_cmn_get_index(hw->dtm_idx, i);
+-		u64 reg = readq_relaxed(dtm->base + offset);
+-		u16 dtm_count = reg >> (dtm_idx * 16);
+-
+-		count += dtm_count;
++		if (dtm != &cmn->dtms[dn->dtm]) {
++			dtm = &cmn->dtms[dn->dtm];
++			reg = readq_relaxed(dtm->base + offset);
++		}
++		dtm_idx = arm_cmn_get_index(hw->dtm_idx, i);
++		count += (u16)(reg >> (dtm_idx * 16));
+ 	}
+ 	return count;
+ }
+-- 
+2.25.1
+

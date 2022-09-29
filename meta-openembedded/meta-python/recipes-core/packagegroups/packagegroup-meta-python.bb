@@ -515,6 +515,7 @@ RDEPENDS:packagegroup-meta-python3-ptest = "\
     python3-pyserial-ptest \
     python3-pytest-lazy-fixture-ptest \
     python3-pytoml-ptest \
+    python3-pyzmq-ptest \
     python3-requests-file-ptest \
     python3-requests-toolbelt-ptest \
     python3-scrypt-ptest \

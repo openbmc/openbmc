@@ -1,0 +1,50 @@
+From 06b2a6aa70616aafab780514d9d26e85bd98d965 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 25 Aug 2022 14:02:16 -0700
+Subject: [PATCH] http/fetch: Pass a non-null buffer to
+ ne_set_request_body_buffer API
+
+Newer versions of neon has added a check for non-null arguments for
+ne_set_request_body_buffer() API and this is triggered but older
+compiler only treats -Wnonnull as warning so all was fine, however gcc
+12.2 has started to throw this warning as error by default and builds
+are breaking
+
+Fixes
+src/HTTPFetch.cc:186:38: warning: null passed to a callee that requires a non-null argument [-Wnonnull]
+                        ne_set_request_body_buffer(req,0,0);
+                                                       ~  ^
+Upstream-Status: Submitted [https://github.com/metabrainz/libmusicbrainz/pull/18]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/HTTPFetch.cc | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/HTTPFetch.cc b/src/HTTPFetch.cc
+index baec359..0c0d919 100644
+--- a/src/HTTPFetch.cc
++++ b/src/HTTPFetch.cc
+@@ -182,8 +182,10 @@ int MusicBrainz5::CHTTPFetch::Fetch(const std::string& URL, const std::string& R
+ 		}
+ 
+ 		ne_request *req = ne_request_create(sess, Request.c_str(), URL.c_str());
++		ne_buffer *body = ne_buffer_create();
++
+ 		if (Request=="PUT")
+-			ne_set_request_body_buffer(req,0,0);
++			ne_set_request_body_buffer(req, body->data, ne_buffer_size(body));
+ 
+ 		if (Request!="GET")
+ 			ne_set_request_flag(req, NE_REQFLAG_IDEMPOTENT, 0);
+@@ -195,6 +197,8 @@ int MusicBrainz5::CHTTPFetch::Fetch(const std::string& URL, const std::string& R
+ 
+ 		Ret=m_d->m_Data.size();
+ 
++		ne_buffer_destroy(body);
++
+ 		ne_request_destroy(req);
+ 
+ 		m_d->m_ErrorMessage = ne_get_error(sess);
+-- 
+2.37.2
+

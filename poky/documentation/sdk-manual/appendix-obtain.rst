@@ -4,8 +4,22 @@
 Obtaining the SDK
 *****************
 
+Working with the SDK components directly in a Yocto build
+=========================================================
+
+Please refer to section
+":ref:`sdk-manual/extensible:Setting up the Extensible SDK environment directly in a Yocto build`"
+
+Note that to use this feature effectively either a powerful build
+machine, or a well-functioning sstate cache infrastructure is required:
+otherwise significant time could be spent waiting for components to be built
+by BitBake from source code.
+
+Working with standalone SDK Installers
+======================================
+
 Locating Pre-Built SDK Installers
-=================================
+---------------------------------
 
 You can use existing, pre-built toolchains by locating and running an
 SDK installer script that ships with the Yocto Project. Using this
@@ -72,7 +86,7 @@ Follow these steps to locate and hand-install the toolchain:
    section for more information.
 
 Building an SDK Installer
-=========================
+-------------------------
 
 As an alternative to locating and downloading an SDK installer, you can
 build the SDK installer. Follow these steps:

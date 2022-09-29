@@ -1,0 +1,4 @@
+bootloader --ptable gpt --configfile="qemuarm64.cfg"
+
+part /boot --ondisk=vda --align 64 --size=100M --active --source bootimg-partition --fstype=ext4 --label boot --sourceparams="loader=u-boot"
+part /     --ondisk=vda                                 --source rootfs            --fstype=ext4 --label root

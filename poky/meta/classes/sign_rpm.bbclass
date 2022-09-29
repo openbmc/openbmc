@@ -1,3 +1,9 @@
+#
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
+
 # Class for generating signed RPM packages.
 #
 # Configuration variables used by this class:

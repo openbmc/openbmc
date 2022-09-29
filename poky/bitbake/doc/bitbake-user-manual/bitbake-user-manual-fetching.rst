@@ -688,6 +688,8 @@ Here is an example URL::
 
 It can also be used when setting mirrors definitions using the :term:`PREMIRRORS` variable.
 
+.. _crate-fetcher:
+
 Crate Fetcher (``crate://``)
 ----------------------------
 
@@ -704,6 +706,80 @@ Here is an example URL::
 
    SRC_URI = "crate://crates.io/glob/0.2.11"
 
+.. _npm-fetcher:
+
+NPM Fetcher (``npm://``)
+------------------------
+
+This submodule fetches source code from an
+`NPM <https://en.wikipedia.org/wiki/Npm_(software)>`__
+Javascript package registry.
+
+The format for the :term:`SRC_URI` setting must be::
+
+   SRC_URI = "npm://some.registry.url;ParameterA=xxx;ParameterB=xxx;..."
+
+This fetcher supports the following parameters:
+
+-  *"package":* The NPM package name. This is a mandatory parameter.
+
+-  *"version":* The NPM package version. This is a mandatory parameter.
+
+-  *"downloadfilename":* Specifies the filename used when storing the downloaded file.
+
+-  *"destsuffix":* Specifies the directory to use to unpack the package (default: ``npm``).
+
+Note that NPM fetcher only fetches the package source itself. The dependencies
+can be fetched through the `npmsw-fetcher`_.
+
+Here is an example URL with both fetchers::
+
+   SRC_URI = " \
+       npm://registry.npmjs.org/;package=cute-files;version=${PV} \
+       npmsw://${THISDIR}/${BPN}/npm-shrinkwrap.json \
+       "
+
+See :yocto_docs:`Creating Node Package Manager (NPM) Packages
+</dev-manual/common-tasks.html#creating-node-package-manager-npm-packages>`
+in the Yocto Project manual for details about using
+:yocto_docs:`devtool <https://docs.yoctoproject.org/ref-manual/devtool-reference.html>`
+to automatically create a recipe from an NPM URL.
+
+.. _npmsw-fetcher:
+
+NPM shrinkwrap Fetcher (``npmsw://``)
+-------------------------------------
+
+This submodule fetches source code from an
+`NPM shrinkwrap <https://docs.npmjs.com/cli/v8/commands/npm-shrinkwrap>`__
+description file, which lists the dependencies
+of an NPM package while locking their versions.
+
+The format for the :term:`SRC_URI` setting must be::
+
+   SRC_URI = "npmsw://some.registry.url;ParameterA=xxx;ParameterB=xxx;..."
+
+This fetcher supports the following parameters:
+
+-  *"dev":* Set this parameter to ``1`` to install "devDependencies".
+
+-  *"destsuffix":* Specifies the directory to use to unpack the dependencies
+   (``${S}`` by default).
+
+Note that the shrinkwrap file can also be provided by the recipe for
+the package which has such dependencies, for example::
+
+   SRC_URI = " \
+       npm://registry.npmjs.org/;package=cute-files;version=${PV} \
+       npmsw://${THISDIR}/${BPN}/npm-shrinkwrap.json \
+       "
+
+Such a file can automatically be generated using
+:yocto_docs:`devtool <https://docs.yoctoproject.org/ref-manual/devtool-reference.html>`
+as described in the :yocto_docs:`Creating Node Package Manager (NPM) Packages
+</dev-manual/common-tasks.html#creating-node-package-manager-npm-packages>`
+section of the Yocto Project.
+
 Other Fetchers
 --------------
 
@@ -712,8 +788,6 @@ Fetch submodules also exist for the following:
 -  Bazaar (``bzr://``)
 
 -  Mercurial (``hg://``)
-
--  npm (``npm://``)
 
 -  OSC (``osc://``)
 

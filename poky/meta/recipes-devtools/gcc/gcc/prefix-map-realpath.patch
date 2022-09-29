@@ -1,0 +1,63 @@
+Relative paths don't work with -fdebug-prefix-map and friends. This
+can lead to paths which the user wanted to be remapped being missed.
+Setting -fdebug-prefix-map to work with a relative path isn't practical
+either.
+
+Instead, call gcc's realpath function on the incomming path name before
+comparing it with the remapping. This means other issues like symlinks
+are also accounted for and leads to a more consistent remapping experience.
+
+Upstream-Status: Submitted [https://gcc.gnu.org/pipermail/gcc-patches/2022-August/599885.html]
+[Also https://gcc.gnu.org/pipermail/gcc-patches/2022-August/599884.html]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+
+Index: gcc-12.1.0/gcc/file-prefix-map.cc
+===================================================================
+--- gcc-12.1.0.orig/gcc/file-prefix-map.cc
++++ gcc-12.1.0/gcc/file-prefix-map.cc
+@@ -70,19 +70,28 @@ remap_filename (file_prefix_map *maps, c
+   file_prefix_map *map;
+   char *s;
+   const char *name;
++  char *realname;
+   size_t name_len;
+ 
++  if (lbasename (filename) == filename)
++    return filename;
++
++  realname = lrealpath (filename);
++
+   for (map = maps; map; map = map->next)
+-    if (filename_ncmp (filename, map->old_prefix, map->old_len) == 0)
++    if (filename_ncmp (realname, map->old_prefix, map->old_len) == 0)
+       break;
+-  if (!map)
++  if (!map) {
++    free (realname);
+     return filename;
+-  name = filename + map->old_len;
++  }
++  name = realname + map->old_len;
+   name_len = strlen (name) + 1;
+ 
+   s = (char *) ggc_alloc_atomic (name_len + map->new_len);
+   memcpy (s, map->new_prefix, map->new_len);
+   memcpy (s + map->new_len, name, name_len);
++  free (realname);
+   return s;
+ }
+ 
+Index: gcc-12.1.0/libcpp/macro.cc
+===================================================================
+--- gcc-12.1.0.orig/libcpp/macro.cc
++++ gcc-12.1.0/libcpp/macro.cc
+@@ -563,7 +563,7 @@ _cpp_builtin_macro_text (cpp_reader *pfi
+ 	    if (!name)
+ 	      abort ();
+ 	  }
+-	if (pfile->cb.remap_filename)
++	if (pfile->cb.remap_filename && !pfile->state.in_directive)
+ 	  name = pfile->cb.remap_filename (name);
+ 	len = strlen (name);
+ 	buf = _cpp_unaligned_alloc (pfile, len * 2 + 3);

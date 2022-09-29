@@ -9,9 +9,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=00a27da7ac0f9bcd17320ec29ef4bbf6"
 
 DEPENDS = "alsa-lib libpcre virtual/egl boost freetype dbus openssl libssh virtual/libomxil coreutils-native curl-native userland"
 
-PR = "r5"
+PR = "r6"
 
-SRCREV_default = "f543a0d0e707ab56415f17b0ca6d397394ee8b63"
+SRCREV_default = "1f1d0ccd65d3a1caa86dc79d2863a8f067c8e3f8"
 
 # omxplayer builds its own copy of ffmpeg from source instead of using the
 # system's ffmpeg library. This isn't ideal but it's ok for now. We do however
@@ -83,6 +83,8 @@ export INCLUDES = "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", " -D_
 export DIST = "${D}"
 
 do_compile() {
+    bbwarn "omxplayer is being deprecated and resources are directed at improving vlc."
+
     # Needed for compiler test in ffmpeg's configure
     mkdir -p tmp
 

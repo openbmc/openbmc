@@ -1,0 +1,143 @@
+[
+  {
+    "Desc": {
+      "Name": "Virtual_CFM_Sensor",
+      "SensorType": "airflow"
+    },
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "fan0",
+          "Desc": {
+            "Name": "FAN0_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        },
+        {
+          "ParamName": "fan1",
+          "Desc": {
+            "Name": "FAN1_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        },
+        {
+          "ParamName": "fan2",
+          "Desc": {
+            "Name": "FAN2_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        },
+        {
+          "ParamName": "fan3",
+          "Desc": {
+            "Name": "FAN3_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        }
+      ]
+    },
+    "Expression": "max(0, (avg(fan0, fan1, fan2, fan3) * 0.0448) - 9.5042)"
+  },
+  {
+    "Desc": {
+      "Name": "Virtual_Inlet_Temp",
+      "SensorType": "temperature"
+    },
+    "Threshold": {
+      "CriticalHigh": 40,
+      "CriticalLow": 0
+    },
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "inlet_temp",
+          "Desc": {
+            "Name": "FRONT_PANEL_TEMP",
+            "SensorType": "temperature"
+          }
+        },
+        {
+          "ParamName": "fan0",
+          "Desc": {
+            "Name": "FAN0_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        },
+        {
+          "ParamName": "fan1",
+          "Desc": {
+            "Name": "FAN1_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        },
+        {
+          "ParamName": "fan2",
+          "Desc": {
+            "Name": "FAN2_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        },
+        {
+          "ParamName": "fan3",
+          "Desc": {
+            "Name": "FAN3_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        }
+      ]
+    },
+    "Expression": [
+      "if(",
+      "   avg(fan0, fan1, fan2, fan3) > 0,",
+      "   inlet_temp - (((avg(fan0, fan1, fan2, fan3)^2) * (5e-8)) -",
+      "       (avg(fan0, fan1, fan2, fan3) * (6e-4)) + 1.5841),",
+      "   inlet_temp)"
+    ]
+  },
+  {
+    "Desc": {
+      "Name": "Virtual_P12V_AUX_HSC_Input_Power",
+      "SensorType": "power"
+    },
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "HSC_PWR",
+          "Desc": {
+            "Name": "P12V_AUX_HSC_Input_Power",
+            "SensorType": "power"
+          }
+        }
+      ]
+    },
+    "Expression": [
+      "var PWR[9]:={",
+      "  68.082, 131.899, 194.753, 256.391, 316.721, 376.108, 433.569,",
+      "  490.850, 546.187 };",
+      "var ERR[9]:={",
+      "  0.0425, 0.0497, 0.0537, 0.0555, 0.0565, 0.0577, 0.0587, 0.0597,",
+      "  0.0603 };",
+      "switch {",
+      "  case HSC_PWR<PWR[0]:",
+      "    HSC_PWR/(1+ERR[0]);",
+      "  case inrange(PWR[0],HSC_PWR,PWR[1]):",
+      "    HSC_PWR/(1+ERR[0]+(HSC_PWR-PWR[0])*(ERR[1]-ERR[0])/(PWR[1]-PWR[0]));",
+      "  case inrange(PWR[1],HSC_PWR,PWR[2]):",
+      "    HSC_PWR/(1+ERR[1]+(HSC_PWR-PWR[1])*(ERR[2]-ERR[1])/(PWR[2]-PWR[1]));",
+      "  case inrange(PWR[2],HSC_PWR,PWR[3]):",
+      "    HSC_PWR/(1+ERR[2]+(HSC_PWR-PWR[2])*(ERR[3]-ERR[2])/(PWR[3]-PWR[2]));",
+      "  case inrange(PWR[3],HSC_PWR,PWR[4]):",
+      "    HSC_PWR/(1+ERR[3]+(HSC_PWR-PWR[3])*(ERR[4]-ERR[3])/(PWR[4]-PWR[3]));",
+      "  case inrange(PWR[4],HSC_PWR,PWR[5]):",
+      "    HSC_PWR/(1+ERR[4]+(HSC_PWR-PWR[4])*(ERR[5]-ERR[4])/(PWR[5]-PWR[4]));",
+      "  case inrange(PWR[5],HSC_PWR,PWR[6]):",
+      "    HSC_PWR/(1+ERR[5]+(HSC_PWR-PWR[5])*(ERR[6]-ERR[5])/(PWR[6]-PWR[5]));",
+      "  case inrange(PWR[6],HSC_PWR,PWR[7]):",
+      "    HSC_PWR/(1+ERR[6]+(HSC_PWR-PWR[6])*(ERR[7]-ERR[6])/(PWR[7]-PWR[6]));",
+      "  case inrange(PWR[7],HSC_PWR,PWR[8]):",
+      "    HSC_PWR/(1+ERR[7]+(HSC_PWR-PWR[7])*(ERR[8]-ERR[7])/(PWR[8]-PWR[7]));",
+      "  default : HSC_PWR/(1+ERR[8]);",
+      "}"
+    ]
+  }
+]

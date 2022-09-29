@@ -28,7 +28,6 @@ AMPERE_MONITOR_INSTANCES = " \
 SYSTEMD_ENVIRONMENT_FILE:${PN} +=" \
                                   obmc/gpio/reboot_ack \
                                   obmc/gpio/shutdown_ack \
-                                  obmc/gpio/id_button \
                                   obmc/gpio/S0_scp_auth_failure \
                                   obmc/gpio/S0_overtemp \
                                   obmc/gpio/S0_hightemp_start \
@@ -57,7 +56,6 @@ SYSTEMD_SERVICE:${PN} += " \
                           ampere_fault_led_start@.service \
                           ampere_fault_led_stop@.service \
                           psu_hotswap_reset@.service \
-                          id-button-pressed.service \
                           ampere_scp_failover.service \
                          "
 SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT', 'AMPERE_MONITOR_INSTANCES')}"

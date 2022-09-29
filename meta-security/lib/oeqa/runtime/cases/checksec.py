@@ -19,7 +19,7 @@ class CheckSecTest(OERuntimeTestCase):
 
     @OETestDepends(['checksec.CheckSecTest.test_checksec_help'])
     def test_checksec_xml(self):
-        status, output = self.target.run('checksec --format xml --proc-all')
+        status, output = self.target.run('checksec --format=xml --proc=1')
         msg = ('checksec xml failed. Output: %s' % output)
         self.assertEqual(status, 0, msg = msg)
 

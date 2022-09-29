@@ -1,25 +1,25 @@
 ## This is information on the rust-snapshot (binary) used to build our current release.
-## snapshot info is taken from rust/src/stage0.txt
+## snapshot info is taken from rust/src/stage0.json
 ## Rust is self-hosting and bootstraps itself with a pre-built previous version of itself.
 ## The exact (previous) version that has been used is specified in the source tarball.
 ## The version is replicated here.
 ## TODO: find a way to add additional SRC_URIs based on the contents of an
 ##       earlier SRC_URI.
-RS_VERSION = "1.59.0"
-CARGO_VERSION = "1.59.0"
+RS_VERSION = "1.62.0"
+CARGO_VERSION = "1.62.0"
 
 # TODO: Add hashes for other architecture toolchains as well. Make a script?
-SRC_URI[rust-std-snapshot-x86_64.sha256sum] = "c854a9ee3dd8e5be9522c1581f75838c1cbae6dece3934b0004f138c4a5024a3"
-SRC_URI[rustc-snapshot-x86_64.sha256sum] = "838de1fef855ef7733a87862c2575e8da9f3fa11fd0a8ce05c293038ea92356e"
-SRC_URI[cargo-snapshot-x86_64.sha256sum] = "f56ebfb333ea46e4429377bf4b16a2ec889d61640a41c3093577cdd8f3c80b96"
+SRC_URI[rust-std-snapshot-x86_64.sha256sum] = "addfae87b6b1b521d98a50fdc5120990888a51bb397100062e9c558267c67c77"
+SRC_URI[rustc-snapshot-x86_64.sha256sum] = "e7f71f4ef09334ddc9ec8cbf2f958d654e36f580c95f8fec6d5c816ce256dbd6"
+SRC_URI[cargo-snapshot-x86_64.sha256sum] = "815c63119a9cf0282ff240c6444b6f867238763ee3dea182f10837ae7dbbb1d4"
 
-SRC_URI[rust-std-snapshot-aarch64.sha256sum] = "68e50dee4f6dddeab7330906e46022f57f2c004c847eae3f5b1bc82c59e43fc0"
-SRC_URI[rustc-snapshot-aarch64.sha256sum] = "d9789013ef6edd76eae3e7427b48f420a036ab3ee2af883e60baa33a9e1c23d7"
-SRC_URI[cargo-snapshot-aarch64.sha256sum] = "11b8da4b90ff74c6c796a3d6c1f5150de23c411ed2546e10b301077b904191fd"
+SRC_URI[rust-std-snapshot-aarch64.sha256sum] = "dd5df8a92af3e5d49a1122b9561821ebd72a9317884a37ecddae041e652a7563"
+SRC_URI[rustc-snapshot-aarch64.sha256sum] = "0fa320a19d41dcfc592bc006f5e9eda8e3b972598a26c96ad64eedd868516df3"
+SRC_URI[cargo-snapshot-aarch64.sha256sum] = "475038ecacca9ff586cad2082d5d950544b0d581a2a287facc7d899aae488813"
 
-SRC_URI[rust-std-snapshot-powerpc64le.sha256sum] = "15dee7705967e3351aff11c64ada30c4957b54066c7ee49b87be4b8155bd0a7d"
-SRC_URI[rustc-snapshot-powerpc64le.sha256sum] = "e5458f55e51f8baecab4ff1e43fae5c6e1c40d8171098ab633747ee0684b37bb"
-SRC_URI[cargo-snapshot-powerpc64le.sha256sum] = "fdab44481286db3ea8f4b6d409e648355009ef458188352d5e2c5799f7614fbd"
+SRC_URI[rust-std-snapshot-powerpc64le.sha256sum] = "d6678b7c971f3adbe7f820adae669d03a314468441e2907747c76eca98e0be92"
+SRC_URI[rustc-snapshot-powerpc64le.sha256sum] = "b66d0bc6dbfdc0d4b826f787ec4e772dea8e3d2015cecbe2105632d468c28dcb"
+SRC_URI[cargo-snapshot-powerpc64le.sha256sum] = "016257f1641693008068bd086fec66d68550d1778f6aea9d06c9b263fca392d5"
 
 SRC_URI += " \
     https://static.rust-lang.org/dist/${RUST_STD_SNAPSHOT}.tar.xz;name=rust-std-snapshot-${RUST_BUILD_ARCH};subdir=rust-snapshot-components \

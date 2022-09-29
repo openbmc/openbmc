@@ -1,0 +1,92 @@
+From 736bd8aeceefd474c15a97e4a4ec99f07ef9a82c Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Fri, 11 Feb 2022 18:28:43 +0000
+Subject: [PATCH 2/4] tc0: fix mpmm config
+
+Do not enable MPMM in standard features set.
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Change-Id: I7b273a2055452e2e8cd78a0d932514a6f2947ec5
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ product/tc0/scp_ramfw/config_mpmm.c | 15 ---------------
+ 1 file changed, 15 deletions(-)
+
+diff --git a/product/tc0/scp_ramfw/config_mpmm.c b/product/tc0/scp_ramfw/config_mpmm.c
+index 3bfe99d3..13d866a5 100644
+--- a/product/tc0/scp_ramfw/config_mpmm.c
++++ b/product/tc0/scp_ramfw/config_mpmm.c
+@@ -27,7 +27,6 @@ enum core_pd_idx {
+     CORE7_IDX
+ };
+ 
+-#if defined(PLATFORM_VARIANT) && (PLATFORM_VARIANT == TC0_VARIANT_STD)
+ static struct mod_mpmm_pct_table k_pct[] = {
+     { .cores_online = 4,
+       .default_perf_limit = 1153 * 1000000UL,
+@@ -115,7 +114,6 @@ static struct mod_mpmm_pct_table m_pct[] = {
+                           },
+                         } },
+ };
+-#endif
+ 
+ static struct mod_mpmm_pct_table m_elp_pct[] = {
+     { .cores_online = 1,
+@@ -132,7 +130,6 @@ static struct mod_mpmm_pct_table m_elp_pct[] = {
+                         } },
+ };
+ 
+-#if defined(PLATFORM_VARIANT) && (PLATFORM_VARIANT == TC0_VARIANT_STD)
+ static const struct mod_mpmm_core_config k_core_config[] = {
+     [0] = {
+         .pd_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN, CORE0_IDX),
+@@ -180,7 +177,6 @@ static const struct mod_mpmm_core_config m_core_config[] = {
+         .core_starts_online = false,
+         },
+ };
+-#endif
+ 
+ static const struct mod_mpmm_core_config m_elp_core_config[] = {
+     [0] = {
+@@ -191,7 +187,6 @@ static const struct mod_mpmm_core_config m_elp_core_config[] = {
+         },
+ };
+ 
+-#if defined(PLATFORM_VARIANT) && (PLATFORM_VARIANT == TC0_VARIANT_STD)
+ static const struct mod_mpmm_domain_config k_domain_conf[] = {
+     [0] = {
+         .perf_id = FWK_ID_ELEMENT_INIT(
+@@ -219,7 +214,6 @@ static const struct mod_mpmm_domain_config m_domain_conf[] = {
+     },
+     [1] = {0},
+ };
+-#endif
+ 
+ static const struct mod_mpmm_domain_config m_elp_domain_conf[] = {
+     [0] = {
+@@ -236,14 +230,6 @@ static const struct mod_mpmm_domain_config m_elp_domain_conf[] = {
+ };
+ 
+ static const struct fwk_element element_table[] = {
+-#if defined(PLATFORM_VARIANT) && (PLATFORM_VARIANT == TC0_VAR_EXPERIMENT_POWER)
+-    [0] = {
+-        .name = "MPMM_MATTERHORN_ELP_ARM_ELEM",
+-        .sub_element_count = 1,
+-        .data = m_elp_domain_conf,
+-    },
+-    [1] = { 0 },
+-#else
+     [0] = {
+         .name = "MPMM_KLEIN_ELEM",
+         .sub_element_count = 4,
+@@ -260,7 +246,6 @@ static const struct fwk_element element_table[] = {
+         .data = m_elp_domain_conf,
+     },
+     [3] = { 0 },
+-#endif
+ };
+ 
+ static const struct fwk_element *mpmm_get_element_table(fwk_id_t module_id)
+-- 
+2.30.2
+

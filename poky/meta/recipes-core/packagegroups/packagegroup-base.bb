@@ -267,11 +267,14 @@ RRECOMMENDS:packagegroup-base-ipsec = "\
 # packagegroup-base-wifi contain everything needed to get WiFi working
 # WEP/WPA connection needs to be supported out-of-box
 #
+# Choose either 'wpa-supplicant' or 'iwd' as wireless-daemon
+WIRELESS_DAEMON ??= "wpa-supplicant"
 SUMMARY:packagegroup-base-wifi = "WiFi support"
 RDEPENDS:packagegroup-base-wifi = "\
     iw \
     wireless-regdb-static \
-    wpa-supplicant"
+    ${WIRELESS_DAEMON} \
+"
 
 RRECOMMENDS:packagegroup-base-wifi = "\
     ${@bb.utils.contains('COMBINED_FEATURES', 'usbhost', 'kernel-module-zd1211rw', '',d)} \

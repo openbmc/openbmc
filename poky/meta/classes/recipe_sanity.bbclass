@@ -1,3 +1,9 @@
+#
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
+
 def __note(msg, d):
     bb.note("%s: recipe_sanity: %s" % (d.getVar("P"), msg))
 

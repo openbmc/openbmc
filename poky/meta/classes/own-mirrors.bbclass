@@ -1,3 +1,9 @@
+#
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
+
 PREMIRRORS:prepend = " \
 cvs://.*/.*     ${SOURCE_MIRROR_URL} \
 svn://.*/.*     ${SOURCE_MIRROR_URL} \

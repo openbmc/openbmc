@@ -19,6 +19,7 @@ UPSTREAM_CHECK_URI = "https://github.com/libffi/libffi/releases/"
 UPSTREAM_CHECK_REGEX = "libffi-(?P<pver>\d+(\.\d+)+)\.tar"
 
 EXTRA_OECONF += "--disable-builddir --disable-exec-static-tramp"
+EXTRA_OECONF:class-native += "--with-gcc-arch=generic"
 EXTRA_OEMAKE:class-target = "LIBTOOLFLAGS='--tag=CC'"
 inherit autotools texinfo multilib_header
 
@@ -33,4 +34,3 @@ FILES:${PN}-dev += "${libdir}/libffi-${PV}"
 MIPS_INSTRUCTION_SET = "mips"
 
 BBCLASSEXTEND = "native nativesdk"
-

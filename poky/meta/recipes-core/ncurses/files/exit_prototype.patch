@@ -1,0 +1,22 @@
+Add needed headers for including mbstate_t and exit()
+
+Upstream-Status: Inappropriate [Reconfigure will solve it]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/configure
++++ b/configure
+@@ -3422,6 +3422,7 @@ rm -f "conftest.$ac_objext" "conftest.$a
+   cat >"conftest.$ac_ext" <<_ACEOF
+ #line 3423 "configure"
+ #include "confdefs.h"
++#include <stdlib.h>
+ $ac_declaration
+ int
+ main (void)
+@@ -12997,6 +12998,7 @@ cat >"conftest.$ac_ext" <<_ACEOF
+ #include <stdlib.h>
+ #include <stdarg.h>
+ #include <stdio.h>
++#include <wchar.h>
+ #ifdef HAVE_LIBUTF8_H
+ #include <libutf8.h>
+ #endif

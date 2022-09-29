@@ -1,4 +1,4 @@
-From 54883e714b7fd1e7f4ce47eb1fc09adff35d561e Mon Sep 17 00:00:00 2001
+From cc0cd6f71f6ef96fca2d7b730a3f0f6722fec696 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 7 May 2022 12:15:22 -0700
 Subject: [PATCH] Define strndupa if it does not exist
@@ -7,17 +7,18 @@ musl e.g. does not supply strndupa, unlike glibc
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  etc/systemd/system-generators/zfs-mount-generator.c | 9 +++++++++
  1 file changed, 9 insertions(+)
 
 diff --git a/etc/systemd/system-generators/zfs-mount-generator.c b/etc/systemd/system-generators/zfs-mount-generator.c
-index b806339..592d2f9 100644
+index f4c6c26..255bee4 100644
 --- a/etc/systemd/system-generators/zfs-mount-generator.c
 +++ b/etc/systemd/system-generators/zfs-mount-generator.c
-@@ -47,6 +47,15 @@
- #define	STRCMP ((int(*)(const void *, const void *))&strcmp)
- #define	PID_T_CMP ((int(*)(const void *, const void *))&pid_t_cmp)
+@@ -193,6 +193,15 @@ fopenat(int dirfd, const char *pathname, int flags,
+ 	return (fdopen(fd, stream_mode));
+ }
  
 +#ifndef strndupa
 +#define strndupa(s, n) \
@@ -29,8 +30,5 @@ index b806339..592d2f9 100644
 +#endif
 +
  static int
- pid_t_cmp(const pid_t *lhs, const pid_t *rhs)
+ line_worker(char *line, const char *cachefile)
  {
--- 
-2.36.0
-

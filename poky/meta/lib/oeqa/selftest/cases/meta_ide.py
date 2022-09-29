@@ -1,4 +1,6 @@
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: MIT
 #
 
@@ -16,13 +18,14 @@ class MetaIDE(OESelftestTestCase):
     def setUpClass(cls):
         super(MetaIDE, cls).setUpClass()
         bitbake('meta-ide-support')
-        bb_vars = get_bb_vars(['MULTIMACH_TARGET_SYS', 'TMPDIR', 'COREBASE'])
+        bitbake('build-sysroots')
+        bb_vars = get_bb_vars(['MULTIMACH_TARGET_SYS', 'DEPLOY_DIR_IMAGE', 'COREBASE'])
         cls.environment_script = 'environment-setup-%s' % bb_vars['MULTIMACH_TARGET_SYS']
-        cls.tmpdir = bb_vars['TMPDIR']
-        cls.environment_script_path = '%s/%s' % (cls.tmpdir, cls.environment_script)
+        cls.deploydir = bb_vars['DEPLOY_DIR_IMAGE']
+        cls.environment_script_path = '%s/%s' % (cls.deploydir, cls.environment_script)
         cls.corebasedir = bb_vars['COREBASE']
         cls.tmpdir_metaideQA = tempfile.mkdtemp(prefix='metaide')
-        
+
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls.tmpdir_metaideQA, ignore_errors=True)
@@ -49,3 +52,8 @@ class MetaIDE(OESelftestTestCase):
                         msg="Running make failed")
         self.assertEqual(self.project.run_install(), 0,
                         msg="Running make install failed")
+
+    def test_meta_ide_can_run_sdk_tests(self):
+        bitbake('-c populate_sysroot gtk+3')
+        bitbake('build-sysroots')
+        bitbake('-c testsdk meta-ide-support')

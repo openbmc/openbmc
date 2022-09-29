@@ -18,11 +18,9 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
  bindings/swig/src/auditswig.i     | 2 +-
  2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/bindings/swig/python3/Makefile.am b/bindings/swig/python3/Makefile.am
-index dd9d934..61b486d 100644
 --- a/bindings/swig/python3/Makefile.am
 +++ b/bindings/swig/python3/Makefile.am
-@@ -22,6 +22,7 @@
+@@ -23,6 +23,7 @@
  CONFIG_CLEAN_FILES = *.loT *.rej *.orig
  AM_CFLAGS = -fPIC -DPIC -fno-strict-aliasing $(PYTHON3_CFLAGS)
  AM_CPPFLAGS = -I. -I$(top_builddir) -I${top_srcdir}/lib $(PYTHON3_INCLUDES)
@@ -30,7 +28,7 @@ index dd9d934..61b486d 100644
  LIBS = $(top_builddir)/lib/libaudit.la
  SWIG_FLAGS = -python -py3 -modern
  SWIG_INCLUDES = -I. -I$(top_builddir) -I${top_srcdir}/lib $(PYTHON3_INCLUDES)
-@@ -36,7 +37,7 @@ _audit_la_DEPENDENCIES =${top_srcdir}/lib/libaudit.h ${top_builddir}/lib/libaudi
+@@ -37,7 +38,7 @@ _audit_la_DEPENDENCIES =${top_srcdir}/li
  _audit_la_LIBADD = ${top_builddir}/lib/libaudit.la
  nodist__audit_la_SOURCES  = audit_wrap.c
  audit.py audit_wrap.c: ${srcdir}/../src/auditswig.i 
@@ -39,8 +37,6 @@ index dd9d934..61b486d 100644
  
  CLEANFILES = audit.py* audit_wrap.c *~
  
-diff --git a/bindings/swig/src/auditswig.i b/bindings/swig/src/auditswig.i
-index 21aafca..dd0f62c 100644
 --- a/bindings/swig/src/auditswig.i
 +++ b/bindings/swig/src/auditswig.i
 @@ -39,7 +39,7 @@ signed
@@ -48,10 +44,7 @@ index 21aafca..dd0f62c 100644
  typedef unsigned __u32;
  typedef unsigned uid_t;
 -%include "/usr/include/linux/audit.h"
-+%include "linux/audit.h"
++%include "../lib/audit.h"
  #define __extension__ /*nothing*/
  %include <stdint.i>
  %include "../lib/libaudit.h"
--- 
-2.17.1
-

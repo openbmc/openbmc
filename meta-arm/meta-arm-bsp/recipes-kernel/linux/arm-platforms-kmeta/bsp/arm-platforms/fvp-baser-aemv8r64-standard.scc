@@ -1,0 +1,7 @@
+define KMACHINE fvp-baser-aemv8r64
+define KTYPE standard
+define KARCH arm64
+
+include ktypes/standard/standard.scc
+
+include fvp-baser-aemv8r64.scc

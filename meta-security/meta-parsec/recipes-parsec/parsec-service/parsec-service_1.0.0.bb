@@ -45,7 +45,7 @@ PARSEC_CONFIG ?= "${S}/config.toml"
 do_install () {
     # Binaries
     install -d -m 700 -o parsec -g parsec "${D}${libexecdir}/parsec"
-    install -m 700 -o parsec -g parsec "${WORKDIR}/build/target/${CARGO_TARGET_SUBDIR}/parsec" ${D}${libexecdir}/parsec/parsec
+    install -m 700 -o parsec -g parsec "${B}/target/${CARGO_TARGET_SUBDIR}/parsec" ${D}${libexecdir}/parsec/parsec
 
     # Config file
     install -d -m 700 -o parsec -g parsec "${D}${sysconfdir}/parsec"
@@ -69,9 +69,10 @@ do_install () {
 
 inherit useradd
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM:${PN} = "-r -g parsec -s /bin/false -d ${localstatedir}/lib/parsec parsec"
 GROUPADD_PARAM:${PN} = "-r parsec"
-GROUPMEMS_PARAM:${PN} = "${@bb.utils.contains('PACKAGECONFIG_CONFARGS', 'tpm-provider', '-a parsec -g tss', '', d)}"
+USERADD_PARAM:${PN} = "-r -g parsec -s /bin/false -d ${localstatedir}/lib/parsec parsec"
+GROUPMEMS_PARAM:${PN} = "${@bb.utils.contains('PACKAGECONFIG_CONFARGS', 'tpm-provider', '-a parsec -g tss ;', '', d)}"
+GROUPMEMS_PARAM:${PN} += "${@bb.utils.contains('PACKAGECONFIG_CONFARGS', 'trusted-service-provider', '-a parsec -g teeclnt', '', d)}"
 
 FILES:${PN} += " \
     ${sysconfdir}/parsec/config.toml \

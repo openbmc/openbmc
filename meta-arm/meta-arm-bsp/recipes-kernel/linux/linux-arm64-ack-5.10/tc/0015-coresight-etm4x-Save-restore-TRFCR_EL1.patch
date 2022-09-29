@@ -1,0 +1,181 @@
+From 7150eac72ee0c2c7da03f53a90a871c3d6d4e538 Mon Sep 17 00:00:00 2001
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Date: Tue, 14 Sep 2021 11:26:32 +0100
+Subject: [PATCH 1/2] coresight: etm4x: Save restore TRFCR_EL1
+
+When the CPU enters a low power mode, the TRFCR_EL1 contents could be
+reset. Thus we need to save/restore the TRFCR_EL1 along with the ETM4x
+registers to allow the tracing.
+
+The TRFCR related helpers are in a new header file, as we need to use
+them for TRBE in the later patches.
+
+Cc: Mathieu Poirier <mathieu.poirier@linaro.org>
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: Mike Leach <mike.leach@linaro.org>
+Cc: Leo Yan <leo.yan@linaro.org>
+Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Link: https://lore.kernel.org/r/20210914102641.1852544-2-suzuki.poulose@arm.com
+[Fixed cosmetic details]
+Signed-off-by: Mathieu Poirier <mathieu.poirier@linaro.org>
+
+Upstream-Status: Backport [https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=937d3f58cacf377cab7c32e475e1ffa91d611dce]
+Signed-off-by: Davidson K <davidson.kumaresan@arm.com>
+---
+ .../coresight/coresight-etm4x-core.c          | 43 +++++++++++++------
+ drivers/hwtracing/coresight/coresight-etm4x.h |  2 +
+ .../coresight/coresight-self-hosted-trace.h   | 24 +++++++++++
+ 3 files changed, 57 insertions(+), 12 deletions(-)
+ create mode 100644 drivers/hwtracing/coresight/coresight-self-hosted-trace.h
+
+diff --git a/drivers/hwtracing/coresight/coresight-etm4x-core.c b/drivers/hwtracing/coresight/coresight-etm4x-core.c
+index 90827077d2f9..b78080d169f8 100644
+--- a/drivers/hwtracing/coresight/coresight-etm4x-core.c
++++ b/drivers/hwtracing/coresight/coresight-etm4x-core.c
+@@ -39,6 +39,7 @@
+ 
+ #include "coresight-etm4x.h"
+ #include "coresight-etm-perf.h"
++#include "coresight-self-hosted-trace.h"
+ 
+ static int boot_enable;
+ module_param(boot_enable, int, 0444);
+@@ -990,7 +991,7 @@ static void cpu_enable_tracing(struct etmv4_drvdata *drvdata)
+ 	if (is_kernel_in_hyp_mode())
+ 		trfcr |= TRFCR_EL2_CX;
+ 
+-	write_sysreg_s(trfcr, SYS_TRFCR_EL1);
++	write_trfcr(trfcr);
+ }
+ 
+ static void etm4_init_arch_data(void *info)
+@@ -1528,7 +1529,7 @@ static void etm4_init_trace_id(struct etmv4_drvdata *drvdata)
+ 	drvdata->trcid = coresight_get_trace_id(drvdata->cpu);
+ }
+ 
+-static int etm4_cpu_save(struct etmv4_drvdata *drvdata)
++static int __etm4_cpu_save(struct etmv4_drvdata *drvdata)
+ {
+ 	int i, ret = 0;
+ 	struct etmv4_save_state *state;
+@@ -1667,7 +1668,23 @@ static int etm4_cpu_save(struct etmv4_drvdata *drvdata)
+ 	return ret;
+ }
+ 
+-static void etm4_cpu_restore(struct etmv4_drvdata *drvdata)
++static int etm4_cpu_save(struct etmv4_drvdata *drvdata)
++{
++	int ret = 0;
++
++	/* Save the TRFCR irrespective of whether the ETM is ON */
++	if (drvdata->trfc)
++		drvdata->save_trfcr = read_trfcr();
++	/*
++	 * Save and restore the ETM Trace registers only if
++	 * the ETM is active.
++	 */
++	if (local_read(&drvdata->mode) && drvdata->save_state)
++		ret = __etm4_cpu_save(drvdata);
++	return ret;
++}
++
++static void __etm4_cpu_restore(struct etmv4_drvdata *drvdata)
+ {
+ 	int i;
+ 	struct etmv4_save_state *state = drvdata->save_state;
+@@ -1763,6 +1780,14 @@ static void etm4_cpu_restore(struct etmv4_drvdata *drvdata)
+ 	etm4_cs_lock(drvdata, csa);
+ }
+ 
++static void etm4_cpu_restore(struct etmv4_drvdata *drvdata)
++{
++	if (drvdata->trfc)
++		write_trfcr(drvdata->save_trfcr);
++	if (drvdata->state_needs_restore)
++		__etm4_cpu_restore(drvdata);
++}
++
+ static int etm4_cpu_pm_notify(struct notifier_block *nb, unsigned long cmd,
+ 			      void *v)
+ {
+@@ -1774,23 +1799,17 @@ static int etm4_cpu_pm_notify(struct notifier_block *nb, unsigned long cmd,
+ 
+ 	drvdata = etmdrvdata[cpu];
+ 
+-	if (!drvdata->save_state)
+-		return NOTIFY_OK;
+-
+ 	if (WARN_ON_ONCE(drvdata->cpu != cpu))
+ 		return NOTIFY_BAD;
+ 
+ 	switch (cmd) {
+ 	case CPU_PM_ENTER:
+-		/* save the state if self-hosted coresight is in use */
+-		if (local_read(&drvdata->mode))
+-			if (etm4_cpu_save(drvdata))
+-				return NOTIFY_BAD;
++		if (etm4_cpu_save(drvdata))
++			return NOTIFY_BAD;
+ 		break;
+ 	case CPU_PM_EXIT:
+ 	case CPU_PM_ENTER_FAILED:
+-		if (drvdata->state_needs_restore)
+-			etm4_cpu_restore(drvdata);
++		etm4_cpu_restore(drvdata);
+ 		break;
+ 	default:
+ 		return NOTIFY_DONE;
+diff --git a/drivers/hwtracing/coresight/coresight-etm4x.h b/drivers/hwtracing/coresight/coresight-etm4x.h
+index e5b79bdb9851..82cba16b73a6 100644
+--- a/drivers/hwtracing/coresight/coresight-etm4x.h
++++ b/drivers/hwtracing/coresight/coresight-etm4x.h
+@@ -921,6 +921,7 @@ struct etmv4_save_state {
+  * @lpoverride:	If the implementation can support low-power state over.
+  * @trfc:	If the implementation supports Arm v8.4 trace filter controls.
+  * @config:	structure holding configuration parameters.
++ * @save_trfcr:	Saved TRFCR_EL1 register during a CPU PM event.
+  * @save_state:	State to be preserved across power loss
+  * @state_needs_restore: True when there is context to restore after PM exit
+  * @skip_power_up: Indicates if an implementation can skip powering up
+@@ -973,6 +974,7 @@ struct etmv4_drvdata {
+ 	bool				lpoverride;
+ 	bool				trfc;
+ 	struct etmv4_config		config;
++	u64				save_trfcr;
+ 	struct etmv4_save_state		*save_state;
+ 	bool				state_needs_restore;
+ 	bool				skip_power_up;
+diff --git a/drivers/hwtracing/coresight/coresight-self-hosted-trace.h b/drivers/hwtracing/coresight/coresight-self-hosted-trace.h
+new file mode 100644
+index 000000000000..303d71911870
+--- /dev/null
++++ b/drivers/hwtracing/coresight/coresight-self-hosted-trace.h
+@@ -0,0 +1,24 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Arm v8 Self-Hosted trace support.
++ *
++ * Copyright (C) 2021 ARM Ltd.
++ */
++
++#ifndef __CORESIGHT_SELF_HOSTED_TRACE_H
++#define __CORESIGHT_SELF_HOSTED_TRACE_H
++
++#include <asm/sysreg.h>
++
++static inline u64 read_trfcr(void)
++{
++	return read_sysreg_s(SYS_TRFCR_EL1);
++}
++
++static inline void write_trfcr(u64 val)
++{
++	write_sysreg_s(val, SYS_TRFCR_EL1);
++	isb();
++}
++
++#endif /*  __CORESIGHT_SELF_HOSTED_TRACE_H */
+-- 
+2.34.1
+

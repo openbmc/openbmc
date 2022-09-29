@@ -11,7 +11,7 @@ RDEPENDS:${PN} = "openssl-bin"
 
 do_install() {
   install -d ${D}/${bindir}
-  install -m 755 "${B}/target/${TARGET_SYS}/release/parsec-tool" "${D}${bindir}/parsec-tool"
+  install -m 755 "${B}/target/${CARGO_TARGET_SUBDIR}/parsec-tool" "${D}${bindir}/parsec-tool"
   install -m 755 "${S}/tests/parsec-cli-tests.sh" "${D}${bindir}/parsec-cli-tests.sh"
 }
 

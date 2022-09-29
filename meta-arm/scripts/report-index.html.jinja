@@ -1,0 +1,50 @@
+{% extends "report-base.html.jinja" %}
+{% block title %}Recipe Report{% endblock %}
+
+{% block content %}
+  <table class="table is-striped">
+    <thead>
+      <tr>
+        <th>Machine</th>
+        {% for recipe in recipes|sort %}
+        <th>{{ recipe }} ({{releases[recipe]|default("?")}})</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for machine, data in data|dictsort %}
+      <tr>
+        <th><a href="{{machine}}.html">{{ machine }}</a></th>
+        {% for recipe in recipes|sort %}
+          {% if recipe in data %}
+            {% set details = data[recipe] %}
+            <td style="text-align: center">
+            <a href="{{machine}}.html#recipe-{{details.recipe}}">
+              {{ details.recipe if details.recipe != recipe}}
+              {{ details.version }}
+            </a>
+            {% if details.patches or details.needs_update %}
+            <br>
+            {% if details.patches %}
+              <span class="tag {{ "is-info" if details.patches_safe else "is-danger" }}">
+                {% trans count=details.patches|length %}
+                  {{ count }} Patch
+                {% pluralize %}
+                  {{ count }} Patches
+                {% endtrans %}
+              </span>
+            {% endif %}
+            {% if details.needs_update %}
+              <span class="tag is-danger">Upgrade</span>
+            {% endif %}
+            {% endif %}
+            </td>
+          {% else %}
+            <td>-</td>
+          {% endif %}
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

@@ -1,0 +1,19 @@
+[Unit]
+Description=Phosphor Chassis%i State Manager
+Before=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
+Wants=obmc-mapper.target
+After=obmc-mapper.target
+After=org.openbmc.control.Power@%i.service
+Wants=xyz.openbmc_project.Logging.service
+After=xyz.openbmc_project.Logging.service
+After=host-powerctrl.service
+
+[Service]
+ExecStartPre=/bin/sleep 5
+ExecStart=/usr/bin/phosphor-chassis-state-manager --chassis %i
+Restart=always
+Type=dbus
+BusName=xyz.openbmc_project.State.Chassis%i
+
+[Install]
+WantedBy=multi-user.target

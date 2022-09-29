@@ -1,3 +1,9 @@
+#
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
+
 # IceCream distributed compiling support
 #
 # Stages directories with symlinks from gcc/g++ to icecc, for both

@@ -1,0 +1,9 @@
+header:
+  version: 11
+  includes:
+    - ci/base.yml
+
+machine: tc1
+
+target:
+  - tc-artifacts-image

@@ -444,7 +444,7 @@ class BuildPerfTestCase(unittest.TestCase):
         buildstats = []
         for fname in os.listdir(bs_dir):
             recipe_dir = os.path.join(bs_dir, fname)
-            if not os.path.isdir(recipe_dir):
+            if not os.path.isdir(recipe_dir) or fname == "reduced_proc_pressure":
                 continue
             name, epoch, version, revision = split_nevr(fname)
             recipe_bs = OrderedDict((('name', name),

@@ -1,0 +1,87 @@
+From e91fb0618ce0a5d42f239d0fca602544858f0819 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 16 Aug 2022 08:44:18 -0700
+Subject: [PATCH] Remove using std::binary_function
+
+std::binary_function and std::unary_function are deprecated since c++11
+and removed in c++17, therefore remove it and use lambda functions to get same
+functionality implemented.
+
+Upstream-Status: Submitted [https://salsa.debian.org/apt-team/apt/-/merge_requests/253]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ftparchive/apt-ftparchive.cc | 33 ++++++++++-----------------------
+ 1 file changed, 10 insertions(+), 23 deletions(-)
+
+diff --git a/ftparchive/apt-ftparchive.cc b/ftparchive/apt-ftparchive.cc
+index 87ce9153c..56fdc2246 100644
+--- a/ftparchive/apt-ftparchive.cc
++++ b/ftparchive/apt-ftparchive.cc
+@@ -48,6 +48,11 @@
+ using namespace std;
+ unsigned Quiet = 0;
+ 
++auto ContentsCompare = [](const auto &a, const auto &b) { return a.ContentsMTime < b.ContentsMTime; };
++auto DBCompare = [](const auto &a, const auto &b) { return a.BinCacheDB < b.BinCacheDB; };
++auto SrcDBCompare = [](const auto &a, const auto &b) { return a.SrcCacheDB < b.SrcCacheDB; };
++
++
+ static struct timeval GetTimevalFromSteadyClock()			/*{{{*/
+ {
+    auto const Time = std::chrono::steady_clock::now().time_since_epoch();
+@@ -116,24 +121,6 @@ struct PackageMap
+    bool SrcDone;
+    time_t ContentsMTime;
+    
+-   struct ContentsCompare : public binary_function<PackageMap,PackageMap,bool>
+-   {
+-      inline bool operator() (const PackageMap &x,const PackageMap &y)
+-      {return x.ContentsMTime < y.ContentsMTime;};
+-   };
+-    
+-   struct DBCompare : public binary_function<PackageMap,PackageMap,bool>
+-   {
+-      inline bool operator() (const PackageMap &x,const PackageMap &y)
+-      {return x.BinCacheDB < y.BinCacheDB;};
+-   };  
+-
+-   struct SrcDBCompare : public binary_function<PackageMap,PackageMap,bool>
+-   {
+-      inline bool operator() (const PackageMap &x,const PackageMap &y)
+-      {return x.SrcCacheDB < y.SrcCacheDB;};
+-   };
+-   
+    void GetGeneral(Configuration &Setup,Configuration &Block);
+    bool GenPackages(Configuration &Setup,struct CacheDB::Stats &Stats);
+    bool GenSources(Configuration &Setup,struct CacheDB::Stats &Stats);
+@@ -869,7 +856,7 @@ static bool DoGenerateContents(Configuration &Setup,
+       else
+ 	 I->ContentsMTime = A.st_mtime;
+    }
+-   stable_sort(PkgList.begin(),PkgList.end(),PackageMap::ContentsCompare());
++   stable_sort(PkgList.begin(),PkgList.end(),ContentsCompare);
+    
+    /* Now for Contents.. The process here is to do a make-like dependency
+       check. Each contents file is verified to be newer than the package files
+@@ -941,8 +928,8 @@ static bool Generate(CommandLine &CmdL)
+    LoadBinDir(PkgList,Setup);
+ 
+    // Sort by cache DB to improve IO locality.
+-   stable_sort(PkgList.begin(),PkgList.end(),PackageMap::DBCompare());
+-   stable_sort(PkgList.begin(),PkgList.end(),PackageMap::SrcDBCompare());
++   stable_sort(PkgList.begin(),PkgList.end(),DBCompare);
++   stable_sort(PkgList.begin(),PkgList.end(),SrcDBCompare);
+ 
+    // Generate packages
+    if (_config->FindB("APT::FTPArchive::ContentsOnly", false) == false)
+@@ -993,8 +980,8 @@ static bool Clean(CommandLine &CmdL)
+    LoadBinDir(PkgList,Setup);
+ 
+    // Sort by cache DB to improve IO locality.
+-   stable_sort(PkgList.begin(),PkgList.end(),PackageMap::DBCompare());
+-   stable_sort(PkgList.begin(),PkgList.end(),PackageMap::SrcDBCompare());
++   stable_sort(PkgList.begin(),PkgList.end(),DBCompare);
++   stable_sort(PkgList.begin(),PkgList.end(),SrcDBCompare);
+ 
+    string CacheDir = Setup.FindDir("Dir::CacheDir");
+ 

@@ -1,0 +1,29 @@
+From 3deb7a0eded04ab08a9cb2d88526cb1c7b440061 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 14 Aug 2022 00:23:29 -0700
+Subject: [PATCH] Skip validating xmlto output
+
+Avoids network access
+
+Upstream-Status: Submitted [https://pagure.io/xmlto/pull-request/11]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 50fa279..6a2da62 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -68,7 +68,7 @@ EXTRA_DIST = xmlto.spec \
+ 	doc/xmlif.xml \
+ 	xmlto.mak
+ 
+-GEN_MANPAGE = FORMAT_DIR=$(top_srcdir)/format $(BASH) ./xmlto -o $(@D) man $<
++GEN_MANPAGE = FORMAT_DIR=$(top_srcdir)/format $(BASH) ./xmlto --skip-validation -o $(@D) man $<
+ man/man1/xmlto.1: doc/xmlto.xml ; $(GEN_MANPAGE)
+ man/man1/xmlif.1: doc/xmlif.xml ; $(GEN_MANPAGE)
+ 
+-- 
+2.37.2
+

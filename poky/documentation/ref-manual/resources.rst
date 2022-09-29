@@ -64,22 +64,22 @@ and announcements. To subscribe to one of the following mailing lists,
 click on the appropriate URL in the following list and follow the
 instructions:
 
--  :yocto_lists:`/g/yocto` - General Yocto Project
+-  :yocto_lists:`/g/yocto` --- general Yocto Project
    discussion mailing list.
 
--  :oe_lists:`/g/openembedded-core` - Discussion mailing
+-  :oe_lists:`/g/openembedded-core` --- discussion mailing
    list about OpenEmbedded-Core (the core metadata).
 
--  :oe_lists:`/g/openembedded-devel` - Discussion
+-  :oe_lists:`/g/openembedded-devel` --- discussion
    mailing list about OpenEmbedded.
 
--  :oe_lists:`/g/bitbake-devel` - Discussion mailing
+-  :oe_lists:`/g/bitbake-devel` --- discussion mailing
    list about the :term:`BitBake` build tool.
 
--  :yocto_lists:`/g/poky` - Discussion mailing list
+-  :yocto_lists:`/g/poky` --- discussion mailing list
    about :term:`Poky`.
 
--  :yocto_lists:`/g/yocto-announce` - Mailing list to
+-  :yocto_lists:`/g/yocto-announce` --- mailing list to
    receive official Yocto Project release and milestone announcements.
 
 For more Yocto Project-related mailing lists, see the

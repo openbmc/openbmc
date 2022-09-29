@@ -398,20 +398,16 @@ Ref.:
 
 Support for WM8960 based sound cards such as the WM8960 Hi-Fi Sound Card HAT for Raspberry Pi from Waveshare, and ReSpeaker 2 / 4 / 6 Mics Pi HAT from Seeed Studio, can be enabled in `local.conf`
 
-    ```conf
     MACHINE_FEATURES += "wm8960"
-    ```
 
 You may need to adjust volume and toggle switches that are off by default
 
-    ```bash
     amixer -c1 sset 'Headphone',0 80%,80%
     amixer -c1 sset 'Speaker',0 80%,80%
     amixer -c1 sset 'Left Input Mixer Boost' toggle
     amixer -c1 sset 'Left Output Mixer PCM' toggle
     amixer -c1 sset 'Right Input Mixer Boost' toggle
     amixer -c1 sset 'Right Output Mixer PCM' toggle
-    ```
 
 Audio capture on ReSpeaker 2 / 4 / 6 Mics Pi HAT from Seeed Studio is very noisy.
 

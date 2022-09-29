@@ -1,0 +1,9 @@
+[Unit]
+Description=Sled%i Host Power Reset
+Requires=motor-init-calibration@%i.service
+After=motor-init-calibration@%i.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/power-ctrl sled%i reset
+SyslogIdentifier=power-ctrl

@@ -1,0 +1,15 @@
+# WIC partitioning for corstone1000
+# Layout and maximum sizes (to be defined):
+#
+
+part --source rawcopy --sourceparams="file=bl2_signed.bin" --align 1 --no-table --fixed-size 100k
+part --source rawcopy --sourceparams="file=bl2_signed.bin" --align 1 --no-table --fixed-size 100k
+
+part --source rawcopy --sourceparams="file=tfm_s_signed.bin" --align 1 --no-table --fixed-size 376k
+part --source rawcopy --sourceparams="file=tfm_s_signed.bin" --align 1 --no-table --fixed-size 376k
+
+# Rawcopy of the FIP binary
+part --source rawcopy --sourceparams="file=signed_fip-corstone1000.bin" --align 1 --no-table --fixed-size 2
+
+# Rawcopy of kernel with initramfs
+part --source rawcopy --sourceparams="file=Image.gz-initramfs-${MACHINE}.bin" --no-table --fixed-size 12

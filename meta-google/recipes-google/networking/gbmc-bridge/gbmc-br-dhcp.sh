@@ -19,6 +19,9 @@
 # shellcheck disable=SC2034
 GBMC_BR_DHCP_HOOKS=()
 
+# A dict of outstanding items that should prevent DHCP completion
+declare -A GBMC_BR_DHCP_OUTSTANDING=()
+
 # SC can't find this path during repotest
 # shellcheck disable=SC1091
 source /usr/share/network/lib.sh || exit
@@ -64,7 +67,14 @@ if [ "$1" = bound ]; then
 
   gbmc_br_run_hooks GBMC_BR_DHCP_HOOKS || exit
 
+  # If any of our hooks had expectations we should fail here
+  if [ "${#GBMC_BR_DHCP_OUTSTANDING[@]}" -gt 0 ]; then
+    echo "Not done with DHCP process: ${!GBMC_BR_DHCP_OUTSTANDING[*]}" >&2
+    exit 1
+  fi
+
   # Ensure that the installer knows we have completed processing DHCP by
   # running a service that reports completion
+  echo 'Start DHCP Done' >&2
   systemctl start dhcp-done --no-block
 fi

@@ -1,0 +1,59 @@
+From 32e35a2f179d1b036d2eb699d77f869f7787f36b Mon Sep 17 00:00:00 2001
+From: Adrian Herrera <adrian.herrera@arm.com>
+Date: Tue, 8 Dec 2020 20:12:55 +0000
+Subject: [PATCH] util: m5ops, optional extra build flags
+
+This increases compilation control for users. Main use case is building
+m5ops as part of an image distribution. Specifying a different sysroot
+or dynamic linker may be required when the cross toolchain is built as
+part of the process.
+
+Change-Id: Icbd3faa92ea6e084fc4a9b2db83129bce73faf21
+Signed-off-by: Adrian Herrera <adrian.herrera@arm.com>
+Reviewed-on: https://gem5-review.googlesource.com/c/public/gem5/+/38416
+Reviewed-by: Jason Lowe-Power <power.jg@gmail.com>
+Reviewed-by: Gabe Black <gabe.black@gmail.com>
+Maintainer: Jason Lowe-Power <power.jg@gmail.com>
+Tested-by: kokoro <noreply+kokoro@google.com>
+
+Upstream-Status: Accepted [https://gem5-review.googlesource.com/c/public/gem5/+/38416]
+Expected version: v20.2
+---
+ util/m5/SConstruct | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/util/m5/SConstruct b/util/m5/SConstruct
+index bbae8d9bbf..a37573d763 100644
+--- a/util/m5/SConstruct
++++ b/util/m5/SConstruct
+@@ -136,16 +136,24 @@ for root, dirs, files in os.walk(abspath(src_dir)):
+         #
+         # This also considers scons command line settings which may look like
+         # environment variables, but are set after "scons" on the command line.
+-        def get_abi_opt(name, default):
++        def _extract_abi_opt_val(name, default):
+             var_name = env.subst('${ABI}.%s' % name)
+-            env[name] = os.environ.get(
+-                    var_name, ARGUMENTS.get(var_name, default))
++            return os.environ.get(var_name, ARGUMENTS.get(var_name, default))
++        def get_abi_opt(name, default):
++            env[name] = _extract_abi_opt_val(name, default)
++        def append_abi_opt(name):
++            env.Append(**{ name: _extract_abi_opt_val(name, '') })
+ 
+         # Process the ABI's settings in the SConsopts file, storing them
+         # in a copy of the primary environment.
+         env.SConscript(Dir(root).File('SConsopts'),
+                        exports=[ 'env', 'get_abi_opt' ])
+ 
++        # The user can pass extra build flags for each ABI
++        append_abi_opt('CCFLAGS')
++        append_abi_opt('CXXFLAGS')
++        append_abi_opt('LINKFLAGS')
++
+         # Once all the options have been configured, set up build targets for
+         # this abi.
+         abi_dir = build_dir.Dir(env.subst('${ABI}'))
+-- 
+2.17.1
+

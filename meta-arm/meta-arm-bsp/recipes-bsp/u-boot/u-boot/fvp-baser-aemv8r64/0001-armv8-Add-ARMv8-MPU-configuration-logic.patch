@@ -1,0 +1,259 @@
+From e90aa7853ae32cb03c86249a6c572ec88cdebaa2 Mon Sep 17 00:00:00 2001
+From: Peter Hoyes <Peter.Hoyes@arm.com>
+Date: Wed, 26 May 2021 17:41:10 +0100
+Subject: [PATCH 1/9] armv8: Add ARMv8 MPU configuration logic
+
+Detect whether an MMU is present at the current exception level. If
+not, initialize the MPU instead of the MMU during init, and clear the
+MPU regions before transition to Linux.
+
+The MSA in use at EL1&0 may be configurable but can only by determined
+by inspecting VTCR_EL2 at EL2, so assume that there is an MMU for
+backwards compatibility.
+
+Provide a default (blank) MPU memory map, which can be overridden by
+board configurations.
+
+Issue-Id: SCM-2443
+Upstream-Status: Inappropriate [other]
+  Implementation pending further discussion
+Signed-off-by: Peter Hoyes <Peter.Hoyes@arm.com>
+Change-Id: I0ee3879f9d7f03fe940664b3551c68eeaa458d17
+---
+ arch/arm/cpu/armv8/cache_v8.c    | 101 ++++++++++++++++++++++++++++++-
+ arch/arm/include/asm/armv8/mpu.h |  59 ++++++++++++++++++
+ arch/arm/include/asm/system.h    |  19 ++++++
+ 3 files changed, 176 insertions(+), 3 deletions(-)
+ create mode 100644 arch/arm/include/asm/armv8/mpu.h
+
+diff --git a/arch/arm/cpu/armv8/cache_v8.c b/arch/arm/cpu/armv8/cache_v8.c
+index e4736e5643..798aed8058 100644
+--- a/arch/arm/cpu/armv8/cache_v8.c
++++ b/arch/arm/cpu/armv8/cache_v8.c
+@@ -15,6 +15,7 @@
+ #include <asm/global_data.h>
+ #include <asm/system.h>
+ #include <asm/armv8/mmu.h>
++#include <asm/armv8/mpu.h>
+ 
+ DECLARE_GLOBAL_DATA_PTR;
+ 
+@@ -385,6 +386,91 @@ __weak u64 get_page_table_size(void)
+ 	return size;
+ }
+ 
++static void mpu_clear_regions(void)
++{
++	int i;
++
++	for (i = 0; mpu_mem_map[i].end || mpu_mem_map[i].attrs; i++) {
++		setup_el2_mpu_region(i, 0, 0);
++	}
++}
++
++static struct mpu_region default_mpu_mem_map[] = {{0,}};
++__weak struct mpu_region *mpu_mem_map = default_mpu_mem_map;
++
++static void mpu_setup(void)
++{
++	int i;
++
++	if (current_el() != 2) {
++		panic("MPU configuration is only supported at EL2");
++	}
++
++	set_sctlr(get_sctlr() & ~(CR_M | CR_WXN));
++
++	asm volatile("msr MAIR_EL2, %0" : : "r" MEMORY_ATTRIBUTES);
++
++	for (i = 0; mpu_mem_map[i].end || mpu_mem_map[i].attrs; i++) {
++		setup_el2_mpu_region(i,
++			PRBAR_ADDRESS(mpu_mem_map[i].start)
++				| PRBAR_OUTER_SH | PRBAR_AP_RW_ANY,
++			PRLAR_ADDRESS(mpu_mem_map[i].end)
++				| mpu_mem_map[i].attrs | PRLAR_EN_BIT
++			);
++	}
++
++	set_sctlr(get_sctlr() | CR_M);
++}
++
++static bool el_has_mmu(void)
++{
++	if (current_el() < 2) {
++		// We have no way of knowing, so assuming we have an MMU
++		return true;
++	}
++
++	uint64_t id_aa64mmfr0;
++	asm volatile("mrs %0, id_aa64mmfr0_el1"
++			: "=r" (id_aa64mmfr0) : : "cc");
++	uint64_t msa = id_aa64mmfr0 & ID_AA64MMFR0_EL1_MSA_MASK;
++	uint64_t msa_frac = id_aa64mmfr0 & ID_AA64MMFR0_EL1_MSA_FRAC_MASK;
++
++	switch (msa) {
++		case ID_AA64MMFR0_EL1_MSA_VMSA:
++			/*
++			 * VMSA supported in all translation regimes.
++			 * No support for PMSA.
++			 */
++			return true;
++		case ID_AA64MMFR0_EL1_MSA_USE_FRAC:
++			/* See MSA_frac for the supported MSAs. */
++			switch (msa_frac) {
++				case ID_AA64MMFR0_EL1_MSA_FRAC_NO_PMSA:
++					/*
++					 * PMSA not supported in any translation
++					 * regime.
++					 */
++					return true;
++				case ID_AA64MMFR0_EL1_MSA_FRAC_VMSA:
++					/*
++					* PMSA supported in all translation
++					* regimes. No support for VMSA.
++					*/
++				case ID_AA64MMFR0_EL1_MSA_FRAC_PMSA:
++					/*
++					 * PMSA supported in all translation
++					 * regimes.
++					 */
++					return false;
++				default:
++					panic("Unsupported id_aa64mmfr0_el1 " \
++						"MSA_frac value");
++			}
++		default:
++			panic("Unsupported id_aa64mmfr0_el1 MSA value");
++	}
++}
++
+ void setup_pgtables(void)
+ {
+ 	int i;
+@@ -499,8 +585,13 @@ void dcache_enable(void)
+ 	/* The data cache is not active unless the mmu is enabled */
+ 	if (!(get_sctlr() & CR_M)) {
+ 		invalidate_dcache_all();
+-		__asm_invalidate_tlb_all();
+-		mmu_setup();
++
++		if (el_has_mmu()) {
++			__asm_invalidate_tlb_all();
++			mmu_setup();
++		} else {
++			mpu_setup();
++		}
+ 	}
+ 
+ 	set_sctlr(get_sctlr() | CR_C);
+@@ -519,7 +610,11 @@ void dcache_disable(void)
+ 	set_sctlr(sctlr & ~(CR_C|CR_M));
+ 
+ 	flush_dcache_all();
+-	__asm_invalidate_tlb_all();
++
++	if (el_has_mmu())
++		__asm_invalidate_tlb_all();
++	else
++		mpu_clear_regions();
+ }
+ 
+ int dcache_status(void)
+diff --git a/arch/arm/include/asm/armv8/mpu.h b/arch/arm/include/asm/armv8/mpu.h
+new file mode 100644
+index 0000000000..8de627cafd
+--- /dev/null
++++ b/arch/arm/include/asm/armv8/mpu.h
+@@ -0,0 +1,59 @@
++/*
++ * SPDX-License-Identifier: GPL-2.0+
++ *
++ * (C) Copyright 2021 Arm Limited
++ */
++
++#ifndef _ASM_ARMV8_MPU_H_
++#define _ASM_ARMV8_MPU_H_
++
++#include <asm/armv8/mmu.h>
++#include <linux/stringify.h>
++
++#define PRSELR_EL2		S3_4_c6_c2_1
++#define PRBAR_EL2		S3_4_c6_c8_0
++#define PRLAR_EL2		S3_4_c6_c8_1
++#define MPUIR_EL2		S3_4_c0_c0_4
++
++#define PRBAR_ADDRESS(addr)	((addr) & ~(0x3fULL))
++
++/* Access permissions */
++#define PRBAR_AP(val)		(((val) & 0x3) << 2)
++#define PRBAR_AP_RW_HYP		PRBAR_AP(0x0)
++#define PRBAR_AP_RW_ANY		PRBAR_AP(0x1)
++#define PRBAR_AP_RO_HYP		PRBAR_AP(0x2)
++#define PRBAR_AP_RO_ANY		PRBAR_AP(0x3)
++
++/* Shareability */
++#define PRBAR_SH(val)		(((val) & 0x3) << 4)
++#define PRBAR_NON_SH		PRBAR_SH(0x0)
++#define PRBAR_OUTER_SH		PRBAR_SH(0x2)
++#define PRBAR_INNER_SH		PRBAR_SH(0x3)
++
++/* Memory attribute (MAIR idx) */
++#define PRLAR_ATTRIDX(val)	(((val) & 0x7) << 1)
++#define PRLAR_EN_BIT		(0x1)
++#define PRLAR_ADDRESS(addr)	((addr) & ~(0x3fULL))
++
++#ifndef __ASSEMBLY__
++
++static inline void setup_el2_mpu_region(uint8_t region, uint64_t base, uint64_t limit)
++{
++	asm volatile("msr " __stringify(PRSELR_EL2) ", %0" : : "r" (region));
++	asm volatile("msr " __stringify(PRBAR_EL2) ", %0" : : "r" (base));
++	asm volatile("msr " __stringify(PRLAR_EL2) ", %0" : : "r" (limit));
++
++	asm volatile("isb");
++}
++
++#endif
++
++struct mpu_region {
++	u64 start;
++	u64 end;
++	u64 attrs;
++};
++
++extern struct mpu_region *mpu_mem_map;
++
++#endif /* _ASM_ARMV8_MPU_H_ */
+diff --git a/arch/arm/include/asm/system.h b/arch/arm/include/asm/system.h
+index 87d1c77e8b..4510db98a2 100644
+--- a/arch/arm/include/asm/system.h
++++ b/arch/arm/include/asm/system.h
+@@ -95,6 +95,25 @@
+ 				               auth algorithm                 */
+ #define ID_AA64ISAR1_EL1_APA	(0xF << 4)  /* QARMA address auth algorithm   */
+ 
++/*
++ * ID_AA64MMFR0_EL1 bits definitions
++ */
++#define ID_AA64MMFR0_EL1_MSA_FRAC_MASK		(0xFUL << 52) /* Memory system
++								 architecture
++								 frac         */
++#define ID_AA64MMFR0_EL1_MSA_FRAC_VMSA		(0x2UL << 52) /* EL1&0 supports
++								 VMSA         */
++#define ID_AA64MMFR0_EL1_MSA_FRAC_PMSA		(0x1UL << 52) /* EL1&0 only
++							         supports PMSA*/
++#define ID_AA64MMFR0_EL1_MSA_FRAC_NO_PMSA	(0x0UL << 52) /* No PMSA
++								 support      */
++#define ID_AA64MMFR0_EL1_MSA_MASK		(0xFUL << 48) /* Memory system
++								 architecture */
++#define ID_AA64MMFR0_EL1_MSA_USE_FRAC		(0xFUL << 48) /* Use MSA_FRAC */
++#define ID_AA64MMFR0_EL1_MSA_VMSA		(0x0UL << 48) /* Memory system
++								 architecture
++								 is VMSA      */
++
+ /*
+  * ID_AA64PFR0_EL1 bits definitions
+  */
+-- 
+2.25.1
+

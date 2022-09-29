@@ -15,6 +15,7 @@ SRC_URI = "${SAVANNAH_GNU_MIRROR}/sysvinit/sysvinit-${PV}.tar.xz \
            file://pidof-add-m-option.patch \
            file://realpath.patch \
            file://0001-include-sys-sysmacros.h-for-major-minor-defines-in-g.patch \
+           file://sysvinit_remove_linux_fs.patch \
            file://rcS-default \
            file://rc \
            file://rcS \

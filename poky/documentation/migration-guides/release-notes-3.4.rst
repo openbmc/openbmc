@@ -5,7 +5,7 @@ New Features / Enhancements in 3.4
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  Linux kernel 5.14, glibc 2.34 and ~280 other recipe upgrades
--  Switched override character to ':' (replacing '_') for more robust parsing and improved performance - see the above migration guide for help
+-  Switched override character to ':' (replacing '_') for more robust parsing and improved performance --- see the above migration guide for help
 -  Rust integrated into core, providing rust support for cross-compilation and SDK
 -  New create-spdx class for creating SPDX SBoM documents
 -  New recipes: cargo, core-image-ptest-all, core-image-ptest-fast, core-image-weston-sdk, erofs-utils, gcompat, gi-docgen, libmicrohttpd, libseccomp, libstd-rs, perlcross, python3-markdown, python3-pyyaml, python3-smartypants, python3-typogrify, rust, rust-cross, rust-cross-canadian, rust-hello-world, rust-llvm, rust-tools-cross-canadian, rustfmt, xwayland

@@ -1,9 +1,7 @@
 SUMMARY = "Phosphor IPMI daemon configuration"
-PR = "r1"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
-
-inherit allarch
+PR = "r1"
 
 SRC_URI = " \
     file://cipher_list.json \
@@ -17,23 +15,12 @@ SRC_URI = " \
     file://cs_privilege_levels.json \
     "
 
-FILES:${PN} = " \
-    ${datadir}/ipmi-providers/cipher_list.json \
-    ${datadir}/ipmi-providers/dcmi_cap.json \
-    ${datadir}/ipmi-providers/dcmi_sensors.json \
-    ${datadir}/ipmi-providers/dev_id.json \
-    ${datadir}/ipmi-providers/power_reading.json \
-    ${datadir}/ipmi-providers/channel_access.json \
-    ${datadir}/ipmi-providers/channel_config.json \
-    ${datadir}/ipmi-providers/entity-map.json \
-    ${datadir}/ipmi-providers/cs_privilege_levels.json \
-    "
+inherit allarch
 
 do_fetch[noexec] = "1"
 do_patch[noexec] = "1"
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
-
 do_install() {
     install -d ${D}${datadir}/ipmi-providers
     install -m 0644 -D ${WORKDIR}/cipher_list.json \
@@ -55,3 +42,15 @@ do_install() {
     install -m 0644 -D ${WORKDIR}/cs_privilege_levels.json \
         ${D}${datadir}/ipmi-providers/cs_privilege_levels.json
 }
+
+FILES:${PN} = " \
+    ${datadir}/ipmi-providers/cipher_list.json \
+    ${datadir}/ipmi-providers/dcmi_cap.json \
+    ${datadir}/ipmi-providers/dcmi_sensors.json \
+    ${datadir}/ipmi-providers/dev_id.json \
+    ${datadir}/ipmi-providers/power_reading.json \
+    ${datadir}/ipmi-providers/channel_access.json \
+    ${datadir}/ipmi-providers/channel_config.json \
+    ${datadir}/ipmi-providers/entity-map.json \
+    ${datadir}/ipmi-providers/cs_privilege_levels.json \
+    "

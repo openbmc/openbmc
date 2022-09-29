@@ -613,7 +613,7 @@ Errors and Warnings
     so using ${:term:`BPN`} rather than ${:term:`PN`} as the latter will change
     for different variants of the same recipe e.g. when :term:`BBCLASSEXTEND`
     or multilib are being used. This check will fail if a reference to ``${PN}``
-    is found within the :term:`SRC_URI` value - change it to ``${BPN}`` instead.
+    is found within the :term:`SRC_URI` value --- change it to ``${BPN}`` instead.
 
 
 .. _qa-check-unhandled-features-check:
@@ -727,7 +727,7 @@ Errors and Warnings
             devtool modify <recipe>
 
     This will apply all of the patches, and create new commits out of them in
-    the workspace - with the patch context updated.
+    the workspace --- with the patch context updated.
 
     Then, replace the patches in the recipe layer::
 

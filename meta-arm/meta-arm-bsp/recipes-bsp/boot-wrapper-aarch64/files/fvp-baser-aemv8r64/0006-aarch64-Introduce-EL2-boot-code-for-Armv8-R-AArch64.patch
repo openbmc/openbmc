@@ -1,0 +1,182 @@
+From 81df76f8d94cb6c31c01739b078a72bdb8497441 Mon Sep 17 00:00:00 2001
+From: Jaxson Han <jaxson.han@arm.com>
+Date: Tue, 25 May 2021 07:25:00 +0100
+Subject: [PATCH] aarch64: Introduce EL2 boot code for Armv8-R AArch64
+
+The Armv8-R AArch64 profile does not support the EL3 exception level.
+The Armv8-R AArch64 profile allows for an (optional) VMSAv8-64 MMU
+at EL1, which allows to run off-the-shelf Linux. However EL2 only
+supports a PMSA, which is not supported by Linux, so we need to drop
+into EL1 before entering the kernel.
+
+We add a new err_invalid_arch symbol as a dead loop. If we detect the
+current Armv8-R aarch64 only supports with PMSA, meaning we cannot boot
+Linux anymore, then we jump to err_invalid_arch.
+
+During Armv8-R aarch64 init, to make sure nothing unexpected traps into
+EL2, we auto-detect and config FIEN and EnSCXT in HCR_EL2.
+
+The boot sequence is:
+If CurrentEL == EL3, then goto EL3 initialisation and drop to lower EL
+  before entering the kernel.
+If CurrentEL == EL2 && id_aa64mmfr0_el1.MSA == 0xf (Armv8-R aarch64),
+  if id_aa64mmfr0_el1.MSA_frac == 0x2,
+    then goto Armv8-R AArch64 initialisation and drop to EL1 before
+    entering the kernel.
+  else, which means VMSA unsupported and cannot boot Linux,
+    goto err_invalid_arch (dead loop).
+Else, no initialisation and keep the current EL before entering the
+  kernel.
+
+Upstream-Status: Pending
+Signed-off-by: Jaxson Han <jaxson.han@arm.com>
+---
+ arch/aarch64/boot.S            | 92 +++++++++++++++++++++++++++++++++-
+ arch/aarch64/include/asm/cpu.h |  2 +
+ 2 files changed, 92 insertions(+), 2 deletions(-)
+
+diff --git a/arch/aarch64/boot.S b/arch/aarch64/boot.S
+index 908764a..def9192 100644
+--- a/arch/aarch64/boot.S
++++ b/arch/aarch64/boot.S
+@@ -24,16 +24,24 @@ ASM_FUNC(_start)
+ 	 * Boot sequence
+ 	 * If CurrentEL == EL3, then goto EL3 initialisation and drop to
+ 	 *   lower EL before entering the kernel.
++	 * If CurrentEL == EL2 && id_aa64mmfr0_el1.MSA == 0xf, then
++	 *   If id_aa64mmfr0_el1.MSA_frac == 0x2, then goto
++	 *     Armv8-R AArch64 initialisation and drop to EL1 before
++	 *     entering the kernel.
++	 *   Else, which means VMSA unsupported and cannot boot Linux,
++	 *     goto err_invalid_arch (dead loop).
+ 	 * Else, no initialisation and keep the current EL before
+ 	 *   entering the kernel.
+ 	 */
+ 	mrs	x0, CurrentEL
+-	cmp	x0, #CURRENTEL_EL3
+-	b.eq	el3_init
++	cmp	x0, #CURRENTEL_EL2
++	bgt	el3_init
++	beq	el2_init
+ 
+ 	/*
+ 	 * We stay in the current EL for entering the kernel
+ 	 */
++keep_el:
+ 	mov	w0, #1
+ 	ldr	x1, =flag_keep_el
+ 	str	w0, [x1]
+@@ -139,6 +147,85 @@ el3_init:
+ 	str	w0, [x1]
+ 	b	el_max_init
+ 
++	/*
++	 * EL2 Armv8-R AArch64 initialisation
++	 */
++el2_init:
++	/* Detect Armv8-R AArch64 */
++	mrs	x1, id_aa64mmfr0_el1
++	/*
++	 * Check MSA, bits [51:48]:
++	 * 0xf means Armv8-R AArch64.
++	 * If not 0xf, proceed in Armv8-A EL2.
++	 */
++	ubfx	x0, x1, #48, #4			// MSA
++	cmp	x0, 0xf
++	bne	keep_el
++	/*
++	 * Check MSA_frac, bits [55:52]:
++	 * 0x2 means EL1&0 translation regime also supports VMSAv8-64.
++	 */
++	ubfx	x0, x1, #52, #4			// MSA_frac
++	cmp	x0, 0x2
++	/*
++	 * If not 0x2, no VMSA, so cannot boot Linux and dead loop.
++	 * Also, since the architecture guarantees that those CPUID
++	 * fields never lose features when the value in a field
++	 * increases, we use blt to cover it.
++	*/
++	blt	err_invalid_arch
++
++	mrs	x0, midr_el1
++	msr	vpidr_el2, x0
++
++	mrs	x0, mpidr_el1
++	msr	vmpidr_el2, x0
++
++	mov	x0, #(1 << 31)			// VTCR_MSA: VMSAv8-64 support
++	msr	vtcr_el2, x0
++
++	/* Init HCR_EL2 */
++	mov	x0, #(1 << 31)			// RES1: Armv8-R aarch64 only
++
++	mrs	x1, id_aa64pfr0_el1
++	ubfx	x2, x1, #56, 4			// ID_AA64PFR0_EL1.CSV2
++	cmp	x2, 0x2
++	b.lt	1f
++	/*
++	 * Disable trap when accessing SCTXNUM_EL0 or SCTXNUM_EL1
++	 * if FEAT_CSV2.
++	 */
++	orr	x0, x0, #(1 << 53)		// HCR_EL2.EnSCXT
++
++1:	ubfx	x2, x1, #28, 4			// ID_AA64PFR0_EL1.RAS
++	cmp	x2, 0x2
++	b.lt	1f
++	/* Disable trap when accessing ERXPFGCDN_EL1 if FEAT_RASv1p1. */
++	orr	x0, x0, #(1 << 47)		// HCR_EL2.FIEN
++
++	/* Enable pointer authentication if present */
++1:	mrs	x1, id_aa64isar1_el1
++	/*
++	 * If ID_AA64ISAR1_EL1.{GPI, GPA, API, APA} == {0000, 0000, 0000, 0000}
++	 *   then HCR_EL2.APK and HCR_EL2.API are RES 0.
++	 * Else
++	 *   set HCR_EL2.APK and HCR_EL2.API.
++	 */
++	ldr	x2, =(((0xff) << 24) | (0xff << 4))
++	and	x1, x1, x2
++	cbz	x1, 1f
++
++	orr	x0, x0, #(1 << 40)		// HCR_EL2.APK
++	orr	x0, x0, #(1 << 41)		// HCR_EL2.API
++
++1:	msr	hcr_el2, x0
++	isb
++
++	mov	w0, #SPSR_KERNEL_EL1
++	ldr	x1, =spsr_to_elx
++	str	w0, [x1]
++	// fall through
++
+ el_max_init:
+ 	ldr	x0, =COUNTER_FREQ
+ 	msr	cntfrq_el0, x0
+@@ -148,6 +235,7 @@ el_max_init:
+ 	b	start_el_max
+ 
+ err_invalid_id:
++err_invalid_arch:
+ 	b	.
+ 
+ 	/*
+diff --git a/arch/aarch64/include/asm/cpu.h b/arch/aarch64/include/asm/cpu.h
+index b1003f4..91f803c 100644
+--- a/arch/aarch64/include/asm/cpu.h
++++ b/arch/aarch64/include/asm/cpu.h
+@@ -25,6 +25,7 @@
+ #define SPSR_I			(1 << 7)	/* IRQ masked */
+ #define SPSR_F			(1 << 6)	/* FIQ masked */
+ #define SPSR_T			(1 << 5)	/* Thumb */
++#define SPSR_EL1H		(5 << 0)	/* EL1 Handler mode */
+ #define SPSR_EL2H		(9 << 0)	/* EL2 Handler mode */
+ #define SPSR_HYP		(0x1a << 0)	/* M[3:0] = hyp, M[4] = AArch32 */
+ 
+@@ -43,6 +44,7 @@
+ #else
+ #define SCTLR_EL1_KERNEL	SCTLR_EL1_RES1
+ #define SPSR_KERNEL		(SPSR_A | SPSR_D | SPSR_I | SPSR_F | SPSR_EL2H)
++#define SPSR_KERNEL_EL1		(SPSR_A | SPSR_D | SPSR_I | SPSR_F | SPSR_EL1H)
+ #endif
+ 
+ #ifndef __ASSEMBLY__

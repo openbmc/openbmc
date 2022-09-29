@@ -18,6 +18,7 @@ trap 'rm $patch_files_tmp $allowed_patches_tmp' exit
 git ls-files -- \
   '*.patch' \
   ':!:poky/**' \
+  ':!:meta-arm/**' \
   ':!:meta-security/**' \
   ':!:meta-raspberrypi/**' \
   ':!:meta-openembedded/**' \
@@ -38,7 +39,6 @@ meta-ampere/meta-common/recipes-devtools/mtd/mtd-utils/0001-flashcp-support-offs
 meta-aspeed/recipes-bsp/u-boot/files/default-gcc.patch
 meta-bytedance/meta-g220a/recipes-kernel/linux/linux-aspeed/0005-ARM-dts-aspeed-Enable-g220a-uart-route.patch
 meta-bytedance/meta-g220a/recipes-phosphor/ipmi/phosphor-node-manager-proxy/0001-Remove-Total_Power-sensor.patch
-meta-facebook/meta-bletchley/recipes-bsp/u-boot/u-boot-aspeed-sdk/0001-u-boot-ast2600-57600-baudrate-for-bletchley.patch
 meta-facebook/meta-tiogapass/recipes-bsp/u-boot/u-boot-aspeed/0001-configs-ast-common-use-57600-baud-rate-to-match-Tiog.patch
 meta-facebook/meta-yosemitev2/recipes-bsp/u-boot/u-boot-aspeed-sdk/0001-board-aspeed-Add-Mux-for-yosemitev2.patch
 meta-facebook/meta-yosemitev2/recipes-bsp/u-boot/u-boot-aspeed-sdk/0002-spl-host-console-handle.patch
@@ -48,6 +48,7 @@ meta-google/recipes-extended/libconfig/files/0001-makefile-Add-missing-LDFLAGS.p
 meta-google/recipes-phosphor/initrdscripts/obmc-phosphor-initfs/rwfs-clean-dev.patch
 meta-ingrasys/meta-zaius/recipes-bsp/u-boot/u-boot-aspeed/0001-board-aspeed-Add-reset_phy-for-Zaius.patch
 meta-nuvoton/recipes-bsp/images/npcm7xx-igps/0001-Adjust-paths-for-use-with-Bitbake.patch
+meta-nuvoton/recipes-bsp/images/npcm8xx-igps/0001-Adjust-paths-for-use-with-Bitbake.patch
 meta-yadro/meta-nicole/recipes-bsp/u-boot/files/0001-Add-system-reset-status-support.patch
 meta-yadro/meta-nicole/recipes-bsp/u-boot/files/0002-config-ast-common-set-fieldmode-to-true.patch
 meta-yadro/meta-nicole/recipes-bsp/u-boot/files/0003-aspeed-add-gpio-support.patch
@@ -81,6 +82,7 @@ trap 'rm $dts_files_tmp $allowed_dts_tmp' exit
 git ls-files -- \
   '*.dts' \
   ':!:poky/**' \
+  ':!:meta-arm/**' \
   ':!:meta-security/**' \
   ':!:meta-raspberrypi/**' \
   ':!:meta-openembedded/**' \
@@ -202,6 +204,7 @@ done
 
 non_bbfiles=$(git ls-files -- \
   ':!:poky/**' \
+  ':!:meta-arm/**' \
   ':!:meta-security/**' \
   ':!:meta-raspberrypi/**' \
   ':!:meta-openembedded/**' \

@@ -11,7 +11,10 @@ EXTRA_OECONF = "--without-python --libdir=${base_libdir}"
 
 SRC_URI = "git://github.com/cracklib/cracklib;protocol=https;branch=master \
            file://0001-packlib.c-support-dictionary-byte-order-dependent.patch \
-           file://0002-craklib-fix-testnum-and-teststr-failed.patch"
+           file://0002-craklib-fix-testnum-and-teststr-failed.patch \
+           file://0001-rules-Drop-using-register-keyword.patch \
+           file://0002-rules-Correct-parameter-types-to-Debug-calls.patch \
+           "
 
 SRCREV = "f83934cf3cced0c9600c7d81332f4169f122a2cf"
 S = "${WORKDIR}/git/src"

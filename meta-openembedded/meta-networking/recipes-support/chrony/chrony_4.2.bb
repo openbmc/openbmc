@@ -126,6 +126,10 @@ do_install() {
            ${D}${systemd_unitdir}/system/chronyd.service
     sed -i 's!^PATH=.*!PATH=${base_sbindir}:${base_bindir}:${sbindir}:${bindir}!' ${D}${sysconfdir}/init.d/chronyd
     sed -i 's!^EnvironmentFile=.*!EnvironmentFile=-${sysconfdir}/default/chronyd!' ${D}${systemd_unitdir}/system/chronyd.service
+
+    install -d ${D}${sysconfdir}/tmpfiles.d
+    echo "d /var/lib/chrony 0755 root root -" > ${D}${sysconfdir}/tmpfiles.d/chronyd.conf
+
 }
 
 FILES:${PN} = "${sbindir}/chronyd ${sysconfdir} ${localstatedir}/lib/chrony ${localstatedir}"

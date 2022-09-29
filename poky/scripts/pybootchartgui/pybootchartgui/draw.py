@@ -80,6 +80,22 @@ MEM_BUFFERS_COLOR = (0.4, 0.4, 0.4, 0.3)
 # Swap color
 MEM_SWAP_COLOR = DISK_TPUT_COLOR
 
+# avg10 CPU pressure color
+CPU_PRESSURE_AVG10_COLOR = (0.0, 0.0, 0.0, 1.0)
+# delta total CPU pressure color
+CPU_PRESSURE_TOTAL_COLOR = CPU_COLOR
+# avg10 IO pressure color
+IO_PRESSURE_AVG10_COLOR = (0.0, 0.0, 0.0, 1.0)
+# delta total IO pressure color
+IO_PRESSURE_TOTAL_COLOR = IO_COLOR
+# avg10 memory pressure color
+MEM_PRESSURE_AVG10_COLOR = (0.0, 0.0, 0.0, 1.0)
+# delta total memory pressure color
+MEM_PRESSURE_TOTAL_COLOR = DISK_TPUT_COLOR
+
+
+
+
 # Process border color.
 PROC_BORDER_COLOR = (0.71, 0.71, 0.71, 1.0)
 # Waiting process color.
@@ -415,6 +431,108 @@ def render_charts(ctx, options, clip, trace, curr_y, w, h, sec_w):
 
         curr_y = curr_y + 30 + bar_h
 
+    # render CPU pressure chart
+    if trace.cpu_pressure:
+        max_sample_avg = max (trace.cpu_pressure, key = lambda s: s.avg10)
+        max_sample_total = max (trace.cpu_pressure, key = lambda s: s.deltaTotal)
+        draw_legend_line(ctx, "avg10 CPU Pressure (max %d%%)"  % (max_sample_avg.avg10), CPU_PRESSURE_AVG10_COLOR, off_x, curr_y+20, leg_s)
+        draw_legend_box(ctx, "delta total CPU Pressure (max %d)" % (max_sample_total.deltaTotal), CPU_PRESSURE_TOTAL_COLOR, off_x + 240, curr_y+20, leg_s)
+
+        # render delta total cpu
+        chart_rect = (off_x, curr_y+30, w, bar_h)
+        if clip_visible (clip, chart_rect):
+            draw_box_ticks (ctx, chart_rect, sec_w)
+            draw_annotations (ctx, proc_tree, trace.times, chart_rect)
+            draw_chart (ctx, CPU_PRESSURE_TOTAL_COLOR, True, chart_rect, \
+                    [(sample.time, sample.deltaTotal) for sample in trace.cpu_pressure], \
+                    proc_tree, None)
+
+        # render avg10 cpu
+        if clip_visible (clip, chart_rect):
+            draw_chart (ctx, CPU_PRESSURE_AVG10_COLOR, False, chart_rect, \
+                    [(sample.time, sample.avg10) for sample in trace.cpu_pressure], \
+                    proc_tree, None)
+
+        pos_x = off_x + ((max_sample_avg.time - proc_tree.start_time) * w / proc_tree.duration)
+
+        shift_x, shift_y = -20, 20
+        if (pos_x < off_x + 245):
+            shift_x, shift_y = 5, 40
+
+
+        label = "%d%%" % (max_sample_avg.avg10)
+        draw_text (ctx, label, CPU_PRESSURE_AVG10_COLOR, pos_x + shift_x, curr_y + shift_y)
+
+        curr_y = curr_y + 30 + bar_h
+
+    # render I/O pressure chart
+    if trace.io_pressure:
+        max_sample_avg = max (trace.io_pressure, key = lambda s: s.avg10)
+        max_sample_total = max (trace.io_pressure, key = lambda s: s.deltaTotal)
+        draw_legend_line(ctx, "avg10 I/O Pressure (max %d%%)"  % (max_sample_avg.avg10), IO_PRESSURE_AVG10_COLOR, off_x, curr_y+20, leg_s)
+        draw_legend_box(ctx, "delta total I/O Pressure (max %d)" % (max_sample_total.deltaTotal), IO_PRESSURE_TOTAL_COLOR, off_x + 240, curr_y+20, leg_s)
+
+        # render delta total io
+        chart_rect = (off_x, curr_y+30, w, bar_h)
+        if clip_visible (clip, chart_rect):
+            draw_box_ticks (ctx, chart_rect, sec_w)
+            draw_annotations (ctx, proc_tree, trace.times, chart_rect)
+            draw_chart (ctx, IO_PRESSURE_TOTAL_COLOR, True, chart_rect, \
+                    [(sample.time, sample.deltaTotal) for sample in trace.io_pressure], \
+                    proc_tree, None)
+
+        # render avg10 io
+        if clip_visible (clip, chart_rect):
+            draw_chart (ctx, IO_PRESSURE_AVG10_COLOR, False, chart_rect, \
+                    [(sample.time, sample.avg10) for sample in trace.io_pressure], \
+                    proc_tree, None)
+
+        pos_x = off_x + ((max_sample_avg.time - proc_tree.start_time) * w / proc_tree.duration)
+
+        shift_x, shift_y = -20, 20
+        if (pos_x < off_x + 245):
+            shift_x, shift_y = 5, 40
+
+
+        label = "%d%%" % (max_sample_avg.avg10)
+        draw_text (ctx, label, IO_PRESSURE_AVG10_COLOR, pos_x + shift_x, curr_y + shift_y)
+
+        curr_y = curr_y + 30 + bar_h
+
+    # render MEM pressure chart
+    if trace.mem_pressure:
+        max_sample_avg = max (trace.mem_pressure, key = lambda s: s.avg10)
+        max_sample_total = max (trace.mem_pressure, key = lambda s: s.deltaTotal)
+        draw_legend_line(ctx, "avg10 MEM Pressure (max %d%%)"  % (max_sample_avg.avg10), MEM_PRESSURE_AVG10_COLOR, off_x, curr_y+20, leg_s)
+        draw_legend_box(ctx, "delta total MEM Pressure (max %d)" % (max_sample_total.deltaTotal), MEM_PRESSURE_TOTAL_COLOR, off_x + 240, curr_y+20, leg_s)
+
+        # render delta total mem
+        chart_rect = (off_x, curr_y+30, w, bar_h)
+        if clip_visible (clip, chart_rect):
+            draw_box_ticks (ctx, chart_rect, sec_w)
+            draw_annotations (ctx, proc_tree, trace.times, chart_rect)
+            draw_chart (ctx, MEM_PRESSURE_TOTAL_COLOR, True, chart_rect, \
+                    [(sample.time, sample.deltaTotal) for sample in trace.mem_pressure], \
+                    proc_tree, None)
+
+        # render avg10 mem
+        if clip_visible (clip, chart_rect):
+            draw_chart (ctx, MEM_PRESSURE_AVG10_COLOR, False, chart_rect, \
+                    [(sample.time, sample.avg10) for sample in trace.mem_pressure], \
+                    proc_tree, None)
+
+        pos_x = off_x + ((max_sample_avg.time - proc_tree.start_time) * w / proc_tree.duration)
+
+        shift_x, shift_y = -20, 20
+        if (pos_x < off_x + 245):
+            shift_x, shift_y = 5, 40
+
+
+        label = "%d%%" % (max_sample_avg.avg10)
+        draw_text (ctx, label, MEM_PRESSURE_AVG10_COLOR, pos_x + shift_x, curr_y + shift_y)
+
+        curr_y = curr_y + 30 + bar_h
+
     # render disk space usage
     #
     # Draws the amount of disk space used on each volume relative to the
@@ -698,7 +816,7 @@ def draw_processes_recursively(ctx, proc, proc_tree, y, proc_h, rect, clip) :
         cmdString = proc.cmd
     else:
         cmdString = ''
-    if (OPTIONS.show_pid or OPTIONS.show_all) and ipid is not 0:
+    if (OPTIONS.show_pid or OPTIONS.show_all) and ipid != 0:
         cmdString = cmdString + " [" + str(ipid // 1000) + "]"
     if OPTIONS.show_all:
         if proc.args:
@@ -796,7 +914,7 @@ class CumlSample:
         if self.color is None:
             i = self.next() % HSV_MAX_MOD
             h = 0.0
-            if i is not 0:
+            if i != 0:
                 h = (1.0 * i) / HSV_MAX_MOD
             s = 0.5
             v = 1.0

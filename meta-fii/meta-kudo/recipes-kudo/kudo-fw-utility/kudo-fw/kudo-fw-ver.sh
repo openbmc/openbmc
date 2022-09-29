@@ -2,6 +2,9 @@
 
 # Disable check for splitting
 # shellcheck disable=SC2207
+# Provide source directive to shellcheck.
+# shellcheck source=meta-fii/meta-kudo/recipes-kudo/kudo-fw-utility/kudo-fw/kudo-lib.sh
+source /usr/libexec/kudo-fw/kudo-lib.sh
 
 BMC_CPLD_VER_FILE="/run/cpld0.version"
 MB_CPLD_VER_FILE="/run/cpld1.version"

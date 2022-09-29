@@ -1,0 +1,18 @@
+header:
+  version: 11
+  includes:
+    - ci/base.yml
+
+machine: qemuarm64-secureboot
+
+local_conf_header:
+  failing_tests: |
+    # software IO TLB: Cannot allocate buffer
+    DEFAULT_TEST_SUITES:remove = "parselogs"
+
+target:
+  - core-image-base
+  - optee-examples
+  - optee-test
+  - optee-spdevkit
+  - optee-os-tadevkit

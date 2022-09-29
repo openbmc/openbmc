@@ -1,0 +1,284 @@
+From 1e5ce152214e22a7cd9617a5059e42c370351354 Mon Sep 17 00:00:00 2001
+From: Imre Kis <imre.kis@arm.com>
+Date: Fri, 17 Jun 2022 15:40:18 +0200
+Subject: [PATCH 20/24] Add mock for libsp/sp_messaging
+
+Add mock_sp_messaging for mocking sp_messaging part of libsp.
+
+Signed-off-by: Imre Kis <imre.kis@arm.com>
+Change-Id: I87478027c61b41028682b10e2535a7e14cf6922f
+
+Upstream-Status: Pending [In review]
+Signed-off-by: Anton Antonov <Anton.Antonov@arm.com>
+
+---
+ .../messaging/ffa/libsp/mock/component.cmake  |  1 +
+ .../ffa/libsp/mock/mock_sp_messaging.cpp      | 86 +++++++++++++++++++
+ .../ffa/libsp/mock/mock_sp_messaging.h        | 39 +++++++++
+ .../mock/test/test_mock_sp_messaging.cpp      | 77 +++++++++++++++++
+ components/messaging/ffa/libsp/tests.cmake    | 14 +++
+ 5 files changed, 217 insertions(+)
+ create mode 100644 components/messaging/ffa/libsp/mock/mock_sp_messaging.cpp
+ create mode 100644 components/messaging/ffa/libsp/mock/mock_sp_messaging.h
+ create mode 100644 components/messaging/ffa/libsp/mock/test/test_mock_sp_messaging.cpp
+
+diff --git a/components/messaging/ffa/libsp/mock/component.cmake b/components/messaging/ffa/libsp/mock/component.cmake
+index eb0d28c..375cb46 100644
+--- a/components/messaging/ffa/libsp/mock/component.cmake
++++ b/components/messaging/ffa/libsp/mock/component.cmake
+@@ -14,6 +14,7 @@ target_sources(${TGT} PRIVATE
+ 	"${CMAKE_CURRENT_LIST_DIR}/mock_ffa_internal_api.cpp"
+ 	"${CMAKE_CURRENT_LIST_DIR}/mock_sp_discovery.cpp"
+ 	"${CMAKE_CURRENT_LIST_DIR}/mock_sp_memory_management.cpp"
++	"${CMAKE_CURRENT_LIST_DIR}/mock_sp_messaging.cpp"
+ 	"${CMAKE_CURRENT_LIST_DIR}/mock_sp_rxtx.cpp"
+ 	)
+ 
+diff --git a/components/messaging/ffa/libsp/mock/mock_sp_messaging.cpp b/components/messaging/ffa/libsp/mock/mock_sp_messaging.cpp
+new file mode 100644
+index 0000000..522abb3
+--- /dev/null
++++ b/components/messaging/ffa/libsp/mock/mock_sp_messaging.cpp
+@@ -0,0 +1,86 @@
++// SPDX-License-Identifier: BSD-3-Clause
++/*
++ * Copyright (c) 2022, Arm Limited. All rights reserved.
++ */
++
++#include <CppUTestExt/MockSupport.h>
++#include "mock_sp_messaging.h"
++
++void expect_sp_msg_wait(const struct sp_msg *msg, sp_result result)
++{
++	mock()
++		.expectOneCall("sp_msg_wait")
++		.withOutputParameterReturning("msg", msg, sizeof(*msg))
++		.andReturnValue(result);
++}
++
++sp_result sp_msg_wait(struct sp_msg *msg)
++{
++	return mock()
++		.actualCall("sp_msg_wait")
++		.withOutputParameter("msg", msg)
++		.returnIntValue();
++}
++
++void expect_sp_msg_send_direct_req(const struct sp_msg *req,
++				   const struct sp_msg *resp,
++				   sp_result result)
++{
++	mock()
++		.expectOneCall("sp_msg_send_direct_req")
++		.withMemoryBufferParameter("req", (const unsigned char *)req, sizeof(*req))
++		.withOutputParameterReturning("resp", resp, sizeof(*resp))
++		.andReturnValue(result);
++}
++
++sp_result sp_msg_send_direct_req(const struct sp_msg *req, struct sp_msg *resp)
++{
++	return mock()
++		.actualCall("sp_msg_send_direct_req")
++		.withMemoryBufferParameter("req", (const unsigned char *)req, sizeof(*req))
++		.withOutputParameter("resp", resp)
++		.returnIntValue();
++}
++
++void expect_sp_msg_send_direct_resp(const struct sp_msg *resp,
++				    const struct sp_msg *req,
++				    sp_result result)
++{
++	mock()
++		.expectOneCall("sp_msg_send_direct_resp")
++		.withMemoryBufferParameter("resp", (const unsigned char *)resp, sizeof(*resp))
++		.withOutputParameterReturning("req", req, sizeof(*req))
++		.andReturnValue(result);
++}
++
++sp_result sp_msg_send_direct_resp(const struct sp_msg *resp,
++				  struct sp_msg *req)
++{
++	return mock()
++		.actualCall("sp_msg_send_direct_resp")
++		.withMemoryBufferParameter("resp", (const unsigned char *)resp, sizeof(*resp))
++		.withOutputParameter("req", req)
++		.returnIntValue();
++}
++
++#if FFA_DIRECT_MSG_ROUTING_EXTENSION
++void expect_sp_msg_send_rc_req(const struct sp_msg *req,
++			       const struct sp_msg *resp,
++			       sp_result result)
++{
++	mock()
++		.expectOneCall("sp_msg_send_rc_req")
++		.withMemoryBufferParameter("req", (const unsigned char *)req, sizeof(*req))
++		.withOutputParameterReturning("resp", resp, sizeof(*resp))
++		.andReturnValue(result);
++}
++
++sp_result sp_msg_send_rc_req(const struct sp_msg *req, struct sp_msg *resp)
++{
++	return mock()
++		.actualCall("sp_msg_send_rc_req")
++		.withMemoryBufferParameter("req", (const unsigned char *)req, sizeof(*req))
++		.withOutputParameter("resp", resp)
++		.returnIntValue();
++}
++#endif /* FFA_DIRECT_MSG_ROUTING_EXTENSION */
+diff --git a/components/messaging/ffa/libsp/mock/mock_sp_messaging.h b/components/messaging/ffa/libsp/mock/mock_sp_messaging.h
+new file mode 100644
+index 0000000..8183012
+--- /dev/null
++++ b/components/messaging/ffa/libsp/mock/mock_sp_messaging.h
+@@ -0,0 +1,39 @@
++/* SPDX-License-Identifier: BSD-3-Clause */
++/*
++ * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
++ */
++
++#ifndef LIBSP_MOCK_MOCK_SP_MESSAGING_H_
++#define LIBSP_MOCK_MOCK_SP_MESSAGING_H_
++
++#include "../include/sp_messaging.h"
++
++#include <stdint.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++void expect_sp_msg_wait(const struct sp_msg *msg, sp_result result);
++
++
++void expect_sp_msg_send_direct_req(const struct sp_msg *req,
++				   const struct sp_msg *resp,
++				   sp_result result);
++
++
++void expect_sp_msg_send_direct_resp(const struct sp_msg *resp,
++				    const struct sp_msg *req,
++				    sp_result result);
++
++#if FFA_DIRECT_MSG_ROUTING_EXTENSION
++void expect_sp_msg_send_rc_req(const struct sp_msg *req,
++			       const struct sp_msg *resp,
++			       sp_result result);
++#endif /* FFA_DIRECT_MSG_ROUTING_EXTENSION */
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* LIBSP_MOCK_MOCK_SP_MESSAGING_H_ */
+diff --git a/components/messaging/ffa/libsp/mock/test/test_mock_sp_messaging.cpp b/components/messaging/ffa/libsp/mock/test/test_mock_sp_messaging.cpp
+new file mode 100644
+index 0000000..bfc7959
+--- /dev/null
++++ b/components/messaging/ffa/libsp/mock/test/test_mock_sp_messaging.cpp
+@@ -0,0 +1,77 @@
++// SPDX-License-Identifier: BSD-3-Clause
++/*
++ * Copyright (c) 2022, Arm Limited. All rights reserved.
++ */
++
++#include <CppUTestExt/MockSupport.h>
++#include <CppUTest/TestHarness.h>
++#include "mock_sp_messaging.h"
++#include <stdint.h>
++#include <stdlib.h>
++#include <string.h>
++
++static const struct sp_msg expected_req = {
++	.source_id = 0x0123,
++	.destination_id = 0x4567,
++	.args = {0x89abcdef, 0xfedcba98, 0x76543210, 0xabcdef01}
++};
++static const struct sp_msg expected_resp = {
++	.source_id = 0x1234,
++	.destination_id = 0x5678,
++	.args = {0x9abcdef8, 0xedcba98f, 0x65432107, 0xbcdef01a}
++};
++
++TEST_GROUP(mock_sp_messaging)
++{
++	TEST_SETUP()
++	{
++		memset(&req, 0x00, sizeof(req));
++		memset(&resp, 0x00, sizeof(resp));
++	}
++
++	TEST_TEARDOWN()
++	{
++		mock().checkExpectations();
++		mock().clear();
++	}
++
++	struct sp_msg req;
++	struct sp_msg resp;
++	static const sp_result result = -1;
++};
++
++TEST(mock_sp_messaging, sp_msg_wait)
++{
++	expect_sp_msg_wait(&expected_req, result);
++	LONGS_EQUAL(result, sp_msg_wait(&req));
++	MEMCMP_EQUAL(&expected_req, &req, sizeof(expected_req));
++}
++
++TEST(mock_sp_messaging, sp_msg_send_direct_req)
++{
++	req = expected_req;
++
++	expect_sp_msg_send_direct_req(&expected_req, &expected_resp, result);
++	LONGS_EQUAL(result, sp_msg_send_direct_req(&req, &resp));
++	MEMCMP_EQUAL(&expected_resp, &resp, sizeof(expected_resp));
++}
++
++TEST(mock_sp_messaging, sp_msg_send_direct_resp)
++{
++	resp = expected_resp;
++
++	expect_sp_msg_send_direct_resp(&expected_resp, &expected_req, result);
++	LONGS_EQUAL(result, sp_msg_send_direct_resp(&resp, &req));
++	MEMCMP_EQUAL(&expected_req, &req, sizeof(expected_req));
++}
++
++#if FFA_DIRECT_MSG_ROUTING_EXTENSION
++TEST(mock_sp_messaging, sp_msg_send_rc_req)
++{
++	req = expected_req;
++
++	expect_sp_msg_send_rc_req(&expected_req, &expected_resp, result);
++	LONGS_EQUAL(result, sp_msg_send_rc_req(&req, &resp));
++	MEMCMP_EQUAL(&expected_resp, &resp, sizeof(expected_resp));
++}
++#endif /* FFA_DIRECT_MSG_ROUTING_EXTENSION */
+diff --git a/components/messaging/ffa/libsp/tests.cmake b/components/messaging/ffa/libsp/tests.cmake
+index 63abb57..eb0b41e 100644
+--- a/components/messaging/ffa/libsp/tests.cmake
++++ b/components/messaging/ffa/libsp/tests.cmake
+@@ -176,6 +176,20 @@ unit_test_add_suite(
+ 		-DARM64
+ )
+ 
++unit_test_add_suite(
++	NAME libsp_mock_sp_messaging
++	SOURCES
++		${CMAKE_CURRENT_LIST_DIR}/mock/test/test_mock_sp_messaging.cpp
++		${CMAKE_CURRENT_LIST_DIR}/mock/mock_sp_messaging.cpp
++	INCLUDE_DIRECTORIES
++		${CMAKE_CURRENT_LIST_DIR}/include/
++		${CMAKE_CURRENT_LIST_DIR}/mock
++		${UNIT_TEST_PROJECT_PATH}/components/common/utils/include
++	COMPILE_DEFINITIONS
++		-DARM64
++		-DFFA_DIRECT_MSG_ROUTING_EXTENSION=1
++)
++
+ unit_test_add_suite(
+ 	NAME libsp_sp_messaging_with_routing_extension
+ 	SOURCES
+-- 
+2.17.1
+

@@ -1,0 +1,38 @@
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
+
+From 327290faefe16440c4975c9539b11d43c92bcf48 Mon Sep 17 00:00:00 2001
+From: Vishnu Banavath <vishnu.banavath@arm.com>
+Date: Thu, 25 Nov 2021 06:20:48 +0000
+Subject: [PATCH] plat-corstone1000: add a rule in Makefile to SP_MAKEFILE_PATH
+
+This change is to provide an option to user to include
+secure manifest into optee-os Makefile so that the secure
+partition is part of optee-os image
+
+Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
+
+diff --git a/Makefile b/Makefile
+index f6fcea8b..21722939 100644
+--- a/Makefile
++++ b/Makefile
+@@ -18,6 +18,16 @@ unexport MAKEFILE_LIST
+ # nonzero status). Useful since a few recipes use shell redirection.
+ .DELETE_ON_ERROR:
+ 
++# include secure partition make file and manifest file
++ifdef CFG_SP_MKFILE_PATH
++ifdef CFG_EMBED_DTB_SOURCE_FILE
++include $(CFG_SP_MKFILE_PATH)
++$(info Loading secure partitions manifest ${CFG_EMBED_DTB_SOURCE_FILE})
++CFG_EMBED_DTB_SOURCE_FILE :=${CFG_EMBED_DTB_SOURCE_FILE}
++OPTEE_OS_COMMON_EXTRA_FLAGS+=${CFG_EMBED_DTB_SOURCE_FILE}
++endif
++endif
++
+ include mk/checkconf.mk
+ 
+ .PHONY: all
+-- 
+2.17.1
+

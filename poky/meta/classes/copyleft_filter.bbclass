@@ -1,10 +1,14 @@
+#
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
+
 # Filter the license, the copyleft_should_include returns True for the
 # COPYLEFT_LICENSE_INCLUDE recipe, and False for the
 # COPYLEFT_LICENSE_EXCLUDE.
 #
 # By default, includes all GPL and LGPL, and excludes CLOSED and Proprietary.
-#
-# vi:sts=4:sw=4:et
 
 COPYLEFT_LICENSE_INCLUDE ?= 'GPL* LGPL* AGPL*'
 COPYLEFT_LICENSE_INCLUDE[type] = 'list'

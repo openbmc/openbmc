@@ -9,6 +9,8 @@ SRC_URI = "file://skeleton \
 	   file://COPYRIGHT \
 	   "
 
+S = "${WORKDIR}"
+
 do_compile () {
 	${CC} ${CFLAGS} ${LDFLAGS} ${WORKDIR}/skeleton_test.c -o ${WORKDIR}/skeleton-test
 }

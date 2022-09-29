@@ -1,0 +1,43 @@
+From 008cfc6457c239466ca62610d59aaf1a78f6b2f6 Mon Sep 17 00:00:00 2001
+From: Tudor Cretu <tudor.cretu@arm.com>
+Date: Fri, 21 May 2021 14:56:37 +0000
+Subject: [PATCH 1/7] plat: tc: Increase maximum BL2 size.
+
+BL2 size gets increased due to the firmware update changes.
+Increase the MAX_BL2_SIZE by 8Kb.
+
+Signed-off-by: Tudor Cretu <tudor.cretu@arm.com>
+Change-Id: I1cb28b0eb7f834426873ff9f4c40bd496413806f
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ plat/arm/board/tc/include/platform_def.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/plat/arm/board/tc/include/platform_def.h b/plat/arm/board/tc/include/platform_def.h
+index 745d91cab..cd77773aa 100644
+--- a/plat/arm/board/tc/include/platform_def.h
++++ b/plat/arm/board/tc/include/platform_def.h
+@@ -120,9 +120,9 @@
+  * little space for growth.
+  */
+ #if TRUSTED_BOARD_BOOT
+-# define PLAT_ARM_MAX_BL2_SIZE		0x20000
++# define PLAT_ARM_MAX_BL2_SIZE		0x25000
+ #else
+-# define PLAT_ARM_MAX_BL2_SIZE		0x14000
++# define PLAT_ARM_MAX_BL2_SIZE		0x19000
+ #endif
+ 
+ /*
+@@ -130,7 +130,7 @@
+  * calculated using the current BL31 PROGBITS debug size plus the sizes of
+  * BL2 and BL1-RW
+  */
+-#define PLAT_ARM_MAX_BL31_SIZE		0x3F000
++#define PLAT_ARM_MAX_BL31_SIZE		0x4F000
+ 
+ /*
+  * Size of cacheable stacks
+-- 
+2.30.2
+

@@ -103,7 +103,7 @@ do_install_armmultilib () {
 
 BBCLASSEXTEND = "nativesdk"
 
-RDEPENDS:${PN}-dev = ""
+DEV_PKG_DEPENDENCY = ""
 RRECOMMENDS:${PN}-dbg = "${PN}-dev (= ${EXTENDPKGV})"
 
 INHIBIT_DEFAULT_DEPS = "1"

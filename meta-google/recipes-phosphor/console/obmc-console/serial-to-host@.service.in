@@ -1,8 +1,7 @@
 [Unit]
 Description=Host Serial Getty on %I
 BindsTo=dev-%i.device
-After=dev-%i.device systemd-user-sessions.service
-After=rc-local.service
+After=dev-%i.device
 Before=getty.target
 IgnoreOnIsolate=yes
 

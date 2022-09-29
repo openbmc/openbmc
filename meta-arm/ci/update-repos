@@ -1,0 +1,43 @@
+#! /usr/bin/env python3
+
+# Update clones of the repositories we need in KAS_REPO_REF_DIR to speed up fetches
+
+import sys
+import os
+import subprocess
+import pathlib
+
+def repo_shortname(url):
+    # Taken from Kas (Repo.__getattr__) to ensure the logic is right
+    from urllib.parse import urlparse
+    url = urlparse(url)
+    return ('{url.netloc}{url.path}'
+            .format(url=url)
+            .replace('@', '.')
+            .replace(':', '.')
+            .replace('/', '.')
+            .replace('*', '.'))
+
+repositories = (
+    "https://git.yoctoproject.org/git/poky",
+    "https://git.openembedded.org/meta-openembedded",
+    "https://git.yoctoproject.org/git/meta-virtualization",
+    "https://git.yoctoproject.org/git/meta-zephyr",
+    "https://github.com/kraj/meta-clang",
+)
+
+if __name__ == "__main__":
+    if "KAS_REPO_REF_DIR" not in os.environ:
+        print("KAS_REPO_REF_DIR needs to be set")
+        sys.exit(1)
+
+    base_repodir = pathlib.Path(os.environ["KAS_REPO_REF_DIR"])
+
+    for repo in repositories:
+        repodir = base_repodir / repo_shortname(repo)
+        if repodir.exists():
+            print("Updating %s..." % repo)
+            subprocess.run(["git", "-C", repodir, "fetch"], check=True)
+        else:
+            print("Cloning %s..." % repo)
+            subprocess.run(["git", "clone", "--bare", repo, repodir], check=True)

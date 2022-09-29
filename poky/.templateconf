@@ -1,2 +1,2 @@
 # Template settings
-TEMPLATECONF=${TEMPLATECONF:-meta-poky/conf}
+TEMPLATECONF=${TEMPLATECONF:-meta-poky/conf/templates/default}

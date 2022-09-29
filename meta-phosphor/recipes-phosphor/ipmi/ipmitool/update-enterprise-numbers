@@ -1,0 +1,69 @@
+#!/bin/env python3
+
+from sh import curl
+from typing import List
+
+ENTERPRISES = {
+    0: "Reserved",
+    2: "IBM",
+    343: "Intel Corporation",
+    674: "Dell Inc.",
+    1694: "HCL Technologies Limited",
+    2487: "Phoenix Technologies Ltd.",
+    4128: "ARM Ltd.",
+    6569: "INVENTEC CORPORATION",
+    7244: "Quanta Computer Inc.",
+    8554: "Departement Elektrotechnik, ETH Zuerich",
+    11129: "Google, Inc.",
+    11183: "Mitac International Corp.",
+    19046: "Lenovo Enterprise Business Group",
+    20974: "American Megatrends, Inc",
+    33049: "Mellanox Technologies LTD",
+    40092: "Wiwynn Corporation",
+    40981: "Facebook, Inc.",
+    42817: "IBM Platform Firmware Division",
+    45065: "Insyde",
+    48482: "Linaro Ltd",
+    48512: "Inspur Group Co.,Ltd.",
+    49150: "Vertiv Co",
+    49769: "YADRO",
+    51974: "Raptor Computing Systems, LLC",
+    52538: "Ampere Computing",
+    52893: "Inspur Power Systems Co.,Ltd.",
+}
+
+HEADER = '''\
+This file has been reduced to entities signing CLAs with OpenBMC
+https://drive.google.com/drive/folders/1Ooi0RdTcaOWF1DWFJUAJDdN7tRKde7Nl\
+'''
+
+found_first: bool = False
+org: List[str] = []
+
+for l in curl(
+    "-L", "http://www.iana.org/assignments/enterprise-numbers"
+).splitlines():
+    line = l.rstrip()
+
+    # Look for Reserved/EN-0 as the start of the data.
+    if "0" == line:
+        found_first = True
+
+    # Haven't found EN-0, emit as is.
+    if not found_first:
+        print(line)
+        # Look for magic string.
+        if line.startswith("This file is "):
+            print(HEADER)
+        continue
+
+    # Add line into 'org' set.
+    org.append(line)
+
+    # Every 4 lines (EN, Org, Contact, Email) make an org.
+    if len(org) == 4:
+        if int(org[0]) in ENTERPRISES:
+            for g in org:
+                print(g)
+
+        org = []

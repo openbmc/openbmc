@@ -13,6 +13,12 @@ SRC_URI = "git://github.com/libimobiledevice/libplist;protocol=https;branch=mast
 
 S = "${WORKDIR}/git"
 
+CVE_CHECK_IGNORE += "\
+    CVE-2017-5834 \
+    CVE-2017-5835 \
+    CVE-2017-5836 \
+"
+
 do_install:append () {
     if [ -e ${D}${libdir}/python*/site-packages/plist/_plist.so ]; then
         chrpath -d ${D}${libdir}/python*/site-packages/plist/_plist.so

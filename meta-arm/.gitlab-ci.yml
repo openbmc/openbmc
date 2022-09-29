@@ -1,0 +1,273 @@
+image: ghcr.io/siemens/kas/kas:latest-release
+
+stages:
+  - prep
+  - build
+
+# Common job fragment to get a worker ready
+.setup:
+  stage: build
+  interruptible: true
+  variables:
+    KAS_WORK_DIR: $CI_PROJECT_DIR/work
+    KAS_REPO_REF_DIR: $CI_BUILDS_DIR/persist/repos
+    SSTATE_DIR: $CI_BUILDS_DIR/persist/sstate
+    DL_DIR: $CI_BUILDS_DIR/persist/downloads
+    BB_LOGCONFIG: $CI_PROJECT_DIR/ci/logging.yml
+    TOOLCHAIN_DIR: $CI_BUILDS_DIR/persist/toolchains
+    IMAGE_DIR: $CI_PROJECT_DIR/work/build/tmp/deploy/images
+    TOOLCHAIN_LINK_DIR: $CI_PROJECT_DIR/work/build/toolchains
+  before_script:
+    - echo KAS_WORK_DIR = $KAS_WORK_DIR
+    - echo SSTATE_DIR = $SSTATE_DIR
+    - echo DL_DIR = $DL_DIR
+    - rm -rf $KAS_WORK_DIR
+    - mkdir --verbose --parents $KAS_WORK_DIR $KAS_REPO_REF_DIR $SSTATE_DIR $DL_DIR $TOOLCHAIN_DIR $TOOLCHAIN_LINK_DIR
+    # Must do this here, as it's the only way to make sure the toolchain is installed on the same builder
+    - ./ci/get-binary-toolchains $DL_DIR $TOOLCHAIN_DIR $TOOLCHAIN_LINK_DIR
+    - sudo apt-get update && sudo apt-get install --yes telnet python3-subunit
+
+# Generalised fragment to do a Kas build
+.build:
+  extends: .setup
+  script:
+    - KASFILES=$(./ci/jobs-to-kas "$CI_JOB_NAME")
+    - kas shell --update --force-checkout $KASFILES -c 'cat conf/*.conf'
+    - kas build $KASFILES
+    - ./ci/check-warnings $KAS_WORK_DIR/build/warnings.log
+  artifacts:
+    name: "logs"
+    when: on_failure
+    paths:
+      - $CI_PROJECT_DIR/work/build/tmp/work*/**/temp/log.do_*.*
+
+#
+# Prep stage, update repositories once
+#
+update-repos:
+  extends: .setup
+  stage: prep
+  script:
+    - flock --verbose --timeout 60 $KAS_REPO_REF_DIR ./ci/update-repos
+
+#
+# Build stage, the actual build jobs
+#
+# Available options for building are
+#  TOOLCHAINS: [gcc, clang, armgcc, external-gccarm]
+#  TCLIBC: [glibc, musl]
+#  FIRMWARE: [uboot, edk2]
+#  VIRT: [none, xen]
+#  TESTING: testimage
+
+corstone500:
+  extends: .build
+  parallel:
+    matrix:
+      - TESTING: testimage
+  tags:
+    - x86_64
+
+corstone1000-fvp:
+  extends: .build
+  parallel:
+    matrix:
+      - TESTING: [testimage,tftf]
+  tags:
+    - x86_64
+
+corstone1000-mps3:
+  extends: .build
+
+fvp-base:
+  extends: .build
+  parallel:
+    matrix:
+      - TESTING: testimage
+  tags:
+    - x86_64
+
+fvp-base-arm32:
+  extends: .build
+  parallel:
+    matrix:
+      - TOOLCHAINS: [gcc, external-gccarm]
+        TESTING: testimage
+  tags:
+    - x86_64
+
+fvp-baser-aemv8r64:
+  extends: .build
+  parallel:
+    matrix:
+      - TESTING: testimage
+  tags:
+    - x86_64
+
+fvps:
+  extends: .build
+
+gem5-arm64:
+  extends: .build
+  parallel:
+    matrix:
+      - VIRT: [none, xen]
+
+gem5-atp-arm64:
+  extends: .build
+
+generic-arm64:
+  extends: .build
+
+juno:
+  extends: .build
+  parallel:
+    matrix:
+      - TOOLCHAINS: [gcc, clang]
+        FIRMWARE: [uboot, edk2]
+
+microbit-v1:
+  extends: .build
+  parallel:
+    matrix:
+      - TESTING: testimage-zephyr
+
+musca-b1:
+  extends: .build
+
+musca-s1:
+  extends: .build
+
+n1sdp:
+  extends: .build
+  parallel:
+    matrix:
+      - TOOLCHAINS: [gcc, armgcc]
+
+qemu-cortex-a53:
+  extends: .build
+
+qemu-cortex-m3:
+  extends: .build
+  parallel:
+    matrix:
+      - TESTING: testimage-zephyr
+
+qemu-cortex-r5:
+  extends: .build
+
+qemu-generic-arm64:
+  extends: .build
+  parallel:
+    matrix:
+      - TOOLCHAINS: [gcc, clang]
+        TESTING: testimage
+
+qemuarm64-secureboot:
+  extends: .build
+  parallel:
+    matrix:
+      - TOOLCHAINS: [gcc, clang]
+        TCLIBC: [glibc, musl]
+        TESTING: testimage
+
+qemuarm64-secureboot-ts:
+  extends: .build
+  parallel:
+    matrix:
+      - TCLIBC: [glibc, musl]
+        TESTING: testimage
+
+qemuarm64:
+  extends: .build
+  parallel:
+    matrix:
+      - TOOLCHAINS: [gcc, clang]
+        EFI: [uboot, edk2]
+        TESTING: testimage
+      - VIRT: xen
+
+qemuarm-secureboot:
+  extends: .build
+  parallel:
+    matrix:
+      - TOOLCHAINS: [gcc, clang]
+        TESTING: testimage
+
+qemuarm:
+  extends: .build
+  parallel:
+    matrix:
+      - TOOLCHAINS: [gcc, clang]
+        EFI: [uboot, edk2]
+        TESTING: testimage
+      - VIRT: xen
+
+qemuarmv5:
+  extends: .build
+  parallel:
+    matrix:
+      - TESTING: testimage
+
+sgi575:
+  extends: .build
+
+tc0:
+  extends: .build
+  tags:
+    - x86_64
+
+tc1:
+  extends: .build
+  tags:
+    - x86_64
+
+toolchains:
+  extends: .build
+
+selftest:
+  extends: .setup
+  script:
+    - KASFILES=./ci/qemuarm64.yml:./ci/selftest.yml
+    - kas shell --update --force-checkout $KASFILES -c 'oe-selftest --num-processes 1 --run-tests runfvp'
+
+# Validate layers are Yocto Project Compatible
+check-layers:
+  extends: .setup
+  script:
+    - kas shell --update --force-checkout ci/base.yml:ci/meta-openembedded.yml --command \
+      "yocto-check-layer-wrapper $CI_PROJECT_DIR/$LAYER --dependency $CI_PROJECT_DIR/meta-* $KAS_WORK_DIR/meta-openembedded/meta-oe --no-auto-dependency"
+  parallel:
+    matrix:
+      - LAYER: [meta-arm, meta-arm-bsp, meta-arm-toolchain, meta-gem5]
+
+pending-updates:
+  extends: .setup
+  artifacts:
+    paths:
+      - update-report
+  script:
+    - rm -fr update-report
+    # This configuration has all of the layers we need enabled
+    - kas shell ci/gem5-arm64.yml --command \
+      "$CI_PROJECT_DIR/scripts/machine-summary.py -t report -o $CI_PROJECT_DIR/update-report $($CI_PROJECT_DIR/ci/listmachines.py meta-arm meta-arm-bsp meta-gem5)"
+  # Do this on x86 whilst the compilers are x86-only
+  tags:
+    - x86_64
+
+# What percentage of machines in the layer do we build
+machine-coverage:
+  stage: build
+  interruptible: true
+  script:
+    - ./ci/check-machine-coverage
+  coverage: '/Coverage: \d+/'
+
+metrics:
+  extends: .setup
+  artifacts:
+    reports:
+      metrics: metrics.txt
+  script:
+    - kas shell --update --force-checkout ci/base.yml --command \
+      "$CI_PROJECT_DIR/ci/patchreview $CI_PROJECT_DIR/meta-* --verbose --metrics $CI_PROJECT_DIR/metrics.txt"

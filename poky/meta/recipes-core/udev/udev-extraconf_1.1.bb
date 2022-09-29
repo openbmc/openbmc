@@ -37,8 +37,19 @@ do_install() {
     install -m 0755 ${WORKDIR}/network.sh ${D}${sysconfdir}/udev/scripts
 }
 
-FILES:${PN} = "${sysconfdir}/udev"
-RDEPENDS:${PN} = "udev"
+pkg_postinst:${PN} () {
+	if [ -e $D${systemd_unitdir}/system/systemd-udevd.service ]; then
+		sed -i "/\[Service\]/aMountFlags=shared" $D${systemd_unitdir}/system/systemd-udevd.service
+	fi
+}
+
+pkg_postrm:${PN} () {
+	if [ -e $D${systemd_unitdir}/system/systemd-udevd.service ]; then
+		sed -i "/MountFlags=shared/d" $D${systemd_unitdir}/system/systemd-udevd.service
+	fi
+}
+
+RDEPENDS:${PN} = "udev util-linux-blkid ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'util-linux-lsblk', '', d)}"
 CONFFILES:${PN} = "${sysconfdir}/udev/mount.ignorelist"
 
 # to replace udev-extra-rules from meta-oe

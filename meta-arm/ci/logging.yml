@@ -1,0 +1,13 @@
+# Python logging configuration to write all warnings to a separate file
+version: 1
+
+handlers:
+  warnings:
+    class: logging.FileHandler
+    level: WARNING
+    filename: warnings.log
+    formatter: BitBake.logfileFormatter
+
+loggers:
+  BitBake:
+    handlers: [warnings]

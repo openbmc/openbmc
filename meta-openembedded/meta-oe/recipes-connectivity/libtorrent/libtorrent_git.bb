@@ -11,6 +11,10 @@ SRC_URI = "git://github.com/rakshasa/libtorrent;branch=master;protocol=https \
            "
 SRCREV = "756f70010779927dc0691e1e722ed433d5d295e1"
 
+CVE_CHECK_IGNORE += "\
+    CVE-2009-1760 \
+"
+
 PV = "0.13.8"
 
 S = "${WORKDIR}/git"

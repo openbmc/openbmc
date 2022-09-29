@@ -1,0 +1,176 @@
+SUMMARY = "ALSA Plugins"
+DESCRIPTION = "Used to create virtual devices that can be used like normal \
+hardware devices but cause extra processing of the sound stream to take place. \
+They are used while configuring ALSA in the .asoundrc file."
+HOMEPAGE = "http://alsa-project.org"
+BUGTRACKER = "http://alsa-project.org/main/index.php/Bug_Tracking"
+SECTION = "multimedia"
+
+# The primary license of alsa-plugins is LGPL-2.1-only.
+#
+# m4/attributes.m4 is licensed under GPL-2.0-or-later. m4/attributes.m4 is part
+# of the build system, and doesn't affect the licensing of the build result.
+#
+# The samplerate plugin source code is licensed under GPL-2.0-or-later to be
+# consistent with the libsamplerate license. However, if the licensee has a
+# commercial license for libsamplerate, the samplerate plugin may be used under
+# the terms of LGPL-2.1-only like the rest of the plugins.
+LICENSE = "LGPL-2.1-only & GPL-2.0-or-later"
+LIC_FILES_CHKSUM = "file://COPYING;md5=a916467b91076e631dd8edb7424769c7 \
+                    file://COPYING.GPL;md5=59530bdf33659b29e73d4adb9f9f6552 \
+                    file://m4/attributes.m4;endline=33;md5=bb8c6b2a67ac15156961e242fec33e50 \
+                    file://rate/rate_samplerate.c;endline=35;md5=fd77bce85f4a338c0e8ab18430b69fae \
+                    "
+
+SRC_URI = "https://www.alsa-project.org/files/pub/plugins/${BP}.tar.bz2 \
+           file://0001-arcam_av.c-Include-missing-string.h.patch \
+           "
+SRC_URI[sha256sum] = "8c337814954bb7c167456733a6046142a2931f12eccba3ec2a4ae618a3432511"
+
+DEPENDS += "alsa-lib"
+
+inherit autotools pkgconfig
+
+PACKAGECONFIG ??= "\
+        samplerate \
+        speexdsp \
+        ${@bb.utils.filter('DISTRO_FEATURES', 'pulseaudio', d)} \
+"
+PACKAGECONFIG[aaf] = "--enable-aaf,--disable-aaf,libavtp"
+PACKAGECONFIG[jack] = "--enable-jack,--disable-jack,jack"
+PACKAGECONFIG[libav] = "--enable-libav,--disable-libav,libav"
+PACKAGECONFIG[maemo-plugin] = "--enable-maemo-plugin,--disable-maemo-plugin"
+PACKAGECONFIG[maemo-resource-manager] = "--enable-maemo-resource-manager,--disable-maemo-resource-manager,dbus"
+PACKAGECONFIG[pulseaudio] = "--enable-pulseaudio,--disable-pulseaudio,pulseaudio"
+PACKAGECONFIG[samplerate] = "--enable-samplerate,--disable-samplerate,libsamplerate0"
+PACKAGECONFIG[speexdsp] = "--with-speex=lib,--with-speex=no,speexdsp"
+
+PACKAGES += "${@bb.utils.contains('PACKAGECONFIG', 'pulseaudio', 'alsa-plugins-pulseaudio-conf', '', d)}"
+
+PACKAGES_DYNAMIC = "^libasound-module-.*"
+
+# The alsa-plugins package doesn't itself contain anything, it just depends on
+# all built plugins.
+FILES:${PN} = ""
+ALLOW_EMPTY:${PN} = "1"
+
+do_install:append() {
+	rm -f ${D}${libdir}/alsa-lib/*.la
+
+	if [ "${@bb.utils.contains('PACKAGECONFIG', 'pulseaudio', 'yes', 'no', d)}" = "yes" ]; then
+		# We use the example as is. Upstream installs the file under
+		# /etc, but we move it under /usr/share and add a symlink under
+		# /etc to be consistent with other installed configuration
+		# files.
+		mv ${D}${sysconfdir}/alsa/conf.d/99-pulseaudio-default.conf.example ${D}${datadir}/alsa/alsa.conf.d/99-pulseaudio-default.conf
+		ln -s ${datadir}/alsa/alsa.conf.d/99-pulseaudio-default.conf ${D}${sysconfdir}/alsa/conf.d/99-pulseaudio-default.conf
+	fi
+}
+
+python populate_packages:prepend() {
+    plugindir = d.expand('${libdir}/alsa-lib/')
+    packages = " ".join(do_split_packages(d, plugindir, r'^libasound_module_(.*)\.so$', 'libasound-module-%s', 'Alsa plugin for %s', extra_depends=''))
+    d.setVar("RDEPENDS:alsa-plugins", packages)
+}
+
+# Many plugins have a configuration file (plus a symlink in /etc) associated
+# with them. We put the plugin and it's configuration usually in the same
+# package, but that's problematic when the configuration file is related to
+# multiple plugins, as is the case with the pulse, oss and maemo plugins. In
+# case of the pulse plugins, we have a separate alsa-plugins-pulseaudio-conf
+# package that depends on all the pulse plugins, which ensures that all plugins
+# that the configuration references are installed. The oss and maemo
+# configuration files, on the other hand, are in the respective pcm plugin
+# packages. Therefore it's possible to install the configuration file without
+# the ctl plugin that the configuration file references. This is unlikely to
+# cause big problems, but some kind of improvement to the packaging could
+# probably be done here (at least it would be good to handle the different
+# plugins in a consistent way).
+FILES:${MLPREFIX}libasound-module-ctl-arcam-av += "\
+        ${datadir}/alsa/alsa.conf.d/50-arcam-av-ctl.conf \
+        ${sysconfdir}/alsa/conf.d/50-arcam-av-ctl.conf \
+"
+FILES:${MLPREFIX}libasound-module-pcm-a52 += "\
+        ${datadir}/alsa/alsa.conf.d/60-a52-encoder.conf \
+        ${sysconfdir}/alsa/conf.d/60-a52-encoder.conf \
+"
+FILES:${MLPREFIX}libasound-module-pcm-alsa-dsp += "\
+        ${datadir}/alsa/alsa.conf.d/98-maemo.conf \
+        ${sysconfdir}/alsa/conf.d/98-maemo.conf \
+"
+FILES:${MLPREFIX}libasound-module-pcm-jack += "\
+        ${datadir}/alsa/alsa.conf.d/50-jack.conf \
+        ${sysconfdir}/alsa/conf.d/50-jack.conf \
+"
+FILES:${MLPREFIX}libasound-module-pcm-oss += "\
+        ${datadir}/alsa/alsa.conf.d/50-oss.conf \
+        ${sysconfdir}/alsa/conf.d/50-oss.conf \
+"
+FILES:${MLPREFIX}libasound-module-pcm-speex += "\
+        ${datadir}/alsa/alsa.conf.d/60-speex.conf \
+        ${sysconfdir}/alsa/conf.d/60-speex.conf \
+"
+FILES:${MLPREFIX}libasound-module-pcm-upmix += "\
+        ${datadir}/alsa/alsa.conf.d/60-upmix.conf \
+        ${sysconfdir}/alsa/conf.d/60-upmix.conf \
+"
+FILES:${MLPREFIX}libasound-module-pcm-usb-stream += "\
+        ${datadir}/alsa/alsa.conf.d/98-usb-stream.conf \
+        ${sysconfdir}/alsa/conf.d/98-usb-stream.conf \
+"
+FILES:${MLPREFIX}libasound-module-pcm-vdownmix += "\
+        ${datadir}/alsa/alsa.conf.d/60-vdownmix.conf \
+        ${sysconfdir}/alsa/conf.d/60-vdownmix.conf \
+"
+FILES:${MLPREFIX}libasound-module-rate-lavrate += "\
+        ${datadir}/alsa/alsa.conf.d/10-rate-lav.conf \
+        ${sysconfdir}/alsa/conf.d/10-rate-lav.conf \
+"
+FILES:${MLPREFIX}libasound-module-rate-samplerate += "\
+        ${datadir}/alsa/alsa.conf.d/10-samplerate.conf \
+        ${sysconfdir}/alsa/conf.d/10-samplerate.conf \
+"
+FILES:${MLPREFIX}libasound-module-rate-speexrate += "\
+        ${datadir}/alsa/alsa.conf.d/10-speexrate.conf \
+        ${sysconfdir}/alsa/conf.d/10-speexrate.conf \
+"
+
+# The rate plugins create some symlinks. For example, the samplerate plugin
+# creates these links to the main plugin file:
+#
+#   libasound_module_rate_samplerate_best.so
+#   libasound_module_rate_samplerate_linear.so
+#   libasound_module_rate_samplerate_medium.so
+#   libasound_module_rate_samplerate_order.so
+#
+# The other rate plugins create similar links. We have to add the links to
+# FILES manually, because do_split_packages() skips the links (which is good,
+# because we wouldn't want do_split_packages() to create separate packages for
+# the symlinks).
+#
+# The symlinks cause QA errors, because usually it's a bug if a non
+# -dev/-dbg/-nativesdk package contains links to .so files, but in this case
+# the errors are false positives, so we disable the QA checks.
+FILES:${MLPREFIX}libasound-module-rate-lavrate += "${libdir}/alsa-lib/*rate_lavrate_*.so"
+FILES:${MLPREFIX}libasound-module-rate-samplerate += "${libdir}/alsa-lib/*rate_samplerate_*.so"
+FILES:${MLPREFIX}libasound-module-rate-speexrate += "${libdir}/alsa-lib/*rate_speexrate_*.so"
+INSANE_SKIP:${MLPREFIX}libasound-module-rate-lavrate = "dev-so"
+INSANE_SKIP:${MLPREFIX}libasound-module-rate-samplerate = "dev-so"
+INSANE_SKIP:${MLPREFIX}libasound-module-rate-speexrate = "dev-so"
+
+# 50-pulseaudio.conf defines a device named "pulse" that applications can use
+# if they explicitly want to use the PulseAudio plugin.
+# 99-pulseaudio-default.conf configures the "default" device to use the
+# PulseAudio plugin.
+FILES:${PN}-pulseaudio-conf += "\
+        ${datadir}/alsa/alsa.conf.d/50-pulseaudio.conf \
+        ${datadir}/alsa/alsa.conf.d/99-pulseaudio-default.conf \
+        ${sysconfdir}/alsa/conf.d/50-pulseaudio.conf \
+        ${sysconfdir}/alsa/conf.d/99-pulseaudio-default.conf \
+"
+
+RDEPENDS:${PN}-pulseaudio-conf += "\
+        ${MLPREFIX}libasound-module-conf-pulse \
+        ${MLPREFIX}libasound-module-ctl-pulse \
+        ${MLPREFIX}libasound-module-pcm-pulse \
+"

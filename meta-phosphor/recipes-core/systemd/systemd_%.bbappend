@@ -1,6 +1,4 @@
-FILES:${PN}-catalog-extralocales = \
-            "${exec_prefix}/lib/systemd/catalog/*.*.catalog"
-PACKAGES =+ "${PN}-catalog-extralocales"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 PACKAGECONFIG = "\
         coredump \
         hostnamed \
@@ -18,14 +16,20 @@ PACKAGECONFIG = "\
         zstd \
         "
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 SRC_URI += "file://0001-sd-bus-Don-t-automatically-add-ObjectManager.patch"
 
 EXTRA_OEMESON:append = " -Ddns-servers=''"
 
-ALTERNATIVE:${PN} += "init"
-ALTERNATIVE_TARGET[init] = "${rootlibexecdir}/systemd/systemd"
+PACKAGES =+ "${PN}-catalog-extralocales"
+
+RRECOMMENDS:${PN}:append:openbmc-phosphor = " phosphor-systemd-policy"
+
+FILES:${PN}-catalog-extralocales = "\
+    ${exec_prefix}/lib/systemd/catalog/*.*.catalog \
+"
+
 ALTERNATIVE_LINK_NAME[init] = "${base_sbindir}/init"
 ALTERNATIVE_PRIORITY[init] ?= "300"
 
-RRECOMMENDS:${PN}:append:openbmc-phosphor = " phosphor-systemd-policy"
+ALTERNATIVE:${PN} += "init"
+ALTERNATIVE_TARGET[init] = "${rootlibexecdir}/systemd/systemd"

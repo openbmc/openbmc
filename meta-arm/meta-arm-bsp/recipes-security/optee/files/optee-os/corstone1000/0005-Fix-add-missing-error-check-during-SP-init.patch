@@ -1,0 +1,40 @@
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
+
+From 4617f85b70c7e4206b244f3eaffdc62ac3744a17 Mon Sep 17 00:00:00 2001
+From: Jelle Sels <jelle.sels@arm.com>
+Date: Mon, 10 May 2021 11:37:23 +0200
+Subject: [PATCH] Fix: add missing error check during SP init
+
+Error checking during SP initialization (sp_init_uuid()) was lacking.
+As a result an out of CORE HEAP situation resulted in a panic. This was
+due to lack of memory in the inflate() function of zlib.
+
+Signed-off-by: Jelle Sels <jelle.sels@arm.com>
+Change-Id: I287e2e2dd507feb45991b32ed264b3b6ad6fcd39
+
+diff --git a/core/arch/arm/kernel/sp.c b/core/arch/arm/kernel/sp.c
+index 4acbc2e2..23532a01 100644
+--- a/core/arch/arm/kernel/sp.c
++++ b/core/arch/arm/kernel/sp.c
+@@ -383,10 +383,14 @@ static TEE_Result __attribute__((unused)) sp_init_uuid(const TEE_UUID *uuid)
+ 				  cancel_req_to,
+ 				  &param);
+ 
+-	args.a0 = sp_get_session(sess->id)->sp_regs.x[0];
+-	sp_thread(sess->id, FFA_NW_ID, &args);
++	if (res == TEE_SUCCESS) {
++		args.a0 = sp_get_session(sess->id)->sp_regs.x[0];
++		sp_thread(sess->id, FFA_NW_ID, &args);
+ 
+-	thread_spmc_msg_recv(&args, sess->id);
++		thread_spmc_msg_recv(&args, sess->id);
++	} else {
++		EMSG("SP initialization failed, try increasing CFG_CORE_HEAP_SIZE");
++	}
+ 
+ 	return res;
+ }
+-- 
+2.25.1
+

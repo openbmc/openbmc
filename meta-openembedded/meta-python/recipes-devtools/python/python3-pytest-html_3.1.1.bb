@@ -10,6 +10,10 @@ PYPI_PACKAGE = "pytest-html"
 
 inherit pypi python_setuptools_build_meta
 
+DEPENDS += "python3-setuptools-scm-git-archive-native"
+
+SRC_URI += "file://no-pip.patch"
+
 RDEPENDS:${PN} += " \
     ${PYTHON_PN}-pytest \
 "

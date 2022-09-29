@@ -10,6 +10,8 @@ SRC_URI = "https://github.com/tpm2-software/${BPN}/releases/download/${PV}/${BPN
 
 SRC_URI[sha256sum] = "79f28899047defd6b4b72b7268dd56abf27774954022315f818c239af33e05bd"
 
+UPSTREAM_CHECK_URI = "https://github.com/tpm2-software/${BPN}/releases"
+
 inherit autotools-brokensep pkgconfig python3native
 
 EXTRA_OECONF += "--disable-ptool-checks"

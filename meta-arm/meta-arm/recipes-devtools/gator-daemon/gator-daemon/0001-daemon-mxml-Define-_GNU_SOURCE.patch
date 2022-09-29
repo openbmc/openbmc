@@ -1,0 +1,31 @@
+From 04e2e924c3ab8da41343277746804dbcd7bf520d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 13 Aug 2022 16:49:52 -0700
+Subject: [PATCH] daemon/mxml: Define _GNU_SOURCE
+
+This file uses vasprintf() which is defined only with _GNU_SOURCE
+feature macro is on.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ daemon/mxml/mxml-string.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/daemon/mxml/mxml-string.c b/daemon/mxml/mxml-string.c
+index 678aeb9..c9cd153 100644
+--- a/daemon/mxml/mxml-string.c
++++ b/daemon/mxml/mxml-string.c
+@@ -13,6 +13,8 @@
+  * Include necessary headers...
+  */
+ 
++#define _GNU_SOURCE
++
+ #include "config.h"
+ 
+ 
+-- 
+2.37.2
+

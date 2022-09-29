@@ -26,19 +26,30 @@ RDEPENDS:packagegroup-core-security = "\
 
 SUMMARY:packagegroup-security-utils = "Security utilities"
 RDEPENDS:packagegroup-security-utils = "\
+    bubblewrap \
     checksec \
+    cryptmount \
     ding-libs \
     ecryptfs-utils \
     fscryptctl \
+    glome \
     keyutils \
     nmap \
     pinentry \
     softhsm \
     sshguard \
+    firejail \
     ${@bb.utils.contains_any("TUNE_FEATURES", "riscv32 ", "", " libseccomp",d)} \
-    ${@bb.utils.contains("DISTRO_FEATURES", "pam", "sssd google-authenticator-libpam", "",d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "pam", "google-authenticator-libpam krill", "",d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "pax", "pax-utils packctl", "",d)} \
     "
+
+RDEPENDS:packagegroup-security-utils:append:x86 = " chipsec"
+RDEPENDS:packagegroup-security-utils:append:x86-64 = " chipsec"
+RDEPENDS:packagegroup-security-utils:remove:mipsarch = "firejail krill"
+RDEPENDS:packagegroup-security-utils:remove:libc-musl = "krill"
+RDEPENDS:packagegroup-security-utils:remove:riscv64 = "krill"
+RDEPENDS:packagegroup-security-utils:remove:armv7ve = " krill"
 
 SUMMARY:packagegroup-security-scanners = "Security scanners"
 RDEPENDS:packagegroup-security-scanners = "\

@@ -17,7 +17,7 @@ The 'perf' tool is the profiling and tracing tool that comes bundled
 with the Linux kernel.
 
 Don't let the fact that it's part of the kernel fool you into thinking
-that it's only for tracing and profiling the kernel - you can indeed use
+that it's only for tracing and profiling the kernel --- you can indeed use
 it to trace and profile just the kernel, but you can also use it to
 profile specific applications separately (with or without kernel
 context), and you can also use it to trace and profile the kernel and
@@ -176,7 +176,7 @@ interactive text-based UI (or simply as text if we specify ``--stdio`` to
 
 As our first attempt at profiling this workload, we'll simply run 'perf
 record', handing it the workload we want to profile (everything after
-'perf record' and any perf options we hand it - here none - will be
+'perf record' and any perf options we hand it --- here none, will be
 executed in a new shell). perf collects samples until the process exits
 and records them in a file named 'perf.data' in the current working
 directory. ::
@@ -203,7 +203,7 @@ The above screenshot displays a 'flat' profile, one entry for each
 'bucket' corresponding to the functions that were profiled during the
 profiling run, ordered from the most popular to the least (perf has
 options to sort in various orders and keys as well as display entries
-only above a certain threshold and so on - see the perf documentation
+only above a certain threshold and so on --- see the perf documentation
 for details). Note that this includes both userspace functions (entries
 containing a [.]) and kernel functions accounted to the process (entries
 containing a [k]). (perf has command-line modifiers that can be used to
@@ -608,7 +608,7 @@ and tell perf to do a profile using it as the sampling event::
 The screenshot above shows the results of running a profile using
 sched:sched_switch tracepoint, which shows the relative costs of various
 paths to sched_wakeup (note that sched_wakeup is the name of the
-tracepoint - it's actually defined just inside ttwu_do_wakeup(), which
+tracepoint --- it's actually defined just inside ttwu_do_wakeup(), which
 accounts for the function name actually displayed in the profile:
 
 .. code-block:: c
@@ -877,7 +877,7 @@ System-Wide Tracing and Profiling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The examples so far have focused on tracing a particular program or
-workload - in other words, every profiling run has specified the program
+workload --- in other words, every profiling run has specified the program
 to profile in the command-line e.g. 'perf record wget ...'.
 
 It's also possible, and more interesting in many cases, to run a
@@ -964,7 +964,7 @@ Filtering
 Notice that there are a lot of events that don't really have anything to
 do with what we're interested in, namely events that schedule 'perf'
 itself in and out or that wake perf up. We can get rid of those by using
-the '--filter' option - for each event we specify using -e, we can add a
+the '--filter' option --- for each event we specify using -e, we can add a
 --filter after that to filter out trace events that contain fields with
 specific values::
 
@@ -1135,7 +1135,7 @@ callgraphs from starting a few programs during those 30 seconds:
 .. admonition:: Tying it Together
 
    The trace events subsystem accommodate static and dynamic tracepoints
-   in exactly the same way - there's no difference as far as the
+   in exactly the same way --- there's no difference as far as the
    infrastructure is concerned. See the ftrace section for more details
    on the trace event subsystem.
 
@@ -1201,7 +1201,7 @@ For this section, we'll assume you've already performed the basic setup
 outlined in the ":ref:`profile-manual/intro:General Setup`" section.
 
 ftrace, trace-cmd, and kernelshark run on the target system, and are
-ready to go out-of-the-box - no additional setup is necessary. For the
+ready to go out-of-the-box --- no additional setup is necessary. For the
 rest of this section we assume you've ssh'ed to the host and will be
 running ftrace on the target. kernelshark is a GUI application and if
 you use the '-X' option to ssh you can have the kernelshark GUI run on
@@ -1321,7 +1321,7 @@ great way to learn about how the kernel code works in a dynamic sense.
    ftrace:function tracepoint.
 
 It is a little more difficult to follow the call chains than it needs to
-be - luckily there's a variant of the function tracer that displays the
+be --- luckily there's a variant of the function tracer that displays the
 callchains explicitly, called the 'function_graph' tracer::
 
    root@sugarbay:/sys/kernel/debug/tracing# echo function_graph > current_tracer
@@ -2138,7 +2138,7 @@ You can now view the trace in text form on the target::
    .
 
 You can now safely destroy the trace
-session (note that this doesn't delete the trace - it's still there in
+session (note that this doesn't delete the trace --- it's still there in
 ~/lttng-traces)::
 
    root@crownbay:~# lttng destroy
@@ -2222,7 +2222,7 @@ You can now view the trace in text form on the target::
    .
 
 You can now safely destroy the trace session (note that this doesn't delete the
-trace - it's still there in ~/lttng-traces)::
+trace --- it's still there in ~/lttng-traces)::
 
    root@crownbay:~# lttng destroy
    Session auto-20190303-021943 destroyed at /home/root
@@ -2557,7 +2557,7 @@ Execute the workload you're interested in::
    root@crownbay:/sys/kernel/debug/tracing# cat /media/sdc/testfile.txt
 
 And look at the output (note here that we're using 'trace_pipe' instead of
-trace to capture this trace - this allows us to wait around on the pipe
+trace to capture this trace --- this allows us to wait around on the pipe
 for data to appear)::
 
    root@crownbay:/sys/kernel/debug/tracing# cat trace_pipe

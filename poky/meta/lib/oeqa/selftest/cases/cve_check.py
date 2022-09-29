@@ -1,3 +1,9 @@
+#
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
+
 import json
 import os
 from oeqa.selftest.case import OESelftestTestCase
@@ -117,3 +123,85 @@ CVE_CHECK_FORMAT_JSON = "1"
         self.assertEqual(report["version"], "1")
         self.assertEqual(len(report["package"]), 1)
         self.assertEqual(report["package"][0]["name"], recipename)
+
+
+    def test_recipe_report_json_unpatched(self):
+        config = """
+INHERIT += "cve-check"
+CVE_CHECK_FORMAT_JSON = "1"
+CVE_CHECK_REPORT_PATCHED = "0"
+"""
+        self.write_config(config)
+
+        vars = get_bb_vars(["CVE_CHECK_SUMMARY_DIR", "CVE_CHECK_SUMMARY_FILE_NAME_JSON"])
+        summary_json = os.path.join(vars["CVE_CHECK_SUMMARY_DIR"], vars["CVE_CHECK_SUMMARY_FILE_NAME_JSON"])
+        recipe_json = os.path.join(vars["CVE_CHECK_SUMMARY_DIR"], "m4-native_cve.json")
+
+        try:
+            os.remove(summary_json)
+            os.remove(recipe_json)
+        except FileNotFoundError:
+            pass
+
+        bitbake("m4-native -c cve_check")
+
+        def check_m4_json(filename):
+            with open(filename) as f:
+                report = json.load(f)
+            self.assertEqual(report["version"], "1")
+            self.assertEqual(len(report["package"]), 1)
+            package = report["package"][0]
+            self.assertEqual(package["name"], "m4-native")
+            #m4 had only Patched CVEs, so the issues array will be empty
+            self.assertEqual(package["issue"], [])
+
+        self.assertExists(summary_json)
+        check_m4_json(summary_json)
+        self.assertExists(recipe_json)
+        check_m4_json(recipe_json)
+
+
+    def test_recipe_report_json_ignored(self):
+        config = """
+INHERIT += "cve-check"
+CVE_CHECK_FORMAT_JSON = "1"
+CVE_CHECK_REPORT_PATCHED = "1"
+"""
+        self.write_config(config)
+
+        vars = get_bb_vars(["CVE_CHECK_SUMMARY_DIR", "CVE_CHECK_SUMMARY_FILE_NAME_JSON"])
+        summary_json = os.path.join(vars["CVE_CHECK_SUMMARY_DIR"], vars["CVE_CHECK_SUMMARY_FILE_NAME_JSON"])
+        recipe_json = os.path.join(vars["CVE_CHECK_SUMMARY_DIR"], "logrotate_cve.json")
+
+        try:
+            os.remove(summary_json)
+            os.remove(recipe_json)
+        except FileNotFoundError:
+            pass
+
+        bitbake("logrotate -c cve_check")
+
+        def check_m4_json(filename):
+            with open(filename) as f:
+                report = json.load(f)
+            self.assertEqual(report["version"], "1")
+            self.assertEqual(len(report["package"]), 1)
+            package = report["package"][0]
+            self.assertEqual(package["name"], "logrotate")
+            found_cves = { issue["id"]: issue["status"] for issue in package["issue"]}
+            # m4 CVE should not be in logrotate
+            self.assertNotIn("CVE-2008-1687", found_cves)
+            # logrotate has both Patched and Ignored CVEs
+            self.assertIn("CVE-2011-1098", found_cves)
+            self.assertEqual(found_cves["CVE-2011-1098"], "Patched")
+            self.assertIn("CVE-2011-1548", found_cves)
+            self.assertEqual(found_cves["CVE-2011-1548"], "Ignored")
+            self.assertIn("CVE-2011-1549", found_cves)
+            self.assertEqual(found_cves["CVE-2011-1549"], "Ignored")
+            self.assertIn("CVE-2011-1550", found_cves)
+            self.assertEqual(found_cves["CVE-2011-1550"], "Ignored")
+
+        self.assertExists(summary_json)
+        check_m4_json(summary_json)
+        self.assertExists(recipe_json)
+        check_m4_json(recipe_json)

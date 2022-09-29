@@ -34,11 +34,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  crypto/build.info                 |  2 +-
  2 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/Configurations/unix-Makefile.tmpl b/Configurations/unix-Makefile.tmpl
-index f88a70f..528cdef 100644
---- a/Configurations/unix-Makefile.tmpl
-+++ b/Configurations/unix-Makefile.tmpl
-@@ -471,13 +471,23 @@ BIN_LDFLAGS={- join(' ', $target{bin_lflags} || (),
+Index: openssl-3.0.4/Configurations/unix-Makefile.tmpl
+===================================================================
+--- openssl-3.0.4.orig/Configurations/unix-Makefile.tmpl
++++ openssl-3.0.4/Configurations/unix-Makefile.tmpl
+@@ -472,13 +472,23 @@ BIN_LDFLAGS={- join(' ', $target{bin_lfl
                           '$(CNF_LDFLAGS)', '$(LDFLAGS)') -}
  BIN_EX_LIBS=$(CNF_EX_LIBS) $(EX_LIBS)
  
@@ -63,10 +63,10 @@ index f88a70f..528cdef 100644
  PERLASM_SCHEME= {- $target{perlasm_scheme} -}
  
  # For x86 assembler: Set PROCESSOR to 386 if you want to support
-diff --git a/crypto/build.info b/crypto/build.info
-index efca6cc..eda433e 100644
---- a/crypto/build.info
-+++ b/crypto/build.info
+Index: openssl-3.0.4/crypto/build.info
+===================================================================
+--- openssl-3.0.4.orig/crypto/build.info
++++ openssl-3.0.4/crypto/build.info
 @@ -109,7 +109,7 @@ DEFINE[../libcrypto]=$UPLINKDEF
  
  DEPEND[info.o]=buildinf.h
@@ -74,5 +74,5 @@ index efca6cc..eda433e 100644
 -GENERATE[buildinf.h]=../util/mkbuildinf.pl "$(CC) $(LIB_CFLAGS) $(CPPFLAGS_Q)" "$(PLATFORM)"
 +GENERATE[buildinf.h]=../util/mkbuildinf.pl "$(CC_Q) $(CFLAGS_Q) $(CPPFLAGS_Q)" "$(PLATFORM)"
  
- GENERATE[uplink-x86.s]=../ms/uplink-x86.pl
+ GENERATE[uplink-x86.S]=../ms/uplink-x86.pl
  GENERATE[uplink-x86_64.s]=../ms/uplink-x86_64.pl

@@ -1,0 +1,44 @@
+From e9e9027d7a324e1ce5e0cb06d4eb51847262a09d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 28 Aug 2022 12:26:52 -0700
+Subject: [PATCH] mplay: Fix build with musl
+
+pthread_t is an opaque type, therefore typecast it to avoid warnings on
+musl
+
+Fixes
+mplay.c:200:12: error: incompatible integer to pointer conversion initializing 'pthread_t' (aka 'struct __pthread *') with an expression of type 'int' [-Wint-conversion]
+|         .tid                            = -1
+|                                           ^~
+
+Upstream-Status: Submitted [https://sourceforge.net/p/lirc/git/merge-requests/47/]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ plugins/mplay.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/plugins/mplay.c b/plugins/mplay.c
+index d6d9619..5b9eb4b 100644
+--- a/plugins/mplay.c
++++ b/plugins/mplay.c
+@@ -197,7 +197,7 @@ static struct {
+ 	.latest_button			= MPLAY_CODE_ERROR,
+ 	.fd				= -1,
+ 	.pipefd				= { -1,	     -1	  },
+-	.tid				= -1
++	.tid				= (pthread_t)-1
+ };
+ 
+ /**
+@@ -788,7 +788,7 @@ int mplayfamily_deinit(void)
+ 			return 0;
+ 		}
+ 		pthread_join(mplayfamily_local_data.tid, NULL);
+-		mplayfamily_local_data.tid = -1;
++		mplayfamily_local_data.tid = (pthread_t)-1;
+ 	}
+ 	if (mplayfamily_local_data.pipefd[0] != -1) {
+ 		close(mplayfamily_local_data.pipefd[0]);
+-- 
+2.37.2
+

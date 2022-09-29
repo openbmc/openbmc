@@ -1,0 +1,29 @@
+From ed499cffabe64fc1dc5898cb69ffa7e62c19e9d8 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 5 Jul 2022 21:19:20 +0200
+Subject: [PATCH] xcb-proto.pc.in: reinstate libdir
+
+Otherwise the following occurs when building libxcb:
+| checking for xcb-proto >= 1.14... no
+| configure: error: Package requirements (xcb-proto >= 1.14) were not met:
+|
+| Variable 'libdir' not defined in '/srv/work/alex/poky/build-64-alt/tmp/work/core2-64-poky-linux/libxcb/1.15-r0/recipe-sysroot/usr/share/pkgconfig/xcb-proto.pc'
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/xorg/proto/xcbproto/-/merge_requests/31]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ xcb-proto.pc.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/xcb-proto.pc.in b/xcb-proto.pc.in
+index 0822b18..c7c8b47 100644
+--- a/xcb-proto.pc.in
++++ b/xcb-proto.pc.in
+@@ -2,6 +2,7 @@ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+ datarootdir=@datarootdir@
+ datadir=@datadir@
++libdir=@libdir@
+ xcbincludedir=${pc_sysrootdir}@xcbincludedir@
+ PYTHON_PREFIX=@PYTHON_PREFIX@
+ pythondir=${pc_sysrootdir}@pythondir@

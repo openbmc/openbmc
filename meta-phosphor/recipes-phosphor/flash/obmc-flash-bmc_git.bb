@@ -1,7 +1,9 @@
 SUMMARY = "OpenBMC BMC update utility"
 DESCRIPTION = "OpenBMC BMC update utility."
-PR = "r1"
 PV = "1.0+git${SRCPV}"
+PR = "r1"
+
+SKELETON_DIR = "pyflashbmc"
 
 inherit skeleton-python
 inherit obmc-phosphor-dbus-service
@@ -16,5 +18,4 @@ RDEPENDS:${PN} += "\
         pyphosphor-dbus \
         "
 
-SKELETON_DIR = "pyflashbmc"
 DBUS_SERVICE:${PN} += "org.openbmc.control.BmcFlash.service"

@@ -14,19 +14,13 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/google/protobuf/port_def.inc | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/google/protobuf/port_def.inc b/src/google/protobuf/port_def.inc
-index 71325c387..303475232 100644
 --- a/src/google/protobuf/port_def.inc
 +++ b/src/google/protobuf/port_def.inc
-@@ -230,7 +230,7 @@
+@@ -255,6 +255,7 @@
  #error PROTOBUF_TAILCALL was previously defined
  #endif
- #if __has_cpp_attribute(clang::musttail) && \
--  !defined(__arm__) && !defined(_ARCH_PPC) && !defined(__wasm__)
-+  !defined(__arm__) && !defined(_ARCH_PPC) && !defined(__wasm__) && !defined(__mips__)
- #  ifndef PROTO2_OPENSOURCE
- // Compilation fails on ARM32: b/195943306
- // Compilation fails on powerpc64le: b/187985113
--- 
-2.33.1
-
+ #if __has_cpp_attribute(clang::musttail) && !defined(__arm__) && \
++    !defined(__mips__) && \
+     !defined(_ARCH_PPC) && !defined(__wasm__) &&                 \
+     !(defined(_MSC_VER) && defined(_M_IX86)) &&                  \
+     !(defined(__NDK_MAJOR__) && __NDK_MAJOR <= 24)

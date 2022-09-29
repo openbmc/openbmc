@@ -1,0 +1,28 @@
+From 3c7deaa3a961a0f3ce4ff108468e3d70118f17b3 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Thu, 9 Jun 2022 17:23:42 +0200
+Subject: [PATCH] generate_umath.py: do not write full path to output files
+
+This helps reproducibility as those paths vary in automated
+build environments.
+
+Upstream-Status: Submitted [https://github.com/numpy/numpy/pull/21707]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
+---
+ numpy/core/code_generators/generate_umath.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/numpy/core/code_generators/generate_umath.py b/numpy/core/code_generators/generate_umath.py
+index 292d9e0..df37941 100644
+--- a/numpy/core/code_generators/generate_umath.py
++++ b/numpy/core/code_generators/generate_umath.py
+@@ -1233,7 +1233,7 @@ def make_code(funcdict, filename):
+ 
+         return 0;
+     }
+-    """) % (filename, code1, code2, code3)
++    """) % (os.path.basename(filename), code1, code2, code3)
+     return code
+ 
+ 

@@ -7,7 +7,7 @@ require polkit-group-rule.inc
 # The file originates from https://github.com/coldfix/udiskie/wiki/Permissions
 SRC_URI = "file://50-org.freedesktop.udiskie.rules"
 
-RDEPENDS_${PN} += "udisks2"
+RDEPENDS:${PN} += "udisks2"
 
 do_install() {
     install -m 0755 ${WORKDIR}/50-org.freedesktop.udiskie.rules ${D}${sysconfdir}/polkit-1/rules.d

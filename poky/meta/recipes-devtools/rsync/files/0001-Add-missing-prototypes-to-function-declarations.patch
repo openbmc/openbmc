@@ -1,0 +1,173 @@
+From 785c0072c80c2f6e0839478453cf65fdeac15da0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 29 Aug 2022 19:53:28 -0700
+Subject: [PATCH] Add missing prototypes to function declarations
+
+With Clang 15+ compiler -Wstrict-prototypes is triggering warnings which
+are turned into errors with -Werror, this fixes the problem by adding
+missing prototypes
+
+Fixes errors like
+| log.c:134:24: error: a function declaration without a prototype is deprecated in all versions of C [-Werror,-Wstrict-prototypes]
+| static void syslog_init()
+|                        ^
+|                         void
+
+Upstream-Status: Submitted [https://lists.samba.org/archive/rsync/2022-August/032858.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ checksum.c       | 2 +-
+ exclude.c        | 2 +-
+ hlink.c          | 3 +--
+ lib/pool_alloc.c | 2 +-
+ log.c            | 2 +-
+ main.c           | 2 +-
+ syscall.c        | 4 ++--
+ zlib/crc32.c     | 2 +-
+ zlib/trees.c     | 2 +-
+ zlib/zutil.c     | 4 ++--
+ 10 files changed, 12 insertions(+), 13 deletions(-)
+
+diff --git a/checksum.c b/checksum.c
+index fb8c0a0..174c28c 100644
+--- a/checksum.c
++++ b/checksum.c
+@@ -629,7 +629,7 @@ int sum_end(char *sum)
+ 	return csum_len_for_type(cursum_type, 0);
+ }
+ 
+-void init_checksum_choices()
++void init_checksum_choices(void)
+ {
+ #ifdef SUPPORT_XXH3
+ 	char buf[32816];
+diff --git a/exclude.c b/exclude.c
+index adc82e2..79f5a82 100644
+--- a/exclude.c
++++ b/exclude.c
+@@ -358,7 +358,7 @@ void implied_include_partial_string(const char *s_start, const char *s_end)
+ 	memcpy(partial_string_buf, s_start, partial_string_len);
+ }
+ 
+-void free_implied_include_partial_string()
++void free_implied_include_partial_string(void)
+ {
+ 	if (partial_string_buf) {
+ 		free(partial_string_buf);
+diff --git a/hlink.c b/hlink.c
+index 66810a3..6511dfb 100644
+--- a/hlink.c
++++ b/hlink.c
+@@ -117,8 +117,7 @@ static void match_gnums(int32 *ndx_list, int ndx_count)
+ 	struct ht_int32_node *node = NULL;
+ 	int32 gnum, gnum_next;
+ 
+-	qsort(ndx_list, ndx_count, sizeof ndx_list[0], (int (*)()) hlink_compare_gnum);
+-
++	qsort(ndx_list, ndx_count, sizeof ndx_list[0], (int (*)(const void *, const void *)) hlink_compare_gnum);
+ 	for (from = 0; from < ndx_count; from++) {
+ 		file = hlink_flist->sorted[ndx_list[from]];
+ 		gnum = F_HL_GNUM(file);
+diff --git a/lib/pool_alloc.c b/lib/pool_alloc.c
+index a1a7245..4eae062 100644
+--- a/lib/pool_alloc.c
++++ b/lib/pool_alloc.c
+@@ -9,7 +9,7 @@ struct alloc_pool
+ 	size_t			size;		/* extent size		*/
+ 	size_t			quantum;	/* allocation quantum	*/
+ 	struct pool_extent	*extents;	/* top extent is "live" */
+-	void			(*bomb)();	/* called if malloc fails */
++	void			(*bomb)(const char *, const char *, int);	/* called if malloc fails */
+ 	int			flags;
+ 
+ 	/* statistical data */
+diff --git a/log.c b/log.c
+index 44344e2..991e359 100644
+--- a/log.c
++++ b/log.c
+@@ -131,7 +131,7 @@ static void logit(int priority, const char *buf)
+ 	}
+ }
+ 
+-static void syslog_init()
++static void syslog_init(void)
+ {
+ 	int options = LOG_PID;
+ 
+diff --git a/main.c b/main.c
+index 9ebfbea..affa244 100644
+--- a/main.c
++++ b/main.c
+@@ -244,7 +244,7 @@ void read_del_stats(int f)
+ 	stats.deleted_files += stats.deleted_specials = read_varint(f);
+ }
+ 
+-static void become_copy_as_user()
++static void become_copy_as_user(void)
+ {
+ 	char *gname;
+ 	uid_t uid;
+diff --git a/syscall.c b/syscall.c
+index d92074a..92ca86d 100644
+--- a/syscall.c
++++ b/syscall.c
+@@ -389,9 +389,9 @@ OFF_T do_lseek(int fd, OFF_T offset, int whence)
+ {
+ #ifdef HAVE_LSEEK64
+ #if !SIZEOF_OFF64_T
+-	OFF_T lseek64();
++	OFF_T lseek64(int fd, OFF_T offset, int whence);
+ #else
+-	off64_t lseek64();
++	off64_t lseek64(int fd, off64_t offset, int whence);
+ #endif
+ 	return lseek64(fd, offset, whence);
+ #else
+diff --git a/zlib/crc32.c b/zlib/crc32.c
+index 05733f4..50c6c02 100644
+--- a/zlib/crc32.c
++++ b/zlib/crc32.c
+@@ -187,7 +187,7 @@ local void write_table(out, table)
+ /* =========================================================================
+  * This function can be used by asm versions of crc32()
+  */
+-const z_crc_t FAR * ZEXPORT get_crc_table()
++const z_crc_t FAR * ZEXPORT get_crc_table(void)
+ {
+ #ifdef DYNAMIC_CRC_TABLE
+     if (crc_table_empty)
+diff --git a/zlib/trees.c b/zlib/trees.c
+index 9c66770..0d9047e 100644
+--- a/zlib/trees.c
++++ b/zlib/trees.c
+@@ -231,7 +231,7 @@ local void send_bits(s, value, length)
+ /* ===========================================================================
+  * Initialize the various 'constant' tables.
+  */
+-local void tr_static_init()
++local void tr_static_init(void)
+ {
+ #if defined(GEN_TREES_H) || !defined(STDC)
+     static int static_init_done = 0;
+diff --git a/zlib/zutil.c b/zlib/zutil.c
+index bbba7b2..61f8dc9 100644
+--- a/zlib/zutil.c
++++ b/zlib/zutil.c
+@@ -27,12 +27,12 @@ z_const char * const z_errmsg[10] = {
+ ""};
+ 
+ 
+-const char * ZEXPORT zlibVersion()
++const char * ZEXPORT zlibVersion(void)
+ {
+     return ZLIB_VERSION;
+ }
+ 
+-uLong ZEXPORT zlibCompileFlags()
++uLong ZEXPORT zlibCompileFlags(void)
+ {
+     uLong flags;
+ 
+-- 
+2.37.2
+

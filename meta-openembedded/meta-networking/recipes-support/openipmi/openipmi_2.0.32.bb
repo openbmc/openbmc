@@ -41,6 +41,8 @@ SRC_URI[sha256sum] = "f6d0fd4c0a74b05f80907229d0b270f54ca23294bcc11979f8b8d12766
 
 inherit autotools-brokensep pkgconfig python3native perlnative update-rc.d systemd cpan-base python3targetconfig
 
+CFLAGS += "-D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
+
 EXTRA_OECONF = "--disable-static \
                 --with-perl='${STAGING_BINDIR_NATIVE}/perl-native/perl' \
                 --with-python='${STAGING_BINDIR_NATIVE}/python3-native/python3' \
@@ -83,6 +85,10 @@ do_configure () {
         sed -i -e "/^PERL_CFLAGS/s:-I .* :-I ${STAGING_LIBDIR}${PERL_OWN_DIR}/perl5/${@get_perl_version(d)}/${@get_perl_arch(d)}/CORE :g" $i
         sed -i -e "/^PERL_INSTALL_DIR/s:^PERL_INSTALL_DIR = .*:PERL_INSTALL_DIR = ${libdir}/perl/vendor_perl/$perl_ver:g" $i
     done
+}
+
+do_compile:append () {
+    sed -i -e 's#${RECIPE_SYSROOT_NATIVE}##g' ${S}/swig/perl/OpenIPMI_wrap.c
 }
 
 do_install:append () {

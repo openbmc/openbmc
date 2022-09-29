@@ -1,0 +1,8 @@
+header:
+  version: 11
+
+local_conf_header:
+  cc: |
+    SKIP_RECIPE[gcc-cross-arm] = "Using external toolchain"
+    TCMODE = "external-arm"
+    EXTERNAL_TOOLCHAIN = "${TOPDIR}/toolchains/${TARGET_ARCH}"

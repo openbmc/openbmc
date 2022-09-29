@@ -1,0 +1,46 @@
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Arpita S.K <arpita.s.k@arm.com>
+
+From e5d9dfa703a5a57e535b5dab4eda47a9707972d3 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Mon, 25 Oct 2021 12:51:37 +0100
+Subject: [PATCH 2/2] script: loading the driver in a generic way
+
+Use the kernel module from the modules path.
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+---
+ load_module.sh => load_ffa_debugfs.sh | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+ rename load_module.sh => load_ffa_debugfs.sh (50%)
+ mode change 100755 => 100644
+
+diff --git a/load_module.sh b/load_ffa_debugfs.sh
+old mode 100755
+new mode 100644
+similarity index 50%
+rename from load_module.sh
+rename to load_ffa_debugfs.sh
+index 2137245..4f31ff3
+--- a/load_module.sh
++++ b/load_ffa_debugfs.sh
+@@ -1,10 +1,14 @@
+ #!/bin/sh
++#
++# Use:
++# load_ffa_debugfs.sh <folder containing sp_uuid_list.txt>
++#
+ 
+-[ ! -f $(dirname "$0")/sp_uuid_list.txt ] && \
++[ ! -f "$1"/sp_uuid_list.txt ] && \
+ 	{ echo "Error: missing SP UUID list"; exit 1; }
+ 
+ if ! grep -qs 'arm-ffa-user' /proc/modules; then
+-	insmod $(dirname "$0")/arm-ffa-user.ko uuid_str_list=$(cat $(dirname "$0")/sp_uuid_list.txt)
++	insmod /lib/modules/$(uname -r)/extra/arm-ffa-user.ko uuid_str_list=$(cat "$1"/sp_uuid_list.txt)
+ fi
+ 
+ if ! grep -qs 'debugfs' /proc/mounts; then
+-- 
+2.17.1
+

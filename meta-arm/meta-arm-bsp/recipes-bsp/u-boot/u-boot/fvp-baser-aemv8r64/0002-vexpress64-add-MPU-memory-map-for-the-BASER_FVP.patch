@@ -1,0 +1,61 @@
+From 80c64d0c035a5cd0cb23c7b01be39f25e15c7193 Mon Sep 17 00:00:00 2001
+From: Qi Feng <qi.feng@arm.com>
+Date: Tue, 26 Jul 2022 18:13:23 +0800
+Subject: [PATCH 2/9] vexpress64: add MPU memory map for the BASER_FVP
+
+The previous patch added support for initializing an Armv8 MPU. There is only an
+MPU at S-EL2 on the BASER_FVP, so add a platform-specific MPU memory map.
+
+See https://developer.arm.com/documentation/100964/1117/Base-Platform/Base---memory/BaseR-Platform-memory-map
+
+Upstream-Status: Inappropriate [other]
+  Implementation pending further discussion
+Signed-off-by: Peter Hoyes <Peter.Hoyes@arm.com>
+Signed-off-by: Qi Feng <qi.feng@arm.com>
+---
+ board/armltd/vexpress64/vexpress64.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/board/armltd/vexpress64/vexpress64.c b/board/armltd/vexpress64/vexpress64.c
+index 709ebf3fb0..1791cd986f 100644
+--- a/board/armltd/vexpress64/vexpress64.c
++++ b/board/armltd/vexpress64/vexpress64.c
+@@ -19,6 +19,7 @@
+ #include <dm/platform_data/serial_pl01x.h>
+ #include "pcie.h"
+ #include <asm/armv8/mmu.h>
++#include <asm/armv8/mpu.h>
+ #ifdef CONFIG_VIRTIO_NET
+ #include <virtio_types.h>
+ #include <virtio.h>
+@@ -37,6 +38,27 @@ U_BOOT_DRVINFO(vexpress_serials) = {
+ 	.plat = &serial_plat,
+ };
+ 
++static struct mpu_region vexpress64_aemv8r_mem_map[] = {
++	{
++		.start = 0x0UL,
++		.end = 0x7fffffffUL,
++		.attrs = PRLAR_ATTRIDX(MT_NORMAL)
++	}, {
++		.start = 0x80000000UL,
++		.end = 0xffffffffUL,
++		.attrs = PRLAR_ATTRIDX(MT_DEVICE_NGNRNE)
++	}, {
++		.start = 0x100000000UL,
++		.end = 0xffffffffffUL,
++		.attrs = PRLAR_ATTRIDX(MT_NORMAL)
++	}, {
++		/* List terminator */
++		0,
++	}
++};
++
++struct mpu_region *mpu_mem_map = vexpress64_aemv8r_mem_map;
++
+ static struct mm_region vexpress64_mem_map[] = {
+ 	{
+ 		.virt = V2M_PA_BASE,
+-- 
+2.25.1
+

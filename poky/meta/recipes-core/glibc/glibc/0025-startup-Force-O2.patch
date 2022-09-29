@@ -1,0 +1,28 @@
+From 5e635e5dc7d1b21a78f38109d4f43a03bec865c8 Mon Sep 17 00:00:00 2001
+From: "H.J. Lu" <hjl.tools@gmail.com>
+Date: Sun, 7 Aug 2022 12:51:48 +0200
+Subject: [PATCH] startup: Force -O2
+
+Upstream-Status: Submitted [https://sourceware.org/bugzilla/show_bug.cgi?id=29249]
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ sysdeps/unix/sysv/linux/startup.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/sysdeps/unix/sysv/linux/startup.h b/sysdeps/unix/sysv/linux/startup.h
+index 39859b404a..e1fc1b682d 100644
+--- a/sysdeps/unix/sysv/linux/startup.h
++++ b/sysdeps/unix/sysv/linux/startup.h
+@@ -21,6 +21,11 @@
+ #else
+ # include <sysdep.h>
+ 
++# if !defined __OPTIMIZE__ || __OPTIMIZE__ < 2
++/* Force to fold strlen.  */
++#  pragma GCC optimize(2)
++# endif
++
+ /* Avoid a run-time invocation of strlen.  */
+ #define _startup_fatal(message)                                         \
+   do                                                                    \

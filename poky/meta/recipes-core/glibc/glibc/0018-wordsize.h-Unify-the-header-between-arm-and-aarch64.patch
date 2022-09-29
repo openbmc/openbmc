@@ -1,7 +1,7 @@
-From 4d6bce6b106d9d9a629aadba74d74cd8a500ccbf Mon Sep 17 00:00:00 2001
+From e2dba281429384cc22a73a58eaf79459e64be266 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 15 May 2020 17:05:45 -0700
-Subject: [PATCH 18/24] wordsize.h: Unify the header between arm and aarch64
+Subject: [PATCH] wordsize.h: Unify the header between arm and aarch64
 
 This helps OE multilibs to not sythesize this header which causes all
 kind of recursions and other issues since wordsize is fundamental header
@@ -11,10 +11,10 @@ Upstream-Status: Inappropriate [ OE-Specific ]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- sysdeps/aarch64/bits/wordsize.h          |  8 ++++++--
- sysdeps/{aarch64 => arm}/bits/wordsize.h | 10 +++++++---
- 2 files changed, 13 insertions(+), 5 deletions(-)
- copy sysdeps/{aarch64 => arm}/bits/wordsize.h (80%)
+ sysdeps/aarch64/bits/wordsize.h          | 8 ++++++--
+ sysdeps/{aarch64 => arm}/bits/wordsize.h | 8 ++++++--
+ 2 files changed, 12 insertions(+), 4 deletions(-)
+ copy sysdeps/{aarch64 => arm}/bits/wordsize.h (85%)
 
 diff --git a/sysdeps/aarch64/bits/wordsize.h b/sysdeps/aarch64/bits/wordsize.h
 index 4635431f0e..5ef0ed21f3 100644
@@ -40,10 +40,10 @@ index 4635431f0e..5ef0ed21f3 100644
  
  #define __WORDSIZE_TIME64_COMPAT32	0
 diff --git a/sysdeps/aarch64/bits/wordsize.h b/sysdeps/arm/bits/wordsize.h
-similarity index 80%
+similarity index 85%
 copy from sysdeps/aarch64/bits/wordsize.h
 copy to sysdeps/arm/bits/wordsize.h
-index 4635431f0e..34fcdef1f1 100644
+index 4635431f0e..5ef0ed21f3 100644
 --- a/sysdeps/aarch64/bits/wordsize.h
 +++ b/sysdeps/arm/bits/wordsize.h
 @@ -17,12 +17,16 @@
@@ -65,6 +65,3 @@ index 4635431f0e..34fcdef1f1 100644
  #endif
  
  #define __WORDSIZE_TIME64_COMPAT32	0
--- 
-2.34.1
-

@@ -1,0 +1,67 @@
+From 5b8cb5192dbd0332e027e8999c3afe4433983291 Mon Sep 17 00:00:00 2001
+From: Jaxson Han <jaxson.han@arm.com>
+Date: Wed, 29 Dec 2021 10:50:21 +0800
+Subject: [PATCH] platform: Add print_hex func
+
+Refine the print functions, and add a new print_hex func to print hex
+numbers.
+
+Issue-Id: SCM-3814
+Upstream-Status: Inappropriate [other]
+  Implementation pending further discussion
+Signed-off-by: Jaxson Han <jaxson.han@arm.com>
+Change-Id: Ic960345d9ef0b41d81d30c4a4dbd9c31139907c4
+---
+ common/platform.c | 33 +++++++++++++++++++++++++--------
+ 1 file changed, 25 insertions(+), 8 deletions(-)
+
+diff --git a/common/platform.c b/common/platform.c
+index d11f568..8269392 100644
+--- a/common/platform.c
++++ b/common/platform.c
+@@ -30,20 +30,37 @@
+ #define V2M_SYS(reg)	((void *)SYSREGS_BASE + V2M_SYS_##reg)
+ #endif
+ 
+-static void print_string(const char *str)
++static void print_char(const char c)
+ {
+ 	uint32_t flags;
++	do {
++		flags = raw_readl(PL011(UARTFR));
++	} while (flags & PL011_UARTFR_FIFO_FULL);
+ 
++	raw_writel(c, PL011(UARTDR));
++
++	do {
++		flags = raw_readl(PL011(UARTFR));
++	} while (flags & PL011_UARTFR_BUSY);
++}
++
++void print_string(const char *str)
++{
+ 	while (*str) {
+-		do
+-			flags = raw_readl(PL011(UARTFR));
+-		while (flags & PL011_UARTFR_FIFO_FULL);
++		print_char(*str++);
++	}
++}
+ 
+-		raw_writel(*str++, PL011(UARTDR));
++#define HEX_CHARS_PER_INT (2 * sizeof(int))
++
++void print_hex(unsigned int val)
++{
+ 
+-		do
+-			flags = raw_readl(PL011(UARTFR));
+-		while (flags & PL011_UARTFR_BUSY);
++	const char hex_chars[16] = "0123456789abcdef";
++	int i;
++	for (i = HEX_CHARS_PER_INT - 1; i >= 0; i--) {
++		int v = (val >> (4 * i)) & 0xf;
++		print_char(hex_chars[v]);
+ 	}
+ }
+ 

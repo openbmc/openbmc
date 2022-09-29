@@ -1,0 +1,25 @@
+From 53ca110d53ca82f6c4224e4c29dbcf7dfe6914cd Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 23 Aug 2022 00:25:06 -0700
+Subject: [PATCH] Forward port defining PREFIX_BINDIR to use new autoconf
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.in b/configure.in
+index c3ef568..a320c56 100644
+--- a/configure.in
++++ b/configure.in
+@@ -44,7 +44,7 @@ wi_EXTRA_SYSV_SUNOS_DIRS	dnl	For better curses library on SunOS 4
+ 
+ dnl Try to use PATH rather than hardcode the installation path, if possible.
+ if test "${prefix-NONE}" != "NONE" && test "$prefix" != "/usr/local" && test "$prefix" != "/usr"; then
+-	AC_DEFINE_UNQUOTED(PREFIX_BINDIR, "$prefix/bin")
++	AC_DEFINE([PREFIX_BINDIR], [${prefix}/bin], [Install bindir])
+ fi
+ 
+ 

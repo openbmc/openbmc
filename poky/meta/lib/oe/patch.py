@@ -1,4 +1,6 @@
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
@@ -299,10 +301,10 @@ class GitApplyTree(PatchTree):
         PatchTree.__init__(self, dir, d)
         self.commituser = d.getVar('PATCH_GIT_USER_NAME')
         self.commitemail = d.getVar('PATCH_GIT_USER_EMAIL')
-        if not self._isInitialized():
+        if not self._isInitialized(d):
             self._initRepo()
 
-    def _isInitialized(self):
+    def _isInitialized(self, d):
         cmd = "git rev-parse --show-toplevel"
         try:
             output = runcmd(cmd.split(), self.dir).strip()
@@ -310,8 +312,8 @@ class GitApplyTree(PatchTree):
             ## runcmd returned non-zero which most likely means 128
             ## Not a git directory
             return False
-        ## Make sure repo is in builddir to not break top-level git repos
-        return os.path.samefile(output, self.dir)
+        ## Make sure repo is in builddir to not break top-level git repos, or under workdir
+        return os.path.samefile(output, self.dir) or oe.path.is_path_parent(d.getVar('WORKDIR'), output)
 
     def _initRepo(self):
         runcmd("git init".split(), self.dir)

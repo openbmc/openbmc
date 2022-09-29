@@ -1,3 +1,8 @@
+From b4a6e3c8309cff0f2311cd959c5091213b633851 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Tue, 7 Feb 2017 14:35:43 +0000
+Subject: [PATCH] slang: rewrite recipe to run autoconf
+
 SLANG_INST_LIB is the location of where slang will end up, but when building for
 packaging this doesn't have DESTDIR appended so can potentially link to the host
 for cross builds and will trigger QA errors.
@@ -7,10 +12,20 @@ As this is obviously wrong, delete it.
 Upstream-Status: Pending
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
+---
+ slsh/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 diff --git a/slsh/Makefile.in b/slsh/Makefile.in
-index cba9d81..4c1c370 100644
+index addd343..63a5c9b 100644
 --- a/slsh/Makefile.in
 +++ b/slsh/Makefile.in
-@@ -80 +80 @@ SHELL = /bin/sh
--INST_LIBS = $(DEST_LIB_DIR) $(RPATH) $(SLANG_INST_LIB) -lslang $(READLINE_LIB) $(DYNAMIC_LIBS)
-+INST_LIBS = $(DEST_LIB_DIR) $(RPATH) -lslang $(READLINE_LIB) $(DYNAMIC_LIBS)
+@@ -77,7 +77,7 @@ SLSYSWRAP_LIB = @LIB_SLSYSWRAP@
+ #----------------------------------------------------------------------------
+ @SET_MAKE@
+ SHELL = /bin/sh
+-INST_LIBS = $(DEST_LIB_DIR) $(RPATH) $(SLANG_INST_LIB) -lslang $(LDFLAGS) $(READLINE_LIB) $(DYNAMIC_LIBS)
++INST_LIBS = $(DEST_LIB_DIR) $(RPATH) -lslang $(LDFLAGS) $(READLINE_LIB) $(DYNAMIC_LIBS)
+ DEFS = -DSLSH_CONF_DIR='"$(SLSH_CONF_DIR)"' -DSLSH_PATH='"$(SLSH_LIB_DIR)"' \
+  -DSLSH_CONF_DIR_ENV='$(SLSH_CONF_DIR_ENV)' -DSLSH_LIB_DIR_ENV='$(SLSH_LIB_DIR_ENV)' \
+  -DSLSH_PATH_ENV='$(SLSH_PATH_ENV)' $(SLSYSWRAP_DEF)

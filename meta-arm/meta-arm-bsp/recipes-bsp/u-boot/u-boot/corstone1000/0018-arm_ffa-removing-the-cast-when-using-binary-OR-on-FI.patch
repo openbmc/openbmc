@@ -1,0 +1,40 @@
+From 460406b46b51b6c585788001147a8961c95cc73c Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Sat, 11 Dec 2021 21:05:10 +0000
+Subject: [PATCH 18/24] arm_ffa: removing the cast when using binary OR on
+ FIELD_PREP macros
+
+When the GENMASK used is above 16-bits wide a u16 cast will cause
+loss of data.
+
+This commit fixes that.
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+---
+ drivers/arm-ffa/arm_ffa_prv.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/arm-ffa/arm_ffa_prv.h b/drivers/arm-ffa/arm_ffa_prv.h
+index 38ea4ba83efc..d0db3ef508a1 100644
+--- a/drivers/arm-ffa/arm_ffa_prv.h
++++ b/drivers/arm-ffa/arm_ffa_prv.h
+@@ -40,13 +40,13 @@
+ 
+ #define PREP_SELF_ENDPOINT_ID_MASK		GENMASK(31, 16)
+ #define PREP_SELF_ENDPOINT_ID(x)		\
+-			((u16)(FIELD_PREP(PREP_SELF_ENDPOINT_ID_MASK, (x))))
++			(FIELD_PREP(PREP_SELF_ENDPOINT_ID_MASK, (x)))
+ 
+ /* Partition endpoint ID mask  (partition with which u-boot communicates with) */
+ 
+ #define PREP_PART_ENDPOINT_ID_MASK		GENMASK(15, 0)
+ #define PREP_PART_ENDPOINT_ID(x)		\
+-			((u16)(FIELD_PREP(PREP_PART_ENDPOINT_ID_MASK, (x))))
++			(FIELD_PREP(PREP_PART_ENDPOINT_ID_MASK, (x)))
+ 
+ /* The FF-A SMC function prototype definition */
+ 
+-- 
+2.37.1
+

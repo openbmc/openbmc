@@ -1,5 +1,5 @@
-RPITOOLS_DATE ?= "20211101"
-SRCREV ?= "13474ee775d0c5ec8a7da4fb0a9fa84187abfc87"
+RPITOOLS_DATE ?= "20220711"
+SRCREV ?= "439b6198a9b340de5998dd14a26a0d9d38a6bcac"
 RPITOOLS_SRC_URI ?= "git://github.com/raspberrypi/tools;protocol=https;branch=master"
 RPITOOLS_S ?= "${WORKDIR}/git"
 

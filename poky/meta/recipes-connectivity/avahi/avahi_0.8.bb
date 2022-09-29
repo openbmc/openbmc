@@ -147,8 +147,8 @@ FILES:libavahi-glib = "${libdir}/libavahi-glib.so.*"
 FILES:libavahi-gobject = "${libdir}/libavahi-gobject.so.*  ${libdir}/girepository-1.0/Avahi*.typelib"
 FILES:avahi-utils = "${bindir}/avahi-* ${bindir}/b* ${datadir}/applications/b*"
 
-RDEPENDS:${PN}-dev = "avahi-daemon (= ${EXTENDPKGV}) libavahi-core (= ${EXTENDPKGV})"
-RDEPENDS:${PN}-dev += "${@["", " libavahi-client (= ${EXTENDPKGV})"][bb.utils.contains('PACKAGECONFIG', 'dbus', 1, 0, d)]}"
+DEV_PKG_DEPENDENCY = "avahi-daemon (= ${EXTENDPKGV}) libavahi-core (= ${EXTENDPKGV})"
+DEV_PKG_DEPENDENCY += "${@["", " libavahi-client (= ${EXTENDPKGV})"][bb.utils.contains('PACKAGECONFIG', 'dbus', 1, 0, d)]}"
 RDEPENDS:${PN}-dnsconfd = "${PN}-daemon"
 
 RRECOMMENDS:avahi-daemon:append:libc-glibc = " libnss-mdns"

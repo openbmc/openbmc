@@ -1,0 +1,124 @@
+From 14b84786e85483bf3c737ef8b392204e307c0ff1 Mon Sep 17 00:00:00 2001
+From: Olivier Deprez <olivier.deprez@arm.com>
+Date: Mon, 16 Nov 2020 10:14:02 +0100
+Subject: [PATCH] WIP: Enable managed exit
+
+This change declares OP-TEE SP as supporting managed exit in response to
+a NS interrupt triggering while the SWd runs.
+
+At init OP-TEE enables (HF_INTERRUPT_ENABLE) the managed exit virtual
+interrupt through the Hafnium para-virtualized interface.
+
+Physical interrupts are trapped to the SPMC which injects a managed exit
+interrupt to OP-TEE. The managed exit interrupt is acknowledged by
+OP-TEE by HF_INTERUPT_GET hvc call.
+
+Note: this code change is meant with in mind the SPMC runs at SEL2. It
+needs slight refactoring such that it does not break the SEL1 SPMC
+configuration.
+
+Change-Id: I9a95f36cf517c11048ff04680007f40259c4f636
+Signed-off-by: Olivier Deprez <olivier.deprez@arm.com>
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+---
+ core/arch/arm/kernel/boot.c                          | 12 ++++++++++++
+ core/arch/arm/kernel/thread_a64.S                    | 11 ++++++++++-
+ core/arch/arm/kernel/thread_spmc.c                   | 11 +++++++++++
+ .../arm/plat-totalcompute/fdts/optee_sp_manifest.dts |  2 +-
+ 4 files changed, 34 insertions(+), 2 deletions(-)
+
+diff --git a/core/arch/arm/kernel/boot.c b/core/arch/arm/kernel/boot.c
+index 09c1b811..d130107f 100644
+--- a/core/arch/arm/kernel/boot.c
++++ b/core/arch/arm/kernel/boot.c
+@@ -1279,6 +1279,18 @@ static void init_secondary_helper(unsigned long nsec_entry)
+ 	init_vfp_sec();
+ 	init_vfp_nsec();
+ 
++	/* Enable managed exit interrupt for secondary core. */
++	__asm__ volatile (
++		"mov x0, %0;"
++		"mov x1, %1;"
++		"mov x2, %2;"
++		"mov x3, %3;"
++		"hvc #0"
++		: : "i" (0xff03), "i" (4), "i" (1), "i" (1));
++
++	IMSG("%s core %lu: enabled managed exit interrupt.",
++		__func__, get_core_pos());
++
+ 	IMSG("Secondary CPU %zu switching to normal world boot", get_core_pos());
+ }
+ 
+diff --git a/core/arch/arm/kernel/thread_a64.S b/core/arch/arm/kernel/thread_a64.S
+index 3e0f5115..63bf396a 100644
+--- a/core/arch/arm/kernel/thread_a64.S
++++ b/core/arch/arm/kernel/thread_a64.S
+@@ -904,6 +904,14 @@ END_FUNC el0_sync_abort
+ 	bl	dcache_op_louis
+ 	ic	iallu
+ #endif
++
++	/* HF_INTERRUPT_GET */
++	mov	x0, #0xff04
++	hvc	#0
++	/* Expect managed exit interrupt */
++	cmp	x0, #4
++	bne	.
++
+ 	/*
+ 	 * Mark current thread as suspended
+ 	 */
+@@ -1021,8 +1029,9 @@ LOCAL_FUNC elx_irq , :
+ #endif
+ END_FUNC elx_irq
+ 
++#define HF_MANAGED_EXIT		1
+ LOCAL_FUNC elx_fiq , :
+-#if defined(CFG_ARM_GICV3)
++#if defined(CFG_ARM_GICV3) || defined (HF_MANAGED_EXIT)
+ 	foreign_intr_handler	fiq
+ #else
+ 	native_intr_handler	fiq
+diff --git a/core/arch/arm/kernel/thread_spmc.c b/core/arch/arm/kernel/thread_spmc.c
+index bd7930e7..89ff82bc 100644
+--- a/core/arch/arm/kernel/thread_spmc.c
++++ b/core/arch/arm/kernel/thread_spmc.c
+@@ -1394,6 +1394,17 @@ static TEE_Result spmc_init(void)
+ 	my_endpoint_id = spmc_get_id();
+ 	DMSG("My endpoint ID %#x", my_endpoint_id);
+ 
++	/* Enable managed exit interrupt for boot core. */
++	__asm__ volatile (
++		"mov x0, %0;"
++		"mov x1, %1;"
++		"mov x2, %2;"
++		"mov x3, %3;"
++		"hvc #0"
++		: : "i" (0xff03), "i" (4), "i" (1), "i" (1));
++
++	IMSG("%s enabled managed exit interrupt.", __func__);
++
+ 	return TEE_SUCCESS;
+ }
+ #endif /*CFG_CORE_SEL2_SPMC*/
+diff --git a/core/arch/arm/plat-totalcompute/fdts/optee_sp_manifest.dts b/core/arch/arm/plat-totalcompute/fdts/optee_sp_manifest.dts
+index 4b8b3681..04847c4d 100644
+--- a/core/arch/arm/plat-totalcompute/fdts/optee_sp_manifest.dts
++++ b/core/arch/arm/plat-totalcompute/fdts/optee_sp_manifest.dts
+@@ -23,7 +23,8 @@
+ 	entrypoint-offset = <0x1000>;
+ 	xlat-granule = <0>; /* 4KiB */
+ 	boot-order = <0>;
+-	messaging-method = <0>; /* Direct messaging only */
++	messaging-method = <3>; /* Direct request/response supported */
++	managed-exit; /* Managed exit supported */
+
+ 	device-regions {
+ 		compatible = "arm,ffa-manifest-device-regions";
+-- 
+2.29.2
+

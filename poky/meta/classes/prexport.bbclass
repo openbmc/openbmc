@@ -1,3 +1,9 @@
+#
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
+
 PRSERV_DUMPOPT_VERSION = "${PRAUTOINX}"
 PRSERV_DUMPOPT_PKGARCH  = ""
 PRSERV_DUMPOPT_CHECKSUM = ""

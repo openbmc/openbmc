@@ -1,5 +1,9 @@
 #!/bin/bash
 #
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
 # oe-time-dd-test records how much time it takes to 
 # write <count> number of kilobytes to the filesystem.
 # It also records the number of processes that are in

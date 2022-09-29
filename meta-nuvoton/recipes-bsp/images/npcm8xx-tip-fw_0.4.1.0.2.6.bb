@@ -1,7 +1,7 @@
 SUMMARY = "TIP FW for NPCM8XX (Arbel) devices"
 DESCRIPTION = "TIP FW for NPCM8XX (Arbel) devices"
 HOMEPAGE = "https://github.com/Nuvoton-Israel/npcm8xx-tip-fw"
-LICENSE = "GPL-2.0-only"
+LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=650b869bd8ff2aed59c62bad2a22a821"
 
 FILENAME = "Kmt_TipFwL0_Skmt_TipFwL1_${PV}.bin"
@@ -10,7 +10,7 @@ S = "${WORKDIR}"
 
 SRCREV = "04e43fbacdc55860153444e04672097e3f2b29fa"
 SRC_URI = " \
-    https://github.com/Nuvoton-Israel/npcm8xx-tip-fw/blob/${SRCREV}/LICENSE;name=lic \
+    https://github.com/Nuvoton-Israel/npcm8xx-tip-fw/${SRCREV}/LICENSE;name=lic \
     https://github.com/Nuvoton-Israel/npcm8xx-tip-fw/releases/download/TIP_FW_L0_0.4.1_L1_0.2.6/Kmt_TipFwL0_Skmt_TipFwL1.bin;downloadfilename=${FILENAME};name=bin \
 "
 

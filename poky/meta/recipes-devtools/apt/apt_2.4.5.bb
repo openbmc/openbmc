@@ -13,6 +13,7 @@ SRC_URI = "${DEBIAN_MIRROR}/main/a/apt/${BPN}_${PV}.tar.xz \
            file://0001-cmake-Do-not-build-po-files.patch \
            file://0001-Hide-fstatat64-and-prlimit64-defines-on-musl.patch \
            file://0001-aptwebserver.cc-Include-array.patch \
+           file://0001-Remove-using-std-binary_function.patch \
            "
 
 SRC_URI:append:class-native = " \
@@ -138,5 +139,5 @@ do_install:append:class-target() {
 
 do_install:append() {
 	# Avoid non-reproducible -src package
-	sed -i -e "s,${B},,g" ${B}/apt-pkg/tagfile-keys.cc
+	sed -i -e "s,${B}/include/,,g" ${B}/apt-pkg/tagfile-keys.cc
 }

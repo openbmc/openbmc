@@ -1,0 +1,2 @@
+# tee devices can only be accessed by the teeclnt group members
+KERNEL=="tee[0-9]*", TAG+="systemd", MODE="0660", GROUP="teeclnt"

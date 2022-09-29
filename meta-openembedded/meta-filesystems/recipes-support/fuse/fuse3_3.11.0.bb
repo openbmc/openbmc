@@ -35,7 +35,28 @@ RDEPENDS:${PN}-ptest += " \
 
 do_install_ptest() {
         install -d ${D}${PTEST_PATH}/test
+        install -d ${D}${PTEST_PATH}/example
+        install -d ${D}${PTEST_PATH}/util
         cp -rf ${S}/test/* ${D}${PTEST_PATH}/test/
+
+        example_excutables=`find ${B}/example -type f -executable`
+        util_excutables=`find ${B}/util -type f -executable`
+        test_excutables=`find ${B}/test -type f -executable`
+
+        for e in $example_excutables
+        do
+            cp -rf $e  ${D}${PTEST_PATH}/example/
+         done
+
+        for e in $util_excutables
+        do
+            cp -rf $e  ${D}${PTEST_PATH}/util/
+        done
+
+        for e in $test_excutables
+        do
+            cp -rf $e  ${D}${PTEST_PATH}/test
+        done
 }
 
 DEPENDS = "udev"
@@ -48,10 +69,6 @@ RRECOMMENDS:${PN}:class-target = "kernel-module-fuse fuse3-utils"
 
 FILES:${PN} += "${libdir}/libfuse3.so.*"
 FILES:${PN}-dev += "${libdir}/libfuse3*.la"
-
-EXTRA_OEMESON += " \
-     -Dexamples=false \
-"
 
 # Forbid auto-renaming to libfuse3-utils
 FILES:fuse3-utils = "${bindir} ${base_sbindir}"

@@ -1,0 +1,45 @@
+Exclude all the seccomp files to run during build.
+
+Upstream-Status: Inappropriate [embedded specific]
+There are some files that need to run to generate the appropriate files
+we are currently doing this on the target. 
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: git/Makefile.in
+===================================================================
+--- git.orig/Makefile.in
++++ git/Makefile.in
+@@ -34,7 +34,6 @@ MYDIRS = src/lib $(MAN_SRC) $(COMPLETION
+ MYLIBS = src/libpostexecseccomp/libpostexecseccomp.so src/libtrace/libtrace.so src/libtracelog/libtracelog.so
+ COMPLETIONS = src/zsh_completion/_firejail src/bash_completion/firejail.bash_completion
+ MANPAGES = firejail.1 firemon.1 firecfg.1 firejail-profile.5 firejail-login.5 firejail-users.5 jailcheck.1
+-SECCOMP_FILTERS = seccomp seccomp.debug seccomp.32 seccomp.block_secondary seccomp.mdwx seccomp.mdwx.32
+ ALL_ITEMS = $(APPS) $(SBOX_APPS) $(SBOX_APPS_NON_DUMPABLE) $(MYLIBS)
+ 
+ .PHONY: all_items $(ALL_ITEMS)
+@@ -52,7 +51,7 @@ $(MANPAGES): src/man
+ 
+ man: $(MANPAGES)
+ 
+-filters: $(SECCOMP_FILTERS) $(SBOX_APPS_NON_DUMPABLE)
++filters: $(SBOX_APPS_NON_DUMPABLE)
+ seccomp: src/fseccomp/fseccomp src/fsec-optimize/fsec-optimize
+ 	src/fseccomp/fseccomp default seccomp
+ 	src/fsec-optimize/fsec-optimize seccomp
+@@ -81,7 +80,6 @@ clean:
+ 	done
+ 	$(MAKE) -C test clean
+ 	rm -f $(MANPAGES) $(MANPAGES:%=%.gz) firejail*.rpm
+-	rm -f $(SECCOMP_FILTERS)
+ 	rm -f test/utils/index.html*
+ 	rm -f test/utils/wget-log
+ 	rm -f test/utils/firejail-test-file*
+@@ -119,7 +117,7 @@ endif
+ 	# libraries and plugins
+ 	install -m 0755 -d $(DESTDIR)$(libdir)/firejail
+ 	install -m 0755 -t $(DESTDIR)$(libdir)/firejail src/firecfg/firejail-welcome.sh
+-	install -m 0644 -t $(DESTDIR)$(libdir)/firejail $(MYLIBS) $(SECCOMP_FILTERS)
++	install -m 0644 -t $(DESTDIR)$(libdir)/firejail $(MYLIBS) 
+ 	install -m 0755 -t $(DESTDIR)$(libdir)/firejail $(SBOX_APPS)
+ 	install -m 0755 -t $(DESTDIR)$(libdir)/firejail src/profstats/profstats
+ 	# plugins w/o read permission (non-dumpable)

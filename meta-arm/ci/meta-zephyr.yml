@@ -1,0 +1,13 @@
+header:
+  version: 11
+  includes:
+    - ci/meta-openembedded.yml
+
+repos:
+  meta-zephyr:
+    url: https://git.yoctoproject.org/git/meta-zephyr
+    layers:
+      meta-zephyr-core:
+
+target:
+  - zephyr-kernel-test-all

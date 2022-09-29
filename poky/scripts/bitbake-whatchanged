@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
-
+#
 # Copyright (c) 2013 Wind River Systems, Inc.
 #
 # SPDX-License-Identifier: GPL-2.0-only

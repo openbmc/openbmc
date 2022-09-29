@@ -1,0 +1,26 @@
+From 67eae4f20af9aaaf693025d95a05527a2c1fed1a Mon Sep 17 00:00:00 2001
+From: Christian Hesse <mail@eworm.de>
+Date: Wed, 19 Jul 2017 14:38:43 +0200
+Subject: [PATCH 3/3] include config.h
+
+Upstream-Status: Pending [https://github.com/archlinux/svntogit-packages/tree/packages/libmpd/trunk]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/libmpd-strfsong.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/libmpd-strfsong.c b/src/libmpd-strfsong.c
+index 7d47bed..76fa3ff 100644
+--- a/src/libmpd-strfsong.c
++++ b/src/libmpd-strfsong.c
+@@ -28,6 +28,7 @@
+ #include <unistd.h>
+ #include <string.h>
+ #include <glib.h>
++#include <config.h>
+ #include "libmpd.h"
+ #include "libmpd-internal.h"
+ 
+-- 
+2.37.2
+

@@ -1,8 +1,8 @@
 [Unit]
 Description=OpenPOWER OCC Active Disable
-Wants=obmc-host-stop-pre@%i.target
 Before=obmc-host-stop-pre@%i.target
 Before=op-enter-mpreboot@%i.service
+Before=op-stop-instructions@%i.service
 Conflicts=op-occ-enable@%i.service
 
 [Service]

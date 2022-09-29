@@ -1,0 +1,32 @@
+From f873e25e29684cbbf7b141d9c6ee725268505c29 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Sun, 24 Jul 2022 07:07:29 -0700
+Subject: [PATCH] Avoid hardcoded build time paths in the output binaries
+
+replace the compile definitions with the output locations.
+
+Upstream-Status: Inappropriate [would need reworking somehow to be acceptable upstream]
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ support/Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/support/Makefile b/support/Makefile
+index 9b50eac117..4c24d9f61a 100644
+--- a/support/Makefile
++++ b/support/Makefile
+@@ -218,9 +218,9 @@ libsupport-inhibit-o += .o
+ endif
+ 
+ CFLAGS-support_paths.c = \
+-		-DSRCDIR_PATH=\"`cd .. ; pwd`\" \
+-		-DOBJDIR_PATH=\"`cd $(objpfx)/..; pwd`\" \
+-		-DOBJDIR_ELF_LDSO_PATH=\"`cd $(objpfx)/..; pwd`/elf/$(rtld-installed-name)\" \
++		-DSRCDIR_PATH=\"$(oe_srcdir)\" \
++		-DOBJDIR_PATH=\"$(libdir)/glibc-tests/ptest/tests/glibc-ptest\" \
++		-DOBJDIR_ELF_LDSO_PATH=\"$(slibdir)/$(rtld-installed-name)\" \
+ 		-DINSTDIR_PATH=\"$(prefix)\" \
+ 		-DLIBDIR_PATH=\"$(libdir)\" \
+ 		-DBINDIR_PATH=\"$(bindir)\" \

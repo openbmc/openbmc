@@ -1,0 +1,52 @@
+#!/bin/sh
+xtest | awk '
+
+    # Escapes the special characters in a string so that, when
+    # included in a regex, it represents a literal match
+    function regx_escape_literal(str,    ret) {
+        ret = str
+        gsub(/[\[\]\^\$\.\*\?\+\{\}\\\(\)\|]/ , "\\\\&", str)
+        return str
+    }
+
+    # Returns the simple test formatted name
+    function name(n,    ret) {
+        ret = n
+        gsub(/\./, " ", ret)
+        return ret
+    }
+
+    # Returns the simple test formatted result
+    function result(res) {
+        if(res ~ /OK/) {
+            return "PASS"
+        } else if(res ~ /FAILED/) {
+            return "FAIL"
+        }
+    }
+
+    function parse(name, description,     has_subtests, result_line) {
+        has_subtests = 0
+
+        # Consume every line up to the result line
+        result_line = "  " regx_escape_literal(name) " (OK|FAILED)"
+        do {
+            getline
+
+            # If this is a subtest (denoted by an "o" bullet) then subparse
+            if($0 ~ /^o /) {
+                parse($2, description " : " substr($0, index($0, $3)))
+                has_subtests = 1
+            }
+        } while ($0 !~ result_line)
+
+        # Only print the results for the deepest nested subtests
+        if(!has_subtests) {
+            print result($2) ": " name(name) " - " description
+        }
+    }
+
+    # Start parsing at the beginning of every test (denoted by a "*" bullet)
+    /^\* / { parse($2, substr($0, index($0, $3))) }
+
+'

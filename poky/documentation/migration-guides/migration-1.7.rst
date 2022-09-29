@@ -31,7 +31,7 @@ build host is now 1.7.8 because the ``--list`` option is now required by
 BitBake's Git fetcher. As always, if your host distribution does not
 provide a version of Git that meets this requirement, you can use the
 ``buildtools-tarball`` that does. See the
-":ref:`ref-manual/system-requirements:required git, tar, python and gcc versions`"
+":ref:`ref-manual/system-requirements:required git, tar, python, make and gcc versions`"
 section for more information.
 
 .. _migration-1.7-autotools-class-changes:

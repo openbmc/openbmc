@@ -13,7 +13,7 @@ SRCREV = "d34bc1a3bdc148e2e1fe64998398e1a0552ab04c"
 
 S = "${WORKDIR}/git"
 
-DEPENDS += "opencl-headers opencl-icd-loader"
+DEPENDS += "opencl-headers virtual/opencl-icd"
 
 do_install() {
         install -D -m 755 clinfo ${D}${bindir}/clinfo

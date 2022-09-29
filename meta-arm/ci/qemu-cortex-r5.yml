@@ -1,0 +1,11 @@
+header:
+  version: 11
+  includes:
+    - ci/base.yml
+    - ci/meta-zephyr.yml
+
+local_conf_header:
+  nonbuilding_tests: |
+    ZEPHYRTESTS:remove = "common poll sleep queue device"
+
+machine: qemu-cortex-r5

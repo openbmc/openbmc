@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Script used for running executables with custom labels, as well as custom uid/gid
 # Process label is changed by writing to /proc/self/attr/curent
@@ -9,8 +9,8 @@
 # """By  default,  each  user  in Debian GNU/Linux is given a corresponding group 
 # with the same name. """
 #
-# Usage: root@desk:~# python notroot.py <uid> <label> <full_path_to_executable> [arguments ..]
-# eg: python notroot.py 1000 User::Label /bin/ping -c 3 192.168.1.1
+# Usage: root@desk:~# python3 notroot.py <uid> <label> <full_path_to_executable> [arguments ..]
+# eg: python3 notroot.py 1000 User::Label /bin/ping -c 3 192.168.1.1
 #
 # Author: Alexandru Cornea <alexandru.cornea@intel.com>
 import os
@@ -28,6 +28,6 @@ try:
 	os.setuid(uid)	
 	os.execv(path,sys.argv)
 
-except Exception,e:
-	print e.message
-	sys.exit(1)
+except Exception as e:
+	print(e.strerror)
+	sys.exit(-1)

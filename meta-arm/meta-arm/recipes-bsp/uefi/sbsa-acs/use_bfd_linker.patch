@@ -1,0 +1,22 @@
+Enforce using good old BFD linker
+
+some distros may use gold as system linker and it crashes while linking the app
+
+TOPDIR/build/tmpfs/work/qemuarm64-yoe-linux/sbsa-acs/3.0-r0/recipe-sysroot-native/usr/bin/aarch64-yoe-linux/../../libexec/aarch64-yoe-linux/gcc/aarch64-yoe-linux/11.0.1/ld: error: TOPDIR/build/tmpfs/work/qemuarm64-yoe-linux/sbsa-acs/3.0-r0/edk2/BaseTools/Scripts/GccBase.lds:54:10: INFO section type is unsupported
+TOPDIR/build/tmpfs/work/qemuarm64-yoe-linux/sbsa-acs/3.0-r0/recipe-sysroot-native/usr/bin/aarch64-yoe-linux/../../libexec/aarch64-yoe-linux/gcc/aarch64-yoe-linux/11.0.1/ld: error: TOPDIR/build/tmpfs/work/qemuarm64-yoe-linux/sbsa-acs/3.0-r0/edk2/BaseTools/Scripts/GccBase.lds:66:14: INFO section type is unsupported
+TOPDIR/build/tmpfs/work/qemuarm64-yoe-linux/sbsa-acs/3.0-r0/recipe-sysroot-native/usr/bin/aarch64-yoe-linux/../../libexec/aarch64-yoe-linux/gcc/aarch64-yoe-linux/11.0.1/ld: internal error in do_layout, at ../../gold/object.cc:1939
+collect2: error: ld returned 1 exit status
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/BaseTools/Conf/tools_def.template
++++ b/BaseTools/Conf/tools_def.template
+@@ -1926,7 +1926,7 @@ DEFINE GCC_ARM_CC_XIPFLAGS         = -mn
+ DEFINE GCC_AARCH64_CC_FLAGS        = DEF(GCC_ALL_CC_FLAGS) -mlittle-endian -fno-short-enums -fverbose-asm -funsigned-char  -ffunction-sections -fdata-sections -Wno-address -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-pic -fno-pie -ffixed-x18
+ DEFINE GCC_AARCH64_CC_XIPFLAGS     = -mstrict-align -mgeneral-regs-only
+ DEFINE GCC_DLINK_FLAGS_COMMON      = -nostdlib --pie
+-DEFINE GCC_DLINK2_FLAGS_COMMON     = -Wl,--script=$(EDK_TOOLS_PATH)/Scripts/GccBase.lds
++DEFINE GCC_DLINK2_FLAGS_COMMON     = -fuse-ld=bfd -Wl,--script=$(EDK_TOOLS_PATH)/Scripts/GccBase.lds
+ DEFINE GCC_IA32_X64_DLINK_COMMON   = DEF(GCC_DLINK_FLAGS_COMMON) --gc-sections
+ DEFINE GCC_ARM_AARCH64_DLINK_COMMON= -Wl,--emit-relocs -nostdlib -Wl,--gc-sections -u $(IMAGE_ENTRY_POINT) -Wl,-e,$(IMAGE_ENTRY_POINT),-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map
+ DEFINE GCC_ARM_DLINK_FLAGS         = DEF(GCC_ARM_AARCH64_DLINK_COMMON) -z common-page-size=0x20 -Wl,--pic-veneer

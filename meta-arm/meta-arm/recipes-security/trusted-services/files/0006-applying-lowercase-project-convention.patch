@@ -1,0 +1,32 @@
+From 37559c70443fe85e246f1f652045f0cd3c78012b Mon Sep 17 00:00:00 2001
+From: Vishnu Banavath <vishnu.banavath@arm.com>
+Date: Sat, 13 Nov 2021 07:47:44 +0000
+Subject: [PATCH] tools/cmake/common: applying lowercase project convention
+
+Lowercase convention should only apply on the paths inside TS
+source-code.
+Host build paths should not be lowercased. Otherwise, builds
+with uppercase paths will break.
+
+Upstream-Status: Pending [In review]
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Signed-off-by: Anton Antonov <Anton.Antonov@arm.com>
+
+diff --git a/tools/cmake/common/AddPlatform.cmake b/tools/cmake/common/AddPlatform.cmake
+index ae34c6e..31bcd8c 100644
+--- a/tools/cmake/common/AddPlatform.cmake
++++ b/tools/cmake/common/AddPlatform.cmake
+@@ -37,8 +37,8 @@ function(add_platform)
+ 	set(TGT ${MY_PARAMS_TARGET} CACHE STRING "")
+ 
+ 	# Ensure file path conforms to lowercase project convention
+-	string(TOLOWER "${TS_PLATFORM_ROOT}/${TS_PLATFORM}/platform.cmake" _platdef)
+-	include(${_platdef})
++	string(TOLOWER "${TS_PLATFORM}/platform.cmake" _platdef)
++	include(${TS_PLATFORM_ROOT}/${_platdef})
+ 	set(CMAKE_CONFIGURE_DEPENDS ${_platdef})
+ 
+ 	unset(TGT CACHE)
+-- 
+2.25.1
+

@@ -1,4 +1,4 @@
-From d6300e80c7c010fa7ca33e36e826151558cec498 Mon Sep 17 00:00:00 2001
+From 9373891f13f3550f9b3f896c34ac152efd369ca9 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:42:58 +0000
 Subject: [PATCH] eglibc: Cross building and testing instructions

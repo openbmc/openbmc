@@ -1,0 +1,27 @@
+From a11c8f88de6b6c42c805ba76e70532977bfd24bf Mon Sep 17 00:00:00 2001
+From: Saul Wold <sgw@linux.intel.com>
+Date: Wed, 10 Dec 2014 10:26:33 -0800
+Subject: [PATCH] remove clean script
+
+This script try to call git submodule, since we are downloading
+the tarball it seems in-correct to do this.
+
+Upstream-Status: Inappropriate [OE-Specific]
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ efi/Makefile | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/efi/Makefile b/efi/Makefile
+index 72e081e..3cfb3f6 100644
+--- a/efi/Makefile
++++ b/efi/Makefile
+@@ -102,7 +102,6 @@ tidy dist:
+ 	rm -f *.so *.o wrapper
+ 	find . \( -name \*.o -o -name \*.a -o -name .\*.d -o -name \*.tmp \) -print0 | \
+ 		xargs -0r rm -f
+-	$(topdir)/efi/clean-gnu-efi.sh $(EFI_SUBARCH) $(objdir)
+ 
+ clean: tidy
+ 

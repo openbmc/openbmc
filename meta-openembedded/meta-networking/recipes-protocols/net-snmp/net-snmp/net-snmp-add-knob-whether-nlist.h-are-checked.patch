@@ -1,4 +1,4 @@
-From e507dcf8b29c55011f85d88bf05400d4717e4074 Mon Sep 17 00:00:00 2001
+From ad65b106d3cb3c6e595381be1c45a73c1ef6eb5e Mon Sep 17 00:00:00 2001
 From: Chong Lu <Chong.Lu@windriver.com>
 Date: Thu, 28 May 2020 09:46:34 -0500
 Subject: [PATCH] net-snmp: add knob whether nlist.h are checked
@@ -15,7 +15,7 @@ Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/configure.d/config_os_headers b/configure.d/config_os_headers
-index 76ef58a..f07d512 100644
+index b9c8c31..01c3376 100644
 --- a/configure.d/config_os_headers
 +++ b/configure.d/config_os_headers
 @@ -37,6 +37,7 @@ AC_CHECK_HEADERS([getopt.h   pthread.h  regex.h      ] dnl

@@ -1,4 +1,4 @@
-From ddb9c5147883f8b27b4205450139e4a115d9961f Mon Sep 17 00:00:00 2001
+From a91130bb95528743a3f7253f8fe945b7505047d5 Mon Sep 17 00:00:00 2001
 From: Kyungjik Min <dp.min@lge.com>
 Date: Mon, 28 Dec 2020 15:56:09 +0900
 Subject: [PATCH] Fix linking error with ld-gold
@@ -19,6 +19,7 @@ N/A
 :Issues Addressed:
 [PLAT-130467] Fix build error for libgoogleassistant with latest
               protobuf-3.11.4
+
 ---
  src/libprotobuf-lite.map | 2 ++
  src/libprotobuf.map      | 2 ++
@@ -64,6 +65,3 @@ index 391554669..a1853ca6c 100644
  
    local:
      *;
--- 
-2.17.1
-

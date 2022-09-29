@@ -18,5 +18,5 @@ do_install() {
     install -m 0755 ${B}/src/${PN} ${D}${sbindir}/
 }
 
-CFLAGS += "${LDFLAGS}"
+CFLAGS += "-D_GNU_SOURCE ${LDFLAGS}"
 

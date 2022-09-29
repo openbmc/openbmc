@@ -9,17 +9,14 @@ inherit cargo_common
 
 DEPENDS += "file-native python3-native"
 DEPENDS:append:class-native = " rust-llvm-native"
+DEPENDS:append:class-nativesdk = " nativesdk-rust-llvm"
 
 S = "${RUSTSRC}"
-
-# We generate local targets, and need to be able to locate them
-export RUST_TARGET_PATH="${WORKDIR}/targets/"
 
 export FORCE_CRATE_HASH="${BB_TASKHASH}"
 
 RUST_ALTERNATE_EXE_PATH ?= "${STAGING_LIBDIR}/llvm-rust/bin/llvm-config"
-export YOCTO_ALTERNATE_EXE_PATH = "${RUST_ALTERNATE_EXE_PATH}"
-export YOCTO_ALTERNATE_MULTILIB_NAME = "/${BASELIB}"
+RUST_ALTERNATE_EXE_PATH_NATIVE = "${STAGING_LIBDIR_NATIVE}/llvm-rust/bin/llvm-config"
 
 # We don't want to use bitbakes vendoring because the rust sources do their
 # own vendoring.
@@ -27,19 +24,15 @@ CARGO_DISABLE_BITBAKE_VENDORING = "1"
 
 # We can't use RUST_BUILD_SYS here because that may be "musl" if
 # TCLIBC="musl". Snapshots are always -unknown-linux-gnu
-SNAPSHOT_BUILD_SYS = "${RUST_BUILD_ARCH}-unknown-linux-gnu"
 setup_cargo_environment () {
     # The first step is to build bootstrap and some early stage tools,
     # these are build for the same target as the snapshot, e.g.
     # x86_64-unknown-linux-gnu.
     # Later stages are build for the native target (i.e. target.x86_64-linux)
     cargo_common_do_configure
-
-    printf '[target.%s]\n' "${SNAPSHOT_BUILD_SYS}" >> ${CARGO_HOME}/config
-    printf "linker = '%s'\n" "${RUST_BUILD_CCLD}" >> ${CARGO_HOME}/config
 }
 
-include rust-common.inc
+inherit rust-target-config
 
 do_rust_setup_snapshot () {
     for installer in "${WORKDIR}/rust-snapshot-components/"*"/install.sh"; do
@@ -79,24 +72,41 @@ python do_configure() {
     config = configparser.RawConfigParser()
 
     # [target.ARCH-poky-linux]
-    target_section = "target.{}".format(d.getVar('TARGET_SYS', True))
-    config.add_section(target_section)
+    host_section = "target.{}".format(d.getVar('RUST_HOST_SYS', True))
+    config.add_section(host_section)
 
-    llvm_config = d.expand("${YOCTO_ALTERNATE_EXE_PATH}")
-    config.set(target_section, "llvm-config", e(llvm_config))
+    llvm_config_target = d.expand("${RUST_ALTERNATE_EXE_PATH}")
+    llvm_config_build = d.expand("${RUST_ALTERNATE_EXE_PATH_NATIVE}")
+    config.set(host_section, "llvm-config", e(llvm_config_target))
 
-    config.set(target_section, "cxx", e(d.expand("${RUST_TARGET_CXX}")))
-    config.set(target_section, "cc", e(d.expand("${RUST_TARGET_CC}")))
+    config.set(host_section, "cxx", e(d.expand("${RUST_TARGET_CXX}")))
+    config.set(host_section, "cc", e(d.expand("${RUST_TARGET_CC}")))
+    if "musl" in host_section:
+        config.set(host_section, "musl-root", e(d.expand("${STAGING_DIR_HOST}${exec_prefix}")))
 
     # If we don't do this rust-native will compile it's own llvm for BUILD.
     # [target.${BUILD_ARCH}-unknown-linux-gnu]
-    target_section = "target.{}".format(d.getVar('SNAPSHOT_BUILD_SYS', True))
-    config.add_section(target_section)
+    build_section = "target.{}".format(d.getVar('RUST_BUILD_SYS', True))
+    if build_section != host_section:
+        config.add_section(build_section)
 
-    config.set(target_section, "llvm-config", e(llvm_config))
+        config.set(build_section, "llvm-config", e(llvm_config_build))
 
-    config.set(target_section, "cxx", e(d.expand("${RUST_BUILD_CXX}")))
-    config.set(target_section, "cc", e(d.expand("${RUST_BUILD_CC}")))
+        config.set(build_section, "cxx", e(d.expand("${RUST_BUILD_CXX}")))
+        config.set(build_section, "cc", e(d.expand("${RUST_BUILD_CC}")))
+
+    target_section = "target.{}".format(d.getVar('RUST_TARGET_SYS', True))
+    if target_section != host_section and target_section != build_section:
+        config.add_section(target_section)
+
+        config.set(target_section, "llvm-config", e(llvm_config_target))
+
+        config.set(target_section, "cxx", e(d.expand("${RUST_TARGET_CXX}")))
+        config.set(target_section, "cc", e(d.expand("${RUST_TARGET_CC}")))
+
+    # [llvm]
+    config.add_section("llvm")
+    config.set("llvm", "static-libstdcpp", e(False))
 
     # [rust]
     config.add_section("rust")
@@ -124,16 +134,16 @@ python do_configure() {
     config.set("build", "vendor", e(True))
 
     if not "targets" in locals():
-        targets = [d.getVar("TARGET_SYS", True)]
+        targets = [d.getVar("RUST_TARGET_SYS", True)]
     config.set("build", "target", e(targets))
 
     if not "hosts" in locals():
-        hosts = [d.getVar("HOST_SYS", True)]
+        hosts = [d.getVar("RUST_HOST_SYS", True)]
     config.set("build", "host", e(hosts))
 
     # We can't use BUILD_SYS since that is something the rust snapshot knows
     # nothing about when trying to build some stage0 tools (like fabricate)
-    config.set("build", "build", e(d.getVar("SNAPSHOT_BUILD_SYS", True)))
+    config.set("build", "build", e(d.getVar("RUST_BUILD_SYS", True)))
 
     # [install]
     config.add_section("install")
@@ -165,6 +175,16 @@ rust_runx () {
     unset CXXFLAGS
     unset CPPFLAGS
 
+    export RUSTFLAGS="${RUST_DEBUG_REMAP}"
+
+    # Copy the natively built llvm-config into the target so we can run it. Horrible,
+    # but works!
+    if [ ${RUST_ALTERNATE_EXE_PATH_NATIVE} != ${RUST_ALTERNATE_EXE_PATH} ]; then
+        mkdir -p `dirname ${RUST_ALTERNATE_EXE_PATH}`
+        cp ${RUST_ALTERNATE_EXE_PATH_NATIVE} ${RUST_ALTERNATE_EXE_PATH}
+        chrpath -d ${RUST_ALTERNATE_EXE_PATH}
+    fi
+
     oe_cargo_fix_env
 
     python3 src/bootstrap/bootstrap.py ${@oe.utils.parallel_make_argument(d, '-j %d')} "$@" --verbose
@@ -177,26 +197,14 @@ do_compile () {
 
 rust_do_install () {
     mkdir -p ${D}${bindir}
-    cp build/${HOST_SYS}/stage2/bin/* ${D}${bindir}
+    cp build/${RUST_HOST_SYS}/stage2/bin/* ${D}${bindir}
 
     mkdir -p ${D}${libdir}/rustlib
-    cp -pRd build/${HOST_SYS}/stage2/lib/* ${D}${libdir}
+    cp -pRd build/${RUST_HOST_SYS}/stage2/lib/* ${D}${libdir}
     # Remove absolute symlink so bitbake doesn't complain
     rm -f ${D}${libdir}/rustlib/src/rust
 }
 
-rust_install_targets() {
-    # Install our custom target.json files
-    local td="${D}${libdir}/rustlib/"
-    install -d "$td"
-    for tgt in "${WORKDIR}/targets/"* ; do
-        install -m 0644 "$tgt" "$td"
-    done
-}
-
-
 do_install () {
     rust_do_install
-    rust_install_targets
 }
-# ex: sts=4 et sw=4 ts=8

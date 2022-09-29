@@ -1,15 +1,18 @@
-From eaecfb21e1bca42e99321cc731e21dbfc1ea0d0c Mon Sep 17 00:00:00 2001
+From 4af72493cb380ab5ce0dd7c5bcd25a8b5457d770 Mon Sep 17 00:00:00 2001
 From: Gustavo Lima Chaves <limachaves@gmail.com>
 Date: Tue, 25 Jan 2022 09:43:21 +0000
-Subject: [PATCH 3/3] Added support for duktape as JS engine
+Subject: [PATCH] Added support for duktape as JS engine
 
 Original author: Wu Xiaotian (@yetist)
 Resurrection author, runaway-killer author: Gustavo Lima Chaves (@limachaves)
 
 Signed-off-by: Mikko Rapeli <mikko.rapeli@bmw.de>
 
+Upstream-Status: Backport [c7fc4e1b61f0fd82fc697c19c604af7e9fb291a2]
+Dropped change to .gitlab-ci.yml and adapted configure.ac due to other
+patches in meta-oe.
+
 ---
- .gitlab-ci.yml                                |    1 +
  buildutil/ax_pthread.m4                       |  522 ++++++++
  configure.ac                                  |   34 +-
  docs/man/polkit.xml                           |    4 +-
@@ -23,15 +26,11 @@ Signed-off-by: Mikko Rapeli <mikko.rapeli@bmw.de>
  .../polkitbackendjsauthority.cpp              |  721 +----------
  .../etc/polkit-1/rules.d/10-testing.rules     |    6 +-
  .../test-polkitbackendjsauthority.c           |    2 +-
- 14 files changed, 2399 insertions(+), 678 deletions(-)
+ 13 files changed, 2398 insertions(+), 678 deletions(-)
  create mode 100644 buildutil/ax_pthread.m4
  create mode 100644 src/polkitbackend/polkitbackendcommon.c
  create mode 100644 src/polkitbackend/polkitbackendcommon.h
  create mode 100644 src/polkitbackend/polkitbackendduktapeauthority.c
-
-Upstream-Status: Backport [c7fc4e1b61f0fd82fc697c19c604af7e9fb291a2]
-Dropped change to .gitlab-ci.yml and adapted configure.ac due to other
-patches in meta-oe.
 
 diff --git a/buildutil/ax_pthread.m4 b/buildutil/ax_pthread.m4
 new file mode 100644
@@ -603,7 +602,7 @@ index b625743..bbf4768 100644
 +CC="$PTHREAD_CC"
 +AC_CHECK_FUNCS([pthread_condattr_setclock])
 +
- AC_CHECK_FUNCS(clearenv fdatasync setnetgrent)
+ AC_CHECK_FUNCS(clearenv fdatasync)
  
  if test "x$GCC" = "xyes"; then
 @@ -581,6 +598,13 @@ echo "
@@ -3458,6 +3457,3 @@ index f97e0e0..2103b17 100644
    },
  
    {
--- 
-2.20.1
-

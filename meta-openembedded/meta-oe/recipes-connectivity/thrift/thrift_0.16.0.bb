@@ -15,6 +15,8 @@ SRC_URI[sha256sum] = "f460b5c1ca30d8918ff95ea3eb6291b3951cf518553566088f3f2be898
 
 BBCLASSEXTEND = "native nativesdk"
 
+CVE_PRODUCT = "apache:thrift"
+
 inherit pkgconfig cmake python3native
 
 export STAGING_INCDIR

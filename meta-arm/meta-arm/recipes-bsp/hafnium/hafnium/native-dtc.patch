@@ -1,0 +1,16 @@
+Use our dtc tools instead of the prebuilt (x86-64-only) binaries.
+
+Upstream-Status: Pending [part of a larger effort to remove prebuilt]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/build/image/dtc.py b/build/image/dtc.py
+index d077818..1513120 100755
+--- a/build/image/dtc.py
++++ b/build/image/dtc.py
+@@ -16,4 +16,2 @@ import sys
+-HF_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+-DTC_ROOT = os.path.join(HF_ROOT, "prebuilts", "linux-x64", "dtc")
+-DTC = os.path.join(DTC_ROOT, "dtc")
+-FDTOVERLAY = os.path.join(DTC_ROOT, "fdtoverlay")
++DTC = "dtc"
++FDTOVERLAY = "fdtoverlay"

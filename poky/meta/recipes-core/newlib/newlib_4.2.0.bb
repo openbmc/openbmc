@@ -17,4 +17,4 @@ do_install:append() {
 }
 
 # No rpm package is actually created but -dev depends on it, avoid dnf error
-RDEPENDS:${PN}-dev:libc-newlib = ""
+DEV_PKG_DEPENDENCY:libc-newlib = ""

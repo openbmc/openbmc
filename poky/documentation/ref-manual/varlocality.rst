@@ -113,7 +113,7 @@ This section lists variables that are required for recipes.
 
 -  :term:`LIC_FILES_CHKSUM`
 
--  :term:`SRC_URI` - used in recipes that fetch local or remote files.
+-  :term:`SRC_URI` --- used in recipes that fetch local or remote files.
 
 .. _ref-varlocality-recipe-dependencies:
 

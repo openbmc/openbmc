@@ -1,16 +1,19 @@
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
 import os
 
-def sort_file(filename, mapping):
+def sort_shadowutils_file(filename, mapping):
     """
     Sorts a passwd or group file based on the numeric ID in the third column.
     If a mapping is given, the name from the first column is mapped via that
     dictionary instead (necessary for /etc/shadow and /etc/gshadow). If not,
     a new mapping is created on the fly and returned.
     """
+
     new_mapping = {}
     with open(filename, 'rb+') as f:
         lines = f.readlines()
@@ -31,30 +34,57 @@ def sort_file(filename, mapping):
         # We overwrite the entire file, i.e. no truncate() necessary.
         f.seek(0)
         f.write(b''.join(lines))
+
     return new_mapping
 
-def remove_backup(filename):
+def sort_shadowutils_files(sysconfdir):
     """
-    Removes the backup file for files like /etc/passwd.
+    Sorts shadow-utils 'passwd' and 'group' files in a rootfs' /etc directory
+    by ID.
     """
+
+    for main, shadow in (('passwd', 'shadow'),
+                         ('group', 'gshadow')):
+        filename = os.path.join(sysconfdir, main)
+        if os.path.exists(filename):
+            mapping = sort_shadowutils_file(filename, None)
+            filename = os.path.join(sysconfdir, shadow)
+            if os.path.exists(filename):
+                 sort_shadowutils_file(filename, mapping)
+
+def remove_shadowutils_backup_file(filename):
+    """
+    Remove shadow-utils backup file for files like /etc/passwd.
+    """
+
     backup_filename = filename + '-'
     if os.path.exists(backup_filename):
         os.unlink(backup_filename)
 
-def sort_passwd(sysconfdir):
+def remove_shadowutils_backup_files(sysconfdir):
     """
-    Sorts passwd and group files in a rootfs /etc directory by ID.
-    Backup files are sometimes are inconsistent and then cannot be
-    sorted (YOCTO #11043), and more importantly, are not needed in
-    the initial rootfs, so they get deleted.
+    Remove shadow-utils backup files in a rootfs /etc directory. They are not
+    needed in the initial root filesystem and sorting them can be inconsistent
+    (YOCTO #11043).
     """
-    for main, shadow in (('passwd', 'shadow'),
-                         ('group', 'gshadow')):
-        filename = os.path.join(sysconfdir, main)
-        remove_backup(filename)
-        if os.path.exists(filename):
-            mapping = sort_file(filename, None)
-            filename = os.path.join(sysconfdir, shadow)
-            remove_backup(filename)
-            if os.path.exists(filename):
-                 sort_file(filename, mapping)
+
+    for filename in (
+            'group',
+            'gshadow',
+            'passwd',
+            'shadow',
+            'subgid',
+            'subuid',
+        ):
+        filepath = os.path.join(sysconfdir, filename)
+        remove_shadowutils_backup_file(filepath)
+
+def tidy_shadowutils_files(sysconfdir):
+    """
+    Tidy up shadow-utils files.
+    """
+
+    remove_shadowutils_backup_files(sysconfdir)
+    sort_shadowutils_files(sysconfdir)
+
+    return True

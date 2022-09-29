@@ -1,6 +1,6 @@
 PRIVATE ENTERPRISE NUMBERS
 
-(last updated 2020-03-05)
+(last updated 2022-09-13)
 
 SMI Network Management Private Enterprise Codes:
 
@@ -81,11 +81,15 @@ Decimal
       bing_wu&wiwynn.com
 40981
   Facebook, Inc.
-    Tim Tickel
-      twt&fb.com
+    Neal Poole
+      iana-assign&fb.com
+42817
+  IBM Platform Firmware Division
+    Jayashankar Padath
+      jayashankar.padath&in.ibm.com
 45065
   Insyde
-    Y.C. Lin 
+    Y.C. Lin
       yc.lin&insyde.com
 48482
   Linaro Ltd
@@ -111,3 +115,7 @@ Decimal
   Ampere Computing
     AJ Shah
       aj&amperecomputing.com
+52893
+  Inspur Power Systems Co.,Ltd.
+    Bing Liu
+      liubing&inspur.com

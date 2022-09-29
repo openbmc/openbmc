@@ -10,8 +10,7 @@ do_configure () {
 	mkdir -p ${B}/${TARGET_SYS}/${BPN}/
 	cd ${B}/${BPN}
 	chmod a+x ${S}/${BPN}/configure
-	relpath=${@os.path.relpath("${S}/${BPN}", "${B}/${BPN}")}
-	$relpath/configure ${CONFIGUREOPTS} ${EXTRA_OECONF}
+	${S}/${BPN}/configure ${CONFIGUREOPTS} ${EXTRA_OECONF}
 }
 EXTRACONFFUNCS += "extract_stashed_builddir"
 do_configure[depends] += "${COMPILERDEP}"
@@ -45,15 +44,19 @@ do_install () {
 }
 
 do_install:append:libc-baremetal () {
-	rmdir ${D}${base_libdir}
+	if [ "${base_libdir}" != "${libdir}" ]; then
+		rmdir ${D}${base_libdir}
+	fi
 }
 do_install:append:libc-newlib () {
-	rmdir ${D}${base_libdir}
+	if [ "${base_libdir}" != "${libdir}" ]; then
+		rmdir ${D}${base_libdir}
+	fi
 }
 
 # No rpm package is actually created but -dev depends on it, avoid dnf error
-RDEPENDS:${PN}-dev:libc-baremetal = ""
-RDEPENDS:${PN}-dev:libc-newlib = ""
+DEV_PKG_DEPENDENCY:libc-baremetal = ""
+DEV_PKG_DEPENDENCY:libc-newlib = ""
 
 BBCLASSEXTEND = "nativesdk"
 

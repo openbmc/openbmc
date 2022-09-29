@@ -28,42 +28,49 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  src/python/grpcio/commands.py | 5 ++++-
  2 files changed, 10 insertions(+), 4 deletions(-)
 
+diff --git a/setup.py b/setup.py
+index ec27fe4..b2d2d1a 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -199,8 +199,11 @@ def check_linker_need_libatomic():
+@@ -206,8 +206,11 @@ def check_linker_need_libatomic():
      """Test if linker on system needs libatomic."""
      code_test = (b'#include <atomic>\n' +
                   b'int main() { return std::atomic<int64_t>{}; }')
--    cxx = os.environ.get('CXX', 'c++')
--    cpp_test = subprocess.Popen([cxx, '-x', 'c++', '-std=c++11', '-'],
+-    cxx = shlex.split(os.environ.get('CXX', 'c++'))
+-    cpp_test = subprocess.Popen(cxx + ['-x', 'c++', '-std=c++14', '-'],
 +    cxx, cxx_args = os.environ.get('CXX').split(' ', 1) or 'c++'
 +    if not cxx_args:
 +      cxx_args = "-g"
 +
-+    cpp_test = subprocess.Popen([cxx, cxx_args, '-x', 'c++', '-std=c++11', '-'],
++    cpp_test = subprocess.Popen([cxx, cxx_args, '-x', 'c++', '-std=c++14', '-'],
                                  stdin=PIPE,
                                  stdout=PIPE,
                                  stderr=PIPE)
-@@ -210,7 +213,7 @@ def check_linker_need_libatomic():
+@@ -217,7 +220,7 @@ def check_linker_need_libatomic():
      # Double-check to see if -latomic actually can solve the problem.
      # https://github.com/grpc/grpc/issues/22491
      cpp_test = subprocess.Popen(
--        [cxx, '-x', 'c++', '-std=c++11', '-', '-latomic'],
-+        [cxx, cxx_args, '-x', 'c++', '-std=c++11', '-', '-latomic'],
+-        [cxx, '-x', 'c++', '-std=c++14', '-', '-latomic'],
++        [cxx, cxx_args, '-x', 'c++', '-std=c++14', '-', '-latomic'],
          stdin=PIPE,
          stdout=PIPE,
          stderr=PIPE)
+diff --git a/src/python/grpcio/commands.py b/src/python/grpcio/commands.py
+index d93b6c7..a8c4a51 100644
 --- a/src/python/grpcio/commands.py
 +++ b/src/python/grpcio/commands.py
 @@ -228,7 +228,10 @@ class BuildExt(build_ext.build_ext):
              """
              try:
                  # TODO(lidiz) Remove the generated a.out for success tests.
--                cc_test = subprocess.Popen(['cc', '-x', 'c', '-std=c++11', '-'],
+-                cc_test = subprocess.Popen(['cc', '-x', 'c', '-std=c++14', '-'],
 +                cc_test, cc_args = os.environ.get('CC').split(' ', 1) or 'gcc'
 +                if not cc_args:
 +                    cc_args = "-g"
-+                cc_test = subprocess.Popen([cc_test, cc_args, '-x', 'c', '-std=c++11', '-'],
++                cc_test = subprocess.Popen([cc_test, cc_args, '-x', 'c', '-std=c++14', '-'],
                                             stdin=subprocess.PIPE,
                                             stdout=subprocess.PIPE,
                                             stderr=subprocess.PIPE)
+-- 
+2.25.1
+

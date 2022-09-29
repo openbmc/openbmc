@@ -1,0 +1,105 @@
+From af05764e7b64e0704291ba2e71138f2345737afa Mon Sep 17 00:00:00 2001
+From: Peter Hoyes <Peter.Hoyes@arm.com>
+Date: Wed, 18 May 2022 15:24:19 +0100
+Subject: [PATCH 8/9] armv8: Allow PRBAR MPU attributes to be configured
+
+In a previous patch, support was added to initialize an S-EL2 MPU on
+armv8r64 machines. This implementation allowed the PRLAR attribute
+index to be configured, but not the shareability and access permission
+attributes in PRBAR. These attributes were hard-coded as "outer
+shareable" and "read/write at EL1 and EL0".
+
+Add separate prlar_attrs and prbar_attrs to the MPU region struct so
+that these attributes can be configured on a per-region basis.
+
+For the BASER_FVP, ensure the MPU memory attributes match those in the
+existing vexpress64 board MMU configuration ("non shareable" for device
+memory and "inner shareable" for normal memory).
+
+Issue-Id: SCM-4641
+Signed-off-by: Peter Hoyes <Peter.Hoyes@arm.com>
+Upstream-Status: Inappropriate [other]
+  Implementation pending further discussion
+Change-Id: I6b72aead91ad12412262aa32c61a53e12eab3984
+---
+ arch/arm/cpu/armv8/cache_v8.c        | 12 ++++++++----
+ arch/arm/include/asm/armv8/mpu.h     |  3 ++-
+ board/armltd/vexpress64/vexpress64.c |  9 ++++++---
+ 3 files changed, 16 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm/cpu/armv8/cache_v8.c b/arch/arm/cpu/armv8/cache_v8.c
+index 798aed8058..e336339281 100644
+--- a/arch/arm/cpu/armv8/cache_v8.c
++++ b/arch/arm/cpu/armv8/cache_v8.c
+@@ -390,7 +390,9 @@ static void mpu_clear_regions(void)
+ {
+ 	int i;
+ 
+-	for (i = 0; mpu_mem_map[i].end || mpu_mem_map[i].attrs; i++) {
++	for (i = 0; mpu_mem_map[i].end ||
++	     mpu_mem_map[i].prbar_attrs ||
++	     mpu_mem_map[i].prlar_attrs; i++) {
+ 		setup_el2_mpu_region(i, 0, 0);
+ 	}
+ }
+@@ -410,12 +412,14 @@ static void mpu_setup(void)
+ 
+ 	asm volatile("msr MAIR_EL2, %0" : : "r" MEMORY_ATTRIBUTES);
+ 
+-	for (i = 0; mpu_mem_map[i].end || mpu_mem_map[i].attrs; i++) {
++	for (i = 0; mpu_mem_map[i].end ||
++	     mpu_mem_map[i].prbar_attrs ||
++	     mpu_mem_map[i].prlar_attrs; i++) {
+ 		setup_el2_mpu_region(i,
+ 			PRBAR_ADDRESS(mpu_mem_map[i].start)
+-				| PRBAR_OUTER_SH | PRBAR_AP_RW_ANY,
++				| mpu_mem_map[i].prbar_attrs,
+ 			PRLAR_ADDRESS(mpu_mem_map[i].end)
+-				| mpu_mem_map[i].attrs | PRLAR_EN_BIT
++				| mpu_mem_map[i].prlar_attrs | PRLAR_EN_BIT
+ 			);
+ 	}
+ 
+diff --git a/arch/arm/include/asm/armv8/mpu.h b/arch/arm/include/asm/armv8/mpu.h
+index 8de627cafd..dd4c689ea6 100644
+--- a/arch/arm/include/asm/armv8/mpu.h
++++ b/arch/arm/include/asm/armv8/mpu.h
+@@ -51,7 +51,8 @@ static inline void setup_el2_mpu_region(uint8_t region, uint64_t base, uint64_t
+ struct mpu_region {
+ 	u64 start;
+ 	u64 end;
+-	u64 attrs;
++	u64 prbar_attrs;
++	u64 prlar_attrs;
+ };
+ 
+ extern struct mpu_region *mpu_mem_map;
+diff --git a/board/armltd/vexpress64/vexpress64.c b/board/armltd/vexpress64/vexpress64.c
+index 1791cd986f..7858521fec 100644
+--- a/board/armltd/vexpress64/vexpress64.c
++++ b/board/armltd/vexpress64/vexpress64.c
+@@ -42,15 +42,18 @@ static struct mpu_region vexpress64_aemv8r_mem_map[] = {
+ 	{
+ 		.start = 0x0UL,
+ 		.end = 0x7fffffffUL,
+-		.attrs = PRLAR_ATTRIDX(MT_NORMAL)
++		.prbar_attrs = PRBAR_INNER_SH | PRBAR_AP_RW_ANY,
++		.prlar_attrs = PRLAR_ATTRIDX(MT_NORMAL)
+ 	}, {
+ 		.start = 0x80000000UL,
+ 		.end = 0xffffffffUL,
+-		.attrs = PRLAR_ATTRIDX(MT_DEVICE_NGNRNE)
++		.prbar_attrs = PRBAR_OUTER_SH | PRBAR_AP_RW_ANY,
++		.prlar_attrs = PRLAR_ATTRIDX(MT_DEVICE_NGNRNE)
+ 	}, {
+ 		.start = 0x100000000UL,
+ 		.end = 0xffffffffffUL,
+-		.attrs = PRLAR_ATTRIDX(MT_NORMAL)
++		.prbar_attrs = PRBAR_INNER_SH | PRBAR_AP_RW_ANY,
++		.prlar_attrs = PRLAR_ATTRIDX(MT_NORMAL)
+ 	}, {
+ 		/* List terminator */
+ 		0,
+-- 
+2.25.1
+

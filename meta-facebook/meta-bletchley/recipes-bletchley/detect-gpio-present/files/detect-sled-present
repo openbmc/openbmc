@@ -1,0 +1,109 @@
+#!/bin/bash
+
+SLED_ID=$1
+SERVICE_NAME="xyz.openbmc_project.Inventory.Manager"
+PRESENT_OBJPATH="/xyz/openbmc_project/inventory/system/chassis/presence/presence_sled${SLED_ID}"
+DBUS_PROPERTY_INTF="org.freedesktop.DBus.Properties"
+
+bind_i2c_driver()
+{
+    I2C_BUS_ADDR=$1
+    DRIVER_NAME=$2
+    DRIVER_DIR="/sys/bus/i2c/drivers/${DRIVER_NAME}"
+    if [ ! -e "${DRIVER_DIR}/${I2C_BUS_ADDR}" ]; then
+        echo "${I2C_BUS_ADDR}" > "${DRIVER_DIR}"/bind
+    fi
+}
+
+unbind_i2c_driver()
+{
+    I2C_BUS_ADDR=$1
+    DRIVER_NAME=$2
+    DRIVER_DIR="/sys/bus/i2c/drivers/${DRIVER_NAME}"
+    if [ -e "${DRIVER_DIR}/${I2C_BUS_ADDR}" ]; then
+        echo "${I2C_BUS_ADDR}" > "${DRIVER_DIR}"/unbind
+    fi
+}
+
+sled_insert_action()
+{
+    SLED_ID=$1
+    I2C_BUS_NUM=$((SLED_ID-1))
+
+    # 0022: fusb302
+    bind_i2c_driver "${I2C_BUS_NUM}-0022" "typec_fusb302"
+
+    # 0045: ina230
+    bind_i2c_driver "${I2C_BUS_NUM}-0045" "ina2xx"
+
+    # 0040: mp5023
+    bind_i2c_driver "${I2C_BUS_NUM}-0040" "mp5023"
+
+    # 0041: pca9536
+    bind_i2c_driver "${I2C_BUS_NUM}-0041" "pca953x"
+
+    # 0076: pca9539
+    bind_i2c_driver "${I2C_BUS_NUM}-0076" "pca953x"
+
+    # 004f: tmp421
+    bind_i2c_driver "${I2C_BUS_NUM}-004f" "tmp421"
+
+    # 0067: pca9552
+    bind_i2c_driver "${I2C_BUS_NUM}-0067" "leds-pca955x"
+
+    # 0054: 24c64
+    bind_i2c_driver "${I2C_BUS_NUM}-0054" "at24"
+
+    # start bletchley-sled-insertion target
+    /bin/systemctl start bletchley-sled-insertion@"${SLED_ID}".target
+}
+
+sled_remove_action()
+{
+    SLED_ID=$1
+    I2C_BUS_NUM=$((SLED_ID-1))
+
+    # 0022: fusb302
+    unbind_i2c_driver "${I2C_BUS_NUM}-0022" "typec_fusb302"
+
+    # # 0045: ina230
+    # unbind_i2c_driver "${I2C_BUS_NUM}-0045" "ina2xx"
+
+    # # 0040: mp5023
+    # unbind_i2c_driver "${I2C_BUS_NUM}-0040" "mp5023"
+
+    # # 0041: pca9536
+    # unbind_i2c_driver "${I2C_BUS_NUM}-0041" "pca953x"
+
+    # # 0076: pca9539
+    # unbind_i2c_driver "${I2C_BUS_NUM}-0076" "pca953x"
+
+    # # 004f: tmp421
+    # unbind_i2c_driver "${I2C_BUS_NUM}-004f" "tmp421"
+
+    # # 0067: pca9552
+    # unbind_i2c_driver "${I2C_BUS_NUM}-0067" "leds-pca955x"
+
+    # # 0054: 24c64
+    # unbind_i2c_driver "${I2C_BUS_NUM}-0054" "at24"
+
+    # start bletchley-sled-removal target
+    /bin/systemctl start bletchley-sled-removal@"${SLED_ID}".target
+}
+
+
+dbus-monitor --system "type=signal,interface=${DBUS_PROPERTY_INTF},sender=${SERVICE_NAME},path=${PRESENT_OBJPATH}" |
+while read -r line; do
+    case "$line" in
+        *"boolean false"*)
+            echo "SLED${SLED_ID} Removal"
+            sled_remove_action "$SLED_ID"
+            ;;
+        *"boolean true"*)
+            echo "SLED${SLED_ID} Insertion"
+            sled_insert_action "$SLED_ID"
+            ;;
+    esac
+done
+
+exit 0

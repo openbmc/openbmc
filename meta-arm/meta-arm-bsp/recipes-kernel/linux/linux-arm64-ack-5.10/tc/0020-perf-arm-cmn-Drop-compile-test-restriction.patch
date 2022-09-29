@@ -1,0 +1,89 @@
+From c3b11ad7a7e3e154a17f36c6768deab9227e28de Mon Sep 17 00:00:00 2001
+From: Robin Murphy <robin.murphy@arm.com>
+Date: Fri, 3 Dec 2021 11:44:52 +0000
+Subject: [PATCH 04/14] perf/arm-cmn: Drop compile-test restriction
+
+Although CMN is currently (and overwhelmingly likely to remain) deployed
+in arm64-only (modulo userspace) systems, the 64-bit "dependency" for
+compile-testing was just laziness due to heavy reliance on readq/writeq
+accessors. Since we only need one extra include for robustness in that
+regard, let's pull that in, widen the compile-test coverage, and fix up
+the smattering of type laziness that that brings to light.
+
+Signed-off-by: Robin Murphy <robin.murphy@arm.com>
+Link: https://lore.kernel.org/r/baee9ee0d0bdad8aaeb70f5a4b98d8fd4b1f5786.1638530442.git.robin.murphy@arm.com
+Signed-off-by: Will Deacon <will@kernel.org>
+
+Upstream-Status: Backport [https://lore.kernel.org/r/baee9ee0d0bdad8aaeb70f5a4b98d8fd4b1f5786.1638530442.git.robin.murphy@arm.com]
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com>
+---
+ drivers/perf/Kconfig   |  2 +-
+ drivers/perf/arm-cmn.c | 25 +++++++++++++------------
+ 2 files changed, 14 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/perf/Kconfig b/drivers/perf/Kconfig
+index 130327ff0b0e..828a042d6a07 100644
+--- a/drivers/perf/Kconfig
++++ b/drivers/perf/Kconfig
+@@ -43,7 +43,7 @@ config ARM_CCN
+ 
+ config ARM_CMN
+ 	tristate "Arm CMN-600 PMU support"
+-	depends on ARM64 || (COMPILE_TEST && 64BIT)
++	depends on ARM64 || COMPILE_TEST
+ 	help
+ 	  Support for PMU events monitoring on the Arm CMN-600 Coherent Mesh
+ 	  Network interconnect.
+diff --git a/drivers/perf/arm-cmn.c b/drivers/perf/arm-cmn.c
+index 2146d1c0103f..e9af79b5f3de 100644
+--- a/drivers/perf/arm-cmn.c
++++ b/drivers/perf/arm-cmn.c
+@@ -7,6 +7,7 @@
+ #include <linux/bitops.h>
+ #include <linux/interrupt.h>
+ #include <linux/io.h>
++#include <linux/io-64-nonatomic-lo-hi.h>
+ #include <linux/kernel.h>
+ #include <linux/list.h>
+ #include <linux/module.h>
+@@ -122,11 +123,11 @@
+ 
+ 
+ /* Event attributes */
+-#define CMN_CONFIG_TYPE			GENMASK(15, 0)
+-#define CMN_CONFIG_EVENTID		GENMASK(23, 16)
+-#define CMN_CONFIG_OCCUPID		GENMASK(27, 24)
+-#define CMN_CONFIG_BYNODEID		BIT(31)
+-#define CMN_CONFIG_NODEID		GENMASK(47, 32)
++#define CMN_CONFIG_TYPE			GENMASK_ULL(15, 0)
++#define CMN_CONFIG_EVENTID		GENMASK_ULL(23, 16)
++#define CMN_CONFIG_OCCUPID		GENMASK_ULL(27, 24)
++#define CMN_CONFIG_BYNODEID		BIT_ULL(31)
++#define CMN_CONFIG_NODEID		GENMASK_ULL(47, 32)
+ 
+ #define CMN_EVENT_TYPE(event)		FIELD_GET(CMN_CONFIG_TYPE, (event)->attr.config)
+ #define CMN_EVENT_EVENTID(event)	FIELD_GET(CMN_CONFIG_EVENTID, (event)->attr.config)
+@@ -134,13 +135,13 @@
+ #define CMN_EVENT_BYNODEID(event)	FIELD_GET(CMN_CONFIG_BYNODEID, (event)->attr.config)
+ #define CMN_EVENT_NODEID(event)		FIELD_GET(CMN_CONFIG_NODEID, (event)->attr.config)
+ 
+-#define CMN_CONFIG_WP_COMBINE		GENMASK(27, 24)
+-#define CMN_CONFIG_WP_DEV_SEL		BIT(48)
+-#define CMN_CONFIG_WP_CHN_SEL		GENMASK(50, 49)
+-#define CMN_CONFIG_WP_GRP		BIT(52)
+-#define CMN_CONFIG_WP_EXCLUSIVE		BIT(53)
+-#define CMN_CONFIG1_WP_VAL		GENMASK(63, 0)
+-#define CMN_CONFIG2_WP_MASK		GENMASK(63, 0)
++#define CMN_CONFIG_WP_COMBINE		GENMASK_ULL(27, 24)
++#define CMN_CONFIG_WP_DEV_SEL		BIT_ULL(48)
++#define CMN_CONFIG_WP_CHN_SEL		GENMASK_ULL(50, 49)
++#define CMN_CONFIG_WP_GRP		BIT_ULL(52)
++#define CMN_CONFIG_WP_EXCLUSIVE		BIT_ULL(53)
++#define CMN_CONFIG1_WP_VAL		GENMASK_ULL(63, 0)
++#define CMN_CONFIG2_WP_MASK		GENMASK_ULL(63, 0)
+ 
+ #define CMN_EVENT_WP_COMBINE(event)	FIELD_GET(CMN_CONFIG_WP_COMBINE, (event)->attr.config)
+ #define CMN_EVENT_WP_DEV_SEL(event)	FIELD_GET(CMN_CONFIG_WP_DEV_SEL, (event)->attr.config)
+-- 
+2.25.1
+

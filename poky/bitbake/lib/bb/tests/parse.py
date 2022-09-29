@@ -164,6 +164,7 @@ python () {
     # become unset/disappear.
     #
     def test_parse_classextend_contamination(self):
+        self.d.setVar("__bbclasstype", "recipe")
         cls = self.parsehelper(self.classextend_bbclass, suffix=".bbclass")
         #clsname = os.path.basename(cls.name).replace(".bbclass", "")
         self.classextend = self.classextend.replace("###CLASS###", cls.name)
@@ -193,4 +194,27 @@ deltask ${EMPTYVAR}
         self.assertTrue("addtask contained multiple 'after' keywords" in stdout)
         self.assertTrue('addtask ignored: " do_patch"' in stdout)
         #self.assertTrue('dependent task do_foo for do_patch does not exist' in stdout)
+
+    broken_multiline_comment = """
+# First line of comment \\
+# Second line of comment \\
+
+"""
+    def test_parse_broken_multiline_comment(self):
+        f = self.parsehelper(self.broken_multiline_comment)
+        with self.assertRaises(bb.BBHandledException):
+            d = bb.parse.handle(f.name, self.d)['']
+
+
+    comment_in_var = """
+VAR = " \\
+    SOMEVAL \\
+#   some comment \\
+    SOMEOTHERVAL \\
+"
+"""
+    def test_parse_comment_in_var(self):
+        f = self.parsehelper(self.comment_in_var)
+        with self.assertRaises(bb.BBHandledException):
+            d = bb.parse.handle(f.name, self.d)['']
 

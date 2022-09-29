@@ -1,3 +1,9 @@
+#
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
+
 # Class for generation of overlayfs mount units
 #
 # It's often desired in Embedded System design to have a read-only rootfs.

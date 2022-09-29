@@ -1,0 +1,34 @@
+From 5c63ec2e2d4726268ace85e5c61727cbd811d982 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 27 Aug 2022 09:00:24 -0700
+Subject: [PATCH] metadata_downloader: Include unistd.h for lseek()
+
+This is found when compiling on musl systems
+
+Fixes
+
+metadata_downloader.c:331:9: error: call to undeclared function 'lseek'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+        lseek(fd_value, SEEK_SET, 0);
+        ^
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/librepo/pull/263]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ librepo/metadata_downloader.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/librepo/metadata_downloader.c b/librepo/metadata_downloader.c
+index 123c77b..6604255 100644
+--- a/librepo/metadata_downloader.c
++++ b/librepo/metadata_downloader.c
+@@ -24,6 +24,7 @@
+ #include <assert.h>
+ #include <string.h>
+ #include <errno.h>
++#include <unistd.h>
+ #include <sys/stat.h>
+ 
+ #include "librepo/librepo.h"
+-- 
+2.37.2
+

@@ -26,6 +26,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  setup.py | 9 ++++++---
  1 file changed, 6 insertions(+), 3 deletions(-)
 
+diff --git a/setup.py b/setup.py
+index cc53e79..be3bc78 100644
 --- a/setup.py
 +++ b/setup.py
 @@ -87,8 +87,11 @@ def check_linker_need_libatomic():
@@ -33,12 +35,12 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
      code_test = (b'#include <atomic>\n' +
                   b'int main() { return std::atomic<int64_t>{}; }')
 -    cxx = os.environ.get('CXX', 'c++')
--    cpp_test = subprocess.Popen([cxx, '-x', 'c++', '-std=c++11', '-'],
+-    cpp_test = subprocess.Popen([cxx, '-x', 'c++', '-std=c++14', '-'],
 +    cxx, cxx_args = os.environ.get('CXX').split(' ', 1) or 'c++'
 +    if not cxx_args:
 +      cxx_args = "-g"
 +
-+    cpp_test = subprocess.Popen([cxx, cxx_args, '-x', 'c++', '-std=c++11', '-'],
++    cpp_test = subprocess.Popen([cxx, cxx_args, '-x', 'c++', '-std=c++14', '-'],
                                  stdin=PIPE,
                                  stdout=PIPE,
                                  stderr=PIPE)
@@ -46,8 +48,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
      # Double-check to see if -latomic actually can solve the problem.
      # https://github.com/grpc/grpc/issues/22491
      cpp_test = subprocess.Popen(
--        [cxx, '-x', 'c++', '-std=c++11', '-', '-latomic'],
-+        [cxx, cxx_args, '-x', 'c++', '-std=c++11', '-', '-latomic'],
+-        [cxx, '-x', 'c++', '-std=c++14', '-', '-latomic'],
++        [cxx, cxx_args, '-x', 'c++', '-std=c++14', '-', '-latomic'],
          stdin=PIPE,
          stdout=PIPE,
          stderr=PIPE)
+-- 
+2.25.1
+

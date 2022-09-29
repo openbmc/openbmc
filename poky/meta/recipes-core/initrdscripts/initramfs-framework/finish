@@ -26,6 +26,15 @@ finish_run() {
 
 		info "Switching root to '$ROOTFS_DIR'..."
 
+		debug "Moving basic mounts onto rootfs"
+		for dir in `awk '/\/dev.* \/run\/media/{print $2}' /proc/mounts`; do
+			# Parse any OCT or HEX encoded chars such as spaces
+			# in the mount points to actual ASCII chars
+			dir=`printf $dir`
+			mkdir -p "${ROOTFS_DIR}/media/${dir##*/}"
+			mount -n --move "$dir" "${ROOTFS_DIR}/media/${dir##*/}"
+		done
+
 		debug "Moving /dev, /proc and /sys onto rootfs..."
 		mount --move /dev $ROOTFS_DIR/dev
 		mount --move /proc $ROOTFS_DIR/proc

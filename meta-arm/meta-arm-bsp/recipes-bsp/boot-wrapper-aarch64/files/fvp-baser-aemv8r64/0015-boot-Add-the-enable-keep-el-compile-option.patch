@@ -1,0 +1,102 @@
+From 8271c21bcff260295203214b7b8c87cdb8236453 Mon Sep 17 00:00:00 2001
+From: Jaxson Han <jaxson.han@arm.com>
+Date: Tue, 4 Jan 2022 17:01:55 +0800
+Subject: [PATCH] boot: Add the --enable-keep-el compile option
+
+Add --enable-keep-el compile option to enable boot-wrapper booting next
+stage at EL2.
+The Armv8R AArch64 boots at EL2. If the next stage requires EL2 booting,
+the boot-wrapper should not drop to EL1.
+Currently, this option only works for Armv8R AArch64. Also, to work with
+Linux PSCI, this option will cause secondary cores booting at EL1.
+
+Issue-Id: SCM-3813
+Upstream-Status: Inappropriate [other]
+  Implementation pending further discussion
+Signed-off-by: Jaxson Han <jaxson.han@arm.com>
+Change-Id: I3ba9c87cf0b59d163ca433f74c9e3a46e5ca2c63
+---
+ Makefile.am         | 4 ++++
+ arch/aarch64/boot.S | 6 +++++-
+ common/psci.c       | 6 ++++++
+ configure.ac        | 5 +++++
+ 4 files changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 734de92..054becd 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -33,6 +33,10 @@ PSCI_CPU_ON	:= 0xc4000003
+ endif
+ PSCI_CPU_OFF	:= 0x84000002
+ 
++if KEEP_EL
++DEFINES		+= -DKEEP_EL
++endif
++
+ COMMON_SRC	:= common/
+ COMMON_OBJ	:= boot.o bakery_lock.o platform.o lib.o device_tree.o
+ 
+diff --git a/arch/aarch64/boot.S b/arch/aarch64/boot.S
+index 6dbd5cc..157c097 100644
+--- a/arch/aarch64/boot.S
++++ b/arch/aarch64/boot.S
+@@ -233,7 +233,11 @@ el2_init:
+ 	msr	cnthctl_el2, x0
+ 	isb
+ 
++#ifdef KEEP_EL
++	mov	w0, #SPSR_KERNEL
++#else
+ 	mov	w0, #SPSR_KERNEL_EL1
++#endif
+ 	ldr	x1, =spsr_to_elx
+ 	str	w0, [x1]
+ 	// fall through
+@@ -313,5 +317,5 @@ ASM_FUNC(jump_kernel)
+ 	.align 3
+ flag_keep_el:
+ 	.long 0
+-spsr_to_elx:
++ASM_DATA(spsr_to_elx)
+ 	.long 0
+diff --git a/common/psci.c b/common/psci.c
+index a0e8700..945780b 100644
+--- a/common/psci.c
++++ b/common/psci.c
+@@ -18,6 +18,8 @@
+ #error "No MPIDRs provided"
+ #endif
+ 
++extern unsigned int spsr_to_elx;
++
+ static unsigned long branch_table[NR_CPUS];
+ 
+ bakery_ticket_t branch_table_lock[NR_CPUS];
+@@ -44,6 +46,10 @@ static int psci_cpu_on(unsigned long target_mpidr, unsigned long address)
+ 	ret = psci_store_address(cpu, address);
+ 	bakery_unlock(branch_table_lock, this_cpu);
+ 
++#ifdef KEEP_EL
++	spsr_to_elx = SPSR_KERNEL_EL1;
++#endif
++
+ 	return ret;
+ }
+ 
+diff --git a/configure.ac b/configure.ac
+index 53e51be..0e07db3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -25,6 +25,11 @@ AS_IF([test "x$BOOTWRAPPER_ES" = x32 -a "x$KERNEL_ES" != x32],
+ 	[AC_MSG_ERROR([a 32-bit boot-wrapper cannot launch a 64-bit kernel])]
+ )
+ 
++AC_ARG_ENABLE([keep-el],
++	AC_HELP_STRING([--enable-keep-el], [keep exception level when start kernel]),
++	[KEEP_EL=yes], [KEEP_EL=no])
++AM_CONDITIONAL([KEEP_EL], [test "x$KEEP_EL" = xyes])
++
+ # Allow a user to pass --with-kernel-dir
+ AC_ARG_WITH([kernel-dir],
+ 	AS_HELP_STRING([--with-kernel-dir], [specify the root Linux kernel build directory (required)]),

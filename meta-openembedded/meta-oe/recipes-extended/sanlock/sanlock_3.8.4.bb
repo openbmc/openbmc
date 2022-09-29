@@ -21,6 +21,10 @@ SRCREV = "a181e951376d49a82eef17920c8ebedec80b4823"
 
 S = "${WORKDIR}/git"
 
+CVE_CHECK_IGNORE += "\
+    CVE-2012-5638 \
+"
+
 DEPENDS = "libaio util-linux"
 
 inherit setuptools3 useradd

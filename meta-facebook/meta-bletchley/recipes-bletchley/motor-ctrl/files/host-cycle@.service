@@ -1,0 +1,9 @@
+[Unit]
+Description=Sled%i Host Power Cycle
+Requires=motor-init-calibration@%i.service
+After=motor-init-calibration@%i.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/power-ctrl sled%i cycle
+SyslogIdentifier=power-ctrl

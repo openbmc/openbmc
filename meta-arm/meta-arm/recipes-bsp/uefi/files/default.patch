@@ -1,0 +1,23 @@
+Platform/ARM: fix uninitialized variable FileSize in RunAxf
+
+Clang 14 detects a potentially uninitialized variable FileSize:
+
+RunAxf.c:216:11: error: variable 'FileSize' is used uninitialized
+                        whenever 'if' condition is false
+RunAxf.c:281:38: note: uninitialized use occurs here
+WriteBackDataCacheRange (FileData, FileSize);
+                                    ^~~~~~~~
+
+Reading the code it doesn't look like this can actually happen, but we
+can keep clang happy by initialising FileSize to 0.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/Platform/ARM/Library/ArmShellCmdRunAxf/RunAxf.c b/Platform/ARM/Library/ArmShellCmdRunAxf/RunAxf.c
+index d23739ad38..fba5e0ba30 100644
+--- a/Platform/ARM/Library/ArmShellCmdRunAxf/RunAxf.c
++++ b/Platform/ARM/Library/ArmShellCmdRunAxf/RunAxf.c
+@@ -136,1 +136,1 @@ ShellDynCmdRunAxfHandler (
+-  UINTN                       FileSize;
++  UINTN                       FileSize = 0;

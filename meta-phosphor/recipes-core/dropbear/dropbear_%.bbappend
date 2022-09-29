@@ -2,6 +2,7 @@
 # has been upstreamed.  This patch can be removed once we upgrade
 # to yocto 2.5 or later which will pull in the latest dropbear code.
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+
 SRC_URI += "file://dropbearkey.service \
             file://localoptions.h \
             file://dropbear.default \

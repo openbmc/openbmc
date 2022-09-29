@@ -1,0 +1,34 @@
+From 887ecc7837962e9be77a4fea7d9122648f73a84a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 15 Aug 2022 14:47:53 -0700
+Subject: [PATCH] mountd: Check for return of stat function
+
+simplify the check, stat() return 0 on success -1 on failure
+
+Fixes clang reported errors e.g.
+
+| v4clients.c:29:6: error: logical not is only applied to the left hand side of this comparison [-Werror,-Wlogical-not-parentheses]
+|         if (!stat("/proc/fs/nfsd/clients", &sb) == 0 ||
+|             ^                                   ~~
+
+Upstream-Status: Submitted [https://patchwork.kernel.org/project/linux-nfs/patch/20220816024403.2694169-1-raj.khem@gmail.com/]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Cc: Konstantin Khorenko <khorenko@virtuozzo.com>
+Cc: Steve Dickson <steved@redhat.com>
+---
+ support/export/v4clients.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/support/export/v4clients.c b/support/export/v4clients.c
+index 5f15b61..3230251 100644
+--- a/support/export/v4clients.c
++++ b/support/export/v4clients.c
+@@ -26,7 +26,7 @@ void v4clients_init(void)
+ {
+ 	struct stat sb;
+ 
+-	if (!stat("/proc/fs/nfsd/clients", &sb) == 0 ||
++	if (stat("/proc/fs/nfsd/clients", &sb) != 0 ||
+ 	    !S_ISDIR(sb.st_mode))
+ 		return;
+ 	if (clients_fd >= 0)

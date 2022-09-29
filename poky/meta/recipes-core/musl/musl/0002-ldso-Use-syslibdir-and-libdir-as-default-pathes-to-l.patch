@@ -1,7 +1,8 @@
-From 5a2886f81dbca3f2ed28eebe7d27d471da278db8 Mon Sep 17 00:00:00 2001
+From 3cce8716c6c3ae2e0c835caeac3780ec35090b2d Mon Sep 17 00:00:00 2001
 From: Serhey Popovych <serhe.popovych@gmail.com>
 Date: Tue, 11 Dec 2018 05:44:20 -0500
-Subject: [PATCH] ldso: Use syslibdir and libdir as default pathes to libdirs
+Subject: [PATCH 2/2] ldso: Use syslibdir and libdir as default pathes to
+ libdirs
 
 In absence of /etc/ld-musl-$(ARCH).path ldso uses default path to search
 libraries /lib:/usr/local/lib:/usr/lib.
@@ -20,6 +21,8 @@ Signed-off-by: Serhey Popovych <serhe.popovych@gmail.com>
  ldso/dynlink.c | 4 +++-
  2 files changed, 5 insertions(+), 2 deletions(-)
 
+diff --git a/Makefile b/Makefile
+index 466d9afd..d2f458fa 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -47,7 +47,8 @@ CFLAGS_AUTO = -Os -pipe
@@ -32,6 +35,8 @@ Signed-off-by: Serhey Popovych <serhe.popovych@gmail.com>
  CFLAGS_ALL += $(CPPFLAGS) $(CFLAGS_AUTO) $(CFLAGS)
  
  LDFLAGS_ALL = $(LDFLAGS_AUTO) $(LDFLAGS)
+diff --git a/ldso/dynlink.c b/ldso/dynlink.c
+index cc677952..b0e8815b 100644
 --- a/ldso/dynlink.c
 +++ b/ldso/dynlink.c
 @@ -29,6 +29,8 @@
@@ -40,10 +45,10 @@ Signed-off-by: Serhey Popovych <serhe.popovych@gmail.com>
  
 +#define SYS_PATH_DFLT SYSLIBDIR ":" LIBDIR
 +
- static void error(const char *, ...);
- 
- #define MAXP2(a,b) (-(-(a)&-(b)))
-@@ -1094,7 +1096,7 @@ static struct dso *load_library(const ch
+ static void error_impl(const char *, ...);
+ static void error_noop(const char *, ...);
+ static void (*error)(const char *, ...) = error_noop;
+@@ -1097,7 +1099,7 @@ static struct dso *load_library(const char *name, struct dso *needed_by)
  					sys_path = "";
  				}
  			}
@@ -52,3 +57,6 @@ Signed-off-by: Serhey Popovych <serhe.popovych@gmail.com>
  			fd = path_open(name, sys_path, buf, sizeof buf);
  		}
  		pathname = buf;
+-- 
+2.37.2
+

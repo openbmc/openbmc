@@ -39,7 +39,7 @@ index a9bf28f6d9..11d3644168 100644
          ['proc-sys-fs-binfmt_misc.mount',       'ENABLE_BINFMT'],
          ['reboot.target',                       '',
           'ctrl-alt-del.target' + (with_runlevels ? ' runlevel6.target' : '')],
-@@ -184,8 +183,7 @@ in_units = [
+@@ -186,8 +185,7 @@ in_units = [
          ['rescue.service',                       ''],
          ['serial-getty@.service',                ''],
          ['systemd-backlight@.service',           'ENABLE_BACKLIGHT'],

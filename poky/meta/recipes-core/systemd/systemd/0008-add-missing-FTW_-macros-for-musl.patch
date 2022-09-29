@@ -7,59 +7,27 @@ This is to avoid build failures like below for musl.
 
   locale-util.c:296:24: error: 'FTW_STOP' undeclared
 
-Revisit this when upgrading to 251+ since most of these defines are not
-needed anymore except FTW_CONTINUE
-
 Upstream-Status: Inappropriate [musl specific]
 
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 
 ---
- src/basic/missing_type.h    | 20 ++++++++++++++++++++
- src/shared/mount-setup.c    |  1 +
- src/test/test-recurse-dir.c |  1 +
- 3 files changed, 22 insertions(+)
+ src/basic/missing_type.h    | 4 ++++
+ src/test/test-recurse-dir.c | 1 +
+ 2 files changed, 5 insertions(+)
 
 diff --git a/src/basic/missing_type.h b/src/basic/missing_type.h
-index aeaf6ad5ec..3df1084ef2 100644
+index 6c0456349d..73a5b90e3c 100644
 --- a/src/basic/missing_type.h
 +++ b/src/basic/missing_type.h
-@@ -19,3 +19,23 @@ typedef int (*comparison_fn_t)(const void *, const void *);
- #define __COMPAR_FN_T
- typedef int (*__compar_fn_t)(const void *, const void *);
+@@ -14,3 +14,7 @@
+ #ifndef __GLIBC__
+ typedef int (*comparison_fn_t)(const void *, const void *);
  #endif
-+
-+#ifndef FTW_ACTIONRETVAL
-+#define FTW_ACTIONRETVAL 16
-+#endif
 +
 +#ifndef FTW_CONTINUE
 +#define FTW_CONTINUE 0
 +#endif
-+
-+#ifndef FTW_STOP
-+#define FTW_STOP 1
-+#endif
-+
-+#ifndef FTW_SKIP_SUBTREE
-+#define FTW_SKIP_SUBTREE 2
-+#endif
-+
-+#ifndef FTW_SKIP_SIBLINGS
-+#define FTW_SKIP_SIBLINGS 3
-+#endif
-diff --git a/src/shared/mount-setup.c b/src/shared/mount-setup.c
-index 7917968497..cc3d5baaab 100644
---- a/src/shared/mount-setup.c
-+++ b/src/shared/mount-setup.c
-@@ -32,6 +32,7 @@
- #include "strv.h"
- #include "user-util.h"
- #include "virt.h"
-+#include "missing_type.h"
- 
- typedef enum MountMode {
-         MNT_NONE           = 0,
 diff --git a/src/test/test-recurse-dir.c b/src/test/test-recurse-dir.c
 index 2c2120b136..bc60a178a2 100644
 --- a/src/test/test-recurse-dir.c

@@ -1,5 +1,7 @@
 #!/bin/sh
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: GPL-2.0-only
 #
 # Used to find files installed in sysroot which are not tracked by sstate manifest

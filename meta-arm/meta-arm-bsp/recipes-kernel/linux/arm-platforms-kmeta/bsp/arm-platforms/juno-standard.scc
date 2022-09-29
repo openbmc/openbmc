@@ -1,0 +1,11 @@
+define KMACHINE juno
+define KTYPE standard
+define KARCH arm64
+
+include ktypes/standard/standard.scc
+
+include juno.scc
+
+# default policy for standard kernels
+#include features/latencytop/latencytop.scc
+#include features/profiling/profiling.scc

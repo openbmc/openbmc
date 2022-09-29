@@ -1,4 +1,6 @@
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: GPL-2.0-only
 #
 # Implements system state sampling. Called by buildstats.bbclass.
@@ -14,13 +16,27 @@ class SystemStats:
         bn = d.getVar('BUILDNAME')
         bsdir = os.path.join(d.getVar('BUILDSTATS_BASE'), bn)
         bb.utils.mkdirhier(bsdir)
+        file_handlers =  [('diskstats', self._reduce_diskstats),
+                            ('meminfo', self._reduce_meminfo),
+                            ('stat', self._reduce_stat)]
+
+        # Some hosts like openSUSE have readable /proc/pressure files
+        # but throw errors when these files are opened. Catch these error
+        # and ensure that the reduce_proc_pressure directory is not created.
+        if os.path.exists("/proc/pressure"):
+            try:
+                with open('/proc/pressure/cpu', 'rb') as source:
+                    source.read()
+                pressuredir = os.path.join(bsdir, 'reduced_proc_pressure')
+                bb.utils.mkdirhier(pressuredir)
+                file_handlers.extend([('pressure/cpu', self._reduce_pressure),
+                                     ('pressure/io', self._reduce_pressure),
+                                     ('pressure/memory', self._reduce_pressure)])
+            except Exception:
+                pass
 
         self.proc_files = []
-        for filename, handler in (
-                ('diskstats', self._reduce_diskstats),
-                ('meminfo', self._reduce_meminfo),
-                ('stat', self._reduce_stat),
-        ):
+        for filename, handler in (file_handlers):
             # The corresponding /proc files might not exist on the host.
             # For example, /proc/diskstats is not available in virtualized
             # environments like Linux-VServer. Silently skip collecting
@@ -37,24 +53,32 @@ class SystemStats:
         # Last time that we sampled /proc data resp. recorded disk monitoring data.
         self.last_proc = 0
         self.last_disk_monitor = 0
-        # Minimum number of seconds between recording a sample. This
-        # becames relevant when we get called very often while many
-        # short tasks get started. Sampling during quiet periods
+        # Minimum number of seconds between recording a sample. This becames relevant when we get
+        # called very often while many short tasks get started. Sampling during quiet periods
         # depends on the heartbeat event, which fires less often.
-        self.min_seconds = 1
+        # By default, the Heartbeat events occur roughly once every second but the actual time
+        # between these events deviates by a few milliseconds, in most cases. Hence
+        # pick a somewhat arbitary tolerance such that we sample a large majority
+        # of the Heartbeat events. This ignores rare events that fall outside the minimum
+        # and may lead an extra sample in a given second every so often. However, it allows for fairly
+        # consistent intervals between samples without missing many events.
+        self.tolerance = 0.01
+        self.min_seconds = 1.0 - self.tolerance
 
         self.meminfo_regex = re.compile(rb'^(MemTotal|MemFree|Buffers|Cached|SwapTotal|SwapFree):\s*(\d+)')
         self.diskstats_regex = re.compile(rb'^([hsv]d.|mtdblock\d|mmcblk\d|cciss/c\d+d\d+.*)$')
         self.diskstats_ltime = None
         self.diskstats_data = None
         self.stat_ltimes = None
+        # Last time we sampled /proc/pressure. All resources stored in a single dict with the key as filename
+        self.last_pressure = {"pressure/cpu": None, "pressure/io": None, "pressure/memory": None}
 
     def close(self):
         self.monitor_disk.close()
         for _, output, _ in self.proc_files:
             output.close()
 
-    def _reduce_meminfo(self, time, data):
+    def _reduce_meminfo(self, time, data, filename):
         """
         Extracts 'MemTotal', 'MemFree', 'Buffers', 'Cached', 'SwapTotal', 'SwapFree'
         and writes their values into a single line, in that order.
@@ -75,7 +99,7 @@ class SystemStats:
         disk = linetokens[2]
         return self.diskstats_regex.match(disk)
 
-    def _reduce_diskstats(self, time, data):
+    def _reduce_diskstats(self, time, data, filename):
         relevant_tokens = filter(self._diskstats_is_relevant_line, map(lambda x: x.split(), data.split(b'\n')))
         diskdata = [0] * 3
         reduced = None
@@ -104,10 +128,10 @@ class SystemStats:
         return reduced
 
 
-    def _reduce_nop(self, time, data):
+    def _reduce_nop(self, time, data, filename):
         return (time, data)
 
-    def _reduce_stat(self, time, data):
+    def _reduce_stat(self, time, data, filename):
         if not data:
             return None
         # CPU times {user, nice, system, idle, io_wait, irq, softirq} from first line
@@ -126,14 +150,41 @@ class SystemStats:
         self.stat_ltimes = times
         return reduced
 
+    def _reduce_pressure(self, time, data, filename):
+        """
+        Return reduced pressure: {avg10, avg60, avg300} and delta total compared to the previous sample
+        for the cpu, io and memory resources. A common function is used for all 3 resources since the
+        format of the /proc/pressure file is the same in each case.
+        """
+        if not data:
+            return None
+        tokens = data.split(b'\n', 1)[0].split()
+        avg10 = float(tokens[1].split(b'=')[1])
+        avg60 = float(tokens[2].split(b'=')[1])
+        avg300 = float(tokens[3].split(b'=')[1])
+        total = int(tokens[4].split(b'=')[1])
+
+        reduced = None
+        if self.last_pressure[filename]:
+            delta = total - self.last_pressure[filename]
+            reduced = (time, (avg10, avg60, avg300, delta))
+        self.last_pressure[filename] = total
+        return reduced
+
     def sample(self, event, force):
+        """
+        Collect and log proc or disk_monitor stats periodically.
+        Return True if a new sample is collected and hence the value last_proc or last_disk_monitor
+        is changed.
+        """
+        retval = False
         now = time.time()
         if (now - self.last_proc > self.min_seconds) or force:
             for filename, output, handler in self.proc_files:
                 with open(os.path.join('/proc', filename), 'rb') as input:
                     data = input.read()
                     if handler:
-                        reduced = handler(now, data)
+                        reduced = handler(now, data, filename)
                     else:
                         reduced = (now, data)
                     if reduced:
@@ -150,6 +201,7 @@ class SystemStats:
                                  data +
                                  b'\n')
             self.last_proc = now
+            retval = True
 
         if isinstance(event, bb.event.MonitorDiskEvent) and \
            ((now - self.last_disk_monitor > self.min_seconds) or force):
@@ -159,3 +211,5 @@ class SystemStats:
                               for dev, sample in event.disk_usage.items()]).encode('ascii') +
                      b'\n')
             self.last_disk_monitor = now
+            retval = True
+        return retval

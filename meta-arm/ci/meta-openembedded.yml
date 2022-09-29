@@ -1,0 +1,11 @@
+header:
+  version: 11
+
+repos:
+  meta-openembedded:
+    url: https://git.openembedded.org/meta-openembedded
+    layers:
+      meta-filesystems:
+      meta-networking:
+      meta-oe:
+      meta-python:

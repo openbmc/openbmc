@@ -1,1 +1,1 @@
-PACKAGECONFIG:remove = " cpusensor ipmbsensor"
+PACKAGECONFIG:remove = " intelcpusensor ipmbsensor"

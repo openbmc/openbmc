@@ -14,8 +14,8 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
 
 --- a/usr/klibc/arch/arm/MCONFIG
 +++ b/usr/klibc/arch/arm/MCONFIG
-@@ -29,6 +29,7 @@ else
- KLIBCSHAREDFLAGS = -Ttext-segment 0x01800000
+@@ -27,6 +27,7 @@ else
+ KLIBCSHAREDFLAGS = $(LD_IMAGE_BASE_OPT) 0x01800000
  ifeq ($(CONFIG_AEABI),y)
  KLIBCREQFLAGS += -mabi=aapcs-linux -mno-thumb-interwork
 +KLIBCLDFLAGS += $(FIX_ARMV4_EABI_BX)

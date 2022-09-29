@@ -420,6 +420,16 @@ fi
 
 mkdir -p $upper $work
 
+# Opportunisticly set a sane BMC date based on a file that gets
+# written right before rebooting or powercycling. If none exists,
+# use the image build date.
+files="$upper/var/lib/systemd/random-seed $rodir/etc/os-release"
+time=$(find $files -exec stat -c %Y {} \; | sort -n | tail -n 1)
+# Allow RTC coordinated time to supersede this setting
+if [ "$(date +%s)" -lt "$time" ]; then
+  date -s @$((time + 5)) || true
+fi
+
 mount -t overlay -o lowerdir=$rodir,upperdir=$upper,workdir=$work cow /root
 
 while ! chroot /root /bin/sh -c "test -x '$init' -a -s '$init'"

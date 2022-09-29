@@ -1,0 +1,104 @@
+#! /usr/bin/env python3
+
+import asyncio
+import os
+import pathlib
+import signal
+import sys
+
+import logging
+logger = logging.getLogger("RunFVP")
+
+# Add meta-arm/lib/ to path
+libdir = pathlib.Path(__file__).parents[1] / "meta-arm" / "lib"
+sys.path.insert(0, str(libdir))
+
+from fvp import terminal, runner, conffile
+
+def parse_args(arguments):
+    import argparse
+    terminals = terminal.terminals
+
+    parser = argparse.ArgumentParser(description="Run images in a FVP")
+    parser.add_argument("config", nargs="?", help="Machine name or path to .fvpconf file")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("-t", "--terminals", choices=terminals.all_terminals(), default=terminals.preferred_terminal(), help="Automatically start terminals (default: %(default)s)")
+    group.add_argument("-c", "--console", action="store_true", help="Attach the first uart to stdin/stdout")
+    parser.add_argument("--verbose", action="store_true", help="Output verbose logging")
+    parser.usage = f"{parser.format_usage().strip()} -- [ arguments passed to FVP ]"
+    # TODO option for telnet vs netcat
+
+    # If the arguments contains -- then everything after it should be passed to the FVP binary directly.
+    if "--" in arguments:
+        i = arguments.index("--")
+        fvp_args = arguments[i+1:]
+        arguments = arguments[:i]
+    else:
+        fvp_args = []
+
+    args = parser.parse_args(args=arguments)
+    logging.basicConfig(level=args.verbose and logging.DEBUG or logging.WARNING)
+
+    # If we're hooking up the console, don't start any terminals
+    if args.console:
+        args.terminals = "none"
+
+    logger.debug(f"Parsed arguments: {vars(args)}")
+    logger.debug(f"FVP arguments: {fvp_args}")
+    return args, fvp_args
+
+
+async def start_fvp(args, config, extra_args):
+    fvp = runner.FVPRunner(logger)
+    try:
+        await fvp.start(config, extra_args, args.terminals)
+
+        if args.console:
+            fvp.add_line_callback(lambda line: logger.debug(f"FVP output: {line}"))
+            expected_terminal = config["consoles"]["default"]
+            if not expected_terminal:
+                logger.error("--console used but FVP_CONSOLE not set in machine configuration")
+                return 1
+            telnet = await fvp.create_telnet(expected_terminal)
+            await telnet.wait()
+            logger.debug(f"Telnet quit, cancelling tasks")
+        else:
+            fvp.add_line_callback(lambda line: print(line))
+            await fvp.run()
+
+    finally:
+        await fvp.stop()
+
+def runfvp(cli_args):
+    args, extra_args = parse_args(cli_args)
+    if args.config and pathlib.Path(args.config).exists():
+        config_file = args.config
+    else:
+        config_file = conffile.find(args.config)
+    logger.debug(f"Loading {config_file}")
+    config = conffile.load(config_file)
+
+    try:
+        # When we can assume Py3.7+, this can simply be asyncio.run()
+        loop = asyncio.get_event_loop()
+        return loop.run_until_complete(start_fvp(args, config, extra_args))
+    except asyncio.CancelledError:
+        # This means telnet exited, which isn't an error
+        return 0
+
+if __name__ == "__main__":
+    try:
+        # Set the process group so that it's possible to kill runfvp and
+        # everything it spawns easily.
+        # Ignore permission errors happening when spawned from an other process
+        # for example run from except
+        try:
+            os.setpgid(0, 0)
+        except PermissionError:
+            pass
+        if sys.stdin.isatty():
+            signal.signal(signal.SIGTTOU, signal.SIG_IGN)
+            os.tcsetpgrp(sys.stdin.fileno(), os.getpgrp())
+        sys.exit(runfvp(sys.argv[1:]))
+    except KeyboardInterrupt:
+        pass

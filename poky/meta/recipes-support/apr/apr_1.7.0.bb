@@ -24,6 +24,8 @@ SRC_URI = "${APACHE_MIRROR}/apr/${BPN}-${PV}.tar.bz2 \
            file://libtoolize_check.patch \
            file://0001-Add-option-to-disable-timed-dependant-tests.patch \
            file://autoconf270.patch \
+           file://0001-add-AC_CACHE_CHECK-for-strerror_r-return-type.patch \
+           file://0001-configure-Remove-runtime-test-for-mmap-that-can-map-.patch \
            file://CVE-2021-35940.patch \
            "
 
@@ -36,17 +38,30 @@ OE_BINCONFIG_EXTRA_MANGLE = " -e 's:location=source:location=installed:'"
 
 # Added to fix some issues with cmake. Refer to https://github.com/bmwcarit/meta-ros/issues/68#issuecomment-19896928
 CACHED_CONFIGUREVARS += "apr_cv_mutex_recursive=yes"
-
+# Enable largefile
+CACHED_CONFIGUREVARS += "apr_cv_use_lfs64=yes"
+# Additional AC_TRY_RUN tests which will need to be cached for cross compile
+CACHED_CONFIGUREVARS += "apr_cv_epoll=yes epoll_create1=yes apr_cv_sock_cloexec=yes \
+    ac_cv_struct_rlimit=yes \
+    ac_cv_func_sem_open=yes \
+    apr_cv_process_shared_works=yes \
+    apr_cv_mutex_robust_shared=yes \
+    "
 # Also suppress trying to use sctp.
 #
 CACHED_CONFIGUREVARS += "ac_cv_header_netinet_sctp_h=no ac_cv_header_netinet_sctp_uio_h=no"
 
-CACHED_CONFIGUREVARS += "ac_cv_sizeof_struct_iovec=yes"
+# ac_cv_sizeof_struct_iovec is deduced using runtime check which will fail during cross-compile
+CACHED_CONFIGUREVARS += "${@['ac_cv_sizeof_struct_iovec=16','ac_cv_sizeof_struct_iovec=8'][d.getVar('SITEINFO_BITS') != '32']}"
+
 CACHED_CONFIGUREVARS += "ac_cv_file__dev_zero=yes"
 
+CACHED_CONFIGUREVARS:append:libc-musl = " ac_cv_strerror_r_rc_int=yes"
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"
+PACKAGECONFIG:append:libc-musl = " xsi-strerror"
 PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
 PACKAGECONFIG[timed-tests] = "--enable-timed-tests,--disable-timed-tests,"
+PACKAGECONFIG[xsi-strerror] = "ac_cv_strerror_r_rc_int=yes,ac_cv_strerror_r_rc_int=no,"
 
 do_configure:prepend() {
 	# Avoid absolute paths for grep since it causes failures

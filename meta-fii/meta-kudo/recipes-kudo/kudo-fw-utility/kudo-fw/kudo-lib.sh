@@ -41,7 +41,7 @@ function get_gpio_ctrl() {
 }
 
 function get_scp_eeprom() {
-    scp_eeprom_sel=$(get_gpio_ctrl 168)
+    scp_eeprom_sel=$(get_gpio_ctrl BACKUP_SCP_SEL)
     case $scp_eeprom_sel in
     0)
         echo " Using Secondary SCP EEPROM"
@@ -70,3 +70,4 @@ I2C_S1_PCIE_CLKGEN2=(17 67)
 # Board Version Definitions
 BOARDVER_EVT_LAST=64
 BOARDVER_DVT_LAST=127
+BOARDVER_PVT_LAST=191

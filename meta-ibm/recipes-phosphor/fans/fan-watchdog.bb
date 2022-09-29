@@ -10,12 +10,12 @@ RDEPENDS:${PN} += "busybox"
 
 RESET_SERVICE = "reset-fan-watchdog.service"
 TGTFMT = "obmc-chassis-poweron@0.target"
-RESET_FMT = "../${RESET_SERVICE}:${TGTFMT}.requires/${RESET_SERVICE}"
+RESET_FMT = "../${RESET_SERVICE}:${TGTFMT}.wants/${RESET_SERVICE}"
 
 MONITOR_SERVICE = "fan-watchdog-monitor@.service"
 
 WATCHDOG_SERVICE = "fan-watchdog.service"
-WATCHDOG_FMT = "../${WATCHDOG_SERVICE}:${TGTFMT}.requires/${WATCHDOG_SERVICE}"
+WATCHDOG_FMT = "../${WATCHDOG_SERVICE}:${TGTFMT}.wants/${WATCHDOG_SERVICE}"
 
 SYSTEMD_SERVICE:${PN} += "${RESET_SERVICE} ${MONITOR_SERVICE} ${WATCHDOG_SERVICE}"
 SYSTEMD_LINK:${PN} += "${RESET_FMT} ${WATCHDOG_FMT}"

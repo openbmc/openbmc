@@ -1,0 +1,112 @@
+From 5ac5885d35257888d0e4a9dda903405314f9fc84 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 10 Aug 2022 17:53:13 -0700
+Subject: [PATCH] configure: Add correct system headers and prototypes to tests
+
+Newer compilers e.g. clang-15+ have turned stricter towards these
+warnings and turned them into errors which results in subtle failures
+during build, therefore make the testcases use the needed headers and
+modern C
+
+Upstream-Status: Inactive-Upstream
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ unix/configure | 51 +++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 40 insertions(+), 11 deletions(-)
+
+diff --git a/unix/configure b/unix/configure
+index 49579f3..8fd82dd 100755
+--- a/unix/configure
++++ b/unix/configure
+@@ -379,14 +379,37 @@ $CC $CFLAGS -c conftest.c >/dev/null 2>/dev/null
+ 
+ # Check for missing functions
+ # add NO_'function_name' to flags if missing
+-for func in fchmod fchown lchown nl_langinfo
+-do
+-  echo Check for $func
+-  echo "int main(){ $func(); return 0; }" > conftest.c
+-  $CC $BFLAG $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
+-  [ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DNO_`echo $func | tr '[a-z]' '[A-Z]'`"
+-done
++echo Check for fchmod
++cat > conftest.c << _EOF_
++#include <sys/stat.h>
++int main(){ fchmod(0,0); return 0; }
++_EOF_
++$CC $BFLAG $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
++[ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DNO_FCHMOD"
+ 
++echo Check for fchown
++cat > conftest.c << _EOF_
++#include <unistd.h>
++int main(){ fchown(0,0,0); return 0; }
++_EOF_
++$CC $BFLAG $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
++[ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DNO_FCHOWN"
++
++echo Check for lchown
++cat > conftest.c << _EOF_
++#include <unistd.h>
++int main(){ lchown(NULL,0,0); return 0; }
++_EOF_
++$CC $BFLAG $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
++[ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DNO_LCHOWN"
++
++echo Check for nl_langinfo
++cat > conftest.c << _EOF_
++#include <langinfo.h>
++int main(){ nl_langinfo(0); return 0; }
++_EOF_
++$CC $BFLAG $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
++[ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DNO_NL_LANGINFO"
+ # Check (seriously) for a working lchmod.
+ echo 'Check for lchmod'
+ temp_file="/tmp/unzip_test_$$"
+@@ -401,14 +424,17 @@ ln -s "${temp_link}" "${temp_file}" && \
+ rm -f "${temp_file}"
+ 
+ echo Check for memset
+-echo "int main(){ char k; memset(&k,0,0); return 0; }" > conftest.c
++cat > conftest.c << _EOF_
++#include <string.h>
++int main(){ char k; memset(&k,0,0); return 0; }
++_EOF_
+ $CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
+ [ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DZMEM"
+ 
+ echo Check for errno declaration
+ cat > conftest.c << _EOF_
+ #include <errno.h>
+-main()
++int main()
+ {
+   errno = 0;
+   return 0;
+@@ -419,6 +445,8 @@ $CC $CFLAGS -c conftest.c >/dev/null 2>/dev/null
+ 
+ echo Check for directory libraries
+ cat > conftest.c << _EOF_
++#include <sys/types.h>
++#include <dirent.h>
+ int main() { return closedir(opendir(".")); }
+ _EOF_
+ 
+@@ -523,10 +551,11 @@ fi
+ # needed for AIX (and others ?) when mmap is used
+ echo Check for valloc
+ cat > conftest.c << _EOF_
+-main()
++#include <stdlib.h>
++int main()
+ {
+ #ifdef MMAP
+-    valloc();
++    valloc(0);
+ #endif
+ }
+ _EOF_
+-- 
+2.37.1
+

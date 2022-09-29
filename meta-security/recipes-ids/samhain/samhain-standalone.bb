@@ -1,6 +1,7 @@
 require samhain.inc
 
 SRC_URI += "file://samhain-not-run-ptest-on-host.patch \
+            file://0001-Don-t-expose-configure-args.patch \
             file://run-ptest \
 "
 

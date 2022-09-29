@@ -25,4 +25,4 @@ inherit autotools pkgconfig features_check
 REQUIRED_DISTRO_FEATURES = "x11 opengl"
 
 # Remove the mesa-glu dependency in mesa-glu-dev, as mesa-glu is empty
-RDEPENDS:${PN}-dev = ""
+DEV_PKG_DEPENDENCY = ""

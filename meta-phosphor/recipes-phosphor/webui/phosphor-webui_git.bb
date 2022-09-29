@@ -1,19 +1,17 @@
+LICENSE = "Apache-2.0"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
+DEPENDS:prepend = "nodejs-native "
+SRCREV = "e16bb5c35893591eab048ae4ef646a9e5e2f7e94"
+PV = "1.0+git${SRCPV}"
 # This recipe requires online access to build, as it uses NPM for dependency
 # management and resolution.
 PR = "r1"
-PV = "1.0+git${SRCPV}"
-LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 SRC_URI = "git://github.com/openbmc/phosphor-webui.git;branch=master;protocol=https"
-SRCREV = "0acdba8b866fd43f2916b64769edd8118d6ca380"
+
 S = "${WORKDIR}/git"
 
-DEPENDS:prepend = "nodejs-native "
-
 inherit allarch
-
-FILES:${PN} += "${datadir}/www/*"
 
 do_compile () {
     bbwarn "phosphor-webui is deprecated and has been replaced with webui-vue"
@@ -22,7 +20,6 @@ do_compile () {
     npm --loglevel info --proxy=${http_proxy} --https-proxy=${https_proxy} install
     npm run-script build
 }
-
 do_install () {
    # create directory structure
    install -d ${D}${datadir}/www
@@ -31,3 +28,4 @@ do_install () {
    find ${D}${datadir}/www -type d -exec chmod a=rx,u+w '{}' +
 }
 
+FILES:${PN} += "${datadir}/www/*"

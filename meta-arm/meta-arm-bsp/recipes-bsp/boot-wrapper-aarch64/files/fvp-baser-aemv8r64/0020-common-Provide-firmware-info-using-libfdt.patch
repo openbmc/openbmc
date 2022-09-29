@@ -1,0 +1,345 @@
+From 8bdbb64d13f14d40546b71dbcfee2b2a8ea002a5 Mon Sep 17 00:00:00 2001
+From: Jaxson Han <jaxson.han@arm.com>
+Date: Wed, 29 Dec 2021 15:17:38 +0800
+Subject: [PATCH] common: Provide firmware info using libfdt
+
+Boot-wrapper uses libfdt to provide more info in device tree.
+We add a new node to include those new firmware relevant infomation.
+The new node defined as follows:
+  fw-shared-info {
+        compatible = "firmware,shared_info";
+
+        #address-cells = <0x02>;
+        #size-cells = <0x02>;
+
+        version = "1.0";
+        regions = <START_ADDR_HIGH START_ADDR_LOW SIZE_HIGH SIZE_LOW
+                   0x0 0x80000000 0x0 0x400000
+                   0x0 0x90000000 0x0 0x400000
+                   0x0 0xA0000000 0x0 0x400000>;
+        regions-permission = "RX", "R", "RWX", "RW";
+        regions-cache = "Cache", "NCache", "Cache", "Device"
+
+        function_entry = <ENTRY_ADDR_HIGH ENRTY_ADDR_LOW>;
+  };
+The node path is /fw-shared-info.
+For boot-wrapper, in real case, it will be:
+  fw-shared-info {
+        compatible = "firmware,shared_info";
+
+        #address-cells = <0x02>;
+        #size-cells = <0x02>;
+
+        version = "1.0";
+        regions = <0x0 firmware_start 0x0 firmware_code_size
+                   0x0 firmware_data 0x0 firmware_data_size>;
+        regions-permission = "RX", "RW";
+        regions-cache = "Cache", "Cache";
+
+        function_entry = <0x0 smc_fn_entry>;
+  };
+
+Issue-Id: SCM-3816
+Upstream-Status: Inappropriate [other]
+  Implementation pending further discussion
+Signed-off-by: Jaxson Han <jaxson.han@arm.com>
+Change-Id: I6ebc59ce2bd3939b0fe066720d57821eaa1bed27
+---
+ common/device_tree.c | 271 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 270 insertions(+), 1 deletion(-)
+
+diff --git a/common/device_tree.c b/common/device_tree.c
+index 4d0876c..7f7befc 100644
+--- a/common/device_tree.c
++++ b/common/device_tree.c
+@@ -8,13 +8,225 @@
+  */
+ #include <libfdt.h>
+ 
++#define DEVICE_TREE_DEBUG 1
++
++#define FW_NODE_NAME	"/fw-shared-info"
++#define FW_COMPAT	"firmware,shared_info"
++#define FW_INFO_VER	"1.0"
++
++#ifdef BOOTWRAPPER_32
++#define CELL_NUM	1
++#define VAL_TYPE	uint32_t
++#else
++#define CELL_NUM	2
++#define VAL_TYPE	uint64_t
++#endif
++
++#define ALIGN(x)	(((x) + (FDT_TAGSIZE) - 1) & ~((FDT_TAGSIZE) - 1))
++
+ extern unsigned long dtb;
+-extern char firmware_start[], firmware_end[];
++extern char firmware_start[], firmware_data[], firmware_end[];
++
++extern long smc_fn_entry(unsigned long, unsigned long, unsigned long);
+ 
+ extern void print_string(const char *str);
++extern void print_hex(unsigned int val);
+ 
+ static void *blob;
+ 
++static char *realloc_node(char *fdt, const char *name)
++{
++	int delta;
++	int new_sz;
++	/* FDT_BEGIN_NODE, node name in off_struct and FDT_END_NODE */
++	delta = sizeof(struct fdt_node_header) + ALIGN(strlen(name) + 1)
++			+ FDT_TAGSIZE;
++	new_sz = fdt_totalsize(fdt) + delta;
++	fdt_open_into(fdt, fdt, new_sz);
++	return fdt;
++}
++
++static int create_node(const char *node_name)
++{
++	int node = 0;
++	char *p;
++
++	p = strrchr(node_name, '/');
++	if (!p) {
++		print_string("node name without '/'\r\n");
++		return -1;
++	}
++	*p = '\0';
++
++	blob = realloc_node(blob, p + 1);
++
++	if (p > node_name) {
++		node = fdt_path_offset(blob, node_name);
++		if (node < 0) {
++			print_string("no node name\r\n");
++			return -1;
++		}
++	}
++
++	node = fdt_add_subnode(blob, node, p + 1);
++	if (node < 0) {
++		print_string("add subnode err\r\n");
++		return -1;
++	}
++
++	return node;
++}
++
++static int dt_create_fw_node(void) {
++	int fw_node;
++
++	fw_node = fdt_path_offset(blob, FW_NODE_NAME);
++
++	if(fw_node < 0) {
++		fw_node = create_node(FW_NODE_NAME);
++	}
++
++	return fw_node;
++}
++
++static char *realloc_property(char *fdt, int nodeoffset, const char *name,
++			      int newlen)
++{
++	int delta = 0;
++	int oldlen = 0;
++	int new_sz;
++
++	if (!fdt_get_property(fdt, nodeoffset, name, &oldlen))
++		delta = sizeof(struct fdt_property) + strlen(name) + 1;
++
++	if (newlen > oldlen)
++		delta += ALIGN(newlen) - ALIGN(oldlen);
++
++	new_sz = fdt_totalsize(fdt) + delta;
++	fdt_open_into(fdt, fdt, new_sz);
++	return fdt;
++}
++
++static void dt_set_prop(int node, char *property, void *buf, int len)
++{
++	int err;
++
++	err = fdt_setprop(blob, node, property, buf, len);
++	if (err == -FDT_ERR_NOSPACE) {
++		blob = realloc_property(blob, node, property, len);
++		err = fdt_setprop(blob, node, property, buf, len);
++	}
++	if (err) {
++		print_string("fdt error\n\r");
++	}
++}
++
++static void dt_set_prop_u32(int node, char *property, uint32_t val)
++{
++	fdt32_t fdt_val = cpu_to_fdt32(val);
++	int len = sizeof(fdt32_t);
++
++	dt_set_prop(node, property, (void*)&fdt_val, len);
++}
++
++static void dt_set_prop_u64(int node, char *property, uint64_t val)
++{
++	fdt64_t fdt_val = cpu_to_fdt64(val);
++	int len = sizeof(fdt64_t);
++
++	dt_set_prop(node, property, (void*)&fdt_val, len);
++}
++
++/* This dt_set_prop_u32_array maybe unused according to the BOOTWRAPPER_32 */
++__attribute__((unused))
++static void dt_set_prop_u32_array(int node, char *property, uint32_t *vals,
++				       int size)
++{
++	fdt32_t *fdt_vals = (fdt32_t*)vals;
++	int len = sizeof(fdt32_t) * size;
++
++	for (int i = 0; i < size; i++) {
++		fdt_vals[i] = cpu_to_fdt32(vals[i]);
++	}
++
++	dt_set_prop(node, property, (void*)fdt_vals, len);
++}
++
++static void dt_set_prop_u64_array(int node, char *property, uint64_t *vals,
++				       int size)
++{
++	fdt64_t *fdt_vals = (fdt64_t*)vals;
++	int len = sizeof(fdt64_t) * size;
++
++	for (int i = 0; i < size; i++) {
++		fdt_vals[i] = cpu_to_fdt64(vals[i]);
++	}
++
++	dt_set_prop(node, property, (void*)fdt_vals, len);
++}
++
++#if DEVICE_TREE_DEBUG
++static void dt_dump_string(const void *s, int len)
++{
++	char *sub = (char*)s;
++	int sublen;
++	while(*sub && ((uint64_t)sub - (uint64_t)s) < len) {
++		sublen = strlen(sub) + 1;
++		print_string(sub);
++		print_string(" ");
++		sub += sublen;
++	}
++	print_string("\n\r");
++}
++
++static void dt_dump_fdt32_array(const void *vals, int len)
++{
++	fdt32_t *fdt_vals = (fdt32_t*)vals;
++	len = len / sizeof(fdt32_t);
++	for (int i = 0; i < len; i++) {
++		print_hex(fdt32_to_cpu(fdt_vals[i]));
++		print_string(" ");
++	}
++	print_string("\n\r");
++}
++
++static void dt_dump(int node, char *property, char type)
++{
++	const void *val;
++	int len;
++
++	val = fdt_getprop(blob, node, property, &len);
++	print_string(property);
++	print_string(": ");
++
++	if (type == 's') {
++		/* string type */
++		dt_dump_string(val, len);
++		return;
++	}
++
++	/* uint type */
++	dt_dump_fdt32_array(val, len);
++}
++
++void dt_dump_all(int node)
++{
++	if (node >= 0) {
++		print_string(FW_NODE_NAME" info:\r\n");
++		dt_dump(node, "compatible", 's');
++		dt_dump(node, "version", 's');
++		dt_dump(node, "function_entry", 'i');
++		dt_dump(node, "address-cells", 'i');
++		dt_dump(node, "size-cells", 'i');
++		dt_dump(node, "regions", 'i');
++		dt_dump(node, "regions-permission", 's');
++		dt_dump(node, "regions-cache", 's');
++		print_string("\r\n");
++	}
++}
++#else
++void dt_dump_all(int node) { (void*)node; return; }
++#endif
+ 
+ void dt_add_memreserve(void)
+ {
+@@ -32,3 +244,60 @@ void dt_add_memreserve(void)
+ 		print_string("reserve mem add err\n\r");
+ 	}
+ }
++
++void dt_fw_node_init(int enable)
++{
++	int fw_node;
++
++	VAL_TYPE regions[] = {
++		/* code region: start, end, ro, x, cachable */
++		(VAL_TYPE)firmware_start,
++		(VAL_TYPE)(firmware_data - firmware_start),
++		/* data region: start, end, rw, xn, cachable */
++		(VAL_TYPE)firmware_data,
++		(VAL_TYPE)(firmware_end - firmware_data),
++	};
++	int regions_num = sizeof(regions) / sizeof(VAL_TYPE);
++	char regions_permission[] = "RX\0RW";
++	char regions_cache[] = "Cache\0Cache";
++
++	if (!enable)
++		return;
++
++	print_string("Prepare "FW_NODE_NAME" node\n\r");
++
++	blob = (void*)&dtb;
++
++	if(fdt_path_offset(blob, "/psci") < 0) {
++		print_string("/psci node not found\n\r");
++		return;
++	}
++
++	fw_node = dt_create_fw_node();
++
++	if(fw_node < 0) {
++		print_string(FW_NODE_NAME" node create err\n\r");
++	}
++
++	dt_set_prop(fw_node, "compatible", FW_COMPAT, sizeof(FW_COMPAT));
++	dt_set_prop(fw_node, "version", FW_INFO_VER, sizeof(FW_INFO_VER));
++
++	dt_set_prop_u32(fw_node, "address-cells", CELL_NUM);
++	dt_set_prop_u32(fw_node, "size-cells", CELL_NUM);
++	dt_set_prop(fw_node, "regions-permission", regions_permission,
++		    sizeof(regions_permission));
++	dt_set_prop(fw_node, "regions-cache", regions_cache,
++		    sizeof(regions_cache));
++
++#ifdef BOOTWRAPPER_32
++	dt_set_prop_u32_array(fw_node, "regions", regions, regions_num);
++	dt_set_prop_u32(fw_node, "function_entry", (VAL_TYPE)smc_fn_entry);
++#else
++	dt_set_prop_u64_array(fw_node, "regions", regions, regions_num);
++	dt_set_prop_u64(fw_node, "function_entry", (VAL_TYPE)smc_fn_entry);
++#endif
++
++	fdt_pack(blob);
++
++	dt_dump_all(fw_node);
++}
+-- 
+2.25.1
+

@@ -1,0 +1,29 @@
+From 3a240f6b6c58d70471fd0752b8854c43c7c4df72 Mon Sep 17 00:00:00 2001
+From: Usama Arif <usama.arif@arm.com>
+Date: Wed, 11 Aug 2021 11:00:52 +0100
+Subject: [PATCH 2/2] ffa: Update function ID according to FFA v1.1 spec
+
+This updates function ID FFA_SECONDARY_EP_REGISTER_64.
+
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Usama Arif <usama.arif@arm.com>
+---
+ core/arch/arm/include/ffa.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/core/arch/arm/include/ffa.h b/core/arch/arm/include/ffa.h
+index 20a009ca..b0d68173 100644
+--- a/core/arch/arm/include/ffa.h
++++ b/core/arch/arm/include/ffa.h
+@@ -69,7 +69,7 @@
+ #define FFA_MEM_RECLAIM			U(0x84000077)
+ #define FFA_MEM_FRAG_RX			U(0x8400007A)
+ #define FFA_MEM_FRAG_TX			U(0x8400007B)
+-#define FFA_SECONDARY_EP_REGISTER_64	U(0xC4000084)
++#define FFA_SECONDARY_EP_REGISTER_64	U(0xC4000087)
+ 
+ /* Special value for traffic targeted to the Hypervisor or SPM */
+ #define FFA_TARGET_INFO_MBZ		U(0x0)
+-- 
+2.17.1
+

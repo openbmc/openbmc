@@ -1,4 +1,4 @@
-From 99ae3189430eaa5472b2117e5a999109a6ca9251 Mon Sep 17 00:00:00 2001
+From 2c6449014151a4bcd4b253b2acc920f0b3d6b13f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:33:49 +0000
 Subject: [PATCH] eglibc: Forward port cross locale generation support
@@ -23,7 +23,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  create mode 100644 locale/catnames.c
 
 diff --git a/locale/Makefile b/locale/Makefile
-index b7c60681fa..07c606cde3 100644
+index eb55750496..b0461ac4b9 100644
 --- a/locale/Makefile
 +++ b/locale/Makefile
 @@ -26,7 +26,8 @@ headers		= langinfo.h locale.h bits/locale.h \
@@ -89,10 +89,10 @@ index 0000000000..538f3f5edb
 +    [LC_ALL] = sizeof ("LC_ALL") - 1
 +  };
 diff --git a/locale/localeinfo.h b/locale/localeinfo.h
-index 22f9dc1140..fa31b3c5ea 100644
+index 3dc26272a0..b667d32c23 100644
 --- a/locale/localeinfo.h
 +++ b/locale/localeinfo.h
-@@ -230,7 +230,7 @@ __libc_tsd_define (extern, locale_t, LOCALE)
+@@ -246,7 +246,7 @@ __libc_tsd_define (extern, locale_t, LOCALE)
     unused.  We can manage this playing some tricks with weak references.
     But with thread-local locale settings, it becomes quite ungainly unless
     we can use __thread variables.  So only in that case do we attempt this.  */
@@ -102,7 +102,7 @@ index 22f9dc1140..fa31b3c5ea 100644
  # define NL_CURRENT_INDIRECT	1
  #endif
 diff --git a/locale/programs/charmap-dir.c b/locale/programs/charmap-dir.c
-index 4841bfd05d..ffcba1fd79 100644
+index 396a0d76c0..91f4a765ee 100644
 --- a/locale/programs/charmap-dir.c
 +++ b/locale/programs/charmap-dir.c
 @@ -18,7 +18,9 @@
@@ -148,7 +148,7 @@ index 4841bfd05d..ffcba1fd79 100644
    return NULL;
  }
 diff --git a/locale/programs/ld-collate.c b/locale/programs/ld-collate.c
-index 06a5203334..84b3ff4166 100644
+index 992814491d..da4dde4663 100644
 --- a/locale/programs/ld-collate.c
 +++ b/locale/programs/ld-collate.c
 @@ -352,7 +352,7 @@ new_element (struct locale_collate_t *collate, const char *mbs, size_t mbslen,
@@ -160,7 +160,7 @@ index 06a5203334..84b3ff4166 100644
        uint32_t zero = 0;
        /* Handle <U0000> as a single character.  */
        if (nwcs == 0)
-@@ -1783,8 +1783,7 @@ symbol `%s' has the same encoding as"), (*eptr)->name);
+@@ -1776,8 +1776,7 @@ symbol `%s' has the same encoding as"), (*eptr)->name);
  
  	      if ((*eptr)->nwcs == runp->nwcs)
  		{
@@ -170,7 +170,7 @@ index 06a5203334..84b3ff4166 100644
  
  		  if (c == 0)
  		    {
-@@ -2011,9 +2010,9 @@ add_to_tablewc (uint32_t ch, struct element_t *runp)
+@@ -2004,9 +2003,9 @@ add_to_tablewc (uint32_t ch, struct element_t *runp)
  	     one consecutive entry.  */
  	  if (runp->wcnext != NULL
  	      && runp->nwcs == runp->wcnext->nwcs
@@ -183,7 +183,7 @@ index 06a5203334..84b3ff4166 100644
  	      && (runp->wcs[runp->nwcs - 1]
  		  == runp->wcnext->wcs[runp->nwcs - 1] + 1))
  	    {
-@@ -2037,9 +2036,9 @@ add_to_tablewc (uint32_t ch, struct element_t *runp)
+@@ -2030,9 +2029,9 @@ add_to_tablewc (uint32_t ch, struct element_t *runp)
  		runp = runp->wcnext;
  	      while (runp->wcnext != NULL
  		     && runp->nwcs == runp->wcnext->nwcs
@@ -197,7 +197,7 @@ index 06a5203334..84b3ff4166 100644
  			 == runp->wcnext->wcs[runp->nwcs - 1] + 1));
  
 diff --git a/locale/programs/ld-ctype.c b/locale/programs/ld-ctype.c
-index 07b64ac5a1..70b49ab733 100644
+index c6749dbd82..ac99777925 100644
 --- a/locale/programs/ld-ctype.c
 +++ b/locale/programs/ld-ctype.c
 @@ -914,7 +914,7 @@ ctype_output (struct localedef_t *locale, const struct charmap_t *charmap,
@@ -229,7 +229,7 @@ index 07b64ac5a1..70b49ab733 100644
  	  handle_digits = 1;
  	  goto read_charclass;
  
-@@ -3903,8 +3903,7 @@ allocate_arrays (struct locale_ctype_t *ctype, const struct charmap_t *charmap,
+@@ -3876,8 +3876,7 @@ allocate_arrays (struct locale_ctype_t *ctype, const struct charmap_t *charmap,
  
  	  while (idx < number)
  	    {
@@ -239,7 +239,7 @@ index 07b64ac5a1..70b49ab733 100644
  	      if (res == 0)
  		{
  		  replace = 1;
-@@ -3941,11 +3940,11 @@ allocate_arrays (struct locale_ctype_t *ctype, const struct charmap_t *charmap,
+@@ -3914,11 +3913,11 @@ allocate_arrays (struct locale_ctype_t *ctype, const struct charmap_t *charmap,
        for (size_t cnt = 0; cnt < number; ++cnt)
  	{
  	  struct translit_to_t *srunp;
@@ -253,7 +253,7 @@ index 07b64ac5a1..70b49ab733 100644
  	      srunp = srunp->next;
  	    }
  	  /* Plus one for the extra NUL character marking the end of
-@@ -3969,18 +3968,18 @@ allocate_arrays (struct locale_ctype_t *ctype, const struct charmap_t *charmap,
+@@ -3942,18 +3941,18 @@ allocate_arrays (struct locale_ctype_t *ctype, const struct charmap_t *charmap,
  	  ctype->translit_from_idx[cnt] = from_len;
  	  ctype->translit_to_idx[cnt] = to_len;
  
@@ -279,7 +279,7 @@ index 07b64ac5a1..70b49ab733 100644
  	      srunp = srunp->next;
  	    }
 diff --git a/locale/programs/ld-time.c b/locale/programs/ld-time.c
-index e6f320d2b3..c6631ad101 100644
+index b58fecfcee..a4d70e0780 100644
 --- a/locale/programs/ld-time.c
 +++ b/locale/programs/ld-time.c
 @@ -219,8 +219,10 @@ No definition for %s category found"), "LC_TIME");
@@ -348,20 +348,20 @@ index e6f320d2b3..c6631ad101 100644
  
  
 diff --git a/locale/programs/linereader.c b/locale/programs/linereader.c
-index a1f22b28ed..cbd3b40ceb 100644
+index 0460074a0c..31a7151f66 100644
 --- a/locale/programs/linereader.c
 +++ b/locale/programs/linereader.c
-@@ -594,7 +594,7 @@ get_string (struct linereader *lr, const struct charmap_t *charmap,
+@@ -776,7 +776,7 @@ get_string (struct linereader *lr, const struct charmap_t *charmap,
  {
    int return_widestr = lr->return_widestr;
-   char *buf;
+   struct lr_buffer lrb;
 -  wchar_t *buf2 = NULL;
 +  uint32_t *buf2 = NULL;
-   size_t bufact;
-   size_t bufmax = 56;
+ 
+   lr_buffer_init (&lrb);
  
 diff --git a/locale/programs/localedef.c b/locale/programs/localedef.c
-index f0da25e9e5..5d9e01cda2 100644
+index 35a092a111..94712bf114 100644
 --- a/locale/programs/localedef.c
 +++ b/locale/programs/localedef.c
 @@ -108,6 +108,7 @@ void (*argp_program_version_hook) (FILE *, struct argp_state *) = print_version;
@@ -407,7 +407,7 @@ index f0da25e9e5..5d9e01cda2 100644
        force_output = 1;
        break;
 diff --git a/locale/programs/locfile.c b/locale/programs/locfile.c
-index 1427b518a9..dafa84a20b 100644
+index 8fa74dce60..8d5aca6d9e 100644
 --- a/locale/programs/locfile.c
 +++ b/locale/programs/locfile.c
 @@ -543,6 +543,9 @@ compare_files (const char *filename1, const char *filename2, size_t size,
@@ -430,7 +430,7 @@ index 1427b518a9..dafa84a20b 100644
  
  /* Record that FILE's next element is the 32-bit integer VALUE.  */
 diff --git a/locale/programs/locfile.h b/locale/programs/locfile.h
-index cbc20fe88d..ae88e6d0af 100644
+index 57b2211e2f..e9498c6c7e 100644
 --- a/locale/programs/locfile.h
 +++ b/locale/programs/locfile.h
 @@ -70,6 +70,8 @@ extern void write_all_categories (struct localedef_t *definitions,
@@ -519,7 +519,7 @@ index cbc20fe88d..ae88e6d0af 100644
 +
  #endif /* locfile.h */
 diff --git a/locale/setlocale.c b/locale/setlocale.c
-index 19ed85ae8e..f28ca11446 100644
+index 56c14d8533..6aac00503e 100644
 --- a/locale/setlocale.c
 +++ b/locale/setlocale.c
 @@ -63,35 +63,6 @@ static char *const _nl_current_used[] =

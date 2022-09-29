@@ -1,4 +1,4 @@
-From ba73bb0f3d2023839bc3b681c49b7ec1192cceb4 Mon Sep 17 00:00:00 2001
+From f81b60ebcbbfd9548c8aa1e388662c429068d1e3 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Sat, 8 May 2021 21:58:54 +0200
 Subject: [PATCH] Add use_prebuilt_tools option
@@ -18,7 +18,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  5 files changed, 42 insertions(+), 19 deletions(-)
 
 diff --git a/gdk-pixbuf/meson.build b/gdk-pixbuf/meson.build
-index 8b0590b..7331491 100644
+index 54ff9dd..2e321cf 100644
 --- a/gdk-pixbuf/meson.build
 +++ b/gdk-pixbuf/meson.build
 @@ -342,13 +342,20 @@ foreach bin: gdkpixbuf_bin
@@ -45,16 +45,18 @@ index 8b0590b..7331491 100644
    # load the installed cache; we always build it by default
    loaders_cache = custom_target('loaders.cache',
 diff --git a/meson.build b/meson.build
-index 7a1409b..0bc73eb 100644
+index 813bd43..a93e6f7 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -403,16 +403,16 @@ subdir('gdk-pixbuf')
+@@ -369,18 +369,18 @@ subdir('gdk-pixbuf')
  # i18n
  subdir('po')
  
 -if not meson.is_cross_build()
 +if not meson.is_cross_build() or get_option('use_prebuilt_tools')
-   subdir('tests')
+   if get_option('tests')
+     subdir('tests')
+   endif
 -  subdir('thumbnailer')
  endif
 +subdir('thumbnailer')
@@ -69,10 +71,10 @@ index 7a1409b..0bc73eb 100644
      gdk_pixbuf_bindir,
      gdk_pixbuf_libdir,
 diff --git a/meson_options.txt b/meson_options.txt
-index 0ee6718..cc29855 100644
+index d198d99..1c899e9 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
-@@ -49,4 +49,8 @@ option('gio_sniffing',
+@@ -53,4 +53,8 @@ option('gio_sniffing',
         description: 'Perform file type detection using GIO (Unused on MacOS and Windows)',
         type: 'boolean',
         value: true)
@@ -82,7 +84,7 @@ index 0ee6718..cc29855 100644
 +       value: false)
  
 diff --git a/tests/meson.build b/tests/meson.build
-index 7c6cb11..1029e6a 100644
+index 28c2525..d97c02d 100644
 --- a/tests/meson.build
 +++ b/tests/meson.build
 @@ -5,6 +5,12 @@

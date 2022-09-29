@@ -1,0 +1,29 @@
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
+
+From cf84c933bb7b8a95742d1e723950cb2cde2d5320 Mon Sep 17 00:00:00 2001
+From: Vishnu Banavath <vishnu.banavath@arm.com>
+Date: Wed, 20 Jul 2022 16:37:10 +0100
+Subject: [PATCH] core: arm: add MPIDR affinity shift and mask for 32-bit
+
+This change is to add MPIDR affinity shift and mask for
+32-bit
+
+Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
+
+diff --git a/core/arch/arm/include/arm.h b/core/arch/arm/include/arm.h
+index f59478af..2f6f82e7 100644
+--- a/core/arch/arm/include/arm.h
++++ b/core/arch/arm/include/arm.h
+@@ -63,6 +63,8 @@
+ #define MPIDR_AFF1_MASK		(MPIDR_AFFLVL_MASK << MPIDR_AFF1_SHIFT)
+ #define MPIDR_AFF2_SHIFT	U(16)
+ #define MPIDR_AFF2_MASK		(MPIDR_AFFLVL_MASK << MPIDR_AFF2_SHIFT)
++#define MPIDR_AFF3_SHIFT	U(32)
++#define MPIDR_AFF3_MASK		(MPIDR_AFFLVL_MASK << MPIDR_AFF3_SHIFT)
+ 
+ #define MPIDR_MT_SHIFT		U(24)
+ #define MPIDR_MT_MASK		BIT(MPIDR_MT_SHIFT)
+-- 
+2.17.1
+

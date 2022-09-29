@@ -3,6 +3,8 @@
 #
 # Copyright (C) 2006 Tim Ansell
 #
+# SPDX-License-Identifier: GPL-2.0-only
+#
 # Please Note:
 # Be careful when using mutable types (ie Dict and Lists) - operations involving these are SLOW.
 # Assign a file to __warn__ to get warnings about slow operations.

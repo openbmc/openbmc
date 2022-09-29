@@ -11,6 +11,7 @@ import re
 import sys
 
 from collections import namedtuple
+from itertools import chain
 from pathlib import Path
 
 version = 1.0
@@ -25,12 +26,16 @@ locations = list()
 
 class SystemdFile():
     """Class representing a single systemd configuration file"""
-    def __init__(self, root, path):
+    def __init__(self, root, path, instance_unit_name):
         self.sections = dict()
         self._parse(root, path)
         dirname = os.path.basename(path.name) + ".d"
         for location in locations:
-            for path2 in sorted((root / location / "system" / dirname).glob("*.conf")):                
+            files = (root / location / "system" / dirname).glob("*.conf")
+            if instance_unit_name:
+                inst_dirname = instance_unit_name + ".d"
+                files = chain(files, (root / location / "system" / inst_dirname).glob("*.conf"))
+            for path2 in sorted(files):
                 self._parse(root, path2)
 
     def _parse(self, root, path):
@@ -195,8 +200,11 @@ class SystemdUnit():
         # if we're enabling an instance, first extract the actual instance
         # then figure out what the template unit is
         template = re.match(r"[^@]+@(?P<instance>[^\.]*)\.", self.unit)
+        instance_unit_name = None
         if template:
             instance = template.group('instance')
+            if instance != "":
+                instance_unit_name = self.unit
             unit = re.sub(r"@[^\.]*\.", "@.", self.unit, 1)
         else:
             instance = None
@@ -208,7 +216,7 @@ class SystemdUnit():
             # ignore aliases
             return
 
-        config = SystemdFile(self.root, path)
+        config = SystemdFile(self.root, path, instance_unit_name)
         if instance == "":
             try:
                 default_instance = config.get('Install', 'DefaultInstance')[0]

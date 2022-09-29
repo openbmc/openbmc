@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: GPL-2.0-only
 #
 # Used to compare sstate checksums between MACHINES.

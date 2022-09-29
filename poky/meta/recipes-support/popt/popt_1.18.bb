@@ -17,7 +17,7 @@ SRC_URI[sha256sum] = "5159bc03a20b28ce363aa96765f37df99ea4d8850b1ece17d1e6ad5c24
 
 inherit autotools gettext ptest
 
-RDEPENDS_${PN}-ptest += "bash"
+RDEPENDS:${PN}-ptest += "bash"
 
 do_compile_ptest() {
     sed 's#lt-test1#test1#g' ${S}/tests/testit.sh > ${B}/tests/testit.sh

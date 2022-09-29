@@ -1,0 +1,93 @@
+From cf0ffbb5c8fa167376926d12a63613f15aa7602f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 15 Aug 2022 14:50:15 -0700
+Subject: [PATCH] Fix function prototypes
+
+Clang is now erroring out on functions with out parameter types
+
+Fixes errors like
+error: a function declaration without a prototype is deprecated in all versions of C [-Werror,-Wstrict-prototypes]
+
+Upstream-Status: Submitted [https://patchwork.kernel.org/project/linux-nfs/patch/20220816024403.2694169-2-raj.khem@gmail.com/]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ support/export/auth.c     | 2 +-
+ support/export/v4root.c   | 2 +-
+ support/export/xtab.c     | 2 +-
+ utils/exportfs/exportfs.c | 4 ++--
+ utils/mount/network.c     | 2 +-
+ 5 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/support/export/auth.c b/support/export/auth.c
+index 03ce4b8..2d7960f 100644
+--- a/support/export/auth.c
++++ b/support/export/auth.c
+@@ -82,7 +82,7 @@ check_useipaddr(void)
+ }
+ 
+ unsigned int
+-auth_reload()
++auth_reload(void)
+ {
+ 	struct stat		stb;
+ 	static ino_t		last_inode;
+diff --git a/support/export/v4root.c b/support/export/v4root.c
+index c12a7d8..fbb0ad5 100644
+--- a/support/export/v4root.c
++++ b/support/export/v4root.c
+@@ -198,7 +198,7 @@ static int v4root_add_parents(nfs_export *exp)
+  * looking for components of the v4 mount.
+  */
+ void
+-v4root_set()
++v4root_set(void)
+ {
+ 	nfs_export	*exp;
+ 	int	i;
+diff --git a/support/export/xtab.c b/support/export/xtab.c
+index c888a80..e210ca9 100644
+--- a/support/export/xtab.c
++++ b/support/export/xtab.c
+@@ -135,7 +135,7 @@ xtab_write(char *xtab, char *xtabtmp, char *lockfn, int is_export)
+ }
+ 
+ int
+-xtab_export_write()
++xtab_export_write(void)
+ {
+ 	return xtab_write(etab.statefn, etab.tmpfn, etab.lockfn, 1);
+ }
+diff --git a/utils/exportfs/exportfs.c b/utils/exportfs/exportfs.c
+index 6ba615d..0897b22 100644
+--- a/utils/exportfs/exportfs.c
++++ b/utils/exportfs/exportfs.c
+@@ -69,14 +69,14 @@ static int _lockfd = -1;
+  * need these additional lockfile() routines.
+  */
+ static void
+-grab_lockfile()
++grab_lockfile(void)
+ {
+ 	_lockfd = open(lockfile, O_CREAT|O_RDWR, 0666);
+ 	if (_lockfd != -1)
+ 		lockf(_lockfd, F_LOCK, 0);
+ }
+ static void
+-release_lockfile()
++release_lockfile(void)
+ {
+ 	if (_lockfd != -1) {
+ 		lockf(_lockfd, F_ULOCK, 0);
+diff --git a/utils/mount/network.c b/utils/mount/network.c
+index ed2f825..01ead49 100644
+--- a/utils/mount/network.c
++++ b/utils/mount/network.c
+@@ -179,7 +179,7 @@ static const unsigned long probe_mnt3_only[] = {
+ 
+ static const unsigned int *nfs_default_proto(void);
+ #ifdef MOUNT_CONFIG
+-static const unsigned int *nfs_default_proto()
++static const unsigned int *nfs_default_proto(void)
+ {
+ 	extern unsigned long config_default_proto;
+ 	/*

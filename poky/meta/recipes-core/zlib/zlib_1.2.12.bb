@@ -12,6 +12,8 @@ SRC_URI = "https://zlib.net/${BP}.tar.xz \
            file://0001-configure-Pass-LDFLAGS-to-link-tests.patch \
            file://run-ptest \
            file://0001-Correct-incorrect-inputs-provided-to-the-CRC-functio.patch \
+           file://0001-Fix-a-bug-when-getting-a-gzip-header-extra-field-wit.patch \
+           file://0001-Fix-extra-field-processing-bug-that-dereferences-NUL.patch \
            "
 UPSTREAM_CHECK_URI = "http://zlib.net/"
 
@@ -37,18 +39,6 @@ do_install() {
 
 do_install_ptest() {
 	install ${B}/examplesh ${D}${PTEST_PATH}
-}
-
-# Move zlib shared libraries for target builds to $base_libdir so the library
-# can be used in early boot before $prefix is mounted.
-do_install:append:class-target() {
-	if [ ${base_libdir} != ${libdir} ]
-	then
-		mkdir -p ${D}/${base_libdir}
-		mv ${D}/${libdir}/libz.so.* ${D}/${base_libdir}
-		libname=`readlink ${D}/${libdir}/libz.so`
-		ln -sf ${@oe.path.relative("${libdir}", "${base_libdir}")}/$libname ${D}${libdir}/libz.so
-	fi
 }
 
 BBCLASSEXTEND = "native nativesdk"

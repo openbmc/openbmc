@@ -1,10 +1,21 @@
-Compatibility fixes for musl.
+From 328805fd16930deefda400a77e9c2c5d17d04d29 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 13 Mar 2021 00:42:25 -0800
+Subject: [PATCH] Compatibility fixes for musl.
 
+---
+ m4/pc_from_ucontext.m4             | 4 +++-
+ src/getpc.h                        | 3 +++
+ src/stacktrace_powerpc-linux-inl.h | 8 ++++++--
+ 3 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/m4/pc_from_ucontext.m4 b/m4/pc_from_ucontext.m4
+index 7f09dd7..5f4ee8c 100644
 --- a/m4/pc_from_ucontext.m4
 +++ b/m4/pc_from_ucontext.m4
 @@ -34,6 +34,7 @@ AC_DEFUN([AC_PC_FROM_UCONTEXT],
+    pc_fields="$pc_fields uc_mcontext.gregs[[R15]]"     # Linux (arm old [untested])
     pc_fields="$pc_fields uc_mcontext.arm_pc"           # Linux (arm arch 5)
-    pc_fields="$pc_fields uc_mcontext.cr0_hi"           # Linux (e2k)
     pc_fields="$pc_fields uc_mcontext.gp_regs[[PT_NIP]]"  # Suse SLES 11 (ppc64)
 +   pc_fields="$pc_fields uc_mcontext.gregs[[PT_NIP]]"
     pc_fields="$pc_fields uc_mcontext.mc_eip"           # FreeBSD (i386)
@@ -20,6 +31,8 @@ Compatibility fixes for musl.
                          [ucontext_t u; return u.$pc_field == 0;],
                          AC_DEFINE_UNQUOTED(PC_FROM_UCONTEXT, $pc_field,
                                             How to access the PC from a struct ucontext)
+diff --git a/src/getpc.h b/src/getpc.h
+index 9605363..cd8ccfa 100644
 --- a/src/getpc.h
 +++ b/src/getpc.h
 @@ -68,6 +68,9 @@
@@ -32,6 +45,8 @@ Compatibility fixes for musl.
  
  // Take the example where function Foo() calls function Bar().  For
  // many architectures, Bar() is responsible for setting up and tearing
+diff --git a/src/stacktrace_powerpc-linux-inl.h b/src/stacktrace_powerpc-linux-inl.h
+index a301a46..efca426 100644
 --- a/src/stacktrace_powerpc-linux-inl.h
 +++ b/src/stacktrace_powerpc-linux-inl.h
 @@ -186,7 +186,7 @@ static int GET_STACK_TRACE_OR_FRAMES {

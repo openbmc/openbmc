@@ -1,0 +1,10 @@
+[Unit]
+Description=Bletchlet SLED%i insertion target
+
+Requires=host-ac-on@%i.service
+After=host-ac-on@%i.service
+Requires=motor-init-calibration@%i.service
+After=motor-init-calibration@%i.service
+Conflicts=bletchley-sled-removed@%i.target
+
+RefuseManualStop=yes

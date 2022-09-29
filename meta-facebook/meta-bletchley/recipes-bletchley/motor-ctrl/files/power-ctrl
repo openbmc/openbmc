@@ -34,6 +34,8 @@ ACTION_ON="on"
 ACTION_OFF="off"
 ACTION_DFU="dfu"
 ACTION_RECOVERY="recovery"
+ACTION_CYCLE="cycle"
+ACTION_RESET="reset"
 ACTION_AC_ON="ac-on"
 ACTION_AC_OFF="ac-off"
 ACTION_STATUS="status"
@@ -46,6 +48,8 @@ VALID_SLED_ACTIONS="
     $ACTION_STATUS
     $ACTION_DFU
     $ACTION_RECOVERY
+    $ACTION_CYCLE
+    $ACTION_RESET
 "
 
 function is_valid_sled_action()
@@ -319,6 +323,39 @@ function get_host_status()
     return $?
 }
 
+function do_action_reset()
+{
+    # 1. Power off
+    # 2. Power on
+
+    local SLED_NUM=$1
+    local CUR_ST=$2
+
+    if [ "$CUR_ST" != "$HOST_ST_OFF" ]; then
+        do_action_off "$SLED_NUM"
+    else
+        echo "sled${SLED_NUM}: already powered off"
+    fi
+
+    sleep 3
+    do_action_on "$SLED_NUM"
+}
+
+function do_action_cycle()
+{
+    # 1. AC off
+    # 2. AC on
+    # 3. Power on
+
+    local SLED_NUM=$1
+
+    do_action_ac_off "$SLED_NUM"
+    sleep 3
+    do_action_ac_on "$SLED_NUM"
+    sleep 3
+    do_action_on "$SLED_NUM"
+}
+
 function do_action_ac_on()
 {
     local SLED_NUM=$1
@@ -340,6 +377,7 @@ function do_action_on()
     local SLED_NUM=$1
     echo "sled${SLED_NUM}: power on host"
     trigger_power_button  "$SLED_NUM"  "$DELAY_POWER_ON"
+    sleep 10 # Mac mini need about 10 second to stable link status
     echo "$ACTION_ON" > "/tmp/sled${SLED_NUM}-last-action"
 }
 
@@ -404,6 +442,12 @@ function host_state_on_action_handler()
         "$ACTION_AC_OFF")
             do_action_ac_off "$SLED_NUM"
             ;;
+        "$ACTION_RESET")
+            do_action_reset "$SLED_NUM" "$HOST_ST_ON"
+            ;;
+        "$ACTION_CYCLE")
+            do_action_cycle "$SLED_NUM"
+            ;;
         *)
             echo "Invalid action ($ACTION) for current host state (On)"
             return 1
@@ -426,6 +470,12 @@ function host_state_sleep_action_handler()
         "$ACTION_AC_OFF")
             do_action_ac_off "$SLED_NUM"
             ;;
+        "$ACTION_RESET")
+            do_action_reset "$SLED_NUM" "$HOST_ST_ON"
+            ;;
+        "$ACTION_CYCLE")
+            do_action_cycle "$SLED_NUM"
+            ;;
         *)
             echo "Invalid action ($ACTION) for current host state (Sleep)"
             return 1
@@ -447,6 +497,12 @@ function host_state_off_action_handler()
             ;;
         "$ACTION_AC_OFF")
             do_action_ac_off "$SLED_NUM"
+            ;;
+        "$ACTION_RESET")
+            do_action_reset "$SLED_NUM" "$HOST_ST_ON"
+            ;;
+        "$ACTION_CYCLE")
+            do_action_cycle "$SLED_NUM"
             ;;
         *)
             echo "Invalid action ($ACTION) for current host state (Off)"
@@ -471,6 +527,9 @@ function host_state_ac_off_action_handler()
             echo "sled${SLED_NUM}: already ac off"
             return 1
             ;;
+        "$ACTION_CYCLE")
+            do_action_reset "$SLED_NUM"
+            ;;
         *)
             echo "Invalid action ($ACTION) for current host state (AC Off)"
             return 1
@@ -486,6 +545,9 @@ function host_state_ac_on_action_handler()
     case $ACTION in
         "$ACTION_AC_OFF")
             do_action_ac_off "$SLED_NUM"
+            ;;
+        "$ACTION_CYCLE")
+            do_action_cycle "$SLED_NUM"
             ;;
         *)
             echo "sled${SLED_NUM}: already ac on"
@@ -506,6 +568,12 @@ function host_state_recovery_action_handler()
         "$ACTION_AC_OFF")
             do_action_ac_off "$SLED_NUM"
             ;;
+        "$ACTION_RESET")
+            do_action_reset "$SLED_NUM" "$HOST_ST_ON"
+            ;;
+        "$ACTION_CYCLE")
+            do_action_cycle "$SLED_NUM"
+            ;;
         *)
             echo "Invalid action ($ACTION) for current host state (Recovery)"
             return 1
@@ -521,6 +589,9 @@ function host_state_dfu_action_handler()
     case $ACTION in
         "$ACTION_AC_OFF")
             do_action_ac_off "$SLED_NUM"
+            ;;
+        "$ACTION_CYCLE")
+            do_action_cycle "$SLED_NUM"
             ;;
         *)
             echo "Invalid action ($ACTION) for current host state (DFU)"

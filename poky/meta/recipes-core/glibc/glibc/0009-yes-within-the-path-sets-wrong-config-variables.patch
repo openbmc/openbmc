@@ -1,4 +1,4 @@
-From f6e96a95212bc1fef57b9594a7dddc0c20639873 Mon Sep 17 00:00:00 2001
+From 07655aaa14f9d1f3a521caadde2936067ce84b07 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:31:06 +0000
 Subject: [PATCH] 'yes' within the path sets wrong config variables
@@ -29,10 +29,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  12 files changed, 28 insertions(+), 28 deletions(-)
 
 diff --git a/sysdeps/aarch64/configure b/sysdeps/aarch64/configure
-index 4c1fac49f3..597314f476 100644
+index bf972122b1..f9397b8d6e 100644
 --- a/sysdeps/aarch64/configure
 +++ b/sysdeps/aarch64/configure
-@@ -157,12 +157,12 @@ else
+@@ -152,12 +152,12 @@ else
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
  /* end confdefs.h.  */
  #ifdef __AARCH64EB__
@@ -48,10 +48,10 @@ index 4c1fac49f3..597314f476 100644
  else
    libc_cv_aarch64_be=no
 diff --git a/sysdeps/aarch64/configure.ac b/sysdeps/aarch64/configure.ac
-index 3347c13fa1..4af163c0b6 100644
+index 51253d9802..ba36a0e8b4 100644
 --- a/sysdeps/aarch64/configure.ac
 +++ b/sysdeps/aarch64/configure.ac
-@@ -17,8 +17,8 @@ AC_DEFINE(SUPPORT_STATIC_PIE)
+@@ -13,8 +13,8 @@ AC_DEFINE(SUPPORT_STATIC_PIE)
  # the dynamic linker via %ifdef.
  AC_CACHE_CHECK([for big endian],
    [libc_cv_aarch64_be],
@@ -63,10 +63,10 @@ index 3347c13fa1..4af163c0b6 100644
    ], libc_cv_aarch64_be=yes, libc_cv_aarch64_be=no)])
  if test $libc_cv_aarch64_be = yes; then
 diff --git a/sysdeps/arm/configure b/sysdeps/arm/configure
-index 431e843b2b..e152461138 100644
+index 5b0237e521..969fc9fe95 100644
 --- a/sysdeps/arm/configure
 +++ b/sysdeps/arm/configure
-@@ -151,12 +151,12 @@ else
+@@ -148,12 +148,12 @@ else
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
  /* end confdefs.h.  */
  #ifdef __ARM_PCS_VFP
@@ -82,10 +82,10 @@ index 431e843b2b..e152461138 100644
  else
    libc_cv_arm_pcs_vfp=no
 diff --git a/sysdeps/arm/configure.ac b/sysdeps/arm/configure.ac
-index 90cdd69c75..05a262ba00 100644
+index 5172e30bbe..f06dedd7c5 100644
 --- a/sysdeps/arm/configure.ac
 +++ b/sysdeps/arm/configure.ac
-@@ -15,8 +15,8 @@ AC_DEFINE(PI_STATIC_AND_HIDDEN)
+@@ -10,8 +10,8 @@ GLIBC_PROVIDES dnl See aclocal.m4 in the top level source directory.
  # the dynamic linker via %ifdef.
  AC_CACHE_CHECK([whether the compiler is using the ARM hard-float ABI],
    [libc_cv_arm_pcs_vfp],
@@ -97,10 +97,10 @@ index 90cdd69c75..05a262ba00 100644
    ], libc_cv_arm_pcs_vfp=yes, libc_cv_arm_pcs_vfp=no)])
  if test $libc_cv_arm_pcs_vfp = yes; then
 diff --git a/sysdeps/mips/configure b/sysdeps/mips/configure
-index 4e13248c03..f14af952d0 100644
+index 3f4d9e9759..888453c70b 100644
 --- a/sysdeps/mips/configure
 +++ b/sysdeps/mips/configure
-@@ -143,11 +143,11 @@ else
+@@ -145,11 +145,11 @@ else
  /* end confdefs.h.  */
  dnl
  #ifdef __mips_nan2008
@@ -115,11 +115,11 @@ index 4e13248c03..f14af952d0 100644
  else
    libc_cv_mips_nan2008=no
 diff --git a/sysdeps/mips/configure.ac b/sysdeps/mips/configure.ac
-index bcbdaffd9f..ad3057f4cc 100644
+index d3cd780d78..250223d206 100644
 --- a/sysdeps/mips/configure.ac
 +++ b/sysdeps/mips/configure.ac
 @@ -6,9 +6,9 @@ dnl position independent way.
- dnl AC_DEFINE(PI_STATIC_AND_HIDDEN)
+ AC_DEFINE(HIDDEN_VAR_NEEDS_DYNAMIC_RELOC)
  
  AC_CACHE_CHECK([whether the compiler is using the 2008 NaN encoding],
 -  libc_cv_mips_nan2008, [AC_EGREP_CPP(yes, [dnl
@@ -131,7 +131,7 @@ index bcbdaffd9f..ad3057f4cc 100644
  if test x$libc_cv_mips_nan2008 = xyes; then
    AC_DEFINE(HAVE_MIPS_NAN2008)
 diff --git a/sysdeps/nios2/configure b/sysdeps/nios2/configure
-index 14c8a3a014..dde3814ef2 100644
+index b3cd28349e..f47e5a5adc 100644
 --- a/sysdeps/nios2/configure
 +++ b/sysdeps/nios2/configure
 @@ -142,12 +142,12 @@ else
@@ -150,7 +150,7 @@ index 14c8a3a014..dde3814ef2 100644
  else
    libc_cv_nios2_be=no
 diff --git a/sysdeps/nios2/configure.ac b/sysdeps/nios2/configure.ac
-index f05f43802b..dc8639902d 100644
+index f738e9a7ed..4085851cbc 100644
 --- a/sysdeps/nios2/configure.ac
 +++ b/sysdeps/nios2/configure.ac
 @@ -4,8 +4,8 @@ GLIBC_PROVIDES dnl See aclocal.m4 in the top level source directory.

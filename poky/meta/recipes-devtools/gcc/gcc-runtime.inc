@@ -16,7 +16,8 @@ EXTRA_OECONF_PATHS = "\
 
 EXTRA_OECONF:append:linuxstdbase = " --enable-clocale=gnu"
 EXTRA_OECONF:append = " --cache-file=${B}/config.cache"
-EXTRA_OECONF:append:libc-newlib = " --with-newlib"
+EXTRA_OECONF:append:libc-newlib = " --with-newlib --with-target-subdir"
+EXTRA_OECONF:append:libc-baremetal = " --with-target-subdir"
 
 # Disable ifuncs for libatomic on arm conflicts -march/-mcpu
 EXTRA_OECONF:append:arm = " libat_cv_have_ifunc=no "
@@ -49,34 +50,20 @@ RUNTIMETARGET:libc-newlib = "libstdc++-v3"
 # libiberty
 # libgfortran needs separate recipe due to libquadmath dependency
 
-# Relative path to be repaced into debug info
-REL_S = "/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}"
-
-DEBUG_PREFIX_MAP:class-target = " \
-   -fdebug-prefix-map=${WORKDIR}/recipe-sysroot= \
-   -fdebug-prefix-map=${WORKDIR}/recipe-sysroot-native= \
-   -fdebug-prefix-map=${S}=${REL_S} \
-   -fdebug-prefix-map=${S}/include=${REL_S}/libstdc++-v3/../include \
-   -fdebug-prefix-map=${S}/libiberty=${REL_S}/libstdc++-v3/../libiberty \
-   -fdebug-prefix-map=${S}/libgcc=${REL_S}/libstdc++-v3/../libgcc \
-   -fdebug-prefix-map=${B}=${REL_S} \
-   -ffile-prefix-map=${B}/${HOST_SYS}/libstdc++-v3/include=${includedir}/c++/${BINV} \
-   "
-
 do_configure () {
 	export CXX="${CXX} -nostdinc++ -L${WORKDIR}/dummylib"
 	# libstdc++ isn't built yet so CXX would error not able to find it which breaks stdc++'s configure
 	# tests. Create a dummy empty lib for the purposes of configure.
 	mkdir -p ${WORKDIR}/dummylib
-	touch ${WORKDIR}/dummylib/libstdc++.so
+	${CC} -x c /dev/null -c -o ${WORKDIR}/dummylib/dummylib.o
+	${AR} rcs ${WORKDIR}/dummylib/libstdc++.a ${WORKDIR}/dummylib/dummylib.o
 	for d in libgcc ${RUNTIMETARGET}; do
 		echo "Configuring $d"
 		rm -rf ${B}/${TARGET_SYS}/$d/
 		mkdir -p ${B}/${TARGET_SYS}/$d/
 		cd ${B}/${TARGET_SYS}/$d/
 		chmod a+x ${S}/$d/configure
-		relpath=${@os.path.relpath("${S}/$d", "${B}/${TARGET_SYS}/$d")}
-		$relpath/configure ${CONFIGUREOPTS} ${EXTRA_OECONF}
+		${S}/$d/configure ${CONFIGUREOPTS} ${EXTRA_OECONF}
 		if [ "$d" = "libgcc" ]; then
 			(cd ${B}/${TARGET_SYS}/libgcc; oe_runmake enable-execute-stack.c unwind.h md-unwind-support.h sfp-machine.h gthr-default.h)
 		fi

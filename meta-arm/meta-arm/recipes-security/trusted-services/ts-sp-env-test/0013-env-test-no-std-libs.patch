@@ -1,0 +1,33 @@
+From 7a0dcc40ea736dc20b25813dfc08e576c2615217 Mon Sep 17 00:00:00 2001
+From: Anton Antonov <Anton.Antonov@arm.com>
+Date: Wed, 31 Aug 2022 17:32:47 +0100
+Subject: [PATCH] Do not use standard libraries in env-test opteesp deployment
+
+In opteesp deployments newlib used used. The standard libraries should not be included.
+
+Upstream-Status: Pending
+Signed-off-by: Anton Antonov <Anton.Antonov@arm.com>
+---
+ deployments/env-test/opteesp/CMakeLists.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/deployments/env-test/opteesp/CMakeLists.txt b/deployments/env-test/opteesp/CMakeLists.txt
+index cff00ff..60abc0d 100644
+--- a/deployments/env-test/opteesp/CMakeLists.txt
++++ b/deployments/env-test/opteesp/CMakeLists.txt
+@@ -56,9 +56,9 @@ include(../env-test.cmake REQUIRED)
+ #-------------------------------------------------------------------------------
+ add_platform(TARGET env-test)
+ 
+-if(CMAKE_CROSSCOMPILING)
+-	target_link_libraries(env-test PRIVATE stdc++ gcc m)
+-endif()
++#if(CMAKE_CROSSCOMPILING)
++#	target_link_libraries(env-test PRIVATE stdc++ gcc m)
++#endif()
+ 
+ #################################################################
+ 
+-- 
+2.25.1
+

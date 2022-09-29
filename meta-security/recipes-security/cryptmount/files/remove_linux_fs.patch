@@ -1,0 +1,19 @@
+# From glibc 2.36, <linux/mount.h> (included from <linux/fs.h>) and 
+# <sys/mount.h> (included from glibc) are no longer compatible:
+# https://sourceware.org/glibc/wiki/Release/2.36#Usage_of_.3Clinux.2Fmount.h.3E_and_.3Csys.2Fmount.h.3E
+
+Upstream-Status: Pending
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: cryptmount-5.3.3/cryptmount.c
+===================================================================
+--- cryptmount-5.3.3.orig/cryptmount.c
++++ cryptmount-5.3.3/cryptmount.c
+@@ -41,7 +41,6 @@
+ #ifdef HAVE_SYSLOG
+ #  include <syslog.h>
+ #endif
+-#include <linux/fs.h>       /* Beware ordering conflict with sys/mount.h */
+ 
+ 
+ #include "armour.h"

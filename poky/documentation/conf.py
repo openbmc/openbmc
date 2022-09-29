@@ -53,7 +53,7 @@ author = 'The Linux Foundation'
 # -- General configuration ---------------------------------------------------
 
 # Prevent building with an outdated version of sphinx
-needs_sphinx = "3.1"
+needs_sphinx = "4.0"
 
 # to load local extension from the folder 'sphinx'
 sys.path.insert(0, os.path.abspath('sphinx'))
@@ -90,7 +90,7 @@ rst_prolog = """
 
 # external links and substitutions
 extlinks = {
-    'cve': ('https://nvd.nist.gov/vuln/detail/CVE-%s', 'CVE-'),
+    'cve': ('https://nvd.nist.gov/vuln/detail/CVE-%s', 'CVE-%s'),
     'yocto_home': ('https://www.yoctoproject.org%s', None),
     'yocto_wiki': ('https://wiki.yoctoproject.org/wiki%s', None),
     'yocto_dl': ('https://downloads.yoctoproject.org%s', None),
@@ -98,7 +98,7 @@ extlinks = {
     'yocto_bugs': ('https://bugzilla.yoctoproject.org%s', None),
     'yocto_ab': ('https://autobuilder.yoctoproject.org%s', None),
     'yocto_docs': ('https://docs.yoctoproject.org%s', None),
-    'yocto_git': ('https://git.yoctoproject.org/cgit/cgit.cgi%s', None),
+    'yocto_git': ('https://git.yoctoproject.org%s', None),
     'yocto_sstate': ('http://sstate.yoctoproject.org%s', None),
     'oe_home': ('https://www.openembedded.org%s', None),
     'oe_lists': ('https://lists.openembedded.org%s', None),

@@ -8,10 +8,10 @@ inherit phosphor-inventory-manager
 
 S = "${WORKDIR}"
 
-SRC_URI = "file://inventory-cleanup.yaml"
+SRC_URI:append:ibm-ac-server = " file://inventory-cleanup.yaml"
 
-do_install() {
+do_install:append:ibm-ac-server() {
         install -D inventory-cleanup.yaml ${D}${base_datadir}/events.d/inventory-cleanup.yaml
 }
 
-FILES:${PN} += "${base_datadir}/events.d/inventory-cleanup.yaml"
+FILES:${PN}:append:ibm-ac-server = " ${base_datadir}/events.d/inventory-cleanup.yaml"

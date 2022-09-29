@@ -18,4 +18,12 @@ S = "${WORKDIR}/Devel-CheckLib-${PV}"
 
 inherit cpan
 
+do_install:append() {
+    # update interpreter on shebang line
+    # since old version env doesn't support multiple arguments, replace option
+    # '-w' with 'use warnings;'
+    sed -i -e "s:^#!.*:#!/usr/bin/env perl:" \
+           -e "/use strict;/ause warnings;" ${D}${bindir}/use-devel-checklib
+}
+
 BBCLASSEXTEND="native"

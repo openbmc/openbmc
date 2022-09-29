@@ -1,0 +1,11 @@
+[Unit]
+Description=Init PWM sensors
+Before=xyz.openbmc_project.fansensor.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/pwm-init/pwm_init.sh
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=xyz.openbmc_project.fansensor.service

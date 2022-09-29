@@ -34,19 +34,14 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  usr/klibc/syscalls/Kbuild | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/usr/klibc/syscalls/Kbuild b/usr/klibc/syscalls/Kbuild
-index 2430b9b4..754d028e 100644
 --- a/usr/klibc/syscalls/Kbuild
 +++ b/usr/klibc/syscalls/Kbuild
-@@ -71,7 +71,7 @@ $(obj)/typesize.c: $(srctree)/$(KLIBCSRC)/syscalls.pl $(obj)/SYSCALLS.i     \
+@@ -71,7 +71,7 @@ $(obj)/typesize.c: $(srctree)/$(KLIBCSRC
  
  # Convert typesize.o to typesize.bin
  quiet_cmd_mkbin = OBJCOPY $@
--      cmd_mkbin = $(KLIBCOBJCOPY) -O binary $< $@
+-      cmd_mkbin = $(KLIBCOBJCOPY) -O binary --only-section .rodata $< $@
 +      cmd_mkbin = $(KLIBCOBJCOPY) -O binary --remove-section .note.gnu.property $< $@
  
  $(obj)/typesize.bin: $(obj)/typesize.o FORCE
  	$(call if_changed,mkbin)
--- 
-2.30.0
-

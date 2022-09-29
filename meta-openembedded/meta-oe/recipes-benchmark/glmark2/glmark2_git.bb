@@ -18,12 +18,12 @@ SRC_URI = " \
     file://0001-fix-dispmanx-build.patch \
     file://0002-run-dispmanx-fullscreen.patch \
     file://0001-libmatrix-Include-missing-utility-header.patch \
-    "
+"
 SRCREV = "0858b450cd88c84a15b99dda9698d44e7f7e8c70"
 
 S = "${WORKDIR}/git"
 
-inherit waf pkgconfig features_check
+inherit meson pkgconfig features_check
 
 ANY_OF_DISTRO_FEATURES = "opengl dispmanx"
 
@@ -59,6 +59,6 @@ python __anonymous() {
     if "dispmanx" in packageconfig:
         flavors = ["dispmanx-glesv2"]
     if flavors:
-        d.appendVar("EXTRA_OECONF", " --with-flavors=%s" % ",".join(flavors))
+        d.appendVar("EXTRA_OEMESON", " -Dflavors=%s" % ",".join(flavors))
 }
 

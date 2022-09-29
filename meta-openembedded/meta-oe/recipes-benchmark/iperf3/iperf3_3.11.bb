@@ -30,3 +30,5 @@ PACKAGECONFIG[lksctp] = "ac_cv_header_netinet_sctp_h=yes,ac_cv_header_netinet_sc
 PACKAGECONFIG[openssl] = "--with-openssl=${RECIPE_SYSROOT}${prefix},--without-openssl,openssl"
 
 CFLAGS += "-D_GNU_SOURCE"
+
+CVE_PRODUCT = "iperf_project:iperf"

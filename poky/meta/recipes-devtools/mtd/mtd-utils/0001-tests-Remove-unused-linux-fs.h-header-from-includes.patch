@@ -1,0 +1,31 @@
+From 6fb10bd18488ed84776675bc1b2982800a51d839 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 6 Aug 2022 20:14:38 -0700
+Subject: [mtd-utils][PATCH] tests: Remove unused linux/fs.h header from includes
+
+This header is not needed, moreover it includes linux/mount.h which is
+now in conflict[1] with glibc provided sys/mount.h from glibc 2.36 onwards
+
+[1] https://sourceware.org/glibc/wiki/Release/2.36
+
+Upstream-Status: Submitted [https://lists.infradead.org/pipermail/linux-mtd/2022-August/094667.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/fs-tests/lib/tests.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/tests/fs-tests/lib/tests.c b/tests/fs-tests/lib/tests.c
+index d1a2e0c..3db0426 100644
+--- a/tests/fs-tests/lib/tests.c
++++ b/tests/fs-tests/lib/tests.c
+@@ -35,7 +35,6 @@
+ #include <sys/vfs.h>
+ #include <sys/mount.h>
+ #include <sys/statvfs.h>
+-#include <linux/fs.h>
+ #include <linux/jffs2.h>
+ 
+ #include "tests.h"
+-- 
+2.37.1
+

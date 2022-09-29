@@ -3,11 +3,11 @@ Don't refuse to build afalgeng if cross-compiling or the host kernel is too old.
 Upstream-Status: Submitted [hhttps://github.com/openssl/openssl/pull/7688]
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
-diff --git a/Configure b/Configure
-index 3baa8ce..9ef52ed 100755
---- a/Configure
-+++ b/Configure
-@@ -1550,20 +1550,7 @@ unless ($disabled{"crypto-mdebug-backtrace"})
+Index: openssl-3.0.4/Configure
+===================================================================
+--- openssl-3.0.4.orig/Configure
++++ openssl-3.0.4/Configure
+@@ -1681,20 +1681,7 @@ $config{CFLAGS} = [ map { $_ eq '--ossl-
  unless ($disabled{afalgeng}) {
      $config{afalgeng}="";
      if (grep { $_ eq 'afalgeng' } @{$target{enable}}) {

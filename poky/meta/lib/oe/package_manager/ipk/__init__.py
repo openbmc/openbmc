@@ -1,4 +1,6 @@
 #
+# Copyright OpenEmbedded Contributors
+#
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
@@ -102,12 +104,14 @@ class OpkgDpkgPM(PackageManager):
         This method extracts the common parts for Opkg and Dpkg
         """
 
-        try:
-            output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True).decode("utf-8")
-        except subprocess.CalledProcessError as e:
+        proc = subprocess.run(cmd, capture_output=True, encoding="utf-8", shell=True)
+        if proc.returncode:
             bb.fatal("Unable to list available packages. Command '%s' "
-                     "returned %d:\n%s" % (cmd, e.returncode, e.output.decode("utf-8")))
-        return opkg_query(output)
+                     "returned %d:\n%s" % (cmd, proc.returncode, proc.stderr))
+        elif proc.stderr:
+            bb.note("Command '%s' returned stderr: %s" % (cmd, proc.stderr))
+
+        return opkg_query(proc.stdout)
 
     def extract(self, pkg, pkg_info):
         """
@@ -337,7 +341,7 @@ class OpkgPM(OpkgDpkgPM):
 
         self.deploy_dir_unlock()
 
-    def install(self, pkgs, attempt_only=False):
+    def install(self, pkgs, attempt_only=False, hard_depends_only=False):
         if not pkgs:
             return
 
@@ -346,6 +350,8 @@ class OpkgPM(OpkgDpkgPM):
             cmd += " --add-exclude %s" % exclude
         for bad_recommendation in (self.d.getVar("BAD_RECOMMENDATIONS") or "").split():
             cmd += " --add-ignore-recommends %s" % bad_recommendation
+        if hard_depends_only:
+            cmd += " --no-install-recommends"
         cmd += " install "
         cmd += " ".join(pkgs)
 
@@ -443,15 +449,16 @@ class OpkgPM(OpkgDpkgPM):
         cmd = "%s %s --noaction install %s " % (self.opkg_cmd,
                                                 opkg_args,
                                                 ' '.join(pkgs))
-        try:
-            output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
-        except subprocess.CalledProcessError as e:
+        proc = subprocess.run(cmd, capture_output=True, encoding="utf-8", shell=True)
+        if proc.returncode:
             bb.fatal("Unable to dummy install packages. Command '%s' "
-                     "returned %d:\n%s" % (cmd, e.returncode, e.output.decode("utf-8")))
+                     "returned %d:\n%s" % (cmd, proc.returncode, proc.stderr))
+        elif proc.stderr:
+            bb.note("Command '%s' returned stderr: %s" % (cmd, proc.stderr))
 
         bb.utils.remove(temp_rootfs, True)
 
-        return output
+        return proc.stdout
 
     def backup_packaging_data(self):
         # Save the opkglib for increment ipk image generation

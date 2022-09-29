@@ -29,7 +29,7 @@ inherit cpan ptest-perl
 BBCLASSEXTEND = "native"
 
 # for backwards compatibility
-PROVIDES_${PN} += "libcrypt-openssl-guess"
+PROVIDES += "libcrypt-openssl-guess"
 
 RDEPENDS:${PN}-ptest += "\
     perl-module-test-more \

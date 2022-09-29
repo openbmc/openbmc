@@ -1,0 +1,135 @@
+From 3e7cfbe39a2a053d2a6b0d928cc172ed9d1c6da8 Mon Sep 17 00:00:00 2001
+From: Jaxson Han <jaxson.han@arm.com>
+Date: Tue, 25 May 2021 07:25:00 +0100
+Subject: [PATCH] aarch64: Rename labels and prepare for lower EL booting
+
+Prepare for booting from lower EL. Rename *_el3 relavant labels with
+*_el_max and *_no_el3 with *_keep_el. Since the original _no_el3 means
+"We neither do init sequence at this highest EL nor drop to lower EL
+when entering to kernel", we rename it with _keep_el to make it more
+clear for lower EL initialisation.
+
+Upstream-Status: Pending
+Signed-off-by: Jaxson Han <jaxson.han@arm.com>
+---
+ arch/aarch64/boot.S | 28 ++++++++++++++++++++--------
+ arch/aarch64/psci.S |  9 +++++----
+ arch/aarch64/spin.S |  4 ++--
+ 3 files changed, 27 insertions(+), 14 deletions(-)
+
+diff --git a/arch/aarch64/boot.S b/arch/aarch64/boot.S
+index 27ba449..84e1646 100644
+--- a/arch/aarch64/boot.S
++++ b/arch/aarch64/boot.S
+@@ -21,18 +21,30 @@ ASM_FUNC(_start)
+ 
+ 	/*
+ 	 * EL3 initialisation
++	 * Boot sequence
++	 * If CurrentEL == EL3, then goto EL3 initialisation and drop to
++	 *   lower EL before entering the kernel.
++	 * Else, no initialisation and keep the current EL before
++	 *   entering the kernel.
+ 	 */
+ 	mrs	x0, CurrentEL
+ 	cmp	x0, #CURRENTEL_EL3
+-	b.eq	1f
++	b.eq	el3_init
+ 
++	/*
++	 * We stay in the current EL for entering the kernel
++	 */
+ 	mov	w0, #1
+-	ldr	x1, =flag_no_el3
++	ldr	x1, =flag_keep_el
+ 	str	w0, [x1]
+ 
+-	b	start_no_el3
++	b	start_keep_el
+ 
+-1:	mov	x0, #0x30			// RES1
++	/*
++	 * EL3 initialisation
++	 */
++el3_init:
++	mov	x0, #0x30			// RES1
+ 	orr	x0, x0, #(1 << 0)		// Non-secure EL1
+ 	orr	x0, x0, #(1 << 8)		// HVC enable
+ 
+@@ -124,7 +136,7 @@ ASM_FUNC(_start)
+ 
+ 	bl	gic_secure_init
+ 
+-	b	start_el3
++	b	start_el_max
+ 
+ err_invalid_id:
+ 	b	.
+@@ -151,7 +163,7 @@ ASM_FUNC(jump_kernel)
+ 	bl	find_logical_id
+ 	bl	setup_stack		// Reset stack pointer
+ 
+-	ldr	w0, flag_no_el3
++	ldr	w0, flag_keep_el
+ 	cmp	w0, #0			// Prepare Z flag
+ 
+ 	mov	x0, x20
+@@ -160,7 +172,7 @@ ASM_FUNC(jump_kernel)
+ 	mov	x3, x23
+ 
+ 	b.eq	1f
+-	br	x19			// No EL3
++	br	x19			// Keep current EL
+ 
+ 1:	mov	x4, #SPSR_KERNEL
+ 
+@@ -178,5 +190,5 @@ ASM_FUNC(jump_kernel)
+ 
+ 	.data
+ 	.align 3
+-flag_no_el3:
++flag_keep_el:
+ 	.long 0
+diff --git a/arch/aarch64/psci.S b/arch/aarch64/psci.S
+index 8bd224b..7b8919a 100644
+--- a/arch/aarch64/psci.S
++++ b/arch/aarch64/psci.S
+@@ -79,7 +79,7 @@ smc_exit:
+ 	ldp	x18, x19, [sp], #16
+ 	eret
+ 
+-ASM_FUNC(start_el3)
++ASM_FUNC(start_el_max)
+ 	ldr	x0, =vector
+ 	bl	setup_vector
+ 
+@@ -89,10 +89,11 @@ ASM_FUNC(start_el3)
+ 	b	psci_first_spin
+ 
+ /*
+- * This PSCI implementation requires EL3. Without EL3 we'll only boot the
+- * primary cpu, all others will be trapped in an infinite loop.
++ * This PSCI implementation requires the highest EL(EL3 or Armv8-R EL2).
++ * Without the highest EL, we'll only boot the primary cpu, all othersr
++ * will be trapped in an infinite loop.
+  */
+-ASM_FUNC(start_no_el3)
++ASM_FUNC(start_keep_el)
+ 	cpuid	x0, x1
+ 	bl	find_logical_id
+ 	cbz	x0, psci_first_spin
+diff --git a/arch/aarch64/spin.S b/arch/aarch64/spin.S
+index 1ea1c0b..bfb1d47 100644
+--- a/arch/aarch64/spin.S
++++ b/arch/aarch64/spin.S
+@@ -12,8 +12,8 @@
+ 
+ 	.text
+ 
+-ASM_FUNC(start_el3)
+-ASM_FUNC(start_no_el3)
++ASM_FUNC(start_el_max)
++ASM_FUNC(start_keep_el)
+ 	cpuid	x0, x1
+ 	bl	find_logical_id
+ 

@@ -1,0 +1,7 @@
+header:
+  version: 11
+  includes:
+    - ci/base.yml
+
+machine: fvp-baser-aemv8r64
+

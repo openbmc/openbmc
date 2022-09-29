@@ -1,7 +1,7 @@
-From 64d856b243812907068776b204a003a3a8fa122a Mon Sep 17 00:00:00 2001
+From 9110cf47d04ca1958d14228908a5c57a23769e7d Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Wed, 31 Dec 2014 16:17:42 +0800
-Subject: [PATCH 3/9] linux/syslinux: implement install_to_ext2()
+Subject: [PATCH] linux/syslinux: implement install_to_ext2()
 
 * The handle_adv_on_ext() checks whether we only need update adv.
 * The write_to_ext() installs files (ldlinux.sys or ldlinux.c32) to the
@@ -13,14 +13,14 @@ Upstream-Status: Submitted
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 Tested-by: Du Dolpher <dolpher.du@intel.com>
 ---
- linux/syslinux.c | 79 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ linux/syslinux.c | 79 ++++++++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 79 insertions(+)
 
 diff --git a/linux/syslinux.c b/linux/syslinux.c
-index cc4e7da..45f080d 100755
+index f3727ea..fc5edb1 100755
 --- a/linux/syslinux.c
 +++ b/linux/syslinux.c
-@@ -346,11 +346,90 @@ static int open_ext2_fs(const char *device, const char *subdir)
+@@ -347,11 +347,90 @@ static int open_ext2_fs(const char *device, const char *subdir)
  fail:
      (void) ext2fs_close(e2fs);
      return -1;
@@ -111,6 +111,3 @@ index cc4e7da..45f080d 100755
  }
  
  int main(int argc, char *argv[])
--- 
-1.9.1
-

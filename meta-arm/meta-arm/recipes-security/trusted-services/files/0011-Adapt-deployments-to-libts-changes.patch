@@ -1,0 +1,197 @@
+From dfadca01ff028f9fc935937cdaf92b0effff2b90 Mon Sep 17 00:00:00 2001
+From: Gyorgy Szing <Gyorgy.Szing@arm.com>
+Date: Wed, 20 Jul 2022 16:49:39 +0000
+Subject: [PATCH] Adapt deployments to libts changes
+
+Update deployments and restore compatibility to libts build-system
+interface changes.
+
+Signed-off-by: Gyorgy Szing <Gyorgy.Szing@arm.com>
+Change-Id: Iffd38f92fe628a2a6aaff60224986f22ec3a8a2a
+
+Upstream-Status: Pending [In review]
+Signed-off-by: Anton Antonov <Anton.Antonov@arm.com>
+
+---
+
+diff --git a/deployments/platform-inspect/platform-inspect.cmake b/deployments/platform-inspect/platform-inspect.cmake
+index ef4ba4b..b1b316d 100644
+--- a/deployments/platform-inspect/platform-inspect.cmake
++++ b/deployments/platform-inspect/platform-inspect.cmake
+@@ -1,5 +1,5 @@
+ #-------------------------------------------------------------------------------
+-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+ #
+ # SPDX-License-Identifier: BSD-3-Clause
+ #
+@@ -12,14 +12,14 @@
+ 
+ #-------------------------------------------------------------------------------
+ #  Use libts for locating and accessing trusted services. An appropriate version
+-#  of libts will be imported for the enviroment in which platform-inspect is
++#  of libts will be imported for the environment in which platform-inspect is
+ #  built.
+ #-------------------------------------------------------------------------------
+ include(${TS_ROOT}/deployments/libts/libts-import.cmake)
+-target_link_libraries(platform-inspect PRIVATE libts)
++target_link_libraries(platform-inspect PRIVATE libts::ts)
+ 
+ #-------------------------------------------------------------------------------
+-#  Components that are common accross all deployments
++#  Components that are common across all deployments
+ #
+ #-------------------------------------------------------------------------------
+ add_components(
+diff --git a/deployments/psa-api-test/psa-api-test.cmake b/deployments/psa-api-test/psa-api-test.cmake
+index d58620f..5c3469c 100644
+--- a/deployments/psa-api-test/psa-api-test.cmake
++++ b/deployments/psa-api-test/psa-api-test.cmake
+@@ -1,5 +1,5 @@
+ #-------------------------------------------------------------------------------
+-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+ #
+ # SPDX-License-Identifier: BSD-3-Clause
+ #
+@@ -12,14 +12,14 @@
+ 
+ #-------------------------------------------------------------------------------
+ #  Use libts for locating and accessing services. An appropriate version of
+-#  libts will be imported for the enviroment in which service tests are
++#  libts will be imported for the environment in which service tests are
+ #  deployed.
+ #-------------------------------------------------------------------------------
+ include(${TS_ROOT}/deployments/libts/libts-import.cmake)
+-target_link_libraries(${PROJECT_NAME} PRIVATE libts)
++target_link_libraries(${PROJECT_NAME} PRIVATE libts::ts)
+ 
+ #-------------------------------------------------------------------------------
+-#  Components that are common accross all deployments
++#  Components that are common across all deployments
+ #
+ #-------------------------------------------------------------------------------
+ add_components(
+diff --git a/deployments/ts-demo/ts-demo.cmake b/deployments/ts-demo/ts-demo.cmake
+index 3e7cca0..9fd8585 100644
+--- a/deployments/ts-demo/ts-demo.cmake
++++ b/deployments/ts-demo/ts-demo.cmake
+@@ -1,5 +1,5 @@
+ #-------------------------------------------------------------------------------
+-# Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
++# Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ #
+ # SPDX-License-Identifier: BSD-3-Clause
+ #
+@@ -13,11 +13,11 @@
+ 
+ #-------------------------------------------------------------------------------
+ #  Use libts for locating and accessing services. An appropriate version of
+-#  libts will be imported for the enviroment in which service tests are
++#  libts will be imported for the environment in which service tests are
+ #  deployed.
+ #-------------------------------------------------------------------------------
+ include(${TS_ROOT}/deployments/libts/libts-import.cmake)
+-target_link_libraries(ts-demo PRIVATE libts)
++target_link_libraries(ts-demo PRIVATE libts::ts)
+ 
+ #-------------------------------------------------------------------------------
+ #  Common main for all deployments
+@@ -28,7 +28,7 @@
+ )
+ 
+ #-------------------------------------------------------------------------------
+-#  Components that are common accross all deployments
++#  Components that are common across all deployments
+ #
+ #-------------------------------------------------------------------------------
+ add_components(
+diff --git a/deployments/ts-remote-test/ts-remote-test.cmake b/deployments/ts-remote-test/ts-remote-test.cmake
+index 0f35bb2..c310445 100644
+--- a/deployments/ts-remote-test/ts-remote-test.cmake
++++ b/deployments/ts-remote-test/ts-remote-test.cmake
+@@ -1,5 +1,5 @@
+ #-------------------------------------------------------------------------------
+-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+ #
+ # SPDX-License-Identifier: BSD-3-Clause
+ #
+@@ -13,11 +13,11 @@
+ 
+ #-------------------------------------------------------------------------------
+ #  Use libts for locating and accessing services. An appropriate version of
+-#  libts will be imported for the enviroment in which tests are
++#  libts will be imported for the environment in which tests are
+ #  deployed.
+ #-------------------------------------------------------------------------------
+ include(${TS_ROOT}/deployments/libts/libts-import.cmake)
+-target_link_libraries(ts-remote-test PRIVATE libts)
++target_link_libraries(ts-remote-test PRIVATE libts::ts)
+ 
+ #-------------------------------------------------------------------------------
+ #  Common main for all deployments
+@@ -28,7 +28,7 @@
+ )
+ 
+ #-------------------------------------------------------------------------------
+-#  Components that are common accross all deployments
++#  Components that are common across all deployments
+ #
+ #-------------------------------------------------------------------------------
+ add_components(
+diff --git a/deployments/ts-service-test/ts-service-test.cmake b/deployments/ts-service-test/ts-service-test.cmake
+index 4a8c59c..3e33757 100644
+--- a/deployments/ts-service-test/ts-service-test.cmake
++++ b/deployments/ts-service-test/ts-service-test.cmake
+@@ -1,5 +1,5 @@
+ #-------------------------------------------------------------------------------
+-# Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
++# Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ #
+ # SPDX-License-Identifier: BSD-3-Clause
+ #
+@@ -8,19 +8,19 @@
+ #-------------------------------------------------------------------------------
+ #  The base build file shared between deployments of 'ts-service-test' for
+ #  different environments.  Used for running end-to-end service-level tests
+-#  where test cases excerise trusted service client interfaces.
++#  where test cases exercise trusted service client interfaces.
+ #-------------------------------------------------------------------------------
+ 
+ #-------------------------------------------------------------------------------
+ #  Use libts for locating and accessing services. An appropriate version of
+-#  libts will be imported for the enviroment in which service tests are
++#  libts will be imported for the environment in which service tests are
+ #  deployed.
+ #-------------------------------------------------------------------------------
+ include(${TS_ROOT}/deployments/libts/libts-import.cmake)
+-target_link_libraries(ts-service-test PRIVATE libts)
++target_link_libraries(ts-service-test PRIVATE libts::ts)
+ 
+ #-------------------------------------------------------------------------------
+-#  Components that are common accross all deployments
++#  Components that are common across all deployments
+ #
+ #-------------------------------------------------------------------------------
+ add_components(
+diff --git a/deployments/uefi-test/uefi-test.cmake b/deployments/uefi-test/uefi-test.cmake
+index ea678d0..2f47891 100644
+--- a/deployments/uefi-test/uefi-test.cmake
++++ b/deployments/uefi-test/uefi-test.cmake
+@@ -1,5 +1,5 @@
+ #-------------------------------------------------------------------------------
+-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+ #
+ # SPDX-License-Identifier: BSD-3-Clause
+ #
+@@ -18,7 +18,7 @@
+ #  deployed.
+ #-------------------------------------------------------------------------------
+ include(${TS_ROOT}/deployments/libts/libts-import.cmake)
+-target_link_libraries(uefi-test PRIVATE libts)
++target_link_libraries(uefi-test PRIVATE libts::ts)
+ 
+ #-------------------------------------------------------------------------------
+ #  Components that are common accross all deployments

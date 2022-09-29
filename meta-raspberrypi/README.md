@@ -5,9 +5,22 @@ Yocto BSP layer for the Raspberry Pi boards - <http://www.raspberrypi.org/>.
 [![Documentation Status](https://readthedocs.org/projects/meta-raspberrypi/badge/?version=latest)](https://meta-raspberrypi.readthedocs.io/en/latest/?badge=latest)
 [![Matrix](https://img.shields.io/badge/chat-meta--raspberrypi-brightgreen)](https://matrix.to/#/#meta-raspberrypi:matrix.org)
 
-|                           |                                        |
-|:-:                        | :-:                                    |
-| Build server sponsored by | [balena.io](https://www.balena.io/) |
+<table border="0" rules="none">
+<tr border="0">
+<td width="140" height="100" align="center">
+  <br />
+  <a href="https://www.yoctoproject.org/ecosystem/branding/">
+    <img alt="Yocto Project Layer Compatible" src="img/LF_17_02_Yocto-Badge-Update_Compatible_Final_Blank.png">
+  </a>
+</td>
+<td width="150" height="100" align="center">
+  Sponsored by:<br />
+  <a href="https://balena.io">
+    <img alt="balena.io" src="img/balena.png">
+  </a>
+</td>
+</tr>
+</table>
 
 ## Quick links
 
@@ -30,6 +43,12 @@ OpenEmbedded/Yocto distributions and layer stacks, such as:
 * Distro-less (only with OE-Core).
 * Yoe Disto (Video and Camera Products).
 * Yocto/Poky (main focus of testing).
+
+## Yocto Project Compatible Layer
+
+This layer is officially approved as part of the `Yocto Project Compatible
+Layers Program`. You can find details of that on the official Yocto Project
+[website](https://www.yoctoproject.org/software-overview/layers/?searchTerm=meta-raspberrypi).
 
 ## Dependencies
 

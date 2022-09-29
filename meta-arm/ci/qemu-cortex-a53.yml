@@ -1,0 +1,9 @@
+header:
+  version: 11
+  includes:
+    - ci/base.yml
+    - ci/meta-zephyr.yml
+
+# FIXME - testimage fails all tests currently, but all the tests build
+
+machine: qemu-cortex-a53

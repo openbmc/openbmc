@@ -1,0 +1,4 @@
+[Unit]
+Description=Chassis%i (Hard Power Off)
+After=multi-user.target
+Requires=obmc-poweroff.service
