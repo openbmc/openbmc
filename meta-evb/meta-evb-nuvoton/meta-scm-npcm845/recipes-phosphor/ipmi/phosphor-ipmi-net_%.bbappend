@@ -1,1 +1,0 @@
-RMCPP_IFACE = "eth0"

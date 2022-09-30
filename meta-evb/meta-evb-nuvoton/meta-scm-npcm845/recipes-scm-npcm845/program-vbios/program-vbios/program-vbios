@@ -1,5 +1,0 @@
-#!/bin/sh
-set -e
-
-systemctl start program-vbios
-cat /tmp/program_vbios.log
