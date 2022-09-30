@@ -87,10 +87,9 @@ do_install() {
 	if [ ${PACKAGE_NO_GCONV} -eq 0 ]; then
 		copy_locale_files ${libdir}/gconv 0755
 		copy_locale_files ${datadir}/i18n 0644
-	else
-		# Remove the libdir if it is empty when gconv is not copied
-		find ${D}${libdir} -type d -empty -delete
 	fi
+	# Remove empty dirs in libdir when gconv or locales are not copied
+	find ${D}${libdir} -type d -empty -delete
 	copy_locale_files ${datadir}/locale 0644
 	install -m 0644 ${LOCALETREESRC}/SUPPORTED ${WORKDIR}/SUPPORTED
 }

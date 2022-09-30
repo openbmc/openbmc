@@ -1,3 +1,11 @@
+From da6e47f1717f34c73de388c56ffaf4861a07fdc5 Mon Sep 17 00:00:00 2001
+From: t bettler <thomas.bettler@gmail.com>
+Date: Sat, 9 Jul 2022 09:28:51 +0000
+Subject: [PATCH] nir/nir_opt_move: fix ALWAYS_INLINE compiler error
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
 Backport merge request to fix mesa compile error when debug build
 enabled.
 
@@ -5,10 +13,6 @@ Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/mesa/-/merge_req
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 
-From c69c6e7a35205557de73734ad4a1f411c8f99926 Mon Sep 17 00:00:00 2001
-From: t bettler <thomas.bettler@gmail.com>
-Date: Sat, 9 Jul 2022 09:28:51 +0000
-Subject: [PATCH] nir/nir_opt_move: fix ALWAYS_INLINE compiler error
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -17,13 +21,14 @@ fix call to ‘always_inline’ ‘src_is_ssa’
 
 Closes: https://gitlab.freedesktop.org/mesa/mesa/-/issues/6825
 Fixes: f1d20ec67c3f186886b97de94f74484650f8fda1 ("nir/nir_opt_move: handle non-SSA defs ")
+
 ---
  src/compiler/nir/nir_inline_helpers.h | 10 ++++++++--
  src/compiler/nir/nir_opt_move.c       |  2 +-
  2 files changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/src/compiler/nir/nir_inline_helpers.h b/src/compiler/nir/nir_inline_helpers.h
-index 125dd8a537c..ec33f0509f7 100644
+index 125dd8a..ec33f05 100644
 --- a/src/compiler/nir/nir_inline_helpers.h
 +++ b/src/compiler/nir/nir_inline_helpers.h
 @@ -73,8 +73,8 @@ nir_foreach_dest(nir_instr *instr, nir_foreach_dest_cb cb, void *state)
@@ -48,7 +53,7 @@ index 125dd8a537c..ec33f0509f7 100644
 +   return _nir_foreach_src(instr, cb, state);
 +}
 diff --git a/src/compiler/nir/nir_opt_move.c b/src/compiler/nir/nir_opt_move.c
-index 81bcde5c436..051c3cc6295 100644
+index 81bcde5..051c3cc 100644
 --- a/src/compiler/nir/nir_opt_move.c
 +++ b/src/compiler/nir/nir_opt_move.c
 @@ -60,7 +60,7 @@ src_is_ssa(nir_src *src, void *state)
@@ -60,6 +65,3 @@ index 81bcde5c436..051c3cc6295 100644
  }
  
  static bool
--- 
-2.34.1
-

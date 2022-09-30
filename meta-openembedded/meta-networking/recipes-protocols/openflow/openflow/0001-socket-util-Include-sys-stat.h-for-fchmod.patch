@@ -1,0 +1,23 @@
+From b875c6e264eaf7350ad4e4ebf427692d8fd3cd72 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 29 Aug 2022 12:58:53 -0700
+Subject: [PATCH] socket-util: Include sys/stat.h for fchmod
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/socket-util.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/socket-util.c b/lib/socket-util.c
+index c7b5d6d..5b3d602 100644
+--- a/lib/socket-util.c
++++ b/lib/socket-util.c
+@@ -42,6 +42,7 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <sys/resource.h>
++#include <sys/stat.h>
+ #include <sys/un.h>
+ #include <unistd.h>
+ #include "fatal-signal.h"

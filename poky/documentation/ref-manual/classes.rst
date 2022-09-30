@@ -580,8 +580,8 @@ Finally, here is an example that sets the root password::
 .. note::
 
    From a security perspective, hardcoding a default password is not
-   generally a good idea or even legal in some jurisdictions. It is 
-   recommended that you do not do this if you are building a production 
+   generally a good idea or even legal in some jurisdictions. It is
+   recommended that you do not do this if you are building a production
    image.
 
 
@@ -792,7 +792,7 @@ The class stages directories with symlinks from ``gcc`` and ``g++`` to
 ``icecc``, for both native and cross compilers. Depending on each
 configure or compile, the OpenEmbedded build system adds the directories
 at the head of the ``PATH`` list and then sets the ``ICECC_CXX`` and
-``ICEC_CC`` variables, which are the paths to the ``g++`` and ``gcc``
+``ICECC_CC`` variables, which are the paths to the ``g++`` and ``gcc``
 compilers, respectively.
 
 For the cross compiler, the class creates a ``tar.gz`` file that
@@ -800,8 +800,8 @@ contains the Yocto Project toolchain and sets ``ICECC_VERSION``, which
 is the version of the cross-compiler used in the cross-development
 toolchain, accordingly.
 
-The class handles all three different compile stages (i.e native
-,cross-kernel and target) and creates the necessary environment
+The class handles all three different compile stages (i.e native,
+cross-kernel and target) and creates the necessary environment
 ``tar.gz`` file to be used by the remote machines. The class also
 supports SDK generation.
 
@@ -811,12 +811,13 @@ using ``which``. If :term:`ICECC_ENV_EXEC` is set
 in your ``local.conf`` file, the variable should point to the
 ``icecc-create-env`` script provided by the user. If you do not point to
 a user-provided script, the build system uses the default script
-provided by the recipe ``icecc-create-env-native.bb``.
+provided by the recipe :oe_git:`icecc-create-env_0.1.bb
+</openembedded-core/tree/meta/recipes-devtools/icecc-create-env/icecc-create-env_0.1.bb>`.
 
 .. note::
 
    This script is a modified version and not the one that comes with
-   icecc.
+   ``icecream``.
 
 If you do not want the Icecream distributed compile support to apply to
 specific recipes or classes, you can ask them to be ignored by Icecream

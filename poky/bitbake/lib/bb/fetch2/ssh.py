@@ -150,8 +150,6 @@ class SSH(FetchMethod):
         )
 
         check_network_access(d, cmd, urldata.url)
+        runfetchcmd(cmd, d)
 
-        if runfetchcmd(cmd, d):
-            return True
-
-        return False
+        return True

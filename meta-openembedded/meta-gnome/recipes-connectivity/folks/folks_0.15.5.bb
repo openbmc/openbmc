@@ -8,8 +8,9 @@ DEPENDS = " \
 "
 
 GNOMEBASEBUILDCLASS = "meson"
-EXTRA_OEMESON += "-Dtests=false"
+EXTRA_OEMESON += "-Dtests=false -Db_lto=false "
 
+CFLAGS:append:toolchain-clang = " -Wno-error=implicit-function-declaration"
 # gobject-introspection is mandatory and cannot be configured
 REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
 GIR_MESON_OPTION = ""

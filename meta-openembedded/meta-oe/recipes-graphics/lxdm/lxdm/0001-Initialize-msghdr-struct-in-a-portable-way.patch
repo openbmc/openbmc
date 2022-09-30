@@ -1,0 +1,40 @@
+From 7c370576b4fb7c7d3b6dbf33125136a4ae70a330 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 31 Aug 2022 21:52:16 -0700
+Subject: [PATCH] Initialize msghdr struct in a portable way
+
+Initializing the structure assuming glibc layout results in
+compile errors on musl, therefore do partial intialization and then
+assigning the members individually.
+
+Upstream-Status: Submitted [https://sourceforge.net/p/lxdm/code/merge-requests/4/]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lxcom.c       | 9 +++++++--
+ 2 files changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/src/lxcom.c b/src/lxcom.c
+index 397d1b5..517c775 100644
+--- a/src/lxcom.c
++++ b/src/lxcom.c
+@@ -117,10 +117,15 @@ static gboolean lxcom_dispatch (GSource *source,GSourceFunc callback,gpointer us
+ 	char ctrl[/*CMSG_SPACE(sizeof(LXDM_CRED))*/1024];
+ 	struct sockaddr_un peer;
+ 	struct iovec v={buf,sizeof(buf)};
+-	struct msghdr h={&peer,sizeof(peer),&v,1,ctrl,sizeof(ctrl),0};
++	struct msghdr h={0};
+ 	struct cmsghdr *cmptr;
+ 	int ret;
+-
++	h.msg_name = &peer;
++	h.msg_namelen = sizeof(peer);
++	h.msg_iov = &v;
++	h.msg_iovlen = 1;
++	h.msg_control = ctrl;
++	h.msg_controllen = sizeof(ctrl);
+ 	while(1)
+ 	{
+ 		peer.sun_family=0;
+-- 
+2.37.3
+

@@ -7,23 +7,24 @@ SRC_URI = "\
 	git://github.com/KhronosGroup/glslang.git;protocol=https;destsuffix=git/external/glslang/src;name=glslang;branch=master \
 	git://github.com/KhronosGroup/SPIRV-Headers.git;protocol=https;destsuffix=git/external/spirv-headers/src;name=spirv-headers;branch=master \
 	git://github.com/KhronosGroup/SPIRV-Tools.git;protocol=https;destsuffix=git/external/spirv-tools/src;name=spirv-tools;branch=master \
-	https://raw.githubusercontent.com/baldurk/renderdoc/v1.1/renderdoc/api/app/renderdoc_app.h;subdir=git/external/renderdoc/src;name=renderdoc \
+        git://github.com/open-source-parsers/jsoncpp.git;protocol=https;destsuffix=git/external/jsoncpp/src;name=jsoncpp;branch=master \
+        git://github.com/KhronosGroup/Vulkan-Docs.git;protocol=https;destsuffix=git/external/vulkan-docs/src;name=vulkan-docs;branch=main \
+        https://raw.githubusercontent.com/baldurk/renderdoc/fcdea67879fa1991e56cf7734ce0ce27866b665f/renderdoc/api/app/renderdoc_app.h;subdir=git/external/renderdoc/src;name=renderdoc \
 "
 
 S = "${WORKDIR}/git"
 
-SRCREV_FORMAT = "vk-gl-cts_amber_glslang_spirv-headers_spirv-tools"
+SRCREV_FORMAT = "vk-gl-cts_amber_glslang_spirv-headers_spirv-tools_jsoncpp_vulkan-docs"
 
 S = "${WORKDIR}/git"
 
-inherit pkgconfig cmake features_check
+inherit pkgconfig cmake features_check python3native qemu
 
 ANY_OF_DISTRO_FEATURES += "opengl wayland"
 
-DEPENDS += "libpng zlib virtual/libgles2"
+DEPENDS += "python3-lxml-native libpng zlib virtual/libgles2 qemu-native"
 
-SRC_URI += "file://0001-Workaround-for-GCC-11-uninit-variable-warnings-946.patch;patchdir=external/amber/src \
-            file://0001-Include-limits-header-for-numeric_limits.patch;patchdir=external/vulkancts \
+SRC_URI += " \
             file://0001-vulkancts.patch \
             file://0001-use-library-sonames-for-linking.patch \
 "
@@ -37,6 +38,8 @@ SRC_URI:append:toolchain-clang = "\
 	file://fix-clang-private-operator.patch \
 "
 
+EXTRA_OECMAKE:prepend:class-target = "-DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/qemuwrapper -DWAYLAND_SCANNER=${STAGING_BINDIR_NATIVE}/wayland-scanner -DWAYLAND_PROTOCOLS_DIR=${STAGING_DATADIR}/wayland-protocols"
+
 # The best thing for the user to do is to not specify any of the following
 # PACKAGECONFIGs (i.e. leave it blank) which tells the project to do its own
 # probing and build what it thinks is appropriate.
@@ -44,10 +47,21 @@ SRC_URI:append:toolchain-clang = "\
 # to override this behaviour.
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[surfaceless] = "-DDEQP_TARGET=surfaceless,,,,,wayland x11_egl x11_glx x11_egl_glx"
-PACKAGECONFIG[wayland] = "-DDEQP_TARGET=wayland,,wayland,,,surfaceless x11_egl x11_glx x11_egl_glx"
+PACKAGECONFIG[wayland] = "-DDEQP_TARGET=wayland,,wayland-native wayland wayland-protocols,,,surfaceless x11_egl x11_glx x11_egl_glx"
 PACKAGECONFIG[x11_egl] = "-DDEQP_TARGET=x11_egl,,virtual/libx11 virtual/egl,,,surfaceless wayland x11_glx x11_egl_glx"
 PACKAGECONFIG[x11_glx] = "-DDEQP_TARGET=x11_glx,,virtual/libx11,,,surfaceless wayland x11_egl x11_egl_glx"
 PACKAGECONFIG[x11_egl_glx] = "-DDEQP_TARGET=x11_glx,,virtual/libx11 virtual/egl,,,surfaceless wayland x11_egl x11_glx"
+
+do_configure:append() {
+        # Write out a qemu wrapper that will be used by cmake
+        # so that it can run target helper binaries through that.
+        qemu_binary="${@qemu_wrapper_cmdline(d, d.getVar('STAGING_DIR_HOST'), [d.expand('${STAGING_DIR_HOST}${libdir}'),d.expand('${STAGING_DIR_HOST}${base_libdir}')])}"
+        cat > ${WORKDIR}/qemuwrapper << EOF
+#!/bin/sh
+$qemu_binary "\$@"
+EOF
+        chmod +x ${WORKDIR}/qemuwrapper
+}
 
 python __anonymous() {
     # if the user doesn't specify any PACKAGECONFIG then the cts build system
@@ -57,7 +71,7 @@ python __anonymous() {
     distrofeatures = (d.getVar("DISTRO_FEATURES") or "")
     if not bb.utils.contains_any("PACKAGECONFIG", ["surfaceless", "wayland", "x11_egl", "x11_glx", "x11_egl_glx"], True, False, d):
         if "wayland" in distrofeatures:
-            d.appendVar("DEPENDS", " wayland ")
+            d.appendVar("DEPENDS", " wayland-native wayland wayland-protocols")
         if "x11" in distrofeatures:
             d.appendVar("DEPENDS", " virtual/libx11 virtual/egl ")
 }

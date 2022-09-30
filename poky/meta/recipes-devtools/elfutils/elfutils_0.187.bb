@@ -21,6 +21,7 @@ SRC_URI = "https://sourceware.org/elfutils/ftp/${PV}/${BP}.tar.bz2 \
            file://run-ptest \
            file://ptest.patch \
            file://0001-tests-Makefile.am-compile-test_nlist-with-standard-C.patch \
+           file://0001-tests-Add-libeu-to-tests-needing-error-API.patch \
            "
 SRC_URI:append:libc-musl = " \
            file://0003-musl-utils.patch \
@@ -29,7 +30,6 @@ SRC_URI:append:libc-musl = " \
 SRC_URI[sha256sum] = "e70b0dfbe610f90c4d1fe0d71af142a4e25c3c4ef9ebab8d2d72b65159d454c8"
 
 inherit autotools gettext ptest pkgconfig
-PTEST_ENABLED:libc-musl = "0"
 
 EXTRA_OECONF = "--program-prefix=eu-"
 
@@ -66,6 +66,7 @@ do_install_ptest() {
 		# copy the files which needed by the cases
 		TEST_FILES="strip strip.o addr2line elfcmp objdump readelf size.o nm.o nm elflint elfcompress elfclassify stack unstrip"
 		install -d -m 755                       ${D}${PTEST_PATH}/src
+		install -d -m 755                       ${D}${PTEST_PATH}/lib
 		install -d -m 755                       ${D}${PTEST_PATH}/libelf
 		install -d -m 755                       ${D}${PTEST_PATH}/libdw
 		install -d -m 755                       ${D}${PTEST_PATH}/libdwfl
@@ -83,6 +84,7 @@ do_install_ptest() {
 		cp ${D}${libdir}/libasm-${PV}.so ${D}${PTEST_PATH}/libasm/libasm.so
 		cp ${B}/libcpu/libcpu.a ${D}${PTEST_PATH}/libcpu/
 		cp ${B}/libebl/libebl.a ${D}${PTEST_PATH}/libebl/
+		cp ${B}/lib/libeu.a ${D}${PTEST_PATH}/lib/
 		cp ${S}/libelf/*.h             ${D}${PTEST_PATH}/libelf/
 		cp ${S}/libdw/*.h              ${D}${PTEST_PATH}/libdw/
 		cp ${S}/libdwfl/*.h            ${D}${PTEST_PATH}/libdwfl/

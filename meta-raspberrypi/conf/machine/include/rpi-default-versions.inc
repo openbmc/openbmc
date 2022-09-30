@@ -1,3 +1,4 @@
 # RaspberryPi BSP default versions
 
 PREFERRED_VERSION_linux-raspberrypi ??= "5.15.%"
+PREFERRED_VERSION_linux-raspberrypi-v7 ??= "${PREFERRED_VERSION_linux-raspberrypi}"

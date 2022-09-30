@@ -1,0 +1,28 @@
+From 46f0aadf80d5e28f587149b6e90c3ba005971f6e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 2 Sep 2022 19:22:17 -0700
+Subject: [PATCH] configure: Include unistd.h for getpid API
+
+This fixes the check for perf events support in configure
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.ac b/configure.ac
+index e4f4024..3384628 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -119,6 +119,7 @@ if test "$kernel_may_have_perf_events_support" = "yes"; then
+ 				#include <asm/unistd.h>
+ 				#include <sys/types.h>
+ 				#include <string.h>
++				#include <unistd.h>
+ 			]],
+ 			[[struct perf_event_attr attr;
+ 				pid_t pid;
+-- 
+2.37.3
+

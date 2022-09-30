@@ -1,0 +1,22 @@
+Calling openat() on a fifo causes a pseudo hang for us (e.g. the fifo in psplash).
+Avoid calling openat for fifos.
+
+Introduced upstream with:
+
+https://github.com/rpm-software-management/rpm/commit/96ec957e281220f8e137a2d5eb23b83a6377d556
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/rpm/issues/2195]
+
+Index: git/lib/fsm.c
+===================================================================
+--- git.orig/lib/fsm.c
++++ git/lib/fsm.c
+@@ -1010,7 +1010,7 @@ int rpmPackageFilesInstall(rpmts ts, rpm
+                     rc = RPMERR_UNKNOWN_FILETYPE;
+             }
+ 
+-	    if (!rc && fd == -1 && !S_ISLNK(fp->sb.st_mode)) {
++	    if (!rc && fd == -1 && !S_ISLNK(fp->sb.st_mode) && !S_ISFIFO(fp->sb.st_mode)) {
+ 		/* Only follow safe symlinks, and never on temporary files */
+ 		fd = fsmOpenat(di.dirfd, fp->fpath,
+ 				fp->suffix ? AT_SYMLINK_NOFOLLOW : 0, 0);

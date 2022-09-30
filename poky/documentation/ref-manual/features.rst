@@ -113,10 +113,15 @@ configuration level. See the
 information.
 
 This list only represents features as shipped with the Yocto Project
-metadata:
+metadata, as extra layers can define their own:
 
--  *alsa:* Include ALSA support (OSS compatibility kernel modules
-   installed if available).
+-  *3g:* Include support for cellular data.
+
+-  *acl:* Include
+   `Access Control List <https://en.wikipedia.org/wiki/Access-control_list>`__ support.
+
+-  *alsa:* Include `Advanced Linux Sound Architecture <https://en.wikipedia.org/wiki/Advanced_Linux_Sound_Architecture>`__
+   support (OSS compatibility kernel modules installed if available).
 
 -  *api-documentation:* Enables generation of API documentation during
    recipe builds. The resulting documentation is added to SDK tarballs
@@ -129,6 +134,10 @@ metadata:
 
 -  *cramfs:* Include CramFS support.
 
+-  *debuginfod:* Include support for getting ELF debugging information through
+   a :ref:`debuginfod <dev-manual/common-tasks:using the debuginfod server method>`
+   server.
+
 -  *directfb:* Include DirectFB support.
 
 -  *ext2:* Include tools for supporting for devices with internal
@@ -136,13 +145,24 @@ metadata:
 
 -  *ipsec:* Include IPSec support.
 
+-  *ipv4:* Include IPv4 support.
+
 -  *ipv6:* Include IPv6 support.
 
 -  *keyboard:* Include keyboard support (e.g. keymaps will be loaded
    during boot).
 
+-  *largefile:* Enable building applications with
+   `argefile support <https://en.wikipedia.org/wiki/Large-file_support>`__.
+
+-  *multiarch:* Enable building applications with multiple architecture
+   support.
+
 -  *ldconfig:* Include support for ldconfig and ``ld.so.conf`` on the
    target.
+
+-  *nfc:* Include support for
+   `Near Field Communication <https://en.wikipedia.org/wiki/Near-field_communication>`__.
 
 -  *nfs:* Include NFS client support (for mounting NFS exports on
    device).
@@ -162,6 +182,11 @@ metadata:
    ":ref:`dev-manual/common-tasks:testing packages with ptest`" section
    in the Yocto Project Development Tasks Manual.
 
+-  *seccomp:* Enables building applications with
+   `seccomp <https://en.wikipedia.org/wiki/Seccomp>`__ support, to
+   allow them to strictly restrict the system calls that they are allowed
+   to invoke.
+
 -  *smbfs:* Include SMB networks client support (for mounting
    Samba/Microsoft Windows shares on device).
 
@@ -180,12 +205,24 @@ metadata:
    directories into their respective counterparts in the ``/usr``
    directory to provide better package and application compatibility.
 
+-  *vfat:* Include `FAT filesystem <https://en.wikipedia.org/wiki/File_Allocation_Table>`__
+   support.
+
+-  *vulkan:* Include support for the
+   `Vulkan API <https://en.wikipedia.org/wiki/Vulkan>`__.
+
 -  *wayland:* Include the Wayland display server protocol and the
    library that supports it.
 
 -  *wifi:* Include WiFi support (integrated only).
 
 -  *x11:* Include the X server and libraries.
+
+-  *xattr:* Include support for
+   `extended file attributes <https://en.wikipedia.org/wiki/Extended_file_attributes>`__.
+
+-  *zeroconf:* Include support for
+   `zero configuration networking <https://en.wikipedia.org/wiki/Zero-configuration_networking>`__.
 
 .. _ref-features-image:
 

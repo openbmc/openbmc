@@ -19,7 +19,7 @@ EXTRA_OECONF:append:armv6:class-target = " --with-arch=armv6${ARMFPARCHEXT}"
 EXTRA_OECONF:append:armv7a:class-target = " --with-arch=armv7-a${ARMFPARCHEXT}"
 EXTRA_OECONF:append:armv7ve:class-target = " --with-arch=armv7ve${ARMFPARCHEXT}"
 EXTRA_OECONF:append:arc:class-target = " --with-cpu=${TUNE_PKGARCH}"
-EXTRA_OECONF:append:x86-64:class-target = " --with-arch=native"
+EXTRA_OECONF:append:x86-64:class-target = " ${@get_gcc_x86_64_arch_setting(bb, d)}"
 
 # libcc1 requres gcc_cv_objdump when cross build, but gcc_cv_objdump is
 # set in subdir gcc, so subdir libcc1 can't use it, export it here to

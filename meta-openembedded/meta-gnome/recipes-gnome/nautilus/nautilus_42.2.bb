@@ -21,6 +21,7 @@ inherit gnomebase gsettings gobject-introspection gtk-doc gettext features_check
 def gnome_verdir(v):
     return oe.utils.trim_version(v, 1)
 
+SRC_URI += " file://0001-Provide-parameter-prototype-for-functions-without-pa.patch"
 SRC_URI[archive.sha256sum] = "99212d2eb75996f181728ad04a2e2d86f2577b064e68a34c8b81a7037df4ccb2"
 
 REQUIRED_DISTRO_FEATURES = "x11"

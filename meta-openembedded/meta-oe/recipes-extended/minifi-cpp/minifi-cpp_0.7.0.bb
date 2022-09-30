@@ -30,6 +30,7 @@ SRC_URI = "git://github.com/apache/nifi-minifi-cpp.git;branch=master;protocol=ht
             file://0001-civetweb-CMakeLists.txt-do-not-search-gcc-ar-and-gcc.patch \
             file://0001-cxxopts-Add-limits-header.patch \
             file://0001-Fix-build-with-libc.patch \
+            file://0001-civetweb-Disable-lto.patch \
             file://minifi.service \
             file://systemd-volatile.conf \
             file://sysvinit-volatile.conf \
@@ -57,6 +58,7 @@ EXTRA_OECMAKE += " \
     -DSKIP_TESTS=ON \
     -DGCC_AR=${STAGING_BINDIR_TOOLCHAIN}/${AR} \
     -DGCC_RANLIB=${STAGING_BINDIR_TOOLCHAIN}/${RANLIB} \
+    -DDISABLE_PYTHON_SCRIPTING=ON \
     "
 EXTRA_OECMAKE:append:toolchain-clang = " -DCMAKE_RANLIB=${STAGING_BINDIR_TOOLCHAIN}/${TARGET_PREFIX}llvm-ranlib"
 LDFLAGS:append:toolchain-clang = " -fuse-ld=lld"
@@ -78,6 +80,14 @@ TARGET_CXXFLAGS:append:riscv64 = " -fpic"
 
 do_install[cleandirs] += "${WORKDIR}/minifi-install"
 PSEUDO_CONSIDER_PATHS .= ",${WORKDIR}/minifi-install"
+
+do_configure:prepend:libc-musl() {
+    sed -i -e 's/-DHAVE_GLIBC_STRERROR_R=1/-DHAVE_GLIBC_STRERROR_R=0/' ${S}/CMakeLists.txt
+    sed -i -e 's/-DHAVE_POSIX_STRERROR_R=0/-DHAVE_POSIX_STRERROR_R=1/' ${S}/CMakeLists.txt
+}
+
+CFLAGS:append:libc-glibc = " -D_GNU_SOURCE"
+CXXFLAGS:append:libc-glibc = " -D_GNU_SOURCE"
 
 do_install() {
     DESTDIR='${WORKDIR}/minifi-install' cmake_runcmake_build --target ${OECMAKE_TARGET_INSTALL}

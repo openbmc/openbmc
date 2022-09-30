@@ -15,19 +15,32 @@ mount -t sysfs sysfs /sys
 
 [ -z "$CONSOLE" ] && CONSOLE="/dev/console"
 
+BASE_OVERLAY_ETC_DIR={OVERLAYFS_ETC_MOUNT_POINT}/overlay-etc
+UPPER_DIR=$BASE_OVERLAY_ETC_DIR/upper
+WORK_DIR=$BASE_OVERLAY_ETC_DIR/work
+LOWER_DIR=$BASE_OVERLAY_ETC_DIR/lower
+
 mkdir -p {OVERLAYFS_ETC_MOUNT_POINT}
 if mount -n -t {OVERLAYFS_ETC_FSTYPE} \
     -o {OVERLAYFS_ETC_MOUNT_OPTIONS} \
     {OVERLAYFS_ETC_DEVICE} {OVERLAYFS_ETC_MOUNT_POINT}
 then
-    mkdir -p {OVERLAYFS_ETC_MOUNT_POINT}/overlay-etc/upper
-    mkdir -p {OVERLAYFS_ETC_MOUNT_POINT}/overlay-etc/work
+    mkdir -p $UPPER_DIR
+    mkdir -p $WORK_DIR
+
+    if {OVERLAYFS_ETC_EXPOSE_LOWER}; then
+        mkdir -p $LOWER_DIR
+
+        # provide read-only access to original /etc content
+        mount -o bind,ro /etc $LOWER_DIR
+    fi
+
     mount -n -t overlay \
-        -o upperdir={OVERLAYFS_ETC_MOUNT_POINT}/overlay-etc/upper \
+        -o upperdir=$UPPER_DIR \
         -o lowerdir=/etc \
-        -o workdir={OVERLAYFS_ETC_MOUNT_POINT}/overlay-etc/work \
+        -o workdir=$WORK_DIR \
         -o index=off,xino=off,redirect_dir=off,metacopy=off \
-        {OVERLAYFS_ETC_MOUNT_POINT}/overlay-etc/upper /etc || \
+        $UPPER_DIR /etc || \
             echo "PREINIT: Mounting etc-overlay failed!"
 else
     echo "PREINIT: Mounting </data> failed!"

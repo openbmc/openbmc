@@ -1,0 +1,33 @@
+From d2d05928342f7f9f687ffea5e0b77f97f0ae5aad Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Wed, 7 Sep 2022 14:29:13 +0900
+Subject: [PATCH] Modify include dir
+
+error messagge:
+../../xforms-1.2.4/lib/fd/cmdbr.h:28:10: fatal error: ../include/forms.h: No such file or directory
+
+../include/forms.h specified in the header file cmdbr.h is not exist.
+
+Upstream-Status: Pending
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ lib/fd/cmdbr.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/fd/cmdbr.h b/lib/fd/cmdbr.h
+index 8495e05..2ddeced 100644
+--- a/lib/fd/cmdbr.h
++++ b/lib/fd/cmdbr.h
+@@ -25,7 +25,7 @@
+ #ifndef FD_cmd_h_
+ #define FD_cmd_h_
+ 
+-#include "../include/forms.h"
++#include "include/forms.h"
+ 
+ /* Callbacks, globals and object handlers */
+ 
+-- 
+2.25.1
+

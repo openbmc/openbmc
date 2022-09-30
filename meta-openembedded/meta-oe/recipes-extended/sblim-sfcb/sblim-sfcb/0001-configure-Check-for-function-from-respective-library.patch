@@ -1,0 +1,72 @@
+From 366c4a1c8b7724241ad2b703e48615ca5affa32e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 1 Sep 2022 12:46:07 -0700
+Subject: [PATCH] configure: Check for function from respective library in
+ AC_CHECK_LIB
+
+This helps in doing correct checks especially with newer autoconf and
+toolchain
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index d4915a1..6154514 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -332,8 +332,8 @@ if [test "$enable_tests"]; then
+ fi
+ 
+ if [test "$test_gcov" == "yes"]; then
+-    AC_CHECK_LIB(gcc,main)
+-    AC_CHECK_LIB(gcov,main)
++    AC_CHECK_LIB(gcc,_Unwind_GetIP)
++    AC_CHECK_LIB(gcov,gcov_write_summary)
+     AC_PATH_PROG(LCOV,lcov,yes,no)
+     AC_PATH_PROG(GENHTML,genhtml,yes,no)
+     if test "$LCOV" == "no" -o "$GENHTML" == "no" ; then
+@@ -400,7 +400,7 @@ fi
+ 
+ if test "$enable_pam" == "yes"; then
+    AC_DEFINE(HAVE_PAM,,[PAM support enabled.])
+-   AC_CHECK_LIB(pam,main,[SFCB_LIBPAM=-lpam],[AC_MSG_ERROR(Could not find required pam library.)])
++   AC_CHECK_LIB(pam,pam_start,[SFCB_LIBPAM=-lpam],[AC_MSG_ERROR(Could not find required pam library.)])
+    SFCB_CONF_BASICAUTHLIB=sfcBasicPAMAuthentication   
+    SFCB_CONF_DOBASICAUTH=true
+ else
+@@ -470,16 +470,16 @@ if test "$HAVE_UNZIP" = "no" ; then
+ fi
+ 
+ # Checks for libraries.
+-AC_CHECK_LIB(pthread,main)
+-AC_CHECK_LIB(dl,main)
+-AC_CHECK_LIB(z,main,[SFCB_LIBZ=-lz],[AC_MSG_ERROR([Could not find required libz])])
++AC_CHECK_LIB(pthread,pthread_create)
++AC_CHECK_LIB(dl,dlopen)
++AC_CHECK_LIB(z,inflate,[SFCB_LIBZ=-lz],[AC_MSG_ERROR([Could not find required libz])])
+ # Test for the newest function here to make sure it's up to date.
+ AC_CHECK_LIB(sfcUtil,invalid_uint,, \
+   [AC_MSG_ERROR([Function invalid_uint not found. Is the required version of sfcCommon installed?])])
+ if test "$enable_indications" = "yes" ; then
+    LOAD_INDICATION_PROVIDER=
+    AC_DEFINE(HAVE_INDICATIONS,1,[Indication support enabled.])
+-   AC_CHECK_LIB(curl,main)
++   AC_CHECK_LIB(curl,curl_easy_init)
+ else
+    LOAD_INDICATION_PROVIDER='#'
+ fi
+@@ -487,7 +487,7 @@ fi
+ AC_SUBST(LOAD_INDICATION_PROVIDER)
+ 
+ if test "$enable_ssl" = "yes"; then
+-   AC_CHECK_LIB(ssl,main)
++   AC_CHECK_LIB(ssl,SSL_CTX_new)
+    SFCB_CONF_HTTPS=true
+    SFCB_CONF_HTTP=false
+ else
+-- 
+2.37.3
+

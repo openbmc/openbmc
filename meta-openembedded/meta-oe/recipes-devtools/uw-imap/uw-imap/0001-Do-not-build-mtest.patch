@@ -1,0 +1,38 @@
+From f92becaf97be16a28013693cd99bac92c54074f2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 7 Sep 2022 13:54:58 -0700
+Subject: [PATCH 1/2] Do not build mtest
+
+its a test utility which is not generally used. We need to disable it
+because it uses gets() function which is not available in glibc, if we
+want to use it then port it to use something like fgets
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index cf6d405..1e2d0fb 100644
+--- a/Makefile
++++ b/Makefile
+@@ -669,7 +669,6 @@ an ua:
+ 	$(TOOLS)/$@ "$(LN)" src/ansilib c-client
+ 	$(TOOLS)/$@ "$(LN)" src/charset c-client
+ 	$(TOOLS)/$@ "$(LN)" src/osdep/$(SYSTEM) c-client
+-	$(TOOLS)/$@ "$(LN)" src/mtest mtest
+ 	$(TOOLS)/$@ "$(LN)" src/ipopd ipopd
+ 	$(TOOLS)/$@ "$(LN)" src/imapd imapd
+ 	$(TOOLS)/$@ "$(LN)" src/mailutil mailutil
+@@ -706,7 +705,6 @@ rebuildclean:
+ 
+ bundled:
+ 	@echo Building bundled tools...
+-	$(CD) mtest;$(MAKE)
+ 	$(CD) ipopd;$(MAKE)
+ 	$(CD) imapd;$(MAKE)
+ 	$(CD) mailutil;$(MAKE)
+-- 
+2.37.3
+

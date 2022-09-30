@@ -9,7 +9,9 @@ SECTION = "console/utils"
 DEPENDS = ""
 
 SRCREV = "61ed2f28b294b1ebeb767df8cb5fcd391709c8e2"
-SRC_URI = "git://gitlab.com/pibox/con2fbmap.git;protocol=https;branch=master"
+SRC_URI = "git://gitlab.com/pibox/con2fbmap.git;protocol=https;branch=master \
+           file://0001-con2fbmap-Add-missing-include-on-string.h.patch \
+           "
 
 S = "${WORKDIR}/git"
 

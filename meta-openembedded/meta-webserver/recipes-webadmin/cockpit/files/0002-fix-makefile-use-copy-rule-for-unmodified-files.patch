@@ -7,13 +7,11 @@ Subject: [PATCH] fix(makefile): use copy rule for unmodified files
  pkg/Makefile.am | 27 +++++++++++++++++++++++++++
  1 file changed, 27 insertions(+)
 
-diff --git a/pkg/Makefile.am b/pkg/Makefile.am
-index 192b785..03b9787 100644
 --- a/pkg/Makefile.am
 +++ b/pkg/Makefile.am
-@@ -13,6 +13,33 @@ playground_DATA = \
- dist/playground/extra.de.po: pkg/playground/extra.de.po
- 	$(COPY_RULE)
+@@ -7,6 +7,33 @@ TESTS += $(pkg_TESTS)
+ %.metainfo.xml: %.metainfo.xml.in
+ 	$(AM_V_GEN) mkdir -p $(dir $@) && msgfmt --xml -d $(top_srcdir)/po --template $< --output $@
  
 +dist/playground/hammer.gif: pkg/playground/hammer.gif
 +	$(COPY_RULE)
@@ -43,5 +41,5 @@ index 192b785..03b9787 100644
 +	$(COPY_RULE)
 +
  metainfodir = ${datarootdir}/metainfo
- metainfo_DATA = pkg/sosreport/org.cockpit-project.cockpit-sosreport.metainfo.xml \
- 		pkg/kdump/org.cockpit-project.cockpit-kdump.metainfo.xml \
+ nodist_metainfo_DATA = \
+ 	pkg/sosreport/org.cockpit-project.cockpit-sosreport.metainfo.xml \

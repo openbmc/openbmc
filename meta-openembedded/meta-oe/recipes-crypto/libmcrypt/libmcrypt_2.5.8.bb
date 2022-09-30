@@ -14,6 +14,8 @@ UPSTREAM_CHECK_REGEX = "Libmcrypt/(?P<pver>\d+(\.\d+)+)/"
 
 inherit autotools-brokensep gettext binconfig
 
+CFLAGS += "-Wno-error=implicit-int"
+
 do_configure() {
         install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.guess ${S}
         install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.sub ${S}

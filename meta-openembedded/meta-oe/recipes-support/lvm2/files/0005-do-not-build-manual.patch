@@ -15,25 +15,26 @@ Upstream-Status: Pending
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
-
 Update context for lvm2 2.03.02.
-
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Update context for lvm2 2.03.16.
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
 ---
  Makefile.in  | 6 +++---
  configure.ac | 1 -
  2 files changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index 6a1a990..80cba91 100644
+index 3b7e0ec..37f14eb 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -18,7 +18,7 @@ top_builddir = @top_builddir@
  abs_top_builddir = @abs_top_builddir@
  abs_top_srcdir = @abs_top_srcdir@
  
--SUBDIRS = conf daemons include lib libdaemon libdm man scripts tools
-+SUBDIRS = conf daemons include lib libdaemon libdm scripts tools
+-SUBDIRS = libdm conf daemons include lib libdaemon man scripts tools
++SUBDIRS = libdm conf daemons include lib libdaemon scripts tools
  
  ifeq ("@UDEV_RULES@", "yes")
    SUBDIRS += udev
@@ -46,20 +47,20 @@ index 6a1a990..80cba91 100644
      libdaemon lib tools daemons libdm \
      udev po
  tools.distclean: test.distclean
-@@ -65,7 +65,7 @@ libdm.device-mapper: include.device-mapper
+@@ -59,7 +59,7 @@ unit-test  run-unit-test: test
+ 
  daemons.device-mapper: libdm.device-mapper
  tools.device-mapper: libdm.device-mapper
- scripts.device-mapper: include.device-mapper
 -device-mapper: tools.device-mapper daemons.device-mapper man.device-mapper
 +device-mapper: tools.device-mapper daemons.device-mapper
+ device_mapper: device-mapper
  
  ifeq ("@INTL@", "yes")
- lib.pofile: include.pofile
 diff --git a/configure.ac b/configure.ac
-index 7fd0561..4154dc0 100644
+index 6def519..18a5c97 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1812,7 +1812,6 @@ libdaemon/server/Makefile
+@@ -2018,7 +2018,6 @@ libdaemon/server/Makefile
  libdm/Makefile
  libdm/dm-tools/Makefile
  libdm/libdevmapper.pc
@@ -68,5 +69,5 @@ index 7fd0561..4154dc0 100644
  scripts/lvm2-pvscan.service
  scripts/blkdeactivate.sh
 -- 
-2.7.4
+2.25.1
 

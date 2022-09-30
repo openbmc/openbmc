@@ -1,0 +1,31 @@
+From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Date: Tue, 19 Jan 2021 20:35:29 +0100
+Subject: Fix build on powerpc and ppc64
+
+Upstream-status: Pending
+
+---
+ libswscale/ppc/yuv2rgb_altivec.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/libswscale/ppc/yuv2rgb_altivec.c b/libswscale/ppc/yuv2rgb_altivec.c
+index 5365452..930ef6b 100644
+--- a/libswscale/ppc/yuv2rgb_altivec.c
++++ b/libswscale/ppc/yuv2rgb_altivec.c
+@@ -283,6 +283,16 @@ static inline void cvtyuvtoRGB(SwsContext *c, vector signed short Y,
+  * ------------------------------------------------------------------------------
+  */
+
++#if !HAVE_VSX
++static inline vector unsigned char vec_xl(signed long long offset, const ubyte *addr)
++{
++    const vector unsigned char *v_addr = (const vector unsigned char *) (addr + offset);
++    vector unsigned char align_perm = vec_lvsl(offset, addr);
++
++    return (vector unsigned char) vec_perm(v_addr[0], v_addr[1], align_perm);
++}
++#endif /* !HAVE_VSX */
++
+ #define DEFCSP420_CVT(name, out_pixels)                                       \
+ static int altivec_ ## name(SwsContext *c, const unsigned char **in,          \
+                             int *instrides, int srcSliceY, int srcSliceH,     \

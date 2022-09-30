@@ -145,6 +145,8 @@ export logdir = "${localstatedir}/log"
 CACHED_CONFIGUREVARS = "ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes"
 
 do_configure:prepend () {
+    # use host for RUST_SURICATA_LIB_XC_DIR
+    sed -i -e 's,\${host_alias},${RUST_HOST_SYS},' ${S}/configure.ac
     oe_runconf
 }
 

@@ -1,0 +1,690 @@
+From 05fe9751dfb370b0fb726e95bc36674468116db4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 2 Sep 2022 16:57:51 -0700
+Subject: [PATCH] provide function declaration with prototypes
+
+Fixes build with clang-15+
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libgeis/backend/grail/geis_grail_window_grab.c           | 2 +-
+ libgeis/backend/grail/geis_ugsubscription_store.c        | 2 +-
+ libgeis/backend/grail/geis_ugsubscription_store.h        | 2 +-
+ libgeis/backend/test_fixture/geis_backend_test_fixture.c | 4 ++--
+ libgeis/geis.c                                           | 2 +-
+ libgeis/geis_backend_multiplexor.c                       | 4 ++--
+ libgeis/geis_backend_multiplexor.h                       | 2 +-
+ libgeis/geis_class.c                                     | 2 +-
+ libgeis/geis_class.h                                     | 2 +-
+ libgeis/geis_device.c                                    | 2 +-
+ libgeis/geis_device.h                                    | 2 +-
+ libgeis/geis_event_queue.c                               | 2 +-
+ libgeis/geis_event_queue.h                               | 2 +-
+ libgeis/geis_filter.c                                    | 2 +-
+ libgeis/geis_filter.h                                    | 2 +-
+ libgeis/geis_filterable.c                                | 2 +-
+ libgeis/geis_filterable.h                                | 2 +-
+ libgeis/geis_frame.c                                     | 2 +-
+ libgeis/geis_frame.h                                     | 2 +-
+ libgeis/geis_group.c                                     | 2 +-
+ libgeis/geis_group.h                                     | 2 +-
+ libgeis/geis_region.c                                    | 2 +-
+ libgeis/geis_region.h                                    | 2 +-
+ libgeis/geis_touch.c                                     | 2 +-
+ libgeis/geis_touch.h                                     | 2 +-
+ libgeis/server/geis_dbus_client_proxy.c                  | 2 +-
+ libgeis/server/geis_dbus_proxy_box.c                     | 2 +-
+ libgeis/server/geis_dbus_proxy_box.h                     | 2 +-
+ libs/geis-dbus/geis_dbus_dispatcher.c                    | 2 +-
+ libs/geis-util/geis_logging.c                            | 2 +-
+ testsuite/geis1/check_gesture_attrs.c                    | 2 +-
+ testsuite/geis1/check_gesture_types.c                    | 2 +-
+ testsuite/geis1/check_instance.c                         | 2 +-
+ testsuite/geis1/check_subscription.c                     | 2 +-
+ testsuite/geis2/check_attr.c                             | 2 +-
+ testsuite/geis2/check_class.c                            | 2 +-
+ testsuite/geis2/check_config.c                           | 2 +-
+ testsuite/geis2/check_device.c                           | 2 +-
+ testsuite/geis2/check_error_codes.c                      | 2 +-
+ testsuite/geis2/check_event.c                            | 2 +-
+ testsuite/geis2/check_filter.c                           | 2 +-
+ testsuite/geis2/check_frame.c                            | 2 +-
+ testsuite/geis2/check_geis_new.c                         | 2 +-
+ testsuite/geis2/check_general_types.c                    | 2 +-
+ testsuite/geis2/check_region.c                           | 2 +-
+ testsuite/geis2/check_subscription.c                     | 2 +-
+ tools/geis-server/geis-server.c                          | 2 +-
+ 47 files changed, 49 insertions(+), 49 deletions(-)
+
+diff --git a/libgeis/backend/grail/geis_grail_window_grab.c b/libgeis/backend/grail/geis_grail_window_grab.c
+index 003adee..f8480ac 100644
+--- a/libgeis/backend/grail/geis_grail_window_grab.c
++++ b/libgeis/backend/grail/geis_grail_window_grab.c
+@@ -49,7 +49,7 @@ static const GeisFloat _geis_grail_window_grab_store_growth_factor = 1.7;
+ 
+ 
+ static GeisGrailWindowGrabStore
+-_window_grab_allocate()
++_window_grab_allocate(void)
+ {
+   GeisGrailWindowGrabStore wgs = malloc(sizeof(struct GeisGrailWindowGrabStore));
+   if (!wgs)
+diff --git a/libgeis/backend/grail/geis_ugsubscription_store.c b/libgeis/backend/grail/geis_ugsubscription_store.c
+index bb1f0bb..cb7e620 100644
+--- a/libgeis/backend/grail/geis_ugsubscription_store.c
++++ b/libgeis/backend/grail/geis_ugsubscription_store.c
+@@ -42,7 +42,7 @@ static const GeisFloat _geis_grail_ugsubscription_store_growth_factor = 1.7;
+  * Creates a new, empty grail subscription store.
+  */
+ GeisUGSubscriptionStore
+-geis_ugsubscription_store_new()
++geis_ugsubscription_store_new(void)
+ {
+   GeisUGSubscriptionStore store = geis_bag_new(sizeof(struct GeisUGSubscription),
+                                   _geis_grail_ugsubscription_store_default_size,
+diff --git a/libgeis/backend/grail/geis_ugsubscription_store.h b/libgeis/backend/grail/geis_ugsubscription_store.h
+index a93e1b6..06273ef 100644
+--- a/libgeis/backend/grail/geis_ugsubscription_store.h
++++ b/libgeis/backend/grail/geis_ugsubscription_store.h
+@@ -41,7 +41,7 @@ typedef GeisBag GeisUGSubscriptionStore;
+  * @returns a pointer to a valid store, or NULL to indicate failure.
+  */
+ GeisUGSubscriptionStore
+-geis_ugsubscription_store_new();
++geis_ugsubscription_store_new(void);
+ 
+ /**
+  * Destroys a grail subscription store.
+diff --git a/libgeis/backend/test_fixture/geis_backend_test_fixture.c b/libgeis/backend/test_fixture/geis_backend_test_fixture.c
+index 5912acb..099cde4 100644
+--- a/libgeis/backend/test_fixture/geis_backend_test_fixture.c
++++ b/libgeis/backend/test_fixture/geis_backend_test_fixture.c
+@@ -434,7 +434,7 @@ _token_free_subscription_pdata(GeisBackendToken gbtoken GEIS_UNUSED,
+ }
+ 
+ __attribute__((constructor))
+-static void _register_test_fixture()
++static void _register_test_fixture(void)
+ {
+   geis_register_backend(GEIS_INIT_MOCK_BACKEND,
+                         sizeof(struct GeisBackendTestFixture),
+@@ -444,6 +444,6 @@ static void _register_test_fixture()
+ 
+ /* A dummy routine to force linkage of this module without dlopening it */
+ void
+-geis_include_backend_test_fixture()
++geis_include_backend_test_fixture(void)
+ {
+ }
+diff --git a/libgeis/geis.c b/libgeis/geis.c
+index 4290d19..3f7bd12 100644
+--- a/libgeis/geis.c
++++ b/libgeis/geis.c
+@@ -402,7 +402,7 @@ geis_filterable_attribute_foreach(Geis geis,
+  * Creates a new empty Geis API instance.
+  */
+ static Geis
+-geis_new_empty()
++geis_new_empty(void)
+ {
+   geis_error_clear(NULL);
+   Geis geis = calloc(1, sizeof(struct _Geis));
+diff --git a/libgeis/geis_backend_multiplexor.c b/libgeis/geis_backend_multiplexor.c
+index 3f80080..0f76198 100644
+--- a/libgeis/geis_backend_multiplexor.c
++++ b/libgeis/geis_backend_multiplexor.c
+@@ -60,7 +60,7 @@ struct _GeisBackendMultiplexor
+  * Creates a new container for callback info.
+  */
+ static CallbackInfoBag
+-_callback_info_bag_new()
++_callback_info_bag_new(void)
+ {
+   CallbackInfoBag cbib = calloc(1, sizeof(struct CallbackInfoBag));
+   if (!cbib)
+@@ -209,7 +209,7 @@ _callback_info_bag_release(CallbackInfoBag cbib, int fd)
+  * Creates a new backend multiplexor.
+  */
+ GeisBackendMultiplexor
+-geis_backend_multiplexor_new()
++geis_backend_multiplexor_new(void)
+ {
+   GeisBackendMultiplexor mx = calloc(1, sizeof(struct _GeisBackendMultiplexor));
+   if (!mx)
+diff --git a/libgeis/geis_backend_multiplexor.h b/libgeis/geis_backend_multiplexor.h
+index ff4c318..8e7102e 100644
+--- a/libgeis/geis_backend_multiplexor.h
++++ b/libgeis/geis_backend_multiplexor.h
+@@ -74,7 +74,7 @@ typedef void (*GeisBackendFdEventCallback)(int                             fd,
+ /**
+  * Constructs a new back end multiplexor.
+  */
+-GeisBackendMultiplexor geis_backend_multiplexor_new();
++GeisBackendMultiplexor geis_backend_multiplexor_new(void);
+ 
+ /**
+  * A reasonable default value for the max_events_per_pump parameter to
+diff --git a/libgeis/geis_class.c b/libgeis/geis_class.c
+index e889e4b..5c26a87 100644
+--- a/libgeis/geis_class.c
++++ b/libgeis/geis_class.c
+@@ -46,7 +46,7 @@ static const int gesture_class_bag_growth_constant = 2;
+  * Creates a new class bag,
+  */
+ GeisGestureClassBag
+-geis_gesture_class_bag_new()
++geis_gesture_class_bag_new(void)
+ {
+   GeisGestureClassBag bag = calloc(1, sizeof(struct _GeisGestureClassBag));
+   if (!bag)
+diff --git a/libgeis/geis_class.h b/libgeis/geis_class.h
+index 1d60998..724c353 100644
+--- a/libgeis/geis_class.h
++++ b/libgeis/geis_class.h
+@@ -35,7 +35,7 @@ typedef struct _GeisGestureClassBag *GeisGestureClassBag;
+ /**
+  * Creates a new class bag,
+  */
+-GeisGestureClassBag geis_gesture_class_bag_new();
++GeisGestureClassBag geis_gesture_class_bag_new(void);
+ 
+ /**
+  * Destroys a gesture class bag.
+diff --git a/libgeis/geis_device.c b/libgeis/geis_device.c
+index 1f61fc1..ff3216b 100644
+--- a/libgeis/geis_device.c
++++ b/libgeis/geis_device.c
+@@ -44,7 +44,7 @@ static const int device_bag_growth_constant = 2;
+ 
+ 
+ GeisDeviceBag
+-geis_device_bag_new()
++geis_device_bag_new(void)
+ {
+   GeisDeviceBag bag = calloc(1, sizeof(struct _GeisDeviceBag));
+   if (!bag)
+diff --git a/libgeis/geis_device.h b/libgeis/geis_device.h
+index c411e54..707943b 100644
+--- a/libgeis/geis_device.h
++++ b/libgeis/geis_device.h
+@@ -35,7 +35,7 @@ typedef struct _GeisDeviceBag *GeisDeviceBag;
+ /**
+  * Creates a new device bag,
+  */
+-GeisDeviceBag geis_device_bag_new();
++GeisDeviceBag geis_device_bag_new(void);
+ 
+ /**
+  * Destroys a device bag.
+diff --git a/libgeis/geis_event_queue.c b/libgeis/geis_event_queue.c
+index 0b7d0fb..f357683 100644
+--- a/libgeis/geis_event_queue.c
++++ b/libgeis/geis_event_queue.c
+@@ -50,7 +50,7 @@ struct _GeisEventQueue
+  * Creates a new Geis Event queue.
+  */
+ GeisEventQueue
+-geis_event_queue_new()
++geis_event_queue_new(void)
+ {
+   GeisEventQueue queue = calloc(1, sizeof(struct _GeisEventQueue));
+   if (!queue)
+diff --git a/libgeis/geis_event_queue.h b/libgeis/geis_event_queue.h
+index e4c186d..5f3da1d 100644
+--- a/libgeis/geis_event_queue.h
++++ b/libgeis/geis_event_queue.h
+@@ -41,7 +41,7 @@ typedef struct _GeisEventQueue *GeisEventQueue;
+ /**
+  * Creates a new Geis Event queue.
+  */
+-GeisEventQueue geis_event_queue_new();
++GeisEventQueue geis_event_queue_new(void);
+ 
+ /**
+  * Destroys a Geis Event queue.
+diff --git a/libgeis/geis_filter.c b/libgeis/geis_filter.c
+index 4fe5da6..83d65a8 100644
+--- a/libgeis/geis_filter.c
++++ b/libgeis/geis_filter.c
+@@ -57,7 +57,7 @@ static GeisSize s_filter_oid = 0;
+  * Creates a new filter bag,
+  */
+ GeisFilterBag
+-geis_filter_bag_new()
++geis_filter_bag_new(void)
+ {
+   GeisFilterBag bag = calloc(1, sizeof(struct _GeisFilterBag));
+   if (!bag)
+diff --git a/libgeis/geis_filter.h b/libgeis/geis_filter.h
+index 7b613bf..f825bb7 100644
+--- a/libgeis/geis_filter.h
++++ b/libgeis/geis_filter.h
+@@ -42,7 +42,7 @@ typedef GeisFilter *GeisFilterIterator;
+ /**
+  * Creates a new filter bag,
+  */
+-GeisFilterBag geis_filter_bag_new();
++GeisFilterBag geis_filter_bag_new(void);
+ 
+ /**
+  * Destroys a filter bag.
+diff --git a/libgeis/geis_filterable.c b/libgeis/geis_filterable.c
+index 57bd4ac..5fb4b0c 100644
+--- a/libgeis/geis_filterable.c
++++ b/libgeis/geis_filterable.c
+@@ -40,7 +40,7 @@ struct FilterableAttributeBag
+  * Constructs a new filterable attribute bag.
+  */
+ FilterableAttributeBag
+-geis_filterable_attribute_bag_new()
++geis_filterable_attribute_bag_new(void)
+ {
+   FilterableAttributeBag bag = calloc(1, sizeof(struct FilterableAttributeBag));
+   if (!bag)
+diff --git a/libgeis/geis_filterable.h b/libgeis/geis_filterable.h
+index 6d400fc..63c563d 100644
+--- a/libgeis/geis_filterable.h
++++ b/libgeis/geis_filterable.h
+@@ -86,7 +86,7 @@ geis_filterable_attribute_init(GeisFilterableAttribute fa,
+  * Constructs a new filterable attribute bag.
+  */
+ FilterableAttributeBag
+-geis_filterable_attribute_bag_new();
++geis_filterable_attribute_bag_new(void);
+ 
+ /**
+  * Destroys a filterable attribute bag.
+diff --git a/libgeis/geis_frame.c b/libgeis/geis_frame.c
+index ebe11a1..068d9aa 100644
+--- a/libgeis/geis_frame.c
++++ b/libgeis/geis_frame.c
+@@ -57,7 +57,7 @@ struct _GeisFrameSet
+  * Creates a new, empty frame set.
+  */
+ GeisFrameSet
+-geis_frameset_new()
++geis_frameset_new(void)
+ {
+   GeisFrameSet frameset = calloc(1, sizeof(struct _GeisFrameSet));
+   if (!frameset)
+diff --git a/libgeis/geis_frame.h b/libgeis/geis_frame.h
+index e0d1eb6..4a4b0ba 100644
+--- a/libgeis/geis_frame.h
++++ b/libgeis/geis_frame.h
+@@ -32,7 +32,7 @@ typedef struct _GeisFrameSet *GeisFrameSet;
+ /**
+  * Creates a new, empty frame set.
+  */
+-GeisFrameSet geis_frameset_new();
++GeisFrameSet geis_frameset_new(void);
+ 
+ /**
+  * Destroys a frame set and all framees contained in it.
+diff --git a/libgeis/geis_group.c b/libgeis/geis_group.c
+index 0829bd4..4c51a39 100644
+--- a/libgeis/geis_group.c
++++ b/libgeis/geis_group.c
+@@ -42,7 +42,7 @@ struct _GeisGroupSet
+  * Creates a new, empty group set.
+  */
+ GeisGroupSet
+-geis_groupset_new()
++geis_groupset_new(void)
+ {
+   GeisGroupSet groupset = calloc(1, sizeof(struct _GeisGroupSet));
+   if (!groupset)
+diff --git a/libgeis/geis_group.h b/libgeis/geis_group.h
+index 76e0efc..c44ce62 100644
+--- a/libgeis/geis_group.h
++++ b/libgeis/geis_group.h
+@@ -31,7 +31,7 @@
+ /**
+  * Creates a new, empty group set.
+  */
+-GeisGroupSet geis_groupset_new();
++GeisGroupSet geis_groupset_new(void);
+ 
+ /**
+  * Destroys a group set and all groups contained in it.
+diff --git a/libgeis/geis_region.c b/libgeis/geis_region.c
+index fc8cc1e..18181cb 100644
+--- a/libgeis/geis_region.c
++++ b/libgeis/geis_region.c
+@@ -52,7 +52,7 @@ static const int region_bag_growth_constant = 2;
+  * Constructs a region bag.
+  */
+ GeisRegionBag
+-geis_region_bag_new()
++geis_region_bag_new(void)
+ {
+   GeisRegionBag bag = calloc(1, sizeof(struct _GeisRegionBag));
+   if (!bag)
+diff --git a/libgeis/geis_region.h b/libgeis/geis_region.h
+index 53a52b8..18d908f 100644
+--- a/libgeis/geis_region.h
++++ b/libgeis/geis_region.h
+@@ -49,7 +49,7 @@ typedef struct _GeisRegionBag *GeisRegionBag;
+ /**
+  * Creates a new region bag.
+  */
+-GeisRegionBag geis_region_bag_new();
++GeisRegionBag geis_region_bag_new(void);
+ 
+ /**
+  * Destroys a region bag.
+diff --git a/libgeis/geis_touch.c b/libgeis/geis_touch.c
+index 74d1b3e..be0f1a7 100644
+--- a/libgeis/geis_touch.c
++++ b/libgeis/geis_touch.c
+@@ -43,7 +43,7 @@ struct _GeisTouchSet
+  * Creates a new, empty touch set.
+  */
+ GeisTouchSet
+-geis_touchset_new()
++geis_touchset_new(void)
+ {
+   GeisTouchSet touchset = calloc(1, sizeof(struct _GeisTouchSet));
+   if (!touchset)
+diff --git a/libgeis/geis_touch.h b/libgeis/geis_touch.h
+index 62af610..b64c755 100644
+--- a/libgeis/geis_touch.h
++++ b/libgeis/geis_touch.h
+@@ -30,7 +30,7 @@
+ /**
+  * Creates a new, empty touch set.
+  */
+-GeisTouchSet geis_touchset_new();
++GeisTouchSet geis_touchset_new(void);
+ 
+ /**
+  * Destroys a touch set and all touches contained in it.
+diff --git a/libgeis/server/geis_dbus_client_proxy.c b/libgeis/server/geis_dbus_client_proxy.c
+index 3f1af47..65f229b 100644
+--- a/libgeis/server/geis_dbus_client_proxy.c
++++ b/libgeis/server/geis_dbus_client_proxy.c
+@@ -52,7 +52,7 @@ struct GeisDBusClientProxy
+  * failure.
+  */
+ GeisDBusClientProxy
+-_client_proxy_allocate()
++_client_proxy_allocate(void)
+ {
+   GeisDBusClientProxy proxy = calloc(1, sizeof(struct GeisDBusClientProxy));
+   return proxy;
+diff --git a/libgeis/server/geis_dbus_proxy_box.c b/libgeis/server/geis_dbus_proxy_box.c
+index 4c7752a..f129bc3 100644
+--- a/libgeis/server/geis_dbus_proxy_box.c
++++ b/libgeis/server/geis_dbus_proxy_box.c
+@@ -49,7 +49,7 @@ struct GeisDBusProxyBox
+  * Constructs a %GeisDBusProxyBox.
+  */
+ GeisDBusProxyBox
+-geis_dbus_proxy_box_new()
++geis_dbus_proxy_box_new(void)
+ {
+   GeisDBusProxyBox box = calloc(1, sizeof(struct GeisDBusProxyBox));
+   if (!box)
+diff --git a/libgeis/server/geis_dbus_proxy_box.h b/libgeis/server/geis_dbus_proxy_box.h
+index d8a70f5..47e84b7 100644
+--- a/libgeis/server/geis_dbus_proxy_box.h
++++ b/libgeis/server/geis_dbus_proxy_box.h
+@@ -47,7 +47,7 @@ typedef struct GeisDBusProxyBoxNode *GeisDBusProxyBoxIterator;
+  * @returns a valid %GeisDBusProxyBox or NULL on failure.
+  */
+ GeisDBusProxyBox
+-geis_dbus_proxy_box_new();
++geis_dbus_proxy_box_new(void);
+ 
+ /**
+  * Destroys a %GeisDBusProxyBox.
+diff --git a/libs/geis-dbus/geis_dbus_dispatcher.c b/libs/geis-dbus/geis_dbus_dispatcher.c
+index 10c4134..d8a3f9d 100644
+--- a/libs/geis-dbus/geis_dbus_dispatcher.c
++++ b/libs/geis-dbus/geis_dbus_dispatcher.c
+@@ -82,7 +82,7 @@ struct GeisDBusDispatcher
+  * assumption that if you're creating a bag you're going to use it.
+  */
+ static GeisDBusWatchBag 
+-_geis_dbus_watch_bag_new()
++_geis_dbus_watch_bag_new(void)
+ {
+   GeisDBusWatchBag bag = calloc(1, sizeof(struct GeisDBusWatchBag));
+   if (!bag)
+diff --git a/libs/geis-util/geis_logging.c b/libs/geis-util/geis_logging.c
+index a02077b..030a591 100644
+--- a/libs/geis-util/geis_logging.c
++++ b/libs/geis-util/geis_logging.c
+@@ -31,7 +31,7 @@ static const char *error_marker   = "error";
+ 
+ 
+ static int
+-reporting_level()
++reporting_level(void)
+ {
+   char *level = getenv("GEIS_DEBUG");
+   if (level)
+diff --git a/testsuite/geis1/check_gesture_attrs.c b/testsuite/geis1/check_gesture_attrs.c
+index 2228d2f..d990c7c 100644
+--- a/testsuite/geis1/check_gesture_attrs.c
++++ b/testsuite/geis1/check_gesture_attrs.c
+@@ -169,7 +169,7 @@ END_TEST
+ 
+ 
+ Suite *
+-geis1_gesture_attrs_new()
++geis1_gesture_attrs_new(void)
+ {
+   Suite *s = suite_create("geis1_gesture_attrs");
+   TCase *test;
+diff --git a/testsuite/geis1/check_gesture_types.c b/testsuite/geis1/check_gesture_types.c
+index 3492062..980f8fb 100644
+--- a/testsuite/geis1/check_gesture_types.c
++++ b/testsuite/geis1/check_gesture_types.c
+@@ -62,7 +62,7 @@ START_TEST(gesture_types)
+ END_TEST
+ 
+ Suite *
+-geis1_gesture_types_new()
++geis1_gesture_types_new(void)
+ {
+   Suite *s = suite_create("geis1_gesture_types");
+   TCase *test;
+diff --git a/testsuite/geis1/check_instance.c b/testsuite/geis1/check_instance.c
+index ac897ab..584abfd 100644
+--- a/testsuite/geis1/check_instance.c
++++ b/testsuite/geis1/check_instance.c
+@@ -44,7 +44,7 @@ END_TEST
+ 
+ 
+ Suite *
+-geis1_instance_suite_new()
++geis1_instance_suite_new(void)
+ {
+   TCase *create;
+   Suite *s = suite_create("geis1_instance_suite");
+diff --git a/testsuite/geis1/check_subscription.c b/testsuite/geis1/check_subscription.c
+index 0797337..e69c332 100644
+--- a/testsuite/geis1/check_subscription.c
++++ b/testsuite/geis1/check_subscription.c
+@@ -146,7 +146,7 @@ END_TEST
+ 
+ 
+ Suite *
+-geis1_subscription_new()
++geis1_subscription_new(void)
+ {
+   Suite *s = suite_create("geis1_subscription");
+   TCase *test;
+diff --git a/testsuite/geis2/check_attr.c b/testsuite/geis2/check_attr.c
+index 9e01219..58c8ebc 100644
+--- a/testsuite/geis2/check_attr.c
++++ b/testsuite/geis2/check_attr.c
+@@ -42,7 +42,7 @@ END_TEST
+ 
+ /* boilerplate */
+ Suite *
+-geis2_attr_suite_new()
++geis2_attr_suite_new(void)
+ {
+   Suite *s = suite_create("geis2_attr");
+ 
+diff --git a/testsuite/geis2/check_class.c b/testsuite/geis2/check_class.c
+index ca7accd..b60d827 100644
+--- a/testsuite/geis2/check_class.c
++++ b/testsuite/geis2/check_class.c
+@@ -92,7 +92,7 @@ END_TEST
+ 
+ /* boilerplate */
+ Suite *
+-geis2_gesture_class_suite_new()
++geis2_gesture_class_suite_new(void)
+ {
+   TCase *gesture_class;
+   TCase *usage;
+diff --git a/testsuite/geis2/check_config.c b/testsuite/geis2/check_config.c
+index a9fc9c1..03b3137 100644
+--- a/testsuite/geis2/check_config.c
++++ b/testsuite/geis2/check_config.c
+@@ -48,7 +48,7 @@ END_TEST
+ 
+ /* boilerplate */
+ Suite *
+-geis2_config_suite_new()
++geis2_config_suite_new(void)
+ {
+   Suite *s = suite_create("geis2_configuration");
+ 
+diff --git a/testsuite/geis2/check_device.c b/testsuite/geis2/check_device.c
+index 8b3b7be..9583cb5 100644
+--- a/testsuite/geis2/check_device.c
++++ b/testsuite/geis2/check_device.c
+@@ -99,7 +99,7 @@ END_TEST
+ 
+ /* boilerplate */
+ Suite *
+-geis2_device_suite_new()
++geis2_device_suite_new(void)
+ {
+   TCase *device;
+   TCase *usage;
+diff --git a/testsuite/geis2/check_error_codes.c b/testsuite/geis2/check_error_codes.c
+index 9c7508d..57e7fc7 100644
+--- a/testsuite/geis2/check_error_codes.c
++++ b/testsuite/geis2/check_error_codes.c
+@@ -20,7 +20,7 @@ END_TEST
+ 
+ /* boilerplate */
+ Suite *
+-geis2_error_codes_suite_new()
++geis2_error_codes_suite_new(void)
+ {
+   Suite *s = suite_create("geis2_error_codes");
+ 
+diff --git a/testsuite/geis2/check_event.c b/testsuite/geis2/check_event.c
+index 8ecda1d..c752a30 100644
+--- a/testsuite/geis2/check_event.c
++++ b/testsuite/geis2/check_event.c
+@@ -43,7 +43,7 @@ END_TEST
+ 
+ /* boilerplate */
+ Suite *
+-geis2_event_suite_new()
++geis2_event_suite_new(void)
+ {
+   Suite *s = suite_create("geis2_event");
+ 
+diff --git a/testsuite/geis2/check_filter.c b/testsuite/geis2/check_filter.c
+index 3272a2a..afa23e5 100644
+--- a/testsuite/geis2/check_filter.c
++++ b/testsuite/geis2/check_filter.c
+@@ -67,7 +67,7 @@ END_TEST
+ 
+ /* boilerplate */
+ Suite *
+-geis2_filter_suite_new()
++geis2_filter_suite_new(void)
+ {
+   TCase *filter;
+   TCase *usage;
+diff --git a/testsuite/geis2/check_frame.c b/testsuite/geis2/check_frame.c
+index dce6faf..3ea3db0 100644
+--- a/testsuite/geis2/check_frame.c
++++ b/testsuite/geis2/check_frame.c
+@@ -172,7 +172,7 @@ END_TEST
+ 
+ /* boilerplate */
+ Suite *
+-geis2_gesture_frame_suite_new()
++geis2_gesture_frame_suite_new(void)
+ {
+   Suite *s = suite_create("geis2_gesture_frame");
+   TCase *gesture_frame;
+diff --git a/testsuite/geis2/check_geis_new.c b/testsuite/geis2/check_geis_new.c
+index 1fb8de2..36cd3e9 100644
+--- a/testsuite/geis2/check_geis_new.c
++++ b/testsuite/geis2/check_geis_new.c
+@@ -32,7 +32,7 @@ END_TEST
+ 
+ /* boilerplate */
+ Suite *
+-geis2_geis_new_suite_new()
++geis2_geis_new_suite_new(void)
+ {
+   Suite *s = suite_create("geis2_geis_init");
+ 
+diff --git a/testsuite/geis2/check_general_types.c b/testsuite/geis2/check_general_types.c
+index 79e29bb..0f463d4 100644
+--- a/testsuite/geis2/check_general_types.c
++++ b/testsuite/geis2/check_general_types.c
+@@ -20,7 +20,7 @@ END_TEST
+ 
+ /* boilerplate */
+ Suite *
+-geis2_general_types_suite_new()
++geis2_general_types_suite_new(void)
+ {
+   Suite *s = suite_create("geis2_general_types");
+   TCase *create;
+diff --git a/testsuite/geis2/check_region.c b/testsuite/geis2/check_region.c
+index 3e64e0c..606350a 100644
+--- a/testsuite/geis2/check_region.c
++++ b/testsuite/geis2/check_region.c
+@@ -48,7 +48,7 @@ END_TEST
+ 
+ /* boilerplate */
+ Suite *
+-geis2_region_suite_new()
++geis2_region_suite_new(void)
+ {
+   Suite *s = suite_create("geis2_region");
+   TCase *creation;
+diff --git a/testsuite/geis2/check_subscription.c b/testsuite/geis2/check_subscription.c
+index a45c4ad..17a6779 100644
+--- a/testsuite/geis2/check_subscription.c
++++ b/testsuite/geis2/check_subscription.c
+@@ -161,7 +161,7 @@ END_TEST
+ 
+ /* boilerplate */
+ Suite *
+-geis2_subscription_suite_new()
++geis2_subscription_suite_new(void)
+ {
+   TCase *create;
+   TCase *usage;
+diff --git a/tools/geis-server/geis-server.c b/tools/geis-server/geis-server.c
+index 97c8b99..6600d8f 100644
+--- a/tools/geis-server/geis-server.c
++++ b/tools/geis-server/geis-server.c
+@@ -23,7 +23,7 @@
+ 
+ 
+ int
+-main()
++main(void)
+ {
+   GeisStatus status;
+ 
+-- 
+2.37.3
+

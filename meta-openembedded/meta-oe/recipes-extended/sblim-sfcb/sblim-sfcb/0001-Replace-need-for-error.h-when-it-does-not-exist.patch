@@ -16,8 +16,6 @@ Upstream-Status: Pending
  trace.c       |  4 +++-
  5 files changed, 24 insertions(+), 5 deletions(-)
 
-diff --git a/brokerUpc.c b/brokerUpc.c
-index 17cbd9b..fe2b347 100644
 --- a/brokerUpc.c
 +++ b/brokerUpc.c
 @@ -20,8 +20,11 @@
@@ -33,8 +31,6 @@ index 17cbd9b..fe2b347 100644
  #include "support.h"
  #include "native.h"
  #include <sfcCommon/utilft.h>
-diff --git a/configure.ac b/configure.ac
-index ab2964e..d4915a1 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -517,7 +517,7 @@ fi
@@ -46,8 +42,6 @@ index ab2964e..d4915a1 100644
  AC_CHECK_HEADERS([cmpi/cmpimacs.h cmpi/cmpift.h cmpi/cmpidt.h],[],[AC_MSG_ERROR([Could not find required CPMI header.])])
  
  # Checks for typedefs, structures, and compiler characteristics.
-diff --git a/httpAdapter.c b/httpAdapter.c
-index 2719e6c..e768972 100644
 --- a/httpAdapter.c
 +++ b/httpAdapter.c
 @@ -71,7 +71,9 @@
@@ -61,11 +55,15 @@ index 2719e6c..e768972 100644
  /* should probably go into cimRequest.h */
  #define CIM_PROTOCOL_ANY     0
  #define CIM_PROTOCOL_CIM_XML 1
-diff --git a/support.c b/support.c
-index c7bba8b..5b3eef1 100644
 --- a/support.c
 +++ b/support.c
-@@ -32,7 +32,11 @@
+@@ -27,16 +27,20 @@
+  *  @sa native.h
+  */
+ 
++#include "config.h"
+ #include <stdio.h>
+ #include <dlfcn.h>
  #include "support.h"
  #include <stdio.h>
  #include <stdlib.h>
@@ -77,7 +75,11 @@ index c7bba8b..5b3eef1 100644
  #include <errno.h>
  #include "native.h"
  #include "trace.h"
-@@ -331,17 +335,25 @@ loadQualifierDeclMI(const char *provider,
+-#include "config.h"
+ #include "control.h"
+ #include <pthread.h>
+ 
+@@ -331,17 +335,25 @@ loadQualifierDeclMI(const char *provider
    _SFCB_RETURN(NULL);
  };
  
@@ -104,8 +106,6 @@ index c7bba8b..5b3eef1 100644
  /**
   * flag to ensure MM is initialized only once
   */
-diff --git a/trace.c b/trace.c
-index d7f30db..438af46 100644
 --- a/trace.c
 +++ b/trace.c
 @@ -279,7 +279,9 @@ _sfcb_trap(int tn)
@@ -119,6 +119,3 @@ index d7f30db..438af46 100644
  sigHandler     *
  setSignal(int sn, sigHandler * sh, int flags)
  {
--- 
-2.14.1
-

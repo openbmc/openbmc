@@ -150,13 +150,11 @@ remove_broken_musl_sources() {
 	# sync with upstream
 	# https://github.com/linux-test-project/ltp/blob/master/ci/alpine.sh#L33
 	rm -rfv \
-		testcases/kernel/syscalls/confstr/confstr01.c \
 		testcases/kernel/syscalls/fmtmsg/fmtmsg01.c \
 		testcases/kernel/syscalls/getcontext/getcontext01.c \
 		testcases/kernel/syscalls/rt_tgsigqueueinfo/rt_tgsigqueueinfo01.c \
 		testcases/kernel/syscalls/timer_create/timer_create01.c \
-		testcases/kernel/syscalls/timer_create/timer_create03.c \
-		utils/benchmark/ebizzy-0.3
+		testcases/kernel/syscalls/timer_create/timer_create03.c
 }
 do_patch[postfuncs] += "remove_broken_musl_sources"
 

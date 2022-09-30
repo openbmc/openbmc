@@ -185,6 +185,19 @@ index bb07cc244e3..ce161d3c853 100644
  
  /* Pass -d* flags, possibly modifying -dumpdir, -dumpbase et al.
  
+@@ -1265,7 +1270,11 @@ static const char *cc1_options =
+  %{coverage:-fprofile-arcs -ftest-coverage}\
+  %{fprofile-arcs|fprofile-generate*|coverage:\
+    %{!fprofile-update=single:\
+-     %{pthread:-fprofile-update=prefer-atomic}}}";
++     %{pthread:-fprofile-update=prefer-atomic}}}"
++#ifdef POISON_BY_DEFAULT
++ " -Werror=poison-system-directories"
++#endif
++  ;
+
+ static const char *asm_options =
+ "%{-target-help:%:print-asm-header()} "
 diff --git a/gcc/incpath.cc b/gcc/incpath.cc
 index bd2a97938eb..c80f100f476 100644
 --- a/gcc/incpath.cc

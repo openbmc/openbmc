@@ -14,7 +14,9 @@ SRC_URI = "http://nchc.dl.sourceforge.net/project/${BPN}/${BPN}/${PV}/${BPN}-${P
            file://0001-IFNAMSIZ-is-defined-in-net-if.h.patch \
            file://0001-saaldump-atmdump-Include-linux-sockios.h-for-SIOCGST.patch \
            file://0001-make-Add-PREFIX-knob.patch \
-"
+           file://0001-include-string-h-from-memcpy-and-strcpy-function-pro.patch \
+           file://0001-configure-Check-for-symbol-from-libresolv-instead-of.patch \
+           "
 
 SRC_URI:append:libc-musl = " file://musl-no-on_exit.patch"
 

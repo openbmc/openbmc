@@ -16,8 +16,6 @@ Signed-off-by: Harald Geyer <harald@ccbib.org>
  clients/lcdproc/iface.h | 2 +-
  2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/clients/lcdproc/iface.c b/clients/lcdproc/iface.c
-index 40e50cb7..1ac355bd 100644
 --- a/clients/lcdproc/iface.c
 +++ b/clients/lcdproc/iface.c
 @@ -32,6 +32,7 @@
@@ -28,8 +26,6 @@ index 40e50cb7..1ac355bd 100644
  
  static int iface_count = 0;	/* number of interfaces */
  static char unit_label[10] = "B";	/* default unit label is Bytes */
-diff --git a/clients/lcdproc/iface.h b/clients/lcdproc/iface.h
-index cc6dbaaf..c1bd6b5b 100644
 --- a/clients/lcdproc/iface.h
 +++ b/clients/lcdproc/iface.h
 @@ -18,7 +18,7 @@
@@ -41,6 +37,3 @@ index cc6dbaaf..c1bd6b5b 100644
  
  /** Update screen content */
  int iface_screen(int rep, int display, int *flags_ptr);
--- 
-2.28.0
-

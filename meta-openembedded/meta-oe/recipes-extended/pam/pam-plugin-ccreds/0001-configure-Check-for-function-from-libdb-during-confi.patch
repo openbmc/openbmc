@@ -1,0 +1,34 @@
+From 1915754179401b6ee00f0e2ffd844596778e43a2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 1 Sep 2022 12:05:02 -0700
+Subject: [PATCH] configure: Check for function from libdb during configure
+
+checking for main in AC_CHECK_LIB is not the right check to find out if
+a library exists or not, using a function provided by library is more
+appropriate and will help using newer compilers and autoconf in future
+
+Upstream-Status: Submitted [https://github.com/PADL/pam_ccreds/pull/2]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 3829d9f..3d52933 100644
+--- a/configure.in
++++ b/configure.in
+@@ -72,9 +72,9 @@ AC_CHECK_HEADERS(pam/pam_appl.h pam/pam_misc.h pam/pam_modules.h)
+ 
+ AC_CHECK_HEADERS(db.h)
+ 
+-AC_CHECK_LIB(db, main,[LIBS="-ldb $LIBS" found_db_lib=yes],,$LIBS)
++AC_CHECK_LIB(db, db_create,[LIBS="-ldb $LIBS" found_db_lib=yes],,$LIBS)
+ if test -z "$found_db_lib"; then
+-	AC_CHECK_LIB(db1, main,[LIBS="-ldb1 $LIBS" found_db_lib=yes],,$LIBS)
++	AC_CHECK_LIB(db1, db_create,[LIBS="-ldb1 $LIBS" found_db_lib=yes],,$LIBS)
+ fi
+ 
+ AC_CHECK_LIB(pam, pam_start)
+-- 
+2.37.3
+

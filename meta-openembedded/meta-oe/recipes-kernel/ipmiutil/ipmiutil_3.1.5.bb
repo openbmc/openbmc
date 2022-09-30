@@ -22,6 +22,7 @@ PARALLEL_MAKE = ""
 SRC_URI = "${SOURCEFORGE_MIRROR}/ipmiutil/ipmiutil-${PV}.tar.gz \
            file://fix_systemd_path.patch \
            file://0001-Prevent-access-times-from-changing-resulting-gzip-md.patch \
+           file://0001-ihpm-Include-stdlib.h-for-malloc-free-atoi-functions.patch \
           "
 SRC_URI[md5sum] = "292d6df25cad678bb27e5c8cdc6748f9"
 SRC_URI[sha256sum] = "58ccdbd5755d7dd72478756715af09e9c73330dfad2b91dbf03d2ac504b301a3"

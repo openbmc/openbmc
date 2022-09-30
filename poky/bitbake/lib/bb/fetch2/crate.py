@@ -71,7 +71,7 @@ class Crate(Wget):
         ud.parm['downloadfilename'] = "%s-%s.crate" % (name, version)
         ud.parm['name'] = name
 
-        logger.debug("Fetching %s to %s" % (ud.url, ud.parm['downloadfilename']))
+        logger.debug2("Fetching %s to %s" % (ud.url, ud.parm['downloadfilename']))
 
     def unpack(self, ud, rootdir, d):
         """

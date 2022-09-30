@@ -16,6 +16,28 @@
 
 Note: The raspberrypi3 machines include support for Raspberry Pi 3B+.
 
+## Multi-board Machines
+
+This layer generally provides support for machines that are targetting a single
+Raspberry Pi board (or a very few subsets of them). This is so that the build
+infrastructure can tune and tweak the configuration with the flexibility to
+optimise for both runtime performance and disk storage.
+
+For usecases where compatibility of more boards is required, the layer provides
+machines that are tagetting a wider support of Raspberry Pi boards.
+
+### raspberrypi-armv7
+
+This machine targets support for all the ARMv7-based Raspberry Pi boards. It
+will pull in the firmware and deploy the kernel image and kernel modules for
+all the relevant boards.
+
+### raspberrypi-armv8
+
+This machine targets support for all the ARMv8-based Raspberry Pi boards. It
+will pull in the firmware and deploy the kernel image and kernel modules for
+all the relevant boards.
+
 ## Images
 
 * rpi-test-image

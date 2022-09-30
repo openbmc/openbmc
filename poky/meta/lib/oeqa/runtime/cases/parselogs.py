@@ -67,6 +67,8 @@ common_errors = [
     "was skipped because of a failed condition check",
     "was skipped because all trigger condition checks failed",
     "xf86OpenConsole: Switching VT failed",
+    "Failed to read LoaderConfigTimeoutOneShot variable, ignoring: Operation not supported",
+    "Failed to read LoaderEntryOneShot variable, ignoring: Operation not supported",
     ]
 
 video_related = [

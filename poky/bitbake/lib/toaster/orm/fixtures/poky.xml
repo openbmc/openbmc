@@ -42,7 +42,7 @@
   <!-- Releases available -->
   <object model="orm.release" pk="1">
     <field type="CharField" name="name">kirkstone</field>
-    <field type="CharField" name="description">Yocto Project 3.5 "Kirkstone"</field>
+    <field type="CharField" name="description">Yocto Project 4.0 "Kirkstone"</field>
     <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">1</field>
     <field type="CharField" name="branch_name">kirkstone</field>
     <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href="https://git.yoctoproject.org/cgit/cgit.cgi/poky/log/?h=kirkstone"&gt;Yocto Project Kirkstone branch&lt;/a&gt;.</field>

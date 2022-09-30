@@ -9,7 +9,6 @@ inherit autotools-brokensep update-alternatives
 
 DEPENDS += "libtirpc"
 CFLAGS += "-I${STAGING_INCDIR}/tirpc"
-LDLIBS += " -ltirpc "
 
 PR = "r2"
 
@@ -23,13 +22,14 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/lmbench/lmbench-${PV}.tgz \
            file://fix-lmbench-memory-check-failure.patch \
            file://0001-avoid-gcc-optimize-away-the-loops.patch \
            file://0001-lat_http.c-Add-printf-format.patch \
-           file://0001-Check-for-musl-define-guard-before-redefining-sockle.patch \
            file://0002-build-Adjust-CFLAGS-LDFLAGS-to-append-values-passed-.patch \
            file://0001-src-Makefile-use-libdir-instead-of-hardcoded-lib.patch \
            file://0001-lmbench-Point-webpage-lm-to-target-directory.patch \
            file://0001-doc-Fix-typos-in-manual-pages.patch \
            file://0001-lat_fifo-Fix-cleanup-sequence.patch \
            file://0001-doc-Fix-typos-in-lat_unix_connect-manual-page.patch \
+           file://0001-bench.h-Fix-typo-in-specifying-string.h.patch \
+           file://0001-scripts-build-Fix-the-tests-to-build-with-clang15.patch \
            "
 SRC_URI[md5sum] = "b3351a3294db66a72e2864a199d37cbf"
 SRC_URI[sha256sum] = "cbd5777d15f44eab7666dcac418054c3c09df99826961a397d9acf43d8a2a551"
@@ -37,8 +37,11 @@ SRC_URI[sha256sum] = "cbd5777d15f44eab7666dcac418054c3c09df99826961a397d9acf43d8
 UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/lmbench/files/development/"
 UPSTREAM_CHECK_REGEX = "lmbench-(?P<pver>\d+(\.\d+)+-[a-z]+\d+)"
 
+export OS = "${TARGET_SYS}"
+export TARGET = "${TARGET_OS}"
+
 EXTRA_OEMAKE = 'CC="${CC}" AR="${AR}" RANLIB="${RANLIB}" CFLAGS="${CFLAGS}" \
-                LDFLAGS="${LDFLAGS}" LDLIBS="${LDLIBS}" LD="${LD}" OS="${TARGET_SYS}" \
+                LDFLAGS="${LDFLAGS}" LD="${LD}" OS="${TARGET_SYS}" \
                 TARGET="${TARGET_OS}" BASE="${prefix}" MANDIR="${mandir}"'
 
 do_configure() {
@@ -53,7 +56,7 @@ do_compile () {
         CFLAGS="${CFLAGS} -DHAVE_uint"
     fi
     install -d ${S}/bin/${TARGET_SYS}
-    oe_runmake -C src
+    ${S}/scripts/build
 }
 
 do_install () {

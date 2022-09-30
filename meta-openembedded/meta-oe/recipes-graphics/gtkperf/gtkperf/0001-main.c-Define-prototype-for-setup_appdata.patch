@@ -1,0 +1,27 @@
+From 6b5f695cb206cd8b3cbcbcd7713e52772e89306b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 2 Sep 2022 20:47:32 -0700
+Subject: [PATCH] main.c: Define prototype for setup_appdata
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/main.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/main.c b/src/main.c
+index c226799..b4ce6d1 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -18,6 +18,8 @@
+ #include "callbacks.h"
+ #include "appdata.h"
+ 
++void setup_appdata(AppData * appdata_in);
++
+ int
+ main (int argc, char **argv)
+ {
+-- 
+2.37.3
+

@@ -56,13 +56,15 @@ rust_do_install:class-nativesdk() {
     rm ${D}${libdir}/rustlib/manifest*
 }
 
+EXTRA_TOOLS ?= "cargo-clippy clippy-driver rustfmt"
+EXTRA_TOOLS:remove:riscv32 = "rustfmt"
 rust_do_install:class-target() {
     export PSEUDO_UNLOAD=1
     rust_runx install
     unset PSEUDO_UNLOAD
 
     install -d ${D}${bindir}
-    for i in cargo-clippy clippy-driver rustfmt; do
+    for i in ${EXTRA_TOOLS}; do
         cp build/${RUST_BUILD_SYS}/stage2-tools/${RUST_HOST_SYS}/release/$i ${D}${bindir}
         chrpath -r "\$ORIGIN/../lib" ${D}${bindir}/$i
     done

@@ -1,0 +1,64 @@
+From b7a1a4d3259557f2587f7d5d47502691d94c21c2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Sep 2022 20:00:30 -0700
+Subject: [PATCH 1/2] typecast time_t and suseconds_t from std::chrono
+
+This fixes build on some architectures like mips
+progress.cc:125:31: error: non-constant-expression cannot be narrowed from type 'std::chrono::duration<long long>::rep' (aka 'long long') to '__time_t' (aka 'long') in initializer list [-Wc++11-narrowing]
+   struct timeval NowTime = { Now_sec.count(), Now_usec.count() };
+
+Upstream-Status: Submitted [https://salsa.debian.org/apt-team/apt/-/merge_requests/259]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ apt-pkg/acquire.cc           | 4 ++--
+ apt-pkg/contrib/progress.cc  | 2 +-
+ ftparchive/apt-ftparchive.cc | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/apt-pkg/acquire.cc b/apt-pkg/acquire.cc
+index 100ccde..dd0624a 100644
+--- a/apt-pkg/acquire.cc
++++ b/apt-pkg/acquire.cc
+@@ -53,11 +53,11 @@
+ using namespace std;
+ 
+ // helper to convert time_point to a timeval
+-static struct timeval SteadyDurationToTimeVal(std::chrono::steady_clock::duration Time)
++constexpr struct timeval SteadyDurationToTimeVal(std::chrono::steady_clock::duration Time)
+ {
+    auto const Time_sec = std::chrono::duration_cast<std::chrono::seconds>(Time);
+    auto const Time_usec = std::chrono::duration_cast<std::chrono::microseconds>(Time - Time_sec);
+-   return {Time_sec.count(), Time_usec.count()};
++   return timeval{static_cast<time_t>(Time_sec.count()), static_cast<suseconds_t>(Time_usec.count())};
+ }
+ 
+ std::string pkgAcquire::URIEncode(std::string const &part)		/*{{{*/
+diff --git a/apt-pkg/contrib/progress.cc b/apt-pkg/contrib/progress.cc
+index 03f88d4..eb688b9 100644
+--- a/apt-pkg/contrib/progress.cc
++++ b/apt-pkg/contrib/progress.cc
+@@ -122,7 +122,7 @@ bool OpProgress::CheckChange(float Interval)
+    auto const Now = std::chrono::steady_clock::now().time_since_epoch();
+    auto const Now_sec = std::chrono::duration_cast<std::chrono::seconds>(Now);
+    auto const Now_usec = std::chrono::duration_cast<std::chrono::microseconds>(Now - Now_sec);
+-   struct timeval NowTime = { Now_sec.count(), Now_usec.count() };
++   struct timeval NowTime = { static_cast<time_t>(Now_sec.count()), static_cast<suseconds_t>(Now_usec.count()) };
+ 
+    std::chrono::duration<decltype(Interval)> Delta =
+       std::chrono::seconds(NowTime.tv_sec - LastTime.tv_sec) +
+diff --git a/ftparchive/apt-ftparchive.cc b/ftparchive/apt-ftparchive.cc
+index 56fdc22..0a253b1 100644
+--- a/ftparchive/apt-ftparchive.cc
++++ b/ftparchive/apt-ftparchive.cc
+@@ -58,7 +58,7 @@ static struct timeval GetTimevalFromSteadyClock()			/*{{{*/
+    auto const Time = std::chrono::steady_clock::now().time_since_epoch();
+    auto const Time_sec = std::chrono::duration_cast<std::chrono::seconds>(Time);
+    auto const Time_usec = std::chrono::duration_cast<std::chrono::microseconds>(Time - Time_sec);
+-   return { Time_sec.count(), Time_usec.count() };
++   return { static_cast<time_t>(Time_sec.count()), static_cast<suseconds_t>(Time_usec.count()) };
+ }
+ 									/*}}}*/
+ static auto GetTimeDeltaSince(struct timeval StartTime)			/*{{{*/
+-- 
+2.37.3
+

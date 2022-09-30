@@ -8,10 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552"
 
 SRCREV = "6fa6a0e07644f20abf2596f78a60112713e11cbe"
 UPSTREAM_CHECK_COMMITS = "1"
-SRC_URI = "git://pagure.io/xmlto.git;protocol=https;branch=master \
-           file://configure.in-drop-the-test-of-xmllint-and-xsltproc.patch \
-           file://0001-Skip-validating-xmlto-output.patch \
-"
+SRC_URI = "git://pagure.io/xmlto.git;protocol=https;branch=master"
 S = "${WORKDIR}/git"
 
 PV .= "+0.0.29+git${SRCPV}"
@@ -34,11 +31,11 @@ RDEPENDS:${PN}:append:class-target = " \
                   libxslt-bin \
                   coreutils \
 "
-CACHED_CONFIGUREVARS += "ac_cv_path_TAIL=tail ac_cv_path_GREP=grep"
+CACHED_CONFIGUREVARS += "ac_cv_path_TAIL=tail ac_cv_path_GREP=grep ac_cv_path_XMLLINT=xmllint ac_cv_path_XSLTPROC=xsltproc"
 
 BBCLASSEXTEND = "native"
 
-EXTRA_OECONF:append = " BASH=/bin/bash GCP=/bin/cp XMLLINT=xmllint XSLTPROC=xsltproc"
+EXTRA_OECONF:append = " BASH=/bin/bash GCP=/bin/cp"
 
 do_configure:prepend() {
     (cd ${S} && flex -o xmlif/xmlif.c xmlif/xmlif.l)

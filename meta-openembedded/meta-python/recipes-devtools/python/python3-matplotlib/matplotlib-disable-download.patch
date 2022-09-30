@@ -6,10 +6,11 @@ Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
 
 --- a/setup.py
 +++ b/setup.py
-@@ -317,7 +317,6 @@ setup(  # Finally, pass this all along t
+@@ -316,8 +316,6 @@ setup(  # Finally, pass this all along t
+     setup_requires=[
          "certifi>=2020.06.20",
          "numpy>=1.17",
-         "setuptools_scm>=4",
+-        "setuptools_scm>=4,<7",
 -        "setuptools_scm_git_archive",
      ],
      install_requires=[

@@ -9,7 +9,7 @@ FILES:${PN} += "${datadir}/icons/hicolor"
 GTKIC_VERSION ??= '3'
 
 GTKPN = "${@ 'gtk4' if d.getVar('GTKIC_VERSION') == '4' else 'gtk+3' }"
-GTKIC_CMD = "${@ 'gtk-update-icon-cache-3.0.0' if d.getVar('GTKIC_VERSION') == '4' else 'gtk4-update-icon-cache' }"
+GTKIC_CMD = "${@ 'gtk4-update-icon-cache' if d.getVar('GTKIC_VERSION') == '4' else 'gtk-update-icon-cache-3.0' }"
 
 #gtk+3/gtk4 require GTK3DISTROFEATURES, DEPENDS on it make all the
 #recipes inherit this class require GTK3DISTROFEATURES

@@ -1,0 +1,28 @@
+From b9db43e36ad0942d33cb4db5b394abd722862568 Mon Sep 17 00:00:00 2001
+From: Andrei Gherzan <andrei.gherzan@huawei.com>
+Date: Fri, 9 Sep 2022 20:28:06 +0200
+Subject: [PATCH] Default 43455 firmware to standard variant
+
+The firmware for 43455 is loaded as a symlink: brcmfmac43455-sdio.bin.
+This symlink is now broken as the debian package handles the right
+target of this symlink through a postinstall. We don't have that logic
+here so we default to the standard variant.
+
+Upstream-Status: Inappropriate [issue reported at https://github.com/RPi-Distro/firmware-nonfree/issues/26]
+Signed-off-by: Andrei Gherzan <andrei.gherzan@huawei.com>
+---
+ debian/config/brcm80211/brcm/brcmfmac43455-sdio.bin | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/debian/config/brcm80211/brcm/brcmfmac43455-sdio.bin b/debian/config/brcm80211/brcm/brcmfmac43455-sdio.bin
+index 9c39208..b914838 120000
+--- a/debian/config/brcm80211/brcm/brcmfmac43455-sdio.bin
++++ b/debian/config/brcm80211/brcm/brcmfmac43455-sdio.bin
+@@ -1 +1 @@
+-../cypress/cyfmac43455-sdio.bin
+\ No newline at end of file
++../cypress/cyfmac43455-sdio-standard.bin
+\ No newline at end of file
+-- 
+2.25.1
+

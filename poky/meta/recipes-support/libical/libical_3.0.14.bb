@@ -12,13 +12,12 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=1910a2a76ddf6a9ba369182494170d87 \
                     "
 SECTION = "libs"
 
-SRC_URI = "https://github.com/${BPN}/${BPN}/releases/download/v${PV}/${BP}.tar.gz \
+SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/${BP}.tar.gz \
            file://0001-cmake-Do-not-export-CC-into-gir-compiler.patch \
           "
 SRC_URI[sha256sum] = "4284b780356f1dc6a01f16083e7b836e63d3815e27ed0eaaad684712357ccc8f"
-UPSTREAM_CHECK_URI = "https://github.com/libical/libical/releases"
 
-inherit cmake pkgconfig gobject-introspection vala
+inherit cmake pkgconfig gobject-introspection vala github-releases
 
 DEPENDS += "libical-native"
 

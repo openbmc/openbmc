@@ -30,7 +30,16 @@ diff --git a/src/common/config_info.c b/src/common/config_info.c
 index e72e729..b482c20 100644
 --- a/src/common/config_info.c
 +++ b/src/common/config_info.c
-@@ -123,74 +123,6 @@ get_configdata(const char *my_exec_path, size_t *configdata_len)
+@@ -38,7 +38,7 @@
+ 	int			i = 0;
+ 
+ 	/* Adjust this to match the number of items filled below */
+-	*configdata_len = 23;
++	*configdata_len = 14;
+ 	configdata = (ConfigData *) palloc(*configdata_len * sizeof(ConfigData));
+ 
+ 	configdata[i].name = pstrdup("BINDIR");
+@@ -123,74 +123,6 @@
  	configdata[i].setting = pstrdup(path);
  	i++;
  

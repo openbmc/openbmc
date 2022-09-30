@@ -430,3 +430,34 @@ the device tree is properly tweaked. Also, mind the runtime components that
 take advantage of your RTC device. You can do that by checking what is
 included/configured in the build system based on the inclusion of `rtc` in
 `MACHINE_FEATURES`.
+
+## Raspberry Pi Distro VLC
+
+To enable Raspberry Pi Distro VLC, the `meta-openembedded/meta-multimedia` layer must be
+included in your `bblayers.conf`.
+
+VLC does not support HW accelerated video decode through MMAL on a 64-bit OS.
+
+See:
+* <https://forums.raspberrypi.com/viewtopic.php?t=275370>
+* <https://forums.raspberrypi.com/viewtopic.php?t=325218#p1946169>
+
+MMAL is not enabled by default. To enable it add
+
+    DISABLE_VC4GRAPHICS = "1"
+
+to `local.conf`. Adding `vlc` to `IMAGE_INSTALL` will then default to building the Raspberry
+Pi's Distro implementation of VLC with HW accelerated video decode through MMAL into the system
+image. It also defaults to building VLC with Raspberry PI's Distro implementation of ffmpeg. The
+oe-core implementation of ffmpeg and the meta-openembedded/meta-multimedia implementation of VLC
+can however be selected via:
+
+    PREFERRED_PROVIDER_ffmpeg = "ffmpeg"
+    PREFERRED_PROVIDER_vlc = "vlc"
+
+Usage example: Start VLC with mmal_vout plugin and without an active display server.
+
+    DISPLAYNUM=$(tvservice -l | tail -c 2)
+    MMAL_DISPLAY=$(expr $DISPLAYNUM + 1)
+    VLC_SETTINGS="-I dummy --vout=mmal_vout --mmal-resize --mmal-display hdmi-$MMAL_DISPLAY --no-dbus"
+    cvlc $VLC_SETTINGS <video/playlist>

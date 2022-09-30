@@ -1,28 +1,28 @@
-From 52c38fa9f3a790a7c2805e7d8cce3ea9262d6ae2 Mon Sep 17 00:00:00 2001
+CVE: CVE-2022-1050
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/20220403095234.2210-1-yuval.shaia.ml@gmail.com/]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From dbdef95c272e8f3ec037c3db4197c66002e30995 Mon Sep 17 00:00:00 2001
 From: Yuval Shaia <yuval.shaia.ml@gmail.com>
-Date: Tue, 12 Apr 2022 11:01:51 +0100
-Subject: [PATCH 10/12] hw/pvrdma: Protect against buggy or malicious guest
- driver
+Date: Sun, 3 Apr 2022 12:52:34 +0300
+Subject: [PATCH] hw/pvrdma: Protect against buggy or malicious guest driver
 
 Guest driver might execute HW commands when shared buffers are not yet
 allocated.
-This might happen on purpose (malicious guest) or because some other
-guest/host address mapping.
+This could happen on purpose (malicious guest) or because of some other
+guest/host address mapping error.
 We need to protect againts such case.
 
-Reported-by: Mauro Matteo Cascella <mcascell@redhat.com>
+Fixes: CVE-2022-1050
+
+Reported-by: Raven <wxhusst@gmail.com>
 Signed-off-by: Yuval Shaia <yuval.shaia.ml@gmail.com>
-
-CVE: CVE-2022-1050
-Upstream-Status: Submitted [https://lists.nongnu.org/archive/html/qemu-devel/2022-03/msg05197.html]
-
 ---
- hw/rdma/vmw/pvrdma_cmd.c  | 6 ++++++
- hw/rdma/vmw/pvrdma_main.c | 3 ++-
- 2 files changed, 8 insertions(+), 1 deletion(-)
+ hw/rdma/vmw/pvrdma_cmd.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-index da7ddfa54..89db963c4 100644
+index da7ddfa548..89db963c46 100644
 --- a/hw/rdma/vmw/pvrdma_cmd.c
 +++ b/hw/rdma/vmw/pvrdma_cmd.c
 @@ -796,6 +796,12 @@ int pvrdma_exec_cmd(PVRDMADev *dev)
@@ -38,20 +38,6 @@ index da7ddfa54..89db963c4 100644
      if (dsr_info->req->hdr.cmd >= sizeof(cmd_handlers) /
                        sizeof(struct cmd_handler)) {
          rdma_error_report("Unsupported command");
-diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index 91206dbb8..0b7d908e2 100644
---- a/hw/rdma/vmw/pvrdma_main.c
-+++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -249,7 +249,8 @@ static void init_dsr_dev_caps(PVRDMADev *dev)
- {
-     struct pvrdma_device_shared_region *dsr;
- 
--    if (dev->dsr_info.dsr == NULL) {
-+    if (!dev->dsr_info.dsr) {
-+        /* Buggy or malicious guest driver */
-         rdma_error_report("Can't initialized DSR");
-         return;
-     }
 -- 
-2.30.2
+2.34.1
 

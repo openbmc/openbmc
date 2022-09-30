@@ -5,7 +5,9 @@ LIC_FILES_CHKSUM = "file://LICENSE_1_0.txt;md5=e4224ccaecb14d942c71d31bef20d78c"
 SECTION = "libs"
 DEPENDS = "boost"
 
-SRC_URI = "${SOURCEFORGE_MIRROR}/project/${BPN}/${BPN}/${BP}/${BP}.tar.gz"
+SRC_URI = "${SOURCEFORGE_MIRROR}/project/${BPN}/${BPN}/${BP}/${BP}.tar.gz \
+           file://0001-Do-not-use-std-shuffle-with-clang-15.patch \
+           "
 SRC_URI[sha256sum] = "615e5f7e4b52007f3a3b4050a99aadf6346b56b5098eb08b3a650836083c6a33"
 
 TESTCONFIG = '-DSOCI_TEST_EMPTY_CONNSTR="dummy" -DSOCI_TEST_SQLITE3_CONNSTR="test.db" \

@@ -1,0 +1,41 @@
+From 93557d5c5acf9ebb2c0fa708658e1d36621dd23a Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Wed, 7 Sep 2022 10:05:15 +0900
+Subject: [PATCH] Do not download the catch framework during configure.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ tests/CMakeLists.txt | 15 ---------------
+ 1 file changed, 15 deletions(-)
+
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 80c4f6a..ae210db 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -74,21 +74,6 @@ if(Catch2_FOUND)
+   endif()
+   message(STATUS "Found Catch2")
+   target_link_libraries(catch_main PUBLIC Catch2::Catch2)
+-else()
+-  message(STATUS "Downloading Catch2")
+-
+-  # FetchContent would be better, but requires newer CMake.
+-  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/catch2")
+-  set(url https://github.com/philsquared/Catch/releases/download/v2.13.7/catch.hpp)
+-  file(
+-    DOWNLOAD ${url} "${CMAKE_CURRENT_BINARY_DIR}/catch2/catch.hpp"
+-    STATUS status
+-    EXPECTED_HASH SHA256=ea379c4a3cb5799027b1eb451163dff065a3d641aaba23bf4e24ee6b536bd9bc)
+-  list(GET status 0 error)
+-  if(error)
+-    message(FATAL_ERROR "Could not download ${url}, and Catch2 not found on your system.")
+-  endif()
+-  target_include_directories(catch_main PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
+ endif()
+ 
+ # Target must already exist
+-- 
+2.25.1
+

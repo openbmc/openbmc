@@ -1,4 +1,4 @@
-From 7ef2621ab7adcedc099ed39acfb73c6fa835cbc3 Mon Sep 17 00:00:00 2001
+From a334fac72112c01cd322f7c97ef7ca21457ab52f Mon Sep 17 00:00:00 2001
 From: "A. Wilcox" <AWilcox@Wilcox-Tech.com>
 Date: Sun, 15 May 2022 05:04:10 +0000
 Subject: [PATCH] Make netgroup support optional
@@ -37,7 +37,7 @@ Signed-off-by: Marta Rybczynska <marta.rybczynska@huawei.com>
  9 files changed, 43 insertions(+), 8 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 59858df..5a7fc11 100644
+index ca4b9f2..4c5d596 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -100,7 +100,7 @@ AC_CHECK_LIB(expat,XML_ParserCreate,[EXPAT_LIBS="-lexpat"],

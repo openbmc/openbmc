@@ -1,0 +1,28 @@
+From 64292091fe3e8ea7c9bfe74af730b2ff5428bf10 Mon Sep 17 00:00:00 2001
+From: Matt Johnston <matt@ucc.asn.au>
+Date: Sat, 23 Apr 2022 22:33:31 +0800
+Subject: [PATCH] Fix X11 build failure, use DROPBEAR_PRIO_LOWDELAY
+
+Upstream-Status: Backport
+
+Signed-off-by: Daniel Gomez <daniel@qtec.com>
+---
+ svr-x11fwd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/svr-x11fwd.c b/svr-x11fwd.c
+index 353cb12..5d9e6a9 100644
+--- a/svr-x11fwd.c
++++ b/svr-x11fwd.c
+@@ -206,7 +206,7 @@ void x11cleanup(struct ChanSess *chansess) {
+ }
+
+ static int x11_inithandler(struct Channel *channel) {
+-	channel->prio = DROPBEAR_CHANNEL_PRIO_INTERACTIVE;
++	channel->prio = DROPBEAR_PRIO_LOWDELAY;
+ 	return 0;
+ }
+
+--
+2.35.1
+

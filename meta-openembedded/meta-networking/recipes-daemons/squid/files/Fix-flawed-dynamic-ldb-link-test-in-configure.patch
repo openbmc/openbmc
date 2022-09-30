@@ -19,7 +19,7 @@ diff --git a/configure.ac b/configure.ac
 index d2f7feb..c7ae568 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -3235,6 +3235,16 @@ case "$host" in
+@@ -3268,6 +3268,16 @@ case "$host" in
  		;;
  esac
  

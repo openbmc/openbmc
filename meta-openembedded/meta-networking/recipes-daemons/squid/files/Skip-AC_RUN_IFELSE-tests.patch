@@ -38,10 +38,10 @@ index ad0ba60..4477446 100644
    ])
  ]) dnl SQUID_CHECK_KRB5_HEIMDAL_BROKEN_KRB5_H
 diff --git a/acinclude/lib-checks.m4 b/acinclude/lib-checks.m4
-index 7624b56..b449c5a 100644
+index 1e9333527c..2d42787029 100644
 --- a/acinclude/lib-checks.m4
 +++ b/acinclude/lib-checks.m4
-@@ -217,7 +217,9 @@ AC_DEFUN([SQUID_CHECK_OPENSSL_CONST_SSL_METHOD],[
+@@ -227,7 +227,9 @@ AC_DEFUN([SQUID_CHECK_OPENSSL_CONST_SSL_METHOD],[
    [
     AC_MSG_RESULT([no])
    ],
@@ -52,14 +52,15 @@ index 7624b56..b449c5a 100644
  
  SQUID_STATE_ROLLBACK(check_const_SSL_METHOD)
  ])
-@@ -377,7 +379,9 @@ AC_DEFUN([SQUID_CHECK_OPENSSL_TXTDB],[
+@@ -386,8 +386,9 @@ AC_DEFUN([SQUID_CHECK_OPENSSL_TXTDB],[
+   [
     AC_MSG_RESULT([yes])
     AC_DEFINE(SQUID_USE_SSLLHASH_HACK, 1)
-   ],
+-  ],
 -[])
-+[
-+   AC_MSG_RESULT([skipped - can't test in cross-compiled env])
-+])
++  ],[
++    AC_MSG_RESULT([skipped - can't test in cross-compiled env])
++  ])
  
  SQUID_STATE_ROLLBACK(check_TXTDB)
  ])

@@ -9,7 +9,7 @@ DEPENDS = "gperf-native"
 
 PROVIDES = "udev"
 
-SRC_URI = "https://github.com/eudev-project/${BPN}/releases/download/v${PV}/${BP}.tar.gz \
+SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/${BP}.tar.gz \
            file://init \
            file://local.rules \
            file://0001-build-Remove-dead-g-i-r-configuration.patch \
@@ -17,10 +17,9 @@ SRC_URI = "https://github.com/eudev-project/${BPN}/releases/download/v${PV}/${BP
 
 SRC_URI[sha256sum] = "19847cafec67897da855fde56f9dc7d92e21c50e450aa79068a7e704ed44558b"
 
-UPSTREAM_CHECK_URI = "https://github.com/eudev-project/eudev/releases"
-UPSTREAM_CHECK_REGEX = "eudev-(?P<pver>\d+(\.\d+)+)\.tar"
+GITHUB_BASE_URI = "https://github.com/eudev-project/eudev/releases"
 
-inherit autotools update-rc.d qemu pkgconfig features_check manpages
+inherit autotools update-rc.d qemu pkgconfig features_check manpages github-releases
 
 CONFLICT_DISTRO_FEATURES = "systemd"
 

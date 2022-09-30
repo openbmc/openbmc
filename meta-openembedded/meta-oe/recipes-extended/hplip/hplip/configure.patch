@@ -1,10 +1,9 @@
 --- a/configure.in
 +++ b/configure.in
-@@ -27,8 +27,7 @@
+@@ -30,7 +30,7 @@
+ AC_INIT([HP Linux Imaging and Printing], [3.22.6], [3.22.6], [hplip])
  
- #AC_PREREQ(2.59)
- AC_INIT([HP Linux Imaging and Printing], [3.19.12], [3.19.12], [hplip])
--#AM_INIT_AUTOMAKE([1.9 foreign])
+ #AM_INIT_AUTOMAKE([1.9 foreign])
 -AM_INIT_AUTOMAKE
 +AM_INIT_AUTOMAKE([foreign])
  AC_DISABLE_STATIC

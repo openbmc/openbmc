@@ -7,43 +7,18 @@ Subject: [PATCH] remove tests dep on gobject-intro
  src/ws/Makefile-ws.am | 54 ---------------------------------------------------
  1 file changed, 54 deletions(-)
 
-diff --git a/src/ws/Makefile-ws.am b/src/ws/Makefile-ws.am
-index 009130941..34e13d7fe 100644
 --- a/src/ws/Makefile-ws.am
 +++ b/src/ws/Makefile-ws.am
-@@ -246,60 +246,6 @@ EXTRA_DIST += \
+@@ -58,46 +58,6 @@ pam_cockpit_cert_so_LDFLAGS = -shared
+ pam_cockpit_cert_so_SOURCES = src/ws/pam_cockpit_cert.c
  
- # ----------------------------------------------------------------------------------------------------
- 
--noinst_PROGRAMS += test-server
+ # -----------------------------------------------------------------------------
+-# test-server: server for running the html/browser unit tests against
+-
 -check_PROGRAMS += test-server
 -
--GDBUS_CODEGEN_XML = $(srcdir)/src/ws/com.redhat.Cockpit.DBusTests.xml
--
--GDBUS_CODEGEN_GENERATED = \
--	src/ws/mock-dbus-tests.h \
--	src/ws/mock-dbus-tests.c \
--	$(NULL)
--
--# FIXME: --header/--body and --output are only available from GLib 2.56.
--# just use --generate-c-code and a bit of dependency ugliness for now
--GDBUS_CODEGEN_INVOCATION = \
--	$(AM_V_GEN) gdbus-codegen \
--	--interface-prefix com.redhat.Cockpit.DBusTests \
--	--c-namespace Test \
--	--c-generate-object-manager \
--	--generate-c-code src/ws/mock-dbus-tests \
--	$(GDBUS_CODEGEN_XML)
--
--BUILT_SOURCES += $(GDBUS_CODEGEN_GENERATED)
--CLEANFILES += $(GDBUS_CODEGEN_GENERATED)
--EXTRA_DIST += $(GDBUS_CODEGEN_XML)
--
--src/ws/mock-dbus-tests.h: $(GDBUS_CODEGEN_XML)
--	$(GDBUS_CODEGEN_INVOCATION)
--
--src/ws/mock-dbus-tests.c: $(GDBUS_CODEGEN_XML) src/ws/mock-dbus-tests.h
--	$(GDBUS_CODEGEN_INVOCATION)
+-test_server_CPPFLAGS = $(libcockpit_ws_a_CPPFLAGS) $(TEST_CPP)
+-test_server_LDADD = $(libcockpit_ws_a_LIBS) $(TEST_LIBS)
 -
 -test_server_SOURCES = \
 -	src/ws/mock-service.c \
@@ -51,27 +26,33 @@ index 009130941..34e13d7fe 100644
 -	src/ws/test-server.c \
 -	$(NULL)
 -
--nodist_test_server_SOURCES = \
--	$(GDBUS_CODEGEN_GENERATED) \
+-test_server_CPPFLAGS += -I$(top_builddir)/src/ws
+-nodist_test_server_SOURCES = $(GDBUS_CODEGEN_GENERATED)
+-
+-BUILT_SOURCES += $(GDBUS_CODEGEN_GENERATED)
+-CLEANFILES += $(GDBUS_CODEGEN_GENERATED)
+-GDBUS_CODEGEN_GENERATED = \
+-	src/ws/mock-dbus-tests.h \
+-	src/ws/mock-dbus-tests.c \
 -	$(NULL)
 -
--test_server_CFLAGS = 					\
--	-I$(builddir)/src/ws \
--	-I$(top_srcdir)/src/ws \
--	-DG_LOG_DOMAIN=\"test-server\"			\
--	$(GIO_CFLAGS)					\
--	$(COCKPIT_WS_CFLAGS) \
+-EXTRA_DIST += $(GDBUS_CODEGEN_XML)
+-GDBUS_CODEGEN_XML = $(srcdir)/src/ws/com.redhat.Cockpit.DBusTests.xml
+-
+-GDBUS_CODEGEN_INVOCATION = \
+-	$(AM_V_GEN) gdbus-codegen \
+-	--interface-prefix com.redhat.Cockpit.DBusTests \
+-	--c-namespace Test \
+-	--c-generate-object-manager \
 -	$(NULL)
 -
--test_server_LDADD = 					\
--	$(libcockpit_ws_LIBS) \
--	$(GIO_LIBS)					\
--	-lpam 						\
--	$(NULL)
+-src/ws/mock-dbus-tests.h: $(GDBUS_CODEGEN_XML)
+-	$(GDBUS_CODEGEN_INVOCATION) --header --output $@ $<
 -
- WS_CHECKS = \
- 	test-base64 \
- 	test-creds \
--- 
-2.11.0
-
+-src/ws/mock-dbus-tests.c: $(GDBUS_CODEGEN_XML)
+-	$(GDBUS_CODEGEN_INVOCATION) --body --output $@ $<
+-
+-# -----------------------------------------------------------------------------
+ # Unit tests
+ 
+ check_SCRIPTS += src/ws/mock-cat-with-init

@@ -1,0 +1,26 @@
+From c7753f82261d49862d5e0f9691bf87799d36ef0c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 31 Aug 2022 16:20:03 -0700
+Subject: [PATCH] client: Include string.h form mem* function prototypes
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ client.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/client.c b/client.c
+index 883b1de..e474e55 100644
+--- a/client.c
++++ b/client.c
+@@ -16,6 +16,7 @@
+    on your Linux system; if not, write to the Free Software Foundation, 
+    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
+ #include <stdio.h>
++#include <string.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
+ #include <unistd.h>
+-- 
+2.37.3
+

@@ -27,6 +27,8 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/daemons/autofs/v5/autofs-${PV}.tar.gz \
            file://0001-Bug-fix-for-pid_t-not-found-on-musl.patch \
            file://0001-Define-__SWORD_TYPE-if-undefined.patch \
            file://mount_conflict.patch \
+           file://0001-autofs-5.1.8-add-autofs_strerror_r-helper-for-musl.patch \
+           file://0002-autofs-5.1.8-handle-innetgr-not-present-in-musl.patch \
            "
 SRC_URI[sha256sum] = "0bd401c56f0eb1ca6251344c3a3d70bface3eccf9c67117cd184422c4cace30c"
 

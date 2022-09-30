@@ -259,6 +259,7 @@ RDEPENDS:packagegroup-meta-networking-support = "\
     ettercap \
 "
 RDEPENDS:packagegroup-meta-networking-support:remove:mipsarch = "memcached"
+RDEPENDS:packagegroup-meta-networking-support:remove:libc-musl = "ypbind-mt"
 
 EXCLUDE_FROM_WORLD = "1"
 # Empty packages, only devel headers and libs

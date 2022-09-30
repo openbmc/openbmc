@@ -1,0 +1,27 @@
+target/arm: mark SP_EL1 with ARM_CP_EL3_NO_EL2_KEEP
+
+SP_EL1 must be kept when EL3 is present but EL2 is not. Therefore mark
+it with ARM_CP_EL3_NO_EL2_KEEP.
+
+Fixes: 696ba3771894 ("target/arm: Handle cpreg registration for missing EL")
+Signed-off-by: Jerome Forissier <jerome.forissier@linaro.org>
+
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/qemu-devel/2022-09/msg04515.html]
+
+---
+ target/arm/helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: qemu-7.1.0/target/arm/helper.c
+===================================================================
+--- qemu-7.1.0.orig/target/arm/helper.c
++++ qemu-7.1.0/target/arm/helper.c
+@@ -4971,7 +4971,7 @@ static const ARMCPRegInfo v8_cp_reginfo[
+       .fieldoffset = offsetof(CPUARMState, sp_el[0]) },
+     { .name = "SP_EL1", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 4, .crn = 4, .crm = 1, .opc2 = 0,
+-      .access = PL2_RW, .type = ARM_CP_ALIAS,
++      .access = PL2_RW, .type = ARM_CP_ALIAS | ARM_CP_EL3_NO_EL2_KEEP,
+       .fieldoffset = offsetof(CPUARMState, sp_el[1]) },
+     { .name = "SPSel", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 0, .crn = 4, .crm = 2, .opc2 = 0,

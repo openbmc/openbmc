@@ -11,4 +11,4 @@ inherit pypi
 inherit setuptools3
 
 DEPENDS += "python3-pbr-native"
-RDEPENDS_${PN} = "python3-requests python3-urllib3"
+RDEPENDS:${PN} = "python3-requests python3-urllib3"

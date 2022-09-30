@@ -8,6 +8,7 @@ PV = "1.1+gitr${SRCPV}"
 
 SRC_URI = "git://github.com/freesmartphone/cornucopia.git;branch=master;protocol=https \
            file://0001-serial_forward-Disable-default-static-linking.patch;striplevel=3 \
+           file://0001-correct-the-typo-in-include-file-name-string.h.patch;striplevel=3 \
           "
 S = "${WORKDIR}/git/tools/serial_forward"
 

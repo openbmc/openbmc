@@ -18,22 +18,41 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  madt/madt.c | 18 +++++++++++++++++-
  1 file changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/madt/madt.c b/madt/madt.c
-index aed965c..8770cd5 100644
 --- a/madt/madt.c
 +++ b/madt/madt.c
-@@ -51,7 +51,9 @@ get_next_entry(acpi_table_entry_header * entry_header)
+@@ -34,14 +34,16 @@ typedef unsigned long long u64;
+ //#include <sys/mman.h>
+ #include <stdio.h> // fread
+ #include <stdlib.h> // malloc
++#include <string.h> // memset/memcpy
+ 
+ #include "./tables.c"
+ 
+ int verbose = 0;
+ /*
+-/* read standard input
++ * read standard input
+  * write decoded madt to standard output
+  */
++size_t
+ get_next_entry(acpi_table_entry_header * entry_header)
+ {
+ 	size_t retval;
+@@ -51,9 +53,11 @@ get_next_entry(acpi_table_entry_header *
  	return retval;
  }
  
 -u8	buffer[1024];
-+
+ 
+-main()
 +u8	buf[1024];
 +u8	*buffer = buf;
- 
- main()
++int
++main(int argc, char *argv[])
  {
-@@ -75,6 +77,17 @@ main()
+ 	size_t retval;
+ 	struct acpi_table_madt *madt_header;
+@@ -75,6 +79,17 @@ main()
  
  	if (verbose) printf("header.length %d\n", madt_header->header.length);
  
@@ -51,7 +70,7 @@ index aed965c..8770cd5 100644
  	acpi_table_print((void*)&(buffer[bytes_read]), 0);
  
  	bytes_read = sizeof(struct acpi_table_madt);
-@@ -118,6 +131,9 @@ done:
+@@ -118,6 +133,9 @@ done:
  		printf("Checksum 0x%x != 0; 0x%x in header ERROR\n", csum,
  			 madt_header->header.checksum);
  
@@ -61,6 +80,3 @@ index aed965c..8770cd5 100644
  	return 0;
  }
  
--- 
-1.8.1.2
-

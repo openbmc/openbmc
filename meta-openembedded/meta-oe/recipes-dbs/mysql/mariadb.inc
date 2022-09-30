@@ -224,6 +224,17 @@ RDEPENDS:${PN}-setupdb = "coreutils"
 # Allow old code to link to the backward compatible library
 RDEPENDS:libmysqlclient-dev = "libmysqlclient-r-dev"
 
+PACKAGE_PREPROCESS_FUNCS += "src_package_preprocess"
+src_package_preprocess () {
+        # Trim build paths from comments in generated sources to ensure reproducibility
+        sed -i -e "s,${S}/sql/,,g" \
+               -e "s,${B}/sql/,,g" \
+            ${B}/sql/yy_oracle.hh \
+            ${B}/sql/yy_mariadb.cc \
+            ${B}/sql/yy_mariadb.hh \
+            ${B}/sql/yy_oracle.cc
+}
+
 FILES:libmysqlclient = "\
     ${libdir}/libmysqlclient.so.* \
     ${libdir}/libmariadb.so.* \

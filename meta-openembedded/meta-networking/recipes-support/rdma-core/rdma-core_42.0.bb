@@ -5,7 +5,9 @@ SECTION = "libs"
 DEPENDS = "libnl"
 RDEPENDS:${PN} = "bash perl"
 
-SRC_URI = "git://github.com/linux-rdma/rdma-core.git;branch=master;protocol=https"
+SRC_URI = "git://github.com/linux-rdma/rdma-core.git;branch=master;protocol=https \
+           file://0001-examples-Include-alloca.h-for-strdupa.patch \
+           "
 SRCREV = "196bad56ed060612e22674b668b5ec3d8659ade3"
 S = "${WORKDIR}/git"
 

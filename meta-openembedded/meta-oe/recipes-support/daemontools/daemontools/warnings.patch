@@ -1,0 +1,74 @@
+Fixup misc warnings
+
+Patch by RiverRat
+
+http://bugs.gentoo.org/124487
+
+--- a/src/chkshsgr.c
++++ b/src/chkshsgr.c
+@@ -1,10 +1,13 @@
+ /* Public domain. */
+ 
++#include <sys/types.h>
++#include <stdlib.h>
++#include <grp.h>
+ #include <unistd.h>
+ 
+ int main()
+ {
+-  short x[4];
++  gid_t x[4];
+ 
+   x[0] = x[1] = 0;
+   if (getgroups(1,x) == 0) if (setgroups(1,x) == -1) _exit(1);
+--- a/src/matchtest.c
++++ b/src/matchtest.c
+@@ -1,3 +1,4 @@
++#include <unistd.h>
+ #include "match.h"
+ #include "buffer.h"
+ #include "str.h"
+--- a/src/multilog.c
++++ b/src/multilog.c
+@@ -1,3 +1,4 @@
++#include <stdio.h>
+ #include <unistd.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+--- a/src/prot.c
++++ b/src/prot.c
+@@ -1,5 +1,8 @@
+ /* Public domain. */
+ 
++#include <sys/types.h>
++#include <unistd.h>
++#include <grp.h>
+ #include "hasshsgr.h"
+ #include "prot.h"
+ 
+--- a/src/seek_set.c
++++ b/src/seek_set.c
+@@ -1,6 +1,7 @@
+ /* Public domain. */
+ 
+ #include <sys/types.h>
++#include <unistd.h>
+ #include "seek.h"
+ 
+ #define SET 0 /* sigh */
+--- a/src/supervise.c
++++ b/src/supervise.c
+@@ -1,3 +1,4 @@
++#include <stdio.h>
+ #include <unistd.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+--- a/src/pathexec_run.c
++++ b/src/pathexec_run.c
+@@ -1,5 +1,6 @@
+ /* Public domain. */
+ 
++#include <unistd.h>
+ #include "error.h"
+ #include "stralloc.h"
+ #include "str.h"

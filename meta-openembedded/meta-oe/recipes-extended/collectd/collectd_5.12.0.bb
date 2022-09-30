@@ -51,6 +51,7 @@ PACKAGECONFIG[libatasmart] = "--with-libatasmart,--without-libatasmart,libatasma
 PACKAGECONFIG[ldap] = "--enable-openldap --with-libldap,--disable-openldap --without-libldap, openldap"
 PACKAGECONFIG[rrdtool] = "--enable-rrdtool,--disable-rrdtool,rrdtool"
 PACKAGECONFIG[rrdcached] = "--enable-rrdcached,--disable-rrdcached,rrdcached"
+PACKAGECONFIG[python] = "--enable-python,--disable-python"
 
 EXTRA_OECONF = " \
                 ${FPLAYOUT} \

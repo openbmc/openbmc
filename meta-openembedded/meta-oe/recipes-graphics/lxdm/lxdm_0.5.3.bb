@@ -19,6 +19,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/project/${BPN}/${BPN}%20${PV}/${BPN}-${PV}.tar.
            file://0008-greeter.c-show-information-on-gtk-label-info.patch \
            file://0009-greeter.c-disallow-empty-new-password.patch \
            file://0001-systemd-lxdm.service-remove-plymouth-quit-conflicts.patch \
+           file://0001-Initialize-msghdr-struct-in-a-portable-way.patch \
            "
 SRC_URI[md5sum] = "061caae432634e6db38bbdc84bc6ffa0"
 SRC_URI[sha256sum] = "4891efee81c72a400cc6703e40aa76f3f3853833d048b72ec805da0f93567f2f"

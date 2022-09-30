@@ -1,0 +1,130 @@
+From: Till Kamppeter <till.kamppeter@gmail.com>
+Date: Fri, 22 Jul 2016 09:33:04 +0200
+Subject: Workaround patch for missing Python3 transition of the old
+ (pre-USB-storage) photo memory card support (pcardext) as this part builds
+ in Python3 environments but with pointer-related warnings which are fatal
+ errors for Ubuntu's build servers. The patch silences the warnings but the
+ memory card support is dropped in Python3 environments. This patch is
+ supplied by the HPLIP upstream developers and will be replaced by a more
+ proper solution in the next upstream release of HPLIP (see LP: #1275353)
+
+---
+ pcard/pcardext/pcardext.c | 59 +++++++++++++++++++++++++++++++++++++----------
+ pcard/photocard.py        |  2 +-
+ unload.py                 |  5 ++++
+ 3 files changed, 53 insertions(+), 13 deletions(-)
+
+--- a/pcard/pcardext/pcardext.c
++++ b/pcard/pcardext/pcardext.c
+@@ -20,7 +20,7 @@ pcardext - Python extension for HP photo
+ Requires:
+ Python 2.2+
+ 
+-Author: Don Welch
++Author: Don Welch
+ 
+ \*****************************************************************************/
+ 
+@@ -41,9 +41,37 @@ typedef int Py_ssize_t;
+ 
+ int verbose=0;
+ 
++#if PY_MAJOR_VERSION >= 3
++  #define MOD_ERROR_VAL NULL
++  #define MOD_SUCCESS_VAL(val) val
++  #define MOD_INIT(name) PyMODINIT_FUNC PyInit_##name(void)
++  #define PyInt_AS_LONG PyLong_AS_LONG
++  #define MOD_DEF(ob, name, doc, methods) \
++          static struct PyModuleDef moduledef = { \
++            PyModuleDef_HEAD_INIT, name, doc, -1, methods, }; \
++          ob = PyModule_Create(&moduledef);
++
++
++  #define PY_String_Bytes  PyBytes_FromStringAndSize
++  #define PY_AsString_Bytes  PyBytes_AsStringAndSize
++
++#else
++  #define MOD_ERROR_VAL
++  #define MOD_SUCCESS_VAL(val)
++  #define MOD_INIT(name) void init##name(void)
++  #define MOD_DEF(ob, name, doc, methods)         \
++        ob = Py_InitModule3(name, methods, doc);
++
++  #define PY_String_Bytes PyString_FromStringAndSize
++  #define PY_AsString_Bytes PyString_AsStringAndSize
++
++#endif
++
+ PyObject * readsectorFunc = NULL;
+ PyObject * writesectorFunc = NULL;
+ 
++
++
+ int ReadSector(int sector, int nsector, void *buf, int size)
+ {
+     PyObject * result;
+@@ -59,9 +87,13 @@ int ReadSector(int sector, int nsector,
+         if( result )
+         {
+             Py_ssize_t len = 0;
+-            PyString_AsStringAndSize( result, &result_str, &len );
++
++            //PyString_AsStringAndSize( result, &result_str, &len );
++            //PyBytes_AsStringAndSize( result, &result_str, &len );
++            PY_AsString_Bytes( result, &result_str, &len );
+             
+-            if( len < nsector*FAT_HARDSECT )
++
++	    if( len < nsector*FAT_HARDSECT )
+             {
+                 goto abort;
+             }
+@@ -208,7 +240,9 @@ PyObject * pcardext_read( PyObject * sel
+     
+     if( FatReadFileExt( name, offset, len, buffer ) == len )
+     {
+-        return PyString_FromStringAndSize( (char *)buffer, len );
++        // return PyString_FromStringAndSize( (char *)buffer, len );
++        return PY_String_Bytes( (char *)buffer, len );
++        // return PyBytes_FromStringAndSize( (char *)buffer, len );
+     }
+     else
+     {
+@@ -236,14 +270,15 @@ static PyMethodDef pcardext_methods[] =
+ 
+ static char pcardext_documentation[] = "Python extension for HP photocard services";
+ 
+-void initpcardext( void )
+-{
+-    PyObject * mod = Py_InitModule4( "pcardext", pcardext_methods, 
+-                                     pcardext_documentation, (PyObject*)NULL, 
+-                                     PYTHON_API_VERSION );
+-                     
+-    if (mod == NULL)
+-      return;
++MOD_INIT(pcardext)  {
++
++  PyObject* mod ;
++  MOD_DEF(mod, "pcardext", pcardext_documentation, pcardext_methods);
++  if (mod == NULL)
++    return MOD_ERROR_VAL;
++
++  return MOD_SUCCESS_VAL(mod);
++
+ }
+ 
+ 
+--- a/unload.py
++++ b/unload.py
+@@ -44,6 +44,11 @@ except ImportError:
+ 
+ # Local
+ from base.g import *
++from base.sixext import PY3
++if PY3:
++    log.error("This functionality is not spported in python3 environment.")
++    sys.exit(1)
++
+ from base import device, utils, tui, module
+ from prnt import cups
+ 

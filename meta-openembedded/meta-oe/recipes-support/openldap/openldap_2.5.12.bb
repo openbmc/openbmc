@@ -22,6 +22,7 @@ SRC_URI = "http://www.openldap.org/software/download/OpenLDAP/openldap-release/$
     file://0001-build-top.mk-unset-STRIP_OPTS.patch \
     file://0001-libraries-Makefile.in-ignore-the-mkdir-errors.patch \
     file://0001-librewrite-include-ldap_pvt_thread.h-before-redefini.patch \
+    file://0001-configure-Pass-pthread_t-to-pthread_detach.patch \
 "
 
 SRC_URI[sha256sum] = "d5086cbfc49597fa7d0670a429a9054552d441b16ee8b2435412797ab0e37b96"

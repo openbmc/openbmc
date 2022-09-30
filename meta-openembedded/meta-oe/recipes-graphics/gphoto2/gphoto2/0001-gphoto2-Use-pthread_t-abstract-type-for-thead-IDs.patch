@@ -1,0 +1,39 @@
+From 23c67e93e51f700d0aeecfc08277e39f51201fc3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 2 Sep 2022 12:59:46 -0700
+Subject: [PATCH] gphoto2: Use pthread_t abstract type for thead IDs
+
+This is not a plain old datatype in every libc, e.g. with musl this
+would fail in type conversion
+
+Upstream-Status: Submitted [https://github.com/gphoto/gphoto2/pull/535]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gphoto2/main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gphoto2/main.c b/gphoto2/main.c
+index 2bf5964..9a6b05d 100644
+--- a/gphoto2/main.c
++++ b/gphoto2/main.c
+@@ -1198,7 +1198,7 @@ thread_func (void *data)
+ 	pthread_cleanup_pop (1);
+ }
+ 
+-static unsigned int
++static pthread_t
+ start_timeout_func (Camera *camera, unsigned int timeout,
+ 		    CameraTimeoutFunc func, void __unused__ *data)
+ {
+@@ -1219,7 +1219,7 @@ start_timeout_func (Camera *camera, unsigned int timeout,
+ }
+ 
+ static void
+-stop_timeout_func (Camera __unused__ *camera, unsigned int id,
++stop_timeout_func (Camera __unused__ *camera, pthread_t id,
+ 		   void __unused__ *data)
+ {
+ 	pthread_t tid = id;
+-- 
+2.37.3
+

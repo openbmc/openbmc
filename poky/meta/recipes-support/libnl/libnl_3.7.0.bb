@@ -14,17 +14,17 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 
 DEPENDS = "flex-native bison-native"
 
-SRC_URI = "https://github.com/thom311/${BPN}/releases/download/${BPN}${@d.getVar('PV').replace('.','_')}/${BP}.tar.gz \
+SRC_URI = "${GITHUB_BASE_URI}/download/${BPN}${@d.getVar('PV').replace('.','_')}/${BP}.tar.gz \
            file://enable-serial-tests.patch \
            file://run-ptest \
            "
 
 SRC_URI[sha256sum] = "9fe43ccbeeea72c653bdcf8c93332583135cda46a79507bfd0a483bb57f65939"
 
+GITHUB_BASE_URI = "https://github.com/thom311/${BPN}/releases"
+UPSTREAM_CHECK_REGEX = "releases/tag/libnl(?P<pver>.+)"
 
-UPSTREAM_CHECK_URI = "https://github.com/thom311/${BPN}/releases"
-
-inherit autotools pkgconfig ptest
+inherit autotools pkgconfig ptest github-releases
 
 FILES:${PN} = "${libdir}/libnl-3.so.* \
                ${libdir}/libnl.so.* \

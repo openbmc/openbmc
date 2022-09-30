@@ -1,4 +1,4 @@
-From f35e07aceb4a16121d83b47ee77990018bec98ea Mon Sep 17 00:00:00 2001
+From 28b9f115e36e2133301b02fa02ad71a8efbed9b9 Mon Sep 17 00:00:00 2001
 From: Joe Slater <jslater@windriver.com>
 Date: Thu, 9 Mar 2017 10:58:06 -0800
 Subject: [PATCH] chrony: fix build failure for arma9
@@ -22,12 +22,13 @@ Subject: [PATCH] chrony: fix build failure for arma9
     Refreshed for 4.0
 
     Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  sys_linux.c | 15 +++++++++------
  1 file changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/sys_linux.c b/sys_linux.c
-index 9cab2ef..8104b8f 100644
+index f2baab1..14a9241 100644
 --- a/sys_linux.c
 +++ b/sys_linux.c
 @@ -484,7 +484,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
@@ -45,8 +46,8 @@ index 9cab2ef..8104b8f 100644
 -    SCMP_SYS(getrlimit),
      SCMP_SYS(getuid),
      SCMP_SYS(getuid32),
-     SCMP_SYS(rt_sigaction),
-@@ -508,7 +506,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
+ #ifdef __NR_rseq
+@@ -511,7 +509,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
      /* Memory */
      SCMP_SYS(brk),
      SCMP_SYS(madvise),
@@ -54,7 +55,7 @@ index 9cab2ef..8104b8f 100644
      SCMP_SYS(mmap2),
      SCMP_SYS(mprotect),
      SCMP_SYS(mremap),
-@@ -568,8 +565,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
+@@ -571,8 +568,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
      SCMP_SYS(sendmsg),
      SCMP_SYS(sendto),
      SCMP_SYS(shutdown),
@@ -63,7 +64,7 @@ index 9cab2ef..8104b8f 100644
  
      /* General I/O */
      SCMP_SYS(_newselect),
-@@ -593,7 +588,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
+@@ -596,7 +591,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
  #ifdef __NR_futex_time64
      SCMP_SYS(futex_time64),
  #endif
@@ -71,7 +72,7 @@ index 9cab2ef..8104b8f 100644
      SCMP_SYS(set_robust_list),
      SCMP_SYS(write),
  
-@@ -601,6 +595,15 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
+@@ -604,6 +598,15 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
      SCMP_SYS(getrandom),
      SCMP_SYS(sysinfo),
      SCMP_SYS(uname),
@@ -87,6 +88,3 @@ index 9cab2ef..8104b8f 100644
    };
  
    const int denied_any[] = {
--- 
-2.25.1
-

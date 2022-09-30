@@ -1,0 +1,21 @@
+From a27d6264671e7201b5d78bcc9200e7d946429979 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 2 Sep 2022 17:57:53 -0700
+Subject: [PATCH 3/4] pserror.c: Define column to be int explcitly
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ prnt/hpps/pserror.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/prnt/hpps/pserror.c
++++ b/prnt/hpps/pserror.c
+@@ -24,7 +24,7 @@ extern char *program ;	/* Defined by mai
+ void message(int flags, char *format, ...)
+ {
+   va_list args ;
+-  static column = 0 ;		/* current screen column for message wrap */
++  static int column = 0 ;	/* current screen column for message wrap */
+   char msgbuf[MAX_MESSAGE] ;	/* buffer in which to put the message */
+   char *bufptr = msgbuf ;	/* message buffer pointer */
+ 

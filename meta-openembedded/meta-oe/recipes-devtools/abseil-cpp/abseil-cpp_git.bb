@@ -7,8 +7,8 @@ SECTION = "libs"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=df52c6edb7adc22e533b2bacc3bd3915"
 
-PV = "20220623.0"
-SRCREV = "273292d1cfc0a94a65082ee350509af1d113344d"
+PV = "20220623.1"
+SRCREV = "8c0b94e793a66495e0b1f34a5eb26bd7dc672db0"
 BRANCH = "lts_2022_06_23"
 SRC_URI = "git://github.com/abseil/abseil-cpp;branch=${BRANCH};protocol=https \
            file://0001-absl-always-use-asm-sgidefs.h.patch             \

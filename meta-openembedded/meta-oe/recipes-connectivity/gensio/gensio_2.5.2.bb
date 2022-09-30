@@ -9,6 +9,7 @@ SRCREV = "b6cd354afe6d5f63bc859c94fd3a455a3cdf0449"
 
 SRC_URI = "git://github.com/cminyard/gensio;protocol=https;branch=master \
            file://0001-tools-gensiot-Fix-build-with-musl.patch \
+           file://0001-configure-Check-for-request_init-API-when-probing-fo.patch \
 "
 
 S = "${WORKDIR}/git"

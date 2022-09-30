@@ -13,11 +13,11 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  lib/rpmrc.c | 19 ++++++++++++++-----
  1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/lib/rpmrc.c b/lib/rpmrc.c
-index 19fe80f98..6b27b3941 100644
---- a/lib/rpmrc.c
-+++ b/lib/rpmrc.c
-@@ -455,10 +455,14 @@ const char * lookupInDefaultTable(const char * name,
+Index: git/lib/rpmrc.c
+===================================================================
+--- git.orig/lib/rpmrc.c
++++ git/lib/rpmrc.c
+@@ -455,10 +455,14 @@ const char * lookupInDefaultTable(const
  static void setDefaults(void)
  {
      const char *confdir = rpmConfigDir();
@@ -46,7 +46,7 @@ index 19fe80f98..6b27b3941 100644
      }
  #else
      macrofiles = MACROFILES;
-@@ -989,7 +993,11 @@ static void read_auxv(void)
+@@ -997,7 +1001,11 @@ static void read_auxv(void)
   */
  static void defaultMachine(rpmrcCtx ctx, const char ** arch, const char ** os)
  {
@@ -59,7 +59,7 @@ index 19fe80f98..6b27b3941 100644
      static struct utsname un;
      char * chptr;
      canonEntry canon;
-@@ -1286,6 +1294,7 @@ static void defaultMachine(rpmrcCtx ctx, const char ** arch, const char ** os)
+@@ -1307,6 +1315,7 @@ static void defaultMachine(rpmrcCtx ctx,
  
      if (arch) *arch = un.machine;
      if (os) *os = un.sysname;
@@ -67,6 +67,3 @@ index 19fe80f98..6b27b3941 100644
  }
  
  static
--- 
-2.11.0
-

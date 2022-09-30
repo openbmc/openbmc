@@ -9,11 +9,15 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2814b59e00e7918c864fa3b6bbe049b4"
 
 PV = "1.6+git${SRCPV}"
-SRC_URI = "git://github.com/stedolan/jq;protocol=https;branch=master"
-SRCREV = "a9f97e9e61a910a374a5d768244e8ad63f407d3e"
+SRC_URI = "git://github.com/stedolan/jq;protocol=https;branch=master \
+    file://0001-configure-Pass-_XOPEN_SOURCE-when-checking-for-strpt.patch \
+    file://0002-builtin-Replace-_BSD_SOURCE-with-_DEFAULT_SOURCE.patch \
+    file://run-ptest \
+    "
+SRCREV = "cff5336ec71b6fee396a95bb0e4bea365e0cd1e8"
 S = "${WORKDIR}/git"
 
-inherit autotools-brokensep
+inherit autotools-brokensep ptest
 
 PACKAGECONFIG ?= "oniguruma"
 
@@ -24,5 +28,13 @@ PACKAGECONFIG[oniguruma] = "--with-oniguruma,--without-oniguruma,onig"
 EXTRA_OECONF += " \
     --disable-valgrind \
 "
+
+do_install_ptest() {
+    cp -rf ${B}/tests ${D}${PTEST_PATH}
+    cp -rf ${B}/.libs ${D}${PTEST_PATH}
+    # libjq.so.* is packaged in the main jq component, so remove it from ptest
+    rm -f ${D}${PTEST_PATH}/.libs/libjq.so.*
+    ln -sf ${bindir}/jq ${D}${PTEST_PATH}
+}
 
 BBCLASSEXTEND = "native"

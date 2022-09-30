@@ -49,7 +49,6 @@ SRC_URI = "${BASEURI} \
            file://0009-gcc-armv4-pass-fix-v4bx-to-linker-to-support-EABI.patch \
            file://0010-Use-the-multilib-config-files-from-B-instead-of-usin.patch \
            file://0011-Avoid-using-libdir-from-.la-which-usually-points-to-.patch \
-           file://0012-export-CPP.patch \
            file://0013-Ensure-target-gcc-headers-can-be-included.patch \
            file://0014-Don-t-search-host-directory-during-relink-if-inst_pr.patch \
            file://0015-libcc1-fix-libcc1-s-install-path-and-rpath.patch \
@@ -59,10 +58,8 @@ SRC_URI = "${BASEURI} \
            file://0019-Re-introduce-spe-commandline-options.patch \
            file://0020-libgcc_s-Use-alias-for-__cpu_indicator_init-instead-.patch \
            file://0021-gentypes-genmodes-Do-not-use-__LINE__-for-maintainin.patch \
-           file://0022-mingw32-Enable-operation_not_supported.patch \
            file://0023-libatomic-Do-not-enforce-march-on-aarch64.patch \
            file://0024-Fix-install-path-of-linux64.h.patch \
-           file://0025-Move-sched.h-include-ahead-of-user-headers.patch \
            file://0026-rust-recursion-limit.patch \
            file://prefix-map-realpath.patch \
            file://hardcoded-paths.patch \

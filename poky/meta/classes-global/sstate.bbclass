@@ -784,6 +784,7 @@ def pstaging_fetch(sstatefetch, d):
         uris += ['file://{0}.sig;downloadfilename={0}.sig'.format(sstatefetch)]
 
     for srcuri in uris:
+        localdata.delVar('SRC_URI')
         localdata.setVar('SRC_URI', srcuri)
         try:
             fetcher = bb.fetch2.Fetch([srcuri], localdata, cache=False)

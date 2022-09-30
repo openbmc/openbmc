@@ -203,7 +203,7 @@ Load the kernel, and boot the system as follows:
 
  5. Download the kernel and boot:
 
- => tftp tftp $loadaddr vmlinux
+ => tftp $loadaddr vmlinux
  => bootoctlinux $loadaddr coremask=0x3 root=/dev/nfs rw nfsroot=<nfsroot ip>:<rootfs path> ip=<board ip>:<server ip>:<gateway ip>:<netmask>:edgerouter:eth0:off mtdparts=phys_mapped_flash:512k(boot0),512k(boot1),64k@3072k(eeprom)
 
 --- Booting from USB disk ---

@@ -1,0 +1,48 @@
+From c33e07f78982acfb0574a84fb523f8591e55c50e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 11 Sep 2022 19:46:28 -0700
+Subject: [PATCH] subpel_variance_neon: Provide prototypes for missing
+ functions
+
+Fixes build with clang-15
+aom_dsp/arm/subpel_variance_neon.c:121:10: error: call to undeclared function 'aom_variance8x8_neon'; ISO C99 and later do not support implicit function dec
+larations [-Wimplicit-function-declaration]
+|   return aom_variance8x8_neon(temp2, 8, dst, dst_stride, sse);
+|          ^
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ aom_dsp/arm/subpel_variance_neon.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/aom_dsp/arm/subpel_variance_neon.c b/aom_dsp/arm/subpel_variance_neon.c
+index 4ecf891cbeb..859168ea0c5 100644
+--- a/aom_dsp/arm/subpel_variance_neon.c
++++ b/aom_dsp/arm/subpel_variance_neon.c
+@@ -20,6 +20,22 @@
+ #include "aom_dsp/aom_filter.h"
+ #include "aom_dsp/variance.h"
+ 
++extern unsigned int aom_variance8x8_neon(const uint8_t *a, int a_stride,
++                                         const uint8_t *b, int b_stride,
++                                         unsigned int *sse);
++
++extern unsigned int aom_variance16x16_neon(const uint8_t *a, int a_stride,
++                                         const uint8_t *b, int b_stride,
++                                         unsigned int *sse);
++
++extern unsigned int aom_variance32x32_neon(const uint8_t *a, int a_stride,
++                                         const uint8_t *b, int b_stride,
++                                         unsigned int *sse);
++
++extern unsigned int aom_variance64x64_neon(const uint8_t *a, int a_stride,
++                                         const uint8_t *b, int b_stride,
++                                         unsigned int *sse);
++
+ // Load 2 sets of 4 bytes when alignment is not guaranteed.
+ static INLINE uint8x8_t load_unaligned_u8(const uint8_t *buf, int stride) {
+   uint32_t a;
+-- 
+2.37.3
+

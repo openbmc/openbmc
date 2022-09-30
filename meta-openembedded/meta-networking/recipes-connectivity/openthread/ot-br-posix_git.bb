@@ -17,14 +17,18 @@ PV = "0.3.0+git${SRCPV}"
 SRC_URI = "gitsm://github.com/openthread/ot-br-posix.git;protocol=https;branch=main \
            file://0001-otbr-agent.service.in-remove-pre-exec-hook-for-mdns-.patch \
            file://0001-cmake-Disable-nonnull-compare-warning-on-gcc.patch \
+           file://0001-bn_mul.h-fix-x86-PIC-inline-ASM-compilation-with-GCC.patch \
+           file://mbedtls.patch \
+           file://unused_var.patch \
            "
 
 S = "${WORKDIR}/git"
 SYSTEMD_SERVICE:${PN} = "otbr-agent.service"
 
 inherit pkgconfig cmake systemd
-
-CXXFLAGS:append:libc-musl:toolchain-clang = " -Wno-error=sign-compare"
+# openthread/repo/src/cli/cli.cpp:1786:18: fatal error: variable 'i' set but not used [-Wunused-but-set-variable]
+#    for (uint8_t i = 0;; i++)
+CXXFLAGS:append:libc-musl:toolchain-clang = " -Wno-error=sign-compare -Wno-error=unused-but-set-variable"
 
 EXTRA_OECMAKE = "-DBUILD_TESTING=OFF \
                  -DOTBR_DBUS=ON \
@@ -53,7 +57,7 @@ EXTRA_OECMAKE = "-DBUILD_TESTING=OFF \
                  -DOT_DHCP6_SERVER=ON \
                  "
 
-RDEPENDS:${PN} = "iproute2 avahi-daemon"
+RDEPENDS:${PN} = "iproute2 ipset avahi-daemon"
 
 RCONFLICTS:${PN} = "ot-daemon"
 

@@ -483,6 +483,31 @@ overview of their function and contents.
          You must set this variable in the external environment in order
          for it to work.
 
+   :term:`BB_PRESSURE_MAX_CPU`
+      The threshold for maximum CPU pressure before BitBake prevents the
+      scheduling of new tasks. Once the :term:`BB_PRESSURE_MAX_CPU` threshold
+      is exceeded, new tasks are not started until the pressure subsides to
+      below the threshold. If :term:`BB_PRESSURE_MAX_CPU` is not set, CPU
+      pressure is not monitored. A threshold can be set in ``conf/local.conf``
+      as::
+
+         BB_PRESSURE_MAX_CPU = "500"
+
+   :term:`BB_PRESSURE_MAX_IO`
+      The threshold for maximum IO pressure experienced before BitBake
+      prevents the scheduling of new tasks. The IO pressure is regulated in the
+      same way as :term:`BB_PRESSURE_MAX_CPU`. At this point in time,
+      experiments show that IO pressure tends to be short-lived and regulating
+      just the CPU can help to reduce it.
+
+   :term:`BB_PRESSURE_MAX_MEMORY`
+      The threshold for maximum memory pressure experienced before BitBake
+      prevents the scheduling of new tasks. The memory pressure is regulated in
+      the same way as :term:`BB_PRESSURE_MAX_CPU`. Note that any memory
+      pressure indicates that a system is being pushed beyond its capacity. At
+      this point in time, experiments show that memory pressure tends to be
+      short-lived and regulating just the CPU can help to reduce it.
+
    :term:`BB_RUNFMT`
       Specifies the name of the executable script files (i.e. run files)
       saved into ``${``\ :term:`T`\ ``}``. By default, the

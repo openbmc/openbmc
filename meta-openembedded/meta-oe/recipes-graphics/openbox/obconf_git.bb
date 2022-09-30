@@ -14,6 +14,7 @@ PV = "2.0.4+git${SRCPV}"
 SRCREV = "63ec47c5e295ad4f09d1df6d92afb7e10c3fec39"
 SRC_URI = " \
     git://git.openbox.org/dana/obconf;branch=master \
+    file://0001-Fix-function-protype-visibility.patch \
 "
 
 S = "${WORKDIR}/git"

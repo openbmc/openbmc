@@ -28,9 +28,11 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  lib/rpmscript.c | 11 ++++++++---
  1 file changed, 8 insertions(+), 3 deletions(-)
 
---- a/lib/rpmscript.c
-+++ b/lib/rpmscript.c
-@@ -17,7 +17,7 @@
+Index: git/lib/rpmscript.c
+===================================================================
+--- git.orig/lib/rpmscript.c
++++ git/lib/rpmscript.c
+@@ -18,7 +18,7 @@
  #include "rpmio/rpmio_internal.h"
  
  #include "lib/rpmplugins.h"     /* rpm plugins hooks */
@@ -39,7 +41,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  #include "debug.h"
  
  struct scriptNextFileFunc_s {
-@@ -391,8 +391,7 @@ exit:
+@@ -427,8 +427,7 @@ exit:
  	Fclose(out);	/* XXX dup'd STDOUT_FILENO */
  
      if (fn) {
@@ -49,18 +51,18 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  	free(fn);
      }
      free(mline);
-@@ -426,7 +425,13 @@ rpmRC rpmScriptRun(rpmScript script, int
+@@ -462,7 +461,13 @@ rpmRC rpmScriptRun(rpmScript script, int
  
      if (rc != RPMRC_FAIL) {
  	if (script_type & RPMSCRIPTLET_EXEC) {
--	    rc = runExtScript(plugins, prefixes, script->descr, lvl, scriptFd, &args, script->body, arg1, arg2, &script->nextFileFunc);
+-	    rc = runExtScript(plugins, prefixes, script->descr, lvl, scriptFd, &args, script->body, arg1, arg2, script->nextFileFunc);
 +	    if (getenv("RPM_NO_CHROOT_FOR_SCRIPTS") != NULL) {
 +		rpmChrootOut();
-+		rc = runExtScript(plugins, prefixes, script->descr, lvl, scriptFd, &args, script->body, arg1, arg2, &script->nextFileFunc);
++		rc = runExtScript(plugins, prefixes, script->descr, lvl, scriptFd, &args, script->body, arg1, arg2, script->nextFileFunc);
 +		rpmChrootIn();
 +	    } else {
-+		rc = runExtScript(plugins, prefixes, script->descr, lvl, scriptFd, &args, script->body, arg1, arg2, &script->nextFileFunc);
++		rc = runExtScript(plugins, prefixes, script->descr, lvl, scriptFd, &args, script->body, arg1, arg2, script->nextFileFunc);
 +	    }
  	} else {
- 	    rc = runLuaScript(plugins, prefixes, script->descr, lvl, scriptFd, &args, script->body, arg1, arg2, &script->nextFileFunc);
+ 	    rc = runLuaScript(plugins, prefixes, script->descr, lvl, scriptFd, &args, script->body, arg1, arg2, script->nextFileFunc);
  	}

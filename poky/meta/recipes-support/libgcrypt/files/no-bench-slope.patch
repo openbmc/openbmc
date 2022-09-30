@@ -1,0 +1,20 @@
+The bench-slope test appears to be aborting fairly frequently, which causes
+failures on the autobuilder.
+
+Until this has been root-caused, disable the test.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/tests/testdrv.c b/tests/testdrv.c
+index 0ccde326..d3455186 100644
+--- a/tests/testdrv.c
++++ b/tests/testdrv.c
+@@ -77,7 +77,6 @@ static struct {
+    { "t-x448"      },
+    { "t-ed448"     },
+    { "benchmark"   },
+-   { "bench-slope" },
+    { "hashtest-256g",  "hashtest", "--gigs 256 SHA1 SHA256 SHA512 SM3",
+      LONG_RUNNING },
+    { NULL }

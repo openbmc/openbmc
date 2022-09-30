@@ -11,6 +11,7 @@ SRC_URI = "http://www.codon.org.uk/~mjg59/libx86/downloads/${BPN}-${PV}.tar.gz \
            file://libx86-mmap-offset.patch \
            file://0001-assume-zero-is-valid-address.patch \
            file://makefile-add-ldflags.patch \
+           file://0001-Fix-type-of-the-void-pointer-assignment.patch \
 "
 
 SRC_URI[md5sum] = "41bee1f8e22b82d82b5f7d7ba51abc2a"

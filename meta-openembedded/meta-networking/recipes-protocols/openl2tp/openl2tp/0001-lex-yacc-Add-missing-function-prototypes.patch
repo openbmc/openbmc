@@ -1,0 +1,45 @@
+From 2bfdd02d288de92ff118bf41b54c135a6a318c19 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 29 Aug 2022 23:42:11 -0700
+Subject: [PATCH] lex/yacc: Add missing function prototypes
+
+Fixes build with clang15
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ l2tp_config_parse.y | 3 +++
+ l2tp_config_token.l | 3 +++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/l2tp_config_parse.y b/l2tp_config_parse.y
+index 4baf1e0..15392d0 100644
+--- a/l2tp_config_parse.y
++++ b/l2tp_config_parse.y
+@@ -29,6 +29,9 @@ static struct l2tp_api_session_msg_data session;
+ 
+ extern void l2tp_log(int level, char *fmt, ...);
+ extern void yyfatal(const char *s);
++extern const char *l2tp_strerror(int error);
++extern int yylex (void);
++extern void yyerror(const char *s);
+ 
+ %}
+ 
+diff --git a/l2tp_config_token.l b/l2tp_config_token.l
+index 9016af6..43b8f0a 100644
+--- a/l2tp_config_token.l
++++ b/l2tp_config_token.l
+@@ -15,6 +15,9 @@
+ #include "l2tp_config_types.h"
+ #include "l2tp_config_parse.h"
+ 
++extern void l2tp_log(int level, char *fmt, ...);
++extern const char *l2tp_strerror(int error);
++
+ void yyfatal(const char *s);
+ void yyerror(const char *s);
+ 
+-- 
+2.37.2
+

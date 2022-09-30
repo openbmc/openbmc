@@ -22,7 +22,8 @@ SRC_URI = "http://matt.ucc.asn.au/dropbear/releases/dropbear-${PV}.tar.bz2 \
            file://dropbear.socket \
            file://dropbear.default \
            ${@bb.utils.contains('DISTRO_FEATURES', 'pam', '${PAM_SRC_URI}', '', d)} \
-           ${@bb.utils.contains('PACKAGECONFIG', 'disable-weak-ciphers', 'file://dropbear-disable-weak-ciphers.patch', '', d)} "
+           ${@bb.utils.contains('PACKAGECONFIG', 'disable-weak-ciphers', 'file://dropbear-disable-weak-ciphers.patch', '', d)} \
+           file://0007-Fix-X11-build-failure-use-DROPBEAR_PRIO_LOWDELAY.patch"
 
 SRC_URI[sha256sum] = "3a038d2bbc02bf28bbdd20c012091f741a3ec5cbe460691811d714876aad75d1"
 
@@ -53,6 +54,7 @@ EXTRA_OEMAKE = 'MULTI=1 SCPPROGRESS=1 PROGRAMS="${SBINCOMMANDS} ${BINCOMMANDS}"'
 PACKAGECONFIG ?= "disable-weak-ciphers"
 PACKAGECONFIG[system-libtom] = "--disable-bundled-libtom,--enable-bundled-libtom,libtommath libtomcrypt"
 PACKAGECONFIG[disable-weak-ciphers] = ""
+PACKAGECONFIG[enable-x11-forwarding] = ""
 
 EXTRA_OECONF += "\
  ${@bb.utils.contains('DISTRO_FEATURES', 'pam', '--enable-pam', '--disable-pam', d)}"
@@ -63,6 +65,13 @@ EXTRA_OECONF += "--disable-harden"
 
 # musl does not implement wtmp/logwtmp APIs
 EXTRA_OECONF:append:libc-musl = " --disable-wtmp --disable-lastlog"
+
+do_configure:append() {
+	echo "/* Dropbear features */" > ${B}/localoptions.h
+	if ${@bb.utils.contains('PACKAGECONFIG', 'enable-x11-forwarding', 'true', 'false', d)}; then
+		echo "#define DROPBEAR_X11FWD 1" >> ${B}/localoptions.h
+	fi
+}
 
 do_install() {
 	install -d ${D}${sysconfdir} \

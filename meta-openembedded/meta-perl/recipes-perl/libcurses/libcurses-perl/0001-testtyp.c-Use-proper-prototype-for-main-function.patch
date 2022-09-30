@@ -1,0 +1,40 @@
+From 01d0904a987ec3d8850ae3b54252c9d3bbe75962 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 30 Aug 2022 15:43:42 -0700
+Subject: [PATCH] testtyp.c: Use proper prototype for main function
+
+Newer compilers like clang-15+ will complain about the prototype
+vigorously, and the test will end up failing for this reason instead of
+real check it should be failing/passing for.
+
+Fixes
+testint.c:11:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
+main() {
+^
+int
+1 error generated.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ testtyp.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/testtyp.c b/testtyp.c
+index 949c3d4..4042f73 100644
+--- a/testtyp.c
++++ b/testtyp.c
+@@ -7,7 +7,8 @@
+ #define _XOPEN_SOURCE_EXTENDED 1  /* We expect wide character functions */
+ 
+ #include "c-config.h"
+-
+-main() {
++int
++main(int argc, char *argv[]) {
+   typedef SYM c_sym_t;
++  return 0;
+ }
+-- 
+2.37.3
+

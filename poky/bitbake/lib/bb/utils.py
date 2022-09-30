@@ -29,6 +29,8 @@ import collections
 import copy
 import ctypes
 import random
+import socket
+import struct
 import tempfile
 from subprocess import getstatusoutput
 from contextlib import contextmanager
@@ -1603,6 +1605,44 @@ def set_process_name(name):
     except:
         pass
 
+def enable_loopback_networking():
+    # From bits/ioctls.h
+    SIOCGIFFLAGS = 0x8913
+    SIOCSIFFLAGS = 0x8914
+    SIOCSIFADDR = 0x8916
+    SIOCSIFNETMASK = 0x891C
+
+    # if.h
+    IFF_UP = 0x1
+    IFF_RUNNING = 0x40
+
+    # bits/socket.h
+    AF_INET = 2
+
+    # char ifr_name[IFNAMSIZ=16]
+    ifr_name = struct.pack("@16s", b"lo")
+    def netdev_req(fd, req, data = b""):
+        # Pad and add interface name
+        data = ifr_name + data + (b'\x00' * (16 - len(data)))
+        # Return all data after interface name
+        return fcntl.ioctl(fd, req, data)[16:]
+
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_IP) as sock:
+        fd = sock.fileno()
+
+        # struct sockaddr_in ifr_addr { unsigned short family; uint16_t sin_port ; uint32_t in_addr; }
+        req = struct.pack("@H", AF_INET) + struct.pack("=H4B", 0, 127, 0, 0, 1)
+        netdev_req(fd, SIOCSIFADDR, req)
+
+        # short ifr_flags
+        flags = struct.unpack_from('@h', netdev_req(fd, SIOCGIFFLAGS))[0]
+        flags |= IFF_UP | IFF_RUNNING
+        netdev_req(fd, SIOCSIFFLAGS, struct.pack('@h', flags))
+
+        # struct sockaddr_in ifr_netmask
+        req = struct.pack("@H", AF_INET) + struct.pack("=H4B", 0, 255, 0, 0, 0)
+        netdev_req(fd, SIOCSIFNETMASK, req)
+
 def disable_network(uid=None, gid=None):
     """
     Disable networking in the current process if the kernel supports it, else
@@ -1624,7 +1664,7 @@ def disable_network(uid=None, gid=None):
 
     ret = libc.unshare(CLONE_NEWNET | CLONE_NEWUSER)
     if ret != 0:
-        logger.debug("System doesn't suport disabling network without admin privs")
+        logger.debug("System doesn't support disabling network without admin privs")
         return
     with open("/proc/self/uid_map", "w") as f:
         f.write("%s %s 1" % (uid, uid))

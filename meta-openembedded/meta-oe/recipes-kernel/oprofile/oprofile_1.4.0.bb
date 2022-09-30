@@ -30,6 +30,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}-${PV}.tar.gz \
            file://0008-include-linux-limits.h-for-MAX_INPUT.patch \
            file://0009-Prevent-running-check-tests-on-host-if-cross-compili.patch \
            file://0010-oprofile-Determine-the-root-home-directory-dynamical.patch \
+           file://0001-configure-Include-unistd.h-for-getpid-API.patch \
 "
 SRC_URI[sha256sum] = "7ba06f99d7c188389d20d1d5e53ee690c7733f87aa9af62bd664fa0ca235a412"
 

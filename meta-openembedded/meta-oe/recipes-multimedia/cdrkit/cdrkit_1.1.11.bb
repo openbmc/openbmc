@@ -12,6 +12,7 @@ SRC_URI = "${DEBIAN_MIRROR}/main/c/${BPN}/${BPN}_${PV}.orig.tar.gz \
            file://0002-Do-not-use-rcmd-on-build-with-musl.patch \
            file://0001-genisoimage-Add-missing-extern-definition.patch \
            file://0001-add-new-option-eltorito-platform.patch \
+           file://0001-genisoimage-Add-checksum.h-and-md5.h-for-function-pr.patch \
            "
 SRC_URI:append:class-nativesdk = " \
            file://0001-install-netscsid-to-bin-for-nativesdk.patch \

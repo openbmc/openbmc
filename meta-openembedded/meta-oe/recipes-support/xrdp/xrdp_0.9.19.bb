@@ -15,6 +15,7 @@ SRC_URI = "https://github.com/neutrinolabs/${BPN}/releases/download/v${PV}/${BPN
            file://0001-Added-req_distinguished_name-in-etc-xrdp-openssl.con.patch \
            file://0001-Fix-the-compile-error.patch \
            file://0001-arch-Define-NO_NEED_ALIGN-on-ppc64.patch \
+           file://0001-mark-count-with-unused-attribute.patch \
            "
 
 SRC_URI[sha256sum] = "94017d30e475c6d7a24f651e16791551862ae46f82d8de62385e63393f5f93d0"

@@ -28,10 +28,6 @@ UPSTREAM_CHECK_REGEX = "/watchdog/(?P<pver>(\d+[\.\-_]*)+)/"
 
 inherit autotools update-rc.d systemd pkgconfig
 
-DEPENDS += "libtirpc"
-CFLAGS += "-I${STAGING_INCDIR}/tirpc"
-LDFLAGS += "-ltirpc"
-
 EXTRA_OECONF += " --disable-nfs "
 CACHED_CONFIGUREVARS += "ac_cv_path_PATH_SENDMAIL=${sbindir}/sendmail"
 

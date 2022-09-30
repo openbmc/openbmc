@@ -10,8 +10,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=c9a450b7be84eac23e6353efecb60b5b \
 
 DEPENDS = "virtual/crypt"
 
-UPSTREAM_CHECK_URI = "https://github.com/shadow-maint/shadow/releases"
-SRC_URI = "https://github.com/shadow-maint/shadow/releases/download/${PV}/${BP}.tar.gz \
+GITHUB_BASE_URI = "https://github.com/shadow-maint/shadow/releases"
+SRC_URI = "${GITHUB_BASE_URI}/download/${PV}/${BP}.tar.gz \
            file://0001-shadow-use-relaxed-usernames.patch \
            ${@bb.utils.contains('PACKAGECONFIG', 'pam', '${PAM_SRC_URI}', '', d)} \
            file://useradd \
@@ -42,7 +42,7 @@ PAM_SRC_URI = "file://pam.d/chfn \
                file://pam.d/passwd \
                file://pam.d/su"
 
-inherit autotools gettext
+inherit autotools gettext github-releases
 
 export CONFIG_SHELL="/bin/sh"
 

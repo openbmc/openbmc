@@ -222,7 +222,6 @@ RDEPENDS:packagegroup-meta-oe-dbs ="\
     psqlodbc \
     rocksdb \
     soci \
-    sqlite \
 "
 RDEPENDS:packagegroup-meta-oe-dbs:remove:libc-musl:powerpc = "rocksdb"
 

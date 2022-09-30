@@ -85,7 +85,7 @@ class QemuRunner:
         accepted_patterns = ['search_reached_prompt', 'send_login_user', 'search_login_succeeded', 'search_cmd_finished']
         default_boot_patterns = defaultdict(str)
         # Default to the usual paterns used to communicate with the target
-        default_boot_patterns['search_reached_prompt'] = b' login:'
+        default_boot_patterns['search_reached_prompt'] = ' login:'
         default_boot_patterns['send_login_user'] = 'root\n'
         default_boot_patterns['search_login_succeeded'] = r"root@[a-zA-Z0-9\-]+:~#"
         default_boot_patterns['search_cmd_finished'] = r"[a-zA-Z0-9]+@[a-zA-Z0-9\-]+:~#"
@@ -109,12 +109,15 @@ class QemuRunner:
             sock.close()
             raise
 
+    def decode_qemulog(self, todecode):
+        # Sanitize the data received from qemu as it may contain control characters
+        msg = todecode.decode("utf-8", errors='ignore')
+        msg = re_control_char.sub('', msg)
+        return msg
+
     def log(self, msg):
         if self.logfile:
-            # It is needed to sanitize the data received from qemu
-            # because is possible to have control characters
-            msg = msg.decode("utf-8", errors='ignore')
-            msg = re_control_char.sub('', msg)
+            msg = self.decode_qemulog(msg)
             self.msg += msg
             with codecs.open(self.logfile, "a", encoding="utf-8") as f:
                 f.write("%s" % msg)
@@ -188,8 +191,8 @@ class QemuRunner:
         importlib.invalidate_caches()
         try:
             qmp = importlib.import_module("qmp")
-        except:
-            self.logger.error("qemurunner: qmp.py missing, please ensure it's installed")
+        except Exception as e:
+            self.logger.error("qemurunner: qmp.py missing, please ensure it's installed (%s)" % str(e))
             return False
         # Path relative to tmpdir used as cwd for qemu below to avoid unix socket path length issues
         qmp_file = "." + next(tempfile._get_candidate_names())
@@ -325,7 +328,8 @@ class QemuRunner:
         try:
             os.chdir(os.path.dirname(qmp_port))
             try:
-               self.qmp = qmp.QEMUMonitorProtocol(os.path.basename(qmp_port))
+               from qmp.legacy import QEMUMonitorProtocol
+               self.qmp = QEMUMonitorProtocol(os.path.basename(qmp_port))
             except OSError as msg:
                 self.logger.warning("Failed to initialize qemu monitor socket: %s File: %s" % (msg, msg.filename))
                 return False
@@ -467,13 +471,15 @@ class QemuRunner:
                             self.log(data)
 
                         data = b''
-                        if self.boot_patterns['search_reached_prompt'] in bootlog:
+
+                        decodedlog = self.decode_qemulog(bootlog)
+                        if self.boot_patterns['search_reached_prompt'] in decodedlog:
                             self.server_socket = qemusock
                             stopread = True
                             reachedlogin = True
-                            self.logger.debug("Reached login banner in %s seconds (%s)" %
+                            self.logger.debug("Reached login banner in %s seconds (%s, %s)" %
                                               (time.time() - (endtime - self.boottime),
-                                              time.strftime("%D %H:%M:%S")))
+                                              time.strftime("%D %H:%M:%S"), time.time()))
                     else:
                         # no need to check if reachedlogin unless we support multiple connections
                         self.logger.debug("QEMU socket disconnected before login banner reached. (%s)" %
@@ -487,10 +493,10 @@ class QemuRunner:
                 self.logger.warning("Target didn't reach login banner in %d seconds (%s)" %
                                   (self.boottime, time.strftime("%D %H:%M:%S")))
             tail = lambda l: "\n".join(l.splitlines()[-25:])
-            bootlog = bootlog.decode("utf-8")
+            bootlog = self.decode_qemulog(bootlog)
             # in case bootlog is empty, use tail qemu log store at self.msg
             lines = tail(bootlog if bootlog else self.msg)
-            self.logger.warning("Last 25 lines of text:\n%s" % lines)
+            self.logger.warning("Last 25 lines of text (%d):\n%s" % (len(bootlog), lines))
             self.logger.warning("Check full boot log: %s" % self.logfile)
             self._dump_host()
             self.stop()

@@ -8,10 +8,10 @@ DEPENDS = "flac libogg libvorbis"
 SECTION = "libs/multimedia"
 LICENSE = "LGPL-2.1-only"
 
-SRC_URI = "https://github.com/libsndfile/libsndfile/releases/download/${PV}/libsndfile-${PV}.tar.xz \
+SRC_URI = "${GITHUB_BASE_URI}/download/${PV}/libsndfile-${PV}.tar.xz \
            file://noopus.patch \
           "
-UPSTREAM_CHECK_URI = "https://github.com/libsndfile/libsndfile/releases/"
+GITHUB_BASE_URI = "https://github.com/libsndfile/libsndfile/releases/"
 
 SRC_URI[sha256sum] = "0f98e101c0f7c850a71225fb5feaf33b106227b3d331333ddc9bacee190bcf41"
 
@@ -25,7 +25,7 @@ PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'alsa', d)}"
 PACKAGECONFIG[alsa] = "--enable-alsa,--disable-alsa,alsa-lib"
 PACKAGECONFIG[regtest] = "--enable-sqlite,--disable-sqlite,sqlite3"
 
-inherit autotools lib_package pkgconfig multilib_header
+inherit autotools lib_package pkgconfig multilib_header github-releases
 
 do_install:append() {
     oe_multilib_header sndfile.h

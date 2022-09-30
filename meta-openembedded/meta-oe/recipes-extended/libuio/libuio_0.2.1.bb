@@ -3,16 +3,13 @@ SECTION = "base"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=393a5ca445f6965873eca0259a17f833"
 
-SRC_URI = "git://git.code.sf.net/p/libuio/code;branch=master \
-           file://replace_inline_with_static-inline.patch \
-           file://0001-include-fcntl.h-for-O_RDWR-define.patch \
-           "
+SRCREV = "17d96e8f9a5bce7cee5e2222855ab46a246dba51"
+
+SRC_URI = "git://git.code.sf.net/p/libuio/code;branch=master;protocol=https"
+
+PV .= "+0.2.2+git${SRCPV}"
 
 inherit autotools
-
-SRCREV = "ed4f07ea147ac403c28105ab44d01bbf524d36f9"
-
-PV .= "+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 

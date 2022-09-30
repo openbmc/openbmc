@@ -1,0 +1,33 @@
+From 864f43ae09d18b1114d5c894e836698743e4e44c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 6 Sep 2022 21:36:35 -0700
+Subject: [PATCH] sntp: Fix types in check for pthread_detach
+
+New compilers are stricter and flag assigning NULL to pthread_t as error
+therefore using a pthread_t variable constructed from -1
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sntp/m4/openldap-thread-check.m4 | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/sntp/m4/openldap-thread-check.m4 b/sntp/m4/openldap-thread-check.m4
+index 7768a5c..b9e54ad 100644
+--- a/sntp/m4/openldap-thread-check.m4
++++ b/sntp/m4/openldap-thread-check.m4
+@@ -262,10 +262,7 @@ pthread_rwlock_t rwlock;
+ 				dnl save the flags
+ 				AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+ #include <pthread.h>
+-#ifndef NULL
+-#define NULL (void*)0
+-#endif
+-]], [[pthread_detach(NULL);]])],[ol_cv_func_pthread_detach=yes],[ol_cv_func_pthread_detach=no])
++]], [[pthread_detach((pthread_t)-1);]])],[ol_cv_func_pthread_detach=yes],[ol_cv_func_pthread_detach=no])
+ 			])
+ 
+ 			if test $ol_cv_func_pthread_detach = no ; then
+-- 
+2.37.3
+

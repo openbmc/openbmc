@@ -1,4 +1,4 @@
-From 63788c63ed39a3ce9994f4315d8997e1a9300d4d Mon Sep 17 00:00:00 2001
+From c853c9e5c44f1b23a15a7ba629ee02f7d8ec23a0 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 6 Jan 2020 12:44:42 +0100
 Subject: [PATCH] meson.build: use 'python3' directly for python
@@ -8,17 +8,18 @@ its configuration).
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  meson.build | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 682d7c8..19d2eae 100644
+index 13d95bb..b241eb2 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -60,7 +60,7 @@ foreach w : warnings
-    endif
- endforeach
+@@ -64,7 +64,7 @@ flags = [
+ 
+ add_project_arguments(cc.get_supported_arguments(flags), language : 'c')
  
 -prog_python = import('python').find_installation('python3')
 +prog_python = 'python3'

@@ -4,7 +4,7 @@ HOMEPAGE = "http://oss.oetiker.ch/rrdtool/"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=39df84cfd8a5e18bf988f277f7946676"
 
-DEPENDS = "libpng zlib cairo pango glib-2.0 libxml2 groff-native python3-setuptools-native"
+DEPENDS = "libpng zlib glib-2.0 libxml2 groff-native python3-setuptools-native"
 
 SRCREV = "3af04acd38bbc61bbdcdd931dcf234c971aa5336"
 PV = "1.8.0"
@@ -24,7 +24,7 @@ SYSTEMD_SERVICE:rrdcached = "rrdcached.socket rrdcached.service"
 
 EXTRA_AUTORECONF = "-I m4 --exclude=autopoint"
 
-PACKAGECONFIG ??= "perl ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
+PACKAGECONFIG ??= "perl graph ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 
 PACKAGECONFIG[python] = "--enable-python=yes \
 am_cv_python_pythondir=${STAGING_LIBDIR}/python${PYTHON_BASEVERSION}/site-packages \
@@ -39,6 +39,8 @@ ac_cv_path_PERL_CC='${CC}',  \
 PACKAGECONFIG[dbi] = "--enable-libdbi,--disable-libdbi,libdbi"
 
 PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_unitdir}/system/,--without-systemdsystemunitdir,systemd,"
+
+PACKAGECONFIG[graph] = "--enable-rrd_graph,--disable-rrd_graph,pango cairo"
 
 EXTRA_OECONF = " \
     --enable-shared \

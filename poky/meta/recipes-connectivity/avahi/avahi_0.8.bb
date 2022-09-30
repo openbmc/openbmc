@@ -19,7 +19,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=2d5025d4aa3495befef8f17206a5b0a1 \
                     file://avahi-daemon/main.c;endline=21;md5=9ee77368c5407af77caaef1b07285969 \
                     file://avahi-client/client.h;endline=23;md5=f4ac741a25c4f434039ba3e18c8674cf"
 
-SRC_URI = "https://github.com/lathiat/avahi/releases/download/v${PV}/avahi-${PV}.tar.gz \
+SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/avahi-${PV}.tar.gz \
            file://00avahi-autoipd \
            file://99avahi-autoipd \
            file://initscript.patch \
@@ -28,7 +28,7 @@ SRC_URI = "https://github.com/lathiat/avahi/releases/download/v${PV}/avahi-${PV}
            file://local-ping.patch \
            "
 
-UPSTREAM_CHECK_URI = "https://github.com/lathiat/avahi/releases/"
+GITHUB_BASE_URI = "https://github.com/lathiat/avahi/releases/"
 SRC_URI[md5sum] = "229c6aa30674fc43c202b22c5f8c2be7"
 SRC_URI[sha256sum] = "060309d7a333d38d951bc27598c677af1796934dbd98e1024e7ad8de798fedda"
 
@@ -48,7 +48,7 @@ PACKAGECONFIG[libdns_sd] = "--enable-compat-libdns_sd --enable-dbus,,dbus"
 PACKAGECONFIG[libevent] = "--enable-libevent,--disable-libevent,libevent"
 PACKAGECONFIG[qt5] = "--enable-qt5,--disable-qt5,qtbase"
 
-inherit autotools pkgconfig gettext gobject-introspection
+inherit autotools pkgconfig gettext gobject-introspection github-releases
 
 EXTRA_OECONF = "--with-avahi-priv-access-group=adm \
              --disable-stack-protector \

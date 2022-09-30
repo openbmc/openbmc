@@ -1,0 +1,28 @@
+From 0a948d8d91b789e9c9b60136fada75b1d464af63 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 2 Sep 2022 18:31:27 -0700
+Subject: [PATCH] con2fbmap: Add missing include on string.h
+
+strerror() is from string.h therefore include it to fix -Wimplicit-function-declaration
+warnings
+
+Upstream-Status: Submitted [https://gitlab.com/pibox/con2fbmap/-/merge_requests/1]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/con2fbmap.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/con2fbmap.c b/src/con2fbmap.c
+index 7831931..7a2e870 100644
+--- a/src/con2fbmap.c
++++ b/src/con2fbmap.c
+@@ -1,5 +1,6 @@
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <string.h> /* for strerror */
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include <sys/ioctl.h>
+-- 
+2.37.3
+

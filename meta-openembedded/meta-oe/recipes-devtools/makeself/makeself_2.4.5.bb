@@ -9,7 +9,7 @@ LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "\
-    git://git@github.com/megastep/makeself.git;protocol=https;branch=master \
+    git://github.com/megastep/${BPN}.git;protocol=https;branch=master \
 "
 
 SRCREV = "5742be6410bfad2c619fb1e98bf795e8fa0913c7"
@@ -21,7 +21,6 @@ do_compile[noexec] = "1"
 
 do_install() {
     install -d ${D}${bindir}
-    install -m 0755 ${S}/makeself.1 ${D}${bindir}/
     install -m 0755 ${S}/makeself.sh ${D}${bindir}/
     install -m 0755 ${S}/makeself-header.sh ${D}${bindir}/
 }

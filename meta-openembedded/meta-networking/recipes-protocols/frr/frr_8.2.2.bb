@@ -10,6 +10,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://COPYING-LGPLv2.1;md5=4fbd65380cdd255951079008b364516c"
 
 SRC_URI = "git://github.com/FRRouting/frr.git;protocol=https;branch=stable/8.2 \
+           file://0001-configure-Check-for-readline-function-instead-of-mai.patch \
            file://frr.pam \
 	      "
 

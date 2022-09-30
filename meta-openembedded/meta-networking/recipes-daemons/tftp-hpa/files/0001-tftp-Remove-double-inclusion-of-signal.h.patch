@@ -1,0 +1,39 @@
+From e9ed48d91642d384ce07cbb9bec788f07fc6354c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 6 Sep 2022 14:51:42 -0700
+Subject: [PATCH] tftp: Remove double inclusion of signal.h
+
+Undefine __USE_XOPEN2K8 so we can get bsd_signal definition from system
+headers
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ config.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/config.h b/config.h
+index 3ff2915..ae1a14b 100644
+--- a/config.h
++++ b/config.h
+@@ -93,7 +93,6 @@
+ #endif
+ 
+ #include <errno.h>
+-#include <signal.h>
+ 
+ #ifdef HAVE_SYS_SOCKET_H
+ #include <sys/socket.h>
+@@ -296,6 +295,9 @@ char *xstrdup(const char *);
+ 
+ #ifndef HAVE_BSD_SIGNAL
+ void (*bsd_signal(int, void (*)(int))) (int);
++#else
++#undef __USE_XOPEN2K8
++#include <signal.h>
+ #endif
+ #ifndef HAVE_DUP2
+ int dup2(int, int);
+-- 
+2.37.3
+

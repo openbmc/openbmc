@@ -1,0 +1,34 @@
+From e5ccf769c2dc7283b56a597fffdb5dc1558e3ce8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 3 Sep 2022 01:23:28 -0700
+Subject: [PATCH] src/internal: Use __GLIBC__ to check for GNU extention
+ implementation
+
+__USE_GNU is defined by _GNU_SOURCE and configure explicitly sets this
+macro and it does have meaning on musl too, where it may have some level
+of GNU compatibility but strerror_r is not one of them. Therefore we
+have to check for libc implementation for this to be sure.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/internal.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/internal.c b/src/internal.c
+index ef83b71..fb326fa 100644
+--- a/src/internal.c
++++ b/src/internal.c
+@@ -431,7 +431,7 @@ char *cleanpath(char *path) {
+ 
+ const char *xstrerror(int errnum, char *buf, size_t len) {
+ #ifdef HAVE_STRERROR_R
+-# ifdef __USE_GNU
++# ifdef __GLIBC__
+     /* Annoying linux specific API contract */
+     return strerror_r(errnum, buf, len);
+ # else
+-- 
+2.37.3
+

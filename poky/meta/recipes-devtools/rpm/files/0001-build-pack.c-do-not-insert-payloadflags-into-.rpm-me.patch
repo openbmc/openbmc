@@ -13,10 +13,10 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  build/pack.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/build/pack.c b/build/pack.c
-index 932cb213e..b45d0726f 100644
---- a/build/pack.c
-+++ b/build/pack.c
+Index: git/build/pack.c
+===================================================================
+--- git.orig/build/pack.c
++++ git/build/pack.c
 @@ -328,7 +328,7 @@ static char *getIOFlags(Package pkg)
  	    headerPutString(pkg->header, RPMTAG_PAYLOADCOMPRESSOR, compr);
  	buf = xstrdup(rpmio_flags);

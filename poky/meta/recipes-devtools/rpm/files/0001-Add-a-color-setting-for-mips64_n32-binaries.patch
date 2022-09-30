@@ -11,11 +11,11 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  rpmrc.in      | 2 ++
  2 files changed, 6 insertions(+)
 
-diff --git a/build/rpmfc.c b/build/rpmfc.c
-index 10c380ee9..b7655aa93 100644
---- a/build/rpmfc.c
-+++ b/build/rpmfc.c
-@@ -639,6 +639,7 @@ exit:
+Index: git/build/rpmfc.c
+===================================================================
+--- git.orig/build/rpmfc.c
++++ git/build/rpmfc.c
+@@ -645,6 +645,7 @@ exit:
  static const struct rpmfcTokens_s rpmfcTokens[] = {
    { "directory",		RPMFC_INCLUDE },
  
@@ -23,7 +23,7 @@ index 10c380ee9..b7655aa93 100644
    { "ELF 32-bit",		RPMFC_ELF32|RPMFC_INCLUDE },
    { "ELF 64-bit",		RPMFC_ELF64|RPMFC_INCLUDE },
  
-@@ -1149,6 +1150,9 @@ static uint32_t getElfColor(const char *fn)
+@@ -1150,6 +1151,9 @@ static uint32_t getElfColor(const char *
  		color = RPMFC_ELF32;
  		break;
  	    }
@@ -33,11 +33,11 @@ index 10c380ee9..b7655aa93 100644
  	    elf_end(elf);
  	}
  	close(fd);
-diff --git a/rpmrc.in b/rpmrc.in
-index 5bd9ba3e5..f15bb8dad 100644
---- a/rpmrc.in
-+++ b/rpmrc.in
-@@ -137,6 +137,8 @@ archcolor: mipsr6el 1
+Index: git/rpmrc.in
+===================================================================
+--- git.orig/rpmrc.in
++++ git/rpmrc.in
+@@ -139,6 +139,8 @@ archcolor: mipsr6el 1
  archcolor: mips64r6 2
  archcolor: mips64r6el 2
  

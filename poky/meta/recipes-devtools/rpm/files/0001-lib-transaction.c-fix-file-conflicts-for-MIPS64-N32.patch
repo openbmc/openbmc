@@ -31,11 +31,11 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  lib/transaction.c | 13 ++++++++++++-
  1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/lib/transaction.c b/lib/transaction.c
-index 67b9db5..82386b8 100644
---- a/lib/transaction.c
-+++ b/lib/transaction.c
-@@ -391,7 +391,18 @@ static int handleColorConflict(rpmts ts,
+Index: git/lib/transaction.c
+===================================================================
+--- git.orig/lib/transaction.c
++++ git/lib/transaction.c
+@@ -402,7 +402,18 @@ static int handleColorConflict(rpmts ts,
  		    rpmfsSetAction(ofs, ofx, FA_CREATE);
  		rpmfsSetAction(fs, fx, FA_SKIPCOLOR);
  		rConflicts = 0;
@@ -55,6 +55,3 @@ index 67b9db5..82386b8 100644
  	}
      }
  
--- 
-2.7.4
-

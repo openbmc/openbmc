@@ -12,7 +12,7 @@ BBCLASSEXTEND = "native nativesdk"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e4742cf92e89040b39486a6219b68067 \
                     file://src/gettext.h;beginline=1;endline=17;md5=9c05dda2f58d89b850c399cf22e1a00c"
 
-SRC_URI = "https://github.com/westes/flex/releases/download/v${PV}/flex-${PV}.tar.gz \
+SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/flex-${PV}.tar.gz \
            file://run-ptest \
            file://0001-tests-add-a-target-for-building-tests-without-runnin.patch \
            ${@bb.utils.contains('PTEST_ENABLED', '1', '', 'file://disable-tests.patch', d)} \
@@ -24,16 +24,14 @@ SRC_URI = "https://github.com/westes/flex/releases/download/v${PV}/flex-${PV}.ta
 SRC_URI[md5sum] = "2882e3179748cc9f9c23ec593d6adc8d"
 SRC_URI[sha256sum] = "e87aae032bf07c26f85ac0ed3250998c37621d95f8bd748b31f15b33c45ee995"
 
-# Flex has moved to github from 2.6.1 onwards
-UPSTREAM_CHECK_URI = "https://github.com/westes/flex/releases"
-UPSTREAM_CHECK_REGEX = "flex-(?P<pver>\d+(\.\d+)+)\.tar"
+GITHUB_BASE_URI = "https://github.com/westes/flex/releases"
 
 # Disputed - yes there is stack exhaustion but no bug and it is building the
 # parser, not running it, effectively similar to a compiler ICE. Upstream no plans to address
 # https://github.com/westes/flex/issues/414
 CVE_CHECK_IGNORE += "CVE-2019-6293"
 
-inherit autotools gettext texinfo ptest
+inherit autotools gettext texinfo ptest github-releases
 
 M4 = "${bindir}/m4"
 M4:class-native = "${STAGING_BINDIR_NATIVE}/m4"

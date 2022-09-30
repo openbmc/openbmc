@@ -9,10 +9,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  lib/rpmrc.c | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/lib/rpmrc.c b/lib/rpmrc.c
-index 4ed991321..19fe80f98 100644
---- a/lib/rpmrc.c
-+++ b/lib/rpmrc.c
+Index: git/lib/rpmrc.c
+===================================================================
+--- git.orig/lib/rpmrc.c
++++ git/lib/rpmrc.c
 @@ -458,8 +458,7 @@ static void setDefaults(void)
      if (!defrcfiles) {
  	defrcfiles = rstrscat(NULL, confdir, "/rpmrc", ":",
@@ -33,6 +33,3 @@ index 4ed991321..19fe80f98 100644
      }
  #else
      macrofiles = MACROFILES;
--- 
-2.11.0
-

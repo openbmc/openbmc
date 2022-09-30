@@ -1,0 +1,51 @@
+From 25efd1478b48b5406fdab3b7b9c1f7e0ef95a7ed Mon Sep 17 00:00:00 2001
+From: Pablo Saavedra <psaavedra@igalia.com>
+Date: Mon, 27 Jun 2022 16:56:04 -0700
+Subject: [PATCH] Fix include gstreamer path on cross compiler toolchains
+ https://bugs.webkit.org/show_bug.cgi?id=241483
+
+Reviewed by Adrian Perez de Castro.
+
+Set the include paths for the gstreamer components to the full path
+using the find_path(). This function relies in CMAKE_FIND_ROOT_PATH to
+find the right place where the includes they are. This fixes possible
+warnings/errors on cross toolchains using -Wpoison-system-directories
+and -Werror=poison-system-directories.
+
+* Source/cmake/FindGStreamer.cmake:
+
+Canonical link: https://commits.webkit.org/251895@main
+
+Upstream-Status: Backport [2.37.1 https://github.com/WebKit/WebKit/commit/25efd1478b48b5406fdab3b7b9c1f7e0ef95a7ed]
+---
+ Source/cmake/FindGStreamer.cmake | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/Source/cmake/FindGStreamer.cmake b/Source/cmake/FindGStreamer.cmake
+index 3216f6974b53..b65a11f30871 100644
+--- a/Source/cmake/FindGStreamer.cmake
++++ b/Source/cmake/FindGStreamer.cmake
+@@ -75,12 +75,20 @@ macro(FIND_GSTREAMER_COMPONENT _component_prefix _pkgconfig_name _library)
+     # ${includedir}/gstreamer-1.0 which remains correct. The issue here is that
+     # we don't rely on the `Cflags`, cmake fails to generate a proper
+     # `.._INCLUDE_DIRS` variable in this case. So we need to do it here...
++
++    # Populate the list initially from the _INCLUDE_DIRS result variable.
++    set(${_component_prefix}_INCLUDE_DIRS ${PC_${_component_prefix}_INCLUDE_DIRS})
++
+     set(_include_dir "${PC_${_component_prefix}_INCLUDEDIR}")
+     string(REGEX MATCH "(.*)/gstreamer-1.0" _dummy "${_include_dir}")
++
+     if ("${CMAKE_MATCH_1}" STREQUAL "")
+-        set(${_component_prefix}_INCLUDE_DIRS "${_include_dir}/gstreamer-1.0;${PC_${_component_prefix}_INCLUDE_DIRS}")
+-    else ()
+-        set(${_component_prefix}_INCLUDE_DIRS "${PC_${_component_prefix}_INCLUDE_DIRS}")
++        find_path(${_component_prefix}_RESOLVED_INCLUDEDIR NAMES "${_include_dir}/gstreamer-1.0")
++        # Only add the resolved path from `_INCLUDEDIR` if found.
++        if (${_component_prefix}_RESOLVED_INCLUDEDIR)
++            list(APPEND ${_component_prefix}_INCLUDE_DIRS
++                 "${${_component_prefix}_RESOLVED_INCLUDEDIR}")
++        endif ()
+     endif ()
+ 
+     find_library(${_component_prefix}_LIBRARIES

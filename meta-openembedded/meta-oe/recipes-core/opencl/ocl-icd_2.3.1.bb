@@ -15,4 +15,4 @@ inherit autotools
 
 DEPENDS = "ruby-native"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

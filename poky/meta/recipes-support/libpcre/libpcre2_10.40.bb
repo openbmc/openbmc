@@ -10,9 +10,10 @@ SECTION = "devel"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENCE;md5=41bfb977e4933c506588724ce69bf5d2"
 
-SRC_URI = "https://github.com/PhilipHazel/pcre2/releases/download/pcre2-${PV}/pcre2-${PV}.tar.bz2"
+SRC_URI = "${GITHUB_BASE_URI}/download/pcre2-${PV}/pcre2-${PV}.tar.bz2"
 
-UPSTREAM_CHECK_URI = "https://github.com/PhilipHazel/pcre2/releases"
+GITHUB_BASE_URI = "https://github.com/PhilipHazel/pcre2/releases"
+UPSTREAM_CHECK_REGEX = "releases/tag/pcre2-(?P<pver>.+)"
 
 SRC_URI[sha256sum] = "14e4b83c4783933dc17e964318e6324f7cae1bc75d8f3c79bc6969f00c159d68"
 
@@ -25,7 +26,7 @@ DEPENDS += "bzip2 zlib"
 
 BINCONFIG = "${bindir}/pcre2-config"
 
-inherit autotools binconfig-disabled
+inherit autotools binconfig-disabled github-releases
 
 EXTRA_OECONF = "\
     --enable-newline-is-lf \

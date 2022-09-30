@@ -18,6 +18,7 @@ LIC_FILES_CHKSUM = "file://debian/copyright;md5=c4ec20aa158fa9de26ee1accf78dcaae
 
 SRCREV = "c440893051406c11f0a315058939657d5937be4f"
 SRC_URI = "git://salsa.debian.org/debian/init-system-helpers.git;protocol=https;branch=master"
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))(?!_exp)"
 
 S = "${WORKDIR}/git"
 

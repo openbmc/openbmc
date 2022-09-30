@@ -19,3 +19,10 @@ EXTRA_OEMESON = " \
 PACKAGES =+ "${PN}-python3"
 FILES:${PN}-python3 = "${PYTHON_SITEPACKAGES_DIR}"
 RDEPENDS:${PN}-python3 = "${PN}"
+
+PACKAGE_PREPROCESS_FUNCS += "src_package_preprocess"
+src_package_preprocess () {
+        # Trim build paths from comments in generated sources to ensure reproducibility
+        sed -i -e "s,${B}/../${BPN}-${PV}/${BPN}/,,g" \
+            ${B}/gexiv2/gexiv2-enums.cpp
+}
