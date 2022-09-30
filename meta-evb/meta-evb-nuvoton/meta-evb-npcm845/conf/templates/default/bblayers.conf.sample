@@ -11,6 +11,8 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-openembedded/meta-networking \
   ##OEROOT##/meta-openembedded/meta-python \
   ##OEROOT##/meta-phosphor \
+  ##OEROOT##/meta-arm/meta-arm \
+  ##OEROOT##/meta-arm/meta-arm-toolchain \
   ##OEROOT##/meta-nuvoton \
   ##OEROOT##/meta-evb \
   ##OEROOT##/meta-evb/meta-evb-nuvoton \
