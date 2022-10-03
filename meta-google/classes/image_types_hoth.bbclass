@@ -84,7 +84,7 @@ python do_generate_layout () {
                     'hoth_mailbox',
                     d.getVar('FLASH_HOTH_MAILBOX_OFFSET'),
                     d.getVar('FLASH_SIZE')),
-    ] if d.getVar('TARGET_ARCH' == "aarch64") else [
+    ] if d.getVar('TARGET_ARCH') == "aarch64" else [
             convertPart(
                     'u_boot',
                     d.getVar('FLASH_UBOOT_OFFSET'),
