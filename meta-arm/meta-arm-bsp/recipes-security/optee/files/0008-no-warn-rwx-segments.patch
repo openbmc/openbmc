@@ -1,0 +1,65 @@
+From 3126adccaf9c9dc669bb7e1f96326c03da4b570d Mon Sep 17 00:00:00 2001
+From: Jerome Forissier <jerome.forissier@linaro.org>
+Date: Fri, 5 Aug 2022 09:48:03 +0200
+Subject: [PATCH] core: link: add --no-warn-rwx-segments
+
+Signed-off-by: Anton Antonov <Anton.Antonov@arm.com>
+Upstream-Status: Backport [https://github.com/OP-TEE/optee_os/pull/5474]
+
+binutils ld.bfd generates one RWX LOAD segment by merging several sections
+with mixed R/W/X attributes (.text, .rodata, .data). After version 2.38 it
+also warns by default when that happens [1], which breaks the build due to
+--fatal-warnings. The RWX segment is not a problem for the TEE core, since
+that information is not used to set memory permissions. Therefore, silence
+the warning.
+
+Link: [1] https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=ba951afb99912da01a6e8434126b8fac7aa75107
+Link: https://sourceware.org/bugzilla/show_bug.cgi?id=29448
+Reported-by: Dominique Martinet <dominique.martinet@atmark-techno.com>
+Signed-off-by: Jerome Forissier <jerome.forissier@linaro.org>
+Acked-by: Jens Wiklander <jens.wiklander@linaro.org>
+
+---
+ core/arch/arm/kernel/link.mk | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/core/arch/arm/kernel/link.mk b/core/arch/arm/kernel/link.mk
+index 69375ad6..bea239cf 100644
+--- a/core/arch/arm/kernel/link.mk
++++ b/core/arch/arm/kernel/link.mk
+@@ -17,6 +17,7 @@ link-ldflags += -T $(link-script-pp) -Map=$(link-out-dir)/tee.map
+ link-ldflags += --sort-section=alignment
+ link-ldflags += --fatal-warnings
+ link-ldflags += --gc-sections
++link-ldflags += $(call ld-option,--no-warn-rwx-segments)
+ 
+ link-ldadd  = $(LDADD)
+ link-ldadd += $(libdeps)
+@@ -37,6 +38,7 @@ link-script-cppflags := \
+ 		$(cppflagscore))
+ 
+ ldargs-all_objs := -T $(link-script-dummy) --no-check-sections \
++		   $(call ld-option,--no-warn-rwx-segments) \
+ 		   $(link-objs) $(link-ldadd) $(libgcccore)
+ cleanfiles += $(link-out-dir)/all_objs.o
+ $(link-out-dir)/all_objs.o: $(objs) $(libdeps) $(MAKEFILE_LIST)
+@@ -49,7 +51,8 @@ $(link-out-dir)/unpaged_entries.txt: $(link-out-dir)/all_objs.o
+ 	$(q)$(NMcore) $< | \
+ 		$(AWK) '/ ____keep_pager/ { printf "-u%s ", $$3 }' > $@
+ 
+-unpaged-ldargs = -T $(link-script-dummy) --no-check-sections --gc-sections
++unpaged-ldargs := -T $(link-script-dummy) --no-check-sections --gc-sections \
++		 $(call ld-option,--no-warn-rwx-segments)
+ unpaged-ldadd := $(objs) $(link-ldadd) $(libgcccore)
+ cleanfiles += $(link-out-dir)/unpaged.o
+ $(link-out-dir)/unpaged.o: $(link-out-dir)/unpaged_entries.txt
+@@ -77,7 +80,8 @@ $(link-out-dir)/init_entries.txt: $(link-out-dir)/all_objs.o
+ 	$(q)$(NMcore) $< | \
+ 		$(AWK) '/ ____keep_init/ { printf "-u%s ", $$3 }' > $@
+ 
+-init-ldargs := -T $(link-script-dummy) --no-check-sections --gc-sections
++init-ldargs := -T $(link-script-dummy) --no-check-sections --gc-sections \
++	       $(call ld-option,--no-warn-rwx-segments)
+ init-ldadd := $(link-objs-init) $(link-out-dir)/version.o  $(link-ldadd) \
+ 	      $(libgcccore)
+ cleanfiles += $(link-out-dir)/init.o

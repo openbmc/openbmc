@@ -1,0 +1,34 @@
+From 26c8a8528b794dbaba49bcf3e1bae8a1e15a8448 Mon Sep 17 00:00:00 2001
+From: Jon Mason <jon.mason@arm.com>
+Date: Thu, 25 Aug 2022 11:21:28 +0100
+Subject: [PATCH] corstone1000: add compressed kernel support
+
+The corstone1000 kernel has become too large to fit in the available
+storage.  Swtiching to a compressed kernel avoids the problem, but
+requires uncompressing it.  Add this decompression to the default boot
+instructions.
+
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ include/configs/corstone1000.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/configs/corstone1000.h b/include/configs/corstone1000.h
+index 815239590e..a8aa105fe6 100644
+--- a/include/configs/corstone1000.h
++++ b/include/configs/corstone1000.h
+@@ -120,7 +120,8 @@
+ #define CONFIG_BOOTCOMMAND								\
+ 				"run retrieve_kernel_load_addr;"			\
+ 				"echo Loading kernel from $kernel_addr to memory ... ;"	\
+-				"loadm $kernel_addr $kernel_addr_r 0xc00000;"		\
++				"unzip $kernel_addr 0x90000000;"	\
++				"loadm 0x90000000 $kernel_addr_r 0xf00000;"		\
+ 				"usb start; usb reset;"					\
+ 				"run distro_bootcmd;"					\
+ 				"bootefi $kernel_addr_r $fdtcontroladdr;"
+-- 
+2.17.1
+

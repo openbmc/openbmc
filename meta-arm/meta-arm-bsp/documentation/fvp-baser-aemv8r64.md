@@ -27,7 +27,7 @@ The fvp-baser-aemv8r64 Yocto MACHINE supports the following BSP components,
 where either a standard or Real-Time Linux kernel (PREEMPT\_RT) can be built
 and run:
 
- - FVP_Base_AEMv8R: v11.18.16
+ - FVP_Base_AEMv8R: v11.19.14
  - boot-wrapper-aarch64: provides PSCI support
  - U-Boot: v2022.04 - provides UEFI services
  - Linux kernel: linux-yocto-5.15

@@ -81,7 +81,7 @@ export CLANG38_ARM_PREFIX = "${TARGET_PREFIX}"
 TOOLCHAIN:arm = "gcc"
 
 do_configure:prepend() {
-    sed -i -e "s#-target ${HOST_ARCH}-linux-gnu*#-target ${HOST_SYS}#" ${S}/BaseTools/Conf/tools_def.template
+    sed -i -e "s#-target ${HOST_ARCH}-linux-gnu.*#-target ${HOST_SYS}#" ${S}/BaseTools/Conf/tools_def.template
 }
 
 do_compile() {

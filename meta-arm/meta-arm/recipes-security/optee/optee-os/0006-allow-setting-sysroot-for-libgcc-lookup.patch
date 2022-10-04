@@ -1,4 +1,4 @@
-From 0bab935695ebcf0c533b49896ab18ff33d4a47d1 Mon Sep 17 00:00:00 2001
+From 528aeb42652a3159c1bfd51d6c1442c3ff27b84c Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@arm.com>
 Date: Tue, 26 May 2020 14:38:02 -0500
 Subject: [PATCH] allow setting sysroot for libgcc lookup
@@ -9,6 +9,7 @@ otherwise.
 
 Upstream-Status: Pending [https://github.com/OP-TEE/optee_os/issues/4188]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
+
 ---
  mk/gcc.mk | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)

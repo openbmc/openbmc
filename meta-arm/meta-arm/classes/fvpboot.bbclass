@@ -23,6 +23,8 @@ FVP_CONSOLE ?= ""
 FVP_CONSOLES[default] ?= "${FVP_CONSOLE}"
 # Arbitrary extra arguments
 FVP_EXTRA_ARGS ?= ""
+# Bitbake variables to pass to the FVP environment
+FVP_ENV_PASSTHROUGH ?= ""
 
 EXTRA_IMAGEDEPENDS += "${FVP_PROVIDER}"
 
@@ -65,6 +67,10 @@ python do_write_fvpboot_conf() {
     data["consoles"] = getFlags("FVP_CONSOLES")
     data["terminals"] = getFlags("FVP_TERMINALS")
     data["args"] = shlex.split(d.getVar("FVP_EXTRA_ARGS") or "")
+
+    data["env"] = {}
+    for var in d.getVar("FVP_ENV_PASSTHROUGH").split():
+        data["env"][var] = d.getVar(var)
 
     os.makedirs(os.path.dirname(conffile), exist_ok=True)
     with open(conffile, "wt") as f:

@@ -126,12 +126,6 @@ juno:
       - TOOLCHAINS: [gcc, clang]
         FIRMWARE: [uboot, edk2]
 
-microbit-v1:
-  extends: .build
-  parallel:
-    matrix:
-      - TESTING: testimage-zephyr
-
 musca-b1:
   extends: .build
 
@@ -143,18 +137,6 @@ n1sdp:
   parallel:
     matrix:
       - TOOLCHAINS: [gcc, armgcc]
-
-qemu-cortex-a53:
-  extends: .build
-
-qemu-cortex-m3:
-  extends: .build
-  parallel:
-    matrix:
-      - TESTING: testimage-zephyr
-
-qemu-cortex-r5:
-  extends: .build
 
 qemu-generic-arm64:
   extends: .build

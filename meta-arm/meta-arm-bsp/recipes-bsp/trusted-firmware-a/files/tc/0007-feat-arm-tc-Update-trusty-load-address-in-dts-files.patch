@@ -1,0 +1,44 @@
+From ea9556a14bec0249ac6e01e4a55cbb04fd15b51a Mon Sep 17 00:00:00 2001
+From: Rupinderjit Singh <rupinderjit.singh@arm.com>
+Date: Wed, 27 Jul 2022 09:23:58 +0100
+Subject: [PATCH] feat(arm/tc): Update trusty load-address in dts files.
+
+Change is required to align with sp header size change from 0x1000 to 0x4000
+
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com>
+Change-Id: Ieeaa7450196b33ecff1612cf3b55cf173a7941e0
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ plat/arm/board/tc/fdts/tc_spmc_trusty_sp_manifest.dts | 2 +-
+ plat/arm/board/tc/fdts/tc_tb_fw_config.dts            | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/plat/arm/board/tc/fdts/tc_spmc_trusty_sp_manifest.dts b/plat/arm/board/tc/fdts/tc_spmc_trusty_sp_manifest.dts
+index e2ea7b811..66a686c9a 100644
+--- a/plat/arm/board/tc/fdts/tc_spmc_trusty_sp_manifest.dts
++++ b/plat/arm/board/tc/fdts/tc_spmc_trusty_sp_manifest.dts
+@@ -25,7 +25,7 @@
+ 		vm1 {
+ 			is_ffa_partition;
+ 			debug_name = "trusty";
+-			load_address = <0xf901f000>;
++			load_address = <0xf901c000>;
+ 			vcpu_count = <8>;
+ 			mem_size = <0x3f00000>; /* 64MB TZC DRAM - 1MB align */
+ 		};
+diff --git a/plat/arm/board/tc/fdts/tc_tb_fw_config.dts b/plat/arm/board/tc/fdts/tc_tb_fw_config.dts
+index a72772fb3..a5bb520fe 100644
+--- a/plat/arm/board/tc/fdts/tc_tb_fw_config.dts
++++ b/plat/arm/board/tc/fdts/tc_tb_fw_config.dts
+@@ -50,7 +50,7 @@
+ #elif TRUSTY_SP_FW_CONFIG
+ 		trusty {
+ 		       uuid = "40ee25f0-a2bc-304c-8c4c-a173c57d8af1";
+-		       load-address = <0xf901f000>;
++		       load-address = <0xf901c000>;
+ 		};
+ #else
+ 		cactus-primary {
+-- 
+2.25.1
+

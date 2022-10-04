@@ -16,20 +16,23 @@ LIC_FILES_CHKSUM = "file://license.rst;md5=07f368487da347f3c7bd0fc3085f3afa \
                     file://../mcuboot/LICENSE;md5=b6ee33f1d12a5e6ee3de1e82fb51eeb8"
 
 SRC_URI  = "git://git.trustedfirmware.org/TF-M/trusted-firmware-m.git;protocol=https;branch=${SRCBRANCH_tfm};name=tfm;destsuffix=git/tfm \
-            git://git.trustedfirmware.org/TF-M/tf-m-tests.git;protocol=https;branch=release/1.6.x;name=tfm-tests;destsuffix=git/tf-m-tests \
-            git://github.com/ARMmbed/mbedtls.git;protocol=https;branch=master;name=mbedtls;destsuffix=git/mbedtls \
-            git://github.com/mcu-tools/mcuboot.git;protocol=https;branch=main;name=mcuboot;destsuffix=git/mcuboot \
+            git://git.trustedfirmware.org/TF-M/tf-m-tests.git;protocol=https;branch=${SRCBRANCH_tfm-tests};name=tfm-tests;destsuffix=git/tf-m-tests \
+            git://github.com/ARMmbed/mbedtls.git;protocol=https;branch=${SRCBRANCH_mbedtls};name=mbedtls;destsuffix=git/mbedtls \
+            git://github.com/mcu-tools/mcuboot.git;protocol=https;branch=${SRCBRANCH_mcuboot};name=mcuboot;destsuffix=git/mcuboot \
             "
 
 # The required dependencies are documented in tf-m/config/config_default.cmake
 # TF-Mv1.6.0
-SRCBRANCH_tfm = "release/1.6.x"
+SRCBRANCH_tfm ?= "release/1.6.x"
 SRCREV_tfm = "7387d88158701a3c51ad51c90a05326ee12847a8"
 # mbedtls-3.1.0
+SRCBRANCH_mbedtls ?= "master"
 SRCREV_mbedtls = "d65aeb37349ad1a50e0f6c9b694d4b5290d60e49"
 # TF-Mv1.6.0
+SRCBRANCH_tfm-tests ?= "release/1.6.x"
 SRCREV_tfm-tests = "723905d46019596f3f2df66d79b5d6bff6f3f213"
 # v1.9.0
+SRCBRANCH_mcuboot ?= "main"
 SRCREV_mcuboot = "c657cbea75f2bb1faf1fceacf972a0537a8d26dd"
 
 UPSTREAM_CHECK_GITTAGREGEX = "^TF-Mv(?P<pver>\d+(\.\d+)+)$"

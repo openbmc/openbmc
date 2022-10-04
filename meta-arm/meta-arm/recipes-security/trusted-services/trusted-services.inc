@@ -50,3 +50,5 @@ EXTRA_OECMAKE += "${@oe.utils.conditional('TS_ENV', 'opteesp', \
 EXTRA_OECMAKE += "-Dlibts_DIR=${STAGING_DIR_HOST}${TS_INSTALL}/lib/cmake/ \
                   -DNEWLIB_INSTALL_DIR=${STAGING_DIR_HOST}${TS_INSTALL}/newlib_install \
                  "
+# Newlib does not compile with clang
+TOOLCHAIN = "gcc"

@@ -1,10 +1,10 @@
-Signed-off-by: Anton Antonov <Anton.Antonov@arm.com>
-Upstream-Status: Backport [https://github.com/OP-TEE/optee_os/pull/5474]
-
-From 0b8a917fa51a366806edc0f04b88cd23b24098c4 Mon Sep 17 00:00:00 2001
+From cf2a2451f4e9300532d677bb3a8315494a3b3a82 Mon Sep 17 00:00:00 2001
 From: Jerome Forissier <jerome.forissier@linaro.org>
 Date: Fri, 5 Aug 2022 09:48:03 +0200
 Subject: [PATCH] core: link: add --no-warn-rwx-segments
+
+Signed-off-by: Anton Antonov <Anton.Antonov@arm.com>
+Upstream-Status: Backport [https://github.com/OP-TEE/optee_os/pull/5474]
 
 binutils ld.bfd generates one RWX LOAD segment by merging several sections
 with mixed R/W/X attributes (.text, .rodata, .data). After version 2.38 it
@@ -18,12 +18,13 @@ Link: https://sourceware.org/bugzilla/show_bug.cgi?id=29448
 Reported-by: Dominique Martinet <dominique.martinet@atmark-techno.com>
 Signed-off-by: Jerome Forissier <jerome.forissier@linaro.org>
 Acked-by: Jens Wiklander <jens.wiklander@linaro.org>
+
 ---
  core/arch/arm/kernel/link.mk | 8 ++++++--
  1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/core/arch/arm/kernel/link.mk b/core/arch/arm/kernel/link.mk
-index 7eed333a32..c39d43cbfc 100644
+index 7eed333a..c39d43cb 100644
 --- a/core/arch/arm/kernel/link.mk
 +++ b/core/arch/arm/kernel/link.mk
 @@ -31,6 +31,7 @@ link-ldflags += -T $(link-script-pp) -Map=$(link-out-dir)/tee.map

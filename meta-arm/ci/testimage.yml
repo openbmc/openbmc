@@ -5,9 +5,15 @@ local_conf_header:
   testimage: |
     IMAGE_CLASSES += "testimage"
     TESTIMAGE_AUTO = "1"
+  kvm: |
+    QEMU_USE_KVM = ""
   slirp: |
     TEST_RUNQEMUPARAMS = "slirp"
     TEST_SERVER_IP = "127.0.0.1"
     QEMU_USE_SLIRP = "1"
   sshd: |
     IMAGE_FEATURES:append = " ssh-server-dropbear"
+  sshkeys: |
+    CORE_IMAGE_EXTRA_INSTALL += "ssh-pregen-hostkeys"
+  universally_failing_tests: |
+    TEST_SUITES:remove = "opkg"

@@ -1,10 +1,7 @@
-Upstream-Status: Inappropriate [will not be submitted as its an hack required to fix the hardware issue]
-Signed-off-by: Sayanta Pattanayak <sayanta.pattanayak@arm.com>
-
-From 4d69e38213bf52a48f2f0239da8c7b76501428b2 Mon Sep 17 00:00:00 2001
+From 7a5147f51f2eb80ecb6f62a28b8bd86aa5ceebf7 Mon Sep 17 00:00:00 2001
 From: Sayanta Pattanayak <sayanta.pattanayak@arm.com>
 Date: Wed, 9 Feb 2022 20:37:43 +0530
-Subject: [PATCH 4/5] n1sdp: pcie: add quirk support enabling remote chip PCIe
+Subject: [PATCH] n1sdp: pcie: add quirk support enabling remote chip PCIe
 
 Base address mapping for remote chip Root PCIe ECAM space.
 
@@ -19,6 +16,9 @@ Signed-off-by: Sayanta Pattanayak <sayanta.pattanayak@arm.com>
 Signed-off-by: Khasim Syed Mohammed <khasim.mohammed@arm.com>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Signed-off-by: sahil <sahil@arm.com>
+
+Upstream-Status: Inappropriate [will not be submitted as its an hack required to fix the hardware issue]
+Signed-off-by: Sayanta Pattanayak <sayanta.pattanayak@arm.com>
 ---
  drivers/acpi/pci_mcfg.c             |  1 +
  drivers/pci/controller/pcie-n1sdp.c | 32 +++++++++++++++++++++++++----
@@ -26,17 +26,17 @@ Signed-off-by: sahil <sahil@arm.com>
  3 files changed, 30 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/acpi/pci_mcfg.c b/drivers/acpi/pci_mcfg.c
-index f31727da21ac..58f59b5fffa2 100644
+index 67c34e6c24a7..4584a5a2ca20 100644
 --- a/drivers/acpi/pci_mcfg.c
 +++ b/drivers/acpi/pci_mcfg.c
-@@ -176,6 +176,7 @@ static struct mcfg_fixup mcfg_quirks[] = {
+@@ -158,6 +158,7 @@ static struct mcfg_fixup mcfg_quirks[] = {
  	/* N1SDP SoC with v1 PCIe controller */
  	N1SDP_ECAM_MCFG(0x20181101, 0, &pci_n1sdp_pcie_ecam_ops),
  	N1SDP_ECAM_MCFG(0x20181101, 1, &pci_n1sdp_ccix_ecam_ops),
 +	N1SDP_ECAM_MCFG(0x20181101, 2, &pci_n1sdp_remote_pcie_ecam_ops),
- };
  
- static char mcfg_oem_id[ACPI_OEM_ID_SIZE];
+ #define ALTRA_ECAM_QUIRK(rev, seg) \
+ 	{ "Ampere", "Altra   ", rev, seg, MCFG_BUS_ANY, &pci_32b_read_ops }
 diff --git a/drivers/pci/controller/pcie-n1sdp.c b/drivers/pci/controller/pcie-n1sdp.c
 index 408699b9dcb1..a03665dd056a 100644
 --- a/drivers/pci/controller/pcie-n1sdp.c
@@ -121,17 +121,14 @@ index 408699b9dcb1..a03665dd056a 100644
  	{ .compatible = "arm,n1sdp-pcie", .data = &pci_n1sdp_pcie_ecam_ops },
  	{ },
 diff --git a/include/linux/pci-ecam.h b/include/linux/pci-ecam.h
-index e6bbc037cef8..7bd8c1d702ee 100644
+index e6bbc037cef8..d936d3f14bce 100644
 --- a/include/linux/pci-ecam.h
 +++ b/include/linux/pci-ecam.h
-@@ -89,6 +89,7 @@ extern const struct pci_ecam_ops al_pcie_ops;	/* Amazon Annapurna Labs PCIe */
- extern const struct pci_ecam_ops tegra194_pcie_ops; /* Tegra194 PCIe */
- extern const struct pci_ecam_ops pci_n1sdp_pcie_ecam_ops; /* Arm N1SDP PCIe */
+@@ -91,6 +91,7 @@ extern const struct pci_ecam_ops pci_n1sdp_pcie_ecam_ops; /* Arm N1SDP PCIe */
  extern const struct pci_ecam_ops pci_n1sdp_ccix_ecam_ops; /* Arm N1SDP PCIe */
-+extern const struct pci_ecam_ops pci_n1sdp_remote_pcie_ecam_ops; /* Arm N1SDP PCIe */
  #endif
  
++extern const struct pci_ecam_ops pci_n1sdp_remote_pcie_ecam_ops; /* Arm N1SDP PCIe */
  #if IS_ENABLED(CONFIG_PCI_HOST_COMMON)
--- 
-2.17.1
-
+ /* for DT-based PCI controllers that support ECAM */
+ int pci_host_common_probe(struct platform_device *pdev);

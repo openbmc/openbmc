@@ -1,0 +1,51 @@
+From 47be0456ea1760837d2de857e57842e595e9ea5e Mon Sep 17 00:00:00 2001
+From: Davidson K <davidson.kumaresan@arm.com>
+Date: Mon, 27 Jun 2022 14:11:27 +0530
+Subject: [PATCH 7/7] arm_ffa: unmap rxtx buffer before exiting u-boot
+
+The linux kernel ffa driver will be used after the kernel boots. It
+will try to map its own rxtx buffer. But there can be only one rxtx
+buffer mapped from the non secure world. Since the rxtx buffer of
+the u-boot is no longer used and we have to map the rxtx buffer of
+the linux kernel, the rxtx buffer of the u-boot should be unmapped.
+
+This will not be needed after the efi runtime services are enabled
+
+Signed-off-by: Davidson K <davidson.kumaresan@arm.com>
+Change-Id: I9deb6283d81f791185aa0a32d205b394d6d91f76
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ drivers/arm-ffa/core.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/drivers/arm-ffa/core.c b/drivers/arm-ffa/core.c
+index 98e2d2fa17..0c619439cb 100644
+--- a/drivers/arm-ffa/core.c
++++ b/drivers/arm-ffa/core.c
+@@ -1470,6 +1470,16 @@ static const struct udevice_id ffa_match_id[] = {
+ 	{},
+ };
+ 
++/**
++ * Unmap the rxtx buffer before exiting u-boot
++ * This avoids conflicts with the linux kernel ffa driver
++ */
++
++static int ffa_remove(struct udevice *dev)
++{
++	return ffa_unmap_rxtx_buffers();
++}
++
+ /**
+  * Declaring the arm_ffa driver under UCLASS_FFA
+  */
+@@ -1481,4 +1491,6 @@ U_BOOT_DRIVER(arm_ffa) = {
+ 	.of_to_plat	= ffa_of_to_plat,
+ 	.probe		= ffa_probe,
+ 	.plat_auto	= sizeof(struct ffa_pdata),
++	.remove		= ffa_remove,
++	.flags		= DM_FLAG_OS_PREPARE,
+ };
+-- 
+2.34.1
+

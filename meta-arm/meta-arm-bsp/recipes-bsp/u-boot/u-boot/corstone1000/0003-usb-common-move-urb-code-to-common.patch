@@ -1,12 +1,13 @@
-From 61c5fe3758a0febdee33429f5be16f69279045cc Mon Sep 17 00:00:00 2001
+From 178da5bee196f44c4c10e9804674fe5ac0bc1176 Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Mon, 28 Jun 2021 23:20:55 +0100
-Subject: [PATCH 03/24] usb: common: move urb code to common
+Subject: [PATCH 03/26] usb: common: move urb code to common
 
 Move urb code from musb only use to a more common scope, so other
 drivers in the future can use the handling of urb in usb.
 
 Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+Upstream-Status: Accepted [2022.10-rc1]
 ---
  drivers/usb/common/Makefile                   |   2 +
  drivers/usb/common/usb_urb.c                  | 160 ++++++++++++++++++
@@ -23,7 +24,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  rename drivers/usb/musb-new/usb-compat.h => include/linux/usb/usb_urb_compat.h (60%)
 
 diff --git a/drivers/usb/common/Makefile b/drivers/usb/common/Makefile
-index 3bedbf213f47..dc05cb0a5077 100644
+index 3bedbf213f..dc05cb0a50 100644
 --- a/drivers/usb/common/Makefile
 +++ b/drivers/usb/common/Makefile
 @@ -4,5 +4,7 @@
@@ -36,7 +37,7 @@ index 3bedbf213f47..dc05cb0a5077 100644
  obj-$(CONFIG_USB_XHCI_FSL) += fsl-dt-fixup.o fsl-errata.o
 diff --git a/drivers/usb/common/usb_urb.c b/drivers/usb/common/usb_urb.c
 new file mode 100644
-index 000000000000..be3b6b9f32e8
+index 0000000000..be3b6b9f32
 --- /dev/null
 +++ b/drivers/usb/common/usb_urb.c
 @@ -0,0 +1,160 @@
@@ -201,7 +202,7 @@ index 000000000000..be3b6b9f32e8
 +	return usb_urb_submit(hcd, urb);
 +}
 diff --git a/drivers/usb/host/r8a66597-hcd.c b/drivers/usb/host/r8a66597-hcd.c
-index f1fc93f3d403..3ccbc16da379 100644
+index f1fc93f3d4..3ccbc16da3 100644
 --- a/drivers/usb/host/r8a66597-hcd.c
 +++ b/drivers/usb/host/r8a66597-hcd.c
 @@ -14,6 +14,7 @@
@@ -249,7 +250,7 @@ index f1fc93f3d403..3ccbc16da379 100644
  {
  	struct usb_device *parent = usb_dev_get_parent(dev);
 diff --git a/drivers/usb/musb-new/musb_core.c b/drivers/usb/musb-new/musb_core.c
-index 18d9bc805f8a..fc7af7484e4c 100644
+index 18d9bc805f..fc7af7484e 100644
 --- a/drivers/usb/musb-new/musb_core.c
 +++ b/drivers/usb/musb-new/musb_core.c
 @@ -89,9 +89,9 @@
@@ -264,7 +265,7 @@ index 18d9bc805f8a..fc7af7484e4c 100644
  
  #include "musb_core.h"
 diff --git a/drivers/usb/musb-new/musb_host.c b/drivers/usb/musb-new/musb_host.c
-index acb2d40f3b5a..e5905d90d66f 100644
+index acb2d40f3b..e5905d90d6 100644
 --- a/drivers/usb/musb-new/musb_host.c
 +++ b/drivers/usb/musb-new/musb_host.c
 @@ -26,8 +26,8 @@
@@ -278,7 +279,7 @@ index acb2d40f3b5a..e5905d90d66f 100644
  
  #include "musb_core.h"
 diff --git a/drivers/usb/musb-new/musb_host.h b/drivers/usb/musb-new/musb_host.h
-index afc8fa35a738..5a604bdb0cf2 100644
+index afc8fa35a7..5a604bdb0c 100644
 --- a/drivers/usb/musb-new/musb_host.h
 +++ b/drivers/usb/musb-new/musb_host.h
 @@ -10,7 +10,7 @@
@@ -291,7 +292,7 @@ index afc8fa35a738..5a604bdb0cf2 100644
  
  static inline struct usb_hcd *musb_to_hcd(struct musb *musb)
 diff --git a/drivers/usb/musb-new/musb_uboot.c b/drivers/usb/musb-new/musb_uboot.c
-index 61ff68def2fa..d186facc7e02 100644
+index 61ff68def2..d186facc7e 100644
 --- a/drivers/usb/musb-new/musb_uboot.c
 +++ b/drivers/usb/musb-new/musb_uboot.c
 @@ -8,10 +8,10 @@
@@ -347,7 +348,7 @@ index 61ff68def2fa..d186facc7e02 100644
 -}
 -#endif
 diff --git a/drivers/usb/musb-new/musb_uboot.h b/drivers/usb/musb-new/musb_uboot.h
-index 18282efccc9d..6b162f03b19e 100644
+index 18282efccc..6b162f03b1 100644
 --- a/drivers/usb/musb-new/musb_uboot.h
 +++ b/drivers/usb/musb-new/musb_uboot.h
 @@ -8,8 +8,8 @@
@@ -364,7 +365,7 @@ diff --git a/drivers/usb/musb-new/usb-compat.h b/include/linux/usb/usb_urb_compa
 similarity index 60%
 rename from drivers/usb/musb-new/usb-compat.h
 rename to include/linux/usb/usb_urb_compat.h
-index df68c9220a7a..5ed96fa64e96 100644
+index df68c9220a..5ed96fa64e 100644
 --- a/drivers/usb/musb-new/usb-compat.h
 +++ b/include/linux/usb/usb_urb_compat.h
 @@ -1,16 +1,31 @@
@@ -439,7 +440,7 @@ index df68c9220a7a..5ed96fa64e96 100644
 +
  #endif /* __USB_COMPAT_H__ */
 diff --git a/include/usb_defs.h b/include/usb_defs.h
-index 6dd2c997f9b3..ec00161710a5 100644
+index 6dd2c997f9..ec00161710 100644
 --- a/include/usb_defs.h
 +++ b/include/usb_defs.h
 @@ -81,6 +81,32 @@
@@ -493,5 +494,5 @@ index 6dd2c997f9b3..ec00161710a5 100644
  /*
   * Hub Status & Hub Change bit masks
 -- 
-2.37.1
+2.17.1
 

@@ -1,7 +1,7 @@
-From 14b84786e85483bf3c737ef8b392204e307c0ff1 Mon Sep 17 00:00:00 2001
+From 34db1357ab3192f18629ceadf4ea33b948513fec Mon Sep 17 00:00:00 2001
 From: Olivier Deprez <olivier.deprez@arm.com>
 Date: Mon, 16 Nov 2020 10:14:02 +0100
-Subject: [PATCH] WIP: Enable managed exit
+Subject: [PATCH 1/2] WIP: Enable managed exit
 
 This change declares OP-TEE SP as supporting managed exit in response to
 a NS interrupt triggering while the SWd runs.
@@ -27,14 +27,14 @@ Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
  core/arch/arm/kernel/boot.c                          | 12 ++++++++++++
  core/arch/arm/kernel/thread_a64.S                    | 11 ++++++++++-
  core/arch/arm/kernel/thread_spmc.c                   | 11 +++++++++++
- .../arm/plat-totalcompute/fdts/optee_sp_manifest.dts |  2 +-
- 4 files changed, 34 insertions(+), 2 deletions(-)
+ .../arm/plat-totalcompute/fdts/optee_sp_manifest.dts |  1 +
+ 4 files changed, 34 insertions(+), 1 deletion(-)
 
 diff --git a/core/arch/arm/kernel/boot.c b/core/arch/arm/kernel/boot.c
-index 09c1b811..d130107f 100644
+index f173384d..466c042e 100644
 --- a/core/arch/arm/kernel/boot.c
 +++ b/core/arch/arm/kernel/boot.c
-@@ -1279,6 +1279,18 @@ static void init_secondary_helper(unsigned long nsec_entry)
+@@ -1350,6 +1350,18 @@ static void init_secondary_helper(unsigned long nsec_entry)
  	init_vfp_sec();
  	init_vfp_nsec();
  
@@ -54,10 +54,10 @@ index 09c1b811..d130107f 100644
  }
  
 diff --git a/core/arch/arm/kernel/thread_a64.S b/core/arch/arm/kernel/thread_a64.S
-index 3e0f5115..63bf396a 100644
+index d6baee4d..1b0c8f37 100644
 --- a/core/arch/arm/kernel/thread_a64.S
 +++ b/core/arch/arm/kernel/thread_a64.S
-@@ -904,6 +904,14 @@ END_FUNC el0_sync_abort
+@@ -1087,6 +1087,14 @@ END_FUNC el0_sync_abort
  	bl	dcache_op_louis
  	ic	iallu
  #endif
@@ -72,7 +72,7 @@ index 3e0f5115..63bf396a 100644
  	/*
  	 * Mark current thread as suspended
  	 */
-@@ -1021,8 +1029,9 @@ LOCAL_FUNC elx_irq , :
+@@ -1204,8 +1212,9 @@ LOCAL_FUNC elx_irq , :
  #endif
  END_FUNC elx_irq
  
@@ -84,10 +84,10 @@ index 3e0f5115..63bf396a 100644
  #else
  	native_intr_handler	fiq
 diff --git a/core/arch/arm/kernel/thread_spmc.c b/core/arch/arm/kernel/thread_spmc.c
-index bd7930e7..89ff82bc 100644
+index ea9e8f03..15577e7e 100644
 --- a/core/arch/arm/kernel/thread_spmc.c
 +++ b/core/arch/arm/kernel/thread_spmc.c
-@@ -1394,6 +1394,17 @@ static TEE_Result spmc_init(void)
+@@ -1518,6 +1518,17 @@ static TEE_Result spmc_init(void)
  	my_endpoint_id = spmc_get_id();
  	DMSG("My endpoint ID %#x", my_endpoint_id);
  
@@ -104,21 +104,19 @@ index bd7930e7..89ff82bc 100644
 +
  	return TEE_SUCCESS;
  }
- #endif /*CFG_CORE_SEL2_SPMC*/
+ #endif /* !defined(CFG_CORE_SEL1_SPMC) */
 diff --git a/core/arch/arm/plat-totalcompute/fdts/optee_sp_manifest.dts b/core/arch/arm/plat-totalcompute/fdts/optee_sp_manifest.dts
-index 4b8b3681..04847c4d 100644
+index 0bfe33f3..00cfa5b2 100644
 --- a/core/arch/arm/plat-totalcompute/fdts/optee_sp_manifest.dts
 +++ b/core/arch/arm/plat-totalcompute/fdts/optee_sp_manifest.dts
-@@ -23,7 +23,8 @@
- 	entrypoint-offset = <0x1000>;
+@@ -24,6 +24,7 @@
  	xlat-granule = <0>; /* 4KiB */
  	boot-order = <0>;
--	messaging-method = <0>; /* Direct messaging only */
-+	messaging-method = <3>; /* Direct request/response supported */
+ 	messaging-method = <0x3>; /* Direct request/response supported */
 +	managed-exit; /* Managed exit supported */
-
+ 
  	device-regions {
  		compatible = "arm,ffa-manifest-device-regions";
 -- 
-2.29.2
+2.34.1
 

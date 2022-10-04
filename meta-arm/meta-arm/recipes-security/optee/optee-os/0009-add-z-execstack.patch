@@ -1,0 +1,94 @@
+From ea932656461865ab9ac4036245c756c082aeb3e1 Mon Sep 17 00:00:00 2001
+From: Jerome Forissier <jerome.forissier@linaro.org>
+Date: Tue, 23 Aug 2022 11:41:00 +0000
+Subject: [PATCH] core, ldelf: link: add -z execstack
+
+When building for arm32 with GNU binutils 2.39, the linker outputs
+warnings when generating some TEE core binaries (all_obj.o, init.o,
+unpaged.o and tee.elf) as well as ldelf.elf:
+
+ arm-poky-linux-gnueabi-ld.bfd: warning: atomic_a32.o: missing .note.GNU-stack section implies executable stack
+ arm-poky-linux-gnueabi-ld.bfd: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+The permissions used when mapping the TEE core stacks do not depend on
+any metadata found in the ELF file. Similarly when the TEE core loads
+ldelf it already creates a non-executable stack regardless of ELF
+information. Therefore we can safely ignore the warnings. This is done
+by adding the '-z execstack' option.
+
+Signed-off-by: Jerome Forissier <jerome.forissier@linaro.org>
+
+Signed-off-by: Anton Antonov <Anton.Antonov@arm.com>
+Upstream-Status: Backport [https://github.com/OP-TEE/optee_os/pull/5499]
+
+---
+ core/arch/arm/kernel/link.mk | 13 +++++++++----
+ ldelf/link.mk                |  3 +++
+ 2 files changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/core/arch/arm/kernel/link.mk b/core/arch/arm/kernel/link.mk
+index c39d43cb..0e96e606 100644
+--- a/core/arch/arm/kernel/link.mk
++++ b/core/arch/arm/kernel/link.mk
+@@ -9,6 +9,11 @@ link-script-dep = $(link-out-dir)/.kern.ld.d
+ 
+ AWK	 = awk
+ 
++link-ldflags-common += $(call ld-option,--no-warn-rwx-segments)
++ifeq ($(CFG_ARM32_core),y)
++link-ldflags-common += $(call ld-option,--no-warn-execstack)
++endif
++
+ link-ldflags  = $(LDFLAGS)
+ ifeq ($(CFG_CORE_ASLR),y)
+ link-ldflags += -pie -Bsymbolic -z norelro $(ldflag-apply-dynamic-relocs)
+@@ -31,7 +36,7 @@ link-ldflags += -T $(link-script-pp) -Map=$(link-out-dir)/tee.map
+ link-ldflags += --sort-section=alignment
+ link-ldflags += --fatal-warnings
+ link-ldflags += --gc-sections
+-link-ldflags += $(call ld-option,--no-warn-rwx-segments)
++link-ldflags += $(link-ldflags-common)
+ 
+ link-ldadd  = $(LDADD)
+ link-ldadd += $(ldflags-external)
+@@ -56,7 +61,7 @@ link-script-cppflags := \
+ 		$(cppflagscore))
+ 
+ ldargs-all_objs := -T $(link-script-dummy) --no-check-sections \
+-		   $(call ld-option,--no-warn-rwx-segments) \
++		   $(link-ldflags-common) \
+ 		   $(link-objs) $(link-ldadd) $(libgcccore)
+ cleanfiles += $(link-out-dir)/all_objs.o
+ $(link-out-dir)/all_objs.o: $(objs) $(libdeps) $(MAKEFILE_LIST)
+@@ -70,7 +75,7 @@ $(link-out-dir)/unpaged_entries.txt: $(link-out-dir)/all_objs.o
+ 		$(AWK) '/ ____keep_pager/ { printf "-u%s ", $$3 }' > $@
+ 
+ unpaged-ldargs := -T $(link-script-dummy) --no-check-sections --gc-sections \
+-		 $(call ld-option,--no-warn-rwx-segments)
++		 $(link-ldflags-common)
+ unpaged-ldadd := $(objs) $(link-ldadd) $(libgcccore)
+ cleanfiles += $(link-out-dir)/unpaged.o
+ $(link-out-dir)/unpaged.o: $(link-out-dir)/unpaged_entries.txt
+@@ -99,7 +104,7 @@ $(link-out-dir)/init_entries.txt: $(link-out-dir)/all_objs.o
+ 		$(AWK) '/ ____keep_init/ { printf "-u%s ", $$3 }' > $@
+ 
+ init-ldargs := -T $(link-script-dummy) --no-check-sections --gc-sections \
+-	       $(call ld-option,--no-warn-rwx-segments)
++	       $(link-ldflags-common)
+ init-ldadd := $(link-objs-init) $(link-out-dir)/version.o  $(link-ldadd) \
+ 	      $(libgcccore)
+ cleanfiles += $(link-out-dir)/init.o
+diff --git a/ldelf/link.mk b/ldelf/link.mk
+index 64c8212a..bd49551e 100644
+--- a/ldelf/link.mk
++++ b/ldelf/link.mk
+@@ -20,6 +20,9 @@ link-ldflags += -z max-page-size=4096 # OP-TEE always uses 4K alignment
+ ifeq ($(CFG_CORE_BTI),y)
+ link-ldflags += $(call ld-option,-z force-bti) --fatal-warnings
+ endif
++ifeq ($(CFG_ARM32_$(sm)), y)
++link-ldflags += $(call ld-option,--no-warn-execstack)
++endif
+ link-ldflags += $(link-ldflags$(sm))
+ 
+ link-ldadd  = $(addprefix -L,$(libdirs))

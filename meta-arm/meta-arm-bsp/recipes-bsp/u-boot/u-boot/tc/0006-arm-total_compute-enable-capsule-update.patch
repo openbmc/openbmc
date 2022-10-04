@@ -1,0 +1,70 @@
+From 2ab887402b9e22842d07e5f2fe1ac54518555af5 Mon Sep 17 00:00:00 2001
+From: Davidson K <davidson.kumaresan@arm.com>
+Date: Mon, 6 Jun 2022 13:24:42 +0530
+Subject: [PATCH 6/7] arm: total_compute: enable capsule update
+
+It includes:
+* Enabling runtime capsule update
+* Enabling efidebug command line tool
+* Enabling the FMP driver that supports ARM PSA firmware update specification
+* Predefining the carved out memory to be used for MM communication
+* Enabling FF-A transport driver and adding an entry in dts
+
+Signed-off-by: Davidson K <davidson.kumaresan@arm.com>
+Change-Id: I6d6c70c6fc386d6c40def800a7417c1ce4b8acf5
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ arch/arm/dts/total_compute.dts  | 7 +++++++
+ configs/total_compute_defconfig | 5 +++++
+ include/configs/total_compute.h | 4 ++++
+ 3 files changed, 16 insertions(+)
+
+diff --git a/arch/arm/dts/total_compute.dts b/arch/arm/dts/total_compute.dts
+index 96edacda0b..9b2cbfb452 100644
+--- a/arch/arm/dts/total_compute.dts
++++ b/arch/arm/dts/total_compute.dts
+@@ -45,8 +45,15 @@
+ 		clock-frequency = <24000000>;
+ 		clock-output-names = "bp:clock24mhz";
+ 	};
++
+ 	psci {
+ 		compatible = "arm,psci-1.0", "arm,psci-0.2";
+ 		method = "smc";
+ 	};
++
++	arm_ffa {
++		compatible = "arm,ffa";
++		method = "smc";
++		status = "okay";
++	};
+ };
+diff --git a/configs/total_compute_defconfig b/configs/total_compute_defconfig
+index 6a375543cd..531ce41cd3 100644
+--- a/configs/total_compute_defconfig
++++ b/configs/total_compute_defconfig
+@@ -52,3 +52,8 @@ CONFIG_SYS_FLASH_PROTECTION=y
+ CONFIG_SYS_FLASH_CFI=y
+ CONFIG_LIBAVB=y
+ CONFIG_OF_LIBFDT_OVERLAY=y
++CONFIG_ARM_FFA_TRANSPORT=y
++CONFIG_CMD_EFIDEBUG=y
++CONFIG_EFI_CAPSULE_FIRMWARE_ARM_PSA=y
++CONFIG_EFI_CAPSULE_ON_DISK=y
++CONFIG_EFI_RUNTIME_UPDATE_CAPSULE=y
+diff --git a/include/configs/total_compute.h b/include/configs/total_compute.h
+index 62bdb4f6a3..4b00f47ec6 100644
+--- a/include/configs/total_compute.h
++++ b/include/configs/total_compute.h
+@@ -59,4 +59,8 @@
+ #define CONFIG_SYS_FLASH_EMPTY_INFO	/* flinfo indicates empty blocks */
+ #define FLASH_MAX_SECTOR_SIZE		0x00040000
+ 
++/* Shared buffer used for communication between u-boot and the FWU SP */
++#define FFA_SHARED_MM_BUFFER_SIZE	4 * 1024 * 1024 /* 4 MB */
++#define FFA_SHARED_MM_BUFFER_ADDR	(0xFCA00000)
++
+ #endif /* __TOTAL_COMPUTE_H */
+-- 
+2.34.1
+

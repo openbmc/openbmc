@@ -1,0 +1,993 @@
+From 6d26058401bce6012173b5341cdf4de72772a1c2 Mon Sep 17 00:00:00 2001
+From: Davidson K <davidson.kumaresan@arm.com>
+Date: Mon, 6 Jun 2022 13:19:07 +0530
+Subject: [PATCH 5/7] efi_firmware: add new fmp driver that supports arm fwu
+ specification
+
+This fmp driver communicates to the firmware update secure partition
+executing in the secure world which is an implementation of the arm
+psa specification for the firmware update. The communication to the
+firmware update secure partition is based on stmm and arm ff-a framework.
+
+It implements only the get_image_info and set_image api.
+
+Signed-off-by: Davidson K <davidson.kumaresan@arm.com>
+Change-Id: I94c2cad210c32a60a8a0594cacf530b68ab6a09d
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ include/efi_firmware_arm_psa.h        | 218 +++++++++++
+ include/efi_loader.h                  |   1 +
+ lib/efi_loader/Kconfig                |   9 +
+ lib/efi_loader/Makefile               |   1 +
+ lib/efi_loader/efi_capsule.c          |   8 +
+ lib/efi_loader/efi_firmware.c         | 134 +++++++
+ lib/efi_loader/efi_firmware_arm_psa.c | 520 ++++++++++++++++++++++++++
+ 7 files changed, 891 insertions(+)
+ create mode 100644 include/efi_firmware_arm_psa.h
+ create mode 100644 lib/efi_loader/efi_firmware_arm_psa.c
+
+diff --git a/include/efi_firmware_arm_psa.h b/include/efi_firmware_arm_psa.h
+new file mode 100644
+index 0000000000..82f932066c
+--- /dev/null
++++ b/include/efi_firmware_arm_psa.h
+@@ -0,0 +1,218 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Copyright (C) 2022 Arm Limited
++ */
++
++#ifndef _EFI_FIRMWARE_ARM_PSA_H
++#define _EFI_FIRMWARE_ARM_PSA_H
++
++#include <efi_loader.h>
++#include <mm_communication.h>
++#include <stdint.h>
++
++#define PSA_FWU_DIRECTORY_UUID \
++	EFI_GUID(0xdeee58d9, 0x5147, 0x4ad3, \
++		 0xa2, 0x90, 0x77, 0x66, 0x6e, 0x23, 0x41, 0xa5)
++
++#define PSA_FWU_SP_UUID \
++	EFI_GUID(0x6823a838, 0x1b06, 0x470e, \
++		 0x97, 0x74, 0x0c, 0xce, 0x8b, 0xfb, 0x53, 0xfd)
++
++#define FFA_FWU_SP_UUID \
++	{0x68, 0x23, 0xa8, 0x38, 0x1b, 0x06, 0x47, \
++		0x0e, 0x97, 0x74, 0x0c, 0xce, 0x8b, 0xfb, 0x53, 0xfd}
++
++#define FWU_DISCOVER		0
++#define FWU_BEGIN_STAGING	1
++#define FWU_END_STAGING 	2
++#define FWU_CANCEL_STAGING	3
++#define FWU_OPEN		4
++#define FWU_WRITE_STREAM	5
++#define FWU_READ_STREAM 	6
++#define FWU_COMMIT		7
++#define FWU_ACCEPT_IMAGE	9
++#define FWU_SELECT_PREVIOUS	10
++
++#define FWU_SUCCESS		0
++#define FWU_UNKNOWN		((int32_t)-1)
++#define FWU_BUSY		((int32_t)-2)
++#define FWU_OUT_OF_BOUNDS	((int32_t)-3)
++#define FWU_AUTH_FAIL		((int32_t)-4)
++#define FWU_NO_PERMISSION	((int32_t)-5)
++#define FWU_DENIED		((int32_t)-6)
++#define FWU_RESUME		((int32_t)-7)
++
++#define MAX_IMAGES		5
++
++typedef int32_t fwu_status_t;
++
++struct fwu_image_info_entry {
++	efi_guid_t image_guid;
++	uint32_t client_permissions;
++	uint32_t img_max_size;
++	uint32_t lowest_acceptable_version;
++	uint32_t img_version;
++	uint32_t accepted;
++	uint32_t reserved;
++}__packed;
++
++struct fwu_image_directory {
++	uint32_t directory_version;
++	uint32_t num_images;
++	uint32_t active_index;
++	uint32_t boot_index;
++	struct fwu_image_info_entry entries[MAX_IMAGES];
++}__packed;
++
++int __efi_runtime arm_psa_get_image_info(
++	efi_uintn_t *image_info_size,
++	struct efi_firmware_image_descriptor *image_info,
++	u32 *descriptor_version,
++	u8 *descriptor_count,
++	efi_uintn_t *descriptor_size,
++	u32 *package_version,
++	u16 **package_version_name
++);
++
++int __efi_runtime arm_psa_update(
++	const void *image,
++	u8 image_index,
++	efi_uintn_t image_size
++);
++
++struct mm_fwu_discover_arg {
++	uint32_t func_id;
++}__packed;
++
++struct mm_fwu_discover_ret {
++	uint32_t status;
++	uint8_t version_major;
++	uint8_t version_minor;
++	uint16_t num_func;
++	uint8_t function_presence[];
++}__packed;
++
++struct mm_fwu_begin_staging_arg {
++	uint32_t func_id;
++}__packed;
++
++struct mm_fwu_begin_staging_ret {
++	uint32_t status;
++}__packed;
++
++struct mm_fwu_end_staging_arg {
++	uint32_t func_id;
++}__packed;
++
++struct mm_fwu_end_staging_ret {
++	uint32_t status;
++}__packed;
++
++struct mm_fwu_cancel_staging_arg {
++	uint32_t func_id;
++}__packed;
++
++struct mm_fwu_cancel_staging_ret {
++	uint32_t status;
++}__packed;
++
++struct mm_fwu_open_arg {
++	uint32_t func_id;
++	efi_guid_t image_guid;
++}__packed;
++
++struct mm_fwu_open_ret {
++	uint32_t status;
++	uint32_t handle;
++}__packed;
++
++struct mm_fwu_write_stream_arg {
++	uint32_t func_id;
++	uint32_t handle;
++	uint32_t data_len;
++	uint8_t payload[];
++}__packed;
++
++struct mm_fwu_write_stream_ret {
++	uint32_t status;
++};
++
++struct mm_fwu_read_stream_arg {
++	uint32_t func_id;
++	uint32_t handle;
++}__packed;
++
++struct mm_fwu_read_stream_ret {
++	uint32_t status;
++	uint32_t read_bytes;
++	uint32_t total_bytes;
++	uint8_t payload[];
++}__packed;
++
++struct mm_fwu_commit_arg {
++	uint32_t func_id;
++	uint32_t handle;
++	uint32_t acceptance_req;
++	uint32_t max_atomic_len;
++}__packed;
++
++struct mm_fwu_commit_ret {
++	uint32_t status;
++	uint32_t progress;
++	uint32_t total_work;
++}__packed;
++
++struct mm_fwu_accept_arg {
++	uint32_t func_id;
++	uint32_t reserved;
++	efi_guid_t image_type_uuid;
++}__packed;
++
++struct mm_fwu_accept_ret {
++	uint32_t status;
++};
++
++struct mm_fwu_select_previous_arg {
++	uint32_t func_id;
++}__packed;
++
++struct mm_fwu_select_previous_ret {
++	uint32_t status;
++}__packed;
++
++inline static void *get_fwu_hdr(struct efi_mm_communicate_header *mm_hdr)
++{
++	const efi_guid_t fwu_sp_guid = PSA_FWU_SP_UUID;
++	guidcpy(&mm_hdr->header_guid, &fwu_sp_guid);
++	return mm_hdr->data;
++}
++
++#define GET_HDR(name)						\
++static inline struct mm_fwu_##name *				\
++get_fwu_##name (struct efi_mm_communicate_header *mm_hdr)	\
++{								\
++	return (struct mm_fwu_##name *)get_fwu_hdr(mm_hdr);	\
++}								\
++
++GET_HDR(discover_arg)
++GET_HDR(discover_ret)
++GET_HDR(begin_staging_arg)
++GET_HDR(begin_staging_ret)
++GET_HDR(end_staging_arg)
++GET_HDR(end_staging_ret)
++GET_HDR(cancel_staging_arg)
++GET_HDR(cancel_staging_ret)
++GET_HDR(open_arg)
++GET_HDR(open_ret)
++GET_HDR(write_stream_arg)
++GET_HDR(write_stream_ret)
++GET_HDR(read_stream_arg)
++GET_HDR(read_stream_ret)
++GET_HDR(commit_arg)
++GET_HDR(commit_ret)
++GET_HDR(accept_arg)
++GET_HDR(accept_ret)
++GET_HDR(select_previous_arg)
++GET_HDR(select_previous_ret)
++
++#endif /* _EFI_FIRMWARE_ARM_PSA_H */
+diff --git a/include/efi_loader.h b/include/efi_loader.h
+index af36639ec6..7327c87497 100644
+--- a/include/efi_loader.h
++++ b/include/efi_loader.h
+@@ -961,6 +961,7 @@ u16 *efi_create_indexed_name(u16 *buffer, size_t buffer_size, const char *name,
+ 
+ extern const struct efi_firmware_management_protocol efi_fmp_fit;
+ extern const struct efi_firmware_management_protocol efi_fmp_raw;
++extern const struct efi_firmware_management_protocol efi_fmp_arm_psa;
+ 
+ /* Capsule update */
+ efi_status_t EFIAPI efi_update_capsule(
+diff --git a/lib/efi_loader/Kconfig b/lib/efi_loader/Kconfig
+index e5e35fe51f..f99d436f16 100644
+--- a/lib/efi_loader/Kconfig
++++ b/lib/efi_loader/Kconfig
+@@ -168,6 +168,15 @@ config EFI_CAPSULE_FIRMWARE_MANAGEMENT
+ 	  Select this option if you want to enable capsule-based
+ 	  firmware update using Firmware Management Protocol.
+ 
++config EFI_CAPSULE_FIRMWARE_ARM_PSA
++	bool "FMP driver for ARM PSA FWU specification"
++	depends on EFI_CAPSULE_FIRMWARE_MANAGEMENT
++	select EFI_CAPSULE_FIRMWARE
++	help
++	  Select this option if you want to enable firmware management protocol
++	  driver that supports the ARM PSA firmware update specification as
++	  mentioned in https://developer.arm.com/documentation/den0118/a/
++
+ config EFI_CAPSULE_FIRMWARE_FIT
+ 	bool "FMP driver for FIT images"
+ 	depends on FIT
+diff --git a/lib/efi_loader/Makefile b/lib/efi_loader/Makefile
+index 034d26cf01..f986ac6417 100644
+--- a/lib/efi_loader/Makefile
++++ b/lib/efi_loader/Makefile
+@@ -38,6 +38,7 @@ obj-y += efi_boottime.o
+ obj-y += efi_helper.o
+ obj-$(CONFIG_EFI_HAVE_CAPSULE_SUPPORT) += efi_capsule.o
+ obj-$(CONFIG_EFI_CAPSULE_FIRMWARE) += efi_firmware.o
++obj-$(CONFIG_EFI_CAPSULE_FIRMWARE_ARM_PSA) += efi_firmware_arm_psa.o
+ obj-y += efi_console.o
+ obj-y += efi_device_path.o
+ obj-$(CONFIG_EFI_DEVICE_PATH_TO_TEXT) += efi_device_path_to_text.o
+diff --git a/lib/efi_loader/efi_capsule.c b/lib/efi_loader/efi_capsule.c
+index f00440163d..3154fc51d3 100644
+--- a/lib/efi_loader/efi_capsule.c
++++ b/lib/efi_loader/efi_capsule.c
+@@ -1041,6 +1041,14 @@ efi_status_t __weak efi_load_capsule_drivers(void)
+ 				&efi_fmp_raw, NULL));
+ 	}
+ 
++	if (IS_ENABLED(CONFIG_EFI_CAPSULE_FIRMWARE_ARM_PSA)) {
++		handle = NULL;
++		ret = EFI_CALL(efi_install_multiple_protocol_interfaces(
++				&handle,
++				&efi_guid_firmware_management_protocol,
++				&efi_fmp_arm_psa, NULL));
++	}
++
+ 	return ret;
+ }
+ 
+diff --git a/lib/efi_loader/efi_firmware.c b/lib/efi_loader/efi_firmware.c
+index a5ff32f121..3356559af8 100644
+--- a/lib/efi_loader/efi_firmware.c
++++ b/lib/efi_loader/efi_firmware.c
+@@ -9,6 +9,7 @@
+ #include <common.h>
+ #include <charset.h>
+ #include <dfu.h>
++#include <efi_firmware_arm_psa.h>
+ #include <efi_loader.h>
+ #include <image.h>
+ #include <signatures.h>
+@@ -478,3 +479,136 @@ const struct efi_firmware_management_protocol efi_fmp_raw = {
+ 	.set_package_info = efi_firmware_set_package_info_unsupported,
+ };
+ #endif /* CONFIG_EFI_CAPSULE_FIRMWARE_RAW */
++
++#ifdef CONFIG_EFI_CAPSULE_FIRMWARE_ARM_PSA
++/*
++ * This FIRMWARE_MANAGEMENT_PROTOCOL driver provides a firmware update
++ * method that supports the arm psa firmware update specification.
++ */
++
++/**
++ * efi_firmware_arm_psa_get_image_info - return information about the
++ * 					 current firmware image
++ * @this:			Protocol instance
++ * @image_info_size:		Size of @image_info
++ * @image_info:			Image information
++ * @descriptor_version:		Pointer to version number
++ * @descriptor_count:		Pointer to number of descriptors
++ * @descriptor_size:		Pointer to descriptor size
++ * package_version:		Package version
++ * package_version_name:	Package version's name
++ *
++ * Return information bout the current firmware image in @image_info.
++ * @image_info will consist of a number of descriptors.
++ *
++ * Return		status code
++ */
++
++static
++efi_status_t EFIAPI efi_firmware_arm_psa_get_image_info(
++	struct efi_firmware_management_protocol *this,
++	efi_uintn_t *image_info_size,
++	struct efi_firmware_image_descriptor *image_info,
++	u32 *descriptor_version,
++	u8 *descriptor_count,
++	efi_uintn_t *descriptor_size,
++	u32 *package_version,
++	u16 **package_version_name)
++{
++	int ret;
++
++	EFI_ENTRY("%p %p %p %p %p %p %p %p\n", this,
++		  image_info_size, image_info,
++		  descriptor_version, descriptor_count, descriptor_size,
++		  package_version, package_version_name);
++
++	if (!image_info_size)
++		return EFI_EXIT(EFI_INVALID_PARAMETER);
++
++	if (*image_info_size &&
++	    (!image_info || !descriptor_version || !descriptor_count ||
++	     !descriptor_size || !package_version || !package_version_name))
++		return EFI_EXIT(EFI_INVALID_PARAMETER);
++
++	ret = arm_psa_get_image_info(image_info_size, image_info,
++				descriptor_version, descriptor_count,
++				descriptor_size,
++				package_version, package_version_name);
++
++	if (ret) {
++		if (ret == -ENOMEM)
++			return EFI_EXIT(EFI_BUFFER_TOO_SMALL);
++		else
++			return EFI_EXIT(EFI_DEVICE_ERROR);
++	}
++
++	return EFI_EXIT(EFI_SUCCESS);
++}
++
++/**
++ * efi_firmware_arm_psa_set_image - update the firmware image
++ * @this:		Protocol instance
++ * @image_index:	Image index number
++ * @image:		New image
++ * @image_size:		Size of new image
++ * @vendor_code:	Vendor-specific update policy
++ * @progress:		Function to report the progress of update
++ * @abort_reason:	Pointer to string of abort reason
++ *
++ * Update the firmware to new image, following the arm psa firmware
++ * update specification.
++ * @vendor_code, @progress and @abort_reason are not supported.
++ *
++ * Return:		status code
++ */
++static
++efi_status_t EFIAPI efi_firmware_arm_psa_set_image(
++	struct efi_firmware_management_protocol *this,
++	u8 image_index,
++	const void *image,
++	efi_uintn_t image_size,
++	const void *vendor_code,
++	efi_status_t (*progress)(efi_uintn_t completion),
++	u16 **abort_reason)
++{
++	u32 fmp_hdr_signature;
++	const struct fmp_payload_header *header;
++
++	EFI_ENTRY("%p %d %p %zd %p %p %p\n", this, image_index, image,
++		  image_size, vendor_code, progress, abort_reason);
++
++	if (!image)
++		return EFI_EXIT(EFI_INVALID_PARAMETER);
++
++	/* TODO: capsule authentication */
++
++	fmp_hdr_signature = FMP_PAYLOAD_HDR_SIGNATURE;
++	header = (void *)image;
++
++	if (!memcmp(&header->signature, &fmp_hdr_signature,
++		    sizeof(fmp_hdr_signature))) {
++		/*
++		 * When building the capsule with the scripts in
++		 * edk2, a FMP header is inserted above the capsule
++		 * payload. Compensate for this header to get the
++		 * actual payload that is to be updated.
++		 */
++		image = (unsigned char *)image + header->header_size;
++		image_size -= header->header_size;
++	}
++
++	if (arm_psa_update(image, image_index, image_size))
++		return EFI_EXIT(EFI_DEVICE_ERROR);
++
++	return EFI_EXIT(EFI_SUCCESS);
++}
++
++const struct efi_firmware_management_protocol efi_fmp_arm_psa = {
++	.get_image_info = efi_firmware_arm_psa_get_image_info,
++	.get_image = efi_firmware_get_image_unsupported,
++	.set_image = efi_firmware_arm_psa_set_image,
++	.check_image = efi_firmware_check_image_unsupported,
++	.get_package_info = efi_firmware_get_package_info_unsupported,
++	.set_package_info = efi_firmware_set_package_info_unsupported,
++};
++#endif /* CONFIG_EFI_CAPSULE_FIRMWARE_ARM_PSA */
+diff --git a/lib/efi_loader/efi_firmware_arm_psa.c b/lib/efi_loader/efi_firmware_arm_psa.c
+new file mode 100644
+index 0000000000..ab575f0124
+--- /dev/null
++++ b/lib/efi_loader/efi_firmware_arm_psa.c
+@@ -0,0 +1,520 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Copyright (C) 2022 Arm Limited
++ */
++
++#include <arm_ffa_helper.h>
++#include <configs/total_compute.h>
++#include <efi_firmware_arm_psa.h>
++#include <efi_loader.h>
++#include <malloc.h>
++#include <mapmem.h>
++#include <mm_communication.h>
++
++/* MM return codes */
++#define MM_SUCCESS	0
++
++#define ARM_SVC_ID_SP_EVENT_COMPLETE_AARCH64	0xC4000061
++#define ARM_SVC_ID_SP_EVENT_COMPLETE		ARM_SVC_ID_SP_EVENT_COMPLETE_AARCH64
++
++__efi_runtime_data static u16 mm_sp_id;
++__efi_runtime_data static int fwu_initialized = 0;
++__efi_runtime_data struct fwu_image_directory cached_image_directory;
++__efi_runtime_data struct efi_mm_communicate_header *mm_hdr;
++__efi_runtime_data void *mm_comm_buf;
++
++/**
++ * ffa_discover_mm_sp_id() - Query the MM partition ID
++ *
++ * Use the FF-A driver to get the MM partition ID.
++ * If multiple partitions are found, use the first one
++ *
++ * Return:
++ *
++ * 0 on success
++ */
++static int __efi_runtime ffa_discover_mm_sp_id(void)
++{
++	struct ffa_interface_data func_data = {0};
++	u32 count = 0;
++	int ret;
++	struct ffa_partition_info *parts_info;
++	static union ffa_partition_uuid fwu_sp_uuid = {.bytes = FFA_FWU_SP_UUID};
++
++	/*
++	 * get from the driver the count of the SPs matching the UUID
++	 */
++	func_data.data0_size = sizeof(fwu_sp_uuid);
++	func_data.data0 = &fwu_sp_uuid;
++	func_data.data1_size = sizeof(count);
++	func_data.data1 = &count;
++
++	ret = ffa_helper_get_partitions_info(&func_data);
++	if (ret != FFA_ERR_STAT_SUCCESS) {
++		log_err("EFI: Failure in querying partitions count (error code: %d)\n", ret);
++		return ret;
++	}
++
++	if (!count) {
++		log_info("EFI: No MM partition found\n");
++		return ret;
++	}
++
++	/*
++	 * pre-allocate a buffer to be filled by the driver
++	 * with  ffa_partition_info structs
++	 */
++	parts_info = calloc(count, sizeof(struct ffa_partition_info));
++	if (!parts_info)
++		return -EINVAL;
++
++	log_info("EFI: Pre-allocating %d partition(s) info structures\n", count);
++
++	func_data.data1_size = count * sizeof(struct ffa_partition_info);
++	func_data.data1 = parts_info;
++
++	/*
++	 * ask the driver to fill the
++	 * buffer with the SPs info
++	 */
++	ret = ffa_helper_get_partitions_info(&func_data);
++	if (ret != FFA_ERR_STAT_SUCCESS) {
++		log_err("EFI: Failure in querying partition(s) info (error code: %d)\n", ret);
++		free(parts_info);
++		return ret;
++	}
++
++	/*
++	 * MM SPs found , use the first one
++	 */
++
++	mm_sp_id = parts_info[0].id;
++
++	log_info("EFI: MM partition ID 0x%x\n", mm_sp_id);
++
++	free(parts_info);
++
++	return 0;
++}
++
++/**
++ * ffa_notify_mm_sp() - Announce there is data in the shared buffer
++ *
++ * Notifies the MM partition in the trusted world that
++ * data is available in the shared buffer.
++ * This is a blocking call during which trusted world has exclusive access
++ * to the MM shared buffer.
++ *
++ * Return:
++ *
++ * 0 on success
++ */
++static int __efi_runtime ffa_notify_mm_sp(void)
++{
++	struct ffa_interface_data func_data = {0};
++	struct ffa_send_direct_data msg = {0};
++	int ret;
++	u32 sp_event_complete;
++	int sp_event_ret;
++
++	func_data.data0_size = sizeof(mm_sp_id);
++	func_data.data0 = &mm_sp_id;
++
++	msg.a3 = FFA_SHARED_MM_BUFFER_ADDR;
++	msg.a4 = FFA_SHARED_MM_BUFFER_SIZE;
++	func_data.data1_size = sizeof(msg);
++	func_data.data1 = &msg;
++
++	ret = ffa_helper_msg_send_direct_req(&func_data);
++	if (ret != FFA_ERR_STAT_SUCCESS) {
++		log_err("EFI: Failure to notify the MM SP , FF-A  error (%d)\n", ret);
++		return ret;
++	}
++
++	sp_event_complete = msg.a3;
++	sp_event_ret = (int)msg.a4;
++
++	if (sp_event_complete == ARM_SVC_ID_SP_EVENT_COMPLETE && sp_event_ret == MM_SUCCESS)
++		return 0;
++
++	log_err("EFI: Failure to notify the MM SP (0x%x , %d)\n",
++		sp_event_complete,
++		sp_event_ret);
++
++	return -EACCES;
++}
++
++static fwu_status_t __efi_runtime fwu_discover(void)
++{
++	int ret;
++	struct mm_fwu_discover_arg *discover_arg = get_fwu_discover_arg(mm_hdr);
++	struct mm_fwu_discover_ret *discover_ret = get_fwu_discover_ret(mm_hdr);
++
++	discover_arg->func_id = FWU_DISCOVER;
++
++	mm_hdr->message_len = sizeof(struct mm_fwu_discover_arg);
++
++	ret = ffa_notify_mm_sp();
++	if (ret)
++		return ret;
++
++	if (discover_ret->version_major != 1) {
++		log_err("FWU: Unsupported Update Agent version\n");
++		return -EINVAL;
++	}
++	/* TODO: check other parameters as well */
++
++	return discover_ret->status;
++}
++
++static fwu_status_t __efi_runtime fwu_begin_staging(void)
++{
++	int ret;
++	struct mm_fwu_begin_staging_arg *begin_staging_arg = get_fwu_begin_staging_arg(mm_hdr);
++	struct mm_fwu_begin_staging_ret *begin_staging_ret = get_fwu_begin_staging_ret(mm_hdr);
++
++	begin_staging_arg->func_id = FWU_BEGIN_STAGING;
++
++	mm_hdr->message_len = sizeof(struct mm_fwu_begin_staging_arg);
++
++	ret = ffa_notify_mm_sp();
++	if (ret)
++		return ret;
++
++	return begin_staging_ret->status;
++}
++
++static fwu_status_t __efi_runtime fwu_end_staging(void)
++{
++	int ret;
++	struct mm_fwu_end_staging_arg *end_staging_arg = get_fwu_end_staging_arg(mm_hdr);
++	struct mm_fwu_end_staging_ret *end_staging_ret = get_fwu_end_staging_ret(mm_hdr);
++
++	end_staging_arg->func_id = FWU_END_STAGING;
++
++	mm_hdr->message_len = sizeof(struct mm_fwu_end_staging_arg);
++
++	ret = ffa_notify_mm_sp();
++	if (ret)
++		return ret;
++
++	return end_staging_ret->status;
++}
++
++static fwu_status_t __efi_runtime fwu_cancel_staging(void)
++{
++	int ret;
++	struct mm_fwu_cancel_staging_arg *cancel_staging_arg = get_fwu_cancel_staging_arg(mm_hdr);
++	struct mm_fwu_cancel_staging_ret *cancel_staging_ret = get_fwu_cancel_staging_ret(mm_hdr);
++
++	cancel_staging_arg->func_id = FWU_CANCEL_STAGING;
++
++	mm_hdr->message_len = sizeof(struct mm_fwu_cancel_staging_arg);
++
++	ret = ffa_notify_mm_sp();
++	if (ret)
++		return ret;
++
++	return cancel_staging_ret->status;
++}
++
++static fwu_status_t __efi_runtime fwu_open(const efi_guid_t *img_uuid, uint32_t *handle)
++{
++	int ret;
++	struct mm_fwu_open_arg *open_hdr = get_fwu_open_arg(mm_hdr);
++	struct mm_fwu_open_ret *open_ret = get_fwu_open_ret(mm_hdr);
++
++	open_hdr->func_id = FWU_OPEN;
++	guidcpy(&open_hdr->image_guid, img_uuid);
++
++	mm_hdr->message_len = sizeof(struct mm_fwu_open_arg);
++
++	ret = ffa_notify_mm_sp();
++	if (ret)
++		return ret;
++
++	*handle = open_ret->handle;
++
++	return open_ret->status;
++}
++
++static fwu_status_t __efi_runtime fwu_read_stream(uint32_t handle, uint8_t *buffer, uint32_t buffer_size)
++{
++	int ret;
++	struct mm_fwu_read_stream_arg *read_stream_hdr = get_fwu_read_stream_arg(mm_hdr);
++	struct mm_fwu_read_stream_ret *read_stream_ret = get_fwu_read_stream_ret(mm_hdr);
++	uint32_t payload_size = FFA_SHARED_MM_BUFFER_SIZE - sizeof(struct mm_fwu_read_stream_ret)
++							- sizeof(struct efi_mm_communicate_header);
++	uint32_t read_offset = 0, read_size, total_size;
++
++	do {
++		read_stream_hdr->func_id = FWU_READ_STREAM;
++		read_stream_hdr->handle = handle;
++
++		mm_hdr->message_len = sizeof(struct mm_fwu_read_stream_arg);
++
++		ret = ffa_notify_mm_sp();
++		if (ret)
++			return ret;
++
++		if (read_stream_ret->status)
++			return read_stream_ret->status;
++
++		read_size = read_stream_ret->read_bytes;
++		total_size = read_stream_ret->total_bytes;
++
++		log_info("FWU: read bytes / total bytes : %d/%d\n", read_size, total_size);
++
++		if ((read_size <= payload_size) && (read_offset + read_size <= buffer_size))
++			memcpy(buffer + read_offset, read_stream_ret->payload, read_size);
++		else
++			return -EINVAL;
++
++		read_offset += read_size;
++
++		if (read_offset > total_size)
++			return -EINVAL;
++	} while (total_size != read_offset);
++
++	return read_stream_ret->status;
++}
++
++static fwu_status_t __efi_runtime fwu_write_stream(uint32_t handle, const uint8_t *buffer, uint32_t remaining_size)
++{
++	int ret;
++	struct mm_fwu_write_stream_arg *write_stream_arg = get_fwu_write_stream_arg(mm_hdr);
++	struct mm_fwu_write_stream_ret *write_stream_ret = get_fwu_write_stream_ret(mm_hdr);
++	uint32_t write_size;
++	uint32_t payload_size = FFA_SHARED_MM_BUFFER_SIZE - sizeof(struct mm_fwu_write_stream_arg)
++							- sizeof(struct efi_mm_communicate_header);
++
++	while (remaining_size) {
++		write_size = (remaining_size < payload_size) ? remaining_size :  payload_size;
++		write_stream_arg->func_id = FWU_WRITE_STREAM;
++		write_stream_arg->handle = handle;
++		write_stream_arg->data_len = write_size;
++		memcpy(write_stream_arg->payload, buffer, write_size);
++
++		mm_hdr->message_len = sizeof(struct mm_fwu_write_stream_arg) + write_size;
++
++		ret = ffa_notify_mm_sp();
++		if (ret)
++			return ret;
++
++		if(write_stream_ret->status)
++			return write_stream_ret->status;
++
++		remaining_size -= write_size;
++		buffer += write_size;
++
++		log_info("FWU: write size = %d, remaining size = %d\n",
++				write_size, remaining_size);
++	}
++
++	return write_stream_ret->status;
++}
++
++static fwu_status_t __efi_runtime fwu_commit(uint32_t handle, bool client_accept)
++{
++	int ret;
++	struct mm_fwu_commit_arg *commit_arg = get_fwu_commit_arg(mm_hdr);
++	struct mm_fwu_commit_ret *commit_ret = get_fwu_commit_ret(mm_hdr);
++
++	do {
++		commit_arg->func_id = FWU_COMMIT;
++		commit_arg->handle = handle;
++		commit_arg->acceptance_req = client_accept;
++		commit_arg->max_atomic_len = 0;
++
++		mm_hdr->message_len = sizeof(struct mm_fwu_commit_arg);
++
++		ret = ffa_notify_mm_sp();
++		if (ret)
++			return ret;
++
++		log_info("FWU: commit progress %d/%d (work/total_work)\n",
++			commit_ret->progress, commit_ret->total_work);
++
++	} while(commit_ret->status==FWU_RESUME);
++
++	return commit_ret->status;
++}
++
++int __efi_runtime arm_psa_update(
++	const void *image,
++	u8 image_index,
++	efi_uintn_t image_size
++)
++{
++	int ret = 0;
++	uint32_t handle;
++
++	if(image_index >= cached_image_directory.num_images)
++		return -EINVAL;
++
++	ret = fwu_begin_staging();
++	if (ret) {
++		log_err("FWU: begin staging failed, ret = %d\n", ret);
++		return ret;
++	}
++
++	ret = fwu_open(&cached_image_directory.entries[image_index].image_guid, &handle);
++	if (ret) {
++		log_err("FWU: firmware image open failed, ret = %d\n", ret);
++		goto cancel_staging;
++	}
++
++	ret = fwu_write_stream(handle, (uint8_t *)image, image_size);
++	if (ret) {
++		log_err("FWU: write stream failed, ret = %d\n", ret);
++		goto cancel_staging;
++	}
++
++	/* TODO: implement client driven image acceptance */
++	ret = fwu_commit(handle, 0);
++	if (ret) {
++		log_err("FWU: commit failed, ret = %d\n", ret);
++		goto cancel_staging;
++	}
++
++	ret = fwu_end_staging();
++	if (ret) {
++		log_err("FWU: end staging failed, ret = %d\n", ret);
++		goto cancel_staging;
++	}
++
++	log_info("successfully updated the image at index %d\n", image_index);
++	return ret;
++
++cancel_staging:
++	if (fwu_cancel_staging())
++		log_err("FWU: cancel staging failed, ret = %d\n", ret);
++
++	return ret;
++}
++
++static int __efi_runtime read_image_directory(void)
++{
++	int ret;
++	uint32_t handle;
++
++	const efi_guid_t fwu_directory_uuid = PSA_FWU_DIRECTORY_UUID;
++
++	ret = fwu_open(&fwu_directory_uuid, &handle);
++	if (ret) {
++		log_err("FWU: open image directory failed, ret = %d\n", ret);
++		return ret;
++	}
++
++	ret = fwu_read_stream(handle, (uint8_t *)&cached_image_directory, sizeof(cached_image_directory));
++	if (ret) {
++		log_err("FWU: read stream failed, ret = %d\n", ret);
++		return ret;
++	}
++
++	if(cached_image_directory.num_images > MAX_IMAGES) {
++		log_err("FWU: image limit exceeded.\n");
++		log_err("FWU: number of images present: %d, max number of images supported: %d\n",
++					cached_image_directory.num_images, MAX_IMAGES);
++		return -EINVAL;
++	}
++
++	return ret;
++}
++
++static int update_agent_init(void)
++{
++	int ret;
++
++	ret = ffa_discover_mm_sp_id();
++	if (ret) {
++		log_err("FWU: discover update agent failed, ret = %d\n", ret);
++		return ret;
++	}
++
++	mm_comm_buf = (void *)map_sysmem((phys_addr_t)FFA_SHARED_MM_BUFFER_ADDR, 0);
++	mm_hdr = (struct efi_mm_communicate_header *)mm_comm_buf;
++
++	ret = fwu_discover();
++	if (ret) {
++		log_err("FWU: discover failed, ret = %d\n", ret);
++		goto out;
++	}
++
++	ret = read_image_directory();
++	if (ret) {
++		log_err("FWU: reading image directory failed, ret = %d\n", ret);
++		goto out;
++	}
++
++	fwu_initialized = 1;
++	return ret;
++out:
++	unmap_sysmem(mm_comm_buf);
++	return ret;
++}
++
++int __efi_runtime arm_psa_get_image_info(
++        efi_uintn_t *image_info_size,
++        struct efi_firmware_image_descriptor *image_info,
++        u32 *descriptor_version,
++        u8 *descriptor_count,
++        efi_uintn_t *descriptor_size,
++        u32 *package_version,
++        u16 **package_version_name)
++{
++	int ret = 0;
++	int required_image_info_size;
++
++	if (!fwu_initialized) {
++		ret = update_agent_init();
++		if (ret) {
++			log_err("update agent init failed, ret = %d\n", ret);
++			return ret;
++		}
++	}
++
++	required_image_info_size = cached_image_directory.num_images *
++				sizeof(struct efi_firmware_image_descriptor);
++
++	if (*image_info_size < required_image_info_size) {
++		*image_info_size = required_image_info_size;
++		return -ENOMEM;
++	}
++
++	*descriptor_version = EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION;
++	*descriptor_count = cached_image_directory.num_images;
++	*descriptor_size = required_image_info_size;
++	*package_version = 0xffffffff; /* not supported */
++	*package_version_name = NULL; /* not supported */
++
++	for (int i = 0; i < cached_image_directory.num_images; i++) {
++		image_info[i].image_index = i+1;
++		guidcpy(&image_info[i].image_type_id, &cached_image_directory.entries[i].image_guid);
++		image_info[i].image_id = i;
++		image_info[i].image_id_name = NULL; /* not supported */
++		image_info[i].version = cached_image_directory.entries[i].img_version;
++		image_info[i].version_name = NULL; /* not supported */
++		image_info[i].size = cached_image_directory.entries[i].img_max_size;
++
++		image_info[i].attributes_supported =
++			IMAGE_ATTRIBUTE_IMAGE_UPDATABLE |
++			IMAGE_ATTRIBUTE_AUTHENTICATION_REQUIRED;
++		image_info[i].attributes_setting =
++				IMAGE_ATTRIBUTE_IMAGE_UPDATABLE;
++
++		/* Check if the capsule authentication is enabled */
++		if (IS_ENABLED(CONFIG_EFI_CAPSULE_AUTHENTICATE))
++			image_info[i].attributes_setting |=
++				IMAGE_ATTRIBUTE_AUTHENTICATION_REQUIRED;
++
++		image_info[i].lowest_supported_image_version =
++			cached_image_directory.entries[i].lowest_acceptable_version;
++		image_info[i].last_attempt_version = 0;
++		image_info[i].last_attempt_status = LAST_ATTEMPT_STATUS_SUCCESS;
++		image_info[i].hardware_instance = 1;
++		image_info[i].dependencies = NULL; /* not supported */
++	}
++
++	return ret;
++}
+-- 
+2.34.1
+

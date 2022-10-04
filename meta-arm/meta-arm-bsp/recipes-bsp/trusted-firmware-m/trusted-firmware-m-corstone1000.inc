@@ -25,25 +25,8 @@ SRC_URI += "git://github.com/OpenAMP/open-amp.git;protocol=https;branch=main;nam
 SRCREV_openamp = "347397decaa43372fc4d00f965640ebde042966d"
 EXTRA_OECMAKE += "-DLIBOPENAMP_SRC_PATH=${WORKDIR}/git/openamp -DLIBOPENAMP_BIN_PATH=${B}/libopenamp-build"
 
-DEPENDS += "trusted-firmware-a"
-
-# adding host images signing support
-require trusted-firmware-m-sign-host-images.inc
-
 do_install() {
   install -D -p -m 0644 ${B}/install/outputs/tfm_s_signed.bin ${D}/firmware/tfm_s_signed.bin
   install -D -p -m 0644 ${B}/install/outputs/bl2_signed.bin ${D}/firmware/bl2_signed.bin
   install -D -p -m 0644 ${B}/install/outputs/bl1.bin ${D}/firmware/bl1.bin
-
-  #
-  # Signing TF-A BL2 and the FIP image
-  #
-
-  sign_host_image ${TFA_BL2_BINARY} ${RECIPE_SYSROOT}/firmware ${TFA_BL2_RE_IMAGE_LOAD_ADDRESS} ${TFA_BL2_RE_SIGN_BIN_SIZE}
-
-  fiptool update \
-      --tb-fw ${D}/firmware/signed_${TFA_BL2_BINARY} \
-      ${RECIPE_SYSROOT}/firmware/${TFA_FIP_BINARY}
-
-  sign_host_image ${TFA_FIP_BINARY} ${RECIPE_SYSROOT}/firmware ${TFA_FIP_RE_IMAGE_LOAD_ADDRESS} ${TFA_FIP_RE_SIGN_BIN_SIZE}
 }

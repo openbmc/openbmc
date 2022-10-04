@@ -6,7 +6,9 @@ Subject: [PATCH] configure: Check for readline() function instead of main
 main is not a function found in libreadline, its better to check for a
 function thats provided by it.
 
-Upstream-Status: Submitted [https://github.com/FRRouting/frr/pull/11893]
+Upstream-Status: Backport
+[https://github.com/FRRouting/frr/commit/9399d58c13257849179d3c2b3698a2b43bc1b2a0]
+
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  configure.ac | 2 +-

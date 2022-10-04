@@ -20,14 +20,16 @@ inherit cmake binconfig pkgconfig python3native
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[cpp-wrapper] = "-DFTDI_BUILD_CPP=on -DFTDIPP=on,-DFTDI_BUILD_CPP=off -DFTDIPP=off,boost"
+PACKAGECONFIG[ftdi-eeprom] = "-DFTDI_EEPROM=on,-DFTDI_EEPROM=off,libconfuse"
 
-EXTRA_OECMAKE = "-DSTATICLIBS=off -DEXAMPLES=off -DFTDI_EEPROM=off \
+EXTRA_OECMAKE = "-DSTATICLIBS=off -DEXAMPLES=off \
                  -DLIB_SUFFIX=${@d.getVar('baselib').replace('lib', '')} \
                  -DPYTHON_LIBRARY=${STAGING_LIBDIR}/lib${PYTHON_DIR}${PYTHON_ABI}.so \
                  -DPYTHON_INCLUDE_DIR=${STAGING_INCDIR}/${PYTHON_DIR}${PYTHON_ABI}"
 
 BBCLASSEXTEND = "native nativesdk"
 
-PACKAGES += "${PN}-python"
+PACKAGES =+ "${PN}-python ftdi-eeprom"
 
+FILES:ftdi-eeprom = "${bindir}/ftdi_eeprom"
 FILES:${PN}-python = "${libdir}/${PYTHON_DIR}/site-packages/"

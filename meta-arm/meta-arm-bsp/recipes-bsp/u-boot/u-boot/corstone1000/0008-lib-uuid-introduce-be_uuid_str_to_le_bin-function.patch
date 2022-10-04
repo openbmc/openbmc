@@ -1,0 +1,127 @@
+From af17d357674393565c8be15f21c86cba972963e7 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Thu, 4 Aug 2022 16:46:47 +0100
+Subject: [PATCH 08/26] lib: uuid: introduce be_uuid_str_to_le_bin function
+
+convert big endian UUID string to little endian buffer
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20220926101723.9965-1-abdellatif.elkhlifi@arm.com/]
+---
+
+Changelog:
+===============
+
+v4:
+
+* rename ffa_uuid_str_to_bin to be_uuid_str_to_le_bin and put in
+  a standalone commit (the current)
+
+v3:
+
+* introduce ffa_uuid_str_to_bin (provided by
+  arm_ffa: introduce Arm FF-A low-level driver)
+
+ include/uuid.h |  6 +++++
+ lib/uuid.c     | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 69 insertions(+)
+
+diff --git a/include/uuid.h b/include/uuid.h
+index 4a4883d3b5..5355230b5e 100644
+--- a/include/uuid.h
++++ b/include/uuid.h
+@@ -44,4 +44,10 @@ int uuid_guid_get_bin(const char *guid_str, unsigned char *guid_bin);
+ const char *uuid_guid_get_str(const unsigned char *guid_bin);
+ void gen_rand_uuid(unsigned char *uuid_bin);
+ void gen_rand_uuid_str(char *uuid_str, int str_format);
++
++/**
++ * be_uuid_str_to_le_bin - Converts a big endian UUID string to a little endian buffer
++ */
++int be_uuid_str_to_le_bin(const char *uuid_str, unsigned char *uuid_bin);
++
+ #endif
+diff --git a/lib/uuid.c b/lib/uuid.c
+index 284f8113ff..d0fa51d0bf 100644
+--- a/lib/uuid.c
++++ b/lib/uuid.c
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0+
+ /*
+  * Copyright 2011 Calxeda, Inc.
++ * Copyright 2022 ARM Limited
+  */
+ 
+ #include <common.h>
+@@ -342,6 +343,68 @@ int uuid_str_to_bin(const char *uuid_str, unsigned char *uuid_bin,
+ 	return 0;
+ }
+ 
++/**
++ * be_uuid_str_to_le_bin - Converts a big endian UUID string to a little endian buffer
++ * @uuid_str:	UUID string in big endian format (36 bytes wide + '/0')
++ * @uuid_bin:	preallocated 16 bytes UUID buffer in little endian format
++ *
++ * UUID string is 36 characters (36 bytes):
++ *
++ * xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
++ * be		     be	     be	      be      be
++ *
++ * where x is a hexadecimal character. Fields are separated by '-'s.
++ * When converting to a binary UUID, these endianness rules apply:
++ *     be: means the field in the string is considered a big endian hex number
++ *	   and should be converted to little endian binary format
++ *
++ * Return:
++ *
++ *    uuid_bin filled with little endian UUID data
++ *    On success 0 is returned. Otherwise, failure code.
++ */
++int be_uuid_str_to_le_bin(const char *uuid_str, unsigned char *uuid_bin)
++{
++	u16 tmp16 = 0;
++	u32 tmp32 = 0;
++	u64 tmp64 = 0;
++
++	if (!uuid_str_valid(uuid_str) || !uuid_bin)
++		return -EINVAL;
++
++	/*
++	 * reverse bytes from big to little endian
++	 */
++	tmp32 = simple_strtoul(uuid_str, NULL, 16);
++	memcpy(uuid_bin, &tmp32, 4);
++
++	/*
++	 * reverse bytes from big to little endian
++	 */
++	tmp16 = simple_strtoul(uuid_str + 9, NULL, 16);
++	memcpy(uuid_bin + 4, &tmp16, 2);
++
++	/*
++	 * reverse bytes from big to little endian
++	 */
++	tmp16 = simple_strtoul(uuid_str + 14, NULL, 16);
++	memcpy(uuid_bin + 6, &tmp16, 2);
++
++	/*
++	 * reverse bytes from big to little endian
++	 */
++	tmp16 = simple_strtoul(uuid_str + 19, NULL, 16);
++	memcpy(uuid_bin + 8, &tmp16, 2);
++
++	/*
++	 * reverse bytes from big to little endian
++	 */
++	tmp64 = simple_strtoull(uuid_str + 24, NULL, 16);
++	memcpy(uuid_bin + 10, (char *)&tmp64, 6);
++
++	return 0;
++}
++
+ /*
+  * uuid_bin_to_str() - convert big endian binary data to string UUID or GUID.
+  *
+-- 
+2.17.1
+
