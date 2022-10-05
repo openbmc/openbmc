@@ -1,0 +1,9 @@
+[Unit]
+Description=CPU ERR LED Service
+Wants=mapper-wait@-xyz-openbmc_project-led-groups.service
+After=mapper-wait@-xyz-openbmc_project-led-groups.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/toggle_caterr_led.sh

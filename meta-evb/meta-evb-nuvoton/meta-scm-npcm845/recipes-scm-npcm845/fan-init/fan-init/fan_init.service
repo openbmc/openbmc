@@ -1,0 +1,11 @@
+[Unit]
+Description=Fan init Daemon
+Before=xyz.openbmc_project.EntityManager.service
+Before=xyz.openbmc_project.fansensor.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/fan_init.sh
+
+[Install]
+WantedBy=multi-user.target

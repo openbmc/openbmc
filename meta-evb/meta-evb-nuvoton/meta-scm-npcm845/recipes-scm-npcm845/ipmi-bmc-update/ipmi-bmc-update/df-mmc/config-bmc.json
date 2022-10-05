@@ -1,0 +1,20 @@
+[{
+    "blob": "/flash/image",
+    "handler": {
+        "type": "file",
+        "path": "/tmp/bmc.tar"
+    },
+    "actions": {
+        "preparation": {
+            "type": "skip"
+        },
+        "verification": {
+            "type": "systemd",
+            "unit": "phosphor-ipmi-flash-bmc-verify.service"
+        },
+        "update": {
+            "type": "systemd",
+            "unit": "phosphor-ipmi-flash-bmc-update.service"
+        }
+    }
+}]

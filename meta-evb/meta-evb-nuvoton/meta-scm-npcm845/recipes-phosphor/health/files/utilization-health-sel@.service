@@ -1,0 +1,10 @@
+[Unit]
+Description=BMC health CPU/Memory utilization SEL add service
+Requires=xyz.openbmc_project.Logging.IPMI.service
+Wants=mapper-wait@-xyz-openbmc_project-Logging-IPMI.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+Restart=no
+ExecStart=/bin/bash /usr/bin/utilization-health-sel.sh %I

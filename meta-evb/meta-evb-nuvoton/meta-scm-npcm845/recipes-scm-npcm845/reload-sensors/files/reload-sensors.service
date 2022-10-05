@@ -1,0 +1,11 @@
+[Unit]
+Description=Reload sensors
+
+[Service]
+ExecStart=/usr/bin/reload-sensors.sh
+StandardOutput=syslog
+Type=simple
+Restart=on-failure
+
+[Install]
+WantedBy=obmc-post-complete.target

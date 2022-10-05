@@ -1,0 +1,118 @@
+From 19c26508001f1f4c0dff7afdd3587cc5ad5562c6 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Mon, 15 Aug 2022 10:54:09 +0800
+Subject: [PATCH 2/2] support chassis on/off and post complete target
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ src/power_control.cpp | 66 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 66 insertions(+)
+
+diff --git a/src/power_control.cpp b/src/power_control.cpp
+index 680603e..962eaff 100644
+--- a/src/power_control.cpp
++++ b/src/power_control.cpp
+@@ -419,6 +419,56 @@ static void powerStateTransitionToCycleOff(const Event event);
+ static void powerStateGracefulTransitionToCycleOff(const Event event);
+ static void powerStateCheckForWarmReset(const Event event);
+ 
++static constexpr auto systemdBusname = "org.freedesktop.systemd1";
++static constexpr auto systemdPath = "/org/freedesktop/systemd1";
++static constexpr auto systemdInterface = "org.freedesktop.systemd1.Manager";
++static constexpr auto chassisOnTargetName = "obmc-chassis-poweron.target";
++static constexpr auto chassisOffTargetName = "obmc-chassis-poweroff.target";
++static constexpr auto postCompleteTargetName = "obmc-post-complete.target";
++
++void HostPostCompleted()
++{
++    conn->async_method_call(
++        [](boost::system::error_code ec) {
++            if (ec)
++            {
++                lg2::error("Failed to call HostPostCompleted: {MSG}", "MSG", ec.message());
++            }
++        },
++        systemdBusname, systemdPath, systemdInterface, "StartUnit",
++        postCompleteTargetName, "replace");
++    return;
++}
++
++void chassisPowerOn()
++{
++    conn->async_method_call(
++        [](boost::system::error_code ec) {
++            if (ec)
++            {
++                lg2::error("Failed to call chassisPowerOn: {MSG}", "MSG", ec.message());
++            }
++        },
++        systemdBusname, systemdPath, systemdInterface, "StartUnit",
++        chassisOnTargetName, "replace");
++    return;
++}
++
++void chassisPowerOff()
++{
++    conn->async_method_call(
++        [](boost::system::error_code ec) {
++            if (ec)
++            {
++                lg2::error("Failed to call chassisPowerOff: {MSG}", "MSG", ec.message());
++            }
++        },
++        systemdBusname, systemdPath, systemdInterface, "StartUnit",
++        chassisOffTargetName, "replace");
++    return;
++}
++
++
+ static std::function<void(const Event)> getPowerStateHandler(PowerState state)
+ {
+     switch (state)
+@@ -595,6 +645,11 @@ static void setPowerState(const PowerState state)
+ 
+     // Save the power state for the restore policy
+     savePowerState(state);
++
++    if (state == PowerState::on)
++        power_control::chassisPowerOn();
++    else if (state == PowerState::off)
++        power_control::chassisPowerOff();
+ }
+ 
+ enum class RestartCause
+@@ -2242,6 +2297,7 @@ static void postCompleteHandler(bool state)
+     {
+         sendPowerControlEvent(Event::postCompleteAssert);
+         setOperatingSystemState(OperatingSystemStateStage::Standby);
++        HostPostCompleted();
+     }
+     else
+     {
+@@ -2767,6 +2823,11 @@ int main(int argc, char* argv[])
+              (sioPowerGoodLine.get_value() == sioPwrGoodConfig.polarity)))
+         {
+             powerState = PowerState::on;
++            power_control::chassisPowerOn();
++        }
++        else
++        {
++            power_control::chassisPowerOff();
+         }
+     }
+     else
+@@ -2774,6 +2835,11 @@ int main(int argc, char* argv[])
+         if (getProperty(powerOkConfig))
+         {
+             powerState = PowerState::on;
++            power_control::chassisPowerOn();
++        }
++        else
++        {
++            power_control::chassisPowerOff();
+         }
+     }
+     // Check if we need to start the Power Restore policy
+-- 
+2.17.1
+

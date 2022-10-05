@@ -1,0 +1,14 @@
+[Unit]
+Description=BMC health warm reset SEL add service
+Requires=xyz.openbmc_project.Logging.IPMI.service
+Wants=mapper-wait@-xyz-openbmc_project-Logging-IPMI.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+Restart=no
+ExecStart=/bin/sh -c "busctl call `mapper get-service /xyz/openbmc_project/Logging/IPMI` /xyz/openbmc_project/Logging/IPMI xyz.openbmc_project.Logging.IPMI IpmiSelAdd ssaybq 'OEM BMC health warm reset' '/xyz/openbmc_project/sensors/oem_health/warm_spi_boot' 3 162 1 0 true 0x2000"
+ExecStart=/bin/sh -c "busctl call `mapper get-service /xyz/openbmc_project/Logging/IPMI` /xyz/openbmc_project/Logging/IPMI xyz.openbmc_project.Logging.IPMI IpmiSelAdd ssaybq 'OEM BMC health thread restarted' '/xyz/openbmc_project/sensors/oem_health/thread_restarted' 3 160 40 0 true 0x2000"
+
+[Install]
+WantedBy=phosphor-ipmi-warm-reset.target

@@ -1,0 +1,10 @@
+[Unit]
+Description=Phosphor-ipmi-flash bmc update service
+
+[Service]
+ExecStart=/usr/bin/obmc-flash-bmc mmc bmc-image /tmp/images
+ExecStop=/bin/systemctl start --job-mode=replace-irreversibly --no-block reboot.target
+Type=oneshot
+
+[Install]
+WantedBy=phosphor-ipmi-flash-bmc-update.target

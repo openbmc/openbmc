@@ -1,0 +1,83 @@
+From 64ea5f75050cfbbfac96ddbbbe28ebdd9f71677b Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Mon, 15 Aug 2022 10:52:31 +0800
+Subject: [PATCH] skip POWER BUTTON
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ src/power_control.cpp | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/src/power_control.cpp b/src/power_control.cpp
+index 05aa45c..680603e 100644
+--- a/src/power_control.cpp
++++ b/src/power_control.cpp
+@@ -738,12 +738,14 @@ static void powerRestorePolicyLog()
+                     "OpenBMC.0.1.PowerRestorePolicyApplied", NULL);
+ }
+ 
++#if 0
+ static void powerButtonPressLog()
+ {
+     sd_journal_send("MESSAGE=PowerControl: power button pressed", "PRIORITY=%i",
+                     LOG_INFO, "REDFISH_MESSAGE_ID=%s",
+                     "OpenBMC.0.1.PowerButtonPressed", NULL);
+ }
++#endif
+ 
+ static void resetButtonPressLog()
+ {
+@@ -1995,6 +1997,7 @@ static void sioS5Handler(bool state)
+     sendPowerControlEvent(powerControlEvent);
+ }
+ 
++#if 0
+ static void powerButtonHandler(bool state)
+ {
+     powerButtonIface->set_property("ButtonPressed", !state);
+@@ -2012,6 +2015,7 @@ static void powerButtonHandler(bool state)
+         }
+     }
+ }
++#endif
+ 
+ static void resetButtonHandler(bool state)
+ {
+@@ -2621,7 +2625,7 @@ int main(int argc, char* argv[])
+             return -1;
+         }
+     }
+-
++#if 0
+     // Request POWER_BUTTON GPIO events
+     if (powerButtonConfig.type == ConfigType::GPIO)
+     {
+@@ -2637,7 +2641,7 @@ int main(int argc, char* argv[])
+             power_control::dbusGPIOMatcher(powerButtonConfig,
+                                            powerButtonHandler);
+     }
+-
++#endif
+     // Request RESET_BUTTON GPIO events
+     if (resetButtonConfig.type == ConfigType::GPIO)
+     {
+@@ -3062,6 +3066,7 @@ int main(int argc, char* argv[])
+     sdbusplus::asio::object_server buttonsServer =
+         sdbusplus::asio::object_server(conn);
+ 
++#if 0
+     if (!powerButtonConfig.lineName.empty())
+     {
+         // Power Button Interface
+@@ -3116,7 +3121,7 @@ int main(int argc, char* argv[])
+ 
+         powerButtonIface->initialize();
+     }
+-
++#endif
+     if (!resetButtonConfig.lineName.empty())
+     {
+         // Reset Button Interface
+-- 
+2.17.1
+

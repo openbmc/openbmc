@@ -1,0 +1,20 @@
+[{
+    "blob": "/flash/bios",
+    "handler": {
+        "type": "file",
+        "path": "/tmp/bios-image"
+    },
+    "actions": {
+        "preparation": {
+            "type": "skip"
+        },
+        "verification": {
+            "type": "systemd",
+            "unit": "phosphor-ipmi-flash-bios-verify.service"
+        },
+        "update": {
+            "type": "systemd",
+            "unit": "phosphor-ipmi-flash-bios-update.service"
+        }
+    }
+}]

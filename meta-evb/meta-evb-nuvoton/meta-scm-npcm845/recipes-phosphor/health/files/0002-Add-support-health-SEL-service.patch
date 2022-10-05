@@ -1,0 +1,89 @@
+From b2cee74741050926f7381d0b94fea9e996cf5b24 Mon Sep 17 00:00:00 2001
+From: Brian Ma <chma0@nuvoton.com>
+Date: Fri, 30 Sep 2022 15:31:58 +0800
+Subject: [PATCH] Add support health SEL service
+
+---
+ healthMonitor.cpp | 35 ++++++++++++++++++++++++++++++++++-
+ healthMonitor.hpp |  2 ++
+ 2 files changed, 36 insertions(+), 1 deletion(-)
+
+diff --git a/healthMonitor.cpp b/healthMonitor.cpp
+index 9a92b58..49a9207 100644
+--- a/healthMonitor.cpp
++++ b/healthMonitor.cpp
+@@ -336,7 +336,7 @@ void HealthSensor::checkSensorThreshold(const double value)
+                 error(
+                     "ASSERT: sensor {SENSOR} is above the upper threshold warning high",
+                     "SENSOR", sensorConfig.name);
+-                startUnit(sensorConfig.warningTgt);
++                startUnit(getUnitInfo(sensorConfig.warningTgt, true));
+             }
+         }
+         return;
+@@ -346,9 +346,12 @@ void HealthSensor::checkSensorThreshold(const double value)
+     {
+         WarningInterface::warningAlarmHigh(false);
+         if (sensorConfig.warningLog)
++        {
+             info(
+                 "DEASSERT: sensor {SENSOR} is under the upper threshold warning high",
+                 "SENSOR", sensorConfig.name);
++            startUnit(getUnitInfo(sensorConfig.warningTgt, false));
++        }
+     }
+ }
+ 
+@@ -416,6 +419,36 @@ void HealthSensor::startUnit(const std::string& sysdUnit)
+     bus.call_noreply(msg);
+ }
+ 
++std::string HealthSensor::getUnitInfo(const std::string& sysdUnit, bool asserted)
++{
++    // Only handle service can set info and
++    // do nothing for deassert case for normal unit
++    size_t index = sysdUnit.find('@');
++    if (index == std::string::npos)
++        return asserted ? sysdUnit : "";
++
++    // Get service name with @
++    std::string service = sysdUnit.substr(0, index + 1);
++
++    // Get alarm event information string
++    std::string boolstr =  asserted ? "true" : "false";
++    char event[32] = {0};
++    int rc = sprintf(event, "%s_%s_%.0f", sensorConfig.name.c_str(),
++                     boolstr.c_str(), ValueIface::value());
++    if (rc <= 0)
++    {
++        error("Cannot generate service infomation: {SENSOR}", "SENSOR",
++              sensorConfig.name);
++        return "";
++    }
++    if (DEBUG)
++    {
++        info("unit event: {INFO}", "INFO", std::string(event));
++    }
++
++    return service + std::string(event) + ".service";
++}
++
+ void HealthMon::recreateSensors()
+ {
+     PHOSPHOR_LOG2_USING;
+diff --git a/healthMonitor.hpp b/healthMonitor.hpp
+index b86563e..dba9a85 100644
+--- a/healthMonitor.hpp
++++ b/healthMonitor.hpp
+@@ -126,6 +126,8 @@ class HealthSensor : public healthIfaces
+     void readHealthSensor();
+     /** @brief Start configured threshold systemd unit */
+     void startUnit(const std::string& sysdUnit);
++    /** @brief Get sensor infomation for set SEL */
++    std::string getUnitInfo(const std::string& sysdUnit, bool asserted);
+ };
+ 
+ class HealthMon
+-- 
+2.17.1
+

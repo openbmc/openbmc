@@ -1,0 +1,10 @@
+[Unit]
+Description=Check for DHCP address
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/dhcp-check.sh
+
+[Install]
+WantedBy=multi-user.target

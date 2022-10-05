@@ -1,0 +1,15 @@
+[Unit]
+Description=phosphor ECC dbus
+Wants=phosphor-dbus-monitor.service
+After=phosphor-dbus-monitor.service
+ConditionPathExists=|/sys/devices/system/edac/mc/mc0
+
+[Service]
+ExecStart=/usr/bin/ecc_main
+Restart=always
+SyslogIdentifier=phosphor-ecc
+Type=dbus
+BusName=xyz.openbmc_project.memory.ECC
+
+[Install]
+WantedBy=multi-user.target

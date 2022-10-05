@@ -1,0 +1,28 @@
+{
+  "CPU" : {
+    "Frequency" : 1,
+    "Window_size": 120,
+    "Threshold":
+    {
+        "Warning":
+        {
+          "Value": 70.0,
+          "Log": true,
+          "Target": "utilization-health-sel@.service"
+        }
+    }
+  },
+  "Memory" : {
+    "Frequency" : 1,
+    "Window_size": 120,
+    "Threshold":
+    {
+        "Warning":
+        {
+          "Value": 70.0,
+          "Log": true,
+          "Target": "utilization-health-sel@.service"
+        }
+    }
+  }
+}

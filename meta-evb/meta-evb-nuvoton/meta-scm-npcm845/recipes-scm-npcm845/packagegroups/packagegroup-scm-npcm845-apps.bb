@@ -25,14 +25,16 @@ RDEPENDS:${PN}-chassis = " \
         x86-power-control \
         "
 
-#SUMMARY:${PN}-fans = "EVB NPCM845 Fans"
-#RDEPENDS:${PN}-fans = " \
-#        phosphor-pid-control \
-#        "
+SUMMARY:${PN}-fans = "EVB NPCM845 Fans"
+RDEPENDS:${PN}-fans = " \
+        phosphor-pid-control \
+        "
 
 SUMMARY:${PN}-flash = "EVB NPCM845 Flash"
 RDEPENDS:${PN}-flash = " \
         phosphor-ipmi-flash \
+        ipmi-bios-update \
+        ipmi-bmc-update \
         "
 
 SUMMARY:${PN}-system = "EVB NPCM845 System"
@@ -40,9 +42,6 @@ RDEPENDS:${PN}-system = " \
         webui-vue \
         obmc-ikvm \
         iperf3 \
-        nmon \
-        memtester \
-        htop \
         ipmitool \
         nuvoton-ipmi-oem \
         openssl-bin \
@@ -51,15 +50,21 @@ RDEPENDS:${PN}-system = " \
         phosphor-sel-logger \
         rsyslog \
         loadsvf \
-        pciutils \
         phosphor-ecc \
         i3c-tools \
         phosphor-ipmi-blobs \
         phosphor-image-signing \
         optee-client \
         optee-test \
-	tcpdump \
-	net-tools \
-	ethtool \
-	phytool \
+        ethtool \
+        fan-init \
+        phosphor-post-code-manager \
+        update-psu \
+        scm-boot-status-led \
+        cpu-err \
+        dhcp-check \
+        phosphor-virtual-sensor \
+        esmi-oob-tool \
+        boot-health \
+        reload-sensors \
         "

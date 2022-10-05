@@ -1,0 +1,15 @@
+[Unit]
+Description=Boot Status LED Manager
+Wants=xyz.openbmc_project.led.controller@sys-class-leds-power_amber.service
+Wants=xyz.openbmc_project.led.controller@sys-class-leds-power_green.service
+After=xyz.openbmc_project.led.controller@sys-class-leds-power_amber.service
+After=xyz.openbmc_project.led.controller@sys-class-leds-power_green.service
+
+[Service]
+ExecStart=/usr/bin/boot-status-led.sh
+StandardOutput=syslog
+Type=simple
+Restart=on-failure
+
+[Install]
+WantedBy=obmc-chassis-poweron.target obmc-chassis-poweroff.target
