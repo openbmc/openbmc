@@ -1,0 +1,83 @@
+From 1f680bc96a12e0f1f1a2d43bdb4919fccf055431 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Thu, 15 Sep 2022 14:02:24 +0800
+Subject: [PATCH] hwmon: pmbus: support p2011
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ drivers/hwmon/pmbus/pmbus.c      |  6 ++++++
+ drivers/hwmon/pmbus/pmbus.h      |  2 ++
+ drivers/hwmon/pmbus/pmbus_core.c | 13 +++++++++++++
+ 3 files changed, 21 insertions(+)
+
+diff --git a/drivers/hwmon/pmbus/pmbus.c b/drivers/hwmon/pmbus/pmbus.c
+index d0d386990af5..792e6d89ae6c 100644
+--- a/drivers/hwmon/pmbus/pmbus.c
++++ b/drivers/hwmon/pmbus/pmbus.c
+@@ -199,6 +199,11 @@ static const struct pmbus_device_info pmbus_info_zero = {
+ 	.flags = 0
+ };
+ 
++static const struct pmbus_device_info pmbus_info_zero_skip = {
++	.pages = 0,
++	.flags = PMBUS_SKIP_STATUS_CHECK | PMBUS_NO_WRITE_PROTECT
++};
++
+ static const struct pmbus_device_info pmbus_info_one_skip = {
+ 	.pages = 1,
+ 	.flags = PMBUS_SKIP_STATUS_CHECK
+@@ -242,6 +247,7 @@ static const struct i2c_device_id pmbus_id[] = {
+ 	{"tps544c20", (kernel_ulong_t)&pmbus_info_one},
+ 	{"tps544c25", (kernel_ulong_t)&pmbus_info_one},
+ 	{"udt020", (kernel_ulong_t)&pmbus_info_one},
++	{"p2011", (kernel_ulong_t)&pmbus_info_zero_skip},
+ 	{}
+ };
+ 
+diff --git a/drivers/hwmon/pmbus/pmbus.h b/drivers/hwmon/pmbus/pmbus.h
+index ef3a8ecde4df..9ce33dcc4e8f 100644
+--- a/drivers/hwmon/pmbus/pmbus.h
++++ b/drivers/hwmon/pmbus/pmbus.h
+@@ -135,6 +135,8 @@ enum pmbus_regs {
+ 	PMBUS_MFR_MAX_TEMP_2		= 0xC1,
+ 	PMBUS_MFR_MAX_TEMP_3		= 0xC2,
+ 
++	PMBUS_P2011_FAN_MONITOR		= 0xE4,
++
+ /*
+  * Virtual registers.
+  * Useful to support attributes which are not supported by standard PMBus
+diff --git a/drivers/hwmon/pmbus/pmbus_core.c b/drivers/hwmon/pmbus/pmbus_core.c
+index d7458778cff4..81068c326239 100644
+--- a/drivers/hwmon/pmbus/pmbus_core.c
++++ b/drivers/hwmon/pmbus/pmbus_core.c
+@@ -596,6 +596,11 @@ static int pmbus_get_status(struct i2c_client *client, int page, int reg)
+ 
+ static void pmbus_update_sensor_data(struct i2c_client *client, struct pmbus_sensor *sensor)
+ {
++	if (!strcmp(client->name, "p2011") && sensor->reg == PMBUS_P2011_FAN_MONITOR) {
++		sensor->data = pmbus_read_byte_data(client, sensor->page,
++						    sensor->reg);
++		return;
++	}
+ 	if (sensor->data < 0 || sensor->update)
+ 		sensor->data = _pmbus_read_word_data(client, sensor->page,
+ 						     sensor->phase, sensor->reg);
+@@ -1902,6 +1907,14 @@ static int pmbus_add_fan_ctrl(struct i2c_client *client,
+ {
+ 	struct pmbus_sensor *sensor;
+ 
++	if (!strcmp(client->name, "p2011")) {
++		sensor = pmbus_add_sensor(data, "fan", "target", index, page,
++					  0xff, PMBUS_P2011_FAN_MONITOR, PSC_FAN,
++					  false, false, false);
++		if (!sensor)
++			return -ENOMEM;
++		return 0;
++	}
+ 	sensor = pmbus_add_sensor(data, "fan", "target", index, page,
+ 				  0xff, PMBUS_VIRT_FAN_TARGET_1 + id, PSC_FAN,
+ 				  false, false, true);
+-- 
+2.17.1
+

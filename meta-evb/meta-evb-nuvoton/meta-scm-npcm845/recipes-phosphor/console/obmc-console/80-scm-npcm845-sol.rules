@@ -1,1 +1,4 @@
-SUBSYSTEM=="tty", ATTRS{iomem_base}=="0xF0001000", ENV{SYSTEMD_WANTS}="obmc-console@ttyS1" SYMLINK+="ttyS1", TAG+="systemd"
+SUBSYSTEM=="tty", ATTRS{iomem_base}=="0xF0002000", ENV{SYSTEMD_WANTS}="obmc-console@ttyS2" SYMLINK+="ttyS2", TAG+="systemd"
+SUBSYSTEM=="tty", ATTRS{iomem_base}=="0xF0004000", ENV{SYSTEMD_WANTS}="obmc-console@ttyS4" SYMLINK+="ttyS4", TAG+="systemd"
+SUBSYSTEM=="tty", ATTRS{iomem_base}=="0xF0005000", ENV{SYSTEMD_WANTS}="obmc-console@ttyS5" SYMLINK+="ttyS5", TAG+="systemd"
+SUBSYSTEM=="tty", ATTRS{iomem_base}=="0xF0006000", ENV{SYSTEMD_WANTS}="obmc-console@ttyS6" SYMLINK+="ttyS6", TAG+="systemd"

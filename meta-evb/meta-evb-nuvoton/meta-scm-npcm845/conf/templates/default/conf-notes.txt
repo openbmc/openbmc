@@ -1,0 +1,5 @@
+Make entity-manager target
+     DISTRO=arbel-scm-entity bitbake obmc-phosphor-image
+
+Make emmc image with entity-manager (boot linux/openbmc from emmc)
+     DISTRO=arbel-scm-emmc-entity  bitbake obmc-phosphor-image

@@ -52,7 +52,6 @@ RDEPENDS:${PN}-system = " \
         rsyslog \
         loadsvf \
         pciutils \
-        cpfw \
         phosphor-ecc \
         i3c-tools \
         phosphor-ipmi-blobs \

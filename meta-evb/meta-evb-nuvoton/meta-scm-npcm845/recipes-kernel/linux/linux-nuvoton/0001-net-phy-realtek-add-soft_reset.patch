@@ -1,0 +1,25 @@
+From e6519e69d8d709fa6290e18abb379e7db91763ca Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Thu, 9 Jun 2022 08:58:20 +0800
+Subject: [PATCH] net: phy: realtek: add soft_reset
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ drivers/net/phy/realtek.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+index b4879306bb8a..b5b21c06ae43 100644
+--- a/drivers/net/phy/realtek.c
++++ b/drivers/net/phy/realtek.c
+@@ -640,6 +640,7 @@ static struct phy_driver realtek_drvs[] = {
+ 		.resume		= rtl821x_resume,
+ 		.read_page	= rtl821x_read_page,
+ 		.write_page	= rtl821x_write_page,
++		.soft_reset	= genphy_soft_reset,
+ 	}, {
+ 		.name		= "Generic FE-GE Realtek PHY",
+ 		.match_phy_device = rtlgen_match_phy_device,
+-- 
+2.17.1
+

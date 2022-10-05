@@ -1,103 +1,750 @@
 {
     "Exposes": [
         {
-            "Address": "0x4B",
+            "LED": "fan_fault",
+            "Name": "DUAL ROTOR FAN CONN",
+            "Pwm": 0,
+            "PwmName": "PWM_1",
+            "PowerState": "On",
+            "EntityId": "0x07",
+            "EntityInstance": "0x00",
+            "Tachs": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11
+            ],
+            "Type": "FanConnector"
+        },
+        {
+            "Address": "0x23",
             "Bus": 4,
-            "EntityId": 7,
-            "EntityInstance": 1,
-            "Name": "Outlet_Temp1",
+            "EntityId": "0x1D",
+            "EntityInstance": "0x01",
+            "BindConnector": "DUAL ROTOR FAN CONN",
+            "PowerState": "On",
+            "Index": 0,
+            "Name": "Fan_0A",
             "Thresholds": [
                 {
-                    "Direction": "greater than",
-                    "Name": "upper critical",
+                    "Direction": "less than",
+                    "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 65.000
-                },
-                {
-                    "Direction": "greater than",
-                    "Name": "upper non critical",
-                    "Severity": 0,
-                    "Value": 50.000
+                    "Value": 600
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 15.000
-                },
+                    "Value": 1000
+                }
+            ],
+            "Type": "I2CFan"
+        },
+        {
+            "Address": "0x23",
+            "Bus": 4,
+            "EntityId": "0x1D",
+            "EntityInstance": "0x02",
+            "BindConnector": "DUAL ROTOR FAN CONN",
+            "PowerState": "On",
+            "Index": 1,
+            "Name": "Fan_0B",
+            "Thresholds": [
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 0
+                    "Value": 600
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1000
                 }
             ],
+            "Type": "I2CFan"
+        },
+        {
+            "Address": "0x23",
+            "Bus": 4,
+            "EntityId": "0x1D",
+            "EntityInstance": "0x03",
+            "BindConnector": "DUAL ROTOR FAN CONN",
+            "PowerState": "On",
+            "Index": 2,
+            "Name": "Fan_1A",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 600
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1000
+                }
+            ],
+            "Type": "I2CFan"
+        },
+        {
+            "Address": "0x23",
+            "Bus": 4,
+            "EntityId": "0x1D",
+            "EntityInstance": "0x04",
+            "BindConnector": "DUAL ROTOR FAN CONN",
+            "PowerState": "On",
+            "Index": 3,
+            "Name": "Fan_1B",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 600
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1000
+                }
+            ],
+            "Type": "I2CFan"
+        },
+        {
+            "Address": "0x23",
+            "Bus": 4,
+            "EntityId": "0x1D",
+            "EntityInstance": "0x05",
+            "BindConnector": "DUAL ROTOR FAN CONN",
+            "PowerState": "On",
+            "Index": 4,
+            "Name": "Fan_2A",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 600
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1000
+                }
+            ],
+            "Type": "I2CFan"
+        },
+        {
+            "Address": "0x23",
+            "Bus": 4,
+            "EntityId": "0x1D",
+            "EntityInstance": "0x06",
+            "BindConnector": "DUAL ROTOR FAN CONN",
+            "PowerState": "On",
+            "Index": 5,
+            "Name": "Fan_2B",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 600
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1000
+                }
+            ],
+            "Type": "I2CFan"
+        },
+        {
+            "Address": "0x23",
+            "Bus": 4,
+            "EntityId": "0x1D",
+            "EntityInstance": "0x07",
+            "BindConnector": "DUAL ROTOR FAN CONN",
+            "PowerState": "On",
+            "Index": 6,
+            "Name": "Fan_3A",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 600
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1000
+                }
+            ],
+            "Type": "I2CFan"
+        },
+        {
+            "Address": "0x23",
+            "Bus": 4,
+            "EntityId": "0x1D",
+            "EntityInstance": "0x08",
+            "BindConnector": "DUAL ROTOR FAN CONN",
+            "PowerState": "On",
+            "Index": 7,
+            "Name": "Fan_3B",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 600
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1000
+                }
+            ],
+            "Type": "I2CFan"
+        },
+        {
+            "Address": "0x23",
+            "Bus": 4,
+            "EntityId": "0x1D",
+            "EntityInstance": "0x09",
+            "BindConnector": "DUAL ROTOR FAN CONN",
+            "PowerState": "On",
+            "Index": 8,
+            "Name": "Fan_4A",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 600
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1000
+                }
+            ],
+            "Type": "I2CFan"
+        },
+        {
+            "Address": "0x23",
+            "Bus": 4,
+            "EntityId": "0x1D",
+            "EntityInstance": "0x0a",
+            "BindConnector": "DUAL ROTOR FAN CONN",
+            "PowerState": "On",
+            "Index": 9,
+            "Name": "Fan_4B",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 600
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1000
+                }
+            ],
+            "Type": "I2CFan"
+        },
+        {
+            "Address": "0x23",
+            "Bus": 4,
+            "EntityId": "0x1D",
+            "EntityInstance": "0x0b",
+            "BindConnector": "DUAL ROTOR FAN CONN",
+            "PowerState": "On",
+            "Index": 10,
+            "Name": "Fan_5A",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 600
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1000
+                }
+            ],
+            "Type": "I2CFan"
+        },
+        {
+            "Address": "0x23",
+            "Bus": 4,
+            "EntityId": "0x1D",
+            "EntityInstance": "0x0c",
+            "BindConnector": "DUAL ROTOR FAN CONN",
+            "PowerState": "On",
+            "Index": 11,
+            "Name": "Fan_5B",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 600
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1000
+                }
+            ],
+            "Type": "I2CFan"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x20",
+            "Class": "temperature",
+            "EntityId": "0x20",
+            "EntityInstance": "0x00",
+            "Name": "Temp_DIMM_A",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 85.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 83.000
+                }
+            ],
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x21",
+            "Class": "temperature",
+            "EntityId": "0x20",
+            "EntityInstance": "0x01",
+            "Name": "Temp_DIMM_B",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 85.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 83.000
+                }
+            ],
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x22",
+            "Class": "temperature",
+            "EntityId": "0x20",
+            "EntityInstance": "0x02",
+            "Name": "Temp_DIMM_C",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 85.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 83.000
+                }
+            ],
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x23",
+            "Class": "temperature",
+            "EntityId": "0x20",
+            "EntityInstance": "0x03",
+            "Name": "Temp_DIMM_D",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 85.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 83.000
+                }
+            ],
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x24",
+            "Class": "temperature",
+            "EntityId": "0x20",
+            "EntityInstance": "0x04",
+            "Name": "Temp_DIMM_E",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 85.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 83.000
+                }
+            ],
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x25",
+            "Class": "temperature",
+            "EntityId": "0x20",
+            "EntityInstance": "0x05",
+            "Name": "Temp_DIMM_F",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 85.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 83.000
+                }
+            ],
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x30",
+            "Class": "temperature",
+            "EntityId": "0x20",
+            "EntityInstance": "0x06",
+            "Name": "Temp_DIMM_G",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 85.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 83.000
+                }
+            ],
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x31",
+            "Class": "temperature",
+            "EntityId": "0x20",
+            "EntityInstance": "0x07",
+            "Name": "Temp_DIMM_H",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 85.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 83.000
+                }
+            ],
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x32",
+            "Class": "temperature",
+            "EntityId": "0x20",
+            "EntityInstance": "0x08",
+            "Name": "Temp_DIMM_I",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 85.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 83.000
+                }
+            ],
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x33",
+            "Class": "temperature",
+            "EntityId": "0x20",
+            "EntityInstance": "0x09",
+            "Name": "Temp_DIMM_J",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 85.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 83.000
+                }
+            ],
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x34",
+            "Class": "temperature",
+            "EntityId": "0x20",
+            "EntityInstance": "0x0a",
+            "Name": "Temp_DIMM_K",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 85.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 83.000
+                }
+            ],
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x35",
+            "Class": "temperature",
+            "EntityId": "0x20",
+            "EntityInstance": "0x0b",
+            "Name": "Temp_DIMM_L",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 85.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 83.000
+                }
+            ],
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x20",
+            "Class": "power",
+            "EntityId": "0x20",
+            "EntityInstance": "0x0c",
+            "Name": "Power_DIMM_A",
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x21",
+            "Class": "power",
+            "EntityId": "0x20",
+            "EntityInstance": "0x0d",
+            "Name": "Power_DIMM_B",
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x22",
+            "Class": "power",
+            "EntityId": "0x20",
+            "EntityInstance": "0x0e",
+            "Name": "Power_DIMM_C",
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x23",
+            "Class": "power",
+            "EntityId": "0x20",
+            "EntityInstance": "0x0f",
+            "Name": "Power_DIMM_D",
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x24",
+            "Class": "power",
+            "EntityId": "0x20",
+            "EntityInstance": "0x10",
+            "Name": "Power_DIMM_E",
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x25",
+            "Class": "power",
+            "EntityId": "0x20",
+            "EntityInstance": "0x11",
+            "Name": "Power_DIMM_F",
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x30",
+            "Class": "power",
+            "EntityId": "0x20",
+            "EntityInstance": "0x12",
+            "Name": "Power_DIMM_G",
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x31",
+            "Class": "power",
+            "EntityId": "0x20",
+            "EntityInstance": "0x13",
+            "Name": "Power_DIMM_H",
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x32",
+            "Class": "power",
+            "EntityId": "0x20",
+            "EntityInstance": "0x14",
+            "Name": "Power_DIMM_I",
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x33",
+            "Class": "power",
+            "EntityId": "0x20",
+            "EntityInstance": "0x15",
+            "Name": "Power_DIMM_J",
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x34",
+            "Class": "power",
+            "EntityId": "0x20",
+            "EntityInstance": "0x16",
+            "Name": "Power_DIMM_K",
+            "Type": "dimm"
+        },
+        {
+            "Interface": "sbrmi",
+            "Addr": "0x34",
+            "Class": "power",
+            "EntityId": "0x20",
+            "EntityInstance": "0x17",
+            "Name": "Power_DIMM_L",
+            "Type": "dimm"
+        },
+        {
+            "Address": "0x4B",
+            "Bus": 4,
+            "EntityId": 7,
+            "EntityInstance": 0,
+            "Name": "Temp_Outlet_1",
+            "PowerState": "Off",
             "Type": "TMP75"
         },
         {
             "Address": "0x4D",
             "Bus": 4,
             "EntityId": 7,
-            "EntityInstance": 2,
-            "Name": "Outlet_Temp2",
-            "Thresholds": [
-                {
-                    "Direction": "greater than",
-                    "Name": "upper critical",
-                    "Severity": 1,
-                    "Value": 65.000
-                },
-                {
-                    "Direction": "greater than",
-                    "Name": "upper non critical",
-                    "Severity": 0,
-                    "Value": 50.000
-                },
-                {
-                    "Direction": "less than",
-                    "Name": "lower non critical",
-                    "Severity": 0,
-                    "Value": 15.000
-                },
-                {
-                    "Direction": "less than",
-                    "Name": "lower critical",
-                    "Severity": 1,
-                    "Value": 0
-                }
-            ],
+            "EntityInstance": 1,
+            "Name": "Temp_Outlet_2",
+            "PowerState": "Off",
             "Type": "TMP75"
         },
         {
             "Address": "0x48",
             "Bus": 6,
             "EntityId": 7,
-            "EntityInstance": 3,
-            "Name": "HPM_Inlet_Temp1",
+            "EntityInstance": 0,
+            "Name": "Temp_Inlet_1",
+            "PowerState": "Off",
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 65.000
+                    "Value": 40.000
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 50.000
-                },
-                {
-                    "Direction": "less than",
-                    "Name": "lower non critical",
-                    "Severity": 0,
-                    "Value": 15.000
-                },
-                {
-                    "Direction": "less than",
-                    "Name": "lower critical",
-                    "Severity": 1,
-                    "Value": 0
+                    "Value": 37.000
                 }
             ],
             "Type": "TMP75"
@@ -106,32 +753,21 @@
             "Address": "0x49",
             "Bus": 6,
             "EntityId": 7,
-            "EntityInstance": 4,
-            "Name": "HPM_Inlet_Temp2",
+            "EntityInstance": 0,
+            "Name": "Temp_Inlet_2",
+            "PowerState": "Off",
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 65.000
+                    "Value": 40.000
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 50.000
-                },
-                {
-                    "Direction": "less than",
-                    "Name": "lower non critical",
-                    "Severity": 0,
-                    "Value": 15.000
-                },
-                {
-                    "Direction": "less than",
-                    "Name": "lower critical",
-                    "Severity": 1,
-                    "Value": 0
+                    "Value": 37.000
                 }
             ],
             "Type": "TMP75"
@@ -140,67 +776,212 @@
             "Address": "0x4A",
             "Bus": 6,
             "EntityId": 7,
-            "EntityInstance": 5,
-            "Name": "HPM_Inlet_Temp3",
+            "EntityInstance": 0,
+            "Name": "Temp_Inlet_3",
+            "PowerState": "Off",
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 65.000
+                    "Value": 40.000
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 50.000
-                },
-                {
-                    "Direction": "less than",
-                    "Name": "lower non critical",
-                    "Severity": 0,
-                    "Value": 15.000
-                },
-                {
-                    "Direction": "less than",
-                    "Name": "lower critical",
-                    "Severity": 1,
-                    "Value": 0
+                    "Value": 37.000
                 }
             ],
             "Type": "TMP75"
         },
         {
+            "Address": "0x4C",
+            "Bus": 33,
+            "EntityId": 11,
+            "EntityInstance": 2,
+            "Name": "CP_S2_AMB_TEMP",
+            "Name1": "CP_S2_FPGA_TEMP",
+            "PowerState": "On",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 90.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 70.000
+                }
+            ],
+            "Type": "TMP421"
+        },
+        {
+            "Address": "0x42",
+            "Bus": 33,
+            "Labels": [
+                "temp1",
+                "pin"
+            ],
+            "PowerState": "On",
+            "temp1_Name": "CP_S2_HSC_TEMP",
+            "pin_Name": "CP_S2_POWER",
+            "EntityId": 8,
+            "EntityInstance": 13,
+            "Name": "CP_S2_HSC",
+            "Type": "pmbus"
+        },
+        {
+            "Address": "0x1F",
+            "Bus": 34,
+            "EntityId": 11,
+            "EntityInstance": 0,
+            "Name": "Temp_OCP_NIC",
+            "Reg": "0x01",
+            "RegWidth": 1,
+            "Scale": 1,
+            "Class": "NICTemp",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 102.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 97.000
+                }
+            ],
+            "Type": "MCUTempSensor"
+        },
+        {
+            "Address": "0x11",
+            "Bus": 7,
+            "Name": "HSC0",
+            "EntityId": 10,
+            "EntityInstance": 16,
+            "PowerState": "Off",
+            "pin_Name": "HSC0 Input Power",
+            "vin_Name": "HSC0 Input Volt",
+            "iout1_Name": "HSC0 Output Curr",
+            "temp1_Name": "Temp HSC0",
+            "Labels": [
+                "temp1",
+                "vin",
+                "pin",
+                "iout1"
+            ],
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Label": "pin",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 1350
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "pin",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 1300
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 115
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout1",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 110
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "temp1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 103
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "temp1",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 100
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vin",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 13.5
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vin",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 13
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vin",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 10.5
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vin",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 11
+                }
+            ],
+            "Type": "ADM1278"
+        },
+        {
             "Index": 3,
             "EntityId": 7,
             "EntityInstance": 6,
-            "Name": "P12V_AUX",
-            "PowerState": "Always",
+            "Name": "P12V_AUX_HPM",
+            "PowerState": "Off",
             "ScaleFactor": 0.112,
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 13.500
+                    "Value": 13.800
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 13.000
+                    "Value": 13.200
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 11.000
+                    "Value": 10.800
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 10.000
+                    "Value": 10.230
                 }
             ],
             "Type": "ADC"
@@ -209,33 +990,33 @@
             "Index": 4,
             "EntityId": 7,
             "EntityInstance": 7,
-            "Name": "P5V_AUX",
-            "PowerState": "Always",
+            "Name": "P5V_AUX_HPM",
+            "PowerState": "Off",
             "ScaleFactor": 0.272,
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 6.500
+                    "Value": 5.500
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 6.000
+                    "Value": 5.300
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 4.500
+                    "Value": 4.700
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 4.000
+                    "Value": 4.500
                 }
             ],
             "Type": "ADC"
@@ -244,33 +1025,74 @@
             "Index": 5,
             "EntityId": 7,
             "EntityInstance": 8,
-            "Name": "P3V3_AUX",
-            "PowerState": "Always",
+            "Name": "P3V3_AUX_HPM",
+            "PowerState": "Off",
             "ScaleFactor": 0.417,
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 4.500
+                    "Value": 3.630
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 4.000
+                    "Value": 3.500
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 2.800
+                    "Value": 3.100
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 2.500
+                    "Value": 2.970
+                }
+            ],
+            "Type": "ADC"
+        },
+        {
+            "Index": 6,
+            "EntityId": "0x2d",
+            "EntityInstance": 2,
+            "Name": "P3V_BAT",
+            "PowerState": "Off",
+            "ScaleFactor": 0.323,
+            "BridgeGpio": [
+                {
+                    "Name": "P3V_BAT_EN",
+                    "Polarity": "Low"
+                }
+            ],
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 3.944
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 3.915
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 2.204
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 2.117
                 }
             ],
             "Type": "ADC"
@@ -278,118 +1100,611 @@
         {
             "Index": 8,
             "EntityId": 7,
-            "EntityInstance": 10,
+            "EntityInstance": 4,
             "Name": "P3V3",
-            "PowerState": "Always",
+            "PowerState": "On",
             "ScaleFactor": 0.41,
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 4.500
+                    "Value": 3.630
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 4.000
+                    "Value": 3.500
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 2.800
+                    "Value": 3.100
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 2.500
+                    "Value": 2.970
                 }
             ],
             "Type": "ADC"
         },
         {
             "Index": 9,
-            "EntityId": 7,
-            "EntityInstance": 11,
+            "EntityId": "0x2d",
+            "EntityInstance": 7,
             "Name": "P12V",
-            "PowerState": "Always",
+            "PowerState": "On",
             "ScaleFactor": 0.112,
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 13.500
+                    "Value": 13.794
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 13.000
+                    "Value": 13.200
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 11.000
+                    "Value": 10.820
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 10.000
+                    "Value": 10.230
                 }
             ],
             "Type": "ADC"
         },
         {
             "Index": 10,
-            "EntityId": 7,
-            "EntityInstance": 12,
-            "Name": "P1V8_AUX",
-            "PowerState": "Always",
+            "EntityId": "0x2d",
+            "EntityInstance": 3,
+            "Name": "P1V8_AUX_HPM",
+            "PowerState": "Off",
             "ScaleFactor": 1,
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 2.800
+                    "Value": 2.000
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 2.500
+                    "Value": 1.900
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 1.200
+                    "Value": 1.760
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 1.000
+                    "Value": 1.500
                 }
             ],
             "Type": "ADC"
+        },
+        {
+            "Address": "0x61",
+            "Bus": 3,
+            "Labels": [
+                "temp1",
+                "vout1",
+                "vout2",
+                "pout1",
+                "pout2",
+                "iout1",
+                "iout2"
+            ],
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Label": "temp1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 100
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 2.3
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout1",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 2.2
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Label": "vout1",
+                    "Value": 0.35
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Label": "vout1",
+                    "Value": 0.3
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout2",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 1.45
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout2",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 1.35
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Label": "vout2",
+                    "Value": 0.6
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Label": "vout2",
+                    "Value": 0.5
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "pout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 208
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "pout1",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 194
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "pout2",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 221
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "pout2",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 192
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 195
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout1",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 192
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout2",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 197
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout2",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 192
+                }
+            ],
+            "PowerState": "On",
+            "temp1_Name": "Temp_VR_0",
+            "vout1_Name": "P0_CORE_0_RUN",
+            "vout2_Name": "P0_SOC_RUN",
+            "pout1_Name": "VR_CORE_0_PWR",
+            "pout2_Name": "VR_SOC_PWR",
+            "iout1_Name": "VR_CORE_0_CUR",
+            "iout2_Name": "VR_SOC_CUR",
+            "EntityId": 3,
+            "EntityInstance": 0,
+            "Name": "vrm",
+            "Type": "pmbus"
+        },
+        {
+            "Address": "0x62",
+            "Bus": 3,
+            "Labels": [
+                "temp1",
+                "vout1",
+                "vout2",
+                "pout1",
+                "pout2",
+                "iout1",
+                "iout2"
+            ],
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Label": "temp1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 100
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 2.3
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout1",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 2.2
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Label": "vout1",
+                    "Value": 0.35
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Label": "vout1",
+                    "Value": 0.3
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout2",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 1.45
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout2",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 1.35
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Label": "vout2",
+                    "Value": 0.6
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Label": "vout2",
+                    "Value": 0.5
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "pout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 208
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "pout1",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 194
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "pout2",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 221
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "pout2",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 192
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 195
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout1",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 192
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout2",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 197
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout2",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 192
+                }
+            ],
+            "PowerState": "On",
+            "temp1_Name": "Temp_VR_1",
+            "vout1_Name": "P0_CORE_1_RUN",
+            "vout2_Name": "P0_VDDIO_RUN",
+            "pout1_Name": "VR_CORE_1_PWR",
+            "pout2_Name": "VR_VDDIO_PWR",
+            "iout1_Name": "VR_CORE_1_CUR",
+            "iout2_Name": "VR_VDDIO_CUR",
+            "EntityId": 3,
+            "EntityInstance": 1,
+            "Name": "vrm1",
+            "Type": "pmbus"
+        },
+        {
+            "Address": "0x63",
+            "Bus": 3,
+            "Labels": [
+                "vout1",
+                "pout1",
+                "iout1"
+            ],
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Label": "vout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 1.2
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout1",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 1.115
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Label": "vout1",
+                    "Value": 1.05
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Label": "vout1",
+                    "Value": 1
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "pout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 221
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "pout1",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 192
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 197
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout1",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 192
+                }
+            ],
+            "PowerState": "On",
+            "vout1_Name": "P0_11_SUS",
+            "pout1_Name": "VR_SUS_PWR",
+            "iout1_Name": "VR_SUS_CUR",
+            "EntityId": 3,
+            "EntityInstance": 4,
+            "Name": "vrm2",
+            "Type": "pmbus"
+        },
+        {
+            "Address": "0x58",
+            "Bus": 7,
+            "Labels": [
+                "fan1",
+                "fan2",
+                "fan3",
+                "temp1",
+                "temp2",
+                "temp3"
+            ],
+            "PowerState": "On",
+            "fan1_Name": "Fan_PSU_1",
+            "fan2_Name": "Fan_PSU_2",
+            "fan3_Name": "Fan_PSU_3",
+            "temp1_Name": "Temp_PSU_HOTSPOT",
+            "temp2_Name": "Temp_PSU_INLET",
+            "temp3_Name": "Temp_PSU_OUTLET",
+            "EntityId": "0x1D",
+            "EntityInstance": 1,
+            "Name": "PSU",
+            "Type": "p2011"
+        },
+        {
+            "Address": "0x4c",
+            "Bus": 1,
+            "EntityId": 3,
+            "EntityInstance": 0,
+            "Name": "Temp_CPU0",
+            "PowerState": "On",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 97.000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 95.000
+                }
+            ],
+            "Type": "SBTSI"
+        },
+        {
+            "Address": "0x6a",
+            "Bus": "36",
+            "Name": "M2_S1",
+            "Type": "NVME1000"
+        },
+        {
+            "Address": "0x6a",
+            "Bus": "37",
+            "Name": "M2_S2",
+            "Type": "NVME1000"
+        },
+        {
+            "Address": "0x6a",
+            "Bus": "20",
+            "Name": "E1_S1",
+            "Type": "NVME1000"
+        },
+        {
+            "Address": "0x6a",
+            "Bus": "21",
+            "Name": "E1_S2",
+            "Type": "NVME1000"
+        },
+        {
+            "Address": "0x6a",
+            "Bus": "22",
+            "Name": "E1_S3",
+            "Type": "NVME1000"
+        },
+        {
+            "Address": "0x6a",
+            "Bus": "23",
+            "Name": "E1_S4",
+            "Type": "NVME1000"
+        },
+        {
+            "Address": "0x6a",
+            "Bus": "24",
+            "Name": "E1_S5",
+            "Type": "NVME1000"
+        },
+        {
+            "Address": "0x6a",
+            "Bus": "28",
+            "Name": "E1_S6",
+            "Type": "NVME1000"
+        },
+        {
+            "Address": "0x6a",
+            "Bus": "29",
+            "Name": "E1_S7",
+            "Type": "NVME1000"
+        },
+        {
+            "Address": "0x6a",
+            "Bus": "30",
+            "Name": "E1_S8",
+            "Type": "NVME1000"
+        },
+        {
+            "Address": "0x6a",
+            "Bus": "31",
+            "Name": "E1_S9",
+            "Type": "NVME1000"
+        },
+        {
+            "Address": "0x6a",
+            "Bus": "32",
+            "Name": "E1_S10",
+            "Type": "NVME1000"
         }
     ],
-    "Name": "AUREA_HPM",
-    "Probe": "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': 'C2012'})",
+    "Name": "C2195",
+    "Probe": "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': 'C2*'})",
     "Type": "Board",
+    "xyz.openbmc_project.Inventory.Decorator.Asset": {
+        "Manufacturer": "$BOARD_MANUFACTURER",
+        "Model": "$BOARD_PRODUCT_NAME",
+        "PartNumber": "$BOARD_PART_NUMBER",
+        "SerialNumber": "$BOARD_SERIAL_NUMBER"
+    },
     "xyz.openbmc_project.Inventory.Decorator.Ipmi": {
-        "EntityId": 7,
+        "EntityId": "0x7",
         "EntityInstance": 0
     },
-    "xyz.openbmc_project.Inventory.Item.Bmc": {},
-    "xyz.openbmc_project.Common.UUID": {
-        "UUID": "$BOARD_INFO_AM1"
-    }
+    "xyz.openbmc_project.Inventory.Decorator.I2CDevice": {
+        "Bus": "$BUS",
+        "Address": "$ADDRESS",
+        "Name": "$BOARD_PRODUCT_NAME"
+    },
+    "xyz.openbmc_project.Inventory.Item.System": {}
 }

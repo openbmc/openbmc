@@ -1,3 +1,0 @@
-SOURCE=/usr/share/vbios/vbios.bin
-TARGET=/sys/bus/spi/devices/spi1.0/eeprom
-SIZE=32

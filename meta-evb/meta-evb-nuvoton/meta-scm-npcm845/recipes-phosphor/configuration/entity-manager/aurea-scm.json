@@ -2,9 +2,9 @@
     "Exposes": [
         {
             "Index": 0,
-            "EntityId": 6,
-            "EntityInstance": 1,
-            "Name": "P12V_STBY",
+            "EntityId": 7,
+            "EntityInstance": 6,
+            "Name": "P12V_AUX_SCM",
             "PowerState": "Always",
             "ScaleFactor": 0.13,
             "Thresholds": [
@@ -12,34 +12,34 @@
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 13.500
+                    "Value": 13.800
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 13.000
+                    "Value": 13.200
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 11.000
+                    "Value": 10.800
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 10.000
+                    "Value": 10.230
                 }
             ],
             "Type": "ADC"
         },
         {
             "Index": 1,
-            "EntityId": 6,
-            "EntityInstance": 2,
-            "Name": "P5V_STBY",
+            "EntityId": 7,
+            "EntityInstance": 6,
+            "Name": "P5V_AUX_SCM",
             "PowerState": "Always",
             "ScaleFactor": 0.33,
             "Thresholds": [
@@ -47,34 +47,34 @@
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 6.500
+                    "Value": 5.500
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 6.000
+                    "Value": 5.300
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 4.500
+                    "Value": 4.700
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 4.000
+                    "Value": 4.500
                 }
             ],
             "Type": "ADC"
         },
         {
             "Index": 2,
-            "EntityId": 6,
-            "EntityInstance": 3,
-            "Name": "P3V3_SCM_STBY",
+            "EntityId": 7,
+            "EntityInstance": 6,
+            "Name": "P3V3_AUX_SCM",
             "PowerState": "Always",
             "ScaleFactor": 0.5,
             "Thresholds": [
@@ -82,25 +82,25 @@
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 4.500
+                    "Value": 3.630
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 4.000
+                    "Value": 3.500
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 2.800
+                    "Value": 3.100
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 2.500
+                    "Value": 2.970
                 }
             ],
             "Type": "ADC"
@@ -108,113 +108,43 @@
         {
             "Address": "0x48",
             "Bus": 15,
-            "EntityId": 6,
-            "EntityInstance": 4,
-            "Name": "SCM_Inlet_Temp",
+            "EntityId": 7,
+            "EntityInstance": 3,
+            "Name": "Temp_Inlet_SCM",
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 65.000
+                    "Value": 40.000
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 50.000
-                },
-                {
-                    "Direction": "less than",
-                    "Name": "lower non critical",
-                    "Severity": 0,
-                    "Value": 15.000
-                },
-                {
-                    "Direction": "less than",
-                    "Name": "lower critical",
-                    "Severity": 1,
-                    "Value": 0
+                    "Value": 37.000
                 }
             ],
             "Type": "TMP75"
-        },
-        {
-            "Index": "0",
-            "EntityId": 6,
-            "EntityInstance": 5,
-            "Name": "BMC_CPU_Temp0",
-            "Thresholds": [
-                {
-                    "Direction": "greater than",
-                    "Name": "upper critical",
-                    "Severity": 1,
-                    "Value": 75.000
-                },
-                {
-                    "Direction": "greater than",
-                    "Name": "upper non critical",
-                    "Severity": 0,
-                    "Value": 60.000
-                },
-                {
-                    "Direction": "less than",
-                    "Name": "lower non critical",
-                    "Severity": 0,
-                    "Value": 15.000
-                },
-                {
-                    "Direction": "less than",
-                    "Name": "lower critical",
-                    "Severity": 1,
-                    "Value": 0
-                }
-            ],
-            "Type": "BMCOnDieThermalSensor"
-        },
-        {
-            "Index": "1",
-            "EntityId": 6,
-            "EntityInstance": 6,
-            "Name": "BMC_CPU_Temp1",
-            "Thresholds": [
-                {
-                    "Direction": "greater than",
-                    "Name": "upper critical",
-                    "Severity": 1,
-                    "Value": 75.000
-                },
-                {
-                    "Direction": "greater than",
-                    "Name": "upper non critical",
-                    "Severity": 0,
-                    "Value": 60.000
-                },
-                {
-                    "Direction": "less than",
-                    "Name": "lower non critical",
-                    "Severity": 0,
-                    "Value": 15.000
-                },
-                {
-                    "Direction": "less than",
-                    "Name": "lower critical",
-                    "Severity": 1,
-                    "Value": 0
-                }
-            ],
-            "Type": "BMCOnDieThermalSensor"
         }
     ],
     "Name": "Aurea",
-    "Probe": "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': 'Aurea'})",
+    "Probe": "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': 'Aurea|M1110'})",
     "Type": "Board",
-    "xyz.openbmc_project.Inventory.Decorator.Ipmi": {
-        "EntityId": 6,
-        "EntityInstance": 0
+    "xyz.openbmc_project.Inventory.Decorator.Asset": {
+        "Manufacturer": "$BOARD_MANUFACTURER",
+        "Model": "$BOARD_PRODUCT_NAME",
+        "PartNumber": "$BOARD_PART_NUMBER",
+        "SerialNumber": "$BOARD_SERIAL_NUMBER"
     },
-    "xyz.openbmc_project.Inventory.Item.Bmc": {},
-    "xyz.openbmc_project.Common.UUID": {
-        "UUID": "$BOARD_INFO_AM1"
-    }
+    "xyz.openbmc_project.Inventory.Decorator.Ipmi": {
+        "EntityId": "0x10",
+        "EntityInstance": 1
+    },
+    "xyz.openbmc_project.Inventory.Decorator.I2CDevice": {
+        "Bus": "$BUS",
+        "Address": "$ADDRESS",
+        "Name": "$BOARD_PRODUCT_NAME"
+    },
+    "xyz.openbmc_project.Inventory.Item.System": {}
 }

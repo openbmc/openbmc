@@ -1,0 +1,56 @@
+From 5f1014c31df1a5e2f2ed4bf3dcd1b56f030f31a0 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Thu, 15 Sep 2022 14:14:05 +0800
+Subject: [PATCH] dts: add bu4 bu5 pinctrl
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ .../boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi b/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi
+index 356222f740e3..d95c057eb341 100644
+--- a/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi
++++ b/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi
+@@ -323,18 +323,22 @@
+ 			serial4: serial@4000 {
+ 				compatible = "nuvoton,npcm845-uart", "nuvoton,npcm750-uart";
+ 				reg = <0x4000 0x1000>;
+-				clocks = <&clk NPCM8XX_CLK_UART>;
++				clocks = <&clk NPCM8XX_CLK_UART2>;
+ 				interrupts = <GIC_SPI 196 IRQ_TYPE_LEVEL_HIGH>;
+ 				reg-shift = <2>;
++				pinctrl-names = "default";
++				pinctrl-0 = <&bu4_pins>;
+ 				status = "disabled";
+ 			};
+ 
+ 			serial5: serial@5000 {
+ 				compatible = "nuvoton,npcm845-uart", "nuvoton,npcm750-uart";
+ 				reg = <0x5000 0x1000>;
+-				clocks = <&clk NPCM8XX_CLK_UART>;
++				clocks = <&clk NPCM8XX_CLK_UART2>;
+ 				interrupts = <GIC_SPI 197 IRQ_TYPE_LEVEL_HIGH>;
+ 				reg-shift = <2>;
++				pinctrl-names = "default";
++				pinctrl-0 = <&bu5_pins>;
+ 				status = "disabled";
+ 			};
+ 
+@@ -1468,5 +1472,13 @@
+ 			groups = "hgpio7";
+ 			function = "hgpio7";
+ 		};
++		bu4_pins: bu4-pins {
++			groups = "bu4";
++			function = "bu4";
++		};
++		bu5_pins: bu5-pins {
++			groups = "bu5";
++			function = "bu5";
++		};
+ 	};
+ };
+-- 
+2.17.1
+

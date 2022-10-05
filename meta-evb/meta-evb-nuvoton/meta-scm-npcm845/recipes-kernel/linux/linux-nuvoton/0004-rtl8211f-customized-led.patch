@@ -1,0 +1,52 @@
+From 28f4715f6ca680133583ee580a1f053f44fd872a Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Thu, 15 Sep 2022 14:21:40 +0800
+Subject: [PATCH] rtl8211f: customized led
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ drivers/net/phy/realtek.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+index 11be60333fa8..8fb3535533d3 100644
+--- a/drivers/net/phy/realtek.c
++++ b/drivers/net/phy/realtek.c
+@@ -300,6 +300,26 @@ static irqreturn_t rtl8211f_handle_interrupt(struct phy_device *phydev)
+ 	return IRQ_HANDLED;
+ }
+ 
++static void rtl8211f_link_change_notify(struct phy_device *phydev)
++{
++	if (phydev->link && phydev->state == PHY_RUNNING) {
++		phy_write(phydev, RTL821x_PAGE_SELECT, 0xd04);
++
++		if (phydev->speed == SPEED_1000) {
++			phy_write(phydev, 0x10, 0x6000);
++			phy_write(phydev, 0x11, 0x6008);
++		} else if (phydev->speed == SPEED_100) {
++			phy_write(phydev, 0x10, 0x4842);
++			phy_write(phydev, 0x11, 0x6008);
++		} else if (phydev->speed == SPEED_10) {
++			phy_write(phydev, 0x10, 0x4401);
++			phy_write(phydev, 0x11, 0x600f);
++		}
++
++		phy_write(phydev, RTL821x_PAGE_SELECT, 0);
++	}
++}
++
+ static int rtl8211_config_aneg(struct phy_device *phydev)
+ {
+ 	int ret;
+@@ -916,6 +936,7 @@ static struct phy_driver realtek_drvs[] = {
+ 		.name		= "RTL8211F Gigabit Ethernet",
+ 		.probe		= rtl821x_probe,
+ 		.config_init	= &rtl8211f_config_init,
++		.link_change_notify     = &rtl8211f_link_change_notify,
+ 		.read_status	= rtlgen_read_status,
+ 		.config_intr	= &rtl8211f_config_intr,
+ 		.handle_interrupt = rtl8211f_handle_interrupt,
+-- 
+2.17.1
+

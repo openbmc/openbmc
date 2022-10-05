@@ -1,0 +1,78 @@
+{
+    "sensors" : [
+        {
+            "name": "Fan_0A",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan_0A",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0084000.i2c/i2c-4/4-0020/hwmon/**/pwm1",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "Temp_Outlet_1",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/Temp_Outlet_1",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        }
+    ],
+    "zones" : [
+        {
+            "id": 0,
+            "minThermalOutput": 0.0,
+            "failsafePercent": 70.0,
+            "pids": [
+                {
+                    "name": "Fan_0A",
+                    "type": "fan",
+                    "inputs": ["Fan_0A"],
+                    "setpoint": 40.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 1.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 70.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0
+                    }
+                },
+                {
+                    "name": "Temp_Outlet_1",
+                    "type": "stepwise",
+                    "inputs": ["Temp_Outlet_1"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0,
+                        "isCeiling": false,
+                        "reading": {
+                            "0": 25,
+                            "1": 28,
+                            "2": 31,
+                            "3": 34,
+                            "4": 37,
+                            "5": 40
+                        },
+                        "output": {
+                            "0": 70,
+                            "1": 70,
+                            "2": 70,
+                            "3": 70,
+                            "4": 70,
+                            "5": 70
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
