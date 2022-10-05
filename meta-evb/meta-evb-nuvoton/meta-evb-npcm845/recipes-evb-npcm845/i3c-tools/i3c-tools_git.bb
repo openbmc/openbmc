@@ -1,7 +1,7 @@
 DESCRIPTION = "I3C Tools"
 PR = "r1"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://README.md;beginline=1;endline=2;md5=c9111daf206fae2fe457e0ee79f8bbbe"
 
 SRC_URI = "git://github.com/vitor-soares-snps/i3c-tools.git;branch=master;protocol=https"
