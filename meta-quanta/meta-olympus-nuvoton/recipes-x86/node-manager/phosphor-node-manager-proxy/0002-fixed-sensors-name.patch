@@ -1,14 +1,14 @@
-From f7b7ef760f904cec7f026ba9fdbc96c49b0e7936 Mon Sep 17 00:00:00 2001
+From 490abedc45d0c5630428d2ead8ba69ef0aff48c2 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Mon, 3 Feb 2020 18:36:32 +0800
-Subject: [PATCH] fixed sensors name
+Subject: [PATCH 2/5] fixed sensors name
 
 ---
  NodeManagerProxy.cpp | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/NodeManagerProxy.cpp b/NodeManagerProxy.cpp
-index c875ee4..ebf9932 100644
+index d9fb760..ae5f992 100644
 --- a/NodeManagerProxy.cpp
 +++ b/NodeManagerProxy.cpp
 @@ -121,13 +121,13 @@ void createSensors()
@@ -29,5 +29,5 @@ index c875ee4..ebf9932 100644
  }
  
 -- 
-2.17.1
+2.34.1
 

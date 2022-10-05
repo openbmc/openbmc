@@ -3,7 +3,7 @@ FILESEXTRAPATHS:prepend:olympus-nuvoton := "${THISDIR}/${PN}:"
 SRC_URI:append:olympus-nuvoton = " file://0001-Handle-now-allow-execption-in-account-service.patch"
 SRC_URI:append:olympus-nuvoton = " file://0002-Redfish-Add-power-metrics-support.patch"
 SRC_URI:append:olympus-nuvoton = " file://0003-Create-new-user-without-SSH-group.patch"
-SRC_URI:append:olympus-nuvoton = " file://0004-bmcweb-chassis-add-indicatorLED-support.patch"
+#SRC_URI:append:olympus-nuvoton = " file://0004-bmcweb-chassis-add-indicatorLED-support.patch"
 SRC_URI:append:olympus-nuvoton = " file://0005-redfish-log_services-fix-createDump-functionality.patch"
 
 # Enable CPU Log support

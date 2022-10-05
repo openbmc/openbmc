@@ -1,7 +1,7 @@
-From de343a99a59343d98cfb6584e05fe09312e404d2 Mon Sep 17 00:00:00 2001
+From be3f59aaaba3bcd48dd8a9c0f57191303db8a038 Mon Sep 17 00:00:00 2001
 From: Brian Ma <chma0@nuvoton.com>
 Date: Thu, 6 Feb 2020 12:00:51 +0800
-Subject: [PATCH] add force recovery functions
+Subject: [PATCH 4/5] add force recovery functions
 
 ---
  NodeManagerProxy.cpp | 107 +++++++++++++++++++++++++++++++++++++++++++
@@ -131,10 +131,10 @@ index ae5f992..571c39c 100644
 +    return std::string(result);
 +}
 diff --git a/NodeManagerProxy.hpp b/NodeManagerProxy.hpp
-index 154c033..d84237c 100644
+index b8f0409..8e73297 100644
 --- a/NodeManagerProxy.hpp
 +++ b/NodeManagerProxy.hpp
-@@ -139,6 +139,15 @@ constexpr uint8_t highPowerIOsubsystem = 0x4;
+@@ -143,6 +143,15 @@ constexpr uint8_t highPowerIOsubsystem = 0x4;
  constexpr uint8_t ipmiGetDevIdNetFn = 0x6;
  constexpr uint8_t ipmiGetDevIdLun = 0;
  constexpr uint8_t ipmiGetDevIdCmd = 0x1;
@@ -150,7 +150,7 @@ index 154c033..d84237c 100644
  
  /**
   * @brief Part of Get Device ID Command Response Payload
-@@ -242,6 +251,14 @@ typedef struct
+@@ -246,6 +255,14 @@ typedef struct
      uint16_t statsPeriod;
  } __attribute__((packed)) nmIpmiSetNmPolicyReq;
  
@@ -165,7 +165,7 @@ index 154c033..d84237c 100644
  /**
   * @brief Enable/Disable NM Policy Control request format
   */
-@@ -800,4 +817,8 @@ struct HealthData
+@@ -826,4 +843,8 @@ struct HealthData
      boost::container::flat_set<std::string> warning;
  };
  
@@ -175,5 +175,5 @@ index 154c033..d84237c 100644
 +
  #endif
 -- 
-2.17.1
+2.34.1
 

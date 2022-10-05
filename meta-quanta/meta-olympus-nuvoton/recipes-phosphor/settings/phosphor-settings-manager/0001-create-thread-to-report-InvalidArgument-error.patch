@@ -1,27 +1,16 @@
-From b598b543806c935e7a3eef769edc862e24238bc0 Mon Sep 17 00:00:00 2001
+From 5842795b2f0c8efc73be577517cf5b693942d044 Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
 Date: Mon, 20 Jul 2020 11:04:31 +0800
 Subject: [PATCH] create thread to report InvalidArgument error
 
 Signed-off-by: Stanley Chu <yschu@nuvoton.com>
 ---
- Makefile.am               |  1 +
  settings_main.cpp         | 12 ++++++++++++
  settings_manager.mako.hpp | 19 ++++++++-----------
- 3 files changed, 21 insertions(+), 11 deletions(-)
+ 2 files changed, 20 insertions(+), 11 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 68cbd87..2cb508c 100755
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -33,4 +33,5 @@ phosphor_settings_manager_LDADD = \
- 	$(PHOSPHOR_DBUS_INTERFACES_LIBS) \
- 	$(SDBUSPLUS_LIBS) \
- 	$(PHOSPHOR_LOGGING_LIBS) \
-+	-lpthread \
- 	-lstdc++fs
 diff --git a/settings_main.cpp b/settings_main.cpp
-index 0790a7b..29aad62 100644
+index 78a0ebe..757a555 100644
 --- a/settings_main.cpp
 +++ b/settings_main.cpp
 @@ -1,10 +1,22 @@
@@ -48,7 +37,7 @@ index 0790a7b..29aad62 100644
  {
      auto bus = sdbusplus::bus::new_default();
 diff --git a/settings_manager.mako.hpp b/settings_manager.mako.hpp
-index d22fd2d..bbcde52 100644
+index 6f14612..676043b 100644
 --- a/settings_manager.mako.hpp
 +++ b/settings_manager.mako.hpp
 @@ -50,6 +50,8 @@ using namespace phosphor::logging;
@@ -85,5 +74,5 @@ index d22fd2d..bbcde52 100644
                  }
               % endif
 -- 
-2.17.1
+2.34.1
 

@@ -1,0 +1,38 @@
+From 96212dc02282abe246dc3b8d419cd387c539a7e4 Mon Sep 17 00:00:00 2001
+From: Allen <jhkang@nuvoton.com>
+Date: Tue, 4 Oct 2022 18:32:55 +0800
+Subject: [PATCH 1/5] fix build error due to c++17
+
+Signed-off-by: Allen Kang <jhkang@nuvoton.com>
+---
+ CMakeLists.txt       | 2 +-
+ NodeManagerProxy.hpp | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2b7c4b6..0b66e8e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,6 +1,6 @@
+ cmake_minimum_required (VERSION 3.5 FATAL_ERROR)
+ project (node-manager-proxy CXX)
+-set (CMAKE_CXX_STANDARD 17)
++set (CMAKE_CXX_STANDARD 20)
+ set (CMAKE_CXX_STANDARD_REQUIRED ON)
+ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
+ set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-rtti")
+diff --git a/NodeManagerProxy.hpp b/NodeManagerProxy.hpp
+index 0dc08a8..b848355 100644
+--- a/NodeManagerProxy.hpp
++++ b/NodeManagerProxy.hpp
+@@ -16,6 +16,7 @@
+ #include <boost/container/flat_set.hpp>
+ #include <phosphor-logging/log.hpp>
+ #include <sdbusplus/asio/object_server.hpp>
++#include <boost/container/flat_map.hpp>
+ 
+ #ifndef NODEMANAGERPROXY_HPP
+ #define NODEMANAGERPROXY_HPP
+-- 
+2.34.1
+

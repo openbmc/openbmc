@@ -8,9 +8,10 @@ PV = "0.1+git${SRCPV}"
 
 FILESEXTRAPATHS:prepend:olympus-nuvoton := "${THISDIR}/${PN}:"
 SRC_URI += " \
+            file://0001-fix-build-error-due-to-c-17.patch \
+            file://0002-fixed-sensors-name.patch \
             file://0003-watch-for-propery-change-of-PowerCap.patch \
             file://0004-add-force-recovery-functions.patch \
-            file://0002-fixed-sensors-name.patch \
             file://0005-remove-fno-rtti-cxx-flags.patch \
             "
 

@@ -1,27 +1,27 @@
-From f57bb803bc9e1cb1f477446b3d9039f3d13684f3 Mon Sep 17 00:00:00 2001
+From f13b26c6587bc061cb92ecda5936ff1971ee7f5d Mon Sep 17 00:00:00 2001
 From: kfting <kfting@nuvoton.com>
 Date: Thu, 16 Jul 2020 14:22:53 +0800
 Subject: [PATCH] Modify dbus call style for calling setTime
 
 Signed-off-by: kfting <kfting@nuvoton.com>
+Signed-off-by: Allen Kang <jhkang@nuvoton.com>
 ---
- epoch_base.cpp | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ bmc_epoch.cpp | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/epoch_base.cpp b/epoch_base.cpp
-index 507c5ff..8b97da1 100644
---- a/epoch_base.cpp
-+++ b/epoch_base.cpp
-@@ -41,7 +41,7 @@ bool EpochBase::setTime(const microseconds& usec)
-     method.append(static_cast<int64_t>(usec.count()),
+diff --git a/bmc_epoch.cpp b/bmc_epoch.cpp
+index db4051a..3425468 100644
+--- a/bmc_epoch.cpp
++++ b/bmc_epoch.cpp
+@@ -125,6 +125,7 @@ bool BmcEpoch::setTime(const microseconds& usec)
                    false,  // relative
                    false); // user_interaction
--
+ 
 +#if 0
      try
      {
          bus.call_noreply(method);
-@@ -52,6 +52,15 @@ bool EpochBase::setTime(const microseconds& usec)
+@@ -135,6 +136,15 @@ bool BmcEpoch::setTime(const microseconds& usec)
          using namespace xyz::openbmc_project::Time;
          elog<FailedError>(Failed::REASON(ex.what()));
      }
@@ -38,5 +38,5 @@ index 507c5ff..8b97da1 100644
  }
  
 -- 
-2.17.1
+2.34.1
 

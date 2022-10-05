@@ -1,4 +1,4 @@
-From 1326a5b9022c7f9cb2c65c44bac98096bc47016f Mon Sep 17 00:00:00 2001
+From d66c4829f65fab198f6648308c0ca3d3640abd14 Mon Sep 17 00:00:00 2001
 From: Tim Lee <timlee660101@gmail.com>
 Date: Mon, 20 Jun 2022 14:46:47 +0800
 Subject: [PATCH] Handle now allow execption in account service
@@ -13,10 +13,10 @@ Signed-off-by: Tim Lee <timlee660101@gmail.com>
  1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/redfish-core/lib/account_service.hpp b/redfish-core/lib/account_service.hpp
-index f8ba32256..c1841cde1 100644
+index 91bd02495..aa25b1e80 100644
 --- a/redfish-core/lib/account_service.hpp
 +++ b/redfish-core/lib/account_service.hpp
-@@ -1810,9 +1810,18 @@ inline void
+@@ -1852,9 +1852,18 @@ inline void
      const std::string userPath(tempObjPath);
  
      crow::connections::systemBus->async_method_call(
@@ -33,9 +33,9 @@ index f8ba32256..c1841cde1 100644
 +                    messages::resourceCannotBeDeleted(asyncResp->res);
 +                    return;
 +                }
-             messages::resourceNotFound(asyncResp->res,
-                                        "#ManagerAccount.v1_4_0.ManagerAccount",
+             messages::resourceNotFound(asyncResp->res, "ManagerAccount",
                                         username);
+             return;
 -- 
-2.17.1
+2.34.1
 

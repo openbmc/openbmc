@@ -1,7 +1,7 @@
-From 505b61f3cfdae11ff77ea087a78d8b47c1b4d90a Mon Sep 17 00:00:00 2001
+From 1809bd39cb9455d724fc182daa2de29643b41499 Mon Sep 17 00:00:00 2001
 From: Tim Lee <timlee660101@gmail.com>
 Date: Mon, 20 Jun 2022 16:06:39 +0800
-Subject: [PATCH 5/5] redfish: log_services: fix createDump functionality
+Subject: [PATCH] redfish: log_services: fix createDump functionality
 
 Signed-off-by: Tim Lee <timlee660101@gmail.com>
 ---
@@ -9,18 +9,19 @@ Signed-off-by: Tim Lee <timlee660101@gmail.com>
  1 file changed, 42 insertions(+), 4 deletions(-)
 
 diff --git a/redfish-core/lib/log_services.hpp b/redfish-core/lib/log_services.hpp
-index 3572ccaf6..10324ec5e 100644
+index d46079467..11b257cba 100644
 --- a/redfish-core/lib/log_services.hpp
 +++ b/redfish-core/lib/log_services.hpp
-@@ -791,22 +791,60 @@ inline void createDump(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
-     crow::connections::systemBus->async_method_call(
+@@ -779,7 +779,7 @@ inline void createDump(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
          [asyncResp, payload(task::Payload(req)), dumpPath,
           dumpType](const boost::system::error_code ec,
+                    const sdbusplus::message::message& msg,
 -                   const uint32_t& dumpId) mutable {
 +                   const sdbusplus::message::object_path& objPath) mutable {
          if (ec)
          {
              BMCWEB_LOG_ERROR << "CreateDump resp_handler got error " << ec;
+@@ -823,15 +823,53 @@ inline void createDump(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
              messages::internalError(asyncResp->res);
              return;
          }
@@ -78,5 +79,5 @@ index 3572ccaf6..10324ec5e 100644
  
  inline void clearDump(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
 -- 
-2.17.1
+2.34.1
 

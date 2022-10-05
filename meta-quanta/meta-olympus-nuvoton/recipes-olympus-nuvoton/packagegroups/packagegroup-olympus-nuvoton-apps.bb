@@ -64,7 +64,7 @@ RDEPENDS:${PN}-system = " \
         smbios-mdr \
         loadmcu \
         usb-network \
-        nuvoton-ipmi-oem \
+	nuvoton-ipmi-oem \
         olympus-nuvoton-iptable-restore \
         srvcfg-manager \
         iperf3 \

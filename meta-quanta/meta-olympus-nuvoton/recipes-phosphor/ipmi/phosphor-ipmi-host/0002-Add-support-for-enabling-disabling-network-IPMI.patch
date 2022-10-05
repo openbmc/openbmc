@@ -1,15 +1,15 @@
-From 4c73d7116d9c2013446031c4b39d4b6ded90d9cd Mon Sep 17 00:00:00 2001
+From ea493a2cf9e7ed5d91645bf626c55ae9ad0a16cd Mon Sep 17 00:00:00 2001
 From: Tim Lee <timlee660101@gmail.com>
 Date: Fri, 13 Dec 2019 16:13:50 +0800
-Subject: [PATCH 2/3] Add support for enabling/disabling network IPMI
+Subject: [PATCH] Add support for enabling/disabling network IPMI
 
 Signed-off-by: Tim Lee <timlee660101@gmail.com>
 ---
- user_channel/channel_mgmt.cpp | 98 +++++++++++++++++++++++++++++++++++
- 1 file changed, 98 insertions(+)
+ user_channel/channel_mgmt.cpp | 96 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 96 insertions(+)
 
 diff --git a/user_channel/channel_mgmt.cpp b/user_channel/channel_mgmt.cpp
-index aa746fd3..059d41b8 100644
+index 7d3cf952..025c7a7a 100644
 --- a/user_channel/channel_mgmt.cpp
 +++ b/user_channel/channel_mgmt.cpp
 @@ -25,6 +25,7 @@
@@ -19,7 +19,7 @@ index aa746fd3..059d41b8 100644
 +#include <boost/process/child.hpp>
  #include <cerrno>
  #include <exception>
- #include <experimental/filesystem>
+ #include <filesystem>
 @@ -149,6 +150,91 @@ const std::array<std::string, PRIVILEGE_OEM + 1> privList = {
      "priv-reserved", "priv-callback", "priv-user",
      "priv-operator", "priv-admin",    "priv-oem"};
@@ -112,7 +112,7 @@ index aa746fd3..059d41b8 100644
  std::string ChannelConfig::getChannelName(const uint8_t chNum)
  {
      if (!isValidChannel(chNum))
-@@ -619,6 +705,16 @@ Cc ChannelConfig::setChannelAccessPersistData(const uint8_t chNum,
+@@ -615,6 +701,16 @@ Cc ChannelConfig::setChannelAccessPersistData(const uint8_t chNum,
      {
          channelData[chNum].chAccess.chNonVolatileData.accessMode =
              chAccessData.accessMode;
@@ -129,18 +129,6 @@ index aa746fd3..059d41b8 100644
      }
      if (setFlag & setUserAuthEnabled)
      {
-@@ -1324,9 +1420,11 @@ int ChannelConfig::setDbusProperty(const std::string& service,
-         method.append(interface, property, value);
- 
-         auto reply = bus.call(method);
-+
-     }
-     catch (const sdbusplus::exception::exception& e)
-     {
-+        log<level::ERR>("Exception: ", entry("MSG=%s", e.what()));
-         log<level::DEBUG>("set-property failed",
-                           entry("SERVICE=%s", service.c_str()),
-                           entry("OBJPATH=%s", objPath.c_str()),
 -- 
-2.17.1
+2.34.1
 

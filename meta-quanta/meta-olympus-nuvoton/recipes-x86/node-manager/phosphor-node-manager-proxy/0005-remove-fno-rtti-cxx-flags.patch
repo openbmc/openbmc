@@ -1,10 +1,20 @@
+From 6781a875c89a390b83ebf71c78a9fe22470b70b8 Mon Sep 17 00:00:00 2001
+From: Allen <jhkang@nuvoton.com>
+Date: Wed, 5 Oct 2022 10:26:45 +0800
+Subject: [PATCH 5/5] remove fno rtti cxx flags
+
+Signed-off-by: Allen Kang <jhkang@nuvoton.com>
+---
+ CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 2b7c4b6..fdccfb2 100644
+index 0b66e8e..6628607 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -2,8 +2,8 @@ cmake_minimum_required (VERSION 3.5 FATAL_ERROR)
  project (node-manager-proxy CXX)
- set (CMAKE_CXX_STANDARD 17)
+ set (CMAKE_CXX_STANDARD 20)
  set (CMAKE_CXX_STANDARD_REQUIRED ON)
 -set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
 -set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-rtti")
@@ -13,3 +23,6 @@ index 2b7c4b6..fdccfb2 100644
  
  include_directories (${CMAKE_CURRENT_SOURCE_DIR})
  find_package (Boost REQUIRED)
+-- 
+2.34.1
+
