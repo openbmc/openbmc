@@ -1,0 +1,45 @@
+From 1f80290dd54f3d71b68e7929f1b1cda6b149f6bc Mon Sep 17 00:00:00 2001
+From: Brian Ma <chma0@nuvoton.com>
+Date: Tue, 27 Sep 2022 08:54:34 +0800
+Subject: [PATCH] Move flash layout
+
+---
+ configs/ArbelEVB_defconfig | 4 ++--
+ include/configs/arbel.h    | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/configs/ArbelEVB_defconfig b/configs/ArbelEVB_defconfig
+index c8752b45ce..53a9beaa43 100644
+--- a/configs/ArbelEVB_defconfig
++++ b/configs/ArbelEVB_defconfig
+@@ -6,12 +6,12 @@ CONFIG_SYS_TEXT_BASE=0x8000
+ CONFIG_DEFAULT_DEVICE_TREE="nuvoton-npcm845-evb"
+ CONFIG_ENV_IS_IN_SPI_FLASH=y
+ CONFIG_ENV_SIZE=0x40000
+-CONFIG_ENV_OFFSET=0x1C0000
++CONFIG_ENV_OFFSET=0x3C0000
+ CONFIG_ENV_SECT_SIZE=0x1000
+ CONFIG_CMD_MEMTEST=y
+ CONFIG_SYS_MEMTEST_START=0
+ CONFIG_SYS_MEMTEST_END=0x08000000
+-CONFIG_ENV_ADDR=0x801C0000
++CONFIG_ENV_ADDR=0x803C0000
+ CONFIG_SF_DEFAULT_BUS=0
+ CONFIG_SF_DEFAULT_CS=0
+ CONFIG_NR_DRAM_BANKS=1
+diff --git a/include/configs/arbel.h b/include/configs/arbel.h
+index b4ebc54641..ab7f308b61 100644
+--- a/include/configs/arbel.h
++++ b/include/configs/arbel.h
+@@ -38,7 +38,7 @@
+ 
+ /* Default environemnt variables */
+ #define CONFIG_BOOTCOMMAND "run common_bootargs; run romboot"
+-#define CONFIG_EXTRA_ENV_SETTINGS   "uimage_flash_addr=80200000\0"   \
++#define CONFIG_EXTRA_ENV_SETTINGS   "uimage_flash_addr=80400000\0"   \
+ 		"stdin=serial\0"   \
+ 		"stdout=serial\0"   \
+ 		"stderr=serial\0"    \
+-- 
+2.17.1
+

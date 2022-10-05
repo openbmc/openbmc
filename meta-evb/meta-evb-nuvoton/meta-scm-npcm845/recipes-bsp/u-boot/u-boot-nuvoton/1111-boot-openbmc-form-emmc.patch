@@ -18,7 +18,7 @@ index b4ebc54641..db6b46e943 100644
  /* Default environemnt variables */
 -#define CONFIG_BOOTCOMMAND "run common_bootargs; run romboot"
 +#define CONFIG_BOOTCOMMAND "run emmc_bootargs; run emmcboot"
- #define CONFIG_EXTRA_ENV_SETTINGS   "uimage_flash_addr=80200000\0"   \
+ #define CONFIG_EXTRA_ENV_SETTINGS   "uimage_flash_addr=80400000\0"   \
  		"stdin=serial\0"   \
  		"stdout=serial\0"   \
 @@ -59,6 +59,12 @@
