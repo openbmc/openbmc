@@ -1,0 +1,35 @@
+From e45ee7f50d70d20b6c7a6f3f5656a0f37e6efb85 Mon Sep 17 00:00:00 2001
+From: Medad <ctcchien@nuvoton.com>
+Date: Tue, 11 May 2021 13:45:29 +0800
+Subject: [PATCH] phosphor-ipmi-host: Do not use size_t in struct
+ MetaPassStruct 	Note: size_t is 8 bytes in aarch64
+
+Signed-off-by: Medad <ctcchien@nuvoton.com>
+---
+ user_channel/passwd_mgr.cpp | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/user_channel/passwd_mgr.cpp b/user_channel/passwd_mgr.cpp
+index 5ec66bb..37a6ed4 100644
+--- a/user_channel/passwd_mgr.cpp
++++ b/user_channel/passwd_mgr.cpp
+@@ -51,11 +51,11 @@ struct MetaPassStruct
+ {
+     char signature[10];
+     unsigned char reseved[2];
+-    size_t hashSize;
+-    size_t ivSize;
+-    size_t dataSize;
+-    size_t padSize;
+-    size_t macSize;
++    unsigned int hashSize;
++    unsigned int ivSize;
++    unsigned int dataSize;
++    unsigned int padSize;
++    unsigned int macSize;
+ };
+ 
+ using namespace phosphor::logging;
+-- 
+2.17.1
+

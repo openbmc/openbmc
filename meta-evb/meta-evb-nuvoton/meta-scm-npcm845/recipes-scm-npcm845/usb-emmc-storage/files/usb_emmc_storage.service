@@ -1,0 +1,9 @@
+[Unit]
+Description=enable usb emmc storage
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c '/usr/sbin/usb_emmc_storage.sh'
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,75 @@
+/xyz/openbmc_project/sensors/temperature/HPM_Inlet_Temp1:
+  eventReadingType: 1
+  sensorID: 0x01
+  sensorType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/temperature/HPM_Inlet_Temp2:
+  eventReadingType: 1
+  sensorID: 0x02
+  sensorType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/temperature/HPM_Inlet_Temp3:
+  eventReadingType: 1
+  sensorID: 0x03
+  sensorType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/temperature/Onlet_Temp1:
+  eventReadingType: 1
+  sensorID: 0x04
+  sensorType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/temperature/Outlet_Temp2:
+  eventReadingType: 1
+  sensorID: 0x05
+  sensorType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/temperature/SCM_Inlet_Temp:
+  eventReadingType: 1
+  sensorID: 0x06
+  sensorType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/P12V_STBY:
+  eventReadingType: 1
+  sensorID: 0x7
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/P5V_STBY:
+  eventReadingType: 1
+  sensorID: 0x08
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/P3V3_SCM_STBY:
+  eventReadingType: 1
+  sensorID: 0x09
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/P12V_AUX:
+  eventReadingType: 1
+  sensorID: 0x0A
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/P5V_AUX:
+  eventReadingType: 1
+  sensorID: 0x0B
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/P3V3_AUX:
+  eventReadingType: 1
+  sensorID: 0x0C
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/P2V3:
+  eventReadingType: 1
+  sensorID: 0x0D
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/P12V:
+  eventReadingType: 1
+  sensorID: 0x0E
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/P1V8_AUX:
+  eventReadingType: 1
+  sensorID: 0x0F
+  sensorType: 2
+  offset: 0xff

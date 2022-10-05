@@ -1,0 +1,11 @@
+[Unit]
+Description=Set Fan to Default Duty as Booting Up
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/bin/fan-default-speed.sh
+
+[Install]
+WantedBy=sysinit.target

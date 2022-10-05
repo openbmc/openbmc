@@ -1,0 +1,7 @@
+[Unit]
+Description= USB loopback test
+
+[Service]
+Type=simple
+RemainAfterExit=no
+ExecStart=/bin/bash -c '/usr/sbin/usb_loopback.sh /dev/sda /tmp/mnt'
