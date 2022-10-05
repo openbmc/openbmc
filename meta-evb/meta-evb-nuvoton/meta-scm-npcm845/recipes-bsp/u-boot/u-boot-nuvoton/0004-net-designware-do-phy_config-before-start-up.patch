@@ -1,0 +1,25 @@
+From 290f8a61cd0d120f0ab96f7ebc7066bdba13c117 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Mon, 11 Jul 2022 09:32:48 +0800
+Subject: [PATCH 2/2] net: designware: do phy_config before start up
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ drivers/net/designware.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/net/designware.c b/drivers/net/designware.c
+index a786252d65..9cbbdfc359 100644
+--- a/drivers/net/designware.c
++++ b/drivers/net/designware.c
+@@ -412,6 +412,8 @@ int designware_eth_init(struct dw_eth_dev *priv, u8 *enetaddr)
+ 	writel((CONFIG_DW_AXI_BURST_LEN & 0x1FF >> 1), &dma_p->axibus);
+ #endif
+ 
++	phy_config(priv->phydev);
++
+ 	/* Start up the PHY */
+ 	ret = phy_startup(priv->phydev);
+ 	if (ret) {
+-- 
+2.34.1

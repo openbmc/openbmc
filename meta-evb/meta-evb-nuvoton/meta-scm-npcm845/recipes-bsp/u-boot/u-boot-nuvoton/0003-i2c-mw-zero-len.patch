@@ -26,4 +26,3 @@ index 5d0e207874..5c0e501a7e 100644
  		ret = dm_i2c_write(dev, addr++, &byte, 1);
 -- 
 2.17.1
-

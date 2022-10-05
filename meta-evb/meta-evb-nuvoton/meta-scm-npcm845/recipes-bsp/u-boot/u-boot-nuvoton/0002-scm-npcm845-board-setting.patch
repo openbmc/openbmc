@@ -1,0 +1,137 @@
+From f8a3f19a6075357ba1fbd06b414016710c9962ce Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Mon, 6 Jun 2022 13:56:29 +0800
+Subject: [PATCH] scm-npcm845 board setting
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ board/nuvoton/arbel/arbel.c | 111 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 111 insertions(+)
+
+diff --git a/board/nuvoton/arbel/arbel.c b/board/nuvoton/arbel/arbel.c
+index a674757064..55bf8e49b4 100644
+--- a/board/nuvoton/arbel/arbel.c
++++ b/board/nuvoton/arbel/arbel.c
+@@ -74,9 +74,120 @@ static void arbel_clk_init(void)
+ 
+ int board_init(void)
+ {
++	char *env_var;
++
+ 	arbel_clk_init();
+ 	arbel_eth_init();
+ 
++	/* Do not reset FLM moudule in watchdog reset */
++	clrbits_le32(0xF0801080, BIT(6));
++#if 0
++	/* UART0 to Pin 41/42, UART Switch to SI2 */
++	clrbits_le32(0xf080026c, BIT(1)); // Clear MFSEL4.BSPASEL
++
++	/* Set Pin 41/42 as UART0 function */
++	setbits_le32(0xf0800260, BIT(9)); // Set MFSEL1.BSPSEL
++
++	/* Set SI2 as Serial Interface function */
++	setbits_le32(0xf0800260, BIT(11)); // Set MFSEL1.HSI2ASEL
++	/* Set UART switch mode 1 */
++	clrbits_le32(0xf0800038, 0x7);
++#endif
++	/* clear VGAIOEN */
++	clrbits_le32(0xF080003C, BIT(6));
++
++	/*set PCIRREL*/
++	//setbits_le32(0xf08000a0, BIT(0));
++
++	clrbits_le32(0xf0801080, BIT(7) | BIT(9) | BIT(5));
++	clrbits_le32(0xf0801084, BIT(7) | BIT(9) | BIT(5));
++	clrbits_le32(0xf0801088, BIT(7) | BIT(9) | BIT(5));
++	clrbits_le32(0xf080108c, BIT(7) | BIT(9) | BIT(5));
++	clrbits_le32(0xf0801090, BIT(7) | BIT(9) | BIT(5));
++	clrbits_le32(0xf0801094, BIT(7) | BIT(9) | BIT(5));
++	clrbits_le32(0xf0801098, BIT(7) | BIT(9) | BIT(5));
++	clrbits_le32(0xf080109c, BIT(7) | BIT(9) | BIT(5));
++
++	clrbits_le32(0xf0801038, BIT(31) | BIT(24) | BIT(25));
++	clrbits_le32(0xf080103c, BIT(31) | BIT(24) | BIT(25));
++	clrbits_le32(0xf0801040, BIT(31) | BIT(24) | BIT(25));
++	clrbits_le32(0xf0801044, BIT(31) | BIT(24) | BIT(25));
++	clrbits_le32(0xf0801048, BIT(31) | BIT(24) | BIT(25));
++	clrbits_le32(0xf080104c, BIT(31) | BIT(24) | BIT(25));
++	clrbits_le32(0xf0801050, BIT(31) | BIT(24) | BIT(25));
++	clrbits_le32(0xf080105c, BIT(31) | BIT(24) | BIT(25));
++
++	env_var = env_get("fm_test");
++	if (env_var && !strcmp(env_var, "fm0")) {
++		printf("FM0 is enabled\n");
++		/* FLM0 setup */
++		// Clear FLM_CTL.MEN
++		writel(0xa901, 0xF0210014);
++
++		// Accept JEDEC ID command
++		writel(0x9f, 0xF0210280);
++		// Accept write enable/disable command
++		writel(0x04, 0xF0210284);
++		writel(0x06, 0xF0210288);
++		// accept Read Status1/2 command
++		writel(0x05, 0xF021028C);
++		writel(0x35, 0xF0210290);
++		// accept Read/Read4B command
++		writel(0x03, 0xF0210294);
++		writel(0x13, 0xF0210298);
++		writel(0x0B, 0xF021029C);
++		writel(0x0C, 0xF02102A0);
++		// accept sector_erase command
++		writel(0x20, 0xF02102A4);
++		writel(0x21, 0xF02102A8);
++		// accept program command
++		writel(0x02, 0xF02102AC);
++		writel(0x12, 0xF02102B0);
++		// accept read SFDP command
++		writel(0x5A, 0xF02102B4);
++		// accept EN4B command
++		writel(0xB7, 0xF02102B8);
++
++		/* enable CMB0~13 */
++		writel(0x7FFF, 0xF0210064);
++		/* Enalbe FLM0 */
++		writel(0x4000a901, 0xF0210014);
++	} else if (env_var && !strcmp(env_var, "fm3")) {
++		printf("FM3 is enabled\n");
++		/* FLM3 setup */
++		// Clear FLM_CTL.MEN
++		writel(0xa901, 0xF0213014);
++
++		// Accept JEDEC ID command
++		writel(0x9f, 0xF0213280);
++		// Accept write enable/disable command
++		writel(0x04, 0xF0213284);
++		writel(0x06, 0xF0213288);
++		// accept Read Status1/2 command
++		writel(0x05, 0xF021328C);
++		writel(0x35, 0xF0213290);
++		// accept Read/Read4B command
++		writel(0x03, 0xF0213294);
++		writel(0x13, 0xF0213298);
++		writel(0x0B, 0xF021329C);
++		writel(0x0C, 0xF02132A0);
++		// accept sector_erase command
++		writel(0x20, 0xF02132A4);
++		writel(0x21, 0xF02132A8);
++		// accept program command
++		writel(0x02, 0xF02132AC);
++		writel(0x12, 0xF02132B0);
++		// accept read SFDP command
++		writel(0x5A, 0xF02132B4);
++		// accept EN4B command
++		writel(0xB7, 0xF02132B8);
++
++		/* enable CMB0~13 */
++		writel(0x7FFF, 0xF0213064);
++		/* Enalbe FLM3 */
++		writel(0x4000a901, 0xF0213014);
++	}
++
+ 	return 0;
+ }
+ 
+-- 
+2.17.1

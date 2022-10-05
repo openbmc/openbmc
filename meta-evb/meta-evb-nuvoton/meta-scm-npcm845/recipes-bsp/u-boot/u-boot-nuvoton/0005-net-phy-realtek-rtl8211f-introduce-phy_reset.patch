@@ -1,0 +1,26 @@
+From fe4aeff2ac95e72dfa9e43e375d6906eedcf7368 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Mon, 11 Jul 2022 09:31:52 +0800
+Subject: [PATCH 1/2] net: phy: realtek: rtl8211f: introduce phy_reset
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ drivers/net/phy/realtek.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+index b1b1fa5080..58f266ffab 100644
+--- a/drivers/net/phy/realtek.c
++++ b/drivers/net/phy/realtek.c
+@@ -213,7 +213,8 @@ static int rtl8211f_config(struct phy_device *phydev)
+ 		phy_write_mmd(phydev, MDIO_MMD_PCS, MDIO_CTRL1, reg);
+ 	}
+ 
+-	phy_write(phydev, MDIO_DEVAD_NONE, MII_BMCR, BMCR_RESET);
++	//phy_write(phydev, MDIO_DEVAD_NONE, MII_BMCR, BMCR_RESET);
++	phy_reset(phydev);
+ 
+ 	phy_write(phydev, MDIO_DEVAD_NONE,
+ 		  MIIM_RTL8211F_PAGE_SELECT, 0xd08);
+-- 
+2.34.1

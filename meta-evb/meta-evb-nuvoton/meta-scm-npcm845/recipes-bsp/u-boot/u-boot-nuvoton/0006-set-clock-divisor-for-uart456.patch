@@ -1,0 +1,40 @@
+From f28b744e05c35ad47ebfedbe06d3ec7765f6b53b Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Fri, 29 Jul 2022 15:57:54 +0800
+Subject: [PATCH] set clock divisor for uart456
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ board/nuvoton/arbel/arbel.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/board/nuvoton/arbel/arbel.c b/board/nuvoton/arbel/arbel.c
+index 0e21aa5bce..29cc8b7bdc 100644
+--- a/board/nuvoton/arbel/arbel.c
++++ b/board/nuvoton/arbel/arbel.c
+@@ -19,8 +19,10 @@
+ DECLARE_GLOBAL_DATA_PTR;
+ 
+ #define CLKSEL	0x4
++#define CLKDIV3	0x58
+ #define PIXCKSEL_GFX	0
+ #define PIXCKSEL_MASK	GENMASK(5, 4)
++#define CLKDIV3_UARTDIV2_MASK	GENMASK(15, 11)
+ #define SR_MII_CTRL_SWR_BIT15   15
+ #define VR_MII_MMD_DIG_CTRL1_R2TLBE_BIT14 14
+ 
+@@ -70,6 +72,12 @@ static void arbel_clk_init(void)
+ 	val &= ~PIXCKSEL_MASK;
+ 	val |= FIELD_PREP(PIXCKSEL_MASK, PIXCKSEL_GFX);
+ 	writel(val, NPCM_CLK_BA + CLKSEL);
++
++	/* Set clock divisor 19 for uart4/5/6 */
++	val = readl(NPCM_CLK_BA + CLKDIV3);
++	val &= ~CLKDIV3_UARTDIV2_MASK;
++	val |= FIELD_PREP(CLKDIV3_UARTDIV2_MASK, 19);
++	writel(val, NPCM_CLK_BA + CLKDIV3);
+ }
+ 
+ int board_init(void)
+-- 
+2.17.1

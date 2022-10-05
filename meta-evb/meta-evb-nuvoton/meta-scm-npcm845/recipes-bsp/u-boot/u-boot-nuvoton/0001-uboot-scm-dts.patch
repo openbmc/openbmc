@@ -1,15 +1,16 @@
-From 17e5d2e3840d5b688bd2fdb0ba1020e47e836da1 Mon Sep 17 00:00:00 2001
+From f8c447c921b59826093aae658d150d8ad2655d48 Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
-Date: Fri, 27 May 2022 18:57:30 +0800
+Date: Fri, 10 Jun 2022 10:33:32 +0800
 Subject: [PATCH] uboot scm dts
 
 Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
  arch/arm/dts/Makefile                        |   3 +-
  arch/arm/dts/nuvoton-common-npcm8xx.dtsi     |   4 +
- arch/arm/dts/nuvoton-npcm845-scm-pincfg.dtsi | 700 +++++++++++++++++++
+ arch/arm/dts/nuvoton-npcm845-scm-pincfg.dtsi | 706 +++++++++++++++++++
  arch/arm/dts/nuvoton-npcm845-scm.dts         | 341 +++++++++
- 4 files changed, 1047 insertions(+), 1 deletion(-)
+ 4 files changed, 1053 insertions(+), 1 deletion(-)
  create mode 100644 arch/arm/dts/nuvoton-npcm845-scm-pincfg.dtsi
  create mode 100644 arch/arm/dts/nuvoton-npcm845-scm.dts
 
@@ -43,10 +44,10 @@ index 126a34e27c..6dfea9750a 100644
  };
 diff --git a/arch/arm/dts/nuvoton-npcm845-scm-pincfg.dtsi b/arch/arm/dts/nuvoton-npcm845-scm-pincfg.dtsi
 new file mode 100644
-index 0000000000..1881c91e2d
+index 0000000000..ec53016dc5
 --- /dev/null
 +++ b/arch/arm/dts/nuvoton-npcm845-scm-pincfg.dtsi
-@@ -0,0 +1,700 @@
+@@ -0,0 +1,706 @@
 +// SPDX-License-Identifier: GPL-2.0
 +// Copyright (c) 2018 Nuvoton Technology
 +
@@ -220,10 +221,10 @@ index 0000000000..1881c91e2d
 +			input-enable;
 +			persist-enable;
 +		};
-+		gpio76oh_pins: gpio76oh-pins {
++		gpio76ol_pins: gpio76ol-pins {
 +			pins = "GPIO76/FANIN12";
 +			bias-disable;
-+			output-high;
++			output-low;
 +			persist-enable;
 +		};
 +		gpio77i_pins: gpio77i-pins {
@@ -333,12 +334,14 @@ index 0000000000..1881c91e2d
 +			bias-disable;
 +			input-enable;
 +			persist-enable;
++			event-clear;
 +		};
 +		gpio97i_pins: gpio97i-pins {
 +			pins = "GPIO97/CP1_GPIO6/BU2_RXD/TP_GPIO6";
 +			bias-disable;
 +			input-enable;
 +			persist-enable;
++			event-clear;
 +		};
 +		gpio99i_pins: gpio99i-pins {
 +			pins = "GPIO99/CP1_GPIO4/BU4_RXD/TP_GPIO4";
@@ -590,13 +593,13 @@ index 0000000000..1881c91e2d
 +			pins = "GPIO233/SPI1_nCS1/FM1_CSO";
 +			bias-disable;
 +			input-enable;
-+			persist-enable;
++			event-clear;
 +		};
 +		gpio234i_pins: gpio234i-pins {
 +			pins = "GPIO234/PWM10/SMB20_SCL";
 +			bias-disable;
 +			input-enable;
-+			persist-enable;
++			event-clear;
 +		};
 +		gpio235oh_pins: gpio235oh-pins {
 +			pins = "GPIO235/PWM11/SMB20_SDA";
@@ -608,6 +611,10 @@ index 0000000000..1881c91e2d
 +		fm0cso_slew: fm0cso-slew {
 +			pins = "GPIO199/SMB0D_SCL/FM0_CSO";
 +			slew-rate = <1>;
++		};
++		fm3cso_slew: fm3cso-slew {
++			pins = "GPIO187/SPI3_nCS1_SMB14_SDA";
++			slew-rate = <0>;
 +		};
 +		pin108_slew: pin108-slew {
 +			pins = "GPIO108/SG1_MDC";
@@ -749,7 +756,7 @@ index 0000000000..1881c91e2d
 +};
 diff --git a/arch/arm/dts/nuvoton-npcm845-scm.dts b/arch/arm/dts/nuvoton-npcm845-scm.dts
 new file mode 100644
-index 0000000000..ec56b1f711
+index 0000000000..1f746a3cea
 --- /dev/null
 +++ b/arch/arm/dts/nuvoton-npcm845-scm.dts
 @@ -0,0 +1,341 @@
@@ -1034,7 +1041,7 @@ index 0000000000..ec56b1f711
 +			&gpio73oh_pins
 +			&gpio74i_pins
 +			&gpio75i_pins
-+			&gpio76oh_pins
++			&gpio76ol_pins
 +			&gpio77i_pins
 +			&gpio78oh_pins
 +			&gpio79oh_pins
@@ -1095,5 +1102,4 @@ index 0000000000..ec56b1f711
 +        >;
 +};
 -- 
-2.17.1
-
+2.34.1
