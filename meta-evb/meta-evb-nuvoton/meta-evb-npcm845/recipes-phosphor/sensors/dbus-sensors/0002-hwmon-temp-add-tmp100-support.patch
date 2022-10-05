@@ -1,27 +1,25 @@
-From e00e62cd0c56576a8840b8deeeebe61203ffd4a0 Mon Sep 17 00:00:00 2001
+From a355b633bec5cc299dff56be4bb97a06a4ab01ab Mon Sep 17 00:00:00 2001
 From: Tim Lee <timlee660101@gmail.com>
-Date: Tue, 26 Jul 2022 16:08:48 +0800
-Subject: [PATCH 2/2] hwmon temp: add tmp100 support
+Date: Wed, 5 Oct 2022 14:03:22 +0800
+Subject: [PATCH 2/2] hwmon temp add tmp100 support
 
 Signed-off-by: Tim Lee <timlee660101@gmail.com>
 ---
- src/HwmonTempMain.cpp | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ src/HwmonTempMain.cpp | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/src/HwmonTempMain.cpp b/src/HwmonTempMain.cpp
-index 565ab7cb..cc8b3f91 100644
+index 9ebdfcdf..01e3debe 100644
 --- a/src/HwmonTempMain.cpp
 +++ b/src/HwmonTempMain.cpp
-@@ -72,7 +72,8 @@ static auto sensorTypes{
-                                 "xyz.openbmc_project.Configuration.TMP441",
-                                 "xyz.openbmc_project.Configuration.TMP75",
-                                 "xyz.openbmc_project.Configuration.W83773G",
--                                "xyz.openbmc_project.Configuration.BMCOnDieThermalSensor"})};
-+                                "xyz.openbmc_project.Configuration.BMCOnDieThermalSensor",
-+                                "xyz.openbmc_project.Configuration.TMP100"})};
+@@ -73,6 +73,7 @@ static const I2CDeviceTypeMap sensorTypes{
+     {"TMP441", I2CDeviceType{"tmp441", true}},
+     {"TMP75", I2CDeviceType{"tmp75", true}},
+     {"W83773G", I2CDeviceType{"w83773g", true}},
++    {"TMP100", I2CDeviceType{"tmp100", true}},
+ };
  
  static struct SensorParams
-     getSensorParameters(const std::filesystem::path& path)
 -- 
 2.17.1
 
