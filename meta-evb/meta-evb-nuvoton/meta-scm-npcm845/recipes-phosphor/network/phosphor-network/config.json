@@ -1,0 +1,5 @@
+{
+  "eeprom" : "/sys/bus/i2c/devices/15-0054/eeprom",
+  "mac_offset" : "0x1800"
+}
+

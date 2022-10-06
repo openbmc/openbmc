@@ -1,0 +1,232 @@
+From 5519f0eec2a14d4548206de97ea427ce8c92e0fa Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Wed, 17 Aug 2022 10:48:40 +0800
+Subject: [PATCH] suuport sync mac from eeprom
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ meson.build                |   1 +
+ meson_options.txt          |   2 +
+ src/ethernet_interface.cpp |   5 ++
+ src/network_config.cpp     | 133 +++++++++++++++++++++++++++++++++++++
+ src/network_config.hpp     |   1 +
+ 5 files changed, 142 insertions(+)
+
+diff --git a/meson.build b/meson.build
+index 36b00f62..632daab1 100644
+--- a/meson.build
++++ b/meson.build
+@@ -22,6 +22,7 @@ conf_data.set(
+ conf_data.set('NIC_SUPPORTS_ETHTOOL', get_option('nic-ethtool'))
+ conf_data.set('SYNC_MAC_FROM_INVENTORY', get_option('sync-mac'))
+ conf_data.set('PERSIST_MAC', get_option('persist-mac'))
++conf_data.set('SYNC_MAC_FROM_EEPROM', get_option('sync-mac-eeprom'))
+ 
+ sdbusplus_dep = dependency('sdbusplus')
+ sdbusplusplus_prog = find_program('sdbus++', native: true)
+diff --git a/meson_options.txt b/meson_options.txt
+index 59d20f49..5d38f646 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -14,3 +14,5 @@ option('hyp-nw-config', type : 'boolean',
+        description : 'ibm-oem: Enable the hypervisor network manager')
+ option('persist-mac', type: 'boolean',
+        description: 'Permit the MAC address to be written to the systemd.network config')
++option('sync-mac-eeprom', type: 'boolean',
++       description: 'Sync mac address from fru eeprom')
+diff --git a/src/ethernet_interface.cpp b/src/ethernet_interface.cpp
+index 1c77f8d4..2d99cba7 100644
+--- a/src/ethernet_interface.cpp
++++ b/src/ethernet_interface.cpp
+@@ -8,6 +8,7 @@
+ #include "network_manager.hpp"
+ #include "util.hpp"
+ #include "vlan_interface.hpp"
++#include "network_config.hpp"
+ 
+ #include <arpa/inet.h>
+ #include <fmt/compile.h>
+@@ -1140,6 +1141,10 @@ std::string EthernetInterface::macAddress([[maybe_unused]] std::string value)
+     }
+ #endif // HAVE_UBOOT_ENV
+ 
++#ifdef SYNC_MAC_FROM_EEPROM
++    phosphor::network::bmc::writeMACtoEEPROM(validMAC);
++#endif
++
+     return value;
+ #else
+     elog<NotAllowed>(
+diff --git a/src/network_config.cpp b/src/network_config.cpp
+index 249be581..eedfc00a 100644
+--- a/src/network_config.cpp
++++ b/src/network_config.cpp
+@@ -3,6 +3,14 @@
+ #include "network_config.hpp"
+ 
+ #include "config_parser.hpp"
++#include "util.hpp"
++
++#include <fstream>
++#include <nlohmann/json.hpp>
++#include <phosphor-logging/log.hpp>
++
++constexpr auto configFile = "/usr/share/network/config.json";
++using namespace phosphor::logging;
+ 
+ namespace phosphor
+ {
+@@ -11,6 +19,117 @@ namespace network
+ 
+ namespace bmc
+ {
++#ifdef SYNC_MAC_FROM_EEPROM
++void writeMACtoEEPROM(std::string MACstr)
++{
++    std::ifstream in(configFile);
++    nlohmann::json configJson;
++    in >> configJson;
++
++    ether_addr newMAC = phosphor::network::mac_address::fromString(MACstr);
++    auto eeprom_entry = configJson.find("eeprom");
++    auto offset_entry = configJson.find("mac_offset");
++    if (eeprom_entry != configJson.end() && offset_entry != configJson.end())
++    {
++        auto eeprom_path = (*eeprom_entry).get<std::string>();
++        auto mac_offset = (*offset_entry).get<std::string>();
++        std::ofstream eeprom(eeprom_path);
++        eeprom.seekp(std::stoul(mac_offset, nullptr, 16));
++        if (eeprom.fail())
++        {
++            log<level::ERR>("Invalid offset in EEPROM");
++            eeprom.close();
++            in.close();
++            return;
++        }
++        eeprom.write((char*)&newMAC, 6);
++        if (eeprom.fail())
++        {
++            log<level::ERR>("Fail to write MAC to EEPROM");
++        }
++        else
++        {
++            log<level::INFO>("write MAC to EEPROM",
++                             entry("MAC=%s", MACstr.c_str()));
++        }
++        eeprom.close();
++    }
++    in.close();
++}
++
++ether_addr getMACfromEEPROM(void)
++{
++    ether_addr addr = {0};
++
++    std::ifstream in(configFile);
++    nlohmann::json configJson;
++    in >> configJson;
++
++    auto eeprom_entry = configJson.find("eeprom");
++    auto offset_entry = configJson.find("mac_offset");
++    if (eeprom_entry != configJson.end() && offset_entry != configJson.end())
++    {
++        auto eeprom_path = (*eeprom_entry).get<std::string>();
++        auto mac_offset = (*offset_entry).get<std::string>();
++        std::ifstream eeprom(eeprom_path);
++        eeprom.seekg(std::stoul(mac_offset, nullptr, 16));
++        if (eeprom.fail())
++        {
++            log<level::ERR>("Invalid offset in EEPROM");
++            eeprom.close();
++            in.close();
++            return addr;
++        }
++        eeprom.read((char*)&addr, 6);
++        if (eeprom.gcount() == 6)
++        {
++            if (!phosphor::network::mac_address::isUnicast(addr))
++            {
++                std::string MACaddr =
++                    phosphor::network::mac_address::toString(addr);
++                log<level::ERR>("MACAddress in EEPROM is not valid",
++                                entry("MAC=%s", MACaddr.c_str()));
++                memset(&addr, 0, sizeof(addr));
++            }
++        }
++        else
++        {
++            log<level::ERR>("No MACAddress in EEPROM");
++            memset(&addr, 0, sizeof(addr));
++        }
++        eeprom.close();
++    }
++    in.close();
++
++    return addr;
++}
++
++static constexpr char const* ipmiSELObject = "xyz.openbmc_project.Logging.IPMI";
++static constexpr char const* ipmiSELPath = "/xyz/openbmc_project/Logging/IPMI";
++static constexpr char const* ipmiSELAddInterface =
++    "xyz.openbmc_project.Logging.IPMI";
++static constexpr char const* oemHealthSensor =
++    "/xyz/openbmc_project/sensors/oem_health/no_mac_eeprom";
++void noMACinEEPROM()
++{
++    // MS spec 18.2.5 BMC health status, No MAC address programmed
++    static const std::string ipmiSELAddMessage = "No MAC address programmed";
++    static const std::vector<uint8_t> eventData = {0xac, 0, 0};
++    uint16_t genId = 0x2000; // byte 1 0x20 BMC
++    auto bus = sdbusplus::bus::new_default();
++    sdbusplus::message::message writeSEL = bus.new_method_call(
++        ipmiSELObject, ipmiSELPath, ipmiSELAddInterface, "IpmiSelAdd");
++    writeSEL.append(ipmiSELAddMessage, oemHealthSensor, eventData, true, genId);
++    try
++    {
++        bus.call(writeSEL);
++    }
++    catch (sdbusplus::exception_t& e)
++    {
++        phosphor::logging::log<phosphor::logging::level::ERR>(e.what());
++    }
++}
++#endif
+ void writeDHCPDefault(const std::filesystem::path& filename,
+                       std::string_view interface)
+ {
+@@ -43,6 +162,20 @@ void writeDHCPDefault(const std::filesystem::path& filename,
+     }
+     config.map["IPv6AcceptRA"].emplace_back()["DHCPv6Client"].emplace_back(
+         "true");
++#ifdef SYNC_MAC_FROM_EEPROM
++    ether_addr mac_addr = getMACfromEEPROM();
++    if (phosphor::network::mac_address::isUnicast(mac_addr))
++    {
++        std::string MACAddrStr =
++            phosphor::network::mac_address::toString(mac_addr);
++        config.map["Link"].emplace_back()["MACAddress"].emplace_back(
++            MACAddrStr);
++    }
++    else
++    {
++        noMACinEEPROM();
++    }
++#endif
+     config.writeFile(filename);
+ }
+ } // namespace bmc
+diff --git a/src/network_config.hpp b/src/network_config.hpp
+index a5c73005..54660897 100644
+--- a/src/network_config.hpp
++++ b/src/network_config.hpp
+@@ -10,6 +10,7 @@ namespace bmc
+ {
+ void writeDHCPDefault(const std::filesystem::path& filename,
+                       std::string_view interface);
++void writeMACtoEEPROM(std::string MACaddr);
+ }
+ 
+ } // namespace network
+-- 
+2.17.1
+

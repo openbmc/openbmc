@@ -8,6 +8,7 @@
     missingok
     postrotate
         systemctl reload rsyslog 2> /dev/null || true
+        /bin/sh /usr/bin/bmc-health-sel-rollover.sh
     endscript
 }
 # Keep up to four 64k files for redfish (256k total)

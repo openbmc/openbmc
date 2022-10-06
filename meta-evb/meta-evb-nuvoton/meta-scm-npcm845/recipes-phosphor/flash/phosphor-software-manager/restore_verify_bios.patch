@@ -1,0 +1,81 @@
+From 00f8bff2d8737794464ef5ce79ae9ef296c09a17 Mon Sep 17 00:00:00 2001
+From: Brian Ma <chma0@nuvoton.com>
+Date: Thu, 6 Oct 2022 08:27:41 +0800
+Subject: [PATCH] Add restore BIOS version support
+
+---
+ image_verify.cpp |  1 +
+ item_updater.cpp | 24 +++++++++++++++++++++++-
+ meson.build      |  2 ++
+ 3 files changed, 26 insertions(+), 1 deletion(-)
+
+diff --git a/image_verify.cpp b/image_verify.cpp
+index 9551e4e..01836e0 100644
+--- a/image_verify.cpp
++++ b/image_verify.cpp
+@@ -105,6 +105,7 @@ bool Signature::verifyFullImage()
+     }
+ 
+     std::vector<std::string> fullImages = {
++        fs::path(imageDirPath) / "image-bios.sig",
+         fs::path(imageDirPath) / "image-bmc.sig",
+         fs::path(imageDirPath) / "image-hostfw.sig",
+         fs::path(imageDirPath) / "image-kernel.sig",
+diff --git a/item_updater.cpp b/item_updater.cpp
+index 96782f2..a04cf09 100644
+--- a/item_updater.cpp
++++ b/item_updater.cpp
+@@ -834,6 +834,28 @@ bool ItemUpdater::checkImage(const std::string& filePath,
+ }
+ 
+ #ifdef HOST_BIOS_UPGRADE
++std::string restoreBIOSVersion()
++{
++    std::string version = "null";
++    fs::path release = fs::path(PERSIST_DIR) / HOST_RELEASE_FILE;
++    if (fs::exists(release))
++    {
++        try
++        {
++            version = VersionClass::getBMCVersion(release.string());
++        }
++        catch (const std::exception& e)
++        {
++            warning("Failed to parse BIOS version: {ERROR}", "ERROR", e);
++        }
++    }
++    else
++    {
++        info("No bios version file exist");
++    }
++    return version;
++}
++
+ void ItemUpdater::createBIOSObject()
+ {
+     std::string path = BIOS_OBJPATH;
+@@ -849,7 +871,7 @@ void ItemUpdater::createBIOSObject()
+     createFunctionalAssociation(path);
+ 
+     auto versionId = path.substr(pos + 1);
+-    auto version = "null";
++    auto version = restoreBIOSVersion();
+     AssociationList assocs = {};
+     biosActivation = std::make_unique<Activation>(
+         bus, path, *this, versionId, server::Activation::Activations::Active,
+diff --git a/meson.build b/meson.build
+index 0dca8c0..2bf7700 100644
+--- a/meson.build
++++ b/meson.build
+@@ -57,6 +57,8 @@ conf.set_quoted('UPDATEABLE_REV_ASSOCIATION', 'software_version')
+ conf.set_quoted('BMC_ROFS_PREFIX', get_option('media-dir') + '/rofs-')
+ # The name of the BMC table of contents file
+ conf.set_quoted('OS_RELEASE_FILE', '/etc/os-release')
++# The name of the host firmware version file
++conf.set_quoted('HOST_RELEASE_FILE', 'bios-release')
+ # The dir where activation data is stored in files
+ conf.set_quoted('PERSIST_DIR', '/var/lib/phosphor-bmc-code-mgmt/')
+ 
+-- 
+2.17.1
+
