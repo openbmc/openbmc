@@ -58,31 +58,38 @@ PV = "1.0+git${SRCPV}"
 PR = "r1"
 
 S = "${WORKDIR}/git"
+
+# OBMC_CHASSIS_ZERO_ONLY: hacky way to fix the templates until
+# openbmc/phosphor-fan-presence#26 is resolved.  This should likely be
+# returned to OBMC_CHASSIS_INSTANCES.
+OBMC_CHASSIS_ZERO_ONLY = "0"
+
 SYSTEMD_PACKAGES = "${FAN_PACKAGES}"
 SYSTEMD_SERVICE:${PN}-presence-tach += "${TMPL_TACH}"
-SYSTEMD_LINK:${PN}-presence-tach += "${@compose_list(d, 'FMT_TACH', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK:${PN}-presence-tach += "${@compose_list(d, 'FMT_TACH', 'OBMC_CHASSIS_ZERO_ONLY')}"
 # JSON mode also gets linked into multi-user
 SYSTEMD_LINK:${PN}-presence-tach += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
-        compose_list(d, 'FMT_TACH_MUSR', 'OBMC_CHASSIS_INSTANCES'), '', d)}"
+        compose_list(d, 'FMT_TACH_MUSR', 'OBMC_CHASSIS_ZERO_ONLY'), '', d)}"
 SYSTEMD_SERVICE:${PN}-control += "${TMPL_CONTROL}"
 SYSTEMD_SERVICE:${PN}-control += "${@bb.utils.contains('PACKAGECONFIG', 'json', '', '${TMPL_CONTROL_INIT}', d)}"
 # JSON: Linked to multi-user and poweron
 # YAML: Linked to fans-ready and fan control-init poweron
 SYSTEMD_LINK:${PN}-control += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
-        compose_list(d, 'FMT_CONTROL_MUSR', 'OBMC_CHASSIS_INSTANCES'), \
-        compose_list(d, 'FMT_CONTROL', 'OBMC_CHASSIS_INSTANCES'), d)}"
+        compose_list(d, 'FMT_CONTROL_MUSR', 'OBMC_CHASSIS_ZERO_ONLY'), \
+        compose_list(d, 'FMT_CONTROL', 'OBMC_CHASSIS_ZERO_ONLY'), d)}"
 SYSTEMD_LINK:${PN}-control += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
-        compose_list(d, 'FMT_CONTROL_PWRON', 'OBMC_CHASSIS_INSTANCES'), \
-        compose_list(d, 'FMT_CONTROL_INIT', 'OBMC_CHASSIS_INSTANCES'), d)}"
+        compose_list(d, 'FMT_CONTROL_PWRON', 'OBMC_CHASSIS_ZERO_ONLY'), \
+        compose_list(d, 'FMT_CONTROL_INIT', 'OBMC_CHASSIS_ZERO_ONLY'), d)}"
 SYSTEMD_SERVICE:${PN}-monitor += "${TMPL_MONITOR}"
 SYSTEMD_SERVICE:${PN}-monitor += "${@bb.utils.contains('PACKAGECONFIG', 'json', '', '${TMPL_MONITOR_INIT}', d)}"
+
 # JSON: power on and multi-user links.  YAML: fans-ready and fan monitor init links
 SYSTEMD_LINK:${PN}-monitor += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
-                                compose_list(d, 'FMT_MONITOR_PWRON', 'OBMC_CHASSIS_INSTANCES'), \
-                                compose_list(d, 'FMT_MONITOR_FANSREADY', 'OBMC_CHASSIS_INSTANCES'), d)}"
+                                compose_list(d, 'FMT_MONITOR_PWRON', 'OBMC_CHASSIS_ZERO_ONLY'), \
+                                compose_list(d, 'FMT_MONITOR_FANSREADY', 'OBMC_CHASSIS_ZERO_ONLY'), d)}"
 SYSTEMD_LINK:${PN}-monitor += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
-                                compose_list(d, 'FMT_MONITOR_MUSR', 'OBMC_CHASSIS_INSTANCES'), \
-                                compose_list(d, 'FMT_MONITOR_INIT', 'OBMC_CHASSIS_INSTANCES'), d)}"
+                                compose_list(d, 'FMT_MONITOR_MUSR', 'OBMC_CHASSIS_ZERO_ONLY'), \
+                                compose_list(d, 'FMT_MONITOR_INIT', 'OBMC_CHASSIS_ZERO_ONLY'), d)}"
 SYSTEMD_SERVICE:sensor-monitor += "sensor-monitor.service"
 SYSTEMD_LINK:sensor-monitor += "../sensor-monitor.service:${MULTI_USR_TGT}.wants/sensor-monitor.service"
 
