@@ -1,62 +1,61 @@
-From de704e52c20544accf6e5f803840d6204c36c3e3 Mon Sep 17 00:00:00 2001
-From: Joseph Liu <kwliu@nuvoton.com>
-Date: Mon, 22 Aug 2022 03:35:19 +0000
-Subject: [PATCH] npcm8xx: support NCSI
+From f8116e8279ea2dd934909c93b3679d245efd5518 Mon Sep 17 00:00:00 2001
+From: Marvin Lin <milkfafa@gmail.com>
+Date: Mon, 3 Oct 2022 16:34:23 +0800
+Subject: [PATCH] add ncsi
 
-Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
  .../boot/dts/nuvoton/nuvoton-npcm845-evb.dts  |   4 +-
  drivers/net/ethernet/stmicro/stmmac/stmmac.h  |   2 +
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 168 ++++++++++++------
- .../ethernet/stmicro/stmmac/stmmac_platform.c |  29 ++-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 185 ++++++++++++------
+ .../ethernet/stmicro/stmmac/stmmac_platform.c |  27 ++-
  include/linux/stmmac.h                        |   1 +
- 5 files changed, 143 insertions(+), 61 deletions(-)
+ 5 files changed, 150 insertions(+), 69 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
-index 6188acee08bb..906fc747b303 100644
+index 36c879bff98a..b561dab94b82 100644
 --- a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
 +++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
-@@ -166,12 +166,12 @@ phy0: ethernet-phy@1 {
- 		};
+@@ -458,12 +458,12 @@ &gmac1 {
+ };
  
- 		gmac2: eth@f0806000 {
--			phy-mode = "rmii";
- 			pinctrl-names = "default";
-+			snps,ps-speed = <100>;
- 			pinctrl-0 = <&r1_pins
- 					&r1oen_pins>;
--			phy-handle = <&phy0>;
- 			status = "okay";
-+			use-ncsi;
- 		};
+ &gmac2 {
+-	phy-mode = "rmii";
+ 	pinctrl-names = "default";
++	snps,ps-speed = <100>;
+ 	pinctrl-0 = <&r1_pins
+ 			&r1oen_pins>;
+-	phy-handle = <&phy0>;
+ 	status = "okay";
++	use-ncsi;
+ };
  
- 		mdio1: mdio@1 {
+ &gmac3 {
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index 727e68dfaf1c..8026eb490ab1 100644
+index 05b5371ca036..7211fb422f1e 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -244,6 +244,8 @@ struct stmmac_priv {
- 
- 	/* Receive Side Scaling */
- 	struct stmmac_rss rss;
+@@ -316,6 +316,8 @@ struct stmmac_priv {
+ 	/* XDP BPF Program */
+ 	unsigned long *af_xdp_zc_qps;
+ 	struct bpf_prog *xdp_prog;
 +
 +	struct ncsi_dev *ncsidev;
  };
  
  enum stmmac_state {
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 11ddfd58a9e8..57d80c9466b5 100644
+index 1a56ff8a7d1a..e4fe1e1f97ec 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -45,6 +45,7 @@
+@@ -49,6 +49,7 @@
  #include "dwmac1000.h"
  #include "dwxgmac2.h"
  #include "hwif.h"
 +#include <net/ncsi.h>
  
- #define	STMMAC_ALIGN(x)		ALIGN(ALIGN(x, SMP_CACHE_BYTES), 16)
- #define	TSO_MAX_BUFF_SIZE	(SZ_16K - 1)
-@@ -2317,10 +2318,12 @@ static int stmmac_init_dma_engine(struct stmmac_priv *priv)
+ /* As long as the interface is active, we keep the timestamping counter enabled
+  * with fine resolution and binary rollover. This avoid non-monotonic behavior
+@@ -2910,10 +2911,12 @@ static int stmmac_init_dma_engine(struct stmmac_priv *priv)
  	if (priv->extend_desc && (priv->mode == STMMAC_RING_MODE))
  		atds = 1;
  
@@ -73,7 +72,7 @@ index 11ddfd58a9e8..57d80c9466b5 100644
  	}
  
  	/* DMA Configuration */
-@@ -2779,6 +2782,15 @@ static void stmmac_hw_teardown(struct net_device *dev)
+@@ -3415,6 +3418,15 @@ static void stmmac_hw_teardown(struct net_device *dev)
  	clk_disable_unprepare(priv->plat->clk_ptp_ref);
  }
  
@@ -86,37 +85,39 @@ index 11ddfd58a9e8..57d80c9466b5 100644
 +		    nd->link_up ? "up" : "down");
 +}
 +
- /**
-  *  stmmac_open - open entry point of the driver
-  *  @dev : pointer to the device structure.
-@@ -2795,15 +2807,17 @@ static int stmmac_open(struct net_device *dev)
- 	u32 chan;
- 	int ret;
+ static void stmmac_free_irq(struct net_device *dev,
+ 			    enum request_irq_err irq_err, int irq_idx)
+ {
+@@ -3703,16 +3715,18 @@ static int stmmac_open(struct net_device *dev)
+ 		return ret;
+ 	}
  
 -	if (priv->hw->pcs != STMMAC_PCS_TBI &&
 -	    priv->hw->pcs != STMMAC_PCS_RTBI &&
--	    priv->hw->xpcs == NULL) {
+-	    (!priv->hw->xpcs ||
+-	     xpcs_get_an_mode(priv->hw->xpcs, mode) != DW_AN_C73)) {
 -		ret = stmmac_init_phy(dev);
 -		if (ret) {
 -			netdev_err(priv->dev,
 -				   "%s: Cannot attach to PHY (error: %d)\n",
 -				   __func__, ret);
--			return ret;
+-			goto init_phy_error;
 +	if (!priv->plat->use_ncsi) {
 +		if (priv->hw->pcs != STMMAC_PCS_TBI &&
-+			priv->hw->pcs != STMMAC_PCS_RTBI &&
-+			priv->hw->xpcs == NULL) {
++		    priv->hw->pcs != STMMAC_PCS_RTBI &&
++		    (!priv->hw->xpcs ||
++		     xpcs_get_an_mode(priv->hw->xpcs, mode) != DW_AN_C73)) {
 +			ret = stmmac_init_phy(dev);
 +			if (ret) {
 +				netdev_err(priv->dev,
-+					"%s: Cannot attach to PHY (error: %d)\n",
-+					__func__, ret);
-+				return ret;
++					   "%s: Cannot attach to PHY (error: %d)\n",
++					   __func__, ret);
++				goto init_phy_error;
 +			}
  		}
  	}
  
-@@ -2859,9 +2873,23 @@ static int stmmac_open(struct net_device *dev)
+@@ -3768,9 +3782,23 @@ static int stmmac_open(struct net_device *dev)
  
  	stmmac_init_coalesce(priv);
  
@@ -141,11 +142,11 @@ index 11ddfd58a9e8..57d80c9466b5 100644
 +		phylink_speed_up(priv->phylink);
 +	}
  
- 	/* Request the IRQ lines */
- 	ret = request_irq(dev->irq, stmmac_interrupt,
-@@ -2900,15 +2928,26 @@ static int stmmac_open(struct net_device *dev)
- 	stmmac_enable_all_queues(priv);
+ 	ret = stmmac_request_irq(dev);
+ 	if (ret)
+@@ -3780,10 +3808,21 @@ static int stmmac_open(struct net_device *dev)
  	netif_tx_start_all_queues(priv->dev);
+ 	stmmac_enable_all_dma_irq(priv);
  
 -	return 0;
 +	/* Start the NCSI device */
@@ -160,31 +161,26 @@ index 11ddfd58a9e8..57d80c9466b5 100644
 +	return 0;
 +ncsi_error:
 +	stmmac_disable_all_queues(priv);
- lpiirq_error:
- 	if (priv->wol_irq != dev->irq)
- 		free_irq(priv->wol_irq, dev);
- wolirq_error:
- 	free_irq(dev->irq, dev);
  irq_error:
 -	phylink_stop(priv->phylink);
 +	if (!priv->plat->use_ncsi)
 +		phylink_stop(priv->phylink);
  
  	for (chan = 0; chan < priv->plat->tx_queues_to_use; chan++)
- 		del_timer_sync(&priv->tx_queue[chan].txtimer);
-@@ -2917,7 +2956,8 @@ static int stmmac_open(struct net_device *dev)
+ 		hrtimer_cancel(&priv->tx_queue[chan].txtimer);
+@@ -3792,7 +3831,8 @@ static int stmmac_open(struct net_device *dev)
  init_error:
  	free_dma_desc_resources(priv);
  dma_desc_error:
 -	phylink_disconnect_phy(priv->phylink);
 +	if (!priv->plat->use_ncsi)
 +		phylink_disconnect_phy(priv->phylink);
+ init_phy_error:
+ 	pm_runtime_put(priv->device);
  	return ret;
- }
+@@ -3821,11 +3861,15 @@ static int stmmac_release(struct net_device *dev)
  
-@@ -2932,11 +2972,15 @@ static int stmmac_release(struct net_device *dev)
- 	struct stmmac_priv *priv = netdev_priv(dev);
- 	u32 chan;
+ 	netif_tx_disable(dev);
  
 -	if (device_may_wakeup(priv->device))
 -		phylink_speed_down(priv->phylink, false);
@@ -203,7 +199,7 @@ index 11ddfd58a9e8..57d80c9466b5 100644
  
  	stmmac_disable_all_queues(priv);
  
-@@ -4206,7 +4250,8 @@ static int stmmac_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
+@@ -5861,7 +5905,8 @@ static int stmmac_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
  	case SIOCGMIIPHY:
  	case SIOCGMIIREG:
  	case SIOCSMIIREG:
@@ -213,7 +209,7 @@ index 11ddfd58a9e8..57d80c9466b5 100644
  		break;
  	case SIOCSHWTSTAMP:
  		ret = stmmac_hwtstamp_set(dev, rq);
-@@ -4897,7 +4942,9 @@ int stmmac_dvr_probe(struct device *device,
+@@ -6992,7 +7037,9 @@ int stmmac_dvr_probe(struct device *device,
  	priv->device = device;
  	priv->dev = ndev;
  
@@ -224,9 +220,9 @@ index 11ddfd58a9e8..57d80c9466b5 100644
  	priv->pause = pause;
  	priv->plat = plat_dat;
  	priv->ioaddr = res->addr;
-@@ -5069,22 +5116,36 @@ int stmmac_dvr_probe(struct device *device,
- 
- 	stmmac_check_pcs_mode(priv);
+@@ -7193,31 +7240,45 @@ int stmmac_dvr_probe(struct device *device,
+ 	pm_runtime_set_active(device);
+ 	pm_runtime_enable(device);
  
 -	if (priv->hw->pcs != STMMAC_PCS_TBI &&
 -	    priv->hw->pcs != STMMAC_PCS_RTBI) {
@@ -239,7 +235,7 @@ index 11ddfd58a9e8..57d80c9466b5 100644
 -			goto error_mdio_register;
 +	if (!priv->plat->use_ncsi) {
 +		if (priv->hw->pcs != STMMAC_PCS_TBI &&
-+			priv->hw->pcs != STMMAC_PCS_RTBI) {
++		    priv->hw->pcs != STMMAC_PCS_RTBI) {
 +			/* MDIO bus Registration */
 +			ret = stmmac_mdio_register(ndev);
 +			if (ret < 0) {
@@ -250,6 +246,22 @@ index 11ddfd58a9e8..57d80c9466b5 100644
 +			}
  		}
 -	}
+ 
+-	if (priv->plat->speed_mode_2500)
+-		priv->plat->speed_mode_2500(ndev, priv->plat->bsp_priv);
++		if (priv->plat->speed_mode_2500)
++			priv->plat->speed_mode_2500(ndev, priv->plat->bsp_priv);
+ 
+-	if (priv->plat->mdio_bus_data && priv->plat->mdio_bus_data->has_xpcs) {
+-		ret = stmmac_xpcs_setup(priv->mii);
+-		if (ret)
+-			goto error_xpcs_setup;
+-	}
++		if (priv->plat->mdio_bus_data && priv->plat->mdio_bus_data->has_xpcs) {
++			ret = stmmac_xpcs_setup(priv->mii);
++			if (ret)
++				goto error_xpcs_setup;
++		}
  
 -	ret = stmmac_phy_setup(priv);
 -	if (ret) {
@@ -275,54 +287,57 @@ index 11ddfd58a9e8..57d80c9466b5 100644
  	}
  
  	ret = register_netdev(ndev);
-@@ -5111,11 +5172,13 @@ int stmmac_dvr_probe(struct device *device,
+@@ -7252,12 +7313,14 @@ int stmmac_dvr_probe(struct device *device,
  error_serdes_powerup:
  	unregister_netdev(ndev);
  error_netdev_register:
 -	phylink_destroy(priv->phylink);
 +	if (!priv->plat->use_ncsi)
 +		phylink_destroy(priv->phylink);
+ error_xpcs_setup:
  error_phy_setup:
 -	if (priv->hw->pcs != STMMAC_PCS_TBI &&
 -	    priv->hw->pcs != STMMAC_PCS_RTBI)
 -		stmmac_mdio_unregister(ndev);
 +	if (!priv->plat->use_ncsi)
 +		if (priv->hw->pcs != STMMAC_PCS_TBI &&
-+			priv->hw->pcs != STMMAC_PCS_RTBI)
++		    priv->hw->pcs != STMMAC_PCS_RTBI)
 +			stmmac_mdio_unregister(ndev);
  error_mdio_register:
  	stmmac_napi_del(ndev);
  error_hw_init:
-@@ -5210,14 +5273,15 @@ int stmmac_suspend(struct device *dev)
- 		stmmac_pmt(priv, priv->hw, priv->wolopts);
- 		priv->irq_wake = 1;
- 	} else {
--		mutex_unlock(&priv->lock);
--		rtnl_lock();
+@@ -7361,15 +7424,17 @@ int stmmac_suspend(struct device *dev)
+ 
+ 	mutex_unlock(&priv->lock);
+ 
+-	rtnl_lock();
+-	if (device_may_wakeup(priv->device) && priv->plat->pmt) {
+-		phylink_suspend(priv->phylink, true);
+-	} else {
 -		if (device_may_wakeup(priv->device))
 -			phylink_speed_down(priv->phylink, false);
--		phylink_stop(priv->phylink);
--		rtnl_unlock();
--		mutex_lock(&priv->lock);
--
-+		if (!priv->plat->use_ncsi) {
-+			mutex_unlock(&priv->lock);
-+			rtnl_lock();
+-		phylink_suspend(priv->phylink, false);
++	if (!priv->plat->use_ncsi) {
++		rtnl_lock();
++		if (device_may_wakeup(priv->device) && priv->plat->pmt) {
++			phylink_suspend(priv->phylink, true);
++		} else {
 +			if (device_may_wakeup(priv->device))
 +				phylink_speed_down(priv->phylink, false);
-+			phylink_stop(priv->phylink);
-+			rtnl_unlock();
-+			mutex_lock(&priv->lock);
++			phylink_suspend(priv->phylink, false);
 +		}
- 		stmmac_mac_set(priv, priv->ioaddr, false);
- 		pinctrl_pm_select_sleep_state(priv->device);
- 		/* Disable clock in case of PWM is off */
++		rtnl_unlock();
+ 	}
+-	rtnl_unlock();
+ 
+ 	if (priv->dma_cap.fpesel) {
+ 		/* Disable FPE */
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index b9dff3bccd89..0bb641f6f9a1 100644
+index 64a914a2307d..a9e804ff7ad9 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -421,18 +421,33 @@ stmmac_probe_config_dt(struct platform_device *pdev, const char **mac)
- 		*mac = NULL;
+@@ -421,18 +421,31 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+ 		eth_zero_addr(mac);
  	}
  
 -	phy_mode = device_get_phy_mode(&pdev->dev);
@@ -336,8 +351,8 @@ index b9dff3bccd89..0bb641f6f9a1 100644
 +	}
 +	else
 +		plat->use_ncsi = false;
-+
-+
+ 
+-	plat->phy_interface = phy_mode;
 +	if (!plat->use_ncsi) {
 +		phy_mode = device_get_phy_mode(&pdev->dev);
 +		if (phy_mode < 0)
@@ -345,8 +360,6 @@ index b9dff3bccd89..0bb641f6f9a1 100644
 +
 +		plat->phy_interface = phy_mode;
 +	}
- 
--	plat->phy_interface = phy_mode;
  	plat->interface = stmmac_of_get_mac_mode(np);
  	if (plat->interface < 0)
  		plat->interface = plat->phy_interface;
@@ -356,18 +369,18 @@ index b9dff3bccd89..0bb641f6f9a1 100644
 -	plat->phy_node = of_parse_phandle(np, "phy-handle", 0);
 +	if (!plat->use_ncsi) {
 +		/* Some wrapper drivers still rely on phy_node. Let's save it while
-+		* they are not converted to phylink. */
++		 * they are not converted to phylink. */
 +		plat->phy_node = of_parse_phandle(np, "phy-handle", 0);
 +	}
  
  	/* PHYLINK automatically parses the phy-handle property */
  	plat->phylink_node = np;
 diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index 79abf9f8573a..5eef27bb0ae6 100644
+index e88cfddc8355..ffc25e053005 100644
 --- a/include/linux/stmmac.h
 +++ b/include/linux/stmmac.h
-@@ -186,6 +186,7 @@ struct plat_stmmacenet_data {
- 	struct mac_device_info *(*setup)(void *priv);
+@@ -236,6 +236,7 @@ struct plat_stmmacenet_data {
+ 	void (*dump_debug_regs)(void *priv);
  	void *bsp_priv;
  	int eee_force_disable;
 +	int use_ncsi;
