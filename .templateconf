@@ -1,1 +1,1 @@
-TEMPLATECONF=${TEMPLATECONF:-meta-phosphor/conf}
+poky/.templateconf
