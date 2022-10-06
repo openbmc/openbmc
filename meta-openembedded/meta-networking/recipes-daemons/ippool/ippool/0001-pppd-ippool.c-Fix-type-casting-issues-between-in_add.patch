@@ -1,0 +1,72 @@
+From da67444994bde603c7ff1483a6803bdab24e1f14 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 29 Aug 2022 09:36:55 -0700
+Subject: [PATCH 1/2] pppd/ippool.c: Fix type casting issues between in_addr
+ and ippool_api_ip_addr
+
+Also remove unused variabled
+
+Upstream-Status: Inappropriate [No upstream]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ pppd/ippool.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
+
+--- a/pppd/ippool.c
++++ b/pppd/ippool.c
+@@ -16,6 +16,7 @@
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+ #include <netinet/in.h>
++#include <arpa/inet.h>
+ #include <signal.h>
+ 
+ #include <linux/types.h>
+@@ -24,7 +25,6 @@
+ 
+ const char pppd_version[] = VERSION;
+ 
+-static int ippool_fd = -1;
+ static char *ippool_pool_name = NULL;
+ static char *ippool_pool_name2 = NULL;
+ static char *ippool_server = "localhost";
+@@ -64,9 +64,9 @@ static int ippool_addr_alloc(CLIENT *cl,
+ 	}
+ 
+ 	*addr = clnt_res.addr.s_addr;
+-
++	struct in_addr temp_addr = {*addr};
+ 	if (ippool_debug) {
+-		dbglog("Allocated address %s from pool %s", inet_ntoa(clnt_res.addr.s_addr), pool_name);
++		dbglog("Allocated address %s from pool %s", inet_ntoa(temp_addr), pool_name);
+ 	}
+ out:
+ 	return result;
+@@ -85,14 +85,16 @@ static void ippool_addr_free(CLIENT *cl,
+ 	}
+ 	if (clnt_res < 0) {
+ 		if (ippool_debug) {
++			struct in_addr temp_addr = {free_addr.s_addr};
+ 			warn("IP address %s free to pool %s failed: %s", 
+-			     inet_ntoa(free_addr), pool_name, strerror(-clnt_res));
++			     inet_ntoa(temp_addr), pool_name, strerror(-clnt_res));
+ 		}
+ 		goto out;
+ 	}
+ 
+ 	if (ippool_debug) {
+-		dbglog("Freed address %s to pool %s", inet_ntoa(free_addr), pool_name);
++		struct in_addr temp_addr = {free_addr.s_addr};
++		dbglog("Freed address %s to pool %s", inet_ntoa(temp_addr), pool_name);
+ 	}
+ out:
+ 	return;
+@@ -138,8 +140,6 @@ static void ippool_choose_ip(u_int32_t *
+ {
+ 	ipcp_options *wo = &ipcp_wantoptions[0];
+ 	ipcp_options *go = &ipcp_gotoptions[0];
+-	ipcp_options *ao = &ipcp_allowoptions[0];
+-	ipcp_options *ho = &ipcp_hisoptions[0];
+ 	CLIENT *cl;
+ 	int result = 0;
+ 

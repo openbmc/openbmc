@@ -75,6 +75,8 @@ EXTRA_OECONF = " \
 EXTRA_OEMAKE = " \
     V=1 \
 "
+# clang treats them as errors by default now starting with 15.0+
+CFLAGS += "-Wno-error=int-conversion -Wno-error=implicit-int"
 
 do_install:append() {
     install -d -m 0755 ${D}/${sysconfdir}/xdg/fvwm

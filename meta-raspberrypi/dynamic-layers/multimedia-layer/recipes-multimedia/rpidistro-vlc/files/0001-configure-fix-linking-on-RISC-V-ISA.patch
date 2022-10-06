@@ -1,0 +1,19 @@
+From: =?utf-8?q?R=C3=A9mi_Denis-Courmont?= <remi@remlab.net>
+Date: Sat, 16 Jun 2018 21:31:45 +0300
+Subject: configure: fix linking on RISC-V ISA
+
+Upstream-status: Pending
+---
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -113,6 +113,7 @@ case "${host_os}" in
+     ;;
+   linux*)
+     SYS=linux
++    test "${host_cpu}" = "riscv64" && CFLAGS="${CFLAGS} -pthread"
+     ;;
+   bsdi*)
+     SYS=bsdi

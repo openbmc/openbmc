@@ -15,3 +15,7 @@ LTTNGUST:arc = ""
 
 COMPATIBLE_HOST:arc:pn-lttng-ust = "null"
 
+# Whether the platform supports lttng-tools
+# lttng-tools requires SYS_ppoll and SYS_pselect6 which are not supported on riscv32.
+# It's also turned off for riscv32 in meta-riscv. See https://github.com/riscv/meta-riscv/blob/master/conf/layer.conf
+COMPATIBLE_HOST:riscv32:pn-lttng-tools = "null"

@@ -22,6 +22,7 @@ SRC_URI += "http://www.w3.org/XML/Test/xmlts20080827.tar.gz;subdir=${BP};name=te
            file://fix-execution-of-ptests.patch \
            file://remove-fuzz-from-ptests.patch \
            file://libxml-m4-use-pkgconfig.patch \
+           file://0001-Port-gentest.py-to-Python-3.patch \
            "
 
 SRC_URI[archive.sha256sum] = "60d74a257d1ccec0475e749cba2f21559e48139efba6ff28224357c7c798dfee"
@@ -82,6 +83,16 @@ do_configure:prepend () {
 }
 
 do_compile_ptest() {
+        # Make sure that testapi.c is newer than gentests.py, because
+        # with reproducible builds, they will both get e.g. Jan  1  1970
+        # modification time from SOURCE_DATE_EPOCH and then check-am
+        # might try to rebuild_testapi, which will fail even with
+        # 0001-Port-gentest.py-to-Python-3.patch, because it needs
+        # libxml2 module (libxml2-native dependency and correctly
+        # set PYTHON_SITE_PACKAGES), it's easier to
+        # just rely on pre-generated testapi.c from the release
+        touch ${S}/testapi.c
+
 	oe_runmake check-am
 }
 
@@ -110,7 +121,8 @@ do_install:append:class-native () {
 	# Docs are not needed in the native case
 	rm ${D}${datadir}/gtk-doc -rf
 
-	create_wrapper ${D}${bindir}/xmllint XML_CATALOG_FILES=${sysconfdir}/xml/catalog
+	create_wrapper ${D}${bindir}/xmllint 'XML_CATALOG_FILES=${XML_CATALOG_FILES:-${sysconfdir}/xml/catalog}'
 }
+do_install[vardepsexclude] += "XML_CATALOG_FILES:-${sysconfdir}/xml/catalog"
 
 BBCLASSEXTEND = "native nativesdk"

@@ -1,0 +1,32 @@
+From 2b7d6cf62296ff4e25e5ad909aa39a257bf9ff78 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 31 Aug 2022 19:37:35 -0700
+Subject: [PATCH] wfa_cmdproc: Store return value into location
+
+Fixes
+| wfa_cmdproc.c:100:20: error: incompatible integer to pointer conversion assigning to 'int *' from 'int' [-Wint-conversion]
+|         paramValue = atoi(str);
+|                    ^ ~~~~~~~~~
+
+Upstream-Status: Submitted [https://github.com/Wi-FiTestSuite/Wi-FiTestSuite-Linux-DUT/pull/57]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/wfa_cmdproc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/wfa_cmdproc.c b/lib/wfa_cmdproc.c
+index 9f5fd16..49a3f16 100644
+--- a/lib/wfa_cmdproc.c
++++ b/lib/wfa_cmdproc.c
+@@ -97,7 +97,7 @@ int getParamValueInt(char *pcmdStr, char *pParam, int *paramValue)
+     if(strcasecmp(pcmdStr, pParam) == 0)
+     {
+         str = strtok_r(NULL, ",", &pcmdStr);
+-        paramValue = atoi(str);
++        *paramValue = atoi(str);
+         return 0;
+     }
+     return -1;
+-- 
+2.37.3
+

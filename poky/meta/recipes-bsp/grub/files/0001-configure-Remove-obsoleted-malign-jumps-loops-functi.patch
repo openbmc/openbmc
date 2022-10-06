@@ -1,0 +1,48 @@
+From eb486898dac8cbc29b2cc39f911b657c3417ae34 Mon Sep 17 00:00:00 2001
+From: Fangrui Song via Grub-devel <grub-devel@gnu.org>
+Date: Thu, 26 Aug 2021 09:02:31 -0700
+Subject: [PATCH 1/2] configure: Remove obsoleted -malign-{jumps, loops,
+ functions}
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The GCC warns "cc1: warning: ‘-malign-loops’ is obsolete, use ‘-falign-loops’".
+The Clang silently ignores -malign-{jumps,loops,functions}.
+
+The preferred -falign-* forms have been supported since GCC 3.2. So, just
+remove -malign-{jumps,loops,functions}.
+
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/grub.git/commit/?id=eb486898dac8cbc29b2cc39f911b657c3417ae34]
+Signed-off-by: Fangrui Song <maskray@google.com>
+Acked-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ configure.ac | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index bee28dbeb..9a12151bd 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -805,17 +805,8 @@ if test "x$target_cpu" = xi386; then
+ 	[grub_cv_cc_falign_loop=no])
+   ])
+ 
+-  AC_CACHE_CHECK([whether -malign-loops works], [grub_cv_cc_malign_loop], [
+-    CFLAGS="$TARGET_CFLAGS -malign-loops=1 -Werror"
+-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[]])],
+-        [grub_cv_cc_malign_loop=yes],
+-	[grub_cv_cc_malign_loop=no])
+-  ])
+-
+   if test "x$grub_cv_cc_falign_loop" = xyes; then
+     TARGET_CFLAGS="$TARGET_CFLAGS -falign-jumps=1 -falign-loops=1 -falign-functions=1"
+-  elif test "x$grub_cv_cc_malign_loop" = xyes; then
+-    TARGET_CFLAGS="$TARGET_CFLAGS -malign-jumps=1 -malign-loops=1 -malign-functions=1"
+   fi
+ fi
+ 
+-- 
+2.37.3
+

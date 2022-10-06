@@ -25,11 +25,6 @@ inherit image_types
 # This image depends on the rootfs image
 IMAGE_TYPEDEP:rpi-sdimg = "${SDIMG_ROOTFS_TYPE}"
 
-# Kernel image name
-SDIMG_KERNELIMAGE:raspberrypi  ?= "kernel.img"
-SDIMG_KERNELIMAGE:raspberrypi2 ?= "kernel7.img"
-SDIMG_KERNELIMAGE:raspberrypi3-64 ?= "kernel8.img"
-
 # Boot partition volume id
 # Shorten raspberrypi to just rpi to keep it under 11 characters
 # now enforced by mkfs.vfat from dosfstools-4.2

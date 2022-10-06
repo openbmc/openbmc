@@ -1,7 +1,7 @@
-From c9a9a467bb335047812004dd022dcadf9514101f Mon Sep 17 00:00:00 2001
+From 3523b1bac430f10f02a31f7d013ea369e29656be Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Tue, 15 Feb 2022 09:44:10 +0000
-Subject: [PATCH 02/24] arm: add support to corstone1000 platform
+Subject: [PATCH 02/26] arm: add support to corstone1000 platform
 
 Corstone1000 is a platform from arm, which includes pre
 verified Corstone SSE710 sub-system that combines Cortex-A and
@@ -18,6 +18,7 @@ FPGA MPS3 board implementation of this platform. [2]
 
 Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+Upstream-Status: Accepted [2022.10-rc1]
 ---
  arch/arm/Kconfig                         |   8 ++
  arch/arm/dts/Makefile                    |   3 +
@@ -42,7 +43,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  create mode 100644 include/configs/corstone1000.h
 
 diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index 9898c7d68e1b..2fc2b7d20f12 100644
+index 9898c7d68e..2fc2b7d20f 100644
 --- a/arch/arm/Kconfig
 +++ b/arch/arm/Kconfig
 @@ -1347,6 +1347,12 @@ config ARCH_VEXPRESS64
@@ -68,7 +69,7 @@ index 9898c7d68e1b..2fc2b7d20f12 100644
  source "board/bosch/guardian/Kconfig"
  source "board/Marvell/octeontx/Kconfig"
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index a7e0d9f6c0e8..8c8f15b6a813 100644
+index a7e0d9f6c0..8c8f15b6a8 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
 @@ -1265,6 +1265,9 @@ dtb-$(CONFIG_TARGET_EA_LPC3250DEVKITV2) += lpc3250-ea3250.dtb
@@ -83,7 +84,7 @@ index a7e0d9f6c0e8..8c8f15b6a813 100644
  targets += $(dtb-y)
 diff --git a/arch/arm/dts/corstone1000-fvp.dts b/arch/arm/dts/corstone1000-fvp.dts
 new file mode 100644
-index 000000000000..1fcc137a493c
+index 0000000000..1fcc137a49
 --- /dev/null
 +++ b/arch/arm/dts/corstone1000-fvp.dts
 @@ -0,0 +1,23 @@
@@ -112,7 +113,7 @@ index 000000000000..1fcc137a493c
 +};
 diff --git a/arch/arm/dts/corstone1000-mps3.dts b/arch/arm/dts/corstone1000-mps3.dts
 new file mode 100644
-index 000000000000..e3146747c2d9
+index 0000000000..e3146747c2
 --- /dev/null
 +++ b/arch/arm/dts/corstone1000-mps3.dts
 @@ -0,0 +1,32 @@
@@ -150,7 +151,7 @@ index 000000000000..e3146747c2d9
 +};
 diff --git a/arch/arm/dts/corstone1000.dtsi b/arch/arm/dts/corstone1000.dtsi
 new file mode 100644
-index 000000000000..d0194aa893f2
+index 0000000000..d0194aa893
 --- /dev/null
 +++ b/arch/arm/dts/corstone1000.dtsi
 @@ -0,0 +1,169 @@
@@ -325,7 +326,7 @@ index 000000000000..d0194aa893f2
 +};
 diff --git a/board/armltd/corstone1000/Kconfig b/board/armltd/corstone1000/Kconfig
 new file mode 100644
-index 000000000000..709674d4cf7d
+index 0000000000..709674d4cf
 --- /dev/null
 +++ b/board/armltd/corstone1000/Kconfig
 @@ -0,0 +1,12 @@
@@ -343,7 +344,7 @@ index 000000000000..709674d4cf7d
 +endif
 diff --git a/board/armltd/corstone1000/MAINTAINERS b/board/armltd/corstone1000/MAINTAINERS
 new file mode 100644
-index 000000000000..8c905686de76
+index 0000000000..8c905686de
 --- /dev/null
 +++ b/board/armltd/corstone1000/MAINTAINERS
 @@ -0,0 +1,7 @@
@@ -356,7 +357,7 @@ index 000000000000..8c905686de76
 +F:	configs/corstone1000_defconfig
 diff --git a/board/armltd/corstone1000/Makefile b/board/armltd/corstone1000/Makefile
 new file mode 100644
-index 000000000000..77a82c28929b
+index 0000000000..77a82c2892
 --- /dev/null
 +++ b/board/armltd/corstone1000/Makefile
 @@ -0,0 +1,7 @@
@@ -369,7 +370,7 @@ index 000000000000..77a82c28929b
 +obj-y	:= corstone1000.o
 diff --git a/board/armltd/corstone1000/corstone1000.c b/board/armltd/corstone1000/corstone1000.c
 new file mode 100644
-index 000000000000..2fa485ff3799
+index 0000000000..2fa485ff37
 --- /dev/null
 +++ b/board/armltd/corstone1000/corstone1000.c
 @@ -0,0 +1,125 @@
@@ -500,7 +501,7 @@ index 000000000000..2fa485ff3799
 +}
 diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
 new file mode 100644
-index 000000000000..02f931b0d469
+index 0000000000..02f931b0d4
 --- /dev/null
 +++ b/configs/corstone1000_defconfig
 @@ -0,0 +1,80 @@
@@ -586,7 +587,7 @@ index 000000000000..02f931b0d469
 +CONFIG_MISC=y
 diff --git a/include/configs/corstone1000.h b/include/configs/corstone1000.h
 new file mode 100644
-index 000000000000..cf166f107efd
+index 0000000000..cf166f107e
 --- /dev/null
 +++ b/include/configs/corstone1000.h
 @@ -0,0 +1,86 @@
@@ -677,5 +678,5 @@ index 000000000000..cf166f107efd
 +				"bootefi $kernel_addr_r $fdtcontroladdr;"
 +#endif
 -- 
-2.37.1
+2.17.1
 

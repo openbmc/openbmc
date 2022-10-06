@@ -1,0 +1,87 @@
+From 5217cb7c829cf87771096c4ce41fd4648dca47cb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 29 Aug 2022 16:36:21 -0700
+Subject: [PATCH] include string,h from memcpy and strcpy function prototype
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/led/address.c  | 1 +
+ src/led/display.c  | 1 +
+ src/lib/unix.c     | 1 +
+ src/maint/hediag.c | 1 +
+ src/sigd/kernel.c  | 1 +
+ src/sigd/policy.c  | 1 +
+ 6 files changed, 6 insertions(+)
+
+diff --git a/src/led/address.c b/src/led/address.c
+index 574e881..b5c5fbb 100644
+--- a/src/led/address.c
++++ b/src/led/address.c
+@@ -31,6 +31,7 @@
+ #endif
+ 
+ #include <sys/ioctl.h>
++#include <string.h>
+ #include <unistd.h>
+ #include <errno.h>
+ 
+diff --git a/src/led/display.c b/src/led/display.c
+index d78a15d..b835e89 100644
+--- a/src/led/display.c
++++ b/src/led/display.c
+@@ -5,6 +5,7 @@
+ #if HAVE_CONFIG_H
+ #include <config.h>
+ #endif
++#include <string.h>
+ 
+ #include <atm.h>
+ #include <atmd.h>
+diff --git a/src/lib/unix.c b/src/lib/unix.c
+index 34aa465..d5bef54 100644
+--- a/src/lib/unix.c
++++ b/src/lib/unix.c
+@@ -8,6 +8,7 @@
+ 
+ #include <stdlib.h>
+ #include <stdio.h>
++#include <string.h>
+ #include <unistd.h>
+ #include <errno.h>
+ #include <sys/types.h>
+diff --git a/src/maint/hediag.c b/src/maint/hediag.c
+index 8a4312a..a4f792f 100644
+--- a/src/maint/hediag.c
++++ b/src/maint/hediag.c
+@@ -1,5 +1,6 @@
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <string.h>
+ #include <unistd.h>
+ #include <sys/ioctl.h>
+ #include <sys/types.h>
+diff --git a/src/sigd/kernel.c b/src/sigd/kernel.c
+index 9ee74b1..2491626 100644
+--- a/src/sigd/kernel.c
++++ b/src/sigd/kernel.c
+@@ -8,6 +8,7 @@
+ 
+ #include <stdlib.h>
+ #include <stdio.h>
++#include <string.h>
+ #include <errno.h>
+ #include <assert.h>
+ 
+diff --git a/src/sigd/policy.c b/src/sigd/policy.c
+index 2cfb42d..87223a7 100644
+--- a/src/sigd/policy.c
++++ b/src/sigd/policy.c
+@@ -6,6 +6,7 @@
+ #include <config.h>
+ #endif
+ 
++#include <string.h>
+ #include <atm.h>
+ #include <atmd.h>
+ 

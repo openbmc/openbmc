@@ -23,6 +23,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 +  uint64_t result;
 +  asm volatile("mfspr %0, 268" : "=r"(result));
 +  return result;
- #elif defined(__riscv) // RISC-V
- #if __riscv_xlen == 32
-   uint32_t lo, hi0, hi1;
+ #elif defined(__s390x__)
+   uint64_t result;
+   asm volatile("stckf %0" : "=Q"(result) : : "cc");

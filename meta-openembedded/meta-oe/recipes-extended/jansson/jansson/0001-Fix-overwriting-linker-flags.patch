@@ -1,0 +1,29 @@
+From fe6e8eec7e7df4f1e72f0c9d9337b1fe11236687 Mon Sep 17 00:00:00 2001
+From: Thomas Heinrichs <46387399+Thomas1664@users.noreply.github.com>
+Date: Thu, 28 Apr 2022 17:36:54 +0200
+Subject: [PATCH] Fix overwriting linker flags
+
+Upstream-Status: Backport
+[https://github.com/akheron/jansson/commit/fe6e8eec7e7df4f1e72f0c9d9337b1fe11236687]
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 39b9ad365f78..ed33e3c47f70 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -342,7 +342,7 @@ if(JANSSON_BUILD_SHARED_LIBS)
+    )
+       list(REMOVE_ITEM CMAKE_REQUIRED_LIBRARIES "-Wl,--version-script,${CMAKE_CURRENT_BINARY_DIR}/jansson.sym")
+       if (VSCRIPT_WORKS)
+-         set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--version-script,${CMAKE_CURRENT_BINARY_DIR}/jansson.sym")
++         set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--version-script,${CMAKE_CURRENT_BINARY_DIR}/jansson.sym")
+       endif()
+    endif()
+ 
+-- 
+2.35.1
+

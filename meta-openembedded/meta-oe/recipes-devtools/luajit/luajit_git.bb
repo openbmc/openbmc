@@ -6,6 +6,7 @@ HOMEPAGE = "http://luajit.org"
 SRC_URI = "git://luajit.org/git/luajit-2.0.git;protocol=http;branch=v2.1 \
            file://0001-Do-not-strip-automatically-this-leaves-the-stripping.patch \
            file://clang.patch \
+           file://0001-Use-builtin-for-clear_cache.patch \
            "
 
 # Set PV to a version tag and date (YYMMDD) associated with SRCREV if it is later.

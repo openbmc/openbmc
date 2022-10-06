@@ -13,11 +13,11 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  lib/rpmscript.c | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/lib/rpmscript.c b/lib/rpmscript.c
-index 2b0e43862..e319673f1 100644
---- a/lib/rpmscript.c
-+++ b/lib/rpmscript.c
-@@ -226,7 +226,7 @@ static char * writeScript(const char *cmd, const char *script)
+Index: git/lib/rpmscript.c
+===================================================================
+--- git.orig/lib/rpmscript.c
++++ git/lib/rpmscript.c
+@@ -270,7 +270,7 @@ static char * writeScript(const char *cm
      if (Ferror(fd))
  	goto exit;
  
@@ -26,7 +26,7 @@ index 2b0e43862..e319673f1 100644
  	static const char set_x[] = "set -x\n";
  	/* Assume failures will be caught by the write below */
  	Fwrite(set_x, sizeof(set_x[0]), sizeof(set_x)-1, fd);
-@@ -258,7 +258,7 @@ static rpmRC runExtScript(rpmPlugins plugins, ARGV_const_t prefixes,
+@@ -302,7 +302,7 @@ static rpmRC runExtScript(rpmPlugins plu
      char *mline = NULL;
      rpmRC rc = RPMRC_FAIL;
  
@@ -35,7 +35,7 @@ index 2b0e43862..e319673f1 100644
  
      if (script) {
  	fn = writeScript(*argvp[0], script);
-@@ -310,7 +310,7 @@ static rpmRC runExtScript(rpmPlugins plugins, ARGV_const_t prefixes,
+@@ -354,7 +354,7 @@ static rpmRC runExtScript(rpmPlugins plu
  		sname, strerror(errno));
  	goto exit;
      } else if (pid == 0) {/* Child */
@@ -44,7 +44,7 @@ index 2b0e43862..e319673f1 100644
  	       sname, *argvp[0], (unsigned)getpid());
  
  	fclose(in);
-@@ -353,7 +353,7 @@ static rpmRC runExtScript(rpmPlugins plugins, ARGV_const_t prefixes,
+@@ -397,7 +397,7 @@ static rpmRC runExtScript(rpmPlugins plu
  	reaped = waitpid(pid, &status, 0);
      } while (reaped == -1 && errno == EINTR);
  

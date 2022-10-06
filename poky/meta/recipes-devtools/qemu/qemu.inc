@@ -27,16 +27,12 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0008-tests-meson.build-use-relative-path-to-refer-to-file.patch \
            file://0009-Define-MAP_SYNC-and-MAP_SHARED_VALIDATE-on-needed-li.patch \
            file://0010-hw-pvrdma-Protect-against-buggy-or-malicious-guest-d.patch \
-           file://qemu-7.0.0-glibc-2.36.patch \
-           file://CVE-2022-35414.patch \
-           file://CVE-2021-3507_1.patch \
-           file://CVE-2021-3507_2.patch \
-           file://CVE-2022-0216_1.patch \
-           file://CVE-2022-0216_2.patch \
+           file://0001-net-tulip-Restrict-DMA-engine-to-memories.patch \
+           file://arm-cpreg-fix.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 
-SRC_URI[sha256sum] = "f6b375c7951f728402798b0baabb2d86478ca53d44cedbefabbe1c46bf46f839"
+SRC_URI[sha256sum] = "a0634e536bded57cf38ec8a751adb124b89c776fe0846f21ab6c6728f1cbbbe6"
 
 SRC_URI:append:class-target = " file://cross.patch"
 SRC_URI:append:class-nativesdk = " file://cross.patch"
@@ -75,8 +71,14 @@ do_install_ptest() {
 	# Strip the paths from the QEMU variable, we can use PATH
 	sed -i -e "s#^QEMU=.*/qemu-#QEMU=qemu-#g" ${D}${PTEST_PATH}/tests/tcg/*.mak
 
-        # Strip compiler flags as they break reproducibility
-        sed -i -e "s,CROSS_CC_GUEST=.*,CROSS_CC_GUEST=," ${D}${PTEST_PATH}/tests/tcg/*.mak
+	# Strip compiler flags as they break reproducibility
+	sed -i -e "s,^CC=.*,CC=gcc," \
+	       -e "s,^CCAS=.*,CCAS=gcc," \
+	       -e "s,^LD=.*,LD=ld," ${D}${PTEST_PATH}/tests/tcg/*.mak
+
+	# Update SRC_PATH variable to the right place on target
+	sed -i -e "s#^SRC_PATH=.*#SRC_PATH=${PTEST_PATH}#g" ${D}${PTEST_PATH}/tests/tcg/*.mak
+
 }
 
 # QEMU_TARGETS is overridable variable
@@ -151,7 +153,6 @@ PACKAGECONFIG[uring] = "--enable-linux-io-uring,--disable-linux-io-uring,liburin
 PACKAGECONFIG[xen] = "--enable-xen,--disable-xen,xen-tools,xen-tools-libxenstore xen-tools-libxenctrl xen-tools-libxenguest"
 PACKAGECONFIG[vnc-sasl] = "--enable-vnc --enable-vnc-sasl,--disable-vnc-sasl,cyrus-sasl,"
 PACKAGECONFIG[vnc-jpeg] = "--enable-vnc --enable-vnc-jpeg,--disable-vnc-jpeg,jpeg,"
-PACKAGECONFIG[vnc-png] = "--enable-vnc --enable-vnc-png,--disable-vnc-png,libpng,"
 PACKAGECONFIG[libcurl] = "--enable-curl,--disable-curl,curl,"
 PACKAGECONFIG[nss] = "--enable-smartcard,--disable-smartcard,nss,"
 PACKAGECONFIG[curses] = "--enable-curses,--disable-curses,ncurses,"

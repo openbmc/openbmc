@@ -37,6 +37,3 @@ EXTRA_OEMAKE:append = " \
                         BL32=${RECIPE_SYSROOT}/lib/firmware/tee-pager_v2.bin \
                         LOG_LEVEL=50 \
                         "
-
-# trigger TF-M build so TF-A binaries get signed
-do_deploy[depends]+= "virtual/trusted-firmware-m:do_prepare_recipe_sysroot"

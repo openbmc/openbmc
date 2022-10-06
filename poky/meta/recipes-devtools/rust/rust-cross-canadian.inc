@@ -7,13 +7,18 @@ LICENSE = "MIT"
 
 MODIFYTOS = "0"
 
+DEPENDS += "virtual/${SDK_PREFIX}gcc-crosssdk virtual/nativesdk-libc virtual/nativesdk-${SDK_PREFIX}compilerlibs"
+
+SRC_URI += "file://target-rust-ccld.c"
+LIC_FILES_CHKSUM = "file://target-rust-ccld.c;md5=af4e0e29f81a34cffe05aa07c89e93e9;endline=7"
+S = "${WORKDIR}"
+
 # Need to use our SDK's sh here, see #14878
 create_sdk_wrapper () {
         file="$1"
         shift
-
         cat <<- EOF > "${file}"
-		#!${base_prefix}/bin/sh
+		#!/bin/sh
 		\$$1 \$@
 		EOF
 
@@ -32,8 +37,17 @@ do_install () {
     install -m 0644 "${RUST_TARGETS_DIR}/${RUST_TARGET_SYS}.json" "${RUSTLIB_DIR}"
 
     # Uses SDK's CC as linker so linked binaries works out of box.
+    # We have a problem as rust sets LD_LIBRARY_PATH and this will break running host
+    # binaries (even /bin/sh) in the SDK as they detect a newer glibc from the SDK
+    # in those paths and we hit symbol errors. We saw particular problems with symbol
+    # mismatch on ubuntu1804 during development. To avoid this we have an SDK built
+    # binary which unsets LD_LIBRARY_PATH, which can then call the wrapper script
+    # where the context is easier to do the env maniupations needed
     install -d ${SYS_BINDIR}
-    create_sdk_wrapper "${SYS_BINDIR}/target-rust-ccld" "CC"
+    outfile="${SYS_BINDIR}/target-rust-ccld"
+    ${CC} ${WORKDIR}/target-rust-ccld.c -o $outfile
+    chmod +x "$outfile"
+    create_sdk_wrapper "${SYS_BINDIR}/target-rust-ccld-wrapper" "CC"
 
     ENV_SETUP_DIR=${D}${base_prefix}/environment-setup.d
     mkdir "${ENV_SETUP_DIR}"

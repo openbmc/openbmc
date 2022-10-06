@@ -5,8 +5,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 SECTION = "base"
 
 S = "${WORKDIR}/git"
-PV = "2022.05.18"
-SRCREV = "def8be9d35fda35492b72f54a94515f7df8d1e9f"
+PV = "2022.09.23"
+SRCREV = "5e2f8c66476bcf60eb8c2921807e34efb30294ee"
 SRC_URI = "git://github.com/KhronosGroup/OpenCL-Headers.git;branch=main;protocol=https"
 
 do_configure[noexec] = "1"

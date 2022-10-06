@@ -1,0 +1,35 @@
+From 8f58e1b5c15fc3b6f775207971d078c058d9eb7b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 1 Sep 2022 08:21:56 -0700
+Subject: [PATCH] m4macros: Check for a function provided by libX11 in
+ AC_CHECK_LIB
+
+checking for main is not ideal, since its not a function from libX11
+moreover with newer versions of autoconf this will start to fail [1], so
+change this to use XFree API which is provided by libX11 and seems more
+relevant to check here.
+
+[1] https://lists.gnu.org/archive/html/autoconf-patches/2022-08/msg00018.html
+
+Upstream-Status: Submitted [https://gitlab.xfce.org/xfce/xfce4-dev-tools/-/issues/57]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ m4macros/xdt-depends.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/m4macros/xdt-depends.m4 b/m4macros/xdt-depends.m4
+index 3c07c90..ce1b272 100644
+--- a/m4macros/xdt-depends.m4
++++ b/m4macros/xdt-depends.m4
+@@ -213,7 +213,7 @@ AC_DEFUN([XDT_CHECK_LIBX11],
+ 
+   LIBX11_CFLAGS= LIBX11_LDFLAGS= LIBX11_LIBS=
+   if test x"$no_x" != x"yes"; then
+-    AC_CHECK_LIB([X11], [main],
++    AC_CHECK_LIB([X11], [XFree],
+     [
+       AC_DEFINE([HAVE_LIBX11], [1], [Define if libX11 is available])
+       LIBX11_CFLAGS="$X_CFLAGS"
+-- 
+2.37.3
+

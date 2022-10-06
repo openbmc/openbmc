@@ -28,7 +28,7 @@ try:
     import oeqa.sdkext
 except ImportError:
     pass
-from oeqa.utils.decorators import LogResults, gettag, getResults
+from oeqa.utils.decorators import LogResults, gettag
 
 logger = logging.getLogger("BitBake")
 
@@ -57,7 +57,6 @@ def filterByTagExp(testsuite, tagexp):
 @LogResults
 class oeTest(unittest.TestCase):
 
-    pscmd = "ps"
     longMessage = True
 
     @classmethod
@@ -110,20 +109,6 @@ class oeRuntimeTest(oeTest):
     def tearDown(self):
         # Uninstall packages in the DUT
         self.tc.install_uninstall_packages(self.id(), False)
-
-        res = getResults()
-        # If a test fails or there is an exception dump
-        # for QemuTarget only
-        if (type(self.target).__name__ == "QemuTarget" and
-                (self.id() in res.getErrorList() or
-                self.id() in  res.getFailList())):
-            self.tc.host_dumper.create_dir(self._testMethodName)
-            self.tc.host_dumper.dump_host()
-            self.target.target_dumper.dump_target(
-                    self.tc.host_dumper.dump_dir)
-            print ("%s dump data stored in %s" % (self._testMethodName,
-                     self.tc.host_dumper.dump_dir))
-
         self.tearDownLocal()
 
     # Method to be run after tearDown and implemented by child classes
@@ -397,11 +382,6 @@ class RuntimeTestContext(TestContext):
 
     def _get_test_suites_required(self):
         return [t for t in self.d.getVar("TEST_SUITES").split() if t != "auto"]
-
-    def loadTests(self):
-        super(RuntimeTestContext, self).loadTests()
-        if oeTest.hasPackage("procps"):
-            oeRuntimeTest.pscmd = "ps -ef"
 
     def extract_packages(self):
         """

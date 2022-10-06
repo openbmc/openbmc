@@ -1,0 +1,33 @@
+From c5ca31940d1d1889ef2cc6974c18ff24ab406748 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 31 Aug 2022 16:42:23 -0700
+Subject: [PATCH] sata.c: Declare ata_get_powermode prototype
+
+Fixes build warnings/errors
+
+sata.c:127:10: error: call to undeclared function 'ata_get_powermode'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+|   switch(ata_get_powermode(dsk->fd))
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/sata.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/sata.c b/src/sata.c
+index d67621f..4172245 100644
+--- a/src/sata.c
++++ b/src/sata.c
+@@ -52,7 +52,8 @@
+                 (((u16)(__x) & (u16)0xff00U) >> 8) )); \
+ })
+ 
+- 
++extern enum e_powermode ata_get_powermode(int device);
++
+ static int sata_probe(int device) {
+   int bus_num;
+   unsigned char cmd[4] = { WIN_IDENTIFY, 0, 0, 1 };
+-- 
+2.37.3
+

@@ -1,0 +1,44 @@
+From 20984c73bea8c3df00f297176edd4f6d47c31b55 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 2 Sep 2022 17:49:20 -0700
+Subject: [PATCH 1/4] common/utils: Include string.h for strcasestr
+
+Also define _GNU_SOURCE for the same
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ common/utils.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+--- a/common/utils.c
++++ b/common/utils.c
+@@ -1,9 +1,11 @@
++#define _GNU_SOURCE
+ #include "utils.h"
+ #include "string.h"
+ #include <dlfcn.h>
+ #include <sys/stat.h>
+ #include <errno.h>
+ #include <stdlib.h>
++#include <string.h> /* strcasestr */
+ 
+ extern int errno;
+ 
+--- a/protocol/hp_ipp.c
++++ b/protocol/hp_ipp.c
+@@ -18,12 +18,13 @@ Boston, MA 02110-1301, USA.
+ 
+ \******************************************************************************/
+ 
+-
++#define _GNU_SOURCE
+ #include <cups/cups.h>
+ #include <cups/language.h>
+ #include <cups/ppd.h>
+ #include <syslog.h>
+ #include <stdarg.h>
++#include <string.h> /* strcasecmp */
+ #include <sys/types.h>
+ #include <pwd.h>
+ #include <sys/stat.h> 

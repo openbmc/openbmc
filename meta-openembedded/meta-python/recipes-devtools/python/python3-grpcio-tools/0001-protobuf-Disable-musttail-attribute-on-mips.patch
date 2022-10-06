@@ -1,0 +1,24 @@
+From 64d737318656286f69ddc5ad654072785ddcbbed Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Sep 2022 19:09:15 -0700
+Subject: [PATCH] protobuf: Disable musttail attribute on mips
+
+See https://github.com/llvm/llvm-project/issues/57795
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ third_party/protobuf/src/google/protobuf/port_def.inc | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+--- a/third_party/protobuf/src/google/protobuf/port_def.inc
++++ b/third_party/protobuf/src/google/protobuf/port_def.inc
+@@ -255,6 +255,7 @@
+ #error PROTOBUF_TAILCALL was previously defined
+ #endif
+ #if __has_cpp_attribute(clang::musttail) && !defined(__arm__) && \
++    !defined(__mips__) &&                                        \
+     !defined(_ARCH_PPC) && !defined(__wasm__) &&                 \
+     !(defined(_MSC_VER) && defined(_M_IX86)) &&                  \
+     !(defined(__NDK_MAJOR__) && __NDK_MAJOR <= 24)

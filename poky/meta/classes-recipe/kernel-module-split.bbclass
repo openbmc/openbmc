@@ -18,7 +18,7 @@ pkg_postrm:modules () {
 if [ -z "$D" ]; then
 	depmod -a ${KERNEL_VERSION}
 else
-	depmodwrapper -a -b $D ${KERNEL_VERSION}
+	depmodwrapper -a -b $D ${KERNEL_VERSION} ${KERNEL_PACKAGE_NAME}
 fi
 }
 

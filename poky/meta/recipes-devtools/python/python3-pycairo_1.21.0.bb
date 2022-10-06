@@ -10,14 +10,14 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=f3713ca2c28d9312ad718520b6dc3eee \
 # cairo >= 1.14
 DEPENDS = "cairo python3"
 
-SRC_URI = "https://github.com/pygobject/pycairo/releases/download/v${PV}/pycairo-${PV}.tar.gz"
-UPSTREAM_CHECK_URI = "https://github.com/pygobject/pycairo/releases/"
+SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/pycairo-${PV}.tar.gz"
+GITHUB_BASE_URI = "https://github.com/pygobject/pycairo/releases/"
 
 SRC_URI[sha256sum] = "251907f18a552df938aa3386657ff4b5a4937dde70e11aa042bc297957f4b74b"
 
 S = "${WORKDIR}/pycairo-${PV}"
 
-inherit meson pkgconfig python3targetconfig
+inherit meson pkgconfig python3targetconfig github-releases
 
 CFLAGS += "-fPIC"
 

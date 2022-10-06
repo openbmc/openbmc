@@ -22,8 +22,6 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  kexec/arch/mips/kexec-mips.h           |  1 +
  4 files changed, 39 insertions(+), 28 deletions(-)
 
-diff --git a/kexec/arch/mips/include/arch/options.h b/kexec/arch/mips/include/arch/options.h
-index 416e224..18d2811 100644
 --- a/kexec/arch/mips/include/arch/options.h
 +++ b/kexec/arch/mips/include/arch/options.h
 @@ -5,6 +5,7 @@
@@ -44,11 +42,9 @@ index 416e224..18d2811 100644
  
  
  #define KEXEC_ARCH_OPT_STR KEXEC_OPT_STR ""
-diff --git a/kexec/arch/mips/kexec-elf-mips.c b/kexec/arch/mips/kexec-elf-mips.c
-index 849a7ba..5c0e535 100644
 --- a/kexec/arch/mips/kexec-elf-mips.c
 +++ b/kexec/arch/mips/kexec-elf-mips.c
-@@ -141,35 +141,37 @@ int elf_mips_load(int argc, char **argv, const char *buf, off_t len,
+@@ -141,45 +141,49 @@ int elf_mips_load(int argc, char **argv,
  	else
  		cmdline_addr = 0;
  
@@ -63,9 +59,22 @@ index 849a7ba..5c0e535 100644
 -	} else {
 -		create_flatten_tree(&dtb_buf, &dtb_length, cmdline_buf + strlen(CMDLINE_PREFIX));
 -	}
- 
+-
 -	if (arch_options.initrd_file) {
 -		initrd_buf = slurp_file(arch_options.initrd_file, &initrd_size);
+ 
+-		/* Create initrd entries in dtb - although at this time
+-		 * they would not point to the correct location */
+-		dtb_set_initrd(&dtb_buf, &dtb_length, initrd_buf, initrd_buf + initrd_size);
+-
+-		initrd_base = add_buffer(info, initrd_buf, initrd_size,
+-					initrd_size, sizeof(void *),
+-					_ALIGN_UP(kernel_addr + kernel_size + dtb_length,
+-						pagesize), 0x0fffffff, 1);
+-
+-		/* Now that the buffer for initrd is prepared, update the dtb
+-		 * with an appropriate location */
+-		dtb_set_initrd(&dtb_buf, &dtb_length, initrd_base, initrd_base + initrd_size);
 +	if (!arch_options.no_dtb) {
 +		/* MIPS systems that have been converted to use device tree
 +		 * passed through UHI will use commandline in the DTB and
@@ -78,39 +87,29 @@ index 849a7ba..5c0e535 100644
 +		} else {
 +			create_flatten_tree(&dtb_buf, &dtb_length, cmdline_buf + strlen(CMDLINE_PREFIX));
 +		}
- 
--		/* Create initrd entries in dtb - although at this time
--		 * they would not point to the correct location */
--		dtb_set_initrd(&dtb_buf, &dtb_length, initrd_buf, initrd_buf + initrd_size);
++
 +		if (arch_options.initrd_file) {
 +			initrd_buf = slurp_file(arch_options.initrd_file, &initrd_size);
- 
--		initrd_base = add_buffer(info, initrd_buf, initrd_size,
--					initrd_size, sizeof(void *),
--					_ALIGN_UP(kernel_addr + kernel_size + dtb_length,
--						pagesize), 0x0fffffff, 1);
++
 +			/* Create initrd entries in dtb - although at this time
 +			 * they would not point to the correct location */
-+			dtb_set_initrd(&dtb_buf, &dtb_length, initrd_buf, initrd_buf + initrd_size);
- 
--		/* Now that the buffer for initrd is prepared, update the dtb
--		 * with an appropriate location */
--		dtb_set_initrd(&dtb_buf, &dtb_length, initrd_base, initrd_base + initrd_size);
--	}
++			dtb_set_initrd(&dtb_buf, &dtb_length, (off_t)initrd_buf, (off_t)initrd_buf + initrd_size);
++
 +			initrd_base = add_buffer(info, initrd_buf, initrd_size,
 +						initrd_size, sizeof(void *),
 +						_ALIGN_UP(kernel_addr + kernel_size + dtb_length,
 +							pagesize), 0x0fffffff, 1);
- 
++
 +			/* Now that the buffer for initrd is prepared, update the dtb
 +			 * with an appropriate location */
 +			dtb_set_initrd(&dtb_buf, &dtb_length, initrd_base, initrd_base + initrd_size);
 +		}
-+	}
+ 	}
  
+-
  	/* This is a legacy method for commandline passing used
  	 * currently by Octeon CPUs only */
-@@ -177,9 +179,11 @@ int elf_mips_load(int argc, char **argv, const char *buf, off_t len,
+ 	add_buffer(info, cmdline_buf, sizeof(cmdline_buf),
  			sizeof(cmdline_buf), sizeof(void *),
  			cmdline_addr, 0x0fffffff, 1);
  
@@ -125,8 +124,6 @@ index 849a7ba..5c0e535 100644
  
  	return 0;
  }
-diff --git a/kexec/arch/mips/kexec-mips.c b/kexec/arch/mips/kexec-mips.c
-index 415c2ed..e557f8b 100644
 --- a/kexec/arch/mips/kexec-mips.c
 +++ b/kexec/arch/mips/kexec-mips.c
 @@ -89,6 +89,7 @@ void arch_usage(void)
@@ -137,7 +134,7 @@ index 415c2ed..e557f8b 100644
  	);
  }
  
-@@ -121,6 +122,9 @@ int arch_process_options(int argc, char **argv)
+@@ -121,6 +122,9 @@ int arch_process_options(int argc, char
  		case OPT_RAMDISK:
  			arch_options.initrd_file = optarg;
  			break;
@@ -147,8 +144,6 @@ index 415c2ed..e557f8b 100644
  		default:
  			break;
  		}
-diff --git a/kexec/arch/mips/kexec-mips.h b/kexec/arch/mips/kexec-mips.h
-index 222c815..90b21c3 100644
 --- a/kexec/arch/mips/kexec-mips.h
 +++ b/kexec/arch/mips/kexec-mips.h
 @@ -22,6 +22,7 @@ struct arch_options_t {

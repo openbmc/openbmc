@@ -1,0 +1,29 @@
+From e6bdf74a424652c4f9a38457c7fa93a2051157f5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 30 Aug 2022 13:09:07 -0700
+Subject: [PATCH] docs: Disable building
+
+It needs linuxdoc-tools which we do not have in OE anymore
+
+Upstream-Status: Inappropriate [OE-Specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ docs/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/docs/Makefile.am b/docs/Makefile.am
+index daa2288..b355185 100644
+--- a/docs/Makefile.am
++++ b/docs/Makefile.am
+@@ -8,7 +8,7 @@ CLEANFILES = $(man_MANS) $(SGML_OUTPUTS)
+ EXTRA_DIST = attributes.txt libuser.conf.5.in rfc2307.txt sgml/libuser.sgml \
+ 	$(SGML_OUTPUTS)
+ 
+-all: sgml/libuser.txt sgml/libuser.html
++all:
+ 
+ libuser.conf.5: $(srcdir)/libuser.conf.5.in Makefile
+ 	sed 's,@sysconfdir\@,$(sysconfdir),g' \
+-- 
+2.37.2
+

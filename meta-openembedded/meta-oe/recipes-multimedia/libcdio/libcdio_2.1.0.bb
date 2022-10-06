@@ -18,6 +18,9 @@ PACKAGECONFIG[cdda-player] = "--with-cdda-player,--without-cdda-player,ncurses"
 PACKAGECONFIG[cddb] = "--enable-cddb,--disable-cddb,libcddb"
 PACKAGECONFIG[vcd-info] = "--enable-vcd-info,--disable-vcd-info,vcdimager"
 
+# add -D_LARGEFILE64_SOURCE for 32bit targets
+CFLAGS += "${@['-D_LARGEFILE64_SOURCE',''][d.getVar('SITEINFO_BITS') != '32']}"
+
 PACKAGES += "${PN}-utils"
 
 FILES:${PN} = "${libdir}/${BPN}${SOLIB}"

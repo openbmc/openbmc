@@ -1,12 +1,13 @@
-From 8abb9c6a342d750a3a3a66e674c3be6597fc9f66 Mon Sep 17 00:00:00 2001
+From 83ba88292211394ce6b3a21fbc0f702dae543290 Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Mon, 28 Jun 2021 23:31:25 +0100
-Subject: [PATCH 04/24] usb: add isp1760 family driver
+Subject: [PATCH 04/26] usb: add isp1760 family driver
 
 ISP1760/61/63 are a family of usb controllers, blah, blah, more info
 here.
 
 Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+Upstream-Status: Accepted [2022.10-rc1]
 ---
  Makefile                            |    1 +
  drivers/usb/Kconfig                 |    2 +
@@ -34,7 +35,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  create mode 100644 drivers/usb/isp1760/isp1760-uboot.h
 
 diff --git a/Makefile b/Makefile
-index 98867fbe06b4..67851020f5c1 100644
+index 98867fbe06..67851020f5 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -841,6 +841,7 @@ libs-y += drivers/usb/host/
@@ -46,7 +47,7 @@ index 98867fbe06b4..67851020f5c1 100644
  libs-y += drivers/usb/ulpi/
  ifdef CONFIG_POST
 diff --git a/drivers/usb/Kconfig b/drivers/usb/Kconfig
-index ab1d061bd0d5..bbe07be02cab 100644
+index ab1d061bd0..bbe07be02c 100644
 --- a/drivers/usb/Kconfig
 +++ b/drivers/usb/Kconfig
 @@ -78,6 +78,8 @@ source "drivers/usb/musb/Kconfig"
@@ -59,7 +60,7 @@ index ab1d061bd0d5..bbe07be02cab 100644
  
  source "drivers/usb/phy/Kconfig"
 diff --git a/drivers/usb/common/Makefile b/drivers/usb/common/Makefile
-index dc05cb0a5077..f08b064d2493 100644
+index dc05cb0a50..f08b064d24 100644
 --- a/drivers/usb/common/Makefile
 +++ b/drivers/usb/common/Makefile
 @@ -4,6 +4,7 @@
@@ -72,7 +73,7 @@ index dc05cb0a5077..f08b064d2493 100644
  obj-$(CONFIG_USB_EHCI_FSL) += fsl-dt-fixup.o fsl-errata.o
 diff --git a/drivers/usb/isp1760/Kconfig b/drivers/usb/isp1760/Kconfig
 new file mode 100644
-index 000000000000..993d71e74cd2
+index 0000000000..993d71e74c
 --- /dev/null
 +++ b/drivers/usb/isp1760/Kconfig
 @@ -0,0 +1,12 @@
@@ -90,7 +91,7 @@ index 000000000000..993d71e74cd2
 +	  capable bus.
 diff --git a/drivers/usb/isp1760/Makefile b/drivers/usb/isp1760/Makefile
 new file mode 100644
-index 000000000000..2c809c01b118
+index 0000000000..2c809c01b1
 --- /dev/null
 +++ b/drivers/usb/isp1760/Makefile
 @@ -0,0 +1,6 @@
@@ -102,7 +103,7 @@ index 000000000000..2c809c01b118
 +obj-$(CONFIG_USB_ISP1760) += isp1760.o
 diff --git a/drivers/usb/isp1760/isp1760-core.c b/drivers/usb/isp1760/isp1760-core.c
 new file mode 100644
-index 000000000000..3080595549c5
+index 0000000000..3080595549
 --- /dev/null
 +++ b/drivers/usb/isp1760/isp1760-core.c
 @@ -0,0 +1,378 @@
@@ -486,7 +487,7 @@ index 000000000000..3080595549c5
 +}
 diff --git a/drivers/usb/isp1760/isp1760-core.h b/drivers/usb/isp1760/isp1760-core.h
 new file mode 100644
-index 000000000000..0a60e30b5fe7
+index 0000000000..0a60e30b5f
 --- /dev/null
 +++ b/drivers/usb/isp1760/isp1760-core.h
 @@ -0,0 +1,96 @@
@@ -588,7 +589,7 @@ index 000000000000..0a60e30b5fe7
 +#endif
 diff --git a/drivers/usb/isp1760/isp1760-hcd.c b/drivers/usb/isp1760/isp1760-hcd.c
 new file mode 100644
-index 000000000000..b1d86dd69b94
+index 0000000000..b1d86dd69b
 --- /dev/null
 +++ b/drivers/usb/isp1760/isp1760-hcd.c
 @@ -0,0 +1,2574 @@
@@ -3168,7 +3169,7 @@ index 000000000000..b1d86dd69b94
 +}
 diff --git a/drivers/usb/isp1760/isp1760-hcd.h b/drivers/usb/isp1760/isp1760-hcd.h
 new file mode 100644
-index 000000000000..00f5ca8c1f75
+index 0000000000..00f5ca8c1f
 --- /dev/null
 +++ b/drivers/usb/isp1760/isp1760-hcd.h
 @@ -0,0 +1,82 @@
@@ -3256,7 +3257,7 @@ index 000000000000..00f5ca8c1f75
 +#endif /* _ISP1760_HCD_H_ */
 diff --git a/drivers/usb/isp1760/isp1760-if.c b/drivers/usb/isp1760/isp1760-if.c
 new file mode 100644
-index 000000000000..c610da6b23fb
+index 0000000000..c610da6b23
 --- /dev/null
 +++ b/drivers/usb/isp1760/isp1760-if.c
 @@ -0,0 +1,127 @@
@@ -3389,7 +3390,7 @@ index 000000000000..c610da6b23fb
 +};
 diff --git a/drivers/usb/isp1760/isp1760-regs.h b/drivers/usb/isp1760/isp1760-regs.h
 new file mode 100644
-index 000000000000..94ea60c20b2a
+index 0000000000..94ea60c20b
 --- /dev/null
 +++ b/drivers/usb/isp1760/isp1760-regs.h
 @@ -0,0 +1,292 @@
@@ -3687,7 +3688,7 @@ index 000000000000..94ea60c20b2a
 +#endif
 diff --git a/drivers/usb/isp1760/isp1760-uboot.c b/drivers/usb/isp1760/isp1760-uboot.c
 new file mode 100644
-index 000000000000..7635210fe2b4
+index 0000000000..7635210fe2
 --- /dev/null
 +++ b/drivers/usb/isp1760/isp1760-uboot.c
 @@ -0,0 +1,76 @@
@@ -3769,7 +3770,7 @@ index 000000000000..7635210fe2b4
 +};
 diff --git a/drivers/usb/isp1760/isp1760-uboot.h b/drivers/usb/isp1760/isp1760-uboot.h
 new file mode 100644
-index 000000000000..2486de6f9e27
+index 0000000000..2486de6f9e
 --- /dev/null
 +++ b/drivers/usb/isp1760/isp1760-uboot.h
 @@ -0,0 +1,27 @@
@@ -3801,5 +3802,5 @@ index 000000000000..2486de6f9e27
 +
 +#endif
 -- 
-2.37.1
+2.17.1
 

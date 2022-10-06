@@ -653,39 +653,6 @@ For help on the BitBake layer management tool, use the following
 command::
 
    $ bitbake-layers --help
-   NOTE: Starting bitbake server...
-   usage: bitbake-layers [-d] [-q] [-F] [--color COLOR] [-h] <subcommand> ...
-
-   BitBake layers utility
-
-   optional arguments:
-     -d, --debug           Enable debug output
-     -q, --quiet           Print only errors
-     -F, --force           Force add without recipe parse verification
-     --color COLOR         Colorize output (where COLOR is auto, always, never)
-     -h, --help            show this help message and exit
-
-   subcommands:
-     <subcommand>
-       layerindex-fetch    Fetches a layer from a layer index along with its
-                           dependent layers, and adds them to conf/bblayers.conf.
-       layerindex-show-depends
-                           Find layer dependencies from layer index.
-       add-layer           Add one or more layers to bblayers.conf.
-       remove-layer        Remove one or more layers from bblayers.conf.
-       flatten             flatten layer configuration into a separate output
-                           directory.
-       show-layers         show current configured layers.
-       show-overlayed      list overlayed recipes (where the same recipe exists
-                           in another layer)
-       show-recipes        list available recipes, showing the layer they are
-                           provided by
-       show-appends        list bbappend files and recipe files they apply to
-       show-cross-depends  Show dependencies between recipes that cross layer
-                           boundaries.
-       create-layer        Create a basic layer
-
-   Use bitbake-layers <subcommand> --help to get help on a specific command
 
 The following list describes the available commands:
 
@@ -759,7 +726,17 @@ The following list describes the available commands:
 -  ``layerindex-show-depends``: Finds layer dependencies from the
    layer index.
 
+-  ``save-build-conf``: Saves the currently active build configuration
+   (``conf/local.conf``, ``conf/bblayers.conf``) as a template into a layer.
+   This template can later be used for setting up builds via :term:``TEMPLATECONF``.
+   For information about saving and using configuration templates, see
+   ":ref:`dev-manual/common-tasks:creating a custom template configuration directory`".
+
 -  ``create-layer``: Creates a basic layer.
+
+-  ``create-layers-setup``: Writes out a configuration file and/or a script that
+   can replicate the directory structure and revisions of the layers in a current build.
+   For more information, see ":ref:`dev-manual/common-tasks:saving and restoring the layers setup`".
 
 Creating a General Layer Using the ``bitbake-layers`` Script
 ------------------------------------------------------------
@@ -879,6 +856,62 @@ enables the build system to locate the layer during the build.
 
    During a build, the OpenEmbedded build system looks in the layers
    from the top of the list down to the bottom in that order.
+
+Saving and restoring the layers setup
+-------------------------------------
+
+Once you have a working build with the correct set of layers, it is beneficial
+to capture the layer setup --- what they are, which repositories they come from
+and which SCM revisions they're at --- into a configuration file, so that this
+setup can be easily replicated later, perhaps on a different machine. Here's
+how to do this::
+
+   $ bitbake-layers create-layers-setup /srv/work/alex/meta-alex/
+   NOTE: Starting bitbake server...
+   NOTE: Created /srv/work/alex/meta-alex/setup-layers.json
+   NOTE: Created /srv/work/alex/meta-alex/setup-layers
+
+The tool needs a single argument which tells where to place the output, consisting
+of a json formatted layer configuration, and a ``setup-layers`` script that can use that configuration
+to restore the layers in a different location, or on a different host machine. The argument
+can point to a custom layer (which is then deemed a "bootstrap" layer that needs to be
+checked out first), or into a completely independent location.
+
+The replication of the layers is performed by running the ``setup-layers`` script provided
+above:
+
+1. Clone the bootstrap layer or some other repository to obtain
+   the json config and the setup script that can use it.
+
+2. Run the script directly with no options::
+
+      alex@Zen2:/srv/work/alex/my-build$ meta-alex/setup-layers
+      Note: not checking out source meta-alex, use --force-bootstraplayer-checkout to override.
+
+      Setting up source meta-intel, revision 15.0-hardknott-3.3-310-g0a96edae, branch master
+      Running 'git init -q /srv/work/alex/my-build/meta-intel'
+      Running 'git remote remove origin > /dev/null 2>&1; git remote add origin git://git.yoctoproject.org/meta-intel' in /srv/work/alex/my-build/meta-intel
+      Running 'git fetch -q origin || true' in /srv/work/alex/my-build/meta-intel
+      Running 'git checkout -q 0a96edae609a3f48befac36af82cf1eed6786b4a' in /srv/work/alex/my-build/meta-intel
+
+      Setting up source poky, revision 4.1_M1-372-g55483d28f2, branch akanavin/setup-layers
+      Running 'git init -q /srv/work/alex/my-build/poky'
+      Running 'git remote remove origin > /dev/null 2>&1; git remote add origin git://git.yoctoproject.org/poky' in /srv/work/alex/my-build/poky
+      Running 'git fetch -q origin || true' in /srv/work/alex/my-build/poky
+      Running 'git remote remove poky-contrib > /dev/null 2>&1; git remote add poky-contrib ssh://git@push.yoctoproject.org/poky-contrib' in /srv/work/alex/my-build/poky
+      Running 'git fetch -q poky-contrib || true' in /srv/work/alex/my-build/poky
+      Running 'git checkout -q 11db0390b02acac1324e0f827beb0e2e3d0d1d63' in /srv/work/alex/my-build/poky
+
+.. note::
+   This will work to update an existing checkout as well.
+
+.. note::
+   The script is self-sufficient and requires only python3
+   and git on the build machine.
+
+.. note::
+   Both the ``create-layers-setup`` and the ``setup-layers`` provided several additional options
+   that customize their behavior - you are welcome to study them via ``--help`` command line parameter.
 
 Customizing Images
 ==================
@@ -2577,7 +2610,7 @@ chapter of the BitBake User Manual.
 
       S = "${WORKDIR}/postfix-${PV}"
       CFLAGS += "-DNO_ASM"
-      SRC_URI:append = " file://fixup.patch"
+      CFLAGS:append = " --enable-important-feature"
 
 -  *Functions:* Functions provide a series of actions to be performed.
    You usually use functions to override the default implementation of a
@@ -2708,19 +2741,21 @@ in the BitBake User Manual.
    to existing variables. This operator does not add any additional
    space. Also, the operator is applied after all the ``+=``, and ``=+``
    operators have been applied and after all ``=`` assignments have
-   occurred.
+   occurred. This means that if ``:append`` is used in a recipe, it can
+   only be overridden by another layer using the  special ``:remove``
+   operator, which in turn will prevent further layers from adding it back.
 
    The following example shows the space being explicitly added to the
    start to ensure the appended value is not merged with the existing
    value::
 
-      SRC_URI:append = " file://fix-makefile.patch"
+      CFLAGS:append = " --enable-important-feature"
 
    You can also use
    the ``:append`` operator with overrides, which results in the actions
    only being performed for the specified target or machine::
 
-      SRC_URI:append:sh4 = " file://fix-makefile.patch"
+      CFLAGS:append:sh4 = " --enable-important-sh4-specific-feature"
 
 -  *Prepending (:prepend):* Use the ``:prepend`` operator to prepend
    values to existing variables. This operator does not add any
@@ -3559,6 +3594,9 @@ functions::
    pydevshell> d.getVar("FOO")
    pydevshell> bb.build.exec_func("do_unpack", d)
    pydevshell>
+
+See the ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:functions you can call from within python`"
+section in the BitBake User Manual for details about available functions.
 
 The commands execute just as if the OpenEmbedded build
 system were executing them. Consequently, working this way can be
@@ -6431,71 +6469,51 @@ Creating a Custom Template Configuration Directory
 ==================================================
 
 If you are producing your own customized version of the build system for
-use by other users, you might want to customize the message shown by the
-setup script or you might want to change the template configuration
-files (i.e. ``local.conf`` and ``bblayers.conf``) that are created in a
-new build directory.
+use by other users, you might want to provide a custom build configuration
+that includes all the necessary settings and layers (i.e. ``local.conf`` and
+``bblayers.conf`` that are created in a new build directory) and a custom
+message that is shown when setting up the build. This can be done by
+creating one or more template configuration directories in your
+custom distribution layer.
+
+This can be done by using ``bitbake-layers save-build-conf``::
+
+   $ bitbake-layers save-build-conf ../../meta-alex/ test-1
+   NOTE: Starting bitbake server...
+   NOTE: Configuration template placed into /srv/work/alex/meta-alex/conf/templates/test-1
+   Please review the files in there, and particularly provide a configuration description in /srv/work/alex/meta-alex/conf/templates/test-1/conf-notes.txt
+   You can try out the configuration with
+   TEMPLATECONF=/srv/work/alex/meta-alex/conf/templates/test-1 . /srv/work/alex/poky/oe-init-build-env build-try-test-1
+
+The above command takes the config files from the currently active build directory under ``conf``,
+replaces site-specific paths in ``bblayers.conf`` with ``##OECORE##``-relative paths, and copies
+the config files into a specified layer under a specified template name.
+
+To use those saved templates as a starting point for a build, users should point
+to one of them with :term:`TEMPLATECONF` environment variable::
+
+   TEMPLATECONF=/srv/work/alex/meta-alex/conf/templates/test-1 . /srv/work/alex/poky/oe-init-build-env build-try-test-1
 
 The OpenEmbedded build system uses the environment variable
 :term:`TEMPLATECONF` to locate the directory from which it gathers
 configuration information that ultimately ends up in the
 :term:`Build Directory` ``conf`` directory.
-By default, :term:`TEMPLATECONF` is set as follows in the ``poky``
-repository::
 
-   TEMPLATECONF=${TEMPLATECONF:-meta-poky/conf}
+If :term:`TEMPLATECONF` is not set, the default value is obtained
+from ``.templateconf`` file that is read from the same directory as
+``oe-init-build-env`` script. For the Poky reference distribution this
+would be::
 
-This is the
-directory used by the build system to find templates from which to build
-some key configuration files. If you look at this directory, you will
+   TEMPLATECONF=${TEMPLATECONF:-meta-poky/conf/templates/default}
+
+If you look at a configuration template directory, you will
 see the ``bblayers.conf.sample``, ``local.conf.sample``, and
 ``conf-notes.txt`` files. The build system uses these files to form the
-respective ``bblayers.conf`` file, ``local.conf`` file, and display the
-list of BitBake targets when running the setup script.
-
-To override these default configuration files with configurations you
-want used within every new Build Directory, simply set the
-:term:`TEMPLATECONF` variable to your directory. The :term:`TEMPLATECONF`
-variable is set in the ``.templateconf`` file, which is in the top-level
-:term:`Source Directory` folder
-(e.g. ``poky``). Edit the ``.templateconf`` so that it can locate your
-directory.
-
-Best practices dictate that you should keep your template configuration
-directory in your custom distribution layer. For example, suppose you
-have a layer named ``meta-mylayer`` located in your home directory and
-you want your template configuration directory named ``myconf``.
-Changing the ``.templateconf`` as follows causes the OpenEmbedded build
-system to look in your directory and base its configuration files on the
-``*.sample`` configuration files it finds. The final configuration files
-(i.e. ``local.conf`` and ``bblayers.conf`` ultimately still end up in
-your Build Directory, but they are based on your ``*.sample`` files.
-::
-
-   TEMPLATECONF=${TEMPLATECONF:-meta-mylayer/myconf}
-
-Aside from the ``*.sample`` configuration files, the ``conf-notes.txt``
-also resides in the default ``meta-poky/conf`` directory. The script
-that sets up the build environment (i.e.
-:ref:`structure-core-script`) uses this file to
-display BitBake targets as part of the script output. Customizing this
-``conf-notes.txt`` file is a good way to make sure your list of custom
-targets appears as part of the script's output.
-
-Here is the default list of targets displayed as a result of running
-either of the setup scripts::
-
-   You can now run 'bitbake <target>'
-
-   Common targets are:
-       core-image-minimal
-       core-image-sato
-       meta-toolchain
-       meta-ide-support
-
-Changing the listed common targets is as easy as editing your version of
-``conf-notes.txt`` in your custom template configuration directory and
-making sure you have :term:`TEMPLATECONF` set to your directory.
+respective ``bblayers.conf`` file, ``local.conf`` file, and show
+users a note about the build they're setting up
+when running the ``oe-init-build-env`` setup script. These can be
+edited further if needed to improve or change the build configurations
+available to the users.
 
 Conserving Disk Space
 =====================
@@ -11417,12 +11435,12 @@ example:
    # clean up the .git repos
    $ find . -name ".git" -type d -exec rm -rf {} \;
 
-One
-thing a development organization might want to consider for end-user
-convenience is to modify ``meta-poky/conf/bblayers.conf.sample`` to
-ensure that when the end user utilizes the released build system to
-build an image, the development organization's layers are included in
-the ``bblayers.conf`` file automatically::
+One thing a development organization might want to consider for end-user
+convenience is to modify
+``meta-poky/conf/templates/default/bblayers.conf.sample`` to ensure that when
+the end user utilizes the released build system to build an image, the
+development organization's layers are included in the ``bblayers.conf`` file
+automatically::
 
    # POKY_BBLAYERS_CONF_VERSION is increased each time build/conf/bblayers.conf
    # changes incompatibly
@@ -11451,9 +11469,9 @@ The spdx module has been integrated to a layer named meta-spdxscanner.
 meta-spdxscanner provides several kinds of scanner. If you want to enable
 this function, you have to follow the following steps:
 
-1. Add meta-spdxscanner layer into ``bblayers.conf``. 
+1. Add meta-spdxscanner layer into ``bblayers.conf``.
 
-2. Refer to the README in meta-spdxscanner to setup the environment (e.g, 
+2. Refer to the README in meta-spdxscanner to setup the environment (e.g,
    setup a fossology server) needed for the scanner.
 
 3. Meta-spdxscanner provides several methods within the bbclass to create spdx files.

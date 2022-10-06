@@ -5,6 +5,10 @@ FLASH_HOTH_UPDATE_OFFSET:hoth = "${@1024 if FLASH_SIZE == '65536' else 31744}"
 FLASH_HOTH_MAILBOX_OFFSET:hoth = "${@65472 if FLASH_SIZE == '65536' else 7168}"
 unset FLASH_UBOOT_ENV_OFFSET
 
+# 64 bit kernels are larger, so they require a different layout
+FLASH_IMAGE_DESC_OFFSET:hoth:aarch64 = "${@61312 if FLASH_SIZE == '65536' else 7232}"
+FLASH_HOTH_UPDATE_OFFSET:hoth:aarch64 = "${@61376 if FLASH_SIZE == '65536' else 31744}"
+
 python do_generate_static:append() {
     _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
                                'image-hoth-update'),
@@ -43,6 +47,44 @@ python do_generate_layout () {
 
     # TODO: make this work for Aspeed too
     region = [
+            convertPart(
+                    'u_boot',
+                    d.getVar('FLASH_UBOOT_OFFSET'),
+                    d.getVar('FLASH_KERNEL_OFFSET'),
+                    static=True,
+                    wp=True),
+            convertPart(
+                    'kernel',
+                    d.getVar('FLASH_KERNEL_OFFSET'),
+                    d.getVar('FLASH_ROFS_OFFSET'),
+                    static=True,
+                    wp=True),
+            convertPart(
+                    'rofs',
+                    d.getVar('FLASH_ROFS_OFFSET'),
+                    d.getVar('FLASH_IMAGE_DESC_OFFSET'),
+                    static=True,
+                    wp=True),
+            convertPart(
+                    'image_descriptor',
+                    d.getVar('FLASH_IMAGE_DESC_OFFSET'),
+                    d.getVar('FLASH_HOTH_UPDATE_OFFSET'),
+                    static=True,
+                    wp=True),
+            convertPart(
+                    'hoth_update',
+                    d.getVar('FLASH_HOTH_UPDATE_OFFSET'),
+                    d.getVar('FLASH_RWFS_OFFSET')),
+            convertPart(
+                    'rwfs',
+                    d.getVar('FLASH_RWFS_OFFSET'),
+                    d.getVar('FLASH_HOTH_MAILBOX_OFFSET'),
+                    persist=True),
+            convertPart(
+                    'hoth_mailbox',
+                    d.getVar('FLASH_HOTH_MAILBOX_OFFSET'),
+                    d.getVar('FLASH_SIZE')),
+    ] if d.getVar('TARGET_ARCH') == "aarch64" else [
             convertPart(
                     'u_boot',
                     d.getVar('FLASH_UBOOT_OFFSET'),

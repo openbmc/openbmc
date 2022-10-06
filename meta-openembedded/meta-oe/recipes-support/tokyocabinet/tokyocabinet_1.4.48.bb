@@ -17,6 +17,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=7fbc338309ac38fefcd64b04bb903e34"
 
 SRC_URI = "http://fallabs.com/tokyocabinet/${BP}.tar.gz \
            file://remove-hard-coded-include-and-lib-paths.patch \
+           file://0001-configure-Fix-check-functions-for-AC_CHECK_LIB-test.patch \
 "
 
 SRC_URI[md5sum] = "fd03df6965f8f56dd5b8518ca43b4f5e"

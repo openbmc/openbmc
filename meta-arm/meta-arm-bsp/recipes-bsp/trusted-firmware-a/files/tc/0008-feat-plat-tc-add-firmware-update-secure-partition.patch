@@ -1,0 +1,63 @@
+From 16f183e3c09d64fee92638ea9d0017ac7973ddf8 Mon Sep 17 00:00:00 2001
+From: Tudor Cretu <tudor.cretu@arm.com>
+Date: Fri, 24 Sep 2021 12:09:53 +0000
+Subject: [PATCH 1/2] feat(plat/tc): add firmware update secure partition
+
+Firmware update is a trusted service secure partition that implements
+the PSA firmware update specification. It executes in the secure world
+in total compute platform.
+
+Signed-off-by: Davidson K <davidson.kumaresan@arm.com>
+Signed-off-by: Tudor Cretu <tudor.cretu@arm.com>
+Change-Id: I6223d247b078de8c03b068185bf120b3d502f500
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ plat/arm/board/tc/fdts/tc_spmc_optee_sp_manifest.dts | 9 ++++++++-
+ plat/arm/board/tc/fdts/tc_tb_fw_config.dts           | 4 ++++
+ 2 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/plat/arm/board/tc/fdts/tc_spmc_optee_sp_manifest.dts b/plat/arm/board/tc/fdts/tc_spmc_optee_sp_manifest.dts
+index 92e2ddda6..23ad06888 100644
+--- a/plat/arm/board/tc/fdts/tc_spmc_optee_sp_manifest.dts
++++ b/plat/arm/board/tc/fdts/tc_spmc_optee_sp_manifest.dts
+@@ -28,7 +28,7 @@
+ 			load_address = <0xfd280000>;
+ 			vcpu_count = <8>;
+ #ifdef TS_SP_FW_CONFIG
+-			mem_size = <26738688>; /* 25MB TZC DRAM */
++			mem_size = <20447232>; /* 19MB TZC DRAM */
+ #else
+ 			mem_size = <30928896>; /* 29MB TZC DRAM */
+ #endif
+@@ -48,6 +48,13 @@
+ 			vcpu_count = <1>;
+ 			mem_size = <2097152>; /* 2MB TZC DRAM */
+ 		};
++		vm4 {
++			is_ffa_partition;
++			debug_name = "firmware-update";
++			load_address = <0xfe600000>;
++			vcpu_count = <1>;
++			mem_size = <6291456>; /* 6MB TZC DRAM */
++		};
+ #endif
+ 	};
+ 
+diff --git a/plat/arm/board/tc/fdts/tc_tb_fw_config.dts b/plat/arm/board/tc/fdts/tc_tb_fw_config.dts
+index a5bb520fe..2c640b363 100644
+--- a/plat/arm/board/tc/fdts/tc_tb_fw_config.dts
++++ b/plat/arm/board/tc/fdts/tc_tb_fw_config.dts
+@@ -41,6 +41,10 @@
+ 		       uuid = "d9df52d5-16a2-4bb2-9aa4-d26d3b84e8c0";
+ 		       load-address = <0xfec00000>;
+ 		};
++		firmware-update {
++		       uuid = "6823a838-1b06-470e-9774-0cce8bfb53fd";
++		       load-address = <0xfe600000>;
++		};
+ #endif
+ #if OPTEE_SP_FW_CONFIG
+ 		op-tee {
+-- 
+2.34.1
+

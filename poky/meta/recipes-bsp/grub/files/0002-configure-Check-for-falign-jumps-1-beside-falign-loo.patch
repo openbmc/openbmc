@@ -1,0 +1,59 @@
+From e372dcb0d4541ee9b9682cde088ec87a7b238ca2 Mon Sep 17 00:00:00 2001
+From: Fangrui Song via Grub-devel <grub-devel@gnu.org>
+Date: Thu, 26 Aug 2021 09:02:32 -0700
+Subject: [PATCH 2/2] configure: Check for -falign-jumps=1 beside
+ -falign-loops=1
+
+The Clang does not support -falign-jumps and only recently gained support
+for -falign-loops. The -falign-jumps=1 should be tested beside
+-fliang-loops=1 to avoid passing unrecognized options to the Clang:
+
+  clang-14: error: optimization flag '-falign-jumps=1' is not supported [-Werror,-Wignored-optimization-argument]
+
+The -falign-functions=1 is supported by GCC 5.1.0/Clang 3.8.0. So, just
+add the option unconditionally.
+
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/grub.git/commit/?id=e372dcb0d4541ee9b9682cde088ec87a7b238ca2]
+Signed-off-by: Fangrui Song <maskray@google.com>
+Acked-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ configure.ac | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 9a12151bd..eeb5d2211 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -798,6 +798,8 @@ fi
+ 
+ # Force no alignment to save space on i386.
+ if test "x$target_cpu" = xi386; then
++  TARGET_CFLAGS="$TARGET_CFLAGS -falign-functions=1"
++
+   AC_CACHE_CHECK([whether -falign-loops works], [grub_cv_cc_falign_loop], [
+     CFLAGS="$TARGET_CFLAGS -falign-loops=1 -Werror"
+     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[]])],
+@@ -806,7 +808,18 @@ if test "x$target_cpu" = xi386; then
+   ])
+ 
+   if test "x$grub_cv_cc_falign_loop" = xyes; then
+-    TARGET_CFLAGS="$TARGET_CFLAGS -falign-jumps=1 -falign-loops=1 -falign-functions=1"
++    TARGET_CFLAGS="$TARGET_CFLAGS -falign-loops=1"
++  fi
++
++  AC_CACHE_CHECK([whether -falign-jumps works], [grub_cv_cc_falign_jumps], [
++    CFLAGS="$TARGET_CFLAGS -falign-jumps=1 -Werror"
++    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[]])],
++        [grub_cv_cc_falign_jumps=yes],
++        [grub_cv_cc_falign_jumps=no])
++  ])
++
++  if test "x$grub_cv_cc_falign_jumps" = xyes; then
++    TARGET_CFLAGS="$TARGET_CFLAGS -falign-jumps=1"
+   fi
+ fi
+ 
+-- 
+2.37.3
+

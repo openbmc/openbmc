@@ -1,0 +1,29 @@
+From ca8f7d968a212f2da64492faac4f80384a5ba395 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 11 Sep 2022 13:23:19 -0700
+Subject: [PATCH] Use builtin for clear_cache
+
+This makes it compile on mips/clang and also portable across platforms
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lj_mcode.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lj_mcode.c b/src/lj_mcode.c
+index 163aada4..471897da 100644
+--- a/src/lj_mcode.c
++++ b/src/lj_mcode.c
+@@ -46,7 +46,7 @@ void lj_mcode_sync(void *start, void *end)
+ #elif LJ_TARGET_PPC
+   lj_vm_cachesync(start, end);
+ #elif defined(__GNUC__) || defined(__clang__)
+-  __clear_cache(start, end);
++  __builtin___clear_cache(start, end);
+ #else
+ #error "Missing builtin to flush instruction cache"
+ #endif
+-- 
+2.37.3
+

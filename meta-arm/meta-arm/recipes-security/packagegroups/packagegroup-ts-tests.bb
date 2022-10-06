@@ -1,10 +1,10 @@
 SUMMARY = "Trusted Services test/demo linux tools"
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 inherit packagegroup
 
 COMPATIBLE_HOST = "aarch64.*-linux"
-
-PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 PACKAGES = "${PN} ${PN}-psa"
 

@@ -1,0 +1,48 @@
+From 73aab76042ae34fa4b07414c1830129e572dcd65 Mon Sep 17 00:00:00 2001
+From: sahil <sahil@arm.com>
+Date: Wed, 20 Apr 2022 12:24:41 +0530
+Subject: [PATCH 2/3] Platform/ARM/N1Sdp: Fix RemoteDdrSize cast
+
+RemoteDdrSize calculation wraps around when booting N1Sdp in
+multichip mode. Casting it to UINT64 to fix the issue.
+
+Upstream-Status: Pending
+Signed-off-by: Adam Johnston <adam.johnston@arm.com>
+Signed-off-by: Xueliang Zhong <xueliang.zhong@arm.com>
+Signed-off-by: sahil <sahil@arm.com>
+Change-Id: I2c2a70c2ab046337236fba92d25dec5905ccd117
+
+---
+ .../ConfigurationManagerDxe/ConfigurationManager.c              | 2 +-
+ Silicon/ARM/NeoverseN1Soc/Library/PlatformLib/PlatformLibMem.c  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Platform/ARM/N1Sdp/ConfigurationManager/ConfigurationManagerDxe/ConfigurationManager.c b/Platform/ARM/N1Sdp/ConfigurationManager/ConfigurationManagerDxe/ConfigurationManager.c
+index e023d47c..36b5fc9e 100644
+--- a/Platform/ARM/N1Sdp/ConfigurationManager/ConfigurationManagerDxe/ConfigurationManager.c
++++ b/Platform/ARM/N1Sdp/ConfigurationManager/ConfigurationManagerDxe/ConfigurationManager.c
+@@ -1254,7 +1254,7 @@ InitializePlatformRepository (
+   PlatRepoInfo->MemAffInfo[LOCAL_DDR_REGION2].Length = Dram2Size;
+ 
+   if (PlatInfo->MultichipMode == 1) {
+-    RemoteDdrSize = ((PlatInfo->RemoteDdrSize - 2) * SIZE_1GB);
++    RemoteDdrSize = ((UINT64)(PlatInfo->RemoteDdrSize - 2) * SIZE_1GB);
+ 
+     // Update Remote DDR Region1
+     PlatRepoInfo->MemAffInfo[REMOTE_DDR_REGION1].ProximityDomain = 1;
+diff --git a/Silicon/ARM/NeoverseN1Soc/Library/PlatformLib/PlatformLibMem.c b/Silicon/ARM/NeoverseN1Soc/Library/PlatformLib/PlatformLibMem.c
+index b58bda4b..fbc9b05e 100644
+--- a/Silicon/ARM/NeoverseN1Soc/Library/PlatformLib/PlatformLibMem.c
++++ b/Silicon/ARM/NeoverseN1Soc/Library/PlatformLib/PlatformLibMem.c
+@@ -157,7 +157,7 @@ ArmPlatformGetVirtualMemoryMap (
+     DramBlock2Size);
+ 
+   if (PlatInfo->MultichipMode == 1) {
+-    RemoteDdrSize = ((PlatInfo->RemoteDdrSize - 2) * SIZE_1GB);
++    RemoteDdrSize = ((UINT64)(PlatInfo->RemoteDdrSize - 2) * SIZE_1GB);
+ 
+     BuildResourceDescriptorHob (
+       EFI_RESOURCE_SYSTEM_MEMORY,
+-- 
+2.37.2
+

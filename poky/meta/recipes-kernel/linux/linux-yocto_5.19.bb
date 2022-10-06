@@ -13,24 +13,24 @@ KBRANCH:qemux86  ?= "v5.19/standard/base"
 KBRANCH:qemux86-64 ?= "v5.19/standard/base"
 KBRANCH:qemumips64 ?= "v5.19/standard/mti-malta64"
 
-SRCREV_machine:qemuarm ?= "2cbb2d5097fc44a23da635d2ebbccb33df20a34d"
-SRCREV_machine:qemuarm64 ?= "4d933456709d664a55fdda85304c08567265ad4d"
-SRCREV_machine:qemumips ?= "7741c5b2f536b99815329849cca09799cdb82e62"
-SRCREV_machine:qemuppc ?= "4d933456709d664a55fdda85304c08567265ad4d"
-SRCREV_machine:qemuriscv64 ?= "4d933456709d664a55fdda85304c08567265ad4d"
-SRCREV_machine:qemuriscv32 ?= "4d933456709d664a55fdda85304c08567265ad4d"
-SRCREV_machine:qemux86 ?= "4d933456709d664a55fdda85304c08567265ad4d"
-SRCREV_machine:qemux86-64 ?= "4d933456709d664a55fdda85304c08567265ad4d"
-SRCREV_machine:qemumips64 ?= "4ced38bbd45f6cb623728bd755894928a719edac"
-SRCREV_machine ?= "4d933456709d664a55fdda85304c08567265ad4d"
-SRCREV_meta ?= "5eb0fa93f8490a962ff0c36c14d8def271d75128"
+SRCREV_machine:qemuarm ?= "446661f6a3b07535304497c1a51d9cab95f48f0b"
+SRCREV_machine:qemuarm64 ?= "65a9a22786a6710fc7b4edb7cfae80dd83f591f1"
+SRCREV_machine:qemumips ?= "98da147618fca3da29cf1c6ab9c53f24de2c587c"
+SRCREV_machine:qemuppc ?= "65a9a22786a6710fc7b4edb7cfae80dd83f591f1"
+SRCREV_machine:qemuriscv64 ?= "65a9a22786a6710fc7b4edb7cfae80dd83f591f1"
+SRCREV_machine:qemuriscv32 ?= "65a9a22786a6710fc7b4edb7cfae80dd83f591f1"
+SRCREV_machine:qemux86 ?= "65a9a22786a6710fc7b4edb7cfae80dd83f591f1"
+SRCREV_machine:qemux86-64 ?= "65a9a22786a6710fc7b4edb7cfae80dd83f591f1"
+SRCREV_machine:qemumips64 ?= "53842054198d851b5deb5810afaf126156efbb54"
+SRCREV_machine ?= "65a9a22786a6710fc7b4edb7cfae80dd83f591f1"
+SRCREV_meta ?= "350b544d077955b599b54ab364f6227d96a90455"
 
 # set your preferred provider of linux-yocto to 'linux-yocto-upstream', and you'll
 # get the <version>/base branch, which is pure upstream -stable, and the same
 # meta SRCREV as the linux-yocto-standard builds. Select your version using the
 # normal PREFERRED_VERSION settings.
 BBCLASSEXTEND = "devupstream:target"
-SRCREV_machine:class-devupstream ?= "bf44eed7f2fc9af74eb72f4bc415bdd3d11c4bed"
+SRCREV_machine:class-devupstream ?= "d1105a680e66b0482bd18048534c58ecabb5c284"
 PN:class-devupstream = "linux-yocto-upstream"
 KBRANCH:class-devupstream = "v5.19/base"
 
@@ -38,7 +38,7 @@ SRC_URI = "git://git.yoctoproject.org/linux-yocto.git;name=machine;branch=${KBRA
            git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-5.19;destsuffix=${KMETA}"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
-LINUX_VERSION ?= "5.19.3"
+LINUX_VERSION ?= "5.19.9"
 
 DEPENDS += "${@bb.utils.contains('ARCH', 'x86', 'elfutils-native', '', d)}"
 DEPENDS += "openssl-native util-linux-native"
@@ -56,7 +56,7 @@ COMPATIBLE_MACHINE = "^(qemuarm|qemuarmv5|qemuarm64|qemux86|qemuppc|qemuppc64|qe
 # Functionality flags
 KERNEL_EXTRA_FEATURES ?= "features/netfilter/netfilter.scc"
 KERNEL_FEATURES:append = " ${KERNEL_EXTRA_FEATURES}"
-KERNEL_FEATURES:append:qemuall=" cfg/virtio.scc features/drm-bochs/drm-bochs.scc"
+KERNEL_FEATURES:append:qemuall=" cfg/virtio.scc features/drm-bochs/drm-bochs.scc cfg/net/mdio.scc"
 KERNEL_FEATURES:append:qemux86=" cfg/sound.scc cfg/paravirt_kvm.scc"
 KERNEL_FEATURES:append:qemux86-64=" cfg/sound.scc cfg/paravirt_kvm.scc"
 KERNEL_FEATURES:append = " ${@bb.utils.contains("TUNE_FEATURES", "mx32", " cfg/x32.scc", "", d)}"

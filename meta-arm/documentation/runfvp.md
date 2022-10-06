@@ -116,6 +116,14 @@ Arbitrary extra arguments that are passed directly to the FVP.  For example:
 FVP_EXTRA_ARGS = "--simlimit 60"
 ```
 
+### `FVP_ENV_PASSTHROUGH`
+
+The FVP is launched with an isolated set of environment variables. Add the name of a Bitbake variable to this list to pass it through to the FVP environment. For example:
+
+```
+FVP_ENV_PASSTHROUGH = "ARMLMD_LICENSE_FILE FM_TRACE_PLUGINS"
+```
+
 
 [AEM]: https://developer.arm.com/tools-and-software/simulation-models/fixed-virtual-platforms/arm-ecosystem-models
 [FVP]: https://developer.arm.com/tools-and-software/simulation-models/fixed-virtual-platforms

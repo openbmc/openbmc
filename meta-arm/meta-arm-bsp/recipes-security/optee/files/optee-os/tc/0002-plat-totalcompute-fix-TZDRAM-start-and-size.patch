@@ -1,0 +1,50 @@
+From 35dba075593cb32c62b881e7763fcf0ea37908f7 Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Mon, 23 May 2022 11:32:41 +0100
+Subject: [PATCH 2/2] plat-totalcompute: fix TZDRAM start and size
+
+- Fix TZDRAM_SIZE in TC platform
+- For CFG_CORE_SEL2_SPMC, manifest size is increased from 0x1000 to
+  0x4000 for boot protocol support.
+
+Upstream-Status: Pending [Not submitted to upstream yet]
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Change-Id: Iff19c498e9edae961f469604d69419c1a32145f5
+---
+ core/arch/arm/plat-totalcompute/conf.mk                    | 5 +++--
+ core/arch/arm/plat-totalcompute/fdts/optee_sp_manifest.dts | 2 +-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/core/arch/arm/plat-totalcompute/conf.mk b/core/arch/arm/plat-totalcompute/conf.mk
+index b39ac0f0..2f6c0ee1 100644
+--- a/core/arch/arm/plat-totalcompute/conf.mk
++++ b/core/arch/arm/plat-totalcompute/conf.mk
+@@ -32,8 +32,9 @@ ifeq ($(CFG_CORE_SEL1_SPMC),y)
+ CFG_TZDRAM_START ?= 0xfd000000
+ CFG_TZDRAM_SIZE  ?= 0x02000000
+ else ifeq ($(CFG_CORE_SEL2_SPMC),y)
+-CFG_TZDRAM_START ?= 0xfd281000
+-CFG_TZDRAM_SIZE  ?= 0x01d7f000
++CFG_TZDRAM_START ?= 0xfd284000
++# TZDRAM size 0x1980000 - 0x4000 manifest size
++CFG_TZDRAM_SIZE  ?= 0x0197c000
+ else
+ CFG_TZDRAM_START ?= 0xff000000
+ CFG_TZDRAM_SIZE  ?= 0x01000000
+diff --git a/core/arch/arm/plat-totalcompute/fdts/optee_sp_manifest.dts b/core/arch/arm/plat-totalcompute/fdts/optee_sp_manifest.dts
+index 00cfa5b2..56e69f37 100644
+--- a/core/arch/arm/plat-totalcompute/fdts/optee_sp_manifest.dts
++++ b/core/arch/arm/plat-totalcompute/fdts/optee_sp_manifest.dts
+@@ -20,7 +20,7 @@
+ 	exception-level = <2>; /* S-EL1 */
+ 	execution-state = <0>; /* AARCH64 */
+ 	load-address = <0xfd280000>;
+-	entrypoint-offset = <0x1000>;
++	entrypoint-offset = <0x4000>;
+ 	xlat-granule = <0>; /* 4KiB */
+ 	boot-order = <0>;
+ 	messaging-method = <0x3>; /* Direct request/response supported */
+-- 
+2.34.1
+

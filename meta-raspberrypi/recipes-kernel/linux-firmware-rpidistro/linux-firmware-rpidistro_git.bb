@@ -15,7 +15,9 @@ NO_GENERIC_LICENSE[binary-redist-Cypress-rpidistro] = "debian/config/brcm80211/c
 NO_GENERIC_LICENSE[Synaptics-rpidistro] = "debian/config/brcm80211/copyright"
 LICENSE_FLAGS = "synaptics-killswitch"
 
-SRC_URI = "git://github.com/RPi-Distro/firmware-nonfree;branch=bullseye;protocol=https"
+SRC_URI = "git://github.com/RPi-Distro/firmware-nonfree;branch=bullseye;protocol=https \
+    file://0001-Default-43455-firmware-to-standard-variant.patch \
+"
 SRCREV = "541e5a05d152e7e6f0d9be45622e4a3741e51c02"
 PV = "20210315-3+rpt7"
 S = "${WORKDIR}/git"

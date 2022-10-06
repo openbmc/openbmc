@@ -14,19 +14,19 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
  configure | 4 ----
  1 file changed, 4 deletions(-)
 
-diff --git a/configure b/configure
-index 7c08c1835..0613279f9 100755
---- a/configure
-+++ b/configure
-@@ -3118,7 +3118,6 @@ if test "$skip_meson" = no; then
-   fi
+Index: qemu-7.1.0/configure
+===================================================================
+--- qemu-7.1.0.orig/configure
++++ qemu-7.1.0/configure
+@@ -2710,7 +2710,6 @@ if test "$skip_meson" = no; then
    echo "strip = [$(meson_quote $strip)]" >> $cross
+   echo "widl = [$(meson_quote $widl)]" >> $cross
    echo "windres = [$(meson_quote $windres)]" >> $cross
 -  if test "$cross_compile" = "yes"; then
      cross_arg="--cross-file config-meson.cross"
      echo "[host_machine]" >> $cross
      echo "system = '$targetos'" >> $cross
-@@ -3136,9 +3135,6 @@ if test "$skip_meson" = no; then
+@@ -2728,9 +2727,6 @@ if test "$skip_meson" = no; then
      else
          echo "endian = 'little'" >> $cross
      fi
@@ -36,6 +36,3 @@ index 7c08c1835..0613279f9 100755
    mv $cross config-meson.cross
  
    rm -rf meson-private meson-info meson-logs
--- 
-2.30.2
-

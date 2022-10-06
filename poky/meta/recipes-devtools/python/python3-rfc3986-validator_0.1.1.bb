@@ -13,7 +13,7 @@ UPSTREAM_CHECK_REGEX = "/rfc3986-validator/(?P<pver>(\d+[\.\-_]*)+)/"
 
 inherit pypi setuptools3
 
-SRC_URI:append = " \
+SRC_URI += "\
     file://0001-setup.py-move-pytest-runner-to-test_requirements.patch \
 "
 

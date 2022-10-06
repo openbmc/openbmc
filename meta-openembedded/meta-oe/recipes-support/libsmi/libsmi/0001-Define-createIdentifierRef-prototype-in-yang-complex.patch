@@ -1,0 +1,53 @@
+From 77b520a8ee193b6d9f12e049f505d8d98204c11c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 31 Aug 2022 17:13:32 -0700
+Subject: [PATCH] Define createIdentifierRef prototype in yang-complex-types.c
+
+Provide needed prototype to make compiler happy
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/parser-yang.y        | 3 ++-
+ lib/yang-complex-types.c | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+--- a/lib/parser-yang.y
++++ b/lib/parser-yang.y
+@@ -41,7 +41,8 @@
+ #include "yang-complex-types.h"
+ #include "util.h"
+ #include "error.h"
+-    
++#include "yang-check.h"
++
+ #ifdef HAVE_DMALLOC_H
+ #include <dmalloc.h>
+ #endif
+@@ -61,7 +62,8 @@
+ #define debug
+ #endif
+ 
+-    
++extern void createIdentifierRef(struct _YangNode *node, char* prefix, char* ident);
++extern void smiyyerror(char *msg, Parser *parserPtr);
+ /*
+  * NOTE: The argument lvalp ist not really a void pointer. Unfortunately,
+  * we don't know it better at this point. bison generated C code declares
+--- a/lib/yang-complex-types.c
++++ b/lib/yang-complex-types.c
+@@ -35,12 +35,13 @@
+ #include "yang-data.h"
+ #include "yang-check.h"
+ #include "yang-complex-types.h"
+-
+ /*
+  * Current parser defined in parser-yang. Workaround - can't include data.h
+  */
+ extern Parser *currentParser;
+ 
++extern void createIdentifierRef(struct _YangNode *node, char* prefix, char* ident);
++
+ static const int parents_complex_type[] = {
+     YANG_DECL_MODULE, YANG_DECL_SUBMODULE, YANG_DECL_CONTAINER,
+     YANG_DECL_LIST, YANG_DECL_RPC, YANG_DECL_INPUT,

@@ -7,16 +7,16 @@ SECTION = "libs"
 LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4d794c5d710e5b3547a6cc6a6609a641"
 
-inherit autotools pkgconfig
+inherit autotools pkgconfig github-releases
 
 DEPENDS = "bison-native flex-native"
 
-SRC_URI = "https://github.com/${BPN}/${BPN}/releases/download/v3.0/${BP}.tar.gz \
+SRC_URI = "${GITHUB_BASE_URI}/download/v3.0/${BP}.tar.gz \
            file://0001-api-Use-GNU-strerror_r-when-available.patch \
 "
+UPSTREAM_CHECK_URI = "https://github.com/libcgroup/libcgroup/tags"
 
 SRC_URI[sha256sum] = "8d284d896fca1c981b55850e92acd3ad9648a69227c028dda7ae3402af878edd"
-UPSTREAM_CHECK_URI = "https://github.com/libcgroup/libcgroup/releases/"
 
 DEPENDS:append:libc-musl = " fts "
 EXTRA_OEMAKE:append:libc-musl = " LIBS=-lfts"

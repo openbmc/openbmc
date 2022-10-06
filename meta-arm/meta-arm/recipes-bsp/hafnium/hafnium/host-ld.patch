@@ -1,3 +1,8 @@
+From 9b1b93184c365a07b340c9404a6a0581e971bd54 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Tue, 9 Nov 2021 23:31:22 +0000
+Subject: [PATCH] arm/hafnium: fix kernel tool linking
+
 We need to be sure that the host linker flags are passed to the kernel build,
 as otherwise it is possible that binaries are incorrectly linked. For example:
 
@@ -7,8 +12,12 @@ ld: .../recipe-sysroot-native/usr/lib/pkgconfig/../../../usr/lib/libcrypto.so: u
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 
+---
+ build/linux/linux.gni | 1 +
+ 1 file changed, 1 insertion(+)
+
 diff --git a/build/linux/linux.gni b/build/linux/linux.gni
-index 65cc9df..19adbfb 100644
+index 45860fa..b010254 100644
 --- a/build/linux/linux.gni
 +++ b/build/linux/linux.gni
 @@ -60,6 +60,7 @@ template("linux_kernel") {
@@ -16,6 +25,6 @@ index 65cc9df..19adbfb 100644
      "LLVM_IAS=1",
      "CROSS_COMPILE=aarch64-linux-gnu-",
 +    "HOSTLDFLAGS=" + getenv("BUILD_LDFLAGS"),
-
+ 
      # Build out-of-tree in `target_out_dir`.
      "O=" + rebase_path(target_out_dir),

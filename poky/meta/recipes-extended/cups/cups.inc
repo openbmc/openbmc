@@ -8,7 +8,7 @@ SECTION = "console/utils"
 LICENSE = "Apache-2.0"
 DEPENDS = "libpng jpeg dbus zlib libusb1"
 
-SRC_URI = "https://github.com/OpenPrinting/cups/releases/download/v${PV}/cups-${PV}-source.tar.gz \
+SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/cups-${PV}-source.tar.gz \
            file://0001-use-echo-only-in-init.patch \
            file://0002-don-t-try-to-run-generated-binaries.patch \
            file://libexecdir.patch \
@@ -17,8 +17,7 @@ SRC_URI = "https://github.com/OpenPrinting/cups/releases/download/v${PV}/cups-${
            file://cups-volatiles.conf \
            "
 
-UPSTREAM_CHECK_URI = "https://github.com/OpenPrinting/cups/releases"
-UPSTREAM_CHECK_REGEX = "cups-(?P<pver>(?!.+\d(b|rc)\d.+).+)-source.tar"
+GITHUB_BASE_URI = "https://github.com/OpenPrinting/cups/releases"
 
 # Issue only applies to MacOS
 CVE_CHECK_IGNORE += "CVE-2008-1033"
@@ -33,7 +32,7 @@ LEAD_SONAME = "libcupsdriver.so"
 
 CLEANBROKEN = "1"
 
-inherit autotools-brokensep binconfig useradd systemd pkgconfig multilib_script
+inherit autotools-brokensep binconfig useradd systemd pkgconfig multilib_script github-releases
 
 USERADD_PACKAGES = "${PN}"
 GROUPADD_PARAM:${PN} = "--system lpadmin"

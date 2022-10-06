@@ -1,0 +1,27 @@
+From faec0206611f8ea4ca6f70987866077ac8c3c6c1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 2 Sep 2022 21:24:27 -0700
+Subject: [PATCH] getopt: Include string.h for strcmp/stcncmp functions
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ compat/getopt.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/compat/getopt.c b/compat/getopt.c
+index 752f28a..9b984b4 100644
+--- a/compat/getopt.c
++++ b/compat/getopt.c
+@@ -43,6 +43,7 @@
+ #endif
+ 
+ #include <stdio.h>
++#include <string.h> /* strcmp */
+ 
+ /* Comment out all this code if we are using the GNU C Library, and are not
+    actually compiling the library itself.  This code is part of the GNU C
+-- 
+2.37.3
+

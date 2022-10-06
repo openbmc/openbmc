@@ -545,7 +545,7 @@ def mirror_from_string(data):
         bb.warn('Invalid mirror data %s, should have paired members.' % data)
     return list(zip(*[iter(mirrors)]*2))
 
-def verify_checksum(ud, d, precomputed={}):
+def verify_checksum(ud, d, precomputed={}, localpath=None, fatal_nochecksum=True):
     """
     verify the MD5 and SHA256 checksum for downloaded src
 
@@ -563,13 +563,16 @@ def verify_checksum(ud, d, precomputed={}):
     if ud.ignore_checksums or not ud.method.supports_checksum(ud):
         return {}
 
+    if localpath is None:
+        localpath = ud.localpath
+
     def compute_checksum_info(checksum_id):
         checksum_name = getattr(ud, "%s_name" % checksum_id)
 
         if checksum_id in precomputed:
             checksum_data = precomputed[checksum_id]
         else:
-            checksum_data = getattr(bb.utils, "%s_file" % checksum_id)(ud.localpath)
+            checksum_data = getattr(bb.utils, "%s_file" % checksum_id)(localpath)
 
         checksum_expected = getattr(ud, "%s_expected" % checksum_id)
 
@@ -595,7 +598,7 @@ def verify_checksum(ud, d, precomputed={}):
             checksum_lines = ["SRC_URI[%s] = \"%s\"" % (ci["name"], ci["data"])]
 
     # If no checksum has been provided
-    if ud.method.recommends_checksum(ud) and all(ci["expected"] is None for ci in checksum_infos):
+    if fatal_nochecksum and ud.method.recommends_checksum(ud) and all(ci["expected"] is None for ci in checksum_infos):
         messages = []
         strict = d.getVar("BB_STRICT_CHECKSUM") or "0"
 
@@ -627,7 +630,7 @@ def verify_checksum(ud, d, precomputed={}):
     for ci in checksum_infos:
         if ci["expected"] and ci["expected"] != ci["data"]:
             messages.append("File: '%s' has %s checksum '%s' when '%s' was " \
-                            "expected" % (ud.localpath, ci["id"], ci["data"], ci["expected"]))
+                            "expected" % (localpath, ci["id"], ci["data"], ci["expected"]))
             bad_checksum = ci["data"]
 
     if bad_checksum:
@@ -977,6 +980,7 @@ def build_mirroruris(origud, mirrors, ld):
 
                 try:
                     newud = FetchData(newuri, ld)
+                    newud.ignore_checksums = True
                     newud.setup_localpath(ld)
                 except bb.fetch2.BBFetchException as e:
                     logger.debug("Mirror fetch failure for url %s (original url: %s)" % (newuri, origud.url))

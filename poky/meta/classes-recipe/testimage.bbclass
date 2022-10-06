@@ -189,11 +189,7 @@ def get_testimage_boot_patterns(d):
                     search_login_succeeded,search_cmd_finished\n Make sure your TESTIMAGE_BOOT_PATTERNS=%s \
                     contains an accepted flag.' % d.getVar('TESTIMAGE_BOOT_PATTERNS'))
                     return
-                # We know boot prompt is searched through in binary format, others might be expressions
-                if flag == 'search_reached_prompt':
-                    boot_patterns[flag] = flagval.encode()
-                else:
-                    boot_patterns[flag] = flagval.encode().decode('unicode-escape')
+                boot_patterns[flag] = flagval.encode().decode('unicode-escape')
     return boot_patterns
 
 
@@ -472,10 +468,7 @@ def create_rpm_index(d):
         package_list = glob.glob(idx_path + "*/*.rpm")
 
         for pkg in package_list:
-            if os.path.basename(pkg).startswith(("curl-ptest")):
-                bb.utils.remove(pkg)
-
-            if not os.path.basename(pkg).startswith(("rpm", "run-postinsts", "busybox", "bash", "update-alternatives", "libc6", "curl", "musl")):
+            if not os.path.basename(pkg).startswith(("dnf-test-", "busybox", "update-alternatives", "libc6", "musl")):
                 bb.utils.remove(pkg)
 
         bb.utils.unlockfile(lf)

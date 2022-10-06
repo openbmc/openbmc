@@ -1,0 +1,63 @@
+From e66885e66a2ce7fd916933b12d1ba523a25141e4 Mon Sep 17 00:00:00 2001
+From: Alex Kiernan <alex.kiernan@gmail.com>
+Date: Mon, 3 Oct 2022 13:25:05 +0100
+Subject: [PATCH] Honour multilib paths
+
+Upstream-Status: Pending
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ CMakeLists.txt | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 39b9ad365f78..bf297e936a72 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,8 +20,8 @@ endif ()
+ 
+ # Set some nicer output dirs.
+ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
++set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
++set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
+ set(JANSSON_TEMP_DIR ${CMAKE_CURRENT_BINARY_DIR}/tmp)
+ 
+ # Give the debug version a different postfix for windows,
+@@ -573,14 +573,14 @@ endif ()
+ #
+ 
+ # Allow the user to override installation directories.
+-set(JANSSON_INSTALL_LIB_DIR       lib CACHE PATH "Installation directory for libraries")
++set(JANSSON_INSTALL_LIB_DIR       ${CMAKE_INSTALL_LIBDIR} CACHE PATH "Installation directory for libraries")
+ set(JANSSON_INSTALL_BIN_DIR       bin CACHE PATH "Installation directory for executables")
+ set(JANSSON_INSTALL_INCLUDE_DIR   include CACHE PATH "Installation directory for header files")
+ 
+ if(WIN32 AND NOT CYGWIN)
+   set(DEF_INSTALL_CMAKE_DIR cmake)
+ else()
+-  set(DEF_INSTALL_CMAKE_DIR lib/cmake/jansson)
++  set(DEF_INSTALL_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/jansson)
+ endif()
+ 
+ set(JANSSON_INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH "Installation directory for CMake files")
+@@ -633,8 +633,8 @@ option(JANSSON_INSTALL "Generate installation target" ON)
+ if (JANSSON_INSTALL)
+   install(TARGETS jansson
+           EXPORT janssonTargets
+-          LIBRARY DESTINATION "lib"
+-          ARCHIVE DESTINATION "lib"
++          LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
++          ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+           RUNTIME DESTINATION "bin"
+           INCLUDES DESTINATION "include")
+ 
+@@ -644,7 +644,7 @@ if (JANSSON_INSTALL)
+   # Install the pkg-config.
+   install(FILES
+           ${CMAKE_CURRENT_BINARY_DIR}/jansson.pc
+-          DESTINATION lib/pkgconfig)
++          DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+ 
+   # Install the configs.
+   install(FILES

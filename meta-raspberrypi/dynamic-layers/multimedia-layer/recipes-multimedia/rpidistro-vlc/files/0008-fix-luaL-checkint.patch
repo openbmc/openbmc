@@ -1,0 +1,233 @@
+* luaL_checkint and luaL_optint were deprecated in lua 5.3
+* replacement functions are luaL_checkinteger and luaL_optinteger
+
+Upstream-status: Pending
+
+Signed-off-by: Tim Orling <TicoTimo@gmail.com>
+
+--- a/modules/lua/demux.c
++++ b/modules/lua/demux.c
+@@ -52,7 +52,7 @@ struct vlclua_playlist
+ static int vlclua_demux_peek( lua_State *L )
+ {
+     stream_t *s = (stream_t *)vlclua_get_this(L);
+-    int n = luaL_checkint( L, 1 );
++    int n = luaL_checkinteger( L, 1 );
+     const uint8_t *p_peek;
+ 
+     ssize_t val = vlc_stream_Peek(s->p_source, &p_peek, n);
+@@ -66,7 +66,7 @@ static int vlclua_demux_peek( lua_State
+ static int vlclua_demux_read( lua_State *L )
+ {
+     stream_t *s = (stream_t *)vlclua_get_this(L);
+-    int n = luaL_checkint( L, 1 );
++    int n = luaL_checkinteger( L, 1 );
+     char *buf = malloc(n);
+ 
+     if (buf != NULL)
+--- a/modules/lua/libs/net.c
++++ b/modules/lua/libs/net.c
+@@ -179,7 +179,7 @@ static int vlclua_net_listen_tcp( lua_St
+ {
+     vlc_object_t *p_this = vlclua_get_this( L );
+     const char *psz_host = luaL_checkstring( L, 1 );
+-    int i_port = luaL_checkint( L, 2 );
++    int i_port = luaL_checkinteger( L, 2 );
+     int *pi_fd = net_ListenTCP( p_this, psz_host, i_port );
+     if( pi_fd == NULL )
+         return luaL_error( L, "Cannot listen on %s:%d", psz_host, i_port );
+@@ -251,7 +251,7 @@ static int vlclua_net_connect_tcp( lua_S
+ {
+     vlc_object_t *p_this = vlclua_get_this( L );
+     const char *psz_host = luaL_checkstring( L, 1 );
+-    int i_port = luaL_checkint( L, 2 );
++    int i_port = luaL_checkinteger( L, 2 );
+     int i_fd = net_ConnectTCP( p_this, psz_host, i_port );
+     lua_pushinteger( L, vlclua_fd_map_safe( L, i_fd ) );
+     return 1;
+@@ -259,14 +259,14 @@ static int vlclua_net_connect_tcp( lua_S
+ 
+ static int vlclua_net_close( lua_State *L )
+ {
+-    int i_fd = luaL_checkint( L, 1 );
++    int i_fd = luaL_checkinteger( L, 1 );
+     vlclua_fd_unmap_safe( L, i_fd );
+     return 0;
+ }
+ 
+ static int vlclua_net_send( lua_State *L )
+ {
+-    int fd = vlclua_fd_get( L, luaL_checkint( L, 1 ) );
++    int fd = vlclua_fd_get( L, luaL_checkinteger( L, 1 ) );
+     size_t i_len;
+     const char *psz_buffer = luaL_checklstring( L, 2, &i_len );
+ 
+@@ -278,7 +278,7 @@ static int vlclua_net_send( lua_State *L
+ 
+ static int vlclua_net_recv( lua_State *L )
+ {
+-    int fd = vlclua_fd_get( L, luaL_checkint( L, 1 ) );
++    int fd = vlclua_fd_get( L, luaL_checkinteger( L, 1 ) );
+     size_t i_len = (size_t)luaL_optinteger( L, 2, 1 );
+     char psz_buffer[i_len];
+ 
+@@ -312,7 +312,7 @@ static int vlclua_net_poll( lua_State *L
+     lua_pushnil( L );
+     for( int i = 0; lua_next( L, 1 ); i++ )
+     {
+-        luafds[i] = luaL_checkint( L, -2 );
++        luafds[i] = luaL_checkinteger( L, -2 );
+         p_fds[i].fd = vlclua_fd_get( L, luafds[i] );
+         p_fds[i].events = luaL_checkinteger( L, -1 );
+         p_fds[i].events &= POLLIN | POLLOUT | POLLPRI;
+@@ -360,7 +360,7 @@ static int vlclua_fd_open( lua_State *L
+ #ifndef _WIN32
+ static int vlclua_fd_write( lua_State *L )
+ {
+-    int fd = vlclua_fd_get( L, luaL_checkint( L, 1 ) );
++    int fd = vlclua_fd_get( L, luaL_checkinteger( L, 1 ) );
+     size_t i_len;
+     const char *psz_buffer = luaL_checklstring( L, 2, &i_len );
+ 
+@@ -371,7 +371,7 @@ static int vlclua_fd_write( lua_State *L
+ 
+ static int vlclua_fd_read( lua_State *L )
+ {
+-    int fd = vlclua_fd_get( L, luaL_checkint( L, 1 ) );
++    int fd = vlclua_fd_get( L, luaL_checkinteger( L, 1 ) );
+     size_t i_len = (size_t)luaL_optinteger( L, 2, 1 );
+     char psz_buffer[i_len];
+ 
+--- a/modules/lua/libs/osd.c
++++ b/modules/lua/libs/osd.c
+@@ -154,7 +154,7 @@ static int vlc_osd_slider_type_from_stri
+ 
+ static int vlclua_osd_slider( lua_State *L )
+ {
+-    int i_position = luaL_checkint( L, 1 );
++    int i_position = luaL_checkinteger( L, 1 );
+     const char *psz_type = luaL_checkstring( L, 2 );
+     int i_type = vlc_osd_slider_type_from_string( psz_type );
+     int i_chan = (int)luaL_optinteger( L, 3, VOUT_SPU_CHANNEL_OSD );
+@@ -198,7 +198,7 @@ static int vlclua_spu_channel_register(
+ 
+ static int vlclua_spu_channel_clear( lua_State *L )
+ {
+-    int i_chan = luaL_checkint( L, 1 );
++    int i_chan = luaL_checkinteger( L, 1 );
+     input_thread_t *p_input = vlclua_get_input_internal( L );
+     if( !p_input )
+         return luaL_error( L, "Unable to find input." );
+--- a/modules/lua/libs/playlist.c
++++ b/modules/lua/libs/playlist.c
+@@ -69,7 +69,7 @@ static int vlclua_playlist_next( lua_Sta
+ 
+ static int vlclua_playlist_skip( lua_State * L )
+ {
+-    int i_skip = luaL_checkint( L, 1 );
++    int i_skip = luaL_checkinteger( L, 1 );
+     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
+     playlist_Skip( p_playlist, i_skip );
+     return 0;
+@@ -127,7 +127,7 @@ static int vlclua_playlist_random( lua_S
+ 
+ static int vlclua_playlist_gotoitem( lua_State * L )
+ {
+-    int i_id = luaL_checkint( L, 1 );
++    int i_id = luaL_checkinteger( L, 1 );
+     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
+     PL_LOCK;
+     playlist_ViewPlay( p_playlist, NULL,
+@@ -138,7 +138,7 @@ static int vlclua_playlist_gotoitem( lua
+ 
+ static int vlclua_playlist_delete( lua_State * L )
+ {
+-    int i_id = luaL_checkint( L, 1 );
++    int i_id = luaL_checkinteger( L, 1 );
+     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
+ 
+     PL_LOCK;
+@@ -152,8 +152,8 @@ static int vlclua_playlist_delete( lua_S
+ 
+ static int vlclua_playlist_move( lua_State * L )
+ {
+-    int i_item = luaL_checkint( L, 1 );
+-    int i_target = luaL_checkint( L, 2 );
++    int i_item = luaL_checkinteger( L, 1 );
++    int i_target = luaL_checkinteger( L, 2 );
+     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
+     PL_LOCK;
+     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_item );
+--- a/modules/lua/libs/stream.c
++++ b/modules/lua/libs/stream.c
+@@ -123,7 +123,7 @@ static int vlclua_stream_read( lua_State
+ {
+     int i_read;
+     stream_t **pp_stream = (stream_t **)luaL_checkudata( L, 1, "stream" );
+-    int n = luaL_checkint( L, 2 );
++    int n = luaL_checkinteger( L, 2 );
+     uint8_t *p_read = malloc( n );
+     if( !p_read ) return vlclua_error( L );
+ 
+--- a/modules/lua/libs/volume.c
++++ b/modules/lua/libs/volume.c
+@@ -48,7 +48,7 @@
+ static int vlclua_volume_set( lua_State *L )
+ {
+     playlist_t *p_this = vlclua_get_playlist_internal( L );
+-    int i_volume = luaL_checkint( L, 1 );
++    int i_volume = luaL_checkinteger( L, 1 );
+     if( i_volume < 0 )
+         i_volume = 0;
+     int i_ret = playlist_VolumeSet( p_this, i_volume/(float)AOUT_VOLUME_DEFAULT );
+--- a/modules/lua/libs/dialog.c
++++ b/modules/lua/libs/dialog.c
+@@ -382,7 +382,7 @@ static int lua_GetDialogUpdate( lua_Stat
+     /* Read entry in the Lua registry */
+     lua_pushlightuserdata( L, (void*) &key_update );
+     lua_gettable( L, LUA_REGISTRYINDEX );
+-    return luaL_checkint( L, -1 );
++    return luaL_checkinteger( L, -1 );
+ }
+ 
+ /** Manually update a dialog
+@@ -573,22 +573,22 @@ static int vlclua_create_widget_inner( l
+ 
+     /* Set common arguments: col, row, hspan, vspan, width, height */
+     if( lua_isnumber( L, arg ) )
+-        p_widget->i_column = luaL_checkint( L, arg );
++        p_widget->i_column = luaL_checkinteger( L, arg );
+     else goto end_of_args;
+     if( lua_isnumber( L, ++arg ) )
+-        p_widget->i_row = luaL_checkint( L, arg );
++        p_widget->i_row = luaL_checkinteger( L, arg );
+     else goto end_of_args;
+     if( lua_isnumber( L, ++arg ) )
+-        p_widget->i_horiz_span = luaL_checkint( L, arg );
++        p_widget->i_horiz_span = luaL_checkinteger( L, arg );
+     else goto end_of_args;
+     if( lua_isnumber( L, ++arg ) )
+-        p_widget->i_vert_span = luaL_checkint( L, arg );
++        p_widget->i_vert_span = luaL_checkinteger( L, arg );
+     else goto end_of_args;
+     if( lua_isnumber( L, ++arg ) )
+-        p_widget->i_width = luaL_checkint( L, arg );
++        p_widget->i_width = luaL_checkinteger( L, arg );
+     else goto end_of_args;
+     if( lua_isnumber( L, ++arg ) )
+-        p_widget->i_height = luaL_checkint( L, arg );
++        p_widget->i_height = luaL_checkinteger( L, arg );
+     else goto end_of_args;
+ 
+ end_of_args:
+--- a/modules/lua/libs/io.c
++++ b/modules/lua/libs/io.c
+@@ -139,7 +139,7 @@ static int vlclua_io_file_seek( lua_Stat
+     const char* psz_mode = luaL_optstring( L, 2, NULL );
+     if ( psz_mode != NULL )
+     {
+-        long i_offset = luaL_optlong( L, 3, 0 );
++        long i_offset = (long)luaL_optinteger( L, 3, 0 );
+         int i_mode;
+         if ( !strcmp( psz_mode, "set" ) )
+             i_mode = SEEK_SET;

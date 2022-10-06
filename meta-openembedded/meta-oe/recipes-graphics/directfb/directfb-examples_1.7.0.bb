@@ -9,6 +9,7 @@ LICENSE = "MIT"
 SRC_URI = " \
            http://downloads.yoctoproject.org/mirror/sources/DirectFB-examples-${PV}.tar.gz \
            file://configure.in-Fix-string-argument-syntax.patch \
+           file://0001-spacedream-Add-typecast-to-pthread_t-in-assignment.patch \
           "
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=ecf6fd2b19915afc4da56043926ca18f"

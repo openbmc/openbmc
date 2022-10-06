@@ -13,6 +13,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=f27defe1e96c2e1ecd4e0c9be8967949"
 SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.gz \
            file://enscript-autoconf.patch \
            file://0001-Fix-builds-with-recent-gettext.patch \
+           file://0001-getopt-Include-string.h-for-strcmp-stcncmp-functions.patch \
            "
 
 inherit autotools gettext

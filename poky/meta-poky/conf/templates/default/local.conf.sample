@@ -234,7 +234,7 @@ BB_DISKMON_DIRS ??= "\
 # which will depend on your network.
 # Note: For this to work you also need hash-equivalence passthrough to the matching server
 #
-#BB_HASHSERVE_UPSTREAM = "typhoon.yocto.io:8687"
+#BB_HASHSERVE_UPSTREAM = "hashserv.yocto.io:8687"
 #SSTATE_MIRRORS ?= "file://.* http://sstate.yoctoproject.org/all/PATH;downloadfilename=PATH"
 
 #

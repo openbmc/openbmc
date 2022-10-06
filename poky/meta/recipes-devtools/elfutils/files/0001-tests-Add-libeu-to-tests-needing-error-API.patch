@@ -1,0 +1,147 @@
+From c05c787070a390a2061bfcb845e1e35e8b1373b3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 13 Sep 2022 09:33:00 -0700
+Subject: [PATCH] tests: Add libeu to tests needing error() API
+
+A local error() impelmentation is used when libc does not provide it,
+therefore link in libeu.a which contains this function in tests needing
+error() API
+
+Upstream-Status: Submitted [https://sourceware.org/pipermail/elfutils-devel/2022q3/005375.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/Makefile.am | 60 +++++++++++++++++++++++------------------------
+ 1 file changed, 30 insertions(+), 30 deletions(-)
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 3943e17..1acc49b 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -638,17 +638,17 @@ libeu = ../lib/libeu.a
+ arextract_LDADD = $(libelf)
+ arsymtest_LDADD = $(libelf)
+ newfile_LDADD = $(libelf)
+-saridx_LDADD = $(libelf)
++saridx_LDADD = $(libeu) $(libelf)
+ scnnames_LDADD = $(libelf)
+-sectiondump_LDADD = $(libelf)
++sectiondump_LDADD = $(libeu) $(libelf)
+ showptable_LDADD = $(libelf)
+ hash_LDADD = $(libelf)
+ test_nlist_CFLAGS =-g -O0 $(EXTRA_NLIST_CFLAGS)
+ test_nlist_LDADD = $(libelf)
+ msg_tst_LDADD = $(libelf)
+ newscn_LDADD = $(libelf)
+-early_offscn_LDADD = $(libelf)
+-ecp_LDADD = $(libelf)
++early_offscn_LDADD = $(libeu) $(libelf)
++ecp_LDADD = $(libeu) $(libelf)
+ update1_LDADD = $(libelf)
+ update2_LDADD = $(libelf)
+ update3_LDADD = $(libdw) $(libelf)
+@@ -662,12 +662,12 @@ get_files_LDADD = $(libdw) $(libelf)
+ next_files_LDADD = $(libdw) $(libelf)
+ get_aranges_LDADD = $(libdw) $(libelf)
+ allfcts_LDADD = $(libdw) $(libelf)
+-line2addr_LDADD = $(libdw) $(argp_LDADD)
+-addrscopes_LDADD = $(libdw) $(argp_LDADD)
+-funcscopes_LDADD = $(libdw) $(argp_LDADD)
+-funcretval_LDADD = $(libdw) $(argp_LDADD)
+-allregs_LDADD = $(libdw) $(argp_LDADD)
+-find_prologues_LDADD = $(libdw) $(argp_LDADD)
++line2addr_LDADD = $(libeu) $(libdw) $(argp_LDADD)
++addrscopes_LDADD = $(libeu) $(libdw) $(argp_LDADD)
++funcscopes_LDADD = $(libeu) $(libdw) $(argp_LDADD)
++funcretval_LDADD = $(libeu) $(libdw) $(argp_LDADD)
++allregs_LDADD = $(libeu) $(libdw) $(argp_LDADD)
++find_prologues_LDADD = $(libeu) $(libdw) $(argp_LDADD)
+ #show_ciefde_LDADD = ../libdwarf/libdwarf.so $(libelf)
+ asm_tst1_LDADD = $(libasm) $(libebl) $(libelf) $(libdw)
+ asm_tst2_LDADD = $(libasm) $(libebl) $(libelf) $(libdw)
+@@ -678,19 +678,19 @@ asm_tst6_LDADD = $(libasm) $(libebl) $(libelf) $(libdw)
+ asm_tst7_LDADD = $(libasm) $(libebl) $(libelf) $(libdw)
+ asm_tst8_LDADD = $(libasm) $(libebl) $(libelf) $(libdw)
+ asm_tst9_LDADD = $(libasm) $(libebl) $(libelf) $(libdw)
+-dwflmodtest_LDADD = $(libdw) $(libebl) $(libelf) $(argp_LDADD)
+-rdwrmmap_LDADD = $(libelf)
++dwflmodtest_LDADD = $(libeu) $(libdw) $(libebl) $(libelf) $(argp_LDADD)
++rdwrmmap_LDADD = $(libeu) $(libelf)
+ dwfl_bug_addr_overflow_LDADD = $(libdw) $(libebl) $(libelf)
+ arls_LDADD = $(libelf)
+-dwfl_bug_fd_leak_LDADD = $(libdw) $(libebl) $(libelf)
++dwfl_bug_fd_leak_LDADD = $(libeu) $(libdw) $(libebl) $(libelf)
+ dwfl_bug_report_LDADD = $(libdw) $(libebl) $(libelf)
+-dwfl_bug_getmodules_LDADD = $(libdw) $(libebl) $(libelf)
+-dwfl_addr_sect_LDADD = $(libdw) $(libebl) $(libelf) $(argp_LDADD)
++dwfl_bug_getmodules_LDADD = $(libeu) $(libdw) $(libebl) $(libelf)
++dwfl_addr_sect_LDADD = $(libeu) $(libdw) $(libebl) $(libelf) $(argp_LDADD)
+ dwarf_getmacros_LDADD = $(libdw)
+ dwarf_ranges_LDADD = $(libdw)
+ dwarf_getstring_LDADD = $(libdw)
+ addrcfi_LDADD = $(libdw) $(libebl) $(libelf) $(argp_LDADD)
+-dwarfcfi_LDADD = $(libdw) $(libelf)
++dwarfcfi_LDADD = $(libeu) $(libdw) $(libelf)
+ test_flag_nobits_LDADD = $(libelf)
+ rerequest_tag_LDADD = $(libdw)
+ alldts_LDADD = $(libdw) $(libelf)
+@@ -699,35 +699,35 @@ typeiter2_LDADD = $(libdw) $(libelf)
+ low_high_pc_LDADD = $(libdw) $(libelf) $(argp_LDADD)
+ test_elf_cntl_gelf_getshdr_LDADD = $(libelf)
+ dwflsyms_LDADD = $(libdw) $(libelf) $(argp_LDADD)
+-dwfllines_LDADD = $(libdw) $(libelf) $(argp_LDADD)
+-dwfl_report_elf_align_LDADD = $(libdw)
++dwfllines_LDADD = $(libeu) $(libdw) $(libelf) $(argp_LDADD)
++dwfl_report_elf_align_LDADD = $(libeu) $(libdw)
+ dwfl_report_segment_contiguous_LDADD = $(libdw) $(libebl) $(libelf)
+-varlocs_LDADD = $(libdw) $(libelf) $(argp_LDADD)
+-backtrace_LDADD = $(libdw) $(libelf) $(argp_LDADD)
++varlocs_LDADD = $(libeu) $(libdw) $(libelf) $(argp_LDADD)
++backtrace_LDADD = $(libeu) $(libdw) $(libelf) $(argp_LDADD)
+ # backtrace-child-biarch also uses those *_CFLAGS and *_LDLAGS variables:
+ backtrace_child_CFLAGS = $(fpie_CFLAGS)
+ backtrace_child_LDFLAGS = -pie -pthread
+ backtrace_child_biarch_SOURCES = backtrace-child.c
+-backtrace_data_LDADD = $(libdw) $(libelf)
++backtrace_data_LDADD = $(libeu) $(libdw) $(libelf)
+ backtrace_dwarf_CFLAGS = -Wno-unused-parameter
+-backtrace_dwarf_LDADD = $(libdw) $(libelf)
+-debuglink_LDADD = $(libdw) $(libelf)
+-debugaltlink_LDADD = $(libdw) $(libelf)
+-buildid_LDADD = $(libdw) $(libelf)
++backtrace_dwarf_LDADD = $(libeu) $(libdw) $(libelf)
++debuglink_LDADD = $(libeu) $(libdw) $(libelf)
++debugaltlink_LDADD = $(libeu) $(libdw) $(libelf)
++buildid_LDADD = $(libeu) $(libdw) $(libelf)
+ deleted_LDADD = ./deleted-lib.so
+ deleted_lib_so_LDFLAGS = -shared
+ deleted_lib_so_CFLAGS = $(fpic_CFLAGS) -fasynchronous-unwind-tables
+ aggregate_size_LDADD = $(libdw) $(libelf) $(argp_LDADD)
+ peel_type_LDADD = $(libdw) $(libelf) $(argp_LDADD)
+-vdsosyms_LDADD = $(libdw) $(libelf)
+-getsrc_die_LDADD = $(libdw) $(libelf)
++vdsosyms_LDADD = $(libeu) $(libdw) $(libelf)
++getsrc_die_LDADD = $(libeu) $(libdw) $(libelf)
+ strptr_LDADD = $(libelf)
+ newdata_LDADD = $(libelf)
+ elfstrtab_LDADD = $(libelf)
+-dwfl_proc_attach_LDADD = $(libdw)
++dwfl_proc_attach_LDADD = $(libeu) $(libdw)
+ dwfl_proc_attach_LDFLAGS = -pthread -rdynamic $(AM_LDFLAGS)
+ elfshphehdr_LDADD =$(libelf)
+-elfstrmerge_LDADD = $(libdw) $(libelf)
++elfstrmerge_LDADD = $(libeu) $(libdw) $(libelf)
+ dwelfgnucompressed_LDADD = $(libelf) $(libdw)
+ elfgetchdr_LDADD = $(libelf) $(libdw)
+ elfgetzdata_LDADD = $(libelf)
+@@ -743,7 +743,7 @@ get_units_split_LDADD = $(libdw)
+ attr_integrate_skel_LDADD = $(libdw)
+ all_dwarf_ranges_LDADD = $(libdw)
+ unit_info_LDADD = $(libdw)
+-next_cfi_LDADD = $(libelf) $(libdw)
++next_cfi_LDADD = $(libeu) $(libelf) $(libdw)
+ elfcopy_LDADD = $(libelf)
+ addsections_LDADD = $(libelf)
+ debuginfod_build_id_find_LDADD = $(libelf) $(libdw)
+-- 
+2.37.3
+

@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=fa22e16ebbe6638b2bd253338fbded9f"
 DEPENDS = "nettle autoconf-archive"
 
 SRC_URI = "https://rdfind.pauldreik.se/${BP}.tar.gz \
+           file://0001-configure-Fix-check-for-AC_CHECK_LIB.patch \
 "
 
 SRC_URI[md5sum] = "180418c863b861d1df221bc486a07ce7"

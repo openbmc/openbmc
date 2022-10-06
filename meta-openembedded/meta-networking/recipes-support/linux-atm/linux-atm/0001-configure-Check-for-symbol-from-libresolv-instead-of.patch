@@ -1,0 +1,28 @@
+From a2a2e1b7a3f4f90e32912b5ba9b79e1a02275775 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 1 Sep 2022 11:17:13 -0700
+Subject: [PATCH] configure: Check for symbol from libresolv instead of main
+
+This checks will fail with modern autoconf and compilers
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/configure.in
++++ b/configure.in
+@@ -45,12 +45,7 @@ AC_CHECK_HEADER(linux/atmsap.h, ,
+ )
+ 
+ dnl Check for libraries
+-dnl libresolv is required
+-AC_CHECK_LIB(resolv, main, ,
+-	AC_MSG_ERROR([*** Unable to find libresolv!!!])
+-)
+ 
+-dnl We don't want libresolv everywhere, just with libatm
+ LIBS=""
+ 
+ INCLUDES="-I\$(top_srcdir)/src/include"

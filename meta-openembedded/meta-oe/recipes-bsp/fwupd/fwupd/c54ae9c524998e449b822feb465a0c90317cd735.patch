@@ -1,0 +1,26 @@
+From c54ae9c524998e449b822feb465a0c90317cd735 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 20 Sep 2022 15:10:26 +0100
+Subject: [PATCH] trivial: Fix compile when using python 3.7 or older
+
+Upstream-Status: Backport [https://github.com/fwupd/fwupd/pull/5051]
+Signed-off-by: Richard Hughes <richard@hughsie.com>
+---
+ contrib/generate-gresource-xml.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/contrib/generate-gresource-xml.py b/contrib/generate-gresource-xml.py
+index 235a770020..569c804937 100755
+--- a/contrib/generate-gresource-xml.py
++++ b/contrib/generate-gresource-xml.py
+@@ -23,6 +23,9 @@
+         n_file.set("preprocess", "xml-stripblanks")
+     n_file.set("alias", os.path.basename(fn))
+ with open(sys.argv[1], "wb") as f:
+-    f.write(ET.tostring(root, "utf-8", xml_declaration=True))
++    try:
++        f.write(ET.tostring(root, "utf-8", xml_declaration=True))
++    except TypeError:
++        f.write(ET.tostring(root, "utf-8"))
+ 
+ sys.exit(0)

@@ -21,3 +21,10 @@ SRC_URI += "file://0001-Use-compiler-fcf-protection-only-if-compiler-arch-su.pat
 S = "${WORKDIR}/${BPN}-${PV}-Source"
 
 inherit cmake gettext
+
+do_install:append:class-target() {
+    # reproducibility: remove build host path
+    sed -i ${D}${libdir}/cmake/exiv2/exiv2Config.cmake \
+        -e 's:${STAGING_DIR_HOST}::g'
+}
+

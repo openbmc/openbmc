@@ -1,0 +1,22 @@
+From f9ea91771f0d3c984e7d5fe9e15962db1ee686ad Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 29 Aug 2022 09:39:16 -0700
+Subject: [PATCH 2/2] ippool_rpc_server.c: Add missing prototype for
+ ippool_api_rpc_check_request
+
+Upstream-Status: Inappropriate [no upstream]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ippool_rpc_server.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+--- a/Makefile
++++ b/Makefile
+@@ -123,6 +123,7 @@ $(IPPOOL_RPC_STEM)_server.c:	$(IPPOOL_RP
+ 			-$(RM) $@ $@.tmp
+ 			rpcgen $(RPCGENFLAGS) -m -o $@.tmp $<
+ 			cat $@.tmp | sed -e 's/switch (rqstp->rq_proc) {/if (ippool_api_rpc_check_request(transp) < 0) return; switch (rqstp->rq_proc) {/' > $@
++			sed -i '20i int ippool_api_rpc_check_request(SVCXPRT *xprt);' $@
+ 
+ $(IPPOOL_RPC_STEM)_client.c:	$(IPPOOL_RPC_STEM).x
+ 			-$(RM) $@

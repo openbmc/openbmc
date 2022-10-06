@@ -1,0 +1,27 @@
+From 2897794c337625d1951eb0b402cd8840ae2182a8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 31 Aug 2022 10:33:57 -0700
+Subject: [PATCH] correct the typo in include file name string.h
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tools/serial_forward/src/forward.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/serial_forward/src/forward.c b/tools/serial_forward/src/forward.c
+index 9fad6f9b..4c0dd9df 100644
+--- a/tools/serial_forward/src/forward.c
++++ b/tools/serial_forward/src/forward.c
+@@ -20,7 +20,7 @@
+ #include <stdlib.h>
+ #include <unistd.h>
+ #include <termios.h>
+-#include <strings.h>
++#include <string.h>
+ #include <getopt.h>
+ 
+ #include "forward.h"
+-- 
+2.37.3
+

@@ -1,7 +1,7 @@
-From 7a1a84ea74fdd06a7f5f239f4c5f4b727d6cd232 Mon Sep 17 00:00:00 2001
+From 910760408430de32ad08b1e5ddf894cc9f2f3d0c Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Thu, 24 Jun 2021 09:25:00 +0100
-Subject: [PATCH 01/24] cmd: load: add load command for memory mapped
+Subject: [PATCH 01/26] cmd: load: add load command for memory mapped
 
 cp.b is used a lot as a way to load binaries to memory and execute
 them, however we may need to integrate this with the efi subsystem to
@@ -16,6 +16,7 @@ with this a kernel with CONFIG_EFI_STUB enabled will be loaded and
 then subsequently booted with bootefi command.
 
 Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+Upstream-Status: Accepted [2022.10-rc1]
 ---
  README                           |  1 +
  cmd/Kconfig                      |  6 ++++
@@ -26,7 +27,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  6 files changed, 78 insertions(+)
 
 diff --git a/README b/README
-index b7ab6e50708d..cd76f95e74c1 100644
+index b7ab6e5070..cd76f95e74 100644
 --- a/README
 +++ b/README
 @@ -2578,6 +2578,7 @@ rarpboot- boot image via network using RARP/TFTP protocol
@@ -38,7 +39,7 @@ index b7ab6e50708d..cd76f95e74c1 100644
  mm	- memory modify (auto-incrementing)
  nm	- memory modify (constant address)
 diff --git a/cmd/Kconfig b/cmd/Kconfig
-index 09193b61b95f..ba2f321ae989 100644
+index 09193b61b9..ba2f321ae9 100644
 --- a/cmd/Kconfig
 +++ b/cmd/Kconfig
 @@ -1143,6 +1143,12 @@ config CMD_LOADB
@@ -55,7 +56,7 @@ index 09193b61b95f..ba2f321ae989 100644
  	bool "loads"
  	default y
 diff --git a/cmd/bootefi.c b/cmd/bootefi.c
-index 827fcd97dfd8..37ce659fa123 100644
+index 827fcd97df..37ce659fa1 100644
 --- a/cmd/bootefi.c
 +++ b/cmd/bootefi.c
 @@ -34,6 +34,18 @@ static struct efi_device_path *bootefi_device_path;
@@ -78,7 +79,7 @@ index 827fcd97dfd8..37ce659fa123 100644
   * efi_clear_bootdev() - clear boot device
   */
 diff --git a/cmd/load.c b/cmd/load.c
-index 7e4a552d90ef..1224a7f85bb3 100644
+index 7e4a552d90..1224a7f85b 100644
 --- a/cmd/load.c
 +++ b/cmd/load.c
 @@ -1063,6 +1063,44 @@ static ulong load_serial_ymodem(ulong offset, int mode)
@@ -141,7 +142,7 @@ index 7e4a552d90ef..1224a7f85bb3 100644
 +);
 +#endif /* CONFIG_CMD_LOADM */
 diff --git a/include/efi_loader.h b/include/efi_loader.h
-index 11930fbea838..5b41985244e2 100644
+index 11930fbea8..5b41985244 100644
 --- a/include/efi_loader.h
 +++ b/include/efi_loader.h
 @@ -591,6 +591,8 @@ efi_status_t efi_load_pe(struct efi_loaded_image_obj *handle,
@@ -154,7 +155,7 @@ index 11930fbea838..5b41985244e2 100644
  void efi_add_handle(efi_handle_t obj);
  /* Create handle */
 diff --git a/lib/efi_loader/efi_device_path.c b/lib/efi_loader/efi_device_path.c
-index 171661b89727..2493d7432613 100644
+index 171661b897..2493d74326 100644
 --- a/lib/efi_loader/efi_device_path.c
 +++ b/lib/efi_loader/efi_device_path.c
 @@ -1158,6 +1158,8 @@ efi_status_t efi_dp_from_name(const char *dev, const char *devnr,
@@ -181,5 +182,5 @@ index 171661b89727..2493d7432613 100644
  		part = blk_get_device_part_str(dev, devnr, &desc, &fs_partition,
  					       1);
 -- 
-2.37.1
+2.17.1
 

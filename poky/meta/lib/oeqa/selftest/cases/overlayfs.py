@@ -333,24 +333,14 @@ EXTRA_IMAGE_FEATURES += "package-management"
         self.assertTrue("overlayfs-etc" in res.output, msg=res.output)
         self.assertTrue("package-management" in res.output, msg=res.output)
 
-    def test_image_feature_is_missing_class_included(self):
-        configAppend = """
-INHERIT += "overlayfs-etc"
-"""
-        self.run_check_image_feature(configAppend)
-
     def test_image_feature_is_missing(self):
-        self.run_check_image_feature()
-
-    def run_check_image_feature(self, appendToConfig=""):
         """
         Summary:   Overlayfs-etc class is not applied when image feature is not set
-                   even if we inherit it directly,
         Expected:  Image is created successfully but /etc is not an overlay
         Author:    Vyacheslav Yurkov <uvv.mail@gmail.com>
         """
 
-        config = f"""
+        config = """
 DISTRO_FEATURES:append = " systemd"
 
 # Use systemd as init manager
@@ -366,7 +356,6 @@ EXTRA_IMAGE_FEATURES += "read-only-rootfs"
 # Image configuration for overlayfs-etc
 OVERLAYFS_ETC_MOUNT_POINT = "/data"
 OVERLAYFS_ETC_DEVICE = "/dev/sda3"
-{appendToConfig}
 """
 
         self.write_config(config)
@@ -392,7 +381,84 @@ OVERLAYFS_ETC_DEVICE = "/dev/sda3"
         Author:    Vyacheslav Yurkov <uvv.mail@gmail.com>
         """
 
-        config = """
+        config = self.get_working_config()
+
+        args = {
+            'OVERLAYFS_INIT_OPTION': "" if origInit else "init=/sbin/preinit",
+            'OVERLAYFS_ETC_USE_ORIG_INIT_NAME': int(origInit == True)
+        }
+
+        self.write_config(config.format(**args))
+
+        bitbake('core-image-minimal')
+        testFile = "/etc/my-test-data"
+
+        with runqemu('core-image-minimal', image_fstype='wic', discard_writes=False) as qemu:
+            status, output = qemu.run_serial("/bin/mount")
+
+            line = getline_qemu(output, "/dev/sda3")
+            self.assertTrue("/data" in output, msg=output)
+
+            line = getline_qemu(output, "upperdir=/data/overlay-etc/upper")
+            self.assertTrue(line and line.startswith("/data/overlay-etc/upper on /etc type overlay"), msg=output)
+
+            # check that lower layer is not available
+            status, output = qemu.run_serial("ls -1 /data/overlay-etc/lower")
+            line = getline_qemu(output, "No such file or directory")
+            self.assertTrue(line, msg=output)
+
+            status, output = qemu.run_serial("touch " + testFile)
+            status, output = qemu.run_serial("sync")
+            status, output = qemu.run_serial("ls -1 " + testFile)
+            line = getline_qemu(output, testFile)
+            self.assertTrue(line and line.startswith(testFile), msg=output)
+
+        # Check that file exists in /etc after reboot
+        with runqemu('core-image-minimal', image_fstype='wic') as qemu:
+            status, output = qemu.run_serial("ls -1 " + testFile)
+            line = getline_qemu(output, testFile)
+            self.assertTrue(line and line.startswith(testFile), msg=output)
+
+    def test_lower_layer_access(self):
+        """
+        Summary:   Test that lower layer of /etc is available read-only when configured
+        Expected:  Can't write to lower layer. The files on lower and upper different after
+                   modification
+        Author:    Vyacheslav Yurkov <uvv.mail@gmail.com>
+        """
+
+        config = self.get_working_config()
+
+        configLower = """
+OVERLAYFS_ETC_EXPOSE_LOWER = "1"
+IMAGE_INSTALL:append = " overlayfs-user"
+"""
+        testFile = "lower-layer-test.txt"
+
+        args = {
+            'OVERLAYFS_INIT_OPTION': "",
+            'OVERLAYFS_ETC_USE_ORIG_INIT_NAME': 1
+        }
+
+        self.write_config(config.format(**args))
+
+        self.append_config(configLower)
+        bitbake('core-image-minimal')
+
+        with runqemu('core-image-minimal', image_fstype='wic') as qemu:
+            status, output = qemu.run_serial("echo \"Modified in upper\" > /etc/" + testFile)
+            status, output = qemu.run_serial("diff /etc/" + testFile + " /data/overlay-etc/lower/" + testFile)
+            line = getline_qemu(output, "Modified in upper")
+            self.assertTrue(line, msg=output)
+            line = getline_qemu(output, "Original file")
+            self.assertTrue(line, msg=output)
+
+            status, output = qemu.run_serial("touch /data/overlay-etc/lower/ro-test.txt")
+            line = getline_qemu(output, "Read-only file system")
+            self.assertTrue(line, msg=output)
+
+    def get_working_config(self):
+        return """
 DISTRO_FEATURES:append = " systemd"
 
 # Use systemd as init manager
@@ -414,34 +480,3 @@ OVERLAYFS_ETC_FSTYPE = "ext4"
 OVERLAYFS_ETC_DEVICE = "/dev/sda3"
 OVERLAYFS_ETC_USE_ORIG_INIT_NAME = "{OVERLAYFS_ETC_USE_ORIG_INIT_NAME}"
 """
-
-        args = {
-            'OVERLAYFS_INIT_OPTION': "" if origInit else "init=/sbin/preinit",
-            'OVERLAYFS_ETC_USE_ORIG_INIT_NAME': int(origInit == True)
-        }
-
-        self.write_config(config.format(**args))
-
-        bitbake('core-image-minimal')
-        testFile = "/etc/my-test-data"
-
-        with runqemu('core-image-minimal', image_fstype='wic', discard_writes=False) as qemu:
-            status, output = qemu.run_serial("/bin/mount")
-
-            line = getline_qemu(output, "/dev/sda3")
-            self.assertTrue("/data" in output, msg=output)
-
-            line = getline_qemu(output, "upperdir=/data/overlay-etc/upper")
-            self.assertTrue(line and line.startswith("/data/overlay-etc/upper on /etc type overlay"), msg=output)
-
-            status, output = qemu.run_serial("touch " + testFile)
-            status, output = qemu.run_serial("sync")
-            status, output = qemu.run_serial("ls -1 " + testFile)
-            line = getline_qemu(output, testFile)
-            self.assertTrue(line and line.startswith(testFile), msg=output)
-
-        # Check that file exists in /etc after reboot
-        with runqemu('core-image-minimal', image_fstype='wic') as qemu:
-            status, output = qemu.run_serial("ls -1 " + testFile)
-            line = getline_qemu(output, testFile)
-            self.assertTrue(line and line.startswith(testFile), msg=output)

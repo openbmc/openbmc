@@ -30,9 +30,7 @@ S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
 
-EXTRA_OECONF += "--enable-cpluscplus"
-
-CFLAGS:append:libc-musl = " -D_GNU_SOURCE -DNO_GETCONTEXT -DSEARCH_FOR_DATA_START -DUSE_MMAP -DHAVE_DL_ITERATE_PHDR"
+EXTRA_OECONF += "--enable-cplusplus"
 
 FILES:${PN}-doc = "${datadir}"
 

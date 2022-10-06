@@ -6,7 +6,9 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=6ea91368c1bbdf877159435572b931f5 \
                     file://PATENTS;md5=e69ad12202bd20da3c76a5d3648cfa83 \
                    "
 
-SRC_URI = "git://aomedia.googlesource.com/aom;protocol=https;branch=main"
+SRC_URI = "git://aomedia.googlesource.com/aom;protocol=https;branch=main \
+           file://0001-subpel_variance_neon-Provide-prototypes-for-missing-.patch \
+          "
 
 SRCREV = "fd0c9275d36930a6eea6d3c35972e7cf9c512944"
 

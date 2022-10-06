@@ -1,0 +1,59 @@
+From 83f9da30247c2d021658bc1b595c59ecc35eadf5 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Fri, 29 Jul 2022 13:07:43 +0100
+Subject: [PATCH 07/26] arm64: smccc: clear the Xn registers after SMC calls
+
+set to zero the x0-x17 registers
+
+As per the SMCCC v1.2 spec, unused result and scratch registers can leak
+information after an SMC call. We can mitigate against this risk by
+returning zero in each register.
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20220926101723.9965-1-abdellatif.elkhlifi@arm.com/]
+---
+
+Changelog:
+===============
+
+v4:
+
+* move the clearing code into a new macro: clear_gp_regs
+
+v3:
+
+* clear the Xn registers after SMC calls
+
+ arch/arm/cpu/armv8/smccc-call.S | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/arch/arm/cpu/armv8/smccc-call.S b/arch/arm/cpu/armv8/smccc-call.S
+index ec6f299bc9..32f3eb8eeb 100644
+--- a/arch/arm/cpu/armv8/smccc-call.S
++++ b/arch/arm/cpu/armv8/smccc-call.S
+@@ -50,6 +50,12 @@ ENDPROC(__arm_smccc_hvc)
+ 
+ #ifdef CONFIG_ARM64
+ 
++	.macro	clear_gp_regs
++	.irp	n,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
++	mov	x\n, xzr
++	.endr
++	.endm
++
+ 	.macro SMCCC_1_2 instr
+ 	/* Save `res` and free a GPR that won't be clobbered */
+ 	stp     x1, x19, [sp, #-16]!
+@@ -84,6 +90,9 @@ ENDPROC(__arm_smccc_hvc)
+ 	stp	x14, x15, [x19, #ARM_SMCCC_1_2_REGS_X14_OFFS]
+ 	stp	x16, x17, [x19, #ARM_SMCCC_1_2_REGS_X16_OFFS]
+ 
++	/* x0-x17 registers can leak information after an SMC or HVC call. Let's clear them */
++	clear_gp_regs
++
+ 	/* Restore original x19 */
+ 	ldp     xzr, x19, [sp], #16
+ 	ret
+-- 
+2.17.1
+

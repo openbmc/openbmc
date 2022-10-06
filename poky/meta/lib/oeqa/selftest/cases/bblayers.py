@@ -14,7 +14,9 @@ from oeqa.selftest.case import OESelftestTestCase
 
 class BitbakeLayers(OESelftestTestCase):
 
-    def setUpLocal(self):
+    @classmethod
+    def setUpClass(cls):
+        super(BitbakeLayers, cls).setUpClass()
         bitbake("python3-jsonschema-native")
         bitbake("-c addto_recipe_sysroot python3-jsonschema-native")
 

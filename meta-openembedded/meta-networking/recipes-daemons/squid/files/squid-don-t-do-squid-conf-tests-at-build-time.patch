@@ -20,11 +20,11 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  1 file changed, 7 insertions(+), 8 deletions(-)
 
 diff --git a/test-suite/Makefile.am b/test-suite/Makefile.am
-index 061a463..350dfb2 100644
+index 0233c0e..e0021b6 100644
 --- a/test-suite/Makefile.am
 +++ b/test-suite/Makefile.am
-@@ -41,8 +41,7 @@ TESTS += debug \
- 	MemPoolTest\
+@@ -40,8 +40,7 @@ TESTS += debug \
+ 	splay\
  	mem_node_test\
  	mem_hdr_test\
 -	$(ESI_TESTS) \
@@ -33,7 +33,7 @@ index 061a463..350dfb2 100644
  
  ## Sort by alpha - any build failures are significant.
  check_PROGRAMS += debug \
-@@ -125,19 +124,19 @@ VirtualDeleteOperator_SOURCES = VirtualDeleteOperator.cc $(DEBUG_SOURCE)
+@@ -159,19 +158,19 @@ VirtualDeleteOperator_SOURCES = \
  ##$(TARGLIB): $(LIBOBJS)
  ##	$(AR_R) $(TARGLIB) $(LIBOBJS)
  

@@ -9,10 +9,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  docs/Makefile.am | 2 --
  1 file changed, 2 deletions(-)
 
-diff --git a/docs/Makefile.am b/docs/Makefile.am
-index 5a6bd203a..6257767fd 100644
---- a/docs/Makefile.am
-+++ b/docs/Makefile.am
+Index: git/docs/Makefile.am
+===================================================================
+--- git.orig/docs/Makefile.am
++++ git/docs/Makefile.am
 @@ -1,7 +1,5 @@
  ## Process this file with automake to produce Makefile.in
  
@@ -21,6 +21,3 @@ index 5a6bd203a..6257767fd 100644
  EXTRA_DIST =
  
  EXTRA_DIST += \
--- 
-2.32.0
-

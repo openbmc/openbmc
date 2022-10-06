@@ -1,0 +1,45 @@
+From 769e96b60f631e8c208fd7f72900d0bb17760f88 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 30 Aug 2022 09:54:11 +0800
+Subject: [PATCH] libopts.m4: set POSIX_SHELL to /bin/sh
+
+POSIX_SHELL is specified a host tool path as it searches path on build
+host using `which` when configure. Set it to a fixed path '/bin/sh'.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ m4/libopts.m4 | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
+
+diff --git a/m4/libopts.m4 b/m4/libopts.m4
+index cfbd477..c8047eb 100644
+--- a/m4/libopts.m4
++++ b/m4/libopts.m4
+@@ -111,21 +111,7 @@ AC_DEFUN([INVOKE_LIBOPTS_MACROS_FIRST],[
+   AC_CHECK_FUNCS([mmap canonicalize_file_name snprintf strdup strchr \
+                  strrchr strsignal fchmod fstat chmod])
+   AC_PROG_SED
+-  [while :
+-  do
+-      POSIX_SHELL=`which bash`
+-      test -x "$POSIX_SHELL" && break
+-      POSIX_SHELL=`which dash`
+-      test -x "$POSIX_SHELL" && break
+-      POSIX_SHELL=/usr/xpg4/bin/sh
+-      test -x "$POSIX_SHELL" && break
+-      POSIX_SHELL=`/bin/sh -c '
+-          exec 2>/dev/null
+-          if ! true ; then exit 1 ; fi
+-          echo /bin/sh'`
+-      test -x "$POSIX_SHELL" && break
+-      ]AC_MSG_ERROR([cannot locate a working POSIX shell])[
+-  done]
++  POSIX_SHELL='/bin/sh'
+   AC_DEFINE_UNQUOTED([POSIX_SHELL], ["${POSIX_SHELL}"],
+            [define to a working POSIX compliant shell])
+   AC_SUBST([POSIX_SHELL])
+-- 
+2.25.1
+

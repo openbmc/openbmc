@@ -81,6 +81,7 @@ python do_configure() {
 
     config.set(host_section, "cxx", e(d.expand("${RUST_TARGET_CXX}")))
     config.set(host_section, "cc", e(d.expand("${RUST_TARGET_CC}")))
+    config.set(host_section, "linker", e(d.expand("${RUST_TARGET_CCLD}")))
     if "musl" in host_section:
         config.set(host_section, "musl-root", e(d.expand("${STAGING_DIR_HOST}${exec_prefix}")))
 
@@ -94,6 +95,7 @@ python do_configure() {
 
         config.set(build_section, "cxx", e(d.expand("${RUST_BUILD_CXX}")))
         config.set(build_section, "cc", e(d.expand("${RUST_BUILD_CC}")))
+        config.set(build_section, "linker", e(d.expand("${RUST_BUILD_CCLD}")))
 
     target_section = "target.{}".format(d.getVar('RUST_TARGET_SYS', True))
     if target_section != host_section and target_section != build_section:
@@ -103,10 +105,13 @@ python do_configure() {
 
         config.set(target_section, "cxx", e(d.expand("${RUST_TARGET_CXX}")))
         config.set(target_section, "cc", e(d.expand("${RUST_TARGET_CC}")))
+        config.set(target_section, "linker", e(d.expand("${RUST_TARGET_CCLD}")))
 
     # [llvm]
     config.add_section("llvm")
     config.set("llvm", "static-libstdcpp", e(False))
+    if "llvm" in (d.getVar('TC_CXX_RUNTIME') or ""):
+        config.set("llvm", "use-libcxx", e(True))
 
     # [rust]
     config.add_section("rust")
@@ -115,6 +120,10 @@ python do_configure() {
 
     # Whether or not to optimize the compiler and standard library
     config.set("rust", "optimize", e(True))
+
+    # Emits extraneous output from tests to ensure that failures of the test
+    # harness are debuggable just from logfiles
+    config.set("rust", "verbose-tests", e(True))
 
     # [build]
     config.add_section("build")

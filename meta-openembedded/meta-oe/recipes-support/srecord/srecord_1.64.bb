@@ -7,6 +7,7 @@ SRC_URI = " \
     http://srecord.sourceforge.net/srecord-${PV}.tar.gz \
     file://add-option-to-remove-docs.patch \
     file://libtool.patch \
+    file://0001-configure-Fix-AC_CHECK_LIB-test-for-gpg-error.patch \
 "
 
 SRC_URI[md5sum] = "4de4a7497472d7972645c2af91313769"

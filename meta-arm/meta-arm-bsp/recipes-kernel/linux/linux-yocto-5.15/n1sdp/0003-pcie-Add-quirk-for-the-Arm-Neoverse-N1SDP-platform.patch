@@ -1,10 +1,7 @@
-Upstream-Status: Inappropriate [will not be submitted as its a workaround to address hardware issue]
-Signed-off-by: Deepak Pandey <Deepak.Pandey@arm.com>
-
-From 63ee3a71eeb778a632f5683f3b9e404a70760e75 Mon Sep 17 00:00:00 2001
+From 4877796976647a24a3a9102facd0577586f5ac9a Mon Sep 17 00:00:00 2001
 From: Deepak Pandey <Deepak.Pandey@arm.com>
 Date: Fri, 31 May 2019 16:42:43 +0100
-Subject: [PATCH 3/5] pcie: Add quirk for the Arm Neoverse N1SDP platform
+Subject: [PATCH] pcie: Add quirk for the Arm Neoverse N1SDP platform
 
 The Arm N1SDP SoC suffers from some PCIe integration issues, most
 prominently config space accesses to not existing BDFs being answered
@@ -27,6 +24,9 @@ Signed-off-by: Deepak Pandey <Deepak.Pandey@arm.com>
 Signed-off-by: Sudipto Paul <sudipto.paul@arm.com>
 [Andre: fix coding style issues, rewrite some parts, add DT support]
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+
+Upstream-Status: Inappropriate [will not be submitted as its a workaround to address hardware issue]
+Signed-off-by: Deepak Pandey <Deepak.Pandey@arm.com>
 ---
  arch/arm64/configs/defconfig        |   1 +
  drivers/acpi/pci_mcfg.c             |   7 +
@@ -38,10 +38,10 @@ Signed-off-by: Andre Przywara <andre.przywara@arm.com>
  create mode 100644 drivers/pci/controller/pcie-n1sdp.c
 
 diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index 545197bc0501..57ae850ccdf0 100644
+index c27d0fed2ce2..70ed38cecee9 100644
 --- a/arch/arm64/configs/defconfig
 +++ b/arch/arm64/configs/defconfig
-@@ -212,6 +212,7 @@ CONFIG_NFC_NCI=m
+@@ -209,6 +209,7 @@ CONFIG_NFC_NCI=m
  CONFIG_NFC_S3FWRN5_I2C=m
  CONFIG_PCI=y
  CONFIG_PCIEPORTBUS=y
@@ -50,23 +50,23 @@ index 545197bc0501..57ae850ccdf0 100644
  CONFIG_PCI_PASID=y
  CONFIG_HOTPLUG_PCI=y
 diff --git a/drivers/acpi/pci_mcfg.c b/drivers/acpi/pci_mcfg.c
-index 53cab975f612..f31727da21ac 100644
+index 63b98eae5e75..67c34e6c24a7 100644
 --- a/drivers/acpi/pci_mcfg.c
 +++ b/drivers/acpi/pci_mcfg.c
-@@ -169,6 +169,13 @@ static struct mcfg_fixup mcfg_quirks[] = {
- 	ALTRA_ECAM_QUIRK(1, 13),
- 	ALTRA_ECAM_QUIRK(1, 14),
- 	ALTRA_ECAM_QUIRK(1, 15),
-+
+@@ -152,6 +152,13 @@ static struct mcfg_fixup mcfg_quirks[] = {
+ 	XGENE_V2_ECAM_MCFG(4, 1),
+ 	XGENE_V2_ECAM_MCFG(4, 2),
+ 
 +#define N1SDP_ECAM_MCFG(rev, seg, ops) \
 +	{"ARMLTD", "ARMN1SDP", rev, seg, MCFG_BUS_ANY, ops }
 +
 +	/* N1SDP SoC with v1 PCIe controller */
 +	N1SDP_ECAM_MCFG(0x20181101, 0, &pci_n1sdp_pcie_ecam_ops),
 +	N1SDP_ECAM_MCFG(0x20181101, 1, &pci_n1sdp_ccix_ecam_ops),
- };
++
+ #define ALTRA_ECAM_QUIRK(rev, seg) \
+ 	{ "Ampere", "Altra   ", rev, seg, MCFG_BUS_ANY, &pci_32b_read_ops }
  
- static char mcfg_oem_id[ACPI_OEM_ID_SIZE];
 diff --git a/drivers/pci/controller/Kconfig b/drivers/pci/controller/Kconfig
 index 326f7d13024f..f9700d037c46 100644
 --- a/drivers/pci/controller/Kconfig
@@ -318,6 +318,3 @@ index adea5a4771cf..e6bbc037cef8 100644
  #endif
  
  #if IS_ENABLED(CONFIG_PCI_HOST_COMMON)
--- 
-2.17.1
-

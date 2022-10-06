@@ -17,3 +17,5 @@ S = "${WORKDIR}/git"
 inherit autotools pkgconfig
 
 EXTRA_OECONF = " --without-cython "
+
+CFLAGS += "-D_GNU_SOURCE"

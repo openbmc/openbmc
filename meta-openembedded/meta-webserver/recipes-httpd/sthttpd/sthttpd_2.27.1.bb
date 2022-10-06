@@ -8,6 +8,7 @@ DEPENDS += "base-passwd virtual/crypt"
 
 SRCREV = "2845bf5bff2b820d2336c8c8061cbfc5f271e720"
 SRC_URI = "git://github.com/blueness/${BPN};branch=master;protocol=https \
+           file://0001-Define-_GNU_SOURCE-if-HAVE_SIGSET-is-set.patch \
            file://thttpd.service \
            file://thttpd.conf \
            file://init"

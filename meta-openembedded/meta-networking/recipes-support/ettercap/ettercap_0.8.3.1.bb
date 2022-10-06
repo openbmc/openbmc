@@ -32,6 +32,7 @@ EXTRA_OECMAKE = " \
     -DENABLE_GTK=OFF \
 "
 
+CFLAGS += "-D_GNU_SOURCE"
 # Replaces default encoding set (ISO-8859-1) with UTF-8 in ettercap
 # configuration file installed by the package.
 # It ensures that all characters are properly decoded and avoids

@@ -7,12 +7,11 @@ DEPENDS += "sdbusplus"
 DEPENDS += "systemd"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "boost"
-SRCREV = "02f366d68bb9752e6de04db0efc8eb885b19b219"
+SRCREV = "3930b6bff5dc1d94c2860db427c86b8e7b28e5c1"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
 SRC_URI += "git://github.com/openbmc/phosphor-led-sysfs;branch=master;protocol=https"
-SRC_URI += "file://70-leds.rules"
 
 S = "${WORKDIR}/git"
 
@@ -21,9 +20,4 @@ inherit obmc-phosphor-dbus-service
 
 EXTRA_OEMESON:append = " -Dtests=disabled"
 
-do_install:append() {
-        install -d ${D}/${nonarch_base_libdir}/udev/rules.d/
-        install -m 0644 ${WORKDIR}/70-leds.rules ${D}/${nonarch_base_libdir}/udev/rules.d/
-}
-
-DBUS_SERVICE:${PN} += "xyz.openbmc_project.led.controller@.service"
+SYSTEMD_SERVICE:${PN} += "xyz.openbmc_project.led.controller@.service"

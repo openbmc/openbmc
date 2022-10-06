@@ -11,11 +11,11 @@ version of the recipe instead.
 
 Signed-off-by: Alejandro Enedino Hernandez Samaniego <alejandro@enedino.org>
 
-Index: emacs-27.1/src/Makefile.in
+Index: emacs-28.2/src/Makefile.in
 ===================================================================
---- emacs-27.1.orig/src/Makefile.in
-+++ emacs-27.1/src/Makefile.in
-@@ -472,7 +472,7 @@ ifeq ($(CHECK_STRUCTS),true)
+--- emacs-28.2.orig/src/Makefile.in
++++ emacs-28.2/src/Makefile.in
+@@ -462,7 +462,7 @@ ifeq ($(CHECK_STRUCTS),true)
  pdumper.o: dmpstruct.h
  endif
  dmpstruct.h: $(srcdir)/dmpstruct.awk
@@ -24,7 +24,7 @@ Index: emacs-27.1/src/Makefile.in
  	$(AM_V_GEN)POSIXLY_CORRECT=1 awk -f $(srcdir)/dmpstruct.awk \
  		$(dmpstruct_headers) > $@
  
-@@ -566,8 +566,7 @@ ${lispintdir}/characters.elc: ${charscri
+@@ -563,8 +563,7 @@ SYSTEM_TYPE = @SYSTEM_TYPE@
  ## Strictly speaking, emacs does not depend directly on all of $lisp,
  ## since not all pieces are used on all platforms.  But DOC depends
  ## on all of $lisp, and emacs depends on DOC, so it is ok to use $lisp here.
@@ -32,9 +32,9 @@ Index: emacs-27.1/src/Makefile.in
 -                lisp.mk $(etc)/DOC $(lisp) \
 +emacs$(EXEEXT): lisp.mk $(etc)/DOC $(lisp) \
                  $(lispsource)/international/charprop.el ${charsets}
- ifeq ($(DUMPING),unexec)
- 	LC_ALL=C $(RUN_TEMACS) -batch $(BUILD_DETAILS) -l loadup --temacs=dump
-@@ -596,15 +595,15 @@ endif
+ ifeq ($(SYSTEM_TYPE),cygwin)
+ 	find ${top_builddir} -name '*.eln' | rebase -v -O -T -
+@@ -597,15 +596,15 @@ endif
  ## for the first time, this prevents any variation between configurations
  ## in the contents of the DOC file.
  ##
@@ -54,9 +54,9 @@ Index: emacs-27.1/src/Makefile.in
    $(lib)/libgnu.a
  	$(MAKE) -C $(dir $@) $(notdir $@)
  
-@@ -622,8 +621,8 @@ am__v_GLOBALS_ = $(am__v_GLOBALS_@AM_DEF
- am__v_GLOBALS_0 = @echo "  GEN     " globals.h;
- am__v_GLOBALS_1 =
+@@ -618,8 +617,8 @@ buildobj.h: Makefile
+ 
+ GLOBAL_SOURCES = $(base_obj:.o=.c) $(NS_OBJC_OBJ:.o=.m)
  
 -gl-stamp: $(libsrc)/make-docfile$(EXEEXT) $(GLOBAL_SOURCES)
 -	$(AM_V_GLOBALS)$(libsrc)/make-docfile -d $(srcdir) -g $(obj) > globals.tmp
@@ -65,7 +65,7 @@ Index: emacs-27.1/src/Makefile.in
  	$(AM_V_at)$(top_srcdir)/build-aux/move-if-change globals.tmp globals.h
  	$(AM_V_at)echo timestamp > $@
  
-@@ -637,7 +636,7 @@ $(LIBEGNU_ARCHIVE): $(config_h)
+@@ -633,7 +632,7 @@ $(LIBEGNU_ARCHIVE): $(config_h)
  	$(MAKE) -C $(dir $@) all
  
  ifeq ($(HAVE_PDUMPER),yes)
@@ -74,12 +74,12 @@ Index: emacs-27.1/src/Makefile.in
  else
    MAKE_PDUMPER_FINGERPRINT =
  endif
-@@ -647,7 +646,7 @@ endif
+@@ -643,7 +642,7 @@ endif
  ## This goes on to affect various things, and the emacs binary fails
  ## to start if Vinstallation_directory has the wrong value.
  temacs$(EXEEXT): $(LIBXMENU) $(ALLOBJS) $(LIBEGNU_ARCHIVE) $(EMACSRES) \
--  $(charsets) $(charscript) $(MAKE_PDUMPER_FINGERPRINT)
-+  $(charsets) $(charscript)
+-  $(charsets) $(charscript) ${emoji-zwj} $(MAKE_PDUMPER_FINGERPRINT)
++  $(charsets) $(charscript) ${emoji-zwj}
  	$(AM_V_CCLD)$(CC) -o $@.tmp \
  	  $(ALL_CFLAGS) $(TEMACS_LDFLAGS) $(LDFLAGS) \
  	  $(ALLOBJS) $(LIBEGNU_ARCHIVE) $(W32_RES_LINK) $(LIBES)

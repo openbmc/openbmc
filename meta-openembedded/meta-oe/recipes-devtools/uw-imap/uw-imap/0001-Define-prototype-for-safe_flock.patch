@@ -1,0 +1,105 @@
+From c512c877a7ca933bee980dcc1268a7319f233d59 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 2 Sep 2022 00:07:47 -0700
+Subject: [PATCH] Define prototype for safe_flock
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/osdep/unix/env_unix.c | 3 +++
+ src/osdep/unix/mbx.c      | 2 ++
+ src/osdep/unix/os_lnx.h   | 2 ++
+ src/osdep/unix/os_slx.h   | 3 +++
+ src/osdep/unix/unix.c     | 4 ++++
+ 5 files changed, 14 insertions(+)
+
+diff --git a/src/osdep/unix/env_unix.c b/src/osdep/unix/env_unix.c
+index 6b2c447..cefefca 100644
+--- a/src/osdep/unix/env_unix.c
++++ b/src/osdep/unix/env_unix.c
+@@ -59,6 +59,9 @@
+ #define S_IXOTH (S_IEXEC >> 6)
+ #endif
+ 
++
++extern int safe_flock (int fd,int op);
++
+ /* c-client environment parameters */
+ 
+ static char *myUserName = NIL;	/* user name */
+diff --git a/src/osdep/unix/mbx.c b/src/osdep/unix/mbx.c
+index 1ece5d8..c8a45a5 100644
+--- a/src/osdep/unix/mbx.c
++++ b/src/osdep/unix/mbx.c
+@@ -41,12 +41,14 @@ extern int errno;		/* just in case */
+ #include "mail.h"
+ #include "osdep.h"
+ #include <pwd.h>
++#include <utime.h>
+ #include <sys/stat.h>
+ #include <sys/time.h>
+ #include "misc.h"
+ #include "dummy.h"
+ #include "fdstring.h"
+ 
++extern int safe_flock (int fd,int op);
+ 
+ /* Build parameters */
+ 
+diff --git a/src/osdep/unix/os_lnx.h b/src/osdep/unix/os_lnx.h
+index b5f39ff..22c216b 100644
+--- a/src/osdep/unix/os_lnx.h
++++ b/src/osdep/unix/os_lnx.h
+@@ -57,6 +57,8 @@
+ 
+ #define direct dirent
+ 
++extern int safe_flock (int fd,int op);
++
+ #define flock safe_flock
+ 
+ 
+diff --git a/src/osdep/unix/os_slx.h b/src/osdep/unix/os_slx.h
+index b5f39ff..c9adbcd 100644
+--- a/src/osdep/unix/os_slx.h
++++ b/src/osdep/unix/os_slx.h
+@@ -46,11 +46,14 @@
+ #include <sys/types.h>
+ #include <dirent.h>
+ #include <time.h>		/* for struct tm */
++#include <utime.h>		/* for struct tm */
+ #include <fcntl.h>
+ #include <syslog.h>
+ #include <sys/file.h>
+ 
+ 
++extern int safe_flock (int fd,int op);
++
+ /* Linux gets this wrong */
+ 
+ #define setpgrp setpgid
+diff --git a/src/osdep/unix/unix.c b/src/osdep/unix/unix.c
+index be3c437..86be3f9 100644
+--- a/src/osdep/unix/unix.c
++++ b/src/osdep/unix/unix.c
+@@ -45,6 +45,7 @@ extern int errno;		/* just in case */
+ #include "mail.h"
+ #include "osdep.h"
+ #include <time.h>
++#include <utime.h>
+ #include <sys/stat.h>
+ #include "unix.h"
+ #include "pseudo.h"
+@@ -52,6 +53,9 @@ extern int errno;		/* just in case */
+ #include "misc.h"
+ #include "dummy.h"
+ 
++
++extern int safe_flock (int fd,int op);
++
+ /* UNIX I/O stream local data */
+ 
+ typedef struct unix_local {
+-- 
+2.37.3
+

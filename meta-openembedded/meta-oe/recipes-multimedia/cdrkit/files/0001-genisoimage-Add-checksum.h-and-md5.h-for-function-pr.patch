@@ -1,0 +1,44 @@
+From f28b8ec20c3485068f1617ff93b497bafe5264e1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 3 Sep 2022 00:50:17 -0700
+Subject: [PATCH] genisoimage: Add checksum.h and md5.h for function prototypes
+
+Needed for parse_checksum_algo and calculate_md5sum
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ genisoimage/genisoimage.c | 2 ++
+ genisoimage/jte.c         | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/genisoimage/genisoimage.c b/genisoimage/genisoimage.c
+index 84ac3c2..5c9f7f3 100644
+--- a/genisoimage/genisoimage.c
++++ b/genisoimage/genisoimage.c
+@@ -59,6 +59,8 @@
+ #include "udf.h"
+ #endif
+ 
++#include "checksum.h"
++
+ #ifdef	NEED_O_BINARY
+ #include <io.h>					/* for setmode() prototype */
+ #endif
+diff --git a/genisoimage/jte.c b/genisoimage/jte.c
+index 0dff289..1f03ad3 100644
+--- a/genisoimage/jte.c
++++ b/genisoimage/jte.c
+@@ -36,6 +36,8 @@
+ #include "vms.h"
+ #endif
+ 
++#include "md5.h"
++
+ /* Different types used in building our state list below */
+ #define JTET_FILE_MATCH 1
+ #define JTET_NOMATCH    2
+-- 
+2.37.3
+

@@ -22,6 +22,16 @@ PACKAGECONFIG[gcrypt] = "--with-libgcrypt, --without-libgcrypt, libgcrypt"
 PACKAGECONFIG[luks] = "--enable-luks, --disable-luks, cryptsetup"
 PACKAGECONFIG[nls] = "--enable-nls, --disable-nls, "
 
+SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} = "cryptmount.service"
+
+do_install:append () {
+    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+        install -D -m 0644 ${S}/sysinit/cryptmount.service ${D}${systemd_system_unitdir}/cryptmount.service
+        rm -fr ${D}/usr/lib
+    fi
+}
+
+FILES:${PN} += "${systemd_system_unitdir}"
 
 RDEPENDS:${PN} = "libdevmapper"

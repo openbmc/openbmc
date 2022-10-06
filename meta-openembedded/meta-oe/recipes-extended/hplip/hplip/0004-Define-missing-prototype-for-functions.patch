@@ -1,0 +1,53 @@
+From 33454817880fa57b2226dd40b724e5c3d6074aca Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 2 Sep 2022 17:58:33 -0700
+Subject: [PATCH 4/4] Define missing prototype for functions
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ prnt/cupsext/cupsext.c | 1 +
+ protocol/hp_ipp.c      | 4 ++--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+--- a/prnt/cupsext/cupsext.c
++++ b/prnt/cupsext/cupsext.c
+@@ -101,6 +101,11 @@ typedef int Py_ssize_t;
+ #define _STRINGIZE(x) #x
+ #define STRINGIZE(x) _STRINGIZE(x)
+ 
++void _releaseCupsInstance(void);
++int addCupsPrinter(char *name, char *device_uri, char *location, char *ppd_file, char *model, char *info);
++int setDefaultCupsPrinter(char *pr_name);
++int delCupsPrinter(char *pr_name);
++int controlCupsPrinter(char *pr_name, int op);
+ 
+ //static http_t * http = NULL;     /* HTTP object */
+ 
+--- a/protocol/hp_ipp.c
++++ b/protocol/hp_ipp.c
+@@ -22,6 +22,7 @@ Boston, MA 02110-1301, USA.
+ #include <cups/cups.h>
+ #include <cups/language.h>
+ #include <cups/ppd.h>
++#include <stdio.h>
+ #include <syslog.h>
+ #include <stdarg.h>
+ #include <string.h> /* strcasecmp */
+@@ -42,7 +43,7 @@ Boston, MA 02110-1301, USA.
+ #define STRINGIZE(x) _STRINGIZE(x)
+ 
+ 
+-http_t* acquireCupsInstance()
++http_t* acquireCupsInstance(void)
+ {
+     if ( http == NULL)
+     {
+@@ -53,7 +54,7 @@ http_t* acquireCupsInstance()
+ }
+ 
+ 
+-void _releaseCupsInstance()
++void _releaseCupsInstance(void)
+ {
+     if (http)
+     {

@@ -24,7 +24,7 @@ PACKAGECONFIG ??= "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
 "
 
-PACKAGECONFIG ??= "video python3"
+PACKAGECONFIG ??= "video"
 
 inherit autotools pkgconfig gettext \
     ${@bb.utils.contains('PACKAGECONFIG', 'python3', 'python3native', '', d)} \

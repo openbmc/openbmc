@@ -1,0 +1,28 @@
+From 86b706f694b822d8028fd36320147767056d2ffa Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 6 Sep 2022 12:09:00 -0700
+Subject: [PATCH] parser-yang: Define _DEFAULT_SOURCE
+
+This is needed for timegm API
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/parser-yang.y | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/parser-yang.y b/lib/parser-yang.y
+index b111607..0ded9d2 100644
+--- a/lib/parser-yang.y
++++ b/lib/parser-yang.y
+@@ -21,6 +21,7 @@
+ #ifdef BACKEND_YANG
+ 
+ #define _ISOC99_SOURCE
++#define _DEFAULT_SOURCE
+ #include <stdio.h>
+ #include <errno.h>
+ #include <stdlib.h>
+-- 
+2.37.3
+

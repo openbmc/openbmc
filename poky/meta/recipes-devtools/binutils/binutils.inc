@@ -36,6 +36,24 @@ FILES:${PN}-dev = " \
 # Rather than duplicating multiple entries for these, make one
 # list and reuse it.
 
+GPROFNGS = " \
+	gp-archive \
+	gp-collect-app \
+	gp-display-html \
+	gp-display-src \
+	gp-display-text \
+	gprofng \
+"
+
+# it disables gprofng for clang and musl in the bb file
+GPROFNGS:toolchain-clang = ""
+GPROFNGS:libc-musl = ""
+
+GPROFNG_ALTS ?= ""
+GPROFNG_ALTS:x86 = "${GPROFNGS}"
+GPROFNG_ALTS:x86-64 = "${GPROFNGS}"
+GPROFNG_ALTS:aarch64 = "${GPROFNGS}"
+
 LDGOLD_ALTS ?= "ld.gold dwp"
 LDGOLD_ALTS:riscv64 = ""
 LDGOLD_ALTS:riscv32 = ""
@@ -48,6 +66,7 @@ USE_ALTERNATIVES_FOR = " \
 	c++filt \
 	elfedit \
 	gprof \
+	${GPROFNG_ALTS} \
 	ld \
 	ld.bfd \
 	${LDGOLD_ALTS} \

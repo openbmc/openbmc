@@ -1,0 +1,14 @@
+Add protoype declaration for  b64_pton
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/adb/adb_auth_client.c
++++ b/adb/adb_auth_client.c
+@@ -29,6 +29,7 @@
+ 
+ #define TRACE_TAG TRACE_AUTH
+ 
++extern int b64_pton(const char* src, uint8_t* target, size_t targsize);
+ 
+ struct adb_public_key {
+     struct listnode node;

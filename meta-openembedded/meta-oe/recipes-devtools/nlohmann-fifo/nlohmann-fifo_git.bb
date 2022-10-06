@@ -8,7 +8,7 @@ SRC_URI = "git://github.com/nlohmann/fifo_map.git;branch=master;protocol=https"
 
 PV = "1.0.0+git${SRCPV}"
 
-SRCREV = "0dfbf5dacbb15a32c43f912a7e66a54aae39d0f9"
+SRCREV = "d732aaf9a315415ae8fd7eb11e3a4c1f80e42a48"
 
 UPSTREAM_CHECK_COMMITS = "1"
 
@@ -19,6 +19,9 @@ S = "${WORKDIR}/git"
 RDEPENDS:${PN}-dev = ""
 
 BBCLASSEXTEND = "native nativesdk"
+
+# See https://github.com/SOCI/soci/issues/984
+CXXFLAGS:append:toolchain-clang:runtime-llvm = " -DCATCH_CONFIG_CPP11_NO_SHUFFLE"
 
 do_install() {
     install -d ${D}${includedir}

@@ -11,15 +11,13 @@ Signed-off-by: Qian Lei <qianl.fnst@cn.fujitsu.com>
  iface.c | 9 ++++++++-
  1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/iface.c b/iface.c
-index 5951d81..27793f0 100644
 --- a/iface.c
 +++ b/iface.c
 @@ -43,7 +43,14 @@
         __result; }))
  #endif
  
--#define	UTEMPTER_DEFAULT_PATHNAME	LIBEXECDIR "/utempter/utempter"
+-#define UTEMPTER_DEFAULT_PATHNAME	LIBEXECDIR "/utempter/utempter"
 +#ifdef  LIBEXECDIR
 +#  define CAT_PATH(DIR1,DIR2)           DIR1##DIR2
 +#  define RAW_UTEMPTER_PATH             CAT_PATH(LIBEXECDIR,/utempter/utempter)
@@ -31,6 +29,3 @@ index 5951d81..27793f0 100644
  
  static const char *utempter_pathname;
  static int saved_fd = -1;
--- 
-1.8.3.1
-

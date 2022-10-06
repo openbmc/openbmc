@@ -1,0 +1,31 @@
+From 492f74dbea1d9a15fbc3e870e78ab52e7fc5583b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 31 Aug 2022 20:19:32 -0700
+Subject: [PATCH] mark count with unused attribute
+
+This may throw a warning when devel logs are disabled
+Fixed
+../../../xrdp-0.9.19/sesman/chansrv/chansrv.c:198:9: error: variable 'count' set but not used [-Werror,-Wunused-but-set-variable]                                                                                                                     int count;                                                                                                                   ^                                                                                                                1 error generated.
+
+Upstream-Status: Submitted [https://github.com/neutrinolabs/xrdp/pull/2353]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sesman/chansrv/chansrv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sesman/chansrv/chansrv.c b/sesman/chansrv/chansrv.c
+index 4452d998..b818bff3 100644
+--- a/sesman/chansrv/chansrv.c
++++ b/sesman/chansrv/chansrv.c
+@@ -195,7 +195,7 @@ check_timeout(void)
+     struct timeout_obj *tobj;
+     struct timeout_obj *last_tobj;
+     struct timeout_obj *temp_tobj;
+-    int count;
++    int count __attribute__((unused));
+     tui32 now;
+ 
+     LOG_DEVEL(LOG_LEVEL_DEBUG, "check_timeout:");
+-- 
+2.37.3
+

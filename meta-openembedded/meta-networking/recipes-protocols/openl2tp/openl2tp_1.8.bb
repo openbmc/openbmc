@@ -35,6 +35,8 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${PV}/${BP}.tar.gz \
            file://run-ptest \
            file://fix_linux_4.15_compile.patch \
            file://0002-user-ipv6-structures.patch \
+           file://0001-l2tp_rpc_server.c-Add-missing-prototype-for-l2tp_api.patch \
+           file://0001-lex-yacc-Add-missing-function-prototypes.patch \
            "
 SRC_URI[md5sum] = "e3d08dedfb9e6a9a1e24f6766f6dadd0"
 SRC_URI[sha256sum] = "1c97704d4b963a87fbc0e741668d4530933991515ae9ab0dffd11b5444f4860f"

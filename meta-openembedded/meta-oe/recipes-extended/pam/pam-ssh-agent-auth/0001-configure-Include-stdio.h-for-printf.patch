@@ -1,0 +1,37 @@
+From a0ae303fe0bcd81dfb1a649cc5e7a372d3bd878d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 1 Sep 2022 20:44:42 -0700
+Subject: [PATCH] configure: Include stdio.h for printf
+
+Fixes test for __progname
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -2791,7 +2791,9 @@ if test "x$ac_cv_have_control_in_msghdr"
+ fi
+ 
+ AC_CACHE_CHECK([if libc defines __progname], ac_cv_libc_defines___progname, [
+-	AC_TRY_LINK([],
++	AC_TRY_LINK([
++#include <stdio.h>
++],
+ 		[ extern char *__progname; printf("%s", __progname); ],
+ 		[ ac_cv_libc_defines___progname="yes" ],
+ 		[ ac_cv_libc_defines___progname="no" ]
+--- a/configure
++++ b/configure
+@@ -14838,7 +14838,7 @@ else
+ 
+ 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+-
++#include <stdio.h>
+ int
+ main ()
+ {

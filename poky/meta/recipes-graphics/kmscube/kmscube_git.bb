@@ -10,11 +10,8 @@ DEPENDS = "virtual/libgles3 virtual/libgles2 virtual/egl libdrm"
 
 LIC_FILES_CHKSUM = "file://kmscube.c;beginline=1;endline=23;md5=8b309d4ee67b7315ff7381270dd631fb"
 
-SRCREV = "9f63f359fab1b5d8e862508e4e51c9dfe339ccb0"
-SRC_URI = "git://gitlab.freedesktop.org/mesa/kmscube;branch=master;protocol=https \
-           file://0001-texturator-Use-correct-GL-extension-header.patch \
-           file://0001-drm-common.c-do-not-use-invalid-modifier.patch \
-           "
+SRCREV = "3bf6ee1a02334386d87cfe356c3bfb0b24e1fed8"
+SRC_URI = "git://gitlab.freedesktop.org/mesa/kmscube;branch=master;protocol=https"
 UPSTREAM_CHECK_COMMITS = "1"
 
 S = "${WORKDIR}/git"

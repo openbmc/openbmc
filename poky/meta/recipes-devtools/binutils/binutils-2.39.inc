@@ -31,5 +31,13 @@ SRC_URI = "\
      file://0010-sync-with-OE-libtool-changes.patch \
      file://0011-Check-for-clang-before-checking-gcc-version.patch \
      file://0012-Only-generate-an-RPATH-entry-if-LD_RUN_PATH-is-not-e.patch \
+     file://0013-CVE-2022-38533.patch \
+     file://0014-CVE-2022-38128-1.patch \
+     file://0014-CVE-2022-38128-2.patch \
+     file://0014-CVE-2022-38128-3.patch \
 "
 S  = "${WORKDIR}/git"
+# Already in 2.39 branch
+# - https://sourceware.org/bugzilla/show_bug.cgi?id=29289
+# - https://sourceware.org/bugzilla/show_bug.cgi?id=29290
+CVE_CHECK_IGNORE += "CVE-2022-38126 CVE-2022-38127"

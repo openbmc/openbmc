@@ -360,9 +360,9 @@ home directory:
 
       FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-      SRC_URI:append = " file://patch-file-one.patch"
-      SRC_URI:append = " file://patch-file-two.patch"
-      SRC_URI:append = " file://patch-file-three.patch"
+      SRC_URI += "file://patch-file-one.patch"
+      SRC_URI += "file://patch-file-two.patch"
+      SRC_URI += "file://patch-file-three.patch"
 
    The :term:`FILESEXTRAPATHS` and :term:`SRC_URI` statements
    enable the OpenEmbedded build system to find patch files. For more
@@ -1002,7 +1002,7 @@ Section.
    contents::
 
       FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
-      SRC_URI:append = " file://0001-calibrate.c-Added-some-printk-statements.patch"
+      SRC_URI += "file://0001-calibrate.c-Added-some-printk-statements.patch"
 
    The :term:`FILESEXTRAPATHS` and :term:`SRC_URI` statements
    enable the OpenEmbedded build system to find the patch file.
@@ -1875,7 +1875,7 @@ build.
 2. *Add the Feature File to SRC_URI:* Add the ``.scc`` file to the
    recipe's :term:`SRC_URI` statement::
 
-      SRC_URI:append = " file://test.scc"
+      SRC_URI += "file://test.scc"
 
    The leading space before the path is important as the path is
    appended to the existing path.
@@ -1884,7 +1884,7 @@ build.
    :term:`KERNEL_FEATURES` statement to specify the feature as a kernel
    feature::
 
-      KERNEL_FEATURES:append = " test.scc"
+      KERNEL_FEATURES += "test.scc"
 
    The OpenEmbedded build
    system processes the kernel feature when it builds the kernel.

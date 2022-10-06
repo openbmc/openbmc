@@ -29,6 +29,9 @@ EXTRA_OECMAKE += "${PLATFORM_CMAKE_FLAGS}"
 PACKAGE_BEFORE_PN += "${PN}-examples-python ${PN}-examples"
 FILES:${PN}-examples-python = "${bindir}/py*"
 FILES:${PN}-examples = "${bindir}"
+# cec-client doesn't link with libcec, but uses LibCecInitialise to dlopen libcec, so do_package
+# cannot add the runtime dependency automatically
+RDEPENDS:${PN}-examples = "${PN}"
 RDEPENDS:${PN}-examples-python = "python3-${BPN} python3-core"
 
 # Create the wrapper for python3

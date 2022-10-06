@@ -128,7 +128,7 @@ PROTO_RE="[a-z][a-z+]*://"
 GIT_RE="\(^\($PROTO_RE\)\?\)\($USER_RE@\)\?\([^:/]*\)[:/]\(.*\)"
 REMOTE_URL=${REMOTE_URL%.git}
 REMOTE_REPO=$(echo $REMOTE_URL | sed "s#$GIT_RE#\5#")
-REMOTE_URL=$(echo $REMOTE_URL | sed "s#$GIT_RE#git://\4/\5#")
+REMOTE_URL=$(echo $REMOTE_URL | sed "s#$GIT_RE#https://\4/\5#")
 
 if [ -z "$BRANCH" ]; then
 	BRANCH=$(git branch | grep -e "^\* " | cut -d' ' -f2)

@@ -11,7 +11,7 @@ DEPENDS += " \
 SRCREV = "4250785723d92b6578176a2d961d47ab66e08124"
 PACKAGECONFIG ??= "signals handler"
 PACKAGECONFIG[signals] = ",,gpioplus nlohmann-json,"
-PACKAGECONFIG[handler] = ",,,phosphor-state-manager-chassis phosphor-state-manager-host"
+PACKAGECONFIG[handler] = ",,,${VIRTUAL-RUNTIME_obmc-host-state-manager} ${VIRTUAL-RUNTIME_obmc-chassis-state-manager}"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
@@ -32,3 +32,11 @@ ALLOW_EMPTY:${PN} = "1"
 BUTTON_PACKAGES = "${PN}-signals ${PN}-handler"
 
 PACKAGE_BEFORE_PN += "${BUTTON_PACKAGES}"
+
+do_install:append() {
+  if [ -e "${WORKDIR}/gpio_defs.json" ]; then
+     install -m 0755 -d ${D}/etc/default/obmc/gpio
+     install -m 0644 -D ${WORKDIR}/gpio_defs.json \
+                   ${D}/etc/default/obmc/gpio
+  fi
+}

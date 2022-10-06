@@ -7,6 +7,7 @@ SECTION = "Development/Languages/C and C++"
 SRC_URI = "http://download.savannah.gnu.org/releases/${BPN}/${BP}.tar.gz \
     file://change-mandir-to-DESTDIR.patch \
     file://modify-acinclude.m4-and-configure.in.patch \
+    file://0001-Include-stdlib.h-for-exit-and-abort-prototypes.patch \
 "
 SRC_URI[md5sum] = "66c88aa0ad095b2e67673773135475f1"
 SRC_URI[sha256sum] = "fd1819ffea94b209513959447e4802afe2719600e7d161cd78b265a42812affa"

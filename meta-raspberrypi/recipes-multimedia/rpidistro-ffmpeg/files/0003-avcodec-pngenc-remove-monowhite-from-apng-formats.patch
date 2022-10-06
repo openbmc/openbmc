@@ -1,0 +1,28 @@
+From: Paul B Mahol <onemda@gmail.com>
+Date: Sun, 14 Feb 2021 17:20:03 +0100
+Subject: avcodec/pngenc: remove monowhite from apng formats
+
+Monowhite pixel format is not supported, and it does not make sense
+to add support for it.
+
+Fixes #7989
+
+Upstream-status: Pending
+
+---
+ libavcodec/pngenc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libavcodec/pngenc.c b/libavcodec/pngenc.c
+index efcae8c..eebb164 100644
+--- a/libavcodec/pngenc.c
++++ b/libavcodec/pngenc.c
+@@ -1174,7 +1174,7 @@ AVCodec ff_apng_encoder = {
+         AV_PIX_FMT_PAL8,
+         AV_PIX_FMT_GRAY8, AV_PIX_FMT_GRAY8A,
+         AV_PIX_FMT_GRAY16BE, AV_PIX_FMT_YA16BE,
+-        AV_PIX_FMT_MONOBLACK, AV_PIX_FMT_NONE
++        AV_PIX_FMT_NONE
+     },
+     .priv_class     = &apngenc_class,
+ };

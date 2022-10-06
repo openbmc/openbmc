@@ -32,6 +32,16 @@ def get_gcc_float_setting(bb, d):
 
 get_gcc_float_setting[vardepvalue] = "${@get_gcc_float_setting(bb, d)}"
 
+def get_gcc_x86_64_arch_setting(bb, d):
+    import re
+    march = re.match(r'^.*-march=([^\s]*)', d.getVar('TUNE_CCARGS'))
+    if march:
+        return "--with-arch=%s " % march.group(1)
+    # The earliest supported x86-64 CPU
+    return "--with-arch=core2"
+
+get_gcc_x86_64_arch_setting[vardepvalue] = "${@get_gcc_x86_64_arch_setting(bb, d)}"
+
 def get_gcc_mips_plt_setting(bb, d):
     if d.getVar('TRANSLATED_TARGET_ARCH') in [ 'mips', 'mipsel' ] and bb.utils.contains('DISTRO_FEATURES', 'mplt', True, False, d):
         return "--with-mips-plt"

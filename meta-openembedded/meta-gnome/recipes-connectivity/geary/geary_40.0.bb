@@ -52,6 +52,10 @@ PACKAGECONFIG[tnef] = "-Dtnef=enabled,-Dtnef=disabled,libytnef"
 PACKAGECONFIG[valadoc] = "-Dvaladoc=enabled,-Dvaladoc=disabled"
 
 PACKAGECONFIG ??= ""
+# rfc822/rfc822-message.c:2097:12: error: incompatible pointer to integer conversion returning 'void *' from a function with result type 'gboolean' (aka 'int') [-Wint-conversion]
+#|                                 return NULL;
+#|                                        ^~~~
+CFLAGS:append:toolchain-clang = " -Wno-error=int-conversion"
 
 FILES:${PN} += "${datadir}"
 

@@ -10,17 +10,17 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=fbc093901857fcd118f065f900982c24"
 
 BBCLASSEXTEND = "native nativesdk"
 
-SRC_URI = "https://github.com/libusb/libusb/releases/download/v${PV}/libusb-${PV}.tar.bz2 \
+SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/libusb-${PV}.tar.bz2 \
            file://run-ptest \
           "
 
-UPSTREAM_CHECK_URI = "https://github.com/libusb/libusb/releases"
+GITHUB_BASE_URI = "https://github.com/libusb/libusb/releases"
 
 SRC_URI[sha256sum] = "12ce7a61fc9854d1d2a1ffe095f7b5fac19ddba095c259e6067a46500381b5a5"
 
 S = "${WORKDIR}/libusb-${PV}"
 
-inherit autotools pkgconfig ptest
+inherit autotools pkgconfig ptest github-releases
 
 PACKAGECONFIG:class-target ??= "udev"
 PACKAGECONFIG[udev] = "--enable-udev,--disable-udev,udev"

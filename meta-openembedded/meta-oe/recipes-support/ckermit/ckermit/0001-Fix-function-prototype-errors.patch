@@ -1,0 +1,106 @@
+From f73eade85b7a1b93f7b9ef6ca9ead9d2441f8f84 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 31 Aug 2022 19:01:38 -0700
+Subject: [PATCH] Fix function prototype errors
+
+Clang 15 is strict, therefore ensure that right headers are pulled in
+and also right function prototypes are used.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ckcmai.c | 4 ++++
+ ckucmd.c | 2 +-
+ ckucmd.h | 2 --
+ ckucon.c | 2 +-
+ ckufio.c | 2 +-
+ ckuusx.c | 2 +-
+ 6 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/ckcmai.c b/ckcmai.c
+index a5640e5..a4e322d 100644
+--- a/ckcmai.c
++++ b/ckcmai.c
+@@ -561,6 +561,10 @@ ACKNOWLEDGMENTS:
+ #include "ckntap.h"
+ #endif /* NT */
+ 
++#ifndef VMS
++#include <time.h> /* time() */
++#endif
++
+ #ifndef NOSERVER
+ /* Text message definitions.. each should be 256 chars long, or less. */
+ #ifdef MINIX
+diff --git a/ckucmd.c b/ckucmd.c
+index 274dc2d..730f20d 100644
+--- a/ckucmd.c
++++ b/ckucmd.c
+@@ -7356,7 +7356,7 @@ cmdgetc(timelimit) int timelimit; {	/* Get a character from the tty. */
+   Returns 0 or greater always.
+ */
+ int
+-cmdconchk() {
++cmdconchk(void) {
+     int x = 0, y;
+     y = pushc ? 1 : 0;			/* Have command character pushed? */
+ #ifdef OS2
+diff --git a/ckucmd.h b/ckucmd.h
+index 7cd4ced..5c43cc4 100644
+--- a/ckucmd.h
++++ b/ckucmd.h
+@@ -280,9 +280,7 @@ _PROTOTYP( int cmdsquo, (int) );
+ _PROTOTYP( int cmdgquo, (void) );
+ _PROTOTYP( char * ckcvtdate, (char *, int) );
+ _PROTOTYP( int cmdgetc, (int));
+-#ifndef NOARROWKEYS
+ _PROTOTYP( int cmdconchk, (void) );
+-#endif /* NOARROWKEYS */
+ 
+ #ifdef CK_RECALL
+ _PROTOTYP( char * cmgetcmd, (char *) );
+diff --git a/ckucon.c b/ckucon.c
+index 50ceb7e..954719e 100644
+--- a/ckucon.c
++++ b/ckucon.c
+@@ -39,8 +39,8 @@ _PROTOTYP( static VOID concld, (void) );
+ 
+ #ifdef NEXT
+ #undef NSIG
+-#include <sys/wait.h>			/* For wait() */
+ #endif /* NEXT */
++#include <sys/wait.h>			/* For wait() */
+ 
+ #include <signal.h>			/* Signals */
+ 
+diff --git a/ckufio.c b/ckufio.c
+index b5bfaae..2a8d4e5 100644
+--- a/ckufio.c
++++ b/ckufio.c
+@@ -142,8 +142,8 @@ _PROTOTYP( int parser, ( int ) );
+ 
+ #ifdef UNIX                             /* Pointer arg to wait() allowed */
+ #define CK_CHILD                        /* Assume this is safe in all UNIX */
++#include <sys/wait.h>			/* wait() API */
+ #endif /* UNIX */
+-
+ extern int binary, recursive, stathack;
+ #ifdef CK_CTRLZ
+ extern int eofmethod;
+diff --git a/ckuusx.c b/ckuusx.c
+index d332bed..253f992 100644
+--- a/ckuusx.c
++++ b/ckuusx.c
+@@ -9144,7 +9144,7 @@ char *s;        /* a string */
+ #ifndef CK_CURPOS
+ /* Dummies for when cursor control is not supported */
+ int
+-ck_curpos(row, col) {
++ck_curpos(int row, int col) {
+     return(-1);
+ }
+ 
+-- 
+2.37.3
+

@@ -1,0 +1,27 @@
+From 891076c2cf4298b5d587545497f4831f0d21caa1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Sep 2022 20:04:43 -0700
+Subject: [PATCH 2/2] interactive-helper: Undefine _FORTIFY_SOURCE
+
+This ensures that it compiles when clang compiler is passing
+-DFORTIFY_SOURCES=2
+
+Upstream-Status: Submitted [https://salsa.debian.org/apt-team/apt/-/merge_requests/259]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test/interactive-helper/libnoprofile.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/test/interactive-helper/libnoprofile.c b/test/interactive-helper/libnoprofile.c
+index f11b898..b26ec2a 100644
+--- a/test/interactive-helper/libnoprofile.c
++++ b/test/interactive-helper/libnoprofile.c
+@@ -1,4 +1,5 @@
+ #define _GNU_SOURCE
++#undef _FORTIFY_SOURCE
+ #include <stdarg.h>
+ #include <stdlib.h>
+ #include <string.h>
+-- 
+2.37.3
+

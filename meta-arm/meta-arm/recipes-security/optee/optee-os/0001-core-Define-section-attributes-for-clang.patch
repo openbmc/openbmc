@@ -37,11 +37,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  core/kernel/thread.c             | 13 +++++++++++-
  4 files changed, 71 insertions(+), 8 deletions(-)
 
-diff --git a/core/arch/arm/kernel/thread.c b/core/arch/arm/kernel/thread.c
-index f083b159e..432983c86 100644
 --- a/core/arch/arm/kernel/thread.c
 +++ b/core/arch/arm/kernel/thread.c
-@@ -44,15 +44,30 @@ static size_t thread_user_kcode_size __nex_bss;
+@@ -44,16 +44,31 @@ static size_t thread_user_kcode_size __n
  #if defined(CFG_CORE_UNMAP_CORE_AT_EL0) && \
  	defined(CFG_CORE_WORKAROUND_SPECTRE_BP_SEC) && defined(ARM64)
  long thread_user_kdata_sp_offset __nex_bss;
@@ -64,21 +62,20 @@ index f083b159e..432983c86 100644
 -	__section(".nex_nozi.kdata_page");
 +	__section(".nex_nozi.kdata_page")
  #endif
-+#endif
+ #endif
 +    ;
 +#endif
 +
 +/* reset BSS section to default ( .bss ) */
 +#ifdef __clang__
 +#pragma clang section bss=""
- #endif
++#endif
  
  #ifdef ARM32
-diff --git a/core/arch/arm/mm/core_mmu_lpae.c b/core/arch/arm/mm/core_mmu_lpae.c
-index 19cd7b61b..78f5910c5 100644
+ uint32_t __nostackcheck thread_get_exceptions(void)
 --- a/core/arch/arm/mm/core_mmu_lpae.c
 +++ b/core/arch/arm/mm/core_mmu_lpae.c
-@@ -230,19 +230,46 @@ typedef uint16_t l1_idx_t;
+@@ -233,19 +233,46 @@ typedef uint16_t l1_idx_t;
  typedef uint64_t base_xlat_tbls_t[CFG_TEE_CORE_NB_CORE][NUM_BASE_LEVEL_ENTRIES];
  typedef uint64_t xlat_tbl_t[XLAT_TABLE_ENTRIES];
  
@@ -129,8 +126,6 @@ index 19cd7b61b..78f5910c5 100644
  /*
   * TAs page table entry inside a level 1 page table.
   *
-diff --git a/core/arch/arm/mm/pgt_cache.c b/core/arch/arm/mm/pgt_cache.c
-index d658b3e68..6c36706c0 100644
 --- a/core/arch/arm/mm/pgt_cache.c
 +++ b/core/arch/arm/mm/pgt_cache.c
 @@ -104,8 +104,18 @@ void pgt_init(void)
@@ -153,11 +148,9 @@ index d658b3e68..6c36706c0 100644
  	size_t n;
  
  	for (n = 0; n < ARRAY_SIZE(pgt_tables); n++) {
-diff --git a/core/kernel/thread.c b/core/kernel/thread.c
-index 18d34e6ad..086129e28 100644
 --- a/core/kernel/thread.c
 +++ b/core/kernel/thread.c
-@@ -37,13 +37,24 @@ struct thread_core_local thread_core_local[CFG_TEE_CORE_NB_CORE] __nex_bss;
+@@ -37,13 +37,24 @@ struct thread_core_local thread_core_loc
  	name[stack_num][sizeof(name[stack_num]) / sizeof(uint32_t) - 1]
  #endif
  
@@ -183,6 +176,55 @@ index 18d34e6ad..086129e28 100644
  #define GET_STACK(stack) ((vaddr_t)(stack) + STACK_SIZE(stack))
  
  DECLARE_STACK(stack_tmp, CFG_TEE_CORE_NB_CORE,
--- 
-2.37.2
-
+--- a/core/arch/arm/mm/core_mmu_v7.c
++++ b/core/arch/arm/mm/core_mmu_v7.c
+@@ -204,16 +204,46 @@ typedef uint32_t l1_xlat_tbl_t[NUM_L1_EN
+ typedef uint32_t l2_xlat_tbl_t[NUM_L2_ENTRIES];
+ typedef uint32_t ul1_xlat_tbl_t[NUM_UL1_ENTRIES];
+ 
++#ifdef __clang__
++#pragma clang section bss=".nozi.mmu.l1"
++#endif
+ static l1_xlat_tbl_t main_mmu_l1_ttb
+-		__aligned(L1_ALIGNMENT) __section(".nozi.mmu.l1");
++		__aligned(L1_ALIGNMENT)
++#ifndef __clang__
++       __section(".nozi.mmu.l1")
++#endif
++;
++#ifdef __clang__
++#pragma clang section bss=""
++#endif
+ 
+ /* L2 MMU tables */
++#ifdef __clang__
++#pragma clang section bss=".nozi.mmu.l2"
++#endif
+ static l2_xlat_tbl_t main_mmu_l2_ttb[MAX_XLAT_TABLES]
+-		__aligned(L2_ALIGNMENT) __section(".nozi.mmu.l2");
++		__aligned(L2_ALIGNMENT)
++#ifndef __clang__
++       __section(".nozi.mmu.l2")
++#endif
++;
++#ifdef __clang__
++#pragma clang section bss=""
++#endif
+ 
+ /* MMU L1 table for TAs, one for each thread */
++#ifdef __clang__
++#pragma clang section bss=".nozi.mmu.ul1"
++#endif
+ static ul1_xlat_tbl_t main_mmu_ul1_ttb[CFG_NUM_THREADS]
+-		__aligned(UL1_ALIGNMENT) __section(".nozi.mmu.ul1");
++		__aligned(UL1_ALIGNMENT)
++#ifndef __clang__
++       __section(".nozi.mmu.ul1")
++#endif
++;
++#ifdef __clang__
++#pragma clang section bss=""
++#endif
+ 
+ struct mmu_partition {
+ 	l1_xlat_tbl_t *l1_table;

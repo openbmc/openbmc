@@ -17,7 +17,7 @@ POWER_SERVICE_PACKAGES_P10 = " \
 "
 
 EXTRA_IBM_LOGGING_PKGS = ""
-EXTRA_IBM_LOGGING_PKGS:witherspoon = "ibm-logging"
+EXTRA_IBM_LOGGING_PKGS:witherspoon = ""
 EXTRA_IBM_LOGGING_PKGS:witherspoon-tacoma = ""
 EXTRA_IBM_LOGGING_PKGS:mihawk = "ibm-logging"
 EXTRA_IBM_LOGGING_PKGS:p10bmc = " \

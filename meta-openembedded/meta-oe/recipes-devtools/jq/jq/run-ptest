@@ -1,0 +1,11 @@
+#!/bin/sh
+
+for test in optionaltest mantest jqtest onigtest shtest utf8test base64test; do
+	./tests/${test}
+	if [ $? -eq 0 ]; then
+		echo "PASS: ${test}"
+	else
+		echo "FAIL: ${test}"
+	fi
+done
+

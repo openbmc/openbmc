@@ -8,6 +8,7 @@ SRC_URI[sha256sum] = "3fcf37884383c5da64846ab510190720027dca0768def34dd8dcb659db
 
 SRC_URI:append = " \
            file://0001-setup_build.py-avoid-absolute-path.patch \
+           file://0001-fix-wrong-file-driver-version.patch \
           "
 
 inherit pkgconfig pypi setuptools3
@@ -28,4 +29,4 @@ RDEPENDS:${PN} = "python3-numpy \
                   python3-json \
                  "
 
-export HDF5_VERSION="1.8.21"
+export HDF5_VERSION="1.13.2"

@@ -1,4 +1,4 @@
-From 253b042d2bf10e9abfa9cc508e0782aefd834145 Mon Sep 17 00:00:00 2001
+From 859bfc342d1db9b61c43f30d9aa27cea35ca7599 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 16 Oct 2020 11:03:47 -0700
 Subject: [PATCH] futex.h: Define __NR_futex if it does not exist
@@ -18,12 +18,12 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/src/util/futex.h b/src/util/futex.h
-index 43097f4..941b0ec 100644
+index 2a2a00c..92fc123 100644
 --- a/src/util/futex.h
 +++ b/src/util/futex.h
-@@ -34,6 +34,10 @@
- #include <sys/syscall.h>
- #include <sys/time.h>
+@@ -38,6 +38,10 @@
+ #define SYS_futex SYS_futex_time64
+ #endif
  
 +#if !defined(SYS_futex) && defined(SYS_futex_time64)
 +# define SYS_futex SYS_futex_time64

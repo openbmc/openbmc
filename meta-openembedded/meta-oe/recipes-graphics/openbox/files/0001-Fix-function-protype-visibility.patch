@@ -1,0 +1,94 @@
+From 941d5ff3426e68cb9bcb4ae86066124cb2535b69 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 2 Sep 2022 12:32:20 -0700
+Subject: [PATCH] Fix function protype visibility
+
+Include ctye.h for toupper
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/appearance.c | 1 +
+ src/desktops.c   | 2 +-
+ src/desktops.h   | 2 +-
+ src/main.c       | 1 +
+ src/moveresize.c | 2 +-
+ src/moveresize.h | 2 +-
+ 6 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/src/appearance.c b/src/appearance.c
+index 4fb3f0c..ee55661 100644
+--- a/src/appearance.c
++++ b/src/appearance.c
+@@ -20,6 +20,7 @@
+ #include "main.h"
+ #include "tree.h"
+ #include "preview_update.h"
++#include <ctype.h> /* for toupper */
+ 
+ static gboolean mapping = FALSE;
+ 
+diff --git a/src/desktops.c b/src/desktops.c
+index 8297f00..27ca514 100644
+--- a/src/desktops.c
++++ b/src/desktops.c
+@@ -38,7 +38,7 @@ static void on_desktop_names_cell_edited(GtkCellRendererText *cell,
+                                          gpointer data);
+ static void enable_stuff();
+ 
+-void desktops_setup_tab()
++void desktops_setup_tab(void)
+ {
+     GtkWidget *w;
+     GtkCellRenderer *render;
+diff --git a/src/desktops.h b/src/desktops.h
+index 1ba3e36..446bfbb 100644
+--- a/src/desktops.h
++++ b/src/desktops.h
+@@ -24,5 +24,5 @@
+ 
+ void desktops_setup_num(GtkWidget *w);
+ void desktops_setup_names(GtkWidget *w);
+-
++void desktops_setup_tab(void);
+ #endif
+diff --git a/src/main.c b/src/main.c
+index d7e3446..0176035 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -28,6 +28,7 @@
+ #include "dock.h"
+ #include "preview_update.h"
+ #include "gettext.h"
++#include "moveresize.h"
+ 
+ #include <gdk/gdkx.h>
+ #define SN_API_NOT_YET_FROZEN
+diff --git a/src/moveresize.c b/src/moveresize.c
+index c6fb3dd..bb52729 100644
+--- a/src/moveresize.c
++++ b/src/moveresize.c
+@@ -37,7 +37,7 @@ static gboolean mapping = FALSE;
+ static void enable_stuff();
+ static void write_fixed_position(const gchar *coord);
+ 
+-void moveresize_setup_tab()
++void moveresize_setup_tab(void)
+ {
+     GtkWidget *w, *w1, *w2, *w3;
+     GtkSizeGroup *group;
+diff --git a/src/moveresize.h b/src/moveresize.h
+index 82ecc96..8faf526 100644
+--- a/src/moveresize.h
++++ b/src/moveresize.h
+@@ -20,6 +20,6 @@
+ #ifndef obconf__moveresize_h
+ #define obconf__moveresize_h
+ 
+-void moveresize_setup_tab();
++void moveresize_setup_tab(void);
+ 
+ #endif
+-- 
+2.37.3
+

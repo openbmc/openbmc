@@ -32,6 +32,7 @@ KCONFIG_MODE:corstone500 = "--alldefconfig"
 # Corstone1000 KMACHINE
 #
 FILESEXTRAPATHS:prepend:corstone1000 := "${ARMBSPFILESPATHS}"
+FILESEXTRAPATHS:prepend:corstone1000 := "${ARMFILESPATHS}"
 COMPATIBLE_MACHINE:corstone1000 = "${MACHINE}"
 KCONFIG_MODE:corstone1000 = "--alldefconfig"
 KMACHINE:corstone1000 = "corstone1000"
@@ -41,6 +42,8 @@ KERNEL_EXTRA_ARGS:corstone1000 += "CONFIG_INITRAMFS_COMPRESSION_NONE=y"
 SRC_URI:append:corstone1000 = " \
            file://defconfig  \
            file://0001-UPSTREAM-firmware-arm_ffa-Handle-compatibility-with-.patch  \
+           file://0002-Add-external-system-driver.patch \
+           file://0003-Add-rpsmg-driver-for-corstone1000.patch \
         "
 
 SRC_URI:append:corstone1000 = " ${@bb.utils.contains('MACHINE_FEATURES', \

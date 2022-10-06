@@ -1,0 +1,209 @@
+From 269f18d5e6698fdd34fec2798f10c6fe072f3cd5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 1 Sep 2022 23:36:52 -0700
+Subject: [PATCH] Fix signature of main function
+
+Clang-15 errors out otherewise.
+Include needed headers for missing functions
+
+Upstream-Status:Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/chkshsgr.c    | 2 +-
+ src/tai64n.c      | 2 +-
+ src/tai64nlocal.c | 2 +-
+ src/trycpp.c      | 5 +++--
+ src/tryflock.c    | 4 ++--
+ src/trymkffo.c    | 2 +-
+ src/trypoll.c     | 3 ++-
+ src/trysgact.c    | 4 ++--
+ src/trysgprm.c    | 4 ++--
+ src/tryshsgr.c    | 3 ++-
+ src/tryulong64.c  | 4 ++--
+ src/trywaitp.c    | 4 ++--
+ src/x86cpuid.c    | 2 +-
+ 13 files changed, 22 insertions(+), 19 deletions(-)
+
+diff --git a/src/chkshsgr.c b/src/chkshsgr.c
+index 038afe9..9547a4c 100644
+--- a/src/chkshsgr.c
++++ b/src/chkshsgr.c
+@@ -5,7 +5,7 @@
+ #include <grp.h>
+ #include <unistd.h>
+ 
+-int main()
++int main(int argc, char *argv[])
+ {
+   gid_t x[4];
+ 
+diff --git a/src/tai64n.c b/src/tai64n.c
+index 17bdb82..7096ab3 100644
+--- a/src/tai64n.c
++++ b/src/tai64n.c
+@@ -27,7 +27,7 @@ buffer in = BUFFER_INIT(myread,0,inbuf,sizeof inbuf);
+ 
+ char stamp[TIMESTAMP + 1];
+ 
+-int main()
++int main(int argc, char *argv[])
+ {
+   char ch;
+ 
+diff --git a/src/tai64nlocal.c b/src/tai64nlocal.c
+index ce16ad8..2435737 100644
+--- a/src/tai64nlocal.c
++++ b/src/tai64nlocal.c
+@@ -28,7 +28,7 @@ unsigned long nanosecs;
+ unsigned long u;
+ struct tm *t;
+ 
+-int main()
++int main(int argc, char *argv[])
+ {
+   char ch;
+ 
+diff --git a/src/trycpp.c b/src/trycpp.c
+index e4503d4..d96c955 100644
+--- a/src/trycpp.c
++++ b/src/trycpp.c
+@@ -1,6 +1,7 @@
+ /* Public domain. */
+-
+-int main()
++#include <stdio.h>
++#include <stdlib.h>
++int main(int argc, char *argv[])
+ {
+ #ifdef NeXT
+   printf("nextstep\n"); exit(0);
+diff --git a/src/tryflock.c b/src/tryflock.c
+index a82ffc2..5ca97d3 100644
+--- a/src/tryflock.c
++++ b/src/tryflock.c
+@@ -3,8 +3,8 @@
+ #include <sys/types.h>
+ #include <sys/file.h>
+ #include <fcntl.h>
+-
+-main()
++void
++main(int argc, char *argv[])
+ {
+   flock(0,LOCK_EX | LOCK_UN | LOCK_NB);
+ }
+diff --git a/src/trymkffo.c b/src/trymkffo.c
+index 9356342..f92414a 100644
+--- a/src/trymkffo.c
++++ b/src/trymkffo.c
+@@ -3,7 +3,7 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ 
+-void main()
++void main(int argc, char *argv[])
+ {
+   mkfifo("temp-trymkffo",0);
+ }
+diff --git a/src/trypoll.c b/src/trypoll.c
+index 6506617..cb888cc 100644
+--- a/src/trypoll.c
++++ b/src/trypoll.c
+@@ -3,8 +3,9 @@
+ #include <sys/types.h>
+ #include <fcntl.h>
+ #include <poll.h>
++#include <unistd.h>
+ 
+-int main()
++int main(int argc, char *argv[])
+ {
+   struct pollfd x;
+ 
+diff --git a/src/trysgact.c b/src/trysgact.c
+index e264ef2..25da013 100644
+--- a/src/trysgact.c
++++ b/src/trysgact.c
+@@ -1,8 +1,8 @@
+ /* Public domain. */
+ 
+ #include <signal.h>
+-
+-main()
++void
++main(int argc, char *argv[])
+ {
+   struct sigaction sa;
+   sa.sa_handler = 0;
+diff --git a/src/trysgprm.c b/src/trysgprm.c
+index a46c82c..5a9491c 100644
+--- a/src/trysgprm.c
++++ b/src/trysgprm.c
+@@ -1,8 +1,8 @@
+ /* Public domain. */
+ 
+ #include <signal.h>
+-
+-main()
++void
++main(int argc, char *argv[])
+ {
+   sigset_t ss;
+  
+diff --git a/src/tryshsgr.c b/src/tryshsgr.c
+index c5ed6d6..d111e40 100644
+--- a/src/tryshsgr.c
++++ b/src/tryshsgr.c
+@@ -1,6 +1,7 @@
+ /* Public domain. */
+ 
+-int main()
++#include <unistd.h>
++int main(int argc, char *argv[])
+ {
+   short x[4];
+  
+diff --git a/src/tryulong64.c b/src/tryulong64.c
+index 003548a..20a3a40 100644
+--- a/src/tryulong64.c
++++ b/src/tryulong64.c
+@@ -1,6 +1,6 @@
+ /* Public domain. */
+-
+-int main()
++#include <unistd.h>
++int main(int argc, char *argv[])
+ {
+   unsigned long u;
+   u = 1;
+diff --git a/src/trywaitp.c b/src/trywaitp.c
+index 319b81f..90bc5aa 100644
+--- a/src/trywaitp.c
++++ b/src/trywaitp.c
+@@ -2,8 +2,8 @@
+ 
+ #include <sys/types.h>
+ #include <sys/wait.h>
+-
+-main()
++void
++main(int argc, char *argv[])
+ {
+   waitpid(0,0,0);
+ }
+diff --git a/src/x86cpuid.c b/src/x86cpuid.c
+index f81c593..1cb1ea6 100644
+--- a/src/x86cpuid.c
++++ b/src/x86cpuid.c
+@@ -7,7 +7,7 @@ void nope()
+   exit(1);
+ }
+ 
+-int main()
++int main(int argc, char *argv[])
+ {
+   unsigned long x[4];
+   unsigned long y[4];
+-- 
+2.37.3
+

@@ -26,6 +26,9 @@ locations = list()
 
 class SystemdFile():
     """Class representing a single systemd configuration file"""
+
+    _clearable_keys = ['WantedBy']
+
     def __init__(self, root, path, instance_unit_name):
         self.sections = dict()
         self._parse(root, path)
@@ -80,6 +83,14 @@ class SystemdFile():
                 v = m.group('value')
                 if k not in section:
                     section[k] = list()
+
+                # If we come across a "key=" line for a "clearable key", then
+                # forget all preceding assignments. This works because we are
+                # processing files in correct parse order.
+                if k in self._clearable_keys and not v:
+                    del section[k]
+                    continue
+
                 section[k].extend(v.split())
 
     def get(self, section, prop):

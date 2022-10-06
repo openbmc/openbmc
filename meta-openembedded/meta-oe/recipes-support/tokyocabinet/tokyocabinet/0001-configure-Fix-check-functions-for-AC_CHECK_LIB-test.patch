@@ -1,0 +1,58 @@
+From e192da006dd9b0ecbbef540a3e86b65ff88e89e2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 1 Sep 2022 13:28:29 -0700
+Subject: [PATCH] configure: Fix check functions for AC_CHECK_LIB test
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.in | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 5b24947..0542490 100644
+--- a/configure.in
++++ b/configure.in
+@@ -247,30 +247,30 @@ test -n "$LDFLAGS" && MYLDFLAGS="$LDFLAGS $MYLDFLAGS"
+ AC_C_BIGENDIAN(MYCPPFLAGS="$MYCPPFLAGS -D_MYBIGEND")
+ 
+ # Underlying libraries
+-AC_CHECK_LIB(c, main)
+-AC_CHECK_LIB(m, main)
++AC_CHECK_LIB(c, printf)
++AC_CHECK_LIB(m, pow)
+ if test "$enable_pthread" != "no"
+ then
+-  AC_CHECK_LIB(pthread, main)
+-  AC_CHECK_LIB(rt, main)
++  AC_CHECK_LIB(pthread, pthread_create)
++  AC_CHECK_LIB(rt, clock_gettime)
+ fi
+ if test "$enable_zlib" != "no"
+ then
+-  AC_CHECK_LIB(z, main)
++  AC_CHECK_LIB(z, inflate)
+ fi
+ if test "$enable_bzip" != "no"
+ then
+-  AC_CHECK_LIB(bz2, main)
++  AC_CHECK_LIB(bz2, BZ2_bzCompressInit)
+ fi
+ if test "$enable_exlzma" = "yes"
+ then
+-  AC_CHECK_LIB(lzma, main)
++  AC_CHECK_LIB(lzma, lzma_easy_buffer_encode)
+ fi
+ if test "$enable_exlzo" = "yes"
+ then
+-  AC_CHECK_LIB(lzo2, main)
++  AC_CHECK_LIB(lzo2, lzo1x_1_compress)
+ fi
+-AC_CHECK_LIB(tokyocabinet, main, AC_MSG_WARN([old version of Tokyo Cabinet was detected]))
++AC_CHECK_LIB(tokyocabinet, tcbdbopen, AC_MSG_WARN([old version of Tokyo Cabinet was detected]))
+ 
+ # Necessary headers
+ AC_CHECK_HEADER(stdlib.h, true, AC_MSG_ERROR([stdlib.h is required]))
+-- 
+2.37.3
+

@@ -8,6 +8,7 @@ SRCNAME = "libpwquality"
 SRC_URI = "https://github.com/${SRCNAME}/${SRCNAME}/releases/download/${SRCNAME}-${PV}/${SRCNAME}-${PV}.tar.bz2 \
            file://add-missing-python-include-dir-for-cross.patch \
 "
+SRC_URI:append:libc-musl = " file://0001-fix-musl-build.patch "
 
 SRC_URI[md5sum] = "1fe43f6641dbf1e1766e2a02cf68a9c3"
 SRC_URI[sha256sum] = "d43baf23dc6887fe8f8e9b75cabaabc5f4bbbaa0f9eff44278d276141752a545"

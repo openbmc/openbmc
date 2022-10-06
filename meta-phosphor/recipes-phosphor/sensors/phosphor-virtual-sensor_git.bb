@@ -10,7 +10,7 @@ DEPENDS:append = "\
     phosphor-logging \
     sdbusplus \
 "
-SRCREV = "dc7770153b8fdfca26f1e7fd038033dff6b20456"
+SRCREV = "f6825b916c8a0c252511ff8b3bdfada05031b7f4"
 PR = "r1"
 
 SRC_URI = "git://github.com/openbmc/phosphor-virtual-sensor.git;protocol=https;branch=master"

@@ -1,4 +1,8 @@
-Latest clang is causing build failures because -Werror is used:
+From 17f490101f51b03c1ffc7151cc35e9fbd42b6060 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Tue, 22 Feb 2022 10:38:13 +0000
+Subject: [PATCH] Latest clang is causing build failures because -Werror is
+ used
 
   edk2/MdeModulePkg/Include/Guid/ExtendedFirmwarePerformance.h:78:47:
   error: field Guid within 'FPDT_GUID_EVENT_RECORD' is less aligned than 'EFI_GUID'
@@ -11,11 +15,20 @@ This has been reported upstream[1] so until this is resolved, ignore the warning
 
 Upstream-Status: Pending
 Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ BaseTools/Conf/tools_def.template | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/BaseTools/Conf/tools_def.template b/BaseTools/Conf/tools_def.template
-index f2bb6247e8..ca2b449f0a 100755
+index 5ed19810b7..9b4f173519 100755
 --- a/BaseTools/Conf/tools_def.template
 +++ b/BaseTools/Conf/tools_def.template
-@@ -2570 +2570 @@ DEFINE CLANG38_X64_TARGET           = -target x86_64-pc-linux-gnu
+@@ -2548,7 +2548,7 @@ DEFINE CLANG38_X64_PREFIX           = ENV(CLANG38_BIN)
+ DEFINE CLANG38_IA32_TARGET          = -target i686-pc-linux-gnu
+ DEFINE CLANG38_X64_TARGET           = -target x86_64-pc-linux-gnu
+ 
 -DEFINE CLANG38_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-unused-const-variable -Wno-varargs -Wno-unknown-warning-option -Wno-unused-but-set-variable -Wno-unused-const-variable
-+DEFINE CLANG38_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-unused-const-variable -Wno-varargs -Wno-unknown-warning-option -Wno-unused-but-set-variable -Wno-unused-const-variable -Wno-error=unaligned-access
++DEFINE CLANG38_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-unused-const-variable -Wno-varargs -Wno-unknown-warning-option -Wno-unused-but-set-variable -Wno-unused-const-variable -Wno-error=unaligned-access -Wno-unused-command-line-argument 
+ DEFINE CLANG38_ALL_CC_FLAGS         = DEF(GCC48_ALL_CC_FLAGS) DEF(CLANG38_WARNING_OVERRIDES) -fno-stack-protector -mms-bitfields -Wno-address -Wno-shift-negative-value -Wno-unknown-pragmas -Wno-incompatible-library-redeclaration -fno-asynchronous-unwind-tables -mno-sse -mno-mmx -msoft-float -mno-implicit-float  -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -funsigned-char -fno-ms-extensions -Wno-null-dereference
+ 
+ ###########################

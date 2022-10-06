@@ -151,6 +151,7 @@ BOOST_PARALLEL_MAKE = "${@oe.utils.parallel_make_argument(d, '-j%d')}"
 BJAM_OPTS    = '${BOOST_PARALLEL_MAKE} -d+2 -q \
 		${BJAM_TOOLS} \
 		-sBOOST_BUILD_USER_CONFIG=${WORKDIR}/user-config.jam \
+		-sICU_PATH=${STAGING_EXECPREFIXDIR} \
 		--build-dir=${B} \
 		--disable-icu \
 		${BJAM_EXTRA}'

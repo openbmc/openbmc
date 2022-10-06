@@ -1,0 +1,2611 @@
+From 42fd69fb5ec0c441b3d31ec544ed03bedab28d45 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Tue, 16 Nov 2021 12:34:52 +0000
+Subject: [PATCH 2/7] arm_ffa: introducing Arm FF-A low-level driver
+
+This driver implements Arm Firmware Framework for Armv8-A on u-boot
+
+The Firmware Framework for Arm A-profile processors (FF-A)
+describes interfaces (ABIs) that standardize communication
+between the Secure World and Normal World leveraging TrustZone
+technology.
+
+This driver is based on FF-A specification v1.0 and uses SMC32
+calling convention.
+
+FF-A specification:
+
+https://developer.arm.com/documentation/den0077/a/?lang=en
+
+The driver provides helper FF-A interfaces for user layers.
+These helper functions allow clients to pass data and select the
+FF-A function to use for the communication with secure world.
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+Upstream-Status: Submitted [https://patchwork.ozlabs.org/project/uboot/patch/20220801172053.20163-4-abdellatif.elkhlifi@arm.com/]
+---
+ MAINTAINERS                      |    8 +
+ arch/arm/cpu/armv8/smccc-call.S  |   27 +
+ arch/arm/lib/asm-offsets.c       |    6 +
+ common/board_r.c                 |    6 +
+ drivers/Kconfig                  |    2 +
+ drivers/Makefile                 |    1 +
+ drivers/arm-ffa/Kconfig          |   26 +
+ drivers/arm-ffa/Makefile         |    3 +
+ drivers/arm-ffa/arm-ffa-uclass.c |   67 ++
+ drivers/arm-ffa/arm_ffa_prv.h    |  199 ++++
+ drivers/arm-ffa/core.c           | 1484 ++++++++++++++++++++++++++++++
+ include/arm_ffa.h                |  191 ++++
+ include/arm_ffa_helper.h         |   45 +
+ include/dm/uclass-id.h           |    1 +
+ include/linux/arm-smccc.h        |   28 +-
+ lib/Kconfig                      |    1 +
+ lib/Makefile                     |    1 +
+ lib/arm-ffa/Kconfig              |    6 +
+ lib/arm-ffa/Makefile             |    8 +
+ lib/arm-ffa/arm_ffa_helper.c     |  188 ++++
+ lib/efi_loader/efi_boottime.c    |   17 +
+ 21 files changed, 2314 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/arm-ffa/Kconfig
+ create mode 100644 drivers/arm-ffa/Makefile
+ create mode 100644 drivers/arm-ffa/arm-ffa-uclass.c
+ create mode 100644 drivers/arm-ffa/arm_ffa_prv.h
+ create mode 100644 drivers/arm-ffa/core.c
+ create mode 100644 include/arm_ffa.h
+ create mode 100644 include/arm_ffa_helper.h
+ create mode 100644 lib/arm-ffa/Kconfig
+ create mode 100644 lib/arm-ffa/Makefile
+ create mode 100644 lib/arm-ffa/arm_ffa_helper.c
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 96582fc677..14307e6da6 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -232,6 +232,14 @@ F:	board/CZ.NIC/
+ F:	configs/turris_*_defconfig
+ F:	include/configs/turris_*.h
+ 
++ARM FF-A
++M:	Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
++S:	Maintained
++F:	drivers/arm-ffa/
++F:	include/arm_ffa.h
++F:	include/arm_ffa_helper.h
++F:	lib/arm-ffa/
++
+ ARM FREESCALE IMX
+ M:	Stefano Babic <sbabic@denx.de>
+ M:	Fabio Estevam <festevam@gmail.com>
+diff --git a/arch/arm/cpu/armv8/smccc-call.S b/arch/arm/cpu/armv8/smccc-call.S
+index dc92b28777..ffc39c9fef 100644
+--- a/arch/arm/cpu/armv8/smccc-call.S
++++ b/arch/arm/cpu/armv8/smccc-call.S
+@@ -1,6 +1,8 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+ /*
+  * Copyright (c) 2015, Linaro Limited
++ * (C) Copyright 2021 ARM Limited
++ * Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+  */
+ #include <linux/linkage.h>
+ #include <linux/arm-smccc.h>
+@@ -45,3 +47,28 @@ ENDPROC(__arm_smccc_smc)
+ ENTRY(__arm_smccc_hvc)
+ 	SMCCC	hvc
+ ENDPROC(__arm_smccc_hvc)
++
++#if (IS_ENABLED(CONFIG_ARM_FFA_TRANSPORT))
++
++	.macro FFASMCCC instr
++	.cfi_startproc
++	\instr	#0
++	ldr	x9, [sp]
++	stp	x0, x1, [x9, #ARM_SMCCC_RES_X0_OFFS]
++	stp	x2, x3, [x9, #ARM_SMCCC_RES_X2_OFFS]
++	stp	x4, x5, [x9, #ARM_SMCCC_RES_X4_OFFS]
++	stp	x6, x7, [x9, #ARM_SMCCC_RES_X6_OFFS]
++	ret
++	.cfi_endproc
++	.endm
++
++/*
++ * void arm_ffa_smccc_smc(unsigned long a0, unsigned long a1, unsigned long a2,
++ *		  unsigned long a3, unsigned long a4, unsigned long a5,
++ *		  unsigned long a6, unsigned long a7, struct arm_smccc_res *res)
++ */
++ENTRY(__arm_ffa_smccc_smc)
++	FFASMCCC	smc
++ENDPROC(__arm_ffa_smccc_smc)
++
++#endif
+diff --git a/arch/arm/lib/asm-offsets.c b/arch/arm/lib/asm-offsets.c
+index 22fd541f9a..45eca83a47 100644
+--- a/arch/arm/lib/asm-offsets.c
++++ b/arch/arm/lib/asm-offsets.c
+@@ -9,6 +9,8 @@
+  * generate asm statements containing #defines,
+  * compile this file to assembler, and then extract the
+  * #defines from the assembly-language output.
++ *
++ * (C) Copyright 2021 ARM Limited
+  */
+ 
+ #include <common.h>
+@@ -115,6 +117,10 @@ int main(void)
+ #ifdef CONFIG_ARM_SMCCC
+ 	DEFINE(ARM_SMCCC_RES_X0_OFFS, offsetof(struct arm_smccc_res, a0));
+ 	DEFINE(ARM_SMCCC_RES_X2_OFFS, offsetof(struct arm_smccc_res, a2));
++#if (IS_ENABLED(CONFIG_ARM_FFA_TRANSPORT))
++	DEFINE(ARM_SMCCC_RES_X4_OFFS, offsetof(struct arm_smccc_res, a4));
++	DEFINE(ARM_SMCCC_RES_X6_OFFS, offsetof(struct arm_smccc_res, a6));
++#endif
+ 	DEFINE(ARM_SMCCC_QUIRK_ID_OFFS, offsetof(struct arm_smccc_quirk, id));
+ 	DEFINE(ARM_SMCCC_QUIRK_STATE_OFFS, offsetof(struct arm_smccc_quirk, state));
+ #endif
+diff --git a/common/board_r.c b/common/board_r.c
+index c24d9b4e22..af20f38b10 100644
+--- a/common/board_r.c
++++ b/common/board_r.c
+@@ -61,6 +61,9 @@
+ #include <wdt.h>
+ #include <asm-generic/gpio.h>
+ #include <efi_loader.h>
++#ifdef CONFIG_ARM_FFA_TRANSPORT
++#include <arm_ffa_helper.h>
++#endif
+ 
+ DECLARE_GLOBAL_DATA_PTR;
+ 
+@@ -770,6 +773,9 @@ static init_fnc_t init_sequence_r[] = {
+ 	INIT_FUNC_WATCHDOG_RESET
+ 	initr_net,
+ #endif
++#ifdef CONFIG_ARM_FFA_TRANSPORT
++	ffa_helper_init_device,
++#endif
+ #ifdef CONFIG_POST
+ 	initr_post,
+ #endif
+diff --git a/drivers/Kconfig b/drivers/Kconfig
+index b26ca8cf70..e83c23789d 100644
+--- a/drivers/Kconfig
++++ b/drivers/Kconfig
+@@ -6,6 +6,8 @@ source "drivers/core/Kconfig"
+ 
+ source "drivers/adc/Kconfig"
+ 
++source "drivers/arm-ffa/Kconfig"
++
+ source "drivers/ata/Kconfig"
+ 
+ source "drivers/axi/Kconfig"
+diff --git a/drivers/Makefile b/drivers/Makefile
+index 4e7cf28440..6671d2a604 100644
+--- a/drivers/Makefile
++++ b/drivers/Makefile
+@@ -107,6 +107,7 @@ obj-y += iommu/
+ obj-y += smem/
+ obj-y += thermal/
+ obj-$(CONFIG_TEE) += tee/
++obj-$(CONFIG_ARM_FFA_TRANSPORT) += arm-ffa/
+ obj-y += axi/
+ obj-y += ufs/
+ obj-$(CONFIG_W1) += w1/
+diff --git a/drivers/arm-ffa/Kconfig b/drivers/arm-ffa/Kconfig
+new file mode 100644
+index 0000000000..d71444c1fa
+--- /dev/null
++++ b/drivers/arm-ffa/Kconfig
+@@ -0,0 +1,26 @@
++# SPDX-License-Identifier: GPL-2.0
++
++config ARM_FFA_TRANSPORT
++	bool "Enable Arm Firmware Framework for Armv8-A driver"
++	depends on DM && ARM64
++	select ARM_SMCCC
++	select LIB_UUID
++	select ARM_FFA_TRANSPORT_HELPERS
++	select CMD_ARMFFA
++	help
++	  The Firmware Framework for Arm A-profile processors (FF-A)
++	  describes interfaces (ABIs) that standardize communication
++	  between the Secure World and Normal World leveraging TrustZone
++	  technology.
++
++	  This driver is based on FF-A specification v1.0 and uses SMC32
++	  calling convention.
++
++	  FF-A specification:
++
++	  https://developer.arm.com/documentation/den0077/a/?lang=en
++
++	  In u-boot FF-A design, the Secure World is considered as one
++	  entity to communicate with. FF-A communication is handled by
++	  one device and one instance. This device takes care of
++	  all the interactions between Normal world and Secure World.
+diff --git a/drivers/arm-ffa/Makefile b/drivers/arm-ffa/Makefile
+new file mode 100644
+index 0000000000..9fb5bea522
+--- /dev/null
++++ b/drivers/arm-ffa/Makefile
+@@ -0,0 +1,3 @@
++# SPDX-License-Identifier: GPL-2.0+
++
++obj-y += arm-ffa-uclass.o core.o
+diff --git a/drivers/arm-ffa/arm-ffa-uclass.c b/drivers/arm-ffa/arm-ffa-uclass.c
+new file mode 100644
+index 0000000000..43f6066281
+--- /dev/null
++++ b/drivers/arm-ffa/arm-ffa-uclass.c
+@@ -0,0 +1,67 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * (C) Copyright 2021 ARM Limited
++ * Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
++ */
++
++#include <common.h>
++#include <dm.h>
++#include <arm_ffa.h>
++#include <errno.h>
++#include <log.h>
++#include <asm/global_data.h>
++
++DECLARE_GLOBAL_DATA_PTR;
++
++UCLASS_DRIVER(ffa) = {
++	.name		= "ffa",
++	.id		= UCLASS_FFA,
++};
++
++/**
++ * ffa_get_invoke_func - performs a call to the FF-A driver dispatcher
++ * @func_id:	The FF-A function to be used
++ * @func_data:  Pointer to the FF-A function arguments
++ *				container structure. This also includes
++ *				pointers to the returned data needed by
++ *				clients.
++ *
++ * This runtime function passes the FF-A function ID and its arguments to
++ * the FF-A driver dispatcher.
++ * This function is called by the FF-A helper functions.
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++int __ffa_runtime ffa_get_invoke_func(u32 func_id, struct ffa_interface_data *func_data)
++{
++	if (!ffa_device_get_ops()->invoke_func)
++		return -EINVAL;
++
++	return ffa_device_get_ops()->invoke_func(func_id, func_data);
++}
++
++/**
++ * ffa_init_device - probes the arm_ffa device
++ *
++ * This boot time function makes sure the arm_ffa device is probed
++ * and ready for use.
++ * This function is called automatically at initcalls
++ * level (after u-boot relocation).
++ *
++ * Arm FF-A transport is implemented through a single u-boot
++ * device (arm_ffa). So, there is only one device belonging to UCLASS_FFA.
++ * All FF-A clients should use the arm_ffa device to use the FF-A
++ * transport.
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++int ffa_init_device(void)
++{
++	ffa_dbg("[%s]", __func__);
++
++	return ffa_get_device();
++}
+diff --git a/drivers/arm-ffa/arm_ffa_prv.h b/drivers/arm-ffa/arm_ffa_prv.h
+new file mode 100644
+index 0000000000..38ea4ba83e
+--- /dev/null
++++ b/drivers/arm-ffa/arm_ffa_prv.h
+@@ -0,0 +1,199 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * (C) Copyright 2021 ARM Limited
++ * Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
++ */
++
++#ifndef __ARM_FFA_PRV_H
++#define __ARM_FFA_PRV_H
++
++#include <arm_ffa.h>
++#include <linux/bitfield.h>
++#include <linux/bitops.h>
++
++/*
++ * This header is private. It is exclusively used by the FF-A driver
++ */
++
++/* FF-A driver version definitions */
++
++#define MAJOR_VERSION_MASK		GENMASK(30, 16)
++#define MINOR_VERSION_MASK		GENMASK(15, 0)
++#define GET_FFA_MAJOR_VERSION(x)		\
++				((u16)(FIELD_GET(MAJOR_VERSION_MASK, (x))))
++#define GET_FFA_MINOR_VERSION(x)		\
++				((u16)(FIELD_GET(MINOR_VERSION_MASK, (x))))
++#define PACK_VERSION_INFO(major, minor)			\
++	(FIELD_PREP(MAJOR_VERSION_MASK, (major)) |	\
++	 FIELD_PREP(MINOR_VERSION_MASK, (minor)))
++
++#define FFA_MAJOR_VERSION		(1)
++#define FFA_MINOR_VERSION		(0)
++#define FFA_VERSION_1_0		\
++			PACK_VERSION_INFO(FFA_MAJOR_VERSION, FFA_MINOR_VERSION)
++
++/* Endpoint ID mask (u-boot endpoint ID) */
++
++#define GET_SELF_ENDPOINT_ID_MASK		GENMASK(15, 0)
++#define GET_SELF_ENDPOINT_ID(x)		\
++			((u16)(FIELD_GET(GET_SELF_ENDPOINT_ID_MASK, (x))))
++
++#define PREP_SELF_ENDPOINT_ID_MASK		GENMASK(31, 16)
++#define PREP_SELF_ENDPOINT_ID(x)		\
++			((u16)(FIELD_PREP(PREP_SELF_ENDPOINT_ID_MASK, (x))))
++
++/* Partition endpoint ID mask  (partition with which u-boot communicates with) */
++
++#define PREP_PART_ENDPOINT_ID_MASK		GENMASK(15, 0)
++#define PREP_PART_ENDPOINT_ID(x)		\
++			((u16)(FIELD_PREP(PREP_PART_ENDPOINT_ID_MASK, (x))))
++
++/* The FF-A SMC function prototype definition */
++
++typedef void (*invoke_ffa_fn_t)(unsigned long a0, unsigned long a1,
++			unsigned long a2, unsigned long a3, unsigned long a4,
++			unsigned long a5, unsigned long a6, unsigned long a7,
++			struct arm_smccc_res *res);
++
++/**
++ * enum ffa_conduit - Arm FF-A conduits supported by the Arm FF-A driver
++ * Currently only SMC32 is supported.
++ */
++enum ffa_conduit {
++	FFA_CONDUIT_SMC = 0,
++};
++
++/**
++ * FFA_DECLARE_ARGS - FF-A functions local variables
++ * @a0-a7:	local variables used to set registers x0-x7
++ * @res:	the structure hosting the FF-A function return data
++ *
++ * A helper macro for declaring local variables for the FF-A functions  arguments.
++ * The x0-x7 registers are used to exchange data with the secure world.
++ * But, only the bottom 32-bit of thes registers contains the data.
++ */
++#define FFA_DECLARE_ARGS \
++	unsigned long a0 = 0; \
++	unsigned long a1 = 0; \
++	unsigned long a2 = 0; \
++	unsigned long a3 = 0; \
++	unsigned long a4 = 0; \
++	unsigned long a5 = 0; \
++	unsigned long a6 = 0; \
++	unsigned long a7 = 0; \
++	struct arm_smccc_res res = {0}
++
++/* FF-A error codes */
++#define FFA_ERR_STAT_NOT_SUPPORTED				(-1)
++#define FFA_ERR_STAT_INVALID_PARAMETERS				(-2)
++#define FFA_ERR_STAT_NO_MEMORY				(-3)
++#define FFA_ERR_STAT_BUSY				(-4)
++#define FFA_ERR_STAT_INTERRUPTED				(-5)
++#define FFA_ERR_STAT_DENIED				(-6)
++#define FFA_ERR_STAT_RETRY				(-7)
++#define FFA_ERR_STAT_ABORTED				(-8)
++
++/**
++ * struct ffa_features_desc - FF-A functions features
++ * @func_id:	FF-A function
++ * @field1:	features read from register w2
++ * @field2:	features read from register w3
++ *
++ * Data structure describing the features of the  FF-A functions queried by
++ * FFA_FEATURES
++ */
++struct ffa_features_desc {
++	u32 func_id;
++	u32 field1;
++	u32 field2;
++};
++
++/**
++ * enum ffa_rxtx_buf_sizes - minimum sizes supported
++ * for the RX/TX buffers
++ */
++enum ffa_rxtx_buf_sizes {
++	RXTX_4K,
++	RXTX_64K,
++	RXTX_16K
++};
++
++/*
++ * Number of the FF-A interfaces features descriptors
++ * currently only FFA_RXTX_MAP descriptor is supported
++ */
++#define FFA_FEATURE_DESC_CNT (1)
++
++/**
++ * struct ffa_pdata - platform data for the arm_ffa device
++ * @conduit: The FF-A conduit used
++ *
++ * Platform data structure read from the device tree
++ */
++struct ffa_pdata {
++	enum ffa_conduit conduit;
++};
++
++/**
++ * struct ffa_rxtxpair - structure hosting the RX/TX buffers physical addresses
++ * @rxbuf:	physical address of the RX buffer
++ * @txbuf:	physical address of the TX buffer
++ *
++ * Data structure hosting the physical addresses of the mapped RX/TX buffers
++ * These physical address are used by the FF-A functions that use the RX/TX buffers
++ */
++struct ffa_rxtxpair {
++	u64 rxbuf; /* physical address */
++	u64 txbuf; /* physical address */
++};
++
++/**
++ * struct ffa_partition_desc - the secure partition descriptor
++ * @info:	partition information
++ * @UUID:	UUID
++ *
++ * Each partition has its descriptor containing the partitions information and the UUID
++ */
++struct ffa_partition_desc {
++	struct ffa_partition_info info;
++	union ffa_partition_uuid UUID;
++};
++
++/**
++ * struct ffa_partitions - descriptors for all secure partitions
++ * @count:	The number of partitions descriptors
++ * @descs	The partitions descriptors table
++ *
++ * This data structure contains the partitions descriptors table
++ */
++struct ffa_partitions {
++	u32 count;
++	struct ffa_partition_desc *descs; /* virtual address */
++};
++
++/**
++ * struct ffa_prvdata - the driver private data structure
++ *
++ * @dev:	The arm_ffa device under u-boot driver model
++ * @fwk_version:	FF-A framework version
++ * @id:	u-boot endpoint ID
++ * @partitions:	The partitions descriptors structure
++ * @pair:	The RX/TX buffers pair
++ * @conduit:	The selected conduit
++ * @invoke_ffa_fn:	The function executing the FF-A function
++ * @features:	Table of the FF-A functions having features
++ *
++ * The driver data structure hosting all resident data.
++ */
++struct ffa_prvdata {
++	struct udevice *dev;
++	u32 fwk_version;
++	u16 id;
++	struct ffa_partitions partitions;
++	struct ffa_rxtxpair pair;
++	enum ffa_conduit conduit;
++	invoke_ffa_fn_t invoke_ffa_fn;
++	struct ffa_features_desc features[FFA_FEATURE_DESC_CNT];
++};
++
++#endif
+diff --git a/drivers/arm-ffa/core.c b/drivers/arm-ffa/core.c
+new file mode 100644
+index 0000000000..98e2d2fa17
+--- /dev/null
++++ b/drivers/arm-ffa/core.c
+@@ -0,0 +1,1484 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * (C) Copyright 2021 ARM Limited
++ * Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
++ */
++
++#include "arm_ffa_prv.h"
++#include <asm/global_data.h>
++#include <asm/io.h>
++#include <common.h>
++#include <dm.h>
++#include <fdtdec.h>
++#include <linux/errno.h>
++#include <linux/sizes.h>
++#include <log.h>
++#include <malloc.h>
++#include <mapmem.h>
++#include <string.h>
++
++DECLARE_GLOBAL_DATA_PTR;
++
++/**
++ * The device private data structure containing all the resident
++ * data read from secure world
++ */
++struct ffa_prvdata __ffa_runtime_data ffa_priv_data = {0};
++
++/*
++ * Driver functions
++ */
++
++/**
++ * ffa_get_device - probes the arm_ffa device
++ *
++ * This boot time function makes sure the arm_ffa device is probed
++ * and ready for use. This is done using uclass_get_device.
++ * The arm_ffa driver belongs to UCLASS_FFA.
++ * This function should be called before using the driver.
++ *
++ * Arm FF-A transport is implemented through a single u-boot
++ * device (arm_ffa). So, there is only one device belonging to UCLASS_FFA.
++ * All FF-A clients should use the arm_ffa device to use the FF-A
++ * transport.
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++int ffa_get_device(void)
++{
++	int ret;
++	int devnum = 0;
++
++	ffa_dbg("[%s]", __func__);
++
++	if (ffa_priv_data.dev)
++		return FFA_ERR_STAT_SUCCESS;
++
++	/*
++	 * searching and probing the device
++	 */
++	ret = uclass_get_device(UCLASS_FFA, devnum, &ffa_priv_data.dev);
++	if (ret) {
++		ffa_err("can not find the device");
++		ffa_priv_data.dev = NULL;
++		return -ENODEV;
++	}
++
++	return FFA_ERR_STAT_SUCCESS;
++}
++
++/**
++ * ffa_get_version - FFA_VERSION handler function
++ *
++ * This is the boot time function that implements FFA_VERSION FF-A function
++ * to get from the secure world the FF-A framework version
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++static int ffa_get_version(void)
++{
++	u16 major, minor;
++
++	FFA_DECLARE_ARGS;
++
++	ffa_dbg("[%s]", __func__);
++
++	if (!ffa_priv_data.invoke_ffa_fn)
++		panic("[FFA] no private data found\n");
++
++	a0 = FFA_VERSION;
++	a1 = FFA_VERSION_1_0;
++	ffa_priv_data.invoke_ffa_fn(a0, a1, a2, a3, a4, a5, a6, a7, &res);
++
++	if (res.a0 == FFA_ERR_STAT_NOT_SUPPORTED) {
++		ffa_err("A Firmware Framework implementation does not exist");
++		return -EOPNOTSUPP;
++	}
++
++	major = GET_FFA_MAJOR_VERSION(res.a0);
++	minor = GET_FFA_MINOR_VERSION(res.a0);
++
++	ffa_info("FF-A driver %d.%d\nFF-A framework %d.%d",
++		 FFA_MAJOR_VERSION, FFA_MINOR_VERSION, major, minor);
++
++	if ((major == FFA_MAJOR_VERSION && minor >= FFA_MINOR_VERSION)) {
++		ffa_info("Versions are compatible ");
++
++		ffa_priv_data.fwk_version = res.a0;
++
++		return FFA_ERR_STAT_SUCCESS;
++	}
++
++	ffa_info("Versions are incompatible ");
++	return -EPROTONOSUPPORT;
++}
++
++/**
++ * ffa_get_endpoint_id - FFA_ID_GET handler function
++ *
++ * This is the boot time function that implements FFA_ID_GET FF-A function
++ * to get from the secure world u-boot endpoint ID
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++static int ffa_get_endpoint_id(void)
++{
++	FFA_DECLARE_ARGS;
++
++	ffa_dbg("[%s]", __func__);
++
++	if (!ffa_priv_data.invoke_ffa_fn)
++		panic("[FFA] no private data found\n");
++
++	a0 = FFA_ID_GET;
++
++	ffa_priv_data.invoke_ffa_fn(a0, a1, a2, a3, a4, a5, a6, a7, &res);
++
++	switch (res.a0) {
++	case FFA_ERROR:
++	{
++		if (((int)res.a2) == FFA_ERR_STAT_NOT_SUPPORTED) {
++			ffa_err("This function is not implemented at this FF-A instance");
++			return -EOPNOTSUPP;
++		}
++
++		ffa_err("Undefined error code (%d)", ((int)res.a2));
++		return -EINVAL;
++	}
++	case FFA_SUCCESS:
++	{
++		ffa_priv_data.id = GET_SELF_ENDPOINT_ID(res.a2);
++		ffa_info("endpoint ID is %u", ffa_priv_data.id);
++
++		return FFA_ERR_STAT_SUCCESS;
++	}
++	default:
++	{
++		ffa_err("Undefined response function (0x%lx)", res.a0);
++		return -EINVAL;
++	}
++	}
++}
++
++/**
++ * ffa_get_features_desc - returns the features descriptor of the specified
++ *						FF-A function
++ * @func_id:	the FF-A function which the features are to be retrieved
++ *
++ * This is a boot time function that searches the features descriptor of the
++ * specified FF-A function
++ *
++ * Return:
++ *
++ * When found, the address of the features descriptor is returned. Otherwise, NULL.
++ */
++static struct ffa_features_desc *ffa_get_features_desc(u32 func_id)
++{
++	u32 desc_idx;
++
++	/*
++	 * search for the descriptor of the selected FF-A interface
++	 */
++	for (desc_idx = 0; desc_idx < FFA_FEATURE_DESC_CNT ; desc_idx++)
++		if (ffa_priv_data.features[desc_idx].func_id == func_id)
++			return &ffa_priv_data.features[desc_idx];
++
++	return NULL;
++}
++
++/**
++ * ffa_get_rxtx_map_features - FFA_FEATURES handler function with FFA_RXTX_MAP
++ *							argument
++ *
++ * This is the boot time function that implements FFA_FEATURES FF-A function
++ * to retrieve the FFA_RXTX_MAP features
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++static int ffa_get_rxtx_map_features(void)
++{
++	FFA_DECLARE_ARGS;
++
++	ffa_dbg("[%s]", __func__);
++
++	if (!ffa_priv_data.invoke_ffa_fn)
++		panic("[FFA] no private data found\n");
++
++	a0 = FFA_FEATURES;
++	a1 = FFA_RXTX_MAP;
++
++	ffa_priv_data.invoke_ffa_fn(a0, a1, a2, a3, a4, a5, a6, a7, &res);
++
++	switch (res.a0) {
++	case FFA_ERROR:
++	{
++		if (((int)res.a2) == FFA_ERR_STAT_NOT_SUPPORTED) {
++			ffa_err("FFA_RXTX_MAP is not implemented at this FF-A instance");
++			return -EOPNOTSUPP;
++		}
++
++		ffa_err("Undefined error code (%d)", ((int)res.a2));
++		return -EINVAL;
++	}
++	case FFA_SUCCESS:
++	{
++		u32 desc_idx;
++
++		/*
++		 * search for an empty descriptor
++		 */
++		for (desc_idx = 0; desc_idx < FFA_FEATURE_DESC_CNT ; desc_idx++)
++			if (!ffa_priv_data.features[desc_idx].func_id) {
++				/*
++				 * populate the descriptor with
++				 * the interface features data
++				 */
++				ffa_priv_data.features[desc_idx].func_id =
++					FFA_RXTX_MAP;
++				ffa_priv_data.features[desc_idx].field1 =
++					res.a2;
++
++				ffa_info("FFA_RXTX_MAP features data 0x%lx",
++					 res.a2);
++
++				return FFA_ERR_STAT_SUCCESS;
++			}
++
++		ffa_err("Cannot save FFA_RXTX_MAP features data. Descriptors table full");
++		return -ENOBUFS;
++	}
++	default:
++	{
++		ffa_err("Undefined response function (0x%lx)",
++			res.a0);
++		return -EINVAL;
++	}
++	}
++}
++
++/**
++ * ffa_get_rxtx_buffers_pages_cnt - reads from the features data descriptors
++ *						the minimum number of pages in each of the RX/TX
++ *						buffers
++ * @buf_4k_pages: Pointer to the minimum number of pages
++ *
++ * This is the boot time function that  returns the minimum number of pages
++ *  in each of the RX/TX buffers
++ *
++ * Return:
++ *
++ * buf_4k_pages points to the returned number of pages
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++static int ffa_get_rxtx_buffers_pages_cnt(size_t *buf_4k_pages)
++{
++	struct ffa_features_desc *desc = NULL;
++
++	ffa_dbg("[%s]", __func__);
++
++	if (!buf_4k_pages)
++		return -EINVAL;
++
++	desc = ffa_get_features_desc(FFA_RXTX_MAP);
++	if (!desc)
++		return -EINVAL;
++
++	ffa_dbg("FFA_RXTX_MAP descriptor found");
++
++	switch (desc->field1) {
++	case RXTX_4K:
++		*buf_4k_pages = 1;
++		break;
++	case RXTX_16K:
++		*buf_4k_pages = 4;
++		break;
++	case RXTX_64K:
++		*buf_4k_pages = 16;
++		break;
++	default:
++		ffa_err("RX/TX buffer size not supported");
++		return -EINVAL;
++	}
++
++	return FFA_ERR_STAT_SUCCESS;
++}
++
++/**
++ * ffa_free_rxtx_buffers - frees the RX/TX buffers
++ * @buf_4k_pages: the minimum number of pages in each of the RX/TX
++ *			  buffers
++ *
++ * This is the boot time function used to free the RX/TX buffers
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++static int ffa_free_rxtx_buffers(size_t buf_4k_pages)
++{
++	efi_status_t free_rxbuf_ret, free_txbuf_ret;
++
++	ffa_info("Freeing RX/TX buffers");
++
++	free_rxbuf_ret = efi_free_pages(ffa_priv_data.pair.rxbuf, buf_4k_pages);
++	free_txbuf_ret = efi_free_pages(ffa_priv_data.pair.txbuf, buf_4k_pages);
++
++	if (free_rxbuf_ret != EFI_SUCCESS || free_txbuf_ret != EFI_SUCCESS) {
++		ffa_err("Failed to free RX/TX buffers (rx: %lu , tx: %lu)",
++			free_rxbuf_ret,
++			free_txbuf_ret);
++		return -EINVAL;
++	}
++
++	return FFA_ERR_STAT_SUCCESS;
++}
++
++/**
++ * ffa_alloc_rxtx_buffers - allocates the RX/TX buffers
++ * @buf_4k_pages: the minimum number of pages in each of the RX/TX
++ *			  buffers
++ *
++ * This is the boot time function used by ffa_map_rxtx_buffers to allocate
++ * the RX/TX buffers before mapping them
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++static int ffa_alloc_rxtx_buffers(size_t buf_4k_pages)
++{
++	ffa_dbg("[%s]", __func__);
++
++#if CONFIG_IS_ENABLED(EFI_LOADER)
++
++	efi_status_t efi_ret;
++	void *virt_txbuf;
++	void *virt_rxbuf;
++
++	ffa_info("Using %lu 4KB page(s) for RX/TX buffers size",
++		 buf_4k_pages);
++
++	efi_ret = efi_allocate_pages(EFI_ALLOCATE_ANY_PAGES,
++				     EFI_BOOT_SERVICES_DATA,
++				     buf_4k_pages,
++				     &ffa_priv_data.pair.rxbuf);
++
++	if (efi_ret != EFI_SUCCESS) {
++		ffa_priv_data.pair.rxbuf = 0;
++		ffa_err("Failure to allocate RX buffer (EFI error: 0x%lx)",
++			efi_ret);
++
++		return -ENOBUFS;
++	}
++
++	ffa_info("RX buffer at phys 0x%llx",
++		 ffa_priv_data.pair.rxbuf);
++
++	/*
++	 * convert the RX buffer physical address to virtual address
++	 */
++	virt_rxbuf = (void *)map_sysmem((phys_addr_t)ffa_priv_data.pair.rxbuf, 0);
++
++	/*
++	 * make sure the buffer is clean before use
++	 */
++	memset(virt_rxbuf, 0, buf_4k_pages * SZ_4K);
++
++	unmap_sysmem(virt_rxbuf);
++
++	efi_ret = efi_allocate_pages(EFI_ALLOCATE_ANY_PAGES,
++				     EFI_RUNTIME_SERVICES_DATA,
++				     buf_4k_pages,
++				     &ffa_priv_data.pair.txbuf);
++
++	if (efi_ret != EFI_SUCCESS) {
++		ffa_dbg("FFA_RXTX_MAP: freeing RX buffer");
++		efi_free_pages(ffa_priv_data.pair.rxbuf, buf_4k_pages);
++		ffa_priv_data.pair.rxbuf = 0;
++		ffa_priv_data.pair.txbuf = 0;
++		ffa_err("Failure to allocate the TX buffer (EFI error: 0x%lx)"
++			, efi_ret);
++
++		return -ENOBUFS;
++	}
++
++	ffa_info("TX buffer at phys 0x%llx",
++		 ffa_priv_data.pair.txbuf);
++
++	/*
++	 * convert the TX buffer physical address to virtual address
++	 */
++	virt_txbuf = (void *)map_sysmem((phys_addr_t)ffa_priv_data.pair.txbuf, 0);
++
++	/*
++	 * make sure the buffer is clean before use
++	 */
++	memset(virt_txbuf, 0, buf_4k_pages * SZ_4K);
++
++	unmap_sysmem(virt_txbuf);
++
++	return FFA_ERR_STAT_SUCCESS;
++
++#else
++	return -ENOBUFS;
++#endif
++}
++
++/**
++ * ffa_map_rxtx_buffers - FFA_RXTX_MAP handler function
++ * @buf_4k_pages: the minimum number of pages in each of the RX/TX
++ *			  buffers
++ *
++ * This is the boot time function that implements FFA_RXTX_MAP FF-A function
++ * to map the RX/TX buffers
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++static int ffa_map_rxtx_buffers(size_t buf_4k_pages)
++{
++	int ret;
++
++	FFA_DECLARE_ARGS;
++
++	ffa_dbg("[%s]", __func__);
++
++	if (!ffa_priv_data.invoke_ffa_fn)
++		panic("[FFA] no private data found\n");
++
++	ret = ffa_alloc_rxtx_buffers(buf_4k_pages);
++	if (ret != FFA_ERR_STAT_SUCCESS)
++		return ret;
++
++	a0 = FFA_RXTX_MAP;
++	a1 = ffa_priv_data.pair.txbuf;
++	a2 = ffa_priv_data.pair.rxbuf;
++	a3 = buf_4k_pages;
++
++	ffa_priv_data.invoke_ffa_fn(a0, a1, a2, a3, a4, a5, a6, a7, &res);
++
++	switch (res.a0) {
++	case FFA_ERROR:
++	{
++		switch (((int)res.a2)) {
++		case FFA_ERR_STAT_INVALID_PARAMETERS:
++			ffa_err("One or more fields in input parameters is incorrectly encoded");
++			ret = -EPERM;
++			break;
++		case FFA_ERR_STAT_NO_MEMORY:
++			ffa_err("Not enough memory");
++			ret = -ENOMEM;
++			break;
++		case FFA_ERR_STAT_DENIED:
++			ffa_err("Buffer pair already registered");
++			ret = -EACCES;
++			break;
++		case FFA_ERR_STAT_NOT_SUPPORTED:
++			ffa_err("This function is not implemented at this FF-A instance");
++			ret = -EOPNOTSUPP;
++			break;
++		default:
++			ffa_err("Undefined error (%d)",
++				((int)res.a2));
++			ret = -EINVAL;
++		}
++		break;
++	}
++	case FFA_SUCCESS:
++		ffa_info("RX/TX buffers mapped");
++		return FFA_ERR_STAT_SUCCESS;
++	default:
++		ffa_err("Undefined response function (0x%lx)",
++			res.a0);
++		ret = -EINVAL;
++	}
++
++	ffa_free_rxtx_buffers(buf_4k_pages);
++
++	return ret;
++}
++
++/**
++ * ffa_unmap_rxtx_buffers - FFA_RXTX_UNMAP handler function
++ *
++ * This is the boot time function that implements FFA_RXTX_UNMAP FF-A function
++ * to unmap the RX/TX buffers
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++static int ffa_unmap_rxtx_buffers(void)
++{
++	FFA_DECLARE_ARGS;
++
++	ffa_dbg("[%s]", __func__);
++
++	if (!ffa_priv_data.invoke_ffa_fn)
++		panic("[FFA] no private data found\n");
++
++	a0 = FFA_RXTX_UNMAP;
++	a1 = PREP_SELF_ENDPOINT_ID(ffa_priv_data.id);
++
++	ffa_priv_data.invoke_ffa_fn(a0, a1, a2, a3, a4, a5, a6, a7, &res);
++
++	switch (res.a0) {
++	case FFA_ERROR:
++	{
++		if (((int)res.a2) == FFA_ERR_STAT_NOT_SUPPORTED)
++			panic("[FFA] FFA_RXTX_UNMAP is not implemented at this FF-A instance\n");
++		else if (((int)res.a2) == FFA_ERR_STAT_INVALID_PARAMETERS)
++			panic("[FFA] There is no buffer pair registered on behalf of the caller\n");
++		else
++			panic("[FFA] Undefined error (%d)\n", ((int)res.a2));
++	}
++	case FFA_SUCCESS:
++	{
++		size_t buf_4k_pages = 0;
++		int ret;
++
++		ret = ffa_get_rxtx_buffers_pages_cnt(&buf_4k_pages);
++		if (ret != FFA_ERR_STAT_SUCCESS)
++			panic("[FFA] RX/TX buffers unmapped but failure in getting pages count\n");
++
++		ret = ffa_free_rxtx_buffers(buf_4k_pages);
++		if (ret != FFA_ERR_STAT_SUCCESS)
++			panic("[FFA] RX/TX buffers unmapped but failure in freeing the memory\n");
++
++		ffa_info("RX/TX buffers unmapped and memory freed");
++
++		return FFA_ERR_STAT_SUCCESS;
++	}
++	default:
++		panic("[FFA] Undefined response function (0x%lx)", res.a0);
++	}
++}
++
++/**
++ * ffa_release_rx_buffer - FFA_RX_RELEASE handler function
++ *
++ * This is the boot time function that invokes FFA_RX_RELEASE FF-A function
++ * to release the ownership of the RX buffer
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++static int ffa_release_rx_buffer(void)
++{
++	FFA_DECLARE_ARGS;
++
++	ffa_dbg("[%s]", __func__);
++
++	if (!ffa_priv_data.invoke_ffa_fn)
++		panic("[FFA] no private data found\n");
++
++	a0 = FFA_RX_RELEASE;
++
++	ffa_priv_data.invoke_ffa_fn(a0, a1, a2, a3, a4, a5, a6, a7, &res);
++
++	switch (res.a0) {
++	case FFA_ERROR:
++	{
++		if (((int)res.a2) == FFA_ERR_STAT_NOT_SUPPORTED)
++			panic("[FFA] FFA_RX_RELEASE is not implemented at this FF-A instance\n");
++		else if (((int)res.a2) == FFA_ERR_STAT_DENIED)
++			panic("[FFA] Caller did not have ownership of the RX buffer\n");
++		else
++			panic("[FFA] Undefined error (%d)\n", ((int)res.a2));
++	}
++	case FFA_SUCCESS:
++		ffa_info("RX buffer released");
++		return FFA_ERR_STAT_SUCCESS;
++
++	default:
++		panic("[FFA] Undefined response function (0x%lx)\n", res.a0);
++	}
++}
++
++/**
++ * ffa_uuid_are_identical - checks whether two given UUIDs are identical
++ * @uuid1: first UUID
++ * @uuid2: second UUID
++ *
++ * This is a boot time function used by ffa_read_partitions_info to search
++ * for a UUID in the partitions descriptors table
++ *
++ * Return:
++ *
++ * 1 when UUIDs match. Otherwise, 0
++ */
++int ffa_uuid_are_identical(const union ffa_partition_uuid *uuid1,
++			   const union ffa_partition_uuid *uuid2)
++{
++	if (!uuid1 || !uuid2)
++		return 0;
++
++	return (!memcmp(uuid1, uuid2, sizeof(union ffa_partition_uuid)));
++}
++
++/**
++ * ffa_read_partitions_info - reads the data queried by FFA_PARTITION_INFO_GET
++ *							and saves it in the private structure
++ * @count: The number of partitions queried
++ * @part_uuid: Pointer to the partition(s) UUID
++ *
++ * This is the boot time function that reads the partitions information
++ * returned by the FFA_PARTITION_INFO_GET and saves it in the private
++ * data structure.
++ *
++ * Return:
++ *
++ * The private data structure is updated with the partition(s) information
++ * FFA_ERR_STAT_SUCCESS is returned on success. Otherwise, failure
++ */
++static int ffa_read_partitions_info(u32 count, union ffa_partition_uuid *part_uuid)
++{
++	ffa_dbg("[%s]", __func__);
++
++	if (!count) {
++		ffa_err("No partition detected");
++		return -ENODATA;
++	}
++
++	ffa_info("Reading partitions data from the RX buffer");
++
++#if CONFIG_IS_ENABLED(EFI_LOADER)
++
++	if (!part_uuid) {
++		/*
++		 * querying information of all partitions
++		 */
++		u64 data_pages;
++		u64 data_bytes;
++		efi_status_t efi_ret;
++		size_t buf_4k_pages = 0;
++		u32 desc_idx;
++		struct ffa_partition_info *parts_info;
++		int ret;
++
++		data_bytes = count * sizeof(struct ffa_partition_desc);
++		data_pages = efi_size_in_pages(data_bytes);
++
++		/*
++		 * get the RX buffer size in pages
++		 */
++		ret = ffa_get_rxtx_buffers_pages_cnt(&buf_4k_pages);
++		if (ret != FFA_ERR_STAT_SUCCESS) {
++			ffa_err("Can not get the RX buffer size (error %d)", ret);
++			return ret;
++		}
++
++		if (data_pages > buf_4k_pages) {
++			ffa_err("Partitions data size exceeds the RX buffer size:");
++			ffa_err("    Sizes in pages: data %llu , RX buffer %lu ",
++				data_pages,
++				buf_4k_pages);
++
++			return -ENOMEM;
++		}
++
++		efi_ret = efi_allocate_pages(EFI_ALLOCATE_ANY_PAGES,
++					     EFI_RUNTIME_SERVICES_DATA,
++					     data_pages,
++					     (u64 *)&ffa_priv_data.partitions.descs);
++
++		if (efi_ret != EFI_SUCCESS) {
++			ffa_priv_data.partitions.descs = NULL;
++
++			ffa_err("Cannot  allocate partitions data buffer (EFI error 0x%lx)",
++				efi_ret);
++
++			return -ENOBUFS;
++		}
++
++		/*
++		 * convert the descs buffer physical address
++		 * to virtual address
++		 * This virtual address should not be unmapped
++		 * descs is expected to be a virtual address
++		 */
++		ffa_priv_data.partitions.descs =
++			(struct ffa_partition_desc *)
++			map_sysmem((phys_addr_t)
++				   ffa_priv_data.partitions.descs, 0);
++
++		/*
++		 * make sure the buffer is clean before use
++		 */
++		memset(ffa_priv_data.partitions.descs, 0,
++		       data_pages * SZ_4K);
++
++		ffa_info("Copying %lld page(s) of partitions data from RX buffer",
++			 data_pages);
++
++		/*
++		 * convert the RX buffer physical address to
++		 * virtual address
++		 */
++		parts_info = (struct ffa_partition_info *)
++			map_sysmem((phys_addr_t)
++				   ffa_priv_data.pair.rxbuf, 0);
++
++		for (desc_idx = 0 ; desc_idx < count ; desc_idx++) {
++			ffa_priv_data.partitions.descs[desc_idx].info =
++				parts_info[desc_idx];
++
++			ffa_info("Partition ID %x : info cached",
++				 ffa_priv_data.partitions.descs[desc_idx].info.id);
++		}
++		unmap_sysmem(parts_info);
++
++		ffa_priv_data.partitions.count = count;
++
++		ffa_info("%d partition(s) found and cached", count);
++
++	} else {
++		u32 rx_desc_idx, cached_desc_idx;
++		struct ffa_partition_info *parts_info;
++		u8 desc_found;
++
++		/*
++		 * convert the RX buffer physical address to virtual address
++		 */
++		parts_info = (struct ffa_partition_info *)
++			map_sysmem((phys_addr_t)ffa_priv_data.pair.rxbuf, 0);
++
++		/*
++		 * search for the SP IDs read from the RX buffer
++		 * in the already cached SPs.
++		 * Update the UUID when ID found.
++		 */
++		for (rx_desc_idx = 0; rx_desc_idx < count ; rx_desc_idx++) {
++			desc_found = 0;
++
++			/*
++			 * search the current ID in the cached partitions
++			 */
++			for (cached_desc_idx = 0;
++			     cached_desc_idx < ffa_priv_data.partitions.count;
++			     cached_desc_idx++) {
++				/*
++				 * save the UUID
++				 */
++				if (ffa_priv_data.partitions.descs[cached_desc_idx].info.id ==
++				    parts_info[rx_desc_idx].id) {
++					ffa_priv_data.partitions.descs[cached_desc_idx].UUID =
++						*part_uuid;
++
++					desc_found = 1;
++					break;
++				}
++			}
++
++			if (!desc_found) {
++				unmap_sysmem(parts_info);
++				return -ENODATA;
++			}
++		}
++		unmap_sysmem(parts_info);
++	}
++#else
++#warning "arm_ffa: reading FFA_PARTITION_INFO_GET data not implemented"
++#endif
++
++	return  FFA_ERR_STAT_SUCCESS;
++}
++
++/**
++ * ffa_query_partitions_info - invokes FFA_PARTITION_INFO_GET
++ *							and saves partitions data
++ * @part_uuid: Pointer to the partition(s) UUID
++ * @pcount: Pointer to the number of partitions variable filled when querying
++ *
++ * This is the boot time function that executes the FFA_PARTITION_INFO_GET
++ * to query the partitions data. Then, it calls ffa_read_partitions_info
++ * to save the data in the private data structure.
++ *
++ * After reading the data the RX buffer is released using ffa_release_rx_buffer
++ *
++ * Return:
++ *
++ * When part_uuid is NULL, all partitions data are retrieved from secure world
++ * When part_uuid is non NULL, data for partitions matching the given UUID are
++ * retrieved and the number of partitions is returned
++ * FFA_ERR_STAT_SUCCESS is returned on success. Otherwise, failure
++ */
++static int ffa_query_partitions_info(union ffa_partition_uuid *part_uuid,
++				     u32 *pcount)
++{
++	unsigned long a0 = 0;
++	union ffa_partition_uuid query_uuid = {0};
++	unsigned long a5 = 0;
++	unsigned long a6 = 0;
++	unsigned long a7 = 0;
++	struct arm_smccc_res res = {0};
++
++	ffa_dbg("[%s]", __func__);
++
++	if (!ffa_priv_data.invoke_ffa_fn)
++		panic("[FFA] no private data found\n");
++
++	a0 = FFA_PARTITION_INFO_GET;
++
++	/*
++	 * If a UUID is specified. Information for one or more
++	 * partitions in the system is queried. Otherwise, information
++	 * for all installed partitions is queried
++	 */
++
++	if (part_uuid) {
++		if (!pcount)
++			return -EINVAL;
++
++		query_uuid = *part_uuid;
++	}
++
++	ffa_priv_data.invoke_ffa_fn(a0, query_uuid.words.a1, query_uuid.words.a2,
++				    query_uuid.words.a3, query_uuid.words.a4,
++				    a5, a6, a7, &res);
++
++	switch (res.a0) {
++	case FFA_ERROR:
++	{
++		switch (((int)res.a2)) {
++		case FFA_ERR_STAT_INVALID_PARAMETERS:
++			ffa_err("Unrecognized UUID");
++			return -EPERM;
++		case FFA_ERR_STAT_NO_MEMORY:
++			ffa_err("Results cannot fit in RX buffer of the caller");
++			return -ENOMEM;
++		case FFA_ERR_STAT_DENIED:
++			ffa_err("Callee is not in a state to handle this request");
++			return -EACCES;
++		case FFA_ERR_STAT_NOT_SUPPORTED:
++			ffa_err("This function is not implemented at this FF-A instance");
++			return -EOPNOTSUPP;
++		case FFA_ERR_STAT_BUSY:
++			ffa_err("RX buffer of the caller is not free");
++			return -EBUSY;
++		default:
++			ffa_err("Undefined error (%d)", ((int)res.a2));
++			return -EINVAL;
++		}
++	}
++	case FFA_SUCCESS:
++	{
++		int ret;
++
++		/*
++		 * res.a2 contains the count of partition information descriptors
++		 * populated in the RX buffer
++		 */
++		if (res.a2) {
++			ret = ffa_read_partitions_info(res.a2, part_uuid);
++			if (ret)
++				ffa_err("Failed to read partition(s) data , error (%d)", ret);
++		}
++
++		/*
++		 * return the SP count
++		 */
++		if (part_uuid) {
++			if (!ret)
++				*pcount = res.a2;
++			else
++				*pcount = 0;
++		}
++		/*
++		 * After calling FFA_PARTITION_INFO_GET the buffer ownership
++		 * is assigned to the consumer (u-boot). So, we need to give
++		 * the ownership back to the secure world
++		 */
++		ret = ffa_release_rx_buffer();
++
++		if (!part_uuid && !res.a2) {
++			ffa_err("[FFA] no partition installed in the system");
++			return -ENODEV;
++		}
++
++		return ret;
++	}
++	default:
++		ffa_err("Undefined response function (0x%lx)", res.a0);
++		return  -EINVAL;
++	}
++}
++
++/**
++ * ffa_get_partitions_info - FFA_PARTITION_INFO_GET handler function
++ * @func_data: Pointer to the FF-A function arguments container structure.
++ * The passed arguments:
++ * Mode 1: When getting from the driver the number of
++ *	secure partitions:
++ *	@data0_size: UUID size
++ *	@data0: pointer to the UUID (little endian)
++ *	@data1_size: size of the number of partitions
++ *				variable
++ *	@data1: pointer to the number of partitions
++ *			 variable. The variable will be set
++ *			 by the driver
++ * Mode 2: When requesting the driver to return the
++ *	partitions information:
++ *	@data0_size: UUID size
++ *	@data0: pointer to the UUID (little endian)
++ *	@data1_size: size of the SPs information buffer
++ *	@data1: pointer to SPs information buffer
++ *		(allocated by the client).
++ *		The buffer will be filled by the driver
++ *
++ * This is the boot time function that queries the secure partition data from
++ * the private data structure. If not found, it invokes FFA_PARTITION_INFO_GET
++ * FF-A function to query the partition information from secure world.
++ *
++ * A client of the FF-A driver should know the UUID of the service it wants to
++ * access. It should use the UUID to request the FF-A driver to provide the
++ * partition(s) information of the service. The FF-A driver uses
++ * PARTITION_INFO_GET to obtain this information. This is implemented through
++ * ffa_get_partitions_info function.
++ * A new FFA_PARTITION_INFO_GET call is issued (first one performed through
++ * ffa_cache_partitions_info) allowing to retrieve the partition(s) information.
++ * They are not saved (already done). We only update the UUID in the cached area.
++ * This assumes that partitions data does not change in the secure world.
++ * Otherwise u-boot will have an outdated partition data. The benefit of caching
++ * the information in the FF-A driver is to accommodate discovery after
++ * ExitBootServices().
++ *
++ * When invoked through a client request, ffa_get_partitions_info should be
++ * called twice. First call is to get from the driver the number of secure
++ * partitions (SPs) associated to a particular UUID.
++ * Then, the caller (client) allocates the buffer to host the SPs data and
++ * issues a 2nd call. Then, the driver fills the SPs data in the pre-allocated
++ * buffer.
++ *
++ * To achieve the mechanism described above, ffa_get_partitions_info uses the
++ * following functions:
++ *		ffa_read_partitions_info
++ *		ffa_query_partitions_info
++ *
++ * Return:
++ *
++ * @data1: When pointing to the number of partitions variable, the number is
++ * set by the driver.
++ * When pointing to the partitions information buffer, the buffer will be
++ * filled by the driver.
++ *
++ * On success FFA_ERR_STAT_SUCCESS is returned. Otherwise, failure
++ */
++static int ffa_get_partitions_info(struct ffa_interface_data *func_data)
++{
++	/*
++	 * fill_data:
++	 * 0: return the SP count
++	 * 1: fill SP data and return it to the caller
++	 * -1: undefined mode
++	 */
++	int fill_data = -1;
++	u32 desc_idx, client_desc_idx;
++	union ffa_partition_uuid *part_uuid;
++	u32 client_desc_max_cnt;
++	u32 parts_found = 0;
++
++	ffa_dbg("[%s]", __func__);
++
++	if (!func_data) {
++		ffa_err("No function data provided");
++		return -EINVAL;
++	}
++
++	if (!ffa_priv_data.partitions.count || !ffa_priv_data.partitions.descs)
++		panic("[FFA] No partition installed\n");
++
++	if (func_data->data0_size == sizeof(union ffa_partition_uuid) &&
++	    func_data->data0 &&
++	    func_data->data1_size == sizeof(u32) &&
++	    func_data->data1) {
++		/*
++		 * data0 (in): pointer to UUID
++		 * data1 (in): pointer to SP count
++		 * Out: SP count returned in the count variable pointed by data1
++		 */
++
++		fill_data = 0;
++
++		ffa_info("Preparing for checking partitions count");
++
++	} else if ((func_data->data0_size == sizeof(union ffa_partition_uuid)) &&
++		   func_data->data0 &&
++		   (func_data->data1_size >= sizeof(struct ffa_partition_info)) &&
++		   !(func_data->data1_size % sizeof(struct ffa_partition_info)) &&
++		   func_data->data1) {
++		/*
++		 * data0 (in): pointer to UUID
++		 * data1 (in): pointer to SPs descriptors buffer
++		 *             (created by the client)
++		 * Out: SPs descriptors returned in the buffer
++		 *      pointed by data1
++		 */
++
++		fill_data = 1;
++
++		client_desc_idx = 0;
++
++		/*
++		 * number of empty descriptors preallocated by the caller
++		 */
++		client_desc_max_cnt =
++			func_data->data1_size / sizeof(struct ffa_partition_info);
++
++		ffa_info("Preparing for filling partitions info");
++
++	} else {
++		ffa_err("Invalid function arguments provided");
++		return -EINVAL;
++	}
++
++	part_uuid = (union ffa_partition_uuid *)func_data->data0;
++
++	ffa_info("Searching partitions using the provided UUID");
++
++#ifdef DEBUG
++	{
++		u32 dbg_uuid_cnt;
++
++		ffa_dbg("UUID: [LSB]");
++
++		for (dbg_uuid_cnt = 0 ; dbg_uuid_cnt < UUID_SIZE ; dbg_uuid_cnt++)
++			ffa_dbg(" %02x", part_uuid->bytes[dbg_uuid_cnt]);
++	}
++#endif
++
++	/*
++	 * search in the cached partitions
++	 */
++	for (desc_idx = 0;
++	     desc_idx < ffa_priv_data.partitions.count;
++	     desc_idx++) {
++		if (ffa_uuid_are_identical(&ffa_priv_data.partitions.descs[desc_idx].UUID,
++					   part_uuid)) {
++			ffa_info("Partition ID %x matches the provided UUID",
++				 ffa_priv_data.partitions.descs[desc_idx].info.id);
++
++			parts_found++;
++
++			if (fill_data) {
++				/*
++				 * trying to fill the partition info in data1
++				 */
++
++				if (client_desc_idx < client_desc_max_cnt) {
++					((struct ffa_partition_info *)
++					 func_data->data1)[client_desc_idx++] =
++						ffa_priv_data.partitions.descs[desc_idx].info;
++					continue;
++				}
++
++				ffa_err("Failed to fill the current descriptor client buffer full");
++				return -ENOBUFS;
++			}
++		}
++	}
++
++	if (!parts_found) {
++		int ret;
++
++		ffa_info("No partition found. Querying framework ...");
++
++		ret = ffa_query_partitions_info(part_uuid, &parts_found);
++
++		if (ret == FFA_ERR_STAT_SUCCESS) {
++			if (!fill_data) {
++				*((u32 *)func_data->data1) = parts_found;
++
++				ffa_info("Number of partition(s) found matching the UUID: %d",
++					 parts_found);
++			} else {
++				/*
++				 * we want to read SPs info
++				 */
++
++				/*
++				 * If SPs data filled, retry searching SP info again
++				 */
++				if (parts_found)
++					ret = ffa_get_partitions_info(func_data);
++				else
++					ret = -ENODATA;
++			}
++		}
++
++		return ret;
++	}
++
++	/* partition(s) found */
++	if (!fill_data)
++		*((u32 *)func_data->data1) = parts_found;
++
++	return FFA_ERR_STAT_SUCCESS;
++}
++
++/**
++ * ffa_cache_partitions_info - Queries and saves all secure partitions data
++ *
++ * This is a boot time function that invokes FFA_PARTITION_INFO_GET FF-A
++ * function to query from secure world all partitions information.
++ *
++ * The FFA_PARTITION_INFO_GET call is issued with nil UUID as an argument.
++ * All installed partitions information are returned. We cache them in the
++ * resident private data structure and we keep the UUID field empty
++ * (in FF-A 1.0 UUID is not provided by the partition descriptor)
++ *
++ * This function is called at the device probing level.
++ * ffa_cache_partitions_info uses ffa_query_partitions_info to get the data
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++static int ffa_cache_partitions_info(void)
++{
++	ffa_dbg("[%s]", __func__);
++	return ffa_query_partitions_info(NULL, NULL);
++}
++
++/**
++ * ffa_msg_send_direct_req - FFA_MSG_SEND_DIRECT_{REQ,RESP} handler function
++ * @func_data: Pointer to the FF-A function arguments container structure.
++ *					The passed arguments:
++ *						@data0_size: partition ID size
++ *						@data0: pointer to the partition ID
++ *						@data1_size: exchanged data size
++ *						@data1: pointer to the data buffer preallocated by
++ *								the client (in/out)
++ *
++ * This is the runtime function that implements FFA_MSG_SEND_DIRECT_{REQ,RESP}
++ * FF-A functions.
++ *
++ * FFA_MSG_SEND_DIRECT_REQ is used to send the data to the secure partition.
++ * The response from the secure partition is handled by reading the
++ * FFA_MSG_SEND_DIRECT_RESP arguments.
++ *
++ * The maximum size of the data that can be exchanged is 20 bytes which is
++ * sizeof(struct ffa_send_direct_data) as defined by the FF-A specification 1.0
++ * in the section relevant to FFA_MSG_SEND_DIRECT_{REQ,RESP}
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++static int __ffa_runtime ffa_msg_send_direct_req(struct ffa_interface_data
++						 *func_data)
++{
++	u16 dst_part_id;
++	unsigned long a0 = 0;
++	unsigned long a1 = 0;
++	unsigned long a2 = 0;
++	struct ffa_send_direct_data *msg;
++	struct arm_smccc_res res = {0};
++
++	ffa_dbg("[%s]", __func__);
++
++	if (!ffa_priv_data.invoke_ffa_fn)
++		panic("[FFA] no private data found\n");
++
++	if (!func_data)
++		return -EINVAL;
++
++	if (!ffa_priv_data.partitions.count || !ffa_priv_data.partitions.descs)
++		panic("[FFA] no partition installed\n");
++
++	if (func_data->data0_size != sizeof(u16) ||
++	    !func_data->data0 ||
++	    func_data->data1_size != FFA_MSG_SEND_DIRECT_MAX_SIZE ||
++	    !func_data->data1) {
++		ffa_err("Undefined interface parameters");
++		return -EINVAL;
++	}
++
++	dst_part_id = *((u16 *)func_data->data0);
++	msg = func_data->data1;
++
++	ffa_dbg("Sending data to partition ID 0x%x", dst_part_id);
++
++	a0 = FFA_MSG_SEND_DIRECT_REQ;
++
++	a1 = PREP_SELF_ENDPOINT_ID(ffa_priv_data.id) |
++		PREP_PART_ENDPOINT_ID(dst_part_id);
++
++	ffa_priv_data.invoke_ffa_fn(a0, a1, a2,
++				    msg->a3,
++				    msg->a4,
++				    msg->a5,
++				    msg->a6,
++				    msg->a7,
++				    &res);
++
++	while (res.a0 == FFA_INTERRUPT)
++		ffa_priv_data.invoke_ffa_fn(FFA_RUN, res.a1,
++					    0, 0, 0, 0, 0, 0,
++					    &res);
++
++	switch (res.a0) {
++	case FFA_ERROR:
++	{
++		switch (((int)res.a2)) {
++		case FFA_ERR_STAT_INVALID_PARAMETERS:
++			ffa_err("Invalid endpoint ID or non-zero reserved register");
++			return -EPERM;
++		case FFA_ERR_STAT_ABORTED:
++			panic("[FFA] Message target ran into unexpected error and has aborted\n");
++		case FFA_ERR_STAT_DENIED:
++			panic("[FFA] Callee is not in a state to handle this request\n");
++		case FFA_ERR_STAT_NOT_SUPPORTED:
++			panic("[FFA] This function is not implemented at this FF-A instance\n");
++		case FFA_ERR_STAT_BUSY:
++			panic("[FFA] Message target is busy\n");
++		default:
++			panic("[FFA] Undefined error (%d)\n", ((int)res.a2));
++		}
++	}
++	case FFA_SUCCESS:
++
++		ffa_dbg("Message sent with no response");
++		return FFA_ERR_STAT_SUCCESS;
++
++	case FFA_MSG_SEND_DIRECT_RESP:
++
++		ffa_dbg("Message sent with response");
++
++		/*
++		 * extract the 32-bit wide return data
++		 */
++		msg->a3 = (u32)res.a3;
++		msg->a4 = (u32)res.a4;
++		msg->a5 = (u32)res.a5;
++		msg->a6 = (u32)res.a6;
++		msg->a7 = (u32)res.a7;
++
++		return FFA_ERR_STAT_SUCCESS;
++
++	default:
++		panic("[FFA] Undefined response function (0x%lx)\n", res.a0);
++	}
++}
++
++/**
++ * invoke_ffa_drv_api - The driver dispatcher function
++ * @func_id:	The FF-A function to be used
++ * @func_data:  Pointer to the FF-A function arguments container
++ *					structure. This also includes pointers to the
++ *					returned data needed by clients.
++ * The dispatcher is a runtime function that selects the FF-A function handler
++ * based on the input FF-A function ID.
++ * The input arguments are passed to the handler function.
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++int __ffa_runtime invoke_ffa_drv_api(u32 func_id,
++				     struct ffa_interface_data *func_data)
++{
++	if (!ffa_priv_data.dev)
++		panic("[FFA] no device found\n");
++
++	switch (func_id) {
++	case FFA_PARTITION_INFO_GET:
++		return ffa_get_partitions_info(func_data);
++	case FFA_RXTX_UNMAP:
++		return ffa_unmap_rxtx_buffers();
++	case FFA_MSG_SEND_DIRECT_REQ:
++		return ffa_msg_send_direct_req(func_data);
++	default:
++
++		ffa_err("Undefined FF-A interface (%d)", func_id);
++
++		return -EINVAL;
++	}
++}
++
++/**
++ * ffa_init_private_data - Initialization of the private data
++ * @dev:	the arm_ffa device
++ *
++ * This boot time function reads data from the platform data structure
++ * and populates the private data structure
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++static int ffa_init_private_data(struct udevice *dev)
++{
++	struct ffa_pdata *pdata = dev_get_plat(dev);
++
++	ffa_priv_data.conduit = pdata->conduit;
++
++	if (ffa_priv_data.conduit == FFA_CONDUIT_SMC) {
++		ffa_priv_data.invoke_ffa_fn = arm_ffa_smccc_smc;
++	} else {
++		ffa_err("Undefined FF-A conduit (%d)", ffa_priv_data.conduit);
++		return -EINVAL;
++	}
++
++	ffa_info("Conduit is %s",
++		 ((ffa_priv_data.conduit == FFA_CONDUIT_SMC) ?
++		   "SMC" : "NOT SUPPORTED"));
++
++	return FFA_ERR_STAT_SUCCESS;
++}
++
++/**
++ * ffa_probe - The driver probe function
++ * @dev:	the arm_ffa device
++ *
++ * Probing is done at boot time and triggered by the uclass device discovery.
++ * At probe level the following actions are done:
++ *	- initialization of the driver private data structure
++ *	- querying from secure world the FF-A framework version
++ *	- querying from secure world the u-boot endpoint ID
++ *	- querying from secure world the supported features of the specified FF-A calls
++ *	- mapping the RX/TX buffers
++ *	- querying from secure world all the partitions information
++ *
++ * All data queried from secure world is saved in the resident private data structure.
++ *
++ * The probe will fail if either FF-A framework is not detected or the
++ * FF-A requests are not behaving correctly. This ensures that the
++ * driver is not installed and its operations are not exported to the clients.
++ * However, once the driver is successfully probed and an FF-A anomaly is
++ * detected when clients invoke the driver operations, the driver cause
++ * u-boot to panic because the client would not know what to do in such conditions.
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++static int ffa_probe(struct udevice *dev)
++{
++	int ret;
++	size_t buf_4k_pages = 0;
++
++	ffa_dbg("[%s]: initializing the FF-A driver", __func__);
++
++	ret = ffa_init_private_data(dev);
++
++	if (ret != FFA_ERR_STAT_SUCCESS)
++		return ret;
++
++	ret = ffa_get_version();
++
++	if (ret != FFA_ERR_STAT_SUCCESS)
++		return ret;
++
++	ret = ffa_get_endpoint_id();
++
++	if (ret != FFA_ERR_STAT_SUCCESS)
++		return ret;
++
++	ret = ffa_get_rxtx_map_features();
++
++	if (ret != FFA_ERR_STAT_SUCCESS)
++		return ret;
++
++	ret = ffa_get_rxtx_buffers_pages_cnt(&buf_4k_pages);
++
++	if (ret != FFA_ERR_STAT_SUCCESS)
++		return ret;
++
++	ret = ffa_map_rxtx_buffers(buf_4k_pages);
++
++	if (ret != FFA_ERR_STAT_SUCCESS)
++		return ret;
++
++	ret = ffa_cache_partitions_info();
++
++	if (ret != FFA_ERR_STAT_SUCCESS) {
++		ffa_free_rxtx_buffers(buf_4k_pages);
++		return ret;
++	}
++
++	ffa_dbg("[%s]: initialization done", __func__);
++
++	return FFA_ERR_STAT_SUCCESS;
++}
++
++/**
++ * ffa_of_to_plat - Reads the device tree node
++ * @dev:	the arm_ffa device
++ *
++ * This boot time function reads data from the device tree node and populates
++ * the platform data structure
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++static int ffa_of_to_plat(struct udevice *dev)
++{
++	struct ffa_pdata *pdata = dev_get_plat(dev);
++	const char *conduit;
++
++	ffa_dbg("[%s]", __func__);
++
++	conduit = fdt_getprop(gd->fdt_blob, dev_of_offset(dev), "method", NULL);
++
++	if (strcmp("smc", conduit)) {
++		ffa_err("Unsupported conduit");
++		return -EINVAL;
++	}
++
++	pdata->conduit = FFA_CONDUIT_SMC;
++
++	return FFA_ERR_STAT_SUCCESS;
++}
++
++/**
++ * ffa_drv_ops - The driver operations runtime structure
++ * @invoke_func:	The driver dispatcher
++ */
++struct ffa_ops __ffa_runtime_data ffa_drv_ops = {
++	.invoke_func = invoke_ffa_drv_api
++};
++
++/**
++ * ffa_device_get_ops - driver operations getter
++ *
++ * Return:
++ * This runtime function returns a pointer to the driver operations structure
++ */
++const struct ffa_ops * __ffa_runtime ffa_device_get_ops(void)
++{
++	return &ffa_drv_ops;
++}
++
++/**
++ * Defining the device tree compatible string
++ */
++
++static const struct udevice_id ffa_match_id[] = {
++	{"arm,ffa", 0},
++	{},
++};
++
++/**
++ * Declaring the arm_ffa driver under UCLASS_FFA
++ */
++
++U_BOOT_DRIVER(arm_ffa) = {
++	.name		= "arm_ffa",
++	.of_match	= ffa_match_id,
++	.id		= UCLASS_FFA,
++	.of_to_plat	= ffa_of_to_plat,
++	.probe		= ffa_probe,
++	.plat_auto	= sizeof(struct ffa_pdata),
++};
+diff --git a/include/arm_ffa.h b/include/arm_ffa.h
+new file mode 100644
+index 0000000000..313f46f747
+--- /dev/null
++++ b/include/arm_ffa.h
+@@ -0,0 +1,191 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * (C) Copyright 2021 ARM Limited
++ * Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
++ */
++
++#ifndef __ARM_FFA_H
++#define __ARM_FFA_H
++
++#include <linux/arm-smccc.h>
++#include <linux/printk.h>
++
++/*
++ * This header is public. It can be used by clients to access
++ * data structures and definitions they need
++ */
++
++/*
++ * Macros for displaying logs
++ */
++
++#define ffa_dbg(fmt, ...)  pr_debug("[FFA] " fmt "\n", ##__VA_ARGS__)
++#define ffa_info(fmt, ...)  pr_info("[FFA] " fmt "\n", ##__VA_ARGS__)
++#define ffa_err(fmt, ...)  pr_err("[FFA] " fmt "\n", ##__VA_ARGS__)
++
++/*
++ * The driver operations success error code
++ */
++#define FFA_ERR_STAT_SUCCESS				(0)
++
++#if CONFIG_IS_ENABLED(EFI_LOADER)
++
++#include <efi_loader.h>
++
++/*
++ * __ffa_runtime_data and __ffa_runtime - controls whether data/code are
++ * available after calling the EFI ExitBootServices service.
++ * Data/code tagged with these keywords are resident (available at boot time and
++ * at runtime)
++ */
++
++#define __ffa_runtime_data __efi_runtime_data
++#define __ffa_runtime __efi_runtime
++
++#else
++
++#define __ffa_runtime_data
++#define __ffa_runtime
++
++#endif
++
++/*
++ * Definitions of the Arm FF-A interfaces supported by the Arm FF-A driver
++ */
++
++#define FFA_SMC(calling_convention, func_num)				\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL, (calling_convention),	\
++			   ARM_SMCCC_OWNER_STANDARD, (func_num))
++
++#define FFA_SMC_32(func_num)	FFA_SMC(ARM_SMCCC_SMC_32, (func_num))
++
++#define FFA_VERSION				FFA_SMC_32(0x63)
++#define FFA_ID_GET				FFA_SMC_32(0x69)
++#define FFA_FEATURES				FFA_SMC_32(0x64)
++#define FFA_PARTITION_INFO_GET				FFA_SMC_32(0x68)
++#define FFA_RXTX_MAP				FFA_SMC_32(0x66)
++#define FFA_RXTX_UNMAP				FFA_SMC_32(0x67)
++#define FFA_RX_RELEASE				FFA_SMC_32(0x65)
++#define FFA_MSG_SEND_DIRECT_REQ				FFA_SMC_32(0x6F)
++#define FFA_MSG_SEND_DIRECT_RESP				FFA_SMC_32(0x70)
++#define FFA_RUN				FFA_SMC_32(0x6D)
++#define FFA_ERROR				FFA_SMC_32(0x60)
++#define FFA_SUCCESS				FFA_SMC_32(0x61)
++#define FFA_INTERRUPT				FFA_SMC_32(0x62)
++
++/*
++ * struct ffa_partition_info - Partition information descriptor
++ * @id:	Partition ID
++ * @exec_ctxt:	Execution context count
++ * @properties:	Partition properties
++ *
++ * Data structure containing information about partitions instantiated in the system
++ * This structure is filled with the data queried by FFA_PARTITION_INFO_GET
++ */
++struct  __packed ffa_partition_info {
++	u16 id;
++	u16 exec_ctxt;
++/* partition supports receipt of direct requests */
++#define FFA_PARTITION_DIRECT_RECV	BIT(0)
++/* partition can send direct requests. */
++#define FFA_PARTITION_DIRECT_SEND	BIT(1)
++/* partition can send and receive indirect messages. */
++#define FFA_PARTITION_INDIRECT_MSG	BIT(2)
++	u32 properties;
++};
++
++/*
++ * struct ffa_send_direct_data - Data structure hosting the data
++ *                                       used by FFA_MSG_SEND_DIRECT_{REQ,RESP}
++ * @a3-a7:	Data read/written from/to w3-w7 registers
++ *
++ * Data structure containing the data to be sent by FFA_MSG_SEND_DIRECT_REQ
++ * or read from FFA_MSG_SEND_DIRECT_RESP
++ */
++struct __packed ffa_send_direct_data {
++	u32 a3; /* w3 */
++	u32 a4; /* w4 */
++	u32 a5; /* w5 */
++	u32 a6; /* w6 */
++	u32 a7; /* w7 */
++};
++
++#define FFA_MSG_SEND_DIRECT_MAX_SIZE (sizeof(struct ffa_send_direct_data))
++
++/* UUID data size */
++#define UUID_SIZE (16)
++
++/*
++ * union ffa_partition_uuid - Data union hosting the UUID
++ *							transmitted by FFA_PARTITION_INFO_GET
++ * @words:	data structure giving 32-bit words access to the UUID data
++ * @bytes:	data structure giving byte access to the UUID data
++ *
++ * The structure holds little-endian UUID data.
++ */
++union ffa_partition_uuid {
++	struct __packed words {
++	u32 a1; /* w1 */
++	u32 a2; /* w2 */
++	u32 a3; /* w3 */
++	u32 a4; /* w4 */
++	} words;
++	u8 bytes[UUID_SIZE];
++};
++
++/**
++ * struct ffa_interface_data - generic FF-A interface data structure used to exchange
++ *							data between user layers and the driver
++ * @data0_size:	size of the first argument
++ * @data0:	pointer to the first argument
++ * @data1_size>:	size of the second argument
++ * @data1:	pointer to the second argument
++ *
++ * Using this structure user layers can pass various types of data with different sizes.
++ * The driver internal functions can detect the nature of this data, verfy compliance
++ * then execute the request when appropriate.
++ */
++struct ffa_interface_data {
++	u32 data0_size; /* size of the first argument */
++	void *data0; /* pointer to the first argument */
++	u32 data1_size; /* size of the second argument */
++	void *data1; /* pointer to the second argument */
++};
++
++/**
++ * struct ffa_ops - The driver operations structure
++ * @invoke_func:	function pointer to the invoke function
++ *
++ * The data structure providing all the operations supported by the driver.
++ * This structure is resident.
++ */
++struct ffa_ops {
++	/* the driver dispatcher */
++	int (*invoke_func)(u32 func_id, struct ffa_interface_data *func_data);
++};
++
++/**
++ * The device driver and the Uclass driver public functions
++ */
++
++/**
++ * ffa_get_invoke_func - performs a call to the FF-A driver dispatcher
++ */
++int __ffa_runtime ffa_get_invoke_func(u32 func_id,
++				      struct ffa_interface_data *func_data);
++
++/**
++ * ffa_device_get_ops - driver operations getter
++ */
++const struct ffa_ops * __ffa_runtime ffa_device_get_ops(void);
++
++/**
++ * ffa_get_device - probes the arm_ffa device
++ */
++int ffa_get_device(void);
++
++/**
++ * ffa_init_device - probes the arm_ffa device
++ */
++int ffa_init_device(void);
++#endif
+diff --git a/include/arm_ffa_helper.h b/include/arm_ffa_helper.h
+new file mode 100644
+index 0000000000..0e143e5451
+--- /dev/null
++++ b/include/arm_ffa_helper.h
+@@ -0,0 +1,45 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * (C) Copyright 2021 ARM Limited
++ * Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
++ */
++
++#ifndef __ARM_FFA_HELPER_H
++#define __ARM_FFA_HELPER_H
++
++#include <arm_ffa.h>
++
++/*
++ * This header is public. Including this header provides all data structures
++ * and definitions needed by clients to use the FF-A transport driver
++ *
++ * It also provides helper functions allowing to pass data and invoke  FF-A functions
++ */
++
++/**
++ * ffa_helper_get_partitions_info - Wrapper function for FFA_PARTITION_INFO_GET
++ */
++int ffa_helper_get_partitions_info(struct ffa_interface_data *func_data);
++
++/**
++ * ffa_helper_unmap_rxtx_buffers - Wrapper function for FFA_RXTX_UNMAP
++ */
++int ffa_helper_unmap_rxtx_buffers(void);
++
++/**
++ * ffa_helper_msg_send_direct_req - Wrapper function for
++ *								FFA_MSG_SEND_DIRECT_{REQ,RESP}
++ */
++int __ffa_runtime ffa_helper_msg_send_direct_req(struct ffa_interface_data
++						 *func_data);
++
++/**
++ * ffa_helper_init_device - Wrapper function for probing the arm_ffa device
++ */
++int ffa_helper_init_device(void);
++
++/**
++ * ffa_uuid_str_to_bin - Converts a big endian UUID string to a little endian buffer
++ */
++int ffa_uuid_str_to_bin(const char *uuid_str, unsigned char *uuid_bin);
++#endif
+diff --git a/include/dm/uclass-id.h b/include/dm/uclass-id.h
+index 0e26e1d138..a1181b8f48 100644
+--- a/include/dm/uclass-id.h
++++ b/include/dm/uclass-id.h
+@@ -52,6 +52,7 @@ enum uclass_id {
+ 	UCLASS_EFI_MEDIA,	/* Devices provided by UEFI firmware */
+ 	UCLASS_ETH,		/* Ethernet device */
+ 	UCLASS_ETH_PHY,		/* Ethernet PHY device */
++	UCLASS_FFA,		/* Arm Firmware Framework for Armv8-A */
+ 	UCLASS_FIRMWARE,	/* Firmware */
+ 	UCLASS_FS_FIRMWARE_LOADER,		/* Generic loader */
+ 	UCLASS_GPIO,		/* Bank of general-purpose I/O pins */
+diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+index 7f2be23394..54980a130f 100644
+--- a/include/linux/arm-smccc.h
++++ b/include/linux/arm-smccc.h
+@@ -1,6 +1,8 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+ /*
+  * Copyright (c) 2015, Linaro Limited
++ * (C) Copyright 2021 ARM Limited
++ * Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+  */
+ #ifndef __LINUX_ARM_SMCCC_H
+ #define __LINUX_ARM_SMCCC_H
+@@ -57,13 +59,17 @@
+ #include <linux/types.h>
+ /**
+  * struct arm_smccc_res - Result from SMC/HVC call
+- * @a0-a3 result values from registers 0 to 3
++ * @a0-a7 result values from registers 0 to 7
+  */
+ struct arm_smccc_res {
+ 	unsigned long a0;
+ 	unsigned long a1;
+ 	unsigned long a2;
+ 	unsigned long a3;
++	unsigned long a4;
++	unsigned long a5;
++	unsigned long a6;
++	unsigned long a7;
+ };
+ 
+ /**
+@@ -113,6 +119,26 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
+ 			unsigned long a5, unsigned long a6, unsigned long a7,
+ 			struct arm_smccc_res *res, struct arm_smccc_quirk *quirk);
+ 
++#if (IS_ENABLED(CONFIG_ARM_FFA_TRANSPORT))
++/**
++ * __arm_ffa_smccc_smc() - make SMC calls used for FF-A transport
++ * @a0-a7: arguments passed in 64-bit registers x0 to x7
++ * @res: result values from 64-bit registers x0 to x7
++ *
++ * This function is used to make SMC calls following SMC32 Calling Convention.
++ * The content of the supplied parameters is copied to registers x0 to x7 prior
++ * to the SMC instruction. The SMC call return data is 32-bit data read from
++ * registers x0 tp x7.
++ */
++asmlinkage void __arm_ffa_smccc_smc(unsigned long a0, unsigned long a1,
++				    unsigned long a2, unsigned long a3, unsigned long a4,
++				    unsigned long a5, unsigned long a6, unsigned long a7,
++				    struct arm_smccc_res *res);
++
++#define arm_ffa_smccc_smc __arm_ffa_smccc_smc
++
++#endif
++
+ #define arm_smccc_smc(...) __arm_smccc_smc(__VA_ARGS__, NULL)
+ 
+ #define arm_smccc_smc_quirk(...) __arm_smccc_smc(__VA_ARGS__)
+diff --git a/lib/Kconfig b/lib/Kconfig
+index 3c6fa99b1a..473821b882 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -810,6 +810,7 @@ config SMBIOS_PARSER
+ source lib/efi/Kconfig
+ source lib/efi_loader/Kconfig
+ source lib/optee/Kconfig
++source lib/arm-ffa/Kconfig
+ 
+ config TEST_FDTDEC
+ 	bool "enable fdtdec test"
+diff --git a/lib/Makefile b/lib/Makefile
+index 11b03d1cbe..8e6fad6130 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -9,6 +9,7 @@ obj-$(CONFIG_EFI) += efi/
+ obj-$(CONFIG_EFI_LOADER) += efi_driver/
+ obj-$(CONFIG_EFI_LOADER) += efi_loader/
+ obj-$(CONFIG_CMD_BOOTEFI_SELFTEST) += efi_selftest/
++obj-$(CONFIG_ARM_FFA_TRANSPORT_HELPERS) += arm-ffa/
+ obj-$(CONFIG_LZMA) += lzma/
+ obj-$(CONFIG_BZIP2) += bzip2/
+ obj-$(CONFIG_TIZEN) += tizen/
+diff --git a/lib/arm-ffa/Kconfig b/lib/arm-ffa/Kconfig
+new file mode 100644
+index 0000000000..79acbc5a8f
+--- /dev/null
++++ b/lib/arm-ffa/Kconfig
+@@ -0,0 +1,6 @@
++config ARM_FFA_TRANSPORT_HELPERS
++	bool "Enable interface helpers for Arm Firmware Framework for Armv8-A"
++	depends on ARM_FFA_TRANSPORT
++	help
++	  User layers call FF-A interfaces using helper functions which
++	  pass the data and the FF-A function ID to the low level driver
+diff --git a/lib/arm-ffa/Makefile b/lib/arm-ffa/Makefile
+new file mode 100644
+index 0000000000..c30c0f3981
+--- /dev/null
++++ b/lib/arm-ffa/Makefile
+@@ -0,0 +1,8 @@
++# SPDX-License-Identifier: GPL-2.0+
++#
++# (C) Copyright 2021 Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
++#
++
++# This file only gets included when CONFIG_ARM_FFA_TRANSPORT_HELPERS is set
++
++obj-y += arm_ffa_helper.o
+diff --git a/lib/arm-ffa/arm_ffa_helper.c b/lib/arm-ffa/arm_ffa_helper.c
+new file mode 100644
+index 0000000000..623899d380
+--- /dev/null
++++ b/lib/arm-ffa/arm_ffa_helper.c
+@@ -0,0 +1,188 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * (C) Copyright 2021 ARM Limited
++ * Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
++ */
++
++#include <common.h>
++#include <arm_ffa_helper.h>
++#include <uuid.h>
++
++/**
++ * ffa_helper_get_partitions_info - Wrapper function for FFA_PARTITION_INFO_GET
++ *
++ * @func_data: Pointer to the FF-A function arguments container
++ *				structure.
++ *				The passed arguments:
++ *					Mode 1: When getting from the driver the number of
++ *						secure partitions:
++ *						@data0_size: UUID size
++ *						@data0: pointer to the UUID (little endian)
++ *						@data1_size: size of the number of partitions
++ *									variable
++ *						@data1: pointer to the number of partitions
++ *								 variable. The variable will be set
++ *								 by the driver
++ *					Mode 2: When requesting the driver to return the
++ *						partitions information:
++ *						@data0_size: UUID size
++ *						@data0: pointer to the UUID (little endian)
++ *						@data1_size: size of the SPs information buffer
++ *						@data1: pointer to SPs information buffer
++ *								(allocated by the client).
++ *							The buffer will be filled by the driver
++ *
++ * This is the boot time function used by clients who wants to get from secure
++ * world the partition(s) information.
++ *
++ * A client of the FF-A driver should know the UUID of the service it wants to
++ * access. It should use the UUID to request the FF-A driver to provide the
++ * partition(s) information of the service. The client should use
++ * ffa_helper_get_partitions_info to pass the UUID information to the driver
++ * which uses PARTITION_INFO_GET to obtain the partition(s) information.
++ *
++ * ffa_helper_get_partitions_info should be called twice. First call is to get
++ * from the driver the number of secure partitions (SPs) associated to a
++ * particular UUID. Then, the caller (client) allocates the buffer to host the
++ * SPs data and issues a 2nd call. Then, the driver fills the SPs data in the
++ * pre-allocated buffer.
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++int ffa_helper_get_partitions_info(struct ffa_interface_data *func_data)
++{
++	return ffa_get_invoke_func(FFA_PARTITION_INFO_GET, func_data);
++}
++
++/**
++ * ffa_helper_unmap_rxtx_buffers - Wrapper function for FFA_RXTX_UNMAP
++ *
++ * This is the boot time function that allows clients to unmap the RX/TX
++ * buffers
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++int ffa_helper_unmap_rxtx_buffers(void)
++{
++	return ffa_get_invoke_func(FFA_RXTX_UNMAP, NULL);
++}
++
++/**
++ * ffa_helper_msg_send_direct_req - Wrapper function for
++ *								FFA_MSG_SEND_DIRECT_{REQ,RESP}
++ * @func_data: Pointer to the FF-A function arguments container structure.
++ * The passed arguments:
++ *	@data0_size: partition ID size
++ *	@data0: pointer to the partition ID
++ *	@data1_size: exchanged data size
++ *	@data1: pointer to the data buffer preallocated by the client (in/out)
++ *
++ * This is the runtime function that allows clients to send data to the secure
++ * world partitions. The arm_ffa driver uses FFA_MSG_SEND_DIRECT_REQ to send the
++ * data to the secure partition. The response from the secure partition is
++ * handled internally by the driver using FFA_MSG_SEND_DIRECT_RESP and returned
++ * to ffa_helper_msg_send_direct_req through @func_data
++ *
++ * The maximum size of the data that can be exchanged is 20 bytes which is
++ * sizeof(struct ffa_send_direct_data) as defined by the FF-A specification 1.0
++ * in the section relevant to FFA_MSG_SEND_DIRECT_{REQ,RESP}
++ *
++ * The client should pre-allocate a buffer pointed by @data1 which the size
++ * is sizeof(struct ffa_send_direct_data)
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++int __ffa_runtime ffa_helper_msg_send_direct_req(struct ffa_interface_data
++											 *func_data)
++{
++	return ffa_get_invoke_func(FFA_MSG_SEND_DIRECT_REQ, func_data);
++}
++
++/**
++ * ffa_helper_init_device - Wrapper function for probing the arm_ffa device
++ *
++ * This boot time function should be called to probe the arm_ffa device so
++ * it becomes ready for use.
++ * To achieve that, this function is called automatically at initcalls
++ * level (after u-boot relocation).
++ *
++ * Return:
++ *
++ * FFA_ERR_STAT_SUCCESS on success. Otherwise, failure
++ */
++int ffa_helper_init_device(void)
++{
++	return ffa_init_device();
++}
++
++/**
++ * ffa_uuid_str_to_bin - Converts a big endian UUID string to a little endian buffer
++ * @uuid_str:	UUID string in big endian format (36 bytes wide + '/0')
++ * @uuid_bin:	preallocated 16 bytes UUID buffer in little endian format
++ *
++ * UUID binary format used by the FF-A framework (16 bytes):
++ *
++ * [LSB] 4B-2B-2B-2B-6B (little endian data fields)
++ *
++ * UUID string is 36 length of characters (36 bytes):
++ *
++ * xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
++ * be                be      be       be      be
++ *
++ * where x is a hexadecimal character. Fields are separated by '-'s.
++ * When converting to a binary UUID, these endianness rules apply:
++ *     be: means the field in the string is considered a big endian hex number
++ *         and should be converted to little endian binary format
++ *
++ * Return:
++ *
++ *    uuid_bin filled with little endian UUID data
++ *    On success 0 is returned. Otherwise, failure code.
++ */
++int ffa_uuid_str_to_bin(const char *uuid_str, unsigned char *uuid_bin)
++{
++	u16 tmp16 = 0;
++	u32 tmp32 = 0;
++	u64 tmp64 = 0;
++
++	if (!uuid_str_valid(uuid_str) || !uuid_bin)
++		return -EINVAL;
++
++	/*
++	 * reverse bytes from big to little endian
++	 */
++	tmp32 = simple_strtoul(uuid_str, NULL, 16);
++	memcpy(uuid_bin, &tmp32, 4);
++
++	/*
++	 * reverse bytes from big to little endian
++	 */
++	tmp16 = simple_strtoul(uuid_str + 9, NULL, 16);
++	memcpy(uuid_bin + 4, &tmp16, 2);
++
++	/*
++	 * reverse bytes from big to little endian
++	 */
++	tmp16 = simple_strtoul(uuid_str + 14, NULL, 16);
++	memcpy(uuid_bin + 6, &tmp16, 2);
++
++	/*
++	 * reverse bytes from big to little endian
++	 */
++	tmp16 = simple_strtoul(uuid_str + 19, NULL, 16);
++	memcpy(uuid_bin + 8, &tmp16, 2);
++
++	/*
++	 * reverse bytes from big to little endian
++	 */
++	tmp64 = simple_strtoull(uuid_str + 24, NULL, 16);
++	memcpy(uuid_bin + 10, (char *)&tmp64, 6);
++
++	return 0;
++}
+diff --git a/lib/efi_loader/efi_boottime.c b/lib/efi_loader/efi_boottime.c
+index 5bcb8253ed..cffa2c69d6 100644
+--- a/lib/efi_loader/efi_boottime.c
++++ b/lib/efi_loader/efi_boottime.c
+@@ -23,6 +23,10 @@
+ #include <asm/setjmp.h>
+ #include <linux/libfdt_env.h>
+ 
++#if defined(CONFIG_ARM_FFA_TRANSPORT)
++#include <arm_ffa_helper.h>
++#endif
++
+ DECLARE_GLOBAL_DATA_PTR;
+ 
+ /* Task priority level */
+@@ -2114,6 +2118,10 @@ static efi_status_t EFIAPI efi_exit_boot_services(efi_handle_t image_handle,
+ 	struct efi_event *evt, *next_event;
+ 	efi_status_t ret = EFI_SUCCESS;
+ 
++#if defined(CONFIG_ARM_FFA_TRANSPORT)
++	int ffa_ret;
++#endif
++
+ 	EFI_ENTRY("%p, %zx", image_handle, map_key);
+ 
+ 	/* Check that the caller has read the current memory map */
+@@ -2174,6 +2182,15 @@ static efi_status_t EFIAPI efi_exit_boot_services(efi_handle_t image_handle,
+ 		dm_remove_devices_flags(DM_REMOVE_ACTIVE_ALL);
+ 	}
+ 
++#if defined(CONFIG_ARM_FFA_TRANSPORT)
++	/* unmap FF-A RX/TX buffers */
++	ffa_ret = ffa_helper_unmap_rxtx_buffers();
++	if (ffa_ret)
++		debug("[efi_boottime][ERROR]: can not unmap FF-A RX/TX buffers\n");
++	else
++		debug("[efi_boottime][INFO]: FF-A RX/TX buffers unmapped\n");
++#endif
++
+ 	/* Patch out unsupported runtime function */
+ 	efi_runtime_detach();
+ 
+-- 
+2.34.1
+

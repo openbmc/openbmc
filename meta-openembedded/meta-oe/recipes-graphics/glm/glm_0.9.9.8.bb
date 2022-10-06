@@ -22,6 +22,8 @@ S = "${WORKDIR}/git"
 
 inherit cmake
 
+CXXFLAGS:append:toolchain-clang = " -Wno-error=invalid-utf8 -Wno-error=disabled-macro-expansion -Wno-error=reserved-identifier"
+
 do_install() {
     install -d ${D}${includedir} ${D}${docdir}/glm ${D}${libdir}/pkgconfig ${D}${libdir}/cmake/glm
     cp -R --no-dereference --preserve=mode,links ${S}/glm ${D}${includedir}

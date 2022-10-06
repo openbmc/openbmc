@@ -51,6 +51,7 @@ def load(config_file):
     sanitise("terminals", {})
     sanitise("args", [])
     sanitise("consoles", {})
+    sanitise("env", {})
 
     if not config["exe"]:
         raise ValueError("Required value FVP_EXE not set in machine configuration")

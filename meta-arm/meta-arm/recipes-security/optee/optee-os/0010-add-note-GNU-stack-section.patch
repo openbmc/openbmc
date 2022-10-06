@@ -1,0 +1,128 @@
+From ec30e84671aac9a2e9549754eb7bc6201728db4c Mon Sep 17 00:00:00 2001
+From: Jerome Forissier <jerome.forissier@linaro.org>
+Date: Tue, 23 Aug 2022 12:31:46 +0000
+Subject: [PATCH] arm32: libutils, libutee, ta: add .note.GNU-stack section to
+
+ .S files
+
+When building for arm32 with GNU binutils 2.39, the linker outputs
+warnings when linking Trusted Applications:
+
+ arm-unknown-linux-uclibcgnueabihf-ld.bfd: warning: utee_syscalls_a32.o: missing .note.GNU-stack section implies executable stack
+ arm-unknown-linux-uclibcgnueabihf-ld.bfd: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+We could silence the warning by adding the '-z execstack' option to the
+TA link flags, like we did in the parent commit for the TEE core and
+ldelf. Indeed, ldelf always allocates a non-executable piece of memory
+for the TA to use as a stack.
+
+However it seems preferable to comply with the common ELF practices in
+this case. A better fix is therefore to add the missing .note.GNU-stack
+sections in the assembler files.
+
+Signed-off-by: Jerome Forissier <jerome.forissier@linaro.org>
+
+Signed-off-by: Anton Antonov <Anton.Antonov@arm.com>
+Upstream-Status: Backport [https://github.com/OP-TEE/optee_os/pull/5499]
+
+---
+ lib/libutee/arch/arm/utee_syscalls_a32.S             | 2 ++
+ lib/libutils/ext/arch/arm/atomic_a32.S               | 2 ++
+ lib/libutils/ext/arch/arm/mcount_a32.S               | 2 ++
+ lib/libutils/isoc/arch/arm/arm32_aeabi_divmod_a32.S  | 2 ++
+ lib/libutils/isoc/arch/arm/arm32_aeabi_ldivmod_a32.S | 2 ++
+ lib/libutils/isoc/arch/arm/setjmp_a32.S              | 2 ++
+ ta/arch/arm/ta_entry_a32.S                           | 2 ++
+ 7 files changed, 14 insertions(+)
+
+diff --git a/lib/libutee/arch/arm/utee_syscalls_a32.S b/lib/libutee/arch/arm/utee_syscalls_a32.S
+index 6e621ca6..af405f62 100644
+--- a/lib/libutee/arch/arm/utee_syscalls_a32.S
++++ b/lib/libutee/arch/arm/utee_syscalls_a32.S
+@@ -7,6 +7,8 @@
+ #include <tee_syscall_numbers.h>
+ #include <asm.S>
+ 
++	.section .note.GNU-stack,"",%progbits
++
+         .section .text
+         .balign 4
+         .code 32
+diff --git a/lib/libutils/ext/arch/arm/atomic_a32.S b/lib/libutils/ext/arch/arm/atomic_a32.S
+index eaef6914..2be73ffa 100644
+--- a/lib/libutils/ext/arch/arm/atomic_a32.S
++++ b/lib/libutils/ext/arch/arm/atomic_a32.S
+@@ -5,6 +5,8 @@
+ 
+ #include <asm.S>
+ 
++	.section .note.GNU-stack,"",%progbits
++
+ /* uint32_t atomic_inc32(uint32_t *v); */
+ FUNC atomic_inc32 , :
+ 	ldrex	r1, [r0]
+diff --git a/lib/libutils/ext/arch/arm/mcount_a32.S b/lib/libutils/ext/arch/arm/mcount_a32.S
+index 51439a23..54dc3c02 100644
+--- a/lib/libutils/ext/arch/arm/mcount_a32.S
++++ b/lib/libutils/ext/arch/arm/mcount_a32.S
+@@ -7,6 +7,8 @@
+ 
+ #if defined(CFG_TA_GPROF_SUPPORT) || defined(CFG_FTRACE_SUPPORT)
+ 
++	.section .note.GNU-stack,"",%progbits
++
+ /*
+  * Convert return address to call site address by subtracting the size of the
+  * mcount call instruction (blx __gnu_mcount_nc).
+diff --git a/lib/libutils/isoc/arch/arm/arm32_aeabi_divmod_a32.S b/lib/libutils/isoc/arch/arm/arm32_aeabi_divmod_a32.S
+index a600c879..37ae9ec6 100644
+--- a/lib/libutils/isoc/arch/arm/arm32_aeabi_divmod_a32.S
++++ b/lib/libutils/isoc/arch/arm/arm32_aeabi_divmod_a32.S
+@@ -5,6 +5,8 @@
+ 
+ #include <asm.S>
+ 
++	.section .note.GNU-stack,"",%progbits
++
+ /*
+  * signed ret_idivmod_values(signed quot, signed rem);
+  * return quotient and remaining the EABI way (regs r0,r1)
+diff --git a/lib/libutils/isoc/arch/arm/arm32_aeabi_ldivmod_a32.S b/lib/libutils/isoc/arch/arm/arm32_aeabi_ldivmod_a32.S
+index 2dc50bc9..5c3353e2 100644
+--- a/lib/libutils/isoc/arch/arm/arm32_aeabi_ldivmod_a32.S
++++ b/lib/libutils/isoc/arch/arm/arm32_aeabi_ldivmod_a32.S
+@@ -5,6 +5,8 @@
+ 
+ #include <asm.S>
+ 
++	.section .note.GNU-stack,"",%progbits
++
+ /*
+  * __value_in_regs lldiv_t __aeabi_ldivmod( long long n, long long d)
+  */
+diff --git a/lib/libutils/isoc/arch/arm/setjmp_a32.S b/lib/libutils/isoc/arch/arm/setjmp_a32.S
+index 43ea5937..f8a0b70d 100644
+--- a/lib/libutils/isoc/arch/arm/setjmp_a32.S
++++ b/lib/libutils/isoc/arch/arm/setjmp_a32.S
+@@ -51,6 +51,8 @@
+ #define SIZE(x)
+ #endif
+ 
++	.section .note.GNU-stack,"",%progbits
++
+ /* Arm/Thumb interworking support:
+ 
+    The interworking scheme expects functions to use a BX instruction
+diff --git a/ta/arch/arm/ta_entry_a32.S b/ta/arch/arm/ta_entry_a32.S
+index d2f8a69d..cd9a12f9 100644
+--- a/ta/arch/arm/ta_entry_a32.S
++++ b/ta/arch/arm/ta_entry_a32.S
+@@ -5,6 +5,8 @@
+ 
+ #include <asm.S>
+ 
++	.section .note.GNU-stack,"",%progbits
++
+ /*
+  * This function is the bottom of the user call stack. Mark it as such so that
+  * the unwinding code won't try to go further down.

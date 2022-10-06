@@ -1,0 +1,59 @@
+From aecd42801904462501a890d173648e4e826eda19 Mon Sep 17 00:00:00 2001
+From: "A. Wilcox" <AWilcox@Wilcox-Tech.com>
+Date: Sat, 23 Oct 2021 23:29:40 -0500
+Subject: [PATCH] auxv: new module
+
+Adds `__getauxval` wrapper, needed for Parallels Tools GUI installer.
+
+Upstream-Status: Submitted [https://git.adelielinux.org/adelie/gcompat/-/commit/e860a38a88c7ea148ee15976136a1f83ea13f8e0]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CHANGELOG.rst     | 5 +++++
+ Makefile          | 1 +
+ libgcompat/auxv.c | 6 ++++++
+ 3 files changed, 12 insertions(+)
+ create mode 100644 libgcompat/auxv.c
+
+diff --git a/CHANGELOG.rst b/CHANGELOG.rst
+index ce6859b..c3a9cee 100644
+--- a/CHANGELOG.rst
++++ b/CHANGELOG.rst
+@@ -11,6 +11,11 @@
+ 1.1 (202?-??-??)
+ ================
+ 
++auxv
++----
++
++* Add __getauxval wrapper for getauxval.
++
+ locale
+ ------
+ 
+diff --git a/Makefile b/Makefile
+index cbb7634..1893cc1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -2,6 +2,7 @@ LIBGCOMPAT_INCLUDE = \
+ 	libgcompat/alias.h \
+ 	libgcompat/internal.h
+ LIBGCOMPAT_SRC = \
++	libgcompat/auxv.c		\
+ 	libgcompat/ctype.c		\
+ 	libgcompat/cxx_thread.c		\
+ 	libgcompat/dlfcn.c		\
+diff --git a/libgcompat/auxv.c b/libgcompat/auxv.c
+new file mode 100644
+index 0000000..01de376
+--- /dev/null
++++ b/libgcompat/auxv.c
+@@ -0,0 +1,6 @@
++#include <sys/auxv.h> /* getauxval */
++
++unsigned long __getauxval(unsigned long value)
++{
++	return getauxval(value);
++}
+-- 
+2.37.3
+

@@ -1,0 +1,26 @@
+From 097e108b81f2571c4c51871044adf409b6954649 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 3 Sep 2022 00:44:52 -0700
+Subject: [PATCH] ihpm: Include stdlib.h for malloc/free/atoi functions
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ util/ihpm.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/util/ihpm.c b/util/ihpm.c
+index 740ab74..5ad9ef6 100644
+--- a/util/ihpm.c
++++ b/util/ihpm.c
+@@ -68,6 +68,7 @@ typedef uint32_t    socklen_t;
+ #endif
+ #include <stdio.h>
+ #include <stdarg.h>
++#include <stdlib.h> /* malloc/free/atoi */
+ #include <string.h>
+ #include <time.h>
+ 
+-- 
+2.37.3
+

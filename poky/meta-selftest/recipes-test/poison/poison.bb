@@ -9,8 +9,12 @@ inherit nopackages
 # will result in compiler errors.  This recipe should will fail to build and
 # oe-selftest has a test that verifies that.
 do_compile() {
-    touch empty.c
-    ${CPP} ${CFLAGS} -I/usr/include empty.c
+    bbnote Testing preprocessor
+    echo "int main(int argc, char** argv) {}" | ${CPP} -I/usr/include -
+    bbnote Testing C compiler
+    echo "int main(int argc, char** argv) {}" | ${CC} -x c -I/usr/include -
+    bbnote Testing C++ compiler
+    echo "int main(int argc, char** argv) {}" | ${CC} -x c++ -I/usr/include -
 }
 
 EXCLUDE_FROM_WORLD = "1"

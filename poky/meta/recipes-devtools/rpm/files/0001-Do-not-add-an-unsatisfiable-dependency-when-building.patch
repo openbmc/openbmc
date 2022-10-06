@@ -14,11 +14,11 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  build/pack.c | 4 ----
  1 file changed, 4 deletions(-)
 
-diff --git a/build/pack.c b/build/pack.c
-index e6cec1816..810cd7351 100644
---- a/build/pack.c
-+++ b/build/pack.c
-@@ -724,10 +724,6 @@ static rpmRC packageBinary(rpmSpec spec, Package pkg, const char *cookie, int ch
+Index: git/build/pack.c
+===================================================================
+--- git.orig/build/pack.c
++++ git/build/pack.c
+@@ -709,10 +709,6 @@ static rpmRC packageBinary(rpmSpec spec,
  	headerPutBin(pkg->header, RPMTAG_SOURCEPKGID, spec->sourcePkgId,16);
      }
  

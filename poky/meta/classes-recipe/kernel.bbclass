@@ -677,7 +677,7 @@ pkg_postinst:${KERNEL_PACKAGE_NAME}-base () {
 		mkdir -p $D/lib/modules/${KERNEL_VERSION}
 	fi
 	if [ -n "$D" ]; then
-		depmodwrapper -a -b $D ${KERNEL_VERSION}
+		depmodwrapper -a -b $D ${KERNEL_VERSION} ${KERNEL_PACKAGE_NAME}
 	else
 		depmod -a ${KERNEL_VERSION}
 	fi

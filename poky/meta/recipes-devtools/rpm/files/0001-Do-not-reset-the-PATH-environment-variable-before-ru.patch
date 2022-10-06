@@ -13,11 +13,11 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  lib/rpmscript.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/lib/rpmscript.c b/lib/rpmscript.c
-index 6a31e0d..2b0e438 100644
---- a/lib/rpmscript.c
-+++ b/lib/rpmscript.c
-@@ -184,7 +184,7 @@ static void doScriptExec(ARGV_const_t argv, ARGV_const_t prefixes,
+Index: git/lib/rpmscript.c
+===================================================================
+--- git.orig/lib/rpmscript.c
++++ git/lib/rpmscript.c
+@@ -231,7 +231,7 @@ static void doScriptExec(ARGV_const_t ar
  	if (ipath && ipath[5] != '%')
  	    path = ipath;
  

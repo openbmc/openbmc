@@ -68,6 +68,9 @@ information on separating output from your local Source Directory files
 (commonly described as an "out of tree" build), see the
 ":ref:`structure-core-script`" section.
 
+See the ":ref:`The Build Directory --- build/ <structure-build>`" section for details
+about the contents of the :term:`Build Directory`.
+
 .. _handbook:
 
 ``documentation/``
@@ -189,7 +192,7 @@ Directory named ``mybuilds/`` that is outside of the :term:`Source Directory`::
    $ source oe-init-build-env ~/mybuilds
 
 The OpenEmbedded build system uses the template configuration files, which
-are found by default in the ``meta-poky/conf/`` directory in the Source
+are found by default in the ``meta-poky/conf/templates/default`` directory in the Source
 Directory. See the
 ":ref:`dev-manual/common-tasks:creating a custom template configuration directory`"
 section in the Yocto Project Development Tasks Manual for more
@@ -237,6 +240,18 @@ subdirectories. For information on the build history feature, see the
 ":ref:`dev-manual/common-tasks:maintaining build output quality`"
 section in the Yocto Project Development Tasks Manual.
 
+.. _structure-build-cache:
+
+``build/cache/``
+----------------
+
+This directory contains several internal files used by the OpenEmbedded
+build system.
+
+It also contains ``sanity_info``, a text file keeping track of important
+build information such as the values of :term:`TMPDIR`, :term:`SSTATE_DIR`,
+as well as the name and version of the host distribution.
+
 .. _structure-build-conf-local.conf:
 
 ``build/conf/local.conf``
@@ -261,15 +276,15 @@ OpenEmbedded build system creates it from ``local.conf.sample`` when you
 :ref:`structure-core-script`.
 
 The source ``local.conf.sample`` file used depends on the
-:term:`TEMPLATECONF` script variable, which defaults to ``meta-poky/conf/``
+:term:`TEMPLATECONF` script variable, which defaults to ``meta-poky/conf/templates/default``
 when you are building from the Yocto Project development environment,
-and to ``meta/conf/`` when you are building from the OpenEmbedded-Core
+and to ``meta/conf/templates/default`` when you are building from the OpenEmbedded-Core
 environment. Because the script variable points to the source of the
 ``local.conf.sample`` file, this implies that you can configure your
 build environment from any layer by setting the variable in the
 top-level build environment setup script as follows::
 
-   TEMPLATECONF=your_layer/conf
+   TEMPLATECONF=your_layer/conf/templates/your_template_name
 
 Once the build process gets the sample
 file, it uses ``sed`` to substitute final
@@ -281,7 +296,7 @@ file, it uses ``sed`` to substitute final
    You can see how the :term:`TEMPLATECONF` variable is used by looking at the
    ``scripts/oe-setup-builddir`` script in the :term:`Source Directory`.
    You can find the Yocto Project version of the ``local.conf.sample`` file in
-   the ``meta-poky/conf`` directory.
+   the ``meta-poky/conf/templates/default`` directory.
 
 .. _structure-build-conf-bblayers.conf:
 
@@ -301,14 +316,14 @@ you ``source`` the top-level build environment setup script (i.e.
 
 As with the ``local.conf`` file, the source ``bblayers.conf.sample``
 file used depends on the :term:`TEMPLATECONF` script variable, which
-defaults to ``meta-poky/conf/`` when you are building from the Yocto
-Project development environment, and to ``meta/conf/`` when you are
+defaults to ``meta-poky/conf/templates/default`` when you are building from the Yocto
+Project development environment, and to ``meta/conf/templates/default`` when you are
 building from the OpenEmbedded-Core environment. Because the script
 variable points to the source of the ``bblayers.conf.sample`` file, this
 implies that you can base your build from any layer by setting the
 variable in the top-level build environment setup script as follows::
 
-   TEMPLATECONF=your_layer/conf
+   TEMPLATECONF=your_layer/conf/templates/your_template_name
 
 Once the build process gets the sample file, it uses ``sed`` to substitute final
 ``${``\ :term:`OEROOT`\ ``}`` values for all ``##OEROOT##`` values.
@@ -317,16 +332,8 @@ Once the build process gets the sample file, it uses ``sed`` to substitute final
 
    You can see how the :term:`TEMPLATECONF` variable is defined by the ``scripts/oe-setup-builddir``
    script in the :term:`Source Directory`. You can find the Yocto Project
-   version of the ``bblayers.conf.sample`` file in the ``meta-poky/conf/``
+   version of the ``bblayers.conf.sample`` file in the ``meta-poky/conf/templates/default``
    directory.
-
-.. _structure-build-conf-sanity_info:
-
-``build/cache/sanity_info``
----------------------------
-
-This file indicates the state of the sanity checks and is created during
-the build.
 
 .. _structure-build-downloads:
 
@@ -366,14 +373,14 @@ remove the ``build/sstate-cache`` directory.
 .. _structure-build-tmp-buildstats:
 
 ``build/tmp/buildstats/``
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This directory stores the build statistics.
 
 .. _structure-build-tmp-cache:
 
 ``build/tmp/cache/``
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 When BitBake parses the metadata (recipes and configuration files), it
 caches the results in ``build/tmp/cache/`` to speed up future builds.
@@ -389,7 +396,7 @@ cache is reused. If the file has changed, it is reparsed.
 .. _structure-build-tmp-deploy:
 
 ``build/tmp/deploy/``
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 This directory contains any "end result" output from the OpenEmbedded
 build process. The :term:`DEPLOY_DIR` variable points
@@ -402,7 +409,7 @@ Project Overview and Concepts Manual.
 .. _structure-build-tmp-deploy-deb:
 
 ``build/tmp/deploy/deb/``
--------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This directory receives any ``.deb`` packages produced by the build
 process. The packages are sorted into feeds for different architecture
@@ -411,7 +418,7 @@ types.
 .. _structure-build-tmp-deploy-rpm:
 
 ``build/tmp/deploy/rpm/``
--------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This directory receives any ``.rpm`` packages produced by the build
 process. The packages are sorted into feeds for different architecture
@@ -420,14 +427,14 @@ types.
 .. _structure-build-tmp-deploy-ipk:
 
 ``build/tmp/deploy/ipk/``
--------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This directory receives ``.ipk`` packages produced by the build process.
 
 .. _structure-build-tmp-deploy-licenses:
 
 ``build/tmp/deploy/licenses/``
-------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This directory receives package licensing information. For example, the
 directory contains sub-directories for ``bash``, ``busybox``, and
@@ -440,7 +447,7 @@ section in the Yocto Project Development Tasks Manual.
 .. _structure-build-tmp-deploy-images:
 
 ``build/tmp/deploy/images/``
-----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This directory is populated with the basic output objects of the build
 (think of them as the "generated artifacts" of the build process),
@@ -467,7 +474,7 @@ the kernel files::
 .. _structure-build-tmp-deploy-sdk:
 
 ``build/tmp/deploy/sdk/``
--------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The OpenEmbedded build system creates this directory to hold toolchain
 installer scripts which, when executed, install the sysroot that matches
@@ -479,7 +486,7 @@ Software Development Kit (eSDK) manual.
 .. _structure-build-tmp-sstate-control:
 
 ``build/tmp/sstate-control/``
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The OpenEmbedded build system uses this directory for the shared state
 manifest files. The shared state code uses these files to record the
@@ -492,7 +499,7 @@ another.
 .. _structure-build-tmp-sysroots-components:
 
 ``build/tmp/sysroots-components/``
-----------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This directory is the location of the sysroot contents that the task
 :ref:`ref-tasks-prepare_recipe_sysroot`
@@ -507,7 +514,7 @@ should be automatic, and recipes should not directly reference
 .. _structure-build-tmp-sysroots:
 
 ``build/tmp/sysroots/``
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 Previous versions of the OpenEmbedded build system used to create a
 global shared sysroot per machine along with a native sysroot. Since
@@ -525,7 +532,7 @@ recipe-specific :term:`WORKDIR` directories. Thus, the
 .. _structure-build-tmp-stamps:
 
 ``build/tmp/stamps/``
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 This directory holds information that BitBake uses for accounting
 purposes to track what tasks have run and when they have run. The
@@ -545,7 +552,7 @@ section in the Yocto Project Overview and Concepts Manual.
 .. _structure-build-tmp-log:
 
 ``build/tmp/log/``
-------------------
+~~~~~~~~~~~~~~~~~~
 
 This directory contains general logs that are not otherwise placed using
 the package's :term:`WORKDIR`. Examples of logs are the output from the
@@ -555,7 +562,7 @@ necessarily mean this directory is created.
 .. _structure-build-tmp-work:
 
 ``build/tmp/work/``
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 This directory contains architecture-specific work sub-directories for
 packages built by BitBake. All tasks execute from the appropriate work
@@ -587,7 +594,7 @@ install" places its output that is then split into sub-packages within
 .. _structure-build-tmp-work-tunearch-recipename-version:
 
 ``build/tmp/work/tunearch/recipename/version/``
------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The recipe work directory --- ``${WORKDIR}``.
 
@@ -645,7 +652,7 @@ Here are key subdirectories within each recipe work directory:
 .. _structure-build-work-shared:
 
 ``build/tmp/work-shared/``
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For efficiency, the OpenEmbedded build system creates and uses this
 directory to hold recipes that share a work directory with other
@@ -695,7 +702,7 @@ distribution configuration file.
 .. _structure-meta-conf-machine:
 
 ``meta/conf/machine/``
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 This directory contains all the machine configuration files. If you set
 ``MACHINE = "qemux86"``, the OpenEmbedded build system looks for a
@@ -706,7 +713,7 @@ support for a new machine to the Yocto Project, look in this directory.
 .. _structure-meta-conf-distro:
 
 ``meta/conf/distro/``
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 The contents of this directory controls any distribution-specific
 configurations. For the Yocto Project, the ``defaultsetup.conf`` is the
@@ -718,7 +725,7 @@ file mainly inherits its configuration from Poky.
 .. _structure-meta-conf-machine-sdk:
 
 ``meta/conf/machine-sdk/``
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The OpenEmbedded build system searches this directory for configuration
 files that correspond to the value of

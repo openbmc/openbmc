@@ -1,0 +1,30 @@
+From 4c90a66fb7fd9dbb861c5a888fc828f3795fe540 Mon Sep 17 00:00:00 2001
+From: Ben Brown <ben@demerara.io>
+Date: Tue, 19 Jul 2022 16:12:12 +0100
+Subject: [PATCH] Fix daemon install ignoring configured runstatedir
+
+Upstream-Status: Backport
+
+Signed-off-by: Ben Brown <ben@demerara.io>
+Signed-off-by: Ming Liu <liu.ming50@gmail.com>
+
+---
+ src/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index ad3655d..abd7a4c 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -37,7 +37,7 @@ escrow_PROGRAMS = plymouthd-fd-escrow
+ 
+ plymouthd_fd_escrow_SOURCES = plymouthd-fd-escrow.c
+ 
+-plymouthdrundir = $(localstatedir)/run/plymouth
++plymouthdrundir = $(plymouthruntimedir)
+ plymouthdspooldir = $(localstatedir)/spool/plymouth
+ plymouthdtimedir = $(localstatedir)/lib/plymouth
+ 
+-- 
+2.25.1
+

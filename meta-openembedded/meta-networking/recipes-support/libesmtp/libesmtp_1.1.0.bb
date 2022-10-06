@@ -32,5 +32,9 @@ EXTRA_OEMESON = " \
 
 CFLAGS += "-D_GNU_SOURCE"
 
+do_configure:prepend:libc-glibc() {
+    sed -i -e "s/conf.set('HAVE_WORKING_STRERROR_R', 0)/conf.set('HAVE_WORKING_STRERROR_R', 1)/g" ${S}/meson.build
+}
+
 FILES:${PN} = "${libdir}/lib*${SOLIBS} \
                ${libdir}/esmtp-plugins-6.2.0/*${SOLIBSDEV}"

@@ -1248,5 +1248,16 @@
             "${libdir}/python${PYTHON_MAJMIN}/xmlrpc/__pycache__"
         ],
         "cached": []
+    },
+    "zoneinfo": {
+        "summary": "IANA time zone support",
+        "rdepends": [
+            "core"
+        ],
+        "files": [
+            "${libdir}/python${PYTHON_MAJMIN}/zoneinfo",
+            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_zoneinfo.*.so"
+        ],
+       "cached": []
     }
 }

@@ -6,7 +6,9 @@ inherit gnomebase lib_package gtk-doc gobject-introspection gettext upstream-ver
 
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
-SRC_URI += "file://0001-fix-compile-error-for-cross-compile.patch"
+SRC_URI += "file://0001-fix-compile-error-for-cross-compile.patch \
+            file://0001-Pass-correct-parameter.patch \
+            "
 
 SRC_URI[archive.sha256sum] = "78f3274c0c79c434c03655c1b35edf7b95ec0421430897fb1345a98a265ed2d4"
 

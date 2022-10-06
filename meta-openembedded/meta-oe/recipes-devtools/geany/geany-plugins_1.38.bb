@@ -33,6 +33,7 @@ SRC_URI = " \
     file://0001-Use-pkg-config-to-find-gpgme.patch \
     file://0001-git-changebar-Adjust-structs-for-libgit2-1.4.x.patch \
     file://0001-geany.m4-Do-not-tinker-with-pkg-config-paths.patch \
+    file://0001-scope-Use-0-instead-of-NULL-for-gboolean.patch \
 "
 SRC_URI[sha256sum] = "1c578a7ebb390aa8882f195acd3d8da3ceb73925d291b28dec90cd3e5fd20586"
 

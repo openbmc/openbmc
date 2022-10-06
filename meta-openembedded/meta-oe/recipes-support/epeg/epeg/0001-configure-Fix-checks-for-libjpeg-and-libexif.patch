@@ -1,0 +1,32 @@
+From 4e0c62634b0db6dbad0d41377bb71a8012abd75b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 1 Sep 2022 12:56:54 -0700
+Subject: [PATCH] configure: Fix checks for libjpeg and libexif
+
+Use the functions from the respective library instead of using main
+function which is not part of library
+
+Upstream-Status: Submitted [https://github.com/mattes/epeg/pull/27]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index a4f6ebd..e474b1d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -31,8 +31,8 @@ AC_SUBST(version_info)
+ dnl AC_CHECK_FUNCS(fmemopen)
+ dnl AC_CHECK_FUNCS(open_memstream)
+ 
+-AC_CHECK_LIB([jpeg], [main], [], [echo "libjpeg library not found. Please install it before proceeding"; exit -1])
+-AC_CHECK_LIB([exif], [main], [], [echo "libexif library not found. Please install it before proceeding"; exit -1])
++AC_CHECK_LIB([jpeg], [jpeg_simple_progression], [], [echo "libjpeg library not found. Please install it before proceeding"; exit -1])
++AC_CHECK_LIB([exif], [exif_data_new_from_file], [], [echo "libexif library not found. Please install it before proceeding"; exit -1])
+ 
+ my_includes=""
+ my_libs="-ljpeg -lexif"
+-- 
+2.37.3
+

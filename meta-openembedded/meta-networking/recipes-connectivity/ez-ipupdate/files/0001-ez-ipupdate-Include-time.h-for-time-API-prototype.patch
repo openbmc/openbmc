@@ -1,0 +1,44 @@
+From 6c8fe883df993b9e7987c8f1c849962f8007a373 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 29 Aug 2022 12:50:37 -0700
+Subject: [PATCH] ez-ipupdate: Include time.h for time() API prototype
+
+Fix printf format specifiers for snprintf
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ez-ipupdate.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/ez-ipupdate.c b/ez-ipupdate.c
+index 15a4c13..5cbe7f3 100644
+--- a/ez-ipupdate.c
++++ b/ez-ipupdate.c
+@@ -38,6 +38,8 @@
+ #  include <config.h>
+ #endif
+ 
++#include <time.h>
++
+ // you man very well need to edit this, don't worry though, email is only sent
+ // if bad things happend and it has to exit when in daemon mode.
+ #define SEND_EMAIL_CMD "mail"
+@@ -2483,7 +2485,7 @@ int DHS_update_entry(void)
+   p += strlen(p);
+   limit = BUFFER_SIZE - 1 - strlen(buf);
+ 
+-  snprintf(buf, BUFFER_SIZE, "Content-length: %d\015\012", strlen(putbuf));
++  snprintf(buf, BUFFER_SIZE, "Content-length: %lu\015\012", strlen(putbuf));
+   output(buf);
+   snprintf(buf, BUFFER_SIZE, "\015\012");
+   output(buf);
+@@ -2620,7 +2622,7 @@ int DHS_update_entry(void)
+     p += strlen(p);
+     limit = BUFFER_SIZE - 1 - strlen(buf);
+ 
+-    snprintf(buf, BUFFER_SIZE, "Content-length: %d\015\012", strlen(putbuf));
++    snprintf(buf, BUFFER_SIZE, "Content-length: %lu\015\012", strlen(putbuf));
+     output(buf);
+     snprintf(buf, BUFFER_SIZE, "\015\012");
+     output(buf);

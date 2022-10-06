@@ -1,0 +1,64 @@
+CVE: CVE-2022-2962
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From 5c5c50b0a73d78ffe18336c9996fef5eae9bbbb0 Mon Sep 17 00:00:00 2001
+From: Zheyu Ma <zheyuma97@gmail.com>
+Date: Sun, 21 Aug 2022 20:43:43 +0800
+Subject: [PATCH] net: tulip: Restrict DMA engine to memories
+
+The DMA engine is started by I/O access and then itself accesses the
+I/O registers, triggering a reentrancy bug.
+
+The following log can reveal it:
+==5637==ERROR: AddressSanitizer: stack-overflow
+    #0 0x5595435f6078 in tulip_xmit_list_update qemu/hw/net/tulip.c:673
+    #1 0x5595435f204a in tulip_write qemu/hw/net/tulip.c:805:13
+    #2 0x559544637f86 in memory_region_write_accessor qemu/softmmu/memory.c:492:5
+    #3 0x5595446379fa in access_with_adjusted_size qemu/softmmu/memory.c:554:18
+    #4 0x5595446372fa in memory_region_dispatch_write qemu/softmmu/memory.c
+    #5 0x55954468b74c in flatview_write_continue qemu/softmmu/physmem.c:2825:23
+    #6 0x559544683662 in flatview_write qemu/softmmu/physmem.c:2867:12
+    #7 0x5595446833f3 in address_space_write qemu/softmmu/physmem.c:2963:18
+    #8 0x5595435fb082 in dma_memory_rw_relaxed qemu/include/sysemu/dma.h:87:12
+    #9 0x5595435fb082 in dma_memory_rw qemu/include/sysemu/dma.h:130:12
+    #10 0x5595435fb082 in dma_memory_write qemu/include/sysemu/dma.h:171:12
+    #11 0x5595435fb082 in stl_le_dma qemu/include/sysemu/dma.h:272:1
+    #12 0x5595435fb082 in stl_le_pci_dma qemu/include/hw/pci/pci.h:910:1
+    #13 0x5595435fb082 in tulip_desc_write qemu/hw/net/tulip.c:101:9
+    #14 0x5595435f7e3d in tulip_xmit_list_update qemu/hw/net/tulip.c:706:9
+    #15 0x5595435f204a in tulip_write qemu/hw/net/tulip.c:805:13
+
+Fix this bug by restricting the DMA engine to memories regions.
+
+Signed-off-by: Zheyu Ma <zheyuma97@gmail.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ hw/net/tulip.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/hw/net/tulip.c b/hw/net/tulip.c
+index 097e905bec..b9e42c322a 100644
+--- a/hw/net/tulip.c
++++ b/hw/net/tulip.c
+@@ -70,7 +70,7 @@ static const VMStateDescription vmstate_pci_tulip = {
+ static void tulip_desc_read(TULIPState *s, hwaddr p,
+         struct tulip_descriptor *desc)
+ {
+-    const MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
++    const MemTxAttrs attrs = { .memory = true };
+ 
+     if (s->csr[0] & CSR0_DBO) {
+         ldl_be_pci_dma(&s->dev, p, &desc->status, attrs);
+@@ -88,7 +88,7 @@ static void tulip_desc_read(TULIPState *s, hwaddr p,
+ static void tulip_desc_write(TULIPState *s, hwaddr p,
+         struct tulip_descriptor *desc)
+ {
+-    const MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
++    const MemTxAttrs attrs = { .memory = true };
+ 
+     if (s->csr[0] & CSR0_DBO) {
+         stl_be_pci_dma(&s->dev, p, desc->status, attrs);
+-- 
+2.34.1
+

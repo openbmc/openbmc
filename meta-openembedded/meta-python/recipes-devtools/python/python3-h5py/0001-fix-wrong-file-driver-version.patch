@@ -1,0 +1,53 @@
+From 5b0b1d0b941ba338d449f9261bdf4cb2b679d048 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 20 Sep 2022 02:53:11 -0700
+Subject: [PATCH] fix wrong file driver version
+
+Due to commit [1] applied in hdf5 (1.13.2), import hdf5 failed
+
+|>>> import h5py
+|Traceback (most recent call last):
+|  File "<stdin>", line 1, in <module>
+|  File "/usr/lib/python3.10/site-packages/h5py/__init__.py", line 56, in <module>
+|    from . import h5a, h5d, h5ds, h5f, h5fd, h5g, h5r, h5s, h5t, h5p, h5z, h5pl
+|  File "h5py/h5fd.pyx", line 220, in init h5py.h5fd
+|RuntimeError: Wrong file driver version # (wrong file driver version #)
+
+Initial driver version to fix the error
+
+[1] https://github.com/HDFGroup/hdf5/commit/42b767fc67ad1e13735e3cee2077f2e108f9463e
+
+Upstream-Status: Submitted  [https://github.com/h5py/h5py/pull/2153]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ h5py/api_types_hdf5.pxd | 1 +
+ h5py/h5fd.pyx           | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/h5py/api_types_hdf5.pxd b/h5py/api_types_hdf5.pxd
+index 6977f1a7..312fdaa0 100644
+--- a/h5py/api_types_hdf5.pxd
++++ b/h5py/api_types_hdf5.pxd
+@@ -237,6 +237,7 @@ cdef extern from "hdf5.h":
+ 
+   # Class information for each file driver
+   ctypedef struct H5FD_class_t:
++    unsigned version;
+     const char *name
+     haddr_t maxaddr
+     H5F_close_degree_t fc_degree
+diff --git a/h5py/h5fd.pyx b/h5py/h5fd.pyx
+index 04aff077..d41953d0 100644
+--- a/h5py/h5fd.pyx
++++ b/h5py/h5fd.pyx
+@@ -191,6 +191,7 @@ cdef herr_t H5FD_fileobj_flush(H5FD_fileobj_t *f, hid_t dxpl, hbool_t closing) e
+ cdef H5FD_class_t info
+ memset(&info, 0, sizeof(info))
+ 
++info.version = 0x01
+ info.name = 'fileobj'
+ info.maxaddr = libc.stdint.SIZE_MAX - 1
+ info.fc_degree = H5F_CLOSE_WEAK
+-- 
+2.37.1
+

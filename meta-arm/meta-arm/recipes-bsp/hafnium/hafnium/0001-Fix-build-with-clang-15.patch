@@ -1,0 +1,116 @@
+From d96f696244e0869654004f49586b53811037db30 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 22 Sep 2022 19:13:49 -0700
+Subject: [PATCH] Fix build with clang-15
+
+Clang-15 warns about prototypes a bit harder
+Remove unused variable suites_in_image
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ test/hftest/common.c                                         | 2 --
+ test/vmapi/arch/aarch64/gicv3/gicv3.c                        | 2 +-
+ test/vmapi/arch/aarch64/gicv3/inc/gicv3.h                    | 2 +-
+ test/vmapi/arch/aarch64/gicv3/timer_secondary.c              | 2 +-
+ test/vmapi/el0_partitions/services/interruptible.c           | 2 +-
+ test/vmapi/el0_partitions/services/interruptible_echo.c      | 2 +-
+ test/vmapi/primary_with_secondaries/services/interruptible.c | 2 +-
+ 7 files changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/test/hftest/common.c b/test/hftest/common.c
+index 344ff24..175230a 100644
+--- a/test/hftest/common.c
++++ b/test/hftest/common.c
+@@ -67,7 +67,6 @@ void hftest_json(void)
+ {
+ 	const char *suite = NULL;
+ 	size_t i;
+-	size_t suites_in_image = 0;
+ 	size_t tests_in_suite = 0;
+ 
+ 	HFTEST_LOG("{");
+@@ -81,7 +80,6 @@ void hftest_json(void)
+ 				HFTEST_LOG("    },");
+ 			}
+ 			/* Move onto new suite. */
+-			++suites_in_image;
+ 			suite = test->suite;
+ 			tests_in_suite = 0;
+ 			HFTEST_LOG("    {");
+diff --git a/test/vmapi/arch/aarch64/gicv3/gicv3.c b/test/vmapi/arch/aarch64/gicv3/gicv3.c
+index 682bc4e..82582f0 100644
+--- a/test/vmapi/arch/aarch64/gicv3/gicv3.c
++++ b/test/vmapi/arch/aarch64/gicv3/gicv3.c
+@@ -42,7 +42,7 @@ static void irq(void)
+ 	dlog("primary IRQ %d ended\n", interrupt_id);
+ }
+ 
+-void system_setup()
++void system_setup(void)
+ {
+ 	const uint32_t mode = MM_MODE_R | MM_MODE_W | MM_MODE_D;
+ 	hftest_mm_identity_map((void *)GICD_BASE, PAGE_SIZE, mode);
+diff --git a/test/vmapi/arch/aarch64/gicv3/inc/gicv3.h b/test/vmapi/arch/aarch64/gicv3/inc/gicv3.h
+index 5faf3a8..f681e58 100644
+--- a/test/vmapi/arch/aarch64/gicv3/inc/gicv3.h
++++ b/test/vmapi/arch/aarch64/gicv3/inc/gicv3.h
+@@ -30,4 +30,4 @@ extern void *recv_buffer;
+ 
+ extern volatile uint32_t last_interrupt_id;
+ 
+-void system_setup();
++void system_setup(void);
+diff --git a/test/vmapi/arch/aarch64/gicv3/timer_secondary.c b/test/vmapi/arch/aarch64/gicv3/timer_secondary.c
+index ebc4db3..8260e10 100644
+--- a/test/vmapi/arch/aarch64/gicv3/timer_secondary.c
++++ b/test/vmapi/arch/aarch64/gicv3/timer_secondary.c
+@@ -55,7 +55,7 @@ TEAR_DOWN(timer_secondary_ffa)
+ 	EXPECT_FFA_ERROR(ffa_rx_release(), FFA_DENIED);
+ }
+ 
+-static void timer_busywait_secondary()
++static void timer_busywait_secondary(void)
+ {
+ 	const char message[] = "loop 0099999";
+ 	const char expected_response[] = "Got IRQ 03.";
+diff --git a/test/vmapi/el0_partitions/services/interruptible.c b/test/vmapi/el0_partitions/services/interruptible.c
+index 0d00b16..3c3250d 100644
+--- a/test/vmapi/el0_partitions/services/interruptible.c
++++ b/test/vmapi/el0_partitions/services/interruptible.c
+@@ -43,7 +43,7 @@ static void irq(void)
+  * Try to receive a message from the mailbox, blocking if necessary, and
+  * retrying if interrupted.
+  */
+-static struct ffa_value mailbox_receive_retry()
++static struct ffa_value mailbox_receive_retry(void)
+ {
+ 	struct ffa_value received;
+ 
+diff --git a/test/vmapi/el0_partitions/services/interruptible_echo.c b/test/vmapi/el0_partitions/services/interruptible_echo.c
+index b618cf2..636ebc9 100644
+--- a/test/vmapi/el0_partitions/services/interruptible_echo.c
++++ b/test/vmapi/el0_partitions/services/interruptible_echo.c
+@@ -32,7 +32,7 @@ static void irq(void)
+  * Try to receive a message from the mailbox, blocking if necessary, and
+  * retrying if interrupted.
+  */
+-static struct ffa_value mailbox_receive_retry()
++static struct ffa_value mailbox_receive_retry(void)
+ {
+ 	struct ffa_value received;
+ 
+diff --git a/test/vmapi/primary_with_secondaries/services/interruptible.c b/test/vmapi/primary_with_secondaries/services/interruptible.c
+index cc1c1f9..c94093b 100644
+--- a/test/vmapi/primary_with_secondaries/services/interruptible.c
++++ b/test/vmapi/primary_with_secondaries/services/interruptible.c
+@@ -40,7 +40,7 @@ static void irq(void)
+  * Try to receive a message from the mailbox, blocking if necessary, and
+  * retrying if interrupted.
+  */
+-struct ffa_value mailbox_receive_retry()
++struct ffa_value mailbox_receive_retry(void)
+ {
+ 	struct ffa_value received;
+ 

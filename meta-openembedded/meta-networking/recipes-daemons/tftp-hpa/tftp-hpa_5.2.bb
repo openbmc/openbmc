@@ -29,6 +29,7 @@ SRC_URI = "http://kernel.org/pub/software/network/tftp/tftp-hpa/tftp-hpa-${PV}.t
            file://fix-writing-emtpy-file.patch \
            file://0001-__progname-is-provided-by-libc.patch \
            file://0001-tftp-Mark-toplevel-definition-as-external.patch \
+           file://0001-tftp-Remove-double-inclusion-of-signal.h.patch \
            file://tftpd-hpa.socket \
            file://tftpd-hpa.service \
 "

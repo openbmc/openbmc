@@ -15,11 +15,15 @@ SECTION = "System/Servers"
 LIC_FILES_CHKSUM = "file://src/prot.c;beginline=1;endline=1;md5=96964cadf07e8f8c1e2ffb3b507dd647"
 LICENSE = "PD"
 
+DEPENDS += "coreutils"
+
 SRC_URI = "http://cr.yp.to/daemontools/${BPN}-${PV}.tar.gz \
     file://0001-error.h-include-errno.h-instead-of-extern-int.diff \
     file://0002-supervise.c-.-supervise-may-be-a-symlink-if-it-s-da.diff \
     file://cross-compile.patch \
     file://0001-daemontools-Fix-QA-Issue.patch \
+    file://warnings.patch \
+    file://0001-Fix-signature-of-main-function.patch \
 "
 
 SRC_URI[md5sum] = "1871af2453d6e464034968a0fbcb2bfc"

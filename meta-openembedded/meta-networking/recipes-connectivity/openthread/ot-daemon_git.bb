@@ -12,6 +12,8 @@ SRCREV = "7dfde1f12923f03c9680be4d838b94b7a2320324"
 PV = "0.1+git${SRCPV}"
 
 SRC_URI = "git://github.com/openthread/openthread.git;protocol=https;branch=main \
+           file://0001-bn_mul.h-fix-x86-PIC-inline-ASM-compilation-with-GCC.patch \
+           file://mbedtls.patch \
            "
 
 S = "${WORKDIR}/git"

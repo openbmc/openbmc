@@ -137,9 +137,10 @@ To use them, remove the comments::
    #use_proxy = on
 
 The Yocto Project also includes a
-``meta-poky/conf/site.conf.sample`` file that shows how to configure CVS
-and Git proxy servers if needed. For more information on setting up
-various proxy types and configuring proxy servers, see the
+``meta-poky/conf/templates/default/site.conf.sample`` file that shows
+how to configure CVS and Git proxy servers if needed. For more
+information on setting up various proxy types and configuring proxy
+servers, see the
 ":yocto_wiki:`Working Behind a Network Proxy </Working_Behind_a_Network_Proxy>`"
 Wiki page.
 

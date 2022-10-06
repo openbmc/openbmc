@@ -1,0 +1,26 @@
+From fbd00d93cc07fa5da20414b355fffe628dcd37b3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 7 Sep 2022 13:57:19 -0700
+Subject: [PATCH 2/2] tmail: Include ctype.h for isdigit
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/tmail/tmail.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/tmail/tmail.c b/src/tmail/tmail.c
+index ed5fc58..a9e3645 100644
+--- a/src/tmail/tmail.c
++++ b/src/tmail/tmail.c
+@@ -26,6 +26,7 @@
+  * Last Edited:	30 October 2008
+  */
+ 
++#include <ctype.h>		/* for isdigit */
+ #include <stdio.h>
+ #include <pwd.h>
+ #include <errno.h>
+-- 
+2.37.3
+

@@ -135,7 +135,6 @@ system and gives an overview of their function and contents.
       appear in :term:`DISTRO_FEATURES` within the current configuration, then
       the recipe will be skipped, and if the build system attempts to build
       the recipe then an error will be triggered.
-      
 
    :term:`APPEND`
       An override list of append strings for each target specified with
@@ -728,22 +727,6 @@ system and gives an overview of their function and contents.
       that supports building targets with multiple configurations, see the
       ":ref:`dev-manual/common-tasks:building images for multiple targets using multiple configurations`"
       section in the Yocto Project Development Tasks Manual.
-
-   :term:`BBPATH`
-      Used by BitBake to locate ``.bbclass`` and configuration files. This
-      variable is analogous to the ``PATH`` variable.
-
-      .. note::
-
-         If you run BitBake from a directory outside of the
-         :term:`Build Directory`, you must be sure to set :term:`BBPATH`
-         to point to the Build Directory. Set the variable as you would any
-         environment variable and then run BitBake::
-
-                 $ BBPATH = "build_directory"
-                 $ export BBPATH
-                 $ bitbake target
-
 
    :term:`BBSERVER`
       If defined in the BitBake environment, :term:`BBSERVER` points to the
@@ -2386,8 +2369,8 @@ system and gives an overview of their function and contents.
       .. note::
 
          From a security perspective, hardcoding a default password is not
-         generally a good idea or even legal in some jurisdictions. It is 
-         recommended that you do not do this if you are building a production 
+         generally a good idea or even legal in some jurisdictions. It is
+         recommended that you do not do this if you are building a production
          image.
 
       Additionally there is a special ``passwd-expire`` command that will
@@ -2967,8 +2950,10 @@ system and gives an overview of their function and contents.
 
       If you do not point to a script that you provide, the OpenEmbedded
       build system uses the default script provided by the
-      ``icecc-create-env.bb`` recipe, which is a modified version and not
-      the one that comes with ``icecc``.
+      :oe_git:`icecc-create-env_0.1.bb
+      </openembedded-core/tree/meta/recipes-devtools/icecc-create-env/icecc-create-env_0.1.bb>`
+      recipe, which is a modified version and not the one that comes with
+      ``icecream``.
 
    :term:`ICECC_PARALLEL_MAKE`
       Extra options passed to the ``make`` command during the
@@ -3690,10 +3675,10 @@ system and gives an overview of their function and contents.
          to "core-image-minimal-initramfs".
 
       You can also find more information by referencing the
-      ``meta-poky/conf/local.conf.sample.extended`` configuration file in
-      the Source Directory, the :ref:`image <ref-classes-image>` class,
-      and the :ref:`kernel <ref-classes-kernel>` class to see how to use
-      the :term:`INITRAMFS_IMAGE` variable.
+      ``meta-poky/conf/templates/default/local.conf.sample.extended``
+      configuration file in the Source Directory, the :ref:`image
+      <ref-classes-image>` class, and the :ref:`kernel <ref-classes-kernel>`
+      class to see how to use the :term:`INITRAMFS_IMAGE` variable.
 
       If :term:`INITRAMFS_IMAGE` is empty, which is the default, then no
       initramfs image is built.
@@ -3752,7 +3737,7 @@ system and gives an overview of their function and contents.
          configuration file. You cannot set the variable in a recipe file.
 
       See the
-      :yocto_git:`local.conf.sample.extended </poky/tree/meta-poky/conf/local.conf.sample.extended>`
+      :yocto_git:`local.conf.sample.extended </poky/tree/meta-poky/conf/templates/default/local.conf.sample.extended>`
       file for additional information. Also, for information on creating an
       initramfs, see the ":ref:`dev-manual/common-tasks:building an initial ram filesystem (initramfs) image`" section
       in the Yocto Project Development Tasks Manual.
@@ -3984,11 +3969,10 @@ system and gives an overview of their function and contents.
 
          KCONFIG_MODE = "alldefconfig"
 
-
    :term:`KERNEL_ALT_IMAGETYPE`
       Specifies an alternate kernel image type for creation in addition to
-      the kernel image type specified using the
-      :term:`KERNEL_IMAGETYPE` variable.
+      the kernel image type specified using the :term:`KERNEL_IMAGETYPE` and
+      :term:`KERNEL_IMAGETYPES` variables.
 
    :term:`KERNEL_ARTIFACT_NAME`
       Specifies the name of all of the build artifacts. You can change the
@@ -4172,9 +4156,12 @@ system and gives an overview of their function and contents.
       when building the kernel and is passed to ``make`` as the target to
       build.
 
-      If you want to build an alternate kernel image type in addition to that
-      specified by :term:`KERNEL_IMAGETYPE`, use the :term:`KERNEL_ALT_IMAGETYPE`
-      variable.
+      To build additional kernel image types, use :term:`KERNEL_IMAGETYPES`.
+
+   :term:`KERNEL_IMAGETYPES`
+      Lists additional types of kernel images to build for a device in addition
+      to image type specified in :term:`KERNEL_IMAGETYPE`. Usually set by the
+      machine configuration files.
 
    :term:`KERNEL_MODULE_AUTOLOAD`
       Lists kernel modules that need to be auto-loaded during boot.
@@ -6075,9 +6062,9 @@ system and gives an overview of their function and contents.
    :term:`PRSERV_HOST`
       The network based :term:`PR` service host and port.
 
-      The ``conf/local.conf.sample.extended`` configuration file in the
-      :term:`Source Directory` shows how the
-      :term:`PRSERV_HOST` variable is set::
+      The ``conf/templates/default/local.conf.sample.extended`` configuration
+      file in the :term:`Source Directory` shows how the :term:`PRSERV_HOST`
+      variable is set::
 
          PRSERV_HOST = "localhost:0"
 
@@ -6588,7 +6575,7 @@ system and gives an overview of their function and contents.
 
    :term:`SDK_CUSTOM_TEMPLATECONF`
       When building the extensible SDK, if :term:`SDK_CUSTOM_TEMPLATECONF` is set to
-      "1" and a ``conf/templateconf.conf`` file exists in the build directory
+      "1" and a ``conf/templateconf.cfg`` file exists in the build directory
       (:term:`TOPDIR`) then this will be copied into the SDK.
 
    :term:`SDK_DEPLOY`
@@ -7973,6 +7960,12 @@ system and gives an overview of their function and contents.
       toolchain. You can use ``meta-sourcery`` as a template for adding
       support for other external toolchains.
 
+   :term:`TC_CXX_RUNTIME`
+      Specifies the C/C++ STL and runtime variant to use during
+      the build process. Default value is 'gnu'
+
+      You can select "gnu", "llvm", or "android".
+
    :term:`TEMPLATECONF`
       Specifies the directory used by the build system to find templates
       from which to build the ``bblayers.conf`` and ``local.conf`` files.
@@ -8666,7 +8659,8 @@ system and gives an overview of their function and contents.
          USER_CLASSES ?= "buildstats"
 
       For more information, see
-      ``meta-poky/conf/local.conf.sample`` in the :term:`Source Directory`.
+      ``meta-poky/conf/templates/default/local.conf.sample`` in the
+      :term:`Source Directory`.
 
    :term:`USERADD_ERROR_DYNAMIC`
       If set to ``error``, forces the OpenEmbedded build system to produce
@@ -8924,4 +8918,3 @@ system and gives an overview of their function and contents.
 
       On systems where many tasks run in parallel, setting a limit to this
       can be helpful in controlling system resource usage.
-

@@ -15,6 +15,7 @@ SRC_URI = "http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-${PV}.tar.g
            file://reproducibility-fixed-path-to-posix-shell.patch \
            file://0001-libntp-Do-not-use-PTHREAD_STACK_MIN-on-glibc.patch \
            file://0001-test-Fix-build-with-new-compiler-defaults-to-fno-com.patch \
+           file://0001-sntp-Fix-types-in-check-for-pthread_detach.patch \
            file://ntpd \
            file://ntp.conf \
            file://ntpdate \
@@ -138,8 +139,9 @@ PACKAGES += "ntpdate sntp ntpdc ntpq ${PN}-tickadj ${PN}-utils"
 # ntp originally includes tickadj. It's split off for inclusion in small firmware images on platforms
 # with wonky clocks (e.g. OpenSlug)
 RDEPENDS:${PN} = "${PN}-tickadj"
-# ntpd require libgcc for execution
+# ntpd & sntp require libgcc for execution due to phtread_cancel/pthread_exit calls
 RDEPENDS:${PN} += "libgcc"
+RDEPENDS:sntp += "libgcc"
 # Handle move from bin to utils package
 RPROVIDES:${PN}-utils = "${PN}-bin"
 RREPLACES:${PN}-utils = "${PN}-bin"

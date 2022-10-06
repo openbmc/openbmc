@@ -1,0 +1,37 @@
+From 6eee50e5376356b1faeb30507b411120a8b5c7d1 Mon Sep 17 00:00:00 2001
+From: Davidson K <davidson.kumaresan@arm.com>
+Date: Mon, 6 Jun 2022 15:13:15 +0530
+Subject: [PATCH 4/7] arm_ffa: rxtx_map should use 64 bit calls
+
+rxtx_map deals with the 64 bit addresses and hence the 64 bit calls
+should be used
+
+Signed-off-by: Davidson K <davidson.kumaresan@arm.com>
+Change-Id: Iec1251266e61139767588d683d60bada1ed10abe
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ include/arm_ffa.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/arm_ffa.h b/include/arm_ffa.h
+index 313f46f747..9627107079 100644
+--- a/include/arm_ffa.h
++++ b/include/arm_ffa.h
+@@ -58,12 +58,13 @@
+ 			   ARM_SMCCC_OWNER_STANDARD, (func_num))
+ 
+ #define FFA_SMC_32(func_num)	FFA_SMC(ARM_SMCCC_SMC_32, (func_num))
++#define FFA_SMC_64(func_num)	FFA_SMC(ARM_SMCCC_SMC_64, (func_num))
+ 
+ #define FFA_VERSION				FFA_SMC_32(0x63)
+ #define FFA_ID_GET				FFA_SMC_32(0x69)
+ #define FFA_FEATURES				FFA_SMC_32(0x64)
+ #define FFA_PARTITION_INFO_GET				FFA_SMC_32(0x68)
+-#define FFA_RXTX_MAP				FFA_SMC_32(0x66)
++#define FFA_RXTX_MAP				FFA_SMC_64(0x66)
+ #define FFA_RXTX_UNMAP				FFA_SMC_32(0x67)
+ #define FFA_RX_RELEASE				FFA_SMC_32(0x65)
+ #define FFA_MSG_SEND_DIRECT_REQ				FFA_SMC_32(0x6F)
+-- 
+2.34.1
+

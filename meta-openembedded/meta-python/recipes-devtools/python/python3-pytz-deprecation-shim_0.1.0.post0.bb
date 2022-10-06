@@ -9,3 +9,7 @@ PYPI_PACKAGE = "pytz_deprecation_shim"
 PYPI_SRC_URI = "https://files.pythonhosted.org/packages/94/f0/909f94fea74759654390a3e1a9e4e185b6cd9aa810e533e3586f39da3097/${PYPI_PACKAGE}-${PV}.tar.gz"
 
 inherit pypi python_setuptools_build_meta
+
+RDEPENDS:${PN} += "\
+        ${PYTHON_PN}-zoneinfo \
+"

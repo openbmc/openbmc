@@ -1,0 +1,51 @@
+From f3889e5870e9761ee6113fac7f38aa44cc43e46c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 7 Sep 2022 00:30:52 -0700
+Subject: [PATCH] Define _GNU_SOURCE if HAVE_SIGSET is set
+
+This enforces using sigset() API which needs _GNU_SOURCE macro to be
+defined
+
+Upstream-Status: Submitted [https://github.com/blueness/sthttpd/pull/16]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/libhttpd.c | 5 ++++-
+ src/thttpd.c   | 4 ++++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/src/libhttpd.c b/src/libhttpd.c
+index fa42c10..669be11 100644
+--- a/src/libhttpd.c
++++ b/src/libhttpd.c
+@@ -25,9 +25,12 @@
+ ** SUCH DAMAGE.
+ */
+ 
+-
+ #include <config.h>
+ 
++#ifdef HAVE_SIGSET
++#define _GNU_SOURCE
++#endif
++
+ //system headers
+ #include <sys/types.h>
+ #include <sys/param.h>
+diff --git a/src/thttpd.c b/src/thttpd.c
+index ad97188..3c7a449 100644
+--- a/src/thttpd.c
++++ b/src/thttpd.c
+@@ -28,6 +28,10 @@
+ 
+ #include <config.h>
+ 
++#ifdef HAVE_SIGSET
++#define _GNU_SOURCE
++#endif
++
+ //system headers
+ #include <sys/param.h>
+ #include <sys/types.h>
+-- 
+2.37.3
+

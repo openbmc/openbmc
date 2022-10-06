@@ -1,0 +1,39 @@
+From 85a30903ea3ba4232379bbbcb54960307d5a2da0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 2 Sep 2022 18:49:03 -0700
+Subject: [PATCH] spacedream: Add typecast to pthread_t in assignment
+
+render_loop_thread is of type pthread_t, therefore -1 which is int can
+not be assigned to it. Do the needed typecast conversion
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/spacedream/main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/spacedream/main.c b/src/spacedream/main.c
+index 430800f..8e1887c 100644
+--- a/src/spacedream/main.c
++++ b/src/spacedream/main.c
+@@ -205,7 +205,7 @@ void unload_stars()
+ int main( int argc, char *argv[] )
+ {
+      int                   quit = 0;
+-     pthread_t             render_loop_thread = -1;
++     pthread_t             render_loop_thread = (pthread_t)-1;
+ 
+      IDirectFBSurface     *primary;
+      IDirectFBEventBuffer *buffer;
+@@ -344,7 +344,7 @@ int main( int argc, char *argv[] )
+      pthread_cancel( render_loop_thread );
+      pthread_mutex_unlock( &render_start );
+      pthread_join( render_loop_thread, NULL );
+-     render_loop_thread = -1;
++     render_loop_thread = (pthread_t)-1;
+ 
+ 
+      unload_stars();
+-- 
+2.37.3
+

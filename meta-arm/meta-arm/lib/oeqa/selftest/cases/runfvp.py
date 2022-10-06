@@ -20,11 +20,10 @@ class RunFVPTests(OESelftestTestCase):
         on exit code 0 or fail the test, otherwise return the CompletedProcess
         instance.
         """
-        # Put the test directory in PATH so that any mock FVPs are found first
-        newenv = {"PATH": str(testdir) + ":" + os.environ["PATH"]}
         cli = [runfvp,] + list(args)
         print(f"Calling {cli}")
-        ret = subprocess.run(cli, env=newenv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+        # Set cwd to testdir so that any mock FVPs are found
+        ret = subprocess.run(cli, cwd=testdir, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
         if should_succeed:
             self.assertEqual(ret.returncode, 0, f"runfvp exit {ret.returncode}, output: {ret.stdout}")
             return ret.stdout
@@ -40,8 +39,6 @@ class RunFVPTests(OESelftestTestCase):
         self.run_fvp("--this-is-an-invalid-option", should_succeed=False)
 
     def test_run_auto_tests(self):
-        newenv = {"PATH": str(testdir) + ":" + os.environ["PATH"]}
-
         cases = list(testdir.glob("auto-*.json"))
         if not cases:
             self.fail("No tests found")
@@ -79,6 +76,7 @@ class ConfFileTests(OESelftestTestCase):
             self.assertTrue("terminals" in conf)
             self.assertTrue("args" in conf)
             self.assertTrue("consoles" in conf)
+            self.assertTrue("env" in conf)
 
 
 class RunnerTests(OESelftestTestCase):
@@ -97,6 +95,7 @@ class RunnerTests(OESelftestTestCase):
                 "applications": {'a1': 'file'},
                 "terminals": {},
                 "args": ['--extra-arg'],
+                "env": {"FOO": "BAR"}
             }))
 
             m.assert_called_once_with('/usr/bin/FVP_Binary',
@@ -106,4 +105,27 @@ class RunnerTests(OESelftestTestCase):
                 '--extra-arg',
                 stdin=unittest.mock.ANY,
                 stdout=unittest.mock.ANY,
-                stderr=unittest.mock.ANY)
+                stderr=unittest.mock.ANY,
+                env={"FOO":"BAR"})
+
+    @unittest.mock.patch.dict(os.environ, {"DISPLAY": ":42", "WAYLAND_DISPLAY": "wayland-42"})
+    def test_env_passthrough(self):
+        from fvp import runner
+        with self.create_mock() as m:
+            fvp = runner.FVPRunner(self.logger)
+            asyncio.run(fvp.start({
+                "fvp-bindir": "/usr/bin",
+                "exe": "FVP_Binary",
+                "parameters": {},
+                "data": [],
+                "applications": {},
+                "terminals": {},
+                "args": [],
+                "env": {"FOO": "BAR"}
+            }))
+
+            m.assert_called_once_with('/usr/bin/FVP_Binary',
+                stdin=unittest.mock.ANY,
+                stdout=unittest.mock.ANY,
+                stderr=unittest.mock.ANY,
+                env={"DISPLAY":":42", "FOO": "BAR", "WAYLAND_DISPLAY": "wayland-42"})

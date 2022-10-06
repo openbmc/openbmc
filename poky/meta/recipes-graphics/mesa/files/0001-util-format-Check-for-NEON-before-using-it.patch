@@ -1,4 +1,4 @@
-From fdb2face4eeac3c20eedcca7520f4e7014225fb4 Mon Sep 17 00:00:00 2001
+From f17e836ef9b1bbc6056790596420b699e48128c2 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 2 Dec 2021 19:57:42 -0800
 Subject: [PATCH] util/format: Check for NEON before using it
@@ -20,10 +20,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/util/format/u_format.c b/src/util/format/u_format.c
-index 36c5e52..f0a0097 100644
+index c071250..0880984 100644
 --- a/src/util/format/u_format.c
 +++ b/src/util/format/u_format.c
-@@ -1138,7 +1138,7 @@ static void
+@@ -1184,7 +1184,7 @@ static void
  util_format_unpack_table_init(void)
  {
     for (enum pipe_format format = PIPE_FORMAT_NONE; format < PIPE_FORMAT_COUNT; format++) {

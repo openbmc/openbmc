@@ -1,0 +1,41 @@
+From 272f9838f3495f5e419f77e000762c420754c96d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 2 Sep 2022 15:57:32 -0700
+Subject: [PATCH] add missing system header string.h
+
+This is needed for mem* function prototypes used in these sources
+
+Upstream-Status: Submitted [https://pagure.io/sanlock/issue/8]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/sanlock_sock.c | 1 +
+ wdmd/wdmd_sock.c   | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/src/sanlock_sock.c b/src/sanlock_sock.c
+index b83f9ae..e206f88 100644
+--- a/src/sanlock_sock.c
++++ b/src/sanlock_sock.c
+@@ -12,6 +12,7 @@
+ #include <stdio.h>
+ #include <stdint.h>
+ #include <stddef.h>
++#include <string.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
+ 
+diff --git a/wdmd/wdmd_sock.c b/wdmd/wdmd_sock.c
+index 45d9d9b..110ce9f 100644
+--- a/wdmd/wdmd_sock.c
++++ b/wdmd/wdmd_sock.c
+@@ -12,6 +12,7 @@
+ #include <stdio.h>
+ #include <stdint.h>
+ #include <stddef.h>
++#include <string.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
+ 
+-- 
+2.37.3
+

@@ -1,0 +1,28 @@
+From ded84ed583e9b0617bc35ab1798032d18b873144 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 29 Aug 2022 23:30:02 -0700
+Subject: [PATCH] l2tp_rpc_server.c: Add missing prototype for
+ l2tp_api_rpc_check_request
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile b/Makefile
+index 0815b31..2fa5b2f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -236,6 +236,7 @@ endif
+ 			-$(RM) $@ $@.tmp
+ 			$(RPCGEN) $(RPCGENFLAGS) -m -o $@.tmp $<
+ 			cat $@.tmp | sed -e 's/switch (rqstp->rq_proc) {/if (l2tp_api_rpc_check_request(transp) < 0) return; switch (rqstp->rq_proc) {/' > $@
++			sed -i '21i int l2tp_api_rpc_check_request(SVCXPRT *xprt);' $@
+ 
+ %_client.c:		%.x
+ 			-$(RM) $@
+-- 
+2.37.2
+

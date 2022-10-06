@@ -1,0 +1,27 @@
+From 4bbedd25e74adb5cb181a9ae589adb2052ade630 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 31 Aug 2022 23:34:48 -0700
+Subject: [PATCH] bench.h: Fix typo in specifying string.h
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/bench.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/bench.h b/src/bench.h
+index 2ebdf5a..750bebf 100644
+--- a/src/bench.h
++++ b/src/bench.h
+@@ -21,7 +21,7 @@ typedef unsigned char bool_t;
+ #include        <signal.h>
+ #include        <errno.h>
+ #ifndef WIN32
+-#include        <strings.h>
++#include        <string.h>
+ #endif
+ #include        <sys/types.h>
+ #ifndef WIN32
+-- 
+2.37.3
+

@@ -1,0 +1,32 @@
+From e5f72c656829402c6f70e7416039bc18f0c26485 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 30 Aug 2022 22:17:14 -0700
+Subject: [PATCH] Do not use std::shuffle with clang 15
+
+This fails to compile although its preferred approach for c++11 and
+newer
+
+See
+https://github.com/SOCI/soci/issues/984
+
+Upstream-Status: Inappropriate [Workaround]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ cmake/SociConfig.cmake | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/cmake/SociConfig.cmake b/cmake/SociConfig.cmake
+index 492e1837..f24fd9a6 100644
+--- a/cmake/SociConfig.cmake
++++ b/cmake/SociConfig.cmake
+@@ -94,6 +94,7 @@ else()
+     set(SOCI_CXX11 ON)
+     set(SOCI_CXX_VERSION_FLAGS "-std=c++11")
+     add_definitions(-DCATCH_CONFIG_CPP11_NO_IS_ENUM)
++    add_definitions(-DCATCH_CONFIG_CPP11_NO_SHUFFLE)
+ 
+     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SOCI_GCC_CLANG_COMMON_FLAGS} ${SOCI_CXX_VERSION_FLAGS}")
+ 
+-- 
+2.37.3
+

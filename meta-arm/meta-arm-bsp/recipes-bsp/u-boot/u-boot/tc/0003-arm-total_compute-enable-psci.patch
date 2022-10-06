@@ -1,0 +1,30 @@
+From 8dd3e03bd83939746b6a849dce37435ea7581032 Mon Sep 17 00:00:00 2001
+From: Davidson K <davidson.kumaresan@arm.com>
+Date: Thu, 14 Jul 2022 19:35:41 +0530
+Subject: [PATCH 3/7] arm: total_compute: enable psci
+
+psci is used for system reset
+
+Signed-off-by: Davidson K <davidson.kumaresan@arm.com>
+Change-Id: Iff4f769dc5e64b6000e892d77a011102b090acfd
+Upstream-Status: Submitted [https://patchwork.ozlabs.org/project/uboot/patch/20220809102652.23776-1-davidson.kumaresan@arm.com/]
+---
+ arch/arm/dts/total_compute.dts | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm/dts/total_compute.dts b/arch/arm/dts/total_compute.dts
+index 4399269a44..96edacda0b 100644
+--- a/arch/arm/dts/total_compute.dts
++++ b/arch/arm/dts/total_compute.dts
+@@ -45,4 +45,8 @@
+ 		clock-frequency = <24000000>;
+ 		clock-output-names = "bp:clock24mhz";
+ 	};
++	psci {
++		compatible = "arm,psci-1.0", "arm,psci-0.2";
++		method = "smc";
++	};
+ };
+-- 
+2.34.1
+
