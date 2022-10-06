@@ -1,0 +1,24 @@
+From 417f21995597d60854b8b0c1434bbaae19e4e9fd Mon Sep 17 00:00:00 2001
+From: Brian Ma <chma0@nuvoton.com>
+Date: Mon, 22 Aug 2022 10:09:41 +0800
+Subject: [PATCH] [WA] fix watchdog bootstatus incorrect
+
+---
+ drivers/watchdog/npcm_wdt.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/watchdog/npcm_wdt.c b/drivers/watchdog/npcm_wdt.c
+index 2656ba278178..8013e4d46010 100644
+--- a/drivers/watchdog/npcm_wdt.c
++++ b/drivers/watchdog/npcm_wdt.c
+@@ -210,7 +210,6 @@ static void npcm_get_reset_status(struct npcm_wdt *wdt, struct device *dev)
+ 	regmap_read(gcr_regmap, NPCM7XX_RESSR_OFFSET, &rstval);
+ 	if (!rstval) {
+ 		regmap_read(gcr_regmap, NPCM7XX_INTCR2_OFFSET, &rstval);
+-		rstval = ~rstval;
+ 	}
+ 
+ 	if (rstval & wdt->card_reset)
+-- 
+2.17.1
+
