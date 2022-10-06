@@ -227,15 +227,8 @@ VIRTUAL-RUNTIME_phosphor-ipmi-providers ?= "phosphor-ipmi-fru"
 # Set security headers on builds
 require conf/distro/include/security_flags.inc
 
-# Disable security on croserver.
-# Remove if https://github.com/open-power/eCMD/pull/433 is ever merged
-SECURITY_STRINGFORMAT:pn-croserver = ""
 # obmc-libobmc-intf doesn't compile with security flags enabled
 SECURITY_CFLAGS:pn-obmc-libobmc-intf = ""
-
-# remove when https://gerrit.openbmc-project.xyz/c/openbmc/pldm/+/39984
-# is merged and rev bumped
-SECURITY_CFLAGS:pn-pldm = ""
 
 # We generally want to enable LTO with meson
 EXTRA_OEMESON:append:class-target = " -Db_lto=true"
