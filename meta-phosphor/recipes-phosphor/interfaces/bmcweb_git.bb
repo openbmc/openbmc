@@ -41,7 +41,7 @@ do_install_ptest() {
 
 RDEPENDS:${PN} += " \
     jsnbd \
-    phosphor-mapper \
+    phosphor-objmgr \
 "
 
 FILES:${PN} += "${datadir}/** "

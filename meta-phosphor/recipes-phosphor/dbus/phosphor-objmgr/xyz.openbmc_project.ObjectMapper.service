@@ -1,0 +1,15 @@
+[Unit]
+Description=Phosphor DBus Service Discovery Manager
+Before=obmc-mapper.target
+After=dbus.service
+
+[Service]
+Restart=always
+Type=dbus
+ExecStart=/usr/bin/mapperx
+BusName={BUSNAME}
+TimeoutStartSec=300
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

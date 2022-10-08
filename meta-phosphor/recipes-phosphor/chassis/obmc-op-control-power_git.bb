@@ -7,7 +7,7 @@ inherit skeleton-gdbus
 inherit obmc-phosphor-dbus-service
 inherit pkgconfig
 
-DEPENDS += "phosphor-mapper systemd"
+DEPENDS += "libmapper systemd"
 
 SKELETON_DIR = "op-pwrctl"
 

@@ -4,7 +4,6 @@ HOMEPAGE = "http://github.com/openbmc/phosphor-time-manager"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 DEPENDS += "autoconf-archive-native"
-DEPENDS += "phosphor-mapper"
 DEPENDS += "systemd"
 DEPENDS += "sdbusplus"
 DEPENDS += "${PYTHON_PN}-sdbus++-native"
@@ -23,6 +22,6 @@ inherit obmc-phosphor-dbus-service
 
 RDEPENDS:${PN} += "phosphor-settings-manager"
 RDEPENDS:${PN} += "phosphor-network"
-RDEPENDS:${PN} += "phosphor-mapper"
+RDEPENDS:${PN} += "phosphor-objmgr"
 
 DBUS_SERVICE:${PN} += "xyz.openbmc_project.Time.Manager.service"
