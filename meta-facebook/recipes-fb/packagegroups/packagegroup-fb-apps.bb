@@ -62,5 +62,6 @@ RDEPENDS:${PN}-system = " \
         dbus-sensors \
         phosphor-virtual-sensor \
         sensor-monitor \
+        phosphor-gpio-monitor-monitor \
         ${RDEPENDS_PN_SYSTEM_EXTRAS} \
         "
