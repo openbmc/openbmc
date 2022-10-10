@@ -1,0 +1,30 @@
+[
+    {
+        "Name": "presence-slot1",
+        "LineName": "PRESENCE-SLOT1",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Target": "obmc-ipmb-rescan-fru.service"
+    },
+    {
+        "Name": "presence-slot2",
+        "LineName": "PRESENCE-SLOT2",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Target": "obmc-ipmb-rescan-fru.service"
+    },
+    {
+        "Name": "presence-slot3",
+        "LineName": "PRESENCE-SLOT3",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Target": "obmc-ipmb-rescan-fru.service"
+    },
+    {
+        "Name": "presence-slot4",
+        "LineName": "PRESENCE-SLOT4",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Target": "obmc-ipmb-rescan-fru.service"
+    }
+]
