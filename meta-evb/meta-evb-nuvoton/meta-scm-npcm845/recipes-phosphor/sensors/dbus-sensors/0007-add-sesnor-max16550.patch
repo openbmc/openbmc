@@ -1,0 +1,36 @@
+From 843c8480e70e4a9f948916c76a3234a54833b53f Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Mon, 15 Aug 2022 14:58:46 +0800
+Subject: [PATCH 7/8] add sesnor max16550
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ src/PSUSensorMain.cpp | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/PSUSensorMain.cpp b/src/PSUSensorMain.cpp
+index 4f8fab0a..8f1dcd11 100644
+--- a/src/PSUSensorMain.cpp
++++ b/src/PSUSensorMain.cpp
+@@ -47,7 +47,7 @@ static constexpr auto sensorTypes{std::to_array<const char*>(
+      "MAX20730",  "MAX20734",  "MAX20796",  "MAX34451",  "MP2971",
+      "MP2973",    "MP5023",    "pmbus",     "PXE1610",   "RAA228000",
+      "RAA228228", "RAA228620", "RAA229001", "RAA229004", "RAA229126",
+-     "TPS546D24", "XDPE12284", "p2011"})};
++     "TPS546D24", "XDPE12284", "p2011", "MAX1655"})};
+ 
+ // clang-format off
+ static constexpr auto pmbusNames{std::to_array<const char*>({
+@@ -88,7 +88,8 @@ static constexpr auto pmbusNames{std::to_array<const char*>({
+     "raa229126",
+     "tps546d24",
+     "xdpe12284",
+-    "p2011"
++    "p2011",
++    "max16550"
+ })};
+ //clang-format on
+ 
+-- 
+2.17.1
+

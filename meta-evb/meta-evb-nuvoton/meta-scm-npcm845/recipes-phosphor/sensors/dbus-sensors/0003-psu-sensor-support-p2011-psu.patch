@@ -1,0 +1,36 @@
+From 56fc5d6f66726f0318798e50e34c150beb030e8f Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Mon, 15 Aug 2022 14:24:40 +0800
+Subject: [PATCH 3/8] psu sensor: support p2011 psu
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ src/PSUSensorMain.cpp | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/PSUSensorMain.cpp b/src/PSUSensorMain.cpp
+index 2851564c..21a777dc 100644
+--- a/src/PSUSensorMain.cpp
++++ b/src/PSUSensorMain.cpp
+@@ -47,7 +47,7 @@ static constexpr auto sensorTypes{std::to_array<const char*>(
+      "MAX20730",  "MAX20734",  "MAX20796",  "MAX34451",  "MP2971",
+      "MP2973",    "MP5023",    "pmbus",     "PXE1610",   "RAA228000",
+      "RAA228228", "RAA228620", "RAA229001", "RAA229004", "RAA229126",
+-     "TPS546D24", "XDPE12284"})};
++     "TPS546D24", "XDPE12284", "p2011"})};
+ 
+ // clang-format off
+ static constexpr auto pmbusNames{std::to_array<const char*>({
+@@ -87,7 +87,8 @@ static constexpr auto pmbusNames{std::to_array<const char*>({
+     "raa229004",
+     "raa229126",
+     "tps546d24",
+-    "xdpe12284"
++    "xdpe12284",
++    "p2011"
+ })};
+ //clang-format on
+ 
+-- 
+2.17.1
+

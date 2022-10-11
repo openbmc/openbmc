@@ -1,0 +1,45 @@
+From d5175a063d1292dd0d7a1df74658eacaf0e2d6d1 Mon Sep 17 00:00:00 2001
+From: Tim Lee <timlee660101@gmail.com>
+Date: Fri, 18 Feb 2022 14:55:06 +0800
+Subject: [PATCH 2/2] Customize phosphor-watchdog for Nuvoton platform
+
+Signed-off-by: Tim Lee <timlee660101@gmail.com>
+---
+ src/watchdog.cpp | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/src/watchdog.cpp b/src/watchdog.cpp
+index ea94082..6c5246b 100644
+--- a/src/watchdog.cpp
++++ b/src/watchdog.cpp
+@@ -20,6 +20,11 @@ using namespace phosphor::logging;
+ 
+ using sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure;
+ 
++// systemd service to kick start a target.
++constexpr auto SYSTEMD_SERVICE = "org.freedesktop.systemd1";
++constexpr auto SYSTEMD_ROOT = "/org/freedesktop/systemd1";
++constexpr auto SYSTEMD_INTERFACE = "org.freedesktop.systemd1.Manager";
++
+ const static constexpr char* currentHostState = "CurrentHostState";
+ const static constexpr char* hostStatusOff =
+     "xyz.openbmc_project.State.Host.HostState.Off";
+@@ -354,11 +359,10 @@ void Watchdog::timeOutHandler()
+                                       "RestartCause.WatchdogTimer"));
+                     bus.call_noreply(method);
+                 }
+-                method = bus.new_method_call(chassis::busName, chassis::path,
+-                                             "org.freedesktop.DBus.Properties",
+-                                             "Set");
+-                method.append(chassis::interface, chassis::request,
+-                              std::variant<std::string>(target->second));
++                method = bus.new_method_call(SYSTEMD_SERVICE, SYSTEMD_ROOT,
++                                              SYSTEMD_INTERFACE, "StartUnit");
++                method.append(target->second);
++                method.append("replace");
+                 bus.call_noreply(method);
+             }
+         }
+-- 
+2.17.1
+

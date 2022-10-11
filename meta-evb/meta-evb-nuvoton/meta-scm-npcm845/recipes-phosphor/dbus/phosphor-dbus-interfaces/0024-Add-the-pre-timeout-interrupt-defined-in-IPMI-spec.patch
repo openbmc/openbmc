@@ -1,0 +1,57 @@
+From cf396e70f5d29a625bcfc10355a301c5e1ea4e14 Mon Sep 17 00:00:00 2001
+From: Ren Yu <yux.ren@intel.com>
+Date: Fri, 24 May 2019 14:55:10 +0800
+Subject: [PATCH] Add the pre-timeout interrupt defined in IPMI spec
+
+The IPMI watchdog pre-timeout interrupt is used to set the different
+pre-timeout interrupt source. Add them as a dbus property,
+IPMI set/get watchdog commands will use it.
+
+Signed-off-by: Ren Yu <yux.ren@intel.com>
+---
+ .../State/Watchdog.interface.yaml             | 22 +++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/yaml/xyz/openbmc_project/State/Watchdog.interface.yaml b/yaml/xyz/openbmc_project/State/Watchdog.interface.yaml
+index 7f79c7c8..d8075646 100644
+--- a/yaml/xyz/openbmc_project/State/Watchdog.interface.yaml
++++ b/yaml/xyz/openbmc_project/State/Watchdog.interface.yaml
+@@ -33,6 +33,11 @@ properties:
+       description: >
+           The action the watchdog should perform when it expires.
+       default: "HardReset"
++    - name: PreTimeoutInterrupt
++      type: enum[self.PreTimeoutInterruptAction]
++      description: >
++          The BMC generates the selected interrupt before the timer expires.
++      default: 'None'
+     - name: Interval
+       type: uint64
+       description: >
+@@ -73,6 +78,23 @@ enumerations:
+             description: >
+                 Perform a power cycle of the system.
+ 
++    - name: PreTimeoutInterruptAction
++      description: >
++        The type of PreTimeout Interrupt.
++      values:
++          - name: 'None'
++            description: >
++                Do nothing.
++          - name: 'SMI'
++            description: >
++                SMI.
++          - name: 'NMI'
++            description: >
++                NMI / Diagnostic Interrupt.
++          - name: 'MI'
++            description: >
++                Messaging Interrupt.
++
+     - name: TimerUse
+       description: >
+           The type of timer use.
+-- 
+2.17.1
+

@@ -1,0 +1,40 @@
+From abab7c5040adbed268707a7161e22eeb6458689e Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Fri, 24 Jun 2022 18:36:29 +0800
+Subject: [PATCH 2/8] psu sensor: add fan3 support
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ src/PSUSensorMain.cpp | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/src/PSUSensorMain.cpp b/src/PSUSensorMain.cpp
+index 918b9c6c..2851564c 100644
+--- a/src/PSUSensorMain.cpp
++++ b/src/PSUSensorMain.cpp
+@@ -1020,9 +1020,10 @@ void propertyInitialize(void)
+         {"temp6", PSUProperty("Temperature", 127, -128, 3, 0)},
+         {"maxtemp1", PSUProperty("Max Temperature", 127, -128, 3, 0)},
+         {"fan1", PSUProperty("Fan Speed 1", 30000, 0, 0, 0)},
+-        {"fan2", PSUProperty("Fan Speed 2", 30000, 0, 0, 0)}};
++        {"fan2", PSUProperty("Fan Speed 2", 30000, 0, 0, 0)},
++        {"fan3", PSUProperty("Fan Speed 3", 30000, 0, 0, 0)}};
+ 
+-    pwmTable = {{"fan1", "Fan_1"}, {"fan2", "Fan_2"}};
++    pwmTable = {{"fan1", "1"}};
+ 
+     limitEventMatch = {{"PredictiveFailure", {"max_alarm", "min_alarm"}},
+                        {"Failure", {"crit_alarm", "lcrit_alarm"}}};
+@@ -1034,7 +1035,8 @@ void propertyInitialize(void)
+ 
+     groupEventMatch = {{"FanFault",
+                         {{"fan1", {"fan1_alarm", "fan1_fault"}},
+-                         {"fan2", {"fan2_alarm", "fan2_fault"}}}}};
++                         {"fan2", {"fan2_alarm", "fan2_fault"}},
++                         {"fan3", {"fan3_alarm", "fan3_fault"}}}}};
+ }
+ 
+ int main()
+-- 
+2.17.1
+
