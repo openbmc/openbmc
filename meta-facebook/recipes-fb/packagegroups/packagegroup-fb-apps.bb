@@ -61,5 +61,6 @@ RDEPENDS:${PN}-system = " \
         entity-manager \
         dbus-sensors \
         phosphor-virtual-sensor \
+        sensor-monitor \
         ${RDEPENDS_PN_SYSTEM_EXTRAS} \
         "
