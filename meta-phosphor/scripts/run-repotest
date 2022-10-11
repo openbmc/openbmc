@@ -140,7 +140,6 @@ meta-ibm/meta-romulus/recipes-phosphor/chassis/vrm-control/vrm-control.sh
 meta-ibm/meta-romulus/recipes-phosphor/gpio/id-button/toggle_identify_led.sh
 meta-ibm/recipes-phosphor/chassis/power-workarounds/witherspoon/power-workarounds.sh
 meta-ibm/recipes-phosphor/chassis/vrm-control/ibm-ac-server/ir35221-unbind-bind.sh
-meta-ibm/recipes-phosphor/chassis/vrm-control/mihawk/ir35221-unbind-bind.sh
 meta-ibm/recipes-phosphor/chassis/vrm-control/vrm-control.sh
 meta-ibm/recipes-phosphor/dump/phosphor-debug-collector/plugins.d/ibm_elogall
 meta-ibm/recipes-phosphor/dump/phosphor-debug-collector/plugins.d/pels

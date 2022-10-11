@@ -1,6 +1,5 @@
 OBMC_IMAGE_EXTRA_INSTALL:append:ibm-ac-server = " mboxd max31785-msl phosphor-msl-verify liberation-fonts uart-render-controller first-boot-set-hostname"
 OBMC_IMAGE_EXTRA_INSTALL:append:p10bmc = " mboxd"
-OBMC_IMAGE_EXTRA_INSTALL:append:mihawk = " mboxd liberation-fonts uart-render-controller "
 
 IMAGE_FEATURES:append = " obmc-dbus-monitor"
 
