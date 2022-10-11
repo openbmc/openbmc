@@ -1,0 +1,21 @@
+{
+	"inlet": [
+		{"instance": 1, "dbus": "/xyz/openbmc_project/sensors/temperature/InletTemp", "record_id": 6},
+		{"instance": 2, "dbus": "/xyz/openbmc_project/sensors/temperature/SysCabInletTemp", "record_id": 7},
+		{"instance": 3, "dbus": "/xyz/openbmc_project/sensors/temperature/MBInletTemp1", "record_id": 8},
+		{"instance": 4, "dbus": "/xyz/openbmc_project/sensors/temperature/MBInletTemp2", "record_id": 9},
+		{"instance": 5, "dbus": "/xyz/openbmc_project/sensors/temperature/SysInletTemp", "record_id": 13}
+	],
+	"baseboard": [
+		{"instance": 1, "dbus": "/xyz/openbmc_project/sensors/temperature/OutletTemp", "record_id": 1},
+		{"instance": 2, "dbus": "/xyz/openbmc_project/sensors/temperature/Psu0InletTemp2", "record_id": 2},
+		{"instance": 3, "dbus": "/xyz/openbmc_project/sensors/temperature/Psu1InletTemp2", "record_id": 3},
+		{"instance": 4, "dbus": "/xyz/openbmc_project/sensors/temperature/PcieZoneTemp1", "record_id": 4},
+		{"instance": 5, "dbus": "/xyz/openbmc_project/sensors/temperature/PcieZoneTemp2", "record_id": 5},
+		{"instance": 6, "dbus": "/xyz/openbmc_project/sensors/temperature/AST2600CPUTemp", "record_id": 10}
+	],
+	"cpu": [
+		{ "instance": 13, "dbus": "/xyz/openbmc_project/sensors/temperature/S0_THDIODE_Temp", "record_id": 250 },
+		{ "instance": 14, "dbus": "/xyz/openbmc_project/sensors/temperature/S1_THDIODE_Temp", "record_id": 251 }
+	]
+}
