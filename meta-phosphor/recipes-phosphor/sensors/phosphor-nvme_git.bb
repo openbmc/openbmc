@@ -8,7 +8,7 @@ DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "nlohmann-json"
-SRCREV = "d4f5199251f2acbcf007c9bc163fd65d3695655b"
+SRCREV = "76f455e440fb73888698a1f129f9c8824abde016"
 PR = "r1"
 
 SRC_URI = "git://github.com/openbmc/phosphor-nvme.git;protocol=https;branch=master"
