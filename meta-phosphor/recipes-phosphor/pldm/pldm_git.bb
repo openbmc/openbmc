@@ -20,7 +20,6 @@ inherit systemd
 EXTRA_OEMESON = " \
         -Dtests=disabled \
         -Doem-ibm=disabled \
-        -Dlibpldm-only=disabled \
         "
 
 pkg_prerm:${PN} () {
