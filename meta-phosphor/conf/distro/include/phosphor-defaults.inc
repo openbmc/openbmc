@@ -49,64 +49,17 @@ VIRTUAL-RUNTIME_obmc-fan-control ?= "phosphor-fan-control"
 # interface.
 VIRTUAL-RUNTIME_obmc-inventory-manager ?= "phosphor-inventory-manager"
 
-# obmc-led-manager
-#
-# Provides an implementation of the xyz.openbmc_project.ledmanager interface.
-VIRTUAL-RUNTIME_obmc-leds-manager ?= "phosphor-led-manager"
-
-# obmc-led-monitor
-#
-# Provides an implementation of the FRU fault monitor.
-VIRTUAL-RUNTIME_obmc-led-monitor ?= "phosphor-led-manager-faultmonitor"
-
-# obmc-led-sysfs
-#
-# Provides an implementation of xyz.openbmc_project.Led.Physical for
-# Linux kernel LED subsystem LEDs.
-VIRTUAL-RUNTIME_obmc-leds-sysfs ?= "phosphor-led-sysfs"
-
-# obmc-bmc-download-mgr
-#
-# Provides an implementation of the xyz.openbmc_project.Common.TFTP
-# interface.
-VIRTUAL-RUNTIME_obmc-bmc-download-mgr ?= "phosphor-software-manager-download-mgr"
-
-# obmc-bmc-version
-#
-# Provides an implementation of the xyz.openbmc_project.Software.Version
-# interface.
-VIRTUAL-RUNTIME_obmc-bmc-version ?= "phosphor-software-manager-version"
-
-# obmc-bmc-updater
-#
-# Provides an implementation of the xyz.openbmc_project.Software.Activation
-# interface.
-VIRTUAL-RUNTIME_obmc-bmc-updater ?= "phosphor-software-manager-updater"
-
 # obmc-sensors-hwmon
 #
 # Provides an implementation of xyz.openbmc_project.Sensor.Value
 # for hwmon sensors.
 VIRTUAL-RUNTIME_obmc-sensors-hwmon ?= "phosphor-hwmon"
 
-# obmc-dump-manager
-# Provide support for managing dump
-VIRTUAL-RUNTIME_obmc-dump-manager ?= "phosphor-debug-collector-manager"
-
-# obmc-dump-monitor
-# Provide support for monitoring BMC core dumps
-VIRTUAL-RUNTIME_obmc-dump-monitor ?= "phosphor-debug-collector-monitor"
-
 # phosphor-hwmon-config
 #
 # The phosphor-hwmon package can have its configuration generated
 # automatically if the MRW feature is enabled.
 VIRTUAL-RUNTIME_phosphor-hwmon-config ?= ""
-
-# obmc-network-manager
-#
-# Provide support for managing network
-VIRTUAL-RUNTIME_obmc-network-manager ?= "phosphor-network"
 
 # Configuration overrides for phosphor-ipmi-fru.
 #
@@ -189,25 +142,6 @@ PREFERRED_PROVIDER_virtual/phosphor-fan-presence-config ?= \
 # location expected by the phosphor-fan-control build process in the sysroot.
 PREFERRED_PROVIDER_virtual/phosphor-fan-control-fan-config ?= \
     "phosphor-fan-control-fan-config"
-
-# The phosphor-gpio-monitor application is data-driven and requires an input.
-# The application then watches the passed in input event entry for the
-# change in polarity for the value matching user input. Once the required
-# condition is met, it calls into a systemd target file if one is mentioned
-# in input.
-PREFERRED_PROVIDER_virtual/obmc-gpio-monitor ?= "phosphor-gpio-monitor"
-
-# The phosphor-watchdog application is data-driven and requires an input.
-# The application then starts a timer in disabled state. User of this timer
-# needs to first enable and then use it. This also provides a way for changing
-# the timeout if needed.
-PREFERRED_PROVIDER_virtual/obmc-watchdog ?= "phosphor-watchdog"
-
-# obmc-user-mgmt
-#
-# Provides an implementation of xyz.openbmc_project.User.Manager catering
-# to user management
-VIRTUAL-RUNTIME_obmc-user-mgmt ?= "phosphor-user-manager"
 
 OBMC_DBUS_PATH_ROOT ?= "/xyz/openbmc_project"
 OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"

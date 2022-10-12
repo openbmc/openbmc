@@ -19,7 +19,7 @@ OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " openssl-bin"
 OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " phosphor-ipmi-blobs-binarystore"
 OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " phosphor-virtual-sensor"
 OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " acpi-power-state-daemon"
-OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " virtual/obmc-gpio-presence"
+OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " phosphor-gpio-monitor-presence"
 OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " ipmitool"
 OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " phosphor-health-monitor"
 
@@ -31,9 +31,9 @@ OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " bmcweb"
 OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " phosphor-certificate-manager"
 OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " phosphor-user-manager"
 # Required for LEDs. Part of obmc-leds
-OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " ${VIRTUAL-RUNTIME_obmc-leds-manager}"
-OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " ${VIRTUAL-RUNTIME_obmc-leds-sysfs}"
-OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " ${VIRTUAL-RUNTIME_obmc-led-monitor}"
+OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " phosphor-led-manager"
+OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " phosphor-led-sysfs"
+OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " phosphor-led-manager-faultmonitor"
 # Required for the front port. Part of obmc-console
 OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " obmc-console"
 # Required from packagegroup-gbs-apps

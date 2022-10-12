@@ -5,7 +5,7 @@ EXTRA_OEMESON:bletchley = " \
     "
 
 # host watchdog does not support on bletchley
-RDEPENDS:${PN}:remove:bletchley = "virtual/obmc-watchdog"
+RDEPENDS:${PN}:remove:bletchley = "phosphor-watchdog"
 
 # bletchley doesn't have IPMI support, skip xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service
 SOFT_SVC = ""

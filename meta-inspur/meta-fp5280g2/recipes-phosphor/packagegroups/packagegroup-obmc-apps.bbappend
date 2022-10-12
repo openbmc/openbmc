@@ -9,7 +9,7 @@ RDEPENDS:${PN}-inventory:append:fp5280g2 = " \
                                              openpower-fru-vpd \
                                              openpower-occ-control \
                                              phosphor-cooling-type \
-                                             virtual/obmc-gpio-presence \
+                                             phosphor-gpio-monitor-presence \
                                             "
 
 RDEPENDS:${PN}-extras:append:fp5280g2 = " \

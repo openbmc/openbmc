@@ -5,8 +5,8 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/Apache-2.0;md5=89aea4e17d99a7ca
 
 inherit obmc-phosphor-systemd
 
-DEPENDS += "virtual/obmc-gpio-monitor"
-RDEPENDS:${PN} += "virtual/obmc-gpio-monitor"
+DEPENDS += "phosphor-gpio-monitor"
+RDEPENDS:${PN} += "phosphor-gpio-monitor-monitor"
 RDEPENDS:${PN} += "bash"
 
 AMPERE_MONITOR_INSTANCES = " \
