@@ -23,7 +23,7 @@ S = "${WORKDIR}/git"
 SYSTEMD_PACKAGES = "${PN} ${EXTRA_ENTITY_MANAGER_PACKAGES}"
 SYSTEMD_SERVICE:${PN} = "xyz.openbmc_project.EntityManager.service"
 SYSTEMD_SERVICE:fru-device = "xyz.openbmc_project.FruDevice.service"
-SYSTEMD_AUTO_ENABLE:fru-device_ibm-power-cpu = "disable"
+SYSTEMD_AUTO_ENABLE:fru-device:ibm-power-cpu = "disable"
 
 inherit pkgconfig meson systemd python3native
 
