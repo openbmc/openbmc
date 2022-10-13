@@ -17,7 +17,6 @@ RPROVIDES:${PN}-system += "virtual-obmc-system-mgmt"
 
 SUMMARY:${PN}-flash = "ASRock Flash"
 RDEPENDS:${PN}-flash = " \
-	obmc-control-bmc \
 	phosphor-ipmi-flash \
 	"
 

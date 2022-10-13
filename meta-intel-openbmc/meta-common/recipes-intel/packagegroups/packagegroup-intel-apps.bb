@@ -34,7 +34,6 @@ RDEPENDS:${PN}-fans = " \
 
 SUMMARY:${PN}-flash = "Intel Flash"
 RDEPENDS:${PN}-flash = " \
-        obmc-control-bmc \
         "
 
 SUMMARY:${PN}-system = "Intel System"

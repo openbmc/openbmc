@@ -34,7 +34,6 @@ RDEPENDS:${PN}-fans = " \
 
 SUMMARY:${PN}-flash = "Supermicro Flash"
 RDEPENDS:${PN}-flash = " \
-        obmc-control-bmc \
         "
 
 SUMMARY:${PN}-system = "Supermicro System"
