@@ -1,0 +1,83 @@
+From ab7c05055dba1cb40126d8a63381ec6b008cc7c9 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Mon, 15 Aug 2022 16:46:21 +0800
+Subject: [PATCH 01/21] Add-set-BIOS-version-support
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ apphandler.cpp | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
+
+diff --git a/apphandler.cpp b/apphandler.cpp
+index 8e472880..0fc9b2f0 100644
+--- a/apphandler.cpp
++++ b/apphandler.cpp
+@@ -52,6 +52,8 @@ static constexpr auto versionIntf = "xyz.openbmc_project.Software.Version";
+ static constexpr auto activationIntf =
+     "xyz.openbmc_project.Software.Activation";
+ static constexpr auto softwareRoot = "/xyz/openbmc_project/software";
++static constexpr auto biosObjPath = "/xyz/openbmc_project/software/bios_active";
++static constexpr auto biosFile = "/var/lib/phosphor-bmc-code-mgmt/bios-release";
+ 
+ void register_netfn_app_functions() __attribute__((constructor));
+ 
+@@ -1419,6 +1421,46 @@ ipmi::RspType<uint8_t,                // Parameter revision
+     return ipmi::responseSuccess(paramRevision, setSelector, configData);
+ }
+ 
++void handleFirmwareVersion(uint8_t paramSelector, std::string version){
++    // only handle FW version
++    if (paramSelector != IPMI_SYSINFO_SYSTEM_FW_VERSION)
++    {
++        return;
++    }
++    sdbusplus::bus::bus bus{ipmid_get_sd_bus_connection()};
++
++    log<level::INFO>(("ipmid get BIOS version:" + version).c_str());
++
++    // update host version to software manager
++    std::string service;
++    try
++    {
++        service = ipmi::getService(bus, versionIntf, biosObjPath);
++        ipmi::setDbusProperty(bus, service, biosObjPath, versionIntf,
++                              "Version", version);
++    }
++    catch (const std::runtime_error& e)
++    {
++        log<level::ERR>("Cannot get service for update version",
++                         entry("ERROR=%s", e.what()),
++                         entry("INTERFACE=%s", versionIntf));
++    }
++    catch (sdbusplus::exception::SdBusError& e)
++    {
++        log<level::ERR>("sdbusplus exception - Unable to update BIOS version",
++                        entry("ERROR=%s", e.what()),
++                        entry("INTERFACE=%s", versionIntf),
++                        entry("SERVICE=%s", service.c_str()));
++    }
++    // write version file to storage
++    log<level::DEBUG>("write BIOS version file.");
++    std::ofstream myfile(biosFile, std::ofstream::out);
++    std::string ver = "VERSION_ID=\"" + version + "\"";
++    myfile << ver << std::endl;
++    myfile.close();
++}
++
++
+ ipmi::RspType<> ipmiAppSetSystemInfo(uint8_t paramSelector, uint8_t data1,
+                                      std::vector<uint8_t> configData)
+ {
+@@ -1508,6 +1550,9 @@ ipmi::RspType<> ipmiAppSetSystemInfo(uint8_t paramSelector, uint8_t data1,
+         std::copy_n(configData.begin(), count, paramString.begin() + offset);
+     }
+     sysInfoParamStore->update(paramSelector, paramString);
++
++    // update BIOS version
++    handleFirmwareVersion(paramSelector, paramString);
+     return ipmi::responseSuccess();
+ }
+ 
+-- 
+2.17.1
+

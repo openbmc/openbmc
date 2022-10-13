@@ -1,0 +1,315 @@
+From 00305efa5c3a5ea58944a161b0f261f99e2e8539 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Thu, 28 Jul 2022 09:59:17 +0800
+Subject: [PATCH 20/21] set channel security keys
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ app/channel.hpp             |  15 ++++
+ apphandler.cpp              | 156 ++++++++++++++++++++++++++++++++++++
+ apphandler.hpp              |   1 +
+ include/ipmid/api.h         |   5 ++
+ user_channel/user_layer.cpp |  34 ++++++++
+ user_channel/user_layer.hpp |   5 ++
+ 6 files changed, 216 insertions(+)
+
+diff --git a/app/channel.hpp b/app/channel.hpp
+index 8e5accbc..aca02bd9 100644
+--- a/app/channel.hpp
++++ b/app/channel.hpp
+@@ -92,3 +92,18 @@ static constexpr auto conf = "confidentiality";
+ static constexpr auto confTag = 0x80;
+ 
+ } // namespace cipher
++
++struct SetChSecurityresp
++{
++   uint8_t LockStatus;
++   uint8_t keys[20];
++}__attribute__((packed));
++
++struct SetChSecurity
++{
++   uint8_t ChannelNum;
++   uint8_t Operation;
++   uint8_t KeyID;
++   uint8_t keys[20];
++}__attribute__((packed));
++
+diff --git a/apphandler.cpp b/apphandler.cpp
+index 334b625d..36707663 100644
+--- a/apphandler.cpp
++++ b/apphandler.cpp
+@@ -65,7 +65,21 @@ using Activation =
+ using BMC = sdbusplus::xyz::openbmc_project::State::server::BMC;
+ namespace fs = std::filesystem;
+ 
++#define MAXCH 15
++#define KR 0
++#define KG 1
++#define READ_KEY 0
++#define SET_KEY 1
++#define LOCKKEY 2
++#define NULLSTR "00000000000000000000"
++#define KEYSIZE 20
++#define KR_FILE "/etc/ipmi_kr"
++#define KG_FILE "/etc/ipmi_kg"
++#define KR_LOCK_FILE "/etc/ipmi_kr_locked"
++#define KEYLOCKED 1
++#define KEYUNLOCKED 2
+ #ifdef ENABLE_I2C_WHITELIST_CHECK
++
+ typedef struct
+ {
+     uint8_t busId;
+@@ -1819,6 +1833,144 @@ ipmi::RspType<std::vector<uint8_t>>
+     return ipmi::responseSuccess(readBuf);
+ }
+ 
++bool CheckNullValue(uint8_t* keys, uint8_t* testNull)
++{
++        for(int i = 0; i < KEYSIZE ; i++ )
++        {
++            testNull[i] = keys[i]+48;
++        }
++        std::string p (reinterpret_cast<char*>(testNull));
++        if( !strncmp(p.c_str(),NULLSTR,KEYSIZE))
++        {
++                return true;
++        }
++        return false;
++}
++
++/**
++ @brief Implements Set Channel Security Command which can be used for
++ channel security via RMCP+
++**/
++ipmi_ret_t ipmi_set_chan_security_keys(ipmi_netfn_t, ipmi_cmd_t,
++                                    ipmi_request_t request,
++                                    ipmi_response_t response,
++                                    ipmi_data_len_t dataLen,
++                                    ipmi_context_t)
++{
++        std::array<uint8_t,KEYSIZE> keys;
++        std::fill(keys.data(),
++              keys.data() + keys.size(),0);
++        uint8_t testNull[KEYSIZE];
++
++        auto *reqData = reinterpret_cast<SetChSecurity*>(request);
++        auto *resp = reinterpret_cast<SetChSecurityresp*>(response);
++        if( reqData->ChannelNum > MAXCH )
++        {
++                return IPMI_CC_INVALID_FIELD_REQUEST;
++        }
++
++        switch(reqData->Operation)
++        {
++                case READ_KEY:
++                        {
++                                if(*dataLen != 3)
++                                {
++                                        return IPMI_CC_INVALID_FIELD_REQUEST;
++                                }
++                                if(reqData->KeyID != KR && reqData->KeyID != KG)
++                                {
++                                        return IPMI_CC_INVALID_FIELD_REQUEST;
++                                }
++
++                                *dataLen = sizeof(SetChSecurityresp);
++
++                                if(reqData->KeyID == KR && fs::exists(KR_LOCK_FILE))
++                                {
++                                    resp->LockStatus = KEYLOCKED;
++                                    return IPMI_CC_REQ_CANNOT_PERFORM_KEY_LOCKED;
++                                } else
++                                {
++                                    resp->LockStatus = KEYUNLOCKED;
++                                }
++
++                                std::string key_file;
++                                if (reqData->KeyID == KR)
++                                    key_file = KR_FILE;
++                                else
++                                    key_file = KG_FILE;
++                                std::ifstream readkey(key_file, std::ios::in | std::ios::binary);
++                                if (!readkey.is_open())
++                                {
++                                        std::memcpy(resp->keys,&keys,KEYSIZE);
++                                        break;
++                                }
++                                readkey.read(reinterpret_cast<char*>(keys.data()),KEYSIZE);
++                                readkey.close();
++                                std::string p (reinterpret_cast<char*>(keys.data()));
++                                if(!strncmp(p.c_str(),NULLSTR,KEYSIZE))
++                                {
++                                        std::fill(keys.data(),
++                                                        keys.data() + keys.size(),0);
++                                        std::memcpy(resp->keys,&keys,KEYSIZE);
++                                        break;
++                                }
++                                std::memcpy(resp->keys, reinterpret_cast<uint8_t*>(&keys),KEYSIZE);
++                                break;
++                        }
++
++                case SET_KEY:
++                        {
++                                if(( *dataLen - 3 ) >  KEYSIZE)
++                                {
++                                        return IPMI_CC_REQ_TO_MANY_KEY_BYTES;
++                                }
++                                if(( *dataLen - 3 ) <  KEYSIZE)
++                                {
++                                        return IPMI_CC_REQ_INSUFFICIENT_KEY_BYTES;
++                                }
++
++                                if(reqData->KeyID != KR && reqData->KeyID != KG)
++                                {
++                                        return IPMI_CC_INVALID_FIELD_REQUEST;
++                                }
++                                if (reqData->KeyID == KR && fs::exists(KR_LOCK_FILE))
++                                {
++                                        return IPMI_CC_REQ_CANNOT_PERFORM_KEY_LOCKED;
++                                }
++                                std::string key_file;
++                                if (reqData->KeyID == KR)
++                                    key_file = KR_FILE;
++                                else
++                                    key_file = KG_FILE;
++                                *dataLen = 0;
++                                std::ofstream writekey(key_file, std::ios::out | std::ios::trunc);
++                                if(CheckNullValue(reqData->keys,testNull))
++                                {
++                                        writekey.write(reinterpret_cast<char*>(&testNull) , KEYSIZE );
++                                        writekey.close();
++                                        break;
++                                }
++                                writekey.write(reinterpret_cast<char*>(&(reqData->keys)) , KEYSIZE );
++                                writekey.close();
++                                break;
++                        }
++
++		case LOCKKEY :
++                        {
++                                if(reqData->KeyID != KR)
++                                    return IPMI_CC_REQ_KEY_DOES_NOT_MEET_CRITERIA;
++                                resp->LockStatus = KEYLOCKED;
++                                std::ofstream lock_file(KR_LOCK_FILE, std::ios::out | std::ios::trunc);
++                                lock_file.close();
++                                break;
++                        }
++                default :
++                                return IPMI_CC_INVALID_FIELD_REQUEST;
++        }
++
++        return IPMI_CC_OK;
++}
++
+ void register_netfn_app_functions()
+ {
+     // <Get Device ID>
+@@ -1903,5 +2055,9 @@ void register_netfn_app_functions()
+     ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnApp,
+                           ipmi::app::cmdSetSystemInfoParameters,
+                           ipmi::Privilege::Admin, ipmiAppSetSystemInfo);
++    // <Set Channel Security Keys>
++    ipmi_register_callback(NETFUN_APP, IPMI_CMD_SET_CHAN_SECURITY_KEYS , NULL,
++                           ipmi_set_chan_security_keys, PRIVILEGE_ADMIN);
++
+     return;
+ }
+diff --git a/apphandler.hpp b/apphandler.hpp
+index 4f03121d..4710ddc7 100644
+--- a/apphandler.hpp
++++ b/apphandler.hpp
+@@ -19,6 +19,7 @@ enum ipmi_netfn_app_cmds
+     IPMI_CMD_SET_CHAN_ACCESS = 0x40,
+     IPMI_CMD_GET_CHANNEL_ACCESS = 0x41,
+     IPMI_CMD_GET_CHAN_INFO = 0x42,
++    IPMI_CMD_SET_CHAN_SECURITY_KEYS = 0x56,
+     IPMI_CMD_SET_SYSTEM_INFO = 0x58,
+     IPMI_CMD_GET_SYSTEM_INFO = 0x59,
+ };
+diff --git a/include/ipmid/api.h b/include/ipmid/api.h
+index 188db4a9..8251b7f0 100644
+--- a/include/ipmid/api.h
++++ b/include/ipmid/api.h
+@@ -116,6 +116,11 @@ enum ipmi_return_codes
+     IPMI_WDOG_CC_NOT_INIT = 0x80,
+     IPMI_CC_SYSTEM_INFO_PARAMETER_NOT_SUPPORTED = 0x80,
+     IPMI_CC_SYSTEM_INFO_PARAMETER_SET_READ_ONLY = 0x82,
++    IPMI_CC_REQ_CANNOT_PERFORM_KEY_LOCKED = 0x80,
++    IPMI_CC_REQ_INSUFFICIENT_KEY_BYTES = 0x81,
++    IPMI_CC_REQ_TO_MANY_KEY_BYTES = 0x82,
++    IPMI_CC_REQ_KEY_DOES_NOT_MEET_CRITERIA = 0x83,
++    IPMI_CC_REQ_KR_IS_NOT_USED = 0x84,
+     IPMI_CC_BUSY = 0xC0,
+     IPMI_CC_INVALID = 0xC1,
+     IPMI_CC_TIMEOUT = 0xC3,
+diff --git a/user_channel/user_layer.cpp b/user_channel/user_layer.cpp
+index bb9ac381..4efa91e3 100644
+--- a/user_channel/user_layer.cpp
++++ b/user_channel/user_layer.cpp
+@@ -18,6 +18,14 @@
+ 
+ #include "passwd_mgr.hpp"
+ #include "user_mgmt.hpp"
++#include <fstream>
++#include <iostream>
++#define SETZERO 48
++#define KEYSIZE 20
++#define ID_KR 0
++#define ID_KG 1
++#define KR_FILE "/etc/ipmi_kr"
++#define KG_FILE "/etc/ipmi_kg"
+ 
+ namespace
+ {
+@@ -226,4 +234,30 @@ Cc ipmiUserGetUserPayloadAccess(const uint8_t chNum, const uint8_t userId,
+     return ccSuccess;
+ }
+ 
++std::string ipmiGetChannelSecurityKeys(const uint8_t keyId)
++{
++   std::array<uint8_t,20> keys;
++   std::string keyfile;
++
++   if (keyId == ID_KR)
++       keyfile = KR_FILE;
++   else if (keyId == ID_KG)
++       keyfile = KG_FILE;
++   else
++       return "00000000000000000000";
++
++   std::ifstream chsecuritykey(keyfile, std::ios::in | std::ios::binary);
++   if (!chsecuritykey.is_open())
++   {
++            std::fill(keys.data(),
++              keys.data() + keys.size(),SETZERO);
++      std::string p (reinterpret_cast<char*>(keys.data()));
++      return p;
++   }
++   chsecuritykey.read(reinterpret_cast<char*>(keys.data()), KEYSIZE);
++   chsecuritykey.close();
++
++   std::string p (reinterpret_cast<char*>(keys.data()));
++   return p;
++}
+ } // namespace ipmi
+diff --git a/user_channel/user_layer.hpp b/user_channel/user_layer.hpp
+index 82e0d31f..bf8f0984 100644
+--- a/user_channel/user_layer.hpp
++++ b/user_channel/user_layer.hpp
+@@ -265,5 +265,10 @@ Cc ipmiUserSetUserPayloadAccess(const uint8_t chNum, const uint8_t operation,
+  */
+ Cc ipmiUserGetUserPayloadAccess(const uint8_t chNum, const uint8_t userId,
+                                 PayloadAccess& payloadAccess);
++/** @brief The ipmi get security keys
++ *
++ *  @return 20 byte security
++ */
++std::string ipmiGetChannelSecurityKeys(const uint8_t keyId);
+ 
+ } // namespace ipmi
+-- 
+2.17.1
+

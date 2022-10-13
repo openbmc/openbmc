@@ -1,0 +1,92 @@
+From eafe5f216fdc0e23c77ebf38abb3c8ec3f772de8 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Mon, 15 Aug 2022 17:23:50 +0800
+Subject: [PATCH 03/21] Add sensor type command
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ dbus-sdr/sensorcommands.cpp | 34 ++++++++++++++++++++++++++++++++++
+ sensorhandler.cpp           | 10 +++++-----
+ 2 files changed, 39 insertions(+), 5 deletions(-)
+
+diff --git a/dbus-sdr/sensorcommands.cpp b/dbus-sdr/sensorcommands.cpp
+index 522cbb82..43a4eb87 100644
+--- a/dbus-sdr/sensorcommands.cpp
++++ b/dbus-sdr/sensorcommands.cpp
+@@ -2220,6 +2220,35 @@ static ipmi::RspType<uint8_t, // respcount
+                                  sdrLastAdd);
+ }
+ 
++/**
++ *  @brief implements the get sensor type command.
++ *  @param - sensorNumber
++ *
++ *  @return IPMI completion code plus response data on success.
++ *   - sensorType
++ *   - eventType
++ **/
++
++ipmi::RspType<uint8_t, // sensorType
++              uint8_t  // eventType
++              >
++    ipmiSenGetSensorType(ipmi::Context::ptr ctx, uint8_t sensorNumber)
++{
++    std::string connection;
++    std::string path;
++    uint8_t sensorType, eventType;
++
++    auto status = getSensorConnection(ctx, sensorNumber, connection, path);
++    if (status)
++    {
++        return ipmi::response(status);
++    }
++
++    sensorType = getSensorTypeFromPath(path);
++    eventType = getSensorEventTypeFromPath(path);
++    return ipmi::responseSuccess(sensorType, eventType);
++}
++
+ /* end sensor commands */
+ 
+ /* storage commands */
+@@ -2458,5 +2487,10 @@ void registerSensorFunctions()
+     ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnStorage,
+                           ipmi::storage::cmdGetSdr, ipmi::Privilege::User,
+                           ipmiStorageGetSDR);
++
++    // <Get Sensor Type>
++    ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnSensor,
++                          ipmi::sensor_event::cmdGetSensorType,
++                          ipmi::Privilege::User, ipmiSenGetSensorType);
+ }
+ } // namespace ipmi
+diff --git a/sensorhandler.cpp b/sensorhandler.cpp
+index 1a24c42c..6f17e1bb 100644
+--- a/sensorhandler.cpp
++++ b/sensorhandler.cpp
+@@ -1510,6 +1510,11 @@ void register_netfn_sen_functions()
+     ipmi_register_callback(NETFUN_SENSOR, IPMI_CMD_GET_DEVICE_SDR, nullptr,
+                            ipmi_sen_get_sdr, PRIVILEGE_USER);
+ 
++    // <Get Sensor Type>
++    ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnSensor,
++                          ipmi::sensor_event::cmdGetSensorType,
++                          ipmi::Privilege::User, ipmiGetSensorType);
++
+ #endif
+ 
+     // Common Handers used by both implementation.
+@@ -1518,10 +1523,5 @@ void register_netfn_sen_functions()
+     ipmi_register_callback(NETFUN_SENSOR, IPMI_CMD_PLATFORM_EVENT, nullptr,
+                            ipmicmdPlatformEvent, PRIVILEGE_OPERATOR);
+ 
+-    // <Get Sensor Type>
+-    ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnSensor,
+-                          ipmi::sensor_event::cmdGetSensorType,
+-                          ipmi::Privilege::User, ipmiGetSensorType);
+-
+     return;
+ }
+-- 
+2.17.1
+

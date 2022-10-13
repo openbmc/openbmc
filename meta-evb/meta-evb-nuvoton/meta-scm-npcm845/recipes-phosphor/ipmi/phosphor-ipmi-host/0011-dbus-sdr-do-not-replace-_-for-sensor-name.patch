@@ -1,0 +1,26 @@
+From 0b4cc3e6239fc34993431294e03ac1965c8ded4e Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Tue, 16 Aug 2022 16:02:14 +0800
+Subject: [PATCH 11/21] dbus-sdr: do not replace '_' for sensor name
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ dbus-sdr/sensorcommands.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dbus-sdr/sensorcommands.cpp b/dbus-sdr/sensorcommands.cpp
+index 43a4eb87..3967d5f1 100644
+--- a/dbus-sdr/sensorcommands.cpp
++++ b/dbus-sdr/sensorcommands.cpp
+@@ -460,7 +460,7 @@ std::string parseSdrIdFromPath(const std::string& path)
+             name.resize(FULL_RECORD_ID_STR_MAX_LENGTH);
+         }
+     }
+-    std::replace(name.begin(), name.end(), '_', ' ');
++    //std::replace(name.begin(), name.end(), '_', ' ');
+     return name;
+ }
+ 
+-- 
+2.17.1
+

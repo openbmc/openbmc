@@ -1,0 +1,45 @@
+From 09231bbf21910597cb9cb7792d1ecb6c4c16d8d3 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Tue, 16 Aug 2022 16:44:30 +0800
+Subject: [PATCH 17/21] add oem sel support
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ dbus-sdr/storagecommands.cpp | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/dbus-sdr/storagecommands.cpp b/dbus-sdr/storagecommands.cpp
+index 4929e230..178be8c7 100644
+--- a/dbus-sdr/storagecommands.cpp
++++ b/dbus-sdr/storagecommands.cpp
+@@ -1114,6 +1114,27 @@ ipmi::RspType<uint16_t, // Next Record ID
+             systemEventType{timestamp, generatorID, evmRev, sensorType,
+                             sensorNum, eventType, eventDir, eventData});
+     }
++    else if (recordType >= dynamic_sensors::ipmi::sel::oemTsEventFirst &&
++             recordType <= dynamic_sensors::ipmi::sel::oemEventLast)
++    {
++        phosphor::logging::log<phosphor::logging::level::INFO>("Get OEM SEL");
++        // Get the timestamp
++        std::tm timeStruct = {};
++        std::istringstream entryStream(entryTimestamp);
++
++        uint32_t timestamp = ipmi::sel::invalidTimeStamp;
++        if (entryStream >> std::get_time(&timeStruct, "%Y-%m-%dT%H:%M:%S"))
++        {
++            timestamp = std::mktime(&timeStruct);
++        }
++        std::array<uint8_t, dynamic_sensors::ipmi::sel::oemTsEventSize>
++            eventData{};
++        std::copy_n(eventDataBytes.begin(),
++                    std::min(eventDataBytes.size(), eventData.size()),
++                    eventData.begin());
++        return ipmi::responseSuccess(nextRecordID, recordID, recordType,
++                                     oemTsEventType{timestamp, eventData});
++    }
+ 
+     return ipmi::responseUnspecifiedError();
+ }
+-- 
+2.17.1
+

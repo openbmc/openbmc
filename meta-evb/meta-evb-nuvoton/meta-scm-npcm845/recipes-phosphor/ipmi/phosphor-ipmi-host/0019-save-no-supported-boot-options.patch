@@ -1,0 +1,124 @@
+From 99128c0357c4ecb72cfc2258a419c4b57d47c4fe Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Tue, 16 Aug 2022 16:50:31 +0800
+Subject: [PATCH 19/21] save no supported boot options
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ chassishandler.cpp | 75 ++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 73 insertions(+), 2 deletions(-)
+
+diff --git a/chassishandler.cpp b/chassishandler.cpp
+index d6c203e4..22a3a48b 100644
+--- a/chassishandler.cpp
++++ b/chassishandler.cpp
+@@ -120,6 +120,8 @@ static constexpr const char* resetButtonPath =
+     "/xyz/openbmc_project/chassis/buttons/reset";
+ static constexpr const char* interruptButtonPath =
+     "/xyz/openbmc_project/chassis/buttons/nmi";
++static constexpr const char* deviceInstanceFile = "/var/lib/ipmi/dev_instance";
++
+ // Phosphor Host State manager
+ namespace State = sdbusplus::xyz::openbmc_project::State::server;
+ 
+@@ -1825,6 +1827,64 @@ static ipmi::Cc setBootOneTime(ipmi::Context::ptr& ctx, const bool& onetime)
+     return ipmi::ccUnspecifiedError;
+ }
+ 
++static ipmi::Cc getBootDevInstance(uint8_t& data3, uint8_t& data4,
++                                   uint8_t& data5)
++{
++    char msg[3] = {0};
++    std::fstream dev_file(deviceInstanceFile, dev_file.in | dev_file.binary);
++    if (!dev_file.is_open())
++    {
++        // file may not be created
++        log<level::INFO>("Cannot open boot device instance file");
++    }
++    else
++    {
++        try
++        {
++            dev_file.read(msg, 3);
++        }
++        catch (const std::exception& e)
++        {
++            log<level::ERR>("Cannot read boot device instance file");
++            dev_file.close();
++            return ipmi::ccUnspecifiedError;
++        }
++        dev_file.close();
++    }
++    data3 = msg[0];
++    data4 = msg[1];
++    data5 = msg[2];
++    return ipmi::ccSuccess;
++}
++
++static ipmi::Cc setBootDevInstance(const uint8_t& data3, const uint8_t& data4,
++                                   const uint8_t& data5)
++{
++    std::fstream dev_file(deviceInstanceFile, dev_file.out | dev_file.binary);
++    if (!dev_file.is_open())
++    {
++        log<level::ERR>("Cannot open boot device instance file");
++        return ipmi::ccUnspecifiedError;
++    }
++    else
++    {
++        unsigned char msg[3] = {data3, data4, data5};
++        try
++        {
++            dev_file.write((char*)msg, 3);
++        }
++        catch (const std::exception& e)
++        {
++            log<level::ERR>("Cannot write boot device instance file",
++                            entry("ERROR=%s", e.what()));
++            dev_file.close();
++            return ipmi::ccUnspecifiedError;
++        }
++        dev_file.close();
++    }
++    return ipmi::ccSuccess;
++}
++
+ static constexpr uint8_t setComplete = 0x0;
+ static constexpr uint8_t setInProgress = 0x1;
+ static uint8_t transferStatus = setComplete;
+@@ -1956,12 +2016,17 @@ ipmi::RspType<ipmi::message::Payload>
+             }
+ 
+             uint1_t validFlag = valid ? 1 : 0;
++            uint8_t data3, data4, data5;
++            rc = getBootDevInstance(data3, data4, data5);
++            if (rc != ipmi::ccSuccess)
++            {
++                return ipmi::response(rc);
++            }
+ 
+             response.pack(bootOptionParameter, reserved1, uint5_t{},
+                           uint1_t{biosBootType}, uint1_t{permanent},
+                           uint1_t{validFlag}, uint2_t{}, uint4_t{bootOption},
+-                          uint1_t{}, cmosClear, uint8_t{}, uint8_t{},
+-                          uint8_t{});
++                          uint1_t{}, cmosClear, data3, data4, data5);
+             return ipmi::responseSuccess(std::move(response));
+         }
+         catch (const InternalFailure& e)
+@@ -2159,6 +2224,12 @@ ipmi::RspType<> ipmiChassisSetSysBootOptions(ipmi::Context::ptr ctx,
+                     "ipmiChassisSetSysBootOptions: Boot option not supported");
+                 return ipmi::responseInvalidFieldRequest();
+             }
++            rc = setBootDevInstance(data3, static_cast<uint8_t>(biosInfo),
++                                    static_cast<uint8_t>(deviceInstance));
++            if (rc != ipmi::ccSuccess)
++            {
++                return ipmi::response(rc);
++            }
+         }
+         catch (const sdbusplus::exception_t& e)
+         {
+-- 
+2.17.1
+

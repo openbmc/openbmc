@@ -1,0 +1,29 @@
+From cd7268c0e5cb27438ee80d0f1db216a662058c7c Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Tue, 16 Aug 2022 15:41:43 +0800
+Subject: [PATCH 07/21] Force self test OK
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ apphandler.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/apphandler.cpp b/apphandler.cpp
+index 5dcde028..ad3b9cbc 100644
+--- a/apphandler.cpp
++++ b/apphandler.cpp
+@@ -752,9 +752,9 @@ auto ipmiAppGetSelfTestResults() -> ipmi::RspType<uint8_t, uint8_t>
+     //      [2] 1b = Internal Use Area of BMC FRU corrupted.
+     //      [1] 1b = controller update 'boot block' firmware corrupted.
+     //      [0] 1b = controller operational firmware corrupted.
+-    constexpr uint8_t notImplemented = 0x56;
++    // constexpr uint8_t notImplemented = 0x56;
+     constexpr uint8_t zero = 0;
+-    return ipmi::responseSuccess(notImplemented, zero);
++    return ipmi::responseSuccess(0x55, zero);
+ }
+ 
+ static constexpr size_t uuidBinaryLength = 16;
+-- 
+2.17.1
+

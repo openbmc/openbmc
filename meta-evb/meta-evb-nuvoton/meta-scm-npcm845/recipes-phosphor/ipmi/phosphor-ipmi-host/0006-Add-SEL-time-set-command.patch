@@ -1,0 +1,95 @@
+From b622d3942326b04956620add792ba0b25493323a Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Tue, 16 Aug 2022 15:39:00 +0800
+Subject: [PATCH 06/21] Add SEL time set command
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ dbus-sdr/storagecommands.cpp | 56 ++++++++++++++++++++++++++++++++++--
+ 1 file changed, 53 insertions(+), 3 deletions(-)
+
+diff --git a/dbus-sdr/storagecommands.cpp b/dbus-sdr/storagecommands.cpp
+index d12458ab..651af7dc 100644
+--- a/dbus-sdr/storagecommands.cpp
++++ b/dbus-sdr/storagecommands.cpp
+@@ -29,6 +29,7 @@
+ #include <ipmid/api.hpp>
+ #include <ipmid/message.hpp>
+ #include <ipmid/types.hpp>
++#include <ipmid/utils.hpp>
+ #include <phosphor-logging/log.hpp>
+ #include <sdbusplus/message/types.hpp>
+ #include <sdbusplus/timer.hpp>
+@@ -111,6 +112,14 @@ constexpr static const char* chassisTypeMainServer = "17";
+ // event direction is bit[7] of eventType where 1b = Deassertion event
+ constexpr static const uint8_t deassertionEvent = 0x80;
+ 
++constexpr auto TIME_INTERFACE = "xyz.openbmc_project.Time.EpochTime";
++constexpr auto BMC_TIME_PATH = "/xyz/openbmc_project/time/bmc";
++constexpr auto PROPERTY_ELAPSED = "Elapsed";
++constexpr auto TIME_SYNC_INTERFACE = "xyz.openbmc_project.Time.Synchronization";
++constexpr auto TIME_SYNC_PATH = "/xyz/openbmc_project/time/sync_method";
++constexpr auto TIME_SYNC_PROPERTIE = "TimeSyncMethod";
++constexpr auto TIME_SYNC_MANUAL =
++    "xyz.openbmc_project.Time.Synchronization.Method.Manual";
+ static constexpr char const* ipmiSELObject = "xyz.openbmc_project.Logging.IPMI";
+ static constexpr char const* ipmiSELPath = "/xyz/openbmc_project/Logging/IPMI";
+ static constexpr char const* ipmiSELAddInterface =
+@@ -1284,10 +1293,51 @@ ipmi::RspType<uint32_t> ipmiStorageGetSELTime()
+     return ipmi::responseSuccess(selTime.tv_sec);
+ }
+ 
+-ipmi::RspType<> ipmiStorageSetSELTime(uint32_t)
++ipmi::RspType<> ipmiStorageSetSELTime(ipmi::Context::ptr ctx, uint32_t selTime)
+ {
+-    // Set SEL Time is not supported
+-    return ipmi::responseInvalidCommand();
++    using namespace std::chrono;
++    using namespace phosphor::logging;
++    microseconds usec{seconds(selTime)};
++
++    std::string service;
++    boost::system::error_code ec;
++    // Force set time sync method to manual first
++    ec = ipmi::getService(ctx, TIME_SYNC_INTERFACE, TIME_SYNC_PATH, service);
++    if (ec)
++    {
++        log<level::ERR>("Cannot get time sync service",
++                        entry("WHAT=%s", ec.message().c_str()));
++        return ipmi::responseUnspecifiedError();
++    }
++    ec = ipmi::setDbusProperty(ctx, service, TIME_SYNC_PATH,
++                               TIME_SYNC_INTERFACE, TIME_SYNC_PROPERTIE,
++                               std::string(TIME_SYNC_MANUAL));
++    if (ec)
++    {
++        log<level::ERR>("Cannot set time sync mode to manual",
++                        entry("WHAT=%s", ec.message().c_str()));
++        return ipmi::responseUnspecifiedError();
++    }
++    // Set bmc time
++    ec = ipmi::getService(ctx, TIME_INTERFACE, BMC_TIME_PATH, service);
++    if (ec)
++    {
++        log<level::ERR>("Cannot get time manager service",
++                        entry("WHAT=%s", ec.message().c_str()));
++        return ipmi::responseUnspecifiedError();
++    }
++    ec = ipmi::setDbusProperty(ctx, service, BMC_TIME_PATH, TIME_INTERFACE,
++                               PROPERTY_ELAPSED, (uint64_t)usec.count());
++    if (ec)
++    {
++        log<level::ERR>("Cannot set time, maybe wait timesyncd stopped",
++                        entry("VALUE=%ul", usec.count()),
++                        entry("SERVICE=%s", service.c_str()),
++                        entry("WHAT=%s", ec.message().c_str()));
++        return ipmi::responseUnspecifiedError();
++    }
++
++    return ipmi::responseSuccess();
+ }
+ 
+ std::vector<uint8_t>
+-- 
+2.17.1
+

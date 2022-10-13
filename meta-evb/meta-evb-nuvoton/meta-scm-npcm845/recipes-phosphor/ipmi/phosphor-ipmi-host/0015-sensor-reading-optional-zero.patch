@@ -1,0 +1,26 @@
+From e260bab718a75f92a2013c1a03af61114c89cd24 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Tue, 16 Aug 2022 16:23:46 +0800
+Subject: [PATCH 15/21] sensor reading optional zero
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ dbus-sdr/sensorcommands.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dbus-sdr/sensorcommands.cpp b/dbus-sdr/sensorcommands.cpp
+index 5039a948..6497debe 100644
+--- a/dbus-sdr/sensorcommands.cpp
++++ b/dbus-sdr/sensorcommands.cpp
+@@ -918,7 +918,7 @@ ipmi::RspType<uint8_t, uint8_t, uint8_t, std::optional<uint8_t>>
+     }
+ 
+     // no discrete as of today so optional byte is never returned
+-    return ipmi::responseSuccess(value, operation, thresholds, std::nullopt);
++    return ipmi::responseSuccess(value, operation, thresholds, (uint8_t)0);
+ }
+ 
+ /** @brief implements the Set Sensor threshold command
+-- 
+2.17.1
+

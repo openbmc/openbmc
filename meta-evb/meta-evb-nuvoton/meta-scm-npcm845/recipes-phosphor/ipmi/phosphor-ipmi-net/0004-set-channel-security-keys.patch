@@ -1,0 +1,43 @@
+From c0c1124ff05529eba7ddddfcc64c7768a9f0eeb0 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Tue, 16 Aug 2022 16:58:12 +0800
+Subject: [PATCH 4/4] set channel security keys
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ command/rakp34.cpp | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/command/rakp34.cpp b/command/rakp34.cpp
+index f14430e..9fb7e7b 100644
+--- a/command/rakp34.cpp
++++ b/command/rakp34.cpp
+@@ -11,6 +11,10 @@
+ #include <algorithm>
+ #include <cstring>
+ 
++#define NULLSTR "00000000000000000000"
++#define KEYSIZE 20
++#define ID_KG 1
++
+ namespace command
+ {
+ 
+@@ -210,6 +214,14 @@ std::vector<uint8_t> RAKP34(const std::vector<uint8_t>& inPayload,
+ 
+     std::copy_n(session->userName.data(), userLength, iter);
+ 
++    std::string chsecuritykeys = ipmi::ipmiGetChannelSecurityKeys(ID_KG);
++    if(strncmp(chsecuritykeys.c_str(),NULLSTR,KEYSIZE))
++    {
++        std::fill(authAlgo->userKey.data(),
++              authAlgo->userKey.data() + authAlgo->userKey.size(), 0);
++        std::copy_n(chsecuritykeys.c_str(), chsecuritykeys.size() , authAlgo->userKey.data());
++    }
++
+     // Generate Session Integrity Key
+     auto sikOutput = authAlgo->generateHMAC(input);
+ 
+-- 
+2.17.1
+

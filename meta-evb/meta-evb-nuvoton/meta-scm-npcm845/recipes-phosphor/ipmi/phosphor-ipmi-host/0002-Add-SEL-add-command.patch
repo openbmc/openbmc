@@ -1,0 +1,120 @@
+From 8f72edbbf5bbd6ee6f741285f3cbf9ad461ce936 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Mon, 15 Aug 2022 17:08:47 +0800
+Subject: [PATCH 02/21] Add SEL add command
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ dbus-sdr/storagecommands.cpp | 84 +++++++++++++++++++++++++++++++++---
+ 1 file changed, 78 insertions(+), 6 deletions(-)
+
+diff --git a/dbus-sdr/storagecommands.cpp b/dbus-sdr/storagecommands.cpp
+index eeed777e..d12458ab 100644
+--- a/dbus-sdr/storagecommands.cpp
++++ b/dbus-sdr/storagecommands.cpp
+@@ -111,6 +111,11 @@ constexpr static const char* chassisTypeMainServer = "17";
+ // event direction is bit[7] of eventType where 1b = Deassertion event
+ constexpr static const uint8_t deassertionEvent = 0x80;
+ 
++static constexpr char const* ipmiSELObject = "xyz.openbmc_project.Logging.IPMI";
++static constexpr char const* ipmiSELPath = "/xyz/openbmc_project/Logging/IPMI";
++static constexpr char const* ipmiSELAddInterface =
++    "xyz.openbmc_project.Logging.IPMI";
++
+ static std::vector<uint8_t> fruCache;
+ static uint8_t cacheBus = 0xFF;
+ static uint8_t cacheAddr = 0XFF;
+@@ -1111,17 +1116,84 @@ Unused arguments
+   uint8_t eventType, uint8_t eventData1, uint8_t eventData2,
+   uint8_t eventData3
+ */
+-ipmi::RspType<uint16_t> ipmiStorageAddSELEntry(uint16_t, uint8_t, uint32_t,
+-                                               uint16_t, uint8_t, uint8_t,
+-                                               uint8_t, uint8_t, uint8_t,
+-                                               uint8_t, uint8_t)
++ipmi::RspType<uint16_t> ipmiStorageAddSELEntry(uint16_t recordID, uint8_t recordType, uint32_t,
++                                               uint16_t generatorID, uint8_t, uint8_t sensorType,
++                                               uint8_t sensorNum, uint8_t eventType, uint8_t eventData1,
++                                               uint8_t eventData2, uint8_t eventData3)
+ {
+     // Per the IPMI spec, need to cancel any reservation when a SEL entry is
+     // added
+     cancelSELReservation();
+ 
+-    uint16_t responseID = 0xFFFF;
+-    return ipmi::responseSuccess(responseID);
++    static const std::string ipmiSELAddMessage =
++        "IPMI SEL entry logged using IPMI Add SEL Entry command.";
++
++    sdbusplus::bus::bus bus{ipmid_get_sd_bus_connection()};
++    std::vector<uint8_t> eventData = {eventData1, eventData2, eventData3};
++
++    if (recordType == dynamic_sensors::ipmi::sel::systemEvent)
++    {
++        std::string sensorPath = getPathFromSensorNumber(sensorNum);
++
++        if (sensorPath.length() == 0)
++        {
++            return ipmi::responseSensorInvalid();
++        }
++
++        bool assert =
++            (eventType & ipmi::storage::deassertionEvent) ? false : true;
++        uint16_t genId = generatorID;
++        sdbusplus::message::message writeSEL = bus.new_method_call(
++            ipmiSELObject, ipmiSELPath, ipmiSELAddInterface, "IpmiSelAdd");
++        writeSEL.append(ipmiSELAddMessage, sensorPath, eventData, assert,
++                        genId);
++        try
++        {
++            sdbusplus::message::message writeSELResp = bus.call(writeSEL);
++            writeSELResp.read(recordID);
++        }
++        catch (sdbusplus::exception_t& e)
++        {
++            phosphor::logging::log<phosphor::logging::level::ERR>(e.what());
++            return ipmi::responseUnspecifiedError();
++        }
++    }
++    else if (recordType >= dynamic_sensors::ipmi::sel::oemTsEventFirst &&
++             recordType <= dynamic_sensors::ipmi::sel::oemEventLast)
++    {
++        eventData.clear();
++        uint24_t mfgId = 40092;
++        eventData.push_back((uint8_t)mfgId & 0xff);
++        eventData.push_back((uint8_t)(mfgId >> 8) & 0xff);
++        eventData.push_back((uint8_t)(mfgId >> 16) & 0xff);
++        eventData.push_back((uint8_t)generatorID & 0xff);
++        eventData.push_back((uint8_t)(generatorID > 8) & 0xff);
++        eventData.push_back(sensorType);
++        eventData.push_back(sensorNum);
++        eventData.push_back(eventType);
++        eventData.push_back(eventData1);
++
++        sdbusplus::message::message writeSEL = bus.new_method_call(
++            ipmiSELObject, ipmiSELPath, ipmiSELAddInterface, "IpmiSelAddOem");
++        writeSEL.append(ipmiSELAddMessage, eventData, recordType);
++        try
++        {
++            sdbusplus::message::message writeSELResp = bus.call(writeSEL);
++            writeSELResp.read(recordID);
++        }
++        catch (sdbusplus::exception_t& e)
++        {
++            phosphor::logging::log<phosphor::logging::level::ERR>(e.what());
++            return ipmi::responseUnspecifiedError();
++        }
++    }
++    else
++    {
++        return ipmi::responseUnspecifiedError();
++    }
++
++    return ipmi::responseSuccess(recordID);
++
+ }
+ 
+ ipmi::RspType<uint8_t> ipmiStorageClearSEL(ipmi::Context::ptr ctx,
+-- 
+2.17.1
+

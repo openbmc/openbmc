@@ -1,0 +1,43 @@
+From 0556d89aebe9555e0d5f628c9d75c1eb5f552e88 Mon Sep 17 00:00:00 2001
+From: Brian Ma <chma0@nuvoton.com>
+Date: Thu, 7 Jul 2022 16:27:15 +0800
+Subject: [PATCH 1/4] Revert "Remove HMAC-SHA1 from Authentication/Integrity
+ Alg"
+
+This reverts commit 4c494398a36d9f1bdc4f256f937487c7ebcc4e95.
+---
+ auth_algo.hpp      | 3 ++-
+ integrity_algo.hpp | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/auth_algo.hpp b/auth_algo.hpp
+index f940370..c218acf 100644
+--- a/auth_algo.hpp
++++ b/auth_algo.hpp
+@@ -106,7 +106,8 @@ class Interface
+      */
+     static bool isAlgorithmSupported(Algorithms algo)
+     {
+-        if (algo == Algorithms::RAKP_HMAC_SHA256)
++        if (algo == Algorithms::RAKP_HMAC_SHA1 ||
++            algo == Algorithms::RAKP_HMAC_SHA256)
+         {
+             return true;
+         }
+diff --git a/integrity_algo.hpp b/integrity_algo.hpp
+index d451d0e..1b48dd1 100644
+--- a/integrity_algo.hpp
++++ b/integrity_algo.hpp
+@@ -95,7 +95,8 @@ class Interface
+      */
+     static bool isAlgorithmSupported(Algorithms algo)
+     {
+-        if (algo == Algorithms::HMAC_SHA256_128)
++        if (algo == Algorithms::HMAC_SHA1_96 ||
++            algo == Algorithms::HMAC_SHA256_128)
+         {
+             return true;
+         }
+-- 
+2.17.1
+

@@ -1,0 +1,77 @@
+From db1707ffe0f420bc868e5bda030789e55e3b7699 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Tue, 5 Jul 2022 15:18:37 +0800
+Subject: [PATCH 05/21] get system guid command
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ apphandler.cpp | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+
+diff --git a/apphandler.cpp b/apphandler.cpp
+index 0fc9b2f0..5dcde028 100644
+--- a/apphandler.cpp
++++ b/apphandler.cpp
+@@ -842,6 +842,7 @@ auto ipmiAppGetBtCapabilities()
+     return ipmi::responseSuccess(nrOutstanding, inputBufferSize,
+                                  outputBufferSize, transactionTime, nrRetries);
+ }
++/*
+ 
+ auto ipmiAppGetSystemGuid() -> ipmi::RspType<std::array<uint8_t, 16>>
+ {
+@@ -887,6 +888,51 @@ auto ipmiAppGetSystemGuid() -> ipmi::RspType<std::array<uint8_t, 16>>
+     }
+     return ipmi::responseSuccess(uuid);
+ }
++*/
++
++auto ipmiAppGetSystemGuid() -> ipmi::RspType<std::array<uint8_t, 16>>
++{
++    std::string  systemUuid {""};
++    const char* filename = "/usr/share/ipmi-providers/system_guid.json";
++    std::ifstream sys_uuid(filename);
++        if (sys_uuid.is_open())
++        {
++            auto data = nlohmann::json::parse(sys_uuid, nullptr, false);
++            if (data.is_discarded())
++            {
++                    log<level::INFO>("Error parsing persistent data in json file");
++            }
++            else{
++                  for (const auto& item : data.items())
++                  {
++                     if (item.key() == "system_uuid")
++                     {
++                        const std::string* jSystemUuid =
++                        item.value().get_ptr<const std::string*>();
++                        if (jSystemUuid != nullptr)
++                        {
++                          systemUuid = *jSystemUuid;
++                          break;
++                        }
++                    }
++                  }
++              }
++        }
++
++    std::array<uint8_t, 16> uuid;
++    std::string rfc4122Uuid =  systemUuid;
++    try
++    {
++        // convert to IPMI format
++        uuid = rfc4122ToIpmi(rfc4122Uuid);
++    }
++    catch (const InvalidArgument& e)
++    {
++        log<level::ERR>("Failed in converting Uuid");
++        return ipmi::responseUnspecifiedError();
++    }
++    return ipmi::responseSuccess(uuid);
++}
+ 
+ /**
+  * @brief set the session state as teardown
+-- 
+2.17.1
+

@@ -1,0 +1,143 @@
+From e83605e4259102e3711026e61053c8a23f8d81c0 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Tue, 16 Aug 2022 16:33:07 +0800
+Subject: [PATCH 16/21] add sensor reading factory support
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ dbus-sdr/sensorcommands.cpp | 113 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 113 insertions(+)
+
+diff --git a/dbus-sdr/sensorcommands.cpp b/dbus-sdr/sensorcommands.cpp
+index 6497debe..3e84c80e 100644
+--- a/dbus-sdr/sensorcommands.cpp
++++ b/dbus-sdr/sensorcommands.cpp
+@@ -2431,6 +2431,115 @@ ipmi::RspType<uint16_t,            // next record ID
+ }
+ /* end storage commands */
+ 
++// TODO: implement non-linear part
++ipmi::RspType<std::vector<uint8_t>> ipmiSenReadingFactor(ipmi::Context::ptr ctx,
++                                                         uint8_t sensorNumber,
++                                                         uint8_t)
++{
++    std::vector<uint8_t> resp;
++    uint8_t next_reading, m_lsb, b_msb_and_accuracy_lsb, b_lsb,
++        m_msb_and_tolerance, r_b_exponents;
++    double max = 0;
++    double min = 0;
++    std::string connection;
++    std::string path;
++    auto status = getSensorConnection(ctx, sensorNumber, connection, path);
++    if (status)
++    {
++        return ipmi::response(status);
++    }
++
++    DbusInterfaceMap sensorMap;
++    if (!getSensorMap(ctx, connection, path, sensorMap))
++    {
++        return ipmi::responseResponseError();
++    }
++
++    auto sensorObject = sensorMap.find(sensor::sensorInterface);
++
++    if (sensorObject == sensorMap.end() ||
++        sensorObject->second.find("Value") == sensorObject->second.end())
++    {
++        return ipmi::responseResponseError();
++    }
++    auto& valueVariant = sensorObject->second["Value"];
++    double reading = std::visit(VariantToDoubleVisitor(), valueVariant);
++#ifdef DEBUG
++    // For debug information
++    if (sensorObject->second.find("Unit") != sensorObject->second.end())
++    {
++        auto& unitVar = sensorObject->second["Unit"];
++        std::string unit =
++            "ReadingFactor unit:" + std::get<std::string>(unitVar);
++        phosphor::logging::log<phosphor::logging::level::INFO>(unit.c_str());
++    }
++#endif
++
++    getSensorMaxMin(sensorMap, max, min);
++
++    int16_t mValue = 0;
++    int8_t rExp = 0;
++    int16_t bValue = 0;
++    int8_t bExp = 0;
++    bool bSigned = false;
++
++    if (!getSensorAttributes(max, min, mValue, rExp, bValue, bExp, bSigned))
++    {
++        phosphor::logging::log<phosphor::logging::level::ERR>(
++            "getSensorDataRecord: getSensorAttributes error");
++        return responseUnspecifiedError();
++    }
++
++    next_reading =
++        scaleIPMIValueFromDouble(reading, mValue, rExp, bValue, bExp, bSigned);
++
++    // The record.body is a struct SensorDataFullRecordBody
++    // from sensorhandler.hpp in phosphor-ipmi-host.
++    // The meaning of these bits appears to come from
++    // table 43.1 of the IPMI spec.
++    // The above 5 sensor attributes are stuffed in as follows:
++    // Byte 21 = AA000000 = analog interpretation, 10 signed, 00 unsigned
++    // Byte 22-24 are for other purposes
++    // Byte 25 = MMMMMMMM = LSB of M
++    // Byte 26 = MMTTTTTT = MSB of M (signed), and Tolerance
++    // Byte 27 = BBBBBBBB = LSB of B
++    // Byte 28 = BBAAAAAA = MSB of B (signed), and LSB of Accuracy
++    // Byte 29 = AAAAEE00 = MSB of Accuracy, exponent of Accuracy
++    // Byte 30 = RRRRBBBB = rExp (signed), bExp (signed)
++
++    // apply M, B, and exponents, M and B are 10 bit values, exponents are 4
++    m_lsb = mValue & 0xFF;
++
++    uint8_t mBitSign = (mValue < 0) ? 1 : 0;
++    uint8_t mBitNine = (mValue & 0x0100) >> 8;
++
++    // move the smallest bit of the MSB into place (bit 9)
++    // the MSbs are bits 7:8 in m_msb_and_tolerance
++    m_msb_and_tolerance = (mBitSign << 7) | (mBitNine << 6);
++
++    b_lsb = bValue & 0xFF;
++
++    uint8_t bBitSign = (bValue < 0) ? 1 : 0;
++    uint8_t bBitNine = (bValue & 0x0100) >> 8;
++
++    // move the smallest bit of the MSB into place (bit 9)
++    // the MSbs are bits 7:8 in b_msb_and_accuracy_lsb
++    b_msb_and_accuracy_lsb = (bBitSign << 7) | (bBitNine << 6);
++
++    uint8_t rExpSign = (rExp < 0) ? 1 : 0;
++    uint8_t rExpBits = rExp & 0x07;
++
++    uint8_t bExpSign = (bExp < 0) ? 1 : 0;
++    uint8_t bExpBits = bExp & 0x07;
++
++    // move rExp and bExp into place
++    r_b_exponents =
++        (rExpSign << 7) | (rExpBits << 4) | (bExpSign << 3) | bExpBits;
++    resp = {next_reading,           m_lsb, m_msb_and_tolerance, b_lsb,
++            b_msb_and_accuracy_lsb, 0,     r_b_exponents};
++    return ipmi::responseSuccess(resp);
++}
++
+ void registerSensorFunctions()
+ {
+     // <Platform Event>
+@@ -2511,5 +2620,9 @@ void registerSensorFunctions()
+     ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnSensor,
+                           ipmi::sensor_event::cmdGetSensorType,
+                           ipmi::Privilege::User, ipmiSenGetSensorType);
++    // <Get Sensor Reading Factor>
++    ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnSensor,
++                          ipmi::sensor_event::cmdGetSensorReadingFactors,
++                          ipmi::Privilege::User, ipmiSenReadingFactor);
+ }
+ } // namespace ipmi
+-- 
+2.17.1
+

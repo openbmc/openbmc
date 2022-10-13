@@ -1,0 +1,34 @@
+From 267b12b946723a3f3ae677e230e9b7bbe7665635 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Wed, 13 Jul 2022 11:54:13 +0800
+Subject: [PATCH 3/4] add server type and oem id in the response
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ command/channel_auth.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/command/channel_auth.cpp b/command/channel_auth.cpp
+index 44d5cad..fe181bb 100644
+--- a/command/channel_auth.cpp
++++ b/command/channel_auth.cpp
+@@ -77,12 +77,12 @@ std::vector<uint8_t>
+     response->nullUsers = 0;      // Null usernames disabled
+     response->anonymousLogin = 0; // Anonymous Login disabled
+ 
+-    response->reserved4 = 0;
++    response->reserved4 = 0x26;   // Server type: C2195
+     response->extCapabilities = 0x2; // Channel supports IPMI v2.0 connections
+ 
+-    response->oemID[0] = 0;
+-    response->oemID[1] = 0;
+-    response->oemID[2] = 0;
++    response->oemID[0] = 0x37;      // IANA OEM ID: Microsoft (311)
++    response->oemID[1] = 0x01;
++    response->oemID[2] = 0x00;
+     response->oemAuxillary = 0;
+     return outPayload;
+ }
+-- 
+2.17.1
+

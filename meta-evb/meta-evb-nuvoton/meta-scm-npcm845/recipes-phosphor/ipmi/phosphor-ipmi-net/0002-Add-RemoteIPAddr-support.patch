@@ -1,0 +1,119 @@
+From 6bb6313c48d8588fc1421bdd03563ae758ae7437 Mon Sep 17 00:00:00 2001
+From: Brian Ma <chma0@nuvoton.com>
+Date: Tue, 11 Oct 2022 14:45:19 +0800
+Subject: [PATCH 2/4] Add RemoteIPAddr support
+
+---
+ message_handler.cpp |  3 +-
+ socket_channel.hpp  | 73 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 75 insertions(+), 1 deletion(-)
+
+diff --git a/message_handler.cpp b/message_handler.cpp
+index b7314b8..e26f713 100644
+--- a/message_handler.cpp
++++ b/message_handler.cpp
+@@ -48,8 +48,9 @@ void Handler::updSessionData(std::shared_ptr<Message>& inMessage)
+     session->channelPtr = channel;
+     session->remotePort(channel->getPort());
+     uint32_t ipAddr = 0;
+-    channel->getRemoteAddress(ipAddr);
++    std::string _ip = channel->getRemoteAddress(ipAddr);
+     session->remoteIPAddr(ipAddr);
++    session->remoteMACAddress(channel->getRemoteMac(_ip));
+ }
+ 
+ Handler::~Handler()
+diff --git a/socket_channel.hpp b/socket_channel.hpp
+index 0edfcd5..85aab5d 100644
+--- a/socket_channel.hpp
++++ b/socket_channel.hpp
+@@ -6,6 +6,7 @@
+ #include <boost/asio/ip/udp.hpp>
+ #include <phosphor-logging/lg2.hpp>
+ 
++#include <fstream>
+ #include <memory>
+ #include <optional>
+ #include <string>
+@@ -103,6 +104,78 @@ class Channel
+         return std::string();
+     }
+ 
++    std::vector<uint8_t> getRemoteMac(std::string remoteIpv4Addr)
++    {
++        using namespace phosphor::logging;
++        std::vector<uint8_t> ret(6, 0);
++        constexpr auto ARP_FILE = "/proc/net/arp";
++        std::ifstream istrm(ARP_FILE, std::ifstream::in);
++        std::string line, msg, mac;
++        std::string::size_type pos, mac_start;
++        bool found = false;
++        // remoteIpv4Addr will be like ::ffff:192.168.56.105
++        pos = remoteIpv4Addr.rfind(":");
++        if (pos != std::string::npos)
++        {
++            pos += 1;
++            remoteIpv4Addr =
++                remoteIpv4Addr.substr(pos, remoteIpv4Addr.size() - pos);
++        }
++        msg = "new remote ip address: " + remoteIpv4Addr;
++        log<level::INFO>(msg.c_str());
++        // ignore header
++        std::getline(istrm, line);
++        // lookup arp table
++        while (std::getline(istrm, line))
++        {
++            pos = line.find(" ");
++            if (pos != std::string::npos)
++            {
++                std::string ip = line.substr(0, pos);
++                if (ip == remoteIpv4Addr)
++                {
++                    found = true;
++                    break;
++                }
++            }
++        }
++        if (!found)
++        {
++            msg = "Cannot find IP in arp table, " + remoteIpv4Addr;
++            log<level::INFO>(msg.c_str());
++            return ret;
++        }
++
++        // parse mac string
++        try
++        {
++            pos = line.find(":", pos);
++            pos = line.find(" ", pos);
++            mac_start = line.rfind(" ", pos - 1) + 1;
++            mac = line.substr(mac_start, pos - mac_start);
++            msg = "get remote mac: " + mac;
++            log<level::INFO>(msg.c_str());
++            ret.clear();
++            for (size_t i = 0; i < mac.size(); i += 3)
++            {
++                ret.push_back(static_cast<uint8_t>(
++                    std::stoul(mac.substr(i, 2), nullptr, 16)));
++            }
++        }
++        catch (const std::exception& e)
++        {
++            msg = "unkown error while find mac";
++            log<level::ERR>(msg.c_str(), entry("LINE=%s", line.c_str()),
++                            entry("ERROR=%s", e.what()));
++        }
++        // should be equals 6, but only handle smaller case for debug
++        if (ret.size() < 6)
++        {
++            ret.resize(6, 0);
++        }
++        return ret;
++    }
++
+     /**
+      * @brief Fetch the port number of the remote peer
+      *
+-- 
+2.17.1
+

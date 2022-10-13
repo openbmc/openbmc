@@ -1,0 +1,30 @@
+From d023daebef2f4c589953d79128fc926835a21249 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Wed, 13 Jul 2022 11:57:10 +0800
+Subject: [PATCH 13/21] add server type and oem id to meet MS spec
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ user_channel/usercommands.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/user_channel/usercommands.cpp b/user_channel/usercommands.cpp
+index 901e4a61..e0ccafc2 100644
+--- a/user_channel/usercommands.cpp
++++ b/user_channel/usercommands.cpp
+@@ -437,10 +437,10 @@ ipmi::RspType<uint8_t,  // channel number
+     constexpr bool userAuth = false;       // User authentication - enabled
+     constexpr bool nullUsers = false;      // Null user names - not supported
+     constexpr bool anonymousLogin = false; // Anonymous login - not supported
+-    constexpr uint6_t reserved5 = 0;
++    constexpr uint6_t reserved5 = 0x26;  // Server type: C2195
+     constexpr bool rmcpp = true; // IPMI 2.0 - supported
+     constexpr bool rmcp = false; // IPMI 1.5 - not supported
+-    constexpr uint24_t oemID = 0;
++    constexpr uint24_t oemID = 311;  // OEM ID: Microsoft (311)
+     constexpr uint8_t oemAuxillary = 0;
+ 
+     bool nonNullUsers = 0;
+-- 
+2.17.1
+

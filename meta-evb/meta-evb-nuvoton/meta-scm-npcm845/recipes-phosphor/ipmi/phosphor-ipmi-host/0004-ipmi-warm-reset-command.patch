@@ -1,0 +1,122 @@
+From 60718cbfa2c0eec29d7eb55ae4f3788ad4ba1e94 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Tue, 5 Jul 2022 12:56:01 +0800
+Subject: [PATCH 04/21] ipmi warm reset command
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ globalhandler.cpp | 64 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 63 insertions(+), 1 deletion(-)
+
+diff --git a/globalhandler.cpp b/globalhandler.cpp
+index 4012ce03..ac7fb0d5 100644
+--- a/globalhandler.cpp
++++ b/globalhandler.cpp
+@@ -1,13 +1,18 @@
+ #include "globalhandler.hpp"
+ 
++#include <atomic>
++#include <chrono>
+ #include <ipmid/api.hpp>
+ #include <ipmid/utils.hpp>
+ #include <phosphor-logging/elog-errors.hpp>
+ #include <phosphor-logging/log.hpp>
+ #include <string>
++#include <thread>
+ #include <xyz/openbmc_project/Common/error.hpp>
+ #include <xyz/openbmc_project/State/BMC/server.hpp>
+ 
++static std::atomic_flag reset_queued = ATOMIC_FLAG_INIT;
++
+ static constexpr auto bmcStateRoot = "/xyz/openbmc_project/state";
+ static constexpr auto bmcStateIntf = "xyz.openbmc_project.State.BMC";
+ static constexpr auto reqTransition = "RequestedBMCTransition";
+@@ -18,6 +23,11 @@ using BMC = sdbusplus::xyz::openbmc_project::State::server::BMC;
+ 
+ void register_netfn_global_functions() __attribute__((constructor));
+ 
++constexpr auto SYSTEMD_SERVICE = "org.freedesktop.systemd1";
++constexpr auto SYSTEMD_OBJ_PATH = "/org/freedesktop/systemd1";
++constexpr auto SYSTEMD_INTERFACE = "org.freedesktop.systemd1.Manager";
++constexpr auto SYSTEMD_WARM_RESET_TARGET = "phosphor-ipmi-warm-reset.target";
++
+ void resetBMC()
+ {
+     sdbusplus::bus_t bus{ipmid_get_sd_bus_connection()};
+@@ -32,7 +42,30 @@ void resetBMC()
+                           convertForMessage(BMC::Transition::Reboot));
+ }
+ 
+-/** @brief implements cold and warm reset commands
++void warmResetBMC()
++{
++    try
++    {
++        std::this_thread::sleep_for(std::chrono::milliseconds(100));
++        //sdbusplus::bus::bus bus{ipmid_get_sd_bus_connection()};
++        auto bus = sdbusplus::bus::new_default();
++        // Reset the failed units so we don't end up having systemd not properly restart if the command is spammed.
++        auto reset = bus.new_method_call(SYSTEMD_SERVICE, SYSTEMD_OBJ_PATH, SYSTEMD_INTERFACE, "ResetFailed");
++        bus.call_noreply(reset);
++        std::this_thread::sleep_for(std::chrono::milliseconds(100));
++        // Restart the target (restart will propagate to units).
++        auto restart = bus.new_method_call(SYSTEMD_SERVICE, SYSTEMD_OBJ_PATH, SYSTEMD_INTERFACE, "RestartUnit");
++        restart.append(SYSTEMD_WARM_RESET_TARGET, "replace");
++        bus.call_noreply(restart);
++    }
++    catch (std::exception& e)
++    {
++        log<level::ERR>(e.what());
++        reset_queued.clear();
++    }
++}
++
++/** @brief implements cold reset command
+  *  @param - None
+  *  @returns IPMI completion code.
+  */
+@@ -52,6 +85,32 @@ ipmi::RspType<> ipmiGlobalReset()
+     return ipmi::responseSuccess();
+ }
+ 
++
++/** @brief implements warm reset command
++ *  @param - None
++ *  @returns IPMI completion code.
++ */
++ipmi::RspType<> ipmiWarmReset()
++{
++    try
++    {
++        if (!reset_queued.test_and_set()) {
++            // Do this asynchronously so that we can properly return this command.
++            std::thread t(warmResetBMC);
++            t.detach();
++        }
++    }
++    catch (std::exception& e)
++    {
++        log<level::ERR>(e.what());
++        reset_queued.clear();
++        return ipmi::responseUnspecifiedError();
++    }
++
++    // Status code.
++    return ipmi::responseSuccess();
++}
++
+ void register_netfn_global_functions()
+ {
+ 
+@@ -59,5 +118,8 @@ void register_netfn_global_functions()
+     ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnApp,
+                           ipmi::app::cmdColdReset, ipmi::Privilege::Admin,
+                           ipmiGlobalReset);
++    ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnApp,
++                          ipmi::app::cmdWarmReset, ipmi::Privilege::Admin,
++                          ipmiWarmReset);
+     return;
+ }
+-- 
+2.17.1
+

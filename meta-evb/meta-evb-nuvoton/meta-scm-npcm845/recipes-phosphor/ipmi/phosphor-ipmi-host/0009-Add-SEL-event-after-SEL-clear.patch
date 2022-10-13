@@ -1,0 +1,41 @@
+From c6e52e39d092d9bae4dbcd2de10e35087f4af0eb Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Tue, 16 Aug 2022 15:48:21 +0800
+Subject: [PATCH 09/21] Add SEL event after SEL clear
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ dbus-sdr/storagecommands.cpp | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/dbus-sdr/storagecommands.cpp b/dbus-sdr/storagecommands.cpp
+index 651af7dc..4929e230 100644
+--- a/dbus-sdr/storagecommands.cpp
++++ b/dbus-sdr/storagecommands.cpp
+@@ -1277,6 +1277,23 @@ ipmi::RspType<uint8_t> ipmiStorageClearSEL(ipmi::Context::ptr ctx,
+ 
+     // Save the erase time
+     dynamic_sensors::ipmi::sel::erase_time::save();
++    // MS spec 4.1.37, add an event after clear SEL immediately
++    static const std::string ipmiSELAddMessage = "IPMI clear SEL";
++    static const std::vector<uint8_t> eventData = {0, 0, 0};
++    sdbusplus::bus::bus bus{ipmid_get_sd_bus_connection()};
++    sdbusplus::message::message writeSEL = bus.new_method_call(
++        ipmiSELObject, ipmiSELPath, ipmiSELAddInterface, "IpmiSelAdd");
++    writeSEL.append(ipmiSELAddMessage, ipmiSELPath, eventData, true,
++                    (uint16_t)0);
++    try
++    {
++        bus.call(writeSEL);
++    }
++    catch (sdbusplus::exception_t& e)
++    {
++        phosphor::logging::log<phosphor::logging::level::ERR>(e.what());
++        return ipmi::responseUnspecifiedError();
++    }
+ #endif
+     return ipmi::responseSuccess(ipmi::sel::eraseComplete);
+ }
+-- 
+2.17.1
+

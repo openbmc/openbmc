@@ -1,0 +1,46 @@
+From 11baaef5ae6b6619f3817b7a778ec7af93b6b248 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Tue, 16 Aug 2022 16:12:02 +0800
+Subject: [PATCH 12/21] Add session RemoteMACAddress support
+
+Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+---
+ apphandler.cpp | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/apphandler.cpp b/apphandler.cpp
+index ad3b9cbc..334b625d 100644
+--- a/apphandler.cpp
++++ b/apphandler.cpp
+@@ -1167,7 +1167,6 @@ uint8_t getSessionState(ipmi::Context::ptr ctx, const std::string& service,
+     return ipmi::ccSuccess;
+ }
+ 
+-static constexpr uint8_t macAddrLen = 6;
+ /** Alias SessionDetails - contain the optional information about an
+  *        RMCP+ session.
+  *
+@@ -1183,7 +1182,7 @@ static constexpr uint8_t macAddrLen = 6;
+  */
+ using SessionDetails =
+     std::tuple<uint2_t, uint6_t, uint4_t, uint4_t, uint4_t, uint4_t, uint32_t,
+-               std::array<uint8_t, macAddrLen>, uint16_t>;
++               std::vector<uint8_t>, uint16_t>;
+ 
+ /** @brief get session details for a given session
+  *
+@@ -1232,7 +1231,10 @@ ipmi::Cc getSessionDetails(ipmi::Context::ptr ctx, const std::string& service,
+         std::get<5>(details) = rmcpPlusProtocol;
+         std::get<6>(details) =
+             ipmi::mappedVariant<uint32_t>(sessionProps, "RemoteIPAddr", 0);
+-        // std::get<7>(details) = {{0}}; // default constructed to all 0
++        std::get<7>(details) =
++            ipmi::mappedVariant<std::vector<uint8_t>>(
++                sessionProps, "RemoteMACAddress",
++                std::vector<uint8_t>(6, 0));
+         std::get<8>(details) =
+             ipmi::mappedVariant<uint16_t>(sessionProps, "RemotePort", 0);
+     }
+-- 
+2.17.1
+

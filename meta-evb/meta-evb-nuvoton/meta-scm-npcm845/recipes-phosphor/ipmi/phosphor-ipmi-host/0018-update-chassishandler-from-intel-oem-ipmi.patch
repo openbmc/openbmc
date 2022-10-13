@@ -1,0 +1,494 @@
+From 50c69821f8cf58adee90af5218914f5eb8336207 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Tue, 26 Jul 2022 12:09:14 +0800
+Subject: [PATCH 18/21] update chassishandler from intel oem ipmi
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ chassishandler.cpp | 331 ++++++++++++++++++++++++---------------------
+ 1 file changed, 175 insertions(+), 156 deletions(-)
+
+diff --git a/chassishandler.cpp b/chassishandler.cpp
+index c2ed8076..d6c203e4 100644
+--- a/chassishandler.cpp
++++ b/chassishandler.cpp
+@@ -65,6 +65,7 @@ static constexpr size_t forceIdentifyPos = 1;
+ 
+ namespace ipmi
+ {
++
+ constexpr Cc ccParmNotSupported = 0x80;
+ 
+ static inline auto responseParmNotSupported()
+@@ -108,15 +109,17 @@ const static constexpr char chassisSMDevAddrProp[] = "SMDeviceAddress";
+ const static constexpr char chassisBridgeDevAddrProp[] = "BridgeDeviceAddress";
+ static constexpr uint8_t chassisCapFlagMask = 0x0f;
+ static constexpr uint8_t chassisCapAddrMask = 0xfe;
+-static constexpr const char* powerButtonIntf =
+-    "xyz.openbmc_project.Chassis.Buttons.Power";
++
++static constexpr const char* buttonIntf = "xyz.openbmc_project.Chassis.Buttons";
++
++const static constexpr char* idButtonPath =
++    "/xyz/openbmc_project/chassis/buttons/id";
+ static constexpr const char* powerButtonPath =
+-    "/xyz/openbmc_project/Chassis/Buttons/Power0";
+-static constexpr const char* resetButtonIntf =
+-    "xyz.openbmc_project.Chassis.Buttons.Reset";
++    "/xyz/openbmc_project/chassis/buttons/power";
+ static constexpr const char* resetButtonPath =
+-    "/xyz/openbmc_project/Chassis/Buttons/Reset0";
+-
++    "/xyz/openbmc_project/chassis/buttons/reset";
++static constexpr const char* interruptButtonPath =
++    "/xyz/openbmc_project/chassis/buttons/nmi";
+ // Phosphor Host State manager
+ namespace State = sdbusplus::xyz::openbmc_project::State::server;
+ 
+@@ -1024,47 +1027,43 @@ std::optional<bool> getPowerStatus()
+  */
+ bool getACFailStatus()
+ {
+-    constexpr const char* powerControlObj =
+-        "/xyz/openbmc_project/Chassis/Control/Power0";
+-    constexpr const char* powerControlIntf =
+-        "xyz.openbmc_project.Chassis.Control.Power";
+-    bool acFail = false;
++    constexpr const char* acBootObj =
++        "/xyz/openbmc_project/control/host0/ac_boot";
++    constexpr const char* acBootIntf = "xyz.openbmc_project.Common.ACBoot";
++    std::string acFail;
+     std::shared_ptr<sdbusplus::asio::connection> bus = getSdBus();
+     try
+     {
+-        auto service =
+-            ipmi::getService(*bus, powerControlIntf, powerControlObj);
++        auto service = ipmi::getService(*bus, acBootIntf, acBootObj);
+ 
+-        ipmi::Value variant = ipmi::getDbusProperty(
+-            *bus, service, powerControlObj, powerControlIntf, "PFail");
+-        acFail = std::get<bool>(variant);
++        ipmi::Value variant = ipmi::getDbusProperty(*bus, service, acBootObj,
++                                                    acBootIntf, "ACBoot");
++        acFail = std::get<std::string>(variant);
+     }
+     catch (const std::exception& e)
+     {
+-        log<level::ERR>("Failed to fetch PFail property",
+-                        entry("ERROR=%s", e.what()),
+-                        entry("PATH=%s", powerControlObj),
+-                        entry("INTERFACE=%s", powerControlIntf));
++        log<level::ERR>(
++            "Failed to fetch ACBoot property", entry("ERROR=%s", e.what()),
++            entry("PATH=%s", acBootObj), entry("INTERFACE=%s", acBootIntf));
+     }
+-    return acFail;
++    return acFail == "True";
+ }
+ } // namespace power_policy
+ 
+-static std::optional<bool> getButtonEnabled(const std::string& buttonPath,
+-                                            const std::string& buttonIntf)
++static std::optional<bool> getButtonEnabled(const std::string& buttonPath)
+ {
+     std::shared_ptr<sdbusplus::asio::connection> busp = getSdBus();
+     bool buttonDisabled = false;
+     try
+     {
+-        auto service = ipmi::getService(*busp, buttonIntf, buttonPath);
+-        ipmi::Value enabled = ipmi::getDbusProperty(*busp, service, buttonPath,
+-                                                    buttonIntf, "Enabled");
+-        buttonDisabled = !std::get<bool>(enabled);
++        auto service = ipmi::getService(*getSdBus(), buttonIntf, buttonPath);
++        ipmi::Value disabled = ipmi::getDbusProperty(
++            *busp, service, buttonPath, buttonIntf, "ButtonMasked");
++        buttonDisabled = std::get<bool>(disabled);
+     }
+     catch (const sdbusplus::exception_t& e)
+     {
+-        log<level::ERR>("Fail to get button Enabled property",
++        log<level::ERR>("Fail to get button disabled property",
+                         entry("PATH=%s", buttonPath.c_str()),
+                         entry("ERROR=%s", e.what()));
+         return std::nullopt;
+@@ -1072,29 +1071,71 @@ static std::optional<bool> getButtonEnabled(const std::string& buttonPath,
+     return std::make_optional(buttonDisabled);
+ }
+ 
+-static bool setButtonEnabled(ipmi::Context::ptr& ctx,
+-                             const std::string& buttonPath,
+-                             const std::string& buttonIntf, bool enable)
++static bool setButtonEnabled(const std::string& buttonPath, const bool disabled)
++{
++    try
++    {
++        auto service = ipmi::getService(*getSdBus(), buttonIntf, buttonPath);
++        ipmi::setDbusProperty(*getSdBus(), service, buttonPath, buttonIntf,
++                              "ButtonMasked", disabled);
++    }
++    catch (const std::exception& e)
++    {
++        log<level::ERR>("Failed to set button disabled",
++                        entry("EXCEPTION=%s, REQUEST=%x", e.what(), disabled));
++        return -1;
++    }
++
++    return 0;
++}
++
++/*
++ * getRestartCause
++ * helper function for Get Host restart cause Command
++ * return - optional value for RestartCause (no value on error)
++ */
++static bool getRestartCause(ipmi::Context::ptr& ctx, std::string& restartCause)
+ {
++    constexpr const char* restartCausePath =
++        "/xyz/openbmc_project/control/host0/restart_cause";
++    constexpr const char* restartCauseIntf =
++        "xyz.openbmc_project.Control.Host.RestartCause";
++
+     std::string service;
+-    boost::system::error_code ec;
+-    ec = ipmi::getService(ctx, buttonIntf, buttonPath, service);
++    boost::system::error_code ec =
++        ipmi::getService(ctx, restartCauseIntf, restartCausePath, service);
++
+     if (!ec)
+     {
+-        ec = ipmi::setDbusProperty(ctx, service, buttonPath, buttonIntf,
+-                                   "Enabled", enable);
++        ec = ipmi::getDbusProperty(ctx, service, restartCausePath,
++                                   restartCauseIntf, "RestartCause",
++                                   restartCause);
+     }
+     if (ec)
+     {
+-        log<level::ERR>("Fail to set button Enabled property",
+-                        entry("SERVICE=%s", service.c_str()),
+-                        entry("PATH=%s", buttonPath.c_str()),
+-                        entry("ERROR=%s", ec.message().c_str()));
++        log<level::ERR>("Failed to fetch RestartCause property",
++                        entry("ERROR=%s", ec.message().c_str()),
++                        entry("PATH=%s", restartCausePath),
++                        entry("INTERFACE=%s", restartCauseIntf));
+         return false;
+     }
+     return true;
+ }
+ 
++static bool checkIPMIRestartCause(ipmi::Context::ptr& ctx,
++                                  bool& ipmiRestartCause)
++{
++    std::string restartCause;
++    if (!getRestartCause(ctx, restartCause))
++    {
++        return false;
++    }
++    ipmiRestartCause =
++        (restartCause ==
++         "xyz.openbmc_project.State.Host.RestartCause.IpmiCommand");
++    return true;
++}
++
+ //----------------------------------------------------------------------
+ // Get Chassis Status commands
+ //----------------------------------------------------------------------
+@@ -1130,9 +1171,8 @@ ipmi::RspType<bool,    // Power is on
+               bool, // Diagnostic Interrupt button disable allowed
+               bool  // Standby (sleep) button disable allowed
+               >
+-    ipmiGetChassisStatus()
++    ipmiGetChassisStatus(ipmi::Context::ptr ctx)
+ {
+-    using namespace chassis::internal;
+     std::optional<uint2_t> restorePolicy =
+         power_policy::getPowerRestorePolicy();
+     std::optional<bool> powerGood = power_policy::getPowerStatus();
+@@ -1142,8 +1182,7 @@ ipmi::RspType<bool,    // Power is on
+     }
+ 
+     //  Front Panel Button Capabilities and disable/enable status(Optional)
+-    std::optional<bool> powerButtonReading =
+-        getButtonEnabled(powerButtonPath, powerButtonIntf);
++    std::optional<bool> powerButtonReading = getButtonEnabled(powerButtonPath);
+     // allow disable if the interface is present
+     bool powerButtonDisableAllow = static_cast<bool>(powerButtonReading);
+     // default return the button is enabled (not disabled)
+@@ -1154,8 +1193,7 @@ ipmi::RspType<bool,    // Power is on
+         powerButtonDisabled = *powerButtonReading;
+     }
+ 
+-    std::optional<bool> resetButtonReading =
+-        getButtonEnabled(resetButtonPath, resetButtonIntf);
++    std::optional<bool> resetButtonReading = getButtonEnabled(resetButtonPath);
+     // allow disable if the interface is present
+     bool resetButtonDisableAllow = static_cast<bool>(resetButtonReading);
+     // default return the button is enabled (not disabled)
+@@ -1166,8 +1204,27 @@ ipmi::RspType<bool,    // Power is on
+         resetButtonDisabled = *resetButtonReading;
+     }
+ 
++    std::optional<bool> interruptButtonReading =
++        getButtonEnabled(interruptButtonPath);
++    // allow disable if the interface is present
++    bool interruptButtonDisableAllow =
++        static_cast<bool>(interruptButtonReading);
++    // default return the button is enabled (not disabled)
++    bool interruptButtonDisabled = false;
++    if (interruptButtonDisableAllow)
++    {
++        // return the real value of the button status, if present
++        interruptButtonDisabled = *interruptButtonReading;
++    }
++
+     bool powerDownAcFailed = power_policy::getACFailStatus();
+ 
++    bool powerStatusIPMI = false;
++    if (!checkIPMIRestartCause(ctx, powerStatusIPMI))
++    {
++        return ipmi::responseUnspecifiedError();
++    }
++
+     // This response has a lot of hard-coded, unsupported fields
+     // They are set to false or 0
+     constexpr bool powerOverload = false;
+@@ -1177,7 +1234,6 @@ ipmi::RspType<bool,    // Power is on
+     constexpr bool powerDownOverload = false;
+     constexpr bool powerDownInterlock = false;
+     constexpr bool powerDownPowerFault = false;
+-    constexpr bool powerStatusIPMI = false;
+     constexpr bool chassisIntrusionActive = false;
+     constexpr bool frontPanelLockoutActive = false;
+     constexpr bool driveFault = false;
+@@ -1185,9 +1241,7 @@ ipmi::RspType<bool,    // Power is on
+     // chassisIdentifySupport set because this command is implemented
+     constexpr bool chassisIdentifySupport = true;
+     uint2_t chassisIdentifyState = types::enum_cast<uint2_t>(chassisIDState);
+-    constexpr bool diagButtonDisabled = false;
+     constexpr bool sleepButtonDisabled = false;
+-    constexpr bool diagButtonDisableAllow = false;
+     constexpr bool sleepButtonDisableAllow = false;
+ 
+     return ipmi::responseSuccess(
+@@ -1203,120 +1257,86 @@ ipmi::RspType<bool,    // Power is on
+         coolingFanFault, chassisIdentifyState, chassisIdentifySupport,
+         false, // reserved
+ 
+-        powerButtonDisabled, resetButtonDisabled, diagButtonDisabled,
++        powerButtonDisabled, resetButtonDisabled, interruptButtonDisabled,
+         sleepButtonDisabled, powerButtonDisableAllow, resetButtonDisableAllow,
+-        diagButtonDisableAllow, sleepButtonDisableAllow);
++        interruptButtonDisableAllow, sleepButtonDisableAllow);
+ }
+ 
+-enum class IpmiRestartCause
+-{
+-    Unknown = 0x0,
+-    RemoteCommand = 0x1,
+-    ResetButton = 0x2,
+-    PowerButton = 0x3,
+-    WatchdogTimer = 0x4,
+-    PowerPolicyAlwaysOn = 0x6,
+-    PowerPolicyPreviousState = 0x7,
+-    SoftReset = 0xa,
+-};
+-
+-static IpmiRestartCause
+-    restartCauseToIpmiRestartCause(State::Host::RestartCause cause)
++static uint4_t getRestartCauseValue(const std::string& cause)
+ {
+-    switch (cause)
++    uint4_t restartCauseValue = 0;
++    if (cause == "xyz.openbmc_project.State.Host.RestartCause.Unknown")
+     {
+-        case State::Host::RestartCause::Unknown:
+-        {
+-            return IpmiRestartCause::Unknown;
+-        }
+-        case State::Host::RestartCause::RemoteCommand:
+-        {
+-            return IpmiRestartCause::RemoteCommand;
+-        }
+-        case State::Host::RestartCause::ResetButton:
+-        {
+-            return IpmiRestartCause::ResetButton;
+-        }
+-        case State::Host::RestartCause::PowerButton:
+-        {
+-            return IpmiRestartCause::PowerButton;
+-        }
+-        case State::Host::RestartCause::WatchdogTimer:
+-        {
+-            return IpmiRestartCause::WatchdogTimer;
+-        }
+-        case State::Host::RestartCause::PowerPolicyAlwaysOn:
+-        {
+-            return IpmiRestartCause::PowerPolicyAlwaysOn;
+-        }
+-        case State::Host::RestartCause::PowerPolicyPreviousState:
+-        {
+-            return IpmiRestartCause::PowerPolicyPreviousState;
+-        }
+-        case State::Host::RestartCause::SoftReset:
+-        {
+-            return IpmiRestartCause::SoftReset;
+-        }
+-        default:
+-        {
+-            return IpmiRestartCause::Unknown;
+-        }
++        restartCauseValue = 0x0;
+     }
+-}
+-
+-/*
+- * getRestartCause
+- * helper function for Get Host restart cause Command
+- * return - optional value for RestartCause (no value on error)
+- */
+-static std::optional<uint4_t> getRestartCause(ipmi::Context::ptr ctx)
+-{
+-    constexpr const char* restartCausePath =
+-        "/xyz/openbmc_project/control/host0/restart_cause";
+-    constexpr const char* restartCauseIntf =
+-        "xyz.openbmc_project.Control.Host.RestartCause";
+-
+-    std::string service;
+-    boost::system::error_code ec =
+-        ipmi::getService(ctx, restartCauseIntf, restartCausePath, service);
+-    if (!ec)
++    else if (cause == "xyz.openbmc_project.State.Host.RestartCause.IpmiCommand")
+     {
+-        std::string restartCauseStr;
+-        ec = ipmi::getDbusProperty<std::string>(
+-            ctx, service, restartCausePath, restartCauseIntf, "RestartCause",
+-            restartCauseStr);
+-        if (!ec)
+-        {
+-            auto cause =
+-                State::Host::convertRestartCauseFromString(restartCauseStr);
+-            return types::enum_cast<uint4_t>(
+-                restartCauseToIpmiRestartCause(cause));
+-        }
++        restartCauseValue = 0x1;
+     }
+-
+-    log<level::ERR>("Failed to fetch RestartCause property",
+-                    entry("ERROR=%s", ec.message().c_str()),
+-                    entry("PATH=%s", restartCausePath),
+-                    entry("INTERFACE=%s", restartCauseIntf));
+-    return std::nullopt;
++    else if (cause == "xyz.openbmc_project.State.Host.RestartCause.ResetButton")
++    {
++        restartCauseValue = 0x2;
++    }
++    else if (cause == "xyz.openbmc_project.State.Host.RestartCause.PowerButton")
++    {
++        restartCauseValue = 0x3;
++    }
++    else if (cause ==
++             "xyz.openbmc_project.State.Host.RestartCause.WatchdogTimer")
++    {
++        restartCauseValue = 0x4;
++    }
++    else if (cause == "xyz.openbmc_project.State.Host.RestartCause.OEM")
++    {
++        restartCauseValue = 0x5;
++    }
++    else if (cause ==
++             "xyz.openbmc_project.State.Host.RestartCause.PowerPolicyAlwaysOn")
++    {
++        restartCauseValue = 0x6;
++    }
++    else if (cause == "xyz.openbmc_project.State.Host.RestartCause."
++                      "PowerPolicyPreviousState")
++    {
++        restartCauseValue = 0x7;
++    }
++    else if (cause == "xyz.openbmc_project.State.Host.RestartCause.PEFReset")
++    {
++        restartCauseValue = 0x8;
++    }
++    else if (cause ==
++             "xyz.openbmc_project.State.Host.RestartCause.PEFPowerCycle")
++    {
++        restartCauseValue = 0x9;
++    }
++    else if (cause == "xyz.openbmc_project.State.Host.RestartCause.SoftReset")
++    {
++        restartCauseValue = 0xa;
++    }
++    else if (cause == "xyz.openbmc_project.State.Host.RestartCause.RTCWakeup")
++    {
++        restartCauseValue = 0xb;
++    }
++    return restartCauseValue;
+ }
+ 
+ ipmi::RspType<uint4_t, // Restart Cause
+               uint4_t, // reserved
+-              uint8_t  // channel number (not supported)
++              uint8_t  // channel number
+               >
+     ipmiGetSystemRestartCause(ipmi::Context::ptr ctx)
+ {
+-    std::optional<uint4_t> cause = getRestartCause(ctx);
+-    if (!cause)
++    std::string restartCauseStr;
++    if (!getRestartCause(ctx, restartCauseStr))
+     {
+         return ipmi::responseUnspecifiedError();
+     }
+-
+     constexpr uint4_t reserved = 0;
+     auto channel = static_cast<uint8_t>(ctx->channel);
+-    return ipmi::responseSuccess(cause.value(), reserved, channel);
++    return ipmi::responseSuccess(getRestartCauseValue(restartCauseStr),
++                                 reserved, channel);
+ }
++
+ /** @brief Implementation of chassis control command
+  *
+  *  @param - chassisControl command byte
+@@ -2321,24 +2341,23 @@ ipmi::RspType<uint3_t, // policy support
+     return ipmi::responseSuccess(power_policy::allSupport, reserved);
+ }
+ 
+-ipmi::RspType<> ipmiSetFrontPanelButtonEnables(ipmi::Context::ptr ctx,
+-                                               bool disablePowerButton,
+-                                               bool disableResetButton, bool,
+-                                               bool, uint4_t)
++ipmi::RspType<> ipmiSetFrontPanelButtonEnables(bool disablePowerButton,
++                                               bool disableResetButton,
++                                               bool disableInterruptButton,
++                                               bool, uint4_t reserved)
+ {
+-    using namespace chassis::internal;
+-
+-    // set power button Enabled property
+-    bool success = setButtonEnabled(ctx, powerButtonPath, powerButtonIntf,
+-                                    !disablePowerButton);
++    if (reserved)
++    {
++        return ipmi::responseInvalidFieldRequest();
++    }
++    bool error = false;
+ 
+-    // set reset button Enabled property
+-    success &= setButtonEnabled(ctx, resetButtonPath, resetButtonIntf,
+-                                !disableResetButton);
++    error |= setButtonEnabled(powerButtonPath, disablePowerButton);
++    error |= setButtonEnabled(resetButtonPath, disableResetButton);
++    error |= setButtonEnabled(interruptButtonPath, disableInterruptButton);
+ 
+-    if (!success)
++    if (error)
+     {
+-        // not all buttons were successfully set
+         return ipmi::responseUnspecifiedError();
+     }
+     return ipmi::responseSuccess();
+-- 
+2.17.1
+
