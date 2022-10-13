@@ -1,6 +1,6 @@
-From da9551dc27d02ed7ec555367aee085588aa14e88 Mon Sep 17 00:00:00 2001
+From b028b92d66ba80595b6023ed4ca489f3f9f3ef38 Mon Sep 17 00:00:00 2001
 From: Tim Lee <timlee660101@gmail.com>
-Date: Thu, 28 Jul 2022 14:57:30 +0800
+Date: Thu, 13 Oct 2022 17:12:20 +0800
 Subject: [PATCH] Adjust paths for use with Bitbake
 
 Signed-off-by: Tim Lee <timlee660101@gmail.com>
@@ -16,10 +16,10 @@ Signed-off-by: Tim Lee <timlee660101@gmail.com>
  8 files changed, 24 insertions(+), 24 deletions(-)
 
 diff --git a/py_scripts/ImageGeneration/inputs/BL31_AndHeader.xml b/py_scripts/ImageGeneration/inputs/BL31_AndHeader.xml
-index 4ab84c9..d9d277e 100644
+index ca08ce5..2bf500d 100644
 --- a/py_scripts/ImageGeneration/inputs/BL31_AndHeader.xml
 +++ b/py_scripts/ImageGeneration/inputs/BL31_AndHeader.xml
-@@ -52,7 +52,7 @@
+@@ -62,7 +62,7 @@
  			<offset>0x1FC</offset>
  			<size>0x4</size>
  		</config>
@@ -28,7 +28,7 @@ index 4ab84c9..d9d277e 100644
  	</BinField>
  
  	<BinField>
-@@ -60,9 +60,9 @@
+@@ -70,9 +70,9 @@
  		<name>Code</name>
  		<config>
  			<offset>0x200</offset>
@@ -41,10 +41,10 @@ index 4ab84c9..d9d277e 100644
  
  </Bin_Ecc_Map>
 diff --git a/py_scripts/ImageGeneration/inputs/OpTeeAndHeader.xml b/py_scripts/ImageGeneration/inputs/OpTeeAndHeader.xml
-index 683d647..6ac9535 100644
+index ef80df8..aaede21 100644
 --- a/py_scripts/ImageGeneration/inputs/OpTeeAndHeader.xml
 +++ b/py_scripts/ImageGeneration/inputs/OpTeeAndHeader.xml
-@@ -53,7 +53,7 @@
+@@ -62,7 +62,7 @@
  			<offset>0x1FC</offset>       
  			<size>0x4</size> 
  		</config>
@@ -53,7 +53,7 @@ index 683d647..6ac9535 100644
  	</BinField>
  	
  	<BinField>
-@@ -61,9 +61,9 @@
+@@ -70,9 +70,9 @@
  		<name>Code</name>             
  		<config>
  			<offset>0x200</offset>       
@@ -66,10 +66,10 @@ index 683d647..6ac9535 100644
  	
  </Bin_Ecc_Map>
 diff --git a/py_scripts/ImageGeneration/references/BootBlockAndHeader_A1_EB.xml b/py_scripts/ImageGeneration/references/BootBlockAndHeader_A1_EB.xml
-index 6bddc9d..036980b 100644
+index 31acc9e..634c51e 100644
 --- a/py_scripts/ImageGeneration/references/BootBlockAndHeader_A1_EB.xml
 +++ b/py_scripts/ImageGeneration/references/BootBlockAndHeader_A1_EB.xml
-@@ -548,7 +548,7 @@
+@@ -558,7 +558,7 @@
  			<offset>0x1FC</offset>       
  			<size>0x4</size> 
  		</config>
@@ -78,7 +78,7 @@ index 6bddc9d..036980b 100644
  	</BinField>
  	
  	<BinField>
-@@ -556,9 +556,9 @@
+@@ -566,9 +566,9 @@
  		<name>Code</name>             
  		<config>
  			<offset>0x200</offset>       
@@ -166,22 +166,22 @@ index 0b77249..6086e66 100644
  	
  </Bin_Ecc_Map>
 diff --git a/py_scripts/ImageGeneration/references/UbootHeader_A1.xml b/py_scripts/ImageGeneration/references/UbootHeader_A1.xml
-index 685365a..96a5de9 100644
+index 4e3935f..8746e4a 100644
 --- a/py_scripts/ImageGeneration/references/UbootHeader_A1.xml
 +++ b/py_scripts/ImageGeneration/references/UbootHeader_A1.xml
-@@ -53,7 +53,7 @@
- 			<offset>0x1FC</offset>        <!-- offset in the header -->
- 			<size>0x4</size>              <!-- size in the header -->
+@@ -203,7 +203,7 @@
+ 			<offset>0x1FC</offset>
+ 			<size>0x4</size>
  		</config>
 -		<content format='FileSize'>inputs/u-boot.bin</content>	<!-- content the user should fill -->
 +		<content format='FileSize'>u-boot.bin</content>	<!-- content the user should fill -->
  	</BinField>
  	
  	<BinField>
-@@ -61,9 +61,9 @@
+@@ -211,9 +211,9 @@
  		<name>Code</name>             
  		<config>
- 			<offset>0x200</offset>        <!-- offset in the header -->
+ 			<offset>0x200</offset>
 -			<size format='FileSize'>inputs/u-boot.bin</size>                 <!-- size in the header calculated by tool-->
 +			<size format='FileSize'>u-boot.bin</size>                 <!-- size in the header calculated by tool-->
  		</config>
@@ -191,22 +191,22 @@ index 685365a..96a5de9 100644
  	
  	
 diff --git a/py_scripts/ImageGeneration/references/UbootHeader_Z1.xml b/py_scripts/ImageGeneration/references/UbootHeader_Z1.xml
-index 685365a..96a5de9 100644
+index ba03e8c..4b98e82 100644
 --- a/py_scripts/ImageGeneration/references/UbootHeader_Z1.xml
 +++ b/py_scripts/ImageGeneration/references/UbootHeader_Z1.xml
-@@ -53,7 +53,7 @@
- 			<offset>0x1FC</offset>        <!-- offset in the header -->
- 			<size>0x4</size>              <!-- size in the header -->
+@@ -210,7 +210,7 @@
+ 			<offset>0x1FC</offset>
+ 			<size>0x4</size>
  		</config>
 -		<content format='FileSize'>inputs/u-boot.bin</content>	<!-- content the user should fill -->
 +		<content format='FileSize'>u-boot.bin</content>	<!-- content the user should fill -->
  	</BinField>
  	
  	<BinField>
-@@ -61,9 +61,9 @@
+@@ -218,9 +218,9 @@
  		<name>Code</name>             
  		<config>
- 			<offset>0x200</offset>        <!-- offset in the header -->
+ 			<offset>0x200</offset>
 -			<size format='FileSize'>inputs/u-boot.bin</size>                 <!-- size in the header calculated by tool-->
 +			<size format='FileSize'>u-boot.bin</size>                 <!-- size in the header calculated by tool-->
  		</config>

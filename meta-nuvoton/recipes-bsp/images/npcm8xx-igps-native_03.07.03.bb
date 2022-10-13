@@ -9,8 +9,8 @@ SRC_URI = " \
     file://0001-Adjust-paths-for-use-with-Bitbake.patch \
 "
 
-# tag IGPS_03.06.04
-SRCREV = "6b056bb97a8f0e677d196afb6704372cae8bdd5b"
+# tag IGPS_03.07.03
+SRCREV = "4e53f4bbe88e115cca522cbf34160ad1a21236b2"
 
 S = "${WORKDIR}/git"
 
