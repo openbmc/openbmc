@@ -23,6 +23,9 @@ FLASH_UBI_RWFS_TXT_SIZE ?= "6MiB"
 
 SERIAL_CONSOLES ?= "115200;ttyS0"
 
+ALIGN ?= "4096"
+ALIGN_END ?= "4096"
+
 SOC_FAMILY = "npcm8xx"
 include conf/machine/include/soc-family.inc
 MACHINEOVERRIDES .= ":npcm8xx"
