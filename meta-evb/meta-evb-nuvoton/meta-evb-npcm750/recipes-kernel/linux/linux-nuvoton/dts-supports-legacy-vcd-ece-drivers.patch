@@ -1,20 +1,19 @@
-From b4b14f8c1ce6ae619f8bed48a2973052a0f2e537 Mon Sep 17 00:00:00 2001
+From 9e6e1c334869fd8b37db136d4efd5a7e4584fd9f Mon Sep 17 00:00:00 2001
 From: Marvin Lin <milkfafa@gmail.com>
-Date: Fri, 8 Jul 2022 15:40:48 +0800
+Date: Fri, 14 Oct 2022 16:21:59 +0800
 Subject: [PATCH] dts supports legacy vcd ece drivers
 
 ---
  arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi | 18 ++++++++++++
- .../boot/dts/nuvoton-npcm750-buv-runbmc.dts   | 22 +++++++++++++-
  arch/arm/boot/dts/nuvoton-npcm750-evb.dts     | 22 +++++++++++++-
  .../dts/nuvoton-npcm750-runbmc-olympus.dts    | 29 ++++++++++++++++++-
- 4 files changed, 88 insertions(+), 3 deletions(-)
+ 3 files changed, 67 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi b/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
-index cb5eabf93146..a18f63221fa8 100644
+index 421b45762bdb..2c3e8399460c 100644
 --- a/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
 +++ b/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
-@@ -291,6 +291,24 @@
+@@ -294,6 +294,24 @@ dvc: dvc@f0808000 {
  			interrupts = <0 23 4>;
  		};
  
@@ -39,53 +38,11 @@ index cb5eabf93146..a18f63221fa8 100644
  		video: video@f0810000 {
  			compatible = "nuvoton,npcm750-video";
  			reg = <0xf0810000 0x10000>, <0xf0820000 0x2000>;
-diff --git a/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts b/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts
-index 41647efd543c..febde8c04af8 100644
---- a/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts
-+++ b/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts
-@@ -64,6 +64,16 @@
- 		#size-cells = <1>;
- 		ranges;
- 
-+		vcd_memory: framebuffer@0x1e200000 {
-+			reg = <0x1e200000 0x600000>;
-+			no-map;
-+		};
-+
-+		ece_memory: framebuffer@0x1e800000 {
-+			reg = <0x1e800000 0x600000>;
-+			no-map;
-+		};
-+
- 		video_memory: framebuffer@0x1b000000 {
- 			compatible = "shared-dma-pool";
- 			reg = <0x1b000000 0x02000000>;
-@@ -576,9 +586,19 @@
- 	status = "okay";
- };
- 
-+&vcd {
-+	status = "okay";
-+	memory-region = <&vcd_memory>;
-+};
-+
-+&ece {
-+	status = "okay";
-+	memory-region = <&ece_memory>;
-+};
-+
- &video {
- 	memory-region = <&video_memory>;
--	status = "okay";
-+	status = "disabled";
- };
- 
- &watchdog1 {
 diff --git a/arch/arm/boot/dts/nuvoton-npcm750-evb.dts b/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
-index 24550c772aff..3640cee339aa 100644
+index e885d6d7a587..741315e34854 100644
 --- a/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
 +++ b/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
-@@ -69,6 +69,16 @@
+@@ -69,6 +69,16 @@ reserved-memory {
  		#size-cells = <1>;
  		ranges;
  
@@ -101,8 +58,8 @@ index 24550c772aff..3640cee339aa 100644
 +
  		video_memory: framebuffer@0x1b000000 {
  			compatible = "shared-dma-pool";
- 			reg = <0x1b000000 0x02000000>;
-@@ -337,9 +347,19 @@
+ 			reg = <0x1b000000 0x01800000>;
+@@ -375,9 +385,19 @@ &pcimbox {
  	status = "okay";
  };
  
@@ -124,10 +81,10 @@ index 24550c772aff..3640cee339aa 100644
  
  &watchdog1 {
 diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
-index fa64763e8182..1e77ffe650e0 100644
+index 1fca68e0a21e..e88e625a2cfc 100644
 --- a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
 +++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
-@@ -64,6 +64,23 @@
+@@ -64,6 +64,23 @@ reserved-memory {
  		#size-cells = <1>;
  		ranges;
  
@@ -150,8 +107,8 @@ index fa64763e8182..1e77ffe650e0 100644
 +
  		video_memory: framebuffer@0x1b000000 {
  			compatible = "shared-dma-pool";
- 			reg = <0x1b000000 0x02000000>;
-@@ -977,9 +994,19 @@
+ 			reg = <0x1b000000 0x01800000>;
+@@ -1003,9 +1020,19 @@ &pcimbox {
  	status = "okay";
  };
  
@@ -173,5 +130,5 @@ index fa64763e8182..1e77ffe650e0 100644
  
  &watchdog1 {
 -- 
-2.17.1
+2.34.1
 
