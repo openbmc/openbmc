@@ -1,0 +1,115 @@
+From 3bfadb22e58bdf7691f80f403dd85794f2b86ad6 Mon Sep 17 00:00:00 2001
+From: Liviu Dudau <liviu.dudau@arm.com>
+Date: Fri, 8 Jul 2022 16:39:21 +0100
+Subject: [PATCH] drm/komeda: Fix handling of atomic commits in the
+ atomic_commit_tail hook
+
+Komeda driver relies on the generic DRM atomic helper functions to handle
+commits. It only implements an atomic_commit_tail hook for the
+mode_config_helper_funcs and even that one is pretty close to the generic
+implementation with the exception of additional dma_fence signalling.
+
+What the generic helper framework doesn't do is waiting for the actual
+hardware to signal that the commit parameters have been written into the
+appropriate registers. As we signal CRTC events only on the irq handlers,
+we need to flush the configuration and wait for the hardware to respond.
+
+Add the Komeda specific implementation for atomic_commit_hw_done() that
+flushes and waits for flip done before calling drm_atomic_helper_commit_hw_done().
+
+The fix was prompted by a patch from Carsten Haitzler where he was trying to
+solve the same issue but in a different way that I think can lead to wrong
+event signaling to userspace.
+
+Upstream-Status: Backport [https://patchwork.freedesktop.org/patch/msgid/20220722122139.288486-1-liviu.dudau@arm.com]
+Reported-by: Carsten Haitzler <carsten.haitzler@arm.com>
+Tested-by: Carsten Haitzler <carsten.haitzler@arm.com>
+Reviewed-by: Carsten Haitzler <carsten.haitzler@arm.com>
+Signed-off-by: Liviu Dudau <liviu.dudau@arm.com>
+Link: https://patchwork.freedesktop.org/patch/msgid/20220722122139.288486-1-liviu.dudau@arm.com
+Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+Change-Id: I0bd92150120eb929692c1d38c4d1077d38401cdd
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com>
+---
+ .../gpu/drm/arm/display/komeda/komeda_crtc.c  |  4 ++--
+ .../gpu/drm/arm/display/komeda/komeda_kms.c   | 21 ++++++++++++++++++-
+ .../gpu/drm/arm/display/komeda/komeda_kms.h   |  2 ++
+ 3 files changed, 24 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/gpu/drm/arm/display/komeda/komeda_crtc.c b/drivers/gpu/drm/arm/display/komeda/komeda_crtc.c
+index 59172acb9738..292f533d8cf0 100644
+--- a/drivers/gpu/drm/arm/display/komeda/komeda_crtc.c
++++ b/drivers/gpu/drm/arm/display/komeda/komeda_crtc.c
+@@ -235,7 +235,7 @@ void komeda_crtc_handle_event(struct komeda_crtc   *kcrtc,
+ 			crtc->state->event = NULL;
+ 			drm_crtc_send_vblank_event(crtc, event);
+ 		} else {
+-			DRM_WARN("CRTC[%d]: FLIP happen but no pending commit.\n",
++			DRM_WARN("CRTC[%d]: FLIP happened but no pending commit.\n",
+ 				 drm_crtc_index(&kcrtc->base));
+ 		}
+ 		spin_unlock_irqrestore(&crtc->dev->event_lock, flags);
+@@ -286,7 +286,7 @@ komeda_crtc_atomic_enable(struct drm_crtc *crtc,
+ 	komeda_crtc_do_flush(crtc, old);
+ }
+ 
+-static void
++void
+ komeda_crtc_flush_and_wait_for_flip_done(struct komeda_crtc *kcrtc,
+ 					 struct completion *input_flip_done)
+ {
+diff --git a/drivers/gpu/drm/arm/display/komeda/komeda_kms.c b/drivers/gpu/drm/arm/display/komeda/komeda_kms.c
+index 8b2be8a9a27d..c434fb43d82c 100644
+--- a/drivers/gpu/drm/arm/display/komeda/komeda_kms.c
++++ b/drivers/gpu/drm/arm/display/komeda/komeda_kms.c
+@@ -69,6 +69,25 @@ static const struct drm_driver komeda_kms_driver = {
+ 	.minor = 1,
+ };
+ 
++static void komeda_kms_atomic_commit_hw_done(struct drm_atomic_state *state)
++{
++	struct drm_device *dev = state->dev;
++	struct komeda_kms_dev *kms = to_kdev(dev);
++	int i;
++
++	for (i = 0; i < kms->n_crtcs; i++) {
++		struct komeda_crtc *kcrtc = &kms->crtcs[i];
++
++		if (kcrtc->base.state->active) {
++			struct completion *flip_done = NULL;
++			if (kcrtc->base.state->event)
++				flip_done = kcrtc->base.state->event->base.completion;
++			komeda_crtc_flush_and_wait_for_flip_done(kcrtc, flip_done);
++		}
++	}
++	drm_atomic_helper_commit_hw_done(state);
++}
++
+ static void komeda_kms_commit_tail(struct drm_atomic_state *old_state)
+ {
+ 	struct drm_device *dev = old_state->dev;
+@@ -81,7 +100,7 @@ static void komeda_kms_commit_tail(struct drm_atomic_state *old_state)
+ 
+ 	drm_atomic_helper_commit_modeset_enables(dev, old_state);
+ 
+-	drm_atomic_helper_commit_hw_done(old_state);
++	komeda_kms_atomic_commit_hw_done(old_state);
+ 
+ 	drm_atomic_helper_wait_for_flip_done(dev, old_state);
+ 
+diff --git a/drivers/gpu/drm/arm/display/komeda/komeda_kms.h b/drivers/gpu/drm/arm/display/komeda/komeda_kms.h
+index 456f3c435719..bf6e8fba5061 100644
+--- a/drivers/gpu/drm/arm/display/komeda/komeda_kms.h
++++ b/drivers/gpu/drm/arm/display/komeda/komeda_kms.h
+@@ -182,6 +182,8 @@ void komeda_kms_cleanup_private_objs(struct komeda_kms_dev *kms);
+ 
+ void komeda_crtc_handle_event(struct komeda_crtc   *kcrtc,
+ 			      struct komeda_events *evts);
++void komeda_crtc_flush_and_wait_for_flip_done(struct komeda_crtc *kcrtc,
++					      struct completion *input_flip_done);
+ 
+ struct komeda_kms_dev *komeda_kms_attach(struct komeda_dev *mdev);
+ void komeda_kms_detach(struct komeda_kms_dev *kms);
+-- 
+2.25.1
+

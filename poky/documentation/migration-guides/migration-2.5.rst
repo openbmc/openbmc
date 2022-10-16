@@ -261,7 +261,7 @@ The following are additional changes:
    ``pkg_postinst_ontarget()`` or call
    ``postinst_intercept delay_to_first_boot`` from ``pkg_postinst()``.
    Any failure of a ``pkg_postinst()`` script (including ``exit 1``)
-   will trigger a warning during ``do_rootfs``.
+   will trigger a warning during :ref:`ref-tasks-rootfs`.
 
    For more information, see the
    ":ref:`dev-manual/common-tasks:post-installation scripts`"

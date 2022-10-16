@@ -1112,7 +1112,7 @@ links created within the source tree:
       ``${``\ :term:`D`\ ``}``.
 
    -  ``sysroot-destdir/``: Contains a subset of files installed within
-      ``do_install`` that have been put into the shared sysroot. For
+      :ref:`ref-tasks-install` that have been put into the shared sysroot. For
       more information, see the
       ":ref:`dev-manual/common-tasks:sharing files between recipes`" section.
 

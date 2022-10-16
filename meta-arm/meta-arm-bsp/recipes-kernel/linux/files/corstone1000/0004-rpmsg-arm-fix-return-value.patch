@@ -1,0 +1,35 @@
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Rui Miguel Silva <rui.silva@arm.com>
+
+From 1426dd2b541cb51741bffbd95191ae5593e1749d Mon Sep 17 00:00:00 2001
+From: Rui Miguel Silva <rui.silva@linaro.org>
+Date: Tue, 27 Sep 2022 10:05:27 +0100
+Subject: [PATCH 1/2] rpmsg: arm: fix return value
+
+The creation of and endpoint returns a pointer, fix the return
+value to the right type.
+
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+---
+ drivers/rpmsg/rpmsg_arm_mailbox.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/rpmsg/rpmsg_arm_mailbox.c b/drivers/rpmsg/rpmsg_arm_mailbox.c
+index 4a80102669f6..5c0dcc8e353d 100644
+--- a/drivers/rpmsg/rpmsg_arm_mailbox.c
++++ b/drivers/rpmsg/rpmsg_arm_mailbox.c
+@@ -103,8 +103,9 @@ static struct rpmsg_endpoint *arm_create_ept(struct rpmsg_device *rpdev,
+ 
+ 	channel->mbox = mbox_request_channel_byname(&channel->cl, chinfo.name);
+ 	if (IS_ERR_OR_NULL(channel->mbox)) {
+-		printk("RPMsg ARM: Cannot get channel by name: '%s'\n", chinfo.name);
+-		return -1;
++		printk("RPMsg ARM: Cannot get channel by name: %s\n",
++		       chinfo.name);
++		return ERR_PTR(-ENOENT);
+ 	}
+ 
+ 	return &channel->ept;
+-- 
+2.37.3
+

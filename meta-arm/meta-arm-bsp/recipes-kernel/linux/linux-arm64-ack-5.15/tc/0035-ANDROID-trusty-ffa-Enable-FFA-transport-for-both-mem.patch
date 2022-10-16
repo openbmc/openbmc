@@ -1,0 +1,143 @@
+From 8612a35bb376a3d104fe81f07c7109a252dcd9bf Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Thu, 3 Feb 2022 11:19:38 +0000
+Subject: [PATCH 35/40] ANDROID: trusty-ffa: Enable FFA transport for both
+ memory and message ops
+
+Adds new API version TRUSTY_API_VERSION_FFA and sets this as current
+API version.
+
+If Trusty on the secure side supports receipt of FFA direct request,
+then trusty core uses FFA calls for messages and memory operations.
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Change-Id: I4a8b060f906a96935a7df10713026fb543e2b9a7
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com
+---
+ drivers/trusty/trusty-ffa.c   | 58 +++++++++++++++++++++++++++++++++++
+ drivers/trusty/trusty.c       |  3 ++
+ include/linux/trusty/smcall.h |  3 +-
+ 3 files changed, 63 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/trusty/trusty-ffa.c b/drivers/trusty/trusty-ffa.c
+index 0655b3887b52..543f5a0d31cb 100644
+--- a/drivers/trusty/trusty-ffa.c
++++ b/drivers/trusty/trusty-ffa.c
+@@ -15,6 +15,36 @@
+ #include "trusty-ffa.h"
+ #include "trusty-private.h"
+ 
++/* partition property: Supports receipt of direct requests */
++#define FFA_PARTITION_DIRECT_REQ_RECV	BIT(0)
++
++/* string representation of trusty UUID used for partition info get call */
++static const char *trusty_uuid = "40ee25f0-a2bc-304c-8c4c-a173c57d8af1";
++
++static u32 trusty_ffa_send_direct_msg(struct device *dev, unsigned long fid,
++				      unsigned long a0, unsigned long a1,
++				      unsigned long a2)
++{
++	struct trusty_state *s = platform_get_drvdata(to_platform_device(dev));
++	struct ffa_send_direct_data ffa_msg;
++	struct ffa_device *ffa_dev;
++	int ret;
++
++	ffa_dev = to_ffa_dev(s->ffa->dev);
++
++	ffa_msg.data0 = fid;
++	ffa_msg.data1 = a0;
++	ffa_msg.data2 = a1;
++	ffa_msg.data3 = a2;
++	ffa_msg.data4 = 0;
++
++	ret = s->ffa->ops->sync_send_receive(ffa_dev, &ffa_msg);
++	if (!ret)
++		return ffa_msg.data0;
++
++	return ret;
++}
++
+ static int __trusty_ffa_share_memory(struct device *dev, u64 *id,
+ 				     struct scatterlist *sglist,
+ 				     unsigned int nents, pgprot_t pgprot,
+@@ -114,6 +144,11 @@ static int trusty_ffa_reclaim_memory(struct device *dev, u64 id,
+ 	return 0;
+ }
+ 
++static const struct trusty_msg_ops trusty_ffa_msg_ops = {
++	.desc = &trusty_ffa_transport,
++	.send_direct_msg = &trusty_ffa_send_direct_msg,
++};
++
+ static const struct trusty_mem_ops trusty_ffa_mem_ops = {
+ 	.desc = &trusty_ffa_transport,
+ 	.trusty_share_memory = &trusty_ffa_share_memory,
+@@ -181,6 +216,7 @@ static int trusty_ffa_transport_setup(struct device *dev)
+ 	struct trusty_state *s = platform_get_drvdata(to_platform_device(dev));
+ 	struct trusty_ffa_state *ffa_state;
+ 	struct ffa_device *ffa_dev;
++	struct ffa_partition_info pinfo = { 0 };
+ 
+ 	/* ffa transport not required for lower api versions */
+ 	if (s->api_version != 0 && s->api_version < TRUSTY_API_VERSION_MEM_OBJ) {
+@@ -208,6 +244,28 @@ static int trusty_ffa_transport_setup(struct device *dev)
+ 		return 0;
+ 	}
+ 
++	/* check if Trusty partition can support receipt of direct requests. */
++	rc = ffa_state->ops->partition_info_get(trusty_uuid, &pinfo);
++	if (rc || !(pinfo.properties & FFA_PARTITION_DIRECT_REQ_RECV)) {
++		dev_err(ffa_state->dev, "trusty_ffa_pinfo: ret: 0x%x, prop: 0x%x\n",
++			rc, pinfo.properties);
++		return -EINVAL;
++	}
++
++	/* query and check Trusty API version */
++	s->ffa = ffa_state;
++	rc = trusty_init_api_version(s, dev, trusty_ffa_send_direct_msg);
++	if (rc) {
++		s->ffa = NULL;
++		return -EINVAL;
++	}
++
++	if (s->api_version == TRUSTY_API_VERSION_FFA) {
++		s->msg_ops = &trusty_ffa_msg_ops;
++		s->mem_ops = &trusty_ffa_mem_ops;
++		return 0;
++	}
++
+ 	return -EINVAL;
+ }
+ 
+diff --git a/drivers/trusty/trusty.c b/drivers/trusty/trusty.c
+index f91c255c9897..66273873f169 100644
+--- a/drivers/trusty/trusty.c
++++ b/drivers/trusty/trusty.c
+@@ -679,6 +679,9 @@ static int trusty_remove(struct platform_device *pdev)
+  *     trusty_smc_transport used for messaging.
+  *     trusty_ffa_transport used for memory sharing.
+  *
++ * For Trusty API version > TRUSTY_API_VERSION_MEM_OBJ:
++ *     trusty_ffa_transport used for messaging and memory sharing operations.
++ *
+  */
+ static const trusty_transports_t trusty_transports[] = {
+ 	&trusty_smc_transport,
+diff --git a/include/linux/trusty/smcall.h b/include/linux/trusty/smcall.h
+index aea3f6068593..17b3d1c2c4f6 100644
+--- a/include/linux/trusty/smcall.h
++++ b/include/linux/trusty/smcall.h
+@@ -109,7 +109,8 @@
+ #define TRUSTY_API_VERSION_SMP_NOP	(3)
+ #define TRUSTY_API_VERSION_PHYS_MEM_OBJ	(4)
+ #define TRUSTY_API_VERSION_MEM_OBJ	(5)
+-#define TRUSTY_API_VERSION_CURRENT	(5)
++#define TRUSTY_API_VERSION_FFA		(6)
++#define TRUSTY_API_VERSION_CURRENT	(6)
+ #define SMC_FC_API_VERSION	SMC_FASTCALL_NR(SMC_ENTITY_SECURE_MONITOR, 11)
+ 
+ /* TRUSTED_OS entity calls */
+-- 
+2.34.1
+

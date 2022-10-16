@@ -1,0 +1,43 @@
+From bf890db9200464083c44987cd41c034b1019fc5a Mon Sep 17 00:00:00 2001
+From: Colin Ian King <colin.i.king@googlemail.com>
+Date: Sat, 23 Oct 2021 12:52:09 +0100
+Subject: [PATCH 14/40] optee: Fix spelling mistake "reclain" -> "reclaim"
+
+There are spelling mistakes in pr_err error messages. Fix them.
+
+Fixes: 4615e5a34b95 ("optee: add FF-A support")
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+Reviewed-by: Sumit Garg <sumit.garg@linaro.org>
+[jw: added a fixes]
+Signed-off-by: Jens Wiklander <jens.wiklander@linaro.org>
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com
+---
+ drivers/tee/optee/ffa_abi.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/tee/optee/ffa_abi.c b/drivers/tee/optee/ffa_abi.c
+index 6defd1ec982a..45424824e0f9 100644
+--- a/drivers/tee/optee/ffa_abi.c
++++ b/drivers/tee/optee/ffa_abi.c
+@@ -333,7 +333,7 @@ static int optee_ffa_shm_unregister(struct tee_context *ctx,
+ 
+ 	rc = ffa_ops->memory_reclaim(global_handle, 0);
+ 	if (rc)
+-		pr_err("mem_reclain: 0x%llx %d", global_handle, rc);
++		pr_err("mem_reclaim: 0x%llx %d", global_handle, rc);
+ 
+ 	return rc;
+ }
+@@ -355,7 +355,7 @@ static int optee_ffa_shm_unregister_supp(struct tee_context *ctx,
+ 	optee_shm_rem_ffa_handle(optee, global_handle);
+ 	rc = ffa_ops->memory_reclaim(global_handle, 0);
+ 	if (rc)
+-		pr_err("mem_reclain: 0x%llx %d", global_handle, rc);
++		pr_err("mem_reclaim: 0x%llx %d", global_handle, rc);
+ 
+ 	shm->sec_world_id = 0;
+ 
+-- 
+2.34.1
+

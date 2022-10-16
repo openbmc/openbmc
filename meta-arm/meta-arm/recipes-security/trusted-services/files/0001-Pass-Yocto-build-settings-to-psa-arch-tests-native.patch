@@ -1,0 +1,32 @@
+From 3f9b148fe3cad9f1bc6eb08ff8807c54dec5b8d9 Mon Sep 17 00:00:00 2001
+From: Anton Antonov <Anton.Antonov@arm.com>
+Date: Tue, 11 Oct 2022 16:17:15 +0100
+Subject: [PATCH] Pass Yocto build settings to psa-arch-tests native build
+
+PSA-arch-tests need to build a native executable as a part of target build.
+The patch defines correct toolchain settings for native builds.
+
+Upstream-Status: Inappropriate [Yocto build specific change]
+Signed-off-by: Anton Antonov <Anton.Antonov@arm.com>
+---
+ api-tests/tools/scripts/target_cfg/CMakeLists.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/api-tests/tools/scripts/target_cfg/CMakeLists.txt b/api-tests/tools/scripts/target_cfg/CMakeLists.txt
+index 259eb9c..fec1fb8 100644
+--- a/api-tests/tools/scripts/target_cfg/CMakeLists.txt
++++ b/api-tests/tools/scripts/target_cfg/CMakeLists.txt
+@@ -26,7 +26,9 @@ include("common/CMakeSettings")
+ include("common/Utils")
+ 
+ # Causes toolchain to be re-evaluated
+-unset(ENV{CC})
++set(ENV{CC} $ENV{BUILD_CC})
++set(ENV{CFLAGS} $ENV{BUILD_CFLAGS})
++set(ENV{LDFLAGS} $ENV{BUILD_LDFLAGS})
+ 
+ # Let the CMake look for C compiler
+ project(TargetConfigGen LANGUAGES C)
+-- 
+2.25.1
+

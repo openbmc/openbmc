@@ -1731,7 +1731,7 @@ your software is built:
 
       If you need to install one or more custom CMake toolchain files
       that are supplied by the application you are building, install the
-      files to ``${D}${datadir}/cmake/Modules`` during ``do_install``.
+      files to ``${D}${datadir}/cmake/Modules`` during :ref:`ref-tasks-install`.
 
 -  *Other:* If your source files do not have a ``configure.ac`` or
    ``CMakeLists.txt`` file, then your software is built using some
@@ -1826,8 +1826,8 @@ out-of-tree modules. Your recipe will also need the following::
 Compilation
 -----------
 
-During a build, the ``do_compile`` task happens after source is fetched,
-unpacked, and configured. If the recipe passes through ``do_compile``
+During a build, the :ref:`ref-tasks-compile` task happens after source is fetched,
+unpacked, and configured. If the recipe passes through :ref:`ref-tasks-compile`
 successfully, nothing needs to be done.
 
 However, if the compile step fails, you need to diagnose the failure.
@@ -1888,7 +1888,7 @@ Here are some common issues that cause failures.
 Installing
 ----------
 
-During ``do_install``, the task copies the built files along with their
+During :ref:`ref-tasks-install`, the task copies the built files along with their
 hierarchy to locations that would mirror their locations on the target
 device. The installation process copies files from the
 ``${``\ :term:`S`\ ``}``,
@@ -1906,14 +1906,14 @@ the software being built:
 -  *Autotools and CMake:* If the software your recipe is building uses
    Autotools or CMake, the OpenEmbedded build system understands how to
    install the software. Consequently, you do not have to have a
-   ``do_install`` task as part of your recipe. You just need to make
+   :ref:`ref-tasks-install` task as part of your recipe. You just need to make
    sure the install portion of the build completes with no issues.
    However, if you wish to install additional files not already being
    installed by ``make install``, you should do this using a
    ``do_install:append`` function using the install command as described
    in the "Manual" bulleted item later in this list.
 
--  *Other (using* ``make install``\ *)*: You need to define a ``do_install``
+-  *Other (using* ``make install``\ *)*: You need to define a :ref:`ref-tasks-install`
    function in your recipe. The function should call
    ``oe_runmake install`` and will likely need to pass in the
    destination directory as well. How you pass that path is dependent on
@@ -1923,7 +1923,7 @@ the software being built:
    For an example recipe using ``make install``, see the
    ":ref:`dev-manual/common-tasks:makefile-based package`" section.
 
--  *Manual:* You need to define a ``do_install`` function in your
+-  *Manual:* You need to define a :ref:`ref-tasks-install` function in your
    recipe. The function must first use ``install -d`` to create the
    directories under
    ``${``\ :term:`D`\ ``}``. Once the
@@ -1946,10 +1946,10 @@ installed correctly.
       might need to replace hard-coded paths in an initscript with
       values of variables provided by the build system, such as
       replacing ``/usr/bin/`` with ``${bindir}``. If you do perform such
-      modifications during ``do_install``, be sure to modify the
+      modifications during :ref:`ref-tasks-install`, be sure to modify the
       destination file after copying rather than before copying.
       Modifying after copying ensures that the build system can
-      re-execute ``do_install`` if needed.
+      re-execute :ref:`ref-tasks-install` if needed.
 
    -  ``oe_runmake install``, which can be run directly or can be run
       indirectly by the
@@ -1958,7 +1958,7 @@ installed correctly.
       runs ``make install`` in parallel. Sometimes, a Makefile can have
       missing dependencies between targets that can result in race
       conditions. If you experience intermittent failures during
-      ``do_install``, you might be able to work around them by disabling
+      :ref:`ref-tasks-install`, you might be able to work around them by disabling
       parallel Makefile installs by adding the following to the recipe::
 
          PARALLEL_MAKEINST = ""
@@ -1980,7 +1980,7 @@ additional definitions in your recipe.
 If you are adding services and the service initialization script or the
 service file itself is not installed, you must provide for that
 installation in your recipe using a ``do_install:append`` function. If
-your recipe already has a ``do_install`` function, update the function
+your recipe already has a :ref:`ref-tasks-install` function, update the function
 near its end rather than adding an additional ``do_install:append``
 function.
 
@@ -2028,10 +2028,10 @@ Successful packaging is a combination of automated processes performed
 by the OpenEmbedded build system and some specific steps you need to
 take. The following list describes the process:
 
--  *Splitting Files*: The ``do_package`` task splits the files produced
+-  *Splitting Files*: The :ref:`ref-tasks-package` task splits the files produced
    by the recipe into logical components. Even software that produces a
    single binary might still have debug symbols, documentation, and
-   other logical components that should be split out. The ``do_package``
+   other logical components that should be split out. The :ref:`ref-tasks-package`
    task ensures that files are split up and packaged correctly.
 
 -  *Running QA Checks*: The
@@ -2337,7 +2337,7 @@ Single .c File Package (Hello World!)
 Building an application from a single file that is stored locally (e.g.
 under ``files``) requires a recipe that has the file listed in the
 :term:`SRC_URI` variable. Additionally, you need to manually write the
-``do_compile`` and ``do_install`` tasks. The :term:`S` variable defines the
+:ref:`ref-tasks-compile` and :ref:`ref-tasks-install` tasks. The :term:`S` variable defines the
 directory containing the source code, which is set to
 :term:`WORKDIR` in this case --- the
 directory BitBake uses for the build.
@@ -2401,14 +2401,14 @@ Makefile-Based Package
 
 Applications that use GNU ``make`` also require a recipe that has the
 source archive listed in :term:`SRC_URI`. You do not need to add a
-``do_compile`` step since by default BitBake starts the ``make`` command
+:ref:`ref-tasks-compile` step since by default BitBake starts the ``make`` command
 to compile the application. If you need additional ``make`` options, you
 should store them in the
 :term:`EXTRA_OEMAKE` or
 :term:`PACKAGECONFIG_CONFARGS`
 variables. BitBake passes these options into the GNU ``make``
-invocation. Note that a ``do_install`` task is still required.
-Otherwise, BitBake runs an empty ``do_install`` task by default.
+invocation. Note that a :ref:`ref-tasks-install` task is still required.
+Otherwise, BitBake runs an empty :ref:`ref-tasks-install` task by default.
 
 Some applications might require extra parameters to be passed to the
 compiler. For example, the application might need an additional header
@@ -2551,7 +2551,7 @@ doing the following:
    ``${``\ :term:`S`\ ``}``.
 
    If ``${S}`` might contain a Makefile, or if you inherit some class
-   that replaces ``do_configure`` and ``do_compile`` with custom
+   that replaces :ref:`ref-tasks-configure` and :ref:`ref-tasks-compile` with custom
    versions, then you can use the
    ``[``\ :ref:`noexec <bitbake-user-manual/bitbake-user-manual-metadata:variable flags>`\ ``]``
    flag to turn the tasks into no-ops, as follows::
@@ -2567,7 +2567,7 @@ doing the following:
    :ref:`ref-tasks-patch` tasks to the
    :ref:`ref-tasks-install` task.
 
--  Make sure your ``do_install`` task installs the binaries
+-  Make sure your :ref:`ref-tasks-install` task installs the binaries
    appropriately.
 
 -  Ensure that you set up :term:`FILES`
@@ -2881,7 +2881,7 @@ you can use as references.
 If you are creating a new kernel recipe, normal recipe-writing rules
 apply for setting up a :term:`SRC_URI`. Thus, you need to specify any
 necessary patches and set :term:`S` to point at the source code. You need to
-create a ``do_configure`` task that configures the unpacked kernel with
+create a :ref:`ref-tasks-configure` task that configures the unpacked kernel with
 a ``defconfig`` file. You can do this by using a ``make defconfig``
 command or, more commonly, by copying in a suitable ``defconfig`` file
 and then running ``make oldconfig``. By making use of ``inherit kernel``
@@ -3446,7 +3446,7 @@ Follow these general steps:
    you added to the patch.
 
 6. *Test Your Changes:* Once you have modified the source code, the
-   easiest way to test your changes is by calling the ``do_compile``
+   easiest way to test your changes is by calling the :ref:`ref-tasks-compile`
    task as shown in the following example::
 
       $ bitbake -c compile -f package
@@ -3458,7 +3458,7 @@ Follow these general steps:
    .. note::
 
       All the modifications you make to the temporary source code disappear
-      once you run the ``do_clean`` or ``do_cleanall`` tasks using BitBake
+      once you run the :ref:`ref-tasks-clean` or :ref:`ref-tasks-cleanall` tasks using BitBake
       (i.e. ``bitbake -c clean package`` and ``bitbake -c cleanall package``).
       Modifications will also disappear if you use the ``rm_work`` feature as
       described in the
@@ -3853,8 +3853,8 @@ to be added to the recipe that builds the ``core-image-sato`` image::
    do_image[mcdepends] = "mc:x86:arm:core-image-minimal:do_rootfs"
 
 In this example, the `from_multiconfig` is "x86". The `to_multiconfig` is "arm". The
-task on which the ``do_image`` task in the recipe depends is the
-``do_rootfs`` task from the ``core-image-minimal`` recipe associated
+task on which the :ref:`ref-tasks-image` task in the recipe depends is the
+:ref:`ref-tasks-rootfs` task from the ``core-image-minimal`` recipe associated
 with the "arm" multiconfig.
 
 Once you set up this dependency, you can build the "x86" multiconfig
@@ -3864,7 +3864,7 @@ using a BitBake command as follows::
 
 This command executes all the tasks needed to create the
 ``core-image-sato`` image for the "x86" multiconfig. Because of the
-dependency, BitBake also executes through the ``do_rootfs`` task for the
+dependency, BitBake also executes through the :ref:`ref-tasks-rootfs` task for the
 "arm" multiconfig build.
 
 Having a recipe depend on the root filesystem of another build might not
@@ -3882,99 +3882,59 @@ and have separate configuration files, BitBake places the artifacts for
 each build in the respective temporary build directories (i.e.
 :term:`TMPDIR`).
 
-Building an Initial RAM Filesystem (initramfs) Image
+Building an Initial RAM Filesystem (Initramfs) Image
 ----------------------------------------------------
 
-An initial RAM filesystem (initramfs) image provides a temporary root
-filesystem used for early system initialization (e.g. loading of modules
-needed to locate and mount the "real" root filesystem).
+An initial RAM filesystem (:term:`Initramfs`) image provides a temporary root
+filesystem used for early system initialization, typically providing tools and
+loading modules needed to locate and mount the final root filesystem.
 
-.. note::
+Follow these steps to create an :term:`Initramfs` image:
 
-   The initramfs image is the successor of initial RAM disk (initrd). It
-   is a "copy in and out" (cpio) archive of the initial filesystem that
-   gets loaded into memory during the Linux startup process. Because
-   Linux uses the contents of the archive during initialization, the
-   initramfs image needs to contain all of the device drivers and tools
-   needed to mount the final root filesystem.
-
-Follow these steps to create an initramfs image:
-
-1. *Create the initramfs Image Recipe:* You can reference the
+1. *Create the Initramfs Image Recipe:* You can reference the
    ``core-image-minimal-initramfs.bb`` recipe found in the
    ``meta/recipes-core`` directory of the :term:`Source Directory`
-   as an example
-   from which to work.
+   as an example from which to work.
 
-2. *Decide if You Need to Bundle the initramfs Image Into the Kernel
-   Image:* If you want the initramfs image that is built to be bundled
-   in with the kernel image, set the
-   :term:`INITRAMFS_IMAGE_BUNDLE`
-   variable to "1" in your ``local.conf`` configuration file and set the
-   :term:`INITRAMFS_IMAGE`
-   variable in the recipe that builds the kernel image.
+2. *Decide if You Need to Bundle the Initramfs Image Into the Kernel
+   Image:* If you want the :term:`Initramfs` image that is built to be bundled
+   in with the kernel image, set the :term:`INITRAMFS_IMAGE_BUNDLE`
+   variable to ``"1"`` in your ``local.conf`` configuration file and set the
+   :term:`INITRAMFS_IMAGE` variable in the recipe that builds the kernel image.
 
-   .. note::
-
-      It is recommended that you bundle the initramfs image with the
-      kernel image to avoid circular dependencies between the kernel
-      recipe and the initramfs recipe should the initramfs image include
-      kernel modules.
-
-   Setting the :term:`INITRAMFS_IMAGE_BUNDLE` flag causes the initramfs
+   Setting the :term:`INITRAMFS_IMAGE_BUNDLE` flag causes the :term:`Initramfs`
    image to be unpacked into the ``${B}/usr/`` directory. The unpacked
-   initramfs image is then passed to the kernel's ``Makefile`` using the
-   :term:`CONFIG_INITRAMFS_SOURCE`
-   variable, allowing the initramfs image to be built into the kernel
-   normally.
+   :term:`Initramfs` image is then passed to the kernel's ``Makefile`` using the
+   :term:`CONFIG_INITRAMFS_SOURCE` variable, allowing the :term:`Initramfs`
+   image to be built into the kernel normally.
 
-   .. note::
+3. *Optionally Add Items to the Initramfs Image Through the Initramfs
+   Image Recipe:* If you add items to the :term:`Initramfs` image by way of its
+   recipe, you should use :term:`PACKAGE_INSTALL` rather than
+   :term:`IMAGE_INSTALL`. :term:`PACKAGE_INSTALL` gives more direct control of
+   what is added to the image as compared to the defaults you might not
+   necessarily want that are set by the :ref:`image <ref-classes-image>`
+   or :ref:`core-image <ref-classes-core-image>` classes.
 
-      Bundling the initramfs with the kernel conflates the code in the initramfs
-      with the GPLv2 licensed Linux kernel binary. Thus only GPLv2 compatible
-      software may be part of a bundled initramfs.
-
-   .. note::
-
-      If you choose to not bundle the initramfs image with the kernel
-      image, you are essentially using an
-      `Initial RAM Disk (initrd) <https://en.wikipedia.org/wiki/Initrd>`__.
-      Creating an initrd is handled primarily through the :term:`INITRD_IMAGE`,
-      ``INITRD_LIVE``, and ``INITRD_IMAGE_LIVE`` variables. For more
-      information, see the :ref:`ref-classes-image-live` file.
-
-3. *Optionally Add Items to the initramfs Image Through the initramfs
-   Image Recipe:* If you add items to the initramfs image by way of its
-   recipe, you should use
-   :term:`PACKAGE_INSTALL`
-   rather than
-   :term:`IMAGE_INSTALL`.
-   :term:`PACKAGE_INSTALL` gives more direct control of what is added to the
-   image as compared to the defaults you might not necessarily want that
-   are set by the :ref:`image <ref-classes-image>`
-   or :ref:`core-image <ref-classes-core-image>`
-   classes.
-
-4. *Build the Kernel Image and the initramfs Image:* Build your kernel
-   image using BitBake. Because the initramfs image recipe is a
-   dependency of the kernel image, the initramfs image is built as well
+4. *Build the Kernel Image and the Initramfs Image:* Build your kernel
+   image using BitBake. Because the :term:`Initramfs` image recipe is a
+   dependency of the kernel image, the :term:`Initramfs` image is built as well
    and bundled with the kernel image if you used the
-   :term:`INITRAMFS_IMAGE_BUNDLE`
-   variable described earlier.
+   :term:`INITRAMFS_IMAGE_BUNDLE` variable described earlier.
 
 Bundling an Initramfs Image From a Separate Multiconfig
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There may be a case where we want to build an initramfs image which does not
+There may be a case where we want to build an :term:`Initramfs` image which does not
 inherit the same distro policy as our main image, for example, we may want
-our main image to use ``TCLIBC="glibc"``, but to use ``TCLIBC="musl"`` in our initramfs
+our main image to use ``TCLIBC="glibc"``, but to use ``TCLIBC="musl"`` in our :term:`Initramfs`
 image to keep a smaller footprint. However, by performing the steps mentioned
-above the initramfs image will inherit ``TCLIBC="glibc"`` without allowing us
+above the :term:`Initramfs` image will inherit ``TCLIBC="glibc"`` without allowing us
 to override it.
 
 To achieve this, you need to perform some additional steps:
 
-1. *Create a multiconfig for your initramfs image:* You can perform the steps
+1. *Create a multiconfig for your Initramfs image:* You can perform the steps
    on ":ref:`dev-manual/common-tasks:building images for multiple targets using multiple configurations`" to create a separate multiconfig.
    For the sake of simplicity let's assume such multiconfig is called: ``initramfscfg.conf`` and
    contains the variables::
@@ -3982,7 +3942,7 @@ To achieve this, you need to perform some additional steps:
       TMPDIR="${TOPDIR}/tmp-initramfscfg"
       TCLIBC="musl"
 
-2. *Set additional initramfs variables on your main configuration:*
+2. *Set additional Initramfs variables on your main configuration:*
    Additionally, on your main configuration (``local.conf``) you need to set the
    variables::
 
@@ -3995,9 +3955,9 @@ To achieve this, you need to perform some additional steps:
    buildsystem know where the :term:`INITRAMFS_IMAGE` will be located.
 
    Building a system with such configuration will build the kernel using the
-   main configuration but the ``do_bundle_initramfs`` task will grab the
+   main configuration but the :ref:`ref-tasks-bundle_initramfs` task will grab the
    selected :term:`INITRAMFS_IMAGE` from :term:`INITRAMFS_DEPLOY_DIR_IMAGE`
-   instead, resulting in a musl based initramfs image bundled in the kernel
+   instead, resulting in a musl based :term:`Initramfs` image bundled in the kernel
    but a glibc based main image.
 
    The same is applicable to avoid inheriting :term:`DISTRO_FEATURES` on :term:`INITRAMFS_IMAGE`
@@ -4171,7 +4131,7 @@ file::
 Finally, you should consider exactly the type of root filesystem you
 need to meet your needs while also reducing its size. For example,
 consider ``cramfs``, ``squashfs``, ``ubifs``, ``ext2``, or an
-``initramfs`` using ``initramfs``. Be aware that ``ext3`` requires a 1
+:term:`Initramfs` using ``initramfs``. Be aware that ``ext3`` requires a 1
 Mbyte journal. If you are okay with running read-only, you do not need
 this journal.
 
@@ -4740,7 +4700,7 @@ the built library.
 The :term:`PACKAGES` and
 :term:`FILES:* <FILES>` variables in the
 ``meta/conf/bitbake.conf`` configuration file define how files installed
-by the ``do_install`` task are packaged. By default, the :term:`PACKAGES`
+by the :ref:`ref-tasks-install` task are packaged. By default, the :term:`PACKAGES`
 variable includes ``${PN}-staticdev``, which represents all static
 library files.
 
@@ -6902,7 +6862,7 @@ The previous example specifies a number of things in the call to
 ``do_split_packages``.
 
 -  A directory within the files installed by your recipe through
-   ``do_install`` in which to search.
+   :ref:`ref-tasks-install` in which to search.
 
 -  A regular expression used to match module files in that directory. In
    the example, note the parentheses () that mark the part of the
@@ -8481,7 +8441,7 @@ The following list shows the files produced for SDKs:
    information.
 
 -  ``sstate-task-sizes.txt:`` A text file containing name-value pairs
-   with information about task group sizes (e.g. ``do_populate_sysroot``
+   with information about task group sizes (e.g. :ref:`ref-tasks-populate_sysroot`
    tasks have a total size). The ``sstate-task-sizes.txt`` file exists
    only when an extensible SDK is created.
 
@@ -8802,7 +8762,7 @@ perform a one-time setup of your controller image by doing the following:
    -  Installs normal linux utilities not BusyBox ones (e.g. ``bash``,
       ``coreutils``, ``tar``, ``gzip``, and ``kmod``).
 
-   -  Uses a custom Initial RAM Disk (initramfs) image with a custom
+   -  Uses a custom :term:`Initramfs` image with a custom
       installer. A normal image that you can install usually creates a
       single root filesystem partition. This image uses another installer that
       creates a specific partition layout. Not all Board Support
@@ -9081,7 +9041,7 @@ Class methods are as follows:
 
 -  *hasPackage(pkg):* Returns "True" if ``pkg`` is in the installed
    package list of the image, which is based on the manifest file that
-   is generated during the ``do_rootfs`` task.
+   is generated during the :ref:`ref-tasks-rootfs` task.
 
 -  *hasFeature(feature):* Returns "True" if the feature is in
    :term:`IMAGE_FEATURES` or
@@ -9633,11 +9593,11 @@ Running Specific Tasks
 ----------------------
 
 Any given recipe consists of a set of tasks. The standard BitBake
-behavior in most cases is: ``do_fetch``, ``do_unpack``, ``do_patch``,
-``do_configure``, ``do_compile``, ``do_install``, ``do_package``,
-``do_package_write_*``, and ``do_build``. The default task is
-``do_build`` and any tasks on which it depends build first. Some tasks,
-such as ``do_devshell``, are not part of the default build chain. If you
+behavior in most cases is: :ref:`ref-tasks-fetch`, :ref:`ref-tasks-unpack`, :ref:`ref-tasks-patch`,
+:ref:`ref-tasks-configure`, :ref:`ref-tasks-compile`, :ref:`ref-tasks-install`, :ref:`ref-tasks-package`,
+:ref:`do_package_write_* <ref-tasks-package_write_deb>`, and :ref:`ref-tasks-build`. The default task is
+:ref:`ref-tasks-build` and any tasks on which it depends build first. Some tasks,
+such as :ref:`ref-tasks-devshell`, are not part of the default build chain. If you
 wish to run a task that is not part of the default build chain, you can
 use the ``-c`` option in BitBake. Here is an example::
 
@@ -9677,7 +9637,7 @@ The following example shows one way you can use the ``-f`` option::
 
 This sequence first builds and then recompiles ``matchbox-desktop``. The
 last command reruns all tasks (basically the packaging tasks) after the
-compile. BitBake recognizes that the ``do_compile`` task was rerun and
+compile. BitBake recognizes that the :ref:`ref-tasks-compile` task was rerun and
 therefore understands that the other tasks also need to be run again.
 
 Another, shorter way to rerun a task and all
@@ -9724,7 +9684,7 @@ task dependency mechanisms.
 
 
 You can view a list of tasks in a given package by running the
-``do_listtasks`` task as follows::
+:ref:`ref-tasks-listtasks` task as follows::
 
    $ bitbake matchbox-desktop -c listtasks
 

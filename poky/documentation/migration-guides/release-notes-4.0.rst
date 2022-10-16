@@ -30,7 +30,7 @@ New Features / Enhancements in 4.0
 
 - New :ref:`overlayfs <ref-classes-overlayfs>` and
   :ref:`overlayfs-etc <ref-classes-overlayfs-etc>` classes and
-  ``overlayroot`` support in the initramfs framework to make it easier to
+  ``overlayroot`` support in the :term:`Initramfs` framework to make it easier to
   overlay read-only filesystems (for example) with
   `OverlayFS <https://en.wikipedia.org/wiki/OverlayFS>`__.
 
@@ -168,7 +168,7 @@ New Features / Enhancements in 4.0
 
 -  Kernel-related enhancements:
 
-   - Allow initramfs to be built from a separate multiconfig
+   - Allow :term:`Initramfs` to be built from a separate multiconfig
    - Make kernel-base recommend kernel-image, not depend (allowing images containing kernel modules without kernel image)
    - linux-yocto: split vtpm for more granular inclusion
    - linux-yocto: cfg/debug: add configs for kcsan
@@ -182,7 +182,7 @@ New Features / Enhancements in 4.0
 
 - FIT image related enhancements:
 
-   - New ``FIT_SUPPORTED_INITRAMFS_FSTYPES`` variable to allow extending initramfs image types to look for
+   - New ``FIT_SUPPORTED_INITRAMFS_FSTYPES`` variable to allow extending :term:`Initramfs` image types to look for
    - New ``FIT_CONF_PREFIX`` variable to allow overriding FIT configuration prefix
    - Use 'bbnote' for better logging
 
@@ -276,7 +276,7 @@ New Features / Enhancements in 4.0
 - volatile-binds: SELinux and overlayfs extensions in mount-copybind
 - gtk-icon-cache: Allow using gtk4
 - kmod: Add an exclude directive to depmod
-- os-release: add os-release-initrd package for use in systemd-based initramfs images
+- os-release: add os-release-initrd package for use in systemd-based :term:`Initramfs` images
 - gstreamer1.0-plugins-base: add support for graphene
 - gpg-sign: Add parameters to gpg signature function
 - package_manager: sign DEB package feeds

@@ -135,7 +135,7 @@ Fetching these types of dependencies that are not provided in the
 sysroot negatively affects the ability to reproduce builds. This type of
 fetching is now explicitly disabled. Consequently, any missing
 dependencies in Python recipes that use these classes now result in an
-error during the ``do_configure`` task.
+error during the :ref:`ref-tasks-configure` task.
 
 .. _migration-2.6-linux-yocto-configuration-audit-issues-now-correctly-reported:
 

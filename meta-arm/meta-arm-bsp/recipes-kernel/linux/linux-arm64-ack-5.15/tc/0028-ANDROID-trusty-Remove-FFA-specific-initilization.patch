@@ -1,0 +1,1077 @@
+From 1ecad11415cff1f4a1f098ddb224293fcc8df4a1 Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Fri, 14 Jan 2022 13:41:26 +0000
+Subject: [PATCH 28/40] ANDROID: trusty: Remove FFA specific initilization
+
+Remove FFA specific initialization and its arm_ffa.h file from Trusty
+driver. These changes are done so that Trusty can use ARM FFA driver
+and its related header files.
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Change-Id: Iaad473659de94930cdf78cd7201f016d59cee8d7
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com
+---
+ drivers/trusty/trusty-mem.c    |  37 ---
+ drivers/trusty/trusty.c        | 286 +---------------
+ include/linux/trusty/arm_ffa.h | 590 ---------------------------------
+ include/linux/trusty/trusty.h  |   3 -
+ 4 files changed, 3 insertions(+), 913 deletions(-)
+ delete mode 100644 include/linux/trusty/arm_ffa.h
+
+diff --git a/drivers/trusty/trusty-mem.c b/drivers/trusty/trusty-mem.c
+index 8a360298e501..7775ff76c38c 100644
+--- a/drivers/trusty/trusty-mem.c
++++ b/drivers/trusty/trusty-mem.c
+@@ -5,7 +5,6 @@
+ 
+ #include <linux/types.h>
+ #include <linux/printk.h>
+-#include <linux/trusty/arm_ffa.h>
+ #include <linux/trusty/trusty.h>
+ #include <linux/trusty/smcall.h>
+ 
+@@ -75,8 +74,6 @@ int trusty_encode_page_info(struct ns_mem_page_info *inf,
+ {
+ 	int mem_attr;
+ 	u64 pte;
+-	u8 ffa_mem_attr;
+-	u8 ffa_mem_perm = 0;
+ 
+ 	if (!inf || !page)
+ 		return -EINVAL;
+@@ -89,30 +86,6 @@ int trusty_encode_page_info(struct ns_mem_page_info *inf,
+ 	if (mem_attr < 0)
+ 		return mem_attr;
+ 
+-	switch (mem_attr) {
+-	case MEM_ATTR_STRONGLY_ORDERED:
+-		ffa_mem_attr = FFA_MEM_ATTR_DEVICE_NGNRNE;
+-		break;
+-
+-	case MEM_ATTR_DEVICE:
+-		ffa_mem_attr = FFA_MEM_ATTR_DEVICE_NGNRE;
+-		break;
+-
+-	case MEM_ATTR_NORMAL_NON_CACHEABLE:
+-		ffa_mem_attr = FFA_MEM_ATTR_NORMAL_MEMORY_UNCACHED;
+-		break;
+-
+-	case MEM_ATTR_NORMAL_WRITE_BACK_READ_ALLOCATE:
+-	case MEM_ATTR_NORMAL_WRITE_BACK_WRITE_ALLOCATE:
+-		ffa_mem_attr = FFA_MEM_ATTR_NORMAL_MEMORY_CACHED_WB;
+-		break;
+-
+-	default:
+-		return -EINVAL;
+-	}
+-
+-	inf->paddr = pte;
+-
+ 	/* add other attributes */
+ #if defined(CONFIG_ARM64) || defined(CONFIG_ARM_LPAE)
+ 	pte |= pgprot_val(pgprot);
+@@ -123,16 +96,6 @@ int trusty_encode_page_info(struct ns_mem_page_info *inf,
+ 		pte |= ATTR_INNER_SHAREABLE; /* inner sharable */
+ #endif
+ 
+-	if (!(pte & ATTR_RDONLY))
+-		ffa_mem_perm |= FFA_MEM_PERM_RW;
+-	else
+-		ffa_mem_perm |= FFA_MEM_PERM_RO;
+-
+-	if ((pte & ATTR_INNER_SHAREABLE) == ATTR_INNER_SHAREABLE)
+-		ffa_mem_attr |= FFA_MEM_ATTR_INNER_SHAREABLE;
+-
+-	inf->ffa_mem_attr = ffa_mem_attr;
+-	inf->ffa_mem_perm = ffa_mem_perm;
+ 	inf->compat_attr = (pte & 0x0000FFFFFFFFFFFFull) |
+ 			   ((u64)mem_attr << 48);
+ 	return 0;
+diff --git a/drivers/trusty/trusty.c b/drivers/trusty/trusty.c
+index 265eab52aea0..2dec75398f69 100644
+--- a/drivers/trusty/trusty.c
++++ b/drivers/trusty/trusty.c
+@@ -11,7 +11,6 @@
+ #include <linux/slab.h>
+ #include <linux/stat.h>
+ #include <linux/string.h>
+-#include <linux/trusty/arm_ffa.h>
+ #include <linux/trusty/smcall.h>
+ #include <linux/trusty/sm_err.h>
+ #include <linux/trusty/trusty.h>
+@@ -42,11 +41,6 @@ struct trusty_state {
+ 	struct list_head nop_queue;
+ 	spinlock_t nop_lock; /* protects nop_queue */
+ 	struct device_dma_parameters dma_parms;
+-	void *ffa_tx;
+-	void *ffa_rx;
+-	u16 ffa_local_id;
+-	u16 ffa_remote_id;
+-	struct mutex share_memory_msg_lock; /* protects share_memory_msg */
+ };
+ 
+ static inline unsigned long smc(unsigned long r0, unsigned long r1,
+@@ -246,19 +240,6 @@ int trusty_transfer_memory(struct device *dev, u64 *id,
+ 	struct ns_mem_page_info pg_inf;
+ 	struct scatterlist *sg;
+ 	size_t count;
+-	size_t i;
+-	size_t len;
+-	u64 ffa_handle = 0;
+-	size_t total_len;
+-	size_t endpoint_count = 1;
+-	struct ffa_mtd *mtd = s->ffa_tx;
+-	size_t comp_mrd_offset = offsetof(struct ffa_mtd, emad[endpoint_count]);
+-	struct ffa_comp_mrd *comp_mrd = s->ffa_tx + comp_mrd_offset;
+-	struct ffa_cons_mrd *cons_mrd = comp_mrd->address_range_array;
+-	size_t cons_mrd_offset = (void *)cons_mrd - s->ffa_tx;
+-	struct smc_ret8 smc_ret;
+-	u32 cookie_low;
+-	u32 cookie_high;
+ 
+ 	if (WARN_ON(dev->driver != &trusty_driver.driver))
+ 		return -EINVAL;
+@@ -284,126 +265,11 @@ int trusty_transfer_memory(struct device *dev, u64 *id,
+ 	if (ret) {
+ 		dev_err(s->dev, "%s: trusty_encode_page_info failed\n",
+ 			__func__);
+-		goto err_encode_page_info;
+-	}
+-
+-	if (s->api_version < TRUSTY_API_VERSION_MEM_OBJ) {
+-		*id = pg_inf.compat_attr;
+-		return 0;
+-	}
+-
+-	len = 0;
+-	for_each_sg(sglist, sg, nents, i)
+-		len += sg_dma_len(sg);
+-
+-	mutex_lock(&s->share_memory_msg_lock);
+-
+-	mtd->sender_id = s->ffa_local_id;
+-	mtd->memory_region_attributes = pg_inf.ffa_mem_attr;
+-	mtd->reserved_3 = 0;
+-	mtd->flags = 0;
+-	mtd->handle = 0;
+-	mtd->tag = tag;
+-	mtd->reserved_24_27 = 0;
+-	mtd->emad_count = endpoint_count;
+-	for (i = 0; i < endpoint_count; i++) {
+-		struct ffa_emad *emad = &mtd->emad[i];
+-		/* TODO: support stream ids */
+-		emad->mapd.endpoint_id = s->ffa_remote_id;
+-		emad->mapd.memory_access_permissions = pg_inf.ffa_mem_perm;
+-		emad->mapd.flags = 0;
+-		emad->comp_mrd_offset = comp_mrd_offset;
+-		emad->reserved_8_15 = 0;
+-	}
+-	comp_mrd->total_page_count = len / PAGE_SIZE;
+-	comp_mrd->address_range_count = nents;
+-	comp_mrd->reserved_8_15 = 0;
+-
+-	total_len = cons_mrd_offset + nents * sizeof(*cons_mrd);
+-	sg = sglist;
+-	while (count) {
+-		size_t lcount =
+-			min_t(size_t, count, (PAGE_SIZE - cons_mrd_offset) /
+-			      sizeof(*cons_mrd));
+-		size_t fragment_len = lcount * sizeof(*cons_mrd) +
+-				      cons_mrd_offset;
+-
+-		for (i = 0; i < lcount; i++) {
+-			cons_mrd[i].address = sg_dma_address(sg);
+-			cons_mrd[i].page_count = sg_dma_len(sg) / PAGE_SIZE;
+-			cons_mrd[i].reserved_12_15 = 0;
+-			sg = sg_next(sg);
+-		}
+-		count -= lcount;
+-		if (cons_mrd_offset) {
+-			u32 smc = lend ? SMC_FC_FFA_MEM_LEND :
+-					 SMC_FC_FFA_MEM_SHARE;
+-			/* First fragment */
+-			smc_ret = trusty_smc8(smc, total_len,
+-					      fragment_len, 0, 0, 0, 0, 0);
+-		} else {
+-			smc_ret = trusty_smc8(SMC_FC_FFA_MEM_FRAG_TX,
+-					      cookie_low, cookie_high,
+-					      fragment_len, 0, 0, 0, 0);
+-		}
+-		if (smc_ret.r0 == SMC_FC_FFA_MEM_FRAG_RX) {
+-			cookie_low = smc_ret.r1;
+-			cookie_high = smc_ret.r2;
+-			dev_dbg(s->dev, "cookie %x %x", cookie_low,
+-				cookie_high);
+-			if (!count) {
+-				/*
+-				 * We have sent all our descriptors. Expected
+-				 * SMC_FC_FFA_SUCCESS, not a request to send
+-				 * another fragment.
+-				 */
+-				dev_err(s->dev, "%s: fragment_len %zd/%zd, unexpected SMC_FC_FFA_MEM_FRAG_RX\n",
+-					__func__, fragment_len, total_len);
+-				ret = -EIO;
+-				break;
+-			}
+-		} else if (smc_ret.r0 == SMC_FC_FFA_SUCCESS) {
+-			ffa_handle = smc_ret.r2 | (u64)smc_ret.r3 << 32;
+-			dev_dbg(s->dev, "%s: fragment_len %zu/%zu, got handle 0x%llx\n",
+-				__func__, fragment_len, total_len,
+-				ffa_handle);
+-			if (count) {
+-				/*
+-				 * We have not sent all our descriptors.
+-				 * Expected SMC_FC_FFA_MEM_FRAG_RX not
+-				 * SMC_FC_FFA_SUCCESS.
+-				 */
+-				dev_err(s->dev, "%s: fragment_len %zu/%zu, unexpected SMC_FC_FFA_SUCCESS, count %zu != 0\n",
+-					__func__, fragment_len, total_len,
+-					count);
+-				ret = -EIO;
+-				break;
+-			}
+-		} else {
+-			dev_err(s->dev, "%s: fragment_len %zu/%zu, SMC_FC_FFA_MEM_SHARE failed 0x%lx 0x%lx 0x%lx",
+-				__func__, fragment_len, total_len,
+-				smc_ret.r0, smc_ret.r1, smc_ret.r2);
+-			ret = -EIO;
+-			break;
+-		}
+-
+-		cons_mrd = s->ffa_tx;
+-		cons_mrd_offset = 0;
+-	}
+-
+-	mutex_unlock(&s->share_memory_msg_lock);
+-
+-	if (!ret) {
+-		*id = ffa_handle;
+-		dev_dbg(s->dev, "%s: done\n", __func__);
+-		return 0;
++		return ret;
+ 	}
+ 
+-	dev_err(s->dev, "%s: failed %d", __func__, ret);
+-
+-err_encode_page_info:
+-	dma_unmap_sg(dev, sglist, nents, DMA_BIDIRECTIONAL);
+-	return ret;
++	*id = pg_inf.compat_attr;
++	return 0;
+ }
+ EXPORT_SYMBOL(trusty_transfer_memory);
+ 
+@@ -433,8 +299,6 @@ int trusty_reclaim_memory(struct device *dev, u64 id,
+ 			  struct scatterlist *sglist, unsigned int nents)
+ {
+ 	struct trusty_state *s = platform_get_drvdata(to_platform_device(dev));
+-	int ret = 0;
+-	struct smc_ret8 smc_ret;
+ 
+ 	if (WARN_ON(dev->driver != &trusty_driver.driver))
+ 		return -EINVAL;
+@@ -454,28 +318,6 @@ int trusty_reclaim_memory(struct device *dev, u64 id,
+ 		return 0;
+ 	}
+ 
+-	mutex_lock(&s->share_memory_msg_lock);
+-
+-	smc_ret = trusty_smc8(SMC_FC_FFA_MEM_RECLAIM, (u32)id, id >> 32, 0, 0,
+-			      0, 0, 0);
+-	if (smc_ret.r0 != SMC_FC_FFA_SUCCESS) {
+-		dev_err(s->dev, "%s: SMC_FC_FFA_MEM_RECLAIM failed 0x%lx 0x%lx 0x%lx",
+-			__func__, smc_ret.r0, smc_ret.r1, smc_ret.r2);
+-		if (smc_ret.r0 == SMC_FC_FFA_ERROR &&
+-		    smc_ret.r2 == FFA_ERROR_DENIED)
+-			ret = -EBUSY;
+-		else
+-			ret = -EIO;
+-	}
+-
+-	mutex_unlock(&s->share_memory_msg_lock);
+-
+-	if (ret != 0)
+-		return ret;
+-
+-	dma_unmap_sg(dev, sglist, nents, DMA_BIDIRECTIONAL);
+-
+-	dev_dbg(s->dev, "%s: done\n", __func__);
+ 	return 0;
+ }
+ EXPORT_SYMBOL(trusty_reclaim_memory);
+@@ -527,118 +369,6 @@ const char *trusty_version_str_get(struct device *dev)
+ }
+ EXPORT_SYMBOL(trusty_version_str_get);
+ 
+-static int trusty_init_msg_buf(struct trusty_state *s, struct device *dev)
+-{
+-	phys_addr_t tx_paddr;
+-	phys_addr_t rx_paddr;
+-	int ret;
+-	struct smc_ret8 smc_ret;
+-
+-	if (s->api_version < TRUSTY_API_VERSION_MEM_OBJ)
+-		return 0;
+-
+-	/* Get supported FF-A version and check if it is compatible */
+-	smc_ret = trusty_smc8(SMC_FC_FFA_VERSION, FFA_CURRENT_VERSION, 0, 0,
+-			      0, 0, 0, 0);
+-	if (FFA_VERSION_TO_MAJOR(smc_ret.r0) != FFA_CURRENT_VERSION_MAJOR) {
+-		dev_err(s->dev,
+-			"%s: Unsupported FF-A version 0x%lx, expected 0x%x\n",
+-			__func__, smc_ret.r0, FFA_CURRENT_VERSION);
+-		ret = -EIO;
+-		goto err_version;
+-	}
+-
+-	/* Check that SMC_FC_FFA_MEM_SHARE is implemented */
+-	smc_ret = trusty_smc8(SMC_FC_FFA_FEATURES, SMC_FC_FFA_MEM_SHARE, 0, 0,
+-			      0, 0, 0, 0);
+-	if (smc_ret.r0 != SMC_FC_FFA_SUCCESS) {
+-		dev_err(s->dev,
+-			"%s: SMC_FC_FFA_FEATURES(SMC_FC_FFA_MEM_SHARE) failed 0x%lx 0x%lx 0x%lx\n",
+-			__func__, smc_ret.r0, smc_ret.r1, smc_ret.r2);
+-		ret = -EIO;
+-		goto err_features;
+-	}
+-
+-	/*
+-	 * Set FF-A endpoint IDs.
+-	 *
+-	 * Hardcode 0x8000 for the secure os.
+-	 * TODO: Use FF-A call or device tree to configure this dynamically
+-	 */
+-	smc_ret = trusty_smc8(SMC_FC_FFA_ID_GET, 0, 0, 0, 0, 0, 0, 0);
+-	if (smc_ret.r0 != SMC_FC_FFA_SUCCESS) {
+-		dev_err(s->dev,
+-			"%s: SMC_FC_FFA_ID_GET failed 0x%lx 0x%lx 0x%lx\n",
+-			__func__, smc_ret.r0, smc_ret.r1, smc_ret.r2);
+-		ret = -EIO;
+-		goto err_id_get;
+-	}
+-
+-	s->ffa_local_id = smc_ret.r2;
+-	s->ffa_remote_id = 0x8000;
+-
+-	s->ffa_tx = kmalloc(PAGE_SIZE, GFP_KERNEL);
+-	if (!s->ffa_tx) {
+-		ret = -ENOMEM;
+-		goto err_alloc_tx;
+-	}
+-	tx_paddr = virt_to_phys(s->ffa_tx);
+-	if (WARN_ON(tx_paddr & (PAGE_SIZE - 1))) {
+-		ret = -EINVAL;
+-		goto err_unaligned_tx_buf;
+-	}
+-
+-	s->ffa_rx = kmalloc(PAGE_SIZE, GFP_KERNEL);
+-	if (!s->ffa_rx) {
+-		ret = -ENOMEM;
+-		goto err_alloc_rx;
+-	}
+-	rx_paddr = virt_to_phys(s->ffa_rx);
+-	if (WARN_ON(rx_paddr & (PAGE_SIZE - 1))) {
+-		ret = -EINVAL;
+-		goto err_unaligned_rx_buf;
+-	}
+-
+-	smc_ret = trusty_smc8(SMC_FCZ_FFA_RXTX_MAP, tx_paddr, rx_paddr, 1, 0,
+-			      0, 0, 0);
+-	if (smc_ret.r0 != SMC_FC_FFA_SUCCESS) {
+-		dev_err(s->dev, "%s: SMC_FCZ_FFA_RXTX_MAP failed 0x%lx 0x%lx 0x%lx\n",
+-			__func__, smc_ret.r0, smc_ret.r1, smc_ret.r2);
+-		ret = -EIO;
+-		goto err_rxtx_map;
+-	}
+-
+-	return 0;
+-
+-err_rxtx_map:
+-err_unaligned_rx_buf:
+-	kfree(s->ffa_rx);
+-	s->ffa_rx = NULL;
+-err_alloc_rx:
+-err_unaligned_tx_buf:
+-	kfree(s->ffa_tx);
+-	s->ffa_tx = NULL;
+-err_alloc_tx:
+-err_id_get:
+-err_features:
+-err_version:
+-	return ret;
+-}
+-
+-static void trusty_free_msg_buf(struct trusty_state *s, struct device *dev)
+-{
+-	struct smc_ret8 smc_ret;
+-
+-	smc_ret = trusty_smc8(SMC_FC_FFA_RXTX_UNMAP, 0, 0, 0, 0, 0, 0, 0);
+-	if (smc_ret.r0 != SMC_FC_FFA_SUCCESS) {
+-		dev_err(s->dev, "%s: SMC_FC_FFA_RXTX_UNMAP failed 0x%lx 0x%lx 0x%lx\n",
+-			__func__, smc_ret.r0, smc_ret.r1, smc_ret.r2);
+-	} else {
+-		kfree(s->ffa_rx);
+-		kfree(s->ffa_tx);
+-	}
+-}
+-
+ static void trusty_init_version(struct trusty_state *s, struct device *dev)
+ {
+ 	int ret;
+@@ -842,7 +572,6 @@ static int trusty_probe(struct platform_device *pdev)
+ 	spin_lock_init(&s->nop_lock);
+ 	INIT_LIST_HEAD(&s->nop_queue);
+ 	mutex_init(&s->smc_lock);
+-	mutex_init(&s->share_memory_msg_lock);
+ 	ATOMIC_INIT_NOTIFIER_HEAD(&s->notifier);
+ 	init_completion(&s->cpu_idle_completion);
+ 
+@@ -862,10 +591,6 @@ static int trusty_probe(struct platform_device *pdev)
+ 	if (ret < 0)
+ 		goto err_api_version;
+ 
+-	ret = trusty_init_msg_buf(s, &pdev->dev);
+-	if (ret < 0)
+-		goto err_init_msg_buf;
+-
+ 	s->nop_wq = alloc_workqueue("trusty-nop-wq", WQ_CPU_INTENSIVE, 0);
+ 	if (!s->nop_wq) {
+ 		ret = -ENODEV;
+@@ -910,13 +635,10 @@ static int trusty_probe(struct platform_device *pdev)
+ err_alloc_works:
+ 	destroy_workqueue(s->nop_wq);
+ err_create_nop_wq:
+-	trusty_free_msg_buf(s, &pdev->dev);
+-err_init_msg_buf:
+ err_api_version:
+ 	s->dev->dma_parms = NULL;
+ 	kfree(s->version_str);
+ 	device_for_each_child(&pdev->dev, NULL, trusty_remove_child);
+-	mutex_destroy(&s->share_memory_msg_lock);
+ 	mutex_destroy(&s->smc_lock);
+ 	kfree(s);
+ err_allocate_state:
+@@ -938,9 +660,7 @@ static int trusty_remove(struct platform_device *pdev)
+ 	free_percpu(s->nop_works);
+ 	destroy_workqueue(s->nop_wq);
+ 
+-	mutex_destroy(&s->share_memory_msg_lock);
+ 	mutex_destroy(&s->smc_lock);
+-	trusty_free_msg_buf(s, &pdev->dev);
+ 	s->dev->dma_parms = NULL;
+ 	kfree(s->version_str);
+ 	kfree(s);
+diff --git a/include/linux/trusty/arm_ffa.h b/include/linux/trusty/arm_ffa.h
+deleted file mode 100644
+index ab7b2afb794c..000000000000
+--- a/include/linux/trusty/arm_ffa.h
++++ /dev/null
+@@ -1,590 +0,0 @@
+-/* SPDX-License-Identifier: MIT */
+-/*
+- * Copyright (C) 2020 Google, Inc.
+- *
+- * Trusty and TF-A also have a copy of this header.
+- * Please keep the copies in sync.
+- */
+-#ifndef __LINUX_TRUSTY_ARM_FFA_H
+-#define __LINUX_TRUSTY_ARM_FFA_H
+-
+-/*
+- * Subset of Arm PSA Firmware Framework for Arm v8-A 1.0 EAC 1_0
+- * (https://developer.arm.com/docs/den0077/a) needed for shared memory.
+- */
+-
+-#include "smcall.h"
+-
+-#ifndef STATIC_ASSERT
+-#define STATIC_ASSERT(e) _Static_assert(e, #e)
+-#endif
+-
+-#define FFA_CURRENT_VERSION_MAJOR (1U)
+-#define FFA_CURRENT_VERSION_MINOR (0U)
+-
+-#define FFA_VERSION_TO_MAJOR(version) ((version) >> 16)
+-#define FFA_VERSION_TO_MINOR(version) ((version) & (0xffff))
+-#define FFA_VERSION(major, minor) (((major) << 16) | (minor))
+-#define FFA_CURRENT_VERSION \
+-	FFA_VERSION(FFA_CURRENT_VERSION_MAJOR, FFA_CURRENT_VERSION_MINOR)
+-
+-#define SMC_ENTITY_SHARED_MEMORY 4
+-
+-#define SMC_FASTCALL_NR_SHARED_MEMORY(nr) \
+-	SMC_FASTCALL_NR(SMC_ENTITY_SHARED_MEMORY, nr)
+-#define SMC_FASTCALL64_NR_SHARED_MEMORY(nr) \
+-	SMC_FASTCALL64_NR(SMC_ENTITY_SHARED_MEMORY, nr)
+-
+-/**
+- * typedef ffa_endpoint_id16_t - Endpoint ID
+- *
+- * Current implementation only supports VMIDs. FFA spec also support stream
+- * endpoint ids.
+- */
+-typedef uint16_t ffa_endpoint_id16_t;
+-
+-/**
+- * struct ffa_cons_mrd - Constituent memory region descriptor
+- * @address:
+- *         Start address of contiguous memory region. Must be 4K page aligned.
+- * @page_count:
+- *         Number of 4K pages in region.
+- * @reserved_12_15:
+- *         Reserve bytes 12-15 to pad struct size to 16 bytes.
+- */
+-struct ffa_cons_mrd {
+-	uint64_t address;
+-	uint32_t page_count;
+-	uint32_t reserved_12_15;
+-};
+-STATIC_ASSERT(sizeof(struct ffa_cons_mrd) == 16);
+-
+-/**
+- * struct ffa_comp_mrd - Composite memory region descriptor
+- * @total_page_count:
+- *         Number of 4k pages in memory region. Must match sum of
+- *         @address_range_array[].page_count.
+- * @address_range_count:
+- *         Number of entries in @address_range_array.
+- * @reserved_8_15:
+- *         Reserve bytes 8-15 to pad struct size to 16 byte alignment and
+- *         make @address_range_array 16 byte aligned.
+- * @address_range_array:
+- *         Array of &struct ffa_cons_mrd entries.
+- */
+-struct ffa_comp_mrd {
+-	uint32_t total_page_count;
+-	uint32_t address_range_count;
+-	uint64_t reserved_8_15;
+-	struct ffa_cons_mrd address_range_array[];
+-};
+-STATIC_ASSERT(sizeof(struct ffa_comp_mrd) == 16);
+-
+-/**
+- * typedef ffa_mem_attr8_t - Memory region attributes
+- *
+- * * @FFA_MEM_ATTR_DEVICE_NGNRNE:
+- *     Device-nGnRnE.
+- * * @FFA_MEM_ATTR_DEVICE_NGNRE:
+- *     Device-nGnRE.
+- * * @FFA_MEM_ATTR_DEVICE_NGRE:
+- *     Device-nGRE.
+- * * @FFA_MEM_ATTR_DEVICE_GRE:
+- *     Device-GRE.
+- * * @FFA_MEM_ATTR_NORMAL_MEMORY_UNCACHED
+- *     Normal memory. Non-cacheable.
+- * * @FFA_MEM_ATTR_NORMAL_MEMORY_CACHED_WB
+- *     Normal memory. Write-back cached.
+- * * @FFA_MEM_ATTR_NON_SHAREABLE
+- *     Non-shareable. Combine with FFA_MEM_ATTR_NORMAL_MEMORY_*.
+- * * @FFA_MEM_ATTR_OUTER_SHAREABLE
+- *     Outer Shareable. Combine with FFA_MEM_ATTR_NORMAL_MEMORY_*.
+- * * @FFA_MEM_ATTR_INNER_SHAREABLE
+- *     Inner Shareable. Combine with FFA_MEM_ATTR_NORMAL_MEMORY_*.
+- */
+-typedef uint8_t ffa_mem_attr8_t;
+-#define FFA_MEM_ATTR_DEVICE_NGNRNE ((1U << 4) | (0x0U << 2))
+-#define FFA_MEM_ATTR_DEVICE_NGNRE ((1U << 4) | (0x1U << 2))
+-#define FFA_MEM_ATTR_DEVICE_NGRE ((1U << 4) | (0x2U << 2))
+-#define FFA_MEM_ATTR_DEVICE_GRE ((1U << 4) | (0x3U << 2))
+-#define FFA_MEM_ATTR_NORMAL_MEMORY_UNCACHED ((2U << 4) | (0x1U << 2))
+-#define FFA_MEM_ATTR_NORMAL_MEMORY_CACHED_WB ((2U << 4) | (0x3U << 2))
+-#define FFA_MEM_ATTR_NON_SHAREABLE (0x0U << 0)
+-#define FFA_MEM_ATTR_OUTER_SHAREABLE (0x2U << 0)
+-#define FFA_MEM_ATTR_INNER_SHAREABLE (0x3U << 0)
+-
+-/**
+- * typedef ffa_mem_perm8_t - Memory access permissions
+- *
+- * * @FFA_MEM_ATTR_RO
+- *     Request or specify read-only mapping.
+- * * @FFA_MEM_ATTR_RW
+- *     Request or allow read-write mapping.
+- * * @FFA_MEM_PERM_NX
+- *     Deny executable mapping.
+- * * @FFA_MEM_PERM_X
+- *     Request executable mapping.
+- */
+-typedef uint8_t ffa_mem_perm8_t;
+-#define FFA_MEM_PERM_RO (1U << 0)
+-#define FFA_MEM_PERM_RW (1U << 1)
+-#define FFA_MEM_PERM_NX (1U << 2)
+-#define FFA_MEM_PERM_X (1U << 3)
+-
+-/**
+- * typedef ffa_mem_flag8_t - Endpoint memory flags
+- *
+- * * @FFA_MEM_FLAG_OTHER
+- *     Other borrower. Memory region must not be or was not retrieved on behalf
+- *     of this endpoint.
+- */
+-typedef uint8_t ffa_mem_flag8_t;
+-#define FFA_MEM_FLAG_OTHER (1U << 0)
+-
+-/**
+- * typedef ffa_mtd_flag32_t - Memory transaction descriptor flags
+- *
+- * * @FFA_MTD_FLAG_ZERO_MEMORY
+- *     Zero memory after unmapping from sender (must be 0 for share).
+- * * @FFA_MTD_FLAG_TIME_SLICING
+- *     Not supported by this implementation.
+- * * @FFA_MTD_FLAG_ZERO_MEMORY_AFTER_RELINQUISH
+- *     Zero memory after unmapping from borrowers (must be 0 for share).
+- * * @FFA_MTD_FLAG_TYPE_MASK
+- *     Bit-mask to extract memory management transaction type from flags.
+- * * @FFA_MTD_FLAG_TYPE_SHARE_MEMORY
+- *     Share memory transaction flag.
+- *     Used by @SMC_FC_FFA_MEM_RETRIEVE_RESP to indicate that memory came from
+- *     @SMC_FC_FFA_MEM_SHARE and by @SMC_FC_FFA_MEM_RETRIEVE_REQ to specify that
+- *     it must have.
+- * * @FFA_MTD_FLAG_ADDRESS_RANGE_ALIGNMENT_HINT_MASK
+- *     Not supported by this implementation.
+- */
+-typedef uint32_t ffa_mtd_flag32_t;
+-#define FFA_MTD_FLAG_ZERO_MEMORY (1U << 0)
+-#define FFA_MTD_FLAG_TIME_SLICING (1U << 1)
+-#define FFA_MTD_FLAG_ZERO_MEMORY_AFTER_RELINQUISH (1U << 2)
+-#define FFA_MTD_FLAG_TYPE_MASK (3U << 3)
+-#define FFA_MTD_FLAG_TYPE_SHARE_MEMORY (1U << 3)
+-#define FFA_MTD_FLAG_ADDRESS_RANGE_ALIGNMENT_HINT_MASK (0x1FU << 5)
+-
+-/**
+- * struct ffa_mapd - Memory access permissions descriptor
+- * @endpoint_id:
+- *         Endpoint id that @memory_access_permissions and @flags apply to.
+- *         (&typedef ffa_endpoint_id16_t).
+- * @memory_access_permissions:
+- *         FFA_MEM_PERM_* values or'ed together (&typedef ffa_mem_perm8_t).
+- * @flags:
+- *         FFA_MEM_FLAG_* values or'ed together (&typedef ffa_mem_flag8_t).
+- */
+-struct ffa_mapd {
+-	ffa_endpoint_id16_t endpoint_id;
+-	ffa_mem_perm8_t memory_access_permissions;
+-	ffa_mem_flag8_t flags;
+-};
+-STATIC_ASSERT(sizeof(struct ffa_mapd) == 4);
+-
+-/**
+- * struct ffa_emad - Endpoint memory access descriptor.
+- * @mapd:  &struct ffa_mapd.
+- * @comp_mrd_offset:
+- *         Offset of &struct ffa_comp_mrd form start of &struct ffa_mtd.
+- * @reserved_8_15:
+- *         Reserved bytes 8-15. Must be 0.
+- */
+-struct ffa_emad {
+-	struct ffa_mapd mapd;
+-	uint32_t comp_mrd_offset;
+-	uint64_t reserved_8_15;
+-};
+-STATIC_ASSERT(sizeof(struct ffa_emad) == 16);
+-
+-/**
+- * struct ffa_mtd - Memory transaction descriptor.
+- * @sender_id:
+- *         Sender endpoint id.
+- * @memory_region_attributes:
+- *         FFA_MEM_ATTR_* values or'ed together (&typedef ffa_mem_attr8_t).
+- * @reserved_3:
+- *         Reserved bytes 3. Must be 0.
+- * @flags:
+- *         FFA_MTD_FLAG_* values or'ed together (&typedef ffa_mtd_flag32_t).
+- * @handle:
+- *         Id of shared memory object. Most be 0 for MEM_SHARE.
+- * @tag:   Client allocated tag. Must match original value.
+- * @reserved_24_27:
+- *         Reserved bytes 24-27. Must be 0.
+- * @emad_count:
+- *         Number of entries in @emad. Must be 1 in current implementation.
+- *         FFA spec allows more entries.
+- * @emad:
+- *         Endpoint memory access descriptor array (see @struct ffa_emad).
+- */
+-struct ffa_mtd {
+-	ffa_endpoint_id16_t sender_id;
+-	ffa_mem_attr8_t memory_region_attributes;
+-	uint8_t reserved_3;
+-	ffa_mtd_flag32_t flags;
+-	uint64_t handle;
+-	uint64_t tag;
+-	uint32_t reserved_24_27;
+-	uint32_t emad_count;
+-	struct ffa_emad emad[];
+-};
+-STATIC_ASSERT(sizeof(struct ffa_mtd) == 32);
+-
+-/**
+- * struct ffa_mem_relinquish_descriptor - Relinquish request descriptor.
+- * @handle:
+- *         Id of shared memory object to relinquish.
+- * @flags:
+- *         If bit 0 is set clear memory after unmapping from borrower. Must be 0
+- *         for share. Bit[1]: Time slicing. Not supported, must be 0. All other
+- *         bits are reserved 0.
+- * @endpoint_count:
+- *         Number of entries in @endpoint_array.
+- * @endpoint_array:
+- *         Array of endpoint ids.
+- */
+-struct ffa_mem_relinquish_descriptor {
+-	uint64_t handle;
+-	uint32_t flags;
+-	uint32_t endpoint_count;
+-	ffa_endpoint_id16_t endpoint_array[];
+-};
+-STATIC_ASSERT(sizeof(struct ffa_mem_relinquish_descriptor) == 16);
+-
+-/**
+- * enum ffa_error - FF-A error code
+- * @FFA_ERROR_NOT_SUPPORTED:
+- *         Operation contained possibly valid parameters not supported by the
+- *         current implementation. Does not match FF-A 1.0 EAC 1_0 definition.
+- * @FFA_ERROR_INVALID_PARAMETERS:
+- *         Invalid parameters. Conditions function specific.
+- * @FFA_ERROR_NO_MEMORY:
+- *         Not enough memory.
+- * @FFA_ERROR_DENIED:
+- *         Operation not allowed. Conditions function specific.
+- *
+- * FF-A 1.0 EAC 1_0 defines other error codes as well but the current
+- * implementation does not use them.
+- */
+-enum ffa_error {
+-	FFA_ERROR_NOT_SUPPORTED = -1,
+-	FFA_ERROR_INVALID_PARAMETERS = -2,
+-	FFA_ERROR_NO_MEMORY = -3,
+-	FFA_ERROR_DENIED = -6,
+-};
+-
+-/**
+- * SMC_FC32_FFA_MIN - First 32 bit SMC opcode reserved for FFA
+- */
+-#define SMC_FC32_FFA_MIN SMC_FASTCALL_NR_SHARED_MEMORY(0x60)
+-
+-/**
+- * SMC_FC32_FFA_MAX - Last 32 bit SMC opcode reserved for FFA
+- */
+-#define SMC_FC32_FFA_MAX SMC_FASTCALL_NR_SHARED_MEMORY(0x7F)
+-
+-/**
+- * SMC_FC64_FFA_MIN - First 64 bit SMC opcode reserved for FFA
+- */
+-#define SMC_FC64_FFA_MIN SMC_FASTCALL64_NR_SHARED_MEMORY(0x60)
+-
+-/**
+- * SMC_FC64_FFA_MAX - Last 64 bit SMC opcode reserved for FFA
+- */
+-#define SMC_FC64_FFA_MAX SMC_FASTCALL64_NR_SHARED_MEMORY(0x7F)
+-
+-/**
+- * SMC_FC_FFA_ERROR - SMC error return opcode
+- *
+- * Register arguments:
+- *
+- * * w1:     VMID in [31:16], vCPU in [15:0]
+- * * w2:     Error code (&enum ffa_error)
+- */
+-#define SMC_FC_FFA_ERROR SMC_FASTCALL_NR_SHARED_MEMORY(0x60)
+-
+-/**
+- * SMC_FC_FFA_SUCCESS - 32 bit SMC success return opcode
+- *
+- * Register arguments:
+- *
+- * * w1:     VMID in [31:16], vCPU in [15:0]
+- * * w2-w7:  Function specific
+- */
+-#define SMC_FC_FFA_SUCCESS SMC_FASTCALL_NR_SHARED_MEMORY(0x61)
+-
+-/**
+- * SMC_FC64_FFA_SUCCESS - 64 bit SMC success return opcode
+- *
+- * Register arguments:
+- *
+- * * w1:             VMID in [31:16], vCPU in [15:0]
+- * * w2/x2-w7/x7:    Function specific
+- */
+-#define SMC_FC64_FFA_SUCCESS SMC_FASTCALL64_NR_SHARED_MEMORY(0x61)
+-
+-/**
+- * SMC_FC_FFA_VERSION - SMC opcode to return supported FF-A version
+- *
+- * Register arguments:
+- *
+- * * w1:     Major version bit[30:16] and minor version in bit[15:0] supported
+- *           by caller. Bit[31] must be 0.
+- *
+- * Return:
+- * * w0:     &SMC_FC_FFA_SUCCESS
+- * * w2:     Major version bit[30:16], minor version in bit[15:0], bit[31] must
+- *           be 0.
+- *
+- * or
+- *
+- * * w0:     SMC_FC_FFA_ERROR
+- * * w2:     FFA_ERROR_NOT_SUPPORTED if major version passed in is less than the
+- *           minimum major version supported.
+- */
+-#define SMC_FC_FFA_VERSION SMC_FASTCALL_NR_SHARED_MEMORY(0x63)
+-
+-/**
+- * SMC_FC_FFA_FEATURES - SMC opcode to check optional feature support
+- *
+- * Register arguments:
+- *
+- * * w1:     FF-A function ID
+- *
+- * Return:
+- * * w0:     &SMC_FC_FFA_SUCCESS
+- * * w2:     Bit[0]: Supports custom buffers for memory transactions.
+- *           Bit[1:0]: For RXTX_MAP min buffer size and alignment boundary.
+- *           Other bits must be 0.
+- * * w3:     For FFA_MEM_RETRIEVE_REQ, bit[7-0]: Number of times receiver can
+- *           retrieve each memory region before relinquishing it specified as
+- *           ((1U << (value + 1)) - 1 (or value = bits in reference count - 1).
+- *           For all other bits and commands: must be 0.
+- * or
+- *
+- * * w0:     SMC_FC_FFA_ERROR
+- * * w2:     FFA_ERROR_NOT_SUPPORTED if function is not implemented, or
+- *           FFA_ERROR_INVALID_PARAMETERS if function id is not valid.
+- */
+-#define SMC_FC_FFA_FEATURES SMC_FASTCALL_NR_SHARED_MEMORY(0x64)
+-
+-/**
+- * SMC_FC_FFA_RXTX_MAP - 32 bit SMC opcode to map message buffers
+- *
+- * Register arguments:
+- *
+- * * w1:     TX address
+- * * w2:     RX address
+- * * w3:     RX/TX page count in bit[5:0]
+- *
+- * Return:
+- * * w0:     &SMC_FC_FFA_SUCCESS
+- */
+-#define SMC_FC_FFA_RXTX_MAP SMC_FASTCALL_NR_SHARED_MEMORY(0x66)
+-
+-/**
+- * SMC_FC64_FFA_RXTX_MAP - 64 bit SMC opcode to map message buffers
+- *
+- * Register arguments:
+- *
+- * * x1:     TX address
+- * * x2:     RX address
+- * * x3:     RX/TX page count in bit[5:0]
+- *
+- * Return:
+- * * w0:     &SMC_FC_FFA_SUCCESS
+- */
+-#define SMC_FC64_FFA_RXTX_MAP SMC_FASTCALL64_NR_SHARED_MEMORY(0x66)
+-#ifdef CONFIG_64BIT
+-#define SMC_FCZ_FFA_RXTX_MAP SMC_FC64_FFA_RXTX_MAP
+-#else
+-#define SMC_FCZ_FFA_RXTX_MAP SMC_FC_FFA_RXTX_MAP
+-#endif
+-
+-/**
+- * SMC_FC_FFA_RXTX_UNMAP - SMC opcode to unmap message buffers
+- *
+- * Register arguments:
+- *
+- * * w1:     ID in [31:16]
+- *
+- * Return:
+- * * w0:     &SMC_FC_FFA_SUCCESS
+- */
+-#define SMC_FC_FFA_RXTX_UNMAP SMC_FASTCALL_NR_SHARED_MEMORY(0x67)
+-
+-/**
+- * SMC_FC_FFA_ID_GET - SMC opcode to get endpoint id of caller
+- *
+- * Return:
+- * * w0:     &SMC_FC_FFA_SUCCESS
+- * * w2:     ID in bit[15:0], bit[31:16] must be 0.
+- */
+-#define SMC_FC_FFA_ID_GET SMC_FASTCALL_NR_SHARED_MEMORY(0x69)
+-
+-/**
+- * SMC_FC_FFA_MEM_DONATE - 32 bit SMC opcode to donate memory
+- *
+- * Not supported.
+- */
+-#define SMC_FC_FFA_MEM_DONATE SMC_FASTCALL_NR_SHARED_MEMORY(0x71)
+-
+-/**
+- * SMC_FC_FFA_MEM_LEND - 32 bit SMC opcode to lend memory
+- *
+- * Not currently supported.
+- */
+-#define SMC_FC_FFA_MEM_LEND SMC_FASTCALL_NR_SHARED_MEMORY(0x72)
+-
+-/**
+- * SMC_FC_FFA_MEM_SHARE - 32 bit SMC opcode to share memory
+- *
+- * Register arguments:
+- *
+- * * w1:     Total length
+- * * w2:     Fragment length
+- * * w3:     Address
+- * * w4:     Page count
+- *
+- * Return:
+- * * w0:     &SMC_FC_FFA_SUCCESS
+- * * w2/w3:  Handle
+- *
+- * or
+- *
+- * * w0:     &SMC_FC_FFA_MEM_FRAG_RX
+- * * w1-:    See &SMC_FC_FFA_MEM_FRAG_RX
+- *
+- * or
+- *
+- * * w0:     SMC_FC_FFA_ERROR
+- * * w2:     Error code (&enum ffa_error)
+- */
+-#define SMC_FC_FFA_MEM_SHARE SMC_FASTCALL_NR_SHARED_MEMORY(0x73)
+-
+-/**
+- * SMC_FC64_FFA_MEM_SHARE - 64 bit SMC opcode to share memory
+- *
+- * Register arguments:
+- *
+- * * w1:     Total length
+- * * w2:     Fragment length
+- * * x3:     Address
+- * * w4:     Page count
+- *
+- * Return:
+- * * w0:     &SMC_FC_FFA_SUCCESS
+- * * w2/w3:  Handle
+- *
+- * or
+- *
+- * * w0:     &SMC_FC_FFA_MEM_FRAG_RX
+- * * w1-:    See &SMC_FC_FFA_MEM_FRAG_RX
+- *
+- * or
+- *
+- * * w0:     SMC_FC_FFA_ERROR
+- * * w2:     Error code (&enum ffa_error)
+- */
+-#define SMC_FC64_FFA_MEM_SHARE SMC_FASTCALL64_NR_SHARED_MEMORY(0x73)
+-
+-/**
+- * SMC_FC_FFA_MEM_RETRIEVE_REQ - 32 bit SMC opcode to retrieve shared memory
+- *
+- * Register arguments:
+- *
+- * * w1:     Total length
+- * * w2:     Fragment length
+- * * w3:     Address
+- * * w4:     Page count
+- *
+- * Return:
+- * * w0:             &SMC_FC_FFA_MEM_RETRIEVE_RESP
+- * * w1/x1-w5/x5:    See &SMC_FC_FFA_MEM_RETRIEVE_RESP
+- */
+-#define SMC_FC_FFA_MEM_RETRIEVE_REQ SMC_FASTCALL_NR_SHARED_MEMORY(0x74)
+-
+-/**
+- * SMC_FC64_FFA_MEM_RETRIEVE_REQ - 64 bit SMC opcode to retrieve shared memory
+- *
+- * Register arguments:
+- *
+- * * w1:     Total length
+- * * w2:     Fragment length
+- * * x3:     Address
+- * * w4:     Page count
+- *
+- * Return:
+- * * w0:             &SMC_FC_FFA_MEM_RETRIEVE_RESP
+- * * w1/x1-w5/x5:    See &SMC_FC_FFA_MEM_RETRIEVE_RESP
+- */
+-#define SMC_FC64_FFA_MEM_RETRIEVE_REQ SMC_FASTCALL64_NR_SHARED_MEMORY(0x74)
+-
+-/**
+- * SMC_FC_FFA_MEM_RETRIEVE_RESP - Retrieve 32 bit SMC return opcode
+- *
+- * Register arguments:
+- *
+- * * w1:     Total length
+- * * w2:     Fragment length
+- */
+-#define SMC_FC_FFA_MEM_RETRIEVE_RESP SMC_FASTCALL_NR_SHARED_MEMORY(0x75)
+-
+-/**
+- * SMC_FC_FFA_MEM_RELINQUISH - SMC opcode to relinquish shared memory
+- *
+- * Input in &struct ffa_mem_relinquish_descriptor format in message buffer.
+- *
+- * Return:
+- * * w0:     &SMC_FC_FFA_SUCCESS
+- */
+-#define SMC_FC_FFA_MEM_RELINQUISH SMC_FASTCALL_NR_SHARED_MEMORY(0x76)
+-
+-/**
+- * SMC_FC_FFA_MEM_RECLAIM - SMC opcode to reclaim shared memory
+- *
+- * Register arguments:
+- *
+- * * w1/w2:  Handle
+- * * w3:     Flags
+- *
+- * Return:
+- * * w0:     &SMC_FC_FFA_SUCCESS
+- */
+-#define SMC_FC_FFA_MEM_RECLAIM SMC_FASTCALL_NR_SHARED_MEMORY(0x77)
+-
+-/**
+- * SMC_FC_FFA_MEM_FRAG_RX - SMC opcode to request next fragment.
+- *
+- * Register arguments:
+- *
+- * * w1/w2:  Cookie
+- * * w3:     Fragment offset.
+- * * w4:     Endpoint id ID in [31:16], if client is hypervisor.
+- *
+- * Return:
+- * * w0:             &SMC_FC_FFA_MEM_FRAG_TX
+- * * w1/x1-w5/x5:    See &SMC_FC_FFA_MEM_FRAG_TX
+- */
+-#define SMC_FC_FFA_MEM_FRAG_RX SMC_FASTCALL_NR_SHARED_MEMORY(0x7A)
+-
+-/**
+- * SMC_FC_FFA_MEM_FRAG_TX - SMC opcode to transmit next fragment
+- *
+- * Register arguments:
+- *
+- * * w1/w2:  Cookie
+- * * w3:     Fragment length.
+- * * w4:     Sender endpoint id ID in [31:16], if client is hypervisor.
+- *
+- * Return:
+- * * w0:             &SMC_FC_FFA_MEM_FRAG_RX or &SMC_FC_FFA_SUCCESS.
+- * * w1/x1-w5/x5:    See opcode in w0.
+- */
+-#define SMC_FC_FFA_MEM_FRAG_TX SMC_FASTCALL_NR_SHARED_MEMORY(0x7B)
+-
+-#endif /* __LINUX_TRUSTY_ARM_FFA_H */
+diff --git a/include/linux/trusty/trusty.h b/include/linux/trusty/trusty.h
+index efbb36999a8b..272d96c1c696 100644
+--- a/include/linux/trusty/trusty.h
++++ b/include/linux/trusty/trusty.h
+@@ -52,9 +52,6 @@ u32 trusty_get_api_version(struct device *dev);
+ bool trusty_get_panic_status(struct device *dev);
+ 
+ struct ns_mem_page_info {
+-	u64 paddr;
+-	u8 ffa_mem_attr;
+-	u8 ffa_mem_perm;
+ 	u64 compat_attr;
+ };
+ 
+-- 
+2.34.1
+

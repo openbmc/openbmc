@@ -36,7 +36,7 @@ directory set to ``${``\ :term:`B`\ ``}``.
 
 The default behavior of this task is to run the ``oe_runmake`` function
 if a makefile (``Makefile``, ``makefile``, or ``GNUmakefile``) is found.
-If no such file is found, the ``do_compile`` task does nothing.
+If no such file is found, the :ref:`ref-tasks-compile` task does nothing.
 
 .. _ref-tasks-compile_ptest_base:
 
@@ -58,7 +58,7 @@ The default behavior of this task is to run ``oe_runmake clean`` if a
 makefile (``Makefile``, ``makefile``, or ``GNUmakefile``) is found and
 :term:`CLEANBROKEN` is not set to "1". If no such
 file is found or the :term:`CLEANBROKEN` variable is set to "1", the
-``do_configure`` task does nothing.
+:ref:`ref-tasks-configure` task does nothing.
 
 .. _ref-tasks-configure_ptest_base:
 
@@ -81,7 +81,7 @@ Recipes implementing this task should inherit the
 :ref:`deploy <ref-classes-deploy>` class and should write the output
 to ``${``\ :term:`DEPLOYDIR`\ ``}``, which is not to be
 confused with ``${DEPLOY_DIR}``. The :ref:`deploy <ref-classes-deploy>` class sets up
-``do_deploy`` as a shared state (sstate) task that can be accelerated
+:ref:`ref-tasks-deploy` as a shared state (sstate) task that can be accelerated
 through sstate use. The sstate mechanism takes care of copying the
 output from ``${DEPLOYDIR}`` to ``${DEPLOY_DIR_IMAGE}``.
 
@@ -90,14 +90,14 @@ output from ``${DEPLOYDIR}`` to ``${DEPLOY_DIR_IMAGE}``.
    Do not write the output directly to ``${DEPLOY_DIR_IMAGE}``, as this causes
    the sstate mechanism to malfunction.
 
-The ``do_deploy`` task is not added as a task by default and
+The :ref:`ref-tasks-deploy` task is not added as a task by default and
 consequently needs to be added manually. If you want the task to run
 after :ref:`ref-tasks-compile`, you can add it by doing
 the following::
 
       addtask deploy after do_compile
 
-Adding ``do_deploy`` after other tasks works the same way.
+Adding :ref:`ref-tasks-deploy` after other tasks works the same way.
 
 .. note::
 
@@ -110,7 +110,7 @@ Adding ``do_deploy`` after other tasks works the same way.
    See the ":ref:`bitbake-user-manual/bitbake-user-manual-execution:dependencies`"
    section in the BitBake User Manual for more information.
 
-If the ``do_deploy`` task re-executes, any previous output is removed
+If the :ref:`ref-tasks-deploy` task re-executes, any previous output is removed
 (i.e. "cleaned").
 
 .. _ref-tasks-fetch:
@@ -128,15 +128,15 @@ module.
 ``do_image``
 ------------
 
-Starts the image generation process. The ``do_image`` task runs after
+Starts the image generation process. The :ref:`ref-tasks-image` task runs after
 the OpenEmbedded build system has run the
 :ref:`ref-tasks-rootfs` task during which packages are
 identified for installation into the image and the root filesystem is
 created, complete with post-processing.
 
-The ``do_image`` task performs pre-processing on the image through the
+The :ref:`ref-tasks-image` task performs pre-processing on the image through the
 :term:`IMAGE_PREPROCESS_COMMAND` and
-dynamically generates supporting ``do_image_*`` tasks as needed.
+dynamically generates supporting :ref:`do_image_* <ref-tasks-image>` tasks as needed.
 
 For more information on image creation, see the ":ref:`overview-manual/concepts:image generation`"
 section in the Yocto Project Overview and Concepts Manual.
@@ -146,13 +146,13 @@ section in the Yocto Project Overview and Concepts Manual.
 ``do_image_complete``
 ---------------------
 
-Completes the image generation process. The ``do_image_complete`` task
+Completes the image generation process. The :ref:`do_image_complete <ref-tasks-image-complete>` task
 runs after the OpenEmbedded build system has run the
 :ref:`ref-tasks-image` task during which image
-pre-processing occurs and through dynamically generated ``do_image_*``
+pre-processing occurs and through dynamically generated :ref:`do_image_* <ref-tasks-image>`
 tasks the image is constructed.
 
-The ``do_image_complete`` task performs post-processing on the image
+The :ref:`do_image_complete <ref-tasks-image-complete>` task performs post-processing on the image
 through the
 :term:`IMAGE_POSTPROCESS_COMMAND`.
 
@@ -168,9 +168,9 @@ section in the Yocto Project Overview and Concepts Manual.
 Copies files that are to be packaged into the holding area
 ``${``\ :term:`D`\ ``}``. This task runs with the current
 working directory set to ``${``\ :term:`B`\ ``}``, which is the
-compilation directory. The ``do_install`` task, as well as other tasks
+compilation directory. The :ref:`ref-tasks-install` task, as well as other tasks
 that either directly or indirectly depend on the installed files (e.g.
-:ref:`ref-tasks-package`, ``do_package_write_*``, and
+:ref:`ref-tasks-package`, :ref:`do_package_write_* <ref-tasks-package_write_deb>`, and
 :ref:`ref-tasks-rootfs`), run under
 :ref:`fakeroot <overview-manual/concepts:fakeroot and pseudo>`.
 
@@ -212,7 +212,7 @@ based on available packages and files. This task makes use of the
 :term:`PACKAGES` and :term:`FILES`
 variables.
 
-The ``do_package`` task, in conjunction with the
+The :ref:`ref-tasks-package` task, in conjunction with the
 :ref:`ref-tasks-packagedata` task, also saves some
 important package metadata. For additional information, see the
 :term:`PKGDESTWORK` variable and the
@@ -327,7 +327,7 @@ file as a patch file::
        "
 
 Conversely, if you have a file whose file type is ``.patch`` or ``.diff``
-and you want to exclude it so that the ``do_patch`` task does not apply
+and you want to exclude it so that the :ref:`ref-tasks-patch` task does not apply
 it during the patch phase, you can use the "apply=no" parameter with the
 :term:`SRC_URI` statement::
 
@@ -392,7 +392,7 @@ For information on what directories are copied by default, see the
 these variables inside your recipe if you need to make additional (or
 fewer) directories available to other recipes at build time.
 
-The ``do_populate_sysroot`` task is a shared state (sstate) task, which
+The :ref:`ref-tasks-populate_sysroot` task is a shared state (sstate) task, which
 means that the task can be accelerated through sstate use. Realize also
 that if the task is re-executed, any previous output is removed (i.e.
 "cleaned").
@@ -447,7 +447,7 @@ Validates the :term:`SRC_URI` value.
 ------------
 
 Removes all output files for a target from the
-:ref:`ref-tasks-unpack` task forward (i.e. ``do_unpack``,
+:ref:`ref-tasks-unpack` task forward (i.e. :ref:`ref-tasks-unpack`,
 :ref:`ref-tasks-configure`,
 :ref:`ref-tasks-compile`,
 :ref:`ref-tasks-install`, and
@@ -473,7 +473,7 @@ use the :ref:`ref-tasks-cleansstate` task instead
 Removes all output files, shared state
 (:ref:`sstate <overview-manual/concepts:shared state cache>`) cache, and
 downloaded source files for a target (i.e. the contents of
-:term:`DL_DIR`). Essentially, the ``do_cleanall`` task is
+:term:`DL_DIR`). Essentially, the :ref:`ref-tasks-cleanall` task is
 identical to the :ref:`ref-tasks-cleansstate` task
 with the added removal of downloaded source files.
 
@@ -481,7 +481,7 @@ You can run this task using BitBake as follows::
 
    $ bitbake -c cleanall recipe
 
-Typically, you would not normally use the ``cleanall`` task. Do so only
+Typically, you would not normally use the :ref:`ref-tasks-cleanall` task. Do so only
 if you want to start fresh with the :ref:`ref-tasks-fetch`
 task.
 
@@ -492,7 +492,7 @@ task.
 
 Removes all output files and shared state
 (:ref:`sstate <overview-manual/concepts:shared state cache>`) cache for a
-target. Essentially, the ``do_cleansstate`` task is identical to the
+target. Essentially, the :ref:`ref-tasks-cleansstate` task is identical to the
 :ref:`ref-tasks-clean` task with the added removal of
 shared state (:ref:`sstate <overview-manual/concepts:shared state cache>`)
 cache.
@@ -501,13 +501,13 @@ You can run this task using BitBake as follows::
 
    $ bitbake -c cleansstate recipe
 
-When you run the ``do_cleansstate`` task, the OpenEmbedded build system
+When you run the :ref:`ref-tasks-cleansstate` task, the OpenEmbedded build system
 no longer uses any sstate. Consequently, building the recipe from
 scratch is guaranteed.
 
 .. note::
 
-   The ``do_cleansstate`` task cannot remove sstate from a remote sstate
+   The :ref:`ref-tasks-cleansstate` task cannot remove sstate from a remote sstate
    mirror. If you need to build a target from scratch using remote mirrors, use
    the "-f" option as follows::
 
@@ -575,10 +575,8 @@ information on live image types.
 ``do_bundle_initramfs``
 -----------------------
 
-Combines an initial RAM disk (initramfs) image and kernel together to
-form a single image. The
-:term:`CONFIG_INITRAMFS_SOURCE` variable
-has some more information about these types of images.
+Combines an :term:`Initramfs` image and kernel together to
+form a single image.
 
 .. _ref-tasks-rootfs:
 
@@ -657,7 +655,7 @@ section in the Yocto Project Linux Kernel Development Manual.
 
 Converts the newly unpacked kernel source into a form with which the
 OpenEmbedded build system can work. Because the kernel source can be
-fetched in several different ways, the ``do_kernel_checkout`` task makes
+fetched in several different ways, the :ref:`ref-tasks-kernel_checkout` task makes
 sure that subsequent tasks are given a clean working tree copy of the
 kernel with the correct branches checked out.
 
@@ -668,7 +666,7 @@ kernel with the correct branches checked out.
 
 Validates the configuration produced by the
 :ref:`ref-tasks-kernel_menuconfig` task. The
-``do_kernel_configcheck`` task produces warnings when a requested
+:ref:`ref-tasks-kernel_configcheck` task produces warnings when a requested
 configuration does not appear in the final ``.config`` file or when you
 override a policy configuration in a hardware configuration fragment.
 You can run this task explicitly and view the output by using the
@@ -686,7 +684,7 @@ section in the Yocto Project Linux Kernel Development Manual.
 ----------------------
 
 After the kernel is patched by the :ref:`ref-tasks-patch`
-task, the ``do_kernel_configme`` task assembles and merges all the
+task, the :ref:`ref-tasks-kernel_configme` task assembles and merges all the
 kernel config fragments into a merged configuration that can then be
 passed to the kernel configuration phase proper. This is also the time
 during which user-specified defconfigs are applied if present, and where
@@ -719,7 +717,7 @@ information on this configuration tool.
 
 Collects all the features required for a given kernel build, whether the
 features come from :term:`SRC_URI` or from Git
-repositories. After collection, the ``do_kernel_metadata`` task
+repositories. After collection, the :ref:`ref-tasks-kernel_metadata` task
 processes the features into a series of config fragments and patches,
 which can then be applied by subsequent tasks such as
 :ref:`ref-tasks-patch` and
@@ -791,4 +789,4 @@ After the kernel is unpacked but before it is patched, this task makes
 sure that the machine and metadata branches as specified by the
 :term:`SRCREV` variables actually exist on the specified
 branches. Otherwise, if :term:`AUTOREV` is not being used, the
-``do_validate_branches`` task fails during the build.
+:ref:`ref-tasks-validate_branches` task fails during the build.

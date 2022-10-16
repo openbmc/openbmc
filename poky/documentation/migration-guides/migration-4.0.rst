@@ -93,8 +93,8 @@ Fetching changes
 
      do_mytask[network] = "1"
 
-  This is allowed by default from ``do_fetch`` but not from any of our other standard
-  tasks. Recipes shouldn't be accessing the network outside of ``do_fetch`` as it
+  This is allowed by default from :ref:`ref-tasks-fetch` but not from any of our other standard
+  tasks. Recipes shouldn't be accessing the network outside of :ref:`ref-tasks-fetch` as it
   usually undermines fetcher source mirroring, image and licence manifests, software
   auditing and supply chain security.
 
@@ -145,7 +145,7 @@ Python changes
   :ref:`python_setuptools_build_meta <ref-classes-python_setuptools_build_meta>`
   and :ref:`python_poetry_core <ref-classes-python_poetry_core>`.  
 
-- The :ref:`setuptools3 <ref-classes-setuptools3>` class ``do_install()`` task now
+- The :ref:`setuptools3 <ref-classes-setuptools3>` class :ref:`ref-tasks-install` task now
   installs the ``wheel`` binary archive. In current versions of ``setuptools`` the
   legacy ``setup.py install`` method is deprecated. If the ``setup.py`` cannot be used
   with wheels, for example it creates files outside of the Python module or standard

@@ -1,0 +1,31 @@
+From 8a62cc0a64670e39f462c1dbbf82e04d2f03b89e Mon Sep 17 00:00:00 2001
+From: Andrei Gherzan <andrei.gherzan@huawei.com>
+Date: Wed, 22 Dec 2021 12:49:25 +0100
+Subject: [PATCH] Fix install path of linux64.h
+
+We add linux64.h to tm includes[1] as a relative path to B. This patch
+adapts the install path of linux64.h to match the include in tm.h.
+
+[1] 0016-Use-the-multilib-config-files-from-B-instead-of-usin.patch
+
+Signed-off-by: Andrei Gherzan <andrei.gherzan@huawei.com>
+
+Upstream-Status: Inappropriate [configuration]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gcc/Makefile.in | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/gcc/Makefile.in b/gcc/Makefile.in
+index 06eb0d27a28..a8678ca24ed 100644
+--- a/gcc/Makefile.in
++++ b/gcc/Makefile.in
+@@ -3686,6 +3686,8 @@ install-plugin: installdirs lang.install-plugin s-header-vars install-gengtype
+ 	  "$(srcdir)"/config/* | "$(srcdir)"/common/config/* \
+ 	  | "$(srcdir)"/c-family/* | "$(srcdir)"/*.def ) \
+ 	    base=`echo "$$path" | sed -e "s|$$srcdirstrip/||"`;; \
++	  */linux64.h ) \
++	    base=`dirname $$path`;;\
+ 	  *) base=`basename $$path` ;; \
+ 	  esac; \
+ 	  dest=$(plugin_includedir)/$$base; \

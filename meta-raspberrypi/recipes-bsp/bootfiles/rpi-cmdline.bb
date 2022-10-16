@@ -13,10 +13,6 @@ CMDLINE_ROOTFS ?= "root=/dev/mmcblk0p2 ${CMDLINE_ROOT_FSTYPE} rootwait"
 
 CMDLINE_SERIAL ?= "${@oe.utils.conditional("ENABLE_UART", "1", "console=serial0,115200", "", d)}"
 
-CMDLINE_CMA ?= "${@oe.utils.conditional("RASPBERRYPI_CAMERA_V2", "1", "cma=64M", "", d)}"
-
-CMDLINE_CMA ?= "${@oe.utils.conditional("RASPBERRYPI_HD_CAMERA", "1", "cma=64M", "", d)}"
-
 CMDLINE_PITFT ?= "${@bb.utils.contains("MACHINE_FEATURES", "pitft", "fbcon=map:10 fbcon=font:VGA8x8", "", d)}"
 
 # Add the kernel debugger over console kernel command line option if enabled

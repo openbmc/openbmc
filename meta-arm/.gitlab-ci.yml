@@ -151,13 +151,7 @@ qemuarm64-secureboot:
     matrix:
       - TOOLCHAINS: [gcc, clang]
         TCLIBC: [glibc, musl]
-        TESTING: testimage
-
-qemuarm64-secureboot-ts:
-  extends: .build
-  parallel:
-    matrix:
-      - TCLIBC: [glibc, musl]
+        TS: [none, trusted-services]
         TESTING: testimage
 
 qemuarm64:

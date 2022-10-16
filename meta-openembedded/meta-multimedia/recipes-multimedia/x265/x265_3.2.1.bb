@@ -18,7 +18,8 @@ SRC_URI[sha256sum] = "fb9badcf92364fd3567f8b5aa0e5e952aeea7a39a2b864387cec31e3b5
 inherit lib_package pkgconfig cmake
 
 EXTRA_OECMAKE:append:x86 = " -DENABLE_ASSEMBLY=OFF"
+EXTRA_OECMAKE:append:aarch64 = " -DENABLE_PIC=ON"
 
 AS[unexport] = "1"
 
-COMPATIBLE_HOST = '(x86_64|i.86).*-linux'
+COMPATIBLE_HOST = '(x86_64|i.86|aarch64).*-linux'

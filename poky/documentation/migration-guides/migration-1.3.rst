@@ -62,7 +62,7 @@ Previously, an inconsistent mix of spaces and tabs existed, which made
 extending these functions using ``_append`` or ``_prepend`` complicated
 given that Python treats whitespace as syntactically significant. If you
 are defining or extending any Python functions (e.g.
-``populate_packages``, ``do_unpack``, ``do_patch`` and so forth) in
+``populate_packages``, :ref:`ref-tasks-unpack`, :ref:`ref-tasks-patch` and so forth) in
 custom recipes or classes, you need to ensure you are using consistent
 four-space indentation.
 

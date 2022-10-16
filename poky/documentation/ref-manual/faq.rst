@@ -54,13 +54,10 @@ Yocto Project is fairly straightforward.
 
 **Q:** Are there any products built using the OpenEmbedded build system?
 
-**A:** The software running on the `Vernier
-LabQuest <https://vernier.com/labquest/>`__ is built using the
-OpenEmbedded build system. See the `Vernier
-LabQuest <https://www.vernier.com/products/interfaces/labq/>`__ website
-for more information. There are a number of pre-production devices using
-the OpenEmbedded build system and the Yocto Project team announces them
-as soon as they are released.
+**A:** See :yocto_wiki:`Products that use the Yocto Project
+</Project_Users#Products_that_use_the_Yocto_Project>` in the Yocto Project
+Wiki. Don't hesitate to contribute to this page if you know other such
+products.
 
 **Q:** What does the OpenEmbedded build system produce as output?
 
@@ -437,7 +434,7 @@ practice very effective.
 **Q:** The files provided by my ``*-native`` recipe do not appear to be
 available to other recipes. Files are missing from the native sysroot,
 my recipe is installing to the wrong place, or I am getting permissions
-errors during the do_install task in my recipe! What is wrong?
+errors during the :ref:`ref-tasks-install` task in my recipe! What is wrong?
 
 **A:** This situation results when a build system does not recognize the
 environment variables supplied to it by :term:`BitBake`. The

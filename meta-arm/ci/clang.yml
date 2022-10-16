@@ -8,9 +8,3 @@ repos:
 local_conf_header:
   clang: |
     TOOLCHAIN = "clang"
-    # Clang causes more binaries to have buildpaths in the debug symbols
-    # https://github.com/llvm/llvm-project/issues/56609
-    WARN_QA:remove = "buildpaths"
-
-target:
-  - core-image-base

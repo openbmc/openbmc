@@ -47,7 +47,7 @@ splitting out of debug symbols during packaging).
    even if the recipes do not produce architecture-specific output.
 
    Configuring such recipes for all architectures causes the
-   ``do_package_write_*`` tasks to
+   :ref:`do_package_write_* <ref-tasks-package_write_deb>` tasks to
    have different signatures for the machines with different tunings.
    Additionally, unnecessary rebuilds occur every time an image for a
    different :term:`MACHINE` is built even when the recipe never changes.
@@ -444,7 +444,7 @@ staging the files from :term:`DEPLOYDIR` to :term:`DEPLOY_DIR_IMAGE`.
 ``devshell.bbclass``
 ====================
 
-The ``devshell`` class adds the ``do_devshell`` task. Distribution
+The ``devshell`` class adds the :ref:`ref-tasks-devshell` task. Distribution
 policy dictates whether to include this class. See the ":ref:`dev-manual/common-tasks:using a development shell`"
 section in the Yocto Project Development Tasks Manual for more
 information about using ``devshell``.
@@ -1081,12 +1081,12 @@ Here are the tests you can list with the :term:`WARN_QA` and
    might result in host contamination of the build output.
 
 -  ``installed-vs-shipped:`` Reports when files have been installed
-   within ``do_install`` but have not been included in any package by
+   within :ref:`ref-tasks-install` but have not been included in any package by
    way of the :term:`FILES` variable. Files that do not
    appear in any package cannot be present in an image later on in the
    build process. Ideally, all installed files should be packaged or not
    installed at all. These files can be deleted at the end of
-   ``do_install`` if the files are not needed in any package.
+   :ref:`ref-tasks-install` if the files are not needed in any package.
 
 -  ``invalid-chars:`` Checks that the recipe metadata variables
    :term:`DESCRIPTION`,
@@ -1256,9 +1256,9 @@ package installs all packages with modules and various other kernel
 packages such as ``kernel-vmlinux``.
 
 The ``kernel`` class contains logic that allows you to embed an initial
-RAM filesystem (initramfs) image when you build the kernel image. For
-information on how to build an initramfs, see the
-":ref:`dev-manual/common-tasks:building an initial ram filesystem (initramfs) image`" section in
+RAM filesystem (:term:`Initramfs`) image when you build the kernel image. For
+information on how to build an :term:`Initramfs`, see the
+":ref:`dev-manual/common-tasks:building an initial ram filesystem (Initramfs) image`" section in
 the Yocto Project Development Tasks Manual.
 
 Various other classes are used by the ``kernel`` and ``module`` classes
@@ -1339,7 +1339,7 @@ Only a single U-boot boot script can be added to the FIT image created by
 ``kernel-fitimage`` and the boot script is optional.
 The boot script is specified in the ITS file as a text file containing
 U-boot commands. When using a boot script the user should configure the
-U-boot ``do_install`` task to copy the script to sysroot.
+U-boot :ref:`ref-tasks-install` task to copy the script to sysroot.
 So the script can be included in the FIT image by the ``kernel-fitimage``
 class. At run-time, U-boot CONFIG_BOOTCOMMAND define can be configured to
 load the boot script from the FIT image and executes it.
@@ -2401,7 +2401,7 @@ uses these build systems, the recipe needs to inherit the ``setuptools3`` class.
 
    .. note::
 
-      The ``setuptools3`` class ``do_compile()`` task now calls
+      The ``setuptools3`` class :ref:`ref-tasks-compile` task now calls
       ``setup.py bdist_wheel`` to build the ``wheel`` binary archive format
       (See `PEP-427 <https://www.python.org/dev/peps/pep-0427/>`__).
 
@@ -2412,7 +2412,7 @@ uses these build systems, the recipe needs to inherit the ``setuptools3`` class.
 
    .. note::
 
-     The ``setuptools3`` class ``do_install()`` task now installs the ``wheel``
+     The ``setuptools3`` class :ref:`ref-tasks-install` task now installs the ``wheel``
      binary archive. In current versions of ``setuptools`` the legacy ``setup.py
      install`` method is deprecated. If the ``setup.py`` cannot be used with
      wheels, for example it creates files outside of the Python module or
@@ -2527,7 +2527,7 @@ stages:
    want to share with other recipes that have dependencies on the
    originating recipe. Normally these dependencies are installed through
    the :ref:`ref-tasks-install` task into
-   ``${``\ :term:`D`\ ``}``. The ``do_populate_sysroot`` task
+   ``${``\ :term:`D`\ ``}``. The :ref:`ref-tasks-populate_sysroot` task
    copies a subset of these files into ``${SYSROOT_DESTDIR}``. This
    subset of files is controlled by the
    :term:`SYSROOT_DIRS`,

@@ -14,7 +14,9 @@ LIC_FILES_CHKSUM = " \
 
 DEPENDS = "libsamplerate0 libsndfile1 readline"
 
-SRC_URI = "git://github.com/jackaudio/jack2.git;branch=master;protocol=https"
+SRC_URI = "git://github.com/jackaudio/jack2.git;branch=master;protocol=https \
+    file://0001-Remove-usage-of-U-mode-bit-for-opening-files-in-pyth.patch \
+"
 SRCREV = "6b3c96d8aeef8aeb4b20f3aa647e6d01b4000ff8"
 
 S = "${WORKDIR}/git"

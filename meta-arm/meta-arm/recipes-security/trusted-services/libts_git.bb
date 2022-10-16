@@ -13,10 +13,6 @@ OECMAKE_SOURCEPATH="${S}/deployments/libts/${TS_ENV}"
 DEPENDS           += "arm-ffa-tee arm-ffa-user"
 RRECOMMENDS:${PN} += "arm-ffa-tee"
 
-# arm-ffa-user.h is installed by arm-ffa-user recipe
-EXTRA_OECMAKE += "-DLINUX_FFA_USER_SHIM_INCLUDE_DIR:PATH=/usr/include \
-                 "
-
 # Unix group name for dev/tee* ownership.
 TEE_GROUP_NAME ?= "teeclnt"
 
@@ -28,12 +24,11 @@ do_install:append () {
     fi
 
     # Move the dynamic libraries into the standard place.
-    # Update a cmake files to use correct paths.
+    # Update a cmake file to use correct paths.
     install -d ${D}${libdir}
     mv ${D}${TS_INSTALL}/lib/libts* ${D}${libdir}
 
-    sed -i -e "s#/${TS_ENV}##g" ${D}${TS_INSTALL}/lib/cmake/libtsTargets-noconfig.cmake
-    sed -i -e 's#INTERFACE_INCLUDE_DIRECTORIES.*$#INTERFACE_INCLUDE_DIRECTORIES "\${_IMPORT_PREFIX}/${TS_ENV}/include"#' ${D}${TS_INSTALL}/lib/cmake/libtsTargets.cmake
+    sed -i -e "s#/${TS_ENV}##g" ${D}${TS_INSTALL}/lib/cmake/libts/libtsTargets-noconfig.cmake
 }
 
 inherit ${@oe.utils.conditional('VIRTUAL-RUNTIME_dev_manager', 'busybox-mdev', '', 'useradd', d)}

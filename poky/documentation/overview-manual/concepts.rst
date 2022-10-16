@@ -703,16 +703,12 @@ the source files and unpack them into the
 
 .. note::
 
-   For every local file (e.g.
-   file://
-   ) that is part of a recipe's
-   SRC_URI
-   statement, the OpenEmbedded build system takes a checksum of the file
-   for the recipe and inserts the checksum into the signature for the
-   do_fetch
-   task. If any local file has been modified, the
-   do_fetch
-   task and all tasks that depend on it are re-executed.
+   For every local file (e.g. ``file://``) that is part of a recipe's
+   :term:`SRC_URI` statement, the OpenEmbedded build system takes a
+   checksum of the file for the recipe and inserts the checksum into
+   the signature for the :ref:`ref-tasks-fetch` task. If any local
+   file has been modified, the :ref:`ref-tasks-fetch` task and all
+   tasks that depend on it are re-executed.
 
 By default, everything is accomplished in the Build Directory, which has
 a defined structure. For additional general information on the Build
@@ -892,7 +888,7 @@ following as well as other items: splitting out debugging symbols,
 looking at shared library dependencies between packages, and looking at
 package relationships.
 
-The ``do_packagedata`` task creates package metadata based on the
+The :ref:`ref-tasks-packagedata` task creates package metadata based on the
 analysis such that the build system can generate the final packages. The
 :ref:`ref-tasks-populate_sysroot`
 task stages (copies) a subset of the files installed by the
@@ -905,7 +901,7 @@ the analysis and package splitting process use several areas:
    individual packages.
 
 -  :term:`PKGDESTWORK`: A
-   temporary work area (i.e. ``pkgdata``) used by the ``do_package``
+   temporary work area (i.e. ``pkgdata``) used by the :ref:`ref-tasks-package`
    task to save package metadata.
 
 -  :term:`PKGDEST`: The parent
@@ -1012,7 +1008,7 @@ all the post installation scripts must succeed on the build host during
 the package installation phase since the root filesystem on the target
 is read-only.
 
-The final stages of the ``do_rootfs`` task handle post processing. Post
+The final stages of the :ref:`ref-tasks-rootfs` task handle post processing. Post
 processing includes creation of a manifest file and optimizations.
 
 The manifest file (``.manifest``) resides in the same directory as the
@@ -1036,7 +1032,7 @@ the
 variable. This variable specifies a list of functions to call before the
 build system creates the final image output files.
 
-The build system dynamically creates ``do_image_*`` tasks as needed,
+The build system dynamically creates :ref:`do_image_* <ref-tasks-image>` tasks as needed,
 based on the image types specified in the
 :term:`IMAGE_FSTYPES` variable.
 The process turns everything into an image file or a set of image files
@@ -1085,7 +1081,7 @@ the extensible SDK (eSDK):
    For more information on the cross-development toolchain generation,
    see the ":ref:`overview-manual/concepts:cross-development toolchain generation`"
    section. For information on advantages gained when building a
-   cross-development toolchain using the do_populate_sdk task, see the
+   cross-development toolchain using the :ref:`ref-tasks-populate_sdk` task, see the
    ":ref:`sdk-manual/appendix-obtain:building an sdk installer`" section in
    the Yocto Project Application Development and the Extensible Software
    Development Kit (eSDK) manual.
@@ -1100,13 +1096,13 @@ actually install. For information on the variables listed in the figure,
 see the ":ref:`overview-manual/concepts:application development sdk`"
 section.
 
-The ``do_populate_sdk`` task helps create the standard SDK and handles
+The :ref:`ref-tasks-populate_sdk` task helps create the standard SDK and handles
 two parts: a target part and a host part. The target part is the part
 built for the target hardware and includes libraries and headers. The
 host part is the part of the SDK that runs on the
 :term:`SDKMACHINE`.
 
-The ``do_populate_sdk_ext`` task helps create the extensible SDK and
+The :ref:`ref-tasks-populate_sdk_ext` task helps create the extensible SDK and
 handles host and target parts differently than its counter part does for
 the standard SDK. For the extensible SDK, the task encapsulates the
 build system, which includes everything needed (host and target) for the
@@ -1198,7 +1194,7 @@ the work involved would be equal to or greater than the underlying task.
 
 In the build system, the common tasks that have setscene variants are
 :ref:`ref-tasks-package`,
-``do_package_write_*``,
+:ref:`do_package_write_* <ref-tasks-package_write_deb>`,
 :ref:`ref-tasks-deploy`,
 :ref:`ref-tasks-packagedata`, and
 :ref:`ref-tasks-populate_sysroot`.
@@ -1208,15 +1204,15 @@ end result.
 The build system has knowledge of the relationship between these tasks
 and other preceding tasks. For example, if BitBake runs
 ``do_populate_sysroot_setscene`` for something, it does not make sense
-to run any of the ``do_fetch``, ``do_unpack``, ``do_patch``,
-``do_configure``, ``do_compile``, and ``do_install`` tasks. However, if
-``do_package`` needs to be run, BitBake needs to run those other tasks.
+to run any of the :ref:`ref-tasks-fetch`, :ref:`ref-tasks-unpack`, :ref:`ref-tasks-patch`,
+:ref:`ref-tasks-configure`, :ref:`ref-tasks-compile`, and :ref:`ref-tasks-install` tasks. However, if
+:ref:`ref-tasks-package` needs to be run, BitBake needs to run those other tasks.
 
 It becomes more complicated if everything can come from an sstate cache
 because some objects are simply not required at all. For example, you do
 not need a compiler or native tools, such as quilt, if there isn't anything
-to compile or patch. If the ``do_package_write_*`` packages are available
-from sstate, BitBake does not need the ``do_package`` task data.
+to compile or patch. If the :ref:`do_package_write_* <ref-tasks-package_write_deb>` packages are available
+from sstate, BitBake does not need the :ref:`ref-tasks-package` task data.
 
 To handle all these complexities, BitBake runs in two phases. The first
 is the "setscene" stage. During this stage, BitBake first checks the
@@ -1801,14 +1797,14 @@ from the :ref:`deploy <ref-classes-deploy>` class::
 
 The following list explains the previous example:
 
--  Adding "do_deploy" to ``SSTATETASKS`` adds some required
+-  Adding ``do_deploy`` to ``SSTATETASKS`` adds some required
    sstate-related processing, which is implemented in the
    :ref:`sstate <ref-classes-sstate>` class, to
    before and after the
    :ref:`ref-tasks-deploy` task.
 
 -  The ``do_deploy[sstate-inputdirs] = "${DEPLOYDIR}"`` declares that
-   ``do_deploy`` places its output in ``${DEPLOYDIR}`` when run normally
+   :ref:`ref-tasks-deploy` places its output in ``${DEPLOYDIR}`` when run normally
    (i.e. when not using the sstate cache). This output becomes the input
    to the shared state cache.
 
@@ -1818,15 +1814,15 @@ The following list explains the previous example:
 
    .. note::
 
-      If ``do_deploy`` is not already in the shared state cache or if its input
+      If :ref:`ref-tasks-deploy` is not already in the shared state cache or if its input
       checksum (signature) has changed from when the output was cached, the task
       runs to populate the shared state cache, after which the contents of the
       shared state cache is copied to ${:term:`DEPLOY_DIR_IMAGE`}. If
-      ``do_deploy`` is in the shared state cache and its signature indicates
+      :ref:`ref-tasks-deploy` is in the shared state cache and its signature indicates
       that the cached output is still valid (i.e. if no relevant task inputs
       have changed), then the contents of the shared state cache copies
       directly to ${:term:`DEPLOY_DIR_IMAGE`} by the ``do_deploy_setscene`` task
-      instead, skipping the ``do_deploy`` task.
+      instead, skipping the :ref:`ref-tasks-deploy` task.
 
 -  The following task definition is glue logic needed to make the
    previous settings effective::
@@ -1836,16 +1832,16 @@ The following list explains the previous example:
       }
       addtask do_deploy_setscene
 
-  ``sstate_setscene()`` takes the flags above as input and accelerates the ``do_deploy`` task
+  ``sstate_setscene()`` takes the flags above as input and accelerates the :ref:`ref-tasks-deploy` task
   through the shared state cache if possible. If the task was
   accelerated, ``sstate_setscene()`` returns True. Otherwise, it
-  returns False, and the normal ``do_deploy`` task runs. For more
+  returns False, and the normal :ref:`ref-tasks-deploy` task runs. For more
   information, see the ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-execution:setscene`"
   section in the BitBake User Manual.
 
 -  The ``do_deploy[dirs] = "${DEPLOYDIR} ${B}"`` line creates
-   ``${DEPLOYDIR}`` and ``${B}`` before the ``do_deploy`` task runs, and
-   also sets the current working directory of ``do_deploy`` to ``${B}``.
+   ``${DEPLOYDIR}`` and ``${B}`` before the :ref:`ref-tasks-deploy` task runs, and
+   also sets the current working directory of :ref:`ref-tasks-deploy` to ``${B}``.
    For more information, see the ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:variable flags`"
    section in the BitBake
    User Manual.
@@ -1854,7 +1850,7 @@ The following list explains the previous example:
 
       In cases where ``sstate-inputdirs`` and ``sstate-outputdirs`` would be
       the same, you can use ``sstate-plaindirs``. For example, to preserve the
-      ${:term:`PKGD`} and ${:term:`PKGDEST`} output from the ``do_package``
+      ${:term:`PKGD`} and ${:term:`PKGDEST`} output from the :ref:`ref-tasks-package`
       task, use the following::
 
               do_package[sstate-plaindirs] = "${PKGD} ${PKGDEST}"
@@ -2101,12 +2097,12 @@ dependencies, you must manually declare the dependencies.
    :term:`PRIVATE_LIBS` inside
    the package's recipe.
 
--  ``pcdeps``: During the ``do_package`` task of each recipe, all
+-  ``pcdeps``: During the :ref:`ref-tasks-package` task of each recipe, all
    pkg-config modules (``*.pc`` files) installed by the recipe are
    located. For each module, the package that contains the module is
    registered as providing the module. The resulting module-to-package
    mapping is saved globally in :term:`PKGDATA_DIR` by the
-   ``do_packagedata`` task.
+   :ref:`ref-tasks-packagedata` task.
 
    Simultaneously, all pkg-config modules installed by the recipe are
    inspected to see what other pkg-config modules they depend on. A
@@ -2147,7 +2143,7 @@ dependencies, you must manually declare the dependencies.
    :term:`ALLOW_EMPTY` variable
    for more information.
 
-The ``do_package`` task depends on the ``do_packagedata`` task of each
+The :ref:`ref-tasks-package` task depends on the :ref:`ref-tasks-packagedata` task of each
 recipe in :term:`DEPENDS` through use
 of a ``[``\ :ref:`deptask <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:variable flags>`\ ``]``
 declaration, which guarantees that the required
@@ -2162,8 +2158,8 @@ operations that are normally reserved for the root user (e.g.
 :ref:`ref-tasks-install`,
 :ref:`do_package_write* <ref-tasks-package_write_deb>`,
 :ref:`ref-tasks-rootfs`, and
-:ref:`do_image* <ref-tasks-image>`). For example,
-the ``do_install`` task benefits from being able to set the UID and GID
+:ref:`do_image_* <ref-tasks-image>`). For example,
+the :ref:`ref-tasks-install` task benefits from being able to set the UID and GID
 of installed files to arbitrary values.
 
 One approach to allowing tasks to perform root-only operations would be

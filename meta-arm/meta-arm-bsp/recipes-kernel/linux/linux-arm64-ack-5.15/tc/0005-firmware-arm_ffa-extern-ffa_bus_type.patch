@@ -1,0 +1,31 @@
+From 53e29fa837f36f3a699f7ada50dd08e43028a9c7 Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Thu, 13 Jan 2022 22:23:52 +0000
+Subject: [PATCH 05/40] firmware: arm_ffa: extern ffa_bus_type
+
+extern ffa_bus_type so that SP driver can use it in bus_find_device call.
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Change-Id: Ib7a6a563aa35627a545f82c796816a5f72c80d70
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com>
+---
+ include/linux/arm_ffa.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/linux/arm_ffa.h b/include/linux/arm_ffa.h
+index 06dc83d38779..d5c0a0c37fbe 100644
+--- a/include/linux/arm_ffa.h
++++ b/include/linux/arm_ffa.h
+@@ -179,6 +179,8 @@ const struct ffa_dev_ops *ffa_dev_ops_get(struct ffa_device *dev)
+ #define ffa_unregister(driver) \
+ 	ffa_driver_unregister(driver)
+ 
++extern struct bus_type ffa_bus_type;
++
+ /**
+  * module_ffa_driver() - Helper macro for registering a psa_ffa driver
+  * @__ffa_driver: ffa_driver structure
+-- 
+2.34.1
+

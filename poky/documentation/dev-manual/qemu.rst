@@ -123,9 +123,9 @@ available. Follow these general steps to run QEMU:
 
          $ runqemu qemux86-64 core-image-minimal ext4
 
-   -  This example specifies to boot an initial RAM disk image and to
-      enable audio in QEMU. For this case, ``runqemu`` set the internal
-      variable ``FSTYPE`` to "cpio.gz". Also, for audio to be enabled,
+   -  This example specifies to boot an :term:`Initramfs` image and to
+      enable audio in QEMU. For this case, ``runqemu`` sets the internal
+      variable ``FSTYPE`` to ``cpio.gz``. Also, for audio to be enabled,
       an appropriate driver must be installed (see the previous
       description for the ``audio`` option for more information).
       ::
@@ -394,7 +394,7 @@ command line:
    options are basically identical. If you do not provide a MACHINE
    option, ``runqemu`` tries to determine it based on other options.
 
--  ``ramfs``: Indicates you are booting an initial RAM disk (initramfs)
+-  ``ramfs``: Indicates you are booting an :term:`Initramfs`
    image, which means the ``FSTYPE`` is ``cpio.gz``.
 
 -  ``iso``: Indicates you are booting an ISO image, which means the

@@ -1,0 +1,55 @@
+From 47cd54d908380de17d84a852625ef3a1ff92f496 Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Fri, 14 Jan 2022 12:23:04 +0000
+Subject: [PATCH 06/40] firmware: arm_ffa: Fix FFA_MEM_SHARE and
+ FFA_MEM_FRAG_TX
+
+FFA memory share on success might return FFA_MEM_FRAG_RX. In that case
+set handle from w1/w2 from FFA return value.
+
+FFA_MEM_FRAG_TX call will return FFA_SUCCESS for the last fragment, so
+check for this return code.
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Change-Id: I7ef44742d53a9e75d8587d1213be98a1352f16d4
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com>
+---
+ drivers/firmware/arm_ffa/driver.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/firmware/arm_ffa/driver.c b/drivers/firmware/arm_ffa/driver.c
+index d3d53fbd3d29..de6641912768 100644
+--- a/drivers/firmware/arm_ffa/driver.c
++++ b/drivers/firmware/arm_ffa/driver.c
+@@ -317,11 +317,15 @@ static int ffa_mem_first_frag(u32 func_id, phys_addr_t buf, u32 buf_sz,
+ 	if (ret.a0 == FFA_ERROR)
+ 		return ffa_to_linux_errno((int)ret.a2);
+ 
+-	if (ret.a0 != FFA_SUCCESS)
++	if (ret.a0 != FFA_SUCCESS && ret.a0 != FFA_MEM_FRAG_RX)
+ 		return -EOPNOTSUPP;
+ 
+-	if (handle)
+-		*handle = PACK_HANDLE(ret.a2, ret.a3);
++	if (handle) {
++		if (ret.a0 == FFA_MEM_FRAG_RX)
++			*handle = PACK_HANDLE(ret.a1, ret.a2);
++		else
++			*handle = PACK_HANDLE(ret.a2, ret.a3);
++	}
+ 
+ 	return frag_len;
+ }
+@@ -345,7 +349,7 @@ static int ffa_mem_next_frag(u64 handle, u32 frag_len)
+ 	if (ret.a0 == FFA_ERROR)
+ 		return ffa_to_linux_errno((int)ret.a2);
+ 
+-	if (ret.a0 != FFA_MEM_FRAG_RX)
++	if (ret.a0 != FFA_SUCCESS && ret.a0 != FFA_MEM_FRAG_RX)
+ 		return -EOPNOTSUPP;
+ 
+ 	return ret.a3;
+-- 
+2.34.1
+

@@ -22,7 +22,6 @@ repositories = (
     "https://git.yoctoproject.org/git/poky",
     "https://git.openembedded.org/meta-openembedded",
     "https://git.yoctoproject.org/git/meta-virtualization",
-    "https://git.yoctoproject.org/git/meta-zephyr",
     "https://github.com/kraj/meta-clang",
 )
 

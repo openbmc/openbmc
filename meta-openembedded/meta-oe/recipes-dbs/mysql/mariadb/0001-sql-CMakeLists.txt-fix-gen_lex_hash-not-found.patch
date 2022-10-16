@@ -1,0 +1,69 @@
+From f92f657973997df30afdb0032c88ad3a14ead46b Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Fri, 23 Sep 2022 15:48:21 +0800
+Subject: [PATCH] sql/CMakeLists.txt: fix gen_lex_hash not found
+
+Fix the below do_compile issue in cross-compiling env.
+| make[2]: *** No rule to make target '/build/tmp/work/aarch64-poky-linux/mariadb/10.3.13-r0/mariadb-10.3.13/sql/gen_lex_hash', needed by 'sql/lex_hash.h'.  Stop.
+| make[2]: *** No rule to make target '/build/tmp/work/aarch64-poky-linux/mariadb/10.3.13-r0/mariadb-10.3.13/sql/gen_lex_token', needed by 'sql/lex_token.h'.  Stop.
+
+Upstream-Status: Inappropriate [oe build specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ sql/CMakeLists.txt | 30 ++++++++++++++++++++++--------
+ 1 file changed, 22 insertions(+), 8 deletions(-)
+
+diff --git a/sql/CMakeLists.txt b/sql/CMakeLists.txt
+index 241b482..27a3991 100644
+--- a/sql/CMakeLists.txt
++++ b/sql/CMakeLists.txt
+@@ -60,11 +60,18 @@ ${CMAKE_BINARY_DIR}/sql
+ ${CMAKE_SOURCE_DIR}/tpool
+ )
+ 
+-ADD_CUSTOM_COMMAND(
+-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/lex_token.h
+-  COMMAND gen_lex_token > lex_token.h
+-  DEPENDS gen_lex_token
++IF(NOT CMAKE_CROSSCOMPILING)
++  ADD_CUSTOM_COMMAND(
++    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/lex_token.h
++    COMMAND gen_lex_token > lex_token.h
++    DEPENDS gen_lex_token
++)
++ELSE()
++  ADD_CUSTOM_COMMAND(
++    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/lex_token.h
++    COMMAND gen_lex_token > lex_token.h
+ )
++ENDIF()
+ 
+ FIND_PACKAGE(BISON 2.4)
+ 
+@@ -372,11 +379,18 @@ IF(NOT CMAKE_CROSSCOMPILING OR DEFINED CMAKE_CROSSCOMPILING_EMULATOR)
+   ADD_EXECUTABLE(gen_lex_hash gen_lex_hash.cc)
+ ENDIF()
+ 
+-ADD_CUSTOM_COMMAND(
+-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/lex_hash.h
+-  COMMAND gen_lex_hash > lex_hash.h
+-  DEPENDS gen_lex_hash
++IF(NOT CMAKE_CROSSCOMPILING)
++  ADD_CUSTOM_COMMAND(
++    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/lex_hash.h
++    COMMAND gen_lex_hash > lex_hash.h
++    DEPENDS gen_lex_hash
++)
++ELSE()
++  ADD_CUSTOM_COMMAND(
++    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/lex_hash.h
++    COMMAND gen_lex_hash > lex_hash.h
+ )
++ENDIF()
+ 
+ MYSQL_ADD_EXECUTABLE(mariadb-tzinfo-to-sql tztime.cc)
+ SET_TARGET_PROPERTIES(mariadb-tzinfo-to-sql PROPERTIES COMPILE_FLAGS "-DTZINFO2SQL")
+-- 
+2.25.1
+

@@ -630,7 +630,7 @@ Here are key subdirectories within each recipe work directory:
    split into individual packages.
 
 -  ``${WORKDIR}/packages-split``: Contains the output of the
-   ``do_package`` task after the output has been split into individual
+   :ref:`ref-tasks-package` task after the output has been split into individual
    packages. There are subdirectories for each individual package created by
    the recipe.
 

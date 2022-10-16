@@ -8,7 +8,3 @@ COMPATIBLE_MACHINE ?= "invalid"
 SP_UUID = "${ENV_TEST_UUID}"
 
 OECMAKE_SOURCEPATH="${S}/deployments/env-test/${TS_ENV}"
-
-SRC_URI += "\
-            file://0013-env-test-no-std-libs.patch \
-"

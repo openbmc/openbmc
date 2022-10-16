@@ -165,7 +165,7 @@ The following changes have occurred to the QA check process:
    more parallel execution. This change is unlikely to be an issue
    except for highly customized recipes that disable packaging tasks
    themselves by marking them as ``noexec``. For those packages, you
-   will need to disable the ``do_package_qa`` task as well.
+   will need to disable the :ref:`ref-tasks-package_qa` task as well.
 
 -  Files being overwritten during the
    :ref:`ref-tasks-populate_sysroot` task now

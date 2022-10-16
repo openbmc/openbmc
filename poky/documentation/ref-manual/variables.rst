@@ -1242,24 +1242,24 @@ system and gives an overview of their function and contents.
          :term:`Source Directory`.
 
    :term:`CONFIG_INITRAMFS_SOURCE`
-      Identifies the initial RAM filesystem (initramfs) source files. The
+      Identifies the initial RAM filesystem (:term:`Initramfs`) source files. The
       OpenEmbedded build system receives and uses this kernel Kconfig
       variable as an environment variable. By default, the variable is set
       to null ("").
 
       The :term:`CONFIG_INITRAMFS_SOURCE` can be either a single cpio archive
       with a ``.cpio`` suffix or a space-separated list of directories and
-      files for building the initramfs image. A cpio archive should contain
-      a filesystem archive to be used as an initramfs image. Directories
-      should contain a filesystem layout to be included in the initramfs
+      files for building the :term:`Initramfs` image. A cpio archive should contain
+      a filesystem archive to be used as an :term:`Initramfs` image. Directories
+      should contain a filesystem layout to be included in the :term:`Initramfs`
       image. Files should contain entries according to the format described
       by the ``usr/gen_init_cpio`` program in the kernel tree.
 
-      If you specify multiple directories and files, the initramfs image
+      If you specify multiple directories and files, the :term:`Initramfs` image
       will be the aggregate of all of them.
 
-      For information on creating an initramfs, see the
-      ":ref:`dev-manual/common-tasks:building an initial ram filesystem (initramfs) image`" section
+      For information on creating an :term:`Initramfs`, see the
+      ":ref:`dev-manual/common-tasks:building an initial ram filesystem (Initramfs) image`" section
       in the Yocto Project Development Tasks Manual.
 
    :term:`CONFIG_SITE`
@@ -1620,7 +1620,7 @@ system and gives an overview of their function and contents.
       the appropriate staging sysroot, given by the
       :term:`STAGING_DIR* <STAGING_DIR>` variables, by the time the
       :ref:`ref-tasks-configure` task for ``foo`` runs.
-      This mechanism is implemented by having ``do_configure`` depend on
+      This mechanism is implemented by having :ref:`ref-tasks-configure` depend on
       the :ref:`ref-tasks-populate_sysroot` task of
       each recipe listed in :term:`DEPENDS`, through a
       ``[``\ :ref:`deptask <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:variable flags>`\ ``]``
@@ -3182,10 +3182,10 @@ system and gives an overview of their function and contents.
             image, do not use the :term:`IMAGE_INSTALL` variable to specify
             packages for installation. Instead, use the
             :term:`PACKAGE_INSTALL` variable, which
-            allows the initial RAM filesystem (initramfs) recipe to use a
+            allows the initial RAM filesystem (:term:`Initramfs`) recipe to use a
             fixed set of packages and not be affected by :term:`IMAGE_INSTALL`.
-            For information on creating an initramfs, see the
-            ":ref:`dev-manual/common-tasks:building an initial ram filesystem (initramfs) image`"
+            For information on creating an :term:`Initramfs`, see the
+            ":ref:`dev-manual/common-tasks:building an initial ram filesystem (Initramfs) image`"
             section in the Yocto Project Development Tasks Manual.
 
          -  Using :term:`IMAGE_INSTALL` with the
@@ -3265,7 +3265,7 @@ system and gives an overview of their function and contents.
       to distinguish the image file from other files created during image
       building; however if this suffix is redundant or not desired you can
       clear the value of this variable (set the value to ""). For example,
-      this is typically cleared in initramfs image recipes.
+      this is typically cleared in :term:`Initramfs` image recipes.
 
    :term:`IMAGE_OVERHEAD_FACTOR`
       Defines a multiplier that the build system applies to the initial
@@ -3632,37 +3632,79 @@ system and gives an overview of their function and contents.
          even if the toolchain's binaries are strippable, there are other files
          needed for the build that are not strippable.
 
+   :term:`Initramfs`
+      An Initial RAM Filesystem (:term:`Initramfs`) is an optionally compressed
+      `cpio <https://en.wikipedia.org/wiki/Cpio>`__ archive which is extracted
+      by the Linux kernel into RAM in a special `tmpfs <https://en.wikipedia.org/wiki/Tmpfs>`__
+      instance, used as the initial root filesystem.
+
+      This is a replacement for the legacy init RAM disk ("initrd")
+      technique, booting on an emulated block device in RAM, but being less
+      efficient because of the overhead of going through a filesystem and
+      having to duplicate accessed file contents in the file cache in RAM,
+      as for any block device.
+
+      .. note:
+
+         As far as bootloaders are concerned, :term:`Initramfs` and "initrd"
+         images are still copied to RAM in the same way. That's why most
+	 most bootloaders refer to :term:`Initramfs` images as "initrd"
+	 or "init RAM disk".
+
+      This kind of mechanism is typically used for two reasons:
+
+      -  For booting the same kernel binary on multiple systems requiring
+         different device drivers. The Initramfs image is then customized
+	 for each type of system, to include the specific  kernel modules
+         necessary to access the final root filesystem. This technique
+	 is used on all GNU / Linux distributions for desktops and servers.
+
+      -  For booting faster. As the root filesystem is extracted into RAM,
+         accessing the first user-space applications is very fast, compared
+         to having to initialize a block device, to access multiple blocks
+         from it, and to go through a filesystem having its own overhead.
+         For example, this allows to display a splashscreen very early,
+	 and to later take care of mounting the final root filesystem and
+         loading less time-critical kernel drivers.
+
+      This cpio archive can either be loaded to RAM by the bootloader,
+      or be included in the kernel binary.
+
+      For information on creating and using an :term:`Initramfs`, see the
+      ":ref:`dev-manual/common-tasks:building an initial ram filesystem (Initramfs) image`"
+      section in the Yocto Project Development Tasks Manual.
+
    :term:`INITRAMFS_DEPLOY_DIR_IMAGE`
-      Indicates the deploy directory used by ``do_bundle_initramfs`` where the
+      Indicates the deploy directory used by :ref:`ref-tasks-bundle_initramfs` where the
       :term:`INITRAMFS_IMAGE` will be fetched from.
       This variable is set by default to ``${DEPLOY_DIR_IMAGE}`` in the
       :ref:`kernel <ref-classes-kernel>` class and it's only meant to be changed
-      when building an initramfs image from a separate multiconfig via :term:`INITRAMFS_MULTICONFIG`.
+      when building an :term:`Initramfs` image from a separate multiconfig via :term:`INITRAMFS_MULTICONFIG`.
 
    :term:`INITRAMFS_FSTYPES`
       Defines the format for the output image of an initial RAM filesystem
-      (initramfs), which is used during boot. Supported formats are the
+      (:term:`Initramfs`), which is used during boot. Supported formats are the
       same as those supported by the
       :term:`IMAGE_FSTYPES` variable.
 
       The default value of this variable, which is set in the
       ``meta/conf/bitbake.conf`` configuration file in the
       :term:`Source Directory`, is "cpio.gz". The Linux kernel's
-      initramfs mechanism, as opposed to the initial RAM filesystem
+      :term:`Initramfs` mechanism, as opposed to the initial RAM filesystem
       `initrd <https://en.wikipedia.org/wiki/Initrd>`__ mechanism, expects
       an optionally compressed cpio archive.
 
    :term:`INITRAMFS_IMAGE`
       Specifies the :term:`PROVIDES` name of an image
-      recipe that is used to build an initial RAM filesystem (initramfs)
+      recipe that is used to build an initial RAM filesystem (:term:`Initramfs`)
       image. In other words, the :term:`INITRAMFS_IMAGE` variable causes an
       additional recipe to be built as a dependency to whatever root
       filesystem recipe you might be using (e.g. ``core-image-sato``). The
-      initramfs image recipe you provide should set
+      :term:`Initramfs` image recipe you provide should set
       :term:`IMAGE_FSTYPES` to
       :term:`INITRAMFS_FSTYPES`.
 
-      An initramfs image provides a temporary root filesystem used for
+      An :term:`Initramfs` image provides a temporary root filesystem used for
       early system initialization (e.g. loading of modules needed to locate
       and mount the "real" root filesystem).
 
@@ -3670,8 +3712,8 @@ system and gives an overview of their function and contents.
 
          See the ``meta/recipes-core/images/core-image-minimal-initramfs.bb``
          recipe in the :term:`Source Directory`
-         for an example initramfs recipe. To select this sample recipe as
-         the one built to provide the initramfs image, set :term:`INITRAMFS_IMAGE`
+         for an example :term:`Initramfs` recipe. To select this sample recipe as
+         the one built to provide the :term:`Initramfs` image, set :term:`INITRAMFS_IMAGE`
          to "core-image-minimal-initramfs".
 
       You can also find more information by referencing the
@@ -3681,13 +3723,13 @@ system and gives an overview of their function and contents.
       class to see how to use the :term:`INITRAMFS_IMAGE` variable.
 
       If :term:`INITRAMFS_IMAGE` is empty, which is the default, then no
-      initramfs image is built.
+      :term:`Initramfs` image is built.
 
       For more information, you can also see the
       :term:`INITRAMFS_IMAGE_BUNDLE`
       variable, which allows the generated image to be bundled inside the
-      kernel image. Additionally, for information on creating an initramfs
-      image, see the ":ref:`dev-manual/common-tasks:building an initial ram filesystem (initramfs) image`" section
+      kernel image. Additionally, for information on creating an :term:`Initramfs`
+      image, see the ":ref:`dev-manual/common-tasks:building an initial ram filesystem (Initramfs) image`" section
       in the Yocto Project Development Tasks Manual.
 
    :term:`INITRAMFS_IMAGE_BUNDLE`
@@ -3696,32 +3738,32 @@ system and gives an overview of their function and contents.
       extra pass
       (:ref:`ref-tasks-bundle_initramfs`) during
       kernel compilation in order to build a single binary that contains
-      both the kernel image and the initial RAM filesystem (initramfs)
+      both the kernel image and the initial RAM filesystem (:term:`Initramfs`)
       image. This makes use of the
       :term:`CONFIG_INITRAMFS_SOURCE` kernel
       feature.
 
       .. note::
 
-         Bundling the initramfs with the kernel conflates the code in the
-         initramfs with the GPLv2 licensed Linux kernel binary. Thus only GPLv2
-         compatible software may be part of a bundled initramfs.
+         Bundling the :term:`Initramfs` with the kernel conflates the code in the
+         :term:`Initramfs` with the GPLv2 licensed Linux kernel binary. Thus only GPLv2
+         compatible software may be part of a bundled :term:`Initramfs`.
 
       .. note::
 
-         Using an extra compilation pass to bundle the initramfs avoids a
-         circular dependency between the kernel recipe and the initramfs
-         recipe should the initramfs include kernel modules. Should that be
-         the case, the initramfs recipe depends on the kernel for the
-         kernel modules, and the kernel depends on the initramfs recipe
-         since the initramfs is bundled inside the kernel image.
+         Using an extra compilation pass to bundle the :term:`Initramfs` avoids a
+         circular dependency between the kernel recipe and the :term:`Initramfs`
+         recipe should the :term:`Initramfs` include kernel modules. Should that be
+         the case, the :term:`Initramfs` recipe depends on the kernel for the
+         kernel modules, and the kernel depends on the :term:`Initramfs` recipe
+         since the :term:`Initramfs` is bundled inside the kernel image.
 
       The combined binary is deposited into the ``tmp/deploy`` directory,
       which is part of the :term:`Build Directory`.
 
       Setting the variable to "1" in a configuration file causes the
       OpenEmbedded build system to generate a kernel image with the
-      initramfs specified in :term:`INITRAMFS_IMAGE` bundled within::
+      :term:`Initramfs` specified in :term:`INITRAMFS_IMAGE` bundled within::
 
          INITRAMFS_IMAGE_BUNDLE = "1"
 
@@ -3739,7 +3781,7 @@ system and gives an overview of their function and contents.
       See the
       :yocto_git:`local.conf.sample.extended </poky/tree/meta-poky/conf/templates/default/local.conf.sample.extended>`
       file for additional information. Also, for information on creating an
-      initramfs, see the ":ref:`dev-manual/common-tasks:building an initial ram filesystem (initramfs) image`" section
+      :term:`Initramfs`, see the ":ref:`dev-manual/common-tasks:building an initial ram filesystem (Initramfs) image`" section
       in the Yocto Project Development Tasks Manual.
 
    :term:`INITRAMFS_LINK_NAME`
@@ -3764,7 +3806,7 @@ system and gives an overview of their function and contents.
       This allows the kernel to bundle an :term:`INITRAMFS_IMAGE` coming from
       a separate multiconfig, this is meant to be used in addition to :term:`INITRAMFS_DEPLOY_DIR_IMAGE`.
 
-      For more information on how to bundle an initramfs image from a separate
+      For more information on how to bundle an :term:`Initramfs` image from a separate
       multiconfig see the ":ref:`dev-manual/common-tasks:Bundling an Initramfs Image From a Separate Multiconfig`"
       section in the Yocto Project Development Tasks Manual.
 
@@ -4240,7 +4282,7 @@ system and gives an overview of their function and contents.
       :term:`KERNELDEPMODDEPEND` does not control whether or not that data
       exists, but simply whether or not it is used. If you do not need to
       use the data, set the :term:`KERNELDEPMODDEPEND` variable in your
-      ``initramfs`` recipe. Setting the variable there when the data is not
+      :term:`Initramfs` recipe. Setting the variable there when the data is not
       needed avoids a potential dependency loop.
 
    :term:`KFEATURE_DESCRIPTION`
@@ -5395,9 +5437,9 @@ system and gives an overview of their function and contents.
       :term:`IMAGE_INSTALL` variable to specify
       packages for installation. The exception to this is when working with
       the :ref:`core-image-minimal-initramfs <ref-manual/images:images>`
-      image. When working with an initial RAM filesystem (initramfs) image,
+      image. When working with an initial RAM filesystem (:term:`Initramfs`) image,
       use the :term:`PACKAGE_INSTALL` variable. For information on creating an
-      initramfs, see the ":ref:`dev-manual/common-tasks:building an initial ram filesystem (initramfs) image`" section
+      :term:`Initramfs`, see the ":ref:`dev-manual/common-tasks:building an initial ram filesystem (Initramfs) image`" section
       in the Yocto Project Development Tasks Manual.
 
    :term:`PACKAGE_INSTALL_ATTEMPTONLY`
@@ -5521,7 +5563,7 @@ system and gives an overview of their function and contents.
       :ref:`cmake <ref-classes-cmake>` use :term:`PACKAGECONFIG_CONFARGS` to
       pass :term:`PACKAGECONFIG` options to ``configure`` and ``cmake``,
       respectively. If you are using :term:`PACKAGECONFIG` but not a class that
-      handles the ``do_configure`` task, then you need to use
+      handles the :ref:`ref-tasks-configure` task, then you need to use
       :term:`PACKAGECONFIG_CONFARGS` appropriately.
 
    :term:`PACKAGEGROUP_DISABLE_COMPLEMENTARY`
@@ -5603,7 +5645,7 @@ system and gives an overview of their function and contents.
       .. note::
 
          If the software being built experiences dependency issues during
-         the ``do_compile`` task that result in race conditions, you can clear
+         the :ref:`ref-tasks-compile` task that result in race conditions, you can clear
          the :term:`PARALLEL_MAKE` variable within the recipe as a workaround. For
          information on addressing race conditions, see the
          ":ref:`dev-manual/common-tasks:debugging parallel make races`"
@@ -5633,7 +5675,7 @@ system and gives an overview of their function and contents.
          way to ensure this is to use the ``oe_runmake`` function.
 
          If the software being built experiences dependency issues during
-         the ``do_install`` task that result in race conditions, you can
+         the :ref:`ref-tasks-install` task that result in race conditions, you can
          clear the :term:`PARALLEL_MAKEINST` variable within the recipe as a
          workaround. For information on addressing race conditions, see the
          ":ref:`dev-manual/common-tasks:debugging parallel make races`"
@@ -6200,7 +6242,7 @@ system and gives an overview of their function and contents.
       The practical effect of the above :term:`RDEPENDS` assignment is that
       ``bar`` and ``baz`` will be declared as dependencies inside the
       package ``foo`` when it is written out by one of the
-      :ref:`do_package_write_\* <ref-tasks-package_write_deb>` tasks.
+      :ref:`do_package_write_* <ref-tasks-package_write_deb>` tasks.
       Exactly how this is done depends on which package format is used,
       which is determined by
       :term:`PACKAGE_CLASSES`. When the
@@ -6212,7 +6254,7 @@ system and gives an overview of their function and contents.
       added. This dependency is from the recipe's
       :ref:`ref-tasks-build` (not to be confused with
       :ref:`ref-tasks-compile`) task to the
-      ``do_package_write_*`` task of the recipes that build ``bar`` and
+      :ref:`do_package_write_* <ref-tasks-package_write_deb>` task of the recipes that build ``bar`` and
       ``baz``.
 
       The names of the packages you list within :term:`RDEPENDS` must be the
@@ -6709,10 +6751,10 @@ system and gives an overview of their function and contents.
       A list of shared state tasks added to the extensible SDK. By default,
       the following tasks are added:
 
-      - do_populate_lic
-      - do_package_qa
-      - do_populate_sysroot
-      - do_deploy
+      - :ref:`ref-tasks-populate_lic`
+      - :ref:`ref-tasks-package_qa`
+      - :ref:`ref-tasks-populate_sysroot`
+      - :ref:`ref-tasks-deploy`
 
       Despite the default value of "" for the
       :term:`SDK_RECRDEP_TASKS` variable, the above four tasks are always added
@@ -7382,7 +7424,7 @@ system and gives an overview of their function and contents.
       For most recipes, this sysroot is the one in which that recipe's
       :ref:`ref-tasks-populate_sysroot` task copies
       files. Exceptions include ``-native`` recipes, where the
-      ``do_populate_sysroot`` task instead uses
+      :ref:`ref-tasks-populate_sysroot` task instead uses
       :term:`STAGING_DIR_NATIVE`. Depending on
       the type of recipe and the build target, :term:`STAGING_DIR_HOST` can
       have the following values:
