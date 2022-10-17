@@ -1,0 +1,39 @@
+#!/bin/bash
+
+declare -a PORT_NUM_MAP=(10 3 2 1 7 6 5)
+declare -a PORT_NAME_MAP=(BMC SLED1 SLED2 SLED3 SLED4 SLED5 SLED6)
+SWITCH_MDIO_BUS="1e650000.mdio-1"
+
+for port_phy in {0..6}
+do
+    printf "========================================\n"
+    printf "Port %d (%s)\n" "${PORT_NUM_MAP[port_phy]}" "${PORT_NAME_MAP[port_phy]}"
+    printf "****************************************\n"
+    printf "[%02X]: %04X (%s)\n" 0x00 "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x00)" "Port Status"
+    printf "[%02X]: %04X (%s)\n" 0x01 "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x01)" "Physical Control"
+    printf "[%02X]: %04X (%s)\n" 0x02 "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x02)" "Flow Control"
+    printf "[%02X]: %04X (%s)\n" 0x03 "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x03)" "Switch Identifier"
+    printf "[%02X]: %04X (%s)\n" 0x04 "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x04)" "Port Control 0"
+    printf "[%02X]: %04X (%s)\n" 0x05 "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x05)" "Port Control 1"
+    printf "[%02X]: %04X (%s)\n" 0x06 "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x06)" "Port Based VLAN Map"
+    printf "[%02X]: %04X (%s)\n" 0x07 "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x07)" "Default VLAN ID & Priority"
+    printf "[%02X]: %04X (%s)\n" 0x08 "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x08)" "Port Control 2"
+    printf "[%02X]: %04X (%s)\n" 0x09 "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x09)" "Egress Rate Control"
+    printf "[%02X]: %04X (%s)\n" 0x0A "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x0A)" "Egress Rate Control 2"
+    printf "[%02X]: %04X (%s)\n" 0x0B "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x0B)" "Port Association Vector"
+    printf "[%02X]: %04X (%s)\n" 0x0C "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x0C)" "Port ATU Control"
+    printf "[%02X]: %04X (%s)\n" 0x0D "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x0D)" "Override"
+    printf "[%02X]: %04X (%s)\n" 0x0E "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x0E)" "Policy & MGMT Control"
+    printf "[%02X]: %04X (%s)\n" 0x10 "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x10)" "Extended Port Control Operation"
+    printf "[%02X]: %04X (%s)\n" 0x11 "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x11)" "Extended Port Control Data"
+    printf "[%02X]: %04X (%s)\n" 0x16 "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x16)" "LED Control"
+    printf "[%02X]: %04X (%s)\n" 0x17 "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x17)" "IP Priority Mapping Table"
+    printf "[%02X]: %04X (%s)\n" 0x18 "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x18)" "IEEE Priority Mapping Table"
+    printf "[%02X]: %04X (%s)\n" 0x19 "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x19)" "Port Control 3"
+    printf "[%02X]: %04X (%s)\n" 0x1B "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x1B)" "Queue Counters"
+    printf "[%02X]: %04X (%s)\n" 0x1C "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x1C)" "Queue Control"
+    printf "[%02X]: %04X (%s)\n" 0x1D "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x1D)" "Queue Control 2"
+    printf "[%02X]: %04X (%s)\n" 0x1E "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x1E)" "Enable & Cut Through"
+    printf "[%02X]: %04X (%s)\n" 0x1F "$(mdio "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[port_phy]}" 0x1F)" "Debug Counters"
+    printf "========================================\n\n"
+done
