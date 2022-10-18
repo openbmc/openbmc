@@ -2628,7 +2628,7 @@ Recipe Syntax
 Understanding recipe file syntax is important for writing recipes. The
 following list overviews the basic items that make up a BitBake recipe
 file. For more complete BitBake syntax descriptions, see the
-":doc:`bitbake-user-manual/bitbake-user-manual-metadata`"
+":doc:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata`"
 chapter of the BitBake User Manual.
 
 -  *Variable Assignments and Manipulations:* Variable assignments allow

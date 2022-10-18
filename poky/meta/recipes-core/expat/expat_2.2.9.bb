@@ -20,6 +20,7 @@ SRC_URI = "git://github.com/libexpat/libexpat.git;protocol=https;branch=master \
            file://CVE-2022-25314.patch \
            file://CVE-2022-25315.patch \
            file://libtool-tag.patch \
+           file://CVE-2022-40674.patch \
          "
 
 SRCREV = "a7bc26b69768f7fb24f0c7976fae24b157b85b13"

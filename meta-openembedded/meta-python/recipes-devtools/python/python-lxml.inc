@@ -18,6 +18,8 @@ LIC_FILES_CHKSUM = "file://LICENSES.txt;md5=e4c045ebad958ead4b48008f70838403 \
 
 DEPENDS += "libxml2 libxslt"
 
+SRC_URI += "file://CVE-2022-2309.patch"
+
 SRC_URI[md5sum] = "f088e452ed45b030b6f84269f1e84d11"
 SRC_URI[sha256sum] = "8620ce80f50d023d414183bf90cc2576c2837b88e00bea3f33ad2630133bbb60"
 

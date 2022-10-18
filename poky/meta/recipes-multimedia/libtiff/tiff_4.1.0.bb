@@ -25,6 +25,10 @@ SRC_URI = "http://download.osgeo.org/libtiff/tiff-${PV}.tar.gz \
            file://CVE-2022-0891.patch \
            file://CVE-2022-0924.patch \
            file://CVE-2022-2056-CVE-2022-2057-CVE-2022-2058.patch \
+           file://CVE-2022-34526.patch \
+           file://CVE-2022-2867-CVE-2022-2868-CVE-2022-2869.patch \
+           file://CVE-2022-1354.patch \
+           file://CVE-2022-1355.patch \
           "
 SRC_URI[md5sum] = "2165e7aba557463acc0664e71a3ed424"
 SRC_URI[sha256sum] = "5d29f32517dadb6dbcd1255ea5bbc93a2b54b94fbf83653b4d65c7d6775b8634"

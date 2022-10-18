@@ -63,6 +63,8 @@ Project metadata:
 
 -  *keyboard:* Hardware has a keyboard
 
+-  *numa:* Hardware has non-uniform memory access
+
 -  *pcbios:* Support for booting through BIOS
 
 -  *pci:* Hardware has a PCI bus

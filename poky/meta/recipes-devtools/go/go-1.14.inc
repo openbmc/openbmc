@@ -25,6 +25,22 @@ SRC_URI += "\
     file://CVE-2021-44717.patch \
     file://CVE-2022-24675.patch \
     file://CVE-2021-31525.patch \
+    file://CVE-2022-30629.patch \
+    file://CVE-2022-30631.patch \
+    file://CVE-2022-30632.patch \
+    file://CVE-2022-30633.patch \
+    file://CVE-2022-30635.patch \
+    file://CVE-2022-32148.patch \
+    file://CVE-2022-32189.patch \
+    file://CVE-2021-27918.patch \
+    file://CVE-2021-36221.patch \
+    file://CVE-2021-39293.patch \
+    file://CVE-2021-41771.patch \
+    file://CVE-2022-27664.patch \
+    file://0001-CVE-2022-32190.patch \
+    file://0002-CVE-2022-32190.patch \
+    file://0003-CVE-2022-32190.patch \
+    file://0004-CVE-2022-32190.patch \
 "
 
 SRC_URI_append_libc-musl = " file://0009-ld-replace-glibc-dynamic-linker-with-musl.patch"
@@ -35,3 +51,9 @@ SRC_URI[main.sha256sum] = "7ed13b2209e54a451835997f78035530b331c5b6943cdcd68a3d8
 # https://github.com/golang/go/issues/30999#issuecomment-910470358
 CVE_CHECK_WHITELIST += "CVE-2021-29923"
 
+# this issue affected go1.15 onwards
+# https://security-tracker.debian.org/tracker/CVE-2022-29526
+CVE_CHECK_WHITELIST += "CVE-2022-29526"
+
+# Issue only on windows
+CVE_CHECK_WHITELIST += "CVE-2022-30634"

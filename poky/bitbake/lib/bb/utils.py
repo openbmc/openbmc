@@ -421,12 +421,14 @@ def better_eval(source, locals, extraglobals = None):
     return eval(source, ctx, locals)
 
 @contextmanager
-def fileslocked(files):
+def fileslocked(files, *args, **kwargs):
     """Context manager for locking and unlocking file locks."""
     locks = []
     if files:
         for lockfile in files:
-            locks.append(bb.utils.lockfile(lockfile))
+            l = bb.utils.lockfile(lockfile, *args, **kwargs)
+            if l is not None:
+                locks.append(l)
 
     try:
         yield

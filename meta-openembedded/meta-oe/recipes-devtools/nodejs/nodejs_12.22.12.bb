@@ -1,7 +1,7 @@
 DESCRIPTION = "nodeJS Evented I/O for V8 JavaScript"
 HOMEPAGE = "http://nodejs.org"
 LICENSE = "MIT & BSD & Artistic-2.0"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=8c66ff8861d9f96076a7cb61e3d75f54"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=93997aa7a45ba0f25f9c61aaab153ab8"
 
 DEPENDS = "openssl"
 DEPENDS_append_class-target = " nodejs-native"
@@ -22,12 +22,11 @@ SRC_URI = "http://nodejs.org/dist/v${PV}/node-v${PV}.tar.xz \
            file://big-endian.patch \
            file://mips-warnings.patch \
            file://0001-Remove-use-of-register-r7-because-llvm-now-issues-an.patch \
-           file://CVE-2021-44532.patch \
            "
 SRC_URI_append_class-target = " \
            file://0002-Using-native-binaries.patch \
            "
-SRC_URI[sha256sum] = "7fd805571df106f086f4c45e131efed98bfd62628d9dec96bd62f8c11b0c48dc"
+SRC_URI[sha256sum] = "bc42b7f8495b9bfc7f7850dd180bb02a5bdf139cc232b8c6f02a6967e20714f2"
 
 S = "${WORKDIR}/node-v${PV}"
 

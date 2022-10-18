@@ -1,0 +1,32 @@
+From 55c6315058fc0dd189ffd116f2cc27ba4fa84cb6 Mon Sep 17 00:00:00 2001
+From: Joan Bruguera <joanbrugueram@gmail.com>
+Date: Mon, 28 Dec 2020 01:41:31 +0100
+Subject: [PATCH] Fix build for Linux 5.11-rc1
+
+ksys_close was removed, as far as I can tell, close_fd replaces it.
+
+See also: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=8760c909f54a82aaa6e76da19afe798a0c77c3c3
+          https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=1572bfdf21d4d50e51941498ffe0b56c2289f783
+
+Upstream-Status: Backport [https://github.com/cryptodev-linux/cryptodev-linux/commit/55c6315058fc0dd189ffd116f2cc27ba4fa84cb6]
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ ioctl.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/ioctl.c b/ioctl.c
+index 3d332380..95481d4f 100644
+--- a/ioctl.c
++++ b/ioctl.c
+@@ -871,8 +871,10 @@ cryptodev_ioctl(struct file *filp, unsigned int cmd, unsigned long arg_)
+ 		if (unlikely(ret)) {
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 17, 0))
+ 			sys_close(fd);
+-#else
++#elif (LINUX_VERSION_CODE < KERNEL_VERSION(5, 11, 0))
+ 			ksys_close(fd);
++#else
++			close_fd(fd);
+ #endif
+ 			return ret;
+ 		}
