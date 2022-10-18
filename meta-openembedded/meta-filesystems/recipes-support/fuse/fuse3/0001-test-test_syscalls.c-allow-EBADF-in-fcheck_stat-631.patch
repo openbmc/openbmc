@@ -1,0 +1,45 @@
+From cee6de8d6619aeeb70f3318dfd35f2fdf5e43848 Mon Sep 17 00:00:00 2001
+From: Luis Henriques <luis-henrix@users.noreply.github.com>
+Date: Sat, 20 Nov 2021 10:09:25 +0000
+Subject: [PATCH] test/test_syscalls.c: allow EBADF in fcheck_stat() (#631)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Test test/test_examples.py::test_passthrough_hp[False] fails because, on
+kernels >= 5.14, fstat() will return -EBADF:
+
+3 [check_unlinked_testfile] fcheck_stat() - fstat: Bad file descriptor
+4 [check_unlinked_testfile] fcheck_stat() - fstat: Bad file descriptor
+5 [check_unlinked_testfile] fcheck_stat() - fstat: Bad file descriptor
+9 [check_unlinked_testfile] fcheck_stat() - fstat: Bad file descriptor
+...
+
+This patch simply whitelists the EBADF errno code.
+
+Signed-off-by: Luís Henriques <lhenriques@suse.de>
+Co-authored-by: Luís Henriques <lhenriques@suse.de>
+
+Upstream-Status: Backport [https://github.com/libfuse/libfuse/commit/cee6de8d6619aeeb70f3318dfd35f2fdf5e43848]
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ test/test_syscalls.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/test/test_syscalls.c b/test/test_syscalls.c
+index 160a2ac..65292ed 100644
+--- a/test/test_syscalls.c
++++ b/test/test_syscalls.c
+@@ -277,7 +277,8 @@ static int fcheck_stat(int fd, int flags, struct stat *st)
+ 		if (flags & O_PATH) {
+ 			// With O_PATH fd, the server does not have to keep
+ 			// the inode alive so FUSE inode may be stale or bad
+-			if (errno == ESTALE || errno == EIO || errno == ENOENT)
++			if (errno == ESTALE || errno == EIO ||
++			    errno == ENOENT || errno == EBADF)
+ 				return 0;
+ 		}
+ 		PERROR("fstat");
+-- 
+2.25.1
+

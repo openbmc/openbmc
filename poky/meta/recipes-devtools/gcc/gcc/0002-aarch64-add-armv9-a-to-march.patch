@@ -1,0 +1,89 @@
+From d3cf45d15b2fabc767b2d10a0c6bb9fb845e4f99 Mon Sep 17 00:00:00 2001
+From: Przemyslaw Wirkus <przemyslaw.wirkus@arm.com>
+Date: Fri, 1 Oct 2021 10:06:45 +0100
+Subject: [PATCH 2/4] aarch64: add armv9-a to -march
+
+commit f0688d42c9b74a6999548ff2e79ae440b049b87f from upstream
+
+gcc/ChangeLog:
+
+	* config/aarch64/aarch64-arches.def (AARCH64_ARCH): Added
+	armv9-a.
+	* config/aarch64/aarch64.h (AARCH64_FL_V9): New.
+	(AARCH64_FL_FOR_ARCH9): New flags for Armv9-A.
+	(AARCH64_ISA_V9): New ISA flag.
+	* doc/invoke.texi: Update docs.
+
+Upstream-Status: Backport
+Signed-off-by: Ruiqiang Hao <Ruiqiang.Hao@windriver.com>
+---
+ gcc/config/aarch64/aarch64-arches.def | 1 +
+ gcc/config/aarch64/aarch64.h          | 5 +++++
+ gcc/doc/invoke.texi                   | 3 +++
+ 3 files changed, 9 insertions(+)
+
+diff --git a/gcc/config/aarch64/aarch64-arches.def b/gcc/config/aarch64/aarch64-arches.def
+index b7497277b..c47ca622c 100644
+--- a/gcc/config/aarch64/aarch64-arches.def
++++ b/gcc/config/aarch64/aarch64-arches.def
+@@ -38,5 +38,6 @@ AARCH64_ARCH("armv8.4-a",     generic,	     8_4A,	8,  AARCH64_FL_FOR_ARCH8_4)
+ AARCH64_ARCH("armv8.5-a",     generic,	     8_5A,	8,  AARCH64_FL_FOR_ARCH8_5)
+ AARCH64_ARCH("armv8.6-a",     generic,	     8_6A,	8,  AARCH64_FL_FOR_ARCH8_6)
+ AARCH64_ARCH("armv8-r",       generic,	     8R  ,	8,  AARCH64_FL_FOR_ARCH8_R)
++AARCH64_ARCH("armv9-a",       generic,	     9A  ,	9,  AARCH64_FL_FOR_ARCH9)
+ 
+ #undef AARCH64_ARCH
+diff --git a/gcc/config/aarch64/aarch64.h b/gcc/config/aarch64/aarch64.h
+index bfffbcd6a..b914bfb5c 100644
+--- a/gcc/config/aarch64/aarch64.h
++++ b/gcc/config/aarch64/aarch64.h
+@@ -230,6 +230,8 @@ extern unsigned aarch64_architecture_version;
+ 
+ /* Pointer Authentication (PAUTH) extension.  */
+ #define AARCH64_FL_PAUTH      (1ULL << 40)
++/* Armv9.0-A.  */
++#define AARCH64_FL_V9         (1ULL << 41)  /* Armv9.0-A Architecture.  */
+ 
+ /* Has FP and SIMD.  */
+ #define AARCH64_FL_FPSIMD     (AARCH64_FL_FP | AARCH64_FL_SIMD)
+@@ -257,6 +259,8 @@ extern unsigned aarch64_architecture_version;
+    | AARCH64_FL_I8MM | AARCH64_FL_BF16)
+ #define AARCH64_FL_FOR_ARCH8_R     \
+   (AARCH64_FL_FOR_ARCH8_4 | AARCH64_FL_V8_R)
++#define AARCH64_FL_FOR_ARCH9       \
++  (AARCH64_FL_FOR_ARCH8_5 | AARCH64_FL_SVE | AARCH64_FL_SVE2 | AARCH64_FL_V9)
+ 
+ /* Macros to test ISA flags.  */
+ 
+@@ -295,6 +299,7 @@ extern unsigned aarch64_architecture_version;
+ #define AARCH64_ISA_SB		   (aarch64_isa_flags & AARCH64_FL_SB)
+ #define AARCH64_ISA_V8_R	   (aarch64_isa_flags & AARCH64_FL_V8_R)
+ #define AARCH64_ISA_PAUTH	   (aarch64_isa_flags & AARCH64_FL_PAUTH)
++#define AARCH64_ISA_V9		   (aarch64_isa_flags & AARCH64_FL_V9)
+ 
+ /* Crypto is an optional extension to AdvSIMD.  */
+ #define TARGET_CRYPTO (TARGET_SIMD && AARCH64_ISA_CRYPTO)
+diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
+index c47cfd472..7184a62d0 100644
+--- a/gcc/doc/invoke.texi
++++ b/gcc/doc/invoke.texi
+@@ -18270,6 +18270,8 @@ and the features that they enable by default:
+ @item @samp{armv8.4-a} @tab Armv8.4-A @tab @samp{armv8.3-a}, @samp{+flagm}, @samp{+fp16fml}, @samp{+dotprod}
+ @item @samp{armv8.5-a} @tab Armv8.5-A @tab @samp{armv8.4-a}, @samp{+sb}, @samp{+ssbs}, @samp{+predres}
+ @item @samp{armv8.6-a} @tab Armv8.6-A @tab @samp{armv8.5-a}, @samp{+bf16}, @samp{+i8mm}
++@item @samp{armv8.7-a} @tab Armv8.7-A @tab @samp{armv8.6-a}, @samp{+ls64}
++@item @samp{armv9-a} @tab Armv9-A @tab @samp{armv8.5-a}, @samp{+sve}, @samp{+sve2}
+ @item @samp{armv8-r} @tab Armv8-R @tab @samp{armv8-r}
+ @end multitable
+ 
+@@ -19692,6 +19694,7 @@ Permissible names are:
+ @samp{armv8.4-a},
+ @samp{armv8.5-a},
+ @samp{armv8.6-a},
++@samp{armv9-a},
+ @samp{armv7-r},
+ @samp{armv8-r},
+ @samp{armv6-m}, @samp{armv6s-m},
+-- 
+2.32.0
+

@@ -471,9 +471,9 @@ class QemuRunner:
                             self.server_socket = qemusock
                             stopread = True
                             reachedlogin = True
-                            self.logger.debug("Reached login banner in %s seconds (%s)" %
+                            self.logger.debug("Reached login banner in %s seconds (%s, %s)" %
                                               (time.time() - (endtime - self.boottime),
-                                              time.strftime("%D %H:%M:%S")))
+                                              time.strftime("%D %H:%M:%S"), time.time()))
                     else:
                         # no need to check if reachedlogin unless we support multiple connections
                         self.logger.debug("QEMU socket disconnected before login banner reached. (%s)" %
@@ -618,6 +618,8 @@ class QemuRunner:
                 return self.qmp.cmd(command)
 
     def run_serial(self, command, raw=False, timeout=60):
+        # Returns (status, output) where status is 1 on success and 0 on error
+
         # We assume target system have echo to get command status
         if not raw:
             command = "%s; echo $?\n" % command

@@ -1,0 +1,38 @@
+From 49bfa1927813ae898dfa4e0d2bbde033c353e3dc Mon Sep 17 00:00:00 2001
+From: Andre Vieira <andre.simoesdiasvieira@arm.com>
+Date: Tue, 22 Mar 2022 11:44:06 +0000
+Subject: [PATCH 3/4] aarch64: Enable FP16 feature by default for Armv9
+
+commit 0bae246acc758d4b11dd575b05207fd69169109b from upstream
+
+This patch adds the feature bit for FP16 to the feature set for Armv9 since
+Armv9 requires SVE to be implemented and SVE requires FP16 to be implemented.
+
+2022-03-22  Andre Vieira  <andre.simoesdiasvieira@arm.com>
+
+	* config/aarch64/aarch64.h (AARCH64_FL_FOR_ARCH9): Add FP16 feature
+	bit.
+
+Upstream-Status: Backport
+Signed-off-by: Ruiqiang Hao <Ruiqiang.Hao@windriver.com>
+---
+ gcc/config/aarch64/aarch64.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/gcc/config/aarch64/aarch64.h b/gcc/config/aarch64/aarch64.h
+index b914bfb5c..55b60d540 100644
+--- a/gcc/config/aarch64/aarch64.h
++++ b/gcc/config/aarch64/aarch64.h
+@@ -260,7 +260,8 @@ extern unsigned aarch64_architecture_version;
+ #define AARCH64_FL_FOR_ARCH8_R     \
+   (AARCH64_FL_FOR_ARCH8_4 | AARCH64_FL_V8_R)
+ #define AARCH64_FL_FOR_ARCH9       \
+-  (AARCH64_FL_FOR_ARCH8_5 | AARCH64_FL_SVE | AARCH64_FL_SVE2 | AARCH64_FL_V9)
++  (AARCH64_FL_FOR_ARCH8_5 | AARCH64_FL_SVE | AARCH64_FL_SVE2 | AARCH64_FL_V9 \
++   | AARCH64_FL_F16)
+ 
+ /* Macros to test ISA flags.  */
+ 
+-- 
+2.32.0
+

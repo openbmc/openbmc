@@ -1,0 +1,207 @@
+From c7cab39de5e4b22620248a190b3d2ee46cff38c2 Mon Sep 17 00:00:00 2001
+From: Fabio Estevam <festevam@denx.de>
+Date: Thu, 26 May 2022 11:14:37 -0300
+Subject: [PATCH] net: Check for the minimum IP fragmented datagram size
+
+Nicolas Bidron and Nicolas Guigo reported the two bugs below:
+
+"
+----------BUG 1----------
+
+In compiled versions of U-Boot that define CONFIG_IP_DEFRAG, a value of
+`ip->ip_len` (IP packet header's Total Length) higher than `IP_HDR_SIZE`
+and strictly lower than `IP_HDR_SIZE+8` will lead to a value for `len`
+comprised between `0` and `7`. This will ultimately result in a
+truncated division by `8` resulting value of `0` forcing the hole
+metadata and fragment to point to the same location. The subsequent
+memcopy will overwrite the hole metadata with the fragment data. Through
+a second fragment, this can be exploited to write to an arbitrary offset
+controlled by that overwritten hole metadata value.
+
+This bug is only exploitable locally as it requires crafting two packets
+the first of which would most likely be dropped through routing due to
+its unexpectedly low Total Length. However, this bug can potentially be
+exploited to root linux based embedded devices locally.
+
+```C
+static struct ip_udp_hdr *__net_defragment(struct ip_udp_hdr *ip, int *lenp)
+{
+     static uchar pkt_buff[IP_PKTSIZE] __aligned(PKTALIGN);
+     static u16 first_hole, total_len;
+     struct hole *payload, *thisfrag, *h, *newh;
+     struct ip_udp_hdr *localip = (struct ip_udp_hdr *)pkt_buff;
+     uchar *indata = (uchar *)ip;
+     int offset8, start, len, done = 0;
+     u16 ip_off = ntohs(ip->ip_off);
+
+     /* payload starts after IP header, this fragment is in there */
+     payload = (struct hole *)(pkt_buff + IP_HDR_SIZE);
+     offset8 =  (ip_off & IP_OFFS);
+     thisfrag = payload + offset8;
+     start = offset8 * 8;
+     len = ntohs(ip->ip_len) - IP_HDR_SIZE;
+```
+
+The last line of the previous excerpt from `u-boot/net/net.c` shows how
+the attacker can control the value of `len` to be strictly lower than
+`8` by issuing a packet with `ip_len` between `21` and `27`
+(`IP_HDR_SIZE` has a value of `20`).
+
+Also note that `offset8` here is `0` which leads to `thisfrag = payload`.
+
+```C
+     } else if (h >= thisfrag) {
+         /* overlaps with initial part of the hole: move this hole */
+         newh = thisfrag + (len / 8);
+         *newh = *h;
+         h = newh;
+         if (h->next_hole)
+             payload[h->next_hole].prev_hole = (h - payload);
+         if (h->prev_hole)
+             payload[h->prev_hole].next_hole = (h - payload);
+         else
+             first_hole = (h - payload);
+
+     } else {
+```
+
+Lower down the same function, execution reaches the above code path.
+Here, `len / 8` evaluates to `0` leading to `newh = thisfrag`. Also note
+that `first_hole` here is `0` since `h` and `payload` point to the same
+location.
+
+```C
+     /* finally copy this fragment and possibly return whole packet */
+     memcpy((uchar *)thisfrag, indata + IP_HDR_SIZE, len);
+```
+
+Finally, in the above excerpt the `memcpy` overwrites the hole metadata
+since `thisfrag` and `h` both point to the same location. The hole
+metadata is effectively overwritten with arbitrary data from the
+fragmented IP packet data. If `len` was crafted to be `6`, `last_byte`,
+`next_hole`, and `prev_hole` of the `first_hole` can be controlled by
+the attacker.
+
+Finally the arbitrary offset write occurs through a second fragment that
+only needs to be crafted to write data in the hole pointed to by the
+previously controlled hole metadata (`next_hole`) from the first packet.
+
+ ### Recommendation
+
+Handle cases where `len` is strictly lower than 8 by preventing the
+overwrite of the hole metadata during the memcpy of the fragment. This
+could be achieved by either:
+* Moving the location where the hole metadata is stored when `len` is
+lower than `8`.
+* Or outright rejecting fragmented IP datagram with a Total Length
+(`ip_len`) lower than 28 bytes which is the minimum valid fragmented IP
+datagram size (as defined as the minimum fragment of 8 octets in the IP
+Specification Document:
+[RFC791](https://datatracker.ietf.org/doc/html/rfc791) page 25).
+
+----------BUG 2----------
+
+In compiled versions of U-Boot that define CONFIG_IP_DEFRAG, a value of
+`ip->ip_len` (IP packet header's Total Length) lower than `IP_HDR_SIZE`
+will lead to a negative value for `len` which will ultimately result in
+a buffer overflow during the subsequent `memcpy` that uses `len` as it's
+`count` parameter.
+
+This bug is only exploitable on local ethernet as it requires crafting
+an invalid packet to include an unexpected `ip_len` value in the IP UDP
+header that's lower than the minimum accepted Total Length of a packet
+(21 as defined in the IP Specification Document:
+[RFC791](https://datatracker.ietf.org/doc/html/rfc791)). Such packet
+would in all likelihood be dropped while being routed to its final
+destination through most routing equipment and as such requires the
+attacker to be in a local position in order to be exploited.
+
+```C
+static struct ip_udp_hdr *__net_defragment(struct ip_udp_hdr *ip, int *lenp)
+{
+     static uchar pkt_buff[IP_PKTSIZE] __aligned(PKTALIGN);
+     static u16 first_hole, total_len;
+     struct hole *payload, *thisfrag, *h, *newh;
+     struct ip_udp_hdr *localip = (struct ip_udp_hdr *)pkt_buff;
+     uchar *indata = (uchar *)ip;
+     int offset8, start, len, done = 0;
+     u16 ip_off = ntohs(ip->ip_off);
+
+     /* payload starts after IP header, this fragment is in there */
+     payload = (struct hole *)(pkt_buff + IP_HDR_SIZE);
+     offset8 =  (ip_off & IP_OFFS);
+     thisfrag = payload + offset8;
+     start = offset8 * 8;
+     len = ntohs(ip->ip_len) - IP_HDR_SIZE;
+```
+
+The last line of the previous excerpt from `u-boot/net/net.c` shows
+where the underflow to a negative `len` value occurs if `ip_len` is set
+to a value strictly lower than 20 (`IP_HDR_SIZE` being 20). Also note
+that in the above excerpt the `pkt_buff` buffer has a size of
+`CONFIG_NET_MAXDEFRAG` which defaults to 16 KB but can range from 1KB to
+64 KB depending on configurations.
+
+```C
+     /* finally copy this fragment and possibly return whole packet */
+     memcpy((uchar *)thisfrag, indata + IP_HDR_SIZE, len);
+```
+
+In the above excerpt the `memcpy` overflows the destination by
+attempting to make a copy of nearly 4 gigabytes in a buffer that's
+designed to hold `CONFIG_NET_MAXDEFRAG` bytes at most which leads to a DoS.
+
+ ### Recommendation
+
+Stop processing of the packet if `ip_len` is lower than 21 (as defined
+by the minimum length of a data carrying datagram in the IP
+Specification Document:
+[RFC791](https://datatracker.ietf.org/doc/html/rfc791) page 34)."
+
+Add a check for ip_len lesser than 28 and stop processing the packet
+in this case.
+
+Such a check covers the two reported bugs.
+
+Reported-by: Nicolas Bidron <nicolas.bidron@nccgroup.com>
+Signed-off-by: Fabio Estevam <festevam@denx.de>
+
+Upstream-Status: Backport [b85d130ea0cac152c21ec38ac9417b31d41b5552]
+CVE: CVE-2022-30552
+
+Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
+---
+ include/net.h | 2 ++
+ net/net.c     | 3 +++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/include/net.h b/include/net.h
+index cec8c98618..09d7e9b9e8 100644
+--- a/include/net.h
++++ b/include/net.h
+@@ -397,6 +397,8 @@ struct ip_hdr {
+ 
+ #define IP_HDR_SIZE		(sizeof(struct ip_hdr))
+ 
++#define IP_MIN_FRAG_DATAGRAM_SIZE	(IP_HDR_SIZE + 8)
++
+ /*
+  *	Internet Protocol (IP) + UDP header.
+  */
+diff --git a/net/net.c b/net/net.c
+index c2992a0908..f5400e6dbc 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -907,6 +907,9 @@ static struct ip_udp_hdr *__net_defragment(struct ip_udp_hdr *ip, int *lenp)
+ 	int offset8, start, len, done = 0;
+ 	u16 ip_off = ntohs(ip->ip_off);
+ 
++	if (ip->ip_len < IP_MIN_FRAG_DATAGRAM_SIZE)
++		return NULL;
++
+ 	/* payload starts after IP header, this fragment is in there */
+ 	payload = (struct hole *)(pkt_buff + IP_HDR_SIZE);
+ 	offset8 =  (ip_off & IP_OFFS);
+-- 
+2.33.0
+

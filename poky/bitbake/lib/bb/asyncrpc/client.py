@@ -1,4 +1,6 @@
 #
+# Copyright BitBake Contributors
+#
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
@@ -29,7 +31,17 @@ class AsyncClient(object):
 
     async def connect_unix(self, path):
         async def connect_sock():
-            return await asyncio.open_unix_connection(path)
+            # AF_UNIX has path length issues so chdir here to workaround
+            cwd = os.getcwd()
+            try:
+                os.chdir(os.path.dirname(path))
+                # The socket must be opened synchronously so that CWD doesn't get
+                # changed out from underneath us so we pass as a sock into asyncio
+                sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM, 0)
+                sock.connect(os.path.basename(path))
+            finally:
+               os.chdir(cwd)
+            return await asyncio.open_unix_connection(sock=sock)
 
         self._connect_sock = connect_sock
 
@@ -148,14 +160,8 @@ class Client(object):
             setattr(self, m, self._get_downcall_wrapper(downcall))
 
     def connect_unix(self, path):
-        # AF_UNIX has path length issues so chdir here to workaround
-        cwd = os.getcwd()
-        try:
-            os.chdir(os.path.dirname(path))
-            self.loop.run_until_complete(self.client.connect_unix(os.path.basename(path)))
-            self.loop.run_until_complete(self.client.connect())
-        finally:
-            os.chdir(cwd)
+        self.loop.run_until_complete(self.client.connect_unix(path))
+        self.loop.run_until_complete(self.client.connect())
 
     @property
     def max_chunk(self):

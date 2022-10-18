@@ -1,0 +1,43 @@
+From ea9ee4dd64ee88e03a959b2c694aa8feb53c7e78 Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Wed, 28 Sep 2022 16:47:24 +0800
+Subject: [PATCH] stress-cpu: disable float128 math on powerpc64 to avoid
+ SIGILL
+
+float128 requires instructions of xsmaddqp and xsmsubqp which are added to
+qemu since v7.0 by the following commit.
+https://github.com/qemu/qemu/commit/3bb1aed246d7b59ceee625a82628f7369d492a8f
+
+While kirkstone is still at v6.2 and thus experiences SIGILL as follow
+root@qemuppc64:~# stress-ng --cpu 2 --timeout 30s
+stress-ng: info: [972] setting to a 30 second run per stressor
+stress-ng: info: [972] dispatching hogs: 2 cpu
+stress-ng: info: [973] stressor terminated with unexpected signal signal 4 'SIGILL'
+<snip>
+
+Upstream-Status: Inappropriate [This is specific to kirkstone since qemu on
+master branch has upgraded to v7.1.]
+
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ stress-cpu.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/stress-cpu.c b/stress-cpu.c
+index 0a08f1d1..2849e715 100644
+--- a/stress-cpu.c
++++ b/stress-cpu.c
+@@ -41,6 +41,10 @@
+ #undef HAVE_FLOAT_DECIMAL128
+ #endif
+ 
++#if defined(STRESS_ARCH_PPC64)
++#undef HAVE_FLOAT128
++#endif
++
+ #define GAMMA 		(0.57721566490153286060651209008240243104215933593992L)
+ #define OMEGA		(0.56714329040978387299996866221035554975381578718651L)
+ #define PSI		(3.35988566624317755317201130291892717968890513373197L)
+-- 
+2.25.1
+

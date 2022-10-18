@@ -1,0 +1,80 @@
+From 65f1066f5abe291c7b10b6075fd60776074a38a9 Mon Sep 17 00:00:00 2001
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+Date: Thu, 9 Jun 2022 16:02:06 +0200
+Subject: [PATCH] fs/squashfs: sqfs_read: Prevent arbitrary code execution
+
+Following Jincheng's report, an out-of-band write leading to arbitrary
+code execution is possible because on one side the squashfs logic
+accepts directory names up to 65535 bytes (u16), while U-Boot fs logic
+accepts directory names up to 255 bytes long.
+
+Prevent such an exploit from happening by capping directory name sizes
+to 255. Use a define for this purpose so that developers can link the
+limitation to its source and eventually kill it some day by dynamically
+allocating this array (if ever desired).
+
+Link: https://lore.kernel.org/all/CALO=DHFB+yBoXxVr5KcsK0iFdg+e7ywko4-e+72kjbcS8JBfPw@mail.gmail.com
+Reported-by: Jincheng Wang <jc.w4ng@gmail.com>
+Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+Tested-by: Jincheng Wang <jc.w4ng@gmail.com>
+
+CVE: CVE-2022-33103
+Upstream-Status: Backport [2ac0baab4aff1a0b45067d0b62f00c15f4e86856]
+
+Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
+---
+ fs/squashfs/sqfs.c | 8 +++++---
+ include/fs.h       | 4 +++-
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/fs/squashfs/sqfs.c b/fs/squashfs/sqfs.c
+index e2d91c654c..a145d754cc 100644
+--- a/fs/squashfs/sqfs.c
++++ b/fs/squashfs/sqfs.c
+@@ -973,6 +973,7 @@ int sqfs_readdir(struct fs_dir_stream *fs_dirs, struct fs_dirent **dentp)
+ 	int i_number, offset = 0, ret;
+ 	struct fs_dirent *dent;
+ 	unsigned char *ipos;
++	u16 name_size;
+ 
+ 	dirs = (struct squashfs_dir_stream *)fs_dirs;
+ 	if (!dirs->size) {
+@@ -1055,9 +1056,10 @@ int sqfs_readdir(struct fs_dir_stream *fs_dirs, struct fs_dirent **dentp)
+ 		return -SQFS_STOP_READDIR;
+ 	}
+ 
+-	/* Set entry name */
+-	strncpy(dent->name, dirs->entry->name, dirs->entry->name_size + 1);
+-	dent->name[dirs->entry->name_size + 1] = '\0';
++	/* Set entry name (capped at FS_DIRENT_NAME_LEN which is a U-Boot limitation) */
++	name_size = min_t(u16, dirs->entry->name_size + 1, FS_DIRENT_NAME_LEN - 1);
++	strncpy(dent->name, dirs->entry->name, name_size);
++	dent->name[name_size] = '\0';
+ 
+ 	offset = dirs->entry->name_size + 1 + SQFS_ENTRY_BASE_LENGTH;
+ 	dirs->entry_count--;
+diff --git a/include/fs.h b/include/fs.h
+index 1c79e299fd..6cb7ec89f4 100644
+--- a/include/fs.h
++++ b/include/fs.h
+@@ -161,6 +161,8 @@ int fs_write(const char *filename, ulong addr, loff_t offset, loff_t len,
+ #define FS_DT_REG  8         /* regular file */
+ #define FS_DT_LNK  10        /* symbolic link */
+ 
++#define FS_DIRENT_NAME_LEN 256
++
+ /**
+  * struct fs_dirent - directory entry
+  *
+@@ -181,7 +183,7 @@ struct fs_dirent {
+ 	/** change_time:	time of last modification */
+ 	struct rtc_time change_time;
+ 	/** name:		file name */
+-	char name[256];
++	char name[FS_DIRENT_NAME_LEN];
+ };
+ 
+ /* Note: fs_dir_stream should be treated as opaque to the user of fs layer */
+-- 
+2.33.0
+

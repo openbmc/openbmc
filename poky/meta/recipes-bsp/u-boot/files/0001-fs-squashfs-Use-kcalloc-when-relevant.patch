@@ -1,0 +1,64 @@
+From 50d4b8b9effcf9dc9e5a90034de2f0003fb063f0 Mon Sep 17 00:00:00 2001
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+Date: Mon, 27 Jun 2022 12:20:03 +0200
+Subject: [PATCH] fs/squashfs: Use kcalloc when relevant
+
+A crafted squashfs image could embed a huge number of empty metadata
+blocks in order to make the amount of malloc()'d memory overflow and be
+much smaller than expected. Because of this flaw, any random code
+positioned at the right location in the squashfs image could be memcpy'd
+from the squashfs structures into U-Boot code location while trying to
+access the rearmost blocks, before being executed.
+
+In order to prevent this vulnerability from being exploited in eg. a
+secure boot environment, let's add a check over the amount of data
+that is going to be allocated. Such a check could look like:
+
+if (!elem_size || n > SIZE_MAX / elem_size)
+	return NULL;
+
+The right way to do it would be to enhance the calloc() implementation
+but this is quite an impacting change for such a small fix. Another
+solution would be to add the check before the malloc call in the
+squashfs implementation, but this does not look right. So for now, let's
+use the kcalloc() compatibility function from Linux, which has this
+check.
+
+Fixes: c5100613037 ("fs/squashfs: new filesystem")
+Reported-by: Tatsuhiko Yasumatsu <Tatsuhiko.Yasumatsu@sony.com>
+Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+Tested-by: Tatsuhiko Yasumatsu <Tatsuhiko.Yasumatsu@sony.com>
+
+Upstream-Status: Backport [7f7fb9937c6cb49dd35153bd6708872b390b0a44]
+CVE: CVE-2022-33967
+
+Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
+---
+ fs/squashfs/sqfs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/fs/squashfs/sqfs.c b/fs/squashfs/sqfs.c
+index e2d91c654c..10e63afbce 100644
+--- a/fs/squashfs/sqfs.c
++++ b/fs/squashfs/sqfs.c
+@@ -13,6 +13,7 @@
+ #include <linux/types.h>
+ #include <linux/byteorder/little_endian.h>
+ #include <linux/byteorder/generic.h>
++#include <linux/compat.h>
+ #include <memalign.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -725,7 +726,8 @@ static int sqfs_read_inode_table(unsigned char **inode_table)
+ 		goto free_itb;
+ 	}
+ 
+-	*inode_table = malloc(metablks_count * SQFS_METADATA_BLOCK_SIZE);
++	*inode_table = kcalloc(metablks_count, SQFS_METADATA_BLOCK_SIZE,
++			       GFP_KERNEL);
+ 	if (!*inode_table) {
+ 		ret = -ENOMEM;
+ 		goto free_itb;
+-- 
+2.33.0
+

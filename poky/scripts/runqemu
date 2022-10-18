@@ -1375,7 +1375,7 @@ class BaseConfig(object):
             elif "-display sdl" in output:
                 self.sdl = True
             else:
-                self.qemu_opt += '-display none'
+                self.qemu_opt += ' -display none'
 
         if self.sdl == True or self.gtk == True or self.egl_headless == True:
 
@@ -1500,6 +1500,9 @@ class BaseConfig(object):
         cmd = "%s %s" % (self.qemu_opt, kernel_opts)
         cmds = shlex.split(cmd)
         logger.info('Running %s\n' % cmd)
+        with open('/proc/uptime', 'r') as f:
+            uptime_seconds = f.readline().split()[0]
+        logger.info('Host uptime: %s\n' % uptime_seconds)
         pass_fds = []
         if self.taplock_descriptor:
             pass_fds = [self.taplock_descriptor.fileno()]
@@ -1523,6 +1526,9 @@ class BaseConfig(object):
         signal.signal(signal.SIGTERM, signal.SIG_IGN)
 
         logger.info("Cleaning up")
+        with open('/proc/uptime', 'r') as f:
+            uptime_seconds = f.readline().split()[0]
+        logger.info('Host uptime: %s\n' % uptime_seconds)
         if self.cleantap:
             cmd = ('sudo', self.qemuifdown, self.tap, self.bindir_native)
             logger.debug('Running %s' % str(cmd))

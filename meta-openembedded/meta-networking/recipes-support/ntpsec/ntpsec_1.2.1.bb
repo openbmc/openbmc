@@ -16,7 +16,9 @@ SRC_URI = "https://ftp.ntpsec.org/pub/releases/ntpsec-${PV}.tar.gz \
            file://0001-ntpd-ntp_sandbox.c-allow-clone3-for-glibc-2.34-in-se.patch \
            file://0001-ntpd-ntp_sandbox.c-allow-newfstatat-on-all-archs-for.patch \
            file://0002-ntpd-ntp_sandbox.c-match-riscv-to-aarch-in-seccomp-f.patch \
-           file://volatiles.ntpsec"
+           file://volatiles.ntpsec \
+           file://0001-wscript-Widen-the-search-for-tags.patch \
+           "
 
 SRC_URI[sha256sum] = "f2684835116c80b8f21782a5959a805ba3c44e3a681dd6c17c7cb00cc242c27a"
 
@@ -54,7 +56,7 @@ export PYTAG = "cpython${@ d.getVar('PYTHON_BASEVERSION').replace('.', '')}"
 export pyext_PATTERN = "%s.so"
 export PYTHON_LDFLAGS = "-lpthread -ldl"
 
-CFLAGS:append = " -I${PYTHON_INCLUDE_DIR}"
+CFLAGS:append = " -I${PYTHON_INCLUDE_DIR} -D_GNU_SOURCE"
 
 EXTRA_OECONF = "--cross-compiler='${CC}' \
                 --cross-cflags='${CFLAGS}' \

@@ -148,7 +148,7 @@ fitimage_emit_section_kernel() {
                 kernel-$2 {
                         description = "Linux kernel";
                         data = /incbin/("$3");
-                        type = "kernel";
+                        type = "${UBOOT_MKIMAGE_KERNEL_TYPE}";
                         arch = "${UBOOT_ARCH}";
                         os = "linux";
                         compression = "$4";
@@ -346,6 +346,7 @@ fitimage_emit_section_config() {
 
 	conf_csum="${FIT_HASH_ALG}"
 	conf_sign_algo="${FIT_SIGN_ALG}"
+	conf_padding_algo="${FIT_PAD_ALG}"
 	if [ "${UBOOT_SIGN_ENABLE}" = "1" ] ; then
 		conf_sign_keyname="${UBOOT_SIGN_KEYNAME}"
 	fi
@@ -465,6 +466,7 @@ EOF
                         signature-1 {
                                 algo = "$conf_csum,$conf_sign_algo";
                                 key-name-hint = "$conf_sign_keyname";
+                                padding = "$conf_padding_algo";
                                 $sign_line
                         };
 EOF
@@ -527,6 +529,10 @@ fitimage_assemble() {
 			fi
 
 			DTB=$(echo "$DTB" | tr '/' '_')
+
+			# Skip DTB if we've picked it up previously
+			echo "$DTBS" | tr ' ' '\n' | grep -xq "$DTB" && continue
+
 			DTBS="$DTBS $DTB"
 			fitimage_emit_section_dtb $1 $DTB $DTB_PATH
 		done
@@ -536,6 +542,10 @@ fitimage_assemble() {
 		dtbcount=1
 		for DTB in $(find "${EXTERNAL_KERNEL_DEVICETREE}" \( -name '*.dtb' -o -name '*.dtbo' \) -printf '%P\n' | sort); do
 			DTB=$(echo "$DTB" | tr '/' '_')
+
+			# Skip DTB if we've picked it up previously
+			echo "$DTBS" | tr ' ' '\n' | grep -xq "$DTB" && continue
+
 			DTBS="$DTBS $DTB"
 			fitimage_emit_section_dtb $1 $DTB "${EXTERNAL_KERNEL_DEVICETREE}/$DTB"
 		done

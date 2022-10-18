@@ -69,7 +69,7 @@ EXTRA_OECONF = "\
     --enable-libuuid --enable-libblkid \
     \
     --enable-fsck --enable-kill --enable-last --enable-mesg \
-    --enable-mount --enable-partx --enable-raw --enable-rfkill \
+    --enable-mount --enable-partx --enable-rfkill \
     --enable-unshare --enable-write \
     \
     --disable-bfs --disable-login \

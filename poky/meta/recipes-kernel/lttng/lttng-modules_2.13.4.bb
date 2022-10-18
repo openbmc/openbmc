@@ -11,7 +11,12 @@ include lttng-platforms.inc
 
 SRC_URI = "https://lttng.org/files/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://0009-Rename-genhd-wrapper-to-blkdev.patch \
+           file://0001-fix-mm-page_alloc-fix-tracepoint-mm_page_alloc_zone_.patch \
+           file://0002-fix-fs-Remove-flags-parameter-from-aops-write_begin-.patch \
+           file://0003-fix-workqueue-Fix-type-of-cpu-in-trace-event-v5.19.patch \
            file://0001-fix-net-skb-introduce-kfree_skb_reason-v5.15.58.v5.1.patch \
+           file://0001-fix-compaction.patch \
+           file://0001-fix-adjust-range-v5.10.137-in-block-probe.patch \
            "
 
 # Use :append here so that the patch is applied also when using devupstream

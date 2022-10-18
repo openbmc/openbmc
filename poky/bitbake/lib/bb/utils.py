@@ -28,6 +28,8 @@ import signal
 import collections
 import copy
 import ctypes
+import random
+import tempfile
 from subprocess import getstatusoutput
 from contextlib import contextmanager
 from ctypes import cdll
@@ -429,12 +431,14 @@ def better_eval(source, locals, extraglobals = None):
     return eval(source, ctx, locals)
 
 @contextmanager
-def fileslocked(files):
+def fileslocked(files, *args, **kwargs):
     """Context manager for locking and unlocking file locks."""
     locks = []
     if files:
         for lockfile in files:
-            locks.append(bb.utils.lockfile(lockfile))
+            l = bb.utils.lockfile(lockfile, *args, **kwargs)
+            if l is not None:
+                locks.append(l)
 
     try:
         yield
@@ -692,8 +696,8 @@ def remove(path, recurse=False, ionice=False):
         return
     if recurse:
         for name in glob.glob(path):
-            if _check_unsafe_delete_path(path):
-                raise Exception('bb.utils.remove: called with dangerous path "%s" and recurse=True, refusing to delete!' % path)
+            if _check_unsafe_delete_path(name):
+                raise Exception('bb.utils.remove: called with dangerous path "%s" and recurse=True, refusing to delete!' % name)
         # shutil.rmtree(name) would be ideal but its too slow
         cmd = []
         if ionice:
@@ -751,7 +755,7 @@ def movefile(src, dest, newmtime = None, sstat = None):
         if not sstat:
             sstat = os.lstat(src)
     except Exception as e:
-        print("movefile: Stating source file failed...", e)
+        logger.warning("movefile: Stating source file failed...", e)
         return None
 
     destexists = 1
@@ -779,7 +783,7 @@ def movefile(src, dest, newmtime = None, sstat = None):
             os.unlink(src)
             return os.lstat(dest)
         except Exception as e:
-            print("movefile: failed to properly create symlink:", dest, "->", target, e)
+            logger.warning("movefile: failed to properly create symlink:", dest, "->", target, e)
             return None
 
     renamefailed = 1
@@ -796,7 +800,7 @@ def movefile(src, dest, newmtime = None, sstat = None):
         except Exception as e:
             if e.errno != errno.EXDEV:
                 # Some random error.
-                print("movefile: Failed to move", src, "to", dest, e)
+                logger.warning("movefile: Failed to move", src, "to", dest, e)
                 return None
             # Invalid cross-device-link 'bind' mounted or actually Cross-Device
 
@@ -808,13 +812,13 @@ def movefile(src, dest, newmtime = None, sstat = None):
                 bb.utils.rename(destpath + "#new", destpath)
                 didcopy = 1
             except Exception as e:
-                print('movefile: copy', src, '->', dest, 'failed.', e)
+                logger.warning('movefile: copy', src, '->', dest, 'failed.', e)
                 return None
         else:
             #we don't yet handle special, so we need to fall back to /bin/mv
             a = getstatusoutput("/bin/mv -f " + "'" + src + "' '" + dest + "'")
             if a[0] != 0:
-                print("movefile: Failed to move special file:" + src + "' to '" + dest + "'", a)
+                logger.warning("movefile: Failed to move special file:" + src + "' to '" + dest + "'", a)
                 return None # failure
         try:
             if didcopy:
@@ -822,7 +826,7 @@ def movefile(src, dest, newmtime = None, sstat = None):
                 os.chmod(destpath, stat.S_IMODE(sstat[stat.ST_MODE])) # Sticky is reset on chown
                 os.unlink(src)
         except Exception as e:
-            print("movefile: Failed to chown/chmod/unlink", dest, e)
+            logger.warning("movefile: Failed to chown/chmod/unlink", dest, e)
             return None
 
     if newmtime:
@@ -1754,3 +1758,22 @@ def is_local_uid(uid=''):
             if str(uid) == line_split[2]:
                 return True
     return False
+
+def mkstemp(suffix=None, prefix=None, dir=None, text=False):
+    """
+    Generates a unique filename, independent of time.
+
+    mkstemp() in glibc (at least) generates unique file names based on the
+    current system time. When combined with highly parallel builds, and
+    operating over NFS (e.g. shared sstate/downloads) this can result in
+    conflicts and race conditions.
+
+    This function adds additional entropy to the file name so that a collision
+    is independent of time and thus extremely unlikely.
+    """
+    entropy = "".join(random.choices("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", k=20))
+    if prefix:
+        prefix = prefix + entropy
+    else:
+        prefix = tempfile.gettempprefix() + entropy
+    return tempfile.mkstemp(suffix=suffix, prefix=prefix, dir=dir, text=text)

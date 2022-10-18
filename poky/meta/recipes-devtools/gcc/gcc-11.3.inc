@@ -65,7 +65,12 @@ SRC_URI = "\
            file://0003-CVE-2021-42574.patch \
            file://0004-CVE-2021-42574.patch \
            file://0001-CVE-2021-46195.patch \
+	   file://0001-aarch64-Update-Neoverse-N2-core-defini.patch \
+	   file://0002-aarch64-add-armv9-a-to-march.patch \
+	   file://0003-aarch64-Enable-FP16-feature-by-default-for-Armv9.patch \
+	   file://0004-arm-add-armv9-a-architecture-to-march.patch \
 "
+
 SRC_URI[sha256sum] = "b47cf2818691f5b1e21df2bb38c795fac2cfbd640ede2d0a5e1c89e338a3ac39"
 
 S = "${TMPDIR}/work-shared/gcc-${PV}-${PR}/gcc-${PV}"

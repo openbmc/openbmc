@@ -322,7 +322,11 @@ do_patch() {
 	meta_dir=$(kgit --meta)
 	(cd ${meta_dir}; ln -sf patch.queue series)
 	if [ -f "${meta_dir}/series" ]; then
-		kgit-s2q --gen -v --patches .kernel-meta/
+		kgit_extra_args=""
+		if [ "${KERNEL_DEBUG_TIMESTAMPS}" != "1" ]; then
+		    kgit_extra_args="--commit-sha author"
+		fi
+		kgit-s2q --gen -v $kgit_extra_args --patches .kernel-meta/
 		if [ $? -ne 0 ]; then
 			bberror "Could not apply patches for ${KMACHINE}."
 			bbfatal_log "Patch failures can be resolved in the linux source directory ${S})"

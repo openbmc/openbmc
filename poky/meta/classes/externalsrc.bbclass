@@ -90,16 +90,18 @@ python () {
                 # Since configure will likely touch ${S}, ensure only we lock so one task has access at a time
                 d.appendVarFlag(task, "lockfiles", " ${S}/singletask.lock")
 
-            for funcname in [task, "base_" + task, "kernel_" + task]:
+        for v in d.keys():
+            cleandirs = d.getVarFlag(v, "cleandirs", False)
+            if cleandirs:
                 # We do not want our source to be wiped out, ever (kernel.bbclass does this for do_clean)
-                cleandirs = oe.recipeutils.split_var_value(d.getVarFlag(funcname, 'cleandirs', False) or '')
+                cleandirs = oe.recipeutils.split_var_value(cleandirs)
                 setvalue = False
                 for cleandir in cleandirs[:]:
                     if oe.path.is_path_parent(externalsrc, d.expand(cleandir)):
                         cleandirs.remove(cleandir)
                         setvalue = True
                 if setvalue:
-                    d.setVarFlag(funcname, 'cleandirs', ' '.join(cleandirs))
+                    d.setVarFlag(v, 'cleandirs', ' '.join(cleandirs))
 
         fetch_tasks = ['do_fetch', 'do_unpack']
         # If we deltask do_patch, there's no dependency to ensure do_unpack gets run, so add one

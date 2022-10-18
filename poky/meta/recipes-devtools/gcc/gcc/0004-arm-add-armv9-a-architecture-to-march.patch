@@ -1,0 +1,294 @@
+From e66a37acae62236611f951e706e9a2bfbd753f39 Mon Sep 17 00:00:00 2001
+From: Przemyslaw Wirkus <przemyslaw.wirkus@arm.com>
+Date: Tue, 9 Nov 2021 09:40:05 +0000
+Subject: [PATCH 4/4] arm: add armv9-a architecture to -march
+
+commit 32ba7860ccaddd5219e6dae94a3d0653e124c9dd from upstream
+
+In this patch:
+	+ Add `armv9-a` to -march.
+	+ Update multilib with armv9-a and armv9-a+simd.
+
+gcc/ChangeLog:
+
+	* config/arm/arm-cpus.in (armv9): New define.
+	(ARMv9a): New group.
+	(armv9-a): New arch definition.
+	* config/arm/arm-tables.opt: Regenerate.
+	* config/arm/arm.h (BASE_ARCH_9A): New arch enum value.
+	* config/arm/t-aprofile: Added armv9-a and armv9+simd.
+	* config/arm/t-arm-elf: Added arm9-a, v9_fps and all_v9_archs
+	to MULTILIB_MATCHES.
+	* config/arm/t-multilib: Added v9_a_nosimd_variants and
+	v9_a_simd_variants to MULTILIB_MATCHES.
+	* doc/invoke.texi: Update docs.
+
+gcc/testsuite/ChangeLog:
+
+	* gcc.target/arm/multilib.exp: Update test with armv9-a entries.
+	* lib/target-supports.exp (v9a): Add new armflag.
+	(__ARM_ARCH_9A__): Add new armdef.
+
+Upstream-Status: Backport
+Signed-off-by: Ruiqiang Hao <Ruiqiang.Hao@windriver.com>
+---
+ gcc/config/arm/arm-cpus.in                | 19 +++++++++++++++++
+ gcc/config/arm/arm-tables.opt             |  7 +++++--
+ gcc/config/arm/arm.h                      |  3 ++-
+ gcc/config/arm/t-aprofile                 | 25 +++++++++++++++++++----
+ gcc/config/arm/t-arm-elf                  |  9 ++++++++
+ gcc/config/arm/t-multilib                 | 12 +++++++++++
+ gcc/doc/invoke.texi                       |  1 +
+ gcc/testsuite/gcc.target/arm/multilib.exp |  8 ++++++++
+ gcc/testsuite/lib/target-supports.exp     |  3 ++-
+ 9 files changed, 79 insertions(+), 8 deletions(-)
+
+diff --git a/gcc/config/arm/arm-cpus.in b/gcc/config/arm/arm-cpus.in
+index bcc9ebe9f..58d83829c 100644
+--- a/gcc/config/arm/arm-cpus.in
++++ b/gcc/config/arm/arm-cpus.in
+@@ -132,6 +132,9 @@ define feature cmse
+ # Architecture rel 8.1-M.
+ define feature armv8_1m_main
+ 
++# Architecture rel 9.0.
++define feature armv9
++
+ # Floating point and Neon extensions.
+ # VFPv1 is not supported in GCC.
+ 
+@@ -293,6 +296,7 @@ define fgroup ARMv8m_base ARMv6m armv8 cmse tdiv
+ define fgroup ARMv8m_main ARMv7m armv8 cmse
+ define fgroup ARMv8r      ARMv8a
+ define fgroup ARMv8_1m_main ARMv8m_main armv8_1m_main
++define fgroup ARMv9a      ARMv8_5a armv9
+ 
+ # Useful combinations.
+ define fgroup VFPv2	vfpv2
+@@ -751,6 +755,21 @@ begin arch armv8.1-m.main
+  option cdecp7 add cdecp7
+ end arch armv8.1-m.main
+ 
++begin arch armv9-a
++ tune for cortex-a53
++ tune flags CO_PROC
++ base 9A
++ profile A
++ isa ARMv9a
++ option simd add FP_ARMv8 DOTPROD
++ option fp16 add fp16 fp16fml FP_ARMv8 DOTPROD
++ option crypto add FP_ARMv8 CRYPTO DOTPROD
++ option nocrypto remove ALL_CRYPTO
++ option nofp remove ALL_FP
++ option i8mm add i8mm FP_ARMv8 DOTPROD
++ option bf16 add bf16 FP_ARMv8 DOTPROD
++end arch armv9-a
++
+ begin arch iwmmxt
+  tune for iwmmxt
+  tune flags LDSCHED STRONG XSCALE
+diff --git a/gcc/config/arm/arm-tables.opt b/gcc/config/arm/arm-tables.opt
+index 5692d4fb7..ae3dd9414 100644
+--- a/gcc/config/arm/arm-tables.opt
++++ b/gcc/config/arm/arm-tables.opt
+@@ -380,10 +380,13 @@ EnumValue
+ Enum(arm_arch) String(armv8.1-m.main) Value(30)
+ 
+ EnumValue
+-Enum(arm_arch) String(iwmmxt) Value(31)
++Enum(arm_arch) String(armv9-a) Value(31)
+ 
+ EnumValue
+-Enum(arm_arch) String(iwmmxt2) Value(32)
++Enum(arm_arch) String(iwmmxt) Value(32)
++
++EnumValue
++Enum(arm_arch) String(iwmmxt2) Value(33)
+ 
+ Enum
+ Name(arm_fpu) Type(enum fpu_type)
+diff --git a/gcc/config/arm/arm.h b/gcc/config/arm/arm.h
+index 47c13a9e5..088c7725c 100644
+--- a/gcc/config/arm/arm.h
++++ b/gcc/config/arm/arm.h
+@@ -456,7 +456,8 @@ enum base_architecture
+   BASE_ARCH_8A = 8,
+   BASE_ARCH_8M_BASE = 8,
+   BASE_ARCH_8M_MAIN = 8,
+-  BASE_ARCH_8R = 8
++  BASE_ARCH_8R = 8,
++  BASE_ARCH_9A = 9
+ };
+ 
+ /* The major revision number of the ARM Architecture implemented by the target.  */
+diff --git a/gcc/config/arm/t-aprofile b/gcc/config/arm/t-aprofile
+index 8574ac3e2..68e2251c7 100644
+--- a/gcc/config/arm/t-aprofile
++++ b/gcc/config/arm/t-aprofile
+@@ -26,8 +26,8 @@
+ 
+ # Arch and FPU variants to build libraries with
+ 
+-MULTI_ARCH_OPTS_A       = march=armv7-a/march=armv7-a+fp/march=armv7-a+simd/march=armv7ve+simd/march=armv8-a/march=armv8-a+simd
+-MULTI_ARCH_DIRS_A       = v7-a v7-a+fp v7-a+simd v7ve+simd v8-a v8-a+simd
++MULTI_ARCH_OPTS_A       = march=armv7-a/march=armv7-a+fp/march=armv7-a+simd/march=armv7ve+simd/march=armv8-a/march=armv8-a+simd/march=armv9-a/march=armv9-a+simd
++MULTI_ARCH_DIRS_A       = v7-a v7-a+fp v7-a+simd v7ve+simd v8-a v8-a+simd v9-a v9-a+simd
+ 
+ # ARMv7-A - build nofp, fp-d16 and SIMD variants
+ 
+@@ -46,6 +46,11 @@ MULTILIB_REQUIRED	+= mthumb/march=armv8-a/mfloat-abi=soft
+ MULTILIB_REQUIRED	+= mthumb/march=armv8-a+simd/mfloat-abi=hard
+ MULTILIB_REQUIRED	+= mthumb/march=armv8-a+simd/mfloat-abi=softfp
+ 
++# Armv9-A - build nofp and SIMD variants.
++MULTILIB_REQUIRED	+= mthumb/march=armv9-a/mfloat-abi=soft
++MULTILIB_REQUIRED	+= mthumb/march=armv9-a+simd/mfloat-abi=hard
++MULTILIB_REQUIRED	+= mthumb/march=armv9-a+simd/mfloat-abi=softfp
++
+ # Matches
+ 
+ # Arch Matches
+@@ -129,17 +134,29 @@ MULTILIB_MATCHES	+= march?armv8-a=march?armv8.6-a
+ MULTILIB_MATCHES	+= $(foreach ARCH, $(v8_6_a_simd_variants), \
+ 			     march?armv8-a+simd=march?armv8.6-a$(ARCH))
+ 
++# Armv9 without SIMD: map down to base architecture
++MULTILIB_MATCHES	+= $(foreach ARCH, $(v9_a_nosimd_variants), \
++			     march?armv9-a=march?armv9-a$(ARCH))
++
++# Armv9 with SIMD: map down to base arch + simd
++MULTILIB_MATCHES	+= march?armv9-a+simd=march?armv9-a+crc+simd \
++			   $(foreach ARCH, $(filter-out +simd, $(v9_a_simd_variants)), \
++			     march?armv9-a+simd=march?armv9-a$(ARCH) \
++			     march?armv9-a+simd=march?armv9-a+crc$(ARCH))
++
+ # Use Thumb libraries for everything.
+ 
+ MULTILIB_REUSE		+= mthumb/march.armv7-a/mfloat-abi.soft=marm/march.armv7-a/mfloat-abi.soft
+ 
+ MULTILIB_REUSE		+= mthumb/march.armv8-a/mfloat-abi.soft=marm/march.armv8-a/mfloat-abi.soft
+ 
++MULTILIB_REUSE		+= mthumb/march.armv9-a/mfloat-abi.soft=marm/march.armv9-a/mfloat-abi.soft
++
+ MULTILIB_REUSE		+= $(foreach ABI, hard softfp, \
+-			     $(foreach ARCH, armv7-a+fp armv7-a+simd armv7ve+simd armv8-a+simd, \
++			     $(foreach ARCH, armv7-a+fp armv7-a+simd armv7ve+simd armv8-a+simd armv9-a+simd, \
+ 			       mthumb/march.$(ARCH)/mfloat-abi.$(ABI)=marm/march.$(ARCH)/mfloat-abi.$(ABI)))
+ 
+ # Softfp but no FP, use the soft-float libraries.
+ MULTILIB_REUSE		+= $(foreach MODE, arm thumb, \
+-			     $(foreach ARCH, armv7-a armv8-a, \
++			     $(foreach ARCH, armv7-a armv8-a armv9-a, \
+ 			       mthumb/march.$(ARCH)/mfloat-abi.soft=m$(MODE)/march.$(ARCH)/mfloat-abi.softfp))
+diff --git a/gcc/config/arm/t-arm-elf b/gcc/config/arm/t-arm-elf
+index d68def308..b3a900e8c 100644
+--- a/gcc/config/arm/t-arm-elf
++++ b/gcc/config/arm/t-arm-elf
+@@ -38,6 +38,8 @@ v7ve_fps	:= vfpv3-d16 vfpv3 vfpv3-d16-fp16 vfpv3-fp16 vfpv4 neon \
+ # it seems to work ok.
+ v8_fps		:= simd fp16 crypto fp16+crypto dotprod fp16fml
+ 
++v9_fps		:= simd fp16 crypto fp16+crypto dotprod fp16fml
++
+ # We don't do anything special with these.  Pre-v4t probably doesn't work.
+ all_early_nofp	:= armv4 armv4t armv5t
+ 
+@@ -49,6 +51,8 @@ all_v7_a_r	:= armv7-a armv7ve armv7-r
+ all_v8_archs	:= armv8-a armv8-a+crc armv8.1-a armv8.2-a armv8.3-a armv8.4-a \
+ 		   armv8.5-a armv8.6-a
+ 
++all_v9_archs	:= armv9-a
++
+ # No floating point variants, require thumb1 softfp
+ all_nofp_t	:= armv6-m armv6s-m armv8-m.base
+ 
+@@ -110,6 +114,11 @@ MULTILIB_MATCHES     += $(foreach ARCH, $(all_v8_archs), \
+ 			  $(foreach FPARCH, $(v8_fps), \
+ 			    march?armv7+fp=march?$(ARCH)+$(FPARCH)))
+ 
++MULTILIB_MATCHES     += $(foreach ARCH, $(all_v9_archs), \
++			  march?armv7+fp=march?$(ARCH) \
++			  $(foreach FPARCH, $(v9_fps), \
++			    march?armv7+fp=march?$(ARCH)+$(FPARCH)))
++
+ MULTILIB_MATCHES     += $(foreach ARCH, armv7e-m armv8-m.mainline, \
+ 			  march?armv7+fp=march?$(ARCH)+fp.dp)
+ 
+diff --git a/gcc/config/arm/t-multilib b/gcc/config/arm/t-multilib
+index ddc5033bf..d789b86ee 100644
+--- a/gcc/config/arm/t-multilib
++++ b/gcc/config/arm/t-multilib
+@@ -78,6 +78,8 @@ v8_4_a_simd_variants	:= $(call all_feat_combs, simd fp16 crypto i8mm bf16)
+ v8_5_a_simd_variants	:= $(call all_feat_combs, simd fp16 crypto i8mm bf16)
+ v8_6_a_simd_variants	:= $(call all_feat_combs, simd fp16 crypto i8mm bf16)
+ v8_r_nosimd_variants	:= +crc
++v9_a_nosimd_variants	:= +crc
++v9_a_simd_variants	:= $(call all_feat_combs, simd fp16 crypto i8mm bf16)
+ 
+ ifneq (,$(HAS_APROFILE))
+ include $(srcdir)/config/arm/t-aprofile
+@@ -202,6 +204,16 @@ MULTILIB_MATCHES	+= march?armv7=march?armv8.6-a
+ MULTILIB_MATCHES	+= $(foreach ARCH, $(v8_6_a_simd_variants), \
+ 			     march?armv7+fp=march?armv8.6-a$(ARCH))
+ 
++# Armv9
++MULTILIB_MATCHES	+= march?armv7=march?armv9-a
++MULTILIB_MATCHES	+= $(foreach ARCH, $(v9_a_nosimd_variants), \
++			     march?armv7=march?armv9-a$(ARCH))
++
++# Armv9 with SIMD
++MULTILIB_MATCHES	+= march?armv7+fp=march?armv9-a+crc+simd \
++			   $(foreach ARCH, $(v9_a_simd_variants), \
++			     march?armv7+fp=march?armv9-a$(ARCH) \
++			     march?armv7+fp=march?armv9-a+crc$(ARCH))
+ endif		# Not APROFILE.
+ 
+ # Use Thumb libraries for everything.
+diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
+index 7184a62d0..9a712c0d6 100644
+--- a/gcc/doc/invoke.texi
++++ b/gcc/doc/invoke.texi
+@@ -19701,6 +19701,7 @@ Permissible names are:
+ @samp{armv7-m}, @samp{armv7e-m},
+ @samp{armv8-m.base}, @samp{armv8-m.main},
+ @samp{armv8.1-m.main},
++@samp{armv9-a},
+ @samp{iwmmxt} and @samp{iwmmxt2}.
+ 
+ Additionally, the following architectures, which lack support for the
+diff --git a/gcc/testsuite/gcc.target/arm/multilib.exp b/gcc/testsuite/gcc.target/arm/multilib.exp
+index 4b30025db..e3f06c316 100644
+--- a/gcc/testsuite/gcc.target/arm/multilib.exp
++++ b/gcc/testsuite/gcc.target/arm/multilib.exp
+@@ -135,6 +135,14 @@ if {[multilib_config "aprofile"] } {
+ 	{-march=armv8.6-a+simd+fp16 -mfloat-abi=softfp} "thumb/v8-a+simd/softfp"
+ 	{-march=armv8.6-a+simd+fp16+nofp -mfloat-abi=softfp} "thumb/v8-a/nofp"
+ 	{-march=armv8.6-a+simd+nofp+fp16 -mfloat-abi=softfp} "thumb/v8-a+simd/softfp"
++	{-march=armv9-a+crypto -mfloat-abi=soft} "thumb/v9-a/nofp"
++	{-march=armv9-a+simd+crypto -mfloat-abi=softfp} "thumb/v9-a+simd/softfp"
++	{-march=armv9-a+simd+crypto+nofp -mfloat-abi=softfp} "thumb/v9-a/nofp"
++	{-march=armv9-a+simd+nofp+crypto -mfloat-abi=softfp} "thumb/v9-a+simd/softfp"
++	{-march=armv9-a+fp16 -mfloat-abi=soft} "thumb/v9-a/nofp"
++	{-march=armv9-a+simd+fp16 -mfloat-abi=softfp} "thumb/v9-a+simd/softfp"
++	{-march=armv9-a+simd+fp16+nofp -mfloat-abi=softfp} "thumb/v9-a/nofp"
++	{-march=armv9-a+simd+nofp+fp16 -mfloat-abi=softfp} "thumb/v9-a+simd/softfp"
+ 	{-mcpu=cortex-a53+crypto -mfloat-abi=hard} "thumb/v8-a+simd/hard"
+ 	{-mcpu=cortex-a53+nofp -mfloat-abi=softfp} "thumb/v8-a/nofp"
+ 	{-march=armv8-a+crc -mfloat-abi=hard -mfpu=vfp} "thumb/v8-a+simd/hard"
+diff --git a/gcc/testsuite/lib/target-supports.exp b/gcc/testsuite/lib/target-supports.exp
+index 857e57218..52e043917 100644
+--- a/gcc/testsuite/lib/target-supports.exp
++++ b/gcc/testsuite/lib/target-supports.exp
+@@ -4820,7 +4820,8 @@ foreach { armfunc armflag armdefs } {
+ 	v8m_base "-march=armv8-m.base -mthumb -mfloat-abi=soft"
+ 		__ARM_ARCH_8M_BASE__
+ 	v8m_main "-march=armv8-m.main -mthumb" __ARM_ARCH_8M_MAIN__
+-	v8_1m_main "-march=armv8.1-m.main -mthumb" __ARM_ARCH_8M_MAIN__ } {
++	v8_1m_main "-march=armv8.1-m.main -mthumb" __ARM_ARCH_8M_MAIN__
++	v9a "-march=armv9-a" __ARM_ARCH_9A__ } {
+     eval [string map [list FUNC $armfunc FLAG $armflag DEFS $armdefs ] {
+ 	proc check_effective_target_arm_arch_FUNC_ok { } {
+ 	    return [check_no_compiler_messages arm_arch_FUNC_ok assembly {
+-- 
+2.34.1
+

@@ -132,5 +132,5 @@ do_install:append:class-target() {
 
 do_install:append() {
 	# Avoid non-reproducible -src package
-	sed -i -e "s,${B},,g" ${B}/apt-pkg/tagfile-keys.cc
+	sed -i -e "s,${B}/include/,,g" ${B}/apt-pkg/tagfile-keys.cc
 }

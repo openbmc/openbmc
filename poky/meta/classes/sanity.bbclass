@@ -351,6 +351,7 @@ def check_connectivity(d):
             if len(msg) == 0:
                 msg = "%s.\n" % err
                 msg += "    Please ensure your host's network is configured correctly.\n"
+                msg += "    Please ensure CONNECTIVITY_CHECK_URIS is correct and specified URIs are available.\n"
                 msg += "    If your ISP or network is blocking the above URL,\n"
                 msg += "    try with another domain name, for example by setting:\n"
                 msg += "    CONNECTIVITY_CHECK_URIS = \"https://www.example.com/\""

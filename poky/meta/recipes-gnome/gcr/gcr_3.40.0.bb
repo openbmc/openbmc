@@ -13,6 +13,8 @@ DEPENDS = "p11-kit glib-2.0 libgcrypt gnupg-native \
 
 CACHED_CONFIGUREVARS += "ac_cv_path_GPG='gpg2'"
 
+CFLAGS += "-D_GNU_SOURCE"
+
 GNOMEBASEBUILDCLASS = "meson"
 GTKDOC_MESON_OPTION = "gtk_doc"
 inherit gnomebase gtk-icon-cache gtk-doc features_check upstream-version-is-even vala gobject-introspection gettext mime mime-xdg

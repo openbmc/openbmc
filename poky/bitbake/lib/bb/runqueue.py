@@ -24,6 +24,7 @@ import pickle
 from multiprocessing import Process
 import shlex
 import pprint
+import time
 
 bblogger = logging.getLogger("BitBake")
 logger = logging.getLogger("BitBake.RunQueue")
@@ -159,6 +160,55 @@ class RunQueueScheduler(object):
                 self.buildable.append(tid)
 
         self.rev_prio_map = None
+        self.is_pressure_usable()
+
+    def is_pressure_usable(self):
+        """
+        If monitoring pressure, return True if pressure files can be open and read. For example
+        openSUSE /proc/pressure/* files have readable file permissions but when read the error EOPNOTSUPP (Operation not supported)
+        is returned.
+        """
+        if self.rq.max_cpu_pressure or self.rq.max_io_pressure or self.rq.max_memory_pressure:
+            try:
+                with open("/proc/pressure/cpu") as cpu_pressure_fds, \
+                    open("/proc/pressure/io") as io_pressure_fds, \
+                    open("/proc/pressure/memory") as memory_pressure_fds:
+
+                    self.prev_cpu_pressure = cpu_pressure_fds.readline().split()[4].split("=")[1]
+                    self.prev_io_pressure = io_pressure_fds.readline().split()[4].split("=")[1]
+                    self.prev_memory_pressure = memory_pressure_fds.readline().split()[4].split("=")[1]
+                    self.prev_pressure_time = time.time()
+                self.check_pressure = True
+            except:
+                bb.note("The /proc/pressure files can't be read. Continuing build without monitoring pressure")
+                self.check_pressure = False
+        else:
+            self.check_pressure = False
+
+    def exceeds_max_pressure(self):
+        """
+        Monitor the difference in total pressure at least once per second, if
+        BB_PRESSURE_MAX_{CPU|IO|MEMORY} are set, return True if above threshold.
+        """
+        if self.check_pressure:
+            with open("/proc/pressure/cpu") as cpu_pressure_fds, \
+                open("/proc/pressure/io") as io_pressure_fds, \
+                open("/proc/pressure/memory") as memory_pressure_fds:
+                # extract "total" from /proc/pressure/{cpu|io}
+                curr_cpu_pressure = cpu_pressure_fds.readline().split()[4].split("=")[1]
+                curr_io_pressure = io_pressure_fds.readline().split()[4].split("=")[1]
+                curr_memory_pressure = memory_pressure_fds.readline().split()[4].split("=")[1]
+                exceeds_cpu_pressure =  self.rq.max_cpu_pressure and (float(curr_cpu_pressure) - float(self.prev_cpu_pressure)) > self.rq.max_cpu_pressure
+                exceeds_io_pressure =  self.rq.max_io_pressure and (float(curr_io_pressure) - float(self.prev_io_pressure)) > self.rq.max_io_pressure
+                exceeds_memory_pressure = self.rq.max_memory_pressure and (float(curr_memory_pressure) - float(self.prev_memory_pressure)) > self.rq.max_memory_pressure
+                now = time.time()
+                if now - self.prev_pressure_time > 1.0:
+                    self.prev_cpu_pressure = curr_cpu_pressure
+                    self.prev_io_pressure = curr_io_pressure
+                    self.prev_memory_pressure = curr_memory_pressure
+                    self.prev_pressure_time = now
+            return (exceeds_cpu_pressure or exceeds_io_pressure or exceeds_memory_pressure)
+        return False
 
     def next_buildable_task(self):
         """
@@ -170,6 +220,12 @@ class RunQueueScheduler(object):
         buildable.difference_update(self.rq.holdoff_tasks)
         buildable.intersection_update(self.rq.tasks_covered | self.rq.tasks_notcovered)
         if not buildable:
+            return None
+
+        # Bitbake requires that at least one task be active. Only check for pressure if
+        # this is the case, otherwise the pressure limitation could result in no tasks
+        # being active and no new tasks started thereby, at times, breaking the scheduler.
+        if self.rq.stats.active and self.exceeds_max_pressure():
             return None
 
         # Filter out tasks that have a max number of threads that have been exceeded
@@ -1699,6 +1755,9 @@ class RunQueueExecute:
 
         self.number_tasks = int(self.cfgData.getVar("BB_NUMBER_THREADS") or 1)
         self.scheduler = self.cfgData.getVar("BB_SCHEDULER") or "speed"
+        self.max_cpu_pressure = self.cfgData.getVar("BB_PRESSURE_MAX_CPU")
+        self.max_io_pressure = self.cfgData.getVar("BB_PRESSURE_MAX_IO")
+        self.max_memory_pressure = self.cfgData.getVar("BB_PRESSURE_MAX_MEMORY")
 
         self.sq_buildable = set()
         self.sq_running = set()
@@ -1733,6 +1792,29 @@ class RunQueueExecute:
         if self.number_tasks <= 0:
              bb.fatal("Invalid BB_NUMBER_THREADS %s" % self.number_tasks)
 
+        lower_limit = 1.0
+        upper_limit = 1000000.0
+        if self.max_cpu_pressure:
+            self.max_cpu_pressure = float(self.max_cpu_pressure)
+            if self.max_cpu_pressure < lower_limit:
+                bb.fatal("Invalid BB_PRESSURE_MAX_CPU %s, minimum value is %s." % (self.max_cpu_pressure, lower_limit))
+            if self.max_cpu_pressure > upper_limit:
+                bb.warn("Your build will be largely unregulated since BB_PRESSURE_MAX_CPU is set to %s. It is very unlikely that such high pressure will be experienced." % (self.max_cpu_pressure))
+
+        if self.max_io_pressure:
+            self.max_io_pressure = float(self.max_io_pressure)
+            if self.max_io_pressure < lower_limit:
+                bb.fatal("Invalid BB_PRESSURE_MAX_IO %s, minimum value is %s." % (self.max_io_pressure, lower_limit))
+            if self.max_io_pressure > upper_limit:
+                bb.warn("Your build will be largely unregulated since BB_PRESSURE_MAX_IO is set to %s. It is very unlikely that such high pressure will be experienced." % (self.max_io_pressure))
+
+        if self.max_memory_pressure:
+            self.max_memory_pressure = float(self.max_memory_pressure)
+            if self.max_memory_pressure < lower_limit:
+                bb.fatal("Invalid BB_PRESSURE_MAX_MEMORY %s, minimum value is %s." % (self.max_memory_pressure, lower_limit))
+            if self.max_memory_pressure > upper_limit:
+                bb.warn("Your build will be largely unregulated since BB_PRESSURE_MAX_MEMORY is set to %s. It is very unlikely that such high pressure will be experienced." % (self.max_io_pressure))
+            
         # List of setscene tasks which we've covered
         self.scenequeue_covered = set()
         # List of tasks which are covered (including setscene ones)
@@ -2172,10 +2254,9 @@ class RunQueueExecute:
 
         # No more tasks can be run. If we have deferred setscene tasks we should run them.
         if self.sq_deferred:
-            tid = self.sq_deferred.pop(list(self.sq_deferred.keys())[0])
-            logger.warning("Runqeueue deadlocked on deferred tasks, forcing task %s" % tid)
-            if tid not in self.runq_complete:
-                self.sq_task_failoutright(tid)
+            deferred_tid = list(self.sq_deferred.keys())[0]
+            blocking_tid = self.sq_deferred.pop(deferred_tid)
+            logger.warning("Runqeueue deadlocked on deferred tasks, forcing task %s blocked by %s" % (deferred_tid, blocking_tid))
             return True
 
         if self.failed_tids:
@@ -2299,6 +2380,9 @@ class RunQueueExecute:
                     self.rqdata.runtaskentries[hashtid].unihash = unihash
                     bb.parse.siggen.set_unihash(hashtid, unihash)
                     toprocess.add(hashtid)
+                if torehash:
+                    # Need to save after set_unihash above
+                    bb.parse.siggen.save_unitaskhashes()
 
         # Work out all tasks which depend upon these
         total = set()
@@ -2438,11 +2522,14 @@ class RunQueueExecute:
 
         if update_tasks:
             self.sqdone = False
-            for tid in [t[0] for t in update_tasks]:
-                h = pending_hash_index(tid, self.rqdata)
-                if h in self.sqdata.hashes and tid != self.sqdata.hashes[h]:
-                    self.sq_deferred[tid] = self.sqdata.hashes[h]
-                    bb.note("Deferring %s after %s" % (tid, self.sqdata.hashes[h]))
+            for mc in sorted(self.sqdata.multiconfigs):
+                for tid in sorted([t[0] for t in update_tasks]):
+                    if mc_from_tid(tid) != mc:
+                        continue
+                    h = pending_hash_index(tid, self.rqdata)
+                    if h in self.sqdata.hashes and tid != self.sqdata.hashes[h]:
+                        self.sq_deferred[tid] = self.sqdata.hashes[h]
+                        bb.note("Deferring %s after %s" % (tid, self.sqdata.hashes[h]))
             update_scenequeue_data([t[0] for t in update_tasks], self.sqdata, self.rqdata, self.rq, self.cooker, self.stampcache, self, summary=False)
 
         for (tid, harddepfail, origvalid) in update_tasks:

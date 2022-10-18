@@ -1,0 +1,52 @@
+From 8ca3c3306f1a149e51a3be6a4b1e47e9aee88262 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 23 Aug 2022 22:42:03 -0700
+Subject: [PATCH] add AC_CACHE_CHECK for strerror_r return type
+
+APR's configure script uses AC_TRY_RUN to detect whether the return type
+of strerror_r is int. When cross-compiling this defaults to no.
+
+This commit adds an AC_CACHE_CHECK so users who cross-compile APR may
+influence the outcome with a configure variable.
+
+Upstream-Status: Backport [https://svn.apache.org/viewvc?view=revision&revision=1875065]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ build/apr_common.m4 | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/build/apr_common.m4 b/build/apr_common.m4
+index cbf2a4c..42e75cf 100644
+--- a/build/apr_common.m4
++++ b/build/apr_common.m4
+@@ -525,8 +525,9 @@ dnl  string.
+ dnl
+ dnl
+ AC_DEFUN([APR_CHECK_STRERROR_R_RC], [
+-AC_MSG_CHECKING(for type of return code from strerror_r)
+-AC_TRY_RUN([
++AC_CACHE_CHECK([whether return code from strerror_r has type int],
++[ac_cv_strerror_r_rc_int],
++[AC_TRY_RUN([
+ #include <errno.h>
+ #include <string.h>
+ #include <stdio.h>
+@@ -542,14 +543,10 @@ main()
+ }], [
+     ac_cv_strerror_r_rc_int=yes ], [
+     ac_cv_strerror_r_rc_int=no ], [
+-    ac_cv_strerror_r_rc_int=no ] )
++    ac_cv_strerror_r_rc_int=no ] ) ] )
+ if test "x$ac_cv_strerror_r_rc_int" = xyes; then
+   AC_DEFINE(STRERROR_R_RC_INT, 1, [Define if strerror returns int])
+-  msg="int"
+-else
+-  msg="pointer"
+ fi
+-AC_MSG_RESULT([$msg])
+ ] )
+ 
+ dnl
+-- 
+2.37.2
+

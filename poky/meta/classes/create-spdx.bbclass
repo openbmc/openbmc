@@ -210,7 +210,7 @@ def add_package_files(d, doc, spdx_pkg, topdir, get_spdxid, get_types, *, archiv
             filepath = Path(subdir) / file
             filename = str(filepath.relative_to(topdir))
 
-            if filepath.is_file() and not filepath.is_symlink():
+            if not filepath.is_symlink() and filepath.is_file():
                 spdx_file = oe.spdx.SPDXFile()
                 spdx_file.SPDXID = get_spdxid(file_counter)
                 for t in get_types(filepath):
@@ -445,7 +445,7 @@ python do_create_spdx() {
     recipe.name = d.getVar("PN")
     recipe.versionInfo = d.getVar("PV")
     recipe.SPDXID = oe.sbom.get_recipe_spdxid(d)
-    recipe.packageSupplier = d.getVar("SPDX_SUPPLIER")
+    recipe.supplier = d.getVar("SPDX_SUPPLIER")
     if bb.data.inherits_class("native", d) or bb.data.inherits_class("cross", d):
         recipe.annotations.append(create_annotation(d, "isNative"))
 
@@ -555,7 +555,7 @@ python do_create_spdx() {
             spdx_package.name = pkg_name
             spdx_package.versionInfo = d.getVar("PV")
             spdx_package.licenseDeclared = convert_license_to_spdx(package_license, package_doc, d, found_licenses)
-            spdx_package.packageSupplier = d.getVar("SPDX_SUPPLIER")
+            spdx_package.supplier = d.getVar("SPDX_SUPPLIER")
 
             package_doc.packages.append(spdx_package)
 
@@ -571,6 +571,7 @@ python do_create_spdx() {
                     pkgdest / package,
                     lambda file_counter: oe.sbom.get_packaged_file_spdxid(pkg_name, file_counter),
                     lambda filepath: ["BINARY"],
+                    ignore_top_level_dirs=['CONTROL', 'DEBIAN'],
                     archive=archive,
                 )
 
@@ -895,7 +896,7 @@ def combine_spdx(d, rootfs_name, rootfs_deploydir, rootfs_spdxid, packages):
     image.name = d.getVar("PN")
     image.versionInfo = d.getVar("PV")
     image.SPDXID = rootfs_spdxid
-    image.packageSupplier = d.getVar("SPDX_SUPPLIER")
+    image.supplier = d.getVar("SPDX_SUPPLIER")
 
     doc.packages.append(image)
 

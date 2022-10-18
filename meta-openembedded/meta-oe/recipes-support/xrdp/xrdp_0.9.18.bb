@@ -49,6 +49,7 @@ do_configure:prepend() {
 
 do_compile:prepend() {
     sed -i 's/(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am/(MAKE) $(AM_MAKEFLAGS) install-exec-am/g' ${S}/keygen/Makefile.in
+    echo "" > ${B}/xrdp_configure_options.h
 }
 
 do_install:append() {

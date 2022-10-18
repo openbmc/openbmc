@@ -384,6 +384,10 @@ def create_rootfs(d, manifest_dir=None, progress_reporter=None, logcatcher=None)
 
 
 def image_list_installed_packages(d, rootfs_dir=None):
+    # Theres no rootfs for baremetal images
+    if bb.data.inherits_class('baremetal-image', d):
+        return ""
+
     if not rootfs_dir:
         rootfs_dir = d.getVar('IMAGE_ROOTFS')
 

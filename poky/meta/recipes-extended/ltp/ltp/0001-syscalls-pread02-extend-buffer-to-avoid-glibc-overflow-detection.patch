@@ -1,0 +1,58 @@
+From de988c9b5605a711b306c4203545b8d761875177 Mon Sep 17 00:00:00 2001
+From: Jan Stancek <jstancek@redhat.com>
+Date: Mon, 31 Jan 2022 12:00:46 +0100
+Subject: [PATCH] syscalls/pread02: extend buffer to avoid glibc overflow
+ detection
+
+Test started failing with recent glibc (glibc-2.34.9000-38.fc36),
+which detects that buffer in pread is potentially too small:
+  tst_test.c:1431: TINFO: Timeout per run is 0h 05m 00s
+  *** buffer overflow detected ***: terminated
+  tst_test.c:1484: TBROK: Test killed by SIGIOT/SIGABRT!
+
+(gdb) bt
+  #0  __pthread_kill_implementation at pthread_kill.c:44
+  #1  0x00007ffff7e46f73 in __pthread_kill_internal at pthread_kill.c:78
+  #2  0x00007ffff7df6a36 in __GI_raise at ../sysdeps/posix/raise.c:26
+  #3  0x00007ffff7de082f in __GI_abort () at abort.c:79
+  #4  0x00007ffff7e3b01e in __libc_message at ../sysdeps/posix/libc_fatal.c:155
+  #5  0x00007ffff7ed945a in __GI___fortify_fail at fortify_fail.c:26
+  #6  0x00007ffff7ed7dc6 in __GI___chk_fail () at chk_fail.c:28
+  #7  0x00007ffff7ed8214 in __pread_chk at pread_chk.c:26
+  #8  0x0000000000404d1a in pread at /usr/include/bits/unistd.h:74
+  #9  verify_pread (n=<optimized out>) at pread02.c:44
+  #10 0x000000000040dc19 in run_tests () at tst_test.c:1246
+  #11 testrun () at tst_test.c:1331
+  #12 fork_testrun () at tst_test.c:1462
+  #13 0x000000000040e9a1 in tst_run_tcases
+  #14 0x0000000000404bde in main
+
+Extend it to number of bytes we are trying to read from fd.
+
+Upstream-Status: Backport
+[https://github.com/linux-test-project/ltp/commit/de988c9b5605a711b306c4203545b8d761875177]
+
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+Acked-by: Petr Vorel <pvorel@suse.cz>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+---
+ testcases/kernel/syscalls/pread/pread02.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testcases/kernel/syscalls/pread/pread02.c b/testcases/kernel/syscalls/pread/pread02.c
+index de2a81fff..fda5fd190 100644
+--- a/testcases/kernel/syscalls/pread/pread02.c
++++ b/testcases/kernel/syscalls/pread/pread02.c
+@@ -39,7 +39,7 @@ struct test_case_t {
+ static void verify_pread(unsigned int n)
+ {
+ 	struct test_case_t *tc = &tcases[n];
+-	char buf;
++	char buf[K1];
+ 
+ 	TST_EXP_FAIL2(pread(*tc->fd, &buf, tc->nb, tc->offst), tc->exp_errno,
+ 		"pread(%d, %zu, %ld) %s", *tc->fd, tc->nb, tc->offst, tc->desc);
+-- 
+2.34.1
+

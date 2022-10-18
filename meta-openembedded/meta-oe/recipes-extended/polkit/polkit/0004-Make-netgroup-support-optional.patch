@@ -1,4 +1,4 @@
-From 7ef2621ab7adcedc099ed39acfb73c6fa835cbc3 Mon Sep 17 00:00:00 2001
+From 5cf1a5fe6f8a24f1c95a749e3f347eeed2f591dd Mon Sep 17 00:00:00 2001
 From: "A. Wilcox" <AWilcox@Wilcox-Tech.com>
 Date: Sun, 15 May 2022 05:04:10 +0000
 Subject: [PATCH] Make netgroup support optional
@@ -37,12 +37,12 @@ Signed-off-by: Marta Rybczynska <marta.rybczynska@huawei.com>
  9 files changed, 43 insertions(+), 8 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 59858df..5a7fc11 100644
+index 18e4223..0f87ea0 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -100,7 +100,7 @@ AC_CHECK_LIB(expat,XML_ParserCreate,[EXPAT_LIBS="-lexpat"],
- 	     [AC_MSG_ERROR([Can't find expat library. Please install expat.])])
- AC_SUBST(EXPAT_LIBS)
+@@ -117,7 +117,7 @@ CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+ CC="$PTHREAD_CC"
+ AC_CHECK_FUNCS([pthread_condattr_setclock])
  
 -AC_CHECK_FUNCS(clearenv fdatasync)
 +AC_CHECK_FUNCS(clearenv fdatasync setnetgrent)
@@ -50,7 +50,7 @@ index 59858df..5a7fc11 100644
  if test "x$GCC" = "xyes"; then
    LDFLAGS="-Wl,--as-needed $LDFLAGS"
 diff --git a/meson.build b/meson.build
-index 733bbff..d840926 100644
+index 7506231..2d9d67a 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -82,6 +82,7 @@ config_h.set('_GNU_SOURCE', true)
@@ -164,10 +164,10 @@ index 056d9a8..36c2f3d 100644
  }
  
 diff --git a/src/polkitbackend/polkitbackendjsauthority.cpp b/src/polkitbackend/polkitbackendjsauthority.cpp
-index 5027815..bcb040c 100644
+index 11e91c0..9ee0391 100644
 --- a/src/polkitbackend/polkitbackendjsauthority.cpp
 +++ b/src/polkitbackend/polkitbackendjsauthority.cpp
-@@ -1524,6 +1524,7 @@ js_polkit_user_is_in_netgroup (JSContext  *cx,
+@@ -1291,6 +1291,7 @@ js_polkit_user_is_in_netgroup (JSContext  *cx,
  
    JS::CallArgs args = JS::CallArgsFromVp (argc, vp);
  
@@ -175,7 +175,7 @@ index 5027815..bcb040c 100644
    JS::RootedString usrstr (authority->priv->cx);
    usrstr = args[0].toString();
    user = JS_EncodeStringToUTF8 (cx, usrstr);
-@@ -1538,6 +1539,7 @@ js_polkit_user_is_in_netgroup (JSContext  *cx,
+@@ -1305,6 +1306,7 @@ js_polkit_user_is_in_netgroup (JSContext  *cx,
      {
        is_in_netgroup =  true;
      }
@@ -233,7 +233,7 @@ index 3701ba1..e1d211e 100644
    return g_test_run ();
  }
 diff --git a/test/polkitbackend/test-polkitbackendjsauthority.c b/test/polkitbackend/test-polkitbackendjsauthority.c
-index f97e0e0..fc52149 100644
+index 2103b17..b187a2f 100644
 --- a/test/polkitbackend/test-polkitbackendjsauthority.c
 +++ b/test/polkitbackend/test-polkitbackendjsauthority.c
 @@ -137,12 +137,14 @@ test_get_admin_identities (void)

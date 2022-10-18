@@ -1,0 +1,109 @@
+From 9c97b5db237a793e0d1b6b0241570bdc6e35ee24 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 7 Aug 2022 17:42:24 -0700
+Subject: [PATCH] Fix implicit-function-declaration warnings
+
+These are seen with clang-15+
+
+Upstream-Status: Inappropriate [upstream is dead]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ hosts_access.c | 3 +++
+ safe_finger.c  | 1 +
+ shell_cmd.c    | 3 +++
+ tcpd.c         | 2 +-
+ tcpdchk.c      | 1 +
+ workarounds.c  | 1 +
+ 6 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/hosts_access.c b/hosts_access.c
+index 0133e5e..58697ea 100644
+--- a/hosts_access.c
++++ b/hosts_access.c
+@@ -33,6 +33,7 @@ static char sccsid[] = "@(#) hosts_access.c 1.21 97/02/12 02:13:22";
+ #endif
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
++#include <rpcsvc/ypclnt.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <syslog.h>
+@@ -45,6 +46,8 @@ static char sccsid[] = "@(#) hosts_access.c 1.21 97/02/12 02:13:22";
+ #endif
+ 
+ extern int errno;
++extern int match_pattern_ylo(const char *s, const char *pattern);
++extern unsigned long cidr_mask_addr(char* str);
+ 
+ #ifndef	INADDR_NONE
+ #define	INADDR_NONE	(-1)		/* XXX should be 0xffffffff */
+diff --git a/safe_finger.c b/safe_finger.c
+index 23afab1..a6458fb 100644
+--- a/safe_finger.c
++++ b/safe_finger.c
+@@ -34,6 +34,7 @@ static char sccsid[] = "@(#) safe_finger.c 1.4 94/12/28 17:42:41";
+ #include <syslog.h>
+ 
+ extern void exit();
++extern int pipe_stdin(char  **argv);
+ 
+ /* Local stuff */
+ 
+diff --git a/shell_cmd.c b/shell_cmd.c
+index 62d31bc..a566092 100644
+--- a/shell_cmd.c
++++ b/shell_cmd.c
+@@ -16,10 +16,13 @@ static char sccsid[] = "@(#) shell_cmd.c 1.5 94/12/28 17:42:44";
+ 
+ #include <sys/types.h>
+ #include <sys/param.h>
++#include <sys/wait.h>
++#include <fcntl.h>
+ #include <signal.h>
+ #include <stdio.h>
+ #include <syslog.h>
+ #include <string.h>
++#include <unistd.h>
+ 
+ extern void exit();
+ 
+diff --git a/tcpd.c b/tcpd.c
+index dc9ff17..4353caa 100644
+--- a/tcpd.c
++++ b/tcpd.c
+@@ -46,7 +46,7 @@ void fix_options(struct request_info *);
+ int     allow_severity = SEVERITY;	/* run-time adjustable */
+ int     deny_severity = LOG_WARNING;	/* ditto */
+ 
+-main(argc, argv)
++void main(argc, argv)
+ int     argc;
+ char  **argv;
+ {
+diff --git a/tcpdchk.c b/tcpdchk.c
+index 5dca8bd..67c12ce 100644
+--- a/tcpdchk.c
++++ b/tcpdchk.c
+@@ -38,6 +38,7 @@ static char sccsid[] = "@(#) tcpdchk.c 1.8 97/02/12 02:13:25";
+ 
+ extern int errno;
+ extern void exit();
++extern unsigned long cidr_mask_addr(char* str);
+ extern int optind;
+ extern char *optarg;
+ 
+diff --git a/workarounds.c b/workarounds.c
+index b22b378..6335049 100644
+--- a/workarounds.c
++++ b/workarounds.c
+@@ -21,6 +21,7 @@ char    sccsid[] = "@(#) workarounds.c 1.6 96/03/19 16:22:25";
+ #include <stdio.h>
+ #include <syslog.h>
+ #include <string.h>
++#include <unistd.h>
+ 
+ extern int errno;
+ 
+-- 
+2.37.1
+

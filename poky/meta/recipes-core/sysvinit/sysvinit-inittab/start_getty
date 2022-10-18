@@ -14,4 +14,7 @@ esac
 
 if [ -e /sys/class/tty/$2 -a -c /dev/$2 ]; then
 	${setsid:-} ${getty} -L $1 $2 $3
+else
+    # Prevent respawning to fast error if /dev entry does not exist
+    sleep 1000
 fi

@@ -73,6 +73,9 @@ UBOOT_FIT_HASH_ALG ?= "sha256"
 FIT_SIGN_ALG ?= "rsa2048"
 UBOOT_FIT_SIGN_ALG ?= "rsa2048"
 
+# Kernel / U-Boot fitImage Padding Algo
+FIT_PAD_ALG ?= "pkcs-1.5"
+
 # Generate keys for signing Kernel / U-Boot fitImage
 FIT_GENERATE_KEYS ?= "0"
 UBOOT_FIT_GENERATE_KEYS ?= "0"

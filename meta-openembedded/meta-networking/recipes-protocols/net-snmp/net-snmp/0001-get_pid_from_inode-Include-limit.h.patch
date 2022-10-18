@@ -1,4 +1,4 @@
-From 2bf1bbe1d428ed06d57aa76b03e394b72ff2216d Mon Sep 17 00:00:00 2001
+From 8097734b27fd146f358a4edd0d1a0d28309bd9a4 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 22 Jul 2016 18:34:39 +0000
 Subject: [PATCH] get_pid_from_inode: Include limit.h
@@ -14,7 +14,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/agent/mibgroup/util_funcs/get_pid_from_inode.c b/agent/mibgroup/util_funcs/get_pid_from_inode.c
-index aee907d..7abaec2 100644
+index 5788e1d..ea380a6 100644
 --- a/agent/mibgroup/util_funcs/get_pid_from_inode.c
 +++ b/agent/mibgroup/util_funcs/get_pid_from_inode.c
 @@ -6,6 +6,7 @@
@@ -23,5 +23,5 @@ index aee907d..7abaec2 100644
  #include <ctype.h>
 +#include <limits.h>
  #include <stdio.h>
- #if HAVE_STDLIB_H
+ #ifdef HAVE_STDLIB_H
  #include <stdlib.h>

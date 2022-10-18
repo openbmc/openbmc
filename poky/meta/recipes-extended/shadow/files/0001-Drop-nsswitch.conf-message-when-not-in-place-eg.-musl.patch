@@ -1,0 +1,27 @@
+From aed5a184401fbbe901cb825be4004ced885b6f9a Mon Sep 17 00:00:00 2001
+From: Andrei Gherzan <andrei.gherzan@huawei.com>
+Date: Wed, 24 Aug 2022 00:54:47 +0200
+Subject: [PATCH] Drop nsswitch.conf message when not in place - eg. musl
+
+Upstream-Status: Inappropriate [issue reported at https://github.com/shadow-maint/shadow/issues/557]
+Signed-off-by: Andrei Gherzan <andrei.gherzan@huawei.com>
+---
+ lib/nss.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/nss.c b/lib/nss.c
+index af3e95a..74e0e16 100644
+--- a/lib/nss.c
++++ b/lib/nss.c
+@@ -57,7 +57,7 @@ void nss_init(char *nsswitch_path) {
+ 	//   subid:	files
+ 	nssfp = fopen(nsswitch_path, "r");
+ 	if (!nssfp) {
+-		fprintf(shadow_logfd, "Failed opening %s: %m", nsswitch_path);
++		//fprintf(shadow_logfd, "Failed opening %s: %m", nsswitch_path);
+ 		atomic_store(&nss_init_completed, true);
+ 		return;
+ 	}
+-- 
+2.25.1
+

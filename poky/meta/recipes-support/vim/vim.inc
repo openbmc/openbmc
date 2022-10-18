@@ -18,12 +18,10 @@ SRC_URI = "git://github.com/vim/vim.git;branch=master;protocol=https \
            file://vim-add-knob-whether-elf.h-are-checked.patch \
            file://0001-src-Makefile-improve-reproducibility.patch \
            file://no-path-adjust.patch \
-           file://racefix.patch \
-           file://crosscompile.patch \
            "
 
-PV .= ".0063"
-SRCREV = "d61efa50f8f5b9d9dcbc136705cc33874f0fdcb3"
+PV .= ".0598"
+SRCREV = "8279af514ca7e5fd3c31cf13b0864163d1a0bfeb"
 
 # Remove when 8.3 is out
 UPSTREAM_VERSION_UNKNOWN = "1"

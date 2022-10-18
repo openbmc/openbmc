@@ -43,12 +43,6 @@ class oeGoToolchainSelfTest(OESelftestTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        # Go creates file which are readonly
-        for dirpath, dirnames, filenames in os.walk(cls.tmpdir_SDKQA):
-            for filename in filenames + dirnames:
-                f = os.path.join(dirpath, filename)
-                if not os.path.islink(f):
-                    os.chmod(f, 0o775)
         shutil.rmtree(cls.tmpdir_SDKQA, ignore_errors=True)
         super(oeGoToolchainSelfTest, cls).tearDownClass()
 
@@ -56,6 +50,8 @@ class oeGoToolchainSelfTest(OESelftestTestCase):
         cmd = "cd %s/src/%s/%s; " % (self.go_path, proj, name)
         cmd = cmd + ". %s; " % self.env_SDK
         cmd = cmd + "export GOPATH=%s; " % self.go_path
+        cmd = cmd + "export GOFLAGS=-modcacherw; "
+        cmd = cmd + "export CGO_ENABLED=1; "
         cmd = cmd + "${CROSS_COMPILE}go %s" % gocmd
         return runCmd(cmd).status
 

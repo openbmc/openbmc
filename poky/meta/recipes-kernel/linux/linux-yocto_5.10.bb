@@ -13,23 +13,23 @@ KBRANCH:qemux86  ?= "v5.10/standard/base"
 KBRANCH:qemux86-64 ?= "v5.10/standard/base"
 KBRANCH:qemumips64 ?= "v5.10/standard/mti-malta64"
 
-SRCREV_machine:qemuarm ?= "23ab0f8300e7b90fdf1e0be923933d5cfd03b618"
-SRCREV_machine:qemuarm64 ?= "5ff1949cbb7ff90ae3e4dc6fd0fd9876ffaab9d2"
-SRCREV_machine:qemumips ?= "01c75770046189608bb4ea9977521ec58a15b6bf"
-SRCREV_machine:qemuppc ?= "7dd170da9eacb57c6d8eff88ca24b8bf55ab042a"
-SRCREV_machine:qemuriscv64 ?= "d09b184cbc0321794bda715ab560dec077a048d0"
-SRCREV_machine:qemuriscv32 ?= "d09b184cbc0321794bda715ab560dec077a048d0"
-SRCREV_machine:qemux86 ?= "d09b184cbc0321794bda715ab560dec077a048d0"
-SRCREV_machine:qemux86-64 ?= "d09b184cbc0321794bda715ab560dec077a048d0"
-SRCREV_machine:qemumips64 ?= "a099189ac94c7218c09f1519ea4222fb2d9070be"
-SRCREV_machine ?= "d09b184cbc0321794bda715ab560dec077a048d0"
-SRCREV_meta ?= "ed7e0c3bb9464387ba99fedd5ea32bf78ae2fe45"
+SRCREV_machine:qemuarm ?= "1cfbadeee39ed8d3a8840586a57eee0cf1686f62"
+SRCREV_machine:qemuarm64 ?= "12f0f8c4af04c4d4cb7762b7a2e5cfaa917f8fe9"
+SRCREV_machine:qemumips ?= "4b9e240c03b2b60be378ae2cc9a321922201de8f"
+SRCREV_machine:qemuppc ?= "7914a529e3ccd64f347439d5cabc202d24af3ea0"
+SRCREV_machine:qemuriscv64 ?= "8cf777336c9b7160ffdf1e8d7e4d8ee0cd8cdb37"
+SRCREV_machine:qemuriscv32 ?= "8cf777336c9b7160ffdf1e8d7e4d8ee0cd8cdb37"
+SRCREV_machine:qemux86 ?= "8cf777336c9b7160ffdf1e8d7e4d8ee0cd8cdb37"
+SRCREV_machine:qemux86-64 ?= "8cf777336c9b7160ffdf1e8d7e4d8ee0cd8cdb37"
+SRCREV_machine:qemumips64 ?= "05365e1787c60331f88bec98dd0fcca08ce78b06"
+SRCREV_machine ?= "8cf777336c9b7160ffdf1e8d7e4d8ee0cd8cdb37"
+SRCREV_meta ?= "92c947578207d27db250ee7250bacc11d9d80d4f"
 
 SRC_URI = "git://git.yoctoproject.org/linux-yocto.git;name=machine;branch=${KBRANCH}; \
            git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-5.10;destsuffix=${KMETA}"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
-LINUX_VERSION ?= "5.10.135"
+LINUX_VERSION ?= "5.10.143"
 
 DEPENDS += "${@bb.utils.contains('ARCH', 'x86', 'elfutils-native', '', d)}"
 DEPENDS += "openssl-native util-linux-native"
@@ -42,7 +42,7 @@ KCONF_BSP_AUDIT_LEVEL = "1"
 
 KERNEL_DEVICETREE:qemuarmv5 = "versatile-pb.dtb"
 
-COMPATIBLE_MACHINE = "qemuarm|qemuarmv5|qemuarm64|qemux86|qemuppc|qemuppc64|qemumips|qemumips64|qemux86-64|qemuriscv64|qemuriscv32"
+COMPATIBLE_MACHINE = "^(qemuarm|qemuarmv5|qemuarm64|qemux86|qemuppc|qemuppc64|qemumips|qemumips64|qemux86-64|qemuriscv64|qemuriscv32)$"
 
 # Functionality flags
 KERNEL_EXTRA_FEATURES ?= "features/netfilter/netfilter.scc"

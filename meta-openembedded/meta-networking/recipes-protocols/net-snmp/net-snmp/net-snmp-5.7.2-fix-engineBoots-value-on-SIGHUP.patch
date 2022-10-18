@@ -1,4 +1,4 @@
-From 1e3178835217ba89aa355e2b6b88e490f17be16d Mon Sep 17 00:00:00 2001
+From 5ad4eab43c1ea63ff343bba64d576440e8783e75 Mon Sep 17 00:00:00 2001
 From: Zheng Ruoqin <zhengrq.fnst@fujitsu.com>
 Date: Wed, 9 Jun 2021 15:47:30 +0900
 Subject: [PATCH] net snmp: fix engineBoots value on SIGHUP
@@ -7,6 +7,7 @@ Upstream-Status: Pending
 
 Signed-off-by: Marian Florea <marian.florea@windriver.com>
 Signed-off-by: Li Zhou <li.zhou@windriver.com>
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
 
 ---
  agent/snmpd.c    | 1 +
@@ -14,19 +15,19 @@ Signed-off-by: Li Zhou <li.zhou@windriver.com>
  2 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/agent/snmpd.c b/agent/snmpd.c
-index 1af439f..355b510 100644
+index 90de12d..1ccc4db 100644
 --- a/agent/snmpd.c
 +++ b/agent/snmpd.c
-@@ -1208,6 +1208,7 @@ receive(void)
- 	    snmp_log(LOG_INFO, "NET-SNMP version %s restarted\n",
- 		     netsnmp_get_version());
-             update_config();
-+	    snmp_store(app_name);
-             send_easy_trap(SNMP_TRAP_ENTERPRISESPECIFIC, 3);
- #if HAVE_SIGPROCMASK
-             ret = sigprocmask(SIG_UNBLOCK, &set, NULL);
+@@ -1169,6 +1169,7 @@ snmpd_reconfig(void)
+     snmp_log(LOG_INFO, "NET-SNMP version %s restarted\n",
+              netsnmp_get_version());
+     update_config();
++    snmp_store(app_name);
+     send_easy_trap(SNMP_TRAP_ENTERPRISESPECIFIC, 3);
+ #ifdef HAVE_SIGPROCMASK
+     ret = sigprocmask(SIG_UNBLOCK, &set, NULL);
 diff --git a/snmplib/snmpv3.c b/snmplib/snmpv3.c
-index 29c2a0f..ada961c 100644
+index 7b1746b..4a17e0d 100644
 --- a/snmplib/snmpv3.c
 +++ b/snmplib/snmpv3.c
 @@ -1059,9 +1059,9 @@ init_snmpv3_post_config(int majorid, int minorid, void *serverarg,
@@ -41,6 +42,3 @@ index 29c2a0f..ada961c 100644
          engineBoots = 1;
      }
  
--- 
-2.25.1
-

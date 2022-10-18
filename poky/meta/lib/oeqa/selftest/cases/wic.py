@@ -1420,7 +1420,7 @@ class ModifyTests(WicTestCase):
 
         # list directory content of the first partition
         result = runCmd("wic ls %s:1 -n %s" % (images[0], sysroot))
-        self.assertIn('\n%s        ' % kerneltype.upper(), result.output)
+        self.assertIn('\n%s ' % kerneltype.upper(), result.output)
         self.assertIn('\nEFI          <DIR>     ', result.output)
 
         # remove file. EFI partitions are case-insensitive so exercise that too

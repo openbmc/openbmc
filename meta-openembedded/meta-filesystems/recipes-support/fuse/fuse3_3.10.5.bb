@@ -12,6 +12,7 @@ LIC_FILES_CHKSUM = "file://GPL2.txt;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://LICENSE;md5=a55c12a2d7d742ecb41ca9ae0a6ddc66"
 
 SRC_URI = "https://github.com/libfuse/libfuse/releases/download/fuse-${PV}/fuse-${PV}.tar.xz \
+           file://0001-test-test_syscalls.c-allow-EBADF-in-fcheck_stat-631.patch \
 "
 SRC_URI[sha256sum] = "b2e283485d47404ac896dd0bb7f7ba81e1470838e677e45f659804c3a3b69666"
 
@@ -35,7 +36,28 @@ RDEPENDS:${PN}-ptest += " \
 
 do_install_ptest() {
         install -d ${D}${PTEST_PATH}/test
+        install -d ${D}${PTEST_PATH}/example
+        install -d ${D}${PTEST_PATH}/util
         cp -rf ${S}/test/* ${D}${PTEST_PATH}/test/
+
+        example_excutables=`find ${B}/example -type f -executable`
+        util_excutables=`find ${B}/util -type f -executable`
+        test_excutables=`find ${B}/test -type f -executable`
+
+        for e in $example_excutables
+        do
+            cp -rf $e  ${D}${PTEST_PATH}/example/
+         done
+
+        for e in $util_excutables
+        do
+            cp -rf $e  ${D}${PTEST_PATH}/util/
+        done
+
+        for e in $test_excutables
+        do
+            cp -rf $e  ${D}${PTEST_PATH}/test
+        done
 }
 
 DEPENDS = "udev"
@@ -48,10 +70,6 @@ RRECOMMENDS:${PN}:class-target = "kernel-module-fuse fuse3-utils"
 
 FILES:${PN} += "${libdir}/libfuse3.so.*"
 FILES:${PN}-dev += "${libdir}/libfuse3*.la"
-
-EXTRA_OEMESON += " \
-     -Dexamples=false \
-"
 
 # Forbid auto-renaming to libfuse3-utils
 FILES:fuse3-utils = "${bindir} ${base_sbindir}"

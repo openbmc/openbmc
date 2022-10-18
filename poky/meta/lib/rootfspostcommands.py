@@ -58,3 +58,10 @@ def sort_passwd(sysconfdir):
             remove_backup(filename)
             if os.path.exists(filename):
                  sort_file(filename, mapping)
+    # Drop other known backup shadow-utils.
+    for filename in (
+            'subgid',
+            'subuid',
+        ):
+        filepath = os.path.join(sysconfdir, filename)
+        remove_backup(filepath)

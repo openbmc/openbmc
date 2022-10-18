@@ -22,12 +22,17 @@ SRC_URI += "http://www.w3.org/XML/Test/xmlts20080827.tar.gz;subdir=${BP};name=te
            file://fix-execution-of-ptests.patch \
            file://remove-fuzz-from-ptests.patch \
            file://libxml-m4-use-pkgconfig.patch \
+           file://0001-Port-gentest.py-to-Python-3.patch \
            "
 
 SRC_URI[archive.sha256sum] = "60d74a257d1ccec0475e749cba2f21559e48139efba6ff28224357c7c798dfee"
 SRC_URI[testtar.sha256sum] = "96151685cec997e1f9f3387e3626d61e6284d4d6e66e0e440c209286c03e9cc7"
 
 BINCONFIG = "${bindir}/xml2-config"
+
+# Fixed since 2.9.11 via
+# https://gitlab.gnome.org/GNOME/libxml2/-/commit/c1ba6f54d32b707ca6d91cb3257ce9de82876b6f
+CVE_CHECK_IGNORE += "CVE-2016-3709"
 
 PACKAGECONFIG ??= "python \
     ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)} \
@@ -78,6 +83,16 @@ do_configure:prepend () {
 }
 
 do_compile_ptest() {
+        # Make sure that testapi.c is newer than gentests.py, because
+        # with reproducible builds, they will both get e.g. Jan  1  1970
+        # modification time from SOURCE_DATE_EPOCH and then check-am
+        # might try to rebuild_testapi, which will fail even with
+        # 0001-Port-gentest.py-to-Python-3.patch, because it needs
+        # libxml2 module (libxml2-native dependency and correctly
+        # set PYTHON_SITE_PACKAGES), it's easier to
+        # just rely on pre-generated testapi.c from the release
+        touch ${S}/testapi.c
+
 	oe_runmake check-am
 }
 

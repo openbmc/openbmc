@@ -5,7 +5,7 @@ on wait status values."
 HOMEPAGE = "http://search.cpan.org/~rosch/Proc-WaitStat/"
 SECTION = "libraries"
 
-LICENSE = "Artistic-1.0|GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://README;beginline=21;endline=23;md5=f36550f59a0ae5e6e3b0be6a4da60d26"
 
 RDEPENDS:${PN} += "perl libipc-signal-perl"

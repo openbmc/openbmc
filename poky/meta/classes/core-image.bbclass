@@ -59,6 +59,10 @@ FEATURE_PACKAGES_hwcodecs = "${MACHINE_HWCODECS}"
 # IMAGE_FEATURES_REPLACES_foo = 'bar1 bar2'
 # Including image feature foo would replace the image features bar1 and bar2
 IMAGE_FEATURES_REPLACES_ssh-server-openssh = "ssh-server-dropbear"
+# Do not install openssh complementary packages if either packagegroup-core-ssh-dropbear or dropbear
+# is installed # to avoid openssh-dropbear conflict
+# see [Yocto #14858] for more information
+PACKAGE_EXCLUDE_COMPLEMENTARY:append = "${@bb.utils.contains_any('PACKAGE_INSTALL', 'packagegroup-core-ssh-dropbear dropbear', 'openssh', '' , d)}"
 
 # IMAGE_FEATURES_CONFLICTS_foo = 'bar1 bar2'
 # An error exception would be raised if both image features foo and bar1(or bar2) are included

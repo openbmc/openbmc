@@ -1097,6 +1097,8 @@ def try_mirror_url(fetch, origud, ud, ld, check = False):
 
 def ensure_symlink(target, link_name):
     if not os.path.exists(link_name):
+        dirname = os.path.dirname(link_name)
+        bb.utils.mkdirhier(dirname)
         if os.path.islink(link_name):
             # Broken symbolic link
             os.unlink(link_name)

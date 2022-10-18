@@ -1,4 +1,6 @@
 #
+# Copyright BitBake Contributors
+#
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
@@ -419,7 +421,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
                 bb.error("Taskhash mismatch %s versus %s for %s" % (computed_taskhash, self.taskhash[tid], tid))
                 sigfile = sigfile.replace(self.taskhash[tid], computed_taskhash)
 
-        fd, tmpfile = tempfile.mkstemp(dir=os.path.dirname(sigfile), prefix="sigtask.")
+        fd, tmpfile = bb.utils.mkstemp(dir=os.path.dirname(sigfile), prefix="sigtask.")
         try:
             with bb.compress.zstd.open(fd, "wt", encoding="utf-8", num_threads=1) as f:
                 json.dump(data, f, sort_keys=True, separators=(",", ":"), cls=SetEncoder)

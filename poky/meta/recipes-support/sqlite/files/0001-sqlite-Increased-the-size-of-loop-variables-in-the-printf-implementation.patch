@@ -1,0 +1,26 @@
+From ec75530b8d8268cb07d8e476d79e1b0e59492fa2 Mon Sep 17 00:00:00 2001
+From: drh
+Date: Thu, 18 Aug 2022 15:10:46 +0200
+Subject: [PATCH] sqlite: Increase the size of loop variables in the printf() implementation
+
+Increase the size of loop variables in the printf() implementation to avoid integer overflow on multi-gigabyte string arguments. CVE-2022-35737.
+
+This bug fix refers to: CVE-2022-35737 and it's a backport of a fix added in sqlite 3.39.2 (2022-07-21).
+
+Signed-off-by: Ghassane Ben El Aattar ghassaneb.aattar@huawei.com
+
+CVE: CVE-2022-35737
+
+Upstream-Status: Backport [https://www.sqlite.org/src/info/aab790a16e1bdff7]
+---
+ sqlite3.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/sqlite3.c b/sqlite3.c
+index f867d62..490199a 100644
+--- a/sqlite3.c
++++ b/sqlite3.c
+@@ -30234,1 +30234,2 @@ static int vxprintf(
+-        int i, j, k, n, isnull;
++        i64  i, j, k, n;
++        int isnull;

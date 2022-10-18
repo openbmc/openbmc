@@ -28,6 +28,7 @@ SRC_URI = "git://github.com/linux-test-project/ltp.git;branch=master;protocol=ht
            file://0001-Remove-OOM-tests-from-runtest-mm.patch \
            file://0001-metadata-parse.sh-sort-filelist-for-reproducibility.patch \
            file://disable_hanging_tests.patch \
+           file://0001-syscalls-pread02-extend-buffer-to-avoid-glibc-overflow-detection.patch \
            "
 
 S = "${WORKDIR}/git"

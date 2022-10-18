@@ -1,0 +1,31 @@
+From 8f51462d41d8fe942d5d0a06f08d47f625141995 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Thu, 4 Aug 2022 12:15:08 +0200
+Subject: [PATCH] configure.ac: add linux-gnux32 variant to triplet handling
+
+x32 is a 64 bit x86 ABI with 32 bit pointers.
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/rpm/pull/2143]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ configure.ac | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 372875fc49..7d6a3d274e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -845,6 +845,10 @@ if echo "$host_os" | grep '.*-gnuabi64$' > /dev/null ; then
+ 	host_os=`echo "${host_os}" | sed 's/-gnuabi64$//'`
+ 	host_os_gnu=-gnuabi64
+ fi
++if echo "$host_os" | grep '.*-gnux32$' > /dev/null ; then
++	host_os=`echo "${host_os}" | sed 's/-gnux32$//'`
++	host_os_gnu=-gnux32
++fi
+ if echo "$host_os" | grep '.*-gnu$' > /dev/null ; then
+ 	host_os=`echo "${host_os}" | sed 's/-gnu$//'`
+ fi
+-- 
+2.30.2
+

@@ -8,7 +8,7 @@ your programs."
 
 HOMEPAGE = "http://search.cpan.org/dist/XML-LibXML-1.99/"
 SECTION = "libs"
-LICENSE = "Artistic-1.0|GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 DEPENDS += "libxml2 \
         libxml-sax-perl-native \
         zlib \

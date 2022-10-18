@@ -4,7 +4,7 @@ require glibc-tests.inc
 inherit ptest features_check
 REQUIRED_DISTRO_FEATURES = "ptest"
 
-SRC_URI:append = " \
+SRC_URI += " \
 	file://reproducible-paths.patch \
 	file://run-ptest \
 "
@@ -30,7 +30,7 @@ python __anonymous() {
 RPROVIDES:${PN} = "${PN}"
 RRECOMMENDS:${PN} = ""
 RDEPENDS:${PN} = " glibc sed"
-DEPENDS:append = " sed"
+DEPENDS += "sed"
 
 export oe_srcdir="${exec_prefix}/src/debug/glibc/${PV}/"
 

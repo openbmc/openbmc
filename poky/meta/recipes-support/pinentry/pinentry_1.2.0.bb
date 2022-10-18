@@ -32,5 +32,8 @@ PACKAGECONFIG[secret] = "--enable-libsecret, --disable-libsecret, libsecret"
 EXTRA_OECONF = " \
     --disable-rpath \
 "
+EXTRA_OECONF:append:libc-musl = " \
+    ac_cv_should_define__xopen_source=yes \
+"
 
 BBCLASSEXTEND = "native nativesdk"

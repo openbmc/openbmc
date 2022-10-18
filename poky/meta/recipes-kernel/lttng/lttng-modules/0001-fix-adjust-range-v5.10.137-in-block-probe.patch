@@ -1,0 +1,92 @@
+From 5dab3d515b6f5c5ac80c8e7674628495e3bf4ac6 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 22 Aug 2022 14:16:27 -0400
+Subject: [PATCH] fix: adjust range v5.10.137 in block probe
+
+See upstream commit, backported in v5.10.137 :
+
+commit 1cb3032406423b25aa984854b4d78e0100d292dd
+Author: Christoph Hellwig <hch@lst.de>
+Date:   Thu Dec 3 17:21:39 2020 +0100
+
+    block: remove the request_queue to argument request based tracepoints
+
+    [ Upstream commit a54895fa057c67700270777f7661d8d3c7fda88a ]
+
+    The request_queue can trivially be derived from the request.
+
+Change-Id: I01f96a437641421faf993b4b031171c372bd0374
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+
+Upstream-Status: Backport [https://github.com/lttng/lttng-modules/commit/5dab3d515b6f5c5ac80c8e7674628495e3bf4ac6]
+Signed-off-by: Steve Sakoman <steve@sakoman.com>
+
+---
+ include/instrumentation/events/block.h | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/include/instrumentation/events/block.h b/include/instrumentation/events/block.h
+index 882e6e08..d4821c12 100644
+--- a/include/instrumentation/events/block.h
++++ b/include/instrumentation/events/block.h
+@@ -366,7 +366,8 @@ LTTNG_TRACEPOINT_EVENT(block_rq_requeue,
+ 			lttng_req_op(rq), lttng_req_rw(rq), blk_rq_bytes(rq))
+ 	)
+ )
+-#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0))
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0) \
++	|| LTTNG_KERNEL_RANGE(5,10,137, 5,11,0))
+ /**
+  * block_rq_requeue - place block IO request back on a queue
+  * @rq: block IO operation request
+@@ -611,7 +612,8 @@ LTTNG_TRACEPOINT_EVENT_CLASS(block_rq,
+ 		ctf_array_text(char, comm, current->comm, TASK_COMM_LEN)
+ 	)
+ )
+-#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0))
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0) \
++	|| LTTNG_KERNEL_RANGE(5,10,137, 5,11,0))
+ LTTNG_TRACEPOINT_EVENT_CLASS(block_rq,
+ 
+ 	TP_PROTO(struct request *rq),
+@@ -746,7 +748,8 @@ LTTNG_TRACEPOINT_EVENT_CLASS_CODE(block_rq,
+ )
+ #endif /* #else #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,11,0)) */
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0) \
++	|| LTTNG_KERNEL_RANGE(5,10,137, 5,11,0))
+ /**
+  * block_rq_insert - insert block operation request into queue
+  * @rq: block IO operation request
+@@ -781,7 +784,8 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(block_rq, block_rq_insert,
+ )
+ #endif
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0) \
++	|| LTTNG_KERNEL_RANGE(5,10,137, 5,11,0))
+ /**
+  * block_rq_issue - issue pending block IO request operation to device driver
+  * @rq: block IO operation operation request
+@@ -812,7 +816,8 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(block_rq, block_rq_issue,
+ )
+ #endif
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0) \
++	|| LTTNG_KERNEL_RANGE(5,10,137, 5,11,0))
+ /**
+  * block_rq_merge - merge request with another one in the elevator
+  * @rq: block IO operation operation request
+@@ -1632,7 +1637,8 @@ LTTNG_TRACEPOINT_EVENT(block_rq_remap,
+ 			lttng_req_op(rq), lttng_req_rw(rq), blk_rq_bytes(rq))
+ 	)
+ )
+-#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0))
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0) \
++	|| LTTNG_KERNEL_RANGE(5,10,137, 5,11,0))
+ /**
+  * block_rq_remap - map request for a block operation request
+  * @rq: block IO operation request

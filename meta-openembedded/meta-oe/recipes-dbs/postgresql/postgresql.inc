@@ -205,7 +205,7 @@ do_install:append() {
     # multiple server config directory
     install -d -m 700 ${D}${sysconfdir}/default/${BPN}
 
-    if [ "${@d.getVar('enable_pam')}" = "pam" ]; then
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'true', 'false', d)}; then
         install -d ${D}${sysconfdir}/pam.d
         install -m 644 ${WORKDIR}/postgresql.pam ${D}${sysconfdir}/pam.d/postgresql
     fi
