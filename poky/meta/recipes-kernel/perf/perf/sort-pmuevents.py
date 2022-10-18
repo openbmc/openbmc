@@ -33,10 +33,10 @@ if os.path.exists(outfile):
 with open(infile, 'r') as file:
     data = file.read()
 
-preamble_regex = re.compile( '^(.*?)^struct', re.MULTILINE | re.DOTALL )
+preamble_regex = re.compile( '^(.*?)^(struct|const struct|static struct|static const struct)', re.MULTILINE | re.DOTALL )
 
 preamble = re.search( preamble_regex, data )
-struct_block_regex = re.compile( '^struct.*?(\w+) (.*?)\[\] = {(.*?)^};', re.MULTILINE | re.DOTALL )
+struct_block_regex = re.compile( '^(struct|const struct|static struct|static const struct).*?(\w+) (.*?)\[\] = {(.*?)^};', re.MULTILINE | re.DOTALL )
 field_regex =  re.compile( '{.*?},', re.MULTILINE | re.DOTALL )
 cpuid_regex = re.compile( '\.cpuid = (.*?),', re.MULTILINE | re.DOTALL )
 name_regex = re.compile( '\.name = (.*?),', re.MULTILINE | re.DOTALL )
@@ -45,22 +45,25 @@ name_regex = re.compile( '\.name = (.*?),', re.MULTILINE | re.DOTALL )
 # types and then their fields.
 entry_dict = {}
 for struct in re.findall( struct_block_regex, data ):
-    # print( "struct: %s %s" % (struct[0],struct[1]) )
-    entry_dict[struct[1]] = {}
-    entry_dict[struct[1]]['type'] = struct[0]
-    entry_dict[struct[1]]['fields'] = {}
-    for entry in re.findall( field_regex, struct[2] ):
+    # print( "struct: %s %s %s" % (struct[0],struct[1],struct[2]) )
+    entry_dict[struct[2]] = {}
+    entry_dict[struct[2]]['type_prefix'] = struct[0]
+    entry_dict[struct[2]]['type'] = struct[1]
+    entry_dict[struct[2]]['fields'] = {}
+    for entry in re.findall( field_regex, struct[3] ):
         #print( "    entry: %s" % entry )
         cpuid = re.search( cpuid_regex, entry )
         if cpuid:
             #print( "    cpuid found: %s" % cpuid.group(1) )
-            entry_dict[struct[1]]['fields'][cpuid.group(1)] = entry
-            
+            entry_dict[struct[2]]['fields'][cpuid.group(1)] = entry
+
         name = re.search( name_regex, entry )
         if name:
             #print( "    name found: %s" % name.group(1) )
-            entry_dict[struct[1]]['fields'][name.group(1)] = entry
-        
+            entry_dict[struct[2]]['fields'][name.group(1)] = entry
+
+        if not entry_dict[struct[2]]['fields']:
+            entry_dict[struct[2]]['fields']['0'] = entry
 
 # created ordered dictionaries from the captured values. These are ordered by
 # a sorted() iteration of the keys. We don't care about the order we read
@@ -72,6 +75,7 @@ for struct in re.findall( struct_block_regex, data ):
 entry_dict_sorted = OrderedDict()
 for i in sorted(entry_dict.keys()):
     entry_dict_sorted[i] = {}
+    entry_dict_sorted[i]['type_prefix'] = entry_dict[i]['type_prefix']
     entry_dict_sorted[i]['type'] = entry_dict[i]['type']
     entry_dict_sorted[i]['fields'] = {}
     for f in sorted(entry_dict[i]['fields'].keys()):
@@ -83,7 +87,7 @@ outf = open( outfile, 'w' )
 print( preamble.group(1) )
 outf.write( preamble.group(1) )
 for d in entry_dict_sorted:
-    outf.write( "struct %s %s[] = {\n" % (entry_dict_sorted[d]['type'],d) )
+    outf.write( "%s %s %s[] = {\n" % (entry_dict_sorted[d]['type_prefix'], entry_dict_sorted[d]['type'],d) )
     for f in entry_dict_sorted[d]['fields']:
         outf.write( entry_dict_sorted[d]['fields'][f] + '\n' )
 
