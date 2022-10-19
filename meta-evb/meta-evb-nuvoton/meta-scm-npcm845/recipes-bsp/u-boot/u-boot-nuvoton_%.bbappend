@@ -9,6 +9,5 @@ SRC_URI:append:scm-npcm845 = " file://0003-i2c-mw-zero-len.patch"
 SRC_URI:append:scm-npcm845 = " file://0004-net-designware-do-phy_config-before-start-up.patch"
 SRC_URI:append:scm-npcm845 = " file://0005-net-phy-realtek-rtl8211f-introduce-phy_reset.patch"
 SRC_URI:append:scm-npcm845 = " file://0006-set-clock-divisor-for-uart456.patch"
-SRC_URI:append:scm-npcm845 = " file://0008-Move-flash-layout.patch"
 SRC_URI:append:scm-npcm845 = " \
 	${@emmc_enabled(d, 'file://1111-boot-openbmc-form-emmc.patch')}"
