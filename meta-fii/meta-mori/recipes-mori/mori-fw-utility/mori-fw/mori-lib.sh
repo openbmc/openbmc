@@ -76,6 +76,15 @@ rst_bios_spi() {
   set_gpio_ctrl RST_BIOS_EEPROM0_N 1
 }
 
+function Does_File_Exist() {
+  local FILE=$1
+
+  if [[ ! -f "${FILE}" ]]; then
+    echo "${FILE} file does not exist" >&2
+    return 1
+  fi
+}
+
 # Start definitions
 
 # I2C Definitions
@@ -88,3 +97,7 @@ I2C_MB_PWRSEQ=(40 40)
 I2C_CPU_EEPROM=(19 50)
 I2C_STBUCK=(33 74)
 I2C_HOTSWAP_CTRL=(25 1f)
+
+# File Path Definition
+# File path used to prevent hotswapping
+RST_LOCK_FILE="/etc/FW_FLASH_ONGOING"

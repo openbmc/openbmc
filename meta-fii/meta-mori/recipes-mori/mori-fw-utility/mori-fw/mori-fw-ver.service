@@ -1,5 +1,7 @@
 [Unit]
 Description=Firmware Version Daemon
+Wants=host-powerctrl.service
+After=host-powerctrl.service
 
 [Service]
 RemainAfterExit=yes

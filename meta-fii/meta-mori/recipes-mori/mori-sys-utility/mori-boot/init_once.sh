@@ -15,7 +15,7 @@ function set_mux_default(){
 }
 
 set_mux_default
-set_gpio_ctrl HPM_STBY_RST_N 1
+
 sleep 5
 set_gpio_ctrl S0_BMC_OK 1
 
