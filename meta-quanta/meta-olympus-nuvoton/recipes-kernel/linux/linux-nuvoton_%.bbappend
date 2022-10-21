@@ -7,3 +7,4 @@ SRC_URI:append:olympus-nuvoton = " file://0008-WAR-skip-clear-fault-for-flexpowe
 SRC_URI:append:olympus-nuvoton = " file://enable-v4l2.cfg"
 SRC_URI:append:olympus-nuvoton = " file://0001-drivers-misc-porting-mcu-flash-driver.patch"
 SRC_URI:append:olympus-nuvoton = " file://0001-drivers-spi-Bugfixed-npcm_fiu_uma_read-set-wrong-val.patch"
+SRC_URI:append:olympus-nuvoton = " file://0001-dts-fix-firmware-update.patch"
