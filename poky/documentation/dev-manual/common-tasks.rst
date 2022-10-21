@@ -973,7 +973,7 @@ a recipe and using :term:`EXTRA_IMAGE_FEATURES` from within your
 :term:`Build Directory`.
 
 To understand how these features work, the best reference is
-:ref:`meta/classes/image.bbclass <ref-classes-image>`.
+:ref:`meta/classes-recipe/image.bbclass <ref-classes-image>`.
 This class lists out the available
 :term:`IMAGE_FEATURES` of which most map to package groups while some, such
 as ``debug-tweaks`` and ``read-only-rootfs``, resolve as general
@@ -2124,7 +2124,7 @@ removed later when a recipe is either modified or removed. Thus, the
 sysroot is able to remain free from stale files.
 
 A subset of the files installed by the :ref:`ref-tasks-install` task are
-used by the :ref:`ref-tasks-populate_sysroot` task as defined by the the
+used by the :ref:`ref-tasks-populate_sysroot` task as defined by the
 :term:`SYSROOT_DIRS` variable to automatically populate the sysroot. It
 is possible to modify the list of directories that populate the sysroot.
 The following example shows how you could add the ``/opt`` directory to
@@ -3048,7 +3048,7 @@ The following steps describe how to set up the AUH utility:
       your build directory.
 
    -  If you want to enable testing through the
-      :ref:`testimage <ref-classes-testimage*>`
+      :ref:`testimage <ref-classes-testimage>`
       class, which is optional, you need to have the following set in
       your ``conf/local.conf`` file::
 
@@ -6889,7 +6889,7 @@ multiple times if you have more than one set of modules to package.
 For more examples that show how to use ``do_split_packages``, see the
 ``connman.inc`` file in the ``meta/recipes-connectivity/connman/``
 directory of the ``poky`` :ref:`source repository <overview-manual/development-environment:yocto project source repositories>`. You can
-also find examples in ``meta/classes/kernel.bbclass``.
+also find examples in ``meta/classes-recipe/kernel.bbclass``.
 
 Following is a reference that shows ``do_split_packages`` mandatory and
 optional arguments::
@@ -8893,7 +8893,7 @@ You can start the tests automatically or manually:
 
 -  *Manually running tests:* To manually run the tests, first globally
    inherit the
-   :ref:`testimage <ref-classes-testimage*>` class
+   :ref:`testimage <ref-classes-testimage>` class
    by editing your ``local.conf`` file::
 
       INHERIT += "testimage"

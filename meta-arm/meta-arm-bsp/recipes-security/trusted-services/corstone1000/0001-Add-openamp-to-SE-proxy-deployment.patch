@@ -1,0 +1,287 @@
+From 7c9589c4bb056db5e1696f2a777891ab235b1b63 Mon Sep 17 00:00:00 2001
+From: Vishnu Banavath <vishnu.banavath@arm.com>
+Date: Fri, 3 Dec 2021 16:36:51 +0000
+Subject: [PATCH 01/19] Add openamp to SE proxy deployment
+
+Openamp is required to communicate between secure partitions(running on
+Cortex-A) and trusted-firmware-m(running on Cortex-M).
+These changes are to fetch libmetal and openamp from github repo's
+and build it.
+
+Upstream-Status: Pending
+Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+---
+ deployments/se-proxy/opteesp/lse.S            | 28 ++++++++
+ deployments/se-proxy/se-proxy.cmake           |  8 +++
+ external/openamp/libmetal-init-cache.cmake.in | 20 ++++++
+ external/openamp/libmetal.cmake               | 67 +++++++++++++++++++
+ external/openamp/openamp-init-cache.cmake.in  | 20 ++++++
+ external/openamp/openamp.cmake                | 66 ++++++++++++++++++
+ 6 files changed, 209 insertions(+)
+ create mode 100644 deployments/se-proxy/opteesp/lse.S
+ create mode 100644 external/openamp/libmetal-init-cache.cmake.in
+ create mode 100644 external/openamp/libmetal.cmake
+ create mode 100644 external/openamp/openamp-init-cache.cmake.in
+ create mode 100644 external/openamp/openamp.cmake
+
+diff --git a/deployments/se-proxy/opteesp/lse.S b/deployments/se-proxy/opteesp/lse.S
+new file mode 100644
+index 000000000000..8e466d65fc2b
+--- /dev/null
++++ b/deployments/se-proxy/opteesp/lse.S
+@@ -0,0 +1,28 @@
++// SPDX-License-Identifier: BSD-3-Clause
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ */
++
++.text
++.globl __aarch64_cas4_acq_rel
++.globl __aarch64_cas4_sync
++
++__aarch64_cas4_acq_rel:
++	mov	w16, w0
++	ldaxr	w0, [x2]
++	cmp	w0, w16
++0:	bne	1f
++
++	stlxr	w17, w1, [x2]
++	cbnz	w17, 0b
++1:	ret
++
++__aarch64_cas4_sync:
++	mov	w16, w0
++	ldxr	w0, [x2]
++	cmp	w0, w16
++0:	bne	1f
++
++	stlxr	w17, w1, [x2]
++	cbnz	w17, 0b
++1:	ret
+diff --git a/deployments/se-proxy/se-proxy.cmake b/deployments/se-proxy/se-proxy.cmake
+index 426c66c05350..d39873a0fe81 100644
+--- a/deployments/se-proxy/se-proxy.cmake
++++ b/deployments/se-proxy/se-proxy.cmake
+@@ -61,6 +61,7 @@ add_components(TARGET "se-proxy"
+ target_sources(se-proxy PRIVATE
+ 	${CMAKE_CURRENT_LIST_DIR}/common/se_proxy_sp.c
+ 	${CMAKE_CURRENT_LIST_DIR}/common/service_proxy_factory.c
++	${CMAKE_CURRENT_LIST_DIR}/opteesp/lse.S
+ )
+ 
+ #-------------------------------------------------------------------------------
+@@ -73,6 +74,13 @@ include(../../../external/nanopb/nanopb.cmake)
+ target_link_libraries(se-proxy PRIVATE nanopb::protobuf-nanopb-static)
+ protobuf_generate_all(TGT "se-proxy" NAMESPACE "protobuf" BASE_DIR "${TS_ROOT}/protocols")
+ 
++# libmetal
++include(../../../external/openamp/libmetal.cmake)
++
++# OpenAMP
++include(../../../external/openamp/openamp.cmake)
++target_link_libraries(se-proxy PRIVATE openamp libmetal)
++
+ #################################################################
+ 
+ target_include_directories(se-proxy PRIVATE
+diff --git a/external/openamp/libmetal-init-cache.cmake.in b/external/openamp/libmetal-init-cache.cmake.in
+new file mode 100644
+index 000000000000..04c25fbde960
+--- /dev/null
++++ b/external/openamp/libmetal-init-cache.cmake.in
+@@ -0,0 +1,20 @@
++#-------------------------------------------------------------------------------
++# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
++# Copyright (c) 2021-2022, Linaro. All rights reserved.
++#
++# SPDX-License-Identifier: BSD-3-Clause
++#
++#-------------------------------------------------------------------------------
++
++set(CMAKE_INSTALL_PREFIX "@BUILD_INSTALL_DIR@" CACHE STRING "")
++set(CMAKE_TOOLCHAIN_FILE "@TS_EXTERNAL_LIB_TOOLCHAIN_FILE@" CACHE STRING "")
++set(BUILD_SHARED_LIBS Off CACHE BOOL "")
++set(BUILD_STATIC_LIBS On CACHE BOOL "")
++
++set(WITH_DOC OFF CACHE BOOL "")
++set(WITH_TESTS OFF CACHE BOOL "")
++set(WITH_EXAMPLES OFF CACHE BOOL "")
++set(WITH_DEFAULT_LOGGER OFF CACHE BOOL "")
++set(MACHINE "template" CACHE STRING "")
++
++@_cmake_fragment@
+diff --git a/external/openamp/libmetal.cmake b/external/openamp/libmetal.cmake
+new file mode 100644
+index 000000000000..6e5004ff555c
+--- /dev/null
++++ b/external/openamp/libmetal.cmake
+@@ -0,0 +1,67 @@
++#-------------------------------------------------------------------------------
++# Copyright (c) 2022 Linaro Limited
++# Copyright (c) 2022, Arm Limited. All rights reserved.
++#
++# SPDX-License-Identifier: BSD-3-Clause
++#
++#-------------------------------------------------------------------------------
++
++set (LIBMETAL_URL "https://github.com/OpenAMP/libmetal.git"
++		    CACHE STRING "libmetal repository URL")
++set (LIBMETAL_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/libmetal_install"
++		    CACHE DIR "libmetal installation directory")
++set(LIBMETAL_SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/_deps/libmetal"
++		CACHE DIR "libmetal source-code")
++set (LIBMETAL_PACKAGE_DIR "${LIBMETAL_INSTALL_DIR}/libmetal/cmake"
++			    CACHE DIR "libmetal CMake package directory")
++set (LIBMETAL_TARGET_NAME "libmetal")
++set (LIBMETAL_REFSPEC "f252f0e007fbfb8b3a52b1d5901250ddac96baad"
++			CACHE STRING "The version of libmetal to use")
++set(LIBMETAL_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/_deps/libmetal-build")
++
++set(GIT_OPTIONS
++    GIT_REPOSITORY ${LIBMETAL_URL}
++    GIT_TAG ${LIBMETAL_REFSPEC}
++    GIT_SHALLOW FALSE
++)
++
++if(NOT LIBMETAL_DEBUG)
++	set(LIBMETAL_BUILD_TYPE "Release")
++else()
++	set(LIBMETAL_BUILD_TYPE "Debug")
++endif()
++
++include(FetchContent)
++
++# Checking git
++find_program(GIT_COMMAND "git")
++if (NOT GIT_COMMAND)
++	message(FATAL_ERROR "Please install git")
++endif()
++
++# Only pass libc settings to libmetal if needed. For environments where the
++# standard library is not overridden, this is not needed.
++if(TARGET stdlib::c)
++	include(${TS_ROOT}/tools/cmake/common/PropertyCopy.cmake)
++
++	# Save libc settings
++	save_interface_target_properties(TGT stdlib::c PREFIX LIBC)
++	# Translate libc settings to cmake code fragment. Will be inserted into
++	# libmetal-init-cache.cmake.in when LazyFetch configures the file.
++	translate_interface_target_properties(PREFIX LIBC RES _cmake_fragment)
++	unset_saved_properties(LIBC)
++endif()
++
++include(${TS_ROOT}/tools/cmake/common/LazyFetch.cmake REQUIRED)
++LazyFetch_MakeAvailable(DEP_NAME libmetal
++    FETCH_OPTIONS "${GIT_OPTIONS}"
++    INSTALL_DIR "${LIBMETAL_INSTALL_DIR}"
++    CACHE_FILE "${TS_ROOT}/external/openamp/libmetal-init-cache.cmake.in"
++    SOURCE_DIR "${LIBMETAL_SOURCE_DIR}"
++)
++unset(_cmake_fragment)
++
++#Create an imported target to have clean abstraction in the build-system.
++add_library(libmetal STATIC IMPORTED)
++set_property(TARGET libmetal PROPERTY IMPORTED_LOCATION "${LIBMETAL_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}metal${CMAKE_STATIC_LIBRARY_SUFFIX}")
++set_property(TARGET libmetal PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${LIBMETAL_INSTALL_DIR}/include")
+diff --git a/external/openamp/openamp-init-cache.cmake.in b/external/openamp/openamp-init-cache.cmake.in
+new file mode 100644
+index 000000000000..302b80511bce
+--- /dev/null
++++ b/external/openamp/openamp-init-cache.cmake.in
+@@ -0,0 +1,20 @@
++#-------------------------------------------------------------------------------
++# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
++# Copyright (c) 2021-2022, Linaro. All rights reserved.
++#
++# SPDX-License-Identifier: BSD-3-Clause
++#
++#-------------------------------------------------------------------------------
++
++set(CMAKE_INSTALL_PREFIX "@BUILD_INSTALL_DIR@" CACHE STRING "")
++set(CMAKE_TOOLCHAIN_FILE "@TS_EXTERNAL_LIB_TOOLCHAIN_FILE@" CACHE STRING "")
++set(BUILD_SHARED_LIBS Off CACHE BOOL "")
++set(BUILD_STATIC_LIBS On CACHE BOOL "")
++
++set(LIBMETAL_INCLUDE_DIR "@CMAKE_CURRENT_BINARY_DIR@/libmetal_install/include" CACHE
++    STRING "")
++set(LIBMETAL_LIB "@CMAKE_CURRENT_BINARY_DIR@/libmetal_install/lib" CACHE STRING "")
++set(RPMSG_BUFFER_SIZE "512" CACHE STRING "")
++set(MACHINE "template" CACHE STRING "")
++
++@_cmake_fragment@
+diff --git a/external/openamp/openamp.cmake b/external/openamp/openamp.cmake
+new file mode 100644
+index 000000000000..449f35f4fda4
+--- /dev/null
++++ b/external/openamp/openamp.cmake
+@@ -0,0 +1,66 @@
++#-------------------------------------------------------------------------------
++# Copyright (c) 2022 Linaro Limited
++# Copyright (c) 2022, Arm Limited. All rights reserved.
++#
++# SPDX-License-Identifier: BSD-3-Clause
++#
++#-------------------------------------------------------------------------------
++
++set (OPENAMP_URL "https://github.com/OpenAMP/open-amp.git"
++		    CACHE STRING "OpenAMP repository URL")
++set (OPENAMP_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/openamp_install"
++			    CACHE DIR "OpenAMP installation directory")
++set (OPENAMP_SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/_deps/openamp"
++			    CACHE DIR "OpenAMP source code directory")
++set (OPENAMP_PACKAGE_DIR "${OPENAMP_INSTALL_DIR}/openamp/cmake"
++			    CACHE DIR "OpenAMP CMake package directory")
++set (OPENAMP_TARGET_NAME "openamp")
++set (OPENAMP_REFSPEC "347397decaa43372fc4d00f965640ebde042966d"
++			CACHE STRING "The version of openamp to use")
++
++set(GIT_OPTIONS
++    GIT_REPOSITORY ${OPENAMP_URL}
++    GIT_TAG ${OPENAMP_REFSPEC}
++    GIT_SHALLOW FALSE
++)
++
++if(NOT OPENAMP_DEBUG)
++	set(OPENAMP_BUILD_TYPE "Release")
++else()
++	set(OPENAMP_BUILD_TYPE "Debug")
++endif()
++
++include(FetchContent)
++
++# Checking git
++find_program(GIT_COMMAND "git")
++if (NOT GIT_COMMAND)
++	message(FATAL_ERROR "Please install git")
++endif()
++
++# Only pass libc settings to openamp if needed. For environments where the
++# standard library is not overridden, this is not needed.
++if(TARGET stdlib::c)
++	include(${TS_ROOT}/tools/cmake/common/PropertyCopy.cmake)
++
++	# Save libc settings
++	save_interface_target_properties(TGT stdlib::c PREFIX LIBC)
++	# Translate libc settings to cmake code fragment. Will be inserted into
++	# libmetal-init-cache.cmake.in when LazyFetch configures the file.
++	translate_interface_target_properties(PREFIX LIBC RES _cmake_fragment)
++	unset_saved_properties(LIBC)
++endif()
++
++include(${TS_ROOT}/tools/cmake/common/LazyFetch.cmake REQUIRED)
++LazyFetch_MakeAvailable(DEP_NAME openamp
++    FETCH_OPTIONS "${GIT_OPTIONS}"
++    INSTALL_DIR "${OPENAMP_INSTALL_DIR}"
++    CACHE_FILE "${TS_ROOT}/external/openamp/openamp-init-cache.cmake.in"
++    SOURCE_DIR "${OPENAMP_SOURCE_DIR}"
++)
++unset(_cmake_fragment)
++
++#Create an imported target to have clean abstraction in the build-system.
++add_library(openamp STATIC IMPORTED)
++set_property(TARGET openamp PROPERTY IMPORTED_LOCATION "${OPENAMP_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}open_amp${CMAKE_STATIC_LIBRARY_SUFFIX}")
++set_property(TARGET openamp PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${OPENAMP_INSTALL_DIR}/include")
+-- 
+2.38.0
+

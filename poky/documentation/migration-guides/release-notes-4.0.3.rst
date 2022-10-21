@@ -239,7 +239,7 @@ Contributors to Yocto-4.0.3
 -  Yue Tao
 -  gr embeter
 -  leimaohui
--  wangmy
+-  Wang Mingyu
 
 
 Repositories / Downloads for Yocto-4.0.3

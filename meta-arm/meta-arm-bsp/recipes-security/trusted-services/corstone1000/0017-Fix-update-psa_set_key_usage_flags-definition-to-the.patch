@@ -1,0 +1,40 @@
+From b1ff44c650ae82f364a2f74059eeb280996dc4f8 Mon Sep 17 00:00:00 2001
+From: Satish Kumar <satish.kumar01@arm.com>
+Date: Mon, 14 Feb 2022 17:52:00 +0000
+Subject: [PATCH 17/19] Fix : update psa_set_key_usage_flags definition to the
+ latest from the tf-m
+
+Upstream-Status: Pending
+Signed-off-by: Satish Kumar <satish.kumar01@arm.com>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+---
+ components/service/crypto/include/psa/crypto_struct.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/components/service/crypto/include/psa/crypto_struct.h b/components/service/crypto/include/psa/crypto_struct.h
+index 1bc55e375eea..b4a7ed4b39d3 100644
+--- a/components/service/crypto/include/psa/crypto_struct.h
++++ b/components/service/crypto/include/psa/crypto_struct.h
+@@ -155,9 +155,19 @@ static inline psa_key_lifetime_t psa_get_key_lifetime(
+     return( attributes->lifetime );
+ }
+ 
++static inline void psa_extend_key_usage_flags( psa_key_usage_t *usage_flags )
++{
++    if( *usage_flags & PSA_KEY_USAGE_SIGN_HASH )
++        *usage_flags |= PSA_KEY_USAGE_SIGN_MESSAGE;
++
++    if( *usage_flags & PSA_KEY_USAGE_VERIFY_HASH )
++        *usage_flags |= PSA_KEY_USAGE_VERIFY_MESSAGE;
++}
++
+ static inline void psa_set_key_usage_flags(psa_key_attributes_t *attributes,
+                                            psa_key_usage_t usage_flags)
+ {
++    psa_extend_key_usage_flags( &usage_flags );
+     attributes->usage = usage_flags;
+ }
+ 
+-- 
+2.38.0
+

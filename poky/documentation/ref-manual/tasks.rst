@@ -190,8 +190,8 @@ that either directly or indirectly depend on the installed files (e.g.
    -  The ``cp`` command with the ``--no-preserve=ownership`` option.
 
    -  The ``tar`` command with the ``--no-same-owner`` option. See the
-      ``bin_package.bbclass`` file in the ``meta/classes`` directory of
-      the :term:`Source Directory` for an example.
+      ``bin_package.bbclass`` file in the ``meta/classes-recipe``
+      subdirectory of the :term:`Source Directory` for an example.
 
 .. _ref-tasks-install_ptest_base:
 

@@ -1,0 +1,298 @@
+From 8c1bc5a7ae525d64802e2a06746f698f54cf07ca Mon Sep 17 00:00:00 2001
+From: Vishnu Banavath <vishnu.banavath@arm.com>
+Date: Fri, 3 Dec 2021 19:05:18 +0000
+Subject: [PATCH 04/19] add psa client definitions for ff-m
+
+Add PSA client definitions in common include to add future
+ff-m support.
+
+Upstream-Status: Pending
+Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+---
+ .../service/common/include/psa/client.h       | 194 ++++++++++++++++++
+ components/service/common/include/psa/sid.h   |  71 +++++++
+ 2 files changed, 265 insertions(+)
+ create mode 100644 components/service/common/include/psa/client.h
+ create mode 100644 components/service/common/include/psa/sid.h
+
+diff --git a/components/service/common/include/psa/client.h b/components/service/common/include/psa/client.h
+new file mode 100644
+index 000000000000..69ccf14f40a3
+--- /dev/null
++++ b/components/service/common/include/psa/client.h
+@@ -0,0 +1,194 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef SERVICE_PSA_IPC_H
++#define SERVICE_PSA_IPC_H
++
++#include <stddef.h>
++#include <stdint.h>
++
++#include <rpc_caller.h>
++#include <psa/error.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#ifndef IOVEC_LEN
++#define IOVEC_LEN(arr) ((uint32_t)(sizeof(arr)/sizeof(arr[0])))
++#endif
++
++/*********************** PSA Client Macros and Types *************************/
++
++typedef int32_t psa_handle_t;
++
++/**
++ * The version of the PSA Framework API that is being used to build the calling
++ * firmware. Only part of features of FF-M v1.1 have been implemented. FF-M v1.1
++ * is compatible with v1.0.
++ */
++#define PSA_FRAMEWORK_VERSION       (0x0101u)
++
++/**
++ * Return value from psa_version() if the requested RoT Service is not present
++ * in the system.
++ */
++#define PSA_VERSION_NONE            (0u)
++
++/**
++ * The zero-value null handle can be assigned to variables used in clients and
++ * RoT Services, indicating that there is no current connection or message.
++ */
++#define PSA_NULL_HANDLE             ((psa_handle_t)0)
++
++/**
++ * Tests whether a handle value returned by psa_connect() is valid.
++ */
++#define PSA_HANDLE_IS_VALID(handle) ((psa_handle_t)(handle) > 0)
++
++/**
++ * Converts the handle value returned from a failed call psa_connect() into
++ * an error code.
++ */
++#define PSA_HANDLE_TO_ERROR(handle) ((psa_status_t)(handle))
++
++/**
++ * Maximum number of input and output vectors for a request to psa_call().
++ */
++#define PSA_MAX_IOVEC               (4u)
++
++/**
++ * An IPC message type that indicates a generic client request.
++ */
++#define PSA_IPC_CALL                (0)
++
++/**
++ * A read-only input memory region provided to an RoT Service.
++ */
++struct __attribute__ ((__packed__)) psa_invec {
++    uint32_t base;           /*!< the start address of the memory buffer */
++    uint32_t len;                 /*!< the size in bytes                      */
++};
++
++/**
++ * A writable output memory region provided to an RoT Service.
++ */
++struct __attribute__ ((__packed__)) psa_outvec {
++    uint32_t base;                 /*!< the start address of the memory buffer */
++    uint32_t len;                 /*!< the size in bytes                      */
++};
++
++/*************************** PSA Client API **********************************/
++
++/**
++ * \brief Retrieve the version of the PSA Framework API that is implemented.
++ *
++ * \param[in] rpc_caller        RPC caller to use
++ * \return version              The version of the PSA Framework implementation
++ *                              that is providing the runtime services to the
++ *                              caller. The major and minor version are encoded
++ *                              as follows:
++ * \arg                           version[15:8] -- major version number.
++ * \arg                           version[7:0]  -- minor version number.
++ */
++uint32_t psa_framework_version(struct rpc_caller *caller);
++
++/**
++ * \brief Retrieve the version of an RoT Service or indicate that it is not
++ *        present on this system.
++ *
++ * \param[in] rpc_caller        RPC caller to use
++ * \param[in] sid               ID of the RoT Service to query.
++ *
++ * \retval PSA_VERSION_NONE     The RoT Service is not implemented, or the
++ *                              caller is not permitted to access the service.
++ * \retval > 0                  The version of the implemented RoT Service.
++ */
++uint32_t psa_version(struct rpc_caller *caller, uint32_t sid);
++
++/**
++ * \brief Connect to an RoT Service by its SID.
++ *
++ * \param[in] rpc_caller        RPC caller to use
++ * \param[in] sid               ID of the RoT Service to connect to.
++ * \param[in] version           Requested version of the RoT Service.
++ *
++ * \retval > 0                  A handle for the connection.
++ * \retval PSA_ERROR_CONNECTION_REFUSED The SPM or RoT Service has refused the
++ *                              connection.
++ * \retval PSA_ERROR_CONNECTION_BUSY The SPM or RoT Service cannot make the
++ *                              connection at the moment.
++ * \retval "PROGRAMMER ERROR"   The call is a PROGRAMMER ERROR if one or more
++ *                              of the following are true:
++ * \arg                           The RoT Service ID is not present.
++ * \arg                           The RoT Service version is not supported.
++ * \arg                           The caller is not allowed to access the RoT
++ *                                service.
++ */
++psa_handle_t psa_connect(struct rpc_caller *caller, uint32_t sid,
++			 uint32_t version);
++
++/**
++ * \brief Call an RoT Service on an established connection.
++ *
++ * \note  FF-M 1.0 proposes 6 parameters for psa_call but the secure gateway ABI
++ *        support at most 4 parameters. TF-M chooses to encode 'in_len',
++ *        'out_len', and 'type' into a 32-bit integer to improve efficiency.
++ *        Compared with struct-based encoding, this method saves extra memory
++ *        check and memory copy operation. The disadvantage is that the 'type'
++ *        range has to be reduced into a 16-bit integer. So with this encoding,
++ *        the valid range for 'type' is 0-32767.
++ *
++ * \param[in] rpc_caller        RPC caller to use
++ * \param[in] handle            A handle to an established connection.
++ * \param[in] type              The request type.
++ *                              Must be zero( \ref PSA_IPC_CALL) or positive.
++ * \param[in] in_vec            Array of input \ref psa_invec structures.
++ * \param[in] in_len            Number of input \ref psa_invec structures.
++ * \param[in,out] out_vec       Array of output \ref psa_outvec structures.
++ * \param[in] out_len           Number of output \ref psa_outvec structures.
++ *
++ * \retval >=0                  RoT Service-specific status value.
++ * \retval <0                   RoT Service-specific error code.
++ * \retval PSA_ERROR_PROGRAMMER_ERROR The connection has been terminated by the
++ *                              RoT Service. The call is a PROGRAMMER ERROR if
++ *                              one or more of the following are true:
++ * \arg                           An invalid handle was passed.
++ * \arg                           The connection is already handling a request.
++ * \arg                           type < 0.
++ * \arg                           An invalid memory reference was provided.
++ * \arg                           in_len + out_len > PSA_MAX_IOVEC.
++ * \arg                           The message is unrecognized by the RoT
++ *                                Service or incorrectly formatted.
++ */
++psa_status_t psa_call(struct rpc_caller *caller, psa_handle_t handle,
++		      int32_t type, const struct psa_invec *in_vec,
++		      size_t in_len, struct psa_outvec *out_vec, size_t out_len);
++
++/**
++ * \brief Close a connection to an RoT Service.
++ *
++ * \param[in] rpc_caller        RPC caller to use
++ * \param[in] handle            A handle to an established connection, or the
++ *                              null handle.
++ *
++ * \retval void                 Success.
++ * \retval "PROGRAMMER ERROR"   The call is a PROGRAMMER ERROR if one or more
++ *                              of the following are true:
++ * \arg                           An invalid handle was provided that is not
++ *                                the null handle.
++ * \arg                           The connection is currently handling a
++ *                                request.
++ */
++void psa_close(struct rpc_caller *caller, psa_handle_t handle);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* SERVICE_PSA_IPC_H */
++
++
+diff --git a/components/service/common/include/psa/sid.h b/components/service/common/include/psa/sid.h
+new file mode 100644
+index 000000000000..aaa973c6e987
+--- /dev/null
++++ b/components/service/common/include/psa/sid.h
+@@ -0,0 +1,71 @@
++/*
++ * Copyright (c) 2019-2021, Arm Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ *
++ */
++
++#ifndef __PSA_MANIFEST_SID_H__
++#define __PSA_MANIFEST_SID_H__
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/******** TFM_SP_PS ********/
++#define TFM_PROTECTED_STORAGE_SERVICE_SID                          (0x00000060U)
++#define TFM_PROTECTED_STORAGE_SERVICE_VERSION                      (1U)
++#define TFM_PROTECTED_STORAGE_SERVICE_HANDLE                       (0x40000101U)
++
++/* Invalid UID */
++#define TFM_PS_INVALID_UID 0
++
++/* PS message types that distinguish PS services. */
++#define TFM_PS_SET                1001
++#define TFM_PS_GET                1002
++#define TFM_PS_GET_INFO           1003
++#define TFM_PS_REMOVE             1004
++#define TFM_PS_GET_SUPPORT        1005
++
++/******** TFM_SP_ITS ********/
++#define TFM_INTERNAL_TRUSTED_STORAGE_SERVICE_SID                   (0x00000070U)
++#define TFM_INTERNAL_TRUSTED_STORAGE_SERVICE_VERSION               (1U)
++#define TFM_INTERNAL_TRUSTED_STORAGE_SERVICE_HANDLE                (0x40000102U)
++
++/******** TFM_SP_CRYPTO ********/
++#define TFM_CRYPTO_SID                                             (0x00000080U)
++#define TFM_CRYPTO_VERSION                                         (1U)
++#define TFM_CRYPTO_HANDLE                                          (0x40000100U)
++
++/******** TFM_SP_PLATFORM ********/
++#define TFM_SP_PLATFORM_SYSTEM_RESET_SID                           (0x00000040U)
++#define TFM_SP_PLATFORM_SYSTEM_RESET_VERSION                       (1U)
++#define TFM_SP_PLATFORM_IOCTL_SID                                  (0x00000041U)
++#define TFM_SP_PLATFORM_IOCTL_VERSION                              (1U)
++#define TFM_SP_PLATFORM_NV_COUNTER_SID                             (0x00000042U)
++#define TFM_SP_PLATFORM_NV_COUNTER_VERSION                         (1U)
++
++/******** TFM_SP_INITIAL_ATTESTATION ********/
++#define TFM_ATTESTATION_SERVICE_SID                                (0x00000020U)
++#define TFM_ATTESTATION_SERVICE_VERSION                            (1U)
++#define TFM_ATTESTATION_SERVICE_HANDLE                             (0x40000103U)
++
++/******** TFM_SP_FWU ********/
++#define TFM_FWU_WRITE_SID                                          (0x000000A0U)
++#define TFM_FWU_WRITE_VERSION                                      (1U)
++#define TFM_FWU_INSTALL_SID                                        (0x000000A1U)
++#define TFM_FWU_INSTALL_VERSION                                    (1U)
++#define TFM_FWU_ABORT_SID                                          (0x000000A2U)
++#define TFM_FWU_ABORT_VERSION                                      (1U)
++#define TFM_FWU_QUERY_SID                                          (0x000000A3U)
++#define TFM_FWU_QUERY_VERSION                                      (1U)
++#define TFM_FWU_REQUEST_REBOOT_SID                                 (0x000000A4U)
++#define TFM_FWU_REQUEST_REBOOT_VERSION                             (1U)
++#define TFM_FWU_ACCEPT_SID                                         (0x000000A5U)
++#define TFM_FWU_ACCEPT_VERSION                                     (1U)
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* __PSA_MANIFEST_SID_H__ */
+-- 
+2.38.0
+

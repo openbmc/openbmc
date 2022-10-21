@@ -174,8 +174,8 @@ Contributors to 4.0.1
 -  Ross Burton
 -  Russ Dill
 -  Steve Sakoman
--  wangmy
--  zhengruoqin
+-  Wang Mingyu
+-  Zheng Ruoqin
 
 Repositories / Downloads for 4.0.1
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

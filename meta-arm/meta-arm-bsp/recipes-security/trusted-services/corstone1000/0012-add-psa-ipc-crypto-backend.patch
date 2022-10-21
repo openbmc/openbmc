@@ -1,0 +1,2584 @@
+From 896b5009bb07c4b53541290e1712856063411107 Mon Sep 17 00:00:00 2001
+From: Rui Miguel Silva <rui.silva@linaro.org>
+Date: Thu, 9 Dec 2021 14:17:39 +0000
+Subject: [PATCH 12/19] add psa ipc crypto backend
+
+Add psa ipc crypto backend and attach it to se proxy
+deployment.
+
+Upstream-Status: Pending
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+---
+ components/service/common/include/psa/sid.h   |  73 +++++
+ .../crypto/backend/psa_ipc/component.cmake    |  21 ++
+ .../backend/psa_ipc/crypto_ipc_backend.c      |  26 ++
+ .../backend/psa_ipc/crypto_ipc_backend.h      |  70 ++++
+ .../client/caller/psa_ipc/crypto_caller.h     |  34 ++
+ .../caller/psa_ipc/crypto_caller_aead.h       | 252 +++++++++++++++
+ .../crypto_caller_asymmetric_decrypt.h        |  76 +++++
+ .../crypto_caller_asymmetric_encrypt.h        |  76 +++++
+ .../caller/psa_ipc/crypto_caller_cipher.h     | 246 +++++++++++++++
+ .../caller/psa_ipc/crypto_caller_copy_key.h   |  57 ++++
+ .../psa_ipc/crypto_caller_destroy_key.h       |  51 +++
+ .../caller/psa_ipc/crypto_caller_export_key.h |  59 ++++
+ .../psa_ipc/crypto_caller_export_public_key.h |  59 ++++
+ .../psa_ipc/crypto_caller_generate_key.h      |  55 ++++
+ .../psa_ipc/crypto_caller_generate_random.h   |  57 ++++
+ .../crypto_caller_get_key_attributes.h        |  56 ++++
+ .../caller/psa_ipc/crypto_caller_hash.h       | 220 +++++++++++++
+ .../caller/psa_ipc/crypto_caller_import_key.h |  57 ++++
+ .../psa_ipc/crypto_caller_key_attributes.h    |  51 +++
+ .../psa_ipc/crypto_caller_key_derivation.h    | 298 ++++++++++++++++++
+ .../client/caller/psa_ipc/crypto_caller_mac.h | 207 ++++++++++++
+ .../caller/psa_ipc/crypto_caller_purge_key.h  |  51 +++
+ .../caller/psa_ipc/crypto_caller_sign_hash.h  |  64 ++++
+ .../psa_ipc/crypto_caller_verify_hash.h       |  59 ++++
+ .../crypto/include/psa/crypto_client_struct.h |   8 +-
+ .../service/crypto/include/psa/crypto_sizes.h |   2 +-
+ .../se-proxy/common/service_proxy_factory.c   |  15 +-
+ deployments/se-proxy/se-proxy.cmake           |   2 +-
+ .../providers/arm/corstone1000/platform.cmake |   2 +
+ 29 files changed, 2293 insertions(+), 11 deletions(-)
+ create mode 100644 components/service/crypto/backend/psa_ipc/component.cmake
+ create mode 100644 components/service/crypto/backend/psa_ipc/crypto_ipc_backend.c
+ create mode 100644 components/service/crypto/backend/psa_ipc/crypto_ipc_backend.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller_aead.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller_asymmetric_decrypt.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller_asymmetric_encrypt.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller_cipher.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller_copy_key.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller_destroy_key.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller_export_key.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller_export_public_key.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller_generate_key.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller_generate_random.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller_get_key_attributes.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller_hash.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller_import_key.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller_key_attributes.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller_key_derivation.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller_mac.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller_purge_key.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller_sign_hash.h
+ create mode 100644 components/service/crypto/client/caller/psa_ipc/crypto_caller_verify_hash.h
+
+diff --git a/components/service/common/include/psa/sid.h b/components/service/common/include/psa/sid.h
+index 4a951d4a3502..7a29cc253bad 100644
+--- a/components/service/common/include/psa/sid.h
++++ b/components/service/common/include/psa/sid.h
+@@ -37,6 +37,79 @@ extern "C" {
+ #define TFM_CRYPTO_VERSION                                         (1U)
+ #define TFM_CRYPTO_HANDLE                                          (0x40000100U)
+ 
++/**
++ * \brief Define a progressive numerical value for each SID which can be used
++ *        when dispatching the requests to the service
++ */
++enum {
++    TFM_CRYPTO_GET_KEY_ATTRIBUTES_SID = (0u),
++    TFM_CRYPTO_RESET_KEY_ATTRIBUTES_SID,
++    TFM_CRYPTO_OPEN_KEY_SID,
++    TFM_CRYPTO_CLOSE_KEY_SID,
++    TFM_CRYPTO_IMPORT_KEY_SID,
++    TFM_CRYPTO_DESTROY_KEY_SID,
++    TFM_CRYPTO_EXPORT_KEY_SID,
++    TFM_CRYPTO_EXPORT_PUBLIC_KEY_SID,
++    TFM_CRYPTO_PURGE_KEY_SID,
++    TFM_CRYPTO_COPY_KEY_SID,
++    TFM_CRYPTO_HASH_COMPUTE_SID,
++    TFM_CRYPTO_HASH_COMPARE_SID,
++    TFM_CRYPTO_HASH_SETUP_SID,
++    TFM_CRYPTO_HASH_UPDATE_SID,
++    TFM_CRYPTO_HASH_FINISH_SID,
++    TFM_CRYPTO_HASH_VERIFY_SID,
++    TFM_CRYPTO_HASH_ABORT_SID,
++    TFM_CRYPTO_HASH_CLONE_SID,
++    TFM_CRYPTO_MAC_COMPUTE_SID,
++    TFM_CRYPTO_MAC_VERIFY_SID,
++    TFM_CRYPTO_MAC_SIGN_SETUP_SID,
++    TFM_CRYPTO_MAC_VERIFY_SETUP_SID,
++    TFM_CRYPTO_MAC_UPDATE_SID,
++    TFM_CRYPTO_MAC_SIGN_FINISH_SID,
++    TFM_CRYPTO_MAC_VERIFY_FINISH_SID,
++    TFM_CRYPTO_MAC_ABORT_SID,
++    TFM_CRYPTO_CIPHER_ENCRYPT_SID,
++    TFM_CRYPTO_CIPHER_DECRYPT_SID,
++    TFM_CRYPTO_CIPHER_ENCRYPT_SETUP_SID,
++    TFM_CRYPTO_CIPHER_DECRYPT_SETUP_SID,
++    TFM_CRYPTO_CIPHER_GENERATE_IV_SID,
++    TFM_CRYPTO_CIPHER_SET_IV_SID,
++    TFM_CRYPTO_CIPHER_UPDATE_SID,
++    TFM_CRYPTO_CIPHER_FINISH_SID,
++    TFM_CRYPTO_CIPHER_ABORT_SID,
++    TFM_CRYPTO_AEAD_ENCRYPT_SID,
++    TFM_CRYPTO_AEAD_DECRYPT_SID,
++    TFM_CRYPTO_AEAD_ENCRYPT_SETUP_SID,
++    TFM_CRYPTO_AEAD_DECRYPT_SETUP_SID,
++    TFM_CRYPTO_AEAD_GENERATE_NONCE_SID,
++    TFM_CRYPTO_AEAD_SET_NONCE_SID,
++    TFM_CRYPTO_AEAD_SET_LENGTHS_SID,
++    TFM_CRYPTO_AEAD_UPDATE_AD_SID,
++    TFM_CRYPTO_AEAD_UPDATE_SID,
++    TFM_CRYPTO_AEAD_FINISH_SID,
++    TFM_CRYPTO_AEAD_VERIFY_SID,
++    TFM_CRYPTO_AEAD_ABORT_SID,
++    TFM_CRYPTO_SIGN_MESSAGE_SID,
++    TFM_CRYPTO_VERIFY_MESSAGE_SID,
++    TFM_CRYPTO_SIGN_HASH_SID,
++    TFM_CRYPTO_VERIFY_HASH_SID,
++    TFM_CRYPTO_ASYMMETRIC_ENCRYPT_SID,
++    TFM_CRYPTO_ASYMMETRIC_DECRYPT_SID,
++    TFM_CRYPTO_KEY_DERIVATION_SETUP_SID,
++    TFM_CRYPTO_KEY_DERIVATION_GET_CAPACITY_SID,
++    TFM_CRYPTO_KEY_DERIVATION_SET_CAPACITY_SID,
++    TFM_CRYPTO_KEY_DERIVATION_INPUT_BYTES_SID,
++    TFM_CRYPTO_KEY_DERIVATION_INPUT_KEY_SID,
++    TFM_CRYPTO_KEY_DERIVATION_KEY_AGREEMENT_SID,
++    TFM_CRYPTO_KEY_DERIVATION_OUTPUT_BYTES_SID,
++    TFM_CRYPTO_KEY_DERIVATION_OUTPUT_KEY_SID,
++    TFM_CRYPTO_KEY_DERIVATION_ABORT_SID,
++    TFM_CRYPTO_RAW_KEY_AGREEMENT_SID,
++    TFM_CRYPTO_GENERATE_RANDOM_SID,
++    TFM_CRYPTO_GENERATE_KEY_SID,
++    TFM_CRYPTO_SID_MAX,
++};
++
+ /******** TFM_SP_PLATFORM ********/
+ #define TFM_SP_PLATFORM_SYSTEM_RESET_SID                           (0x00000040U)
+ #define TFM_SP_PLATFORM_SYSTEM_RESET_VERSION                       (1U)
+diff --git a/components/service/crypto/backend/psa_ipc/component.cmake b/components/service/crypto/backend/psa_ipc/component.cmake
+new file mode 100644
+index 000000000000..93c297a83ac6
+--- /dev/null
++++ b/components/service/crypto/backend/psa_ipc/component.cmake
+@@ -0,0 +1,21 @@
++#-------------------------------------------------------------------------------
++# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++#
++# SPDX-License-Identifier: BSD-3-Clause
++#
++#-------------------------------------------------------------------------------
++if (NOT DEFINED TGT)
++	message(FATAL_ERROR "mandatory parameter TGT is not defined.")
++endif()
++
++target_sources(${TGT} PRIVATE
++	"${CMAKE_CURRENT_LIST_DIR}/crypto_ipc_backend.c"
++	)
++
++# The ipc crypto backend uses the psa crypto client to realize the
++# psa crypto API that the crypto provider depends on.  This define
++# configures the psa crypto client to be built with the ipc crypto
++# caller.
++target_compile_definitions(${TGT} PRIVATE
++	PSA_CRYPTO_CLIENT_CALLER_SELECTION_H="service/crypto/client/caller/psa_ipc/crypto_caller.h"
++)
+diff --git a/components/service/crypto/backend/psa_ipc/crypto_ipc_backend.c b/components/service/crypto/backend/psa_ipc/crypto_ipc_backend.c
+new file mode 100644
+index 000000000000..e47cd4ffb4ce
+--- /dev/null
++++ b/components/service/crypto/backend/psa_ipc/crypto_ipc_backend.c
+@@ -0,0 +1,26 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <stddef.h>
++#include <psa/crypto.h>
++#include <service/crypto/client/psa/psa_crypto_client.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include "crypto_ipc_backend.h"
++
++psa_status_t crypto_ipc_backend_init(struct rpc_caller *caller)
++{
++	psa_status_t status = psa_crypto_client_init(caller);
++
++	if (status == PSA_SUCCESS)
++		status = psa_crypto_init();
++
++	return status;
++}
++
++void crypto_ipc_backend_deinit(void)
++{
++	psa_crypto_client_deinit();
++}
+diff --git a/components/service/crypto/backend/psa_ipc/crypto_ipc_backend.h b/components/service/crypto/backend/psa_ipc/crypto_ipc_backend.h
+new file mode 100644
+index 000000000000..c13c20e84131
+--- /dev/null
++++ b/components/service/crypto/backend/psa_ipc/crypto_ipc_backend.h
+@@ -0,0 +1,70 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef CRYPTO_IPC_BACKEND_H
++#define CRYPTO_IPC_BACKEND_H
++
++#include <service/crypto/client/psa/psa_crypto_client.h>
++#include <psa/error.h>
++#include <rpc_caller.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/**
++ * \brief This type is used to overcome a limitation in the number of maximum
++ *        IOVECs that can be used especially in psa_aead_encrypt and
++ *        psa_aead_decrypt. To be removed in case the AEAD APIs number of
++ *        parameters passed gets restructured
++ */
++#define TFM_CRYPTO_MAX_NONCE_LENGTH (16u)
++struct psa_ipc_crypto_aead_pack_input {
++	uint8_t nonce[TFM_CRYPTO_MAX_NONCE_LENGTH];
++	uint32_t nonce_length;
++};
++
++struct psa_ipc_crypto_pack_iovec {
++	uint32_t sfn_id;             /*!< Secure function ID used to dispatch the
++				      *   request
++				      */
++	uint16_t step;               /*!< Key derivation step */
++	psa_key_id_t key_id;         /*!< Key id */
++	psa_algorithm_t alg;         /*!< Algorithm */
++	uint32_t op_handle;          /*!< Frontend context handle associated to a
++				      *   multipart operation
++				      */
++	uint32_t capacity;             /*!< Key derivation capacity */
++
++	struct psa_ipc_crypto_aead_pack_input aead_in; /*!< FixMe: Temporarily used for
++							    *   AEAD until the API is
++							    *   restructured
++							    */
++};
++
++#define iov_size sizeof(struct psa_ipc_crypto_pack_iovec)
++
++/**
++ * \brief Initialize the psa ipc crypto backend
++ *
++ * Initializes a crypto backend that uses the psa API client with a
++ * psa_ipc_backend caller to realize the PSA crypto API used by the crypto
++ * service proviser.
++ *
++ * \return PSA_SUCCESS if backend initialized successfully
++ */
++psa_status_t crypto_ipc_backend_init(struct rpc_caller *caller);
++
++/**
++ * \brief Clean-up to free any resource used by the crypto backend
++ */
++void crypto_ipc_backend_deinit(void);
++
++#ifdef __cplusplus
++} /* extern "C" */
++#endif
++
++#endif /* CRYPTO_IPC_BACKEND_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller.h
+new file mode 100644
+index 000000000000..0a972187062f
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller.h
+@@ -0,0 +1,34 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PSA_IPC_CRYPTO_CALLER_H
++#define PSA_IPC_CRYPTO_CALLER_H
++
++/**
++ * Includes all header files that form the psa ipc crypto caller
++ * interface.  May be used by a client that needs to call operations
++ * provided by a crypto service instance using the psa ipc interface.
++ */
++#include "crypto_caller_aead.h"
++#include "crypto_caller_asymmetric_decrypt.h"
++#include "crypto_caller_asymmetric_encrypt.h"
++#include "crypto_caller_cipher.h"
++#include "crypto_caller_copy_key.h"
++#include "crypto_caller_destroy_key.h"
++#include "crypto_caller_export_key.h"
++#include "crypto_caller_export_public_key.h"
++#include "crypto_caller_generate_key.h"
++#include "crypto_caller_generate_random.h"
++#include "crypto_caller_get_key_attributes.h"
++#include "crypto_caller_hash.h"
++#include "crypto_caller_import_key.h"
++#include "crypto_caller_key_derivation.h"
++#include "crypto_caller_mac.h"
++#include "crypto_caller_purge_key.h"
++#include "crypto_caller_sign_hash.h"
++#include "crypto_caller_verify_hash.h"
++
++#endif /* PSA_IPC_CRYPTO_CALLER_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_aead.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_aead.h
+new file mode 100644
+index 000000000000..78517fe32ca9
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_aead.h
+@@ -0,0 +1,252 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PSA_IPC_CRYPTO_CALLER_AEAD_H
++#define PSA_IPC_CRYPTO_CALLER_AEAD_H
++
++#include <string.h>
++#include <stdlib.h>
++#include <psa/crypto.h>
++#include <psa/client.h>
++#include <psa/sid.h>
++#include <service/common/client/service_client.h>
++#include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include <protocols/service/crypto/packed-c/opcodes.h>
++#include <protocols/service/crypto/packed-c/key_attributes.h>
++#include <protocols/service/crypto/packed-c/import_key.h>
++#include "crypto_caller_key_attributes.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline psa_status_t crypto_caller_aead_encrypt(
++					      struct service_client *context,
++					      psa_key_id_t key,
++					      psa_algorithm_t alg,
++					      const uint8_t *nonce,
++					      size_t nonce_length,
++					      const uint8_t *additional_data,
++					      size_t additional_data_length,
++					      const uint8_t *plaintext,
++					      size_t plaintext_length,
++					      uint8_t *aeadtext,
++					      size_t aeadtext_size,
++					      size_t *aeadtext_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	size_t in_len;
++	int i;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_AEAD_ENCRYPT_SID,
++		.key_id = key,
++		.alg = alg,
++		.aead_in = { .nonce = {0}, .nonce_length = nonce_length },
++	};
++
++	if (!additional_data && additional_data_length)
++		return PSA_ERROR_INVALID_ARGUMENT;
++
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++		{ .base = psa_ptr_const_to_u32(plaintext),
++			.len = plaintext_length },
++		{ .base = psa_ptr_const_to_u32(additional_data),
++			.len = additional_data_length},
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(aeadtext), .len = aeadtext_size },
++	};
++
++	if (nonce_length > TFM_CRYPTO_MAX_NONCE_LENGTH)
++		return PSA_ERROR_INVALID_ARGUMENT;
++
++	if (nonce) {
++		for (i = 0; i < nonce_length; i++)
++			iov.aead_in.nonce[i] = nonce[i];
++	}
++
++	in_len = IOVEC_LEN(in_vec);
++
++	if (!additional_data)
++		in_len--;
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  in_len, out_vec, IOVEC_LEN(out_vec));
++
++	*aeadtext_length = out_vec[0].len;
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_aead_decrypt(
++					      struct service_client *context,
++					      psa_key_id_t key,
++					      psa_algorithm_t alg,
++					      const uint8_t *nonce,
++					      size_t nonce_length,
++					      const uint8_t *additional_data,
++					      size_t additional_data_length,
++					      const uint8_t *aeadtext,
++					      size_t aeadtext_length,
++					      uint8_t *plaintext,
++					      size_t plaintext_size,
++					      size_t *plaintext_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	size_t in_len;
++	int i;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_AEAD_DECRYPT_SID,
++		.key_id = key,
++		.alg = alg,
++		.aead_in = { .nonce = {0}, .nonce_length = nonce_length },
++	};
++
++	if (!additional_data && additional_data_length)
++		return PSA_ERROR_INVALID_ARGUMENT;
++
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++		{ .base = psa_ptr_const_to_u32(aeadtext),
++			.len = aeadtext_length },
++		{ .base = psa_ptr_const_to_u32(additional_data),
++			.len = additional_data_length},
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(plaintext), .len = plaintext_size },
++	};
++
++	if (nonce_length > TFM_CRYPTO_MAX_NONCE_LENGTH)
++		return PSA_ERROR_INVALID_ARGUMENT;
++
++	if (nonce) {
++		for (i = 0; i < nonce_length; i++)
++			iov.aead_in.nonce[i] = nonce[i];
++	}
++
++	in_len = IOVEC_LEN(in_vec);
++
++	if (!additional_data)
++		in_len--;
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  in_len, out_vec, IOVEC_LEN(out_vec));
++
++	*plaintext_length = out_vec[0].len;
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_aead_encrypt_setup(
++					    struct service_client *context,
++					    uint32_t *op_handle,
++					    psa_key_id_t key,
++					    psa_algorithm_t alg)
++{
++	return PSA_ERROR_NOT_SUPPORTED;
++}
++
++static inline psa_status_t crypto_caller_aead_decrypt_setup(
++					    struct service_client *context,
++					    uint32_t *op_handle,
++					    psa_key_id_t key,
++					    psa_algorithm_t alg)
++{
++	return PSA_ERROR_NOT_SUPPORTED;
++}
++
++static inline psa_status_t crypto_caller_aead_generate_nonce(
++					     struct service_client *context,
++					     uint32_t op_handle,
++					     uint8_t *nonce,
++					     size_t nonce_size,
++					     size_t *nonce_length)
++{
++	return PSA_ERROR_NOT_SUPPORTED;
++}
++
++static inline psa_status_t crypto_caller_aead_set_nonce(
++						struct service_client *context,
++						uint32_t op_handle,
++						const uint8_t *nonce,
++						size_t nonce_length)
++{
++	return PSA_ERROR_NOT_SUPPORTED;
++}
++
++static inline psa_status_t crypto_caller_aead_set_lengths(
++					  struct service_client *context,
++					  uint32_t op_handle,
++					  size_t ad_length,
++					  size_t plaintext_length)
++{
++	return PSA_ERROR_NOT_SUPPORTED;
++}
++
++static inline psa_status_t crypto_caller_aead_update_ad(
++						struct service_client *context,
++						uint32_t op_handle,
++						const uint8_t *input,
++						size_t input_length)
++{
++	return PSA_ERROR_NOT_SUPPORTED;
++}
++
++static inline psa_status_t crypto_caller_aead_update(
++					     struct service_client *context,
++					     uint32_t op_handle,
++					     const uint8_t *input,
++					     size_t input_length,
++					     uint8_t *output,
++					     size_t output_size,
++					     size_t *output_length)
++{
++	return PSA_ERROR_NOT_SUPPORTED;
++}
++
++static inline psa_status_t crypto_caller_aead_finish(
++					     struct service_client *context,
++					     uint32_t op_handle,
++					     uint8_t *aeadtext,
++					     size_t aeadtext_size,
++					     size_t *aeadtext_length,
++					     uint8_t *tag,
++					     size_t tag_size,
++					     size_t *tag_length)
++{
++	return PSA_ERROR_NOT_SUPPORTED;
++}
++
++static inline psa_status_t crypto_caller_aead_verify(
++					     struct service_client *context,
++					     uint32_t op_handle,
++					     uint8_t *plaintext,
++					     size_t plaintext_size,
++					     size_t *plaintext_length,
++					     const uint8_t *tag,
++					     size_t tag_length)
++{
++	return PSA_ERROR_NOT_SUPPORTED;
++}
++
++static inline psa_status_t crypto_caller_aead_abort(
++					    struct service_client *context,
++					    uint32_t op_handle)
++{
++	return PSA_ERROR_NOT_SUPPORTED;
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PSA_IPC_CRYPTO_CALLER_AEAD_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_asymmetric_decrypt.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_asymmetric_decrypt.h
+new file mode 100644
+index 000000000000..ff01815c09e9
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_asymmetric_decrypt.h
+@@ -0,0 +1,76 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PSA_IPC_CRYPTO_CALLER_ASYMMETRIC_DECRYPT_H
++#define PSA_IPC_CRYPTO_CALLER_ASYMMETRIC_DECRYPT_H
++
++#include <string.h>
++#include <stdlib.h>
++#include <psa/crypto.h>
++#include <psa/client.h>
++#include <psa/sid.h>
++#include <service/common/client/service_client.h>
++#include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include <protocols/service/crypto/packed-c/opcodes.h>
++#include <protocols/service/crypto/packed-c/key_attributes.h>
++#include <protocols/service/crypto/packed-c/import_key.h>
++#include "crypto_caller_key_attributes.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline psa_status_t crypto_caller_asymmetric_decrypt(
++				    struct service_client *context,
++				    psa_key_id_t id,
++				    psa_algorithm_t alg,
++				    const uint8_t *input, size_t input_length,
++				    const uint8_t *salt, size_t salt_length,
++				    uint8_t *output, size_t output_size,
++				    size_t *output_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	size_t in_len;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_ASYMMETRIC_DECRYPT_SID,
++		.key_id = id,
++		.alg = alg,
++	};
++
++	/* Sanitize optional input */
++	if (!salt && salt_length)
++		return PSA_ERROR_INVALID_ARGUMENT;
++
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++		{ .base = psa_ptr_const_to_u32(input), .len = input_length },
++		{ .base = psa_ptr_const_to_u32(salt), .len = salt_length },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(output), .len = output_size },
++	};
++
++
++	in_len = IOVEC_LEN(in_vec);
++	if (!salt)
++		in_len--;
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  in_len, out_vec, IOVEC_LEN(out_vec));
++
++	*output_length = out_vec[0].len;
++
++	return status;
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PSA_IPC_CRYPTO_CALLER_ASYMMETRIC_DECRYPT_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_asymmetric_encrypt.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_asymmetric_encrypt.h
+new file mode 100644
+index 000000000000..1daf1689c076
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_asymmetric_encrypt.h
+@@ -0,0 +1,76 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PSA_IPC_CRYPTO_CALLER_ASYMMETRIC_ENCRYPT_H
++#define PSA_IPC_CRYPTO_CALLER_ASYMMETRIC_ENCRYPT_H
++
++#include <string.h>
++#include <stdlib.h>
++#include <psa/crypto.h>
++#include <psa/client.h>
++#include <psa/sid.h>
++#include <service/common/client/service_client.h>
++#include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include <protocols/service/crypto/packed-c/opcodes.h>
++#include <protocols/service/crypto/packed-c/key_attributes.h>
++#include <protocols/service/crypto/packed-c/import_key.h>
++#include "crypto_caller_key_attributes.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline psa_status_t crypto_caller_asymmetric_encrypt(
++				    struct service_client *context,
++				    psa_key_id_t id,
++				    psa_algorithm_t alg,
++				    const uint8_t *input, size_t input_length,
++				    const uint8_t *salt, size_t salt_length,
++				    uint8_t *output, size_t output_size,
++				    size_t *output_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	size_t in_len;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_ASYMMETRIC_ENCRYPT_SID,
++		.key_id = id,
++		.alg = alg,
++	};
++
++	/* Sanitize optional input */
++	if (!salt && salt_length)
++		return PSA_ERROR_INVALID_ARGUMENT;
++
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++		{ .base = psa_ptr_const_to_u32(input), .len = input_length },
++		{ .base = psa_ptr_const_to_u32(salt), .len = salt_length },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(output), .len = output_size },
++	};
++
++
++	in_len = IOVEC_LEN(in_vec);
++	if (!salt)
++		in_len--;
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  in_len, out_vec, IOVEC_LEN(out_vec));
++
++	*output_length = out_vec[0].len;
++
++	return status;
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PSA_IPC_CRYPTO_CALLER_ASYMMETRIC_ENCRYPT_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_cipher.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_cipher.h
+new file mode 100644
+index 000000000000..fbefb28d813a
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_cipher.h
+@@ -0,0 +1,246 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PSA_IPC_CRYPTO_CALLER_CIPHER_H
++#define PSA_IPC_CRYPTO_CALLER_CIPHER_H
++
++#include <string.h>
++#include <stdlib.h>
++#include <psa/crypto.h>
++#include <psa/client.h>
++#include <psa/sid.h>
++#include <service/common/client/service_client.h>
++#include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include <protocols/service/crypto/packed-c/opcodes.h>
++#include <protocols/service/crypto/packed-c/key_attributes.h>
++#include <protocols/service/crypto/packed-c/import_key.h>
++#include "crypto_caller_key_attributes.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline psa_status_t crypto_caller_cipher_encrypt_setup(
++					      struct service_client *context,
++					      uint32_t *op_handle,
++					      psa_key_id_t key,
++					      psa_algorithm_t alg)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_CIPHER_ENCRYPT_SETUP_SID,
++		.key_id = key,
++		.alg = alg,
++		.op_handle = *op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(op_handle), .len = sizeof(uint32_t) }
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_cipher_decrypt_setup(
++					      struct service_client *context,
++					      uint32_t *op_handle,
++					      psa_key_id_t key,
++					      psa_algorithm_t alg)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_CIPHER_DECRYPT_SETUP_SID,
++		.key_id = key,
++		.alg = alg,
++		.op_handle = *op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(op_handle), .len = sizeof(uint32_t) }
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_cipher_generate_iv(
++					    struct service_client *context,
++					    uint32_t op_handle,
++					    uint8_t *iv,
++					    size_t iv_size,
++					    size_t *iv_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_CIPHER_GENERATE_IV_SID,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(&op_handle), .len = sizeof(uint32_t) },
++		{ .base = psa_ptr_to_u32(iv), .len = iv_size },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	*iv_length = out_vec[1].len;
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_cipher_set_iv(
++					       struct service_client *context,
++					       uint32_t op_handle,
++					       const uint8_t *iv,
++					       size_t iv_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_CIPHER_SET_IV_SID,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++		{ .base = psa_ptr_const_to_u32(iv), .len = iv_length },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(&op_handle), .len = sizeof(uint32_t) },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_cipher_update(
++					       struct service_client *context,
++					       uint32_t op_handle,
++					       const uint8_t *input,
++					       size_t input_length,
++					       uint8_t *output,
++					       size_t output_size,
++					       size_t *output_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_CIPHER_UPDATE_SID,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++		{ .base = psa_ptr_const_to_u32(input), .len = input_length },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(&op_handle), .len = sizeof(uint32_t) },
++		{ .base = psa_ptr_to_u32(output), .len = output_size },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	*output_length = out_vec[1].len;
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_cipher_finish(
++					       struct service_client *context,
++					       uint32_t op_handle,
++					       uint8_t *output,
++					       size_t output_size,
++					       size_t *output_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_CIPHER_FINISH_SID,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(&op_handle), .len = sizeof(uint32_t) },
++		{ .base = psa_ptr_to_u32(output), .len = output_size },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	*output_length = out_vec[1].len;
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_cipher_abort(
++					      struct service_client *context,
++					      uint32_t op_handle)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_CIPHER_ABORT_SID,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(&op_handle), .len = sizeof(uint32_t) },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++static inline size_t crypto_caller_cipher_max_update_size(const struct service_client *context)
++{
++	/* Returns the maximum number of bytes that may be
++	 * carried as a parameter of the cipher_update operation
++	 * using the ipc encoding.
++	 */
++	size_t payload_space = context->service_info.max_payload;
++	size_t overhead = iov_size;
++
++	/* Allow for output to be a whole number of blocks */
++	overhead += PSA_BLOCK_CIPHER_BLOCK_MAX_SIZE;
++
++	return (payload_space > overhead) ? payload_space - overhead : 0;
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PSA_IPC_CRYPTO_CALLER_CIPHER_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_copy_key.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_copy_key.h
+new file mode 100644
+index 000000000000..9a988171b098
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_copy_key.h
+@@ -0,0 +1,57 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PSA_IPC_CRYPTO_CALLER_COPY_KEY_H
++#define PSA_IPC_CRYPTO_CALLER_COPY_KEY_H
++
++#include <string.h>
++#include <stdlib.h>
++#include <psa/crypto.h>
++#include <psa/client.h>
++#include <psa/sid.h>
++#include <service/common/client/service_client.h>
++#include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include <protocols/service/crypto/packed-c/opcodes.h>
++#include <protocols/service/crypto/packed-c/key_attributes.h>
++#include <protocols/service/crypto/packed-c/import_key.h>
++#include "crypto_caller_key_attributes.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline psa_status_t crypto_caller_copy_key(struct service_client *context,
++						  psa_key_id_t source_key,
++						  const psa_key_attributes_t *attributes,
++						  psa_key_id_t *target_key)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_COPY_KEY_SID,
++		.key_id = source_key,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = sizeof(struct psa_ipc_crypto_pack_iovec) },
++		{ .base = psa_ptr_const_to_u32(attributes), .len = sizeof(psa_key_attributes_t) },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(target_key), .len = sizeof(psa_key_id_t) }
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PSA_IPC_CRYPTO_CALLER_COPY_KEY_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_destroy_key.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_destroy_key.h
+new file mode 100644
+index 000000000000..d00f4faa7a52
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_destroy_key.h
+@@ -0,0 +1,51 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PSA_IPC_CRYPTO_CALLER_DESTROY_KEY_H
++#define PSA_IPC_CRYPTO_CALLER_DESTROY_KEY_H
++
++#include <string.h>
++#include <stdlib.h>
++#include <psa/crypto.h>
++#include <psa/client.h>
++#include <psa/sid.h>
++#include <service/common/client/service_client.h>
++#include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include <protocols/service/crypto/packed-c/opcodes.h>
++#include <protocols/service/crypto/packed-c/key_attributes.h>
++#include <protocols/service/crypto/packed-c/import_key.h>
++#include "crypto_caller_key_attributes.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline psa_status_t crypto_caller_destroy_key(struct service_client *context,
++						     psa_key_id_t id)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_DESTROY_KEY_SID,
++		.key_id = id,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = sizeof(struct psa_ipc_crypto_pack_iovec) },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), NULL, 0);
++
++	return status;
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PSA_IPC_CRYPTO_CALLER_DESTROY_KEY_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_export_key.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_export_key.h
+new file mode 100644
+index 000000000000..8ac5477f7b9a
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_export_key.h
+@@ -0,0 +1,59 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PSA_IPC_CRYPTO_CALLER_EXPORT_KEY_H
++#define PSA_IPC_CRYPTO_CALLER_EXPORT_KEY_H
++
++#include <string.h>
++#include <stdlib.h>
++#include <psa/crypto.h>
++#include <psa/client.h>
++#include <psa/sid.h>
++#include <service/common/client/service_client.h>
++#include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include <protocols/service/crypto/packed-c/opcodes.h>
++#include <protocols/service/crypto/packed-c/key_attributes.h>
++#include <protocols/service/crypto/packed-c/import_key.h>
++#include "crypto_caller_key_attributes.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline psa_status_t crypto_caller_export_key(struct service_client *context,
++						    psa_key_id_t id,
++						    uint8_t *data,
++						    size_t data_size,
++						    size_t *data_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_EXPORT_KEY_SID,
++		.key_id = id,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = sizeof(struct psa_ipc_crypto_pack_iovec) },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(data), .len = data_size }
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	*data_length = out_vec[0].len;
++
++	return status;
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PSA_IPC_CRYPTO_CALLER_EXPORT_KEY_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_export_public_key.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_export_public_key.h
+new file mode 100644
+index 000000000000..b24c47f1257e
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_export_public_key.h
+@@ -0,0 +1,59 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PSA_IPC_CRYPTO_CALLER_EXPORT_PUBLIC_KEY_H
++#define PSA_IPC_CRYPTO_CALLER_EXPORT_PUBLIC_KEY_H
++
++#include <string.h>
++#include <stdlib.h>
++#include <psa/crypto.h>
++#include <psa/client.h>
++#include <psa/sid.h>
++#include <service/common/client/service_client.h>
++#include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include <protocols/service/crypto/packed-c/opcodes.h>
++#include <protocols/service/crypto/packed-c/key_attributes.h>
++#include <protocols/service/crypto/packed-c/import_key.h>
++#include "crypto_caller_key_attributes.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline psa_status_t crypto_caller_export_public_key(struct service_client *context,
++							   psa_key_id_t id,
++							   uint8_t *data,
++							   size_t data_size,
++							   size_t *data_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_EXPORT_PUBLIC_KEY_SID,
++		.key_id = id,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = sizeof(struct psa_ipc_crypto_pack_iovec) },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(data), .len = data_size }
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	*data_length = out_vec[0].len;
++
++	return status;
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PSA_IPC_CRYPTO_CALLER_EXPORT_PUBLIC_KEY_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_generate_key.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_generate_key.h
+new file mode 100644
+index 000000000000..1b66ed4020de
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_generate_key.h
+@@ -0,0 +1,55 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PSA_IPC_CRYPTO_CALLER_GENERATE_KEY_H
++#define PSA_IPC_CRYPTO_CALLER_GENERATE_KEY_H
++
++#include <string.h>
++#include <stdlib.h>
++#include <psa/crypto.h>
++#include <psa/client.h>
++#include <psa/sid.h>
++#include <service/common/client/service_client.h>
++#include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include <protocols/service/crypto/packed-c/opcodes.h>
++#include <protocols/service/crypto/packed-c/key_attributes.h>
++#include <protocols/service/crypto/packed-c/import_key.h>
++#include "crypto_caller_key_attributes.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline psa_status_t crypto_caller_generate_key(struct service_client *context,
++						      const psa_key_attributes_t *attributes,
++						      psa_key_id_t *id)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_GENERATE_KEY_SID,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = sizeof(struct psa_ipc_crypto_pack_iovec) },
++		{ .base = psa_ptr_const_to_u32(attributes), .len = sizeof(psa_key_attributes_t) },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(id), .len = sizeof(psa_key_id_t) }
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PSA_IPC_CRYPTO_CALLER_GENERATE_KEY_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_generate_random.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_generate_random.h
+new file mode 100644
+index 000000000000..7c538237805a
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_generate_random.h
+@@ -0,0 +1,57 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PSA_IPC_CRYPTO_CALLER_GENERATE_RANDOM_H
++#define PSA_IPC_CRYPTO_CALLER_GENERATE_RANDOM_H
++
++#include <string.h>
++#include <stdlib.h>
++#include <psa/crypto.h>
++#include <psa/client.h>
++#include <psa/sid.h>
++#include <service/common/client/service_client.h>
++#include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include <protocols/service/crypto/packed-c/opcodes.h>
++#include <protocols/service/crypto/packed-c/key_attributes.h>
++#include <protocols/service/crypto/packed-c/import_key.h>
++#include "crypto_caller_key_attributes.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline psa_status_t crypto_caller_generate_random(struct service_client *context,
++							 uint8_t *output,
++							 size_t output_size)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_GENERATE_RANDOM_SID,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = sizeof(struct psa_ipc_crypto_pack_iovec) },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(output), .len = output_size }
++	};
++
++	if (!output_size)
++		return PSA_SUCCESS;
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PSA_IPC_CRYPTO_CALLER_GENERATE_RANDOM_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_get_key_attributes.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_get_key_attributes.h
+new file mode 100644
+index 000000000000..22f1d18f1476
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_get_key_attributes.h
+@@ -0,0 +1,56 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PSA_IPC_CRYPTO_CALLER_GET_KEY_ATTRIBUTES_H
++#define PSA_IPC_CRYPTO_CALLER_GET_KEY_ATTRIBUTES_H
++
++#include <string.h>
++#include <stdlib.h>
++#include <psa/crypto.h>
++#include <psa/client.h>
++#include <psa/sid.h>
++#include <service/common/client/service_client.h>
++#include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include <protocols/service/crypto/packed-c/opcodes.h>
++#include <protocols/service/crypto/packed-c/key_attributes.h>
++#include <protocols/service/crypto/packed-c/import_key.h>
++#include "crypto_caller_key_attributes.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline psa_status_t crypto_caller_get_key_attributes(
++					    struct service_client *context,
++					    psa_key_id_t key,
++					    psa_key_attributes_t *attributes)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_GET_KEY_ATTRIBUTES_SID,
++		.key_id = key,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = sizeof(struct psa_ipc_crypto_pack_iovec) },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(attributes), .len = sizeof(psa_key_attributes_t) }
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PSA_IPC_CRYPTO_CALLER_GET_KEY_ATTRIBUTES_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_hash.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_hash.h
+new file mode 100644
+index 000000000000..9f37908a2f25
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_hash.h
+@@ -0,0 +1,220 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PSA_IPC_CRYPTO_CALLER_HASH_H
++#define PSA_IPC_CRYPTO_CALLER_HASH_H
++
++#include <string.h>
++#include <stdlib.h>
++#include <psa/crypto.h>
++#include <psa/client.h>
++#include <psa/sid.h>
++#include <service/common/client/service_client.h>
++#include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include <protocols/service/crypto/packed-c/opcodes.h>
++#include <protocols/service/crypto/packed-c/key_attributes.h>
++#include <protocols/service/crypto/packed-c/import_key.h>
++#include "crypto_caller_key_attributes.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline psa_status_t crypto_caller_hash_setup(
++					    struct service_client *context,
++					    uint32_t *op_handle,
++					    psa_algorithm_t alg)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_HASH_SETUP_SID,
++		.alg = alg,
++		.op_handle = *op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(op_handle), .len = sizeof(uint32_t) }
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_hash_update(
++					     struct service_client *context,
++					     uint32_t op_handle,
++					     const uint8_t *input,
++					     size_t input_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_HASH_UPDATE_SID,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++		{ .base = psa_ptr_const_to_u32(input), .len = input_length },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(&op_handle), .len = sizeof(uint32_t) },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_hash_finish(
++					     struct service_client *context,
++					     uint32_t op_handle,
++					     uint8_t *hash,
++					     size_t hash_size,
++					     size_t *hash_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_HASH_FINISH_SID,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(&op_handle), .len = sizeof(uint32_t) },
++		{ .base = psa_ptr_to_u32(hash), .len = hash_size},
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	*hash_length = out_vec[1].len;
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_hash_abort(
++					    struct service_client *context,
++					    uint32_t op_handle)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_HASH_ABORT_SID,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(&op_handle), .len = sizeof(uint32_t) },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_hash_verify(
++					     struct service_client *context,
++					     uint32_t op_handle,
++					     const uint8_t *hash,
++					     size_t hash_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_HASH_VERIFY_SID,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++		{ .base = psa_ptr_const_to_u32(hash), .len = hash_length},
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(&op_handle), .len = sizeof(uint32_t) },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_hash_clone(
++					    struct service_client *context,
++					    uint32_t source_op_handle,
++					    uint32_t *target_op_handle)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_HASH_CLONE_SID,
++		.op_handle = source_op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(target_op_handle),
++			.len = sizeof(uint32_t) },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_hash_suspend(struct service_client *context,
++	uint32_t op_handle,
++	uint8_t *hash_state,
++	size_t hash_state_size,
++	size_t *hash_state_length)
++{
++	return PSA_ERROR_NOT_SUPPORTED;
++}
++
++static inline psa_status_t crypto_caller_hash_resume(struct service_client *context,
++	uint32_t op_handle,
++	const uint8_t *hash_state,
++	size_t hash_state_length)
++{
++	return PSA_ERROR_NOT_SUPPORTED;
++}
++
++static inline size_t crypto_caller_hash_max_update_size(const struct service_client *context)
++{
++	/* Returns the maximum number of bytes that may be
++	 * carried as a parameter of the hash_update operation
++	 * using the packed-c encoding.
++	 */
++	size_t payload_space = context->service_info.max_payload;
++	size_t overhead = iov_size;
++
++	return (payload_space > overhead) ? payload_space - overhead : 0;
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PSA_IPC_CRYPTO_CALLER_HASH_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_import_key.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_import_key.h
+new file mode 100644
+index 000000000000..d47033662790
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_import_key.h
+@@ -0,0 +1,57 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PSA_IPC_CRYPTO_CALLER_IMPORT_KEY_H
++#define PSA_IPC_CRYPTO_CALLER_IMPORT_KEY_H
++
++#include <string.h>
++#include <stdlib.h>
++#include <psa/crypto.h>
++#include <psa/client.h>
++#include <psa/sid.h>
++#include <service/common/client/service_client.h>
++#include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include <protocols/service/crypto/packed-c/opcodes.h>
++#include <protocols/service/crypto/packed-c/key_attributes.h>
++#include <protocols/service/crypto/packed-c/import_key.h>
++#include "crypto_caller_key_attributes.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline psa_status_t crypto_caller_import_key(struct service_client *context,
++				    const psa_key_attributes_t *attributes,
++				    const uint8_t *data, size_t data_length,
++				    psa_key_id_t *id)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_IMPORT_KEY_SID,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = sizeof(struct psa_ipc_crypto_pack_iovec) },
++		{ .base = psa_ptr_const_to_u32(attributes), .len = sizeof(psa_key_attributes_t) },
++		{ .base = psa_ptr_const_to_u32(data), .len = data_length }
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(id), .len = sizeof(psa_key_id_t) }
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PACKEDC_CRYPTO_CALLER_IMPORT_KEY_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_key_attributes.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_key_attributes.h
+new file mode 100644
+index 000000000000..2fad2f0a64e6
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_key_attributes.h
+@@ -0,0 +1,51 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PACKEDC_CRYPTO_CALLER_KEY_ATTRIBUTES_H
++#define PACKEDC_CRYPTO_CALLER_KEY_ATTRIBUTES_H
++
++#include <psa/crypto.h>
++#include <protocols/service/crypto/packed-c/key_attributes.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline void packedc_crypto_caller_translate_key_attributes_to_proto(
++	struct ts_crypto_key_attributes *proto_attributes,
++	const psa_key_attributes_t *psa_attributes)
++{
++	proto_attributes->type = psa_get_key_type(psa_attributes);
++	proto_attributes->key_bits = psa_get_key_bits(psa_attributes);
++	proto_attributes->lifetime = psa_get_key_lifetime(psa_attributes);
++	proto_attributes->id = psa_get_key_id(psa_attributes);
++
++	proto_attributes->policy.usage = psa_get_key_usage_flags(psa_attributes);
++	proto_attributes->policy.alg = psa_get_key_algorithm(psa_attributes);
++ }
++
++static inline void packedc_crypto_caller_translate_key_attributes_from_proto(
++	psa_key_attributes_t *psa_attributes,
++	const struct ts_crypto_key_attributes *proto_attributes)
++{
++	psa_set_key_type(psa_attributes, proto_attributes->type);
++	psa_set_key_bits(psa_attributes, proto_attributes->key_bits);
++	psa_set_key_lifetime(psa_attributes, proto_attributes->lifetime);
++
++	if (proto_attributes->lifetime == PSA_KEY_LIFETIME_PERSISTENT) {
++
++		psa_set_key_id(psa_attributes, proto_attributes->id);
++	}
++
++	psa_set_key_usage_flags(psa_attributes, proto_attributes->policy.usage);
++	psa_set_key_algorithm(psa_attributes, proto_attributes->policy.alg);
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PACKEDC_CRYPTO_CALLER_KEY_ATTRIBUTES_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_key_derivation.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_key_derivation.h
+new file mode 100644
+index 000000000000..5ce4fb6cca82
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_key_derivation.h
+@@ -0,0 +1,298 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PSA_IPC_CRYPTO_CALLER_KEY_DERIVATION_H
++#define PSA_IPC_CRYPTO_CALLER_KEY_DERIVATION_H
++
++#include <string.h>
++#include <stdlib.h>
++#include <psa/crypto.h>
++#include <psa/client.h>
++#include <psa/sid.h>
++#include <service/common/client/service_client.h>
++#include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include <protocols/service/crypto/packed-c/opcodes.h>
++#include <protocols/service/crypto/packed-c/key_attributes.h>
++#include <protocols/service/crypto/packed-c/import_key.h>
++#include "crypto_caller_key_attributes.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline psa_status_t crypto_caller_key_derivation_setup(
++					      struct service_client *context,
++					      uint32_t *op_handle,
++					      psa_algorithm_t alg)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_KEY_DERIVATION_SETUP_SID,
++		.alg = alg,
++		.op_handle = *op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(op_handle), .len = sizeof(uint32_t) }
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_key_derivation_get_capacity(
++					     struct service_client *context,
++					     const uint32_t op_handle,
++					     size_t *capacity)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_KEY_DERIVATION_GET_CAPACITY_SID,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(capacity), .len = sizeof(uint32_t) }
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_key_derivation_set_capacity(
++					     struct service_client *context,
++					     uint32_t op_handle,
++					     size_t capacity)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_KEY_DERIVATION_SET_CAPACITY_SID,
++		.capacity = capacity,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), NULL, 0);
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_key_derivation_input_bytes(
++					    struct service_client *context,
++					    uint32_t op_handle,
++					    psa_key_derivation_step_t step,
++					    const uint8_t *data,
++					    size_t data_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_KEY_DERIVATION_INPUT_BYTES_SID,
++		.step = step,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++		{ .base = psa_ptr_const_to_u32(data), .len = data_length },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), NULL, 0);
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_key_derivation_input_key(
++					  struct service_client *context,
++					  uint32_t op_handle,
++					  psa_key_derivation_step_t step,
++					  psa_key_id_t key)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_KEY_DERIVATION_INPUT_KEY_SID,
++		.key_id = key,
++		.step = step,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), NULL, 0);
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_key_derivation_output_bytes(
++					     struct service_client *context,
++					     uint32_t op_handle,
++					     uint8_t *output,
++					     size_t output_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_KEY_DERIVATION_OUTPUT_BYTES_SID,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(output), .len = output_length },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_key_derivation_output_key(
++				   struct service_client *context,
++				   const psa_key_attributes_t *attributes,
++				   uint32_t op_handle,
++				   psa_key_id_t *key)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_KEY_DERIVATION_OUTPUT_KEY_SID,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++		{ .base = psa_ptr_const_to_u32(attributes),
++			.len = sizeof(psa_key_attributes_t) },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(key), .len = sizeof(psa_key_id_t)},
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_key_derivation_abort(
++					      struct service_client *context,
++					      uint32_t op_handle)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_KEY_DERIVATION_ABORT_SID,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(&op_handle), .len = sizeof(uint32_t) },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_key_derivation_key_agreement(
++				      struct service_client *context,
++				      uint32_t op_handle,
++				      psa_key_derivation_step_t step,
++				      psa_key_id_t private_key,
++				      const uint8_t *peer_key,
++				      size_t peer_key_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_KEY_DERIVATION_KEY_AGREEMENT_SID,
++		.key_id = private_key,
++		.step = step,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++		{ .base = psa_ptr_const_to_u32(peer_key),
++			.len = peer_key_length},
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), NULL, 0);
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_raw_key_agreement(
++					   struct service_client *context,
++					   psa_algorithm_t alg,
++					   psa_key_id_t private_key,
++					   const uint8_t *peer_key,
++					   size_t peer_key_length,
++					   uint8_t *output,
++					   size_t output_size,
++					   size_t *output_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_RAW_KEY_AGREEMENT_SID,
++		.alg = alg,
++		.key_id = private_key,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++		{ .base = psa_ptr_const_to_u32(peer_key),
++			.len = peer_key_length},
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(output), .len = output_size },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	*output_length = out_vec[0].len;
++
++	return status;
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PSA_IPC_CRYPTO_CALLER_KEY_DERIVATION_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_mac.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_mac.h
+new file mode 100644
+index 000000000000..3a820192495a
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_mac.h
+@@ -0,0 +1,207 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PSA_IPC_CRYPTO_CALLER_MAC_H
++#define PSA_IPC_CRYPTO_CALLER_MAC_H
++
++#include <string.h>
++#include <stdlib.h>
++#include <psa/crypto.h>
++#include <psa/client.h>
++#include <psa/sid.h>
++#include <service/common/client/service_client.h>
++#include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include <protocols/service/crypto/packed-c/opcodes.h>
++#include <protocols/service/crypto/packed-c/key_attributes.h>
++#include <protocols/service/crypto/packed-c/import_key.h>
++#include "crypto_caller_key_attributes.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline psa_status_t crypto_caller_mac_sign_setup(
++						struct service_client *context,
++						uint32_t *op_handle,
++						psa_key_id_t key,
++						psa_algorithm_t alg)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_MAC_SIGN_SETUP_SID,
++		.key_id = key,
++		.alg = alg,
++		.op_handle = *op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(op_handle), .len = sizeof(uint32_t) },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_mac_verify_setup(
++					  struct service_client *context,
++					  uint32_t *op_handle,
++					  psa_key_id_t key,
++					  psa_algorithm_t alg)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_MAC_VERIFY_SETUP_SID,
++		.key_id = key,
++		.alg = alg,
++		.op_handle = *op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(op_handle), .len = sizeof(uint32_t) },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_mac_update(
++					    struct service_client *context,
++					    uint32_t op_handle,
++					    const uint8_t *input,
++					    size_t input_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_MAC_UPDATE_SID,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++		{ .base = psa_ptr_const_to_u32(input), .len = input_length },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(&op_handle), .len = sizeof(uint32_t) },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_mac_sign_finish(
++						 struct service_client *context,
++						 uint32_t op_handle,
++						 uint8_t *mac,
++						 size_t mac_size,
++						 size_t *mac_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_MAC_SIGN_FINISH_SID,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(&op_handle), .len = sizeof(uint32_t) },
++		{ .base = psa_ptr_to_u32(mac), .len = mac_size },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	*mac_length = out_vec[1].len;
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_mac_verify_finish(
++					   struct service_client *context,
++					   uint32_t op_handle,
++					   const uint8_t *mac,
++					   size_t mac_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_MAC_VERIFY_FINISH_SID,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++		{ .base = psa_ptr_const_to_u32(mac), .len = mac_length },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(&op_handle), .len = sizeof(uint32_t) },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++static inline psa_status_t crypto_caller_mac_abort(
++					   struct service_client *context,
++					   uint32_t op_handle)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_MAC_ABORT_SID,
++		.op_handle = op_handle,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(&op_handle), .len = sizeof(uint32_t) },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	return status;
++}
++
++static inline size_t crypto_caller_mac_max_update_size(const struct service_client *context)
++{
++	/* Returns the maximum number of bytes that may be
++	 * carried as a parameter of the mac_update operation
++	 * using the packed-c encoding.
++	 */
++	size_t payload_space = context->service_info.max_payload;
++	size_t overhead = iov_size;
++
++	return (payload_space > overhead) ? payload_space - overhead : 0;
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PSA_IPC_CRYPTO_CALLER_MAC_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_purge_key.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_purge_key.h
+new file mode 100644
+index 000000000000..a3a796e2166c
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_purge_key.h
+@@ -0,0 +1,51 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PACKEDC_CRYPTO_CALLER_PURGE_KEY_H
++#define PACKEDC_CRYPTO_CALLER_PURGE_KEY_H
++
++#include <string.h>
++#include <stdlib.h>
++#include <psa/crypto.h>
++#include <psa/client.h>
++#include <psa/sid.h>
++#include <service/common/client/service_client.h>
++#include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include <protocols/service/crypto/packed-c/opcodes.h>
++#include <protocols/service/crypto/packed-c/key_attributes.h>
++#include <protocols/service/crypto/packed-c/import_key.h>
++#include "crypto_caller_key_attributes.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline psa_status_t crypto_caller_purge_key(struct service_client *context,
++						   psa_key_id_t id)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_PURGE_KEY_SID,
++		.key_id = id,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = sizeof(struct psa_ipc_crypto_pack_iovec) },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), NULL, 0);
++
++	return status;
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PACKEDC_CRYPTO_CALLER_PURGE_KEY_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_sign_hash.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_sign_hash.h
+new file mode 100644
+index 000000000000..71d88cededf5
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_sign_hash.h
+@@ -0,0 +1,64 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PSA_IPC_CRYPTO_CALLER_SIGN_HASH_H
++#define PSA_IPC_CRYPTO_CALLER_SIGN_HASH_H
++
++#include <string.h>
++#include <stdlib.h>
++#include <psa/crypto.h>
++#include <psa/client.h>
++#include <psa/sid.h>
++#include <service/common/client/service_client.h>
++#include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include <protocols/service/crypto/packed-c/opcodes.h>
++#include <protocols/service/crypto/packed-c/key_attributes.h>
++#include <protocols/service/crypto/packed-c/import_key.h>
++#include "crypto_caller_key_attributes.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline psa_status_t crypto_caller_sign_hash(struct service_client *context,
++						   psa_key_id_t id,
++						   psa_algorithm_t alg,
++						   const uint8_t *hash,
++						   size_t hash_length,
++						   uint8_t *signature,
++						   size_t signature_size,
++						   size_t *signature_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_SIGN_HASH_SID,
++		.key_id = id,
++		.alg = alg,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++		{ .base = psa_ptr_const_to_u32(hash), .len = hash_length },
++	};
++	struct psa_outvec out_vec[] = {
++		{ .base = psa_ptr_to_u32(signature), .len = signature_size },
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
++
++	*signature_length = out_vec[0].len;
++
++	return status;
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PSA_IPC_CRYPTO_CALLER_SIGN_HASH_H */
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_verify_hash.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_verify_hash.h
+new file mode 100644
+index 000000000000..e16f6e5450af
+--- /dev/null
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_verify_hash.h
+@@ -0,0 +1,59 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PSA_IPC_CRYPTO_CALLER_VERIFY_HASH_H
++#define PSA_IPC_CRYPTO_CALLER_VERIFY_HASH_H
++
++#include <string.h>
++#include <stdlib.h>
++#include <psa/crypto.h>
++#include <psa/client.h>
++#include <psa/sid.h>
++#include <service/common/client/service_client.h>
++#include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include <protocols/service/crypto/packed-c/opcodes.h>
++#include <protocols/service/crypto/packed-c/key_attributes.h>
++#include <protocols/service/crypto/packed-c/import_key.h>
++#include "crypto_caller_key_attributes.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline psa_status_t crypto_caller_verify_hash(struct service_client *context,
++						     psa_key_id_t id,
++						     psa_algorithm_t alg,
++						     const uint8_t *hash,
++						     size_t hash_length,
++						     const uint8_t *signature,
++						     size_t signature_length)
++{
++	struct service_client *ipc = context;
++	struct rpc_caller *caller = ipc->caller;
++	psa_status_t status;
++	struct psa_ipc_crypto_pack_iovec iov = {
++		.sfn_id = TFM_CRYPTO_VERIFY_HASH_SID,
++		.key_id = id,
++		.alg = alg,
++	};
++	struct psa_invec in_vec[] = {
++		{ .base = psa_ptr_to_u32(&iov), .len = sizeof(struct psa_ipc_crypto_pack_iovec) },
++		{ .base = psa_ptr_const_to_u32(hash), .len = hash_length },
++		{ .base = psa_ptr_const_to_u32(signature), .len = signature_length},
++	};
++
++	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
++			  IOVEC_LEN(in_vec), NULL, 0);
++
++	return status;
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PSA_IPC_CRYPTO_CALLER_VERIFY_HASH_H */
+diff --git a/components/service/crypto/include/psa/crypto_client_struct.h b/components/service/crypto/include/psa/crypto_client_struct.h
+index abd420c82607..bf95c9821e55 100644
+--- a/components/service/crypto/include/psa/crypto_client_struct.h
++++ b/components/service/crypto/include/psa/crypto_client_struct.h
+@@ -31,12 +31,12 @@ extern "C" {
+  * data structure internally. */
+ struct psa_client_key_attributes_s
+ {
++    uint16_t type;
++    uint16_t bits;
+     uint32_t lifetime;
+-    uint32_t id;
+-    uint32_t alg;
++    psa_key_id_t id;
+     uint32_t usage;
+-    size_t bits;
+-    uint16_t type;
++    uint32_t alg;
+ };
+ 
+ #define PSA_CLIENT_KEY_ATTRIBUTES_INIT {0, 0, 0, 0, 0, 0}
+diff --git a/components/service/crypto/include/psa/crypto_sizes.h b/components/service/crypto/include/psa/crypto_sizes.h
+index 7a0149bbca62..4d7bf6e959b0 100644
+--- a/components/service/crypto/include/psa/crypto_sizes.h
++++ b/components/service/crypto/include/psa/crypto_sizes.h
+@@ -81,7 +81,7 @@
+ #define PSA_HASH_MAX_SIZE 64
+ #define PSA_HMAC_MAX_HASH_BLOCK_SIZE 128
+ #else
+-#define PSA_HASH_MAX_SIZE 32
++#define PSA_HASH_MAX_SIZE 64
+ #define PSA_HMAC_MAX_HASH_BLOCK_SIZE 64
+ #endif
+ 
+diff --git a/deployments/se-proxy/common/service_proxy_factory.c b/deployments/se-proxy/common/service_proxy_factory.c
+index 1110ac46bf8b..7edeef8b434a 100644
+--- a/deployments/se-proxy/common/service_proxy_factory.c
++++ b/deployments/se-proxy/common/service_proxy_factory.c
+@@ -15,7 +15,7 @@
+ #include <trace.h>
+ 
+ /* Stub backends */
+-#include <service/crypto/backend/stub/stub_crypto_backend.h>
++#include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
+ #include <service/secure_storage/backend/secure_storage_ipc/secure_storage_ipc.h>
+ #include <service/secure_storage/backend/mock_store/mock_store.h>
+ 
+@@ -47,12 +47,17 @@ struct rpc_interface *crypto_proxy_create(void)
+ {
+ 	struct rpc_interface *crypto_iface = NULL;
+ 	struct crypto_provider *crypto_provider;
++	struct rpc_caller *crypto_caller;
+ 
+-	if (stub_crypto_backend_init() == PSA_SUCCESS) {
++	crypto_caller = openamp_caller_init(&openamp);
++	if (!crypto_caller)
++		return NULL;
++
++	if (crypto_ipc_backend_init(&openamp.rpc_caller) != PSA_SUCCESS)
++		return NULL;
+ 
+-		crypto_provider = crypto_provider_factory_create();
+-		crypto_iface = service_provider_get_rpc_interface(&crypto_provider->base_provider);
+-	}
++	crypto_provider = crypto_provider_factory_create();
++	crypto_iface = service_provider_get_rpc_interface(&crypto_provider->base_provider);
+ 
+ 	return crypto_iface;
+ }
+diff --git a/deployments/se-proxy/se-proxy.cmake b/deployments/se-proxy/se-proxy.cmake
+index 38d26821d44d..f647190d9559 100644
+--- a/deployments/se-proxy/se-proxy.cmake
++++ b/deployments/se-proxy/se-proxy.cmake
+@@ -57,7 +57,7 @@ add_components(TARGET "se-proxy"
+ 		"components/rpc/dummy"
+ 		"components/rpc/common/caller"
+ 		"components/service/attestation/key_mngr/stub"
+-		"components/service/crypto/backend/stub"
++		"components/service/crypto/backend/psa_ipc"
+ 		"components/service/crypto/client/psa"
+ 		"components/service/secure_storage/backend/mock_store"
+ )
+diff --git a/platform/providers/arm/corstone1000/platform.cmake b/platform/providers/arm/corstone1000/platform.cmake
+index bb778bb9719b..51e5faa3e4d8 100644
+--- a/platform/providers/arm/corstone1000/platform.cmake
++++ b/platform/providers/arm/corstone1000/platform.cmake
+@@ -8,3 +8,5 @@
+ 
+ # include MHU driver
+ include(${TS_ROOT}/platform/drivers/arm/mhu_driver/component.cmake)
++
++add_compile_definitions(MBEDTLS_ECP_DP_SECP521R1_ENABLED)
+-- 
+2.38.0
+

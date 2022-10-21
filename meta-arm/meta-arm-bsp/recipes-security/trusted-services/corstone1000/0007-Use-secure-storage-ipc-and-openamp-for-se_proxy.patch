@@ -1,0 +1,63 @@
+From 9c7f1e6a5eb9ab887e568cfa3c2003583d387bc9 Mon Sep 17 00:00:00 2001
+From: Vishnu Banavath <vishnu.banavath@arm.com>
+Date: Fri, 3 Dec 2021 19:25:34 +0000
+Subject: [PATCH 07/19] Use secure storage ipc and openamp for se_proxy
+
+Remove mock up backend for secure storage in se proxy
+deployment and use instead the secure storage ipc backend with
+openamp as rpc to secure enclave side.
+
+Upstream-Status: Pending
+Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+---
+ .../se-proxy/common/service_proxy_factory.c      | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/deployments/se-proxy/common/service_proxy_factory.c b/deployments/se-proxy/common/service_proxy_factory.c
+index acfb6e8873fa..57290056d614 100644
+--- a/deployments/se-proxy/common/service_proxy_factory.c
++++ b/deployments/se-proxy/common/service_proxy_factory.c
+@@ -6,15 +6,20 @@
+ 
+ #include <stddef.h>
+ #include <rpc/common/endpoint/rpc_interface.h>
++#include <rpc/openamp/caller/sp/openamp_caller.h>
+ #include <service/attestation/provider/attest_provider.h>
+ #include <service/attestation/provider/serializer/packed-c/packedc_attest_provider_serializer.h>
+ #include <service/crypto/factory/crypto_provider_factory.h>
+ #include <service/secure_storage/frontend/secure_storage_provider/secure_storage_provider.h>
++#include <trace.h>
+ 
+ /* Stub backends */
+ #include <service/crypto/backend/stub/stub_crypto_backend.h>
++#include <service/secure_storage/backend/secure_storage_ipc/secure_storage_ipc.h>
+ #include <service/secure_storage/backend/mock_store/mock_store.h>
+ 
++struct openamp_caller openamp;
++
+ struct rpc_interface *attest_proxy_create(void)
+ {
+ 	struct rpc_interface *attest_iface;
+@@ -47,10 +52,15 @@ struct rpc_interface *crypto_proxy_create(void)
+ 
+ struct rpc_interface *ps_proxy_create(void)
+ {
+-	static struct mock_store ps_backend;
+ 	static struct secure_storage_provider ps_provider;
+-
+-	struct storage_backend *backend = mock_store_init(&ps_backend);
++	static struct secure_storage_ipc ps_backend;
++	static struct rpc_caller *storage_caller;
++	struct storage_backend *backend;
++
++	storage_caller = openamp_caller_init(&openamp);
++	if (!storage_caller)
++		return NULL;
++	backend = secure_storage_ipc_init(&ps_backend, &openamp.rpc_caller);
+ 
+ 	return secure_storage_provider_init(&ps_provider, backend);
+ }
+-- 
+2.38.0
+

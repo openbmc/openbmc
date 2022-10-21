@@ -13,8 +13,14 @@ some default behavior.
 
 Any :term:`Metadata` usually found in a recipe can also be
 placed in a class file. Class files are identified by the extension
-``.bbclass`` and are usually placed in a ``classes/`` directory beneath
-the ``meta*/`` directory found in the :term:`Source Directory`.
+``.bbclass`` and are usually placed in one of a set of subdirectories
+beneath the ``meta*/`` directory found in the :term:`Source Directory`:
+
+  - ``classes-recipe/`` - classes intended to be inherited by recipes
+    individually
+  - ``classes-global/`` - classes intended to be inherited globally
+  - ``classes/`` - classes whose usage context is not clearly defined
+
 Class files can also be pointed to by
 :term:`BUILDDIR` (e.g. ``build/``) in the same way as
 ``.conf`` files in the ``conf`` directory. Class files are searched for
@@ -22,7 +28,7 @@ in :term:`BBPATH` using the same method by which ``.conf``
 files are searched.
 
 This chapter discusses only the most useful and important classes. Other
-classes do exist within the ``meta/classes`` directory in the Source
+classes do exist within the ``meta/classes*`` directories in the Source
 Directory. You can reference the ``.bbclass`` files directly for more
 information.
 
@@ -362,6 +368,14 @@ authors used.
 Both build methods inherit the ``cpan-base`` class for basic Perl
 support.
 
+.. _ref-classes-create-spdx:
+
+``create-spdx.bbclass``
+=======================
+
+The ``create-spdx`` class provides support for automatically creating
+SPDX SBoM documents based upon image and SDK contents.
+
 .. _ref-classes-cross:
 
 ``cross.bbclass``
@@ -659,6 +673,20 @@ the GNU ``gettext`` internationalization and localization system. All
 recipes building software that use ``gettext`` should inherit this
 class.
 
+.. _ref-classes-github-releases:
+
+``github-releases``
+===================
+
+For recipes that fetch release tarballs from github, the ``github-releases``
+class sets up a standard way for checking available upstream versions
+(to support ``devtool upgrade`` and the Automated Upgrade Helper (AUH)).
+
+To use it, add ``github-releases`` to the inherit line in the recipe,
+and if the default value of :term:`GITHUB_BASE_URI` is not suitable,
+then set your own value in the recipe. You should then use ``${GITHUB_BASE_URI}``
+in the value you set for :term:`SRC_URI` within the recipe.
+
 .. _ref-classes-gnomebase:
 
 ``gnomebase.bbclass``
@@ -881,8 +909,22 @@ Yocto Project Overview and Concepts Manual.
 ``image-buildinfo.bbclass``
 ===========================
 
-The ``image-buildinfo`` class writes information to the target
-filesystem on ``/etc/build``.
+The ``image-buildinfo`` class writes a plain text file containing
+build information to the target filesystem at ``${sysconfdir}/buildinfo``
+by default (as specified by :term:`IMAGE_BUILDINFO_FILE`.
+This can be useful for manually determining the origin of any given
+image. It writes out two sections:
+
+1. `Build Configuration`: a list of variables and their values (specified
+   by :term:`IMAGE_BUILDINFO_VARS`, which defaults to :term:`DISTRO` and
+   :term:`DISTRO_VERSION`)
+
+2. `Layer Revisions`: the revisions of all of the layers used in the
+   build.
+
+Additionally, when building an SDK it will write the same contents
+to ``/buildinfo`` by default (as specified by
+:term:`SDK_BUILDINFO_FILE`).
 
 .. _ref-classes-image_types:
 
@@ -980,8 +1022,8 @@ Here are the tests you can list with the :term:`WARN_QA` and
    software, like bootloaders, might need to bypass this check.
 
 -  ``buildpaths:`` Checks for paths to locations on the build host
-   inside the output files. Currently, this test triggers too many false
-   positives and thus is not normally enabled.
+   inside the output files. Not only can these leak information about
+   the build environment, they also hinder binary reproducibility.
 
 -  ``build-deps:`` Determines if a build-time dependency that is
    specified through :term:`DEPENDS`, explicit
@@ -1293,7 +1335,7 @@ device trees, a U-boot script, a Initramfs bundle and a RAM disk
 into a single FIT image. In theory, a FIT image can support any number
 of kernels, U-boot scripts, Initramfs bundles, RAM disks and device-trees.
 However, ``kernel-fitimage`` currently only supports
-limited usescases: just one kernel image, an optional U-boot script,
+limited usecases: just one kernel image, an optional U-boot script,
 an optional Initramfs bundle, an optional RAM disk, and any number of
 device tree.
 
@@ -1976,6 +2018,22 @@ This class is enabled by default because it is inherited by the
 When inherited by a recipe, the ``perlnative`` class supports using the
 native version of Perl built by the build system rather than using the
 version provided by the build host.
+
+.. _ref-classes-pypi:
+
+``pypi.bbclass``
+================
+
+The ``pypi`` class sets variables appropriately for recipes that build
+Python modules from `PyPI <https://pypi.org/>`__, the Python Package Index.
+By default it determines the PyPI package name based upon :term:`BPN`
+(stripping the "python-" or "python3-" prefix off if present), however in
+some cases you may need to set it manually in the recipe by setting
+:term:`PYPI_PACKAGE`.
+
+Variables set by the ``pypi`` class include :term:`SRC_URI`, :term:`SECTION`,
+:term:`HOMEPAGE`, :term:`UPSTREAM_CHECK_URI`, :term:`UPSTREAM_CHECK_REGEX`
+and :term:`CVE_PRODUCT`.
 
 .. _ref-classes-python_flit_core:
 
@@ -2724,33 +2782,32 @@ session needs to be started. For example, the
 :ref:`devshell <ref-classes-devshell>` class all use the ``terminal``
 class.
 
-.. _ref-classes-testimage*:
+.. _ref-classes-testimage:
 
-``testimage*.bbclass``
-======================
+``testimage.bbclass``
+=====================
 
-The ``testimage*`` classes support running automated tests against
+The ``testimage`` class supports running automated tests against
 images using QEMU and on actual hardware. The classes handle loading the
 tests and starting the image. To use the classes, you need to perform
 steps to set up the environment.
 
-.. note::
+To enable this class, add the following to your configuration::
 
-   Best practices include using :term:`IMAGE_CLASSES` rather than
-   :term:`INHERIT` to inherit the ``testimage`` class for automated image
-   testing.
+   IMAGE_CLASSES += "testimage"
 
 The tests are commands that run on the target system over ``ssh``. Each
 test is written in Python and makes use of the ``unittest`` module.
 
-The ``testimage.bbclass`` runs tests on an image when called using the
+The ``testimage`` class runs tests on an image when called using the
 following::
 
    $ bitbake -c testimage image
 
-The ``testimage-auto`` class
-runs tests on an image after the image is constructed (i.e.
-:term:`TESTIMAGE_AUTO` must be set to "1").
+Alternatively, if you wish to have tests automatically run for each image
+after it is built, you can set :term:`TESTIMAGE_AUTO`::
+
+   TESTIMAGE_AUTO = "1"
 
 For information on how to enable, run, and create new tests, see the
 ":ref:`dev-manual/common-tasks:performing automated runtime testing`"
@@ -2892,7 +2949,7 @@ To use this class, you need to define a number of variables:
 These variables list alternative commands needed by a package, provide
 pathnames for links, default links for targets, and so forth. For
 details on how to use this class, see the comments in the
-:yocto_git:`update-alternatives.bbclass </poky/tree/meta/classes/update-alternatives.bbclass>`
+:yocto_git:`update-alternatives.bbclass </poky/tree/meta/classes-recipe/update-alternatives.bbclass>`
 file.
 
 .. note::

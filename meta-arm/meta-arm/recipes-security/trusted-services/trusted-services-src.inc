@@ -42,6 +42,16 @@ SRC_URI += "git://github.com/cpputest/cpputest.git;name=cpputest;protocol=https;
 SRCREV_cpputest = "e25097614e1c4856036366877a02346c4b36bb5b"
 LIC_FILES_CHKSUM += "file://../cpputest/COPYING;md5=ce5d5f1fe02bcd1343ced64a06fd4177"
 
+# Libmetal
+SRC_URI += "git://github.com/OpenAMP/libmetal.git;name=libmetal;protocol=https;branch=main;destsuffix=git/libmetal"
+SRCREV_libmetal = "f252f0e007fbfb8b3a52b1d5901250ddac96baad"
+LIC_FILES_CHKSUM += "file://../libmetal/LICENSE.md;md5=fe0b8a4beea8f0813b606d15a3df3d3c"
+
+# Openamp
+SRC_URI += "git://github.com/OpenAMP/open-amp.git;name=openamp;protocol=https;branch=main;destsuffix=git/openamp"
+SRCREV_openamp = "347397decaa43372fc4d00f965640ebde042966d"
+LIC_FILES_CHKSUM += "file://../openamp/LICENSE.md;md5=a8d8cf662ef6bf9936a1e1413585ecbf"
+
 # TS ships patches for external dependencies that needs to be applied
 apply_ts_patches() {
     for p in ${S}/external/qcbor/*.patch; do
@@ -63,4 +73,6 @@ EXTRA_OECMAKE += "-DDTC_SOURCE_DIR=${WORKDIR}/git/dtc \
                   -DT_COSE_SOURCE_DIR=${WORKDIR}/git/tcose \
                   -DQCBOR_SOURCE_DIR=${WORKDIR}/git/qcbor \
                   -DMBEDTLS_SOURCE_DIR=${WORKDIR}/git/mbedtls \
+                  -DOPENAMP_SOURCE_DIR=${WORKDIR}/git/openamp \
+                  -DLIBMETAL_SOURCE_DIR=${WORKDIR}/git/libmetal \
                  "

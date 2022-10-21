@@ -119,6 +119,10 @@ def make_dtb_boot_files(d):
     # KERNEL_DEVICETREE.
     alldtbs = d.getVar('KERNEL_DEVICETREE')
 
+    # DTBs may be built out of kernel with devicetree.bbclass
+    if not alldtbs:
+        return ''
+
     def transform(dtb):
         base = os.path.basename(dtb)
         if dtb.endswith('dtbo') or base == 'overlay_map.dtb':

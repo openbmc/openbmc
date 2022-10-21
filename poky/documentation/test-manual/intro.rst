@@ -132,8 +132,8 @@ the following types of tests:
 
       $ bitbake image -c testimage
 
-   The tests utilize the :ref:`testimage* <ref-classes-testimage*>`
-   classes and the :ref:`ref-tasks-testimage` task.
+   The tests utilize the :ref:`testimage <ref-classes-testimage>`
+   class and the :ref:`ref-tasks-testimage` task.
 
 -  *Layer Testing:* The Autobuilder has the possibility to test whether
    specific layers work with the test of the system. The layers tested

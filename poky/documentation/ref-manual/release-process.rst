@@ -127,7 +127,7 @@ consists of the following pieces:
    an ARM target, did the build produce ARM binaries. If, for example,
    the build produced PPC binaries then there is a problem.
 
--  :ref:`ref-classes-testimage*`: This class
+-  :ref:`ref-classes-testimage`: This class
    performs runtime testing of images after they are built. The tests
    are usually used with :doc:`QEMU </dev-manual/qemu>`
    to boot the images and check the combined runtime result boot

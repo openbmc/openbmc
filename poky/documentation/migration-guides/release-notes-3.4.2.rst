@@ -167,7 +167,7 @@ Contributors to 3.4.2
 -  Vyacheslav Yurkov
 -  Yongxin Liu
 -  pgowda
--  wangmy
+-  Wang Mingyu
 
 Repositories / Downloads for 3.4.2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

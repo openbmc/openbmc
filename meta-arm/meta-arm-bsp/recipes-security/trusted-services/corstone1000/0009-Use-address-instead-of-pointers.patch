@@ -1,0 +1,168 @@
+From ee767c1ae857cfcc8b4bb520b2558091e253cf94 Mon Sep 17 00:00:00 2001
+From: Satish Kumar <satish.kumar01@arm.com>
+Date: Sun, 12 Dec 2021 10:57:17 +0000
+Subject: [PATCH 09/19] Use address instead of pointers
+
+Since secure enclave is 32bit and we 64bit there is an issue
+in the protocol communication design that force us to handle
+on our side the manipulation of address and pointers to make
+this work.
+
+Upstream-Status: Pending
+Signed-off-by: Satish Kumar <satish.kumar01@arm.com>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+---
+ .../service/common/include/psa/client.h       | 15 ++++++++++++++
+ .../service/common/psa_ipc/service_psa_ipc.c  | 20 ++++++++++++-------
+ .../secure_storage_ipc/secure_storage_ipc.c   | 20 +++++++++----------
+ 3 files changed, 38 insertions(+), 17 deletions(-)
+
+diff --git a/components/service/common/include/psa/client.h b/components/service/common/include/psa/client.h
+index 69ccf14f40a3..12dcd68f8a76 100644
+--- a/components/service/common/include/psa/client.h
++++ b/components/service/common/include/psa/client.h
+@@ -81,6 +81,21 @@ struct __attribute__ ((__packed__)) psa_outvec {
+     uint32_t len;                 /*!< the size in bytes                      */
+ };
+ 
++static void *psa_u32_to_ptr(uint32_t addr)
++{
++	return (void *)(uintptr_t)addr;
++}
++
++static uint32_t psa_ptr_to_u32(void *ptr)
++{
++	return (uintptr_t)ptr;
++}
++
++static uint32_t psa_ptr_const_to_u32(const void *ptr)
++{
++	return (uintptr_t)ptr;
++}
++
+ /*************************** PSA Client API **********************************/
+ 
+ /**
+diff --git a/components/service/common/psa_ipc/service_psa_ipc.c b/components/service/common/psa_ipc/service_psa_ipc.c
+index 5e5815dbc9cf..435c6c0a2eba 100644
+--- a/components/service/common/psa_ipc/service_psa_ipc.c
++++ b/components/service/common/psa_ipc/service_psa_ipc.c
+@@ -62,6 +62,11 @@ static size_t psa_call_out_vec_len(const struct psa_outvec *out_vec, size_t out_
+ 	return resp_len;
+ }
+ 
++static uint32_t psa_virt_to_phys_u32(struct rpc_caller *caller, void *va)
++{
++	return (uintptr_t)rpc_caller_virt_to_phys(caller, va);
++}
++
+ psa_handle_t psa_connect(struct rpc_caller *caller, uint32_t sid,
+ 			 uint32_t version)
+ {
+@@ -147,20 +152,20 @@ psa_status_t psa_call(struct rpc_caller *caller, psa_handle_t psa_handle,
+ 	req_msg->params.psa_call_params.handle = psa_handle;
+ 	req_msg->params.psa_call_params.type = type;
+ 	req_msg->params.psa_call_params.in_len = in_len;
+-	req_msg->params.psa_call_params.in_vec = rpc_caller_virt_to_phys(caller, in_vec_param);
++	req_msg->params.psa_call_params.in_vec = psa_virt_to_phys_u32(caller, in_vec_param);
+ 	req_msg->params.psa_call_params.out_len = out_len;
+-	req_msg->params.psa_call_params.out_vec = rpc_caller_virt_to_phys(caller, out_vec_param);
++	req_msg->params.psa_call_params.out_vec = psa_virt_to_phys_u32(caller, out_vec_param);
+ 
+ 	for (i = 0; i < in_len; i++) {
+-		in_vec_param[i].base = rpc_caller_virt_to_phys(caller, payload);
++		in_vec_param[i].base = psa_virt_to_phys_u32(caller, payload);
+ 		in_vec_param[i].len = in_vec[i].len;
+ 
+-		memcpy(payload, in_vec[i].base, in_vec[i].len);
++		memcpy(payload, psa_u32_to_ptr(in_vec[i].base), in_vec[i].len);
+ 		payload += in_vec[i].len;
+ 	}
+ 
+ 	for (i = 0; i < out_len; i++) {
+-		out_vec_param[i].base = NULL;
++		out_vec_param[i].base = 0;
+ 		out_vec_param[i].len = out_vec[i].len;
+ 	}
+ 
+@@ -182,11 +187,12 @@ psa_status_t psa_call(struct rpc_caller *caller, psa_handle_t psa_handle,
+ 		goto caller_end;
+ 
+ 	out_vec_param = (struct psa_outvec *)rpc_caller_phys_to_virt(caller,
+-						     resp_msg->params.out_vec);
++				psa_u32_to_ptr(resp_msg->params.out_vec));
+ 
+ 	for (i = 0; i < resp_msg->params.out_len; i++) {
+                 out_vec[i].len = out_vec_param[i].len;
+-		memcpy(out_vec[i].base, rpc_caller_phys_to_virt(caller, out_vec_param[i].base),
++		memcpy(psa_u32_to_ptr(out_vec[i].base),
++		       rpc_caller_phys_to_virt(caller,	psa_u32_to_ptr(out_vec_param[i].base)),
+ 		       out_vec[i].len);
+ 	}
+ 
+diff --git a/components/service/secure_storage/backend/secure_storage_ipc/secure_storage_ipc.c b/components/service/secure_storage/backend/secure_storage_ipc/secure_storage_ipc.c
+index a1f369db253e..bda442a61d5c 100644
+--- a/components/service/secure_storage/backend/secure_storage_ipc/secure_storage_ipc.c
++++ b/components/service/secure_storage/backend/secure_storage_ipc/secure_storage_ipc.c
+@@ -22,9 +22,9 @@ static psa_status_t secure_storage_ipc_set(void *context, uint32_t client_id,
+ 	psa_handle_t psa_handle;
+ 	psa_status_t psa_status;
+ 	struct psa_invec in_vec[] = {
+-		{ .base = &uid, .len = sizeof(uid) },
+-		{ .base = p_data, .len = data_length },
+-		{ .base = &create_flags, .len = sizeof(create_flags) },
++		{ .base = psa_ptr_to_u32(&uid), .len = sizeof(uid) },
++		{ .base = psa_ptr_const_to_u32(p_data), .len = data_length },
++		{ .base = psa_ptr_to_u32(&create_flags), .len = sizeof(create_flags) },
+ 	};
+ 
+ 	(void)client_id;
+@@ -53,11 +53,11 @@ static psa_status_t secure_storage_ipc_get(void *context,
+ 	psa_status_t psa_status;
+ 	uint32_t offset = (uint32_t)data_offset;
+ 	struct psa_invec in_vec[] = {
+-		{ .base = &uid, .len = sizeof(uid) },
+-		{ .base = &offset, .len = sizeof(offset) },
++		{ .base = psa_ptr_to_u32(&uid), .len = sizeof(uid) },
++		{ .base = psa_ptr_to_u32(&offset), .len = sizeof(offset) },
+ 	};
+ 	struct psa_outvec out_vec[] = {
+-		{ .base = p_data, .len = data_size },
++		{ .base = psa_ptr_to_u32(p_data), .len = data_size },
+ 	};
+ 
+ 	if (!p_data_length) {
+@@ -84,10 +84,10 @@ static psa_status_t secure_storage_ipc_get_info(void *context,
+ 	psa_handle_t psa_handle;
+ 	psa_status_t psa_status;
+ 	struct psa_invec in_vec[] = {
+-		{ .base = &uid, .len = sizeof(uid) },
++		{ .base = psa_ptr_to_u32(&uid), .len = sizeof(uid) },
+ 	};
+ 	struct psa_outvec out_vec[] = {
+-		{ .base = p_info, .len = sizeof(*p_info) },
++		{ .base = psa_ptr_to_u32(p_info), .len = sizeof(*p_info) },
+ 	};
+ 
+ 	(void)client_id;
+@@ -110,7 +110,7 @@ static psa_status_t secure_storage_ipc_remove(void *context,
+ 	psa_handle_t psa_handle;
+ 	psa_status_t psa_status;
+ 	struct psa_invec in_vec[] = {
+-		{ .base = &uid, .len = sizeof(uid) },
++		{ .base = psa_ptr_to_u32(&uid), .len = sizeof(uid) },
+ 	};
+ 
+ 	(void)client_id;
+@@ -164,7 +164,7 @@ static uint32_t secure_storage_get_support(void *context, uint32_t client_id)
+ 	psa_status_t psa_status;
+ 	uint32_t support_flags;
+ 	struct psa_outvec out_vec[] = {
+-		{ .base = &support_flags, .len =  sizeof(support_flags) },
++		{ .base = psa_ptr_to_u32(&support_flags), .len =  sizeof(support_flags) },
+ 	};
+ 
+ 	(void)client_id;
+-- 
+2.38.0
+

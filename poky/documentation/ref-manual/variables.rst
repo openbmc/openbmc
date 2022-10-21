@@ -773,7 +773,7 @@ system and gives an overview of their function and contents.
          and `glob <https://docs.python.org/3/library/glob.html>`__.
 
       For more information on how this variable works, see
-      ``meta/classes/binconfig.bbclass`` in the :term:`Source Directory`.
+      ``meta/classes-recipe/binconfig.bbclass`` in the :term:`Source Directory`.
       You can also find general
       information on the class in the
       ":ref:`ref-classes-binconfig`" section.
@@ -920,10 +920,10 @@ system and gives an overview of their function and contents.
       and sdk). If you want to track changes to build history over time,
       you should set this value to "1".
 
-      By default, the :ref:`buildhistory <ref-classes-buildhistory>` class does not commit the build
-      history output in a local Git repository::
+      By default, the :ref:`buildhistory <ref-classes-buildhistory>` class
+      enables committing the buildhistory output in a local Git repository::
 
-         BUILDHISTORY_COMMIT ?= "0"
+         BUILDHISTORY_COMMIT ?= "1"
 
    :term:`BUILDHISTORY_COMMIT_AUTHOR`
       When inheriting the :ref:`buildhistory <ref-classes-buildhistory>`
@@ -1171,12 +1171,10 @@ system and gives an overview of their function and contents.
       packages for all the packages explicitly (or implicitly) installed in
       an image.
 
-      .. note::
-
-         The :term:`COMPLEMENTARY_GLOB` variable uses Unix filename pattern matching
-         (`fnmatch <https://docs.python.org/3/library/fnmatch.html#module-fnmatch>`__),
-         which is similar to the Unix style pathname pattern expansion
-         (`glob <https://docs.python.org/3/library/glob.html>`__).
+      The :term:`COMPLEMENTARY_GLOB` variable uses Unix filename pattern matching
+      (`fnmatch <https://docs.python.org/3/library/fnmatch.html#module-fnmatch>`__),
+      which is similar to the Unix style pathname pattern expansion
+      (`glob <https://docs.python.org/3/library/glob.html>`__).
 
       The resulting list of complementary packages is associated with an
       item that can be added to
@@ -1190,6 +1188,11 @@ system and gives an overview of their function and contents.
       wildcard. Here is an example::
 
          COMPLEMENTARY_GLOB[dev-pkgs] = '*-dev'
+
+      .. note::
+
+         When installing complementary packages, recommends relationships
+         (set via :term:`RRECOMMENDS`) are always ignored.
 
    :term:`COMPONENTS_DIR`
       Stores sysroot components for each recipe. The OpenEmbedded build
@@ -1466,15 +1469,31 @@ system and gives an overview of their function and contents.
          # This is windows only issue.
          CVE_CHECK_IGNORE += "CVE-2020-15523"
 
+   :term:`CVE_CHECK_SHOW_WARNINGS`
+      Specifies whether or not the :ref:`cve-check <ref-classes-cve-check>`
+      class should generate warning messages on the console when unpatched
+      CVEs are found. The default is "1", but you may wish to set it to "0" if
+      you are already examining/processing the logs after the build has
+      completed and thus do not need the warning messages.
+
    :term:`CVE_CHECK_SKIP_RECIPE`
       The list of package names (:term:`PN`) for which
       CVEs (Common Vulnerabilities and Exposures) are ignored.
+
+   :term:`CVE_DB_UPDATE_INTERVAL`
+      Specifies the CVE database update interval in seconds, as used by
+      ``cve-update-db-native``. The default value is "86400" i.e. once a day
+      (24*60*60). If the value is set to "0" then the update will be forced
+      every time. Alternatively, a negative value e.g. "-1" will disable
+      updates entirely.
 
    :term:`CVE_PRODUCT`
       In a recipe, defines the name used to match the recipe name
       against the name in the upstream `NIST CVE database <https://nvd.nist.gov/>`__.
 
-      The default is ${:term:`BPN`}. If it does not match the name in the NIST CVE
+      The default is ${:term:`BPN`} (except for recipes that inherit the
+      :ref:`pypi <ref-classes-pypi>` class where it is set based upon
+      :term:`PYPI_PACKAGE`). If it does not match the name in the NIST CVE
       database or matches with multiple entries in the database, the default
       value needs to be changed.
 
@@ -1812,6 +1831,23 @@ system and gives an overview of their function and contents.
       :term:`DESCRIPTION` takes the value of the :term:`SUMMARY`
       variable.
 
+   :term:`DEV_PKG_DEPENDENCY`
+      Provides an easy way for recipes to disable or adjust the runtime
+      dependency (:term:`RDEPENDS`) of the ``${PN}-dev`` package on the main
+      (``${PN}``) package, particularly where the main package may be empty.
+
+   :term:`DISABLE_STATIC`
+      Used in order to disable static linking by default (in order to save
+      space, since static libraries are often unused in embedded systems.)
+      The default value is " --disable-static", however it can be set to ""
+      in order to enable static linking if desired. Certain recipes do this
+      individually, and also there is a
+      ``meta/conf/distro/include/no-static-libs.inc`` include file that
+      disables static linking for a number of recipes. Some software
+      packages or build tools (such as CMake) have explicit support for
+      enabling / disabling static linking, and in those cases
+      :term:`DISABLE_STATIC` is not used.
+
    :term:`DISTRO`
       The short name of the distribution. For information on the long name
       of the distribution, see the :term:`DISTRO_NAME`
@@ -2029,7 +2065,7 @@ system and gives an overview of their function and contents.
       available are xz and bz2.
 
       For information on policies and on how to use this variable, see the
-      comments in the ``meta/classes/compress_doc.bbclass`` file.
+      comments in the ``meta/classes-recipe/compress_doc.bbclass`` file.
 
    :term:`EFI_PROVIDER`
       When building bootable images (i.e. where ``hddimg``, ``iso``, or
@@ -2197,7 +2233,7 @@ system and gives an overview of their function and contents.
       variable tells the OpenEmbedded build system to prefer the installed
       external tools. See the
       :ref:`kernel-yocto <ref-classes-kernel-yocto>` class in
-      ``meta/classes`` to see how the variable is used.
+      ``meta/classes-recipe`` to see how the variable is used.
 
    :term:`EXTERNALSRC`
       When inheriting the :ref:`externalsrc <ref-classes-externalsrc>`
@@ -2574,7 +2610,7 @@ system and gives an overview of their function and contents.
       :term:`SRC_URI` statements.
 
       The default value for the :term:`FILESPATH` variable is defined in the
-      :ref:`ref-classes-base` class found in ``meta/classes`` in the
+      :ref:`ref-classes-base` class found in ``meta/classes-global`` in the
       :term:`Source Directory`::
 
          FILESPATH = "${@base_set_filespath(["${FILE_DIRNAME}/${BP}", \
@@ -2687,6 +2723,10 @@ system and gives an overview of their function and contents.
       Specifies the signature algorithm used in creating the FIT Image.
       For e.g. rsa2048.
 
+   :term:`FIT_PAD_ALG`
+      Specifies the padding algorithm used in creating the FIT Image.
+      The default value is "pkcs-1.5".
+
    :term:`FIT_SIGN_INDIVIDUAL`
       If set to "1", then the :ref:`kernel-fitimage <ref-classes-kernel-fitimage>`
       class will sign the kernel, dtb and ramdisk images individually in addition
@@ -2755,6 +2795,13 @@ system and gives an overview of their function and contents.
    :term:`GITDIR`
       The directory in which a local copy of a Git repository is stored
       when it is cloned.
+
+   :term:`GITHUB_BASE_URI`
+      When inheriting the :ref:`github-releases <ref-classes-github-releases>`
+      class, specifies the base URL for fetching releases for the github
+      project you wish to fetch sources from. The default value is as follows::
+
+         GITHUB_BASE_URI ?= "https://github.com/${BPN}/${BPN}/releases/"
 
    :term:`GLIBC_GENERATE_LOCALES`
       Specifies the list of GLIBC locales to generate should you not wish
@@ -3041,17 +3088,23 @@ system and gives an overview of their function and contents.
       material for Wic is located in the
       ":doc:`/ref-manual/kickstart`" chapter.
 
+   :term:`IMAGE_BUILDINFO_FILE`
+      When using the :ref:`image-buildinfo <ref-classes-image-buildinfo>` class,
+      specifies the file in the image to write the build information into. The
+      default value is "``${sysconfdir}/buildinfo``".
+
+   :term:`IMAGE_BUILDINFO_VARS`
+      When using the :ref:`image-buildinfo <ref-classes-image-buildinfo>` class,
+      specifies the list of variables to include in the `Build Configuration`
+      section of the output file (as a space-separated list). Defaults to
+      ":term:`DISTRO` :term:`DISTRO_VERSION`".
+
    :term:`IMAGE_CLASSES`
-      A list of classes that all images should inherit. You typically use
-      this variable to specify the list of classes that register the
-      different types of images the OpenEmbedded build system creates.
+      A list of classes that all images should inherit. This is typically used
+      to enable functionality across all image recipes.
 
-      The default value for :term:`IMAGE_CLASSES` is ``image_types``. You can
-      set this variable in your ``local.conf`` or in a distribution
-      configuration file.
-
-      For more information, see ``meta/classes/image_types.bbclass`` in the
-      :term:`Source Directory`.
+      Classes specified in :term:`IMAGE_CLASSES` must be located in the
+      ``classes-recipe/`` or ``classes/`` subdirectories.
 
    :term:`IMAGE_CMD`
       Specifies the command to create the image file for a specific image
@@ -3067,7 +3120,7 @@ system and gives an overview of their function and contents.
       You typically do not need to set this variable unless you are adding
       support for a new image type. For more examples on how to set this
       variable, see the :ref:`image_types <ref-classes-image_types>`
-      class file, which is ``meta/classes/image_types.bbclass``.
+      class file, which is ``meta/classes-recipe/image_types.bbclass``.
 
    :term:`IMAGE_DEVICE_TABLES`
       Specifies one or more files that contain custom device tables that
@@ -3463,7 +3516,7 @@ system and gives an overview of their function and contents.
       - wic.lzma
 
       For more information about these types of images, see
-      ``meta/classes/image_types*.bbclass`` in the :term:`Source Directory`.
+      ``meta/classes-recipe/image_types*.bbclass`` in the :term:`Source Directory`.
 
    :term:`IMAGE_VERSION_SUFFIX`
       Version suffix that is part of the default :term:`IMAGE_NAME` and
@@ -3546,7 +3599,7 @@ system and gives an overview of their function and contents.
 
 
          Although you can use other settings, you might be required to
-         remove dependencies on or provide alternatives to components that
+         remove dependencies on (or provide alternatives to) components that
          are required to produce a functional system image.
 
    :term:`INCOMPATIBLE_LICENSE_EXCEPTIONS`
@@ -3562,6 +3615,8 @@ system and gives an overview of their function and contents.
       functions in the class or classes are not executed for the base
       configuration and in each individual recipe. The OpenEmbedded build
       system ignores changes to :term:`INHERIT` in individual recipes.
+      Classes inherited using :term:`INHERIT` must be located in the
+      ``classes-global/`` or ``classes/`` subdirectories.
 
       For more information on :term:`INHERIT`, see the
       :ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:\`\`inherit\`\` configuration directive`"
@@ -3570,6 +3625,9 @@ system and gives an overview of their function and contents.
    :term:`INHERIT_DISTRO`
       Lists classes that will be inherited at the distribution level. It is
       unlikely that you want to edit this variable.
+
+      Classes specified in :term:`INHERIT_DISTRO` must be located in the
+      ``classes-global/`` or ``classes/`` subdirectories.
 
       The default value of the variable is set as follows in the
       ``meta/conf/distro/defaultsetup.conf`` file::
@@ -3786,7 +3844,7 @@ system and gives an overview of their function and contents.
 
    :term:`INITRAMFS_LINK_NAME`
       The link name of the initial RAM filesystem image. This variable is
-      set in the ``meta/classes/kernel-artifact-names.bbclass`` file as
+      set in the ``meta/classes-recipe/kernel-artifact-names.bbclass`` file as
       follows::
 
          INITRAMFS_LINK_NAME ?= "initramfs-${KERNEL_ARTIFACT_LINK_NAME}"
@@ -3812,7 +3870,7 @@ system and gives an overview of their function and contents.
 
    :term:`INITRAMFS_NAME`
       The base name of the initial RAM filesystem image. This variable is
-      set in the ``meta/classes/kernel-artifact-names.bbclass`` file as
+      set in the ``meta/classes-recipe/kernel-artifact-names.bbclass`` file as
       follows::
 
          INITRAMFS_NAME ?= "initramfs-${KERNEL_ARTIFACT_NAME}"
@@ -4022,7 +4080,7 @@ system and gives an overview of their function and contents.
       variable.
 
       The value of :term:`KERNEL_ARTIFACT_NAME`, which is set in the
-      ``meta/classes/kernel-artifact-names.bbclass`` file, has the
+      ``meta/classes-recipe/kernel-artifact-names.bbclass`` file, has the
       following default value::
 
          KERNEL_ARTIFACT_NAME ?= "${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
@@ -4035,7 +4093,7 @@ system and gives an overview of their function and contents.
       :ref:`kernel <ref-classes-kernel>` class should inherit. You
       typically append this variable to enable extended image types. An
       example is the "kernel-fitimage", which enables fitImage support and
-      resides in ``meta/classes/kernel-fitimage.bbclass``. You can register
+      resides in ``meta/classes-recipe/kernel-fitimage.bbclass``. You can register
       custom kernel image types with the :ref:`kernel <ref-classes-kernel>` class using this
       variable.
 
@@ -4043,6 +4101,12 @@ system and gives an overview of their function and contents.
       If set to "1", enables timestamping functionality during building
       the kernel. The default is "0" to disable this for reproducibility
       reasons.
+
+   :term:`KERNEL_DEPLOY_DEPEND`
+      Provides a means of controlling the dependency of an image recipe
+      on the kernel. The default value is "virtual/kernel:do_deploy",
+      however for a small initramfs image or other images that do not
+      need the kernel, this can be set to "" in the image recipe.
 
    :term:`KERNEL_DEVICETREE`
       Specifies the name of the generated Linux kernel device tree (i.e.
@@ -4059,7 +4123,7 @@ system and gives an overview of their function and contents.
 
    :term:`KERNEL_DTB_LINK_NAME`
       The link name of the kernel device tree binary (DTB). This variable
-      is set in the ``meta/classes/kernel-artifact-names.bbclass`` file as
+      is set in the ``meta/classes-recipe/kernel-artifact-names.bbclass`` file as
       follows::
 
          KERNEL_DTB_LINK_NAME ?= "${KERNEL_ARTIFACT_LINK_NAME}"
@@ -4075,7 +4139,7 @@ system and gives an overview of their function and contents.
 
    :term:`KERNEL_DTB_NAME`
       The base name of the kernel device tree binary (DTB). This variable
-      is set in the ``meta/classes/kernel-artifact-names.bbclass`` file as
+      is set in the ``meta/classes-recipe/kernel-artifact-names.bbclass`` file as
       follows::
 
          KERNEL_DTB_NAME ?= "${KERNEL_ARTIFACT_NAME}"
@@ -4126,7 +4190,7 @@ system and gives an overview of their function and contents.
 
    :term:`KERNEL_FIT_LINK_NAME`
       The link name of the kernel flattened image tree (FIT) image. This
-      variable is set in the ``meta/classes/kernel-artifact-names.bbclass``
+      variable is set in the ``meta/classes-recipe/kernel-artifact-names.bbclass``
       file as follows::
 
          KERNEL_FIT_LINK_NAME ?= "${KERNEL_ARTIFACT_LINK_NAME}"
@@ -4142,7 +4206,7 @@ system and gives an overview of their function and contents.
 
    :term:`KERNEL_FIT_NAME`
       The base name of the kernel flattened image tree (FIT) image. This
-      variable is set in the ``meta/classes/kernel-artifact-names.bbclass``
+      variable is set in the ``meta/classes-recipe/kernel-artifact-names.bbclass``
       file as follows::
 
          KERNEL_FIT_NAME ?= "${KERNEL_ARTIFACT_NAME}"
@@ -4154,7 +4218,7 @@ system and gives an overview of their function and contents.
 
    :term:`KERNEL_IMAGE_LINK_NAME`
       The link name for the kernel image. This variable is set in the
-      ``meta/classes/kernel-artifact-names.bbclass`` file as follows::
+      ``meta/classes-recipe/kernel-artifact-names.bbclass`` file as follows::
 
          KERNEL_IMAGE_LINK_NAME ?= "${KERNEL_ARTIFACT_LINK_NAME}"
 
@@ -4182,7 +4246,7 @@ system and gives an overview of their function and contents.
 
    :term:`KERNEL_IMAGE_NAME`
       The base name of the kernel image. This variable is set in the
-      ``meta/classes/kernel-artifact-names.bbclass`` file as follows::
+      ``meta/classes-recipe/kernel-artifact-names.bbclass`` file as follows::
 
          KERNEL_IMAGE_NAME ?= "${KERNEL_ARTIFACT_NAME}"
 
@@ -4917,7 +4981,7 @@ system and gives an overview of their function and contents.
 
    :term:`MODULE_TARBALL_LINK_NAME`
       The link name of the kernel module tarball. This variable is set in
-      the ``meta/classes/kernel-artifact-names.bbclass`` file as follows::
+      the ``meta/classes-recipe/kernel-artifact-names.bbclass`` file as follows::
 
          MODULE_TARBALL_LINK_NAME ?= "${KERNEL_ARTIFACT_LINK_NAME}"
 
@@ -4931,7 +4995,7 @@ system and gives an overview of their function and contents.
 
    :term:`MODULE_TARBALL_NAME`
       The base name of the kernel module tarball. This variable is set in
-      the ``meta/classes/kernel-artifact-names.bbclass`` file as follows::
+      the ``meta/classes-recipe/kernel-artifact-names.bbclass`` file as follows::
 
          MODULE_TARBALL_NAME ?= "${KERNEL_ARTIFACT_NAME}"
 
@@ -4939,6 +5003,11 @@ system and gives an overview of their function and contents.
       which is set in the same file, has the following value::
 
          KERNEL_ARTIFACT_NAME ?= "${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
+
+   :term:`MOUNT_BASE`
+      On non-systemd systems (where ``udev-extraconf`` is being used),
+      specifies the base directory for auto-mounting filesystems. The
+      default value is "/run/media".
 
    :term:`MULTIMACH_TARGET_SYS`
       Uniquely identifies the type of the target system for which packages
@@ -5061,7 +5130,7 @@ system and gives an overview of their function and contents.
       ``sysroots/`` directory so that all builds that use the script will
       use the correct directories for the cross compiling layout.
 
-      See the ``meta/classes/binconfig.bbclass`` in the
+      See the ``meta/classes-recipe/binconfig.bbclass`` in the
       :term:`Source Directory` for details on how this class
       applies these additional sed command arguments.
 
@@ -5117,6 +5186,87 @@ system and gives an overview of their function and contents.
       ``meta/conf/bitbake.conf`` configuration file. You can override this
       default by setting the variable in a custom distribution
       configuration file.
+
+   :term:`OVERLAYFS_ETC_DEVICE`
+      When the :ref:`overlayfs-etc <ref-classes-overlayfs-etc>` class is
+      inherited, specifies the device to be mounted for the read/write
+      layer of ``/etc``. There is no default, so you must set this if you
+      wish to enable :ref:`overlayfs-etc <ref-classes-overlayfs-etc>`, for
+      example, assuming ``/dev/mmcblk0p2`` was the desired device::
+
+         OVERLAYFS_ETC_DEVICE = "/dev/mmcblk0p2"
+
+   :term:`OVERLAYFS_ETC_EXPOSE_LOWER`
+      When the :ref:`overlayfs-etc <ref-classes-overlayfs-etc>` class is
+      inherited, if set to "1" then a read-only access to the original
+      ``/etc`` content will be provided as a ``lower/`` subdirectory of
+      :term:`OVERLAYFS_ETC_MOUNT_POINT`. The default value is "0".
+
+   :term:`OVERLAYFS_ETC_FSTYPE`
+      When the :ref:`overlayfs-etc <ref-classes-overlayfs-etc>` class is
+      inherited, specifies the file system type for the read/write
+      layer of ``/etc``. There is no default, so you must set this if you
+      wish to enable :ref:`overlayfs-etc <ref-classes-overlayfs-etc>`,
+      for example, assuming the file system is ext4::
+
+         OVERLAYFS_ETC_FSTYPE = "ext4"
+
+   :term:`OVERLAYFS_ETC_MOUNT_OPTIONS`
+      When the :ref:`overlayfs-etc <ref-classes-overlayfs-etc>` class is
+      inherited, specifies the mount options for the read-write layer.
+      The default value is "defaults".
+
+   :term:`OVERLAYFS_ETC_MOUNT_POINT`
+      When the :ref:`overlayfs-etc <ref-classes-overlayfs-etc>` class is
+      inherited, specifies the parent mount path for the filesystem layers.
+      There is no default, so you must set this if you wish to enable
+      :ref:`overlayfs-etc <ref-classes-overlayfs-etc>`, for example if
+      the desired path is "/data"::
+
+         OVERLAYFS_ETC_MOUNT_POINT = "/data"
+
+   :term:`OVERLAYFS_ETC_USE_ORIG_INIT_NAME`
+      When the :ref:`overlayfs-etc <ref-classes-overlayfs-etc>` class is
+      inherited, controls how the generated init will be named. For more
+      information, see the :ref:`overlayfs-etc <ref-classes-overlayfs-etc>`
+      class documentation. The default value is "1".
+
+   :term:`OVERLAYFS_MOUNT_POINT`
+      When inheriting the :ref:`overlayfs <ref-classes-overlayfs>` class,
+      specifies mount point(s) to be used. For example::
+
+         OVERLAYFS_MOUNT_POINT[data] = "/data"
+
+      The assumes you have a ``data.mount`` systemd unit defined elsewhere
+      in your BSP (e.g. in ``systemd-machine-units`` recipe) and it is
+      installed into the image. For more information see
+      :ref:`overlayfs <ref-classes-overlayfs>`.
+
+      .. note::
+
+         Although the :ref:`overlayfs <ref-classes-overlayfs>` class is
+         inherited by individual recipes, :term:`OVERLAYFS_MOUNT_POINT`
+         should be set in your machine configuration.
+
+   :term:`OVERLAYFS_QA_SKIP`
+      When inheriting the :ref:`overlayfs <ref-classes-overlayfs>` class,
+      provides the ability to disable QA checks for particular overlayfs
+      mounts. For example::
+
+         OVERLAYFS_QA_SKIP[data] = "mount-configured"
+
+      .. note::
+
+         Although the :ref:`overlayfs <ref-classes-overlayfs>` class is
+         inherited by individual recipes, :term:`OVERLAYFS_QA_SKIP`
+         should be set in your machine configuration.
+
+   :term:`OVERLAYFS_WRITABLE_PATHS`
+      When inheriting the :ref:`overlayfs <ref-classes-overlayfs>` class,
+      specifies writable paths used at runtime for the recipe. For
+      example::
+
+         OVERLAYFS_WRITABLE_PATHS[data] = "/usr/share/my-custom-application"
 
    :term:`OVERRIDES`
       A colon-separated list of overrides that currently apply. Overrides
@@ -6142,6 +6292,14 @@ system and gives an overview of their function and contents.
 
       :term:`PV` is the default value of the :term:`PKGV` variable.
 
+   :term:`PYPI_PACKAGE`
+      When inheriting the :ref:`pypi <ref-classes-pypi>` class, specifies the
+      `PyPI <https://pypi.org/>`__ package name to be built. The default value
+      is set based upon :term:`BPN` (stripping any "python-" or "python3-"
+      prefix off if present), however for some packages it will need to be set
+      explicitly if that will not match the package name (e.g. where the
+      package name has a prefix, underscores, uppercase letters etc.)
+
    :term:`PYTHON_ABI`
       When used by recipes that inherit the
       :ref:`setuptools3 <ref-classes-setuptools3>` class, denotes the
@@ -6615,6 +6773,11 @@ system and gives an overview of their function and contents.
       The target architecture for the SDK. Typically, you do not directly
       set this variable. Instead, use :term:`SDKMACHINE`.
 
+   :term:`SDK_BUILDINFO_FILE`
+      When using the :ref:`image-buildinfo <ref-classes-image-buildinfo>` class,
+      specifies the file in the SDK to write the build information into. The
+      default value is "``/buildinfo``".
+
    :term:`SDK_CUSTOM_TEMPLATECONF`
       When building the extensible SDK, if :term:`SDK_CUSTOM_TEMPLATECONF` is set to
       "1" and a ``conf/templateconf.cfg`` file exists in the build directory
@@ -6813,6 +6976,10 @@ system and gives an overview of their function and contents.
       ":ref:`sdk-manual/appendix-customizing:changing the extensible sdk installer title`"
       section in the Yocto Project Application Development and the
       Extensible Software Development Kit (eSDK) manual.
+
+   :term:`SDK_TOOLCHAIN_LANGS`
+      Specifies programming languages to support in the SDK, as a
+      space-separated list. Currently supported items are ``rust`` and ``go``.
 
    :term:`SDK_UPDATE_URL`
       An optional URL for an update server for the extensible SDK. If set,
@@ -8217,7 +8384,7 @@ system and gives an overview of their function and contents.
       on enabling, running, and writing these tests, see the
       ":ref:`dev-manual/common-tasks:performing automated runtime testing`"
       section in the Yocto Project Development Tasks Manual and the
-      ":ref:`ref-classes-testimage*`" section.
+      ":ref:`ref-classes-testimage`" section.
 
    :term:`THISDIR`
       The directory in which the file BitBake is currently parsing is
@@ -8529,6 +8696,10 @@ system and gives an overview of their function and contents.
       If :term:`UBOOT_MKIMAGE_DTCOPTS` is not set then kernel-fitimage will not
       pass the ``-D`` option to mkimage.
 
+   :term:`UBOOT_MKIMAGE_KERNEL_TYPE`
+      Specifies the type argument for the kernel as passed to ``uboot-mkimage``.
+      The default value is "kernel".
+
    :term:`UBOOT_MKIMAGE_SIGN`
       Specifies the name of the mkimage command as used by the
       :ref:`kernel-fitimage <ref-classes-kernel-fitimage>` class to sign
@@ -8696,6 +8867,9 @@ system and gives an overview of their function and contents.
       A list of classes to globally inherit. These classes are used by the
       OpenEmbedded build system to enable extra features.
 
+      Classes inherited using :term:`USER_CLASSES` must be located in the
+      ``classes-global/`` or ``classes/`` subdirectories.
+
       The default list is set in your ``local.conf`` file::
 
          USER_CLASSES ?= "buildstats"
@@ -8843,6 +9017,15 @@ system and gives an overview of their function and contents.
       your distribution configuration file. For a list of the checks you
       can control with this variable, see the
       ":ref:`ref-classes-insane`" section.
+
+   :term:`WATCHDOG_TIMEOUT`
+      Specifies the timeout in seconds used by the ``watchdog`` recipe and
+      also by ``systemd`` during reboot. The default is 60 seconds.
+
+   :term:`WIRELESS_DAEMON`
+      For ``connman`` and ``packagegroup-base``, specifies the wireless
+      daemon to use. The default is "wpa-supplicant" (note that the value
+      uses a dash and not an underscore).
 
    :term:`WKS_FILE`
       Specifies the location of the Wic kickstart file that is used by the

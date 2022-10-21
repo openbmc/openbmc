@@ -853,7 +853,7 @@ This step in the build process consists of the following tasks:
    variables. For information on how this variable works within that
    class, see the
    :ref:`autotools <ref-classes-autotools>` class
-   :yocto_git:`here </poky/tree/meta/classes/autotools.bbclass>`.
+   :yocto_git:`here </poky/tree/meta/classes-recipe/autotools.bbclass>`.
 
 -  *do_compile*: Once a configuration task has been satisfied,
    BitBake compiles the source using the
@@ -931,7 +931,7 @@ The :term:`FILES` variable defines the
 files that go into each package in
 :term:`PACKAGES`. If you want
 details on how this is accomplished, you can look at
-:yocto_git:`package.bbclass </poky/tree/meta/classes/package.bbclass>`.
+:yocto_git:`package.bbclass </poky/tree/meta/classes-global/package.bbclass>`.
 
 Depending on the type of packages being created (RPM, DEB, or IPK), the
 :ref:`do_package_write_* <ref-tasks-package_write_deb>`
@@ -1014,7 +1014,7 @@ processing includes creation of a manifest file and optimizations.
 The manifest file (``.manifest``) resides in the same directory as the
 root filesystem image. This file lists out, line-by-line, the installed
 packages. The manifest file is useful for the
-:ref:`testimage <ref-classes-testimage*>` class,
+:ref:`testimage <ref-classes-testimage>` class,
 for example, to determine whether or not to run specific tests. See the
 :term:`IMAGE_MANIFEST`
 variable for additional information.
@@ -1431,7 +1431,7 @@ toolchain construction and use.
    :width: 100%
 
 Most of the work occurs on the Build Host. This is the machine used to
-build images and generally work within the the Yocto Project
+build images and generally work within the Yocto Project
 environment. When you run
 :term:`BitBake` to create an image, the
 OpenEmbedded build system uses the host ``gcc`` compiler to bootstrap a

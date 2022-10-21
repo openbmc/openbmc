@@ -95,7 +95,7 @@ Fixes in Yocto-4.0.4
 -  linux-yocto/5.15: update genericx86* machines to v5.15.59
 -  linux-yocto/5.15: update to v5.15.62
 -  linux-yocto: Fix COMPATIBLE_MACHINE regex match
--  linux-yocto: prepend the the value with a space when append to KERNEL_EXTRA_ARGS
+-  linux-yocto: prepend the value with a space when append to KERNEL_EXTRA_ARGS
 -  lttng-modules: fix 5.19+ build
 -  lttng-modules: fix build against mips and v5.19 kernel
 -  lttng-modules: fix build for kernel 5.10.137
@@ -226,7 +226,7 @@ Contributors to Yocto-4.0.4
 -  Yongxin Liu
 -  ghassaneben
 -  pgowda
--  wangmy
+-  Wang Mingyu
 
 Repositories / Downloads for Yocto-4.0.4
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

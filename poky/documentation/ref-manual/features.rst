@@ -72,6 +72,8 @@ Project metadata:
 
 -  *phone:* Mobile phone (voice) support
 
+-  *qemu-usermode:* QEMU can support user-mode emulation for this machine
+
 -  *qvga:* Machine has a QVGA (320x240) display
 
 -  *rtc:* Machine has a Real-Time Clock
@@ -112,6 +114,13 @@ configuration level. See the
 :term:`COMBINED_FEATURES` variable for more
 information.
 
+.. note::
+
+   :term:`DISTRO_FEATURES` is normally independent of kernel configuration,
+   so if a feature specified in :term:`DISTRO_FEATURES` also relies on
+   support in the kernel, you will also need to ensure that support is
+   enabled in the kernel configuration.
+
 This list only represents features as shipped with the Yocto Project
 metadata, as extra layers can define their own:
 
@@ -143,6 +152,9 @@ metadata, as extra layers can define their own:
 -  *ext2:* Include tools for supporting for devices with internal
    HDD/Microdrive for storing files (instead of Flash only devices).
 
+-  *gobject-introspection-data:* Include data to support
+   `GObject Introspection <https://gi.readthedocs.io/en/latest/>`__.
+
 -  *ipsec:* Include IPSec support.
 
 -  *ipv4:* Include IPv4 support.
@@ -152,14 +164,16 @@ metadata, as extra layers can define their own:
 -  *keyboard:* Include keyboard support (e.g. keymaps will be loaded
    during boot).
 
--  *largefile:* Enable building applications with
-   `argefile support <https://en.wikipedia.org/wiki/Large-file_support>`__.
-
 -  *multiarch:* Enable building applications with multiple architecture
    support.
 
+-  *ld-is-gold:* Use the `gold <https://en.wikipedia.org/wiki/Gold_(linker)>`__
+   linker instead of the standard GCC linker (bfd).
+
 -  *ldconfig:* Include support for ldconfig and ``ld.so.conf`` on the
    target.
+
+-  *lto:* Enable `Link-Time Optimisation <https://gcc.gnu.org/wiki/LinkTimeOptimization>`__.
 
 -  *nfc:* Include support for
    `Near Field Communication <https://en.wikipedia.org/wiki/Near-field_communication>`__.
@@ -167,13 +181,23 @@ metadata, as extra layers can define their own:
 -  *nfs:* Include NFS client support (for mounting NFS exports on
    device).
 
+-  *nls:* Include National Language Support (NLS).
+
 -  *opengl:* Include the Open Graphics Library, which is a
    cross-language, multi-platform application programming interface used
    for rendering two and three-dimensional graphics.
 
+-  *overlayfs:* Include `OverlayFS <https://docs.kernel.org/filesystems/overlayfs.html>`__
+   support.
+
+-  *pam:* Include `Pluggable Authentication Module (PAM) <https://en.wikipedia.org/wiki/Pluggable_authentication_module>`__
+   support.
+
 -  *pci:* Include PCI bus support.
 
 -  *pcmcia:* Include PCMCIA/CompactFlash support.
+
+-  *polkit:* Include `Polkit <https://en.wikipedia.org/wiki/Polkit>`__ support.
 
 -  *ppp:* Include PPP dialup support.
 
@@ -181,6 +205,13 @@ metadata, as extra layers can define their own:
    individual recipes. For more information on package tests, see the
    ":ref:`dev-manual/common-tasks:testing packages with ptest`" section
    in the Yocto Project Development Tasks Manual.
+
+-  *pulseaudio:* Include support for
+   `PulseAudio <https://www.freedesktop.org/wiki/Software/PulseAudio/>`__.
+
+-  *selinux:* Include support for
+   `Security-Enhanced Linux (SELinux) <https://en.wikipedia.org/wiki/Security-Enhanced_Linux>`__
+   (requires `meta-selinux <https://layers.openembedded.org/layerindex/layer/meta-selinux/>`__).
 
 -  *seccomp:* Enables building applications with
    `seccomp <https://en.wikipedia.org/wiki/Seccomp>`__ support, to
@@ -273,6 +304,9 @@ Here are the image features available for all images:
        just disables the mechanism which forces an non-empty password for the
        root user.
 
+-  *lic-pkgs:* Installs license packages for all packages installed in a
+   given image.
+
 -  *overlayfs-etc:* Configures the ``/etc`` directory to be in ``overlayfs``.
    This allows to store device specific information elsewhere, especially
    if the root filesystem is configured to be read-only.
@@ -297,12 +331,29 @@ Here are the image features available for all images:
    section in the Yocto Project Development Tasks Manual for more
    information.
 
+-  *read-only-rootfs-delayed-postinsts:* when specified in conjunction
+   with ``read-only-rootfs``, specifies that post-install scripts are
+   still permitted (this assumes that the root filesystem will be made
+   writeable for the first boot; this feature does not do anything to
+   ensure that - it just disables the check for post-install scripts.)
+
+-  *serial-autologin-root:* when specified in conjunction with
+   ``empty-root-password`` will automatically login as root on the
+   serial console. This of course opens up a security hole if the
+   serial console is potentially accessible to an attacker, so use
+   with caution.
+
 -  *splash:* Enables showing a splash screen during boot. By default,
    this screen is provided by ``psplash``, which does allow
    customization. If you prefer to use an alternative splash screen
    package, you can do so by setting the ``SPLASH`` variable to a
    different package name (or names) within the image recipe or at the
    distro configuration level.
+
+-  *stateless-rootfs:*: specifies that the image should be created as
+   stateless - when using ``systemd``, ``systemctl-native`` will not
+   be run on the image, leaving the image for population at runtime by
+   systemd.
 
 -  *staticdev-pkgs:* Installs static development packages, which are
    static libraries (i.e. ``*.a`` files), for all packages installed in
@@ -322,6 +373,21 @@ these valid features is as follows:
 
 -  *ssh-server-dropbear:* Installs the Dropbear minimal SSH server.
 
+   .. note::
+
+      As of the 4.1 release, the ``ssh-server-dropbear`` feature also
+      recommends the ``openssh-sftp-server`` package, which by default
+      will be pulled into the image. This is because recent versions of
+      the OpenSSH ``scp`` client now use the SFTP protocol, and thus
+      require an SFTP server to be present to connect to. However, if
+      you wish to use the Dropbear ssh server `without` the SFTP server
+      installed, you can either remove ``ssh-server-dropbear`` from
+      ``IMAGE_FEATURES`` and add ``dropbear`` to :term:`IMAGE_INSTALL`
+      instead, or alternatively still use the feature but set
+      :term:`BAD_RECOMMENDATIONS` as follows::
+
+         BAD_RECOMMENDATIONS += "openssh-sftp-server"
+
 -  *ssh-server-openssh:* Installs the OpenSSH SSH server, which is more
    full-featured than Dropbear. Note that if both the OpenSSH SSH server
    and the Dropbear minimal SSH server are present in
@@ -338,6 +404,8 @@ these valid features is as follows:
 
 -  *tools-testapps:* Installs device testing tools (e.g. touchscreen
    debugging).
+
+-  *weston:* Installs Weston (reference Wayland environment).
 
 -  *x11:* Installs the X server.
 

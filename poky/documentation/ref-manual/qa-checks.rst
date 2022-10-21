@@ -748,6 +748,22 @@ Errors and Warnings
     other things in the patches, those can be discarded.
 
 
+.. _qa-check-buildpaths:
+
+- ``File <filename> in package <packagename> contains reference to TMPDIR [buildpaths]``
+
+    This check ensures that build system paths (including :term:`TMPDIR`) do not
+    appear in output files, which not only leaks build system configuration into
+    the target, but also hinders binary reproducibility as the output will change
+    if the build system configuration changes.
+
+    Typically these paths will enter the output through some mechanism in the
+    configuration or compilation of the software being built by the recipe. To
+    resolve this issue you will need to determine how the detected path is
+    entering the output. Sometimes it may require adjusting scripts or code to
+    use a relative path rather than an absolute one, or to pick up the path from
+    runtime configuration or environment variables.
+
 
 Configuring and Disabling QA Checks
 ===================================

@@ -497,8 +497,8 @@ your Yocto Project build host:
    launch your WSL distribution just like any other application.
 
 6. *Optimize your WSLv2 storage often:* Due to the way storage is
-   handled on WSLv2, the storage space used by the undelying Linux
-   distribution is not reflected immedately, and since BitBake heavily
+   handled on WSLv2, the storage space used by the underlying Linux
+   distribution is not reflected immediately, and since BitBake heavily
    uses storage, after several builds, you may be unaware you are
    running out of space. WSLv2 uses a VHDX file for storage, this issue
    can be easily avoided by manually optimizing this file often, this

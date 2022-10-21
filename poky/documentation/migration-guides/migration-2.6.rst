@@ -319,7 +319,7 @@ This section provides information about automatic testing changes:
    practices now dictate that you use the
    :term:`IMAGE_CLASSES` variable rather than the
    :term:`INHERIT` variable when you inherit the
-   :ref:`testimage <ref-classes-testimage*>` and
+   :ref:`testimage <ref-classes-testimage>` and
    :ref:`testsdk <ref-classes-testsdk>` classes used for automatic
    testing.
 

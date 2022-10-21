@@ -1,0 +1,72 @@
+From d9169d380366afc63af5d4bf02791aeb41f47897 Mon Sep 17 00:00:00 2001
+From: Satish Kumar <satish.kumar01@arm.com>
+Date: Sun, 12 Dec 2021 10:43:48 +0000
+Subject: [PATCH 08/19] Run psa-arch-test
+
+Fixes needed to run psa-arch-test
+
+Upstream-Status: Pending
+Signed-off-by: Satish Kumar <satish.kumar01@arm.com>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+---
+ components/service/common/psa_ipc/service_psa_ipc.c       | 1 +
+ .../backend/secure_storage_ipc/secure_storage_ipc.c       | 8 --------
+ .../service/secure_storage/include/psa/storage_common.h   | 4 ++--
+ 3 files changed, 3 insertions(+), 10 deletions(-)
+
+diff --git a/components/service/common/psa_ipc/service_psa_ipc.c b/components/service/common/psa_ipc/service_psa_ipc.c
+index 95a07c135f31..5e5815dbc9cf 100644
+--- a/components/service/common/psa_ipc/service_psa_ipc.c
++++ b/components/service/common/psa_ipc/service_psa_ipc.c
+@@ -185,6 +185,7 @@ psa_status_t psa_call(struct rpc_caller *caller, psa_handle_t psa_handle,
+ 						     resp_msg->params.out_vec);
+ 
+ 	for (i = 0; i < resp_msg->params.out_len; i++) {
++                out_vec[i].len = out_vec_param[i].len;
+ 		memcpy(out_vec[i].base, rpc_caller_phys_to_virt(caller, out_vec_param[i].base),
+ 		       out_vec[i].len);
+ 	}
+diff --git a/components/service/secure_storage/backend/secure_storage_ipc/secure_storage_ipc.c b/components/service/secure_storage/backend/secure_storage_ipc/secure_storage_ipc.c
+index 9b55f77dd395..a1f369db253e 100644
+--- a/components/service/secure_storage/backend/secure_storage_ipc/secure_storage_ipc.c
++++ b/components/service/secure_storage/backend/secure_storage_ipc/secure_storage_ipc.c
+@@ -31,10 +31,6 @@ static psa_status_t secure_storage_ipc_set(void *context, uint32_t client_id,
+ 
+ 	ipc->client.rpc_status = TS_RPC_CALL_ACCEPTED;
+ 
+-	/* Validating input parameters */
+-	if (p_data == NULL)
+-		return PSA_ERROR_INVALID_ARGUMENT;
+-
+ 	psa_status = psa_call(caller, TFM_PROTECTED_STORAGE_SERVICE_HANDLE,
+ 			      TFM_PS_SET, in_vec, IOVEC_LEN(in_vec), NULL, 0);
+ 	if (psa_status < 0)
+@@ -96,10 +92,6 @@ static psa_status_t secure_storage_ipc_get_info(void *context,
+ 
+ 	(void)client_id;
+ 
+-	/* Validating input parameters */
+-	if (!p_info)
+-		return PSA_ERROR_INVALID_ARGUMENT;
+-
+ 	psa_status = psa_call(caller, TFM_PROTECTED_STORAGE_SERVICE_HANDLE,
+ 			      TFM_PS_GET_INFO, in_vec,
+ 			      IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
+diff --git a/components/service/secure_storage/include/psa/storage_common.h b/components/service/secure_storage/include/psa/storage_common.h
+index 4f6ba2a7d822..1fd6b40dc803 100644
+--- a/components/service/secure_storage/include/psa/storage_common.h
++++ b/components/service/secure_storage/include/psa/storage_common.h
+@@ -20,8 +20,8 @@ typedef uint64_t psa_storage_uid_t;
+ typedef uint32_t psa_storage_create_flags_t;
+ 
+ struct psa_storage_info_t {
+-	size_t capacity;
+-	size_t size;
++	uint32_t capacity;
++	uint32_t size;
+ 	psa_storage_create_flags_t flags;
+ };
+ 
+-- 
+2.38.0
+

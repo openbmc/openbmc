@@ -20,7 +20,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #ifdef __GLIBC__
  #include <sys/platform/ppc.h>
  #elif defined(__FreeBSD__)
-@@ -53,7 +53,7 @@ double UnscaledCycleClock::Frequency() {
+@@ -58,7 +58,7 @@ double UnscaledCycleClock::Frequency() {
    return base_internal::NominalCPUFrequency();
  }
 
@@ -29,9 +29,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
  int64_t UnscaledCycleClock::Now() {
  #ifdef __GLIBC__
---- a/absl/base/internal/unscaledcycleclock.h
-+++ b/absl/base/internal/unscaledcycleclock.h
-@@ -46,7 +46,8 @@
+--- a/absl/base/internal/unscaledcycleclock_config.h
++++ b/absl/base/internal/unscaledcycleclock_config.h
+@@ -21,7 +21,8 @@
 
  // The following platforms have an implementation of a hardware counter.
  #if defined(__i386__) || defined(__x86_64__) || defined(__aarch64__) || \

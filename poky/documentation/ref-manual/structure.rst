@@ -669,10 +669,10 @@ Yocto Project. Metadata has several important subdivisions:
 
 .. _structure-meta-classes:
 
-``meta/classes/``
------------------
+``meta/classes*/``
+------------------
 
-This directory contains the ``*.bbclass`` files. Class files are used to
+These directories contain the ``*.bbclass`` files. Class files are used to
 abstract common code so it can be reused by multiple packages. Every
 package inherits the :ref:`ref-classes-base` file. Examples of other important
 classes are :ref:`ref-classes-autotools`, which in theory allows any
