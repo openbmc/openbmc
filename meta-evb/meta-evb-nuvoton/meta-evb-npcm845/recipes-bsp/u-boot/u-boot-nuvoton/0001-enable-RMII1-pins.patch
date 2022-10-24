@@ -1,0 +1,25 @@
+From 72d5b865571a7d1599fd183cea61bb0e89277a69 Mon Sep 17 00:00:00 2001
+From: Marvin Lin <milkfafa@gmail.com>
+Date: Mon, 24 Oct 2022 10:20:01 +0800
+Subject: [PATCH] enable RMII1 pins
+
+---
+ arch/arm/dts/nuvoton-npcm845-evb.dts | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm/dts/nuvoton-npcm845-evb.dts b/arch/arm/dts/nuvoton-npcm845-evb.dts
+index 54536e5470..10d73b6200 100644
+--- a/arch/arm/dts/nuvoton-npcm845-evb.dts
++++ b/arch/arm/dts/nuvoton-npcm845-evb.dts
+@@ -336,5 +336,8 @@
+ 		&gspi_pins
+ 		&vgadig_pins
+ 		&spix_pins
++		&r1_pins
++		&r1en_pins
++		&r1oen_pins
+ 	>;
+ };
+-- 
+2.34.1
+
