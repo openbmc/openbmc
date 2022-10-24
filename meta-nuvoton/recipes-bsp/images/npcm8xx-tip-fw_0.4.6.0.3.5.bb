@@ -11,11 +11,11 @@ S = "${WORKDIR}"
 SRCREV = "04e43fbacdc55860153444e04672097e3f2b29fa"
 SRC_URI = " \
     https://github.com/Nuvoton-Israel/npcm8xx-tip-fw/${SRCREV}/LICENSE;name=lic \
-    https://github.com/Nuvoton-Israel/npcm8xx-tip-fw/releases/download/TIP_FW_L0_0.4.1_L1_0.2.6/Kmt_TipFwL0_Skmt_TipFwL1.bin;downloadfilename=${FILENAME};name=bin \
+    https://github.com/Nuvoton-Israel/npcm8xx-tip-fw/releases/download/TIP_FW_L0_0.4.6_L1_0.3.5/Kmt_TipFwL0_Skmt_TipFwL1.bin;downloadfilename=${FILENAME};name=bin \
 "
 
 SRC_URI[lic.sha256sum] = "7c34d28e784b202aa4998f477fd0aa9773146952d7f6fa5971369fcdda59cf48"
-SRC_URI[bin.sha256sum] = "669f03ff336dd168cd7a6098fb2c6dd413f3f4703460acfc795ab9ff975d1458"
+SRC_URI[bin.sha256sum] = "f7229664b05d506df90a110dd64bcfa7fa409da254ffc9f6d7367a845a75d8aa"
 
 inherit deploy
 
