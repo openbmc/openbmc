@@ -738,7 +738,7 @@ index 00000000..87adc43f
 +                }
 +            }
 +        },
-+        entityManagerName, "/", "org.freedesktop.DBus.ObjectManager",
++        entityManagerName, "/xyz/openbmc_project/inventory", "org.freedesktop.DBus.ObjectManager",
 +        "GetManagedObjects");
 +}
 +
