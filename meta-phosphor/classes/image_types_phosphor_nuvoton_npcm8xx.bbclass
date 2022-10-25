@@ -35,14 +35,11 @@ do_prepare_bootloaders() {
 
 python do_merge_bootloaders() {
 
-    def Merge_bin_files_and_pad(inF1, inF2, outF, align):
+    def Merge_bin_files_and_pad(inF1, inF2, outF, align, align_end):
         padding_size = 0
         padding_size_end = 0
         F1_size = os.path.getsize(inF1)
         F2_size = os.path.getsize(inF2)
-
-        # End allign always to sector:
-        align_end = int(d.getVar('ALIGN_END', True))
 
         if ((F1_size % align) != 0):
             padding_size = align - (F1_size % align)
@@ -66,22 +63,22 @@ python do_merge_bootloaders() {
     Merge_bin_files_and_pad(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFW_BINARY',True)),
         os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('BOOTBLOCK',True)),
         os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFW_BB_BINARY',True)),
-        int(d.getVar('ALIGN', True)))
+        int(d.getVar('BB_ALIGN', True)), int(d.getVar('ALIGN_END', True)))
 
     Merge_bin_files_and_pad(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFW_BB_BINARY',True)),
         os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('ATF_BINARY',True)),
         os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFW_BB_BL31_BINARY',True)),
-        int(d.getVar('ALIGN', True)))
+        int(d.getVar('ATF_ALIGN', True)), int(d.getVar('ALIGN_END', True)))
 
     Merge_bin_files_and_pad(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFW_BB_BL31_BINARY',True)),
         os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('OPTEE_BINARY',True)),
         os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFW_BB_BL31_TEE_BINARY',True)),
-        int(d.getVar('ALIGN', True)))
+        int(d.getVar('OPTEE_ALIGN', True)), int(d.getVar('ALIGN_END', True)))
 
     Merge_bin_files_and_pad(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFW_BB_BL31_TEE_BINARY',True)),
         os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s.full' % d.getVar('UBOOT_BINARY',True)),
         os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFW_BB_UBOOT_BINARY',True)),
-        int(d.getVar('ALIGN', True)))
+        int(d.getVar('UBOOT_ALIGN', True)), int(d.getVar('ALIGN_END', True)))
 }
 
 do_prepare_bootloaders[depends] += " \
