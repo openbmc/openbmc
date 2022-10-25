@@ -26,7 +26,7 @@ bootloader --ptable gpt
 part --align 4 --fixed-size 1M
 part --fstype=ext4 --fixed-size 64M --source bootimg-partition --label boot-a
 part --fstype=ext4 --fixed-size 64M --source bootimg-partition --label boot-b
-part --fstype=ext4 --fixed-size 128M --source rootfs --label rofs-a
-part --fstype=ext4 --fixed-size 128M --source rootfs --label rofs-b
+part --fstype=ext4 --fixed-size 256M --source rootfs --label rofs-a
+part --fstype=ext4 --fixed-size 256M --source rootfs --label rofs-b
 part --fstype=ext4 --fixed-size 256M --label rwfs
 #part --fstype=ext4 --fixed-size ${WKS_HOSTFW_SIZE} --source rootfs --rootfs-dir=${DEPLOY_DIR_IMAGE}/hostfw/image/ --label hostfw
