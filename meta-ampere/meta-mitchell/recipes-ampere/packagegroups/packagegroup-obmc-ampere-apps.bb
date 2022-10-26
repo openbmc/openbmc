@@ -38,16 +38,3 @@ SUMMARY:${PN}-flash = "Ampere Flash"
 RDEPENDS:${PN}-flash = " \
                         phosphor-software-manager \
                        "
-
-RDEPENDS:${PN}-inventory:append = " \
-                                   dbus-sensors \
-                                   entity-manager \
-                                  "
-
-RDEPENDS:${PN}-extras:append = " \
-                                webui-vue \
-                                phosphor-virtual-sensor \
-                               "
-RDEPENDS:${PN}-extras:remove = " phosphor-hwmon"
-
-VIRTUAL-RUNTIME_obmc-sensors-hwmon ?= "dbus-sensors"
