@@ -1,0 +1,2 @@
+SNOOP_DEVICE = "postcode"
+
