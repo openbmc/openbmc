@@ -19,7 +19,7 @@ DEPENDS += " \
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/google-ipmi-sys;branch=master;protocol=https"
-SRCREV = "8ec4106b7a4b803f2d9f730a1380ad881d352165"
+SRCREV = "2aaf2c053e37325bc196229d30ecbf7aa201b70a"
 
 FILES:${PN} += "${libdir}/ipmid-providers"
 
