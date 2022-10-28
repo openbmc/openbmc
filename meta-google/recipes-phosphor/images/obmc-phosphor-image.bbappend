@@ -9,6 +9,7 @@ OBMC_IMAGE_EXTRA_INSTALL:append = \
 
 # Google BMC (gBMC) specific installs
 OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = " iproute2 iproute2-ss"
+OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = " tzdata-core"
 OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = " gbmc-systemd-config"
 OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = " gbmc-iperf3"
 OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = " authorized-keys-comp"
