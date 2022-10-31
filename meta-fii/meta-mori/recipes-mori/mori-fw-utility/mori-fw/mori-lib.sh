@@ -67,9 +67,18 @@ function get_gpio_ctrl() {
     echo "$GPIO_NUM" > /sys/class/gpio/unexport
 }
 
+# rst_bios_spi
+# Resets BIOS SPI EEPROM
+rst_bios_spi() {
+  echo "Reset BIOS SPI EEPROM"
+  set_gpio_ctrl RST_BIOS_EEPROM0_N 0
+  sleep 1
+  set_gpio_ctrl RST_BIOS_EEPROM0_N 1
+}
+
 # Start definitions
 
-# I2C Definitions 
+# I2C Definitions
 # The array is (<bus> <address>), where address is in hexadecimal.
 I2C_BMC_CPLD=(13 76)
 I2C_MB_CPLD=(0 76)

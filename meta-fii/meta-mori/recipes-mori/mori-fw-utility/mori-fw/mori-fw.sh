@@ -29,6 +29,7 @@ function fwbios() {
 
   fi
   echo "Flashing BIOS @/dev/${BIOS_MTD}"
+  rst_bios_spi
   if [ "$(flashcp -v $1 /dev/${BIOS_MTD})" -ne  0 ]; then
     echo "Flashing the bios failed " >&2
     return 1
