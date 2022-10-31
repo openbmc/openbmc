@@ -43,6 +43,15 @@
                 [
                     "/xyz/openbmc_project/led/groups/powersupply0_fault"
                 ]
+            },
+	    {
+               "types": {
+                   "rType": "powered_by",
+                   "fType": "powering"
+               },
+               "paths": [
+                   "/xyz/openbmc_project/inventory/system/chassis"
+               ]
             }
         ]
     },
@@ -90,6 +99,15 @@
                 [
                     "/xyz/openbmc_project/led/groups/powersupply1_fault"
                 ]
+            },
+	    {
+               "types": {
+                   "rType": "powered_by",
+                   "fType": "powering"
+               },
+               "paths": [
+                   "/xyz/openbmc_project/inventory/system/chassis"
+               ]
             }
         ]
     },
