@@ -425,8 +425,8 @@
                 {
                     "types":
                     {
-                        "rType": "inventory",
-                        "fType": "chassis"
+                        "rType": "powered_by",
+                        "fType": "powering"
                     },
                     "paths":
                     [
@@ -493,8 +493,8 @@
                 {
                     "types":
                     {
-                        "rType": "inventory",
-                        "fType": "chassis"
+                        "rType": "powered_by",
+                        "fType": "powering"
                     },
                     "paths":
                     [
