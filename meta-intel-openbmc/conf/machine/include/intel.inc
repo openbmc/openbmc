@@ -18,3 +18,5 @@ PREFERRED_PROVIDER_virtual/obmc-inventory-data ?= "${VIRTUAL-RUNTIME_skeleton_wo
 PREFERRED_PROVIDER_virtual/obmc-host-ipmi-hw = "phosphor-ipmi-kcs"
 
 OVERRIDES .= ":intel"
+
+OBMC_ORG_YAML_SUBDIRS += "com/intel"
