@@ -1,1 +1,0 @@
-PACKAGECONFIG:append = " nic-ethtool"
