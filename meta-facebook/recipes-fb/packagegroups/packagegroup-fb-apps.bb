@@ -53,7 +53,6 @@ RDEPENDS_PN_SYSTEM_EXTRAS:fb-withhost = " \
         ipmitool \
         phosphor-post-code-manager \
         phosphor-host-postd \
-        tzdata-core \
         phosphor-state-manager \
         "
 
@@ -64,5 +63,6 @@ RDEPENDS:${PN}-system = " \
         phosphor-virtual-sensor \
         sensor-monitor \
         phosphor-gpio-monitor-monitor \
+        tzdata-core \
         ${RDEPENDS_PN_SYSTEM_EXTRAS} \
         "
