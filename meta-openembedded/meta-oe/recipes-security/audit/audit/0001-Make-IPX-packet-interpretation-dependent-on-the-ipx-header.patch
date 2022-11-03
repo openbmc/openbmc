@@ -1,0 +1,65 @@
+From 6b09724c69d91668418ddb3af00da6db6755208c Mon Sep 17 00:00:00 2001
+From: Steve Grubb <sgrubb@redhat.com>
+Date: Thu, 2 Sep 2021 15:01:12 -0400
+Subject: [PATCH] Make IPX packet interpretation dependent on the ipx header
+ file existing
+
+Upstream-Status: Backport [https://github.com/linux-audit/audit-userspace/commit/6b09724c69d91668418ddb3af00da6db6755208c.patch]
+Comment: Remove one hunk from changelog file and refresh rest hunks as per codebase of audit_2.8.5
+Signed-off-by: Akash Hadke <akash.hadke@kpit.com>
+---
+ auparse/interpret.c | 8 ++++++--
+ configure.ac        | 6 ++++++
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/auparse/interpret.c b/auparse/interpret.c
+index 63829aa0e..6c316456d 100644
+--- a/auparse/interpret.c	2022-10-14 11:22:20.833880000 +0200
++++ b/auparse/interpret.c	2022-10-14 11:35:13.196455950 +0200
+@@ -44,8 +44,10 @@
+ #include <linux/ax25.h>
+ #include <linux/atm.h>
+ #include <linux/x25.h>
+-#include <linux/if.h>   // FIXME: remove when ipx.h is fixed
+-#include <linux/ipx.h>
++#ifdef HAVE_IPX_HEADERS
++  #include <linux/if.h>   // FIXME: remove when ipx.h is fixed
++  #include <linux/ipx.h>
++#endif
+ #include <linux/capability.h>
+ #include <sys/personality.h>
+ #include <sys/prctl.h>
+@@ -1158,6 +1160,7 @@
+ 					      x->sax25_call.ax25_call[6]);
+                         }
+                         break;
++#ifdef HAVE_IPX_HEADERS
+                 case AF_IPX:
+                         {
+                                 const struct sockaddr_ipx *ip =
+@@ -1167,6 +1170,7 @@
+ 					str, ip->sipx_port, ip->sipx_network);
+                         }
+                         break;
++#endif
+                 case AF_ATMPVC:
+                         {
+                                 const struct sockaddr_atmpvc* at =
+diff --git a/configure.ac b/configure.ac
+index 8f541e4c0..005eb0b5b 100644
+--- a/configure.ac	2022-10-14 11:22:20.833880000 +0200
++++ b/configure.ac	2022-10-14 11:36:32.391044084 +0200
+@@ -414,6 +414,12 @@
+ 	AC_DEFINE_UNQUOTED(HAVE_LIBWRAP, [], Define if tcp_wrappers support is enabled )
+ fi
+ 
++# linux/ipx.h - deprecated in 2018
++AC_CHECK_HEADER(linux/ipx.h, ipx_headers=yes, ipx_headers=no)
++if test $ipx_headers = yes ; then
++	AC_DEFINE(HAVE_IPX_HEADERS,1,[IPX packet interpretation])
++fi
++
+ # See if we want to support lower capabilities for plugins
+ LIBCAP_NG_PATH
+ 
+

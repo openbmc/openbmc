@@ -83,3 +83,8 @@ FILES:${PN} += " \
 "
 
 require parsec-service_${PV}.inc
+
+# The QA check has been temporarily disabled. An issue has been created 
+# upstream to fix this. 
+# https://github.com/parallaxsecond/parsec/issues/645
+INSANE_SKIP:${PN}-dbg += "buildpaths"

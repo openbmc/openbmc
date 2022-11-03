@@ -10,6 +10,7 @@ Fixes
 noreturn void panic(const char *fmt, ...);
 ^
 
+Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---

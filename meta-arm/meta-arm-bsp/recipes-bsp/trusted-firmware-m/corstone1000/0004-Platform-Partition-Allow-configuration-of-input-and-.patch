@@ -1,0 +1,72 @@
+From f3686dfb8fb97cb42c3d4f8ee2d7aa736d5cb760 Mon Sep 17 00:00:00 2001
+From: Satish Kumar <satish.kumar01@arm.com>
+Date: Wed, 3 Aug 2022 15:50:27 +0100
+Subject: [PATCH 4/6] Platform Partition: Allow configuration of input and
+ output buffer
+
+The change makes input and output buffer size macros used by
+the platform partition to be configured by cmake. This will
+allow platforms to set the buffer size accordingly.
+
+Change-Id: Ia492ce02f8744b0157228d9be51a9ec5b7c88ef6
+Signed-off-by: Satish Kumar <satish.kumar01@arm.com>
+Upstream-Status: Accepted [TF-Mv1.7.0]
+---
+ config/config_default.cmake                  | 2 ++
+ secure_fw/partitions/platform/CMakeLists.txt | 6 ++++++
+ secure_fw/partitions/platform/platform_sp.c  | 9 +++++++--
+ 3 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/config/config_default.cmake b/config/config_default.cmake
+index 3112b707bc..497c972dc9 100755
+--- a/config/config_default.cmake
++++ b/config/config_default.cmake
+@@ -141,6 +141,8 @@ set(ATTEST_INCLUDE_OPTIONAL_CLAIMS      ON          CACHE BOOL      "Include opt
+ set(ATTEST_INCLUDE_COSE_KEY_ID          OFF         CACHE BOOL      "Include COSE key-id in initial attestation token")
+ 
+ set(TFM_PARTITION_PLATFORM              ON          CACHE BOOL      "Enable Platform partition")
++set(PLATFORM_SERVICE_INPUT_BUFFER_SIZE  64          CACHE STRING    "Size of input buffer in platform service.")
++set(PLATFORM_SERVICE_OUTPUT_BUFFER_SIZE 64          CACHE STRING    "Size of output buffer in platform service.")
+ 
+ set(TFM_PARTITION_AUDIT_LOG             OFF         CACHE BOOL      "Enable Audit Log partition")
+ 
+diff --git a/secure_fw/partitions/platform/CMakeLists.txt b/secure_fw/partitions/platform/CMakeLists.txt
+index 4b37cd780c..3070f89d6d 100644
+--- a/secure_fw/partitions/platform/CMakeLists.txt
++++ b/secure_fw/partitions/platform/CMakeLists.txt
+@@ -47,6 +47,12 @@ target_link_libraries(tfm_psa_rot_partition_platform
+         tfm_spm
+ )
+ 
++target_compile_definitions(tfm_psa_rot_partition_platform
++    PRIVATE
++        INPUT_BUFFER_SIZE=${PLATFORM_SERVICE_INPUT_BUFFER_SIZE}
++        OUTPUT_BUFFER_SIZE=${PLATFORM_SERVICE_OUTPUT_BUFFER_SIZE}
++)
++
+ ############################ Secure API ########################################
+ 
+ target_sources(tfm_sprt
+diff --git a/secure_fw/partitions/platform/platform_sp.c b/secure_fw/partitions/platform/platform_sp.c
+index 673cb0ee06..87bd434720 100644
+--- a/secure_fw/partitions/platform/platform_sp.c
++++ b/secure_fw/partitions/platform/platform_sp.c
+@@ -38,8 +38,13 @@ static const int32_t nv_counter_access_map[NV_COUNTER_MAP_SIZE] = {
+ #include "psa/service.h"
+ #include "region_defs.h"
+ 
+-#define INPUT_BUFFER_SIZE  64
+-#define OUTPUT_BUFFER_SIZE 64
++#ifndef INPUT_BUFFER_SIZE
++#define INPUT_BUFFER_SIZE      64
++#endif
++
++#ifndef OUTPUT_BUFFER_SIZE
++#define OUTPUT_BUFFER_SIZE     64
++#endif
+ 
+ typedef enum tfm_platform_err_t (*plat_func_t)(const psa_msg_t *msg);
+ #endif /* TFM_PSA_API */
+-- 
+2.25.1
+

@@ -26,13 +26,7 @@ env:
 
 local_conf_header:
   base: |
-    BB_SERVER_TIMEOUT = "60"
     CONF_VERSION = "2"
-    BB_NUMBER_THREADS = "16"
-    PARALLEL_MAKE = "-j16"
-    XZ_MEMLIMIT = "25%"
-    XZ_THREADS = "16"
-    ZSTD_THREADS = "16"
     LICENSE_FLAGS_ACCEPTED += "Arm-FVP-EULA"
   setup: |
     PACKAGE_CLASSES = "package_ipk"

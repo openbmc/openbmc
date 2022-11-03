@@ -699,7 +699,60 @@ Thanks to the following people who contributed to this release:
 - Zheng Ruoqin
 - Zoltán Böszörményi
 
-
-
 Repositories / Downloads for 4.1
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+poky
+
+-  Repository Location: https://git.yoctoproject.org/git/poky
+-  Branch: :yocto_git:`langdale </poky/log/?h=langdale>`
+-  Tag:  :yocto_git:`yocto-4.1 </poky/log/?h=yocto-4.1>`
+-  Git Revision: :yocto_git:`5200799866b92259e855051112520006e1aaaac0 </poky/commit/?id=5200799866b92259e855051112520006e1aaaac0>`
+-  Release Artefact: poky-5200799866b92259e855051112520006e1aaaac0
+-  sha: 9d9a2f7ecf2502f89f43bf45d63e6b61cdcb95ed1d75c8281372f550d809c823
+-  Download Locations:
+   http://downloads.yoctoproject.org/releases/yocto/yocto-4.1/poky-5200799866b92259e855051112520006e1aaaac0.tar.bz2
+   http://mirrors.kernel.org/yocto/yocto/yocto-4.1/poky-5200799866b92259e855051112520006e1aaaac0.tar.bz2
+
+openembedded-core
+
+-  Repository Location: https://git.openembedded.org/openembedded-core
+-  Branch: :oe_git:`langdale </openembedded-core/log/?h=langdale>`
+-  Tag:  :oe_git:`yocto-4.1 </openembedded-core/log/?h=yocto-4.1>`
+-  Git Revision: :oe_git:`744a2277844ec9a384a9ca7dae2a634d5a0d3590 </openembedded-core/commit/?id=744a2277844ec9a384a9ca7dae2a634d5a0d3590>`
+-  Release Artefact: oecore-744a2277844ec9a384a9ca7dae2a634d5a0d3590
+-  sha: 34f1fd5bb83514bf0ec8ad7f8cce088a8e28677e1338db94c188283da704c663
+-  Download Locations:
+   http://downloads.yoctoproject.org/releases/yocto/yocto-4.1/oecore-744a2277844ec9a384a9ca7dae2a634d5a0d3590.tar.bz2
+   http://mirrors.kernel.org/yocto/yocto/yocto-4.1/oecore-744a2277844ec9a384a9ca7dae2a634d5a0d3590.tar.bz2
+
+meta-mingw
+
+-  Repository Location: https://git.yoctoproject.org/git/meta-mingw
+-  Branch: :yocto_git:`langdale </meta-mingw/log/?h=langdale>`
+-  Tag:  :yocto_git:`yocto-4.1 </meta-mingw/log/?h=yocto-4.1>`
+-  Git Revision: :yocto_git:`b0067202db8573df3d23d199f82987cebe1bee2c </meta-mingw/commit/?id=b0067202db8573df3d23d199f82987cebe1bee2c>`
+-  Release Artefact: meta-mingw-b0067202db8573df3d23d199f82987cebe1bee2c
+-  sha: 704f2940322b81ce774e9cbd27c3cfa843111d497dc7b1eeaa39cd694d9a2366
+-  Download Locations:
+   http://downloads.yoctoproject.org/releases/yocto/yocto-4.1/meta-mingw-b0067202db8573df3d23d199f82987cebe1bee2c.tar.bz2
+   http://mirrors.kernel.org/yocto/yocto/yocto-4.1/meta-mingw-b0067202db8573df3d23d199f82987cebe1bee2c.tar.bz2
+
+bitbake
+
+-  Repository Location: https://git.openembedded.org/bitbake
+-  Branch: :oe_git:`2.2 </bitbake/log/?h=2.2>`
+-  Tag:  :oe_git:`yocto-4.1 </bitbake/log/?h=yocto-4.1>`
+-  Git Revision: :oe_git:`074da4c469d1f4177a1c5be72b9f3ccdfd379d67 </bitbake/commit/?id=074da4c469d1f4177a1c5be72b9f3ccdfd379d67>`
+-  Release Artefact: bitbake-074da4c469d1f4177a1c5be72b9f3ccdfd379d67
+-  sha: e32c300e0c8522d8d49ef10aae473bd5f293202672eb9d38e90ed92594ed1fe8
+-  Download Locations:
+   http://downloads.yoctoproject.org/releases/yocto/yocto-4.1/bitbake-074da4c469d1f4177a1c5be72b9f3ccdfd379d67.tar.bz2
+   http://mirrors.kernel.org/yocto/yocto/yocto-4.1/bitbake-074da4c469d1f4177a1c5be72b9f3ccdfd379d67.tar.bz2
+
+yocto-docs
+
+-  Repository Location: https://git.yoctoproject.org/git/yocto-docs
+-  Branch: :yocto_git:`langdale </yocto-docs/log/?h=langdale>`
+-  Tag: :yocto_git:`yocto-4.1 </yocto-docs/log/?h=yocto-4.1>`
+-  Git Revision: :yocto_git:`42d3e26a0d04bc5951e640b471686f347dc9b74a </yocto-docs/commit/?id=42d3e26a0d04bc5951e640b471686f347dc9b74a>`

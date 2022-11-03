@@ -6,7 +6,8 @@ SECTION = "libs"
 LICENSE = "Zlib"
 LIC_FILES_CHKSUM = "file://zlib.h;beginline=6;endline=23;md5=5377232268e952e9ef63bc555f7aa6c0"
 
-SRC_URI = "https://zlib.net/${BP}.tar.xz \
+# The source tarball needs to be .gz as only the .gz ends up in fossils/
+SRC_URI = "https://zlib.net/${BP}.tar.gz \
            file://cc.patch \
            file://ldflags-tests.patch \
            file://0001-configure-Pass-LDFLAGS-to-link-tests.patch \
@@ -17,7 +18,11 @@ SRC_URI = "https://zlib.net/${BP}.tar.xz \
            "
 UPSTREAM_CHECK_URI = "http://zlib.net/"
 
-SRC_URI[sha256sum] = "7db46b8d7726232a621befaab4a1c870f00a90805511c0e0090441dac57def18"
+SRC_URI[sha256sum] = "91844808532e5ce316b3c010929493c0244f3d37593afd6de04f71821d5136d9"
+
+# When a new release is made the previous release is moved to fossils/, so add this
+# to PREMIRRORS so it is also searched automatically.
+PREMIRRORS:append = " https://zlib.net/ https://zlib.net/fossils/"
 
 CFLAGS += "-D_REENTRANT"
 

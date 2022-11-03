@@ -25,18 +25,11 @@ build a reference embedded OS called Poky.
       in the Yocto Project Development Tasks Manual for more
       information.
 
-   -  You may use Windows Subsystem For Linux v2 to set up a build host
-      using Windows 10.
-
-      .. note::
-
-         The Yocto Project is not compatible with WSLv1, it is
-         compatible but not officially supported nor validated with
-         WSLv2, if you still decide to use WSL please upgrade to WSLv2.
-
-      See the :ref:`dev-manual/start:setting up to use windows
-      subsystem for linux (wslv2)` section in the Yocto Project Development
-      Tasks Manual for more information.
+   -  You may use version 2 of Windows Subsystem For Linux (WSL 2) to set
+      up a build host using Windows 10 or later, Windows Server 2019 or later.
+      See the :ref:`dev-manual/start:setting up to use windows subsystem for
+      linux (wsl 2)` section in the Yocto Project Development Tasks Manual
+      for more information.
 
 If you want more conceptual or background information on the Yocto
 Project, see the :doc:`/overview-manual/index`.

@@ -1,0 +1,573 @@
+From 9d70628b7dc1dbc3c1ac7f4f3c0f6aa6b237510d Mon Sep 17 00:00:00 2001
+From: Satish Kumar <satish.kumar01@arm.com>
+Date: Wed, 6 Jul 2022 11:19:39 +0100
+Subject: [PATCH 5/6] corstone1000: support for UEFI FMP image Information
+
+The commit provides the support for UEFI FMP (Firmware Management
+Protocol) SET and GET Image info APIs.
+
+The APIs to SET and GET image info is implemented. In current design,
+SET is called by secure encalve and GET is called by the host.
+
+FMP image information is initialized on every boot and retained
+in SRAM. The updatable values of the FMP are stored in private
+metadata section of the flash.
+
+Change-Id: Iaf0b4a13a9c24f05e4a32509e61a8b96ee8e9e4b
+Signed-off-by: Satish Kumar <satish.kumar01@arm.com>
+Upstream-Status: Accepted [TF-Mv1.7.0]
+---
+ .../target/arm/corstone1000/CMakeLists.txt    |   2 +
+ .../ext/target/arm/corstone1000/config.cmake  |   8 +-
+ .../corstone1000/fw_update_agent/fwu_agent.c  |  61 ++++-
+ .../corstone1000/fw_update_agent/fwu_agent.h  |   3 +
+ .../corstone1000/fw_update_agent/uefi_fmp.c   | 240 ++++++++++++++++++
+ .../corstone1000/fw_update_agent/uefi_fmp.h   |  56 ++++
+ .../include/corstone1000_ioctl_requests.h     |  14 +-
+ .../services/src/tfm_platform_system.c        |   9 +
+ 8 files changed, 374 insertions(+), 19 deletions(-)
+ create mode 100644 platform/ext/target/arm/corstone1000/fw_update_agent/uefi_fmp.c
+ create mode 100644 platform/ext/target/arm/corstone1000/fw_update_agent/uefi_fmp.h
+
+diff --git a/platform/ext/target/arm/corstone1000/CMakeLists.txt b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+index 81522c7cf0..3602312a3a 100644
+--- a/platform/ext/target/arm/corstone1000/CMakeLists.txt
++++ b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+@@ -76,6 +76,8 @@ target_sources(platform_s
+         fw_update_agent/uefi_capsule_parser.c
+         fw_update_agent/fwu_agent.c
+         $<$<BOOL:${TFM_S_REG_TEST}>:${CMAKE_CURRENT_SOURCE_DIR}/target_cfg.c>
++        fw_update_agent/uefi_fmp.c
++        $<$<NOT:$<BOOL:${PLATFORM_DEFAULT_OTP}>>:${PLATFORM_DIR}/ext/accelerator/cc312/otp_cc312.c>
+ )
+ 
+ if (PLATFORM_IS_FVP)
+diff --git a/platform/ext/target/arm/corstone1000/config.cmake b/platform/ext/target/arm/corstone1000/config.cmake
+index a6a1a33c42..ab0fe17ba8 100644
+--- a/platform/ext/target/arm/corstone1000/config.cmake
++++ b/platform/ext/target/arm/corstone1000/config.cmake
+@@ -50,7 +50,9 @@ else()
+     set(PLATFORM_PSA_ADAC_SECURE_DEBUG      FALSE        CACHE BOOL      "Whether to use psa-adac secure debug.")
+ endif()
+ 
+-set(DEFAULT_MCUBOOT_SECURITY_COUNTERS   OFF          CACHE BOOL      "Whether to use the default security counter configuration defined by TF-M project")
++set(DEFAULT_MCUBOOT_SECURITY_COUNTERS       OFF          CACHE BOOL      "Whether to use the default security counter configuration defined by TF-M project")
+ 
+-set(PS_ENCRYPTION                       OFF          CACHE BOOL      "Enable encryption for Protected Storage partition")
+-set(PS_ROLLBACK_PROTECTION              OFF          CACHE BOOL      "Enable rollback protection for Protected Storage partition")
++set(PS_ENCRYPTION                           OFF          CACHE BOOL      "Enable encryption for Protected Storage partition")
++set(PS_ROLLBACK_PROTECTION                  OFF          CACHE BOOL      "Enable rollback protection for Protected Storage partition")
++
++set(PLATFORM_SERVICE_OUTPUT_BUFFER_SIZE     256          CACHE STRING    "Size of output buffer in platform service.")
+diff --git a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+index 3abb5dd0dc..72a5fc9c1d 100644
+--- a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
++++ b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+@@ -18,6 +18,7 @@
+ #include "platform_description.h"
+ #include "tfm_plat_nv_counters.h"
+ #include "tfm_plat_defs.h"
++#include "uefi_fmp.h"
+ 
+ /* Properties of image in a bank */
+ struct fwu_image_properties {
+@@ -84,6 +85,11 @@ struct fwu_private_metadata {
+        /* staged nv_counter: temprary location before written to the otp */
+        uint32_t nv_counter[NR_OF_IMAGES_IN_FW_BANK];
+ 
++       /* FMP information */
++       uint32_t fmp_version;
++       uint32_t fmp_last_attempt_version;
++       uint32_t fmp_last_attempt_status;
++
+ } __packed;
+ 
+ #define MAX_BOOT_ATTEMPTS_PER_BANK 3
+@@ -278,7 +284,7 @@ enum fwu_agent_error_t fwu_metadata_provision(void)
+ {
+     enum fwu_agent_error_t ret;
+     struct fwu_private_metadata priv_metadata;
+-    uint32_t image_version = 0;
++    uint32_t image_version = FWU_IMAGE_INITIAL_VERSION;
+ 
+     FWU_LOG_MSG("%s: enter\n\r", __func__);
+ 
+@@ -302,8 +308,8 @@ enum fwu_agent_error_t fwu_metadata_provision(void)
+     memset(&_metadata, 0, sizeof(struct fwu_metadata));
+ 
+     _metadata.version = 1;
+-    _metadata.active_index = 0;
+-    _metadata.previous_active_index = 1;
++    _metadata.active_index = BANK_0;
++    _metadata.previous_active_index = BANK_1;
+ 
+     /* bank 0 is the place where images are located at the
+      * start of device lifecycle */
+@@ -339,6 +345,10 @@ enum fwu_agent_error_t fwu_metadata_provision(void)
+     priv_metadata.boot_index = BANK_0;
+     priv_metadata.boot_attempted = 0;
+ 
++    priv_metadata.fmp_version = FWU_IMAGE_INITIAL_VERSION;
++    priv_metadata.fmp_last_attempt_version = FWU_IMAGE_INITIAL_VERSION;
++    priv_metadata.fmp_last_attempt_status = LAST_ATTEMPT_STATUS_SUCCESS;
++
+     ret = private_metadata_write(&priv_metadata);
+     if (ret) {
+         return ret;
+@@ -540,9 +550,25 @@ enum fwu_agent_error_t corstone1000_fwu_flash_image(void)
+                                 &image_bank_offset);
+         switch(image_index) {
+             case IMAGE_ALL:
++
+                 ret = flash_full_capsule(&_metadata, capsule_info.image[i],
+                                          capsule_info.size[i],
+                                          capsule_info.version[i]);
++
++                if (ret != FWU_AGENT_SUCCESS) {
++
++                    priv_metadata.fmp_last_attempt_version = capsule_info.version[i];
++                    priv_metadata.fmp_last_attempt_status = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
++
++                    private_metadata_write(&priv_metadata);
++
++                    fmp_set_image_info(&full_capsule_image_guid,
++                            priv_metadata.fmp_version,
++                            priv_metadata.fmp_last_attempt_version,
++                            priv_metadata.fmp_last_attempt_status);
++                }
++
++
+                 break;
+             default:
+                 FWU_LOG_MSG("%s: sent image not recognized\n\r", __func__);
+@@ -866,17 +892,42 @@ enum fwu_agent_error_t corstone1000_fwu_host_ack(void)
+ 
+     current_state = get_fwu_agent_state(&_metadata, &priv_metadata);
+     if (current_state == FWU_AGENT_STATE_REGULAR) {
++
+         ret = FWU_AGENT_SUCCESS; /* nothing to be done */
++
++        fmp_set_image_info(&full_capsule_image_guid,
++                priv_metadata.fmp_version,
++                priv_metadata.fmp_last_attempt_version,
++                priv_metadata.fmp_last_attempt_status);
++
+         goto out;
++
+     } else if (current_state != FWU_AGENT_STATE_TRIAL) {
+         FWU_ASSERT(0);
+     }
+ 
+     if (_metadata.active_index != priv_metadata.boot_index) {
++
+         /* firmware update failed, revert back to previous bank */
++
++        priv_metadata.fmp_last_attempt_version =
++         _metadata.img_entry[IMAGE_0].img_props[_metadata.active_index].version;
++
++        priv_metadata.fmp_last_attempt_status = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
++
+         ret = fwu_select_previous(&_metadata, &priv_metadata);
++
+     } else {
++
+         /* firmware update successful */
++
++        priv_metadata.fmp_version =
++         _metadata.img_entry[IMAGE_0].img_props[_metadata.active_index].version;
++        priv_metadata.fmp_last_attempt_version =
++         _metadata.img_entry[IMAGE_0].img_props[_metadata.active_index].version;
++
++        priv_metadata.fmp_last_attempt_status = LAST_ATTEMPT_STATUS_SUCCESS;
++
+         ret = fwu_accept_image(&full_capsule_image_guid, &_metadata,
+                                 &priv_metadata);
+         if (!ret) {
+@@ -886,6 +937,10 @@ enum fwu_agent_error_t corstone1000_fwu_host_ack(void)
+ 
+     if (ret == FWU_AGENT_SUCCESS) {
+         disable_host_ack_timer();
++        fmp_set_image_info(&full_capsule_image_guid,
++                priv_metadata.fmp_version,
++                priv_metadata.fmp_last_attempt_version,
++                priv_metadata.fmp_last_attempt_status);
+     }
+ 
+ out:
+diff --git a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.h b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.h
+index 57b07e8d2c..aa18179024 100644
+--- a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.h
++++ b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.h
+@@ -30,6 +30,9 @@ enum fwu_agent_error_t {
+                 }                                                              \
+ 
+ 
++/* Version used for the very first image of the device. */
++#define FWU_IMAGE_INITIAL_VERSION 0
++
+ enum fwu_agent_error_t fwu_metadata_provision(void);
+ enum fwu_agent_error_t fwu_metadata_init(void);
+ 
+diff --git a/platform/ext/target/arm/corstone1000/fw_update_agent/uefi_fmp.c b/platform/ext/target/arm/corstone1000/fw_update_agent/uefi_fmp.c
+new file mode 100644
+index 0000000000..ce576e1794
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/fw_update_agent/uefi_fmp.c
+@@ -0,0 +1,240 @@
++/*
++ * Copyright (c) 2022, Arm Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ *
++ */
++
++#include <string.h>
++#include <stdbool.h>
++#include "cmsis.h"
++#include "uefi_fmp.h"
++
++/* The count will increase when partial update is supported.
++ * At present, only full WIC is considered as updatable image.
++ */
++#define NUMBER_OF_FMP_IMAGES 1
++#define NO_OF_FMP_VARIABLES_PER_IMAGE   6
++
++#define UEFI_ARCHITECTURE_64
++
++#ifdef UEFI_ARCHITECTURE_64
++typedef uint64_t uefi_ptr_t;
++typedef uint64_t efi_uintn_t;
++#else
++typedef uint32_t uefi_ptr_t;
++typedef uint32_t efi_uintn_t;
++#endif
++
++/* Below macro definations and struct declarations taken from UEFI spec 2.9 */
++
++/*
++ * Image Attribute Definitions
++ */
++#define IMAGE_ATTRIBUTE_IMAGE_UPDATABLE            0x00000001
++#define IMAGE_ATTRIBUTE_RESET_REQUIRED             0x00000002
++#define IMAGE_ATTRIBUTE_AUTHENTICATION_REQUIRED    0x00000004
++#define IMAGE_ATTRIBUTE_IN_USE                     0x00000008
++#define IMAGE_ATTRIBUTE_UEFI_IMAGE                 0x00000010
++#define IMAGE_ATTRIBUTE_DEPENDENCY                 0x00000020
++
++typedef uint32_t DescriptorVersion_t;
++typedef uint32_t DescriptorSize_t;
++typedef uint8_t DescriptorCount_t;
++
++typedef __PACKED_STRUCT {
++    uint8_t ImageIndex;
++    struct efi_guid ImageTypeId;
++    uint64_t ImageId;
++    uefi_ptr_t PtrImageIdName;
++    uint32_t Version;
++    uefi_ptr_t PtrVersionName;
++    efi_uintn_t Size;
++    uint64_t AttributesSupported;
++    uint64_t AttributesSetting;
++    uint64_t Compatibilities;
++    /* Introduced with DescriptorVersion 2+ */
++    uint32_t LowestSupportedImageVersion;
++    /* Introduced with DescriptorVersion 3+ */
++    uint32_t LastAttemptVersion;
++    uint32_t LastAttemptStatus;
++    uint64_t HardwareInstance;
++    /* Introduced with DescriptorVersion 4+ */
++    uefi_ptr_t PtrDependencies;
++} EFI_FIRMWARE_IMAGE_DESCRIPTOR;
++
++typedef __PACKED_STRUCT {
++    DescriptorVersion_t DescriptorVersion;
++    DescriptorSize_t DescriptorsSize;
++    DescriptorCount_t DescriptorCount;
++    EFI_FIRMWARE_IMAGE_DESCRIPTOR ImageDescriptor;
++    uint16_t *ImageName;
++    uint32_t ImageNameSize;
++    uint16_t *ImageVersionName;
++    uint32_t ImageVersionNameSize;
++} EFI_FIRMWARE_MANAGEMENT_PROTOCOL_IMAGE_INFO;
++
++
++static uint16_t corstone_image_name0[] = { 'C', 'O', 'R', 'S', 'T', 'O', 'N', 'E', '1', '0', '0', '0', '_', 'W', 'I', 'C', '\0' };
++static uint16_t corstone_version_name0[] = { 'C', 'O', 'R', 'S', 'T', 'O', 'N', 'E', '1', '0', '0', '0', '_', 'B', 'E', 'S', 'T', '\0'};
++
++static EFI_FIRMWARE_MANAGEMENT_PROTOCOL_IMAGE_INFO fmp_info[NUMBER_OF_FMP_IMAGES];
++
++extern struct efi_guid full_capsule_image_guid;
++
++static bool is_fmp_info_initialized = false;
++
++static void init_fmp_info(void)
++{
++    memset(fmp_info, 0,
++     sizeof(EFI_FIRMWARE_MANAGEMENT_PROTOCOL_IMAGE_INFO) * NUMBER_OF_FMP_IMAGES);
++
++    /* Fill information for the WIC.
++     * Add further details when partial image is supported.
++     */
++
++    fmp_info[0].DescriptorVersion = 4;
++    fmp_info[0].DescriptorCount = NUMBER_OF_FMP_IMAGES;
++    fmp_info[0].DescriptorsSize =
++                 sizeof(EFI_FIRMWARE_IMAGE_DESCRIPTOR) +
++                 sizeof(corstone_image_name0) + sizeof(corstone_version_name0);
++
++    fmp_info[0].ImageDescriptor.ImageIndex = 1;
++
++    memcpy(&fmp_info[0].ImageDescriptor.ImageTypeId, &full_capsule_image_guid,
++            sizeof(struct efi_guid));
++
++    fmp_info[0].ImageDescriptor.ImageId = 1;
++    fmp_info[0].ImageDescriptor.Version = FWU_IMAGE_INITIAL_VERSION;
++    fmp_info[0].ImageDescriptor.AttributesSupported = 1;
++    fmp_info[0].ImageDescriptor.AttributesSetting = (
++            IMAGE_ATTRIBUTE_IMAGE_UPDATABLE | IMAGE_ATTRIBUTE_RESET_REQUIRED);
++    fmp_info[0].ImageDescriptor.LowestSupportedImageVersion =
++            FWU_IMAGE_INITIAL_VERSION;
++    fmp_info[0].ImageDescriptor.LastAttemptVersion = FWU_IMAGE_INITIAL_VERSION;
++    fmp_info[0].ImageDescriptor.LastAttemptStatus = LAST_ATTEMPT_STATUS_SUCCESS;
++
++    fmp_info[0].ImageName = corstone_image_name0;
++    fmp_info[0].ImageNameSize = sizeof(corstone_image_name0);
++    fmp_info[0].ImageVersionName = corstone_version_name0;
++    fmp_info[0].ImageVersionNameSize = sizeof(corstone_version_name0);
++
++    is_fmp_info_initialized = true;
++
++    return;
++}
++
++enum fwu_agent_error_t fmp_set_image_info(struct efi_guid *guid,
++                     uint32_t current_version, uint32_t attempt_version,
++                     uint32_t last_attempt_status)
++{
++    enum fwu_agent_error_t status = FWU_AGENT_ERROR;
++
++    FWU_LOG_MSG("%s:%d Enter\n\r", __func__, __LINE__);
++
++    if (is_fmp_info_initialized == false) {
++        init_fmp_info();
++    }
++
++    for (int i = 0; i < NUMBER_OF_FMP_IMAGES; i++) {
++        if ((memcmp(guid, &fmp_info[i].ImageDescriptor.ImageTypeId,
++                        sizeof(struct efi_guid))) == 0)
++        {
++            FWU_LOG_MSG("FMP image update: image id = %u\n\r",
++                                    fmp_info[i].ImageDescriptor.ImageId);
++            fmp_info[i].ImageDescriptor.Version = current_version;
++            fmp_info[i].ImageDescriptor.LastAttemptVersion = attempt_version;
++            fmp_info[i].ImageDescriptor.LastAttemptStatus = last_attempt_status;
++            FWU_LOG_MSG("FMP image update: status = %u"
++                            "version=%u last_attempt_version=%u.\n\r",
++                            last_attempt_status, current_version,
++                            attempt_version);
++            status = FWU_AGENT_SUCCESS;
++            break;
++        }
++    }
++
++    FWU_LOG_MSG("%s:%d Exit.\n\r", __func__, __LINE__);
++    return status;
++}
++
++
++#define NO_OF_FMP_VARIABLES    (NUMBER_OF_FMP_IMAGES * NO_OF_FMP_VARIABLES_PER_IMAGE)
++
++static enum fwu_agent_error_t pack_image_info(void *buffer, uint32_t size)
++{
++    typedef __PACKED_STRUCT {
++        uint32_t variable_count;
++        uint32_t variable_size[NO_OF_FMP_VARIABLES];
++        uint8_t variable[];
++    } packed_buffer_t;
++
++    packed_buffer_t *packed_buffer = buffer;
++    int runner = 0;
++    int index = 0;
++    int current_size = sizeof(packed_buffer_t);
++    int size_requirement_1 = 0;
++    int size_requirement_2 = 0;
++
++    if (size < current_size) {
++        FWU_LOG_MSG("%s:%d Buffer too small.\n\r", __func__, __LINE__);
++        return FWU_AGENT_ERROR;
++    }
++
++    packed_buffer->variable_count = NO_OF_FMP_VARIABLES;
++
++    for (int i = 0; i < NUMBER_OF_FMP_IMAGES; i++) {
++
++       packed_buffer->variable_size[index++] = sizeof(DescriptorVersion_t);
++       packed_buffer->variable_size[index++] = sizeof(DescriptorSize_t);
++       packed_buffer->variable_size[index++] = sizeof(DescriptorCount_t);
++       packed_buffer->variable_size[index++] = sizeof(EFI_FIRMWARE_IMAGE_DESCRIPTOR);
++       packed_buffer->variable_size[index++] = fmp_info[i].ImageNameSize;
++       packed_buffer->variable_size[index++] = fmp_info[i].ImageVersionNameSize;
++
++       size_requirement_1 = sizeof(DescriptorVersion_t) + sizeof(DescriptorSize_t) +
++              sizeof(DescriptorCount_t) + sizeof(EFI_FIRMWARE_IMAGE_DESCRIPTOR);
++
++       size_requirement_2 = fmp_info[i].ImageNameSize + fmp_info[i].ImageVersionNameSize;
++
++       current_size += size_requirement_1 + size_requirement_2;
++
++       if (size < current_size) {
++           FWU_LOG_MSG("%s:%d Buffer too small.\n\r", __func__, __LINE__);
++           return FWU_AGENT_ERROR;
++       }
++
++       FWU_LOG_MSG("%s:%d ImageInfo size = %u, ImageName size = %u, "
++               "ImageVersionName size = %u\n\r", __func__, __LINE__,
++               sizeof(EFI_FIRMWARE_IMAGE_DESCRIPTOR), fmp_info[i].ImageNameSize,
++               fmp_info[i].ImageVersionNameSize);
++   
++       memcpy(&packed_buffer->variable[runner], &fmp_info[i], size_requirement_1);
++       runner += size_requirement_1;
++   
++       memcpy(&packed_buffer->variable[runner], fmp_info[i].ImageName,
++                                       fmp_info[i].ImageNameSize);
++       runner += fmp_info[i].ImageNameSize;
++   
++       memcpy(&packed_buffer->variable[runner], fmp_info[i].ImageVersionName,
++                                       fmp_info[i].ImageVersionNameSize);
++       runner += fmp_info[i].ImageVersionNameSize;
++
++    }
++
++    return FWU_AGENT_SUCCESS;
++}
++
++enum fwu_agent_error_t fmp_get_image_info(void *buffer, uint32_t size)
++{
++    enum fwu_agent_error_t status;
++
++    FWU_LOG_MSG("%s:%d Enter\n\r", __func__, __LINE__);
++
++    status = pack_image_info(buffer, size);
++
++    FWU_LOG_MSG("%s:%d Exit\n\r", __func__, __LINE__);
++
++    return status;
++}
++
+diff --git a/platform/ext/target/arm/corstone1000/fw_update_agent/uefi_fmp.h b/platform/ext/target/arm/corstone1000/fw_update_agent/uefi_fmp.h
+new file mode 100644
+index 0000000000..d876bd7cff
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/fw_update_agent/uefi_fmp.h
+@@ -0,0 +1,56 @@
++/*
++ * Copyright (c) 2022, Arm Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ *
++ */
++
++#ifndef UEFI_FMP_H
++#define UEFI_FMP_H
++
++
++#include <stdint.h>
++#include "fwu_agent.h"
++#include "../fip_parser/external/uuid.h"
++
++/*
++ * Last Attempt Status Value
++ */
++
++#define LAST_ATTEMPT_STATUS_SUCCESS                                     0x00000000
++#define LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL                          0x00000001
++#define LAST_ATTEMPT_STATUS_ERROR_INSUFFICIENT_RESOURCES                0x00000002
++#define LAST_ATTEMPT_STATUS_ERROR_INCORRECT_VERSION                     0x00000003
++#define LAST_ATTEMPT_STATUS_ERROR_INVALID_FORMAT                        0x00000004
++#define LAST_ATTEMPT_STATUS_ERROR_AUTH_ERROR                            0x00000005
++#define LAST_ATTEMPT_STATUS_ERROR_PWR_EVT_AC                            0x00000006
++#define LAST_ATTEMPT_STATUS_ERROR_PWR_EVT_BATT                          0x00000007
++#define LAST_ATTEMPT_STATUS_ERROR_UNSATISFIED_DEPENDENCIES              0x00000008
++/* The LastAttemptStatus values of 0x1000 - 0x4000 are reserved for vendor usage. */
++#define LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL_VENDOR_RANGE_MIN         0x00001000
++#define LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL_VENDOR_RANGE_MAX         0x00004000
++
++
++
++/*
++ * Updates FMP information for the image matched by guid.
++ *
++ * guid : guid of the image
++ * current_version: current versions for the image
++ * attempt_version: attempted versions for the image
++ *
++ */
++enum fwu_agent_error_t fmp_set_image_info(struct efi_guid *guid,
++                     uint32_t current_version, uint32_t attempt_version,
++                     uint32_t last_attempt_status);
++
++/*
++ * Return fmp image information for all the updable images.
++ *
++ * buffer : pointer to the out buffer
++ * size : size of the buffer
++ *
++ */
++enum fwu_agent_error_t fmp_get_image_info(void *buffer, uint32_t size);
++
++#endif /* UEFI_FMP_H */
+diff --git a/platform/ext/target/arm/corstone1000/services/include/corstone1000_ioctl_requests.h b/platform/ext/target/arm/corstone1000/services/include/corstone1000_ioctl_requests.h
+index 8ac67346b6..c5f3537e9d 100644
+--- a/platform/ext/target/arm/corstone1000/services/include/corstone1000_ioctl_requests.h
++++ b/platform/ext/target/arm/corstone1000/services/include/corstone1000_ioctl_requests.h
+@@ -14,19 +14,7 @@
+ enum corstone1000_ioctl_id_t {
+    IOCTL_CORSTONE1000_FWU_FLASH_IMAGES = 0,
+    IOCTL_CORSTONE1000_FWU_HOST_ACK,
++   IOCTL_CORSTONE1000_FMP_GET_IMAGE_INFO,
+ };
+ 
+-
+-typedef struct corstone1000_ioctl_in_params {
+-
+-    uint32_t ioctl_id;
+-
+-} corstone1000_ioctl_in_params_t;
+-
+-typedef struct corstone1000_ioctl_out_params {
+-
+-    int32_t result;
+-
+-} corstone1000_ioctl_out_params_t;
+-
+ #endif /* CORSTONE1000_IOCTL_REQUESTS_H */
+diff --git a/platform/ext/target/arm/corstone1000/services/src/tfm_platform_system.c b/platform/ext/target/arm/corstone1000/services/src/tfm_platform_system.c
+index 5b3f3e14a2..41305ed966 100644
+--- a/platform/ext/target/arm/corstone1000/services/src/tfm_platform_system.c
++++ b/platform/ext/target/arm/corstone1000/services/src/tfm_platform_system.c
+@@ -9,6 +9,7 @@
+ #include "platform_description.h"
+ #include "corstone1000_ioctl_requests.h"
+ #include "fwu_agent.h"
++#include "uefi_fmp.h"
+ 
+ void tfm_platform_hal_system_reset(void)
+ {
+@@ -36,6 +37,14 @@ enum tfm_platform_err_t tfm_platform_hal_ioctl(tfm_platform_ioctl_req_t request,
+             corstone1000_fwu_host_ack();
+             break;
+ 
++        case IOCTL_CORSTONE1000_FMP_GET_IMAGE_INFO:
++            if (out_vec == NULL) {
++                ret = TFM_PLATFORM_ERR_INVALID_PARAM;
++                break;
++            }
++            fmp_get_image_info(out_vec[0].base, out_vec[0].len);
++            break;
++
+         default:
+             ret = TFM_PLATFORM_ERR_NOT_SUPPORTED;
+             break;
+-- 
+2.25.1
+

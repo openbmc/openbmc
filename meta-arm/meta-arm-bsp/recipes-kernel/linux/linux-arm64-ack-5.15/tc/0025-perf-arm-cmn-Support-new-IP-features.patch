@@ -13,7 +13,8 @@ it around as necessary, and handling (most of) the new choices.
 Signed-off-by: Robin Murphy <robin.murphy@arm.com>
 Link: https://lore.kernel.org/r/e58b495bcc7deec3882be4bac910ed0bf6979674.1638530442.git.robin.murphy@arm.com
 Signed-off-by: Will Deacon <will@kernel.org>
-Upstream-Status = Backport [https://lore.kernel.org/r/e58b495bcc7deec3882be4bac910ed0bf6979674.1638530442.git.robin.murphy@arm.com]
+
+Upstream-Status: Backport [https://lore.kernel.org/r/e58b495bcc7deec3882be4bac910ed0bf6979674.1638530442.git.robin.murphy@arm.com]
 Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com>
 Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
 ---

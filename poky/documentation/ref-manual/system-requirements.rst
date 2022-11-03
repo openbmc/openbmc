@@ -74,12 +74,12 @@ distributions:
       the supported platforms listed below.
 
    -  You may use Windows Subsystem For Linux v2 to set up a build host
-      using Windows 10, but validation is not performed against build
-      hosts using WSLv2.
+      using Windows 10 or later, or Windows Server 2019 or later, but validation
+      is not performed against build hosts using WSL 2.
 
-   -  The Yocto Project is not compatible with WSLv1, it is
-      compatible but not officially supported nor validated with
-      WSLv2, if you still decide to use WSL please upgrade to WSLv2.
+      See the
+      :ref:`dev-manual/start:setting up to use windows subsystem for linux (wsl 2)`
+      section in the Yocto Project Development Tasks Manual for more information.
 
    -  If you encounter problems, please go to :yocto_bugs:`Yocto Project
       Bugzilla <>` and submit a bug. We are

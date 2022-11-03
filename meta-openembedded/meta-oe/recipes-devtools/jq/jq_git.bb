@@ -24,10 +24,8 @@ PACKAGECONFIG ?= "oniguruma"
 PACKAGECONFIG[docs] = "--enable-docs,--disable-docs,ruby-native"
 PACKAGECONFIG[maintainer-mode] = "--enable-maintainer-mode,--disable-maintainer-mode,flex-native bison-native"
 PACKAGECONFIG[oniguruma] = "--with-oniguruma,--without-oniguruma,onig"
-
-EXTRA_OECONF += " \
-    --disable-valgrind \
-"
+# enable if you want ptest running under valgrind
+PACKAGECONFIG[valgrind] = "--enable-valgrind,--disable-valgrind,valgrind"
 
 do_install_ptest() {
     cp -rf ${B}/tests ${D}${PTEST_PATH}
@@ -35,6 +33,11 @@ do_install_ptest() {
     # libjq.so.* is packaged in the main jq component, so remove it from ptest
     rm -f ${D}${PTEST_PATH}/.libs/libjq.so.*
     ln -sf ${bindir}/jq ${D}${PTEST_PATH}
+    if [ "${@bb.utils.contains('PACKAGECONFIG', 'valgrind', 'true', 'false', d)}" = "false" ]; then
+        sed -i 's:#export NO_VALGRIND=1:export NO_VALGRIND=1:g' ${D}${PTEST_PATH}/run-ptest
+    fi
+    # handle multilib
+    sed -i s:@libdir@:${libdir}:g ${D}${PTEST_PATH}/run-ptest
 }
 
 BBCLASSEXTEND = "native"

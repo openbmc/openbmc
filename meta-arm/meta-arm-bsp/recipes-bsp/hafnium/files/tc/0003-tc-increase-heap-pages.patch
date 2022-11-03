@@ -3,6 +3,7 @@ From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
 Date: Fri, 29 Apr 2022 20:07:50 +0100
 Subject: [PATCH] tc: increase heap pages
 
+Upstream-Status: Pending
 Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
 ---
  /BUILD.gn | 2 +-

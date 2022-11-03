@@ -16,3 +16,8 @@ do_install() {
 }
 
 require parsec-tool_${PV}.inc
+
+# The QA check has been temporarily disabled. An issue has been created 
+# upstream to fix this. 
+# https://github.com/parallaxsecond/parsec-tool/issues/94
+INSANE_SKIP:${PN}-dbg += "buildpaths"

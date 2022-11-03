@@ -1,7 +1,7 @@
 SUMMARY = "VirtualBox Linux Guest Drivers"
 SECTION = "core"
-LICENSE = "GPL-2.0-only"
-LIC_FILES_CHKSUM = "file://${WORKDIR}/${VBOX_NAME}/COPYING;md5=e197d5641bb35b29d46ca8c4bf7f2660"
+LICENSE = "GPL-3.0-only"
+LIC_FILES_CHKSUM = "file://${WORKDIR}/${VBOX_NAME}/COPYING;md5=fff5fe1c81dd6dc3d522e7862e44881e"
 
 DEPENDS = "virtual/kernel"
 
@@ -15,7 +15,7 @@ SRC_URI = "http://download.virtualbox.org/virtualbox/${PV}/${VBOX_NAME}.tar.bz2 
     file://Makefile.utils \
 "
 
-SRC_URI[sha256sum] = "56d997b58154df3974ce040a64970fa774add41e84b23dfb84b279b24545d7e4"
+SRC_URI[sha256sum] = "1e5b321bf20eec03154e2b3e16331f827a472d6e8e5b1e04c27041978975a97a"
 
 S ?= "${WORKDIR}/vbox_module"
 S:task-patch = "${WORKDIR}/${VBOX_NAME}"

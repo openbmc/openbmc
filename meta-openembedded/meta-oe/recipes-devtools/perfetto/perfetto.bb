@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=f87516e0b698007e9e75a1fe1012b390 \
                     file://debian/copyright;md5=4e08364c82141f181de69d0a2b89d612 \
                     file://python/LICENSE;md5=c602a632c34ade9c78a976734077bce7"
 
-SRC_URI = "git://github.com/google/perfetto.git;branch=master;protocol=https;name=perfetto \
+SRC_URI:append = " \
            git://github.com/protocolbuffers/protobuf.git;branch=3.9.x;protocol=https;destsuffix=git/buildtools/protobuf;name=protobuf \
            git://chromium.googlesource.com/external/github.com/llvm/llvm-project/libcxx.git;protocol=https;destsuffix=git/buildtools/libcxx;branch=main;name=libcxx \
            git://chromium.googlesource.com/external/github.com/llvm/llvm-project/libcxxabi.git;protocol=https;destsuffix=git/buildtools/libcxxabi;branch=main;name=libcxxabi \
@@ -19,13 +19,14 @@ SRC_URI = "git://github.com/google/perfetto.git;branch=master;protocol=https;nam
            https://storage.googleapis.com/perfetto/gn-linux64-1968-0725d782;subdir=git/buildtools/;name=gn \
            file://0001-Remove-check_build_deps-build-steps.patch "
 
-SRCREV_perfetto = "5bd3f582c075d0d026c5fe0b5e291d34dee0d976"
 SRCREV_protobuf = "6a59a2ad1f61d9696092f79b6d74368b4d7970a3"
 SRCREV_libcxx = "d9040c75cfea5928c804ab7c235fed06a63f743a"
 SRCREV_libcxxabi = "196ba1aaa8ac285d94f4ea8d9836390a45360533"
 SRCREV_libunwind = "d999d54f4bca789543a2eb6c995af2d9b5a1f3ed"
 SRCREV_zlib = "5c85a2da4c13eda07f69d81a1579a5afddd35f59"
 SRC_URI[gn.sha256sum] = "f706aaa0676e3e22f5fc9ca482295d7caee8535d1869f99efa2358177b64f5cd"
+
+require perfetto.inc
 
 DEPENDS += " ninja-native"
 
@@ -35,7 +36,6 @@ FILES:${PN}:append = " \
   ${bindir}/tracebox \
   "
 
-S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
 # Run the GN (Generate Ninja) script, and replace the compiler flags where applicable

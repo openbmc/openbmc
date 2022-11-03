@@ -1,0 +1,359 @@
+From 6ab17eeb8225cdf4afc6956c9a2774d60866c36d Mon Sep 17 00:00:00 2001
+From: Satish Kumar <satish.kumar01@arm.com>
+Date: Mon, 28 Mar 2022 05:16:50 +0100
+Subject: [PATCH 1/6] corstone1000: platform secure test framework
+
+Change-Id: Ib781927f0add93ec9c06515d251e79518ee1db6e
+Signed-off-by: Satish Kumar <satish.kumar01@arm.com>
+Upstream-Status: Accepted [TF-Mv1.7.0]
+---
+ .../arm/corstone1000/Native_Driver/firewall.c |  15 ++
+ .../arm/corstone1000/Native_Driver/firewall.h |   5 +
+ .../ci_regression_tests/CMakeLists.txt        |  45 +++++
+ .../corstone1000/ci_regression_tests/s_test.c | 186 ++++++++++++++++++
+ .../corstone1000/ci_regression_tests/s_test.h |  30 +++
+ .../ci_regression_tests/s_test_config.cmake   |   8 +
+ 6 files changed, 289 insertions(+)
+ create mode 100644 platform/ext/target/arm/corstone1000/ci_regression_tests/CMakeLists.txt
+ create mode 100644 platform/ext/target/arm/corstone1000/ci_regression_tests/s_test.c
+ create mode 100644 platform/ext/target/arm/corstone1000/ci_regression_tests/s_test.h
+ create mode 100644 platform/ext/target/arm/corstone1000/ci_regression_tests/s_test_config.cmake
+
+diff --git a/platform/ext/target/arm/corstone1000/Native_Driver/firewall.c b/platform/ext/target/arm/corstone1000/Native_Driver/firewall.c
+index 788cc3ec92..356b85e9d5 100755
+--- a/platform/ext/target/arm/corstone1000/Native_Driver/firewall.c
++++ b/platform/ext/target/arm/corstone1000/Native_Driver/firewall.c
+@@ -293,6 +293,21 @@ void fc_enable_mpl(enum rgn_mpe_t mpe, enum rgn_mpl_t mpl)
+         ptr->rgn_mpl3 |= (mpl & RGN_MPL_EN_MASK);
+ }
+ 
++void fc_read_mpl(enum rgn_mpe_t mpe, enum rgn_mpl_t* mpl)
++{
++    struct _firewall_pe_rwe_reg_map_t *ptr =
++         (struct _firewall_pe_rwe_reg_map_t *)fw_data.rwe_ptr;
++    if (mpe == RGN_MPE0)
++        *mpl = (ptr->rgn_mpl0 & RGN_MPL_EN_MASK);
++    else if (mpe == RGN_MPE1)
++        *mpl = (ptr->rgn_mpl1 & RGN_MPL_EN_MASK);
++    else if (mpe == RGN_MPE2)
++        *mpl = (ptr->rgn_mpl2 & RGN_MPL_EN_MASK);
++    else if (mpe == RGN_MPE3)
++        *mpl = (ptr->rgn_mpl3 & RGN_MPL_EN_MASK);
++}
++
++
+ void fc_disable_mpl(enum rgn_mpe_t mpe, enum rgn_mpl_t mpl)
+ {
+     struct _firewall_pe_rwe_reg_map_t *ptr =
+diff --git a/platform/ext/target/arm/corstone1000/Native_Driver/firewall.h b/platform/ext/target/arm/corstone1000/Native_Driver/firewall.h
+index 48c86725ef..17afe6a92f 100755
+--- a/platform/ext/target/arm/corstone1000/Native_Driver/firewall.h
++++ b/platform/ext/target/arm/corstone1000/Native_Driver/firewall.h
+@@ -247,6 +247,11 @@ void fc_init_mpl(enum rgn_mpe_t mpe);
+  */
+ void fc_enable_mpl(enum rgn_mpe_t mpe, enum rgn_mpl_t mpl);
+ 
++/**
++ * \brief Reads Master Permission List in the selected Firewall Component
++ */
++void fc_read_mpl(enum rgn_mpe_t mpe, enum rgn_mpl_t* mpl);
++
+ /**
+  * \brief Disables Master Permission List in the selected Firewall Component
+  */
+diff --git a/platform/ext/target/arm/corstone1000/ci_regression_tests/CMakeLists.txt b/platform/ext/target/arm/corstone1000/ci_regression_tests/CMakeLists.txt
+new file mode 100644
+index 0000000000..70e1c20e4e
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/ci_regression_tests/CMakeLists.txt
+@@ -0,0 +1,45 @@
++#-------------------------------------------------------------------------------
++# Copyright (c) 2021-22, Arm Limited. All rights reserved.
++#
++# SPDX-License-Identifier: BSD-3-Clause
++#
++#-------------------------------------------------------------------------------
++
++cmake_policy(SET CMP0079 NEW)
++
++include(${CMAKE_CURRENT_SOURCE_DIR}/s_test_config.cmake)
++
++####################### Secure #################################################
++
++add_library(corstone1000_test_s STATIC EXCLUDE_FROM_ALL)
++
++target_sources(corstone1000_test_s
++    PRIVATE
++        ${CMAKE_CURRENT_SOURCE_DIR}/s_test.c
++        ../Native_Driver/firewall.c
++)
++
++target_include_directories(corstone1000_test_s
++    PRIVATE
++        ${CMAKE_CURRENT_SOURCE_DIR}
++        ../Device/Include
++        ../Native_Driver
++)
++
++# Example test links tfm_test_suite_extra_common to use related interface
++target_link_libraries(corstone1000_test_s
++    PRIVATE
++        tfm_test_suite_extra_common
++        tfm_log
++)
++
++target_compile_definitions(corstone1000_test_s
++    PRIVATE
++        $<$<BOOL:${PLATFORM_IS_FVP}>:PLATFORM_IS_FVP>
++)
++
++# The corstone1000_test_s library is linked by tfm_test_suite_extra_s
++target_link_libraries(tfm_test_suite_extra_s
++    PRIVATE
++        corstone1000_test_s
++)
+diff --git a/platform/ext/target/arm/corstone1000/ci_regression_tests/s_test.c b/platform/ext/target/arm/corstone1000/ci_regression_tests/s_test.c
+new file mode 100644
+index 0000000000..963f46d2ab
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/ci_regression_tests/s_test.c
+@@ -0,0 +1,186 @@
++/*
++ * Copyright (c) 2021-22, Arm Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ *
++ */
++
++#include "s_test.h"
++#include "platform_base_address.h"
++#include "firewall.h"
++#include "tfm_log_raw.h"
++
++#define DISABLED_TEST 0
++
++enum host_firewall_host_comp_id_t {
++  HOST_FCTRL = (0x00u),
++  COMP_SYSPERIPH,
++  COMP_DBGPERIPH,
++  COMP_AONPERIPH,
++  COMP_XNVM,
++  COMP_CVM,
++  COMP_HOSTCPU,
++  COMP_EXTSYS0,
++  COMP_EXTSYS1,
++  COMP_EXPSLV0,
++  COMP_EXPSLV1,
++  COMP_EXPMST0,
++  COMP_EXPMST1,
++  COMP_OCVM,
++  COMP_DEBUG,
++};
++
++const struct extra_tests_t plat_s_t = {
++    .test_entry = s_test,
++    .expected_ret = EXTRA_TEST_SUCCESS
++};
++
++static int test_host_firewall_status(void)
++{
++    enum fw_lockdown_status_t status;
++    uint32_t any_component_id = 2;
++
++    fc_select((void *)CORSTONE1000_HOST_FIREWALL_BASE, any_component_id);
++    status = fw_get_lockdown_status();
++    if (status != FW_LOCKED) {
++        tfm_log_printf("FAIL: %s.\n\r", __func__);
++        return EXTRA_TEST_FAILED;
++    }
++
++    tfm_log_printf("PASS: %s\n\r", __func__);
++    return EXTRA_TEST_SUCCESS;
++}
++
++static int test_host_firewall_external_flash_configurations(void)
++{
++    enum rgn_mpl_t mpl_rights = 0;
++    enum rgn_mpl_t expected_rights = 0;
++
++#if !(PLATFORM_IS_FVP)
++    /* External flash */
++    fc_select((void *)CORSTONE1000_HOST_FIREWALL_BASE, COMP_EXPMST0);
++    fc_select_region(3);
++    fc_read_mpl(RGN_MPE0, &mpl_rights);
++    expected_rights = (RGN_MPL_ANY_MST_MASK | RGN_MPL_SECURE_READ_MASK |
++                                              RGN_MPL_SECURE_WRITE_MASK);
++    if (mpl_rights != expected_rights) {
++        tfm_log_printf("FAIL1: %s.\n\r", __func__);
++        return EXTRA_TEST_FAILED;
++    }
++    /* XIP Permissions */
++    fc_select((void *)CORSTONE1000_HOST_FIREWALL_BASE, COMP_XNVM);
++    fc_select_region(1);
++    fc_read_mpl(RGN_MPE0, &mpl_rights);
++    expected_rights = (RGN_MPL_ANY_MST_MASK |
++                              RGN_MPL_SECURE_READ_MASK |
++                              RGN_MPL_NONSECURE_READ_MASK);
++    if (mpl_rights != expected_rights) {
++        tfm_log_printf("FAIL2: %s.\n\r", __func__);
++        return EXTRA_TEST_FAILED;
++    }
++#else
++    /* Enable the below test when FVP Host Firewall is configured. */
++    /*
++    fc_select((void *)CORSTONE1000_HOST_FIREWALL_BASE, COMP_XNVM);
++    fc_select_region(1);
++    fc_read_mpl(RGN_MPE0, &mpl_rights);
++    tfm_log_printf("mpl rights = %d\n\r", mpl_rights);
++    expected_rights = (RGN_MPL_ANY_MST_MASK |
++                  RGN_MPL_SECURE_READ_MASK |
++                  RGN_MPL_SECURE_WRITE_MASK |
++                  RGN_MPL_NONSECURE_READ_MASK |
++                  RGN_MPL_NONSECURE_WRITE_MASK);
++    if (mpl_rights != expected_rights) {
++        tfm_log_printf("FAIL1: %s.\n\r", __func__);
++        return EXTRA_TEST_FAILED;
++    }
++    */
++#endif
++
++    tfm_log_printf("PASS: %s\n\r", __func__);
++    return EXTRA_TEST_SUCCESS;
++}
++
++static int test_host_firewall_secure_flash_configurations(void)
++{
++    enum rgn_mpl_t mpl_rights = 0;
++    enum rgn_mpl_t expected_rights = 0;
++
++#if !(PLATFORM_IS_FVP)
++    /* External flash */
++    fc_select((void *)CORSTONE1000_HOST_FIREWALL_BASE, COMP_EXPMST1);
++    fc_select_region(1);
++    fc_read_mpl(RGN_MPE0, &mpl_rights);
++    expected_rights = (RGN_MPL_ANY_MST_MASK | RGN_MPL_SECURE_READ_MASK |
++                                              RGN_MPL_SECURE_WRITE_MASK);
++    if (mpl_rights != expected_rights) {
++        tfm_log_printf("FAIL: %s.\n\r", __func__);
++        return EXTRA_TEST_FAILED;
++    }
++#endif
++
++    tfm_log_printf("PASS: %s\n\r", __func__);
++    return EXTRA_TEST_SUCCESS;
++}
++
++static int test_bir_programming(void)
++{
++    /* BIR is expected to bhaive like write once register */
++
++    volatile uint32_t *bir_base = (uint32_t *)CORSTONE1000_HOST_BIR_BASE;
++
++    bir_base[0] = 0x1;
++    bir_base[0] = 0x2;
++    if (bir_base[0] != 0x1) {
++        tfm_log_printf("FAIL: %s : (%u)\n\r", __func__, bir_base[0]);
++        return EXTRA_TEST_FAILED;
++    }
++
++    tfm_log_printf("PASS: %s\n\r", __func__);
++    return EXTRA_TEST_SUCCESS;
++}
++
++int32_t s_test(void)
++{
++    int status;
++    int failures = 0;
++
++#if (DISABLED_TEST == 1)
++    status = test_host_firewall_status();
++    if (status) {
++        failures++;
++    }
++#endif
++
++    status = test_host_firewall_secure_flash_configurations();
++    if (status) {
++        failures++;
++    }
++
++    status = test_host_firewall_external_flash_configurations();
++    if (status) {
++        failures++;
++    }
++
++#if (DISABLED_TEST == 1)
++    status = test_bir_programming();
++    if (status) {
++        failures++;
++    }
++#endif
++
++    if (failures) {
++        tfm_log_printf("Not all platform test could pass: failures=%d\n\r", failures);
++        return EXTRA_TEST_FAILED;
++    }
++
++    tfm_log_printf("ALL_PASS: corstone1000 platform test cases passed.\n\r");
++    return EXTRA_TEST_SUCCESS;
++}
++
++int32_t extra_tests_init(struct extra_tests_t *internal_test_t)
++{
++    /* Add platform init code here. */
++
++    return register_extra_tests(internal_test_t, &plat_s_t);
++}
+diff --git a/platform/ext/target/arm/corstone1000/ci_regression_tests/s_test.h b/platform/ext/target/arm/corstone1000/ci_regression_tests/s_test.h
+new file mode 100644
+index 0000000000..8aff4d679c
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/ci_regression_tests/s_test.h
+@@ -0,0 +1,30 @@
++/*
++ * Copyright (c) 2021-22, Arm Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ *
++ */
++
++#ifndef __S_TESTS_H__
++#define __S_TESTS_H__
++
++#include "extra_tests_common.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++const struct extra_tests_t plat_s_t;
++
++/**
++ * \brief Platform specific secure test function.
++ *
++ * \returns Returns error code as specified in \ref int32_t
++ */
++int32_t s_test(void);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* __S_TESTS_H__ */
+diff --git a/platform/ext/target/arm/corstone1000/ci_regression_tests/s_test_config.cmake b/platform/ext/target/arm/corstone1000/ci_regression_tests/s_test_config.cmake
+new file mode 100644
+index 0000000000..bb8d26bf1c
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/ci_regression_tests/s_test_config.cmake
+@@ -0,0 +1,8 @@
++#-------------------------------------------------------------------------------
++# Copyright (c) 2021-22, Arm Limited. All rights reserved.
++#
++# SPDX-License-Identifier: BSD-3-Clause
++#
++#-------------------------------------------------------------------------------
++
++############ Define secure test specific cmake configurations here #############
+-- 
+2.25.1
+

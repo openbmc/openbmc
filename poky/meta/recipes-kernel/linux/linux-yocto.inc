@@ -33,6 +33,7 @@ KERNEL_LD:append:arc = " ${TOOLCHAIN_OPTIONS}"
 
 KERNEL_FEATURES:append:qemuall=" features/debug/printk.scc"
 
+KERNEL_FEATURES:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'efi', 'cfg/efi.scc', '', d)}"
 KERNEL_FEATURES:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'numa', 'features/numa/numa.scc', '', d)}"
 KERNEL_FEATURES:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'vfat', 'cfg/fs/vfat.scc', '', d)}"
 
