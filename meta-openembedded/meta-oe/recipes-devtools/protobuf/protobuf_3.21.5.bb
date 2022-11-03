@@ -26,6 +26,7 @@ inherit cmake pkgconfig ptest
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG:class-native ?= "compiler"
+PACKAGECONFIG:class-nativesdk ?= "compiler"
 PACKAGECONFIG[python] = ",,"
 PACKAGECONFIG[compiler] = "-Dprotobuf_BUILD_PROTOC_BINARIES=ON,-Dprotobuf_BUILD_PROTOC_BINARIES=OFF"
 

@@ -42,7 +42,7 @@ Autotools Class Changes
 The following :ref:`autotools <ref-classes-autotools>` class changes
 occurred:
 
--  *A separate build directory is now used by default:* The
+-  *A separate :term:`Build Directory` is now used by default:* The
    :ref:`autotools <ref-classes-autotools>` class has been
    changed to use a directory for building
    (:term:`B`), which is separate from the source directory

@@ -116,38 +116,34 @@ build the SDK installer. Follow these steps:
 
       $ source oe-init-build-env
 
-   Among other things, the script
-   creates the :term:`Build Directory`,
-   which is
-   ``build`` in this case and is located in the Source Directory. After
-   the script runs, your current working directory is set to the
-   ``build`` directory.
+   Among other things, the script creates the :term:`Build Directory`, which
+   is ``build`` in this case and is located in the Source Directory. After
+   the script runs, your current working directory is set to the ``build``
+   directory.
 
 4. *Make Sure You Are Building an Installer for the Correct Machine:*
-   Check to be sure that your
-   :term:`MACHINE` variable in the
-   ``local.conf`` file in your Build Directory matches the architecture
+   Check to be sure that your :term:`MACHINE` variable in the ``local.conf``
+   file in your :term:`Build Directory` matches the architecture
    for which you are building.
 
 5. *Make Sure Your SDK Machine is Correctly Set:* If you are building a
    toolchain designed to run on an architecture that differs from your
    current development host machine (i.e. the build host), be sure that
-   the :term:`SDKMACHINE` variable
-   in the ``local.conf`` file in your Build Directory is correctly set.
+   the :term:`SDKMACHINE` variable in the ``local.conf`` file in your
+   :term:`Build Directory` is correctly set.
 
    .. note::
 
       If you are building an SDK installer for the Extensible SDK, the
-      SDKMACHINE
-      value must be set for the architecture of the machine you are
-      using to build the installer. If
-      SDKMACHINE
+      :term:`SDKMACHINE` value must be set for the architecture of the
+      machine you are using to build the installer. If :term:`SDKMACHINE`
       is not set appropriately, the build fails and provides an error
       message similar to the following::
 
-              The extensible SDK can currently only be built for the same architecture as the machine being built on - SDK_ARCH is
-              set to i686 (likely via setting SDKMACHINE) which is different from the architecture of the build machine (x86_64).
-              Unable to continue.
+         The extensible SDK can currently only be built for the same
+         architecture as the machine being built on --- :term:`SDK_ARCH`
+         is set to ``i686`` (likely via setting :term:`SDKMACHINE`) which is
+         different from the architecture of the build machine (``x86_64``).
 
 
 6. *Build the SDK Installer:* To build the SDK installer for a standard
@@ -164,7 +160,7 @@ build the SDK installer. Follow these steps:
    that matches your target root filesystem.
 
    When the ``bitbake`` command completes, the SDK installer will be in
-   ``tmp/deploy/sdk`` in the Build Directory.
+   ``tmp/deploy/sdk`` in the :term:`Build Directory`.
 
    .. note::
 
@@ -181,7 +177,7 @@ build the SDK installer. Follow these steps:
          libc-staticdev"
 
 7. *Run the Installer:* You can now run the SDK installer from
-   ``tmp/deploy/sdk`` in the Build Directory. Following is an example::
+   ``tmp/deploy/sdk`` in the :term:`Build Directory`. Following is an example::
 
       $ cd poky/build/tmp/deploy/sdk
       $ ./poky-glibc-x86_64-core-image-sato-core2-64-toolchain-ext-&DISTRO;.sh

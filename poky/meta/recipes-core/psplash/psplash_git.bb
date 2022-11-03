@@ -58,7 +58,7 @@ python __anonymous() {
         d.setVarFlag("ALTERNATIVE_TARGET_%s" % ep, 'psplash', '${bindir}/%s' % p)
         d.appendVar("RDEPENDS:%s" % ep, " %s" % pn)
         if p == "psplash-default":
-            d.appendVar("RRECOMMENDS:%s" % pn, " %s" % ep)
+            d.appendVar("RDEPENDS:%s" % pn, " %s" % ep)
 }
 
 S = "${WORKDIR}/git"

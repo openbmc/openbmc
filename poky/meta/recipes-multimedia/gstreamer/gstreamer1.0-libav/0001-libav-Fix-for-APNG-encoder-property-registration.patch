@@ -1,0 +1,86 @@
+From 78a97c1ec35ada76d83fc67d0549ba56c74d8875 Mon Sep 17 00:00:00 2001
+From: Seungha Yang <seungha@centricular.com>
+Date: Thu, 7 Jul 2022 22:16:30 +0900
+Subject: [PATCH] libav: Fix for APNG encoder property registration
+
+The AVClass name of Animated PNG in FFmpeg 5.x is "(A)PNG"
+and it will be converted to "-a-png" through
+g_ascii_strdown() and g_strcanon(). But GLib disallow leading '-'
+character for a GType name. Strip leading '-' to workaround it.
+
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/2724]
+
+Seungha Yangs patch was imported without modifications.
+
+Signed-off-by: Claus Stovgaard <claus.stovgaard@gmail.com>
+---
+ ext/libav/gstavcfg.c | 29 +++++++++++++++++++++++------
+ 1 file changed, 23 insertions(+), 6 deletions(-)
+
+diff --git a/ext/libav/gstavcfg.c b/ext/libav/gstavcfg.c
+index c736920..a8635a7 100644
+--- a/ext/libav/gstavcfg.c
++++ b/ext/libav/gstavcfg.c
+@@ -91,10 +91,19 @@ register_enum (const AVClass ** obj, const AVOption * top_opt)
+   gchar *lower_obj_name = g_ascii_strdown ((*obj)->class_name, -1);
+   gchar *enum_name = g_strdup_printf ("%s-%s", lower_obj_name, top_opt->unit);
+   gboolean none_default = TRUE;
++  const gchar *enum_name_strip;
+ 
+   g_strcanon (enum_name, G_CSET_a_2_z G_CSET_DIGITS, '-');
+ 
+-  if ((res = g_type_from_name (enum_name)))
++  /* strip leading '-'s */
++  enum_name_strip = enum_name;
++  while (enum_name_strip[0] == '-')
++    enum_name_strip++;
++
++  if (enum_name_strip[0] == '\0')
++    goto done;
++
++  if ((res = g_type_from_name (enum_name_strip)))
+     goto done;
+ 
+   while ((opt = av_opt_next (obj, opt))) {
+@@ -150,9 +159,8 @@ register_enum (const AVClass ** obj, const AVOption * top_opt)
+       }
+     }
+ 
+-    res =
+-        g_enum_register_static (enum_name, &g_array_index (values, GEnumValue,
+-            0));
++    res = g_enum_register_static (enum_name_strip,
++        &g_array_index (values, GEnumValue, 0));
+ 
+     gst_type_mark_as_plugin_api (res, 0);
+   }
+@@ -177,10 +185,19 @@ register_flags (const AVClass ** obj, const AVOption * top_opt)
+   GArray *values = g_array_new (TRUE, TRUE, sizeof (GEnumValue));
+   gchar *lower_obj_name = g_ascii_strdown ((*obj)->class_name, -1);
+   gchar *flags_name = g_strdup_printf ("%s-%s", lower_obj_name, top_opt->unit);
++  const gchar *flags_name_strip;
+ 
+   g_strcanon (flags_name, G_CSET_a_2_z G_CSET_DIGITS, '-');
+ 
+-  if ((res = g_type_from_name (flags_name)))
++  /* strip leading '-'s */
++  flags_name_strip = flags_name;
++  while (flags_name_strip[0] == '-')
++    flags_name_strip++;
++
++  if (flags_name_strip[0] == '\0')
++    goto done;
++
++  if ((res = g_type_from_name (flags_name_strip)))
+     goto done;
+ 
+   while ((opt = av_opt_next (obj, opt))) {
+@@ -211,7 +228,7 @@ register_flags (const AVClass ** obj, const AVOption * top_opt)
+     g_array_sort (values, (GCompareFunc) cmp_flags_value);
+ 
+     res =
+-        g_flags_register_static (flags_name, &g_array_index (values,
++        g_flags_register_static (flags_name_strip, &g_array_index (values,
+             GFlagsValue, 0));
+ 
+     gst_type_mark_as_plugin_api (res, 0);

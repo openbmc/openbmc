@@ -25,12 +25,15 @@ PACKAGECONFIG:remove:pn-openssh = "rng-tools"
 MACHINE_EXTRA_RRECOMMENDS += "ssh-pregen-hostkeys"
 
 TEST_TARGET = "OEFVPTarget"
+TEST_TARGET_IP = "127.0.0.1:8022"
 
 FVP_PROVIDER ?= "fvp-base-a-aem-native"
 FVP_EXE ?= "FVP_Base_RevC-2xAEMvA"
 FVP_CONFIG[bp.ve_sysregs.exit_on_shutdown] ?= "1"
 FVP_CONFIG[bp.virtio_net.enabled] ?= "1"
 FVP_CONFIG[bp.virtio_net.hostbridge.userNetworking] ?= "1"
+# Tell testimage to connect to localhost:8022, and forward that to SSH in the FVP.
+FVP_CONFIG[bp.virtio_net.hostbridge.userNetPorts] = "8022=22"
 FVP_CONFIG[cache_state_modelled] ?= "0"
 FVP_CONFIG[bp.secureflashloader.fname] ?= "${DEPLOY_DIR_IMAGE}/bl1-fvp.bin"
 FVP_CONFIG[bp.flashloader0.fname] ?= "${DEPLOY_DIR_IMAGE}/fip-fvp.bin"

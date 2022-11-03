@@ -5,11 +5,11 @@ to resolve these issues properly upstream.
 Upstream-Status: Inappropriate [patches need rework]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
-Index: rustc-1.62.0-src/src/tools/clippy/src/driver.rs
+Index: rustc-1.64.0-src/src/tools/clippy/src/driver.rs
 ===================================================================
---- rustc-1.62.0-src.orig/src/tools/clippy/src/driver.rs
-+++ rustc-1.62.0-src/src/tools/clippy/src/driver.rs
-@@ -255,7 +255,6 @@ pub fn main() {
+--- rustc-1.64.0-src.orig/src/tools/clippy/src/driver.rs
++++ rustc-1.64.0-src/src/tools/clippy/src/driver.rs
+@@ -259,7 +259,6 @@ pub fn main() {
                      .and_then(|out| String::from_utf8(out.stdout).ok())
                      .map(|s| PathBuf::from(s.trim()))
              })
@@ -17,11 +17,11 @@ Index: rustc-1.62.0-src/src/tools/clippy/src/driver.rs
              .or_else(|| {
                  let home = option_env!("RUSTUP_HOME")
                      .or(option_env!("MULTIRUST_HOME"))
-Index: rustc-1.62.0-src/compiler/rustc_codegen_llvm/src/context.rs
+Index: rustc-1.64.0-src/compiler/rustc_codegen_llvm/src/context.rs
 ===================================================================
---- rustc-1.62.0-src.orig/compiler/rustc_codegen_llvm/src/context.rs
-+++ rustc-1.62.0-src/compiler/rustc_codegen_llvm/src/context.rs
-@@ -167,46 +167,6 @@ pub unsafe fn create_module<'ll>(
+--- rustc-1.64.0-src.orig/compiler/rustc_codegen_llvm/src/context.rs
++++ rustc-1.64.0-src/compiler/rustc_codegen_llvm/src/context.rs
+@@ -166,46 +166,6 @@ pub unsafe fn create_module<'ll>(
          }
      }
  

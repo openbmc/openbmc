@@ -25,18 +25,11 @@ build a reference embedded OS called Poky.
       in the Yocto Project Development Tasks Manual for more
       information.
 
-   -  You may use Windows Subsystem For Linux v2 to set up a build host
-      using Windows 10.
-
-      .. note::
-
-         The Yocto Project is not compatible with WSLv1, it is
-         compatible but not officially supported nor validated with
-         WSLv2, if you still decide to use WSL please upgrade to WSLv2.
-
-      See the :ref:`dev-manual/start:setting up to use windows
-      subsystem for linux (wslv2)` section in the Yocto Project Development
-      Tasks Manual for more information.
+   -  You may use version 2 of Windows Subsystem For Linux (WSL 2) to set
+      up a build host using Windows 10 or later, Windows Server 2019 or later.
+      See the :ref:`dev-manual/start:setting up to use windows subsystem for
+      linux (wsl 2)` section in the Yocto Project Development Tasks Manual
+      for more information.
 
 If you want more conceptual or background information on the Yocto
 Project, see the :doc:`/overview-manual/index`.
@@ -231,13 +224,13 @@ an entire Linux distribution, including the toolchain, from source.
 
    Among other things, the script creates the :term:`Build Directory`, which is
    ``build`` in this case and is located in the :term:`Source Directory`.  After
-   the script runs, your current working directory is set to the Build
-   Directory. Later, when the build completes, the Build Directory contains all the
-   files created during the build.
+   the script runs, your current working directory is set to the
+   :term:`Build Directory`. Later, when the build completes, the
+   :term:`Build Directory` contains all the files created during the build.
 
 #. **Examine Your Local Configuration File:** When you set up the build
    environment, a local configuration file named ``local.conf`` becomes
-   available in a ``conf`` subdirectory of the Build Directory. For this
+   available in a ``conf`` subdirectory of the :term:`Build Directory`. For this
    example, the defaults are set to build for a ``qemux86`` target,
    which is suitable for emulation. The package manager used is set to
    the RPM package manager.
@@ -352,9 +345,7 @@ Follow these steps to add a hardware layer:
 
 #. **Add Your Layer to the Layer Configuration File:** Before you can use
    a layer during a build, you must add it to your ``bblayers.conf``
-   file, which is found in the
-   :term:`Build Directory` ``conf``
-   directory.
+   file, which is found in the :term:`Build Directory` ``conf`` directory.
 
    Use the ``bitbake-layers add-layer`` command to add the layer to the
    configuration file:

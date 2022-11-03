@@ -28,7 +28,7 @@ SRC_URI = "git://github.com/unfs3/unfs3.git;protocol=https;branch=master \
            file://no-yywrap.patch \
           "
 SRCREV = "c12a5c69a8d59be6916cbd0e0f41c159f1962425"
-UPSTREAM_CHECK_GITTAGREGEX = "unfs3\-(?P<pver>.+)"
+UPSTREAM_CHECK_GITTAGREGEX = "unfs3\-(?P<pver>\d+(\.\d+)+)"
 
 PV = "0.9.22+${SRCPV}"
 

@@ -20,19 +20,3 @@ PACKAGECONFIG[tests] = "-Dvalijson_BUILD_TESTS=TRUE,-Dvalijson_BUILD_TESTS=FALSE
 RDEPENDS:${PN}-dev = ""
 
 BBCLASSEXTEND = "native nativesdk"
-
-do_install() {
-    install -d ${D}${includedir}/compat
-    install -d ${D}${includedir}/valijson
-    install -d ${D}${includedir}/valijson/adapters
-    install -d ${D}${includedir}/valijson/constraints
-    install -d ${D}${includedir}/valijson/internal
-    install -d ${D}${includedir}/valijson/utils
-
-    install -m 0644 ${S}/include/compat/* ${D}${includedir}/compat
-    install -D -m 0644 ${S}/include/valijson/*.hpp -t ${D}${includedir}/valijson
-    install -D -m 0644 ${S}/include/valijson/adapters/*.hpp -t ${D}${includedir}/valijson/adapters
-    install -D -m 0644 ${S}/include/valijson/constraints/*.hpp -t ${D}${includedir}/valijson/constraints
-    install -D -m 0644 ${S}/include/valijson/internal/*.hpp -t ${D}${includedir}/valijson/internal
-    install -D -m 0644 ${S}/include/valijson/utils/*.hpp -t ${D}${includedir}/valijson/utils
-}

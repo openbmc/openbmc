@@ -343,8 +343,7 @@ BitBake Changes
 ---------------
 
 The server logfile ``bitbake-cookerdaemon.log`` is now always placed in
-the :term:`Build Directory` instead of the current
-directory.
+the :term:`Build Directory` instead of the current directory.
 
 .. _migration-2.6-security-changes:
 

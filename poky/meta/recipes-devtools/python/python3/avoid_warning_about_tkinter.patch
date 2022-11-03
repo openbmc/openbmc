@@ -1,4 +1,4 @@
-From 6a23d52c905cd1f6a5944255903ec86ea8b904bb Mon Sep 17 00:00:00 2001
+From 627b8fe6b3c11e8bb1bb1ad1d6b816b79b8dd2ce Mon Sep 17 00:00:00 2001
 From: Andrei Gherzan <andrei@gherzan.ro>
 Date: Mon, 28 Jan 2019 15:57:54 +0000
 Subject: [PATCH] _tkinter module needs tk module along with tcl. tk is not yet
@@ -9,23 +9,22 @@ Upstream-Status: Inappropriate [distribution]
 
 Also simply disable the tk module since its not in DEPENDS.
 Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
-
 ---
- setup.py | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ setup.py | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/setup.py b/setup.py
-index 11b5cf5..2be4738 100644
+index 7555dcd..f29ac86 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -1895,8 +1895,8 @@ class PyBuildExt(build_ext):
+@@ -1364,7 +1364,6 @@ class PyBuildExt(build_ext):
          self.detect_decimal()
          self.detect_ctypes()
          self.detect_multiprocessing()
--        if not self.detect_tkinter():
--            self.missing.append('_tkinter')
-+#        if not self.detect_tkinter():
-+#            self.missing.append('_tkinter')
+-        self.detect_tkinter()
          self.detect_uuid()
  
- ##         # Uncomment these lines if you want to play with xxmodule.c
+         # Uncomment the next line if you want to play with xxmodule.c
+-- 
+2.30.2
+

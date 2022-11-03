@@ -37,12 +37,13 @@ NGINX_USER   ?= "www"
 EXTRA_OECONF = ""
 DISABLE_STATIC = ""
 
-PACKAGECONFIG ??= "ssl"
+PACKAGECONFIG ??= "ssl ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"
 
 PACKAGECONFIG[gunzip] = "--with-http_gunzip_module,,"
 PACKAGECONFIG[http2] = "--with-http_v2_module,,"
 PACKAGECONFIG[ssl] = "--with-http_ssl_module,,openssl"
 PACKAGECONFIG[http-auth-request] = "--with-http_auth_request_module,,"
+PACKAGECONFIG[ipv6] = "--with-ipv6,,"
 
 do_configure () {
     if [ "${SITEINFO_BITS}" = "64" ]; then

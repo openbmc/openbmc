@@ -5,7 +5,7 @@ if [ -z "$OECORE_NATIVE_SYSROOT" ]; then
 fi
 
 if [ -z "$SSL_CERT_DIR" ]; then
-    export SSL_CERT_DIR="${OECORE_NATIVE_SYSROOT}/etc/ssl/certs/"
+    export SSL_CERT_DIR="$OECORE_NATIVE_SYSROOT/etc/ssl/certs/"
 fi
 
 # If these are set to a cross-compile path, meson will get confused and try to
@@ -13,7 +13,20 @@ fi
 # config is already in meson.cross.
 unset CC CXX CPP LD AR NM STRIP
 
+for arg in "$@"; do
+    case "$arg" in
+    -*) continue ;;
+    *) SUBCMD="$arg"; break ;;
+    esac
+done
+
+if [ "$SUBCMD" = "setup" ] || [ -d "$SUBCMD" ]; then
+    MESON_SUB_OPTS=" \
+        --cross-file="$OECORE_NATIVE_SYSROOT/usr/share/meson/${TARGET_PREFIX}meson.cross" \
+        --native-file="$OECORE_NATIVE_SYSROOT/usr/share/meson/meson.native" \
+        "
+fi
+
 exec "$OECORE_NATIVE_SYSROOT/usr/bin/meson.real" \
-     --cross-file "${OECORE_NATIVE_SYSROOT}/usr/share/meson/${TARGET_PREFIX}meson.cross" \
-     --native-file "${OECORE_NATIVE_SYSROOT}/usr/share/meson/meson.native" \
-     "$@"
+    "$@" \
+    $MESON_SUB_OPTS

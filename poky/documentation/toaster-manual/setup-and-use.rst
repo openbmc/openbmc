@@ -23,8 +23,8 @@ Once in that directory, source the build environment script::
 
    $ source oe-init-build-env
 
-Next, from the build directory (e.g.
-``poky/build``), start Toaster using this command::
+Next, from the :term:`Build Directory` (e.g. ``poky/build``), start Toaster
+using this command::
 
    $ source toaster start
 
@@ -124,14 +124,14 @@ causes Toaster to create and use ``$TOASTER_DIR./_toaster_clones``.
 The Build Directory
 ===================
 
-Toaster creates a build directory within your Source Directory (e.g.
+Toaster creates a :term:`Build Directory` within your Source Directory (e.g.
 ``poky``) to execute the builds.
 
 Alternatively, if you would like all of your Toaster related files and
 directories to be in a particular location, you can set the
 ``TOASTER_DIR`` environment variable, which takes precedence over your
 current working directory. Setting this environment variable causes
-Toaster to use ``$TOASTER_DIR/build`` as the build directory.
+Toaster to use ``$TOASTER_DIR/build`` as the :term:`Build Directory`.
 
 Creating a Django Superuser
 ===========================
@@ -152,8 +152,8 @@ superuser by following these steps:
       $ export PATH=$PATH:$HOME/.local/bin
 
 #. From the directory containing the Toaster database, which by default
-   is the :term:`Build Directory`,
-   invoke the ``createsuperuser`` command from ``manage.py``::
+   is the :term:`Build Directory`, invoke the ``createsuperuser`` command from
+   ``manage.py``::
 
       $ cd poky/build
       $ ../bitbake/lib/toaster/manage.py createsuperuser
@@ -179,7 +179,7 @@ example, if you are running Toaster locally, use the following URL::
    http://127.0.0.1:8000/admin
 
 You can use the Django administration interface to set Toaster configuration
-parameters such as the build directory, layer sources, default variable
+parameters such as the :term:`Build Directory`, layer sources, default variable
 values, and BitBake versions.
 
 Setting Up a Production Instance of Toaster
@@ -317,8 +317,7 @@ Perform the following steps to install Toaster:
     the ":ref:`toaster-manual/reference:Configuring Toaster`" section.
 
     This line also runs the ``checksettings`` command, which configures
-    the location of the Toaster :term:`Build Directory`.
-    The Toaster
+    the location of the Toaster :term:`Build Directory`. The Toaster
     root directory ``TOASTER_DIR`` determines where the Toaster build
     directory is created on the file system. In the example above,
     ``TOASTER_DIR`` is set as follows::
@@ -326,7 +325,7 @@ Perform the following steps to install Toaster:
        /var/www/toaster/poky
 
 
-    This setting causes the Toaster build directory to be::
+    This setting causes the Toaster :term:`Build Directory` to be::
 
        /var/www/toaster/poky/build
 

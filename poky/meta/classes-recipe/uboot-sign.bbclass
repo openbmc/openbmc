@@ -5,7 +5,7 @@
 #
 
 # This file is part of U-Boot verified boot support and is intended to be
-# inherited from u-boot recipe and from kernel-fitimage.bbclass.
+# inherited from the u-boot recipe.
 #
 # The signature procedure requires the user to generate an RSA key and
 # certificate in a directory and to define the following variable:
@@ -22,19 +22,6 @@
 #
 # The signature support is limited to the use of CONFIG_OF_SEPARATE in U-Boot.
 #
-# The tasks sequence is set as below, using DEPLOY_IMAGE_DIR as common place to
-# treat the device tree blob:
-#
-# * u-boot:do_install:append
-#   Install UBOOT_DTB_BINARY to datadir, so that kernel can use it for
-#   signing, and kernel will deploy UBOOT_DTB_BINARY after signs it.
-#
-# * virtual/kernel:do_assemble_fitimage
-#   Sign the image
-#
-# * u-boot:do_deploy[postfuncs]
-#   Deploy files like UBOOT_DTB_IMAGE, UBOOT_DTB_SYMLINK and others.
-#
 # For more details on signature process, please refer to U-Boot documentation.
 
 # We need some variables from u-boot-config
@@ -43,13 +30,13 @@ inherit uboot-config
 # Enable use of a U-Boot fitImage
 UBOOT_FITIMAGE_ENABLE ?= "0"
 
-# Signature activation - these require their respective fitImages
-UBOOT_SIGN_ENABLE ?= "0"
+# Signature activation - this requires UBOOT_FITIMAGE_ENABLE = "1"
 SPL_SIGN_ENABLE ?= "0"
 
 # Default value for deployment filenames.
 UBOOT_DTB_IMAGE ?= "u-boot-${MACHINE}-${PV}-${PR}.dtb"
 UBOOT_DTB_BINARY ?= "u-boot.dtb"
+UBOOT_DTB_SIGNED ?= "${UBOOT_DTB_BINARY}-signed"
 UBOOT_DTB_SYMLINK ?= "u-boot-${MACHINE}.dtb"
 UBOOT_NODTB_IMAGE ?= "u-boot-nodtb-${MACHINE}-${PV}-${PR}.bin"
 UBOOT_NODTB_BINARY ?= "u-boot-nodtb.bin"
@@ -63,6 +50,7 @@ UBOOT_FITIMAGE_SYMLINK ?= "u-boot-fitImage-${MACHINE}"
 SPL_DIR ?= "spl"
 SPL_DTB_IMAGE ?= "u-boot-spl-${MACHINE}-${PV}-${PR}.dtb"
 SPL_DTB_BINARY ?= "u-boot-spl.dtb"
+SPL_DTB_SIGNED ?= "${SPL_DTB_BINARY}-signed"
 SPL_DTB_SYMLINK ?= "u-boot-spl-${MACHINE}.dtb"
 SPL_NODTB_IMAGE ?= "u-boot-spl-nodtb-${MACHINE}-${PV}-${PR}.bin"
 SPL_NODTB_BINARY ?= "u-boot-spl-nodtb.bin"
@@ -71,90 +59,70 @@ SPL_NODTB_SYMLINK ?= "u-boot-spl-nodtb-${MACHINE}.bin"
 # U-Boot fitImage description
 UBOOT_FIT_DESC ?= "U-Boot fitImage for ${DISTRO_NAME}/${PV}/${MACHINE}"
 
-# Kernel / U-Boot fitImage Hash Algo
-FIT_HASH_ALG ?= "sha256"
+# U-Boot fitImage Hash Algo
 UBOOT_FIT_HASH_ALG ?= "sha256"
 
-# Kernel / U-Boot fitImage Signature Algo
-FIT_SIGN_ALG ?= "rsa2048"
+# U-Boot fitImage Signature Algo
 UBOOT_FIT_SIGN_ALG ?= "rsa2048"
 
-# Kernel / U-Boot fitImage Padding Algo
-FIT_PAD_ALG ?= "pkcs-1.5"
-
-# Generate keys for signing Kernel / U-Boot fitImage
-FIT_GENERATE_KEYS ?= "0"
+# Generate keys for signing U-Boot fitImage
 UBOOT_FIT_GENERATE_KEYS ?= "0"
 
 # Size of private keys in number of bits
-FIT_SIGN_NUMBITS ?= "2048"
 UBOOT_FIT_SIGN_NUMBITS ?= "2048"
 
 # args to openssl genrsa (Default is just the public exponent)
-FIT_KEY_GENRSA_ARGS ?= "-F4"
 UBOOT_FIT_KEY_GENRSA_ARGS ?= "-F4"
 
 # args to openssl req (Default is -batch for non interactive mode and
 # -new for new certificate)
-FIT_KEY_REQ_ARGS ?= "-batch -new"
 UBOOT_FIT_KEY_REQ_ARGS ?= "-batch -new"
 
 # Standard format for public key certificate
-FIT_KEY_SIGN_PKCS ?= "-x509"
 UBOOT_FIT_KEY_SIGN_PKCS ?= "-x509"
 
-# Functions on this bbclass can apply to either U-boot or Kernel,
-# depending on the scenario
-UBOOT_PN = "${@d.getVar('PREFERRED_PROVIDER_u-boot') or 'u-boot'}"
-KERNEL_PN = "${@d.getVar('PREFERRED_PROVIDER_virtual/kernel')}"
+# This is only necessary for determining the signing configuration
+KERNEL_PN = "${PREFERRED_PROVIDER_virtual/kernel}"
 
-# We need u-boot-tools-native if we're creating a U-Boot fitImage
 python() {
-    if d.getVar('UBOOT_FITIMAGE_ENABLE') == '1':
-        depends = d.getVar("DEPENDS")
-        depends = "%s u-boot-tools-native dtc-native" % depends
-        d.setVar("DEPENDS", depends)
+    # We need u-boot-tools-native if we're creating a U-Boot fitImage
+    sign = d.getVar('UBOOT_SIGN_ENABLE') == '1'
+    if d.getVar('UBOOT_FITIMAGE_ENABLE') == '1' or sign:
+        d.appendVar('DEPENDS', " u-boot-tools-native dtc-native")
+    if sign:
+        d.appendVar('DEPENDS', " " + d.getVar('KERNEL_PN'))
 }
 
-concat_dtb_helper() {
-	if [ -e "${UBOOT_DTB_BINARY}" ]; then
-		ln -sf ${UBOOT_DTB_IMAGE} ${DEPLOYDIR}/${UBOOT_DTB_BINARY}
-		ln -sf ${UBOOT_DTB_IMAGE} ${DEPLOYDIR}/${UBOOT_DTB_SYMLINK}
-	fi
+concat_dtb() {
+	type="$1"
+	binary="$2"
 
-	if [ -f "${UBOOT_NODTB_BINARY}" ]; then
-		install ${UBOOT_NODTB_BINARY} ${DEPLOYDIR}/${UBOOT_NODTB_IMAGE}
-		ln -sf ${UBOOT_NODTB_IMAGE} ${DEPLOYDIR}/${UBOOT_NODTB_SYMLINK}
-		ln -sf ${UBOOT_NODTB_IMAGE} ${DEPLOYDIR}/${UBOOT_NODTB_BINARY}
+	if [ -e "${UBOOT_DTB_BINARY}" ]; then
+		# Re-sign the kernel in order to add the keys to our dtb
+		${UBOOT_MKIMAGE_SIGN} \
+			${@'-D "${UBOOT_MKIMAGE_DTCOPTS}"' if len('${UBOOT_MKIMAGE_DTCOPTS}') else ''} \
+			-F -k "${UBOOT_SIGN_KEYDIR}" \
+			-K "${UBOOT_DTB_BINARY}" \
+			-r ${B}/fitImage-linux \
+			${UBOOT_MKIMAGE_SIGN_ARGS}
+		cp ${UBOOT_DTB_BINARY} ${UBOOT_DTB_SIGNED}
 	fi
 
 	# If we're not using a signed u-boot fit, concatenate SPL w/o DTB & U-Boot DTB
-	# with public key (otherwise it will be deployed by the equivalent
-	# concat_spl_dtb_helper function - cf. kernel-fitimage.bbclass for more details)
+	# with public key (otherwise U-Boot will be packaged by uboot_fitimage_assemble)
 	if [ "${SPL_SIGN_ENABLE}" != "1" ] ; then
-		deployed_uboot_dtb_binary='${DEPLOY_DIR_IMAGE}/${UBOOT_DTB_IMAGE}'
 		if [ "x${UBOOT_SUFFIX}" = "ximg" -o "x${UBOOT_SUFFIX}" = "xrom" ] && \
-			[ -e "$deployed_uboot_dtb_binary" ]; then
-			oe_runmake EXT_DTB=$deployed_uboot_dtb_binary
-			install ${UBOOT_BINARY} ${DEPLOYDIR}/${UBOOT_IMAGE}
-		elif [ -e "${DEPLOYDIR}/${UBOOT_NODTB_IMAGE}" -a -e "$deployed_uboot_dtb_binary" ]; then
-			cd ${DEPLOYDIR}
-			cat ${UBOOT_NODTB_IMAGE} $deployed_uboot_dtb_binary | tee ${B}/${CONFIG_B_PATH}/${UBOOT_BINARY} > ${UBOOT_IMAGE}
-
-			if [ -n "${UBOOT_CONFIG}" ]
-			then
-				i=0
-				j=0
-				for config in ${UBOOT_MACHINE}; do
-					i=$(expr $i + 1);
-					for type in ${UBOOT_CONFIG}; do
-						j=$(expr $j + 1);
-						if [ $j -eq $i ]
-						then
-							cp ${UBOOT_IMAGE} ${B}/${CONFIG_B_PATH}/u-boot-$type.${UBOOT_SUFFIX}
-						fi
-					done
-				done
+			[ -e "${UBOOT_DTB_BINARY}" ]; then
+			oe_runmake EXT_DTB="${UBOOT_DTB_SIGNED}" ${UBOOT_MAKE_TARGET}
+			if [ -n "${binary}" ]; then
+				cp ${binary} ${UBOOT_BINARYNAME}-${type}.${UBOOT_SUFFIX}
+			fi
+		elif [ -e "${UBOOT_NODTB_BINARY}" -a -e "${UBOOT_DTB_BINARY}" ]; then
+			if [ -n "${binary}" ]; then
+				cat ${UBOOT_NODTB_BINARY} ${UBOOT_DTB_SIGNED} | tee ${binary} > \
+					${UBOOT_BINARYNAME}-${type}.${UBOOT_SUFFIX}
+			else
+				cat ${UBOOT_NODTB_BINARY} ${UBOOT_DTB_SIGNED} > ${UBOOT_BINARY}
 			fi
 		else
 			bbwarn "Failure while adding public key to u-boot binary. Verified boot won't be available."
@@ -162,120 +130,67 @@ concat_dtb_helper() {
 	fi
 }
 
-concat_spl_dtb_helper() {
+deploy_dtb() {
+	type="$1"
 
-	# We only deploy symlinks to the u-boot-spl.dtb,as the KERNEL_PN will
-	# be responsible for deploying the real file
-	if [ -e "${SPL_DIR}/${SPL_DTB_BINARY}" ] ; then
-		ln -sf ${SPL_DTB_IMAGE} ${DEPLOYDIR}/${SPL_DTB_SYMLINK}
-		ln -sf ${SPL_DTB_IMAGE} ${DEPLOYDIR}/${SPL_DTB_BINARY}
-	fi
-
-	# Concatenate the SPL nodtb binary and u-boot.dtb
-	deployed_spl_dtb_binary='${DEPLOY_DIR_IMAGE}/${SPL_DTB_IMAGE}'
-	if [ -e "${DEPLOYDIR}/${SPL_NODTB_IMAGE}" -a -e "$deployed_spl_dtb_binary" ] ; then
-		cd ${DEPLOYDIR}
-		cat ${SPL_NODTB_IMAGE} $deployed_spl_dtb_binary | tee ${B}/${CONFIG_B_PATH}/${SPL_BINARY} > ${SPL_IMAGE}
+	if [ -n "${type}" ]; then
+		uboot_dtb_binary="u-boot-${type}-${PV}-${PR}.dtb"
+		uboot_nodtb_binary="u-boot-nodtb-${type}-${PV}-${PR}.bin"
 	else
-		bbwarn "Failure while adding public key to spl binary. Verified U-Boot boot won't be available."
+		uboot_dtb_binary="${UBOOT_DTB_IMAGE}"
+		uboot_nodtb_binary="${UBOOT_NODTB_IMAGE}"
 	fi
-}
 
+	if [ -e "${UBOOT_DTB_SIGNED}" ]; then
+		install -Dm644 ${UBOOT_DTB_SIGNED} ${DEPLOYDIR}/${uboot_dtb_binary}
+		if [ -n "${type}" ]; then
+			ln -sf ${uboot_dtb_binary} ${DEPLOYDIR}/${UBOOT_DTB_IMAGE}
+		fi
+	fi
 
-concat_dtb() {
-	if [ "${UBOOT_SIGN_ENABLE}" = "1" -a "${PN}" = "${UBOOT_PN}" -a -n "${UBOOT_DTB_BINARY}" ]; then
-		mkdir -p ${DEPLOYDIR}
-		if [ -n "${UBOOT_CONFIG}" ]; then
-			for config in ${UBOOT_MACHINE}; do
-				CONFIG_B_PATH="$config"
-				cd ${B}/$config
-				concat_dtb_helper
-			done
-		else
-			CONFIG_B_PATH=""
-			cd ${B}
-			concat_dtb_helper
+	if [ -f "${UBOOT_NODTB_BINARY}" ]; then
+		install -Dm644 ${UBOOT_DTB_BINARY} ${DEPLOYDIR}/${uboot_nodtb_binary}
+		if [ -n "${type}" ]; then
+			ln -sf ${uboot_nodtb_binary} ${DEPLOYDIR}/${UBOOT_NODTB_IMAGE}
 		fi
 	fi
 }
 
 concat_spl_dtb() {
-	if [ "${SPL_SIGN_ENABLE}" = "1" -a "${PN}" = "${UBOOT_PN}" -a -n "${SPL_DTB_BINARY}" ]; then
-		mkdir -p ${DEPLOYDIR}
-		if [ -n "${UBOOT_CONFIG}" ]; then
-			for config in ${UBOOT_MACHINE}; do
-				CONFIG_B_PATH="$config"
-				cd ${B}/$config
-				concat_spl_dtb_helper
-			done
-		else
-			CONFIG_B_PATH=""
-			cd ${B}
-			concat_spl_dtb_helper
+	if [ -e "${SPL_DIR}/${SPL_NODTB_BINARY}" -a -e "${SPL_DIR}/${SPL_DTB_BINARY}" ] ; then
+		cat ${SPL_DIR}/${SPL_NODTB_BINARY} ${SPL_DIR}/${SPL_DTB_SIGNED} > "${SPL_BINARY}"
+	else
+		bbwarn "Failure while adding public key to spl binary. Verified U-Boot boot won't be available."
+	fi
+}
+
+deploy_spl_dtb() {
+	type="$1"
+
+	if [ -n "${type}" ]; then
+		spl_dtb_binary="u-boot-spl-${type}-${PV}-${PR}.dtb"
+		spl_nodtb_binary="u-boot-spl-nodtb-${type}-${PV}-${PR}.bin"
+	else
+		spl_dtb_binary="${SPL_DTB_IMAGE}"
+		spl_nodtb_binary="${SPL_NODTB_IMAGE}"
+	fi
+
+	if [ -e "${SPL_DIR}/${SPL_DTB_SIGNED}" ] ; then
+		install -Dm644 ${SPL_DIR}/${SPL_DTB_SIGNED} ${DEPLOYDIR}/${spl_dtb_binary}
+		if [ -n "${type}" ]; then
+			ln -sf ${spl_dtb_binary} ${DEPLOYDIR}/${SPL_DTB_IMAGE}
 		fi
 	fi
-}
 
-
-# Install UBOOT_DTB_BINARY to datadir, so that kernel can use it for
-# signing, and kernel will deploy UBOOT_DTB_BINARY after signs it.
-install_helper() {
-	if [ -f "${UBOOT_DTB_BINARY}" ]; then
-		# UBOOT_DTB_BINARY is a symlink to UBOOT_DTB_IMAGE, so we
-		# need both of them.
-		install -Dm 0644 ${UBOOT_DTB_BINARY} ${D}${datadir}/${UBOOT_DTB_IMAGE}
-		ln -sf ${UBOOT_DTB_IMAGE} ${D}${datadir}/${UBOOT_DTB_BINARY}
-	else
-		bbwarn "${UBOOT_DTB_BINARY} not found"
-	fi
-}
-
-# Install SPL dtb and u-boot nodtb to datadir,
-install_spl_helper() {
-	if [ -f "${SPL_DIR}/${SPL_DTB_BINARY}" ]; then
-		install -Dm 0644 ${SPL_DIR}/${SPL_DTB_BINARY} ${D}${datadir}/${SPL_DTB_IMAGE}
-		ln -sf ${SPL_DTB_IMAGE} ${D}${datadir}/${SPL_DTB_BINARY}
-	else
-		bbwarn "${SPL_DTB_BINARY} not found"
-	fi
-	if [ -f "${UBOOT_NODTB_BINARY}" ] ; then
-		install -Dm 0644 ${UBOOT_NODTB_BINARY} ${D}${datadir}/${UBOOT_NODTB_IMAGE}
-		ln -sf ${UBOOT_NODTB_IMAGE} ${D}${datadir}/${UBOOT_NODTB_BINARY}
-	else
-		bbwarn "${UBOOT_NODTB_BINARY} not found"
-	fi
-
-	# We need to install a 'stub' u-boot-fitimage + its to datadir,
-	# so that the KERNEL_PN can use the correct filename when
-	# assembling and deploying them
-	touch ${D}/${datadir}/${UBOOT_FITIMAGE_IMAGE}
-	touch ${D}/${datadir}/${UBOOT_ITS_IMAGE}
-}
-
-do_install:append() {
-	if [ "${PN}" = "${UBOOT_PN}" ]; then
-		if [ -n "${UBOOT_CONFIG}" ]; then
-			for config in ${UBOOT_MACHINE}; do
-				cd ${B}/$config
-				if [ "${UBOOT_SIGN_ENABLE}" = "1" -o "${UBOOT_FITIMAGE_ENABLE}" = "1" ] && \
-					[ -n "${UBOOT_DTB_BINARY}" ]; then
-					install_helper
-				fi
-				if [ "${UBOOT_FITIMAGE_ENABLE}" = "1" -a -n "${SPL_DTB_BINARY}" ]; then
-					install_spl_helper
-				fi
-			done
-		else
-			cd ${B}
-			if [ "${UBOOT_SIGN_ENABLE}" = "1" -o "${UBOOT_FITIMAGE_ENABLE}" = "1" ] && \
-				[ -n "${UBOOT_DTB_BINARY}" ]; then
-				install_helper
-			fi
-			if [ "${UBOOT_FITIMAGE_ENABLE}" = "1" -a -n "${SPL_DTB_BINARY}" ]; then
-				install_spl_helper
-			fi
+	if [ -f "${SPL_DIR}/${SPL_NODTB_BINARY}" ] ; then
+		install -Dm644 ${SPL_DIR}/${SPL_NODTB_BINARY} ${DEPLOYDIR}/${spl_nodtb_binary}
+		if [ -n "${type}" ]; then
+			ln -sf ${spl_nodtb_binary} ${DEPLOYDIR}/${SPL_NODTB_IMAGE}
 		fi
 	fi
+
+	# For backwards compatibility...
+	install -Dm644 ${SPL_BINARY} ${DEPLOYDIR}/${SPL_IMAGE}
 }
 
 do_uboot_generate_rsa_keys() {
@@ -298,7 +213,7 @@ do_uboot_generate_rsa_keys() {
 				"${UBOOT_FIT_SIGN_NUMBITS}"
 
 			echo "Generating certificate for signing U-Boot fitImage"
-			openssl req ${FIT_KEY_REQ_ARGS} "${UBOOT_FIT_KEY_SIGN_PKCS}" \
+			openssl req ${UBOOT_FIT_KEY_REQ_ARGS} "${UBOOT_FIT_KEY_SIGN_PKCS}" \
 				-key "${SPL_SIGN_KEYDIR}/${SPL_SIGN_KEYNAME}".key \
 				-out "${SPL_SIGN_KEYDIR}/${SPL_SIGN_KEYNAME}".crt
 		fi
@@ -311,19 +226,10 @@ addtask uboot_generate_rsa_keys before do_uboot_assemble_fitimage after do_compi
 # Create a ITS file for the U-boot FIT, for use when
 # we want to sign it so that the SPL can verify it
 uboot_fitimage_assemble() {
-	uboot_its="$1"
-	uboot_nodtb_bin="$2"
-	uboot_dtb="$3"
-	uboot_bin="$4"
-	spl_dtb="$5"
-	uboot_csum="${UBOOT_FIT_HASH_ALG}"
-	uboot_sign_algo="${UBOOT_FIT_SIGN_ALG}"
-	uboot_sign_keyname="${SPL_SIGN_KEYNAME}"
-
-	rm -f $uboot_its $uboot_bin
+	rm -f ${UBOOT_ITS} ${UBOOT_FITIMAGE_BINARY}
 
 	# First we create the ITS script
-	cat << EOF >> $uboot_its
+	cat << EOF >> ${UBOOT_ITS}
 /dts-v1/;
 
 / {
@@ -333,7 +239,7 @@ uboot_fitimage_assemble() {
     images {
         uboot {
             description = "U-Boot image";
-            data = /incbin/("$uboot_nodtb_bin");
+            data = /incbin/("${UBOOT_NODTB_BINARY}");
             type = "standalone";
             os = "u-boot";
             arch = "${UBOOT_ARCH}";
@@ -343,34 +249,34 @@ uboot_fitimage_assemble() {
 EOF
 
 	if [ "${SPL_SIGN_ENABLE}" = "1" ] ; then
-		cat << EOF >> $uboot_its
+		cat << EOF >> ${UBOOT_ITS}
             signature {
-                algo = "$uboot_csum,$uboot_sign_algo";
-                key-name-hint = "$uboot_sign_keyname";
+                algo = "${UBOOT_FIT_HASH_ALG},${UBOOT_FIT_SIGN_ALG}";
+                key-name-hint = "${SPL_SIGN_KEYNAME}";
             };
 EOF
 	fi
 
-	cat << EOF >> $uboot_its
+	cat << EOF >> ${UBOOT_ITS}
         };
         fdt {
             description = "U-Boot FDT";
-            data = /incbin/("$uboot_dtb");
+            data = /incbin/("${UBOOT_DTB_BINARY}");
             type = "flat_dt";
             arch = "${UBOOT_ARCH}";
             compression = "none";
 EOF
 
 	if [ "${SPL_SIGN_ENABLE}" = "1" ] ; then
-		cat << EOF >> $uboot_its
+		cat << EOF >> ${UBOOT_ITS}
             signature {
-                algo = "$uboot_csum,$uboot_sign_algo";
-                key-name-hint = "$uboot_sign_keyname";
+                algo = "${UBOOT_FIT_HASH_ALG},${UBOOT_FIT_SIGN_ALG}";
+                key-name-hint = "${SPL_SIGN_KEYNAME}";
             };
 EOF
 	fi
 
-	cat << EOF >> $uboot_its
+	cat << EOF >> ${UBOOT_ITS}
         };
     };
 
@@ -390,8 +296,8 @@ EOF
 	#
 	${UBOOT_MKIMAGE} \
 		${@'-D "${SPL_MKIMAGE_DTCOPTS}"' if len('${SPL_MKIMAGE_DTCOPTS}') else ''} \
-		-f $uboot_its \
-		$uboot_bin
+		-f ${UBOOT_ITS} \
+		${UBOOT_FITIMAGE_BINARY}
 
 	if [ "${SPL_SIGN_ENABLE}" = "1" ] ; then
 		#
@@ -400,106 +306,140 @@ EOF
 		${UBOOT_MKIMAGE_SIGN} \
 			${@'-D "${SPL_MKIMAGE_DTCOPTS}"' if len('${SPL_MKIMAGE_DTCOPTS}') else ''} \
 			-F -k "${SPL_SIGN_KEYDIR}" \
-			-K "$spl_dtb" \
-			-r $uboot_bin \
+			-K "${SPL_DIR}/${SPL_DTB_BINARY}" \
+			-r ${UBOOT_FITIMAGE_BINARY} \
 			${SPL_MKIMAGE_SIGN_ARGS}
 	fi
 
+	cp ${SPL_DIR}/${SPL_DTB_BINARY} ${SPL_DIR}/${SPL_DTB_SIGNED}
 }
 
-do_uboot_assemble_fitimage() {
-	# This function runs in KERNEL_PN context. The reason for that is that we need to
-	# support the scenario where UBOOT_SIGN_ENABLE is placing the Kernel fitImage's
-	# pubkey in the u-boot.dtb file, so that we can use it when building the U-Boot
-	# fitImage itself.
-	if [ "${UBOOT_FITIMAGE_ENABLE}" = "1" ] && \
-	   [ -n "${SPL_DTB_BINARY}" -a "${PN}" = "${KERNEL_PN}" ] ; then
-		if [ "${UBOOT_SIGN_ENABLE}" != "1" ]; then
-			# If we're not signing the Kernel fitImage, that means
-			# we need to copy the u-boot.dtb from staging ourselves
-			cp -P ${STAGING_DATADIR}/u-boot*.dtb ${B}
-		fi
-		# As we are in the kernel context, we need to copy u-boot-spl.dtb from staging first.
-		# Unfortunately, need to glob on top of ${SPL_DTB_BINARY} since _IMAGE and _SYMLINK
-		# will contain U-boot's PV
-		# Similarly, we need to get the filename for the 'stub' u-boot-fitimage + its in
-		# staging so that we can use it for creating the image with the correct filename
-		# in the KERNEL_PN context.
-		# As for the u-boot.dtb (with fitimage's pubkey), it should come from the dependent
-		# do_assemble_fitimage task
-		cp -P ${STAGING_DATADIR}/u-boot-spl*.dtb ${B}
-		cp -P ${STAGING_DATADIR}/u-boot-nodtb*.bin ${B}
-		rm -rf ${B}/u-boot-fitImage-* ${B}/u-boot-its-*
-		kernel_uboot_fitimage_name=`basename ${STAGING_DATADIR}/u-boot-fitImage-*`
-		kernel_uboot_its_name=`basename ${STAGING_DATADIR}/u-boot-its-*`
-		cd ${B}
-		uboot_fitimage_assemble $kernel_uboot_its_name ${UBOOT_NODTB_BINARY} \
-					${UBOOT_DTB_BINARY} $kernel_uboot_fitimage_name \
-					${SPL_DTB_BINARY}
-	fi
-}
+uboot_assemble_fitimage_helper() {
+	type="$1"
+	binary="$2"
 
-addtask uboot_assemble_fitimage before do_deploy after do_compile
-
-do_deploy:prepend:pn-${UBOOT_PN}() {
 	if [ "${UBOOT_SIGN_ENABLE}" = "1" -a -n "${UBOOT_DTB_BINARY}" ] ; then
-		concat_dtb
+		concat_dtb $type $binary
 	fi
 
-	if [ "${UBOOT_FITIMAGE_ENABLE}" = "1" ] ; then
-	# Deploy the u-boot-nodtb binary and symlinks...
-		if [ -f "${SPL_DIR}/${SPL_NODTB_BINARY}" ] ; then
-			echo "Copying u-boot-nodtb binary..."
-			install -m 0644 ${SPL_DIR}/${SPL_NODTB_BINARY} ${DEPLOYDIR}/${SPL_NODTB_IMAGE}
-			ln -sf ${SPL_NODTB_IMAGE} ${DEPLOYDIR}/${SPL_NODTB_SYMLINK}
-			ln -sf ${SPL_NODTB_IMAGE} ${DEPLOYDIR}/${SPL_NODTB_BINARY}
-		fi
-
-
-		# We only deploy the symlinks to the uboot-fitImage and uboot-its
-		# images, as the KERNEL_PN will take care of deploying the real file
-		ln -sf ${UBOOT_FITIMAGE_IMAGE} ${DEPLOYDIR}/${UBOOT_FITIMAGE_BINARY}
-		ln -sf ${UBOOT_FITIMAGE_IMAGE} ${DEPLOYDIR}/${UBOOT_FITIMAGE_SYMLINK}
-		ln -sf ${UBOOT_ITS_IMAGE} ${DEPLOYDIR}/${UBOOT_ITS}
-		ln -sf ${UBOOT_ITS_IMAGE} ${DEPLOYDIR}/${UBOOT_ITS_SYMLINK}
+	if [ "${UBOOT_FITIMAGE_ENABLE}" = "1" -a -n "${SPL_DTB_BINARY}" ]; then
+		uboot_fitimage_assemble
 	fi
 
 	if [ "${SPL_SIGN_ENABLE}" = "1" -a -n "${SPL_DTB_BINARY}" ] ; then
 		concat_spl_dtb
 	fi
-
-
 }
 
-do_deploy:append:pn-${UBOOT_PN}() {
+do_uboot_assemble_fitimage() {
+	if [ "${UBOOT_SIGN_ENABLE}" = "1" ] ; then
+		cp "${STAGING_DIR_HOST}/sysroot-only/fitImage" "${B}/fitImage-linux"
+	fi
+
+	if [ -n "${UBOOT_CONFIG}" ]; then
+		unset i j k
+		for config in ${UBOOT_MACHINE}; do
+			i=$(expr $i + 1);
+			for type in ${UBOOT_CONFIG}; do
+				j=$(expr $j + 1);
+				if [ $j -eq $i ]; then
+					break;
+				fi
+			done
+
+			for binary in ${UBOOT_BINARIES}; do
+				k=$(expr $j + 1);
+				if [ $k -eq $i ]; then
+					break;
+				fi
+			done
+
+			cd ${B}/${config}
+			uboot_assemble_fitimage_helper ${type} ${binary}
+		done
+	else
+		cd ${B}
+		uboot_assemble_fitimage_helper "" ${UBOOT_BINARY}
+	fi
+}
+
+addtask uboot_assemble_fitimage before do_install do_deploy after do_compile
+
+deploy_helper() {
+	type="$1"
+
+	if [ "${UBOOT_SIGN_ENABLE}" = "1" -a -n "${UBOOT_DTB_SIGNED}" ] ; then
+		deploy_dtb $type
+	fi
+
+	if [ "${UBOOT_FITIMAGE_ENABLE}" = "1" -a -n "${SPL_DTB_BINARY}" ]; then
+		if [ -n "${type}" ]; then
+			uboot_its_image="u-boot-its-${type}-${PV}-${PR}"
+			uboot_fitimage_image="u-boot-fitImage-${type}-${PV}-${PR}"
+		else
+			uboot_its_image="${UBOOT_ITS_IMAGE}"
+			uboot_fitimage_image="${UBOOT_FITIMAGE_IMAGE}"
+		fi
+
+		install -Dm644 ${UBOOT_FITIMAGE_BINARY} ${DEPLOYDIR}/$uboot_fitimage_image
+		install -Dm644 ${UBOOT_ITS} ${DEPLOYDIR}/$uboot_its_image
+
+		if [ -n "${type}" ]; then
+			ln -sf $uboot_its_image ${DEPLOYDIR}/${UBOOT_ITS_IMAGE}
+			ln -sf $uboot_fitimage_image ${DEPLOYDIR}/${UBOOT_FITIMAGE_IMAGE}
+		fi
+	fi
+
+	if [ "${SPL_SIGN_ENABLE}" = "1" -a -n "${SPL_DTB_SIGNED}" ] ; then
+		deploy_spl_dtb $type
+	fi
+}
+
+do_deploy:prepend() {
+	if [ -n "${UBOOT_CONFIG}" ]; then
+		unset i j k
+		for config in ${UBOOT_MACHINE}; do
+			i=$(expr $i + 1);
+			for type in ${UBOOT_CONFIG}; do
+				j=$(expr $j + 1);
+				if [ $j -eq $i ]; then
+					cd ${B}/${config}
+					deploy_helper ${type}
+				fi
+			done
+		done
+	else
+		cd ${B}
+		deploy_helper ""
+	fi
+
+	if [ "${UBOOT_SIGN_ENABLE}" = "1" -a -n "${UBOOT_DTB_BINARY}" ] ; then
+		ln -sf ${UBOOT_DTB_IMAGE} ${DEPLOYDIR}/${UBOOT_DTB_BINARY}
+		ln -sf ${UBOOT_DTB_IMAGE} ${DEPLOYDIR}/${UBOOT_DTB_SYMLINK}
+		ln -sf ${UBOOT_NODTB_IMAGE} ${DEPLOYDIR}/${UBOOT_NODTB_SYMLINK}
+		ln -sf ${UBOOT_NODTB_IMAGE} ${DEPLOYDIR}/${UBOOT_NODTB_BINARY}
+	fi
+
+	if [ "${UBOOT_FITIMAGE_ENABLE}" = "1" ] ; then
+		ln -sf ${UBOOT_ITS_IMAGE} ${DEPLOYDIR}/${UBOOT_ITS}
+		ln -sf ${UBOOT_ITS_IMAGE} ${DEPLOYDIR}/${UBOOT_ITS_SYMLINK}
+		ln -sf ${UBOOT_FITIMAGE_IMAGE} ${DEPLOYDIR}/${UBOOT_FITIMAGE_BINARY}
+		ln -sf ${UBOOT_FITIMAGE_IMAGE} ${DEPLOYDIR}/${UBOOT_FITIMAGE_SYMLINK}
+	fi
+
+	if [ "${SPL_SIGN_ENABLE}" = "1" -a -n "${SPL_DTB_BINARY}" ] ; then
+		ln -sf ${SPL_DTB_IMAGE} ${DEPLOYDIR}/${SPL_DTB_SYMLINK}
+		ln -sf ${SPL_DTB_IMAGE} ${DEPLOYDIR}/${SPL_DTB_BINARY}
+		ln -sf ${SPL_NODTB_IMAGE} ${DEPLOYDIR}/${SPL_NODTB_SYMLINK}
+		ln -sf ${SPL_NODTB_IMAGE} ${DEPLOYDIR}/${SPL_NODTB_BINARY}
+	fi
+}
+
+do_deploy:append() {
 	# If we're creating a u-boot fitImage, point u-boot.bin
 	# symlink since it might get used by image recipes
 	if [ "${UBOOT_FITIMAGE_ENABLE}" = "1" ] ; then
 		ln -sf ${UBOOT_FITIMAGE_IMAGE} ${DEPLOYDIR}/${UBOOT_BINARY}
 		ln -sf ${UBOOT_FITIMAGE_IMAGE} ${DEPLOYDIR}/${UBOOT_SYMLINK}
 	fi
-}
-
-python () {
-    if (   (d.getVar('UBOOT_SIGN_ENABLE') == '1'
-            or d.getVar('UBOOT_FITIMAGE_ENABLE') == '1')
-        and d.getVar('PN') == d.getVar('UBOOT_PN')
-        and d.getVar('UBOOT_DTB_BINARY')):
-
-        # Make "bitbake u-boot -cdeploy" deploys the signed u-boot.dtb
-        # and/or the U-Boot fitImage
-        d.appendVarFlag('do_deploy', 'depends', ' %s:do_deploy' % d.getVar('KERNEL_PN'))
-
-    if d.getVar('UBOOT_FITIMAGE_ENABLE') == '1' and d.getVar('PN') == d.getVar('KERNEL_PN'):
-        # As the U-Boot fitImage is created by the KERNEL_PN, we need
-        # to make sure that the u-boot-spl.dtb and u-boot-spl-nodtb.bin
-        # files are in the staging dir for it's use
-        d.appendVarFlag('do_uboot_assemble_fitimage', 'depends', ' %s:do_populate_sysroot' % d.getVar('UBOOT_PN'))
-
-        # If the Kernel fitImage is being signed, we need to
-        # create the U-Boot fitImage after it
-        if d.getVar('UBOOT_SIGN_ENABLE') == '1':
-            d.appendVarFlag('do_uboot_assemble_fitimage', 'depends', ' %s:do_assemble_fitimage' % d.getVar('KERNEL_PN'))
-            d.appendVarFlag('do_uboot_assemble_fitimage', 'depends', ' %s:do_assemble_fitimage_initramfs' % d.getVar('KERNEL_PN'))
-
 }

@@ -64,31 +64,31 @@ universal, the list includes them just in case:
       builds. The area is created when you ``source`` the setup environment
       script that is found in the Source Directory
       (i.e. :ref:`ref-manual/structure:\`\`oe-init-build-env\`\``). The
-      :term:`TOPDIR` variable points to the Build Directory.
+      :term:`TOPDIR` variable points to the :term:`Build Directory`.
 
-      You have a lot of flexibility when creating the Build Directory.
+      You have a lot of flexibility when creating the :term:`Build Directory`.
       Following are some examples that show how to create the directory.  The
       examples assume your :term:`Source Directory` is named ``poky``:
 
-         -  Create the Build Directory inside your Source Directory and let
-            the name of the Build Directory default to ``build``:
+         -  Create the :term:`Build Directory` inside your Source Directory and let
+            the name of the :term:`Build Directory` default to ``build``:
 
             .. code-block:: shell
 
                $ cd poky
                $ source oe-init-build-env
 
-         -  Create the Build Directory inside your home directory and
+         -  Create the :term:`Build Directory` inside your home directory and
             specifically name it ``test-builds``:
 
             .. code-block:: shell
 
                $ source poky/oe-init-build-env test-builds
 
-         -  Provide a directory path and specifically name the Build
-            Directory. Any intermediate folders in the pathname must exist.
-            This next example creates a Build Directory named
-            ``YP-&DISTRO;`` within the existing directory ``mybuilds``:
+         -  Provide a directory path and specifically name the
+            :term:`Build Directory`. Any intermediate folders in the pathname
+            must exist.  This next example creates a :term:`Build Directory`
+            named ``YP-&DISTRO;`` within the existing directory ``mybuilds``:
 
             .. code-block:: shell
 
@@ -96,13 +96,13 @@ universal, the list includes them just in case:
 
       .. note::
 
-         By default, the Build Directory contains :term:`TMPDIR`, which is a
+         By default, the :term:`Build Directory` contains :term:`TMPDIR`, which is a
          temporary directory the build system uses for its work. :term:`TMPDIR` cannot
-         be under NFS. Thus, by default, the Build Directory cannot be under
-         NFS. However, if you need the Build Directory to be under NFS, you can
+         be under NFS. Thus, by default, the :term:`Build Directory` cannot be under
+         NFS. However, if you need the :term:`Build Directory` to be under NFS, you can
          set this up by setting :term:`TMPDIR` in your ``local.conf`` file to use a local
          drive. Doing so effectively separates :term:`TMPDIR` from :term:`TOPDIR`, which is the
-         Build Directory.
+         :term:`Build Directory`.
 
    :term:`Build Host`
       The system used to build images in a Yocto Project Development
@@ -138,14 +138,12 @@ universal, the list includes them just in case:
       which contains multiple (and typically related) sub-layers which can
       be included independently in your project's ``bblayers.conf`` file.
 
-      In some cases, such as with OpenEmbedded's
-      `meta-openembedded <https://github.com/openembedded/meta-openembedded>`_
+      In some cases, such as with OpenEmbedded's :oe_git:`meta-openembedded </meta-openembedded>`
       layer, the top level ``meta-openembedded/`` directory is not itself an actual layer,
       so you would never explicitly include it in a ``bblayers.conf`` file;
       rather, you would include any number of its layer subdirectories, such as
-      `meta-openembedded/meta-oe <https://github.com/openembedded/meta-openembedded/tree/master/meta-oe>`_,
-      `meta-openembedded/meta-python <https://github.com/openembedded/meta-openembedded/tree/master/meta-python>`_
-      and so on.
+      :oe_git:`meta-oe </meta-openembedded/tree/meta-oe>`, :oe_git:`meta-python
+      </meta-openembedded/tree/meta-python>` and so on.
 
       On the other hand, some container layers (such as
       :yocto_git:`meta-security </meta-security>`)

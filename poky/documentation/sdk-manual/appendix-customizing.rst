@@ -286,9 +286,8 @@ source, you need to do a number of things:
          ESDK_LOCALCONF_ALLOW = "SSTATE_MIRRORS"
 
    -  Alternatively, if you just want to set the :term:`SSTATE_MIRRORS`
-      variable's value for the SDK alone, create a
-      ``conf/sdk-extra.conf`` file either in your
-      :term:`Build Directory` or within any
+      variable's value for the SDK alone, create a ``conf/sdk-extra.conf``
+      file either in your :term:`Build Directory` or within any
       layer and put your :term:`SSTATE_MIRRORS` setting within that file.
 
       .. note::

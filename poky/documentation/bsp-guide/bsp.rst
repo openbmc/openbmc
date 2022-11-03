@@ -109,8 +109,7 @@ them to the "Dependencies" section.
 
 Some layers function as a layer to hold other BSP layers. These layers
 are known as ":term:`container layers <Container Layer>`". An example of
-this type of layer is OpenEmbedded's
-`meta-openembedded <https://github.com/openembedded/meta-openembedded>`__
+this type of layer is OpenEmbedded's :oe_git:`meta-openbedded </meta-openembedded>`
 layer. The ``meta-openembedded`` layer contains many ``meta-*`` layers.
 In cases like this, you need to include the names of the actual layers
 you want to work with, such as::

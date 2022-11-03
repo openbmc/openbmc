@@ -49,6 +49,31 @@ class LayerIndexPlugin(ActionPlugin):
             else:
                 logger.plain("Repository %s needs to be fetched" % url)
                 return subdir, layername, layerdir
+        elif os.path.exists(repodir) and branch:
+            """
+            If the repo is already cloned, ensure it is on the correct branch,
+            switching branches if necessary and possible.
+            """
+            base_cmd = ['git', '--git-dir=%s/.git' % repodir, '--work-tree=%s' % repodir]
+            cmd = base_cmd + ['branch']
+            completed_proc = subprocess.run(cmd, text=True, capture_output=True)
+            if completed_proc.returncode:
+                logger.error("Unable to validate repo %s (%s)" % (repodir, stderr))
+                return None, None, None
+            else:
+                if branch != completed_proc.stdout[2:-1]:
+                    cmd = base_cmd + ['status', '--short']
+                    completed_proc = subprocess.run(cmd, text=True, capture_output=True)
+                    if completed_proc.stdout.count('\n') != 0:
+                        logger.warning("There are uncommitted changes in repo %s" % repodir)
+                    cmd = base_cmd + ['checkout', branch]
+                    completed_proc = subprocess.run(cmd, text=True, capture_output=True)
+                    if completed_proc.returncode:
+                        # Could be due to original shallow clone on a different branch for example
+                        logger.error("Unable to automatically switch %s to desired branch '%s' (%s)"
+                                     % (repodir, branch, completed_proc.stderr))
+                        return None, None, None
+            return subdir, layername, layerdir
         elif os.path.exists(layerdir):
             return subdir, layername, layerdir
         else:

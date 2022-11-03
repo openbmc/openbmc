@@ -484,29 +484,55 @@ overview of their function and contents.
          for it to work.
 
    :term:`BB_PRESSURE_MAX_CPU`
-      The threshold for maximum CPU pressure before BitBake prevents the
-      scheduling of new tasks. Once the :term:`BB_PRESSURE_MAX_CPU` threshold
-      is exceeded, new tasks are not started until the pressure subsides to
-      below the threshold. If :term:`BB_PRESSURE_MAX_CPU` is not set, CPU
-      pressure is not monitored. A threshold can be set in ``conf/local.conf``
-      as::
+      Specifies a maximum CPU pressure threshold, above which BitBake's
+      scheduler will not start new tasks (providing there is at least
+      one active task). If no value is set, CPU pressure is not
+      monitored when starting tasks.
+
+      The pressure data is calculated based upon what Linux kernels since
+      version 4.20 expose under ``/proc/pressure``. The threshold represents
+      the difference in "total" pressure from the previous second. The
+      minimum value is 1.0 (extremely slow builds) and the maximum is
+      1000000 (a pressure value unlikely to ever be reached).
+
+      This threshold can be set in ``conf/local.conf`` as::
 
          BB_PRESSURE_MAX_CPU = "500"
 
    :term:`BB_PRESSURE_MAX_IO`
-      The threshold for maximum IO pressure experienced before BitBake
-      prevents the scheduling of new tasks. The IO pressure is regulated in the
-      same way as :term:`BB_PRESSURE_MAX_CPU`. At this point in time,
-      experiments show that IO pressure tends to be short-lived and regulating
-      just the CPU can help to reduce it.
+      Specifies a maximum I/O pressure threshold, above which BitBake's
+      scheduler will not start new tasks (providing there is at least
+      one active task). If no value is set, I/O pressure is not
+      monitored when starting tasks.
+
+      The pressure data is calculated based upon what Linux kernels since
+      version 4.20 expose under ``/proc/pressure``. The threshold represents
+      the difference in "total" pressure from the previous second. The
+      minimum value is 1.0 (extremely slow builds) and the maximum is
+      1000000 (a pressure value unlikely to ever be reached).
+
+      At this point in time, experiments show that IO pressure tends to
+      be short-lived and regulating just the CPU with
+      :term:`BB_PRESSURE_MAX_CPU` can help to reduce it.
 
    :term:`BB_PRESSURE_MAX_MEMORY`
-      The threshold for maximum memory pressure experienced before BitBake
-      prevents the scheduling of new tasks. The memory pressure is regulated in
-      the same way as :term:`BB_PRESSURE_MAX_CPU`. Note that any memory
-      pressure indicates that a system is being pushed beyond its capacity. At
-      this point in time, experiments show that memory pressure tends to be
-      short-lived and regulating just the CPU can help to reduce it.
+
+      Specifies a maximum memory pressure threshold, above which BitBake's
+      scheduler will not start new tasks (providing there is at least
+      one active task). If no value is set, memory pressure is not
+      monitored when starting tasks.
+
+      The pressure data is calculated based upon what Linux kernels since
+      version 4.20 expose under ``/proc/pressure``. The threshold represents
+      the difference in "total" pressure from the previous second. The
+      minimum value is 1.0 (extremely slow builds) and the maximum is
+      1000000 (a pressure value unlikely to ever be reached).
+
+      Memory pressure is experienced when time is spent swapping,
+      refaulting pages from the page cache or performing direct reclaim.
+      This is why memory pressure is rarely seen, but setting this variable
+      might be useful as a last resort to prevent OOM errors if they are
+      occurring during builds.
 
    :term:`BB_RUNFMT`
       Specifies the name of the executable script files (i.e. run files)

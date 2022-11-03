@@ -270,7 +270,7 @@ the build environment setup script (i.e.  :ref:`structure-core-script`).
 By default, this :term:`Build Directory` is named ``build`` but can be named
 anything you want.
 
-Within the Build Directory, is the ``tmp`` directory. To remove all the
+Within the :term:`Build Directory`, is the ``tmp`` directory. To remove all the
 build output yet preserve any source code or downloaded files from
 previous builds, simply remove the ``tmp`` directory.
 
@@ -381,14 +381,13 @@ system of that image. Thus, the build system provides a value of
 forth.
 
 Meanwhile, ``DESTDIR`` is a path within the :term:`Build Directory`.
-However, when the recipe builds a
-native program (i.e. one that is intended to run on the build machine),
-that program is never installed directly to the build machine's root
-file system. Consequently, the build system uses paths within the Build
-Directory for ``DESTDIR``, ``bindir`` and related variables. To better
-understand this, consider the following two paths (artificially broken
-across lines for readability) where the first is relatively normal and
-the second is not::
+However, when the recipe builds a native program (i.e. one that is
+intended to run on the build machine), that program is never installed
+directly to the build machine's root file system. Consequently, the build
+system uses paths within the Build Directory for ``DESTDIR``, ``bindir``
+and related variables. To better understand this, consider the following
+two paths (artificially broken across lines for readability) where the
+first is relatively normal and the second is not::
 
    /home/maxtothemax/poky-bootchart2/build/tmp/work/i586-poky-linux/zlib/
       1.2.8-r0/sysroot-destdir/usr/bin

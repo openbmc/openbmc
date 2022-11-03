@@ -623,11 +623,9 @@ MIT license `here <https://en.wikipedia.org/wiki/MIT_License>`__.
 
 When you build an image using the Yocto Project, the build process uses
 a known list of licenses to ensure compliance. You can find this list in
-the :term:`Source Directory` at
-``meta/files/common-licenses``. Once the build completes, the list of
-all licenses found and used during that build are kept in the
-:term:`Build Directory` at
-``tmp/deploy/licenses``.
+the :term:`Source Directory` at ``meta/files/common-licenses``. Once the
+build completes, the list of all licenses found and used during that build
+are kept in the :term:`Build Directory` at ``tmp/deploy/licenses``.
 
 If a module requires a license that is not in the base list, the build
 process generates a warning during the build. These tools make it easier

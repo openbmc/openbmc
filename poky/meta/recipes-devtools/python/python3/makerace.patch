@@ -1,4 +1,4 @@
-From 7cc02dfa593d1350a689d64a7a6f2dc6478afe24 Mon Sep 17 00:00:00 2001
+From 4f52aaf2a548b3356c6f1369c62b11335dc27464 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Tue, 13 Jul 2021 23:19:29 +0100
 Subject: [PATCH] python3: Fix make race
@@ -18,15 +18,15 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 5e13ba2..026bffd 100644
+index 7558f0c..8cec819 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -1527,7 +1527,7 @@ TESTSUBDIRS=	ctypes/test \
+@@ -2005,7 +2005,7 @@ TESTSUBDIRS=	ctypes/test \
  		unittest/test unittest/test/testmock
  
  TEST_MODULES=@TEST_MODULES@
--libinstall:	build_all $(srcdir)/Modules/xxmodule.c
-+libinstall:	build_all $(srcdir)/Modules/xxmodule.c libainstall
+-libinstall:	all $(srcdir)/Modules/xxmodule.c
++libinstall:	all $(srcdir)/Modules/xxmodule.c libainstall
  	@for i in $(SCRIPTDIR) $(LIBDEST); \
  	do \
  		if test ! -d $(DESTDIR)$$i; then \

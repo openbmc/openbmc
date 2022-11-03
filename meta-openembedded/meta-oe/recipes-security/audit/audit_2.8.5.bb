@@ -14,6 +14,7 @@ SRC_URI = "git://github.com/linux-audit/${BPN}-userspace.git;branch=2.8_maintena
            file://auditd \
            file://auditd.service \
            file://audit-volatile.conf \
+           file://0001-Make-IPX-packet-interpretation-dependent-on-the-ipx-header.patch \
 "
 
 S = "${WORKDIR}/git"
@@ -71,6 +72,11 @@ FILES:${PN}-python = "${libdir}/python${PYTHON_BASEVERSION}"
 
 CONFFILES:auditd = "${sysconfdir}/audit/audit.rules"
 RDEPENDS:auditd = "bash"
+
+do_configure:prepend() {
+        sed -e 's|buf\[];|buf[0];|g'  ${STAGING_INCDIR}/linux/audit.h > ${S}/lib/audit.h
+        sed -i -e 's|#include <linux/audit.h>|#include "audit.h"|g' ${S}/lib/libaudit.h
+}
 
 do_install:append() {
 	rm -f ${D}/${libdir}/python${PYTHON_BASEVERSION}/site-packages/*.a

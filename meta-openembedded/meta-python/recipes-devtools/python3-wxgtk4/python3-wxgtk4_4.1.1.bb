@@ -33,3 +33,5 @@ RDEPENDS:${PN} = "\
     python3-six \
     python3-xml \
 "
+
+SKIP_RECIPE[python3-wxgtk4] ?= "Not compatible with py3.11; needs version update for both itself and wxwidgets"

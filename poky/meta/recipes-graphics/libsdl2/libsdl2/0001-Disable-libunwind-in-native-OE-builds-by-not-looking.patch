@@ -1,4 +1,4 @@
-From 0234c546d86174fafe9ab280cf5f44de50b73676 Mon Sep 17 00:00:00 2001
+From 77093de6a12c24a60fc447698900d18d0a3943af Mon Sep 17 00:00:00 2001
 From: Carlos Rafael Giani <crg7475@mailbox.org>
 Date: Fri, 18 Mar 2022 12:06:23 +0100
 Subject: [PATCH] Disable libunwind in native OE builds by not looking for
@@ -22,10 +22,10 @@ Upstream-Status: Inappropriate [OE specific]
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 644715a..bbf2e28 100644
+index 7617205..d9b1522 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -869,7 +869,7 @@ if(SDL_LIBC)
+@@ -952,7 +952,7 @@ if(SDL_LIBC)
      check_include_file(sys/types.h HAVE_SYS_TYPES_H)
      foreach(_HEADER
              stdio.h stdlib.h stddef.h stdarg.h malloc.h memory.h string.h limits.h float.h

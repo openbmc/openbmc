@@ -12,7 +12,7 @@ Subject: [PATCH] There are conflict of config files between kea and lib32-kea:
 Because they are all commented out, replace the expanded libdir path with
 '$libdir' in the config files to avoid conflict.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://gitlab.isc.org/isc-projects/kea/-/issues/2602]
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 
 ---

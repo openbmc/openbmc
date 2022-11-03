@@ -20,6 +20,7 @@ SRC_URI:append = " \
     file://0017-Fix-update-psa_set_key_usage_flags-definition-to-the.patch \
     file://0018-Fixes-in-AEAD-for-psa-arch-test-54-and-58.patch \
     file://0019-plat-corstone1000-change-default-smm-values.patch \
+    file://0020-FMP-Support-in-Corstone1000.patch \
     "
 
 

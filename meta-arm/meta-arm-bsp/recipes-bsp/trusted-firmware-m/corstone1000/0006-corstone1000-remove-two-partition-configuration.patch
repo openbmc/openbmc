@@ -1,0 +1,51 @@
+From 492c887c8dff97ea1b8a11b4e729620d3744ac38 Mon Sep 17 00:00:00 2001
+From: Satish Kumar <satish.kumar01@arm.com>
+Date: Mon, 30 May 2022 12:38:23 +0100
+Subject: [PATCH 6/6] corstone1000: remove two partition configuration
+
+Previously to run tf-m test, a larger partition was created
+which allowed all default test binaries to be included.
+The patch revert the change because any partition might
+not be enough to hold all test binaries in the future.
+So its better to run few test at a time instead of creating
+a larger partition.
+
+Signed-off-by: Satish Kumar <satish.kumar01@arm.com>
+Change-Id: I223fe45f2de014dbcadc6ac12c321c524701116a
+Upstream-Status: Accepted [TF-Mv1.7.0]
+---
+ platform/ext/target/arm/corstone1000/bl1/CMakeLists.txt       | 1 -
+ platform/ext/target/arm/corstone1000/partition/flash_layout.h | 4 ----
+ 2 files changed, 5 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/bl1/CMakeLists.txt b/platform/ext/target/arm/corstone1000/bl1/CMakeLists.txt
+index d39c5ae91d..f1ae1ebd47 100644
+--- a/platform/ext/target/arm/corstone1000/bl1/CMakeLists.txt
++++ b/platform/ext/target/arm/corstone1000/bl1/CMakeLists.txt
+@@ -291,7 +291,6 @@ target_compile_definitions(signing_layout_for_bl2
+     PRIVATE
+         MCUBOOT_IMAGE_NUMBER=${BL1_IMAGE_NUMBER}
+         BL1
+-        $<$<BOOL:${TFM_S_REG_TEST}>:TFM_S_REG_TEST>
+ )
+ 
+ target_include_directories(signing_layout_for_bl2
+diff --git a/platform/ext/target/arm/corstone1000/partition/flash_layout.h b/platform/ext/target/arm/corstone1000/partition/flash_layout.h
+index b0319bb319..50a0a11fc8 100644
+--- a/platform/ext/target/arm/corstone1000/partition/flash_layout.h
++++ b/platform/ext/target/arm/corstone1000/partition/flash_layout.h
+@@ -119,11 +119,7 @@
+  *
+  */
+ #define SE_BL2_PARTITION_SIZE           (0x19000)    /* 100 KB */
+-#ifdef TFM_S_REG_TEST
+-#define TFM_PARTITION_SIZE              (0x61C00)    /* 391 KB */
+-#else
+ #define TFM_PARTITION_SIZE              (0x5E000)    /* 376 KB */
+-#endif
+ #define FIP_PARTITION_SIZE              (0x200000)   /* 2 MB */
+ #define KERNEL_PARTITION_SIZE           (0xC00000)   /* 12 MB */
+ 
+-- 
+2.25.1
+

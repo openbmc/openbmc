@@ -1,4 +1,4 @@
-From c24674e0a52367359a1a3d950bab8bc3d282279b Mon Sep 17 00:00:00 2001
+From 9c6b9f46179c8f9c9391767e2b02f268a1ee7a9c Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 31 Jan 2019 16:46:30 +0100
 Subject: [PATCH] distutils/sysconfig: append
@@ -14,10 +14,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index 40c6b3e..ac94cc7 100644
+index ff399e2..95844cf 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
-@@ -474,6 +474,8 @@ def _init_posix(vars):
+@@ -528,6 +528,8 @@ def _init_posix(vars):
      """Initialize the module as appropriate for POSIX systems."""
      # _sysconfigdata is generated at build time, see _generate_posix_vars()
      name = _get_sysconfigdata_name()

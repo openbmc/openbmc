@@ -78,7 +78,7 @@ class OESSHTarget(OETarget):
 
         return (status, output)
 
-    def run(self, command, timeout=None):
+    def run(self, command, timeout=None, ignore_status=True):
         """
             Runs command in target.
 
@@ -97,7 +97,7 @@ class OESSHTarget(OETarget):
         else:
             processTimeout = self.timeout
 
-        status, output = self._run(sshCmd, processTimeout, True)
+        status, output = self._run(sshCmd, processTimeout, ignore_status)
         self.logger.debug('Command: %s\nStatus: %d Output:  %s\n' % (command, status, output))
         if (status == 255) and (('No route to host') in output):
             if self.monitor_dumper:

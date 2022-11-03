@@ -260,9 +260,9 @@ system and gives an overview of their function and contents.
       https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview
 
    :term:`B`
-      The directory within the :term:`Build Directory` in
-      which the OpenEmbedded build system places generated objects during a
-      recipe's build process. By default, this directory is the same as the
+      The directory within the :term:`Build Directory` in which the
+      OpenEmbedded build system places generated objects during a recipe's
+      build process. By default, this directory is the same as the
       :term:`S` directory, which is defined as::
 
          S = "${WORKDIR}/${BP}"
@@ -615,7 +615,7 @@ system and gives an overview of their function and contents.
       software.
 
       When specifying recipe files, you can pattern match using Python's
-      `glob <https://docs.python.org/3/library/glob.html>`_ syntax.
+      `glob <https://docs.python.org/3/library/glob.html>`__ syntax.
       For details on the syntax, see the documentation by following the
       previous link.
 
@@ -903,12 +903,11 @@ system and gives an overview of their function and contents.
       The default value is an empty string ("").
 
    :term:`BUILDDIR`
-      Points to the location of the :term:`Build Directory`.
-      You can define this directory indirectly through the
-      :ref:`structure-core-script` script by passing in a Build
-      Directory path when you run the script. If you run the script and do
-      not provide a Build Directory path, the :term:`BUILDDIR` defaults to
-      ``build`` in the current directory.
+      Points to the location of the :term:`Build Directory`. You can define
+      this directory indirectly through the :ref:`structure-core-script` script
+      by passing in a :term:`Build Directory` path when you run the script. If
+      you run the script and do not provide a :term:`Build Directory` path, the
+      :term:`BUILDDIR` defaults to ``build`` in the current directory.
 
    :term:`BUILDHISTORY_COMMIT`
       When inheriting the :ref:`buildhistory <ref-classes-buildhistory>`
@@ -1508,6 +1507,18 @@ system and gives an overview of their function and contents.
 
          CVE_PRODUCT = "vendor:package"
 
+   :term:`CVE_VERSION`
+      In a recipe, defines the version used to match the recipe version
+      against the version in the `NIST CVE database <https://nvd.nist.gov/>`__
+      when usign :ref:`cve-check <ref-classes-cve-check>`.
+
+      The default is ${:term:`PV`} but if recipes use custom version numbers
+      which do not map to upstream software component release versions and the versions
+      used in the CVE database, then this variable can be used to set the
+      version number for :ref:`cve-check <ref-classes-cve-check>`. Example::
+
+          CVE_VERSION = "2.39"
+
    :term:`CVSDIR`
       The directory in which files checked out under the CVS system are
       stored.
@@ -1700,8 +1711,7 @@ system and gives an overview of their function and contents.
       Points to the general area that the OpenEmbedded build system uses to
       place images, packages, SDKs, and other output files that are ready
       to be used outside of the build system. By default, this directory
-      resides within the :term:`Build Directory` as
-      ``${TMPDIR}/deploy``.
+      resides within the :term:`Build Directory` as ``${TMPDIR}/deploy``.
 
       For more information on the structure of the Build Directory, see
       ":ref:`ref-manual/structure:the build directory --- \`\`build/\`\``" section.
@@ -1747,7 +1757,7 @@ system and gives an overview of their function and contents.
       with the contents of :term:`IMGDEPLOYDIR` by the :ref:`image
       <ref-classes-image>` class.
 
-      For more information on the structure of the Build Directory, see
+      For more information on the structure of the :term:`Build Directory`, see
       ":ref:`ref-manual/structure:the build directory --- \`\`build/\`\``" section.
       For more detail on the contents of the ``deploy`` directory, see the
       ":ref:`overview-manual/concepts:images`" and
@@ -2030,8 +2040,7 @@ system and gives an overview of their function and contents.
       You can set this directory by defining the :term:`DL_DIR` variable in the
       ``conf/local.conf`` file. This directory is self-maintaining and you
       should not have to touch it. By default, the directory is
-      ``downloads`` in the :term:`Build Directory`.
-      ::
+      ``downloads`` in the :term:`Build Directory`::
 
          #DL_DIR ?= "${TOPDIR}/downloads"
 
@@ -2252,8 +2261,8 @@ system and gives an overview of their function and contents.
       class, this variable points to the directory in which the recipe's
       source code is built, which is outside of the OpenEmbedded build
       system. When set, this variable sets the :term:`B` variable,
-      which is what the OpenEmbedded build system uses to locate the Build
-      Directory.
+      which is what the OpenEmbedded build system uses to locate the
+      :term:`Build Directory`.
 
       See the ":ref:`ref-classes-externalsrc`" section for details. You
       can also find information on how to use this variable in the
@@ -2273,9 +2282,8 @@ system and gives an overview of their function and contents.
       more than one feature, separate them with a space.
 
       Typically, you configure this variable in your ``local.conf`` file,
-      which is found in the :term:`Build Directory`.
-      Although you can use this variable from within a recipe, best
-      practices dictate that you do not.
+      which is found in the :term:`Build Directory`. Although you can use this
+      variable from within a recipe, best practices dictate that you do not.
 
       .. note::
 
@@ -2481,7 +2489,7 @@ system and gives an overview of their function and contents.
 
          -  When specifying files or paths, you can pattern match using
             Python's
-            `glob <https://docs.python.org/3/library/glob.html>`_
+            `glob <https://docs.python.org/3/library/glob.html>`__
             syntax. For details on the syntax, see the documentation by
             following the previous link.
 
@@ -2672,10 +2680,9 @@ system and gives an overview of their function and contents.
 
       You define the :term:`FILESYSTEM_PERMS_TABLES` variable in the
       ``conf/local.conf`` file, which is found in the :term:`Build Directory`,
-      to point to your custom
-      ``fs-perms.txt``. You can specify more than a single file permissions
-      setting table. The paths you specify to these files must be defined
-      within the :term:`BBPATH` variable.
+      to point to your custom ``fs-perms.txt``. You can specify more than a
+      single file permissions setting table. The paths you specify to these
+      files must be defined within the :term:`BBPATH` variable.
 
       For guidance on how to create your own file permissions settings
       table file, examine the existing ``fs-perms.txt``.
@@ -4943,7 +4950,7 @@ system and gives an overview of their function and contents.
       See the :term:`KERNEL_MODULE_AUTOLOAD` variable for more information.
 
    :term:`module_conf`
-      Specifies `modprobe.d <https://linux.die.net/man/5/modprobe.d>`_
+      Specifies `modprobe.d <https://linux.die.net/man/5/modprobe.d>`__
       syntax lines for inclusion in the ``/etc/modprobe.d/modname.conf``
       file.
 
@@ -6735,7 +6742,7 @@ system and gives an overview of their function and contents.
       to find the unpacked source.
 
       As an example, assume a :term:`Source Directory`
-      top-level folder named ``poky`` and a default Build Directory at
+      top-level folder named ``poky`` and a default :term:`Build Directory` at
       ``poky/build``. In this case, the work directory the build system
       uses to keep the unpacked recipe for ``db`` is the following::
 
@@ -6780,7 +6787,7 @@ system and gives an overview of their function and contents.
 
    :term:`SDK_CUSTOM_TEMPLATECONF`
       When building the extensible SDK, if :term:`SDK_CUSTOM_TEMPLATECONF` is set to
-      "1" and a ``conf/templateconf.cfg`` file exists in the build directory
+      "1" and a ``conf/templateconf.cfg`` file exists in the :term:`Build Directory`
       (:term:`TOPDIR`) then this will be copied into the SDK.
 
    :term:`SDK_DEPLOY`
@@ -7183,8 +7190,7 @@ system and gives an overview of their function and contents.
 
       To enable file removal, set the variable to "1" in your
       ``conf/local.conf`` configuration file in your:
-      :term:`Build Directory`.
-      ::
+      :term:`Build Directory`::
 
          SKIP_FILEDEPS = "1"
 
@@ -7896,9 +7902,8 @@ system and gives an overview of their function and contents.
       <https://www.freedesktop.org/software/systemd/man/systemd.special.html>`__
       for details.
 
-      For example, this variable is used in the
-      `core-image-minimal-xfce.bb
-      <https://git.openembedded.org/meta-openembedded/tree/meta-xfce/recipes-core/images/core-image-minimal-xfce.bb>`__
+      For example, this variable is used in the :oe_git:`core-image-minimal-xfce.bb
+      </meta-openembedded/tree/meta-xfce/recipes-core/images/core-image-minimal-xfce.bb>`
       recipe::
 
           SYSTEMD_DEFAULT_TARGET = "graphical.target"
@@ -8115,12 +8120,11 @@ system and gives an overview of their function and contents.
       You can select "glibc", "musl", "newlib", or "baremetal".
 
    :term:`TCLIBCAPPEND`
-      Specifies a suffix to be appended onto the
-      :term:`TMPDIR` value. The suffix identifies the
-      ``libc`` variant for building. When you are building for multiple
-      variants with the same :term:`Build Directory`, this
-      mechanism ensures that output for different ``libc`` variants is kept
-      separate to avoid potential conflicts.
+      Specifies a suffix to be appended onto the :term:`TMPDIR` value. The
+      suffix identifies the ``libc`` variant for building. When you are
+      building for multiple variants with the same :term:`Build Directory`,
+      this mechanism ensures that output for different ``libc`` variants is
+      kept separate to avoid potential conflicts.
 
       In the ``defaultsetup.conf`` file, the default value of
       :term:`TCLIBCAPPEND` is "-${TCLIBC}". However, distros such as poky,
@@ -8408,7 +8412,7 @@ system and gives an overview of their function and contents.
          #TMPDIR = "${TOPDIR}/tmp"
 
       An example use for this scenario is to set :term:`TMPDIR` to a local disk,
-      which does not use NFS, while having the Build Directory use NFS.
+      which does not use NFS, while having the :term:`Build Directory` use NFS.
 
       The filesystem used by :term:`TMPDIR` must have standard filesystem
       semantics (i.e. mixed-case files are unique, POSIX file locking, and
@@ -9094,7 +9098,7 @@ system and gives an overview of their function and contents.
       -  :term:`PR`: The recipe revision
 
       As an example, assume a Source Directory top-level folder name
-      ``poky``, a default Build Directory at ``poky/build``, and a
+      ``poky``, a default :term:`Build Directory` at ``poky/build``, and a
       ``qemux86-poky-linux`` machine target system. Furthermore, suppose
       your recipe is named ``foo_1.3.0-r0.bb``. In this case, the work
       directory the build system uses to build the package would be as

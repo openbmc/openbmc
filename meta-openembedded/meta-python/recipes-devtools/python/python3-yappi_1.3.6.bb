@@ -32,3 +32,5 @@ do_install_ptest() {
     cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
     cp -f ${S}/yappi/yappi.py ${D}/${PTEST_PATH}/
 }
+
+SKIP_RECIPE[python3-yappi] ?= "Not compatible with py3.11; needs a new release"

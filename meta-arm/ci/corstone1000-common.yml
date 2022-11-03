@@ -5,7 +5,7 @@ header:
     - ci/meta-openembedded.yml
 
 local_conf_header:
-    perf: |
+    extrapackages: |
     # Intentionally blank to prevent perf from being added to the image in base.yml
 
 distro: poky-tiny

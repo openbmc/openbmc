@@ -330,7 +330,8 @@ Removal (Override Style Syntax)
 
 You can remove values from lists using the removal override style
 syntax. Specifying a value for removal causes all occurrences of that
-value to be removed from the variable.
+value to be removed from the variable. Unlike ":append" and ":prepend",
+there is no need to add a leading or trailing space to the value.
 
 When you use this syntax, BitBake expects one or more strings.
 Surrounding spaces and spacing are preserved. Here is an example::
@@ -420,6 +421,12 @@ them. One extremely common application is to attach some brief
 documentation to a BitBake variable as follows::
 
    CACHE[doc] = "The directory holding the cache of the metadata."
+
+.. note::
+
+   Variable flag names starting with an underscore (``_``) character
+   are allowed but are ignored by ``d.getVarFlags("VAR")``
+   in Python code. Such flag names are used internally by BitBake.
 
 Inline Python Variable Expansion
 --------------------------------

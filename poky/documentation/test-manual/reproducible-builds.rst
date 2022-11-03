@@ -19,7 +19,7 @@ Why it matters
 ==============
 
 The project aligns with the `Reproducible Builds project
-<https://reproducible-builds.org/>`_, which shares information about why
+<https://reproducible-builds.org/>`__, which shares information about why
 reproducibility matters. The primary focus of the project is the ability to
 detect security issues being introduced. However, from a Yocto Project
 perspective, it is also hugely important that our builds are deterministic. When

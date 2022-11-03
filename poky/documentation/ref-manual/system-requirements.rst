@@ -74,12 +74,12 @@ distributions:
       the supported platforms listed below.
 
    -  You may use Windows Subsystem For Linux v2 to set up a build host
-      using Windows 10, but validation is not performed against build
-      hosts using WSLv2.
+      using Windows 10 or later, or Windows Server 2019 or later, but validation
+      is not performed against build hosts using WSL 2.
 
-   -  The Yocto Project is not compatible with WSLv1, it is
-      compatible but not officially supported nor validated with
-      WSLv2, if you still decide to use WSL please upgrade to WSLv2.
+      See the
+      :ref:`dev-manual/start:setting up to use windows subsystem for linux (wsl 2)`
+      section in the Yocto Project Development Tasks Manual for more information.
 
    -  If you encounter problems, please go to :yocto_bugs:`Yocto Project
       Bugzilla <>` and submit a bug. We are
@@ -220,8 +220,13 @@ resolve this by installing a ``buildtools-extended`` tarball that
 contains additional tools, the equivalent of the Debian/Ubuntu ``build-essential``
 package.
 
+For systems with a broken make version (e.g. make 4.2.1 without patches) but
+where the rest of the host tools are usable, you can use the ``buildtools-make``
+tarball instead.
+
 In the sections that follow, three different methods will be described for
-installing the ``buildtools`` or ``buildtools-extended`` toolset.
+installing the ``buildtools``, ``buildtools-extended`` or ``buildtools-make``
+toolset.
 
 Installing a Pre-Built ``buildtools`` Tarball with ``install-buildtools`` script
 --------------------------------------------------------------------------------
@@ -256,6 +261,13 @@ installer and automatically installs the tools for you:
       $ cd poky
       $ scripts/install-buildtools
 
+   Alternatively if your host development system has a broken ``make``
+   version such that you only need a known good version of ``make``,
+   you can use the ``--make-only`` option:
+
+      $ cd poky
+      $ scripts/install-buildtools --make-only
+
 2. Source the tools environment setup script by using a command like the
    following::
 
@@ -289,6 +301,10 @@ steps:
    Here is an example for the extended installer::
 
       $ sh ~/Downloads/x86_64-buildtools-extended-nativesdk-standalone-&DISTRO;.sh
+
+   An example for the make-only installer::
+
+      $ sh ~/Downloads/x86_64-buildtools-make-nativesdk-standalone-&DISTRO;.sh
 
    During execution, a prompt appears that allows you to choose the
    installation directory. For example, you could choose the following:
@@ -335,6 +351,10 @@ installer:
 
       $ bitbake buildtools-extended-tarball
 
+   or to build the make-only tarball::
+
+      $ bitbake buildtools-make-tarball
+
    .. note::
 
       The :term:`SDKMACHINE` variable in your ``local.conf`` file determines
@@ -357,6 +377,10 @@ installer:
    Here is an example for the extended installer::
 
       $ sh ~/Downloads/x86_64-buildtools-extended-nativesdk-standalone-&DISTRO;.sh
+
+   or for the make-only installer::
+
+      $ sh ~/Downloads/x86_64-buildtools-make-nativesdk-standalone-&DISTRO;.sh
 
    During execution, a prompt appears that allows you to choose the
    installation directory. For example, you could choose the following:

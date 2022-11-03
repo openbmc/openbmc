@@ -86,7 +86,7 @@ any new Yocto Project release.
    3. Capture the buildhistory output (as specified by :term:`BUILDHISTORY_DIR`)
       and ensure it is preserved for subsequent builds. How you would do this
       depends on how you are running your builds - if you are doing this all on
-      one workstation in the same build directory you may not need to do
+      one workstation in the same :term:`Build Directory` you may not need to do
       anything other than not deleting the buildhistory output directory. For
       builds in a pipeline it may be more complicated.
 

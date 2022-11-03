@@ -66,19 +66,15 @@ section:
       (i.e. ``poky``) have been cloned using Git and the local repository is named
       "poky".
 
-2. *Prepare Your local.conf File:* By default, the
-   :term:`MACHINE` variable is set to
-   "qemux86-64", which is fine if you are building for the QEMU emulator
-   in 64-bit mode. However, if you are not, you need to set the
+2. *Prepare Your local.conf File:* By default, the :term:`MACHINE` variable
+   is set to "qemux86-64", which is fine if you are building for the QEMU
+   emulator in 64-bit mode. However, if you are not, you need to set the
    :term:`MACHINE` variable appropriately in your ``conf/local.conf`` file
-   found in the
-   :term:`Build Directory` (i.e.
-   ``poky/build`` in this example).
+   found in the :term:`Build Directory` (i.e.  ``poky/build`` in this example).
 
    Also, since you are preparing to work on the kernel image, you need
-   to set the
-   :term:`MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS`
-   variable to include kernel modules.
+   to set the :term:`MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS` variable to include
+   kernel modules.
 
    In this example we wish to build for qemux86 so we must set the
    :term:`MACHINE` variable to "qemux86" and also add the "kernel-modules".
@@ -186,14 +182,11 @@ section:
       (i.e. ``poky``) have been cloned using Git and the local repository is named
       "poky".
 
-2. *Prepare Your local.conf File:* By default, the
-   :term:`MACHINE` variable is set to
-   "qemux86-64", which is fine if you are building for the QEMU emulator
-   in 64-bit mode. However, if you are not, you need to set the
-   :term:`MACHINE` variable appropriately in your ``conf/local.conf`` file
-   found in the
-   :term:`Build Directory` (i.e.
-   ``poky/build`` in this example).
+2. *Prepare Your local.conf File:* By default, the :term:`MACHINE` variable is
+   set to "qemux86-64", which is fine if you are building for the QEMU emulator
+   in 64-bit mode. However, if you are not, you need to set the :term:`MACHINE`
+   variable appropriately in your ``conf/local.conf`` file found in the
+   :term:`Build Directory` (i.e.  ``poky/build`` in this example).
 
    Also, since you are preparing to work on the kernel image, you need
    to set the
@@ -836,8 +829,7 @@ the ":ref:`kernel-dev/common:getting ready to develop using \`\`devtool\`\``" Se
 
 8. *Build the Image With Your Modified Kernel:* You can now build an
    image that includes your kernel patches. Execute the following
-   command from your
-   :term:`Build Directory` in the terminal
+   command from your :term:`Build Directory` in the terminal
    set up to run BitBake::
 
       $ cd poky/build
@@ -1057,9 +1049,8 @@ To use the ``menuconfig`` tool in the Yocto Project development
 environment, you must do the following:
 
 -  Because you launch ``menuconfig`` using BitBake, you must be sure to
-   set up your environment by running the
-   :ref:`structure-core-script` script found in
-   the :term:`Build Directory`.
+   set up your environment by running the :ref:`structure-core-script` script
+   found in the :term:`Build Directory`.
 
 -  You must be sure of the state of your build's configuration in the
    :term:`Source Directory`.
@@ -1111,10 +1102,10 @@ can find the option under "Processor Type and Features". To deselect
 Multi-Processing Support" and enter "N" to clear the asterisk. When you
 are finished, exit out and save the change.
 
-Saving the selections updates the ``.config`` configuration file. This
-is the file that the OpenEmbedded build system uses to configure the
-kernel during the build. You can find and examine this file in the Build
-Directory in ``tmp/work/``. The actual ``.config`` is located in the
+Saving the selections updates the ``.config`` configuration file. This is the
+file that the OpenEmbedded build system uses to configure the kernel during
+the build. You can find and examine this file in the :term:`Build Directory`
+in ``tmp/work/``. The actual ``.config`` is located in the
 area where the specific kernel is built. For example, if you were
 building a Linux Yocto kernel based on the ``linux-yocto-4.12`` kernel
 and you were building a QEMU image targeted for ``x86`` architecture,

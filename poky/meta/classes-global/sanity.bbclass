@@ -504,6 +504,14 @@ def check_tar_version(sanity_data):
     version = result.split()[3]
     if bb.utils.vercmp_string_op(version, "1.28", "<"):
         return "Your version of tar is older than 1.28 and does not have the support needed to enable reproducible builds. Please install a newer version of tar (you could use the project's buildtools-tarball from our last release or use scripts/install-buildtools).\n"
+
+    try:
+        result = subprocess.check_output(["tar", "--help"], stderr=subprocess.STDOUT).decode('utf-8')
+        if "--xattrs" not in result:
+            return "Your tar doesn't support --xattrs, please use GNU tar.\n"
+    except subprocess.CalledProcessError as e:
+        return "Unable to execute tar --help, exit code %d\n%s\n" % (e.returncode, e.output)
+
     return None
 
 # We use git parameters and functionality only found in 1.7.8 or later
@@ -865,7 +873,7 @@ def check_sanity_everybuild(status, d):
     mirror_vars = ['MIRRORS', 'PREMIRRORS', 'SSTATE_MIRRORS']
     protocols = ['http', 'ftp', 'file', 'https', \
                  'git', 'gitsm', 'hg', 'osc', 'p4', 'svn', \
-                 'bzr', 'cvs', 'npm', 'sftp', 'ssh', 's3', 'az', 'ftps']
+                 'bzr', 'cvs', 'npm', 'sftp', 'ssh', 's3', 'az', 'ftps', 'crate']
     for mirror_var in mirror_vars:
         mirrors = (d.getVar(mirror_var) or '').replace('\\n', ' ').split()
 

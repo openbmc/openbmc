@@ -12,6 +12,10 @@ SRC_URI = "http://download.osgeo.org/libtiff/tiff-${PV}.tar.gz \
            file://0001-fix-the-FPE-in-tiffcrop-415-427-and-428.patch \
            file://CVE-2022-34526.patch \
            file://CVE-2022-2953.patch \
+           file://0001-Revised-handling-of-TIFFTAG_INKNAMES-and-related-TIF.patch \
+           file://0001-tiffcrop-S-option-Make-decision-simpler.patch \
+           file://0001-tiffcrop-disable-incompatibility-of-Z-X-Y-z-options-.patch \
+           file://0001-tiffcrop-subroutines-require-a-larger-buffer-fixes-2.patch \
            "
 
 SRC_URI[sha256sum] = "917223b37538959aca3b790d2d73aa6e626b688e02dcda272aec24c2f498abed"
@@ -25,7 +29,6 @@ CVE_CHECK_IGNORE += "CVE-2015-7313"
 # These issues only affect libtiff post-4.3.0 but before 4.4.0,
 # caused by 3079627e and fixed by b4e79bfa.
 CVE_CHECK_IGNORE += "CVE-2022-1622 CVE-2022-1623"
-
 # Issue is in jbig which we don't enable
 CVE_CHECK_IGNORE += "CVE-2022-1210"
 

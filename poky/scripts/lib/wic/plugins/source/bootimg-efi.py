@@ -220,6 +220,8 @@ class BootimgEFIPlugin(SourcePlugin):
                 cls.do_configure_grubefi(hdddir, creator, cr_workdir, source_params)
             elif source_params['loader'] == 'systemd-boot':
                 cls.do_configure_systemdboot(hdddir, creator, cr_workdir, source_params)
+            elif source_params['loader'] == 'uefi-kernel':
+                return
             else:
                 raise WicError("unrecognized bootimg-efi loader: %s" % source_params['loader'])
         except KeyError:
@@ -385,6 +387,28 @@ class BootimgEFIPlugin(SourcePlugin):
                 for mod in [x for x in os.listdir(kernel_dir) if x.startswith("systemd-")]:
                     cp_cmd = "cp %s/%s %s/EFI/BOOT/%s" % (kernel_dir, mod, hdddir, mod[8:])
                     exec_cmd(cp_cmd, True)
+            elif source_params['loader'] == 'uefi-kernel':
+                kernel = get_bitbake_var("KERNEL_IMAGETYPE")
+                if not kernel:
+                    raise WicError("Empty KERNEL_IMAGETYPE %s\n" % target)
+                target = get_bitbake_var("TARGET_SYS")
+                if not target:
+                    raise WicError("Unknown arch (TARGET_SYS) %s\n" % target)
+
+                if re.match("x86_64", target):
+                    kernel_efi_image = "bootx64.efi"
+                elif re.match('i.86', target):
+                    kernel_efi_image = "bootia32.efi"
+                elif re.match('aarch64', target):
+                    kernel_efi_image = "bootaa64.efi"
+                elif re.match('arm', target):
+                    kernel_efi_image = "bootarm.efi"
+                else:
+                    raise WicError("UEFI stub kernel is incompatible with target %s" % target)
+
+                for mod in [x for x in os.listdir(kernel_dir) if x.startswith(kernel)]:
+                    cp_cmd = "cp %s/%s %s/EFI/BOOT/%s" % (kernel_dir, mod, hdddir, kernel_efi_image)
+                    exec_cmd(cp_cmd, True)
             else:
                 raise WicError("unrecognized bootimg-efi loader: %s" %
                                source_params['loader'])
@@ -395,6 +419,11 @@ class BootimgEFIPlugin(SourcePlugin):
         if os.path.exists(startup):
             cp_cmd = "cp %s %s/" % (startup, hdddir)
             exec_cmd(cp_cmd, True)
+
+        for paths in part.include_path or []:
+            for path in paths:
+                cp_cmd = "cp -r %s %s/" % (path, hdddir)
+                exec_cmd(cp_cmd, True)
 
         du_cmd = "du -bks %s" % hdddir
         out = exec_cmd(du_cmd)

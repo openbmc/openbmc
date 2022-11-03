@@ -8,6 +8,7 @@ PTESTS_FAST = "\
     apr-ptest \
     apr-util-ptest \
     attr-ptest \
+    bc-ptest \
     bluez5-ptest \
     bzip2-ptest \
     diffstat-ptest \

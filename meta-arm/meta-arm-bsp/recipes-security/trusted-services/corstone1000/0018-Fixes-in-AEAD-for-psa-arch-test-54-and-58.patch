@@ -1,9 +1,11 @@
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Emekcan Aras <Emekcan.Aras@arm.com>
+
 From a1da63a8c4d55d52321608a72129af49e0a498b2 Mon Sep 17 00:00:00 2001
 From: Satish Kumar <satish.kumar01@arm.com>
 Date: Mon, 14 Feb 2022 08:22:25 +0000
 Subject: [PATCH 18/19] Fixes in AEAD for psa-arch test 54 and 58.
 
-Upstream-Status: Pending
 Signed-off-by: Satish Kumar <satish.kumar01@arm.com>
 Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 ---

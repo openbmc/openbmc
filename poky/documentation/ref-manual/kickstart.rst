@@ -211,14 +211,9 @@ supports the following options:
 .. note::
 
    Bootloader functionality and boot partitions are implemented by the
-   various
-   --source
-   plugins that implement bootloader functionality. The bootloader
+   various source plugins that implement bootloader functionality. The bootloader
    command essentially provides a means of modifying bootloader
    configuration.
-
--  ``--timeout``: Specifies the number of seconds before the
-   bootloader times out and boots the default option.
 
 -  ``--append``: Specifies kernel parameters. These parameters will be
    added to the syslinux :term:`APPEND` or ``grub`` kernel command line.
@@ -227,3 +222,13 @@ supports the following options:
    the bootloader. You can provide a full pathname for the file or a
    file located in the ``canned-wks`` folder. This option overrides
    all other bootloader options.
+
+-  ``--ptable``: Specifies the partition table format. Valid values are:
+
+   -  ``msdos``
+
+   -  ``gpt``
+
+-  ``--timeout``: Specifies the number of seconds before the
+   bootloader times out and boots the default option.
+

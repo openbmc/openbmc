@@ -522,14 +522,13 @@ tasks. You can locate these commands in the
 
    -  When using ``manage.py`` commands given a default configuration,
       you must be sure that your working directory is set to the
-      :term:`Build Directory`. Using
-      ``manage.py`` commands from the Build Directory allows Toaster to
-      find the ``toaster.sqlite`` file, which is located in the Build
-      Directory.
+      :term:`Build Directory`. Using ``manage.py`` commands from the
+      :term:`Build Directory` allows Toaster to find the ``toaster.sqlite``
+      file, which is located in the :term:`Build Directory`.
 
    -  For non-default database configurations, it is possible that you
       can use ``manage.py`` commands from a directory other than the
-      Build Directory. To do so, the ``toastermain/settings.py`` file
+      :term:`Build Directory`. To do so, the ``toastermain/settings.py`` file
       must be configured to point to the correct database backend.
 
 ``buildslist``
@@ -549,7 +548,7 @@ database.
 You need to run the ``buildslist`` command first to identify existing
 builds in the database before using the
 :ref:`toaster-manual/reference:\`\`builddelete\`\`` command. Here is an
-example that assumes default repository and build directory names:
+example that assumes default repository and :term:`Build Directory` names:
 
 .. code-block:: shell
 

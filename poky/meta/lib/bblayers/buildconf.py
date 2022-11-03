@@ -64,7 +64,7 @@ TEMPLATECONF={} . {}/oe-init-build-env build-try-{}"""
         oecore = None
 
         for l in layers:
-            if l[0] == os.path.abspath(args.layerpath):
+            if os.path.abspath(l[0]) == os.path.abspath(args.layerpath):
                 targetlayer = l[0]
             if l[1] == 'meta':
                 oecore = os.path.dirname(l[0])

@@ -53,12 +53,9 @@ def rust_base_triple(d, thing):
     else:
         arch = oe.rust.arch_to_rust_arch(d.getVar('{}_ARCH'.format(thing)))
 
-    # When bootstrapping rust-native, BUILD must be the same as upstream snapshot tarballs
-    bpn = d.getVar('BPN')
-    if thing == "BUILD" and bpn in ["rust"]:
-        return arch + "-unknown-linux-gnu"
-
-    vendor = d.getVar('{}_VENDOR'.format(thing))
+    # Substituting "unknown" when vendor is empty will match rust's standard
+    # targets when building native recipes (including rust-native itself)
+    vendor = d.getVar('{}_VENDOR'.format(thing)) or "-unknown"
 
     # Default to glibc
     libc = "-gnu"

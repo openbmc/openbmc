@@ -1,0 +1,77 @@
+From 6fd49ab55c3419429e437845864c5bb2d731da29 Mon Sep 17 00:00:00 2001
+From: Satish Kumar <satish.kumar01@arm.com>
+Date: Mon, 25 Apr 2022 05:26:38 +0100
+Subject: [PATCH 2/6] corstone1000: make external system support optional
+
+The commits introduce build time variables to make
+external system support in the platform optional.
+
+Change-Id: I593014e0da4ac553c105c66ae55f6fd83ffe427e
+Signed-off-by: Satish Kumar <satish.kumar01@arm.com>
+Upstream-Status: Accepted [TF-Mv1.7.0]
+---
+ .../ext/target/arm/corstone1000/CMakeLists.txt    |  1 +
+ platform/ext/target/arm/corstone1000/config.cmake |  1 +
+ .../target/arm/corstone1000/tfm_hal_multi_core.c  | 15 +++++++++++++++
+ 3 files changed, 17 insertions(+)
+
+diff --git a/platform/ext/target/arm/corstone1000/CMakeLists.txt b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+index 16bc708964..39d7b03455 100644
+--- a/platform/ext/target/arm/corstone1000/CMakeLists.txt
++++ b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+@@ -97,6 +97,7 @@ target_compile_definitions(platform_s
+     PRIVATE
+         $<$<BOOL:${PLATFORM_IS_FVP}>:PLATFORM_IS_FVP>
+         $<$<BOOL:${TEST_S}>:TEST_S>
++        $<$<BOOL:${EXTERNAL_SYSTEM_SUPPORT}>:EXTERNAL_SYSTEM_SUPPORT>
+ )
+ 
+ #========================= Platform BL2 =======================================#
+diff --git a/platform/ext/target/arm/corstone1000/config.cmake b/platform/ext/target/arm/corstone1000/config.cmake
+index e5f91108ee..a3399db318 100644
+--- a/platform/ext/target/arm/corstone1000/config.cmake
++++ b/platform/ext/target/arm/corstone1000/config.cmake
+@@ -21,6 +21,7 @@ set(CRYPTO_HW_ACCELERATOR               ON         CACHE BOOL     "Whether to en
+ set(CRYPTO_NV_SEED                      OFF        CACHE BOOL     "Use stored NV seed to provide entropy")
+ set(TFM_CRYPTO_TEST_ALG_CFB             OFF        CACHE BOOL     "Test CFB cryptography mode")
+ set(NS                                  FALSE      CACHE BOOL     "Whether to build NS app")
++set(EXTERNAL_SYSTEM_SUPPORT             OFF        CACHE BOOL     "Whether to include external system support.")
+ 
+ # FVP is not integrated/tested with CC312.
+ if (${PLATFORM_IS_FVP})
+diff --git a/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c b/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c
+index 8e1b455086..8622844d91 100644
+--- a/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c
++++ b/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c
+@@ -16,6 +16,16 @@
+ #define HOST_CPU_PE0_CONFIG_OFFSET 0x010
+ #define AA64nAA32_MASK (1 << 3)
+ 
++#ifdef EXTERNAL_SYSTEM_SUPPORT
++void tfm_external_system_boot()
++{
++    volatile uint32_t *ext_sys_reset_ctl_reg = (uint32_t *)(CORSTONE1000_EXT_SYS_RESET_REG);
++
++    /* de-assert CPU_WAIT signal*/
++    *ext_sys_reset_ctl_reg = 0x0;
++}
++#endif
++
+ void tfm_hal_boot_ns_cpu(uintptr_t start_addr)
+ {
+     /* Switch the shared flash to XiP mode for the host */
+@@ -53,6 +63,11 @@ void tfm_hal_boot_ns_cpu(uintptr_t start_addr)
+     *reset_ctl_reg = 0;
+ 
+     (void) start_addr;
++
++#ifdef EXTERNAL_SYSTEM_SUPPORT
++    /*release EXT SYS out of reset*/
++    tfm_external_system_boot();
++#endif
+ }
+ 
+ void tfm_hal_wait_for_ns_cpu_ready(void)
+-- 
+2.25.1
+
