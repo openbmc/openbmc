@@ -21,6 +21,7 @@ SRC_URI += " \
   file://gbmc-ncsi-br-pub-addr.sh.in \
   file://gbmc-ncsi-br-deprecated-ips.sh.in \
   file://gbmc-ncsi-set-nicenabled.service.in \
+  file://gbmc-ncsi-alias.service.in \
   file://50-gbmc-ncsi-clear-ip.sh.in \
   "
 
@@ -91,6 +92,13 @@ do_install:append() {
   wantdir=${D}${systemd_system_unitdir}/multi-user.target.wants
   install -d -m0755 "$wantdir"
   ln -sv ../ncsid@.service "$wantdir"/ncsid@$if_name.service
+
+  sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-alias.service.in \
+    >${D}${systemd_system_unitdir}/gbmc-ncsi-alias.service
+  install -d -m0755 "${D}${systemd_system_unitdir}/nic-hostless@$if_name.target.wants"
+  ln -sv ../gbmc-ncsi-alias.service "${D}${systemd_system_unitdir}/nic-hostless@$if_name.target.wants"/
+  install -d -m0755 "${D}${systemd_system_unitdir}/nic-hostful@$if_name.target.wants"
+  ln -sv ../gbmc-ncsi-alias.service "${D}${systemd_system_unitdir}/nic-hostful@$if_name.target.wants"/
 
   install -m 0644 ${WORKDIR}/gbmc-ncsi-sslh.service ${D}${systemd_system_unitdir}
   sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-sslh.socket.in \

@@ -1,0 +1,12 @@
+[Unit]
+BindsTo=ncsid@@NCSI_IF@.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/ip link set @NCSI_IF@ alias ncsi
+ExecStop=/usr/bin/ip link set @NCSI_IF@ alias ''
+
+[Install]
+WantedBy=nic-hostful@@NCSI_IF@.target
+WantedBy=nic-hostless@@NCSI_IF@.target
