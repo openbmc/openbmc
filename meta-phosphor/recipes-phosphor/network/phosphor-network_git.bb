@@ -10,7 +10,7 @@ DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "phosphor-logging"
 DEPENDS += "libnl"
 DEPENDS += "stdplus"
-SRCREV = "90434ee4d911016cb3039bf3b6ca712ba8a17b65"
+SRCREV = "85dc57a57c5e8c9394bad5c787d6f837eae76178"
 PACKAGECONFIG ??= "uboot-env default-link-local-autoconf default-ipv6-accept-ra persist-mac"
 PACKAGECONFIG[uboot-env] = "-Duboot-env=true,-Duboot-env=false,,${UBOOT_ENV_RDEPENDS}"
 PACKAGECONFIG[default-link-local-autoconf] = "-Ddefault-link-local-autoconf=true,-Ddefault-link-local-autoconf=false,,"
@@ -35,5 +35,6 @@ inherit systemd
 EXTRA_OEMESON:append = " -Dtests=disabled"
 
 FILES:${PN} += "${datadir}/dbus-1/system.d"
+FILES:${PN} += "${systemd_unitdir}/network/60-phosphor-networkd-default.network"
 
 UBOOT_ENV_RDEPENDS = "${@d.getVar('PREFERRED_PROVIDER_u-boot-fw-utils', True) or 'u-boot-fw-utils'}"
