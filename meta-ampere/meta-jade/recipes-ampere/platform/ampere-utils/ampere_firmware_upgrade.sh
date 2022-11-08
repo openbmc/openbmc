@@ -102,8 +102,8 @@ if [ $# -eq 0 ]; then
 	echo "Usage:"
 	echo "      $(basename "$0") <Type> <Image file> <DEV_SEL> [SECPRO]"
 	echo "Where:"
-	echo "    <Type>: smpmpro or fru"
-	echo "            If Type is smpmpro, then DEV_SEL must is 1 (MAIN EEPROM), 2 (Failover)"
+	echo "    <Type>: eeprom or fru"
+	echo "            If Type is eeprom, then DEV_SEL must is 1 (MAIN EEPROM), 2 (Failover)"
 	echo "    SECPRO: Optional, input '1' to enter & flash secpro mode. Default: 0"
 	exit 0
 fi
@@ -138,8 +138,11 @@ if [ $SECPRO == 1 ] && [ "$DEV_SEL" == 2 ]; then
 	exit
 fi
 
-if [[ $TYPE == "smpmpro" ]]; then
-	do_smpmpro_upgrade
-elif [[ $TYPE == "fru" ]]; then
-	do_fru_upgrade
-fi
+case $TYPE in
+	"smpmpro" | "eeprom")
+		do_smpmpro_upgrade
+		;;
+	"fru")
+		do_fru_upgrade
+		;;
+esac

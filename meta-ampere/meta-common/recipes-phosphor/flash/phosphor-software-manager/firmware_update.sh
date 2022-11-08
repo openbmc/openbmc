@@ -44,22 +44,12 @@ case ${EXTENDED_VERSION} in
 		CMD="/usr/sbin/ampere_flash_bios.sh $IMAGE 2"
 		;;
 
-	"scp-primary")
-		IMAGE=$(find "${IMG_PATH}" -type f \( -name "*.img" -o -name "*.slim" -o -name "*.rom" \))
-		CMD="/usr/sbin/ampere_firmware_upgrade.sh smpmpro $IMAGE 1"
-		;;
-
-	"scp-secondary")
-		IMAGE=$(find "${IMG_PATH}" -type f \( -name "*.img" -o -name "*.slim" -o -name "*.rom" \))
-		CMD="/usr/sbin/ampere_firmware_upgrade.sh smpmpro $IMAGE 2"
-		;;
-
-	"eeprom" | "eeprom-primary")
+	"eeprom" | "eeprom-primary" | "scp-primary")
 		IMAGE=$(find "${IMG_PATH}" -type f \( -name "*.img" -o -name "*.slim" -o -name "*.rom" -o -name "*.bin" \))
 		CMD="/usr/sbin/ampere_firmware_upgrade.sh eeprom $IMAGE 1"
 		;;
 
-	"eeprom-secondary")
+	"eeprom-secondary" | "scp-secondary")
 		IMAGE=$(find "${IMG_PATH}" -type f \( -name "*.img" -o -name "*.slim" -o -name "*.rom" -o -name "*.bin" \))
 		CMD="/usr/sbin/ampere_firmware_upgrade.sh eeprom $IMAGE 2"
 		;;
@@ -76,14 +66,18 @@ case ${EXTENDED_VERSION} in
 		;;
 
 	"mbcpld")
-		IMAGE=$(find "${IMG_PATH}" -type f \( -name "*.jed" \))
-		CMD="/usr/bin/ampere_firmware_upgrade.sh mb_cpld $IMAGE"
+		IMAGE=$(find "${IMG_PATH}" -type f \( -name "*.jed" -o -name "*.bin" \))
+		CMD="/usr/sbin/ampere_firmware_upgrade.sh mb_cpld $IMAGE"
 		;;
 	"bmccpld")
-		IMAGE=$(find "${IMG_PATH}" -type f \( -name "*.jed" \))
-		CMD="/usr/bin/ampere_firmware_upgrade.sh bmc_cpld $IMAGE"
+		IMAGE=$(find "${IMG_PATH}" -type f \( -name "*.jed" -o -name "*.bin" \))
+		CMD="/usr/sbin/ampere_firmware_upgrade.sh bmc_cpld $IMAGE"
 		;;
-
+	"bpcpld"*)
+		IMAGE=$(find "${IMG_PATH}" -type f \( -name "*.jed" -o -name "*.bin" \))
+		TARGET="${EXTENDED_VERSION:6}"
+		CMD="/usr/sbin/ampere_firmware_upgrade.sh bp_cpld $IMAGE $TARGET"
+		;;
 	*)
 		echo "Invalid ExtendedVersion: ${EXTENDED_VERSION}. Please check MANIFEST file!"
 		exit 1
