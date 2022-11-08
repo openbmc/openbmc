@@ -19,8 +19,8 @@ SYSTEMD_PACKAGES = "${PN}-mstpd"
 SYSTEMD_SERVICE:${PN}-mstpd = "mstpd.service"
 
 do_install:append() {
-  rm -r ${D}${libexecdir} ${D}${libdir}/NetworkManager
-  rmdir ${D}${libdir}
+  rm -rf ${D}${libexecdir} ${D}${libdir}/NetworkManager
+  rmdir ${D}${libdir} || true
 
   install -d -m 0755 ${D}/sbin
   install -m 0755 ${WORKDIR}/bridge-stp ${D}/sbin
