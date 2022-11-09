@@ -1,0 +1,5 @@
+/xyz/openbmc_project/inventory/system/chassis{}/frontpanel:
+- Interface: xyz.openbmc_project.Inventory.Decorator.Asset
+  Properties:
+    Model:
+      Default: '"Bletchley_FPB_HDC1080"'
