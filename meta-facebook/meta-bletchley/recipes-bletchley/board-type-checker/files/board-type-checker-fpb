@@ -1,26 +1,5 @@
 #!/bin/bash
 
-add_i2c_device()
-{
-    local I2C_BUS=$1
-    local DEV_ADDR=$2
-    local DEVICE_COMP=$3
-    local I2C_BUS_DIR="/sys/bus/i2c/devices/i2c-$I2C_BUS"
-    local NEW_DEVIVE="$I2C_BUS_DIR/new_device"
-
-    echo "$DEVICE_COMP" "$DEV_ADDR" > "$NEW_DEVIVE"
-}
-
-delete_i2c_device()
-{
-    local I2C_BUS=$1
-    local DEV_ADDR=$2
-    local I2C_BUS_DIR="/sys/bus/i2c/devices/i2c-$I2C_BUS"
-    local DEL_DEVIVE="$I2C_BUS_DIR/delete_device"
-
-    echo "$DEV_ADDR" > "$DEL_DEVIVE"
-}
-
 is_valid_hdc1080()
 {
     local I2C_BUS=$1
@@ -39,41 +18,27 @@ is_valid_hdc1080()
     return 0;
 }
 
+set_frontpanel_model()
+{
+    busctl set-property xyz.openbmc_project.Settings /xyz/openbmc_project/inventory/system/chassis0/frontpanel xyz.openbmc_project.Inventory.Decorator.Asset Model s "Bletchley_FPB_${1}"
+}
 
 I2C_BUS=10
 DEV_ADDR=0x40
-I2C_BUS_DIR="/sys/bus/i2c/devices/i2c-$I2C_BUS"
-DEV_ADDR_HEXSTR="$(printf %04X $DEV_ADDR)"
-DEV_DIR="$I2C_BUS_DIR/$I2C_BUS-$DEV_ADDR_HEXSTR"
-DEV_NAME_FILE="$DEV_DIR/name"
-
-# Check chip type
-if is_valid_hdc1080 "$I2C_BUS" "$DEV_ADDR"; then
-    CHIP_TYPE="HDC1080"
-    DEVICE_COMP="ti,hdc1080"
-else
-    CHIP_TYPE="SI7021"
-    DEVICE_COMP="silabs,si7020"
-fi
-
-# Check and probe i2c device
-if [ ! -f "$DEV_NAME_FILE" ]; then
-    # i2c device not porbed yet
-    add_i2c_device "$I2C_BUS" "$DEV_ADDR" "$DEVICE_COMP"
-else
-    DEV_NAME=$(cat "$DEV_NAME_FILE")
-    if [ "$DEV_NAME" != "$DEVICE_COMP" ]; then
-        # incorrect driver probed, delete and add again
-        delete_i2c_device "$I2C_BUS" "$DEV_ADDR"
-        add_i2c_device "$I2C_BUS" "$DEV_ADDR" "$DEVICE_COMP"
-    fi
-fi
-
 
 VIRT_SNR_CONF="/usr/share/phosphor-virtual-sensor/virtual_sensor_config.json"
 HDC1080_VIRT_SNR_CONF="/usr/share/phosphor-virtual-sensor/virtual_sensor_config_hdc1080.json"
 SI7021_VIRT_SNR_CONF="/usr/share/phosphor-virtual-sensor/virtual_sensor_config_si7021.json"
 
+# Check chip type
+if is_valid_hdc1080 "$I2C_BUS" "$DEV_ADDR"; then
+    CHIP_TYPE="HDC1080"
+else
+    CHIP_TYPE="SI7021"
+fi
+
+# Set Frontpanel board model
+set_frontpanel_model "$CHIP_TYPE"
 
 # Setup virtual_sensor_config.json for phosphor-virtual-sensor
 case "$CHIP_TYPE" in
