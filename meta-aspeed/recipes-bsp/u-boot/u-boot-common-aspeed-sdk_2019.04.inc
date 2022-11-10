@@ -10,7 +10,7 @@ PE = "1"
 
 # We use the revision in order to avoid having to fetch it from the
 # repo during parse
-SRCREV = "754cbe66efcd7ddc5fc75b8ee69a579c3f960efa"
+SRCREV = "29b2d11d822ee7f9822270c710e1d45cade3ed46"
 SRC_URI = "git://git@github.com/openbmc/u-boot.git;nobranch=1;protocol=https"
 
 SRC_URI:append:uboot-flash-32768 = " file://u-boot_flash_32M.cfg"
