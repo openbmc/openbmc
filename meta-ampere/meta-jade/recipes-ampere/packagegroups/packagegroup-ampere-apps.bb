@@ -23,7 +23,7 @@ SUMMARY:${PN}-chassis = "Ampere Chassis"
 RDEPENDS:${PN}-chassis = " \
         obmc-phosphor-buttons-signals \
         obmc-phosphor-buttons-handler \
-        obmc-op-control-power \
+        phosphor-skelton-control-power \
         ampere-hostctrl \
         phosphor-hostlogger \
         phosphor-sel-logger \
