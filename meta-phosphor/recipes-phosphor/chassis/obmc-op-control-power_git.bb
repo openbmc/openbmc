@@ -15,57 +15,25 @@ OBMC_CONTROL_POWER_FMT ?= "org.openbmc.control.Power@{0}.service"
 DBUS_SERVICE:${PN} += "${@compose_list(d, 'OBMC_CONTROL_POWER_FMT', 'OBMC_POWER_INSTANCES')}"
 
 SYSTEMD_SERVICE:${PN} += " \
-        op-power-start@.service \
         op-wait-power-on@.service \
-        op-power-stop@.service \
         op-wait-power-off@.service \
-        op-reset-chassis-running@.service \
-        op-reset-chassis-on@.service \
-        op-powered-off@.service \
         "
 
 SYSTEMD_ENVIRONMENT_FILE:${PN} += "obmc/power_control"
 
-START_TMPL = "op-power-start@.service"
 START_TGTFMT = "obmc-chassis-poweron@{1}.target"
-START_INSTFMT = "op-power-start@{0}.service"
-START_FMT = "../${START_TMPL}:${START_TGTFMT}.requires/${START_INSTFMT}"
-
-STOP_TMPL = "op-power-stop@.service"
-STOP_TGTFMT = "obmc-chassis-poweroff@{1}.target"
-STOP_INSTFMT = "op-power-stop@{0}.service"
-STOP_FMT = "../${STOP_TMPL}:${STOP_TGTFMT}.requires/${STOP_INSTFMT}"
-
-POWERED_OFF_TMPL = "op-powered-off@.service"
-POWERED_OFF_INSTFMT = "op-powered-off@{0}.service"
-POWERED_OFF_FMT = "../${POWERED_OFF_TMPL}:${STOP_TGTFMT}.requires/${POWERED_OFF_INSTFMT}"
-
 ON_TMPL = "op-wait-power-on@.service"
 ON_INSTFMT = "op-wait-power-on@{0}.service"
 ON_FMT = "../${ON_TMPL}:${START_TGTFMT}.requires/${ON_INSTFMT}"
 
+STOP_TGTFMT = "obmc-chassis-poweroff@{1}.target"
 OFF_TMPL = "op-wait-power-off@.service"
 OFF_INSTFMT = "op-wait-power-off@{0}.service"
 OFF_FMT = "../${OFF_TMPL}:${STOP_TGTFMT}.requires/${OFF_INSTFMT}"
 
-RESET_TGTFMT = "obmc-chassis-powerreset@{1}.target"
-
-RESET_ON_TMPL = "op-reset-chassis-running@.service"
-RESET_ON_INSTFMT = "op-reset-chassis-running@{0}.service"
-RESET_ON_FMT = "../${RESET_ON_TMPL}:${RESET_TGTFMT}.requires/${RESET_ON_INSTFMT}"
-
-RESET_ON_CHASSIS_TMPL = "op-reset-chassis-on@.service"
-RESET_ON_CHASSIS_INSTFMT = "op-reset-chassis-on@{0}.service"
-RESET_ON_CHASSIS_FMT = "../${RESET_ON_CHASSIS_TMPL}:${RESET_TGTFMT}.requires/${RESET_ON_CHASSIS_INSTFMT}"
-
 # Build up requires relationship for START_TGTFMT and STOP_TGTFMT
-SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'START_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'STOP_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'POWERED_OFF_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'ON_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'OFF_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'RESET_ON_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'RESET_ON_CHASSIS_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 
 # Now show that the main control target requires these power targets
 START_TMPL_CTRL = "obmc-chassis-poweron@.target"

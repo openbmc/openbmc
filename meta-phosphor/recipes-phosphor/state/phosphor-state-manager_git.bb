@@ -74,6 +74,11 @@ SYSTEMD_SERVICE:${PN}-host += "phosphor-set-host-transition-to-off@.service"
 
 FILES:${PN}-chassis = "${bindir}/phosphor-chassis-state-manager"
 DBUS_SERVICE:${PN}-chassis += "xyz.openbmc_project.State.Chassis@.service"
+SYSTEMD_SERVICE:${PN}-chassis += "obmc-power-start@.service"
+SYSTEMD_SERVICE:${PN}-chassis += "obmc-power-stop@.service"
+SYSTEMD_SERVICE:${PN}-chassis += "obmc-powered-off@.service"
+SYSTEMD_SERVICE:${PN}-chassis += "phosphor-reset-chassis-on@.service"
+SYSTEMD_SERVICE:${PN}-chassis += "phosphor-reset-chassis-running@.service"
 
 FILES:${PN}-chassis += "${bindir}/obmcutil"
 
@@ -201,6 +206,6 @@ SYSTEMD_LINK:${PN}-obmc-targets += "${@compose_list(d, 'QUIESCE_FMT', 'HOST_ERRO
 
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager;branch=master;protocol=https"
-SRCREV = "eab2ea348d0a2a1b444b6a2c3c4814f277db9870"
+SRCREV = "69a250dd4504c53449bb5136435fddbc168edd1c"
 
 S = "${WORKDIR}/git"
