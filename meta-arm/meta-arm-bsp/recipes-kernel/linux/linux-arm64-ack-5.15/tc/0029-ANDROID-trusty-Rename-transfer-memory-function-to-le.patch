@@ -1,0 +1,192 @@
+From 162daf58abe2d00b9279fce143595b6ff546f803 Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Tue, 18 Jan 2022 18:27:09 +0000
+Subject: [PATCH 29/40] ANDROID: trusty: Rename transfer memory function to
+ lend memory
+
+Renaming trusty_transfer_memory to trusty_lend_memory allows Trusty
+to export memory operation like share, lend, reclaim and use common
+code for memory share and lend operations.
+
+Define TRUSTY_DEFAULT_MEM_OBJ_TAG as 0 and use that in existing calls.
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Change-Id: Ie165a609cc4398bb916967595d0b748d54d75faf
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com
+---
+ drivers/trusty/trusty-ipc.c    | 14 ++++++++----
+ drivers/trusty/trusty-test.c   |  3 ++-
+ drivers/trusty/trusty-virtio.c |  3 ++-
+ drivers/trusty/trusty.c        | 41 ++++++++++++++++++++++------------
+ include/linux/trusty/trusty.h  | 11 ++++-----
+ 5 files changed, 47 insertions(+), 25 deletions(-)
+
+diff --git a/drivers/trusty/trusty-ipc.c b/drivers/trusty/trusty-ipc.c
+index 82d6ddeb41f4..0a27af2063a7 100644
+--- a/drivers/trusty/trusty-ipc.c
++++ b/drivers/trusty/trusty-ipc.c
+@@ -1233,10 +1233,16 @@ static int dn_share_fd(struct tipc_dn_chan *dn, int fd,
+ 		goto cleanup_handle;
+ 	}
+ 
+-	ret = trusty_transfer_memory(tipc_shared_handle_dev(shared_handle),
+-				     &mem_id, shared_handle->sgt->sgl,
+-				     shared_handle->sgt->orig_nents, prot, tag,
+-				     lend);
++	if (lend)
++		ret = trusty_lend_memory(tipc_shared_handle_dev(shared_handle),
++					 &mem_id, shared_handle->sgt->sgl,
++					 shared_handle->sgt->orig_nents, prot,
++					 tag);
++	else
++		ret = trusty_share_memory(tipc_shared_handle_dev(shared_handle),
++					  &mem_id, shared_handle->sgt->sgl,
++					  shared_handle->sgt->orig_nents, prot,
++					  tag);
+ 
+ 	if (ret < 0) {
+ 		dev_dbg(dev, "Transferring memory failed: %d\n", ret);
+diff --git a/drivers/trusty/trusty-test.c b/drivers/trusty/trusty-test.c
+index 844868981fa5..c25fc0f2fcf0 100644
+--- a/drivers/trusty/trusty-test.c
++++ b/drivers/trusty/trusty-test.c
+@@ -138,7 +138,8 @@ static int trusty_test_share_objs(struct trusty_test_state *s,
+ 		t1 = ktime_get();
+ 		tmpret = trusty_share_memory(s->trusty_dev, &obj->mem_id,
+ 					     obj->sgt.sgl, obj->sgt.nents,
+-					     PAGE_KERNEL);
++					     PAGE_KERNEL,
++					     TRUSTY_DEFAULT_MEM_OBJ_TAG);
+ 		t2 = ktime_get();
+ 		if (tmpret) {
+ 			ret = tmpret;
+diff --git a/drivers/trusty/trusty-virtio.c b/drivers/trusty/trusty-virtio.c
+index fea59cd2e218..365e7c04bcf4 100644
+--- a/drivers/trusty/trusty-virtio.c
++++ b/drivers/trusty/trusty-virtio.c
+@@ -626,7 +626,8 @@ static int trusty_virtio_add_devices(struct trusty_ctx *tctx)
+ 
+ 	sg_init_one(&tctx->shared_sg, descr_va, descr_buf_sz);
+ 	ret = trusty_share_memory(tctx->dev->parent, &descr_id,
+-				  &tctx->shared_sg, 1, PAGE_KERNEL);
++				  &tctx->shared_sg, 1, PAGE_KERNEL,
++				  TRUSTY_DEFAULT_MEM_OBJ_TAG);
+ 	if (ret) {
+ 		dev_err(tctx->dev, "trusty_share_memory failed: %d\n", ret);
+ 		goto err_share_memory;
+diff --git a/drivers/trusty/trusty.c b/drivers/trusty/trusty.c
+index 2dec75398f69..6bd30bc1bbc9 100644
+--- a/drivers/trusty/trusty.c
++++ b/drivers/trusty/trusty.c
+@@ -222,18 +222,9 @@ s32 trusty_std_call32(struct device *dev, u32 smcnr, u32 a0, u32 a1, u32 a2)
+ }
+ EXPORT_SYMBOL(trusty_std_call32);
+ 
+-int trusty_share_memory(struct device *dev, u64 *id,
+-			struct scatterlist *sglist, unsigned int nents,
+-			pgprot_t pgprot)
+-{
+-	return trusty_transfer_memory(dev, id, sglist, nents, pgprot, 0,
+-				      false);
+-}
+-EXPORT_SYMBOL(trusty_share_memory);
+-
+-int trusty_transfer_memory(struct device *dev, u64 *id,
+-			   struct scatterlist *sglist, unsigned int nents,
+-			   pgprot_t pgprot, u64 tag, bool lend)
++static int __trusty_share_memory(struct device *dev, u64 *id,
++				 struct scatterlist *sglist, unsigned int nents,
++				 pgprot_t pgprot, u64 tag, bool mem_share)
+ {
+ 	struct trusty_state *s = platform_get_drvdata(to_platform_device(dev));
+ 	int ret;
+@@ -253,6 +244,12 @@ int trusty_transfer_memory(struct device *dev, u64 *id,
+ 		return -EOPNOTSUPP;
+ 	}
+ 
++	if (mem_share == false && s->api_version < TRUSTY_API_VERSION_MEM_OBJ) {
++		dev_err(s->dev, "%s: old trusty version does not support lending memory objects\n",
++			__func__);
++		return -EOPNOTSUPP;
++	}
++
+ 	count = dma_map_sg(dev, sglist, nents, DMA_BIDIRECTIONAL);
+ 	if (count != nents) {
+ 		dev_err(s->dev, "failed to dma map sg_table\n");
+@@ -271,7 +268,22 @@ int trusty_transfer_memory(struct device *dev, u64 *id,
+ 	*id = pg_inf.compat_attr;
+ 	return 0;
+ }
+-EXPORT_SYMBOL(trusty_transfer_memory);
++
++int trusty_share_memory(struct device *dev, u64 *id,
++			struct scatterlist *sglist, unsigned int nents,
++			pgprot_t pgprot, u64 tag)
++{
++	return __trusty_share_memory(dev, id, sglist, nents, pgprot, tag, true);
++}
++EXPORT_SYMBOL(trusty_share_memory);
++
++int trusty_lend_memory(struct device *dev, u64 *id,
++		       struct scatterlist *sglist, unsigned int nents,
++		       pgprot_t pgprot, u64 tag)
++{
++	return __trusty_share_memory(dev, id, sglist, nents, pgprot, tag, false);
++}
++EXPORT_SYMBOL(trusty_lend_memory);
+ 
+ /*
+  * trusty_share_memory_compat - trusty_share_memory wrapper for old apis
+@@ -287,7 +299,8 @@ int trusty_share_memory_compat(struct device *dev, u64 *id,
+ 	int ret;
+ 	struct trusty_state *s = platform_get_drvdata(to_platform_device(dev));
+ 
+-	ret = trusty_share_memory(dev, id, sglist, nents, pgprot);
++	ret = trusty_share_memory(dev, id, sglist, nents, pgprot,
++				  TRUSTY_DEFAULT_MEM_OBJ_TAG);
+ 	if (!ret && s->api_version < TRUSTY_API_VERSION_PHYS_MEM_OBJ)
+ 		*id &= 0x0000FFFFFFFFF000ull;
+ 
+diff --git a/include/linux/trusty/trusty.h b/include/linux/trusty/trusty.h
+index 272d96c1c696..27f635f2d12d 100644
+--- a/include/linux/trusty/trusty.h
++++ b/include/linux/trusty/trusty.h
+@@ -11,6 +11,7 @@
+ #include <linux/device.h>
+ #include <linux/pagemap.h>
+ 
++#define TRUSTY_DEFAULT_MEM_OBJ_TAG	(0)
+ 
+ #if IS_ENABLED(CONFIG_TRUSTY)
+ s32 trusty_std_call32(struct device *dev, u32 smcnr, u32 a0, u32 a1, u32 a2);
+@@ -62,13 +63,13 @@ struct scatterlist;
+ typedef u64 trusty_shared_mem_id_t;
+ int trusty_share_memory(struct device *dev, trusty_shared_mem_id_t *id,
+ 			struct scatterlist *sglist, unsigned int nents,
+-			pgprot_t pgprot);
++			pgprot_t pgprot, u64 tag);
+ int trusty_share_memory_compat(struct device *dev, trusty_shared_mem_id_t *id,
+ 			       struct scatterlist *sglist, unsigned int nents,
+ 			       pgprot_t pgprot);
+-int trusty_transfer_memory(struct device *dev, u64 *id,
+-			   struct scatterlist *sglist, unsigned int nents,
+-			   pgprot_t pgprot, u64 tag, bool lend);
++int trusty_lend_memory(struct device *dev, u64 *id,
++		       struct scatterlist *sglist, unsigned int nents,
++		       pgprot_t pgprot, u64 tag);
+ int trusty_reclaim_memory(struct device *dev, trusty_shared_mem_id_t id,
+ 			  struct scatterlist *sglist, unsigned int nents);
+ 
+@@ -78,7 +79,7 @@ u64 trusty_dma_buf_get_ffa_tag(struct dma_buf *dma_buf);
+ #else
+ static inline u64 trusty_dma_buf_get_ffa_tag(struct dma_buf *dma_buf)
+ {
+-	return 0;
++	return TRUSTY_DEFAULT_MEM_OBJ_TAG;
+ }
+ #endif
+ 
+-- 
+2.34.1
+

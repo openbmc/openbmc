@@ -277,8 +277,8 @@ FIT_SIGN_INDIVIDUAL = "1"
 """
         self.write_config(config)
 
-        # The U-Boot fitImage is created as part of linux recipe
-        bitbake("virtual/kernel")
+        # The U-Boot fitImage is created as part of the U-Boot recipe
+        bitbake("virtual/bootloader")
 
         deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
         machine = get_bb_var('MACHINE')
@@ -350,7 +350,8 @@ UBOOT_LOADADDRESS = "0x80080000"
 UBOOT_ENTRYPOINT = "0x80080000"
 UBOOT_FIT_DESC = "A model description"
 KERNEL_IMAGETYPES += " fitImage "
-KERNEL_CLASSES = " kernel-fitimage test-mkimage-wrapper "
+KERNEL_CLASSES = " kernel-fitimage "
+INHERIT += "test-mkimage-wrapper"
 UBOOT_SIGN_ENABLE = "1"
 FIT_GENERATE_KEYS = "1"
 UBOOT_SIGN_KEYDIR = "${TOPDIR}/signing-keys"
@@ -361,8 +362,8 @@ UBOOT_MKIMAGE_SIGN_ARGS = "-c 'a smart U-Boot comment'"
 """
         self.write_config(config)
 
-        # The U-Boot fitImage is created as part of linux recipe
-        bitbake("virtual/kernel")
+        # The U-Boot fitImage is created as part of the U-Boot recipe
+        bitbake("virtual/bootloader")
 
         deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
         machine = get_bb_var('MACHINE')
@@ -432,7 +433,8 @@ UBOOT_MACHINE = "am57xx_evm_defconfig"
 SPL_BINARY = "MLO"
 # The kernel-fitimage class is a dependency even if we're only
 # creating/signing the U-Boot fitImage
-KERNEL_CLASSES = " kernel-fitimage test-mkimage-wrapper "
+KERNEL_CLASSES = " kernel-fitimage"
+INHERIT += "test-mkimage-wrapper"
 # Enable creation and signing of the U-Boot fitImage
 UBOOT_FITIMAGE_ENABLE = "1"
 SPL_SIGN_ENABLE = "1"
@@ -451,8 +453,8 @@ UBOOT_FIT_HASH_ALG = "sha256"
 """
         self.write_config(config)
 
-        # The U-Boot fitImage is created as part of linux recipe
-        bitbake("virtual/kernel")
+        # The U-Boot fitImage is created as part of the U-Boot recipe
+        bitbake("virtual/bootloader")
 
         image_type = "core-image-minimal"
         deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
@@ -540,7 +542,7 @@ UBOOT_FIT_HASH_ALG = "sha256"
             self.assertEqual(len(value), 512, 'Signature value for section %s not expected length' % signed_section)
 
         # Check for SPL_MKIMAGE_SIGN_ARGS
-        result = runCmd('bitbake -e virtual/kernel | grep ^T=')
+        result = runCmd('bitbake -e virtual/bootloader | grep ^T=')
         tempdir = result.output.split('=', 1)[1].strip().strip('')
         result = runCmd('grep "a smart U-Boot comment" %s/run.do_uboot_assemble_fitimage' % tempdir, ignore_status=True)
         self.assertEqual(result.status, 0, 'SPL_MKIMAGE_SIGN_ARGS value did not get used')
@@ -595,7 +597,8 @@ UBOOT_EXTLINUX = "0"
 UBOOT_FIT_GENERATE_KEYS = "1"
 UBOOT_FIT_HASH_ALG = "sha256"
 KERNEL_IMAGETYPES += " fitImage "
-KERNEL_CLASSES = " kernel-fitimage test-mkimage-wrapper "
+KERNEL_CLASSES = " kernel-fitimage "
+INHERIT += "test-mkimage-wrapper"
 UBOOT_SIGN_ENABLE = "1"
 FIT_GENERATE_KEYS = "1"
 UBOOT_SIGN_KEYDIR = "${TOPDIR}/signing-keys"
@@ -605,8 +608,8 @@ FIT_SIGN_INDIVIDUAL = "1"
 """
         self.write_config(config)
 
-        # The U-Boot fitImage is created as part of linux recipe
-        bitbake("virtual/kernel")
+        # The U-Boot fitImage is created as part of the U-Boot recipe
+        bitbake("virtual/bootloader")
 
         image_type = "core-image-minimal"
         deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
@@ -694,7 +697,7 @@ FIT_SIGN_INDIVIDUAL = "1"
             self.assertEqual(len(value), 512, 'Signature value for section %s not expected length' % signed_section)
 
         # Check for SPL_MKIMAGE_SIGN_ARGS
-        result = runCmd('bitbake -e virtual/kernel | grep ^T=')
+        result = runCmd('bitbake -e virtual/bootloader | grep ^T=')
         tempdir = result.output.split('=', 1)[1].strip().strip('')
         result = runCmd('grep "a smart cascaded U-Boot comment" %s/run.do_uboot_assemble_fitimage' % tempdir, ignore_status=True)
         self.assertEqual(result.status, 0, 'SPL_MKIMAGE_SIGN_ARGS value did not get used')

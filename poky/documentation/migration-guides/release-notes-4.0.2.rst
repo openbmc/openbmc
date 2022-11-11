@@ -223,7 +223,7 @@ Contributors to Yocto-4.0.2
 -  Xiaobing Luo
 -  Yi Zhao
 -  leimaohui
--  wangmy
+-  Wang Mingyu
 
 Repositories / Downloads for Yocto-4.0.2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -16,14 +16,14 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  2 files changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index bc990cd..a37aacd 100644
+index e12d0ce6..e84457a5 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -26,7 +26,12 @@ pkgdatadir = join_paths([prefix, get_option('datadir'), package_name])
  bindir = join_paths([prefix, get_option('bindir')])
  libexecdir = join_paths([prefix, get_option('libexecdir')])
- schemadir = join_paths([datadir, 'glib-2.0', 'schemas'])
--pythondir = join_paths([prefix, python.sysconfig_path('purelib')])
+ schemadir = join_paths(['share', 'glib-2.0', 'schemas'])
+-pythondir = pyinstall.get_install_dir()
 +pythoninstalldir = get_option('pythoninstalldir')
 +if pythoninstalldir != ''
 +    pythondir = join_paths([prefix, pythoninstalldir])
@@ -34,16 +34,17 @@ index bc990cd..a37aacd 100644
  if get_option('policykit')
      have_polkit = 'True'
 diff --git a/meson_options.txt b/meson_options.txt
-index b3e939f..96acbbc 100644
+index 177d9ab8..3e397d8e 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
-@@ -5,5 +5,6 @@ option('pulseaudio', type: 'boolean', value: true, description: 'Enable PulseAud
- option('appindicator', type: 'boolean', value: true, description: 'Enable Libappindicator support')
+@@ -2,6 +2,7 @@ option('runtime_deps_check', type: 'boolean', value: true, description: 'Disable
+ option('dhcp-config-path', type: 'string', value: '/etc/dhcp3/dhcpd.conf', description: 'Set dhcp3 server configuration path')
+ option('policykit', type: 'boolean', value: true, description: 'Enable policykit support')
+ option('pulseaudio', type: 'boolean', value: true, description: 'Enable PulseAudio support')
++option('pythoninstalldir', type: 'string', description: 'Path to python site-packages dir relative to ${prefix}')
  option('systemdsystemunitdir', type: 'string', description: 'Path to systemd system unit dir relative to ${prefix}')
  option('systemduserunitdir', type: 'string', description: 'Path to systemd user unit dir relative to ${prefix}')
-+option('pythoninstalldir', type: 'string', description: 'Path to python site-packages dir relative to ${prefix}')
  option('sendto-plugins', type: 'array', choices: ['Caja', 'Nemo', 'Nautilus'], value: ['Caja', 'Nemo', 'Nautilus'], description: 'Install sendto plugins for various filemanagers')
- option('thunar-sendto', type: 'boolean', value: true, description: 'Install Thunar sendto plugin')
 -- 
-2.33.0
+2.34.1
 

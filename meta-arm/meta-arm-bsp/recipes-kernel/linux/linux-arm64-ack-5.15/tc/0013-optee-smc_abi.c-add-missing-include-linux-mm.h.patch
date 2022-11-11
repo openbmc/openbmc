@@ -1,0 +1,63 @@
+From 61c33344f747deac2860571ef965c20f9170efea Mon Sep 17 00:00:00 2001
+From: Jens Wiklander <jens.wiklander@linaro.org>
+Date: Thu, 21 Oct 2021 14:55:39 +0200
+Subject: [PATCH 13/40] optee: smc_abi.c: add missing #include <linux/mm.h>
+
+Adds missing #include <linux/mm.h> drivers/tee/optee/smc_abi.c to fix
+compile errors like:
+drivers/tee/optee/smc_abi.c:405:15: error: implicit
+declaration of function 'page_to_section'
+[-Werror,-Wimplicit-function-declaration]
+        optee_page = page_to_phys(*pages) +
+                     ^
+arch/arm/include/asm/memory.h:148:43: note: expanded from
+macro 'page_to_phys'
+                                               ^
+include/asm-generic/memory_model.h:52:21: note: expanded
+from macro 'page_to_pfn'
+                    ^
+include/asm-generic/memory_model.h:35:14: note: expanded
+from macro '__page_to_pfn'
+        int __sec = page_to_section(__pg);                      \
+                    ^
+drivers/tee/optee/smc_abi.c:405:15: note: did you mean
+'__nr_to_section'?
+arch/arm/include/asm/memory.h:148:43: note: expanded from
+macro 'page_to_phys'
+                                               ^
+include/asm-generic/memory_model.h:52:21: note: expanded
+from macro 'page_to_pfn'
+                    ^
+include/asm-generic/memory_model.h:35:14: note: expanded
+from macro '__page_to_pfn'
+        int __sec = page_to_section(__pg);                      \
+                    ^
+include/linux/mmzone.h:1365:35: note: '__nr_to_section'
+declared here
+static inline struct mem_section *__nr_to_section(unsigned long nr)
+
+Fixes: c51a564a5b48 ("optee: isolate smc abi")
+Signed-off-by: Jens Wiklander <jens.wiklander@linaro.org>
+Link: https://lore.kernel.org/r/20211021125539.3858495-1-jens.wiklander@linaro.org'
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Upstream-Status: Backport [https://lore.kernel.org/r/20211021125539.3858495-1-jens.wiklander@linaro.org]
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com>
+---
+ drivers/tee/optee/smc_abi.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/tee/optee/smc_abi.c b/drivers/tee/optee/smc_abi.c
+index 9a787fb4f5e5..6196d7c3888f 100644
+--- a/drivers/tee/optee/smc_abi.c
++++ b/drivers/tee/optee/smc_abi.c
+@@ -10,6 +10,7 @@
+ #include <linux/errno.h>
+ #include <linux/io.h>
+ #include <linux/sched.h>
++#include <linux/mm.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
+ #include <linux/of_platform.h>
+-- 
+2.34.1
+

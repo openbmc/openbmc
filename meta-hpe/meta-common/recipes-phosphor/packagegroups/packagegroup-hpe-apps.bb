@@ -36,7 +36,6 @@ RDEPENDS:${PN}-fans = " \
 
 SUMMARY:${PN}-flash = "HPE Flash"
 RDEPENDS:${PN}-flash = " \
-        obmc-control-bmc \
         "
 
 SUMMARY:${PN}-system = "HPE System"

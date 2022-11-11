@@ -5,6 +5,7 @@ After=obmc-power-start-pre@%i.target
 Conflicts=obmc-host-stop@%i.target
 Conflicts=phosphor-reset-host-check@%i.service
 OnFailure=obmc-host-quiesce@%i.target
+OnSuccess=obmc-host-already-on@%i.target
 OnFailureJobMode=flush
 
 [Service]

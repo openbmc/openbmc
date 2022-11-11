@@ -2,11 +2,11 @@ header:
   version: 11
   includes:
     - ci/corstone1000-common.yml
+    - ci/fvp.yml
 
 local_conf_header:
     fvp-config: |
         # Remove Dropbear SSH as it will not fit into the corstone1000 image.
         IMAGE_FEATURES:remove = " ssh-server-dropbear"
-        INHERIT += "fvpboot"
 
 machine: corstone1000-fvp

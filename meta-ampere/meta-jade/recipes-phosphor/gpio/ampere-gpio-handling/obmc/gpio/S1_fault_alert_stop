@@ -1,5 +1,0 @@
-DEVPATH=/dev/input/by-path/platform-gpio-keys-event
-KEY=201
-POLARITY=0
-TARGET=ampere_fault_led_stop@1.service
-EXTRA_ARGS=--continue

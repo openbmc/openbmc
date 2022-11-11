@@ -1,4 +1,4 @@
-From 6692611126b40d499c94bbcc8e29604560262072 Mon Sep 17 00:00:00 2001
+From 7161916f69ae257ce06d9c9bf25abf9709bc55cc Mon Sep 17 00:00:00 2001
 From: Jose Quaresma <quaresma.jose@gmail.com>
 Date: Sun, 7 Feb 2021 01:30:39 +0000
 Subject: [PATCH] generate glslang pkg-config
@@ -16,21 +16,21 @@ Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
  create mode 100644 glslang/glslang.pc.cmake.in
 
 diff --git a/glslang/CMakeLists.txt b/glslang/CMakeLists.txt
-index 1c7d22a2..10c1e841 100644
+index 45c9813a..cea13975 100644
 --- a/glslang/CMakeLists.txt
 +++ b/glslang/CMakeLists.txt
-@@ -209,6 +209,8 @@ if(ENABLE_GLSLANG_INSTALL)
-                 EXPORT  glslangTargets
-                 ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-     endif()
+@@ -221,6 +221,8 @@ if(ENABLE_GLSLANG_INSTALL)
+         endif()
+     ")
+     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/glslangTargets.cmake" DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
 +    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/glslang.pc.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/glslang.pc @ONLY)
 +    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/glslang.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
  
-     install(EXPORT glslangTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
- 
+     set(ALL_HEADERS
+         ${GLSLANG_HEADERS}
 diff --git a/glslang/glslang.pc.cmake.in b/glslang/glslang.pc.cmake.in
 new file mode 100644
-index 00000000..64b6882d
+index 00000000..948a0952
 --- /dev/null
 +++ b/glslang/glslang.pc.cmake.in
 @@ -0,0 +1,11 @@

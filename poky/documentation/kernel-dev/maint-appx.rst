@@ -229,6 +229,5 @@ This behavior means that all the generated files for a particular
 machine or BSP are now in the build tree directory. The files include
 the final ``.config`` file, all the ``.o`` files, the ``.a`` files, and
 so forth. Since each machine or BSP has its own separate
-:term:`Build Directory` in its own separate
-branch of the Git repository, you can easily switch between different
-builds.
+:term:`Build Directory` in its own separate branch of the Git repository,
+you can easily switch between different builds.

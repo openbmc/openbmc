@@ -1,9 +1,0 @@
-header:
-  version: 11
-
-local_conf_header:
-  testimage: |
-    IMAGE_CLASSES += "testimage"
-    TEST_TARGET = "QemuTargetZephyr"
-    TEST_SUITES = "zephyr"
-    TESTIMAGE_AUTO = "1"

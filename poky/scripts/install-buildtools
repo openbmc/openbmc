@@ -57,8 +57,8 @@ logger = scriptutils.logger_create(PROGNAME, stream=sys.stdout)
 
 DEFAULT_INSTALL_DIR = os.path.join(os.path.split(scripts_path)[0],'buildtools')
 DEFAULT_BASE_URL = 'http://downloads.yoctoproject.org/releases/yocto'
-DEFAULT_RELEASE = 'yocto-3.4'
-DEFAULT_INSTALLER_VERSION = '3.4'
+DEFAULT_RELEASE = 'yocto-4.1'
+DEFAULT_INSTALLER_VERSION = '4.1'
 DEFAULT_BUILDDATE = '202110XX'
 
 # Python version sanity check
@@ -154,6 +154,8 @@ def main():
     group.add_argument('--without-extended-buildtools', action='store_false',
                        dest='with_extended_buildtools',
                        help='disable extended buildtools (traditional buildtools tarball)')
+    group.add_argument('--make-only', action='store_true',
+                       help='only install make tarball')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-c', '--check', help='enable checksum validation',
                         default=True, action='store_true')
@@ -169,6 +171,9 @@ def main():
                         help='show this help message and exit')
 
     args = parser.parse_args()
+
+    if args.make_only:
+        args.with_extended_buildtools = False
 
     if args.debug:
         logger.setLevel(logging.DEBUG)
@@ -197,7 +202,10 @@ def main():
                 if not args.build_date:
                     logger.error("Milestone installers require --build-date")
                 else:
-                    if args.with_extended_buildtools:
+                    if args.make_only:
+                        filename = "%s-buildtools-make-nativesdk-standalone-%s-%s.sh" % (
+                            arch, args.installer_version, args.build_date)
+                    elif args.with_extended_buildtools:
                         filename = "%s-buildtools-extended-nativesdk-standalone-%s-%s.sh" % (
                             arch, args.installer_version, args.build_date)
                     else:
@@ -207,6 +215,8 @@ def main():
                     buildtools_url = "%s/milestones/%s/buildtools/%s" % (base_url, args.release, safe_filename)
             # regular release SDK
             else:
+                if args.make_only:
+                    filename = "%s-buildtools-make-nativesdk-standalone-%s.sh" % (arch, args.installer_version)
                 if args.with_extended_buildtools:
                     filename = "%s-buildtools-extended-nativesdk-standalone-%s.sh" % (arch, args.installer_version)
                 else:
@@ -303,7 +313,9 @@ def main():
         if args.with_extended_buildtools and not m:
             logger.info("Ignoring --with-extended-buildtools as filename "
                         "does not contain 'extended'")
-        if args.with_extended_buildtools and m:
+        if args.make_only:
+            tool = 'make'
+        elif args.with_extended_buildtools and m:
             tool = 'gcc'
         else:
             tool = 'tar'

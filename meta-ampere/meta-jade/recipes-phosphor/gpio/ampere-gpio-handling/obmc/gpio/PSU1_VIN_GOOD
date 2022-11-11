@@ -1,4 +1,0 @@
-DEVPATH=/dev/input/by-path/platform-gpio-keys-event
-KEY=60
-POLARITY=0
-TARGET=psu_hotswap_reset@0.service

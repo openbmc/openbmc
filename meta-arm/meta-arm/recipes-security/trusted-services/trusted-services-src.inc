@@ -3,24 +3,10 @@
 LICENSE = "Apache-2.0 & BSD-3-Clause & BSD-2-Clause & Zlib"
 
 SRC_URI = "git://git.trustedfirmware.org/TS/trusted-services.git;protocol=https;branch=integration;name=trusted-services;destsuffix=git/trusted-services \
-           file://0004-correctly-find-headers-dir.patch \
-           file://0005-setting-sysroot-for-libgcc-lookup.patch \
-           file://0006-applying-lowercase-project-convention.patch \
-           file://0009-PSA-CRYPTO-API-INCLUDE.patch \
-           file://0010-change-libts-to-export-CMake-package.patch \
-           file://0011-Adapt-deployments-to-libts-changes.patch \
-           file://0017-Move-libsp-mocks-into-separate-component.patch \
-           file://0018-Add-mock-for-libsp-sp_discovery.patch \
-           file://0019-Add-mock-for-libsp-sp_memory_management.patch \
-           file://0020-Add-mock-for-libsp-sp_messaging.patch \
-           file://0021-Add-64-bit-direct-message-handling-to-libsp.patch \
-           file://0022-Change-MM-communicate-RPC-protocol-of-call-endpoint.patch \
-           file://0023-Change-MM-communicate-RPC-protocol-of-MM-caller.patch \
-           file://0024-Deny-64-bit-FF-A-messages-in-FF-A-RPC-endpoint.patch \
 "
 
-#latest on 05.07.22.
-SRCREV_trusted-services = "1b0c520279445fc4d85fc582eda5e5ff5f380c39"
+#latest on 12.10.22.
+SRCREV_trusted-services = "3d4956770f89eb9ae0a73257901ae6277c078da6"
 LIC_FILES_CHKSUM = "file://${S}/license.rst;md5=ea160bac7f690a069c608516b17997f4"
 
 S = "${WORKDIR}/git/trusted-services"
@@ -56,6 +42,16 @@ SRC_URI += "git://github.com/cpputest/cpputest.git;name=cpputest;protocol=https;
 SRCREV_cpputest = "e25097614e1c4856036366877a02346c4b36bb5b"
 LIC_FILES_CHKSUM += "file://../cpputest/COPYING;md5=ce5d5f1fe02bcd1343ced64a06fd4177"
 
+# Libmetal
+SRC_URI += "git://github.com/OpenAMP/libmetal.git;name=libmetal;protocol=https;branch=main;destsuffix=git/libmetal"
+SRCREV_libmetal = "f252f0e007fbfb8b3a52b1d5901250ddac96baad"
+LIC_FILES_CHKSUM += "file://../libmetal/LICENSE.md;md5=fe0b8a4beea8f0813b606d15a3df3d3c"
+
+# Openamp
+SRC_URI += "git://github.com/OpenAMP/open-amp.git;name=openamp;protocol=https;branch=main;destsuffix=git/openamp"
+SRCREV_openamp = "347397decaa43372fc4d00f965640ebde042966d"
+LIC_FILES_CHKSUM += "file://../openamp/LICENSE.md;md5=a8d8cf662ef6bf9936a1e1413585ecbf"
+
 # TS ships patches for external dependencies that needs to be applied
 apply_ts_patches() {
     for p in ${S}/external/qcbor/*.patch; do
@@ -77,4 +73,6 @@ EXTRA_OECMAKE += "-DDTC_SOURCE_DIR=${WORKDIR}/git/dtc \
                   -DT_COSE_SOURCE_DIR=${WORKDIR}/git/tcose \
                   -DQCBOR_SOURCE_DIR=${WORKDIR}/git/qcbor \
                   -DMBEDTLS_SOURCE_DIR=${WORKDIR}/git/mbedtls \
+                  -DOPENAMP_SOURCE_DIR=${WORKDIR}/git/openamp \
+                  -DLIBMETAL_SOURCE_DIR=${WORKDIR}/git/libmetal \
                  "

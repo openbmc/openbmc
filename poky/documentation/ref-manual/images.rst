@@ -78,11 +78,11 @@ Following is a list of supported recipes:
    libraries you can use in a host development environment.
 
 -  ``core-image-minimal-initramfs``: A ``core-image-minimal`` image that
-   has the Minimal RAM-based Initial Root Filesystem (initramfs) as part
+   has the Minimal RAM-based Initial Root Filesystem (:term:`Initramfs`) as part
    of the kernel, which allows the system to find the first "init"
    program more efficiently. See the
    :term:`PACKAGE_INSTALL` variable for
-   additional information helpful when working with initramfs images.
+   additional information helpful when working with :term:`Initramfs` images.
 
 -  ``core-image-minimal-mtdutils``: A ``core-image-minimal`` image that
    has support for the Minimal MTD Utilities, which let the user
@@ -121,7 +121,7 @@ Following is a list of supported recipes:
    section in the Yocto Project Development Tasks Manual.
 
 -  ``core-image-testmaster-initramfs``: A RAM-based Initial Root
-   Filesystem (initramfs) image tailored for use with the
+   Filesystem (:term:`Initramfs`) image tailored for use with the
    ``core-image-testmaster`` image.
 
 -  ``core-image-weston``: A very basic Wayland image with a terminal.

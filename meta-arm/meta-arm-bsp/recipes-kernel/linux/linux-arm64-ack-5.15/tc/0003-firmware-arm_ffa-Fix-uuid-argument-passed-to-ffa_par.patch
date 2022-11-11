@@ -1,0 +1,30 @@
+From 6b9cf2d89db4fc10b930b8d8f8fce3a0d00fecf8 Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Thu, 13 Jan 2022 20:14:25 +0000
+Subject: [PATCH 03/40] firmware: arm_ffa: Fix uuid argument passed to
+ ffa_partition_probe
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Change-Id: Ib2749ec3e02da5bb6d835f7dbf2d608c41fad1f2
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com>
+---
+ drivers/firmware/arm_ffa/driver.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/firmware/arm_ffa/driver.c b/drivers/firmware/arm_ffa/driver.c
+index fc6d3b9bd472..d3d53fbd3d29 100644
+--- a/drivers/firmware/arm_ffa/driver.c
++++ b/drivers/firmware/arm_ffa/driver.c
+@@ -501,7 +501,7 @@ static int ffa_partition_info_get(const char *uuid_str,
+ 		return -ENODEV;
+ 	}
+ 
+-	count = ffa_partition_probe(&uuid_null, &pbuf);
++	count = ffa_partition_probe(&uuid, &pbuf);
+ 	if (count <= 0)
+ 		return -ENOENT;
+ 
+-- 
+2.34.1
+

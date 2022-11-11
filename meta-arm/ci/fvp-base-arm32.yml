@@ -2,17 +2,6 @@ header:
   version: 11
   includes:
     - ci/base.yml
+    - ci/fvp.yml
 
 machine: fvp-base-arm32
-
-local_conf_header:
-  testimagefvp: |
-    INHERIT = "fvpboot"
-    # This fails but we can't add to the ignorelist from meta-arm yet
-    # https://bugzilla.yoctoproject.org/show_bug.cgi?id=14604
-    TEST_SUITES:remove = "parselogs"
-    # Tell testimage to connect to localhost:8122, and forward that to SSH in the FVP.
-    TEST_TARGET_IP = "127.0.0.1:8122"
-    FVP_CONFIG[bp.virtio_net.hostbridge.userNetPorts] = "8122=22"
-  failing_tests: |
-    TEST_SUITES:remove = "xorg"

@@ -1,0 +1,45 @@
+From 4fe9f6071cd24bcab157a9398adcca474f619f8d Mon Sep 17 00:00:00 2001
+From: Peter Kjellerstedt <pkj@axis.com>
+Date: Sat, 15 Oct 2022 02:45:26 +0200
+Subject: [PATCH] configure.ac, Makefile.am: Support building without NLS
+
+Avoid entering the v4l-utils-po and libdvbv5-po directories if NLS
+support is disabled, as the generated Makefiles in those directories are
+empty then.
+
+Upstream-Status: Submitted [https://patchwork.linuxtv.org/project/linux-media/patch/20221015010541.688322-1-pkj@axis.com/]
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ Makefile.am  | 6 +++++-
+ configure.ac | 1 +
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 7fb443ab..8e924af8 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -2,7 +2,11 @@ AUTOMAKE_OPTIONS = foreign
+ ACLOCAL_AMFLAGS = -I m4
+ AM_MAKEFLAGS = $(word 1, $(subst 1, -w, $(filter 1, $(V))) --no-print-directory)
+ 
+-SUBDIRS = v4l-utils-po libdvbv5-po lib
++SUBDIRS = lib
++
++if USE_NLS
++SUBDIRS += v4l-utils-po libdvbv5-po
++endif
+ 
+ if WITH_V4LUTILS
+ SUBDIRS += utils contrib
+diff --git a/configure.ac b/configure.ac
+index 05298981..7c78467f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -99,6 +99,7 @@ DX_INIT_DOXYGEN($PACKAGE_NAME, doxygen_libdvbv5.cfg)
+ ALL_LINGUAS=""
+ m4_ifdef(AM_GNU_GETTEXT_REQUIRE_VERSION,[AM_GNU_GETTEXT_REQUIRE_VERSION([0.19.8])],[AM_GNU_GETTEXT_VERSION([0.19.8])])
+ AM_GNU_GETTEXT([external])
++AM_CONDITIONAL([USE_NLS], [test "$USE_NLS" = "yes"])
+ 
+ LIBDVBV5_DOMAIN="libdvbv5"
+ AC_DEFINE([LIBDVBV5_DOMAIN], "libdvbv5", [libdvbv5 domain])

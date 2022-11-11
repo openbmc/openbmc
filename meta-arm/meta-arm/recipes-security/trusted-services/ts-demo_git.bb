@@ -11,6 +11,10 @@ RDEPENDS:${PN} += "libts"
 
 OECMAKE_SOURCEPATH="${S}/deployments/ts-demo/${TS_ENV}"
 
+# Mbedtls 3.1.0 does not compile with clang.
+# This can be removed after TS updated required mbedtls version
+TOOLCHAIN = "gcc"
+
 FILES:${PN} = "${bindir}/ts-demo"
 
 do_install:append () {

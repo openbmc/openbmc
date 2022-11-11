@@ -54,7 +54,7 @@ occurred:
       when "pam" is in :term:`DISTRO_FEATURES`.
 
    -  The ``switch_root`` program is now packaged in a separate
-      "util-linux-switch-root" package for small initramfs images that
+      "util-linux-switch-root" package for small :term:`Initramfs` images that
       do not need the whole ``util-linux`` package or the busybox
       binary, which are both much larger than ``switch_root``. The main
       ``util-linux`` package has a recommended runtime dependency (i.e.

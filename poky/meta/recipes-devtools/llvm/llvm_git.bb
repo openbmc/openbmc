@@ -19,14 +19,14 @@ inherit cmake pkgconfig
 
 PROVIDES += "llvm${PV}"
 
-PV = "14.0.6"
+PV = "15.0.1"
 
 MAJOR_VERSION = "${@oe.utils.trim_version("${PV}", 1)}"
 
 LLVM_RELEASE = "${PV}"
 
 BRANCH = "release/${MAJOR_VERSION}.x"
-SRCREV = "f28c006a5895fc0e329fe15fead81e37457cb1d1"
+SRCREV = "b73d2c8c720a8c8e6e73b11be4e27afa6cb75bdf"
 SRC_URI = "git://github.com/llvm/llvm-project.git;branch=${BRANCH};protocol=https \
            file://0007-llvm-allow-env-override-of-exe-path.patch;striplevel=2 \
            file://0001-AsmMatcherEmitter-sort-ClassInfo-lists-by-name-as-we.patch;striplevel=2 \
@@ -80,6 +80,7 @@ EXTRA_OECMAKE += "-DLLVM_ENABLE_ASSERTIONS=OFF \
                   -DLLVM_TARGETS_TO_BUILD='${LLVM_TARGETS}' \
                   -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=ON \
                   -DPYTHON_EXECUTABLE=${HOSTTOOLS_DIR}/python3 \
+                  -DCMAKE_BUILD_TYPE=Release \
                   -G Ninja"
 
 EXTRA_OECMAKE:append:class-target = "\

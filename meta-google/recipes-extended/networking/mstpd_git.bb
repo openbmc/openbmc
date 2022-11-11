@@ -4,7 +4,7 @@ LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=4325afd396febcb659c36b49533135d4"
 
 SRC_URI = "git://github.com/mstpd/mstpd;branch=master;protocol=https"
-SRCREV = "973c403c79f3d419d9e93a242766ddf0099d1299"
+SRCREV = "181c453fc1a00573e19f14960dcc54ad84beea7c"
 S = "${WORKDIR}/git"
 
 SRC_URI += "file://bridge-stp"
@@ -19,7 +19,8 @@ SYSTEMD_PACKAGES = "${PN}-mstpd"
 SYSTEMD_SERVICE:${PN}-mstpd = "mstpd.service"
 
 do_install:append() {
-  rm -r ${D}${libexecdir}
+  rm -rf ${D}${libexecdir} ${D}${libdir}/NetworkManager
+  rmdir ${D}${libdir} || true
 
   install -d -m 0755 ${D}/sbin
   install -m 0755 ${WORKDIR}/bridge-stp ${D}/sbin

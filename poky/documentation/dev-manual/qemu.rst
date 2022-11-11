@@ -99,8 +99,7 @@ available. Follow these general steps to run QEMU:
    Here are some additional examples to help illustrate further QEMU:
 
    -  This example starts QEMU with MACHINE set to "qemux86-64".
-      Assuming a standard
-      :term:`Build Directory`, ``runqemu``
+      Assuming a standard :term:`Build Directory`, ``runqemu``
       automatically finds the ``bzImage-qemux86-64.bin`` image file and
       the ``core-image-minimal-qemux86-64-20200218002850.rootfs.ext4``
       (assuming the current build created a ``core-image-minimal``
@@ -123,9 +122,9 @@ available. Follow these general steps to run QEMU:
 
          $ runqemu qemux86-64 core-image-minimal ext4
 
-   -  This example specifies to boot an initial RAM disk image and to
-      enable audio in QEMU. For this case, ``runqemu`` set the internal
-      variable ``FSTYPE`` to "cpio.gz". Also, for audio to be enabled,
+   -  This example specifies to boot an :term:`Initramfs` image and to
+      enable audio in QEMU. For this case, ``runqemu`` sets the internal
+      variable ``FSTYPE`` to ``cpio.gz``. Also, for audio to be enabled,
       an appropriate driver must be installed (see the previous
       description for the ``audio`` option for more information).
       ::
@@ -246,11 +245,10 @@ be a problem when QEMU is running with KVM enabled. Specifically,
 software compiled with a certain CPU feature crashes when run on a CPU
 under KVM that does not support that feature. To work around this
 problem, you can override QEMU's runtime CPU setting by changing the
-``QB_CPU_KVM`` variable in ``qemuboot.conf`` in the
-:term:`Build Directory` ``deploy/image``
-directory. This setting specifies a ``-cpu`` option passed into QEMU in
-the ``runqemu`` script. Running ``qemu -cpu help`` returns a list of
-available supported CPU types.
+``QB_CPU_KVM`` variable in ``qemuboot.conf`` in the :term:`Build Directory`
+``deploy/image`` directory. This setting specifies a ``-cpu`` option passed
+into QEMU in the ``runqemu`` script. Running ``qemu -cpu help`` returns a
+list of available supported CPU types.
 
 QEMU Performance
 ================
@@ -394,7 +392,7 @@ command line:
    options are basically identical. If you do not provide a MACHINE
    option, ``runqemu`` tries to determine it based on other options.
 
--  ``ramfs``: Indicates you are booting an initial RAM disk (initramfs)
+-  ``ramfs``: Indicates you are booting an :term:`Initramfs`
    image, which means the ``FSTYPE`` is ``cpio.gz``.
 
 -  ``iso``: Indicates you are booting an ISO image, which means the

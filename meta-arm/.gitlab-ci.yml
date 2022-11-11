@@ -151,13 +151,7 @@ qemuarm64-secureboot:
     matrix:
       - TOOLCHAINS: [gcc, clang]
         TCLIBC: [glibc, musl]
-        TESTING: testimage
-
-qemuarm64-secureboot-ts:
-  extends: .build
-  parallel:
-    matrix:
-      - TCLIBC: [glibc, musl]
+        TS: [none, trusted-services]
         TESTING: testimage
 
 qemuarm64:
@@ -193,11 +187,6 @@ qemuarmv5:
 
 sgi575:
   extends: .build
-
-tc0:
-  extends: .build
-  tags:
-    - x86_64
 
 tc1:
   extends: .build
@@ -253,3 +242,18 @@ metrics:
   script:
     - kas shell --update --force-checkout ci/base.yml --command \
       "$CI_PROJECT_DIR/ci/patchreview $CI_PROJECT_DIR/meta-* --verbose --metrics $CI_PROJECT_DIR/metrics.txt"
+
+documentation:
+  extends: .setup
+  script:
+    - |
+      sudo pip3 install -r meta-arm-bsp/documentation/requirements.txt
+      for CONF in meta-*/documentation/*/conf.py ; do
+        SOURCE_DIR=$(dirname $CONF)
+        MACHINE=$(basename $SOURCE_DIR)
+        sphinx-build -vW $SOURCE_DIR build-docs/$MACHINE
+      done
+      test -d build-docs/
+  artifacts:
+    paths:
+      - build-docs/

@@ -1,0 +1,27 @@
+From 71a99394b657019d234b43d9abacf9f86a3c4e4f Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Thu, 19 May 2022 09:56:04 +0100
+Subject: [PATCH 37/40] ANDROID: trusty-log: include panic_notifier.h
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com
+---
+ drivers/trusty/trusty-log.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/trusty/trusty-log.c b/drivers/trusty/trusty-log.c
+index 7b279fe63766..1bd68278d0be 100644
+--- a/drivers/trusty/trusty-log.c
++++ b/drivers/trusty/trusty-log.c
+@@ -6,6 +6,7 @@
+ #include <linux/trusty/smcall.h>
+ #include <linux/trusty/trusty.h>
+ #include <linux/notifier.h>
++#include <linux/panic_notifier.h>
+ #include <linux/scatterlist.h>
+ #include <linux/slab.h>
+ #include <linux/mm.h>
+-- 
+2.34.1
+

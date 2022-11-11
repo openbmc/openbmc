@@ -126,10 +126,9 @@ The following directory changes exist:
    :term:`DEPLOY_DIR_IMAGE` variable in the external environment.
 
 -  When buildhistory is enabled, its output is now written under the
-   :term:`Build Directory` rather than
-   :term:`TMPDIR`. Doing so makes it easier to delete
-   :term:`TMPDIR` and preserve the build history. Additionally, data for
-   produced SDKs is now split by :term:`IMAGE_NAME`.
+   :term:`Build Directory` rather than :term:`TMPDIR`. Doing so makes
+   it easier to delete :term:`TMPDIR` and preserve the build history.
+   Additionally, data for produced SDKs is now split by :term:`IMAGE_NAME`.
 
 -  The ``pkgdata`` directory produced as part of the packaging process
    has been collapsed into a single machine-specific directory. This
@@ -240,7 +239,7 @@ Automated Image Testing
 -----------------------
 
 A new automated image testing framework has been added through the
-:ref:`ref-classes-testimage*` classes. This
+:ref:`ref-classes-testimage` classes. This
 framework replaces the older ``imagetest-qemu`` framework.
 
 You can learn more about performing automated image tests in the

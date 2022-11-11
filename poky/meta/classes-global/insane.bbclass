@@ -555,7 +555,10 @@ python populate_lic_qa_checksum() {
                 import hashlib
                 lineno = 0
                 license = []
-                m = hashlib.new('MD5', usedforsecurity=False)
+                try:
+                    m = hashlib.new('MD5', usedforsecurity=False)
+                except TypeError:
+                    m = hashlib.new('MD5')
                 for line in f:
                     lineno += 1
                     if (lineno >= beginline):

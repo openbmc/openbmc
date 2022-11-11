@@ -127,7 +127,7 @@ function fw_rev() {
   echo " SCP Firmware: ${cmd}"
   get_scp_eeprom
 
-  adm1266_ver  | grep REVISION
+  adm1266_ver "${I2C_MB_PWRSEQ1[0]}" | grep REVISION
 
 }
 

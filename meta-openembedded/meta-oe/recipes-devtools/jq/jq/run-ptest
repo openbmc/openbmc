@@ -1,11 +1,37 @@
 #!/bin/sh
 
+JQ_LIB=@libdir@/jq
+LOG="${JQ_LIB}/ptest/jq_ptest_$(date +%Y%m%d-%H%M%S).log"
+
+# clean up the log file to avoid a file has the same name and has existing content
+echo "" > ${LOG}
+
+# The purpose of ptest is doing intergration test, so disable valgrind by default
+# change PACKAGECOFIG to enable valgrind.
+#export NO_VALGRIND=1
+# The --enable-valgrind configure option for jq only can be used within Makefiles,
+# and it cannot be utilized here since it also checks compile, which cannot be avoid
+# Requested enhancement to jq: https://github.com/stedolan/jq/issues/2493
+
 for test in optionaltest mantest jqtest onigtest shtest utf8test base64test; do
-	./tests/${test}
+	./tests/${test} >> ${LOG} 2>> ${LOG}
 	if [ $? -eq 0 ]; then
 		echo "PASS: ${test}"
+		echo "PASS: ${test}" >> ${LOG}
 	else
 		echo "FAIL: ${test}"
+		echo "FAIL: ${test}" >> ${LOG}
 	fi
 done
 
+passed=`grep PASS: ${LOG}|wc -l`
+failed=`grep FAIL: ${LOG}|wc -l`
+skipped=`grep SKIP: ${LOG}|wc -l`
+all=$((passed + failed + skipped))
+
+( echo "=== Test Summary ==="
+  echo "TOTAL: ${all}"
+  echo "PASSED: ${passed}"
+  echo "FAILED: ${failed}"
+  echo "SKIPPED: ${skipped}"
+) | tee -a /${LOG}

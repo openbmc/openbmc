@@ -10,7 +10,7 @@ tools. The BBAKE_EDK_TOOLS_PATH string is used as a pattern to be replaced
 with the appropriate location before building.
 
 Signed-off-by: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [oe-core cross compile specific]
 ---
  OvmfPkg/build.sh | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

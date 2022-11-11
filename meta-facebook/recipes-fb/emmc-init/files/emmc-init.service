@@ -1,0 +1,13 @@
+[Unit]
+Description=eMMC initialize check
+Before=mnt-data.mount
+Requires=dev-mmcblk0.device
+After=dev-mmcblk0.device
+
+[Service]
+ExecStart=/usr/libexec/emmc-init/emmc-init
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

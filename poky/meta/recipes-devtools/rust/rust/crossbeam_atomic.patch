@@ -14,13 +14,13 @@ Someone with more rust knowledge could split up the triplets in no_atmoics.rs
 and compare against the architecture/processor, or replace -unknown with a glob
 to create a patch that upstream might accept.
 
-Upstream-Status: Inappropriate [OE Specific tweak  but could be rewritten]
+Upstream-Status: Submitted [https://github.com/crossbeam-rs/crossbeam/pull/922]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
-Index: rustc-1.63.0-src/vendor/crossbeam-utils/build.rs
+Index: rustc-1.64.0-src/vendor/crossbeam-utils/build.rs
 ===================================================================
---- rustc-1.63.0-src.orig/vendor/crossbeam-utils/build.rs
-+++ rustc-1.63.0-src/vendor/crossbeam-utils/build.rs
+--- rustc-1.64.0-src.orig/vendor/crossbeam-utils/build.rs
++++ rustc-1.64.0-src/vendor/crossbeam-utils/build.rs
 @@ -29,7 +29,7 @@ use std::env;
  include!("no_atomic.rs");
  
@@ -39,12 +39,43 @@ Index: rustc-1.63.0-src/vendor/crossbeam-utils/build.rs
  
      // Note that this is `no_*`, not `has_*`. This allows treating
      // `cfg(target_has_atomic = "ptr")` as true when the build script doesn't
-Index: rustc-1.63.0-src/vendor/crossbeam-utils/.cargo-checksum.json
+Index: rustc-1.64.0-src/vendor/crossbeam-utils/.cargo-checksum.json
 ===================================================================
---- rustc-1.63.0-src.orig/vendor/crossbeam-utils/.cargo-checksum.json
-+++ rustc-1.63.0-src/vendor/crossbeam-utils/.cargo-checksum.json
+--- rustc-1.64.0-src.orig/vendor/crossbeam-utils/.cargo-checksum.json
++++ rustc-1.64.0-src/vendor/crossbeam-utils/.cargo-checksum.json
+@@ -1 +1 @@
+-{"files":{"CHANGELOG.md":"c2cdac68fbf3795e9c3cb0bbeace5f87736d0745fefbd3db9c07f568dc70d1d1","Cargo.toml":"fc5b0f0f821aa944d4341dc97e7c3b4d4bf658483ba359b5bf2e53d8ad945ac9","LICENSE-APACHE":"a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2","LICENSE-MIT":"5734ed989dfca1f625b40281ee9f4530f91b2411ec01cb748223e7eb87e201ab","README.md":"dfa9fbed47c344c134a63c84b7c0e4651baeac1554b7b3266d0e38643743fc33","benches/atomic_cell.rs":"c927eb3cd1e5ecc4b91adbc3bde98af15ffab4086190792ba64d5cde0e24df3d","build.rs":"7e74dc72343ff57e83d0a84a9fbdd9ff1645894165909999b4c3d2fba94bc96c","no_atomic.rs":"916ed15218bb7b75a4e0d432430e7134efd27ca43ca8a8766e0c90e89febb602","src/atomic/atomic_cell.rs":"f1b407b62b981de47968236eabb932384722c4dd7b7f08f52c59943aefd0b113","src/atomic/consume.rs":"7a7736fcd64f6473dfea7653559ffc5e1a2a234df43835f8aa8734862145ac15","src/atomic/mod.rs":"94193895fa03cece415e8d7be700b73a9a8a7015774ca821253438607f9b0736","src/atomic/seq_lock.rs":"27182e6b87a9db73c5f6831759f8625f9fcdec3c2828204c444aef04f427735a","src/atomic/seq_lock_wide.rs":"9888dd03116bb89ca36d4ab8d5a0b5032107a2983a7eb8024454263b09080088","src/backoff.rs":"7cc7754e15f69b52e92a70d4f49d1bc274693455a0933a2d7eb0605806566af3","src/cache_padded.rs":"6a512698115ad0d5a5b163dbd7a83247e1f1c146c4a30f3fc74b952e3b767b59","src/lib.rs":"6f1bcf157abe06ad8458a53e865bf8efab9fad4a9424790147cee8fefb3795d8","src/sync/mod.rs":"59986f559a8f170a4b3247ab2eea2460b09809d87c8110ed88e4e7103d3519dc","src/sync/parker.rs":"3f997f5b41fec286ccedcf3d36f801d741387badb574820b8e3456117ecd9154","src/sync/sharded_lock.rs":"78433f55ee3defeea348d65abc78e03d63d6a304e09c568b27b403e9ad205771","src/sync/wait_group.rs":"32e946a7581c55f8aa9904527b92b177c538fa0cf7cbcfa1d1f25990582cb6ea","src/thread.rs":"21cf9b3e965529e5c0a6ff8fc1ec846bfe0006c41deb238a149be8d07384e955","tests/atomic_cell.rs":"bf8bc869c922a1cbf929c3b741bae0cae98f2157f572b5a4eb2873d20a407c22","tests/cache_padded.rs":"1bfaff8354c8184e1ee1f902881ca9400b60effb273b0d3f752801a483d2b66d","tests/parker.rs":"6def4721287d9d70b1cfd63ebb34e1c83fbb3376edbad2bc8aac6ef69dd99d20","tests/sharded_lock.rs":"314adeb8a651a28935f7a49c9a261b8fa1fd82bf6a16c865a5aced6216d7e40b","tests/thread.rs":"9a7d7d3028c552fd834c68598b04a1cc252a816bc20ab62cec060d6cd09cab10","tests/wait_group.rs":"ad8f0cdfed31f9594a2e0737234d418f8b924d784a4db8d7e469deab8c95f5f8"},"package":"7d82ee10ce34d7bc12c2122495e7593a9c41347ecdd64185af4ecf72cb1a7f83"}
+\ No newline at end of file
++{"files":{"CHANGELOG.md":"c2cdac68fbf3795e9c3cb0bbeace5f87736d0745fefbd3db9c07f568dc70d1d1","Cargo.toml":"fc5b0f0f821aa944d4341dc97e7c3b4d4bf658483ba359b5bf2e53d8ad945ac9","LICENSE-APACHE":"a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2","LICENSE-MIT":"5734ed989dfca1f625b40281ee9f4530f91b2411ec01cb748223e7eb87e201ab","README.md":"dfa9fbed47c344c134a63c84b7c0e4651baeac1554b7b3266d0e38643743fc33","benches/atomic_cell.rs":"c927eb3cd1e5ecc4b91adbc3bde98af15ffab4086190792ba64d5cde0e24df3d","build.rs":"d983d511c89607ce89473779d1ee195e3eb509cc4d3043b9efe6aa2f94c98158","no_atomic.rs":"916ed15218bb7b75a4e0d432430e7134efd27ca43ca8a8766e0c90e89febb602","src/atomic/atomic_cell.rs":"f1b407b62b981de47968236eabb932384722c4dd7b7f08f52c59943aefd0b113","src/atomic/consume.rs":"7a7736fcd64f6473dfea7653559ffc5e1a2a234df43835f8aa8734862145ac15","src/atomic/mod.rs":"94193895fa03cece415e8d7be700b73a9a8a7015774ca821253438607f9b0736","src/atomic/seq_lock.rs":"27182e6b87a9db73c5f6831759f8625f9fcdec3c2828204c444aef04f427735a","src/atomic/seq_lock_wide.rs":"9888dd03116bb89ca36d4ab8d5a0b5032107a2983a7eb8024454263b09080088","src/backoff.rs":"7cc7754e15f69b52e92a70d4f49d1bc274693455a0933a2d7eb0605806566af3","src/cache_padded.rs":"6a512698115ad0d5a5b163dbd7a83247e1f1c146c4a30f3fc74b952e3b767b59","src/lib.rs":"6f1bcf157abe06ad8458a53e865bf8efab9fad4a9424790147cee8fefb3795d8","src/sync/mod.rs":"59986f559a8f170a4b3247ab2eea2460b09809d87c8110ed88e4e7103d3519dc","src/sync/parker.rs":"3f997f5b41fec286ccedcf3d36f801d741387badb574820b8e3456117ecd9154","src/sync/sharded_lock.rs":"78433f55ee3defeea348d65abc78e03d63d6a304e09c568b27b403e9ad205771","src/sync/wait_group.rs":"32e946a7581c55f8aa9904527b92b177c538fa0cf7cbcfa1d1f25990582cb6ea","src/thread.rs":"21cf9b3e965529e5c0a6ff8fc1ec846bfe0006c41deb238a149be8d07384e955","tests/atomic_cell.rs":"bf8bc869c922a1cbf929c3b741bae0cae98f2157f572b5a4eb2873d20a407c22","tests/cache_padded.rs":"1bfaff8354c8184e1ee1f902881ca9400b60effb273b0d3f752801a483d2b66d","tests/parker.rs":"6def4721287d9d70b1cfd63ebb34e1c83fbb3376edbad2bc8aac6ef69dd99d20","tests/sharded_lock.rs":"314adeb8a651a28935f7a49c9a261b8fa1fd82bf6a16c865a5aced6216d7e40b","tests/thread.rs":"9a7d7d3028c552fd834c68598b04a1cc252a816bc20ab62cec060d6cd09cab10","tests/wait_group.rs":"ad8f0cdfed31f9594a2e0737234d418f8b924d784a4db8d7e469deab8c95f5f8"},"package":"7d82ee10ce34d7bc12c2122495e7593a9c41347ecdd64185af4ecf72cb1a7f83"}
+\ No newline at end of file
+Index: rustc-1.64.0-src/vendor/crossbeam-utils-0.8.8/.cargo-checksum.json
+===================================================================
+--- rustc-1.64.0-src.orig/vendor/crossbeam-utils-0.8.8/.cargo-checksum.json
++++ rustc-1.64.0-src/vendor/crossbeam-utils-0.8.8/.cargo-checksum.json
 @@ -1 +1 @@
 -{"files":{"CHANGELOG.md":"665a9f2c5fd37c98bef7c1b6eda753b58bb925d87e5b42d7298df973d7590631","Cargo.toml":"fe22292acd6a868e65baf225f90d5678678971642814d2d8e92a03954b8bdb40","LICENSE-APACHE":"a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2","LICENSE-MIT":"5734ed989dfca1f625b40281ee9f4530f91b2411ec01cb748223e7eb87e201ab","README.md":"dfa9fbed47c344c134a63c84b7c0e4651baeac1554b7b3266d0e38643743fc33","benches/atomic_cell.rs":"c927eb3cd1e5ecc4b91adbc3bde98af15ffab4086190792ba64d5cde0e24df3d","build.rs":"7e74dc72343ff57e83d0a84a9fbdd9ff1645894165909999b4c3d2fba94bc96c","no_atomic.rs":"71b5f78fd701ce604aa766dd3d825fa5bed774282aae4d6c31d7acb01b1b242f","src/atomic/atomic_cell.rs":"01185588e0e16ba81425677966d0c11887dedc4ac0d4a65991a34057c418adc4","src/atomic/consume.rs":"7a7736fcd64f6473dfea7653559ffc5e1a2a234df43835f8aa8734862145ac15","src/atomic/mod.rs":"94193895fa03cece415e8d7be700b73a9a8a7015774ca821253438607f9b0736","src/atomic/seq_lock.rs":"27182e6b87a9db73c5f6831759f8625f9fcdec3c2828204c444aef04f427735a","src/atomic/seq_lock_wide.rs":"9888dd03116bb89ca36d4ab8d5a0b5032107a2983a7eb8024454263b09080088","src/backoff.rs":"7cc7754e15f69b52e92a70d4f49d1bc274693455a0933a2d7eb0605806566af3","src/cache_padded.rs":"6a512698115ad0d5a5b163dbd7a83247e1f1c146c4a30f3fc74b952e3b767b59","src/lib.rs":"6f1bcf157abe06ad8458a53e865bf8efab9fad4a9424790147cee8fefb3795d8","src/sync/mod.rs":"59986f559a8f170a4b3247ab2eea2460b09809d87c8110ed88e4e7103d3519dc","src/sync/parker.rs":"3f997f5b41fec286ccedcf3d36f801d741387badb574820b8e3456117ecd9154","src/sync/sharded_lock.rs":"14be659744918d0b27db24c56b41c618b0f0484b6761da46561023d96c4c120f","src/sync/wait_group.rs":"32e946a7581c55f8aa9904527b92b177c538fa0cf7cbcfa1d1f25990582cb6ea","src/thread.rs":"6a7676fd4e50af63aec6f655121a10cd6e8c704f4677125388186ba58dc5842d","tests/atomic_cell.rs":"d64faa1ca8896373468308031220940d988aa3a1679ea25d2291a7a7d22bc51a","tests/cache_padded.rs":"1bfaff8354c8184e1ee1f902881ca9400b60effb273b0d3f752801a483d2b66d","tests/parker.rs":"6def4721287d9d70b1cfd63ebb34e1c83fbb3376edbad2bc8aac6ef69dd99d20","tests/sharded_lock.rs":"eb6c5b59f007e0d290dd0f58758e8ccb5cacd38af34e3341368ced815f0c41be","tests/thread.rs":"9a7d7d3028c552fd834c68598b04a1cc252a816bc20ab62cec060d6cd09cab10","tests/wait_group.rs":"ad8f0cdfed31f9594a2e0737234d418f8b924d784a4db8d7e469deab8c95f5f8"},"package":"0bf124c720b7686e3c2663cf54062ab0f68a88af2fb6a030e87e30bf721fcb38"}
 \ No newline at end of file
 +{"files":{"CHANGELOG.md":"665a9f2c5fd37c98bef7c1b6eda753b58bb925d87e5b42d7298df973d7590631","Cargo.toml":"fe22292acd6a868e65baf225f90d5678678971642814d2d8e92a03954b8bdb40","LICENSE-APACHE":"a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2","LICENSE-MIT":"5734ed989dfca1f625b40281ee9f4530f91b2411ec01cb748223e7eb87e201ab","README.md":"dfa9fbed47c344c134a63c84b7c0e4651baeac1554b7b3266d0e38643743fc33","benches/atomic_cell.rs":"c927eb3cd1e5ecc4b91adbc3bde98af15ffab4086190792ba64d5cde0e24df3d","build.rs":"d983d511c89607ce89473779d1ee195e3eb509cc4d3043b9efe6aa2f94c98158","no_atomic.rs":"71b5f78fd701ce604aa766dd3d825fa5bed774282aae4d6c31d7acb01b1b242f","src/atomic/atomic_cell.rs":"01185588e0e16ba81425677966d0c11887dedc4ac0d4a65991a34057c418adc4","src/atomic/consume.rs":"7a7736fcd64f6473dfea7653559ffc5e1a2a234df43835f8aa8734862145ac15","src/atomic/mod.rs":"94193895fa03cece415e8d7be700b73a9a8a7015774ca821253438607f9b0736","src/atomic/seq_lock.rs":"27182e6b87a9db73c5f6831759f8625f9fcdec3c2828204c444aef04f427735a","src/atomic/seq_lock_wide.rs":"9888dd03116bb89ca36d4ab8d5a0b5032107a2983a7eb8024454263b09080088","src/backoff.rs":"7cc7754e15f69b52e92a70d4f49d1bc274693455a0933a2d7eb0605806566af3","src/cache_padded.rs":"6a512698115ad0d5a5b163dbd7a83247e1f1c146c4a30f3fc74b952e3b767b59","src/lib.rs":"6f1bcf157abe06ad8458a53e865bf8efab9fad4a9424790147cee8fefb3795d8","src/sync/mod.rs":"59986f559a8f170a4b3247ab2eea2460b09809d87c8110ed88e4e7103d3519dc","src/sync/parker.rs":"3f997f5b41fec286ccedcf3d36f801d741387badb574820b8e3456117ecd9154","src/sync/sharded_lock.rs":"14be659744918d0b27db24c56b41c618b0f0484b6761da46561023d96c4c120f","src/sync/wait_group.rs":"32e946a7581c55f8aa9904527b92b177c538fa0cf7cbcfa1d1f25990582cb6ea","src/thread.rs":"6a7676fd4e50af63aec6f655121a10cd6e8c704f4677125388186ba58dc5842d","tests/atomic_cell.rs":"d64faa1ca8896373468308031220940d988aa3a1679ea25d2291a7a7d22bc51a","tests/cache_padded.rs":"1bfaff8354c8184e1ee1f902881ca9400b60effb273b0d3f752801a483d2b66d","tests/parker.rs":"6def4721287d9d70b1cfd63ebb34e1c83fbb3376edbad2bc8aac6ef69dd99d20","tests/sharded_lock.rs":"eb6c5b59f007e0d290dd0f58758e8ccb5cacd38af34e3341368ced815f0c41be","tests/thread.rs":"9a7d7d3028c552fd834c68598b04a1cc252a816bc20ab62cec060d6cd09cab10","tests/wait_group.rs":"ad8f0cdfed31f9594a2e0737234d418f8b924d784a4db8d7e469deab8c95f5f8"},"package":"0bf124c720b7686e3c2663cf54062ab0f68a88af2fb6a030e87e30bf721fcb38"}
 \ No newline at end of file
+Index: rustc-1.64.0-src/vendor/crossbeam-utils-0.8.8/build.rs
+===================================================================
+--- rustc-1.64.0-src.orig/vendor/crossbeam-utils-0.8.8/build.rs
++++ rustc-1.64.0-src/vendor/crossbeam-utils-0.8.8/build.rs
+@@ -29,7 +29,7 @@ use std::env;
+ include!("no_atomic.rs");
+ 
+ fn main() {
+-    let target = match env::var("TARGET") {
++    let mut target = match env::var("TARGET") {
+         Ok(target) => target,
+         Err(e) => {
+             println!(
+@@ -40,6 +40,8 @@ fn main() {
+             return;
+         }
+     };
++    let vendor = env::var("TARGET_VENDOR").unwrap();
++    target = target.replace(&vendor, "-unknown");
+ 
+     // Note that this is `no_*`, not `has_*`. This allows treating
+     // `cfg(target_has_atomic = "ptr")` as true when the build script doesn't

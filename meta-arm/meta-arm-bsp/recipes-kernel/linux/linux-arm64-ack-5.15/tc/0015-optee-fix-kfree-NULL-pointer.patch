@@ -1,0 +1,44 @@
+From 9f3b899a2e8bf79f572f408bfd86836578f46106 Mon Sep 17 00:00:00 2001
+From: Lv Ruyi <lv.ruyi@zte.com.cn>
+Date: Thu, 4 Nov 2021 11:30:47 +0000
+Subject: [PATCH 15/40] optee: fix kfree NULL pointer
+
+This patch fixes the following Coccinelle error:
+drivers/tee/optee/ffa_abi.c: 877: ERROR  optee is NULL but dereferenced.
+
+If memory allocation fails, optee is null pointer. the code will goto err
+and release optee.
+
+Fixes: 4615e5a34b95 ("optee: add FF-A support")
+Reported-by: Zeal Robot <zealci@zte.com.cn>
+Signed-off-by: Lv Ruyi <lv.ruyi@zte.com.cn>
+Reviewed-by: Sumit Garg <sumit.garg@linaro.org>
+[jw: removed the redundant braces]
+Signed-off-by: Jens Wiklander <jens.wiklander@linaro.org>
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com
+---
+ drivers/tee/optee/ffa_abi.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/tee/optee/ffa_abi.c b/drivers/tee/optee/ffa_abi.c
+index 45424824e0f9..d8c8683863aa 100644
+--- a/drivers/tee/optee/ffa_abi.c
++++ b/drivers/tee/optee/ffa_abi.c
+@@ -810,10 +810,9 @@ static int optee_ffa_probe(struct ffa_device *ffa_dev)
+ 		return -EINVAL;
+ 
+ 	optee = kzalloc(sizeof(*optee), GFP_KERNEL);
+-	if (!optee) {
+-		rc = -ENOMEM;
+-		goto err;
+-	}
++	if (!optee)
++		return -ENOMEM;
++
+ 	optee->pool = optee_ffa_config_dyn_shm();
+ 	if (IS_ERR(optee->pool)) {
+ 		rc = PTR_ERR(optee->pool);
+-- 
+2.34.1
+

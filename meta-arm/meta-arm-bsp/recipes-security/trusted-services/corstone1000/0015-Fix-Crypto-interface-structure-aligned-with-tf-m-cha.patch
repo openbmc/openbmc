@@ -1,0 +1,31 @@
+From 3cc9c417f12f005244530d8d706a6b7f3be35627 Mon Sep 17 00:00:00 2001
+From: Satish Kumar <satish.kumar01@arm.com>
+Date: Sun, 13 Feb 2022 09:01:10 +0000
+Subject: [PATCH 15/19] Fix: Crypto interface structure aligned with tf-m
+ change.
+
+NO NEED TO RAISE PR: The PR for this FIX  is raied by Emek.
+
+Upstream-Status: Pending
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+---
+ components/service/crypto/backend/psa_ipc/crypto_ipc_backend.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/components/service/crypto/backend/psa_ipc/crypto_ipc_backend.h b/components/service/crypto/backend/psa_ipc/crypto_ipc_backend.h
+index c13c20e84131..ec25eaf868c7 100644
+--- a/components/service/crypto/backend/psa_ipc/crypto_ipc_backend.h
++++ b/components/service/crypto/backend/psa_ipc/crypto_ipc_backend.h
+@@ -38,7 +38,8 @@ struct psa_ipc_crypto_pack_iovec {
+ 				      *   multipart operation
+ 				      */
+ 	uint32_t capacity;             /*!< Key derivation capacity */
+-
++	uint32_t ad_length;            /*!< Additional Data length for multipart AEAD */
++	uint32_t plaintext_length;     /*!< Plaintext length for multipart AEAD */
+ 	struct psa_ipc_crypto_aead_pack_input aead_in; /*!< FixMe: Temporarily used for
+ 							    *   AEAD until the API is
+ 							    *   restructured
+-- 
+2.38.0
+

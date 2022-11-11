@@ -15,12 +15,12 @@ DEPENDS += "virtual/phosphor-logging-callouts"
 DEPENDS += "libcereal"
 DEPENDS += "sdeventplus"
 DEPENDS += "packagegroup-obmc-yaml-providers"
-SRCREV = "23cf1fb6daf6630d80dfb9f62111e91211bc4ee5"
+SRCREV = "b0820142ebfbbcd0cf305b19913d90b5cf3d7709"
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[openpower-pels] = " \
         -Dopenpower-pel-extension=enabled, \
         -Dopenpower-pel-extension=disabled, \
-        nlohmann-json cli11 pldm python3, \
+        nlohmann-json cli11 libpldm python3, \
         python3, \
         "
 PV = "1.0+git${SRCPV}"

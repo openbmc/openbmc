@@ -1,0 +1,19 @@
+[Unit]
+Description=Phosphor IPMI SSIF DBus Bridge
+StartLimitBurst=3
+StartLimitIntervalSec=300
+After=phosphor-ipmi-host.service
+
+[Service]
+Restart=always
+RestartSec=10
+TimeoutStartSec=60
+TimeoutStopSec=60
+ExecStart=/usr/bin/ssifbridged
+ExecStopPost=/bin/sh -c "/usr/bin/gpioset 0 228=0"
+ExecStartPost=/bin/sh -c "/usr/bin/gpioset 0 228=1"
+SyslogIdentifier=ssifbridged
+
+[Install]
+WantedBy=multi-user.target
+RequiredBy=

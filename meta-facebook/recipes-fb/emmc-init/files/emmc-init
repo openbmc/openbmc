@@ -1,0 +1,48 @@
+#!/bin/bash -e
+
+DEVICE_NODE="/dev/mmcblk0"
+DEFAULT_FS_TYPE="btrfs"
+
+#
+# check device node exist
+#
+if [[ ! -b "${DEVICE_NODE}" ]]; then
+    echo "${DEVICE_NODE} is not available"
+    exit 0
+fi
+
+#
+# check if device mounted correctly
+#
+if ! (mount || true) | grep "${DEVICE_NODE}"> /dev/null; then
+    echo "${DEVICE_NODE} is not mounted"
+else
+    echo "${DEVICE_NODE} is mounted"
+    exit 0
+fi
+
+#
+# check filesystem
+#
+FS_TYPE_CHECK="$(blkid "${DEVICE_NODE}" | sed 's/.*TYPE="\([^"]*\).*/\1/' || true)"
+
+if [[ "${FS_TYPE_CHECK}" = "" ]]; then
+    FS_TYPE="unknown"
+else
+    FS_TYPE="${FS_TYPE_CHECK}"
+fi
+
+case "${FS_TYPE}" in
+    "${DEFAULT_FS_TYPE}")
+        echo "Filesystem (${FS_TYPE}) found on ${DEVICE_NODE}"
+        ;;
+
+    *)
+        echo "No or unexpected filesystem (${FS_TYPE}) found on ${DEVICE_NODE}"
+        if ! output=$(mkfs."${DEFAULT_FS_TYPE}" --force "${DEVICE_NODE}" 2>&1); then
+            echo "failed to create ${DEFAULT_FS_TYPE} on ${DEVICE_NODE}:"
+            echo "${output}"
+            exit 1
+        fi
+        ;;
+esac

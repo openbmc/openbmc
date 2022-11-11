@@ -9,9 +9,6 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 inherit meson pkgconfig
 inherit obmc-phosphor-dbus-service
 
-RPROVIDES:${PN} += "virtual/obmc-watchdog"
-PROVIDES += "virtual/obmc-watchdog"
-
 DEPENDS += "cli11"
 DEPENDS += "sdbusplus"
 DEPENDS += "sdeventplus"

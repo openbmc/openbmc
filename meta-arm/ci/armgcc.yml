@@ -3,4 +3,4 @@ header:
 
 local_conf_header:
   cc: |
-    GCCVERSION = "arm-11.2"
+    GCCVERSION = "arm-11.3"

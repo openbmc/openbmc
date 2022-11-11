@@ -2,7 +2,6 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 PACKAGECONFIG = "\
         coredump \
         hostnamed \
-        kmod \
         networkd \
         nss \
         pam \
@@ -10,7 +9,6 @@ PACKAGECONFIG = "\
         resolved \
         seccomp \
         sysusers \
-        sysvinit \
         timedated \
         timesyncd \
         zstd \

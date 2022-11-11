@@ -1,0 +1,298 @@
+From 2e56f2601249243f2fb3ba67caf9febe4bfc8371 Mon Sep 17 00:00:00 2001
+From: Satish Kumar <satish.kumar01@arm.com>
+Date: Tue, 26 Apr 2022 20:17:13 +0100
+Subject: [PATCH 3/6] corstone1000: enable secure enclave run without host
+ binaries
+
+In TEST_S configuration, the build disables part of the code which
+assumes that the host binaries are present in the flash. This change
+will allow secure enclave's part of the platforms software to build
+and run without the host support. The configuration can be used to run
+CI and test secure enclave software independently.
+
+Change-Id: I29325750a3bea270fe5b3b8b47932a7071a59482
+Signed-off-by: Satish Kumar <satish.kumar01@arm.com>
+Upstream-Status: Accepted [TF-Mv1.7.0]
+---
+ .../ext/target/arm/corstone1000/readme.rst    | 88 +++++++++++++++----
+ .../target/arm/corstone1000/CMakeLists.txt    |  8 +-
+ .../arm/corstone1000/bl1/CMakeLists.txt       |  2 +-
+ .../target/arm/corstone1000/bl2_flash_map.c   |  2 +
+ .../target/arm/corstone1000/boot_hal_bl2.c    |  2 +
+ .../ext/target/arm/corstone1000/config.cmake  | 11 ++-
+ .../arm/corstone1000/partition/flash_layout.h |  2 +-
+ .../arm/corstone1000/tfm_hal_multi_core.c     |  2 +
+ 8 files changed, 94 insertions(+), 23 deletions(-)
+
+diff --git a/docs/platform/ext/target/arm/corstone1000/readme.rst b/docs/platform/ext/target/arm/corstone1000/readme.rst
+index 94b58ac6fc..10c9c58f78 100644
+--- a/docs/platform/ext/target/arm/corstone1000/readme.rst
++++ b/docs/platform/ext/target/arm/corstone1000/readme.rst
+@@ -7,22 +7,27 @@ Introduction
+ ************
+ 
+ The ARM's Corstone-1000 platform is a reference implementation of PSA FF-M
+-architecture where NSPE and SPE environments are partitioned into
++architecture where NSPE and SPE environments are partitioned/isolated into
+ Cortex-A35 and Cortex-M0+ respectively.
+ 
+ Cortex-M0+ acting as Secure Enclave is the Root-of-trust of SoC. Its
+-software comprises of two boot loading stages, i.e. Bl1 and Bl2, based on
+-mcuboot, and TF-M as run time software. Cortex-A35, also referred as host,
+-is completely treated as non-secure from the Secure Enclave perspective.
++software comprises of two boot loading stages, i.e. Bl1 and Bl2 (based on
++mcuboot) and TF-M as run time software. Cortex-A35, also referred as host,
++is treated as non-secure from the Secure Enclave perspective.
+ The Cortex-A35 is brought out of rest by Secure Enclave in aarch64 bit mode,
+ and boots the software ecosystem based on linux, u-boot, UEFI run time
+-services, TF-A and Optee.
++services, TF-A, Secure Partitions and Optee.
+ 
+ The communication between NSPE and SPE is based on PSA IPC protocol running on
+-top of OpenAMP.
++top of FF-A/OpenAMP.
+ 
+ The secure enclave subsystem has ARM's CC-312 (Crypto Cell) hardware to
+-accelerate cryptographic operations.
++accelerate cryptographic operations. Additionaly, platform supports Secure Debug
++using SDC-600 as the communication interface between host debugger and platform
++target. The platform has the build option to enable secure debug protocol to
++unlock debug ports during boot time. The protocol is based on ARM's ADAC
++(Authenticated Debug Access Control) standard.
++
+ 
+ ***********
+ System boot
+@@ -33,23 +38,76 @@ System boot
+ - BL1 load, verifies and transfer execution to BL2 which is again based on mcuboot.
+ - BL2 loads and verifies TF-M and host's initial boot loader image.
+ - BL2 transfer the execution to the TF-M.
+-- During TF-M initialization, the host is reset.
++- During TF-M initialization, the host is taken out of rest.
++- Hashes of the keys used for image verification are stored in the OTP memory.
+ 
+ *****
+ Build
+ *****
+ 
+-.. code-block::
++Platform solution
++=================
++
++The platform binaries are build using Yocto. Below is the user guide:
++
++`Arm Corstone-1000 User Guide`_
++
++Secure Test
++===========
++
++This section can be used to test the secure enclave software indedendently from
++the host. The below configuration builds the secure enclave binaries with CI test
++frame integrated. On boot, secure enclave softwares stack is brought up, and
++CI tests starts executing at the end of the initialization process. In the
++below configuration, host software support is disabled, and meant only
++to test/verify the secure enclave softwares.
++
++FVP
++---
+ 
+-    cmake -B build/ -S <tf-m-root>/ -DCMAKE_BUILD_TYPE=Debug -DTFM_TOOLCHAIN_FILE=<tf-m-root>/toolchain_GNUARM.cmake -DTFM_PLATFORM=arm/corstone1000
++- Download Corstone-1000 FVP from : `Arm Ecosystem FVPs`_
++- Install FVP by running the shell script.
++- Running of the binary will boot secure enclave software stack and at the end all CI test
++  from tf-m-test along with platform specific tests are executed.
++
++.. code-block:: bash
++
++    cmake -B build/ -S <tf-m-root>/ -DCMAKE_BUILD_TYPE=Debug -DTFM_TOOLCHAIN_FILE=<tf-m-root>/toolchain_GNUARM.cmake -DTFM_PLATFORM=arm/corstone1000 -DPLATFORM_IS_FVP=TRUE -DTEST_NS=OFF -DTEST_S=ON -DEXTRA_S_TEST_SUITES_PATHS=<tf-m-root>/trusted-firmware-m/platform/ext/target/arm/corstone1000/ci_regression_tests/
+     cmake --build build -- install
++    cd ./build/install/outputs/
++    cat bl2_signed.bin bl2_signed.bin tfm_s_signed.bin > cs1000.bin
++    cd <path-to-FVP-installation>/models/Linux64_GCC-9.3/
++    ./FVP_Corstone-1000 -C board.flashloader0.fname="none" -C se.trustedBootROMloader.fname="./<path-to-build-dir>/install/outputs/bl1.bin" -C board.xnvm_size=64 -C se.trustedSRAM_config=6 -C se.BootROM_config="3" -C board.smsc_91c111.enabled=0  -C board.hostbridge.userNetworking=true --data board.flash0=./<path-to-build-dir>/install/outputs/cs1000.bin@0x68100000 -C diagnostics=4 -C disable_visualisation=true -C board.se_flash_size=8192 -C diagnostics=4  -C disable_visualisation=true
++
++FPGA
++----
+ 
+-The binaries will be installed inside:
++- Follow the above pointed platform user guide to setup the FPGA board.
++- Use the BL1 generated from the below commands to place it inside FPGA board SD Card.
++- Use the cs1000.bin created from the below commands to place it inside FPGA board SD Card.
++
++.. code-block:: bash
++
++    cmake -B build/ -S <tf-m-root>/ -DCMAKE_BUILD_TYPE=Debug -DTFM_TOOLCHAIN_FILE=<tf-m-root>/toolchain_GNUARM.cmake -DTFM_PLATFORM=arm/corstone1000 -DTEST_NS=OFF -DTEST_S=ON -DEXTRA_S_TEST_SUITES_PATHS=<tf-m-root>/trusted-firmware-m/platform/ext/target/arm/corstone1000/ci_regression_tests/ -DTEST_S_PS=OFF -DTEST_S_PLATFORM=OFF
++    cmake --build build -- install
++    cd ./build/install/outputs/
++    cat bl2_signed.bin bl2_signed.bin tfm_s_signed.bin > cs1000.bin
++    cp bl1.bin <path-to-FPGA-SD-CARD>/SOFTWARE/
++    cp cs1000.bin <path-to-FPGA-SD-CARD>/SOFTWARE/
+ 
+-.. code-block::
++FPGA build can not compile all the CI tests into a single build as it exceeds
++the available RAM size. So there is a need to select few tests but not all.
++The above configuration disable build of -DTEST_S_PS and -DTEST_S_PLATFORM.
++Other test configurations are:
+ 
+-    ./build/install/outputs/ARM/CORSTONE1000
++- -DTEST_S_ATTESTATION=ON/OFF
++- -DTEST_S_AUDIT=ON/OFF
++- -DTEST_S_CRYPTO=ON/OFF
++- -DTEST_S_ITS=ON/OFF
++- -DTEST_S_PS=ON/OFF
++- -DTEST_S_PLATFORM=ON/OFF
+ 
+---------------
++*Copyright (c) 2021-2022, Arm Limited. All rights reserved.*
+ 
+-*Copyright (c) 2021, Arm Limited. All rights reserved.*
++.. _Arm Ecosystem FVPs: https://developer.arm.com/tools-and-software/open-source-software/arm-platforms-software/arm-ecosystem-fvps
++.. _Arm Corstone-1000 User Guide: https://gitlab.arm.com/arm-reference-solutions/arm-reference-solutions-docs/-/blob/CORSTONE1000-2022.04.19/docs/embedded-a/corstone1000/user-guide.rst
+diff --git a/platform/ext/target/arm/corstone1000/CMakeLists.txt b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+index 39d7b03455..81522c7cf0 100644
+--- a/platform/ext/target/arm/corstone1000/CMakeLists.txt
++++ b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+@@ -18,7 +18,7 @@ target_include_directories(platform_region_defs
+ 
+ target_compile_definitions(platform_region_defs
+     INTERFACE
+-        $<$<BOOL:${TEST_S}>:TEST_S>
++        $<$<BOOL:${TFM_S_REG_TEST}>:TFM_S_REG_TEST>
+ )
+ #========================= Platform common defs ===============================#
+ 
+@@ -75,7 +75,7 @@ target_sources(platform_s
+         $<$<BOOL:TFM_PARTITION_PLATFORM>:${CMAKE_CURRENT_SOURCE_DIR}/services/src/tfm_platform_system.c>
+         fw_update_agent/uefi_capsule_parser.c
+         fw_update_agent/fwu_agent.c
+-        $<$<BOOL:${TEST_S}>:${CMAKE_CURRENT_SOURCE_DIR}/target_cfg.c>
++        $<$<BOOL:${TFM_S_REG_TEST}>:${CMAKE_CURRENT_SOURCE_DIR}/target_cfg.c>
+ )
+ 
+ if (PLATFORM_IS_FVP)
+@@ -96,7 +96,7 @@ endif()
+ target_compile_definitions(platform_s
+     PRIVATE
+         $<$<BOOL:${PLATFORM_IS_FVP}>:PLATFORM_IS_FVP>
+-        $<$<BOOL:${TEST_S}>:TEST_S>
++        $<$<BOOL:${TFM_S_REG_TEST}>:TFM_S_REG_TEST>
+         $<$<BOOL:${EXTERNAL_SYSTEM_SUPPORT}>:EXTERNAL_SYSTEM_SUPPORT>
+ )
+ 
+@@ -136,7 +136,7 @@ endif()
+ target_compile_definitions(platform_bl2
+     PRIVATE
+         $<$<BOOL:${PLATFORM_IS_FVP}>:PLATFORM_IS_FVP>
+-        $<$<BOOL:${TEST_S}>:TEST_S>
++        $<$<BOOL:${TFM_S_REG_TEST}>:TFM_S_REG_TEST>
+ )
+ 
+ # boot_hal_bl2.c is compiled as part of 'bl2' target and not inside
+diff --git a/platform/ext/target/arm/corstone1000/bl1/CMakeLists.txt b/platform/ext/target/arm/corstone1000/bl1/CMakeLists.txt
+index 369695f148..d39c5ae91d 100644
+--- a/platform/ext/target/arm/corstone1000/bl1/CMakeLists.txt
++++ b/platform/ext/target/arm/corstone1000/bl1/CMakeLists.txt
+@@ -291,7 +291,7 @@ target_compile_definitions(signing_layout_for_bl2
+     PRIVATE
+         MCUBOOT_IMAGE_NUMBER=${BL1_IMAGE_NUMBER}
+         BL1
+-        $<$<BOOL:${TEST_S}>:TEST_S>
++        $<$<BOOL:${TFM_S_REG_TEST}>:TFM_S_REG_TEST>
+ )
+ 
+ target_include_directories(signing_layout_for_bl2
+diff --git a/platform/ext/target/arm/corstone1000/bl2_flash_map.c b/platform/ext/target/arm/corstone1000/bl2_flash_map.c
+index 6bffa274df..0a6a592d94 100644
+--- a/platform/ext/target/arm/corstone1000/bl2_flash_map.c
++++ b/platform/ext/target/arm/corstone1000/bl2_flash_map.c
+@@ -38,6 +38,7 @@ struct flash_area flash_map[] = {
+         .fa_off = FLASH_AREA_1_OFFSET,
+         .fa_size = FLASH_AREA_1_SIZE,
+     },
++#ifndef TFM_S_REG_TEST
+     {
+         .fa_id = FLASH_AREA_2_ID,
+         .fa_device_id = FLASH_DEVICE_ID,
+@@ -52,6 +53,7 @@ struct flash_area flash_map[] = {
+         .fa_off = FLASH_INVALID_OFFSET,
+         .fa_size = FLASH_INVALID_SIZE,
+     },
++#endif
+ };
+ 
+ const int flash_map_entry_num = ARRAY_SIZE(flash_map);
+diff --git a/platform/ext/target/arm/corstone1000/boot_hal_bl2.c b/platform/ext/target/arm/corstone1000/boot_hal_bl2.c
+index 792e06f81e..134315a17b 100644
+--- a/platform/ext/target/arm/corstone1000/boot_hal_bl2.c
++++ b/platform/ext/target/arm/corstone1000/boot_hal_bl2.c
+@@ -100,10 +100,12 @@ int32_t boot_platform_init(void)
+         return 1;
+     }
+ 
++#ifndef TFM_S_REG_TEST
+     result = fill_bl2_flash_map_by_parsing_fips(BANK_0_PARTITION_OFFSET);
+     if (result) {
+         return 1;
+     }
++#endif
+ 
+     result = FLASH_DEV_NAME.Initialize(NULL);
+     if (result != ARM_DRIVER_OK) {
+diff --git a/platform/ext/target/arm/corstone1000/config.cmake b/platform/ext/target/arm/corstone1000/config.cmake
+index a3399db318..a6a1a33c42 100644
+--- a/platform/ext/target/arm/corstone1000/config.cmake
++++ b/platform/ext/target/arm/corstone1000/config.cmake
+@@ -13,8 +13,15 @@ set(DEFAULT_MCUBOOT_FLASH_MAP           OFF        CACHE BOOL     "Whether to us
+ set(MCUBOOT_UPGRADE_STRATEGY            "RAM_LOAD" CACHE STRING   "Upgrade strategy when multiple boot images are loaded")
+ set(MCUBOOT_SECURITY_COUNTER_S          "1"      CACHE STRING    "Security counter for S image. auto sets it to IMAGE_VERSION_S")
+ 
+-set(TFM_ISOLATION_LEVEL                 2          CACHE STRING   "Isolation level")
+-set(MCUBOOT_IMAGE_NUMBER                2          CACHE STRING   "Whether to combine S and NS into either 1 image, or sign each separately")
++if (TEST_S OR TEST_S_ATTESTATION OR TEST_S_AUDIT OR TEST_S_CRYPTO OR TEST_S_ITS OR TEST_S_PS OR TEST_S_PLATFORM OR EXTRA_S_TEST_SUITES_PATHS)
++  # Test configuration: host images are not needed and work only with isolation level 1
++  set(MCUBOOT_IMAGE_NUMBER                1          CACHE STRING   "Whether to combine S and NS into either 1 image, or sign each separately")
++  set(TFM_ISOLATION_LEVEL                 1          CACHE STRING   "Isolation level")
++else()
++  set(MCUBOOT_IMAGE_NUMBER                2          CACHE STRING   "Whether to combine S and NS into either 1 image, or sign each separately")
++  set(TFM_ISOLATION_LEVEL                 2          CACHE STRING   "Isolation level")
++endif()
++
+ set(TFM_MULTI_CORE_TOPOLOGY             ON         CACHE BOOL     "Whether to build for a dual-cpu architecture")
+ set(TFM_PLAT_SPECIFIC_MULTI_CORE_COMM   ON         CACHE BOOL     "Whether to use a platform specific inter core communication instead of mailbox in dual-cpu topology")
+ set(CRYPTO_HW_ACCELERATOR               ON         CACHE BOOL     "Whether to enable the crypto hardware accelerator on supported platforms")
+diff --git a/platform/ext/target/arm/corstone1000/partition/flash_layout.h b/platform/ext/target/arm/corstone1000/partition/flash_layout.h
+index aa5a8fe463..b0319bb319 100644
+--- a/platform/ext/target/arm/corstone1000/partition/flash_layout.h
++++ b/platform/ext/target/arm/corstone1000/partition/flash_layout.h
+@@ -119,7 +119,7 @@
+  *
+  */
+ #define SE_BL2_PARTITION_SIZE           (0x19000)    /* 100 KB */
+-#ifdef TEST_S
++#ifdef TFM_S_REG_TEST
+ #define TFM_PARTITION_SIZE              (0x61C00)    /* 391 KB */
+ #else
+ #define TFM_PARTITION_SIZE              (0x5E000)    /* 376 KB */
+diff --git a/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c b/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c
+index 8622844d91..1146ffe22a 100644
+--- a/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c
++++ b/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c
+@@ -31,6 +31,7 @@ void tfm_hal_boot_ns_cpu(uintptr_t start_addr)
+     /* Switch the shared flash to XiP mode for the host */
+     Select_XIP_Mode_For_Shared_Flash();
+ 
++#ifndef TFM_S_REG_TEST
+     volatile uint32_t *bir_base = (uint32_t *)CORSTONE1000_HOST_BIR_BASE;
+ 
+     /* Program Boot Instruction Register to jump to BL2 (TF-A) base address
+@@ -68,6 +69,7 @@ void tfm_hal_boot_ns_cpu(uintptr_t start_addr)
+     /*release EXT SYS out of reset*/
+     tfm_external_system_boot();
+ #endif
++#endif /* !TFM_S_REG_TEST */
+ }
+ 
+ void tfm_hal_wait_for_ns_cpu_ready(void)
+-- 
+2.25.1
+

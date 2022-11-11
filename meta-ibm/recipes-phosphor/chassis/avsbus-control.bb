@@ -12,8 +12,6 @@ S = "${WORKDIR}"
 
 SRC_URI:append:witherspoon = " file://avsbus-enable.sh"
 SRC_URI:append:witherspoon = " file://avsbus-disable.sh"
-SRC_URI:append:mihawk = " file://avsbus-enable.sh"
-SRC_URI:append:mihawk = " file://avsbus-disable.sh"
 
 do_install:witherspoon() {
         install -d ${D}${bindir}
@@ -21,11 +19,6 @@ do_install:witherspoon() {
         install -m 0755 ${S}/avsbus-disable.sh ${D}${bindir}/avsbus-disable.sh
 }
 
-do_install:mihawk() {
-        install -d ${D}${bindir}
-        install -m 0755 ${S}/avsbus-enable.sh ${D}${bindir}/avsbus-enable.sh
-        install -m 0755 ${S}/avsbus-disable.sh ${D}${bindir}/avsbus-disable.sh
-}
 
 TMPL_EN= "avsbus-enable@.service"
 TMPL_DIS= "avsbus-disable@.service"
@@ -40,7 +33,3 @@ SYSTEMD_SERVICE:${PN}:append:witherspoon = " ${TMPL_DIS}"
 SYSTEMD_LINK:${PN}:append:witherspoon = " ${@compose_list(d, 'FMT_DIS', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK:${PN}:append:witherspoon = " ${@compose_list(d, 'FMT_EN', 'OBMC_CHASSIS_INSTANCES')}"
 
-SYSTEMD_SERVICE:${PN}:append:mihawk = " ${TMPL_EN}"
-SYSTEMD_SERVICE:${PN}:append:mihawk = " ${TMPL_DIS}"
-SYSTEMD_LINK:${PN}:append:mihawk = " ${@compose_list(d, 'FMT_DIS', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK:${PN}:append:mihawk = " ${@compose_list(d, 'FMT_EN', 'OBMC_CHASSIS_INSTANCES')}"

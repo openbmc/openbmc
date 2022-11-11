@@ -1,4 +1,4 @@
-From bb409432f03dd8256865292e382ad16613737829 Mon Sep 17 00:00:00 2001
+From d2abe7328cea770425405aa0da2f4c2dac89fcad Mon Sep 17 00:00:00 2001
 From: Matthias Schoepfer <matthias.schoepfer@ithinx.io>
 Date: Fri, 31 May 2019 15:34:34 +0200
 Subject: [PATCH] bpo-36852: proper detection of mips architecture for soft
@@ -15,19 +15,19 @@ Upstream-Status: Submitted [https://github.com/python/cpython/pull/13196]
 Signed-off-by: Matthias Schoepfer <matthias.schoepfer@ithinx.io>
 
 ---
- configure.ac | 175 +++++++--------------------------------------------
- 1 file changed, 21 insertions(+), 154 deletions(-)
+ configure.ac | 196 ++++++---------------------------------------------
+ 1 file changed, 21 insertions(+), 175 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 4230ef2..ee08b1b 100644
+index 358b6ea..085fc0b 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -718,160 +718,27 @@ then
+@@ -907,181 +907,27 @@ then
  fi
  
  
 -AC_MSG_CHECKING([for the platform triplet based on compiler characteristics])
--cat >> conftest.c <<EOF
+-cat > conftest.c <<EOF
 -#undef bfin
 -#undef cris
 -#undef fr30
@@ -167,6 +167,22 @@ index 4230ef2..ee08b1b 100644
 -        darwin
 -#elif defined(__VXWORKS__)
 -        vxworks
+-#elif defined(__wasm32__)
+-#  if defined(__EMSCRIPTEN__)
+-	wasm32-emscripten
+-#  elif defined(__wasi__)
+-	wasm32-wasi
+-#  else
+-#    error unknown wasm32 platform
+-#  endif
+-#elif defined(__wasm64__)
+-#  if defined(__EMSCRIPTEN)
+-	wasm64-emscripten
+-#  elif defined(__wasi__)
+-	wasm64-wasi
+-#  else
+-#    error unknown wasm64 platform
+-#  endif
 -#else
 -# error unknown platform triplet
 -#endif
@@ -175,6 +191,11 @@ index 4230ef2..ee08b1b 100644
 -
 -if $CPP $CPPFLAGS conftest.c >conftest.out 2>/dev/null; then
 -  PLATFORM_TRIPLET=`grep -v '^#' conftest.out | grep -v '^ *$' | tr -d ' 	'`
+-  case "$build_os" in
+-  linux-musl*)
+-    PLATFORM_TRIPLET=`echo "$PLATFORM_TRIPLET" | sed 's/linux-gnu/linux-musl/'`
+-    ;;
+-  esac
 -  AC_MSG_RESULT([$PLATFORM_TRIPLET])
 -else
 -  AC_MSG_RESULT([none])

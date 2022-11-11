@@ -1,0 +1,313 @@
+From 34236d8df51d00d1167481760fda5abb56850765 Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Fri, 14 Jan 2022 18:47:08 +0000
+Subject: [PATCH 33/40] ANDROID: trusty: Add trusty-ffa driver
+
+Initial changes related to FFA transport support
+  - Adds FFA transport descriptor
+  - Defines Trusty UUID
+  - Initializes FFA transport does probe, sets ffa_ops
+  - Defers Trusty probe if ARM FF-A driver is not initialized or
+    Trusty SP not found.
+  - Link FF-A device as the supplier for Trusty platform device.
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Change-Id: I78f72b85c20e4bad4c24cf0826e96f27dcf2ee1d
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com
+---
+ drivers/trusty/Makefile         |   1 +
+ drivers/trusty/trusty-ffa.c     | 196 ++++++++++++++++++++++++++++++++
+ drivers/trusty/trusty-ffa.h     |  28 +++++
+ drivers/trusty/trusty-private.h |   1 +
+ drivers/trusty/trusty.c         |   6 +
+ 5 files changed, 232 insertions(+)
+ create mode 100644 drivers/trusty/trusty-ffa.c
+ create mode 100644 drivers/trusty/trusty-ffa.h
+
+diff --git a/drivers/trusty/Makefile b/drivers/trusty/Makefile
+index fbb53ee93003..797d61bf68ef 100644
+--- a/drivers/trusty/Makefile
++++ b/drivers/trusty/Makefile
+@@ -6,6 +6,7 @@
+ obj-$(CONFIG_TRUSTY)		+= trusty-core.o
+ trusty-core-objs		+= trusty.o trusty-mem.o
+ trusty-core-objs		+= trusty-smc.o
++trusty-core-objs		+= trusty-ffa.o
+ trusty-core-$(CONFIG_ARM)	+= trusty-smc-arm.o
+ trusty-core-$(CONFIG_ARM64)	+= trusty-smc-arm64.o
+ obj-$(CONFIG_TRUSTY_IRQ)	+= trusty-irq.o
+diff --git a/drivers/trusty/trusty-ffa.c b/drivers/trusty/trusty-ffa.c
+new file mode 100644
+index 000000000000..c8c16a1fc700
+--- /dev/null
++++ b/drivers/trusty/trusty-ffa.c
+@@ -0,0 +1,196 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (C) 2022 ARM Ltd.
++ */
++
++#include <linux/platform_device.h>
++#include <linux/slab.h>
++#include <linux/trusty/smcall.h>
++#include <linux/arm_ffa.h>
++#include <linux/trusty/trusty.h>
++
++#include <linux/scatterlist.h>
++#include <linux/dma-mapping.h>
++
++#include "trusty-ffa.h"
++#include "trusty-private.h"
++
++static const struct trusty_mem_ops trusty_ffa_mem_ops = {
++	.desc = &trusty_ffa_transport,
++};
++
++static const struct ffa_device_id trusty_ffa_device_id[] = {
++	/*
++	 * Trusty UID: RFC-4122 compliant UUID version 4
++	 * 40ee25f0-a2bc-304c-8c4ca173c57d8af1
++	 */
++	{ UUID_INIT(0x40ee25f0, 0xa2bc, 0x304c,
++		    0x8c, 0x4c, 0xa1, 0x73, 0xc5, 0x7d, 0x8a, 0xf1) },
++	{}
++};
++
++static int trusty_ffa_dev_match(struct device *dev, const void *uuid)
++{
++	struct ffa_device *ffa_dev;
++
++	ffa_dev = to_ffa_dev(dev);
++	if (uuid_equal(&ffa_dev->uuid, uuid))
++		return 1;
++
++	return 0;
++}
++
++static struct ffa_device *trusty_ffa_dev_find(void)
++{
++	const void *data;
++	struct device *dev;
++
++	/* currently only one trusty instance is probed */
++	data = &trusty_ffa_device_id[0].uuid;
++
++	dev = bus_find_device(&ffa_bus_type, NULL, data, trusty_ffa_dev_match);
++	if (dev) {
++		/* drop reference count */
++		put_device(dev);
++		return to_ffa_dev(dev);
++	}
++
++	return NULL;
++}
++
++static int trusty_ffa_link_supplier(struct device *c_dev, struct device *s_dev)
++{
++	if (!c_dev || !s_dev)
++		return -EINVAL;
++
++	if (!device_link_add(c_dev, s_dev, DL_FLAG_AUTOREMOVE_CONSUMER)) {
++		return -ENODEV;
++	}
++
++	return 0;
++}
++
++/*
++ * called from trusty probe
++ */
++static int trusty_ffa_transport_setup(struct device *dev)
++{
++	int rc;
++	struct trusty_state *s = platform_get_drvdata(to_platform_device(dev));
++	struct trusty_ffa_state *ffa_state;
++	struct ffa_device *ffa_dev;
++
++	/* ffa transport not required for lower api versions */
++	if (s->api_version != 0 && s->api_version < TRUSTY_API_VERSION_MEM_OBJ) {
++		return -EINVAL;
++	}
++
++	ffa_dev = trusty_ffa_dev_find();
++	if (!ffa_dev) {
++		dev_dbg(dev, "FFA: Trusty device not found defer probe\n");
++		return -EPROBE_DEFER;
++	}
++
++	ffa_state = ffa_dev_get_drvdata(ffa_dev);
++	if (!ffa_state)
++		return -EINVAL;
++
++	rc = trusty_ffa_link_supplier(dev, &ffa_dev->dev);
++	if (rc != 0)
++		return rc;
++
++	/* FFA used only for memory sharing operations */
++	if (s->api_version == TRUSTY_API_VERSION_MEM_OBJ) {
++		s->ffa = ffa_state;
++		s->mem_ops = &trusty_ffa_mem_ops;
++		return 0;
++	}
++
++	return -EINVAL;
++}
++
++static void trusty_ffa_transport_cleanup(struct device *dev)
++{
++	struct trusty_state *s = platform_get_drvdata(to_platform_device(dev));
++
++	/* ffa transport not setup for lower api versions */
++	if (s->api_version < TRUSTY_API_VERSION_MEM_OBJ) {
++		return;
++	}
++
++	s->ffa = NULL;
++	s->mem_ops = NULL;
++}
++
++static int trusty_ffa_probe(struct ffa_device *ffa_dev)
++{
++	const struct ffa_dev_ops *ffa_ops;
++	struct trusty_ffa_state *s;
++	u32 ffa_drv_version;
++
++	ffa_ops = ffa_dev_ops_get(ffa_dev);
++	if (!ffa_ops) {
++		dev_dbg(&ffa_dev->dev, "ffa_dev_ops_get: failed\n");
++		return -ENOENT;
++	}
++
++	/* check ffa driver version compatibility */
++	ffa_drv_version = ffa_ops->api_version_get();
++	if (TO_TRUSTY_FFA_MAJOR(ffa_drv_version) != TRUSTY_FFA_VERSION_MAJOR ||
++	    TO_TRUSTY_FFA_MINOR(ffa_drv_version) < TRUSTY_FFA_VERSION_MINOR)
++		return -EINVAL;
++
++	s = kzalloc(sizeof(*s), GFP_KERNEL);
++	if (!s)
++		return -ENOMEM;
++
++	s->dev = &ffa_dev->dev;
++	s->ops = ffa_ops;
++	mutex_init(&s->share_memory_msg_lock);
++	ffa_dev_set_drvdata(ffa_dev, s);
++
++	ffa_ops->mode_32bit_set(ffa_dev);
++
++	return 0;
++}
++
++static void trusty_ffa_remove(struct ffa_device *ffa_dev)
++{
++	struct trusty_ffa_state *s;
++
++	s = ffa_dev_get_drvdata(ffa_dev);
++
++	mutex_destroy(&s->share_memory_msg_lock);
++	memset(s, 0, sizeof(struct trusty_ffa_state));
++	kfree(s);
++}
++
++static struct ffa_driver trusty_ffa_driver = {
++	.name = "trusty-ffa",
++	.probe = trusty_ffa_probe,
++	.remove = trusty_ffa_remove,
++	.id_table = trusty_ffa_device_id,
++};
++
++static int __init trusty_ffa_transport_init(void)
++{
++	if (IS_REACHABLE(CONFIG_ARM_FFA_TRANSPORT)) {
++		return ffa_register(&trusty_ffa_driver);
++	} else
++		return -ENODEV;
++}
++
++static void __exit trusty_ffa_transport_exit(void)
++{
++	if (IS_REACHABLE(CONFIG_ARM_FFA_TRANSPORT))
++		ffa_unregister(&trusty_ffa_driver);
++}
++
++const struct trusty_transport_desc trusty_ffa_transport = {
++	.name = "ffa",
++	.setup = trusty_ffa_transport_setup,
++	.cleanup = trusty_ffa_transport_cleanup,
++};
++
++module_init(trusty_ffa_transport_init);
++module_exit(trusty_ffa_transport_exit);
+diff --git a/drivers/trusty/trusty-ffa.h b/drivers/trusty/trusty-ffa.h
+new file mode 100644
+index 000000000000..267ca2c5db29
+--- /dev/null
++++ b/drivers/trusty/trusty-ffa.h
+@@ -0,0 +1,28 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (C) 2022 ARM Ltd.
++ */
++
++#ifndef __LINUX_TRUSTY_FFA_H
++#define __LINUX_TRUSTY_FFA_H
++
++#include <linux/types.h>
++#include <linux/uuid.h>
++#include <linux/arm_ffa.h>
++
++#define TRUSTY_FFA_VERSION_MAJOR	(1U)
++#define TRUSTY_FFA_VERSION_MINOR	(0U)
++#define TRUSTY_FFA_VERSION_MAJOR_SHIFT	(16U)
++#define TRUSTY_FFA_VERSION_MAJOR_MASK	(0x7fffU)
++#define TRUSTY_FFA_VERSION_MINOR_SHIFT	(0U)
++#define TRUSTY_FFA_VERSION_MINOR_MASK	(0U)
++
++#define TO_TRUSTY_FFA_MAJOR(v)					\
++	  ((u16)((v >> TRUSTY_FFA_VERSION_MAJOR_SHIFT) &	\
++		 TRUSTY_FFA_VERSION_MAJOR_MASK))
++
++#define TO_TRUSTY_FFA_MINOR(v)					\
++	  ((u16)((v >> TRUSTY_FFA_VERSION_MINOR_SHIFT) &	\
++		 TRUSTY_FFA_VERSION_MINOR_MASK))
++
++#endif /* __LINUX_TRUSTY_FFA_H */
+diff --git a/drivers/trusty/trusty-private.h b/drivers/trusty/trusty-private.h
+index 74b88bb8f83b..2496f397e5d2 100644
+--- a/drivers/trusty/trusty-private.h
++++ b/drivers/trusty/trusty-private.h
+@@ -73,5 +73,6 @@ int trusty_init_api_version(struct trusty_state *s, struct device *dev,
+ typedef const struct trusty_transport_desc *trusty_transports_t;
+ 
+ extern const struct trusty_transport_desc trusty_smc_transport;
++extern const struct trusty_transport_desc trusty_ffa_transport;
+ 
+ #endif /* _TRUSTY_PRIVATE_H */
+diff --git a/drivers/trusty/trusty.c b/drivers/trusty/trusty.c
+index ec0fccfaa24c..4686b0d34f61 100644
+--- a/drivers/trusty/trusty.c
++++ b/drivers/trusty/trusty.c
+@@ -509,6 +509,11 @@ trusty_transports_setup(const trusty_transports_t *transports,
+ 			return -EINVAL;
+ 
+ 		ret = transport->setup(dev);
++		if (ret == -EPROBE_DEFER) {
++			dev_notice(dev, "transport %s: defer probe\n",
++				   transport->name);
++			return ret;
++		}
+ 		transports_ret &= ret;
+ 	}
+ 
+@@ -672,6 +677,7 @@ static int trusty_remove(struct platform_device *pdev)
+  */
+ static const trusty_transports_t trusty_transports[] = {
+ 	&trusty_smc_transport,
++	&trusty_ffa_transport,
+ 	NULL,
+ };
+ 
+-- 
+2.34.1
+

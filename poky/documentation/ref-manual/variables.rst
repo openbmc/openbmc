@@ -260,9 +260,9 @@ system and gives an overview of their function and contents.
       https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview
 
    :term:`B`
-      The directory within the :term:`Build Directory` in
-      which the OpenEmbedded build system places generated objects during a
-      recipe's build process. By default, this directory is the same as the
+      The directory within the :term:`Build Directory` in which the
+      OpenEmbedded build system places generated objects during a recipe's
+      build process. By default, this directory is the same as the
       :term:`S` directory, which is defined as::
 
          S = "${WORKDIR}/${BP}"
@@ -615,7 +615,7 @@ system and gives an overview of their function and contents.
       software.
 
       When specifying recipe files, you can pattern match using Python's
-      `glob <https://docs.python.org/3/library/glob.html>`_ syntax.
+      `glob <https://docs.python.org/3/library/glob.html>`__ syntax.
       For details on the syntax, see the documentation by following the
       previous link.
 
@@ -773,7 +773,7 @@ system and gives an overview of their function and contents.
          and `glob <https://docs.python.org/3/library/glob.html>`__.
 
       For more information on how this variable works, see
-      ``meta/classes/binconfig.bbclass`` in the :term:`Source Directory`.
+      ``meta/classes-recipe/binconfig.bbclass`` in the :term:`Source Directory`.
       You can also find general
       information on the class in the
       ":ref:`ref-classes-binconfig`" section.
@@ -903,12 +903,11 @@ system and gives an overview of their function and contents.
       The default value is an empty string ("").
 
    :term:`BUILDDIR`
-      Points to the location of the :term:`Build Directory`.
-      You can define this directory indirectly through the
-      :ref:`structure-core-script` script by passing in a Build
-      Directory path when you run the script. If you run the script and do
-      not provide a Build Directory path, the :term:`BUILDDIR` defaults to
-      ``build`` in the current directory.
+      Points to the location of the :term:`Build Directory`. You can define
+      this directory indirectly through the :ref:`structure-core-script` script
+      by passing in a :term:`Build Directory` path when you run the script. If
+      you run the script and do not provide a :term:`Build Directory` path, the
+      :term:`BUILDDIR` defaults to ``build`` in the current directory.
 
    :term:`BUILDHISTORY_COMMIT`
       When inheriting the :ref:`buildhistory <ref-classes-buildhistory>`
@@ -920,10 +919,10 @@ system and gives an overview of their function and contents.
       and sdk). If you want to track changes to build history over time,
       you should set this value to "1".
 
-      By default, the :ref:`buildhistory <ref-classes-buildhistory>` class does not commit the build
-      history output in a local Git repository::
+      By default, the :ref:`buildhistory <ref-classes-buildhistory>` class
+      enables committing the buildhistory output in a local Git repository::
 
-         BUILDHISTORY_COMMIT ?= "0"
+         BUILDHISTORY_COMMIT ?= "1"
 
    :term:`BUILDHISTORY_COMMIT_AUTHOR`
       When inheriting the :ref:`buildhistory <ref-classes-buildhistory>`
@@ -1171,12 +1170,10 @@ system and gives an overview of their function and contents.
       packages for all the packages explicitly (or implicitly) installed in
       an image.
 
-      .. note::
-
-         The :term:`COMPLEMENTARY_GLOB` variable uses Unix filename pattern matching
-         (`fnmatch <https://docs.python.org/3/library/fnmatch.html#module-fnmatch>`__),
-         which is similar to the Unix style pathname pattern expansion
-         (`glob <https://docs.python.org/3/library/glob.html>`__).
+      The :term:`COMPLEMENTARY_GLOB` variable uses Unix filename pattern matching
+      (`fnmatch <https://docs.python.org/3/library/fnmatch.html#module-fnmatch>`__),
+      which is similar to the Unix style pathname pattern expansion
+      (`glob <https://docs.python.org/3/library/glob.html>`__).
 
       The resulting list of complementary packages is associated with an
       item that can be added to
@@ -1190,6 +1187,11 @@ system and gives an overview of their function and contents.
       wildcard. Here is an example::
 
          COMPLEMENTARY_GLOB[dev-pkgs] = '*-dev'
+
+      .. note::
+
+         When installing complementary packages, recommends relationships
+         (set via :term:`RRECOMMENDS`) are always ignored.
 
    :term:`COMPONENTS_DIR`
       Stores sysroot components for each recipe. The OpenEmbedded build
@@ -1242,24 +1244,24 @@ system and gives an overview of their function and contents.
          :term:`Source Directory`.
 
    :term:`CONFIG_INITRAMFS_SOURCE`
-      Identifies the initial RAM filesystem (initramfs) source files. The
+      Identifies the initial RAM filesystem (:term:`Initramfs`) source files. The
       OpenEmbedded build system receives and uses this kernel Kconfig
       variable as an environment variable. By default, the variable is set
       to null ("").
 
       The :term:`CONFIG_INITRAMFS_SOURCE` can be either a single cpio archive
       with a ``.cpio`` suffix or a space-separated list of directories and
-      files for building the initramfs image. A cpio archive should contain
-      a filesystem archive to be used as an initramfs image. Directories
-      should contain a filesystem layout to be included in the initramfs
+      files for building the :term:`Initramfs` image. A cpio archive should contain
+      a filesystem archive to be used as an :term:`Initramfs` image. Directories
+      should contain a filesystem layout to be included in the :term:`Initramfs`
       image. Files should contain entries according to the format described
       by the ``usr/gen_init_cpio`` program in the kernel tree.
 
-      If you specify multiple directories and files, the initramfs image
+      If you specify multiple directories and files, the :term:`Initramfs` image
       will be the aggregate of all of them.
 
-      For information on creating an initramfs, see the
-      ":ref:`dev-manual/common-tasks:building an initial ram filesystem (initramfs) image`" section
+      For information on creating an :term:`Initramfs`, see the
+      ":ref:`dev-manual/common-tasks:building an initial ram filesystem (Initramfs) image`" section
       in the Yocto Project Development Tasks Manual.
 
    :term:`CONFIG_SITE`
@@ -1466,15 +1468,31 @@ system and gives an overview of their function and contents.
          # This is windows only issue.
          CVE_CHECK_IGNORE += "CVE-2020-15523"
 
+   :term:`CVE_CHECK_SHOW_WARNINGS`
+      Specifies whether or not the :ref:`cve-check <ref-classes-cve-check>`
+      class should generate warning messages on the console when unpatched
+      CVEs are found. The default is "1", but you may wish to set it to "0" if
+      you are already examining/processing the logs after the build has
+      completed and thus do not need the warning messages.
+
    :term:`CVE_CHECK_SKIP_RECIPE`
       The list of package names (:term:`PN`) for which
       CVEs (Common Vulnerabilities and Exposures) are ignored.
+
+   :term:`CVE_DB_UPDATE_INTERVAL`
+      Specifies the CVE database update interval in seconds, as used by
+      ``cve-update-db-native``. The default value is "86400" i.e. once a day
+      (24*60*60). If the value is set to "0" then the update will be forced
+      every time. Alternatively, a negative value e.g. "-1" will disable
+      updates entirely.
 
    :term:`CVE_PRODUCT`
       In a recipe, defines the name used to match the recipe name
       against the name in the upstream `NIST CVE database <https://nvd.nist.gov/>`__.
 
-      The default is ${:term:`BPN`}. If it does not match the name in the NIST CVE
+      The default is ${:term:`BPN`} (except for recipes that inherit the
+      :ref:`pypi <ref-classes-pypi>` class where it is set based upon
+      :term:`PYPI_PACKAGE`). If it does not match the name in the NIST CVE
       database or matches with multiple entries in the database, the default
       value needs to be changed.
 
@@ -1488,6 +1506,18 @@ system and gives an overview of their function and contents.
       vendor name as a prefix. The syntax for this is::
 
          CVE_PRODUCT = "vendor:package"
+
+   :term:`CVE_VERSION`
+      In a recipe, defines the version used to match the recipe version
+      against the version in the `NIST CVE database <https://nvd.nist.gov/>`__
+      when usign :ref:`cve-check <ref-classes-cve-check>`.
+
+      The default is ${:term:`PV`} but if recipes use custom version numbers
+      which do not map to upstream software component release versions and the versions
+      used in the CVE database, then this variable can be used to set the
+      version number for :ref:`cve-check <ref-classes-cve-check>`. Example::
+
+          CVE_VERSION = "2.39"
 
    :term:`CVSDIR`
       The directory in which files checked out under the CVS system are
@@ -1620,7 +1650,7 @@ system and gives an overview of their function and contents.
       the appropriate staging sysroot, given by the
       :term:`STAGING_DIR* <STAGING_DIR>` variables, by the time the
       :ref:`ref-tasks-configure` task for ``foo`` runs.
-      This mechanism is implemented by having ``do_configure`` depend on
+      This mechanism is implemented by having :ref:`ref-tasks-configure` depend on
       the :ref:`ref-tasks-populate_sysroot` task of
       each recipe listed in :term:`DEPENDS`, through a
       ``[``\ :ref:`deptask <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:variable flags>`\ ``]``
@@ -1681,8 +1711,7 @@ system and gives an overview of their function and contents.
       Points to the general area that the OpenEmbedded build system uses to
       place images, packages, SDKs, and other output files that are ready
       to be used outside of the build system. By default, this directory
-      resides within the :term:`Build Directory` as
-      ``${TMPDIR}/deploy``.
+      resides within the :term:`Build Directory` as ``${TMPDIR}/deploy``.
 
       For more information on the structure of the Build Directory, see
       ":ref:`ref-manual/structure:the build directory --- \`\`build/\`\``" section.
@@ -1728,7 +1757,7 @@ system and gives an overview of their function and contents.
       with the contents of :term:`IMGDEPLOYDIR` by the :ref:`image
       <ref-classes-image>` class.
 
-      For more information on the structure of the Build Directory, see
+      For more information on the structure of the :term:`Build Directory`, see
       ":ref:`ref-manual/structure:the build directory --- \`\`build/\`\``" section.
       For more detail on the contents of the ``deploy`` directory, see the
       ":ref:`overview-manual/concepts:images`" and
@@ -1811,6 +1840,23 @@ system and gives an overview of their function and contents.
       The package description used by package managers. If not set,
       :term:`DESCRIPTION` takes the value of the :term:`SUMMARY`
       variable.
+
+   :term:`DEV_PKG_DEPENDENCY`
+      Provides an easy way for recipes to disable or adjust the runtime
+      dependency (:term:`RDEPENDS`) of the ``${PN}-dev`` package on the main
+      (``${PN}``) package, particularly where the main package may be empty.
+
+   :term:`DISABLE_STATIC`
+      Used in order to disable static linking by default (in order to save
+      space, since static libraries are often unused in embedded systems.)
+      The default value is " --disable-static", however it can be set to ""
+      in order to enable static linking if desired. Certain recipes do this
+      individually, and also there is a
+      ``meta/conf/distro/include/no-static-libs.inc`` include file that
+      disables static linking for a number of recipes. Some software
+      packages or build tools (such as CMake) have explicit support for
+      enabling / disabling static linking, and in those cases
+      :term:`DISABLE_STATIC` is not used.
 
    :term:`DISTRO`
       The short name of the distribution. For information on the long name
@@ -1994,8 +2040,7 @@ system and gives an overview of their function and contents.
       You can set this directory by defining the :term:`DL_DIR` variable in the
       ``conf/local.conf`` file. This directory is self-maintaining and you
       should not have to touch it. By default, the directory is
-      ``downloads`` in the :term:`Build Directory`.
-      ::
+      ``downloads`` in the :term:`Build Directory`::
 
          #DL_DIR ?= "${TOPDIR}/downloads"
 
@@ -2029,7 +2074,7 @@ system and gives an overview of their function and contents.
       available are xz and bz2.
 
       For information on policies and on how to use this variable, see the
-      comments in the ``meta/classes/compress_doc.bbclass`` file.
+      comments in the ``meta/classes-recipe/compress_doc.bbclass`` file.
 
    :term:`EFI_PROVIDER`
       When building bootable images (i.e. where ``hddimg``, ``iso``, or
@@ -2197,7 +2242,7 @@ system and gives an overview of their function and contents.
       variable tells the OpenEmbedded build system to prefer the installed
       external tools. See the
       :ref:`kernel-yocto <ref-classes-kernel-yocto>` class in
-      ``meta/classes`` to see how the variable is used.
+      ``meta/classes-recipe`` to see how the variable is used.
 
    :term:`EXTERNALSRC`
       When inheriting the :ref:`externalsrc <ref-classes-externalsrc>`
@@ -2216,8 +2261,8 @@ system and gives an overview of their function and contents.
       class, this variable points to the directory in which the recipe's
       source code is built, which is outside of the OpenEmbedded build
       system. When set, this variable sets the :term:`B` variable,
-      which is what the OpenEmbedded build system uses to locate the Build
-      Directory.
+      which is what the OpenEmbedded build system uses to locate the
+      :term:`Build Directory`.
 
       See the ":ref:`ref-classes-externalsrc`" section for details. You
       can also find information on how to use this variable in the
@@ -2237,9 +2282,8 @@ system and gives an overview of their function and contents.
       more than one feature, separate them with a space.
 
       Typically, you configure this variable in your ``local.conf`` file,
-      which is found in the :term:`Build Directory`.
-      Although you can use this variable from within a recipe, best
-      practices dictate that you do not.
+      which is found in the :term:`Build Directory`. Although you can use this
+      variable from within a recipe, best practices dictate that you do not.
 
       .. note::
 
@@ -2445,7 +2489,7 @@ system and gives an overview of their function and contents.
 
          -  When specifying files or paths, you can pattern match using
             Python's
-            `glob <https://docs.python.org/3/library/glob.html>`_
+            `glob <https://docs.python.org/3/library/glob.html>`__
             syntax. For details on the syntax, see the documentation by
             following the previous link.
 
@@ -2574,7 +2618,7 @@ system and gives an overview of their function and contents.
       :term:`SRC_URI` statements.
 
       The default value for the :term:`FILESPATH` variable is defined in the
-      :ref:`ref-classes-base` class found in ``meta/classes`` in the
+      :ref:`ref-classes-base` class found in ``meta/classes-global`` in the
       :term:`Source Directory`::
 
          FILESPATH = "${@base_set_filespath(["${FILE_DIRNAME}/${BP}", \
@@ -2636,10 +2680,9 @@ system and gives an overview of their function and contents.
 
       You define the :term:`FILESYSTEM_PERMS_TABLES` variable in the
       ``conf/local.conf`` file, which is found in the :term:`Build Directory`,
-      to point to your custom
-      ``fs-perms.txt``. You can specify more than a single file permissions
-      setting table. The paths you specify to these files must be defined
-      within the :term:`BBPATH` variable.
+      to point to your custom ``fs-perms.txt``. You can specify more than a
+      single file permissions setting table. The paths you specify to these
+      files must be defined within the :term:`BBPATH` variable.
 
       For guidance on how to create your own file permissions settings
       table file, examine the existing ``fs-perms.txt``.
@@ -2686,6 +2729,10 @@ system and gives an overview of their function and contents.
    :term:`FIT_SIGN_ALG`
       Specifies the signature algorithm used in creating the FIT Image.
       For e.g. rsa2048.
+
+   :term:`FIT_PAD_ALG`
+      Specifies the padding algorithm used in creating the FIT Image.
+      The default value is "pkcs-1.5".
 
    :term:`FIT_SIGN_INDIVIDUAL`
       If set to "1", then the :ref:`kernel-fitimage <ref-classes-kernel-fitimage>`
@@ -2755,6 +2802,13 @@ system and gives an overview of their function and contents.
    :term:`GITDIR`
       The directory in which a local copy of a Git repository is stored
       when it is cloned.
+
+   :term:`GITHUB_BASE_URI`
+      When inheriting the :ref:`github-releases <ref-classes-github-releases>`
+      class, specifies the base URL for fetching releases for the github
+      project you wish to fetch sources from. The default value is as follows::
+
+         GITHUB_BASE_URI ?= "https://github.com/${BPN}/${BPN}/releases/"
 
    :term:`GLIBC_GENERATE_LOCALES`
       Specifies the list of GLIBC locales to generate should you not wish
@@ -3041,17 +3095,23 @@ system and gives an overview of their function and contents.
       material for Wic is located in the
       ":doc:`/ref-manual/kickstart`" chapter.
 
+   :term:`IMAGE_BUILDINFO_FILE`
+      When using the :ref:`image-buildinfo <ref-classes-image-buildinfo>` class,
+      specifies the file in the image to write the build information into. The
+      default value is "``${sysconfdir}/buildinfo``".
+
+   :term:`IMAGE_BUILDINFO_VARS`
+      When using the :ref:`image-buildinfo <ref-classes-image-buildinfo>` class,
+      specifies the list of variables to include in the `Build Configuration`
+      section of the output file (as a space-separated list). Defaults to
+      ":term:`DISTRO` :term:`DISTRO_VERSION`".
+
    :term:`IMAGE_CLASSES`
-      A list of classes that all images should inherit. You typically use
-      this variable to specify the list of classes that register the
-      different types of images the OpenEmbedded build system creates.
+      A list of classes that all images should inherit. This is typically used
+      to enable functionality across all image recipes.
 
-      The default value for :term:`IMAGE_CLASSES` is ``image_types``. You can
-      set this variable in your ``local.conf`` or in a distribution
-      configuration file.
-
-      For more information, see ``meta/classes/image_types.bbclass`` in the
-      :term:`Source Directory`.
+      Classes specified in :term:`IMAGE_CLASSES` must be located in the
+      ``classes-recipe/`` or ``classes/`` subdirectories.
 
    :term:`IMAGE_CMD`
       Specifies the command to create the image file for a specific image
@@ -3067,7 +3127,7 @@ system and gives an overview of their function and contents.
       You typically do not need to set this variable unless you are adding
       support for a new image type. For more examples on how to set this
       variable, see the :ref:`image_types <ref-classes-image_types>`
-      class file, which is ``meta/classes/image_types.bbclass``.
+      class file, which is ``meta/classes-recipe/image_types.bbclass``.
 
    :term:`IMAGE_DEVICE_TABLES`
       Specifies one or more files that contain custom device tables that
@@ -3182,10 +3242,10 @@ system and gives an overview of their function and contents.
             image, do not use the :term:`IMAGE_INSTALL` variable to specify
             packages for installation. Instead, use the
             :term:`PACKAGE_INSTALL` variable, which
-            allows the initial RAM filesystem (initramfs) recipe to use a
+            allows the initial RAM filesystem (:term:`Initramfs`) recipe to use a
             fixed set of packages and not be affected by :term:`IMAGE_INSTALL`.
-            For information on creating an initramfs, see the
-            ":ref:`dev-manual/common-tasks:building an initial ram filesystem (initramfs) image`"
+            For information on creating an :term:`Initramfs`, see the
+            ":ref:`dev-manual/common-tasks:building an initial ram filesystem (Initramfs) image`"
             section in the Yocto Project Development Tasks Manual.
 
          -  Using :term:`IMAGE_INSTALL` with the
@@ -3265,7 +3325,7 @@ system and gives an overview of their function and contents.
       to distinguish the image file from other files created during image
       building; however if this suffix is redundant or not desired you can
       clear the value of this variable (set the value to ""). For example,
-      this is typically cleared in initramfs image recipes.
+      this is typically cleared in :term:`Initramfs` image recipes.
 
    :term:`IMAGE_OVERHEAD_FACTOR`
       Defines a multiplier that the build system applies to the initial
@@ -3463,7 +3523,7 @@ system and gives an overview of their function and contents.
       - wic.lzma
 
       For more information about these types of images, see
-      ``meta/classes/image_types*.bbclass`` in the :term:`Source Directory`.
+      ``meta/classes-recipe/image_types*.bbclass`` in the :term:`Source Directory`.
 
    :term:`IMAGE_VERSION_SUFFIX`
       Version suffix that is part of the default :term:`IMAGE_NAME` and
@@ -3546,7 +3606,7 @@ system and gives an overview of their function and contents.
 
 
          Although you can use other settings, you might be required to
-         remove dependencies on or provide alternatives to components that
+         remove dependencies on (or provide alternatives to) components that
          are required to produce a functional system image.
 
    :term:`INCOMPATIBLE_LICENSE_EXCEPTIONS`
@@ -3562,6 +3622,8 @@ system and gives an overview of their function and contents.
       functions in the class or classes are not executed for the base
       configuration and in each individual recipe. The OpenEmbedded build
       system ignores changes to :term:`INHERIT` in individual recipes.
+      Classes inherited using :term:`INHERIT` must be located in the
+      ``classes-global/`` or ``classes/`` subdirectories.
 
       For more information on :term:`INHERIT`, see the
       :ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:\`\`inherit\`\` configuration directive`"
@@ -3570,6 +3632,9 @@ system and gives an overview of their function and contents.
    :term:`INHERIT_DISTRO`
       Lists classes that will be inherited at the distribution level. It is
       unlikely that you want to edit this variable.
+
+      Classes specified in :term:`INHERIT_DISTRO` must be located in the
+      ``classes-global/`` or ``classes/`` subdirectories.
 
       The default value of the variable is set as follows in the
       ``meta/conf/distro/defaultsetup.conf`` file::
@@ -3632,37 +3697,79 @@ system and gives an overview of their function and contents.
          even if the toolchain's binaries are strippable, there are other files
          needed for the build that are not strippable.
 
+   :term:`Initramfs`
+      An Initial RAM Filesystem (:term:`Initramfs`) is an optionally compressed
+      `cpio <https://en.wikipedia.org/wiki/Cpio>`__ archive which is extracted
+      by the Linux kernel into RAM in a special `tmpfs <https://en.wikipedia.org/wiki/Tmpfs>`__
+      instance, used as the initial root filesystem.
+
+      This is a replacement for the legacy init RAM disk ("initrd")
+      technique, booting on an emulated block device in RAM, but being less
+      efficient because of the overhead of going through a filesystem and
+      having to duplicate accessed file contents in the file cache in RAM,
+      as for any block device.
+
+      .. note:
+
+         As far as bootloaders are concerned, :term:`Initramfs` and "initrd"
+         images are still copied to RAM in the same way. That's why most
+	 most bootloaders refer to :term:`Initramfs` images as "initrd"
+	 or "init RAM disk".
+
+      This kind of mechanism is typically used for two reasons:
+
+      -  For booting the same kernel binary on multiple systems requiring
+         different device drivers. The Initramfs image is then customized
+	 for each type of system, to include the specific  kernel modules
+         necessary to access the final root filesystem. This technique
+	 is used on all GNU / Linux distributions for desktops and servers.
+
+      -  For booting faster. As the root filesystem is extracted into RAM,
+         accessing the first user-space applications is very fast, compared
+         to having to initialize a block device, to access multiple blocks
+         from it, and to go through a filesystem having its own overhead.
+         For example, this allows to display a splashscreen very early,
+	 and to later take care of mounting the final root filesystem and
+         loading less time-critical kernel drivers.
+
+      This cpio archive can either be loaded to RAM by the bootloader,
+      or be included in the kernel binary.
+
+      For information on creating and using an :term:`Initramfs`, see the
+      ":ref:`dev-manual/common-tasks:building an initial ram filesystem (Initramfs) image`"
+      section in the Yocto Project Development Tasks Manual.
+
    :term:`INITRAMFS_DEPLOY_DIR_IMAGE`
-      Indicates the deploy directory used by ``do_bundle_initramfs`` where the
+      Indicates the deploy directory used by :ref:`ref-tasks-bundle_initramfs` where the
       :term:`INITRAMFS_IMAGE` will be fetched from.
       This variable is set by default to ``${DEPLOY_DIR_IMAGE}`` in the
       :ref:`kernel <ref-classes-kernel>` class and it's only meant to be changed
-      when building an initramfs image from a separate multiconfig via :term:`INITRAMFS_MULTICONFIG`.
+      when building an :term:`Initramfs` image from a separate multiconfig via :term:`INITRAMFS_MULTICONFIG`.
 
    :term:`INITRAMFS_FSTYPES`
       Defines the format for the output image of an initial RAM filesystem
-      (initramfs), which is used during boot. Supported formats are the
+      (:term:`Initramfs`), which is used during boot. Supported formats are the
       same as those supported by the
       :term:`IMAGE_FSTYPES` variable.
 
       The default value of this variable, which is set in the
       ``meta/conf/bitbake.conf`` configuration file in the
       :term:`Source Directory`, is "cpio.gz". The Linux kernel's
-      initramfs mechanism, as opposed to the initial RAM filesystem
+      :term:`Initramfs` mechanism, as opposed to the initial RAM filesystem
       `initrd <https://en.wikipedia.org/wiki/Initrd>`__ mechanism, expects
       an optionally compressed cpio archive.
 
    :term:`INITRAMFS_IMAGE`
       Specifies the :term:`PROVIDES` name of an image
-      recipe that is used to build an initial RAM filesystem (initramfs)
+      recipe that is used to build an initial RAM filesystem (:term:`Initramfs`)
       image. In other words, the :term:`INITRAMFS_IMAGE` variable causes an
       additional recipe to be built as a dependency to whatever root
       filesystem recipe you might be using (e.g. ``core-image-sato``). The
-      initramfs image recipe you provide should set
+      :term:`Initramfs` image recipe you provide should set
       :term:`IMAGE_FSTYPES` to
       :term:`INITRAMFS_FSTYPES`.
 
-      An initramfs image provides a temporary root filesystem used for
+      An :term:`Initramfs` image provides a temporary root filesystem used for
       early system initialization (e.g. loading of modules needed to locate
       and mount the "real" root filesystem).
 
@@ -3670,8 +3777,8 @@ system and gives an overview of their function and contents.
 
          See the ``meta/recipes-core/images/core-image-minimal-initramfs.bb``
          recipe in the :term:`Source Directory`
-         for an example initramfs recipe. To select this sample recipe as
-         the one built to provide the initramfs image, set :term:`INITRAMFS_IMAGE`
+         for an example :term:`Initramfs` recipe. To select this sample recipe as
+         the one built to provide the :term:`Initramfs` image, set :term:`INITRAMFS_IMAGE`
          to "core-image-minimal-initramfs".
 
       You can also find more information by referencing the
@@ -3681,13 +3788,13 @@ system and gives an overview of their function and contents.
       class to see how to use the :term:`INITRAMFS_IMAGE` variable.
 
       If :term:`INITRAMFS_IMAGE` is empty, which is the default, then no
-      initramfs image is built.
+      :term:`Initramfs` image is built.
 
       For more information, you can also see the
       :term:`INITRAMFS_IMAGE_BUNDLE`
       variable, which allows the generated image to be bundled inside the
-      kernel image. Additionally, for information on creating an initramfs
-      image, see the ":ref:`dev-manual/common-tasks:building an initial ram filesystem (initramfs) image`" section
+      kernel image. Additionally, for information on creating an :term:`Initramfs`
+      image, see the ":ref:`dev-manual/common-tasks:building an initial ram filesystem (Initramfs) image`" section
       in the Yocto Project Development Tasks Manual.
 
    :term:`INITRAMFS_IMAGE_BUNDLE`
@@ -3696,32 +3803,32 @@ system and gives an overview of their function and contents.
       extra pass
       (:ref:`ref-tasks-bundle_initramfs`) during
       kernel compilation in order to build a single binary that contains
-      both the kernel image and the initial RAM filesystem (initramfs)
+      both the kernel image and the initial RAM filesystem (:term:`Initramfs`)
       image. This makes use of the
       :term:`CONFIG_INITRAMFS_SOURCE` kernel
       feature.
 
       .. note::
 
-         Bundling the initramfs with the kernel conflates the code in the
-         initramfs with the GPLv2 licensed Linux kernel binary. Thus only GPLv2
-         compatible software may be part of a bundled initramfs.
+         Bundling the :term:`Initramfs` with the kernel conflates the code in the
+         :term:`Initramfs` with the GPLv2 licensed Linux kernel binary. Thus only GPLv2
+         compatible software may be part of a bundled :term:`Initramfs`.
 
       .. note::
 
-         Using an extra compilation pass to bundle the initramfs avoids a
-         circular dependency between the kernel recipe and the initramfs
-         recipe should the initramfs include kernel modules. Should that be
-         the case, the initramfs recipe depends on the kernel for the
-         kernel modules, and the kernel depends on the initramfs recipe
-         since the initramfs is bundled inside the kernel image.
+         Using an extra compilation pass to bundle the :term:`Initramfs` avoids a
+         circular dependency between the kernel recipe and the :term:`Initramfs`
+         recipe should the :term:`Initramfs` include kernel modules. Should that be
+         the case, the :term:`Initramfs` recipe depends on the kernel for the
+         kernel modules, and the kernel depends on the :term:`Initramfs` recipe
+         since the :term:`Initramfs` is bundled inside the kernel image.
 
       The combined binary is deposited into the ``tmp/deploy`` directory,
       which is part of the :term:`Build Directory`.
 
       Setting the variable to "1" in a configuration file causes the
       OpenEmbedded build system to generate a kernel image with the
-      initramfs specified in :term:`INITRAMFS_IMAGE` bundled within::
+      :term:`Initramfs` specified in :term:`INITRAMFS_IMAGE` bundled within::
 
          INITRAMFS_IMAGE_BUNDLE = "1"
 
@@ -3739,12 +3846,12 @@ system and gives an overview of their function and contents.
       See the
       :yocto_git:`local.conf.sample.extended </poky/tree/meta-poky/conf/templates/default/local.conf.sample.extended>`
       file for additional information. Also, for information on creating an
-      initramfs, see the ":ref:`dev-manual/common-tasks:building an initial ram filesystem (initramfs) image`" section
+      :term:`Initramfs`, see the ":ref:`dev-manual/common-tasks:building an initial ram filesystem (Initramfs) image`" section
       in the Yocto Project Development Tasks Manual.
 
    :term:`INITRAMFS_LINK_NAME`
       The link name of the initial RAM filesystem image. This variable is
-      set in the ``meta/classes/kernel-artifact-names.bbclass`` file as
+      set in the ``meta/classes-recipe/kernel-artifact-names.bbclass`` file as
       follows::
 
          INITRAMFS_LINK_NAME ?= "initramfs-${KERNEL_ARTIFACT_LINK_NAME}"
@@ -3764,13 +3871,13 @@ system and gives an overview of their function and contents.
       This allows the kernel to bundle an :term:`INITRAMFS_IMAGE` coming from
       a separate multiconfig, this is meant to be used in addition to :term:`INITRAMFS_DEPLOY_DIR_IMAGE`.
 
-      For more information on how to bundle an initramfs image from a separate
+      For more information on how to bundle an :term:`Initramfs` image from a separate
       multiconfig see the ":ref:`dev-manual/common-tasks:Bundling an Initramfs Image From a Separate Multiconfig`"
       section in the Yocto Project Development Tasks Manual.
 
    :term:`INITRAMFS_NAME`
       The base name of the initial RAM filesystem image. This variable is
-      set in the ``meta/classes/kernel-artifact-names.bbclass`` file as
+      set in the ``meta/classes-recipe/kernel-artifact-names.bbclass`` file as
       follows::
 
          INITRAMFS_NAME ?= "initramfs-${KERNEL_ARTIFACT_NAME}"
@@ -3980,7 +4087,7 @@ system and gives an overview of their function and contents.
       variable.
 
       The value of :term:`KERNEL_ARTIFACT_NAME`, which is set in the
-      ``meta/classes/kernel-artifact-names.bbclass`` file, has the
+      ``meta/classes-recipe/kernel-artifact-names.bbclass`` file, has the
       following default value::
 
          KERNEL_ARTIFACT_NAME ?= "${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
@@ -3993,7 +4100,7 @@ system and gives an overview of their function and contents.
       :ref:`kernel <ref-classes-kernel>` class should inherit. You
       typically append this variable to enable extended image types. An
       example is the "kernel-fitimage", which enables fitImage support and
-      resides in ``meta/classes/kernel-fitimage.bbclass``. You can register
+      resides in ``meta/classes-recipe/kernel-fitimage.bbclass``. You can register
       custom kernel image types with the :ref:`kernel <ref-classes-kernel>` class using this
       variable.
 
@@ -4001,6 +4108,12 @@ system and gives an overview of their function and contents.
       If set to "1", enables timestamping functionality during building
       the kernel. The default is "0" to disable this for reproducibility
       reasons.
+
+   :term:`KERNEL_DEPLOY_DEPEND`
+      Provides a means of controlling the dependency of an image recipe
+      on the kernel. The default value is "virtual/kernel:do_deploy",
+      however for a small initramfs image or other images that do not
+      need the kernel, this can be set to "" in the image recipe.
 
    :term:`KERNEL_DEVICETREE`
       Specifies the name of the generated Linux kernel device tree (i.e.
@@ -4017,7 +4130,7 @@ system and gives an overview of their function and contents.
 
    :term:`KERNEL_DTB_LINK_NAME`
       The link name of the kernel device tree binary (DTB). This variable
-      is set in the ``meta/classes/kernel-artifact-names.bbclass`` file as
+      is set in the ``meta/classes-recipe/kernel-artifact-names.bbclass`` file as
       follows::
 
          KERNEL_DTB_LINK_NAME ?= "${KERNEL_ARTIFACT_LINK_NAME}"
@@ -4033,7 +4146,7 @@ system and gives an overview of their function and contents.
 
    :term:`KERNEL_DTB_NAME`
       The base name of the kernel device tree binary (DTB). This variable
-      is set in the ``meta/classes/kernel-artifact-names.bbclass`` file as
+      is set in the ``meta/classes-recipe/kernel-artifact-names.bbclass`` file as
       follows::
 
          KERNEL_DTB_NAME ?= "${KERNEL_ARTIFACT_NAME}"
@@ -4084,7 +4197,7 @@ system and gives an overview of their function and contents.
 
    :term:`KERNEL_FIT_LINK_NAME`
       The link name of the kernel flattened image tree (FIT) image. This
-      variable is set in the ``meta/classes/kernel-artifact-names.bbclass``
+      variable is set in the ``meta/classes-recipe/kernel-artifact-names.bbclass``
       file as follows::
 
          KERNEL_FIT_LINK_NAME ?= "${KERNEL_ARTIFACT_LINK_NAME}"
@@ -4100,7 +4213,7 @@ system and gives an overview of their function and contents.
 
    :term:`KERNEL_FIT_NAME`
       The base name of the kernel flattened image tree (FIT) image. This
-      variable is set in the ``meta/classes/kernel-artifact-names.bbclass``
+      variable is set in the ``meta/classes-recipe/kernel-artifact-names.bbclass``
       file as follows::
 
          KERNEL_FIT_NAME ?= "${KERNEL_ARTIFACT_NAME}"
@@ -4112,7 +4225,7 @@ system and gives an overview of their function and contents.
 
    :term:`KERNEL_IMAGE_LINK_NAME`
       The link name for the kernel image. This variable is set in the
-      ``meta/classes/kernel-artifact-names.bbclass`` file as follows::
+      ``meta/classes-recipe/kernel-artifact-names.bbclass`` file as follows::
 
          KERNEL_IMAGE_LINK_NAME ?= "${KERNEL_ARTIFACT_LINK_NAME}"
 
@@ -4140,7 +4253,7 @@ system and gives an overview of their function and contents.
 
    :term:`KERNEL_IMAGE_NAME`
       The base name of the kernel image. This variable is set in the
-      ``meta/classes/kernel-artifact-names.bbclass`` file as follows::
+      ``meta/classes-recipe/kernel-artifact-names.bbclass`` file as follows::
 
          KERNEL_IMAGE_NAME ?= "${KERNEL_ARTIFACT_NAME}"
 
@@ -4240,7 +4353,7 @@ system and gives an overview of their function and contents.
       :term:`KERNELDEPMODDEPEND` does not control whether or not that data
       exists, but simply whether or not it is used. If you do not need to
       use the data, set the :term:`KERNELDEPMODDEPEND` variable in your
-      ``initramfs`` recipe. Setting the variable there when the data is not
+      :term:`Initramfs` recipe. Setting the variable there when the data is not
       needed avoids a potential dependency loop.
 
    :term:`KFEATURE_DESCRIPTION`
@@ -4837,7 +4950,7 @@ system and gives an overview of their function and contents.
       See the :term:`KERNEL_MODULE_AUTOLOAD` variable for more information.
 
    :term:`module_conf`
-      Specifies `modprobe.d <https://linux.die.net/man/5/modprobe.d>`_
+      Specifies `modprobe.d <https://linux.die.net/man/5/modprobe.d>`__
       syntax lines for inclusion in the ``/etc/modprobe.d/modname.conf``
       file.
 
@@ -4875,7 +4988,7 @@ system and gives an overview of their function and contents.
 
    :term:`MODULE_TARBALL_LINK_NAME`
       The link name of the kernel module tarball. This variable is set in
-      the ``meta/classes/kernel-artifact-names.bbclass`` file as follows::
+      the ``meta/classes-recipe/kernel-artifact-names.bbclass`` file as follows::
 
          MODULE_TARBALL_LINK_NAME ?= "${KERNEL_ARTIFACT_LINK_NAME}"
 
@@ -4889,7 +5002,7 @@ system and gives an overview of their function and contents.
 
    :term:`MODULE_TARBALL_NAME`
       The base name of the kernel module tarball. This variable is set in
-      the ``meta/classes/kernel-artifact-names.bbclass`` file as follows::
+      the ``meta/classes-recipe/kernel-artifact-names.bbclass`` file as follows::
 
          MODULE_TARBALL_NAME ?= "${KERNEL_ARTIFACT_NAME}"
 
@@ -4897,6 +5010,11 @@ system and gives an overview of their function and contents.
       which is set in the same file, has the following value::
 
          KERNEL_ARTIFACT_NAME ?= "${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
+
+   :term:`MOUNT_BASE`
+      On non-systemd systems (where ``udev-extraconf`` is being used),
+      specifies the base directory for auto-mounting filesystems. The
+      default value is "/run/media".
 
    :term:`MULTIMACH_TARGET_SYS`
       Uniquely identifies the type of the target system for which packages
@@ -5019,7 +5137,7 @@ system and gives an overview of their function and contents.
       ``sysroots/`` directory so that all builds that use the script will
       use the correct directories for the cross compiling layout.
 
-      See the ``meta/classes/binconfig.bbclass`` in the
+      See the ``meta/classes-recipe/binconfig.bbclass`` in the
       :term:`Source Directory` for details on how this class
       applies these additional sed command arguments.
 
@@ -5075,6 +5193,87 @@ system and gives an overview of their function and contents.
       ``meta/conf/bitbake.conf`` configuration file. You can override this
       default by setting the variable in a custom distribution
       configuration file.
+
+   :term:`OVERLAYFS_ETC_DEVICE`
+      When the :ref:`overlayfs-etc <ref-classes-overlayfs-etc>` class is
+      inherited, specifies the device to be mounted for the read/write
+      layer of ``/etc``. There is no default, so you must set this if you
+      wish to enable :ref:`overlayfs-etc <ref-classes-overlayfs-etc>`, for
+      example, assuming ``/dev/mmcblk0p2`` was the desired device::
+
+         OVERLAYFS_ETC_DEVICE = "/dev/mmcblk0p2"
+
+   :term:`OVERLAYFS_ETC_EXPOSE_LOWER`
+      When the :ref:`overlayfs-etc <ref-classes-overlayfs-etc>` class is
+      inherited, if set to "1" then a read-only access to the original
+      ``/etc`` content will be provided as a ``lower/`` subdirectory of
+      :term:`OVERLAYFS_ETC_MOUNT_POINT`. The default value is "0".
+
+   :term:`OVERLAYFS_ETC_FSTYPE`
+      When the :ref:`overlayfs-etc <ref-classes-overlayfs-etc>` class is
+      inherited, specifies the file system type for the read/write
+      layer of ``/etc``. There is no default, so you must set this if you
+      wish to enable :ref:`overlayfs-etc <ref-classes-overlayfs-etc>`,
+      for example, assuming the file system is ext4::
+
+         OVERLAYFS_ETC_FSTYPE = "ext4"
+
+   :term:`OVERLAYFS_ETC_MOUNT_OPTIONS`
+      When the :ref:`overlayfs-etc <ref-classes-overlayfs-etc>` class is
+      inherited, specifies the mount options for the read-write layer.
+      The default value is "defaults".
+
+   :term:`OVERLAYFS_ETC_MOUNT_POINT`
+      When the :ref:`overlayfs-etc <ref-classes-overlayfs-etc>` class is
+      inherited, specifies the parent mount path for the filesystem layers.
+      There is no default, so you must set this if you wish to enable
+      :ref:`overlayfs-etc <ref-classes-overlayfs-etc>`, for example if
+      the desired path is "/data"::
+
+         OVERLAYFS_ETC_MOUNT_POINT = "/data"
+
+   :term:`OVERLAYFS_ETC_USE_ORIG_INIT_NAME`
+      When the :ref:`overlayfs-etc <ref-classes-overlayfs-etc>` class is
+      inherited, controls how the generated init will be named. For more
+      information, see the :ref:`overlayfs-etc <ref-classes-overlayfs-etc>`
+      class documentation. The default value is "1".
+
+   :term:`OVERLAYFS_MOUNT_POINT`
+      When inheriting the :ref:`overlayfs <ref-classes-overlayfs>` class,
+      specifies mount point(s) to be used. For example::
+
+         OVERLAYFS_MOUNT_POINT[data] = "/data"
+
+      The assumes you have a ``data.mount`` systemd unit defined elsewhere
+      in your BSP (e.g. in ``systemd-machine-units`` recipe) and it is
+      installed into the image. For more information see
+      :ref:`overlayfs <ref-classes-overlayfs>`.
+
+      .. note::
+
+         Although the :ref:`overlayfs <ref-classes-overlayfs>` class is
+         inherited by individual recipes, :term:`OVERLAYFS_MOUNT_POINT`
+         should be set in your machine configuration.
+
+   :term:`OVERLAYFS_QA_SKIP`
+      When inheriting the :ref:`overlayfs <ref-classes-overlayfs>` class,
+      provides the ability to disable QA checks for particular overlayfs
+      mounts. For example::
+
+         OVERLAYFS_QA_SKIP[data] = "mount-configured"
+
+      .. note::
+
+         Although the :ref:`overlayfs <ref-classes-overlayfs>` class is
+         inherited by individual recipes, :term:`OVERLAYFS_QA_SKIP`
+         should be set in your machine configuration.
+
+   :term:`OVERLAYFS_WRITABLE_PATHS`
+      When inheriting the :ref:`overlayfs <ref-classes-overlayfs>` class,
+      specifies writable paths used at runtime for the recipe. For
+      example::
+
+         OVERLAYFS_WRITABLE_PATHS[data] = "/usr/share/my-custom-application"
 
    :term:`OVERRIDES`
       A colon-separated list of overrides that currently apply. Overrides
@@ -5395,9 +5594,9 @@ system and gives an overview of their function and contents.
       :term:`IMAGE_INSTALL` variable to specify
       packages for installation. The exception to this is when working with
       the :ref:`core-image-minimal-initramfs <ref-manual/images:images>`
-      image. When working with an initial RAM filesystem (initramfs) image,
+      image. When working with an initial RAM filesystem (:term:`Initramfs`) image,
       use the :term:`PACKAGE_INSTALL` variable. For information on creating an
-      initramfs, see the ":ref:`dev-manual/common-tasks:building an initial ram filesystem (initramfs) image`" section
+      :term:`Initramfs`, see the ":ref:`dev-manual/common-tasks:building an initial ram filesystem (Initramfs) image`" section
       in the Yocto Project Development Tasks Manual.
 
    :term:`PACKAGE_INSTALL_ATTEMPTONLY`
@@ -5521,7 +5720,7 @@ system and gives an overview of their function and contents.
       :ref:`cmake <ref-classes-cmake>` use :term:`PACKAGECONFIG_CONFARGS` to
       pass :term:`PACKAGECONFIG` options to ``configure`` and ``cmake``,
       respectively. If you are using :term:`PACKAGECONFIG` but not a class that
-      handles the ``do_configure`` task, then you need to use
+      handles the :ref:`ref-tasks-configure` task, then you need to use
       :term:`PACKAGECONFIG_CONFARGS` appropriately.
 
    :term:`PACKAGEGROUP_DISABLE_COMPLEMENTARY`
@@ -5603,7 +5802,7 @@ system and gives an overview of their function and contents.
       .. note::
 
          If the software being built experiences dependency issues during
-         the ``do_compile`` task that result in race conditions, you can clear
+         the :ref:`ref-tasks-compile` task that result in race conditions, you can clear
          the :term:`PARALLEL_MAKE` variable within the recipe as a workaround. For
          information on addressing race conditions, see the
          ":ref:`dev-manual/common-tasks:debugging parallel make races`"
@@ -5633,7 +5832,7 @@ system and gives an overview of their function and contents.
          way to ensure this is to use the ``oe_runmake`` function.
 
          If the software being built experiences dependency issues during
-         the ``do_install`` task that result in race conditions, you can
+         the :ref:`ref-tasks-install` task that result in race conditions, you can
          clear the :term:`PARALLEL_MAKEINST` variable within the recipe as a
          workaround. For information on addressing race conditions, see the
          ":ref:`dev-manual/common-tasks:debugging parallel make races`"
@@ -6100,6 +6299,14 @@ system and gives an overview of their function and contents.
 
       :term:`PV` is the default value of the :term:`PKGV` variable.
 
+   :term:`PYPI_PACKAGE`
+      When inheriting the :ref:`pypi <ref-classes-pypi>` class, specifies the
+      `PyPI <https://pypi.org/>`__ package name to be built. The default value
+      is set based upon :term:`BPN` (stripping any "python-" or "python3-"
+      prefix off if present), however for some packages it will need to be set
+      explicitly if that will not match the package name (e.g. where the
+      package name has a prefix, underscores, uppercase letters etc.)
+
    :term:`PYTHON_ABI`
       When used by recipes that inherit the
       :ref:`setuptools3 <ref-classes-setuptools3>` class, denotes the
@@ -6200,7 +6407,7 @@ system and gives an overview of their function and contents.
       The practical effect of the above :term:`RDEPENDS` assignment is that
       ``bar`` and ``baz`` will be declared as dependencies inside the
       package ``foo`` when it is written out by one of the
-      :ref:`do_package_write_\* <ref-tasks-package_write_deb>` tasks.
+      :ref:`do_package_write_* <ref-tasks-package_write_deb>` tasks.
       Exactly how this is done depends on which package format is used,
       which is determined by
       :term:`PACKAGE_CLASSES`. When the
@@ -6212,7 +6419,7 @@ system and gives an overview of their function and contents.
       added. This dependency is from the recipe's
       :ref:`ref-tasks-build` (not to be confused with
       :ref:`ref-tasks-compile`) task to the
-      ``do_package_write_*`` task of the recipes that build ``bar`` and
+      :ref:`do_package_write_* <ref-tasks-package_write_deb>` task of the recipes that build ``bar`` and
       ``baz``.
 
       The names of the packages you list within :term:`RDEPENDS` must be the
@@ -6535,7 +6742,7 @@ system and gives an overview of their function and contents.
       to find the unpacked source.
 
       As an example, assume a :term:`Source Directory`
-      top-level folder named ``poky`` and a default Build Directory at
+      top-level folder named ``poky`` and a default :term:`Build Directory` at
       ``poky/build``. In this case, the work directory the build system
       uses to keep the unpacked recipe for ``db`` is the following::
 
@@ -6573,9 +6780,14 @@ system and gives an overview of their function and contents.
       The target architecture for the SDK. Typically, you do not directly
       set this variable. Instead, use :term:`SDKMACHINE`.
 
+   :term:`SDK_BUILDINFO_FILE`
+      When using the :ref:`image-buildinfo <ref-classes-image-buildinfo>` class,
+      specifies the file in the SDK to write the build information into. The
+      default value is "``/buildinfo``".
+
    :term:`SDK_CUSTOM_TEMPLATECONF`
       When building the extensible SDK, if :term:`SDK_CUSTOM_TEMPLATECONF` is set to
-      "1" and a ``conf/templateconf.cfg`` file exists in the build directory
+      "1" and a ``conf/templateconf.cfg`` file exists in the :term:`Build Directory`
       (:term:`TOPDIR`) then this will be copied into the SDK.
 
    :term:`SDK_DEPLOY`
@@ -6709,10 +6921,10 @@ system and gives an overview of their function and contents.
       A list of shared state tasks added to the extensible SDK. By default,
       the following tasks are added:
 
-      - do_populate_lic
-      - do_package_qa
-      - do_populate_sysroot
-      - do_deploy
+      - :ref:`ref-tasks-populate_lic`
+      - :ref:`ref-tasks-package_qa`
+      - :ref:`ref-tasks-populate_sysroot`
+      - :ref:`ref-tasks-deploy`
 
       Despite the default value of "" for the
       :term:`SDK_RECRDEP_TASKS` variable, the above four tasks are always added
@@ -6771,6 +6983,10 @@ system and gives an overview of their function and contents.
       ":ref:`sdk-manual/appendix-customizing:changing the extensible sdk installer title`"
       section in the Yocto Project Application Development and the
       Extensible Software Development Kit (eSDK) manual.
+
+   :term:`SDK_TOOLCHAIN_LANGS`
+      Specifies programming languages to support in the SDK, as a
+      space-separated list. Currently supported items are ``rust`` and ``go``.
 
    :term:`SDK_UPDATE_URL`
       An optional URL for an update server for the extensible SDK. If set,
@@ -6974,8 +7190,7 @@ system and gives an overview of their function and contents.
 
       To enable file removal, set the variable to "1" in your
       ``conf/local.conf`` configuration file in your:
-      :term:`Build Directory`.
-      ::
+      :term:`Build Directory`::
 
          SKIP_FILEDEPS = "1"
 
@@ -7382,7 +7597,7 @@ system and gives an overview of their function and contents.
       For most recipes, this sysroot is the one in which that recipe's
       :ref:`ref-tasks-populate_sysroot` task copies
       files. Exceptions include ``-native`` recipes, where the
-      ``do_populate_sysroot`` task instead uses
+      :ref:`ref-tasks-populate_sysroot` task instead uses
       :term:`STAGING_DIR_NATIVE`. Depending on
       the type of recipe and the build target, :term:`STAGING_DIR_HOST` can
       have the following values:
@@ -7687,9 +7902,8 @@ system and gives an overview of their function and contents.
       <https://www.freedesktop.org/software/systemd/man/systemd.special.html>`__
       for details.
 
-      For example, this variable is used in the
-      `core-image-minimal-xfce.bb
-      <https://git.openembedded.org/meta-openembedded/tree/meta-xfce/recipes-core/images/core-image-minimal-xfce.bb>`__
+      For example, this variable is used in the :oe_git:`core-image-minimal-xfce.bb
+      </meta-openembedded/tree/meta-xfce/recipes-core/images/core-image-minimal-xfce.bb>`
       recipe::
 
           SYSTEMD_DEFAULT_TARGET = "graphical.target"
@@ -7906,12 +8120,11 @@ system and gives an overview of their function and contents.
       You can select "glibc", "musl", "newlib", or "baremetal".
 
    :term:`TCLIBCAPPEND`
-      Specifies a suffix to be appended onto the
-      :term:`TMPDIR` value. The suffix identifies the
-      ``libc`` variant for building. When you are building for multiple
-      variants with the same :term:`Build Directory`, this
-      mechanism ensures that output for different ``libc`` variants is kept
-      separate to avoid potential conflicts.
+      Specifies a suffix to be appended onto the :term:`TMPDIR` value. The
+      suffix identifies the ``libc`` variant for building. When you are
+      building for multiple variants with the same :term:`Build Directory`,
+      this mechanism ensures that output for different ``libc`` variants is
+      kept separate to avoid potential conflicts.
 
       In the ``defaultsetup.conf`` file, the default value of
       :term:`TCLIBCAPPEND` is "-${TCLIBC}". However, distros such as poky,
@@ -8175,7 +8388,7 @@ system and gives an overview of their function and contents.
       on enabling, running, and writing these tests, see the
       ":ref:`dev-manual/common-tasks:performing automated runtime testing`"
       section in the Yocto Project Development Tasks Manual and the
-      ":ref:`ref-classes-testimage*`" section.
+      ":ref:`ref-classes-testimage`" section.
 
    :term:`THISDIR`
       The directory in which the file BitBake is currently parsing is
@@ -8199,7 +8412,7 @@ system and gives an overview of their function and contents.
          #TMPDIR = "${TOPDIR}/tmp"
 
       An example use for this scenario is to set :term:`TMPDIR` to a local disk,
-      which does not use NFS, while having the Build Directory use NFS.
+      which does not use NFS, while having the :term:`Build Directory` use NFS.
 
       The filesystem used by :term:`TMPDIR` must have standard filesystem
       semantics (i.e. mixed-case files are unique, POSIX file locking, and
@@ -8487,6 +8700,10 @@ system and gives an overview of their function and contents.
       If :term:`UBOOT_MKIMAGE_DTCOPTS` is not set then kernel-fitimage will not
       pass the ``-D`` option to mkimage.
 
+   :term:`UBOOT_MKIMAGE_KERNEL_TYPE`
+      Specifies the type argument for the kernel as passed to ``uboot-mkimage``.
+      The default value is "kernel".
+
    :term:`UBOOT_MKIMAGE_SIGN`
       Specifies the name of the mkimage command as used by the
       :ref:`kernel-fitimage <ref-classes-kernel-fitimage>` class to sign
@@ -8654,6 +8871,9 @@ system and gives an overview of their function and contents.
       A list of classes to globally inherit. These classes are used by the
       OpenEmbedded build system to enable extra features.
 
+      Classes inherited using :term:`USER_CLASSES` must be located in the
+      ``classes-global/`` or ``classes/`` subdirectories.
+
       The default list is set in your ``local.conf`` file::
 
          USER_CLASSES ?= "buildstats"
@@ -8802,6 +9022,15 @@ system and gives an overview of their function and contents.
       can control with this variable, see the
       ":ref:`ref-classes-insane`" section.
 
+   :term:`WATCHDOG_TIMEOUT`
+      Specifies the timeout in seconds used by the ``watchdog`` recipe and
+      also by ``systemd`` during reboot. The default is 60 seconds.
+
+   :term:`WIRELESS_DAEMON`
+      For ``connman`` and ``packagegroup-base``, specifies the wireless
+      daemon to use. The default is "wpa-supplicant" (note that the value
+      uses a dash and not an underscore).
+
    :term:`WKS_FILE`
       Specifies the location of the Wic kickstart file that is used by the
       OpenEmbedded build system to create a partitioned image
@@ -8869,7 +9098,7 @@ system and gives an overview of their function and contents.
       -  :term:`PR`: The recipe revision
 
       As an example, assume a Source Directory top-level folder name
-      ``poky``, a default Build Directory at ``poky/build``, and a
+      ``poky``, a default :term:`Build Directory` at ``poky/build``, and a
       ``qemux86-poky-linux`` machine target system. Furthermore, suppose
       your recipe is named ``foo_1.3.0-r0.bb``. In this case, the work
       directory the build system uses to build the package would be as

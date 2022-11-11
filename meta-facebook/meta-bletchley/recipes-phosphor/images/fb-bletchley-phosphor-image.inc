@@ -12,4 +12,6 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-ipmi-ipmb \
     fb-ipmi-oem \
     board-type-checker \
+    obmc-phosphor-buttons-signals \
+    obmc-phosphor-buttons-handler \
 "

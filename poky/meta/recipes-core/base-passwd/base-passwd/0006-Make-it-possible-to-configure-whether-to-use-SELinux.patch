@@ -1,0 +1,35 @@
+From 25e3bf09bbbb04aa930ea0fd9f28809a24fb7194 Mon Sep 17 00:00:00 2001
+From: Peter Kjellerstedt <pkj@axis.com>
+Date: Sun, 2 Oct 2022 17:47:29 +0200
+Subject: [PATCH] Make it possible to configure whether to use SELinux or not
+
+Upstream-Status: Backport [https://salsa.debian.org/debian/base-passwd/-/commit/396c41bb35e03c5dcc727aa9f74218a45874ac1f]
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ configure.ac | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 589df88..e46403b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -13,7 +13,18 @@ AC_SYS_LARGEFILE
+ 
+ dnl Scan for things we need
+ AC_CHECK_FUNCS([putgrent])
+-AC_CHECK_LIB([selinux], [is_selinux_enabled])
++
++dnl Check for SELinux
++AC_MSG_CHECKING([whether to enable SELinux support])
++AC_ARG_ENABLE([selinux],
++  [AS_HELP_STRING([--disable-selinux], [disable support for SELinux])],
++  [],
++  [enable_selinux=yes])
++AC_MSG_RESULT($enable_selinux)
++AS_IF([test "x$enable_selinux" != xno],
++  [AC_CHECK_LIB([selinux], [is_selinux_enabled], [],
++    [AC_MSG_ERROR(
++      [SELinux support not available (use --disable-selinux to disable)])])])
+ 
+ dnl Check for debconf
+ AC_MSG_CHECKING([whether to enable debconf support])

@@ -1,8 +1,3 @@
-RDEPENDS:${PN}-extras:remove = " \
-       phosphor-rest \
-       phosphor-gevent \
-       "
-
 #Add python utility.(e.g gpioutil,...)
 RDEPENDS:${PN}-extrasdevtools:append = " ipmitool"
 RDEPENDS:${PN}-extrasdevtools:append = " openssh-sftp-server"

@@ -234,7 +234,7 @@ Packaging changes
 Additional warnings
 -------------------
 
-Warnings will now be shown at ``do_package_qa`` time in the following
+Warnings will now be shown at :ref:`ref-tasks-package_qa` time in the following
 circumstances:
 
 -  A recipe installs ``.desktop`` files containing ``MimeType`` keys but

@@ -1,4 +1,4 @@
-PACKAGECONFIG:append:s6q = " sync-mac nic-ethtool"
+PACKAGECONFIG:append:s6q = " sync-mac"
 
 FILES:${PN}:append:s6q = " ${datadir}/network/config.json"
 

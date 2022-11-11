@@ -33,6 +33,7 @@ SRC_URI:class-native = "${BASE_SRC_URI}"
 # https://core.tcl-lang.org/tcl/info/7079e4f91601e9c7
 CVE_CHECK_IGNORE += "CVE-2021-35331"
 
+UPSTREAM_CHECK_URI = "https://www.tcl.tk/software/tcltk/download.html"
 UPSTREAM_CHECK_REGEX = "tcl(?P<pver>\d+(\.\d+)+)-src"
 
 S = "${WORKDIR}/${BPN}${PV}"

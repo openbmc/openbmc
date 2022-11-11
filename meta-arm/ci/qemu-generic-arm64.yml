@@ -10,5 +10,5 @@ local_conf_header:
 machine: qemu-generic-arm64
 
 target:
-  - core-image-base
+  - core-image-sato
   - sbsa-acs

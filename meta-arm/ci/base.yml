@@ -5,7 +5,7 @@ distro: poky
 
 defaults:
   repos:
-    refspec: master
+    refspec: langdale
 
 repos:
   meta-arm:
@@ -26,10 +26,7 @@ env:
 
 local_conf_header:
   base: |
-    BB_SERVER_TIMEOUT = "60"
     CONF_VERSION = "2"
-    BB_NUMBER_THREADS = "16"
-    PARALLEL_MAKE = "-j16"
     LICENSE_FLAGS_ACCEPTED += "Arm-FVP-EULA"
   setup: |
     PACKAGE_CLASSES = "package_ipk"
@@ -38,8 +35,9 @@ local_conf_header:
     PACKAGECONFIG:append:pn-perf = " coresight"
     INHERIT += "rm_work"
     DISTRO_FEATURES:remove = "ptest"
-  perf: |
-    CORE_IMAGE_EXTRA_INSTALL += "perf"
+  extrapackages: |
+    CORE_IMAGE_EXTRA_INSTALL += "perf opencsd"
+    CORE_IMAGE_EXTRA_INSTALL:append:aarch64 = " gator-daemon"
 
 machine: unset
 

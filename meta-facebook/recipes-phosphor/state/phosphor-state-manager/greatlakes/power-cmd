@@ -1,0 +1,19 @@
+#!/bin/bash
+
+export POWER_BTN_HIGH=0xFF
+export POWER_BTN_LOW=0xFE
+export power_seq=( "$POWER_BTN_HIGH" "$POWER_BTN_LOW" "$POWER_BTN_HIGH" )
+export SERVICE="xyz.openbmc_project.Ipmi.Channel.Ipmb"
+export OBJECT_PATH="/xyz/openbmc_project/Ipmi/Channel/Ipmb"
+export INTERFACE="org.openbmc.Ipmb"
+export DATA_LEN=0x05
+export NETFN=0x06
+export LUN=0x00
+export CMD=0x52
+export STATE_OFF=0
+export STATE_ON=1
+export BUS_NUM=12
+export POW_ON_SLOT=0x01
+export POW_OFF_SLOT=0x00
+export CPLD_PWR_CTRL_ADDR=0xf
+export PWRGD_SYS_PWROK_INDEX=12

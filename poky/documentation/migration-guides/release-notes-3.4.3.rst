@@ -124,7 +124,7 @@ Contributors to 3.4.3
 -  Tean Cunningham
 -  Zoltán Böszörményi
 -  pgowda
--  wangmy
+-  Wang Mingyu
 
 Repositories / Downloads for 3.4.3
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

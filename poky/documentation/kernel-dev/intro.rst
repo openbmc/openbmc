@@ -134,7 +134,7 @@ general information and references for further information.
 3. *Make Changes to the Kernel Source Code if applicable:* Modifying the
    kernel does not always mean directly changing source files. However,
    if you have to do this, you make the changes to the files in the
-   Yocto's Build Directory if you are using ``devtool``. For more
+   Yocto's :term:`Build Directory` if you are using ``devtool``. For more
    information, see the
    ":ref:`kernel-dev/common:using \`\`devtool\`\` to patch the kernel`"
    section.
@@ -155,7 +155,7 @@ general information and references for further information.
    .. note::
 
       Try to resist the temptation to directly edit an existing ``.config``
-      file, which is found in the Build Directory among the source code
+      file, which is found in the :term:`Build Directory` among the source code
       used for the build. Doing so, can produce unexpected results when
       the OpenEmbedded build system regenerates the configuration file.
 

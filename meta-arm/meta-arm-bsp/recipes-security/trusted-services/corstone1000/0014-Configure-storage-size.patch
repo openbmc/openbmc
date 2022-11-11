@@ -1,0 +1,42 @@
+From a71b26f867f1b4a08285d6da82528de6a54321f2 Mon Sep 17 00:00:00 2001
+From: Gowtham Suresh Kumar <gowtham.sureshkumar@arm.com>
+Date: Thu, 16 Dec 2021 21:31:40 +0000
+Subject: [PATCH 14/19] Configure storage size
+
+Upstream-Status: Pending
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+---
+ .../service/smm_variable/backend/uefi_variable_store.c       | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/components/service/smm_variable/backend/uefi_variable_store.c b/components/service/smm_variable/backend/uefi_variable_store.c
+index 715ccc3cb546..aeb8a22062b7 100644
+--- a/components/service/smm_variable/backend/uefi_variable_store.c
++++ b/components/service/smm_variable/backend/uefi_variable_store.c
+@@ -88,6 +88,7 @@ static efi_status_t check_name_terminator(
+  * may be overridden using uefi_variable_store_set_storage_limits()
+  */
+ #define DEFAULT_MAX_VARIABLE_SIZE			(2048)
++#define CONFIGURE_STORAGE_SIZE			    (50)
+ 
+ efi_status_t uefi_variable_store_init(
+ 	struct uefi_variable_store *context,
+@@ -101,13 +102,13 @@ efi_status_t uefi_variable_store_init(
+ 	/* Initialise persistent store defaults */
+ 	context->persistent_store.is_nv = true;
+ 	context->persistent_store.max_variable_size = DEFAULT_MAX_VARIABLE_SIZE;
+-	context->persistent_store.total_capacity = DEFAULT_MAX_VARIABLE_SIZE * max_variables;
++	context->persistent_store.total_capacity = CONFIGURE_STORAGE_SIZE * max_variables;
+ 	context->persistent_store.storage_backend = persistent_store;
+ 
+ 	/* Initialise volatile store defaults */
+ 	context->volatile_store.is_nv = false;
+ 	context->volatile_store.max_variable_size = DEFAULT_MAX_VARIABLE_SIZE;
+-	context->volatile_store.total_capacity = DEFAULT_MAX_VARIABLE_SIZE * max_variables;
++	context->volatile_store.total_capacity = CONFIGURE_STORAGE_SIZE * max_variables;
+ 	context->volatile_store.storage_backend = volatile_store;
+ 
+ 	context->owner_id = owner_id;
+-- 
+2.38.0
+

@@ -64,14 +64,14 @@ binary artefact cache over the network for developers with underpowered laptops.
 Setting up the Extensible SDK environment directly in a Yocto build
 -------------------------------------------------------------------
 
-1. Set up all the needed layers and a Yocto build directory, e.g. a regular Yocto
+1. Set up all the needed layers and a Yocto :term:`Build Directory`, e.g. a regular Yocto
    build where ``bitbake`` can be executed.
 
 2. Run:
     $ bitbake meta-ide-support
     $ bitbake -c populate_sysroot gtk+3
     (or any other target or native item that the application developer would need)
-    $ bitbake populate-sysroots
+    $ bitbake build-sysroots
 
 
 Setting up the Extensible SDK from a standalone installer
@@ -175,7 +175,7 @@ Once you have the SDK installed, you must run the SDK environment setup
 script before you can actually use the SDK.
 
 When using a SDK directly in a Yocto build, you will find the script in
-``tmp/deploy/images/qemux86-64/`` in your build directory.
+``tmp/deploy/images/qemux86-64/`` in your :term:`Build Directory`.
 
 When using a standalone SDK installer, this setup script resides in
 the directory you chose when you installed the SDK, which is either the
@@ -1112,7 +1112,7 @@ links created within the source tree:
       ``${``\ :term:`D`\ ``}``.
 
    -  ``sysroot-destdir/``: Contains a subset of files installed within
-      ``do_install`` that have been put into the shared sysroot. For
+      :ref:`ref-tasks-install` that have been put into the shared sysroot. For
       more information, see the
       ":ref:`dev-manual/common-tasks:sharing files between recipes`" section.
 
@@ -1274,7 +1274,7 @@ is directly accessible to build additional items, and it
 can simply be executed directly:
 
    $ bitbake mesa
-   $ bitbake populate-sysroots
+   $ bitbake build-sysroots
 
 When using a standalone installer for the Extensible SDK
 --------------------------------------------------------

@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit obmc-phosphor-systemd
 
-RDEPENDS:${PN} += "virtual/obmc-gpio-monitor"
+RDEPENDS:${PN} += "phosphor-gpio-monitor-monitor"
 
 SYNC_SERVICE = "power-supply-sync.service"
 TGTFMT = "obmc-chassis-poweron@0.target"

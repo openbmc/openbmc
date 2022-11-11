@@ -1,0 +1,37 @@
+From 07ad7e1f7ba06045bf331d5b73a6adf38a098fb7 Mon Sep 17 00:00:00 2001
+From: Rui Miguel Silva <rui.silva@linaro.org>
+Date: Tue, 11 Oct 2022 10:46:10 +0100
+Subject: [PATCH 19/19] plat: corstone1000: change default smm values
+
+Smm gateway uses SE proxy to route the calls for any NV
+storage so set the NV_STORE_SN.
+Change the storage index uid because TF-M in the secure
+enclave reserves the default value (0x1) to some internal
+operation.
+Increase the maximum number of uefi variables to cope with all
+the needs for testing and certification
+
+Upstream-Status: Pending
+Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+---
+ platform/providers/arm/corstone1000/platform.cmake | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/platform/providers/arm/corstone1000/platform.cmake b/platform/providers/arm/corstone1000/platform.cmake
+index 51e5faa3e4d8..04b629a81906 100644
+--- a/platform/providers/arm/corstone1000/platform.cmake
++++ b/platform/providers/arm/corstone1000/platform.cmake
+@@ -10,3 +10,9 @@
+ include(${TS_ROOT}/platform/drivers/arm/mhu_driver/component.cmake)
+ 
+ add_compile_definitions(MBEDTLS_ECP_DP_SECP521R1_ENABLED)
++
++target_compile_definitions(${TGT} PRIVATE
++	SMM_GATEWAY_NV_STORE_SN="sn:ffa:46bb39d1-b4d9-45b5-88ff-040027dab249:1"
++	SMM_VARIABLE_INDEX_STORAGE_UID=0x787
++	SMM_GATEWAY_MAX_UEFI_VARIABLES=100
++)
+-- 
+2.38.0
+

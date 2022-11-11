@@ -1,4 +1,3 @@
-
 FAN_INSTANCES="0 1 2 3"
 FAN_INSTFMT="obmc-led-group-start@.service:obmc-led-group-start@fan{0}_good.service"
 SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'FAN_INSTFMT', 'FAN_INSTANCES')}"

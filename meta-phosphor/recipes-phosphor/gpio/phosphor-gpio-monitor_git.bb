@@ -12,8 +12,6 @@ DEPENDS += "boost"
 DEPENDS += "libgpiod"
 DEPENDS += "cli11"
 DEPENDS += "nlohmann-json"
-PROVIDES += "virtual/obmc-gpio-monitor"
-PROVIDES += "virtual/obmc-gpio-presence"
 SRCREV = "629f3e3cd414294ee73bb3946e336f485fe8b504"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
@@ -30,9 +28,6 @@ inherit meson pkgconfig
 inherit obmc-phosphor-dbus-service
 
 EXTRA_OEMESON:append = " -Dtests=disabled"
-
-RPROVIDES:${PN}-monitor += "virtual/obmc-gpio-monitor"
-RPROVIDES:${PN}-presence += "virtual/obmc-gpio-presence"
 
 FILES:${PN}-monitor += "${bindir}/phosphor-gpio-monitor"
 FILES:${PN}-monitor += "${bindir}/phosphor-multi-gpio-monitor"

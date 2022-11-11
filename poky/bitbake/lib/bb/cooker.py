@@ -250,7 +250,7 @@ class BBCooker:
     def process_inotify_updates(self):
         for n in [self.confignotifier, self.notifier]:
             if n and n.check_events(timeout=0):
-                # read notified events and enqeue them
+                # read notified events and enqueue them
                 n.read_events()
                 n.process_events()
 

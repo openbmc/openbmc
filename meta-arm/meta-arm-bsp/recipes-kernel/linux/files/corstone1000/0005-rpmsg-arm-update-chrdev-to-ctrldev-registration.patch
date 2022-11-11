@@ -1,0 +1,33 @@
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Rui Miguel Silva <rui.silva@arm.com>
+
+From 20cd41fee8e4638eb47072b91d9a9f985730583b Mon Sep 17 00:00:00 2001
+From: Rui Miguel Silva <rui.silva@linaro.org>
+Date: Tue, 27 Sep 2022 10:07:21 +0100
+Subject: [PATCH 2/2] rpmsg: arm: update chrdev to ctrldev registration
+
+Since "rpmsg: Update rpmsg_chrdev_register_device function",
+there was a replacement of the chrdev driver to ctrldev
+driver. Fix the registration.
+
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+---
+ drivers/rpmsg/rpmsg_arm_mailbox.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/rpmsg/rpmsg_arm_mailbox.c b/drivers/rpmsg/rpmsg_arm_mailbox.c
+index 5c0dcc8e353d..90bc8df90885 100644
+--- a/drivers/rpmsg/rpmsg_arm_mailbox.c
++++ b/drivers/rpmsg/rpmsg_arm_mailbox.c
+@@ -142,7 +142,7 @@ static int client_probe(struct platform_device *pdev)
+ 	rpdev->dev.parent = dev;
+ 	rpdev->dev.release = arm_release_device;
+ 
+-	return rpmsg_chrdev_register_device(rpdev);
++	return rpmsg_ctrldev_register_device(rpdev);
+ }
+ 
+ static const struct of_device_id client_of_match[] = {
+-- 
+2.37.3
+

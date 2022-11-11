@@ -1,0 +1,9 @@
+#! /bin/sh
+
+for TEST in *.b; do
+	if bc -l $TEST </dev/null; then
+		echo “PASS: bc/$TEST”
+	else
+		echo “FAIL: bc/$TEST”
+	fi
+done

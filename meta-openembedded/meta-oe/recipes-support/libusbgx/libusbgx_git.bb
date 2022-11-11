@@ -23,13 +23,13 @@ PACKAGECONFIG[examples] = "--enable-examples,--disable-examples"
 PACKAGECONFIG[gadget-schemes] = "--enable-gadget-schemes,--disable-gadget-schemes"
 PACKAGECONFIG[tests] = "--enable-tests,--disable-tests,cmocka"
 
-PACKAGE_BEFORE_PN = "${PN}-examples"
+PACKAGE_BEFORE_PN = "${@bb.utils.contains('PACKAGECONFIG', 'examples', '${PN}-examples', '', d)}"
 
 SYSTEMD_PACKAGES = "${PN}-examples"
 SYSTEMD_SERVICE:${PN}-examples = "usbgx.service"
 SYSTEMD_AUTO_ENABLE:${PN}-examples = "${@bb.utils.contains('PACKAGECONFIG', 'examples', 'enable', 'disable', d)}"
 
-INITSCRIPT_PACKAGES = "${PN}-examples"
+INITSCRIPT_PACKAGES = "${@bb.utils.contains('PACKAGECONFIG', 'examples', '${PN}-examples', '', d)}"
 INITSCRIPT_NAME = "usbgx"
 INITSCRIPT_PARAMS = "defaults"
 INHIBIT_UPDATERCD_BBCLASS = "${@bb.utils.contains('PACKAGECONFIG', 'examples', '1', '0', d)}"

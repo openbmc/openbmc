@@ -1,0 +1,147 @@
+From f6ffd3bf7b561d603b350dc0274121886193fef0 Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Wed, 16 Mar 2022 11:14:09 +0000
+Subject: [PATCH 36/40] ANDROID: trusty: Make trusty transports configurable
+
+With TRUSTY_SMC_TRANSPORT set to 'y', SMC based message passing and
+memory sharing support will be compiled in to trusty core.
+
+With TRUSTY_FFA_TRANSPORT set to 'y', FFA based message passing and
+memory sharing support will be compiled in to trusty core. This
+depends on ARM FF-A driver (ARM_FFA_TRANSPORT).
+
+Enabling any of the transport sets config TRUSTY_HAVE_TRANSPORT to 'y'.
+Not enabling any of the transport causes the build to break.
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Change-Id: Ib5bbf0d39202e6897700264d14371ae33101c1d1
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com
+---
+ drivers/trusty/Kconfig          | 30 ++++++++++++++++++++++++++++++
+ drivers/trusty/Makefile         | 26 +++++++++++++++-----------
+ drivers/trusty/trusty-private.h |  4 ++++
+ drivers/trusty/trusty.c         |  7 +++++++
+ 4 files changed, 56 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/trusty/Kconfig b/drivers/trusty/Kconfig
+index fcde7f097acf..260022e4595b 100644
+--- a/drivers/trusty/Kconfig
++++ b/drivers/trusty/Kconfig
+@@ -21,6 +21,36 @@ config TRUSTY
+ 
+ if TRUSTY
+ 
++config TRUSTY_HAVE_TRANSPORT
++	bool
++	help
++	  If any of the Trusty transport is enabled then it sets this config
++	  option. This variable is used to break the build when none of the
++	  Trusty transports are enabled.
++
++config TRUSTY_SMC_TRANSPORT
++	bool "Trusty transport based on SMC"
++	select TRUSTY_HAVE_TRANSPORT
++	default n
++	help
++	  Enable SMC based transport for Trusty. This transport is required for
++	  Trusty API version <= TRUSTY_API_VERSION_MEM_OBJ.
++
++	  If you want to use legacy SMC based transport for sending Trusty
++	  messages to secure world, answer Y.
++
++config TRUSTY_FFA_TRANSPORT
++	bool "Trusty transport based on FFA"
++	select TRUSTY_HAVE_TRANSPORT
++	depends on ARM_FFA_TRANSPORT
++	default y
++	help
++	  Enable ARM FF-A based transport for Trusty. This transport is required
++	  for Trusty API version >= TRUSTY_API_VERSION_MEM_OBJ.
++
++	  If you want to use ARM FF-A based transport for sending Trusty messages
++	  to secure world, answer Y.
++
+ config TRUSTY_IRQ
+ 	tristate "Trusty IRQ support"
+ 	default y
+diff --git a/drivers/trusty/Makefile b/drivers/trusty/Makefile
+index 797d61bf68ef..104a4d0ed35c 100644
+--- a/drivers/trusty/Makefile
++++ b/drivers/trusty/Makefile
+@@ -3,14 +3,18 @@
+ # Makefile for trusty components
+ #
+ 
+-obj-$(CONFIG_TRUSTY)		+= trusty-core.o
+-trusty-core-objs		+= trusty.o trusty-mem.o
+-trusty-core-objs		+= trusty-smc.o
+-trusty-core-objs		+= trusty-ffa.o
+-trusty-core-$(CONFIG_ARM)	+= trusty-smc-arm.o
+-trusty-core-$(CONFIG_ARM64)	+= trusty-smc-arm64.o
+-obj-$(CONFIG_TRUSTY_IRQ)	+= trusty-irq.o
+-obj-$(CONFIG_TRUSTY_LOG)	+= trusty-log.o
+-obj-$(CONFIG_TRUSTY_TEST)	+= trusty-test.o
+-obj-$(CONFIG_TRUSTY_VIRTIO)	+= trusty-virtio.o
+-obj-$(CONFIG_TRUSTY_VIRTIO_IPC)	+= trusty-ipc.o
++obj-$(CONFIG_TRUSTY)				+= trusty-core.o
++trusty-core-objs				+= trusty.o
++trusty-arm-smc-$(CONFIG_ARM)			+= trusty-smc-arm.o
++trusty-arm-smc64-$(CONFIG_ARM64)		+= trusty-smc-arm64.o
++trusty-transport-$(CONFIG_TRUSTY_SMC_TRANSPORT) += trusty-smc.o
++trusty-transport-$(CONFIG_TRUSTY_SMC_TRANSPORT) += trusty-mem.o
++trusty-transport-$(CONFIG_TRUSTY_SMC_TRANSPORT) += $(trusty-arm-smc-y)
++trusty-transport-$(CONFIG_TRUSTY_SMC_TRANSPORT) += $(trusty-arm-smc64-y)
++trusty-transport-$(CONFIG_TRUSTY_FFA_TRANSPORT) += trusty-ffa.o
++trusty-core-objs				+= $(trusty-transport-y)
++obj-$(CONFIG_TRUSTY_IRQ)			+= trusty-irq.o
++obj-$(CONFIG_TRUSTY_LOG)			+= trusty-log.o
++obj-$(CONFIG_TRUSTY_TEST)			+= trusty-test.o
++obj-$(CONFIG_TRUSTY_VIRTIO)			+= trusty-virtio.o
++obj-$(CONFIG_TRUSTY_VIRTIO_IPC)			+= trusty-ipc.o
+diff --git a/drivers/trusty/trusty-private.h b/drivers/trusty/trusty-private.h
+index 2496f397e5d2..386ca9ae5af3 100644
+--- a/drivers/trusty/trusty-private.h
++++ b/drivers/trusty/trusty-private.h
+@@ -72,7 +72,11 @@ int trusty_init_api_version(struct trusty_state *s, struct device *dev,
+ 
+ typedef const struct trusty_transport_desc *trusty_transports_t;
+ 
++#ifdef CONFIG_TRUSTY_SMC_TRANSPORT
+ extern const struct trusty_transport_desc trusty_smc_transport;
++#endif
++#ifdef CONFIG_TRUSTY_FFA_TRANSPORT
+ extern const struct trusty_transport_desc trusty_ffa_transport;
++#endif
+ 
+ #endif /* _TRUSTY_PRIVATE_H */
+diff --git a/drivers/trusty/trusty.c b/drivers/trusty/trusty.c
+index 66273873f169..06698f3c67f9 100644
+--- a/drivers/trusty/trusty.c
++++ b/drivers/trusty/trusty.c
+@@ -684,8 +684,12 @@ static int trusty_remove(struct platform_device *pdev)
+  *
+  */
+ static const trusty_transports_t trusty_transports[] = {
++#ifdef CONFIG_TRUSTY_SMC_TRANSPORT
+ 	&trusty_smc_transport,
++#endif
++#ifdef CONFIG_TRUSTY_FFA_TRANSPORT
+ 	&trusty_ffa_transport,
++#endif
+ 	NULL,
+ };
+ 
+@@ -708,6 +712,9 @@ static struct platform_driver trusty_driver = {
+ 
+ static int __init trusty_driver_init(void)
+ {
++	BUILD_BUG_ON_MSG(!IS_ENABLED(CONFIG_TRUSTY_HAVE_TRANSPORT),
++			 "Trusty transport not configured");
++
+ 	return platform_driver_register(&trusty_driver);
+ }
+ 
+-- 
+2.34.1
+

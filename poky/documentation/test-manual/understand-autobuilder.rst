@@ -56,7 +56,7 @@ the "templates" section, which looks like::
 
 Combining these two entries you can see that "qemux86-64" is a three step build where the
 ``bitbake BBTARGETS`` would be run, then ``bitbake SANITYTARGETS`` for each step; all for
-``MACHINE="qemx86-64"`` but with differing SDKMACHINE settings. In step
+``MACHINE="qemux86-64"`` but with differing :term:`SDKMACHINE` settings. In step
 1 an extra variable is added to the ``auto.conf`` file to enable wic
 image generation.
 
@@ -242,7 +242,7 @@ of post-build steps, including:
 #. Call ``scripts/upload-error-reports`` to send any error reports
    generated to the remote server.
 
-#. Cleanup the build directory using
+#. Cleanup the :term:`Build Directory` using
    :ref:`test-manual/understand-autobuilder:clobberdir` if the build was successful,
    else rename it to "build-renamed" for potential future debugging.
 

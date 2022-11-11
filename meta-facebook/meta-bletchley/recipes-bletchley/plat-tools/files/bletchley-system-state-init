@@ -1,0 +1,41 @@
+#!/bin/bash
+
+DBUS_PROPERTIES_INTF_NAME="org.freedesktop.DBus.Properties"
+
+set_host_state()
+{
+    BUS_NAME="xyz.openbmc_project.State.Host$1"
+    OBJ_PATH="/xyz/openbmc_project/state/host$1"
+    INTF_NAME="xyz.openbmc_project.State.Host"
+    PROPERTY_NAME="CurrentHostState"
+    PROPERTY_VAL="xyz.openbmc_project.State.Host.HostState.$2"
+
+    busctl call "$BUS_NAME" "$OBJ_PATH" "$DBUS_PROPERTIES_INTF_NAME" Set ssv "$INTF_NAME" "$PROPERTY_NAME" s "$PROPERTY_VAL"
+}
+
+set_chassis_state()
+{
+    BUS_NAME="xyz.openbmc_project.State.Chassis$1"
+    OBJ_PATH="/xyz/openbmc_project/state/chassis$1"
+    INTF_NAME="xyz.openbmc_project.State.Chassis"
+    PROPERTY_NAME="CurrentPowerState"
+    PROPERTY_VAL="xyz.openbmc_project.State.Chassis.PowerState.$2"
+
+    busctl call "$BUS_NAME" "$OBJ_PATH" "$DBUS_PROPERTIES_INTF_NAME" Set ssv "$INTF_NAME" "$PROPERTY_NAME" s "$PROPERTY_VAL"
+}
+
+INSTENCE_ID="$1"
+HOST_PWR_STATUS=$(/usr/sbin/power-ctrl sled"$1" status)
+
+CHASSIS_STATE_VAL="Off"
+HOST_STATE_VAL="Off"
+
+if [ "$HOST_PWR_STATUS" != "AC Off" ]; then
+    CHASSIS_STATE_VAL="On"
+    if [ "$HOST_PWR_STATUS" != "Off" ]; then
+        HOST_STATE_VAL="Running"
+    fi
+fi
+
+set_chassis_state "$INSTENCE_ID" "$CHASSIS_STATE_VAL"
+set_host_state "$INSTENCE_ID" "$HOST_STATE_VAL"

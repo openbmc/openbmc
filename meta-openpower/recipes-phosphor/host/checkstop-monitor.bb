@@ -6,8 +6,8 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 inherit obmc-phosphor-systemd
 inherit allarch
 
-DEPENDS += "virtual/obmc-gpio-monitor"
-RDEPENDS:${PN} += "virtual/obmc-gpio-monitor"
+DEPENDS += "phosphor-gpio-monitor"
+RDEPENDS:${PN} += "phosphor-gpio-monitor-monitor"
 
 # For now, monitoring checkstop is the only usecase
 OBMC_HOST_MONITOR_INSTANCES = "checkstop"

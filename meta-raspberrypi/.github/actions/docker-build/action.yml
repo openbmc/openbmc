@@ -17,7 +17,7 @@ runs:
   steps:
     - name: Build the ${{ inputs.docker_image }} docker image
       shell: bash
-      # We run this unconditinally even if the change doesn't touch the
+      # We run this unconditionally even if the change doesn't touch the
       # relevant docker files because there is a chance that another PR (or
       # something else) rebuilt the local image. For example if the first
       # version of the PR included change for the relevant docker image but a

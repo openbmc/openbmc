@@ -267,16 +267,16 @@ development using the Yocto Project. Your build host can be a native
 Linux machine (recommended), it can be a machine (Linux, Mac, or
 Windows) that uses `CROPS <https://github.com/crops/poky-container>`__,
 which leverages `Docker Containers <https://www.docker.com/>`__ or it
-can be a Windows machine capable of running Windows Subsystem For Linux
-v2 (WSL).
+can be a Windows machine capable of running version 2 of Windows Subsystem
+For Linux (WSL 2).
 
 .. note::
 
-   The Yocto Project is not compatible with
-   `Windows Subsystem for Linux v1 <https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux>`__.
-   It is compatible but not officially supported nor validated with
-   WSLv2. If you still decide to use WSL please upgrade to
-   `WSLv2 <https://docs.microsoft.com/en-us/windows/wsl/install-win10>`__.
+   The Yocto Project is not compatible with version 1 of
+   `Windows Subsystem for Linux <https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux>`__.
+   It is compatible but neither officially supported nor validated with
+   WSL 2. If you still decide to use WSL please upgrade to
+   `WSL 2 <https://learn.microsoft.com/en-us/windows/wsl/install>`__.
 
 Once your build host is set up to use the Yocto Project, further steps
 are necessary depending on what you want to accomplish. See the
@@ -441,35 +441,36 @@ Kit (eSDK) manual. If you are going to use the Toaster container, see
 the ":doc:`/toaster-manual/setup-and-use`"
 section in the Toaster User Manual.
 
-Setting Up to Use Windows Subsystem For Linux (WSLv2)
+Setting Up to Use Windows Subsystem For Linux (WSL 2)
 -----------------------------------------------------
 
-With `Windows Subsystem for Linux
-(WSLv2) <https://docs.microsoft.com/en-us/windows/wsl/wsl2-about>`__,
+With `Windows Subsystem for Linux (WSL 2)
+<https://learn.microsoft.com/en-us/windows/wsl/>`__,
 you can create a Yocto Project development environment that allows you
 to build on Windows. You can set up a Linux distribution inside Windows
 in which you can develop using the Yocto Project.
 
-Follow these general steps to prepare a Windows machine using WSLv2 as
+Follow these general steps to prepare a Windows machine using WSL 2 as
 your Yocto Project build host:
 
-1. *Make sure your Windows 10 machine is capable of running WSLv2:*
-   WSLv2 is only available for Windows 10 builds > 18917. To check which
-   build version you are running, you may open a command prompt on
-   Windows and execute the command "ver".
-   ::
+1. *Make sure your Windows machine is capable of running WSL 2:*
+
+   While all Windows 11 and Windows Server 2022 builds support WSL 2,
+   the first versions of Windows 10 and Windows Server 2019 didn't.
+   Check the minimum build numbers for `Windows 10
+   <https://learn.microsoft.com/en-us/windows/wsl/install-manual#step-2---check-requirements-for-running-wsl-2>`__
+   and for `Windows Server 2019
+   <https://learn.microsoft.com/en-us/windows/wsl/install-on-server>`__.
+
+   To check which build version you are running, you may open a command
+   prompt on Windows and execute the command "ver"::
 
       C:\Users\myuser> ver
 
       Microsoft Windows [Version 10.0.19041.153]
 
-   If your build is capable of running
-   WSLv2 you may continue, for more information on this subject or
-   instructions on how to upgrade to WSLv2 visit `Windows 10
-   WSLv2 <https://docs.microsoft.com/en-us/windows/wsl/wsl2-install>`__
-
-2. *Install the Linux distribution of your choice inside Windows 10:*
-   Once you know your version of Windows 10 supports WSLv2, you can
+2. *Install the Linux distribution of your choice inside WSL 2:*
+   Once you know your version of Windows supports WSL 2, you can
    install the distribution of your choice from the Microsoft Store.
    Open the Microsoft Store and search for Linux. While there are
    several Linux distributions available, the assumption is that your
@@ -478,31 +479,28 @@ your Yocto Project build host:
    making your selection, simply click "Get" to download and install the
    distribution.
 
-3. *Check your Linux distribution is using WSLv2:* Open a Windows
+3. *Check which Linux distribution WSL 2 is using:* Open a Windows
    PowerShell and run::
 
       C:\WINDOWS\system32> wsl -l -v
       NAME    STATE   VERSION
       *Ubuntu Running 2
 
-   Note the version column which says the WSL version
-   being used by your distribution, on compatible systems, this can be
-   changed back at any point in time.
+   Note that WSL 2 supports running as many different Linux distributions
+   as you want to install.
 
-4. *Optionally Orient Yourself on WSL:* If you are unfamiliar with WSL,
-   you can learn more here -
+4. *Optionally Get Familiar with WSL:* You can learn more on
    https://docs.microsoft.com/en-us/windows/wsl/wsl2-about.
 
 5. *Launch your WSL Distibution:* From the Windows start menu simply
    launch your WSL distribution just like any other application.
 
-6. *Optimize your WSLv2 storage often:* Due to the way storage is
-   handled on WSLv2, the storage space used by the undelying Linux
-   distribution is not reflected immedately, and since BitBake heavily
+6. *Optimize your WSL 2 storage often:* Due to the way storage is
+   handled on WSL 2, the storage space used by the underlying Linux
+   distribution is not reflected immediately, and since BitBake heavily
    uses storage, after several builds, you may be unaware you are
-   running out of space. WSLv2 uses a VHDX file for storage, this issue
-   can be easily avoided by manually optimizing this file often, this
-   can be done in the following way:
+   running out of space. As WSL 2 uses a VHDX file for storage, this issue
+   can be easily avoided by regularly optimizing this file in a manual way:
 
    1. *Find the location of your VHDX file:*
 
@@ -556,14 +554,14 @@ your Yocto Project build host:
 
 .. note::
 
-   The current implementation of WSLv2 does not have out-of-the-box
+   The current implementation of WSL 2 does not have out-of-the-box
    access to external devices such as those connected through a USB
    port, but it automatically mounts your ``C:`` drive on ``/mnt/c/``
    (and others), which you can use to share deploy artifacts to be later
-   flashed on hardware through Windows, but your build directory should
-   not reside inside this mountpoint.
+   flashed on hardware through Windows, but your :term:`Build Directory`
+   should not reside inside this mountpoint.
 
-Once you have WSLv2 set up, everything is in place to develop just as if
+Once you have WSL 2 set up, everything is in place to develop just as if
 you were running on a native Linux machine. If you are going to use the
 Extensible SDK container, see the ":doc:`/sdk-manual/extensible`" Chapter in the Yocto
 Project Application Development and the Extensible Software Development

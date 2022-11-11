@@ -108,7 +108,10 @@ class FVPRunner:
             console.expect(pexpect.EOF, timeout=5.0)
             console.close()
 
-        if self._fvp_process and self._fvp_process.returncode:
+        if self._fvp_process and self._fvp_process.returncode and \
+                self._fvp_process.returncode > 0:
+            # Return codes < 0 indicate that the process was explicitly
+            # terminated above.
             self._logger.info(f"FVP quit with code {self._fvp_process.returncode}")
             return self._fvp_process.returncode
         else:

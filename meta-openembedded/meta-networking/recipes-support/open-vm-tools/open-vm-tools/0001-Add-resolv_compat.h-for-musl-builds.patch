@@ -1,4 +1,4 @@
-From f93b680ec1a816ffe90d5f1bce609f8bf68a456e Mon Sep 17 00:00:00 2001
+From c1ee0b0a0a05379d0e6475dfceaaf41876192640 Mon Sep 17 00:00:00 2001
 From: Trevor Gamblin <trevor.gamblin@windriver.com>
 Date: Wed, 14 Apr 2021 10:24:52 -0400
 Subject: [PATCH] Add resolv_compat.h for musl builds
@@ -10,7 +10,6 @@ https://gitweb.gentoo.org/proj/musl.git/tree/dev-qt/qtwebengine/files/qtwebengin
 Upstream-Status: Pending
 
 Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
-
 ---
  open-vm-tools/lib/nicInfo/nicInfoPosix.c  |  4 +++
  open-vm-tools/lib/nicInfo/resolv_compat.h | 30 +++++++++++++++++++++++
@@ -18,7 +17,7 @@ Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
  create mode 100644 open-vm-tools/lib/nicInfo/resolv_compat.h
 
 diff --git a/open-vm-tools/lib/nicInfo/nicInfoPosix.c b/open-vm-tools/lib/nicInfo/nicInfoPosix.c
-index c56b73cf..8ae3b2f7 100644
+index c56b73cfe..8ae3b2f74 100644
 --- a/open-vm-tools/lib/nicInfo/nicInfoPosix.c
 +++ b/open-vm-tools/lib/nicInfo/nicInfoPosix.c
 @@ -70,6 +70,10 @@
@@ -34,7 +33,7 @@ index c56b73cf..8ae3b2f7 100644
   *
 diff --git a/open-vm-tools/lib/nicInfo/resolv_compat.h b/open-vm-tools/lib/nicInfo/resolv_compat.h
 new file mode 100644
-index 00000000..d768464b
+index 000000000..d768464b9
 --- /dev/null
 +++ b/open-vm-tools/lib/nicInfo/resolv_compat.h
 @@ -0,0 +1,30 @@
@@ -68,3 +67,6 @@ index 00000000..d768464b
 +}
 +#endif
 +
+-- 
+2.25.1
+

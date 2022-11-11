@@ -1,0 +1,30 @@
+From dfa152d399d7e6a285ab31bcc2172f61d5db907d Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Thu, 19 May 2022 09:59:06 +0100
+Subject: [PATCH 38/40] ANDROID: trusty-ipc: fix VIRTIO_ID_TRUSTY_IPC ID
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com
+---
+ include/uapi/linux/virtio_ids.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/include/uapi/linux/virtio_ids.h b/include/uapi/linux/virtio_ids.h
+index 909905cd7618..06ccbf2db5fa 100644
+--- a/include/uapi/linux/virtio_ids.h
++++ b/include/uapi/linux/virtio_ids.h
+@@ -42,6 +42,10 @@
+ #define VIRTIO_ID_RPROC_SERIAL		11 /* virtio remoteproc serial link */
+ #define VIRTIO_ID_CAIF			12 /* Virtio caif */
+ #define VIRTIO_ID_MEMORY_BALLOON	13 /* virtio memory balloon */
++/*
++ * todo: VIRTIO_ID_TRUSTY_IPC conflicts with VIRTIO_ID_MEMORY_BALLOON
++ * replace with unused ID and update trusty kernel header tipc_virtio_dev.h
++ */
+ #define VIRTIO_ID_TRUSTY_IPC		13 /* virtio trusty ipc */
+ #define VIRTIO_ID_GPU			16 /* virtio GPU */
+ #define VIRTIO_ID_CLOCK			17 /* virtio clock/timer */
+-- 
+2.34.1
+

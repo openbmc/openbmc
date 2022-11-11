@@ -1,0 +1,7 @@
+[Unit]
+Description=Ampere Computing LLC Overtemp event handling
+
+[Service]
+Restart=no
+ExecStart=/bin/sh -c "touch /tmp/fault_overtemp && obmcutil chassisoff"
+ExecStartPost=/bin/sh -c "ampere_add_redfishevent.sh OpenBMC.0.1.CPUThermalTrip.Critical %i && sleep 10 && rm /tmp/fault_overtemp"

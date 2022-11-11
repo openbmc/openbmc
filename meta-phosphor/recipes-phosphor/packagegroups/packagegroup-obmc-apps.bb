@@ -116,9 +116,9 @@ RDEPENDS:${PN}-inventory = " \
 
 SUMMARY:${PN}-leds = "LED applications"
 RDEPENDS:${PN}-leds = " \
-        ${VIRTUAL-RUNTIME_obmc-leds-manager} \
-        ${VIRTUAL-RUNTIME_obmc-leds-sysfs} \
-        ${VIRTUAL-RUNTIME_obmc-led-monitor} \
+        phosphor-led-manager \
+        phosphor-led-sysfs \
+        phosphor-led-manager-faultmonitor \
         "
 
 SUMMARY:${PN}-logging = "Logging applications"
@@ -154,16 +154,16 @@ ${PN}-software-extras:df-phosphor-mmc = " \
 
 SUMMARY:${PN}-software = "Software applications"
 RDEPENDS:${PN}-software = " \
-        ${VIRTUAL-RUNTIME_obmc-bmc-download-mgr} \
-        ${VIRTUAL-RUNTIME_obmc-bmc-updater} \
-        ${VIRTUAL-RUNTIME_obmc-bmc-version} \
+        phosphor-software-manager-download-mgr \
+        phosphor-software-manager-updater \
+        phosphor-software-manager-version \
         ${${PN}-software-extras} \
         "
 
 SUMMARY:${PN}-debug-collector = "BMC debug collector"
 RDEPENDS:${PN}-debug-collector = " \
-        ${VIRTUAL-RUNTIME_obmc-dump-manager} \
-        ${VIRTUAL-RUNTIME_obmc-dump-monitor} \
+        phosphor-debug-collector-manager \
+        phosphor-debug-collector-monitor \
         phosphor-debug-collector-dreport \
         phosphor-debug-collector-scripts \
         "
@@ -175,7 +175,7 @@ RDEPENDS:${PN}-settings = " \
 
 SUMMARY:${PN}-network = "BMC Network Manager"
 RDEPENDS:${PN}-network = " \
-        ${VIRTUAL-RUNTIME_obmc-network-manager} \
+        phosphor-network \
         "
 
 SUMMARY:${PN}-telemetry = "Telemetry solution"
@@ -185,7 +185,7 @@ RDEPENDS:${PN}-telemetry = " \
 
 SUMMARY:${PN}-user-mgmt = "User management applications"
 RDEPENDS:${PN}-user-mgmt = " \
-        ${VIRTUAL-RUNTIME_obmc-user-mgmt} \
+        phosphor-user-manager \
         "
 RRECOMMENDS:${PN}-user-mgmt = " \
         pam-plugin-access \

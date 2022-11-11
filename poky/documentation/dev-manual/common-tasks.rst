@@ -418,10 +418,10 @@ Enabling Your Layer
 Before the OpenEmbedded build system can use your new layer, you need to
 enable it. To enable your layer, simply add your layer's path to the
 :term:`BBLAYERS` variable in your ``conf/bblayers.conf`` file, which is
-found in the :term:`Build Directory`.
-The following example shows how to enable your new
-``meta-mylayer`` layer (note how your new layer exists outside of
-the official ``poky`` repository which you would have checked out earlier)::
+found in the :term:`Build Directory`. The following example shows how to
+enable your new ``meta-mylayer`` layer (note how your new layer exists
+outside of the official ``poky`` repository which you would have checked
+out earlier)::
 
    # POKY_BBLAYERS_CONF_VERSION is increased each time build/conf/bblayers.conf
    # changes incompatibly
@@ -969,11 +969,10 @@ high-level image features by using the
 variables. Although the functions for both variables are nearly
 equivalent, best practices dictate using :term:`IMAGE_FEATURES` from within
 a recipe and using :term:`EXTRA_IMAGE_FEATURES` from within your
-``local.conf`` file, which is found in the
-:term:`Build Directory`.
+``local.conf`` file, which is found in the :term:`Build Directory`.
 
 To understand how these features work, the best reference is
-:ref:`meta/classes/image.bbclass <ref-classes-image>`.
+:ref:`meta/classes-recipe/image.bbclass <ref-classes-image>`.
 This class lists out the available
 :term:`IMAGE_FEATURES` of which most map to package groups while some, such
 as ``debug-tweaks`` and ``read-only-rootfs``, resolve as general
@@ -1206,11 +1205,10 @@ application that builds using Autotools. Creating the base recipe using
 ``recipetool`` results in a recipe that has the pre-build dependencies,
 license requirements, and checksums configured.
 
-To run the tool, you just need to be in your
-:term:`Build Directory` and have sourced the
-build environment setup script (i.e.
-:ref:`structure-core-script`).
-To get help on the tool, use the following command::
+To run the tool, you just need to be in your :term:`Build Directory` and
+have sourced the build environment setup script (i.e.
+:ref:`structure-core-script`). To get help on the tool, use the following
+command::
 
    $ recipetool -h
    NOTE: Starting bitbake server...
@@ -1342,8 +1340,7 @@ using BitBake to process the recipe multiple times in order to
 progressively discover and add information to the recipe file.
 
 Assuming you have sourced the build environment setup script (i.e.
-:ref:`structure-core-script`) and you are in
-the :term:`Build Directory`, use
+:ref:`structure-core-script`) and you are in the :term:`Build Directory`, use
 BitBake to process your recipe. All you need to provide is the
 ``basename`` of the recipe as described in the previous section::
 
@@ -1362,7 +1359,7 @@ is to have BitBake return it by running the following::
    $ bitbake -e basename | grep ^WORKDIR=
 
 As an example, assume a Source Directory
-top-level folder named ``poky``, a default Build Directory at
+top-level folder named ``poky``, a default :term:`Build Directory` at
 ``poky/build``, and a ``qemux86-poky-linux`` machine target system.
 Furthermore, suppose your recipe is named ``foo_1.3.0.bb``. In this
 case, the work directory the build system uses to build the package
@@ -1731,7 +1728,7 @@ your software is built:
 
       If you need to install one or more custom CMake toolchain files
       that are supplied by the application you are building, install the
-      files to ``${D}${datadir}/cmake/Modules`` during ``do_install``.
+      files to ``${D}${datadir}/cmake/Modules`` during :ref:`ref-tasks-install`.
 
 -  *Other:* If your source files do not have a ``configure.ac`` or
    ``CMakeLists.txt`` file, then your software is built using some
@@ -1826,8 +1823,8 @@ out-of-tree modules. Your recipe will also need the following::
 Compilation
 -----------
 
-During a build, the ``do_compile`` task happens after source is fetched,
-unpacked, and configured. If the recipe passes through ``do_compile``
+During a build, the :ref:`ref-tasks-compile` task happens after source is fetched,
+unpacked, and configured. If the recipe passes through :ref:`ref-tasks-compile`
 successfully, nothing needs to be done.
 
 However, if the compile step fails, you need to diagnose the failure.
@@ -1888,7 +1885,7 @@ Here are some common issues that cause failures.
 Installing
 ----------
 
-During ``do_install``, the task copies the built files along with their
+During :ref:`ref-tasks-install`, the task copies the built files along with their
 hierarchy to locations that would mirror their locations on the target
 device. The installation process copies files from the
 ``${``\ :term:`S`\ ``}``,
@@ -1906,14 +1903,14 @@ the software being built:
 -  *Autotools and CMake:* If the software your recipe is building uses
    Autotools or CMake, the OpenEmbedded build system understands how to
    install the software. Consequently, you do not have to have a
-   ``do_install`` task as part of your recipe. You just need to make
+   :ref:`ref-tasks-install` task as part of your recipe. You just need to make
    sure the install portion of the build completes with no issues.
    However, if you wish to install additional files not already being
    installed by ``make install``, you should do this using a
    ``do_install:append`` function using the install command as described
    in the "Manual" bulleted item later in this list.
 
--  *Other (using* ``make install``\ *)*: You need to define a ``do_install``
+-  *Other (using* ``make install``\ *)*: You need to define a :ref:`ref-tasks-install`
    function in your recipe. The function should call
    ``oe_runmake install`` and will likely need to pass in the
    destination directory as well. How you pass that path is dependent on
@@ -1923,7 +1920,7 @@ the software being built:
    For an example recipe using ``make install``, see the
    ":ref:`dev-manual/common-tasks:makefile-based package`" section.
 
--  *Manual:* You need to define a ``do_install`` function in your
+-  *Manual:* You need to define a :ref:`ref-tasks-install` function in your
    recipe. The function must first use ``install -d`` to create the
    directories under
    ``${``\ :term:`D`\ ``}``. Once the
@@ -1946,10 +1943,10 @@ installed correctly.
       might need to replace hard-coded paths in an initscript with
       values of variables provided by the build system, such as
       replacing ``/usr/bin/`` with ``${bindir}``. If you do perform such
-      modifications during ``do_install``, be sure to modify the
+      modifications during :ref:`ref-tasks-install`, be sure to modify the
       destination file after copying rather than before copying.
       Modifying after copying ensures that the build system can
-      re-execute ``do_install`` if needed.
+      re-execute :ref:`ref-tasks-install` if needed.
 
    -  ``oe_runmake install``, which can be run directly or can be run
       indirectly by the
@@ -1958,7 +1955,7 @@ installed correctly.
       runs ``make install`` in parallel. Sometimes, a Makefile can have
       missing dependencies between targets that can result in race
       conditions. If you experience intermittent failures during
-      ``do_install``, you might be able to work around them by disabling
+      :ref:`ref-tasks-install`, you might be able to work around them by disabling
       parallel Makefile installs by adding the following to the recipe::
 
          PARALLEL_MAKEINST = ""
@@ -1980,7 +1977,7 @@ additional definitions in your recipe.
 If you are adding services and the service initialization script or the
 service file itself is not installed, you must provide for that
 installation in your recipe using a ``do_install:append`` function. If
-your recipe already has a ``do_install`` function, update the function
+your recipe already has a :ref:`ref-tasks-install` function, update the function
 near its end rather than adding an additional ``do_install:append``
 function.
 
@@ -2028,10 +2025,10 @@ Successful packaging is a combination of automated processes performed
 by the OpenEmbedded build system and some specific steps you need to
 take. The following list describes the process:
 
--  *Splitting Files*: The ``do_package`` task splits the files produced
+-  *Splitting Files*: The :ref:`ref-tasks-package` task splits the files produced
    by the recipe into logical components. Even software that produces a
    single binary might still have debug symbols, documentation, and
-   other logical components that should be split out. The ``do_package``
+   other logical components that should be split out. The :ref:`ref-tasks-package`
    task ensures that files are split up and packaged correctly.
 
 -  *Running QA Checks*: The
@@ -2124,7 +2121,7 @@ removed later when a recipe is either modified or removed. Thus, the
 sysroot is able to remain free from stale files.
 
 A subset of the files installed by the :ref:`ref-tasks-install` task are
-used by the :ref:`ref-tasks-populate_sysroot` task as defined by the the
+used by the :ref:`ref-tasks-populate_sysroot` task as defined by the
 :term:`SYSROOT_DIRS` variable to automatically populate the sysroot. It
 is possible to modify the list of directories that populate the sysroot.
 The following example shows how you could add the ``/opt`` directory to
@@ -2337,7 +2334,7 @@ Single .c File Package (Hello World!)
 Building an application from a single file that is stored locally (e.g.
 under ``files``) requires a recipe that has the file listed in the
 :term:`SRC_URI` variable. Additionally, you need to manually write the
-``do_compile`` and ``do_install`` tasks. The :term:`S` variable defines the
+:ref:`ref-tasks-compile` and :ref:`ref-tasks-install` tasks. The :term:`S` variable defines the
 directory containing the source code, which is set to
 :term:`WORKDIR` in this case --- the
 directory BitBake uses for the build.
@@ -2401,14 +2398,14 @@ Makefile-Based Package
 
 Applications that use GNU ``make`` also require a recipe that has the
 source archive listed in :term:`SRC_URI`. You do not need to add a
-``do_compile`` step since by default BitBake starts the ``make`` command
+:ref:`ref-tasks-compile` step since by default BitBake starts the ``make`` command
 to compile the application. If you need additional ``make`` options, you
 should store them in the
 :term:`EXTRA_OEMAKE` or
 :term:`PACKAGECONFIG_CONFARGS`
 variables. BitBake passes these options into the GNU ``make``
-invocation. Note that a ``do_install`` task is still required.
-Otherwise, BitBake runs an empty ``do_install`` task by default.
+invocation. Note that a :ref:`ref-tasks-install` task is still required.
+Otherwise, BitBake runs an empty :ref:`ref-tasks-install` task by default.
 
 Some applications might require extra parameters to be passed to the
 compiler. For example, the application might need an additional header
@@ -2551,7 +2548,7 @@ doing the following:
    ``${``\ :term:`S`\ ``}``.
 
    If ``${S}`` might contain a Makefile, or if you inherit some class
-   that replaces ``do_configure`` and ``do_compile`` with custom
+   that replaces :ref:`ref-tasks-configure` and :ref:`ref-tasks-compile` with custom
    versions, then you can use the
    ``[``\ :ref:`noexec <bitbake-user-manual/bitbake-user-manual-metadata:variable flags>`\ ``]``
    flag to turn the tasks into no-ops, as follows::
@@ -2567,7 +2564,7 @@ doing the following:
    :ref:`ref-tasks-patch` tasks to the
    :ref:`ref-tasks-install` task.
 
--  Make sure your ``do_install`` task installs the binaries
+-  Make sure your :ref:`ref-tasks-install` task installs the binaries
    appropriately.
 
 -  Ensure that you set up :term:`FILES`
@@ -2881,7 +2878,7 @@ you can use as references.
 If you are creating a new kernel recipe, normal recipe-writing rules
 apply for setting up a :term:`SRC_URI`. Thus, you need to specify any
 necessary patches and set :term:`S` to point at the source code. You need to
-create a ``do_configure`` task that configures the unpacked kernel with
+create a :ref:`ref-tasks-configure` task that configures the unpacked kernel with
 a ``defconfig`` file. You can do this by using a ``make defconfig``
 command or, more commonly, by copying in a suitable ``defconfig`` file
 and then running ``make oldconfig``. By making use of ``inherit kernel``
@@ -3017,15 +3014,14 @@ The following steps describe how to set up the AUH utility:
    AUH is not part of the :term:`OpenEmbedded-Core (OE-Core)` or
    :term:`Poky` repositories.
 
-4. *Create a Dedicated Build Directory:* Run the
-   :ref:`structure-core-script`
-   script to create a fresh build directory that you use exclusively for
-   running the AUH utility::
+4. *Create a Dedicated Build Directory:* Run the :ref:`structure-core-script`
+   script to create a fresh :term:`Build Directory` that you use exclusively
+   for running the AUH utility::
 
       $ cd poky
       $ source oe-init-build-env your_AUH_build_directory
 
-   Re-using an existing build directory and its configurations is not
+   Re-using an existing :term:`Build Directory` and its configurations is not
    recommended as existing settings could cause AUH to fail or behave
    undesirably.
 
@@ -3045,10 +3041,10 @@ The following steps describe how to set up the AUH utility:
       With this configuration and a successful
       upgrade, a build history "diff" file appears in the
       ``upgrade-helper/work/recipe/buildhistory-diff.txt`` file found in
-      your build directory.
+      your :term:`Build Directory`.
 
    -  If you want to enable testing through the
-      :ref:`testimage <ref-classes-testimage*>`
+      :ref:`testimage <ref-classes-testimage>`
       class, which is optional, you need to have the following set in
       your ``conf/local.conf`` file::
 
@@ -3070,7 +3066,7 @@ The following steps describe how to set up the AUH utility:
 
 7. *Create and Edit an AUH Configuration File:* You need to have the
    ``upgrade-helper/upgrade-helper.conf`` configuration file in your
-   build directory. You can find a sample configuration file in the
+   :term:`Build Directory`. You can find a sample configuration file in the
    :yocto_git:`AUH source repository </auto-upgrade-helper/tree/>`.
 
    Read through the sample file and make configurations as needed. For
@@ -3118,7 +3114,7 @@ This next set of examples describes how to use the AUH:
       $ upgrade-helper.py -e all
 
 Once you have run the AUH utility, you can find the results in the AUH
-build directory::
+:term:`Build Directory`::
 
    ${BUILDDIR}/upgrade-helper/timestamp
 
@@ -3179,8 +3175,7 @@ example, assume that the layer has been cloned into following area::
 
    /home/scottrif/meta-openembedded
 
-The following command from your
-:term:`Build Directory` adds the layer to
+The following command from your :term:`Build Directory` adds the layer to
 your build configuration (i.e. ``${BUILDDIR}/conf/bblayers.conf``)::
 
    $ bitbake-layers add-layer /home/scottrif/meta-openembedded/meta-oe
@@ -3341,16 +3336,14 @@ source code used by recipes to build packages. For example, suppose you
 are developing a patch and you need to experiment a bit to figure out
 your solution. After you have initially built the package, you can
 iteratively tweak the source code, which is located in the
-:term:`Build Directory`, and then you can
-force a re-compile and quickly test your altered code. Once you settle
-on a solution, you can then preserve your changes in the form of
-patches.
+:term:`Build Directory`, and then you can force a re-compile and quickly
+test your altered code. Once you settle on a solution, you can then preserve
+your changes in the form of patches.
 
 During a build, the unpacked temporary source code used by recipes to
-build packages is available in the Build Directory as defined by the
-:term:`S` variable. Below is the default
-value for the :term:`S` variable as defined in the
-``meta/conf/bitbake.conf`` configuration file in the
+build packages is available in the :term:`Build Directory` as defined by the
+:term:`S` variable. Below is the default value for the :term:`S` variable as
+defined in the ``meta/conf/bitbake.conf`` configuration file in the
 :term:`Source Directory`::
 
    S = "${WORKDIR}/${BP}"
@@ -3392,7 +3385,7 @@ The actual directory depends on several things:
 -  :term:`PR`: The recipe revision.
 
 As an example, assume a Source Directory top-level folder named
-``poky``, a default Build Directory at ``poky/build``, and a
+``poky``, a default :term:`Build Directory` at ``poky/build``, and a
 ``qemux86-poky-linux`` machine target system. Furthermore, suppose your
 recipe is named ``foo_1.3.0.bb``. In this case, the work directory the
 build system uses to build the package would be as follows::
@@ -3420,8 +3413,7 @@ form of a patch all using Quilt.
 Follow these general steps:
 
 1. *Find the Source Code:* Temporary source code used by the
-   OpenEmbedded build system is kept in the
-   :term:`Build Directory`. See the
+   OpenEmbedded build system is kept in the :term:`Build Directory`. See the
    ":ref:`dev-manual/common-tasks:finding temporary source code`" section to
    learn how to locate the directory that has the temporary source code for a
    particular package.
@@ -3446,7 +3438,7 @@ Follow these general steps:
    you added to the patch.
 
 6. *Test Your Changes:* Once you have modified the source code, the
-   easiest way to test your changes is by calling the ``do_compile``
+   easiest way to test your changes is by calling the :ref:`ref-tasks-compile`
    task as shown in the following example::
 
       $ bitbake -c compile -f package
@@ -3458,7 +3450,7 @@ Follow these general steps:
    .. note::
 
       All the modifications you make to the temporary source code disappear
-      once you run the ``do_clean`` or ``do_cleanall`` tasks using BitBake
+      once you run the :ref:`ref-tasks-clean` or :ref:`ref-tasks-cleanall` tasks using BitBake
       (i.e. ``bitbake -c clean package`` and ``bitbake -c cleanall package``).
       Modifications will also disappear if you use the ``rm_work`` feature as
       described in the
@@ -3649,10 +3641,10 @@ build host running Linux.
       :doc:`/brief-yoctoprojectqs/index` document.
 
 The build process creates an entire Linux distribution from source and
-places it in your :term:`Build Directory` under
-``tmp/deploy/images``. For detailed information on the build process
-using BitBake, see the ":ref:`overview-manual/concepts:images`" section in the
-Yocto Project Overview and Concepts Manual.
+places it in your :term:`Build Directory` under ``tmp/deploy/images``. For
+detailed information on the build process using BitBake, see the
+":ref:`overview-manual/concepts:images`" section in the Yocto Project Overview
+and Concepts Manual.
 
 The following figure and list overviews the build process:
 
@@ -3672,25 +3664,23 @@ The following figure and list overviews the build process:
    When you use the initialization script, the OpenEmbedded build system
    uses ``build`` as the default :term:`Build Directory` in your current work
    directory. You can use a `build_dir` argument with the script to
-   specify a different build directory.
+   specify a different :term:`Build Directory`.
 
    .. note::
 
-      A common practice is to use a different Build Directory for
+      A common practice is to use a different :term:`Build Directory` for
       different targets; for example, ``~/build/x86`` for a ``qemux86``
       target, and ``~/build/arm`` for a ``qemuarm`` target. In any
-      event, it's typically cleaner to locate the build directory
+      event, it's typically cleaner to locate the :term:`Build Directory`
       somewhere outside of your source directory.
 
 3. *Make Sure Your* ``local.conf`` *File is Correct*: Ensure the
-   ``conf/local.conf`` configuration file, which is found in the Build
-   Directory, is set up how you want it. This file defines many aspects
-   of the build environment including the target machine architecture
+   ``conf/local.conf`` configuration file, which is found in the
+   :term:`Build Directory`, is set up how you want it. This file defines many
+   aspects of the build environment including the target machine architecture
    through the :term:`MACHINE` variable, the packaging format used during
-   the build
-   (:term:`PACKAGE_CLASSES`),
-   and a centralized tarball download directory through the
-   :term:`DL_DIR` variable.
+   the build (:term:`PACKAGE_CLASSES`), and a centralized tarball download
+   directory through the :term:`DL_DIR` variable.
 
 4. *Build the Image:* Build the image using the ``bitbake`` command::
 
@@ -3718,7 +3708,7 @@ The following figure and list overviews the build process:
    Once an
    image has been built, it often needs to be installed. The images and
    kernels built by the OpenEmbedded build system are placed in the
-   Build Directory in ``tmp/deploy/images``. For information on how to
+   :term:`Build Directory` in ``tmp/deploy/images``. For information on how to
    run pre-built images such as ``qemux86`` and ``qemuarm``, see the
    :doc:`/sdk-manual/index` manual. For
    information about how to install these images, see the documentation
@@ -3772,7 +3762,7 @@ Follow these steps to set up and execute multiple configuration builds:
       TMPDIR = "${TOPDIR}/tmpmultix86"
 
    The location for these multiconfig configuration files is specific.
-   They must reside in the current build directory in a sub-directory of
+   They must reside in the current :term:`Build Directory` in a sub-directory of
    ``conf`` named ``multiconfig`` or within a layer's ``conf`` directory
    under a directory named ``multiconfig``. Following is an example that defines
    two configuration files for the "x86" and "arm" multiconfigs:
@@ -3853,8 +3843,8 @@ to be added to the recipe that builds the ``core-image-sato`` image::
    do_image[mcdepends] = "mc:x86:arm:core-image-minimal:do_rootfs"
 
 In this example, the `from_multiconfig` is "x86". The `to_multiconfig` is "arm". The
-task on which the ``do_image`` task in the recipe depends is the
-``do_rootfs`` task from the ``core-image-minimal`` recipe associated
+task on which the :ref:`ref-tasks-image` task in the recipe depends is the
+:ref:`ref-tasks-rootfs` task from the ``core-image-minimal`` recipe associated
 with the "arm" multiconfig.
 
 Once you set up this dependency, you can build the "x86" multiconfig
@@ -3864,7 +3854,7 @@ using a BitBake command as follows::
 
 This command executes all the tasks needed to create the
 ``core-image-sato`` image for the "x86" multiconfig. Because of the
-dependency, BitBake also executes through the ``do_rootfs`` task for the
+dependency, BitBake also executes through the :ref:`ref-tasks-rootfs` task for the
 "arm" multiconfig build.
 
 Having a recipe depend on the root filesystem of another build might not
@@ -3882,99 +3872,59 @@ and have separate configuration files, BitBake places the artifacts for
 each build in the respective temporary build directories (i.e.
 :term:`TMPDIR`).
 
-Building an Initial RAM Filesystem (initramfs) Image
+Building an Initial RAM Filesystem (Initramfs) Image
 ----------------------------------------------------
 
-An initial RAM filesystem (initramfs) image provides a temporary root
-filesystem used for early system initialization (e.g. loading of modules
-needed to locate and mount the "real" root filesystem).
+An initial RAM filesystem (:term:`Initramfs`) image provides a temporary root
+filesystem used for early system initialization, typically providing tools and
+loading modules needed to locate and mount the final root filesystem.
 
-.. note::
+Follow these steps to create an :term:`Initramfs` image:
 
-   The initramfs image is the successor of initial RAM disk (initrd). It
-   is a "copy in and out" (cpio) archive of the initial filesystem that
-   gets loaded into memory during the Linux startup process. Because
-   Linux uses the contents of the archive during initialization, the
-   initramfs image needs to contain all of the device drivers and tools
-   needed to mount the final root filesystem.
-
-Follow these steps to create an initramfs image:
-
-1. *Create the initramfs Image Recipe:* You can reference the
+1. *Create the Initramfs Image Recipe:* You can reference the
    ``core-image-minimal-initramfs.bb`` recipe found in the
    ``meta/recipes-core`` directory of the :term:`Source Directory`
-   as an example
-   from which to work.
+   as an example from which to work.
 
-2. *Decide if You Need to Bundle the initramfs Image Into the Kernel
-   Image:* If you want the initramfs image that is built to be bundled
-   in with the kernel image, set the
-   :term:`INITRAMFS_IMAGE_BUNDLE`
-   variable to "1" in your ``local.conf`` configuration file and set the
-   :term:`INITRAMFS_IMAGE`
-   variable in the recipe that builds the kernel image.
+2. *Decide if You Need to Bundle the Initramfs Image Into the Kernel
+   Image:* If you want the :term:`Initramfs` image that is built to be bundled
+   in with the kernel image, set the :term:`INITRAMFS_IMAGE_BUNDLE`
+   variable to ``"1"`` in your ``local.conf`` configuration file and set the
+   :term:`INITRAMFS_IMAGE` variable in the recipe that builds the kernel image.
 
-   .. note::
-
-      It is recommended that you bundle the initramfs image with the
-      kernel image to avoid circular dependencies between the kernel
-      recipe and the initramfs recipe should the initramfs image include
-      kernel modules.
-
-   Setting the :term:`INITRAMFS_IMAGE_BUNDLE` flag causes the initramfs
+   Setting the :term:`INITRAMFS_IMAGE_BUNDLE` flag causes the :term:`Initramfs`
    image to be unpacked into the ``${B}/usr/`` directory. The unpacked
-   initramfs image is then passed to the kernel's ``Makefile`` using the
-   :term:`CONFIG_INITRAMFS_SOURCE`
-   variable, allowing the initramfs image to be built into the kernel
-   normally.
+   :term:`Initramfs` image is then passed to the kernel's ``Makefile`` using the
+   :term:`CONFIG_INITRAMFS_SOURCE` variable, allowing the :term:`Initramfs`
+   image to be built into the kernel normally.
 
-   .. note::
+3. *Optionally Add Items to the Initramfs Image Through the Initramfs
+   Image Recipe:* If you add items to the :term:`Initramfs` image by way of its
+   recipe, you should use :term:`PACKAGE_INSTALL` rather than
+   :term:`IMAGE_INSTALL`. :term:`PACKAGE_INSTALL` gives more direct control of
+   what is added to the image as compared to the defaults you might not
+   necessarily want that are set by the :ref:`image <ref-classes-image>`
+   or :ref:`core-image <ref-classes-core-image>` classes.
 
-      Bundling the initramfs with the kernel conflates the code in the initramfs
-      with the GPLv2 licensed Linux kernel binary. Thus only GPLv2 compatible
-      software may be part of a bundled initramfs.
-
-   .. note::
-
-      If you choose to not bundle the initramfs image with the kernel
-      image, you are essentially using an
-      `Initial RAM Disk (initrd) <https://en.wikipedia.org/wiki/Initrd>`__.
-      Creating an initrd is handled primarily through the :term:`INITRD_IMAGE`,
-      ``INITRD_LIVE``, and ``INITRD_IMAGE_LIVE`` variables. For more
-      information, see the :ref:`ref-classes-image-live` file.
-
-3. *Optionally Add Items to the initramfs Image Through the initramfs
-   Image Recipe:* If you add items to the initramfs image by way of its
-   recipe, you should use
-   :term:`PACKAGE_INSTALL`
-   rather than
-   :term:`IMAGE_INSTALL`.
-   :term:`PACKAGE_INSTALL` gives more direct control of what is added to the
-   image as compared to the defaults you might not necessarily want that
-   are set by the :ref:`image <ref-classes-image>`
-   or :ref:`core-image <ref-classes-core-image>`
-   classes.
-
-4. *Build the Kernel Image and the initramfs Image:* Build your kernel
-   image using BitBake. Because the initramfs image recipe is a
-   dependency of the kernel image, the initramfs image is built as well
+4. *Build the Kernel Image and the Initramfs Image:* Build your kernel
+   image using BitBake. Because the :term:`Initramfs` image recipe is a
+   dependency of the kernel image, the :term:`Initramfs` image is built as well
    and bundled with the kernel image if you used the
-   :term:`INITRAMFS_IMAGE_BUNDLE`
-   variable described earlier.
+   :term:`INITRAMFS_IMAGE_BUNDLE` variable described earlier.
 
 Bundling an Initramfs Image From a Separate Multiconfig
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There may be a case where we want to build an initramfs image which does not
+There may be a case where we want to build an :term:`Initramfs` image which does not
 inherit the same distro policy as our main image, for example, we may want
-our main image to use ``TCLIBC="glibc"``, but to use ``TCLIBC="musl"`` in our initramfs
+our main image to use ``TCLIBC="glibc"``, but to use ``TCLIBC="musl"`` in our :term:`Initramfs`
 image to keep a smaller footprint. However, by performing the steps mentioned
-above the initramfs image will inherit ``TCLIBC="glibc"`` without allowing us
+above the :term:`Initramfs` image will inherit ``TCLIBC="glibc"`` without allowing us
 to override it.
 
 To achieve this, you need to perform some additional steps:
 
-1. *Create a multiconfig for your initramfs image:* You can perform the steps
+1. *Create a multiconfig for your Initramfs image:* You can perform the steps
    on ":ref:`dev-manual/common-tasks:building images for multiple targets using multiple configurations`" to create a separate multiconfig.
    For the sake of simplicity let's assume such multiconfig is called: ``initramfscfg.conf`` and
    contains the variables::
@@ -3982,7 +3932,7 @@ To achieve this, you need to perform some additional steps:
       TMPDIR="${TOPDIR}/tmp-initramfscfg"
       TCLIBC="musl"
 
-2. *Set additional initramfs variables on your main configuration:*
+2. *Set additional Initramfs variables on your main configuration:*
    Additionally, on your main configuration (``local.conf``) you need to set the
    variables::
 
@@ -3995,9 +3945,9 @@ To achieve this, you need to perform some additional steps:
    buildsystem know where the :term:`INITRAMFS_IMAGE` will be located.
 
    Building a system with such configuration will build the kernel using the
-   main configuration but the ``do_bundle_initramfs`` task will grab the
+   main configuration but the :ref:`ref-tasks-bundle_initramfs` task will grab the
    selected :term:`INITRAMFS_IMAGE` from :term:`INITRAMFS_DEPLOY_DIR_IMAGE`
-   instead, resulting in a musl based initramfs image bundled in the kernel
+   instead, resulting in a musl based :term:`Initramfs` image bundled in the kernel
    but a glibc based main image.
 
    The same is applicable to avoid inheriting :term:`DISTRO_FEATURES` on :term:`INITRAMFS_IMAGE`
@@ -4171,7 +4121,7 @@ file::
 Finally, you should consider exactly the type of root filesystem you
 need to meet your needs while also reducing its size. For example,
 consider ``cramfs``, ``squashfs``, ``ubifs``, ``ext2``, or an
-``initramfs`` using ``initramfs``. Be aware that ``ext3`` requires a 1
+:term:`Initramfs` using ``initramfs``. Be aware that ``ext3`` requires a 1
 Mbyte journal. If you are okay with running read-only, you do not need
 this journal.
 
@@ -4315,15 +4265,13 @@ If build speed and package feed maintenance are considerations, you
 should consider the points in this section that can help you optimize
 your tunings to best consider build times and package feed maintenance.
 
--  *Share the Build Directory:* If at all possible, share the
-   :term:`TMPDIR` across builds. The
-   Yocto Project supports switching between different
-   :term:`MACHINE` values in the same
-   :term:`TMPDIR`. This practice is well supported and regularly used by
-   developers when building for multiple machines. When you use the same
-   :term:`TMPDIR` for multiple machine builds, the OpenEmbedded build system
-   can reuse the existing native and often cross-recipes for multiple
-   machines. Thus, build time decreases.
+-  *Share the :term:`Build Directory`:* If at all possible, share the
+   :term:`TMPDIR` across builds. The Yocto Project supports switching between
+   different :term:`MACHINE` values in the same :term:`TMPDIR`. This practice
+   is well supported and regularly used by developers when building for
+   multiple machines. When you use the same :term:`TMPDIR` for multiple
+   machine builds, the OpenEmbedded build system can reuse the existing native
+   and often cross-recipes for multiple machines. Thus, build time decreases.
 
    .. note::
 
@@ -4439,10 +4387,10 @@ your tunings to best consider build times and package feed maintenance.
 Building Software from an External Source
 -----------------------------------------
 
-By default, the OpenEmbedded build system uses the
-:term:`Build Directory` when building source
-code. The build process involves fetching the source files, unpacking
-them, and then patching them if necessary before the build takes place.
+By default, the OpenEmbedded build system uses the :term:`Build Directory`
+when building source code. The build process involves fetching the source
+files, unpacking them, and then patching them if necessary before the build
+takes place.
 
 There are situations where you might want to build software from source
 files that are external to and thus outside of the OpenEmbedded build
@@ -4559,9 +4507,8 @@ directory:
    from your "own-mirror" are used.
 
 2. *Start With a Clean Build:* You can start with a clean build by
-   removing the
-   ``${``\ :term:`TMPDIR`\ ``}``
-   directory or using a new :term:`Build Directory`.
+   removing the ``${``\ :term:`TMPDIR`\ ``}`` directory or using a new
+   :term:`Build Directory`.
 
 3. *Build Your Target:* Use BitBake to build your target::
 
@@ -4662,8 +4609,7 @@ Following are additional factors that can affect build speed:
    the benefits are limited due to the compiler using ``-pipe``. The
    build system goes to some lengths to avoid ``sync()`` calls into the
    file system on the principle that if there was a significant failure,
-   the :term:`Build Directory`
-   contents could easily be rebuilt.
+   the :term:`Build Directory` contents could easily be rebuilt.
 
 -  Inheriting the
    :ref:`rm_work <ref-classes-rm-work>` class:
@@ -4740,7 +4686,7 @@ the built library.
 The :term:`PACKAGES` and
 :term:`FILES:* <FILES>` variables in the
 ``meta/conf/bitbake.conf`` configuration file define how files installed
-by the ``do_install`` task are packaged. By default, the :term:`PACKAGES`
+by the :ref:`ref-tasks-install` task are packaged. By default, the :term:`PACKAGES`
 variable includes ``${PN}-staticdev``, which represents all static
 library files.
 
@@ -4860,8 +4806,7 @@ Using Multilib
 After you have set up the recipes, you need to define the actual
 combination of multiple libraries you want to build. You accomplish this
 through your ``local.conf`` configuration file in the
-:term:`Build Directory`. An example
-configuration would be as follows::
+:term:`Build Directory`. An example configuration would be as follows::
 
    MACHINE = "qemux86-64"
    require conf/multilib.conf
@@ -4911,10 +4856,9 @@ Here are the implementation details for the RPM Package Management System:
 
 -  A unique architecture is defined for the Multilib packages, along
    with creating a unique deploy folder under ``tmp/deploy/rpm`` in the
-   :term:`Build Directory`. For
-   example, consider ``lib32`` in a ``qemux86-64`` image. The possible
-   architectures in the system are "all", "qemux86_64",
-   "lib32:qemux86_64", and "lib32:x86".
+   :term:`Build Directory`. For example, consider ``lib32`` in a
+   ``qemux86-64`` image. The possible architectures in the system are "all",
+   "qemux86_64", "lib32:qemux86_64", and "lib32:x86".
 
 -  The ``${MLPREFIX}`` variable is stripped from ``${PN}`` during RPM
    packaging. The naming for a normal RPM package and a Multilib RPM
@@ -5500,8 +5444,7 @@ system needs to meet the following requirements:
    your development host system.
 
 -  You must have sourced the build environment setup script (i.e.
-   :ref:`structure-core-script`) found in the
-   :term:`Build Directory`.
+   :ref:`structure-core-script`) found in the :term:`Build Directory`.
 
 -  You need to have the build artifacts already available, which
    typically means that you must have already created an image using the
@@ -5609,11 +5552,10 @@ Raw Mode
 
 Running Wic in raw mode allows you to specify all the partitions through
 the ``wic`` command line. The primary use for raw mode is if you have
-built your kernel outside of the Yocto Project
-:term:`Build Directory`. In other words, you
-can point to arbitrary kernel, root filesystem locations, and so forth.
-Contrast this behavior with cooked mode where Wic looks in the Build
-Directory (e.g. ``tmp/deploy/images/``\ machine).
+built your kernel outside of the Yocto Project :term:`Build Directory`.
+In other words, you can point to arbitrary kernel, root filesystem locations,
+and so forth. Contrast this behavior with cooked mode where Wic looks in the
+:term:`Build Directory` (e.g. ``tmp/deploy/images/``\ machine).
 
 The general form of the ``wic`` command in raw mode is::
 
@@ -5666,11 +5608,11 @@ The general form of the ``wic`` command in raw mode is::
 Cooked Mode
 ~~~~~~~~~~~
 
-Running Wic in cooked mode leverages off artifacts in the Build
-Directory. In other words, you do not have to specify kernel or root
-filesystem locations as part of the command. All you need to provide is
+Running Wic in cooked mode leverages off artifacts in the
+:term:`Build Directory`. In other words, you do not have to specify kernel or
+root filesystem locations as part of the command. All you need to provide is
 a kickstart file and the name of the image from which to use artifacts
-by using the "-e" option. Wic looks in the Build Directory (e.g.
+by using the "-e" option. Wic looks in the :term:`Build Directory` (e.g.
 ``tmp/deploy/images/``\ machine) for artifacts.
 
 The general form of the ``wic`` command using Cooked Mode is as follows::
@@ -5918,9 +5860,9 @@ and kickstart file information.
    You should always verify the details provided in the output to make
    sure that the image was indeed created exactly as expected.
 
-Continuing with the example, you can now write the image from the Build
-Directory onto a USB stick, or whatever media for which you built your
-image, and boot from the media. You can write the image by using
+Continuing with the example, you can now write the image from the
+:term:`Build Directory` onto a USB stick, or whatever media for which you
+built your image, and boot from the media. You can write the image by using
 ``bmaptool`` or ``dd``::
 
    $ oe-run-native bmap-tools-native bmaptool copy mkefidisk-201804191017-sda.direct /dev/sdX
@@ -6192,7 +6134,7 @@ any type of image. Use these steps to flash an image using Bmaptool:
 
 3. *Flash the Device:* Flash the device with the image by using Bmaptool
    depending on your particular setup. The following commands assume the
-   image resides in the Build Directory's ``deploy/images/`` area:
+   image resides in the :term:`Build Directory`'s ``deploy/images/`` area:
 
    -  If you have write access to the media, use this command form::
 
@@ -6270,6 +6212,13 @@ more secure:
 -  Ensure you can update the software on the device to mitigate
    vulnerabilities discovered in the future. This consideration
    especially applies when your device is network-enabled.
+
+-  Regularly scan and apply fixes for CVE security issues affecting
+   all software components in the product, see ":ref:`dev-manual/common-tasks:checking for vulnerabilities`".
+
+-  Regularly update your version of Poky and OE-Core from their upstream
+   developers, e.g. to apply updates and security fixes from stable
+   and LTS branches.
 
 -  Ensure you remove or disable debugging functionality before producing
    the final image. For information on how to do this, see the
@@ -6432,11 +6381,9 @@ layer. The following steps provide some more detail:
    variable from the ``local.conf`` file. The variables you use are not
    limited to the list in the previous bulleted item.
 
--  *Point to Your distribution configuration file:* In your
-   ``local.conf`` file in the :term:`Build Directory`,
-   set your
-   :term:`DISTRO` variable to point to
-   your distribution's configuration file. For example, if your
+-  *Point to Your distribution configuration file:* In your ``local.conf``
+   file in the :term:`Build Directory`, set your :term:`DISTRO` variable to
+   point to your distribution's configuration file. For example, if your
    distribution's configuration file is named ``mydistro.conf``, then
    you point to it as follows::
 
@@ -6471,7 +6418,7 @@ Creating a Custom Template Configuration Directory
 If you are producing your own customized version of the build system for
 use by other users, you might want to provide a custom build configuration
 that includes all the necessary settings and layers (i.e. ``local.conf`` and
-``bblayers.conf`` that are created in a new build directory) and a custom
+``bblayers.conf`` that are created in a new :term:`Build Directory`) and a custom
 message that is shown when setting up the build. This can be done by
 creating one or more template configuration directories in your
 custom distribution layer.
@@ -6485,7 +6432,7 @@ This can be done by using ``bitbake-layers save-build-conf``::
    You can try out the configuration with
    TEMPLATECONF=/srv/work/alex/meta-alex/conf/templates/test-1 . /srv/work/alex/poky/oe-init-build-env build-try-test-1
 
-The above command takes the config files from the currently active build directory under ``conf``,
+The above command takes the config files from the currently active :term:`Build Directory` under ``conf``,
 replaces site-specific paths in ``bblayers.conf`` with ``##OECORE##``-relative paths, and copies
 the config files into a specified layer under a specified template name.
 
@@ -6717,10 +6664,9 @@ generated are just "self consistent". The build system adds and removes
 packages and there are no guarantees about upgrade paths but images will
 be consistent and correct with the latest changes.
 
-The simplest form for a PR Service is for a single host
-development system that builds the package feed (building system). For
-this scenario, you can enable a local PR Service by setting
-:term:`PRSERV_HOST` in your
+The simplest form for a PR Service is for a single host development system
+that builds the package feed (building system). For this scenario, you can
+enable a local PR Service by setting :term:`PRSERV_HOST` in your
 ``local.conf`` file in the :term:`Build Directory`::
 
    PRSERV_HOST = "localhost:0"
@@ -6902,7 +6848,7 @@ The previous example specifies a number of things in the call to
 ``do_split_packages``.
 
 -  A directory within the files installed by your recipe through
-   ``do_install`` in which to search.
+   :ref:`ref-tasks-install` in which to search.
 
 -  A regular expression used to match module files in that directory. In
    the example, note the parentheses () that mark the part of the
@@ -6929,7 +6875,7 @@ multiple times if you have more than one set of modules to package.
 For more examples that show how to use ``do_split_packages``, see the
 ``connman.inc`` file in the ``meta/recipes-connectivity/connman/``
 directory of the ``poky`` :ref:`source repository <overview-manual/development-environment:yocto project source repositories>`. You can
-also find examples in ``meta/classes/kernel.bbclass``.
+also find examples in ``meta/classes-recipe/kernel.bbclass``.
 
 Following is a reference that shows ``do_split_packages`` mandatory and
 optional arguments::
@@ -7076,7 +7022,7 @@ machine does not necessarily have to be the package server. The build
 machine could push its artifacts to another machine that acts as the
 server (e.g. Internet-facing). In fact, doing so is advantageous for a
 production environment as getting the packages away from the development
-system's build directory prevents accidental overwrites.
+system's :term:`Build Directory` prevents accidental overwrites.
 
 A simple build that targets just one device produces more than one
 package database. In other words, the packages produced by a build are
@@ -7108,8 +7054,7 @@ to use. In your configuration, you use the
 :term:`PACKAGE_CLASSES`
 variable to specify the format:
 
-1. Open the ``local.conf`` file inside your
-   :term:`Build Directory` (e.g.
+1. Open the ``local.conf`` file inside your :term:`Build Directory` (e.g.
    ``poky/build/conf/local.conf``).
 
 2. Select the desired package format as follows::
@@ -7195,12 +7140,10 @@ environment, the setup is simple and straight forward. Should you want
 to use a different server more suited for production (e.g. Apache 2,
 Lighttpd, or Nginx), take the appropriate steps to do so.
 
-From within the build directory where you have built an image based on
-your packaging choice (i.e. the
-:term:`PACKAGE_CLASSES`
-setting), simply start the server. The following example assumes a build
-directory of ``poky/build/tmp/deploy/rpm`` and a :term:`PACKAGE_CLASSES`
-setting of "package_rpm"::
+From within the :term:`Build Directory` where you have built an image based on
+your packaging choice (i.e. the :term:`PACKAGE_CLASSES` setting), simply start
+the server. The following example assumes a :term:`Build Directory` of ``poky/build``
+and a :term:`PACKAGE_CLASSES` setting of "package_rpm"::
 
    $ cd poky/build/tmp/deploy/rpm
    $ python3 -m http.server
@@ -7472,11 +7415,9 @@ see the :yocto_wiki:`Ptest </Ptest>` wiki page.
 Adding ptest to Your Build
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To add package testing to your build, add the
-:term:`DISTRO_FEATURES` and
-:term:`EXTRA_IMAGE_FEATURES`
-variables to your ``local.conf`` file, which is found in the
-:term:`Build Directory`::
+To add package testing to your build, add the :term:`DISTRO_FEATURES` and
+:term:`EXTRA_IMAGE_FEATURES` variables to your ``local.conf`` file, which
+is found in the :term:`Build Directory`::
 
    DISTRO_FEATURES:append = " ptest"
    EXTRA_IMAGE_FEATURES += "ptest-pkgs"
@@ -7587,17 +7528,16 @@ NPM packages:
 -  Of the two methods that you can use ``devtool`` to create NPM
    packages, the registry approach is slightly simpler. However, you
    might consider the project approach because you do not have to
-   publish your module in the NPM registry
-   (`npm-registry <https://docs.npmjs.com/misc/registry>`_), which
-   is NPM's public registry.
+   publish your module in the `NPM registry <https://docs.npmjs.com/misc/registry>`__,
+   which is NPM's public registry.
 
 -  Be familiar with
    :doc:`devtool </ref-manual/devtool-reference>`.
 
 -  The NPM host tools need the native ``nodejs-npm`` package, which is
    part of the OpenEmbedded environment. You need to get the package by
-   cloning the https://github.com/openembedded/meta-openembedded
-   repository out of GitHub. Be sure to add the path to your local copy
+   cloning the :oe_git:`meta-openembedded </meta-openembedded>`
+   repository. Be sure to add the path to your local copy
    to your ``bblayers.conf`` file.
 
 -  ``devtool`` cannot detect native libraries in module dependencies.
@@ -8127,7 +8067,7 @@ image's recipe file via the :term:`IMAGE_FEATURES` variable::
    IMAGE_FEATURES += "read-only-rootfs"
 
 As an alternative, you can add the same feature
-from within your build directory's ``local.conf`` file with the
+from within your :term:`Build Directory`'s ``local.conf`` file with the
 associated :term:`EXTRA_IMAGE_FEATURES` variable, as in::
 
    EXTRA_IMAGE_FEATURES = "read-only-rootfs"
@@ -8222,9 +8162,8 @@ Enabling and Disabling Build History
 ------------------------------------
 
 Build history is disabled by default. To enable it, add the following
-:term:`INHERIT` statement and set the
-:term:`BUILDHISTORY_COMMIT`
-variable to "1" at the end of your ``conf/local.conf`` file found in the
+:term:`INHERIT` statement and set the :term:`BUILDHISTORY_COMMIT` variable to
+"1" at the end of your ``conf/local.conf`` file found in the
 :term:`Build Directory`::
 
    INHERIT += "buildhistory"
@@ -8247,10 +8186,8 @@ your ``conf/local.conf`` file.
 Understanding What the Build History Contains
 ---------------------------------------------
 
-Build history information is kept in
-``${``\ :term:`TOPDIR`\ ``}/buildhistory``
-in the Build Directory as defined by the
-:term:`BUILDHISTORY_DIR`
+Build history information is kept in ``${``\ :term:`TOPDIR`\ ``}/buildhistory``
+in the :term:`Build Directory` as defined by the :term:`BUILDHISTORY_DIR`
 variable. Here is an example abbreviated listing:
 
 .. image:: figures/buildhistory.png
@@ -8481,7 +8418,7 @@ The following list shows the files produced for SDKs:
    information.
 
 -  ``sstate-task-sizes.txt:`` A text file containing name-value pairs
-   with information about task group sizes (e.g. ``do_populate_sysroot``
+   with information about task group sizes (e.g. :ref:`ref-tasks-populate_sysroot`
    tasks have a total size). The ``sstate-task-sizes.txt`` file exists
    only when an extensible SDK is created.
 
@@ -8802,7 +8739,7 @@ perform a one-time setup of your controller image by doing the following:
    -  Installs normal linux utilities not BusyBox ones (e.g. ``bash``,
       ``coreutils``, ``tar``, ``gzip``, and ``kmod``).
 
-   -  Uses a custom Initial RAM Disk (initramfs) image with a custom
+   -  Uses a custom :term:`Initramfs` image with a custom
       installer. A normal image that you can install usually creates a
       single root filesystem partition. This image uses another installer that
       creates a specific partition layout. Not all Board Support
@@ -8917,11 +8854,9 @@ Running Tests
 
 You can start the tests automatically or manually:
 
--  *Automatically running tests:* To run the tests automatically after
-   the OpenEmbedded build system successfully creates an image, first
-   set the
-   :term:`TESTIMAGE_AUTO`
-   variable to "1" in your ``local.conf`` file in the
+-  *Automatically running tests:* To run the tests automatically after the
+   OpenEmbedded build system successfully creates an image, first set the
+   :term:`TESTIMAGE_AUTO` variable to "1" in your ``local.conf`` file in the
    :term:`Build Directory`::
 
       TESTIMAGE_AUTO = "1"
@@ -8933,7 +8868,7 @@ You can start the tests automatically or manually:
 
 -  *Manually running tests:* To manually run the tests, first globally
    inherit the
-   :ref:`testimage <ref-classes-testimage*>` class
+   :ref:`testimage <ref-classes-testimage>` class
    by editing your ``local.conf`` file::
 
       INHERIT += "testimage"
@@ -9016,10 +8951,9 @@ following BitBake command form::
 
    $ bitbake image -c testexport
 
-Exporting the tests places them in the
-:term:`Build Directory` in
-``tmp/testexport/``\ image, which is controlled by the
-:term:`TEST_EXPORT_DIR` variable.
+Exporting the tests places them in the :term:`Build Directory` in
+``tmp/testexport/``\ image, which is controlled by the :term:`TEST_EXPORT_DIR`
+variable.
 
 You can now run the tests outside of the build environment::
 
@@ -9081,7 +9015,7 @@ Class methods are as follows:
 
 -  *hasPackage(pkg):* Returns "True" if ``pkg`` is in the installed
    package list of the image, which is based on the manifest file that
-   is generated during the ``do_rootfs`` task.
+   is generated during the :ref:`ref-tasks-rootfs` task.
 
 -  *hasFeature(feature):* Returns "True" if the feature is in
    :term:`IMAGE_FEATURES` or
@@ -9246,9 +9180,8 @@ section:
 
 -  ":ref:`dev-manual/common-tasks:viewing task variable dependencies`" describes
    how to use the ``bitbake-dumpsig`` command in conjunction with key
-   subdirectories in the
-   :term:`Build Directory` to determine
-   variable dependencies.
+   subdirectories in the :term:`Build Directory` to determine variable
+   dependencies.
 
 -  ":ref:`dev-manual/common-tasks:running specific tasks`" describes
    how to use several BitBake options (e.g. ``-c``, ``-C``, and ``-f``)
@@ -9633,11 +9566,11 @@ Running Specific Tasks
 ----------------------
 
 Any given recipe consists of a set of tasks. The standard BitBake
-behavior in most cases is: ``do_fetch``, ``do_unpack``, ``do_patch``,
-``do_configure``, ``do_compile``, ``do_install``, ``do_package``,
-``do_package_write_*``, and ``do_build``. The default task is
-``do_build`` and any tasks on which it depends build first. Some tasks,
-such as ``do_devshell``, are not part of the default build chain. If you
+behavior in most cases is: :ref:`ref-tasks-fetch`, :ref:`ref-tasks-unpack`, :ref:`ref-tasks-patch`,
+:ref:`ref-tasks-configure`, :ref:`ref-tasks-compile`, :ref:`ref-tasks-install`, :ref:`ref-tasks-package`,
+:ref:`do_package_write_* <ref-tasks-package_write_deb>`, and :ref:`ref-tasks-build`. The default task is
+:ref:`ref-tasks-build` and any tasks on which it depends build first. Some tasks,
+such as :ref:`ref-tasks-devshell`, are not part of the default build chain. If you
 wish to run a task that is not part of the default build chain, you can
 use the ``-c`` option in BitBake. Here is an example::
 
@@ -9677,7 +9610,7 @@ The following example shows one way you can use the ``-f`` option::
 
 This sequence first builds and then recompiles ``matchbox-desktop``. The
 last command reruns all tasks (basically the packaging tasks) after the
-compile. BitBake recognizes that the ``do_compile`` task was rerun and
+compile. BitBake recognizes that the :ref:`ref-tasks-compile` task was rerun and
 therefore understands that the other tasks also need to be run again.
 
 Another, shorter way to rerun a task and all
@@ -9724,7 +9657,7 @@ task dependency mechanisms.
 
 
 You can view a list of tasks in a given package by running the
-``do_listtasks`` task as follows::
+:ref:`ref-tasks-listtasks` task as follows::
 
    $ bitbake matchbox-desktop -c listtasks
 
@@ -10397,13 +10330,11 @@ Here are some other tips that you might find useful:
    is also possible to switch out of the splashscreen by switching the
    virtual console (e.g. Fn+Left or Fn+Right on a Zaurus).
 
--  Removing :term:`TMPDIR` (usually
-   ``tmp/``, within the
-   :term:`Build Directory`) can often fix
-   temporary build issues. Removing :term:`TMPDIR` is usually a relatively
-   cheap operation, because task output will be cached in
-   :term:`SSTATE_DIR` (usually
-   ``sstate-cache/``, which is also in the Build Directory).
+-  Removing :term:`TMPDIR` (usually ``tmp/``, within the
+   :term:`Build Directory`) can often fix temporary build issues. Removing
+   :term:`TMPDIR` is usually a relatively cheap operation, because task output
+   will be cached in :term:`SSTATE_DIR` (usually ``sstate-cache/``, which is
+   also in the :term:`Build Directory`).
 
    .. note::
 
@@ -10417,8 +10348,8 @@ Here are some other tips that you might find useful:
 
    Using GNU Grep, you can use the following shell function to
    recursively search through common recipe-related files, skipping
-   binary files, ``.git`` directories, and the Build Directory (assuming
-   its name starts with "build")::
+   binary files, ``.git`` directories, and the :term:`Build Directory`
+   (assuming its name starts with "build")::
 
       g() {
           grep -Ir \
@@ -11316,8 +11247,7 @@ of compliance in mind.
 
 One way of doing this (but certainly not the only way) is to release
 just the source as a tarball. You can do this by adding the following to
-the ``local.conf`` file found in the
-:term:`Build Directory`::
+the ``local.conf`` file found in the :term:`Build Directory`::
 
    INHERIT += "archiver"
    ARCHIVER_MODE[src] = "original"
@@ -11476,9 +11406,9 @@ this function, you have to follow the following steps:
 
 3. Meta-spdxscanner provides several methods within the bbclass to create spdx files.
    Please choose one that you want to use and enable the spdx task. You have to
-   add some config options in ``local.conf`` file in your :term:`Build
-   Directory`. Here is an example showing how to generate spdx files
-   during BitBake using the fossology-python.bbclass::
+   add some config options in ``local.conf`` file in your :term:`Build Directory`.
+   Here is an example showing how to generate spdx files during BitBake using the
+   fossology-python.bbclass::
 
       # Select fossology-python.bbclass.
       INHERIT += "fossology-python"
@@ -11535,8 +11465,8 @@ the license from the fetched source::
 Checking for Vulnerabilities
 ============================
 
-Vulnerabilities in images
--------------------------
+Vulnerabilities in Poky and OE-Core
+-----------------------------------
 
 The Yocto Project has an infrastructure to track and address unfixed
 known security vulnerabilities, as tracked by the public
@@ -11549,14 +11479,78 @@ for packages in Poky and OE-Core, tracking the evolution of the number of
 unpatched CVEs and the status of patches. Such information is available for
 the current development version and for each supported release.
 
-To know which packages are vulnerable to known security vulnerabilities
-in the specific image you are building, add the following setting to your
-configuration::
+Security is a process, not a product, and thus at any time, a number of security
+issues may be impacting Poky and OE-Core. It is up to the maintainers, users,
+contributors and anyone interested in the issues to investigate and possibly fix them by
+updating software components to newer versions or by applying patches to address them.
+It is recommended to work with Poky and OE-Core upstream maintainers and submit
+patches to fix them, see ":ref:`dev-manual/common-tasks:submitting a change to the yocto project`" for details.
+
+Vulnerability check at build time
+---------------------------------
+
+To enable a check for CVE security vulnerabilities using :ref:`cve-check <ref-classes-cve-check>` in the specific image
+or target you are building, add the following setting to your configuration::
 
    INHERIT += "cve-check"
 
-This way, at build time, BitBake will warn you about known CVEs
-as in the example below::
+The CVE database contains some old incomplete entries which have been
+deemed not to impact Poky or OE-Core. These CVE entries can be excluded from the
+check using build configuration::
+
+   include conf/distro/include/cve-extra-exclusions.inc
+
+With this CVE check enabled, BitBake build will try to map each compiled software component
+recipe name and version information to the CVE database and generate recipe and
+image specific reports. These reports will contain:
+
+-  metadata about the software component like names and versions
+
+-  metadata about the CVE issue such as description and NVD link
+
+-  for each software component, a list of CVEs which are possibly impacting this version
+
+-  status of each CVE: ``Patched``, ``Unpatched`` or ``Ignored``
+
+The status ``Patched`` means that a patch file to address the security issue has been
+applied. ``Unpatched`` status means that no patches to address the issue have been
+applied and that the issue needs to be investigated. ``Ignored`` means that after
+analysis, it has been deemed to ignore the issue as it for example affects
+the software component on a different operating system platform.
+
+After build with CVE check enabled, reports for each compiled source recipe will be
+found in ``build/tmp/deploy/cve``.
+
+For example the CVE check report for the ``flex-native`` recipe looks like::
+
+   $ cat poky/build/tmp/deploy/cve/flex-native
+   LAYER: meta
+   PACKAGE NAME: flex-native
+   PACKAGE VERSION: 2.6.4
+   CVE: CVE-2016-6354
+   CVE STATUS: Patched
+   CVE SUMMARY: Heap-based buffer overflow in the yy_get_next_buffer function in Flex before 2.6.1 might allow context-dependent attackers to cause a denial of service or possibly execute arbitrary code via vectors involving num_to_read.
+   CVSS v2 BASE SCORE: 7.5
+   CVSS v3 BASE SCORE: 9.8
+   VECTOR: NETWORK
+   MORE INFORMATION: https://nvd.nist.gov/vuln/detail/CVE-2016-6354
+
+   LAYER: meta
+   PACKAGE NAME: flex-native
+   PACKAGE VERSION: 2.6.4
+   CVE: CVE-2019-6293
+   CVE STATUS: Ignored
+   CVE SUMMARY: An issue was discovered in the function mark_beginning_as_normal in nfa.c in flex 2.6.4. There is a stack exhaustion problem caused by the mark_beginning_as_normal function making recursive calls to itself in certain scenarios involving lots of '*' characters. Remote attackers could leverage this vulnerability to cause a denial-of-service.
+   CVSS v2 BASE SCORE: 4.3
+   CVSS v3 BASE SCORE: 5.5
+   VECTOR: NETWORK
+   MORE INFORMATION: https://nvd.nist.gov/vuln/detail/CVE-2019-6293
+
+For images, a summary of all recipes included in the image and their CVEs is also
+generated in textual and JSON formats. These ``.cve`` and ``.json`` reports can be found
+in the ``tmp/deploy/images`` directory for each compiled image.
+
+At build time CVE check will also throw warnings about ``Unpatched`` CVEs::
 
    WARNING: flex-2.6.4-r0 do_cve_check: Found unpatched CVE (CVE-2019-6293), for more information check /poky/build/tmp/work/core2-64-poky-linux/flex/2.6.4-r0/temp/cve.log
    WARNING: libarchive-3.5.1-r0 do_cve_check: Found unpatched CVE (CVE-2021-36976), for more information check /poky/build/tmp/work/core2-64-poky-linux/libarchive/3.5.1-r0/temp/cve.log
@@ -11565,21 +11559,46 @@ It is also possible to check the CVE status of individual packages as follows::
 
    bitbake -c cve_check flex libarchive
 
-Note that OpenEmbedded-Core keeps a list of known unfixed CVE issues which can
-be ignored. You can pass this list to the check as follows::
+Fixing CVE product name and version mappings
+--------------------------------------------
 
-   bitbake -c cve_check libarchive -R conf/distro/include/cve-extra-exclusions.inc
+By default, :ref:`cve-check <ref-classes-cve-check>` uses the recipe name :term:`BPN` as CVE
+product name when querying the CVE database. If this mapping contains false positives, e.g.
+some reported CVEs are not for the software component in question, or false negatives like
+some CVEs are not found to impact the recipe when they should, then the problems can be
+in the recipe name to CVE product mapping. These mapping issues can be fixed by setting
+the :term:`CVE_PRODUCT` variable inside the recipe. This defines the name of software component in the
+upstream `NIST CVE database <https://nvd.nist.gov/>`__.
 
-Enabling vulnerabily tracking in recipes
-----------------------------------------
+The variable supports using vendor and product names like this::
 
-The :term:`CVE_PRODUCT` variable defines the name used to match the recipe name
-against the name in the upstream `NIST CVE database <https://nvd.nist.gov/>`__.
+   CVE_PRODUCT = "flex_project:flex"
 
-Editing recipes to fix vulnerabilities
---------------------------------------
+In this example from the vendor name used in CVE database is ``flex_project`` and
+product is ``flex``. With this setting the ``flex`` recipe only maps to this specific
+product and not products from other vendors with same name ``flex``.
 
-To fix a given known vulnerability, you need to add a patch file to your recipe. Here's
+Similary, when the recipe version :term:`PV` is not compatible with software versions used by
+the upstream software component releases and the CVE database, these can be fixed using
+:term:`CVE_VERSION` variable.
+
+Note that if the CVE entries in NVD databse contain bugs or have missing or incomplete
+information, it is recommended to fix the information there directly instead of working
+around the issues for a possibly long time in Poky and OE-Core side recipes. Feedback to
+NVD about CVEs entries can be provided through the `NVD contact form <https://nvd.nist.gov/info/contact-form>`__.
+
+Fixing vulnerabilities in recipes
+---------------------------------
+
+If a CVE security issue impacts a software component, it can be fixed by updating to a newer
+version of the software component or by applying a patch. For Poky and OE-Core master branches, updating
+to newer software component release with fixes is the best option, but patches can be applied
+if releases are not yet available.
+
+For stable branches, it is preferred to apply patches for the issues. For some software
+components minor version updates can also applied if they are backwards compatible.
+
+Here is an example of fixing CVE security issues with patch files,
 an example from the :oe_layerindex:`ffmpeg recipe</layerindex/recipe/47350>`::
 
    SRC_URI = "https://www.ffmpeg.org/releases/${BP}.tar.xz \
@@ -11591,31 +11610,21 @@ an example from the :oe_layerindex:`ffmpeg recipe</layerindex/recipe/47350>`::
               file://fix-CVE-2020-22033-CVE-2020-22019.patch \
               file://fix-CVE-2021-33815.patch \
 
-The :ref:`cve-check <ref-classes-cve-check>` class defines two ways of
-supplying a patch for a given CVE. The first
-way is to use a patch filename that matches the below pattern::
+A good practice is to include the CVE identifier in both patch file name
+and inside the patch file commit message use the format::
 
-   cve_file_name_match = re.compile(".*([Cc][Vv][Ee]\-\d{4}\-\d+)")
+   CVE: CVE-2020-22033
 
-As shown in the example above, multiple CVE IDs can appear in a patch filename,
-but the :ref:`cve-check <ref-classes-cve-check>` class will only consider
-the last CVE ID in the filename as patched.
+CVE checker will then capture this information and change the CVE status to ``Patched``
+in the generated reports.
 
-The second way to recognize a patched CVE ID is when a line matching the
-below pattern is found in any patch file provided by the recipe::
+If analysis shows that the CVE issue does not impact the recipe due to configuration, platform,
+version or other reasons, the CVE can be marked as ``Ignored`` using :term:`CVE_CHECK_IGNORE` variable.
+As mentioned previously, if data in the CVE database is wrong, it is recommend to fix those
+issues in the CVE database directly.
 
-  cve_match = re.compile("CVE:( CVE\-\d{4}\-\d+)+")
-
-This allows a single patch file to address multiple CVE IDs at the same time.
-
-Of course, another way to fix vulnerabilities is to upgrade to a version
-of the package which is not impacted, typically a more recent one.
-The NIST database knows which versions are vulnerable and which ones
-are not.
-
-Last but not least, you can choose to ignore vulnerabilities through
-the :term:`CVE_CHECK_SKIP_RECIPE` and :term:`CVE_CHECK_IGNORE`
-variables.
+Recipes can be completely skipped by CVE check by including the recipe name in
+the :term:`CVE_CHECK_SKIP_RECIPE` variable.
 
 Implementation details
 ----------------------
@@ -11632,23 +11641,38 @@ file. The found CVE IDs are also considered as patched.
 Then, the code looks up all the CVE IDs in the NIST database for all the
 products defined in :term:`CVE_PRODUCT`. Then, for each found CVE:
 
- - If the package name (:term:`PN`) is part of
-   :term:`CVE_CHECK_SKIP_RECIPE`, it is considered as patched.
+-  If the package name (:term:`PN`) is part of
+   :term:`CVE_CHECK_SKIP_RECIPE`, it is considered as ``Patched``.
 
- - If the CVE ID is part of :term:`CVE_CHECK_IGNORE`, it is
-   considered as patched too.
+-  If the CVE ID is part of :term:`CVE_CHECK_IGNORE`, it is
+   set as ``Ignored``.
 
- - If the CVE ID is part of the patched CVE for the recipe, it is
-   already considered as patched.
+-  If the CVE ID is part of the patched CVE for the recipe, it is
+   already considered as ``Patched``.
 
- - Otherwise, the code checks whether the recipe version (:term:`PV`)
+-  Otherwise, the code checks whether the recipe version (:term:`PV`)
    is within the range of versions impacted by the CVE. If so, the CVE
-   is considered as unpatched.
+   is considered as ``Unpatched``.
 
 The CVE database is stored in :term:`DL_DIR` and can be inspected using
 ``sqlite3`` command as follows::
 
    sqlite3 downloads/CVE_CHECK/nvdcve_1.1.db .dump | grep CVE-2021-37462
+
+When analyzing CVEs, it is recommended to:
+
+-  study the latest information in `CVE database <https://nvd.nist.gov/vuln/search>`__.
+
+-  check how upstream developers of the software component addressed the issue, e.g.
+   what patch was applied, which upstream release contains the fix.
+
+-  check what other Linux distributions like `Debian <https://security-tracker.debian.org/tracker/>`__
+   did to analyze and address the issue.
+
+-  follow security notices from other Linux distributions.
+
+-  follow public `open source security mailing lists <https://oss-security.openwall.org/wiki/mailing-lists>`__ for
+   discussions and advance notifications of CVE bugs and software releases with fixes.
 
 Using the Error Reporting Tool
 ==============================
@@ -11677,12 +11701,9 @@ Enabling and Using the Tool
 ---------------------------
 
 By default, the error reporting tool is disabled. You can enable it by
-inheriting the
-:ref:`report-error <ref-classes-report-error>`
+inheriting the :ref:`report-error <ref-classes-report-error>`
 class by adding the following statement to the end of your
-``local.conf`` file in your
-:term:`Build Directory`.
-::
+``local.conf`` file in your :term:`Build Directory`::
 
    INHERIT += "report-error"
 

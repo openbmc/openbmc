@@ -1,0 +1,161 @@
+#!/bin/bash
+
+export PATH=$PATH:/usr/sbin:/usr/libexec
+
+# shellcheck source=meta-facebook/meta-bletchley/recipes-bletchley/plat-tools/files/bletchley-common-functions
+source /usr/libexec/bletchley-common-functions
+
+MDIO_TOOL="/usr/sbin/mdio"
+SWITCH_MDIO_BUS="1e650000.mdio-1"
+
+declare -a PORT_NUM_MAP=(10 3 2 1 7 6 5)
+
+declare -a HOST_PREVIOUS_STATE=("" "" "" "" "" "" "")
+declare -a HOST_STATE_CHANGE_CHECK=(0 0 0 0 0 0 0)
+HOST_STATE_CHANGE_CHECH_CNT=5
+
+declare -A HOST_ACPI_ST_MAP
+HOST_ACPI_ST_MAP["UNKNOW"]="Unknow"
+HOST_ACPI_ST_MAP["NOT_PRESENT"]="G3"
+HOST_ACPI_ST_MAP["AC_OFF"]="G3"
+HOST_ACPI_ST_MAP["OFF"]="G3"
+HOST_ACPI_ST_MAP["SLEEP"]="SLEEP"
+HOST_ACPI_ST_MAP["ON"]="S0_G0_D0"
+
+declare -A HOST_STATE_MAP
+HOST_STATE_MAP["UNKNOW"]="Quiesced"
+HOST_STATE_MAP["NOT_PRESENT"]="Off"
+HOST_STATE_MAP["AC_OFF"]="Off"
+HOST_STATE_MAP["OFF"]="Off"
+HOST_STATE_MAP["SLEEP"]="Standby"
+HOST_STATE_MAP["ON"]="Running"
+
+declare -A CHASSIS_PWR_STATE_MAP
+CHASSIS_PWR_STATE_MAP["UNKNOW"]="On"
+CHASSIS_PWR_STATE_MAP["NOT_PRESENT"]="Off"
+CHASSIS_PWR_STATE_MAP["AC_OFF"]="Off"
+CHASSIS_PWR_STATE_MAP["OFF"]="On"
+CHASSIS_PWR_STATE_MAP["SLEEP"]="On"
+CHASSIS_PWR_STATE_MAP["ON"]="On"
+
+is_host_ac_on()
+{
+    local HOST_ID=$1
+    local I2C_BUS
+    local P1_OUTPUT_REG
+    local P1_CONFIG_REG
+    local HOST_PWR
+    local IS_OUTPUT
+
+    I2C_BUS=$((HOST_ID-1))
+    P1_OUTPUT_REG=$(i2cget -f -y "$I2C_BUS" 0x76 0x03)
+    P1_CONFIG_REG=$(i2cget -f -y "$I2C_BUS" 0x76 0x07)
+    HOST_PWR="$(( (P1_OUTPUT_REG & 0x80)>>7 ))"
+    IS_OUTPUT="$(( (~P1_CONFIG_REG & 0x80)>>7 ))"
+
+    if [ "$((HOST_PWR & IS_OUTPUT))" -eq 1 ];then
+        return 0
+    fi
+
+    return 1
+}
+
+update_host_acpi_power_state()
+{
+    local BUS_NAME="xyz.openbmc_project.Settings"
+    local OBJ_PATH="/xyz/openbmc_project/control/host$1/acpi_power_state"
+    local DBUS_PROPERTIES_INTF_NAME="org.freedesktop.DBus.Properties"
+    local INTF_NAME="xyz.openbmc_project.Control.Power.ACPIPowerState"
+    local PROPERTY_NAME="SysACPIStatus"
+    local PROPERTY_VAL="xyz.openbmc_project.Control.Power.ACPIPowerState.ACPI.$2"
+    busctl call "$BUS_NAME" "$OBJ_PATH" "$DBUS_PROPERTIES_INTF_NAME" Set ssv "$INTF_NAME" "$PROPERTY_NAME" s "$PROPERTY_VAL"
+}
+
+update_host_state()
+{
+    local BUS_NAME="xyz.openbmc_project.State.Host$1"
+    local OBJ_PATH="/xyz/openbmc_project/state/host$1"
+    local DBUS_PROPERTIES_INTF_NAME="org.freedesktop.DBus.Properties"
+    local INTF_NAME="xyz.openbmc_project.State.Host"
+    local PROPERTY_NAME="CurrentHostState"
+    local PROPERTY_VAL="xyz.openbmc_project.State.Host.HostState.$2"
+    busctl call "$BUS_NAME" "$OBJ_PATH" "$DBUS_PROPERTIES_INTF_NAME" Set ssv "$INTF_NAME" "$PROPERTY_NAME" s "$PROPERTY_VAL"
+}
+
+update_chassis_power_state()
+{
+    local BUS_NAME="xyz.openbmc_project.State.Chassis$1"
+    local OBJ_PATH="/xyz/openbmc_project/state/chassis$1"
+    local DBUS_PROPERTIES_INTF_NAME="org.freedesktop.DBus.Properties"
+    local INTF_NAME="xyz.openbmc_project.State.Chassis"
+    local PROPERTY_NAME="CurrentPowerState"
+    local PROPERTY_VAL="xyz.openbmc_project.State.Chassis.PowerState.$2"
+    busctl call "$BUS_NAME" "$OBJ_PATH" "$DBUS_PROPERTIES_INTF_NAME" Set ssv "$INTF_NAME" "$PROPERTY_NAME" s "$PROPERTY_VAL"
+}
+
+update_sled_led_state()
+{
+    local HOST_ID=$1
+    local HOST_STATE=$2
+    case "$HOST_STATE" in
+        ON|SLEEP)
+            systemctl start obmc-led-group-start@sled"$i"_good.service
+            ;;
+        AC_OFF|OFF)
+            systemctl start obmc-led-group-stop@sled"$i"_good.service
+            ;;
+        *)
+            ;;
+    esac
+}
+
+check_host_state()
+{
+    if ! PORT_ST_VAL=$("$MDIO_TOOL" "$SWITCH_MDIO_BUS" phy "${PORT_NUM_MAP[$1]}" 0x00); then
+        # failed to get port status via mdio
+        echo "UNKNOW"
+        return 1
+    fi
+
+    if [ $((PORT_ST_VAL&16#0800)) -eq $((16#0000)) ]; then
+        echo "OFF"
+    elif [ $((PORT_ST_VAL&16#0A00)) -eq $((16#0A00)) ]; then
+        echo "ON"
+    elif [ $((PORT_ST_VAL&16#0900)) -eq $((16#0900)) ]; then
+        echo "SLEEP"
+    else
+        echo "UNKNOW"
+    fi
+    return 0
+}
+
+while true
+do
+    for i in {1..6}
+    do
+        HOST_STATE=""
+        if ! is_sled_present "$i"; then
+            HOST_STATE="NOT_PRESENT"
+        elif ! is_host_ac_on "$i"; then
+            HOST_STATE="AC_OFF"
+        else
+            HOST_STATE=$(check_host_state "$i")
+        fi
+
+        if [ "$HOST_STATE" = "${HOST_PREVIOUS_STATE[$i]}" ]; then
+            HOST_STATE_CHANGE_CHECK[$i]="$HOST_STATE_CHANGE_CHECH_CNT"
+        elif [ "${HOST_STATE_CHANGE_CHECK[$i]}" -gt "0" ]; then
+            echo "SLED$i: detected state changed (previous:${HOST_PREVIOUS_STATE[$i]}, current:$HOST_STATE), check count: ${HOST_STATE_CHANGE_CHECK[$i]}"
+            HOST_STATE_CHANGE_CHECK[$i]=$((HOST_STATE_CHANGE_CHECK[i]-1))
+        else
+            echo "SLED$i: detected state changed, update host state to $HOST_STATE"
+            update_host_acpi_power_state "$i" "${HOST_ACPI_ST_MAP[$HOST_STATE]}"
+            update_host_state "$i" "${HOST_STATE_MAP[$HOST_STATE]}"
+            update_chassis_power_state "$i" "${CHASSIS_PWR_STATE_MAP[$HOST_STATE]}"
+            update_sled_led_state "$i" "$HOST_STATE"
+            HOST_STATE_CHANGE_CHECK[$i]="$HOST_STATE_CHANGE_CHECH_CNT"
+            HOST_PREVIOUS_STATE[$i]="$HOST_STATE"
+        fi
+    done
+    sleep 1
+done

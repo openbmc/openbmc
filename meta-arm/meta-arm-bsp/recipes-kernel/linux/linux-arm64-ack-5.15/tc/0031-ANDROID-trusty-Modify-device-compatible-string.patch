@@ -1,0 +1,57 @@
+From d022d0c3c6cadacf8a3a5fd2bb42c465834eef26 Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Fri, 14 Jan 2022 14:22:42 +0000
+Subject: [PATCH 31/40] ANDROID: trusty: Modify device compatible string
+
+Drop smc keyword from device tree node as Trusty can use SMC or FFA
+based transport.
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Change-Id: Id99b52f32a2122434a22f1991c0b4cd52b0676ed
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com
+---
+ Documentation/devicetree/bindings/trusty/trusty-irq.txt | 2 +-
+ Documentation/devicetree/bindings/trusty/trusty-smc.txt | 2 +-
+ drivers/trusty/trusty.c                                 | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/trusty/trusty-irq.txt b/Documentation/devicetree/bindings/trusty/trusty-irq.txt
+index cbb545ad452b..ae02030be4e7 100644
+--- a/Documentation/devicetree/bindings/trusty/trusty-irq.txt
++++ b/Documentation/devicetree/bindings/trusty/trusty-irq.txt
+@@ -48,7 +48,7 @@ Example:
+ 	};
+ 	...
+ 	trusty {
+-		compatible = "android,trusty-smc-v1";
++		compatible = "android,trusty-v1";
+ 		ranges;
+ 		#address-cells = <2>;
+ 		#size-cells = <2>;
+diff --git a/Documentation/devicetree/bindings/trusty/trusty-smc.txt b/Documentation/devicetree/bindings/trusty/trusty-smc.txt
+index 1b39ad317c67..8d02a31ba814 100644
+--- a/Documentation/devicetree/bindings/trusty/trusty-smc.txt
++++ b/Documentation/devicetree/bindings/trusty/trusty-smc.txt
+@@ -3,4 +3,4 @@ Trusty smc interface
+ Trusty is running in secure mode on the same (arm) cpu(s) as the current os.
+ 
+ Required properties:
+-- compatible: "android,trusty-smc-v1"
++- compatible: "android,trusty-v1"
+diff --git a/drivers/trusty/trusty.c b/drivers/trusty/trusty.c
+index 0486827a45ca..757dd7b2c527 100644
+--- a/drivers/trusty/trusty.c
++++ b/drivers/trusty/trusty.c
+@@ -615,7 +615,7 @@ static int trusty_remove(struct platform_device *pdev)
+ }
+ 
+ static const struct of_device_id trusty_of_match[] = {
+-	{ .compatible = "android,trusty-smc-v1", },
++	{ .compatible = "android,trusty-v1", },
+ 	{},
+ };
+ 
+-- 
+2.34.1
+

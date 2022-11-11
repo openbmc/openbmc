@@ -300,7 +300,6 @@ RDEPENDS:packagegroup-meta-oe-devtools ="\
     python3-distutils-extra \
     python3-pycups \
     rapidjson \
-    sip3 \
     squashfs-tools-ng \
     uftrace \
     unifex \

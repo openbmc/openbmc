@@ -1,4 +1,0 @@
-DEVPATH=/dev/input/event0
-KEY=50
-POLARITY=1
-TARGET=ampere-host-shutdown-ack@0.service

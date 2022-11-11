@@ -27,3 +27,6 @@ EXTRA_OECMAKE += '-DCMAKE_ASM_FLAGS="${DEBUG_PREFIX_MAP}"'
 # Ignore that SP stripped.elf does not have GNU_HASH
 # Older versions of optee support SYSV hash only.
 INSANE_SKIP:${PN}-dev += "ldflags"
+
+# Trusted Services SPs do not compile with clang
+TOOLCHAIN = "gcc"

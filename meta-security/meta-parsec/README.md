@@ -48,6 +48,7 @@ PKCS11 and MBED-CRYPTO providers build-in.
 - DISTRO_FEATURES contains "tmp2" and
 - "tpm-layer" (meta-tpm) is included in BBLAYERS
 
+The trusted service provider depends on libts recipe from meta-arm layer. 
 
 You can use PACKAGECONFIG for Parsec servic recipe to define
 what providers should be built in. For example:

@@ -1,0 +1,52 @@
+From 2cdf0de8f42c4825f52618b9bbd2ec2084749de0 Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Thu, 19 May 2022 16:44:13 +0100
+Subject: [PATCH 40/40] ANDROID: KVM: arm64: disable FFA driver at EL2
+
+Do not handle FFA calls
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com
+---
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 3 +++
+ arch/arm64/kvm/hyp/nvhe/setup.c    | 4 +++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 49345929af0d..463cf27712c3 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -1134,8 +1134,11 @@ static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
+ 	bool handled;
+ 
+ 	handled = kvm_host_psci_handler(host_ctxt);
++	/* do not handle ffa calls as EL2 FFA driver is not yet complete */
++#if 0
+ 	if (!handled)
+ 		handled = kvm_host_ffa_handler(host_ctxt);
++#endif
+ 	if (!handled)
+ 		default_host_smc_handler(host_ctxt);
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index 1a6f3eba5035..ce84030426d0 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -317,10 +317,12 @@ void __noreturn __pkvm_init_finalise(void)
+ 	if (ret)
+ 		goto out;
+ 
++	/* skip ffa init at EL2, use EL1 driver instead */
++#if 0
+ 	ret = hyp_ffa_init(ffa_proxy_pages);
+ 	if (ret)
+ 		goto out;
+-
++#endif
+ 	hyp_shadow_table_init(shadow_table_base);
+ out:
+ 	/*
+-- 
+2.34.1
+

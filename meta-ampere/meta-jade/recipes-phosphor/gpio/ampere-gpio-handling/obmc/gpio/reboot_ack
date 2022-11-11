@@ -1,4 +1,0 @@
-DEVPATH=/dev/input/event0
-KEY=75
-POLARITY=1
-TARGET=obmc-host-force-warm-reboot@0.target

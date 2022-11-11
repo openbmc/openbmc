@@ -14,7 +14,7 @@ SRC_URI = "git://gitlab.freedesktop.org/mesa/piglit.git;protocol=https;branch=ma
            "
 UPSTREAM_CHECK_COMMITS = "1"
 
-SRCREV = "265896c86f90cb72e8f218ba6a3617fca8b9a1e3"
+SRCREV = "80465078a0ae8f12411db66850ee14f017962fa7"
 # (when PV goes above 1.0 remove the trailing r)
 PV = "1.0+gitr${SRCPV}"
 
@@ -52,8 +52,10 @@ do_configure:prepend() {
    fi
 }
 
-# Forcibly strip because Piglit is *huge*
+# Forcibly strip because Piglit is *huge*, and don't bother trying to split/strip the result.
 OECMAKE_TARGET_INSTALL = "install/strip"
+INHIBIT_PACKAGE_STRIP = "1"
+INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
 
 RDEPENDS:${PN} = "waffle waffle-bin python3 python3-mako python3-json \
 	python3-misc \

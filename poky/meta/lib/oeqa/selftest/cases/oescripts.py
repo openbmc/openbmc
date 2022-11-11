@@ -148,7 +148,7 @@ class OEListPackageconfigTests(OEScriptTests):
         results = runCmd('%s/contrib/list-packageconfig-flags.py' % self.scripts_dir)
         expected_endlines = []
         expected_endlines.append("RECIPE NAME                  PACKAGECONFIG FLAGS")
-        expected_endlines.append("pinentry                     gtk2 libcap ncurses qt secret")
+        expected_endlines.append("pinentry                     gtk2 ncurses qt secret")
         expected_endlines.append("tar                          acl selinux")
 
         self.check_endlines(results, expected_endlines)
@@ -166,11 +166,10 @@ class OEListPackageconfigTests(OEScriptTests):
     def test_packageconfig_flags_option_all(self):
         results = runCmd('%s/contrib/list-packageconfig-flags.py -a' % self.scripts_dir)
         expected_endlines = []
-        expected_endlines.append("pinentry-1.2.0")
-        expected_endlines.append("PACKAGECONFIG ncurses libcap")
+        expected_endlines.append("pinentry-1.2.1")
+        expected_endlines.append("PACKAGECONFIG ncurses")
         expected_endlines.append("PACKAGECONFIG[qt] --enable-pinentry-qt, --disable-pinentry-qt, qtbase-native qtbase")
         expected_endlines.append("PACKAGECONFIG[gtk2] --enable-pinentry-gtk2, --disable-pinentry-gtk2, gtk+ glib-2.0")
-        expected_endlines.append("PACKAGECONFIG[libcap] --with-libcap, --without-libcap, libcap")
         expected_endlines.append("PACKAGECONFIG[ncurses] --enable-ncurses  --with-ncurses-include-dir=${STAGING_INCDIR}, --disable-ncurses, ncurses")
         expected_endlines.append("PACKAGECONFIG[secret] --enable-libsecret, --disable-libsecret, libsecret")
 
@@ -180,7 +179,7 @@ class OEListPackageconfigTests(OEScriptTests):
         results = runCmd('%s/contrib/list-packageconfig-flags.py -p' % self.scripts_dir)
         expected_endlines = []
         expected_endlines.append("RECIPE NAME                  PACKAGECONFIG FLAGS")
-        expected_endlines.append("pinentry                     gtk2 libcap ncurses qt secret")
+        expected_endlines.append("pinentry                     gtk2 ncurses qt secret")
 
         self.check_endlines(results, expected_endlines)
 

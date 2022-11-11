@@ -84,7 +84,7 @@ where the ``linux.inc`` file in ``meta-oe`` was updated.
 
 Recipes that rely on the kernel source code and do not inherit the
 module classes might need to add explicit dependencies on the
-``do_shared_workdir`` kernel task, for example::
+:ref:`ref-tasks-shared_workdir` kernel task, for example::
 
    do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
@@ -128,7 +128,7 @@ when the :ref:`ref-tasks-configure` task needs to be
 re-executed.
 
 One of the improvements is to attempt to run "make clean" during the
-``do_configure`` task if a ``Makefile`` exists. Some software packages
+:ref:`ref-tasks-configure` task if a ``Makefile`` exists. Some software packages
 do not provide a working clean target within their make files. If you
 have such recipes, you need to set
 :term:`CLEANBROKEN` to "1" within the recipe, for example::

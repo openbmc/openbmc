@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Enable BTRFS for eMMC"
+define KFEATURE_COMPATIBILITY all
+
+kconf non-hardware emmc-btrfs.cfg

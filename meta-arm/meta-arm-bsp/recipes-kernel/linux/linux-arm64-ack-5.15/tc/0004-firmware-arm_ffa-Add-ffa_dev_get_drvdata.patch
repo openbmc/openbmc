@@ -1,0 +1,34 @@
+From 9fe23341c66deefb1f953d7ca642f928d8a50c6e Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Thu, 13 Jan 2022 22:22:28 +0000
+Subject: [PATCH 04/40] firmware: arm_ffa: Add ffa_dev_get_drvdata
+
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Change-Id: Icd09d686cab9922563b1deda5276307ea5d94923
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com>
+---
+ include/linux/arm_ffa.h | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/arm_ffa.h b/include/linux/arm_ffa.h
+index f0cb5b72b87b..06dc83d38779 100644
+--- a/include/linux/arm_ffa.h
++++ b/include/linux/arm_ffa.h
+@@ -129,7 +129,12 @@ struct ffa_driver {
+ 
+ static inline void ffa_dev_set_drvdata(struct ffa_device *fdev, void *data)
+ {
+-	fdev->dev.driver_data = data;
++	dev_set_drvdata(&fdev->dev, data);
++}
++
++static inline void *ffa_dev_get_drvdata(struct ffa_device *fdev)
++{
++	return dev_get_drvdata(&fdev->dev);
+ }
+ 
+ #if IS_REACHABLE(CONFIG_ARM_FFA_TRANSPORT)
+-- 
+2.34.1
+

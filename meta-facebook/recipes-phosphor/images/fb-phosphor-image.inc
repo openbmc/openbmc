@@ -6,4 +6,6 @@ OBMC_IMAGE_EXTRA_INSTALL:append = "\
         '', d)} \
     "
 
+OBMC_IMAGE_EXTRA_INSTALL:append:mf-fb-secondary-emmc = " emmc-init"
+
 include recipes-phosphor/images/fb-${MACHINE}-phosphor-image.inc

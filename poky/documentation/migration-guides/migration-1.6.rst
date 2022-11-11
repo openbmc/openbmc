@@ -233,9 +233,9 @@ Separate build and source directories have been enabled by default for
 selected recipes where it is known to work and for all
 recipes that inherit the :ref:`cmake <ref-classes-cmake>` class. In
 future releases the :ref:`autotools <ref-classes-autotools>` class
-will enable a separate build directory by default as well. Recipes
+will enable a separate :term:`Build Directory` by default as well. Recipes
 building Autotools-based software that fails to build with a separate
-build directory should be changed to inherit from the
+:term:`Build Directory` should be changed to inherit from the
 :ref:`autotools-brokensep <ref-classes-autotools>` class instead of
 the ``autotools`` or ``autotools_stage``\ classes.
 

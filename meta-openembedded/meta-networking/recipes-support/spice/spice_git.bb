@@ -58,7 +58,7 @@ PACKAGECONFIG[opus] = "--enable-opus,--disable-opus,libopus,"
 PACKAGECONFIG[opengl] = "--enable-opengl,--disable-opengl,,"
 PACKAGECONFIG[xinerama] = "--enable-xinerama,--disable-xinerama,libxinerama,"
 
-COMPATIBLE_HOST = '(x86_64|i.86).*-linux'
+COMPATIBLE_HOST = '(x86_64|i.86|aarch64).*-linux'
 
 BBCLASSEXTEND = "native nativesdk"
 

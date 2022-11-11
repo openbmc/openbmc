@@ -1,4 +1,4 @@
-From d82cb96eed1098920ad3cdcb36feb32137618066 Mon Sep 17 00:00:00 2001
+From 05d676ddf675d9c8229b723e64717aa485d6809e Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Fri, 10 Sep 2021 12:28:31 +0200
 Subject: [PATCH] Lib/sysconfig.py: use prefix value from build configuration
@@ -15,11 +15,11 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 5 insertions(+)
 
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index e64bcdc..40c6b3e 100644
+index 93c6f73..ff399e2 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
-@@ -613,6 +613,11 @@ def get_config_vars(*args):
-             _init_non_posix(_CONFIG_VARS)
+@@ -668,6 +668,11 @@ def get_config_vars(*args):
+             _CONFIG_VARS['VPATH'] = sys._vpath
          if os.name == 'posix':
              _init_posix(_CONFIG_VARS)
 +        _CONFIG_VARS['installed_base'] = _CONFIG_VARS['prefix']
@@ -27,6 +27,6 @@ index e64bcdc..40c6b3e 100644
 +        _CONFIG_VARS['installed_platbase'] = _CONFIG_VARS['prefix']
 +        _CONFIG_VARS['platbase'] = _CONFIG_VARS['prefix']
 +        _CONFIG_VARS['platlibdir'] = _CONFIG_VARS['PLATLIBDIR']
-         # For backward compatibility, see issue19555
-         SO = _CONFIG_VARS.get('EXT_SUFFIX')
-         if SO is not None:
+         if _HAS_USER_BASE:
+             # Setting 'userbase' is done below the call to the
+             # init function to enable using 'get_config_var' in

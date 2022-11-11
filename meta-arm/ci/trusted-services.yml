@@ -1,0 +1,14 @@
+header:
+  version: 11
+  includes:
+    - ci/meta-openembedded.yml
+
+local_conf_header:
+  trusted_services: |
+    TEST_SUITES:append = " trusted_services"
+    # Include TS Crypto, Storage, ITS, Attestation and SMM-Gateway SPs into optee-os image
+    MACHINE_FEATURES:append = " arm-ffa ts-crypto ts-storage ts-its ts-attestation ts-smm-gateway"
+    # Include TS demo/test tools into image
+    IMAGE_INSTALL:append = " packagegroup-ts-tests"
+    # Include TS PSA Arch tests into image
+    IMAGE_INSTALL:append = " packagegroup-ts-tests-psa"

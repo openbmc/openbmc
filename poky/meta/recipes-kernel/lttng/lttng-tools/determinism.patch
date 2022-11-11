@@ -13,7 +13,7 @@ to me whether the tests need that or not.
 
 Fixes reproducibility issues for lttng-tools.
 
-Upstream-Status: Pending [needs discussion with upstream about the correct solution]
+Upstream-Status: Submitted [https://bugs.lttng.org/issues/1361 - needs discussion with upstream about the correct solution]
 RP 2021/3/1
 
 Index: lttng-tools-2.12.2/tests/regression/ust/ust-dl/Makefile.am

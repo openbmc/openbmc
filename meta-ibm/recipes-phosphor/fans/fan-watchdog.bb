@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit obmc-phosphor-systemd
 
-RDEPENDS:${PN} += "virtual/obmc-gpio-monitor"
+RDEPENDS:${PN} += "phosphor-gpio-monitor-monitor"
 RDEPENDS:${PN} += "busybox"
 
 RESET_SERVICE = "reset-fan-watchdog.service"

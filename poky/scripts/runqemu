@@ -210,6 +210,7 @@ class BaseConfig(object):
         self.mac_tap = "52:54:00:12:34:"
         self.mac_slirp = "52:54:00:12:35:"
         # pid of the actual qemu process
+        self.qemu_environ = os.environ.copy()
         self.qemupid = None
         # avoid cleanup twice
         self.cleaned = False
@@ -449,18 +450,19 @@ class BaseConfig(object):
         # As runqemu can be run within bitbake (when using testimage, for example),
         # we need to ensure that we run host pkg-config, and that it does not
         # get mis-directed to native build paths set by bitbake.
+        env = os.environ.copy()
         try:
-            del os.environ['PKG_CONFIG_PATH']
-            del os.environ['PKG_CONFIG_DIR']
-            del os.environ['PKG_CONFIG_LIBDIR']
-            del os.environ['PKG_CONFIG_SYSROOT_DIR']
+            del env['PKG_CONFIG_PATH']
+            del env['PKG_CONFIG_DIR']
+            del env['PKG_CONFIG_LIBDIR']
+            del env['PKG_CONFIG_SYSROOT_DIR']
         except KeyError:
             pass
         try:
-            dripath = subprocess.check_output("PATH=/bin:/usr/bin:$PATH pkg-config --variable=dridriverdir dri", shell=True)
+            dripath = subprocess.check_output("PATH=/bin:/usr/bin:$PATH pkg-config --variable=dridriverdir dri", shell=True, env=env)
         except subprocess.CalledProcessError as e:
             raise RunQemuError("Could not determine the path to dri drivers on the host via pkg-config.\nPlease install Mesa development files (particularly, dri.pc) on the host machine.")
-        os.environ['LIBGL_DRIVERS_PATH'] = dripath.decode('utf-8').strip()
+        self.qemu_environ['LIBGL_DRIVERS_PATH'] = dripath.decode('utf-8').strip()
 
         # This preloads uninative libc pieces and therefore ensures that RPATH/RUNPATH
         # in host mesa drivers doesn't trick uninative into loading host libc.
@@ -468,7 +470,7 @@ class BaseConfig(object):
         uninative_path = os.path.dirname(self.get("UNINATIVE_LOADER"))
         if os.path.exists(uninative_path):
             preload_paths = [os.path.join(uninative_path, i) for i in preload_items]
-            os.environ['LD_PRELOAD'] = " ".join(preload_paths)
+            self.qemu_environ['LD_PRELOAD'] = " ".join(preload_paths)
 
     def check_args(self):
         for debug in ("-d", "--debug"):
@@ -482,8 +484,8 @@ class BaseConfig(object):
                 sys.argv.remove(quiet)
 
         if 'gl' not in sys.argv[1:] and 'gl-es' not in sys.argv[1:]:
-            os.environ['SDL_RENDER_DRIVER'] = 'software'
-            os.environ['SDL_FRAMEBUFFER_ACCELERATION'] = 'false'
+            self.qemu_environ['SDL_RENDER_DRIVER'] = 'software'
+            self.qemu_environ['SDL_FRAMEBUFFER_ACCELERATION'] = 'false'
 
         unknown_arg = ""
         for arg in sys.argv[1:]:
@@ -497,7 +499,7 @@ class BaseConfig(object):
                 self.gtk = True
             elif arg == 'gl':
                 self.gl = True
-            elif 'gl-es' in sys.argv[1:]:
+            elif arg == 'gl-es':
                 self.gl_es = True
             elif arg == 'egl-headless':
                 self.egl_headless = True
@@ -1369,7 +1371,7 @@ class BaseConfig(object):
         # need our font setup and show-cusor below so we need to see what qemu --help says
         # is supported so we can pass our correct config in.
         if not self.nographic and not self.sdl and not self.gtk and not self.publicvnc and not self.egl_headless == True:
-            output = subprocess.check_output([self.qemu_bin, "--help"], universal_newlines=True)
+            output = subprocess.check_output([self.qemu_bin, "--help"], universal_newlines=True, env=self.qemu_environ)
             if "-display gtk" in output:
                 self.gtk = True
             elif "-display sdl" in output:
@@ -1393,7 +1395,7 @@ class BaseConfig(object):
                 if self.sdl == True:
                     self.qemu_opt += 'sdl,'
                 elif self.gtk == True:
-                    os.environ['FONTCONFIG_PATH'] = '/etc/fonts'
+                    self.qemu_environ['FONTCONFIG_PATH'] = '/etc/fonts'
                     self.qemu_opt += 'gtk,'
 
                 if self.gl == True:
@@ -1514,7 +1516,7 @@ class BaseConfig(object):
         if len(self.portlocks):
             for descriptor in self.portlocks.values():
                 pass_fds.append(descriptor.fileno())
-        process = subprocess.Popen(cmds, stderr=subprocess.PIPE, pass_fds=pass_fds)
+        process = subprocess.Popen(cmds, stderr=subprocess.PIPE, pass_fds=pass_fds, env=self.qemu_environ)
         self.qemupid = process.pid
         retcode = process.wait()
         if retcode:

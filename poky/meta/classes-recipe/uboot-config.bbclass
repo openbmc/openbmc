@@ -19,6 +19,9 @@ def removesuffix(s, suffix):
         return s[:-len(suffix)]
     return s
 
+UBOOT_ENTRYPOINT ?= "20008000"
+UBOOT_LOADADDRESS ?= "${UBOOT_ENTRYPOINT}"
+
 # Some versions of u-boot use .bin and others use .img.  By default use .bin
 # but enable individual recipes to change this value.
 UBOOT_SUFFIX ??= "bin"
@@ -79,6 +82,9 @@ SPL_MKIMAGE_DTCOPTS ??= ""
 # mkimage command
 UBOOT_MKIMAGE ?= "uboot-mkimage"
 UBOOT_MKIMAGE_SIGN ?= "${UBOOT_MKIMAGE}"
+
+# Signature activation - this requires KERNEL_IMAGETYPE = "fitImage"
+UBOOT_SIGN_ENABLE ?= "0"
 
 # Arguments passed to mkimage for signing
 UBOOT_MKIMAGE_SIGN_ARGS ?= ""

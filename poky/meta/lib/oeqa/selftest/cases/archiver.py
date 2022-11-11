@@ -6,6 +6,7 @@
 
 import os
 import glob
+import re
 from oeqa.utils.commands import bitbake, get_bb_vars
 from oeqa.selftest.case import OESelftestTestCase
 
@@ -119,7 +120,38 @@ class Archiver(OESelftestTestCase):
         excluded_present = len(glob.glob(src_path_target + '/%s-*/*' % target_recipes[1]))
         self.assertFalse(excluded_present, 'Recipe %s was not excluded.' % target_recipes[1])
 
+    def test_archiver_multiconfig_shared_unpack_and_patch(self):
+        """
+        Test that shared recipes in original mode with diff enabled works in multiconfig,
+        otherwise it will not build when using the same TMP dir.
+        """
 
+        features = 'BBMULTICONFIG = "mc1 mc2"\n'
+        features += 'INHERIT += "archiver"\n'
+        features += 'ARCHIVER_MODE[src] = "original"\n'
+        features += 'ARCHIVER_MODE[diff] = "1"\n'
+        self.write_config(features)
+
+        # We can use any machine in multiconfig as long as they are different
+        self.write_config('MACHINE = "qemuarm"\n', 'mc1')
+        self.write_config('MACHINE = "qemux86"\n', 'mc2')
+
+        task = 'do_unpack_and_patch'
+        # Use gcc-source as it is a shared recipe (appends the pv to the pn)
+        pn = 'gcc-source-%s' % get_bb_vars(['PV'], 'gcc')['PV']
+
+        # Generate the tasks signatures
+        bitbake('mc:mc1:%s mc:mc2:%s -c %s -S none' % (pn, pn, task))
+
+        # Check the tasks signatures
+        # To be machine agnostic the tasks needs to generate the same signature for each machine
+        locked_sigs_inc = "%s/locked-sigs.inc" % self.builddir
+        locked_sigs = open(locked_sigs_inc).read()
+        task_sigs = re.findall(r"%s:%s:.*" % (pn, task), locked_sigs)
+        uniq_sigs = set(task_sigs)
+        self.assertFalse(len(uniq_sigs) - 1, \
+            'The task "%s" of the recipe "%s" has different signatures in "%s" for each machine in multiconfig' \
+            % (task, pn, locked_sigs_inc))
 
     def test_archiver_srpm_mode(self):
         """

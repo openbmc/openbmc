@@ -275,6 +275,19 @@ websites.
 More information can be found here:
 https://sublime-and-sphinx-guide.readthedocs.io/en/latest/references.html.
 
+For external links, we use this syntax:
+`link text <link URL>`__
+
+instead of:
+`link text <link URL>`_
+
+Both syntaxes work, but the latter also creates a "link text" reference
+target which could conflict with other references with the same name.
+So, only use this variant when you wish to make multiple references
+to this link, reusing only the target name.
+
+See https://stackoverflow.com/questions/27420317/restructured-text-rst-http-links-underscore-vs-use
+
 Anchor (<#link>) links are forbidden as they are not checked by Sphinx during
 the build and may be broken without knowing about it.
 

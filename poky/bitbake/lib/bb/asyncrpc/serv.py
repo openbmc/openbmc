@@ -42,7 +42,7 @@ class AsyncServerConnection(object):
 
             # Read protocol and version
             client_protocol = await self.reader.readline()
-            if client_protocol is None:
+            if not client_protocol:
                 return
 
             (client_proto_name, client_proto_version) = client_protocol.decode('utf-8').rstrip().split()
@@ -59,7 +59,7 @@ class AsyncServerConnection(object):
             # an empty line to signal the end of the headers
             while True:
                 line = await self.reader.readline()
-                if line is None:
+                if not line:
                     return
 
                 line = line.decode('utf-8').rstrip()

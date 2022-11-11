@@ -10,7 +10,7 @@ DEPENDS = "boost \
            valijson \
            ${PYTHON_PN}-jsonschema-native \
 "
-SRCREV = "2594d36e0413ff753768a4cec0fff71e00f9812f"
+SRCREV = "b068d431c663a2c113f589b91cee1eb836eb14b7"
 PACKAGECONFIG ??= "ipmi-fru"
 PACKAGECONFIG[ipmi-fru] = "-Dfru-device=true, -Dfru-device=false, i2c-tools,"
 PV = "0.1+git${SRCPV}"
@@ -23,7 +23,7 @@ S = "${WORKDIR}/git"
 SYSTEMD_PACKAGES = "${PN} ${EXTRA_ENTITY_MANAGER_PACKAGES}"
 SYSTEMD_SERVICE:${PN} = "xyz.openbmc_project.EntityManager.service"
 SYSTEMD_SERVICE:fru-device = "xyz.openbmc_project.FruDevice.service"
-SYSTEMD_AUTO_ENABLE:fru-device_ibm-power-cpu = "disable"
+SYSTEMD_AUTO_ENABLE:fru-device:ibm-power-cpu = "disable"
 
 inherit pkgconfig meson systemd python3native
 

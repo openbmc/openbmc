@@ -1,0 +1,1196 @@
+From e187510a814b48b7b2e477a9913ee35b68522d06 Mon Sep 17 00:00:00 2001
+From: Vishnu Banavath <vishnu.banavath@arm.com>
+Date: Fri, 3 Dec 2021 19:00:54 +0000
+Subject: [PATCH 03/19] Add openamp rpc caller
+
+Upstream-Status: Pending
+Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+---
+ components/rpc/common/caller/rpc_caller.c     |  10 +
+ components/rpc/common/interface/rpc_caller.h  |   8 +
+ .../rpc/openamp/caller/sp/component.cmake     |  15 +
+ .../rpc/openamp/caller/sp/openamp_caller.c    | 203 +++++++
+ .../rpc/openamp/caller/sp/openamp_caller.h    |  43 ++
+ .../rpc/openamp/caller/sp/openamp_mhu.c       | 191 ++++++
+ .../rpc/openamp/caller/sp/openamp_mhu.h       |  19 +
+ .../rpc/openamp/caller/sp/openamp_virtio.c    | 555 ++++++++++++++++++
+ .../rpc/openamp/caller/sp/openamp_virtio.h    |  24 +
+ .../se-proxy/opteesp/default_se-proxy.dts.in  |   6 +
+ deployments/se-proxy/se-proxy.cmake           |   1 +
+ 11 files changed, 1075 insertions(+)
+ create mode 100644 components/rpc/openamp/caller/sp/component.cmake
+ create mode 100644 components/rpc/openamp/caller/sp/openamp_caller.c
+ create mode 100644 components/rpc/openamp/caller/sp/openamp_caller.h
+ create mode 100644 components/rpc/openamp/caller/sp/openamp_mhu.c
+ create mode 100644 components/rpc/openamp/caller/sp/openamp_mhu.h
+ create mode 100644 components/rpc/openamp/caller/sp/openamp_virtio.c
+ create mode 100644 components/rpc/openamp/caller/sp/openamp_virtio.h
+
+diff --git a/components/rpc/common/caller/rpc_caller.c b/components/rpc/common/caller/rpc_caller.c
+index 2dceabeb8967..20d889c162b0 100644
+--- a/components/rpc/common/caller/rpc_caller.c
++++ b/components/rpc/common/caller/rpc_caller.c
+@@ -37,3 +37,13 @@ void rpc_caller_end(struct rpc_caller *s, rpc_call_handle handle)
+ {
+ 	s->call_end(s->context, handle);
+ }
++
++void *rpc_caller_virt_to_phys(struct rpc_caller *s, void *va)
++{
++	return s->virt_to_phys(s->context, va);
++}
++
++void *rpc_caller_phys_to_virt(struct rpc_caller *s, void *pa)
++{
++	return s->phys_to_virt(s->context, pa);
++}
+diff --git a/components/rpc/common/interface/rpc_caller.h b/components/rpc/common/interface/rpc_caller.h
+index 387489cdb1b2..ef9bb64905ed 100644
+--- a/components/rpc/common/interface/rpc_caller.h
++++ b/components/rpc/common/interface/rpc_caller.h
+@@ -45,6 +45,10 @@ struct rpc_caller
+ 		     	rpc_opstatus_t *opstatus, uint8_t **resp_buf, size_t *resp_len);
+ 
+ 	void (*call_end)(void *context, rpc_call_handle handle);
++
++	void *(*virt_to_phys)(void *context, void *va);
++
++	void *(*phys_to_virt)(void *context, void *pa);
+ };
+ 
+ /*
+@@ -87,6 +91,10 @@ RPC_CALLER_EXPORTED rpc_status_t rpc_caller_invoke(struct rpc_caller *s, rpc_cal
+  */
+ RPC_CALLER_EXPORTED void rpc_caller_end(struct rpc_caller *s, rpc_call_handle handle);
+ 
++RPC_CALLER_EXPORTED void *rpc_caller_virt_to_phys(struct rpc_caller *s, void *va);
++
++RPC_CALLER_EXPORTED void *rpc_caller_phys_to_virt(struct rpc_caller *s, void *pa);
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/components/rpc/openamp/caller/sp/component.cmake b/components/rpc/openamp/caller/sp/component.cmake
+new file mode 100644
+index 000000000000..fc919529d731
+--- /dev/null
++++ b/components/rpc/openamp/caller/sp/component.cmake
+@@ -0,0 +1,15 @@
++#-------------------------------------------------------------------------------
++# Copyright (c) 2020, Arm Limited and Contributors. All rights reserved.
++#
++# SPDX-License-Identifier: BSD-3-Clause
++#
++#-------------------------------------------------------------------------------
++if (NOT DEFINED TGT)
++	message(FATAL_ERROR "mandatory parameter TGT is not defined.")
++endif()
++
++target_sources(${TGT} PRIVATE
++	"${CMAKE_CURRENT_LIST_DIR}/openamp_caller.c"
++	"${CMAKE_CURRENT_LIST_DIR}/openamp_virtio.c"
++	"${CMAKE_CURRENT_LIST_DIR}/openamp_mhu.c"
++	)
+diff --git a/components/rpc/openamp/caller/sp/openamp_caller.c b/components/rpc/openamp/caller/sp/openamp_caller.c
+new file mode 100644
+index 000000000000..6cdfb756568f
+--- /dev/null
++++ b/components/rpc/openamp/caller/sp/openamp_caller.c
+@@ -0,0 +1,203 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ * Copyright (c) 2021, Linaro Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <stddef.h>
++#include <trace.h>
++#include "openamp_caller.h"
++#include "openamp_mhu.h"
++#include "openamp_virtio.h"
++#include <protocols/rpc/common/packed-c/status.h>
++
++#define OPENAMP_TRANSACTION_IDLE	0x0
++#define OPENAMP_TRANSACTION_INPROGRESS	0x1
++#define OPENAMP_TRANSACTION_INVOKED	0x2
++
++static rpc_call_handle openamp_call_begin(void *context, uint8_t **req_buf,
++					  size_t req_len)
++{
++	struct openamp_caller *openamp = context;
++	const struct openamp_platform_ops *ops = openamp->platform_ops;
++	rpc_call_handle handle;
++	int ret;
++
++	if (!req_buf) {
++		EMSG("openamp: call_begin: not req_buf");
++		return NULL;
++	}
++
++	if (req_len > UINT32_MAX || req_len == 0) {
++		EMSG("openamp: call_begin: resp_len invalid: %lu", req_len);
++		return NULL;
++	}
++
++	if (openamp->status != OPENAMP_TRANSACTION_IDLE) {
++		EMSG("openamp: call_begin: transaction not idle");
++		return NULL;
++	}
++
++	ret = ops->platform_call_begin(openamp, req_buf, req_len);
++	if (ret < 0) {
++		EMSG("openamp: call_begin: platform begin failed: %d", ret);
++		return NULL;
++	}
++
++	openamp->status = OPENAMP_TRANSACTION_INPROGRESS;
++	handle = openamp;
++
++	return handle;
++}
++
++static rpc_status_t openamp_call_invoke(void *context, rpc_call_handle handle,
++					uint32_t opcode, int *opstatus,
++					uint8_t **resp_buf, size_t *resp_len)
++{
++	struct openamp_caller *openamp = context;
++	const struct openamp_platform_ops *ops = openamp->platform_ops;
++	rpc_status_t status;
++	int ret;
++
++	(void)opcode;
++
++	if ((handle != openamp) || !opstatus || !resp_buf || !resp_len) {
++		EMSG("openamp: call_invoke: invalid arguments");
++		return TS_RPC_ERROR_INVALID_PARAMETER;
++	}
++
++	if (openamp->status != OPENAMP_TRANSACTION_INPROGRESS) {
++		EMSG("openamp: call_invoke: transaction needed to be started");
++		return TS_RPC_ERROR_NOT_READY;
++	}
++
++	ret = ops->platform_call_invoke(openamp, opstatus, resp_buf, resp_len);
++	if (ret < 0)
++		return TS_RPC_ERROR_INTERNAL;
++
++	openamp->status = OPENAMP_TRANSACTION_INVOKED;
++	*opstatus = 0;
++
++	return TS_RPC_CALL_ACCEPTED;
++}
++
++static void openamp_call_end(void *context, rpc_call_handle handle)
++{
++	struct openamp_caller *openamp = context;
++	const struct openamp_platform_ops *ops = openamp->platform_ops;
++
++	if (handle != openamp) {
++		EMSG("openamp: call_end: invalid arguments");
++		return;
++	}
++
++	if (openamp->status == OPENAMP_TRANSACTION_IDLE) {
++		EMSG("openamp: call_end: transaction idle");
++		return;
++	}
++
++	ops->platform_call_end(openamp);
++
++	openamp->status = OPENAMP_TRANSACTION_IDLE;
++}
++
++static void *openamp_virt_to_phys(void *context, void *va)
++{
++	struct openamp_caller *openamp = context;
++	const struct openamp_platform_ops *ops = openamp->platform_ops;
++
++	return ops->platform_virt_to_phys(openamp, va);
++}
++
++static void *openamp_phys_to_virt(void *context, void *pa)
++{
++	struct openamp_caller *openamp = context;
++	const struct openamp_platform_ops *ops = openamp->platform_ops;
++
++	return ops->platform_phys_to_virt(openamp, pa);
++}
++
++static int openamp_init(struct openamp_caller *openamp)
++{
++	const struct openamp_platform_ops *ops = openamp->platform_ops;
++	int ret;
++
++	ret = ops->transport_init(openamp);
++	if (ret < 0)
++		return ret;
++
++	ret = ops->platform_init(openamp);
++	if (ret < 0)
++		goto denit_transport;
++
++	return 0;
++
++denit_transport:
++	ops->transport_deinit(openamp);
++
++	return ret;
++}
++
++static const struct openamp_platform_ops openamp_virtio_ops = {
++	.transport_init = openamp_mhu_init,
++	.transport_deinit = openamp_mhu_deinit,
++	.transport_notify = openamp_mhu_notify_peer,
++	.transport_receive = openamp_mhu_receive,
++	.platform_init = openamp_virtio_init,
++	.platform_call_begin = openamp_virtio_call_begin,
++	.platform_call_invoke = openamp_virtio_call_invoke,
++	.platform_call_end = openamp_virtio_call_end,
++	.platform_virt_to_phys = openamp_virtio_virt_to_phys,
++	.platform_phys_to_virt = openamp_virtio_phys_to_virt,
++};
++
++struct rpc_caller *openamp_caller_init(struct openamp_caller *openamp)
++{
++	struct rpc_caller *rpc = &openamp->rpc_caller;
++	int ret;
++
++	if (openamp->ref_count)
++		return rpc;
++
++	rpc_caller_init(rpc, openamp);
++
++	rpc->call_begin = openamp_call_begin;
++	rpc->call_invoke = openamp_call_invoke;
++	rpc->call_end = openamp_call_end;
++	rpc->virt_to_phys = openamp_virt_to_phys;
++	rpc->phys_to_virt = openamp_phys_to_virt;
++	openamp->platform_ops = &openamp_virtio_ops;
++
++	ret = openamp_init(openamp);
++	if (ret < 0) {
++		EMSG("openamp_init: failed to start: %d", ret);
++		return rpc;
++	}
++	openamp->ref_count++;
++
++	return rpc;
++}
++
++void openamp_caller_deinit(struct openamp_caller *openamp)
++{
++	struct rpc_caller *rpc = &openamp->rpc_caller;
++
++	if (--openamp->ref_count)
++		return;
++
++	rpc->context = NULL;
++	rpc->call_begin = NULL;
++	rpc->call_invoke = NULL;
++	rpc->call_end = NULL;
++}
++
++int openamp_caller_discover(struct openamp_caller *openamp)
++{
++	return openamp_init(openamp);
++}
++
++int openamp_caller_open(struct openamp_caller *openamp)
++{
++
++}
+diff --git a/components/rpc/openamp/caller/sp/openamp_caller.h b/components/rpc/openamp/caller/sp/openamp_caller.h
+new file mode 100644
+index 000000000000..3fb67c56cc53
+--- /dev/null
++++ b/components/rpc/openamp/caller/sp/openamp_caller.h
+@@ -0,0 +1,43 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ * Copyright (c) 2021, Linaro Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++#ifndef OPENAMP_CALLER_H
++#define OPENAMP_CALLER_H
++
++#include <stddef.h>
++#include <rpc_caller.h>
++
++struct openamp_caller {
++	struct rpc_caller rpc_caller;
++	const struct openamp_platform_ops *platform_ops;
++	uint32_t ref_count;
++	uint8_t status;
++
++	void *transport;
++	void *platform;
++};
++
++struct openamp_platform_ops {
++	int (*transport_init)(struct openamp_caller *openamp);
++	int (*transport_deinit)(struct openamp_caller *openamp);
++	int (*transport_notify)(struct openamp_caller *openamp);
++	int (*transport_receive)(struct openamp_caller *openamp);
++	int (*platform_init)(struct openamp_caller *openamp);
++	int (*platform_deinit)(struct openamp_caller *openamp);
++	int (*platform_call_begin)(struct openamp_caller *openamp,
++				   uint8_t **req_buf, size_t req_len);
++	int (*platform_call_invoke)(struct openamp_caller *openamp,
++				    int *opstatus, uint8_t **resp_buf,
++				    size_t *resp_len);
++	int (*platform_call_end)(struct openamp_caller *openamp);
++	void *(*platform_virt_to_phys)(struct openamp_caller *openamp, void *va);
++	void *(*platform_phys_to_virt)(struct openamp_caller *openamp, void *pa);
++};
++
++struct rpc_caller *openamp_caller_init(struct openamp_caller *openamp);
++void openamp_caller_deinit(struct openamp_caller *openamp);
++
++#endif
+diff --git a/components/rpc/openamp/caller/sp/openamp_mhu.c b/components/rpc/openamp/caller/sp/openamp_mhu.c
+new file mode 100644
+index 000000000000..ffdadaf870a3
+--- /dev/null
++++ b/components/rpc/openamp/caller/sp/openamp_mhu.c
+@@ -0,0 +1,191 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ * Copyright (c) 2021, Linaro Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <config/interface/config_store.h>
++#include <config/interface/config_blob.h>
++#include <platform/interface/device_region.h>
++#include <platform/drivers/arm/mhu_driver/mhu_v2.h>
++#include <trace.h>
++#include <errno.h>
++#include <stdlib.h>
++#include <stdint.h>
++#include <stddef.h>
++#include <limits.h>
++
++#include "openamp_caller.h"
++
++#define MHU_V_2_NOTIFY_CHANNEL	0
++#define MHU_V_2_NOTIFY_VALUE	0xff
++
++struct openamp_mhu {
++	struct device_region rx_region;
++	struct device_region tx_region;
++	struct mhu_v2_x_dev_t rx_dev;
++	struct mhu_v2_x_dev_t tx_dev;
++};
++
++static int openamp_mhu_device_get(const char *dev,
++				  struct device_region *dev_region)
++{
++	bool found;
++
++	found = config_store_query(CONFIG_CLASSIFIER_DEVICE_REGION, dev, 0,
++				   dev_region, sizeof(*dev_region));
++	if (!found)
++		return -EINVAL;
++
++	if (!dev_region->base_addr)
++		return -EINVAL;
++
++	IMSG("mhu: device region found: %s addr: 0x%x size: %d", dev,
++	     dev_region->base_addr, dev_region->io_region_size);
++
++	return 0;
++}
++
++int openamp_mhu_receive(struct openamp_caller *openamp)
++{
++	struct mhu_v2_x_dev_t *rx_dev;
++	enum mhu_v2_x_error_t ret;
++	struct openamp_mhu *mhu;
++	uint32_t channel = 0;
++	uint32_t irq_status;
++
++	if (!openamp->transport) {
++		EMSG("openamp: mhu: receive transport not initialized");
++		return -EINVAL;
++	}
++
++	mhu = openamp->transport;
++	rx_dev = &mhu->rx_dev;
++
++	irq_status = 0;
++
++	do {
++		irq_status = mhu_v2_x_get_interrupt_status(rx_dev);
++	} while(!irq_status);
++
++	ret = mhu_v2_1_get_ch_interrupt_num(rx_dev, &channel);
++
++	ret = mhu_v2_x_channel_clear(rx_dev, channel);
++	if (ret != MHU_V_2_X_ERR_NONE) {
++		EMSG("openamp: mhu: failed to clear channel: %d", channel);
++		return -EPROTO;
++	}
++
++	return 0;
++}
++
++int openamp_mhu_notify_peer(struct openamp_caller *openamp)
++{
++	struct mhu_v2_x_dev_t *tx_dev;
++	enum mhu_v2_x_error_t ret;
++	struct openamp_mhu *mhu;
++	uint32_t access_ready;
++
++	if (!openamp->transport) {
++		EMSG("openamp: mhu: notify transport not initialized");
++		return -EINVAL;
++	}
++
++	mhu = openamp->transport;
++	tx_dev = &mhu->tx_dev;
++
++	ret = mhu_v2_x_set_access_request(tx_dev);
++	if (ret != MHU_V_2_X_ERR_NONE) {
++		EMSG("openamp: mhu: set access request failed");
++		return -EPROTO;
++	}
++
++	do {
++		ret = mhu_v2_x_get_access_ready(tx_dev, &access_ready);
++		if (ret != MHU_V_2_X_ERR_NONE) {
++			EMSG("openamp: mhu: failed to get access_ready");
++			return -EPROTO;
++		}
++	} while (!access_ready);
++
++	ret = mhu_v2_x_channel_send(tx_dev, MHU_V_2_NOTIFY_CHANNEL,
++				    MHU_V_2_NOTIFY_VALUE);
++	if (ret != MHU_V_2_X_ERR_NONE) {
++		EMSG("openamp: mhu: failed send over channel");
++		return -EPROTO;
++	}
++
++	ret = mhu_v2_x_reset_access_request(tx_dev);
++	if (ret != MHU_V_2_X_ERR_NONE) {
++		EMSG("openamp: mhu: failed reset access request");
++		return -EPROTO;
++	}
++
++	return 0;
++}
++
++int openamp_mhu_init(struct openamp_caller *openamp)
++{
++	struct mhu_v2_x_dev_t *rx_dev;
++	struct mhu_v2_x_dev_t *tx_dev;
++	struct openamp_mhu *mhu;
++	int ret;
++
++	/* if we already have initialized skip this */
++	if (openamp->transport)
++		return 0;
++
++	mhu = malloc(sizeof(*mhu));
++	if (!mhu)
++		return -1;
++
++	ret = openamp_mhu_device_get("mhu-sender", &mhu->tx_region);
++	if (ret < 0)
++		goto free_mhu;
++
++	ret = openamp_mhu_device_get("mhu-receiver", &mhu->rx_region);
++	if (ret < 0)
++		goto free_mhu;
++
++	rx_dev = &mhu->rx_dev;
++	tx_dev = &mhu->tx_dev;
++
++	rx_dev->base =  (unsigned int)mhu->rx_region.base_addr;
++	rx_dev->frame = MHU_V2_X_RECEIVER_FRAME;
++
++	tx_dev->base =  (unsigned int)mhu->tx_region.base_addr;
++	tx_dev->frame = MHU_V2_X_SENDER_FRAME;
++
++	ret = mhu_v2_x_driver_init(rx_dev, MHU_REV_READ_FROM_HW);
++	if (ret < 0)
++		goto free_mhu;
++
++	ret = mhu_v2_x_driver_init(tx_dev, MHU_REV_READ_FROM_HW);
++	if (ret < 0)
++		goto free_mhu;
++
++	openamp->transport = (void *)mhu;
++
++	return 0;
++
++free_mhu:
++	free(mhu);
++
++	return ret;
++}
++
++int openamp_mhu_deinit(struct openamp_caller *openamp)
++{
++	struct openamp_mhu *mhu;
++
++	if (!openamp->transport)
++		return 0;
++
++	mhu = openamp->transport;
++	free(mhu);
++
++	openamp->transport = NULL;
++
++	return 0;
++}
+diff --git a/components/rpc/openamp/caller/sp/openamp_mhu.h b/components/rpc/openamp/caller/sp/openamp_mhu.h
+new file mode 100644
+index 000000000000..2ae5cb8ee1c6
+--- /dev/null
++++ b/components/rpc/openamp/caller/sp/openamp_mhu.h
+@@ -0,0 +1,19 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ * Copyright (c) 2021, Linaro Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++#ifndef OPENAMP_MHU_H
++#define OPENAMP_MHU_H
++
++#include <stddef.h>
++#include "openamp_caller.h"
++
++int openamp_mhu_init(struct openamp_caller *openamp);
++int openamp_mhu_deinit(struct openamp_caller *openamp);
++
++int openamp_mhu_notify_peer(struct openamp_caller *openamp);
++int openamp_mhu_receive(struct openamp_caller *openamp);
++
++#endif
+diff --git a/components/rpc/openamp/caller/sp/openamp_virtio.c b/components/rpc/openamp/caller/sp/openamp_virtio.c
+new file mode 100644
+index 000000000000..b7c1aa929111
+--- /dev/null
++++ b/components/rpc/openamp/caller/sp/openamp_virtio.c
+@@ -0,0 +1,555 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ * Copyright (c) 2021, Linaro Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <metal/device.h>
++#include <metal/spinlock.h>
++#include <openamp/open_amp.h>
++#include <platform/interface/device_region.h>
++#include <config/interface/config_store.h>
++
++#include <stddef.h>
++#include <trace.h>
++#include "openamp_caller.h"
++
++#define OPENAMP_SHEM_DEVICE_NAME "openamp-virtio"
++#define OPENAMP_RPMSG_ENDPOINT_NAME OPENAMP_SHEM_DEVICE_NAME
++#define OPENAMP_RPMSG_ENDPOINT_ADDR 1024
++
++#define OPENAMP_SHEM_PHYS 0x88000000
++#define OPENAMP_SHEM_PHYS_PAGES 1
++#define OPENAMP_SHEM_SE_PHYS 0xa8000000
++
++#define OPENAMP_SHEM_VDEV_SIZE (4 * 1024)
++#define OPENAMP_SHEM_VRING_SIZE (4 * 1024)
++
++#define OPENAMP_BUFFER_NO_WAIT  0
++#define OPENAMP_BUFFER_WAIT     1
++
++#define VIRTQUEUE_NR            2
++#define VQ_TX                   0
++#define VQ_RX                   1
++
++#define VRING_DESCRIPTORS       16
++#define VRING_ALIGN             4
++
++#define container_of(ptr, type, member) \
++	((type *)((char *)(ptr) - (unsigned long)(&((type *)0)->member)))
++
++struct openamp_virtio_shm {
++	uintptr_t base_addr;
++	size_t size;
++	uintptr_t vdev_status;
++	size_t vdev_status_size;
++	uintptr_t payload_addr;
++	size_t payload_size;
++	uintptr_t vring_tx;
++	size_t vring_tx_size;
++	uintptr_t vring_rx;
++	size_t vring_rx_size;
++
++	metal_phys_addr_t shm_physmap[OPENAMP_SHEM_PHYS_PAGES];
++};
++
++struct openamp_virtio_metal {
++	struct metal_spinlock lock;
++	struct metal_device shm_dev;
++	struct metal_device *io_dev;
++
++	struct metal_io_region *io;
++	struct openamp_virtio_shm shm;
++};
++
++struct openamp_virtio_device {
++	struct virtio_device virtio_dev;
++	struct virtqueue *vq[VIRTQUEUE_NR];
++	struct virtio_vring_info rvrings[VIRTQUEUE_NR];
++};
++
++struct openamp_virtio_rpmsg {
++	struct rpmsg_virtio_device rpmsg_vdev;
++	struct rpmsg_endpoint ep;
++	uint8_t *req_buf;
++	uint32_t req_len;
++	uint8_t *resp_buf;
++	size_t resp_len;
++};
++
++struct openamp_virtio {
++	struct openamp_caller *openamp;
++	struct openamp_virtio_rpmsg rpmsg;
++	struct openamp_virtio_device vdev;
++	struct openamp_virtio_metal metal;
++};
++
++static struct openamp_virtio *openamp_virtio_from_dev(struct virtio_device *vdev)
++{
++	struct openamp_virtio_device *openamp_vdev;
++
++	openamp_vdev = container_of(vdev, struct openamp_virtio_device,
++			    virtio_dev);
++
++	return container_of(openamp_vdev, struct openamp_virtio, vdev);
++}
++
++static struct openamp_virtio_rpmsg *openamp_virtio_rpmsg_from_dev(struct rpmsg_device *rdev)
++{
++	struct rpmsg_virtio_device *rvdev;
++
++	rvdev = container_of(rdev, struct rpmsg_virtio_device, rdev);
++
++	return container_of(rvdev, struct openamp_virtio_rpmsg, rpmsg_vdev);
++
++}
++
++static void openamp_virtio_metal_device_setup(struct metal_device *shm_dev,
++					      struct openamp_virtio_shm *shm)
++{
++	struct metal_io_region *shm_region;
++
++	shm_region = &shm_dev->regions[0];
++
++	shm_dev->name = OPENAMP_SHEM_DEVICE_NAME;
++	shm_dev->num_regions = 1;
++
++	shm_region->virt = (void *)shm->payload_addr;
++	shm_region->size = shm->payload_size;
++
++	shm_region->physmap = &shm->shm_physmap;
++	shm_region->page_shift = (metal_phys_addr_t)(-1);
++	shm_region->page_mask = (metal_phys_addr_t)(-1);
++}
++
++static int openamp_virtio_metal_init(struct openamp_virtio_metal *metal)
++{
++	struct metal_init_params params = METAL_INIT_DEFAULTS;
++	struct metal_device *shm_dev = &metal->shm_dev;
++	int ret;
++
++	openamp_virtio_metal_device_setup(shm_dev, &metal->shm);
++
++	metal_spinlock_init(&metal->lock);
++
++	ret = metal_init(&params);
++	if (ret < 0)
++		return ret;
++
++	ret = metal_register_generic_device(shm_dev);
++	if (ret < 0)
++		goto metal_finish;
++
++	ret = metal_device_open("generic", OPENAMP_SHEM_DEVICE_NAME,
++				&metal->io_dev);
++	if (ret < 0)
++		goto metal_finish;
++
++	metal->io = metal_device_io_region(metal->io_dev, 0);
++	if (!metal->io) {
++		EMSG("openamp: virtio: failed to init metal io");
++		ret = -EPROTO;
++		goto metal_finish;
++	}
++
++	return 0;
++
++metal_finish:
++	metal_finish();
++	return ret;
++}
++
++static unsigned char openamp_virtio_status_get(struct virtio_device *vdev)
++{
++	struct openamp_virtio *virtio = openamp_virtio_from_dev(vdev);
++	struct openamp_virtio_shm *shm = &virtio->metal.shm;
++
++	uint32_t status = *(volatile uint32_t *)shm->vdev_status;
++
++	return status;
++}
++
++static void openamp_virtio_status_set(struct virtio_device *vdev,
++				      unsigned char status)
++{
++	struct openamp_virtio *virtio = openamp_virtio_from_dev(vdev);
++	struct openamp_virtio_shm *shm = &virtio->metal.shm;
++
++	*(volatile uint32_t *)shm->vdev_status = status;
++}
++
++static int count;
++
++static uint32_t openamp_virtio_features_get(struct virtio_device *vdev)
++{
++	return 1 << VIRTIO_RPMSG_F_NS;
++}
++
++static void openamp_virtio_notify(struct virtqueue *vq)
++{
++	struct openamp_virtio_device *openamp_vdev;
++	struct openamp_caller *openamp;
++	struct openamp_virtio *virtio;
++	int ret;
++
++	openamp_vdev = container_of(vq->vq_dev, struct openamp_virtio_device, virtio_dev);
++	virtio = container_of(openamp_vdev, struct openamp_virtio, vdev);
++	openamp = virtio->openamp;
++
++	ret = openamp->platform_ops->transport_notify(openamp);
++	if (ret < 0)
++		EMSG("openamp: virtio: erro in transport_notify: %d", ret);
++}
++
++const static struct virtio_dispatch openamp_virtio_dispatch = {
++	.get_status = openamp_virtio_status_get,
++	.set_status = openamp_virtio_status_set,
++	.get_features = openamp_virtio_features_get,
++	.notify = openamp_virtio_notify,
++};
++
++static int openamp_virtio_device_setup(struct openamp_virtio *virtio)
++{
++	struct openamp_virtio_metal *metal = &virtio->metal;
++	struct openamp_virtio_device *openamp_vdev = &virtio->vdev;
++	struct virtio_device *vdev = &openamp_vdev->virtio_dev;
++	struct openamp_virtio_shm *shm = &metal->shm;
++	struct virtio_vring_info *rvring;
++
++	rvring = &openamp_vdev->rvrings[0];
++
++	vdev->role = RPMSG_REMOTE;
++	vdev->vrings_num = VIRTQUEUE_NR;
++	vdev->func = &openamp_virtio_dispatch;
++
++	openamp_vdev->vq[VQ_TX] = virtqueue_allocate(VRING_DESCRIPTORS);
++	if (!openamp_vdev->vq[VQ_TX]) {
++		EMSG("openamp: virtio: failed to allocate virtqueue 0");
++		return -ENOMEM;
++	}
++	rvring->io = metal->io;
++	rvring->info.vaddr = (void *)shm->vring_tx;
++	rvring->info.num_descs = VRING_DESCRIPTORS;
++	rvring->info.align = VRING_ALIGN;
++	rvring->vq = openamp_vdev->vq[VQ_TX];
++
++	openamp_vdev->vq[VQ_RX] = virtqueue_allocate(VRING_DESCRIPTORS);
++	if (!openamp_vdev->vq[VQ_RX]) {
++		EMSG("openamp: virtio: failed to allocate virtqueue 1");
++		goto free_vq;
++	}
++	rvring = &openamp_vdev->rvrings[VQ_RX];
++	rvring->io = metal->io;
++	rvring->info.vaddr = (void *)shm->vring_rx;
++	rvring->info.num_descs = VRING_DESCRIPTORS;
++	rvring->info.align = VRING_ALIGN;
++	rvring->vq = openamp_vdev->vq[VQ_RX];
++
++	vdev->vrings_info = &openamp_vdev->rvrings[0];
++
++	return 0;
++
++free_vq:
++	virtqueue_free(openamp_vdev->vq[VQ_TX]);
++	virtqueue_free(openamp_vdev->vq[VQ_RX]);
++
++	return -ENOMEM;
++}
++
++static int openamp_virtio_rpmsg_endpoint_callback(struct rpmsg_endpoint *ep,
++						  void *data, size_t len,
++						  uint32_t src, void *priv)
++{
++	struct openamp_virtio_rpmsg *vrpmsg;
++	struct rpmsg_device *rdev;
++	struct openamp_virtio *virtio;
++
++	rdev = ep->rdev;
++	vrpmsg = openamp_virtio_rpmsg_from_dev(rdev);
++	virtio = container_of(vrpmsg, struct openamp_virtio, rpmsg);
++
++	rpmsg_hold_rx_buffer(ep, data);
++	vrpmsg->resp_buf = data;
++	vrpmsg->resp_len = len;
++
++	return 0;
++}
++
++static void openamp_virtio_rpmsg_service_unbind(struct rpmsg_endpoint *ep)
++{
++	struct openamp_virtio_rpmsg *vrpmsg;
++	struct rpmsg_device *rdev;
++
++	rdev = container_of(ep, struct rpmsg_device, ns_ept);
++	vrpmsg = openamp_virtio_rpmsg_from_dev(rdev);
++
++	rpmsg_destroy_ept(&vrpmsg->ep);
++}
++
++static void openamp_virtio_rpmsg_endpoint_bind(struct rpmsg_device *rdev,
++					       const char *name,
++					       unsigned int dest)
++{
++	struct openamp_virtio_rpmsg *vrpmsg;
++
++	vrpmsg = openamp_virtio_rpmsg_from_dev(rdev);
++
++	rpmsg_create_ept(&vrpmsg->ep, rdev, name, RPMSG_ADDR_ANY, dest,
++			 openamp_virtio_rpmsg_endpoint_callback,
++			 openamp_virtio_rpmsg_service_unbind);
++}
++
++static int openamp_virtio_rpmsg_device_setup(struct openamp_virtio *virtio,
++					     struct device_region *virtio_dev)
++{
++	struct openamp_virtio_rpmsg *vrpmsg = &virtio->rpmsg;
++	struct rpmsg_virtio_device *rpmsg_vdev = &vrpmsg->rpmsg_vdev;
++	struct openamp_virtio_device *openamp_vdev = &virtio->vdev;
++	struct virtio_device *vdev = &openamp_vdev->virtio_dev;
++	struct openamp_virtio_metal *metal = &virtio->metal;
++	int ret;
++
++	/*
++	 * we assume here that we are the client side and do not need to
++	 * initialize the share memory poll (this is done at server side).
++	 */
++	ret = rpmsg_init_vdev(rpmsg_vdev, vdev,
++			      openamp_virtio_rpmsg_endpoint_bind, metal->io,
++			      NULL);
++	if (ret < 0) {
++		EMSG("openamp: virtio: init vdev failed: %d", ret);
++		return ret;
++	}
++
++
++	ret = rpmsg_create_ept(&vrpmsg->ep, &rpmsg_vdev->rdev,
++			       OPENAMP_RPMSG_ENDPOINT_NAME, RPMSG_ADDR_ANY,
++			       RPMSG_ADDR_ANY,
++			       openamp_virtio_rpmsg_endpoint_callback,
++			       openamp_virtio_rpmsg_service_unbind);
++	if (ret < 0) {
++		EMSG("openamp: virtio: failed to create endpoint: %d", ret);
++		return ret;
++	}
++
++	/* set default remote addr */
++	vrpmsg->ep.dest_addr = OPENAMP_RPMSG_ENDPOINT_ADDR;
++
++	return 0;
++}
++
++static void openamp_virtio_shm_set(struct openamp_virtio *virtio,
++				   struct device_region *virtio_region)
++{
++	struct openamp_virtio_shm *shm = &virtio->metal.shm;
++
++	shm->base_addr = virtio_region->base_addr;
++	shm->size = virtio_region->io_region_size;
++
++	shm->vdev_status = shm->base_addr;
++	shm->vdev_status_size = OPENAMP_SHEM_VDEV_SIZE;
++
++	shm->vring_rx = shm->base_addr + shm->size -
++		(2 * OPENAMP_SHEM_VRING_SIZE);
++	shm->vring_rx_size = OPENAMP_SHEM_VRING_SIZE;
++
++	shm->vring_tx = shm->vring_rx + shm->vring_rx_size;
++	shm->vring_tx_size = OPENAMP_SHEM_VRING_SIZE;
++
++	shm->payload_addr = shm->vdev_status + shm->vdev_status_size;
++	shm->payload_size = shm->size - shm->vdev_status_size -
++		shm->vring_rx_size - shm->vring_tx_size;
++
++	shm->shm_physmap[0] = OPENAMP_SHEM_PHYS + shm->vdev_status_size;
++
++	IMSG("SHEM: base: 0x%0x size: 0x%0x size: %d",
++	     shm->base_addr, shm->size, shm->size);
++	IMSG("VDEV: base: 0x%0x size: 0x%0x size: %d",
++	     shm->vdev_status, shm->vdev_status_size, shm->vdev_status_size);
++	IMSG("PAYLOAD: base: 0x%0x size: 0x%0x size: %d",
++	     shm->payload_addr, shm->payload_size, shm->payload_size);
++	IMSG("VRING_TX: base: 0x%0x size: 0x%0x size: %d",
++	     shm->vring_tx, shm->vring_tx_size, shm->vring_tx_size);
++	IMSG("VRING_RX: base: 0x%0x size: 0x%0x size: %d",
++	     shm->vring_rx, shm->vring_rx_size, shm->vring_rx_size);
++	IMSG("PHYMAP: base: 0x%0x", shm->shm_physmap[0]);
++}
++
++static int openamp_virtio_device_get(const char *dev,
++				     struct device_region *dev_region)
++{
++	bool found;
++
++	found = config_store_query(CONFIG_CLASSIFIER_DEVICE_REGION, dev, 0,
++				   dev_region, sizeof(*dev_region));
++	if (!found) {
++		EMSG("openamp: virtio: device region not found: %s", dev);
++		return -EINVAL;
++	}
++
++	if (dev_region->base_addr == 0 || dev_region->io_region_size == 0) {
++		EMSG("openamp: virtio: device region not valid");
++		return -EINVAL;
++	}
++
++	IMSG("openamp: virtio: device region found: %s addr: 0x%x size: %d",
++	     dev, dev_region->base_addr, dev_region->io_region_size);
++
++	return  0;
++}
++
++int openamp_virtio_call_begin(struct openamp_caller *openamp, uint8_t **req_buf,
++			      size_t req_len)
++{
++	struct openamp_virtio *virtio = openamp->platform;
++	struct openamp_virtio_rpmsg *vrpmsg = &virtio->rpmsg;
++	struct rpmsg_endpoint *ep = &vrpmsg->ep;
++
++
++	*req_buf = rpmsg_get_tx_payload_buffer(ep, &vrpmsg->req_len,
++					       OPENAMP_BUFFER_WAIT);
++	if (*req_buf == NULL)
++		return -EINVAL;
++
++	if (vrpmsg->req_len < req_len)
++		return -E2BIG;
++
++	vrpmsg->req_buf = *req_buf;
++
++	return 0;
++}
++
++int openamp_virtio_call_invoke(struct openamp_caller *openamp, int *opstatus,
++			       uint8_t **resp_buf, size_t *resp_len)
++{
++	const struct openamp_platform_ops *ops = openamp->platform_ops;
++	struct openamp_virtio *virtio = openamp->platform;
++	struct openamp_virtio_device *openamp_vdev = &virtio->vdev;
++	struct openamp_virtio_rpmsg *vrpmsg = &virtio->rpmsg;
++	struct rpmsg_endpoint *ep = &vrpmsg->ep;
++	int ret;
++
++	ret = rpmsg_send_nocopy(ep, vrpmsg->req_buf, vrpmsg->req_len);
++	if (ret < 0) {
++		EMSG("openamp: virtio: send nocopy failed: %d", ret);
++		return -EIO;
++	}
++
++	if (ret != vrpmsg->req_len) {
++		EMSG("openamp: virtio: send less bytes %d than requested %d",
++		     ret, vrpmsg->req_len);
++		return -EIO;
++	}
++
++	if (!ops->transport_receive)
++		return 0;
++
++	ret = ops->transport_receive(openamp);
++	if (ret < 0) {
++		EMSG("openamp: virtio: failed transport_receive");
++		return -EIO;
++	}
++
++	virtqueue_notification(openamp_vdev->vq[VQ_RX]);
++
++	*resp_buf = vrpmsg->resp_buf;
++	*resp_len = vrpmsg->resp_len;
++
++	return  0;
++}
++
++void openamp_virtio_call_end(struct openamp_caller *openamp)
++{
++	struct openamp_virtio *virtio = openamp->platform;
++	struct openamp_virtio_rpmsg *vrpmsg = &virtio->rpmsg;
++
++	rpmsg_release_rx_buffer(&vrpmsg->ep, vrpmsg->resp_buf);
++
++	vrpmsg->req_buf = NULL;
++	vrpmsg->req_len = 0;
++	vrpmsg->resp_buf = NULL;
++	vrpmsg->resp_len = 0;
++}
++
++void *openamp_virtio_virt_to_phys(struct openamp_caller *openamp, void *va)
++{
++	struct openamp_virtio *virtio = openamp->platform;
++	struct openamp_virtio_metal *metal = &virtio->metal;
++
++	return metal_io_virt_to_phys(metal->io, va);
++}
++
++void *openamp_virtio_phys_to_virt(struct openamp_caller *openamp, void *pa)
++{
++	struct openamp_virtio *virtio = openamp->platform;
++	struct openamp_virtio_metal *metal = &virtio->metal;
++
++	return metal_io_phys_to_virt(metal->io, pa);
++}
++
++int openamp_virtio_init(struct openamp_caller *openamp)
++{
++	struct device_region virtio_dev;
++	struct openamp_virtio *virtio;
++	int ret;
++
++	if (openamp->platform)
++		return 0;
++
++
++	virtio = malloc(sizeof(*virtio));
++	if (!virtio)
++		return -ENOMEM;
++
++	virtio->openamp = openamp;
++
++	ret = openamp_virtio_device_get(OPENAMP_SHEM_DEVICE_NAME, &virtio_dev);
++	if (ret < 0)
++		goto free_virtio;
++
++	openamp_virtio_shm_set(virtio, &virtio_dev);
++
++	ret = openamp_virtio_metal_init(&virtio->metal);
++	if (ret < 0)
++		goto free_virtio;
++
++	ret = openamp_virtio_device_setup(virtio);
++	if (ret < 0)
++		goto finish_metal;
++
++	ret = openamp_virtio_rpmsg_device_setup(virtio, &virtio_dev);
++	if (ret < 0) {
++		EMSG("openamp: virtio: rpmsg device setup failed: %d", ret);
++		goto finish_metal;
++	}
++
++	openamp->platform = virtio;
++
++	return 0;
++
++finish_metal:
++	metal_finish();
++
++free_virtio:
++	free(virtio);
++
++	return ret;
++}
++
++int openamp_virtio_deinit(struct openamp_caller *openamp)
++{
++	struct openamp_virtio *virtio;
++
++	if (!openamp->platform)
++		return 0;
++
++	virtio = openamp->platform;
++
++	metal_finish();
++	free(virtio);
++
++	openamp->platform = NULL;
++
++	return 0;
++}
+diff --git a/components/rpc/openamp/caller/sp/openamp_virtio.h b/components/rpc/openamp/caller/sp/openamp_virtio.h
+new file mode 100644
+index 000000000000..915128ff65ce
+--- /dev/null
++++ b/components/rpc/openamp/caller/sp/openamp_virtio.h
+@@ -0,0 +1,24 @@
++/*
++ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
++ * Copyright (c) 2021, Linaro Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++#ifndef OPENAMP_VIRTIO_H
++#define OPENAMP_VIRTIO_H
++
++#include <stddef.h>
++#include "openamp_caller.h"
++
++int openamp_virtio_call_begin(struct openamp_caller *openamp, uint8_t **req_buf,
++			      size_t req_len);
++int openamp_virtio_call_invoke(struct openamp_caller *openamp, int *opstatus,
++			       uint8_t **resp_buf, size_t *resp_len);
++int openamp_virtio_call_end(struct openamp_caller *openamp);
++void *openamp_virtio_virt_to_phys(struct openamp_caller *openamp, void *va);
++void *openamp_virtio_phys_to_virt(struct openamp_caller *openamp, void *pa);
++
++int openamp_virtio_init(struct openamp_caller *openamp);
++int openamp_virtio_deinit(struct openamp_caller *openamp);
++
++#endif
+diff --git a/deployments/se-proxy/opteesp/default_se-proxy.dts.in b/deployments/se-proxy/opteesp/default_se-proxy.dts.in
+index 267b4f923540..04c181586b06 100644
+--- a/deployments/se-proxy/opteesp/default_se-proxy.dts.in
++++ b/deployments/se-proxy/opteesp/default_se-proxy.dts.in
+@@ -32,5 +32,11 @@
+ 			pages-count = <16>;
+ 			attributes = <0x3>; /* read-write */
+ 		};
++		openamp-virtio {
++			/* Armv8 A Foundation Platform values */
++			base-address = <0x00000000 0x88000000>;
++			pages-count = <256>;
++			attributes = <0x3>; /* read-write */
++		};
+ 	};
+ };
+diff --git a/deployments/se-proxy/se-proxy.cmake b/deployments/se-proxy/se-proxy.cmake
+index d39873a0fe81..34fe5ff1b925 100644
+--- a/deployments/se-proxy/se-proxy.cmake
++++ b/deployments/se-proxy/se-proxy.cmake
+@@ -47,6 +47,7 @@ add_components(TARGET "se-proxy"
+ 		"components/service/attestation/include"
+ 		"components/service/attestation/provider"
+ 		"components/service/attestation/provider/serializer/packed-c"
++		"components/rpc/openamp/caller/sp"
+ 
+ 		# Stub service provider backends
+ 		"components/rpc/dummy"
+-- 
+2.38.0
+

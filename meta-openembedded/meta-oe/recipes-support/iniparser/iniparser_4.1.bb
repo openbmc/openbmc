@@ -22,3 +22,5 @@ do_install:append() {
     install -Dm 0644 ${S}/iniparser.pc ${D}${libdir}/pkgconfig/iniparser.pc
     sed -i -e 's,@baselib@,${baselib},g' ${D}${libdir}/pkgconfig/iniparser.pc
 }
+
+BBCLASSEXTEND += "native"

@@ -66,19 +66,15 @@ section:
       (i.e. ``poky``) have been cloned using Git and the local repository is named
       "poky".
 
-2. *Prepare Your local.conf File:* By default, the
-   :term:`MACHINE` variable is set to
-   "qemux86-64", which is fine if you are building for the QEMU emulator
-   in 64-bit mode. However, if you are not, you need to set the
+2. *Prepare Your local.conf File:* By default, the :term:`MACHINE` variable
+   is set to "qemux86-64", which is fine if you are building for the QEMU
+   emulator in 64-bit mode. However, if you are not, you need to set the
    :term:`MACHINE` variable appropriately in your ``conf/local.conf`` file
-   found in the
-   :term:`Build Directory` (i.e.
-   ``poky/build`` in this example).
+   found in the :term:`Build Directory` (i.e.  ``poky/build`` in this example).
 
    Also, since you are preparing to work on the kernel image, you need
-   to set the
-   :term:`MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS`
-   variable to include kernel modules.
+   to set the :term:`MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS` variable to include
+   kernel modules.
 
    In this example we wish to build for qemux86 so we must set the
    :term:`MACHINE` variable to "qemux86" and also add the "kernel-modules".
@@ -186,14 +182,11 @@ section:
       (i.e. ``poky``) have been cloned using Git and the local repository is named
       "poky".
 
-2. *Prepare Your local.conf File:* By default, the
-   :term:`MACHINE` variable is set to
-   "qemux86-64", which is fine if you are building for the QEMU emulator
-   in 64-bit mode. However, if you are not, you need to set the
-   :term:`MACHINE` variable appropriately in your ``conf/local.conf`` file
-   found in the
-   :term:`Build Directory` (i.e.
-   ``poky/build`` in this example).
+2. *Prepare Your local.conf File:* By default, the :term:`MACHINE` variable is
+   set to "qemux86-64", which is fine if you are building for the QEMU emulator
+   in 64-bit mode. However, if you are not, you need to set the :term:`MACHINE`
+   variable appropriately in your ``conf/local.conf`` file found in the
+   :term:`Build Directory` (i.e.  ``poky/build`` in this example).
 
    Also, since you are preparing to work on the kernel image, you need
    to set the
@@ -836,8 +829,7 @@ the ":ref:`kernel-dev/common:getting ready to develop using \`\`devtool\`\``" Se
 
 8. *Build the Image With Your Modified Kernel:* You can now build an
    image that includes your kernel patches. Execute the following
-   command from your
-   :term:`Build Directory` in the terminal
+   command from your :term:`Build Directory` in the terminal
    set up to run BitBake::
 
       $ cd poky/build
@@ -1057,9 +1049,8 @@ To use the ``menuconfig`` tool in the Yocto Project development
 environment, you must do the following:
 
 -  Because you launch ``menuconfig`` using BitBake, you must be sure to
-   set up your environment by running the
-   :ref:`structure-core-script` script found in
-   the :term:`Build Directory`.
+   set up your environment by running the :ref:`structure-core-script` script
+   found in the :term:`Build Directory`.
 
 -  You must be sure of the state of your build's configuration in the
    :term:`Source Directory`.
@@ -1111,10 +1102,10 @@ can find the option under "Processor Type and Features". To deselect
 Multi-Processing Support" and enter "N" to clear the asterisk. When you
 are finished, exit out and save the change.
 
-Saving the selections updates the ``.config`` configuration file. This
-is the file that the OpenEmbedded build system uses to configure the
-kernel during the build. You can find and examine this file in the Build
-Directory in ``tmp/work/``. The actual ``.config`` is located in the
+Saving the selections updates the ``.config`` configuration file. This is the
+file that the OpenEmbedded build system uses to configure the kernel during
+the build. You can find and examine this file in the :term:`Build Directory`
+in ``tmp/work/``. The actual ``.config`` is located in the
 area where the specific kernel is built. For example, if you were
 building a Linux Yocto kernel based on the ``linux-yocto-4.12`` kernel
 and you were building a QEMU image targeted for ``x86`` architecture,
@@ -1316,7 +1307,7 @@ In order to run this task, you must have an existing ``.config`` file.
 See the ":ref:`kernel-dev/common:using \`\`menuconfig\`\``" section for
 information on how to create a configuration file.
 
-Following is sample output from the ``do_kernel_configcheck`` task:
+Following is sample output from the :ref:`ref-tasks-kernel_configcheck` task:
 
 .. code-block:: none
 
@@ -1396,7 +1387,7 @@ possible by reading the output of the kernel configuration fragment
 audit, noting any issues, making changes to correct the issues, and then
 repeating.
 
-As part of the kernel build process, the ``do_kernel_configcheck`` task
+As part of the kernel build process, the :ref:`ref-tasks-kernel_configcheck` task
 runs. This task validates the kernel configuration by checking the final
 ``.config`` file against the input files. During the check, the task
 produces warning messages for the following issues:
@@ -1430,13 +1421,13 @@ To streamline the configuration, do the following:
    successfully. Use this configuration file as your baseline.
 
 2. *Run Configure and Check Tasks:* Separately run the
-   ``do_kernel_configme`` and ``do_kernel_configcheck`` tasks::
+   :ref:`ref-tasks-kernel_configme` and :ref:`ref-tasks-kernel_configcheck` tasks::
 
       $ bitbake linux-yocto -c kernel_configme -f
       $ bitbake linux-yocto -c kernel_configcheck -f
 
 3. *Process the Results:* Take the resulting list of files from the
-   ``do_kernel_configcheck`` task warnings and do the following:
+   :ref:`ref-tasks-kernel_configcheck` task warnings and do the following:
 
    -  Drop values that are redefined in the fragment but do not change
       the final ``.config`` file.
@@ -1450,7 +1441,7 @@ To streamline the configuration, do the following:
 
 4. *Re-Run Configure and Check Tasks:* After you have worked through the
    output of the kernel configuration audit, you can re-run the
-   ``do_kernel_configme`` and ``do_kernel_configcheck`` tasks to see the
+   :ref:`ref-tasks-kernel_configme` and :ref:`ref-tasks-kernel_configcheck` tasks to see the
    results of your changes. If you have more issues, you can deal with
    them as described in the previous step.
 

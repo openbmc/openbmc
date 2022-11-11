@@ -18,7 +18,6 @@ import re
 scripts_path = os.path.dirname(os.path.realpath(__file__))
 lib_path = scripts_path + '/lib'
 sys.path = sys.path + [lib_path]
-import scriptutils
 import scriptpath
 scriptpath.add_bitbake_lib_path()
 import argparse_oe
@@ -51,11 +50,8 @@ def check(args):
             env['TMPDIR:forcevariable'] = tmpdir
 
         try:
-            output = subprocess.check_output(
-                    'bitbake -n %s' % ' '.join(args.target),
-                    stderr=subprocess.STDOUT,
-                    env=env,
-                    shell=True)
+            cmd = ['bitbake', '--dry-run', '--runall=build'] + args.target
+            output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, env=env)
 
             task_re = re.compile('NOTE: Running setscene task [0-9]+ of [0-9]+ \(([^)]+)\)')
             tasks = []

@@ -1,4 +1,4 @@
-From fc9bf1ce9f1a21150b10736a1c968d4ca6d4eaa3 Mon Sep 17 00:00:00 2001
+From c953564b9f029b31381a2c630b47133ffe6a33e7 Mon Sep 17 00:00:00 2001
 From: Martin Kelly <mkelly@xevo.com>
 Date: Fri, 7 Apr 2017 15:20:30 -0700
 Subject: [PATCH] configure.ac: don't use dnet-config
@@ -14,9 +14,11 @@ Signed-off-by: Martin Kelly <mkelly@xevo.com>
  open-vm-tools/configure.ac | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/open-vm-tools/configure.ac b/open-vm-tools/configure.ac
+index 3c058135a..124781f99 100644
 --- a/open-vm-tools/configure.ac
 +++ b/open-vm-tools/configure.ac
-@@ -937,7 +937,7 @@ if test "$with_dnet" = "yes"; then
+@@ -1227,7 +1227,7 @@ if test "$with_dnet" = "yes"; then
        AC_VMW_CHECK_LIB([dnet],
                         [DNET],
                         [],
@@ -25,7 +27,7 @@ Signed-off-by: Martin Kelly <mkelly@xevo.com>
                         [],
                         [dnet.h],
                         [intf_open],
-@@ -947,7 +947,7 @@ if test "$with_dnet" = "yes"; then
+@@ -1237,7 +1237,7 @@ if test "$with_dnet" = "yes"; then
  
     if test $have_dnet = "no"; then
  		AC_MSG_ERROR(
@@ -34,3 +36,6 @@ Signed-off-by: Martin Kelly <mkelly@xevo.com>
     fi
  fi
  
+-- 
+2.25.1
+

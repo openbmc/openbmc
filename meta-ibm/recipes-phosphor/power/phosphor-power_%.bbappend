@@ -6,14 +6,12 @@ SRC_URI += "file://psu.json"
 
 EXTRA_OEMESON:append:ibm-ac-server = " -Ducd90160-yaml=${STAGING_DIR_HOST}${datadir}/power-sequencer/ucd90160.yaml"
 EXTRA_OEMESON:append:p10bmc = " -Dibm-vpd=true"
-EXTRA_OEMESON:append:mihawk = " -Dpower_sequencer=mihawk-cpld"
 
 DEPENDS:append:ibm-ac-server = " power-sequencer"
 DEPENDS:append:p10bmc = " power-sequencer"
 
 PACKAGECONFIG:append:ibm-ac-server = " monitor"
 PACKAGECONFIG:append:swift = " monitor"
-PACKAGECONFIG:append:mihawk = " monitor"
 PACKAGECONFIG:append:p10bmc = " monitor-ng"
 
 do_install:append(){

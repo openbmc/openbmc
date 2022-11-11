@@ -1,0 +1,5 @@
+[Unit]
+Description=Ampere power %i already on target
+After=op-wait-power-on@%i.service
+Conflicts=obmc-chassis-poweroff@%i.target
+Conflicts=ampere-host-shutdown-ack@%i.service

@@ -233,13 +233,12 @@ for creating actual configuration files when you source
 :ref:`structure-core-script`, which is the
 build environment script.
 
-Sourcing the build environment script creates a
-:term:`Build Directory` if one does not
-already exist. BitBake uses the Build Directory for all its work during
-builds. The Build Directory has a ``conf`` directory that contains
-default versions of your ``local.conf`` and ``bblayers.conf``
+Sourcing the build environment script creates a :term:`Build Directory`
+if one does not already exist. BitBake uses the :term:`Build Directory`
+for all its work during builds. The Build Directory has a ``conf`` directory
+that contains default versions of your ``local.conf`` and ``bblayers.conf``
 configuration files. These default configuration files are created only
-if versions do not already exist in the Build Directory at the time you
+if versions do not already exist in the :term:`Build Directory` at the time you
 source the build environment setup script.
 
 Because the Poky repository is fundamentally an aggregation of existing
@@ -251,9 +250,9 @@ assumes the script is executed from within a cloned or unpacked version
 of Poky.
 
 Depending on where the script is sourced, different sub-scripts are
-called to set up the Build Directory (Yocto or OpenEmbedded).
+called to set up the :term:`Build Directory` (Yocto or OpenEmbedded).
 Specifically, the script ``scripts/oe-setup-builddir`` inside the poky
-directory sets up the Build Directory and seeds the directory (if
+directory sets up the :term:`Build Directory` and seeds the directory (if
 necessary) with configuration files appropriate for the Yocto Project
 development environment.
 
@@ -428,7 +427,7 @@ The distribution layer provides policy configurations for your
 distribution. Best practices dictate that you isolate these types of
 configurations into their own layer. Settings you provide in
 ``conf/distro/distro.conf`` override similar settings that BitBake finds
-in your ``conf/local.conf`` file in the Build Directory.
+in your ``conf/local.conf`` file in the :term:`Build Directory`.
 
 The following list provides some explanation and references for what you
 typically find in the distribution layer:
@@ -531,10 +530,11 @@ repositories, which is not the default behavior, and store them in the
 variable.
 
 Judicious use of a :term:`DL_DIR` directory can save the build system a trip
-across the Internet when looking for files. A good method for using a
-download directory is to have :term:`DL_DIR` point to an area outside of
-your Build Directory. Doing so allows you to safely delete the Build
-Directory if needed without fear of removing any downloaded source file.
+across the Internet when looking for files. A good method for using a download
+directory is to have :term:`DL_DIR` point to an area outside of your
+:term:`Build Directory`. Doing so allows you to safely delete the
+:term:`Build Directory` if needed without fear of removing any downloaded
+source file.
 
 The remainder of this section provides a deeper look into the source
 files and the mirrors. Here is a more detailed look at the source file
@@ -632,15 +632,14 @@ process validates them with generated output quality assurance checks
 through the :ref:`insane <ref-classes-insane>`
 class.
 
-The package feed area resides in the Build Directory. The directory the
+The package feed area resides in the :term:`Build Directory`. The directory the
 build system uses to temporarily store packages is determined by a
 combination of variables and the particular package manager in use. See
 the "Package Feeds" box in the illustration and note the information to
 the right of that area. In particular, the following defines where
 package files are kept:
 
--  :term:`DEPLOY_DIR`: Defined as
-   ``tmp/deploy`` in the Build Directory.
+-  :term:`DEPLOY_DIR`: Defined as ``tmp/deploy`` in the :term:`Build Directory`.
 
 -  ``DEPLOY_DIR_*``: Depending on the package manager used, the package
    type sub-folder. Given RPM, IPK, or DEB packaging and tarball
@@ -696,35 +695,28 @@ code:
 .. image:: figures/source-fetching.png
    :width: 100%
 
-The :ref:`ref-tasks-fetch` and
-:ref:`ref-tasks-unpack` tasks fetch
-the source files and unpack them into the
-:term:`Build Directory`.
+The :ref:`ref-tasks-fetch` and :ref:`ref-tasks-unpack` tasks fetch
+the source files and unpack them into the :term:`Build Directory`.
 
 .. note::
 
-   For every local file (e.g.
-   file://
-   ) that is part of a recipe's
-   SRC_URI
-   statement, the OpenEmbedded build system takes a checksum of the file
-   for the recipe and inserts the checksum into the signature for the
-   do_fetch
-   task. If any local file has been modified, the
-   do_fetch
-   task and all tasks that depend on it are re-executed.
+   For every local file (e.g. ``file://``) that is part of a recipe's
+   :term:`SRC_URI` statement, the OpenEmbedded build system takes a
+   checksum of the file for the recipe and inserts the checksum into
+   the signature for the :ref:`ref-tasks-fetch` task. If any local
+   file has been modified, the :ref:`ref-tasks-fetch` task and all
+   tasks that depend on it are re-executed.
 
-By default, everything is accomplished in the Build Directory, which has
-a defined structure. For additional general information on the Build
-Directory, see the ":ref:`structure-core-build`" section in
+By default, everything is accomplished in the :term:`Build Directory`, which has
+a defined structure. For additional general information on the
+:term:`Build Directory`, see the ":ref:`structure-core-build`" section in
 the Yocto Project Reference Manual.
 
-Each recipe has an area in the Build Directory where the unpacked source
-code resides. The :term:`S` variable points
-to this area for a recipe's unpacked source code. The name of that
-directory for any given recipe is defined from several different
-variables. The preceding figure and the following list describe the
-Build Directory's hierarchy:
+Each recipe has an area in the :term:`Build Directory` where the unpacked
+source code resides. The :term:`S` variable points to this area for a recipe's
+unpacked source code. The name of that directory for any given recipe is
+defined from several different variables. The preceding figure and the
+following list describe the :term:`Build Directory`'s hierarchy:
 
 -  :term:`TMPDIR`: The base directory
    where the OpenEmbedded build system performs all its work during the
@@ -857,7 +849,7 @@ This step in the build process consists of the following tasks:
    variables. For information on how this variable works within that
    class, see the
    :ref:`autotools <ref-classes-autotools>` class
-   :yocto_git:`here </poky/tree/meta/classes/autotools.bbclass>`.
+   :yocto_git:`here </poky/tree/meta/classes-recipe/autotools.bbclass>`.
 
 -  *do_compile*: Once a configuration task has been satisfied,
    BitBake compiles the source using the
@@ -892,7 +884,7 @@ following as well as other items: splitting out debugging symbols,
 looking at shared library dependencies between packages, and looking at
 package relationships.
 
-The ``do_packagedata`` task creates package metadata based on the
+The :ref:`ref-tasks-packagedata` task creates package metadata based on the
 analysis such that the build system can generate the final packages. The
 :ref:`ref-tasks-populate_sysroot`
 task stages (copies) a subset of the files installed by the
@@ -905,7 +897,7 @@ the analysis and package splitting process use several areas:
    individual packages.
 
 -  :term:`PKGDESTWORK`: A
-   temporary work area (i.e. ``pkgdata``) used by the ``do_package``
+   temporary work area (i.e. ``pkgdata``) used by the :ref:`ref-tasks-package`
    task to save package metadata.
 
 -  :term:`PKGDEST`: The parent
@@ -935,7 +927,7 @@ The :term:`FILES` variable defines the
 files that go into each package in
 :term:`PACKAGES`. If you want
 details on how this is accomplished, you can look at
-:yocto_git:`package.bbclass </poky/tree/meta/classes/package.bbclass>`.
+:yocto_git:`package.bbclass </poky/tree/meta/classes-global/package.bbclass>`.
 
 Depending on the type of packages being created (RPM, DEB, or IPK), the
 :ref:`do_package_write_* <ref-tasks-package_write_deb>`
@@ -1012,13 +1004,13 @@ all the post installation scripts must succeed on the build host during
 the package installation phase since the root filesystem on the target
 is read-only.
 
-The final stages of the ``do_rootfs`` task handle post processing. Post
+The final stages of the :ref:`ref-tasks-rootfs` task handle post processing. Post
 processing includes creation of a manifest file and optimizations.
 
 The manifest file (``.manifest``) resides in the same directory as the
 root filesystem image. This file lists out, line-by-line, the installed
 packages. The manifest file is useful for the
-:ref:`testimage <ref-classes-testimage*>` class,
+:ref:`testimage <ref-classes-testimage>` class,
 for example, to determine whether or not to run specific tests. See the
 :term:`IMAGE_MANIFEST`
 variable for additional information.
@@ -1036,7 +1028,7 @@ the
 variable. This variable specifies a list of functions to call before the
 build system creates the final image output files.
 
-The build system dynamically creates ``do_image_*`` tasks as needed,
+The build system dynamically creates :ref:`do_image_* <ref-tasks-image>` tasks as needed,
 based on the image types specified in the
 :term:`IMAGE_FSTYPES` variable.
 The process turns everything into an image file or a set of image files
@@ -1085,7 +1077,7 @@ the extensible SDK (eSDK):
    For more information on the cross-development toolchain generation,
    see the ":ref:`overview-manual/concepts:cross-development toolchain generation`"
    section. For information on advantages gained when building a
-   cross-development toolchain using the do_populate_sdk task, see the
+   cross-development toolchain using the :ref:`ref-tasks-populate_sdk` task, see the
    ":ref:`sdk-manual/appendix-obtain:building an sdk installer`" section in
    the Yocto Project Application Development and the Extensible Software
    Development Kit (eSDK) manual.
@@ -1100,13 +1092,13 @@ actually install. For information on the variables listed in the figure,
 see the ":ref:`overview-manual/concepts:application development sdk`"
 section.
 
-The ``do_populate_sdk`` task helps create the standard SDK and handles
+The :ref:`ref-tasks-populate_sdk` task helps create the standard SDK and handles
 two parts: a target part and a host part. The target part is the part
 built for the target hardware and includes libraries and headers. The
 host part is the part of the SDK that runs on the
 :term:`SDKMACHINE`.
 
-The ``do_populate_sdk_ext`` task helps create the extensible SDK and
+The :ref:`ref-tasks-populate_sdk_ext` task helps create the extensible SDK and
 handles host and target parts differently than its counter part does for
 the standard SDK. For the extensible SDK, the task encapsulates the
 build system, which includes everything needed (host and target) for the
@@ -1198,7 +1190,7 @@ the work involved would be equal to or greater than the underlying task.
 
 In the build system, the common tasks that have setscene variants are
 :ref:`ref-tasks-package`,
-``do_package_write_*``,
+:ref:`do_package_write_* <ref-tasks-package_write_deb>`,
 :ref:`ref-tasks-deploy`,
 :ref:`ref-tasks-packagedata`, and
 :ref:`ref-tasks-populate_sysroot`.
@@ -1208,15 +1200,15 @@ end result.
 The build system has knowledge of the relationship between these tasks
 and other preceding tasks. For example, if BitBake runs
 ``do_populate_sysroot_setscene`` for something, it does not make sense
-to run any of the ``do_fetch``, ``do_unpack``, ``do_patch``,
-``do_configure``, ``do_compile``, and ``do_install`` tasks. However, if
-``do_package`` needs to be run, BitBake needs to run those other tasks.
+to run any of the :ref:`ref-tasks-fetch`, :ref:`ref-tasks-unpack`, :ref:`ref-tasks-patch`,
+:ref:`ref-tasks-configure`, :ref:`ref-tasks-compile`, and :ref:`ref-tasks-install` tasks. However, if
+:ref:`ref-tasks-package` needs to be run, BitBake needs to run those other tasks.
 
 It becomes more complicated if everything can come from an sstate cache
 because some objects are simply not required at all. For example, you do
 not need a compiler or native tools, such as quilt, if there isn't anything
-to compile or patch. If the ``do_package_write_*`` packages are available
-from sstate, BitBake does not need the ``do_package`` task data.
+to compile or patch. If the :ref:`do_package_write_* <ref-tasks-package_write_deb>` packages are available
+from sstate, BitBake does not need the :ref:`ref-tasks-package` task data.
 
 To handle all these complexities, BitBake runs in two phases. The first
 is the "setscene" stage. During this stage, BitBake first checks the
@@ -1262,15 +1254,12 @@ this output:
    ":doc:`/ref-manual/images`" chapter in the Yocto Project Reference
    Manual.
 
-The build process writes images out to the :term:`Build Directory`
-inside the
-``tmp/deploy/images/machine/`` folder as shown in the figure. This
+The build process writes images out to the :term:`Build Directory` inside
+the ``tmp/deploy/images/machine/`` folder as shown in the figure. This
 folder contains any files expected to be loaded on the target device.
-The :term:`DEPLOY_DIR` variable
-points to the ``deploy`` directory, while the
-:term:`DEPLOY_DIR_IMAGE`
-variable points to the appropriate directory containing images for the
-current configuration.
+The :term:`DEPLOY_DIR` variable points to the ``deploy`` directory, while the
+:term:`DEPLOY_DIR_IMAGE` variable points to the appropriate directory
+containing images for the current configuration.
 
 -  kernel-image: A kernel binary file. The
    :term:`KERNEL_IMAGETYPE`
@@ -1344,10 +1333,9 @@ can initialize the environment before using the tools.
       the :doc:`/sdk-manual/index` manual.
 
 All the output files for an SDK are written to the ``deploy/sdk`` folder
-inside the :term:`Build Directory` as
-shown in the previous figure. Depending on the type of SDK, there are
-several variables to configure these files. Here are the variables
-associated with an extensible SDK:
+inside the :term:`Build Directory` as shown in the previous figure. Depending
+on the type of SDK, there are several variables to configure these files.
+Here are the variables associated with an extensible SDK:
 
 -  :term:`DEPLOY_DIR`: Points to
    the ``deploy`` directory.
@@ -1435,7 +1423,7 @@ toolchain construction and use.
    :width: 100%
 
 Most of the work occurs on the Build Host. This is the machine used to
-build images and generally work within the the Yocto Project
+build images and generally work within the Yocto Project
 environment. When you run
 :term:`BitBake` to create an image, the
 OpenEmbedded build system uses the host ``gcc`` compiler to bootstrap a
@@ -1486,12 +1474,11 @@ relocatable SDK used to develop applications. When you run the
 installer, it installs the toolchain, which contains the development
 tools (e.g., ``gcc-cross-canadian``, ``binutils-cross-canadian``, and
 other ``nativesdk-*`` tools), which are tools native to the SDK (i.e.
-native to :term:`SDK_ARCH`), you
-need to cross-compile and test your software. The figure shows the
-commands you use to easily build out this toolchain. This
-cross-development toolchain is built to execute on the
-:term:`SDKMACHINE`, which might or
-might not be the same machine as the Build Host.
+native to :term:`SDK_ARCH`), you need to cross-compile and test your
+software. The figure shows the commands you use to easily build out
+this toolchain. This cross-development toolchain is built to execute on the
+:term:`SDKMACHINE`, which might or might not be the same machine as
+the Build Host.
 
 .. note::
 
@@ -1801,14 +1788,14 @@ from the :ref:`deploy <ref-classes-deploy>` class::
 
 The following list explains the previous example:
 
--  Adding "do_deploy" to ``SSTATETASKS`` adds some required
+-  Adding ``do_deploy`` to ``SSTATETASKS`` adds some required
    sstate-related processing, which is implemented in the
    :ref:`sstate <ref-classes-sstate>` class, to
    before and after the
    :ref:`ref-tasks-deploy` task.
 
 -  The ``do_deploy[sstate-inputdirs] = "${DEPLOYDIR}"`` declares that
-   ``do_deploy`` places its output in ``${DEPLOYDIR}`` when run normally
+   :ref:`ref-tasks-deploy` places its output in ``${DEPLOYDIR}`` when run normally
    (i.e. when not using the sstate cache). This output becomes the input
    to the shared state cache.
 
@@ -1818,15 +1805,15 @@ The following list explains the previous example:
 
    .. note::
 
-      If ``do_deploy`` is not already in the shared state cache or if its input
+      If :ref:`ref-tasks-deploy` is not already in the shared state cache or if its input
       checksum (signature) has changed from when the output was cached, the task
       runs to populate the shared state cache, after which the contents of the
       shared state cache is copied to ${:term:`DEPLOY_DIR_IMAGE`}. If
-      ``do_deploy`` is in the shared state cache and its signature indicates
+      :ref:`ref-tasks-deploy` is in the shared state cache and its signature indicates
       that the cached output is still valid (i.e. if no relevant task inputs
       have changed), then the contents of the shared state cache copies
       directly to ${:term:`DEPLOY_DIR_IMAGE`} by the ``do_deploy_setscene`` task
-      instead, skipping the ``do_deploy`` task.
+      instead, skipping the :ref:`ref-tasks-deploy` task.
 
 -  The following task definition is glue logic needed to make the
    previous settings effective::
@@ -1836,16 +1823,16 @@ The following list explains the previous example:
       }
       addtask do_deploy_setscene
 
-  ``sstate_setscene()`` takes the flags above as input and accelerates the ``do_deploy`` task
+  ``sstate_setscene()`` takes the flags above as input and accelerates the :ref:`ref-tasks-deploy` task
   through the shared state cache if possible. If the task was
   accelerated, ``sstate_setscene()`` returns True. Otherwise, it
-  returns False, and the normal ``do_deploy`` task runs. For more
+  returns False, and the normal :ref:`ref-tasks-deploy` task runs. For more
   information, see the ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-execution:setscene`"
   section in the BitBake User Manual.
 
 -  The ``do_deploy[dirs] = "${DEPLOYDIR} ${B}"`` line creates
-   ``${DEPLOYDIR}`` and ``${B}`` before the ``do_deploy`` task runs, and
-   also sets the current working directory of ``do_deploy`` to ``${B}``.
+   ``${DEPLOYDIR}`` and ``${B}`` before the :ref:`ref-tasks-deploy` task runs, and
+   also sets the current working directory of :ref:`ref-tasks-deploy` to ``${B}``.
    For more information, see the ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:variable flags`"
    section in the BitBake
    User Manual.
@@ -1854,7 +1841,7 @@ The following list explains the previous example:
 
       In cases where ``sstate-inputdirs`` and ``sstate-outputdirs`` would be
       the same, you can use ``sstate-plaindirs``. For example, to preserve the
-      ${:term:`PKGD`} and ${:term:`PKGDEST`} output from the ``do_package``
+      ${:term:`PKGD`} and ${:term:`PKGDEST`} output from the :ref:`ref-tasks-package`
       task, use the following::
 
               do_package[sstate-plaindirs] = "${PKGD} ${PKGDEST}"
@@ -2101,12 +2088,12 @@ dependencies, you must manually declare the dependencies.
    :term:`PRIVATE_LIBS` inside
    the package's recipe.
 
--  ``pcdeps``: During the ``do_package`` task of each recipe, all
+-  ``pcdeps``: During the :ref:`ref-tasks-package` task of each recipe, all
    pkg-config modules (``*.pc`` files) installed by the recipe are
    located. For each module, the package that contains the module is
    registered as providing the module. The resulting module-to-package
    mapping is saved globally in :term:`PKGDATA_DIR` by the
-   ``do_packagedata`` task.
+   :ref:`ref-tasks-packagedata` task.
 
    Simultaneously, all pkg-config modules installed by the recipe are
    inspected to see what other pkg-config modules they depend on. A
@@ -2147,7 +2134,7 @@ dependencies, you must manually declare the dependencies.
    :term:`ALLOW_EMPTY` variable
    for more information.
 
-The ``do_package`` task depends on the ``do_packagedata`` task of each
+The :ref:`ref-tasks-package` task depends on the :ref:`ref-tasks-packagedata` task of each
 recipe in :term:`DEPENDS` through use
 of a ``[``\ :ref:`deptask <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:variable flags>`\ ``]``
 declaration, which guarantees that the required
@@ -2162,8 +2149,8 @@ operations that are normally reserved for the root user (e.g.
 :ref:`ref-tasks-install`,
 :ref:`do_package_write* <ref-tasks-package_write_deb>`,
 :ref:`ref-tasks-rootfs`, and
-:ref:`do_image* <ref-tasks-image>`). For example,
-the ``do_install`` task benefits from being able to set the UID and GID
+:ref:`do_image_* <ref-tasks-image>`). For example,
+the :ref:`ref-tasks-install` task benefits from being able to set the UID and GID
 of installed files to arbitrary values.
 
 One approach to allowing tasks to perform root-only operations would be

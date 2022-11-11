@@ -1,7 +1,6 @@
 # N1 SDP specific configuration for optee-os
 
-COMPATIBLE_MACHINE:n1sdp = "n1sdp"
-OPTEEMACHINE:n1sdp = "n1sdp"
+require optee-os-generic-n1sdp.inc
 
 TS_INSTALL_PREFIX_PATH = "${RECIPE_SYSROOT}/firmware/sp/opteesp"
 
@@ -11,6 +10,7 @@ SRC_URI:append = " \
     file://0002-plat-n1sdp-add-N1SDP-platform-support.patch \
     file://0003-HACK-disable-instruction-cache-and-data-cache.patch \
     file://0004-Handle-logging-syscall.patch \
+    file://0005-plat-n1sdp-register-DRAM1-to-optee-os.patch \
     "
 
 EXTRA_OEMAKE += " CFG_TEE_CORE_LOG_LEVEL=4"

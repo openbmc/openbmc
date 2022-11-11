@@ -117,7 +117,7 @@ class DirectPlugin(ImagerPlugin):
         updated = False
         for part in self.parts:
             if not part.realnum or not part.mountpoint \
-               or part.mountpoint == "/" or not part.mountpoint.startswith('/'):
+               or part.mountpoint == "/" or not (part.mountpoint.startswith('/') or part.mountpoint == "swap"):
                 continue
 
             if part.use_uuid:
@@ -149,6 +149,9 @@ class DirectPlugin(ImagerPlugin):
             self.updated_fstab_path = os.path.join(self.workdir, "fstab")
             with open(self.updated_fstab_path, "w") as f:
                 f.writelines(fstab_lines)
+            if os.getenv('SOURCE_DATE_EPOCH'):
+                fstab_time = int(os.getenv('SOURCE_DATE_EPOCH'))
+                os.utime(self.updated_fstab_path, (fstab_time, fstab_time))
 
     def _full_path(self, path, name, extention):
         """ Construct full file path to a file we generate. """
@@ -310,7 +313,10 @@ class PartitionedImage():
                           # all partitions (in bytes)
         self.ptable_format = ptable_format  # Partition table format
         # Disk system identifier
-        self.identifier = random.SystemRandom().randint(1, 0xffffffff)
+        if os.getenv('SOURCE_DATE_EPOCH'):
+            self.identifier = random.Random(int(os.getenv('SOURCE_DATE_EPOCH'))).randint(1, 0xffffffff)
+        else:
+            self.identifier = random.SystemRandom().randint(1, 0xffffffff)
 
         self.partitions = partitions
         self.partimages = []

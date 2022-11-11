@@ -135,7 +135,7 @@ Fetching these types of dependencies that are not provided in the
 sysroot negatively affects the ability to reproduce builds. This type of
 fetching is now explicitly disabled. Consequently, any missing
 dependencies in Python recipes that use these classes now result in an
-error during the ``do_configure`` task.
+error during the :ref:`ref-tasks-configure` task.
 
 .. _migration-2.6-linux-yocto-configuration-audit-issues-now-correctly-reported:
 
@@ -319,7 +319,7 @@ This section provides information about automatic testing changes:
    practices now dictate that you use the
    :term:`IMAGE_CLASSES` variable rather than the
    :term:`INHERIT` variable when you inherit the
-   :ref:`testimage <ref-classes-testimage*>` and
+   :ref:`testimage <ref-classes-testimage>` and
    :ref:`testsdk <ref-classes-testsdk>` classes used for automatic
    testing.
 
@@ -343,8 +343,7 @@ BitBake Changes
 ---------------
 
 The server logfile ``bitbake-cookerdaemon.log`` is now always placed in
-the :term:`Build Directory` instead of the current
-directory.
+the :term:`Build Directory` instead of the current directory.
 
 .. _migration-2.6-security-changes:
 

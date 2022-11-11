@@ -8,7 +8,7 @@ DEPENDS        += "libts"
 RDEPENDS:${PN} += "libts"
 
 SRC_URI += "git://github.com/ARM-software/psa-arch-tests.git;name=psatest;protocol=https;branch=main;destsuffix=git/psatest \
-            file://0012-psa-arch-test-toolchain.patch \
+            file://0001-Pass-Yocto-build-settings-to-psa-arch-tests-native.patch;patchdir=../psatest \
            "
 
 SRCREV_psatest = "451aa087a40d02c7d04778235014c5619d126471"

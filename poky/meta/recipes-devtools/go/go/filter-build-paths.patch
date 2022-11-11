@@ -8,7 +8,8 @@ embedded in the go binary so that builds are reproducible regardless of build
 location. This codepath is hit for statically linked go binaries such as those
 on mips/ppc.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://github.com/golang/go/pull/56410]
+
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
 ---

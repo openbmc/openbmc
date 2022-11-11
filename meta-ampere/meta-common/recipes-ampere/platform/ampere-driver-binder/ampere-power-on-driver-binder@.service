@@ -1,0 +1,10 @@
+[Unit]
+Description=Ampere power on driver binder %i
+After=obmc-power-already-on@%i.target
+BindTo=obmc-power-already-on@%i.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c "if command -v ampere_power_on_driver_binder.sh; then echo 'Try to bind driver after power on if does not' && ampere_power_on_driver_binder.sh; fi && exit 0;"
+SyslogIdentifier=power_on_binder
+RemainAfterExit=no

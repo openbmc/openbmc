@@ -22,7 +22,7 @@ PACKAGECONFIG[jffs-workaround] = "-Djffs-workaround=enabled, \
         -Djffs-workaround=disabled"
 PACKAGECONFIG[host-dump-transport-pldm] = " \
         -Dhost-transport=pldm,, \
-        pldm \
+        libpldm \
         "
 PACKAGECONFIG[openpower-dumps-extension] = " \
        -Dopenpower-dumps-extension=enabled, \

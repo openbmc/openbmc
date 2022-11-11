@@ -3,7 +3,11 @@ kconf non-hardware tc/dhcp.cfg
 kconf non-hardware tc/devtmpfs.cfg
 kconf non-hardware tc/gralloc.cfg
 kconf non-hardware tc/mali.cfg
-kconf non-hardware tc/tee.cfg
+kconf non-hardware tc/ffa.cfg
+kconf non-hardware tc/optee.cfg
 kconf non-hardware tc/virtio.cfg
+kconf non-hardware tc/autofdo.cfg
 kconf non-hardware tc/ci700.cfg
 kconf non-hardware tc/trusty.cfg
+kconf non-hardware tc/disable_mpam.cfg
+kconf non-hardware tc/disable_btf.cfg

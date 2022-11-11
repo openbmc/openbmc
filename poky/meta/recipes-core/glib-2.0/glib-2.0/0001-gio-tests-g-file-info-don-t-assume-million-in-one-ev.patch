@@ -1,0 +1,51 @@
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/merge_requests/2990]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From 14838522a706ebdcc3cdab661d4c368099fe3a4e Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Tue, 6 Jul 2021 19:26:03 +0100
+Subject: [PATCH] gio/tests/g-file-info: don't assume million-in-one events
+ don't happen
+
+The access and creation time tests create a file, gets the time in
+seconds, then gets the time in microseconds and assumes that the
+difference between the two has to be above 0.
+
+As rare as this may be, it can happen:
+
+$ stat g-file-info-test-50A450 -c %y
+2021-07-06 18:24:56.000000767 +0100
+
+Change the test to simply assert that the difference not negative to
+handle this case.
+
+This is the same fix as 289f8b, but that was just modification time.
+---
+ gio/tests/g-file-info.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gio/tests/g-file-info.c b/gio/tests/g-file-info.c
+index 59411c3a8..a213e4b92 100644
+--- a/gio/tests/g-file-info.c
++++ b/gio/tests/g-file-info.c
+@@ -239,7 +239,7 @@ test_g_file_info_access_time (void)
+   g_assert_nonnull (dt_usecs);
+ 
+   ts = g_date_time_difference (dt_usecs, dt);
+-  g_assert_cmpint (ts, >, 0);
++  g_assert_cmpint (ts, >=, 0);
+   g_assert_cmpint (ts, <, G_USEC_PER_SEC);
+ 
+   /* Try round-tripping the access time. */
+@@ -316,7 +316,7 @@ test_g_file_info_creation_time (void)
+   g_assert_nonnull (dt_usecs);
+ 
+   ts = g_date_time_difference (dt_usecs, dt);
+-  g_assert_cmpint (ts, >, 0);
++  g_assert_cmpint (ts, >=, 0);
+   g_assert_cmpint (ts, <, G_USEC_PER_SEC);
+ 
+   /* Try round-tripping the creation time. */
+-- 
+2.34.1
+

@@ -13,7 +13,7 @@ DEPENDS = " \
     ${@bb.utils.contains('PTEST_ENABLED', '1', 'gtest', '', d)} \
     ${@bb.utils.contains('PTEST_ENABLED', '1', 'gmock', '', d)} \
 "
-SRCREV = "7a3a8f7aa20017a1bdb4f22737f03a12d0930f19"
+SRCREV = "32d9a653b253e963eab9c9d49a377d4d48e9ea8a"
 PV = "1.0+git${SRCPV}"
 
 SRC_URI = "git://github.com/openbmc/bmcweb.git;branch=master;protocol=https;nobranch=1"
@@ -41,7 +41,7 @@ do_install_ptest() {
 
 RDEPENDS:${PN} += " \
     jsnbd \
-    phosphor-mapper \
+    phosphor-objmgr \
 "
 
 FILES:${PN} += "${datadir}/** "

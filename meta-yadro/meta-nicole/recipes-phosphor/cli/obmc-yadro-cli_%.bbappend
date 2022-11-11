@@ -5,6 +5,6 @@ RDEPENDS:${PN}:append = " \
     openpower-esel-parser \
     phosphor-debug-collector \
     phosphor-led-manager \
-    phosphor-mapper \
+    phosphor-objmgr \
     phosphor-state-manager \
 "

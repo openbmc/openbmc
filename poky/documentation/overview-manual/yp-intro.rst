@@ -584,20 +584,15 @@ Build Host runs, you have several choices.
    ":ref:`dev-manual/start:setting up to use cross platforms (crops)`"
    section in the Yocto Project Development Tasks Manual.
 
--  *Windows Subsystem For Linux (WSLv2):* You may use Windows Subsystem
-   For Linux v2 to set up a Build Host using Windows 10.
+-  *Windows Subsystem For Linux (WSL 2):* You may use Windows Subsystem
+   For Linux version 2 to set up a Build Host using Windows 10 or later,
+   or Windows Server 2019 or later.
 
-   .. note::
-
-      The Yocto Project is not compatible with WSLv1, it is compatible
-      but not officially supported nor validated with WSLv2, if you
-      still decide to use WSL please upgrade to WSLv2.
-
-   The Windows Subsystem For Linux allows Windows 10 to run a real Linux
+   The Windows Subsystem For Linux allows Windows to run a real Linux
    kernel inside of a lightweight virtual machine (VM).
 
-   For information on how to set up a Build Host with WSLv2, see the
-   ":ref:`dev-manual/start:setting up to use windows subsystem for linux (wslv2)`"
+   For information on how to set up a Build Host with WSL 2, see the
+   ":ref:`dev-manual/start:setting up to use windows subsystem for linux (wsl 2)`"
    section in the Yocto Project Development Tasks Manual.
 
 -  *Toaster:* Regardless of what your Build Host is running, you can use

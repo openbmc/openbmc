@@ -1,4 +1,3 @@
-#MACHINE ?= "mihawk"
 #MACHINE ?= "p10bmc"
 #MACHINE ?= "swift"
 MACHINE ??= "witherspoon"

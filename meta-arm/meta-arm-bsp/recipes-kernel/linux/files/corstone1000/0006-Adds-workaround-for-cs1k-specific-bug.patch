@@ -1,0 +1,41 @@
+Upstream-Status: Inappropriate[Temporary bugfix]
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+
+From f1a869ea986305a6fb20f3c770c11778a898b86d Mon Sep 17 00:00:00 2001
+From: Emekcan <emekcan.aras@arm.com>
+Date: Thu, 13 Oct 2022 20:53:42 +0100
+Subject: [PATCH] Adds workaround for cs1k specific bug
+
+Adds a temporary workaround to solve a possible
+race-conditioning issue in the tee driver
+for corstone1000.
+
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+---
+ drivers/firmware/arm_ffa/driver.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/firmware/arm_ffa/driver.c b/drivers/firmware/arm_ffa/driver.c
+index ec731e9e942b..2a3ef649935e 100644
+--- a/drivers/firmware/arm_ffa/driver.c
++++ b/drivers/firmware/arm_ffa/driver.c
+@@ -32,6 +32,7 @@
+ #include <linux/scatterlist.h>
+ #include <linux/slab.h>
+ #include <linux/uuid.h>
++#include <linux/delay.h>
+ 
+ #include "common.h"
+ 
+@@ -344,7 +345,7 @@ static int ffa_msg_send_direct_req(u16 src_id, u16 dst_id, bool mode_32bit,
+ {
+ 	u32 req_id, resp_id, src_dst_ids = PACK_TARGET_INFO(src_id, dst_id);
+ 	ffa_value_t ret;
+-
++	msleep(1);
+ 	if (mode_32bit) {
+ 		req_id = FFA_MSG_SEND_DIRECT_REQ;
+ 		resp_id = FFA_MSG_SEND_DIRECT_RESP;
+-- 
+2.17.1
+

@@ -8,7 +8,6 @@ DEPENDS += " \
         ${PYTHON_PN}-mako-native \
         ${PYTHON_PN}-pyyaml-native \
         phosphor-ipmi-host \
-        phosphor-mapper \
         autoconf-archive-native \
         phosphor-logging \
         cli11 \

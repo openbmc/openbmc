@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Provide source directive to shellcheck.
+# shellcheck source=meta-facebook/recipes-phosphor/state/phosphor-state-manager/greatlakes/host-poweron
+source /usr/libexec/power-cmd
+
+SLOT_ID=$(( $1-1  << 2 ))
+
+# Host Reboot
+host-reboot()
+{
+        power_delay=$1
+        for pwr_cmd in "${power_seq[@]}"
+        do
+             result="$(busctl call $SERVICE $OBJECT_PATH $INTERFACE sendRequest yyyyay $SLOT_ID $NETFN $LUN $CMD $DATA_LEN 0x01 0x42 0x01 0x00 "$pwr_cmd")"
+             echo "$result"
+             if [ "$pwr_cmd" == $POWER_BTN_LOW ]
+             then
+                     sleep "$power_delay"
+             fi
+        done
+}
+
+# Check Host Response and Status
+check-response()
+{
+   response="$(busctl call $SERVICE $OBJECT_PATH $INTERFACE sendRequest yyyyay $SLOT_ID 0x38 $LUN 0x3 0x03 0x15 0xa0 0x00)"
+
+   result=$(echo "$response" | cut -d" " -f $PWRGD_SYS_PWROK_INDEX)
+   res="$(( "$result" & 0x80  ))"
+   pgood="$(( "$res" >> 7 ))"
+   if [ "$pgood" == $STATE_ON ]
+   then
+     host-reboot 6
+     sleep 15
+     host-reboot 2
+     exit 0;
+   else
+       echo "Host is Off"
+       exit 1;
+   fi
+}
+check-response

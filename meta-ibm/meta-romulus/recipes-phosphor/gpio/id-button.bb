@@ -5,8 +5,8 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit obmc-phosphor-systemd
 
-DEPENDS += "virtual/obmc-gpio-monitor"
-RDEPENDS:${PN} += "virtual/obmc-gpio-monitor"
+DEPENDS += "phosphor-gpio-monitor"
+RDEPENDS:${PN} += "phosphor-gpio-monitor-monitor"
 
 S = "${WORKDIR}"
 SRC_URI += "file://toggle_identify_led.sh"

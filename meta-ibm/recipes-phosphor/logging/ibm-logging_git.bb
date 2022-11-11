@@ -32,7 +32,6 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[policy-interface] = "--enable-policy-interface, --disable-policy-interface,,"
 
 PACKAGECONFIG:ibm-ac-server = "policy-interface"
-PACKAGECONFIG:mihawk = "policy-interface"
 
 SERVICE = "com.ibm.Logging.service"
 DBUS_SERVICE:${PN} += "${SERVICE}"

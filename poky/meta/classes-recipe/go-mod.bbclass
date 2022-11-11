@@ -6,7 +6,7 @@
 
 # Handle Go Modules support
 #
-# When using Go Modules, the the current working directory MUST be at or below
+# When using Go Modules, the current working directory MUST be at or below
 # the location of the 'go.mod' file when the go tool is used, and there is no
 # way to tell it to look elsewhere.  It will automatically look upwards for the
 # file, but not downwards.
