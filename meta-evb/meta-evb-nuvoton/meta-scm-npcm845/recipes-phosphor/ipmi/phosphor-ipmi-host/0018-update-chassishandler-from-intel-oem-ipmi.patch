@@ -1,4 +1,4 @@
-From 50c69821f8cf58adee90af5218914f5eb8336207 Mon Sep 17 00:00:00 2001
+From c77f78ea566f4cfe848901c7b38d4f451104aa2f Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Tue, 26 Jul 2022 12:09:14 +0800
 Subject: [PATCH 18/21] update chassishandler from intel oem ipmi
@@ -490,5 +490,5 @@ index c2ed8076..d6c203e4 100644
      }
      return ipmi::responseSuccess();
 -- 
-2.17.1
+2.34.1
 

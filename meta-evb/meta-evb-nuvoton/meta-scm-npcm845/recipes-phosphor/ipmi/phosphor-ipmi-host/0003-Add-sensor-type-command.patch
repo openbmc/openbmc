@@ -1,4 +1,4 @@
-From eafe5f216fdc0e23c77ebf38abb3c8ec3f772de8 Mon Sep 17 00:00:00 2001
+From e8258f5fe2ae9ba23df263c5cb6e5322bc201fca Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
 Date: Mon, 15 Aug 2022 17:23:50 +0800
 Subject: [PATCH 03/21] Add sensor type command
@@ -10,10 +10,10 @@ Signed-off-by: Stanley Chu <yschu@nuvoton.com>
  2 files changed, 39 insertions(+), 5 deletions(-)
 
 diff --git a/dbus-sdr/sensorcommands.cpp b/dbus-sdr/sensorcommands.cpp
-index 522cbb82..43a4eb87 100644
+index 5a78ddb0..281a7891 100644
 --- a/dbus-sdr/sensorcommands.cpp
 +++ b/dbus-sdr/sensorcommands.cpp
-@@ -2220,6 +2220,35 @@ static ipmi::RspType<uint8_t, // respcount
+@@ -2243,6 +2243,35 @@ static ipmi::RspType<uint8_t, // respcount
                                   sdrLastAdd);
  }
  
@@ -49,10 +49,10 @@ index 522cbb82..43a4eb87 100644
  /* end sensor commands */
  
  /* storage commands */
-@@ -2458,5 +2487,10 @@ void registerSensorFunctions()
-     ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnStorage,
-                           ipmi::storage::cmdGetSdr, ipmi::Privilege::User,
-                           ipmiStorageGetSDR);
+@@ -2589,5 +2618,10 @@ void registerSensorFunctions()
+                                ipmi::dcmi::cmdGetDcmiSensorInfo,
+                                ipmi::Privilege::User,
+                                ipmi::dcmi::getSensorInfo);
 +
 +    // <Get Sensor Type>
 +    ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnSensor,
@@ -61,10 +61,10 @@ index 522cbb82..43a4eb87 100644
  }
  } // namespace ipmi
 diff --git a/sensorhandler.cpp b/sensorhandler.cpp
-index 1a24c42c..6f17e1bb 100644
+index 30cee8bf..cdf6379f 100644
 --- a/sensorhandler.cpp
 +++ b/sensorhandler.cpp
-@@ -1510,6 +1510,11 @@ void register_netfn_sen_functions()
+@@ -1514,6 +1514,11 @@ void register_netfn_sen_functions()
      ipmi_register_callback(NETFUN_SENSOR, IPMI_CMD_GET_DEVICE_SDR, nullptr,
                             ipmi_sen_get_sdr, PRIVILEGE_USER);
  
@@ -76,7 +76,7 @@ index 1a24c42c..6f17e1bb 100644
  #endif
  
      // Common Handers used by both implementation.
-@@ -1518,10 +1523,5 @@ void register_netfn_sen_functions()
+@@ -1522,10 +1527,5 @@ void register_netfn_sen_functions()
      ipmi_register_callback(NETFUN_SENSOR, IPMI_CMD_PLATFORM_EVENT, nullptr,
                             ipmicmdPlatformEvent, PRIVILEGE_OPERATOR);
  
@@ -88,5 +88,5 @@ index 1a24c42c..6f17e1bb 100644
      return;
  }
 -- 
-2.17.1
+2.34.1
 

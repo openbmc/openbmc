@@ -1,4 +1,4 @@
-From 28dd66e5b49dff037534de5f0e88624a49ff3adb Mon Sep 17 00:00:00 2001
+From 187a6b051d43a9904ca76a8a6ac19fba455da3dd Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
 Date: Mon, 15 Aug 2022 14:15:09 +0800
 Subject: [PATCH 1/8] add TMP100 support
@@ -9,7 +9,7 @@ Signed-off-by: Stanley Chu <yschu@nuvoton.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/src/HwmonTempMain.cpp b/src/HwmonTempMain.cpp
-index 9ebdfcdf..0b8cfa69 100644
+index e1b0d623..d0e4fe75 100644
 --- a/src/HwmonTempMain.cpp
 +++ b/src/HwmonTempMain.cpp
 @@ -67,6 +67,7 @@ static const I2CDeviceTypeMap sensorTypes{
@@ -21,5 +21,5 @@ index 9ebdfcdf..0b8cfa69 100644
      {"TMP175", I2CDeviceType{"tmp175", true}},
      {"TMP421", I2CDeviceType{"tmp421", true}},
 -- 
-2.17.1
+2.34.1
 

@@ -1,4 +1,4 @@
-From db1707ffe0f420bc868e5bda030789e55e3b7699 Mon Sep 17 00:00:00 2001
+From e70628dd136293c62b34f691ab28402043498f32 Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
 Date: Tue, 5 Jul 2022 15:18:37 +0800
 Subject: [PATCH 05/21] get system guid command
@@ -9,7 +9,7 @@ Signed-off-by: Stanley Chu <yschu@nuvoton.com>
  1 file changed, 46 insertions(+)
 
 diff --git a/apphandler.cpp b/apphandler.cpp
-index 0fc9b2f0..5dcde028 100644
+index f6334e79..f5c8a854 100644
 --- a/apphandler.cpp
 +++ b/apphandler.cpp
 @@ -842,6 +842,7 @@ auto ipmiAppGetBtCapabilities()
@@ -20,7 +20,7 @@ index 0fc9b2f0..5dcde028 100644
  
  auto ipmiAppGetSystemGuid() -> ipmi::RspType<std::array<uint8_t, 16>>
  {
-@@ -887,6 +888,51 @@ auto ipmiAppGetSystemGuid() -> ipmi::RspType<std::array<uint8_t, 16>>
+@@ -885,6 +886,51 @@ auto ipmiAppGetSystemGuid() -> ipmi::RspType<std::array<uint8_t, 16>>
      }
      return ipmi::responseSuccess(uuid);
  }
@@ -73,5 +73,5 @@ index 0fc9b2f0..5dcde028 100644
  /**
   * @brief set the session state as teardown
 -- 
-2.17.1
+2.34.1
 

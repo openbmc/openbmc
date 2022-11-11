@@ -1,4 +1,4 @@
-From abab7c5040adbed268707a7161e22eeb6458689e Mon Sep 17 00:00:00 2001
+From 4ef4c823deeffafc2edf8bf868f043e06874a505 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Fri, 24 Jun 2022 18:36:29 +0800
 Subject: [PATCH 2/8] psu sensor: add fan3 support
@@ -9,10 +9,10 @@ Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
  1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/src/PSUSensorMain.cpp b/src/PSUSensorMain.cpp
-index 918b9c6c..2851564c 100644
+index d1117751..b58acedd 100644
 --- a/src/PSUSensorMain.cpp
 +++ b/src/PSUSensorMain.cpp
-@@ -1020,9 +1020,10 @@ void propertyInitialize(void)
+@@ -1015,9 +1015,10 @@ void propertyInitialize(void)
          {"temp6", PSUProperty("Temperature", 127, -128, 3, 0)},
          {"maxtemp1", PSUProperty("Max Temperature", 127, -128, 3, 0)},
          {"fan1", PSUProperty("Fan Speed 1", 30000, 0, 0, 0)},
@@ -25,7 +25,7 @@ index 918b9c6c..2851564c 100644
  
      limitEventMatch = {{"PredictiveFailure", {"max_alarm", "min_alarm"}},
                         {"Failure", {"crit_alarm", "lcrit_alarm"}}};
-@@ -1034,7 +1035,8 @@ void propertyInitialize(void)
+@@ -1029,7 +1030,8 @@ void propertyInitialize(void)
  
      groupEventMatch = {{"FanFault",
                          {{"fan1", {"fan1_alarm", "fan1_fault"}},
@@ -36,5 +36,5 @@ index 918b9c6c..2851564c 100644
  
  int main()
 -- 
-2.17.1
+2.34.1
 

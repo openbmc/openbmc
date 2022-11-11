@@ -1,4 +1,4 @@
-From f66c982439ed39f8cb026f4fecf7f84d5331132d Mon Sep 17 00:00:00 2001
+From 77b2719c471f578b0aaf9cac99e7e29dd65bd54b Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
 Date: Mon, 15 Aug 2022 16:13:12 +0800
 Subject: [PATCH 8/8] add dimm sensor
@@ -210,7 +210,7 @@ index d6a8b966..c0ec6454 100644
 +option('dimm', type: 'feature', value: 'enabled', description: 'Enable DIMM sensor.',)
 diff --git a/src/DIMMSensor.cpp b/src/DIMMSensor.cpp
 new file mode 100644
-index 00000000..87adc43f
+index 00000000..31ea0f69
 --- /dev/null
 +++ b/src/DIMMSensor.cpp
 @@ -0,0 +1,576 @@
@@ -791,10 +791,10 @@ index 00000000..87adc43f
 +    return 0;
 +}
 diff --git a/src/meson.build b/src/meson.build
-index e420b278..945a6a98 100644
+index e2af923b..48b428ab 100644
 --- a/src/meson.build
 +++ b/src/meson.build
-@@ -195,3 +195,18 @@ if get_option('external').enabled()
+@@ -196,3 +196,18 @@ if get_option('external').enabled()
          install: true,
      )
  endif
@@ -814,5 +814,5 @@ index e420b278..945a6a98 100644
 +    )
 +endif
 -- 
-2.17.1
+2.34.1
 

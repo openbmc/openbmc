@@ -1,4 +1,4 @@
-From b622d3942326b04956620add792ba0b25493323a Mon Sep 17 00:00:00 2001
+From 94581fca6b8653fb1f4d43bb4235efc2aba7c210 Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
 Date: Tue, 16 Aug 2022 15:39:00 +0800
 Subject: [PATCH 06/21] Add SEL time set command
@@ -91,5 +91,5 @@ index d12458ab..651af7dc 100644
  
  std::vector<uint8_t>
 -- 
-2.17.1
+2.34.1
 

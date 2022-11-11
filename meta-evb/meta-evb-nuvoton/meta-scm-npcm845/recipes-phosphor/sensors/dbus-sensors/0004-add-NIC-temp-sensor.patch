@@ -1,4 +1,4 @@
-From fad9634567f027ccf6c52b7ee04667d3de744256 Mon Sep 17 00:00:00 2001
+From af14631d0a4997e7624f30f66e69579063614a4c Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
 Date: Mon, 15 Aug 2022 14:42:20 +0800
 Subject: [PATCH 4/8] add NIC temp sensor
@@ -10,7 +10,7 @@ Signed-off-by: Stanley Chu <yschu@nuvoton.com>
  2 files changed, 108 insertions(+), 19 deletions(-)
 
 diff --git a/include/MCUTempSensor.hpp b/include/MCUTempSensor.hpp
-index c4c2406f..46bab19a 100644
+index c4c2406f..f17eeb71 100644
 --- a/include/MCUTempSensor.hpp
 +++ b/include/MCUTempSensor.hpp
 @@ -16,7 +16,8 @@ struct MCUTempSensor : public Sensor
@@ -37,7 +37,7 @@ index c4c2406f..46bab19a 100644
      boost::asio::steady_timer waitTimer;
  };
 diff --git a/src/MCUTempSensor.cpp b/src/MCUTempSensor.cpp
-index ba68bedb..d2b2535d 100644
+index f3ada3ca..e825af68 100644
 --- a/src/MCUTempSensor.cpp
 +++ b/src/MCUTempSensor.cpp
 @@ -52,12 +52,12 @@ MCUTempSensor::MCUTempSensor(std::shared_ptr<sdbusplus::asio::connection>& conn,
@@ -203,5 +203,5 @@ index ba68bedb..d2b2535d 100644
                  sensor->init();
              }
 -- 
-2.17.1
+2.34.1
 

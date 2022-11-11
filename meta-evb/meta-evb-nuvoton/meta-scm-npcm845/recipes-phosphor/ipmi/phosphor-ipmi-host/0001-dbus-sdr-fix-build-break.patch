@@ -1,0 +1,39 @@
+From eb82bdf748b8f24200bd86a4e30832520230ee63 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Fri, 11 Nov 2022 15:31:49 +0800
+Subject: [PATCH] dbus-sdr: fix build break
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ dbus-sdr/sensorcommands.cpp | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/dbus-sdr/sensorcommands.cpp b/dbus-sdr/sensorcommands.cpp
+index 5a78ddb0..57d9ae58 100644
+--- a/dbus-sdr/sensorcommands.cpp
++++ b/dbus-sdr/sensorcommands.cpp
+@@ -2417,7 +2417,7 @@ ipmi::RspType<uint8_t,              // No of instances for requested id
+                                     // IDs
+               >
+     getSensorInfo(ipmi::Context::ptr ctx, uint8_t sensorType, uint8_t entityId,
+-                  uint8_t entityInstance, uint8_t instanceStart)
++                  uint8_t entityInstance)
+ {
+     auto match = ipmi::dcmi::validEntityId.find(entityId);
+     if (match == ipmi::dcmi::validEntityId.end())
+@@ -2465,8 +2465,10 @@ ipmi::RspType<uint8_t,              // No of instances for requested id
+         uint8_t entityIdValue = 0;
+         uint8_t entityInstanceValue = 0;
+ 
+-        updateIpmiFromAssociation(sensor.first, sensorMap, entityIdValue,
+-                                  entityInstanceValue);
++        auto& ipmiDecoratorPaths = getIpmiDecoratorPaths(ctx);
++
++        updateIpmiFromAssociation(sensor.first, ipmiDecoratorPaths.value_or(std::unordered_set<std::string>()),
++                            sensorMap, entityIdValue, entityInstanceValue);
+         if (!entityInstance)
+         {
+             if (entityIdValue == match->first || entityIdValue == match->second)
+-- 
+2.34.1
+

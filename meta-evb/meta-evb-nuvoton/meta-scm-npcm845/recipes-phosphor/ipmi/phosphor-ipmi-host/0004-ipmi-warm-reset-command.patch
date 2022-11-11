@@ -1,4 +1,4 @@
-From 60718cbfa2c0eec29d7eb55ae4f3788ad4ba1e94 Mon Sep 17 00:00:00 2001
+From 47d7e5c0b2dd0b295578859b9a353651ac4d0c64 Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
 Date: Tue, 5 Jul 2022 12:56:01 +0800
 Subject: [PATCH 04/21] ipmi warm reset command
@@ -118,5 +118,5 @@ index 4012ce03..ac7fb0d5 100644
      return;
  }
 -- 
-2.17.1
+2.34.1
 

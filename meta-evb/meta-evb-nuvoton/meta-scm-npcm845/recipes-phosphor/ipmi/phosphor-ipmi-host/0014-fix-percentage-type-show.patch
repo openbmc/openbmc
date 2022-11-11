@@ -1,18 +1,18 @@
-From c37e9853c38dc7b22fa0417ad11ca34023e2563f Mon Sep 17 00:00:00 2001
-From: Stanley Chu <yschu@nuvoton.com>
-Date: Tue, 16 Aug 2022 16:22:58 +0800
+From bebbd79e8b3d81030bfa19a97d682583c6967105 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Fri, 11 Nov 2022 15:55:51 +0800
 Subject: [PATCH 14/21] fix percentage type show
 
-Signed-off-by: Stanley Chu <yschu@nuvoton.com>
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
  dbus-sdr/sensorcommands.cpp | 21 ++++++++++++++++++++-
  1 file changed, 20 insertions(+), 1 deletion(-)
 
 diff --git a/dbus-sdr/sensorcommands.cpp b/dbus-sdr/sensorcommands.cpp
-index 3967d5f1..5039a948 100644
+index ca22c5c0..d54873af 100644
 --- a/dbus-sdr/sensorcommands.cpp
 +++ b/dbus-sdr/sensorcommands.cpp
-@@ -1591,6 +1591,18 @@ void constructSensorSdrHeaderKey(uint16_t sensorNum, uint16_t recordID,
+@@ -1605,6 +1605,18 @@ void constructSensorSdrHeaderKey(uint16_t sensorNum, uint16_t recordID,
      record.key.owner_lun = lun;
      record.key.sensor_number = sensornumber;
  }
@@ -28,10 +28,10 @@ index 3967d5f1..5039a948 100644
 +    return unit == PERCENT;
 +}
 +
- bool constructSensorSdr(ipmi::Context::ptr ctx, uint16_t sensorNum,
-                         uint16_t recordID, const std::string& service,
-                         const std::string& path,
-@@ -1700,7 +1712,14 @@ bool constructSensorSdr(ipmi::Context::ptr ctx, uint16_t sensorNum,
+ bool constructSensorSdr(
+     ipmi::Context::ptr ctx,
+     const std::unordered_set<std::string>& ipmiDecoratorPaths,
+@@ -1716,7 +1728,14 @@ bool constructSensorSdr(
          (rExpSign << 7) | (rExpBits << 4) | (bExpSign << 3) | bExpBits;
  
      // Set the analog reading byte interpretation accordingly
@@ -48,5 +48,5 @@ index 3967d5f1..5039a948 100644
      // TODO(): Perhaps care about Tolerance, Accuracy, and so on
      // These seem redundant, but derivable from the above 5 attributes
 -- 
-2.17.1
+2.34.1
 

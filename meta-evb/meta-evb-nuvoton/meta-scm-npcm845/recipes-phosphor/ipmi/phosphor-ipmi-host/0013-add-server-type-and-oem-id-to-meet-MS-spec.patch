@@ -1,4 +1,4 @@
-From d023daebef2f4c589953d79128fc926835a21249 Mon Sep 17 00:00:00 2001
+From a8cff9aa5a2d534b4a6dadf358deb696eb241b4c Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
 Date: Wed, 13 Jul 2022 11:57:10 +0800
 Subject: [PATCH 13/21] add server type and oem id to meet MS spec
@@ -26,5 +26,5 @@ index 901e4a61..e0ccafc2 100644
  
      bool nonNullUsers = 0;
 -- 
-2.17.1
+2.34.1
 

@@ -1,4 +1,4 @@
-From 99128c0357c4ecb72cfc2258a419c4b57d47c4fe Mon Sep 17 00:00:00 2001
+From e415956aac272f5cc2b7ffb13ae56e25a21467a1 Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
 Date: Tue, 16 Aug 2022 16:50:31 +0800
 Subject: [PATCH 19/21] save no supported boot options
@@ -120,5 +120,5 @@ index d6c203e4..22a3a48b 100644
          catch (const sdbusplus::exception_t& e)
          {
 -- 
-2.17.1
+2.34.1
 

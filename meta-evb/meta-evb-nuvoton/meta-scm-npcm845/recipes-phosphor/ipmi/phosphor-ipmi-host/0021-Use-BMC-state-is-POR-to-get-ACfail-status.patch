@@ -1,0 +1,57 @@
+From 3658f1908e4f6f44cbc4e282e4fa82ea6bd24210 Mon Sep 17 00:00:00 2001
+From: Brian Ma <chma0@nuvoton.com>
+Date: Mon, 22 Aug 2022 13:50:48 +0800
+Subject: [PATCH 21/21] Use BMC state is POR to get ACfail status
+
+---
+ chassishandler.cpp | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+
+diff --git a/chassishandler.cpp b/chassishandler.cpp
+index 22a3a48b..ce64bdfb 100644
+--- a/chassishandler.cpp
++++ b/chassishandler.cpp
+@@ -1029,6 +1029,7 @@ std::optional<bool> getPowerStatus()
+  */
+ bool getACFailStatus()
+ {
++    /* Intel ACboot is not in Openbmc dbus interface, settings may not work.
+     constexpr const char* acBootObj =
+         "/xyz/openbmc_project/control/host0/ac_boot";
+     constexpr const char* acBootIntf = "xyz.openbmc_project.Common.ACBoot";
+@@ -1049,6 +1050,32 @@ bool getACFailStatus()
+             entry("PATH=%s", acBootObj), entry("INTERFACE=%s", acBootIntf));
+     }
+     return acFail == "True";
++    */
++    constexpr const char* bmcStateObj = "/xyz/openbmc_project/state/bmc0";
++    constexpr const char* bmcStateIntf = "xyz.openbmc_project.State.BMC";
++    std::string rebootCause;
++    bool acFail = false;
++    std::shared_ptr<sdbusplus::asio::connection> bus = getSdBus();
++    try
++    {
++        auto service = ipmi::getService(*bus, bmcStateIntf, bmcStateObj);
++
++        ipmi::Value variant = ipmi::getDbusProperty(
++            *bus, service, bmcStateObj, bmcStateIntf, "LastRebootCause");
++        rebootCause = std::get<std::string>(variant);
++        if (rebootCause == "xyz.openbmc_project.State.BMC.RebootCause.POR")
++        {
++            acFail = true;
++        }
++    }
++    catch (const std::exception& e)
++    {
++        log<level::ERR>("Failed to fetch LastRebootCause property",
++                        entry("ERROR=%s", e.what()),
++                        entry("PATH=%s", bmcStateObj),
++                        entry("INTERFACE=%s", bmcStateIntf));
++    }
++    return acFail;
+ }
+ } // namespace power_policy
+ 
+-- 
+2.34.1
+

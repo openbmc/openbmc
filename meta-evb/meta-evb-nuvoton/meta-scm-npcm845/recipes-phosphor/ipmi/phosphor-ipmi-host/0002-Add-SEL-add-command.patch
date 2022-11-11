@@ -1,4 +1,4 @@
-From 8f72edbbf5bbd6ee6f741285f3cbf9ad461ce936 Mon Sep 17 00:00:00 2001
+From ce65575b9c2b186de098e0795a0de02a8f88331f Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
 Date: Mon, 15 Aug 2022 17:08:47 +0800
 Subject: [PATCH 02/21] Add SEL add command
@@ -116,5 +116,5 @@ index eeed777e..d12458ab 100644
  
  ipmi::RspType<uint8_t> ipmiStorageClearSEL(ipmi::Context::ptr ctx,
 -- 
-2.17.1
+2.34.1
 

@@ -1,4 +1,4 @@
-From 318a52c061749a5dc074955d1e87d4d119146d99 Mon Sep 17 00:00:00 2001
+From 430c14a2d987c83677335c6a01f6193fd4757dcd Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
 Date: Tue, 16 Aug 2022 16:00:00 +0800
 Subject: [PATCH 10/21] Add reset SEL
@@ -11,10 +11,10 @@ Signed-off-by: Stanley Chu <yschu@nuvoton.com>
  3 files changed, 48 insertions(+), 2 deletions(-)
 
 diff --git a/dbus-sdr/sdrutils.cpp b/dbus-sdr/sdrutils.cpp
-index abc8671d..78863554 100644
+index e818ef3c..85b92547 100644
 --- a/dbus-sdr/sdrutils.cpp
 +++ b/dbus-sdr/sdrutils.cpp
-@@ -261,6 +261,10 @@ uint16_t getSensorNumberFromPath(const std::string& path)
+@@ -264,6 +264,10 @@ uint16_t getSensorNumberFromPath(const std::string& path)
      {
          return invalidSensorNumber;
      }
@@ -83,10 +83,10 @@ index ac7fb0d5..b60cf39a 100644
      {
          std::this_thread::sleep_for(std::chrono::milliseconds(100));
 diff --git a/include/dbus-sdr/sdrutils.hpp b/include/dbus-sdr/sdrutils.hpp
-index c4b7cfaa..13d62bd7 100644
+index c1298764..d558927c 100644
 --- a/include/dbus-sdr/sdrutils.hpp
 +++ b/include/dbus-sdr/sdrutils.hpp
-@@ -314,13 +314,15 @@ enum class SensorTypeCodes : uint8_t
+@@ -316,13 +316,15 @@ enum class SensorTypeCodes : uint8_t
      buttons = 0x14,
      watchdog2 = 0x23,
      entity = 0x25,
@@ -103,7 +103,7 @@ index c4b7cfaa..13d62bd7 100644
  };
  
  const static boost::container::flat_map<
-@@ -351,7 +353,10 @@ const static boost::container::flat_map<
+@@ -353,7 +355,10 @@ const static boost::container::flat_map<
           {"watchdog", std::make_pair(SensorTypeCodes::watchdog2,
                                       SensorEventTypeCodes::sensorSpecified)},
           {"entity", std::make_pair(SensorTypeCodes::entity,
@@ -116,5 +116,5 @@ index c4b7cfaa..13d62bd7 100644
  
  uint8_t getSensorTypeFromPath(const std::string& path);
 -- 
-2.17.1
+2.34.1
 
