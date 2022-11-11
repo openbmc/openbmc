@@ -20,6 +20,9 @@ SRC_URI:append:evb-npcm845 = " file://0002-Support-bridging-commands.patch"
 # EXTRA_OEMESON:append:evb-npcm845 = "-Dsel-logger-clears-sel=enabled"
 #SRC_URI:append:evb-npcm845 = " file://0008-dbus-sdr-fix-build-error-when-enable-sel-logger-clea.patch"
 
+# Fix build error when enable dbus-sdr
+SRC_URI:append:evb-npcm845 = " file://0001-dbus-sdr-fix-build-break.patch"
+
 PACKAGECONFIG:append:evb-npcm845 = " ${@entity_enabled(d, 'dynamic-sensors', '')}"
 
 # avoid build error after remove ipmi-fru
