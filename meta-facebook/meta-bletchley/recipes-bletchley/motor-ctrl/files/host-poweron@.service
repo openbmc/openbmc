@@ -8,6 +8,6 @@ Conflicts=host-poweroff@%i.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/sbin/power-ctrl sled%i on
+ExecStart=/usr/sbin/power-ctrl sled%i boot-from-bootmode
 SyslogIdentifier=power-ctrl
 
