@@ -34298,7 +34298,7 @@
                   "Priority":"L"
                }
             ],
-            "Dest":"/sys-0/node-0/bellavista-0/SI5332_BMC_01-1",
+            "Dest":"/sys-0/node-0/bellavista-0/SI5332LD-osc-1",
             "HexAddress":"0x6a",
             "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
          },
@@ -34408,7 +34408,7 @@
                   "Priority":"L"
                }
             ],
-            "Dest":"/sys-0/node-0/bellavista-0/SI5332_BMC_02-0",
+            "Dest":"/sys-0/node-0/bellavista-0/SI5332LD-osc-0",
             "HexAddress":"0x6a",
             "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
          },
@@ -35514,6 +35514,42 @@
             "HexAddress":"0x77",
             "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
          },
+         "21":{
+            "Callouts":[
+               {
+                  "LocationCode":"P0-C59",
+                  "Name":"/sys-0/node-0/bellavista-0/VRM-aux1-C59-conn/reist-aux-0",
+                  "Priority":"H"
+               },
+               {
+                  "LocationCode":"P0-C0",
+                  "MRU":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/BMC-0",
+                  "Name":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0",
+                  "Priority":"L"
+               }
+            ],
+            "Dest":"/sys-0/node-0/bellavista-0/VRM-aux1-C59-conn/reist-aux-0/TDA38740-1V1CS1-0",
+            "HexAddress":"0x15",
+            "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
+         },
+         "22":{
+            "Callouts":[
+               {
+                  "LocationCode":"P0-C59",
+                  "Name":"/sys-0/node-0/bellavista-0/VRM-aux1-C59-conn/reist-aux-0",
+                  "Priority":"H"
+               },
+               {
+                  "LocationCode":"P0-C0",
+                  "MRU":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/BMC-0",
+                  "Name":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0",
+                  "Priority":"L"
+               }
+            ],
+            "Dest":"/sys-0/node-0/bellavista-0/VRM-aux1-C59-conn/reist-aux-0/TDA38740-1V1CS2-1",
+            "HexAddress":"0x16",
+            "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
+         },
          "24":{
             "Callouts":[
                {
@@ -36375,6 +36411,42 @@
          "21":{
             "Callouts":[
                {
+                  "LocationCode":"P0-C17",
+                  "Name":"/sys-0/node-0/bellavista-0/VRM-aux2-C17-conn/reist-aux-0",
+                  "Priority":"H"
+               },
+               {
+                  "LocationCode":"P0-C0",
+                  "MRU":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/BMC-0",
+                  "Name":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0",
+                  "Priority":"L"
+               }
+            ],
+            "Dest":"/sys-0/node-0/bellavista-0/VRM-aux2-C17-conn/reist-aux-0/TDA38740-1V1CS1-0",
+            "HexAddress":"0x15",
+            "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
+         },
+         "22":{
+            "Callouts":[
+               {
+                  "LocationCode":"P0-C17",
+                  "Name":"/sys-0/node-0/bellavista-0/VRM-aux2-C17-conn/reist-aux-0",
+                  "Priority":"H"
+               },
+               {
+                  "LocationCode":"P0-C0",
+                  "MRU":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/BMC-0",
+                  "Name":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0",
+                  "Priority":"L"
+               }
+            ],
+            "Dest":"/sys-0/node-0/bellavista-0/VRM-aux2-C17-conn/reist-aux-0/TDA38740-1V1CS2-1",
+            "HexAddress":"0x16",
+            "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
+         },
+         "23":{
+            "Callouts":[
+               {
                   "LocationCode":"P0-C0",
                   "MRU":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/BMC-0",
                   "Name":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0",
@@ -36387,7 +36459,7 @@
                }
             ],
             "Dest":"/sys-0/node-0/bellavista-0/Bellavista_ADS7138_Imon_C1-C4",
-            "HexAddress":"0x15",
+            "HexAddress":"0x17",
             "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
          },
          "24":{
@@ -38387,7 +38459,7 @@
             "HexAddress":"0x6d",
             "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
          },
-         "22":{
+         "23":{
             "Callouts":[
                {
                   "LocationCode":"P0-C0",
@@ -38402,7 +38474,7 @@
                }
             ],
             "Dest":"/sys-0/node-0/bellavista-0/Bellavista_ADS7138_Imon_C5-C8",
-            "HexAddress":"0x16",
+            "HexAddress":"0x17",
             "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
          },
          "56":{
@@ -39039,6 +39111,24 @@
             "Dest":"/sys-0/node-0/bellavista-0/Dasd-BP-conn-0/BaseCamp-0/IR35220-BMC16_10",
             "HexAddress":"0x14",
             "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
+         },
+         "64":{
+            "Callouts":[
+               {
+                  "LocationCode":"P1",
+                  "Name":"/sys-0/node-0/bellavista-0/Dasd-BP-conn-0/BaseCamp-0",
+                  "Priority":"H"
+               },
+               {
+                  "LocationCode":"P0-C0",
+                  "MRU":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/BMC-0",
+                  "Name":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0",
+                  "Priority":"L"
+               }
+            ],
+            "Dest":"/sys-0/node-0/bellavista-0/Dasd-BP-conn-0/BaseCamp-0/basecamp_TDA38740-BMC16_10",
+            "HexAddress":"0x40",
+            "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
          }
       },
       "46":{
@@ -39077,10 +39167,28 @@
             "Dest":"/sys-0/node-0/bellavista-0/Dasd-BP-conn-0/BaseCamp-0/IR35220-BMC16_11",
             "HexAddress":"0x14",
             "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
+         },
+         "64":{
+            "Callouts":[
+               {
+                  "LocationCode":"P1",
+                  "Name":"/sys-0/node-0/bellavista-0/Dasd-BP-conn-0/BaseCamp-0",
+                  "Priority":"H"
+               },
+               {
+                  "LocationCode":"P0-C0",
+                  "MRU":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/BMC-0",
+                  "Name":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0",
+                  "Priority":"L"
+               }
+            ],
+            "Dest":"/sys-0/node-0/bellavista-0/Dasd-BP-conn-0/BaseCamp-0/basecamp_TDA38740-BMC16_11",
+            "HexAddress":"0x40",
+            "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
          }
       },
       "47":{
-         "15":{
+         "16":{
             "Callouts":[
                {
                   "LocationCode":"P0-C0",
@@ -39090,10 +39198,10 @@
                }
             ],
             "Dest":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/TDA38740-00-0",
-            "HexAddress":"0xf",
+            "HexAddress":"0x10",
             "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
          },
-         "63":{
+         "20":{
             "Callouts":[
                {
                   "LocationCode":"P0-C0",
@@ -39103,12 +39211,25 @@
                }
             ],
             "Dest":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/IR35220-00-0",
-            "HexAddress":"0x3f",
+            "HexAddress":"0x14",
+            "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
+         },
+         "64":{
+            "Callouts":[
+               {
+                  "LocationCode":"P0-C0",
+                  "MRU":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/BMC-0",
+                  "Name":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0",
+                  "Priority":"H"
+               }
+            ],
+            "Dest":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/TDA38740-00-0",
+            "HexAddress":"0x40",
             "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
          }
       },
       "48":{
-         "15":{
+         "16":{
             "Callouts":[
                {
                   "LocationCode":"P0-C0",
@@ -39118,10 +39239,10 @@
                }
             ],
             "Dest":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/TDA38740-01-0",
-            "HexAddress":"0xf",
+            "HexAddress":"0x10",
             "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
          },
-         "63":{
+         "20":{
             "Callouts":[
                {
                   "LocationCode":"P0-C0",
@@ -39131,7 +39252,20 @@
                }
             ],
             "Dest":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/IR35220-01-0",
-            "HexAddress":"0x3f",
+            "HexAddress":"0x14",
+            "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
+         },
+         "64":{
+            "Callouts":[
+               {
+                  "LocationCode":"P0-C0",
+                  "MRU":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/BMC-0",
+                  "Name":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0",
+                  "Priority":"H"
+               }
+            ],
+            "Dest":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/TDA38740-01-0",
+            "HexAddress":"0x40",
             "Source":"/sys-0/node-0/bellavista-0/eBMC-card-conn-0/Tola-0/bmc-0"
          }
       },
