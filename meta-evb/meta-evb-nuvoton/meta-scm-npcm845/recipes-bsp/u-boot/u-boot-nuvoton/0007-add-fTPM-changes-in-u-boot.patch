@@ -1,0 +1,45 @@
+From 9a2b530d692bca772d9f72b4b45d42eb4ff86725 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Fri, 23 Sep 2022 09:26:44 +0800
+Subject: [PATCH] add fTPM changes in u-boot
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ arch/arm/dts/nuvoton-npcm845-scm.dts | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/dts/nuvoton-npcm845-scm.dts b/arch/arm/dts/nuvoton-npcm845-scm.dts
+index 1f746a3cea..b7259a99e0 100644
+--- a/arch/arm/dts/nuvoton-npcm845-scm.dts
++++ b/arch/arm/dts/nuvoton-npcm845-scm.dts
+@@ -1,6 +1,9 @@
+ // SPDX-License-Identifier: GPL-2.0
+-
+ /dts-v1/;
++
++/* TCG2 Logs */
++/memreserve/ 0x35F00000 0x00010000;
++
+ #include "nuvoton-npcm845.dtsi"
+ #include "nuvoton-npcm845-scm-pincfg.dtsi"
+ 
+@@ -48,6 +51,17 @@
+ 		regulator-max-microvolt = <3300000>;
+ 		regulator-always-on;
+ 	};
++
++	tpm@0 {
++		compatible = "microsoft,ftpm";
++	};
++
++	firmware {
++		optee {
++			 compatible = "linaro,optee-tz";
++			 method = "smc";
++		};
++	};
+ };
+ 
+ &serial0 {
+-- 
+2.34.1
