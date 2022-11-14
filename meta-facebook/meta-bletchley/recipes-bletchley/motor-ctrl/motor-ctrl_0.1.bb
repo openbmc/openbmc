@@ -57,10 +57,3 @@ SYSTEMD_LINK:${PN} += "${@compose_list(d, 'AC_ON_INSTFMT', 'OBMC_HOST_INSTANCES'
 SYSTEMD_SERVICE:${PN} += "host-ac-off@.service"
 SYSTEMD_LINK:${PN} += "${@compose_list(d, 'AC_OFF_INSTFMT', 'OBMC_HOST_INSTANCES')}"
 
-# Host on unit configurations
-HOST_ON_OVERRIDE_CONF_FMT = "host-poweron.conf:host-poweron@{0}.service.d/host-poweron.conf"
-SYSTEMD_OVERRIDE:${PN}:bletchley += "${@compose_list_zip(d, 'HOST_ON_OVERRIDE_CONF_FMT', 'OBMC_HOST_INSTANCES')}"
-
-# Host off unit configurations
-HOST_OFF_OVERRIDE_CONF_FMT = "host-poweroff.conf:host-poweroff@{0}.service.d/host-poweroff.conf"
-SYSTEMD_OVERRIDE:${PN}:bletchley += "${@compose_list_zip(d, 'HOST_OFF_OVERRIDE_CONF_FMT', 'OBMC_HOST_INSTANCES')}"
