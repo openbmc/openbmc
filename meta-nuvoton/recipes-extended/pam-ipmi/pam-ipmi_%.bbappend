@@ -1,9 +1,3 @@
 FILESEXTRAPATHS:prepend:npcm8xx := "${THISDIR}/${PN}:"
 
-SRC_URI:append:npcm8xx= " file://ipmi_pass_64"
-
-do_install:append:npcm8xx() {
-    install -d ${D}${sysconfdir}
-    rm -f ${D}${sysconfdir}/ipmi_pass
-    install -m 0600 ${WORKDIR}/ipmi_pass_64 ${D}${sysconfdir}/ipmi_pass
-}
+SRC_URI:append:npcm8xx= " file://0001-change-size_t-to-uint32_t-type-in-encrypt_decrypt_da.patch"
