@@ -1,6 +1,6 @@
-FILESEXTRAPATHS:prepend:mtjade := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += " \
-    file://${MACHINE}.cfg \
-"
+            file://mtjade.cfg \
+           "
 
