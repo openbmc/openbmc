@@ -1,0 +1,99 @@
+[
+   {
+        "name": "FAN3",
+        "path": "/system/chassis/Mt_Jade/FAN3",
+        "methods": [
+           {
+              "type": "tach",
+              "sensors": [
+                 "FAN3_1",
+                 "FAN3_2"
+              ]
+           }
+        ],
+        "rpolicy": {
+           "type": "anyof"
+        }
+   },
+   {
+       "name": "FAN4",
+       "path": "/system/chassis/Mt_Jade/FAN4",
+       "methods": [
+          {
+             "type": "tach",
+             "sensors": [
+                "FAN4_1",
+                "FAN4_2"
+             ]
+          }
+       ],
+       "rpolicy": {
+          "type": "anyof"
+       }
+   },
+   {
+       "name": "FAN5",
+       "path": "/system/chassis/Mt_Jade/FAN5",
+       "methods": [
+          {
+             "type": "tach",
+             "sensors": [
+                "FAN5_1",
+                "FAN5_2"
+             ]
+          }
+       ],
+       "rpolicy": {
+          "type": "anyof"
+       }
+   },
+   {
+       "name": "FAN6",
+       "path": "/system/chassis/Mt_Jade/FAN6",
+       "methods": [
+          {
+             "type": "tach",
+             "sensors": [
+                "FAN6_1",
+                "FAN6_2"
+             ]
+          }
+       ],
+       "rpolicy": {
+          "type": "anyof"
+       }
+   },
+   {
+       "name": "FAN7",
+       "path": "/system/chassis/Mt_Jade/FAN7",
+       "methods": [
+          {
+             "type": "tach",
+             "sensors": [
+                "FAN7_1",
+                "FAN7_2"
+             ]
+          }
+       ],
+       "rpolicy": {
+          "type": "anyof"
+       }
+   },
+   {
+       "name": "FAN8",
+       "path": "/system/chassis/Mt_Jade/FAN8",
+       "methods": [
+          {
+             "type": "tach",
+             "sensors": [
+                "FAN8_1",
+                "FAN8_2"
+             ]
+          }
+       ],
+       "rpolicy": {
+          "type": "anyof"
+       }
+   }
+]
+

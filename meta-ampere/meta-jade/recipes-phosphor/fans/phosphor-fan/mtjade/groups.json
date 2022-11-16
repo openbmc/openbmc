@@ -1,0 +1,80 @@
+[
+    {
+        "name": "air_cooled_zone0_fans",
+        "members": [
+            "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade/FAN3",
+            "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade/FAN4",
+            "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade/FAN5",
+            "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade/FAN6",
+            "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade/FAN7",
+            "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade/FAN8"
+        ]
+    },
+    {
+        "name": "fan3",
+        "members": [
+          "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade/FAN3/FAN3_1",
+          "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade/FAN3/FAN3_2"
+        ]
+    },
+    {
+        "name": "fan4",
+        "members": [
+          "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade/FAN4/FAN4_1",
+          "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade/FAN4/FAN4_2"
+        ]
+    },
+    {
+        "name": "fan5",
+        "members": [
+          "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade/FAN5/FAN5_1",
+          "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade/FAN5/FAN5_2"
+        ]
+    },
+    {
+        "name": "fan6",
+        "members": [
+          "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade/FAN6/FAN6_1",
+          "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade/FAN6/FAN6_2"
+        ]
+    },
+    {
+        "name": "fan7",
+        "members": [
+          "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade/FAN7/FAN7_1",
+          "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade/FAN7/FAN7_2"
+        ]
+    },
+    {
+        "name": "fan8",
+        "members": [
+          "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade/FAN8/FAN8_1",
+          "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade/FAN8/FAN8_2"
+        ]
+    },
+    {
+        "name": "zone0_ambient",
+        "service": "xyz.openbmc_project.HwmonTempSensor",
+        "members": [
+            "/xyz/openbmc_project/sensors/temperature/TS4_Temp"
+        ]
+    },
+    {
+        "name": "zone0_ocp",
+        "members": [
+            "/xyz/openbmc_project/sensors/temperature/OCP_Temp"
+        ]
+    },
+    {
+        "name": "zone0_bp_nvme",
+        "members": [
+            "/xyz/openbmc_project/sensors/temperature/nvme_bp_max"
+        ]
+    },
+    {
+        "name": "zone0_m2_nvme",
+        "members": [
+            "/xyz/openbmc_project/sensors/temperature/nvme_m2_max"
+        ]
+    }
+]
