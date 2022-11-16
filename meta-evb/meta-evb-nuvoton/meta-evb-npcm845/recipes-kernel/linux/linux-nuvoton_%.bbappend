@@ -14,4 +14,3 @@ SRC_URI:append:evb-npcm845 = " file://0001-dts-nuvoton-evb-npcm845-support-openb
 #SRC_URI:append:evb-npcm845 = " file://0009-dts-npcm8xx-add-psci-smp-method-tz.patch"
 #SRC_URI:append:evb-npcm845 = " file://0010-device-tree-optee-enable.patch"
 #SRC_URI:append:evb-npcm845 = " file://0011-replace-jtag2-pins-with-tp-jtag3-pins.patch"
-SRC_URI:append:evb-npcm845 = " file://0012-stmmac-support-ncsi-kernel.patch"
