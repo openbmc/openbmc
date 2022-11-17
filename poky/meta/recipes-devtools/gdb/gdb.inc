@@ -14,5 +14,6 @@ SRC_URI = "${GNU_MIRROR}/gdb/gdb-${PV}.tar.xz \
            file://0007-resolve-restrict-keyword-conflict.patch \
            file://0008-Fix-invalid-sigprocmask-call.patch \
            file://0009-gdbserver-ctrl-c-handling.patch \
+           file://readline-8.2.patch \
            "
 SRC_URI[sha256sum] = "0e1793bf8f2b54d53f46dea84ccfd446f48f81b297b28c4f7fc017b818d69fed"

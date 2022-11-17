@@ -530,6 +530,33 @@ system and gives an overview of their function and contents.
       ":ref:`dev-manual/common-tasks:speeding up a build`"
       section in the Yocto Project Development Tasks Manual.
 
+      On the other hand, if your goal is to limit the amount of system
+      resources consumed by BitBake tasks, setting :term:`BB_NUMBER_THREADS`
+      to a number lower than the number of CPU threads in your machine
+      won't be sufficient. That's because each package will still be built
+      and installed through a number of parallel jobs specified by the
+      :term:`PARALLEL_MAKE` variable, which is by default the number of CPU
+      threads in your system, and is not impacted by the
+      :term:`BB_NUMBER_THREADS` value.
+
+      So, if you set :term:`BB_NUMBER_THREADS` to "1" but don't set
+      :term:`PARALLEL_MAKE`, most of your system resources will be consumed
+      anyway.
+
+      Therefore, if you intend to reduce the load of your build system by
+      setting :term:`BB_NUMBER_THREADS` to a relatively low value compared
+      to the number of CPU threads on your system, you should also set
+      :term:`PARALLEL_MAKE` to a similarly low value.
+
+      An alternative to using :term:`BB_NUMBER_THREADS` to keep the usage
+      of build system resources under control is to use the smarter
+      :term:`BB_PRESSURE_MAX_CPU`, :term:`BB_PRESSURE_MAX_IO` or
+      :term:`BB_PRESSURE_MAX_MEMORY` controls. They will prevent BitBake
+      from starting new tasks as long as thresholds are exceeded. Anyway,
+      as with :term:`BB_NUMBER_THREADS`, such controls won't prevent the
+      tasks already being run from using all CPU threads on the system
+      if :term:`PARALLEL_MAKE` is not set to a low value.
+
    :term:`BB_SERVER_TIMEOUT`
       Specifies the time (in seconds) after which to unload the BitBake
       server due to inactivity. Set :term:`BB_SERVER_TIMEOUT` to determine how
@@ -3699,8 +3726,8 @@ system and gives an overview of their function and contents.
 
    :term:`Initramfs`
       An Initial RAM Filesystem (:term:`Initramfs`) is an optionally compressed
-      `cpio <https://en.wikipedia.org/wiki/Cpio>`__ archive which is extracted
-      by the Linux kernel into RAM in a special `tmpfs <https://en.wikipedia.org/wiki/Tmpfs>`__
+      :wikipedia:`cpio <Cpio>` archive which is extracted
+      by the Linux kernel into RAM in a special :wikipedia:`tmpfs <Tmpfs>`
       instance, used as the initial root filesystem.
 
       This is a replacement for the legacy init RAM disk ("initrd")
@@ -3756,7 +3783,7 @@ system and gives an overview of their function and contents.
       ``meta/conf/bitbake.conf`` configuration file in the
       :term:`Source Directory`, is "cpio.gz". The Linux kernel's
       :term:`Initramfs` mechanism, as opposed to the initial RAM filesystem
-      `initrd <https://en.wikipedia.org/wiki/Initrd>`__ mechanism, expects
+      :wikipedia:`initrd <Initrd>` mechanism, expects
       an optionally compressed cpio archive.
 
    :term:`INITRAMFS_IMAGE`
@@ -4894,6 +4921,13 @@ system and gives an overview of their function and contents.
       The revision currently checked out for the OpenEmbedded-Core layer (path
       determined by :term:`COREBASE`).
 
+   :term:`MIME_XDG_PACKAGES`
+      The current implementation of the :ref:`mime-xdg <ref-classes-mime-xdg>`
+      class cannot detect ``.desktop`` files installed through absolute
+      symbolic links. Use this setting to make the class create post-install
+      and post-remove scripts for these packages anyway, to invoke the
+      ``update-destop-database`` command.
+
    :term:`MIRRORS`
       Specifies additional paths from which the OpenEmbedded build system
       gets source code. When the build system searches for source code, it
@@ -5784,17 +5818,20 @@ system and gives an overview of their function and contents.
       desired splitting.
 
    :term:`PARALLEL_MAKE`
-      Extra options passed to the ``make`` command during the
-      :ref:`ref-tasks-compile` task in order to specify
-      parallel compilation on the local build host. This variable is
-      usually in the form "-j x", where x represents the maximum number of
-      parallel threads ``make`` can run.
+
+      Extra options passed to the build tool command (``make``,
+      ``ninja`` or more specific build engines, like the Go language one)
+      during the :ref:`ref-tasks-compile` task, to specify parallel compilation
+      on the local build host. This variable is usually in the form "-j x",
+      where x represents the maximum number of parallel threads such engines
+      can run.
 
       .. note::
 
-         In order for :term:`PARALLEL_MAKE` to be effective, ``make`` must be
-         called with ``${``\ :term:`EXTRA_OEMAKE`\ ``}``. An easy way to ensure
-         this is to use the ``oe_runmake`` function.
+         For software compiled by ``make``, in order for :term:`PARALLEL_MAKE`
+         to be effective, ``make`` must be called with
+         ``${``\ :term:`EXTRA_OEMAKE`\ ``}``. An easy
+         way to ensure this is to use the ``oe_runmake`` function.
 
       By default, the OpenEmbedded build system automatically sets this
       variable to be equal to the number of cores the build system uses.
@@ -5819,15 +5856,16 @@ system and gives an overview of their function and contents.
       section in the Yocto Project Development Tasks Manual.
 
    :term:`PARALLEL_MAKEINST`
-      Extra options passed to the ``make install`` command during the
-      :ref:`ref-tasks-install` task in order to specify
+      Extra options passed to the build tool install command
+      (``make install``, ``ninja install`` or more specific ones)
+      during the :ref:`ref-tasks-install` task in order to specify
       parallel installation. This variable defaults to the value of
       :term:`PARALLEL_MAKE`.
 
       .. note::
 
-         In order for :term:`PARALLEL_MAKEINST` to be effective, ``make`` must
-         be called with
+         For software compiled by ``make``, in order for :term:`PARALLEL_MAKEINST`
+         to be effective, ``make`` must be called with
          ``${``\ :term:`EXTRA_OEMAKE`\ ``}``. An easy
          way to ensure this is to use the ``oe_runmake`` function.
 
@@ -7283,6 +7321,88 @@ system and gives an overview of their function and contents.
       .. note::
 
          You can specify only a single URL in :term:`SOURCE_MIRROR_URL`.
+
+   :term:`SPDX_ARCHIVE_PACKAGED`
+      This option allows to add to :term:`SPDX` output compressed archives
+      of the files in the generated target packages.
+
+      Such archives are available in
+      ``tmp/deploy/spdx/MACHINE/packages/packagename.tar.zst``
+      under the :term:`Build Directory`.
+
+      Enable this option as follows::
+
+         SPDX_ARCHIVE_PACKAGED = "1"
+
+      According to our tests on release 4.1 "langdale", building
+      ``core-image-minimal`` for the ``qemux86-64`` machine, enabling this
+      option multiplied the size of the ``tmp/deploy/spdx`` directory by a
+      factor of 13 (+1.6 GiB for this image), compared to just using the
+      :ref:`create-spdx <ref-classes-create-spdx>` class with no option.
+
+      Note that this option doesn't increase the size of :term:`SPDX`
+      files in ``tmp/deploy/images/MACHINE``.
+
+   :term:`SPDX_ARCHIVE_SOURCES`
+      This option allows to add to :term:`SPDX` output compressed archives
+      of the sources for packages installed on the target. It currently
+      only works when :term:`SPDX_INCLUDE_SOURCES` is set.
+
+      This is one way of fulfilling "source code access" license
+      requirements.
+
+      Such source archives are available in
+      ``tmp/deploy/spdx/MACHINE/recipes/recipe-packagename.tar.zst``
+      under the :term:`Build Directory`.
+
+      Enable this option as follows::
+
+         SPDX_INCLUDE_SOURCES = "1"
+         SPDX_ARCHIVE_SOURCES = "1"
+
+      According to our tests on release 4.1 "langdale", building
+      ``core-image-minimal`` for the ``qemux86-64`` machine, enabling
+      these options multiplied the size of the ``tmp/deploy/spdx``
+      directory by a factor of 11 (+1.4 GiB for this image),
+      compared to just using the :ref:`create-spdx <ref-classes-create-spdx>`
+      class with no option.
+
+      Note that using this option only marginally increases the size
+      of the :term:`SPDX` output in ``tmp/deploy/images/MACHINE/``
+      (+ 0.07\% with the tested image), compared to just enabling
+      :term:`SPDX_INCLUDE_SOURCES`.
+
+   :term:`SPDX_INCLUDE_SOURCES`
+      This option allows to add a description of the source files used to build
+      the host tools and the target packages, to the ``spdx.json`` files in
+      ``tmp/deploy/spdx/MACHINE/recipes/`` under the :term:`Build Directory`.
+      As a consequence, the ``spdx.json`` files under the ``by-namespace`` and
+      ``packages`` subdirectories in ``tmp/deploy/spdx/MACHINE`` are also
+      modified to include references to such source file descriptions.
+
+      Enable this option as follows::
+
+         SPDX_INCLUDE_SOURCES = "1"
+
+      According to our tests on release 4.1 "langdale", building
+      ``core-image-minimal`` for the ``qemux86-64`` machine, enabling
+      this option multiplied the total size of the ``tmp/deploy/spdx``
+      directory by a factor of 3  (+291 MiB for this image),
+      and the size of the ``IMAGE-MACHINE.spdx.tar.zst`` in
+      ``tmp/deploy/images/MACHINE`` by a factor of 130 (+15 MiB for this
+      image), compared to just using the
+      :ref:`create-spdx <ref-classes-create-spdx>` class with no option.
+
+   :term:`SPDX_PRETTY`
+      This option makes the SPDX output more human-readable, using
+      identation and newlines, instead of the default output in a
+      single line::
+
+         SPDX_PRETTY = "1"
+
+      The generated SPDX files are approximately 20% bigger, but
+      this option is recommended if you want to inspect the SPDX
+      output files with a text editor.
 
    :term:`SPDXLICENSEMAP`
       Maps commonly used license names to their SPDX counterparts found in

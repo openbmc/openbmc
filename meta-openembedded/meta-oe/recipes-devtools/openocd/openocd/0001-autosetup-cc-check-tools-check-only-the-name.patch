@@ -1,0 +1,30 @@
+From 29e8dfae4593c91f11d7ea31a4722a6d82f6c950 Mon Sep 17 00:00:00 2001
+From: Kory Maincent <kory.maincent@bootlin.com>
+Date: Wed, 2 Nov 2022 16:39:30 +0100
+Subject: [PATCH] autosetup: cc-check-tools: check only the name of the tool
+ without its params
+
+Update the tool existence check. Test only the first word of the
+args to keep only the executable without its parameters.
+
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+---
+ autosetup/cc.tcl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/jimtcl/autosetup/cc.tcl b/jimtcl/autosetup/cc.tcl
+index 585d259..4c87854 100644
+--- a/jimtcl/autosetup/cc.tcl
++++ b/jimtcl/autosetup/cc.tcl
+@@ -264,7 +264,7 @@ proc cc-check-tools {args} {
+ 	foreach tool $args {
+ 		set TOOL [string toupper $tool]
+ 		set exe [get-env $TOOL [get-define cross]$tool]
+-		if {[find-executable {*}$exe]} {
++		if {[find-executable {*}[regexp -inline {\S+} $exe]]} {
+ 			define $TOOL $exe
+ 			continue
+ 		}
+-- 
+2.25.1
+

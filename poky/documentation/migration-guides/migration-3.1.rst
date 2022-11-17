@@ -238,7 +238,7 @@ Warnings will now be shown at :ref:`ref-tasks-package_qa` time in the following
 circumstances:
 
 -  A recipe installs ``.desktop`` files containing ``MimeType`` keys but
-   does not inherit the new ``mime-xdg`` class
+   does not inherit the new :ref:`mime-xdg <ref-classes-mime-xdg>` class
 
 -  A recipe installs ``.xml`` files into ``${datadir}/mime/packages``
    but does not inherit the :ref:`mime <ref-classes-mime>` class

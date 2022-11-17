@@ -1356,7 +1356,7 @@ Project Reference Manual.
 -  :term:`EXTRA_IMAGECMD`:
    Specifies additional options for image creation commands. In this
    example, the "-lnp " option is used when creating the
-   `JFFS2 <https://en.wikipedia.org/wiki/JFFS2>`__ image.
+   :wikipedia:`JFFS2 <JFFS2>` image.
 
 -  :term:`WKS_FILE`: The location of
    the :ref:`Wic kickstart <ref-manual/kickstart:openembedded kickstart (\`\`.wks\`\`) reference>` file used

@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${ARMFILESPATHS}"
 
 # Enable ARM-FFA transport
 SRC_URI:append = " \

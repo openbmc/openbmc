@@ -1,0 +1,28 @@
+#!/bin/sh
+
+set -e
+
+cd /opt/libc-test
+make cleanall
+make run || true
+
+echo ""
+echo "--- ptest result ---"
+# libc-test runs tests by module(e.g. src/api) and generates sub-module test
+# report(e.g. src/api/REPORT) first. After all tests finish, it generates the
+# consolidated report file src/REPORT.
+report="/opt/libc-test/src/REPORT"
+if ! [ -f "${report}" ]; then
+    echo "${report} not found!"
+    echo "FAIL: libc-test"
+    exit 1
+# libc-test prints error on failure and prints nothing on success.
+elif grep -q '^FAIL src.*\.exe.*' "${report}"; then
+    # Print test failure in ptest format.
+    # e.g. "FAIL src/api/main.exe [status 1]" -> "FAIL: api_main"
+    grep '^FAIL src.*\.exe.*' "${report}" \
+        | sed 's|^FAIL src/|FAIL: |;s|/|_|;s|\.exe.*\]||'
+    exit 1
+else
+    echo "PASS: libc-test"
+fi

@@ -177,7 +177,7 @@ the ``part`` and ``partition`` commands:
 -  ``--part-type``: This option is a Wic-specific option that
    specifies the partition type globally unique identifier (GUID) for
    GPT partitions. You can find the list of partition type GUIDs at
-   https://en.wikipedia.org/wiki/GUID_Partition_Table#Partition_type_GUIDs.
+   :wikipedia:`GUID_Partition_Table#Partition_type_GUIDs`.
 
 -  ``--use-uuid``: This option is a Wic-specific option that causes
    Wic to generate a random GUID for the partition. The generated

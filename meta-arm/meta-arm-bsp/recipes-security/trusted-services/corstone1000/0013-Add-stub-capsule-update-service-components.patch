@@ -1,7 +1,7 @@
-From 6b8ebdeb8caa6326ae2a4befaf4410a7a54d4e02 Mon Sep 17 00:00:00 2001
+From 050be6fdfee656b0556766cc1db30f4c0ea87c79 Mon Sep 17 00:00:00 2001
 From: Julian Hall <julian.hall@arm.com>
 Date: Tue, 12 Oct 2021 15:45:41 +0100
-Subject: [PATCH 13/19] Add stub capsule update service components
+Subject: [PATCH 13/20] Add stub capsule update service components
 
 To facilitate development of a capsule update service provider,
 stub components are added to provide a starting point for an
@@ -338,7 +338,7 @@ index 298d407a2371..02aa7fe2550d 100644
  #ifdef __cplusplus
  }
 diff --git a/deployments/se-proxy/se-proxy.cmake b/deployments/se-proxy/se-proxy.cmake
-index f647190d9559..e35b0d0f610d 100644
+index 3dbbc36c968d..f0db2d43f443 100644
 --- a/deployments/se-proxy/se-proxy.cmake
 +++ b/deployments/se-proxy/se-proxy.cmake
 @@ -51,6 +51,7 @@ add_components(TARGET "se-proxy"
@@ -432,5 +432,5 @@ index 000000000000..285d924186be
 +
 +#endif /* CAPSULE_UPDATE_PARAMETERS_H */
 -- 
-2.38.0
+2.38.1
 

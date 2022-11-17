@@ -7157,8 +7157,7 @@ system. This section provides information for RPM, IPK, and DEB.
 Using RPM
 ^^^^^^^^^
 
-The `Dandified Packaging
-Tool <https://en.wikipedia.org/wiki/DNF_(software)>`__ (DNF) performs
+The :wikipedia:`Dandified Packaging <DNF_(software)>` (DNF) performs
 runtime package management of RPM packages. In order to use DNF for
 runtime package management, you must perform an initial setup on the
 target machine for cases where the ``PACKAGE_FEED_*`` variables were not
@@ -7501,7 +7500,7 @@ test. Here is what you have to do for each recipe:
 Creating Node Package Manager (NPM) Packages
 --------------------------------------------
 
-`NPM <https://en.wikipedia.org/wiki/Npm_(software)>`__ is a package
+:wikipedia:`NPM <Npm_(software)>` is a package
 manager for the JavaScript programming language. The Yocto Project
 supports the NPM :ref:`fetcher <bitbake:bitbake-user-manual/bitbake-user-manual-fetching:fetchers>`. You can
 use this fetcher in combination with
@@ -9374,8 +9373,7 @@ This command writes the following files in the current directory:
 
 -  ``task-depends.dot``: A graph showing dependencies between tasks.
 
-The graphs are in
-`DOT <https://en.wikipedia.org/wiki/DOT_%28graph_description_language%29>`__
+The graphs are in :wikipedia:`DOT <DOT_%28graph_description_language%29>`
 format and can be converted to images (e.g. using the ``dot`` tool from
 `Graphviz <https://www.graphviz.org/>`__).
 
@@ -11200,8 +11198,6 @@ to be covered by assuming that there are three main areas of concern:
 -  Compilation scripts and modifications to the source code must be
    provided.
 
--  spdx files can be provided.
-
 There are other requirements beyond the scope of these three and the
 methods described in this section (e.g. the mechanism through which
 source code is distributed).
@@ -11392,39 +11388,6 @@ layers (recipes, configuration files, and so forth) enables you to meet
 your requirements to include the scripts to control compilation as well
 as any modifications to the original source.
 
-Providing spdx files
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The spdx module has been integrated to a layer named meta-spdxscanner.
-meta-spdxscanner provides several kinds of scanner. If you want to enable
-this function, you have to follow the following steps:
-
-1. Add meta-spdxscanner layer into ``bblayers.conf``.
-
-2. Refer to the README in meta-spdxscanner to setup the environment (e.g,
-   setup a fossology server) needed for the scanner.
-
-3. Meta-spdxscanner provides several methods within the bbclass to create spdx files.
-   Please choose one that you want to use and enable the spdx task. You have to
-   add some config options in ``local.conf`` file in your :term:`Build Directory`.
-   Here is an example showing how to generate spdx files during BitBake using the
-   fossology-python.bbclass::
-
-      # Select fossology-python.bbclass.
-      INHERIT += "fossology-python"
-      # For fossology-python.bbclass, TOKEN is necessary, so, after setup a
-      # Fossology server, you have to create a token.
-      TOKEN = "eyJ0eXAiO..."
-      # The fossology server is necessary for fossology-python.bbclass.
-      FOSSOLOGY_SERVER = "http://xx.xx.xx.xx:8081/repo"
-      # If you want to upload the source code to a special folder:
-      FOLDER_NAME = "xxxx" //Optional
-      # If you don't want to put spdx files in tmp/deploy/spdx, you can enable:
-      SPDX_DEPLOY_DIR = "${DEPLOY_DIR}" //Optional
-
-For more usage information refer to :yocto_git:`the meta-spdxscanner repository
-</meta-spdxscanner/>`.
-
 Compliance Limitations with Executables Built from Static Libraries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -11470,7 +11433,7 @@ Vulnerabilities in Poky and OE-Core
 
 The Yocto Project has an infrastructure to track and address unfixed
 known security vulnerabilities, as tracked by the public
-`Common Vulnerabilities and Exposures (CVE) <https://en.wikipedia.org/wiki/Common_Vulnerabilities_and_Exposures>`__
+:wikipedia:`Common Vulnerabilities and Exposures (CVE) <Common_Vulnerabilities_and_Exposures>`
 database.
 
 The Yocto Project maintains a `list of known vulnerabilities
@@ -11518,7 +11481,7 @@ applied and that the issue needs to be investigated. ``Ignored`` means that afte
 analysis, it has been deemed to ignore the issue as it for example affects
 the software component on a different operating system platform.
 
-After build with CVE check enabled, reports for each compiled source recipe will be
+After a build with CVE check enabled, reports for each compiled source recipe will be
 found in ``build/tmp/deploy/cve``.
 
 For example the CVE check report for the ``flex-native`` recipe looks like::
@@ -11567,36 +11530,36 @@ product name when querying the CVE database. If this mapping contains false posi
 some reported CVEs are not for the software component in question, or false negatives like
 some CVEs are not found to impact the recipe when they should, then the problems can be
 in the recipe name to CVE product mapping. These mapping issues can be fixed by setting
-the :term:`CVE_PRODUCT` variable inside the recipe. This defines the name of software component in the
+the :term:`CVE_PRODUCT` variable inside the recipe. This defines the name of the software component in the
 upstream `NIST CVE database <https://nvd.nist.gov/>`__.
 
 The variable supports using vendor and product names like this::
 
    CVE_PRODUCT = "flex_project:flex"
 
-In this example from the vendor name used in CVE database is ``flex_project`` and
+In this example the vendor name used in the CVE database is ``flex_project`` and the
 product is ``flex``. With this setting the ``flex`` recipe only maps to this specific
 product and not products from other vendors with same name ``flex``.
 
-Similary, when the recipe version :term:`PV` is not compatible with software versions used by
+Similarly, when the recipe version :term:`PV` is not compatible with software versions used by
 the upstream software component releases and the CVE database, these can be fixed using
-:term:`CVE_VERSION` variable.
+the :term:`CVE_VERSION` variable.
 
-Note that if the CVE entries in NVD databse contain bugs or have missing or incomplete
+Note that if the CVE entries in the NVD database contain bugs or have missing or incomplete
 information, it is recommended to fix the information there directly instead of working
-around the issues for a possibly long time in Poky and OE-Core side recipes. Feedback to
-NVD about CVEs entries can be provided through the `NVD contact form <https://nvd.nist.gov/info/contact-form>`__.
+around the issues possibly for a long time in Poky and OE-Core side recipes. Feedback to
+NVD about CVE entries can be provided through the `NVD contact form <https://nvd.nist.gov/info/contact-form>`__.
 
 Fixing vulnerabilities in recipes
 ---------------------------------
 
 If a CVE security issue impacts a software component, it can be fixed by updating to a newer
 version of the software component or by applying a patch. For Poky and OE-Core master branches, updating
-to newer software component release with fixes is the best option, but patches can be applied
+to a newer software component release with fixes is the best option, but patches can be applied
 if releases are not yet available.
 
 For stable branches, it is preferred to apply patches for the issues. For some software
-components minor version updates can also applied if they are backwards compatible.
+components minor version updates can also be applied if they are backwards compatible.
 
 Here is an example of fixing CVE security issues with patch files,
 an example from the :oe_layerindex:`ffmpeg recipe</layerindex/recipe/47350>`::
@@ -11610,8 +11573,8 @@ an example from the :oe_layerindex:`ffmpeg recipe</layerindex/recipe/47350>`::
               file://fix-CVE-2020-22033-CVE-2020-22019.patch \
               file://fix-CVE-2021-33815.patch \
 
-A good practice is to include the CVE identifier in both patch file name
-and inside the patch file commit message use the format::
+A good practice is to include the CVE identifier in both the patch file name
+and inside the patch file commit message using the format::
 
    CVE: CVE-2020-22033
 
@@ -11619,7 +11582,7 @@ CVE checker will then capture this information and change the CVE status to ``Pa
 in the generated reports.
 
 If analysis shows that the CVE issue does not impact the recipe due to configuration, platform,
-version or other reasons, the CVE can be marked as ``Ignored`` using :term:`CVE_CHECK_IGNORE` variable.
+version or other reasons, the CVE can be marked as ``Ignored`` using the :term:`CVE_CHECK_IGNORE` variable.
 As mentioned previously, if data in the CVE database is wrong, it is recommend to fix those
 issues in the CVE database directly.
 
@@ -11673,6 +11636,72 @@ When analyzing CVEs, it is recommended to:
 
 -  follow public `open source security mailing lists <https://oss-security.openwall.org/wiki/mailing-lists>`__ for
    discussions and advance notifications of CVE bugs and software releases with fixes.
+
+Creating a Software Bill of Materials
+=====================================
+
+Once you are able to build an image for your project, once the licenses for
+each software component are all identified (see
+":ref:`dev-manual/common-tasks:working with licenses`") and once vulnerability
+fixes are applied (see ":ref:`dev-manual/common-tasks:checking
+for vulnerabilities`"), the OpenEmbedded build system can generate
+a description of all the components you used, their licenses, their dependencies,
+the changes that were applied and the known vulnerabilities that were fixed.
+
+This description is generated in the form of a *Software Bill of Materials*
+(:term:`SBOM`), using the :term:`SPDX` standard.
+
+When you release software, this is the most standard way to provide information
+about the Software Supply Chain of your software image and SDK. The
+:term:`SBOM` tooling is often used to ensure open source license compliance by
+providing the license texts used in the product which legal departments and end
+users can read in standardized format.
+
+:term:`SBOM` information is also critical to performing vulnerability exposure
+assessments, as all the components used in the Software Supply Chain are listed.
+
+The OpenEmbedded build system doesn't generate such information by default.
+To make this happen, you must inherit the
+:ref:`create-spdx <ref-classes-create-spdx>` class from a configuration file::
+
+   INHERIT += "create-spdx"
+
+You then get :term:`SPDX` output in JSON format as an
+``IMAGE-MACHINE.spdx.json`` file in ``tmp/deploy/images/MACHINE/`` inside the
+:term:`Build Directory`.
+
+This is a toplevel file accompanied by an ``IMAGE-MACHINE.spdx.index.json``
+containing an index of JSON :term:`SPDX` files for individual recipes, together
+with an ``IMAGE-MACHINE.spdx.tar.zst`` compressed archive containing all such
+files.
+
+The :ref:`create-spdx <ref-classes-create-spdx>` class offers options to include
+more information in the output :term:`SPDX` data, such as making the generated
+files more human readable (:term:`SPDX_PRETTY`), adding compressed archives of
+the files in the generated target packages (:term:`SPDX_ARCHIVE_PACKAGED`),
+adding a description of the source files handled by the target recipes
+(:term:`SPDX_INCLUDE_SOURCES`) and adding archives of these source files
+themselves (:term:`SPDX_ARCHIVE_SOURCES`).
+
+Though the toplevel :term:`SPDX` output is available in
+``tmp/deploy/images/MACHINE/`` inside the :term:`Build Directory`, ancillary
+generated files are available in ``tmp/deploy/spdx/MACHINE`` too, such as:
+
+-  The individual :term:`SPDX` JSON files in the ``IMAGE-MACHINE.spdx.tar.zst``
+   archive.
+
+-  Compressed archives of the files in the generated target packages,
+   in ``packages/packagename.tar.zst`` (when :term:`SPDX_ARCHIVE_PACKAGED`
+   is set).
+
+-  Compressed archives of the source files used to build the host tools
+   and the target packages in ``recipes/recipe-packagename.tar.zst``
+   (when :term:`SPDX_ARCHIVE_SOURCES` is set). Those are needed to fulfill
+   "source code access" license requirements.
+
+See the `tools page <https://spdx.dev/resources/tools/>`__ on the :term:`SPDX`
+project website for a list of tools to consume and transform the :term:`SPDX`
+data generated by the OpenEmbedded build system.
 
 Using the Error Reporting Tool
 ==============================
@@ -11760,7 +11789,7 @@ Instructions on how to set it up are in the README document.
 Using Wayland and Weston
 ========================
 
-`Wayland <https://en.wikipedia.org/wiki/Wayland_(display_server_protocol)>`__
+:wikipedia:`Wayland <Wayland_(display_server_protocol)>`
 is a computer display server protocol that provides a method for
 compositing window managers to communicate directly with applications
 and video hardware and expects them to communicate with input hardware
@@ -11769,20 +11798,18 @@ in better control over graphics frame rendering than an application
 might otherwise achieve.
 
 The Yocto Project provides the Wayland protocol libraries and the
-reference
-`Weston <https://en.wikipedia.org/wiki/Wayland_(display_server_protocol)#Weston>`__
+reference :wikipedia:`Weston <Wayland_(display_server_protocol)#Weston>`
 compositor as part of its release. You can find the integrated packages
 in the ``meta`` layer of the :term:`Source Directory`.
 Specifically, you
 can find the recipes that build both Wayland and Weston at
 ``meta/recipes-graphics/wayland``.
 
-You can build both the Wayland and Weston packages for use only with
-targets that accept the `Mesa 3D and Direct Rendering
-Infrastructure <https://en.wikipedia.org/wiki/Mesa_(computer_graphics)>`__,
-which is also known as Mesa DRI. This implies that you cannot build and
-use the packages if your target uses, for example, the Intel Embedded
-Media and Graphics Driver (Intel EMGD) that overrides Mesa DRI.
+You can build both the Wayland and Weston packages for use only with targets
+that accept the :wikipedia:`Mesa 3D and Direct Rendering Infrastructure
+<Mesa_(computer_graphics)>`, which is also known as Mesa DRI. This implies that
+you cannot build and use the packages if your target uses, for example, the
+Intel Embedded Media and Graphics Driver (Intel EMGD) that overrides Mesa DRI.
 
 .. note::
 

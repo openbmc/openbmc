@@ -246,6 +246,7 @@
             "${libdir}/python${PYTHON_MAJMIN}/heapq.py",
             "${libdir}/python${PYTHON_MAJMIN}/imp.py",
             "${libdir}/python${PYTHON_MAJMIN}/importlib",
+            "${libdir}/python${PYTHON_MAJMIN}/importlib/_abc.py",
             "${libdir}/python${PYTHON_MAJMIN}/importlib/_bootstrap.py",
             "${libdir}/python${PYTHON_MAJMIN}/importlib/_bootstrap_external.py",
             "${libdir}/python${PYTHON_MAJMIN}/importlib/abc.py",
@@ -266,6 +267,7 @@
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_opcode.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_posixsubprocess.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_struct.*.so",
+            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_typing.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/array.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/binascii.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/grp.*.so",
@@ -290,7 +292,11 @@
             "${libdir}/python${PYTHON_MAJMIN}/pkgutil.py",
             "${libdir}/python${PYTHON_MAJMIN}/platform.py",
             "${libdir}/python${PYTHON_MAJMIN}/posixpath.py",
-            "${libdir}/python${PYTHON_MAJMIN}/re.py",
+            "${libdir}/python${PYTHON_MAJMIN}/re",
+            "${libdir}/python${PYTHON_MAJMIN}/re/_casefix.py",
+            "${libdir}/python${PYTHON_MAJMIN}/re/_compiler.py",
+            "${libdir}/python${PYTHON_MAJMIN}/re/_constants.py",
+            "${libdir}/python${PYTHON_MAJMIN}/re/_parser.py",
             "${libdir}/python${PYTHON_MAJMIN}/reprlib.py",
             "${libdir}/python${PYTHON_MAJMIN}/rlcompleter.py",
             "${libdir}/python${PYTHON_MAJMIN}/runpy.py",
@@ -315,8 +321,11 @@
             "${libdir}/python${PYTHON_MAJMIN}/traceback.py",
             "${libdir}/python${PYTHON_MAJMIN}/types.py",
             "${libdir}/python${PYTHON_MAJMIN}/typing.py",
+            "${libdir}/python${PYTHON_MAJMIN}/urllib",
+            "${libdir}/python${PYTHON_MAJMIN}/urllib/parse.py",
             "${libdir}/python${PYTHON_MAJMIN}/warnings.py",
             "${libdir}/python${PYTHON_MAJMIN}/weakref.py",
+            "${libdir}/python${PYTHON_MAJMIN}/zipimport.py",
             "${prefix}/lib/python${PYTHON_MAJMIN}/config*/*[!.a]"
         ],
         "cached": [
@@ -398,9 +407,17 @@
             "${libdir}/python${PYTHON_MAJMIN}/encodings/__pycache__/latin_1.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/encodings/__pycache__/utf_8.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/importlib/__pycache__",
+            "${libdir}/python${PYTHON_MAJMIN}/importlib/__pycache__/_abc.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/importlib/__pycache__/abc.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/importlib/__pycache__/machinery.*.pyc",
-            "${libdir}/python${PYTHON_MAJMIN}/importlib/__pycache__/util.*.pyc"
+            "${libdir}/python${PYTHON_MAJMIN}/importlib/__pycache__/util.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/re/__pycache__",
+            "${libdir}/python${PYTHON_MAJMIN}/re/__pycache__/_casefix.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/re/__pycache__/_compiler.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/re/__pycache__/_constants.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/re/__pycache__/_parser.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/urllib/__pycache__",
+            "${libdir}/python${PYTHON_MAJMIN}/urllib/__pycache__/parse.*.pyc"
         ]
     },
     "crypt": {
@@ -487,6 +504,7 @@
         "rdepends": [
             "core",
             "pprint",
+            "profile",
             "shell",
             "stringold"
         ],
@@ -560,6 +578,7 @@
             "debugger",
             "difflib",
             "pprint",
+            "profile",
             "shell",
             "stringold",
             "unittest"
@@ -617,12 +636,9 @@
             "core"
         ],
         "files": [
-            "${libdir}/python${PYTHON_MAJMIN}/formatter.py",
             "${libdir}/python${PYTHON_MAJMIN}/html"
         ],
-        "cached": [
-            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/formatter.*.pyc"
-        ]
+        "cached": []
     },
     "idle": {
         "summary": "Python Integrated Development Environment",
@@ -711,7 +727,6 @@
             "crypt",
             "datetime",
             "email",
-            "fcntl",
             "io",
             "math",
             "mime",
@@ -810,7 +825,7 @@
             "shell",
             "smtpd",
             "sqlite3",
-	    "statistics",
+            "statistics",
             "stringold",
             "syslog",
             "terminal",
@@ -873,7 +888,6 @@
             "${libdir}/python${PYTHON_MAJMIN}/smtplib.py",
             "${libdir}/python${PYTHON_MAJMIN}/telnetlib.py",
             "${libdir}/python${PYTHON_MAJMIN}/urllib",
-            "${libdir}/python${PYTHON_MAJMIN}/urllib/parse.py",
             "${libdir}/python${PYTHON_MAJMIN}/uuid.py"
         ],
         "cached": [
@@ -886,8 +900,6 @@
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/secrets.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/smtplib.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/telnetlib.*.pyc",
-            "${libdir}/python${PYTHON_MAJMIN}/urllib/__pycache__",
-            "${libdir}/python${PYTHON_MAJMIN}/urllib/__pycache__/parse.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/uuid.*.pyc"
         ]
     },
@@ -981,7 +993,7 @@
         "summary": "Python pretty-print support",
         "rdepends": [
             "core",
-	    "profile"
+            "profile"
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/pprint.py"
@@ -1088,18 +1100,20 @@
         "cached": []
     },
     "statistics": {
-	"summary": "Basic statistics module",
-	"rdepends": [
-	    "core",
-	    "math",
-	    "numbers"
-	],
-	"files": [
-	    "${libdir}/python${PYTHON_MAJMIN}/statistics.py"
-	],
-	"cached": [
-	    "${libdir}/python${PYTHON_MAJMIN}/__pycache__/statistics.*.pyc"
-	]
+        "summary": "Basic statistics module",
+        "rdepends": [
+            "core",
+            "crypt",
+            "math",
+            "numbers"
+        ],
+        "files": [
+            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_statistics.*.so",
+            "${libdir}/python${PYTHON_MAJMIN}/statistics.py"
+        ],
+        "cached": [
+            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/statistics.*.pyc"
+        ]
     },
     "stringold": {
         "summary": "Python string APIs [deprecated]",
@@ -1159,7 +1173,6 @@
             "core"
         ],
         "files": [
-	    "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_tkinter.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/tkinter"
         ],
         "cached": []
@@ -1175,6 +1188,7 @@
             "netclient",
             "numbers",
             "pprint",
+            "profile",
             "stringold"
         ],
         "files": [
@@ -1231,7 +1245,6 @@
             "crypt",
             "datetime",
             "email",
-            "fcntl",
             "html",
             "io",
             "math",
@@ -1252,12 +1265,13 @@
     "zoneinfo": {
         "summary": "IANA time zone support",
         "rdepends": [
-            "core"
+            "core",
+            "datetime"
         ],
         "files": [
-            "${libdir}/python${PYTHON_MAJMIN}/zoneinfo",
-            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_zoneinfo.*.so"
+            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_zoneinfo.*.so",
+            "${libdir}/python${PYTHON_MAJMIN}/zoneinfo"
         ],
-       "cached": []
+        "cached": []
     }
 }

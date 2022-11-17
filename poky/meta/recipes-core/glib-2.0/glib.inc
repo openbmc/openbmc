@@ -5,10 +5,10 @@ HOMEPAGE = "https://developer.gnome.org/glib/"
 # pcre is under BSD;
 # docs/reference/COPYING is with a 'public domain'-like license!
 LICENSE = "LGPL-2.1-or-later & BSD-3-Clause & PD"
-LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c \
-                    file://glib/glib.h;beginline=4;endline=17;md5=b88abb7f3ad09607e71cb9d530155906 \
-                    file://gmodule/COPYING;md5=4fbd65380cdd255951079008b364516c \
-                    file://gmodule/gmodule.h;beginline=4;endline=17;md5=b88abb7f3ad09607e71cb9d530155906 \
+LIC_FILES_CHKSUM = "file://COPYING;md5=41890f71f740302b785c27661123bff5 \
+                    file://glib/glib.h;beginline=4;endline=17;md5=72f7cc2847407f65d8981ef112e4e630 \
+                    file://LICENSES/LGPL-2.1-or-later.txt;md5=41890f71f740302b785c27661123bff5 \
+                    file://gmodule/gmodule.h;beginline=4;endline=17;md5=72f7cc2847407f65d8981ef112e4e630 \
                     file://docs/reference/COPYING;md5=f51a5100c17af6bae00735cd791e1fcc"
 BUGTRACKER = "http://bugzilla.gnome.org"
 SECTION = "libs"
@@ -21,7 +21,7 @@ DEPENDS = "glib-2.0-native \
            virtual/libintl \
            virtual/libiconv \
            libffi \
-           libpcre \
+           libpcre2 \
            zlib"
 
 PACKAGES += "${PN}-codegen ${PN}-utils"
@@ -45,7 +45,7 @@ PACKAGECONFIG[libelf] = ",,elfutils"
 PACKAGECONFIG[tests] = "-Dinstalled_tests=true,-Dinstalled_tests=false,"
 PACKAGECONFIG[selinux] = "-Dselinux=enabled,-Dselinux=disabled,libselinux"
 
-EXTRA_OEMESON = "-Ddtrace=false -Dfam=false -Dsystemtap=false"
+EXTRA_OEMESON = "-Ddtrace=false -Dsystemtap=false"
 
 do_configure:prepend() {
 	sed -i -e '1s,#!.*,#!${USRBINPATH}/env python3,' ${S}/gio/gdbus-2.0/codegen/gdbus-codegen.in
@@ -54,6 +54,7 @@ do_configure:prepend() {
 FILES:${PN} = "${libdir}/lib*${SOLIBS} \
                ${libdir}/gio \
                ${libexecdir}/*gio-querymodules \
+               ${libexecdir}/*gio-launch-desktop \
                ${datadir}/glib-2.0/schemas"
 
 FILES:${PN}-utils += "${bindir}/glib-genmarshal \
@@ -130,6 +131,8 @@ do_install:append:class-target () {
                 mv ${D}${datadir}/installed-tests/glib/static-link.test ${D}${datadir}/installed-tests/glib/${MLPREFIX}static-link.test
         fi
 	fi
+        # https://gitlab.gnome.org/GNOME/glib/-/issues/2810
+        rm -f ${D}${datadir}/installed-tests/glib/thread-pool-slow.test
 }
 
 # As we do not build python3 for windows, makes no sense to ship the script that's using it
@@ -148,6 +151,7 @@ RDEPENDS:${PN}-ptest += "\
             coreutils \
             libgcc \
             dbus \
+            desktop-file-utils \
             gnome-desktop-testing \
             tzdata \
             tzdata-americas \

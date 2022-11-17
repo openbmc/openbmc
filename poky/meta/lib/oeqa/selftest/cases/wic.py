@@ -15,32 +15,13 @@ import hashlib
 
 from glob import glob
 from shutil import rmtree, copy
-from functools import wraps, lru_cache
 from tempfile import NamedTemporaryFile
 
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.core.decorator import OETestTag
+from oeqa.core.decorator.data import skipIfNotArch
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars, runqemu
 
-
-@lru_cache()
-def get_host_arch():
-    return get_bb_var('HOST_ARCH')
-
-
-def only_for_arch(archs):
-    """Decorator for wrapping test cases that can be run only for specific target
-    architectures. A list of compatible architectures is passed in `archs`.
-    """
-    def wrapper(func):
-        @wraps(func)
-        def wrapped_f(*args, **kwargs):
-            arch = get_host_arch()
-            if archs and arch not in archs:
-                raise unittest.SkipTest("Testcase arch dependency not met: %s" % arch)
-            return func(*args, **kwargs)
-        return wrapped_f
-    return wrapper
 
 def extract_files(debugfs_output):
     """
@@ -171,14 +152,14 @@ class Wic(WicTestCase):
         runCmd(cmd)
         self.assertEqual(1, len(glob(os.path.join (self.resultdir, "wictestdisk-*.direct"))))
 
-    @only_for_arch(['i586', 'i686', 'x86_64'])
+    @skipIfNotArch(['i586', 'i686', 'x86_64'])
     def test_gpt_image(self):
         """Test creation of core-image-minimal with gpt table and UUID boot"""
         cmd = "wic create directdisk-gpt --image-name core-image-minimal -o %s" % self.resultdir
         runCmd(cmd)
         self.assertEqual(1, len(glob(os.path.join(self.resultdir, "directdisk-*.direct"))))
 
-    @only_for_arch(['i586', 'i686', 'x86_64'])
+    @skipIfNotArch(['i586', 'i686', 'x86_64'])
     def test_iso_image(self):
         """Test creation of hybrid iso image with legacy and EFI boot"""
         config = 'INITRAMFS_IMAGE = "core-image-minimal-initramfs"\n'\
@@ -192,21 +173,21 @@ class Wic(WicTestCase):
         self.assertEqual(1, len(glob(os.path.join(self.resultdir, "HYBRID_ISO_IMG-*.direct"))))
         self.assertEqual(1, len(glob(os.path.join (self.resultdir, "HYBRID_ISO_IMG-*.iso"))))
 
-    @only_for_arch(['i586', 'i686', 'x86_64'])
+    @skipIfNotArch(['i586', 'i686', 'x86_64'])
     def test_qemux86_directdisk(self):
         """Test creation of qemux-86-directdisk image"""
         cmd = "wic create qemux86-directdisk -e core-image-minimal -o %s" % self.resultdir
         runCmd(cmd)
         self.assertEqual(1, len(glob(os.path.join(self.resultdir, "qemux86-directdisk-*direct"))))
 
-    @only_for_arch(['i586', 'i686', 'x86_64', 'aarch64'])
+    @skipIfNotArch(['i586', 'i686', 'x86_64', 'aarch64'])
     def test_mkefidisk(self):
         """Test creation of mkefidisk image"""
         cmd = "wic create mkefidisk -e core-image-minimal -o %s" % self.resultdir
         runCmd(cmd)
         self.assertEqual(1, len(glob(os.path.join(self.resultdir, "mkefidisk-*direct"))))
 
-    @only_for_arch(['i586', 'i686', 'x86_64'])
+    @skipIfNotArch(['i586', 'i686', 'x86_64'])
     def test_bootloader_config(self):
         """Test creation of directdisk-bootloader-config image"""
         config = 'DEPENDS:pn-core-image-minimal += "syslinux"\n'
@@ -217,7 +198,7 @@ class Wic(WicTestCase):
         runCmd(cmd)
         self.assertEqual(1, len(glob(os.path.join(self.resultdir, "directdisk-bootloader-config-*direct"))))
 
-    @only_for_arch(['i586', 'i686', 'x86_64', 'aarch64'])
+    @skipIfNotArch(['i586', 'i686', 'x86_64', 'aarch64'])
     def test_systemd_bootdisk(self):
         """Test creation of systemd-bootdisk image"""
         config = 'MACHINE_FEATURES:append = " efi"\n'
@@ -248,7 +229,7 @@ class Wic(WicTestCase):
         self.assertEqual(1, len(glob(os.path.join(self.resultdir, "sdimage-bootpart-*direct"))))
 
     # TODO this doesn't have to be x86-specific
-    @only_for_arch(['i586', 'i686', 'x86_64'])
+    @skipIfNotArch(['i586', 'i686', 'x86_64'])
     def test_default_output_dir(self):
         """Test default output location"""
         for fname in glob("directdisk-*.direct"):
@@ -261,7 +242,7 @@ class Wic(WicTestCase):
         runCmd(cmd)
         self.assertEqual(1, len(glob("directdisk-*.direct")))
 
-    @only_for_arch(['i586', 'i686', 'x86_64'])
+    @skipIfNotArch(['i586', 'i686', 'x86_64'])
     def test_build_artifacts(self):
         """Test wic create directdisk providing all artifacts."""
         bb_vars = get_bb_vars(['STAGING_DATADIR', 'RECIPE_SYSROOT_NATIVE'],
@@ -353,7 +334,7 @@ class Wic(WicTestCase):
         self.assertEqual(1, len(glob(os.path.join(self.resultdir, "wictestdisk-*.direct"))))
 
     # TODO this doesn't have to be x86-specific
-    @only_for_arch(['i586', 'i686', 'x86_64'])
+    @skipIfNotArch(['i586', 'i686', 'x86_64'])
     def test_rootfs_indirect_recipes(self):
         """Test usage of rootfs plugin with rootfs recipes"""
         runCmd("wic create directdisk-multi-rootfs "
@@ -364,7 +345,7 @@ class Wic(WicTestCase):
         self.assertEqual(1, len(glob(os.path.join(self.resultdir, "directdisk-multi-rootfs*.direct"))))
 
     # TODO this doesn't have to be x86-specific
-    @only_for_arch(['i586', 'i686', 'x86_64'])
+    @skipIfNotArch(['i586', 'i686', 'x86_64'])
     def test_rootfs_artifacts(self):
         """Test usage of rootfs plugin with rootfs paths"""
         bb_vars = get_bb_vars(['STAGING_DATADIR', 'RECIPE_SYSROOT_NATIVE'],
@@ -817,7 +798,8 @@ class Wic2(WicTestCase):
                                       self.resultdir))
         self.assertEqual(1, len(glob(os.path.join(self.resultdir, "wictestdisk-*direct"))))
 
-    @only_for_arch(['i586', 'i686', 'x86_64', 'aarch64'])
+    # TODO this test could also work on aarch64
+    @skipIfNotArch(['i586', 'i686', 'x86_64'])
     def test_wic_image_type(self):
         """Test building wic images by bitbake"""
         config = 'IMAGE_FSTYPES += "wic"\nWKS_FILE = "wic-image-minimal"\n'\
@@ -837,7 +819,7 @@ class Wic2(WicTestCase):
             self.assertTrue(os.path.isfile(os.path.realpath(path)))
 
     # TODO this should work on aarch64
-    @only_for_arch(['i586', 'i686', 'x86_64'])
+    @skipIfNotArch(['i586', 'i686', 'x86_64'])
     @OETestTag("runqemu")
     def test_qemu(self):
         """Test wic-image-minimal under qemu"""
@@ -858,7 +840,7 @@ class Wic2(WicTestCase):
             self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
             self.assertEqual(output, 'UUID=2c71ef06-a81d-4735-9d3a-379b69c6bdba\t/media\text4\tdefaults\t0\t0')
 
-    @only_for_arch(['i586', 'i686', 'x86_64'])
+    @skipIfNotArch(['i586', 'i686', 'x86_64'])
     @OETestTag("runqemu")
     def test_qemu_efi(self):
         """Test core-image-minimal efi image under qemu"""
@@ -1042,7 +1024,8 @@ class Wic2(WicTestCase):
             size = int(size[:-3])
             self.assertGreaterEqual(size, 204800)
 
-    @only_for_arch(['i586', 'i686', 'x86_64', 'aarch64'])
+    # TODO this test could also work on aarch64
+    @skipIfNotArch(['i586', 'i686', 'x86_64'])
     @OETestTag("runqemu")
     def test_rawcopy_plugin_qemu(self):
         """Test rawcopy plugin in qemu"""
@@ -1109,7 +1092,7 @@ class Wic2(WicTestCase):
         result = runCmd("wic ls %s -n %s | awk -F ' ' '{print $1 \" \" $5}' | grep '^2' | wc -w" % (image_path, sysroot))
         self.assertEqual('1', result.output)
 
-    @only_for_arch(['i586', 'i686', 'x86_64'])
+    @skipIfNotArch(['i586', 'i686', 'x86_64'])
     @OETestTag("runqemu")
     def test_biosplusefi_plugin_qemu(self):
         """Test biosplusefi plugin in qemu"""
@@ -1142,7 +1125,7 @@ class Wic2(WicTestCase):
             self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
             self.assertEqual(output, '*')
 
-    @only_for_arch(['i586', 'i686', 'x86_64'])
+    @skipIfNotArch(['i586', 'i686', 'x86_64'])
     def test_biosplusefi_plugin(self):
         """Test biosplusefi plugin"""
         # Wic generation below may fail depending on the order of the unittests
@@ -1169,7 +1152,7 @@ class Wic2(WicTestCase):
             self.assertEqual(1, len(out))
 
     # TODO this test could also work on aarch64
-    @only_for_arch(['i586', 'i686', 'x86_64'])
+    @skipIfNotArch(['i586', 'i686', 'x86_64'])
     @OETestTag("runqemu")
     def test_efi_plugin_unified_kernel_image_qemu(self):
         """Test efi plugin's Unified Kernel Image feature in qemu"""
@@ -1287,7 +1270,7 @@ class Wic2(WicTestCase):
             out = glob(os.path.join(self.resultdir, "%s-*direct" % wksname))
             self.assertEqual(1, len(out))
 
-    @only_for_arch(['i586', 'i686', 'x86_64'])
+    @skipIfNotArch(['i586', 'i686', 'x86_64'])
     @OETestTag("runqemu")
     def test_expand_mbr_image(self):
         """Test wic write --expand command for mbr image"""

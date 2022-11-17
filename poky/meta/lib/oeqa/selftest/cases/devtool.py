@@ -954,7 +954,7 @@ class DevtoolUpdateTests(DevtoolBase):
 
     def test_devtool_update_recipe_git(self):
         # Check preconditions
-        testrecipe = 'mtd-utils'
+        testrecipe = 'mtd-utils-selftest'
         bb_vars = get_bb_vars(['FILE', 'SRC_URI'], testrecipe)
         recipefile = bb_vars['FILE']
         src_uri = bb_vars['SRC_URI']
@@ -1075,7 +1075,7 @@ class DevtoolUpdateTests(DevtoolBase):
 
     def test_devtool_update_recipe_append_git(self):
         # Check preconditions
-        testrecipe = 'mtd-utils'
+        testrecipe = 'mtd-utils-selftest'
         bb_vars = get_bb_vars(['FILE', 'SRC_URI'], testrecipe)
         recipefile = bb_vars['FILE']
         src_uri = bb_vars['SRC_URI']

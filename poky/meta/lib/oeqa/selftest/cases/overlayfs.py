@@ -7,6 +7,7 @@
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake, runqemu
 from oeqa.core.decorator import OETestTag
+from oeqa.core.decorator.data import skipIfNotMachine
 
 def getline_qemu(out, line):
     for l in out.split('\n'):
@@ -333,6 +334,8 @@ EXTRA_IMAGE_FEATURES += "package-management"
         self.assertTrue("overlayfs-etc" in res.output, msg=res.output)
         self.assertTrue("package-management" in res.output, msg=res.output)
 
+    # https://bugzilla.yoctoproject.org/show_bug.cgi?id=14963
+    @skipIfNotMachine("qemux86-64", "tests are qemux86-64 specific currently")
     def test_image_feature_is_missing(self):
         """
         Summary:   Overlayfs-etc class is not applied when image feature is not set
@@ -368,9 +371,11 @@ OVERLAYFS_ETC_DEVICE = "/dev/sda3"
             line = getline_qemu(output, "upperdir=/data/overlay-etc/upper")
             self.assertFalse(line, msg=output)
 
+    @skipIfNotMachine("qemux86-64", "tests are qemux86-64 specific currently")
     def test_sbin_init_preinit(self):
         self.run_sbin_init(False)
 
+    @skipIfNotMachine("qemux86-64", "tests are qemux86-64 specific currently")
     def test_sbin_init_original(self):
         self.run_sbin_init(True)
 
@@ -419,6 +424,7 @@ OVERLAYFS_ETC_DEVICE = "/dev/sda3"
             line = getline_qemu(output, testFile)
             self.assertTrue(line and line.startswith(testFile), msg=output)
 
+    @skipIfNotMachine("qemux86-64", "tests are qemux86-64 specific currently")
     def test_lower_layer_access(self):
         """
         Summary:   Test that lower layer of /etc is available read-only when configured

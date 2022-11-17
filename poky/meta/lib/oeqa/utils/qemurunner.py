@@ -354,7 +354,7 @@ class QemuRunner:
             except OSError as msg:
                 self.logger.warning("Failed to connect qemu monitor socket: %s File: %s" % (msg, msg.filename))
                 return False
-            except qmp.QMPConnectError as msg:
+            except qmp.legacy.QMPError as msg:
                 self.logger.warning("Failed to communicate with qemu monitor: %s" % (msg))
                 return False
         finally:

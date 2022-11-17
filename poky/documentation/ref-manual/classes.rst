@@ -85,7 +85,7 @@ about the variable flags (varflags) that help control archive creation.
 ======================
 
 The :ref:`autotools* <ref-classes-autotools>` classes support packages built with the
-`GNU Autotools <https://en.wikipedia.org/wiki/GNU_Autotools>`__.
+:wikipedia:`GNU Autotools <GNU_Autotools>`.
 
 The ``autoconf``, ``automake``, and ``libtool`` packages bring
 standardization. This class defines a set of tasks (e.g. ``configure``,
@@ -373,8 +373,26 @@ support.
 ``create-spdx.bbclass``
 =======================
 
-The :ref:`create-spdx <ref-classes-create-spdx>` class provides support for automatically creating
-SPDX SBoM documents based upon image and SDK contents.
+The :ref:`create-spdx <ref-classes-create-spdx>` class provides support for
+automatically creating :term:`SPDX` :term:`SBOM` documents based upon image
+and SDK contents.
+
+This class is meant to be inherited globally from a configuration file::
+
+   INHERIT += "create-spdx"
+
+The toplevel :term:`SPDX` output file is generated in JSON format as a
+``IMAGE-MACHINE.spdx.json`` file in ``tmp/deploy/images/MACHINE/`` inside the
+:term:`Build Directory`. There are other related files in the same directory,
+as well as in ``tmp/deploy/spdx``.
+
+The exact behaviour of this class, and the amount of output can be controlled
+by the :term:`SPDX_PRETTY`, :term:`SPDX_ARCHIVE_PACKAGED`,
+:term:`SPDX_ARCHIVE_SOURCES` and :term:`SPDX_INCLUDE_SOURCES` variables.
+
+See the description of these variables and the
+":ref:`dev-manual/common-tasks:creating a software bill of materials`"
+section in the Yocto Project Development Manual for more details.
 
 .. _ref-classes-cross:
 
@@ -723,8 +741,8 @@ class.
 
 .. _ref-classes-github-releases:
 
-``github-releases``
-===================
+``github-releases.bbclass``
+===========================
 
 For recipes that fetch release tarballs from github, the :ref:`github-releases <ref-classes-github-releases>`
 class sets up a standard way for checking available upstream versions
@@ -959,7 +977,7 @@ Yocto Project Overview and Concepts Manual.
 
 The :ref:`image-buildinfo <ref-classes-image-buildinfo>` class writes a plain text file containing
 build information to the target filesystem at ``${sysconfdir}/buildinfo``
-by default (as specified by :term:`IMAGE_BUILDINFO_FILE`.
+by default (as specified by :term:`IMAGE_BUILDINFO_FILE`).
 This can be useful for manually determining the origin of any given
 image. It writes out two sections:
 
@@ -1586,6 +1604,27 @@ The :ref:`mime <ref-classes-mime>` class generates the proper post-install and p
 These scriptlets call ``update-mime-database`` to add the MIME types to
 the shared database.
 
+.. _ref-classes-mime-xdg:
+
+``mime-xdg.bbclass``
+====================
+
+The :ref:`mime-xdg <ref-classes-mime-xdg>` class generates the proper
+post-install and post-remove (postinst/postrm) scriptlets for packages
+that install ``.desktop`` files containing ``MimeType`` entries.
+These scriptlets call ``update-desktop-database`` to add the MIME types
+to the database of MIME types handled by desktop files.
+
+Thanks to this class, when users open a file through a file browser
+on recently created images, they don't have to choose the application
+to open the file from the pool of all known applications, even the ones
+that cannot open the selected file.
+
+If you have recipes installing their ``.desktop`` files as absolute
+symbolic links, the detection of such files cannot be done by the current
+implementation of this class. In this case, you have to add the corresponding
+package names to the :term:`MIME_XDG_PACKAGES` variable.
+
 .. _ref-classes-mirrors:
 
 ``mirrors.bbclass``
@@ -1736,8 +1775,8 @@ is not needed.
 ``npm.bbclass``
 ===============
 
-Provides support for building Node.js software fetched using the `node
-package manager (NPM) <https://en.wikipedia.org/wiki/Npm_(software)>`__.
+Provides support for building Node.js software fetched using the
+:wikipedia:`node package manager (NPM) <Npm_(software)>`.
 
 .. note::
 

@@ -18,12 +18,15 @@ RCONFLICTS:${PN} = "stress"
 
 inherit bash-completion
 
-do_compile:prepend() {
+EXTRA_OEMAKE = "VERBOSE=1"
+
+do_configure() {
     mkdir -p configs
     touch configs/HAVE_APPARMOR
+    oe_runmake makeconfig
 }
 
 do_install() {
-    oe_runmake DESTDIR=${D} install
+    oe_runmake DESTDIR=${D} BINDIR=${bindir} install
     ln -s stress-ng ${D}${bindir}/stress
 }

@@ -14,8 +14,6 @@ PACKAGECONFIG = "\
         zstd \
         "
 
-SRC_URI += "file://0001-sd-bus-Don-t-automatically-add-ObjectManager.patch"
-
 EXTRA_OEMESON:append = " -Ddns-servers=''"
 
 PACKAGES =+ "${PN}-catalog-extralocales"

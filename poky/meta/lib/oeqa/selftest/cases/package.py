@@ -135,8 +135,10 @@ class PackageTests(OESelftestTestCase):
                     self.logger.error("No debugging symbols found. GDB result:\n%s" % output)
                     return False
 
-                # Check debugging symbols works correctly
-                elif re.match(r"Breakpoint 1.*hello\.c.*4", l):
+                # Check debugging symbols works correctly. Don't look for a
+                # source file as optimisation can put the breakpoint inside
+                # stdio.h.
+                elif "Breakpoint 1 at" in l:
                     return True
 
             self.logger.error("GDB result:\n%d: %s", status, output)
@@ -151,25 +153,25 @@ class PackageTests(OESelftestTestCase):
                     self.fail('GDB %s failed' % binary)
 
     def test_preserve_ownership(self):
-        import os, stat, oe.cachedpath
         features = 'IMAGE_INSTALL:append = " selftest-chown"\n'
         self.write_config(features)
         bitbake("core-image-minimal")
 
-        sysconfdir = get_bb_var('sysconfdir', 'selftest-chown')
-        def check_ownership(qemu, gid, uid, path):
+        def check_ownership(qemu, expected_gid, expected_uid, path):
             self.logger.info("Check ownership of %s", path)
-            status, output = qemu.run_serial(r'/bin/stat -c "%U %G" ' + path, timeout=60)
-            output = output.split(" ")
-            if output[0] != uid or output[1] != gid :
-                self.logger.error("Incrrect ownership %s [%s:%s]", path, output[0], output[1])
-                return False
-            return True
+            status, output = qemu.run_serial('stat -c "%U %G" ' + path)
+            self.assertEqual(status, 1, "stat failed: " + output)
+            try:
+                uid, gid = output.split()
+                self.assertEqual(uid, expected_uid)
+                self.assertEqual(gid, expected_gid)
+            except ValueError:
+                self.fail("Cannot parse output: " + output)
 
+        sysconfdir = get_bb_var('sysconfdir', 'selftest-chown')
         with runqemu('core-image-minimal') as qemu:
             for path in [ sysconfdir + "/selftest-chown/file",
                           sysconfdir + "/selftest-chown/dir",
                           sysconfdir + "/selftest-chown/symlink",
                           sysconfdir + "/selftest-chown/fifotest/fifo"]:
-                if not check_ownership(qemu, "test", "test", path):
-                    self.fail('Test ownership %s failed' % path)
+                check_ownership(qemu, "test", "test", path)

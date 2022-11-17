@@ -125,8 +125,9 @@ available. Follow these general steps to run QEMU:
    -  This example specifies to boot an :term:`Initramfs` image and to
       enable audio in QEMU. For this case, ``runqemu`` sets the internal
       variable ``FSTYPE`` to ``cpio.gz``. Also, for audio to be enabled,
-      an appropriate driver must be installed (see the previous
-      description for the ``audio`` option for more information).
+      an appropriate driver must be installed (see the ``audio`` option
+      in :ref:`dev-manual/qemu:\`\`runqemu\`\` command-line options`
+      for more information).
       ::
 
          $ runqemu qemux86-64 ramfs audio

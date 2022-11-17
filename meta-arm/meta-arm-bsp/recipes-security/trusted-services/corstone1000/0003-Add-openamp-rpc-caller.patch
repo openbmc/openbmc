@@ -1,7 +1,7 @@
-From e187510a814b48b7b2e477a9913ee35b68522d06 Mon Sep 17 00:00:00 2001
+From 55394c4c9681af71b1ed7f7ebc7c44b2e1737113 Mon Sep 17 00:00:00 2001
 From: Vishnu Banavath <vishnu.banavath@arm.com>
 Date: Fri, 3 Dec 2021 19:00:54 +0000
-Subject: [PATCH 03/19] Add openamp rpc caller
+Subject: [PATCH 03/20] Add openamp rpc caller
 
 Upstream-Status: Pending
 Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
@@ -1192,5 +1192,5 @@ index d39873a0fe81..34fe5ff1b925 100644
  		# Stub service provider backends
  		"components/rpc/dummy"
 -- 
-2.38.0
+2.38.1
 

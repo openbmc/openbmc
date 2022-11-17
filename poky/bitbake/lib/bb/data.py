@@ -4,14 +4,16 @@ BitBake 'Data' implementations
 Functions for interacting with the data structure used by the
 BitBake build tools.
 
-The expandKeys and update_data are the most expensive
-operations. At night the cookie monster came by and
+expandKeys and datastore iteration are the most expensive
+operations. Updating overrides is now "on the fly" but still based
+on the idea of the cookie monster introduced by zecke:
+"At night the cookie monster came by and
 suggested 'give me cookies on setting the variables and
 things will work out'. Taking this suggestion into account
 applying the skills from the not yet passed 'Entwurf und
 Analyse von Algorithmen' lecture and the cookie
 monster seems to be right. We will track setVar more carefully
-to have faster update_data and expandKeys operations.
+to have faster datastore operations."
 
 This is a trade-off between speed and memory again but
 the speed is more critical here.
@@ -69,10 +71,6 @@ def initVar(var, d):
 def keys(d):
     """Return a list of keys in d"""
     return d.keys()
-
-
-__expand_var_regexp__ = re.compile(r"\${[^{}]+}")
-__expand_python_regexp__ = re.compile(r"\${@.+?}")
 
 def expand(s, d, varname = None):
     """Variable expansion using the data store"""
@@ -267,10 +265,6 @@ def emit_func_python(func, o=sys.__stdout__, d = init()):
                newdeps |= pp.execs
                newdeps |= set((d.getVarFlag(dep, "vardeps") or "").split())
         newdeps -= seen
-
-def update_data(d):
-    """Performs final steps upon the datastore, including application of overrides"""
-    d.finalize(parent = True)
 
 def build_dependencies(key, keys, shelldeps, varflagsexcl, ignored_vars, d):
     deps = set()

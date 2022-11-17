@@ -32,6 +32,12 @@ def sstate_rundepfilter(siggen, fn, recipename, task, dep, depname, dataCaches):
     depmc, _, deptaskname, depmcfn = bb.runqueue.split_tid_mcfn(dep)
     mc, _ = bb.runqueue.split_mc(fn)
 
+    # We can skip the rm_work task signature to avoid running the task
+    # when we remove some tasks from the dependencie chain
+    # i.e INHERIT:remove = "create-spdx" will trigger the do_rm_work
+    if task == "do_rm_work":
+        return False
+
     # Keep all dependencies between SPDX tasks in the signature. SPDX documents
     # are linked together by hashes, which means if a dependent document changes,
     # all downstream documents must be re-written (even if they are "safe"

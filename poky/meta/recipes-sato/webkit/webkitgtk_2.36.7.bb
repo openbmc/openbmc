@@ -43,7 +43,7 @@ DEPENDS = " \
           gstreamer1.0-plugins-base \
           "
 
-PACKAGECONFIG_SOUP ?= "soup2"
+PACKAGECONFIG_SOUP ?= "soup3"
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd wayland x11', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'x11 opengl', 'webgl opengl', '', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', '', 'webgl gles2', d)} \

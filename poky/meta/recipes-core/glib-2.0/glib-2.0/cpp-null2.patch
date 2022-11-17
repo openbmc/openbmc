@@ -1,0 +1,31 @@
+From 7dc19632f3115e3f517c6bc80436fe72c1dcdeb4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marco=20Trevisan=20=28Trevi=C3=B1o=29?= <mail@3v1n0.net>
+Date: Sat, 29 Oct 2022 04:16:00 +0200
+Subject: [PATCH] glib/tests/cxx: Ensure NULL is always casted to a pointer
+ type
+
+Otherwise it may not be recognized as valid sentinel
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/commit/7dc19632f3115e3f517c6bc80436fe72c1dcdeb4]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ glib/tests/cxx.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/glib/tests/cxx.cpp b/glib/tests/cxx.cpp
+index 045457c6e2..aa5e0cb576 100644
+--- a/glib/tests/cxx.cpp
++++ b/glib/tests/cxx.cpp
+@@ -186,7 +186,11 @@ test_steal_pointer (void)
+ int
+ main (int argc, char *argv[])
+ {
++#if __cplusplus >= 201103L
+   g_test_init (&argc, &argv, NULL);
++#else
++  g_test_init (&argc, &argv, static_cast<void *>(NULL));
++#endif
+ 
+   g_test_add_func ("/C++/typeof", test_typeof);
+   g_test_add_func ("/C++/atomic-pointer-compare-and-exchange", test_atomic_pointer_compare_and_exchange);
+-- 
+GitLab

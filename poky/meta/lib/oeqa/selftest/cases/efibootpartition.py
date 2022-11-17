@@ -5,42 +5,29 @@
 # SPDX-License-Identifier: MIT
 #
 
-import re
-
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import bitbake, runqemu, get_bb_var
+from oeqa.utils.commands import bitbake, runqemu
+from oeqa.core.decorator.data import skipIfNotMachine
+import oe.types
 
 class GenericEFITest(OESelftestTestCase):
     """EFI booting test class"""
+    @skipIfNotMachine("qemux86-64", "test is qemux86-64 specific currently")
+    def test_boot_efi(self):
+        cmd = "runqemu nographic serial wic ovmf"
+        if oe.types.qemu_use_kvm(self.td['QEMU_USE_KVM'], self.td["TARGET_ARCH"]):
+            cmd += " kvm"
+        image = "core-image-minimal"
 
-    cmd_common = "runqemu nographic serial wic ovmf"
-    efi_provider = "systemd-boot"
-    image = "core-image-minimal"
-    machine = "qemux86-64"
-    recipes_built = False
-
-    @classmethod
-    def setUpLocal(self):
-        super(GenericEFITest, self).setUpLocal(self)
-
-        self.write_config(self,
-"""
-EFI_PROVIDER = "%s"
+        self.write_config("""
+EFI_PROVIDER = "systemd-boot"
 IMAGE_FSTYPES:pn-%s:append = " wic"
-MACHINE = "%s"
 MACHINE_FEATURES:append = " efi"
 WKS_FILE = "efi-bootdisk.wks.in"
 IMAGE_INSTALL:append = " grub-efi systemd-boot kernel-image-bzimage"
 """
-% (self.efi_provider, self.image, self.machine))
-        if not self.recipes_built:
-            bitbake("ovmf")
-            bitbake(self.image)
-            self.recipes_built = True
+% (image))
 
-    @classmethod
-    def test_boot_efi(self):
-        """Test generic boot partition with qemu"""
-        cmd = "%s %s" % (self.cmd_common, self.machine)
-        with runqemu(self.image, ssh=False, launch_cmd=cmd) as qemu:
+        bitbake(image + " ovmf")
+        with runqemu(image, ssh=False, launch_cmd=cmd) as qemu:
             self.assertTrue(qemu.runner.logged, "Failed: %s" % cmd)

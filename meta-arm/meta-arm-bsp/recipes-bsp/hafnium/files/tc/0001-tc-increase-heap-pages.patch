@@ -1,0 +1,27 @@
+From 613dea068fa546956717ce0b60328e39d451f661 Mon Sep 17 00:00:00 2001
+From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+Date: Fri, 29 Apr 2022 20:07:50 +0100
+Subject: [PATCH] tc: increase heap pages
+
+Upstream-Status: Pending
+Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+---
+ BUILD.gn | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/BUILD.gn b/BUILD.gn
+index 6b9b383..62ba763 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -235,7 +235,7 @@ aarch64_toolchains("secure_tc") {
+   gicd_base_address = "0x30000000"
+   gicr_base_address = "0x30080000"
+   gicr_frames = 8
+-  heap_pages = 60
++  heap_pages = 120
+   max_cpus = 8
+   max_vms = 16
+   branch_protection = "standard"
+-- 
+2.30.2
+

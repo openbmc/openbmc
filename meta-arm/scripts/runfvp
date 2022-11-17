@@ -1,10 +1,11 @@
 #! /usr/bin/env python3
 
-import asyncio
+import itertools
 import os
 import pathlib
 import signal
 import sys
+import threading
 
 import logging
 logger = logging.getLogger("RunFVP")
@@ -37,7 +38,8 @@ def parse_args(arguments):
         fvp_args = []
 
     args = parser.parse_args(args=arguments)
-    logging.basicConfig(level=args.verbose and logging.DEBUG or logging.WARNING)
+    logging.basicConfig(level=args.verbose and logging.DEBUG or logging.WARNING,
+                        format='\033[G%(levelname)s: %(message)s')
 
     # If we're hooking up the console, don't start any terminals
     if args.console:
@@ -47,27 +49,37 @@ def parse_args(arguments):
     logger.debug(f"FVP arguments: {fvp_args}")
     return args, fvp_args
 
-
-async def start_fvp(args, config, extra_args):
+def start_fvp(args, config, extra_args):
     fvp = runner.FVPRunner(logger)
     try:
-        await fvp.start(config, extra_args, args.terminals)
+        fvp.start(config, extra_args, args.terminals)
 
         if args.console:
-            fvp.add_line_callback(lambda line: logger.debug(f"FVP output: {line}"))
             expected_terminal = config["consoles"]["default"]
             if not expected_terminal:
                 logger.error("--console used but FVP_CONSOLE not set in machine configuration")
                 return 1
-            telnet = await fvp.create_telnet(expected_terminal)
-            await telnet.wait()
+            port_stdout, log_stdout = itertools.tee(fvp.stdout, 2)
+            parser = runner.ConsolePortParser(port_stdout)
+            port = parser.parse_port(expected_terminal)
+
+            def debug_log():
+                for line in log_stdout:
+                    line = line.strip().decode(errors='ignore')
+                    logger.debug(f'FVP output: {line}')
+            log_thread = threading.Thread(None, debug_log)
+            log_thread.start()
+
+            telnet = fvp.create_telnet(port)
+            telnet.wait()
             logger.debug(f"Telnet quit, cancelling tasks")
         else:
-            fvp.add_line_callback(lambda line: print(line))
-            await fvp.run()
+            for line in fvp.stdout:
+                print(line.strip().decode(errors='ignore'))
 
     finally:
-        await fvp.stop()
+        fvp.stop()
+
 
 def runfvp(cli_args):
     args, extra_args = parse_args(cli_args)
@@ -77,14 +89,8 @@ def runfvp(cli_args):
         config_file = conffile.find(args.config)
     logger.debug(f"Loading {config_file}")
     config = conffile.load(config_file)
+    start_fvp(args, config, extra_args)
 
-    try:
-        # When we can assume Py3.7+, this can simply be asyncio.run()
-        loop = asyncio.get_event_loop()
-        return loop.run_until_complete(start_fvp(args, config, extra_args))
-    except asyncio.CancelledError:
-        # This means telnet exited, which isn't an error
-        return 0
 
 if __name__ == "__main__":
     try:

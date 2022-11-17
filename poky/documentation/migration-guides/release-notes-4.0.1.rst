@@ -182,7 +182,7 @@ Repositories / Downloads for 4.0.1
 
 poky
 
--  Repository Location: https://git.yoctoproject.org/git/poky
+-  Repository Location: :yocto_git:`/poky`
 -  Branch: :yocto_git:`kirkstone </poky/log/?h=kirkstone>`
 -  Tag: :yocto_git:`yocto-4.0.1 </poky/tag/?h=yocto-4.0.1>`
 -  Git Revision: :yocto_git:`8c489602f218bcf21de0d3c9f8cf620ea5f06430 </poky/commit/?id=8c489602f218bcf21de0d3c9f8cf620ea5f06430>`
@@ -206,7 +206,7 @@ openembedded-core
 
 meta-mingw
 
--  Repository Location: https://git.yoctoproject.org/git/meta-mingw
+-  Repository Location: :yocto_git:`/meta-mingw`
 -  Branch: :yocto_git:`kirkstone </meta-mingw/log/?h=kirkstone>`
 -  Tag: :yocto_git:`yocto-4.0.1 </meta-mingw/tag/?h=yocto-4.0.1>`
 -  Git Revision: :yocto_git:`a90614a6498c3345704e9611f2842eb933dc51c1 </meta-mingw/commit/?id=a90614a6498c3345704e9611f2842eb933dc51c1>`
@@ -218,7 +218,7 @@ meta-mingw
 
 meta-gplv2
 
--  Repository Location: https://git.yoctoproject.org/git/meta-gplv2
+-  Repository Location: :yocto_git:`/meta-gplv2`
 -  Branch: :yocto_git:`kirkstone </meta-gplv2/log/?h=kirkstone>`
 -  Tag: :yocto_git:`yocto-4.0.1 </meta-gplv2/tag/?h=yocto-4.0.1>`
 -  Git Revision: :yocto_git:`d2f8b5cdb285b72a4ed93450f6703ca27aa42e8a </meta-mingw/commit/?id=d2f8b5cdb285b72a4ed93450f6703ca27aa42e8a>`
@@ -242,7 +242,7 @@ bitbake
 
 yocto-docs
 
--  Repository Location: https://git.yoctoproject.org/git/yocto-docs
+-  Repository Location: :yocto_git:`/yocto-docs`
 -  Branch: :yocto_git:`kirkstone </yocto-docs/log/?h=kirkstone>`
 -  Tag: :yocto_git:`yocto-4.0.1 </yocto-docs/tag/?h=yocto-4.0>`
 -  Git Revision: :yocto_git:`4ec9df3336a425719a9a35532504731ce56984ca </yocto-docs/commit/?id=4ec9df3336a425719a9a35532504731ce56984ca>`

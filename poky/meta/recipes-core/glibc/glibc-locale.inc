@@ -5,14 +5,9 @@ SUMMARY = "Locale data from glibc"
 BPN = "glibc"
 LOCALEBASEPN = "${MLPREFIX}glibc"
 
-# glibc-collateral.inc inhibits all default deps, but do_package needs objcopy
-# ERROR: objcopy failed with exit code 127 (cmd was 'i586-webos-linux-objcopy' --only-keep-debug 'glibc-locale/2.17-r0/package/usr/lib/gconv/IBM1166.so' 'glibc-locale/2.17-r0/package/usr/lib/gconv/.debug/IBM1166.so')
-# ERROR: Function failed: split_and_strip_files
-BINUTILSDEP = "virtual/${MLPREFIX}${TARGET_PREFIX}binutils:do_populate_sysroot"
-BINUTILSDEP:class-nativesdk = "virtual/${TARGET_PREFIX}binutils-crosssdk:do_populate_sysroot"
-do_package[depends] += "${BINUTILSDEP}"
-
-DEPENDS += "virtual/libc"
+# Do not inhibit default deps, do_package requires binutils/gcc for
+# objcopy/gcc-nm and glibc-locale depends on virtual/libc directly.
+INHIBIT_DEFAULT_DEPS = ""
 
 # Binary locales are generated at build time if ENABLE_BINARY_LOCALE_GENERATION
 # is set. The idea is to avoid running localedef on the target (at first boot)

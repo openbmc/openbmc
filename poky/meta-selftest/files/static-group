@@ -23,3 +23,4 @@ _apt:x:523:
 weston-launch:x:524:
 weston:x:525:
 wayland:x:526:
+render:x:527:

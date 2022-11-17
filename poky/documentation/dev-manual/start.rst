@@ -273,7 +273,7 @@ For Linux (WSL 2).
 .. note::
 
    The Yocto Project is not compatible with version 1 of
-   `Windows Subsystem for Linux <https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux>`__.
+   :wikipedia:`Windows Subsystem for Linux <Windows_Subsystem_for_Linux>`.
    It is compatible but neither officially supported nor validated with
    WSL 2. If you still decide to use WSL please upgrade to
    `WSL 2 <https://learn.microsoft.com/en-us/windows/wsl/install>`__.

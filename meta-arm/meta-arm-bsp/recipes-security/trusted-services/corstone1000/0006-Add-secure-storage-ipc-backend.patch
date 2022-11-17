@@ -1,7 +1,7 @@
-From 0df82487a7a253c601ca20ca1bd64fbb9ed64230 Mon Sep 17 00:00:00 2001
+From ed4371d63cb52c121be9678bc225055944286c30 Mon Sep 17 00:00:00 2001
 From: Vishnu Banavath <vishnu.banavath@arm.com>
 Date: Fri, 3 Dec 2021 19:19:24 +0000
-Subject: [PATCH 06/19] Add secure storage ipc backend
+Subject: [PATCH 06/20] Add secure storage ipc backend
 
 Add secure storage ipc ff-m implementation which may use
 openamp as rpc to communicate with other processor.
@@ -519,5 +519,5 @@ index dd0c5d00c21e..cd51460406ca 100644
  		"components/service/attestation/provider"
  		"components/service/attestation/provider/serializer/packed-c"
 -- 
-2.38.0
+2.38.1
 

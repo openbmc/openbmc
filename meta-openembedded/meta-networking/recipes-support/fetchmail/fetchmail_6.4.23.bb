@@ -18,5 +18,9 @@ inherit autotools gettext pkgconfig python3-dir python3native
 
 EXTRA_OECONF = "--with-ssl=${STAGING_DIR_HOST}${prefix}"
 
+do_install:append() {
+    sed -i 's,${RECIPE_SYSROOT_NATIVE},,g' ${D}${bindir}/fetchmailconf
+}
+
 PACKAGES =+ "fetchmail-python"
 FILES:fetchmail-python = "${libdir}/${PYTHON_DIR}/*"

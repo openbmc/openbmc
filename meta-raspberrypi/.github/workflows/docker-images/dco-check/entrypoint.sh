@@ -16,6 +16,14 @@ GIT_REPO_PATH="/work"
 [ -d "$GIT_REPO_PATH/.git" ] ||
 	error "Can't find a git checkout under $GIT_REPO_PATH ."
 cd "$GIT_REPO_PATH"
+
+# The GitHub runner user and the container user might differ making git error
+# out with:
+# 	error: fatal: detected dubious ownership in repository at '/work'
+# Avoid this as the security risk is minimum here while guarding the git hooks
+# via PRs.
+git config --global --add safe.directory /work
+
 dco-check \
 	--verbose \
 	--default-branch "origin/$BASE_REF"

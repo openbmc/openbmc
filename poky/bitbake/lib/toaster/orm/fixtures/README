@@ -27,4 +27,4 @@ Data can be provided in XML, JSON and if installed YAML formats.
 
 Use the django management command manage.py loaddata <your fixture file>
 For further information see the Django command documentation at:
-https://docs.djangoproject.com/en/1.8/ref/django-admin/#django-admin-loaddata
+https://docs.djangoproject.com/en/3.2/ref/django-admin/#django-admin-loaddata

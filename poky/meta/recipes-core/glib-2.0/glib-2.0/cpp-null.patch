@@ -1,0 +1,77 @@
+From 0ca5254c5d92aec675b76b4bfa72a6885cde6066 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marco=20Trevisan=20=28Trevi=C3=B1o=29?= <mail@3v1n0.net>
+Date: Sat, 29 Oct 2022 04:30:52 +0200
+Subject: [PATCH] glib/gmacros: Always define NULL as nullptr in C++11 and
+ newer
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/commit/0ca5254c5d92aec675b76b4bfa72a6885cde6066]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ glib/gmacros.h     |  9 ++++++++-
+ glib/tests/cxx.cpp | 13 -------------
+ 2 files changed, 8 insertions(+), 14 deletions(-)
+
+diff --git a/glib/gmacros.h b/glib/gmacros.h
+index 5302841105..9fe8270822 100644
+--- a/glib/gmacros.h
++++ b/glib/gmacros.h
+@@ -870,10 +870,17 @@
+  */
+ #ifndef NULL
+ #  ifdef __cplusplus
+-#  define NULL        (0L)
++#    if __cplusplus >= 201103L
++#      define NULL (nullptr)
++#    else
++#      define NULL (0L)
++#    endif /* __cplusplus >= 201103L */
+ #  else /* !__cplusplus */
+ #  define NULL        ((void*) 0)
+ #  endif /* !__cplusplus */
++#elif defined (__cplusplus) && __cplusplus >= 201103L
++#  undef NULL
++#  define NULL (nullptr)
+ #endif
+ 
+ #ifndef	FALSE
+diff --git a/glib/tests/cxx.cpp b/glib/tests/cxx.cpp
+index 6ac60791c8..045457c6e2 100644
+--- a/glib/tests/cxx.cpp
++++ b/glib/tests/cxx.cpp
+@@ -34,21 +34,12 @@ test_typeof (void)
+   MyObject *obj3 = g_atomic_pointer_get (&obj2);
+   g_assert_true (obj3 == obj);
+ 
+-#if __cplusplus >= 201103L
+-  MyObject *obj4 = nullptr;
+-#else
+   MyObject *obj4 = NULL;
+-#endif
+   g_atomic_pointer_set (&obj4, obj3);
+   g_assert_true (obj4 == obj);
+ 
+-#if __cplusplus >= 201103L
+-  MyObject *obj5 = nullptr;
+-  g_atomic_pointer_compare_and_exchange (&obj5, nullptr, obj4);
+-#else
+   MyObject *obj5 = NULL;
+   g_atomic_pointer_compare_and_exchange (&obj5, NULL, obj4);
+-#endif
+   g_assert_true (obj5 == obj);
+ 
+   MyObject *obj6 = g_steal_pointer (&obj5);
+@@ -195,11 +186,7 @@ test_steal_pointer (void)
+ int
+ main (int argc, char *argv[])
+ {
+-#if __cplusplus >= 201103L
+-  g_test_init (&argc, &argv, nullptr);
+-#else
+   g_test_init (&argc, &argv, NULL);
+-#endif
+ 
+   g_test_add_func ("/C++/typeof", test_typeof);
+   g_test_add_func ("/C++/atomic-pointer-compare-and-exchange", test_atomic_pointer_compare_and_exchange);
+-- 
+GitLab
+

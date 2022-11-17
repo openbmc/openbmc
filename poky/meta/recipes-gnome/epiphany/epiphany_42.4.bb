@@ -30,7 +30,7 @@ SRC_URI = "${GNOME_MIRROR}/${GNOMEBN}/${@oe.utils.trim_version("${PV}", 1)}/${GN
            "
 SRC_URI[archive.sha256sum] = "370938ad2920eeb28bc2435944776b7ba55a0e2ede65836f79818cfb7e8f0860"
 
-PACKAGECONFIG_SOUP ?= "soup2"
+PACKAGECONFIG_SOUP ?= "soup3"
 PACKAGECONFIG ??= "${PACKAGECONFIG_SOUP}"
 
 # Developer mode enables debugging

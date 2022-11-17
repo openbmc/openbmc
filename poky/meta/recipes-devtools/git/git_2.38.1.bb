@@ -71,7 +71,8 @@ do_install () {
 	install -m 644 ${S}/contrib/completion/git-completion.bash ${D}/${datadir}/bash-completion/completions/git
 
         if [ "${@bb.utils.filter('PACKAGECONFIG', 'manpages', d)}" ]; then
-            oe_runmake install-man DESTDIR="${D}"
+            # Needs to be serial with make 4.4 due to https://savannah.gnu.org/bugs/index.php?63362
+            make install-man DESTDIR="${D}"
         fi
 }
 

@@ -1,3 +1,8 @@
+From d1bf23817afffd5917b74da6946e0c3b7e63e336 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 28 Dec 2020 21:04:27 +0100
+Subject: [PATCH] bash: update 5.0 -> 5.1
+
 Including m4 files directly like this confuses autotools.bbclass, remove
 the references and rely upon aclocal to collect the m4 files together
 as needed instead making it work like other autotools based projects.
@@ -5,16 +10,22 @@ as needed instead making it work like other autotools based projects.
 Upstream-Status: Inappropriate [OE configuration specific]
 RP 2021/1/20
 
-Index: bash-5.1/configure.ac
-===================================================================
---- bash-5.1.orig/configure.ac
-+++ bash-5.1/configure.ac
-@@ -688,47 +688,6 @@ if test x$SIZE = x; then
+---
+ configure.ac | 43 -------------------------------------------
+ 1 file changed, 43 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 50a6e20..a3b5bd7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -710,49 +710,6 @@ if test x$SIZE = x; then
  fi
  AC_SUBST(SIZE)
  
 -m4_include([m4/stat-time.m4])
 -m4_include([m4/timespec.m4])
+-
+-m4_include([m4/strtoimax.m4])
 -
 -dnl include files for gettext
 -
@@ -54,6 +65,6 @@ Index: bash-5.1/configure.ac
 -m4_include([m4/wint_t.m4])
 -m4_include([m4/xsize.m4])
 -
- dnl Turn on any extensions available in the GNU C library.
- AC_DEFINE(_GNU_SOURCE, 1)
- 
+ dnl C compiler characteristics
+ AC_C_CONST
+ AC_C_INLINE

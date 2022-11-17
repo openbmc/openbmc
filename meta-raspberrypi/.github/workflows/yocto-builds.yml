@@ -38,7 +38,7 @@ jobs:
       SSTATE_DIR: /var/lib/ci/yocto/sstate
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Define Yocto build files

@@ -108,7 +108,7 @@ Packaging Changes
 
 The following packaging changes have occurred.
 
--  The `Epiphany <https://en.wikipedia.org/wiki/GNOME_Web>`__ browser
+-  The :wikipedia:`Epiphany <GNOME_Web>` browser
    has been dropped from ``packagegroup-self-hosted`` as it has not been
    needed inside ``build-appliance-image`` for quite some time and was
    causing resource problems.

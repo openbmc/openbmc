@@ -60,6 +60,15 @@ class DataExpansions(unittest.TestCase):
         val = self.d.expand("${@5*12}")
         self.assertEqual(str(val), "60")
 
+    def test_python_snippet_w_dict(self):
+        val = self.d.expand("${@{ 'green': 1, 'blue': 2 }['green']}")
+        self.assertEqual(str(val), "1")
+
+    def test_python_unexpanded_multi(self):
+        self.d.setVar("bar", "${unsetvar}")
+        val = self.d.expand("${@2*2},${foo},${@d.getVar('foo') + ' ${bar}'},${foo}")
+        self.assertEqual(str(val), "4,value_of_foo,${@d.getVar('foo') + ' ${unsetvar}'},value_of_foo")
+
     def test_expand_in_python_snippet(self):
         val = self.d.expand("${@'boo ' + '${foo}'}")
         self.assertEqual(str(val), "boo value_of_foo")

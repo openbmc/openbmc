@@ -1,7 +1,7 @@
-From e9778f726ed582360152f150301995b10d268aae Mon Sep 17 00:00:00 2001
+From 0311fc8f131fe7a2b0f4dd9988c610fda47394aa Mon Sep 17 00:00:00 2001
 From: Vishnu Banavath <vishnu.banavath@arm.com>
 Date: Fri, 3 Dec 2021 19:13:03 +0000
-Subject: [PATCH 05/19] Add common service component to ipc support
+Subject: [PATCH 05/20] Add common service component to ipc support
 
 Add support for inter processor communication for PSA
 including, the openamp client side structures lib.
@@ -291,5 +291,5 @@ index 34fe5ff1b925..dd0c5d00c21e 100644
  		"components/service/discovery/provider"
  		"components/service/discovery/provider/serializer/packed-c"
 -- 
-2.38.0
+2.38.1
 

@@ -74,8 +74,7 @@ simple JSON files.
    The project uses Buildbot for historical reasons but also because
    many of the project developers have knowledge of Python. It is
    possible to use the outer layers from another Continuous Integration
-   (CI) system such as
-   `Jenkins <https://en.wikipedia.org/wiki/Jenkins_(software)>`__
+   (CI) system such as :wikipedia:`Jenkins <Jenkins_(software)>`
    instead of Buildbot.
 
 The following figure shows the Yocto Project Autobuilder stack with a

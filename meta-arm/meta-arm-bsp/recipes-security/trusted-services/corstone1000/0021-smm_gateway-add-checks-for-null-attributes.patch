@@ -1,0 +1,35 @@
+From 6d3cac6f3a6e977e9330c9c06514a372ade170a2 Mon Sep 17 00:00:00 2001
+From: Emekcan <emekcan.aras@arm.com>
+Date: Wed, 2 Nov 2022 09:58:27 +0000
+Subject: [PATCH] smm_gateway: add checks for null attributes
+
+As par EDK-2 and EDK-2 test code, setVariable() with 0 
+attributes means a delete variable request. Currently, 
+smm gatway doesn't handle this scenario. This commit adds
+that support.
+
+Upstream-Status: Pending
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+---
+ components/service/smm_variable/backend/uefi_variable_store.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/components/service/smm_variable/backend/uefi_variable_store.c b/components/service/smm_variable/backend/uefi_variable_store.c
+index 6c3b9ed8..a691dc5d 100644
+--- a/components/service/smm_variable/backend/uefi_variable_store.c
++++ b/components/service/smm_variable/backend/uefi_variable_store.c
+@@ -202,9 +202,9 @@ efi_status_t uefi_variable_store_set_variable(
+ 		if (info->is_variable_set) {
+ 
+ 			/* It's a request to update to an existing variable */
+-			if (!(var->Attributes &
++			if (!(var->Attributes) || (!(var->Attributes &
+ 				(EFI_VARIABLE_APPEND_WRITE | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS_MASK)) &&
+-				!var->DataSize) {
++				!var->DataSize)) {
+ 
+ 				/* It's a remove operation - for a remove, the variable
+ 				 * data must be removed from the storage backend before
+-- 
+2.17.1
+
