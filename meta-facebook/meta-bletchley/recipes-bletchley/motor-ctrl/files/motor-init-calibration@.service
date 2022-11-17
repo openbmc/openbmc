@@ -1,7 +1,7 @@
 [Unit]
 Description=Motor Initialize for sled%i
 StartLimitIntervalSec=90
-StartLimitBurst=5
+StartLimitBurst=2
 Requires=phosphor-gpio-presence@presence-sled%i.service
 After=phosphor-gpio-presence@presence-sled%i.service
 Wants=mapper-wait@-xyz-openbmc_project-inventory-system-chassis-presence-presence_sled%i.service
