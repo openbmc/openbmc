@@ -31,14 +31,26 @@ do_smpmpro_upgrade() {
 	then
 		echo "Turning the Chassis off"
 		obmcutil chassisoff
-		sleep 15
-		# Check if HOST was OFF
-		chassisstate_off=$(obmcutil chassisstate | awk -F. '{print $NF}')
-		if [ "$chassisstate_off" == 'On' ];
-		then
-			echo "Error : Failed turning the Chassis off"
-			exit
-		fi
+
+		# Wait 60s until Chassis is off
+		cnt=30
+		while [ "$cnt" -gt 0 ];
+		do
+			cnt=$((cnt - 1))
+			sleep 2
+			# Check if HOST was OFF
+			chassisstate_off=$(obmcutil chassisstate | awk -F. '{print $NF}')
+			if [ "$chassisstate_off" != 'On' ];
+			then
+				break
+			fi
+
+			if [ "$cnt" == "0" ];
+			then
+				echo "--- Error : Failed turning the Chassis off"
+				exit 1
+			fi
+		done
 	fi
 
 	if [[ $SECPRO == 1 ]]; then
@@ -73,6 +85,15 @@ do_smpmpro_upgrade() {
 	# 226 is BMC_GPIOAC2_SPI0_PROGRAM_SEL
 	gpioset 0 226=1
 
+	# Deassert SECPRO GPIO PINs
+        if [[ $SECPRO == 1 ]]; then
+                echo "De-asserting special GPIO PINs"
+                # 3 is S0_SPECIAL_BOOT
+                gpioset 0 3=0
+                # 66 is S1_SPECIAL_BOOT
+                gpioset 0 66=0
+        fi
+
 	if [ "$chassisstate" == 'On' ];
 	then
 		sleep 5
@@ -80,20 +101,6 @@ do_smpmpro_upgrade() {
 		obmcutil poweron
 	fi
 
-	# Deassert SECPRO GPIO PINs
-	if [[ $SECPRO == 1 ]]; then
-		chassisstate=$(obmcutil chassisstate | awk -F. '{print $NF}')
-		if [ "$chassisstate_off" == 'Off' ]; then
-			obmcutil poweron
-		fi
-
-		sleep 30s
-		echo "De-asserting special GPIO PINs"
-		# 3 is S0_SPECIAL_BOOT
-		gpioset 0 3=0
-		# 66 is S1_SPECIAL_BOOT
-		gpioset 0 66=0
-	fi
 }
 
 

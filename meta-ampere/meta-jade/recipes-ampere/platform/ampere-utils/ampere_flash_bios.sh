@@ -69,14 +69,26 @@ if [ "$chassisstate" == 'On' ];
 then
 	echo "--- Turning the Chassis off"
 	obmcutil chassisoff
-	sleep 10
-	# Check if HOST was OFF
-	chassisstate_off=$(obmcutil chassisstate | awk -F. '{print $NF}')
-	if [ "$chassisstate_off" == 'On' ];
-	then
-		echo "--- Error : Failed turning the Chassis off"
-		exit 1
-	fi
+
+	# Wait 60s until Chassis is off
+	cnt=30
+	while [ "$cnt" -gt 0 ];
+	do
+		cnt=$((cnt - 1))
+		sleep 2
+		# Check if HOST was OFF
+		chassisstate_off=$(obmcutil chassisstate | awk -F. '{print $NF}')
+		if [ "$chassisstate_off" != 'On' ];
+		then
+			break
+		fi
+
+		if [ "$cnt" == "0" ];
+		then
+			echo "--- Error : Failed turning the Chassis off"
+			exit 1
+		fi
+	done
 fi
 
 # Switch the host SPI bus to BMC"
