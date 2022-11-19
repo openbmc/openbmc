@@ -1,0 +1,8 @@
+[Unit]
+Description=Ampere Computing LLC host reboot
+Conflicts=obmc-chassis-poweron@0.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/ampere_power_util.sh mb host_reboot_wa
+SyslogIdentifier=ampere_host_reboot

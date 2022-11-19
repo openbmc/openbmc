@@ -5,7 +5,7 @@ source /usr/sbin/gpio-lib.sh
 
 # Usage of this utility
 function usage() {
-	echo "usage: power-util mb [status|shutdown_ack|force_reset|soft_off]";
+	echo "usage: power-util mb [status|shutdown_ack|force_reset|soft_off|host_reboot_wa]";
 }
 
 power_status() {
@@ -84,6 +84,24 @@ force_reset() {
 	gpio_name_set host0-sysreset-n 1
 }
 
+host_reboot_wa() {
+    busctl set-property xyz.openbmc_project.State.Chassis \
+        /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis \
+        RequestedPowerTransition s "xyz.openbmc_project.State.Chassis.Transition.Off"
+
+    while ( true )
+    do
+        if systemctl status obmc-power-off@0.target | grep "Active: active"; then
+            break;
+        fi
+        sleep 2
+    done
+    echo "The power is already Off."
+
+    busctl set-property xyz.openbmc_project.State.Host \
+        /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host \
+        RequestedHostTransition s "xyz.openbmc_project.State.Host.Transition.On"
+}
 
 if [ ! -d "/run/openbmc/" ]; then
 	mkdir -p "/run/openbmc/"
@@ -95,6 +113,8 @@ elif [ "$2" == "status" ]; then
 	power_status
 elif [ "$2" == "force_reset" ]; then
 	force_reset
+elif [ "$2" == "host_reboot_wa" ]; then
+	host_reboot_wa
 elif [ "$2" == "soft_off" ]; then
 	ret=$(soft_off)
 	if [ "$ret" == 0 ]; then

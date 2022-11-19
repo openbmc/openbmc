@@ -3,7 +3,7 @@
         "Name": "REBOOT_ACK",
         "LineName": "host0-reboot-ack-n",
         "EventMon": "FALLING",
-        "Target": "obmc-host-force-warm-reboot@0.target",
+        "Target": "ampere-host-reboot@0.service",
         "Continue": true
     },
     {
