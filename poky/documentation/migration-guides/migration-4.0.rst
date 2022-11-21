@@ -183,8 +183,8 @@ a new :term:`KERNEL_DEBUG_TIMESTAMPS` variable to "1".
 Supported host distribution changes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- Support for `AlmaLinux <https://en.wikipedia.org/wiki/AlmaLinux>`__
-  hosts replacing `CentOS <https://en.wikipedia.org/wiki/CentOS>`__.
+- Support for :wikipedia:`AlmaLinux <AlmaLinux>`
+  hosts replacing :wikipedia:`CentOS <CentOS>`.
   The following distribution versions were dropped: CentOS 8, Ubuntu 16.04 and Fedora 30, 31 and 32.
 
 - ``gcc`` version 7.5 is now required at minimum on the build host. For older

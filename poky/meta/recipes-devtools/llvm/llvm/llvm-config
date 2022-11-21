@@ -29,6 +29,15 @@ for arg in "$@"; do
     --ldflags)
       output="${output} ${LDFLAGS}"
       ;;
+    --shared-mode)
+      output="${output} shared"
+      ;;
+    --libs)
+      output="${output} -lLLVM"
+      ;;
+    --link-shared)
+      break
+      ;;
     *)
       remain="${remain} ${arg}"
       ;;

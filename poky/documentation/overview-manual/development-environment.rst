@@ -39,10 +39,9 @@ Linus Torvalds in 1991. Conversely, a good example of a non-open source
 project is the Windows family of operating systems developed by
 Microsoft Corporation.
 
-Wikipedia has a good historical description of the Open Source
-Philosophy `here <https://en.wikipedia.org/wiki/Open_source>`__. You can
-also find helpful information on how to participate in the Linux
-Community
+Wikipedia has a good :wikipedia:`historical description of the Open Source
+Philosophy <Open_source>`. You can also find helpful information on how
+to participate in the Linux Community
 `here <https://www.kernel.org/doc/html/latest/process/index.html>`__.
 
 The Development Host
@@ -608,18 +607,16 @@ licensing structures in place. License evolution for both Open Source
 and Free Software has an interesting history. If you are interested in
 this history, you can find basic information here:
 
--  `Open source license
-   history <https://en.wikipedia.org/wiki/Open-source_license>`__
+-  :wikipedia:`Open source license history <Open-source_license>`
 
--  `Free software license
-   history <https://en.wikipedia.org/wiki/Free_software_license>`__
+-  :wikipedia:`Free software license history <Free_software_license>`
 
 In general, the Yocto Project is broadly licensed under the
 Massachusetts Institute of Technology (MIT) License. MIT licensing
 permits the reuse of software within proprietary software as long as the
 license is distributed with that software. Patches to the Yocto Project
 follow the upstream licensing scheme. You can find information on the
-MIT license `here <https://en.wikipedia.org/wiki/MIT_License>`__.
+MIT license :wikipedia:`here <MIT_License>`.
 
 When you build an image using the Yocto Project, the build process uses
 a known list of licenses to ensure compliance. You can find this list in

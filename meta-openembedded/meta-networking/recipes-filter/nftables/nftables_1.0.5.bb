@@ -35,7 +35,7 @@ PACKAGES =+ "${PN}-python"
 FILES:${PN}-python = "${nonarch_libdir}/${PYTHON_DIR}"
 RDEPENDS:${PN}-python = "python3-core python3-json ${PN}"
 
-RDEPENDS:${PN}-ptest += " ${PN}-python make bash python3-core python3-ctypes python3-json python3-misc util-linux"
+RDEPENDS:${PN}-ptest += " ${PN}-python bash make iproute2 iputils-ping procps python3-core python3-ctypes python3-json python3-misc sed util-linux"
 
 TESTDIR = "tests"
 
@@ -50,4 +50,6 @@ do_install_ptest() {
     cp -rf ${S}/${TESTDIR} ${D}${PTEST_PATH}/${TESTDIR}
     sed -i 's#/usr/bin/python#/usr/bin/python3#' ${D}${PTEST_PATH}/${TESTDIR}/json_echo/run-test.py
     sed -i 's#/usr/bin/env python#/usr/bin/env python3#' ${D}${PTEST_PATH}/${TESTDIR}/py/nft-test.py
+    # handle multilib
+    sed -i s:@libdir@:${libdir}:g ${D}${PTEST_PATH}/run-ptest
 }

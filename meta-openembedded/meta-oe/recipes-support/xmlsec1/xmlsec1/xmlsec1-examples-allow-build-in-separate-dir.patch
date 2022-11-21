@@ -6,25 +6,27 @@ Subject: [PATCH] examples: allow build in separate dir
 Upstream-Status: Inappropriate [ OE specific ]
 
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
-
 ---
  examples/Makefile | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/examples/Makefile b/examples/Makefile
-index c1cbcca..3f1bd14 100644
+index cbc2661..e882b61 100644
 --- a/examples/Makefile
 +++ b/examples/Makefile
 @@ -12,8 +12,10 @@ ifndef CC
  CC	= gcc
  endif
  
--CFLAGS  += -I../include -g $(shell PKG_CONFIG_PATH=.. pkg-config --cflags xmlsec1 ) -DUNIX_SOCKETS
--LDLIBS += -L../src/.libs -g $(shell PKG_CONFIG_PATH=.. pkg-config --libs xmlsec1 )
+-CFLAGS  += -I../include -g $(shell PKG_CONFIG_PATH=.. pkg-config --cflags xmlsec1 ) -DUNIX_SOCKETS -Wall -Wextra
+-LDLIBS  += -L../src/.libs -g $(shell PKG_CONFIG_PATH=.. pkg-config --libs xmlsec1 )
 +top_srcdir = ..
 +top_builddir = ..
-+CFLAGS  += -I$(top_srcdir)/include -g $(shell PKG_CONFIG_PATH=$(top_srcdir) pkg-config --cflags xmlsec1 ) -DUNIX_SOCKETS
++CFLAGS  += -I$(top_srcdir)/include -g $(shell PKG_CONFIG_PATH=$(top_srcdir) pkg-config --cflags xmlsec1 ) -DUNIX_SOCKETS -Wall -Wextra
 +LDLIBS += -L$(top_builddir)/src/.libs -g $(shell PKG_CONFIG_PATH=$(top_srcdir) pkg-config --libs xmlsec1 )
  
  DESTDIR = /usr/share/xmlsec1
  install-ptest:
+-- 
+2.25.1
+

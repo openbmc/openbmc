@@ -1,7 +1,7 @@
-From 94770f9660154bb1157e19c11fb706889a81ae73 Mon Sep 17 00:00:00 2001
+From 4240977f7c38950f5edb316bb08ae05cb7b99875 Mon Sep 17 00:00:00 2001
 From: Satish Kumar <satish.kumar01@arm.com>
 Date: Thu, 9 Dec 2021 14:11:06 +0000
-Subject: [PATCH 11/19] Setup its backend as openamp rpc using secure storage
+Subject: [PATCH 11/20] Setup its backend as openamp rpc using secure storage
  ipc implementation.
 
 Upstream-Status: Pending
@@ -159,5 +159,5 @@ index 4b8cceccbe4d..1110ac46bf8b 100644
 +        return secure_storage_provider_init(&its_provider, backend);
  }
 -- 
-2.38.0
+2.38.1
 

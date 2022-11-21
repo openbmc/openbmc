@@ -1,0 +1,35 @@
+From 13f8ba5d5b699df1f88eeea859406daba6d6941f Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 8 Nov 2022 18:08:51 +0100
+Subject: [PATCH] tests/meson.build: install nofonts/fonts.conf as it is
+ required by tests
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/pango/-/merge_requests/654]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ tests/meson.build | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/tests/meson.build b/tests/meson.build
+index 8b4bfa38..6c1c461b 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -250,6 +250,10 @@ foreach d: test_items_data
+   installed_test_items_data += d + '.expected'
+ endforeach
+ 
++installed_test_nofonts_data = [
++  'nofonts/fonts.conf',
++]
++
+ installed_test_datadir = join_paths(pango_datadir, 'installed-tests', 'pango')
+ installed_test_bindir = join_paths(pango_libexecdir, 'installed-tests', 'pango')
+ 
+@@ -261,6 +265,7 @@ if get_option('install-tests')
+   install_data(installed_test_breaks_data, install_dir: join_paths(installed_test_bindir, 'breaks'))
+   install_data(installed_test_items_data, install_dir: join_paths(installed_test_bindir, 'itemize'))
+   install_data(installed_test_fontsets_data, install_dir: join_paths(installed_test_bindir, 'fontsets'))
++  install_data(installed_test_nofonts_data, install_dir: join_paths(installed_test_bindir, 'nofonts'))
+ endif
+ 
+ gen_installed_test = files([ 'gen-installed-test.py' ])

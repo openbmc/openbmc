@@ -5,16 +5,11 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=0fca02217a5d49a14dfe2d11837bb34d"
 
 SRC_URI = "git://gn.googlesource.com/gn;protocol=https;branch=main"
-SRCREV = "69ec4fca1fa69ddadae13f9e6b7507efa0675263"
+SRCREV = "bf4e17dc67b2a2007475415e3f9e1d1cf32f6e35"
 PV = "0+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
-
-# Currently fails to build with clang, eg:
-# https://errors.yoctoproject.org/Errors/Details/610602/
-# https://errors.yoctoproject.org/Errors/Details/610486/
-TOOLCHAIN = "gcc"
 
 # Map from our _OS strings to the GN's platform values.
 def gn_platform(variable, d):

@@ -1,7 +1,7 @@
-From e4ccb92f8de94a82edd3548d62c853790ae36bd1 Mon Sep 17 00:00:00 2001
+From 28aedac78016e5063ebd675a43e6c3655f87b442 Mon Sep 17 00:00:00 2001
 From: Vishnu Banavath <vishnu.banavath@arm.com>
 Date: Fri, 3 Dec 2021 18:00:46 +0000
-Subject: [PATCH 02/19] Implement mhu driver and the OpenAmp conversion layer.
+Subject: [PATCH 02/20] Implement mhu driver and the OpenAmp conversion layer.
 
 This commit adds an mhu driver (v2.1 and v2) to the secure
 partition se_proxy and a conversion layer to communicate with
@@ -1087,5 +1087,5 @@ index 000000000000..bb778bb9719b
 +# include MHU driver
 +include(${TS_ROOT}/platform/drivers/arm/mhu_driver/component.cmake)
 -- 
-2.38.0
+2.38.1
 

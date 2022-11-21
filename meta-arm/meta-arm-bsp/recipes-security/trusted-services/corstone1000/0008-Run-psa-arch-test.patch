@@ -1,7 +1,7 @@
-From d9169d380366afc63af5d4bf02791aeb41f47897 Mon Sep 17 00:00:00 2001
+From 1b50ab6b6ff1c6f27ab320e18fb0d4aeb1122f0d Mon Sep 17 00:00:00 2001
 From: Satish Kumar <satish.kumar01@arm.com>
 Date: Sun, 12 Dec 2021 10:43:48 +0000
-Subject: [PATCH 08/19] Run psa-arch-test
+Subject: [PATCH 08/20] Run psa-arch-test
 
 Fixes needed to run psa-arch-test
 
@@ -68,5 +68,5 @@ index 4f6ba2a7d822..1fd6b40dc803 100644
  };
  
 -- 
-2.38.0
+2.38.1
 

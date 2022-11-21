@@ -19,11 +19,15 @@ source /usr/share/network/lib.sh || exit
 gbmc_ncsi_br_deprecated_ips_init=
 gbmc_ncsi_br_deprecated_ips_confip=
 gbmc_ncsi_br_deprecated_ips_lastip=
+gbmc_ncsi_br_deprecated_ips_lastncsi=
+gbmc_ncsi_br_deprecated_ips_confncsi=
 
 gbmc_ncsi_br_deprecated_ips_update() {
   [ -n "$gbmc_ncsi_br_deprecated_ips_init" ] || return
-  [ "$gbmc_ncsi_br_deprecated_ips_confip" != "$gbmc_ncsi_br_deprecated_ips_lastip" ] || return
+  [ "$gbmc_ncsi_br_deprecated_ips_confip" != "$gbmc_ncsi_br_deprecated_ips_lastip" ] || \
+    [ "$gbmc_ncsi_br_deprecated_ips_confncsi" != "$gbmc_ncsi_br_deprecated_ips_lastncsi" ] || return
   gbmc_ncsi_br_deprecated_ips_confip="$gbmc_ncsi_br_deprecated_ips_lastip"
+  gbmc_ncsi_br_deprecated_ips_confncsi="$gbmc_ncsi_br_deprecated_ips_lastncsi"
 
   printf 'gBMC NCSI Deprecated Addrs: %s\n' \
     "${gbmc_ncsi_br_deprecated_ips_lastip:-(deleted)}" >&2
@@ -46,20 +50,24 @@ gbmc_ncsi_br_deprecated_ips_update() {
     fi
     pfx_bytes[8]=0
     pfx_bytes[9]=0
-    local host_pfx="$(ip_bytes_to_str pfx_bytes)"
+    local host_pfx=
+    if [ -n "${gbmc_ncsi_br_deprecated_ips_confncsi}" ]; then
+      # Only impersonate the host if we have an NCSI state machine
+      host_pfx="$(ip_bytes_to_str pfx_bytes)"
+    fi
     read -r -d '' contents <<EOF
 [Network]
 IPv6ProxyNDP=yes
 IPv6ProxyNDPAddress=$pfx
 IPv6ProxyNDPAddress=$stateless_pfx
-IPv6ProxyNDPAddress=$host_pfx
+${host_pfx:+IPv6ProxyNDPAddress=}$host_pfx
 ${stateless_ip:+IPv6ProxyNDPAddress=}$stateless_ip
 EOF
     read -r -d '' nfcontents <<EOF
 table inet filter {
   chain ncsi_input {
     ip6 saddr != $pfx/76 ip6 daddr $pfx/76 goto ncsi_gbmc_br_pub_input
-    ip6 daddr $host_pfx/64 goto ncsi_legacy_input
+    ${host_pfx:+ip6 daddr $host_pfx/64 goto ncsi_legacy_input}
   }
   chain ncsi_forward {
     ip6 saddr != $pfx/76 ip6 daddr $pfx/76 accept
@@ -126,6 +134,14 @@ gbmc_ncsi_br_deprecated_ips_hook() {
     fi
     if [ "$action" = 'del' -a "$ip" = "$gbmc_ncsi_br_deprecated_ips_lastip" ]; then
       gbmc_ncsi_br_deprecated_ips_lastip=
+      gbmc_ip_monitor_defer
+    fi
+  elif [ "$change" = 'link' -a "$action" = 'add' -a "$intf" = '@NCSI_IF@' ]; then
+    if ip link show '@NCSI_IF@' | grep -q '^ *alias ncsi$'; then
+      gbmc_ncsi_br_deprecated_ips_lastncsi=1
+      gbmc_ip_monitor_defer
+    else
+      gbmc_ncsi_br_deprecated_ips_lastncsi=
       gbmc_ip_monitor_defer
     fi
   fi

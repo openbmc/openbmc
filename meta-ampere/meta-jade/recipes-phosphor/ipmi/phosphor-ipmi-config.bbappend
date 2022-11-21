@@ -1,1 +1,1 @@
-FILESEXTRAPATHS:append:mtjade := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"

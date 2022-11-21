@@ -81,13 +81,13 @@ class ConfFileTests(OESelftestTestCase):
 
 class RunnerTests(OESelftestTestCase):
     def create_mock(self):
-        return unittest.mock.patch("asyncio.create_subprocess_exec")
+        return unittest.mock.patch("subprocess.Popen")
 
     def test_start(self):
         from fvp import runner
         with self.create_mock() as m:
             fvp = runner.FVPRunner(self.logger)
-            asyncio.run(fvp.start({
+            fvp.start({
                 "fvp-bindir": "/usr/bin",
                 "exe": "FVP_Binary",
                 "parameters": {'foo': 'bar'},
@@ -96,13 +96,13 @@ class RunnerTests(OESelftestTestCase):
                 "terminals": {},
                 "args": ['--extra-arg'],
                 "env": {"FOO": "BAR"}
-            }))
+            })
 
-            m.assert_called_once_with('/usr/bin/FVP_Binary',
+            m.assert_called_once_with(['/usr/bin/FVP_Binary',
                 '--parameter', 'foo=bar',
                 '--data', 'data1',
                 '--application', 'a1=file',
-                '--extra-arg',
+                '--extra-arg'],
                 stdin=unittest.mock.ANY,
                 stdout=unittest.mock.ANY,
                 stderr=unittest.mock.ANY,
@@ -113,7 +113,7 @@ class RunnerTests(OESelftestTestCase):
         from fvp import runner
         with self.create_mock() as m:
             fvp = runner.FVPRunner(self.logger)
-            asyncio.run(fvp.start({
+            fvp.start({
                 "fvp-bindir": "/usr/bin",
                 "exe": "FVP_Binary",
                 "parameters": {},
@@ -122,9 +122,9 @@ class RunnerTests(OESelftestTestCase):
                 "terminals": {},
                 "args": [],
                 "env": {"FOO": "BAR"}
-            }))
+            })
 
-            m.assert_called_once_with('/usr/bin/FVP_Binary',
+            m.assert_called_once_with(['/usr/bin/FVP_Binary'],
                 stdin=unittest.mock.ANY,
                 stdout=unittest.mock.ANY,
                 stderr=unittest.mock.ANY,

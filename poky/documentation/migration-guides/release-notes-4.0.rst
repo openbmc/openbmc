@@ -32,7 +32,7 @@ New Features / Enhancements in 4.0
   :ref:`overlayfs-etc <ref-classes-overlayfs-etc>` classes and
   ``overlayroot`` support in the :term:`Initramfs` framework to make it easier to
   overlay read-only filesystems (for example) with
-  `OverlayFS <https://en.wikipedia.org/wiki/OverlayFS>`__.
+  :wikipedia:`OverlayFS <OverlayFS>`.
 
 - Inclusive language adjustments to some variable names - see the
   :ref:`4.0 migration guide <migration-4.0-inclusive-language>` for details.
@@ -104,7 +104,7 @@ New Features / Enhancements in 4.0
 
 - Shared state (sstate) improvements:
 
-   - Switched to `ZStandard (zstd) <https://en.wikipedia.org/wiki/Zstd>`__ instead
+   - Switched to :wikipedia:`ZStandard (zstd) <Zstd>` instead
      of Gzip, for better performance.
    - Allow validation of sstate signatures against a list of keys
    - Improved error messages and exception handling
@@ -866,7 +866,7 @@ Repositories / Downloads for 4.0
 
 poky
 
--  Repository Location: https://git.yoctoproject.org/git/poky
+-  Repository Location: :yocto_git:`/poky`
 -  Branch: :yocto_git:`kirkstone </poky/log/?h=kirkstone>`
 -  Tag: :yocto_git:`yocto-4.0 </poky/tag/?h=yocto-4.0>`
 -  Git Revision: :yocto_git:`00cfdde791a0176c134f31e5a09eff725e75b905 </poky/commit/?id=00cfdde791a0176c134f31e5a09eff725e75b905>`
@@ -890,7 +890,7 @@ openembedded-core
 
 meta-mingw
 
--  Repository Location: https://git.yoctoproject.org/git/meta-mingw
+-  Repository Location: :yocto_git:`/meta-mingw`
 -  Branch: :yocto_git:`kirkstone </meta-mingw/log/?h=kirkstone>`
 -  Tag: :yocto_git:`yocto-4.0 </meta-mingw/tag/?h=yocto-4.0>`
 -  Git Revision: :yocto_git:`a90614a6498c3345704e9611f2842eb933dc51c1 </meta-mingw/commit/?id=a90614a6498c3345704e9611f2842eb933dc51c1>`
@@ -902,7 +902,7 @@ meta-mingw
 
 meta-gplv2
 
--  Repository Location: https://git.yoctoproject.org/git/meta-gplv2
+-  Repository Location: :yocto_git:`/meta-gplv2`
 -  Branch: :yocto_git:`kirkstone </meta-gplv2/log/?h=kirkstone>`
 -  Tag: :yocto_git:`yocto-4.0 </meta-gplv2/tag/?h=yocto-4.0>`
 -  Git Revision: :yocto_git:`d2f8b5cdb285b72a4ed93450f6703ca27aa42e8a </meta-mingw/commit/?id=d2f8b5cdb285b72a4ed93450f6703ca27aa42e8a>`
@@ -926,7 +926,7 @@ bitbake
 
 yocto-docs
 
--  Repository Location: https://git.yoctoproject.org/git/yocto-docs
+-  Repository Location: :yocto_git:`/yocto-docs`
 -  Branch: :yocto_git:`kirkstone </yocto-docs/log/?h=kirkstone>`
 -  Tag: :yocto_git:`yocto-4.0 </yocto-docs/tag/?h=yocto-4.0>`
 -  Git Revision: :yocto_git:`a6f571ad5b087385cad8765ed455c4b4eaeebca6 </yocto-docs/commit/?id=a6f571ad5b087385cad8765ed455c4b4eaeebca6>`

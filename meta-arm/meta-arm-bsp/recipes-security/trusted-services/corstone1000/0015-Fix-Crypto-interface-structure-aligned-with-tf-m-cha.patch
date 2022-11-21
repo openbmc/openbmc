@@ -1,7 +1,7 @@
-From 3cc9c417f12f005244530d8d706a6b7f3be35627 Mon Sep 17 00:00:00 2001
+From cf83184500703f9b4f2ac04be59cc7d624d8fd66 Mon Sep 17 00:00:00 2001
 From: Satish Kumar <satish.kumar01@arm.com>
 Date: Sun, 13 Feb 2022 09:01:10 +0000
-Subject: [PATCH 15/19] Fix: Crypto interface structure aligned with tf-m
+Subject: [PATCH 15/20] Fix: Crypto interface structure aligned with tf-m
  change.
 
 NO NEED TO RAISE PR: The PR for this FIX  is raied by Emek.
@@ -27,5 +27,5 @@ index c13c20e84131..ec25eaf868c7 100644
  							    *   AEAD until the API is
  							    *   restructured
 -- 
-2.38.0
+2.38.1
 

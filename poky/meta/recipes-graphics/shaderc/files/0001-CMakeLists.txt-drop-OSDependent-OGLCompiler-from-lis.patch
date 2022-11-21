@@ -1,0 +1,76 @@
+From 7f6c60f928dabd8b15aa948886523ddf15709215 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Wed, 2 Nov 2022 15:42:58 +0100
+Subject: [PATCH] CMakeLists.txt: drop OSDependent/OGLCompiler from lists of
+ glslang libraries
+
+glslang no longer installs them separately, and all needed
+functionality has been merged into glslang shared library itself:
+
+This wasn't a problem previously as they were still provided,
+as static libraries but in latest glslang they no longer are:
+https://github.com/KhronosGroup/glslang/commit/7cd519511c32d7e86d901c7ed231cb84c652d18d
+
+Upstream-Status: Submitted [https://github.com/google/shaderc/pull/1276]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ glslc/CMakeLists.txt           | 2 +-
+ libshaderc/CMakeLists.txt      | 2 +-
+ libshaderc/README.md           | 4 ++--
+ libshaderc_util/CMakeLists.txt | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/glslc/CMakeLists.txt b/glslc/CMakeLists.txt
+index 31664d1..5093bd9 100644
+--- a/glslc/CMakeLists.txt
++++ b/glslc/CMakeLists.txt
+@@ -43,7 +43,7 @@ if (SHADERC_ENABLE_WGSL_OUTPUT)
+ endif(SHADERC_ENABLE_WGSL_OUTPUT)
+ 
+ target_link_libraries(glslc PRIVATE
+-  glslang OSDependent OGLCompiler HLSL glslang SPIRV    # Glslang libraries
++  glslang HLSL glslang SPIRV    # Glslang libraries
+   $<$<BOOL:${SHADERC_ENABLE_WGSL_OUTPUT}>:libtint>      # Tint libraries, optional
+   shaderc_util shaderc                                  # internal Shaderc libraries
+   ${CMAKE_THREAD_LIBS_INIT})
+diff --git a/libshaderc/CMakeLists.txt b/libshaderc/CMakeLists.txt
+index 3ada419..d3542bf 100644
+--- a/libshaderc/CMakeLists.txt
++++ b/libshaderc/CMakeLists.txt
+@@ -62,7 +62,7 @@ endif(SHADERC_ENABLE_INSTALL)
+ 
+ find_package(Threads)
+ set(SHADERC_LIBS
+-  glslang OSDependent OGLCompiler glslang ${CMAKE_THREAD_LIBS_INIT}
++  glslang glslang ${CMAKE_THREAD_LIBS_INIT}
+   shaderc_util
+   SPIRV # from glslang
+   SPIRV-Tools
+diff --git a/libshaderc/README.md b/libshaderc/README.md
+index bf9d317..1071769 100644
+--- a/libshaderc/README.md
++++ b/libshaderc/README.md
+@@ -7,8 +7,8 @@ A library for compiling shader strings into SPIR-V.
+ There are two main shaderc libraries that are created during a CMake
+ compilation. The first is `libshaderc`, which is a static library
+ containing just the functionality exposed by libshaderc. It depends
+-on other compilation targets `glslang`, `OSDependent`, `OGLCompiler`,
+-`shaderc_util`, `SPIRV`, `HLSL`, `SPIRV-Tools`, and `SPIRV-Tools-opt`.
++on other compilation targets `glslang`, `shaderc_util`, `SPIRV`,
++`HLSL`, `SPIRV-Tools`, and `SPIRV-Tools-opt`.
+ 
+ The other is `libshaderc_combined`, which is a static library containing
+ libshaderc and all of its dependencies.
+diff --git a/libshaderc_util/CMakeLists.txt b/libshaderc_util/CMakeLists.txt
+index 99ce3c4..5291175 100644
+--- a/libshaderc_util/CMakeLists.txt
++++ b/libshaderc_util/CMakeLists.txt
+@@ -46,7 +46,7 @@ add_definitions(-DENABLE_HLSL)
+ 
+ find_package(Threads)
+ target_link_libraries(shaderc_util PRIVATE
+-  glslang OSDependent OGLCompiler HLSL glslang SPIRV
++  glslang HLSL glslang SPIRV
+   SPIRV-Tools-opt ${CMAKE_THREAD_LIBS_INIT})
+ 
+ shaderc_add_tests(

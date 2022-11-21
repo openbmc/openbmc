@@ -1,0 +1,41 @@
+From 4b59905d2fec01cc17038b1c167b4e57e7835adf Mon Sep 17 00:00:00 2001
+From: Davidson K <davidson.kumaresan@arm.com>
+Date: Thu, 7 Oct 2021 12:20:08 +0530
+Subject: [PATCH] feat(vhe): set STAGE1_NS while mapping memory from NWd to SWd
+
+If the memory is shared by a VM executing in non secure world, attribute
+MM_MODE_NS had to be set while mapping that in a S-EL0 SP executing in
+secure world. It will not be needed for a S-EL1 SP since the NS bit is
+available only for the stage 1 translations and the stage 1 translations
+for a S-EL1 SP will be handled by a trusted OS running in S-EL1.
+
+Signed-off-by: Davidson K <davidson.kumaresan@arm.com>
+Change-Id: I074e2d5a50a659bd3c097d797c4901f08d210b1b
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ src/ffa_memory.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/src/ffa_memory.c b/src/ffa_memory.c
+index 048cca9c..8910cc79 100644
+--- a/src/ffa_memory.c
++++ b/src/ffa_memory.c
+@@ -2483,6 +2483,18 @@ struct ffa_value ffa_memory_retrieve(struct vm_locked to_locked,
+ 
+ 	memory_to_attributes = ffa_memory_permissions_to_mode(
+ 		permissions, share_state->sender_orig_mode);
++
++	if (to_locked.vm->el0_partition) {
++		/*
++		 * Get extra mapping attributes for the given VM ID.
++		 * If the memory is shared by a VM executing in non secure
++		 * world, attribute MM_MODE_NS had to be set while mapping
++		 * that in a SP executing in secure world.
++		 */
++		memory_to_attributes |= arch_mm_extra_attributes_from_vm(
++						retrieve_request->sender);
++	}
++
+ 	ret = ffa_retrieve_check_update(
+ 		to_locked, memory_region->sender, share_state->fragments,
+ 		share_state->fragment_constituent_counts,

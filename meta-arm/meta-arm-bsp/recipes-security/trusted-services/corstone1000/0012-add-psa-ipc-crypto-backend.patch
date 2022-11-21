@@ -1,7 +1,7 @@
-From 896b5009bb07c4b53541290e1712856063411107 Mon Sep 17 00:00:00 2001
+From 0b5d96b1a9f927dc141047600edf2249af7022c5 Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Thu, 9 Dec 2021 14:17:39 +0000
-Subject: [PATCH 12/19] add psa ipc crypto backend
+Subject: [PATCH 12/20] add psa ipc crypto backend
 
 Add psa ipc crypto backend and attach it to se proxy
 deployment.
@@ -36,9 +36,8 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  .../crypto/include/psa/crypto_client_struct.h |   8 +-
  .../service/crypto/include/psa/crypto_sizes.h |   2 +-
  .../se-proxy/common/service_proxy_factory.c   |  15 +-
- deployments/se-proxy/se-proxy.cmake           |   2 +-
  .../providers/arm/corstone1000/platform.cmake |   2 +
- 29 files changed, 2293 insertions(+), 11 deletions(-)
+ 28 files changed, 2292 insertions(+), 10 deletions(-)
  create mode 100644 components/service/crypto/backend/psa_ipc/component.cmake
  create mode 100644 components/service/crypto/backend/psa_ipc/crypto_ipc_backend.c
  create mode 100644 components/service/crypto/backend/psa_ipc/crypto_ipc_backend.h
@@ -2556,19 +2555,6 @@ index 1110ac46bf8b..7edeef8b434a 100644
  
  	return crypto_iface;
  }
-diff --git a/deployments/se-proxy/se-proxy.cmake b/deployments/se-proxy/se-proxy.cmake
-index 38d26821d44d..f647190d9559 100644
---- a/deployments/se-proxy/se-proxy.cmake
-+++ b/deployments/se-proxy/se-proxy.cmake
-@@ -57,7 +57,7 @@ add_components(TARGET "se-proxy"
- 		"components/rpc/dummy"
- 		"components/rpc/common/caller"
- 		"components/service/attestation/key_mngr/stub"
--		"components/service/crypto/backend/stub"
-+		"components/service/crypto/backend/psa_ipc"
- 		"components/service/crypto/client/psa"
- 		"components/service/secure_storage/backend/mock_store"
- )
 diff --git a/platform/providers/arm/corstone1000/platform.cmake b/platform/providers/arm/corstone1000/platform.cmake
 index bb778bb9719b..51e5faa3e4d8 100644
 --- a/platform/providers/arm/corstone1000/platform.cmake
@@ -2580,5 +2566,5 @@ index bb778bb9719b..51e5faa3e4d8 100644
 +
 +add_compile_definitions(MBEDTLS_ECP_DP_SECP521R1_ENABLED)
 -- 
-2.38.0
+2.38.1
 

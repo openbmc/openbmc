@@ -28,6 +28,7 @@ LIC_FILES_CHKSUM = "file://%s;md5=d41d8cd98f00b204e9800998ecf8427e"
 SRC_URI = "file://%s;md5=d41d8cd98f00b204e9800998ecf8427e"
 """ % (urllib.parse.quote(lic_path), urllib.parse.quote(lic_path)))
         result = bitbake(bitbake_cmd)
+        self.delete_recipeinc('emptytest')
 
 
     # Verify that changing a license file that has an absolute path causes
@@ -53,5 +54,6 @@ SRC_URI = "file://%s;md5=d41d8cd98f00b204e9800998ecf8427e"
             f.write("data")
 
         result = bitbake(bitbake_cmd, ignore_status=True)
+        self.delete_recipeinc('emptytest')
         if error_msg not in result.output:
             raise AssertionError(result.output)

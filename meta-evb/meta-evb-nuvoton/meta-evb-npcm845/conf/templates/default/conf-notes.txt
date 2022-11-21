@@ -9,3 +9,5 @@ Make emmc image with inventory-manager (boot linux/openbmc from emmc)
 
 Make emmc image with entity-manager (boot linux/openbmc from emmc)
      DISTRO=arbel-evb-emmc-entity  bitbake obmc-phosphor-image
+Common targets are:
+     obmc-phosphor-image

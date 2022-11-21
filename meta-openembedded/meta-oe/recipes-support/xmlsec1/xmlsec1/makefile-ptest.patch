@@ -9,13 +9,12 @@ and it's installed as ptest.
 Upstream-Status: Inappropriate [ OE ptest specific ]
 
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
-
 ---
  examples/Makefile | 12 ++++++++++--
  1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/examples/Makefile b/examples/Makefile
-index 89b1d61..c1cbcca 100644
+index 02480c2..cbc2661 100644
 --- a/examples/Makefile
 +++ b/examples/Makefile
 @@ -8,9 +8,17 @@ PROGRAMS = \
@@ -24,12 +23,12 @@ index 89b1d61..c1cbcca 100644
  
 +ifndef CC
  CC	= gcc
--CFLAGS	+= -g $(shell xmlsec1-config --cflags) -DUNIX_SOCKETS
+-CFLAGS	+= -g $(shell xmlsec1-config --cflags) -DUNIX_SOCKETS -Wall -Wextra
 -LDLIBS	+= -g $(shell xmlsec1-config --libs)
 +endif
 +
-+CFLAGS  += -I../include -g $(shell PKG_CONFIG_PATH=.. pkg-config --cflags xmlsec1 ) -DUNIX_SOCKETS
-+LDLIBS += -L../src/.libs -g $(shell PKG_CONFIG_PATH=.. pkg-config --libs xmlsec1 )
++CFLAGS  += -I../include -g $(shell PKG_CONFIG_PATH=.. pkg-config --cflags xmlsec1 ) -DUNIX_SOCKETS -Wall -Wextra
++LDLIBS  += -L../src/.libs -g $(shell PKG_CONFIG_PATH=.. pkg-config --libs xmlsec1 )
 +
 +DESTDIR = /usr/share/xmlsec1
 +install-ptest:
@@ -38,3 +37,6 @@ index 89b1d61..c1cbcca 100644
  
  all: $(PROGRAMS)
  
+-- 
+2.25.1
+

@@ -1,7 +1,7 @@
-From 8c1bc5a7ae525d64802e2a06746f698f54cf07ca Mon Sep 17 00:00:00 2001
+From fb6d2f33e26c7b6ef88d552feca1f835da3f0df6 Mon Sep 17 00:00:00 2001
 From: Vishnu Banavath <vishnu.banavath@arm.com>
 Date: Fri, 3 Dec 2021 19:05:18 +0000
-Subject: [PATCH 04/19] add psa client definitions for ff-m
+Subject: [PATCH 04/20] add psa client definitions for ff-m
 
 Add PSA client definitions in common include to add future
 ff-m support.
@@ -294,5 +294,5 @@ index 000000000000..aaa973c6e987
 +
 +#endif /* __PSA_MANIFEST_SID_H__ */
 -- 
-2.38.0
+2.38.1
 

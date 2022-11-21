@@ -49,7 +49,6 @@ oe_cargo_build () {
 	export RUSTFLAGS="${RUSTFLAGS}"
 	bbnote "Using rust targets from ${RUST_TARGET_PATH}"
 	bbnote "cargo = $(which ${CARGO})"
-	bbnote "rustc = $(which ${RUSTC})"
 	bbnote "${CARGO} build ${CARGO_BUILD_FLAGS} $@"
 	"${CARGO}" build ${CARGO_BUILD_FLAGS} "$@"
 }

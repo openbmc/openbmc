@@ -23,6 +23,7 @@ SRC_URI = "${SAMBA_MIRROR}/stable/samba-${PV}.tar.gz \
            file://0001-Fix-pyext_PATTERN-for-cross-compilation.patch \
            file://0001-smbtorture-skip-test-case-tfork_cmd_send.patch \
            file://0001-waf-Fix-errors-with-Werror-implicit-function-declara.patch \
+           file://0001-Deleted-settiong-of-python-to-fix-the-install-confli.patch \
            "
 
 SRC_URI:append:libc-musl = " \

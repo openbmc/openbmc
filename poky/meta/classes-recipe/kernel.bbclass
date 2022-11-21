@@ -591,6 +591,22 @@ do_shared_workdir () {
 			cp tools/objtool/objtool ${kerneldir}/tools/objtool/
 		fi
 	fi
+
+	# When building with CONFIG_MODVERSIONS=y and CONFIG_RANDSTRUCT=y we need
+	# to copy the build assets generated for the randstruct seed to
+	# STAGING_KERNEL_BUILDDIR, otherwise the out-of-tree modules build will
+	# generate those assets which will result in a different
+	# RANDSTRUCT_HASHED_SEED
+	if [ -d scripts/basic ]; then
+		mkdir -p ${kerneldir}/scripts
+		cp -r scripts/basic ${kerneldir}/scripts
+	fi
+
+	if [ -d scripts/gcc-plugins ]; then
+		mkdir -p ${kerneldir}/scripts
+		cp -r scripts/gcc-plugins ${kerneldir}/scripts
+	fi
+
 }
 
 # We don't need to stage anything, not the modules/firmware since those would clash with linux-firmware

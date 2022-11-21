@@ -131,9 +131,9 @@ Repositories / Downloads for 3.4.3
 
 poky
 
--  Repository Location: https://git.yoctoproject.org/poky/
+-  Repository Location: :yocto_git:`/poky`
 -  Branch: :yocto_git:`honister </poky/log/?h=honister>`
--  Tag: `yocto-3.4.3 <https://git.yoctoproject.org/poky/tag/?h=yocto-3.4.3>`__
+-  Tag: :yocto_git:`yocto-3.4.3 </poky/tag/?h=yocto-3.4.3>`
 -  Git Revision: :yocto_git:`ee68ae307fd951b9de6b31dc6713ea29186b7749 </poky/commit/?id=ee68ae307fd951b9de6b31dc6713ea29186b7749>`
 -  Release Artefact: poky-ee68ae307fd951b9de6b31dc6713ea29186b7749
 -  sha: 92c3d73c3e74f0e1d5c2ab2836ce3a3accbe47772cea70df3755845e0db1379b
@@ -155,7 +155,7 @@ openembedded-core
 
 meta-mingw
 
--  Repository Location: https://git.yoctoproject.org/meta-mingw
+-  Repository Location: :yocto_git:`/meta-mingw`
 -  Branch: :yocto_git:`honister </meta-mingw/log/?h=honister>`
 -  Tag: :yocto_git:`yocto-3.4.3 </meta-mingw/tag/?h=yocto-3.4.3>`
 -  Git Revision: :yocto_git:`f5d761cbd5c957e4405c5d40b0c236d263c916a8 </meta-mingw/commit/?id=f5d761cbd5c957e4405c5d40b0c236d263c916a8>`
@@ -167,7 +167,7 @@ meta-mingw
 
 meta-gplv2
 
--  Repository Location: https://git.yoctoproject.org/meta-gplv2
+-  Repository Location: :yocto_git:`/meta-gplv2`
 -  Branch: :yocto_git:`honister </meta-gplv2/log/?h=honister>`
 -  Tag: :yocto_git:`yocto-3.4.3 </meta-gplv2/tag/?h=yocto-3.4.3>`
 -  Git Revision: :yocto_git:`f04e4369bf9dd3385165281b9fa2ed1043b0e400 </meta-gplv2/commit/?id=f04e4369bf9dd3385165281b9fa2ed1043b0e400>`
@@ -191,7 +191,7 @@ bitbake
 
 yocto-docs
 
--  Repository Location: https://git.yoctoproject.org/yocto-docs
+-  Repository Location: :yocto_git:`/yocto-docs`
 -  Branch: :yocto_git:`honister </yocto-docs/log/?h=honister>`
 -  Tag: :yocto_git:`yocto-3.4.3 </yocto-docs/tag/?h=yocto-3.4.3>`
 -  Git Revision: :yocto_git:`15f46f97d9cad558c19fc1dc19cfbe3720271d04 </yocto-docs/commit/?15f46f97d9cad558c19fc1dc19cfbe3720271d04>`

@@ -1,0 +1,48 @@
+From fdbffaea2fa85c203cc6aacb5734acac65aeaa19 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Fri, 11 Nov 2022 13:12:42 +0100
+Subject: [PATCH] tests/meson.build: do not use can_run_host_binaries()
+
+can_run_host_binaries() returns true even when cross compiling,
+if there is an executable wrapper defined that can run
+cross-binaries under some kind of emulation.
+
+Unfortunately, custom_target() will not use the wrapper
+and will attempt to execute the command directly. Until
+this is addressed in meson upstream, we have to disable
+these targets in cross scenarios.
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/glib/-/merge_requests/3067]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
+---
+ gio/tests/meson.build  | 2 +-
+ glib/tests/meson.build | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gio/tests/meson.build b/gio/tests/meson.build
+index 49cfa25ce..ea59656f9 100644
+--- a/gio/tests/meson.build
++++ b/gio/tests/meson.build
+@@ -652,7 +652,7 @@ if installed_tests_enabled
+   endforeach
+ endif
+ 
+-if meson.can_run_host_binaries()
++if not meson.is_cross_build()
+ 
+   compiler_type = '--compiler=@0@'.format(cc.get_id())
+ 
+diff --git a/glib/tests/meson.build b/glib/tests/meson.build
+index 69508178e..e4f75f302 100644
+--- a/glib/tests/meson.build
++++ b/glib/tests/meson.build
+@@ -411,7 +411,7 @@ executable('testing-helper', 'testing-helper.c',
+ )
+ 
+ # some testing of gtester functionality
+-if meson.can_run_host_binaries() and host_system != 'windows'
++if not meson.is_cross_build() and host_system != 'windows'
+   xmllint = find_program('xmllint', required: false)
+   if xmllint.found()
+     tmpsample_xml = custom_target('tmpsample.xml',

@@ -4,7 +4,7 @@ EXTRA_OECONF:append:scm-npcm845 = " --disable-i2c-whitelist-check"
 EXTRA_OECONF:append:scm-npcm845 = " --enable-sel_logger_clears_sel"
 
 # Fix build error when enable dbus-sdr
-SRC_URI:append:scm-npcm845 = " file://0001-dbus-sdr-fix-build-break.patch"
+# SRC_URI:append:scm-npcm845 = " file://0001-dbus-sdr-fix-build-break.patch"
 
 SRC_URI:append:scm-npcm845 = " file://0001-Add-set-BIOS-version-support.patch"
 SRC_URI:append:scm-npcm845 = " file://0002-Add-SEL-add-command.patch"

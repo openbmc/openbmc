@@ -721,7 +721,7 @@ Repositories / Downloads for 3.4
 
 poky
 
--  Repository Location: https://git.yoctoproject.org/poky/
+-  Repository Location: :yocto_git:`/poky`
 -  Branch: :yocto_git:`honister </poky/log/?h=honister>`
 -  Tag: :yocto_git:`yocto-3.4 </poky/tag/?h=yocto-3.4>`
 -  Git Revision: :yocto_git:`f6d1126fff213460dc6954a5d5fc168606d76b66 </poky/commit/?id=f6d1126fff213460dc6954a5d5fc168606d76b66>`
@@ -745,7 +745,7 @@ openembedded-core
 
 meta-mingw
 
--  Repository Location: https://git.yoctoproject.org/meta-mingw
+-  Repository Location: :yocto_git:`/meta-mingw`
 -  Branch: :yocto_git:`honister </meta-mingw/log/?h=honister>`
 -  Tag: :yocto_git:`yocto-3.4 </meta-mingw/tag/?h=yocto-3.4>`
 -  Git Revision: :yocto_git:`f5d761cbd5c957e4405c5d40b0c236d263c916a8 </meta-mingw/commit/?id=f5d761cbd5c957e4405c5d40b0c236d263c916a8>`
@@ -757,7 +757,7 @@ meta-mingw
 
 meta-intel
 
--  Repository Location: https://git.yoctoproject.org/meta-intel
+-  Repository Location: :yocto_git:`/meta-intel`
 -  Branch: :yocto_git:`honister </meta-intel/log/?h=honister>`
 -  Tag: :yocto_git:`yocto-3.4 </meta-intel/tag/?h=yocto-3.4>`
 -  Git Revision: :yocto_git:`90170cf85fe35b4e8dc00eee50053c0205276b63 </meta-intel/commit/?id=90170cf85fe35b4e8dc00eee50053c0205276b63>`
@@ -769,7 +769,7 @@ meta-intel
 
 meta-gplv2
 
--  Repository Location: https://git.yoctoproject.org/meta-gplv2
+-  Repository Location: :yocto_git:`/meta-gplv2`
 -  Branch: :yocto_git:`honister </meta-gplv2/log/?h=honister>`
 -  Tag: :yocto_git:`yocto-3.4 </meta-gplv2/tag/?h=yocto-3.4>`
 -  Git Revision: :yocto_git:`f04e4369bf9dd3385165281b9fa2ed1043b0e400 </meta-gplv2/commit/?id=f04e4369bf9dd3385165281b9fa2ed1043b0e400>`
@@ -793,7 +793,7 @@ bitbake
 
 yocto-docs
 
--  Repository Location: https://git.yoctoproject.org/yocto-docs
+-  Repository Location: :yocto_git:`/yocto-docs`
 -  Branch: :yocto_git:`honister </yocto-docs/log/?h=honister>`
 -  Tag: :yocto_git:`yocto-3.4 </yocto-docs/tag/?h=yocto-3.4>`
 -  Git Revision: :yocto_git:`d75c5450ecf56c8ac799a633ee9ac459e88f91fc </yocto-docs/commit/?id=d75c5450ecf56c8ac799a633ee9ac459e88f91fc>`

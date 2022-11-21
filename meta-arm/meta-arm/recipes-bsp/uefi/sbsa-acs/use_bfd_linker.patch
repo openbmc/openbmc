@@ -9,9 +9,16 @@ collect2: error: ld returned 1 exit status
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ BaseTools/Conf/tools_def.template | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/BaseTools/Conf/tools_def.template b/BaseTools/Conf/tools_def.template
+index 5ed19810b7..e08e6b4ff4 100755
 --- a/BaseTools/Conf/tools_def.template
 +++ b/BaseTools/Conf/tools_def.template
-@@ -1926,7 +1926,7 @@ DEFINE GCC_ARM_CC_XIPFLAGS         = -mn
+@@ -1856,7 +1856,7 @@ DEFINE GCC_ARM_CC_XIPFLAGS         = -mno-unaligned-access
  DEFINE GCC_AARCH64_CC_FLAGS        = DEF(GCC_ALL_CC_FLAGS) -mlittle-endian -fno-short-enums -fverbose-asm -funsigned-char  -ffunction-sections -fdata-sections -Wno-address -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-pic -fno-pie -ffixed-x18
  DEFINE GCC_AARCH64_CC_XIPFLAGS     = -mstrict-align -mgeneral-regs-only
  DEFINE GCC_DLINK_FLAGS_COMMON      = -nostdlib --pie
@@ -20,3 +27,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  DEFINE GCC_IA32_X64_DLINK_COMMON   = DEF(GCC_DLINK_FLAGS_COMMON) --gc-sections
  DEFINE GCC_ARM_AARCH64_DLINK_COMMON= -Wl,--emit-relocs -nostdlib -Wl,--gc-sections -u $(IMAGE_ENTRY_POINT) -Wl,-e,$(IMAGE_ENTRY_POINT),-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map
  DEFINE GCC_ARM_DLINK_FLAGS         = DEF(GCC_ARM_AARCH64_DLINK_COMMON) -z common-page-size=0x20 -Wl,--pic-veneer
+-- 
+2.30.2
+

@@ -1,7 +1,7 @@
-From 380f2cf944dd5db36c168a11d31a46ad14cdcb6d Mon Sep 17 00:00:00 2001
+From 97a8ca1835f5d9512dacda497540d5523e56c7dd Mon Sep 17 00:00:00 2001
 From: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
 Date: Tue, 26 Apr 2022 14:43:58 +0100
-Subject: [PATCH 4/5] feat: emulate interrupt controller register access
+Subject: [PATCH] feat: emulate interrupt controller register access
 
 This emulates ICC_SGI1R_EL1 and ICC_IGRPEN1_EL1 register
 
@@ -16,10 +16,10 @@ Upstream-Status: Inappropriate [Experimental feature]
  4 files changed, 97 insertions(+)
 
 diff --git a/src/arch/aarch64/hypervisor/handler.c b/src/arch/aarch64/hypervisor/handler.c
-index c9068c5..b9aa5d8 100644
+index 4c1b6e48..cd5146bd 100644
 --- a/src/arch/aarch64/hypervisor/handler.c
 +++ b/src/arch/aarch64/hypervisor/handler.c
-@@ -1282,6 +1282,11 @@ void handle_system_register_access(uintreg_t esr_el2)
+@@ -1283,6 +1283,11 @@ void handle_system_register_access(uintreg_t esr_el2)
  			inject_el1_unknown_exception(vcpu, esr_el2);
  			return;
  		}
@@ -32,7 +32,7 @@ index c9068c5..b9aa5d8 100644
  		inject_el1_unknown_exception(vcpu, esr_el2);
  		return;
 diff --git a/src/arch/aarch64/hypervisor/perfmon.c b/src/arch/aarch64/hypervisor/perfmon.c
-index f13b035..05e216c 100644
+index f13b0354..05e216c8 100644
 --- a/src/arch/aarch64/hypervisor/perfmon.c
 +++ b/src/arch/aarch64/hypervisor/perfmon.c
 @@ -116,6 +116,10 @@
@@ -131,7 +131,7 @@ index f13b035..05e216c 100644
 +	return true;
 +}
 diff --git a/src/arch/aarch64/hypervisor/perfmon.h b/src/arch/aarch64/hypervisor/perfmon.h
-index 81669ba..c90d45b 100644
+index 81669ba1..c90d45bf 100644
 --- a/src/arch/aarch64/hypervisor/perfmon.h
 +++ b/src/arch/aarch64/hypervisor/perfmon.h
 @@ -70,3 +70,8 @@ bool perfmon_process_access(struct vcpu *vcpu, ffa_vm_id_t vm_id,
@@ -144,7 +144,7 @@ index 81669ba..c90d45b 100644
 +bool intr_ctrl_el1_process_access(struct vcpu *vcpu, ffa_vm_id_t vm_id,
 +				  uintreg_t esr);
 diff --git a/src/arch/aarch64/msr.h b/src/arch/aarch64/msr.h
-index 55e7833..82aa884 100644
+index 55e78330..82aa8846 100644
 --- a/src/arch/aarch64/msr.h
 +++ b/src/arch/aarch64/msr.h
 @@ -134,3 +134,6 @@
@@ -154,6 +154,4 @@ index 55e7833..82aa884 100644
 +
 +#define ICC_IGRPEN1_EL1 S3_0_C12_C12_7
 +#define ICC_SGI1R_EL1 S3_0_C12_C11_5
--- 
-2.17.1
 

@@ -1,0 +1,42 @@
+From 92ab2e642d2c04b3dcb5a736ae6193680bfd5f74 Mon Sep 17 00:00:00 2001
+From: Paul Smith <psmith@gnu.org>
+Date: Sun, 6 Nov 2022 15:22:02 -0500
+Subject: * src/main.c (main): [SV 63307] Handle SIGPIPE as a fatal signal
+
+Always ignoring SIGPIPE is visible to child processes.
+
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/make.git/commit/?id=92ab2e642d2c04b3dcb5a736ae6193680bfd5f74]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ src/main.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/src/main.c b/src/main.c
+index eec9365..f2caf7a 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -1182,11 +1182,6 @@ main (int argc, char **argv, char **envp)
+   /* Useful for attaching debuggers, etc.  */
+   SPIN ("main-entry");
+ 
+-  /* Don't die if our stdout sends us SIGPIPE.  */
+-#ifdef SIGPIPE
+-  bsd_signal (SIGPIPE, SIG_IGN);
+-#endif
+-
+ #ifdef HAVE_ATEXIT
+   if (ANY_SET (check_io_state (), IO_STDOUT_OK))
+     atexit (close_stdout);
+@@ -1265,6 +1260,9 @@ main (int argc, char **argv, char **envp)
+ #ifdef SIGQUIT
+   FATAL_SIG (SIGQUIT);
+ #endif
++#ifdef SIGPIPE
++  FATAL_SIG (SIGPIPE);
++#endif
+   FATAL_SIG (SIGINT);
+   FATAL_SIG (SIGTERM);
+ 
+-- 
+cgit v1.1
+

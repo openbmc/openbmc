@@ -136,7 +136,7 @@ class ImageFeatures(OESelftestTestCase):
         img_types = [ 'vmdk', 'vdi', 'qcow2' ]
         features = ""
         for itype in img_types:
-            features += 'IMAGE_FSTYPES += "wic.%s"\n' % itype
+            features += 'IMAGE_FSTYPES += "ext4.%s"\n' % itype
         self.write_config(features)
 
         image_name = 'core-image-minimal'
@@ -145,7 +145,7 @@ class ImageFeatures(OESelftestTestCase):
         deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
         link_name = get_bb_var('IMAGE_LINK_NAME', image_name)
         for itype in img_types:
-            image_path = os.path.join(deploy_dir_image, "%s.wic.%s" %
+            image_path = os.path.join(deploy_dir_image, "%s.ext4.%s" %
                                       (link_name, itype))
 
             # check if result image file is in deploy directory
@@ -206,9 +206,12 @@ class ImageFeatures(OESelftestTestCase):
         skip_image_types = set(('container', 'elf', 'f2fs', 'multiubi', 'tar.zst', 'wic.zst', 'squashfs-lzo'))
         img_types = all_image_types - skip_image_types
 
-        config = 'IMAGE_FSTYPES += "%s"\n'\
-                 'MKUBIFS_ARGS ?= "-m 2048 -e 129024 -c 2047"\n'\
-                 'UBINIZE_ARGS ?= "-m 2048 -p 128KiB -s 512"' % ' '.join(img_types)
+        config = """
+IMAGE_FSTYPES += "%s"
+WKS_FILE = "wictestdisk.wks"
+MKUBIFS_ARGS ?= "-m 2048 -e 129024 -c 2047"
+UBINIZE_ARGS ?= "-m 2048 -p 128KiB -s 512"
+""" % ' '.join(img_types)
         self.write_config(config)
 
         bitbake(image_name)
@@ -271,7 +274,6 @@ SKIP_RECIPE[busybox] = "Don't build this"
         image_name = 'core-image-minimal'
         features = 'IMAGE_GEN_DEBUGFS = "1"\n'
         features += 'IMAGE_FSTYPES_DEBUGFS = "tar.bz2"\n'
-        features += 'MACHINE = "genericx86-64"\n'
         self.write_config(features)
 
         bitbake(image_name)

@@ -1,7 +1,7 @@
-From a71b26f867f1b4a08285d6da82528de6a54321f2 Mon Sep 17 00:00:00 2001
+From 229ec29154a4404426ad3083af68ca111a214e13 Mon Sep 17 00:00:00 2001
 From: Gowtham Suresh Kumar <gowtham.sureshkumar@arm.com>
 Date: Thu, 16 Dec 2021 21:31:40 +0000
-Subject: [PATCH 14/19] Configure storage size
+Subject: [PATCH 14/20] Configure storage size
 
 Upstream-Status: Pending
 Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
@@ -10,7 +10,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/components/service/smm_variable/backend/uefi_variable_store.c b/components/service/smm_variable/backend/uefi_variable_store.c
-index 715ccc3cb546..aeb8a22062b7 100644
+index 611e2e225c6b..6c3b9ed81c25 100644
 --- a/components/service/smm_variable/backend/uefi_variable_store.c
 +++ b/components/service/smm_variable/backend/uefi_variable_store.c
 @@ -88,6 +88,7 @@ static efi_status_t check_name_terminator(
@@ -38,5 +38,5 @@ index 715ccc3cb546..aeb8a22062b7 100644
  
  	context->owner_id = owner_id;
 -- 
-2.38.0
+2.38.1
 

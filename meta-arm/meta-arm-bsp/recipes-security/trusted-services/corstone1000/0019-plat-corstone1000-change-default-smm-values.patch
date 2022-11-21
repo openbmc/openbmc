@@ -1,7 +1,7 @@
-From 07ad7e1f7ba06045bf331d5b73a6adf38a098fb7 Mon Sep 17 00:00:00 2001
+From c519bae79629bfe551d79cfeb4e7d8a059545145 Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Tue, 11 Oct 2022 10:46:10 +0100
-Subject: [PATCH 19/19] plat: corstone1000: change default smm values
+Subject: [PATCH 19/20] plat: corstone1000: change default smm values
 
 Smm gateway uses SE proxy to route the calls for any NV
 storage so set the NV_STORE_SN.
@@ -33,5 +33,5 @@ index 51e5faa3e4d8..04b629a81906 100644
 +	SMM_GATEWAY_MAX_UEFI_VARIABLES=100
 +)
 -- 
-2.38.0
+2.38.1
 

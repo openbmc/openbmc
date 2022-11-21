@@ -1043,7 +1043,7 @@ Using  ``menuconfig``
 The easiest way to define kernel configurations is to set them through
 the ``menuconfig`` tool. This tool provides an interactive method with
 which to set kernel configurations. For general information on
-``menuconfig``, see https://en.wikipedia.org/wiki/Menuconfig.
+``menuconfig``, see :wikipedia:`Menuconfig`.
 
 To use the ``menuconfig`` tool in the Yocto Project development
 environment, you must do the following:

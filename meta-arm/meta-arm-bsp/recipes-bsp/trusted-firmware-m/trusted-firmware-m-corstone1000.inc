@@ -34,6 +34,7 @@ SRC_URI:append:corstone1000 = " \
         file://0004-Platform-Partition-Allow-configuration-of-input-and-.patch    \
         file://0005-corstone1000-support-for-UEFI-FMP-image-Information.patch     \
         file://0006-corstone1000-remove-two-partition-configuration.patch         \
+        file://0007-corstone1000-adjust-PS-asset-configuration.patch              \
       "
 
 do_install() {

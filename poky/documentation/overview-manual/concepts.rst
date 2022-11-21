@@ -110,7 +110,7 @@ Class files (``.bbclass``) contain information that is useful to share
 between recipes files. An example is the
 :ref:`autotools <ref-classes-autotools>` class,
 which contains common settings for any application that is built with
-the `GNU Autotools <https://en.wikipedia.org/wiki/GNU_Autotools>`__.
+the :wikipedia:`GNU Autotools <GNU_Autotools>`.
 The ":ref:`ref-manual/classes:Classes`" chapter in the Yocto Project
 Reference Manual provides details about classes and how to use them.
 
@@ -2061,7 +2061,7 @@ dependencies, you must manually declare the dependencies.
    located. For each shared library, the package that contains the
    shared library is registered as providing the shared library. More
    specifically, the package is registered as providing the
-   `soname <https://en.wikipedia.org/wiki/Soname>`__ of the library. The
+   :wikipedia:`soname <Soname>` of the library. The
    resulting shared-library-to-package mapping is saved globally in
    :term:`PKGDATA_DIR` by the
    :ref:`ref-tasks-packagedata`

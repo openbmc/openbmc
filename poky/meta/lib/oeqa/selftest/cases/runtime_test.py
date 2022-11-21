@@ -10,7 +10,7 @@ from oeqa.core.decorator import OETestTag
 import os
 import tempfile
 import oe.lsb
-from oeqa.core.decorator.data import skipIfNotQemu
+from oeqa.core.decorator.data import skipIfNotQemu, skipIfNotMachine
 
 class TestExport(OESelftestTestCase):
 
@@ -202,6 +202,8 @@ class TestImage(OESelftestTestCase):
         bitbake('core-image-full-cmdline socat')
         bitbake('-c testimage core-image-full-cmdline')
 
+    # https://bugzilla.yoctoproject.org/show_bug.cgi?id=14966
+    @skipIfNotMachine("qemux86-64", "test needs qemux86-64")
     def test_testimage_virgl_gtk_sdl(self):
         """
         Summary: Check host-assisted accelerate OpenGL functionality in qemu with gtk and SDL frontends
@@ -243,6 +245,7 @@ class TestImage(OESelftestTestCase):
         bitbake('core-image-minimal')
         bitbake('-c testimage core-image-minimal')
 
+    @skipIfNotMachine("qemux86-64", "test needs qemux86-64")
     def test_testimage_virgl_headless(self):
         """
         Summary: Check host-assisted accelerate OpenGL functionality in qemu with egl-headless frontend

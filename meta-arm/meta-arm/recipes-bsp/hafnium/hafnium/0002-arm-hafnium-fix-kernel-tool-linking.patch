@@ -1,0 +1,30 @@
+From b54c7b4d325b7effbebe5bdd86d0cfceedb66b9d Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Tue, 9 Nov 2021 23:31:22 +0000
+Subject: [PATCH] arm/hafnium: fix kernel tool linking
+
+We need to be sure that the host linker flags are passed to the kernel build,
+as otherwise it is possible that binaries are incorrectly linked. For example:
+
+HOSTCC scripts/extract-cert
+ld: .../recipe-sysroot-native/usr/lib/pkgconfig/../../../usr/lib/libcrypto.so: undefined reference to `pthread_once@GLIBC_2.34'
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+---
+ build/linux/linux.gni | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/build/linux/linux.gni b/build/linux/linux.gni
+index 45860fab..b0102544 100644
+--- a/build/linux/linux.gni
++++ b/build/linux/linux.gni
+@@ -60,6 +60,7 @@ template("linux_kernel") {
+     "LLVM=1",
+     "LLVM_IAS=1",
+     "CROSS_COMPILE=aarch64-linux-gnu-",
++    "HOSTLDFLAGS=" + getenv("BUILD_LDFLAGS"),
+ 
+     # Build out-of-tree in `target_out_dir`.
+     "O=" + rebase_path(target_out_dir),

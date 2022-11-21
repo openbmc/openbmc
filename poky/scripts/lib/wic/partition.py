@@ -294,16 +294,35 @@ class Partition():
                 f.write("cd etc\n")
                 f.write("rm fstab\n")
                 f.write("write %s fstab\n" % (self.updated_fstab_path))
-                if os.getenv('SOURCE_DATE_EPOCH'):
-                    fstab_time = int(os.getenv('SOURCE_DATE_EPOCH'))
-                    for time in ["atime", "mtime", "ctime"]:
-                        f.write("set_inode_field fstab %s %s\n" % (time, hex(fstab_time)))
-                        f.write("set_inode_field fstab %s_extra 0\n" % (time))
             debugfs_cmd = "debugfs -w -f %s %s" % (debugfs_script_path, rootfs)
             exec_native_cmd(debugfs_cmd, native_sysroot)
 
         mkfs_cmd = "fsck.%s -pvfD %s" % (self.fstype, rootfs)
         exec_native_cmd(mkfs_cmd, native_sysroot, pseudo=pseudo)
+
+        if os.getenv('SOURCE_DATE_EPOCH'):
+            sde_time = hex(int(os.getenv('SOURCE_DATE_EPOCH')))
+            debugfs_script_path = os.path.join(cr_workdir, "debugfs_script")
+            files = []
+            for root, dirs, others in os.walk(rootfs_dir):
+                base = root.replace(rootfs_dir, "").rstrip(os.sep)
+                files += [ "/" if base == "" else base ]
+                files += [ base + "/" + n for n in dirs + others ]
+            with open(debugfs_script_path, "w") as f:
+                f.write("set_current_time %s\n" % (sde_time))
+                if self.updated_fstab_path and self.has_fstab and not self.no_fstab_update:
+                    f.write("set_inode_field /etc/fstab mtime %s\n" % (sde_time))
+                    f.write("set_inode_field /etc/fstab mtime_extra 0\n")
+                for file in set(files):
+                    for time in ["atime", "ctime", "crtime"]:
+                        f.write("set_inode_field \"%s\" %s %s\n" % (file, time, sde_time))
+                        f.write("set_inode_field \"%s\" %s_extra 0\n" % (file, time))
+                for time in ["wtime", "mkfs_time", "lastcheck"]:
+                    f.write("set_super_value %s %s\n" % (time, sde_time))
+                for time in ["mtime", "first_error_time", "last_error_time"]:
+                    f.write("set_super_value %s 0\n" % (time))
+            debugfs_cmd = "debugfs -w -f %s %s" % (debugfs_script_path, rootfs)
+            exec_native_cmd(debugfs_cmd, native_sysroot)
 
         self.check_for_Y2038_problem(rootfs, native_sysroot)
 

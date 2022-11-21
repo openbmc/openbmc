@@ -79,7 +79,7 @@ machine() {
                 TEMPLATECONF="${tmpl}/templates/default" source \
                         oe-init-build-env "${build_dir}"
 
-                if [ "$(cat conf/templateconf.cfg)" = "${tmpl}" ]; then
+                if [ "$(cat conf/templateconf.cfg)" = "${tmpl}/templates/default" ]; then
                     sed "s/^\(MACHINE\s*[?:]*\s*=\s*\).*$/\1\"${target}\"/" \
                         -i conf/local.conf
                 fi

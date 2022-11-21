@@ -64,6 +64,10 @@ RDEPENDS:${PN}-system = " \
         phosphor-ipmi-blobs \
         phosphor-image-signing \
         program-vbios \
+        dhrystone \
+        phosphor-ecc \
+        phosphor-ipmi-blobs \
+        phosphor-image-signing \
         optee-client \
         optee-test \
         "

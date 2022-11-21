@@ -1,31 +1,31 @@
-From 4f327be49fd6ac5a77da6e48459b37f37a601977 Mon Sep 17 00:00:00 2001
+From ba1728bc27c88597164957d000b70ec4be6edf28 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 13 Feb 2019 15:32:05 +0100
 Subject: [PATCH] Set host_machine correctly when building with mingw32
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  gio/tests/meson.build  | 8 ++++----
  glib/tests/meson.build | 2 +-
  meson.build            | 3 +++
- tests/meson.build      | 2 +-
- 4 files changed, 9 insertions(+), 6 deletions(-)
+ 3 files changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/gio/tests/meson.build b/gio/tests/meson.build
-index abe676767c60..34b347815308 100644
+index f644aa2..64a8684 100644
 --- a/gio/tests/meson.build
 +++ b/gio/tests/meson.build
-@@ -27,7 +27,7 @@ if build_machine.system() == 'linux'
-   endif # libutil.length() > 0
- endif # build_machine.system() == 'linux'
+@@ -29,7 +29,7 @@ endif
+ 
+ test_cpp_args = test_c_args
  
 -if host_machine.system() == 'windows'
 +if host_system == 'windows'
    common_gio_tests_deps += [iphlpapi_dep, winsock2, cc.find_library ('secur32')]
  endif
  
-@@ -176,7 +176,7 @@ else
+@@ -210,7 +210,7 @@ if have_dbus_daemon
  endif
  
  #  Test programs buildable on UNIX only
@@ -33,8 +33,8 @@ index abe676767c60..34b347815308 100644
 +if host_system != 'windows'
    gio_tests += {
      'file' : {},
-     'gdbus-peer' : {
-@@ -434,7 +434,7 @@ if host_machine.system() != 'windows'
+     'gdbus-peer-object-manager' : {},
+@@ -462,7 +462,7 @@ if host_machine.system() != 'windows'
  endif # unix
  
  #  Test programs buildable on Windows only
@@ -43,7 +43,7 @@ index abe676767c60..34b347815308 100644
    gio_tests += {'win32-streams' : {}}
  endif
  
-@@ -504,7 +504,7 @@ if cc.get_id() != 'msvc' and cc.get_id() != 'clang-cl'
+@@ -532,7 +532,7 @@ if cc.get_id() != 'msvc' and cc.get_id() != 'clang-cl'
    }
  endif
  
@@ -53,10 +53,10 @@ index abe676767c60..34b347815308 100644
      'gdbus-example-unix-fd-client' : {
        'install' : false,
 diff --git a/glib/tests/meson.build b/glib/tests/meson.build
-index a0c64afe6ae9..48407f99569c 100644
+index db01b54..6950817 100644
 --- a/glib/tests/meson.build
 +++ b/glib/tests/meson.build
-@@ -151,7 +151,7 @@ if glib_conf.has('HAVE_EVENTFD')
+@@ -188,7 +188,7 @@ if glib_conf.has('HAVE_EVENTFD')
    }
  endif
  
@@ -66,10 +66,10 @@ index a0c64afe6ae9..48407f99569c 100644
      glib_tests += {
        'gpoll' : {
 diff --git a/meson.build b/meson.build
-index e0b14319fb58..f6756a3c7dfb 100644
+index 43bb468..5f9b59c 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -54,6 +54,9 @@ else
+@@ -43,6 +43,9 @@ else
  endif
  
  host_system = host_machine.system()
@@ -79,19 +79,3 @@ index e0b14319fb58..f6756a3c7dfb 100644
  
  if host_system == 'darwin'
    ios_test_code = '''#include <TargetConditionals.h>
-diff --git a/tests/meson.build b/tests/meson.build
-index 5ff99a4a8258..8a4dad0ccae7 100644
---- a/tests/meson.build
-+++ b/tests/meson.build
-@@ -53,7 +53,7 @@ test_extra_programs = {
-   'assert-msg-test' : {},
- }
- 
--if host_machine.system() != 'windows'
-+if host_system != 'windows'
-   tests += {
-     'timeloop' : {},
-   }
--- 
-2.34.1
-

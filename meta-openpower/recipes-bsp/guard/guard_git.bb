@@ -11,7 +11,7 @@ inherit pkgconfig meson
 S = "${WORKDIR}/git"
 
 SRC_URI = "git://git@github.com/open-power/guard;branch="main";protocol=https"
-SRCREV = "c7c018c6d7735da8150334da6f3e7f8d9357efb9"
+SRCREV = "e000b571c82e854180ddcbda3b76754341c72618"
 
 DEPENDS = "cli11"
 

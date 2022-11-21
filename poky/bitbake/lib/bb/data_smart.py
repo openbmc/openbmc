@@ -29,7 +29,7 @@ logger = logging.getLogger("BitBake.Data")
 __setvar_keyword__ = [":append", ":prepend", ":remove"]
 __setvar_regexp__ = re.compile(r'(?P<base>.*?)(?P<keyword>:append|:prepend|:remove)(:(?P<add>[^A-Z]*))?$')
 __expand_var_regexp__ = re.compile(r"\${[a-zA-Z0-9\-_+./~:]+?}")
-__expand_python_regexp__ = re.compile(r"\${@.+?}")
+__expand_python_regexp__ = re.compile(r"\${@(?:{.*?}|.)+?}")
 __whitespace_split__ = re.compile(r'(\s)')
 __override_regexp__ = re.compile(r'[a-z0-9]+')
 
@@ -118,6 +118,11 @@ class VariableParse:
                 code = match
             else:
                 code = match.group()[3:-1]
+
+            # Do not run code that contains one or more unexpanded variables
+            # instead return the code with the characters we removed put back
+            if __expand_var_regexp__.findall(code):
+                return "${@" + code + "}"
 
             if self.varname:
                 varname = 'Var <%s>' % self.varname
@@ -476,13 +481,6 @@ class DataSmart(MutableMapping):
     def expand(self, s, varname = None):
         return self.expandWithRefs(s, varname).value
 
-    def finalize(self, parent = False):
-        return
-
-    def internal_finalize(self, parent = False):
-        """Performs final steps upon the datastore, including application of overrides"""
-        self.overrides = None
-
     def need_overrides(self):
         if self.overrides is not None:
             return
@@ -633,7 +631,7 @@ class DataSmart(MutableMapping):
                 nextnew.update(vardata.references)
                 nextnew.update(vardata.contains.keys())
             new = nextnew
-        self.internal_finalize(True)
+        self.overrides = None
 
     def _setvar_update_overrides(self, var, **loginfo):
         # aka pay the cookie monster

@@ -1,4 +1,4 @@
-ARMFILESPATHS := "${THISDIR}/${PN}:"
+ARMFILESPATHS := "${THISDIR}/files:"
 
 COMPATIBLE_MACHINE:generic-arm64 = "generic-arm64"
 FILESEXTRAPATHS:prepend:generic-arm64 = "${ARMFILESPATHS}"

@@ -4,7 +4,7 @@ OE-Core's [oeqa][OEQA] framework provides a method of performing runtime tests o
 
 Tests can be configured to run automatically post-build by setting the variable `TESTIMAGE_AUTO="1"`, e.g. in your Kas file or local.conf.
 
-There are two main methods of testing, using different test "targets".
+There are two main methods of testing, using different test "targets". Both test targets generate an additional log file with the prefix 'fvp_log' in the image recipe's `${WORKDIR}/testimage` containing the FVP's stdout.
 
 ## OEFVPTarget
 

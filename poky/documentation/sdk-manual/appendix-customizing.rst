@@ -176,9 +176,8 @@ the installed SDKs to update the installed SDKs by using the
 ``devtool sdk-update`` command:
 
 1. Create a directory that can be shared over HTTP or HTTPS. You can do
-   this by setting up a web server such as an `Apache HTTP
-   Server <https://en.wikipedia.org/wiki/Apache_HTTP_Server>`__ or
-   `Nginx <https://en.wikipedia.org/wiki/Nginx>`__ server in the cloud
+   this by setting up a web server such as an :wikipedia:`Apache HTTP Server
+   <Apache_HTTP_Server>` or :wikipedia:`Nginx <Nginx>` server in the cloud
    to host the directory. This directory must contain the published SDK.
 
 2. Set the
@@ -262,9 +261,8 @@ source, you need to do a number of things:
 
 2. Expose the ``sstate-cache`` directory produced by the build.
    Typically, you expose this directory by making it available through
-   an `Apache HTTP
-   Server <https://en.wikipedia.org/wiki/Apache_HTTP_Server>`__ or
-   `Nginx <https://en.wikipedia.org/wiki/Nginx>`__ server.
+   an :wikipedia:`Apache HTTP Server <Apache_HTTP_Server>` or
+   :wikipedia:`Nginx <Nginx>` server.
 
 3. Set the appropriate configuration so that the produced SDK knows how
    to find the configuration. The variable you need to set is

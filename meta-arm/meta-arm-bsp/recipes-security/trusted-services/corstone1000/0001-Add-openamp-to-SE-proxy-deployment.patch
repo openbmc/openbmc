@@ -1,7 +1,7 @@
-From 7c9589c4bb056db5e1696f2a777891ab235b1b63 Mon Sep 17 00:00:00 2001
+From 13de79cd4f0d25b812e5f4ad4a19bc075496be83 Mon Sep 17 00:00:00 2001
 From: Vishnu Banavath <vishnu.banavath@arm.com>
 Date: Fri, 3 Dec 2021 16:36:51 +0000
-Subject: [PATCH 01/19] Add openamp to SE proxy deployment
+Subject: [PATCH 01/20] Add openamp to SE proxy deployment
 
 Openamp is required to communicate between secure partitions(running on
 Cortex-A) and trusted-firmware-m(running on Cortex-M).
@@ -283,5 +283,5 @@ index 000000000000..449f35f4fda4
 +set_property(TARGET openamp PROPERTY IMPORTED_LOCATION "${OPENAMP_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}open_amp${CMAKE_STATIC_LIBRARY_SUFFIX}")
 +set_property(TARGET openamp PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${OPENAMP_INSTALL_DIR}/include")
 -- 
-2.38.0
+2.38.1
 

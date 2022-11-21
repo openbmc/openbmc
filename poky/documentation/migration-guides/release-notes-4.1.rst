@@ -704,7 +704,7 @@ Repositories / Downloads for 4.1
 
 poky
 
--  Repository Location: https://git.yoctoproject.org/git/poky
+-  Repository Location: :yocto_git:`/poky`
 -  Branch: :yocto_git:`langdale </poky/log/?h=langdale>`
 -  Tag:  :yocto_git:`yocto-4.1 </poky/log/?h=yocto-4.1>`
 -  Git Revision: :yocto_git:`5200799866b92259e855051112520006e1aaaac0 </poky/commit/?id=5200799866b92259e855051112520006e1aaaac0>`
@@ -716,7 +716,7 @@ poky
 
 openembedded-core
 
--  Repository Location: https://git.openembedded.org/openembedded-core
+-  Repository Location: :oe_git:`/openembedded-core`
 -  Branch: :oe_git:`langdale </openembedded-core/log/?h=langdale>`
 -  Tag:  :oe_git:`yocto-4.1 </openembedded-core/log/?h=yocto-4.1>`
 -  Git Revision: :oe_git:`744a2277844ec9a384a9ca7dae2a634d5a0d3590 </openembedded-core/commit/?id=744a2277844ec9a384a9ca7dae2a634d5a0d3590>`
@@ -728,7 +728,7 @@ openembedded-core
 
 meta-mingw
 
--  Repository Location: https://git.yoctoproject.org/git/meta-mingw
+-  Repository Location: :yocto_git:`/meta-mingw`
 -  Branch: :yocto_git:`langdale </meta-mingw/log/?h=langdale>`
 -  Tag:  :yocto_git:`yocto-4.1 </meta-mingw/log/?h=yocto-4.1>`
 -  Git Revision: :yocto_git:`b0067202db8573df3d23d199f82987cebe1bee2c </meta-mingw/commit/?id=b0067202db8573df3d23d199f82987cebe1bee2c>`
@@ -740,7 +740,7 @@ meta-mingw
 
 bitbake
 
--  Repository Location: https://git.openembedded.org/bitbake
+-  Repository Location: :oe_git:`/bitbake`
 -  Branch: :oe_git:`2.2 </bitbake/log/?h=2.2>`
 -  Tag:  :oe_git:`yocto-4.1 </bitbake/log/?h=yocto-4.1>`
 -  Git Revision: :oe_git:`074da4c469d1f4177a1c5be72b9f3ccdfd379d67 </bitbake/commit/?id=074da4c469d1f4177a1c5be72b9f3ccdfd379d67>`
@@ -752,7 +752,7 @@ bitbake
 
 yocto-docs
 
--  Repository Location: https://git.yoctoproject.org/git/yocto-docs
+-  Repository Location: :yocto_git:`/yocto-docs`
 -  Branch: :yocto_git:`langdale </yocto-docs/log/?h=langdale>`
 -  Tag: :yocto_git:`yocto-4.1 </yocto-docs/log/?h=yocto-4.1>`
 -  Git Revision: :yocto_git:`42d3e26a0d04bc5951e640b471686f347dc9b74a </yocto-docs/commit/?id=42d3e26a0d04bc5951e640b471686f347dc9b74a>`

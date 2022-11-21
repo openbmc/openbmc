@@ -490,16 +490,31 @@ def inject_minidebuginfo(file, dvar, dv, d):
         bb.debug(1, 'ELF file {} has no debuginfo, skipping minidebuginfo injection'.format(file))
         return
 
+    # minidebuginfo does not make sense to apply to ELF objects other than
+    # executables and shared libraries, skip applying the minidebuginfo
+    # generation for objects like kernel modules.
+    for line in subprocess.check_output([readelf, '-h', debugfile], universal_newlines=True).splitlines():
+        if not line.strip().startswith("Type:"):
+            continue
+        elftype = line.split(":")[1].strip()
+        if not any(elftype.startswith(i) for i in ["EXEC", "DYN"]):
+            bb.debug(1, 'ELF file {} is not executable/shared, skipping minidebuginfo injection'.format(file))
+            return
+        break
+
     # Find non-allocated PROGBITS, NOTE, and NOBITS sections in the debuginfo.
     # We will exclude all of these from minidebuginfo to save space.
     remove_section_names = []
     for line in subprocess.check_output([readelf, '-W', '-S', debugfile], universal_newlines=True).splitlines():
-        fields = line.split()
-        if len(fields) < 8:
+        # strip the leading "  [ 1]" section index to allow splitting on space
+        if ']' not in line:
+            continue
+        fields = line[line.index(']') + 1:].split()
+        if len(fields) < 7:
             continue
         name = fields[0]
         type = fields[1]
-        flags = fields[7]
+        flags = fields[6]
         # .debug_ sections will be removed by objcopy -S so no need to explicitly remove them
         if name.startswith('.debug_'):
             continue

@@ -112,6 +112,8 @@ do_rm_work () {
         fi
     done
 }
+do_rm_work[vardepsexclude] += "SSTATETASKS"
+
 do_rm_work_all () {
     :
 }
