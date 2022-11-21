@@ -11,7 +11,7 @@ DEPENDS += " \
   ipmi-blob-tool \
   function2 \
 "
-SRCREV = "76d37b6b23d6e29b135d35eb3ca8c26653cff458"
+SRCREV = "ea65e680fd40a7ed984d654ad5e2c66760e86a81"
 PACKAGECONFIG ?= "cleanup-delete"
 PACKAGECONFIG[cleanup-delete] = "-Dcleanup-delete=enabled,-Dcleanup-delete=disabled"
 # If using static-layout, reboot-update is a good option to handle updating.
