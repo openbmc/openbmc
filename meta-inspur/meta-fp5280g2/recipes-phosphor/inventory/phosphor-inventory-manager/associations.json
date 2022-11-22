@@ -148,6 +148,17 @@
                 [
                     "/xyz/openbmc_project/led/groups/fan0_fault"
                 ]
+            },
+            {
+                "types":
+                {
+                    "rType": "cooled_by",
+                    "fType": "cooling"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/inventory/system/chassis"
+                ]
             }
         ]
     },
@@ -187,6 +198,17 @@
                 "paths":
                 [
                     "/xyz/openbmc_project/led/groups/fan1_fault"
+                ]
+            },
+            {
+                "types":
+                {
+                    "rType": "cooled_by",
+                    "fType": "cooling"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/inventory/system/chassis"
                 ]
             }
         ]
@@ -228,6 +250,17 @@
                 [
                     "/xyz/openbmc_project/led/groups/fan2_fault"
                 ]
+            },
+            {
+                "types":
+                {
+                    "rType": "cooled_by",
+                    "fType": "cooling"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/inventory/system/chassis"
+                ]
             }
         ]
     },
@@ -267,6 +300,17 @@
                 "paths":
                 [
                     "/xyz/openbmc_project/led/groups/fan3_fault"
+                ]
+            },
+            {
+                "types":
+                {
+                    "rType": "cooled_by",
+                    "fType": "cooling"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/inventory/system/chassis"
                 ]
             }
         ]
