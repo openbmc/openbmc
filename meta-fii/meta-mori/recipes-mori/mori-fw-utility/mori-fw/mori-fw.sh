@@ -9,6 +9,11 @@ source /usr/libexec/mori-fw/mori-lib.sh
 function fwbios() {
   KERNEL_FIU_ID="c0000000.spi"
   KERNEL_SYSFS_FIU="/sys/bus/platform/drivers/NPCM-FIU"
+  ret=0
+  if [ ! -f "$1" ]; then
+    echo " Cannot find the" "$1" "image file"
+    return 1
+  fi
 
   # switch the SPI mux from Host to BMC
   set_gpio_ctrl FM_BIOS_FLASH_SPI_MUX_R_SEL 1
@@ -23,18 +28,11 @@ function fwbios() {
   # write to the mtd device
   BIOS_MTD=$(grep "hnor" /proc/mtd | sed -n 's/^\(.*\):.*/\1/p')
 
-  if [ ! -f "$1" ]; then
-    echo " Cannot find the" "$1" "image file"
-    return 1
-
-  fi
   echo "Flashing BIOS @/dev/${BIOS_MTD}"
-  rst_bios_spi
-  if [ "$(flashcp -v $1 /dev/${BIOS_MTD})" -ne  0 ]; then
+  if ! flashcp -v $1 /dev/${BIOS_MTD} ; then
     echo "Flashing the bios failed " >&2
-    return 1
+    ret=1
   fi
-  wait
 
   # switch the SPI mux from BMC to Host
   if [ -d "${KERNEL_SYSFS_FIU}/${KERNEL_FIU_ID}" ]; then
@@ -42,34 +40,51 @@ function fwbios() {
   fi
   set_gpio_ctrl FM_BIOS_FLASH_SPI_MUX_R_SEL 0
 
-  return 0
+  return $ret
 }
 
 function fwbmccpld() {
+  if [ ! -s "$1" ]; then
+    echo "Image file" "$1" "is empty or nonexistent, BMC CPLD update failed"
+    return 1
+  fi
+
   # MB_JTAG_MUX 0:CPU 1:MB
   # BMC_JTAG_MUX 0:GF/MB 1:BMC
   set_gpio_ctrl MB_JTAG_MUX_SEL 0
   set_gpio_ctrl BMC_JTAG_MUX_SEL  1
-  if [ "$(loadsvf -d /dev/jtag0 -s $1 -m 0)" -ne  0 ]; then
-    echo "BMC CPLD update failed" >&2
+
+  # 1st condition checks if the svf file is valid
+  # 2nd condition checks flashing logs for flash errors
+  if ! mesg=$(loadsvf -d /dev/jtag0 -s $1 -m 0 2>&1) \
+        || echo "$mesg" | grep -i -e error -e fail ; then
+    echo "BMC CPLD update failed"
     return 1
   fi
-  wait
-
+  echo "BMC CPLD update successful"
   return 0
 }
 
 function fwmbcpld() {
+  if [ ! -s "$1" ]; then
+    echo "Image file" "$1" "is empty or nonexistent, MB CPLD update failed"
+    return 1
+  fi
+
   # MB_JTAG_MUX 0:CPU 1:MB
   # BMC_JTAG_MUX 0:GF/MB 1:BMC
   set_gpio_ctrl MB_JTAG_MUX_SEL 1
   set_gpio_ctrl BMC_JTAG_MUX_SEL  0
-  if [ "$(loadsvf -d /dev/jtag0 -s $1 -m 0)" -ne  0 ]; then
-    echo "Mobo CPLD update failed" >&2
+
+  # 1st condition checks if the svf file is valid
+  # 2nd condition checks flashing logs for flash errors
+  if ! mesg=$(loadsvf -d /dev/jtag0 -s $1 -m 0 2>&1) \
+        || echo "$mesg" | grep -i -e error -e fail ; then
+    echo "MB CPLD update failed"
     return 1
   fi
-  wait
   set_gpio_ctrl MB_JTAG_MUX_SEL 0
+  echo "MB CPLD update successful"
 
   return 0
 }
@@ -90,7 +105,7 @@ function fwbootstrap() {
 
   #bind bootstrap EEPROM
   echo ${I2C_CPU_EEPROM[0]}-00${I2C_CPU_EEPROM[1]} > /sys/bus/i2c/drivers/at24/bind
- 
+
   #switch back access to CPU
   set_gpio_ctrl CPU_EEPROM_SEL 1
   return 0
