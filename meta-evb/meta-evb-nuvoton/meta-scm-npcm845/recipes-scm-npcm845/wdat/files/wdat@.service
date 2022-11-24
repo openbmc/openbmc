@@ -1,0 +1,8 @@
+[Unit]
+Description=WDAT service
+
+[Service]
+Type=simple
+StandardOutput=journal
+SyslogIdentifier=wdat
+ExecStart=/usr/sbin/wdat /dev/raw-$i
