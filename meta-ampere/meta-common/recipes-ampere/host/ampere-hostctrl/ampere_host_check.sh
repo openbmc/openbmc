@@ -18,6 +18,10 @@ do
 		Get ss xyz.openbmc_project.Condition.HostFirmware \
 		CurrentFirmwareCondition | cut -d"." -f6)
 	if [ "$st" == "Running\"" ]; then
+		if command -v ampere_driver_binder.sh;
+		then
+			ampere_driver_binder.sh
+		fi
 		exit 0
 	fi
 	sleep 1
