@@ -25,6 +25,7 @@ SRC_URI:append:greatlakes = " \
     file://host-poweron@.service \
     file://host-powercycle@.service \
     file://host-powerreset@.service \
+    file://power-ctrl-init.service \
     file://chassis-poweroff \
     file://chassis-poweron \
     file://chassis-powercycle \
@@ -33,6 +34,7 @@ SRC_URI:append:greatlakes = " \
     file://host-powercycle \
     file://host-powerreset \
     file://power-cmd \
+    file://power-ctrl-init \
     "
 
 RDEPENDS:${PN}:append:greatlakes = " bash"
@@ -41,7 +43,7 @@ do_install:append:greatlakes() {
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/*.service ${D}${systemd_system_unitdir}/
 
-    install -d ${D}${libexecdir}
+    install -d ${D}${libexecdir}/${PN}
     install -m 0777 ${WORKDIR}/chassis-poweroff ${D}${libexecdir}/
     install -m 0777 ${WORKDIR}/chassis-poweron ${D}${libexecdir}/
     install -m 0777 ${WORKDIR}/chassis-powercycle ${D}${libexecdir}/
@@ -50,5 +52,9 @@ do_install:append:greatlakes() {
     install -m 0777 ${WORKDIR}/host-powercycle ${D}${libexecdir}/
     install -m 0777 ${WORKDIR}/host-powerreset ${D}${libexecdir}/
     install -m 0777 ${WORKDIR}/power-cmd ${D}${libexecdir}/
+    install -m 0777 ${WORKDIR}/power-ctrl-init ${D}${libexecdir}/${PN}/
 }
+
 FILES:${PN} += " /lib/systemd/system/*.service"
+
+SYSTEMD_SERVICE:${PN}-bmc:append:greatlakes = "power-ctrl-init.service"
