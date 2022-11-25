@@ -1,0 +1,10 @@
+{
+"start": 1,
+"stop": 2,
+"reset": 3,
+"query": 4,
+"get_timeout": 5,
+"set_timeout": 6,
+"get_run": 7,
+"get_stop": 8
+}
