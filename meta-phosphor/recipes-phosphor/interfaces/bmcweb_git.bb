@@ -31,7 +31,6 @@ inherit pkgconfig meson ptest
 EXTRA_OEMESON = " \
     --buildtype=minsize \
     -Dtests=${@bb.utils.contains('PTEST_ENABLED', '1', 'enabled', 'disabled', d)} \
-    -Dyocto-deps=enabled \
 "
 
 do_install_ptest() {
