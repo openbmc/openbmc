@@ -1,19 +1,69 @@
 [
   {
     "Desc": {
-      "Name": "BMC_SENSOR_FAN_IOUT",
-      "SensorType": "current"
+      "Name": "BB_ADC_FAN_OUTPUT_CURR_A",
+      "SensorType": "current",
+      "MinValue": 0
     },
 
     "Threshold": {
-      "CriticalHigh": 14.52
+      "CriticalHigh": 28.6,
+      "HardShutdownHigh": 39.2
     },
 
     "Params": {
       "ConstParam": [
         {
           "ParamName": "P1",
-          "Value": 0.665
+          "Value": 0.157
+        },
+        {
+          "ParamName": "P2",
+          "Value": 0.33
+        },
+        {
+          "ParamName": "P3",
+          "Value": 2.5
+        },
+        {
+          "ParamName": "P4",
+          "Value": 0.96
+        },
+        {
+          "ParamName": "P5",
+          "Value": 0.15
+        }
+      ],
+
+      "DbusParam": [
+        {
+          "ParamName": "P6",
+          "Desc": {
+            "Name": "BB_ADC_FAN_ISENSE_VOLT_V",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+
+    "Expression": "( P6 / P1 / P2 - P3 ) * P4 + P5"
+  },
+  {
+    "Desc": {
+      "Name": "BB_ADC_NIC_OUTPUT_CURR_A",
+      "SensorType": "current"
+    },
+
+    "Threshold": {
+      "CriticalHigh": 6.6,
+      "HardShutdownHigh": 8.15
+    },
+
+    "Params": {
+      "ConstParam": [
+        {
+          "ParamName": "P1",
+          "Value": 0.183
         }
       ],
 
@@ -21,7 +71,7 @@
         {
           "ParamName": "P2",
           "Desc": {
-            "Name": "BMC_SENSOR_FAN_Voltage",
+            "Name": "BB_ADC_NIC_ISENSE_VOLT_V",
             "SensorType": "voltage"
           }
         }
@@ -32,19 +82,20 @@
   },
   {
     "Desc": {
-      "Name": "BMC_SENSOR_NIC_IOUT",
-      "SensorType": "current"
+      "Name": "BB_NIC_PWR_W",
+      "SensorType": "power"
     },
 
     "Threshold": {
-      "CriticalHigh": 6.6
+      "CriticalHigh": 82.5,
+      "HardShutdownHigh": 101.875
     },
 
     "Params": {
       "ConstParam": [
         {
           "ParamName": "P1",
-          "Value": 1.2
+          "Value": 0.183
         }
       ],
 
@@ -52,13 +103,139 @@
         {
           "ParamName": "P2",
           "Desc": {
-            "Name": "BMC_SENSOR_NIC_Voltage",
+            "Name": "BB_ADC_NIC_P12V_VOLT_V",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "BB_ADC_NIC_ISENSE_VOLT_V",
             "SensorType": "voltage"
           }
         }
       ]
     },
 
-    "Expression": "P2 / P1"
+    "Expression": "P2 * ( P3 / P1 )"
+  },
+  {
+    "Desc": {
+      "Name": "BB_MEDUSA_VDELTA_VOLT_V",
+      "SensorType": "voltage"
+    },
+
+    "Threshold": {
+        "CriticalHigh": 0.5
+    },
+
+    "Params": {
+        "DbusParam": [
+            {
+                "ParamName": "P1",
+                "Desc": {
+                    "Name": "BB_MEDUSA_INPUT_VOLT_V",
+                    "SensorType": "voltage"
+                }
+            },
+            {
+                "ParamName": "P2",
+                "Desc": {
+                    "Name": "BB_MEDUSA_OUTPUT_VOLT_V",
+                    "SensorType": "voltage"
+                }
+            }
+        ]
+    },
+
+    "Expression": "P1 - P2"
+  },
+  {
+    "Desc": {
+      "Name": "BB_CPU_PDB_VDELTA_VOLT_V",
+      "SensorType": "voltage",
+      "MinValue": 0
+    },
+
+    "Threshold": {
+        "CriticalHigh": 0.8
+    },
+
+    "Params": {
+        "DbusParam": [
+            {
+                "ParamName": "P1",
+                "Desc": {
+                    "Name": "BB_MEDUSA_OUTPUT_VOLT_V",
+                    "SensorType": "voltage"
+                }
+            },
+            {
+                "ParamName": "P2",
+                "Desc": {
+                    "Name": "BB_HSC_INPUT_VOLT_V",
+                    "SensorType": "voltage"
+                }
+            }
+        ]
+    },
+
+    "Expression": "P1 - P2"
+  },
+  {
+    "Desc": {
+      "Name": "BB_FAN_PWR_W",
+      "SensorType": "power",
+      "MinValue": 0
+    },
+
+    "Threshold": {
+      "CriticalHigh": 396.825,
+      "HardShutdownHigh": 544.88
+    },
+
+    "Params": {
+        "ConstParam": [
+          {
+            "ParamName": "P1",
+            "Value": 0.157
+          },
+          {
+            "ParamName": "P2",
+            "Value": 0.33
+          },
+          {
+            "ParamName": "P3",
+            "Value": 2.5
+          },
+          {
+            "ParamName": "P4",
+            "Value": 0.96
+          },
+          {
+            "ParamName": "P5",
+            "Value": 0.15
+          }
+        ],
+
+        "DbusParam": [
+          {
+            "ParamName": "P6",
+            "Desc": {
+              "Name": "BB_ADC_FAN_ISENSE_VOLT_V",
+              "SensorType": "voltage"
+            }
+          },
+          {
+            "ParamName": "P7",
+              "Desc": {
+                  "Name": "BB_MEDUSA_OUTPUT_VOLT_V",
+                  "SensorType": "voltage"
+              }
+          }
+        ]
+    },
+
+    "Expression": "(( P6 / P1 / P2 - P3 ) * P4 + P5 ) * P7"
   }
 ]
