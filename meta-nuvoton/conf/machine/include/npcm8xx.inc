@@ -28,6 +28,7 @@ ATF_ALIGN ?= "4096"
 OPTEE_ALIGN ?= "4096"
 UBOOT_ALIGN ?= "4096"
 ALIGN_END ?= "4096"
+PAD_ALIGN ?= "32"
 
 SOC_FAMILY = "npcm8xx"
 include conf/machine/include/soc-family.inc
