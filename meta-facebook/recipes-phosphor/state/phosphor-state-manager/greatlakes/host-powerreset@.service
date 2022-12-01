@@ -3,7 +3,7 @@ Description=Host Power Reset: %i
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/host-powerreset %i
+ExecStart=/usr/libexec/phosphor-state-manager/host-powerreset %i
 
 [Install]
 WantedBy=obmc-host-force-warm-reboot@%i.target

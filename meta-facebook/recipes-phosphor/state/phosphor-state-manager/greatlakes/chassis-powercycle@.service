@@ -3,7 +3,7 @@ Description=Chassis Power Cycle: %i
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/chassis-powercycle %i
+ExecStart=/usr/libexec/phosphor-state-manager/chassis-powercycle %i
 
 [Install]
 WantedBy=obmc-chassis-powercycle@%i.target

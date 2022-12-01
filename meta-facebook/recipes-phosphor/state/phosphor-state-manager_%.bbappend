@@ -44,14 +44,14 @@ do_install:append:greatlakes() {
     install -m 0644 ${WORKDIR}/*.service ${D}${systemd_system_unitdir}/
 
     install -d ${D}${libexecdir}/${PN}
-    install -m 0777 ${WORKDIR}/chassis-poweroff ${D}${libexecdir}/
-    install -m 0777 ${WORKDIR}/chassis-poweron ${D}${libexecdir}/
-    install -m 0777 ${WORKDIR}/chassis-powercycle ${D}${libexecdir}/
-    install -m 0777 ${WORKDIR}/host-poweroff ${D}${libexecdir}/
-    install -m 0777 ${WORKDIR}/host-poweron ${D}${libexecdir}/
-    install -m 0777 ${WORKDIR}/host-powercycle ${D}${libexecdir}/
-    install -m 0777 ${WORKDIR}/host-powerreset ${D}${libexecdir}/
-    install -m 0777 ${WORKDIR}/power-cmd ${D}${libexecdir}/
+    install -m 0777 ${WORKDIR}/chassis-poweroff ${D}${libexecdir}/${PN}/
+    install -m 0777 ${WORKDIR}/chassis-poweron ${D}${libexecdir}/${PN}/
+    install -m 0777 ${WORKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
+    install -m 0777 ${WORKDIR}/host-poweroff ${D}${libexecdir}/${PN}/
+    install -m 0777 ${WORKDIR}/host-poweron ${D}${libexecdir}/${PN}/
+    install -m 0777 ${WORKDIR}/host-powercycle ${D}${libexecdir}/${PN}/
+    install -m 0777 ${WORKDIR}/host-powerreset ${D}${libexecdir}/${PN}/
+    install -m 0777 ${WORKDIR}/power-cmd ${D}${libexecdir}/${PN}/
     install -m 0777 ${WORKDIR}/power-ctrl-init ${D}${libexecdir}/${PN}/
 }
 
