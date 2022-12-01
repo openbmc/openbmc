@@ -15,8 +15,8 @@ index 6c791eec..1442e0ee 100644
            state managed.
        parameters:
            - name: object
--            type: dict[path,dict[string,dict[string,variant[boolean,size,int64,string,array[byte]]]]]
-+            type: dict[path,dict[string,dict[string,variant[boolean,size,int64,string,uint64,uint16,byte,array[byte]]]]]
+-            type: dict[object_path,dict[string,dict[string,variant[boolean,size,int64,string,array[byte]]]]]
++            type: dict[object_path,dict[string,dict[string,variant[boolean,size,int64,string,uint64,uint16,byte,array[byte]]]]]
              description: >
                  A dictionary of fully enumerated items to be managed.
 -- 
