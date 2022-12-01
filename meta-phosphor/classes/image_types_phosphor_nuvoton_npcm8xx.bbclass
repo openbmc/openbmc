@@ -114,7 +114,7 @@ python do_merge_bootloaders() {
         int(d.getVar('UBOOT_ALIGN', True)), int(d.getVar('ALIGN_END', True)))
 }
 
-do_prepare_bootloaders[depends] += " \
+do_pad_binary[depends] += " \
     npcm8xx-tip-fw:do_deploy \
     npcm8xx-bootblock:do_deploy \
     u-boot-nuvoton:do_deploy \
