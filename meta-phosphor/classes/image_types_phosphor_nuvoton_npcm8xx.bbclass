@@ -66,6 +66,37 @@ do_prepare_bootloaders() {
     cd "$olddir"
 }
 
+# Sign images for secure os be enabled
+do_sign_binary() {
+    if [ "${SECURED_OS}" = "True" ]; then
+        # Used to embed the key index inside the image, usually at offset 0x140
+        python3 ${IGPS_DIR}/BinarySignatureGenerator.py Replace_binary_single_byte \
+            ${DEPLOY_DIR_IMAGE}/${BOOTBLOCK} 140 ${KEY_BB_INDEX}
+
+        python3 ${IGPS_DIR}/BinarySignatureGenerator.py Replace_binary_single_byte \
+            ${DEPLOY_DIR_IMAGE}/${ATF_BINARY} 140 ${KEY_BL31_INDEX}
+
+        python3 ${IGPS_DIR}/BinarySignatureGenerator.py Replace_binary_single_byte \
+            ${DEPLOY_DIR_IMAGE}/${OPTEE_BINARY} 140 ${KEY_OPTEE_INDEX}
+
+        python3 ${IGPS_DIR}/BinarySignatureGenerator.py Replace_binary_single_byte \
+            ${DEPLOY_DIR_IMAGE}/${UBOOT_BINARY}.${FULL_SUFFIX} 140 ${KEY_UBOOT_INDEX}
+
+        # Sign specific image with specific key
+        python3 ${IGPS_DIR}/BinarySignatureGenerator.py Sign_binary \
+            ${DEPLOY_DIR_IMAGE}/${BOOTBLOCK} 112 ${KEY_BB} 16 ${DEPLOY_DIR_IMAGE}/${BOOTBLOCK} ${KEY_SIGN} 0 ${KEY_BB_ID}
+
+        python3 ${IGPS_DIR}/BinarySignatureGenerator.py Sign_binary \
+            ${DEPLOY_DIR_IMAGE}/${ATF_BINARY} 112 ${KEY_BL31} 16 ${DEPLOY_DIR_IMAGE}/${ATF_BINARY} ${KEY_SIGN} 0 ${KEY_BL31_ID}
+
+        python3 ${IGPS_DIR}/BinarySignatureGenerator.py Sign_binary \
+            ${DEPLOY_DIR_IMAGE}/${OPTEE_BINARY} 112 ${KEY_OPTEE} 16 ${DEPLOY_DIR_IMAGE}/${OPTEE_BINARY} ${KEY_SIGN} 0 ${KEY_OPTEE_ID}
+
+        python3 ${IGPS_DIR}/BinarySignatureGenerator.py Sign_binary \
+            ${DEPLOY_DIR_IMAGE}/${UBOOT_BINARY}.${FULL_SUFFIX} 112 ${KEY_UBOOT} 16 ${DEPLOY_DIR_IMAGE}/${UBOOT_BINARY}.${FULL_SUFFIX} ${KEY_SIGN} 0 ${KEY_UBOOT_ID}
+    fi
+}
+
 python do_merge_bootloaders() {
 
     def Merge_bin_files_and_pad(inF1, inF2, outF, align, align_end):
@@ -135,6 +166,7 @@ do_generate_ext4_tar:append() {
 }
 
 addtask do_pad_binary before do_prepare_bootloaders
+addtask do_sign_binary before do_merge_bootloaders after do_prepare_bootloaders
 addtask do_prepare_bootloaders before do_generate_static after do_generate_rwfs_static
 addtask do_merge_bootloaders before do_generate_static after do_prepare_bootloaders
 addtask do_merge_bootloaders before do_generate_ext4_tar after do_prepare_bootloaders

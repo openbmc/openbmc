@@ -3,6 +3,7 @@
 #@DESCRIPTION: Common machine configuration for Nuvoton NPCM8XX Chip
 
 require conf/machine/include/nuvoton.inc
+require conf/machine/include/keys.inc
 
 KERNEL_IMAGETYPE ?= "Image"
 KERNEL_EXTRA_ARGS ?= "UIMAGE_LOADADDR=0x00008000"
@@ -29,6 +30,8 @@ OPTEE_ALIGN ?= "4096"
 UBOOT_ALIGN ?= "4096"
 ALIGN_END ?= "4096"
 PAD_ALIGN ?= "32"
+
+SECURED_OS ?= "False"
 
 SOC_FAMILY = "npcm8xx"
 include conf/machine/include/soc-family.inc
