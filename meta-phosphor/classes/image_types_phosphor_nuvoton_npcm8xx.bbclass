@@ -13,6 +13,39 @@ UBOOT_SUFFIX:append = ".${MERGED_SUFFIX}"
 
 IGPS_DIR = "${STAGING_DIR_NATIVE}/${datadir}/npcm8xx-igps"
 
+BB_BIN = "arbel_a35_bootblock.bin"
+BL31_BIN = "bl31.bin"
+OPTEE_BIN = "tee.bin"
+UBOOT_BIN = "u-boot.bin"
+
+# Align images if needed
+python do_pad_binary() {
+    def Pad_bin_file_inplace(inF, align):
+        padding_size = 0
+        padding_size_end = 0
+
+        F_size = os.path.getsize(inF)
+
+        padding_size = align - (F_size % align)
+
+        infile = open(inF, "ab")
+        infile.seek(0, 2)
+        infile.write(b'\x00' * padding_size)
+        infile.close()
+
+    Pad_bin_file_inplace(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
+        '%s' % d.getVar('BB_BIN',True)), int(d.getVar('PAD_ALIGN', True)))
+
+    Pad_bin_file_inplace(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
+        '%s' % d.getVar('BL31_BIN',True)), int(d.getVar('PAD_ALIGN', True)))
+
+    Pad_bin_file_inplace(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
+        '%s' % d.getVar('OPTEE_BIN',True)), int(d.getVar('PAD_ALIGN', True)))
+
+    Pad_bin_file_inplace(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
+        '%s' % d.getVar('UBOOT_BIN',True)), int(d.getVar('PAD_ALIGN', True)))
+}
+
 # Prepare the Bootblock and U-Boot images using npcm8xx-bingo
 do_prepare_bootloaders() {
     local olddir="$(pwd)"
@@ -101,6 +134,7 @@ do_generate_ext4_tar:append() {
     ln -sf ${IMAGE_NAME}.rootfs.wic.gz image-emmc.gz
 }
 
+addtask do_pad_binary before do_prepare_bootloaders
 addtask do_prepare_bootloaders before do_generate_static after do_generate_rwfs_static
 addtask do_merge_bootloaders before do_generate_static after do_prepare_bootloaders
 addtask do_merge_bootloaders before do_generate_ext4_tar after do_prepare_bootloaders
