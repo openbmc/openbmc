@@ -1,0 +1,37 @@
+From 21a3a9d527eb19fda7c1df38abe138caa9ca24be Mon Sep 17 00:00:00 2001
+From: Allen <jhkang@nuvoton.com>
+Date: Tue, 4 Oct 2022 16:32:36 +0800
+Subject: [PATCH] drivers: spi: Bugfixed: npcm_fiu_uma_read() set wrong value
+ to NPCM_FIU_UMA_CFG
+
+In kernel 5.15, op->dummy.buswidth might be 0 in OpenBMC emmc image.
+If so, NPCM_FIU_UMA_CFG will be set to an unexpected value.
+To avoid this issue, we do nothig when op->dummy.buswidth is 0.
+
+Signed-off-by: Allen Kang<jhkang@nuvoton.com>
+---
+ drivers/spi/spi-npcm-fiu.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/spi/spi-npcm-fiu.c b/drivers/spi/spi-npcm-fiu.c
+index cd11b4632f2f..348ab8d1e2a5 100644
+--- a/drivers/spi/spi-npcm-fiu.c
++++ b/drivers/spi/spi-npcm-fiu.c
+@@ -353,8 +353,13 @@ static int npcm_fiu_uma_read(struct spi_mem *mem,
+ 		uma_cfg |= ilog2(op->cmd.buswidth);
+ 		uma_cfg |= ilog2(op->addr.buswidth)
+ 			<< NPCM_FIU_UMA_CFG_ADBPCK_SHIFT;
+-		uma_cfg |= ilog2(op->dummy.buswidth)
++
++		// To fix dummy.buswidth is zero bug
++		if (op->dummy.buswidth != 0){
++			uma_cfg |= ilog2(op->dummy.buswidth)
+ 			<< NPCM_FIU_UMA_CFG_DBPCK_SHIFT;
++		}
++
+ 		uma_cfg |= ilog2(op->data.buswidth)
+ 			<< NPCM_FIU_UMA_CFG_RDBPCK_SHIFT;
+ 		uma_cfg |= op->dummy.nbytes << NPCM_FIU_UMA_CFG_DBSIZ_SHIFT;
+-- 
+2.34.1
+

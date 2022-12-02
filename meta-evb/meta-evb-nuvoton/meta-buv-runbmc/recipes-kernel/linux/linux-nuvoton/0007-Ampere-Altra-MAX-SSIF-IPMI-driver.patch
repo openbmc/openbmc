@@ -1,14 +1,15 @@
-From 03cd7c38332df0adfc2d910a40fb5bd7b74f104a Mon Sep 17 00:00:00 2001
+From 0096ebbbc62bbec2279ef1c5ad4fd07a8d22bf79 Mon Sep 17 00:00:00 2001
 From: Lancelot Kao <lancelot.cy.kao@fii-na.corp-partner.google.com>
-Date: Wed, 12 May 2021 11:16:12 -0500
-Subject: [PATCH] Ampere Altra MAX SSIF IPMI driver
+Date: Fri, 28 Oct 2022 17:36:14 +0800
+Subject: [PATCH 1/1] Ampere Altra MAX SSIF IPMI driver
 
 The SMBus system interface (SSIF) IPMI BMC driver can be used to perform
 in-band IPMI communication with their host in management (BMC) side.
 
 Using the older driver from google
 
-Signed-off-by: Lancelot Kao <lancelot.cy.kao@fii-na.corp-partner.google.com>
+Signed-off-by: yhyang2 <yhyang2@nuvoton.com>
+Signed-off-by: Allen Kang <jhkang@nuvoton.com>
 ---
  drivers/char/ipmi/Kconfig            |  33 ++
  drivers/char/ipmi/Makefile           |   3 +
@@ -16,19 +17,17 @@ Signed-off-by: Lancelot Kao <lancelot.cy.kao@fii-na.corp-partner.google.com>
  drivers/char/ipmi/ssif_bmc.h         |  91 ++++
  drivers/char/ipmi/ssif_bmc_aspeed.c  | 132 ++++++
  drivers/char/ipmi/ssif_bmc_npcm7xx.c | 331 +++++++++++++++
- drivers/i2c/i2c-core-smbus.c         |   3 +-
- include/linux/i2c.h                  |   1 +
- 8 files changed, 1191 insertions(+), 1 deletion(-)
+ 6 files changed, 1188 insertions(+)
  create mode 100644 drivers/char/ipmi/ssif_bmc.c
  create mode 100644 drivers/char/ipmi/ssif_bmc.h
  create mode 100644 drivers/char/ipmi/ssif_bmc_aspeed.c
  create mode 100644 drivers/char/ipmi/ssif_bmc_npcm7xx.c
 
 diff --git a/drivers/char/ipmi/Kconfig b/drivers/char/ipmi/Kconfig
-index 56eba099e705..9b9890016291 100644
+index 644240d83809..399c4b4ab3f4 100644
 --- a/drivers/char/ipmi/Kconfig
 +++ b/drivers/char/ipmi/Kconfig
-@@ -133,6 +133,39 @@ config ASPEED_BT_IPMI_BMC
+@@ -177,6 +177,39 @@ config ASPEED_BT_IPMI_BMC
  	  found on Aspeed SOCs (AST2400 and AST2500). The driver
  	  implements the BMC side of the BT interface.
  
@@ -69,10 +68,10 @@ index 56eba099e705..9b9890016291 100644
  	tristate 'IPMB Interface handler'
  	depends on I2C
 diff --git a/drivers/char/ipmi/Makefile b/drivers/char/ipmi/Makefile
-index 0822adc2ec41..11ad2c9b043a 100644
+index 3390985b4802..fd6d726b8274 100644
 --- a/drivers/char/ipmi/Makefile
 +++ b/drivers/char/ipmi/Makefile
-@@ -27,3 +27,6 @@ obj-$(CONFIG_ASPEED_BT_IPMI_BMC) += bt-bmc.o
+@@ -30,3 +30,6 @@ obj-$(CONFIG_ASPEED_BT_IPMI_BMC) += bt-bmc.o
  obj-$(CONFIG_ASPEED_KCS_IPMI_BMC) += kcs_bmc_aspeed.o
  obj-$(CONFIG_NPCM7XX_KCS_IPMI_BMC) += kcs_bmc_npcm7xx.o
  obj-$(CONFIG_IPMB_DEVICE_INTERFACE) += ipmb_dev_int.o
@@ -1255,39 +1254,6 @@ index 000000000000..1568234c9f60
 +MODULE_AUTHOR("Mohaimen <mohaimen.alsamarai@foxconn.com>");
 +MODULE_DESCRIPTION("Device driver of the Nuvoton BMC IPMI SSIF interface.");
 +MODULE_LICENSE("GPL v2");
-diff --git a/drivers/i2c/i2c-core-smbus.c b/drivers/i2c/i2c-core-smbus.c
-index f5c9787992e9..b37697b7cbfd 100644
---- a/drivers/i2c/i2c-core-smbus.c
-+++ b/drivers/i2c/i2c-core-smbus.c
-@@ -38,7 +38,7 @@ static u8 crc8(u16 data)
- }
- 
- /* Incremental CRC8 over count bytes in the array pointed to by p */
--static u8 i2c_smbus_pec(u8 crc, u8 *p, size_t count)
-+u8 i2c_smbus_pec(u8 crc, u8 *p, size_t count)
- {
- 	int i;
- 
-@@ -46,6 +46,7 @@ static u8 i2c_smbus_pec(u8 crc, u8 *p, size_t count)
- 		crc = crc8((crc ^ p[i]) << 8);
- 	return crc;
- }
-+EXPORT_SYMBOL(i2c_smbus_pec);
- 
- /* Assume a 7-bit address, which is reasonable for SMBus */
- static u8 i2c_smbus_msg_pec(u8 pec, struct i2c_msg *msg)
-diff --git a/include/linux/i2c.h b/include/linux/i2c.h
-index 56622658b215..0d75e5bcdde6 100644
---- a/include/linux/i2c.h
-+++ b/include/linux/i2c.h
-@@ -144,6 +144,7 @@ s32 __i2c_smbus_xfer(struct i2c_adapter *adapter, u16 addr,
- /* Now follow the 'nice' access routines. These also document the calling
-    conventions of i2c_smbus_xfer. */
- 
-+u8 i2c_smbus_pec(u8 crc, u8 *p, size_t count);
- s32 i2c_smbus_read_byte(const struct i2c_client *client);
- s32 i2c_smbus_write_byte(const struct i2c_client *client, u8 value);
- s32 i2c_smbus_read_byte_data(const struct i2c_client *client, u8 command);
 -- 
 2.17.1
 

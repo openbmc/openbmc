@@ -8,3 +8,4 @@ SRC_URI:append:buv-runbmc = " \
   file://0008-driver-misc-seven-segment-display-gpio-driver.patch \
   "
 
+SRC_URI:append:buv-runbmc = " file://0001-drivers-spi-Bugfixed-npcm_fiu_uma_read-set-wrong-val.patch"

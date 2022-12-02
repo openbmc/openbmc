@@ -1,25 +1,26 @@
-From d01d2a3e5863a35765430b2ef7c382e67a716bd5 Mon Sep 17 00:00:00 2001
+From 5f2fb8352a423a1670047f2a4599a041a1d75be8 Mon Sep 17 00:00:00 2001
 From: Brian Ma <chma0@nuvoton.com>
 Date: Fri, 28 Aug 2020 09:45:40 +0800
 Subject: [PATCH] driver: SPI: add w25q01jv support
 
+Signed-off-by: Allen Kang <jhkang@nuvoton.com>
 ---
- drivers/mtd/spi-nor/spi-nor.c | 2 ++
+ drivers/mtd/spi-nor/winbond.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/drivers/mtd/spi-nor/spi-nor.c b/drivers/mtd/spi-nor/spi-nor.c
-index fb57b312e5e1..a3731bd07d2f 100644
---- a/drivers/mtd/spi-nor/spi-nor.c
-+++ b/drivers/mtd/spi-nor/spi-nor.c
-@@ -2486,6 +2486,8 @@ static const struct flash_info spi_nor_ids[] = {
- 			SPI_NOR_HAS_LOCK | SPI_NOR_HAS_TB) },
- 	{ "w25m512jv", INFO(0xef7119, 0, 64 * 1024, 1024,
- 			SECT_4K | SPI_NOR_QUAD_READ | SPI_NOR_DUAL_READ) },
-+	{ "w25q01jv", INFO(0xef7021, 0, 64 * 1024, 2048,
-+			SECT_4K | SPI_NOR_QUAD_READ | SPI_NOR_DUAL_READ) },
+diff --git a/drivers/mtd/spi-nor/winbond.c b/drivers/mtd/spi-nor/winbond.c
+index 0ff7a20d030c..7a52eabe0975 100644
+--- a/drivers/mtd/spi-nor/winbond.c
++++ b/drivers/mtd/spi-nor/winbond.c
+@@ -106,6 +106,8 @@ static const struct flash_info winbond_parts[] = {
+ 			     SECT_4K | SPI_NOR_DUAL_READ | SPI_NOR_QUAD_READ) },
+ 	{ "w25q01jviq", INFO(0xef4021, 0, 64 * 1024, 2048,
+ 			     SECT_4K | SPI_NOR_DUAL_READ | SPI_NOR_QUAD_READ) },
++	{ "w25q01jviq", INFO(0xef4021, 0, 64 * 1024, 2048,
++			     SECT_4K | SPI_NOR_DUAL_READ | SPI_NOR_QUAD_READ) },
+ };
  
- 	/* Catalyst / On Semiconductor -- non-JEDEC */
- 	{ "cat25c11", CAT25_INFO(  16, 8, 16, 1, SPI_NOR_NO_ERASE | SPI_NOR_NO_FR) },
+ /**
 -- 
-2.17.1
+2.34.1
 

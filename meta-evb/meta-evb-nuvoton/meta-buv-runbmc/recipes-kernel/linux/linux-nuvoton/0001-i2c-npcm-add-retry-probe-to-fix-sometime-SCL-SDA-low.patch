@@ -1,17 +1,18 @@
-From f87f8e8120642ff4138ceda64fdba8ea8df67f9c Mon Sep 17 00:00:00 2001
+From 9abd7aab865149885c302c3565574b1817302b01 Mon Sep 17 00:00:00 2001
 From: jimliu2 <JJLIU0@nuvoton.com>
 Date: Fri, 12 Nov 2021 11:19:55 +0800
 Subject: [PATCH] i2c: npcm: add retry probe to fix sometime SCL/SDA low
 
+Signed-off-by: Allen Kang <jhkang@nuvoton.com>
 ---
- drivers/i2c/busses/i2c-npcm7xx.c | 21 ++++++++++++++++-----
- 1 file changed, 16 insertions(+), 5 deletions(-)
+ drivers/i2c/busses/i2c-npcm7xx.c | 22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/i2c/busses/i2c-npcm7xx.c b/drivers/i2c/busses/i2c-npcm7xx.c
-index 71304d173712..383818e4f9a6 100644
+index fd8965c4424f..7e3938b835e6 100644
 --- a/drivers/i2c/busses/i2c-npcm7xx.c
 +++ b/drivers/i2c/busses/i2c-npcm7xx.c
-@@ -1953,7 +1953,8 @@ static int npcm_i2c_init_module(struct npcm_i2c *bus, enum i2c_mode mode,
+@@ -1997,7 +1997,8 @@ static int npcm_i2c_init_module(struct npcm_i2c *bus, enum i2c_mode mode,
  				u32 bus_freq_hz)
  {
  	u8 val;
@@ -21,20 +22,20 @@ index 71304d173712..383818e4f9a6 100644
  
  	/* Check whether module already enabled or frequency is out of bounds */
  	if ((bus->state != I2C_DISABLE && bus->state != I2C_IDLE) ||
-@@ -1992,11 +1993,21 @@ static int npcm_i2c_init_module(struct npcm_i2c *bus, enum i2c_mode mode,
+@@ -2036,10 +2037,21 @@ static int npcm_i2c_init_module(struct npcm_i2c *bus, enum i2c_mode mode,
  	npcm_i2c_reset(bus);
  
- 	/* check HW is OK: SDA and SCL should be high at this point. */
--	if ((npcm_i2c_get_SDA(&bus->adap) == 0) ||
--	    (npcm_i2c_get_SCL(&bus->adap) == 0)) {
--		dev_err(bus->dev, "I2C%d init fail: lines are low", bus->num);
+ 	/* Check HW is OK: SDA and SCL should be high at this point. */
+-	if ((npcm_i2c_get_SDA(&bus->adap) == 0) || (npcm_i2c_get_SCL(&bus->adap) == 0)) {
+-		dev_err(bus->dev, "I2C%d init fail: lines are low\n", bus->num);
+-		dev_err(bus->dev, "SDA=%d SCL=%d\n", npcm_i2c_get_SDA(&bus->adap),
+-			npcm_i2c_get_SCL(&bus->adap));
 +
 +	do {
 +		if ((npcm_i2c_get_SDA(&bus->adap) == 0) ||
 +			(npcm_i2c_get_SCL(&bus->adap) == 0)) {
 +		dev_err(bus->dev, "I2C%d init fail: lines are low, iter: %d", bus->num, iter);
- 		dev_err(bus->dev, "SDA=%d SCL=%d", npcm_i2c_get_SDA(&bus->adap),
--			npcm_i2c_get_SCL(&bus->adap));
++		dev_err(bus->dev, "SDA=%d SCL=%d", npcm_i2c_get_SDA(&bus->adap),
 +				npcm_i2c_get_SCL(&bus->adap));
 +		usleep_range(20, 30);
 +		} else {
@@ -48,5 +49,5 @@ index 71304d173712..383818e4f9a6 100644
  	}
  
 -- 
-2.17.1
+2.34.1
 

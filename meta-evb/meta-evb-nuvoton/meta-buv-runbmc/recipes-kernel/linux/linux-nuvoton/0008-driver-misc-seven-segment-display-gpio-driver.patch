@@ -1,9 +1,10 @@
-From c4a65954311db5c5ca357215a81d9e22d73a8fe7 Mon Sep 17 00:00:00 2001
+From 9d1b7b54b5ce8826a00db1fdcb5562d7a35f0bf3 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Thu, 25 Mar 2021 13:12:00 +0800
 Subject: [PATCH] driver: misc: seven segment display/gpio driver
 
 Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+Signed-off-by: Allen Kang <jhkang@nuvoton.com>
 ---
  drivers/misc/Kconfig          |  16 +++
  drivers/misc/Makefile         |   2 +
@@ -16,12 +17,12 @@ Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
  create mode 100644 drivers/misc/seven_seg_gpio.c
 
 diff --git a/drivers/misc/Kconfig b/drivers/misc/Kconfig
-index 9ff8439ac617..da3842d68b0b 100644
+index e7eab4e70611..94c02e26367d 100644
 --- a/drivers/misc/Kconfig
 +++ b/drivers/misc/Kconfig
-@@ -500,6 +500,22 @@ config NPCM7XX_MCU_FLASH
+@@ -507,6 +507,22 @@ config NPCM750_ECE
  	help
- 	  Control GPIO to transmit SPI signals to support MCU firmware flash function.
+ 	  Enable Nuvoton Encoding and Compression Engine.
  
 +config SEVEN_SEGMENT_DISPLAY
 +        tristate "Character driver for seven segment display support"
@@ -43,15 +44,17 @@ index 9ff8439ac617..da3842d68b0b 100644
  source "drivers/misc/eeprom/Kconfig"
  source "drivers/misc/cb710/Kconfig"
 diff --git a/drivers/misc/Makefile b/drivers/misc/Makefile
-index 2309139d00d6..72fc492657b3 100644
+index 2db97ac01a4f..b810bb659d36 100644
 --- a/drivers/misc/Makefile
 +++ b/drivers/misc/Makefile
-@@ -63,3 +63,5 @@ obj-$(CONFIG_NPCM_VDM)		+= npcm-vdm/
+@@ -63,5 +63,7 @@ obj-$(CONFIG_NPCM_LPC_BPC)	+= npcm7xx-lpc-bpc.o
+ obj-$(CONFIG_NPCM_PCI_MBOX)	+= npcm7xx-pci-mbox.o
  obj-$(CONFIG_NPCM7XX_JTAG_MASTER)	+= npcm7xx-jtag-master.o
- obj-$(CONFIG_MCTP_LPC)		+= mctp-lpc.o
- obj-$(CONFIG_NPCM7XX_MCU_FLASH) += npcm7xx-mcu-flash.o
+ obj-$(CONFIG_NPCM8XX_JTAG_MASTER)       += npcm8xx-jtag-master.o
 +obj-$(CONFIG_SEVEN_SEGMENT_DISPLAY)    += seven_seg_disp.o
 +obj-$(CONFIG_SEVEN_SEGMENT_GPIO) += seven_seg_gpio.o
+ obj-$(CONFIG_NPCM750_VCD) += npcm750_vcd.o
+ obj-$(CONFIG_NPCM750_ECE) += npcm750_ece.o
 diff --git a/drivers/misc/seven_seg_disp.c b/drivers/misc/seven_seg_disp.c
 new file mode 100644
 index 000000000000..eedcfed592f4
@@ -453,5 +456,5 @@ index 000000000000..4eed6579123e
 +MODULE_AUTHOR("Jaghathiswari Rankappagounder Natarajan <jaghu@google.com>");
 +MODULE_DESCRIPTION("Seven segment display driver using GPIO config");
 -- 
-2.17.1
+2.34.1
 
