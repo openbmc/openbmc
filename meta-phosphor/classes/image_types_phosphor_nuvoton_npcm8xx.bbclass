@@ -68,7 +68,7 @@ do_prepare_bootloaders() {
 
 # Sign images for secure os be enabled
 do_sign_binary() {
-    if [ "${SECURED_OS}" = "True" ]; then
+    if [ "${SECURED_IMAGE}" = "True" ]; then
         # Used to embed the key index inside the image, usually at offset 0x140
         python3 ${IGPS_DIR}/BinarySignatureGenerator.py Replace_binary_single_byte \
             ${DEPLOY_DIR_IMAGE}/${BOOTBLOCK} 140 ${KEY_BB_INDEX}

@@ -31,7 +31,7 @@ UBOOT_ALIGN ?= "4096"
 ALIGN_END ?= "4096"
 PAD_ALIGN ?= "32"
 
-SECURED_OS ?= "False"
+SECURED_IMAGE ?= "False"
 
 SOC_FAMILY = "npcm8xx"
 include conf/machine/include/soc-family.inc

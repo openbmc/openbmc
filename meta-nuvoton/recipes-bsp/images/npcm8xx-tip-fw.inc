@@ -19,11 +19,6 @@ inherit deploy
 
 do_deploy () {
 	install -D -m 644 ${WORKDIR}/${FILENAME} ${DEPLOYDIR}/Kmt_TipFwL0_Skmt_TipFwL1.bin
-
-    if [ "${SECURED_OS}" = "True" ]; then
-        install -D -m 644 ${SKMT_BIN} ${DEPLOYDIR}/Kmt_TipFwL0_Skmt_TipFwL1.bin
-    fi
-
 }
 
 addtask deploy before do_build after do_compile
