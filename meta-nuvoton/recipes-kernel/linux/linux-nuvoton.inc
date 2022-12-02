@@ -9,10 +9,13 @@ KCONFIG_MODE="--alldefconfig"
 KSRC ?= "git://github.com/openbmc/linux;protocol=https;branch=${KBRANCH}"
 SRC_URI = "${KSRC}"
 SRC_URI:append:npcm7xx = " file://defconfig"
+SRC_URI:append:npcm8xx = " file://npcm8xx_defconfig"
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 
 PV = "${LINUX_VERSION}+git${SRCPV}"
+
+UBOOT_MKIMAGE:append:npcm8xx = " -E -B 8"
 
 inherit kernel
 require recipes-kernel/linux/linux-yocto.inc
