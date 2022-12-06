@@ -83,17 +83,31 @@ do_sign_binary() {
             ${DEPLOY_DIR_IMAGE}/${UBOOT_BINARY}.${FULL_SUFFIX} 140 ${KEY_UBOOT_INDEX}
 
         # Sign specific image with specific key
-        python3 ${IGPS_DIR}/BinarySignatureGenerator.py Sign_binary \
-            ${DEPLOY_DIR_IMAGE}/${BOOTBLOCK} 112 ${KEY_BB} 16 ${DEPLOY_DIR_IMAGE}/${BOOTBLOCK} ${KEY_SIGN} 0 ${KEY_BB_ID}
+        res=`python3 ${IGPS_DIR}/BinarySignatureGenerator.py Sign_binary \
+            ${DEPLOY_DIR_IMAGE}/${BOOTBLOCK} 112 ${KEY_BB} 16 \
+            ${DEPLOY_DIR_IMAGE}/${BOOTBLOCK} ${KEY_SIGN} 0 ${KEY_BB_ID}
 
-        python3 ${IGPS_DIR}/BinarySignatureGenerator.py Sign_binary \
-            ${DEPLOY_DIR_IMAGE}/${ATF_BINARY} 112 ${KEY_BL31} 16 ${DEPLOY_DIR_IMAGE}/${ATF_BINARY} ${KEY_SIGN} 0 ${KEY_BL31_ID}
+            python3 ${IGPS_DIR}/BinarySignatureGenerator.py Sign_binary \
+            ${DEPLOY_DIR_IMAGE}/${ATF_BINARY} 112 ${KEY_BL31} 16 \
+            ${DEPLOY_DIR_IMAGE}/${ATF_BINARY} ${KEY_SIGN} 0 ${KEY_BL31_ID}
 
-        python3 ${IGPS_DIR}/BinarySignatureGenerator.py Sign_binary \
-            ${DEPLOY_DIR_IMAGE}/${OPTEE_BINARY} 112 ${KEY_OPTEE} 16 ${DEPLOY_DIR_IMAGE}/${OPTEE_BINARY} ${KEY_SIGN} 0 ${KEY_OPTEE_ID}
+            python3 ${IGPS_DIR}/BinarySignatureGenerator.py Sign_binary \
+            ${DEPLOY_DIR_IMAGE}/${OPTEE_BINARY} 112 ${KEY_OPTEE} 16 \
+            ${DEPLOY_DIR_IMAGE}/${OPTEE_BINARY} ${KEY_SIGN} 0 ${KEY_OPTEE_ID}
 
-        python3 ${IGPS_DIR}/BinarySignatureGenerator.py Sign_binary \
-            ${DEPLOY_DIR_IMAGE}/${UBOOT_BINARY}.${FULL_SUFFIX} 112 ${KEY_UBOOT} 16 ${DEPLOY_DIR_IMAGE}/${UBOOT_BINARY}.${FULL_SUFFIX} ${KEY_SIGN} 0 ${KEY_UBOOT_ID}
+            python3 ${IGPS_DIR}/BinarySignatureGenerator.py Sign_binary \
+            ${DEPLOY_DIR_IMAGE}/${UBOOT_BINARY}.${FULL_SUFFIX} 112 ${KEY_UBOOT} 16 \
+            ${DEPLOY_DIR_IMAGE}/${UBOOT_BINARY}.${FULL_SUFFIX} ${KEY_SIGN} 0 ${KEY_UBOOT_ID}`
+
+        # Stop full image build process when sign binary got failed
+        set +e
+        err=`echo $res | grep -E "missing|Invalid|failed"`
+        if [ -n "${err}" ]; then
+            echo $res
+            MSG="Sign binary failed"
+            bbfatal $MSG
+        fi
+        set -e
     fi
 }
 
