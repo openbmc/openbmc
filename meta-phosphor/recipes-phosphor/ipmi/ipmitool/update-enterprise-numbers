@@ -1,7 +1,8 @@
-#!/bin/env python3
+#!/usr/bin/env python3
 
-from sh import curl
 from typing import List
+
+from sh import curl  # type: ignore
 
 ENTERPRISES = {
     0: "Reserved",
@@ -32,18 +33,18 @@ ENTERPRISES = {
     52893: "Inspur Power Systems Co.,Ltd.",
 }
 
-HEADER = '''\
+HEADER = """\
 This file has been reduced to entities signing CLAs with OpenBMC
 https://drive.google.com/drive/folders/1Ooi0RdTcaOWF1DWFJUAJDdN7tRKde7Nl\
-'''
+"""
 
 found_first: bool = False
 org: List[str] = []
 
-for l in curl(
+for ln in curl(
     "-L", "http://www.iana.org/assignments/enterprise-numbers"
 ).splitlines():
-    line = l.rstrip()
+    line = ln.rstrip()
 
     # Look for Reserved/EN-0 as the start of the data.
     if "0" == line:
