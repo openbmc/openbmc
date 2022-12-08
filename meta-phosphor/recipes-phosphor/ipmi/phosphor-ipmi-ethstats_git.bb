@@ -5,7 +5,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "phosphor-ipmi-host"
-SRCREV = "c8894c55f5d58862f266aebedc43e2652f529a41"
+SRCREV = "1e34d327c7f25a744102d0279155aeacc9f453f5"
 PV = "0.1+git${SRCPV}"
 PR = "r1"
 
