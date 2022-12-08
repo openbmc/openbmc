@@ -8,7 +8,7 @@ DEPENDS += " \
   phosphor-ipmi-host \
   phosphor-logging \
   "
-SRCREV = "83f9992cc60dedb6a2a964a733fd35c89c8a0cfa"
+SRCREV = "8848c4384c639696a0a2c3f30badb545b364acec"
 PV = "0.1+git${SRCPV}"
 PR = "r1"
 
