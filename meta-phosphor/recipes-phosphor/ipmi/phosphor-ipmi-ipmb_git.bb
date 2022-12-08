@@ -8,7 +8,7 @@ DEPENDS = "sdbusplus \
            i2c-tools \
            boost \
            nlohmann-json"
-SRCREV = "8978a5a81cddfa86423cd2a0c2a8154858df0151"
+SRCREV = "0da15b5517b05685c5af70ff6ee5d67e523f47de"
 PV = "0.1+git${SRCPV}"
 
 SRC_URI = "git://github.com/openbmc/ipmbbridge.git;branch=master;protocol=https"
