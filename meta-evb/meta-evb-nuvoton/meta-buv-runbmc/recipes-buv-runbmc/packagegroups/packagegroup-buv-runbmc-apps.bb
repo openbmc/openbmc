@@ -49,6 +49,10 @@ RDEPENDS:${PN}-system = " \
     nuvoton-ipmi-oem \
     "
 
+RDEPENDS:${PN}-system:append = " \
+        ${@entity_enabled(d, '', 'first-boot-set-psu')} \
+        "
+
 SUMMARY:${PN}-entity = "BUV RunBMC entity"
 #RDEPENDS:${PN}-entity = " \
 #    intel-ipmi-oem \

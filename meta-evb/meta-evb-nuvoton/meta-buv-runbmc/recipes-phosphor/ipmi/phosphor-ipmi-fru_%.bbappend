@@ -12,7 +12,7 @@ EXTRA_OECONF:buv-runbmc = " \
     ${@entity_enabled(d, '', 'PROP_YAML=${STAGING_DIR_HOST}${datadir}/buv-runbmc-yaml-config/ipmi-extra-properties.yaml')} \
     "
 
-EEPROM_NAMES = "bmc"
+EEPROM_NAMES = "motherboard bmc"
 
 EEPROMFMT = "system/chassis/{0}"
 EEPROM_ESCAPEDFMT = "system-chassis-{0}"
