@@ -42,10 +42,10 @@ HOST_ON_RESET_HOSTFMT = "../${HOST_ON_RESET_HOSTTMPL}:${HOST_ON_RESET_HOSTTGTFMT
 SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'HOST_ON_RESET_HOSTFMT', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_SERVICE:${PN} += "${HOST_ON_RESET_HOSTTMPL}"
 
-# append on op-wait-power-on
+# append on phosphor-wait-power-on
 AMPERE_POWER_ON_TGT = "obmc-power-already-on@.target"
 AMPERE_POWER_ON_INSTMPL = "obmc-power-already-on@{0}.target"
-OP_WAIT_POWER_ON = "op-wait-power-on@{0}.service"
+OP_WAIT_POWER_ON = "phosphor-wait-power-on@{0}.service"
 AMPERE_POWER_ON_TARGET_FMT = "../${AMPERE_POWER_ON_TGT}:${OP_WAIT_POWER_ON}.wants/${AMPERE_POWER_ON_INSTMPL}"
 SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'AMPERE_POWER_ON_TARGET_FMT', 'OBMC_HOST_INSTANCES')}"
 
