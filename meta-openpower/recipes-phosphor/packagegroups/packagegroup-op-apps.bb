@@ -25,7 +25,7 @@ SUMMARY:${PN}-chassis = "OpenPOWER Chassis"
 RDEPENDS:${PN}-chassis = " \
         obmc-phosphor-buttons-signals \
         obmc-phosphor-buttons-handler \
-        obmc-op-control-power \
+        phosphor-skeleton-control-power \
         obmc-host-failure-reboots \
         "
 #Pull in obmc-fsi on all P9 OpenPOWER systems

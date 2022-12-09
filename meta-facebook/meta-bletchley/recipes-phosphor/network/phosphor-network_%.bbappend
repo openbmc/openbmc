@@ -1,6 +1,9 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 PACKAGECONFIG:append = " sync-mac"
+
+EXTRA_OEMESON = "-Dforce-sync-mac=true"
+
 SRC_URI += " \
     file://config.json \
     "

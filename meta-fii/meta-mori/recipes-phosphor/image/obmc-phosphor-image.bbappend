@@ -31,7 +31,7 @@ OBMC_IMAGE_EXTRA_INSTALL:append:mori = " obmc-console"
 # Required from packagegroup-mori-apps
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " obmc-phosphor-buttons-signals"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " obmc-phosphor-buttons-handler"
-OBMC_IMAGE_EXTRA_INSTALL:append:mori = " obmc-op-control-power"
+OBMC_IMAGE_EXTRA_INSTALL:append:mori = " phosphor-skeleton-control-power"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " ncsid"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " gbmc-mac-config"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " entity-manager"

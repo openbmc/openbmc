@@ -39,6 +39,7 @@ ACTION_RESET="reset"
 ACTION_AC_ON="ac-on"
 ACTION_AC_OFF="ac-off"
 ACTION_STATUS="status"
+ACTION_BOOT_MODE="boot-from-bootmode"
 
 VALID_SLED_ACTIONS="
     $ACTION_ON
@@ -50,7 +51,12 @@ VALID_SLED_ACTIONS="
     $ACTION_RECOVERY
     $ACTION_CYCLE
     $ACTION_RESET
+    $ACTION_BOOT_MODE
 "
+
+BOOT_MODE_REGULAR="\"xyz.openbmc_project.Control.Boot.Mode.Modes.Regular\""
+BOOT_MODE_SAFE="\"xyz.openbmc_project.Control.Boot.Mode.Modes.Safe\""
+BOOT_MODE_SETUP="\"xyz.openbmc_project.Control.Boot.Mode.Modes.Setup\""
 
 function is_valid_sled_action()
 {
@@ -332,6 +338,14 @@ function get_host_status()
     return $?
 }
 
+function get_host_bootmode()
+{
+    local BUS_NAME="xyz.openbmc_project.Settings"
+    local OBJ_PATH="/xyz/openbmc_project/control/host${1}/boot"
+    local INTF_NAME="xyz.openbmc_project.Control.Boot.Mode"
+    busctl get-property "${BUS_NAME}" "${OBJ_PATH}" "${INTF_NAME}" BootMode | awk '{print $2}'
+}
+
 function do_action_reset()
 {
     # 1. Power off
@@ -421,7 +435,7 @@ function do_action_dfu()
         echo "SLED$SLED_NUM: press power button failed"
         echo "SLED$SLED_NUM: releasing power button"
         release_power_button "$SLED_NUM"
-        exit 1
+        return 1
     fi
     sleep 1
 
@@ -434,7 +448,7 @@ function do_action_dfu()
     echo "SLED$SLED_NUM: releasing host power button"
     if ! release_power_button "$SLED_NUM"; then
         echo "SLED$SLED_NUM: release power button failed"
-        exit 1
+        return 1
     fi
     echo "$ACTION_DFU" > "/tmp/sled${SLED_NUM}-last-action"
 }
@@ -504,6 +518,9 @@ function host_state_off_action_handler()
         "$ACTION_RECOVERY")
             do_action_recovery "$SLED_NUM"
             ;;
+        "$ACTION_DFU")
+            do_action_dfu "$SLED_NUM"
+            ;;
         "$ACTION_AC_OFF")
             do_action_ac_off "$SLED_NUM"
             ;;
@@ -554,6 +571,9 @@ function host_state_ac_on_action_handler()
     case $ACTION in
         "$ACTION_AC_OFF")
             do_action_ac_off "$SLED_NUM"
+            ;;
+        "$ACTION_DFU")
+            do_action_dfu "$SLED_NUM"
             ;;
         "$ACTION_CYCLE")
             do_action_cycle "$SLED_NUM"
@@ -688,6 +708,28 @@ elif [ "$ACTION" = "$ACTION_STATUS" ];then
     echo "$HOST_CURR_STATUS"
 else
     HOST_CURR_STATUS=$(get_host_status "$SLED_NUM")
+
+    if [ "$ACTION" = "$ACTION_BOOT_MODE" ]; then
+        BOOT_MODE=$(get_host_bootmode "$SLED_NUM")
+        case "$BOOT_MODE" in
+        "$BOOT_MODE_REGULAR")
+            echo "Boot mode: on (regular)"
+            ACTION="$ACTION_ON"
+            ;;
+        "$BOOT_MODE_SAFE")
+            echo "Boot mode: recovery (safe)"
+            ACTION="$ACTION_RECOVERY"
+            ;;
+        "$BOOT_MODE_SETUP")
+            echo "Boot mode: dfu (setup)"
+            ACTION="$ACTION_DFU"
+            ;;
+        *)
+            echo "Boot mode: unknow"
+            ;;
+        esac
+    fi
+
     case $HOST_CURR_STATUS in
         "$HOST_AC_OFF")
             host_state_ac_off_action_handler "$SLED_NUM" "$ACTION"

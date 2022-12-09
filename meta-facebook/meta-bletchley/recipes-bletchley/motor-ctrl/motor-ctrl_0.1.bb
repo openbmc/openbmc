@@ -57,31 +57,3 @@ SYSTEMD_LINK:${PN} += "${@compose_list(d, 'AC_ON_INSTFMT', 'OBMC_HOST_INSTANCES'
 SYSTEMD_SERVICE:${PN} += "host-ac-off@.service"
 SYSTEMD_LINK:${PN} += "${@compose_list(d, 'AC_OFF_INSTFMT', 'OBMC_HOST_INSTANCES')}"
 
-# Host on requires these chassis on
-START_TMPL_CTRL = "obmc-chassis-poweron@.target"
-START_TGTFMT_CTRL = "obmc-host-startmin@{0}.target"
-START_INSTFMT_CTRL = "obmc-chassis-poweron@{0}.target"
-START_FMT_CTRL = "../${START_TMPL_CTRL}:${START_TGTFMT_CTRL}.requires/${START_INSTFMT_CTRL}"
-SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'START_FMT_CTRL', 'OBMC_HOST_INSTANCES')}"
-
-# Chassis off requires host off
-STOP_TMPL_CTRL = "obmc-host-stop@.target"
-STOP_TGTFMT_CTRL = "obmc-chassis-poweroff@{0}.target"
-STOP_INSTFMT_CTRL = "obmc-host-stop@{0}.target"
-STOP_FMT_CTRL = "../${STOP_TMPL_CTRL}:${STOP_TGTFMT_CTRL}.requires/${STOP_INSTFMT_CTRL}"
-SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'STOP_FMT_CTRL', 'OBMC_HOST_INSTANCES')}"
-
-# Hard power off requires chassis off
-HARD_OFF_TMPL_CTRL = "obmc-chassis-poweroff@.target"
-HARD_OFF_TGTFMT_CTRL = "obmc-chassis-hard-poweroff@{0}.target"
-HARD_OFF_INSTFMT_CTRL = "obmc-chassis-poweroff@{0}.target"
-HARD_OFF_FMT_CTRL = "../${HARD_OFF_TMPL_CTRL}:${HARD_OFF_TGTFMT_CTRL}.requires/${HARD_OFF_INSTFMT_CTRL}"
-SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'HARD_OFF_FMT_CTRL', 'OBMC_HOST_INSTANCES')}"
-
-# Host on unit configurations
-HOST_ON_OVERRIDE_CONF_FMT = "host-poweron.conf:host-poweron@{0}.service.d/host-poweron.conf"
-SYSTEMD_OVERRIDE:${PN}:bletchley += "${@compose_list_zip(d, 'HOST_ON_OVERRIDE_CONF_FMT', 'OBMC_HOST_INSTANCES')}"
-
-# Host off unit configurations
-HOST_OFF_OVERRIDE_CONF_FMT = "host-poweroff.conf:host-poweroff@{0}.service.d/host-poweroff.conf"
-SYSTEMD_OVERRIDE:${PN}:bletchley += "${@compose_list_zip(d, 'HOST_OFF_OVERRIDE_CONF_FMT', 'OBMC_HOST_INSTANCES')}"

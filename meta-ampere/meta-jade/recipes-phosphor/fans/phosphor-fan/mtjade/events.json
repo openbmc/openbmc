@@ -1,0 +1,394 @@
+[
+  {
+    "name": "set_target_fan_not_present",
+    "groups": [
+      {
+        "name": "air_cooled_zone0_fans",
+        "interface": "xyz.openbmc_project.Inventory.Item",
+        "property": { "name": "Present" }
+      }
+    ],
+    "triggers": [
+      {
+        "class": "init",
+        "method": "get_properties"
+      },
+      {
+        "class": "signal",
+        "signal": "properties_changed"
+      }
+    ],
+    "actions": [
+      {
+        "name": "count_state_before_target",
+        "count": 1,
+        "state": false,
+        "target": 255
+      }
+    ]
+  },
+  {
+    // Hold fans at the given target when a number of rotors are nonfunctional.
+    "name": "set_target_fan_not_functional",
+    "groups": [
+      {
+        "name": "fan3",
+        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+        "property": { "name": "Functional" }
+      },
+      {
+        "name": "fan4",
+        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+        "property": { "name": "Functional" }
+      },
+      {
+        "name": "fan5",
+        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+        "property": { "name": "Functional" }
+      },
+      {
+        "name": "fan6",
+        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+        "property": { "name": "Functional" }
+      },
+      {
+        "name": "fan7",
+        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+        "property": { "name": "Functional" }
+      },
+      {
+        "name": "fan8",
+        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
+        "property": { "name": "Functional" }
+      }
+    ],
+    "triggers": [
+      {
+        "class": "init",
+        "method": "get_properties"
+      },
+      {
+        "class": "signal",
+        "signal": "properties_changed"
+      }
+    ],
+    "actions": [
+      {
+        "name": "count_state_before_target",
+        "count": 1,
+        "state": false,
+        "target": 255
+      }
+    ]
+  },
+  {
+    "name": "default_fan_floor_on_missing_service",
+    "groups": [
+        {
+        "name": "zone0_ambient",
+        "interface": "xyz.openbmc_project.Sensor.Value",
+        "property": { "name": "Value" }
+        }
+    ],
+    "triggers": [
+        {
+        "class": "init",
+        "method": "name_has_owner"
+        },
+        {
+        "class": "signal",
+        "signal": "name_owner_changed"
+        }
+    ],
+    "actions": [
+        {
+        "name": "call_actions_based_on_timer",
+        "timer": {
+            "interval": 5000000,
+            "type": "oneshot"
+        },
+        "actions": [
+            {
+            "name": "default_floor_on_missing_owner",
+            "groups": [
+              {
+              "name": "zone0_ambient",
+              "interface": "xyz.openbmc_project.Sensor.Value",
+              "property": { "name": "Value" }
+              }
+            ]
+            }
+        ]
+        }
+    ]
+  },
+  {
+    "name": "target_mapping_from_TS_temp",
+    "groups": [
+      {
+        "name": "zone0_ambient",
+        "interface": "xyz.openbmc_project.Sensor.Value",
+        "property": { "name": "Value" }
+      }
+    ],
+    "triggers": [
+      {
+        "class": "init",
+        "method": "get_properties"
+      },
+      {
+        "class": "signal",
+        "signal": "properties_changed"
+      },
+      {
+        "class": "timer",
+        "type": "repeating",
+        "interval": 5000000,
+        "preload_groups": true
+      }
+    ],
+    "actions": [
+      {
+        "name": "target_from_group_max",
+        "groups": [
+          {
+            "name": "zone0_ambient",
+            "interface": "xyz.openbmc_project.Sensor.Value",
+            "property": { "name": "Value" }
+          }
+        ],
+        "neg_hysteresis": 1,
+        "pos_hysteresis": 0,
+        "index": 0,
+        "map": [
+              { "value": 10.0, "target": 38.0 },
+              { "value": 18.0, "target": 38.0 },
+              { "value": 20.0, "target": 41.0 },
+              { "value": 21.0, "target": 43.0 },
+              { "value": 22.0, "target": 46.0 },
+              { "value": 24.0, "target": 48.0 },
+              { "value": 28.0, "target": 51.0 },
+              { "value": 32.0, "target": 56.0 },
+              { "value": 34.0, "target": 59.0 },
+              { "value": 36.0, "target": 61.0 },
+              { "value": 40.0, "target": 64.0 },
+              { "value": 41.0, "target": 66.0 },
+              { "value": 42.0, "target": 69.0 },
+              { "value": 43.0, "target": 71.0 },
+              { "value": 44.0, "target": 74.0 },
+              { "value": 45.0, "target": 77.0 },
+              { "value": 46.0, "target": 79.0 },
+              { "value": 47.0, "target": 82.0 },
+              { "value": 48.0, "target": 84.0 },
+              { "value": 49.0, "target": 87.0 },
+              { "value": 50.0, "target": 89.0 }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "target_mapping_from_OCP_temp",
+    "groups": [
+      {
+        "name": "zone0_ocp",
+        "interface": "xyz.openbmc_project.Sensor.Value",
+        "property": { "name": "Value" }
+      }
+    ],
+    "triggers": [
+      {
+        "class": "init",
+        "method": "get_properties"
+      },
+      {
+        "class": "signal",
+        "signal": "properties_changed"
+      },
+      {
+        "class": "timer",
+        "type": "repeating",
+        "interval": 5000000,
+        "preload_groups": true
+      }
+    ],
+    "actions": [
+      {
+        "name": "target_from_group_max",
+        "groups": [
+          {
+            "name": "zone0_ocp",
+            "interface": "xyz.openbmc_project.Sensor.Value",
+            "property": { "name": "Value" }
+          }
+        ],
+        "neg_hysteresis": 2,
+        "pos_hysteresis": 2,
+        "index": 3,
+        "map": [
+          { "value": 10.0, "target": 38.0 },
+          { "value": 65.0, "target": 38.0 },
+          { "value": 66.0, "target": 43.0 },
+          { "value": 67.0, "target": 51.0 },
+          { "value": 68.0, "target": 54.0 },
+          { "value": 69.0, "target": 56.0 },
+          { "value": 70.0, "target": 61.0 },
+          { "value": 71.0, "target": 66.0 },
+          { "value": 72.0, "target": 71.0 },
+          { "value": 73.0, "target": 77.0 },
+          { "value": 74.0, "target": 82.0 },
+          { "value": 75.0, "target": 87.0 },
+          { "value": 76.0, "target": 92.0 },
+          { "value": 77.0, "target": 97.0 },
+          { "value": 78.0, "target": 102.0 },
+          { "value": 79.0, "target": 107.0 },
+          { "value": 80.0, "target": 112.0 },
+          { "value": 81.0, "target": 122.0 },
+          { "value": 82.0, "target": 128.0 },
+          { "value": 83.0, "target": 133.0 },
+          { "value": 84.0, "target": 140.0 },
+          { "value": 85.0, "target": 148.0 },
+          { "value": 86.0, "target": 156.0 },
+          { "value": 87.0, "target": 163.0 },
+          { "value": 88.0, "target": 171.0 },
+          { "value": 89.0, "target": 179.0 },
+          { "value": 90.0, "target": 186.0 },
+          { "value": 91.0, "target": 194.0 },
+          { "value": 92.0, "target": 201.0 },
+          { "value": 93.0, "target": 209.0 },
+          { "value": 94.0, "target": 217.0 },
+          { "value": 95.0, "target": 224.0 },
+          { "value": 96.0, "target": 232.0 },
+          { "value": 97.0, "target": 240.0 },
+          { "value": 98.0, "target": 247.0 },
+          { "value": 99.0, "target": 255.0 }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "target_mapping_from_BP_NVME_temp",
+    "groups": [
+      {
+        "name": "zone0_bp_nvme",
+        "interface": "xyz.openbmc_project.Sensor.Value",
+        "property": { "name": "Value" }
+      }
+    ],
+    "triggers": [
+      {
+        "class": "init",
+        "method": "get_properties"
+      },
+      {
+        "class": "signal",
+        "signal": "properties_changed"
+      },
+      {
+        "class": "timer",
+        "type": "repeating",
+        "interval": 5000000,
+        "preload_groups": true
+      }
+    ],
+    "actions": [
+      {
+        "name": "target_from_group_max",
+        "groups": [
+          {
+            "name": "zone0_bp_nvme",
+            "interface": "xyz.openbmc_project.Sensor.Value",
+            "property": { "name": "Value" }
+          }
+        ],
+        "neg_hysteresis": 2,
+        "pos_hysteresis": 0,
+        "index": 4,
+        "map": [
+          { "value": 10.0, "target": 38.0 },
+          { "value": 35.0, "target": 38.0 },
+          { "value": 36.0, "target": 43.0 },
+          { "value": 37.0, "target": 48.0 },
+          { "value": 38.0, "target": 54.0 },
+          { "value": 39.0, "target": 59.0 },
+          { "value": 40.0, "target": 64.0 },
+          { "value": 41.0, "target": 66.0 },
+          { "value": 42.0, "target": 69.0 },
+          { "value": 43.0, "target": 71.0 },
+          { "value": 44.0, "target": 74.0 },
+          { "value": 45.0, "target": 77.0 },
+          { "value": 46.0, "target": 79.0 },
+          { "value": 47.0, "target": 82.0 },
+          { "value": 48.0, "target": 84.0 },
+          { "value": 49.0, "target": 87.0 },
+          { "value": 50.0, "target": 89.0 },
+          { "value": 51.0, "target": 99.0 },
+          { "value": 52.0, "target": 99.0 },
+          { "value": 53.0, "target": 105.0 },
+          { "value": 54.0, "target": 110.0 },
+          { "value": 55.0, "target": 115.0 },
+          { "value": 56.0, "target": 120.0 },
+          { "value": 57.0, "target": 125.0 },
+          { "value": 58.0, "target": 130.0 },
+          { "value": 59.0, "target": 135.0 },
+          { "value": 60.0, "target": 140.0 },
+          { "value": 61.0, "target": 150.0 },
+          { "value": 62.0, "target": 161.0 },
+          { "value": 63.0, "target": 171.0 },
+          { "value": 64.0, "target": 181.0 },
+          { "value": 65.0, "target": 191.0 },
+          { "value": 66.0, "target": 204.0 },
+          { "value": 67.0, "target": 217.0 },
+          { "value": 68.0, "target": 230.0 },
+          { "value": 69.0, "target": 255.0 }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "target_mapping_from_M2_NVME_temp",
+    "groups": [
+      {
+        "name": "zone0_m2_nvme",
+        "interface": "xyz.openbmc_project.Sensor.Value",
+        "property": { "name": "Value" }
+      }
+    ],
+    "triggers": [
+      {
+        "class": "init",
+        "method": "get_properties"
+      },
+      {
+        "class": "signal",
+        "signal": "properties_changed"
+      },
+      {
+        "class": "timer",
+        "type": "repeating",
+        "interval": 5000000,
+        "preload_groups": true
+      }
+    ],
+    "actions": [
+      {
+        "name": "target_from_group_max",
+        "groups": [
+          {
+            "name": "zone0_m2_nvme",
+            "interface": "xyz.openbmc_project.Sensor.Value",
+            "property": { "name": "Value" }
+          }
+        ],
+        "neg_hysteresis": 2,
+        "pos_hysteresis": 0,
+        "index": 5,
+        "map": [
+          { "value": 10.0, "target": 38.0 },
+          { "value": 61.0, "target": 38.0 },
+          { "value": 68.0, "target": 38.0 },
+          { "value": 69.0, "target": 204.0 }
+        ]
+      }
+    ]
+  }
+]

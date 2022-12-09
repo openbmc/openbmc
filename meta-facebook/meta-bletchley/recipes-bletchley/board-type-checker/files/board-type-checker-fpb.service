@@ -4,6 +4,8 @@ StartLimitIntervalSec=90
 StartLimitBurst=5
 Before=phosphor-virtual-sensor.service
 Before=xyz.openbmc_project.EntityManager.service
+Wants=mapper-wait@-xyz-openbmc_project-inventory-system-chassis0-frontpanel.service
+After=mapper-wait@-xyz-openbmc_project-inventory-system-chassis0-frontpanel.service
 
 [Service]
 ExecStart=/usr/libexec/board-type-checker-fpb

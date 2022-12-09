@@ -13,7 +13,7 @@ DEPENDS = " \
     ${@bb.utils.contains('PTEST_ENABLED', '1', 'gtest', '', d)} \
     ${@bb.utils.contains('PTEST_ENABLED', '1', 'gmock', '', d)} \
 "
-SRCREV = "4ca3ec3c54d1d74fcd2b76c594be08fbba3774f1"
+SRCREV = "ddfc67521c537c372d54bc662c74c6e6b73be1c9"
 PV = "1.0+git${SRCPV}"
 
 SRC_URI = "git://github.com/openbmc/bmcweb.git;branch=master;protocol=https;nobranch=1"
@@ -31,7 +31,6 @@ inherit pkgconfig meson ptest
 EXTRA_OEMESON = " \
     --buildtype=minsize \
     -Dtests=${@bb.utils.contains('PTEST_ENABLED', '1', 'enabled', 'disabled', d)} \
-    -Dyocto-deps=enabled \
 "
 
 do_install_ptest() {

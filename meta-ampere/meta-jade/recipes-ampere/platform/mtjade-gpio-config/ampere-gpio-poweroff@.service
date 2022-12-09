@@ -1,6 +1,6 @@
 [Unit]
 Description=Ampere set GPIOs before power off
-Before=op-wait-power-off@%i.service
+Before=phosphor-wait-power-off@%i.service
 Conflicts=obmc-chassis-poweron@%i.target
 
 [Service]

@@ -1,0 +1,160 @@
+{
+    "fans": [
+       {
+         "inventory": "/system/chassis/Mt_Jade/FAN3",
+         "allowed_out_of_range_time": 10,
+         "deviation": 25,
+         "num_sensors_nonfunc_for_fan_nonfunc": 1,
+         "monitor_start_delay": 30,
+         "set_func_on_present": false,
+         "sensors": [
+            {
+               "name": "FAN3_1",
+               "has_target": true,
+               "target_interface": "xyz.openbmc_project.Control.FanPwm",
+               "target_path": "/xyz/openbmc_project/control/fanpwm/PWM3",
+               "factor": 82,
+               "offset": 0
+            },
+            {
+               "name": "FAN3_2",
+               "has_target": false,
+               "target_interface": "xyz.openbmc_project.Control.FanPwm",
+               "target_path": "/xyz/openbmc_project/control/fanpwm/PWM3",
+               "factor": 82,
+               "offset": 0
+            }
+         ]
+       },
+       {
+        "inventory": "/system/chassis/Mt_Jade/FAN4",
+        "allowed_out_of_range_time": 10,
+        "deviation": 25,
+        "num_sensors_nonfunc_for_fan_nonfunc": 1,
+        "monitor_start_delay": 30,
+        "set_func_on_present": false,
+        "sensors": [
+           {
+              "name": "FAN4_1",
+              "has_target": true,
+              "target_interface": "xyz.openbmc_project.Control.FanPwm",
+              "target_path": "/xyz/openbmc_project/control/fanpwm/PWM4",
+              "factor": 82,
+              "offset": 0
+           },
+           {
+              "name": "FAN4_2",
+               "has_target": false,
+              "target_interface": "xyz.openbmc_project.Control.FanPwm",
+              "target_path": "/xyz/openbmc_project/control/fanpwm/PWM4",
+              "factor": 82,
+              "offset": 0
+           }
+        ]
+       },
+       {
+        "inventory": "/system/chassis/Mt_Jade/FAN5",
+        "allowed_out_of_range_time": 10,
+        "deviation": 25,
+        "num_sensors_nonfunc_for_fan_nonfunc": 1,
+        "monitor_start_delay": 30,
+        "set_func_on_present": false,
+        "sensors": [
+           {
+              "name": "FAN5_1",
+              "has_target": true,
+              "target_interface": "xyz.openbmc_project.Control.FanPwm",
+              "target_path": "/xyz/openbmc_project/control/fanpwm/PWM5",
+              "factor": 82,
+              "offset": 0
+           },
+           {
+              "name": "FAN5_2",
+               "has_target": false,
+              "target_interface": "xyz.openbmc_project.Control.FanPwm",
+              "target_path": "/xyz/openbmc_project/control/fanpwm/PWM5",
+              "factor": 82,
+              "offset": 0
+           }
+        ]
+       },
+       {
+        "inventory": "/system/chassis/Mt_Jade/FAN6",
+        "allowed_out_of_range_time": 10,
+        "deviation": 25,
+        "num_sensors_nonfunc_for_fan_nonfunc": 1,
+        "monitor_start_delay": 30,
+        "set_func_on_present": false,
+        "sensors": [
+           {
+              "name": "FAN6_1",
+              "has_target": true,
+              "target_interface": "xyz.openbmc_project.Control.FanPwm",
+              "target_path": "/xyz/openbmc_project/control/fanpwm/PWM6",
+              "factor": 82,
+              "offset": 0
+           },
+           {
+              "name": "FAN6_2",
+               "has_target": false,
+              "target_interface": "xyz.openbmc_project.Control.FanPwm",
+              "target_path": "/xyz/openbmc_project/control/fanpwm/PWM6",
+              "factor": 82,
+              "offset": 0
+           }
+        ]
+       },
+       {
+        "inventory": "/system/chassis/Mt_Jade/FAN7",
+        "allowed_out_of_range_time": 10,
+        "deviation": 25,
+        "num_sensors_nonfunc_for_fan_nonfunc": 1,
+        "monitor_start_delay": 30,
+        "set_func_on_present": false,
+        "sensors": [
+           {
+              "name": "FAN7_1",
+              "has_target": true,
+              "target_interface": "xyz.openbmc_project.Control.FanPwm",
+              "target_path": "/xyz/openbmc_project/control/fanpwm/PWM7",
+              "factor": 82,
+              "offset": 0
+           },
+           {
+              "name": "FAN7_2",
+               "has_target": false,
+              "target_interface": "xyz.openbmc_project.Control.FanPwm",
+              "target_path": "/xyz/openbmc_project/control/fanpwm/PWM7",
+              "factor": 82,
+              "offset": 0
+           }
+        ]
+       },
+       {
+        "inventory": "/system/chassis/Mt_Jade/FAN8",
+        "allowed_out_of_range_time": 10,
+        "deviation": 25,
+        "num_sensors_nonfunc_for_fan_nonfunc": 1,
+        "monitor_start_delay": 30,
+        "set_func_on_present": false,
+        "sensors": [
+           {
+              "name": "FAN8_1",
+              "has_target": true,
+              "target_interface": "xyz.openbmc_project.Control.FanPwm",
+              "target_path": "/xyz/openbmc_project/control/fanpwm/PWM8",
+              "factor": 82,
+              "offset": 0
+           },
+           {
+              "name": "FAN8_2",
+               "has_target": false,
+              "target_interface": "xyz.openbmc_project.Control.FanPwm",
+              "target_path": "/xyz/openbmc_project/control/fanpwm/PWM8",
+              "factor": 82,
+              "offset": 0
+           }
+        ]
+       }
+    ]
+ }
