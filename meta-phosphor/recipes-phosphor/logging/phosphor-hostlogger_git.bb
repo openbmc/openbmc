@@ -9,7 +9,7 @@ DEPENDS += " \
             phosphor-logging \
             zlib \
            "
-SRCREV = "c8047cf2c5db6d698e5059c1813a689649bad35e"
+SRCREV = "9376e692db4ccebeaed493c3ebf4dd467104c959"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
