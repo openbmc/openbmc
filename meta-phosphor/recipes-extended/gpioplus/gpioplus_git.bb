@@ -3,7 +3,7 @@ DESCRIPTION = "C++ bindings for linux gpio APIs."
 HOMEPAGE = "http://github.com/openbmc/gpioplus"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
-SRCREV = "42c77addd06938f674e383e3207bbc7dc981e033"
+SRCREV = "01bc0bf6b15fa3dcd8904bea6c9e40c502d0230f"
 PV = "0.1+git${SRCPV}"
 PR = "r1"
 
