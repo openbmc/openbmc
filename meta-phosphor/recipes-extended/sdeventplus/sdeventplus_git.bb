@@ -7,7 +7,7 @@ DEPENDS += " \
         stdplus \
         systemd \
         "
-SRCREV = "209d834118e611be0f1d4b8f35a2c46629b8054b"
+SRCREV = "db7e56bdb0765da28327a371ed3295bf8ca74803"
 PV = "0.1+git${SRCPV}"
 PR = "r1"
 
