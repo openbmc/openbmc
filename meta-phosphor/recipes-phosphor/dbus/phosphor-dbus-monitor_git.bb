@@ -16,7 +16,7 @@ DEPENDS += " \
         ${PYTHON_PN}-setuptools-native \
         ${PYTHON_PN}-mako-native \
         "
-SRCREV = "7b7cb1a8361c64fc58a0adc1d61be6923901a181"
+SRCREV = "34d7d74a23d62c074d37f6b757ec132e3a1f20fb"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
