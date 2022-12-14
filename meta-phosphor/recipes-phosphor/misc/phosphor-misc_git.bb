@@ -35,6 +35,9 @@ inherit systemd
 PACKAGES = "${PHOSPHOR_MISC_PACKAGES}"
 
 RDEPENDS:${PN}-http-redirect-awk = "${VIRTUAL-RUNTIME_base-utils}"
+RDEPENDS:${PN}-first-boot-set-hostname += "bash"
+RDEPENDS:${PN}-first-boot-set-mac += "bash"
+RDEPENDS:${PN}-usb-ctrl += "bash"
 
 # first-boot-set-hostname
 FILES:${PN}-first-boot-set-hostname = "${bindir}/first-boot-set-hostname.sh"
