@@ -6,6 +6,7 @@ KERNEL_CLASSES ?= "kernel-fitimage"
 KERNEL_IMAGETYPES ?= "fitImage vmlinux"
 
 OBMC_IMAGE_INCLUDE = "static"
+OBMC_IMAGE_INCLUDE:df-obmc-static-norootfs = "static-norootfs"
 OBMC_IMAGE_INCLUDE:df-obmc-ubi-fs = "ubi-fs"
 OBMC_IMAGE_INCLUDE:df-phosphor-mmc = "mmc"
 

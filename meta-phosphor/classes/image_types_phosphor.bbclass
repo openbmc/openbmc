@@ -2,6 +2,10 @@
 
 inherit image_version
 
+FIT_IMAGE_INHERIT=""
+FIT_IMAGE_INHERIT:df-obmc-static-norootfs = "fit-image"
+inherit ${FIT_IMAGE_INHERIT}
+
 # Phosphor image types
 #
 # Phosphor OpenBMC supports a fixed partition mtd layout,
@@ -13,21 +17,32 @@ FLASH_KERNEL_IMAGE ?= "fitImage-${INITRAMFS_IMAGE}-${MACHINE}-${MACHINE}"
 FLASH_KERNEL_IMAGE:df-obmc-ubi-fs ?= "fitImage-${MACHINE}.bin"
 
 IMAGE_BASETYPE ?= "squashfs-xz"
+IMAGE_BASETYPE:df-obmc-static-norootfs ?= "cpio"
 OVERLAY_BASETYPE ?= "jffs2"
 FLASH_UBI_BASETYPE ?= "${IMAGE_BASETYPE}"
 FLASH_UBI_OVERLAY_BASETYPE ?= "ubifs"
 FLASH_EXT4_BASETYPE ?= "ext4"
 FLASH_EXT4_OVERLAY_BASETYPE ?= "ext4"
 
-IMAGE_TYPES += "mtd-static mtd-static-alltar mtd-static-tar mtd-ubi mtd-ubi-tar mmc-ext4-tar"
+PHOSPHOR_IMAGE_TYPES += " \
+    mtd-static \
+    mtd-static-alltar \
+    mtd-static-tar \
+    mtd-static-norootfs \
+    mtd-ubi \
+    mtd-ubi-tar \
+    mmc-ext4-tar \
+"
+IMAGE_TYPES += "${PHOSPHOR_IMAGE_TYPES}"
+IMAGE_TYPES_MASKED += "${PHOSPHOR_IMAGE_TYPES}"
 
 IMAGE_TYPEDEP:mtd-static = "${IMAGE_BASETYPE}"
 IMAGE_TYPEDEP:mtd-static-tar = "${IMAGE_BASETYPE}"
 IMAGE_TYPEDEP:mtd-static-alltar = "mtd-static"
+IMAGE_TYPEDEP:mtd-static-norootfs = "${IMAGE_BASETYPE}"
 IMAGE_TYPEDEP:mtd-ubi = "${FLASH_UBI_BASETYPE}"
 IMAGE_TYPEDEP:mtd-ubi-tar = "${FLASH_UBI_BASETYPE}"
 IMAGE_TYPEDEP:mmc-ext4-tar = "${FLASH_EXT4_BASETYPE}"
-IMAGE_TYPES_MASKED += "mtd-static mtd-static-alltar mtd-static-tar mtd-ubi mtd-ubi-tar mmc-ext4-tar"
 
 # Flash characteristics in KB unless otherwise noted
 DISTROOVERRIDES .= ":flash-${FLASH_SIZE}"
@@ -421,6 +436,59 @@ do_generate_static_tar[depends] += " \
         "
 do_generate_static_tar[vardepsexclude] = "DATETIME"
 
+python do_generate_static_norootfs() {
+    import subprocess
+
+    nor_image_basename = '%s.static.mtd' % d.getVar('IMAGE_NAME', True)
+    nor_image = os.path.join(d.getVar('IMGDEPLOYDIR', True), nor_image_basename)
+
+    def _append_image(imgpath, start_kb, finish_kb):
+        imgsize = os.path.getsize(imgpath)
+        maxsize = (finish_kb - start_kb) * 1024
+        bb.debug(1, 'Considering file size=' + str(imgsize) + ' name=' + imgpath)
+        bb.debug(1, 'Spanning start=' + str(start_kb) + 'K end=' + str(finish_kb) + 'K')
+        bb.debug(1, 'Compare needed=' + str(imgsize) + ' available=' + str(maxsize) + ' margin=' + str(maxsize - imgsize))
+        if imgsize > maxsize:
+            bb.fatal("Image '%s' is too large!" % imgpath)
+
+        subprocess.check_call(['dd', 'bs=1k', 'conv=notrunc',
+                               'seek=%d' % start_kb,
+                               'if=%s' % imgpath,
+                               'of=%s' % nor_image])
+    uboot_offset = int(d.getVar('FLASH_UBOOT_OFFSET', True))
+
+    spl_binary = d.getVar('SPL_BINARY', True)
+    if spl_binary:
+        _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
+                                   'u-boot-spl.%s' % d.getVar('UBOOT_SUFFIX',True)),
+                      int(d.getVar('FLASH_UBOOT_OFFSET', True)),
+                      int(d.getVar('FLASH_UBOOT_SPL_SIZE', True)))
+        uboot_offset += int(d.getVar('FLASH_UBOOT_SPL_SIZE', True))
+
+    _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
+                               'u-boot.%s' % d.getVar('UBOOT_SUFFIX',True)),
+                  uboot_offset,
+                  int(d.getVar('FLASH_KERNEL_OFFSET', True)))
+
+    _append_image(os.path.join(d.getVar('IMGDEPLOYDIR', True),
+                               '%s.cpio.%s.fitImage' % (
+                                    d.getVar('IMAGE_LINK_NAME', True),
+                                    d.getVar('INITRAMFS_CTYPE', True))),
+                  int(d.getVar('FLASH_KERNEL_OFFSET', True)),
+                  int(d.getVar('FLASH_RWFS_OFFSET', True)))
+
+    flash_symlink = os.path.join(
+                        d.getVar('IMGDEPLOYDIR', True),
+                        'flash-%s' % d.getVar('MACHINE', True))
+    if os.path.exists(flash_symlink):
+        os.remove(flash_symlink)
+    os.symlink(nor_image_basename, flash_symlink)
+}
+do_generate_static_norootfs[depends] += " \
+        ${PN}:do_image_${@d.getVar('IMAGE_BASETYPE', True).replace('-', '_')} \
+        u-boot:do_deploy \
+        "
+
 do_generate_ubi_tar() {
 	ln -sf ${S}/MANIFEST MANIFEST
 	ln -sf ${S}/publickey publickey
@@ -560,6 +628,12 @@ python() {
                 'do_generate_static_tar',
                 'do_image_complete',
                 'do_generate_rwfs_static do_generate_phosphor_manifest', d)
+
+    if 'mtd-static-norootfs' in types:
+        bb.build.addtask(
+                'do_generate_static_norootfs',
+                'do_image_complete',
+                'do_image_cpio', d)
 
     if 'mtd-ubi' in types:
         bb.build.addtask(
