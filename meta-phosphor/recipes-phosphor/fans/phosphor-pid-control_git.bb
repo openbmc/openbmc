@@ -28,14 +28,14 @@ SERVICE_FILE = "phosphor-pid-control.service"
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} = "${SERVICE_FILE}"
 
-inherit autotools pkgconfig
+inherit meson pkgconfig
 inherit obmc-phosphor-ipmiprovider-symlink
 inherit systemd
 
-EXTRA_OECONF = " \
-  SYSTEMD_TARGET="multi-user.target" \
-  --disable-tests \
-       "
+EXTRA_OEMESON = " \
+  -Dtests=disabled \
+  -Dsystemd_target="multi-user.target" \
+  "
 
 FILES:${PN} = "${bindir}/swampd ${bindir}/setsensor"
 # The following installs the OEM IPMI handler for the fan controls.
