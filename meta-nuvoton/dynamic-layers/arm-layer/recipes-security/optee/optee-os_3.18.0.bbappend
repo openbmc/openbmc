@@ -6,7 +6,7 @@ SRC_URI:remove:npcm8xx = " \
 
 SRC_URI:append:npcm8xx = "git://github.com/Nuvoton-Israel/optee_os.git;branch=npcm_3_18;protocol=https"
 
-SRCREV:npcm8xx = "485dc7ac4e4a3f51d86c5b6562e3720a338441c7"
+SRCREV:npcm8xx = "6bac40e18433a1c0cf219d994cc33610899febe7"
 
 EXTRA_OEMAKE:append:npcm8xx = " \
     CFG_REE_FS=n \
