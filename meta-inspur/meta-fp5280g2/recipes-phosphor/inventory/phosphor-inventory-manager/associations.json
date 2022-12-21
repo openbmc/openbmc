@@ -21,20 +21,21 @@
             },
             {
                 "types": {
-                    "rType": "inventory",
-                    "fType": "leds"
-                },
-                "paths": [
-                    "/xyz/openbmc_project/led/physical/front_psu"
-                ]
-            },
-            {
-                "types": {
                     "rType": "identified_by",
                     "fType": "identifying"
                 },
                 "paths": [
                     "/xyz/openbmc_project/led/groups/enclosure_identify"
+                ]
+            },
+            {
+                "types": {
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
+                },
+                "paths": [
+                    "/xyz/openbmc_project/led/groups/powersupply_fault_warning",
+                    "/xyz/openbmc_project/led/groups/powersupply_fault_critical"
                 ]
             },
             {
@@ -79,11 +80,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/powersupply1_fault"
+                    "/xyz/openbmc_project/led/groups/powersupply_fault_warning",
+                    "/xyz/openbmc_project/led/groups/powersupply_fault_critical"
                 ]
             },
             {
@@ -121,11 +123,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/fan0_fault"
+                    "/xyz/openbmc_project/led/groups/fan_fault_warning",
+                    "/xyz/openbmc_project/led/groups/fan_fault_critical"
                 ]
             },
             {
@@ -163,11 +166,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/fan1_fault"
+                    "/xyz/openbmc_project/led/groups/fan_fault_warning",
+                    "/xyz/openbmc_project/led/groups/fan_fault_critical"
                 ]
             },
             {
@@ -205,11 +209,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/fan2_fault"
+                    "/xyz/openbmc_project/led/groups/fan_fault_warning",
+                    "/xyz/openbmc_project/led/groups/fan_fault_critical"
                 ]
             },
             {
@@ -247,11 +252,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/fan3_fault"
+                    "/xyz/openbmc_project/led/groups/fan_fault_warning",
+                    "/xyz/openbmc_project/led/groups/fan_fault_critical"
                 ]
             },
             {
@@ -301,11 +307,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/bmc_fault"
+                    "/xyz/openbmc_project/led/groups/system_fault_warning",
+                    "/xyz/openbmc_project/led/groups/system_fault_critical"
                 ]
             }
         ]
@@ -324,11 +331,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/cpu0_fault"
+                    "/xyz/openbmc_project/led/groups/system_hot_fault_warning",
+                    "/xyz/openbmc_project/led/groups/system_hot_fault_critical"
                 ]
             }
         ]
@@ -347,11 +355,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/cpu1_fault"
+                    "/xyz/openbmc_project/led/groups/system_hot_fault_warning",
+                    "/xyz/openbmc_project/led/groups/system_hot_fault_critical"
                 ]
             }
         ]
@@ -1051,11 +1060,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/dimm0_fault"
+                    "/xyz/openbmc_project/led/groups/dimm_fault_warning",
+                    "/xyz/openbmc_project/led/groups/dimm_fault_critical"
                 ]
             }
         ]
@@ -1083,11 +1093,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/dimm1_fault"
+                    "/xyz/openbmc_project/led/groups/dimm_fault_warning",
+                    "/xyz/openbmc_project/led/groups/dimm_fault_critical"
                 ]
             }
         ]
@@ -1115,11 +1126,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/dimm2_fault"
+                    "/xyz/openbmc_project/led/groups/dimm_fault_warning",
+                    "/xyz/openbmc_project/led/groups/dimm_fault_critical"
                 ]
             }
         ]
@@ -1147,11 +1159,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/dimm3_fault"
+                    "/xyz/openbmc_project/led/groups/dimm_fault_warning",
+                    "/xyz/openbmc_project/led/groups/dimm_fault_critical"
                 ]
             }
         ]
@@ -1179,11 +1192,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/dimm4_fault"
+                    "/xyz/openbmc_project/led/groups/dimm_fault_warning",
+                    "/xyz/openbmc_project/led/groups/dimm_fault_critical"
                 ]
             }
         ]
@@ -1211,11 +1225,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/dimm5_fault"
+                    "/xyz/openbmc_project/led/groups/dimm_fault_warning",
+                    "/xyz/openbmc_project/led/groups/dimm_fault_critical"
                 ]
             }
         ]
@@ -1243,11 +1258,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/dimm6_fault"
+                    "/xyz/openbmc_project/led/groups/dimm_fault_warning",
+                    "/xyz/openbmc_project/led/groups/dimm_fault_critical"
                 ]
             }
         ]
@@ -1275,11 +1291,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/dimm7_fault"
+                    "/xyz/openbmc_project/led/groups/dimm_fault_warning",
+                    "/xyz/openbmc_project/led/groups/dimm_fault_critical"
                 ]
             }
         ]
@@ -1307,11 +1324,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/dimm8_fault"
+                    "/xyz/openbmc_project/led/groups/dimm_fault_warning",
+                    "/xyz/openbmc_project/led/groups/dimm_fault_critical"
                 ]
             }
         ]
@@ -1339,11 +1357,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/dimm9_fault"
+                    "/xyz/openbmc_project/led/groups/dimm_fault_warning",
+                    "/xyz/openbmc_project/led/groups/dimm_fault_critical"
                 ]
             }
         ]
@@ -1371,11 +1390,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/dimm10_fault"
+                    "/xyz/openbmc_project/led/groups/dimm_fault_warning",
+                    "/xyz/openbmc_project/led/groups/dimm_fault_critical"
                 ]
             }
         ]
@@ -1403,11 +1423,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/dimm11_fault"
+                    "/xyz/openbmc_project/led/groups/dimm_fault_warning",
+                    "/xyz/openbmc_project/led/groups/dimm_fault_critical"
                 ]
             }
         ]
@@ -1435,11 +1456,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/dimm12_fault"
+                    "/xyz/openbmc_project/led/groups/dimm_fault_warning",
+                    "/xyz/openbmc_project/led/groups/dimm_fault_critical"
                 ]
             }
         ]
@@ -1467,11 +1489,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/dimm13_fault"
+                    "/xyz/openbmc_project/led/groups/dimm_fault_warning",
+                    "/xyz/openbmc_project/led/groups/dimm_fault_critical"
                 ]
             }
         ]
@@ -1499,11 +1522,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/dimm14_fault"
+                    "/xyz/openbmc_project/led/groups/dimm_fault_warning",
+                    "/xyz/openbmc_project/led/groups/dimm_fault_critical"
                 ]
             }
         ]
@@ -1531,11 +1555,12 @@
             },
             {
                 "types": {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/dimm15_fault"
+                    "/xyz/openbmc_project/led/groups/dimm_fault_warning",
+                    "/xyz/openbmc_project/led/groups/dimm_fault_critical"
                 ]
             }
         ]
@@ -1550,6 +1575,16 @@
                 },
                 "paths": [
                     "/xyz/openbmc_project/led/groups/enclosure_identify"
+                ]
+            },
+            {
+                "types": {
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
+                },
+                "paths": [
+                    "/xyz/openbmc_project/led/groups/system_fault_warning",
+                    "/xyz/openbmc_project/led/groups/system_fault_critical"
                 ]
             },
             {
