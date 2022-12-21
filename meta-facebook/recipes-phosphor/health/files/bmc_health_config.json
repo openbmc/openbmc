@@ -6,15 +6,15 @@
     {
         "Critical":
         {
-            "Value": 90.0,
+            "Value": "CPU_CRIT_VAL",
             "Log": true,
-            "Target": "reboot.target"
+            "Target": "CPU_CRIT_TGT"
         },
         "Warning":
         {
-            "Value": 80.0,
+            "Value": "CPU_WARN_VAL",
             "Log": true,
-            "Target": ""
+            "Target": "CPU_WARN_TGT"
         }
     }
   },
@@ -25,15 +25,15 @@
     {
         "Critical":
         {
-            "Value": 85.0,
+            "Value": "MEM_CRIT_VAL",
             "Log": true,
-            "Target": "reboot.target"
+            "Target": "MEM_CRIT_TGT"
         },
         "Warning":
         {
-            "Value": 70.0,
+            "Value": "MEM_WARN_VAL",
             "Log": true,
-            "Target": ""
+            "Target": "MEM_WARN_TGT"
         }
     }
   },
@@ -45,15 +45,15 @@
     {
         "Critical":
         {
-            "Value": 95.0,
+            "Value": "STORAGE_CRIT_VAL",
             "Log": true,
-            "Target": ""
+            "Target": "STORAGE_CRIT_TGT"
         },
         "Warning":
         {
-            "Value": 90.0,
+            "Value": "STORAGE_WARN_VAL",
             "Log": true,
-            "Target": ""
+            "Target": "STORAGE_WARN_TGT"
         }
     }
   }
