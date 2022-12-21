@@ -2,6 +2,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 DEFAULT_TARGETS = " \
     multi-user.target.requires/obmc-host-reset@{}.target \
+    multi-user.target.wants/phosphor-discover-system-state@{}.service \
     obmc-chassis-poweron@{}.target.wants/chassis-poweron@{}.service \
     obmc-chassis-hard-poweroff@{}.target.wants/chassis-poweroff@{}.service \
     obmc-host-shutdown@{}.target.wants/host-poweroff@{}.service \
