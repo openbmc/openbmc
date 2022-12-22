@@ -1,0 +1,12 @@
+[Unit]
+Description=System unit to hard reset or system reset chassis
+Conflicts=xyz.openbmc_project.psusensor.service
+Wants=gbmc-psu-hardreset.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=true
+
+[Install]
+WantedBy=chassis-system-reset.target
