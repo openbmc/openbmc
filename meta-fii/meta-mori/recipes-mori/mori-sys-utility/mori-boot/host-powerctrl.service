@@ -2,8 +2,6 @@
 Description = Host Power Control Sequence
 Wants=ssifbridge.service
 After=ssifbridge.service
-Wants=mori-bios-verify.service
-After=mori-bios-verify.service
 
 [Service]
 Restart=no
