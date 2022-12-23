@@ -1,43 +1,28 @@
-From c33f0a97a15c99ca3144c9f8e67a67abe8fcee0a Mon Sep 17 00:00:00 2001
+From 81b17ed3711f02d8329a68e9cf426260c6abe07e Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
-Date: Thu, 11 Nov 2021 16:10:26 +0800
+Date: Fri, 23 Dec 2022 10:13:44 +0800
 Subject: [PATCH] novnc: add 16-bit hextile support for nuvoton ece engine
 
-Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
  package-lock.json | 5 ++---
- package.json      | 2 +-
- 2 files changed, 3 insertions(+), 4 deletions(-)
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/package-lock.json b/package-lock.json
-index 413dd624..759fe1ba 100644
+index 4d16dacd..46c2e33b 100644
 --- a/package-lock.json
 +++ b/package-lock.json
 @@ -3281,9 +3281,8 @@
-       "dev": true
-     },
-     "@novnc/novnc": {
--      "version": "1.2.0",
--      "resolved": "https://registry.npmjs.org/@novnc/novnc/-/novnc-1.2.0.tgz",
--      "integrity": "sha512-FaUckOedGhSbwQBXk/KGyxKt9ngskg4wPw6ghbHWXOUEmQscAZr3467lTU5DSfppwHJt5k+lQiHoeYUuY90l2Q=="
-+      "version": "Nuvoton-Israel/noVNC.git#openbmc-v1.2.0",
-+      "from": "@novnc/novnc@Nuvoton-Israel/noVNC.git#openbmc-v1.2.0"
-     },
-     "@npmcli/move-file": {
-       "version": "1.0.1",
-diff --git a/package.json b/package.json
-index 91d45434..9cb3e226 100644
---- a/package.json
-+++ b/package.json
-@@ -16,7 +16,7 @@
-   },
-   "dependencies": {
-     "@carbon/icons-vue": "10.28.0",
--    "@novnc/novnc": "1.2.0",
-+    "@novnc/novnc": "Nuvoton-Israel/noVNC.git#openbmc-v1.2.0",
-     "axios": "0.21.4",
-     "bootstrap": "4.6.0",
-     "bootstrap-vue": "2.21.2",
+             "dev": true
+         },
+         "@novnc/novnc": {
+-            "version": "1.2.0",
+-            "resolved": "https://registry.npmjs.org/@novnc/novnc/-/novnc-1.2.0.tgz",
+-            "integrity": "sha512-FaUckOedGhSbwQBXk/KGyxKt9ngskg4wPw6ghbHWXOUEmQscAZr3467lTU5DSfppwHJt5k+lQiHoeYUuY90l2Q=="
++            "version": "Nuvoton-Israel/noVNC.git#openbmc-v1.2.0",
++            "from": "@novnc/novnc@Nuvoton-Israel/noVNC.git#openbmc-v1.2.0"
+         },
+         "@npmcli/move-file": {
+             "version": "1.0.1",
 -- 
-2.25.1
+2.34.1
 
