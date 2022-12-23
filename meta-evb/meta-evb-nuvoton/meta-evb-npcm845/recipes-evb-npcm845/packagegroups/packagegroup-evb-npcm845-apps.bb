@@ -71,4 +71,6 @@ RDEPENDS:${PN}-system = " \
         optee-client \
         optee-test \
         cerberus-utility \
+        estoraged \
+        cryptsetup \
         "

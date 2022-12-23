@@ -523,7 +523,11 @@
                 }
             ],
             "Type": "BMCOnDieThermalSensor"
-        }
+        },
+	{
+	    "Name":"evb_emmc",
+	    "Type":"EmmcDevice"
+	}
     ],
     "Name": "EVB_ARBEL_NUVOTON",
     "Probe": "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': 'NUVOTON-ARBEL-EVB'})",
