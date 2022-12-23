@@ -1,7 +1,7 @@
-From a698c0e71a132acc56a94b2e9aa36cf94b7dd506 Mon Sep 17 00:00:00 2001
+From c1cab76497ad5e7f454e31e70b3f15922d375f41 Mon Sep 17 00:00:00 2001
 From: James Feist <james.feist@linux.intel.com>
 Date: Mon, 17 Jun 2019 12:00:58 -0700
-Subject: [PATCH] Customize phosphor-watchdog for Intel platforms
+Subject: [PATCH 1/2] Customize phosphor-watchdog for Intel platforms
 
 This patch adds various changes to phosphor-watchdog that are
 required for compatibility with Intel platforms.
@@ -27,7 +27,7 @@ Signed-off-by: Sunita Kumari <sunitax.kumari@intel.com>
  2 files changed, 240 insertions(+), 11 deletions(-)
 
 diff --git a/src/watchdog.cpp b/src/watchdog.cpp
-index 05a95e9..ea94082 100644
+index c401022..b88636a 100644
 --- a/src/watchdog.cpp
 +++ b/src/watchdog.cpp
 @@ -5,8 +5,10 @@
@@ -245,7 +245,7 @@ index 05a95e9..ea94082 100644
  
      auto target = actionTargetMap.find(action);
      if (target == actionTargetMap.end())
-@@ -146,12 +322,45 @@ void Watchdog::timeOutHandler()
+@@ -133,12 +309,45 @@ void Watchdog::timeOutHandler()
  
          try
          {
@@ -294,18 +294,18 @@ index 05a95e9..ea94082 100644
 +                bus.call_noreply(method);
 +            }
          }
-         catch (const sdbusplus::exception::exception& e)
+         catch (const sdbusplus::exception_t& e)
          {
 diff --git a/src/watchdog.hpp b/src/watchdog.hpp
-index 31cde63..2b7ff36 100644
+index a0693ee..406ac86 100644
 --- a/src/watchdog.hpp
 +++ b/src/watchdog.hpp
-@@ -73,7 +73,17 @@ class Watchdog : public WatchdogInherits
+@@ -74,7 +74,17 @@ class Watchdog : public WatchdogInherits
          bus(bus), actionTargetMap(std::move(actionTargetMap)),
          fallback(fallback), minInterval(minInterval),
          timer(event, std::bind(&Watchdog::timeOutHandler, this)),
--        objPath(objPath)
-+        objPath(objPath), powerStateChangedSignal(
+-        objPath(objPath), exitAfterTimeout(exitAfterTimeout)
++        objPath(objPath), exitAfterTimeout(exitAfterTimeout), powerStateChangedSignal(
 +            bus,
 +            sdbusplus::bus::match::rules::propertiesChanged(
 +                "/xyz/openbmc_project/state/host0",
@@ -319,7 +319,7 @@ index 31cde63..2b7ff36 100644
      {
          // Use default if passed in otherwise just use default that comes
          // with object
-@@ -90,6 +100,12 @@ class Watchdog : public WatchdogInherits
+@@ -91,6 +101,12 @@ class Watchdog : public WatchdogInherits
          tryFallbackOrDisable();
      }
  
@@ -332,7 +332,7 @@ index 31cde63..2b7ff36 100644
      /** @brief Resets the TimeRemaining to the configured Interval
       *         Optionally enables the watchdog.
       *
-@@ -178,6 +194,10 @@ class Watchdog : public WatchdogInherits
+@@ -179,6 +195,10 @@ class Watchdog : public WatchdogInherits
      /** @brief Contained timer object */
      sdeventplus::utility::Timer<sdeventplus::ClockId::Monotonic> timer;
  
@@ -344,5 +344,5 @@ index 31cde63..2b7ff36 100644
      void timeOutHandler();
  
 -- 
-2.17.1
+2.34.1
 
