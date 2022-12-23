@@ -1,0 +1,50 @@
+From 54374bf67f6ddefc2ba20d1f1f4d5538662b3bc9 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Fri, 23 Dec 2022 15:20:56 +0800
+Subject: [PATCH] dts: scm npcm845 add tip mailbox support
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ .../boot/dts/nuvoton/nuvoton-npcm845-scm.dts  | 26 +++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts
+index 6d0395db67df..e4990b41576d 100644
+--- a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts
++++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts
+@@ -138,6 +138,32 @@ optee {
+ 		};
+ 	};
+ 
++	tip_mbox: mailbox@f080d000 {
++		compatible = "nuvoton,npcm845-mbox";
++		reg = <0 0xf080d000 0 0x1000>;
++		interrupts = <GIC_SPI 2 IRQ_TYPE_LEVEL_HIGH>;
++		#mbox-cells = <2>;
++	};
++
++	tip_sram: sram@fffce000 {
++		compatible = "mmio-sram";
++		reg = <0 0xfffce000 0 0x1000>;
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges = <0 0 0xfffce000 0x1000>;
++		ch0_shm: ch_shm@0 {
++			reg = <0 0x1000>;
++		};
++	};
++
++	tip {
++		compatible = "nuvoton,cerberus";
++		mboxes = <&tip_mbox 0 16>; /*channel 0, 16th doorbell */
++		mbox-names = "cerberus";
++		shmem = <&ch0_shm>;
++		status = "okay";
++	};
++
+ 	ahb {
+ 		mc: memory-controller@f0824000 {
+ 			compatible = "nuvoton,npcm8xx-sdram-edac";
+-- 
+2.34.1
+

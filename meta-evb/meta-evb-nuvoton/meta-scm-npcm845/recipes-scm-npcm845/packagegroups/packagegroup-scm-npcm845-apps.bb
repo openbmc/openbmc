@@ -67,4 +67,5 @@ RDEPENDS:${PN}-system = " \
         esmi-oob-tool \
         boot-health \
         reload-sensors \
+        cerberus-utility \
         "
