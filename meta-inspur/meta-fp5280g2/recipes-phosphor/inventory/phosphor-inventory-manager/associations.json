@@ -36,15 +36,15 @@
             {
                 "types":
                 {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/groups/powersupply0_fault"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
-	    {
+            {
                "types": {
                    "rType": "powered_by",
                    "fType": "powering"
@@ -81,12 +81,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front_psu"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -100,7 +100,7 @@
                     "/xyz/openbmc_project/led/groups/powersupply1_fault"
                 ]
             },
-	    {
+            {
                "types": {
                    "rType": "powered_by",
                    "fType": "powering"
@@ -130,12 +130,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front_fan"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -147,6 +147,17 @@
                 "paths":
                 [
                     "/xyz/openbmc_project/led/groups/fan0_fault"
+                ]
+            },
+            {
+                "types":
+                {
+                    "rType": "cooled_by",
+                    "fType": "cooling"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/inventory/system/chassis"
                 ]
             }
         ]
@@ -170,12 +181,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front_fan"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -187,6 +198,17 @@
                 "paths":
                 [
                     "/xyz/openbmc_project/led/groups/fan1_fault"
+                ]
+            },
+            {
+                "types":
+                {
+                    "rType": "cooled_by",
+                    "fType": "cooling"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/inventory/system/chassis"
                 ]
             }
         ]
@@ -210,12 +232,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front_fan"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -227,6 +249,17 @@
                 "paths":
                 [
                     "/xyz/openbmc_project/led/groups/fan2_fault"
+                ]
+            },
+            {
+                "types":
+                {
+                    "rType": "cooled_by",
+                    "fType": "cooling"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/inventory/system/chassis"
                 ]
             }
         ]
@@ -250,12 +283,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front_fan"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -267,6 +300,17 @@
                 "paths":
                 [
                     "/xyz/openbmc_project/led/groups/fan3_fault"
+                ]
+            },
+            {
+                "types":
+                {
+                    "rType": "cooled_by",
+                    "fType": "cooling"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/inventory/system/chassis"
                 ]
             }
         ]
@@ -302,12 +346,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front_syshealth"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -330,12 +374,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -358,12 +402,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -1213,12 +1257,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-memory"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -1252,12 +1296,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-memory"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -1291,12 +1335,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-memory"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -1330,12 +1374,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-memory"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -1369,12 +1413,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-memory"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -1408,12 +1452,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-memory"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -1447,12 +1491,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-memory"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -1486,12 +1530,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-memory"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -1525,12 +1569,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-memory"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -1564,12 +1608,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-memory"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -1603,12 +1647,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-memory"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -1642,12 +1686,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-memory"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -1681,12 +1725,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-memory"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -1720,12 +1764,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-memory"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -1759,12 +1803,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-memory"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -1798,12 +1842,12 @@
             {
                 "types":
                 {
-                    "rType": "inventory",
-                    "fType": "leds"
+                    "rType": "identified_by",
+                    "fType": "identifying"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-memory"
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
                 ]
             },
             {
@@ -1823,6 +1867,17 @@
         "path": "system/chassis",
         "endpoints":
         [
+            {
+                "types":
+                {
+                    "rType": "identified_by",
+                    "fType": "identifying"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/led/groups/enclosure_identify"
+                ]
+            },
             {
                 "types":
                 {

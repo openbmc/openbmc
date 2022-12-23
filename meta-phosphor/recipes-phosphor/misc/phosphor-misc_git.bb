@@ -3,7 +3,7 @@ HOMEPAGE = "https://github.com/openbmc/phosphor-misc"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 DEPENDS = "systemd"
-SRCREV = "c109f41ac45addbc8e535d584307336c65e5622c"
+SRCREV = "37c76da7c277f3531f35ec726ac690e53ab4915a"
 PACKAGECONFIG ??= " \
     first-boot-set-hostname \
     first-boot-set-mac \
@@ -35,6 +35,9 @@ inherit systemd
 PACKAGES = "${PHOSPHOR_MISC_PACKAGES}"
 
 RDEPENDS:${PN}-http-redirect-awk = "${VIRTUAL-RUNTIME_base-utils}"
+RDEPENDS:${PN}-first-boot-set-hostname += "bash"
+RDEPENDS:${PN}-first-boot-set-mac += "bash"
+RDEPENDS:${PN}-usb-ctrl += "bash"
 
 # first-boot-set-hostname
 FILES:${PN}-first-boot-set-hostname = "${bindir}/first-boot-set-hostname.sh"

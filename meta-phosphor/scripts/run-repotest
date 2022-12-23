@@ -34,7 +34,6 @@ git ls-files -- \
 #
 # https://github.com/openbmc/docs/blob/master/meta-layer-guidelines.md
 echo "\
-meta-amd/meta-ethanolx/recipes-x86/chassis/x86-power-control/0001-Amd-power-control-modifications-for-EthanolX.patch
 meta-ampere/meta-common/recipes-devtools/mtd/mtd-utils/0001-flashcp-support-offset-option.patch
 meta-aspeed/recipes-bsp/u-boot/files/default-gcc.patch
 meta-bytedance/meta-g220a/recipes-kernel/linux/linux-aspeed/0005-ARM-dts-aspeed-Enable-g220a-uart-route.patch

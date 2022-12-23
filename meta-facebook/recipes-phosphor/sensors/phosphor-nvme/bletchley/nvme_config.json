@@ -1,4 +1,5 @@
 {
+    "maxSmbusErrorRetry": 3,
     "config": [
         {
             "NVMeDriveIndex": 1,

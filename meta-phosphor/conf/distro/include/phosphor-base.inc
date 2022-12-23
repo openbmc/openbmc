@@ -1,5 +1,8 @@
 require conf/distro/include/phosphor-defaults.inc
 
+# Match the distro codename from upstream poky.
+DISTRO_CODENAME ?= "langdale"
+
 # Override these in poky based distros
 POKY_DEFAULT_DISTRO_FEATURES = "largefile opengl ptest multiarch wayland vulkan"
 POKY_DEFAULT_EXTRA_RDEPENDS = "packagegroup-core-boot"

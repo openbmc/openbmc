@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "systemd"
 PROVIDES += "virtual/obmc-host-ipmi-hw"
-SRCREV = "a6ec899618a28a30f7907a6cc90fe027047297d1"
+SRCREV = "87a0efd5f529c39c0e2039519b6595aa0a22bbde"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
