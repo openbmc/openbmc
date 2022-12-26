@@ -9,6 +9,7 @@ SRC_URI:evb-npcm750 = " \
     file://evb-npcm750-ipmi-fru.yaml \
     file://evb-npcm750-ipmi-fru-properties.yaml \
     file://evb-npcm750-ipmi-sensors.yaml \
+    file://evb-npcm750-ipmi-inventory-sensors.yaml \
     "
 
 S = "${WORKDIR}"
@@ -20,12 +21,15 @@ do_install:evb-npcm750() {
         ${D}${datadir}/${BPN}/ipmi-fru-read.yaml
     install -m 0644 -D evb-npcm750-ipmi-sensors.yaml \
         ${D}${datadir}/${BPN}/ipmi-sensors.yaml
+    install -m 0644 -D evb-npcm750-ipmi-inventory-sensors.yaml \
+        ${D}${datadir}/${BPN}/ipmi-inventory-sensors.yaml
 }
 
 FILES:${PN}-dev = " \
     ${datadir}/${BPN}/ipmi-extra-properties.yaml \
     ${datadir}/${BPN}/ipmi-fru-read.yaml \
     ${datadir}/${BPN}/ipmi-sensors.yaml \
+    ${datadir}/${BPN}/ipmi-inventory-sensors.yaml \
     "
 
 ALLOW_EMPTY:${PN} = "1"
