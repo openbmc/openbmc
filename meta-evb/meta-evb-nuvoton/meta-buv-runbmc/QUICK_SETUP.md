@@ -52,13 +52,13 @@ Insert HSBUV board into MB PCIe slot through PCIE Gen2 (x4) interface for VGA di
 # Build OpenBMC
 
 ### Source ###
-- [https://github.com/Nuvoton-Israel/openbmc/tree/runbmc](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc)
+- [https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master](https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master)
 
 ### How to Build Image ###
 (build environment: Ubuntu 18.04)
   ```
   $ sudo apt-get install -y git build-essential libsdl1.2-dev texinfo gawk chrpath diffstat
-  $ git clone -b runbmc --single-branch https://github.com/Nuvoton-Israel/openbmc
+  $ git clone -b npcm-master --single-branch https://github.com/Nuvoton-Israel/openbmc
   $ cd opebnmc
   $ . setup buv-runbmc
   $ bitbake obmc-phosphor-image

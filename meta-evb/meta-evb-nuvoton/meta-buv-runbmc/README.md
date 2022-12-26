@@ -25,12 +25,12 @@ Please submit any patches against the meta-buv-runbmc layer to the maintainer of
 * Joseph Liu, <kwliu@nuvoton.com>
 
 # Quick Setup
-- [Quick Setup Guide](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/QUICK_SETUP.md)
+- [Quick Setup Guide](https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/QUICK_SETUP.md)
 
 
 # Rework for BUV Board
 If you want to test secure boot, you need to rework the RunBMC card.
-- Please look at [Rework Guide](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/REWORK.md)
+- Please look at [Rework Guide](https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/REWORK.md)
 
 # Table of Contents
 
@@ -128,7 +128,7 @@ The Serial over LAN (SoL) console redirects the output of the server’s serial 
 
 **Source URL**
 
-* [https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/console](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/console)
+* [https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/console](https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/console)
 
 **How to use**
 
@@ -223,7 +223,7 @@ Virtual Media (VM) is to emulate an USB drive on remote host PC via Network Bloc
 
 **Source URL**
 
-* [https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-phosphor/nuvoton-layer/recipes-connectivity/jsnbd](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-phosphor/nuvoton-layer/recipes-connectivity/jsnbd)
+* [https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-phosphor/nuvoton-layer/recipes-connectivity/jsnbd](https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-phosphor/nuvoton-layer/recipes-connectivity/jsnbd)
 * [https://github.com/Nuvoton-Israel/openbmc-util/tree/master/virtual_media_openbmc2.6](https://github.com/Nuvoton-Israel/openbmc-util/tree/master/virtual_media_openbmc2.6)
 
 **How to use**
@@ -332,9 +332,9 @@ This is a secure flash update mechanism to update BMC firmware via WebUI.
 [phosphor-hwmon](https://github.com/openbmc/phosphor-hwmon) daemon will periodically check the sensor reading to see if it exceeds lower bound or upper bound . If alarm condition is hit, the [phosphor-sel-logger](https://github.com/openbmc/phosphor-sel-logger) handles all sensor events to add new IPMI SEL records to the journal, [phosphor-host-ipmid](https://github.com/Nuvoton-Israel/phosphor-host-ipmid) will convert the journal SEL records to IPMI SEL record format and reply to host.
 
 **Source URL**
-* [https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/configuration](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/configuration)
-* [https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/ipmi](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/ipmi)
-* [https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/sensors](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/sensors)
+* [https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/configuration](https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/configuration)
+* [https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/ipmi](https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/ipmi)
+* [https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/sensors](https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/sensors)
 
 
 **How to use**
@@ -343,7 +343,7 @@ This is a secure flash update mechanism to update BMC firmware via WebUI.
   
   * Add Sensor Configuration File
   
-    Each sensor **temperature**, **adc**, **fan**, **peci** and **power** has a [hwmon config file](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/sensors/phosphor-hwmon/obmc/hwmon/ahb/apb) and [ipmi sdr config file](https://github.com/Nuvoton-Israel/openbmc/blob/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/configuration/buv-runbmc-yaml-config/buv-runbmc-ipmi-sensors.yaml) that defines the sensor name and its warning or critical thresholds.  
+    Each sensor **temperature**, **adc**, **fan**, **peci** and **power** has a [hwmon config file](https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/sensors/phosphor-hwmon/obmc/hwmon/ahb/apb) and [ipmi sdr config file](https://github.com/Nuvoton-Israel/openbmc/blob/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/configuration/buv-runbmc-yaml-config/buv-runbmc-ipmi-sensors.yaml) that defines the sensor name and its warning or critical thresholds.  
 
     Below is hwmon config for a LM75 sensor on BMC. The sensor type is **temperature** and its name is **bmc_card**. It has warning and critical thresholds for **upper** and **lower** bound.
       ```
@@ -457,9 +457,9 @@ In NPCM750, we support a FIFO for monitoring BIOS POST Code. Typically, this fea
 
 This is a patch for enabling BIOS POST Code feature in [phosphor-host-postd](https://github.com/openbmc/phosphor-host-postd) on Nuvoton's NPCM750.
 
-* [https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/host/phosphor-host-postd_%25.bbappend](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/host/phosphor-host-postd_%25.bbappend)
-* [https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-kernel/linux/linux-nuvoton/0004-add-seven_seg_gpio.patch](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-kernel/linux/linux-nuvoton/0004-add-seven_seg_gpio.patch)
-* [https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-kernel/linux/linux-nuvoton/0005-misc-Character-device-driver.patch](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-kernel/linux/linux-nuvoton/0005-misc-Character-device-driver.patch)
+* [https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/host/phosphor-host-postd_%25.bbappend](https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/host/phosphor-host-postd_%25.bbappend)
+* [https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-kernel/linux/linux-nuvoton/0004-add-seven_seg_gpio.patch](https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-kernel/linux/linux-nuvoton/0004-add-seven_seg_gpio.patch)
+* [https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-kernel/linux/linux-nuvoton/0005-misc-Character-device-driver.patch](https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-kernel/linux/linux-nuvoton/0005-misc-Character-device-driver.patch)
 
 **How to use**
 
@@ -592,7 +592,7 @@ In NPCM750, we have two PWM modules and support eight PWM signals to control fan
 **Source URL**
 
 * [https://github.com/openbmc/phosphor-pid-control](https://github.com/openbmc/phosphor-pid-control)
-* [https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/fans/phosphor-pid-control](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/fans/phosphor-pid-control)
+* [https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/fans/phosphor-pid-control](https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-buv-runbmc/recipes-phosphor/fans/phosphor-pid-control)
 
 **How to use**
 
