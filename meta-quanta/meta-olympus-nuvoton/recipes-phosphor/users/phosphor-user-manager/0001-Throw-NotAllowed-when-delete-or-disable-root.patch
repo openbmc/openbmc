@@ -1,4 +1,4 @@
-From a6cbd4d4bc57e8cd3897ada969f38049d422f810 Mon Sep 17 00:00:00 2001
+From 939067d91febed1052c281bafa845f067f149ba5 Mon Sep 17 00:00:00 2001
 From: Brian Ma <chma0@nuvoton.com>
 Date: Fri, 25 Mar 2022 16:28:25 +0800
 Subject: [PATCH] Throw NotAllowed when delete or disable root
@@ -7,6 +7,8 @@ Throw NotAllowed execption when try to delete or disable root instead of
 throw InternalFailure execption.
 
 Signed-off-by: Brian Ma <chma0@nuvoton.com>
+Signed-off-by: Allen Kang <jhkang@nuvoton.com>
+
 Change-Id: I32430ab376c584ef7e4eec88cf604e00bfc6f415
 ---
  user_mgr.cpp | 14 ++++++++++++++
@@ -14,10 +16,10 @@ Change-Id: I32430ab376c584ef7e4eec88cf604e00bfc6f415
  2 files changed, 21 insertions(+)
 
 diff --git a/user_mgr.cpp b/user_mgr.cpp
-index 8fc899f..77945dd 100644
+index f4a90ec..099b2d1 100644
 --- a/user_mgr.cpp
 +++ b/user_mgr.cpp
-@@ -89,6 +89,7 @@ using InternalFailure =
+@@ -92,6 +92,7 @@ using InternalFailure =
      sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure;
  using InvalidArgument =
      sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument;
@@ -25,15 +27,15 @@ index 8fc899f..77945dd 100644
  using UserNameExists =
      sdbusplus::xyz::openbmc_project::User::Common::Error::UserNameExists;
  using UserNameDoesNotExist =
-@@ -99,6 +100,7 @@ using NoResource =
+@@ -101,6 +102,7 @@ using UserNameGroupFail =
+ using NoResource =
      sdbusplus::xyz::openbmc_project::User::Common::Error::NoResource;
- 
  using Argument = xyz::openbmc_project::Common::InvalidArgument;
 +using NotAllowedReason = xyz::openbmc_project::Common::NotAllowed;
- 
- template <typename... ArgTypes>
- static std::vector<std::string> executeCmd(const char* path,
-@@ -208,6 +210,15 @@ void UserMgr::throwForUserExists(const std::string& userName)
+ using GroupNameExists =
+     sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameExists;
+ using GroupNameDoesNotExists =
+@@ -230,6 +232,15 @@ void UserMgr::throwForUserExists(const std::string& userName)
      }
  }
  
@@ -49,15 +51,15 @@ index 8fc899f..77945dd 100644
  void UserMgr::throwForUserNameConstraints(
      const std::string& userName, const std::vector<std::string>& groupNames)
  {
-@@ -352,6 +363,7 @@ void UserMgr::deleteUser(std::string userName)
+@@ -393,6 +404,7 @@ void UserMgr::deleteUser(std::string userName)
      // All user management lock has to be based on /etc/shadow
      // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
      throwForUserDoesNotExist(userName);
 +    throwForNotAllowRoot(userName);
      try
      {
-         executeCmd("/usr/sbin/userdel", userName.c_str(), "-r");
-@@ -653,6 +665,8 @@ void UserMgr::userEnable(const std::string& userName, bool enabled)
+         executeUserDelete(userName.c_str());
+@@ -766,6 +778,8 @@ void UserMgr::userEnable(const std::string& userName, bool enabled)
      // All user management lock has to be based on /etc/shadow
      // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
      throwForUserDoesNotExist(userName);
@@ -65,12 +67,12 @@ index 8fc899f..77945dd 100644
 +        throwForNotAllowRoot(userName);
      try
      {
-         // set EXPIRE_DATE to 0 to disable user, PAM takes 0 as expire on
+         executeUserModifyUserEnable(userName.c_str(), enabled);
 diff --git a/user_mgr.hpp b/user_mgr.hpp
-index f5aac22..1f621fa 100644
+index ec205e4..29be825 100644
 --- a/user_mgr.hpp
 +++ b/user_mgr.hpp
-@@ -244,6 +244,13 @@ class UserMgr : public Ifaces
+@@ -299,6 +299,13 @@ class UserMgr : public Ifaces
       */
      void throwForUserExists(const std::string& userName);
  
@@ -85,5 +87,5 @@ index f5aac22..1f621fa 100644
       *  method to check user name constraints and throw if failed.
       *
 -- 
-2.17.1
+2.34.1
 

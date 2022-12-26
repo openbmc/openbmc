@@ -1,0 +1,40 @@
+From 5bf4108df5e1d283a0ff7c042208201b81a1c565 Mon Sep 17 00:00:00 2001
+From: Allen Kang <jhkang@nuvoton.com>
+Date: Mon, 26 Dec 2022 15:44:01 +0800
+Subject: [PATCH] dts: modify flash layout for increasing flash size
+
+Signed-off-by: Allen Kang <jhkang@nuvoton.com>
+---
+ arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+index 9b6691e54154..537fefa6f1c7 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+@@ -151,7 +151,7 @@ partitions@80000000 {
+ 			#size-cells = <1>;
+ 			bmc@0{
+ 				label = "bmc";
+-				reg = <0x000000 0x2000000>;
++				reg = <0x000000 0x4000000>;
+ 			};
+ 			u-boot@0 {
+ 				label = "u-boot";
+@@ -167,11 +167,11 @@ kernel@200000 {
+ 			};
+ 			rofs@800000 {
+ 				label = "rofs";
+-				reg = <0x800000 0x1500000>;
++				reg = <0x800000 0x3500000>;
+ 			};
+ 			rwfs@1d00000 {
+ 				label = "rwfs";
+-				reg = <0x1d00000 0x300000>;
++				reg = <0x3d00000 0x300000>;
+ 			};
+ 		};
+ 	};
+-- 
+2.34.1
+

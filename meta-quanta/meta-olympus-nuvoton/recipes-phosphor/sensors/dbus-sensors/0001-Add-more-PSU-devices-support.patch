@@ -1,22 +1,21 @@
-From 83833a85391da1b16f1f9330d2600034414638e6 Mon Sep 17 00:00:00 2001
+From 08627a115b498f8b468d3971e0f88b8b46e70925 Mon Sep 17 00:00:00 2001
 From: Brian Ma <chma0@nuvoton.com>
 Date: Thu, 15 Jul 2021 14:54:27 +0800
 Subject: [PATCH] Add more PSU devices support
 
+Signed-off-by: Allen Kang <jhkang@nuvoton.com>
 ---
- src/PSUSensorMain.cpp | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ src/PSUSensorMain.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/src/PSUSensorMain.cpp b/src/PSUSensorMain.cpp
-index 7ca5d3d3..63d8da2d 100644
+index 38f92a76..9b5caabe 100644
 --- a/src/PSUSensorMain.cpp
 +++ b/src/PSUSensorMain.cpp
-@@ -109,7 +109,10 @@ static constexpr auto pmbusNames{std::to_array<const char*>({
-     "raa229004",
-     "raa229126",
+@@ -96,6 +96,9 @@ static constexpr auto pmbusNames{std::to_array<const char*>({
      "tps546d24",
--    "xdpe12284"
-+    "xdpe12284",
+     "xdpe11280",
+     "xdpe12284"
 +    "flexpower",
 +    "tps53659",
 +    "tps53679"
@@ -24,5 +23,5 @@ index 7ca5d3d3..63d8da2d 100644
  //clang-format on
  
 -- 
-2.17.1
+2.34.1
 
