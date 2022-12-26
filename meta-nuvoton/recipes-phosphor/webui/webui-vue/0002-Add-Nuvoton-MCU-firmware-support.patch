@@ -1,29 +1,32 @@
-From 5edbc8d1a2a787b8d8c7197cf07a74f4074a2234 Mon Sep 17 00:00:00 2001
+From d04dc3883fadd8d24747415c60d2a0ce018eeb8d Mon Sep 17 00:00:00 2001
 From: Brian Ma <chma0@nuvoton.com>
 Date: Tue, 29 Jun 2021 10:34:23 +0800
-Subject: [PATCH 2/2] Add Nuvoton MCU firmware support
+Subject: [PATCH] Add Nuvoton MCU firmware support
 
 Signed-off-by: Brian Ma <chma0@nuvoton.com>
+Signed-off-by: Allen Kang <jhkang@nuvoton.com>
 ---
- src/locales/en-US.json                        |  1 +
+ src/locales/en-US.json                        |  3 +-
  src/store/modules/Operations/FirmwareStore.js |  9 +++++
  src/views/Operations/Firmware/Firmware.vue    |  5 +++
  .../Operations/Firmware/FirmwareCardsMcu.vue  | 37 +++++++++++++++++++
- 4 files changed, 52 insertions(+)
+ 4 files changed, 53 insertions(+), 1 deletion(-)
  create mode 100644 src/views/Operations/Firmware/FirmwareCardsMcu.vue
 
 diff --git a/src/locales/en-US.json b/src/locales/en-US.json
-index e43167c6..689bff9e 100644
+index ffb6a2ea..1a0db4dc 100644
 --- a/src/locales/en-US.json
 +++ b/src/locales/en-US.json
-@@ -325,6 +325,7 @@
-     "sectionTitleBmcCards": "BMC",
-     "sectionTitleBmcCardsCombined": "BMC and server",
-     "sectionTitleHostCards": "Host",
-+    "sectionTitleMcuCards": "MCU",
-     "sectionTitleUpdateFirmware": "Update firmware",
-     "alert": {
-       "operationInProgress": "Server power operation in progress.",
+@@ -326,7 +326,8 @@
+         "sectionTitleBmcCards": "BMC",
+         "sectionTitleBmcCardsCombined": "BMC and server",
+         "sectionTitleHostCards": "Host",
+-        "sectionTitleUpdateFirmware": "Update firmware",
++	"sectionTitleMcuCards": "MCU",
++	"sectionTitleUpdateFirmware": "Update firmware",
+         "alert": {
+             "operationInProgress": "Server power operation in progress.",
+             "serverMustBePoweredOffTo": "Server must be powered off to:",
 diff --git a/src/store/modules/Operations/FirmwareStore.js b/src/store/modules/Operations/FirmwareStore.js
 index c6639ff7..79f8638f 100644
 --- a/src/store/modules/Operations/FirmwareStore.js
@@ -139,5 +142,5 @@ index 00000000..3d5641e1
 +}
 +</style>
 -- 
-2.17.1
+2.34.1
 
