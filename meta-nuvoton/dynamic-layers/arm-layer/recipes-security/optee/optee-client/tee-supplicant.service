@@ -5,6 +5,7 @@ Description=TEE Supplicant
 User=root
 EnvironmentFile=-@sysconfdir@/default/tee-supplicant
 ExecStart=@sbindir@/tee-supplicant $OPTARGS
+ExecStartPost=sh -c "echo 0 > /sys/bus/tee/drivers_autoprobe; modprobe tpm_ftpm_tee"
 ExecStop=sh -c "echo -n 'optee-ta-bc50d971-d4c9-42c4-82cb-343fb7f37896' > /sys/bus/tee/drivers/optee-ftpm/unbind"
 
 [Install]
