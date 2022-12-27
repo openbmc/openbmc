@@ -6,6 +6,7 @@ SRC_URI:append:evb-npcm845 = " file://luks.cfg"
 
 SRC_URI:append:evb-npcm845 = " file://0001-dts-nuvoton-evb-npcm845-support-openbmc-partition.patch"
 SRC_URI:append:evb-npcm845 = " file://0014-dts-evb-npcm845-add-tip-mailbox-support.patch"
+SRC_URI:append:evb-npcm845 = " file://0015-dts-add-reserved-memory.patch"
 
 #SRC_URI:append:evb-npcm845 = " file://0002-dts-nuvoton-evb-npcm845-boot-from-fiu0-cs1.patch"
 #SRC_URI:append:evb-npcm845 = " file://0003-dts-meta-evb-npcm845-update-pin-configuration-for-SP.patch"

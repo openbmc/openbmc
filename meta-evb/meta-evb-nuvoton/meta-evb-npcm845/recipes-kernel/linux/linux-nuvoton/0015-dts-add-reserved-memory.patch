@@ -1,0 +1,56 @@
+From 1ee5b8fcf1744797fe378a6886d151d1ec32f417 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Tue, 27 Dec 2022 11:22:03 +0800
+Subject: [PATCH] reserved memory
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ .../boot/dts/nuvoton/nuvoton-npcm845-evb.dts  | 31 +++++++++++++++++++
+ 1 file changed, 25 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
+index de58bb474b5a..e13068a9c534 100644
+--- a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
++++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
+@@ -2,6 +2,7 @@
+ // Copyright (c) 2021 Nuvoton Technology tomer.maimon@nuvoton.com
+ 
+ /dts-v1/;
++
+ #include "nuvoton-npcm845.dtsi"
+ #include "nuvoton-npcm845-pincfg-evb.dtsi"
+ 
+@@ -78,6 +79,30 @@ reserved-memory {
+ 		#size-cells = <2>;
+ 		ranges;
+ 
++		gfx_memory: gfx@37000000 {
++			reg = <0x0 0x37000000 0x0 0x1000000>;
++			no-map;
++		};
++
++		optee_memory: optee@36000000 {
++			reg = <0x0 0x36000000 0x0 0x1000000>;
++			no-map;
++		};
++
++		tcg_log: tcg-log@35F00000 {
++			reg = <0x0 0x35F00000 0x0 0x10000>;
++		};
++
++		tip_memory: tip@34f00000 {
++			reg = <0x0 0x34f00000 0x0 0x1000000>;
++			no-map;
++		};
++
++		cp_memory: cp@34d00000 {
++			reg = <0x0 0x34d00000 0x0 0x20000>;
++			no-map;
++		};
++
+ 		video_memory: framebuffer@0x33000000 {
+ 			compatible = "shared-dma-pool";
+ 			reg = <0x0 0x33000000 0x0 0x01800000>;
+-- 
+2.34.1
+
