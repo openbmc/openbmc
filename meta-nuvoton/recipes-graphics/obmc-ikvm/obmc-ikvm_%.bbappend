@@ -4,4 +4,4 @@
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=75859989545e37968a99b631ef42722e"
 SRC_URI:nuvoton := "git://github.com/Nuvoton-Israel/obmc-ikvm.git;branch=upstream-v4l2;protocol=https"
-SRCREV:nuvoton := "fbedaee73fa599a5dc375bc5a24bf67405a2da9b"
+SRCREV:nuvoton := "624e6635a051adbab8b9a000aa2dd1abf3498ea0"
