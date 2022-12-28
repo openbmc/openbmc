@@ -1,0 +1,25 @@
+From 368b2a9ce312faae181cd97910c5ed0e7aea3069 Mon Sep 17 00:00:00 2001
+From: Marvin Lin <milkfafa@gmail.com>
+Date: Wed, 28 Dec 2022 11:02:28 +0800
+Subject: [PATCH] Fix WS connection failed
+
+---
+ http/routing.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/http/routing.hpp b/http/routing.hpp
+index ed1b7e48..b444a8f8 100644
+--- a/http/routing.hpp
++++ b/http/routing.hpp
+@@ -1267,7 +1267,7 @@ class Router
+         }
+ 
+         if ((rules[ruleIndex]->getMethods() &
+-             (1U << static_cast<size_t>(req.method()))) == 0)
++             (static_cast<size_t>(req.method()))) == 0)
+         {
+             BMCWEB_LOG_DEBUG << "Rule found but method mismatch: " << req.url
+                              << " with " << req.methodString() << "("
+-- 
+2.34.1
+
