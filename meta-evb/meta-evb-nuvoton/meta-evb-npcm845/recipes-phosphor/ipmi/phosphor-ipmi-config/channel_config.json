@@ -165,7 +165,7 @@
     }
   },
   "15" : {
-    "name" : "ipmi-kcs1",
+    "name" : "ipmi_kcs1",
     "is_valid" : true,
     "active_sessions" : 0,
     "channel_info" : {
