@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:append:evb-npcm845 := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:append:npcm8xx := "${THISDIR}/${PN}:"
 
 SRC_URI:append:npcm8xx = " file://tee-supplicant.service"
 
