@@ -23,8 +23,8 @@ DEFAULT_TARGETS = " \
     obmc-host-warm-reboot@{}.target.requires/obmc-host-force-warm-reboot@{}.target \
     obmc-chassis-poweroff@{}.target.wants/phosphor-clear-one-time@{}.service \
     obmc-chassis-blackout@{}.target.wants/phosphor-reset-sensor-states@{}.service \
-    obmc-chassis-powerreset@{}.target.requires/obmc-reset-chassis-on@{}.service \
-    obmc-chassis-powerreset@{}.target.requires/obmc-reset-chassis-running@{}.service \
+    obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-on@{}.service \
+    obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-running@{}.service \
 "
 
 # TODO: There are some targets that are chassis oriented, but there is no
