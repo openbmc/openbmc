@@ -1,0 +1,48 @@
+From 324266c4f0e62d8b1985344c66f8a2ab8c8020a5 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Thu, 29 Dec 2022 14:08:38 +0800
+Subject: [PATCH] add reserved memory for gfx/optee/tip/cp/tcg log
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ .../boot/dts/nuvoton/nuvoton-npcm845-scm.dts  | 24 +++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts
+index c3876193288b..e4728cde0978 100644
+--- a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts
++++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts
+@@ -71,6 +71,30 @@ reserved-memory {
+ 		#size-cells = <2>;
+ 		ranges;
+ 
++		gfx_memory: gfx@37000000 {
++			reg = <0x0 0x37000000 0x0 0x1000000>;
++			no-map;
++		};
++
++		optee_memory: optee@36000000 {
++			reg = <0x0 0x36000000 0x0 0x1000000>;
++			no-map;
++		};
++
++		tcg_log: tcg-log@35F00000 {
++			reg = <0x0 0x35F00000 0x0 0x10000>;
++		};
++
++		tip_memory: tip@34f00000 {
++			reg = <0x0 0x34f00000 0x0 0x1000000>;
++			no-map;
++		};
++
++		cp_memory: cp@34d00000 {
++			reg = <0x0 0x34d00000 0x0 0x20000>;
++			no-map;
++		};
++
+ 		video_memory: framebuffer@0x33000000 {
+ 			compatible = "shared-dma-pool";
+ 			reg = <0x0 0x33000000 0x0 0x01800000>;
+-- 
+2.34.1
+

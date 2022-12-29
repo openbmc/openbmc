@@ -1,0 +1,30 @@
+From b25fb6fa668ce38ac80f79e1be6113093b0e44b9 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Thu, 29 Dec 2022 13:49:26 +0800
+Subject: [PATCH] dts: npcm845-scm: add ftpm tee
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts
+index db735150b4a7..c3876193288b 100644
+--- a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts
++++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-scm.dts
+@@ -138,6 +138,12 @@ optee {
+ 		};
+ 	};
+ 
++	tpm@0 {
++		compatible = "microsoft,ftpm";
++		linux,sml-base = <0x0 0x35F00000>;
++		linux,sml-size = <0x10000>;
++	};
++
+ 	tip_mbox: mailbox@f080d000 {
+ 		compatible = "nuvoton,npcm845-mbox";
+ 		reg = <0 0xf080d000 0 0x1000>;
+-- 
+2.34.1
+
