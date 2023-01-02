@@ -163,12 +163,12 @@ Dive deeper into OpenBMC by opening the
 
 The Technical Steering Committee (TSC) guides the project. Members are:
 
- * Roxanne Clarke, IBM
- * Nancy Yuen, Google
- * Sai Dasari, Facebook
- * Terry Duncan, Intel
- * Sagar Dharia, Microsoft
- * Samer El-Haj-Mahmoud, Arm
+* Roxanne Clarke, IBM
+* Nancy Yuen, Google
+* Patrick Williams, Meta
+* Terry Duncan, Intel
+* Sagar Dharia, Microsoft
+* Samer El-Haj-Mahmoud, Arm
 
 ## Contact
 - Mail: openbmc@lists.ozlabs.org [https://lists.ozlabs.org/listinfo/openbmc](https://lists.ozlabs.org/listinfo/openbmc)
