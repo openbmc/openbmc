@@ -1,6 +1,6 @@
 # OpenBMC
 
-[![Build Status](https://openpower.xyz/buildStatus/icon?job=openbmc-build)](https://openpower.xyz/job/openbmc-build/)
+[![Build Status](https://jenkins.openbmc.org/buildStatus/icon?job=latest-master)](https://jenkins.openbmc.org/job/latest-master/)
 
 OpenBMC is a Linux distribution for management controllers used in devices such
 as servers, top of rack switches or RAID appliances. It uses
@@ -93,7 +93,7 @@ tested via our [Jenkins](https://jenkins.openbmc.org/) server. Commits are run
 through two levels of testing.  At the repository level the makefile `make
 check` directive is run.  At the system level, the commit is built into a
 firmware image and run with an arm-softmmu QEMU model against a barrage of
-[CI tests](https://openpower.xyz/job/openbmc-test-qemu-ci/).
+[CI tests](https://jenkins.openbmc.org/job/CI-MISC/job/run-ci-in-qemu/).
 
 Commits submitted by non-members do not automatically proceed through CI
 testing. After visual inspection of the commit, a CI run can be manually
