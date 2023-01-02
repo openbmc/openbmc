@@ -14,38 +14,43 @@ customization for your platform.
 
 ### 1) Prerequisite
 
-See the [Yocto documentation](https://docs.yoctoproject.org/ref-manual/system-requirements.html#required-packages-for-the-build-host)
+See the
+[Yocto documentation](https://docs.yoctoproject.org/ref-manual/system-requirements.html#required-packages-for-the-build-host)
 for the latest requirements
 
 #### Ubuntu
-```
-$ sudo apt install git python3-distutils gcc g++ make file wget \
+
+```sh
+sudo apt install git python3-distutils gcc g++ make file wget \
     gawk diffstat bzip2 cpio chrpath zstd lz4 bzip2
 ```
 
 #### Fedora
-```
-$ sudo dnf install git python3 gcc g++ gawk which bzip2 chrpath cpio
-hostname file diffutils diffstat lz4 wget zstd rpcgen patch
+
+```sh
+sudo dnf install git python3 gcc g++ gawk which bzip2 chrpath cpio \
+    hostname file diffutils diffstat lz4 wget zstd rpcgen patch
 ```
 
 ### 2) Download the source
-```
+
+```sh
 git clone https://github.com/openbmc/openbmc
 cd openbmc
 ```
 
 ### 3) Target your hardware
+
 Any build requires an environment set up according to your hardware target.
-There is a special script in the root of this repository that can be used
-to configure the environment as needed. The script is called `setup` and
-takes the name of your hardware target as an argument.
+There is a special script in the root of this repository that can be used to
+configure the environment as needed. The script is called `setup` and takes the
+name of your hardware target as an argument.
 
 The script needs to be sourced while in the top directory of the OpenBMC
-repository clone, and, if run without arguments, will display the list
-of supported hardware targets, see the following example:
+repository clone, and, if run without arguments, will display the list of
+supported hardware targets, see the following example:
 
-```
+```text
 $ . setup <machine> [build_dir]
 Target machine must be specified. Use one of:
 
@@ -68,13 +73,13 @@ lannister               s7106
 
 Once you know the target (e.g. romulus), source the `setup` script as follows:
 
-```
+```sh
 . setup romulus
 ```
 
 ### 4) Build
 
-```
+```sh
 bitbake obmc-phosphor-image
 ```
 
@@ -83,16 +88,17 @@ repository.
 
 ## OpenBMC Development
 
-The OpenBMC community maintains a set of tutorials new users can go through
-to get up to speed on OpenBMC development out
+The OpenBMC community maintains a set of tutorials new users can go through to
+get up to speed on OpenBMC development out
 [here](https://github.com/openbmc/docs/blob/master/development/README.md)
 
 ## Build Validation and Testing
+
 Commits submitted by members of the OpenBMC GitHub community are compiled and
 tested via our [Jenkins](https://jenkins.openbmc.org/) server. Commits are run
-through two levels of testing.  At the repository level the makefile `make
-check` directive is run.  At the system level, the commit is built into a
-firmware image and run with an arm-softmmu QEMU model against a barrage of
+through two levels of testing. At the repository level the makefile `make check`
+directive is run. At the system level, the commit is built into a firmware image
+and run with an arm-softmmu QEMU model against a barrage of
 [CI tests](https://jenkins.openbmc.org/job/CI-MISC/job/run-ci-in-qemu/).
 
 Commits submitted by non-members do not automatically proceed through CI
@@ -100,21 +106,22 @@ testing. After visual inspection of the commit, a CI run can be manually
 performed by the reviewer.
 
 Automated testing against the QEMU model along with supported systems are
-performed.  The OpenBMC project uses the
-[Robot Framework](http://robotframework.org/) for all automation.  Our
-complete test repository can be found
+performed. The OpenBMC project uses the
+[Robot Framework](http://robotframework.org/) for all automation. Our complete
+test repository can be found
 [here](https://github.com/openbmc/openbmc-test-automation).
 
 ## Submitting Patches
-Support of additional hardware and software packages is always welcome.
-Please follow the [contributing guidelines](https://github.com/openbmc/docs/blob/master/CONTRIBUTING.md)
-when making a submission.  It is expected that contributions contain test
-cases.
+
+Support of additional hardware and software packages is always welcome. Please
+follow the
+[contributing guidelines](https://github.com/openbmc/docs/blob/master/CONTRIBUTING.md)
+when making a submission. It is expected that contributions contain test cases.
 
 ## Bug Reporting
-[Issues](https://github.com/openbmc/openbmc/issues) are managed on
-GitHub.  It is recommended you search through the issues before opening
-a new one.
+
+[Issues](https://github.com/openbmc/openbmc/issues) are managed on GitHub. It is
+recommended you search through the issues before opening a new one.
 
 ## Questions
 
@@ -122,55 +129,59 @@ First, please do a search on the internet. There's a good chance your question
 has already been asked.
 
 For general questions, please use the openbmc tag on
-[Stack Overflow](https://stackoverflow.com/questions/tagged/openbmc).
-Please review the [discussion](https://meta.stackexchange.com/questions/272956/a-new-code-license-the-mit-this-time-with-attribution-required?cb=1)
+[Stack Overflow](https://stackoverflow.com/questions/tagged/openbmc). Please
+review the
+[discussion](https://meta.stackexchange.com/questions/272956/a-new-code-license-the-mit-this-time-with-attribution-required?cb=1)
 on Stack Overflow licensing before posting any code.
 
-For technical discussions, please see [contact info](#contact) below for
-Discord and mailing list information. Please don't file an issue to ask a
-question. You'll get faster results by using the mailing list or Discord.
+For technical discussions, please see [contact info](#contact) below for Discord
+and mailing list information. Please don't file an issue to ask a question.
+You'll get faster results by using the mailing list or Discord.
 
 ## Features of OpenBMC
 
-**Feature List**
-* Host management: Power, Cooling, LEDs, Inventory, Events, Watchdog
-* Full IPMI 2.0 Compliance with DCMI
-* Code Update Support for multiple BMC/BIOS images
-* Web-based user interface
-* REST interfaces
-* D-Bus based interfaces
-* SSH based SOL
-* Remote KVM
-* Hardware Simulation
-* Automated Testing
-* User management
-* Virtual media
+### Feature List
 
-**Features In Progress**
-* OpenCompute Redfish Compliance
-* Verified Boot
+- Host management: Power, Cooling, LEDs, Inventory, Events, Watchdog
+- Full IPMI 2.0 Compliance with DCMI
+- Code Update Support for multiple BMC/BIOS images
+- Web-based user interface
+- REST interfaces
+- D-Bus based interfaces
+- SSH based SOL
+- Remote KVM
+- Hardware Simulation
+- Automated Testing
+- User management
+- Virtual media
 
-**Features Requested but need help**
-* OpenBMC performance monitoring
+### Features In Progress
 
+- OpenCompute Redfish Compliance
+- Verified Boot
+
+### Features Requested but need help
+
+- OpenBMC performance monitoring
 
 ## Finding out more
 
-Dive deeper into OpenBMC by opening the
-[docs](https://github.com/openbmc/docs) repository.
+Dive deeper into OpenBMC by opening the [docs](https://github.com/openbmc/docs)
+repository.
 
 ## Technical Steering Committee
 
 The Technical Steering Committee (TSC) guides the project. Members are:
 
-* Roxanne Clarke, IBM
-* Nancy Yuen, Google
-* Patrick Williams, Meta
-* Terry Duncan, Intel
-* Sagar Dharia, Microsoft
-* Samer El-Haj-Mahmoud, Arm
+- Roxanne Clarke, IBM
+- Nancy Yuen, Google
+- Patrick Williams, Meta
+- Terry Duncan, Intel
+- Sagar Dharia, Microsoft
+- Samer El-Haj-Mahmoud, Arm
 
 ## Contact
-- Mail: openbmc@lists.ozlabs.org [https://lists.ozlabs.org/listinfo/openbmc](https://lists.ozlabs.org/listinfo/openbmc)
-- Discord: https://discord.gg/69Km47zH98
 
+- Mail: openbmc@lists.ozlabs.org
+  [https://lists.ozlabs.org/listinfo/openbmc](https://lists.ozlabs.org/listinfo/openbmc)
+- Discord: [https://discord.gg/69Km47zH98](https://discord.gg/69Km47zH98)
