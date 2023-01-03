@@ -10,12 +10,16 @@ SRC_URI += " \
     file://bletchley-system-state-init \
     file://bletchley-system-state-init@.service \
     file://bletchley-switch-diag \
+    file://bletchley-usbmux-util \
     "
 
 do_install() {
     install -d ${D}${libexecdir}
     install -m 0755 ${WORKDIR}/bletchley-system-state-init ${D}${libexecdir}
     install -m 0755 ${WORKDIR}/bletchley-switch-diag ${D}${libexecdir}
+
+    install -d ${D}${bindir}
+    install -m 0755 ${WORKDIR}/bletchley-usbmux-util ${D}${bindir}
 }
 
 
