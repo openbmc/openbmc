@@ -1,3 +1,4 @@
+IMAGE_FEATURES:remove = "obmc-net-ipmi"
 IMAGE_FEATURES:remove:fb-nohost = "obmc-console"
 
 OBMC_IMAGE_EXTRA_INSTALL:append = "\
