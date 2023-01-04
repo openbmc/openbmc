@@ -8,6 +8,7 @@ OBMC_IMAGE_EXTRA_INSTALL:append = "\
     curl \
     strace \
     tmux \
+    wget \
     "
 
 IMAGE_LINGUAS="en-us"
