@@ -5,7 +5,10 @@ OBMC_IMAGE_EXTRA_INSTALL:append = "\
         bb.utils.contains('MACHINE_FEATURES', 'tpm2', 'packagegroup-security-tpm2 libtss2-tcti-device', '', d), \
         '', d)} \
     curl \
+    tmux \
     "
+
+IMAGE_LINGUAS="en-us"
 
 OBMC_IMAGE_EXTRA_INSTALL:append:mf-fb-secondary-emmc = " emmc-init"
 
