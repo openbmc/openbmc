@@ -1,0 +1,51 @@
+From f33de230826f51ea6c5cd74712736ca9c4fcd51e Mon Sep 17 00:00:00 2001
+From: Tim Lee <timlee660101@gmail.com>
+Date: Fri, 6 Jan 2023 11:37:50 +0800
+Subject: [PATCH] add Enabled property and remove nmiEnable method
+
+Signed-off-by: Tim Lee <timlee660101@gmail.com>
+---
+ .../Chassis/Control/NMISource.interface.yaml       | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/yaml/xyz/openbmc_project/Chassis/Control/NMISource.interface.yaml b/yaml/xyz/openbmc_project/Chassis/Control/NMISource.interface.yaml
+index cb1d0371..82ee751f 100644
+--- a/yaml/xyz/openbmc_project/Chassis/Control/NMISource.interface.yaml
++++ b/yaml/xyz/openbmc_project/Chassis/Control/NMISource.interface.yaml
+@@ -1,12 +1,5 @@
+ description: >
+     An interface for NMI signal source.
+-methods:
+-    - name: nmiEnable
+-      description: >
+-          Enables the BMC NMI out event.
+-      errors:
+-          - xyz.openbmc_project.Chassis.Common.Error.UnsupportedCommand
+-          - xyz.openbmc_project.Chassis.Common.Error.IOError
+ 
+ properties:
+     - name: BMCSource
+@@ -14,6 +7,11 @@ properties:
+       description: >
+           Keeps track of NMI signal source in BMC.
+       default: "None"
++    - name: Enabled
++      type: boolean
++      description: >
++          whether the BMC enables NMI event.
++      default: false
+ 
+ enumerations:
+     - name: BMCSourceSignal
+@@ -23,7 +21,7 @@ enumerations:
+           - name: None
+             description: >
+                 NONE NMI signal.
+-          - name: FrontPanelButton
++          - name: FpBtn
+             description: >
+                 Via Front Panel NMI button.
+           - name: Watchdog
+-- 
+2.17.1
+
