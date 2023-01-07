@@ -8,7 +8,7 @@ SYSTEMD_SUBSTITUTIONS:remove:scm-npcm845 = "OBMC_CONSOLE_HOST_TTY:${OBMC_CONSOLE
 SYSTEMD_SUBSTITUTIONS:remove:scm-npcm845 = "OBMC_CONSOLE_HOST_TTY:${OBMC_CONSOLE_HOST_TTY}:${PN}-ssh.socket"
 
 # Declare port spcific conf and service files
-HOST_CONSOLE_TTY = "ttyS2 ttyS5"
+HOST_CONSOLE_TTY = "ttyS1 ttyS2 ttyS5"
 CONSOLE_CONF_FMT = "file://server.{0}.conf"
 SRC_URI:append:scm-npcm845 = " ${@compose_list(d, 'CONSOLE_CONF_FMT', 'HOST_CONSOLE_TTY')}"
 CONSOLE_SSH_SOCKET_FILE_FMT = "file://${PN}-{0}-ssh.socket"
