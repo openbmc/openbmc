@@ -1,0 +1,122 @@
+#!/bin/bash
+
+CMD=$1
+SLED_INDEX=$2
+
+CHIP_NUM=0
+USB2_SEL0_A_PIN_OFFSET=0
+USB2_SEL1_A_PIN_OFFSET=0
+USB2_SEL0_B_PIN_OFFSET=0
+USB2_SEL1_B_PIN_OFFSET=0
+
+init_gpio_pin_info()
+{
+    local pin_info
+
+    read -r -a pin_info < <(gpiofind USB2_SEL0_A)
+    CHIP_NUM="${pin_info[0]}"
+    USB2_SEL0_A_PIN_OFFSET="${pin_info[1]}"
+    read -r -a pin_info < <(gpiofind USB2_SEL1_A)
+    USB2_SEL1_A_PIN_OFFSET="${pin_info[1]}"
+    read -r -a pin_info < <(gpiofind USB2_SEL0_B)
+    USB2_SEL0_B_PIN_OFFSET="${pin_info[1]}"
+    read -r -a pin_info < <(gpiofind USB2_SEL1_B)
+    USB2_SEL1_B_PIN_OFFSET="${pin_info[1]}"
+}
+
+set_usbmux_gpio()
+{
+    gpioset "$CHIP_NUM" \
+    "$USB2_SEL0_A_PIN_OFFSET"="$1" \
+    "$USB2_SEL1_A_PIN_OFFSET"="$2" \
+    "$USB2_SEL0_B_PIN_OFFSET"="$3" \
+    "$USB2_SEL1_B_PIN_OFFSET"="$4"
+}
+
+print_help()
+{
+    echo "Usage:"
+    echo "    bletchley-usbmux-util off"
+    echo "    bletchley-usbmux-util on <SLED_INDEX>"
+    echo ""
+    echo "SLED_INDEX: 1 - 6"
+    echo ""
+}
+
+usb_mux_off()
+{
+    set_usbmux_gpio 1 1 1 1
+}
+
+usb_mux_sled1()
+{
+    usb_mux_off
+    sleep 2
+    set_usbmux_gpio 0 0 1 1
+}
+
+usb_mux_sled2()
+{
+    usb_mux_off
+    sleep 2
+    set_usbmux_gpio 1 0 1 1
+}
+
+usb_mux_sled3()
+{
+    usb_mux_off
+    sleep 2
+    set_usbmux_gpio 0 1 1 1
+}
+
+usb_mux_sled4()
+{
+    usb_mux_off
+    sleep 2
+    set_usbmux_gpio 1 1 0 0
+}
+
+usb_mux_sled5()
+{
+    usb_mux_off
+    sleep 2
+    set_usbmux_gpio 1 1 1 0
+}
+
+usb_mux_sled6()
+{
+    usb_mux_off
+    sleep 2
+    set_usbmux_gpio 1 1 0 1
+}
+
+init_gpio_pin_info
+
+if [ "$CMD" == "off" ]; then
+    usb_mux_off
+elif [ "$CMD" == "on" ]; then
+    if [ "$SLED_INDEX" -eq 1 ]; then
+        usb_mux_sled1
+    elif [ "$SLED_INDEX" -eq 2 ]; then
+        usb_mux_sled2
+    elif [ "$SLED_INDEX" -eq 3 ]; then
+        usb_mux_sled3
+    elif [ "$SLED_INDEX" -eq 4 ]; then
+        usb_mux_sled4
+    elif [ "$SLED_INDEX" -eq 5 ]; then
+        usb_mux_sled5
+    elif [ "$SLED_INDEX" -eq 6 ]; then
+        usb_mux_sled6
+    else
+        echo "Invalid SLED index: $SLED_INDEX"
+        print_help
+        exit 1
+    fi
+    sleep 1
+else
+    echo "Invalid command: $CMD"
+    print_help
+    exit 1
+fi
+
+exit 0
