@@ -1,7 +1,7 @@
-From 77b2719c471f578b0aaf9cac99e7e29dd65bd54b Mon Sep 17 00:00:00 2001
+From c61ea2f20bbc1b18acacb71b37e4b43a4e34969a Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
 Date: Mon, 15 Aug 2022 16:13:12 +0800
-Subject: [PATCH 8/8] add dimm sensor
+Subject: [PATCH] add dimm sensor
 
 Signed-off-by: Stanley Chu <yschu@nuvoton.com>
 ---
@@ -9,9 +9,9 @@ Signed-off-by: Stanley Chu <yschu@nuvoton.com>
  include/amd-apml.h     |  74 ++++++
  include/i3cdev.h       |  39 +++
  meson_options.txt      |   1 +
- src/DIMMSensor.cpp     | 576 +++++++++++++++++++++++++++++++++++++++++
+ src/DIMMSensor.cpp     | 577 +++++++++++++++++++++++++++++++++++++++++
  src/meson.build        |  15 ++
- 6 files changed, 756 insertions(+)
+ 6 files changed, 757 insertions(+)
  create mode 100644 include/DIMMSensor.hpp
  create mode 100644 include/amd-apml.h
  create mode 100644 include/i3cdev.h
@@ -210,10 +210,10 @@ index d6a8b966..c0ec6454 100644
 +option('dimm', type: 'feature', value: 'enabled', description: 'Enable DIMM sensor.',)
 diff --git a/src/DIMMSensor.cpp b/src/DIMMSensor.cpp
 new file mode 100644
-index 00000000..31ea0f69
+index 00000000..dd685090
 --- /dev/null
 +++ b/src/DIMMSensor.cpp
-@@ -0,0 +1,576 @@
+@@ -0,0 +1,577 @@
 +#include <DIMMSensor.hpp>
 +#include <Utils.hpp>
 +#include <VariantVisitors.hpp>
@@ -748,6 +748,7 @@ index 00000000..31ea0f69
 +    auto systemBus = std::make_shared<sdbusplus::asio::connection>(io);
 +    systemBus->request_name("xyz.openbmc_project.DIMMSensor");
 +    sdbusplus::asio::object_server objectServer(systemBus);
++    objectServer.add_manager("/xyz/openbmc_project/sensors");
 +
 +    io.post([&]() { createSensors(io, objectServer, sensors, systemBus); });
 +
