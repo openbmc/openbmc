@@ -830,7 +830,7 @@ The EVB has I3C0~I3C5 interfaces on the J_I3C header.
         status = "okay";
         i2c-scl-hz = <400000>;
         i3c-scl-hz = <4000000>;
-        static-address;
+        jedec,jesd403;
         hub@0x57 {
             reg = <0x57 0x4CC 0x51180000>;
         };
@@ -865,8 +865,7 @@ PMIC: /dev/i3c-2-4cc89000000
 - Use [i3ctransfer](https://github.com/vitor-soares-snps/i3c-tools) tool to test
 - Read HUB device type
 ```
-root@evb-npcm845:~# i3ctransfer -d /dev/i3c-2-4cc51180000 -w "0x00,0x00"
-root@evb-npcm845:~# i3ctransfer -d /dev/i3c-2-4cc51180000 -r 2
+root@evb-npcm845:~# i3ctransfer -d /dev/i3c-2-4cc51180000 -w "0x00,0x00" -r 2
 Success on message 0
   received data:
     0x51
@@ -879,8 +878,7 @@ i3ctransfer -d /dev/i3c-2-4cc51180000 -r 10
 ```
 - Read TS0 device type
 ```
-root@evb-npcm845:~# i3ctransfer -d /dev/i3c-2-4cc51110000 -w "0x00"
-root@evb-npcm845:~# i3ctransfer -d /dev/i3c-2-4cc51110000 -r 2
+root@evb-npcm845:~# i3ctransfer -d /dev/i3c-2-4cc51110000 -w "0x00" -r 2
 Success on message 0
   received data:
     0x51
@@ -888,8 +886,7 @@ Success on message 0
 ```
 - Read TS0 temperature data
 ```
-root@evb-npcm845:~# i3ctransfer -d /dev/i3c-2-4cc51110000 -w "0x31"
-root@evb-npcm845:~# i3ctransfer -d /dev/i3c-2-4cc51110000 -r 2
+root@evb-npcm845:~# i3ctransfer -d /dev/i3c-2-4cc51110000 -w "0x31" -r 2
 Success on message 0
   received data:
     0xb4
@@ -897,9 +894,7 @@ Success on message 0
 ```
 - Read PMIC register. The following example is to read register 0x32.
 ```
-# i3ctransfer -d /dev/i3c-2-4cc89000000 -w "0x32"
-Success on message 0
-# i3ctransfer -d /dev/i3c-2-4cc89000000 -r 1
+# i3ctransfer -d /dev/i3c-2-4cc89000000 -w "0x32" -r 1
 Success on message 0
   received data:
     0x40
