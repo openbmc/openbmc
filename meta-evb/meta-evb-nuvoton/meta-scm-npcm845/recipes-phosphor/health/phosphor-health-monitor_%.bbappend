@@ -10,7 +10,6 @@ SRC_URI:append:scm-npcm845 = " \
   file://0002-Add-support-health-SEL-service.patch \
 "
 FILES:${PN}:append:scm-npcm845 = " ${systemd_system_unitdir}/utilization-health-sel@.service"
-SRCREV:scm-npcm845 = "b7d7bd5a384ea501766b15e4613eb9b14fe71e7f"
 
 do_install:append:scm-npcm845() {
     install -d ${D}/${sysconfdir}/healthMon/
