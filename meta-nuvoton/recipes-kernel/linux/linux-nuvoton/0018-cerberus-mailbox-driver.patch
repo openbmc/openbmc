@@ -1,4 +1,4 @@
-From 702e39ff2f7aec5c2c7bca9aab94774362625a18 Mon Sep 17 00:00:00 2001
+From 4acc6fbde63d7989ef1a08484dfb17fe53e597ba Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Mon, 14 Nov 2022 17:47:38 +0800
 Subject: [PATCH] CERBERUS mailbox driver
@@ -7,8 +7,8 @@ Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
  drivers/mailbox/Kconfig         |   9 +
  drivers/mailbox/Makefile        |   1 +
- drivers/mailbox/npcm-cerberus.c | 304 ++++++++++++++++++++++++++++++++
- 3 files changed, 314 insertions(+)
+ drivers/mailbox/npcm-cerberus.c | 317 ++++++++++++++++++++++++++++++++
+ 3 files changed, 327 insertions(+)
  create mode 100644 drivers/mailbox/npcm-cerberus.c
 
 diff --git a/drivers/mailbox/Kconfig b/drivers/mailbox/Kconfig
@@ -40,10 +40,10 @@ index fc1d6228853e..24c614fb4434 100644
 +obj-$(CONFIG_NPCM_MBOX_CERBERUS)	+= npcm-cerberus.o
 diff --git a/drivers/mailbox/npcm-cerberus.c b/drivers/mailbox/npcm-cerberus.c
 new file mode 100644
-index 000000000000..fffae11ebfe0
+index 000000000000..e1c1dc800a8b
 --- /dev/null
 +++ b/drivers/mailbox/npcm-cerberus.c
-@@ -0,0 +1,304 @@
+@@ -0,0 +1,317 @@
 +/******************************************************************************
 + *   Copyright (C) Microsoft Corporation. All rights reserved.
 + *
@@ -68,7 +68,7 @@ index 000000000000..fffae11ebfe0
 +#include <linux/kfifo.h>
 +#include <linux/slab.h>
 +
-+#define MSG_QUEUE_SIZE 16 // Max number of msgs in the queue
++#define MSG_QUEUE_SIZE 32 // Max number of msgs in the queue
 +#define MAX_MSG_SIZE 2048 // Should be equal to rd shmem size
 +
 +/**
@@ -130,7 +130,7 @@ index 000000000000..fffae11ebfe0
 +	ssize_t ret;
 +	struct cerberus_drvinfo *cerberus = to_cerberus_drvinfo(fp);
 +	unsigned long flags;
-+	struct cerberus_msg *msg;
++	struct cerberus_msg *rmsg;
 +
 +	/* offset always should be 0 */
 +	*ppos = 0;
@@ -139,27 +139,29 @@ index 000000000000..fffae11ebfe0
 +		return -EAGAIN;
 +	}
 +
-+	msg = kmalloc(sizeof(struct cerberus_msg), GFP_KERNEL);
-+	if (!msg)
++	rmsg = kmalloc(sizeof(struct cerberus_msg), GFP_KERNEL);
++	if (!rmsg)
 +		return 0;
 +
 +	spin_lock_irqsave(&cerberus->lock, flags);
++
 +	ret = wait_event_interruptible_lock_irq_timeout(
 +		cerberus->wq, (kfifo_is_empty(&cerberus->mq) == false),
 +		cerberus->lock, HZ/1000);
 +	if (ret > 0)
-+		kfifo_out(&cerberus->mq, msg, 1);
++		kfifo_out(&cerberus->mq, rmsg, 1);
 +
 +	spin_unlock_irqrestore(&cerberus->lock, flags);
++
 +	if (ret <= 0) {
 +		ret = 0;
 +		goto fail_free_resources;
 +	}
 +
-+	ret = simple_read_from_buffer(buf, count, ppos, msg->buf,
++	ret = simple_read_from_buffer(buf, count, ppos, rmsg->buf,
 +				      cerberus->rd_win.size);
 +fail_free_resources:
-+	kfree(msg);
++	kfree(rmsg);
 +	return ret;
 +}
 +
@@ -192,6 +194,7 @@ index 000000000000..fffae11ebfe0
 +{
 +	ssize_t ret;
 +	struct cerberus_drvinfo *cerberus = to_cerberus_drvinfo(fp);
++	struct cerberus_msg *wmsg;
 +
 +	/* Write size must be with in window limits */
 +	if (count > cerberus->wr_win.size)
@@ -199,14 +202,22 @@ index 000000000000..fffae11ebfe0
 +
 +	/* offset always should be 0 */
 +	*ppos = 0;
++	
++	wmsg = kmalloc(sizeof(struct cerberus_msg), GFP_KERNEL);
++	if (!wmsg)
++		return 0;
++
++	memset(wmsg, 0, sizeof(struct cerberus_msg));
++	
++	if (copy_from_user(wmsg->buf, buf, count)) {
++		ret = -EFAULT;
++		goto fail_free_resources;
++	}
 +
 +	mutex_lock(&cerberus->mutex);
 +
-+	if (copy_from_user(cerberus->wr_win.off, buf, count)) {
-+		ret = -EFAULT;
-+		goto fail_unlock;
-+	}
-+
++	memcpy_toio(cerberus->wr_win.off, wmsg->buf, count);
++	
 +	/** Ring the doorbell (Blocking call) and wait for the data
 +	 * to be received by TIP.
 +	 */
@@ -216,6 +227,8 @@ index 000000000000..fffae11ebfe0
 +
 +fail_unlock:
 +	mutex_unlock(&cerberus->mutex);
++fail_free_resources:
++	kfree(wmsg);
 +	return ret;
 +}
 +
@@ -348,6 +361,7 @@ index 000000000000..fffae11ebfe0
 +MODULE_LICENSE("GPL");
 +MODULE_AUTHOR("Parvathi Bhogaraju <pbhogaraju@microsoft.com>");
 +MODULE_DESCRIPTION("Mailbox client driver for cerberus on TIP");
+\ No newline at end of file
 -- 
-2.34.1
+2.17.1
 
