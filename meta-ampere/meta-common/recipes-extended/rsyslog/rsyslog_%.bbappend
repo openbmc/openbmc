@@ -5,6 +5,7 @@ SRC_URI += "file://rsyslog.conf \
             file://rotate-event-logs.service \
             file://rotate-event-logs.sh \
             file://rsyslog-override.conf \
+            file://hostconsole.conf \
            "
 
 FILES:${PN} += "${systemd_system_unitdir}/rsyslog.service.d/rsyslog-override.conf"
@@ -18,6 +19,7 @@ do_install:append() {
                         ${D}${systemd_system_unitdir}/rsyslog.service.d/rsyslog-override.conf
         install -d ${D}${bindir}
         install -m 0755 ${WORKDIR}/rotate-event-logs.sh ${D}/${bindir}/rotate-event-logs.sh
+        install -m 0755 ${WORKDIR}/hostconsole.conf ${D}${sysconfdir}/rsyslog.d/hostconsole.conf
         rm ${D}${sysconfdir}/rsyslog.d/imjournal.conf
 }
 
