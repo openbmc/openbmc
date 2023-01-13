@@ -39,3 +39,4 @@ do_write_config:append() {
         sed -i "/^\[built-in options\]\$/a$intf = false" ${WORKDIR}/meson.cross
     done
 }
+do_write_config[deptask] += "do_unpack"
