@@ -1,0 +1,31 @@
+From 6626765a79f125cf0ec9cdaefa51ceef718d41e7 Mon Sep 17 00:00:00 2001
+From: Michael Catanzaro <mcatanzaro@redhat.com>
+Date: Tue, 20 Dec 2022 17:10:41 -0600
+Subject: [PATCH] gthread-posix: need to #include <errno.h>
+
+a79c6af23eff5ee978db62e048828c9a992a1261 uses errno without the required
+header.
+
+
+(cherry picked from commit 03cb4261e00cf505790f4fd4e69f97b2ef4fcccd)
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/commit/6626765a79f125cf0ec9cdaefa51ceef718d41e7]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ glib/gthreadprivate.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/glib/gthreadprivate.h b/glib/gthreadprivate.h
+index 6eaf422753..f34368a7c2 100644
+--- a/glib/gthreadprivate.h
++++ b/glib/gthreadprivate.h
+@@ -41,6 +41,7 @@ struct  _GRealThread
+ /* system thread implementation (gthread-posix.c, gthread-win32.c) */
+ 
+ #if defined(HAVE_FUTEX) || defined(HAVE_FUTEX_TIME64)
++#include <errno.h>
+ #include <linux/futex.h>
+ #include <sys/syscall.h>
+ #include <unistd.h>
+-- 
+GitLab

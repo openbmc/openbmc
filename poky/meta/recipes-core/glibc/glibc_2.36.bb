@@ -54,6 +54,7 @@ SRC_URI =  "${GLIBC_GIT_URI};branch=${SRCBRANCH};name=glibc \
            file://0023-fix-create-thread-failed-in-unprivileged-process-BZ-.patch \
            file://0024-Avoid-hardcoded-build-time-paths-in-the-output-binar.patch \
            file://0025-startup-Force-O2.patch \
+           file://0001-Linux-Add-ppoll-fortify-symbol-for-64-bit-time_t-BZ-.patch \
 "
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build-${TARGET_SYS}"

@@ -46,7 +46,7 @@ class MakeSetupPlugin(LayerPlugin):
         return describe.strip()
 
     def make_repo_config(self, destdir):
-        """ This is a helper function for the writer plugins that discovers currently confugured layers.
+        """ This is a helper function for the writer plugins that discovers currently configured layers.
         The writers do not have to use it, but it can save a bit of work and avoid duplicated code, hence it is
         available here. """
         repos = {}

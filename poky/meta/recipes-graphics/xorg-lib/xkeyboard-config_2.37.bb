@@ -28,3 +28,5 @@ do_install:append () {
     install -d ${D}${datadir}/X11/xkb/compiled
     cd ${D}${datadir}/X11/xkb/rules && ln -sf base xorg
 }
+
+BBCLASSEXTEND += "native"

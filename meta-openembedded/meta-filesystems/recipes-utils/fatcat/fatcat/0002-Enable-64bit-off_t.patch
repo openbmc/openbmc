@@ -1,0 +1,71 @@
+From 0383fff94471278c92ef2ad5edc14abbb40a9acd Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Dec 2022 18:54:55 -0800
+Subject: [PATCH] Enable 64bit off_t
+
+Ensure that off_t is always 64-bit by specifying -D_LARGEFILE_SOURCE
+-D_FILE_OFFSET_BITS=64 this will ensure that normal lseek() function is
+same as lseek64
+
+This helps compiling on latest musl where lseek64 and friends are not
+available
+
+Upstream-status: Submitted [https://github.com/Gregwar/fatcat/pull/34]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt         | 2 ++
+ src/core/FatSystem.cpp | 4 ++--
+ src/core/FatSystem.h   | 2 --
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index d6a2649..4cdd1fb 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -34,6 +34,8 @@ IF(DEFINE_WIN)
+ 	add_definitions(-D__WIN__)
+ ENDIF(DEFINE_WIN)
+ 
++add_definitions(-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64)
++
+ include_directories("${CMAKE_SOURCE_DIR}/src")
+ 
+ add_executable(fatcat "src/fatcat.cpp" ${ALL_SOURCES})
+diff --git a/src/core/FatSystem.cpp b/src/core/FatSystem.cpp
+index 79cda8c..1f52e82 100644
+--- a/src/core/FatSystem.cpp
++++ b/src/core/FatSystem.cpp
+@@ -90,7 +90,7 @@ int FatSystem::readData(unsigned long long address, char *buffer, int size)
+         cerr << "! Trying to read outside the disk" << endl;
+     }
+ 
+-    lseek64(fd, globalOffset+address, SEEK_SET);
++    lseek(fd, globalOffset+address, SEEK_SET);
+ 
+     int n;
+     int pos = 0;
+@@ -112,7 +112,7 @@ int FatSystem::writeData(unsigned long long address, const char *buffer, int siz
+         throw string("Trying to write data while write mode is disabled");
+     }
+ 
+-    lseek64(fd, globalOffset+address, SEEK_SET);
++    lseek(fd, globalOffset+address, SEEK_SET);
+ 
+     int n;
+     int pos = 0;
+diff --git a/src/core/FatSystem.h b/src/core/FatSystem.h
+index cd3c914..f9f2ca3 100644
+--- a/src/core/FatSystem.h
++++ b/src/core/FatSystem.h
+@@ -11,11 +11,9 @@
+ 
+ #ifdef __APPLE__
+ #define O_LARGEFILE 0
+-#define lseek64 lseek
+ #endif
+ #ifdef __WIN__
+ #define O_LARGEFILE 0
+-#define lseek64 lseek
+ #endif
+ using namespace std;
+ 

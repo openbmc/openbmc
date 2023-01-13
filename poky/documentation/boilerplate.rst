@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 .. include:: <xhtml1-lat1.txt>
 .. include:: <xhtml1-symbol.txt>
 

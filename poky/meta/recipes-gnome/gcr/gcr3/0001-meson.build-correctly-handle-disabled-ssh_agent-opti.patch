@@ -1,0 +1,36 @@
+From 9b67bb18d8409e0e693cc6000507acbd73a30eab Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Wed, 16 Nov 2022 11:27:24 +0100
+Subject: [PATCH 1/2] meson.build: correctly handle disabled ssh_agent option
+
+Existing code produces these errors:
+| gcr/meson.build:61:0: ERROR: Unable to get the path of a not-found external program
+| gcr/meson.build:101:5: ERROR: Unknown variable "ssh_add_path".
+
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
+Upstream-Status: Backport [ https://gitlab.gnome.org/GNOME/gcr/-/commit/9b67bb18d8409e0e693cc6000507acbd73a30eab ]
+---
+ meson.build | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 3f35173..11d7fa7 100644
+--- a/meson.build
++++ b/meson.build
+@@ -96,8 +98,10 @@ conf.set('HAVE_TIMEGM', cc.has_function('timegm'))
+ conf.set('HAVE_MLOCK', cc.has_function('mlock'))
+ conf.set_quoted('GPG_EXECUTABLE', gpg_path)
+ conf.set_quoted('LIBGCRYPT_VERSION', libgcrypt_dep.version())
+-conf.set_quoted('SSH_ADD_EXECUTABLE', ssh_add_path)
+-conf.set_quoted('SSH_AGENT_EXECUTABLE', ssh_agent_path)
++if get_option('ssh_agent')
++  conf.set_quoted('SSH_ADD_EXECUTABLE', ssh_add_path)
++  conf.set_quoted('SSH_AGENT_EXECUTABLE', ssh_agent_path)
++endif
+ conf.set10('WITH_SYSTEMD', with_systemd)
+ config_file = configure_file(
+   output: 'config.h',
+-- 
+2.34.1
+

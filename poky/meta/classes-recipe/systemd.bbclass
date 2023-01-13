@@ -205,7 +205,7 @@ python systemd_populate_packages() {
         systemd_check_services()
 }
 
-PACKAGESPLITFUNCS:prepend = "systemd_populate_packages "
+PACKAGESPLITFUNCS =+ "systemd_populate_packages"
 
 python rm_systemd_unitdir (){
     import shutil

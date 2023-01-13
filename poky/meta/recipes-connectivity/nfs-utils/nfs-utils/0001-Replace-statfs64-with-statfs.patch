@@ -1,0 +1,171 @@
+From e89652b853ca7de671093ae44305fa3435e13d3d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 15 Dec 2022 13:29:43 -0800
+Subject: [PATCH] Replace statfs64 with statfs
+
+autoconf AC_SYS_LARGEFILE is used by configure to add needed defines
+when needed for enabling 64bit off_t, therefore replacing statfs64 with
+statfs should be functionally same. Additionally this helps compiling
+with latest musl where 64bit LFS functions like statfs64 and friends are
+now moved under _LARGEFILE64_SOURCE feature test macro, this works on
+glibc systems because _GNU_SOURCE macros also enables
+_LARGEFILE64_SOURCE indirectly. This is not case with musl and this
+latest issue is exposed.
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-nfs/20221215213605.4061853-1-raj.khem@gmail.com/T/#u]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ support/export/cache.c      | 14 +++++++-------
+ support/include/nfsd_path.h |  6 +++---
+ support/misc/nfsd_path.c    | 24 ++++++++++++------------
+ utils/exportfs/exportfs.c   |  4 ++--
+ 4 files changed, 24 insertions(+), 24 deletions(-)
+
+diff --git a/support/export/cache.c b/support/export/cache.c
+index a5823e9..2497d4f 100644
+--- a/support/export/cache.c
++++ b/support/export/cache.c
+@@ -346,27 +346,27 @@ static int uuid_by_path(char *path, int type, size_t uuidlen, char *uuid)
+ 
+ 	/* Possible sources of uuid are
+ 	 * - blkid uuid
+-	 * - statfs64 uuid
++	 * - statfs uuid
+ 	 *
+-	 * On some filesystems (e.g. vfat) the statfs64 uuid is simply an
++	 * On some filesystems (e.g. vfat) the statfs uuid is simply an
+ 	 * encoding of the device that the filesystem is mounted from, so
+ 	 * it we be very bad to use that (as device numbers change).  blkid
+ 	 * must be preferred.
+-	 * On other filesystems (e.g. btrfs) the statfs64 uuid contains
++	 * On other filesystems (e.g. btrfs) the statfs uuid contains
+ 	 * important info that the blkid uuid cannot contain:  This happens
+ 	 * when multiple subvolumes are exported (they have the same
+-	 * blkid uuid but different statfs64 uuids).
++	 * blkid uuid but different statfs uuids).
+ 	 * We rely on get_uuid_blkdev *knowing* which is which and not returning
+-	 * a uuid for filesystems where the statfs64 uuid is better.
++	 * a uuid for filesystems where the statfs uuid is better.
+ 	 *
+ 	 */
+-	struct statfs64 st;
++	struct statfs st;
+ 	char fsid_val[17];
+ 	const char *blkid_val = NULL;
+ 	const char *val;
+ 	int rc;
+ 
+-	rc = nfsd_path_statfs64(path, &st);
++	rc = nfsd_path_statfs(path, &st);
+ 
+ 	if (type == 0 && rc == 0) {
+ 		const unsigned long *bad;
+diff --git a/support/include/nfsd_path.h b/support/include/nfsd_path.h
+index 3b73aad..aa1e1dd 100644
+--- a/support/include/nfsd_path.h
++++ b/support/include/nfsd_path.h
+@@ -7,7 +7,7 @@
+ #include <sys/stat.h>
+ 
+ struct file_handle;
+-struct statfs64;
++struct statfs;
+ 
+ void 		nfsd_path_init(void);
+ 
+@@ -18,8 +18,8 @@ char *		nfsd_path_prepend_dir(const char *dir, const char *pathname);
+ int 		nfsd_path_stat(const char *pathname, struct stat *statbuf);
+ int 		nfsd_path_lstat(const char *pathname, struct stat *statbuf);
+ 
+-int		nfsd_path_statfs64(const char *pathname,
+-				   struct statfs64 *statbuf);
++int		nfsd_path_statfs(const char *pathname,
++				   struct statfs *statbuf);
+ 
+ char *		nfsd_realpath(const char *path, char *resolved_path);
+ 
+diff --git a/support/misc/nfsd_path.c b/support/misc/nfsd_path.c
+index 65e53c1..c3dea4f 100644
+--- a/support/misc/nfsd_path.c
++++ b/support/misc/nfsd_path.c
+@@ -184,46 +184,46 @@ nfsd_path_lstat(const char *pathname, struct stat *statbuf)
+ 	return nfsd_run_stat(nfsd_wq, nfsd_lstatfunc, pathname, statbuf);
+ }
+ 
+-struct nfsd_statfs64_data {
++struct nfsd_statfs_data {
+ 	const char *pathname;
+-	struct statfs64 *statbuf;
++	struct statfs *statbuf;
+ 	int ret;
+ 	int err;
+ };
+ 
+ static void
+-nfsd_statfs64func(void *data)
++nfsd_statfsfunc(void *data)
+ {
+-	struct nfsd_statfs64_data *d = data;
++	struct nfsd_statfs_data *d = data;
+ 
+-	d->ret = statfs64(d->pathname, d->statbuf);
++	d->ret = statfs(d->pathname, d->statbuf);
+ 	if (d->ret < 0)
+ 		d->err = errno;
+ }
+ 
+ static int
+-nfsd_run_statfs64(struct xthread_workqueue *wq,
++nfsd_run_statfs(struct xthread_workqueue *wq,
+ 		  const char *pathname,
+-		  struct statfs64 *statbuf)
++		  struct statfs *statbuf)
+ {
+-	struct nfsd_statfs64_data data = {
++	struct nfsd_statfs_data data = {
+ 		pathname,
+ 		statbuf,
+ 		0,
+ 		0
+ 	};
+-	xthread_work_run_sync(wq, nfsd_statfs64func, &data);
++	xthread_work_run_sync(wq, nfsd_statfsfunc, &data);
+ 	if (data.ret < 0)
+ 		errno = data.err;
+ 	return data.ret;
+ }
+ 
+ int
+-nfsd_path_statfs64(const char *pathname, struct statfs64 *statbuf)
++nfsd_path_statfs(const char *pathname, struct statfs *statbuf)
+ {
+ 	if (!nfsd_wq)
+-		return statfs64(pathname, statbuf);
+-	return nfsd_run_statfs64(nfsd_wq, pathname, statbuf);
++		return statfs(pathname, statbuf);
++	return nfsd_run_statfs(nfsd_wq, pathname, statbuf);
+ }
+ 
+ struct nfsd_realpath_data {
+diff --git a/utils/exportfs/exportfs.c b/utils/exportfs/exportfs.c
+index 0897b22..6d79a5b 100644
+--- a/utils/exportfs/exportfs.c
++++ b/utils/exportfs/exportfs.c
+@@ -513,7 +513,7 @@ validate_export(nfs_export *exp)
+ 	 */
+ 	struct stat stb;
+ 	char *path = exportent_realpath(&exp->m_export);
+-	struct statfs64 stf;
++	struct statfs stf;
+ 	int fs_has_fsid = 0;
+ 
+ 	if (stat(path, &stb) < 0) {
+@@ -528,7 +528,7 @@ validate_export(nfs_export *exp)
+ 	if (!can_test())
+ 		return;
+ 
+-	if (!statfs64(path, &stf) &&
++	if (!statfs(path, &stf) &&
+ 	    (stf.f_fsid.__val[0] || stf.f_fsid.__val[1]))
+ 		fs_has_fsid = 1;
+ 

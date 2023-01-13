@@ -1,0 +1,19 @@
+Upstream-Status: Inappropriate
+
+RPI-Distro repo forks original vlc and applies patches
+to enable raspiberry pi support.
+
+--- a/bin/vlc.c
++++ b/bin/vlc.c
+@@ -106,7 +106,10 @@ static void vlc_kill (void *data)
+ static void exit_timeout (int signum)
+ {
+     (void) signum;
+-    signal (SIGINT, SIG_DFL);
++// This doesn't seem to be strong enough to reliably kill us if we fail to exit
++// in a timely fashion - so upgrade to _exit().
++//    signal (SIGINT, SIG_DFL);
++    _exit(0);
+ }
+ 
+ /*****************************************************************************

@@ -255,7 +255,7 @@ python copy_buildsystem () {
     bbpath = d.getVar('BBPATH')
     env = os.environ.copy()
     env['PYTHONDONTWRITEBYTECODE'] = '1'
-    bb.process.run(['devtool', '--bbpath', bbpath, '--basepath', baseoutpath, 'create-workspace', '--create-only', os.path.join(baseoutpath, 'workspace')], env=env)
+    bb.process.run(['devtool', '--bbpath', bbpath, '--basepath', baseoutpath, 'create-workspace', '--layerseries', d.getVar("LAYERSERIES_CORENAMES"), '--create-only', os.path.join(baseoutpath, 'workspace')], env=env)
 
     # Create bblayers.conf
     bb.utils.mkdirhier(baseoutpath + '/conf')
@@ -497,7 +497,6 @@ python copy_buildsystem () {
         create_filtered_tasklist(d, baseoutpath, tasklistfn, conf_initpath)
     else:
         tasklistfn = None
-
 
     cachedir = os.path.join(baseoutpath, 'cache')
     bb.utils.mkdirhier(cachedir)

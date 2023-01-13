@@ -1,3 +1,8 @@
+From e5d8f6d4a7652ea95c8d069ce9333494f2db868c Mon Sep 17 00:00:00 2001
+From: Joshua Lock <josh@linux.intel.com>
+Date: Fri, 16 Sep 2011 15:35:48 -0700
+Subject: [PATCH] texinfo: several changes to build without zlib and ncurses
+
 We already DEPEND on the native texinfo being present before building so
 there isn't any need to try and build the required native texinfo binaries
 before cross-compiling. This simplifies the recipe somewhat!
@@ -6,11 +11,15 @@ Upstream-Status: Inappropriate oe specific
 
 Signed-off-by: Joshua Lock <josh@linux.intel.com>
 
-Index: texinfo-4.13/configure.ac
-===================================================================
---- texinfo-4.13.orig/configure.ac
-+++ texinfo-4.13/configure.ac
-@@ -100,29 +100,7 @@ AC_CANONICAL_BUILD
+---
+ configure.ac | 24 +-----------------------
+ 1 file changed, 1 insertion(+), 23 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 6fcd3a0..c108df7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -180,29 +180,7 @@ AC_CANONICAL_BUILD
  # $native_tools is also added to SUBDIRS in the main Makefile.am,
  # so that make compiles the native tools first.
  #

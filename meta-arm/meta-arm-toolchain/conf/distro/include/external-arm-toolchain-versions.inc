@@ -123,7 +123,6 @@ python external_arm_toolchain_version_handler () {
         return
     d = e.data
     ld = d.createCopy()
-    ld.finalize()
 
     d.setVar('EAT_VER_MAIN', eat_get_main_version(ld))
     d.setVar('EAT_VER_GCC', eat_get_gcc_version(ld))

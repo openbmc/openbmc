@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 Release 3.1 (dunfell)
 =====================
 
@@ -125,7 +127,7 @@ renamed to ``features_check``; the ``distro_features_check`` class still
 exists but generates a warning and redirects to the new class. In
 preparation for a future removal of the old class it is recommended that
 you update recipes currently inheriting ``distro_features_check`` to
-inherit :ref:`features_check <ref-classes-features_check>` instead.
+inherit :ref:`ref-classes-features_check` instead.
 
 .. _migration-3.1-removed-classes:
 
@@ -238,10 +240,10 @@ Warnings will now be shown at :ref:`ref-tasks-package_qa` time in the following
 circumstances:
 
 -  A recipe installs ``.desktop`` files containing ``MimeType`` keys but
-   does not inherit the new :ref:`mime-xdg <ref-classes-mime-xdg>` class
+   does not inherit the new :ref:`ref-classes-mime-xdg` class
 
 -  A recipe installs ``.xml`` files into ``${datadir}/mime/packages``
-   but does not inherit the :ref:`mime <ref-classes-mime>` class
+   but does not inherit the :ref:`ref-classes-mime` class
 
 .. _migration-3.1-x86-live-wic:
 

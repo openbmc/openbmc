@@ -1,0 +1,48 @@
+From 5adae6737e919d957a08df437951ccb6996f9882 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 21 Dec 2022 19:16:03 -0800
+Subject: [PATCH 1/2] replace off64_t with off_t
+
+off_t is already 64-bits when _FILE_OFFSET_BITS=64
+using off_t also makes it portable on musl systems
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ user/v9/drbdadm_main.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/user/v9/drbdadm_main.c b/user/v9/drbdadm_main.c
+index 91e9507d..2030946c 100644
+--- a/user/v9/drbdadm_main.c
++++ b/user/v9/drbdadm_main.c
+@@ -1264,11 +1264,11 @@ static int adm_resource(const struct cfg_ctx *ctx)
+ 	return ex;
+ }
+ 
+-static off64_t read_drbd_dev_size(int minor)
++static off_t read_drbd_dev_size(int minor)
+ {
+ 	char *path;
+ 	FILE *file;
+-	off64_t val;
++	off_t val;
+ 	int r;
+ 
+ 	m_asprintf(&path, "/sys/block/drbd%d/size", minor);
+@@ -1289,9 +1289,9 @@ int adm_resize(const struct cfg_ctx *ctx)
+ 	char *argv[MAX_ARGS];
+ 	struct d_option *opt;
+ 	bool is_resize = !strcmp(ctx->cmd->name, "resize");
+-	off64_t old_size = -1;
+-	off64_t target_size = 0;
+-	off64_t new_size;
++	off_t old_size = -1;
++	off_t target_size = 0;
++	off_t new_size;
+ 	int argc = 0;
+ 	int silent;
+ 	int ex;
+-- 
+2.39.0
+

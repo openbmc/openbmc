@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 Release 2.0 (jethro)
 ====================
 
@@ -214,7 +216,7 @@ modifications synchronized, it is not always obvious to developers how
 to manipulate the Metadata as compared to the source.
 
 Metadata processing has now been removed from the
-:ref:`kernel-yocto <ref-classes-kernel-yocto>` class and the external
+:ref:`ref-classes-kernel-yocto` class and the external
 Metadata repository ``yocto-kernel-cache``, which has always been used
 to seed the ``linux-yocto`` "meta" branch. This separate ``linux-yocto``
 cache repository is now the primary location for this data. Due to this

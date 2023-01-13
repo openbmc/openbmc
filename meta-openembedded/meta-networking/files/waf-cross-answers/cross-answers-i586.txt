@@ -45,3 +45,4 @@ Checking value of GNUTLS_MAC_AES_CMAC_128: OK
 Checking whether fcntl supports flags to send direct I/O availability signals: NO
 Checking whether fcntl supports setting/geting hints: NO
 Checking for readlink breakage: NO
+Checking for gnutls fips mode support: NO

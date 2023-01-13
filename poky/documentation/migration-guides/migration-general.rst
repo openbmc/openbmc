@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 Introduction
 ============
 
@@ -74,32 +76,33 @@ any new Yocto Project release.
 
 - *Checking Image / SDK Changes*:
 
-   The :ref:`buildhistory <ref-classes-buildhistory>` class can be used
+   The :ref:`ref-classes-buildhistory` class can be used
    if you wish to check the impact of changes to images / SDKs across
    the migration (e.g. added/removed packages, added/removed files, size
    changes etc.). To do this, follow these steps:
 
-   1. Enable buildhistory before the migration
+   #. Enable :ref:`ref-classes-buildhistory` before the migration
 
-   2. Run a pre-migration build
+   #. Run a pre-migration build
 
-   3. Capture the buildhistory output (as specified by :term:`BUILDHISTORY_DIR`)
-      and ensure it is preserved for subsequent builds. How you would do this
-      depends on how you are running your builds - if you are doing this all on
-      one workstation in the same :term:`Build Directory` you may not need to do
-      anything other than not deleting the buildhistory output directory. For
-      builds in a pipeline it may be more complicated.
+   #. Capture the :ref:`ref-classes-buildhistory` output (as
+      specified by :term:`BUILDHISTORY_DIR`) and ensure it is preserved for
+      subsequent builds. How you would do this depends on how you are running
+      your builds - if you are doing this all on one workstation in the same
+      :term:`Build Directory` you may not need to do anything other than not
+      deleting the :ref:`ref-classes-buildhistory` output
+      directory. For builds in a pipeline it may be more complicated.
 
-   4. Set a tag in the buildhistory output (which is a git repository) before
+   #. Set a tag in the :ref:`ref-classes-buildhistory` output (which is a git repository) before
       migration, to make the commit from the pre-migration build easy to find
       as you may end up running multiple builds during the migration.
 
-   5. Perform the migration
+   #. Perform the migration
 
-   6. Run a build
+   #. Run a build
 
-   7. Check the output changes between the previously set tag and HEAD in the
-      buildhistory output using ``git diff`` or ``buildhistory-diff``.
+   #. Check the output changes between the previously set tag and HEAD in the
+      :ref:`ref-classes-buildhistory` output using ``git diff`` or ``buildhistory-diff``.
 
-   For more information on using buildhistory, see
-   :ref:`dev-manual/common-tasks:maintaining build output quality`.
+   For more information on using :ref:`ref-classes-buildhistory`, see
+   :ref:`dev-manual/build-quality:maintaining build output quality`.

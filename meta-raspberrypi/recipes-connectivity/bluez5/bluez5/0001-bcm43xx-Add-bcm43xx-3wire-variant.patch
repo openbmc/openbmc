@@ -1,17 +1,17 @@
-From b4f2b77472aeb967d3a7595e8a965785c7a37c87 Mon Sep 17 00:00:00 2001
+From 8e8321cd597d3d9d342a8a3533ad10751dde5885 Mon Sep 17 00:00:00 2001
 From: Phil Elwell <phil@raspberrypi.org>
 Date: Tue, 16 Feb 2016 16:40:46 +0000
-Subject: [PATCH 1/4] bcm43xx: Add bcm43xx-3wire variant
+Subject: [PATCH] bcm43xx: Add bcm43xx-3wire variant
 
 ---
  tools/hciattach.c | 3 +++
  1 file changed, 3 insertions(+)
 
 diff --git a/tools/hciattach.c b/tools/hciattach.c
-index 59a76a7..5861d33 100644
+index 276a4e56e..7d01d8b74 100644
 --- a/tools/hciattach.c
 +++ b/tools/hciattach.c
-@@ -1144,6 +1144,9 @@ struct uart_t uart[] = {
+@@ -1078,6 +1078,9 @@ struct uart_t uart[] = {
  	{ "bcm43xx",    0x0000, 0x0000, HCI_UART_H4,   115200, 3000000,
  				FLOW_CTL, DISABLE_PM, NULL, bcm43xx, NULL  },
  
@@ -21,6 +21,3 @@ index 59a76a7..5861d33 100644
  	{ "ath3k",    0x0000, 0x0000, HCI_UART_ATH3K, 115200, 115200,
  			FLOW_CTL, DISABLE_PM, NULL, ath3k_ps, ath3k_pm  },
  
--- 
-1.9.1
-

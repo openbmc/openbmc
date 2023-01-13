@@ -1,0 +1,37 @@
+From 6bf2bb136a0b3961339369bc08e58b661fba0edb Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Thu, 17 Nov 2022 17:26:30 +0800
+Subject: [PATCH] avoid using -m option for readlink
+
+Use a more widely used option '-f' instead of '-m' here to
+avoid dependency on coreutils.
+
+Looking at the git history of the resolvconf repo, the '-m'
+is deliberately used. And it wants to depend on coreutils.
+But in case of OE, the existence of /etc is ensured, and busybox
+readlink provides '-f' option, so we can just use '-f'. In this
+way, the coreutils dependency is not necessary any more.
+
+Upstream-Status: Inappropriate [OE Specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ etc/resolvconf/update.d/libc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/etc/resolvconf/update.d/libc b/etc/resolvconf/update.d/libc
+index 1c4f6bc..f75d22c 100755
+--- a/etc/resolvconf/update.d/libc
++++ b/etc/resolvconf/update.d/libc
+@@ -57,7 +57,7 @@ fi
+ report_warning() { echo "$0: Warning: $*" >&2 ; }
+ 
+ resolv_conf_is_symlinked_to_dynamic_file() {
+-	[ -L ${ETC}/resolv.conf ] && [ "$(readlink -m ${ETC}/resolv.conf)" = "$DYNAMICRSLVCNFFILE" ]
++	[ -L ${ETC}/resolv.conf ] && [ "$(readlink -f ${ETC}/resolv.conf)" = "$DYNAMICRSLVCNFFILE" ]
+ }
+ 
+ if ! resolv_conf_is_symlinked_to_dynamic_file ; then
+-- 
+2.17.1
+

@@ -74,7 +74,6 @@ python toolchain_metadata_setup () {
 
     d = e.data
     l = d.createCopy()
-    l.finalize()
     oe_import(l)
 
     external_toolchain = l.getVar('EXTERNAL_TOOLCHAIN', True)
@@ -99,7 +98,6 @@ def populate_toolchain_links(d):
     from glob import glob
 
     d = d.createCopy()
-    d.finalize()
 
     pattern = bb.data.expand('${EXTERNAL_TOOLCHAIN}/bin/${TARGET_PREFIX}*', d)
     files = glob(pattern)

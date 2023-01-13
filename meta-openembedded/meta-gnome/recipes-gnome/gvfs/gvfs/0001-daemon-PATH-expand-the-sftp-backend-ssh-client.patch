@@ -1,0 +1,60 @@
+From 8327383e262e1e7f32750a8a2d3dd708195b0f53 Mon Sep 17 00:00:00 2001
+From: Alex Stewart <alex.stewart@ni.com>
+Date: Wed, 14 Dec 2022 03:05:45 -0600
+Subject: [PATCH] daemon: PATH-expand the sftp backend ssh client
+
+Meson is currently configured to search the gvfs builder's PATH for an
+ssh client, and hardcode its fullpath as the canonical ssh client for
+the gvfs sftp backend.
+
+This setup breaks in cases where the builder has a different ssh client
+from the final runtime root, or where the client's pathes differ.
+Builders using OpenEmbedded or buildroot workspaces are particularly
+affected.
+
+Instead, set SSH_PROGRAM to `ssh` so that it gets PATH-expanded at
+runtime.
+
+Closes: https://gitlab.gnome.org/GNOME/gvfs/-/issues/465
+Signed-off-by: Alex Stewart <alex.stewart@ni.com>
+
+Upstream-Status: Accepted
+* https://gitlab.gnome.org/GNOME/gvfs/-/merge_requests/157
+  * Expect upstream merge in GNOME 44
+
+---
+ daemon/meson.build | 2 +-
+ meson.build        | 4 ----
+ 2 files changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/daemon/meson.build b/daemon/meson.build
+index e20ada29..72a16890 100644
+--- a/daemon/meson.build
++++ b/daemon/meson.build
+@@ -256,7 +256,7 @@ if enable_sftp
+     '-DDEFAULT_BACKEND_TYPE=sftp',
+     '-DBACKEND_TYPES="sftp", G_VFS_TYPE_BACKEND_SFTP,',
+     '-DMAX_JOB_THREADS=1',
+-    '-DSSH_PROGRAM="@0@"'.format(ssh.full_path()),
++    '-DSSH_PROGRAM="ssh"',
+   ]
+ 
+   programs += {'gvfsd-sftp': {'sources': sources, 'dependencies': deps, 'c_args': cflags}}
+diff --git a/meson.build b/meson.build
+index 7fd67427..a84c0104 100644
+--- a/meson.build
++++ b/meson.build
+@@ -457,10 +457,6 @@ endif
+ 
+ # *** SFTP backend ***
+ enable_sftp = get_option('sftp')
+-if enable_sftp
+-  ssh = find_program('ssh', required: false)
+-  assert(ssh.found(), 'SFTP backend requested but a ssh client is required')
+-endif
+ 
+ # *** Enable development utils ***
+ enable_devel_utils = get_option('devel_utils')
+-- 
+2.38.1
+

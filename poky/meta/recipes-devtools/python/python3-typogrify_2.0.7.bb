@@ -8,7 +8,7 @@ inherit pypi setuptools3
 PYPI_PACKAGE = "typogrify"
 SRC_URI[sha256sum] = "8be4668cda434163ce229d87ca273a11922cb1614cb359970b7dc96eed13cb38"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"
 
 RDEPENDS:${PN} += "${PYTHON_PN}-smartypants"
 

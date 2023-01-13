@@ -1896,7 +1896,7 @@ manual, and boot the resulting target image.
 .. note::
 
    If you have a :term:`Build Directory` containing multiple machines, you need
-   to have the MACHINE you're connecting to selected in local.conf, and
+   to have the :term:`MACHINE` you're connecting to selected in local.conf, and
    the kernel in that machine's :term:`Build Directory` must match the kernel on
    the booted system exactly, or you'll get the above 'crosstap' message
    when you try to invoke a script.

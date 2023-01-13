@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 Release notes for 3.4.4 (honister)
 ----------------------------------
 
@@ -19,20 +21,20 @@ Fixes in 3.4.4
 -  bitbake: knotty: reduce keep-alive timeout from 5000s (83 minutes) to 10 minutes
 -  bitbake: server/process: Disable gc around critical section
 -  bitbake: server/xmlrpcserver: Add missing xmlrpcclient import
--  bitbake: toaster: Fix IMAGE_INSTALL issues with _append vs :append
+-  bitbake: toaster: Fix :term:`IMAGE_INSTALL` issues with _append vs :append
 -  bitbake: toaster: fixtures replace gatesgarth
 -  build-appliance-image: Update to honister head revision
 -  conf.py/poky.yaml: Move version information to poky.yaml and read in conf.py
 -  conf/machine: fix QEMU x86 sound options
--  devupstream: fix handling of SRC_URI
+-  devupstream: fix handling of :term:`SRC_URI`
 -  documentation: update for 3.4.4 release
 -  externalsrc/devtool: Fix to work with fixed export funcition flags handling
 -  gmp: add missing COPYINGv3
--  gnu-config: update SRC_URI
+-  gnu-config: update :term:`SRC_URI`
 -  libxml2: fix CVE-2022-23308 regression
 -  libxml2: move to gitlab.gnome.org
 -  libxml2: update to 2.9.13
--  libxshmfence: Correct LICENSE to HPND
+-  libxshmfence: Correct :term:`LICENSE` to HPND
 -  license_image.bbclass: close package.manifest file
 -  linux-firmware: correct license for ar3k firmware
 -  linux-firmware: upgrade 20220310 -> 20220411
@@ -54,7 +56,7 @@ Fixes in 3.4.4
 -  u-boot: Inherit pkgconfig
 -  uninative: Upgrade to 3.6 with gcc 12 support
 -  vim: Upgrade 8.2.4524 -> 8.2.4681
--  virglrenderer: update SRC_URI
+-  virglrenderer: update :term:`SRC_URI`
 -  webkitgtk: update to 2.32.4
 -  wireless-regdb: upgrade 2022.02.18 -> 2022.04.08
 

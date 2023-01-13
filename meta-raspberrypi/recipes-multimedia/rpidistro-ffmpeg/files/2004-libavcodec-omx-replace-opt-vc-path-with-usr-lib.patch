@@ -1,0 +1,35 @@
+From 0dfb56e12fa709794525cda1471091f6699905d5 Mon Sep 17 00:00:00 2001
+From: Vincent Davis Jr <vince@underview.tech>
+Date: Thu, 8 Dec 2022 10:49:03 -0600
+Subject: [PATCH] libavcodec: omx replace /opt/vc path with /usr/lib
+
+Upstream-Status: Inappropriate
+
+RPI-Distro repo clones original ffmpeg and applies patches to enable
+raspiberry pi support.
+
+Configures omx.c for OE usages as libbcm_host.so
+and libopenmaxil.so are located in a different
+location.
+
+Signed-off-by: Vincent Davis Jr <vince@underview.tech>
+---
+ libavcodec/omx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libavcodec/omx.c b/libavcodec/omx.c
+index 0a6a3083..8c6e9193 100644
+--- a/libavcodec/omx.c
++++ b/libavcodec/omx.c
+@@ -141,7 +141,7 @@ static av_cold OMXContext *omx_init(void *logctx, const char *libname, const cha
+ {
+     static const char * const libnames[] = {
+ #if CONFIG_OMX_RPI
+-        "/opt/vc/lib/libopenmaxil.so", "/opt/vc/lib/libbcm_host.so",
++        "/usr/lib/libopenmaxil.so", "/usr/lib/libbcm_host.so",
+ #else
+         "libOMX_Core.so", NULL,
+         "libOmxCore.so", NULL,
+-- 
+2.38.1
+

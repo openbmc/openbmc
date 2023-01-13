@@ -1,4 +1,4 @@
-From 1fe937835311a2d0afbc85ce4a4dbd3c9e0c912f Mon Sep 17 00:00:00 2001
+From 820d2ef3596189041da43d1139da8689336bb918 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Mon, 26 Nov 2018 11:19:45 +0800
 Subject: [PATCH] Subject: [PATCH] Always use devmapper for kpartx
@@ -19,25 +19,27 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
 
 Rebase to 0.7.9
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
+[OP: Rebase to 0.9.3]
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
 ---
  kpartx/Makefile | 4 +---
  1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/kpartx/Makefile b/kpartx/Makefile
-index 7eb467e..c143321 100644
+index 742d3bcd..d886483d 100644
 --- a/kpartx/Makefile
 +++ b/kpartx/Makefile
-@@ -8,9 +8,7 @@ LDFLAGS += $(BIN_LDFLAGS)
+@@ -9,9 +9,7 @@ LDFLAGS += $(BIN_LDFLAGS)
  
  LIBDEPS += -ldevmapper
  
--ifneq ($(call check_func,dm_task_set_cookie,/usr/include/libdevmapper.h),0)
--	CFLAGS += -DLIBDM_API_COOKIE
+-ifneq ($(call check_func,dm_task_set_cookie,$(DEVMAPPER_INCDIR)/libdevmapper.h),0)
+-	CPPFLAGS += -DLIBDM_API_COOKIE
 -endif
-+CFLAGS += -DLIBDM_API_COOKIE
++CPPFLAGS += -DLIBDM_API_COOKIE
  
  OBJS = bsd.o dos.o kpartx.o solaris.o unixware.o dasd.o sun.o \
  	gpt.o mac.o ps3.o crc32.o lopart.o xstrncpy.o devmapper.o
 -- 
-2.7.4
+2.38.1
 

@@ -1,0 +1,230 @@
+From f189457b79989543f65b8a4e8729eff2cdf9a758 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 13 Aug 2022 19:24:55 -0700
+Subject: [PATCH] core: Define section attributes for clang
+
+Clang's attribute section is not same as gcc, here we need to add flags
+to sections so they can be eventually collected by linker into final
+output segments. Only way to do so with clang is to use
+
+pragma clang section ...
+
+The behavious is described here [1], this allows us to define names bss
+sections. This was not an issue until clang-15 where LLD linker starts
+to detect the section flags before merging them and throws the following
+errors
+
+| ld.lld: error: section type mismatch for .nozi.kdata_page
+| >>> /mnt/b/yoe/master/build/tmp/work/qemuarm64-yoe-linux/optee-os-tadevkit/3.17.0-r0/build/core/arch/arm/kernel/thread.o:(.nozi.kdata_page): SHT_PROGBITS
+| >>> output section .nozi: SHT_NOBITS
+|
+| ld.lld: error: section type mismatch for .nozi.mmu.l2
+| >>> /mnt/b/yoe/master/build/tmp/work/qemuarm64-yoe-linux/optee-os-tadevkit/3.17.0-r0/build/core/arch/arm/mm/core_mmu_lpae.o:(.nozi.mmu.l2): SHT_PROGBITS
+| >>> output section .nozi: SHT_NOBITS
+
+These sections should be carrying SHT_NOBITS but so far it was not
+possible to do so, this patch tries to use clangs pragma to get this
+going and match the functionality with gcc.
+
+[1] https://intel.github.io/llvm-docs/clang/LanguageExtensions.html#specifying-section-names-for-global-objects-pragma-clang-section
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ core/arch/arm/kernel/thread.c    | 19 +++++++++++++++--
+ core/arch/arm/mm/core_mmu_lpae.c | 35 ++++++++++++++++++++++++++++----
+ core/arch/arm/mm/pgt_cache.c     | 12 ++++++++++-
+ core/kernel/thread.c             | 13 +++++++++++-
+ 4 files changed, 71 insertions(+), 8 deletions(-)
+
+--- a/core/arch/arm/kernel/thread.c
++++ b/core/arch/arm/kernel/thread.c
+@@ -44,16 +44,31 @@ static size_t thread_user_kcode_size __n
+ #if defined(CFG_CORE_UNMAP_CORE_AT_EL0) && \
+ 	defined(CFG_CORE_WORKAROUND_SPECTRE_BP_SEC) && defined(ARM64)
+ long thread_user_kdata_sp_offset __nex_bss;
++#ifdef __clang__
++#ifndef CFG_VIRTUALIZATION
++#pragma clang section bss=".nozi.kdata_page"
++#else
++#pragma clang section bss=".nex_nozi.kdata_page"
++#endif
++#endif
+ static uint8_t thread_user_kdata_page[
+ 	ROUNDUP(sizeof(struct thread_core_local) * CFG_TEE_CORE_NB_CORE,
+ 		SMALL_PAGE_SIZE)]
+ 	__aligned(SMALL_PAGE_SIZE)
++#ifndef __clang__
+ #ifndef CFG_VIRTUALIZATION
+-	__section(".nozi.kdata_page");
++	__section(".nozi.kdata_page")
+ #else
+-	__section(".nex_nozi.kdata_page");
++	__section(".nex_nozi.kdata_page")
+ #endif
+ #endif
++    ;
++#endif
++
++/* reset BSS section to default ( .bss ) */
++#ifdef __clang__
++#pragma clang section bss=""
++#endif
+ 
+ #ifdef ARM32
+ uint32_t __nostackcheck thread_get_exceptions(void)
+--- a/core/arch/arm/mm/core_mmu_lpae.c
++++ b/core/arch/arm/mm/core_mmu_lpae.c
+@@ -233,19 +233,46 @@ typedef uint16_t l1_idx_t;
+ typedef uint64_t base_xlat_tbls_t[CFG_TEE_CORE_NB_CORE][NUM_BASE_LEVEL_ENTRIES];
+ typedef uint64_t xlat_tbl_t[XLAT_TABLE_ENTRIES];
+ 
++#ifdef __clang__
++#pragma clang section bss=".nozi.mmu.base_table"
++#endif
+ static base_xlat_tbls_t base_xlation_table[NUM_BASE_TABLES]
+ 	__aligned(NUM_BASE_LEVEL_ENTRIES * XLAT_ENTRY_SIZE)
+-	__section(".nozi.mmu.base_table");
++#ifndef __clang__
++	__section(".nozi.mmu.base_table")
++#endif
++;
++#ifdef __clang__
++#pragma clang section bss=""
++#endif
+ 
++#ifdef __clang__
++#pragma clang section bss=".nozi.mmu.l2"
++#endif
+ static xlat_tbl_t xlat_tables[MAX_XLAT_TABLES]
+-	__aligned(XLAT_TABLE_SIZE) __section(".nozi.mmu.l2");
++	__aligned(XLAT_TABLE_SIZE)
++#ifndef __clang__
++	__section(".nozi.mmu.l2")
++#endif
++;
++#ifdef __clang__
++#pragma clang section bss=""
++#endif
+ 
+ #define XLAT_TABLES_SIZE	(sizeof(xlat_tbl_t) * MAX_XLAT_TABLES)
+ 
++#ifdef __clang__
++#pragma clang section bss=".nozi.mmu.l2"
++#endif
+ /* MMU L2 table for TAs, one for each thread */
+ static xlat_tbl_t xlat_tables_ul1[CFG_NUM_THREADS]
+-	__aligned(XLAT_TABLE_SIZE) __section(".nozi.mmu.l2");
+-
++#ifndef __clang__
++	__aligned(XLAT_TABLE_SIZE) __section(".nozi.mmu.l2")
++#endif
++;
++#ifdef __clang__
++#pragma clang section bss=""
++#endif
+ /*
+  * TAs page table entry inside a level 1 page table.
+  *
+--- a/core/arch/arm/mm/pgt_cache.c
++++ b/core/arch/arm/mm/pgt_cache.c
+@@ -104,8 +104,18 @@ void pgt_init(void)
+ 	 * has a large alignment, while .bss has a small alignment. The current
+ 	 * link script is optimized for small alignment in .bss
+ 	 */
++#ifdef __clang__
++#pragma clang section bss=".nozi.mmu.l2"
++#endif
+ 	static uint8_t pgt_tables[PGT_CACHE_SIZE][PGT_SIZE]
+-			__aligned(PGT_SIZE) __section(".nozi.pgt_cache");
++			__aligned(PGT_SIZE)
++#ifndef __clang__
++			__section(".nozi.pgt_cache")
++#endif
++			;
++#ifdef __clang__
++#pragma clang section bss=""
++#endif
+ 	size_t n;
+ 
+ 	for (n = 0; n < ARRAY_SIZE(pgt_tables); n++) {
+--- a/core/kernel/thread.c
++++ b/core/kernel/thread.c
+@@ -37,13 +37,24 @@ struct thread_core_local thread_core_loc
+ 	name[stack_num][sizeof(name[stack_num]) / sizeof(uint32_t) - 1]
+ #endif
+ 
++#define DO_PRAGMA(x) _Pragma (#x)
++
++#ifdef __clang__
++#define DECLARE_STACK(name, num_stacks, stack_size, linkage) \
++DO_PRAGMA (clang section bss=".nozi_stack." #name) \
++linkage uint32_t name[num_stacks] \
++		[ROUNDUP(stack_size + STACK_CANARY_SIZE + STACK_CHECK_EXTRA, \
++			 STACK_ALIGNMENT) / sizeof(uint32_t)] \
++		__attribute__((aligned(STACK_ALIGNMENT))); \
++DO_PRAGMA(clang section bss="")
++#else
+ #define DECLARE_STACK(name, num_stacks, stack_size, linkage) \
+ linkage uint32_t name[num_stacks] \
+ 		[ROUNDUP(stack_size + STACK_CANARY_SIZE + STACK_CHECK_EXTRA, \
+ 			 STACK_ALIGNMENT) / sizeof(uint32_t)] \
+ 		__attribute__((section(".nozi_stack." # name), \
+ 			       aligned(STACK_ALIGNMENT)))
+-
++#endif
+ #define GET_STACK(stack) ((vaddr_t)(stack) + STACK_SIZE(stack))
+ 
+ DECLARE_STACK(stack_tmp, CFG_TEE_CORE_NB_CORE,
+--- a/core/arch/arm/mm/core_mmu_v7.c
++++ b/core/arch/arm/mm/core_mmu_v7.c
+@@ -204,16 +204,46 @@ typedef uint32_t l1_xlat_tbl_t[NUM_L1_EN
+ typedef uint32_t l2_xlat_tbl_t[NUM_L2_ENTRIES];
+ typedef uint32_t ul1_xlat_tbl_t[NUM_UL1_ENTRIES];
+ 
++#ifdef __clang__
++#pragma clang section bss=".nozi.mmu.l1"
++#endif
+ static l1_xlat_tbl_t main_mmu_l1_ttb
+-		__aligned(L1_ALIGNMENT) __section(".nozi.mmu.l1");
++		__aligned(L1_ALIGNMENT)
++#ifndef __clang__
++       __section(".nozi.mmu.l1")
++#endif
++;
++#ifdef __clang__
++#pragma clang section bss=""
++#endif
+ 
+ /* L2 MMU tables */
++#ifdef __clang__
++#pragma clang section bss=".nozi.mmu.l2"
++#endif
+ static l2_xlat_tbl_t main_mmu_l2_ttb[MAX_XLAT_TABLES]
+-		__aligned(L2_ALIGNMENT) __section(".nozi.mmu.l2");
++		__aligned(L2_ALIGNMENT)
++#ifndef __clang__
++       __section(".nozi.mmu.l2")
++#endif
++;
++#ifdef __clang__
++#pragma clang section bss=""
++#endif
+ 
+ /* MMU L1 table for TAs, one for each thread */
++#ifdef __clang__
++#pragma clang section bss=".nozi.mmu.ul1"
++#endif
+ static ul1_xlat_tbl_t main_mmu_ul1_ttb[CFG_NUM_THREADS]
+-		__aligned(UL1_ALIGNMENT) __section(".nozi.mmu.ul1");
++		__aligned(UL1_ALIGNMENT)
++#ifndef __clang__
++       __section(".nozi.mmu.ul1")
++#endif
++;
++#ifdef __clang__
++#pragma clang section bss=""
++#endif
+ 
+ struct mmu_partition {
+ 	l1_xlat_tbl_t *l1_table;

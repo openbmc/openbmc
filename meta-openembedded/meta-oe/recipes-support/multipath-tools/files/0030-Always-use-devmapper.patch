@@ -1,7 +1,7 @@
-From e4acb46b10484d1da6f093257e34f269832e6a37 Mon Sep 17 00:00:00 2001
+From f20d7651a62efff818ebd0d1bc920f6f362c890d Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Mon, 26 Nov 2018 11:17:41 +0800
-Subject: [PATCH] Subject: [PATCH]  Always use devmapper
+Subject: [PATCH] Subject: [PATCH] Always use devmapper
 
 Do not try to compute several _API_ make variables
 from host information when cross-compiling.
@@ -21,40 +21,57 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
 
 Rebase to 0.7.9
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
+[OP: Rebase to 0.9.3]
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
 ---
- libmultipath/Makefile | 19 ++++---------------
- 1 file changed, 4 insertions(+), 15 deletions(-)
+ libmultipath/Makefile | 34 +++++++---------------------------
+ 1 file changed, 7 insertions(+), 27 deletions(-)
 
 diff --git a/libmultipath/Makefile b/libmultipath/Makefile
-index 33f5269..adf6f4a 100644
+index 3b60a525..72aca7ca 100644
 --- a/libmultipath/Makefile
 +++ b/libmultipath/Makefile
-@@ -20,21 +20,10 @@ ifdef SYSTEMD
+@@ -22,33 +22,13 @@ ifdef SYSTEMD
  	endif
  endif
  
--ifneq ($(call check_func,dm_task_no_flush,/usr/include/libdevmapper.h),0)
--	CFLAGS += -DLIBDM_API_FLUSH -D_GNU_SOURCE
+-ifneq ($(call check_func,dm_task_no_flush,$(DEVMAPPER_INCDIR)/libdevmapper.h),0)
+-	CPPFLAGS += -DLIBDM_API_FLUSH
 -endif
 -
--ifneq ($(call check_func,dm_task_set_cookie,/usr/include/libdevmapper.h),0)
--	CFLAGS += -DLIBDM_API_COOKIE
+-ifneq ($(call check_func,dm_task_get_errno,$(DEVMAPPER_INCDIR)/libdevmapper.h),0)
+-	CPPFLAGS += -DLIBDM_API_GET_ERRNO
 -endif
 -
--ifneq ($(call check_func,udev_monitor_set_receive_buffer_size,/usr/include/libudev.h),0)
--	CFLAGS += -DLIBUDEV_API_RECVBUF
+-ifneq ($(call check_func,dm_task_set_cookie,$(DEVMAPPER_INCDIR)/libdevmapper.h),0)
+-	CPPFLAGS += -DLIBDM_API_COOKIE
 -endif
 -
--ifneq ($(call check_func,dm_task_deferred_remove,/usr/include/libdevmapper.h),0)
--	CFLAGS += -DLIBDM_API_DEFERRED
+-ifneq ($(call check_func,udev_monitor_set_receive_buffer_size,$(LIBUDEV_INCDIR)/libudev.h),0)
+-	CPPFLAGS += -DLIBUDEV_API_RECVBUF
 -endif
-+CFLAGS += -DLIBDM_API_FLUSH -D_GNU_SOURCE
-+CFLAGS += -DLIBDM_API_COOKIE
-+CFLAGS += -DLIBUDEV_API_RECVBUF
-+CFLAGS += -DLIBDM_API_DEFERRED
+-
+-ifneq ($(call check_func,dm_task_deferred_remove,$(DEVMAPPER_INCDIR)/libdevmapper.h),0)
+-	CPPFLAGS += -DLIBDM_API_DEFERRED
+-endif
+-
+-ifneq ($(call check_func,dm_hold_control_dev,$(DEVMAPPER_INCDIR)/libdevmapper.h),0)
+-	CPPFLAGS += -DLIBDM_API_HOLD_CONTROL
+-endif
+-
+-ifneq ($(call check_var,ELS_DTAG_LNK_INTEGRITY,$(LINUX_HEADERS_INCDIR)/scsi/fc/fc_els.h),0)
+-	CPPFLAGS += -DFPIN_EVENT_HANDLER
+-endif
++CPPFLAGS += -DLIBDM_API_FLUSH
++CPPFLAGS += -DLIBDM_API_GET_ERRNO
++CPPFLAGS += -DLIBDM_API_COOKIE
++CPPFLAGS += -DLIBUDEV_API_RECVBUF
++CPPFLAGS += -DLIBDM_API_DEFERRED
++CPPFLAGS += -DLIBDM_API_HOLD_CONTROL
++CPPFLAGS += -DFPIN_EVENT_HANDLER
  
- OBJS = memory.o parser.o vector.o devmapper.o callout.o \
- 	hwtable.o blacklist.o util.o dmparser.o config.o \
+ # object files referencing MULTIPATH_DIR or CONFIG_DIR
+ # they need to be recompiled for unit tests
 -- 
-2.7.4
+2.38.1
 

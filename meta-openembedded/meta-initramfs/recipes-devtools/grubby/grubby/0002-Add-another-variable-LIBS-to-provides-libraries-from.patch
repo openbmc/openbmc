@@ -1,0 +1,38 @@
+From c02d1bf46174656cdb6f7c08fa3e8fa520edcd8e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 15 Jul 2017 10:19:22 -0700
+Subject: [PATCH] Add another variable LIBS to provides libraries from env
+
+Upstream-Status: Inactive-Upstream [lastcommit: 2022 lastrelease: 2016]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 968c276..75abe44 100644
+--- a/Makefile
++++ b/Makefile
+@@ -31,7 +31,8 @@ ifneq ($(VERBOSE_TEST),)
+ 	VERBOSE_TEST="--verbose"
+ endif
+ 
+-grubby_LIBS = -lblkid -lpopt
++grubby_LIBS = -lblkid -lpopt ${LIBS}
++rpm-sort_LIBS = ${LIBS}
+ 
+ all: grubby rpm-sort
+ 
+@@ -63,7 +64,7 @@ grubby:: $(OBJECTS)
+ 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(grubby_LIBS)
+ 
+ rpm-sort::rpm-sort.o
+-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ -lrpmio
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ -lrpmio $(rpm-sort_LIBS)
+ 
+ clean:
+ 	rm -f *.o grubby rpm-sort *~
+-- 
+2.25.1
+

@@ -1,4 +1,4 @@
-From 6d3c48d1b01943a467928235c3affbab463c25ab Mon Sep 17 00:00:00 2001
+From 644c3380f75b20a11755e7052aa632887f3eee2b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 7 Jul 2022 12:32:47 -0700
 Subject: [PATCH] cmake: Use alternate way to detect libm
@@ -8,17 +8,20 @@ when libm is folded into libc starting glibc 2.35+
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  CMakeLists.txt                   | 7 ++++++-
  contrib/fonttools/CMakeLists.txt | 2 +-
  fontforge/CMakeLists.txt         | 2 +-
- fontforgeexe/CMakeLists.txt      | 4 ++--
- 4 files changed, 10 insertions(+), 5 deletions(-)
+ fontforgeexe/CMakeLists.txt      | 2 +-
+ 4 files changed, 9 insertions(+), 4 deletions(-)
 
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e234cb6e9..284ba2d20 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -111,9 +111,14 @@ find_package_with_target(Intl REQUIRED)
- find_package(GLIB 2.6 REQUIRED COMPONENTS gio gobject)
+@@ -115,9 +115,14 @@ else()
+ endif()
  find_package(Iconv REQUIRED)
  find_package(LibXml2 REQUIRED)
 -find_package(MathLib REQUIRED)
@@ -33,9 +36,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  check_include_file(pthread.h HAVE_PTHREAD_H)
  if(HAVE_PTHREAD_H)
    find_package(Threads)
+diff --git a/contrib/fonttools/CMakeLists.txt b/contrib/fonttools/CMakeLists.txt
+index d6c698877..1608af152 100644
 --- a/contrib/fonttools/CMakeLists.txt
 +++ b/contrib/fonttools/CMakeLists.txt
-@@ -15,6 +15,6 @@ add_executable(woff woff.c)
+@@ -15,7 +15,7 @@ add_executable(woff woff.c)
  
  target_link_libraries(acorn2sfd PRIVATE fontforge)
  target_link_libraries(dewoff PRIVATE ZLIB::ZLIB)
@@ -43,6 +48,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 +target_link_libraries(pcl2ttf PRIVATE ${EXTRA_LIBS})
  target_link_libraries(ttf2eps PRIVATE fontforge)
  target_link_libraries(woff PRIVATE ZLIB::ZLIB)
+ 
+diff --git a/fontforge/CMakeLists.txt b/fontforge/CMakeLists.txt
+index 9a052f360..067ef40df 100644
 --- a/fontforge/CMakeLists.txt
 +++ b/fontforge/CMakeLists.txt
 @@ -237,7 +237,7 @@ target_link_libraries(fontforge
@@ -54,9 +62,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
      Iconv::Iconv
      ZLIB::ZLIB
  )
+diff --git a/fontforgeexe/CMakeLists.txt b/fontforgeexe/CMakeLists.txt
+index e2982c39d..8829993ea 100644
 --- a/fontforgeexe/CMakeLists.txt
 +++ b/fontforgeexe/CMakeLists.txt
-@@ -110,7 +110,7 @@ if(ENABLE_PYTHON_SCRIPTING_RESULT)
+@@ -121,7 +121,7 @@ if(ENABLE_PYTHON_SCRIPTING_RESULT)
    target_link_libraries(fontforgeexe PRIVATE Python3::Python)
  endif()
  

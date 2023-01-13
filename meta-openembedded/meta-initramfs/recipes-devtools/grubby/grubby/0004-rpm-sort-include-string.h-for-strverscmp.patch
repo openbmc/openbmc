@@ -1,0 +1,33 @@
+From 45bc228090b3adfc0a5058b9cd019d91831e110a Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 3 Jan 2023 13:59:48 +0800
+Subject: [PATCH] rpm-sort: include string.h for strverscmp
+
+Include string.h to fix build error:
+rpm-sort.c: In function 'package_version_compare':
+rpm-sort.c:156:13: error: 'strverscmp' undeclared (first use in this function)
+  156 |       cmp = strverscmp;
+      |             ^~~~~~~~~~
+
+Upstream-Status: Inactive-Upstream [lastcommit: 2022 lastrelease: 2016]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ rpm-sort.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/rpm-sort.c b/rpm-sort.c
+index f196356..2eb91ce 100644
+--- a/rpm-sort.c
++++ b/rpm-sort.c
+@@ -8,6 +8,7 @@
+ #include <argp.h>
+ #include <rpm/rpmlib.h>
+ #include <err.h>
++#include <string.h>
+ 
+ typedef enum {
+         RPMNVRCMP,
+-- 
+2.25.1
+

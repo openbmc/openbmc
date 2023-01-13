@@ -288,7 +288,7 @@ class RunQueueTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="runqueuetest") as tempdir:
             extraenv = {
                 "BBMULTICONFIG" : "mc-1 mc_2",
-                "BB_SIGNATURE_HANDLER" : "TestMulticonfigDepends",
+                "BB_SIGNATURE_HANDLER" : "basichash",
                 "EXTRA_BBFILES": "${COREBASE}/recipes/fails-mc/*.bb",
             }
             tasks = self.run_bitbakecmd(["bitbake", "mc:mc-1:f1"], tempdir, "", extraenv=extraenv, cleanup=True)

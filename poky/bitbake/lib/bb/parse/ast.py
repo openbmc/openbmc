@@ -9,6 +9,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
+import sys
 import bb
 from bb import methodpool
 from bb.parse import logger
@@ -269,6 +270,41 @@ class BBHandlerNode(AstNode):
             data.setVarFlag(h, "handler", 1)
         data.setVar('__BBHANDLERS', bbhands)
 
+class PyLibNode(AstNode):
+    def __init__(self, filename, lineno, libdir, namespace):
+        AstNode.__init__(self, filename, lineno)
+        self.libdir = libdir
+        self.namespace = namespace
+
+    def eval(self, data):
+        global_mods = (data.getVar("BB_GLOBAL_PYMODULES") or "").split()
+        for m in global_mods:
+            if m not in bb.utils._context:
+                bb.utils._context[m] = __import__(m)
+
+        libdir = data.expand(self.libdir)
+        if libdir not in sys.path:
+            sys.path.append(libdir)
+        try:
+            bb.utils._context[self.namespace] = __import__(self.namespace)
+            toimport = getattr(bb.utils._context[self.namespace], "BBIMPORTS", [])
+            for i in toimport:
+                bb.utils._context[self.namespace] = __import__(self.namespace + "." + i)
+                mod = getattr(bb.utils._context[self.namespace], i)
+                fn = getattr(mod, "__file__")
+                funcs = {}
+                for f in dir(mod):
+                    if f.startswith("_"):
+                        continue
+                    fcall = getattr(mod, f)
+                    if not callable(fcall):
+                        continue
+                    funcs[f] = fcall
+                bb.codeparser.add_module_functions(fn, funcs, "%s.%s" % (self.namespace, i))
+
+        except AttributeError as e:
+            bb.error("Error importing OE modules: %s" % str(e))
+
 class InheritNode(AstNode):
     def __init__(self, filename, lineno, classes):
         AstNode.__init__(self, filename, lineno)
@@ -319,6 +355,9 @@ def handleDelTask(statements, filename, lineno, m):
 
 def handleBBHandlers(statements, filename, lineno, m):
     statements.append(BBHandlerNode(filename, lineno, m.group(1)))
+
+def handlePyLib(statements, filename, lineno, m):
+    statements.append(PyLibNode(filename, lineno, m.group(1), m.group(2)))
 
 def handleInherit(statements, filename, lineno, m):
     classes = m.group(1)

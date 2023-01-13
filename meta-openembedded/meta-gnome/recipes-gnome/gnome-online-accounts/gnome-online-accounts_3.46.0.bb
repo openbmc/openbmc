@@ -8,12 +8,13 @@ inherit gnomebase gsettings gobject-introspection gtk-icon-cache vala features_c
 
 DEPENDS = "gtk+3 gtk+3-native gdk-pixbuf dbus json-glib libxml2 webkitgtk glib-2.0 rest libsecret"
 
+SRC_URI += "file://0001-build-Use-the-appropriate-dependency-object.patch"
 SRC_URI[archive.sha256sum] = "5e7859ce4858a6b99d3995ed70527d66e297bb90bbf75ec8780fe9da22c1fcaa"
 
 PACKAGECONFIG_SOUP ?= "soup3"
 PACKAGECONFIG ?= "kerberos owncloud lastfm google windows_live ${PACKAGECONFIG_SOUP}"
 
-PACKAGECONFIG[kerberos] = "-Dkerberos=true, -Dkerberos=false,krb5 gcr"
+PACKAGECONFIG[kerberos] = "-Dkerberos=true, -Dkerberos=false,krb5 gcr3"
 PACKAGECONFIG[exchange] = "-Dexchange=true, -Dexchange=false"
 PACKAGECONFIG[google] = "-Dgoogle=true, -Dgoogle=false"
 PACKAGECONFIG[owncloud] = "-Downcloud=true, -Downcloud=false"

@@ -10,6 +10,7 @@
 import logging
 import os
 import sys
+import time
 import atexit
 import re
 from collections import OrderedDict, defaultdict
@@ -729,6 +730,7 @@ class Tinfoil:
 
         ret = self.run_command('buildTargets', targets, task)
         if handle_events:
+            lastevent = time.time()
             result = False
             # Borrowed from knotty, instead somewhat hackily we use the helper
             # as the object to store "shutdown" on
@@ -741,6 +743,7 @@ class Tinfoil:
                     try:
                         event = self.wait_event(0.25)
                         if event:
+                            lastevent = time.time()
                             if event_callback and event_callback(event):
                                 continue
                             if helper.eventHandler(event):
@@ -773,7 +776,7 @@ class Tinfoil:
                             if isinstance(event, bb.command.CommandCompleted):
                                 result = True
                                 break
-                            if isinstance(event, bb.command.CommandFailed):
+                            if isinstance(event, (bb.command.CommandFailed, bb.command.CommandExit)):
                                 self.logger.error(str(event))
                                 result = False
                                 break
@@ -785,10 +788,13 @@ class Tinfoil:
                                 self.logger.error(str(event))
                                 result = False
                                 break
-
                         elif helper.shutdown > 1:
                             break
                         termfilter.updateFooter()
+                        if time.time() > (lastevent + (3*60)):
+                            if not self.run_command('ping', handle_events=False):
+                                print("\nUnable to ping server and no events, closing down...\n")
+                                return False
                     except KeyboardInterrupt:
                         termfilter.clearFooter()
                         if helper.shutdown == 1:

@@ -1,0 +1,31 @@
+From cc86b8bdd45ca30bdf65a3b8b0960b27aeb34522 Mon Sep 17 00:00:00 2001
+From: Jens Rehsack <rehsack@gmail.com>
+Date: Thu, 19 Nov 2015 20:45:56 +0100
+Subject: [PATCH] avoid openldap unless wanted
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Jens Rehsack <rehsack@gmail.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ wscript | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/wscript b/wscript
+index 7f14847..092da2d 100644
+--- a/wscript
++++ b/wscript
+@@ -154,9 +154,7 @@ def configure(conf):
+     if conf.env.standalone_ldb:
+         conf.CHECK_XSLTPROC_MANPAGES()
+ 
+-        # we need this for the ldap backend
+-        if conf.CHECK_FUNCS_IN('ber_flush ldap_open ldap_initialize', 'lber ldap', headers='lber.h ldap.h'):
+-            conf.env.ENABLE_LDAP_BACKEND = True
++        conf.env.ENABLE_LDAP_BACKEND = False
+ 
+         # we don't want any libraries or modules to rely on runtime
+         # resolution of symbols
+-- 
+2.25.1
+

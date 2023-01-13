@@ -134,4 +134,4 @@ python split_wpa_supplicant_libs () {
         d.setVar('RRECOMMENDS:' + pn + '-plugins', ' '.join(split_packages))
         d.appendVar('RRECOMMENDS:' + pn + '-dbg', ' ' + ' '.join(split_dbg_packages))
 }
-PACKAGESPLITFUNCS:prepend = "split_wpa_supplicant_libs "
+PACKAGESPLITFUNCS += "split_wpa_supplicant_libs"

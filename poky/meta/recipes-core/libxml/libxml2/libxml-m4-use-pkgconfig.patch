@@ -1,26 +1,8 @@
-From 7196bce35954c4b46391cb0139aeb15ed628fa54 Mon Sep 17 00:00:00 2001
-From: Tony Tascioglu <tony.tascioglu@windriver.com>
-Date: Fri, 14 May 2021 11:50:35 -0400
-Subject: [PATCH] AM_PATH_XML2 uses xml-config which we disable through
+Change the AM_PATH_XML2 macros to use pkg-config instead of xml2-config.
 
-binconfig-disabled.bbclass, so port it to use pkg-config instead.
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/libxml2/-/commit/d598d8af0913b6e3d4e61ffa62397a275b669dca]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
 
-This cannot be upstreamed, as the original macro supports various
-optional arguments which cannot be supported with a direct call
-to pkg-config.
-
-Upstream-Status: Inappropriate [oe-core specific; see above]
-Signed-off-by: Ross Burton <ross.burton@intel.com>
-
-Rebase to 2.9.9
-Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
-
-Updated to apply cleanly to v2.9.12
-Signed-off-by: Tony Tascioglu <tony.tascioglu@windriver.com>
-
-Rebase to 2.9.14
-Signed-off-by: Jiaqing Zhao <jiaqing.zhao@linux.intel.com>
----
  libxml.m4 | 189 ++----------------------------------------------------
  1 file changed, 5 insertions(+), 184 deletions(-)
 

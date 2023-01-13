@@ -1,4 +1,4 @@
-From c1002138033fcccb2d1abfc41f5c2e46c836f7a0 Mon Sep 17 00:00:00 2001
+From c5050ac84c8a3cc3ff8c7e558f8c2fdb57f410d9 Mon Sep 17 00:00:00 2001
 From: Joshua Lock <josh@linux.intel.com>
 Date: Mon, 29 Jul 2013 15:02:34 -0700
 Subject: [PATCH] install-info uses symbols from zlib so must link against it.

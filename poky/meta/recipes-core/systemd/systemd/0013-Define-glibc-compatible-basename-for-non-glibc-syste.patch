@@ -14,13 +14,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/machine/machine-dbus.c | 5 +++++
  1 file changed, 5 insertions(+)
 
-diff --git a/src/machine/machine-dbus.c b/src/machine/machine-dbus.c
-index 8f11afd65b..a2b57deb7a 100644
 --- a/src/machine/machine-dbus.c
 +++ b/src/machine/machine-dbus.c
-@@ -10,6 +10,11 @@
- #include <libgen.h>
- #undef basename
+@@ -4,6 +4,11 @@
+ #include <sys/mount.h>
+ #include <sys/wait.h>
  
 +#if !defined(__GLIBC__)
 +#include <string.h>

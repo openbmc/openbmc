@@ -41,7 +41,7 @@ PACKAGES_DYNAMIC = "^${PN}-.*$"
 python split_libevent_libs () {
     do_split_packages(d, '${libdir}', r'^libevent_([a-z]*)-.*\.so\..*', '${PN}-%s', '${SUMMARY} (%s)', prepend=True, allow_links=True)
 }
-PACKAGESPLITFUNCS:prepend = "split_libevent_libs "
+PACKAGESPLITFUNCS =+ "split_libevent_libs"
 
 BBCLASSEXTEND = "native nativesdk"
 

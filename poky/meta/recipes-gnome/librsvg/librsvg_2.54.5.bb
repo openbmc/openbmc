@@ -42,6 +42,8 @@ do_configure[postfuncs] += "cargo_common_do_configure"
 
 inherit rust-target-config
 
+EXTRA_OECONF:class-target = "--enable-vala"
+
 # rust-cross writes the target linker binary into target json definition without any flags.
 # This breaks here because the linker isn't going to work without at least knowing where
 # the sysroot is. So copy the json to workdir, and patch in the path to wrapper from rust class

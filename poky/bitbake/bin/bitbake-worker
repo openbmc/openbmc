@@ -24,8 +24,7 @@ import subprocess
 from multiprocessing import Lock
 from threading import Thread
 
-if sys.getfilesystemencoding() != "utf-8":
-    sys.exit("Please use a locale setting which supports UTF-8 (such as LANG=en_US.UTF-8).\nPython can't change the filesystem locale after loading so we need a UTF-8 when Python starts or things won't work.")
+bb.utils.check_system_locale()
 
 # Users shouldn't be running this code directly
 if len(sys.argv) != 2 or not sys.argv[1].startswith("decafbad"):
@@ -122,11 +121,10 @@ def worker_child_fire(event, d):
 
     data = b"<event>" + pickle.dumps(event) + b"</event>"
     try:
-        worker_pipe_lock.acquire()
-        while(len(data)):
-            written = worker_pipe.write(data)
-            data = data[written:]
-        worker_pipe_lock.release()
+        with bb.utils.lock_timeout(worker_pipe_lock):
+            while(len(data)):
+                written = worker_pipe.write(data)
+                data = data[written:]
     except IOError:
         sigterm_handler(None, None)
         raise
@@ -145,7 +143,16 @@ def sigterm_handler(signum, frame):
     os.killpg(0, signal.SIGTERM)
     sys.exit()
 
-def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskhash, unihash, appends, taskdepdata, extraconfigdata, quieterrors=False, dry_run_exec=False):
+def fork_off_task(cfg, data, databuilder, workerdata, extraconfigdata, runtask):
+
+    fn = runtask['fn']
+    task = runtask['task']
+    taskname = runtask['taskname']
+    taskhash = runtask['taskhash']
+    unihash = runtask['unihash']
+    appends = runtask['appends']
+    taskdepdata = runtask['taskdepdata']
+    quieterrors = runtask['quieterrors']
     # We need to setup the environment BEFORE the fork, since
     # a fork() or exec*() activates PSEUDO...
 
@@ -157,8 +164,7 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
     uid = os.getuid()
     gid = os.getgid()
 
-
-    taskdep = workerdata["taskdeps"][fn]
+    taskdep = runtask['taskdep']
     if 'umask' in taskdep and taskname in taskdep['umask']:
         umask = taskdep['umask'][taskname]
     elif workerdata["umask"]:
@@ -170,24 +176,24 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
         except TypeError:
              pass
 
-    dry_run = cfg.dry_run or dry_run_exec
+    dry_run = cfg.dry_run or runtask['dry_run']
 
     # We can't use the fakeroot environment in a dry run as it possibly hasn't been built
     if 'fakeroot' in taskdep and taskname in taskdep['fakeroot'] and not dry_run:
         fakeroot = True
-        envvars = (workerdata["fakerootenv"][fn] or "").split()
+        envvars = (runtask['fakerootenv'] or "").split()
         for key, value in (var.split('=') for var in envvars):
             envbackup[key] = os.environ.get(key)
             os.environ[key] = value
             fakeenv[key] = value
 
-        fakedirs = (workerdata["fakerootdirs"][fn] or "").split()
+        fakedirs = (runtask['fakerootdirs'] or "").split()
         for p in fakedirs:
             bb.utils.mkdirhier(p)
         logger.debug2('Running %s:%s under fakeroot, fakedirs: %s' %
                         (fn, taskname, ', '.join(fakedirs)))
     else:
-        envvars = (workerdata["fakerootnoenv"][fn] or "").split()
+        envvars = (runtask['fakerootnoenv'] or "").split()
         for key, value in (var.split('=') for var in envvars):
             envbackup[key] = os.environ.get(key)
             os.environ[key] = value
@@ -238,7 +244,6 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
                 os.umask(umask)
 
             try:
-                bb_cache = bb.cache.NoCache(databuilder)
                 (realfn, virtual, mc) = bb.cache.virtualfn2realfn(fn)
                 the_data = databuilder.mcdata[mc]
                 the_data.setVar("BB_WORKERCONTEXT", "1")
@@ -257,9 +262,10 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
                     bb.parse.siggen.set_taskhashes(workerdata["newhashes"])
                 ret = 0
 
-                the_data = bb_cache.loadDataFull(fn, appends)
+                the_data = databuilder.parseRecipe(fn, appends)
                 the_data.setVar('BB_TASKHASH', taskhash)
                 the_data.setVar('BB_UNIHASH', unihash)
+                bb.parse.siggen.setup_datacache_from_datastore(fn, the_data)
 
                 bb.utils.set_process_name("%s:%s" % (the_data.getVar("PN"), taskname.replace("do_", "")))
 
@@ -475,11 +481,15 @@ class BitbakeWorker(object):
         sys.exit(0)
 
     def handle_runtask(self, data):
-        fn, task, taskname, taskhash, unihash, quieterrors, appends, taskdepdata, dry_run_exec = pickle.loads(data)
+        runtask = pickle.loads(data)
+
+        fn = runtask['fn']
+        task = runtask['task']
+        taskname = runtask['taskname']
+
         workerlog_write("Handling runtask %s %s %s\n" % (task, fn, taskname))
 
-        pid, pipein, pipeout = fork_off_task(self.cookercfg, self.data, self.databuilder, self.workerdata, fn, task, taskname, taskhash, unihash, appends, taskdepdata, self.extraconfigdata, quieterrors, dry_run_exec)
-
+        pid, pipein, pipeout = fork_off_task(self.cookercfg, self.data, self.databuilder, self.workerdata, self.extraconfigdata, runtask)
         self.build_pids[pid] = task
         self.build_pipes[pid] = runQueueWorkerPipe(pipein, pipeout)
 

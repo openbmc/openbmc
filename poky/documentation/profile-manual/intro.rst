@@ -38,7 +38,7 @@ an 'sdk' image e.g. ::
 
    $ bitbake core-image-sato-sdk
 
-or alternatively by adding 'tools-profile' to the EXTRA_IMAGE_FEATURES line in
+or alternatively by adding 'tools-profile' to the :term:`EXTRA_IMAGE_FEATURES` line in
 your local.conf::
 
    EXTRA_IMAGE_FEATURES = "debug-tweaks tools-profile"
@@ -65,7 +65,7 @@ If you've already built a stripped image, you can generate debug
 packages (xxx-dbg) which you can manually install as needed.
 
 To generate debug info for packages, you can add dbg-pkgs to
-EXTRA_IMAGE_FEATURES in local.conf. For example::
+:term:`EXTRA_IMAGE_FEATURES` in local.conf. For example::
 
    EXTRA_IMAGE_FEATURES = "debug-tweaks tools-profile dbg-pkgs"
 

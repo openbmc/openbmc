@@ -1,3 +1,8 @@
+From 74fe171fa4a25c120607e9f8450cbdfee675c959 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Mon, 14 Mar 2022 14:39:22 +0000
+Subject: [PATCH] python3-installer: add installer module
+
 Let us override the hashbang directly (possibly upstreamable), and don't
 play games with hashbangs: for now assume that even hashbangs with spaces
 are simple (assume the spaces are only used to separate arguments) and
@@ -6,13 +11,18 @@ we don't have long hashbangs.
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 
+---
+ src/installer/__main__.py |  9 ++++++++-
+ src/installer/scripts.py  | 15 +--------------
+ 2 files changed, 9 insertions(+), 15 deletions(-)
+
 diff --git a/src/installer/__main__.py b/src/installer/__main__.py
-index 3357ec5..d2fd8d2 100644
+index 51014b9..38de286 100644
 --- a/src/installer/__main__.py
 +++ b/src/installer/__main__.py
-@@ -23,6 +23,13 @@ def _get_main_parser() -> argparse.ArgumentParser:
+@@ -30,6 +30,13 @@ def _get_main_parser() -> argparse.ArgumentParser:
          type=str,
-         help="destination directory (prefix to prepend to each file)",
+         help="override prefix to install packages to",
      )
 +    parser.add_argument(
 +        "--interpreter",
@@ -24,10 +34,10 @@ index 3357ec5..d2fd8d2 100644
      parser.add_argument(
          "--compile-bytecode",
          action="append",
-@@ -73,7 +80,7 @@ def _main(cli_args: Sequence[str], program: Optional[str] = None) -> None:
+@@ -86,7 +93,7 @@ def _main(cli_args: Sequence[str], program: Optional[str] = None) -> None:
      with WheelFile.open(args.wheel) as source:
          destination = SchemeDictionaryDestination(
-             scheme_dict=_get_scheme_dict(source.distribution),
+             scheme_dict=_get_scheme_dict(source.distribution, prefix=args.prefix),
 -            interpreter=sys.executable,
 +            interpreter=args.interpreter,
              script_kind=get_launcher_kind(),
@@ -56,6 +66,6 @@ index 7e3c8fc..ba6ed5a 100644
 -    # I don't understand a lick what this is trying to do.
 -    return b"#!/bin/sh\n'''exec' " + quoted + b' "$0" "$@"\n' + b"' '''"
 +    return b"#!" + executable_bytes
-
-
+ 
+ 
  class InvalidScript(ValueError):

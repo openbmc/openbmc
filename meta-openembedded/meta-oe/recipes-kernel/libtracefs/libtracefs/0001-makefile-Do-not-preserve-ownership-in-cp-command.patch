@@ -1,0 +1,31 @@
+From 6650d0e79eea330b53635574885208a138fef97e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 21 Dec 2022 22:50:56 -0800
+Subject: [PATCH] makefile: Do not preserve ownership in cp command
+
+Fixes
+ERROR: libtracefs-1.6.3-r0 do_package_qa: QA Issue: libtracefs: /usr/lib/libtracefs.so is owned by uid 1000, which is the same as the user running bitbake. This may be due to host contamination [host-user-contaminated]
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 27d425c..3aea142 100644
+--- a/Makefile
++++ b/Makefile
+@@ -273,7 +273,7 @@ endif # DESTDIR = ""
+ 
+ install_libs: libs install_pkgconfig
+ 	$(Q)$(call do_install,$(LIBTRACEFS_SHARED),$(libdir_SQ)); \
+-		cp -fpR $(LIB_INSTALL) $(DESTDIR)$(libdir_SQ)
++		cp --no-preserve=ownership --recursive $(LIB_INSTALL) $(DESTDIR)$(libdir_SQ)
+ 	$(Q)$(call do_install,$(src)/include/tracefs.h,$(includedir_SQ),644)
+ 	$(Q)$(call install_ld_config)
+ 
+-- 
+2.39.0
+

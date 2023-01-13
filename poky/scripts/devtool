@@ -137,17 +137,27 @@ def create_workspace(args, config, basepath, workspace):
         workspacedir = os.path.abspath(args.layerpath)
     else:
         workspacedir = os.path.abspath(os.path.join(basepath, 'workspace'))
-    _create_workspace(workspacedir, config, basepath)
+    layerseries = None
+    if args.layerseries:
+        layerseries = args.layerseries
+    _create_workspace(workspacedir, config, basepath, layerseries)
     if not args.create_only:
         _enable_workspace_layer(workspacedir, config, basepath)
 
-def _create_workspace(workspacedir, config, basepath):
+def _create_workspace(workspacedir, config, basepath, layerseries=None):
     import bb
 
     confdir = os.path.join(workspacedir, 'conf')
     if os.path.exists(os.path.join(confdir, 'layer.conf')):
         logger.info('Specified workspace already set up, leaving as-is')
     else:
+        if not layerseries:
+            tinfoil = setup_tinfoil(config_only=True, basepath=basepath)
+            try:
+                layerseries = tinfoil.config_data.getVar('LAYERSERIES_CORENAMES')
+            finally:
+                tinfoil.shutdown()
+
         # Add a config file
         bb.utils.mkdirhier(confdir)
         with open(os.path.join(confdir, 'layer.conf'), 'w') as f:
@@ -159,7 +169,7 @@ def _create_workspace(workspacedir, config, basepath):
             f.write('BBFILE_PATTERN_workspacelayer = "^$' + '{LAYERDIR}/"\n')
             f.write('BBFILE_PATTERN_IGNORE_EMPTY_workspacelayer = "1"\n')
             f.write('BBFILE_PRIORITY_workspacelayer = "99"\n')
-            f.write('LAYERSERIES_COMPAT_workspacelayer = "${LAYERSERIES_COMPAT_core}"\n')
+            f.write('LAYERSERIES_COMPAT_workspacelayer = "%s"\n' % layerseries)
         # Add a README file
         with open(os.path.join(workspacedir, 'README'), 'w') as f:
             f.write('This layer was created by the OpenEmbedded devtool utility in order to\n')
@@ -309,6 +319,7 @@ def main():
                                                         description='Sets up a new workspace. NOTE: other devtool subcommands will create a workspace automatically as needed, so you only need to use %(prog)s if you want to specify where the workspace should be located.',
                                                         group='advanced')
         parser_create_workspace.add_argument('layerpath', nargs='?', help='Path in which the workspace layer should be created')
+        parser_create_workspace.add_argument('--layerseries', help='Layer series the workspace should be set to be compatible with')
         parser_create_workspace.add_argument('--create-only', action="store_true", help='Only create the workspace layer, do not alter configuration')
         parser_create_workspace.set_defaults(func=create_workspace, no_workspace=True)
 

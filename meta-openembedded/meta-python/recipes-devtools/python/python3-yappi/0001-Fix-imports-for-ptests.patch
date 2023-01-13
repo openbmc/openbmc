@@ -8,10 +8,9 @@ Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
  tests/test_asyncio.py              | 2 +-
  tests/test_asyncio_context_vars.py | 2 +-
  tests/test_functionality.py        | 2 +-
- tests/test_gevent.py               | 2 +-
  tests/test_hooks.py                | 2 +-
  tests/test_tags.py                 | 2 +-
- 6 files changed, 6 insertions(+), 6 deletions(-)
+ 5 files changed, 6 insertions(+), 6 deletions(-)
 
 --- a/tests/test_asyncio.py
 +++ b/tests/test_asyncio.py
@@ -23,7 +22,7 @@ Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
 +from .utils import YappiUnitTestCase, find_stat_by_name, burn_cpu, burn_io
  
  
- @asyncio.coroutine
+ async def async_sleep(sec):
 --- a/tests/test_asyncio_context_vars.py
 +++ b/tests/test_asyncio_context_vars.py
 @@ -5,7 +5,7 @@ import contextvars
@@ -3870,17 +3869,6 @@ Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
 +    #     import sys;sys.argv = ['', 'BasicUsage.test_run_as_script']
 +    #     import sys;sys.argv = ['', 'MultithreadedScenarios.test_subsequent_profile']
 +    unittest.main()
---- a/tests/test_gevent.py
-+++ b/tests/test_gevent.py
-@@ -4,7 +4,7 @@ import yappi
- import gevent
- from gevent.event import Event
- import threading
--from utils import (
-+from .utils import (
-     YappiUnitTestCase, find_stat_by_name, burn_cpu, burn_io,
-     burn_io_gevent
- )
 --- a/tests/test_hooks.py
 +++ b/tests/test_hooks.py
 @@ -5,7 +5,7 @@ import unittest

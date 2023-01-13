@@ -5,24 +5,28 @@ not appropriate for oe.
 Upstream-Status: Pending [oe specific]
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for wxWidgets 3.2.1.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  build/cmake/functions.cmake | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/build/cmake/functions.cmake b/build/cmake/functions.cmake
-index 53cd6a1ace..95efa17fe4 100644
+index e374d9a273..c6b1908bd6 100644
 --- a/build/cmake/functions.cmake
 +++ b/build/cmake/functions.cmake
-@@ -211,9 +211,9 @@ function(wx_set_target_properties target_name is_base)
-         endif()
-     else()
-         set(cross_target "")
--        if (CMAKE_CROSSCOMPILING)
--            set(cross_target "-${CMAKE_SYSTEM_NAME}")
--        endif ()
-+        #if (CMAKE_CROSSCOMPILING)
-+        #    set(cross_target "-${CMAKE_SYSTEM_NAME}")
-+        #endif ()
+@@ -219,9 +219,9 @@ function(wx_set_target_properties target_name)
+     endif()
  
-         set_target_properties(${target_name}
-             PROPERTIES
+     set(cross_target)
+-    if (CMAKE_CROSSCOMPILING)
+-        set(cross_target "-${CMAKE_SYSTEM_NAME}")
+-    endif()
++    #if (CMAKE_CROSSCOMPILING)
++    #    set(cross_target "-${CMAKE_SYSTEM_NAME}")
++    #endif()
+ 
+     set(lib_prefix "lib")
+     if(MSVC OR (WIN32 AND wxBUILD_SHARED))

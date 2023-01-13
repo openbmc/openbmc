@@ -1,4 +1,20 @@
 #!/bin/sh
 
+set -e
+
 export LC_ALL=en_US.UTF-8
-make -k runtests
+
+# testModule isn't that useful and hard-codes buildtree, so we don't run that
+TESTS="runtest runsuite testrecurse testchar testdict testThreads runxmlconf testapi"
+
+for T in $TESTS; do
+    echo Running $T
+    ./$T && echo PASS: $T || echo FAIL: $T
+done
+
+if test -d python/tests; then
+    cd python/tests
+    for T in *.py; do
+        python3 ./$T && echo PASS: $T || echo FAIL: $T
+    done
+fi

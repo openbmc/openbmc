@@ -18,6 +18,8 @@ SRC_URI = "git://github.com/numactl/numactl;branch=master;protocol=https \
            file://Makefile \
            file://run-ptest \
            file://0001-define-run-test-target.patch \
+           file://0001-configure-Check-for-largefile-support.patch \
+           file://0002-shm.c-Replace-stat64-fstat64-ftruncate64mmap64-with-.patch \
            "
 
 S = "${WORKDIR}/git"

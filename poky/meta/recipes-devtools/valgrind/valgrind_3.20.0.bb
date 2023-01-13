@@ -242,6 +242,15 @@ do_install_ptest() {
     install ${S}/none/tests/tls.c ${D}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/none/tests/
 }
 
+do_install_ptest:append:x86-64 () {
+    # https://bugs.kde.org/show_bug.cgi?id=463456
+    rm ${D}${PTEST_PATH}/memcheck/tests/origin6-fp.vgtest
+    # https://bugs.kde.org/show_bug.cgi?id=463458
+    rm ${D}${PTEST_PATH}/memcheck/tests/vcpu_fnfns.vgtest
+    # https://bugs.kde.org/show_bug.cgi?id=463463
+    rm ${D}${PTEST_PATH}/none/tests/amd64/fma.vgtest
+}
+
 # avoid stripping some generated binaries otherwise some of the tests will fail
 # run-strip-reloc.sh, run-strip-strmerge.sh and so on will fail
 INHIBIT_PACKAGE_STRIP_FILES += "\

@@ -26,7 +26,7 @@ S = "${WORKDIR}/git"
 inherit features_check
 REQUIRED_DISTRO_FEATURES = "systemd"
 
-inherit gettext autotools python3native pkgconfig
+inherit gettext autotools python3native python3targetconfig pkgconfig
 
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES','x11','gtk','',d)}"
 PACKAGECONFIG[gtk] = "--with-gtk, --without-gtk, gtk+3,"

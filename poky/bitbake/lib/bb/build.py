@@ -772,44 +772,7 @@ def exec_task(fn, task, d, profile = False):
             event.fire(failedevent, d)
         return 1
 
-def stamp_internal(taskname, d, file_name, baseonly=False, noextra=False):
-    """
-    Internal stamp helper function
-    Makes sure the stamp directory exists
-    Returns the stamp path+filename
-
-    In the bitbake core, d can be a CacheData and file_name will be set.
-    When called in task context, d will be a data store, file_name will not be set
-    """
-    taskflagname = taskname
-    if taskname.endswith("_setscene") and taskname != "do_setscene":
-        taskflagname = taskname.replace("_setscene", "")
-
-    if file_name:
-        stamp = d.stamp[file_name]
-        extrainfo = d.stamp_extrainfo[file_name].get(taskflagname) or ""
-    else:
-        stamp = d.getVar('STAMP')
-        file_name = d.getVar('BB_FILENAME')
-        extrainfo = d.getVarFlag(taskflagname, 'stamp-extra-info') or ""
-
-    if baseonly:
-        return stamp
-    if noextra:
-        extrainfo = ""
-
-    if not stamp:
-        return
-
-    stamp = bb.parse.siggen.stampfile(stamp, file_name, taskname, extrainfo)
-
-    stampdir = os.path.dirname(stamp)
-    if cached_mtime_noerror(stampdir) == 0:
-        bb.utils.mkdirhier(stampdir)
-
-    return stamp
-
-def stamp_cleanmask_internal(taskname, d, file_name):
+def _get_cleanmask(taskname, mcfn):
     """
     Internal stamp helper function to generate stamp cleaning mask
     Returns the stamp path+filename
@@ -817,27 +780,14 @@ def stamp_cleanmask_internal(taskname, d, file_name):
     In the bitbake core, d can be a CacheData and file_name will be set.
     When called in task context, d will be a data store, file_name will not be set
     """
-    taskflagname = taskname
-    if taskname.endswith("_setscene") and taskname != "do_setscene":
-        taskflagname = taskname.replace("_setscene", "")
+    cleanmask = bb.parse.siggen.stampcleanmask_mcfn(taskname, mcfn)
+    taskflagname = taskname.replace("_setscene", "")
+    if cleanmask:
+        return [cleanmask, cleanmask.replace(taskflagname, taskflagname + "_setscene")]
+    return []
 
-    if file_name:
-        stamp = d.stampclean[file_name]
-        extrainfo = d.stamp_extrainfo[file_name].get(taskflagname) or ""
-    else:
-        stamp = d.getVar('STAMPCLEAN')
-        file_name = d.getVar('BB_FILENAME')
-        extrainfo = d.getVarFlag(taskflagname, 'stamp-extra-info') or ""
-
-    if not stamp:
-        return []
-
-    cleanmask = bb.parse.siggen.stampcleanmask(stamp, file_name, taskname, extrainfo)
-
-    return [cleanmask, cleanmask.replace(taskflagname, taskflagname + "_setscene")]
-
-def clean_stamp(task, d, file_name = None):
-    cleanmask = stamp_cleanmask_internal(task, d, file_name)
+def clean_stamp_mcfn(task, mcfn):
+    cleanmask = _get_cleanmask(task, mcfn)
     for mask in cleanmask:
         for name in glob.glob(mask):
             # Preserve sigdata files in the stamps directory
@@ -847,33 +797,46 @@ def clean_stamp(task, d, file_name = None):
             if name.endswith('.taint'):
                 continue
             os.unlink(name)
-    return
 
-def make_stamp(task, d, file_name = None):
-    """
-    Creates/updates a stamp for a given task
-    (d can be a data dict or dataCache)
-    """
-    clean_stamp(task, d, file_name)
+def clean_stamp(task, d):
+    mcfn = d.getVar('BB_FILENAME')
+    clean_stamp_mcfn(task, mcfn)
 
-    stamp = stamp_internal(task, d, file_name)
+def make_stamp_mcfn(task, mcfn):
+
+    basestamp = bb.parse.siggen.stampfile_mcfn(task, mcfn)
+
+    stampdir = os.path.dirname(basestamp)
+    if cached_mtime_noerror(stampdir) == 0:
+        bb.utils.mkdirhier(stampdir)
+
+    clean_stamp_mcfn(task, mcfn)
+
     # Remove the file and recreate to force timestamp
     # change on broken NFS filesystems
-    if stamp:
-        bb.utils.remove(stamp)
-        open(stamp, "w").close()
+    if basestamp:
+        bb.utils.remove(basestamp)
+        open(basestamp, "w").close()
+
+def make_stamp(task, d):
+    """
+    Creates/updates a stamp for a given task
+    """
+    mcfn = d.getVar('BB_FILENAME')
+
+    make_stamp_mcfn(task, mcfn)
 
     # If we're in task context, write out a signature file for each task
     # as it completes
-    if not task.endswith("_setscene") and task != "do_setscene" and not file_name:
-        stampbase = stamp_internal(task, d, None, True)
-        file_name = d.getVar('BB_FILENAME')
-        bb.parse.siggen.dump_sigtask(file_name, task, stampbase, True)
+    if not task.endswith("_setscene"):
+        stampbase = bb.parse.siggen.stampfile_base(mcfn)
+        bb.parse.siggen.dump_sigtask(mcfn, task, stampbase, True)
 
-def find_stale_stamps(task, d, file_name=None):
-    current = stamp_internal(task, d, file_name)
-    current2 = stamp_internal(task + "_setscene", d, file_name)
-    cleanmask = stamp_cleanmask_internal(task, d, file_name)
+
+def find_stale_stamps(task, mcfn):
+    current = bb.parse.siggen.stampfile_mcfn(task, mcfn)
+    current2 = bb.parse.siggen.stampfile_mcfn(task + "_setscene", mcfn)
+    cleanmask = _get_cleanmask(task, mcfn)
     found = []
     for mask in cleanmask:
         for name in glob.glob(mask):
@@ -887,38 +850,14 @@ def find_stale_stamps(task, d, file_name=None):
             found.append(name)
     return found
 
-def del_stamp(task, d, file_name = None):
-    """
-    Removes a stamp for a given task
-    (d can be a data dict or dataCache)
-    """
-    stamp = stamp_internal(task, d, file_name)
-    bb.utils.remove(stamp)
-
-def write_taint(task, d, file_name = None):
+def write_taint(task, d):
     """
     Creates a "taint" file which will force the specified task and its
     dependents to be re-run the next time by influencing the value of its
     taskhash.
-    (d can be a data dict or dataCache)
     """
-    import uuid
-    if file_name:
-        taintfn = d.stamp[file_name] + '.' + task + '.taint'
-    else:
-        taintfn = d.getVar('STAMP') + '.' + task + '.taint'
-    bb.utils.mkdirhier(os.path.dirname(taintfn))
-    # The specific content of the taint file is not really important,
-    # we just need it to be random, so a random UUID is used
-    with open(taintfn, 'w') as taintf:
-        taintf.write(str(uuid.uuid4()))
-
-def stampfile(taskname, d, file_name = None, noextra=False):
-    """
-    Return the stamp for a given task
-    (d can be a data dict or dataCache)
-    """
-    return stamp_internal(taskname, d, file_name, noextra=noextra)
+    mcfn = d.getVar('BB_FILENAME')
+    bb.parse.siggen.invalidate_task(task, mcfn)
 
 def add_tasks(tasklist, d):
     task_deps = d.getVar('_task_deps', False)

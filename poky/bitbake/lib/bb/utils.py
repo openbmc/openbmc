@@ -13,6 +13,7 @@ import errno
 import logging
 import bb
 import bb.msg
+import locale
 import multiprocessing
 import fcntl
 import importlib
@@ -608,6 +609,21 @@ def preserved_envvars():
     ]
     return v + preserved_envvars_exported()
 
+def check_system_locale():
+    """Make sure the required system locale are available and configured"""
+    default_locale = locale.getlocale(locale.LC_CTYPE)
+
+    try:
+        locale.setlocale(locale.LC_CTYPE, ("en_US", "UTF-8"))
+    except:
+        sys.exit("Please make sure locale 'en_US.UTF-8' is available on your system")
+    else:
+        locale.setlocale(locale.LC_CTYPE, default_locale)
+
+    if sys.getfilesystemencoding() != "utf-8":
+        sys.exit("Please use a locale setting which supports UTF-8 (such as LANG=en_US.UTF-8).\n"
+                 "Python can't change the filesystem locale after loading so we need a UTF-8 when Python starts or things won't work.")
+
 def filter_environment(good_vars):
     """
     Create a pristine environment for bitbake. This will remove variables that
@@ -991,6 +1007,9 @@ def to_boolean(string, default=None):
     """
     if not string:
         return default
+
+    if isinstance(string, int):
+        return string != 0
 
     normalized = string.lower()
     if normalized in ("y", "yes", "1", "true"):
@@ -1822,3 +1841,16 @@ def mkstemp(suffix=None, prefix=None, dir=None, text=False):
     else:
         prefix = tempfile.gettempprefix() + entropy
     return tempfile.mkstemp(suffix=suffix, prefix=prefix, dir=dir, text=text)
+
+# If we don't have a timeout of some kind and a process/thread exits badly (for example
+# OOM killed) and held a lock, we'd just hang in the lock futex forever. It is better
+# we exit at some point than hang. 5 minutes with no progress means we're probably deadlocked.
+@contextmanager
+def lock_timeout(lock):
+    held = lock.acquire(timeout=5*60)
+    try:
+        if not held:
+            os._exit(1)
+        yield held
+    finally:
+        lock.release()

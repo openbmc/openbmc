@@ -80,7 +80,7 @@ class SkippedPackage:
 
 
 class CookerFeatures(object):
-    _feature_list = [HOB_EXTRA_CACHES, BASEDATASTORE_TRACKING, SEND_SANITYEVENTS] = list(range(3))
+    _feature_list = [HOB_EXTRA_CACHES, BASEDATASTORE_TRACKING, SEND_SANITYEVENTS, RECIPE_SIGGEN_INFO] = list(range(4))
 
     def __init__(self):
         self._features=set()
@@ -149,7 +149,7 @@ class BBCooker:
     Manages one bitbake build run
     """
 
-    def __init__(self, featureSet=None, idleCallBackRegister=None):
+    def __init__(self, featureSet=None, server=None):
         self.recipecaches = None
         self.eventlog = None
         self.skiplist = {}
@@ -163,7 +163,12 @@ class BBCooker:
 
         self.configuration = bb.cookerdata.CookerConfiguration()
 
-        self.idleCallBackRegister = idleCallBackRegister
+        self.process_server = server
+        self.idleCallBackRegister = None
+        self.waitIdle = None
+        if server:
+            self.idleCallBackRegister = server.register_idle_function
+            self.waitIdle = server.wait_for_idle
 
         bb.debug(1, "BBCooker starting %s" % time.time())
         sys.stdout.flush()
@@ -189,12 +194,6 @@ class BBCooker:
 
         self.inotify_modified_files = []
 
-        def _process_inotify_updates(server, cooker, halt):
-            cooker.process_inotify_updates()
-            return 1.0
-
-        self.idleCallBackRegister(_process_inotify_updates, self)
-
         # TOSTOP must not be set or our children will hang when they output
         try:
             fd = sys.stdout.fileno()
@@ -208,7 +207,7 @@ class BBCooker:
         except UnsupportedOperation:
             pass
 
-        self.command = bb.command.Command(self)
+        self.command = bb.command.Command(self, self.process_server)
         self.state = state.initial
 
         self.parser = None
@@ -219,6 +218,8 @@ class BBCooker:
 
         bb.debug(1, "BBCooker startup complete %s" % time.time())
         sys.stdout.flush()
+
+        self.inotify_threadlock = threading.Lock()
 
     def init_configdata(self):
         if not hasattr(self, "data"):
@@ -248,11 +249,18 @@ class BBCooker:
         self.notifier = pyinotify.Notifier(self.watcher, self.notifications)
 
     def process_inotify_updates(self):
-        for n in [self.confignotifier, self.notifier]:
-            if n and n.check_events(timeout=0):
-                # read notified events and enqueue them
-                n.read_events()
-                n.process_events()
+        with bb.utils.lock_timeout(self.inotify_threadlock):
+            for n in [self.confignotifier, self.notifier]:
+                if n and n.check_events(timeout=0):
+                    # read notified events and enqueue them
+                    n.read_events()
+
+    def process_inotify_updates_apply(self):
+        with bb.utils.lock_timeout(self.inotify_threadlock):
+            for n in [self.confignotifier, self.notifier]:
+                if n and n.check_events(timeout=0):
+                    n.read_events()
+                    n.process_events()
 
     def config_notifications(self, event):
         if event.maskname == "IN_Q_OVERFLOW":
@@ -367,12 +375,12 @@ class BBCooker:
         if CookerFeatures.BASEDATASTORE_TRACKING in self.featureset:
             self.enableDataTracking()
 
-        all_extra_cache_names = []
+        caches_name_array = ['bb.cache:CoreRecipeInfo']
         # We hardcode all known cache types in a single place, here.
         if CookerFeatures.HOB_EXTRA_CACHES in self.featureset:
-            all_extra_cache_names.append("bb.cache_extra:HobRecipeInfo")
-
-        caches_name_array = ['bb.cache:CoreRecipeInfo'] + all_extra_cache_names
+            caches_name_array.append("bb.cache_extra:HobRecipeInfo")
+        if CookerFeatures.RECIPE_SIGGEN_INFO in self.featureset:
+            caches_name_array.append("bb.cache:SiggenRecipeInfo")
 
         # At least CoreRecipeInfo will be loaded, so caches_array will never be empty!
         # This is the entry point, no further check needed!
@@ -400,9 +408,7 @@ class BBCooker:
             self.disableDataTracking()
 
         for mc in self.databuilder.mcdata.values():
-            mc.renameVar("__depends", "__base_depends")
             self.add_filewatch(mc.getVar("__base_depends", False), self.configwatcher)
-            mc.setVar("__bbclasstype", "recipe")
 
         self.baseconfig_valid = True
         self.parsecache_valid = False
@@ -436,10 +442,8 @@ class BBCooker:
                     upstream=upstream,
                 )
                 self.hashserv.serve_as_process()
-            self.data.setVar("BB_HASHSERVE", self.hashservaddr)
-            self.databuilder.origdata.setVar("BB_HASHSERVE", self.hashservaddr)
-            self.databuilder.data.setVar("BB_HASHSERVE", self.hashservaddr)
             for mc in self.databuilder.mcdata:
+                self.databuilder.mcorigdata[mc].setVar("BB_HASHSERVE", self.hashservaddr)
                 self.databuilder.mcdata[mc].setVar("BB_HASHSERVE", self.hashservaddr)
 
         bb.parse.init_parser(self.data)
@@ -535,15 +539,6 @@ class BBCooker:
             logger.debug("Base environment change, triggering reparse")
             self.reset()
 
-    def runCommands(self, server, data, halt):
-        """
-        Run any queued asynchronous command
-        This is done by the idle handler so it runs in true context rather than
-        tied to any UI.
-        """
-
-        return self.command.runAsyncCommand()
-
     def showVersions(self):
 
         (latest_versions, preferred_versions, required) = self.findProviders()
@@ -617,8 +612,7 @@ class BBCooker:
 
         if fn:
             try:
-                bb_caches = bb.cache.MulticonfigCache(self.databuilder, self.data_hash, self.caches_array)
-                envdata = bb_caches[mc].loadDataFull(fn, self.collections[mc].get_file_appends(fn))
+                envdata = self.databuilder.parseRecipe(fn, self.collections[mc].get_file_appends(fn))
             except Exception as e:
                 parselog.exception("Unable to read %s", fn)
                 raise
@@ -1449,10 +1443,12 @@ class BBCooker:
         self.recipecaches[mc].rundeps[fn] = defaultdict(list)
         self.recipecaches[mc].runrecs[fn] = defaultdict(list)
 
+        bb.parse.siggen.setup_datacache(self.recipecaches)
+
         # Invalidate task for target if force mode active
         if self.configuration.force:
             logger.verbose("Invalidate task %s, %s", task, fn)
-            bb.parse.siggen.invalidate_task(task, self.recipecaches[mc], fn)
+            bb.parse.siggen.invalidate_task(task, fn)
 
         # Setup taskdata structure
         taskdata = {}
@@ -1466,6 +1462,7 @@ class BBCooker:
         buildname = self.databuilder.mcdata[mc].getVar("BUILDNAME")
         if fireevents:
             bb.event.fire(bb.event.BuildStarted(buildname, [item]), self.databuilder.mcdata[mc])
+            bb.event.enable_heartbeat()
 
         # Execute the runqueue
         runlist = [[mc, item, task, fn]]
@@ -1491,22 +1488,21 @@ class BBCooker:
                 failures += len(exc.args)
                 retval = False
             except SystemExit as exc:
-                self.command.finishAsyncCommand(str(exc))
                 if quietlog:
                     bb.runqueue.logger.setLevel(rqloglevel)
-                return False
+                return bb.server.process.idleFinish(str(exc))
 
             if not retval:
                 if fireevents:
                     bb.event.fire(bb.event.BuildCompleted(len(rq.rqdata.runtaskentries), buildname, item, failures, interrupted), self.databuilder.mcdata[mc])
-                self.command.finishAsyncCommand(msg)
+                    bb.event.disable_heartbeat()
                 # We trashed self.recipecaches above
                 self.parsecache_valid = False
                 self.configuration.limited_deps = False
                 bb.parse.siggen.reset(self.data)
                 if quietlog:
                     bb.runqueue.logger.setLevel(rqloglevel)
-                return False
+                return bb.server.process.idleFinish(msg)
             if retval is True:
                 return True
             return retval
@@ -1536,16 +1532,16 @@ class BBCooker:
                 failures += len(exc.args)
                 retval = False
             except SystemExit as exc:
-                self.command.finishAsyncCommand(str(exc))
-                return False
+                return bb.server.process.idleFinish(str(exc))
 
             if not retval:
                 try:
                     for mc in self.multiconfigs:
                         bb.event.fire(bb.event.BuildCompleted(len(rq.rqdata.runtaskentries), buildname, targets, failures, interrupted), self.databuilder.mcdata[mc])
                 finally:
-                    self.command.finishAsyncCommand(msg)
-                return False
+                    bb.event.disable_heartbeat()
+                return bb.server.process.idleFinish(msg)
+
             if retval is True:
                 return True
             return retval
@@ -1577,6 +1573,7 @@ class BBCooker:
 
         for mc in self.multiconfigs:
             bb.event.fire(bb.event.BuildStarted(buildname, ntargets), self.databuilder.mcdata[mc])
+        bb.event.enable_heartbeat()
 
         rq = bb.runqueue.RunQueue(self, self.data, self.recipecaches, taskdata, runlist)
         if 'universe' in targets:
@@ -1756,22 +1753,26 @@ class BBCooker:
         if hasattr(self, "data"):
             bb.event.fire(CookerExit(), self.data)
 
-    def shutdown(self, force = False):
+    def shutdown(self, force=False):
         if force:
             self.state = state.forceshutdown
         else:
             self.state = state.shutdown
 
         if self.parser:
-            self.parser.shutdown(clean=not force)
+            self.parser.shutdown(clean=False)
             self.parser.final_cleanup()
 
     def finishcommand(self):
+        if hasattr(self.parser, 'shutdown'):
+            self.parser.shutdown(clean=False)
+            self.parser.final_cleanup()
         self.state = state.initial
 
     def reset(self):
         if hasattr(bb.parse, "siggen"):
             bb.parse.siggen.exit()
+        self.finishcommand()
         self.initConfigurationData()
         self.handlePRServ()
 
@@ -1783,8 +1784,9 @@ class BBCooker:
         if hasattr(self, "data"):
            self.databuilder.reset()
            self.data = self.databuilder.data
+        # In theory tinfoil could have modified the base data before parsing,
+        # ideally need to track if anything did modify the datastore
         self.parsecache_valid = False
-        self.baseconfig_valid = False
 
 
 class CookerExit(bb.event.Event):
@@ -2092,29 +2094,29 @@ class Parser(multiprocessing.Process):
         multiprocessing.util.Finalize(None, bb.fetch.fetcher_parse_save, exitpriority=1)
 
         pending = []
+        havejobs = True
         try:
-            while True:
-                try:
-                    self.quit.get_nowait()
-                except queue.Empty:
-                    pass
-                else:
+            while havejobs or pending:
+                if self.quit.is_set():
                     break
 
-                if pending:
-                    result = pending.pop()
-                else:
-                    try:
-                        job = self.jobs.pop()
-                    except IndexError:
-                        break
+                job = None
+                try:
+                    job = self.jobs.pop()
+                except IndexError:
+                    havejobs = False
+                if job:
                     result = self.parse(*job)
                     # Clear the siggen cache after parsing to control memory usage, its huge
                     bb.parse.siggen.postparsing_clean_cache()
-                try:
-                    self.results.put(result, timeout=0.25)
-                except queue.Full:
                     pending.append(result)
+
+                if pending:
+                    try:
+                        result = pending.pop()
+                        self.results.put(result, timeout=0.05)
+                    except queue.Full:
+                        pending.append(result)
         finally:
             self.results.close()
             self.results.join_thread()
@@ -2189,13 +2191,15 @@ class CookerParser(object):
         self.haveshutdown = False
         self.syncthread = None
 
+        bb.cache.SiggenRecipeInfo.reset()
+
     def start(self):
         self.results = self.load_cached()
         self.processes = []
         if self.toparse:
             bb.event.fire(bb.event.ParseStarted(self.toparse), self.cfgdata)
 
-            self.parser_quit = multiprocessing.Queue(maxsize=self.num_processes)
+            self.parser_quit = multiprocessing.Event()
             self.result_queue = multiprocessing.Queue()
 
             def chunkify(lst,n):
@@ -2227,8 +2231,15 @@ class CookerParser(object):
         else:
             bb.error("Parsing halted due to errors, see error messages above")
 
-        for process in self.processes:
-            self.parser_quit.put(None)
+        def sync_caches():
+            for c in self.bb_caches.values():
+                bb.cache.SiggenRecipeInfo.reset()
+                c.sync()
+
+        self.syncthread = threading.Thread(target=sync_caches, name="SyncThread")
+        self.syncthread.start()
+
+        self.parser_quit.set()
 
         # Cleanup the queue before call process.join(), otherwise there might be
         # deadlocks.
@@ -2258,18 +2269,9 @@ class CookerParser(object):
             if hasattr(process, "close"):
                 process.close()
 
-        self.parser_quit.close()
-        # Allow data left in the cancel queue to be discarded
-        self.parser_quit.cancel_join_thread()
 
-        def sync_caches():
-            for c in self.bb_caches.values():
-                c.sync()
-
-        sync = threading.Thread(target=sync_caches, name="SyncThread")
-        self.syncthread = sync
-        sync.start()
         bb.codeparser.parser_cache_savemerge()
+        bb.cache.SiggenRecipeInfo.reset()
         bb.fetch.fetcher_parse_done()
         if self.cooker.configuration.profile:
             profiles = []
@@ -2288,8 +2290,8 @@ class CookerParser(object):
 
     def load_cached(self):
         for mc, cache, filename, appends in self.fromcache:
-            cached, infos = cache.load(filename, appends)
-            yield not cached, mc, infos
+            infos = cache.loadCached(filename, appends)
+            yield False, mc, infos
 
     def parse_generator(self):
         empty = False
@@ -2387,6 +2389,7 @@ class CookerParser(object):
         return True
 
     def reparse(self, filename):
+        bb.cache.SiggenRecipeInfo.reset()
         to_reparse = set()
         for mc in self.cooker.multiconfigs:
             to_reparse.add((mc, filename, self.cooker.collections[mc].get_file_appends(filename)))

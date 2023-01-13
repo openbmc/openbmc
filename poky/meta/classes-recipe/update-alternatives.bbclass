@@ -265,7 +265,7 @@ def update_alternatives_alt_targets(d, pkg):
 
     return updates
 
-PACKAGESPLITFUNCS:prepend = "populate_packages_updatealternatives "
+PACKAGESPLITFUNCS =+ "populate_packages_updatealternatives"
 
 python populate_packages_updatealternatives () {
     if not update_alternatives_enabled(d):

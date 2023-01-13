@@ -1,0 +1,38 @@
+diff --git a/core/arch/arm/kernel/link.mk b/core/arch/arm/kernel/link.mk
+index 0e96e606c..3fbcb6804 100644
+--- a/core/arch/arm/kernel/link.mk
++++ b/core/arch/arm/kernel/link.mk
+@@ -37,6 +37,7 @@ link-ldflags += --sort-section=alignment
+ link-ldflags += --fatal-warnings
+ link-ldflags += --gc-sections
+ link-ldflags += $(link-ldflags-common)
++link-ldflags += $(call ld-option,--no-warn-rwx-segments)
+ 
+ link-ldadd  = $(LDADD)
+ link-ldadd += $(ldflags-external)
+@@ -61,6 +62,7 @@ link-script-cppflags := \
+ 		$(cppflagscore))
+ 
+ ldargs-all_objs := -T $(link-script-dummy) --no-check-sections \
++		   $(call ld-option,--no-warn-rwx-segments) \
+ 		   $(link-ldflags-common) \
+ 		   $(link-objs) $(link-ldadd) $(libgcccore)
+ cleanfiles += $(link-out-dir)/all_objs.o
+@@ -75,7 +77,7 @@ $(link-out-dir)/unpaged_entries.txt: $(link-out-dir)/all_objs.o
+ 		$(AWK) '/ ____keep_pager/ { printf "-u%s ", $$3 }' > $@
+ 
+ unpaged-ldargs := -T $(link-script-dummy) --no-check-sections --gc-sections \
+-		 $(link-ldflags-common)
++		 $(link-ldflags-common) $(call ld-option,--no-warn-rwx-segments)
+ unpaged-ldadd := $(objs) $(link-ldadd) $(libgcccore)
+ cleanfiles += $(link-out-dir)/unpaged.o
+ $(link-out-dir)/unpaged.o: $(link-out-dir)/unpaged_entries.txt
+@@ -104,7 +106,7 @@ $(link-out-dir)/init_entries.txt: $(link-out-dir)/all_objs.o
+ 		$(AWK) '/ ____keep_init/ { printf "-u%s ", $$3 }' > $@
+ 
+ init-ldargs := -T $(link-script-dummy) --no-check-sections --gc-sections \
+-	       $(link-ldflags-common)
++	       $(link-ldflags-common) $(call ld-option,--no-warn-rwx-segments)
+ init-ldadd := $(link-objs-init) $(link-out-dir)/version.o  $(link-ldadd) \
+ 	      $(libgcccore)
+ cleanfiles += $(link-out-dir)/init.o

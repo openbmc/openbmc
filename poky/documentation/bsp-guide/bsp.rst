@@ -127,7 +127,7 @@ you want to work with, such as::
 and so on.
 
 For more information on layers, see the
-":ref:`dev-manual/common-tasks:understanding and creating layers`"
+":ref:`dev-manual/layers:understanding and creating layers`"
 section of the Yocto Project Development Tasks Manual.
 
 Preparing Your Build Host to Work With BSP Layers
@@ -463,7 +463,7 @@ requirements are handled with the ``COPYING.MIT`` file.
 Licensing files can be MIT, BSD, GPLv*, and so forth. These files are
 recommended for the BSP but are optional and totally up to the BSP
 developer. For information on how to maintain license compliance, see
-the ":ref:`dev-manual/common-tasks:maintaining open source license compliance during your product's lifecycle`"
+the ":ref:`dev-manual/licenses:maintaining open source license compliance during your product's lifecycle`"
 section in the Yocto Project Development Tasks Manual.
 
 README File
@@ -589,7 +589,7 @@ filenames correspond to the values to which users have set the
 
 These files define things such as the kernel package to use
 (:term:`PREFERRED_PROVIDER` of
-:ref:`virtual/kernel <dev-manual/common-tasks:using virtual providers>`),
+:ref:`virtual/kernel <dev-manual/new-recipe:using virtual providers>`),
 the hardware drivers to include in different types of images, any
 special software components that are needed, any bootloader information,
 and also any special image format requirements.
@@ -757,7 +757,7 @@ workflow.
    OpenEmbedded build system knows about. For more information on
    layers, see the ":ref:`overview-manual/yp-intro:the yocto project layer model`"
    section in the Yocto Project Overview and Concepts Manual. You can also
-   reference the ":ref:`dev-manual/common-tasks:understanding and creating layers`"
+   reference the ":ref:`dev-manual/layers:understanding and creating layers`"
    section in the Yocto Project Development Tasks Manual. For more
    information on BSP layers, see the ":ref:`bsp-guide/bsp:bsp layers`"
    section.
@@ -816,7 +816,7 @@ workflow.
    key configuration files are configured appropriately: the
    ``conf/local.conf`` and the ``conf/bblayers.conf`` file. You must
    make the OpenEmbedded build system aware of your new layer. See the
-   ":ref:`dev-manual/common-tasks:enabling your layer`"
+   ":ref:`dev-manual/layers:enabling your layer`"
    section in the Yocto Project Development Tasks Manual for information
    on how to let the build system know about your new layer.
 
@@ -845,7 +845,7 @@ Before looking at BSP requirements, you should consider the following:
    layer that can be added to the Yocto Project. For guidelines on
    creating a layer that meets these base requirements, see the
    ":ref:`bsp-guide/bsp:bsp layers`" section in this manual and the
-   ":ref:`dev-manual/common-tasks:understanding and creating layers`"
+   ":ref:`dev-manual/layers:understanding and creating layers`"
    section in the Yocto Project Development Tasks Manual.
 
 -  The requirements in this section apply regardless of how you package
@@ -927,7 +927,7 @@ Yocto Project:
    -  The name and contact information for the BSP layer maintainer.
       This is the person to whom patches and questions should be sent.
       For information on how to find the right person, see the
-      ":ref:`dev-manual/common-tasks:submitting a change to the yocto project`"
+      ":ref:`dev-manual/changes:submitting a change to the yocto project`"
       section in the Yocto Project Development Tasks Manual.
 
    -  Instructions on how to build the BSP using the BSP layer.
@@ -1013,7 +1013,7 @@ the following:
 
 -  Create a ``*.bbappend`` file for the modified recipe. For information on using
    append files, see the
-   ":ref:`dev-manual/common-tasks:appending other layers metadata with your layer`"
+   ":ref:`dev-manual/layers:appending other layers metadata with your layer`"
    section in the Yocto Project Development Tasks Manual.
 
 -  Ensure your directory structure in the BSP layer that supports your
@@ -1117,7 +1117,7 @@ list describes them in order of preference:
    Specifying the matching license string signifies that you agree to
    the license. Thus, the build system can build the corresponding
    recipe and include the component in the image. See the
-   ":ref:`dev-manual/common-tasks:enabling commercially licensed recipes`"
+   ":ref:`dev-manual/licenses:enabling commercially licensed recipes`"
    section in the Yocto Project Development Tasks Manual for details on
    how to use these variables.
 
@@ -1169,7 +1169,7 @@ Use these steps to create a BSP layer:
    ``create-layer`` subcommand to create a new general layer. For
    instructions on how to create a general layer using the
    ``bitbake-layers`` script, see the
-   ":ref:`dev-manual/common-tasks:creating a general layer using the \`\`bitbake-layers\`\` script`"
+   ":ref:`dev-manual/layers:creating a general layer using the \`\`bitbake-layers\`\` script`"
    section in the Yocto Project Development Tasks Manual.
 
 -  *Create a Layer Configuration File:* Every layer needs a layer
@@ -1229,7 +1229,7 @@ configuration files is to examine various files for BSP from the
 :yocto_git:`Source Repositories <>`.
 
 For a detailed description of this particular layer configuration file,
-see ":ref:`step 3 <dev-manual/common-tasks:creating your own layer>`"
+see ":ref:`step 3 <dev-manual/layers:creating your own layer>`"
 in the discussion that describes how to create layers in the Yocto
 Project Development Tasks Manual.
 
@@ -1365,7 +1365,7 @@ Project Reference Manual.
 
 -  :term:`IMAGE_INSTALL`:
    Specifies packages to install into an image through the
-   :ref:`image <ref-classes-image>` class. Recipes
+   :ref:`ref-classes-image` class. Recipes
    use the :term:`IMAGE_INSTALL` variable.
 
 -  ``do_image_wic[depends]``: A task that is constructed during the

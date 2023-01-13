@@ -9,16 +9,27 @@ SECTION = "console/tools"
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-COMPATIBLE_HOST = "(i.86|x86_64|arm|aarch64).*-linux"
+COMPATIBLE_HOST = "(i.86|x86_64|arm|aarch64|riscv64).*-linux"
 
+PV .= "+git${SRCPV}"
+SRCREV = "42fef565731411a784101de614a54bff79d1858e"
 SRC_URI = " \
-    http://ezix.org/software/files/lshw-B.${PV}.tar.gz \
-    file://0001-Fix-musl-build.patch \
+    git://github.com/lyonel/lshw.git;protocol=https;branch=master \
+    file://0001-disable-docbook2man.patch \
 "
-SRC_URI[md5sum] = "8c70d46e906688309095c73ecb9396e3"
-SRC_URI[sha256sum] = "9bb347ac87142339a366a1759ac845e3dbb337ec000aa1b99b50ac6758a80f80"
 
-S = "${WORKDIR}/lshw-B.${PV}"
+S = "${WORKDIR}/git"
+
+inherit pkgconfig
+
+DEPENDS = "gettext-native"
+
+PACKAGECONFIG ??= "zlib"
+PACKAGECONFIG[sqlite] = "SQLITE=1,SQLITE=0,sqlite3"
+PACKAGECONFIG[zlib]   = "ZLIB=1,ZLIB=0,zlib gzip-native"
+
+# use the PACKAGECONFIG configurations arguments
+EXTRA_OEMAKE = "${PACKAGECONFIG_CONFARGS}"
 
 do_compile() {
     # build core only - don't ship gui

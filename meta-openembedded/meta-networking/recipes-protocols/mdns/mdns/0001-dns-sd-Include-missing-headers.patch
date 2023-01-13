@@ -1,0 +1,30 @@
+From cea342c10731cb1c8c8b52f03d55f9d15fc3b091 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 4 Nov 2021 07:31:32 -0700
+Subject: [PATCH 1/6] dns-sd: Include missing headers
+
+Fixes build on Musl
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ mDNSPosix/nss_mdns.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/mDNSPosix/nss_mdns.c b/mDNSPosix/nss_mdns.c
+index afadb3c6c33b..84c312759463 100644
+--- a/mDNSPosix/nss_mdns.c
++++ b/mDNSPosix/nss_mdns.c
+@@ -89,6 +89,9 @@
+ 
+ #include <dns_sd.h>
+ 
++#if !defined(NETDB_INTERNAL)
++#  define NETDB_INTERNAL (-1)
++#endif
+ 
+ //----------
+ // Public functions
+-- 
+2.35.1
+

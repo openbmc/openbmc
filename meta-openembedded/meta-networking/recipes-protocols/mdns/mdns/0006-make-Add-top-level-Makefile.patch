@@ -1,0 +1,25 @@
+From fa9ef50ab4c4225cf3ade4bafc38ddf93e6fe127 Mon Sep 17 00:00:00 2001
+From: Alex Kiernan <alex.kiernan@gmail.com>
+Date: Tue, 6 Dec 2022 13:28:31 +0000
+Subject: [PATCH 6/6] make: Add top-level Makefile
+
+Simple top level Makefile that just delegates to mDNSPosix.
+
+Upstream-Status: Inappropriate [oe-specific]
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
+ create mode 100644 Makefile
+
+diff --git a/Makefile b/Makefile
+new file mode 100644
+index 000000000000..feb6ac67ef47
+--- /dev/null
++++ b/Makefile
+@@ -0,0 +1,2 @@
++all clean:
++	cd mDNSPosix && $(MAKE) $@
+-- 
+2.35.1
+

@@ -1,0 +1,27 @@
+From 470399f3636c412b74f9daf6ae430b13c3126f02 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 15 Dec 2022 15:54:27 -0800
+Subject: [PATCH] configure: Use autoconf macro to detect largefile support
+
+Adds --enable-largefile/--disable-largefile configure knobs
+where default is to detect the support
+
+Upstream-Status: Submitted [https://github.com/strace/strace/pull/230]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 4797b42dd..7d57fb254 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -43,6 +43,8 @@ AC_PROG_INSTALL
+ AC_PROG_RANLIB
+ AC_PROG_LN_S
+ 
++AC_SYS_LARGEFILE
++
+ AC_USE_SYSTEM_EXTENSIONS
+ AX_CODE_COVERAGE
+ 

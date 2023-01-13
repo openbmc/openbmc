@@ -13,6 +13,7 @@ SRC_URI = "git://github.com/rhinstaller/efivar.git;branch=main;protocol=https \
            file://efisecdb-fix-build-with-musl-libc.patch \
            file://0001-Fix-invalid-free-in-main.patch \
            file://0001-Fix-glibc-2.36-build-mount.h-conflicts.patch \
+           file://0001-Use-off_t-instead-of-off64_t.patch \
            "
 SRCREV = "1753149d4176ebfb2b135ac0aaf79340bf0e7a93"
 

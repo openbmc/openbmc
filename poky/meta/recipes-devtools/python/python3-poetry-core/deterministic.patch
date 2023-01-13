@@ -1,0 +1,23 @@
+builders/wheel: Ensure dist-info is written determinisically
+
+glob() returns values in "on disk" order. To make the RECORD file
+deterministic and consistent between builds we need to sort the
+data before adding to the records list.
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Upstream-Status: Submitted [https://github.com/python-poetry/poetry-core/pull/545]
+
+Index: builders/wheel.py
+===================================================================
+--- a/src/poetry/core/masonry/builders/wheel.py
++++ b/src/poetry/core/masonry/builders/wheel.py
+@@ -294,7 +294,7 @@ class WheelBuilder(Builder):
+ 
+     def _copy_dist_info(self, wheel: zipfile.ZipFile, source: Path) -> None:
+         dist_info = Path(self.dist_info)
+-        for file in source.glob("**/*"):
++        for file in sorted(source.glob("**/*") ):
+             if not file.is_file():
+                 continue
+ 

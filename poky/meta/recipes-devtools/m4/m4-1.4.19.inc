@@ -54,6 +54,7 @@ do_install_ptest() {
 
 RDEPENDS:${PN}-ptest += "make coreutils diffutils"
 RDEPENDS:${PN}-ptest:append:libc-glibc = "\
+     locale-base-fr-fr \
      locale-base-fr-fr.iso-8859-1 \
 "
 

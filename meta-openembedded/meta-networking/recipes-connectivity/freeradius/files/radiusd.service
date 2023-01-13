@@ -4,10 +4,11 @@ After=syslog.target network.target
 
 [Service]
 Type=forking
+EnvironmentFile=-/etc/sysconfig/radiusd
 PIDFile=/run/radiusd/radiusd.pid
 ExecStartPre=-@BASE_BINDIR@/chown -R radiusd:radiusd /run/radiusd
 ExecStartPre=@SBINDIR@/radiusd -C
-ExecStart=@SBINDIR@/radiusd -d @SYSCONFDIR@/raddb
+ExecStart=@SBINDIR@/radiusd -d @SYSCONFDIR@/${MLPREFIX}raddb
 ExecReload=@SBINDIR@/radiusd -C
 ExecReload=@BASE_BINDIR@/kill -HUP $MAINPID
 

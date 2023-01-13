@@ -1,0 +1,82 @@
+From 02acc4d875ee81e6fd19ef66d69c9f55b4b4a7e7 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Wed, 9 Nov 2022 16:33:18 +0800
+Subject: [PATCH] 20-resolv.conf: improve the sitation of working with systemd
+
+systemd's resolvconf implementation ignores the protocol part.
+See https://github.com/systemd/systemd/issues/25032.
+
+When using 'dhcp server + dns server + dhcpcd + systemd', we
+get an integration issue, that is dhcpcd runs 'resolvconf -d eth0.ra',
+yet systemd's resolvconf treats it as eth0. This will delete the
+DNS information set by 'resolvconf -a eth0.dhcp'.
+
+Fortunately, 20-resolv.conf has the ability to build the resolv.conf
+file contents itself. We can just pass the generated contents to
+systemd's resolvconf. This way, the DNS information is not incorrectly
+deleted. Also, it does not cause behavior regression for dhcpcd
+in other cases.
+
+Upstream-Status: Inappropriate [OE Specific]
+This patch has been rejected by dhcpcd upstream.
+See details in https://github.com/NetworkConfiguration/dhcpcd/pull/152
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ hooks/20-resolv.conf | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/hooks/20-resolv.conf b/hooks/20-resolv.conf
+index 504a6c53..eb6e5845 100644
+--- a/hooks/20-resolv.conf
++++ b/hooks/20-resolv.conf
+@@ -11,8 +11,12 @@ nocarrier_roaming_dir="$state_dir/roaming"
+ NL="
+ "
+ : ${resolvconf:=resolvconf}
++resolvconf_from_systemd=false
+ if type "$resolvconf" >/dev/null 2>&1; then
+ 	have_resolvconf=true
++	if [ $(basename $(readlink -f $(which $resolvconf))) = resolvectl ]; then
++		resolvconf_from_systemd=true
++	fi
+ else
+ 	have_resolvconf=false
+ fi
+@@ -69,8 +73,13 @@ build_resolv_conf()
+ 	else
+ 		echo "# /etc/resolv.conf.tail can replace this line" >> "$cf"
+ 	fi
+-	if change_file /etc/resolv.conf "$cf"; then
+-		chmod 644 /etc/resolv.conf
++	if $resolvconf_from_systemd; then
++		[ -n "$ifmetric" ] && export IF_METRIC="$ifmetric"
++		"$resolvconf" -a "$ifname" <"$cf"
++	else
++		if change_file /etc/resolv.conf "$cf"; then
++			chmod 644 /etc/resolv.conf
++		fi
+ 	fi
+ 	rm -f "$cf"
+ }
+@@ -170,7 +179,7 @@ add_resolv_conf()
+ 	for x in ${new_domain_name_servers}; do
+ 		conf="${conf}nameserver $x$NL"
+ 	done
+-	if $have_resolvconf; then
++	if $have_resolvconf && ! $resolvconf_from_systemd; then
+ 		[ -n "$ifmetric" ] && export IF_METRIC="$ifmetric"
+ 		printf %s "$conf" | "$resolvconf" -a "$ifname"
+ 		return $?
+@@ -186,7 +195,7 @@ add_resolv_conf()
+ 
+ remove_resolv_conf()
+ {
+-	if $have_resolvconf; then
++	if $have_resolvconf && ($if_down || ! $resolvconf_from_systemd); then
+ 		"$resolvconf" -d "$ifname" -f
+ 	else
+ 		if [ -e "$resolv_conf_dir/$ifname" ]; then
+-- 
+2.17.1
+

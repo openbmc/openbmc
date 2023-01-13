@@ -1,0 +1,52 @@
+From 579b2ebe52d4b97f954e6188df2d07e137820075 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 15 Dec 2022 15:56:13 -0800
+Subject: [PATCH] tests: Replace off64_t with off_t
+
+when _FILE_OFFSET_BITS=64 then off_t is 64bit wide, this also fixes
+build on musl where off64_t is not available without _LARGEFILE64_SOURCE
+
+Upstream-Status: Submitted [https://github.com/strace/strace/pull/230]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/readahead.c        | 2 +-
+ tests/sync_file_range2.c | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+--- a/tests/readahead.c
++++ b/tests/readahead.c
+@@ -42,7 +42,7 @@ static const int fds[] = {
+ 	0x7fffffff,
+ };
+ 
+-static const off64_t offsets[] = {
++static const off_t offsets[] = {
+ 	-0x8000000000000000LL,
+ 	-0x5060708090a0b0c0LL,
+ 	-1LL,
+--- a/tests/sync_file_range2.c
++++ b/tests/sync_file_range2.c
+@@ -20,8 +20,8 @@ int
+ main(void)
+ {
+ 	const int fd = -1;
+-	const off64_t offset = 0xdeadbeefbadc0ded;
+-	const off64_t nbytes = 0xfacefeedcafef00d;
++	const off_t offset = 0xdeadbeefbadc0ded;
++	const off_t nbytes = 0xfacefeedcafef00d;
+ 	const unsigned int flags = -1;
+ 
+ 	int rc = sync_file_range(fd, offset, nbytes, flags);
+--- a/tests/sync_file_range.c
++++ b/tests/sync_file_range.c
+@@ -20,8 +20,8 @@ int
+ main(void)
+ {
+ 	const int fd = -1;
+-	const off64_t offset = 0xdeadbeefbadc0dedULL;
+-	const off64_t nbytes = 0xfacefeedcafef00dULL;
++	const off_t offset = 0xdeadbeefbadc0dedULL;
++	const off_t nbytes = 0xfacefeedcafef00dULL;
+ 	const unsigned int flags = -1;
+ 
+ 	int rc = sync_file_range(fd, offset, nbytes, flags);

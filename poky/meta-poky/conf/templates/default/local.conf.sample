@@ -143,7 +143,8 @@ DISTRO ?= "poky"
 #  "debug-tweaks"   - make an image suitable for development
 #                     e.g. ssh root access has a blank password
 # There are other application targets that can be used here too, see
-# meta/classes/image.bbclass and meta/classes/core-image.bbclass for more details.
+# meta/classes-recipe/image.bbclass and
+# meta/classes-recipe/core-image.bbclass for more details.
 # We default to enabling the debugging tweaks.
 EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
 
@@ -162,7 +163,7 @@ USER_CLASSES ?= "buildstats"
 # The build system can test booting virtual machine images under qemu (an emulator)
 # after any root filesystems are created and run tests against those images. It can also
 # run tests against any SDK that are built. To enable this uncomment these lines.
-# See classes/test{image,sdk}.bbclass for further details.
+# See meta/classes-recipe/test{image,sdk}.bbclass for further details.
 #IMAGE_CLASSES += "testimage testsdk"
 #TESTIMAGE_AUTO:qemuall = "1"
 

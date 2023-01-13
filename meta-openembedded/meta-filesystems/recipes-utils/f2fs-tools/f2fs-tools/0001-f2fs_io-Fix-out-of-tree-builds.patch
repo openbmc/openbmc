@@ -1,0 +1,27 @@
+From f110e34d7a4929cdea647b98fa177cf1bccf8b1e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 21 Dec 2022 18:21:42 -0800
+Subject: [PATCH] f2fs_io: Fix out of tree builds
+
+Relative path does not work when searching for include files
+when srcdir != builddir
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-f2fs-devel/20221222022830.976309-1-raj.khem@gmail.com/T/#t]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tools/f2fs_io/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/f2fs_io/Makefile.am b/tools/f2fs_io/Makefile.am
+index 6c17db1..bc4f9d0 100644
+--- a/tools/f2fs_io/Makefile.am
++++ b/tools/f2fs_io/Makefile.am
+@@ -1,7 +1,7 @@
+ ## Makefile.am
+ 
+ if LINUX
+-AM_CPPFLAGS = -I../../include
++AM_CPPFLAGS = -I$(top_srcdir)/include
+ AM_CFLAGS = -Wall
+ sbin_PROGRAMS = f2fs_io
+ f2fs_io_SOURCES = f2fs_io.c

@@ -1,4 +1,4 @@
-From 0214d886d0153f7288f81213c47dc50f3b9fde20 Mon Sep 17 00:00:00 2001
+From e10f93167c76c477a7b97286cfac603795bf28d8 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Thu, 29 Mar 2018 15:12:17 +0800
 Subject: [PATCH] support pkgconfig
@@ -14,14 +14,14 @@ Signed-off-by: Armin Kuster <akuster808@gmail.com>
 Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 
 ---
- src/gpg-error.m4 | 161 +----------------------------------------------
- 1 file changed, 3 insertions(+), 158 deletions(-)
+ src/gpg-error.m4 | 165 +----------------------------------------------
+ 1 file changed, 3 insertions(+), 162 deletions(-)
 
 diff --git a/src/gpg-error.m4 b/src/gpg-error.m4
-index 4b5cd40..c9978d6 100644
+index a975e53..af4bf2f 100644
 --- a/src/gpg-error.m4
 +++ b/src/gpg-error.m4
-@@ -27,158 +27,12 @@ dnl is added to the gpg_config_script_warn variable.
+@@ -27,162 +27,12 @@ dnl is added to the gpg_config_script_warn variable.
  dnl
  AC_DEFUN([AM_PATH_GPG_ERROR],
  [ AC_REQUIRE([AC_CANONICAL_HOST])
@@ -118,6 +118,10 @@ index 4b5cd40..c9978d6 100644
 -        fi
 -        if test -n "$gpgrt_libdir"; then break; fi
 -      done
+-      if test -z "$libdir_candidates"; then
+-        # No valid pkgconfig dir in any of the system directories, fallback
+-        gpgrt_libdir=${possible_libdir1}
+-      fi
 -    else
 -      # When we cannot determine system libdir-format, use this:
 -      gpgrt_libdir=${possible_libdir1}
@@ -183,7 +187,7 @@ index 4b5cd40..c9978d6 100644
      fi
      if test x"$gpg_error_config_host" != xnone ; then
        if test x"$gpg_error_config_host" != x"$host" ; then
-@@ -194,15 +48,6 @@ AC_DEFUN([AM_PATH_GPG_ERROR],
+@@ -198,15 +48,6 @@ AC_DEFUN([AM_PATH_GPG_ERROR],
        fi
      fi
    else

@@ -1,0 +1,32 @@
+From 00f822ab79b6c06936147af4d832e439cecf0fc0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 7 Jan 2023 19:31:58 -0800
+Subject: [PATCH] build: Use ilp32d abi on riscv32 and lp64d on rv64
+
+ilp32d is common ABI used for linux distributions therefore a better
+default, similarily lp64d is common ABI for rv64 linux
+
+Upstream-Status: Submitted [https://github.com/concurrencykit/ck/pull/204]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ build/ck.build.riscv   | 2 +-
+ build/ck.build.riscv64 | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/build/ck.build.riscv b/build/ck.build.riscv
+index 61e0033..11ac840 100644
+--- a/build/ck.build.riscv
++++ b/build/ck.build.riscv
+@@ -1 +1 @@
+-CFLAGS+=-mabi=ilp32
++CFLAGS+=-mabi=ilp32d
+diff --git a/build/ck.build.riscv64 b/build/ck.build.riscv64
+index 9f89791..7639bd6 100644
+--- a/build/ck.build.riscv64
++++ b/build/ck.build.riscv64
+@@ -1 +1 @@
+-CFLAGS+=-mabi=lp64
++CFLAGS+=-mabi=lp64d
+-- 
+2.39.0
+

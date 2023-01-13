@@ -87,7 +87,7 @@ understand the following documentation:
    as described in the Yocto Project Application Development and the
    Extensible Software Development Kit (eSDK) manual.
 
--  The ":ref:`dev-manual/common-tasks:understanding and creating layers`"
+-  The ":ref:`dev-manual/layers:understanding and creating layers`"
    section in the Yocto Project Development Tasks Manual.
 
 -  The ":ref:`kernel-dev/intro:kernel modification workflow`" section.
@@ -108,12 +108,12 @@ general information and references for further information.
 .. image:: figures/kernel-dev-flow.png
    :width: 100%
 
-1. *Set up Your Host Development System to Support Development Using the
+#. *Set up Your Host Development System to Support Development Using the
    Yocto Project*: See the ":doc:`/dev-manual/start`" section in
    the Yocto Project Development Tasks Manual for options on how to get
    a build host ready to use the Yocto Project.
 
-2. *Set Up Your Host Development System for Kernel Development:* It is
+#. *Set Up Your Host Development System for Kernel Development:* It is
    recommended that you use ``devtool`` for kernel
    development. Alternatively, you can use traditional kernel
    development methods with the Yocto Project. Either way, there are
@@ -131,7 +131,7 @@ general information and references for further information.
    ":ref:`kernel-dev/common:getting ready for traditional kernel development`"
    section.
 
-3. *Make Changes to the Kernel Source Code if applicable:* Modifying the
+#. *Make Changes to the Kernel Source Code if applicable:* Modifying the
    kernel does not always mean directly changing source files. However,
    if you have to do this, you make the changes to the files in the
    Yocto's :term:`Build Directory` if you are using ``devtool``. For more
@@ -144,7 +144,7 @@ general information and references for further information.
    ":ref:`kernel-dev/common:using traditional kernel development to patch the kernel`"
    section.
 
-4. *Make Kernel Configuration Changes if Applicable:* If your situation
+#. *Make Kernel Configuration Changes if Applicable:* If your situation
    calls for changing the kernel's configuration, you can use
    :ref:`menuconfig <kernel-dev/common:using \`\`menuconfig\`\`>`,
    which allows you to
@@ -169,7 +169,7 @@ general information and references for further information.
    Additionally, if you are working in a BSP layer and need to modify
    the BSP's kernel's configuration, you can use ``menuconfig``.
 
-5. *Rebuild the Kernel Image With Your Changes:* Rebuilding the kernel
+#. *Rebuild the Kernel Image With Your Changes:* Rebuilding the kernel
    image applies your changes. Depending on your target hardware, you
    can verify your changes on actual hardware or perhaps QEMU.
 

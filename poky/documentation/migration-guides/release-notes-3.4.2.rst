@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 Release notes for 3.4.2 (honister)
 ----------------------------------
 
@@ -15,7 +17,7 @@ Security Fixes in 3.4.2
 -  libsndfile1: fix :cve:`2021-4156`
 -  xserver-xorg: whitelist two CVEs
 -  grub2: fix :cve:`2021-3981`
--  xserver-xorg: update CVE_PRODUCT
+-  xserver-xorg: update :term:`CVE_PRODUCT`
 -  binutils: :cve:`2021-42574`
 -  gcc: Fix :cve:`2021-42574`
 -  gcc: Fix :cve:`2021-35465`
@@ -38,7 +40,7 @@ Fixes in 3.4.2
 -  vim: upgrade to patch 4269
 -  vim: update to include latest CVE fixes
 -  expat: upgrade to 2.4.4
--  libusb1: correct SRC_URI
+-  libusb1: correct :term:`SRC_URI`
 -  yocto-check-layer: add debug output for the layers that were found
 -  linux-firmware: Add CLM blob to linux-firmware-bcm4373 package
 -  linux-yocto/5.10: update to v5.10.93
@@ -49,7 +51,7 @@ Fixes in 3.4.2
 -  kernel: introduce python3-dtschema-wrapper
 -  vim: upgrade to 8.2 patch 3752
 -  bootchart2: Add missing python3-math dependency
--  socat: update SRC_URI
+-  socat: update :term:`SRC_URI`
 -  pigz: fix one failure of command "unpigz -l"
 -  linux-yocto/5.14: update genericx86* machines to v5.14.21
 -  linux-yocto/5.10: update genericx86* machines to v5.10.87
@@ -69,7 +71,7 @@ Fixes in 3.4.2
 -  rpm: remove tmp folder created during install
 -  package_manager: ipk: Fix host manifest generation
 -  bitbake: utils: Update to use exec_module() instead of load_module()
--  linux-yocto: add libmpc-native to DEPENDS
+-  linux-yocto: add libmpc-native to :term:`DEPENDS`
 -  ref-manual: fix patch documentation
 -  bitbake: tests/fetch: Drop gnu urls from wget connectivity test
 -  bitbake: fetch: npm: Use temporary file for empty user config
@@ -112,7 +114,7 @@ Fixes in 3.4.2
 -  classes/crate-fetch: Ensure crate fetcher is available
 -  rootfs-postcommands: update systemd_create_users
 -  classes/meson: Add optional rust definitions
--  rust-cross: Replace TARGET_ARCH with TUNE_PKGARCH
+-  rust-cross: Replace :term:`TARGET_ARCH` with :term:`TUNE_PKGARCH`
 -  maintainers.inc: fix up rust-cross entry
 -  rust-cross: Fix directory not deleted for race glibc vs. musl
 -  wic: use shutil.which

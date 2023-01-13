@@ -13,10 +13,10 @@ DEPENDS:append:libc-musl = " libucontext"
 SRCREV = "bf8b714bf5075d0a6f2f28504b43095e2b1e11c5"
 SRC_URI = "git://github.com/gperftools/gperftools;branch=master;protocol=https \
            file://0001-Support-Atomic-ops-on-clang.patch \
-           file://0001-fix-build-with-musl-libc.patch \
            file://0001-disbale-heap-checkers-and-debug-allocator-on-musl.patch \
            file://disable_libunwind_aarch64.patch \
            file://sgidef.patch \
+           file://0001-Define-off64_t-as-off_t-on-musl.patch \
            "
 
 SRC_URI:append:libc-musl = " file://ppc-musl.patch"

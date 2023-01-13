@@ -1,0 +1,28 @@
+Not overwrite CFLAGS and CXXFLAGS. It also avoid buildpaths qa issue:
+
+  WARNING: python3-wxgtk4-4.2.0-r0 do_package_qa: QA Issue: File
+  /usr/lib64/python3.11/site-packages/wx/.debug/_xml.cpython-311-aarch64-linux-gnu.so
+  in package python3-wxgtk4-dbg contains reference to TMPDIR [buildpaths]
+
+Upstream-Status: Pending [oe specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ wscript | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/wscript b/wscript
+index 067b307..50d96d1 100644
+--- a/wscript
++++ b/wscript
+@@ -195,8 +195,8 @@ def configure(conf):
+         cfg.finishSetup(conf.env.wx_config, conf.env.debug,
+                         'mingw32' if isWindows and not conf.env.use_msvc else None)
+ 
+-        conf.env.CFLAGS = cfg.cflags[:]
+-        conf.env.CXXFLAGS = cfg.cxxflags[:]
++        #conf.env.CFLAGS = cfg.cflags[:]
++        #conf.env.CXXFLAGS = cfg.cxxflags[:]
+         conf.env.CFLAGS_WX = list()
+         conf.env.CXXFLAGS_WX = list()
+         conf.env.CFLAGS_WXPY = list()

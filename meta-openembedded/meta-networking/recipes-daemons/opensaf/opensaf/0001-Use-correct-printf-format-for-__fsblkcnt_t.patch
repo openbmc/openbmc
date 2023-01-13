@@ -15,15 +15,13 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/base/os_defs.c | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/src/base/os_defs.c b/src/base/os_defs.c
-index 83458c2..655c190 100644
 --- a/src/base/os_defs.c
 +++ b/src/base/os_defs.c
-@@ -917,7 +917,11 @@ uint32_t ncs_os_posix_shm(NCS_OS_POSIX_SHM_REQ_INFO *req)
+@@ -917,7 +917,11 @@ uint32_t ncs_os_posix_shm(NCS_OS_POSIX_S
  			    ((statsvfs.f_bfree - 1) * statsvfs.f_frsize)) {
  				syslog(
  				    LOG_ERR,
-+#if __TIMESIZE == 64 && __WORDSIZE == 32
++#if (_FILE_OFFSET_BITS == 64 || __TIMESIZE == 64) && __WORDSIZE == 32
 +				    "Insufficient shared memory (%lld) to write the data of size: %" PRId64
 +#else
  				    "Insufficient shared memory (%ld) to write the data of size: %" PRId64
@@ -31,6 +29,3 @@ index 83458c2..655c190 100644
  				    "\n",
  				    (statsvfs.f_bfree * statsvfs.f_frsize),
  				    req->info.write.i_write_size);
--- 
-2.29.2
-

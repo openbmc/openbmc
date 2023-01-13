@@ -199,22 +199,12 @@ class QemuTest(OESelftestTestCase):
             qemu_shutdown_succeeded = self._start_qemu_shutdown_check_if_shutdown_succeeded(qemu, shutdown_timeout)
             self.assertTrue(qemu_shutdown_succeeded, 'Failed: %s does not shutdown within timeout(%s)' % (self.machine, shutdown_timeout))
 
-    # Need to have portmap/rpcbind running to allow this test to work and
-    # current autobuilder setup does not have this.
-    def disabled_test_qemu_can_boot_nfs_and_shutdown(self):
-        self.assertExists(self.qemuboot_conf)
-        bitbake('meta-ide-support')
+    def test_qemu_can_boot_nfs_and_shutdown(self):
         rootfs_tar = "%s-%s.tar.bz2" % (self.recipe, self.machine)
         rootfs_tar = os.path.join(self.deploy_dir_image, rootfs_tar)
         self.assertExists(rootfs_tar)
-        tmpdir = tempfile.mkdtemp(prefix='qemu_nfs')
-        tmpdir_nfs = os.path.join(tmpdir, 'nfs')
-        cmd_extract_nfs = 'runqemu-extract-sdk %s %s' % (rootfs_tar, tmpdir_nfs)
-        result = runCmd(cmd_extract_nfs)
-        self.assertEqual(0, result.status, "runqemu-extract-sdk didn't run as expected. %s" % result.output)
-        cmd = "%s nfs %s %s" % (self.cmd_common, self.qemuboot_conf, tmpdir_nfs)
+        cmd = "%s %s" % (self.cmd_common, rootfs_tar)
         shutdown_timeout = 120
         with runqemu(self.recipe, ssh=False, launch_cmd=cmd) as qemu:
             qemu_shutdown_succeeded = self._start_qemu_shutdown_check_if_shutdown_succeeded(qemu, shutdown_timeout)
             self.assertTrue(qemu_shutdown_succeeded, 'Failed: %s does not shutdown within timeout(%s)' % (self.machine, shutdown_timeout))
-        runCmd('rm -rf %s' % tmpdir)

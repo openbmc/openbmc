@@ -50,3 +50,5 @@ RCONFLICTS:${PN} = "libc-client"
 
 ALLOW_EMPTY:${PN} = "1"
 
+PARALLEL_MAKE = ""
+

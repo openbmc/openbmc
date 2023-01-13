@@ -1,0 +1,33 @@
+From d0a7ba506fd302ad195f79f287b5a5a154ac02a3 Mon Sep 17 00:00:00 2001
+From: Vincent Davis Jr <vince@underview.tech>
+Date: Sun, 4 Dec 2022 16:09:51 -0600
+Subject: [PATCH] tremor provides libvorbisidec, use it instead of libvorbisdec
+
+Upstream-Status: Inappropriate
+
+RPI-Distro repo forks original vlc and applies patches to enable
+raspiberry pi support.
+
+THIS PATCHES HAS BEEN REIMPLEMENTED INORDER TO APPLY PROPERLY.
+
+Signed-off-by: Tim Orling <TicoTimo@gmail.com>
+---
+ modules/codec/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/codec/Makefile.am b/modules/codec/Makefile.am
+index 3dadf1119..8b6189e92 100644
+--- a/modules/codec/Makefile.am
++++ b/modules/codec/Makefile.am
+@@ -324,7 +324,7 @@ codec_LTLIBRARIES += $(LTLIBdaala)
+ libtremor_plugin_la_SOURCES = codec/vorbis.c
+ libtremor_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMODULE_NAME_IS_tremor
+ libtremor_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
+-libtremor_plugin_la_LIBADD = -lvorbisdec -logg
++libtremor_plugin_la_LIBADD = -lvorbisidec -logg
+ EXTRA_LTLIBRARIES += libtremor_plugin.la
+ codec_LTLIBRARIES += $(LTLIBtremor)
+ 
+-- 
+2.38.1
+

@@ -218,6 +218,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-keras-preprocessing \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11 opengl", "python3-kivy", "", d)} \
     python3-kiwisolver \
+    python3-kmod \
     python3-langtable \
     python3-lazy-object-proxy \
     python3-libconf \
@@ -413,7 +414,6 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-sqlparse \
     python3-sqlsoup \
     python3-stevedore \
-    python3-strict-rfc3339 \
     python3-supervisor \
     python3-sympy \
     python3-tabulate \
@@ -450,6 +450,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-visitor \
     python3-waitress \
     python3-watchdog \
+    python3-watchdogdev \
     python3-web3 \
     python3-webcolors \
     python3-webencodings \

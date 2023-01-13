@@ -11,6 +11,7 @@ include lttng-platforms.inc
 
 SRC_URI = "https://lttng.org/files/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://0009-Rename-genhd-wrapper-to-blkdev.patch \
+           file://0001-fix-mm-slab_common-drop-kmem_alloc-avoid-dereferenci.patch \ 
            "
 
 # Use :append here so that the patch is applied also when using devupstream

@@ -21,6 +21,7 @@ PROVIDES = "xt"
 PE = "1"
 
 XORG_PN = "libXt"
+XORG_EXT = "tar.bz2"
 
 SRC_URI += "file://libxt_fix_for_x32.patch"
 

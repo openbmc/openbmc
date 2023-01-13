@@ -169,12 +169,12 @@ def deb_write_pkg(pkg, d):
 
         # more fields
 
-        custom_fields_chunk = get_package_additional_metadata("deb", localdata)
+        custom_fields_chunk = oe.packagedata.get_package_additional_metadata("deb", localdata)
         if custom_fields_chunk:
             ctrlfile.write(custom_fields_chunk)
             ctrlfile.write("\n")
 
-        mapping_rename_hook(localdata)
+        oe.packagedata.mapping_rename_hook(localdata)
 
         def debian_cmp_remap(var):
             # dpkg does not allow for '(', ')' or ':' in a dependency name
@@ -269,7 +269,7 @@ def deb_write_pkg(pkg, d):
             scriptfile.close()
             os.chmod(os.path.join(controldir, script), 0o755)
 
-        conffiles_str = ' '.join(get_conffiles(pkg, d))
+        conffiles_str = ' '.join(oe.package.get_conffiles(pkg, d))
         if conffiles_str:
             conffiles = open(os.path.join(controldir, 'conffiles'), 'w')
             for f in conffiles_str.split():

@@ -1,0 +1,53 @@
+Upstream-Status: Inappropriate
+
+RPI-Distro repo forks original vlc and applies patches
+to enable raspiberry pi support.
+
+--- a/modules/hw/mmal/blend_rgba_neon.S
++++ b/modules/hw/mmal/blend_rgba_neon.S
+@@ -1,10 +1,10 @@
+-        .syntax unified
+-        .arm
+-//      .thumb
+-        .text
++#include "../../arm_neon/asm.S"
+         .align 16
+         .arch armv7-a
+-        .fpu neon-vfpv4
++        .syntax unified
++#if HAVE_AS_FPU_DIRECTIVE
++        .fpu    neon-vfpv4
++#endif
+ 
+ @ blend_rgbx_rgba_neon
+ 
+--- a/modules/hw/mmal/codec.c
++++ b/modules/hw/mmal/codec.c
+@@ -29,6 +29,7 @@
+ #include <stdatomic.h>
+ 
+ #include <vlc_common.h>
++#include <vlc_cpu.h>
+ #include <vlc_plugin.h>
+ #include <vlc_codec.h>
+ #include <vlc_filter.h>
+@@ -2311,6 +2312,9 @@ static int OpenBlendMmal(vlc_object_t *o
+     filter_t * const p_filter = (filter_t *)object;
+     const vlc_fourcc_t vfcc_dst = p_filter->fmt_out.video.i_chroma;
+ 
++    if (!vlc_CPU_ARM_NEON())
++        return VLC_EGENERIC;
++
+     if (!hw_mmal_chroma_is_mmal(vfcc_dst) ||
+         !hw_mmal_vzc_subpic_fmt_valid(&p_filter->fmt_in.video))
+     {
+@@ -2421,6 +2425,9 @@ static int OpenBlendNeon(vlc_object_t *o
+     MMAL_FOURCC_T mfcc_dst = vlc_to_mmal_video_fourcc(&p_filter->fmt_out.video);
+     blend_neon_fn * blend_fn = (blend_neon_fn *)0;
+ 
++    if (!vlc_CPU_ARM_NEON())
++        return VLC_EGENERIC;
++
+     // Non-alpha RGB only for dest
+     if (vfcc_dst != VLC_CODEC_RGB32)
+         return VLC_EGENERIC;

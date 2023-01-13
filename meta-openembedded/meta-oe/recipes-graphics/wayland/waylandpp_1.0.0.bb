@@ -10,7 +10,9 @@ DEPENDS:append:class-target = " waylandpp-native wayland virtual/egl virtual/lib
 S = "${WORKDIR}/git"
 SRCREV = "4321ed5c7b4bffa41b8a2a13dc7f3ece1191f4f3"
 
-inherit cmake pkgconfig
+inherit cmake pkgconfig features_check
+
+REQUIRED_DISTRO_FEATURES = "opengl"
 
 EXTRA_OECMAKE:class-native = " \
 	-DBUILD_SCANNER=ON \

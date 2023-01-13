@@ -58,6 +58,9 @@ EXTRA_OECONF:class-nativesdk = "\
                 --disable-r \
                 --disable-sharp \
                 "
+EXTRA_OECONF:class-native = "\
+                --disable-tcl \
+                "
 CFLAGS:append:class-target = " -D_typ_ssize_t=1 -D_long_double=1"
 CFLAGS:append:class-nativesdk = " -D_typ_ssize_t=1 -D_long_double=1"
 do_configure:prepend() {

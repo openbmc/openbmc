@@ -68,8 +68,8 @@ python __anonymous() {
     update_rc_after_parse(d)
 }
 
-PACKAGESPLITFUNCS:prepend = "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'populate_packages_updatercd ', '', d)}"
-PACKAGESPLITFUNCS:remove:class-nativesdk = "populate_packages_updatercd "
+PACKAGESPLITFUNCS =+ "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'populate_packages_updatercd', '', d)}"
+PACKAGESPLITFUNCS:remove:class-nativesdk = "populate_packages_updatercd"
 
 populate_packages_updatercd[vardeps] += "updatercd_prerm updatercd_postrm updatercd_postinst"
 populate_packages_updatercd[vardepsexclude] += "OVERRIDES"

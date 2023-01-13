@@ -1,4 +1,4 @@
-From d767f776e631f1493fd7b266f2026d630ecf70fe Mon Sep 17 00:00:00 2001
+From 21583da072aa66901d859ac00ce209bac87ddecc Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Thu, 17 Jul 2014 15:53:34 +0800
 Subject: [PATCH] commonio.c-fix-unexpected-open-failure-in-chroot-env
@@ -21,10 +21,10 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  1 file changed, 12 insertions(+), 4 deletions(-)
 
 diff --git a/lib/commonio.c b/lib/commonio.c
-index 9e0fde6..7c3a1da 100644
+index 9a02ce1..61384ec 100644
 --- a/lib/commonio.c
 +++ b/lib/commonio.c
-@@ -624,10 +624,18 @@ int commonio_open (struct commonio_db *db, int mode)
+@@ -616,10 +616,18 @@ int commonio_open (struct commonio_db *db, int mode)
  	db->cursor = NULL;
  	db->changed = false;
  

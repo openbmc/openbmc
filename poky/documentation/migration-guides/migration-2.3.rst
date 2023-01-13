@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 Release 2.3 (pyro)
 ==================
 
@@ -50,7 +52,7 @@ Consider the following:
    post-installation script that is installed by a function added to
    :term:`SYSROOT_PREPROCESS_FUNCS`.
 
-   For an example, see the :ref:`pixbufcache <ref-classes-pixbufcache>` class in ``meta/classes/`` in
+   For an example, see the :ref:`ref-classes-pixbufcache` class in ``meta/classes/`` in
    the :ref:`overview-manual/development-environment:yocto project source repositories`.
 
    .. note::
@@ -363,7 +365,7 @@ The following changes have been made to Wic:
 .. note::
 
    For more information on Wic, see the
-   ":ref:`dev-manual/common-tasks:creating partitioned images using wic`"
+   ":ref:`dev-manual/wic:creating partitioned images using wic`"
    section in the Yocto Project Development Tasks Manual.
 
 -  *Default Output Directory Changed:* Wic's default output directory is
@@ -400,7 +402,7 @@ The following QA checks have changed:
    warning, you need to address missing runtime dependencies.
 
    For additional information, see the
-   :ref:`insane <ref-classes-insane>` class and the
+   :ref:`ref-classes-insane` class and the
    ":ref:`ref-manual/qa-checks:errors and warnings`" section.
 
 .. _migration-2.3-miscellaneous-changes:
@@ -444,7 +446,7 @@ The following miscellaneous changes have occurred:
    RSA keys only, and with recent versions of OpenSSH, which deprecates
    DSA host keys.
 
--  The :ref:`buildhistory <ref-classes-buildhistory>` class now
+-  The :ref:`ref-classes-buildhistory` class now
    correctly uses tabs as separators between all columns in
    ``installed-package-sizes.txt`` in order to aid import into other
    tools.
@@ -481,29 +483,26 @@ The following miscellaneous changes have occurred:
    is an unnecessary burden.
 
    If you need to preserve these ``.la`` files (e.g. in a custom
-   distribution), you must change
-   :term:`INHERIT_DISTRO` such that
-   "remove-libtool" is not included in the value.
+   distribution), you must change :term:`INHERIT_DISTRO` such that
+   ":ref:`ref-classes-remove-libtool`" is not included
+   in the value.
 
 -  Extensible SDKs built for GCC 5+ now refuse to install on a
    distribution where the host GCC version is 4.8 or 4.9. This change
    resulted from the fact that the installation is known to fail due to
    the way the ``uninative`` shared state (sstate) package is built. See
-   the :ref:`uninative <ref-classes-uninative>` class for additional
-   information.
+   the :ref:`ref-classes-uninative` class for additional information.
 
--  All native and nativesdk recipes now use a separate
-   :term:`DISTRO_FEATURES` value instead of sharing the value used by
-   recipes for the target, in order to avoid unnecessary rebuilds.
+-  All :ref:`ref-classes-native` and :ref:`ref-classes-nativesdk` recipes now
+   use a separate :term:`DISTRO_FEATURES` value instead of sharing the value
+   used by recipes for the target, in order to avoid unnecessary rebuilds.
 
-   The :term:`DISTRO_FEATURES` for ``native`` recipes is
-   :term:`DISTRO_FEATURES_NATIVE` added to
-   an intersection of :term:`DISTRO_FEATURES` and
-   :term:`DISTRO_FEATURES_FILTER_NATIVE`.
+   The :term:`DISTRO_FEATURES` for :ref:`ref-classes-native` recipes
+   is :term:`DISTRO_FEATURES_NATIVE` added to an intersection of
+   :term:`DISTRO_FEATURES` and :term:`DISTRO_FEATURES_FILTER_NATIVE`.
 
-   For nativesdk recipes, the corresponding variables are
-   :term:`DISTRO_FEATURES_NATIVESDK`
-   and
+   For :ref:`ref-classes-nativesdk` recipes, the corresponding
+   variables are :term:`DISTRO_FEATURES_NATIVESDK` and
    :term:`DISTRO_FEATURES_FILTER_NATIVESDK`.
 
 -  The ``FILESDIR`` variable, which was previously deprecated and rarely

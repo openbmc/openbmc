@@ -10,6 +10,7 @@ DEPENDS += "ethtool \
             librepo \
             libnet \
             libpcap \
+            libpcre \
             ncurses \
             openssl \
             zlib \

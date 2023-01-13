@@ -1,4 +1,4 @@
-From e0bf97eecfa601e08b9578f00b1000890284241a Mon Sep 17 00:00:00 2001
+From 10cfdcc905915d8814c609008a069102f2bc7e39 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 27 Oct 2015 16:02:19 +0200
 Subject: [PATCH] FindGObjectIntrospection.cmake: prefix variables obtained
@@ -9,30 +9,21 @@ reasons why this is not approproiate for upstream submission.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
- Source/cmake/FindGObjectIntrospection.cmake | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ Source/cmake/FindGI.cmake | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/Source/cmake/FindGObjectIntrospection.cmake b/Source/cmake/FindGObjectIntrospection.cmake
-index be96814a..ae67b593 100644
---- a/Source/cmake/FindGObjectIntrospection.cmake
-+++ b/Source/cmake/FindGObjectIntrospection.cmake
-@@ -16,7 +16,6 @@
- # Redistribution and use is allowed according to the terms of the BSD license.
+diff --git a/Source/cmake/FindGI.cmake b/Source/cmake/FindGI.cmake
+index af039cbb..b3e810cd 100644
+--- a/Source/cmake/FindGI.cmake
++++ b/Source/cmake/FindGI.cmake
+@@ -72,6 +72,9 @@ if (PKG_CONFIG_FOUND)
+     endif ()
+ endif ()
  
++set(_GI_SCANNER_EXE "$ENV{PKG_CONFIG_SYSROOT_DIR}${_GI_SCANNER_EXE}")
++set(_GI_COMPILER_EXE "$ENV{PKG_CONFIG_SYSROOT_DIR}${_GI_COMPILER_EXE}")
++
+ find_program(GI_SCANNER_EXE NAMES ${_GI_SCANNER_EXE} g-ir-scanner)
+ find_program(GI_COMPILER_EXE NAMES ${_GI_COMPILER_EXE} g-ir-compiler)
  
--
- find_package(PkgConfig QUIET)
- if (PKG_CONFIG_FOUND)
-     if (PACKAGE_FIND_VERSION_COUNT GREATER 0)
-@@ -30,6 +29,9 @@ if (PKG_CONFIG_FOUND)
-         pkg_get_variable(INTROSPECTION_GENERATE gobject-introspection-1.0 g_ir_generate)
-         pkg_get_variable(INTROSPECTION_GIRDIR gobject-introspection-1.0 girdir)
-         pkg_get_variable(INTROSPECTION_TYPELIBDIR gobject-introspection-1.0 typelibdir)
-+        set(INTROSPECTION_SCANNER "$ENV{PKG_CONFIG_SYSROOT_DIR}${INTROSPECTION_SCANNER}")
-+        set(INTROSPECTION_COMPILER "$ENV{PKG_CONFIG_SYSROOT_DIR}${INTROSPECTION_COMPILER}")
-+        set(INTROSPECTION_GENERATE "$ENV{PKG_CONFIG_SYSROOT_DIR}${INTROSPECTION_GENERATE}")
-         set(INTROSPECTION_VERSION "${_pc_gir_VERSION}")
-         if (${INTROSPECTION_VERSION} VERSION_GREATER_EQUAL "1.59.1")
-             set(INTROSPECTION_HAVE_SOURCES_TOP_DIRS YES)

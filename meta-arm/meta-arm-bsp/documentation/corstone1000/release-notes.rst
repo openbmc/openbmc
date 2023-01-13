@@ -7,8 +7,21 @@
 Release notes
 #############
 
+
+*************************
+Disclaimer
+*************************
+
+You expressly assume all liabilities and risks relating to your use or operation
+of Your Software and Your Hardware designed or modified using the Arm Tools,
+including without limitation, Your software or Your Hardware designed or
+intended for safety-critical applications. Should Your Software or Your Hardware
+prove defective, you assume the entire cost of all necessary servicing, repair
+or correction.
+
+
 **************************
-Release notes - 2022.11.10
+Release notes - 2022.11.23
 **************************
 
 Known Issues or Limitations
@@ -18,9 +31,12 @@ Known Issues or Limitations
  - Due to the performance uplimit of MPS3 FPGA and FVP, some Linux distros like Fedora Rawhide can not boot on Corstone-1000 (i.e. user may experience timeouts or boot hang).
  - Below SCT FAILURE is a known issues in the FVP:
    UEFI Compliant - Boot from network protocols must be implemented -- FAILURE
+ - Below SCT FAILURE is a known issue when a terminal emulator (in the system where the user connects to serial ports) does not support 80x25 or 80x50 mode:
+   EFI_SIMPLE_TEXT_OUT_PROTOCOL.SetMode - SetMode() with valid mode -- FAILURE
  - Known limitations regarding ACS tests: The behavior after running ACS tests on FVP is not consistent.  Both behaviors are expected and are valid;
    The system might boot till the Linux prompt. Or, the system might wait after finishing the ACS tests.
    In both cases, the system executes the entire test suite and writes the results as stated in the user guide.
+
 
 Platform Support
 -----------------
@@ -152,7 +168,9 @@ Known Issues or Limitations
 
 Support
 -------
-For support email: support-subsystem-iot@arm.com
+For technical support email: support-subsystem-iot@arm.com
+
+For all security issues, contact Arm by email at arm-security@arm.com.
 
 --------------
 

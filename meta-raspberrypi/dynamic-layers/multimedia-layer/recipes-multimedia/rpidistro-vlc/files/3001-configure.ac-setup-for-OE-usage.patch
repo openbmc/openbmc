@@ -1,0 +1,124 @@
+From ddc2ea76058466b45a1acf37bed0d794cd3112a3 Mon Sep 17 00:00:00 2001
+From: Vincent Davis Jr <vince@underview.tech>
+Date: Fri, 9 Dec 2022 19:04:42 -0600
+Subject: [PATCH] configure.ac: setup for OE usage
+
+Upstream-Status: Inappropriate
+
+RPI-Distro repo forks original vlc and applies patches to enable
+raspiberry pi support.
+
+Need to use userland graphics libraries package files as it's best
+to not assume /opt/vc is where all libs and headers are installed per
+distro. Also, needed to include $BCMHOST_MMAL_LIBS variable as
+AC_CHECK_LIB(bcm_host) fails to find `vc_tv_unregister_callback_full`.
+Adding $BCMHOST_MMAL_LIBS uses all libs inside
+bcm_host.pc, mmal.pc, vcsm.pc, openmaxil.pc files when checking
+for `vc_tv_unregister_callback_full` function.
+
+Supposed to change linked version to opengl to GLESv2
+
+Ensure correct package config file is used for:
+* opencv
+* freerdp
+
+Adds Workaround for modules/codec/omxil/omxil_core.h
+   multiple definition of `pf_enable_graphic_buffers'
+   multiple definition of `pf_get_graphic_buffer_usage'
+   multiple definition of `pf_get_hal_format'
+
+Signed-off-by: Vincent Davis Jr <vince@underview.tech>
+---
+ configure.ac | 34 ++++++++++++++++++++++------------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index a72dca0b6..5b8585a26 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -95,6 +95,13 @@ AS_IF([test -n "${with_binary_version}"],[
+          [Binary specific version])
+ ])
+ 
++# Workaround for modules/codec/omxil/omxil_core.h
++#   multiple definition of `pf_enable_graphic_buffers'
++#   multiple definition of `pf_get_graphic_buffer_usage'
++#   multiple definition of `pf_get_hal_format'
++AC_SUBST([AM_CXXFLAGS], [-fcommon])
++AC_SUBST([AM_CFLAGS], [-fcommon])
++
+ dnl Prevent clang from accepting unknown flags with a mere warning
+ AX_APPEND_COMPILE_FLAGS([-Werror=unknown-warning-option -Werror=invalid-command-line-argument], [CFLAGS])
+ AX_APPEND_COMPILE_FLAGS([-Werror=unknown-warning-option -Werror=invalid-command-line-argument], [CXXFLAGS])
+@@ -1900,7 +1907,7 @@ PKG_ENABLE_MODULES_VLC([BLURAY], [libbluray], [libbluray >= 0.6.2], (libbluray f
+ dnl
+ dnl  OpenCV wrapper and example filters
+ dnl
+-PKG_ENABLE_MODULES_VLC([OPENCV], [opencv_example opencv_wrapper], [opencv > 2.0], (OpenCV (computer vision) filter), [auto])
++PKG_ENABLE_MODULES_VLC([OPENCV], [opencv_example opencv_wrapper], [opencv4 >= 2.0], (OpenCV (computer vision) filter), [auto])
+ 
+ 
+ dnl
+@@ -2077,7 +2084,7 @@ PKG_ENABLE_MODULES_VLC([VNC], [vnc], [libvncclient >= 0.9.9], (VNC/rfb client su
+ 
+ dnl  RDP/Remote Desktop access module
+ dnl
+-PKG_ENABLE_MODULES_VLC([FREERDP], [rdp], [freerdp >= 1.0.1], (RDP/Remote Desktop client support) )
++PKG_ENABLE_MODULES_VLC([FREERDP], [rdp], [freerdp2 >= 1.0.1], (RDP/Remote Desktop client support) )
+ 
+ dnl
+ dnl  Real RTSP plugin
+@@ -3089,14 +3096,14 @@ PKG_CHECK_MODULES([GL], [gl], [
+ #ifdef _WIN32
+ # include <GL/glew.h>
+ #endif
+-#include <GL/gl.h>
++#include <GLES2/gl2.h>
+ ]], [
+     [int t0 = GL_TEXTURE0;]])
+   ], [
+     GL_CFLAGS=""
+     have_gl="yes"
+     AS_IF([test "${SYS}" != "mingw32"], [
+-      GL_LIBS="-lGL"
++      GL_LIBS="-lGLESv2"
+     ], [
+       GL_LIBS="-lopengl32"
+     ])
+@@ -3483,15 +3490,14 @@ AC_ARG_ENABLE(mmal_avcodec,
+     [Use MMAL enabled avcodec libs (default disable)]))
+ if test "${enable_mmal}" != "no"; then
+   VLC_SAVE_FLAGS
+-  LDFLAGS="${LDFLAGS} -L/opt/vc/lib -lvchostif"
+-  CPPFLAGS="${CPPFLAGS} -isystem /opt/vc/include -isystem /opt/vc/include/interface/vcos/pthreads -isystem /opt/vc/include/interface/vmcs_host/linux"
+-  AC_CHECK_HEADERS(interface/mmal/mmal.h,
+-    [ AC_CHECK_LIB(bcm_host, vc_tv_unregister_callback_full, [
++  PKG_CHECK_MODULES(BCMHOST_MMAL, [bcm_host mmal vcsm openmaxil egl], [
++    HAVE_MMAL=yes
++    AC_CHECK_HEADERS(interface/mmal/mmal.h,
++      [ AC_CHECK_LIB(bcm_host $BCMHOST_MMAL_LIBS, vc_tv_unregister_callback_full, [
+         have_mmal="yes"
+-        VLC_ADD_PLUGIN([mmal])
+-        VLC_ADD_LDFLAGS([mmal],[ -L/opt/vc/lib ])
+-        VLC_ADD_CFLAGS([mmal],[ -isystem /opt/vc/include -isystem /opt/vc/include/interface/vcos/pthreads -isystem /opt/vc/include/interface/vmcs_host/linux ])
+-        VLC_ADD_LIBS([mmal],[ -lbcm_host -lmmal -lmmal_core -lmmal_components -lmmal_util -lvchostif -lvchiq_arm -lvcsm ]) ], [
++        VLC_ADD_PLUGIN([bcm_host mmal vcsm openmaxil egl])
++        VLC_ADD_CFLAGS([bcm_host mmal vcsm openmaxil egl],[$BCMHOST_MMAL_CFLAGS])
++        VLC_ADD_LIBS([bcm_host mmal vcsm openmaxil egl],[$BCMHOST_MMAL_LIBS -lmmal_components]) ], [
+           AS_IF([test "${enable_mmal}" = "yes"],
+             [ AC_MSG_ERROR([Cannot find bcm library...]) ],
+             [ AC_MSG_WARN([Cannot find bcm library...]) ])
+@@ -3500,6 +3506,10 @@ if test "${enable_mmal}" != "no"; then
+     ] , [ AS_IF([test "${enable_mmal}" = "yes"],
+       [ AC_MSG_ERROR([Cannot find development headers for mmal...]) ],
+       [ AC_MSG_WARN([Cannot find development headers for mmal...]) ]) ])
++  ],:[
++    AC_MSG_WARN([${BCMHOST_PKG_ERRORS}: userland graphics not available.])
++    HAVE_MMAL=NO
++  ])
+   VLC_RESTORE_FLAGS
+ fi
+ AM_CONDITIONAL([HAVE_MMAL], [test "${have_mmal}" = "yes"])
+-- 
+2.38.1
+

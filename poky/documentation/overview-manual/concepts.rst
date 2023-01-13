@@ -34,7 +34,7 @@ itself is of various types:
 
 BitBake knows how to combine multiple data sources together and refers
 to each data source as a layer. For information on layers, see the
-":ref:`dev-manual/common-tasks:understanding and creating layers`"
+":ref:`dev-manual/layers:understanding and creating layers`"
 section of the Yocto Project Development Tasks Manual.
 
 Following are some brief details on these core components. For
@@ -107,8 +107,7 @@ Classes
 -------
 
 Class files (``.bbclass``) contain information that is useful to share
-between recipes files. An example is the
-:ref:`autotools <ref-classes-autotools>` class,
+between recipes files. An example is the :ref:`ref-classes-autotools` class,
 which contains common settings for any application that is built with
 the :wikipedia:`GNU Autotools <GNU_Autotools>`.
 The ":ref:`ref-manual/classes:Classes`" chapter in the Yocto Project
@@ -149,7 +148,7 @@ Conforming to a known structure allows BitBake to make assumptions
 during builds on where to find types of metadata. You can find
 procedures and learn about tools (i.e. ``bitbake-layers``) for creating
 layers suitable for the Yocto Project in the
-":ref:`dev-manual/common-tasks:understanding and creating layers`"
+":ref:`dev-manual/layers:understanding and creating layers`"
 section of the Yocto Project Development Tasks Manual.
 
 OpenEmbedded Build System Concepts
@@ -307,7 +306,7 @@ during the build. By default, the layers listed in this file include
 layers minimally needed by the build system. However, you must manually
 add any custom layers you have created. You can find more information on
 working with the ``bblayers.conf`` file in the
-":ref:`dev-manual/common-tasks:enabling your layer`"
+":ref:`dev-manual/layers:enabling your layer`"
 section in the Yocto Project Development Tasks Manual.
 
 The files ``site.conf`` and ``auto.conf`` are not created by the
@@ -398,7 +397,7 @@ a ``README`` file as good practice and especially if the layer is to be
 distributed, a configuration directory, and recipe directories. You can
 learn about the general structure for layers used with the Yocto Project
 in the
-":ref:`dev-manual/common-tasks:creating your own layer`"
+":ref:`dev-manual/layers:creating your own layer`"
 section in the
 Yocto Project Development Tasks Manual. For a general discussion on
 layers and the many layers from which you can draw, see the
@@ -561,11 +560,11 @@ reside somewhere local to a project --- perhaps a directory into which the
 user checks in items (e.g. a local directory containing a development
 source tree used by the group).
 
-The canonical method through which to include a local project is to use
-the :ref:`externalsrc <ref-classes-externalsrc>`
-class to include that local project. You use either the ``local.conf``
-or a recipe's append file to override or set the recipe to point to the
-local directory on your disk to pull in the whole source tree.
+The canonical method through which to include a local project is to use the
+:ref:`ref-classes-externalsrc` class to include that local project. You use
+either the ``local.conf`` or a recipe's append file to override or set the
+recipe to point to the local directory on your disk to pull in the whole
+source tree.
 
 Source Control Managers (Optional)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -582,8 +581,7 @@ module.
 .. note::
 
    For information on how to have the OpenEmbedded build system generate
-   tarballs for Git repositories and place them in the
-   DL_DIR
+   tarballs for Git repositories and place them in the :term:`DL_DIR`
    directory, see the :term:`BB_GENERATE_MIRROR_TARBALLS`
    variable in the Yocto Project Reference Manual.
 
@@ -629,8 +627,7 @@ types, and you specify which classes to enable through the
 :term:`PACKAGE_CLASSES`
 variable. Before placing the packages into package feeds, the build
 process validates them with generated output quality assurance checks
-through the :ref:`insane <ref-classes-insane>`
-class.
+through the :ref:`ref-classes-insane` class.
 
 The package feed area resides in the :term:`Build Directory`. The directory the
 build system uses to temporarily store packages is determined by a
@@ -798,7 +795,7 @@ For more information on how the source directories are created, see the
 ":ref:`overview-manual/concepts:source fetching`" section. For
 more information on how to create patches and how the build system
 processes patches, see the
-":ref:`dev-manual/common-tasks:patching code`"
+":ref:`dev-manual/new-recipe:patching code`"
 section in the
 Yocto Project Development Tasks Manual. You can also see the
 ":ref:`sdk-manual/extensible:use \`\`devtool modify\`\` to modify the source of an existing component`"
@@ -841,14 +838,12 @@ This step in the build process consists of the following tasks:
    are specific to configurations for the source code being built by the
    recipe.
 
-   If you are using the
-   :ref:`autotools <ref-classes-autotools>` class,
+   If you are using the :ref:`ref-classes-autotools` class,
    you can add additional configuration options by using the
    :term:`EXTRA_OECONF` or
    :term:`PACKAGECONFIG_CONFARGS`
    variables. For information on how this variable works within that
-   class, see the
-   :ref:`autotools <ref-classes-autotools>` class
+   class, see the :ref:`ref-classes-autotools` class
    :yocto_git:`here </poky/tree/meta/classes-recipe/autotools.bbclass>`.
 
 -  *do_compile*: Once a configuration task has been satisfied,
@@ -921,7 +916,7 @@ the analysis and package splitting process use several areas:
 -  :term:`STAGING_DIR_TARGET`:
    The path for the sysroot used when a component that is built to
    execute on a system and it generates code for yet another machine
-   (e.g. cross-canadian recipes).
+   (e.g. :ref:`ref-classes-cross-canadian` recipes).
 
 The :term:`FILES` variable defines the
 files that go into each package in
@@ -999,7 +994,7 @@ stage of package installation, post installation scripts that are part
 of the packages are run. Any scripts that fail to run on the build host
 are run on the target when the target system is first booted. If you are
 using a
-:ref:`read-only root filesystem <dev-manual/common-tasks:creating a read-only root filesystem>`,
+:ref:`read-only root filesystem <dev-manual/read-only-rootfs:creating a read-only root filesystem>`,
 all the post installation scripts must succeed on the build host during
 the package installation phase since the root filesystem on the target
 is read-only.
@@ -1007,13 +1002,11 @@ is read-only.
 The final stages of the :ref:`ref-tasks-rootfs` task handle post processing. Post
 processing includes creation of a manifest file and optimizations.
 
-The manifest file (``.manifest``) resides in the same directory as the
-root filesystem image. This file lists out, line-by-line, the installed
-packages. The manifest file is useful for the
-:ref:`testimage <ref-classes-testimage>` class,
+The manifest file (``.manifest``) resides in the same directory as the root
+filesystem image. This file lists out, line-by-line, the installed packages.
+The manifest file is useful for the :ref:`ref-classes-testimage` class,
 for example, to determine whether or not to run specific tests. See the
-:term:`IMAGE_MANIFEST`
-variable for additional information.
+:term:`IMAGE_MANIFEST` variable for additional information.
 
 Optimizing processes that are run across the image include ``mklibs``
 and any other post-processing commands as defined by the
@@ -1122,8 +1115,7 @@ checksum <overview-manual/concepts:checksums (signatures)>`.
 
 .. note::
 
-   This naming scheme assumes that
-   BB_SIGNATURE_HANDLER
+   This naming scheme assumes that :term:`BB_SIGNATURE_HANDLER`
    is "OEBasicHash", which is almost always the case in current
    OpenEmbedded.
 
@@ -1158,7 +1150,7 @@ varflag. If some other task depends on such a task, then that task will
 also always be considered out of date, which might not be what you want.
 
 For details on how to view information about a task's signature, see the
-":ref:`dev-manual/common-tasks:viewing task variable dependencies`"
+":ref:`dev-manual/debugging:viewing task variable dependencies`"
 section in the Yocto Project Development Tasks Manual.
 
 Setscene Tasks and Shared State
@@ -1583,15 +1575,15 @@ them if they are deemed to be valid.
       the shared state packages. Consequently, there are considerations that
       affect maintaining shared state feeds. For information on how the
       build system works with packages and can track incrementing :term:`PR`
-      information, see the ":ref:`dev-manual/common-tasks:automatically incrementing a package version number`"
+      information, see the ":ref:`dev-manual/packages:automatically incrementing a package version number`"
       section in the Yocto Project Development Tasks Manual.
 
    -  The code in the build system that supports incremental builds is
       complex. For techniques that help you work around issues
       related to shared state code, see the
-      ":ref:`dev-manual/common-tasks:viewing metadata used to create the input signature of a shared state task`"
+      ":ref:`dev-manual/debugging:viewing metadata used to create the input signature of a shared state task`"
       and
-      ":ref:`dev-manual/common-tasks:invalidating shared state to force a task to run`"
+      ":ref:`dev-manual/debugging:invalidating shared state to force a task to run`"
       sections both in the Yocto Project Development Tasks Manual.
 
 The rest of this section goes into detail about the overall incremental
@@ -1753,12 +1745,11 @@ half the problem of supporting a shared state. The other half of the
 problem is being able to use checksum information during the build and
 being able to reuse or rebuild specific components.
 
-The :ref:`sstate <ref-classes-sstate>` class is a
-relatively generic implementation of how to "capture" a snapshot of a
-given task. The idea is that the build process does not care about the
-source of a task's output. Output could be freshly built or it could be
-downloaded and unpacked from somewhere. In other words, the build
-process does not need to worry about its origin.
+The :ref:`ref-classes-sstate` class is a relatively generic implementation of
+how to "capture" a snapshot of a given task. The idea is that the build process
+does not care about the source of a task's output. Output could be freshly
+built or it could be downloaded and unpacked from somewhere. In other words,
+the build process does not need to worry about its origin.
 
 Two types of output exist. One type is just about creating a directory
 in :term:`WORKDIR`. A good example is
@@ -1769,10 +1760,9 @@ type of output occurs when a set of data is merged into a shared
 directory tree such as the sysroot.
 
 The Yocto Project team has tried to keep the details of the
-implementation hidden in the :ref:`sstate <ref-classes-sstate>` class. From a user's perspective,
+implementation hidden in the :ref:`ref-classes-sstate` class. From a user's perspective,
 adding shared state wrapping to a task is as simple as this
-:ref:`ref-tasks-deploy` example taken
-from the :ref:`deploy <ref-classes-deploy>` class::
+:ref:`ref-tasks-deploy` example taken from the :ref:`ref-classes-deploy` class::
 
    DEPLOYDIR = "${WORKDIR}/deploy-${PN}"
    SSTATETASKS += "do_deploy"
@@ -1788,11 +1778,9 @@ from the :ref:`deploy <ref-classes-deploy>` class::
 
 The following list explains the previous example:
 
--  Adding ``do_deploy`` to ``SSTATETASKS`` adds some required
-   sstate-related processing, which is implemented in the
-   :ref:`sstate <ref-classes-sstate>` class, to
-   before and after the
-   :ref:`ref-tasks-deploy` task.
+-  Adding ``do_deploy`` to ``SSTATETASKS`` adds some required sstate-related
+   processing, which is implemented in the :ref:`ref-classes-sstate` class, to
+   before and after the :ref:`ref-tasks-deploy` task.
 
 -  The ``do_deploy[sstate-inputdirs] = "${DEPLOYDIR}"`` declares that
    :ref:`ref-tasks-deploy` places its output in ``${DEPLOYDIR}`` when run normally

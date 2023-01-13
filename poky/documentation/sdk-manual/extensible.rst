@@ -47,7 +47,7 @@ Two ways to install the Extensible SDK
 Extensible SDK can be installed in two different ways, and both have
 their own pros and cons:
 
-1. *Setting up the Extensible SDK environment directly in a Yocto build*. This
+#. *Setting up the Extensible SDK environment directly in a Yocto build*. This
 avoids having to produce, test, distribute and maintain separate SDK installer
 archives, which can get very large. There is only one environment for the regular
 Yocto build and the SDK and less code paths where things can go not according to plan.
@@ -56,7 +56,7 @@ git fetch or layer management tooling. The SDK extensibility is better than in t
 second option: just run ``bitbake`` again to add more things to the sysroot, or add layers
 if even more things are required.
 
-2. *Setting up the Extensible SDK from a standalone installer*. This has the benefit of
+#. *Setting up the Extensible SDK from a standalone installer*. This has the benefit of
 having a single, self-contained archive that includes all the needed binary artifacts.
 So nothing needs to be rebuilt, and there is no need to provide a well-functioning
 binary artefact cache over the network for developers with underpowered laptops.
@@ -64,10 +64,10 @@ binary artefact cache over the network for developers with underpowered laptops.
 Setting up the Extensible SDK environment directly in a Yocto build
 -------------------------------------------------------------------
 
-1. Set up all the needed layers and a Yocto :term:`Build Directory`, e.g. a regular Yocto
+#. Set up all the needed layers and a Yocto :term:`Build Directory`, e.g. a regular Yocto
    build where ``bitbake`` can be executed.
 
-2. Run:
+#. Run:
     $ bitbake meta-ide-support
     $ bitbake -c populate_sysroot gtk+3
     (or any other target or native item that the application developer would need)
@@ -138,16 +138,7 @@ must be writable for whichever users need to use the SDK.
 The following command shows how to run the installer given a toolchain
 tarball for a 64-bit x86 development host system and a 64-bit x86 target
 architecture. The example assumes the SDK installer is located in
-``~/Downloads/`` and has execution rights.
-
-.. note::
-
-   If you do not have write permissions for the directory into which you
-   are installing the SDK, the installer notifies you and exits. For
-   that case, set up the proper permissions in the directory and run the
-   installer again.
-
-::
+``~/Downloads/`` and has execution rights::
 
    $ ./Downloads/poky-glibc-x86_64-core-image-minimal-core2-64-toolchain-ext-2.5.sh
    Poky (Yocto Project Reference Distro) Extensible SDK installer version 2.5
@@ -167,6 +158,13 @@ architecture. The example assumes the SDK installer is located in
    SDK has been successfully set up and is ready to be used.
    Each time you wish to use the SDK in a new shell session, you need to source the environment setup script e.g.
     $ . /home/scottrif/poky_sdk/environment-setup-core2-64-poky-linux
+
+.. note::
+
+   If you do not have write permissions for the directory into which you
+   are installing the SDK, the installer notifies you and exits. For
+   that case, set up the proper permissions in the directory and run the
+   installer again.
 
 Running the Extensible SDK Environment Setup Script
 ===================================================
@@ -281,7 +279,7 @@ command:
 .. image:: figures/sdk-devtool-add-flow.png
    :width: 100%
 
-1. *Generating the New Recipe*: The top part of the flow shows three
+#. *Generating the New Recipe*: The top part of the flow shows three
    scenarios by which you could use ``devtool add`` to generate a recipe
    based on existing source code.
 
@@ -354,7 +352,7 @@ command:
       Aside from a recipe folder, the command also creates an associated
       append folder and places an initial ``*.bbappend`` file within.
 
-2. *Edit the Recipe*: You can use ``devtool edit-recipe`` to open up the
+#. *Edit the Recipe*: You can use ``devtool edit-recipe`` to open up the
    editor as defined by the ``$EDITOR`` environment variable and modify
    the file::
 
@@ -364,7 +362,7 @@ command:
    can make modifications to the recipe that take effect when you build
    it later.
 
-3. *Build the Recipe or Rebuild the Image*: The next step you take
+#. *Build the Recipe or Rebuild the Image*: The next step you take
    depends on what you are going to do with the new code.
 
    If you need to eventually move the build output to the target
@@ -380,7 +378,7 @@ command:
 
       $ devtool build-image image
 
-4. *Deploy the Build Output*: When you use the ``devtool build`` command
+#. *Deploy the Build Output*: When you use the ``devtool build`` command
    to build out your recipe, you probably want to see if the resulting
    build output works as expected on the target hardware.
 
@@ -402,12 +400,11 @@ command:
    ``devtool`` does not provide a specific command that allows you to
    deploy the image to actual hardware.
 
-5. *Finish Your Work With the Recipe*: The ``devtool finish`` command
+#. *Finish Your Work With the Recipe*: The ``devtool finish`` command
    creates any patches corresponding to commits in the local Git
    repository, moves the new recipe to a more permanent layer, and then
    resets the recipe so that the recipe is built normally rather than
-   from the workspace.
-   ::
+   from the workspace::
 
       $ devtool finish recipe layer
 
@@ -449,7 +446,7 @@ command:
 .. image:: figures/sdk-devtool-modify-flow.png
    :width: 100%
 
-1. *Preparing to Modify the Code*: The top part of the flow shows three
+#. *Preparing to Modify the Code*: The top part of the flow shows three
    scenarios by which you could use ``devtool modify`` to prepare to
    work on source files. Each scenario assumes the following:
 
@@ -558,11 +555,11 @@ command:
       append file for the recipe in the ``devtool`` workspace. The
       recipe and the source code remain in their original locations.
 
-2. *Edit the Source*: Once you have used the ``devtool modify`` command,
+#. *Edit the Source*: Once you have used the ``devtool modify`` command,
    you are free to make changes to the source files. You can use any
    editor you like to make and save your source code modifications.
 
-3. *Build the Recipe or Rebuild the Image*: The next step you take
+#. *Build the Recipe or Rebuild the Image*: The next step you take
    depends on what you are going to do with the new code.
 
    If you need to eventually move the build output to the target
@@ -575,7 +572,7 @@ command:
    (e.g. for testing purposes), you can use the ``devtool build-image``
    command: $ devtool build-image image
 
-4. *Deploy the Build Output*: When you use the ``devtool build`` command
+#. *Deploy the Build Output*: When you use the ``devtool build`` command
    to build out your recipe, you probably want to see if the resulting
    build output works as expected on target hardware.
 
@@ -600,13 +597,12 @@ command:
    ``devtool`` does not provide a specific command to deploy the image
    to actual hardware.
 
-5. *Finish Your Work With the Recipe*: The ``devtool finish`` command
+#. *Finish Your Work With the Recipe*: The ``devtool finish`` command
    creates any patches corresponding to commits in the local Git
    repository, updates the recipe to point to them (or creates a
    ``.bbappend`` file to do so, depending on the specified destination
    layer), and then resets the recipe so that the recipe is built
-   normally rather than from the workspace.
-   ::
+   normally rather than from the workspace::
 
       $ devtool finish recipe layer
 
@@ -652,7 +648,7 @@ counterparts.
    ``devtool upgrade``
    happens to be one. You can read about all the methods by which you
    can upgrade recipes in the
-   :ref:`dev-manual/common-tasks:upgrading recipes` section
+   :ref:`dev-manual/upgrading-recipes:upgrading recipes` section
    of the Yocto Project Development Tasks Manual.
 
 The ``devtool upgrade`` command is flexible enough to allow you to
@@ -668,7 +664,7 @@ The following diagram shows the common development flow used with the
 .. image:: figures/sdk-devtool-upgrade-flow.png
    :width: 100%
 
-1. *Initiate the Upgrade*: The top part of the flow shows the typical
+#. *Initiate the Upgrade*: The top part of the flow shows the typical
    scenario by which you use the ``devtool upgrade`` command. The
    following conditions exist:
 
@@ -720,7 +716,7 @@ The following diagram shows the common development flow used with the
    are incorporated into the build the next time you build the software
    just as are other changes you might have made to the source.
 
-2. *Resolve any Conflicts created by the Upgrade*: Conflicts could happen
+#. *Resolve any Conflicts created by the Upgrade*: Conflicts could happen
    after upgrading the software to a new version. Conflicts occur
    if your recipe specifies some patch files in :term:`SRC_URI` that
    conflict with changes made in the new version of the software. For
@@ -731,7 +727,7 @@ The following diagram shows the common development flow used with the
    conflicts created through use of a newer or different version of the
    software.
 
-3. *Build the Recipe or Rebuild the Image*: The next step you take
+#. *Build the Recipe or Rebuild the Image*: The next step you take
    depends on what you are going to do with the new code.
 
    If you need to eventually move the build output to the target
@@ -746,7 +742,7 @@ The following diagram shows the common development flow used with the
 
       $ devtool build-image image
 
-4. *Deploy the Build Output*: When you use the ``devtool build`` command
+#. *Deploy the Build Output*: When you use the ``devtool build`` command
    or ``bitbake`` to build your recipe, you probably want to see if the
    resulting build output works as expected on target hardware.
 
@@ -768,7 +764,7 @@ The following diagram shows the common development flow used with the
    ``devtool`` does not provide a specific command that allows you to do
    this.
 
-5. *Finish Your Work With the Recipe*: The ``devtool finish`` command
+#. *Finish Your Work With the Recipe*: The ``devtool finish`` command
    creates any patches corresponding to commits in the local Git
    repository, moves the new recipe to a more permanent layer, and then
    resets the recipe so that the recipe is built normally rather than
@@ -780,8 +776,7 @@ The following diagram shows the common development flow used with the
 
    If you specify a destination layer that is the same as the original
    source, then the old version of the recipe and associated files are
-   removed prior to adding the new version.
-   ::
+   removed prior to adding the new version::
 
       $ devtool finish recipe layer
 
@@ -1059,17 +1054,17 @@ Working With Recipes
 When building a recipe using the ``devtool build`` command, the typical
 build progresses as follows:
 
-1. Fetch the source
+#. Fetch the source
 
-2. Unpack the source
+#. Unpack the source
 
-3. Configure the source
+#. Configure the source
 
-4. Compile the source
+#. Compile the source
 
-5. Install the build output
+#. Install the build output
 
-6. Package the installed output
+#. Package the installed output
 
 For recipes in the workspace, fetching and unpacking is disabled as the
 source tree has already been prepared and is persistent. Each of these
@@ -1084,9 +1079,8 @@ does not include complete instructions for building the software.
 Instead, common functionality is encapsulated in classes inherited with
 the ``inherit`` directive. This technique leaves the recipe to describe
 just the things that are specific to the software being built. There is
-a :ref:`base <ref-classes-base>` class that
-is implicitly inherited by all recipes and provides the functionality
-that most recipes typically need.
+a :ref:`ref-classes-base` class that is implicitly inherited by all recipes
+and provides the functionality that most recipes typically need.
 
 The remainder of this section presents information useful when working
 with recipes.
@@ -1114,7 +1108,7 @@ links created within the source tree:
    -  ``sysroot-destdir/``: Contains a subset of files installed within
       :ref:`ref-tasks-install` that have been put into the shared sysroot. For
       more information, see the
-      ":ref:`dev-manual/common-tasks:sharing files between recipes`" section.
+      ":ref:`dev-manual/new-recipe:sharing files between recipes`" section.
 
    -  ``packages-split/``: Contains subdirectories for each package
       produced by the recipe. For more information, see the
@@ -1327,15 +1321,15 @@ those customers need an SDK that has custom libraries. In such a case,
 you can produce a derivative SDK based on the currently installed SDK
 fairly easily by following these steps:
 
-1. If necessary, install an extensible SDK that you want to use as a
+#. If necessary, install an extensible SDK that you want to use as a
    base for your derivative SDK.
 
-2. Source the environment script for the SDK.
+#. Source the environment script for the SDK.
 
-3. Add the extra libraries or other components you want by using the
+#. Add the extra libraries or other components you want by using the
    ``devtool add`` command.
 
-4. Run the ``devtool build-sdk`` command.
+#. Run the ``devtool build-sdk`` command.
 
 The previous steps take the recipes added to the workspace and construct
 a new SDK installer that contains those recipes and the resulting binary

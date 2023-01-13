@@ -1,4 +1,4 @@
-From 63a803ead3656353329a801846a9a3beb7210c46 Mon Sep 17 00:00:00 2001
+From 451a9b9c3874872d575693fc7733fae02690a7d3 Mon Sep 17 00:00:00 2001
 From: Edwin Plauchu <edwin.plauchu.camacho@intel.com>
 Date: Tue, 29 Nov 2016 13:43:24 -0600
 Subject: [PATCH] dont-depend-on-help2man
@@ -14,18 +14,18 @@ Signed-off-by: Edwin Plauchu <edwin.plauchu.camacho@intel.com>
  2 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/doc/Makefile.am b/doc/Makefile.am
-index 732833e..041cb9b 100644
+index 407a38c..6b5ff3e 100644
 --- a/doc/Makefile.am
 +++ b/doc/Makefile.am
-@@ -37,7 +37,7 @@ refcard_files = refcard/Makefile refcard/txicmdcheck \
+@@ -55,7 +55,7 @@ refcard_files = refcard/Makefile refcard/txicmdcheck \
  # Include our texinfo.tex, not Automake's.
  EXTRA_DIST = epsf.tex texinfo.tex \
               fdl.texi \
 -	     $(man_MANS) $(TXI_XLATE) \
 +	     $(TXI_XLATE) \
               $(refcard_files) \
+              gendocs.chapter/gendocs_template \
  	     texinfo-tex-test.texi texinfo-tex-test.WIDOWs \
-              texinfo-ja.tex short-sample-ja.texi
 diff --git a/man/Makefile.am b/man/Makefile.am
 index d0cd72c..a19e52a 100644
 --- a/man/Makefile.am

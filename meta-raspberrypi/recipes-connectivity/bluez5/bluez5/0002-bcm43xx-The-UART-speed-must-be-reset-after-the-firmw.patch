@@ -1,17 +1,18 @@
-From e145c9621f976063e5c573db1f2053d906f63427 Mon Sep 17 00:00:00 2001
+From 96e5e5eef04c6c4ae83d4d822a536cfa87605ae2 Mon Sep 17 00:00:00 2001
 From: Phil Elwell <phil@raspberrypi.org>
 Date: Tue, 16 Feb 2016 16:39:09 +0000
-Subject: [PATCH 2/4] bcm43xx: The UART speed must be reset after the firmware download
+Subject: [PATCH] bcm43xx: The UART speed must be reset after the firmware
+ download
 
 ---
  tools/hciattach_bcm43xx.c | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/tools/hciattach_bcm43xx.c b/tools/hciattach_bcm43xx.c
-index 81f38cb..0b792e0 100644
+index b89fc1b50..de01a6aea 100644
 --- a/tools/hciattach_bcm43xx.c
 +++ b/tools/hciattach_bcm43xx.c
-@@ -366,11 +366,8 @@ int bcm43xx_init(int fd, int def_speed, int speed, struct termios *ti,
+@@ -350,11 +350,8 @@ int bcm43xx_init(int fd, int def_speed, int speed, struct termios *ti,
  		return -1;
  
  	if (bcm43xx_locate_patch(FIRMWARE_DIR, chip_name, fw_path)) {
@@ -24,7 +25,7 @@ index 81f38cb..0b792e0 100644
  		if (bcm43xx_load_firmware(fd, fw_path))
  			return -1;
  
-@@ -380,6 +377,7 @@ int bcm43xx_init(int fd, int def_speed, int speed, struct termios *ti,
+@@ -364,6 +361,7 @@ int bcm43xx_init(int fd, int def_speed, int speed, struct termios *ti,
  			return -1;
  		}
  
@@ -32,6 +33,3 @@ index 81f38cb..0b792e0 100644
  		if (bcm43xx_reset(fd))
  			return -1;
  	}
--- 
-1.9.1
-

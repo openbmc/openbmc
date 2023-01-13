@@ -1,0 +1,26 @@
+From 3a1ab02d821cd4b0af44c0dad87e290ebaabef83 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Wed, 14 Dec 2022 06:50:40 +0100
+Subject: [PATCH] flatpak.pc: add pc_sysrootdir
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 4a0b865e..5f69b1d9 100644
+--- a/meson.build
++++ b/meson.build
+@@ -509,7 +509,7 @@ pkgconfig_variables += 'exec_prefix=${prefix}'
+ pkgconfig_variables += 'datadir=' + ('${prefix}' / get_option('datadir'))
+ 
+ pkgconfig_variables += 'datarootdir=' + ('${prefix}' / get_option('datadir'))
+-pkgconfig_variables += 'interfaces_dir=${datadir}/dbus-1/interfaces/'
++pkgconfig_variables += 'interfaces_dir=${pc_sysrootdir}${datadir}/dbus-1/interfaces/'
+ pkgconfig_variables += 'httpbackend=' + get_option('http_backend')
+ 
+ pkgconfig.generate(
+-- 
+2.34.1
+

@@ -2,7 +2,10 @@ From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 Date: Tue, 19 Jan 2021 20:35:29 +0100
 Subject: Fix build on powerpc and ppc64
 
-Upstream-status: Pending
+Upstream-Status: Inappropriate
+
+RPI-Distro repo clones original ffmpeg and applies patches to enable
+raspiberry pi support.
 
 ---
  libswscale/ppc/yuv2rgb_altivec.c | 10 ++++++++++
@@ -15,7 +18,7 @@ index 5365452..930ef6b 100644
 @@ -283,6 +283,16 @@ static inline void cvtyuvtoRGB(SwsContext *c, vector signed short Y,
   * ------------------------------------------------------------------------------
   */
-
+ 
 +#if !HAVE_VSX
 +static inline vector unsigned char vec_xl(signed long long offset, const ubyte *addr)
 +{

@@ -70,6 +70,13 @@ class ConsolePortParser:
                 pass
 
 
+# This function is backported from Python 3.8. Remove it and replace call sites
+# with shlex.join once OE-core support for earlier Python versions is dropped.
+def shlex_join(split_command):
+    """Return a shell-escaped string from *split_command*."""
+    return ' '.join(shlex.quote(arg) for arg in split_command)
+
+
 class FVPRunner:
     def __init__(self, logger):
         self._logger = logger
@@ -88,7 +95,7 @@ class FVPRunner:
             if name in os.environ:
                 env[name] = os.environ[name]
 
-        self._logger.debug(f"Constructed FVP call: {shlex.join(cli)}")
+        self._logger.debug(f"Constructed FVP call: {shlex_join(cli)}")
         self._fvp_process = subprocess.Popen(
             cli,
             stdin=subprocess.DEVNULL, stdout=stdout, stderr=subprocess.STDOUT,

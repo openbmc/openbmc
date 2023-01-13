@@ -1,0 +1,37 @@
+From 1a8aaa8ff7f4aca68b5ae964458e49ab16b4315f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 14 Dec 2022 20:56:44 -0800
+Subject: [PATCH] ext2fs: Use 64bit lseek when _FILE_OFFSET_BITS is 64
+
+Use lseek() with 64bit off_t when _FILE_OFFSET_BITS is 64
+this fixes build with musl where there is no _llseek but lseek
+is using off_t which is 64bit on musl
+
+Upstream-Status: Submitted [https://github.com/tytso/e2fsprogs/pull/129]
+Signe-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/ext2fs/llseek.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/ext2fs/llseek.c b/lib/ext2fs/llseek.c
+index 922a0d56..45f21d09 100644
+--- a/lib/ext2fs/llseek.c
++++ b/lib/ext2fs/llseek.c
+@@ -51,7 +51,7 @@ extern long long llseek (int fd, long long offset, int origin);
+ 
+ #else	/* ! HAVE_LLSEEK */
+ 
+-#if SIZEOF_LONG == SIZEOF_LONG_LONG
++#if SIZEOF_LONG == SIZEOF_LONG_LONG || _FILE_OFFSET_BITS+0 == 64
+ 
+ #define my_llseek lseek
+ 
+@@ -69,7 +69,7 @@ static int _llseek (unsigned int, unsigned long,
+ 
+ static _syscall5(int,_llseek,unsigned int,fd,unsigned long,offset_high,
+ 		 unsigned long, offset_low,ext2_loff_t *,result,
+-		 unsigned int, origin)
++		 unsigned int, origin);
+ #endif
+ 
+ static ext2_loff_t my_llseek (int fd, ext2_loff_t offset, int origin)

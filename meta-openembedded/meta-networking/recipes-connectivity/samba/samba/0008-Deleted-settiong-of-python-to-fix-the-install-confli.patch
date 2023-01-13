@@ -1,0 +1,123 @@
+From f783bb9c87ce11e824dfefca473d0dcf6edad238 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@fujitsu.com>
+Date: Sun, 30 Oct 2022 11:59:31 +0900
+Subject: [PATCH] Deleted settiong of python to fix the install conflict error
+ when enable multilib.
+
+  file /usr/bin/samba-tool conflicts between attempted installs of samba-4.14.14-r0.core2_64 and lib32-samba-4.14.14-r0.i686
+  file /usr/sbin/samba-gpupdate conflicts between attempted installs of samba-4.14.14-r0.core2_64 and lib32-samba-4.14.14-r0.i686
+  file /usr/sbin/samba_dnsupdate conflicts between attempted installs of samba-4.14.14-r0.core2_64 and lib32-samba-4.14.14-r0.i686
+  file /usr/sbin/samba_downgrade_db conflicts between attempted installs of samba-4.14.14-r0.core2_64 and lib32-samba-4.14.14-r0.i686
+  file /usr/sbin/samba_kcc conflicts between attempted installs of samba-4.14.14-r0.core2_64 and lib32-samba-4.14.14-r0.i686
+  file /usr/sbin/samba_spnupdate conflicts between attempted installs of samba-4.14.14-r0.core2_64 and lib32-samba-4.14.14-r0.i686
+  file /usr/sbin/samba_upgradedns conflicts between attempted installs of samba-4.14.14-r0.core2_64 and lib32-samba-4.14.14-r0.i686
+
+The conflict is because there is a  difference between of lib32-samba-* and samba-* as the following:
+64bit:
+sys.path.insert(0, "/usr/lib64/python3.10/site-packages")
+
+32bit:
+sys.path.insert(0, "/usr/lib/python3.10/site-packages")
+
+But this setting is for environment when running from source tree. There
+is no necessary on target.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Lei Maohui <leimaohui@fujitsu.com>
+---
+ source4/scripting/bin/samba-gpupdate     | 1 -
+ source4/scripting/bin/samba-tool         | 1 -
+ source4/scripting/bin/samba_dnsupdate    | 1 -
+ source4/scripting/bin/samba_downgrade_db | 1 -
+ source4/scripting/bin/samba_kcc          | 1 -
+ source4/scripting/bin/samba_spnupdate    | 1 -
+ source4/scripting/bin/samba_upgradedns   | 1 -
+ 7 files changed, 7 deletions(-)
+
+diff --git a/source4/scripting/bin/samba-gpupdate b/source4/scripting/bin/samba-gpupdate
+index 4b3f057..08fec2d 100755
+--- a/source4/scripting/bin/samba-gpupdate
++++ b/source4/scripting/bin/samba-gpupdate
+@@ -25,7 +25,6 @@ applied, have changed, or is in the right container'''
+ import os
+ import sys
+ 
+-sys.path.insert(0, "bin/python")
+ 
+ import optparse
+ from samba import getopt as options
+diff --git a/source4/scripting/bin/samba-tool b/source4/scripting/bin/samba-tool
+index f8a70a6..3c818de 100755
+--- a/source4/scripting/bin/samba-tool
++++ b/source4/scripting/bin/samba-tool
+@@ -22,7 +22,6 @@
+ import sys
+ 
+ # Find right direction when running from source tree
+-sys.path.insert(0, "bin/python")
+ 
+ # make sure the script dies immediately when hitting control-C,
+ # rather than raising KeyboardInterrupt. As we do all database
+diff --git a/source4/scripting/bin/samba_dnsupdate b/source4/scripting/bin/samba_dnsupdate
+index 1ce53f5..2cdfbf8 100755
+--- a/source4/scripting/bin/samba_dnsupdate
++++ b/source4/scripting/bin/samba_dnsupdate
+@@ -36,7 +36,6 @@ os.environ['PYTHONUNBUFFERED'] = '1'
+ os.environ["TZ"] = "GMT"
+ 
+ # Find right directory when running from source tree
+-sys.path.insert(0, "bin/python")
+ 
+ import samba
+ import optparse
+diff --git a/source4/scripting/bin/samba_downgrade_db b/source4/scripting/bin/samba_downgrade_db
+index b9a0909..80f581e 100755
+--- a/source4/scripting/bin/samba_downgrade_db
++++ b/source4/scripting/bin/samba_downgrade_db
+@@ -23,7 +23,6 @@ import optparse
+ import sys
+ 
+ # Find right directory when running from source tree
+-sys.path.insert(0, "bin/python")
+ 
+ 
+ import samba
+diff --git a/source4/scripting/bin/samba_kcc b/source4/scripting/bin/samba_kcc
+index 67d801e..2fc0d6a 100755
+--- a/source4/scripting/bin/samba_kcc
++++ b/source4/scripting/bin/samba_kcc
+@@ -36,7 +36,6 @@ os.environ['PYTHONUNBUFFERED'] = '1'
+ os.environ["TZ"] = "GMT"
+ 
+ # Find right directory when running from source tree
+-sys.path.insert(0, "bin/python")
+ 
+ import optparse
+ import time
+diff --git a/source4/scripting/bin/samba_spnupdate b/source4/scripting/bin/samba_spnupdate
+index 84ff771..b6fe041 100755
+--- a/source4/scripting/bin/samba_spnupdate
++++ b/source4/scripting/bin/samba_spnupdate
+@@ -32,7 +32,6 @@ os.environ['PYTHONUNBUFFERED'] = '1'
+ os.environ["TZ"] = "GMT"
+ 
+ # Find right directory when running from source tree
+-sys.path.insert(0, "bin/python")
+ 
+ import samba, ldb
+ import optparse
+diff --git a/source4/scripting/bin/samba_upgradedns b/source4/scripting/bin/samba_upgradedns
+index afc5807..727a3cc 100755
+--- a/source4/scripting/bin/samba_upgradedns
++++ b/source4/scripting/bin/samba_upgradedns
+@@ -27,7 +27,6 @@ import grp
+ from base64 import b64encode
+ import shlex
+ 
+-sys.path.insert(0, "bin/python")
+ 
+ import ldb
+ import samba
+-- 
+2.25.1
+

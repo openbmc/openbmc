@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 Release 3.3 (hardknott)
 =======================
 
@@ -12,7 +14,7 @@ Minimum system requirements
 
 You will now need at least Python 3.6 installed on your build host. Most recent
 distributions provide this, but should you be building on a distribution that
-does not have it, you can use the ``buildtools-tarball`` (easily installable
+does not have it, you can use the :term:`buildtools` tarball (easily installable
 using ``scripts/install-buildtools``) --- see
 :ref:`ref-manual/system-requirements:required git, tar, python, make and gcc versions`
 for details.
@@ -61,13 +63,15 @@ need to update those.
 New ``python3targetconfig`` class
 ---------------------------------
 
-A new :ref:`python3targetconfig <ref-classes-python3targetconfig>` class has been
-created for situations where you would previously have inherited the
-:ref:`python3native <ref-classes-python3native>` class but need access to target configuration data (such as
-correct installation directories). Recipes where this situation applies should
-be changed to inherit ``python3targetconfig`` instead of ``python3native``. This
-also adds a dependency on target ``python3``, so it should only be used where
-appropriate in order to avoid unnecessarily lengthening builds.
+A new :ref:`ref-classes-python3targetconfig` class has
+been created for situations where you would previously have inherited the
+:ref:`ref-classes-python3native` class but need access to
+target configuration data (such as correct installation directories). Recipes
+where this situation applies should be changed to inherit
+:ref:`ref-classes-python3targetconfig` instead of
+:ref:`ref-classes-python3native`. This also adds a dependency
+on target ``python3``, so it should only be used where appropriate in order to
+avoid unnecessarily lengthening builds.
 
 Some example recipes where this change has been made: ``gpgme``, ``libcap-ng``,
 ``python3-pycairo``.
@@ -95,11 +99,10 @@ variable so that recipes can specify it explicitly, for example::
    S = "${WORKDIR}/git"
    DISTUTILS_SETUP_PATH = "${S}/python/pythonmodule"
 
-Recipes that inherit from ``distutils3`` (or
-:ref:`setuptools3 <ref-classes-setuptools3>` which itself inherits
-``distutils3``) that also set :term:`S` to
-point to a Python module within a subdirectory in the aforementioned
-manner should be changed to set ``DISTUTILS_SETUP_PATH`` instead.
+Recipes that inherit from ``distutils3`` (or :ref:`ref-classes-setuptools3`
+which itself inherits ``distutils3``) that also set :term:`S` to point to a
+Python module within a subdirectory in the aforementioned manner should be
+changed to set ``DISTUTILS_SETUP_PATH`` instead.
 
 
 .. _migration-3.3-bitbake:

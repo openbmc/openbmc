@@ -13,11 +13,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/shared/mkdir-label.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/src/shared/mkdir-label.c b/src/shared/mkdir-label.c
-index 5b1ac5d1e0..fa5802b894 100644
 --- a/src/shared/mkdir-label.c
 +++ b/src/shared/mkdir-label.c
-@@ -6,6 +6,7 @@
+@@ -7,6 +7,7 @@
  #include "selinux-util.h"
  #include "smack-util.h"
  #include "user-util.h"

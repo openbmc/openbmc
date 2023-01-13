@@ -15,8 +15,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  adb/sysdeps.h                | 12 ++++++------
  4 files changed, 20 insertions(+), 14 deletions(-)
 
-diff --git a/adb/adb.h b/adb/adb.h
-index 44e5981bdc..bcdc49f63c 100644
 --- a/adb/adb.h
 +++ b/adb/adb.h
 @@ -18,7 +18,9 @@
@@ -29,11 +27,9 @@ index 44e5981bdc..bcdc49f63c 100644
  #include "adb_trace.h"
  #include "transport.h"  /* readx(), writex() */
  
-diff --git a/adb/disable_verity_service.c b/adb/disable_verity_service.c
-index ed3da52108..29fa3d65a9 100644
 --- a/adb/disable_verity_service.c
 +++ b/adb/disable_verity_service.c
-@@ -14,25 +14,28 @@
+@@ -14,25 +14,32 @@
   * limitations under the License.
   */
  
@@ -51,13 +47,18 @@ index ed3da52108..29fa3d65a9 100644
  #include <sys/stat.h>
  #include <fcntl.h>
  #include <inttypes.h>
-+#include <unistd.h>
-+#include <errno.h>
-+#include <stdbool.h>
- 
+-
 -#include "cutils/properties.h"
 -#include "ext4_sb.h"
 -#include <fs_mgr.h>
++#include <unistd.h>
++#include <errno.h>
++#include <stdbool.h>
++
++#if defined(__linux__) && !defined(__GLIBC__)
++#define lseek64 lseek
++#define off64_t off_t
++#endif
  
  #define FSTAB_PREFIX "/fstab."
  struct fstab *fstab;
@@ -67,8 +68,6 @@ index ed3da52108..29fa3d65a9 100644
  static void write_console(int fd, const char* format, ...)
  {
      char buffer[256];
-diff --git a/adb/framebuffer_service.c b/adb/framebuffer_service.c
-index 8cbe8403cc..8f0ccfb7aa 100644
 --- a/adb/framebuffer_service.c
 +++ b/adb/framebuffer_service.c
 @@ -14,6 +14,10 @@
@@ -92,11 +91,9 @@ index 8cbe8403cc..8f0ccfb7aa 100644
  #include <linux/fb.h>
  #include <sys/ioctl.h>
  #include <sys/mman.h>
-diff --git a/adb/sysdeps.h b/adb/sysdeps.h
-index cc1f839e9f..ea39ac39cc 100644
 --- a/adb/sysdeps.h
 +++ b/adb/sysdeps.h
-@@ -123,8 +123,8 @@ static __inline__ int  unix_close(int fd)
+@@ -123,8 +123,8 @@ static __inline__ int  unix_close(int fd
  {
      return close(fd);
  }
@@ -118,7 +115,7 @@ index cc1f839e9f..ea39ac39cc 100644
  
  
  static __inline__  int  adb_read(int  fd, void*  buf, size_t  len)
-@@ -392,8 +392,8 @@ static __inline__ int   adb_lseek(int  fd, int  pos, int  where)
+@@ -392,8 +392,8 @@ static __inline__ int   adb_lseek(int  f
  {
      return lseek(fd, pos, where);
  }

@@ -1,4 +1,4 @@
-From 502c01e180d9085fcbeaf2fb46239999c4f335d2 Mon Sep 17 00:00:00 2001
+From 42e7d5f5f1d84a56b125aa05de33d31e28ad1124 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <rpurdie@linux.intel.com>
 Date: Wed, 31 Dec 2008 17:20:38 +0000
 Subject: [PATCH] pciutils: Upgarde 2.2.4 -> 3.0.3
@@ -24,20 +24,20 @@ Upstream-Status: Inappropriate [embedded specific]
  2 files changed, 11 insertions(+), 5 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 9319bb4..78a2d54 100644
+index 3df076d..9b247d3 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -108,7 +108,7 @@ example$(EXEEXT): example.o lib/$(PCILIB)
+@@ -110,7 +110,7 @@ example$(EXEEXT): example.o lib/$(PCIIMPLIB)
  example.o: example.c $(PCIINC)
  
  %$(EXEEXT): %.o
 -	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
 +	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ $(LIB_LDLIBS) $(LDLIBS) -o $@
  
- %.8 %.7 %.5: %.man
- 	M=`echo $(DATE) | sed 's/-01-/-January-/;s/-02-/-February-/;s/-03-/-March-/;s/-04-/-April-/;s/-05-/-May-/;s/-06-/-June-/;s/-07-/-July-/;s/-08-/-August-/;s/-09-/-September-/;s/-10-/-October-/;s/-11-/-November-/;s/-12-/-December-/;s/\(.*\)-\(.*\)-\(.*\)/\3 \2 \1/'` ; sed <$< >$@ "s/@TODAY@/$$M/;s/@VERSION@/pciutils-$(VERSION)/;s#@IDSDIR@#$(IDSDIR)#;s#@PCI_IDS@#$(PCI_IDS)#"
+ ifdef PCI_OS_WINDOWS
+ comma := ,
 diff --git a/lib/configure b/lib/configure
-index 45a416a..1afdaa6 100755
+index 57b064b..b269332 100755
 --- a/lib/configure
 +++ b/lib/configure
 @@ -9,6 +9,10 @@ echo_n() {

@@ -31,12 +31,13 @@ EXTRA_OECONF += "--with-python-rev=${PYTHON_BASEVERSION} \
                  --with-python-binary=${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} \
                  --with-pythonsitedir=${PYTHON_SITEPACKAGES_DIR} \
                  --libdir=${libdir} \
+                 --with-securedir=${base_libdir}/security \
 "
 
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam', '', d)}"
 PACKAGECONFIG[pam] = "--enable-pam, --disable-pam, libpam"
 
-FILES:${PN} += "${libdir}/security/pam_pwquality.so"
-FILES:${PN}-dbg += "${libdir}/security/.debug"
-FILES:${PN}-staticdev += "${libdir}/security/pam_pwquality.a"
-FILES:${PN}-dev += "${libdir}/security/pam_pwquality.la"
+FILES:${PN} += "${base_libdir}/security/pam_pwquality.so"
+FILES:${PN}-dbg += "${base_libdir}/security/.debug"
+FILES:${PN}-staticdev += "${base_libdir}/security/pam_pwquality.a"
+FILES:${PN}-dev += "${base_libdir}/security/pam_pwquality.la"

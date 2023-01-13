@@ -17,28 +17,27 @@ Upsteam-Status: Pending
 
 Update patch to 0.8.2
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
+[OP: Rebase to 0.9.3]
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
 ---
- libmultipath/blacklist.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+ libmultipath/blacklist.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/libmultipath/blacklist.c b/libmultipath/blacklist.c
-index 00e8dbd..5204501 100644
+index 8d15d2ea..820b0d68 100644
 --- a/libmultipath/blacklist.c
 +++ b/libmultipath/blacklist.c
-@@ -192,12 +192,6 @@ setup_default_blist (struct config * conf)
- 	char * str;
+@@ -198,9 +198,6 @@ setup_default_blist (struct config * conf)
+ 	struct hwentry *hwe;
  	int i;
  
--	str = STRDUP("^(ram|zram|raw|loop|fd|md|dm-|sr|scd|st|dcssblk)[0-9]");
--	if (!str)
--		return 1;
--	if (store_ble(conf->blist_devnode, str, ORIGIN_DEFAULT))
+-	if (store_ble(conf->blist_devnode, "!^(sd[a-z]|dasd[a-z]|nvme[0-9])", ORIGIN_DEFAULT))
 -		return 1;
 -
- 	str = STRDUP("^(td|hd|vd)[a-z]");
- 	if (!str)
+ 	if (store_ble(conf->elist_property, "(SCSI_IDENT_|ID_WWN)", ORIGIN_DEFAULT))
  		return 1;
-@@ -437,8 +431,11 @@ filter_property(struct config *conf, struct udev_device *udev, int lvl,
+ 
+@@ -435,8 +432,11 @@ filter_property(const struct config *conf, struct udev_device *udev,
  			r = MATCH_NOTHING;
  	}
  
@@ -53,5 +52,5 @@ index 00e8dbd..5204501 100644
  
  static void free_ble(struct blentry *ble)
 -- 
-2.7.4
+2.38.1
 

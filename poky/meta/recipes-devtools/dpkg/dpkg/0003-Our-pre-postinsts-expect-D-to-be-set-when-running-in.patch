@@ -1,4 +1,4 @@
-From dd11ed66640f79143e42d778b58fdd5a61fb5836 Mon Sep 17 00:00:00 2001
+From ff325b35639a797edd92b373fbebf7b8b9f3f0c3 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 26 Aug 2015 16:25:45 +0300
 Subject: [PATCH] Our pre/postinsts expect $D to be set when running in a
@@ -11,22 +11,23 @@ RP 2011/12/07
 ALIMON 2016/05/26
 ALIMON 2017/02/21
 KKang 2019/02/20
+
 ---
- src/main/script.c | 54 +++--------------------------------------------
- 1 file changed, 3 insertions(+), 51 deletions(-)
+ src/main/script.c | 53 +++--------------------------------------------
+ 1 file changed, 3 insertions(+), 50 deletions(-)
 
 diff --git a/src/main/script.c b/src/main/script.c
-index abe65b6..0edb8f1 100644
+index ecce4d842..16f4e6ff5 100644
 --- a/src/main/script.c
 +++ b/src/main/script.c
-@@ -96,58 +96,10 @@ setexecute(const char *path, struct stat *stab)
- static const char *
+@@ -97,58 +97,11 @@ static const char *
  maintscript_pre_exec(struct command *cmd)
  {
+ 	const char *instdir = dpkg_fsys_get_dir();
 -	const char *admindir = dpkg_db_get_dir();
 -	const char *changedir;
 -	size_t instdirlen = strlen(instdir);
--
+ 
 -	if (instdirlen > 0 && in_force(FORCE_SCRIPT_CHROOTLESS))
 -		changedir = instdir;
 -	else
@@ -81,6 +82,3 @@ index abe65b6..0edb8f1 100644
  }
  
  /**
--- 
-2.25.1
-

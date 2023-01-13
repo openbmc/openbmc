@@ -1,0 +1,29 @@
+From 744f894e42d05b1dee917cc221ed3c1815990459 Mon Sep 17 00:00:00 2001
+From: Phil Elwell <phil@raspberrypi.org>
+Date: Tue, 23 Feb 2016 17:52:29 +0000
+Subject: [PATCH] Move the hciattach firmware into /lib/firmware
+
+* FIRMWARE_DIR is now used by all hciattach firmware (not just bcm43xx) since 5.66 with:
+  commit d9253248363b995e44c1f5e393ed1c7aa4ec81ce
+  Author: Marek Vasut <marex@denx.de>
+  Date:   Tue Nov 1 12:53:33 2022 +0100
+  Subject: tools: Make hciattach_* firmware path build-time configurable
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ tools/hciattach.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/hciattach.h b/tools/hciattach.h
+index dfa4c1e7a..e88484766 100644
+--- a/tools/hciattach.h
++++ b/tools/hciattach.h
+@@ -41,7 +41,7 @@
+ #define HCI_UART_VND_DETECT	5
+ 
+ #ifndef FIRMWARE_DIR
+-#define FIRMWARE_DIR "/etc/firmware"
++#define FIRMWARE_DIR "/lib/firmware"
+ #endif
+ 
+ int read_hci_event(int fd, unsigned char *buf, int size);

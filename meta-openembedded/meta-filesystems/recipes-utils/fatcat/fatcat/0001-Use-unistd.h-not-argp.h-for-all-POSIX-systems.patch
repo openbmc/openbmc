@@ -8,8 +8,8 @@ of any of the GNU specific argp extensions. Include unistd.h directly to
 allow building with musl on linux, whilst retaining compatibility with
 glibc and other unices.
 
+Upstream-status: Submitted [https://github.com/Gregwar/fatcat/pull/34]
 Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
-Upstream-status: Pending
 ---
  src/fatcat.cpp | 8 ++------
  1 file changed, 2 insertions(+), 6 deletions(-)

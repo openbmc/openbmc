@@ -45,7 +45,7 @@ inherit update-rc.d useradd systemd
 
 CONFFILES:${PN} = "${sysconfdir}/vsftpd.conf"
 LDFLAGS:append =" -lcrypt -lcap"
-CFLAGS:append:libc-musl = " -D_GNU_SOURCE -include fcntl.h"
+CFLAGS:append:libc-musl = " -D_GNU_SOURCE -D_LARGEFILE64_SOURCE -include fcntl.h"
 EXTRA_OEMAKE = "-e MAKEFLAGS="
 
 do_configure() {

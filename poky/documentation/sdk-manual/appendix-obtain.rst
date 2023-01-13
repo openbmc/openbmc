@@ -28,14 +28,14 @@ and then run the script to hand-install the toolchain.
 
 Follow these steps to locate and hand-install the toolchain:
 
-1. *Go to the Installers Directory:* Go to
+#. *Go to the Installers Directory:* Go to
    :yocto_dl:`/releases/yocto/yocto-&DISTRO;/toolchain/`
 
-2. *Open the Folder for Your Build Host:* Open the folder that matches
+#. *Open the Folder for Your Build Host:* Open the folder that matches
    your :term:`Build Host` (i.e.
    ``i686`` for 32-bit machines or ``x86_64`` for 64-bit machines).
 
-3. *Locate and Download the SDK Installer:* You need to find and
+#. *Locate and Download the SDK Installer:* You need to find and
    download the installer appropriate for your build host, target
    hardware, and image type.
 
@@ -72,7 +72,7 @@ Follow these steps to locate and hand-install the toolchain:
 
       poky-glibc-x86_64-core-image-sato-core2-64-toolchain-ext-&DISTRO;.sh
 
-4. *Run the Installer:* Be sure you have execution privileges and run
+#. *Run the Installer:* Be sure you have execution privileges and run
    the installer. Following is an example from the ``Downloads``
    directory::
 
@@ -91,13 +91,13 @@ Building an SDK Installer
 As an alternative to locating and downloading an SDK installer, you can
 build the SDK installer. Follow these steps:
 
-1. *Set Up the Build Environment:* Be sure you are set up to use BitBake
+#. *Set Up the Build Environment:* Be sure you are set up to use BitBake
    in a shell. See the ":ref:`dev-manual/start:preparing the build host`" section
    in the Yocto Project Development Tasks Manual for information on how
    to get a build host ready that is either a native Linux machine or a
    machine that uses CROPS.
 
-2. *Clone the ``poky`` Repository:* You need to have a local copy of the
+#. *Clone the ``poky`` Repository:* You need to have a local copy of the
    Yocto Project :term:`Source Directory`
    (i.e. a local
    ``poky`` repository). See the ":ref:`dev-manual/start:cloning the \`\`poky\`\` repository`" and
@@ -107,12 +107,11 @@ build the SDK installer. Follow these steps:
    how to clone the ``poky`` repository and check out the appropriate
    branch for your work.
 
-3. *Initialize the Build Environment:* While in the root directory of
+#. *Initialize the Build Environment:* While in the root directory of
    the Source Directory (i.e. ``poky``), run the
    :ref:`structure-core-script` environment
    setup script to define the OpenEmbedded build environment on your
-   build host.
-   ::
+   build host::
 
       $ source oe-init-build-env
 
@@ -121,12 +120,12 @@ build the SDK installer. Follow these steps:
    the script runs, your current working directory is set to the ``build``
    directory.
 
-4. *Make Sure You Are Building an Installer for the Correct Machine:*
+#. *Make Sure You Are Building an Installer for the Correct Machine:*
    Check to be sure that your :term:`MACHINE` variable in the ``local.conf``
    file in your :term:`Build Directory` matches the architecture
    for which you are building.
 
-5. *Make Sure Your SDK Machine is Correctly Set:* If you are building a
+#. *Make Sure Your SDK Machine is Correctly Set:* If you are building a
    toolchain designed to run on an architecture that differs from your
    current development host machine (i.e. the build host), be sure that
    the :term:`SDKMACHINE` variable in the ``local.conf`` file in your
@@ -146,7 +145,7 @@ build the SDK installer. Follow these steps:
          different from the architecture of the build machine (``x86_64``).
 
 
-6. *Build the SDK Installer:* To build the SDK installer for a standard
+#. *Build the SDK Installer:* To build the SDK installer for a standard
    SDK and populate the SDK image, use the following command form. Be
    sure to replace ``image`` with an image (e.g. "core-image-sato")::
 
@@ -176,7 +175,7 @@ build the SDK installer. Follow these steps:
          static development libraries: TOOLCHAIN_TARGET_TASK:append = "
          libc-staticdev"
 
-7. *Run the Installer:* You can now run the SDK installer from
+#. *Run the Installer:* You can now run the SDK installer from
    ``tmp/deploy/sdk`` in the :term:`Build Directory`. Following is an example::
 
       $ cd poky/build/tmp/deploy/sdk
@@ -204,7 +203,7 @@ separately extract a root filesystem:
 
 Follow these steps to extract the root filesystem:
 
-1. *Locate and Download the Tarball for the Pre-Built Root Filesystem
+#. *Locate and Download the Tarball for the Pre-Built Root Filesystem
    Image File:* You need to find and download the root filesystem image
    file that is appropriate for your target system. These files are kept
    in machine-specific folders in the
@@ -242,7 +241,7 @@ Follow these steps to extract the root filesystem:
 
       core-image-sato-sdk-beaglebone-yocto.tar.bz2
 
-2. *Initialize the Cross-Development Environment:* You must ``source``
+#. *Initialize the Cross-Development Environment:* You must ``source``
    the cross-development environment setup script to establish necessary
    environment variables.
 
@@ -254,7 +253,7 @@ Follow these steps to extract the root filesystem:
 
       $ source poky_sdk/environment-setup-core2-64-poky-linux
 
-3. *Extract the Root Filesystem:* Use the ``runqemu-extract-sdk``
+#. *Extract the Root Filesystem:* Use the ``runqemu-extract-sdk``
    command and provide the root filesystem image.
 
    Following is an example command that extracts the root filesystem

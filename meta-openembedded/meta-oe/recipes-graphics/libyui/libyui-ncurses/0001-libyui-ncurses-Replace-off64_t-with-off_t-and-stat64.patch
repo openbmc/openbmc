@@ -1,0 +1,176 @@
+From b81fb7942ab77b0bf6791e5fd98411dd68f133d9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 18 Dec 2022 15:13:00 -0800
+Subject: [PATCH] libyui-ncurses: Replace off64_t with off_t and stat64 with stat
+
+stat is same as stat64 when 64bit off_t is used.
+
+Upstream-Status: Submitted [https://github.com/libyui/libyui/pull/88]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt         |  2 +-
+ src/NCAskForFile.cc    |  6 +++---
+ src/NCFileSelection.cc | 24 ++++++++++++------------
+ src/NCFileSelection.h  |  6 +++---
+ 4 files changed, 19 insertions(+), 19 deletions(-)
+
+diff --git a/CMakeLists.txt b/libyui-ncurses/CMakeLists.txt
+index b10eab8e..2000bb58 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -58,7 +58,7 @@ set( CMAKE_INSTALL_MESSAGE LAZY ) # Suppress "up-to-date" messages during "make
+ # Initialize compiler flags for all targets in all subdirectories
+ add_compile_options( "-Wall" )
+ add_compile_options( "-Os" )    # Optimize for size (overrides CMake's -O3 in RELEASE builds)
+-
++add_compile_options( "-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" ) # Enable largefile support
+ if ( WERROR )
+   add_compile_options( "-Werror" )
+ endif()
+diff --git a/src/NCAskForFile.cc b/libyui-ncurses/src/NCAskForFile.cc
+index aba6e0a6..44bb81bc 100644
+--- a/src/NCAskForFile.cc
++++ b/src/NCAskForFile.cc
+@@ -73,8 +73,8 @@ std::string NCAskForFile::checkIniDir( std::string iniDir )
+ {
+     std::string dname = "";
+ 
+-    struct stat64 statInfo;
+-    stat64( iniDir.c_str(), &statInfo );
++    struct stat statInfo;
++    stat( iniDir.c_str(), &statInfo );
+ 
+     if ( S_ISDIR( statInfo.st_mode ) )
+     {
+@@ -90,7 +90,7 @@ std::string NCAskForFile::checkIniDir( std::string iniDir )
+ 	     && pos != 0 )
+ 	{
+ 	    std::string dir = iniDir.substr( 0, pos );
+-	    stat64( dir.c_str(), &statInfo );
++	    stat( dir.c_str(), &statInfo );
+ 
+ 	    if ( S_ISDIR( statInfo.st_mode ) )
+ 	    {
+diff --git a/src/NCFileSelection.cc b/libyui-ncurses/src/NCFileSelection.cc
+index 3eb9c908..8894dc72 100644
+--- a/src/NCFileSelection.cc
++++ b/src/NCFileSelection.cc
+@@ -46,7 +46,7 @@ using std::list;
+ 
+ 
+ NCFileInfo::NCFileInfo( string	        fileName,
+-			struct stat64 *	statInfo,
++			struct stat *	statInfo,
+ 			bool	        link )
+ {
+     _name   = fileName;
+@@ -146,7 +146,7 @@ NCFileInfo::NCFileInfo()
+     _mode     = ( mode_t )0;
+     _device   = ( dev_t )0;
+     _links    = ( nlink_t )0;
+-    _size     = ( off64_t )0;
++    _size     = ( off_t )0;
+     _mtime    = ( time_t )0;
+ }
+ 
+@@ -177,11 +177,11 @@ NCFileSelection::NCFileSelection( YWidget *           parent,
+ {
+     SetSepChar( ' ' );
+ 
+-    struct stat64 statInfo;
++    struct stat statInfo;
+ 
+     if ( !iniDir.empty() )
+     {
+-	stat64( iniDir.c_str(), &statInfo );
++	stat( iniDir.c_str(), &statInfo );
+     }
+ 
+     if ( iniDir.empty()
+@@ -559,8 +559,8 @@ NCursesEvent NCFileTable::wHandleInput( wint_t key )
+ bool NCFileTable::fillList()
+ {
+ 
+-    struct stat64	statInfo;
+-    struct stat64	linkInfo;
++    struct stat	statInfo;
++    struct stat	linkInfo;
+     struct dirent *	entry;
+     list<string>	tmpList;
+     list<string>::iterator   it;
+@@ -592,7 +592,7 @@ bool NCFileTable::fillList()
+ 	{
+ 	    string fullName = currentDir + "/" + ( *it );
+ 
+-	    if ( lstat64( fullName.c_str(), &statInfo ) == 0 )
++	    if ( lstat( fullName.c_str(), &statInfo ) == 0 )
+ 	    {
+ 		if ( S_ISREG( statInfo.st_mode ) || S_ISBLK( statInfo.st_mode ) )
+ 		{
+@@ -604,7 +604,7 @@ bool NCFileTable::fillList()
+ 		}
+ 		else if ( S_ISLNK( statInfo.st_mode ) )
+ 		{
+-		    if ( stat64( fullName.c_str(), &linkInfo ) == 0 )
++		    if ( stat( fullName.c_str(), &linkInfo ) == 0 )
+ 		    {
+ 			if ( S_ISREG( linkInfo.st_mode ) || S_ISBLK( linkInfo.st_mode ) )
+ 			{
+@@ -701,8 +701,8 @@ void NCDirectoryTable::fillHeader()
+ 
+ bool NCDirectoryTable::fillList()
+ {
+-    struct stat64	statInfo;
+-    struct stat64	linkInfo;
++    struct stat	statInfo;
++    struct stat	linkInfo;
+     struct dirent *	entry;
+     list<string>	tmpList;
+     list<string>::iterator   it;
+@@ -734,7 +734,7 @@ bool NCDirectoryTable::fillList()
+ 	{
+ 	    string fullName = currentDir + "/" + ( *it );
+ 
+-	    if ( lstat64( fullName.c_str(), &statInfo ) == 0 )
++	    if ( lstat( fullName.c_str(), &statInfo ) == 0 )
+ 	    {
+ 		if ( S_ISDIR( statInfo.st_mode ) )
+ 		{
+@@ -746,7 +746,7 @@ bool NCDirectoryTable::fillList()
+ 		}
+ 		else if ( S_ISLNK( statInfo.st_mode ) )
+ 		{
+-		    if ( stat64( fullName.c_str(), &linkInfo ) == 0 )
++		    if ( stat( fullName.c_str(), &linkInfo ) == 0 )
+ 		    {
+ 			if ( S_ISDIR( linkInfo.st_mode ) )
+ 			{
+diff --git a/src/NCFileSelection.h b/libyui-ncurses/src/NCFileSelection.h
+index 0569215d..5c459d62 100644
+--- a/src/NCFileSelection.h
++++ b/src/NCFileSelection.h
+@@ -44,10 +44,10 @@
+ struct NCFileInfo
+ {
+     /**
+-     * Constructor from a stat buffer (i.e. based on an lstat64() call).
++     * Constructor from a stat buffer (i.e. based on an lstat() call).
+      **/
+     NCFileInfo( std::string	fileName,
+-		struct stat64	* statInfo,
++		struct stat	* statInfo,
+ 		bool link	= false );
+ 
+     NCFileInfo();
+@@ -65,7 +65,7 @@ struct NCFileInfo
+     dev_t		_device;	// device this object resides on
+     mode_t		_mode;		// file permissions + object type
+     nlink_t		_links;		// number of links
+-    off64_t		_size;		// size in bytes
++    off_t		_size;		// size in bytes
+     time_t		_mtime;		// modification time
+ 
+     bool isDir()  { return (( S_ISDIR( _mode ) ) ? true : false ); }
+-- 
+2.39.0
+

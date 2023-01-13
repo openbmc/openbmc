@@ -170,7 +170,7 @@ the system can checkout repositories.
 Shared DL_DIR
 -------------
 
-The Workers are all connected over NFS which allows DL_DIR to be shared
+The Workers are all connected over NFS which allows :term:`DL_DIR` to be shared
 between them. This reduces network accesses from the system and allows
 the build to be sped up. Usage of the directory within the build system
 is designed to be able to be shared over NFS.
@@ -204,9 +204,9 @@ The ``scripts/run-config`` execution is where most of the work within
 the Autobuilder happens. It runs through a number of steps; the first
 are general setup steps that are run once and include:
 
-#. Set up any ``buildtools-tarball`` if configured.
+#. Set up any :term:`buildtools` tarball if configured.
 
-#. Call "buildhistory-init" if buildhistory is configured.
+#. Call "buildhistory-init" if :ref:`ref-classes-buildhistory` is configured.
 
 For each step that is configured in ``config.json``, it will perform the
 following:

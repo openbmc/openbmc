@@ -5,12 +5,23 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=05df38dd77c35ec8431f212410a3329e"
 GNOMEBASEBUILDCLASS = "meson"
 inherit gnomebase gsettings bash-completion gettext upstream-version-is-even features_check useradd
 
-DEPENDS += "libsecret glib-2.0 glib-2.0-native libgudev shadow-native \
-            gsettings-desktop-schemas dbus"
+DEPENDS += "\
+    dbus \
+    glib-2.0 \
+    glib-2.0-native \
+    gsettings-desktop-schemas \
+    libgudev \
+    libsecret \
+    libxml2 \
+    shadow-native \
+"
 
 RDEPENDS:${PN} += "gsettings-desktop-schemas"
 
-SRC_URI = "https://download.gnome.org/sources/${BPN}/${@gnome_verdir("${PV}")}/${BPN}-${PV}.tar.xz;name=archive"
+SRC_URI = "\
+    https://download.gnome.org/sources/${BPN}/${@gnome_verdir("${PV}")}/${BPN}-${PV}.tar.xz;name=archive \
+    file://0001-daemon-PATH-expand-the-sftp-backend-ssh-client.patch \
+"
 
 SRC_URI[archive.sha256sum] = "03d72b8c15ef438110f0cf457b5655266c8b515d0412b30f4d55cfa0da06ac5e"
 
@@ -54,8 +65,8 @@ PACKAGECONFIG[admin] = "-Dadmin=true, -Dadmin=false, libcap polkit"
 PACKAGECONFIG[afc] = "-Dafc=true, -Dafc=false, libimobiledevice libplist"
 PACKAGECONFIG[archive] = "-Darchive=true, -Darchive=false, libarchive"
 PACKAGECONFIG[dnssd] = "-Ddnssd=true, -Ddnssd=false, avahi"
-PACKAGECONFIG[gcr] = "-Dgcr=true, -Dgcr=false, gcr"
-PACKAGECONFIG[http] = "-Dhttp=true, -Dhttp=false, libsoup-2.4"
+PACKAGECONFIG[gcr] = "-Dgcr=true, -Dgcr=false, gcr3"
+PACKAGECONFIG[http] = "-Dhttp=true, -Dhttp=false, libsoup-3.0"
 PACKAGECONFIG[libmtp] = "-Dmtp=true, -Dmtp=false, libmtp"
 PACKAGECONFIG[logind] = "-Dlogind=true, -Dlogind=false, systemd"
 PACKAGECONFIG[libgphoto2] = "-Dgphoto2=true, -Dgphoto2=false, libgphoto2"
@@ -69,13 +80,13 @@ PACKAGECONFIG[fuse] = "-Dfuse=true, -Dfuse=false, fuse3"
 PACKAGECONFIG[cdda] = "-Dcdda=true, -Dcdda=false, libcdio-paranoia"
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM:${PN} = "--system --no-create-home --user-group --home-dir ${sysconfdir}/${BPN}-1 polkitd"
+USERADD_PARAM:${PN} = "--system --no-create-home --user-group --home-dir ${sysconfdir}/polkit-1 polkitd"
 
 do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'polkit', 'true', 'false', d)}; then
         # Fix up permissions on polkit rules.d to work with rpm4 constraints
-        chmod 700 ${D}/${datadir}/polkit-1/rules.d
-        chown polkitd:root ${D}/${datadir}/polkit-1/rules.d
+        chmod 700 ${D}${datadir}/polkit-1/rules.d
+        chown polkitd:root ${D}${datadir}/polkit-1/rules.d
     fi
 
     # After rebuilds (not from scracth) it can happen that the executables in

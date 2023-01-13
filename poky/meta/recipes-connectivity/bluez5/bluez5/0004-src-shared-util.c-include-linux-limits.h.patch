@@ -1,0 +1,26 @@
+From 51584158b9a2e58f3790f8a7387b5cf167eca88b Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Mon, 12 Dec 2022 13:10:19 +0100
+Subject: [PATCH] src/shared/util.c: include linux/limits.h
+
+MAX_INPUT is defined in that file. This matters on non-glibc
+systems such as those using musl.
+
+Upstream-Status: Submitted [to linux-bluetooth@vger.kernel.org,luiz.von.dentz@intel.com,frederic.danis@collabora.com]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ src/shared/util.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/shared/util.c b/src/shared/util.c
+index 0a0308c..1f61314 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -22,6 +22,7 @@
+ #include <unistd.h>
+ #include <dirent.h>
+ #include <limits.h>
++#include <linux/limits.h>
+ #include <string.h>
+ 
+ #ifdef HAVE_SYS_RANDOM_H

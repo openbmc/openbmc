@@ -52,8 +52,7 @@ libraries appropriate for developing against the corresponding image.
 
 The names of the tarball installer scripts are such that a string
 representing the host system appears first in the filename and then is
-immediately followed by a string representing the target architecture.
-::
+immediately followed by a string representing the target architecture::
 
    poky-glibc-host_system-image_type-arch-toolchain-release_version.sh
 
@@ -97,16 +96,7 @@ must be writable for whichever users need to use the SDK.
 The following command shows how to run the installer given a toolchain
 tarball for a 64-bit x86 development host system and a 64-bit x86 target
 architecture. The example assumes the SDK installer is located in
-``~/Downloads/`` and has execution rights.
-
-.. note::
-
-   If you do not have write permissions for the directory into which you
-   are installing the SDK, the installer notifies you and exits. For
-   that case, set up the proper permissions in the directory and run the
-   installer again.
-
-::
+``~/Downloads/`` and has execution rights::
 
    $ ./Downloads/poky-glibc-x86_64-core-image-sato-i586-toolchain-&DISTRO;.sh
    Poky (Yocto Project Reference Distro) SDK installer version &DISTRO;
@@ -118,6 +108,13 @@ architecture. The example assumes the SDK installer is located in
    SDK has been successfully set up and is ready to be used.
    Each time you wish to use the SDK in a new shell session, you need to source the environment setup script e.g.
     $ . /opt/poky/&DISTRO;/environment-setup-i586-poky-linux
+
+.. note::
+
+   If you do not have write permissions for the directory into which you
+   are installing the SDK, the installer notifies you and exits. For
+   that case, set up the proper permissions in the directory and run the
+   installer again.
 
 Again, reference the
 ":ref:`sdk-manual/appendix-obtain:installed standard sdk directory structure`"

@@ -27,7 +27,7 @@ In the second version of the program, a script was added to make validation
 easier and clearer, the script is called  ``yocto-check-layer`` and is
 available in :term:`OpenEmbedded-Core (OE-Core)`.
 
-See :ref:`dev-manual/common-tasks:making sure your layer is compatible with yocto project`
+See :ref:`dev-manual/layers:making sure your layer is compatible with yocto project`
 for details.
 
 ========

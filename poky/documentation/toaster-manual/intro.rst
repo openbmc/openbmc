@@ -76,9 +76,8 @@ extensive information about the build process.
    -  See performance information such as build time, task time, CPU
       usage, and disk I/O.
 
-For an overview of Toaster shipped with the Yocto Project &DISTRO;
-Release, see the "`Toaster - Yocto Project
-2.2 <https://youtu.be/BlXdOYLgPxA>`__" video.
+For an overview of Toaster, see this
+`introduction video <https://youtu.be/BlXdOYLgPxA>`__.
 
 Installation Options
 ====================

@@ -6,12 +6,16 @@ Subject: [PATCH] Drop x11 dependencies
 Upstream-Status: Inappropriate [OE-Specific]
 
 Signed-off-by: Ming Liu <ming.liu@toradex.com>
+
+Rebase for version 1.8.3.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  configure.ac | 44 --------------------------------------------
  1 file changed, 44 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index a5fd706..b42488c 100644
+index 33d0102..50e2d93 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -76,27 +76,8 @@ fi
@@ -20,7 +24,7 @@ index a5fd706..b42488c 100644
  # Checks for pkg-config packages
 -
 -# Always required
--X11_REQUIRES='xproto >= 7.0.17 xextproto xtrans xcb >= 1.11.1'
+-X11_REQUIRES='xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1'
 -X11_EXTRA_DEPS="xcb >= 1.11.1"
 -
  PKG_PROG_PKG_CONFIG()
@@ -42,7 +46,7 @@ index a5fd706..b42488c 100644
  # Check for dlopen
  AC_MSG_CHECKING([if run-time linking is supported])
  AC_SEARCH_LIBS(dlopen,[dl svld])
-@@ -237,30 +218,6 @@ AC_SUBST(XTHREAD_CFLAGS)
+@@ -255,30 +236,6 @@ AC_SUBST(USE_THREAD_LIBS)
  
  AC_CHECK_FUNC(poll, [AC_DEFINE(USE_POLL, 1, [poll() function is available])], )
  
@@ -73,7 +77,7 @@ index a5fd706..b42488c 100644
  AC_ARG_ENABLE(xcms,
                AS_HELP_STRING([--disable-xcms],
                  [Disable Xlib support for CMS *EXPERIMENTAL*]),
-@@ -340,7 +297,6 @@ X11_LIBDIR="${libdir}/X11"
+@@ -358,7 +315,6 @@ X11_LIBDIR="${libdir}/X11"
  AX_DEFINE_DIR(X11_LIBDIR, X11_LIBDIR, [Location of libX11 library data])
  AC_SUBST(X11_LIBDIR)
  

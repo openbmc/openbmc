@@ -23,6 +23,8 @@ inherit autotools
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[zlib] = "--enable-zlib,--disable-zlib,zlib"
 PACKAGECONFIG[pam-wheel] = ",,,pam-plugin-wheel"
+PACKAGECONFIG[audit] = "--with-linux-audit,--without-linux-audit,audit"
+PACKAGECONFIG[selinux] = "--with-selinux,--without-selinux,libselinux"
 
 EXTRA_OECONF = "--with-editor=${base_bindir}/vi --with-env-editor"
 

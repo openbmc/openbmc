@@ -19,7 +19,6 @@ PROVIDES = "xext"
 PE = "1"
 
 XORG_PN = "libXext"
-XORG_EXT = "tar.xz"
 BBCLASSEXTEND = "native nativesdk"
 
 SRC_URI[sha256sum] = "db14c0c895c57ea33a8559de8cb2b93dc76c42ea4a39e294d175938a133d7bca"

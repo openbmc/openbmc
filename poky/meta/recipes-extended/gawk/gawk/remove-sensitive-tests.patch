@@ -1,24 +1,43 @@
+From 354d24baf7c51977d22ff61ad42e6a2cbd4dc8ac Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Tue, 21 Dec 2021 17:09:12 +0000
+Subject: [PATCH] gawk: remove load-sensitive tests
+
 These tests require an unloaded host as otherwise timing sensitive tests can fail
 https://bugzilla.yoctoproject.org/show_bug.cgi?id=14371
 
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 
---- a/test/Maketests~
-+++ b/test/Maketests
-@@ -2069,7 +2069,2 @@
+---
+ test/Maketests | 10 ----------
+ 1 file changed, 10 deletions(-)
 
+diff --git a/test/Maketests b/test/Maketests
+index 3a667af..f117697 100644
+--- a/test/Maketests
++++ b/test/Maketests
+@@ -2137,11 +2137,6 @@ symtab12:
+ 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+ 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+ 
 -timeout:
 -	@echo $@ $(ZOS_FAIL)
--	@AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 -	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 -
  typedregex1:
-@@ -2297,7 +2292,2 @@
+ 	@echo $@
+ 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+@@ -2371,11 +2366,6 @@ rwarray:
+ 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
  	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
--
+ 
 -time:
 -	@echo $@
--	@AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 -	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
-
+-
+ mpfrbigint:
+ 	@echo $@
+ 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  -M >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@

@@ -1,0 +1,19 @@
+--- a/storage/connect/os.h
++++ b/storage/connect/os.h
+@@ -2,13 +2,15 @@
+ #ifndef _OS_H_INCLUDED
+ #define _OS_H_INCLUDED
+ 
+-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__APPLE__)
++#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__APPLE__) || (defined(__linux__) && !defined(__GLIBC__))
+ typedef off_t off64_t;
+ #define lseek64(fd, offset, whence) lseek((fd), (offset), (whence))
+ #define open64(path, flags, mode)   open((path), (flags), (mode))
+ #define ftruncate64(fd, length)     ftruncate((fd), (length))
++#ifndef O_LARGEFILE
+ #define O_LARGEFILE 0
+ #endif
++#endif
+ 
+ #ifdef _AIX
+ #ifndef O_LARGEFILE
