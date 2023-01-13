@@ -11,7 +11,7 @@ SYSTEMD_SERVICE:${PN}:remove = " \
                                "
 
 # Declare port spcific conf and service files
-HOST_CONSOLE_TTY = "ttyS0"
+HOST_CONSOLE_TTY = "ttyS0 ttyS1 ttyS2 ttyS3 ttyS7 ttyS8"
 
 CONSOLE_CONF_FMT = "file://server.{0}.conf"
 SRC_URI += "${@compose_list(d, 'CONSOLE_CONF_FMT', 'HOST_CONSOLE_TTY')}"
