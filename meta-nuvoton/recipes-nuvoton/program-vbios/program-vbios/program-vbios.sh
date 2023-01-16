@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-log_file="/tmp/program_vbios.log"
+log_file="/var/log/program_vbios.log"
 /sbin/modprobe spi-gpio
 sleep 1
 
