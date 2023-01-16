@@ -1,0 +1,43 @@
+From fd4d233757cc46cd89f68b45ec4b059940dd84ae Mon Sep 17 00:00:00 2001
+From: Vincent Davis Jr <vince@underview.tech>
+Date: Fri, 9 Dec 2022 19:58:11 -0600
+Subject: [PATCH] codec: omxil_core.h fix multiple definition of
+
+Upstream-Status: Inappropriate
+
+RPI-Distro repo forks original vlc and applies patches
+to enable raspiberry pi support.
+
+Issue occurs during compilation as
+* pf_enable_graphic_buffers
+* pf_get_graphic_buffer_usage
+* pf_get_hal_format
+
+Apears to be defined multiple times as the omxil_core.h
+is included in multiple files.
+
+Signed-off-by: Vincent Davis Jr <vince@underview.tech>
+---
+ modules/codec/omxil/omxil_core.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/modules/codec/omxil/omxil_core.h b/modules/codec/omxil/omxil_core.h
+index ac3db510b..f6e42f5ed 100644
+--- a/modules/codec/omxil/omxil_core.h
++++ b/modules/codec/omxil/omxil_core.h
+@@ -34,9 +34,9 @@ extern OMX_ERRORTYPE (*pf_component_enum)(OMX_STRING, OMX_U32, OMX_U32);
+ extern OMX_ERRORTYPE (*pf_get_roles_of_component)(OMX_STRING, OMX_U32 *, OMX_U8 **);
+ 
+ /* Extra IOMX android functions. Can be NULL if we don't link with libiomx */
+-OMX_ERRORTYPE (*pf_enable_graphic_buffers)(OMX_HANDLETYPE, OMX_U32, OMX_BOOL);
+-OMX_ERRORTYPE (*pf_get_graphic_buffer_usage)(OMX_HANDLETYPE, OMX_U32, OMX_U32*);
+-OMX_ERRORTYPE (*pf_get_hal_format) (const char *, int *);
++extern OMX_ERRORTYPE (*pf_enable_graphic_buffers)(OMX_HANDLETYPE, OMX_U32, OMX_BOOL);
++extern OMX_ERRORTYPE (*pf_get_graphic_buffer_usage)(OMX_HANDLETYPE, OMX_U32, OMX_U32*);
++extern OMX_ERRORTYPE (*pf_get_hal_format) (const char *, int *);
+ 
+ int InitOmxCore(vlc_object_t *p_this);
+ void DeinitOmxCore(void);
+-- 
+2.38.1
+

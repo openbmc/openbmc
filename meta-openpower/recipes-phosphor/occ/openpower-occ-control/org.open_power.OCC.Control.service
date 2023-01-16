@@ -4,6 +4,10 @@ Wants=mapper-wait@-xyz-openbmc_project-inventory.service
 After=mapper-wait@-xyz-openbmc_project-inventory.service
 Wants=obmc-host-reset-running@0.target
 After=obmc-host-reset-running@0.target
+Wants=xyz.openbmc_project.Logging.service
+After=xyz.openbmc_project.Logging.service
+Wants=xyz.openbmc_project.PLDM
+After=xyz.openbmc_project.PLDM
 
 [Service]
 ExecStart=/usr/bin/openpower-occ-control

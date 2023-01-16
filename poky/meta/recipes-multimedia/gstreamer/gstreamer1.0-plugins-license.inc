@@ -1,7 +1,7 @@
 # This .inc file contains functionality for automatically setting
 # the the license of all plugins according to the GSTREAMER_GPL.
 
-PACKAGESPLITFUNCS:append = " set_gstreamer_license "
+PACKAGESPLITFUNCS += "set_gstreamer_license"
 
 python set_gstreamer_license () {
     import oe.utils

@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 Release notes for 3.4.3 (honister)
 ----------------------------------
 
@@ -28,7 +30,7 @@ Fixes in 3.4.3
 -  build-appliance-image: Update to honister head revision
 -  coreutils: remove obsolete ignored CVE list
 -  crate-fetch: fix setscene failures
--  cups: Add --with-dbusdir to EXTRA_OECONF for deterministic build
+-  cups: Add --with-dbusdir to :term:`EXTRA_OECONF` for deterministic build
 -  cve-check: create directory of CVE_CHECK_MANIFEST before copy
 -  cve-check: get_cve_info should open the database read-only
 -  default-distrovars.inc: Switch connectivity check to a yoctoproject.org page
@@ -59,7 +61,7 @@ Fixes in 3.4.3
 -  kernel-devsrc: do not copy Module.symvers file during install
 -  libarchive : update to 3.5.3
 -  libpcap: Disable DPDK explicitly
--  libxml-parser-perl: Add missing RDEPENDS
+-  libxml-parser-perl: Add missing :term:`RDEPENDS`
 -  linux-firmware: upgrade 20211216 -> 20220209
 -  linux-yocto/5.10: Fix ramoops/ftrace
 -  linux-yocto/5.10: features/zram: remove CONFIG_ZRAM_DEF_COMP
@@ -74,7 +76,7 @@ Fixes in 3.4.3
 -  poky.conf: bump version for 3.4.3 honister release
 -  qemuboot: Fix build error if UNINATIVE_LOADER is unset
 -  quilt: Disable external sendmail for deterministic build
--  recipetool: Fix circular reference in SRC_URI
+-  recipetool: Fix circular reference in :term:`SRC_URI`
 -  releases: update to include 3.3.5
 -  releases: update to include 3.4.2
 -  rootfs-postcommands: amend systemd_create_users add user to group check

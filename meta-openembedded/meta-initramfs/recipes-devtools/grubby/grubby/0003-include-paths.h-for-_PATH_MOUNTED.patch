@@ -1,0 +1,27 @@
+From 7e68976eb6edd766471c11382f5bf57940ba9315 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 15 Jul 2017 10:19:50 -0700
+Subject: [PATCH] include paths.h for _PATH_MOUNTED
+
+Upstream-Status: Inactive-Upstream [lastcommit: 2022 lastrelease: 2016]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ grubby.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/grubby.c b/grubby.c
+index be832f6..4825797 100644
+--- a/grubby.c
++++ b/grubby.c
+@@ -34,6 +34,7 @@
+ #include <libgen.h>
+ #include <execinfo.h>
+ #include <signal.h>
++#include <paths.h>
+ #include <blkid/blkid.h>
+ 
+ #include "log.h"
+-- 
+2.25.1
+

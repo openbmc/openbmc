@@ -12,11 +12,12 @@
 import os
 import sys
 import logging
-import optparse
+import argparse
 import warnings
 import fcntl
 import time
 import traceback
+import datetime
 
 import bb
 from bb import event
@@ -43,18 +44,18 @@ def present_options(optionlist):
     else:
         return optionlist[0]
 
-class BitbakeHelpFormatter(optparse.IndentedHelpFormatter):
-    def format_option(self, option):
+class BitbakeHelpFormatter(argparse.HelpFormatter):
+    def _get_help_string(self, action):
         # We need to do this here rather than in the text we supply to
         # add_option() because we don't want to call list_extension_modules()
         # on every execution (since it imports all of the modules)
         # Note also that we modify option.help rather than the returned text
         # - this is so that we don't have to re-format the text ourselves
-        if option.dest == 'ui':
+        if action.dest == 'ui':
             valid_uis = list_extension_modules(bb.ui, 'main')
-            option.help = option.help.replace('@CHOICES@', present_options(valid_uis))
+            return action.help.replace('@CHOICES@', present_options(valid_uis))
 
-        return optparse.IndentedHelpFormatter.format_option(self, option)
+        return action.help
 
 def list_extension_modules(pkg, checkattr):
     """
@@ -114,180 +115,205 @@ def _showwarning(message, category, filename, lineno, file=None, line=None):
 warnings.showwarning = _showwarning
 
 def create_bitbake_parser():
-    parser = optparse.OptionParser(
-        formatter=BitbakeHelpFormatter(),
-        version="BitBake Build Tool Core version %s" % bb.__version__,
-        usage="""%prog [options] [recipename/target recipe:do_task ...]
+    parser = argparse.ArgumentParser(
+        description="""\
+            It is assumed there is a conf/bblayers.conf available in cwd or in BBPATH which
+            will provide the layer, BBFILES and other configuration information.
+            """,
+        formatter_class=BitbakeHelpFormatter,
+        allow_abbrev=False,
+        add_help=False, # help is manually added below in a specific argument group
+    )
 
-    Executes the specified task (default is 'build') for a given set of target recipes (.bb files).
-    It is assumed there is a conf/bblayers.conf available in cwd or in BBPATH which
-    will provide the layer, BBFILES and other configuration information.""")
+    general_group  = parser.add_argument_group('General options')
+    task_group     = parser.add_argument_group('Task control options')
+    exec_group     = parser.add_argument_group('Execution control options')
+    logging_group  = parser.add_argument_group('Logging/output control options')
+    server_group   = parser.add_argument_group('Server options')
+    config_group   = parser.add_argument_group('Configuration options')
 
-    parser.add_option("-b", "--buildfile", action="store", dest="buildfile", default=None,
-                      help="Execute tasks from a specific .bb recipe directly. WARNING: Does "
-                           "not handle any dependencies from other recipes.")
+    general_group.add_argument("targets", nargs="*", metavar="recipename/target",
+                        help="Execute the specified task (default is 'build') for these target "
+                             "recipes (.bb files).")
 
-    parser.add_option("-k", "--continue", action="store_false", dest="halt", default=True,
-                      help="Continue as much as possible after an error. While the target that "
-                           "failed and anything depending on it cannot be built, as much as "
-                           "possible will be built before stopping.")
+    general_group.add_argument("-s", "--show-versions", action="store_true",
+                        help="Show current and preferred versions of all recipes.")
 
-    parser.add_option("-f", "--force", action="store_true", dest="force", default=False,
-                      help="Force the specified targets/task to run (invalidating any "
-                           "existing stamp file).")
+    general_group.add_argument("-e", "--environment", action="store_true",
+                        dest="show_environment",
+                        help="Show the global or per-recipe environment complete with information"
+                             " about where variables were set/changed.")
 
-    parser.add_option("-c", "--cmd", action="store", dest="cmd",
-                      help="Specify the task to execute. The exact options available "
-                           "depend on the metadata. Some examples might be 'compile'"
-                           " or 'populate_sysroot' or 'listtasks' may give a list of "
-                           "the tasks available.")
-
-    parser.add_option("-C", "--clear-stamp", action="store", dest="invalidate_stamp",
-                      help="Invalidate the stamp for the specified task such as 'compile' "
-                           "and then run the default task for the specified target(s).")
-
-    parser.add_option("-r", "--read", action="append", dest="prefile", default=[],
-                      help="Read the specified file before bitbake.conf.")
-
-    parser.add_option("-R", "--postread", action="append", dest="postfile", default=[],
-                      help="Read the specified file after bitbake.conf.")
-
-    parser.add_option("-v", "--verbose", action="store_true", dest="verbose", default=False,
-                      help="Enable tracing of shell tasks (with 'set -x'). "
-                           "Also print bb.note(...) messages to stdout (in "
-                           "addition to writing them to ${T}/log.do_<task>).")
-
-    parser.add_option("-D", "--debug", action="count", dest="debug", default=0,
-                      help="Increase the debug level. You can specify this "
-                           "more than once. -D sets the debug level to 1, "
-                           "where only bb.debug(1, ...) messages are printed "
-                           "to stdout; -DD sets the debug level to 2, where "
-                           "both bb.debug(1, ...) and bb.debug(2, ...) "
-                           "messages are printed; etc. Without -D, no debug "
-                           "messages are printed. Note that -D only affects "
-                           "output to stdout. All debug messages are written "
-                           "to ${T}/log.do_taskname, regardless of the debug "
-                           "level.")
-
-    parser.add_option("-q", "--quiet", action="count", dest="quiet", default=0,
-                      help="Output less log message data to the terminal. You can specify this more than once.")
-
-    parser.add_option("-n", "--dry-run", action="store_true", dest="dry_run", default=False,
-                      help="Don't execute, just go through the motions.")
-
-    parser.add_option("-S", "--dump-signatures", action="append", dest="dump_signatures",
-                      default=[], metavar="SIGNATURE_HANDLER",
-                      help="Dump out the signature construction information, with no task "
-                           "execution. The SIGNATURE_HANDLER parameter is passed to the "
-                           "handler. Two common values are none and printdiff but the handler "
-                           "may define more/less. none means only dump the signature, printdiff"
-                           " means compare the dumped signature with the cached one.")
-
-    parser.add_option("-p", "--parse-only", action="store_true",
-                      dest="parse_only", default=False,
-                      help="Quit after parsing the BB recipes.")
-
-    parser.add_option("-s", "--show-versions", action="store_true",
-                      dest="show_versions", default=False,
-                      help="Show current and preferred versions of all recipes.")
-
-    parser.add_option("-e", "--environment", action="store_true",
-                      dest="show_environment", default=False,
-                      help="Show the global or per-recipe environment complete with information"
-                           " about where variables were set/changed.")
-
-    parser.add_option("-g", "--graphviz", action="store_true", dest="dot_graph", default=False,
-                      help="Save dependency tree information for the specified "
-                           "targets in the dot syntax.")
-
-    parser.add_option("-I", "--ignore-deps", action="append",
-                      dest="extra_assume_provided", default=[],
-                      help="Assume these dependencies don't exist and are already provided "
-                           "(equivalent to ASSUME_PROVIDED). Useful to make dependency "
-                           "graphs more appealing")
-
-    parser.add_option("-l", "--log-domains", action="append", dest="debug_domains", default=[],
-                      help="Show debug logging for the specified logging domains")
-
-    parser.add_option("-P", "--profile", action="store_true", dest="profile", default=False,
-                      help="Profile the command and save reports.")
+    general_group.add_argument("-g", "--graphviz", action="store_true", dest="dot_graph",
+                        help="Save dependency tree information for the specified "
+                             "targets in the dot syntax.")
 
     # @CHOICES@ is substituted out by BitbakeHelpFormatter above
-    parser.add_option("-u", "--ui", action="store", dest="ui",
-                      default=os.environ.get('BITBAKE_UI', 'knotty'),
-                      help="The user interface to use (@CHOICES@ - default %default).")
+    general_group.add_argument("-u", "--ui",
+                        default=os.environ.get('BITBAKE_UI', 'knotty'),
+                        help="The user interface to use (@CHOICES@ - default %(default)s).")
 
-    parser.add_option("", "--token", action="store", dest="xmlrpctoken",
-                      default=os.environ.get("BBTOKEN"),
-                      help="Specify the connection token to be used when connecting "
-                           "to a remote server.")
+    general_group.add_argument("--version", action="store_true",
+                        help="Show programs version and exit.")
 
-    parser.add_option("", "--revisions-changed", action="store_true",
-                      dest="revisions_changed", default=False,
-                      help="Set the exit code depending on whether upstream floating "
-                           "revisions have changed or not.")
+    general_group.add_argument('-h', '--help', action='help',
+                        help='Show this help message and exit.')
 
-    parser.add_option("", "--server-only", action="store_true",
-                      dest="server_only", default=False,
-                      help="Run bitbake without a UI, only starting a server "
-                           "(cooker) process.")
 
-    parser.add_option("-B", "--bind", action="store", dest="bind", default=False,
-                      help="The name/address for the bitbake xmlrpc server to bind to.")
+    task_group.add_argument("-f", "--force", action="store_true",
+                        help="Force the specified targets/task to run (invalidating any "
+                             "existing stamp file).")
 
-    parser.add_option("-T", "--idle-timeout", type=float, dest="server_timeout",
-                      default=os.getenv("BB_SERVER_TIMEOUT"),
-                      help="Set timeout to unload bitbake server due to inactivity, "
-                           "set to -1 means no unload, "
-                           "default: Environment variable BB_SERVER_TIMEOUT.")
+    task_group.add_argument("-c", "--cmd",
+                        help="Specify the task to execute. The exact options available "
+                             "depend on the metadata. Some examples might be 'compile'"
+                             " or 'populate_sysroot' or 'listtasks' may give a list of "
+                             "the tasks available.")
 
-    parser.add_option("", "--no-setscene", action="store_true",
-                      dest="nosetscene", default=False,
-                      help="Do not run any setscene tasks. sstate will be ignored and "
-                           "everything needed, built.")
+    task_group.add_argument("-C", "--clear-stamp", dest="invalidate_stamp",
+                        help="Invalidate the stamp for the specified task such as 'compile' "
+                             "and then run the default task for the specified target(s).")
 
-    parser.add_option("", "--skip-setscene", action="store_true",
-                      dest="skipsetscene", default=False,
-                      help="Skip setscene tasks if they would be executed. Tasks previously "
-                           "restored from sstate will be kept, unlike --no-setscene")
+    task_group.add_argument("--runall", action="append", default=[],
+                        help="Run the specified task for any recipe in the taskgraph of the "
+                             "specified target (even if it wouldn't otherwise have run).")
 
-    parser.add_option("", "--setscene-only", action="store_true",
-                      dest="setsceneonly", default=False,
-                      help="Only run setscene tasks, don't run any real tasks.")
+    task_group.add_argument("--runonly", action="append",
+                        help="Run only the specified task within the taskgraph of the "
+                             "specified targets (and any task dependencies those tasks may have).")
 
-    parser.add_option("", "--remote-server", action="store", dest="remote_server",
-                      default=os.environ.get("BBSERVER"),
-                      help="Connect to the specified server.")
+    task_group.add_argument("--no-setscene", action="store_true",
+                        dest="nosetscene",
+                        help="Do not run any setscene tasks. sstate will be ignored and "
+                            "everything needed, built.")
 
-    parser.add_option("-m", "--kill-server", action="store_true",
-                      dest="kill_server", default=False,
-                      help="Terminate any running bitbake server.")
+    task_group.add_argument("--skip-setscene", action="store_true",
+                        dest="skipsetscene",
+                        help="Skip setscene tasks if they would be executed. Tasks previously "
+                            "restored from sstate will be kept, unlike --no-setscene.")
 
-    parser.add_option("", "--observe-only", action="store_true",
-                      dest="observe_only", default=False,
-                      help="Connect to a server as an observing-only client.")
+    task_group.add_argument("--setscene-only", action="store_true",
+                        dest="setsceneonly",
+                        help="Only run setscene tasks, don't run any real tasks.")
 
-    parser.add_option("", "--status-only", action="store_true",
-                      dest="status_only", default=False,
-                      help="Check the status of the remote bitbake server.")
 
-    parser.add_option("-w", "--write-log", action="store", dest="writeeventlog",
-                      default=os.environ.get("BBEVENTLOG"),
-                      help="Writes the event log of the build to a bitbake event json file. "
-                           "Use '' (empty string) to assign the name automatically.")
+    exec_group.add_argument("-n", "--dry-run", action="store_true",
+                        help="Don't execute, just go through the motions.")
 
-    parser.add_option("", "--runall", action="append", dest="runall",
-                      help="Run the specified task for any recipe in the taskgraph of the specified target (even if it wouldn't otherwise have run).")
+    exec_group.add_argument("-p", "--parse-only", action="store_true",
+                        help="Quit after parsing the BB recipes.")
 
-    parser.add_option("", "--runonly", action="append", dest="runonly",
-                      help="Run only the specified task within the taskgraph of the specified targets (and any task dependencies those tasks may have).")
+    exec_group.add_argument("-k", "--continue", action="store_false", dest="halt",
+                        help="Continue as much as possible after an error. While the target that "
+                             "failed and anything depending on it cannot be built, as much as "
+                             "possible will be built before stopping.")
+
+    exec_group.add_argument("-P", "--profile", action="store_true",
+                        help="Profile the command and save reports.")
+
+    exec_group.add_argument("-S", "--dump-signatures", action="append",
+                        default=[], metavar="SIGNATURE_HANDLER",
+                        help="Dump out the signature construction information, with no task "
+                             "execution. The SIGNATURE_HANDLER parameter is passed to the "
+                             "handler. Two common values are none and printdiff but the handler "
+                             "may define more/less. none means only dump the signature, printdiff"
+                             " means compare the dumped signature with the cached one.")
+
+    exec_group.add_argument("--revisions-changed", action="store_true",
+                        help="Set the exit code depending on whether upstream floating "
+                            "revisions have changed or not.")
+
+    exec_group.add_argument("-b", "--buildfile",
+                        help="Execute tasks from a specific .bb recipe directly. WARNING: Does "
+                             "not handle any dependencies from other recipes.")
+
+    logging_group.add_argument("-D", "--debug", action="count", default=0,
+                        help="Increase the debug level. You can specify this "
+                             "more than once. -D sets the debug level to 1, "
+                             "where only bb.debug(1, ...) messages are printed "
+                             "to stdout; -DD sets the debug level to 2, where "
+                             "both bb.debug(1, ...) and bb.debug(2, ...) "
+                             "messages are printed; etc. Without -D, no debug "
+                             "messages are printed. Note that -D only affects "
+                             "output to stdout. All debug messages are written "
+                             "to ${T}/log.do_taskname, regardless of the debug "
+                             "level.")
+
+    logging_group.add_argument("-l", "--log-domains", action="append", dest="debug_domains",
+                        default=[],
+                        help="Show debug logging for the specified logging domains.")
+
+    logging_group.add_argument("-v", "--verbose", action="store_true",
+                        help="Enable tracing of shell tasks (with 'set -x'). "
+                             "Also print bb.note(...) messages to stdout (in "
+                             "addition to writing them to ${T}/log.do_<task>).")
+
+    logging_group.add_argument("-q", "--quiet", action="count", default=0,
+                        help="Output less log message data to the terminal. You can specify this "
+                             "more than once.")
+
+    logging_group.add_argument("-w", "--write-log", dest="writeeventlog",
+                        default=os.environ.get("BBEVENTLOG"),
+                        help="Writes the event log of the build to a bitbake event json file. "
+                            "Use '' (empty string) to assign the name automatically.")
+
+
+    server_group.add_argument("-B", "--bind", default=False,
+                        help="The name/address for the bitbake xmlrpc server to bind to.")
+
+    server_group.add_argument("-T", "--idle-timeout", type=float, dest="server_timeout",
+                        default=os.getenv("BB_SERVER_TIMEOUT"),
+                        help="Set timeout to unload bitbake server due to inactivity, "
+                             "set to -1 means no unload, "
+                             "default: Environment variable BB_SERVER_TIMEOUT.")
+
+    server_group.add_argument("--remote-server",
+                        default=os.environ.get("BBSERVER"),
+                        help="Connect to the specified server.")
+
+    server_group.add_argument("-m", "--kill-server", action="store_true",
+                        help="Terminate any running bitbake server.")
+
+    server_group.add_argument("--token", dest="xmlrpctoken",
+                        default=os.environ.get("BBTOKEN"),
+                        help="Specify the connection token to be used when connecting "
+                             "to a remote server.")
+
+    server_group.add_argument("--observe-only", action="store_true",
+                        help="Connect to a server as an observing-only client.")
+
+    server_group.add_argument("--status-only", action="store_true",
+                        help="Check the status of the remote bitbake server.")
+
+    server_group.add_argument("--server-only", action="store_true",
+                        help="Run bitbake without a UI, only starting a server "
+                            "(cooker) process.")
+
+
+    config_group.add_argument("-r", "--read", action="append", dest="prefile", default=[],
+                        help="Read the specified file before bitbake.conf.")
+
+    config_group.add_argument("-R", "--postread", action="append", dest="postfile", default=[],
+                        help="Read the specified file after bitbake.conf.")
+
+
+    config_group.add_argument("-I", "--ignore-deps", action="append",
+                        dest="extra_assume_provided", default=[],
+                        help="Assume these dependencies don't exist and are already provided "
+                             "(equivalent to ASSUME_PROVIDED). Useful to make dependency "
+                             "graphs more appealing.")
+
     return parser
 
 
 class BitBakeConfigParameters(cookerdata.ConfigParameters):
     def parseCommandLine(self, argv=sys.argv):
         parser = create_bitbake_parser()
-        options, targets = parser.parse_args(argv)
+        options = parser.parse_intermixed_args(argv[1:])
+
+        if options.version:
+            print("BitBake Build Tool Core version %s" % bb.__version__)
+            sys.exit(0)
 
         if options.quiet and options.verbose:
             parser.error("options --quiet and --verbose are mutually exclusive")
@@ -319,7 +345,7 @@ class BitBakeConfigParameters(cookerdata.ConfigParameters):
         else:
             options.xmlrpcinterface = (None, 0)
 
-        return options, targets[1:]
+        return options, options.targets
 
 
 def bitbake_main(configParams, configuration):
@@ -384,12 +410,20 @@ def bitbake_main(configParams, configuration):
 
     return 1
 
+def timestamp():
+    return datetime.datetime.now().strftime('%H:%M:%S.%f')
+
 def setup_bitbake(configParams, extrafeatures=None):
     # Ensure logging messages get sent to the UI as events
     handler = bb.event.LogHandler()
     if not configParams.status_only:
         # In status only mode there are no logs and no UI
         logger.addHandler(handler)
+
+    if configParams.dump_signatures:
+        if extrafeatures is None:
+            extrafeatures = []
+        extrafeatures.append(bb.cooker.CookerFeatures.RECIPE_SIGGEN_INFO)
 
     if configParams.server_only:
         featureset = []
@@ -418,7 +452,7 @@ def setup_bitbake(configParams, extrafeatures=None):
         retries = 8
         while retries:
             try:
-                topdir, lock = lockBitbake()
+                topdir, lock, lockfile = lockBitbake()
                 sockname = topdir + "/bitbake.sock"
                 if lock:
                     if configParams.status_only or configParams.kill_server:
@@ -429,18 +463,22 @@ def setup_bitbake(configParams, extrafeatures=None):
                     logger.info("Starting bitbake server...")
                     # Clear the event queue since we already displayed messages
                     bb.event.ui_queue = []
-                    server = bb.server.process.BitBakeServer(lock, sockname, featureset, configParams.server_timeout, configParams.xmlrpcinterface)
+                    server = bb.server.process.BitBakeServer(lock, sockname, featureset, configParams.server_timeout, configParams.xmlrpcinterface, configParams.profile)
 
                 else:
                     logger.info("Reconnecting to bitbake server...")
                     if not os.path.exists(sockname):
-                        logger.info("Previous bitbake instance shutting down?, waiting to retry...")
+                        logger.info("Previous bitbake instance shutting down?, waiting to retry... (%s)" % timestamp())
+                        procs = bb.server.process.get_lockfile_process_msg(lockfile)
+                        if procs:
+                            logger.info("Processes holding bitbake.lock (missing socket %s):\n%s" % (sockname, procs))
+                        logger.info("Directory listing: %s" % (str(os.listdir(topdir))))
                         i = 0
                         lock = None
                         # Wait for 5s or until we can get the lock
                         while not lock and i < 50:
                             time.sleep(0.1)
-                            _, lock = lockBitbake()
+                            _, lock, _ = lockBitbake()
                             i += 1
                         if lock:
                             bb.utils.unlockfile(lock)
@@ -459,9 +497,9 @@ def setup_bitbake(configParams, extrafeatures=None):
                 retries -= 1
                 tryno = 8 - retries
                 if isinstance(e, (bb.server.process.ProcessTimeout, BrokenPipeError, EOFError, SystemExit)):
-                    logger.info("Retrying server connection (#%d)..." % tryno)
+                    logger.info("Retrying server connection (#%d)... (%s)" % (tryno, timestamp()))
                 else:
-                    logger.info("Retrying server connection (#%d)... (%s)" % (tryno, traceback.format_exc()))
+                    logger.info("Retrying server connection (#%d)... (%s, %s)" % (tryno, traceback.format_exc(), timestamp()))
 
             if not retries:
                 bb.fatal("Unable to connect to bitbake server, or start one (server startup failures would be in bitbake-cookerdaemon.log).")
@@ -490,5 +528,5 @@ def lockBitbake():
         bb.error("Unable to find conf/bblayers.conf or conf/bitbake.conf. BBPATH is unset and/or not in a build directory?")
         raise BBMainFatal
     lockfile = topdir + "/bitbake.lock"
-    return topdir, bb.utils.lockfile(lockfile, False, False)
+    return topdir, bb.utils.lockfile(lockfile, False, False), lockfile
 

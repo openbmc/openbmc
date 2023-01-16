@@ -1,0 +1,82 @@
+From 01e738a8f1414acd0102e432bbc15b4e603fd956 Mon Sep 17 00:00:00 2001
+From: Vincent Davis Jr <vince@underview.tech>
+Date: Thu, 8 Dec 2022 10:34:20 -0600
+Subject: [PATCH] configure: setup for OE-core usage
+
+Upstream-Status: Inappropriate
+
+RPI-Distro repo clones original ffmpeg and applies patches to enable
+raspiberry pi support.
+
+Add global CFLAGS and LDFLAGS. So, that when
+./configure runs test it's able to locate proper
+headers and libs in a cross-compile environment.
+
+Add new check to opengl. None of the above headers
+exists and we also should be using GLESv2.
+
+Update where compiler finds OMX_Core.h
+
+Only check that sdl2 version greater than 2.0.1
+
+Signed-off-by: Vincent Davis Jr <vince@underview.tech>
+---
+ configure | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/configure b/configure
+index 723b81f1..0c7f2654 100755
+--- a/configure
++++ b/configure
+@@ -5746,6 +5746,9 @@ enable_weak_pic() {
+ }
+ 
+ enabled pic && enable_weak_pic
++# Set CFLAGS and LDFLAGS globally
++add_cflags -I${sysroot}/usr/include/ -I${sysroot}/usr/include/IL -I${sysroot}/usr/include/drm
++add_ldflags -L${sysroot}/usr/lib/
+ 
+ test_cc <<EOF || die "Symbol mangling check failed."
+ int ff_extern;
+@@ -6471,8 +6474,7 @@ enabled mbedtls           && { check_pkg_config mbedtls mbedtls mbedtls/x509_crt
+                                die "ERROR: mbedTLS not found"; }
+ enabled mediacodec        && { enabled jni || die "ERROR: mediacodec requires --enable-jni"; }
+ ( enabled rpi ||
+-  enabled mmal )          && { { add_cflags -isystem/opt/vc/include/ -isystem/opt/vc/include/interface/vmcs_host/linux -isystem/opt/vc/include/interface/vcos/pthreads -fgnu89-inline &&
+-                               add_ldflags -L/opt/vc/lib/ &&
++  enabled mmal )          && { { add_cflags -I${sysroot}/usr/include/interface/vmcs_host/linux -I${sysroot}/usr/include/interface/vcos/pthreads -fgnu89-inline &&
+                                check_lib mmal interface/mmal/mmal.h mmal_port_connect -lmmal_core -lmmal_util -lmmal_vc_client -lbcm_host -lvcsm -lvchostif -lvchiq_arm -lvcos; } ||
+                                die "ERROR: mmal not found" &&
+                                check_func_headers interface/mmal/mmal.h "MMAL_PARAMETER_VIDEO_MAX_NUM_CALLBACKS"; }
+@@ -6492,15 +6494,15 @@ enabled opengl            && { check_lib opengl GL/glx.h glXGetProcAddress "-lGL
+                                check_lib opengl windows.h wglGetProcAddress "-lopengl32 -lgdi32" ||
+                                check_lib opengl OpenGL/gl3.h glGetError "-Wl,-framework,OpenGL" ||
+                                check_lib opengl ES2/gl.h glGetError "-isysroot=${sysroot} -Wl,-framework,OpenGLES" ||
++                               check_lib opengl GLES2/gl2.h glGetError "-lGLESv2" ||
+                                die "ERROR: opengl not found."
+                              }
+-enabled omx_rpi           && { test_code cc OMX_Core.h OMX_IndexConfigBrcmVideoRequestIFrame ||
++enabled omx_rpi           && { test_code cc IL/OMX_Core.h OMX_IndexConfigBrcmVideoRequestIFrame ||
+                                { ! enabled cross_compile &&
+-                                 add_cflags -isystem/opt/vc/include/IL &&
+-                                 test_code cc OMX_Core.h OMX_IndexConfigBrcmVideoRequestIFrame; } ||
++                                 test_code cc IL/OMX_Core.h OMX_IndexConfigBrcmVideoRequestIFrame; } ||
+                                die "ERROR: OpenMAX IL headers from raspberrypi/firmware not found"; } &&
+                              enable omx
+-enabled omx               && require_headers OMX_Core.h
++enabled omx               && require_headers IL/OMX_Core.h
+ enabled openssl           && { check_pkg_config openssl openssl openssl/ssl.h OPENSSL_init_ssl ||
+                                check_pkg_config openssl openssl openssl/ssl.h SSL_library_init ||
+                                check_lib openssl openssl/ssl.h OPENSSL_init_ssl -lssl -lcrypto ||
+@@ -6540,7 +6542,7 @@ fi
+ 
+ if enabled sdl2; then
+     SDL2_CONFIG="${cross_prefix}sdl2-config"
+-    test_pkg_config sdl2 "sdl2 >= 2.0.1 sdl2 < 2.1.0" SDL_events.h SDL_PollEvent
++    test_pkg_config sdl2 "sdl2 >= 2.0.1" SDL_events.h SDL_PollEvent
+     if disabled sdl2 && "${SDL2_CONFIG}" --version > /dev/null 2>&1; then
+         sdl2_cflags=$("${SDL2_CONFIG}" --cflags)
+         sdl2_extralibs=$("${SDL2_CONFIG}" --libs)
+-- 
+2.38.1
+

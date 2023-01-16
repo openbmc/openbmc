@@ -1,0 +1,41 @@
+From 8f8cbc7b773da63bce8226249784ba6824635c9c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 7 Dec 2022 20:19:27 -0800
+Subject: [PATCH v3 3/3] internal.h: Make LFS mandatory for all usecases
+
+erosfs depend on the consistent use of a 64bit offset
+type, force downstreams to use transparent LFS (_FILE_OFFSET_BITS=64),
+so that it becomes impossible for them to use 32bit interfaces.
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-erofs/20221215064758.93821-3-raj.khem@gmail.com/T/#u]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/erofs/internal.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/include/erofs/internal.h b/include/erofs/internal.h
+index 6a70f11..d3b2986 100644
+--- a/include/erofs/internal.h
++++ b/include/erofs/internal.h
+@@ -21,6 +21,7 @@ typedef unsigned short umode_t;
+ 
+ #include "erofs_fs.h"
+ #include <fcntl.h>
++#include <sys/types.h> /* for off_t definition */
+ 
+ #ifndef PATH_MAX
+ #define PATH_MAX        4096    /* # chars in a path name including nul */
+@@ -104,6 +105,10 @@ struct erofs_sb_info {
+ 	};
+ };
+ 
++
++/* make sure that any user of the erofs headers has atleast 64bit off_t type */
++extern int erofs_assert_largefile[sizeof(off_t)-8];
++
+ /* global sbi */
+ extern struct erofs_sb_info sbi;
+ 
+-- 
+2.39.0
+

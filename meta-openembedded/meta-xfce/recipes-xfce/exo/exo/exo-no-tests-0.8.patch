@@ -10,17 +10,20 @@ Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
 
+Rebase for xfce4 4.18.0.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  Makefile.am | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index 226e79d..62ad18d 100644
+index 513ac36..c395272 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -9,8 +9,7 @@ SUBDIRS =								\
+@@ -6,8 +6,7 @@ SUBDIRS =								\
+ 	exo-open							\
  	docs								\
- 	icons								\
  	pixmaps								\
 -	po								\
 -	tests

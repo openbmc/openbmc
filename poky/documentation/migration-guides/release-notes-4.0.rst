@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 Release notes for 4.0 (kirkstone)
 ---------------------------------
 
@@ -8,9 +10,10 @@ New Features / Enhancements in 4.0
 
 - Linux kernel 5.15, glibc 2.35 and ~300 other recipe upgrades
 
-- Reproducibility: this release fixes the reproducibility issues with ``rust-llvm`` and
-  ``golang``. Recipes in OpenEmbedded-Core are now fully reproducible. Functionality
-  previously in the optional "reproducible" class has been merged into the base class.
+- Reproducibility: this release fixes the reproducibility issues with
+  ``rust-llvm`` and ``golang``. Recipes in OpenEmbedded-Core are now fully
+  reproducible. Functionality previously in the optional "reproducible"
+  class has been merged into the :ref:`ref-classes-base` class.
 
 - Network access is now disabled by default for tasks other than where it is expected to ensure build integrity (where host kernel supports it)
 
@@ -28,8 +31,7 @@ New Features / Enhancements in 4.0
 - The Python package build process is now based on `wheels <https://pythonwheels.com/>`__
   in line with the upstream direction.
 
-- New :ref:`overlayfs <ref-classes-overlayfs>` and
-  :ref:`overlayfs-etc <ref-classes-overlayfs-etc>` classes and
+- New :ref:`ref-classes-overlayfs` and :ref:`ref-classes-overlayfs-etc` classes and
   ``overlayroot`` support in the :term:`Initramfs` framework to make it easier to
   overlay read-only filesystems (for example) with
   :wikipedia:`OverlayFS <OverlayFS>`.
@@ -143,7 +145,7 @@ New Features / Enhancements in 4.0
       - qemuarm64: Add tiny ktype to qemuarm64 bsp
       - armv9a/tune: Add the support for the Neoverse N2 core
       - arch-armv8-5a.inc: Add tune include for armv8.5a
-      - grub-efi: Add xen_boot support when 'xen' is in DISTRO_FEATURES for aarch64
+      - grub-efi: Add xen_boot support when 'xen' is in :term:`DISTRO_FEATURES` for aarch64
       - tune-cortexa73: Introduce cortexa73-crypto tune
       - libacpi: Build libacpi also for 'aarch64' machines
       - core-image-tiny-initramfs: Mark recipe as 32 bit ARM compatible
@@ -175,7 +177,7 @@ New Features / Enhancements in 4.0
    - linux-yocto: cfg: add kcov feature fragment
    - linux-yocto: export pkgconfig variables to devshell
    - linux-yocto-dev: use versioned branch as default
-   - New ``KERNEL_DEBUG_TIMESTAMPS`` variable (to replace removed ``BUILD_REPRODUCIBLE_BINARIES`` for the kernel)
+   - New :term:`KERNEL_DEBUG_TIMESTAMPS` variable (to replace removed ``BUILD_REPRODUCIBLE_BINARIES`` for the kernel)
    - Introduce python3-dtschema-wrapper in preparation for mandatory schema checking on dtb files in 5.16
    - Allow disabling kernel artifact symlink creation
    - Allow changing default .bin kernel artifact extension
@@ -215,7 +217,7 @@ New Features / Enhancements in 4.0
    - Ensure addition of patch-fuzz retriggers do_qa_patch
    - Added a sanity check for allarch packagegroups
 
-- create-spdx class improvements:
+- :ref:`ref-classes-create-spdx` class improvements:
 
    - Get SPDX-License-Identifier from source files
    - Generate manifest also for SDKs
@@ -235,8 +237,10 @@ New Features / Enhancements in 4.0
    
 - SDK-related enhancements:
 
-   - Extended recipes to ``nativesdk``: ``cargo``, ``librsvg``, ``libstd-rs``, ``libva``, ``python3-docutil``, ``python3-packaging``
-   - Enabled nativesdk recipes to find a correct version of the rust cross compiler
+   - Extended recipes to :ref:`ref-classes-nativesdk`: ``cargo``,
+     ``librsvg``, ``libstd-rs``, ``libva``, ``python3-docutil``, ``python3-packaging``
+   - Enabled :ref:`ref-classes-nativesdk` recipes to find a correct version
+     of the rust cross compiler
    - Support creating per-toolchain cmake file in SDK
 
 - Rust enhancements:
@@ -289,7 +293,7 @@ New Features / Enhancements in 4.0
 - libxkbcommon: allow building of API documentation
 - libxkbcommon: split libraries and xkbcli into separate packages
 - systemd: move systemd shared library into its own package
-- systemd: Minimize udev package size if DISTRO_FEATURES doen't contain sysvinit
+- systemd: Minimize udev package size if :term:`DISTRO_FEATURES` doen't contain sysvinit
 
 Known Issues in 4.0
 ~~~~~~~~~~~~~~~~~~~
@@ -301,22 +305,22 @@ Known Issues in 4.0
 Recipe License changes in 4.0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The following corrections have been made to the LICENSE values set by recipes:
+The following corrections have been made to the :term:`LICENSE` values set by recipes:
 
-* cmake: add BSD-1-Clause & MIT & BSD-2-Clause to LICENSE due to additional vendored libraries in native/target context
-* gettext: extend LICENSE conditional upon PACKAGECONFIG (due to vendored libraries)
+* cmake: add BSD-1-Clause & MIT & BSD-2-Clause to :term:`LICENSE` due to additional vendored libraries in native/target context
+* gettext: extend :term:`LICENSE` conditional upon :term:`PACKAGECONFIG` (due to vendored libraries)
 * gstreamer1.0: update licenses of all modules to LGPL-2.1-or-later (with some exceptions that are GPL-2.0-or-later)
 * gstreamer1.0-plugins-bad/ugly: use the GPL-2.0-or-later only when it is in use
 * kern-tools-native: add missing MIT license due to Kconfiglib
-* libcap: add pam_cap license to LIC_FILES_CHKSUM if pam is enabled
+* libcap: add pam_cap license to :term:`LIC_FILES_CHKSUM` if pam is enabled
 * libidn2: add Unicode-DFS-2016 license
-* libsdl2: add BSD-2-Clause to LICENSE due to default yuv2rgb and hidapi inclusion
-* libx11-compose-data: update LICENSE to "MIT & MIT-style & BSD-1-Clause & HPND & HPND-sell-variant" to better reflect reality
-* libx11: update LICENSE to "MIT & MIT-style & BSD-1-Clause & HPND & HPND-sell-variant" to better reflect reality
-* libxshmfence: correct LICENSE - MIT -> HPND
-* newlib: add BSD-3-Clause to LICENSE
-* python3-idna: correct LICENSE - Unicode -> Unicode-TOU
-* python3-pip: add "Apache-2.0 & MPL-2.0 & LGPL-2.1-only & BSD-3-Clause & PSF-2.0 & BSD-2-Clause" to LICENSE due to vendored libraries
+* libsdl2: add BSD-2-Clause to :term:`LICENSE` due to default yuv2rgb and hidapi inclusion
+* libx11-compose-data: update :term:`LICENSE` to "MIT & MIT-style & BSD-1-Clause & HPND & HPND-sell-variant" to better reflect reality
+* libx11: update :term:`LICENSE` to "MIT & MIT-style & BSD-1-Clause & HPND & HPND-sell-variant" to better reflect reality
+* libxshmfence: correct :term:`LICENSE` - MIT -> HPND
+* newlib: add BSD-3-Clause to :term:`LICENSE`
+* python3-idna: correct :term:`LICENSE` - Unicode -> Unicode-TOU
+* python3-pip: add "Apache-2.0 & MPL-2.0 & LGPL-2.1-only & BSD-3-Clause & PSF-2.0 & BSD-2-Clause" to :term:`LICENSE` due to vendored libraries
 
 Other license-related notes:
 

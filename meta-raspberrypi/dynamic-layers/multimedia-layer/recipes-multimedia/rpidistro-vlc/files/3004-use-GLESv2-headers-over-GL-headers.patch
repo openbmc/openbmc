@@ -1,0 +1,60 @@
+From 377a67af6c3f7c38f6f7ba24f042ba1a6cfd3f24 Mon Sep 17 00:00:00 2001
+From: Vincent Davis Jr <vince@underview.tech>
+Date: Fri, 9 Dec 2022 00:21:43 -0600
+Subject: [PATCH] use GLESv2 headers over GL headers
+
+Upstream-Status: Inappropriate
+
+RPI-Distro repo forks original vlc and applies patches to enable
+raspiberry pi support.
+
+We utilize GLESv2 during compilation. Patches ensures
+we utilize headers for it.
+
+Signed-off-by: Vincent Davis Jr <vince@underview.tech>
+---
+ modules/video_output/opengl/converter.h | 12 +++---------
+ modules/visualization/glspectrum.c      |  4 +++-
+ 2 files changed, 6 insertions(+), 10 deletions(-)
+
+diff --git a/modules/video_output/opengl/converter.h b/modules/video_output/opengl/converter.h
+index 7000e1f38..a3fe32671 100644
+--- a/modules/video_output/opengl/converter.h
++++ b/modules/video_output/opengl/converter.h
+@@ -41,15 +41,9 @@
+ #  include <OpenGLES/ES2/glext.h>
+ # endif
+ #else /* !defined (__APPLE__) */
+-# if defined (USE_OPENGL_ES2)
+-#  include <GLES2/gl2.h>
+-#  include <GLES2/gl2ext.h>
+-# else
+-#  ifdef _WIN32
+-#   include <GL/glew.h>
+-#  endif
+-#  include <GL/gl.h>
+-# endif
++#define USE_OPENGL_ES2
++#include <GLES2/gl2.h>
++#include <GLES2/gl2ext.h>
+ #endif
+ 
+ #define VLCGL_PICTURE_MAX 128
+diff --git a/modules/visualization/glspectrum.c b/modules/visualization/glspectrum.c
+index 06f8d1bdf..470080b1a 100644
+--- a/modules/visualization/glspectrum.c
++++ b/modules/visualization/glspectrum.c
+@@ -37,7 +37,9 @@
+ #ifdef __APPLE__
+ # include <OpenGL/gl.h>
+ #else
+-# include <GL/gl.h>
++#define USE_OPENGL_ES2
++#include <GLES2/gl2.h>
++#include <GLES2/gl2ext.h>
+ #endif
+ 
+ #include <math.h>
+-- 
+2.38.1
+

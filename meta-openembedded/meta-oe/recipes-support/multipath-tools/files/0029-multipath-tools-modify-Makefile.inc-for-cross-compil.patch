@@ -1,4 +1,4 @@
-From c3436ec8a502a40579abf62be0a479fa9d7888ad Mon Sep 17 00:00:00 2001
+From d139474f2a6d87c1cd20dfbb916fe650bfcce968 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Tue, 4 Jun 2019 11:39:39 +0800
 Subject: [PATCH] multipath-tools: modify Makefile.inc for cross-compilation
@@ -26,21 +26,23 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
 
 update for version 0.8.1
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
+[OP: Rebase to 0.9.3]
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
 ---
  Makefile.inc | 11 -----------
  1 file changed, 11 deletions(-)
 
 diff --git a/Makefile.inc b/Makefile.inc
-index 661f141..3f9fd28 100644
+index 34f2cc6d..ee6a4c9f 100644
 --- a/Makefile.inc
 +++ b/Makefile.inc
-@@ -35,17 +35,6 @@ ifndef RUN
+@@ -42,17 +42,6 @@ ifndef RUN
  	endif
  endif
  
 -ifndef SYSTEMD
--	ifeq ($(shell pkg-config --modversion libsystemd >/dev/null 2>&1 && echo 1), 1)
--		SYSTEMD = $(shell pkg-config --modversion libsystemd)
+-	ifeq ($(shell $(PKGCONFIG) --modversion libsystemd >/dev/null 2>&1 && echo 1), 1)
+-		SYSTEMD = $(shell $(PKGCONFIG) --modversion libsystemd | awk '{print $$1}')
 -	else
 -		ifeq ($(shell systemctl --version >/dev/null 2>&1 && echo 1), 1)
 -			SYSTEMD = $(shell systemctl --version 2> /dev/null | \
@@ -53,5 +55,5 @@ index 661f141..3f9fd28 100644
  	SYSTEMDPATH=usr/lib
  endif
 -- 
-2.7.4
+2.38.1
 

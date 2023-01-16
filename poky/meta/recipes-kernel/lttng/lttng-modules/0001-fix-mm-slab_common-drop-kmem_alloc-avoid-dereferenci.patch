@@ -1,0 +1,278 @@
+From b977f96d0a414e76d4c544f65791919dde1bc57e Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 17 Oct 2022 13:49:51 -0400
+Subject: [PATCH] fix: mm/slab_common: drop kmem_alloc & avoid dereferencing
+ fields when not using (v6.1)
+
+See uptream commit:
+
+  commit 2c1d697fb8ba6d2d44f914d4268ae1ccdf025f1b
+  Author: Hyeonggon Yoo <42.hyeyoo@gmail.com>
+  Date:   Wed Aug 17 19:18:24 2022 +0900
+
+    mm/slab_common: drop kmem_alloc & avoid dereferencing fields when not using
+
+    Drop kmem_alloc event class, and define kmalloc and kmem_cache_alloc
+    using TRACE_EVENT() macro.
+
+    And then this patch does:
+       - Do not pass pointer to struct kmem_cache to trace_kmalloc.
+         gfp flag is enough to know if it's accounted or not.
+       - Avoid dereferencing s->object_size and s->size when not using kmem_cache_alloc event.
+       - Avoid dereferencing s->name in when not using kmem_cache_free event.
+       - Adjust s->size to SLOB_UNITS(s->size) * SLOB_UNIT in SLOB
+
+Upstream-Status: Backport [commit b977f96d0a414e76d4c544f]
+
+Change-Id: Icd7925731ed4a737699c3746cb7bb7760a4e8009
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/instrumentation/events/kmem.h | 156 ++++++++++++++++++--------
+ 1 file changed, 111 insertions(+), 45 deletions(-)
+
+diff --git a/include/instrumentation/events/kmem.h b/include/instrumentation/events/kmem.h
+index 219533a1..0f5bd8e6 100644
+--- a/include/instrumentation/events/kmem.h
++++ b/include/instrumentation/events/kmem.h
+@@ -10,9 +10,58 @@
+ #include <lttng/kernel-version.h>
+ 
+ #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,0,0))
+-
+ #include <../../mm/slab.h>
++#endif
++
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,1,0))
++LTTNG_TRACEPOINT_EVENT_MAP(kmalloc,
++
++	kmem_kmalloc,
++
++	TP_PROTO(unsigned long call_site,
++		 const void *ptr,
++		 size_t bytes_req,
++		 size_t bytes_alloc,
++		 gfp_t gfp_flags,
++		 int node),
++
++	TP_ARGS(call_site, ptr, bytes_req, bytes_alloc, gfp_flags, node),
++
++	TP_FIELDS(
++		ctf_integer_hex(unsigned long, call_site, call_site)
++		ctf_integer_hex(const void *, ptr, ptr)
++		ctf_integer(size_t, bytes_req, bytes_req)
++		ctf_integer(size_t, bytes_alloc, bytes_alloc)
++		ctf_integer(gfp_t, gfp_flags, gfp_flags)
++		ctf_integer(int, node, node)
++		ctf_integer(bool, accounted, (IS_ENABLED(CONFIG_MEMCG_KMEM) &&
++			(gfp_flags & __GFP_ACCOUNT) ? true : false))
++	)
++)
++
++LTTNG_TRACEPOINT_EVENT(kmem_cache_alloc,
++
++	TP_PROTO(unsigned long call_site,
++		 const void *ptr,
++		 struct kmem_cache *s,
++		 gfp_t gfp_flags,
++		 int node),
++
++	TP_ARGS(call_site, ptr, s, gfp_flags, node),
+ 
++	TP_FIELDS(
++		ctf_integer_hex(unsigned long, call_site, call_site)
++		ctf_integer_hex(const void *, ptr, ptr)
++		ctf_integer(size_t, bytes_req, s->object_size)
++		ctf_integer(size_t, bytes_alloc, s->size)
++		ctf_integer(gfp_t, gfp_flags, gfp_flags)
++		ctf_integer(int, node, node)
++		ctf_integer(bool, accounted, IS_ENABLED(CONFIG_MEMCG_KMEM) ?
++			((gfp_flags & __GFP_ACCOUNT) ||
++			(s->flags & SLAB_ACCOUNT)) : false)
++	)
++)
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,0,0))
+ LTTNG_TRACEPOINT_EVENT_CLASS(kmem_alloc,
+ 
+ 	TP_PROTO(unsigned long call_site,
+@@ -53,18 +102,16 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(kmem_alloc, kmem_cache_alloc,
+ 
+ 	TP_ARGS(call_site, ptr, s, bytes_req, bytes_alloc, gfp_flags)
+ )
+-
+-LTTNG_TRACEPOINT_EVENT_CLASS(kmem_alloc_node,
++#else
++LTTNG_TRACEPOINT_EVENT_CLASS(kmem_alloc,
+ 
+ 	TP_PROTO(unsigned long call_site,
+ 		 const void *ptr,
+-		 struct kmem_cache *s,
+ 		 size_t bytes_req,
+ 		 size_t bytes_alloc,
+-		 gfp_t gfp_flags,
+-		 int node),
++		 gfp_t gfp_flags),
+ 
+-	TP_ARGS(call_site, ptr, s, bytes_req, bytes_alloc, gfp_flags, node),
++	TP_ARGS(call_site, ptr, bytes_req, bytes_alloc, gfp_flags),
+ 
+ 	TP_FIELDS(
+ 		ctf_integer_hex(unsigned long, call_site, call_site)
+@@ -72,42 +119,40 @@ LTTNG_TRACEPOINT_EVENT_CLASS(kmem_alloc_node,
+ 		ctf_integer(size_t, bytes_req, bytes_req)
+ 		ctf_integer(size_t, bytes_alloc, bytes_alloc)
+ 		ctf_integer(gfp_t, gfp_flags, gfp_flags)
+-		ctf_integer(int, node, node)
+-		ctf_integer(bool, accounted, IS_ENABLED(CONFIG_MEMCG_KMEM) ?
+-			((gfp_flags & __GFP_ACCOUNT) ||
+-			(s && s->flags & SLAB_ACCOUNT)) : false)
+ 	)
+ )
+ 
+-LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(kmem_alloc_node, kmalloc_node,
++LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(kmem_alloc, kmalloc,
+ 
+-	kmem_kmalloc_node,
++	kmem_kmalloc,
+ 
+ 	TP_PROTO(unsigned long call_site, const void *ptr,
+-		 struct kmem_cache *s, size_t bytes_req, size_t bytes_alloc,
+-		 gfp_t gfp_flags, int node),
++		 size_t bytes_req, size_t bytes_alloc, gfp_t gfp_flags),
+ 
+-	TP_ARGS(call_site, ptr, s, bytes_req, bytes_alloc, gfp_flags, node)
++	TP_ARGS(call_site, ptr, bytes_req, bytes_alloc, gfp_flags)
+ )
+ 
+-LTTNG_TRACEPOINT_EVENT_INSTANCE(kmem_alloc_node, kmem_cache_alloc_node,
++LTTNG_TRACEPOINT_EVENT_INSTANCE(kmem_alloc, kmem_cache_alloc,
+ 
+ 	TP_PROTO(unsigned long call_site, const void *ptr,
+-		 struct kmem_cache *s, size_t bytes_req, size_t bytes_alloc,
+-		 gfp_t gfp_flags, int node),
++		 size_t bytes_req, size_t bytes_alloc, gfp_t gfp_flags),
+ 
+-	TP_ARGS(call_site, ptr, s, bytes_req, bytes_alloc, gfp_flags, node)
++	TP_ARGS(call_site, ptr, bytes_req, bytes_alloc, gfp_flags)
+ )
+-#else
+-LTTNG_TRACEPOINT_EVENT_CLASS(kmem_alloc,
++#endif
++
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,0,0))
++LTTNG_TRACEPOINT_EVENT_CLASS(kmem_alloc_node,
+ 
+ 	TP_PROTO(unsigned long call_site,
+ 		 const void *ptr,
++		 struct kmem_cache *s,
+ 		 size_t bytes_req,
+ 		 size_t bytes_alloc,
+-		 gfp_t gfp_flags),
++		 gfp_t gfp_flags,
++		 int node),
+ 
+-	TP_ARGS(call_site, ptr, bytes_req, bytes_alloc, gfp_flags),
++	TP_ARGS(call_site, ptr, s, bytes_req, bytes_alloc, gfp_flags, node),
+ 
+ 	TP_FIELDS(
+ 		ctf_integer_hex(unsigned long, call_site, call_site)
+@@ -115,27 +160,33 @@ LTTNG_TRACEPOINT_EVENT_CLASS(kmem_alloc,
+ 		ctf_integer(size_t, bytes_req, bytes_req)
+ 		ctf_integer(size_t, bytes_alloc, bytes_alloc)
+ 		ctf_integer(gfp_t, gfp_flags, gfp_flags)
++		ctf_integer(int, node, node)
++		ctf_integer(bool, accounted, IS_ENABLED(CONFIG_MEMCG_KMEM) ?
++			((gfp_flags & __GFP_ACCOUNT) ||
++			(s && s->flags & SLAB_ACCOUNT)) : false)
+ 	)
+ )
+ 
+-LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(kmem_alloc, kmalloc,
++LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(kmem_alloc_node, kmalloc_node,
+ 
+-	kmem_kmalloc,
++	kmem_kmalloc_node,
+ 
+ 	TP_PROTO(unsigned long call_site, const void *ptr,
+-		 size_t bytes_req, size_t bytes_alloc, gfp_t gfp_flags),
++		 struct kmem_cache *s, size_t bytes_req, size_t bytes_alloc,
++		 gfp_t gfp_flags, int node),
+ 
+-	TP_ARGS(call_site, ptr, bytes_req, bytes_alloc, gfp_flags)
++	TP_ARGS(call_site, ptr, s, bytes_req, bytes_alloc, gfp_flags, node)
+ )
+ 
+-LTTNG_TRACEPOINT_EVENT_INSTANCE(kmem_alloc, kmem_cache_alloc,
++LTTNG_TRACEPOINT_EVENT_INSTANCE(kmem_alloc_node, kmem_cache_alloc_node,
+ 
+ 	TP_PROTO(unsigned long call_site, const void *ptr,
+-		 size_t bytes_req, size_t bytes_alloc, gfp_t gfp_flags),
++		 struct kmem_cache *s, size_t bytes_req, size_t bytes_alloc,
++		 gfp_t gfp_flags, int node),
+ 
+-	TP_ARGS(call_site, ptr, bytes_req, bytes_alloc, gfp_flags)
++	TP_ARGS(call_site, ptr, s, bytes_req, bytes_alloc, gfp_flags, node)
+ )
+-
++#else
+ LTTNG_TRACEPOINT_EVENT_CLASS(kmem_alloc_node,
+ 
+ 	TP_PROTO(unsigned long call_site,
+@@ -192,19 +243,6 @@ LTTNG_TRACEPOINT_EVENT_MAP(kfree,
+ 		ctf_integer_hex(const void *, ptr, ptr)
+ 	)
+ )
+-
+-LTTNG_TRACEPOINT_EVENT(kmem_cache_free,
+-
+-	TP_PROTO(unsigned long call_site, const void *ptr, const char *name),
+-
+-	TP_ARGS(call_site, ptr, name),
+-
+-	TP_FIELDS(
+-		ctf_integer_hex(unsigned long, call_site, call_site)
+-		ctf_integer_hex(const void *, ptr, ptr)
+-		ctf_string(name, name)
+-	)
+-)
+ #else
+ LTTNG_TRACEPOINT_EVENT_CLASS(kmem_free,
+ 
+@@ -235,6 +273,34 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(kmem_free, kmem_cache_free,
+ )
+ #endif
+ 
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,1,0))
++LTTNG_TRACEPOINT_EVENT(kmem_cache_free,
++
++	TP_PROTO(unsigned long call_site, const void *ptr, const struct kmem_cache *s),
++
++	TP_ARGS(call_site, ptr, s),
++
++	TP_FIELDS(
++		ctf_integer_hex(unsigned long, call_site, call_site)
++		ctf_integer_hex(const void *, ptr, ptr)
++		ctf_string(name, s->name)
++	)
++)
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,12,0))
++LTTNG_TRACEPOINT_EVENT(kmem_cache_free,
++
++	TP_PROTO(unsigned long call_site, const void *ptr, const char *name),
++
++	TP_ARGS(call_site, ptr, name),
++
++	TP_FIELDS(
++		ctf_integer_hex(unsigned long, call_site, call_site)
++		ctf_integer_hex(const void *, ptr, ptr)
++		ctf_string(name, name)
++	)
++)
++#endif
++
+ #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(3,3,0))
+ LTTNG_TRACEPOINT_EVENT_MAP(mm_page_free, kmem_mm_page_free,
+ #else
+-- 
+2.19.1
+

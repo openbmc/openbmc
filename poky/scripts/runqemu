@@ -999,7 +999,7 @@ class BaseConfig(object):
             if self.slirp_enabled:
                 self.nfs_server = '10.0.2.2'
             else:
-                self.nfs_server = '192.168.7.1'
+                self.nfs_server = '192.168.7.@GATEWAY@'
 
         # Figure out a new nfs_instance to allow multiple qemus running.
         ps = subprocess.check_output(("ps", "auxww")).decode('utf-8')
@@ -1058,6 +1058,13 @@ class BaseConfig(object):
 
         self.nfs_running = True
 
+    def setup_cmd(self):
+        cmd = self.get('QB_SETUP_CMD')
+        if cmd != '':
+            logger.info('Running setup command %s' % str(cmd))
+            if subprocess.call(cmd, shell=True) != 0:
+                raise RunQemuError('Failed to run %s' % cmd)
+
     def setup_net_bridge(self):
         self.set('NETWORK_CMD', '-netdev bridge,br=%s,id=net0,helper=%s -device virtio-net-pci,netdev=net0 ' % (
             self.net_bridge, os.path.join(self.bindir_native, 'qemu-oe-bridge-helper')))
@@ -1071,7 +1078,7 @@ class BaseConfig(object):
         logger.info("Network configuration:%s", netconf)
         self.kernel_cmdline_script += netconf
         # Port mapping
-        hostfwd = ",hostfwd=tcp::2222-:22,hostfwd=tcp::2323-:23"
+        hostfwd = ",hostfwd=tcp:127.0.0.1:2222-:22,hostfwd=tcp:127.0.0.1:2323-:23"
         qb_slirp_opt_default = "-netdev user,id=net0%s,tftp=%s" % (hostfwd, self.get('DEPLOY_DIR_IMAGE'))
         qb_slirp_opt = self.get('QB_SLIRP_OPT') or qb_slirp_opt_default
         # Figure out the port
@@ -1187,6 +1194,7 @@ class BaseConfig(object):
         netconf = " " + self.cmdline_ip_tap
         netconf = netconf.replace('@CLIENT@', str(client))
         netconf = netconf.replace('@GATEWAY@', str(gateway))
+        self.nfs_server = self.nfs_server.replace('@GATEWAY@', str(gateway))
         logger.info("Network configuration:%s", netconf)
         self.kernel_cmdline_script += netconf
         mac = "%s%02x" % (self.mac_tap, client)
@@ -1525,6 +1533,13 @@ class BaseConfig(object):
             else:
                 logger.error("Failed to run qemu: %s", process.stderr.read().decode())
 
+    def cleanup_cmd(self):
+        cmd = self.get('QB_CLEANUP_CMD')
+        if cmd != '':
+            logger.info('Running cleanup command %s' % str(cmd))
+            if subprocess.call(cmd, shell=True) != 0:
+                raise RunQemuError('Failed to run %s' % cmd)
+
     def cleanup(self):
         if self.cleaned:
             return
@@ -1653,6 +1668,7 @@ def main():
         config.setup_network()
         config.setup_rootfs()
         config.setup_final()
+        config.setup_cmd()
         config.start_qemu()
     except RunQemuError as err:
         logger.error(err)
@@ -1662,6 +1678,7 @@ def main():
         traceback.print_exc()
         return 1
     finally:
+        config.cleanup_cmd()
         config.cleanup()
         # Deliberately ignore the return code of 'tput smam'.
         subprocess.call(["tput", "smam"])

@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 Release 3.2 (gatesgarth)
 ========================
 
@@ -11,7 +13,7 @@ Minimum system requirements
 
 ``gcc`` version 6.0 is now required at minimum on the build host. For older
 host distributions where this is not available, you can use the
-``buildtools-extended-tarball`` (easily installable using
+:term:`buildtools-extended` tarball (easily installable using
 ``scripts/install-buildtools``).
 
 
@@ -175,13 +177,23 @@ errors:
 
 In addition, the following new checks were added and default to triggering an error:
 
-- :ref:`shebang-size <qa-check-shebang-size>`: Check for shebang (#!) lines longer than 128 characters, which can give an error at runtime depending on the operating system.
+- :ref:`shebang-size <qa-check-shebang-size>`: Check for shebang (#!) lines
+  longer than 128 characters, which can give an error at runtime depending on
+  the operating system.
 
-- :ref:`unhandled-features-check <qa-check-unhandled-features-check>`: Check if any of the variables supported by the :ref:`features_check <ref-classes-features_check>` class is set while not inheriting the class itself.
+- :ref:`unhandled-features-check <qa-check-unhandled-features-check>`: Check
+  if any of the variables supported by the :ref:`ref-classes-features_check`
+  class is set while not inheriting the class itself.
 
-- :ref:`missing-update-alternatives <qa-check-missing-update-alternatives>`: Check if the recipe sets the :term:`ALTERNATIVE` variable for any of its packages, and does not inherit the :ref:`update-alternatives <ref-classes-update-alternatives>` class.
+- :ref:`missing-update-alternatives <qa-check-missing-update-alternatives>`:
+  Check if the recipe sets the :term:`ALTERNATIVE` variable for any of its
+  packages, and does not inherit the :ref:`ref-classes-update-alternatives`
+  class.
 
-- A trailing slash or duplicated slashes in the value of :term:`S` or :term:`B` will now trigger a warning so that they can be removed and path comparisons can be more reliable --- remove any instances of these in your recipes if the warning is displayed.
+- A trailing slash or duplicated slashes in the value of :term:`S` or :term:`B`
+  will now trigger a warning so that they can be removed and path comparisons
+  can be more reliable --- remove any instances of these in your recipes if the
+  warning is displayed.
 
 
 .. _migration-3.2-src-uri-file-globbing:
@@ -207,9 +219,18 @@ files into a subdirectory and reference that instead.
 deploy class now cleans ``DEPLOYDIR`` before ``do_deploy``
 ----------------------------------------------------------
 
-:ref:`ref-tasks-deploy` as implemented in the :ref:`deploy <ref-classes-deploy>` class now cleans up ${:term:`DEPLOYDIR`} before running, just as :ref:`ref-tasks-install` cleans up ${:term:`D`} before running. This reduces the risk of :term:`DEPLOYDIR` being accidentally contaminated by files from previous runs, possibly even with different config, in case of incremental builds.
+:ref:`ref-tasks-deploy` as implemented in the :ref:`ref-classes-deploy` class
+now cleans up ${:term:`DEPLOYDIR`} before running, just as
+:ref:`ref-tasks-install` cleans up ${:term:`D`} before running. This reduces
+the risk of :term:`DEPLOYDIR` being accidentally contaminated by files from
+previous runs, possibly even with different config, in case of incremental
+builds.
 
-Most recipes and classes that inherit the :ref:`deploy <ref-classes-deploy>` class or interact with :ref:`ref-tasks-deploy` are unlikely to be affected by this unless they add ``prefuncs`` to :ref:`ref-tasks-deploy` *which also* put files into ``${DEPLOYDIR}`` --- these should be refactored to use ``do_deploy_prepend`` instead.
+Most recipes and classes that inherit the :ref:`ref-classes-deploy` class or
+interact with :ref:`ref-tasks-deploy` are unlikely to be affected by this
+unless they add ``prefuncs`` to :ref:`ref-tasks-deploy` *which also* put files
+into ``${DEPLOYDIR}`` --- these should be refactored to use
+``do_deploy_prepend`` instead.
 
 
 .. _migration-3.2-nativesdk-sdk-provides-dummy:
@@ -217,7 +238,13 @@ Most recipes and classes that inherit the :ref:`deploy <ref-classes-deploy>` cla
 Custom SDK / SDK-style recipes need to include ``nativesdk-sdk-provides-dummy``
 -------------------------------------------------------------------------------
 
-All ``nativesdk`` packages require ``/bin/sh`` due to their postinstall scriptlets, thus this package has to be dummy-provided within the SDK and ``nativesdk-sdk-provides-dummy`` now does this. If you have a custom SDK recipe (or your own SDK-style recipe similar to e.g. ``buildtools-tarball``), you will need to ensure ``nativesdk-sdk-provides-dummy`` or an equivalent is included in :term:`TOOLCHAIN_HOST_TASK`.
+All :ref:`ref-classes-nativesdk` packages require ``/bin/sh`` due
+to their postinstall scriptlets, thus this package has to be dummy-provided
+within the SDK and ``nativesdk-sdk-provides-dummy`` now does this. If you have
+a custom SDK recipe (or your own SDK-style recipe similar to e.g.
+``buildtools-tarball``), you will need to ensure
+``nativesdk-sdk-provides-dummy`` or an equivalent is included in
+:term:`TOOLCHAIN_HOST_TASK`.
 
 
 ``ld.so.conf`` now moved back to main ``glibc`` package

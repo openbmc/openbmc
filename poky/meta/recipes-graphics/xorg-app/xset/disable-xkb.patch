@@ -1,14 +1,21 @@
-add "-disable-xkb" option
+From 3090dcafac7c8080091b5e3e3720209c65251a1a Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard@openedhand.com>
+Date: Mon, 22 May 2006 22:15:57 +0000
+Subject: [PATCH] add "-disable-xkb" option
 
 Upstream-Status: Pending
 
 Rebase for 1.2.1 by: Yu Ke <ke.yu@intel.com>
 
-Index: xset-1.2.3/configure.ac
-===================================================================
---- xset-1.2.3.orig/configure.ac
-+++ xset-1.2.3/configure.ac
-@@ -53,11 +53,15 @@ PKG_CHECK_MODULES(SET_XEXT, xext,
+---
+ configure.ac | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index e7c2bdf..8e1ed5e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -52,11 +52,15 @@ PKG_CHECK_MODULES(SET_XEXT, xext,
  	AC_CHECK_HEADERS([X11/extensions/dpms.h X11/extensions/MITMisc.h],,,[#include <X11/Xlib.h>])
  	CPPFLAGS="$SAVE_CPPFLAGS"],[echo "not found"])
  
@@ -22,5 +29,5 @@ Index: xset-1.2.3/configure.ac
  	CPPFLAGS="$SAVE_CPPFLAGS"],[echo "not found"])
 +fi
  
- AC_ARG_WITH(xf86misc, AS_HELP_STRING([--without-xf86misc],[Disable xf86misc support.]),
-                 [USE_XF86MISC="$withval"], [USE_XF86MISC="yes"])
+ AC_ARG_WITH(xf86misc, AS_HELP_STRING([--with-xf86misc],[Enable xf86misc support.]),
+                 [USE_XF86MISC="$withval"], [USE_XF86MISC="no"])

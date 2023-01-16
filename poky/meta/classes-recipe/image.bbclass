@@ -182,8 +182,7 @@ python () {
 
 IMAGE_POSTPROCESS_COMMAND ?= ""
 
-# some default locales
-IMAGE_LINGUAS ?= "de-de fr-fr en-gb"
+IMAGE_LINGUAS ??= ""
 
 LINGUAS_INSTALL ?= "${@" ".join(map(lambda s: "locale-base-%s" % s, d.getVar('IMAGE_LINGUAS').split()))}"
 
@@ -203,6 +202,7 @@ fakeroot python do_rootfs () {
     from oe.rootfs import create_rootfs
     from oe.manifest import create_manifest
     import logging
+    import oe.packagedata
 
     logger = d.getVar('BB_TASK_LOGGER', False)
     if logger:
@@ -247,9 +247,9 @@ fakeroot python do_rootfs () {
     # otherwise, the multilib renaming could step in and squash any fixups that
     # may have occurred.
     pn = d.getVar('PN')
-    runtime_mapping_rename("PACKAGE_INSTALL", pn, d)
-    runtime_mapping_rename("PACKAGE_INSTALL_ATTEMPTONLY", pn, d)
-    runtime_mapping_rename("BAD_RECOMMENDATIONS", pn, d)
+    oe.packagedata.runtime_mapping_rename("PACKAGE_INSTALL", pn, d)
+    oe.packagedata.runtime_mapping_rename("PACKAGE_INSTALL_ATTEMPTONLY", pn, d)
+    oe.packagedata.runtime_mapping_rename("BAD_RECOMMENDATIONS", pn, d)
 
     # Generate the initial manifest
     create_manifest(d)

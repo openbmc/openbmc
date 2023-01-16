@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 Release notes for 3.4.1 (honister)
 ----------------------------------
 
@@ -53,9 +55,9 @@ Fixes in 3.4.1
 -  ca-certificates: update 20210119 -> 20211016
 -  classes/populate_sdk_base: Add setscene tasks
 -  conf: update for release 3.4
--  convert-srcuri.py: use regex to check space in SRC_URI
+-  convert-srcuri.py: use regex to check space in :term:`SRC_URI`
 -  create-spdx: Fix key errors in do_create_runtime_spdx
--  create-spdx: Protect against None from LICENSE_PATH
+-  create-spdx: Protect against None from :term:`LICENSE_PATH`
 -  create-spdx: Set the Organization field via a variable
 -  create-spdx: add create_annotation function
 -  create-spdx: cross recipes are native also
@@ -82,18 +84,18 @@ Fixes in 3.4.1
 -  insane.bbclass: Add a check for directories that are expected to be empty
 -  kernel-devsrc: Add vdso.lds and other build files for riscv64 as well
 -  libnewt: Use python3targetconfig to fix reproducibility issue
--  libpcre/libpcre2: correct SRC_URI
--  libx11-compose-data: Update LICENSE to better reflect reality
--  libx11: Update LICENSE to better reflect reality
+-  libpcre/libpcre2: correct :term:`SRC_URI`
+-  libx11-compose-data: Update :term:`LICENSE` to better reflect reality
+-  libx11: Update :term:`LICENSE` to better reflect reality
 -  libxml2: Use python3targetconfig to fix reproducibility issue
 -  linunistring: Add missing gperf-native dependency
 -  linux-firmware: upgrade to 20211027
--  linux-yocto-dev: Ensure DEPENDS matches recent 5.14 kernel changes
+-  linux-yocto-dev: Ensure :term:`DEPENDS` matches recent 5.14 kernel changes
 -  linux-yocto-rt/5.10: update to -rt54
 -  linux-yocto/5.10: update to v5.10.78
 -  linux-yocto/5.14: common-pc: enable CONFIG_ATA_PIIX as built-in
 -  linux-yocto/5.14: update to v5.14.17
--  linux-yocto: add libmpc-native to DEPENDS
+-  linux-yocto: add libmpc-native to :term:`DEPENDS`
 -  lttng-tools: replace ad hoc ptest fixup with upstream fixes
 -  manuals: releases.rst: move gatesgarth to outdated releases section
 -  mesa: Enable svga for x86 only
@@ -126,13 +128,13 @@ Fixes in 3.4.1
 -  qemu.inc: Remove empty egg-info directories before running meson
 -  recipes: Update github.com urls to use https
 -  ref-manual: Update how to set a useradd password
--  ref-manual: document "reproducible_build" class and SOURCE_DATE_EPOCH
+-  ref-manual: document "reproducible_build" class and :term:`SOURCE_DATE_EPOCH`
 -  ref-manual: document BUILD_REPRODUCIBLE_BINARIES
--  ref-manual: document TOOLCHAIN_HOST_TASK_ESDK
+-  ref-manual: document :term:`TOOLCHAIN_HOST_TASK_ESDK`
 -  ref-manual: remove meta class
 -  ref-manual: update system requirements
 -  releases.rst: fix release number for 3.3.3
--  scripts/convert-srcuri: Update SRC_URI conversion script to handle github url changes
+-  scripts/convert-srcuri: Update :term:`SRC_URI` conversion script to handle github url changes
 -  scripts/lib/wic/help.py: Update Fedora Kickstart URLs
 -  scripts/oe-package-browser: Fix after overrides change
 -  scripts/oe-package-browser: Handle no packages being built
@@ -153,7 +155,7 @@ Fixes in 3.4.1
 -  waffle: convert to git, website is down
 -  wayland: Fix wayland-tools packaging
 -  wireless-regdb: upgrade 2021.07.14 -> 2021.08.28
--  wpa-supplicant: Match package override to PACKAGES for pkg_postinst
+-  wpa-supplicant: Match package override to :term:`PACKAGES` for pkg_postinst
 
 Contributors to 3.4.1
 ~~~~~~~~~~~~~~~~~~~~~

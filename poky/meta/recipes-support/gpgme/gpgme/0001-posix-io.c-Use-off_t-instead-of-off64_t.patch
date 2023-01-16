@@ -1,0 +1,42 @@
+From be33cf1812b4c2a3ed85fb2532992bfb2b27b3be Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 15 Dec 2022 08:44:13 -0800
+Subject: [PATCH] posix-io.c: Use off_t instead of off64_t
+
+configure.ac checks for largefile support via AC_SYS_LARGEFILE already,
+therefore use off_t and ino_t instead of 64bit variants. Musl e.g. does
+not define them without _LARGEFILE64_SOURCE and error is not seen on
+glibc because _GNU_SOURCE defines _LARGEFILE64_SOURCE
+
+Fixes errors like below on 32-bit musl systems
+
+../../../../../../../../workspace/sources/gpgme/src/posix-io.c:77:3: error: unknown type name 'ino64_t'; did you mean 'int64_t'?
+  ino64_t d_ino;
+  ^~~~~~~
+  int64_t
+                        ^
+../../../../../../../../workspace/sources/gpgme/src/posix-io.c:78:3: error: unknown type name 'off64_t'; did you mean 'off_t'?
+  off64_t d_off;
+  ^~~~~~~
+
+Upstream-Status: Submitted [https://lists.gnupg.org/pipermail/gnupg-devel/2022-December/035222.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/posix-io.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/posix-io.c b/src/posix-io.c
+index 0d0a98b..286a626 100644
+--- a/src/posix-io.c
++++ b/src/posix-io.c
+@@ -74,8 +74,8 @@
+  * define it ourselves.  */
+ struct linux_dirent64
+ {
+-  ino64_t d_ino;
+-  off64_t d_off;
++  ino_t d_ino;
++  off_t d_off;
+   unsigned short d_reclen;
+   unsigned char d_type;
+   char d_name[];

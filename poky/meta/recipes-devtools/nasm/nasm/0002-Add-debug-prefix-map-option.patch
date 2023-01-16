@@ -1,4 +1,4 @@
-From 81d6519499dcfebe7d21e65e002a8885a4e8d852 Mon Sep 17 00:00:00 2001
+From e28c8883050d34d18ee2d66dfeece51e13adb6d5 Mon Sep 17 00:00:00 2001
 From: Joshua Watt <JPEWhacker@gmail.com>
 Date: Tue, 19 Nov 2019 13:12:17 -0600
 Subject: [PATCH] Add --debug-prefix-map option
@@ -17,17 +17,17 @@ Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
  nasmlib/filename.c      | 20 ++++++++++++++++++++
  output/outas86.c        |  4 +++-
  output/outcoff.c        |  4 ++--
- output/outelf.c         |  2 +-
+ output/outelf.c         | 13 ++++++++-----
  output/outieee.c        |  2 +-
  output/outobj.c         |  2 +-
  stdlib/strlcat.c        |  2 +-
  test/elfdebugprefix.asm |  6 ++++++
  test/performtest.pl     | 12 ++++++++++--
- 12 files changed, 82 insertions(+), 9 deletions(-)
+ 12 files changed, 89 insertions(+), 13 deletions(-)
  create mode 100644 test/elfdebugprefix.asm
 
 diff --git a/asm/nasm.c b/asm/nasm.c
-index e5ae89a..7a7f8b4 100644
+index 76c70f6..08ff119 100644
 --- a/asm/nasm.c
 +++ b/asm/nasm.c
 @@ -939,6 +939,7 @@ enum text_options {
@@ -46,7 +46,7 @@ index e5ae89a..7a7f8b4 100644
      {"reproducible", OPT_REPRODUCIBLE, ARG_NO, 0},
      {NULL, OPT_BOGUS, ARG_NO, 0}
  };
-@@ -1337,6 +1339,26 @@ static bool process_arg(char *p, char *q, int pass)
+@@ -1335,6 +1337,26 @@ static bool process_arg(char *p, char *q, int pass)
                  case OPT_REPRODUCIBLE:
                      reproducible = true;
                      break;
@@ -73,7 +73,7 @@ index e5ae89a..7a7f8b4 100644
                  case OPT_HELP:
                      help(stdout);
                      exit(0);
-@@ -2304,6 +2326,8 @@ static void help(FILE *out)
+@@ -2298,6 +2320,8 @@ static void help(FILE *out)
          "    -w-x          disable warning x (also -Wno-x)\n"
          "    -w[+-]error   promote all warnings to errors (also -Werror)\n"
          "    -w[+-]error=x promote warning x to errors (also -Werror=x)\n"
@@ -83,7 +83,7 @@ index e5ae89a..7a7f8b4 100644
  
      fprintf(out, "       %-20s %s\n",
 diff --git a/include/nasmlib.h b/include/nasmlib.h
-index 438178d..4c3e90d 100644
+index 87a7fc6..a3e5144 100644
 --- a/include/nasmlib.h
 +++ b/include/nasmlib.h
 @@ -250,10 +250,19 @@ int64_t readstrnum(char *str, int length, bool *warn);
@@ -107,7 +107,7 @@ index 438178d..4c3e90d 100644
  /*
   * Utility macros...
 diff --git a/nasm.txt b/nasm.txt
-index cc7fa27..d3485c9 100644
+index 950c361..784618c 100644
 --- a/nasm.txt
 +++ b/nasm.txt
 @@ -147,6 +147,10 @@ OPTIONS
@@ -179,10 +179,10 @@ index 54b22f8..c4a412c 100644
  
  static void as86_cleanup(void)
 diff --git a/output/outcoff.c b/output/outcoff.c
-index 58fa024..14baf7b 100644
+index c2b4eb6..e242db2 100644
 --- a/output/outcoff.c
 +++ b/output/outcoff.c
-@@ -1072,14 +1072,14 @@ static void coff_symbol(char *name, int32_t strpos, int32_t value,
+@@ -1259,7 +1259,7 @@ static void coff_symbol(char *name, int32_t strpos, int32_t value,
  
  static void coff_write_symbols(void)
  {
@@ -191,29 +191,61 @@ index 58fa024..14baf7b 100644
      uint32_t i;
  
      /*
-      * The `.file' record, and the file name auxiliary record.
-      */
-     coff_symbol(".file", 0L, 0L, -2, 0, 0x67, 1);
--    strncpy(filename, inname, 18);
-+    filename_debug_remap(filename, inname, 19);
+@@ -1269,7 +1269,7 @@ static void coff_write_symbols(void)
+     if (reproducible)
+         memset(filename, 0, 18);
+     else
+-        strncpy(filename, inname, 18);
++        filename_debug_remap(filename, inname, 19);
      nasm_write(filename, 18, ofile);
  
      /*
 diff --git a/output/outelf.c b/output/outelf.c
-index 61af020..1292958 100644
+index ad8d210..29f1dc1 100644
 --- a/output/outelf.c
 +++ b/output/outelf.c
-@@ -553,7 +553,7 @@ static void elf_init(void)
-     };
+@@ -546,8 +546,8 @@ static void elf_init(void)
      const char * const *p;
+     const char * cur_path = nasm_realpath(inname);
  
 -    strlcpy(elf_module, inname, sizeof(elf_module));
+-    strlcpy(elf_dir, nasm_dirname(cur_path), sizeof(elf_dir));
 +    filename_debug_remap(elf_module, inname, sizeof(elf_module));
++    filename_debug_remap(elf_dir, nasm_dirname(cur_path), sizeof(elf_dir));
      sects = NULL;
      nsects = sectlen = 0;
      syms = saa_init((int32_t)sizeof(struct elf_symbol));
+@@ -3590,13 +3590,17 @@ static void dwarf_findfile(const char * fname)
+     if (dwarf_clist && !(strcmp(fname, dwarf_clist->filename)))
+         return;
+ 
++    char * fname_remapped = nasm_malloc(FILENAME_MAX);
++    filename_debug_remap(fname_remapped,fname,FILENAME_MAX);
++
+     /* search for match */
+     match = 0;
+     if (dwarf_flist) {
+         match = dwarf_flist;
+         for (finx = 0; finx < dwarf_numfiles; finx++) {
+-            if (!(strcmp(fname, match->filename))) {
++            if (!(strcmp(fname_remapped, match->filename))) {
+                 dwarf_clist = match;
++                nasm_free(fname_remapped);
+                 return;
+             }
+             match = match->next;
+@@ -3607,8 +3611,7 @@ static void dwarf_findfile(const char * fname)
+     dwarf_clist = nasm_malloc(sizeof(struct linelist));
+     dwarf_numfiles++;
+     dwarf_clist->line = dwarf_numfiles;
+-    dwarf_clist->filename = nasm_malloc(strlen(fname) + 1);
+-    strcpy(dwarf_clist->filename,fname);
++    dwarf_clist->filename = fname_remapped;
+     dwarf_clist->next = 0;
+     if (!dwarf_flist) {     /* if first entry */
+         dwarf_flist = dwarf_elist = dwarf_clist;
 diff --git a/output/outieee.c b/output/outieee.c
-index 6d6d4b2..cdb8333 100644
+index 7ba9036..796e5af 100644
 --- a/output/outieee.c
 +++ b/output/outieee.c
 @@ -207,7 +207,7 @@ static void ieee_unqualified_name(char *, char *);
@@ -226,7 +258,7 @@ index 6d6d4b2..cdb8333 100644
      fpubhead = NULL;
      fpubtail = &fpubhead;
 diff --git a/output/outobj.c b/output/outobj.c
-index 56b43f9..fefea94 100644
+index 281839d..fc336c1 100644
 --- a/output/outobj.c
 +++ b/output/outobj.c
 @@ -644,7 +644,7 @@ static enum directive_result obj_directive(enum directive, char *);
@@ -264,7 +296,7 @@ index 0000000..a67ba29
 +	  ret
 +
 diff --git a/test/performtest.pl b/test/performtest.pl
-index f7865b3..096f960 100755
+index 46b1bdf..2426848 100755
 --- a/test/performtest.pl
 +++ b/test/performtest.pl
 @@ -42,14 +42,22 @@ sub perform {

@@ -1,4 +1,4 @@
-From 8b845fff891798a03bdf21354b52e4487c2c0200 Mon Sep 17 00:00:00 2001
+From 85d0444229ee3d14fefcf10d093f49c862826f82 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Thu, 14 Apr 2022 23:11:53 +0000
 Subject: [PATCH] Disable use of syslog for shadow-native tools
@@ -17,10 +17,10 @@ Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
  2 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 5dcae19..b2c58f5 100644
+index 924254a..603af81 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -204,7 +204,7 @@ AC_DEFINE_UNQUOTED(PASSWD_PROGRAM, "$shadow_cv_passwd_dir/passwd",
+@@ -191,7 +191,7 @@ AC_DEFINE_UNQUOTED(PASSWD_PROGRAM, "$shadow_cv_passwd_dir/passwd",
  	[Path to passwd program.])
  
  dnl XXX - quick hack, should disappear before anyone notices :).

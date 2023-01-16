@@ -19,6 +19,7 @@ SRC_URI = "http://people.redhat.com/dhowells/keyutils/${BP}.tar.bz2 \
            file://keyutils-fix-error-report-by-adding-default-message.patch \
            file://run-ptest \
            file://fix_library_install_path.patch \
+           file://0001-tests-toolbox.inc.sh-update-regex-for-getting-endian.patch \
            "
 
 SRC_URI[md5sum] = "919af7f33576816b423d537f8a8692e8"

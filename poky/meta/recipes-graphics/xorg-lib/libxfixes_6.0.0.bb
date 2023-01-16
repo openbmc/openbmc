@@ -16,5 +16,6 @@ DEPENDS += "virtual/libx11 xorgproto"
 PE = "1"
 
 XORG_PN = "libXfixes"
+XORG_EXT = "tar.bz2"
 
 BBCLASSEXTEND = "native nativesdk"

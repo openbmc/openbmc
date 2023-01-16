@@ -1,0 +1,32 @@
+From b9f95c06b2e7a525f4f93d705976882e8dcba6ab Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 20 Dec 2022 09:46:31 -0800
+Subject: [PATCH] sip: Conditionally use GetAssertStackTrace under
+ USE_STACKWALKER
+
+Musl eg. does not implement stack walker ( backtrace ) therefore it gets
+disabled for wxwidgets on those systems. This needs to be checked before using
+GetAssertStackTrace()
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sip/cpp/sip_corewxAppTraits.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/sip/cpp/sip_corewxAppTraits.cpp b/sip/cpp/sip_corewxAppTraits.cpp
+index 9c9f9d5b..1d2d2f90 100644
+--- a/sip/cpp/sip_corewxAppTraits.cpp
++++ b/sip/cpp/sip_corewxAppTraits.cpp
+@@ -471,7 +471,11 @@ static PyObject *meth_wxAppTraits_GetAssertStackTrace(PyObject *sipSelf, PyObjec
+             PyErr_Clear();
+ 
+             Py_BEGIN_ALLOW_THREADS
++#if wxUSE_STACKWALKER
+             sipRes = new  ::wxString((sipSelfWasArg ? sipCpp-> ::wxAppTraits::GetAssertStackTrace() : sipCpp->GetAssertStackTrace()));
++#else
++            sipRes = new  ::wxString("");
++#endif
+             Py_END_ALLOW_THREADS
+ 
+             if (PyErr_Occurred())

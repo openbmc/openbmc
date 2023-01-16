@@ -1,0 +1,37 @@
+#!/bin/bash
+set -e
+
+# This script tries to periodically set the passed in network interface to
+# 1 gigabit. It will run until it is successful or it hits its max retries.
+# This script is necessary because there is no clear indication from the kernel
+# NCSI stack when it is in a proper state for this speed setting to succeed
+
+# This script expects 1 parameter
+# - Network interface to configure (i.e. eth0, eth1, ...)
+
+if [ $# -ne 1 ]; then
+    echo "Required network interface not provided"
+    exit 1
+fi
+
+netIface=$1
+
+# 60s total: 12 tries with 5s sleeps
+for i in {1..12}
+do
+    echo "attempt number $i: setting $netIface to 1 gigabit"
+    rc=0
+    # package 0, channel 0, oem command, see Intel I210 datasheet section 10.6.3.10.1
+    /usr/libexec/ncsi-netlink-ifindex "$netIface" -p 0 -c 0 -o 00000157200001 || rc=$?
+    if [ $rc -ne 0 ]; then
+        echo "error code is $rc setting $netIface to 1 gigabit, sleep and retry"
+        sleep 5
+    else
+        echo "success setting $netIface to 1 gigabit"
+        exit 0
+    fi
+
+done
+
+echo "ERROR: all retry attempts exhausted, unable to configure $netIface to 1 gigabit"
+exit 1

@@ -93,7 +93,7 @@ are several ways of working in the Yocto Project environment:
    through your Linux distribution and the Yocto Project.
 
    For a general flow of the build procedures, see the
-   ":ref:`dev-manual/common-tasks:building a simple image`"
+   ":ref:`dev-manual/building:building a simple image`"
    section in the Yocto Project Development Tasks Manual.
 
 -  *Board Support Package (BSP) Development:* Development of BSPs
@@ -244,7 +244,7 @@ and so forth.
 
    For information on finding out who is responsible for (maintains) a
    particular area of code in the Yocto Project, see the
-   ":ref:`dev-manual/common-tasks:submitting a change to the yocto project`"
+   ":ref:`dev-manual/changes:submitting a change to the yocto project`"
    section of the Yocto Project Development Tasks Manual.
 
 The Yocto Project ``poky`` Git repository also has an upstream
@@ -276,7 +276,7 @@ push them into the "contrib" area and subsequently request that the
 maintainer include them into an upstream branch. This process is called
 "submitting a patch" or "submitting a change." For information on
 submitting patches and changes, see the
-":ref:`dev-manual/common-tasks:submitting a change to the yocto project`"
+":ref:`dev-manual/changes:submitting a change to the yocto project`"
 section in the Yocto Project Development Tasks Manual.
 
 In summary, there is a single point of entry for changes into the
@@ -343,7 +343,7 @@ Book <https://book.git-scm.com>`__.
    the ``scripts`` folder of the
    :term:`Source Directory`. For information
    on how to use these scripts, see the
-   ":ref:`dev-manual/common-tasks:using scripts to push a change upstream and request a pull`"
+   ":ref:`dev-manual/changes:using scripts to push a change upstream and request a pull`"
    section in the Yocto Project Development Tasks Manual.
 
 -  *Patch Workflow:* This workflow allows you to notify the maintainer
@@ -352,7 +352,7 @@ Book <https://book.git-scm.com>`__.
    this type of change, you format the patch and then send the email
    using the Git commands ``git format-patch`` and ``git send-email``.
    For information on how to use these scripts, see the
-   ":ref:`dev-manual/common-tasks:submitting a change to the yocto project`"
+   ":ref:`dev-manual/changes:submitting a change to the yocto project`"
    section in the Yocto Project Development Tasks Manual.
 
 Git
@@ -647,5 +647,5 @@ Project uses in the ``meta/files/common-licenses`` directory in your
 For information that can help you maintain compliance with various open
 source licensing during the lifecycle of a product created using the
 Yocto Project, see the
-":ref:`dev-manual/common-tasks:maintaining open source license compliance during your product's lifecycle`"
+":ref:`dev-manual/licenses:maintaining open source license compliance during your product's lifecycle`"
 section in the Yocto Project Development Tasks Manual.

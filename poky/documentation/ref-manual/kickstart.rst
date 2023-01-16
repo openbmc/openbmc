@@ -82,7 +82,7 @@ the ``part`` and ``partition`` commands:
    source of the data that populates the partition. The most common
    value for this option is "rootfs", but you can use any value that
    maps to a valid source plugin. For information on the source plugins,
-   see the ":ref:`dev-manual/common-tasks:using the wic plugin interface`"
+   see the ":ref:`dev-manual/wic:using the wic plugin interface`"
    section in the Yocto Project Development Tasks Manual.
 
    If you use ``--source rootfs``, Wic creates a partition as large as

@@ -1,0 +1,140 @@
+From 956b8a8e1dd5702b9c1657f4ec27a7aeddb0758e Mon Sep 17 00:00:00 2001
+From: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Date: Mon, 21 Nov 2022 00:08:20 +0000
+Subject: [PATCH] Use the stateless platform service calls
+
+Calls to psa_connect is not needed and psa_call can be called
+directly with a pre defined handle.
+
+Signed-off-by: Satish Kumar <satish.kumar01@arm.com>
+Signed-off-by: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Upstream-Status: Inappropriate [Design is to revisted]
+
+---
+ .../provider/capsule_update_provider.c        | 24 ++++---------------
+ .../provider/corstone1000_fmp_service.c       | 10 ++++----
+ .../provider/corstone1000_fmp_service.h       |  3 +--
+ components/service/common/include/psa/sid.h   |  6 +++++
+ 4 files changed, 16 insertions(+), 27 deletions(-)
+
+diff --git a/components/service/capsule_update/provider/capsule_update_provider.c b/components/service/capsule_update/provider/capsule_update_provider.c
+index 991a2235..6809249f 100644
+--- a/components/service/capsule_update/provider/capsule_update_provider.c
++++ b/components/service/capsule_update/provider/capsule_update_provider.c
+@@ -61,7 +61,6 @@ void capsule_update_provider_deinit(struct capsule_update_provider *context)
+ static rpc_status_t event_handler(uint32_t opcode, struct rpc_caller *caller)
+ {
+ 	uint32_t ioctl_id;
+-	psa_handle_t handle;
+ 	rpc_status_t rpc_status = TS_RPC_CALL_ACCEPTED;
+ 
+ 	struct psa_invec in_vec[] = {
+@@ -79,31 +78,18 @@ static rpc_status_t event_handler(uint32_t opcode, struct rpc_caller *caller)
+ 		case CAPSULE_UPDATE_REQUEST:
+ 		/* Openamp call with IOCTL for firmware update*/
+ 		ioctl_id = IOCTL_CORSTONE1000_FWU_FLASH_IMAGES;
+-		handle = psa_connect(caller, TFM_SP_PLATFORM_IOCTL_SID,
+-				TFM_SP_PLATFORM_IOCTL_VERSION);
+-		if (handle <= 0) {
+-			EMSG("%s Invalid handle", __func__);
+-			rpc_status = TS_RPC_ERROR_INVALID_PARAMETER;
+-			return rpc_status;
+-		}
+-		psa_call(caller,handle, PSA_IPC_CALL,
++		psa_call(caller,TFM_PLATFORM_SERVICE_HANDLE, TFM_PLATFORM_API_ID_IOCTL,
+ 			in_vec,IOVEC_LEN(in_vec), NULL, 0);
+-		set_fmp_image_info(caller, handle);
++		set_fmp_image_info(caller);
+ 		break;
+ 
+ 		case KERNEL_STARTED_EVENT:
+ 		ioctl_id = IOCTL_CORSTONE1000_FWU_HOST_ACK;
+ 		/*openamp call with IOCTL for kernel start*/
+-		handle = psa_connect(caller, TFM_SP_PLATFORM_IOCTL_SID,
+-				TFM_SP_PLATFORM_IOCTL_VERSION);
+-		if (handle <= 0) {
+-			EMSG("%s Invalid handle", __func__);
+-			rpc_status = TS_RPC_ERROR_INVALID_PARAMETER;
+-			return rpc_status;
+-		}
+-		psa_call(caller,handle, PSA_IPC_CALL,
++		
++		psa_call(caller,TFM_PLATFORM_SERVICE_HANDLE, TFM_PLATFORM_API_ID_IOCTL,
+ 			in_vec,IOVEC_LEN(in_vec), NULL, 0);
+-		set_fmp_image_info(caller, handle);
++		set_fmp_image_info(caller);
+ 		break;
+ 		default:
+ 			EMSG("%s unsupported opcode", __func__);
+diff --git a/components/service/capsule_update/provider/corstone1000_fmp_service.c b/components/service/capsule_update/provider/corstone1000_fmp_service.c
+index 6a7a47a7..d811af9f 100644
+--- a/components/service/capsule_update/provider/corstone1000_fmp_service.c
++++ b/components/service/capsule_update/provider/corstone1000_fmp_service.c
+@@ -238,8 +238,7 @@ static psa_status_t unpack_image_info(void *buffer, uint32_t size)
+     return PSA_SUCCESS;
+ }
+ 
+-static psa_status_t get_image_info(struct rpc_caller *caller,
+-			   psa_handle_t platform_service_handle)
++static psa_status_t get_image_info(struct rpc_caller *caller)
+ {
+     psa_status_t status;
+     psa_handle_t handle;
+@@ -255,7 +254,7 @@ static psa_status_t get_image_info(struct rpc_caller *caller,
+ 
+     memset(image_info_buffer, 0, IMAGE_INFO_BUFFER_SIZE);
+ 
+-    psa_call(caller, platform_service_handle, PSA_IPC_CALL,
++    psa_call(caller, TFM_PLATFORM_SERVICE_HANDLE, TFM_PLATFORM_API_ID_IOCTL,
+ 	     in_vec, IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
+ 
+     status = unpack_image_info(image_info_buffer, IMAGE_INFO_BUFFER_SIZE);
+@@ -288,12 +287,11 @@ static psa_status_t set_image_info(struct rpc_caller *caller)
+     return PSA_SUCCESS;
+ }
+ 
+-void set_fmp_image_info(struct rpc_caller *caller,
+-			psa_handle_t platform_service_handle)
++void set_fmp_image_info(struct rpc_caller *caller)
+ {
+     psa_status_t status;
+ 
+-    status = get_image_info(caller, platform_service_handle);
++    status = get_image_info(caller);
+     if (status != PSA_SUCCESS) {
+ 	return;
+     }
+diff --git a/components/service/capsule_update/provider/corstone1000_fmp_service.h b/components/service/capsule_update/provider/corstone1000_fmp_service.h
+index 95fba2a0..963223e8 100644
+--- a/components/service/capsule_update/provider/corstone1000_fmp_service.h
++++ b/components/service/capsule_update/provider/corstone1000_fmp_service.h
+@@ -16,8 +16,7 @@ extern "C" {
+ 
+ void provision_fmp_variables_metadata(struct rpc_caller *caller);
+ 
+-void set_fmp_image_info(struct rpc_caller *caller,
+-		psa_handle_t platform_service_handle);
++void set_fmp_image_info(struct rpc_caller *caller);
+ 
+ #ifdef __cplusplus
+ } /* extern "C" */
+diff --git a/components/service/common/include/psa/sid.h b/components/service/common/include/psa/sid.h
+index 7a29cc25..8103a9af 100644
+--- a/components/service/common/include/psa/sid.h
++++ b/components/service/common/include/psa/sid.h
+@@ -37,6 +37,12 @@ extern "C" {
+ #define TFM_CRYPTO_VERSION                                         (1U)
+ #define TFM_CRYPTO_HANDLE                                          (0x40000100U)
+ 
++
++/******** TFM_PLATFORM_SERVICE *******/
++#define TFM_PLATFORM_API_ID_IOCTL         (1013)
++#define TFM_PLATFORM_SERVICE_HANDLE       (0x40000105U)
++
++
+ /**
+  * \brief Define a progressive numerical value for each SID which can be used
+  *        when dispatching the requests to the service
+-- 
+2.25.1
+

@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 Release 1.7 (dizzy)
 ===================
 
@@ -30,7 +32,7 @@ version required on the
 build host is now 1.7.8 because the ``--list`` option is now required by
 BitBake's Git fetcher. As always, if your host distribution does not
 provide a version of Git that meets this requirement, you can use the
-``buildtools-tarball`` that does. See the
+:term:`buildtools` tarball that does. See the
 ":ref:`ref-manual/system-requirements:required git, tar, python, make and gcc versions`"
 section for more information.
 
@@ -39,13 +41,11 @@ section for more information.
 Autotools Class Changes
 -----------------------
 
-The following :ref:`autotools <ref-classes-autotools>` class changes
-occurred:
+The following :ref:`ref-classes-autotools` class changes occurred:
 
 -  *A separate :term:`Build Directory` is now used by default:* The
-   :ref:`autotools <ref-classes-autotools>` class has been
-   changed to use a directory for building
-   (:term:`B`), which is separate from the source directory
+   :ref:`ref-classes-autotools` class has been changed to use a directory for
+   building (:term:`B`), which is separate from the source directory
    (:term:`S`). This is commonly referred to as ``B != S``, or
    an out-of-tree build.
 
@@ -54,9 +54,8 @@ occurred:
    However, if the software is not capable of being built in this
    manner, you will need to either patch the software so that it can
    build separately, or you will need to change the recipe to inherit
-   the :ref:`autotools-brokensep <ref-classes-autotools>` class
-   instead of the :ref:`autotools <ref-classes-autotools>`
-   or ``autotools_stage`` classes.
+   the :ref:`autotools-brokensep <ref-classes-autotools>` class instead
+   of the :ref:`ref-classes-autotools` or ``autotools_stage`` classes.
 
 -  The ``--foreign`` option is no longer passed to ``automake`` when
    running ``autoconf``: This option tells ``automake`` that a
@@ -217,7 +216,7 @@ The following miscellaneous change occurred:
    should manually remove old "build-id" files from your existing build
    history repositories to avoid confusion. For information on the build
    history feature, see the
-   ":ref:`dev-manual/common-tasks:maintaining build output quality`"
+   ":ref:`dev-manual/build-quality:maintaining build output quality`"
    section in the Yocto Project Development Tasks Manual.
 
 

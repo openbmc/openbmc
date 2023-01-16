@@ -11,15 +11,15 @@ Upstream-Status: Pending
 Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
 
 ---
- libxfce4kbd-private/xfce4-keyboard-shortcuts.xml |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
+ libxfce4kbd-private/xfce4-keyboard-shortcuts.xml | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/libxfce4kbd-private/xfce4-keyboard-shortcuts.xml b/libxfce4kbd-private/xfce4-keyboard-shortcuts.xml
-index 723a10d..e6502f3 100644
+index 32901e3..8189c4c 100644
 --- a/libxfce4kbd-private/xfce4-keyboard-shortcuts.xml
 +++ b/libxfce4kbd-private/xfce4-keyboard-shortcuts.xml
-@@ -75,4 +75,8 @@
-       <property name="<Super>KP_Next" type="string" value="tile_down_right_key"/>
+@@ -96,4 +96,8 @@
+       <property name="&lt;Super&gt;KP_Next" type="string" value="tile_down_right_key"/>
      </property>
    </property>
 +  <property name="providers" type="array">

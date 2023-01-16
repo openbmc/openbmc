@@ -4,8 +4,8 @@ HOMEPAGE = "https://salsa.debian.org/dpkg-team/dpkg"
 DESCRIPTION = "The primary interface for the dpkg suite is the dselect program. A more low-level and less user-friendly interface is available in the form of the dpkg command."
 SECTION = "base"
 
-DEPENDS = "zlib bzip2 perl ncurses"
-DEPENDS:class-native = "bzip2-replacement-native zlib-native virtual/update-alternatives-native gettext-native perl-native"
+DEPENDS = "zlib bzip2 perl ncurses libmd"
+DEPENDS:class-native = "bzip2-replacement-native zlib-native virtual/update-alternatives-native gettext-native perl-native libmd-native"
 RDEPENDS:${PN} = "${VIRTUAL-RUNTIME_update-alternatives} perl"
 RDEPENDS:${PN}:class-native = ""
 

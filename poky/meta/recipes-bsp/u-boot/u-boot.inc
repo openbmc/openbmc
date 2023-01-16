@@ -206,6 +206,7 @@ FILES:${PN}-env = " \
 FILES:${PN}-extlinux = "${UBOOT_EXTLINUX_INSTALL_DIR}/${UBOOT_EXTLINUX_CONF_NAME}"
 RDEPENDS:${PN} += "${@bb.utils.contains('UBOOT_EXTLINUX', '1', '${PN}-extlinux', '', d)}"
 
+SYSROOT_DIRS += "/boot"
 FILES:${PN} = "/boot ${datadir}"
 RDEPENDS:${PN} += "${PN}-env"
 

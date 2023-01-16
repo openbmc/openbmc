@@ -92,11 +92,11 @@ top-level kernel feature or BSP. The following actions effectively
 provide the Metadata and create the tree that includes the new feature,
 patch, or BSP:
 
-1. *Pass Feature to the OpenEmbedded Build System:* A top-level kernel
+#. *Pass Feature to the OpenEmbedded Build System:* A top-level kernel
    feature is passed to the kernel build subsystem. Normally, this
    feature is a BSP for a particular kernel type.
 
-2. *Locate Feature:* The file that describes the top-level feature is
+#. *Locate Feature:* The file that describes the top-level feature is
    located by searching these system directories:
 
    -  The in-tree kernel-cache directories, which are located in the
@@ -112,31 +112,31 @@ patch, or BSP:
 
       bsp_root_name-kernel_type.scc
 
-3. *Expand Feature:* Once located, the feature description is either
+#. *Expand Feature:* Once located, the feature description is either
    expanded into a simple script of actions, or into an existing
    equivalent script that is already part of the shipped kernel.
 
-4. *Append Extra Features:* Extra features are appended to the top-level
+#. *Append Extra Features:* Extra features are appended to the top-level
    feature description. These features can come from the
    :term:`KERNEL_FEATURES`
    variable in recipes.
 
-5. *Locate, Expand, and Append Each Feature:* Each extra feature is
+#. *Locate, Expand, and Append Each Feature:* Each extra feature is
    located, expanded and appended to the script as described in step
    three.
 
-6. *Execute the Script:* The script is executed to produce files
+#. *Execute the Script:* The script is executed to produce files
    ``.scc`` and ``.cfg`` files in appropriate directories of the
    ``yocto-kernel-cache`` repository. These files are descriptions of
    all the branches, tags, patches and configurations that need to be
    applied to the base Git repository to completely create the source
    (build) branch for the new BSP or feature.
 
-7. *Clone Base Repository:* The base repository is cloned, and the
+#. *Clone Base Repository:* The base repository is cloned, and the
    actions listed in the ``yocto-kernel-cache`` directories are applied
    to the tree.
 
-8. *Perform Cleanup:* The Git repositories are left with the desired
+#. *Perform Cleanup:* The Git repositories are left with the desired
    branches checked out and any required branching, patching and tagging
    has been performed.
 

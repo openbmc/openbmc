@@ -7,6 +7,7 @@ SRC_URI = "http://sourceforge.net/projects/linuxptp/files/v3.1/linuxptp-${PV}.tg
            file://build-Allow-CC-and-prefix-to-be-overriden.patch \
            file://Use-cross-cpp-in-incdefs.patch \
            file://0001-include-string.h-for-strncpy.patch \
+           file://0001-makefile-use-conditional-assignment-for-KBUILD_OUTPU.patch \
            "
 
 UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/linuxptp/files/"

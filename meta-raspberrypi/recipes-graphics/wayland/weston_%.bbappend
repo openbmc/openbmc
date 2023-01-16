@@ -1,4 +1,4 @@
-PACKAGECONFIG:remove:rpi = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', 'fbdev', '', d)}"
+PACKAGECONFIG:remove:rpi = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', 'fbdev', 'egl clients', d)}"
 
 EXTRA_OECONF:append:rpi = " \
     --disable-xwayland-test \

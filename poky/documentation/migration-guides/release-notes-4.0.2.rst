@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 Release notes for Yocto-4.0.2 (Kirkstone)
 -----------------------------------------
 
@@ -5,7 +7,7 @@ Security Fixes in Yocto-4.0.2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  libxslt: Mark :cve:`2022-29824` as not applying
--  tiff: Add jbig PACKAGECONFIG and clarify IGNORE :cve:`2022-1210`
+-  tiff: Add jbig :term:`PACKAGECONFIG` and clarify IGNORE :cve:`2022-1210`
 -  tiff: mark :cve:`2022-1622` and :cve:`2022-1623` as invalid
 -  pcre2:fix :cve:`2022-1586` Out-of-bounds read
 -  curl: fix :cve:`2022-22576`, :cve:`2022-27775`, :cve:`2022-27776`, :cve:`2022-27774`, :cve:`2022-30115`, :cve:`2022-27780`, :cve:`2022-27781`, :cve:`2022-27779` and :cve:`2022-27782`
@@ -23,7 +25,7 @@ Fixes in Yocto-4.0.2
 -  bash: submit patch upstream
 -  bind: upgrade 9.18.1 -> 9.18.2
 -  binutils: Bump to latest 2.38 release branch
--  bitbake.conf: Make TCLIBC and TCMODE lazy assigned
+-  bitbake.conf: Make :term:`TCLIBC` and :term:`TCMODE` lazy assigned
 -  bitbake: build: Add clean_stamp API function to allow removal of task stamps
 -  bitbake: data: Do not depend on vardepvalueexclude flag
 -  bitbake: fetch2/osc: Small fixes for osc fetcher
@@ -56,7 +58,7 @@ Fixes in Yocto-4.0.2
 -  gcc-source: Fix incorrect task dependencies from ${B}
 -  gcc: Upgrade to 11.3 release
 -  gcc: depend on zstd-native
--  git: fix override syntax in RDEPENDS
+-  git: fix override syntax in :term:`RDEPENDS`
 -  glib-2.0: upgrade 2.72.1 -> 2.72.2
 -  glibc: Drop make-native dependency
 -  go: upgrade 1.17.8 -> 1.17.10
@@ -83,7 +85,7 @@ Fixes in Yocto-4.0.2
 -  libpcre2: upgrade 10.39 -> 10.40
 -  librepo: upgrade 1.14.2 -> 1.14.3
 -  libseccomp: Add missing files for ptests
--  libseccomp: Correct LIC_FILES_CHKSUM
+-  libseccomp: Correct :term:`LIC_FILES_CHKSUM`
 -  libxkbcommon: upgrade 1.4.0 -> 1.4.1
 -  libxml2: Upgrade 2.9.13 -> 2.9.14
 -  license.bbclass: Bound beginline and endline in copy_license_files()
@@ -125,8 +127,8 @@ Fixes in Yocto-4.0.2
 -  perl: Add dependency on make-native to avoid race issues
 -  perl: Fix build with gcc-12
 -  poky.conf: bump version for 4.0.2
--  popt: fix override syntax in RDEPENDS
--  pypi.bbclass: Set CVE_PRODUCT to PYPI_PACKAGE
+-  popt: fix override syntax in :term:`RDEPENDS`
+-  pypi.bbclass: Set :term:`CVE_PRODUCT` to :term:`PYPI_PACKAGE`
 -  python3: Ensure stale empty python module directories don't break the build
 -  python3: Remove problematic paths from sysroot files
 -  python3: fix reproducibility issue with python3-core
@@ -143,7 +145,7 @@ Fixes in Yocto-4.0.2
 -  sanity: Don't warn about make 4.2.1 for mint
 -  sanity: Switch to make 4.0 as a minimum version
 -  sed: Specify shell for "nobody" user in run-ptest
--  selftest/imagefeatures/overlayfs: Always append to DISTRO_FEATURES
+-  selftest/imagefeatures/overlayfs: Always append to :term:`DISTRO_FEATURES`
 -  selftest/multiconfig: Test that multiconfigs in separate layers works
 -  sqlite3: upgrade to 3.38.5
 -  staging.bbclass: process direct dependencies in deterministic order

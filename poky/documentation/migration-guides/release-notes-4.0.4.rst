@@ -1,4 +1,6 @@
-Release notes for Yocto-4.0.4 (Kirkstone)
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
+Releae notes for Yocto-4.0.4 (Kirkstone)
 -----------------------------------------
 
 Security Fixes in Yocto-4.0.4
@@ -28,13 +30,13 @@ Fixes in Yocto-4.0.4
 -  autoconf: Fix strict prototype errors in generated tests
 -  autoconf: Update K & R stype functions
 -  bind: upgrade to 9.18.5
--  bitbake.conf: set BB_DEFAULT_UMASK using ??=
+-  bitbake.conf: set :term:`BB_DEFAULT_UMASK` using ??=
 -  bitbake: ConfHandler/BBHandler: Improve comment error messages and add tests
 -  bitbake: ConfHandler: Remove lingering close
 -  bitbake: bb/utils: movefile: use the logger for printing
 -  bitbake: bb/utils: remove: check the path again the expand python glob
 -  bitbake: bitbake-user-manual: Correct description of the ??= operator
--  bitbake: bitbake-user-manual: npm fetcher: improve description of SRC_URI format
+-  bitbake: bitbake-user-manual: npm fetcher: improve description of :term:`SRC_URI` format
 -  bitbake: bitbake: bitbake-user-manual: hashserv can be accessed on a dedicated domain
 -  bitbake: bitbake: runqueue: add cpu/io pressure regulation
 -  bitbake: bitbake: runqueue: add memory pressure regulation
@@ -77,7 +79,7 @@ Fixes in Yocto-4.0.4
 -  iso-codes: upgrade to 4.11.0
 -  kernel-fitimage.bbclass: add padding algorithm property in config nodes
 -  kernel-fitimage.bbclass: only package unique DTBs
--  kernel: Always set CC and LD for the kernel build
+-  kernel: Always set :term:`CC` and :term:`LD` for the kernel build
 -  kernel: Use consistent make flags for menuconfig
 -  lib:npm_registry: initial checkin
 -  libatomic-ops: upgrade to 7.6.14
@@ -94,18 +96,18 @@ Fixes in Yocto-4.0.4
 -  linux-yocto/5.10: update to v5.10.137
 -  linux-yocto/5.15: update genericx86* machines to v5.15.59
 -  linux-yocto/5.15: update to v5.15.62
--  linux-yocto: Fix COMPATIBLE_MACHINE regex match
--  linux-yocto: prepend the value with a space when append to KERNEL_EXTRA_ARGS
+-  linux-yocto: Fix :term:`COMPATIBLE_MACHINE` regex match
+-  linux-yocto: prepend the value with a space when append to :term:`KERNEL_EXTRA_ARGS`
 -  lttng-modules: fix 5.19+ build
 -  lttng-modules: fix build against mips and v5.19 kernel
 -  lttng-modules: fix build for kernel 5.10.137
 -  lttng-modules: replace mips compaction fix with upstream change
 -  lz4: upgrade to 1.9.4
 -  maintainers: update opkg maintainer
--  meta: introduce UBOOT_MKIMAGE_KERNEL_TYPE
+-  meta: introduce :term:`UBOOT_MKIMAGE_KERNEL_TYPE`
 -  migration guides: add missing release notes
 -  mobile-broadband-provider-info: upgrade to 20220725
--  nativesdk: Clear TUNE_FEATURES
+-  nativesdk: Clear :term:`TUNE_FEATURES`
 -  npm: replace 'npm pack' call by 'tar czf'
 -  npm: return content of 'package.json' in 'npm_pack'
 -  npm: take 'version' directly from 'package.json'
@@ -124,7 +126,7 @@ Fixes in Yocto-4.0.4
 -  poky.conf: add ubuntu-22.04 to tested distros
 -  poky.conf: bump version for 4.0.4
 -  pseudo: Update to include recent upstream minor fixes
--  python3-pip: Fix RDEPENDS after the update
+-  python3-pip: Fix :term:`RDEPENDS` after the update
 -  ref-manual: add numa to machine features
 -  relocate_sdk.py: ensure interpreter size error causes relocation to fail
 -  rootfs-postcommands.bbclass: avoid moving ssh host keys if etc is writable
@@ -140,12 +142,12 @@ Fixes in Yocto-4.0.4
 -  shadow: Avoid nss warning/error with musl
 -  shadow: Enable subid support
 -  system-requirements.rst: Add Ubuntu 22.04 to list of supported distros
--  systemd: Add 'no-dns-fallback' PACKAGECONFIG option
+-  systemd: Add 'no-dns-fallback' :term:`PACKAGECONFIG` option
 -  systemd: Fix unwritable /var/lock when no sysvinit handling
 -  sysvinit-inittab/start_getty: Fix respawn too fast
 -  tcp-wrappers: Fix implicit-function-declaration warnings
 -  tzdata: upgrade to 2022b
--  util-linux: Remove --enable-raw from EXTRA_OECONF
+-  util-linux: Remove --enable-raw from :term:`EXTRA_OECONF`
 -  vala: upgrade to 0.56.3
 -  vim: Upgrade to 9.0.0453
 -  watchdog: Include needed system header for function decls

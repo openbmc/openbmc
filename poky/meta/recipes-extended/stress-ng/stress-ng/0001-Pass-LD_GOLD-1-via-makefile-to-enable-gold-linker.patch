@@ -1,0 +1,65 @@
+From 32386c13420f676bd938a8b1ceaeab8a5da46d17 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 3 Jan 2023 11:00:09 -0800
+Subject: [PATCH] Pass LD_GOLD=1 via makefile to enable gold linker
+
+Current logic prefers gold if a toolchain has gold linker installed and
+does not offer any option to chose default linker which might not be
+gold linker. Its better to pass this control to user instead of auto
+detecting and deciding.
+
+Upstream-Status: Submitted [https://github.com/ColinIanKing/stress-ng/pull/251]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile        | 7 +++++++
+ Makefile.config | 9 +--------
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index f2fd4b6c..bff6b8ac 100644
+--- a/Makefile
++++ b/Makefile
+@@ -69,6 +69,13 @@ endif
+ #CFLAGS += -Weverything
+ #endif
+ 
++#
++# Use gold linker
++#
++ifeq ($(LD_GOLD),1)
++LDFLAGS += -fuse-ld=gold
++endif
++
+ GREP = grep
+ #
+ # SunOS requires special grep for -e support
+diff --git a/Makefile.config b/Makefile.config
+index 394ed20d..48c94fa1 100644
+--- a/Makefile.config
++++ b/Makefile.config
+@@ -241,7 +241,7 @@ define check_ld
+ 	$(call check_ld_tmp,$1,$2,$3)
+ endef
+ 
+-all: linkers libraries headers cpufeatures types functions
++all: libraries headers cpufeatures types functions
+ 	@for I in $$(ls $(CONFIGS)); do \
+ 		if [ -s $(CONFIGS)/$$I ]; then \
+ 			echo "#define $$I"; \
+@@ -262,13 +262,6 @@ configdir:
+ clean:
+ 	@rm -rf $(CONFIGS) config config.h
+ 
+-linkers: \
+-	configdir \
+-	LD_GOLD
+-
+-LD_GOLD:
+-	$(call check_ld,test-ld,HAVE_LD_GOLD,gold)
+-
+ libraries: \
+ 	configdir \
+ 	LIB_AIO LIB_APPARMOR LIB_BSD LIB_CRYPT LIB_DL \
+-- 
+2.39.0
+

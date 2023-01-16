@@ -1,0 +1,34 @@
+From 90fbc3423b5ccdbd54b5851c32b9f92c6658d634 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 6 Jan 2023 17:30:24 -0800
+Subject: [PATCH] Do not emit useless rpath
+
+rpath is pointing to standard libdir which is un-used and yocto build QA
+flag it, there is no need to set rpaths when building in this
+environment
+
+Fixes
+do_package_qa: QA Issue: trace-cmd: /usr/bin/trace-cmd contains probably-redundant RPATH /usr/lib [useless-rpaths]
+
+Upstream-Status: Inappropriate [OE-Specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ scripts/utils.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/utils.mk b/scripts/utils.mk
+index 3fc2d74f..309a8599 100644
+--- a/scripts/utils.mk
++++ b/scripts/utils.mk
+@@ -64,7 +64,7 @@ do_compile =							\
+ 
+ do_app_build =						\
+ 	($(print_app_build)				\
+-	$(CC) $^ -rdynamic -Wl,-rpath=$(libdir) -o $@ $(LDFLAGS) $(CONFIG_LIBS) $(LIBS))
++	$(CC) $^ -rdynamic -o $@ $(LDFLAGS) $(CONFIG_LIBS) $(LIBS))
+ 
+ do_build_static_lib =				\
+ 	($(print_static_lib_build)		\
+-- 
+2.39.0
+

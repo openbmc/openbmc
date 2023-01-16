@@ -15,7 +15,6 @@ DEPENDS += "libxext xorgproto"
 PE = "1"
 
 XORG_PN = "libXxf86vm"
-XORG_EXT = "tar.xz"
 SRC_URI[sha256sum] = "247fef48b3e0e7e67129e41f1e789e8d006ba47dba1c0cdce684b9b703f888e7"
 
 BBCLASSEXTEND = "native nativesdk"

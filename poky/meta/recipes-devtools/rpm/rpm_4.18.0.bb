@@ -25,7 +25,6 @@ LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c4eec0c20c6034b9407a09945b48a43f"
 
 SRC_URI = "git://github.com/rpm-software-management/rpm;branch=rpm-4.18.x;protocol=https \
-           file://environment.d-rpm.sh \
            file://0001-Do-not-add-an-unsatisfiable-dependency-when-building.patch \
            file://0001-Do-not-read-config-files-from-HOME.patch \
            file://0001-When-cross-installing-execute-package-scriptlets-wit.patch \
@@ -118,18 +117,15 @@ do_install:append:class-native() {
 }
 
 do_install:append:class-nativesdk() {
-        for tool in ${WRAPPER_TOOLS}; do
-                test -x ${D}$tool && create_wrapper ${D}$tool \
-                        RPM_CONFIGDIR='`dirname $''realpath`'/${@os.path.relpath(d.getVar('libdir'), d.getVar('bindir'))}/rpm \
-                        RPM_ETCCONFIGDIR='$'{RPM_ETCCONFIGDIR-'`dirname $''realpath`'/${@os.path.relpath(d.getVar('sysconfdir'), d.getVar('bindir'))}/..} \
-                        MAGIC='`dirname $''realpath`'/${@os.path.relpath(d.getVar('datadir'), d.getVar('bindir'))}/misc/magic.mgc \
-                        RPM_NO_CHROOT_FOR_SCRIPTS=1
-        done
-
         rm -rf ${D}/var
 
-        mkdir -p ${D}${SDKPATHNATIVE}/environment-setup.d
-        install -m 644 ${WORKDIR}/environment.d-rpm.sh ${D}${SDKPATHNATIVE}/environment-setup.d/rpm.sh
+	mkdir -p ${D}${SDKPATHNATIVE}/environment-setup.d
+	cat <<- EOF > ${D}${SDKPATHNATIVE}/environment-setup.d/rpm.sh
+		export RPM_CONFIGDIR="$OECORE_NATIVE_SYSROOT${libdir}/rpm"
+		export RPM_ETCCONFIGDIR="$OECORE_NATIVE_SYSROOT${sysconfdir}"
+		export MAGIC="$OECORE_NATIVE_SYSROOT${datadir}/misc/magic.mgc"
+		export RPM_NO_CHROOT_FOR_SCRIPTS=1
+	EOF
 }
 
 # Rpm's make install creates var/tmp which clashes with base-files packaging

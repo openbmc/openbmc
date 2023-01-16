@@ -5,6 +5,8 @@ SRC_URI += "file://remove.ldconfig.call.patch \
            file://ptest.patch \
            file://mkdir_p.patch \
            file://extents.patch \
+           file://0001-Add-option-to-enable-disable-largefile-support.patch \
+           file://0001-ext2fs-Use-64bit-lseek-when-_FILE_OFFSET_BITS-is-64.patch \
            "
 SRC_URI:append:class-native = " \
            file://e2fsprogs-fix-missing-check-for-permission-denied.patch \
@@ -17,7 +19,7 @@ UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+\.\d+(\.\d+)*)$"
 EXTRA_OECONF += "--libdir=${base_libdir} --sbindir=${base_sbindir} \
                 --enable-elf-shlibs --disable-libuuid --disable-uuidd \
                 --disable-libblkid --enable-verbose-makecmds \
-                --with-crond-dir=no"
+                --enable-largefile --with-crond-dir=no"
 
 EXTRA_OECONF:darwin = "--libdir=${base_libdir} --sbindir=${base_sbindir} --enable-bsd-shlibs"
 

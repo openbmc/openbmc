@@ -1,5 +1,6 @@
 #!/bin/sh -e
 
+# shellcheck disable=SC3010
 
 tty="$1"
 uart=0
@@ -13,6 +14,10 @@ case "${tty}" in
  ;;
  "ttyS3") uart=4
  ;;
+ "ttyS7") uart=0
+ ;;
+ "ttyS8") uart=0
+ ;;
  *) echo "Invalid tty passed to $0. Exiting!"
     exit 1;
  ;;
@@ -22,6 +27,9 @@ esac
 # This allows the SoL console in webui, and the ssh port 2200, to work
 # upon startup. If UART transcievers are installed on the header and required,
 # this value should be set to 1
-/usr/sbin/ampere_uartmux_ctrl.sh ${uart} 2
+if [[ ${uart} -ne 0 ]]
+then
+	/usr/sbin/ampere_uartmux_ctrl.sh ${uart} 2
+fi
 
 /usr/sbin/obmc-console-server --config /etc/obmc-console/server."${tty}".conf "${tty}"

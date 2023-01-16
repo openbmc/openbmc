@@ -1,3 +1,8 @@
+From 00a456145531d194d3993c9f4cd404d5ca16c9df Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 6 Apr 2015 17:36:44 +0000
+Subject: [PATCH] quota: Fix build with musl
+
 Include fcntl.h to pacify compiler errors on musl
 like
 
@@ -9,20 +14,14 @@ Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
-diff --git a/quota.h b/quota.h
-index 4c21411..d20c217 100644
---- a/quota.h
-+++ b/quota.h
-@@ -182,6 +182,6 @@ enum {
- 	#endif
- #endif
- 
--long quotactl __P((int, const char *, qid_t, caddr_t));
-+long quotactl (int, const char *, qid_t, caddr_t);
- 
- #endif /* _QUOTA_ */
+---
+ quotacheck.c    | 1 +
+ quotaio.c       | 1 +
+ rquota_client.c | 4 ++++
+ 3 files changed, 6 insertions(+)
+
 diff --git a/quotacheck.c b/quotacheck.c
-index 2cdf475..07c18a7 100644
+index bd62d9a..772a27d 100644
 --- a/quotacheck.c
 +++ b/quotacheck.c
 @@ -19,6 +19,7 @@
@@ -46,7 +45,7 @@ index 94ae458..d57fc1a 100644
  #include <sys/stat.h>
  #include <sys/file.h>
 diff --git a/rquota_client.c b/rquota_client.c
-index a3a4ae3..0ffe7a9 100644
+index 7f8e821..d48505a 100644
 --- a/rquota_client.c
 +++ b/rquota_client.c
 @@ -19,7 +19,9 @@

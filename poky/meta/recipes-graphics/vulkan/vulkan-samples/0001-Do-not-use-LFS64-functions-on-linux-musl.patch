@@ -1,0 +1,37 @@
+From ce7a593e74c8e0c2ece15c73e7614d4f13a19a53 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 30 Dec 2022 13:04:08 -0800
+Subject: [PATCH] Do not use LFS64 functions on linux/musl
+
+On musl, off_t is 64bit always ( even on 32bit platforms ), therefore using
+LFS64 funcitons is not needed on such platforms. Moreover, musl has stopped
+providing aliases for these functions [1] which means it wont compile on
+newer musl systems. Therefore only use it on 32bit glibc/linux platforms
+and exclude musl like cygwin or OSX
+
+[1] https://git.musl-libc.org/cgit/musl/commit/?id=246f1c811448f37a44b41cd8df8d0ef9736d95f4
+
+Upstream-Status: Submitted [https://github.com/gabime/spdlog/pull/2589]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/spdlog/details/os.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/include/spdlog/details/os.h b/include/spdlog/details/os.h
+index 8e8476f0..be0a67b8 100644
+--- a/include/spdlog/details/os.h
++++ b/include/spdlog/details/os.h
+@@ -227,7 +227,9 @@ inline size_t filesize(FILE *f)
+ #else // unix
+     int fd = fileno(f);
+ // 64 bits(but not in osx or cygwin, where fstat64 is deprecated)
+-#if !defined(__FreeBSD__) && !defined(__APPLE__) && (defined(__x86_64__) || defined(__ppc64__)) && !defined(__CYGWIN__)
++#if !defined(__FreeBSD__) && !defined(__APPLE__) && \
++    (defined(__linux__) && defined(__GLIBC__)) && \
++    (defined(__x86_64__) || defined(__ppc64__)) && !defined(__CYGWIN__)
+     struct stat64 st;
+     if (::fstat64(fd, &st) == 0)
+     {
+-- 
+2.39.0
+

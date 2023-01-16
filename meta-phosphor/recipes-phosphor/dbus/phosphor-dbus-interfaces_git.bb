@@ -7,7 +7,7 @@ DEPENDS += " \
         sdbusplus \
         systemd \
         "
-SRCREV = "27b83c43e5b49845368a7c4aee17f621212bb404"
+SRCREV = "0f08d970b101d913d4465e1b9e02937e7f7f37cb"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
@@ -39,3 +39,4 @@ do_write_config:append() {
         sed -i "/^\[built-in options\]\$/a$intf = false" ${WORKDIR}/meson.cross
     done
 }
+do_write_config[deptask] += "do_unpack"

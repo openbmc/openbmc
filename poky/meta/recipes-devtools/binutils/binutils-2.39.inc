@@ -35,6 +35,7 @@ SRC_URI = "\
      file://0014-CVE-2022-38128-1.patch \
      file://0014-CVE-2022-38128-2.patch \
      file://0014-CVE-2022-38128-3.patch \
+     file://0015-CVE-2022-4285.patch \
 "
 S  = "${WORKDIR}/git"
 # Already in 2.39 branch

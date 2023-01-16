@@ -12,6 +12,21 @@ case "$1" in
 		# CPU0 UART0 connects to BMC UART1
 		CONSOLE_PORT=0
 	;;
+	2) GPIO_UARTx_MODE0="uart2-mode0"
+		GPIO_UARTx_MODE1="uart2-mode1"
+		# CPU0 UART1 connects to BMC UART2
+		CONSOLE_PORT=1
+	;;
+	3) GPIO_UARTx_MODE0="uart3-mode0"
+		GPIO_UARTx_MODE1="uart3-mode1"
+		# CPU0 UART4 connects to BMC UART3
+		CONSOLE_PORT=2
+	;;
+	4) GPIO_UARTx_MODE0="uart4-mode0"
+		GPIO_UARTx_MODE1="uart4-mode1"
+		# CPU1 UART1 connects to BMC UART4
+		CONSOLE_PORT=3
+	;;
 	*) echo "Invalid UART port selection"
 		exit 1
 	;;

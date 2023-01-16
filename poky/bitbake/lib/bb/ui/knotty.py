@@ -625,25 +625,38 @@ def main(server, eventHandler, params, tf = TerminalFilter):
 
     printintervaldelta = 10 * 60 # 10 minutes
     printinterval = printintervaldelta
-    lastprint = time.time()
+    pinginterval = 1 * 60 # 1 minute
+    lastevent = lastprint = time.time()
 
     termfilter = tf(main, helper, console_handlers, params.options.quiet)
     atexit.register(termfilter.finish)
 
-    while True:
+    # shutdown levels
+    # 0 - normal operation
+    # 1 - no new task execution, let current running tasks finish
+    # 2 - interrupting currently executing tasks
+    # 3 - we're done, exit
+    while main.shutdown < 3:
         try:
             if (lastprint + printinterval) <= time.time():
                 termfilter.keepAlive(printinterval)
                 printinterval += printintervaldelta
             event = eventHandler.waitEvent(0)
             if event is None:
-                if main.shutdown > 1:
-                    break
+                if (lastevent + pinginterval) <= time.time():
+                    ret, error = server.runCommand(["ping"])
+                    if error or not ret:
+                        termfilter.clearFooter()
+                        print("No reply after pinging server (%s, %s), exiting." % (str(error), str(ret)))
+                        return_value = 3
+                        main.shutdown = 3
+                    lastevent = time.time()
                 if not parseprogress:
                     termfilter.updateFooter()
                 event = eventHandler.waitEvent(0.25)
                 if event is None:
                     continue
+            lastevent = time.time()
             helper.eventHandler(event)
             if isinstance(event, bb.runqueue.runQueueExitWait):
                 if not main.shutdown:
@@ -748,15 +761,15 @@ def main(server, eventHandler, params, tf = TerminalFilter):
                 if event.error:
                     errors = errors + 1
                     logger.error(str(event))
-                main.shutdown = 2
+                main.shutdown = 3
                 continue
             if isinstance(event, bb.command.CommandExit):
                 if not return_value:
                     return_value = event.exitcode
-                main.shutdown = 2
+                main.shutdown = 3
                 continue
             if isinstance(event, (bb.command.CommandCompleted, bb.cooker.CookerExit)):
-                main.shutdown = 2
+                main.shutdown = 3
                 continue
             if isinstance(event, bb.event.MultipleProviders):
                 logger.info(str(event))

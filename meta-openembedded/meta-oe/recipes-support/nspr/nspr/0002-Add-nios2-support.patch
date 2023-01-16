@@ -1,4 +1,4 @@
-From 95bda64fb4cf1825fea745e918cfe8202843f0ba Mon Sep 17 00:00:00 2001
+From 4760065a58153e4dae24e4e437a5136592c624bc Mon Sep 17 00:00:00 2001
 From: Marek Vasut <marex@denx.de>
 Date: Sat, 30 Jan 2016 07:18:02 +0100
 Subject: [PATCH] Add nios2 support
@@ -7,15 +7,14 @@ Add support for the nios2 CPU.
 
 Signed-off-by: Marek Vasut <marex@denx.de>
 Upstream-Status: Submitted [ https://bugzilla.mozilla.org/show_bug.cgi?id=1244421 ]
----
- nspr/pr/include/md/_linux.cfg | 45 +++++++++++++++++++++++++++++++++++++++++++
- nspr/pr/include/md/_linux.h   | 14 ++++++++++++++
- 2 files changed, 59 insertions(+)
 
-Index: nspr/pr/include/md/_linux.cfg
-===================================================================
---- nspr.orig/pr/include/md/_linux.cfg
-+++ nspr/pr/include/md/_linux.cfg
+---
+ pr/include/md/_linux.cfg | 45 +++++++++++++++++++++++++++++++++++
+ pr/include/md/_linux.h   |  4 +++-
+ 2 files changed, 48 insertions(+), 1 deletion(-)
+
+--- a/pr/include/md/_linux.cfg
++++ b/pr/include/md/_linux.cfg
 @@ -975,6 +975,51 @@
  #define PR_BYTES_PER_WORD_LOG2   2
  #define PR_BYTES_PER_DWORD_LOG2  3
@@ -68,10 +67,8 @@ Index: nspr/pr/include/md/_linux.cfg
  #elif defined(__or1k__)
  
  #undef  IS_LITTLE_ENDIAN
-Index: nspr/pr/include/md/_linux.h
-===================================================================
---- nspr.orig/pr/include/md/_linux.h
-+++ nspr/pr/include/md/_linux.h
+--- a/pr/include/md/_linux.h
++++ b/pr/include/md/_linux.h
 @@ -55,6 +55,8 @@
  #define _PR_SI_ARCHITECTURE "avr32"
  #elif defined(__m32r__)
@@ -81,22 +78,12 @@ Index: nspr/pr/include/md/_linux.h
  #elif defined(__or1k__)
  #define _PR_SI_ARCHITECTURE "or1k"
  #elif defined(__riscv) && (__riscv_xlen == 32)
-@@ -129,6 +131,18 @@ extern PRInt32 _PR_x86_64_AtomicSet(PRIn
+@@ -143,7 +145,7 @@ extern PRInt32 _PR_x86_64_AtomicSet(PRIn
  #define _MD_ATOMIC_SET                _PR_x86_64_AtomicSet
  #endif
  
-+#if defined(__nios2__)
-+#if defined(__GNUC__)
-+/* Use GCC built-in functions */
-+#define _PR_HAVE_ATOMIC_OPS
-+#define _MD_INIT_ATOMIC()
-+#define _MD_ATOMIC_INCREMENT(ptr) __sync_add_and_fetch(ptr, 1)
-+#define _MD_ATOMIC_DECREMENT(ptr) __sync_sub_and_fetch(ptr, 1)
-+#define _MD_ATOMIC_ADD(ptr, i) __sync_add_and_fetch(ptr, i)
-+#define _MD_ATOMIC_SET(ptr, nv) __sync_lock_test_and_set(ptr, nv)
-+#endif
-+#endif
-+
- #if defined(__or1k__)
+-#if defined(__loongarch__)
++#if defined(__loongarch__) || defined(__nios2__)
  #if defined(__GNUC__)
  /* Use GCC built-in functions */
+ #define _PR_HAVE_ATOMIC_OPS

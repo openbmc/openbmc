@@ -92,10 +92,11 @@ def infer_caller_details(loginfo, parent = False, varval = True):
             loginfo['func'] = func
 
 class VariableParse:
-    def __init__(self, varname, d, val = None):
+    def __init__(self, varname, d, unexpanded_value = None, val = None):
         self.varname = varname
         self.d = d
         self.value = val
+        self.unexpanded_value = unexpanded_value
 
         self.references = set()
         self.execs = set()
@@ -447,9 +448,9 @@ class DataSmart(MutableMapping):
     def expandWithRefs(self, s, varname):
 
         if not isinstance(s, str): # sanity check
-            return VariableParse(varname, self, s)
+            return VariableParse(varname, self, s, s)
 
-        varparse = VariableParse(varname, self)
+        varparse = VariableParse(varname, self, s)
 
         while s.find('${') != -1:
             olds = s
@@ -486,12 +487,14 @@ class DataSmart(MutableMapping):
             return
         if self.inoverride:
             return
+        overrride_stack = []
         for count in range(5):
             self.inoverride = True
             # Can end up here recursively so setup dummy values
             self.overrides = []
             self.overridesset = set()
             self.overrides = (self.getVar("OVERRIDES") or "").split(":") or []
+            overrride_stack.append(self.overrides)
             self.overridesset = set(self.overrides)
             self.inoverride = False
             self.expand_cache = {}
@@ -501,7 +504,7 @@ class DataSmart(MutableMapping):
             self.overrides = newoverrides
             self.overridesset = set(self.overrides)
         else:
-            bb.fatal("Overrides could not be expanded into a stable state after 5 iterations, overrides must be being referenced by other overridden variables in some recursive fashion. Please provide your configuration to bitbake-devel so we can laugh, er, I mean try and understand how to make it work.")
+            bb.fatal("Overrides could not be expanded into a stable state after 5 iterations, overrides must be being referenced by other overridden variables in some recursive fashion. Please provide your configuration to bitbake-devel so we can laugh, er, I mean try and understand how to make it work. The list of failing override expansions: %s" % "\n".join(str(s) for s in overrride_stack))
 
     def initVar(self, var):
         self.expand_cache = {}
@@ -718,7 +721,7 @@ class DataSmart(MutableMapping):
         if ':' in var:
             override = var[var.rfind(':')+1:]
             shortvar = var[:var.rfind(':')]
-            while override and override.islower():
+            while override and __override_regexp__.match(override):
                 try:
                     if shortvar in self.overridedata:
                         # Force CoW by recreating the list first
@@ -772,6 +775,9 @@ class DataSmart(MutableMapping):
                 bb.warn("Calling getVarFlag with flag unset is invalid")
                 return None
             cachename = var + "[" + flag + "]"
+
+        if not expand and retparser and cachename in self.expand_cache:
+            return self.expand_cache[cachename].unexpanded_value, self.expand_cache[cachename]
 
         if expand and cachename in self.expand_cache:
             return self.expand_cache[cachename].value

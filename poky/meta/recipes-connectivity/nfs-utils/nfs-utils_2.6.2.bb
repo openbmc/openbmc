@@ -32,6 +32,7 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/nfs-utils/${PV}/nfs-utils-${PV}.tar.x
            file://clang-warnings.patch \
            file://0005-mountd-Check-for-return-of-stat-function.patch \
            file://0006-Fix-function-prototypes.patch \
+           file://0001-Replace-statfs64-with-statfs.patch \
            "
 SRC_URI[sha256sum] = "5200873e81c4d610e2462fc262fe18135f2dbe78b7979f95accd159ae64d5011"
 

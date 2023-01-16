@@ -20,4 +20,5 @@ SYSTEMD_SERVICE:phosphor-software-manager-updater-mmc += " \
     obmc-flash-mmc-setprimary@.service \
     obmc-flash-mmc-mount.service \
     obmc-flash-mmc-umount.service \
+    obmc-flash-mmc-mirroruboot.service \
 "

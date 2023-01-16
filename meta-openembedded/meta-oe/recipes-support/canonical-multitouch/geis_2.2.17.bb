@@ -15,7 +15,7 @@ LIC_FILES_CHKSUM = " \
 
 inherit autotools pkgconfig python3native lib_package features_check
 
-REQUIRED_DISTRO_FEATURES = "x11"
+REQUIRED_DISTRO_FEATURES = "x11 opengl"
 
 DEPENDS += "grail dbus-glib python3 virtual/libx11 libxext libxi libxcb dbus frame"
 

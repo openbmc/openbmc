@@ -17,7 +17,7 @@ do_install:append() {
     mv ${D}${bindir}/cygdb ${D}${bindir}/cygdb3
 }
 
-PACKAGEBUILDPKGD += "cython_fix_sources"
+PACKAGESPLITFUNCS =+ "cython_fix_sources"
 
 cython_fix_sources () {
 	for f in ${PKGD}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/Cython/Compiler/FlowControl.c \

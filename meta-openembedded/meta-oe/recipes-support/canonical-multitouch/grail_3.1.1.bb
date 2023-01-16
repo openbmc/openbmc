@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = " \
     file://COPYING.GPL3;md5=d32239bcb673463ab874e80d47fae504 \
 "
 
-inherit autotools pkgconfig
+inherit autotools pkgconfig features_check
 
 DEPENDS = "frame"
 CXXFLAGS:append:toolchain-clang = " -Wno-pessimizing-move"
@@ -18,6 +18,8 @@ UPSTREAM_CHECK_URI = "https://launchpad.net/grail/trunk"
 
 SRC_URI[md5sum] = "0df1b3ec6167920f310e2effe6e2ad44"
 SRC_URI[sha256sum] = "5eed1f650f042481daa3a2de5e7d43261fe343b2a1b1e240f3b7fc26572c9df3"
+
+REQUIRED_DISTRO_FEATURES = "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'opengl', '', d)}"
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)}"
 PACKAGECONFIG[x11] = "--with-x11, --without-x11, libxi"

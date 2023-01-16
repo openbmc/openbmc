@@ -1,0 +1,36 @@
+From 34e4f4dad923095989ccb0ab8efb883c592bdbfd Mon Sep 17 00:00:00 2001
+From: Vincent Davis Jr <vince@underview.tech>
+Date: Fri, 9 Dec 2022 20:04:27 -0600
+Subject: [PATCH] remove xorg related link libs
+
+Upstream-Status: Inappropriate
+
+RPI-Distro repo forks original vlc and applies patches
+to enable raspiberry pi support.
+
+If x11 isn't defined in DISTRO_FEATURES
+required xorg related libs are not included
+in recipe-sysroot resulting in compilation
+failure.
+
+Signed-off-by: Vincent Davis Jr <vince@underview.tech>
+---
+ modules/hw/mmal/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/hw/mmal/Makefile.am b/modules/hw/mmal/Makefile.am
+index 4abe68e2e..86dad2c2d 100644
+--- a/modules/hw/mmal/Makefile.am
++++ b/modules/hw/mmal/Makefile.am
+@@ -8,7 +8,7 @@ libmmal_vout_plugin_la_SOURCES = vout.c mmal_cma.c mmal_picture.c subpic.c\
+   mmal_cma.h mmal_picture.h subpic.h transform_ops.h\
+   mmal_piccpy_neon.S
+ libmmal_vout_plugin_la_CFLAGS = $(AM_CFLAGS)
+-libmmal_vout_plugin_la_LDFLAGS = $(AM_LDFLAGS) -lm -lX11 -lXrandr
++libmmal_vout_plugin_la_LDFLAGS = $(AM_LDFLAGS) -lm
+ libmmal_vout_plugin_la_LIBADD = $(LIBS_mmal)
+ mmal_LTLIBRARIES = libmmal_vout_plugin.la
+ 
+-- 
+2.38.1
+

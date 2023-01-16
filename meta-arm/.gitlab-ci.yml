@@ -1,11 +1,21 @@
 image: ghcr.io/siemens/kas/kas:latest-release
 
+variables:
+  CPU_REQUEST: ""
+  DEFAULT_TAG: ""
+  # These are needed as the k8s executor doesn't respect the container entrypoint
+  # by default
+  FF_KUBERNETES_HONOR_ENTRYPOINT: 1
+  FF_USE_LEGACY_KUBERNETES_EXECUTION_STRATEGY: 0
+
 stages:
   - prep
   - build
 
 # Common job fragment to get a worker ready
 .setup:
+  tags:
+    - $DEFAULT_TAG
   stage: build
   interruptible: true
   variables:
@@ -25,11 +35,14 @@ stages:
     - mkdir --verbose --parents $KAS_WORK_DIR $KAS_REPO_REF_DIR $SSTATE_DIR $DL_DIR $TOOLCHAIN_DIR $TOOLCHAIN_LINK_DIR
     # Must do this here, as it's the only way to make sure the toolchain is installed on the same builder
     - ./ci/get-binary-toolchains $DL_DIR $TOOLCHAIN_DIR $TOOLCHAIN_LINK_DIR
-    - sudo apt-get update && sudo apt-get install --yes telnet python3-subunit
+    # This can be removed with Kas 3.2
+    - sudo apt-get update && sudo apt-get install --yes python3-subunit
 
 # Generalised fragment to do a Kas build
 .build:
   extends: .setup
+  variables:
+    KUBERNETES_CPU_REQUEST: $CPU_REQUEST
   script:
     - KASFILES=$(./ci/jobs-to-kas "$CI_JOB_NAME")
     - kas shell --update --force-checkout $KASFILES -c 'cat conf/*.conf'
@@ -84,8 +97,6 @@ fvp-base:
   parallel:
     matrix:
       - TESTING: testimage
-  tags:
-    - x86_64
 
 fvp-base-arm32:
   extends: .build
@@ -93,8 +104,6 @@ fvp-base-arm32:
     matrix:
       - TOOLCHAINS: [gcc, external-gccarm]
         TESTING: testimage
-  tags:
-    - x86_64
 
 fvp-baser-aemv8r64:
   extends: .build
@@ -105,15 +114,6 @@ fvp-baser-aemv8r64:
     - x86_64
 
 fvps:
-  extends: .build
-
-gem5-arm64:
-  extends: .build
-  parallel:
-    matrix:
-      - VIRT: [none, xen]
-
-gem5-atp-arm64:
   extends: .build
 
 generic-arm64:
@@ -137,6 +137,7 @@ n1sdp:
   parallel:
     matrix:
       - TOOLCHAINS: [gcc, armgcc]
+        TS: [none, trusted-services]
 
 qemu-generic-arm64:
   extends: .build
@@ -210,7 +211,7 @@ check-layers:
       "yocto-check-layer-wrapper $CI_PROJECT_DIR/$LAYER --dependency $CI_PROJECT_DIR/meta-* $KAS_WORK_DIR/meta-openembedded/meta-oe --no-auto-dependency"
   parallel:
     matrix:
-      - LAYER: [meta-arm, meta-arm-bsp, meta-arm-toolchain, meta-gem5]
+      - LAYER: [meta-arm, meta-arm-bsp, meta-arm-toolchain]
 
 pending-updates:
   extends: .setup
@@ -220,16 +221,15 @@ pending-updates:
   script:
     - rm -fr update-report
     # This configuration has all of the layers we need enabled
-    - kas shell ci/gem5-arm64.yml --command \
-      "$CI_PROJECT_DIR/scripts/machine-summary.py -t report -o $CI_PROJECT_DIR/update-report $($CI_PROJECT_DIR/ci/listmachines.py meta-arm meta-arm-bsp meta-gem5)"
+    - kas shell ci/qemuarm64.yml:ci/meta-openembedded.yml --command \
+      "$CI_PROJECT_DIR/scripts/machine-summary.py -t report -o $CI_PROJECT_DIR/update-report $($CI_PROJECT_DIR/ci/listmachines.py meta-arm meta-arm-bsp)"
   # Do this on x86 whilst the compilers are x86-only
   tags:
     - x86_64
 
 # What percentage of machines in the layer do we build
 machine-coverage:
-  stage: build
-  interruptible: true
+  extends: .setup
   script:
     - ./ci/check-machine-coverage
   coverage: '/Coverage: \d+/'

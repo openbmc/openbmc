@@ -33,6 +33,13 @@ BB_SCHEDULER ?= "completion"
 BB_TASK_IONICE_LEVEL:task-rm_work = "3.0"
 
 do_rm_work () {
+    # Force using the HOSTTOOLS 'rm' - otherwise the SYSROOT_NATIVE 'rm' can be selected depending on PATH
+    # Avoids race-condition accessing 'rm' when deleting WORKDIR folders at the end of this function
+    RM_BIN="$(PATH=${HOSTTOOLS_DIR} command -v rm)"
+    if [ -z "${RM_BIN}" ]; then
+        bbfatal "Binary 'rm' not found in HOSTTOOLS_DIR, cannot remove WORKDIR data."
+    fi
+
     # If the recipe name is in the RM_WORK_EXCLUDE, skip the recipe.
     for p in ${RM_WORK_EXCLUDE}; do
         if [ "$p" = "${PN}" ]; then
@@ -50,55 +57,58 @@ do_rm_work () {
     # Change normal stamps into setscene stamps as they better reflect the
     # fact WORKDIR is now empty
     # Also leave noexec stamps since setscene stamps don't cover them
-    cd `dirname ${STAMP}`
-    for i in `basename ${STAMP}`*
-    do
-        case $i in
-        *sigdata*|*sigbasedata*)
-            # Save/skip anything that looks like a signature data file.
-            ;;
-        *do_image_complete_setscene*|*do_image_qa_setscene*)
-            # Ensure we don't 'stack' setscene extensions to these stamps with the sections below
-            ;;
-        *do_image_complete*)
-            # Promote do_image_complete stamps to setscene versions (ahead of *do_image* below)
-            mv $i `echo $i | sed -e "s#do_image_complete#do_image_complete_setscene#"`
-            ;;
-        *do_image_qa*)
-            # Promote do_image_qa stamps to setscene versions (ahead of *do_image* below)
-            mv $i `echo $i | sed -e "s#do_image_qa#do_image_qa_setscene#"`
-            ;;
-        *do_package_write*|*do_rootfs*|*do_image*|*do_bootimg*|*do_write_qemuboot_conf*|*do_build*)
-            ;;
-        *do_addto_recipe_sysroot*)
-            # Preserve recipe-sysroot-native if do_addto_recipe_sysroot has been used
-            excludes="$excludes recipe-sysroot-native"
-            ;;
-        *do_package|*do_package.*|*do_package_setscene.*)
-            # We remove do_package entirely, including any
-            # sstate version since otherwise we'd need to leave 'plaindirs' around
-            # such as 'packages' and 'packages-split' and these can be large. No end
-            # of chain tasks depend directly on do_package anymore.
-            rm -f -- $i;
-            ;;
-        *_setscene*)
-            # Skip stamps which are already setscene versions
-            ;;
-        *)
-            # For everything else: if suitable, promote the stamp to a setscene
-            # version, otherwise remove it
-            for j in ${SSTATETASKS} do_shared_workdir
-            do
-                case $i in
-                *$j|*$j.*)
-                    mv $i `echo $i | sed -e "s#${j}#${j}_setscene#"`
-                    break
-                    ;;
-                esac
-            done
-            rm -f -- $i
-        esac
-    done
+    STAMPDIR=`dirname ${STAMP}`
+    if test -d $STAMPDIR; then
+        cd $STAMPDIR
+        for i in `basename ${STAMP}`*
+        do
+            case $i in
+            *sigdata*|*sigbasedata*)
+                # Save/skip anything that looks like a signature data file.
+                ;;
+            *do_image_complete_setscene*|*do_image_qa_setscene*)
+                # Ensure we don't 'stack' setscene extensions to these stamps with the sections below
+                ;;
+            *do_image_complete*)
+                # Promote do_image_complete stamps to setscene versions (ahead of *do_image* below)
+                mv $i `echo $i | sed -e "s#do_image_complete#do_image_complete_setscene#"`
+                ;;
+            *do_image_qa*)
+                # Promote do_image_qa stamps to setscene versions (ahead of *do_image* below)
+                mv $i `echo $i | sed -e "s#do_image_qa#do_image_qa_setscene#"`
+                ;;
+            *do_package_write*|*do_rootfs*|*do_image*|*do_bootimg*|*do_write_qemuboot_conf*|*do_build*)
+                ;;
+            *do_addto_recipe_sysroot*)
+                # Preserve recipe-sysroot-native if do_addto_recipe_sysroot has been used
+                excludes="$excludes recipe-sysroot-native"
+                ;;
+            *do_package|*do_package.*|*do_package_setscene.*)
+                # We remove do_package entirely, including any
+                # sstate version since otherwise we'd need to leave 'plaindirs' around
+                # such as 'packages' and 'packages-split' and these can be large. No end
+                # of chain tasks depend directly on do_package anymore.
+                "${RM_BIN}" -f -- $i;
+                ;;
+            *_setscene*)
+                # Skip stamps which are already setscene versions
+                ;;
+            *)
+                # For everything else: if suitable, promote the stamp to a setscene
+                # version, otherwise remove it
+                for j in ${SSTATETASKS} do_shared_workdir
+                do
+                    case $i in
+                    *$j|*$j.*)
+                        mv $i `echo $i | sed -e "s#${j}#${j}_setscene#"`
+                        break
+                        ;;
+                    esac
+                done
+                "${RM_BIN}" -f -- $i
+            esac
+        done
+    fi
 
     cd ${WORKDIR}
     for dir in *
@@ -106,9 +116,9 @@ do_rm_work () {
         # Retain only logs and other files in temp, safely ignore
         # failures of removing pseudo folers on NFS2/3 server.
         if [ $dir = 'pseudo' ]; then
-            rm -rf -- $dir 2> /dev/null || true
+            "${RM_BIN}" -rf -- $dir 2> /dev/null || true
         elif ! echo "$excludes" | grep -q -w "$dir"; then
-            rm -rf -- $dir
+            "${RM_BIN}" -rf -- $dir
         fi
     done
 }
@@ -180,7 +190,7 @@ python inject_rm_work() {
         # other recipes and thus will typically run much later than completion of
         # work in the recipe itself.
         # In practice, addtask() here merely updates the dependencies.
-        bb.build.addtask('do_rm_work', 'do_build', ' '.join(deps), d)
+        bb.build.addtask('do_rm_work', 'do_rm_work_all do_build', ' '.join(deps), d)
 
     # Always update do_build_without_rm_work dependencies.
     bb.build.addtask('do_build_without_rm_work', '', ' '.join(deps), d)

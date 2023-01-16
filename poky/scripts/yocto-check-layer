@@ -168,14 +168,13 @@ def main():
 
     layers_tested = 0
     for layer in layers:
-        if layer['type'] == LayerType.ERROR_NO_LAYER_CONF or \
-                layer['type'] == LayerType.ERROR_BSP_DISTRO:
+        if layer['type'] in (LayerType.ERROR_NO_LAYER_CONF, LayerType.ERROR_BSP_DISTRO):
             continue
 
         # Reset to a clean backup copy for each run
         shutil.copyfile(bblayersconf + '.backup', bblayersconf)
 
-        if check_bblayers(bblayersconf, layer['path'], logger):
+        if layer['type'] not in (LayerType.CORE, ) and check_bblayers(bblayersconf, layer['path'], logger):
             logger.info("%s already in %s. To capture initial signatures, layer under test should not present "
                "in BBLAYERS. Please remove %s from BBLAYERS." % (layer['name'], bblayersconf, layer['name']))
             results[layer['name']] = None

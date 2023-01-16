@@ -1,0 +1,737 @@
+From 4a0716f04fb25b51b08e994bd5a900b2e7f7fed5 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Fri, 16 Oct 2015 16:35:16 +0300
+Subject: [PATCH] Do not try to initialize GL without libGL
+
+_gdk_x11_screen_update_visuals_for_gl() will end up calling epoxys
+GLX api which will exit() if libGL.so.1 is not present. We do not
+want that to happen and we don't want every app to have to set
+"GDK_GL=disabled" environment variable: so use #ifdef set based on
+opengl distro feature.
+
+Upstream is not interested in the fix as it is: Either epoxy should be
+fixed (to not exit) or GTK+ possibly could do some additional probing
+before calling epoxy APIs.
+
+Upstream-Status: Denied
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ demos/gtk-demo/meson.build       |  5 ++++-
+ docs/tools/meson.build           |  7 +++++--
+ docs/tools/widgets.c             |  6 +++++-
+ gdk/gdkconfig.h.meson            |  1 +
+ gdk/gdkdisplay.c                 |  4 ++++
+ gdk/gdkgl.c                      | 10 ++++++++++
+ gdk/gdkglcontext.c               |  6 ++++++
+ gdk/gdkwindow.c                  | 13 +++++++++++++
+ gdk/meson.build                  |  8 +++++++-
+ gdk/x11/gdkdisplay-x11.c         |  6 +++++-
+ gdk/x11/gdkvisual-x11.c          |  5 +++++
+ gdk/x11/gdkwindow-x11.c          |  4 ++++
+ gdk/x11/gdkx-autocleanups.h      |  2 ++
+ gdk/x11/gdkx.h                   |  2 ++
+ gdk/x11/meson.build              |  7 +++++--
+ gtk/gtkglarea.c                  | 19 +++++++++++++++++++
+ gtk/inspector/general.c          |  6 ++++++
+ meson.build                      | 17 ++++++++++++++---
+ meson_options.txt                |  2 ++
+ tests/meson.build                |  9 +++++++--
+ testsuite/gtk/objects-finalize.c |  2 ++
+ 21 files changed, 128 insertions(+), 13 deletions(-)
+
+diff --git a/demos/gtk-demo/meson.build b/demos/gtk-demo/meson.build
+index 252da16d05..4b57cff6ac 100644
+--- a/demos/gtk-demo/meson.build
++++ b/demos/gtk-demo/meson.build
+@@ -28,7 +28,6 @@ demos = files([
+   'fishbowl.c',
+   'foreigndrawing.c',
+   'gestures.c',
+-  'glarea.c',
+   'headerbar.c',
+   'hypertext.c',
+   'iconview.c',
+@@ -87,6 +86,10 @@ elif harfbuzz_dep.found() and pangoft_dep.found()
+   gtkdemo_deps += [harfbuzz_dep, pangoft_dep]
+ endif
+ 
++if opengl_enabled
++  demos += files('glarea.c')
++endif
++
+ if os_unix
+   demos += files('pagesetup.c')
+ endif
+diff --git a/docs/tools/meson.build b/docs/tools/meson.build
+index 05621ee7ed..3d0a333b32 100644
+--- a/docs/tools/meson.build
++++ b/docs/tools/meson.build
+@@ -2,10 +2,13 @@ if x11_enabled
+   doc_shooter_sources = [
+     'shadow.c',
+     'shooter.c',
+-    'widgets.c',
+-    '../../tests/gtkgears.c',
++    'widgets.c'
+   ]
+ 
++  if opengl_enabled
++  doc_shooter_sources += ['../../tests/gtkgears.c']
++  endif
++
+   doc_shooter = executable('doc-shooter', doc_shooter_sources,
+                            include_directories: [ confinc, gdkinc, gtkinc, testinc, ],
+                            dependencies: libgtk_dep)
+diff --git a/docs/tools/widgets.c b/docs/tools/widgets.c
+index 932daf1746..348807e133 100644
+--- a/docs/tools/widgets.c
++++ b/docs/tools/widgets.c
+@@ -8,7 +8,9 @@
+ #include <X11/Xatom.h>
+ #include <gdkx.h>
+ #include "widgets.h"
++#ifdef HAVE_OPENGL
+ #include "gtkgears.h"
++#endif
+ 
+ #define SMALL_WIDTH  240
+ #define SMALL_HEIGHT 75
+@@ -1526,9 +1528,11 @@ create_gl_area (void)
+   widget = gtk_frame_new (NULL);
+   gtk_frame_set_shadow_type (GTK_FRAME (widget), GTK_SHADOW_IN);
+ 
++#ifdef HAVE_OPENGL
+   gears = gtk_gears_new ();
+   gtk_container_add (GTK_CONTAINER (widget), gears);
+- 
++#endif
++
+   info = new_widget_info ("glarea", widget, MEDIUM);
+ 
+   return info;
+diff --git a/gdk/gdkconfig.h.meson b/gdk/gdkconfig.h.meson
+index 7db19e0470..088651bafa 100644
+--- a/gdk/gdkconfig.h.meson
++++ b/gdk/gdkconfig.h.meson
+@@ -15,6 +15,7 @@ G_BEGIN_DECLS
+ #mesondefine GDK_WINDOWING_WAYLAND
+ #mesondefine GDK_WINDOWING_WIN32
+ #mesondefine GDK_WINDOWING_QUARTZ
++#mesondefine GDK_WITH_OPENGL
+ 
+ G_END_DECLS
+ 
+diff --git a/gdk/gdkdisplay.c b/gdk/gdkdisplay.c
+index 748f54860c..04ef2c09d4 100644
+--- a/gdk/gdkdisplay.c
++++ b/gdk/gdkdisplay.c
+@@ -2420,7 +2420,11 @@ gboolean
+ gdk_display_make_gl_context_current (GdkDisplay   *display,
+                                      GdkGLContext *context)
+ {
++#ifdef HAVE_OPENGL
+   return GDK_DISPLAY_GET_CLASS (display)->make_gl_context_current (display, context);
++#else
++  return FALSE;
++#endif
+ }
+ 
+ GdkRenderingMode
+diff --git a/gdk/gdkgl.c b/gdk/gdkgl.c
+index 9690077cc2..55f85ef605 100644
+--- a/gdk/gdkgl.c
++++ b/gdk/gdkgl.c
+@@ -26,7 +26,9 @@
+ # include "win32/gdkwin32.h"
+ #endif
+ 
++#ifdef HAVE_OPENGL
+ #include <epoxy/gl.h>
++#endif
+ #include <math.h>
+ #include <string.h>
+ 
+@@ -40,6 +42,7 @@ gdk_cairo_surface_mark_as_direct (cairo_surface_t *surface,
+                                g_object_ref (window),  g_object_unref);
+ }
+ 
++#ifdef HAVE_OPENGL
+ static const char *
+ get_vertex_type_name (int type)
+ {
+@@ -212,6 +215,7 @@ use_texture_rect_program (GdkGLContextPaintData *paint_data)
+       glUseProgram (paint_data->current_program->program);
+     }
+ }
++#endif
+ 
+ void
+ gdk_gl_texture_quads (GdkGLContext *paint_context,
+@@ -220,6 +224,7 @@ gdk_gl_texture_quads (GdkGLContext *paint_context,
+                       GdkTexturedQuad *quads,
+                       gboolean flip_colors)
+ {
++#ifdef HAVE_OPENGL
+   GdkGLContextPaintData *paint_data  = gdk_gl_context_get_paint_data (paint_context);
+   GdkGLContextProgram *program;
+   GdkWindow *window = gdk_gl_context_get_window (paint_context);
+@@ -293,6 +298,7 @@ gdk_gl_texture_quads (GdkGLContext *paint_context,
+ 
+   glDisableVertexAttribArray (program->position_location);
+   glDisableVertexAttribArray (program->uv_location);
++#endif
+ }
+ 
+ /* x,y,width,height describes a rectangle in the gl render buffer
+@@ -341,6 +347,7 @@ gdk_cairo_draw_from_gl (cairo_t              *cr,
+                         int                   width,
+                         int                   height)
+ {
++#ifdef HAVE_OPENGL
+   GdkGLContext *paint_context;
+   cairo_surface_t *image;
+   cairo_matrix_t matrix;
+@@ -718,6 +725,7 @@ out:
+   if (clip_region)
+     cairo_region_destroy (clip_region);
+ 
++#endif
+ }
+ 
+ /* This is always called with the paint context current */
+@@ -725,6 +733,7 @@ void
+ gdk_gl_texture_from_surface (cairo_surface_t *surface,
+ 			     cairo_region_t  *region)
+ {
++#ifdef HAVE_OPENGL
+   GdkGLContext *paint_context;
+   cairo_surface_t *image;
+   double device_x_offset, device_y_offset;
+@@ -825,4 +834,5 @@ gdk_gl_texture_from_surface (cairo_surface_t *surface,
+ 
+   glDisable (GL_SCISSOR_TEST);
+   glDeleteTextures (1, &texture_id);
++#endif
+ }
+diff --git a/gdk/gdkglcontext.c b/gdk/gdkglcontext.c
+index 3b23639e1c..1f04f8e0b2 100644
+--- a/gdk/gdkglcontext.c
++++ b/gdk/gdkglcontext.c
+@@ -85,7 +85,9 @@
+ #include "gdkintl.h"
+ #include "gdk-private.h"
+ 
++#ifdef HAVE_OPENGL
+ #include <epoxy/gl.h>
++#endif
+ 
+ typedef struct {
+   GdkDisplay *display;
+@@ -243,6 +245,7 @@ gdk_gl_context_upload_texture (GdkGLContext    *context,
+                                int              height,
+                                guint            texture_target)
+ {
++#ifdef HAVE_OPENGL
+   GdkGLContextPrivate *priv = gdk_gl_context_get_instance_private (context);
+ 
+   g_return_if_fail (GDK_IS_GL_CONTEXT (context));
+@@ -286,6 +289,7 @@ gdk_gl_context_upload_texture (GdkGLContext    *context,
+             glTexSubImage2D (texture_target, 0, 0, i, width, 1, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, (unsigned char*) data + (i * stride));
+         }
+     }
++#endif
+ }
+ 
+ static gboolean
+@@ -774,6 +778,7 @@ gdk_gl_context_realize (GdkGLContext  *context,
+ static void
+ gdk_gl_context_check_extensions (GdkGLContext *context)
+ {
++#ifdef HAVE_OPENGL
+   GdkGLContextPrivate *priv = gdk_gl_context_get_instance_private (context);
+   gboolean has_npot, has_texture_rectangle;
+ 
+@@ -853,6 +858,7 @@ gdk_gl_context_check_extensions (GdkGLContext *context)
+                        priv->use_texture_rectangle ? "yes" : "no"));
+ 
+   priv->extensions_checked = TRUE;
++#endif
+ }
+ 
+ /**
+diff --git a/gdk/gdkwindow.c b/gdk/gdkwindow.c
+index 727b0cf1f4..d4d91b0d16 100644
+--- a/gdk/gdkwindow.c
++++ b/gdk/gdkwindow.c
+@@ -45,7 +45,9 @@
+ 
+ #include <math.h>
+ 
++#ifdef HAVE_OPENGL
+ #include <epoxy/gl.h>
++#endif
+ 
+ /* for the use of round() */
+ #include "fallback-c89.c"
+@@ -2844,6 +2846,13 @@ gdk_window_get_paint_gl_context (GdkWindow  *window,
+ {
+   GError *internal_error = NULL;
+ 
++#ifndef HAVE_OPENGL
++  g_set_error_literal (error, GDK_GL_ERROR,
++                       GDK_GL_ERROR_NOT_AVAILABLE,
++                       _("GL support disabled with --disable-opengl"));
++  return NULL;
++#endif
++
+   if (_gdk_gl_flags & GDK_GL_DISABLE)
+     {
+       g_set_error_literal (error, GDK_GL_ERROR,
+@@ -2979,6 +2988,7 @@ gdk_window_begin_paint_internal (GdkWindow            *window,
+         }
+       else
+         {
++#ifdef HAVE_OPENGL
+ 	  gdk_gl_context_make_current (context);
+           /* With gl we always need a surface to combine the gl
+              drawing with the native drawing. */
+@@ -2993,6 +3003,7 @@ gdk_window_begin_paint_internal (GdkWindow            *window,
+           glBlendFunc (GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+ 
+           glViewport (0, 0, ww, wh);
++#endif
+         }
+     }
+ 
+@@ -3056,6 +3067,7 @@ gdk_window_end_paint_internal (GdkWindow *window)
+ 
+           gdk_gl_context_make_current (window->gl_paint_context);
+ 
++#ifdef HAVE_OPENGL
+           if (!cairo_region_is_empty (opaque_region))
+             gdk_gl_texture_from_surface (window->current_paint.surface,
+                                          opaque_region);
+@@ -3066,6 +3078,7 @@ gdk_window_end_paint_internal (GdkWindow *window)
+                                            window->current_paint.need_blend_region);
+               glDisable(GL_BLEND);
+             }
++#endif
+ 
+           cairo_region_destroy (opaque_region);
+ 
+diff --git a/gdk/meson.build b/gdk/meson.build
+index 4bb1bf2b6c..64172b8d3e 100644
+--- a/gdk/meson.build
++++ b/gdk/meson.build
+@@ -56,7 +56,6 @@ gdk_gir_public_headers = files(
+   'gdkdrawingcontext.h',
+   'gdkevents.h',
+   'gdkframetimings.h',
+-  'gdkglcontext.h',
+   'gdkkeys.h',
+   'gdkkeysyms.h',
+   'gdkmain.h',
+@@ -78,6 +77,12 @@ gdk_gir_public_headers = files(
+   'gdkwindow.h',
+ )
+ gdk_nogir_public_headers = [files('gdkkeysyms-compat.h')]
++if opengl_enabled
++gdk_gir_public_headers += files('gdkglcontext.h')
++else
++gdk_nogir_public_headers += files('gdkglcontext.h')
++endif
++
+ gdk_public_headers = gdk_gir_public_headers + gdk_nogir_public_headers
+ install_headers(gdk_public_headers, subdir : 'gtk-3.0/gdk')
+ 
+@@ -166,6 +171,7 @@ gdkconfig_cdata.set('GDK_WINDOWING_WAYLAND', wayland_enabled)
+ gdkconfig_cdata.set('GDK_WINDOWING_WIN32', win32_enabled)
+ gdkconfig_cdata.set('GDK_WINDOWING_BROADWAY', broadway_enabled)
+ gdkconfig_cdata.set('GDK_WINDOWING_QUARTZ', quartz_enabled)
++gdkconfig_cdata.set('GDK_WITH_OPENGL', opengl_enabled)
+ 
+ gdkconfig = configure_file(
+   input  : 'gdkconfig.h.meson',
+diff --git a/gdk/x11/gdkdisplay-x11.c b/gdk/x11/gdkdisplay-x11.c
+index 7e08f472cc..30fd7b6089 100644
+--- a/gdk/x11/gdkdisplay-x11.c
++++ b/gdk/x11/gdkdisplay-x11.c
+@@ -37,7 +37,9 @@
+ #include "gdkdisplay-x11.h"
+ #include "gdkprivate-x11.h"
+ #include "gdkscreen-x11.h"
++#ifdef HAVE_OPENGL
+ #include "gdkglcontext-x11.h"
++#endif
+ #include "gdk-private.h"
+ #include "gdkprofilerprivate.h"
+ 
+@@ -3191,7 +3193,9 @@ gdk_x11_display_class_init (GdkX11DisplayClass * class)
+   display_class->text_property_to_utf8_list = _gdk_x11_display_text_property_to_utf8_list;
+   display_class->utf8_to_string_target = _gdk_x11_display_utf8_to_string_target;
+ 
+-  display_class->make_gl_context_current = gdk_x11_display_make_gl_context_current;
++#ifdef HAVE_OPENGL
++   display_class->make_gl_context_current = gdk_x11_display_make_gl_context_current;
++#endif
+ 
+   display_class->get_default_seat = gdk_x11_display_get_default_seat;
+ 
+diff --git a/gdk/x11/gdkvisual-x11.c b/gdk/x11/gdkvisual-x11.c
+index 81479d81f4..3c8c5c02ff 100644
+--- a/gdk/x11/gdkvisual-x11.c
++++ b/gdk/x11/gdkvisual-x11.c
+@@ -306,7 +306,12 @@ _gdk_x11_screen_init_visuals (GdkScreen *screen)
+   /* If GL is available we want to pick better default/rgba visuals,
+      as we care about glx details such as alpha/depth/stencil depth,
+      stereo and double buffering */
++  /* update_visuals_for_gl() will end up calling epoxy GLX api which
++     will exit if libgl is not there: so only do this if we know GL
++     is available */
++#ifdef HAVE_GLX
+   _gdk_x11_screen_update_visuals_for_gl (screen);
++#endif
+ }
+ 
+ gint
+diff --git a/gdk/x11/gdkwindow-x11.c b/gdk/x11/gdkwindow-x11.c
+index 194bc82e29..0302bb68d4 100644
+--- a/gdk/x11/gdkwindow-x11.c
++++ b/gdk/x11/gdkwindow-x11.c
+@@ -36,7 +36,9 @@
+ #include "gdkasync.h"
+ #include "gdkeventsource.h"
+ #include "gdkdisplay-x11.h"
++#ifdef HAVE_OPENGL
+ #include "gdkglcontext-x11.h"
++#endif
+ #include "gdkprivate-x11.h"
+ #include "gdk-private.h"
+ 
+@@ -5888,7 +5890,9 @@ gdk_window_impl_x11_class_init (GdkWindowImplX11Class *klass)
+   impl_class->set_opaque_region = gdk_x11_window_set_opaque_region;
+   impl_class->set_shadow_width = gdk_x11_window_set_shadow_width;
+   impl_class->show_window_menu = gdk_x11_window_show_window_menu;
++#ifdef HAVE_OPENGL
+   impl_class->create_gl_context = gdk_x11_window_create_gl_context;
+   impl_class->invalidate_for_new_frame = gdk_x11_window_invalidate_for_new_frame;
++#endif
+   impl_class->get_unscaled_size = gdk_x11_window_get_unscaled_size;
+ }
+diff --git a/gdk/x11/gdkx-autocleanups.h b/gdk/x11/gdkx-autocleanups.h
+index edb0ea7dbf..a317d61cca 100644
+--- a/gdk/x11/gdkx-autocleanups.h
++++ b/gdk/x11/gdkx-autocleanups.h
+@@ -30,7 +30,9 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GdkX11DeviceXI2, g_object_unref)
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GdkX11Display, g_object_unref)
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GdkX11DisplayManager, g_object_unref)
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GdkX11DragContext, g_object_unref)
++#ifdef HAVE_OPENGL
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GdkX11GLContext, g_object_unref)
++#endif
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GdkX11Keymap, g_object_unref)
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GdkX11Screen, g_object_unref)
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GdkX11Visual, g_object_unref)
+diff --git a/gdk/x11/gdkx.h b/gdk/x11/gdkx.h
+index 1f64bccb6d..4db6c18351 100644
+--- a/gdk/x11/gdkx.h
++++ b/gdk/x11/gdkx.h
+@@ -43,7 +43,9 @@
+ #include <gdk/x11/gdkx11display.h>
+ #include <gdk/x11/gdkx11displaymanager.h>
+ #include <gdk/x11/gdkx11dnd.h>
++#ifdef GDK_WITH_OPENGL
+ #include <gdk/x11/gdkx11glcontext.h>
++#endif
+ #include <gdk/x11/gdkx11keys.h>
+ #include <gdk/x11/gdkx11monitor.h>
+ #include <gdk/x11/gdkx11property.h>
+diff --git a/gdk/x11/meson.build b/gdk/x11/meson.build
+index 754ae0a615..0318c83877 100644
+--- a/gdk/x11/meson.build
++++ b/gdk/x11/meson.build
+@@ -14,7 +14,6 @@ gdk_x11_sources = files(
+   'gdkeventsource.c',
+   'gdkeventtranslator.c',
+   'gdkgeometry-x11.c',
+-  'gdkglcontext-x11.c',
+   'gdkkeys-x11.c',
+   'gdkmain-x11.c',
+   'gdkproperty-x11.c',
+@@ -42,7 +41,6 @@ gdk_x11_public_headers = files(
+   'gdkx11display.h',
+   'gdkx11displaymanager.h',
+   'gdkx11dnd.h',
+-  'gdkx11glcontext.h',
+   'gdkx11keys.h',
+   'gdkx11monitor.h',
+   'gdkx11property.h',
+@@ -53,6 +51,11 @@ gdk_x11_public_headers = files(
+   'gdkx11window.h',
+ )
+ 
++if opengl_enabled
++  gdk_x11_sources += files('gdkglcontext-x11.c')
++  gdk_x11_public_headers += files('gdkx11glcontext.h')
++endif
++
+ install_headers(gdk_x11_public_headers, subdir: 'gtk-3.0/gdk/x11/')
+ install_headers('gdkx.h', subdir: 'gtk-3.0/gdk/')
+ 
+diff --git a/gtk/gtkglarea.c b/gtk/gtkglarea.c
+index 802303ea9f..6439d7745d 100644
+--- a/gtk/gtkglarea.c
++++ b/gtk/gtkglarea.c
+@@ -29,7 +29,9 @@
+ #include "gtkprivate.h"
+ #include "gtkrender.h"
+ 
++#ifdef HAVE_OPENGL
+ #include <epoxy/gl.h>
++#endif
+ 
+ /**
+  * SECTION:gtkglarea
+@@ -369,9 +371,12 @@ gtk_gl_area_real_create_context (GtkGLArea *area)
+ static void
+ gtk_gl_area_resize (GtkGLArea *area, int width, int height)
+ {
++#ifdef HAVE_OPENGL
+   glViewport (0, 0, width, height);
++#endif
+ }
+ 
++#ifdef HAVE_OPENGL
+ /*
+  * Creates all the buffer objects needed for rendering the scene
+  */
+@@ -483,6 +488,7 @@ gtk_gl_area_allocate_buffers (GtkGLArea *area)
+ 
+   priv->needs_render = TRUE;
+ }
++#endif
+ 
+ /**
+  * gtk_gl_area_attach_buffers:
+@@ -501,6 +507,7 @@ gtk_gl_area_allocate_buffers (GtkGLArea *area)
+ void
+ gtk_gl_area_attach_buffers (GtkGLArea *area)
+ {
++#ifdef HAVE_OPENGL
+   GtkGLAreaPrivate *priv = gtk_gl_area_get_instance_private (area);
+ 
+   g_return_if_fail (GTK_IS_GL_AREA (area));
+@@ -533,11 +540,13 @@ gtk_gl_area_attach_buffers (GtkGLArea *area)
+         glFramebufferRenderbuffer (GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
+                                    GL_RENDERBUFFER, priv->depth_stencil_buffer);
+     }
++#endif
+ }
+ 
+ static void
+ gtk_gl_area_delete_buffers (GtkGLArea *area)
+ {
++#ifdef HAVE_OPENGL
+   GtkGLAreaPrivate *priv = gtk_gl_area_get_instance_private (area);
+ 
+   if (priv->context == NULL)
+@@ -569,6 +578,7 @@ gtk_gl_area_delete_buffers (GtkGLArea *area)
+       glDeleteFramebuffers (1, &priv->frame_buffer);
+       priv->frame_buffer = 0;
+     }
++#endif
+ }
+ 
+ static void
+@@ -679,6 +689,7 @@ gtk_gl_area_draw (GtkWidget *widget,
+   GtkGLArea *area = GTK_GL_AREA (widget);
+   GtkGLAreaPrivate *priv = gtk_gl_area_get_instance_private (area);
+   gboolean unused;
++#ifdef HAVE_OPENGL
+   int w, h, scale;
+   GLenum status;
+ 
+@@ -736,6 +747,14 @@ gtk_gl_area_draw (GtkWidget *widget,
+     }
+ 
+   return TRUE;
++#else
++  if (priv->error != NULL)
++      gtk_gl_area_draw_error_screen (area,
++                                     cr,
++                                     gtk_widget_get_allocated_width (widget),
++                                     gtk_widget_get_allocated_height (widget));
++  return FALSE;
++#endif
+ }
+ 
+ static gboolean
+diff --git a/gtk/inspector/general.c b/gtk/inspector/general.c
+index 4fd0c3039c..a8e59ed077 100644
+--- a/gtk/inspector/general.c
++++ b/gtk/inspector/general.c
+@@ -33,8 +33,10 @@
+ 
+ #ifdef GDK_WINDOWING_X11
+ #include "x11/gdkx.h"
++#ifdef HAVE_OPENGL
+ #include <epoxy/glx.h>
+ #endif
++#endif
+ 
+ #ifdef GDK_WINDOWING_WIN32
+ #include "win32/gdkwin32.h"
+@@ -217,6 +219,7 @@ add_label_row (GtkInspectorGeneral *gen,
+   gtk_size_group_add_widget (GTK_SIZE_GROUP (gen->priv->labels), label);
+ }
+ 
++#ifdef HAVE_OPENGL
+ #ifdef GDK_WINDOWING_X11
+ static void
+ append_glx_extension_row (GtkInspectorGeneral *gen,
+@@ -226,6 +229,7 @@ append_glx_extension_row (GtkInspectorGeneral *gen,
+   add_check_row (gen, GTK_LIST_BOX (gen->priv->gl_box), ext, epoxy_has_glx_extension (dpy, 0, ext), 0);
+ }
+ #endif
++#endif
+ 
+ #ifdef GDK_WINDOWING_WAYLAND
+ static void
+@@ -275,6 +279,7 @@ wayland_get_display (struct wl_display *wl_display)
+ static void
+ init_gl (GtkInspectorGeneral *gen)
+ {
++#ifdef HAVE_OPENGL
+ #ifdef GDK_WINDOWING_X11
+   if (GDK_IS_X11_DISPLAY (gdk_display_get_default ()))
+     {
+@@ -301,6 +306,7 @@ init_gl (GtkInspectorGeneral *gen)
+     }
+   else
+ #endif
++#endif
+ #ifdef GDK_WINDOWING_WAYLAND
+   if (GDK_IS_WAYLAND_DISPLAY (gdk_display_get_default ()))
+     {
+diff --git a/meson.build b/meson.build
+index aed48fc3f6..bfc33af0f6 100644
+--- a/meson.build
++++ b/meson.build
+@@ -137,6 +137,7 @@ wayland_enabled        = get_option('wayland_backend')
+ broadway_enabled       = get_option('broadway_backend')
+ quartz_enabled         = get_option('quartz_backend')
+ win32_enabled          = get_option('win32_backend')
++opengl_enabled         = get_option('opengl')
+ 
+ os_unix   = false
+ os_linux  = false
+@@ -430,7 +431,7 @@ pangocairo_dep = dependency('pangocairo', version: cairo_req,
+                             fallback : ['pango', 'libpangocairo_dep'])
+ pixbuf_dep     = dependency('gdk-pixbuf-2.0', version: gdk_pixbuf_req,
+                             fallback : ['gdk-pixbuf', 'gdkpixbuf_dep'])
+-epoxy_dep      = dependency('epoxy', version: epoxy_req,
++epoxy_dep      = dependency('epoxy', version: epoxy_req, required: opengl_enabled,
+                             fallback: ['libepoxy', 'libepoxy_dep'])
+ atk_dep        = dependency('atk', version: atk_req,
+                             fallback : ['atk', 'libatk_dep'])
+@@ -476,6 +477,10 @@ if tracker3_enabled
+   endif
+ endif
+ 
++if opengl_enabled
++  cdata.set('HAVE_OPENGL', 1)
++endif
++
+ if iso_codes_dep.found()
+   cdata.set_quoted('ISO_CODES_PREFIX', iso_codes_dep.get_variable(pkgconfig: 'prefix'))
+ else
+@@ -912,9 +917,15 @@ else
+   gio_packages = ['gio-2.0', glib_req]
+ endif
+ 
++if opengl_enabled
++  epoxy_packages = ['epoxy', epoxy_req]
++else
++  epoxy_packages = []
++endif
++
+ pkgconf.set('GDK_PRIVATE_PACKAGES',
+             ' '.join(gio_packages + x11_pkgs + wayland_pkgs + cairo_backends +
+-                     ['epoxy', epoxy_req] + cloudproviders_packages +
++                     epoxy_packages + cloudproviders_packages +
+                      ['fribidi', fribidi_req]))
+ 
+ gtk_packages = ' '.join([
+@@ -928,7 +939,7 @@ pkgconf.set('GTK_PACKAGES', gtk_packages)
+ # Requires.private
+ pc_gdk_extra_libs += cairo_libs
+ 
+-gtk_private_packages = atk_pkgs + wayland_pkgs + ['epoxy', epoxy_req, 'fribidi', fribidi_req]
++gtk_private_packages = atk_pkgs + wayland_pkgs + epoxy_packages + ['fribidi', fribidi_req]
+ if wayland_enabled or x11_enabled
+   gtk_private_packages += ['pangoft2']
+ endif
+diff --git a/meson_options.txt b/meson_options.txt
+index 94099aa01e..8bd096896d 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -19,6 +19,8 @@ option('profiler', type: 'boolean', value: false,
+   description : 'Enable profiler support')
+ option('tracker3', type: 'boolean', value: false,
+   description : 'Enable Tracker3 filechooser search')
++option('opengl', type: 'boolean', value: true,
++  description : 'Enable use of GL')
+ 
+ # Print backends
+ option('print_backends', type : 'string', value : 'auto',
+diff --git a/tests/meson.build b/tests/meson.build
+index 586fe2f45e..6ecf317dde 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -5,7 +5,6 @@ gtk_tests = [
+   ['scrolling-performance', ['frame-stats.c', 'variable.c']],
+   ['blur-performance', ['../gtk/gtkcairoblur.c']],
+   ['flicker'],
+-  ['gdkgears', ['gtkgears.c']],
+   ['listmodel'],
+   ['motion-compression'],
+   ['styleexamples'],
+@@ -54,7 +53,6 @@ gtk_tests = [
+   ['testfullscreen'],
+   ['testgeometry'],
+   ['testgiconpixbuf'],
+-  ['testglblending', ['gtkgears.c']],
+   ['testgmenu'],
+   ['testgrid'],
+   ['testgrouping'],
+@@ -137,6 +135,13 @@ if x11_enabled
+   ]
+ endif
+ 
++if opengl_enabled
++  gtk_tests += [
++    ['gdkgears', ['gtkgears.c']],
++    ['testglblending', ['gtkgears.c']],
++  ]
++endif
++
+ if os_linux
+   gtk_tests += [['testfontchooserdialog']]
+ endif
+diff --git a/testsuite/gtk/objects-finalize.c b/testsuite/gtk/objects-finalize.c
+index 24540e313f..e0f863ab6a 100644
+--- a/testsuite/gtk/objects-finalize.c
++++ b/testsuite/gtk/objects-finalize.c
+@@ -116,7 +116,9 @@ main (int argc, char **argv)
+ 	  all_types[i] != GDK_TYPE_X11_DEVICE_MANAGER_CORE &&
+ 	  all_types[i] != GDK_TYPE_X11_DEVICE_MANAGER_XI2 &&
+ 	  all_types[i] != GDK_TYPE_X11_DISPLAY_MANAGER &&
++#ifdef HAVE_OPENGL
+ 	  all_types[i] != GDK_TYPE_X11_GL_CONTEXT &&
++#endif
+ #endif
+ 	  /* Not allowed to finalize a GdkPixbufLoader without calling gdk_pixbuf_loader_close() */
+ 	  all_types[i] != GDK_TYPE_PIXBUF_LOADER &&
+-- 
+2.30.2
+

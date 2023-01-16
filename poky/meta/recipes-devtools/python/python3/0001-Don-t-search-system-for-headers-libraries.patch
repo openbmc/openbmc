@@ -1,4 +1,4 @@
-From 910a905aaeb6edb6b042ef65b3e2b73faada80aa Mon Sep 17 00:00:00 2001
+From 32aba1dfba1e27103e7367bbb9e4bef0e31aeac5 Mon Sep 17 00:00:00 2001
 From: Jeremy Puhlman <jpuhlman@mvista.com>
 Date: Wed, 4 Mar 2020 00:06:42 +0000
 Subject: [PATCH] Don't search system for headers/libraries

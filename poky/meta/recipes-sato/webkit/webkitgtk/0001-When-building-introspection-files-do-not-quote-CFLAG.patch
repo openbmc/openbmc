@@ -1,9 +1,9 @@
-From 01f5ab0edf3dd8f76d37fd36c2dcd3108be33a7b Mon Sep 17 00:00:00 2001
+From 89ac299e0d9436f1effaa07711458d616574cc8f Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Mon, 4 Apr 2022 21:20:05 +0200
-Subject: [PATCH] When building introspection files, do not quote CFLAGS.
+Subject: [PATCH] Propagate CFLAGS to introspection targets
 
-This does not seem to be propagated to the compiler correctly:
+Otherwise, important things do not get passed to the compiler in cross compiling with a sysroot scenario:
 
 In file included from /srv/work/alex/poky/build-64-alt/tmp/work/core2-64-poky-linux/webkitgtk/2.36.0-r0/recipe-sysroot-native/usr/lib/x86_64-poky-linux/gcc/x86_64-poky-linux/11.2.0/include-fixed/syslimits.h:7,
                  from /srv/work/alex/poky/build-64-alt/tmp/work/core2-64-poky-linux/webkitgtk/2.36.0-r0/recipe-sysroot-native/usr/lib/x86_64-poky-linux/gcc/x86_64-poky-linux/11.2.0/include-fixed/limits.h:34,
@@ -31,48 +31,25 @@ Traceback (most recent call last):
     raise DistutilsExecError(
 distutils.errors.DistutilsExecError: command '/srv/work/alex/poky/build-64-alt/tmp/work/core2-64-poky-linux/webkitgtk/2.36.0-r0/recipe-sysroot-native/usr/bin/x86_64-poky-linux/x86_64-poky-linux-gcc' failed with exit code 1
 
-Upstream-Status: Inappropriate [upstream has rewritten the whole thing as of https://github.com/WebKit/WebKit/commit/b0ae032850bb6b2672051bab8032fc9f9ef5eb97]
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
+
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
 ---
- Source/JavaScriptCore/PlatformGTK.cmake | 2 +-
- Source/WebKit/PlatformGTK.cmake         | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ Source/cmake/FindGI.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Source/JavaScriptCore/PlatformGTK.cmake b/Source/JavaScriptCore/PlatformGTK.cmake
-index 1c3c8fb7..efd18807 100644
---- a/Source/JavaScriptCore/PlatformGTK.cmake
-+++ b/Source/JavaScriptCore/PlatformGTK.cmake
-@@ -71,7 +71,7 @@ if (ENABLE_INTROSPECTION)
-     add_custom_command(
-         OUTPUT ${CMAKE_BINARY_DIR}/JavaScriptCore-${WEBKITGTK_API_VERSION}.gir
-         DEPENDS JavaScriptCore
--        COMMAND CC=${CMAKE_C_COMPILER} CFLAGS="-Wno-deprecated-declarations ${CMAKE_C_FLAGS}" LDFLAGS=
-+        COMMAND CC=${CMAKE_C_COMPILER} CFLAGS=-Wno-deprecated-declarations\ ${CMAKE_C_FLAGS} LDFLAGS=
-             ${LOADER_LIBRARY_PATH_VAR}="${INTROSPECTION_ADDITIONAL_LIBRARY_PATH}"
-             ${INTROSPECTION_SCANNER}
-             --quiet
-diff --git a/Source/WebKit/PlatformGTK.cmake b/Source/WebKit/PlatformGTK.cmake
-index 48d1820d..ded05035 100644
---- a/Source/WebKit/PlatformGTK.cmake
-+++ b/Source/WebKit/PlatformGTK.cmake
-@@ -675,7 +675,7 @@ if (ENABLE_INTROSPECTION)
-     add_custom_target(WebKit2-${WEBKITGTK_API_VERSION}-gir
-         DEPENDS WebKit
-         DEPENDS ${CMAKE_BINARY_DIR}/JavaScriptCore-${WEBKITGTK_API_VERSION}.gir
--        COMMAND CC=${CMAKE_C_COMPILER} CFLAGS="-Wno-deprecated-declarations ${CMAKE_C_FLAGS}" LDFLAGS=
-+        COMMAND CC=${CMAKE_C_COMPILER} CFLAGS=-Wno-deprecated-declarations\ ${CMAKE_C_FLAGS} LDFLAGS=
-             ${LOADER_LIBRARY_PATH_VAR}="${INTROSPECTION_ADDITIONAL_LIBRARY_PATH}"
-             ${INTROSPECTION_SCANNER}
-             --quiet
-@@ -721,7 +721,7 @@ if (ENABLE_INTROSPECTION)
-         OUTPUT ${CMAKE_BINARY_DIR}/WebKit2WebExtension-${WEBKITGTK_API_VERSION}.gir
-         DEPENDS ${CMAKE_BINARY_DIR}/JavaScriptCore-${WEBKITGTK_API_VERSION}.gir
-         DEPENDS WebKit2-${WEBKITGTK_API_VERSION}-gir
--        COMMAND CC=${CMAKE_C_COMPILER} CFLAGS="-Wno-deprecated-declarations ${CMAKE_C_FLAGS}"
-+        COMMAND CC=${CMAKE_C_COMPILER} CFLAGS=-Wno-deprecated-declarations\ ${CMAKE_C_FLAGS}
-             LDFLAGS="${INTROSPECTION_ADDITIONAL_LDFLAGS}"
-             ${LOADER_LIBRARY_PATH_VAR}="${INTROSPECTION_ADDITIONAL_LIBRARY_PATH}"
-             ${INTROSPECTION_SCANNER}
--- 
-2.30.2
-
+diff --git a/Source/cmake/FindGI.cmake b/Source/cmake/FindGI.cmake
+index b3e810cd..e22a75f7 100644
+--- a/Source/cmake/FindGI.cmake
++++ b/Source/cmake/FindGI.cmake
+@@ -340,7 +340,7 @@ function(GI_INTROSPECT namespace nsversion header)
+         DEPENDS ${gir_deps} ${gir_srcs}
+         VERBATIM
+         COMMAND_EXPAND_LISTS
+-        COMMAND ${CMAKE_COMMAND} -E env "CC=${CMAKE_C_COMPILER}"
++        COMMAND ${CMAKE_COMMAND} -E env "CC=${CMAKE_C_COMPILER}" "CFLAGS=${CMAKE_C_FLAGS}"
+             "${GI_SCANNER_EXE}" --quiet --warn-all --warn-error --no-libtool
+             "--output=${gir_path}"
+             "--library=$<TARGET_FILE_BASE_NAME:${opt_TARGET}>"

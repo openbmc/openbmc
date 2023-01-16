@@ -1,0 +1,43 @@
+From 85f6603aca1d174848b42e696a4cff8af57613d6 Mon Sep 17 00:00:00 2001
+From: Vincent Davis Jr <vince@underview.tech>
+Date: Thu, 8 Dec 2022 23:38:36 -0600
+Subject: [PATCH] codec: omxil_core replace /opt/vc path with /usr/lib
+
+Upstream-Status: Inappropriate
+
+RPI-Distro repo clones original VLC and applies patches to enable
+raspiberry pi support.
+
+Configures omxil_core.c for OE usages as libbcm_host.so
+and libopenmaxil.so are located in a different location.
+
+Signed-off-by: Vincent Davis Jr <vince@underview.tech>
+---
+ modules/codec/omxil/omxil_core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/modules/codec/omxil/omxil_core.c b/modules/codec/omxil/omxil_core.c
+index 5098f517a..5922d9034 100644
+--- a/modules/codec/omxil/omxil_core.c
++++ b/modules/codec/omxil/omxil_core.c
+@@ -56,7 +56,7 @@ static const char *ppsz_dll_list[] =
+ #if defined(USE_IOMX)
+     "libiomx.so", /* Not used when using IOMX, the lib should already be loaded */
+ #elif defined(RPI_OMX)
+-    "/opt/vc/lib/libopenmaxil.so",  /* Broadcom IL core */
++    "/usr/lib/libopenmaxil.so",  /* Broadcom IL core */
+ #elif 1
+     "libOMX_Core.so", /* TI OMAP IL core */
+     "libOmxCore.so", /* Qualcomm IL core */
+@@ -70,7 +70,7 @@ static const char *ppsz_dll_list[] =
+ #ifdef RPI_OMX
+ static const char *ppsz_extra_dll_list[] =
+ {
+-    "/opt/vc/lib/libbcm_host.so",  /* Broadcom host library */
++    "/usr/lib/libbcm_host.so",  /* Broadcom host library */
+     0
+ };
+ #endif
+-- 
+2.38.1
+

@@ -1,0 +1,43 @@
+From fef3b16dba2c5f6ad88951b80cdfbedd423e80a0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 7 Dec 2022 20:16:52 -0800
+Subject: [PATCH v3 1/3] configure: use AC_SYS_LARGEFILE
+
+The autoconf macro AC_SYS_LARGEFILE defines _FILE_OFFSET_BITS=64
+where necessary to ensure that off_t and all interfaces using off_t
+are 64bit, even on 32bit systems.
+
+Pass -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=66 via CFLAGS
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-erofs/20221215064758.93821-1-raj.khem@gmail.com/T/#t]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index a736ff0..e8bb003 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -13,6 +13,8 @@ AC_CONFIG_MACRO_DIR([m4])
+ AC_CONFIG_AUX_DIR(config)
+ AM_INIT_AUTOMAKE([foreign -Wall])
+ 
++AC_SYS_LARGEFILE
++
+ # Checks for programs.
+ AM_PROG_AR
+ AC_PROG_CC
+@@ -319,6 +321,9 @@ if test "x$enable_lzma" = "xyes"; then
+   CPPFLAGS="${saved_CPPFLAGS}"
+ fi
+ 
++# Enable 64-bit off_t
++CFLAGS+=" -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
++
+ # Set up needed symbols, conditionals and compiler/linker flags
+ AM_CONDITIONAL([ENABLE_LZ4], [test "x${have_lz4}" = "xyes"])
+ AM_CONDITIONAL([ENABLE_LZ4HC], [test "x${have_lz4hc}" = "xyes"])
+-- 
+2.39.0
+

@@ -1,0 +1,32 @@
+From 12ba95281d0bbea3576350d635b4dee0f953b94a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 29 Nov 2022 18:38:07 -0800
+Subject: [PATCH] libau: Do not build LFS version of readdir
+
+rdu64 is providing largefile supported version of readdir and readdir_r
+however, we enable largefile support unconditionally in OE therefore its
+not needed since readdir() and readdir_r() are already LFS capable
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libau/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libau/Makefile b/libau/Makefile
+index 9ada831..1fd1ccc 100644
+--- a/libau/Makefile
++++ b/libau/Makefile
+@@ -30,7 +30,7 @@ STRIP ?= strip
+ all: ${LibSo}
+ 
+ ifeq (${Glibc},yes)
+-LibSoObj += rdu64.o
++#LibSoObj += rdu64.o
+ 
+ # this is unnecessary on 64bit system?
+ rdu64.c: rdu.c
+-- 
+2.38.1
+

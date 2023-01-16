@@ -11,7 +11,7 @@ Fixes
 ./sattypes.h:33:17: error: expected namespace name
 using namespace __gnu_cxx; //NOLINT
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://github.com/stressapptest/stressapptest/pull/100]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 --- stressapptest-1.0.9.orig/src/sattypes.h

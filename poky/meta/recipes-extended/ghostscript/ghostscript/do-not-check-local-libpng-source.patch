@@ -1,0 +1,31 @@
+From 108a7d3f79af8c669af129bd87401402e76edfa9 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 18 Jan 2016 01:00:30 -0500
+Subject: [PATCH] configure.ac: do not check local png source
+
+In oe-core, it did not need to compile local libpng
+source in ghostscript, so do not check local png
+source, and directly check the existance of shared
+libpng library.
+
+Upstream-Status: Inappropriate [OE-Core specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index bb57825..389c473 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1441,7 +1441,7 @@ else
+   PNGDEVS=''
+   PNGDEVS_ALL='png48 png16m pnggray pngmono pngmonod png256 png16 pngalpha png16malpha'
+   AC_MSG_CHECKING([for local png library source])
+-  if test -f $srcdir/libpng/pngread.c; then
++  if false; then
+           AC_MSG_RESULT([yes])
+           SHARE_LIBPNG=0
+           LIBPNGDIR=$srcdir/libpng

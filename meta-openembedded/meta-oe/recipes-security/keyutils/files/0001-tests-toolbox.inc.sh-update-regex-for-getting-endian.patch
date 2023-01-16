@@ -1,0 +1,35 @@
+From 935a31dd6f14bd1aff735495f0fdbae4ca05c695 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Fri, 2 Dec 2022 15:35:40 +0800
+Subject: [PATCH] tests/toolbox.inc.sh: update regex for getting endian
+
+Update regex for getting endian in following condition:
+/proc/777/exe: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2
+
+Upstream-Status: Submited [Submitted to keyrings@vger.kernel.org ]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ tests/toolbox.inc.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/toolbox.inc.sh b/tests/toolbox.inc.sh
+index 1964450..e827e20 100644
+--- a/tests/toolbox.inc.sh
++++ b/tests/toolbox.inc.sh
+@@ -13,10 +13,10 @@
+ echo === $OUTPUTFILE ===
+ 
+ endian=`file -L /proc/$$/exe`
+-if expr "$endian" : '.* MSB \+\(executable\|shared object\).*' >&/dev/null
++if expr "$endian" : '.* MSB .*\(executable\|shared object\).*' >&/dev/null
+ then
+     endian=BE
+-elif expr "$endian" : '.* LSB \+\(executable\|shared object\).*' >&/dev/null
++elif expr "$endian" : '.* LSB .*\(executable\|shared object\).*' >&/dev/null
+ then
+     endian=LE
+ else
+-- 
+2.25.1
+

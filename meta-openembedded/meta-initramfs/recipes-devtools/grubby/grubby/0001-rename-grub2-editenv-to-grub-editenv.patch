@@ -1,0 +1,78 @@
+From 7a72139d2e3cc80f64090a823afe7bcea76e4792 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Tue, 4 Aug 2015 23:54:41 -0700
+Subject: [PATCH] rename grub2-editenv to grub-editenv
+
+We don't use the name grub2-editenv for grub2.
+
+Upstream-Status: Inactive-Upstream [lastcommit: 2022 lastrelease: 2016]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ grubby.c | 4 ++--
+ test.sh  | 8 ++++----
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/grubby.c b/grubby.c
+index 98c1516..be832f6 100644
+--- a/grubby.c
++++ b/grubby.c
+@@ -301,7 +301,7 @@ static char *grub2GetEnv(struct configFileInfo *info, char *name)
+ 	char *ret = NULL;
+ 	char *envFile = info->envFile ? info->envFile : "/boot/grub2/grubenv";
+ 	int rc =
+-	    asprintf(&s, "grub2-editenv %s list | grep '^%s='", envFile, name);
++	    asprintf(&s, "grub-editenv %s list | grep '^%s='", envFile, name);
+ 
+ 	if (rc < 0)
+ 		return NULL;
+@@ -373,7 +373,7 @@ static int grub2SetEnv(struct configFileInfo *info, char *name, char *value)
+ 	if (!value)
+ 		return -1;
+ 
+-	rc = asprintf(&s, "grub2-editenv %s set '%s=%s'", envFile, name, value);
++	rc = asprintf(&s, "grub-editenv %s set '%s=%s'", envFile, name, value);
+ 	free(value);
+ 	if (rc < 0)
+ 		return -1;
+diff --git a/test.sh b/test.sh
+index 33d24cf..009479c 100755
+--- a/test.sh
++++ b/test.sh
+@@ -573,7 +573,7 @@ if [ "$testgrub2" == "y" ]; then
+         --remove-kernel=/boot/vmlinuz-2.6.38.2-9.fc15.x86_64 \
+         --boot-filesystem=/boot/
+     commandTest "saved_default output" \
+-        "grub2-editenv test/grub2-support_files/env_temp list" \
++        "grub-editenv test/grub2-support_files/env_temp list" \
+         "saved_entry=Linux, with Fedora 2.6.38.8-32.fc15.x86_64"
+ 
+     # copy a stanza and add arguments as well, while using --set-index=
+@@ -627,7 +627,7 @@ if [ "$testgrub2" == "y" ]; then
+         --title='title' --initrd=/boot/new-initrd --boot-filesystem=/boot/ \
+         --copy-default
+     commandTest "saved_default output" \
+-        "grub2-editenv test/grub2-support_files/env_temp list" \
++        "grub-editenv test/grub2-support_files/env_temp list" \
+         "saved_entry=Linux, with Fedora 2.6.38.8-32.fc15.x86_64"
+ 
+     testing="GRUB2 add kernel with default=saved_entry and a terrible title"
+@@ -640,13 +640,13 @@ if [ "$testgrub2" == "y" ]; then
+     testing="GRUB2 set default with default=saved_entry and a terrible name"
+     grub2Test grub2.9 add/g2-1.9 --env grubenv.1 --set-default-index=0
+     commandTest "saved_default output" \
+-        "grub2-editenv test/grub2-support_files/env_temp list" \
++        "grub-editenv test/grub2-support_files/env_temp list" \
+         'saved_entry=Fedora (3.10.3-300.fc19.x86_64) 19 (Schrödinger’s Cat)'
+ 
+     testing="GRUB2 set default with default=saved_entry"
+     grub2Test grub2.8 add/g2-1.8 --env grubenv.1 --set-default-index=0
+     commandTest "saved_default output" \
+-        "grub2-editenv test/grub2-support_files/env_temp list" \
++        "grub-editenv test/grub2-support_files/env_temp list" \
+         "saved_entry=title"
+ 
+     testing="GRUB2 --default-index with default=saved_entry"
+-- 
+2.25.1
+

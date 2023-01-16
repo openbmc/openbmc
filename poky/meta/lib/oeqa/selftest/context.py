@@ -154,9 +154,6 @@ class OESelftestTestContextExecutor(OETestContextExecutor):
         group.add_argument('-a', '--run-all-tests', default=False,
                 action="store_true", dest="run_all_tests",
                 help='Run all (unhidden) tests')
-        group.add_argument('-R', '--skip-tests', required=False, action='store',
-                nargs='+', dest="skips", default=None,
-                help='Run all (unhidden) tests except the ones specified. Format should be <module>[.<class>[.<test_method>]]')
         group.add_argument('-r', '--run-tests', required=False, action='store',
                 nargs='+', dest="run_tests", default=None,
                 help='Select what tests to run (modules, classes or test methods). Format should be: <module>.<class>.<test_method>')
@@ -171,6 +168,9 @@ class OESelftestTestContextExecutor(OETestContextExecutor):
                 action="store_true", default=False,
                 help='List all available tests.')
 
+        parser.add_argument('-R', '--skip-tests', required=False, action='store',
+                nargs='+', dest="skips", default=None,
+                help='Skip the tests specified. Format should be <module>[.<class>[.<test_method>]]')
         parser.add_argument('-j', '--num-processes', dest='processes', action='store',
                 type=int, help="number of processes to execute in parallel with")
 

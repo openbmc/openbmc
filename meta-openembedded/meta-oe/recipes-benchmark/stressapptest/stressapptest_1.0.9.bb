@@ -9,12 +9,22 @@ SECTION = "benchmark"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=55ea9d559f985fb4834317d8ed6b9e58"
 
-SRCREV = "fb72e5e5f0879231f38e0e826a98a6ca2d1ca38e"
+SRCREV = "9146a8bfe3e3daefa95f7a61b75183e5fc64af2c"
 
+PV .= "+1.0.10git${SRCPV}"
+
+EXTRA_AUTOCONF:append:armv7a = " --with-cpu=armv7a"
+EXTRA_AUTOCONF:append:armv7ve = " --with-cpu=armv7a"
+
+GI_DATA_ENABLED:libc-musl:armv7a = "False"
+GI_DATA_ENABLED:libc-musl:armv7ve = "False"
 SRC_URI = "git://github.com/stressapptest/stressapptest;branch=master;protocol=https \
            file://libcplusplus-compat.patch \
            file://read_sysfs_for_cachesize.patch \
-          "
+           file://0001-configure-Add-with-cpu.patch \
+           file://0002-Replace-lfs64-functions-and-defines.patch \
+           file://0003-configure-Check-for-pthread_rwlockattr_setkind_np-be.patch \
+           "
 
 S = "${WORKDIR}/git"
 

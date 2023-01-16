@@ -2,13 +2,18 @@ From: Sebastian Ramacher <sramacher@debian.org>
 Date: Mon, 19 Aug 2019 21:08:26 +0200
 Subject: Revert "configure: Require libmodplug >= 0.8.9"
 
-This reverts commit 48f014768dc22ecad23d0e9f53c38805a3aff832.
+Upstream-Status: Inappropriate
 
-Upstream-status: Pending
+RPI-Distro repo forks original vlc and applies patches
+to enable raspiberry pi support.
+
+This reverts commit 48f014768dc22ecad23d0e9f53c38805a3aff832.
 ---
  configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/configure.ac b/configure.ac
+index df26367..b8580ec 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -2207,7 +2207,7 @@ AC_ARG_ENABLE(mod,

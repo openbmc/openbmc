@@ -9,8 +9,8 @@
 # Dynamically generate packages for all enabled plugins
 PACKAGES_DYNAMIC = "^${PN}-.* ^libgst.*"
 
-PACKAGESPLITFUNCS:prepend = " split_gstreamer10_packages "
-PACKAGESPLITFUNCS:append = " set_gstreamer10_metapkg_rdepends "
+PACKAGESPLITFUNCS =+ "split_gstreamer10_packages"
+PACKAGESPLITFUNCS += "set_gstreamer10_metapkg_rdepends"
 
 python split_gstreamer10_packages () {
     gst_libdir = d.expand('${libdir}/gstreamer-1.0')

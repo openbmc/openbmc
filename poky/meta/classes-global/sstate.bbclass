@@ -925,6 +925,8 @@ sstate_unpack_package () {
 BB_HASHCHECK_FUNCTION = "sstate_checkhashes"
 
 def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, **kwargs):
+    import itertools
+
     found = set()
     missed = set()
 
@@ -1019,7 +1021,7 @@ def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, 
             connection_cache_pool.put(connection_cache)
 
             if progress:
-                bb.event.fire(bb.event.ProcessProgress(msg, len(tasklist) - thread_worker.tasks.qsize()), d)
+                bb.event.fire(bb.event.ProcessProgress(msg, next(cnt_tasks_done)), d)
 
         tasklist = []
         for tid in missed:
@@ -1029,6 +1031,8 @@ def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, 
         if tasklist:
             nproc = min(int(d.getVar("BB_NUMBER_THREADS")), len(tasklist))
 
+            ## thread-safe counter
+            cnt_tasks_done = itertools.count(start = 1)
             progress = len(tasklist) >= 100
             if progress:
                 msg = "Checking sstate mirror object availability"

@@ -137,7 +137,7 @@ LAYER_CONF_VERSION ?= "8"
 KERNEL_CLASSES:append = " obmc-phosphor-kernel-version"
 
 # Some packages have directory trees of YAML files arranged based on
-# canonical organization names.  'xyz/openbmc_project' should be used
-# everywhere in phosphor, but some layers may append this with their
-# own organization(s).
-OBMC_ORG_YAML_SUBDIRS += " xyz/openbmc_project"
+# canonical organization names.  'org/freedesktop' and 'xyz/openbmc_project'
+# should be used everywhere in phosphor, but some layers may append this with
+# their own organization(s).
+OBMC_ORG_YAML_SUBDIRS += " org/freedesktop xyz/openbmc_project"

@@ -195,7 +195,6 @@ liberty_cv_uint64=${liberty_cv_uint64=uint64_t}
 
 #samba
 ac_cv_func_memcmp_working=${ac_cv_func_memcmp_working=yes}
-fu_cv_sys_stat_statvfs64=${fu_cv_sys_stat_statvfs64=yes}
 samba_cv_HAVE_BROKEN_FCNTL64_LOCKS=${samba_cv_HAVE_BROKEN_FCNTL64_LOCKS=no}
 samba_cv_HAVE_BROKEN_GETGROUPS=${samba_cv_HAVE_BROKEN_GETGROUPS=no}
 samba_cv_HAVE_BROKEN_READDIR=${samba_cv_HAVE_BROKEN_READDIR=yes}

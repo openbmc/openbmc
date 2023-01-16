@@ -5,18 +5,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 SECTION = "graphics"
 
 S = "${WORKDIR}/git"
-SRCREV = "ed16b3e69985feaf565efbecea70a1cc2fca2a58"
-SRC_URI = "git://github.com/KhronosGroup/SPIRV-Cross.git;branch=master;protocol=https \
-	file://0001-Add-install-PHONY-target-in-Makefile.patch \
-"
+SRCREV = "f09ba2777714871bddb70d049878af34b94fa54d"
+SRC_URI = "git://github.com/KhronosGroup/SPIRV-Cross.git;branch=master;protocol=https"
+inherit cmake pkgconfig
 
-EXTRA_OEMAKE += 'TARGET_DIR_LIB="${D}${libdir}"' 
-EXTRA_OEMAKE += 'TARGET_DIR_BIN="${D}${bindir}"'
+EXTRA_OECMAKE = "-DSPIRV_CROSS_SHARED=ON"
 
-do_compile () {
-	cd ${S} && oe_runmake
-}
-
-do_install () {
-	cd ${S} && oe_runmake install
-}
+FILES:${PN} += "${datadir}"

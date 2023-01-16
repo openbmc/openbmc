@@ -2,6 +2,7 @@
     "name": "p10bmc",
     "version": "A3",
     "data_region": {
+        "patch": true,
         "ecc_region": true,
         "key": [
             {
@@ -25,6 +26,13 @@
                 "number_id": 2,
                 "sha_mode": "SHA512"
             }
+        ],
+        "user_data": [
+            {
+                "types": "dw_hex",
+                "file": "emmc_patch.hex",
+                "offset": "0x1B80"
+            }
         ]
     },
     "config_region": {
@@ -38,7 +46,7 @@
         "Disable Uart Message of ROM code":             false,
         "Secure crypto RSA length":                     "RSA4096",
         "Hash mode":                                    "SHA512",
-        "Disable patch code":                           true,
+        "Disable patch code":                           false,
         "Disable Boot from Uart":                       false,
         "Secure Region size":                           "0x0",
         "Write Protect: Secure Region":                 true,
@@ -65,8 +73,8 @@
         "User define data: random number low":          "0x0",
         "User define data: random number high":         "0x0",
         "Manifest ID":                                  "0x0",
-        "Patch code location":                          "0x0",
-        "Patch code size":                              "0x0"
+        "Patch code location":                          "0x6E0",
+        "Patch code size":                              "0x18"
     },
     "otp_strap": {
         "Enable secure boot":                           { "value": false },

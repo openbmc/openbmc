@@ -12,11 +12,12 @@ warnings.simplefilter("default")
 import logging
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(sys.argv[0])), 'lib'))
 
-if sys.getfilesystemencoding() != "utf-8":
-    sys.exit("Please use a locale setting which supports UTF-8 (such as LANG=en_US.UTF-8).\nPython can't change the filesystem locale after loading so we need a UTF-8 when Python starts or things won't work.")
+import bb
+
+bb.utils.check_system_locale()
 
 # Users shouldn't be running this code directly
-if len(sys.argv) != 10 or not sys.argv[1].startswith("decafbad"):
+if len(sys.argv) != 11 or not sys.argv[1].startswith("decafbad"):
     print("bitbake-server is meant for internal execution by bitbake itself, please don't use it standalone.")
     sys.exit(1)
 
@@ -28,7 +29,8 @@ logfile = sys.argv[4]
 lockname = sys.argv[5]
 sockname = sys.argv[6]
 timeout = float(sys.argv[7])
-xmlrpcinterface = (sys.argv[8], int(sys.argv[9]))
+profile = bool(int(sys.argv[8]))
+xmlrpcinterface = (sys.argv[9], int(sys.argv[10]))
 if xmlrpcinterface[0] == "None":
     xmlrpcinterface = (None, xmlrpcinterface[1])
 
@@ -49,5 +51,5 @@ logger = logging.getLogger("BitBake")
 handler = bb.event.LogHandler()
 logger.addHandler(handler)
 
-bb.server.process.execServer(lockfd, readypipeinfd, lockname, sockname, timeout, xmlrpcinterface)
+bb.server.process.execServer(lockfd, readypipeinfd, lockname, sockname, timeout, xmlrpcinterface, profile)
 

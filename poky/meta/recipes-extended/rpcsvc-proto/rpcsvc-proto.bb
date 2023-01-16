@@ -21,7 +21,8 @@ SRCREV = "71e0a12c04d130a78674ac6309eefffa6ecee612"
 
 SRC_URI = "git://github.com/thkukuk/${BPN};branch=master;protocol=https \
            file://0001-Use-cross-compiled-rpcgen.patch \
-          "
+           file://0001-Use-AC_SYS_LARGEFILE-macro-to-control-largefile-supp.patch \
+           "
 
 S = "${WORKDIR}/git"
 

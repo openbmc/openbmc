@@ -1,7 +1,8 @@
-From 0f54b3120ca06ff3168cdbf901a27b68c4638398 Mon Sep 17 00:00:00 2001
+From 262de33671ede81e424344ea9125d9e546cf8612 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Thu, 26 Sep 2019 16:29:48 +0800
 Subject: [PATCH] From 0000000000000000000000000000000000000000 Mon Sep
+
 17
  00:00:00 2001 From: Benjamin Marzinski <bmarzins@redhat.com> Date: Fri,
 17
@@ -25,19 +26,21 @@ Upstream-Status: Pending
 Update this patch to new version 0.8.2
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
+[OP: Rebase to 0.9.3]
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
 ---
  libmultipath/wwids.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
  libmultipath/wwids.h |  1 +
  2 files changed, 45 insertions(+)
 
 diff --git a/libmultipath/wwids.c b/libmultipath/wwids.c
-index 28a2150d..a0bfa851 100644
+index 89bb60ca..bab9aa85 100644
 --- a/libmultipath/wwids.c
 +++ b/libmultipath/wwids.c
-@@ -454,3 +454,47 @@ int op ## _wwid(const char *wwid) \
- declare_failed_wwid_op(is_failed, false)
- declare_failed_wwid_op(mark_failed, true)
- declare_failed_wwid_op(unmark_failed, true)
+@@ -451,3 +451,47 @@ int unmark_failed_wwid(const char *wwid)
+ 	print_failed_wwid_result("unmark_failed", wwid, r);
+ 	return r;
+ }
 +
 +int remember_cmdline_wwid(void)
 +{
@@ -95,5 +98,5 @@ index 0c6ee54d..e32a0b0e 100644
  enum {
  	WWID_IS_NOT_FAILED = 0,
 -- 
-2.17.1
+2.38.1
 

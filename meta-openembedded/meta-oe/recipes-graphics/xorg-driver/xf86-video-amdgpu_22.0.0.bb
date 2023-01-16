@@ -12,6 +12,8 @@ SRC_URI[sha256sum] = "bc47a1a8854e790270fa5de2fb9dfe8558139b03d8f68ac1057dcd235d
 XORG_DRIVER_COMPRESSOR = ".tar.gz"
 DEPENDS += "virtual/libx11 libdrm virtual/libgbm xorgproto"
 
+REQUIRED_DISTRO_FEATURES += "opengl"
+
 PACKAGECONFIG ??= "udev glamor"
 PACKAGECONFIG[udev] = "--enable-udev,--disable-udev,udev"
 PACKAGECONFIG[glamor] = "--enable-glamor,--disable-glamor"

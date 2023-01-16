@@ -11,7 +11,7 @@ This document contains a summary of the new features, changes and
 fixes in each release of Corstone-1000 software stack.
 
 ******************
-Version 2022.11.10
+Version 2022.11.23
 ******************
 
 Changes

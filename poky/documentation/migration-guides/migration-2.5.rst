@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 Release 2.5 (sumo)
 ==================
 
@@ -137,7 +139,7 @@ The following are BitBake changes:
 -  Several explicit "run this task for all recipes in the dependency
    tree" tasks have been removed (e.g. ``fetchall``, ``checkuriall``,
    and the ``*all`` tasks provided by the ``distrodata`` and
-   :ref:`archiver <ref-classes-archiver>` classes). There is a BitBake option to complete this for
+   :ref:`ref-classes-archiver` classes). There is a BitBake option to complete this for
    any arbitrary task. For example::
 
       bitbake <target> -c fetchall
@@ -187,7 +189,7 @@ Miscellaneous Changes
 
 The following are additional changes:
 
--  The :ref:`kernel <ref-classes-kernel>` class supports building packages for multiple kernels.
+-  The :ref:`ref-classes-kernel` class supports building packages for multiple kernels.
    If your kernel recipe or ``.bbappend`` file mentions packaging at
    all, you should replace references to the kernel in package names
    with ``${KERNEL_PACKAGE_NAME}``. For example, if you disable
@@ -195,7 +197,7 @@ The following are additional changes:
    ``RDEPENDS_kernel-base = ""`` you can avoid warnings using
    ``RDEPENDS_${KERNEL_PACKAGE_NAME}-base = ""`` instead.
 
--  The :ref:`buildhistory <ref-classes-buildhistory>` class commits changes to the repository by
+-  The :ref:`ref-classes-buildhistory` class commits changes to the repository by
    default so you no longer need to set ``BUILDHISTORY_COMMIT = "1"``.
    If you want to disable commits you need to set
    ``BUILDHISTORY_COMMIT = "0"`` in your configuration.
@@ -207,12 +209,12 @@ The following are additional changes:
    maintains a full-featured BSP in the ``meta-ti`` layer. This rename
    avoids the previous name clash that existed between the two BSPs.
 
--  The :ref:`update-alternatives <ref-classes-update-alternatives>` class no longer works with SysV ``init``
+-  The :ref:`ref-classes-update-alternatives` class no longer works with SysV ``init``
    scripts because this usage has been problematic. Also, the
    ``sysklogd`` recipe no longer uses ``update-alternatives`` because it
    is incompatible with other implementations.
 
--  By default, the :ref:`cmake <ref-classes-cmake>` class uses
+-  By default, the :ref:`ref-classes-cmake` class uses
    ``ninja`` instead of ``make`` for building. This improves build
    performance. If a recipe is broken with ``ninja``, then the recipe
    can set ``OECMAKE_GENERATOR = "Unix Makefiles"`` to change back to
@@ -264,7 +266,7 @@ The following are additional changes:
    will trigger a warning during :ref:`ref-tasks-rootfs`.
 
    For more information, see the
-   ":ref:`dev-manual/common-tasks:post-installation scripts`"
+   ":ref:`dev-manual/new-recipe:post-installation scripts`"
    section in the Yocto Project Development Tasks Manual.
 
 -  The ``elf`` image type has been removed. This image type was removed

@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 Release 4.0 (kirkstone)
 =======================
 
@@ -117,7 +119,7 @@ License changes
 - The ``AVAILABLE_LICENSES`` variable has been removed. This variable was a performance
   liability and is highly dependent on which layers are added to the configuration,
   which can cause signature issues for users. In addition the ``available_licenses()``
-  function has been removed from the :ref:`license <ref-classes-license>` class as
+  function has been removed from the :ref:`ref-classes-license` class as
   it is no longer needed.
   
 Removed recipes
@@ -141,15 +143,14 @@ Python changes
   
 - The Python package build process is now based on `wheels <https://pythonwheels.com/>`__.
   Here are the new Python packaging classes that should be used:
-  :ref:`python_flit_core <ref-classes-python_flit_core>`,
-  :ref:`python_setuptools_build_meta <ref-classes-python_setuptools_build_meta>`
-  and :ref:`python_poetry_core <ref-classes-python_poetry_core>`.  
+  :ref:`ref-classes-python_flit_core`, :ref:`ref-classes-python_setuptools_build_meta`
+  and :ref:`ref-classes-python_poetry_core`.
 
-- The :ref:`setuptools3 <ref-classes-setuptools3>` class :ref:`ref-tasks-install` task now
+- The :ref:`ref-classes-setuptools3` class :ref:`ref-tasks-install` task now
   installs the ``wheel`` binary archive. In current versions of ``setuptools`` the
   legacy ``setup.py install`` method is deprecated. If the ``setup.py`` cannot be used
   with wheels, for example it creates files outside of the Python module or standard
-  entry points, then :ref:`setuptools3_legacy <ref-classes-setuptools3_legacy>` should
+  entry points, then :ref:`ref-classes-setuptools3_legacy` should
   be used instead.
 
 Prelink removed
@@ -171,7 +172,7 @@ Reproducible as standard
 
 Reproducibility is now considered as standard functionality, thus the 
 ``reproducible`` class has been removed and its previous contents merged into the
-:ref:`base <ref-classes-base>` class. If you have references in your configuration to
+:ref:`ref-classes-base` class. If you have references in your configuration to
 ``reproducible`` in :term:`INHERIT`, :term:`USER_CLASSES` etc. then they should be
 removed.
 
@@ -189,7 +190,7 @@ Supported host distribution changes
 
 - ``gcc`` version 7.5 is now required at minimum on the build host. For older
   host distributions where this is not available, you can use the
-  ``buildtools-extended-tarball`` (easily installable using
+  :term:`buildtools-extended` tarball (easily installable using
   ``scripts/install-buildtools``).
 
 :append/:prepend in combination with other operators
@@ -213,15 +214,15 @@ Miscellaneous changes
 ~~~~~~~~~~~~~~~~~~~~~
   
 - ``blacklist.bbclass`` is removed and the functionality moved to the
-  :ref:`base <ref-classes-base>` class with a more descriptive
+  :ref:`ref-classes-base` class with a more descriptive
   ``varflag`` variable named :term:`SKIP_RECIPE` which will use the `bb.parse.SkipRecipe()`
   function. The usage remains the same, for example::
 
      SKIP_RECIPE[my-recipe] = "Reason for skipping recipe"
 
-- :ref:`allarch <ref-classes-allarch>` packagegroups can no longer depend on packages
+- :ref:`ref-classes-allarch` packagegroups can no longer depend on packages
   which use :term:`PKG` renaming such as :ref:`ref-classes-debian`. Such packagegroups
-  recipes should be changed to avoid inheriting :ref:`allarch <ref-classes-allarch>`.
+  recipes should be changed to avoid inheriting :ref:`ref-classes-allarch`.
 
 - The ``lnr`` script has been removed. ``lnr`` implemented the same behaviour as `ln --relative --symbolic`,
   since at the time of creation `--relative` was only available in coreutils 8.16
@@ -230,7 +231,7 @@ Miscellaneous changes
   any calls to ``lnr`` in your recipes or classes, they should be replaced with
   `ln --relative --symbolic` or `ln -rs` if you prefer the short version.
 
-- The ``package_qa_handle_error()`` function formerly in the :ref:`insane <ref-classes-insane>`
+- The ``package_qa_handle_error()`` function formerly in the :ref:`ref-classes-insane`
   class has been moved and renamed - if you have any references in your own custom
   classes they should be changed to ``oe.qa.handle_error()``.
 
@@ -265,3 +266,6 @@ Miscellaneous changes
   when parsing recipes. Any code depending on the previous behaviour will no longer
   work - change any such code to explicitly use appropriate path variables instead.
 
+- In order to exclude the kernel image from the image rootfs,
+  :term:`RRECOMMENDS`\ ``:${KERNEL_PACKAGE_NAME}-base`` should be set instead of
+  :term:`RDEPENDS`\ ``:${KERNEL_PACKAGE_NAME}-base``.

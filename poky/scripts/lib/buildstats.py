@@ -8,7 +8,7 @@ import json
 import logging
 import os
 import re
-from collections import namedtuple,OrderedDict
+from collections import namedtuple
 from statistics import mean
 
 
@@ -238,7 +238,7 @@ class BuildStats(dict):
         subdirs = os.listdir(path)
         for dirname in subdirs:
             recipe_dir = os.path.join(path, dirname)
-            if not os.path.isdir(recipe_dir):
+            if dirname == "reduced_proc_pressure" or not os.path.isdir(recipe_dir):
                 continue
             name, epoch, version, revision = cls.split_nevr(dirname)
             bsrecipe = BSRecipe(name, epoch, version, revision)

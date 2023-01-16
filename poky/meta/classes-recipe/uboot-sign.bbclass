@@ -149,7 +149,7 @@ deploy_dtb() {
 	fi
 
 	if [ -f "${UBOOT_NODTB_BINARY}" ]; then
-		install -Dm644 ${UBOOT_DTB_BINARY} ${DEPLOYDIR}/${uboot_nodtb_binary}
+		install -Dm644 ${UBOOT_NODTB_BINARY} ${DEPLOYDIR}/${uboot_nodtb_binary}
 		if [ -n "${type}" ]; then
 			ln -sf ${uboot_nodtb_binary} ${DEPLOYDIR}/${UBOOT_NODTB_IMAGE}
 		fi
@@ -407,7 +407,9 @@ do_deploy:prepend() {
 					deploy_helper ${type}
 				fi
 			done
+			unset j
 		done
+		unset i
 	else
 		cd ${B}
 		deploy_helper ""

@@ -4,6 +4,7 @@
 # function below.
 OTPTOOL_CONFIGS ?= ""
 OTPTOOL_KEY_DIR ?= ""
+OTPTOOL_USER_DIR ?= ""
 OTPTOOL_EXTRA_OPTS ?= ""
 OTPTOOL_EXTRA_DEPENDS ?= " socsec-native"
 DEPENDS += '${@oe.utils.conditional("SOCSEC_SIGN_ENABLE", "1", "${OTPTOOL_EXTRA_DEPENDS}", "", d)}'
@@ -12,10 +13,12 @@ do_otptool() {
     local otptool_config=$1
     otptool_config_slug="$(basename ${otptool_config} .json)"
     otptool_config_outdir="${B}"/"${CONFIG_B_PATH}"/"${otptool_config_slug}"
+    otptool_user_folder="$([ -n "${OTPTOOL_USER_DIR}" ] && echo --user_data_folder ${OTPTOOL_USER_DIR})"
     mkdir -p "${otptool_config_outdir}"
     otptool make_otp_image \
         --key_folder ${OTPTOOL_KEY_DIR} \
         --output_folder "${otptool_config_outdir}" \
+        ${otptool_user_folder} \
         ${otptool_config} \
         ${OTPTOOL_EXTRA_OPTS}
 

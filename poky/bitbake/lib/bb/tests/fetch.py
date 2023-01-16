@@ -1401,6 +1401,9 @@ class FetchLatestVersionTest(FetcherTest):
         # http://www.cmake.org/files/v2.8/cmake-2.8.12.1.tar.gz
         ("cmake", "/files/v2.8/cmake-2.8.12.1.tar.gz", "", "")
             : "2.8.12.1",
+        # https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.14.tar.xz
+        ("libxml2", "/software/libxml2/2.9/libxml2-2.9.14.tar.xz", "", "")
+            : "2.10.3",
         #
         # packages with versions only in current directory
         #

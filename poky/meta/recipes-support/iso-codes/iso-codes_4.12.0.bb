@@ -20,3 +20,5 @@ S = "${WORKDIR}/git"
 inherit allarch autotools
 
 FILES:${PN} += "${datadir}/xml/"
+
+BBCLASSEXTEND += "native"

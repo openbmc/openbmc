@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 Release 2.2 (morty)
 ===================
 
@@ -103,7 +105,7 @@ online package-manager support through SMART still require Python 2.
 ``buildtools-tarball`` Includes Python 3
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``buildtools-tarball`` now includes Python 3.
+The :term:`buildtools` tarball now includes Python 3.
 
 .. _migration-2.2-uclibc-replaced-by-musl:
 
@@ -182,13 +184,7 @@ root filesystem, provides an image, and uses the ``nographic`` option::
    $ runqemu qemux86-64 tmp/deploy/images/qemux86-64/core-image-minimal-qemux86-64.ext4 tmp/deploy/images/qemux86-64/bzImage nographic
 
 Following is a list of variables that can be set in configuration files
-such as ``bsp.conf`` to enable the BSP to be booted by ``runqemu``:
-
-.. note::
-
-   "QB" means "QEMU Boot".
-
-::
+such as ``bsp.conf`` to enable the BSP to be booted by ``runqemu``::
 
    QB_SYSTEM_NAME: QEMU name (e.g. "qemu-system-i386")
    QB_OPT_APPEND: Options to append to QEMU (e.g. "-show-cursor")
@@ -220,6 +216,10 @@ such as ``bsp.conf`` to enable the BSP to be booted by ``runqemu``:
 
 To use ``runqemu``, set :term:`IMAGE_CLASSES` as
 follows and run ``runqemu``:
+
+.. note::
+
+   "QB" means "QEMU Boot".
 
 .. note::
 

@@ -11,9 +11,9 @@ inherit gnomebase gobject-introspection gettext gtk-doc upstream-version-is-even
 
 DEPENDS = " \
     json-glib \
-    libsoup-2.4 \
+    libsoup-3.0 \
 "
 
 SRC_URI[archive.sha256sum] = "2d9a6826d158470449a173871221596da0f83ebdcff98b90c7049089056a37aa"
 
-EXTRA_OEMESON = "-Denable-installed-tests=false"
+EXTRA_OEMESON = "-Denable-installed-tests=false -Dsoup2=false"

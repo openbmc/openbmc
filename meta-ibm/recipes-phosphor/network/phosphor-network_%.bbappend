@@ -2,6 +2,8 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/network:"
 
 inherit obmc-phosphor-systemd
 
+RDEPENDS:${PN} += "bash"
+
 OBMC_NETWORK_INTERFACES ?= "eth0"
 OBMC_NETWORK_INTERFACES:append:p10bmc = " eth1"
 
@@ -9,6 +11,7 @@ FAILOVER_TMPL = "ncsi-failover@.service"
 LINKSPEED_TMPL = "ncsi-linkspeed@.service"
 
 SRC_URI += " file://ncsi-netlink-ifindex"
+SRC_URI += " file://ncsi-wait-and-set-speed"
 SRC_URI:append:ibm-ac-server = " file://${FAILOVER_TMPL}"
 SRC_URI:append:p10bmc = " file://${LINKSPEED_TMPL}"
 
@@ -24,6 +27,7 @@ SYSTEMD_LINK:${PN}:append:ibm-ac-server = "${@compose_list(d, 'FAILOVER_FMT', 'O
 SYSTEMD_LINK:${PN}:append:p10bmc = "${@compose_list(d, 'LINKSPEED_FMT', 'OBMC_NETWORK_INTERFACES')}"
 
 FILES:${PN} += "${libexecdir}/ncsi-netlink-ifindex"
+FILES:${PN} += "${libexecdir}/ncsi-wait-and-set-speed"
 FILES:${PN} += "${datadir}/network/*.json"
 
 PACKAGECONFIG:append = " sync-mac"
@@ -37,6 +41,7 @@ install_network_configuration(){
 do_install:append() {
     install -d ${D}${libexecdir}
     install -m 0755 ${WORKDIR}/ncsi-netlink-ifindex ${D}${libexecdir}
+    install -m 0755 ${WORKDIR}/ncsi-wait-and-set-speed ${D}${libexecdir}
 }
 
 SRC_URI:append:p10bmc = " file://inventory-object-map.json"

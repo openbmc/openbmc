@@ -22,7 +22,7 @@ SRC_URI = "git://github.com/MycroftAI/mycroft-core.git;branch=master;protocol=ht
 
 S = "${WORKDIR}/git"
 
-inherit systemd
+inherit systemd features_check
 
 # Mycroft installs itself on the host
 # Just copy the setup files to the rootfs
@@ -91,3 +91,5 @@ RDEPENDS:${PN} += "procps"
 RDEPENDS:${PN} += "bash jq libnotify"
 
 SYSTEMD_SERVICE:${PN} = "mycroft-setup.service mycroft.service"
+
+REQUIRED_DISTRO_FEATURES += "pulseaudio"

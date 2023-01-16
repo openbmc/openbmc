@@ -20,6 +20,7 @@ TOOLCHAIN_HOST_TASK = "\
     nativesdk-libxcrypt-compat \
     nativesdk-libnss-nis \
     nativesdk-sdk-provides-dummy \
+    nativesdk-libgcc \
     "
 
 INHIBIT_DEFAULT_DEPS = "1"

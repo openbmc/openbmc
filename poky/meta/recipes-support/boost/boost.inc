@@ -40,6 +40,7 @@ BOOST_LIBS = "\
 	thread \
 	timer \
 	type_erasure \
+	url \
 	wave \
 	"
 

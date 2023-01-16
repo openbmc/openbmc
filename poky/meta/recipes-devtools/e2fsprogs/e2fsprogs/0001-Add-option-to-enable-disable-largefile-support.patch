@@ -1,0 +1,57 @@
+From 6fab3346d448298a24cee1faeb5fc8507a3b9712 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 10 Nov 2022 20:34:54 -0800
+Subject: [PATCH] Add option to enable/disable largefile support
+
+fallocate can be used to have 64bit off_t provided its compiled with
+_FILE_OFFSET_BITS=64 which will be added automatically when
+--enable-largefile is used.
+
+Upstream-Status: Submitted [https://github.com/tytso/e2fsprogs/pull/129]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac    | 3 +++
+ misc/e4defrag.c | 6 +-----
+ 2 files changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index dff3d1ca..ec1c5b64 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1800,6 +1800,9 @@ OS_IO_FILE=""
+   ;;
+ esac]
+ AC_SUBST(OS_IO_FILE)
++
++AC_SYS_LARGEFILE
++
+ dnl
+ dnl Make our output files, being sure that we create the some miscellaneous 
+ dnl directories
+diff --git a/misc/e4defrag.c b/misc/e4defrag.c
+index 86e97ee3..e7175c37 100644
+--- a/misc/e4defrag.c
++++ b/misc/e4defrag.c
+@@ -195,10 +195,6 @@ static struct frag_statistic_ino	frag_rank[SHOW_FRAG_FILES];
+ #error posix_fadvise not available!
+ #endif
+ 
+-#ifndef HAVE_FALLOCATE64
+-#error fallocate64 not available!
+-#endif /* ! HAVE_FALLOCATE64 */
+-
+ /*
+  * get_mount_point() -	Get device's mount point.
+  *
+@@ -1568,7 +1564,7 @@ static int file_defrag(const char *file, const struct stat64 *buf,
+ 	/* Allocate space for donor inode */
+ 	orig_group_tmp = orig_group_head;
+ 	do {
+-		ret = fallocate64(donor_fd, 0,
++		ret = fallocate(donor_fd, 0,
+ 		  (ext2_loff_t)orig_group_tmp->start->data.logical * block_size,
+ 		  (ext2_loff_t)orig_group_tmp->len * block_size);
+ 		if (ret < 0) {
+-- 
+2.38.1
+

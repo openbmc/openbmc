@@ -1,0 +1,109 @@
+From 856189c324834b838f0e9cfc0d2e05f12518f264 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 7 Dec 2022 22:17:35 -0800
+Subject: [PATCH v3 2/3] erofs: replace [l]stat64 by equivalent [l]stat
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-erofs/20221215064758.93821-2-raj.khem@gmail.com/T/#u]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/inode.c | 10 +++++-----
+ lib/xattr.c |  4 ++--
+ mkfs/main.c |  4 ++--
+ 3 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/lib/inode.c b/lib/inode.c
+index f192510..38003fc 100644
+--- a/lib/inode.c
++++ b/lib/inode.c
+@@ -773,7 +773,7 @@ static u32 erofs_new_encode_dev(dev_t dev)
+ 
+ #ifdef WITH_ANDROID
+ int erofs_droid_inode_fsconfig(struct erofs_inode *inode,
+-			       struct stat64 *st,
++			       struct stat *st,
+ 			       const char *path)
+ {
+ 	/* filesystem_config does not preserve file type bits */
+@@ -818,7 +818,7 @@ int erofs_droid_inode_fsconfig(struct erofs_inode *inode,
+ }
+ #else
+ static int erofs_droid_inode_fsconfig(struct erofs_inode *inode,
+-				      struct stat64 *st,
++				      struct stat *st,
+ 				      const char *path)
+ {
+ 	return 0;
+@@ -826,7 +826,7 @@ static int erofs_droid_inode_fsconfig(struct erofs_inode *inode,
+ #endif
+ 
+ static int erofs_fill_inode(struct erofs_inode *inode,
+-			    struct stat64 *st,
++			    struct stat *st,
+ 			    const char *path)
+ {
+ 	int err = erofs_droid_inode_fsconfig(inode, st, path);
+@@ -910,7 +910,7 @@ static struct erofs_inode *erofs_new_inode(void)
+ /* get the inode from the (source) path */
+ static struct erofs_inode *erofs_iget_from_path(const char *path, bool is_src)
+ {
+-	struct stat64 st;
++	struct stat st;
+ 	struct erofs_inode *inode;
+ 	int ret;
+ 
+@@ -918,7 +918,7 @@ static struct erofs_inode *erofs_iget_from_path(const char *path, bool is_src)
+ 	if (!is_src)
+ 		return ERR_PTR(-EINVAL);
+ 
+-	ret = lstat64(path, &st);
++	ret = lstat(path, &st);
+ 	if (ret)
+ 		return ERR_PTR(-errno);
+ 
+diff --git a/lib/xattr.c b/lib/xattr.c
+index 71ffe3e..fd0e728 100644
+--- a/lib/xattr.c
++++ b/lib/xattr.c
+@@ -467,7 +467,7 @@ static int erofs_count_all_xattrs_from_path(const char *path)
+ {
+ 	int ret;
+ 	DIR *_dir;
+-	struct stat64 st;
++	struct stat st;
+ 
+ 	_dir = opendir(path);
+ 	if (!_dir) {
+@@ -502,7 +502,7 @@ static int erofs_count_all_xattrs_from_path(const char *path)
+ 			goto fail;
+ 		}
+ 
+-		ret = lstat64(buf, &st);
++		ret = lstat(buf, &st);
+ 		if (ret) {
+ 			ret = -errno;
+ 			goto fail;
+diff --git a/mkfs/main.c b/mkfs/main.c
+index d2c9830..5279805 100644
+--- a/mkfs/main.c
++++ b/mkfs/main.c
+@@ -581,7 +581,7 @@ int main(int argc, char **argv)
+ 	struct erofs_buffer_head *sb_bh;
+ 	struct erofs_inode *root_inode;
+ 	erofs_nid_t root_nid;
+-	struct stat64 st;
++	struct stat st;
+ 	erofs_blk_t nblocks;
+ 	struct timeval t;
+ 	char uuid_str[37] = "not available";
+@@ -609,7 +609,7 @@ int main(int argc, char **argv)
+ 			return 1;
+ 	}
+ 
+-	err = lstat64(cfg.c_src_path, &st);
++	err = lstat(cfg.c_src_path, &st);
+ 	if (err)
+ 		return 1;
+ 	if (!S_ISDIR(st.st_mode)) {
+-- 
+2.39.0
+

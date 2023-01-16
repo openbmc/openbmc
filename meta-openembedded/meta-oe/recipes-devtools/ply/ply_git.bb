@@ -5,10 +5,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS += "bison-native"
 
-PV = "2.2.0"
+PV = "2.3.0"
 
 SRC_URI = "git://github.com/iovisor/ply;branch=master;protocol=https"
-SRCREV = "771c32b299355fb31fc296110e90ae0166409b95"
+SRCREV = "864fac79116870df1ab7aa21e639578807e41e75"
 
 S = "${WORKDIR}/git"
 

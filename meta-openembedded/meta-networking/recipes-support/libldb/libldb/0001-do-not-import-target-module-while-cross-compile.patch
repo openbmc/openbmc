@@ -1,4 +1,4 @@
-From 00500909ebb0f51dd3b4e90c665f07158e7fe255 Mon Sep 17 00:00:00 2001
+From 69c409195ede704ed7e9298ed4942cc70a52e099 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Tue, 25 Jun 2019 14:25:08 +0800
 Subject: [PATCH] do not import target module while cross compile
@@ -19,7 +19,7 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
  1 file changed, 19 insertions(+), 8 deletions(-)
 
 diff --git a/buildtools/wafsamba/samba_bundled.py b/buildtools/wafsamba/samba_bundled.py
-index 5f080dd..cdc115e 100644
+index 7d2d855..01dcb56 100644
 --- a/buildtools/wafsamba/samba_bundled.py
 +++ b/buildtools/wafsamba/samba_bundled.py
 @@ -4,6 +4,7 @@ import sys
@@ -28,9 +28,9 @@ index 5f080dd..cdc115e 100644
  from wafsamba import samba_utils
 +import importlib.util, os
  
- def PRIVATE_NAME(bld, name, private_extension, private_library):
+ def PRIVATE_NAME(bld, name):
      '''possibly rename a library to include a bundled extension'''
-@@ -249,17 +250,27 @@ def CHECK_BUNDLED_SYSTEM_PYTHON(conf, libname, modulename, minversion='0.0.0'):
+@@ -241,17 +242,27 @@ def CHECK_BUNDLED_SYSTEM_PYTHON(conf, libname, modulename, minversion='0.0.0'):
      # versions
      minversion = minimum_library_version(conf, libname, minversion)
  
@@ -67,5 +67,5 @@ index 5f080dd..cdc115e 100644
          Logs.error('ERROR: Python module %s of version %s not found, and bundling disabled' % (libname, minversion))
          sys.exit(1)
 -- 
-2.17.1
+2.25.1
 

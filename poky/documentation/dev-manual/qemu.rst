@@ -44,13 +44,13 @@ To use QEMU, you need to have QEMU installed and initialized as well as
 have the proper artifacts (i.e. image files and root filesystems)
 available. Follow these general steps to run QEMU:
 
-1. *Install QEMU:* QEMU is made available with the Yocto Project a
+#. *Install QEMU:* QEMU is made available with the Yocto Project a
    number of ways. One method is to install a Software Development Kit
    (SDK). See ":ref:`sdk-manual/intro:the qemu emulator`" section in the
    Yocto Project Application Development and the Extensible Software
    Development Kit (eSDK) manual for information on how to install QEMU.
 
-2. *Setting Up the Environment:* How you set up the QEMU environment
+#. *Setting Up the Environment:* How you set up the QEMU environment
    depends on how you installed QEMU:
 
    -  If you cloned the ``poky`` repository or you downloaded and
@@ -66,7 +66,7 @@ available. Follow these general steps to run QEMU:
 
          . poky_sdk/environment-setup-core2-64-poky-linux
 
-3. *Ensure the Artifacts are in Place:* You need to be sure you have a
+#. *Ensure the Artifacts are in Place:* You need to be sure you have a
    pre-built kernel that will boot in QEMU. You also need the target
    root filesystem for your target machine's architecture:
 
@@ -84,7 +84,7 @@ available. Follow these general steps to run QEMU:
    Extensible Software Development Kit (eSDK) manual for information on
    how to extract a root filesystem.
 
-4. *Run QEMU:* The basic ``runqemu`` command syntax is as follows::
+#. *Run QEMU:* The basic ``runqemu`` command syntax is as follows::
 
       $ runqemu [option ] [...]
 
@@ -103,7 +103,9 @@ available. Follow these general steps to run QEMU:
       automatically finds the ``bzImage-qemux86-64.bin`` image file and
       the ``core-image-minimal-qemux86-64-20200218002850.rootfs.ext4``
       (assuming the current build created a ``core-image-minimal``
-      image).
+      image)::
+
+        $ runqemu qemux86-64
 
       .. note::
 
@@ -111,14 +113,9 @@ available. Follow these general steps to run QEMU:
          and uses the most recently built image according to the
          timestamp.
 
-      ::
-
-        $ runqemu qemux86-64
-
    -  This example produces the exact same results as the previous
       example. This command, however, specifically provides the image
-      and root filesystem type.
-      ::
+      and root filesystem type::
 
          $ runqemu qemux86-64 core-image-minimal ext4
 
@@ -127,23 +124,20 @@ available. Follow these general steps to run QEMU:
       variable ``FSTYPE`` to ``cpio.gz``. Also, for audio to be enabled,
       an appropriate driver must be installed (see the ``audio`` option
       in :ref:`dev-manual/qemu:\`\`runqemu\`\` command-line options`
-      for more information).
-      ::
+      for more information)::
 
          $ runqemu qemux86-64 ramfs audio
 
    -  This example does not provide enough information for QEMU to
       launch. While the command does provide a root filesystem type, it
-      must also minimally provide a `MACHINE`, `KERNEL`, or `VM` option.
-      ::
+      must also minimally provide a `MACHINE`, `KERNEL`, or `VM` option::
 
          $ runqemu ext4
 
    -  This example specifies to boot a virtual machine image
       (``.wic.vmdk`` file). From the ``.wic.vmdk``, ``runqemu``
       determines the QEMU architecture (`MACHINE`) to be "qemux86-64" and
-      the root filesystem type to be "vmdk".
-      ::
+      the root filesystem type to be "vmdk"::
 
          $ runqemu /home/scott-lenovo/vm/core-image-minimal-qemux86-64.wic.vmdk
 
@@ -190,7 +184,7 @@ the system does not need root privileges to run. It uses a user space
 NFS server to avoid that. Follow these steps to set up for running QEMU
 using an NFS server.
 
-1. *Extract a Root Filesystem:* Once you are able to run QEMU in your
+#. *Extract a Root Filesystem:* Once you are able to run QEMU in your
    environment, you can use the ``runqemu-extract-sdk`` script, which is
    located in the ``scripts`` directory along with the ``runqemu``
    script.
@@ -204,7 +198,7 @@ using an NFS server.
 
       runqemu-extract-sdk ./tmp/deploy/images/qemux86-64/core-image-sato-qemux86-64.tar.bz2 test-nfs
 
-2. *Start QEMU:* Once you have extracted the file system, you can run
+#. *Start QEMU:* Once you have extracted the file system, you can run
    ``runqemu`` normally with the additional location of the file system.
    You can then also make changes to the files within ``./test-nfs`` and
    see those changes appear in the image in real time. Here is an
@@ -329,7 +323,7 @@ Following is the command-line help output for the ``runqemu`` command::
      Simplified QEMU command-line options can be passed with:
        nographic - disable video console
        serial - enable a serial console on /dev/ttyS0
-       slirp - enable user networking, no root privileges is required
+       slirp - enable user networking, no root privileges required
        kvm - enable KVM when running x86/x86_64 (VT-capable CPU required)
        kvm-vhost - enable KVM with vhost when running x86/x86_64 (VT-capable CPU required)
        publicvnc - enable a VNC server open to all hosts
@@ -426,6 +420,29 @@ command line:
 -  ``slirp``: Enables "slirp" networking, which is a different way of
    networking that does not need root access but also is not as easy to
    use or comprehensive as the default.
+
+   Using ``slirp`` by default will forward the guest machine's
+   22 and 23 TCP ports to host machine's 2222 and 2323 ports
+   (or the next free ports). Specific forwarding rules can be configured
+   by setting ``QB_SLIRP_OPT`` as environment variable or in ``qemuboot.conf``
+   in the :term:`Build Directory` ``deploy/image`` directory.
+   Examples::
+
+      QB_SLIRP_OPT="-netdev user,id=net0,hostfwd=tcp::8080-:80"
+
+      QB_SLIRP_OPT="-netdev user,id=net0,hostfwd=tcp::8080-:80,hostfwd=tcp::2222-:22"
+
+   The first example forwards TCP port 80 from the emulated system to
+   port 8080 (or the next free port) on the host system,
+   allowing access to an http server running in QEMU from
+   ``http://<host ip>:8080/``.
+
+   The second example does the same, but also forwards TCP port 22 on the
+   guest system to 2222 (or the next free port) on the host system,
+   allowing ssh access to the emulated system using
+   ``ssh -P 2222 <user>@<host ip>``.
+
+   Keep in mind that proper configuration of firewall software is required.
 
 -  ``kvm``: Enables KVM when running "qemux86" or "qemux86-64" QEMU
    architectures. For KVM to work, all the following conditions must be

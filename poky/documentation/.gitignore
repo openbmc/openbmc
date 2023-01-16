@@ -1,3 +1,4 @@
+sphinx/__pycache__
 _build/
 Pipfile.lock
 poky.yaml

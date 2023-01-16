@@ -1,0 +1,30 @@
+From 544df0f5fd99925a3ce568c777413e0c31cb0028 Mon Sep 17 00:00:00 2001
+From: Jose Quaresma <jose.quaresma@foundries.io>
+Date: Mon, 2 Jan 2023 15:32:39 +0000
+Subject: [PATCH] build: Do not build .sgml file
+
+It needs docbook2man tool which we do not have recipe for
+
+Upstream-Status: OE-Specific [needs native docbook2man tool]
+
+Signed-off-by: Jose Quaresma <jose.quaresma@foundries.io>
+---
+ src/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index ac726d0..af6281d 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -102,7 +102,7 @@ $(PACKAGENAME)-compressed: $(PACKAGENAME)-static
+ 	upx -9 -o $@ $<
+ 
+ $(PACKAGENAME).1: $(PACKAGENAME).sgml
+-	docbook2man $<
++	@echo "Needs docbook2man"
+ 
+ pci.ids:
+ 	wget http://pciids.sourceforge.net/pci.ids
+-- 
+2.25.1
+

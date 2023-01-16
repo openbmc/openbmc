@@ -1,0 +1,80 @@
+From 6820c53c3952f78185beb59f767c372fc745dcf3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 11 Dec 2022 21:42:59 -0800
+Subject: [PATCH] Use AC_SYS_LARGEFILE macro to control largefile support
+
+The autoconf macro AC_SYS_LARGEFILE defines _FILE_OFFSET_BITS=64
+where necessary to ensure that off_t and all interfaces using off_t
+are 64bit, even on 32bit systems.
+
+replace stat64 by equivalent stat struct/func
+
+Upstream-Status: Accepted [https://github.com/thkukuk/rpcsvc-proto/pull/15]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac      |  1 +
+ rpcgen/rpc_main.c | 16 +++++-----------
+ 2 files changed, 6 insertions(+), 11 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index bacc2fb..a9fc730 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -8,6 +8,7 @@ AC_PREFIX_DEFAULT(/usr)
+ AC_SUBST(PACKAGE)
+ AC_SUBST(VERSION)
+ 
++AC_SYS_LARGEFILE
+ AC_PROG_CC
+ AC_GNU_SOURCE
+ AM_PROG_CC_C_O
+diff --git a/rpcgen/rpc_main.c b/rpcgen/rpc_main.c
+index 277adc6..fd7dea9 100644
+--- a/rpcgen/rpc_main.c
++++ b/rpcgen/rpc_main.c
+@@ -62,12 +62,6 @@
+ #define EXTEND	1		/* alias for TRUE */
+ #define DONT_EXTEND	0	/* alias for FALSE */
+ 
+-#ifdef __APPLE__
+-# if __DARWIN_ONLY_64_BIT_INO_T
+-#  define stat64 stat
+-# endif
+-#endif
+-
+ struct commandline
+   {
+     int cflag;			/* xdr C routines */
+@@ -337,9 +331,9 @@ clear_args (void)
+ static void
+ find_cpp (void)
+ {
+-  struct stat64 buf;
++  struct stat buf;
+ 
+-  if (stat64 (CPP, &buf) == 0)
++  if (stat (CPP, &buf) == 0)
+     return;
+ 
+   if (cppDefined) /* user specified cpp but it does not exist */
+@@ -1125,17 +1119,17 @@ putarg (int whereto, const char *cp)
+ static void
+ checkfiles (const char *infile, const char *outfile)
+ {
+-  struct stat64 buf;
++  struct stat buf;
+ 
+   if (infile)			/* infile ! = NULL */
+-    if (stat64 (infile, &buf) < 0)
++    if (stat (infile, &buf) < 0)
+       {
+ 	perror (infile);
+ 	crash ();
+       }
+   if (outfile)
+     {
+-      if (stat64 (outfile, &buf) < 0)
++      if (stat (outfile, &buf) < 0)
+ 	return;			/* file does not exist */
+       else
+ 	{

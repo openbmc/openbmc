@@ -1,0 +1,64 @@
+From 8a08d3583d77bebeb1763fb9b378899201ce5afa Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 15 Dec 2022 12:11:13 -0800
+Subject: [PATCH] shm.c: Replace stat64/fstat64/ftruncate64mmap64 with normal functions
+
+These functions were needed when _FILE_OFFSET_BITS was not 64, using
+AC_SYS_LARGEFILE will detect it correctly and make the normal variants
+of these functions behave same as their *64 counterparts.
+
+Upstream-Status: Backport [https://github.com/numactl/numactl/pull/159]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ shm.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/shm.c b/shm.c
+index 20537d9..5d0d1ab 100644
+--- a/shm.c
++++ b/shm.c
+@@ -24,8 +24,8 @@
+ #include <sys/mman.h>
+ #include <sys/ipc.h>
+ #include <sys/shm.h>
+-#include <sys/fcntl.h>
+ #include <sys/stat.h>
++#include <fcntl.h>
+ #include <stdarg.h>
+ #include <errno.h>
+ #include <unistd.h>
+@@ -135,7 +135,7 @@ void attach_sysvshm(char *name, char *opt)
+ /* Attach a shared memory file. */
+ void attach_shared(char *name, char *opt)
+ {
+-	struct stat64 st;
++	struct stat st;
+ 
+ 	shmfd = open(name, O_RDWR);
+ 	if (shmfd < 0) {
+@@ -146,14 +146,14 @@ void attach_shared(char *name, char *opt)
+ 		if (shmfd < 0)
+ 			nerror("cannot create file %s", name);
+ 	}
+-	if (fstat64(shmfd, &st) < 0)
++	if (fstat(shmfd, &st) < 0)
+ 		err("shm stat");
+ 	/* the file size must be larger than mmap shmlen + shmoffset, otherwise SIGBUS
+ 	 * will be caused when we access memory, because mmaped memory is no longer in
+ 	 * the range of the file laster.
+ 	 */
+ 	if ((shmlen + shmoffset) > st.st_size) {
+-		if (ftruncate64(shmfd, shmlen + shmoffset) < 0) {
++		if (ftruncate(shmfd, shmlen + shmoffset) < 0) {
+ 			/* XXX: we could do it by hand, but it would it
+ 			   would be impossible to apply policy then.
+ 			   need to fix that in the kernel. */
+@@ -168,7 +168,7 @@ void attach_shared(char *name, char *opt)
+ 
+ 	/* RED-PEN For shmlen > address space may need to map in pieces.
+ 	   Left for some poor 32bit soul. */
+-	shmptr = mmap64(NULL, shmlen, PROT_READ | PROT_WRITE, MAP_SHARED, shmfd, shmoffset);
++	shmptr = mmap(NULL, shmlen, PROT_READ | PROT_WRITE, MAP_SHARED, shmfd, shmoffset);
+ 	if (shmptr == (char*)-1)
+ 		err("shm mmap");
+ }

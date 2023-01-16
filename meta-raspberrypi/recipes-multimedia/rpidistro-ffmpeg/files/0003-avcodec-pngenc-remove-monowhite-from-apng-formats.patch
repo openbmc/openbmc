@@ -2,13 +2,15 @@ From: Paul B Mahol <onemda@gmail.com>
 Date: Sun, 14 Feb 2021 17:20:03 +0100
 Subject: avcodec/pngenc: remove monowhite from apng formats
 
+Upstream-Status: Inappropriate
+
+RPI-Distro repo clones original ffmpeg and applies patches to enable
+raspiberry pi support.
+
 Monowhite pixel format is not supported, and it does not make sense
 to add support for it.
 
 Fixes #7989
-
-Upstream-status: Pending
-
 ---
  libavcodec/pngenc.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

@@ -1,4 +1,4 @@
-From 22e0e1c01ec680a2970f4d5ca9e47f90259cbdcf Mon Sep 17 00:00:00 2001
+From e355ca3b8ddcc6e73ee140f53d25634afdaec0da Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 23 Jun 2020 07:49:35 +0000
 Subject: [PATCH] tests/Makefile.am: compile test_nlist with standard CFLAGS
@@ -14,10 +14,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tests/Makefile.am b/tests/Makefile.am
-index a2dfd43..40a0228 100644
+index 2ade5d9..f85cdba 100644
 --- a/tests/Makefile.am
 +++ b/tests/Makefile.am
-@@ -90,7 +90,7 @@ endif
+@@ -98,7 +98,7 @@ endif
  test-nlist$(EXEEXT): test-nlist.c
  	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
  	  $(AM_CPPFLAGS) $(CPPFLAGS) \
@@ -25,4 +25,4 @@ index a2dfd43..40a0228 100644
 +	  $(CFLAGS) $(GCOV_FLAGS) -o $@ $< $(test_nlist_LDADD)
  
  TESTS = run-arextract.sh run-arsymtest.sh run-ar.sh newfile test-nlist \
- 	update1 update2 update3 update4 \
+ 	run-ar-N.sh \

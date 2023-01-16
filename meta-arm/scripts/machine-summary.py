@@ -56,7 +56,7 @@ def get_url_for_patch(layer: str, localpath: pathlib.Path, d) -> str:
     # TODO: assumes default branch
     if layer == "core":
         return f"https://git.openembedded.org/openembedded-core/tree/meta/{relative}"
-    elif layer in ("meta-arm", "meta-arm-bsp", "arm-toolchain", "meta-atp", "meta-gem5"):
+    elif layer in ("meta-arm", "meta-arm-bsp", "arm-toolchain"):
         return f"https://git.yoctoproject.org/meta-arm/tree/{layer}/{relative}"
     else:
         print(f"WARNING: Don't know web URL for layer {layer}", file=sys.stderr)

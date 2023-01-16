@@ -32,7 +32,9 @@ LICENSE:${PN} = "BSD-3-Clause & ISC & PD"
 LIC_FILES_CHKSUM = "file://COPYING;md5=75e85c5a558f86d10fbd5abc567ea5e6"
 SECTION = "libs"
 
-SRC_URI = "https://libbsd.freedesktop.org/releases/${BPN}-${PV}.tar.xz"
+SRC_URI = "https://libbsd.freedesktop.org/releases/${BPN}-${PV}.tar.xz \
+           file://0001-funopen-Replace-off64_t-with-off_t-in-funopen_seek.patch \
+           "
 
 SRC_URI[sha256sum] = "9baa186059ebbf25c06308e9f991fda31f7183c0f24931826d83aa6abd8a0261"
 

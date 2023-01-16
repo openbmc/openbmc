@@ -13,7 +13,8 @@ LICENSE = "GPL-2.0-or-later"
 SRC_URI = "${SOURCEFORGE_MIRROR}/acpid2/acpid-${PV}.tar.xz \
            file://init \
            file://acpid.service \
-          "
+           file://0001-Replace-stat64-with-stat.patch \
+           "
 
 CVE_PRODUCT = "acpid2"
 

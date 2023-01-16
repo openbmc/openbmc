@@ -1,0 +1,183 @@
+From 3c0314e1820afc9a98e890cc5f7973c3c81877f8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 21 Dec 2022 18:23:03 -0800
+Subject: [PATCH] f2fs_io: Define _FILE_OFFSET_BITS=64
+
+Remove _LARGEFILE64_SOURCE, this is redundant when _FILE_OFFSET_BITS=64
+additionally it fixes build with musl because the detection logic for
+lseek64 fails because when using _LARGEFILE64_SOURCE musl also define's
+lseek64 as an alias to lseek
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-f2fs-devel/20221222022830.976309-2-raj.khem@gmail.com/T/#u]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/libf2fs_io.c        | 4 +++-
+ tools/f2fs_io/f2fs_io.c | 4 ++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+--- a/lib/libf2fs_io.c
++++ b/lib/libf2fs_io.c
+@@ -11,7 +11,9 @@
+  *
+  * Dual licensed under the GPL or LGPL version 2 licenses.
+  */
+-#define _LARGEFILE64_SOURCE
++#ifndef _FILE_OFFSET_BITS
++#define _FILE_OFFSET_BITS 64
++#endif
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -67,22 +69,13 @@ static int __get_device_fd(__u64 *offset
+ 	return -1;
+ }
+ 
+-#ifndef HAVE_LSEEK64
+-typedef off_t	off64_t;
+-
+-static inline off64_t lseek64(int fd, __u64 offset, int set)
+-{
+-	return lseek(fd, offset, set);
+-}
+-#endif
+-
+ /* ---------- dev_cache, Least Used First (LUF) policy  ------------------- */
+ /*
+  * Least used block will be the first victim to be replaced when max hash
+  * collision exceeds
+  */
+ static bool *dcache_valid; /* is the cached block valid? */
+-static off64_t  *dcache_blk; /* which block it cached */
++static off_t  *dcache_blk; /* which block it cached */
+ static uint64_t *dcache_lastused; /* last used ticks for cache entries */
+ static char *dcache_buf; /* cached block data */
+ static uint64_t dcache_usetick; /* current use tick */
+@@ -172,7 +165,7 @@ static int dcache_alloc_all(long n)
+ {
+ 	if (n <= 0)
+ 		return -1;
+-	if ((dcache_blk = (off64_t *) malloc(sizeof(off64_t) * n)) == NULL
++	if ((dcache_blk = (off_t *) malloc(sizeof(off_t) * n)) == NULL
+ 		|| (dcache_lastused = (uint64_t *)
+ 				malloc(sizeof(uint64_t) * n)) == NULL
+ 		|| (dcache_buf = (char *) malloc (F2FS_BLKSIZE * n)) == NULL
+@@ -257,7 +250,7 @@ static inline long dcache_relocate(long
+ 			dcache_config.num_cache_entry;
+ }
+ 
+-static long dcache_find(off64_t blk)
++static long dcache_find(off_t blk)
+ {
+ 	register long n = dcache_config.num_cache_entry;
+ 	register unsigned m = dcache_config.max_hash_collision;
+@@ -278,10 +271,10 @@ static long dcache_find(off64_t blk)
+ }
+ 
+ /* Physical read into cache */
+-static int dcache_io_read(int fd, long entry, off64_t offset, off64_t blk)
++static int dcache_io_read(int fd, long entry, off_t offset, off_t blk)
+ {
+-	if (lseek64(fd, offset, SEEK_SET) < 0) {
+-		MSG(0, "\n lseek64 fail.\n");
++	if (lseek(fd, offset, SEEK_SET) < 0) {
++		MSG(0, "\n lseek fail.\n");
+ 		return -1;
+ 	}
+ 	if (read(fd, dcache_buf + entry * F2FS_BLKSIZE, F2FS_BLKSIZE) < 0) {
+@@ -308,12 +301,12 @@ static int dcache_io_read(int fd, long e
+  *       1: cache not available (uninitialized)
+  *      -1: error
+  */
+-static int dcache_update_rw(int fd, void *buf, off64_t offset,
++static int dcache_update_rw(int fd, void *buf, off_t offset,
+ 		size_t byte_count, bool is_write)
+ {
+-	off64_t blk;
++	off_t blk;
+ 	int addr_in_blk;
+-	off64_t start;
++	off_t start;
+ 
+ 	if (!dcache_initialized)
+ 		dcache_init(); /* auto initialize */
+@@ -377,13 +370,13 @@ static int dcache_update_rw(int fd, void
+  * return value: 1: cache not available
+  *               0: success, -1: I/O error
+  */
+-int dcache_update_cache(int fd, void *buf, off64_t offset, size_t count)
++int dcache_update_cache(int fd, void *buf, off_t offset, size_t count)
+ {
+ 	return dcache_update_rw(fd, buf, offset, count, true);
+ }
+ 
+ /* handles read into cache + read into buffer  */
+-int dcache_read(int fd, void *buf, off64_t offset, size_t count)
++int dcache_read(int fd, void *buf, off_t offset, size_t count)
+ {
+ 	return dcache_update_rw(fd, buf, offset, count, false);
+ }
+@@ -395,7 +388,7 @@ int dev_read_version(void *buf, __u64 of
+ {
+ 	if (c.sparse_mode)
+ 		return 0;
+-	if (lseek64(c.kd, (off64_t)offset, SEEK_SET) < 0)
++	if (lseek(c.kd, (off_t)offset, SEEK_SET) < 0)
+ 		return -1;
+ 	if (read(c.kd, buf, len) < 0)
+ 		return -1;
+@@ -537,10 +530,10 @@ int dev_read(void *buf, __u64 offset, si
+ 
+ 	/* err = 1: cache not available, fall back to non-cache R/W */
+ 	/* err = 0: success, err=-1: I/O error */
+-	err = dcache_read(fd, buf, (off64_t)offset, len);
++	err = dcache_read(fd, buf, (off_t)offset, len);
+ 	if (err <= 0)
+ 		return err;
+-	if (lseek64(fd, (off64_t)offset, SEEK_SET) < 0)
++	if (lseek(fd, (off_t)offset, SEEK_SET) < 0)
+ 		return -1;
+ 	if (read(fd, buf, len) < 0)
+ 		return -1;
+@@ -586,9 +579,9 @@ int dev_write(void *buf, __u64 offset, s
+ 	 * dcache_update_cache() just update cache, won't do I/O.
+ 	 * Thus even no error, we need normal non-cache I/O for actual write
+ 	 */
+-	if (dcache_update_cache(fd, buf, (off64_t)offset, len) < 0)
++	if (dcache_update_cache(fd, buf, (off_t)offset, len) < 0)
+ 		return -1;
+-	if (lseek64(fd, (off64_t)offset, SEEK_SET) < 0)
++	if (lseek(fd, (off_t)offset, SEEK_SET) < 0)
+ 		return -1;
+ 	if (write(fd, buf, len) < 0)
+ 		return -1;
+@@ -602,7 +595,7 @@ int dev_write_block(void *buf, __u64 blk
+ 
+ int dev_write_dump(void *buf, __u64 offset, size_t len)
+ {
+-	if (lseek64(c.dump_fd, (off64_t)offset, SEEK_SET) < 0)
++	if (lseek(c.dump_fd, (off_t)offset, SEEK_SET) < 0)
+ 		return -1;
+ 	if (write(c.dump_fd, buf, len) < 0)
+ 		return -1;
+@@ -627,7 +620,7 @@ int dev_fill(void *buf, __u64 offset, si
+ 	/* Only allow fill to zero */
+ 	if (*((__u8*)buf))
+ 		return -1;
+-	if (lseek64(fd, (off64_t)offset, SEEK_SET) < 0)
++	if (lseek(fd, (off_t)offset, SEEK_SET) < 0)
+ 		return -1;
+ 	if (write(fd, buf, len) < 0)
+ 		return -1;
+--- a/tools/f2fs_io/f2fs_io.c
++++ b/tools/f2fs_io/f2fs_io.c
+@@ -12,8 +12,8 @@
+ #ifndef _LARGEFILE_SOURCE
+ #define _LARGEFILE_SOURCE
+ #endif
+-#ifndef _LARGEFILE64_SOURCE
+-#define _LARGEFILE64_SOURCE
++#ifndef _FILE_OFFSET_BITS
++#define _FILE_OFFSET_BITS 64
+ #endif
+ #ifndef O_LARGEFILE
+ #define O_LARGEFILE 0

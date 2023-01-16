@@ -1,0 +1,101 @@
+From 683d0c525765415be34c269edf9cc066276f9f65 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 18 Dec 2022 13:53:51 -0800
+Subject: [PATCH] Replace off64_t with off_t
+
+AC_SYS_LARGEFILE autoconf macro is in use in configure script which will
+add needed feature macros on commandline to enable 64bit off_t.
+
+Also replace lseek64 with lseek, since it will be same when
+_FILE_OFFSET_BITS=64 is defined on relevant platforms via AC_SYS_LARGEFILE
+
+Upstream-Status: Submitted [https://gitlab.com/cryptsetup/cryptsetup/-/merge_requests/467]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/utils.c                 |  4 ++--
+ lib/utils_wipe.c            |  4 ++--
+ src/utils_reencrypt_luks1.c | 12 ++++++------
+ 3 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/lib/utils.c b/lib/utils.c
+index 9d79ee29..be5f5287 100644
+--- a/lib/utils.c
++++ b/lib/utils.c
+@@ -102,9 +102,9 @@ static int keyfile_seek(int fd, uint64_t bytes)
+ 	char tmp[BUFSIZ];
+ 	size_t next_read;
+ 	ssize_t bytes_r;
+-	off64_t r;
++	off_t r;
+ 
+-	r = lseek64(fd, bytes, SEEK_CUR);
++	r = lseek(fd, bytes, SEEK_CUR);
+ 	if (r > 0)
+ 		return 0;
+ 	if (r < 0 && errno != ESPIPE)
+diff --git a/lib/utils_wipe.c b/lib/utils_wipe.c
+index 285a9e77..0c376f44 100644
+--- a/lib/utils_wipe.c
++++ b/lib/utils_wipe.c
+@@ -150,7 +150,7 @@ static int wipe_block(struct crypt_device *cd, int devfd, crypt_wipe_pattern pat
+ 	if (blockdev && pattern == CRYPT_WIPE_ZERO &&
+ 	    !wipe_zeroout(cd, devfd, offset, wipe_block_size)) {
+ 		/* zeroout ioctl does not move offset */
+-		if (lseek64(devfd, offset + wipe_block_size, SEEK_SET) < 0) {
++		if (lseek(devfd, offset + wipe_block_size, SEEK_SET) < 0) {
+ 			log_err(cd, _("Cannot seek to device offset."));
+ 			return -EINVAL;
+ 		}
+@@ -221,7 +221,7 @@ int crypt_wipe_device(struct crypt_device *cd,
+ 	if (r)
+ 		goto out;
+ 
+-	if (lseek64(devfd, offset, SEEK_SET) < 0) {
++	if (lseek(devfd, offset, SEEK_SET) < 0) {
+ 		log_err(cd, _("Cannot seek to device offset."));
+ 		r = -EINVAL;
+ 		goto out;
+diff --git a/src/utils_reencrypt_luks1.c b/src/utils_reencrypt_luks1.c
+index 96368bdb..d83a1da4 100644
+--- a/src/utils_reencrypt_luks1.c
++++ b/src/utils_reencrypt_luks1.c
+@@ -729,8 +729,8 @@ static int copy_data_forward(struct reenc_ctx *rc, int fd_old, int fd_new,
+ 
+ 	log_dbg("Reencrypting in forward direction.");
+ 
+-	if (lseek64(fd_old, rc->device_offset, SEEK_SET) < 0 ||
+-	    lseek64(fd_new, rc->device_offset, SEEK_SET) < 0) {
++	if (lseek(fd_old, rc->device_offset, SEEK_SET) < 0 ||
++	    lseek(fd_new, rc->device_offset, SEEK_SET) < 0) {
+ 		log_err(_("Cannot seek to device offset."));
+ 		goto out;
+ 	}
+@@ -788,7 +788,7 @@ static int copy_data_backward(struct reenc_ctx *rc, int fd_old, int fd_new,
+ 			      size_t block_size, void *buf, uint64_t *bytes)
+ {
+ 	ssize_t s1, s2, working_block;
+-	off64_t working_offset;
++	off_t working_offset;
+ 	int r = -EIO;
+ 	char *backing_file = NULL;
+ 	struct tools_progress_params prog_parms = {
+@@ -827,8 +827,8 @@ static int copy_data_backward(struct reenc_ctx *rc, int fd_old, int fd_new,
+ 			working_block = block_size;
+ 		}
+ 
+-		if (lseek64(fd_old, working_offset, SEEK_SET) < 0 ||
+-		    lseek64(fd_new, working_offset, SEEK_SET) < 0) {
++		if (lseek(fd_old, working_offset, SEEK_SET) < 0 ||
++		    lseek(fd_new, working_offset, SEEK_SET) < 0) {
+ 			log_err(_("Cannot seek to device offset."));
+ 			goto out;
+ 		}
+@@ -874,7 +874,7 @@ static void zero_rest_of_device(int fd, size_t block_size, void *buf,
+ 
+ 	log_dbg("Zeroing rest of device.");
+ 
+-	if (lseek64(fd, offset, SEEK_SET) < 0) {
++	if (lseek(fd, offset, SEEK_SET) < 0) {
+ 		log_dbg("Cannot seek to device offset.");
+ 		return;
+ 	}

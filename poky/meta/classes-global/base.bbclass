@@ -15,30 +15,7 @@ inherit utils
 inherit utility-tasks
 inherit logging
 
-OE_EXTRA_IMPORTS ?= ""
-
-OE_IMPORTS += "os sys time oe.path oe.utils oe.types oe.package oe.packagegroup oe.sstatesig oe.lsb oe.cachedpath oe.license oe.qa oe.reproducible oe.rust oe.buildcfg ${OE_EXTRA_IMPORTS}"
-OE_IMPORTS[type] = "list"
-
 PACKAGECONFIG_CONFARGS ??= ""
-
-def oe_import(d):
-    import sys
-
-    bbpath = [os.path.join(dir, "lib") for dir in d.getVar("BBPATH").split(":")]
-    sys.path[0:0] = [dir for dir in bbpath if dir not in sys.path]
-
-    import oe.data
-    for toimport in oe.data.typed_value("OE_IMPORTS", d):
-        try:
-            # Make a python object accessible from the metadata
-            bb.utils._context[toimport.split(".", 1)[0]] = __import__(toimport)
-        except AttributeError as e:
-            bb.error("Error importing OE modules: %s" % str(e))
-    return ""
-
-# We need the oe module name space early (before INHERITs get added)
-OE_IMPORTED := "${@oe_import(d)}"
 
 inherit metadata_scm
 
@@ -139,7 +116,7 @@ def setup_hosttools_dir(dest, toolsvar, d, fatal=True):
             # /usr/local/bin/ccache/gcc -> /usr/bin/ccache, then which(gcc)
             # would return /usr/local/bin/ccache/gcc, but what we need is
             # /usr/bin/gcc, this code can check and fix that.
-            if "ccache" in srctool:
+            if os.path.islink(srctool) and os.path.basename(os.readlink(srctool)) == 'ccache':
                 srctool = bb.utils.which(path, tool, executable=True, direction=1)
             if srctool:
                 os.symlink(srctool, desttool)
@@ -378,10 +355,6 @@ do_install[dirs] = "${B}"
 do_install[cleandirs] = "${D}"
 
 base_do_install() {
-	:
-}
-
-base_do_package() {
 	:
 }
 
@@ -786,4 +759,4 @@ python do_cleanall() {
 do_cleanall[nostamp] = "1"
 
 
-EXPORT_FUNCTIONS do_fetch do_unpack do_configure do_compile do_install do_package
+EXPORT_FUNCTIONS do_fetch do_unpack do_configure do_compile do_install

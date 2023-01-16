@@ -1,6 +1,6 @@
 Filter out '/usr/include' for swig to avoid host contamination issue.
 
-Upstream-Status: Upstream-Status: Inappropriate [cross compile specific]
+Upstream-Status: Inappropriate [cross compile specific]
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---

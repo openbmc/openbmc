@@ -18,7 +18,6 @@ PROVIDES = "xmu"
 PE = "1"
 
 XORG_PN = "libXmu"
-XORG_EXT = "tar.xz"
 
 LEAD_SONAME = "libXmu"
 

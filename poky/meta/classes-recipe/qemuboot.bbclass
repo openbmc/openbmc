@@ -13,6 +13,7 @@
 # QB_OPT_APPEND: options to append to qemu, e.g., "-device usb-mouse"
 #
 # QB_DEFAULT_KERNEL: default kernel to boot, e.g., "bzImage"
+#                                            e.g., "bzImage-initramfs-qemux86-64.bin" if INITRAMFS_IMAGE_BUNDLE is set to 1.
 #
 # QB_DEFAULT_FSTYPE: default FSTYPE to boot, e.g., "ext4"
 #
@@ -93,7 +94,7 @@
 QB_MEM ?= "-m 256"
 QB_SMP ?= ""
 QB_SERIAL_OPT ?= "-serial mon:stdio -serial null"
-QB_DEFAULT_KERNEL ?= "${KERNEL_IMAGETYPE}"
+QB_DEFAULT_KERNEL ?= "${@bb.utils.contains("INITRAMFS_IMAGE_BUNDLE", "1", "${KERNEL_IMAGETYPE}-${INITRAMFS_LINK_NAME}.bin", "${KERNEL_IMAGETYPE}", d)}"
 QB_DEFAULT_FSTYPE ?= "ext4"
 QB_RNG ?= "-object rng-random,filename=/dev/urandom,id=rng0 -device virtio-rng-pci,rng=rng0"
 QB_OPT_APPEND ?= ""

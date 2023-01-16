@@ -183,3 +183,5 @@ do_install:class-nativesdk() {
 	rm -rf ${D}${localstatedir}/run
 }
 BBCLASSEXTEND = "native nativesdk"
+
+CVE_PRODUCT += "d-bus_project:d-bus"

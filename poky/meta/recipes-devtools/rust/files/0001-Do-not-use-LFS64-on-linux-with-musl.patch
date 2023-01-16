@@ -1,0 +1,168 @@
+From 3ecce665198e3420d70139d86ed22e74804c9379 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 28 Dec 2022 22:35:55 -0800
+Subject: [PATCH] Do not use LFS64 on linux with musl
+
+glibc is providing open64 and other lfs64 functions but musl aliases
+them to normal equivalents since off_t is always 64-bit on musl,
+therefore check for target env along when target OS is linux before
+using open64, this is more available. Latest Musl has made these
+namespace changes [1]
+
+[1] https://git.musl-libc.org/cgit/musl/commit/?id=246f1c811448f37a44b41cd8df8d0ef9736d95f4
+
+Upstream-Status: Submitted [https://github.com/rust-lang/rust/pull/106246]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ library/std/src/os/linux/fs.rs |  9 ++++++++-
+ library/std/src/sys/unix/fd.rs | 14 ++++++++++----
+ library/std/src/sys/unix/fs.rs | 27 ++++++++++++++++++++-------
+ 3 files changed, 38 insertions(+), 12 deletions(-)
+
+diff --git a/library/std/src/os/linux/fs.rs b/library/std/src/os/linux/fs.rs
+index 479bbcc17a8..ab0b2a3eda3 100644
+--- a/library/std/src/os/linux/fs.rs
++++ b/library/std/src/os/linux/fs.rs
+@@ -329,7 +329,14 @@ pub trait MetadataExt {
+ impl MetadataExt for Metadata {
+     #[allow(deprecated)]
+     fn as_raw_stat(&self) -> &raw::stat {
+-        unsafe { &*(self.as_inner().as_inner() as *const libc::stat64 as *const raw::stat) }
++        #[cfg(target_env = "musl")]
++        unsafe {
++            &*(self.as_inner().as_inner() as *const libc::stat as *const raw::stat)
++        }
++        #[cfg(not(target_env = "musl"))]
++        unsafe {
++            &*(self.as_inner().as_inner() as *const libc::stat64 as *const raw::stat)
++        }
+     }
+     fn st_dev(&self) -> u64 {
+         self.as_inner().as_inner().st_dev as u64
+diff --git a/library/std/src/sys/unix/fd.rs b/library/std/src/sys/unix/fd.rs
+index dbaa3c33e2e..5d31557bd11 100644
+--- a/library/std/src/sys/unix/fd.rs
++++ b/library/std/src/sys/unix/fd.rs
+@@ -115,9 +115,12 @@ pub fn read_to_end(&self, buf: &mut Vec<u8>) -> io::Result<usize> {
+     }
+ 
+     pub fn read_at(&self, buf: &mut [u8], offset: u64) -> io::Result<usize> {
+-        #[cfg(not(any(target_os = "linux", target_os = "android")))]
++        #[cfg(not(any(
++            all(target_os = "linux", not(target_env = "musl")),
++            target_os = "android"
++        )))]
+         use libc::pread as pread64;
+-        #[cfg(any(target_os = "linux", target_os = "android"))]
++        #[cfg(any(all(target_os = "linux", not(target_env = "musl")), target_os = "android"))]
+         use libc::pread64;
+ 
+         unsafe {
+@@ -181,9 +184,12 @@ pub fn is_write_vectored(&self) -> bool {
+     }
+ 
+     pub fn write_at(&self, buf: &[u8], offset: u64) -> io::Result<usize> {
+-        #[cfg(not(any(target_os = "linux", target_os = "android")))]
++        #[cfg(not(any(
++            all(target_os = "linux", not(target_env = "musl")),
++            target_os = "android"
++        )))]
+         use libc::pwrite as pwrite64;
+-        #[cfg(any(target_os = "linux", target_os = "android"))]
++        #[cfg(any(all(target_os = "linux", not(target_env = "musl")), target_os = "android"))]
+         use libc::pwrite64;
+ 
+         unsafe {
+diff --git a/library/std/src/sys/unix/fs.rs b/library/std/src/sys/unix/fs.rs
+index aea0c26ee8b..e7be4729ca6 100644
+--- a/library/std/src/sys/unix/fs.rs
++++ b/library/std/src/sys/unix/fs.rs
+@@ -45,19 +45,24 @@
+     all(target_os = "linux", target_env = "gnu")
+ ))]
+ use libc::c_char;
+-#[cfg(any(target_os = "linux", target_os = "emscripten", target_os = "android"))]
++#[cfg(any(
++    all(target_os = "linux", not(target_env = "musl")),
++    target_os = "emscripten",
++    target_os = "android"
++))]
+ use libc::dirfd;
+-#[cfg(any(target_os = "linux", target_os = "emscripten"))]
++#[cfg(any(not(target_env = "musl"), target_os = "emscripten"))]
+ use libc::fstatat64;
+ #[cfg(any(
+     target_os = "android",
+     target_os = "solaris",
+     target_os = "fuchsia",
+     target_os = "redox",
+-    target_os = "illumos"
++    target_os = "illumos",
++    target_env = "musl"
+ ))]
+ use libc::readdir as readdir64;
+-#[cfg(target_os = "linux")]
++#[cfg(all(target_os = "linux", not(target_env = "musl")))]
+ use libc::readdir64;
+ #[cfg(any(target_os = "emscripten", target_os = "l4re"))]
+ use libc::readdir64_r;
+@@ -77,7 +82,13 @@
+     dirent as dirent64, fstat as fstat64, fstatat as fstatat64, ftruncate64, lseek64,
+     lstat as lstat64, off64_t, open as open64, stat as stat64,
+ };
++#[cfg(target_env = "musl")]
++use libc::{
++    dirent as dirent64, fstat as fstat64, ftruncate as ftruncate64, lseek as lseek64,
++    lstat as lstat64, off_t as off64_t, open as open64, stat as stat64,
++};
+ #[cfg(not(any(
++    target_env = "musl",
+     target_os = "linux",
+     target_os = "emscripten",
+     target_os = "l4re",
+@@ -87,7 +98,7 @@
+     dirent as dirent64, fstat as fstat64, ftruncate as ftruncate64, lseek as lseek64,
+     lstat as lstat64, off_t as off64_t, open as open64, stat as stat64,
+ };
+-#[cfg(any(target_os = "linux", target_os = "emscripten", target_os = "l4re"))]
++#[cfg(any(not(target_env = "musl"), target_os = "emscripten", target_os = "l4re"))]
+ use libc::{dirent64, fstat64, ftruncate64, lseek64, lstat64, off64_t, open64, stat64};
+ 
+ pub use crate::sys_common::fs::try_exists;
+@@ -260,6 +271,7 @@ unsafe impl Sync for Dir {}
+ #[cfg(any(
+     target_os = "android",
+     target_os = "linux",
++    not(target_env = "musl"),
+     target_os = "solaris",
+     target_os = "illumos",
+     target_os = "fuchsia",
+@@ -292,6 +304,7 @@ struct dirent64_min {
+ }
+ 
+ #[cfg(not(any(
++    target_env = "musl",
+     target_os = "android",
+     target_os = "linux",
+     target_os = "solaris",
+@@ -745,7 +758,7 @@ pub fn file_name(&self) -> OsString {
+     }
+ 
+     #[cfg(all(
+-        any(target_os = "linux", target_os = "emscripten", target_os = "android"),
++        any(not(target_env = "musl"), target_os = "emscripten", target_os = "android"),
+         not(miri)
+     ))]
+     pub fn metadata(&self) -> io::Result<FileAttr> {
+@@ -769,7 +782,7 @@ pub fn metadata(&self) -> io::Result<FileAttr> {
+     }
+ 
+     #[cfg(any(
+-        not(any(target_os = "linux", target_os = "emscripten", target_os = "android")),
++        not(any(not(target_env = "musl"), target_os = "emscripten", target_os = "android")),
+         miri
+     ))]
+     pub fn metadata(&self) -> io::Result<FileAttr> {
+-- 
+2.39.0
+

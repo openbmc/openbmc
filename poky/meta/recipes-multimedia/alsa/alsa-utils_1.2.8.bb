@@ -24,7 +24,9 @@ PACKAGECONFIG[udev] = "--with-udev-rules-dir=`pkg-config --variable=udevdir udev
 PACKAGECONFIG[manpages] = "--enable-xmlto, --disable-xmlto, xmlto-native docbook-xml-dtd4-native docbook-xsl-stylesheets-native"
 
 # alsa-utils specified in SRC_URI due to alsa-utils-scripts recipe
-SRC_URI = "https://www.alsa-project.org/files/pub/utils/alsa-utils-${PV}.tar.bz2"
+SRC_URI = "https://www.alsa-project.org/files/pub/utils/alsa-utils-${PV}.tar.bz2 \
+           file://0001-aplay-axfer-Replace-off64_t-with-off_t.patch \
+           "
 SRC_URI[sha256sum] = "e140fa604c351f36bd72167c8860c69d81b964ae6ab53992d6434dde38e9333c"
 
 # On build machines with python-docutils (not python3-docutils !!) installed

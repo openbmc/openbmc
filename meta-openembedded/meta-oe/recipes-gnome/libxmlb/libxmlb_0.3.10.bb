@@ -18,3 +18,5 @@ PACKAGECONFIG[tests] = "-Dtests=true,-Dtests=false"
 GTKDOC_MESON_OPTION = "gtkdoc"
 
 FILES:${PN}-bin += "${libexecdir}/*"
+
+BBCLASSEXTEND = "native"

@@ -16,6 +16,7 @@ DEPENDS += "libxext xorgproto libxfixes"
 PE = "1"
 
 XORG_PN = "libXi"
+XORG_EXT = "tar.bz2"
 
 SRC_URI[sha256sum] = "2ed181446a61c7337576467870bc5336fc9e222a281122d96c4d39a3298bba00"
 

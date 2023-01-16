@@ -1,0 +1,34 @@
+From a658e6402382250f0164c5b47b744740e04f3611 Mon Sep 17 00:00:00 2001
+From: Charlie Johnston <charlie.johnston@ni.com>
+Date: Fri, 30 Dec 2022 15:21:14 -0600
+Subject: [PATCH] opkg-key: Remove --no-options flag from gpg calls.
+
+The opkg-key script was always passing the --no-options
+flag to gpg, which uses /dev/null as the options file.
+As a result, the opkg gpg.conf file was not getting
+used. This change removes that flag so that gpg.conf
+in the GPGHOMEDIR for opkg (currently /etc/opkg/gpg/)
+will be used if present.
+
+Upstream-Status: Accepted [https://git.yoctoproject.org/opkg/commit/?id=cee294e72d257417b5e55ef7a76a0fd15313e46b]
+Signed-off-by: Charlie Johnston <charlie.johnston@ni.com>
+---
+ utils/opkg-key | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/utils/opkg-key b/utils/opkg-key
+index e395a59..8645ebc 100755
+--- a/utils/opkg-key
++++ b/utils/opkg-key
+@@ -53,7 +53,7 @@ else
+     exit 1
+ fi
+ 
+-GPG="$GPGCMD --no-options --homedir $GPGHOMEDIR"
++GPG="$GPGCMD --homedir $GPGHOMEDIR"
+ 
+ # Gpg home dir isn't created automatically when --homedir option is used
+ if [ ! -e "$GPGHOMEDIR" ]; then
+-- 
+2.30.2
+

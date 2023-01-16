@@ -10,7 +10,7 @@ DEPENDS = " \
     enchant2 \
     evolution-data-server \
     folks \
-    gcr \
+    gcr3 \
     gmime \
     gnome-online-accounts \
     gsound \
@@ -41,7 +41,7 @@ S = "${WORKDIR}/git"
 SRCREV = "94d6bec861daffb27efea85a296f347db7a5af6d"
 
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
-REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
+REQUIRED_DISTRO_FEATURES = "gobject-introspection-data opengl"
 
 GIR_MESON_OPTION = ""
 EXTRA_OEMESON = "-Dprofile=release"

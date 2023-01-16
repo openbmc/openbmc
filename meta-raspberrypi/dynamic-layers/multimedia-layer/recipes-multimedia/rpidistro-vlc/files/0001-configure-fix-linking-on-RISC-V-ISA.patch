@@ -2,11 +2,17 @@ From: =?utf-8?q?R=C3=A9mi_Denis-Courmont?= <remi@remlab.net>
 Date: Sat, 16 Jun 2018 21:31:45 +0300
 Subject: configure: fix linking on RISC-V ISA
 
-Upstream-status: Pending
+Upstream-Status: Inappropriate
+
+RPI-Distro repo forks original vlc and applies patches
+to enable raspiberry pi support.
+
 ---
  configure.ac | 1 +
  1 file changed, 1 insertion(+)
 
+diff --git a/configure.ac b/configure.ac
+index 2037a9e..df26367 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -113,6 +113,7 @@ case "${host_os}" in

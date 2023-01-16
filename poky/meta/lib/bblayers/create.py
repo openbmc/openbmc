@@ -53,7 +53,7 @@ class CreatePlugin(LayerPlugin):
         shutil.copy(license_src, license_dst)
 
         # Get the compat value for core layer.
-        compat = self.tinfoil.config_data.getVar('LAYERSERIES_COMPAT_core') or ""
+        compat = self.tinfoil.config_data.getVar('LAYERSERIES_CORENAMES') or ""
 
         # Create the layer.conf from templates/layer.conf
         layerconf_template = read_template('layer.conf').format(

@@ -13,6 +13,9 @@ UPSTREAM_CHECK_URI = "https://roy.marples.name/downloads/dhcpcd/"
 
 SRC_URI = "https://roy.marples.name/downloads/${BPN}/${BPN}-${PV}.tar.xz \
            file://0001-remove-INCLUDEDIR-to-prevent-build-issues.patch \
+           file://0001-20-resolv.conf-improve-the-sitation-of-working-with-.patch \
+           file://0001-privsep-Allow-getrandom-sysctl-for-newer-glibc.patch \
+           file://0002-privsep-Allow-newfstatat-syscall-as-well.patch \
            file://dhcpcd.service \
            file://dhcpcd@.service \
            "

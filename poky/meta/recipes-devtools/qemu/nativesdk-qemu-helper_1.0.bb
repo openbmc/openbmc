@@ -1,6 +1,6 @@
 SUMMARY = "Qemu helper scripts"
 LICENSE = "GPL-2.0-only"
-RDEPENDS:${PN} = "nativesdk-qemu \
+RDEPENDS:${PN} = "nativesdk-qemu nativesdk-unfs3 nativesdk-pseudo \
                   nativesdk-python3-shell nativesdk-python3-fcntl nativesdk-python3-logging \
                 "
 

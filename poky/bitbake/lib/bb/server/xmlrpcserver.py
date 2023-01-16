@@ -118,7 +118,7 @@ class BitBakeXMLRPCServerCommands():
         """
         Run a cooker command on the server
         """
-        return self.server.cooker.command.runCommand(command, self.server.readonly)
+        return self.server.cooker.command.runCommand(command, self.server, self.server.readonly)
 
     def getEventHandle(self):
         return self.event_handle

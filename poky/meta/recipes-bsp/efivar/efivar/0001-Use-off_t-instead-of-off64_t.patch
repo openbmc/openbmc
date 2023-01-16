@@ -1,0 +1,39 @@
+From 1eb0fa531301a5045af1b020fc093c4fcfd38680 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 14 Dec 2022 16:55:51 -0800
+Subject: [PATCH] Use off_t instead of off64_t
+
+Pass _FILE_OFFSET_BITS=64 to ensure 64bit off_t
+
+Upstream-Status: Submitted [https://github.com/rhboot/efivar/pull/237]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/error.c             | 2 +-
+ src/include/defaults.mk | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/error.c b/src/error.c
+index fcbba0d..9530e22 100644
+--- a/src/error.c
++++ b/src/error.c
+@@ -191,7 +191,7 @@ dbglog_write(void *cookie, const char *buf, size_t size)
+ }
+ 
+ static int
+-dbglog_seek(void *cookie UNUSED, off64_t *offset, int whence)
++dbglog_seek(void *cookie UNUSED, off_t *offset, int whence)
+ {
+ 	FILE *log = efi_errlog ? efi_errlog : stderr;
+ 	int rc;
+diff --git a/src/include/defaults.mk b/src/include/defaults.mk
+index 632b155..95be8be 100644
+--- a/src/include/defaults.mk
++++ b/src/include/defaults.mk
+@@ -34,6 +34,7 @@ CPPFLAGS ?=
+ override _CPPFLAGS := $(CPPFLAGS)
+ override CPPFLAGS = $(_CPPFLAGS) -DLIBEFIVAR_VERSION=$(VERSION) \
+ 	    -D_GNU_SOURCE \
++	    -D_FILE_OFFSET_BITS=64 \
+ 	    -I$(TOPDIR)/src/include/
+ CFLAGS ?= $(OPTIMIZE) $(DEBUGINFO) $(WARNINGS) $(ERRORS)
+ CFLAGS_GCC ?= -specs=$(TOPDIR)/src/include/gcc.specs \

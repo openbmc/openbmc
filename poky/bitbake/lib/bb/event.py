@@ -68,29 +68,28 @@ _catchall_handlers = {}
 _eventfilter = None
 _uiready = False
 _thread_lock = threading.Lock()
-_thread_lock_enabled = False
-
-if hasattr(__builtins__, '__setitem__'):
-    builtins = __builtins__
-else:
-    builtins = __builtins__.__dict__
+_heartbeat_enabled = False
 
 def enable_threadlock():
-    global _thread_lock_enabled
-    _thread_lock_enabled = True
+    # Always needed now
+    return
 
 def disable_threadlock():
-    global _thread_lock_enabled
-    _thread_lock_enabled = False
+    # Always needed now
+    return
+
+def enable_heartbeat():
+    global _heartbeat_enabled
+    _heartbeat_enabled = True
+
+def disable_heartbeat():
+    global _heartbeat_enabled
+    _heartbeat_enabled = False
 
 def execute_handler(name, handler, event, d):
     event.data = d
-    addedd = False
-    if 'd' not in builtins:
-        builtins['d'] = d
-        addedd = True
     try:
-        ret = handler(event)
+        ret = handler(event, d)
     except (bb.parse.SkipRecipe, bb.BBHandledException):
         raise
     except Exception:
@@ -104,8 +103,7 @@ def execute_handler(name, handler, event, d):
         raise
     finally:
         del event.data
-        if addedd:
-            del builtins['d']
+
 
 def fire_class_handlers(event, d):
     if isinstance(event, logging.LogRecord):
@@ -180,36 +178,30 @@ def print_ui_queue():
 
 def fire_ui_handlers(event, d):
     global _thread_lock
-    global _thread_lock_enabled
 
     if not _uiready:
         # No UI handlers registered yet, queue up the messages
         ui_queue.append(event)
         return
 
-    if _thread_lock_enabled:
-        _thread_lock.acquire()
-
-    errors = []
-    for h in _ui_handlers:
-        #print "Sending event %s" % event
-        try:
-             if not _ui_logfilters[h].filter(event):
-                 continue
-             # We use pickle here since it better handles object instances
-             # which xmlrpc's marshaller does not. Events *must* be serializable
-             # by pickle.
-             if hasattr(_ui_handlers[h].event, "sendpickle"):
-                _ui_handlers[h].event.sendpickle((pickle.dumps(event)))
-             else:
-                _ui_handlers[h].event.send(event)
-        except:
-            errors.append(h)
-    for h in errors:
-        del _ui_handlers[h]
-
-    if _thread_lock_enabled:
-        _thread_lock.release()
+    with bb.utils.lock_timeout(_thread_lock):
+        errors = []
+        for h in _ui_handlers:
+            #print "Sending event %s" % event
+            try:
+                 if not _ui_logfilters[h].filter(event):
+                     continue
+                 # We use pickle here since it better handles object instances
+                 # which xmlrpc's marshaller does not. Events *must* be serializable
+                 # by pickle.
+                 if hasattr(_ui_handlers[h].event, "sendpickle"):
+                    _ui_handlers[h].event.sendpickle((pickle.dumps(event)))
+                 else:
+                    _ui_handlers[h].event.send(event)
+            except:
+                errors.append(h)
+        for h in errors:
+            del _ui_handlers[h]
 
 def fire(event, d):
     """Fire off an Event"""
@@ -253,12 +245,12 @@ def register(name, handler, mask=None, filename=None, lineno=None, data=None):
     if handler is not None:
         # handle string containing python code
         if isinstance(handler, str):
-            tmp = "def %s(e):\n%s" % (name, handler)
+            tmp = "def %s(e, d):\n%s" % (name, handler)
             try:
                 code = bb.methodpool.compile_cache(tmp)
                 if not code:
                     if filename is None:
-                        filename = "%s(e)" % name
+                        filename = "%s(e, d)" % name
                     code = compile(tmp, filename, "exec", ast.PyCF_ONLY_AST)
                     if lineno is not None:
                         ast.increment_lineno(code, lineno-1)
@@ -323,21 +315,23 @@ def set_eventfilter(func):
     _eventfilter = func
 
 def register_UIHhandler(handler, mainui=False):
-    bb.event._ui_handler_seq = bb.event._ui_handler_seq + 1
-    _ui_handlers[_ui_handler_seq] = handler
-    level, debug_domains = bb.msg.constructLogOptions()
-    _ui_logfilters[_ui_handler_seq] = UIEventFilter(level, debug_domains)
-    if mainui:
-        global _uiready
-        _uiready = _ui_handler_seq
-    return _ui_handler_seq
+    with bb.utils.lock_timeout(_thread_lock):
+        bb.event._ui_handler_seq = bb.event._ui_handler_seq + 1
+        _ui_handlers[_ui_handler_seq] = handler
+        level, debug_domains = bb.msg.constructLogOptions()
+        _ui_logfilters[_ui_handler_seq] = UIEventFilter(level, debug_domains)
+        if mainui:
+            global _uiready
+            _uiready = _ui_handler_seq
+        return _ui_handler_seq
 
 def unregister_UIHhandler(handlerNum, mainui=False):
     if mainui:
         global _uiready
         _uiready = False
-    if handlerNum in _ui_handlers:
-        del _ui_handlers[handlerNum]
+    with bb.utils.lock_timeout(_thread_lock):
+        if handlerNum in _ui_handlers:
+            del _ui_handlers[handlerNum]
     return
 
 def get_uihandler():

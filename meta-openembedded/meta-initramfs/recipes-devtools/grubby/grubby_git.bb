@@ -9,25 +9,26 @@ LICENSE = "GPL-2.0-or-later"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=892f569a555ba9c07a568a7c0c4fa63a"
 
-DEPENDS = "popt util-linux"
-DEPENDS:append:libc-musl = " libexecinfo"
+DEPENDS = "popt util-linux rpm"
+DEPENDS:append:libc-musl = " libexecinfo argp-standalone"
 
 S = "${WORKDIR}/git"
-SRCREV = "a1d2ae93408c3408e672d7eba4550fdf27fb0201"
-SRC_URI = "git://github.com/rhboot/grubby.git;protocol=https;;branch=master \
-           file://grubby-rename-grub2-editenv-to-grub-editenv.patch \
+SRCREV = "c01b0d5bb182bde35b464d14996acf354a3ada2e"
+SRC_URI = "git://github.com/rhboot/grubby.git;protocol=https;;branch=main \
+           file://0001-rename-grub2-editenv-to-grub-editenv.patch \
+           file://0002-Add-another-variable-LIBS-to-provides-libraries-from.patch \
+           file://0003-include-paths.h-for-_PATH_MOUNTED.patch \
+           file://0004-rpm-sort-include-string.h-for-strverscmp.patch \
            file://run-ptest \
-           file://0001-Add-another-variable-LIBS-to-provides-libraries-from.patch \
-           file://0002-include-paths.h-for-_PATH_MOUNTED.patch \
            "
 
 RDEPENDS:${PN} += "dracut"
 
 inherit autotools-brokensep ptest
 
-EXTRA_OEMAKE = "-e 'CC=${CC}' 'LDFLAGS=${LDFLAGS}' LIBS='${LIBS}' 'PREFIX'=${@bb.utils.contains('DISTRO_FEATURES','usrmerge','/usr','',d)}"
+EXTRA_OEMAKE = "-e 'CC=${CC}' 'LDFLAGS=${LDFLAGS}' 'LIBS=${LIBS}'"
 
-LIBS:libc-musl = "-lexecinfo"
+LIBS:libc-musl = "-lexecinfo -largp"
 LIBS ?= ""
 do_install_ptest() {
     install -d ${D}${PTEST_PATH}

@@ -15,7 +15,6 @@ PROVIDES = "xtst"
 PE = "1"
 
 XORG_PN = "libXtst"
-XORG_EXT = "tar.xz"
 SRC_URI[sha256sum] = "84f5f30b9254b4ffee14b5b0940e2622153b0d3aed8286a3c5b7eeb340ca33c8"
 
 BBCLASSEXTEND = "native nativesdk"

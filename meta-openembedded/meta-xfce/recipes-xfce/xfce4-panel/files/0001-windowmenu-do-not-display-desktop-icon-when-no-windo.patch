@@ -13,15 +13,19 @@ Content-Transfer-Encoding: 8bit
 Upstream-Status: Pending
 
 Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+
+Rebase for xfce4 4.18.0.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  plugins/windowmenu/windowmenu.c | 10 +++++-----
  1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/plugins/windowmenu/windowmenu.c b/plugins/windowmenu/windowmenu.c
-index f47e993e..061d6544 100644
+index ba245a3..f8fdee8 100644
 --- a/plugins/windowmenu/windowmenu.c
 +++ b/plugins/windowmenu/windowmenu.c
-@@ -251,7 +251,7 @@ window_menu_plugin_init (WindowMenuPlugin *plugin)
+@@ -250,7 +250,7 @@ window_menu_plugin_init (WindowMenuPlugin *plugin)
    g_signal_connect (G_OBJECT (plugin->button), "toggled",
        G_CALLBACK (window_menu_plugin_menu), plugin);
  
@@ -30,16 +34,14 @@ index f47e993e..061d6544 100644
    gtk_container_add (GTK_CONTAINER (plugin->button), plugin->icon);
    gtk_widget_show (plugin->icon);
  }
-@@ -640,7 +640,7 @@ window_menu_plugin_active_window_changed (WnckScreen       *screen,
+@@ -680,19 +680,19 @@ window_menu_plugin_active_window_changed (WnckScreen       *screen,
            /* skip 'fake' windows */
            type = wnck_window_get_window_type (window);
            if (type == WNCK_WINDOW_DESKTOP || type == WNCK_WINDOW_DOCK)
 -            goto show_desktop_icon;
 +            goto show_no_icon;
  
-           /* get the window icon and set the tooltip */
-           gtk_widget_set_tooltip_text (GTK_WIDGET (icon),
-@@ -660,12 +660,12 @@ window_menu_plugin_active_window_changed (WnckScreen       *screen,
+           window_menu_plugin_set_icon (plugin, window);
          }
        else
          {
@@ -47,6 +49,7 @@ index f47e993e..061d6544 100644
 +          show_no_icon:
  
            /* desktop is shown right now */
+           icon_size = xfce_panel_plugin_get_icon_size (XFCE_PANEL_PLUGIN (plugin));
 -          gtk_image_set_from_icon_name (GTK_IMAGE (icon), "user-desktop", icon_size);
 +          gtk_image_set_from_icon_name (GTK_IMAGE (icon), NULL, icon_size);
            gtk_image_set_pixel_size (GTK_IMAGE (icon), icon_size);

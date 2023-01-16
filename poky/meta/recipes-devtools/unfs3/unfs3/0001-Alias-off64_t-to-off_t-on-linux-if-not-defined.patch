@@ -1,0 +1,28 @@
+From 949db882e487d728c44bb68139682b38396dd275 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 14 Dec 2022 14:50:10 -0800
+Subject: [PATCH] Alias off64_t to off_t on linux if not defined
+
+Musl C library does not define off64_t and has 64-bit default off_t
+therefore define off64_t as an alias on linux as well when configure
+detects that off64_t is not provided by a linux system
+
+Upstream-Status: Submitted [https://github.com/unfs3/unfs3/pull/29]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ nfs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/nfs.h b/nfs.h
+index aded011..7996c67 100644
+--- a/nfs.h
++++ b/nfs.h
+@@ -62,7 +62,7 @@ typedef int32_t int32;
+ #endif
+ 
+ #ifndef HAVE_OFF64_T
+-#ifdef __APPLE__
++#if defined(__APPLE__) || defined(__linux__)
+ typedef off_t off64_t;
+ #endif
+ #endif

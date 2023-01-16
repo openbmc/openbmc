@@ -6,6 +6,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=1c65719d42900bb81b83e8293c20a364"
 
 PE = "1"
 
+XORG_PN = "libXaw"
+XORG_EXT = "tar.bz2"
+
 SRC_URI[md5sum] = "c1ce21c296bbf3da3e30cf651649563e"
 SRC_URI[sha256sum] = "76aef98ea3df92615faec28004b5ce4e5c6855e716fa16de40c32030722a6f8e"
 
@@ -23,5 +26,3 @@ FILES:libxaw8 = "${libdir}/libXaw8.so.8*"
 
 # Avoid dependency on libxaw as it is not build
 RDEPENDS:${PN}-dev = ""
-
-XORG_PN = "libXaw"

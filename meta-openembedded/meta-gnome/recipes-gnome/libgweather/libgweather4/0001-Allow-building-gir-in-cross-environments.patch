@@ -11,23 +11,16 @@ For us this works perfectly fine
 Upstream-Status: Inappropriate [OE-specific]
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
----
- libgweather/meson.build | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
 
-diff --git a/libgweather/meson.build b/libgweather/meson.build
-index 08311af..ef554f2 100644
---- a/libgweather/meson.build
-+++ b/libgweather/meson.build
-@@ -208,7 +208,7 @@ lib_libgweather = library('gweather-4',
- )
+--- a/meson.build	2022-09-18 14:48:53.000000000 +0200
++++ b/meson.build	2022-11-26 14:05:13.302487232 +0100
+@@ -51,7 +51,7 @@
+ gen_locations_variant = find_program('build-aux/meson/gen_locations_variant.py')
  
  g_ir_scanner = find_program('g-ir-scanner', required: get_option('introspection'))
 -build_gir = get_option('introspection') and g_ir_scanner.found() and not meson.is_cross_build()
 +build_gir = get_option('introspection') and g_ir_scanner.found()
+ build_docs = get_option('gtk_doc') and build_gir
  
- enable_vala = get_option('enable_vala')
- vapigen = find_program('vapigen', required: enable_vala == 'true')
--- 
-2.34.1
-
+ schemas_srcdir = meson.project_source_root() / 'schemas'

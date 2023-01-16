@@ -1,0 +1,19 @@
+Upstream-Status: Inappropriate
+
+RPI-Distro repo forks original vlc and applies patches
+to enable raspiberry pi support.
+
+--- a/modules/video_chroma/chain.c
++++ b/modules/video_chroma/chain.c
+@@ -280,8 +280,9 @@ static int BuildTransformChain( filter_t
+         return VLC_SUCCESS;
+ 
+     /* Lets try resize+chroma first, then transform */
+-    msg_Dbg( p_filter, "Trying to build chroma+resize" );
+-    EsFormatMergeSize( &fmt_mid, &p_filter->fmt_out, &p_filter->fmt_in );
++    msg_Dbg( p_filter, "Trying to build chroma+resize, then transform" );
++    es_format_Copy( &fmt_mid, &p_filter->fmt_out );
++    video_format_TransformTo(&fmt_mid.video, p_filter->fmt_in.video.orientation);
+     i_ret = CreateChain( p_filter, &fmt_mid );
+     es_format_Clean( &fmt_mid );
+     if( i_ret == VLC_SUCCESS )

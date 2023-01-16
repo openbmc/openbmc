@@ -1,4 +1,4 @@
-From 15668161c351aee5f29152db2972b1648da11210 Mon Sep 17 00:00:00 2001
+From d9048788d906774b1475c3bb1b17e22455c2add4 Mon Sep 17 00:00:00 2001
 From: Saul Wold <sgw@linux.intel.com>
 Date: Wed, 16 Aug 2017 11:16:30 +0800
 Subject: [PATCH] use pkgconfig instead of npth config
@@ -15,7 +15,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 8 insertions(+), 45 deletions(-)
 
 diff --git a/m4/npth.m4 b/m4/npth.m4
-index 06cdaee..4adda01 100644
+index 619ed89..0cb354d 100644
 --- a/m4/npth.m4
 +++ b/m4/npth.m4
 @@ -19,25 +19,10 @@ AC_DEFUN([_AM_PATH_NPTH_CONFIG],
@@ -25,7 +25,7 @@ index 06cdaee..4adda01 100644
 +  AC_PATH_PROG(PKGCONFIG, pkg-config, no)
  
 -  use_gpgrt_config=""
--  if test x"$NPTH_CONFIG" = x -a x"$GPGRT_CONFIG" != x -a "$GPGRT_CONFIG" != "no"; then
+-  if test x"$GPGRT_CONFIG" != x -a "$GPGRT_CONFIG" != "no"; then
 -    if $GPGRT_CONFIG npth --exists; then
 -      NPTH_CONFIG="$GPGRT_CONFIG npth"
 -      AC_MSG_NOTICE([Use gpgrt-config as npth-config])

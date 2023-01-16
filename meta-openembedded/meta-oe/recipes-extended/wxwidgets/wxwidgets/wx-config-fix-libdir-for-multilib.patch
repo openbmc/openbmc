@@ -5,6 +5,10 @@ cross compile. And set default value of baselib with "lib${wxPLATFORM_LIB_DIR}".
 Upstream-Status: Pending [oe specific]
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for wxWidgets 3.2.1. Replace wxPLATFORM_LIB_DIR with variable LIB_SUFFIX.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  build/cmake/config.cmake | 2 +-
  wx-config.in             | 6 ++++--
@@ -50,7 +54,7 @@ index e3f7d115bb..0e78af03c7 100755
  # Determine the base directories we require.
  prefix=${input_option_prefix-${this_prefix:-@prefix@}}
  exec_prefix=${input_option_exec_prefix-${input_option_prefix-${this_exec_prefix:-@exec_prefix@}}}
-+baselib=${input_option_baselib:-lib@wxPLATFORM_LIB_DIR@}
++baselib=${input_option_baselib:-lib${LIB_SUFFIX}}
  wxconfdir="@libdir@/wx/config"
  
  installed_configs=`cd "$wxconfdir" 2> /dev/null && ls | grep -v "^inplace-"`

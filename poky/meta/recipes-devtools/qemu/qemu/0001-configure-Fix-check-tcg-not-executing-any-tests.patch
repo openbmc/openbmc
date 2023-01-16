@@ -1,0 +1,56 @@
+From f295491361ed7fbe729ef6f029d83f68b8e2bee3 Mon Sep 17 00:00:00 2001
+From: Mukilan Thiyagarajan <quic_mthiyaga@quicinc.com>
+Date: Wed, 21 Dec 2022 09:04:06 +0000
+Subject: [PATCH] configure: Fix check-tcg not executing any tests
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+After configuring with --target-list=hexagon-linux-user
+running `make check-tcg` just prints the following:
+
+```
+make: Nothing to be done for 'check-tcg'
+```
+
+In the probe_target_compiler function, the 'break'
+command is used incorrectly. There are no lexically
+enclosing loops associated with that break command which
+is an unspecfied behaviour in the POSIX standard.
+
+The dash shell implementation aborts the currently executing
+loop, in this case, causing the rest of the logic for the loop
+in line 2490 to be skipped, which means no Makefiles are
+generated for the tcg target tests.
+
+Fixes: c3b570b5a9a24d25 (configure: don't enable
+cross compilers unless in target_list)
+
+Signed-off-by: Mukilan Thiyagarajan <quic_mthiyaga@quicinc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Link: https://patchew.org/QEMU/20221207082309.9966-1-quic._5Fmthiyaga@quicinc.com/
+Message-Id: <20221207082309.9966-1-quic_mthiyaga@quicinc.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Message-Id: <20221221090411.1995037-2-alex.bennee@linaro.org>
+
+Upstream-Status: Backport [https://github.com/qemu/qemu/commit/73acb87be536d23e42db73a306104d8fd316ff20]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ configure | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/configure b/configure
+index 0c1db72b8..6b4589273 100755
+--- a/configure
++++ b/configure
+@@ -1881,9 +1881,7 @@ probe_target_compiler() {
+   # We shall skip configuring the target compiler if the user didn't
+   # bother enabling an appropriate guest. This avoids building
+   # extraneous firmware images and tests.
+-  if test "${target_list#*$1}" != "$1"; then
+-      break;
+-  else
++  if test "${target_list#*$1}" = "$1"; then
+       return 1
+   fi
+ 

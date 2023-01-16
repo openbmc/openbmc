@@ -5,7 +5,7 @@ space, Python, and Java programs"
 HOMEPAGE = "https://github.com/abrt/satyr"
 LICENSE = "GPL-2.0-only"
 
-inherit autotools-brokensep python3native pkgconfig
+inherit autotools-brokensep python3native python3targetconfig pkgconfig
 
 SRC_URI = "git://github.com/abrt/satyr.git;branch=master;protocol=https \
            file://0002-fix-compile-failure-against-musl-C-library.patch \

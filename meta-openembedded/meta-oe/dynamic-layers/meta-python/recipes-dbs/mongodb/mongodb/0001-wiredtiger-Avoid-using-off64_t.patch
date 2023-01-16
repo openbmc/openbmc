@@ -1,0 +1,30 @@
+From 0508c1518c2e7c586a231d344e9f93b08507885b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 31 Dec 2022 14:23:40 -0800
+Subject: [PATCH] wiredtiger: Avoid using off64_t
+
+off64_t is not available on musl since off_t is already 64bit by
+default. Therefore replace using off64_t with off_t
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/third_party/wiredtiger/src/os_posix/os_fs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/third_party/wiredtiger/src/os_posix/os_fs.c b/src/third_party/wiredtiger/src/os_posix/os_fs.c
+index 3898eb74343..9ce2d5edb38 100644
+--- a/src/third_party/wiredtiger/src/os_posix/os_fs.c
++++ b/src/third_party/wiredtiger/src/os_posix/os_fs.c
+@@ -533,7 +533,7 @@ __posix_file_sync_nowait(WT_FILE_HANDLE *file_handle, WT_SESSION *wt_session)
+     pfh = (WT_FILE_HANDLE_POSIX *)file_handle;
+ 
+     /* See comment in __posix_sync(): sync cannot be retried or fail. */
+-    WT_SYSCALL(sync_file_range(pfh->fd, (off64_t)0, (off64_t)0, SYNC_FILE_RANGE_WRITE), ret);
++    WT_SYSCALL(sync_file_range(pfh->fd, 0, 0, SYNC_FILE_RANGE_WRITE), ret);
+     if (ret == 0)
+         return (0);
+ 
+-- 
+2.39.0
+

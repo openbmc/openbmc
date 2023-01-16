@@ -101,8 +101,8 @@ def get_statements(filename, absolute_filename, base_name):
             cached_statements[absolute_filename] = statements
         return statements
 
-def handle(fn, d, include):
-    global __func_start_regexp__, __inherit_regexp__, __export_func_regexp__, __addtask_regexp__, __addhandler_regexp__, __infunc__, __body__, __residue__, __classname__
+def handle(fn, d, include, baseconfig=False):
+    global __infunc__, __body__, __residue__, __classname__
     __body__ = []
     __infunc__ = []
     __classname__ = ""
@@ -154,7 +154,7 @@ def handle(fn, d, include):
     return d
 
 def feeder(lineno, s, fn, root, statements, eof=False):
-    global __func_start_regexp__, __inherit_regexp__, __export_func_regexp__, __addtask_regexp__, __addhandler_regexp__, __def_regexp__, __python_func_regexp__, __inpython__, __infunc__, __body__, bb, __residue__, __classname__
+    global __inpython__, __infunc__, __body__, __residue__, __classname__
 
     # Check tabs in python functions:
     # - def py_funcname(): covered by __inpython__
@@ -265,7 +265,7 @@ def feeder(lineno, s, fn, root, statements, eof=False):
         ast.handleInherit(statements, fn, lineno, m)
         return
 
-    return ConfHandler.feeder(lineno, s, fn, statements)
+    return ConfHandler.feeder(lineno, s, fn, statements, conffile=False)
 
 # Add us to the handlers list
 from .. import handlers

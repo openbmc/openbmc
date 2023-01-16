@@ -20,7 +20,7 @@ SRC_URI[sha256sum] = "0d305ad8ccd3974d6b632f74325b1b8a39304c905c6b405b70f52c4cfd
 
 RDEPENDS:${PN} += "gstreamer1.0-plugins-good"
 
-EXTRA_OECONF = "--disable-gtk-doc"
+EXTRA_OECONF = "--disable-gtk-doc DATADIRNAME=share"
 
 PACKAGECONFIG ??= "notify"
 PACKAGECONFIG[clutter] = "--enable-clutter, --disable-clutter, clutter"

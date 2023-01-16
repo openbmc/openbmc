@@ -2,6 +2,7 @@
 Description=Start psplash boot splash screen
 DefaultDependencies=no
 RequiresMountsFor=/run
+ConditionFileIsExecutable=/usr/bin/psplash
 
 [Service]
 Type=notify

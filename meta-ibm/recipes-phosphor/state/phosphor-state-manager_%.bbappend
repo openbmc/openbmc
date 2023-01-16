@@ -1,5 +1,8 @@
 EXTRA_OEMESON:append:witherspoon = " -Dwarm-reboot=disabled"
 
+# IBM systems only want power restore when AC loss occurred
+EXTRA_OEMESON:append = " -Donly-run-apr-on-power-loss=true"
+
 # The scheduled-host-transition package provides support to
 # schedule power on and off operations for the host at some
 # time in the future. IBM systems will utilize this feature

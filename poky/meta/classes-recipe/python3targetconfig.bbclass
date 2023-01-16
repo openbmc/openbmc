@@ -10,26 +10,32 @@ EXTRA_PYTHON_DEPENDS ?= ""
 EXTRA_PYTHON_DEPENDS:class-target = "python3"
 DEPENDS:append = " ${EXTRA_PYTHON_DEPENDS}"
 
-do_configure:prepend:class-target() {
+setup_target_config() {
         export _PYTHON_SYSCONFIGDATA_NAME="_sysconfigdata"
+        export PYTHONPATH=${STAGING_LIBDIR}/python-sysconfigdata
+        export PATH=${STAGING_EXECPREFIXDIR}/python-target-config/:$PATH
+}
+
+do_configure:prepend:class-target() {
+        setup_target_config
 }
 
 do_compile:prepend:class-target() {
-        export _PYTHON_SYSCONFIGDATA_NAME="_sysconfigdata"
+        setup_target_config
 }
 
 do_install:prepend:class-target() {
-        export _PYTHON_SYSCONFIGDATA_NAME="_sysconfigdata"
+        setup_target_config
 }
 
 do_configure:prepend:class-nativesdk() {
-        export _PYTHON_SYSCONFIGDATA_NAME="_sysconfigdata"
+        setup_target_config
 }
 
 do_compile:prepend:class-nativesdk() {
-        export _PYTHON_SYSCONFIGDATA_NAME="_sysconfigdata"
+        setup_target_config
 }
 
 do_install:prepend:class-nativesdk() {
-        export _PYTHON_SYSCONFIGDATA_NAME="_sysconfigdata"
+        setup_target_config
 }

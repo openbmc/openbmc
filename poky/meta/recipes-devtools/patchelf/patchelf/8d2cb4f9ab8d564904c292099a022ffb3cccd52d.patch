@@ -1,0 +1,104 @@
+From 8d2cb4f9ab8d564904c292099a022ffb3cccd52d Mon Sep 17 00:00:00 2001
+From: Jason <otherjason@nodomain.com>
+Date: Fri, 2 Dec 2022 10:01:41 -0500
+Subject: [PATCH] Fix bug in file shifting that could cause conflicting PT_LOAD
+ segments
+
+When a section in the file needs to be enlarged (e.g. to accommodate
+setting a larger RPATH), shiftFile() is used to shift all content
+following the growing section to a later position in the file.
+
+Commit 109b771f53ee3d37ede8c0f165665605183c0975 introduced logic to
+ensure that, after the segment split, no sections span multiple
+segments. This is done by sliding the portion of the segment after the
+split point later in the file, then adding a new PT_LOAD segment that
+contains the preceding data plus the extra room that is being added. The
+existing implementation does this by simply adding
+`extraPages*getPageSize()` bytes to the number of bytes ahead of the
+split point in the segment.
+
+However, this approach can result in two PT_LOAD segments that overlap
+when page boundaries are taken into account. As an example, this PT_LOAD
+section (taken from a Python 3.10 binary):
+
+LOAD           0x0000000000000000 0x0000000000400000 0x0000000000400000
+               0x0000000000000948 0x0000000000000948  R E    0x200000
+
+is split into the following two sections:
+
+LOAD           0x0000000000000000 0x00000000003ff000 0x00000000003ff000
+               0x0000000000001594 0x0000000000001594  R E    0x1000
+LOAD           0x0000000000001594 0x0000000000400594 0x0000000000400594
+               0x00000000000003b4 0x00000000000003b4  R E    0x1000
+
+Note that the two PT_LOAD sections both contain the memory page at
+address 0x400000. The Linux kernel's ELF loader (at least as of v4.18)
+does not accept this as a valid ELF executable, triggering a segfault
+with si_code=SI_KERNEL immediately when the binary is executed.
+
+The fix here is to set the length of the segment that comes before the
+split point more carefully; instead of adding `extraPages*getPageSize()`
+bytes to the portion of the segment that came before the split, the
+actual number of padding bytes that were needed (before rounding up to
+the next multiple of the page size) are used. This avoids the overlap
+in the PT_LOAD segments and makes the output files executable again.
+---
+ src/patchelf.cc | 10 ++++++----
+ src/patchelf.h  |  2 +-
+ 2 files changed, 7 insertions(+), 5 deletions(-)
+
+Upstream-Status: Submitted [https://github.com/NixOS/patchelf/pull/447]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: git/src/patchelf.cc
+===================================================================
+--- git.orig/src/patchelf.cc
++++ git/src/patchelf.cc
+@@ -432,7 +432,7 @@ static uint64_t roundUp(uint64_t n, uint
+ 
+ 
+ template<ElfFileParams>
+-void ElfFile<ElfFileParamNames>::shiftFile(unsigned int extraPages, size_t startOffset)
++void ElfFile<ElfFileParamNames>::shiftFile(unsigned int extraPages, size_t startOffset, size_t extraBytes)
+ {
+     assert(startOffset >= sizeof(Elf_Ehdr));
+ 
+@@ -508,7 +508,7 @@ void ElfFile<ElfFileParamNames>::shiftFi
+     wri(phdr.p_offset, phdrs.at(splitIndex).p_offset - splitShift - shift);
+     wri(phdr.p_paddr, phdrs.at(splitIndex).p_paddr - splitShift - shift);
+     wri(phdr.p_vaddr, phdrs.at(splitIndex).p_vaddr - splitShift - shift);
+-    wri(phdr.p_filesz, wri(phdr.p_memsz, splitShift + shift));
++    wri(phdr.p_filesz, wri(phdr.p_memsz, splitShift + extraBytes));
+     wri(phdr.p_flags, PF_R | PF_W);
+     wri(phdr.p_align, getPageSize());
+ }
+@@ -898,12 +898,14 @@ void ElfFile<ElfFileParamNames>::rewrite
+         neededSpace += sizeof(Elf_Phdr);
+         debug("needed space is %d\n", neededSpace);
+ 
+-        unsigned int neededPages = roundUp(neededSpace - startOffset, getPageSize()) / getPageSize();
++        /* Calculate how many bytes are needed out of the additional pages. */
++        size_t extraSpace = neededSpace - startOffset; 
++        unsigned int neededPages = roundUp(extraSpace, getPageSize()) / getPageSize();
+         debug("needed pages is %d\n", neededPages);
+         if (neededPages * getPageSize() > firstPage)
+             error("virtual address space underrun!");
+ 
+-        shiftFile(neededPages, startOffset);
++        shiftFile(neededPages, startOffset, extraSpace);
+ 
+         firstPage -= neededPages * getPageSize();
+         startOffset += neededPages * getPageSize();
+Index: git/src/patchelf.h
+===================================================================
+--- git.orig/src/patchelf.h
++++ git/src/patchelf.h
+@@ -77,7 +77,7 @@ private:
+ 
+     void sortShdrs();
+ 
+-    void shiftFile(unsigned int extraPages, size_t sizeOffset);
++    void shiftFile(unsigned int extraPages, size_t sizeOffset, size_t extraBytes);
+ 
+     std::string getSectionName(const Elf_Shdr & shdr) const;
+ 

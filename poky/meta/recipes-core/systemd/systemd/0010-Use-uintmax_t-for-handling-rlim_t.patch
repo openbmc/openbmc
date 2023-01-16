@@ -27,11 +27,9 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  src/core/execute.c      |  4 ++--
  3 files changed, 9 insertions(+), 15 deletions(-)
 
-diff --git a/src/basic/format-util.h b/src/basic/format-util.h
-index 8719df3e29..9becc96066 100644
 --- a/src/basic/format-util.h
 +++ b/src/basic/format-util.h
-@@ -34,13 +34,7 @@ assert_cc(sizeof(gid_t) == sizeof(uint32_t));
+@@ -34,13 +34,7 @@ assert_cc(sizeof(gid_t) == sizeof(uint32
  #  error Unknown timex member size
  #endif
  
@@ -46,11 +44,9 @@ index 8719df3e29..9becc96066 100644
  
  #if SIZEOF_DEV_T == 8
  #  define DEV_FMT "%" PRIu64
-diff --git a/src/basic/rlimit-util.c b/src/basic/rlimit-util.c
-index 33dfde9d6c..e018fd81fd 100644
 --- a/src/basic/rlimit-util.c
 +++ b/src/basic/rlimit-util.c
-@@ -44,7 +44,7 @@ int setrlimit_closest(int resource, const struct rlimit *rlim) {
+@@ -44,7 +44,7 @@ int setrlimit_closest(int resource, cons
              fixed.rlim_max == highest.rlim_max)
                  return 0;
  
@@ -59,7 +55,7 @@ index 33dfde9d6c..e018fd81fd 100644
  
          return RET_NERRNO(setrlimit(resource, &fixed));
  }
-@@ -307,13 +307,13 @@ int rlimit_format(const struct rlimit *rl, char **ret) {
+@@ -307,13 +307,13 @@ int rlimit_format(const struct rlimit *r
          if (rl->rlim_cur >= RLIM_INFINITY && rl->rlim_max >= RLIM_INFINITY)
                  r = free_and_strdup(&s, "infinity");
          else if (rl->rlim_cur >= RLIM_INFINITY)
@@ -86,11 +82,9 @@ index 33dfde9d6c..e018fd81fd 100644
  
          return 1;
  }
-diff --git a/src/core/execute.c b/src/core/execute.c
-index fccfb9268c..90f00e10a5 100644
 --- a/src/core/execute.c
 +++ b/src/core/execute.c
-@@ -5633,9 +5633,9 @@ void exec_context_dump(const ExecContext *c, FILE* f, const char *prefix) {
+@@ -5869,9 +5869,9 @@ void exec_context_dump(const ExecContext
          for (unsigned i = 0; i < RLIM_NLIMITS; i++)
                  if (c->rlimit[i]) {
                          fprintf(f, "%sLimit%s: " RLIM_FMT "\n",

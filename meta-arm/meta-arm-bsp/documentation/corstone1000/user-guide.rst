@@ -18,9 +18,7 @@ for more information.
 
 Prerequisites
 -------------
-These instructions assume your host PC is running Ubuntu Linux 18.04 or 20.04 LTS, with
-at least 32GB of free disk space and 16GB of RAM as minimum requirement. The
-following instructions expect that you are using a bash shell.
+These instructions assume your host PC is running Ubuntu Linux 18.04 or 20.04 LTS, with at least 32GB of free disk space and 16GB of RAM as minimum requirement. The following instructions expect that you are using a bash shell. All the paths stated in this document are absolute paths.
 
 The following prerequisites must be available on the host system. To resolve these dependencies, run:
 
@@ -146,11 +144,13 @@ commands to build the stack. To install kas tool, run:
 
     pip3 install kas
 
+If 'kas' command is not found in command-line, please make sure the user installation directories are visible on $PATH. If you have sudo rights, try 'sudo pip3 install kas'. 
+
 In the top directory of the workspace ``<_workspace>``, run:
 
 ::
 
-    git clone https://git.yoctoproject.org/git/meta-arm -b CORSTONE1000-2022.11.10
+    git clone https://git.yoctoproject.org/git/meta-arm -b CORSTONE1000-2022.11.23
 
 To build a Corstone-1000 image for MPS3 FPGA, run:
 
@@ -215,9 +215,10 @@ The directory structure of the FPGA bundle is shown below.
     └── config.txt
 
 Depending upon the MPS3 board version (printed on the MPS3 board) you should update the images.txt file
-(in corresponding HBI0309x folder) so that the file points to the images under SOFTWARE directory.
+(in corresponding HBI0309x folder. Boardfiles/MB/HBI0309<board_revision>/AN550/images.txt) so that the file points to the images under SOFTWARE directory.
 
-Here is an example
+The images.txt file that is compatible with the latest version of the software
+stack can be seen below;
 
 ::
 
@@ -289,6 +290,9 @@ logs on the serial port terminals. Once the HOST(Cortex-A35) is
 booted completely, user can login to the shell using
 **"root"** login.
 
+If system does not boot and only the ttyUSB1 logs are visible, please follow the steps in `Clean Secure Flash Before Testing (applicable to FPGA only)`_ under `SystemReady-IR tests`_ section. The previous image used in FPGA (MPS3) might have filled the Secure Flash completely. The best practice is to clean the secure flash in this case.
+
+
 Running the software on FVP
 ---------------------------
 
@@ -299,8 +303,11 @@ A Yocto recipe is provided and allows to download the latest supported FVP versi
 
 The recipe is located at <_workspace>/meta-arm/meta-arm/recipes-devtools/fvp/fvp-corstone1000.bb
 
-The latest supported Fixed Virtual Platform (FVP) version is 11.19_21 and is automatically downloaded
-and installed when using the runfvp command as detailed below.
+The latest supported Fixed Virtual Platform (FVP) version is 11.19_21 and is automatically downloaded and installed when using the runfvp command as detailed below. The FVP version can be checked by running the following command:
+
+::
+
+<_workspace>/meta-arm/scripts/runfvp <_workspace>/build/tmp/deploy/images/corstone1000-fvp/corstone1000-image-corstone1000-fvp.fvpconf -- --version
 
 The FVP can also be manually downloaded from the `Arm Ecosystem FVPs`_ page. On this page, navigate
 to "Corstone IoT FVPs" section to download the Corstone-1000 platform FVP installer.  Follow the
@@ -361,8 +368,8 @@ boot. Run following commands to build such image.
 ::
 
   cd <_workspace>
-  git clone https://git.yoctoproject.org/git/meta-arm -b CORSTONE1000-2022.11.10
-  git clone https://git.gitlab.arm.com/arm-reference-solutions/systemready-patch.git
+  git clone https://git.yoctoproject.org/git/meta-arm -b CORSTONE1000-2022.11.23
+  git clone https://git.gitlab.arm.com/arm-reference-solutions/systemready-patch.git -b CORSTONE1000-2022.11.23
   cp -f systemready-patch/embedded-a/corstone1000/erase_flash/0001-arm-bsp-trusted-firmware-m-corstone1000-Clean-Secure.patch meta-arm
   cd meta-arm
   git apply 0001-arm-bsp-trusted-firmware-m-corstone1000-Clean-Secure.patch
@@ -374,7 +381,8 @@ Replace the bl1.bin and cs1000.bin files on the SD card with following files:
   - The flash image: <_workspace>/build/tmp/deploy/images/corstone1000-mps3/corstone1000-image-corstone1000-mps3.wic.nopt
 
 Now reboot the board. This step erases the Corstone-1000 SecureEnclave flash
-completely, the user should expect following message from TF-M log:
+completely, the user should expect following message from TF-M log (can be seen
+in ttyUSB1):
 
 ::
 
@@ -388,7 +396,7 @@ software stack and flash the FPGA as normal. And continue the testing.
 Run SystemReady-IR ACS tests
 =============================
 
-ACS image contains two partitions. BOOT partition and RESULTS partition.
+ACS image contains two partitions. BOOT partition and RESULT partition.
 Following packages are under BOOT partition
 
  * SCT
@@ -398,8 +406,8 @@ Following packages are under BOOT partition
  * grub
  * uefi manual capsule application
 
-RESULTS partition is used to store the test results.
-PLEASE MAKE SURE THAT THE RESULTS PARTITION IS EMPTY BEFORE YOU START THE TESTING. OTHERWISE THE TEST RESULTS
+RESULT partition is used to store the test results.
+PLEASE MAKE SURE THAT THE RESULT PARTITION IS EMPTY BEFORE YOU START THE TESTING. OTHERWISE THE TEST RESULTS
 WILL NOT BE CONSISTENT
 
 FPGA instructions for ACS image
@@ -441,6 +449,8 @@ Once the USB stick with ACS image is prepared, the user should make sure that
 ensure that only the USB stick with the ACS image is connected to the board,
 and then boot the board.
 
+The FPGA will reset multiple times during the test, and it might take approx. 24-36 hours to finish the test. At the end of test, the FPGA host terminal will halt showing a shell prompt. Once test is finished the result can be copied following above instructions.
+
 FVP instructions for ACS image and run
 ============================================
 
@@ -456,7 +466,7 @@ SD card.
 
   tmux
 
-  <_workspace>/meta-arm/scripts/runfvp <_workspace>/build/tmp/deploy/images/corstone1000-fvp/corstone1000-image-corstone1000-fvp.fvpconf – -C board.msd_mmc.p_mmc_file="${<path-to-img>/ir_acs_live_image.img}"
+  <_workspace>/meta-arm/scripts/runfvp <_workspace>/build/tmp/deploy/images/corstone1000-fvp/corstone1000-image-corstone1000-fvp.fvpconf -- -C board.msd_mmc.p_mmc_file="${<path-to-img>/ir_acs_live_image.img}"
 
 The test results can be fetched using following commands:
 
@@ -488,7 +498,7 @@ automatically in the following sequence:
  - FWTS
  - BSA Linux
 
-The results can be fetched from the ``acs_results`` partition of the USB stick (FPGA) / SD Card (FVP).
+The results can be fetched from the ``acs_results`` folder in the RESULT partition of the USB stick (FPGA) / SD Card (FVP).
 
 #####################################################
 
@@ -757,11 +767,29 @@ In the Linux command-line run the following:
 Negative scenario
 =================
 
-In the negative case scenario, the user should see appropriate logs in
-the secure enclave terminal. If capsule pass initial verification, but fails
-verifications performed during boot time, secure enclave will try new images
-predetermined number of times (defined in the code), before reverting back to
-the previous good bank.
+In the negative case scenario (rollback the capsule version), the user should 
+see appropriate logs in the secure enclave terminal. 
+
+::
+
+  ...  
+    uefi_capsule_retrieve_images: image 0 at 0xa0000070, size=15654928
+    uefi_capsule_retrieve_images: exit
+    flash_full_capsule: enter: image = 0x0xa0000070, size = 15654928, version = 10
+    ERROR: flash_full_capsule: version error
+    private_metadata_write: enter: boot_index = 1
+    private_metadata_write: success
+    fmp_set_image_info:133 Enter
+    FMP image update: image id = 0
+    FMP image update: status = 1version=11 last_attempt_version=10.
+    fmp_set_image_info:157 Exit.
+    corstone1000_fwu_flash_image: exit: ret = -1
+  ...
+
+
+If capsule pass initial verification, but fails verifications performed during 
+boot time, secure enclave will try new images predetermined number of times 
+(defined in the code), before reverting back to the previous good bank.
 
 ::
 
@@ -803,7 +831,7 @@ Linux distros tests
 Debian/OpenSUSE install and boot (applicable to FPGA only)
 ***************************************************************************************
 
-To test Linux distro install and boot, the user should prepare two empty USB sticks.
+To test Linux distro install and boot, the user should prepare two empty USB sticks (minimum size should be 4GB and formatted with FAT32).
 
 Download one of following Linux distro images:
  - Debian installer image: https://cdimage.debian.org/cdimage/weekly-builds/arm64/iso-dvd/
@@ -819,7 +847,7 @@ file into the first USB stick, run:
 
 ::
 
-  sudo dd if=</path/to/iso_file> of=/dev/sdb iflag=direct oflag=direct status=progress bs=1M; sync;
+  sudo dd if=<path-to-iso_file> of=/dev/sdb iflag=direct oflag=direct status=progress bs=1M; sync;
 
 Boot the MSP3 board with the first USB stick connected. Open following minicom sessions:
 
@@ -828,9 +856,7 @@ Boot the MSP3 board with the first USB stick connected. Open following minicom s
   sudo picocom -b 115200 /dev/ttyUSB0  # in one terminal
   sudo picocom -b 115200 /dev/ttyUSB2  # in another terminal.
 
-Press <Ctrl+x>.
-
-Now plug in the second USB stick, the distro installation process will start.
+Now plug in the second USB stick (once installation screen is visible), the distro installation process will start. The installation prompt can be seen in ttyUSB2. If installer does not start, please try to reboot the board with both USB sticks connected and repeat the process.
 
 **NOTE:** Due to the performance limitation of Corstone-1000 MPS3 FPGA, the
 distro installation process can take up to 24 hours to complete.
@@ -922,7 +948,7 @@ First, load FF-A TEE kernel module:
 
 ::
 
-  insmod /lib/modules/5.19.9-yocto-standard/extra/arm-ffa-tee.ko
+  insmod /lib/modules/5.19.14-yocto-standard/extra/arm-ffa-tee.ko
 
 Then, check whether the FF-A TEE driver is loaded correctly by using the following command:
 
@@ -1034,7 +1060,7 @@ The output on the Host terminal should be:
 Tests results
 -----------------------------------
 
-As a reference for the end user, reports for various tests for `Corstone-1000 software (CORSTONE1000-2022.11.10) <https://git.yoctoproject.org/meta-arm/tag/?h=CORSTONE1000-2022.11.10>`__
+As a reference for the end user, reports for various tests for `Corstone-1000 software (CORSTONE1000-2022.11.23) <https://git.yoctoproject.org/meta-arm/tag/?h=CORSTONE1000-2022.11.23>`__
 can be found in `here <https://gitlab.arm.com/arm-reference-solutions/arm-reference-solutions-test-report/-/tree/master/embedded-a/corstone1000>`__.
 
 Running the software on FVP on Windows

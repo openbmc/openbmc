@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 Release notes for Yocto-4.0.5 (Kirkstone)
 -----------------------------------------
 
@@ -28,7 +30,7 @@ Fixes in Yocto-4.0.5
 -  build-appliance-image: Update to kirkstone head revision (4a88ada)
 -  busybox: add devmem 128-bit support
 -  classes: files: Extend overlayfs-etc class
--  coreutils: add openssl PACKAGECONFIG
+-  coreutils: add openssl :term:`PACKAGECONFIG`
 -  create-pull-request: don't switch the git remote protocol to git://
 -  dev-manual: fix reference to BitBake user manual
 -  expat: upgrade 2.4.8 -> 2.4.9
@@ -39,15 +41,15 @@ Fixes in Yocto-4.0.5
 -  glibc-locale: explicitly remove empty dirs in ${libdir}
 -  glibc-tests: use += instead of :append
 -  glibc: stable 2.35 branch updates.(8d125a1f)
--  go-native: switch from SRC_URI:append to SRC_URI +=
+-  go-native: switch from SRC_URI:append to :term:`SRC_URI` +=
 -  image_types_wic.bbclass: fix cross binutils dependency
 -  kern-tools: allow 'y' or 'm' to avoid config audit warnings
--  kern-tools: fix queue processing in relative TOPDIR configurations
+-  kern-tools: fix queue processing in relative :term:`TOPDIR` configurations
 -  kernel-yocto: allow patch author date to be commit date
 -  libpng: upgrade to 1.6.38
 -  linux-firmware: package new Qualcomm firmware
 -  linux-firmware: upgrade 20220708 -> 20220913
--  linux-libc-headers: switch from SRC_URI:append to SRC_URI +=
+-  linux-libc-headers: switch from SRC_URI:append to :term:`SRC_URI` +=
 -  linux-yocto-dev: add qemuarm64
 -  linux-yocto/5.10: update to v5.10.149
 -  linux-yocto/5.15: cfg: fix ACPI warnings for -tiny
@@ -63,7 +65,7 @@ Fixes in Yocto-4.0.5
 -  perf: Fix for recent kernel upgrades
 -  poky.conf: bump version for 4.0.5
 -  poky.yaml.in: update version requirements
--  python3-rfc3986-validator: switch from SRC_URI:append to SRC_URI +=
+-  python3-rfc3986-validator: switch from SRC_URI:append to :term:`SRC_URI` +=
 -  python3: upgrade 3.10.4 -> 3.10.7
 -  qemu: Backport patches from upstream to support float128 on qemu-ppc64
 -  rpm: Remove -Wimplicit-function-declaration warnings
@@ -72,7 +74,7 @@ Fixes in Yocto-4.0.5
 -  stress-cpu: disable float128 math on powerpc64 to avoid SIGILL
 -  tune-neoversen2: support tune-neoversen2 base on armv9a
 -  tzdata: update to 2022d
--  u-boot: switch from append to += in SRC_URI
+-  u-boot: switch from append to += in :term:`SRC_URI`
 -  uninative: Upgrade to 3.7 to work with glibc 2.36
 -  vim: Upgrade to 9.0.0598
 -  webkitgtk: Update to 2.36.7

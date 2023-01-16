@@ -7,6 +7,8 @@ DEPENDS += " xorgproto zlib"
 PE = "1"
 PR = "r11"
 
+XORG_EXT = "tar.bz2"
+
 SRC_URI += "file://mkg3states-1.1.patch \
             file://0001-lbx_zlib-Mark-declration-with-extern.patch \
            "

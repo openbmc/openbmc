@@ -552,8 +552,8 @@ through dependency chains are more complex and are generally
 accomplished with a Python function. The code in
 ``meta/lib/oe/sstatesig.py`` shows two examples of this and also
 illustrates how you can insert your own policy into the system if so
-desired. This file defines the two basic signature generators
-OpenEmbedded-Core uses: "OEBasic" and "OEBasicHash". By default, there
+desired. This file defines the basic signature generator
+OpenEmbedded-Core uses: "OEBasicHash". By default, there
 is a dummy "noop" signature handler enabled in BitBake. This means that
 behavior is unchanged from previous versions. ``OE-Core`` uses the
 "OEBasicHash" signature handler by default through this setting in the
@@ -561,14 +561,13 @@ behavior is unchanged from previous versions. ``OE-Core`` uses the
 
   BB_SIGNATURE_HANDLER ?= "OEBasicHash"
 
-The "OEBasicHash" :term:`BB_SIGNATURE_HANDLER` is the same as the "OEBasic"
-version but adds the task hash to the stamp files. This results in any
-metadata change that changes the task hash, automatically causing the
-task to be run again. This removes the need to bump
-:term:`PR` values, and changes to metadata automatically
-ripple across the build.
+The main feature of the "OEBasicHash" :term:`BB_SIGNATURE_HANDLER` is that
+it adds the task hash to the stamp files. Thanks to this, any metadata
+change will change the task hash, automatically causing the task to be run
+again. This removes the need to bump :term:`PR` values, and changes to
+metadata automatically ripple across the build.
 
-It is also worth noting that the end result of these signature
+It is also worth noting that the end result of signature
 generators is to make some dependency and hash information available to
 the build. This information includes:
 

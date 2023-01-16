@@ -129,7 +129,7 @@ Here are features and advantages of the Yocto Project:
    arbitrarily include packages.
 
 -  *License Manifest:* The Yocto Project provides a :ref:`license
-   manifest <dev-manual/common-tasks:maintaining open source license compliance during your product's lifecycle>`
+   manifest <dev-manual/licenses:maintaining open source license compliance during your product's lifecycle>`
    for review by people who need to track the use of open source
    licenses (e.g. legal teams).
 
@@ -225,7 +225,7 @@ your Metadata, the easier it is to cope with future changes.
 
    -  Layers support the inclusion of technologies, hardware components,
       and software components. The :ref:`Yocto Project
-      Compatible <dev-manual/common-tasks:making sure your layer is compatible with yocto project>`
+      Compatible <dev-manual/layers:making sure your layer is compatible with yocto project>`
       designation provides a minimum level of standardization that
       contributes to a strong ecosystem. "YP Compatible" is applied to
       appropriate products and software components such as BSPs, other
@@ -269,7 +269,7 @@ of the ``poky`` repository, you will see several layers: ``meta``,
 layer.
 
 For procedures on how to create layers, see the
-":ref:`dev-manual/common-tasks:understanding and creating layers`"
+":ref:`dev-manual/layers:understanding and creating layers`"
 section in the Yocto Project Development Tasks Manual.
 
 Components and Tools
@@ -351,7 +351,7 @@ Yocto Project:
    (BitBake and
    OE-Core) automatically generates upgrades for recipes that are based
    on new versions of the recipes published upstream. See
-   :ref:`dev-manual/common-tasks:using the auto upgrade helper (auh)`
+   :ref:`dev-manual/upgrading-recipes:using the auto upgrade helper (auh)`
    for how to set it up.
 
 -  *Recipe Reporting System:* The Recipe Reporting System tracks recipe
@@ -517,18 +517,18 @@ Historically, the Build Appliance was the second of three methods by
 which you could use the Yocto Project on a system that was not native to
 Linux.
 
-1. *Hob:* Hob, which is now deprecated and is no longer available since
+#. *Hob:* Hob, which is now deprecated and is no longer available since
    the 2.1 release of the Yocto Project provided a rudimentary,
    GUI-based interface to the Yocto Project. Toaster has fully replaced
    Hob.
 
-2. *Build Appliance:* Post Hob, the Build Appliance became available. It
+#. *Build Appliance:* Post Hob, the Build Appliance became available. It
    was never recommended that you use the Build Appliance as a
    day-to-day production development environment with the Yocto Project.
    Build Appliance was useful as a way to try out development in the
    Yocto Project environment.
 
-3. *CROPS:* The final and best solution available now for developing
+#. *CROPS:* The final and best solution available now for developing
    using the Yocto Project on a system not native to Linux is with
    :ref:`CROPS <overview-manual/yp-intro:development tools>`.
 
@@ -719,27 +719,27 @@ workflow:
 
 Following is a brief summary of the "workflow":
 
-1. Developers specify architecture, policies, patches and configuration
+#. Developers specify architecture, policies, patches and configuration
    details.
 
-2. The build system fetches and downloads the source code from the
+#. The build system fetches and downloads the source code from the
    specified location. The build system supports standard methods such
    as tarballs or source code repositories systems such as Git.
 
-3. Once source code is downloaded, the build system extracts the sources
+#. Once source code is downloaded, the build system extracts the sources
    into a local work area where patches are applied and common steps for
    configuring and compiling the software are run.
 
-4. The build system then installs the software into a temporary staging
+#. The build system then installs the software into a temporary staging
    area where the binary package format you select (DEB, RPM, or IPK) is
    used to roll up the software.
 
-5. Different QA and sanity checks run throughout entire build process.
+#. Different QA and sanity checks run throughout entire build process.
 
-6. After the binaries are created, the build system generates a binary
+#. After the binaries are created, the build system generates a binary
    package feed that is used to create the final root file image.
 
-7. The build system generates the file system image and a customized
+#. The build system generates the file system image and a customized
    Extensible SDK (eSDK) for application development in parallel.
 
 For a very detailed look at this workflow, see the
@@ -776,7 +776,7 @@ helpful for getting started:
    Yocto Project.
 
    For more detailed information on layers, see the
-   ":ref:`dev-manual/common-tasks:understanding and creating layers`"
+   ":ref:`dev-manual/layers:understanding and creating layers`"
    section in the Yocto Project Development Tasks Manual. For a
    discussion specifically on BSP Layers, see the
    ":ref:`bsp-guide/bsp:bsp layers`" section in the Yocto

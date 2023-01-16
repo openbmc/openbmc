@@ -1,3 +1,0 @@
-define KFEATURE_DESCRIPTION "Disable SVE support"
-
-kconf non-hardware disable-arm64-sve.cfg

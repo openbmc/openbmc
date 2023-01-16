@@ -44,3 +44,4 @@ pkg_postinst:${PN} () {
 echo /usr/bin/tcsh >> $D/etc/shells
 echo /usr/bin/csh >> $D/etc/shells
 }
+BBCLASSEXTEND = "native nativesdk"

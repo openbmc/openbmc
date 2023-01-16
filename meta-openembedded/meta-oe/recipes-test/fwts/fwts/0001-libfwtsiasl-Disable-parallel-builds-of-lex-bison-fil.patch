@@ -1,0 +1,68 @@
+From 6135a318dd48787f1b6e1296c755d67575f44dc1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 1 Dec 2022 15:18:55 -0800
+Subject: [PATCH] libfwtsiasl: Disable parallel builds of lex/bison files
+
+Since they are using mv cmds they maybe conflicting with each other in
+highly parallelized build resulting in errors like
+
+| mv dtcompilerparser.tab.c dtcompilerparser.c
+| mv dtcompilerparser.tab.c dtcompilerparser.c
+| cp dtcompilerparser.tab.h dtcompilerparser.y.h
+| mv dtcompilerparser.tab.c dtcompilerparser.c
+| mv: cannot stat 'dtcompilerparser.tab.c': No such file or directory
+| make[3]: *** [Makefile:4196: dtcompilerparser.c] Error 1
+| make[3]: *** Waiting for unfinished jobs....
+| mv: cannot stat 'dtcompilerparser.tab.c': No such file or directory
+| make[3]: *** [Makefile:4194: dtcompilerparser.y.h] Error 1
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/libfwtsiasl/Makefile.am | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+--- a/src/libfwtsiasl/Makefile.am
++++ b/src/libfwtsiasl/Makefile.am
+@@ -58,32 +58,24 @@ aslcompiler.y: $(ASL_PARSER)
+ aslcompilerlex.c: $(ASL_LEXER)
+ 	${LEX} ${AM_LFLAGS} -PAslCompiler -o$@ $(top_srcdir)/src/acpica/source/compiler/aslcompiler.l
+ 
+-.NOTPARALLEL: aslcompiler.c
++.NOTPARALLEL: aslcompiler.c aslcompiler.y.h
+ aslcompiler.c aslcompiler.y.h: aslcompiler.y
+-	${YACC} ${AM_YFLAGS} -d -baslcompiler -pAslCompiler $^
+-	mv aslcompiler.tab.c aslcompiler.c
+-	cp aslcompiler.tab.h aslcompiler.y.h
++	${YACC} ${AM_YFLAGS} -d -baslcompiler -pAslCompiler --header=aslcompiler.y.h --output=aslcompiler.c $^
+ 
+-.NOTPARALLEL: dtcompilerparserlex.c
++.NOTPARALLEL: dtcompilerparserlex.c dtcompilerparser.c dtcompilerparser.y.h
+ dtcompilerparserlex.c dtcompilerparser.c dtcompilerparser.y.h: $(top_srcdir)/src/acpica/source/compiler/dtcompilerparser.l $(top_srcdir)/src/acpica/source/compiler/dtcompilerparser.y
+ 	${LEX} ${AM_LFLAGS} -PDtCompilerParser -odtcompilerparserlex.c $<
+-	${YACC} ${AM_YFLAGS} -bdtcompilerparser -pDtCompilerParser $(top_srcdir)/src/acpica/source/compiler/dtcompilerparser.y
+-	mv dtcompilerparser.tab.c dtcompilerparser.c
+-	cp dtcompilerparser.tab.h dtcompilerparser.y.h
++	${YACC} ${AM_YFLAGS} -bdtcompilerparser -pDtCompilerParser --header=dtcompilerparser.y.h --output=dtcompilerparser.c $(top_srcdir)/src/acpica/source/compiler/dtcompilerparser.y
+ 
+-.NOTPARALLEL: dtparserlex.c
++.NOTPARALLEL: dtparserlex.c dtparser.c dtparser.y.h
+ dtparserlex.c dtparser.c dtparser.y.h: $(top_srcdir)/src/acpica/source/compiler/dtparser.l $(top_srcdir)/src/acpica/source/compiler/dtparser.y
+ 	${LEX} ${AM_LFLAGS} -PDtParser -odtparserlex.c $<
+-	${YACC} ${AM_YFLAGS} -bdtparser -pDtParser $(top_srcdir)/src/acpica/source/compiler/dtparser.y
+-	mv dtparser.tab.c dtparser.c
+-	cp dtparser.tab.h dtparser.y.h
++	${YACC} ${AM_YFLAGS} -bdtparser -pDtParser --header=dtparser.y.h --output=dtparser.c $(top_srcdir)/src/acpica/source/compiler/dtparser.y
+ 
+-.NOTPARALLEL: prparserlex.c
++.NOTPARALLEL: prparserlex.c prparser.c prparser.y.h
+ prparserlex.c prparser.c prparser.y.h: $(top_srcdir)/src/acpica/source/compiler/prparser.l $(top_srcdir)/src/acpica/source/compiler/prparser.y
+ 	${LEX} ${AM_LFLAGS} -PPrParser -oprparserlex.c $<
+-	${YACC} ${AM_YFLAGS} -bprparser -pPrParser $(top_srcdir)/src/acpica/source/compiler/prparser.y
+-	mv prparser.tab.c prparser.c
+-	cp prparser.tab.h prparser.y.h
++	${YACC} ${AM_YFLAGS} -bprparser -pPrParser --header=prparser.y.h --output=prparser.c $(top_srcdir)/src/acpica/source/compiler/prparser.y
+ 
+ pkglib_LTLIBRARIES = libfwtsiasl.la
+ 

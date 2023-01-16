@@ -1,0 +1,29 @@
+From bd182584a1e2f820493d9db689598a20c5700ba5 Mon Sep 17 00:00:00 2001
+From: Alex Kiernan <alex.kiernan@gmail.com>
+Date: Mon, 2 Jan 2023 10:37:49 +0000
+Subject: [PATCH] tests: Handle musl's ERANGE mapping
+
+musl uses "Result not representable" for ERANGE, support this in
+addition to glibc's "Numerical result out of range".
+
+Upstream-Status: Backport [https://github.com/ostreedev/ostree/commit/2d4ee168d7eae0afcce356a3f8135294e6d7fe6f]
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ tests/test-commit-timestamp.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/test-commit-timestamp.sh b/tests/test-commit-timestamp.sh
+index 0688c63a4bdb..de105b768a9c 100755
+--- a/tests/test-commit-timestamp.sh
++++ b/tests/test-commit-timestamp.sh
+@@ -40,6 +40,6 @@ fi
+ ${CMD_PREFIX} ostree --repo=./testrepo show env > show-env.txt
+ rm -rf testrepo testrepo-files
+ assert_file_has_content_literal commit-invalid.txt 'Failed to convert SOURCE_DATE_EPOCH'
+-assert_file_has_content_literal commit-overflowing.txt 'Parsing SOURCE_DATE_EPOCH: Numerical result out of range'
++assert_file_has_content commit-overflowing.txt 'Parsing SOURCE_DATE_EPOCH: \(Numerical result out of range\|Result not representable\)'
+ assert_file_has_content_literal show-env.txt 'Date:  2009-02-13 23:31:30 +0000'
+ echo "ok commit with env timestamp"
+-- 
+2.39.0
+

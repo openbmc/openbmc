@@ -1,0 +1,55 @@
+From 5e3b74927b4fef03d91518d235e9e3ba8cd7ab2e Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Wed, 9 Nov 2022 20:49:41 +0100
+Subject: [PATCH] Makefile.am: do not clobber PYTHONPATH from build environment
+
+This environment variable has special significance for python,
+and so lirc's variable has to be named something else.
+
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ Makefile.am       | 2 +-
+ pylint.mak        | 2 +-
+ tools/Makefile.am | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 6718af1..fae423e 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -128,7 +128,7 @@ endif
+ 
+ pylint: .phony
+ 	$(MAKE) -C tools pylint
+-	-PYTHONPATH=$(PYTHONPATH) $(PYLINT) --rcfile=pylint.conf \
++	-PYTHONPATH=$(LIRCPYTHONPATH) $(PYLINT) --rcfile=pylint.conf \
+ 	--msg-template='$(pylint_template)' $(py_PYTHON)
+ 
+ pep8: $(py_PYTHON)
+diff --git a/pylint.mak b/pylint.mak
+index bf427ab..2692951 100644
+--- a/pylint.mak
++++ b/pylint.mak
+@@ -1,5 +1,5 @@
+ PYTHONPATH1      = $(abs_top_srcdir)/python-pkg/lirc:
+ PYTHONPATH2      = $(abs_top_srcdir)/python-pkg/lirc/lib/.libs
+-PYTHONPATH       = $(PYTHONPATH1):$(PYTHONPATH2)
++LIRCPYTHONPATH   = $(PYTHONPATH1):$(PYTHONPATH2)
+ PYLINT           = python3-pylint
+ pylint_template  = {path}:{line}: [{msg_id}({symbol}), {obj}] {msg}
+diff --git a/tools/Makefile.am b/tools/Makefile.am
+index 85d1fd0..96b17f8 100644
+--- a/tools/Makefile.am
++++ b/tools/Makefile.am
+@@ -142,7 +142,7 @@ force-pylint: .phony
+ 
+ pylint: .pylint-stamp
+ .pylint-stamp: $(py_sources)
+-	-PYTHONPATH=$(PYTHONPATH) $(PYLINT) --rcfile=../pylint.conf \
++	-PYTHONPATH=$(LIRCPYTHONPATH) $(PYLINT) --rcfile=../pylint.conf \
+ 	--msg-template='$(pylint_template)' $? && touch $@
+ 
+ .phony:
+-- 
+2.30.2
+

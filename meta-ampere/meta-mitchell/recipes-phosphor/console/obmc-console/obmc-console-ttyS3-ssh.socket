@@ -1,0 +1,10 @@
+[Unit]
+Description=Phosphor Host Console SSH Per-Connection socket
+Wants=obmc-console@ttyS3.service
+
+[Socket]
+ListenStream=2203
+Accept=yes
+
+[Install]
+WantedBy=sockets.target

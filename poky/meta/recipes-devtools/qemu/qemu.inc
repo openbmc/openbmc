@@ -27,13 +27,13 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0008-tests-meson.build-use-relative-path-to-refer-to-file.patch \
            file://0009-Define-MAP_SYNC-and-MAP_SHARED_VALIDATE-on-needed-li.patch \
            file://0010-hw-pvrdma-Protect-against-buggy-or-malicious-guest-d.patch \
-           file://0001-net-tulip-Restrict-DMA-engine-to-memories.patch \
-           file://arm-cpreg-fix.patch \
-           file://CVE-2022-3165.patch \
+           file://0001-contrib-vhost-user-blk-Replace-lseek64-with-lseek.patch \
+           file://0002-linux-user-Replace-use-of-lfs64-related-functions-an.patch \
+           file://0001-configure-Fix-check-tcg-not-executing-any-tests.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 
-SRC_URI[sha256sum] = "a0634e536bded57cf38ec8a751adb124b89c776fe0846f21ab6c6728f1cbbbe6"
+SRC_URI[sha256sum] = "5b49ce2687744dad494ae90a898c52204a3406e84d072482a1e1be854eeb2157"
 
 SRC_URI:append:class-target = " file://cross.patch"
 SRC_URI:append:class-nativesdk = " file://cross.patch"
@@ -70,16 +70,19 @@ do_install_ptest() {
 	sed -i -e "1s,#!/usr/bin/bash,#!${base_bindir}/bash," ${D}${PTEST_PATH}/tests/data/acpi/disassemle-aml.sh
 
 	# Strip the paths from the QEMU variable, we can use PATH
-	sed -i -e "s#^QEMU=.*/qemu-#QEMU=qemu-#g" ${D}${PTEST_PATH}/tests/tcg/*.mak
+	makfiles=$(find ${D}${PTEST_PATH} -name "*.mak")
+	sed -i -e "s#^QEMU=.*/qemu-#QEMU=qemu-#g" $makfiles
 
 	# Strip compiler flags as they break reproducibility
 	sed -i -e "s,^CC=.*,CC=gcc," \
 	       -e "s,^CCAS=.*,CCAS=gcc," \
-	       -e "s,^LD=.*,LD=ld," ${D}${PTEST_PATH}/tests/tcg/*.mak
+	       -e "s,^LD=.*,LD=ld," $makfiles
 
 	# Update SRC_PATH variable to the right place on target
-	sed -i -e "s#^SRC_PATH=.*#SRC_PATH=${PTEST_PATH}#g" ${D}${PTEST_PATH}/tests/tcg/*.mak
+	sed -i -e "s#^SRC_PATH=.*#SRC_PATH=${PTEST_PATH}#g" $makfiles
 
+	# https://gitlab.com/qemu-project/qemu/-/issues/1403
+	rm ${D}${PTEST_PATH}/tests/unit/test-io-channel-command
 }
 
 # QEMU_TARGETS is overridable variable
@@ -148,6 +151,7 @@ PACKAGECONFIG:remove:darwin = "kvm virglrenderer epoxy gtk+"
 PACKAGECONFIG:remove:mingw32 = "kvm virglrenderer epoxy gtk+"
 
 PACKAGECONFIG[sdl] = "--enable-sdl,--disable-sdl,libsdl2"
+PACKAGECONFIG[png] = "--enable-png,--disable-png,libpng"
 PACKAGECONFIG[virtfs] = "--enable-virtfs --enable-attr --enable-cap-ng,--disable-virtfs,libcap-ng attr,"
 PACKAGECONFIG[aio] = "--enable-linux-aio,--disable-linux-aio,libaio,"
 PACKAGECONFIG[uring] = "--enable-linux-io-uring,--disable-linux-io-uring,liburing"
@@ -197,7 +201,7 @@ PACKAGECONFIG[bpf] = "--enable-bpf,--disable-bpf,libbpf"
 PACKAGECONFIG[capstone] = "--enable-capstone,--disable-capstone"
 PACKAGECONFIG[rdma] = "--enable-rdma,--disable-rdma"
 PACKAGECONFIG[vde] = "--enable-vde,--disable-vde"
-PACKAGECONFIG[slirp] = "--enable-slirp=internal,--disable-slirp"
+PACKAGECONFIG[slirp] = "--enable-slirp,--disable-slirp,libslirp"
 PACKAGECONFIG[brlapi] = "--enable-brlapi,--disable-brlapi"
 PACKAGECONFIG[jack] = "--enable-jack,--disable-jack,jack,"
 

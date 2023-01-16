@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 Release notes for Yocto-4.0.3 (Kirkstone)
 -----------------------------------------
 
@@ -29,7 +31,7 @@ Fixes in Yocto-4.0.3
 -  base.bbclass: Correct the test for obsolete license exceptions
 -  base/reproducible: Change Source Date Epoch generation methods
 -  bin_package: install into base_prefix
--  bind: Remove legacy python3 PACKAGECONFIG code
+-  bind: Remove legacy python3 :term:`PACKAGECONFIG` code
 -  bind: upgrade to 9.18.4
 -  binutils: stable 2.38 branch updates
 -  build-appliance-image: Update to kirkstone head revision
@@ -38,8 +40,8 @@ Fixes in Yocto-4.0.3
 -  curl: backport openssl fix CN check error code
 -  cve-check: hook cleanup to the BuildCompleted event, not CookerExit
 -  cve-extra-exclusions: Clean up and ignore three CVEs (2xqemu and nasm)
--  devtool: finish: handle patching when S points to subdir of a git repo
--  devtool: ignore pn- overrides when determining SRC_URI overrides
+-  devtool: finish: handle patching when :term:`S` points to subdir of a git repo
+-  devtool: ignore pn- overrides when determining :term:`SRC_URI` overrides
 -  docs: BB_HASHSERVE_UPSTREAM: update to new host
 -  dropbear: break dependency on base package for -dev package
 -  efivar: fix import functionality
@@ -48,7 +50,7 @@ Fixes in Yocto-4.0.3
 -  externalsrc.bbclass: support crate fetcher on externalsrc
 -  font-util: update 1.3.2 -> 1.3.3
 -  gcc-runtime: Fix build when using gold
--  gcc-runtime: Fix missing MLPREFIX in debug mappings
+-  gcc-runtime: Fix missing :term:`MLPREFIX` in debug mappings
 -  gcc-runtime: Pass -nostartfiles when building dummy libstdc++.so
 -  gcc: Backport a fix for gcc bug 105039
 -  git: upgrade to v2.35.4
@@ -56,8 +58,8 @@ Fixes in Yocto-4.0.3
 -  glib-networking: upgrade to 2.72.1
 -  glibc : stable 2.35 branch updates
 -  glibc-tests: Avoid reproducibility issues
--  glibc-tests: not clear BBCLASSEXTEND
--  glibc: revert one upstream change to work around broken DEBUG_BUILD build
+-  glibc-tests: not clear :term:`BBCLASSEXTEND`
+-  glibc: revert one upstream change to work around broken :term:`DEBUG_BUILD` build
 -  glibc: stable 2.35 branch updates
 -  gnupg: upgrade to 2.3.7
 -  go: upgrade to v1.17.12
@@ -84,8 +86,8 @@ Fixes in Yocto-4.0.3
 -  kernel-arch: Fix buildpaths leaking into external module compiles
 -  kernel-devsrc: fix reproducibility and buildpaths QA warning
 -  kernel-devsrc: ppc32: fix reproducibility
--  kernel-uboot.bbclass: Use vmlinux.initramfs when INITRAMFS_IMAGE_BUNDLE set
--  kernel.bbclass: pass LD also in savedefconfig
+-  kernel-uboot.bbclass: Use vmlinux.initramfs when :term:`INITRAMFS_IMAGE_BUNDLE` set
+-  kernel.bbclass: pass :term:`LD` also in savedefconfig
 -  libffi: fix native build being not portable
 -  libgcc: Fix standalone target builds with usrmerge distro feature
 -  libmodule-build-perl: Use env utility to find perl interpreter
@@ -115,7 +117,7 @@ Fixes in Yocto-4.0.3
 -  oeqa/runtime/scp: Disable scp test for dropbear
 -  oeqa/runtime: add test that the kernel has CONFIG_PREEMPT_RT enabled
 -  oeqa/sdk: drop the nativesdk-python 2.x test
--  openssh: Add openssh-sftp-server to openssh RDEPENDS
+-  openssh: Add openssh-sftp-server to openssh :term:`RDEPENDS`
 -  openssh: break dependency on base package for -dev package
 -  openssl: update to 3.0.5
 -  package.bbclass: Avoid stripping signed kernel modules in splitdebuginfo
@@ -123,28 +125,28 @@ Fixes in Yocto-4.0.3
 -  package.bbclass: Fix kernel source handling when not using externalsrc
 -  package_manager/ipk: do not pipe stderr to stdout
 -  packagegroup-core-ssh-dropbear: Add openssh-sftp-server recommendation
--  patch: handle if S points to a subdirectory of a git repo
+-  patch: handle if :term:`S` points to a subdirectory of a git repo
 -  perf: fix reproducibility in 5.19+
 -  perf: fix reproduciblity in older releases of Linux
 -  perf: sort-pmuevents: really keep array terminators
 -  perl: don't install Makefile.old into perl-ptest
 -  poky.conf: bump version for 4.0.3
--  pulseaudio: add m4-native to DEPENDS
+-  pulseaudio: add m4-native to :term:`DEPENDS`
 -  python3: Backport patch to fix an issue in subinterpreters
--  qemu: Add PACKAGECONFIG for brlapi
+-  qemu: Add :term:`PACKAGECONFIG` for brlapi
 -  qemu: Avoid accidental librdmacm linkage
 -  qemu: Avoid accidental libvdeplug linkage
 -  qemu: Fix slirp determinism issue
--  qemu: add PACKAGECONFIG for capstone
--  recipetool/devtool: Fix python egg whitespace issues in PACKAGECONFIG
+-  qemu: add :term:`PACKAGECONFIG` for capstone
+-  recipetool/devtool: Fix python egg whitespace issues in :term:`PACKAGECONFIG`
 -  ref-manual: variables: remove sphinx directive from literal block
 -  rootfs-postcommands.bbclass: move host-user-contaminated.txt to ${S}
--  ruby: add PACKAGECONFIG for capstone
+-  ruby: add :term:`PACKAGECONFIG` for capstone
 -  rust: fix issue building cross-canadian tools for aarch64 on x86_64
 -  sanity.bbclass: Add ftps to accepted URI protocols for mirrors sanity
 -  selftest/runtime_test/virgl: Disable for all almalinux
 -  sstatesig: Include all dependencies in SPDX task signatures
--  strace: set COMPATIBLE_HOST for riscv32
+-  strace: set :term:`COMPATIBLE_HOST` for riscv32
 -  systemd: Added base_bindir into pkg_postinst:udev-hwdb.
 -  udev-extraconf/initrdscripts/parted: Rename mount.blacklist -> mount.ignorelist
 -  udev-extraconf/mount.sh: add LABELs to mountpoints
@@ -169,7 +171,7 @@ Fixes in Yocto-4.0.3
 -  xev: upgrade to 1.2.5
 -  xf86-input-synaptics: upgrade to 1.9.2
 -  xmodmap: upgrade to 1.0.11
--  xorg-app: Tweak handling of compression changes in SRC_URI
+-  xorg-app: Tweak handling of compression changes in :term:`SRC_URI`
 -  xserver-xorg: upgrade to 21.1.4
 -  xwayland: upgrade to 22.1.3
 -  yocto-bsps/5.10: fix buildpaths issue with gen-mach-types

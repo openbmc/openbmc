@@ -355,7 +355,10 @@ def rust_gen_target(d, thing, wd, arch):
     tspec['target-c-int-width'] = d.getVarFlag('TARGET_C_INT_WIDTH', arch_abi)
     tspec['target-endian'] = d.getVarFlag('TARGET_ENDIAN', arch_abi)
     tspec['arch'] = arch_to_rust_target_arch(rust_arch)
-    tspec['os'] = "linux"
+    if "baremetal" in d.getVar('TCLIBC'):
+        tspec['os'] = "none"
+    else:
+        tspec['os'] = "linux"
     if "musl" in tspec['llvm-target']:
         tspec['env'] = "musl"
     else:
@@ -401,3 +404,19 @@ python do_rust_gen_targets () {
 addtask rust_gen_targets after do_patch before do_compile
 do_rust_gen_targets[dirs] += "${RUST_TARGETS_DIR}"
 
+# For building target C dependecies use only compiler parameters defined in OE
+# and ignore the CC crate defaults which conflicts with OE ones in some cases.
+# https://github.com/rust-lang/cc-rs#external-configuration-via-environment-variables
+# Some CC crate compiler flags are still required.
+# We apply them conditionally in rust wrappers.
+
+CRATE_CC_FLAGS:class-native = ""
+CRATE_CC_FLAGS:class-nativesdk = ""
+CRATE_CC_FLAGS:class-target = " -ffunction-sections -fdata-sections -fPIC"
+
+do_compile:prepend:class-target() {
+    export CRATE_CC_NO_DEFAULTS=1
+}
+do_install:prepend:class-target() {
+    export CRATE_CC_NO_DEFAULTS=1
+}

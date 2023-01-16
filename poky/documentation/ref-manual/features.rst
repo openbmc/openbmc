@@ -143,7 +143,7 @@ metadata, as extra layers can define their own:
 -  *cramfs:* Include CramFS support.
 
 -  *debuginfod:* Include support for getting ELF debugging information through
-   a :ref:`debuginfod <dev-manual/common-tasks:using the debuginfod server method>`
+   a :ref:`debuginfod <dev-manual/debugging:using the debuginfod server method>`
    server.
 
 -  *directfb:* Include DirectFB support.
@@ -202,7 +202,7 @@ metadata, as extra layers can define their own:
 
 -  *ptest:* Enables building the package tests where supported by
    individual recipes. For more information on package tests, see the
-   ":ref:`dev-manual/common-tasks:testing packages with ptest`" section
+   ":ref:`dev-manual/packages:testing packages with ptest`" section
    in the Yocto Project Development Tasks Manual.
 
 -  *pulseaudio:* Include support for
@@ -325,7 +325,7 @@ Here are the image features available for all images:
 
 -  *read-only-rootfs:* Creates an image whose root filesystem is
    read-only. See the
-   ":ref:`dev-manual/common-tasks:creating a read-only root filesystem`"
+   ":ref:`dev-manual/read-only-rootfs:creating a read-only root filesystem`"
    section in the Yocto Project Development Tasks Manual for more
    information.
 
@@ -358,7 +358,7 @@ Here are the image features available for all images:
    a given image.
 
 Some image features are available only when you inherit the
-:ref:`core-image <ref-classes-core-image>` class. The current list of
+:ref:`ref-classes-core-image` class. The current list of
 these valid features is as follows:
 
 -  *hwcodecs:* Installs hardware acceleration codecs.
@@ -394,7 +394,7 @@ these valid features is as follows:
 
 -  *tools-debug:* Installs debugging tools such as ``strace`` and
    ``gdb``. For information on GDB, see the
-   ":ref:`dev-manual/common-tasks:debugging with the gnu project debugger (gdb) remotely`" section
+   ":ref:`dev-manual/debugging:debugging with the gnu project debugger (gdb) remotely`" section
    in the Yocto Project Development Tasks Manual. For information on
    tracing and profiling, see the :doc:`/profile-manual/index`.
 

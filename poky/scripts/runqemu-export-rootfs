@@ -34,16 +34,12 @@ if [ -z "$SYSROOT_SETUP_SCRIPT" ]; then
 	echo "Did you forget to source your build environment setup script?"
 	exit 1
 fi
-. $SYSROOT_SETUP_SCRIPT meta-ide-support
+. $SYSROOT_SETUP_SCRIPT qemu-helper-native
 
 if [ ! -e "$OECORE_NATIVE_SYSROOT/usr/bin/unfsd" ]; then
 	echo "Error: Unable to find unfsd binary in $OECORE_NATIVE_SYSROOT/usr/bin/"
 
-	if [ "x$OECORE_DISTRO_VERSION" = "x" ]; then
-		echo "Have you run 'bitbake meta-ide-support'?"
-	else
-		echo "This shouldn't happen - something is missing from your toolchain installation"
-	fi
+	echo "This shouldn't happen - something is missing from your toolchain installation"
 	exit 1
 fi
 
@@ -74,26 +70,11 @@ MOUNTD_PORT=${MOUNTD_PORT:=$[ 3048 + 2 * $NFS_INSTANCE ]}
 
 ## For debugging you would additionally add
 ## --debug all
-UNFSD_OPTS="-p -N -i $NFSPID -e $EXPORTS -n $NFSD_PORT -m $MOUNTD_PORT"
+UNFSD_OPTS="-p -i $NFSPID -e $EXPORTS -n $NFSD_PORT -m $MOUNTD_PORT"
 
 # See how we were called.
 case "$1" in
   start)
-	PORTMAP_RUNNING=`ps -ef | grep portmap | grep -v grep`
-	RPCBIND_RUNNING=`ps -ef | grep rpcbind | grep -v grep`
-	if [[ "x$PORTMAP_RUNNING" = "x" && "x$RPCBIND_RUNNING" = "x" ]]; then
-		echo "======================================================="
-		echo "Error: neither rpcbind nor portmap appear to be running"
-		echo "Please install and start one of these services first"
-		echo "======================================================="
-		echo "Tip: for recent Ubuntu hosts, run:"
-		echo "  sudo apt-get install rpcbind"
-		echo "Then add OPTIONS=\"-i -w\"  to /etc/default/rpcbind and run"
-		echo "  sudo service portmap restart"
-
-		exit 1
-	fi
-
 	echo "Creating exports file..."
 	echo "$NFS_EXPORT_DIR (rw,no_root_squash,no_all_squash,insecure)" > $EXPORTS
 

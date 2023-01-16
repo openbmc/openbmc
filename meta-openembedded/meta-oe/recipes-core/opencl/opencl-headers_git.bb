@@ -17,3 +17,4 @@ do_install () {
 	install -d ${D}${includedir}/CL/
 	install -m 0644 ${S}/CL/*.h ${D}${includedir}/CL
 }
+BBCLASSEXTEND = "native nativesdk"

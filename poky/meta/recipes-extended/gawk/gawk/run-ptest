@@ -2,7 +2,7 @@
 
 cd test
 for i in `grep -E "^[a-z0-9_-]*:$" Maketests |awk -F: '{print $1}'`; do
-  #LC_ALL=${GAWKLOCALE:-C} LANG=${GAWKLOCALE:-C} 
+  unset LANG
   srcdir=`pwd` AWKPROG=gawk AWK=gawk CMP=cmp make -f Maketests $i >$i.tmp 2>&1
   if [ -e _$i ]; then
     cat _$i

@@ -19,7 +19,7 @@ DEPENDS = " \
     lcms \
     libraw \
     librsvg \
-    libsoup-2.4 \
+    libsoup \
     json-glib \
     libsecret \
 "

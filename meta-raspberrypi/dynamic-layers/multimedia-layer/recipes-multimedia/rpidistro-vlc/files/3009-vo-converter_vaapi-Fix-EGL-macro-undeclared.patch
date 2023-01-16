@@ -1,0 +1,59 @@
+From 35276c4b02b9114436108e74727d192f1e21f239 Mon Sep 17 00:00:00 2001
+From: Vincent Davis Jr <vince@underview.tech>
+Date: Fri, 9 Dec 2022 23:31:33 -0600
+Subject: [PATCH] vo: converter_vaapi Fix EGL macro undeclared
+
+Upstream-Status: Inappropriate
+
+RPI-Distro repo forks original vlc and applies patches to enable
+raspiberry pi support.
+
+Fixes compiler issues related to EGL macro constant/enum value type
+not being defined
+
+Signed-off-by: Vincent Davis Jr <vince@underview.tech>
+---
+ modules/video_output/opengl/converter_vaapi.c | 27 +++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+
+diff --git a/modules/video_output/opengl/converter_vaapi.c b/modules/video_output/opengl/converter_vaapi.c
+index cd842f711..59245fe4c 100644
+--- a/modules/video_output/opengl/converter_vaapi.c
++++ b/modules/video_output/opengl/converter_vaapi.c
+@@ -55,6 +55,33 @@
+ 
+ #define DRM_FORMAT_MOD_INVALID  fourcc_mod_code(NONE, DRM_FORMAT_RESERVED)
+ 
++#define EGL_LINUX_DMA_BUF_EXT           0x3270
++#define EGL_LINUX_DRM_FOURCC_EXT        0x3271
++#define EGL_DMA_BUF_PLANE0_FD_EXT       0x3272
++#define EGL_DMA_BUF_PLANE0_OFFSET_EXT   0x3273
++#define EGL_DMA_BUF_PLANE0_PITCH_EXT    0x3274
++#define EGL_DMA_BUF_PLANE1_FD_EXT       0x3275
++#define EGL_DMA_BUF_PLANE1_OFFSET_EXT   0x3276
++#define EGL_DMA_BUF_PLANE1_PITCH_EXT    0x3277
++#define EGL_DMA_BUF_PLANE2_FD_EXT       0x3278
++#define EGL_DMA_BUF_PLANE2_OFFSET_EXT   0x3279
++#define EGL_DMA_BUF_PLANE2_PITCH_EXT    0x327A
++#define EGL_YUV_COLOR_SPACE_HINT_EXT    0x327B
++#define EGL_SAMPLE_RANGE_HINT_EXT       0x327C
++#define EGL_YUV_CHROMA_HORIZONTAL_SITING_HINT_EXT  0x327D
++#define EGL_YUV_CHROMA_VERTICAL_SITING_HINT_EXT    0x327E
++#define EGL_DMA_BUF_PLANE0_MODIFIER_LO_EXT 0x3443
++#define EGL_DMA_BUF_PLANE0_MODIFIER_HI_EXT 0x3444
++#define EGL_DMA_BUF_PLANE1_MODIFIER_LO_EXT 0x3445
++#define EGL_DMA_BUF_PLANE1_MODIFIER_HI_EXT 0x3446
++#define EGL_DMA_BUF_PLANE2_MODIFIER_LO_EXT 0x3447
++#define EGL_DMA_BUF_PLANE2_MODIFIER_HI_EXT 0x3448
++#define EGL_DMA_BUF_PLANE3_FD_EXT          0x3440
++#define EGL_DMA_BUF_PLANE3_OFFSET_EXT      0x3441
++#define EGL_DMA_BUF_PLANE3_PITCH_EXT       0x3442
++#define EGL_DMA_BUF_PLANE3_MODIFIER_LO_EXT 0x3449
++#define EGL_DMA_BUF_PLANE3_MODIFIER_HI_EXT 0x344A
++
+ struct priv
+ {
+     struct vlc_vaapi_instance *vainst;
+-- 
+2.38.1
+

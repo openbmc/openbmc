@@ -132,7 +132,7 @@ contact us with other suggestions.
    say "bitbake foo" where "foo" is the name for a specific recipe.  As you
    become more advanced using the Yocto Project, and if builds are failing, it
    can be useful to make sure the fetch itself works as desired. Here are some
-   valuable links: :ref:`dev-manual/common-tasks:Using a Development
+   valuable links: :ref:`dev-manual/development-shell:Using a Development
    Shell` for information on how to build and run a specific task using
    devshell. Also, the :ref:`SDK manual shows how to build out a specific recipe
    <sdk-manual/extensible:use \`\`devtool modify\`\` to modify the source of an existing component>`.

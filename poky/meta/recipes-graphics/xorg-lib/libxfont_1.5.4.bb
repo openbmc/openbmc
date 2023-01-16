@@ -15,6 +15,7 @@ PROVIDES = "xfont"
 PE = "1"
 
 XORG_PN = "libXfont"
+XORG_EXT = "tar.bz2"
 
 BBCLASSEXTEND = "native"
 

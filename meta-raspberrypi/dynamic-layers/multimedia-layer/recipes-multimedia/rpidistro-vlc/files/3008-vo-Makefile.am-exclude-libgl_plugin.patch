@@ -1,0 +1,97 @@
+From 28917a258a4173af0abda0eef7faef5cbf95f123 Mon Sep 17 00:00:00 2001
+From: Vincent Davis Jr <vince@underview.tech>
+Date: Fri, 9 Dec 2022 21:28:48 -0600
+Subject: [PATCH] vo: Makefile.am exclude libgl_plugin
+
+Upstream-Status: Inappropriate
+
+RPI-Distro repo forks original vlc and applies patches
+to enable raspiberry pi support.
+
+In the situation where opengl isn't included in
+DISTRO_FEATURES. We need to exclude the opengl
+vout plugin from being built.
+
+Signed-off-by: Vincent Davis Jr <vince@underview.tech>
+---
+ modules/video_output/Makefile.am | 64 --------------------------------
+ 1 file changed, 64 deletions(-)
+
+diff --git a/modules/video_output/Makefile.am b/modules/video_output/Makefile.am
+index 78c06cfc4..14a330e68 100644
+--- a/modules/video_output/Makefile.am
++++ b/modules/video_output/Makefile.am
+@@ -57,70 +57,6 @@ if HAVE_TVOS
+ vout_LTLIBRARIES += libvout_ios_plugin.la libglconv_cvpx_plugin.la
+ endif
+ 
+-### OpenGL ###
+-libgles2_plugin_la_SOURCES = $(OPENGL_COMMONSOURCES) video_output/opengl/display.c
+-libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES2 $(OPENGL_COMMONCLFAGS)
+-libgles2_plugin_la_LIBADD = $(GLES2_LIBS) $(LIBM) $(OPENGL_COMMONLIBS)
+-libgles2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+-
+-EXTRA_LTLIBRARIES += libgles2_plugin.la
+-vout_LTLIBRARIES += $(LTLIBgles2)
+-
+-libgl_plugin_la_SOURCES = $(OPENGL_COMMONSOURCES) video_output/opengl/display.c
+-libgl_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS) $(OPENGL_COMMONCLFAGS)
+-libgl_plugin_la_LIBADD = $(LIBM) $(OPENGL_COMMONLIBS)
+-if HAVE_WIN32
+-libgl_plugin_la_CFLAGS += -DHAVE_GL_CORE_SYMBOLS
+-libgl_plugin_la_LIBADD += $(GL_LIBS)
+-endif
+-
+-libglconv_vaapi_wl_plugin_la_SOURCES = video_output/opengl/converter_vaapi.c \
+-	video_output/opengl/converter.h \
+-	hw/vaapi/vlc_vaapi.c hw/vaapi/vlc_vaapi.h
+-libglconv_vaapi_wl_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS) -DHAVE_VA_WL $(LIBVA_WL_CFLAGS)
+-libglconv_vaapi_wl_plugin_la_LIBADD = $(LIBVA_LIBS) $(LIBVA_EGL_LIBS) \
+-	$(LIBVA_WL_LIBS)
+-
+-libglconv_vaapi_x11_plugin_la_SOURCES = $(libglconv_vaapi_wl_plugin_la_SOURCES)
+-libglconv_vaapi_x11_plugin_la_CFLAGS = $(AM_CFLAGS) -DHAVE_VA_X11
+-libglconv_vaapi_x11_plugin_la_LIBADD = $(LIBVA_LIBS) $(LIBVA_EGL_LIBS) \
+-	$(LIBVA_X11_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lX11
+-
+-libglconv_vaapi_drm_plugin_la_SOURCES = $(libglconv_vaapi_wl_plugin_la_SOURCES)
+-libglconv_vaapi_drm_plugin_la_CFLAGS = $(AM_CFLAGS) -DHAVE_VA_DRM
+-libglconv_vaapi_drm_plugin_la_LIBADD = $(LIBVA_LIBS) $(LIBVA_EGL_LIBS) \
+-	$(LIBVA_DRM_LIBS)
+-
+-libglconv_vdpau_plugin_la_SOURCES = video_output/opengl/converter_vdpau.c \
+-	video_output/opengl/converter.h hw/vdpau/vlc_vdpau.h
+-libglconv_vdpau_plugin_la_CFLAGS = $(AM_CFLAGS) $(VDPAU_CFLAGS)
+-libglconv_vdpau_plugin_la_LIBADD = $(LIBDL) libvlc_vdpau.la $(X_LIBS) $(X_PRE_LIBS) -lX11
+-
+-if HAVE_GL
+-vout_LTLIBRARIES += libgl_plugin.la
+-if HAVE_EGL
+-if HAVE_VAAPI
+-if HAVE_WAYLAND_EGL
+-if HAVE_VAAPI_WL
+-vout_LTLIBRARIES += libglconv_vaapi_wl_plugin.la
+-endif
+-endif
+-if HAVE_XCB
+-if HAVE_VAAPI_X11
+-vout_LTLIBRARIES += libglconv_vaapi_x11_plugin.la
+-endif
+-endif
+-if HAVE_VAAPI_DRM
+-vout_LTLIBRARIES += libglconv_vaapi_drm_plugin.la
+-endif
+-endif
+-endif # HAVE_EGL
+-
+-if HAVE_VDPAU
+-vout_LTLIBRARIES += libglconv_vdpau_plugin.la
+-endif
+-endif # HAVE_GL
+-
+ ### XCB ###
+ libvlc_xcb_events_la_SOURCES = \
+ 	video_output/xcb/events.c video_output/xcb/events.h
+-- 
+2.38.1
+

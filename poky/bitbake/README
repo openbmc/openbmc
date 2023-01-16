@@ -13,6 +13,8 @@ Bitbake plain documentation can be found under the doc directory or its integrat
 html version at the Yocto Project website:
     https://docs.yoctoproject.org
 
+Bitbake requires Python version 3.8 or newer.
+
 Contributing
 ------------
 
@@ -34,10 +36,21 @@ Source code:
 
     https://git.openembedded.org/bitbake/
 
-Testing:
+Testing
+-------
 
 Bitbake has a testsuite located in lib/bb/tests/ whichs aim to try and prevent regressions.
 You can run this with "bitbake-selftest". In particular the fetcher is well covered since
 it has so many corner cases. The datastore has many tests too. Testing with the testsuite is
 recommended before submitting patches, particularly to the fetcher and datastore. We also
 appreciate new test cases and may require them for more obscure issues.
+
+To run the tests "zstd" and "git" must be installed. Git must be correctly configured, in
+particular the user.email and user.name values must be set.
+
+The assumption is made that this testsuite is run from an initialized OpenEmbedded build
+environment (i.e. `source oe-init-build-env` is used). If this is not the case, run the
+testsuite as follows:
+
+    export PATH=$(pwd)/bin:$PATH
+    bin/bitbake-selftest

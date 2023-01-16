@@ -35,7 +35,7 @@ do_install:append() {
 }
 
 KERNEL_SPLIT_MODULES ?= "1"
-PACKAGESPLITFUNCS:prepend = "split_kernel_module_packages "
+PACKAGESPLITFUNCS =+ "split_kernel_module_packages"
 
 KERNEL_MODULES_META_PACKAGE ?= "${@ d.getVar("KERNEL_PACKAGE_NAME") or "kernel" }-modules"
 

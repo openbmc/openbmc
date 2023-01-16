@@ -40,6 +40,8 @@ python uninative_event_fetchloader() {
         with open(loaderchksum, "r") as f:
             readchksum = f.read().strip()
         if readchksum == chksum:
+            if "uninative" not in d.getVar("SSTATEPOSTUNPACKFUNCS"):
+                enable_uninative(d)
             return
 
     import subprocess

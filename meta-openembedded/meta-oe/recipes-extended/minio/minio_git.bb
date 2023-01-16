@@ -16,7 +16,7 @@ SRCREV_mc = "01b87ecc02ffad47dfe13c2154ac31db3e3115df"
 
 GO_IMPORT = "import"
 
-LICENSE = "GPL-3.0-only"
+LICENSE = "AGPL-3.0-only"
 LIC_FILES_CHKSUM = "file://src/${GO_IMPORT}/LICENSE;md5=eb1e647870add0502f8f010b19de32af"
 
 PV = "${SRCREV_mc}"
@@ -24,7 +24,8 @@ PV = "${SRCREV_mc}"
 inherit go
 inherit goarch
 
-CGO_LDFLAGS:append:mips = " -no-pie"
+# | ./github.com/minio/mc/main.go:27:(.text+0xd258b8): relocation R_MIPS_HI16 against `a local symbol' cannot be used when making a shared object; recompile with -fPIC
+COMPATIBLE_HOST:mips = "null"
 
 DEPENDS += "rsync-native"
 

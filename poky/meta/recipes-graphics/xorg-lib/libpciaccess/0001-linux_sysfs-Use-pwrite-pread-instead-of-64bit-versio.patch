@@ -1,0 +1,39 @@
+From d20ff4f2e4feaafa6a6191b9cae3815b85617943 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 11 Nov 2022 11:15:58 -0800
+Subject: [PATCH] linux_sysfs: Use pwrite/pread instead of 64bit versions
+
+pread64/pwrite64 are aliased to pread/pwrite when largefile support is
+enabled e.g. using _FILE_OFFSET_BITS=64 macro
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/xorg/lib/libpciaccess/-/merge_requests/26]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/linux_sysfs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/linux_sysfs.c b/src/linux_sysfs.c
+index d62f48c..20c800e 100644
+--- a/src/linux_sysfs.c
++++ b/src/linux_sysfs.c
+@@ -462,7 +462,7 @@ pci_device_linux_sysfs_read( struct pci_device * dev, void * data,
+ 
+ 
+     while ( temp_size > 0 ) {
+-	const ssize_t bytes = pread64( fd, data_bytes, temp_size, offset );
++	const ssize_t bytes = pread( fd, data_bytes, temp_size, offset );
+ 
+ 	/* If zero bytes were read, then we assume it's the end of the
+ 	 * config file.
+@@ -522,7 +522,7 @@ pci_device_linux_sysfs_write( struct pci_device * dev, const void * data,
+ 
+ 
+     while ( temp_size > 0 ) {
+-	const ssize_t bytes = pwrite64( fd, data_bytes, temp_size, offset );
++	const ssize_t bytes = pwrite( fd, data_bytes, temp_size, offset );
+ 
+ 	/* If zero bytes were written, then we assume it's the end of the
+ 	 * config file.
+-- 
+2.38.1
+

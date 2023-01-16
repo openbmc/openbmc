@@ -1,4 +1,4 @@
-From 04884263d1de8c427a7a15bd1cf6466ea65d3a0b Mon Sep 17 00:00:00 2001
+From ee9f7b6e764be5668bc958f8bb97a46e5056d050 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Mon, 25 May 2020 23:22:55 -0700
 Subject: [PATCH] add explicit dependency on libraries
@@ -17,24 +17,24 @@ ln -sf libmpathpersist.so.0 libmpathpersist.so
 Upstream-Status: Pending
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+[OP: Rebase to 0.9.3]
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
 ---
- Makefile | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ Makefile | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/Makefile b/Makefile
-index bea0a0b2..37a77129 100644
+index f195b570..2d22881c 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -29,7 +29,8 @@ $(BUILDDIRS):
- 	$(MAKE) -C $@
- 
- multipath multipathd mpathpersist libmpathpersist : libmultipath
--mpathpersist:  libmpathpersist
-+mpathpersist multipathd:  libmpathpersist
-+libdmmp libmultipath mpathpersist multipath multipathd: libmpathcmd
+@@ -78,6 +78,7 @@ libmultipath: libmpathutil
+ libmpathpersist libmpathvalid multipath multipathd: libmultipath
+ libmultipath/prioritizers libmultipath/checkers libmultipath/foreign: libmultipath
+ mpathpersist multipathd:  libmpathpersist
++libmultipath mpathpersist multipath multipathd: libmpathcmd
  
  DEPS_ON_MULTIPATH := \
  	multipath \
 -- 
-2.21.0
+2.38.1
 

@@ -72,7 +72,7 @@ strip = ${@meson_array('STRIP', d)}
 readelf = ${@meson_array('READELF', d)}
 objcopy = ${@meson_array('OBJCOPY', d)}
 pkgconfig = 'pkg-config'
-llvm-config = 'llvm-config${LLVMVERSION}'
+llvm-config = 'llvm-config'
 cups-config = 'cups-config'
 g-ir-scanner = '${STAGING_BINDIR}/g-ir-scanner-wrapper'
 g-ir-compiler = '${STAGING_BINDIR}/g-ir-compiler-wrapper'
@@ -152,7 +152,7 @@ meson_do_configure() {
     mkdir -p "${B}/meson-private/tmp"
     export TMPDIR="${B}/meson-private/tmp"
     bbnote Executing meson ${EXTRA_OEMESON}...
-    if ! meson ${MESONOPTS} "${MESON_SOURCEPATH}" "${B}" ${MESON_CROSS_FILE} ${EXTRA_OEMESON}; then
+    if ! meson setup ${MESONOPTS} "${MESON_SOURCEPATH}" "${B}" ${MESON_CROSS_FILE} ${EXTRA_OEMESON}; then
         bbfatal_log meson failed
     fi
 }
@@ -169,11 +169,11 @@ do_configure[postfuncs] += "meson_do_qa_configure"
 
 do_compile[progress] = "outof:^\[(\d+)/(\d+)\]\s+"
 meson_do_compile() {
-    ninja -v ${PARALLEL_MAKE}
+    meson compile -v ${PARALLEL_MAKE}
 }
 
 meson_do_install() {
-    DESTDIR='${D}' ninja -v ${PARALLEL_MAKEINST} install
+    meson install --destdir ${D} --no-rebuild
 }
 
 EXPORT_FUNCTIONS do_configure do_compile do_install

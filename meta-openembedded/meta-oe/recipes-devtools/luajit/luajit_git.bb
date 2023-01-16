@@ -10,8 +10,8 @@ SRC_URI = "git://luajit.org/git/luajit-2.0.git;protocol=http;branch=v2.1 \
            "
 
 # Set PV to a version tag and date (YYMMDD) associated with SRCREV if it is later.
-PV = "2.1.0~beta3-210112"
-SRCREV = "43ebb949a249a16c49d232ad24dc9127cc4302bb"
+PV = "2.1.0~beta3-220721"
+SRCREV = "32984282ddae666b3c94cd27538e1c78b49a1877"
 
 S = "${WORKDIR}/git"
 

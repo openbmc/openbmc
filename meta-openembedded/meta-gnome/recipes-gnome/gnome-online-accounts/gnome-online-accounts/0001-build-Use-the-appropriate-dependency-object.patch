@@ -1,0 +1,35 @@
+From 06240574626eb21af37cf7dde5bf81e892dff467 Mon Sep 17 00:00:00 2001
+From: Emmanuele Bassi <ebassi@gnome.org>
+Date: Wed, 5 Oct 2022 22:15:37 +0100
+Subject: [PATCH] build: Use the appropriate dependency object
+
+Just using `link_with` will not ensure that the GOA web extension shared
+module is properly built against libgoa-backend and libgoa; the
+generated headers must be transitively available by the time we build
+the shared module.
+
+Fixes: #226
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/gnome-online-accounts/-/commit/fe86bfb0271735c8130367c46536b08dad5c20d8]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/goabackend/meson.build | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/goabackend/meson.build b/src/goabackend/meson.build
+index f5382b3..865b2d2 100644
+--- a/src/goabackend/meson.build
++++ b/src/goabackend/meson.build
+@@ -157,9 +157,8 @@ libgoa_web_extension = shared_module(
+   'goawebextension',
+   libgoawebextension_sources,
+   include_directories: common_incs + [goa_inc],
+-  dependencies: deps,
++  dependencies: [deps, libgoa_backend_dep],
+   c_args: cflags,
+-  link_with: libgoa_backend,
+   install: true,
+   install_dir: join_paths(goa_pkglibdir, 'web-extensions')
+ )
+-- 
+2.39.0
+

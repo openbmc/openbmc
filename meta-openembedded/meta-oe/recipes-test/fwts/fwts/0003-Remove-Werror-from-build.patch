@@ -15,7 +15,7 @@ Upstream-Status: Pending
 @@ -13,7 +13,7 @@ AM_CPPFLAGS = \
  	-I$(top_srcdir)/efi_runtime			\
  	-I$(top_srcdir)/smccc_test			\
- 	-pthread `pkg-config --cflags glib-2.0 gio-2.0` \
+ 	-pthread					\
 -	-Wall -Werror -Wextra				\
 +	-Wall -Wextra					\
  	-Wno-address-of-packed-member			\
@@ -23,9 +23,9 @@ Upstream-Status: Pending
  	-Wno-long-long -Wredundant-decls -Wshadow	\
 --- a/src/lib/src/Makefile.am
 +++ b/src/lib/src/Makefile.am
-@@ -25,7 +25,7 @@ AM_CPPFLAGS = \
- 	`pkg-config --silence-errors --cflags json-c`	\
- 	`pkg-config --cflags glib-2.0 gio-2.0` 		\
+@@ -22,7 +22,7 @@ AM_CPPFLAGS = \
+ 	-I$(top_srcdir)/src/acpica/source/include	\
+ 	-I$(top_srcdir)/src/acpica/source/compiler	\
  	-DDATAROOTDIR=\"$(datarootdir)\"		\
 -	-Wall -Werror -Wextra				\
 +	-Wall -Wextra					\

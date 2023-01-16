@@ -8,7 +8,9 @@ LIC_FILES_CHKSUM = " \
     file://COPYING.GPL3;md5=d32239bcb673463ab874e80d47fae504 \
 "
 
-inherit autotools pkgconfig
+inherit autotools pkgconfig features_check
+
+REQUIRED_DISTRO_FEATURES = "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'opengl', '', d)}"
 
 SRC_URI = "https://launchpad.net/${BPN}/trunk/v${PV}/+download/${BPN}-${PV}.tar.gz \
            file://pessimizing-move.patch"

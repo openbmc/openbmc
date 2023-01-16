@@ -1,0 +1,27 @@
+From 61f910f5d12d6f6a66223b5af6d74e30ace3a2e1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 15 Dec 2022 12:10:37 -0800
+Subject: [PATCH] configure: Check for largefile support
+
+This helps in using 64bit versions of off_t related functions
+
+Upstream-Status: Backport [https://github.com/numactl/numactl/pull/159]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 8510fc5..d74bc6e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -14,6 +14,9 @@ LT_INIT
+ 
+ AC_PROG_CC
+ 
++# Check for enabling LFS support
++AC_SYS_LARGEFILE
++
+ # Override CFLAGS so that we can specify custom CFLAGS for numademo.
+ AX_AM_OVERRIDE_VAR([CFLAGS])
+ 

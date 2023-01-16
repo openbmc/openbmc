@@ -25,5 +25,5 @@ do_install() {
 	install qemu-oe-bridge-helper ${D}${bindir}/
 }
 
-DEPENDS += "qemu-system-native"
+DEPENDS += "qemu-system-native unfs3-native pseudo-native"
 addtask addto_recipe_sysroot after do_populate_sysroot before do_build
