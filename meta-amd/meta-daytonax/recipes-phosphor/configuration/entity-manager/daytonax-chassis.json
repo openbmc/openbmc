@@ -1,0 +1,403 @@
+{
+    "Exposes": [
+        {
+            "Index": 0,
+            "BindConnector": "Fan SYS0 connector",
+            "MaxReading": 6000,
+            "Name": "Fan_SYS0_0",
+            "Type": "AspeedFan",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 10
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 10000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 8000
+                }
+            ]
+        },
+        {
+            "Index": 1,
+            "BindConnector": "Fan SYS0 connector",
+            "MaxReading": 6000,
+            "Name": "Fan_SYS0_1",
+            "Type": "AspeedFan",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 10
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 10000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 8000
+                }
+            ]
+        },
+        {
+            "Index": 2,
+            "BindConnector": "Fan SYS1 connector",
+            "MaxReading": 6000,
+            "Name": "Fan_SYS1_0",
+            "Type": "AspeedFan",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 10
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 10000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 8000
+                }
+            ]
+        },
+        {
+            "Index": 3,
+            "BindConnector": "Fan SYS1 connector",
+            "MaxReading": 6000,
+            "Name": "Fan_SYS1_1",
+            "Type": "AspeedFan",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 10
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 10000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 8000
+                }
+            ]
+        },
+        {
+            "Index": 4,
+            "BindConnector": "Fan SYS2 connector",
+            "MaxReading": 6000,
+            "Name": "Fan_SYS2_0",
+            "Type": "AspeedFan",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 10
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 10000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 8000
+                }
+            ]
+        },
+        {
+            "Index": 5,
+            "BindConnector": "Fan SYS2 connector",
+            "MaxReading": 6000,
+            "Name": "Fan_SYS2_1",
+            "Type": "AspeedFan",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 10
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 10000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 8000
+                }
+            ]
+        },
+        {
+            "Index": 6,
+            "BindConnector": "Fan SYS3 connector",
+            "MaxReading": 6000,
+            "Name": "Fan_SYS3_0",
+            "Type": "AspeedFan",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 10
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 10000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 8000
+                }
+            ]
+        },
+        {
+            "Index": 7,
+            "BindConnector": "Fan SYS3 connector",
+            "MaxReading": 6000,
+            "Name": "Fan_SYS3_1",
+            "Type": "AspeedFan",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 10
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 10000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 8000
+                }
+            ]
+        },
+        {
+            "Index": 8,
+            "BindConnector": "Fan SYS4 connector",
+            "MaxReading": 6000,
+            "Name": "Fan_SYS4_0",
+            "Type": "AspeedFan",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 10
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 10000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 8000
+                }
+            ]
+        },
+        {
+            "Index": 9,
+            "BindConnector": "Fan SYS4 connector",
+            "MaxReading": 6000,
+            "Name": "Fan_SYS4_1",
+            "Type": "AspeedFan",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 10
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 10000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 8000
+                }
+            ]
+        },
+        {
+            "Index": 10,
+            "BindConnector": "Fan SYS5 connector",
+            "MaxReading": 6000,
+            "Name": "Fan_SYS5_0",
+            "Type": "AspeedFan",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 10
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 10000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 8000
+                }
+            ]
+        },
+        {
+            "Index": 11,
+            "BindConnector": "Fan SYS5 connector",
+            "MaxReading": 6000,
+            "Name": "Fan_SYS5_1",
+            "Type": "AspeedFan",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 10
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 10000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 8000
+                }
+            ]
+        }
+    ],
+    "Name": "AMD DaytonaX Chassis",
+    "Probe": "FOUND('AMD DaytonaX Baseboard')",
+    "Type": "Chassis"
+}
