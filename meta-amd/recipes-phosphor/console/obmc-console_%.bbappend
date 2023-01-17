@@ -1,8 +1,8 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}/${MACHINE}:"
-OBMC_CONSOLE_HOST_TTY = "ttyS0"
+OBMC_CONSOLE_HOST_TTY:ethanolx = "ttyS0"
 
 SRC_URI:remove = "file://${BPN}.conf"
-SRC_URI += "file://server.ttyS0.conf"
+SRC_URI:ethanolx += "file://server.ttyS0.conf"
 
 do_install:append() {
         # Remove upstream-provided configuration
