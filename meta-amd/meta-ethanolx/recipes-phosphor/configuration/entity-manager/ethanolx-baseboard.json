@@ -1475,5 +1475,6 @@
         "Model": "EthanolX",
         "PartNumber": "109-H43111-00A_02",
         "SerialNumber": "EX782B"
-    }
+    },
+    "xyz.openbmc_project.Inventory.Item.System": {}
 }
