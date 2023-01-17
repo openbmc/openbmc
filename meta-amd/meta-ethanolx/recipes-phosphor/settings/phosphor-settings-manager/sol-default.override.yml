@@ -1,0 +1,17 @@
+/xyz/openbmc_project/ipmi/sol/eth0:
+    - Interface: xyz.openbmc_project.Ipmi.SOL
+      Properties:
+          AccumulateIntervalMS:
+              Default: 1
+          Enable:
+              Default: 'true'
+          Privilege:
+              Default: 4
+          Progress:
+              Default: 0
+          RetryCount:
+              Default: 7
+          RetryIntervalMS:
+              Default: 1
+          Threshold:
+              Default: 1
