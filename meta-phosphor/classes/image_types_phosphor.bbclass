@@ -82,6 +82,9 @@ FLASH_UBI_RWFS_TXT_SIZE:flash-131072 ?= "32MiB"
 MMC_UBOOT_SIZE ?= "1024"
 MMC_BOOT_PARTITION_SIZE ?= "65536"
 
+SIGNING_PUBLIC_KEY ?= ""
+SIGNING_PUBLIC_KEY_TYPE = "${@os.path.splitext(os.path.basename('${SIGNING_PUBLIC_KEY}'))[0]}"
+
 SIGNING_KEY ?= "${STAGING_DIR_NATIVE}${datadir}/OpenBMC.priv"
 INSECURE_KEY = "${@'${SIGNING_KEY}' == '${STAGING_DIR_NATIVE}${datadir}/OpenBMC.priv'}"
 SIGNING_KEY_DEPENDS = "${@oe.utils.conditional('INSECURE_KEY', 'True', 'phosphor-insecure-signing-key-native:do_populate_sysroot', '', d)}"
@@ -351,17 +354,31 @@ do_generate_static[depends] += " \
         "
 
 make_signatures() {
-	signature_files=""
-	for file in "$@"; do
-		openssl dgst -sha256 -sign ${SIGNING_KEY} -out "${file}.sig" $file
-		signature_files="${signature_files} ${file}.sig"
-	done
+	signing_key="${SIGNING_KEY}"
 
-	if [ -n "$signature_files" ]; then
-		sort_signature_files=`echo "$signature_files" | tr ' ' '\n' | sort | tr '\n' ' '`
-		cat $sort_signature_files > image-full
-		openssl dgst -sha256 -sign ${SIGNING_KEY} -out image-full.sig image-full
-		signature_files="${signature_files} image-full.sig"
+	if [ "${INSECURE_KEY}" == "True" ] && [ -n "${SIGNING_PUBLIC_KEY}" ]; then
+		echo "Using SIGNING_PUBLIC_KEY"
+		signing_key=""
+	fi
+
+	if [ -n "${signing_key}" ] && [ -n "${SIGNING_PUBLIC_KEY}" ]; then
+		echo "Both SIGNING_KEY and SIGNING_PUBLIC_KEY are defined, expecting only one"
+		exit 1
+	fi
+
+	signature_files=""
+	if [ -n "${signing_key}" ]; then
+		for file in "$@"; do
+			openssl dgst -sha256 -sign ${signing_key} -out "${file}.sig" $file
+			signature_files="${signature_files} ${file}.sig"
+		done
+
+		if [ -n "${signature_files}" ]; then
+			sort_signature_files=$(echo "${signature_files}" | tr ' ' '\n' | sort | tr '\n' ' ')
+			cat ${sort_signature_files} > image-full
+			openssl dgst -sha256 -sign ${signing_key} -out image-full.sig image-full
+			signature_files="${signature_files} image-full.sig"
+		fi
 	fi
 }
 
