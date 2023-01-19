@@ -426,9 +426,9 @@ index 000000000000..6ff7a4abac99
 +
 +			sgpio2: sgpio@102000 {
 +				status = "okay";
-+				bus-frequency = <16000000>;
-+				nin_gpios = <38>;
-+				nout_gpios = <13>;
++				bus-frequency = <8000000>;
++				nuvoton,input-ngpios = <38>;
++				nuvoton,output-ngpios = <13>;
 +				gpio-line-names =
 +					"BMC_SPI_CPLD_FPGA_SEL","TPM_BMC_ALERT_N","BMC_PCH_FNM","FM_UV_ADR_TRIGGER_EN","FM_SPD_SWITCH_CTRL_N","SMB_SLIVER_RST_BMC_N","PWRBRK_SLI_OE_N","FM_ME_RECOVERY_N",
 +					"FM_BIOS_RECOVERY","FM_BIOS_MRC_DEBUG_MSG_DIS_N","RST_BMC_RTCRST","NMI_OUT","FM_BMC_ONCTL_N",
