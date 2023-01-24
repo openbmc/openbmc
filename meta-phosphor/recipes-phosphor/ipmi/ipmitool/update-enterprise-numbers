@@ -27,6 +27,7 @@ ENTERPRISES = {
     48482: "Linaro Ltd",
     48512: "Inspur Group Co.,Ltd.",
     49150: "Vertiv Co",
+    49622: "ASRock Rack Incorporation",
     49769: "YADRO",
     51974: "Raptor Computing Systems, LLC",
     52538: "Ampere Computing",
@@ -42,7 +43,7 @@ found_first: bool = False
 org: List[str] = []
 
 for ln in curl(
-    "-L", "http://www.iana.org/assignments/enterprise-numbers"
+    "-L", "https://www.iana.org/assignments/enterprise-numbers.txt"
 ).splitlines():
     line = ln.rstrip()
 

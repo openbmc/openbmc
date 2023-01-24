@@ -1,12 +1,12 @@
 PRIVATE ENTERPRISE NUMBERS
 
-(last updated 2022-09-13)
+(last updated 2023-01-25)
 
 SMI Network Management Private Enterprise Codes:
 
 Prefix: iso.org.dod.internet.private.enterprise (1.3.6.1.4.1)
 
-This file is http://www.iana.org/assignments/enterprise-numbers
+This file is https://www.iana.org/assignments/enterprise-numbers.txt
 This file has been reduced to entities signing CLAs with OpenBMC
 https://drive.google.com/drive/folders/1Ooi0RdTcaOWF1DWFJUAJDdN7tRKde7Nl
 
@@ -50,7 +50,7 @@ Decimal
 7244
   Quanta Computer Inc.
     Strong Chen
-      @strong.chen&quantatw.com
+      &strong.chen&quantatw.com
 8554
   Departement Elektrotechnik, ETH Zuerich
     Simon Moser
@@ -103,6 +103,10 @@ Decimal
   Vertiv Co
     John Bogdan
       john.bogdan&vertivco.com
+49622
+  ASRock Rack Incorporation
+    Jeff Chan
+      jeff9_chan&asrockrack.com
 49769
   YADRO
     Support
