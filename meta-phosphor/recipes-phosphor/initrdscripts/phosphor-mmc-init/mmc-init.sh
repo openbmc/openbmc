@@ -2,10 +2,19 @@
 
 # Get the value of the root env variable found in /proc/cmdline
 get_root() {
-    local root="$(cat /proc/cmdline)"
-    root="${root##* root=PARTLABEL=}"
-    root="${root%% *}"
-    [ "${root}" != "" ] && echo "${root}"
+    local cmdline="$(cat /proc/cmdline)"
+    root=
+    for opt in $cmdline
+    do
+        case $opt in
+            root=PARTLABEL=*)
+                root=${opt##root=PARTLABEL=}
+                ;;
+            *)
+                ;;
+        esac
+    done
+    [ -n "$root" ] && echo $root
 }
 
 fslist="proc sys dev run"
