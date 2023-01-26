@@ -15,7 +15,7 @@ DEPENDS = " \
 SRCREV = "770b3ff239f96b419a791bed732f914899b8c202"
 PV = "1.0+git${SRCPV}"
 
-SRC_URI = "git://github.com/openbmc/bmcweb.git;branch=master;protocol=https;nobranch=1"
+SRC_URI = "git://github.com/openbmc/bmcweb.git;branch=master;protocol=https"
 SRC_URI += " \
     file://run-ptest \
 "
