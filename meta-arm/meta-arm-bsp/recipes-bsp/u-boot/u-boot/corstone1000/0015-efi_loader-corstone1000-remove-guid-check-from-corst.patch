@@ -1,0 +1,53 @@
+From caf6c4ec65fd0a5e945dd790f2369acd163d1daf Mon Sep 17 00:00:00 2001
+From: Vishnu Banavath <vishnu.banavath@arm.com>
+Date: Sat, 11 Dec 2021 13:23:55 +0000
+Subject: [PATCH 15/25] efi_loader: corstone1000: remove guid check from
+ corstone1000 config option
+
+Use generic fmp guid and no separte check is required for
+CORSTONE1000 target.
+
+Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ lib/efi_loader/efi_capsule.c | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
+
+diff --git a/lib/efi_loader/efi_capsule.c b/lib/efi_loader/efi_capsule.c
+index c22b9b5aa0..0eee3c2d4c 100644
+--- a/lib/efi_loader/efi_capsule.c
++++ b/lib/efi_loader/efi_capsule.c
+@@ -646,12 +646,6 @@ efi_status_t __efi_runtime EFIAPI efi_update_capsule(
+ 			  i, &capsule->capsule_guid);
+ 
+ #if CONFIG_IS_ENABLED(TARGET_CORSTONE1000)
+-		if (guidcmp(&corstone1000_capsule_guid, &capsule->capsule_guid)) {
+-			ret = EFI_INVALID_PARAMETER;
+-			log_err("Corstone1000: Invalid capsule GUID\n");
+-			goto out;
+-		}
+-
+ 		if (efi_size_in_pages(capsule->capsule_image_size) >
+ 		    CORSTONE1000_CAPSULE_BUFFER_SIZE) {
+ 			log_err("Corstone1000: Capsule data size exceeds the shared buffer size\n");
+@@ -677,15 +671,7 @@ efi_status_t __efi_runtime EFIAPI efi_update_capsule(
+ 		goto out;
+ #endif
+ 
+-		if (!guidcmp(&capsule->capsule_guid,
+-			     &efi_guid_firmware_management_capsule_id)) {
+-			ret  = efi_capsule_update_firmware(capsule);
+-		} else {
+-			log_err("Unsupported capsule type: %pUs\n",
+-				&capsule->capsule_guid);
+-			ret = EFI_UNSUPPORTED;
+-		}
+-
++		ret  = efi_capsule_update_firmware(capsule);
+ 		if (ret != EFI_SUCCESS)
+ 			goto out;
+ 	}
+-- 
+2.17.1
+

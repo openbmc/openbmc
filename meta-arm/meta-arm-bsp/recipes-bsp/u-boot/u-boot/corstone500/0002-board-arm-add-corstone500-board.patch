@@ -1,4 +1,4 @@
-From 3566cf4ab79ca78acd69cfb87e74587394e5aeb2 Mon Sep 17 00:00:00 2001
+From 70cf3f7498e98a98b21804f577f3b850018894da Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Wed, 8 Jan 2020 09:48:11 +0000
 Subject: [PATCH 2/2] board: arm: add corstone500 board
@@ -11,18 +11,14 @@ chip, add the default configuration, initialization and
 makefile for this system.
 
 Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
-
-%% original patch: 0002-board-arm-add-corstone500-board.patch
-
-Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 ---
  arch/arm/Kconfig                       |  10 +++
  board/armltd/corstone500/Kconfig       |  12 +++
  board/armltd/corstone500/Makefile      |   8 ++
- board/armltd/corstone500/corstone500.c |  48 +++++++++++
- configs/corstone500_defconfig          |  40 +++++++++
- include/configs/corstone500.h          | 109 +++++++++++++++++++++++++
- 6 files changed, 227 insertions(+)
+ board/armltd/corstone500/corstone500.c |  48 ++++++++++++
+ configs/corstone500_defconfig          |  41 ++++++++++
+ include/configs/corstone500.h          | 102 +++++++++++++++++++++++++
+ 6 files changed, 221 insertions(+)
  create mode 100644 board/armltd/corstone500/Kconfig
  create mode 100644 board/armltd/corstone500/Makefile
  create mode 100644 board/armltd/corstone500/corstone500.c
@@ -30,12 +26,12 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  create mode 100644 include/configs/corstone500.h
 
 diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index 9898c7d68e1b..8c60ed39712e 100644
+index 82cd456f51f1..a925e7759ee8 100644
 --- a/arch/arm/Kconfig
 +++ b/arch/arm/Kconfig
-@@ -718,6 +718,15 @@ config ARCH_BCMSTB
- 	  This enables support for Broadcom ARM-based set-top box
- 	  chipsets, including the 7445 family of chips.
+@@ -1349,6 +1349,15 @@ config TARGET_CORSTONE1000
+ 	select PL01X_SERIAL
+ 	select DM
  
 +config TARGET_CORSTONE500
 +	bool "Support Corstone500"
@@ -46,10 +42,10 @@ index 9898c7d68e1b..8c60ed39712e 100644
 +	  This enables support for Corstone500 ARM which is a
 +	  Cortex-A5 system
 +
- config TARGET_VEXPRESS_CA9X4
- 	bool "Support vexpress_ca9x4"
- 	select CPU_V7A
-@@ -2299,6 +2308,7 @@ source "board/bosch/shc/Kconfig"
+ config TARGET_TOTAL_COMPUTE
+ 	bool "Support Total Compute Platform"
+ 	select ARM64
+@@ -2302,6 +2311,7 @@ source "board/bosch/shc/Kconfig"
  source "board/bosch/guardian/Kconfig"
  source "board/Marvell/octeontx/Kconfig"
  source "board/Marvell/octeontx2/Kconfig"
@@ -145,22 +141,24 @@ index 000000000000..e878f5c6a521
 +
 diff --git a/configs/corstone500_defconfig b/configs/corstone500_defconfig
 new file mode 100644
-index 000000000000..d3161a4b40d8
+index 000000000000..e475cbe7e40d
 --- /dev/null
 +++ b/configs/corstone500_defconfig
-@@ -0,0 +1,40 @@
+@@ -0,0 +1,41 @@
 +CONFIG_ARM=y
 +CONFIG_SKIP_LOWLEVEL_INIT=y
 +CONFIG_TARGET_CORSTONE500=y
 +CONFIG_SYS_TEXT_BASE=0x88000000
 +CONFIG_SYS_MALLOC_LEN=0x840000
-+CONFIG_SYS_MALLOC_F_LEN=0x2000
 +CONFIG_NR_DRAM_BANKS=1
-+CONFIG_SYS_MEMTEST_START=0x80000000
-+CONFIG_SYS_MEMTEST_END=0xff000000
 +CONFIG_ENV_SIZE=0x40000
++CONFIG_SYS_PROMPT="corstone500# "
 +CONFIG_IDENT_STRING=" corstone500 aarch32"
 +CONFIG_SYS_LOAD_ADDR=0x90000000
++CONFIG_SYS_MEMTEST_START=0x80000000
++CONFIG_SYS_MEMTEST_END=0xff000000
++CONFIG_HAS_CUSTOM_SYS_INIT_SP_ADDR=y
++CONFIG_CUSTOM_SYS_INIT_SP_ADDR=0x83f00000
 +CONFIG_SUPPORT_RAW_INITRD=y
 +CONFIG_BOOTDELAY=1
 +CONFIG_USE_BOOTARGS=y
@@ -168,7 +166,6 @@ index 000000000000..d3161a4b40d8
 +# CONFIG_DISPLAY_CPUINFO is not set
 +# CONFIG_DISPLAY_BOARDINFO is not set
 +CONFIG_HUSH_PARSER=y
-+CONFIG_SYS_PROMPT="corstone500# "
 +# CONFIG_CMD_CONSOLE is not set
 +CONFIG_CMD_BOOTZ=y
 +# CONFIG_CMD_XIMG is not set
@@ -191,10 +188,10 @@ index 000000000000..d3161a4b40d8
 +CONFIG_OF_LIBFDT=y
 diff --git a/include/configs/corstone500.h b/include/configs/corstone500.h
 new file mode 100644
-index 000000000000..93c397d2f515
+index 000000000000..416f5fa4399d
 --- /dev/null
 +++ b/include/configs/corstone500.h
-@@ -0,0 +1,109 @@
+@@ -0,0 +1,102 @@
 +/* SPDX-License-Identifier: GPL-2.0+ */
 +/*
 + * (C) Copyright 2022 ARM Limited
@@ -207,8 +204,6 @@ index 000000000000..93c397d2f515
 +
 +#ifndef __CORSTONE500_H
 +#define __CORSTONE500_H
-+
-+#define CONFIG_SYS_INIT_SP_ADDR		(CONFIG_SYS_SDRAM_BASE + 0x03f00000)
 +
 +/* Generic Timer Definitions */
 +#define CONFIG_SYS_HZ_CLOCK	7500000
@@ -285,12 +280,7 @@ index 000000000000..93c397d2f515
 +				"bootz $kernel_addr $initrd_addr:0x800000 $fdt_addr"
 +
 +/* Monitor Command Prompt */
-+#define CONFIG_SYS_CBSIZE		512     /* Console I/O Buffer Size */
-+#define CONFIG_SYS_MAXARGS		64      /* max command args */
-+
 +#define CONFIG_SYS_FLASH_BASE		0x80000000
-+/* 256 x 256KiB sectors */
-+#define CONFIG_SYS_MAX_FLASH_SECT	256
 +/* Store environment at top of flash */
 +#define CONFIG_ENV_ADDR			0x0a7c0000
 +#define CONFIG_ENV_SECT_SIZE		0x0040000
@@ -305,5 +295,5 @@ index 000000000000..93c397d2f515
 +#define CONFIG_ENV_IS_IN_FLASH		1
 +#endif
 -- 
-2.37.1
+2.38.1
 

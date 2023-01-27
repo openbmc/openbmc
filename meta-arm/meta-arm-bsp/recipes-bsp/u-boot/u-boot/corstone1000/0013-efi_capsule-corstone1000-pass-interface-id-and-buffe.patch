@@ -1,0 +1,74 @@
+From f8ccaf53dec63d57bab2f86b822f9fb3ed06d132 Mon Sep 17 00:00:00 2001
+From: Vishnu Banavath <vishnu.banavath@arm.com>
+Date: Fri, 10 Dec 2021 20:03:35 +0000
+Subject: [PATCH 13/25] efi_capsule: corstone1000: pass interface id and buffer
+ event id using register w4
+
+Initially the interface/event IDs are passed to the SP using register
+w3 and w5.
+
+Now the SE proxy SP requires this arguments to be in register w4.
+
+This change is to pass interface ID(31:16) and event ID(15:0)
+to SE proxy SP to trigger an event to secure enclave about
+firmware update.
+
+Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ include/configs/corstone1000.h |  6 ++++++
+ lib/efi_loader/efi_capsule.c   | 11 +++++++----
+ 2 files changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/include/configs/corstone1000.h b/include/configs/corstone1000.h
+index 4d20090c9b..77f96e87a1 100644
+--- a/include/configs/corstone1000.h
++++ b/include/configs/corstone1000.h
+@@ -24,6 +24,12 @@
+ #define CORSTONE1000_BUFFER_READY_EVT		(0x1)
+ #define CORSTONE1000_KERNEL_STARTED_EVT		(0x2)
+ 
++#define PREP_SEPROXY_SVC_ID_MASK	GENMASK(31, 16)
++#define PREP_SEPROXY_SVC_ID(x)	 (FIELD_PREP(PREP_SEPROXY_SVC_ID_MASK, (x)))
++
++#define PREP_SEPROXY_EVT_MASK		GENMASK(15, 0)
++#define PREP_SEPROXY_EVT(x)	(FIELD_PREP(PREP_SEPROXY_EVT_MASK, (x)))
++
+ /* Size in 4KB pages of the EFI capsule buffer */
+ #define CORSTONE1000_CAPSULE_BUFFER_SIZE	(8192) /* 32 MB */
+ 
+diff --git a/lib/efi_loader/efi_capsule.c b/lib/efi_loader/efi_capsule.c
+index 636b61f0ad..c22b9b5aa0 100644
+--- a/lib/efi_loader/efi_capsule.c
++++ b/lib/efi_loader/efi_capsule.c
+@@ -28,6 +28,8 @@
+ #ifdef CONFIG_TARGET_CORSTONE1000
+ #include <arm_ffa.h>
+ #include <cpu_func.h>
++#include <linux/bitfield.h>
++#include <linux/bitops.h>
+ 
+ void *__efi_runtime_data corstone1000_capsule_buf; /* capsule shared buffer virtual address */
+ efi_guid_t corstone1000_capsule_guid = EFI_CORSTONE1000_CAPSULE_ID_GUID;
+@@ -582,11 +584,12 @@ static int __efi_runtime efi_corstone1000_buffer_ready_event(u32 capsule_image_s
+ 	log_debug("[%s]\n", __func__);
+ 
+ 	/*
+-	 * setting the buffer ready event arguments
++	 * setting the buffer ready event arguments in register w4:
++	 * - capsule update interface ID (31:16)
++	 * - the buffer ready event ID (15:0)
+ 	 */
+-	msg.data0 = CORSTONE1000_SEPROXY_UPDATE_SVC_ID; /* x3 */
+-	msg.data1 = capsule_image_size; /* x4 */
+-	msg.data2 = CORSTONE1000_BUFFER_READY_EVT; /* x5 */
++	msg.data1 = PREP_SEPROXY_SVC_ID(CORSTONE1000_SEPROXY_UPDATE_SVC_ID) |
++		PREP_SEPROXY_EVT(CORSTONE1000_BUFFER_READY_EVT); /* w4 */
+ 
+ 	return ffa_bus_ops_get()->sync_send_receive(NULL, CORSTONE1000_SEPROXY_PART_ID, &msg, 0);
+ }
+-- 
+2.17.1
+

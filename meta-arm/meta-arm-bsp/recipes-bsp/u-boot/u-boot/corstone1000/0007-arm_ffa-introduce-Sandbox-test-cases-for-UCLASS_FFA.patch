@@ -1,0 +1,471 @@
+From de26427c9f9b450ab4a18352fa51f46b3b585bc1 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Mon, 6 Jun 2022 17:26:06 +0100
+Subject: [PATCH 07/25] arm_ffa: introduce Sandbox test cases for UCLASS_FFA
+
+Add functional test cases for the FF-A core driver
+
+These tests rely on the FF-A Sandbox driver which helps in
+ inspecting the FF-A core driver.
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Cc: Tom Rini <trini@konsulko.com>
+Cc: Simon Glass <sjg@chromium.org>
+Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Cc: Jens Wiklander <jens.wiklander@linaro.org>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20221122131751.22747-1-abdellatif.elkhlifi@arm.com/]
+
+Changelog:
+===============
+
+v8:
+
+  * update partition_info_get() second argument to be an SP count
+  * pass NULL device pointer to the FF-A bus discovery and operations
+
+v7: set the tests to use 64-bit direct messaging
+
+v4: align sandbox tests with the new FF-A driver interfaces
+ and new way of error handling
+
+v1: introduce sandbox tests
+---
+ MAINTAINERS      |   1 +
+ test/dm/Makefile |   2 +
+ test/dm/ffa.c    | 392 +++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 395 insertions(+)
+ create mode 100644 test/dm/ffa.c
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 23cebbd526..e682db8d8f 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -256,6 +256,7 @@ F:	doc/arch/arm64.ffa.rst
+ F:	drivers/firmware/arm-ffa/
+ F:	include/arm_ffa.h
+ F:	include/sandbox_arm_ffa.h
++F:	test/dm/ffa.c
+ 
+ ARM FREESCALE IMX
+ M:	Stefano Babic <sbabic@denx.de>
+diff --git a/test/dm/Makefile b/test/dm/Makefile
+index 7543df8823..e5a791768e 100644
+--- a/test/dm/Makefile
++++ b/test/dm/Makefile
+@@ -1,6 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0+
+ #
+ # Copyright (c) 2013 Google, Inc
++# (C) Copyright 2022 ARM Limited
+ 
+ obj-$(CONFIG_UT_DM) += test-dm.o
+ 
+@@ -81,6 +82,7 @@ obj-$(CONFIG_POWER_DOMAIN) += power-domain.o
+ obj-$(CONFIG_ACPI_PMC) += pmc.o
+ obj-$(CONFIG_DM_PMIC) += pmic.o
+ obj-$(CONFIG_DM_PWM) += pwm.o
++obj-$(CONFIG_SANDBOX_FFA) += ffa.o
+ obj-$(CONFIG_QFW) += qfw.o
+ obj-$(CONFIG_RAM) += ram.o
+ obj-y += regmap.o
+diff --git a/test/dm/ffa.c b/test/dm/ffa.c
+new file mode 100644
+index 0000000000..128d8626a7
+--- /dev/null
++++ b/test/dm/ffa.c
+@@ -0,0 +1,392 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Functional tests for UCLASS_FFA  class
++ *
++ * (C) Copyright 2022 ARM Limited
++ * Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
++ */
++
++#include <common.h>
++#include <console.h>
++#include <dm.h>
++#include <dm/test.h>
++#include "../../drivers/firmware/arm-ffa/sandbox_arm_ffa_prv.h"
++#include <sandbox_arm_ffa.h>
++#include <test/test.h>
++#include <test/ut.h>
++
++/* Macros */
++
++#define LOG_MSG_SZ (100)
++#define LOG_CMD_SZ (LOG_MSG_SZ * 2)
++
++/* Functional tests for the UCLASS_FFA */
++
++static int dm_test_ffa_log(struct unit_test_state *uts, char *msg)
++{
++	char cmd[LOG_CMD_SZ] = {0};
++
++	console_record_reset();
++
++	snprintf(cmd, LOG_CMD_SZ, "echo \"%s\"", msg);
++	run_command(cmd, 0);
++
++	ut_assert_console_end();
++
++	return CMD_RET_SUCCESS;
++}
++
++static int check_fwk_version(struct ffa_prvdata *prvdata, struct sandbox_ffa_prvdata *sdx_prvdata,
++			     struct unit_test_state *uts)
++{
++	if (prvdata->fwk_version != sdx_prvdata->fwk_version) {
++		char msg[LOG_MSG_SZ] = {0};
++
++		snprintf(msg, LOG_MSG_SZ,
++			 "[%s]: Error: framework version: core = 0x%x , sandbox  = 0x%x", __func__,
++			 prvdata->fwk_version,
++			sdx_prvdata->fwk_version);
++
++		dm_test_ffa_log(uts, msg);
++		return CMD_RET_FAILURE;
++	}
++	return CMD_RET_SUCCESS;
++}
++
++static int check_endpoint_id(struct ffa_prvdata *prvdata, struct unit_test_state *uts)
++{
++	if (prvdata->id) {
++		char msg[LOG_MSG_SZ] = {0};
++
++		snprintf(msg, LOG_MSG_SZ,
++			 "[%s]: Error: endpoint id: core = 0x%x", __func__, prvdata->id);
++		dm_test_ffa_log(uts, msg);
++		return CMD_RET_FAILURE;
++	}
++	return CMD_RET_SUCCESS;
++}
++
++static int check_core_dev(struct ffa_prvdata *prvdata, struct unit_test_state *uts)
++{
++	if (!prvdata->dev) {
++		char msg[LOG_MSG_SZ] = {0};
++
++		snprintf(msg, LOG_MSG_SZ, "[%s]: Error: core device NULL", __func__);
++		dm_test_ffa_log(uts, msg);
++		return CMD_RET_FAILURE;
++	}
++	return CMD_RET_SUCCESS;
++}
++
++static int check_sandbox_dev(struct sandbox_ffa_prvdata *sdx_prvdata, struct unit_test_state *uts)
++{
++	if (!sdx_prvdata->dev) {
++		char msg[LOG_MSG_SZ] = {0};
++
++		snprintf(msg, LOG_MSG_SZ, "[%s]: Error: sandbox device NULL", __func__);
++		dm_test_ffa_log(uts, msg);
++		return CMD_RET_FAILURE;
++	}
++	return CMD_RET_SUCCESS;
++}
++
++static int check_rxtxbuf(struct ffa_prvdata *prvdata, struct unit_test_state *uts)
++{
++	if (!prvdata->pair.rxbuf && prvdata->pair.txbuf) {
++		char msg[LOG_MSG_SZ] = {0};
++
++		snprintf(msg, LOG_MSG_SZ, "[%s]: Error: rxbuf = 0x%llx txbuf = 0x%llx", __func__,
++			 prvdata->pair.rxbuf,
++			 prvdata->pair.txbuf);
++		dm_test_ffa_log(uts, msg);
++		return CMD_RET_FAILURE;
++	}
++	return CMD_RET_SUCCESS;
++}
++
++static int check_features(struct ffa_prvdata *prvdata, struct unit_test_state *uts)
++{
++	char msg[LOG_MSG_SZ] = {0};
++
++	if (prvdata->pair.rxtx_min_pages != RXTX_4K &&
++	    prvdata->pair.rxtx_min_pages != RXTX_16K &&
++	    prvdata->pair.rxtx_min_pages != RXTX_64K) {
++		snprintf(msg,
++			 LOG_MSG_SZ,
++			 "[%s]: Error: FFA_RXTX_MAP features = 0x%lx",
++			 __func__,
++			 prvdata->pair.rxtx_min_pages);
++		dm_test_ffa_log(uts, msg);
++		return CMD_RET_FAILURE;
++	}
++
++	return CMD_RET_SUCCESS;
++}
++
++static int check_rxbuf_mapped_flag(u32 queried_func_id,
++				   u8 rxbuf_mapped,
++				   struct unit_test_state *uts)
++{
++	char msg[LOG_MSG_SZ] = {0};
++
++	switch (queried_func_id) {
++	case FFA_RXTX_MAP:
++	{
++		if (rxbuf_mapped)
++			return CMD_RET_SUCCESS;
++		break;
++	}
++	case FFA_RXTX_UNMAP:
++	{
++		if (!rxbuf_mapped)
++			return CMD_RET_SUCCESS;
++		break;
++	}
++	default:
++		return CMD_RET_FAILURE;
++	}
++
++	snprintf(msg, LOG_MSG_SZ, "[%s]: Error: %s mapping issue", __func__,
++		 (queried_func_id == FFA_RXTX_MAP ? "FFA_RXTX_MAP" : "FFA_RXTX_UNMAP"));
++	dm_test_ffa_log(uts, msg);
++
++	return CMD_RET_FAILURE;
++}
++
++static int check_rxbuf_release_flag(u8 rxbuf_owned, struct unit_test_state *uts)
++{
++	if (rxbuf_owned) {
++		char msg[LOG_MSG_SZ] = {0};
++
++		snprintf(msg, LOG_MSG_SZ, "[%s]: Error: RX buffer not released", __func__);
++		dm_test_ffa_log(uts, msg);
++		return CMD_RET_FAILURE;
++	}
++	return CMD_RET_SUCCESS;
++}
++
++static int  test_ffa_msg_send_direct_req(u16 part_id, struct unit_test_state *uts)
++{
++	struct ffa_send_direct_data msg = {0};
++	u8 cnt;
++
++	ut_assertok(ffa_bus_ops_get()->sync_send_receive(NULL, part_id, &msg, 1));
++
++	for (cnt = 0; cnt < sizeof(struct ffa_send_direct_data) / sizeof(u64); cnt++)
++		ut_assertok(((u64 *)&msg)[cnt] != 0xffffffffffffffff);
++
++	return CMD_RET_SUCCESS;
++}
++
++static int test_partitions_and_comms(const char *service_uuid,
++				     struct sandbox_ffa_prvdata *sdx_prvdata,
++				     struct unit_test_state *uts)
++{
++	u32 count = 0;
++	struct ffa_partition_info *parts_info;
++	u32 info_idx, exp_info_idx;
++	int ret;
++
++	/*
++	 * get from the driver the count of the SPs matching the UUID
++	 */
++	ret = ffa_bus_ops_get()->partition_info_get(NULL, service_uuid, &count, NULL);
++	/* make sure partitions are detected */
++	ut_assertok(ret != 0);
++	ut_assertok(count != SANDBOX_SP_COUNT_PER_VALID_SERVICE);
++
++	/*
++	 * pre-allocate a buffer to be filled by the driver
++	 * with	 ffa_partition_info structs
++	 */
++
++	parts_info = calloc(count, sizeof(struct ffa_partition_info));
++	ut_assertok(!parts_info);
++
++	/*
++	 * ask the driver to fill the buffer with the SPs info
++	 */
++	ret = ffa_bus_ops_get()->partition_info_get(NULL, service_uuid, &count, parts_info);
++	if (ret != 0) {
++		free(parts_info);
++		ut_assertok(ret != 0);
++	}
++
++	/*
++	 * SPs found , verify the partitions information
++	 */
++
++	ret = CMD_RET_FAILURE;
++
++	for (info_idx = 0; info_idx < count ; info_idx++) {
++		for (exp_info_idx = 0;
++		     exp_info_idx < sdx_prvdata->partitions.count;
++		     exp_info_idx++) {
++			if (parts_info[info_idx].id ==
++			   sdx_prvdata->partitions.descs[exp_info_idx].info.id) {
++				ret = memcmp(&parts_info[info_idx],
++					     &sdx_prvdata->partitions.descs[exp_info_idx]
++					     .info,
++					     sizeof(struct ffa_partition_info));
++				if (ret)
++					free(parts_info);
++				ut_assertok(ret != 0);
++				/* send and receive data from the current partition */
++				test_ffa_msg_send_direct_req(parts_info[info_idx].id, uts);
++			}
++			ret = CMD_RET_SUCCESS;
++		}
++	}
++
++	free(parts_info);
++
++	/* Verify  expected partitions found in the emulated secure world*/
++	ut_assertok(ret != CMD_RET_SUCCESS);
++
++	return CMD_RET_SUCCESS;
++}
++
++static int dm_test_ffa_ack(struct unit_test_state *uts)
++{
++	struct ffa_prvdata *prvdata = NULL;
++	struct sandbox_ffa_prvdata *sdx_prvdata = NULL;
++	struct ffa_sandbox_data func_data = {0};
++	u8 rxbuf_flag = 0;
++	const char *svc1_uuid = SANDBOX_SERVICE1_UUID;
++	const char *svc2_uuid = SANDBOX_SERVICE2_UUID;
++	int ret;
++
++	/*  test probing FF-A devices */
++	ut_assertok(ffa_bus_discover(NULL));
++
++	/* get a pointer to the FF-A core and sandbox drivers private data */
++	func_data.data0 = &prvdata;
++	func_data.data0_size = sizeof(prvdata);
++	func_data.data1 = &sdx_prvdata;
++	func_data.data1_size = sizeof(sdx_prvdata);
++
++	ut_assertok(sandbox_ffa_query_core_state(FFA_VERSION, &func_data));
++
++	/* make sure private data pointers are retrieved */
++	ut_assertok(prvdata == 0);
++	ut_assertok(sdx_prvdata == 0);
++
++	/* make sure dev devices created */
++	ut_assertok(check_core_dev(prvdata, uts));
++	ut_assertok(check_sandbox_dev(sdx_prvdata, uts));
++
++	/* test FFA_VERSION */
++	ut_assertok(check_fwk_version(prvdata, sdx_prvdata, uts));
++
++	/* test FFA_ID_GET */
++	ut_assertok(check_endpoint_id(prvdata, uts));
++
++	/* test FFA_FEATURES */
++	ut_assertok(check_features(prvdata, uts));
++
++	/*  test core RX/TX buffers */
++	ut_assertok(check_rxtxbuf(prvdata, uts));
++
++	/* test FFA_RXTX_MAP */
++	func_data.data0 = &rxbuf_flag;
++	func_data.data0_size = sizeof(rxbuf_flag);
++
++	rxbuf_flag = 0;
++	ut_assertok(sandbox_ffa_query_core_state(FFA_RXTX_MAP, &func_data));
++	ut_assertok(check_rxbuf_mapped_flag(FFA_RXTX_MAP, rxbuf_flag, uts));
++
++	/* FFA_PARTITION_INFO_GET / FFA_MSG_SEND_DIRECT_REQ */
++	ret = test_partitions_and_comms(svc1_uuid, sdx_prvdata, uts);
++	ut_assertok(ret != CMD_RET_SUCCESS);
++
++	/* test FFA_RX_RELEASE */
++	rxbuf_flag = 1;
++	ut_assertok(sandbox_ffa_query_core_state(FFA_RX_RELEASE, &func_data));
++	ut_assertok(check_rxbuf_release_flag(rxbuf_flag, uts));
++
++	/* FFA_PARTITION_INFO_GET / FFA_MSG_SEND_DIRECT_REQ */
++	ret = test_partitions_and_comms(svc2_uuid, sdx_prvdata, uts);
++	ut_assertok(ret != CMD_RET_SUCCESS);
++
++	/* test FFA_RX_RELEASE */
++	rxbuf_flag = 1;
++	ut_assertok(sandbox_ffa_query_core_state(FFA_RX_RELEASE, &func_data));
++	ut_assertok(check_rxbuf_release_flag(rxbuf_flag, uts));
++
++	/* test FFA_RXTX_UNMAP */
++	ut_assertok(ffa_bus_ops_get()->rxtx_unmap(NULL));
++
++	rxbuf_flag = 1;
++	ut_assertok(sandbox_ffa_query_core_state(FFA_RXTX_UNMAP, &func_data));
++	ut_assertok(check_rxbuf_mapped_flag(FFA_RXTX_UNMAP, rxbuf_flag, uts));
++
++	return CMD_RET_SUCCESS;
++}
++
++DM_TEST(dm_test_ffa_ack, UT_TESTF_SCAN_FDT | UT_TESTF_CONSOLE_REC);
++
++static int dm_test_ffa_nack(struct unit_test_state *uts)
++{
++	struct ffa_prvdata *prvdata = NULL;
++	struct sandbox_ffa_prvdata *sdx_prvdata = NULL;
++	struct ffa_sandbox_data func_data = {0};
++	const char *valid_svc_uuid = SANDBOX_SERVICE1_UUID;
++	const char *unvalid_svc_uuid = SANDBOX_SERVICE3_UUID;
++	const char *unvalid_svc_uuid_str = SANDBOX_SERVICE4_UUID;
++	struct ffa_send_direct_data msg = {0};
++	int ret;
++	u32 count = 0;
++	u16 part_id = 0;
++
++	/*  test probing FF-A devices */
++	ut_assertok(ffa_bus_discover(NULL));
++
++	/* get a pointer to the FF-A core and sandbox drivers private data */
++	func_data.data0 = &prvdata;
++	func_data.data0_size = sizeof(prvdata);
++	func_data.data1 = &sdx_prvdata;
++	func_data.data1_size = sizeof(sdx_prvdata);
++
++	ut_assertok(sandbox_ffa_query_core_state(FFA_VERSION, &func_data));
++
++	/* make sure private data pointers are retrieved */
++	ut_assertok(prvdata == 0);
++	ut_assertok(sdx_prvdata == 0);
++
++	/* make sure dev devices created */
++	ut_assertok(check_core_dev(prvdata, uts));
++	ut_assertok(check_sandbox_dev(sdx_prvdata, uts));
++
++	/* query partitions count using  invalid arguments  */
++	ret = ffa_bus_ops_get()->partition_info_get(NULL, unvalid_svc_uuid, NULL, NULL);
++	ut_assertok(ret != -EINVAL);
++
++	/* query partitions count using an invalid UUID  string */
++	ret = ffa_bus_ops_get()->partition_info_get(NULL, unvalid_svc_uuid_str, &count, NULL);
++	ut_assertok(ret != -EINVAL);
++
++	/* query partitions count using an invalid UUID (no matching SP) */
++	count = 0;
++	ret = ffa_bus_ops_get()->partition_info_get(NULL, unvalid_svc_uuid, &count, NULL);
++	ut_assertok(count != 0);
++
++	/* query partitions count using a valid UUID  */
++	count = 0;
++	ret = ffa_bus_ops_get()->partition_info_get(NULL, valid_svc_uuid, &count, NULL);
++	/* make sure partitions are detected */
++	ut_assertok(ret != 0);
++	ut_assertok(count != SANDBOX_SP_COUNT_PER_VALID_SERVICE);
++
++	/* send data to an invalid partition */
++	ret = ffa_bus_ops_get()->sync_send_receive(NULL, part_id, &msg, 1);
++	ut_assertok(ret != -EINVAL);
++
++	/* send data to a valid partition */
++	part_id = prvdata->partitions.descs[0].info.id;
++	ret = ffa_bus_ops_get()->sync_send_receive(NULL, part_id, &msg, 1);
++	ut_assertok(ret != 0);
++
++	return CMD_RET_SUCCESS;
++}
++
++DM_TEST(dm_test_ffa_nack, UT_TESTF_SCAN_FDT | UT_TESTF_CONSOLE_REC);
+-- 
+2.17.1
+

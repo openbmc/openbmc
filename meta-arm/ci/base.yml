@@ -5,7 +5,7 @@ distro: poky
 
 defaults:
   repos:
-    refspec: langdale
+    refspec: master
 
 repos:
   meta-arm:

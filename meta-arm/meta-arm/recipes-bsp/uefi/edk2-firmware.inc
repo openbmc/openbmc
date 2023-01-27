@@ -11,12 +11,13 @@ LIC_FILES_CHKSUM = "file://License.txt;md5=2b415520383f7964e96700ae12b4570a"
 LIC_FILES_CHKSUM += "file://edk2-platforms/License.txt;md5=2b415520383f7964e96700ae12b4570a"
 
 # These can be overridden as needed
-EDK2_SRC_URI = "gitsm://github.com/tianocore/edk2.git;branch=master;protocol=https"
-EDK2_PLATFORMS_SRC_URI = "git://github.com/tianocore/edk2-platforms.git;branch=master;protocol=https"
-
+SRC_URI_EDK2 ?= "gitsm://github.com/tianocore/edk2.git;protocol=https"
+SRC_URI_EDK2_PLATFORMS ?= "git://github.com/tianocore/edk2-platforms.git;protocol=https"
+SRCBRANCH_edk2 = "master"
+SRCBRANCH_edk2_platforms = "master"
 SRC_URI = "\
-    ${EDK2_SRC_URI};name=edk2;destsuffix=edk2;nobranch=1 \
-    ${EDK2_PLATFORMS_SRC_URI};name=edk2-platforms;destsuffix=edk2/edk2-platforms;nobranch=1 \
+    ${SRC_URI_EDK2};branch=${SRCBRANCH_edk2_platforms};name=edk2;destsuffix=edk2 \
+    ${SRC_URI_EDK2_PLATFORMS};branch=${SRCBRANCH_edk2};name=edk2-platforms;destsuffix=edk2/edk2-platforms \
     file://unaligned.patch \
     file://default.patch;patchdir=edk2-platforms \
 "

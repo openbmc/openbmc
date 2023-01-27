@@ -1,4 +1,4 @@
-From dbc1a218e9837e39cd50dd3c19f603f29a08ddba Mon Sep 17 00:00:00 2001
+From 30405f59881c73946b6b0ffdbf25804f9fbf1585 Mon Sep 17 00:00:00 2001
 From: Peter Hoyes <Peter.Hoyes@arm.com>
 Date: Wed, 14 Jul 2021 12:44:27 +0100
 Subject: [PATCH 4/9] armv8: ARMV8_SWITCH_TO_EL1 improvements
@@ -17,29 +17,11 @@ Upstream-Status: Inappropriate [other]
 Signed-off-by: Peter Hoyes <Peter.Hoyes@arm.com>
 Change-Id: If98478148d6d8d1f732acac5439276700614815f
 ---
- arch/arm/cpu/armv8/Kconfig           |  8 +++++++
  arch/arm/cpu/armv8/exception_level.c | 21 ++++++++++++++--
  arch/arm/lib/bootm.c                 | 36 ++++++++++++++++------------
  configs/vexpress_aemv8r_defconfig    |  1 +
- 4 files changed, 49 insertions(+), 17 deletions(-)
+ 3 files changed, 41 insertions(+), 17 deletions(-)
 
-diff --git a/arch/arm/cpu/armv8/Kconfig b/arch/arm/cpu/armv8/Kconfig
-index 031faa909c..110adf63b3 100644
---- a/arch/arm/cpu/armv8/Kconfig
-+++ b/arch/arm/cpu/armv8/Kconfig
-@@ -191,4 +191,12 @@ config ARMV8_EA_EL3_FIRST
- 	  Exception handling at all exception levels for External Abort and
- 	  SError interrupt exception are taken in EL3.
- 
-+config ARMV8_SWITCH_TO_EL1
-+	bool "Switch to EL1 before booting the operating system"
-+	default n
-+	help
-+	  Switch to EL1 before booting the operating system, if for example the
-+	  operating system does not support booting at EL2, or you wish to prevent
-+	  any hypervisors from running. Supported for bootm, booti and bootefi.
-+
- endif
 diff --git a/arch/arm/cpu/armv8/exception_level.c b/arch/arm/cpu/armv8/exception_level.c
 index b11936548f..4aad1550f4 100644
 --- a/arch/arm/cpu/armv8/exception_level.c
@@ -84,10 +66,10 @@ index b11936548f..4aad1550f4 100644
  	}
  }
 diff --git a/arch/arm/lib/bootm.c b/arch/arm/lib/bootm.c
-index a59a5e6c0e..e2cf2e6ec4 100644
+index 9f086f3b90..b044aeca88 100644
 --- a/arch/arm/lib/bootm.c
 +++ b/arch/arm/lib/bootm.c
-@@ -272,7 +272,6 @@ __weak void update_os_arch_secondary_cores(uint8_t os_arch)
+@@ -270,7 +270,6 @@ __weak void update_os_arch_secondary_cores(uint8_t os_arch)
  {
  }
  
@@ -95,7 +77,7 @@ index a59a5e6c0e..e2cf2e6ec4 100644
  static void switch_to_el1(void)
  {
  	if ((IH_ARCH_DEFAULT == IH_ARCH_ARM64) &&
-@@ -287,7 +286,6 @@ static void switch_to_el1(void)
+@@ -285,7 +284,6 @@ static void switch_to_el1(void)
  				    ES_TO_AARCH64);
  }
  #endif
@@ -103,7 +85,7 @@ index a59a5e6c0e..e2cf2e6ec4 100644
  
  /* Subcommand: GO */
  static void boot_jump_linux(bootm_headers_t *images, int flag)
-@@ -314,21 +312,29 @@ static void boot_jump_linux(bootm_headers_t *images, int flag)
+@@ -312,21 +310,29 @@ static void boot_jump_linux(bootm_headers_t *images, int flag)
  
  		update_os_arch_secondary_cores(images->os.arch);
  
@@ -147,10 +129,10 @@ index a59a5e6c0e..e2cf2e6ec4 100644
  #else
  	unsigned long machid = gd->bd->bi_arch_number;
 diff --git a/configs/vexpress_aemv8r_defconfig b/configs/vexpress_aemv8r_defconfig
-index 1d5b7411f0..35e5e8a5e1 100644
+index 683d983c36..6044f82b00 100644
 --- a/configs/vexpress_aemv8r_defconfig
 +++ b/configs/vexpress_aemv8r_defconfig
-@@ -14,3 +14,4 @@ CONFIG_SYS_PROMPT="VExpress64# "
+@@ -17,3 +17,4 @@ CONFIG_SYS_PBSIZE=541
  # CONFIG_MMC is not set
  CONFIG_VIRTIO_MMIO=y
  CONFIG_ARMV8_EXCEPTION_VECTORS=n

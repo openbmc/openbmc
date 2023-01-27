@@ -1,4 +1,4 @@
-From 61a2df4467c13bbc83bff8a3429e9ebb4b957b56 Mon Sep 17 00:00:00 2001
+From 07cc3e4af3def76d92faf39712d4fd8717b21d2b Mon Sep 17 00:00:00 2001
 From: Peter Hoyes <Peter.Hoyes@arm.com>
 Date: Fri, 10 Dec 2021 11:41:19 +0000
 Subject: [PATCH 3/9] armv8: Allow disabling exception vectors on non-SPL
@@ -27,7 +27,7 @@ Change-Id: I0cf0fc6d7ef4d45791411cf1f67c65e198cc8b2b
  4 files changed, 13 insertions(+), 8 deletions(-)
 
 diff --git a/arch/arm/cpu/armv8/Kconfig b/arch/arm/cpu/armv8/Kconfig
-index 09f3f50fa2..031faa909c 100644
+index 1305238c9d..dec4be0e30 100644
 --- a/arch/arm/cpu/armv8/Kconfig
 +++ b/arch/arm/cpu/armv8/Kconfig
 @@ -1,8 +1,8 @@
@@ -55,7 +55,7 @@ index 09f3f50fa2..031faa909c 100644
          bool "Enable multiple CPUs to enter into U-Boot"
  
 diff --git a/arch/arm/cpu/armv8/Makefile b/arch/arm/cpu/armv8/Makefile
-index 85fe0475c8..8b3f695835 100644
+index 2e4bf9e038..001a31cae7 100644
 --- a/arch/arm/cpu/armv8/Makefile
 +++ b/arch/arm/cpu/armv8/Makefile
 @@ -13,10 +13,8 @@ ifndef CONFIG_$(SPL_)SYS_DCACHE_OFF
@@ -94,11 +94,11 @@ index 28f0df13f0..f831e77af3 100644
  	adr	x0, vectors
  	switch_el x1, 3f, 2f, 1f
 diff --git a/configs/vexpress_aemv8r_defconfig b/configs/vexpress_aemv8r_defconfig
-index a1c5d88717..1d5b7411f0 100644
+index 495eb1dee3..683d983c36 100644
 --- a/configs/vexpress_aemv8r_defconfig
 +++ b/configs/vexpress_aemv8r_defconfig
-@@ -13,3 +13,4 @@ CONFIG_BOOTARGS="console=ttyAMA0 earlycon=pl011,0x9c090000 rootfstype=ext4 root=
- CONFIG_SYS_PROMPT="VExpress64# "
+@@ -16,3 +16,4 @@ CONFIG_SYS_CBSIZE=512
+ CONFIG_SYS_PBSIZE=541
  # CONFIG_MMC is not set
  CONFIG_VIRTIO_MMIO=y
 +CONFIG_ARMV8_EXCEPTION_VECTORS=n

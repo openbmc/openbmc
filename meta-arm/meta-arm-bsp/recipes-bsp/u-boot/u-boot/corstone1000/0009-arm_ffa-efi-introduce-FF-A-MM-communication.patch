@@ -1,0 +1,498 @@
+From cefc1d101c62e62e66f9cbf1775defde7d2c3d27 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Mon, 15 Aug 2022 15:12:49 +0100
+Subject: [PATCH 09/25] arm_ffa: efi: introduce FF-A MM communication
+
+Add MM communication support using FF-A transport
+
+This feature allows accessing MM partitions services through
+EFI MM communication protocol. MM partitions such as StandAlonneMM
+or smm-gateway secure partitions which reside in secure world.
+
+An MM shared buffer and a door bell event are used to exchange
+the data.
+
+The data is used by EFI services such as GetVariable()/SetVariable()
+and copied from the communication buffer to the MM shared buffer.
+
+The secure partition is notified about availability of data in the
+MM shared buffer by an FF-A message (door bell).
+
+On such event, MM SP can read the data and updates the MM shared
+buffer with the response data.
+
+The response data is copied back to the communication buffer and
+consumed by the EFI subsystem.
+
+MM communication protocol supports FF-A 64-bit direct messaging.
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Signed-off-by: Gowtham Suresh Kumar <gowtham.sureshkumar@arm.com>
+Cc: Tom Rini <trini@konsulko.com>
+Cc: Simon Glass <sjg@chromium.org>
+Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Cc: Jens Wiklander <jens.wiklander@linaro.org>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20221122131751.22747-1-abdellatif.elkhlifi@arm.com/]
+
+Changelog:
+===============
+
+v8:
+
+* isolate the compilation choices between FF-A and OP-TEE
+* update partition_info_get() second argument to be an SP count
+* pass NULL device pointer to the FF-A bus discovery and operations
+
+v7:
+
+* set the MM door bell event to use 64-bit direct messaging
+* issue a compile time error when one of these macros are not found :
+  FFA_SHARED_MM_BUFFER_SIZE, FFA_SHARED_MM_BUFFER_OFFSET, FFA_SHARED_MM_BUFFER_ADDR
+* make mm_sp_svc_uuid static
+* replace EINVAL with ENOMEM in ffa_discover_mm_sp_id() when calloc() fails
+* improve use of unmap_sysmem() in ffa_mm_communicate()
+
+v6:
+
+* add FF-A runtime discovery at MM communication level
+* drop EFI runtime support for FF-A MM communication
+* revert the changes in include/mm_communication.h for
+  efi_mm_communicate_header and smm_variable_access structures
+
+v4:
+
+* use the new FF-A driver interfaces
+* discover MM partitions at runtime
+* copy FF-A driver private data to EFI runtime section at
+  ExitBootServices()
+* drop use of FFA_ERR_STAT_SUCCESS error code
+* replace EFI_BUFFER_TOO_SMALL with EFI_OUT_OF_RESOURCES
+  in ffa_mm_communicate(). No need for efi_memcpy_runtime() anymore
+* revert the error log in mm_communicate() in case of failure
+* remove packed attribute from efi_mm_communicate_header and
+  smm_variable_communicate_header
+
+v2:
+
+* set default values to 0 for FFA_SHARED_MM_BUFFER_SIZE, FFA_SHARED_MM_BUFFER_ADDR and MM_SP_UUID_DATA and add warnings
+
+v1:
+
+* introduce FF-A MM communication
+---
+ include/mm_communication.h        |   5 +
+ lib/efi_loader/Kconfig            |  14 +-
+ lib/efi_loader/efi_variable_tee.c | 294 +++++++++++++++++++++++++++++-
+ 3 files changed, 307 insertions(+), 6 deletions(-)
+
+diff --git a/include/mm_communication.h b/include/mm_communication.h
+index e65fbde60d..d409bed777 100644
+--- a/include/mm_communication.h
++++ b/include/mm_communication.h
+@@ -6,6 +6,8 @@
+  *  Copyright (c) 2017, Intel Corporation. All rights reserved.
+  *  Copyright (C) 2020 Linaro Ltd. <sughosh.ganu@linaro.org>
+  *  Copyright (C) 2020 Linaro Ltd. <ilias.apalodimas@linaro.org>
++ * (C) Copyright 2022 ARM Limited
++ * Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+  */
+ 
+ #ifndef _MM_COMMUNICATION_H_
+@@ -13,6 +15,9 @@
+ 
+ #include <part_efi.h>
+ 
++/* MM service UUID string (big-endian format). This UUID is  common across all MM SPs */
++#define MM_SP_UUID	"33d532ed-e699-0942-c09c-a798d9cd722d"
++
+ /*
+  * Interface to the pseudo Trusted Application (TA), which provides a
+  * communication channel with the Standalone MM (Management Mode)
+diff --git a/lib/efi_loader/Kconfig b/lib/efi_loader/Kconfig
+index b8fb2701a7..d292f57244 100644
+--- a/lib/efi_loader/Kconfig
++++ b/lib/efi_loader/Kconfig
+@@ -61,13 +61,23 @@ config EFI_VARIABLE_FILE_STORE
+ 	  stored as file /ubootefi.var on the EFI system partition.
+ 
+ config EFI_MM_COMM_TEE
+-	bool "UEFI variables storage service via OP-TEE"
+-	depends on OPTEE
++	bool "UEFI variables storage service via the trusted world"
++	depends on OPTEE || ARM_FFA_TRANSPORT
+ 	help
++	  Allowing access to the MM SP services (SPs such as  StandAlonneMM, smm-gateway).
++	  When using the u-boot OP-TEE driver, StandAlonneMM is supported.
++	  When using the u-boot FF-A  driver any MM SP is supported.
++
+ 	  If OP-TEE is present and running StandAloneMM, dispatch all UEFI
+ 	  variable related operations to that. The application will verify,
+ 	  authenticate and store the variables on an RPMB.
+ 
++	  When ARM_FFA_TRANSPORT is used, dispatch all UEFI variable related
++	  operations to the MM SP running in the secure world.
++	  A door bell mechanism is used to notify the SP when there is data in the shared
++	  MM buffer. The data is copied by u-boot to the shared buffer before issuing
++	  the door bell event.
++
+ config EFI_VARIABLE_NO_STORE
+ 	bool "Don't persist non-volatile UEFI variables"
+ 	help
+diff --git a/lib/efi_loader/efi_variable_tee.c b/lib/efi_loader/efi_variable_tee.c
+index dfef18435d..3933a24e8c 100644
+--- a/lib/efi_loader/efi_variable_tee.c
++++ b/lib/efi_loader/efi_variable_tee.c
+@@ -4,9 +4,12 @@
+  *
+  *  Copyright (C) 2019 Linaro Ltd. <sughosh.ganu@linaro.org>
+  *  Copyright (C) 2019 Linaro Ltd. <ilias.apalodimas@linaro.org>
++ *  Copyright (C) 2022 ARM Limited
++ *  Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+  */
+ 
+ #include <common.h>
++#include <dm.h>
+ #include <efi.h>
+ #include <efi_api.h>
+ #include <efi_loader.h>
+@@ -15,6 +18,36 @@
+ #include <malloc.h>
+ #include <mm_communication.h>
+ 
++#if (IS_ENABLED(CONFIG_ARM_FFA_TRANSPORT))
++
++#include <arm_ffa.h>
++#include <cpu_func.h>
++#include <mapmem.h>
++
++#ifndef FFA_SHARED_MM_BUFFER_SIZE
++#error "FFA_SHARED_MM_BUFFER_SIZE must be defined in include/configs/<board>.h"
++#define FFA_SHARED_MM_BUFFER_SIZE 0
++#endif
++
++#ifndef FFA_SHARED_MM_BUFFER_OFFSET
++#error "FFA_SHARED_MM_BUFFER_OFFSET must be defined in include/configs/<board>.h"
++#define FFA_SHARED_MM_BUFFER_OFFSET 0
++#endif
++
++#ifndef FFA_SHARED_MM_BUFFER_ADDR
++#error "FFA_SHARED_MM_BUFFER_ADDR must be defined in include/configs/<board>.h"
++#define FFA_SHARED_MM_BUFFER_ADDR 0
++#endif
++
++/* MM return codes */
++#define MM_SUCCESS (0)
++
++static const char *mm_sp_svc_uuid = MM_SP_UUID;
++
++static u16 mm_sp_id;
++
++#endif
++
+ extern struct efi_var_file __efi_runtime_data *efi_var_buf;
+ static efi_uintn_t max_buffer_size;	/* comm + var + func + data */
+ static efi_uintn_t max_payload_size;	/* func + data */
+@@ -24,6 +57,7 @@ struct mm_connection {
+ 	u32 session;
+ };
+ 
++#if (IS_ENABLED(CONFIG_OPTEE))
+ /**
+  * get_connection() - Retrieve OP-TEE session for a specific UUID.
+  *
+@@ -143,13 +177,248 @@ static efi_status_t optee_mm_communicate(void *comm_buf, ulong dsize)
+ 
+ 	return ret;
+ }
++#endif
++
++#if (IS_ENABLED(CONFIG_ARM_FFA_TRANSPORT))
+ 
+ /**
+- * mm_communicate() - Adjust the cmonnucation buffer to StandAlonneMM and send
++ * ffa_notify_mm_sp() - Announce there is data in the shared buffer
++ *
++ * Notifies the MM partition in the trusted world that
++ * data is available in the shared buffer.
++ * This is a blocking call during which trusted world has exclusive access
++ * to the MM shared buffer.
++ *
++ * Return:
++ *
++ * 0 on success
++ */
++static int ffa_notify_mm_sp(void)
++{
++	struct ffa_send_direct_data msg = {0};
++	int ret;
++	int sp_event_ret = -1;
++
++	if (!ffa_bus_ops_get())
++		return -EINVAL;
++
++	msg.data0 = FFA_SHARED_MM_BUFFER_OFFSET; /* x3 */
++
++	ret = ffa_bus_ops_get()->sync_send_receive(NULL, mm_sp_id, &msg, 1);
++	if (ret != 0)
++		return ret;
++
++	sp_event_ret = msg.data0; /* x3 */
++
++	if (sp_event_ret == MM_SUCCESS)
++		return 0;
++
++	/*
++	 * Failure to notify the MM SP
++	 */
++
++	return -EACCES;
++}
++
++/**
++ * ffa_discover_mm_sp_id() - Query the MM partition ID
++ *
++ * Use the FF-A driver to get the MM partition ID.
++ * If multiple partitions are found, use the first one.
++ * This is a boot time function.
++ *
++ * Return:
++ *
++ * 0 on success
++ */
++static int ffa_discover_mm_sp_id(void)
++{
++	u32 count = 0;
++	int ret;
++	struct ffa_partition_info *parts_info;
++
++	if (!ffa_bus_ops_get())
++		return -EINVAL;
++
++	/*
++	 * get from the driver the count of the SPs matching the UUID
++	 */
++	ret = ffa_bus_ops_get()->partition_info_get(NULL, mm_sp_svc_uuid, &count, NULL);
++	if (ret != 0) {
++		log_err("EFI: Failure in querying partitions count (error code: %d)\n", ret);
++		return ret;
++	}
++
++	if (!count) {
++		log_info("EFI: No MM partition found\n");
++		return ret;
++	}
++
++	/*
++	 * pre-allocate a buffer to be filled by the driver
++	 * with	 ffa_partition_info structs
++	 */
++
++	log_info("EFI: Pre-allocating %d partition(s) info structures\n", count);
++
++	parts_info = calloc(count, sizeof(*parts_info));
++	if (!parts_info)
++		return -ENOMEM;
++
++	/*
++	 * ask the driver to fill the
++	 * buffer with the SPs info
++	 */
++	ret = ffa_bus_ops_get()->partition_info_get(NULL, mm_sp_svc_uuid, &count, parts_info);
++	if (ret) {
++		log_err("EFI: Failure in querying partition(s) info (error code: %d)\n", ret);
++		free(parts_info);
++		return ret;
++	}
++
++	/*
++	 * MM SPs found , use the first one
++	 */
++
++	mm_sp_id = parts_info[0].id;
++
++	log_info("EFI: MM partition ID 0x%x\n", mm_sp_id);
++
++	free(parts_info);
++
++	return 0;
++}
++
++/**
++ * ffa_mm_communicate() - Exchange EFI services data with  the MM partition using FF-A
++ * @comm_buf:		locally allocated communication buffer used for rx/tx
++ * @dsize:				communication buffer size
++ *
++ * Issues a door bell event to notify the MM partition (SP) running in OP-TEE
++ * that there is data to read from the shared buffer.
++ * Communication with the MM SP is performed using FF-A transport.
++ * On the event, MM SP can read the data from the buffer and
++ * update the MM shared buffer with response data.
++ * The response data is copied back to the communication buffer.
++ *
++ * Return:
++ *
++ * EFI status code
++ */
++static efi_status_t ffa_mm_communicate(void *comm_buf, ulong comm_buf_size)
++{
++	ulong tx_data_size;
++	int ffa_ret;
++	efi_status_t efi_ret;
++	struct efi_mm_communicate_header *mm_hdr;
++	void *virt_shared_buf;
++
++	if (!comm_buf)
++		return EFI_INVALID_PARAMETER;
++
++	/* Discover MM partition ID at boot time */
++	if (!mm_sp_id && ffa_discover_mm_sp_id()  != 0) {
++		log_err("EFI: Failure to discover MM partition ID at boot time\n");
++		return EFI_UNSUPPORTED;
++	}
++
++	mm_hdr = (struct efi_mm_communicate_header *)comm_buf;
++	tx_data_size = mm_hdr->message_len + sizeof(efi_guid_t) + sizeof(size_t);
++
++	if (comm_buf_size != tx_data_size || tx_data_size > FFA_SHARED_MM_BUFFER_SIZE)
++		return EFI_INVALID_PARAMETER;
++
++	/* Copy the data to the shared buffer */
++
++	virt_shared_buf = (void *)map_sysmem((phys_addr_t)FFA_SHARED_MM_BUFFER_ADDR, 0);
++	memcpy(virt_shared_buf, comm_buf, tx_data_size);
++
++	/*
++	 * The secure world might have cache disabled for
++	 * the device region used for shared buffer (which is the case for Optee).
++	 * In this case, the secure world reads the data from DRAM.
++	 * Let's flush the cache so the DRAM is updated with the latest data.
++	 */
++	#ifdef CONFIG_ARM64
++	invalidate_dcache_all();
++	#endif
++
++	/* Announce there is data in the shared buffer */
++
++	ffa_ret = ffa_notify_mm_sp();
++
++	switch (ffa_ret) {
++	case 0:
++	{
++		ulong rx_data_size;
++		/* Copy the MM SP response from the shared buffer to the communication buffer */
++		rx_data_size = ((struct efi_mm_communicate_header *)virt_shared_buf)->message_len +
++			sizeof(efi_guid_t) +
++			sizeof(size_t);
++
++		if (rx_data_size > comm_buf_size) {
++			efi_ret = EFI_OUT_OF_RESOURCES;
++			break;
++		}
++
++		memcpy(comm_buf, virt_shared_buf, rx_data_size);
++		efi_ret = EFI_SUCCESS;
++		break;
++	}
++	case -EINVAL:
++		efi_ret = EFI_DEVICE_ERROR;
++		break;
++	case -EPERM:
++		efi_ret = EFI_INVALID_PARAMETER;
++		break;
++	case -EACCES:
++		efi_ret = EFI_ACCESS_DENIED;
++		break;
++	case -EBUSY:
++		efi_ret = EFI_OUT_OF_RESOURCES;
++		break;
++	default:
++		efi_ret = EFI_ACCESS_DENIED;
++	}
++
++	unmap_sysmem(virt_shared_buf);
++	return efi_ret;
++}
++#endif
++
++/**
++ * select_ffa_mm_comms() - checks FF-A support availability
++ *
++ * Making sure FF-A is compiled in. If that's the case try to discover
++ * the FF-A bus.
++ *
++ * Return:
++ *
++ * 0: FF-A ready for use. Otherwise, failure
++ */
++static efi_status_t select_ffa_mm_comms(void)
++{
++	efi_status_t ret = EFI_UNSUPPORTED;
++#if (IS_ENABLED(CONFIG_ARM_FFA_TRANSPORT))
++	ret = ffa_bus_discover(NULL);
++	if (ret)
++		ret = EFI_NOT_READY;
++#endif
++	return ret;
++}
++
++/**
++ * mm_communicate() - Adjust the communication buffer to the MM SP and send
+  * it to OP-TEE
+  *
+- * @comm_buf:		locally allocted communcation buffer
++ * @comm_buf:		locally allocated communication buffer
+  * @dsize:		buffer size
++ *
++ * The SP (also called partition) can be any MM SP such as  StandAlonneMM or smm-gateway.
++ * The comm_buf format is the same for both partitions.
++ * When using the u-boot OP-TEE driver, StandAlonneMM is supported.
++ * When using the u-boot FF-A  driver, any MM SP is supported.
++ *
+  * Return:		status code
+  */
+ static efi_status_t mm_communicate(u8 *comm_buf, efi_uintn_t dsize)
+@@ -162,7 +431,17 @@ static efi_status_t mm_communicate(u8 *comm_buf, efi_uintn_t dsize)
+ 	mm_hdr = (struct efi_mm_communicate_header *)comm_buf;
+ 	var_hdr = (struct smm_variable_communicate_header *)mm_hdr->data;
+ 
+-	ret = optee_mm_communicate(comm_buf, dsize);
++	ret = select_ffa_mm_comms();
++	if (ret != EFI_SUCCESS) {
++#if (IS_ENABLED(CONFIG_OPTEE))
++		ret = optee_mm_communicate(comm_buf, dsize);
++#endif
++	} else {
++#if (IS_ENABLED(CONFIG_ARM_FFA_TRANSPORT))
++		ret = ffa_mm_communicate(comm_buf, dsize);
++#endif
++	}
++
+ 	if (ret != EFI_SUCCESS) {
+ 		log_err("%s failed!\n", __func__);
+ 		return ret;
+@@ -258,6 +537,13 @@ efi_status_t EFIAPI get_max_payload(efi_uintn_t *size)
+ 		goto out;
+ 	}
+ 	*size = var_payload->size;
++
++	#if (IS_ENABLED(CONFIG_ARM_FFA_TRANSPORT))
++		if (*size > FFA_SHARED_MM_BUFFER_SIZE)
++			*size = FFA_SHARED_MM_BUFFER_SIZE - MM_COMMUNICATE_HEADER_SIZE	-
++				MM_VARIABLE_COMMUNICATE_SIZE;
++	#endif
++
+ 	/*
+ 	 * There seems to be a bug in EDK2 miscalculating the boundaries and
+ 	 * size checks, so deduct 2 more bytes to fulfill this requirement. Fix
+@@ -697,7 +983,7 @@ void efi_variables_boot_exit_notify(void)
+ 		ret = EFI_NOT_FOUND;
+ 
+ 	if (ret != EFI_SUCCESS)
+-		log_err("Unable to notify StMM for ExitBootServices\n");
++		log_err("Unable to notify the MM partition for ExitBootServices\n");
+ 	free(comm_buf);
+ 
+ 	/*
+-- 
+2.17.1
+

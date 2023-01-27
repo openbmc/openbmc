@@ -19,9 +19,7 @@ KERNEL_DEVICETREE = "arm/fvp-base-revc.dtb"
 EXTRA_IMAGEDEPENDS += "trusted-firmware-a u-boot"
 
 # As this is a virtual target that will not be used in the real world there is
-# no need for real SSH keys.  Disable rng-tools (which takes too long to
-# initialise) and install the pre-generated keys.
-PACKAGECONFIG:remove:pn-openssh = "rng-tools"
+# no need for real SSH keys.
 MACHINE_EXTRA_RRECOMMENDS += "ssh-pregen-hostkeys"
 
 TEST_TARGET = "OEFVPTarget"

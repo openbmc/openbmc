@@ -1,0 +1,19 @@
+Avoid encoding build paths into sources used for floating point on powerpc.
+(MACHINE=qemuppc bitbake libgcc).
+
+Upstream-Status: Submitted [https://gcc.gnu.org/pipermail/gcc-patches/2022-August/599882.html]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: gcc-12.1.0/libgcc/config/rs6000/t-float128
+===================================================================
+--- gcc-12.1.0.orig/libgcc/config/rs6000/t-float128
++++ gcc-12.1.0/libgcc/config/rs6000/t-float128
+@@ -103,7 +103,7 @@ $(ibm128_dec_objs)	: INTERNAL_CFLAGS +=
+ $(fp128_softfp_src) : $(srcdir)/soft-fp/$(subst -sw,,$(subst kf,tf,$@)) $(fp128_dep)
+ 	@src="$(srcdir)/soft-fp/$(subst -sw,,$(subst kf,tf,$@))"; \
+ 	echo "Create $@"; \
+-	(echo "/* file created from $$src */"; \
++	(echo "/* file created from `basename $$src` */"; \
+ 	 echo; \
+ 	 sed -f $(fp128_sed) < $$src) > $@
+ 

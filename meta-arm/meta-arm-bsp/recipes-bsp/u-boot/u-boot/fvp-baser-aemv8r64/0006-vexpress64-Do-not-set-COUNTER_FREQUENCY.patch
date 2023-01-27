@@ -1,4 +1,4 @@
-From db7d4cc91ae19d0cbd05c0ff1b9bf6a55ac0d04a Mon Sep 17 00:00:00 2001
+From 862d3f1ac66a75cdf48adbdebd8adbaf671a9366 Mon Sep 17 00:00:00 2001
 From: Qi Feng <qi.feng@arm.com>
 Date: Thu, 28 Jul 2022 17:47:18 +0800
 Subject: [PATCH 6/9] vexpress64: Do not set COUNTER_FREQUENCY
@@ -18,7 +18,7 @@ Signed-off-by: Qi Feng <qi.feng@arm.com>
  1 file changed, 1 deletion(-)
 
 diff --git a/configs/vexpress_aemv8r_defconfig b/configs/vexpress_aemv8r_defconfig
-index 605a724a61..153fa14efc 100644
+index 6226f6b2c1..b902a6a7d9 100644
 --- a/configs/vexpress_aemv8r_defconfig
 +++ b/configs/vexpress_aemv8r_defconfig
 @@ -1,5 +1,4 @@

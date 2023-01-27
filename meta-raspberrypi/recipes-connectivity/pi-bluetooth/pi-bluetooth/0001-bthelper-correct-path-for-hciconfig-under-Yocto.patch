@@ -3,7 +3,7 @@ From: "Peter A. Bigot" <pab@pabigot.com>
 Date: Wed, 14 Nov 2018 09:19:51 -0600
 Subject: [PATCH] bthelper: correct path for hciconfig under Yocto
 
-Upstream-Status: Inapproprate [OE-specific]
+Upstream-Status: Inappropriate [OE-specific]
 Signed-off-by: Peter A. Bigot <pab@pabigot.com>
 Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
 
