@@ -6,7 +6,7 @@ keys on the smart card is possible with PKCS\
 such as the FINEID (Finnish Electronic IDentity) card. Swedish Posten\
 eID cards have also been confirmed to work."
 
-HOMEPAGE = "http://www.opensc-project.org/opensc/"
+HOMEPAGE = "https://github.com/OpenSC/OpenSC/wiki"
 SECTION = "System Environment/Libraries"
 LICENSE = "LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=cb8aedd3bced19bd8026d96a8b6876d7"

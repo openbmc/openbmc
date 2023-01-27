@@ -13,7 +13,7 @@ SRC_URI[sha256sum] = "d0f2a8f4bd45dc794befbf5839ecc0fd3830d65a57bd52b5997542fac5
 inherit pypi python_flit_core
 
 # Need to install by hand as there's a dependency loop
-DEPENDS:remove:class-native = " python3-picobuild-native python3-installer-native"
+DEPENDS:remove:class-native = " python3-build-native python3-installer-native"
 DEPENDS:append:class-native = " unzip-native"
 
 # We need the full flit tarball

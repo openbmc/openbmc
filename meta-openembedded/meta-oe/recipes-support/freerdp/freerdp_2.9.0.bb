@@ -16,6 +16,7 @@ PKGV = "${GITPKGVTAG}"
 SRCREV = "fa8e1b1c765a4466030ac52240f052c0b440a4d1"
 SRC_URI = "git://github.com/FreeRDP/FreeRDP.git;branch=stable-2.0;protocol=https \
     file://winpr-makecert-Build-with-install-RPATH.patch \
+    file://0001-Fix-incompatible-function-pointer-types.patch \
 "
 
 S = "${WORKDIR}/git"
@@ -32,7 +33,7 @@ EXTRA_OECMAKE += " \
 
 PACKAGECONFIG ??= " \
     ${@bb.utils.filter('DISTRO_FEATURES', 'directfb pam pulseaudio wayland x11', d)}\
-    gstreamer cups pcsc \
+    gstreamer cups pcsc server \
 "
 
 X11_DEPS = "virtual/libx11 libxinerama libxext libxcursor libxv libxi libxrender libxfixes libxdamage libxrandr libxkbfile"
@@ -44,6 +45,7 @@ PACKAGECONFIG[pcsc] = "-DWITH_PCSC=ON,-DWITH_PCSC=OFF,pcsc-lite"
 PACKAGECONFIG[pulseaudio] = "-DWITH_PULSEAUDIO=ON,-DWITH_PULSEAUDIO=OFF,pulseaudio"
 PACKAGECONFIG[gstreamer] = "-DWITH_GSTREAMER_1_0=ON,-DWITH_GSTREAMER_1_0=OFF,gstreamer1.0 gstreamer1.0-plugins-base"
 PACKAGECONFIG[cups] = "-DWITH_CUPS=ON,-DWITH_CUPS=OFF,cups"
+PACKAGECONFIG[server] = "-DWITH_SERVER=ON,-DWITH_SERVER=OFF"
 
 PACKAGES =+ "libfreerdp"
 

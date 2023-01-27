@@ -1,0 +1,34 @@
+From 7dfa672dac958bdbc7703ab0920e167eaa126754 Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <slyich@gmail.com>
+Date: Mon, 16 Jan 2023 19:49:53 +0000
+Subject: [PATCH] test/threads/hb-subset-threads.cc: add missing <cstdio> include
+
+This week's `gcc-13` snapshot cleaned further up it's standard headers
+and exposed missing declaration as a build failure:
+
+    ../test/threads/hb-subset-threads.cc: In function 'void test_operation(operation_t, const char*, const test_input_t&)':
+    ../test/threads/hb-subset-threads.cc:127:3: error: 'printf' was not declared in this scope
+
+    ../test/threads/hb-subset-threads.cc: In function 'int main(int, char**)':
+    ../test/threads/hb-subset-threads.cc:157:19: error: 'atoi' was not declared in this scope
+
+Upstream-Status: Backport [https://github.com/harfbuzz/harfbuzz/commit/7dfa672dac958bdbc7703ab0920e167eaa126754]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test/threads/hb-subset-threads.cc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/test/threads/hb-subset-threads.cc b/test/threads/hb-subset-threads.cc
+index 9d86d8d51..f0e4b7e2a 100644
+--- a/test/threads/hb-subset-threads.cc
++++ b/test/threads/hb-subset-threads.cc
+@@ -1,4 +1,6 @@
+ #include <cassert>
++#include <cstdio>
++#include <cstdlib>
+ #include <cstring>
+ #include <thread>
+ #include <condition_variable>
+-- 
+2.39.1
+

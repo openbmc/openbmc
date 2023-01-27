@@ -1,0 +1,77 @@
+From f9ac08a0fea543d68b2dba540093bd079e50be47 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 15 Jan 2023 15:49:09 -0800
+Subject: [PATCH] Define _ALIGN using _Alignof when using C11 or newer
+
+WG14 N2350 made very clear that it is an UB having type definitions
+within "offsetof" [1]. This patch enhances the implementation of macro
+_ALIGN to use builtin "_Alignof" to avoid undefined behavior on
+when using std=c11 or newer
+
+clang 16+ has started to flag this [2]
+
+Fixes build when using -std >= gnu11 and using clang16+
+
+Older compilers gcc < 4.9 or clang < 8 has buggy _Alignof even though it
+may support C11, exclude those compilers too
+
+[1] https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2350.htm
+[2] https://reviews.llvm.org/D133574
+
+Upstream-Status: Submitted [https://github.com/numpy/numpy/pull/23016]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ numpy/core/src/multiarray/arraytypes.c.src | 13 +++++++++++--
+ numpy/core/src/multiarray/common.h         | 12 +++++++++++-
+ 2 files changed, 22 insertions(+), 3 deletions(-)
+
+diff --git a/numpy/core/src/multiarray/arraytypes.c.src b/numpy/core/src/multiarray/arraytypes.c.src
+index c03d09784..683917220 100644
+--- a/numpy/core/src/multiarray/arraytypes.c.src
++++ b/numpy/core/src/multiarray/arraytypes.c.src
+@@ -224,8 +224,17 @@ MyPyLong_AsUnsigned@Type@(PyObject *obj)
+  **                         GETITEM AND SETITEM                             **
+  *****************************************************************************
+  */
+-
+-#define _ALIGN(type) offsetof(struct {char c; type v;}, v)
++/* GCC releases before GCC 4.9 had a bug in _Alignof.  See GCC bug 52023
++   <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52023>.
++   clang versions < 8.0.0 have the same bug.  */
++#if (!defined __STDC_VERSION__ || __STDC_VERSION__ < 201112 \
++     || (defined __GNUC__ && __GNUC__ < 4 + (__GNUC_MINOR__ < 9) \
++  && !defined __clang__) \
++     || (defined __clang__ && __clang_major__ < 8))
++# define _ALIGN(type) offsetof(struct {char c; type v;}, v)
++#else
++# define _ALIGN(type) _Alignof(type)
++#endif
+ /*
+  * Disable harmless compiler warning "4116: unnamed type definition in
+  * parentheses" which is caused by the _ALIGN macro.
+diff --git a/numpy/core/src/multiarray/common.h b/numpy/core/src/multiarray/common.h
+index 3de8c842d..d01074c45 100644
+--- a/numpy/core/src/multiarray/common.h
++++ b/numpy/core/src/multiarray/common.h
+@@ -178,7 +178,17 @@ check_and_adjust_axis(int *axis, int ndim)
+ }
+ 
+ /* used for some alignment checks */
+-#define _ALIGN(type) offsetof(struct {char c; type v;}, v)
++/* GCC releases before GCC 4.9 had a bug in _Alignof.  See GCC bug 52023
++   <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52023>.
++   clang versions < 8.0.0 have the same bug.  */
++#if (!defined __STDC_VERSION__ || __STDC_VERSION__ < 201112 \
++     || (defined __GNUC__ && __GNUC__ < 4 + (__GNUC_MINOR__ < 9) \
++  && !defined __clang__) \
++     || (defined __clang__ && __clang_major__ < 8))
++# define _ALIGN(type) offsetof(struct {char c; type v;}, v)
++#else
++# define _ALIGN(type) _Alignof(type)
++#endif
+ #define _UINT_ALIGN(type) npy_uint_alignment(sizeof(type))
+ /*
+  * Disable harmless compiler warning "4116: unnamed type definition in
+-- 
+2.39.0
+

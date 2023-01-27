@@ -1,0 +1,27 @@
+From 8defe6aaf91613c3fcb540df65a94cd56d377367 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 13 Jan 2023 13:21:51 -0800
+Subject: [PATCH 1/2] include rpm/rpmstring.h
+
+Its needed for rasprintf declaration
+
+Fixes
+src/xml_file.c:341:36: error: call to undeclared functi
+on 'rasprintf'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/createrepo_c/pull/340]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/xml_file.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/src/xml_file.c
++++ b/src/xml_file.c
+@@ -19,6 +19,7 @@
+ 
+ #include <glib.h>
+ #include <glib/gstdio.h>
++#include <rpm/rpmstring.h>
+ #include <assert.h>
+ #include "xml_file.h"
+ #include <errno.h>

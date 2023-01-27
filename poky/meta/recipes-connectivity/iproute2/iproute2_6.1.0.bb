@@ -64,6 +64,7 @@ IPROUTE2_PACKAGES =+ "\
     ${PN}-ip \
     ${PN}-lnstat \
     ${PN}-nstat \
+    ${PN}-routel \
     ${PN}-rtacct \
     ${PN}-ss \
     ${PN}-tc \
@@ -88,6 +89,9 @@ FILES:${PN}-ss = "${base_sbindir}/ss"
 FILES:${PN}-tipc = "${base_sbindir}/tipc"
 FILES:${PN}-devlink = "${base_sbindir}/devlink"
 FILES:${PN}-rdma = "${base_sbindir}/rdma"
+FILES:${PN}-routel = "${base_sbindir}/routel"
+
+RDEPENDS:${PN}-routel = "python3-core"
 
 ALTERNATIVE:${PN}-ip = "ip"
 ALTERNATIVE_TARGET[ip] = "${base_sbindir}/ip.${BPN}"

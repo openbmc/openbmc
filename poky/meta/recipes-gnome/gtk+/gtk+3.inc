@@ -41,8 +41,10 @@ PACKAGECONFIG[x11] = "-Dx11_backend=true,-Dx11_backend=false,at-spi2-atk fontcon
 # this is provided by oe-core patch that removes epoxy/gl dependency from a X11 build
 PACKAGECONFIG[opengl] = "-Dopengl=true,-Dopengl=false,libepoxy"
 PACKAGECONFIG[wayland] = "-Dwayland_backend=true,-Dwayland_backend=false,wayland wayland-protocols libxkbcommon virtual/egl virtual/libgles2 wayland-native"
-PACKAGECONFIG[cups] = "-Dprint_backends=cups,-Dprint_backends=file,cups"
+PACKAGECONFIG[cups] = ",,cups,cups"
 PACKAGECONFIG[colord] = "-Dcolord=yes,-Dcolord=no,colord"
+PACKAGECONFIG[cloudproviders] = "-Dcloudproviders=true,-Dcloudproviders=false,libcloudproviders"
+PACKAGECONFIG[tracker3] = "-Dtracker3=true,-Dtracker3=false,tracker,tracker-miners"
 
 prepare_gtk_scripts() {
     mv ${D}${bindir}/gtk-update-icon-cache ${D}${bindir}/gtk-update-icon-cache-3.0

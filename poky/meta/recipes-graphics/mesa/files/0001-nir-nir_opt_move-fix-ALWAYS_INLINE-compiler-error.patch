@@ -1,67 +1,36 @@
-From da6e47f1717f34c73de388c56ffaf4861a07fdc5 Mon Sep 17 00:00:00 2001
-From: t bettler <thomas.bettler@gmail.com>
-Date: Sat, 9 Jul 2022 09:28:51 +0000
+From 267dd1f4d571ee606141aa66f1665aa152b4e911 Mon Sep 17 00:00:00 2001
+From: t0b3 <thomas.bettler@gmail.com>
+Date: Sat, 10 Dec 2022 14:32:53 +0100
 Subject: [PATCH] nir/nir_opt_move: fix ALWAYS_INLINE compiler error
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 
-Backport merge request to fix mesa compile error when debug build
-enabled.
+Reviewed-by: Iago Toral Quiroga <itoral@igalia.com>
+Reviewed-by: Adam Jackson <ajax@redhat.com>
+Closes: #6825
+Fixes: f1d20ec6 ("nir/nir_opt_move: handle non-SSA defs ")
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/17439>
 
-Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/17439]
-
-Signed-off-by: Kai Kang <kai.kang@windriver.com>
-
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-fix call to ‘always_inline’ ‘src_is_ssa’
-
-Closes: https://gitlab.freedesktop.org/mesa/mesa/-/issues/6825
-Fixes: f1d20ec67c3f186886b97de94f74484650f8fda1 ("nir/nir_opt_move: handle non-SSA defs ")
-
+Upstream-Status: Backport [https://gitlab.freedesktop.org/mesa/mesa/-/commit/267dd1f4d571ee606141aa66f1665aa152b4e911]
 ---
- src/compiler/nir/nir_inline_helpers.h | 10 ++++++++--
- src/compiler/nir/nir_opt_move.c       |  2 +-
- 2 files changed, 9 insertions(+), 3 deletions(-)
+ src/compiler/nir/nir_opt_move.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/compiler/nir/nir_inline_helpers.h b/src/compiler/nir/nir_inline_helpers.h
-index 125dd8a..ec33f05 100644
---- a/src/compiler/nir/nir_inline_helpers.h
-+++ b/src/compiler/nir/nir_inline_helpers.h
-@@ -73,8 +73,8 @@ nir_foreach_dest(nir_instr *instr, nir_foreach_dest_cb cb, void *state)
-    return _nir_foreach_dest(instr, cb, state);
- }
- 
--static inline bool
--nir_foreach_src(nir_instr *instr, nir_foreach_src_cb cb, void *state)
-+static ALWAYS_INLINE bool
-+_nir_foreach_src(nir_instr *instr, nir_foreach_src_cb cb, void *state)
- {
-    switch (instr->type) {
-    case nir_instr_type_alu: {
-@@ -162,3 +162,9 @@ nir_foreach_src(nir_instr *instr, nir_foreach_src_cb cb, void *state)
-    dest_state.cb = cb;
-    return _nir_foreach_dest(instr, _nir_visit_dest_indirect, &dest_state);
- }
-+
-+static inline bool
-+nir_foreach_src(nir_instr *instr, nir_foreach_src_cb cb, void *state)
-+{
-+   return _nir_foreach_src(instr, cb, state);
-+}
 diff --git a/src/compiler/nir/nir_opt_move.c b/src/compiler/nir/nir_opt_move.c
-index 81bcde5..051c3cc 100644
+index 81bcde5c436..9aeb9f4cf86 100644
 --- a/src/compiler/nir/nir_opt_move.c
 +++ b/src/compiler/nir/nir_opt_move.c
-@@ -60,7 +60,7 @@ src_is_ssa(nir_src *src, void *state)
- static ALWAYS_INLINE bool
- instr_reads_register(nir_instr *instr)
+@@ -51,13 +51,13 @@
+  * lower register pressure.
+  */
+ 
+-static ALWAYS_INLINE bool
++static inline bool
+ src_is_ssa(nir_src *src, void *state)
  {
--   return !nir_foreach_src(instr, src_is_ssa, NULL);
-+   return !_nir_foreach_src(instr, src_is_ssa, NULL);
+    return src->is_ssa;
  }
  
- static bool
+-static ALWAYS_INLINE bool
++static inline bool
+ instr_reads_register(nir_instr *instr)
+ {
+    return !nir_foreach_src(instr, src_is_ssa, NULL);

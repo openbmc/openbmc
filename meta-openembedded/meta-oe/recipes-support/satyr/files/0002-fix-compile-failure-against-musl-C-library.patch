@@ -10,19 +10,17 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  lib/rpm.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/lib/rpm.c b/lib/rpm.c
-index 920e145..58140bf 100644
 --- a/lib/rpm.c
 +++ b/lib/rpm.c
-@@ -191,7 +191,7 @@ sr_rpm_package_sort(struct sr_rpm_package *packages)
-     }
+@@ -34,6 +34,11 @@
+ #include <assert.h>
+ #include <string.h>
  
-     /* Sort the array. */
--    qsort(array, count, sizeof(struct sr_rpm_package*), (comparison_fn_t)cmp_nevra_qsort_wrapper);
-+    qsort(array, count, sizeof(struct sr_rpm_package*), cmp_nevra_qsort_wrapper);
- 
-     /* Create a linked list from the sorted array. */
-     for (size_t loop = 0; loop < count; ++loop)
--- 
-2.8.1
-
++#if !defined(__GLIBC__)
++typedef int (*__compar_fn_t) (const void*, const void*);
++typedef __compar_fn_t comparison_fn_t;
++#endif
++
+ struct sr_rpm_package *
+ sr_rpm_package_new()
+ {

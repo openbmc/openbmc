@@ -271,7 +271,6 @@ class CookerDataBuilder(object):
             if self.data.getVar("BB_WORKERCONTEXT", False) is None and not worker:
                 bb.fetch.fetcher_init(self.data)
             bb.parse.init_parser(self.data)
-            bb.codeparser.parser_cache_init(self.data)
 
             bb.event.fire(bb.event.ConfigParsed(), self.data)
 
@@ -369,6 +368,11 @@ class CookerDataBuilder(object):
             # We may have been called with cwd somewhere else so reset TOPDIR
             data.setVar("TOPDIR", os.path.dirname(os.path.dirname(layerconf)))
             data = parse_config_file(layerconf, data)
+
+            if not data.getVar("BB_CACHEDIR"):
+                data.setVar("BB_CACHEDIR", "${TOPDIR}/cache")
+
+            bb.codeparser.parser_cache_init(data.getVar("BB_CACHEDIR"))
 
             layers = (data.getVar('BBLAYERS') or "").split()
             broken_layers = []
@@ -473,6 +477,9 @@ class CookerDataBuilder(object):
 
         if not data.getVar("TOPDIR"):
             data.setVar("TOPDIR", os.path.abspath(os.getcwd()))
+        if not data.getVar("BB_CACHEDIR"):
+            data.setVar("BB_CACHEDIR", "${TOPDIR}/cache")
+        bb.codeparser.parser_cache_init(data.getVar("BB_CACHEDIR"))
 
         data = parse_config_file(os.path.join("conf", "bitbake.conf"), data)
 

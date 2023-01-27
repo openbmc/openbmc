@@ -24,7 +24,6 @@ DEPENDS = "openssl readline ncurses"
 SRCREV = "19d78782d795d0cf4ceefe655f616210c9143e62"
 SRC_URI = "git://github.com/ipmitool/ipmitool;protocol=https;branch=master \
            ${IANA_ENTERPRISE_NUMBERS} \
-           file://0001-ipmi_fru.c-Provide-missing-function-declarations.patch \
            file://0001-configure-Remove-the-logic-to-download-IANA-PEN-data.patch \
            "
 IANA_ENTERPRISE_NUMBERS ?= ""

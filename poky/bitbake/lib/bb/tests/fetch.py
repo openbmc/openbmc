@@ -2852,7 +2852,7 @@ class FetchPremirroronlyLocalTest(FetcherTest):
         os.mkdir(self.mirrordir)
         self.reponame = "bitbake"
         self.gitdir = os.path.join(self.tempdir, "git", self.reponame)
-        self.recipe_url = "git://git.fake.repo/bitbake"
+        self.recipe_url = "git://git.fake.repo/bitbake;branch=master"
         self.d.setVar("BB_FETCH_PREMIRRORONLY", "1")
         self.d.setVar("BB_NO_NETWORK", "1")
         self.d.setVar("PREMIRRORS", self.recipe_url + " " + "file://{}".format(self.mirrordir) + " \n")
@@ -2935,6 +2935,50 @@ class FetchPremirroronlyNetworkTest(FetcherTest):
         fetcher = bb.fetch.Fetch([self.recipe_url], self.d)
         with self.assertRaises(bb.fetch2.NetworkAccess):
             fetcher.download()
+
+class FetchPremirroronlyMercurialTest(FetcherTest):
+    """ Test for premirrors with mercurial repos
+        the test covers also basic hg:// clone (see fetch_and_create_tarball
+    """
+    def skipIfNoHg():
+        import shutil
+        if not shutil.which('hg'):
+            return unittest.skip('Mercurial not installed')
+        return lambda f: f
+
+    def setUp(self):
+        super(FetchPremirroronlyMercurialTest, self).setUp()
+        self.mirrordir = os.path.join(self.tempdir, "mirrors")
+        os.mkdir(self.mirrordir)
+        self.reponame = "libgnt"
+        self.clonedir = os.path.join(self.tempdir, "hg")
+        self.recipe_url = "hg://keep.imfreedom.org/libgnt;module=libgnt"
+        self.d.setVar("SRCREV", "53e8b422faaf")
+        self.mirrorname = "hg_libgnt_keep.imfreedom.org_.libgnt.tar.gz"
+
+    def fetch_and_create_tarball(self):
+        """
+        Ask bitbake to download repo and prepare mirror tarball for us
+        """
+        self.d.setVar("BB_GENERATE_MIRROR_TARBALLS", "1")
+        fetcher = bb.fetch.Fetch([self.recipe_url], self.d)
+        fetcher.download()
+        mirrorfile = os.path.join(self.d.getVar("DL_DIR"), self.mirrorname)
+        self.assertTrue(os.path.exists(mirrorfile), "Mirror tarball {} has not been created".format(mirrorfile))
+        ## moving tarball to mirror directory
+        os.rename(mirrorfile, os.path.join(self.mirrordir, self.mirrorname))
+        self.d.setVar("BB_GENERATE_MIRROR_TARBALLS", "0")
+
+
+    @skipIfNoNetwork()
+    @skipIfNoHg()
+    def test_premirror_mercurial(self):
+        self.fetch_and_create_tarball()
+        self.d.setVar("PREMIRRORS", self.recipe_url + " " + "file://{}".format(self.mirrordir) + " \n")
+        self.d.setVar("BB_FETCH_PREMIRRORONLY", "1")
+        self.d.setVar("BB_NO_NETWORK", "1")
+        fetcher = bb.fetch.Fetch([self.recipe_url], self.d)
+        fetcher.download()
 
 class FetchPremirroronlyBrokenTarball(FetcherTest):
 

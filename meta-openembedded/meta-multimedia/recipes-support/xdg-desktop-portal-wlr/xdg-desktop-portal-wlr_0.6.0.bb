@@ -14,7 +14,7 @@ DEPENDS = " \
 "
 
 inherit meson pkgconfig features_check
-REQUIRED_DISTRO_FEATURES = "opengl"
+REQUIRED_DISTRO_FEATURES = "opengl wayland"
 
 SRC_URI = "git://github.com/emersion/xdg-desktop-portal-wlr.git;protocol=https;nobranch=1"
 

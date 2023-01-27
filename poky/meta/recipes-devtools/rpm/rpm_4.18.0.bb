@@ -123,7 +123,6 @@ do_install:append:class-nativesdk() {
 	cat <<- EOF > ${D}${SDKPATHNATIVE}/environment-setup.d/rpm.sh
 		export RPM_CONFIGDIR="$OECORE_NATIVE_SYSROOT${libdir}/rpm"
 		export RPM_ETCCONFIGDIR="$OECORE_NATIVE_SYSROOT${sysconfdir}"
-		export MAGIC="$OECORE_NATIVE_SYSROOT${datadir}/misc/magic.mgc"
 		export RPM_NO_CHROOT_FOR_SCRIPTS=1
 	EOF
 }

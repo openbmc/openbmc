@@ -11,7 +11,10 @@ SRCREV_jsoncpp = "9059f5cad030ba11d37818847443a53918c327b1"
 SRCREV_vulkan-docs = "9b5562187a8ad72c171410b036ceedbc450153ba"
 SRC_URI[renderdoc.sha256sum] = "e7b5f0aa5b1b0eadc63a1c624c0ca7f5af133aa857d6a4271b0ef3d0bdb6868e"
 
-SRC_URI += "file://0001-cmake-Define-WAYLAND_SCANNER-and-WAYLAND_PROTOCOLS_D.patch"
+SRC_URI += "file://0001-cmake-Define-WAYLAND_SCANNER-and-WAYLAND_PROTOCOLS_D.patch \
+            file://0001-Include-missing-cstdint.patch \
+            file://0001-include-missing-cstdint.patch;patchdir=external/amber/src \
+"
 
 S = "${WORKDIR}/git"
 

@@ -1,0 +1,33 @@
+From cedc84a8db468d0b6652e78a8a6667e655586b53 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 26 Jan 2023 13:00:43 -0800
+Subject: [PATCH] cmake: Do not add -msse4.2 -mpclmul on clang
+
+When testcase is compiled with clang and -msse4.2 -mpclmul is added to
+cxxflags then clang -m32 still ends up compiling the test case which is
+not correct for i386, therefore depend on yocto to pass the right flags
+from environemnt via cflags rather than manufecture them here
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index dbef059028..981545a4e0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -290,7 +290,7 @@ endif()
+ 
+ include(CheckCXXSourceCompiles)
+ set(OLD_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
+-if(NOT MSVC)
++if(NOT MSVC AND NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+   set(CMAKE_REQUIRED_FLAGS "-msse4.2 -mpclmul")
+ endif()
+ 
+-- 
+2.39.1
+

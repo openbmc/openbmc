@@ -1,0 +1,125 @@
+From 9e9d94566d39eef3e4606f806aa418bf5534fab9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 15 Jan 2023 22:04:31 -0800
+Subject: [PATCH 1/2] Define alignof using _Alignof when using C11 or newer
+
+WG14 N2350 made very clear that it is an UB having type definitions
+within "offsetof" [1]. This patch enhances the implementation of macro
+alignof to use builtin "_Alignof" to avoid undefined behavior on
+when using std=c11 or newer
+
+clang 16+ has started to flag this [2]
+
+Fixes build when using -std >= gnu11 and using clang16+
+
+Older compilers gcc < 4.9 or clang < 8 has buggy _Alignof even though it
+may support C11, exclude those compilers too
+
+[1] https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2350.htm
+[2] https://reviews.llvm.org/D133574
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Misc/md5-coreutils.c | 12 +++++++++++-
+ Misc/sha1.c          | 12 +++++++++++-
+ Misc/sha256.c        | 12 +++++++++++-
+ Misc/sha512.c        | 12 +++++++++++-
+ 4 files changed, 44 insertions(+), 4 deletions(-)
+
+diff --git a/Misc/md5-coreutils.c b/Misc/md5-coreutils.c
+index d6503e02..2ffb6050 100644
+--- a/Misc/md5-coreutils.c
++++ b/Misc/md5-coreutils.c
+@@ -154,7 +154,17 @@ md5_process_bytes (const void *buffer, size_t len, struct md5_ctx *ctx)
+   if (len >= 64)
+     {
+ #if !_STRING_ARCH_unaligned
+-# define alignof(type) offsetof (struct { char c; type x; }, x)
++/* GCC releases before GCC 4.9 had a bug in _Alignof.  See GCC bug 52023
++   <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52023>.
++   clang versions < 8.0.0 have the same bug.  */
++# if (!defined __STDC_VERSION__ || __STDC_VERSION__ < 201112 \
++        || (defined __GNUC__ && __GNUC__ < 4 + (__GNUC_MINOR__ < 9) \
++     && !defined __clang__) \
++        || (defined __clang__ && __clang_major__ < 8))
++#    define alignof(type) offsetof (struct { char c; type x; }, x)
++# else
++#    define alignof(type) _Alignof(type)
++# endif
+ # define UNALIGNED_P(p) (((size_t) p) % alignof (uint32_t) != 0)
+       if (UNALIGNED_P (buffer))
+ 	while (len > 64)
+diff --git a/Misc/sha1.c b/Misc/sha1.c
+index 18ceb845..a170efe3 100644
+--- a/Misc/sha1.c
++++ b/Misc/sha1.c
+@@ -149,7 +149,17 @@ sha1_process_bytes (const void *buffer, size_t len, struct sha1_ctx *ctx)
+   if (len >= 64)
+     {
+ #if !_STRING_ARCH_unaligned
+-# define alignof(type) offsetof (struct { char c; type x; }, x)
++/* GCC releases before GCC 4.9 had a bug in _Alignof.  See GCC bug 52023
++   <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52023>.
++   clang versions < 8.0.0 have the same bug.  */
++# if (!defined __STDC_VERSION__ || __STDC_VERSION__ < 201112 \
++        || (defined __GNUC__ && __GNUC__ < 4 + (__GNUC_MINOR__ < 9) \
++     && !defined __clang__) \
++        || (defined __clang__ && __clang_major__ < 8))
++#    define alignof(type) offsetof (struct { char c; type x; }, x)
++# else
++#    define alignof(type) _Alignof(type)
++# endif
+ # define UNALIGNED_P(p) (((size_t) p) % alignof (uint32_t) != 0)
+       if (UNALIGNED_P (buffer))
+ 	while (len > 64)
+diff --git a/Misc/sha256.c b/Misc/sha256.c
+index 68292326..da59e81d 100644
+--- a/Misc/sha256.c
++++ b/Misc/sha256.c
+@@ -372,7 +372,17 @@ sha256_process_bytes (const void *buffer, size_t len, struct sha256_ctx *ctx)
+   if (len >= 64)
+     {
+ #if !_STRING_ARCH_unaligned
+-# define alignof(type) offsetof (struct { char c; type x; }, x)
++/* GCC releases before GCC 4.9 had a bug in _Alignof.  See GCC bug 52023
++   <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52023>.
++   clang versions < 8.0.0 have the same bug.  */
++# if (!defined __STDC_VERSION__ || __STDC_VERSION__ < 201112 \
++        || (defined __GNUC__ && __GNUC__ < 4 + (__GNUC_MINOR__ < 9) \
++     && !defined __clang__) \
++        || (defined __clang__ && __clang_major__ < 8))
++#    define alignof(type) offsetof (struct { char c; type x; }, x)
++# else
++#    define alignof(type) _Alignof(type)
++# endif
+ # define UNALIGNED_P(p) (((size_t) p) % alignof (uint32_t) != 0)
+       if (UNALIGNED_P (buffer))
+         while (len > 64)
+diff --git a/Misc/sha512.c b/Misc/sha512.c
+index db86c659..38e162fc 100644
+--- a/Misc/sha512.c
++++ b/Misc/sha512.c
+@@ -190,7 +190,17 @@ sha512_process_bytes (const void *buffer, size_t len, struct sha512_ctx *ctx)
+   if (len >= 128)
+     {
+ #if !_STRING_ARCH_unaligned
+-# define alignof(type) offsetof (struct { char c; type x; }, x)
++/* GCC releases before GCC 4.9 had a bug in _Alignof.  See GCC bug 52023
++   <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52023>.
++   clang versions < 8.0.0 have the same bug.  */
++# if (!defined __STDC_VERSION__ || __STDC_VERSION__ < 201112 \
++        || (defined __GNUC__ && __GNUC__ < 4 + (__GNUC_MINOR__ < 9) \
++     && !defined __clang__) \
++        || (defined __clang__ && __clang_major__ < 8))
++#    define alignof(type) offsetof (struct { char c; type x; }, x)
++# else
++#    define alignof(type) _Alignof(type)
++# endif
+ # define UNALIGNED_P(p) (((size_t) p) % alignof (uint64_t) != 0)
+       if (UNALIGNED_P (buffer))
+ 	while (len > 128)
+-- 
+2.39.0
+

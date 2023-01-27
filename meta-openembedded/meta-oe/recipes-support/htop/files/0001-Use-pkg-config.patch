@@ -9,8 +9,7 @@ ncurses*-config applications.
 Signed-off-by: Paul Barker <pbarker@toganlabs.com>
 Signed-off-by: Robert Joslyn <robert.joslyn@redrectangle.org>
 
-Upstream-status: Inappropriate
-    (`ncurses*-config` can be used outside of OpenEmbedded)
+Upstream-Status: Inappropriate [`ncurses*-config` can be used outside of OpenEmbedded]
 
 ---
  configure.ac | 12 ++++++------

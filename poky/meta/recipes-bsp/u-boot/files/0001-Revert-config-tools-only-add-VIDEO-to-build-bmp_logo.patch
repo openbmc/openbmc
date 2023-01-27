@@ -1,0 +1,39 @@
+From 5d663e105f5affbe1ba771a1124855bff748b829 Mon Sep 17 00:00:00 2001
+From: Fabio Estevam <festevam@denx.de>
+Date: Wed, 18 Jan 2023 22:15:04 -0300
+Subject: [PATCH] Revert "config: tools only: add VIDEO to build bmp_logo"
+
+This reverts commit 1cfba53ca46cade2dbf4e067afc8c19e72909a4b.
+
+Since commit 1cfba53ca46c ("config: tools only: add VIDEO to build
+bmp_logo") the build of tools-only_defconfig fails:
+
+| /bin/sh: line 1: tools/bmp_logo: No such file or directory
+
+This has been noticed in OpenEmbedded and Debian [1].
+
+Revert it for now.
+
+[1] https://lists.denx.de/pipermail/u-boot/2023-January/504758.html
+
+Upstream-Status: Backport [https://source.denx.de/u-boot/u-boot/-/commit/6333acb961b6fcaa60c6e5b623d676b332481cfa]
+Signed-off-by: Fabio Estevam <festevam@denx.de>
+---
+ configs/tools-only_defconfig | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/configs/tools-only_defconfig b/configs/tools-only_defconfig
+index 2197063112..fb75235e3d 100644
+--- a/configs/tools-only_defconfig
++++ b/configs/tools-only_defconfig
+@@ -29,7 +29,6 @@ CONFIG_DM_RTC=y
+ CONFIG_SOUND=y
+ CONFIG_SYSRESET=y
+ CONFIG_TIMER=y
+-CONFIG_VIDEO=y
+ # CONFIG_VIRTIO_MMIO is not set
+ # CONFIG_VIRTIO_PCI is not set
+ # CONFIG_VIRTIO_SANDBOX is not set
+-- 
+2.25.1
+

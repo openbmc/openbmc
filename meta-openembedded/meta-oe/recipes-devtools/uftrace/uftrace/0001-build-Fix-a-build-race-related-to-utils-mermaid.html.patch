@@ -1,0 +1,38 @@
+From 1fa61d77fa7173744dd6dc9d3c4bb0aa783f5222 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 21 Jan 2023 10:35:46 -0800
+Subject: [PATCH] build: Fix a build race related to utils/mermaid.html.cstr
+
+Sometimes build fails like below
+
+| /home/pokybuild/yocto-worker/meta-oe/build/build/tmp/work/core2-64-poky-linux/uftrace/0.13-r0/git/cmds/dump.c: In function 'dump_mermaid_footer':
+| /home/pokybuild/yocto-worker/meta-oe/build/build/tmp/work/core2-64-poky-linux/uftrace/0.13-r0/git/cmds/dump.c:1347:10: fatal error: utils/mermaid.html.cstr: No such file or directory
+|  1347 | #include "utils/mermaid.html.cstr" /* This file is a converted of mermaid.html to one string literal in build-time */
+|       |          ^~~~~~~~~~~~~~~~~~~~~~~~~
+| compilation terminated.
+| make[1]: *** [Makefile:310: /home/pokybuild/yocto-worker/meta-oe/build/build/tmp/work/core2-64-poky-linux/uftrace/0.13-r0/build/cmds/dump.o] Error 1
+
+Create a dependency on c-str-conversion for dump.o
+
+Upstream-Status: Submitted [https://github.com/namhyung/uftrace/pull/1622]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 70dc12f0..bb2ac669 100644
+--- a/Makefile
++++ b/Makefile
+@@ -304,6 +304,8 @@ $(objdir)/misc/dbginfo.o: $(srcdir)/misc/dbginfo.c $(objdir)/version.h $(COMMON_
+ $(objdir)/misc/bench.o: $(srcdir)/misc/bench.c
+ 	$(QUIET_CC)$(CC) $(BENCH_CFLAGS) -c -o $@ $<
+ 
++$(objdir)/cmds/dump.o: c-str-conversion
++
+ $(UFTRACE_OBJS_VERSION): $(objdir)/version.h
+ 
+ $(filter-out $(objdir)/uftrace.o, $(UFTRACE_OBJS)): $(objdir)/%.o: $(srcdir)/%.c $(COMMON_DEPS)
+-- 
+2.39.1
+

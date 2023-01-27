@@ -1,0 +1,145 @@
+From 47005e155c291ee6a2460cbf9eee604997e87063 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 9 Jan 2023 14:48:49 -0800
+Subject: [PATCH 2/2] Drop using _LARGEFILE64_SOURCE
+
+Its no longer needed since we have dropped using LF64 interfaces
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-trace-devel/20230109225315.1284538-2-raj.khem@gmail.com/T/#u]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/trace-cmd/trace-input.c    | 1 -
+ lib/trace-cmd/trace-output.c   | 1 -
+ lib/trace-cmd/trace-recorder.c | 1 -
+ tracecmd/trace-hist.c          | 1 -
+ tracecmd/trace-listen.c        | 1 -
+ tracecmd/trace-mem.c           | 1 -
+ tracecmd/trace-profile.c       | 1 -
+ tracecmd/trace-read.c          | 1 -
+ tracecmd/trace-restore.c       | 1 -
+ tracecmd/trace-split.c         | 1 -
+ 10 files changed, 10 deletions(-)
+
+diff --git a/lib/trace-cmd/trace-input.c b/lib/trace-cmd/trace-input.c
+index 9b128403..3dd13ce4 100644
+--- a/lib/trace-cmd/trace-input.c
++++ b/lib/trace-cmd/trace-input.c
+@@ -3,7 +3,6 @@
+  * Copyright (C) 2009, 2010 Red Hat Inc, Steven Rostedt <srostedt@redhat.com>
+  *
+  */
+-#define _LARGEFILE64_SOURCE
+ #include <stdbool.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/lib/trace-cmd/trace-output.c b/lib/trace-cmd/trace-output.c
+index ad740d65..eee847e3 100644
+--- a/lib/trace-cmd/trace-output.c
++++ b/lib/trace-cmd/trace-output.c
+@@ -3,7 +3,6 @@
+  * Copyright (C) 2009, 2010 Red Hat Inc, Steven Rostedt <srostedt@redhat.com>
+  *
+  */
+-#define _LARGEFILE64_SOURCE
+ #include <dirent.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/lib/trace-cmd/trace-recorder.c b/lib/trace-cmd/trace-recorder.c
+index c172ad64..70ce52e2 100644
+--- a/lib/trace-cmd/trace-recorder.c
++++ b/lib/trace-cmd/trace-recorder.c
+@@ -3,7 +3,6 @@
+  * Copyright (C) 2009, 2010 Red Hat Inc, Steven Rostedt <srostedt@redhat.com>
+  *
+  */
+-#define _LARGEFILE64_SOURCE
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <fcntl.h>
+diff --git a/tracecmd/trace-hist.c b/tracecmd/trace-hist.c
+index efb790ac..62fe4f9b 100644
+--- a/tracecmd/trace-hist.c
++++ b/tracecmd/trace-hist.c
+@@ -5,7 +5,6 @@
+  * Several of the ideas in this file came from Arnaldo Carvalho de Melo's
+  * work on the perf ui.
+  */
+-#define _LARGEFILE64_SOURCE
+ #include <dirent.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tracecmd/trace-listen.c b/tracecmd/trace-listen.c
+index 86d2b9e9..e95c5711 100644
+--- a/tracecmd/trace-listen.c
++++ b/tracecmd/trace-listen.c
+@@ -3,7 +3,6 @@
+  * Copyright (C) 2009, 2010 Red Hat Inc, Steven Rostedt <srostedt@redhat.com>
+  *
+  */
+-#define _LARGEFILE64_SOURCE
+ #include <dirent.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tracecmd/trace-mem.c b/tracecmd/trace-mem.c
+index 25eb0861..3e1ac9f3 100644
+--- a/tracecmd/trace-mem.c
++++ b/tracecmd/trace-mem.c
+@@ -11,7 +11,6 @@
+  * was written for the newer version. I decided to do some of it here
+  * in C.
+  */
+-#define _LARGEFILE64_SOURCE
+ #include <dirent.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tracecmd/trace-profile.c b/tracecmd/trace-profile.c
+index 6a2cc3d0..d12a0e5e 100644
+--- a/tracecmd/trace-profile.c
++++ b/tracecmd/trace-profile.c
+@@ -5,7 +5,6 @@
+  */
+ 
+ /** FIXME: Convert numbers based on machine and file */
+-#define _LARGEFILE64_SOURCE
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/tracecmd/trace-read.c b/tracecmd/trace-read.c
+index c094ad6a..52ba818e 100644
+--- a/tracecmd/trace-read.c
++++ b/tracecmd/trace-read.c
+@@ -3,7 +3,6 @@
+  * Copyright (C) 2009, 2010 Red Hat Inc, Steven Rostedt <srostedt@redhat.com>
+  *
+  */
+-#define _LARGEFILE64_SOURCE
+ #include <dirent.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tracecmd/trace-restore.c b/tracecmd/trace-restore.c
+index 5bf29c52..e9ca3225 100644
+--- a/tracecmd/trace-restore.c
++++ b/tracecmd/trace-restore.c
+@@ -3,7 +3,6 @@
+  * Copyright (C) 2009, 2010 Red Hat Inc, Steven Rostedt <srostedt@redhat.com>
+  *
+  */
+-#define _LARGEFILE64_SOURCE
+ #include <dirent.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tracecmd/trace-split.c b/tracecmd/trace-split.c
+index 851ec94e..1daa847d 100644
+--- a/tracecmd/trace-split.c
++++ b/tracecmd/trace-split.c
+@@ -3,7 +3,6 @@
+  * Copyright (C) 2010 Red Hat Inc, Steven Rostedt <srostedt@redhat.com>
+  *
+  */
+-#define _LARGEFILE64_SOURCE
+ #include <dirent.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+-- 
+2.39.0
+

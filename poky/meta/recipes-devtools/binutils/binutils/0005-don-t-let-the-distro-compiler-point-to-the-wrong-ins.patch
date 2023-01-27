@@ -1,4 +1,4 @@
-From e74d765a1a95253c9247228bd7ccbcabecdd8f7e Mon Sep 17 00:00:00 2001
+From fc39b9c332a346910695817274d55d0c20dc717a Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:39:01 +0000
 Subject: [PATCH] don't let the distro compiler point to the wrong installation
@@ -17,7 +17,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/libiberty/Makefile.in b/libiberty/Makefile.in
-index abef3c4601b..880c8826482 100644
+index f9fbba23e2c..93495e45d6f 100644
 --- a/libiberty/Makefile.in
 +++ b/libiberty/Makefile.in
 @@ -385,7 +385,8 @@ install-strip: install

@@ -838,11 +838,10 @@ class MultiProcessCache(object):
         self.cachedata = self.create_cachedata()
         self.cachedata_extras = self.create_cachedata()
 
-    def init_cache(self, d, cache_file_name=None):
-        cachedir = (d.getVar("PERSISTENT_DIR") or
-                    d.getVar("CACHE"))
-        if cachedir in [None, '']:
+    def init_cache(self, cachedir, cache_file_name=None):
+        if not cachedir:
             return
+
         bb.utils.mkdirhier(cachedir)
         self.cachefile = os.path.join(cachedir,
                                       cache_file_name or self.__class__.cache_file_name)
@@ -871,6 +870,10 @@ class MultiProcessCache(object):
 
     def save_extras(self):
         if not self.cachefile:
+            return
+
+        have_data = any(self.cachedata_extras)
+        if not have_data:
             return
 
         glf = bb.utils.lockfile(self.cachefile + ".lock", shared=True)
@@ -907,6 +910,8 @@ class MultiProcessCache(object):
 
         data = self.cachedata
 
+        have_data = False
+
         for f in [y for y in os.listdir(os.path.dirname(self.cachefile)) if y.startswith(os.path.basename(self.cachefile) + '-')]:
             f = os.path.join(os.path.dirname(self.cachefile), f)
             try:
@@ -921,12 +926,14 @@ class MultiProcessCache(object):
                 os.unlink(f)
                 continue
 
+            have_data = True
             self.merge_data(extradata, data)
             os.unlink(f)
 
-        with open(self.cachefile, "wb") as f:
-            p = pickle.Pickler(f, -1)
-            p.dump([data, self.__class__.CACHE_VERSION])
+        if have_data:
+            with open(self.cachefile, "wb") as f:
+                p = pickle.Pickler(f, -1)
+                p.dump([data, self.__class__.CACHE_VERSION])
 
         bb.utils.unlockfile(glf)
 

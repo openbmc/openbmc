@@ -1,0 +1,32 @@
+From 1910b3a83a7e5aa1a31c4325829c94134fafce76 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 13 Jan 2023 20:58:07 -0800
+Subject: [PATCH] Remove deprecated register in C++17
+
+Fixes errors like
+
+src/libnurbs/internals/varray.cc:76:5: error: ISO C++17 does not allow 'register' storage class specifier [-Wregister]
+    register long ds = sgn(arc->tail()[0] - arc->prev->tail()[0]);
+    ^~~~~~~~~
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/glu/-/merge_requests/10]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/libnurbs/internals/varray.cc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/libnurbs/internals/varray.cc b/src/libnurbs/internals/varray.cc
+index 1cb2354..41b3b18 100644
+--- a/src/libnurbs/internals/varray.cc
++++ b/src/libnurbs/internals/varray.cc
+@@ -73,8 +73,8 @@ Varray::~Varray( void )
+ inline void
+ Varray::update( Arc_ptr arc, long dir[2], REAL val )
+ {
+-    register long ds = sgn(arc->tail()[0] - arc->prev->tail()[0]);
+-    register long dt = sgn(arc->tail()[1] - arc->prev->tail()[1]);
++    long ds = sgn(arc->tail()[0] - arc->prev->tail()[0]);
++    long dt = sgn(arc->tail()[1] - arc->prev->tail()[1]);
+ 
+     if( dir[0] != ds || dir[1] != dt ) {
+ 	dir[0] = ds;

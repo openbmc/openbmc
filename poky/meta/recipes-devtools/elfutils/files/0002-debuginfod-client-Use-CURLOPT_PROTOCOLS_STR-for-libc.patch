@@ -1,0 +1,34 @@
+From 6560fb26a62ef135a804357ef4f15a47de3e49b3 Mon Sep 17 00:00:00 2001
+From: Mark Wielaard <mark@klomp.org>
+Date: Tue, 10 Jan 2023 23:20:41 +0100
+Subject: [PATCH] debuginfod-client: Use CURLOPT_PROTOCOLS_STR for libcurl >= 7.85.0
+
+https://sourceware.org/bugzilla/show_bug.cgi?id=29926
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=elfutils.git;a=commit;h=6560fb26a62ef135a804357ef4f15a47de3e49b3]
+Signed-off-by: Mark Wielaard <mark@klomp.org>
+---
+ debuginfod/debuginfod-client.c | 5 +++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/debuginfod/debuginfod-client.c b/debuginfod/debuginfod-client.c
+index a16165bd..1ce45632 100644
+--- a/debuginfod/debuginfod-client.c
++++ b/debuginfod/debuginfod-client.c
+@@ -1336,8 +1336,13 @@ debuginfod_query_server (debuginfod_client *c,
+ 
+       /* Only allow http:// + https:// + file:// so we aren't being
+ 	 redirected to some unsupported protocol.  */
++#if CURL_AT_LEAST_VERSION(7, 85, 0)
++      curl_easy_setopt_ck(data[i].handle, CURLOPT_PROTOCOLS_STR,
++			  "http,https,file");
++#else
+       curl_easy_setopt_ck(data[i].handle, CURLOPT_PROTOCOLS,
+ 			  (CURLPROTO_HTTP | CURLPROTO_HTTPS | CURLPROTO_FILE));
++#endif
+       curl_easy_setopt_ck(data[i].handle, CURLOPT_URL, data[i].url);
+       if (vfd >= 0)
+ 	curl_easy_setopt_ck(data[i].handle, CURLOPT_ERRORBUFFER,
+-- 
+2.39.1
+

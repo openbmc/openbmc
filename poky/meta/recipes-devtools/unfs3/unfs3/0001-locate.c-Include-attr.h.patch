@@ -1,0 +1,28 @@
+From 63e0785bb379a8f2c41f34f5cd938ca38555e605 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 13 Jan 2023 23:41:01 -0800
+Subject: [PATCH] locate.c: Include attr.h
+
+Its needed for fix_dir_times() API declarations
+
+Upstream-Status: Submitted [https://github.com/unfs3/unfs3/pull/32]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ locate.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/locate.c b/locate.c
+index 6bbe71f..84e0fe5 100644
+--- a/locate.c
++++ b/locate.c
+@@ -27,6 +27,7 @@
+ #include "nfs.h"
+ #include "fh.h"
+ #include "daemon.h"
++#include "attr.h"
+ 
+ /*
+  * these are the brute-force file searching routines that are used
+-- 
+2.39.0
+

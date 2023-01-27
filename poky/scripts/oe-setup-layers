@@ -10,11 +10,41 @@
 # bitbake-layers create-layers-setup destdir
 #
 # It is recommended that you do not modify this file directly, but rather re-run the above command to get the freshest upstream copy.
+#
+# This script is idempotent. Subsequent runs only change what is necessary to
+# ensure your layers match your configuration.
 
 import argparse
 import json
 import os
 import subprocess
+
+def _is_layer_git_repo(layerdir):
+    git_dir = os.path.join(layerdir, ".git")
+    if not os.access(git_dir, os.R_OK):
+        return False
+    try:
+        return subprocess.check_output("git -C %s rev-parse --is-inside-git-dir" % git_dir, shell=True, stderr=subprocess.DEVNULL)
+    except subprocess.CalledProcessError:
+        return False
+
+def _is_layer_at_rev(layerdir, rev):
+    try:
+        curr_rev = subprocess.check_output("git -C %s rev-parse HEAD" % layerdir, shell=True, stderr=subprocess.DEVNULL)
+        if curr_rev.strip().decode("utf-8") == rev:
+            return True
+    except subprocess.CalledProcessError:
+        pass
+    return False
+
+def _is_layer_at_remote_uri(layerdir, remote, uri):
+    try:
+        curr_uri = subprocess.check_output("git -C %s remote get-url %s" % (layerdir, remote), shell=True, stderr=subprocess.DEVNULL)
+        if curr_uri.strip().decode("utf-8") == uri:
+            return True
+    except subprocess.CalledProcessError:
+        pass
+    return False
 
 def _do_checkout(args, json):
     layers = json['sources']
@@ -36,22 +66,29 @@ def _do_checkout(args, json):
         remotes = l_remote['remotes']
 
         print('\nSetting up source {}, revision {}, branch {}'.format(l_name, desc, branch))
-        cmd = 'git init -q {}'.format(layerdir)
-        print("Running '{}'".format(cmd))
-        subprocess.check_output(cmd, shell=True)
+        if not _is_layer_git_repo(layerdir):
+            cmd = 'git init -q {}'.format(layerdir)
+            print("Running '{}'".format(cmd))
+            subprocess.check_output(cmd, shell=True)
 
         for remote in remotes:
-            cmd = "git remote remove {} > /dev/null 2>&1; git remote add {} {}".format(remote, remote, remotes[remote]['uri'])
+            if not _is_layer_at_remote_uri(layerdir, remote, remotes[remote]['uri']):
+                cmd = "git remote remove {} > /dev/null 2>&1; git remote add {} {}".format(remote, remote, remotes[remote]['uri'])
+                print("Running '{}' in {}".format(cmd, layerdir))
+                subprocess.check_output(cmd, shell=True, cwd=layerdir)
+
+                cmd = "git fetch -q {} || true".format(remote)
+                print("Running '{}' in {}".format(cmd, layerdir))
+                subprocess.check_output(cmd, shell=True, cwd=layerdir)
+
+        if not _is_layer_at_rev(layerdir, rev):
+            cmd = "git fetch -q --all || true"
             print("Running '{}' in {}".format(cmd, layerdir))
             subprocess.check_output(cmd, shell=True, cwd=layerdir)
 
-            cmd = "git fetch -q {} || true".format(remote)
+            cmd = 'git checkout -q {}'.format(rev)
             print("Running '{}' in {}".format(cmd, layerdir))
             subprocess.check_output(cmd, shell=True, cwd=layerdir)
-
-        cmd = 'git checkout -q {}'.format(rev)
-        print("Running '{}' in {}".format(cmd, layerdir))
-        subprocess.check_output(cmd, shell=True, cwd=layerdir)
 
 parser = argparse.ArgumentParser(description="A self contained python script that fetches all the needed layers and sets them to correct revisions using data in a json format from a separate file. The json data can be created from an active build directory with 'bitbake-layers create-layers-setup destdir' and there's a sample file and a schema in meta/files/")
 

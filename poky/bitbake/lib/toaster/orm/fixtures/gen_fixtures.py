@@ -35,26 +35,18 @@ verbose = False
 # [Codename, Yocto Project Version, Release Date, Current Version, Support Level, Poky Version, BitBake branch]
 current_releases = [
     # Release slot #1
-    ['Kirkstone','4.0','April 2022','4.0.5 (October 2022)','Stable - Long Term Support (until Apr. 2024)','','2.0'],
+    ['Kirkstone','4.0','April 2022','4.0.6 (December 2022)','Stable - Long Term Support (until Apr. 2024)','','2.0'],
     # Release slot #2 'local'
     ['HEAD','HEAD','','Local Yocto Project','HEAD','','HEAD'],
     # Release slot #3 'master'
     ['Master','master','','Yocto Project master','master','','master'],
     # Release slot #4
-    ['Langdale','4.1','October 2022','4.1.1 (November 2022)','Support for 7 months (until May 2023)','','2.2'],
+    ['Langdale','4.1','October 2022','4.1.2 (January 2023)','Support for 7 months (until May 2023)','','2.2'],
 #   ['Honister','3.4','October 2021','3.4.2 (February 2022)','Support for 7 months (until May 2022)','26.0','1.52'],
-#   ['Gatesgarth','3.2','Oct 2020','3.2.4 (May 2021)','EOL','24.0','1.48'],
-    # Optional Release slot #4
-    # 'dunfell' seems to have a bug:
-    # Bitbake crash
-    # Traceback (most recent call last):
-    # File "/home/usersetup/poky/bitbake/lib/bb/ui/toasterui.py", line 337, in main
-    #   buildinfohelper.update_and_store_task(event)
-    #   File "/home/usersetup/poky/bitbake/lib/bb/ui/buildinfohelper.py", line 1267, in update_and_store_task
-    #   assert identifier in self.internal_state['taskdata']
-    #   AssertionError
-#   ['Dunfell','3.1','April 2021','3.1.20 (October 2022)','Stable - Long Term Support (until Apr. 2024)','23.0','1.46'],
 #   ['Hardknott','3.3','April 2021','3.3.5 (March 2022)','Stable - Support for 13 months (until Apr. 2022)','25.0','1.50'],
+#   ['Gatesgarth','3.2','Oct 2020','3.2.4 (May 2021)','EOL','24.0','1.48'],
+    # Optional Release slot #5
+    ['Dunfell','3.1','April 2020','3.1.22 (January 2023)','Stable - Long Term Support (until Apr. 2024)','23.0','1.46'],
 ]
 
 default_poky_layers = [

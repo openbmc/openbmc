@@ -1,0 +1,50 @@
+From e826206c58bbaa1c256f55b103d5eb7b0182f152 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 15 Jan 2023 22:05:53 -0800
+Subject: [PATCH 2/2] make: Do not enforce c99
+
+Latest gcc/clang from OE defaults to c11 or newer and stickly to c99
+means we can not use _AlignOf
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Misc/Makefile.am       | 4 +---
+ Port-linux/Makefile.am | 1 -
+ 2 files changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/Misc/Makefile.am b/Misc/Makefile.am
+index d881525a..8d71d2d4 100644
+--- a/Misc/Makefile.am
++++ b/Misc/Makefile.am
+@@ -6,8 +6,6 @@ endif
+ 
+ noinst_LIBRARIES = libMisc.a
+ 
+-libMisc_a_CFLAGS = -std=c99
+-
+ libMisc_a_CPPFLAGS = -I$(top_srcdir)
+ 
+ libMisc_a_SOURCES = addrpack.c
+@@ -27,4 +25,4 @@ libMisc_a_SOURCES += lowlevel-posix.c
+ 
+ libMisc_a_SOURCES += hmac-sha-md5.h hmac-sha-md5.c
+ libMisc_a_SOURCES += md5-coreutils.c md5.h
+-libMisc_a_SOURCES += sha1.c sha1.h sha256.c sha256.h sha512.c sha512.h
+\ No newline at end of file
++libMisc_a_SOURCES += sha1.c sha1.h sha256.c sha256.h sha512.c sha512.h
+diff --git a/Port-linux/Makefile.am b/Port-linux/Makefile.am
+index 72b0a5e3..635998ea 100644
+--- a/Port-linux/Makefile.am
++++ b/Port-linux/Makefile.am
+@@ -1,6 +1,5 @@
+ noinst_LIBRARIES = libLowLevel.a
+ 
+-libLowLevel_a_CFLAGS = -std=c99
+ libLowLevel_a_CPPFLAGS = -I$(top_srcdir)/Misc
+ 
+ libLowLevel_a_SOURCES = daemon.cpp daemon.h ethtool-kernel.h ethtool-local.h interface.c interface.h ip_common.h iproute.c libnetlink.c libnetlink.h ll_map.c ll_map.h ll_types.c lowlevel-linux.c lowlevel-linux-link-state.c lowlevel-options-linux.c rtm_map.h rt_names.h utils.c utils.h
+-- 
+2.39.0
+

@@ -25,6 +25,7 @@ if __name__ == "__main__":
     parser.add_argument('-u', '--unexpand', help='Do not expand the value (with --value)', action="store_true")
     parser.add_argument('-f', '--flag', help='Specify a variable flag to query (with --value)', default=None)
     parser.add_argument('--value', help='Only report the value, no history and no variable name', action="store_true")
+    parser.add_argument('-q', '--quiet', help='Silence bitbake server logging', action="store_true")
     args = parser.parse_args()
 
     if args.unexpand and not args.value:
@@ -35,7 +36,7 @@ if __name__ == "__main__":
         print("--flag only makes sense with --value")
         sys.exit(1)
 
-    with bb.tinfoil.Tinfoil(tracking=True) as tinfoil:
+    with bb.tinfoil.Tinfoil(tracking=True, setup_logging=not args.quiet) as tinfoil:
         if args.recipe:
             tinfoil.prepare(quiet=2)
             d = tinfoil.parse_recipe(args.recipe)

@@ -1,0 +1,138 @@
+From: Victor Westerhuis <victor@westerhu.is>
+Date: Sat, 19 Nov 2022 21:45:39 +0100
+Subject: Do not embed build directory in binaries
+
+This makes the opencv core module build reproducibly.
+
+https://salsa.debian.org/science-team/opencv/-/raw/master/debian/patches/0008-Do-not-embed-build-directory-in-binaries.patch
+Upstream-Status: Backport
+Signed-off-by: Chee Yang Lee <chee.yang.lee@intel.com>
+---
+ modules/core/CMakeLists.txt                   | 10 ------
+ modules/core/include/opencv2/core/private.hpp |  4 +--
+ modules/core/include/opencv2/core/utility.hpp |  4 +--
+ modules/core/src/utils/datafile.cpp           | 48 +--------------------------
+ 4 files changed, 5 insertions(+), 61 deletions(-)
+
+diff --git a/modules/core/CMakeLists.txt b/modules/core/CMakeLists.txt
+index b78bb98..d96b669 100644
+--- a/modules/core/CMakeLists.txt
++++ b/modules/core/CMakeLists.txt
+@@ -188,16 +188,6 @@ if(OPENCV_OTHER_INSTALL_PATH)
+ ")
+ endif()
+ 
+-set(OPENCV_DATA_CONFIG_STR "${OPENCV_DATA_CONFIG_STR}
+-#define OPENCV_BUILD_DIR \"${CMAKE_BINARY_DIR}\"
+-")
+-
+-file(RELATIVE_PATH SOURCE_DIR_RELATIVE ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR})
+-set(OPENCV_DATA_CONFIG_STR "${OPENCV_DATA_CONFIG_STR}
+-#define OPENCV_DATA_BUILD_DIR_SEARCH_PATHS \\
+-    \"${SOURCE_DIR_RELATIVE}/\"
+-")
+-
+ if(WIN32)
+   file(RELATIVE_PATH INSTALL_DATA_DIR_RELATIVE "${CMAKE_INSTALL_PREFIX}/${OPENCV_BIN_INSTALL_PATH}" "${CMAKE_INSTALL_PREFIX}/${OPENCV_OTHER_INSTALL_PATH}")
+ else()
+diff --git a/modules/core/include/opencv2/core/private.hpp b/modules/core/include/opencv2/core/private.hpp
+index 146d37f..dd675bc 100644
+--- a/modules/core/include/opencv2/core/private.hpp
++++ b/modules/core/include/opencv2/core/private.hpp
+@@ -818,10 +818,10 @@ Search directories:
+ 2. Check path specified by configuration parameter with "_HINT" suffix (name of environment variable).
+ 3. Check path specified by configuration parameter (name of environment variable).
+    If parameter value is not empty and nothing is found then stop searching.
+-4. Detects build/install path based on:
++4. Detects install path based on:
+    a. current working directory (CWD)
+    b. and/or binary module location (opencv_core/opencv_world, doesn't work with static linkage)
+-5. Scan `<source>/{,data}` directories if build directory is detected or the current directory is in source tree.
++5. Scan `<source>/{,data}` directories if the current directory is in source tree.
+ 6. Scan `<install>/share/OpenCV` directory if install directory is detected.
+ 
+ @param relative_path Relative path to data file
+diff --git a/modules/core/include/opencv2/core/utility.hpp b/modules/core/include/opencv2/core/utility.hpp
+index 108c0d9..f15d9ea 100644
+--- a/modules/core/include/opencv2/core/utility.hpp
++++ b/modules/core/include/opencv2/core/utility.hpp
+@@ -1163,10 +1163,10 @@ Search directories:
+ 2. OPENCV_SAMPLES_DATA_PATH_HINT environment variable
+ 3. OPENCV_SAMPLES_DATA_PATH environment variable
+    If parameter value is not empty and nothing is found then stop searching.
+-4. Detects build/install path based on:
++4. Detects install path based on:
+    a. current working directory (CWD)
+    b. and/or binary module location (opencv_core/opencv_world, doesn't work with static linkage)
+-5. Scan `<source>/{,data,samples/data}` directories if build directory is detected or the current directory is in source tree.
++5. Scan `<source>/{,data,samples/data}` directories if the current directory is in source tree.
+ 6. Scan `<install>/share/OpenCV` directory if install directory is detected.
+ 
+ @see cv::utils::findDataFile
+diff --git a/modules/core/src/utils/datafile.cpp b/modules/core/src/utils/datafile.cpp
+index 3af83a5..6bda857 100644
+--- a/modules/core/src/utils/datafile.cpp
++++ b/modules/core/src/utils/datafile.cpp
+@@ -280,32 +280,8 @@ cv::String findDataFile(const cv::String& relative_path,
+ 
+ 
+     // Steps: 4, 5, 6
+-    cv::String cwd = utils::fs::getcwd();
+-    cv::String build_dir(OPENCV_BUILD_DIR);
+-    bool has_tested_build_directory = false;
+-    if (isSubDirectory(build_dir, cwd) || isSubDirectory(utils::fs::canonical(build_dir), utils::fs::canonical(cwd)))
+-    {
+-        CV_LOG_DEBUG(NULL, "utils::findDataFile(): the current directory is build sub-directory: " << cwd);
+-        const char* build_subdirs[] = { OPENCV_DATA_BUILD_DIR_SEARCH_PATHS };
+-        for (size_t k = 0; k < sizeof(build_subdirs)/sizeof(build_subdirs[0]); k++)
+-        {
+-            CV_LOG_DEBUG(NULL, "utils::findDataFile(): <build>/" << build_subdirs[k]);
+-            cv::String datapath = utils::fs::join(build_dir, build_subdirs[k]);
+-            if (utils::fs::isDirectory(datapath))
+-            {
+-                for(size_t i = search_subdir.size(); i > 0; i--)
+-                {
+-                    const cv::String& subdir = search_subdir[i - 1];
+-                    cv::String prefix = utils::fs::join(datapath, subdir);
+-                    TRY_FILE_WITH_PREFIX(prefix);
+-                }
+-            }
+-        }
+-        has_tested_build_directory = true;
+-    }
+-
+     cv::String source_dir;
+-    cv::String try_source_dir = cwd;
++    cv::String try_source_dir = utils::fs::getcwd();
+     for (int levels = 0; levels < 3; ++levels)
+     {
+         if (utils::fs::exists(utils::fs::join(try_source_dir, "modules/core/include/opencv2/core/version.hpp")))
+@@ -341,28 +317,6 @@ cv::String findDataFile(const cv::String& relative_path,
+         CV_LOG_INFO(NULL, "Can't detect module binaries location");
+     }
+ 
+-    if (!has_tested_build_directory &&
+-        (isSubDirectory(build_dir, module_path) || isSubDirectory(utils::fs::canonical(build_dir), utils::fs::canonical(module_path)))
+-    )
+-    {
+-        CV_LOG_DEBUG(NULL, "utils::findDataFile(): the binary module directory is build sub-directory: " << module_path);
+-        const char* build_subdirs[] = { OPENCV_DATA_BUILD_DIR_SEARCH_PATHS };
+-        for (size_t k = 0; k < sizeof(build_subdirs)/sizeof(build_subdirs[0]); k++)
+-        {
+-            CV_LOG_DEBUG(NULL, "utils::findDataFile(): <build>/" << build_subdirs[k]);
+-            cv::String datapath = utils::fs::join(build_dir, build_subdirs[k]);
+-            if (utils::fs::isDirectory(datapath))
+-            {
+-                for(size_t i = search_subdir.size(); i > 0; i--)
+-                {
+-                    const cv::String& subdir = search_subdir[i - 1];
+-                    cv::String prefix = utils::fs::join(datapath, subdir);
+-                    TRY_FILE_WITH_PREFIX(prefix);
+-                }
+-            }
+-        }
+-    }
+-
+ #if defined OPENCV_INSTALL_DATA_DIR_RELATIVE
+     if (!module_path.empty())  // require module path
+     {

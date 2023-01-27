@@ -2187,11 +2187,10 @@ class CookerParser(object):
         self.num_processes = min(int(self.cfgdata.getVar("BB_NUMBER_PARSE_THREADS") or
                                  multiprocessing.cpu_count()), self.toparse)
 
+        bb.cache.SiggenRecipeInfo.reset()
         self.start()
         self.haveshutdown = False
         self.syncthread = None
-
-        bb.cache.SiggenRecipeInfo.reset()
 
     def start(self):
         self.results = self.load_cached()
@@ -2231,6 +2230,14 @@ class CookerParser(object):
         else:
             bb.error("Parsing halted due to errors, see error messages above")
 
+        # Cleanup the queue before call process.join(), otherwise there might be
+        # deadlocks.
+        while True:
+            try:
+               self.result_queue.get(timeout=0.25)
+            except queue.Empty:
+                break
+
         def sync_caches():
             for c in self.bb_caches.values():
                 bb.cache.SiggenRecipeInfo.reset()
@@ -2240,14 +2247,6 @@ class CookerParser(object):
         self.syncthread.start()
 
         self.parser_quit.set()
-
-        # Cleanup the queue before call process.join(), otherwise there might be
-        # deadlocks.
-        while True:
-            try:
-               self.result_queue.get(timeout=0.25)
-            except queue.Empty:
-                break
 
         for process in self.processes:
             process.join(0.5)
@@ -2269,7 +2268,7 @@ class CookerParser(object):
             if hasattr(process, "close"):
                 process.close()
 
-
+        bb.codeparser.parser_cache_save()
         bb.codeparser.parser_cache_savemerge()
         bb.cache.SiggenRecipeInfo.reset()
         bb.fetch.fetcher_parse_done()

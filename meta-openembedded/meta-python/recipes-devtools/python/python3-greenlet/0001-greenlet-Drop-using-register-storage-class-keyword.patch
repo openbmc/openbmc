@@ -1,0 +1,31 @@
+From aa505359a3bb5a954fe3c7fbd853c75802bf3533 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 16 Jan 2023 21:37:26 -0800
+Subject: [PATCH] greenlet: Drop using 'register' storage class keyword
+
+This has been dropped in c++17 and newer
+
+Upstream-Status: Submitted [https://github.com/python-greenlet/greenlet/pull/336]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/greenlet/platform/switch_riscv_unix.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/greenlet/platform/switch_riscv_unix.h b/src/greenlet/platform/switch_riscv_unix.h
+index 5b5ea98..24df9db 100644
+--- a/src/greenlet/platform/switch_riscv_unix.h
++++ b/src/greenlet/platform/switch_riscv_unix.h
+@@ -11,8 +11,8 @@
+ static int
+ slp_switch(void)
+ {
+-  register int ret;
+-  register long *stackref, stsizediff;
++  int ret;
++  long *stackref, stsizediff;
+   __asm__ volatile ("" : : : REGS_TO_SAVE);
+   __asm__ volatile ("mv %0, sp" : "=r" (stackref) : );
+   {
+-- 
+2.39.0
+

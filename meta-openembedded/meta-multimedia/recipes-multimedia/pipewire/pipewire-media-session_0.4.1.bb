@@ -16,7 +16,8 @@ S = "${WORKDIR}/git"
 SRCREV = "e5d5cf2404786af8bcc40bdb8a2962bef4ec18b6"
 
 inherit meson pkgconfig
-
+# https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/2952
+CFLAGS += "-DPW_ENABLE_DEPRECATED"
 FILES:${PN} += " \
 	${systemd_user_unitdir}/pipewire-media-session.service \
 	${datadir}/pipewire/media-session.d/* \

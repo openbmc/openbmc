@@ -1,0 +1,46 @@
+From 3be3b9a1345942d1578ec73efa9b2e3c41bd67c5 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 21 Jan 2022 13:22:24 +0800
+Subject: [PATCH] Add autogen.sh
+
+The autogen.sh has been removed since 3.0.22[1]. But we still need it in
+do_configure. Add it back.
+
+[1] https://github.com/FreeRADIUS/freeradius-server/commit/2e9b6227efd19e2b0926541aa26874908e7b7314
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ autogen.sh | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+ create mode 100755 autogen.sh
+
+diff --git a/autogen.sh b/autogen.sh
+new file mode 100755
+index 0000000000..959182b39e
+--- /dev/null
++++ b/autogen.sh
+@@ -0,0 +1,19 @@
++#!/bin/sh -e
++
++parentdir=`dirname $0`
++
++cd $parentdir
++parentdir=`pwd`
++m4include="-I$parentdir -I$parentdir/m4 -Im4"
++
++autoreconf -Wcross --verbose --install --force
++
++mysubdirs="$mysubdirs `find src/modules/ -name configure -print | sed 's%/configure%%'`"
++mysubdirs=`echo $mysubdirs`
++
++for F in $mysubdirs
++do
++	echo "Configuring in $F..."
++	(cd $F && grep "^AC_CONFIG_HEADER" configure.ac > /dev/null || exit 0; autoheader $m4include)
++	(cd $F && autoconf $m4include)
++done
+-- 
+2.25.1
+

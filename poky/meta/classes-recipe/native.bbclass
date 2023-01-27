@@ -139,7 +139,7 @@ python native_virtclass_handler () {
     if "native" not in classextend:
         return
 
-    def map_dependencies(varname, d, suffix = "", selfref=True):
+    def map_dependencies(varname, d, suffix = "", selfref=True, regex=False):
         if suffix:
             varname = varname + ":" + suffix
         deps = d.getVar(varname)
@@ -148,7 +148,9 @@ python native_virtclass_handler () {
         deps = bb.utils.explode_deps(deps)
         newdeps = []
         for dep in deps:
-            if dep == pn:
+            if regex and dep.startswith("^") and dep.endswith("$"):
+                newdeps.append(dep[:-1].replace(pn, bpn) + "-native$")
+            elif dep == pn:
                 if not selfref:
                     continue
                 newdeps.append(dep)
@@ -161,7 +163,7 @@ python native_virtclass_handler () {
                 newdeps.append(dep.replace(pn, bpn) + "-native")
             else:
                 newdeps.append(dep)
-        d.setVar(varname, " ".join(newdeps), parsing=True)
+        d.setVar(varname, " ".join(newdeps))
 
     map_dependencies("DEPENDS", e.data, selfref=False)
     for pkg in e.data.getVar("PACKAGES", False).split():
@@ -171,6 +173,7 @@ python native_virtclass_handler () {
         map_dependencies("RPROVIDES", e.data, pkg)
         map_dependencies("RREPLACES", e.data, pkg)
     map_dependencies("PACKAGES", e.data)
+    map_dependencies("PACKAGES_DYNAMIC", e.data, regex=True)
 
     provides = e.data.getVar("PROVIDES")
     nprovides = []

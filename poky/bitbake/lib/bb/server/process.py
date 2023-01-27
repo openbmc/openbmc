@@ -361,20 +361,21 @@ class ProcessServer():
             except FileNotFoundError:
                 return None
 
-        lockcontents = get_lock_contents(lockfile)
-        serverlog("Original lockfile contents: " + str(lockcontents))
-
         lock.close()
         lock = None
 
         while not lock:
             i = 0
             lock = None
+            if not os.path.exists(os.path.basename(lockfile)):
+                serverlog("Lockfile directory gone, exiting.")
+                return
+
             while not lock and i < 30:
                 lock = bb.utils.lockfile(lockfile, shared=False, retry=False, block=False)
                 if not lock:
                     newlockcontents = get_lock_contents(lockfile)
-                    if newlockcontents != lockcontents:
+                    if not newlockcontents[0].startswith([os.getpid() + "\n", os.getpid() + " "]):
                         # A new server was started, the lockfile contents changed, we can exit
                         serverlog("Lockfile now contains different contents, exiting: " + str(newlockcontents))
                         return

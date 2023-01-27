@@ -1,0 +1,95 @@
+From 6e376601c990abaa5e261d1311f92acb3b370b8f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 24 Jan 2023 21:40:43 -0800
+Subject: [PATCH] Add missing includes <cstdint> and <cstdio>
+
+This is needed with GCC 13 and newer [1]
+
+[1] https://www.gnu.org/software/gcc/gcc-13/porting_to.html
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ .../rocksdb/rocksdb/db/compaction/compaction_iteration_stats.h   | 1 +
+ storage/rocksdb/rocksdb/include/rocksdb/utilities/checkpoint.h   | 1 +
+ .../rocksdb/rocksdb/table/block_based/data_block_hash_index.h    | 1 +
+ storage/rocksdb/rocksdb/util/slice.cc                            | 1 +
+ storage/rocksdb/rocksdb/util/string_util.h                       | 1 +
+ tpool/aio_linux.cc                                               | 1 +
+ 6 files changed, 6 insertions(+)
+
+diff --git a/storage/rocksdb/rocksdb/db/compaction/compaction_iteration_stats.h b/storage/rocksdb/rocksdb/db/compaction/compaction_iteration_stats.h
+index 963c1d8eb49..73487edd96d 100644
+--- a/storage/rocksdb/rocksdb/db/compaction/compaction_iteration_stats.h
++++ b/storage/rocksdb/rocksdb/db/compaction/compaction_iteration_stats.h
+@@ -5,6 +5,7 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include "rocksdb/rocksdb_namespace.h"
+ 
+ struct CompactionIterationStats {
+diff --git a/storage/rocksdb/rocksdb/include/rocksdb/utilities/checkpoint.h b/storage/rocksdb/rocksdb/include/rocksdb/utilities/checkpoint.h
+index c7f93b4cfcd..3c2ab80535a 100644
+--- a/storage/rocksdb/rocksdb/include/rocksdb/utilities/checkpoint.h
++++ b/storage/rocksdb/rocksdb/include/rocksdb/utilities/checkpoint.h
+@@ -8,6 +8,7 @@
+ #pragma once
+ #ifndef ROCKSDB_LITE
+ 
++#include <cstdint>
+ #include <string>
+ #include <vector>
+ #include "rocksdb/status.h"
+diff --git a/storage/rocksdb/rocksdb/table/block_based/data_block_hash_index.h b/storage/rocksdb/rocksdb/table/block_based/data_block_hash_index.h
+index f356395f329..3215221755d 100644
+--- a/storage/rocksdb/rocksdb/table/block_based/data_block_hash_index.h
++++ b/storage/rocksdb/rocksdb/table/block_based/data_block_hash_index.h
+@@ -5,6 +5,7 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include <string>
+ #include <vector>
+ 
+diff --git a/storage/rocksdb/rocksdb/util/slice.cc b/storage/rocksdb/rocksdb/util/slice.cc
+index 6db11cc947a..c26b6a21a57 100644
+--- a/storage/rocksdb/rocksdb/util/slice.cc
++++ b/storage/rocksdb/rocksdb/util/slice.cc
+@@ -8,6 +8,7 @@
+ // found in the LICENSE file. See the AUTHORS file for names of contributors.
+ 
+ #include <algorithm>
++#include <cstdint>
+ #include "rocksdb/slice_transform.h"
+ #include "rocksdb/slice.h"
+ #include "util/string_util.h"
+diff --git a/storage/rocksdb/rocksdb/util/string_util.h b/storage/rocksdb/rocksdb/util/string_util.h
+index a761be66c52..064d059f08f 100644
+--- a/storage/rocksdb/rocksdb/util/string_util.h
++++ b/storage/rocksdb/rocksdb/util/string_util.h
+@@ -6,6 +6,7 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include <sstream>
+ #include <string>
+ #include <unordered_map>
+diff --git a/tpool/aio_linux.cc b/tpool/aio_linux.cc
+index 10234e0e46a..a6adf1af257 100644
+--- a/tpool/aio_linux.cc
++++ b/tpool/aio_linux.cc
+@@ -18,6 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 - 1301 USA*/
+ 
+ # include <thread>
+ # include <atomic>
++# include <cstdio>
+ # include <libaio.h>
+ # include <sys/syscall.h>
+ 
+-- 
+2.39.1
+

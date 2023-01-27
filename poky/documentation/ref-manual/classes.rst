@@ -758,6 +758,29 @@ software from the GNOME stack. This class sets
 mirrors as well as extending :term:`FILES` with the typical
 GNOME installation paths.
 
+.. _ref-classes-go:
+
+``go``
+======
+
+The :ref:`ref-classes-go` class supports building Go programs. The behavior of
+this class is controlled by the mandatory :term:`GO_IMPORT` variable, and
+by the optional :term:`GO_INSTALL` and :term:`GO_INSTALL_FILTEROUT` ones.
+
+To build a Go program with the Yocto Project, you can use the
+:yocto_git:`go-helloworld_0.1.bb </poky/tree/meta/recipes-extended/go-examples/go-helloworld_0.1.bb>`
+recipe as an example.
+
+.. _ref-classes-go-mod:
+
+``go-mod``
+==========
+
+The :ref:`ref-classes-go-mod` class allows to use Go modules, and inherits the
+:ref:`ref-classes-go` class.
+
+See the associated :term:`GO_WORKDIR` variable.
+
 .. _ref-classes-gobject-introspection:
 
 ``gobject-introspection``

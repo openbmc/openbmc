@@ -1,0 +1,38 @@
+From bad6131463275bd8013a82c28fb0b27e882bc801 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 18 Jan 2023 16:07:35 -0800
+Subject: [PATCH] Drop using 'register' keyword for storage classifier
+
+Its gone from C++17 and newer
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/klatt.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/klatt.cpp b/src/klatt.cpp
+index b15f77c..9c51bc5 100755
+--- a/src/klatt.cpp
++++ b/src/klatt.cpp
+@@ -167,7 +167,7 @@ Output = (rnz.a * input) + (rnz.b * oldin1) + (rnz.c * oldin2)
+ #ifdef deleted
+ static double antiresonator(resonator_ptr r, double input)
+ {
+-	register double x = (double)r->a * (double)input + (double)r->b * (double)r->p1 + (double)r->c * (double)r->p2;
++	double x = (double)r->a * (double)input + (double)r->b * (double)r->p1 + (double)r->c * (double)r->p2;
+ 	r->p2 = (double)r->p1;
+ 	r->p1 = (double)input;
+ 	return (double)x;
+@@ -176,7 +176,7 @@ static double antiresonator(resonator_ptr r, double input)
+ 
+ static double antiresonator2(resonator_ptr r, double input)
+ {
+-	register double x = (double)r->a * (double)input + (double)r->b * (double)r->p1 + (double)r->c * (double)r->p2;
++	double x = (double)r->a * (double)input + (double)r->b * (double)r->p1 + (double)r->c * (double)r->p2;
+ 	r->p2 = (double)r->p1;
+ 	r->p1 = (double)input;
+ 
+-- 
+2.39.1
+

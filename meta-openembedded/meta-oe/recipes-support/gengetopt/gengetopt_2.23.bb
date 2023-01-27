@@ -13,4 +13,6 @@ SRC_URI[sha256sum] = "b941aec9011864978dd7fdeb052b1943535824169d2aa2b0e7eae9ab80
 
 inherit autotools texinfo
 
+CXXFLAGS += "-std=c++14"
+
 BBCLASSEXTEND = "native nativesdk"

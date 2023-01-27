@@ -1,0 +1,71 @@
+From 5ba3d140842268cbbdd983266efecb1fba5bdd59 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 22 Aug 2019 10:45:46 +0800
+Subject: [PATCH] Fix libtool detection
+
+Use LT_INIT instead of the deprecated AC_PROG_LIBTOOL to detect libtool, so it
+can work with our libtoolize and libtool.
+
+Simplify the detection of ltdl. It will find the ltdl from the sysroot; the
+switch --with-system-libltdl is no longer needed. The code is copied from
+pulseaudio configure.ac, together with the comment paragraph.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Jesse Zhang <sen.zhang@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ configure.ac | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index ad8bc8cdda..ef8fced680 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -321,6 +321,42 @@ dnl #  See if we have Git.
+ dnl #
+ AC_CHECK_PROG(GIT, git, yes, no)
+ 
++#### libtool stuff ####
++
++dnl set this shit so it doesn't force CFLAGS...
++LTCFLAGS=" "
++
++LT_PREREQ(2.2)
++LT_INIT([dlopen disable-static])
++
++dnl Unfortunately, even up to libtool 2.2.6a there is no way to know
++dnl exactly which version of libltdl is present in the system, so we
++dnl just assume that it's a working version as long as we have the
++dnl library and the header files.
++dnl
++dnl As an extra safety device, check for lt_dladvise_init() which is
++dnl only implemented in libtool 2.x, and refine as we go if we have
++dnl refined requirements.
++dnl
++dnl Check the header files first since the system may have a
++dnl libltdl.so for runtime, but no headers, and we want to bail out as
++dnl soon as possible.
++dnl
++dnl We don't need any special variable for this though, since the user
++dnl can give the proper place to find libltdl through the standard
++dnl variables like LDFLAGS and CPPFLAGS.
++
++AC_CHECK_HEADER([ltdl.h],
++    [AC_CHECK_LIB([ltdl], [lt_dladvise_init], [LIBLTDL=-lltdl], [LIBLTDL=])],
++    [LIBLTDL=])
++
++AS_IF([test "x$LIBLTDL" = "x"],
++    [AC_MSG_ERROR([Unable to find libltdl version 2. Makes sure you have libtool 2.2 or later installed.])])
++AC_SUBST([LIBLTDL])
++LTDL_SUBDIRS=
++INCLTDL=-DWITH_SYSTEM_LTDL
++AC_SUBST(LTDL_SUBDIRS)
++
+ dnl Put this in later, when all distributed modules use autoconf.
+ dnl AC_ARG_WITH(disablemodulefoo,
+ dnl [  --without-rlm_foo         Disables module compilation.  Module list:]
+-- 
+2.25.1
+

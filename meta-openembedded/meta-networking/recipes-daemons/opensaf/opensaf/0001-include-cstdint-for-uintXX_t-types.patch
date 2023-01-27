@@ -1,0 +1,43 @@
+From 225891675b80beaa9d74ce56809e52c4451df72c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 25 Jan 2023 21:46:22 -0800
+Subject: [PATCH 1/2] include cstdint for uintXX_t types
+
+GCC-13 needs it [1]
+
+[1] https://www.gnu.org/software/gcc/gcc-13/porting_to.html
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/imm/immnd/ImmModel.h           | 1 +
+ src/osaf/consensus/consensus_env.h | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/src/imm/immnd/ImmModel.h b/src/imm/immnd/ImmModel.h
+index 44da470..0660431 100644
+--- a/src/imm/immnd/ImmModel.h
++++ b/src/imm/immnd/ImmModel.h
+@@ -22,6 +22,7 @@
+ #include <saImmOm.h>
+ #include <cstdarg>
+ #include <sys/types.h>
++#include <cstdint>
+ #include <string>
+ #include <vector>
+ #include <map>
+diff --git a/src/osaf/consensus/consensus_env.h b/src/osaf/consensus/consensus_env.h
+index df4f93a..89ccf46 100644
+--- a/src/osaf/consensus/consensus_env.h
++++ b/src/osaf/consensus/consensus_env.h
+@@ -15,6 +15,7 @@
+ #ifndef OSAF_CONSENSUS_CONSENSUS_ENV_H_
+ #define OSAF_CONSENSUS_CONSENSUS_ENV_H_
+ 
++#include <cstdint>
+ #include <string>
+ #include "base/mutex.h"
+ 
+-- 
+2.39.1
+

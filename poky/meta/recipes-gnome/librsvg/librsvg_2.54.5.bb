@@ -42,8 +42,6 @@ do_configure[postfuncs] += "cargo_common_do_configure"
 
 inherit rust-target-config
 
-EXTRA_OECONF:class-target = "--enable-vala"
-
 # rust-cross writes the target linker binary into target json definition without any flags.
 # This breaks here because the linker isn't going to work without at least knowing where
 # the sysroot is. So copy the json to workdir, and patch in the path to wrapper from rust class
@@ -58,8 +56,10 @@ CVE_CHECK_IGNORE += "CVE-2018-1000041"
 CACHED_CONFIGUREVARS = "ac_cv_path_GDK_PIXBUF_QUERYLOADERS=${STAGING_LIBDIR_NATIVE}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders"
 
 PACKAGECONFIG ??= "gdkpixbuf"
+PACKAGECONFIG:append:class-target = " ${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'vala', '', d)}"
 # The gdk-pixbuf loader
 PACKAGECONFIG[gdkpixbuf] = "--enable-pixbuf-loader,--disable-pixbuf-loader,gdk-pixbuf-native"
+PACKAGECONFIG[vala] = "--enable-vala,--disable-vala"
 
 do_install:append() {
 	# Loadable modules don't need .a or .la on Linux

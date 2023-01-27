@@ -27,7 +27,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -1000,7 +1000,12 @@ option(ROCKSDB_BUILD_SHARED "Build share
+@@ -1057,7 +1057,12 @@ set(ROCKSDB_SHARED_LIB rocksdb-shared${A
  if(WIN32)
    set(SYSTEM_LIBS ${SYSTEM_LIBS} shlwapi.lib rpcrt4.lib)
  else()

@@ -1,0 +1,70 @@
+From 6e376601c990abaa5e261d1311f92acb3b370b8f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 24 Jan 2023 21:40:43 -0800
+Subject: [PATCH] Add missing includes <cstdint> and <cstdio>
+
+This is needed with GCC 13 and newer [1]
+
+[1] https://www.gnu.org/software/gcc/gcc-13/porting_to.html
+
+Upstream-Status: Backport [https://github.com/facebook/rocksdb/commit/88edfbfb5e1cac228f7cc31fbec24bb637fe54b1]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ .../rocksdb/rocksdb/db/compaction/compaction_iteration_stats.h   | 1 +
+ storage/rocksdb/rocksdb/include/rocksdb/utilities/checkpoint.h   | 1 +
+ .../rocksdb/rocksdb/table/block_based/data_block_hash_index.h    | 1 +
+ storage/rocksdb/rocksdb/util/slice.cc                            | 1 +
+ storage/rocksdb/rocksdb/util/string_util.h                       | 1 +
+ tpool/aio_linux.cc                                               | 1 +
+ 6 files changed, 6 insertions(+)
+
+--- a/db/compaction/compaction_iteration_stats.h
++++ b/db/compaction/compaction_iteration_stats.h
+@@ -7,6 +7,7 @@
+ 
+ #include <cstdint>
+ 
++#include <cstdint>
+ #include "rocksdb/rocksdb_namespace.h"
+ 
+ namespace ROCKSDB_NAMESPACE {
+--- a/include/rocksdb/utilities/checkpoint.h
++++ b/include/rocksdb/utilities/checkpoint.h
+@@ -8,6 +8,7 @@
+ #pragma once
+ #ifndef ROCKSDB_LITE
+ 
++#include <cstdint>
+ #include <string>
+ #include <vector>
+ 
+--- a/table/block_based/data_block_hash_index.h
++++ b/table/block_based/data_block_hash_index.h
+@@ -5,6 +5,7 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include <string>
+ #include <vector>
+ 
+--- a/util/slice.cc
++++ b/util/slice.cc
+@@ -12,6 +12,7 @@
+ #include <stdio.h>
+ 
+ #include <algorithm>
++#include <cstdint>
+ 
+ #include "rocksdb/convenience.h"
+ #include "rocksdb/slice_transform.h"
+--- a/util/string_util.h
++++ b/util/string_util.h
+@@ -6,6 +6,7 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include <sstream>
+ #include <string>
+ #include <unordered_map>

@@ -106,10 +106,10 @@ PTESTS_SLOW = "\
 "
 
 PTESTS_SLOW:remove:riscv64 = "valgrind-ptest"
-PTESTS_PROBLEMS:append:riscv64 = "valgrind-ptest"
+PTESTS_PROBLEMS:append:riscv64 = " valgrind-ptest"
 PTESTS_SLOW:append:libc-musl = " libc-test-ptest"
 PTESTS_SLOW:remove:x86 = "valgrind-ptest"
-PTESTS_PROBLEMS:append:x86 = "valgrind-ptest"
+PTESTS_PROBLEMS:append:x86 = " valgrind-ptest"
 
 #    ruby-ptest \ # Timeout
 #    lz4-ptest \ # Needs a rewrite

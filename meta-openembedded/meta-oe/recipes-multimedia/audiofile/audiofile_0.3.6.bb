@@ -19,6 +19,8 @@ SRC_URI[sha256sum] = "ea2449ad3f201ec590d811db9da6d02ffc5e87a677d06b92ab15363d8c
 
 inherit autotools lib_package pkgconfig
 
+CXXFLAGS += "-std=c++14"
+
 DEPENDS = " \
     asciidoc-native \
     alsa-lib \

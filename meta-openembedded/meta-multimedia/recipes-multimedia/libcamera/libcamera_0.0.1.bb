@@ -10,6 +10,7 @@ LIC_FILES_CHKSUM = "\
 
 SRC_URI = " \
         git://git.libcamera.org/libcamera/libcamera.git;protocol=https;branch=master \
+        file://0001-file_sink.cpp-Avoid-dangling-reference.patch \
 "
 
 SRCREV = "a83aed77df1258e469c0eb42d9cb4f1938db53f2"

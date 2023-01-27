@@ -29,6 +29,8 @@ S ="${WORKDIR}/${BPN}.${PV}"
 
 inherit autotools
 
+CXXFLAGS += "-std=gnu++14"
+
 do_configure:prepend(){
     ${S}/autogen.sh
 }

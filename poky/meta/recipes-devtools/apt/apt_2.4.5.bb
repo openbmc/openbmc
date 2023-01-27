@@ -16,6 +16,7 @@ SRC_URI = "${DEBIAN_MIRROR}/main/a/apt/${BPN}_${PV}.tar.xz \
            file://0001-Remove-using-std-binary_function.patch \
            file://0001-typecast-time_t-and-suseconds_t-from-std-chrono.patch \
            file://0002-interactive-helper-Undefine-_FORTIFY_SOURCE.patch \
+           file://0001-add-missing-cstdint-for-uint16_t.patch \
            "
 
 SRC_URI:append:class-native = " \

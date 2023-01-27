@@ -65,7 +65,7 @@ class BBUIEventQueue:
         self.server = server
 
         self.t = threading.Thread()
-        self.t.setDaemon(True)
+        self.t.daemon = True
         self.t.run = self.startCallbackHandler
         self.t.start()
 

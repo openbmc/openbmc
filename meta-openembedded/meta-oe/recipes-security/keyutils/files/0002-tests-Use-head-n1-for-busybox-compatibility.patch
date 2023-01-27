@@ -1,0 +1,64 @@
+From 5e660f246bb04560692ac9fc144574732c7e19e7 Mon Sep 17 00:00:00 2001
+From: Alex Kiernan <alex.kiernan@gmail.com>
+Date: Thu, 26 Jan 2023 08:28:16 +0000
+Subject: [PATCH 2/2] tests: Use `head -n1` for busybox compatibility
+
+Upstream-Status: Pending
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ tests/keyctl/session/valid/runtest.sh | 4 ++--
+ tests/keyctl/show/noargs/runtest.sh   | 2 +-
+ tests/toolbox.inc.sh                  | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tests/keyctl/session/valid/runtest.sh b/tests/keyctl/session/valid/runtest.sh
+index 4c831314c0b0..456e9f32de23 100644
+--- a/tests/keyctl/session/valid/runtest.sh
++++ b/tests/keyctl/session/valid/runtest.sh
+@@ -17,7 +17,7 @@ then
+     expect_key_rdesc rdesc "keyring@.*@.*@.*@_ses[^@]*\$"
+ 
+     # check the session keyring ID is shown
+-    seskeyring="`tail -2 $OUTPUTFILE | head -1`"
++    seskeyring="`tail -2 $OUTPUTFILE | head -n1`"
+     if ! expr "$seskeyring" : "Joined session keyring: [0-9]*" >&/dev/null
+     then
+ 	failed
+@@ -30,7 +30,7 @@ new_session qwerty keyctl rdescribe @s "@"
+ expect_key_rdesc rdesc "keyring@.*@.*@.*@qwerty"
+ 
+ # check the session keyring ID is shown
+-seskeyring="`tail -2 $OUTPUTFILE | head -1`"
++seskeyring="`tail -2 $OUTPUTFILE | head -n1`"
+ if ! expr "$seskeyring" : "Joined session keyring: [0-9]*" >&/dev/null
+ then
+     failed
+diff --git a/tests/keyctl/show/noargs/runtest.sh b/tests/keyctl/show/noargs/runtest.sh
+index d5072716c76a..a6d8b6b585c4 100644
+--- a/tests/keyctl/show/noargs/runtest.sh
++++ b/tests/keyctl/show/noargs/runtest.sh
+@@ -31,7 +31,7 @@ then
+ fi
+ 
+ # the first key listed (line 2) should be a keying (the session keyring) ...
+-keyring1="`grep -n keyring $OUTPUTFILE | cut -d: -f1 | head -1`"
++keyring1="`grep -n keyring $OUTPUTFILE | cut -d: -f1 | head -n1`"
+ if [ "$keyring1" != "4" ]
+ then
+     failed
+diff --git a/tests/toolbox.inc.sh b/tests/toolbox.inc.sh
+index 7ea2f253ba7d..a461a73daaa3 100644
+--- a/tests/toolbox.inc.sh
++++ b/tests/toolbox.inc.sh
+@@ -229,7 +229,7 @@ function check_notify ()
+     if [ "$1" = "-2" ]
+     then
+ 	shift
+-	my_logline="`tail -2 $watch_log | head -1`"
++	my_logline="`tail -2 $watch_log | head -n1`"
+     else
+ 	my_logline="`tail -1 $watch_log`"
+     fi
+-- 
+2.39.0
+

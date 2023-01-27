@@ -1,0 +1,37 @@
+From 3c461786feb1d5aa1ed2a911942a5f9fbc8b8086 Mon Sep 17 00:00:00 2001
+From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Date: Tue, 24 Jan 2023 17:38:43 +0100
+Subject: [libgpiod v1.6.x][PATCH] build: don't expect automake to set $PYTHON
+
+It seems that the implementation of AM_PATH_PYTHON() changed in automake
+recently and no longer sets $PYTHON variable which breaks the build on
+some systems.
+
+We know we use python3 so use python3-config explicitly.
+
+Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+---
+Upstream-Status: Accepted
+
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 3149384..0460810 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -204,9 +204,9 @@ then
+ 		AC_MSG_ERROR([python3-config not found - needed for python bindings])
+ 	fi
+ 	AS_IF([test -z "$PYTHON_CPPFLAGS"],
+-		[AC_SUBST(PYTHON_CPPFLAGS, [`$PYTHON-config --includes`])])
++		[AC_SUBST(PYTHON_CPPFLAGS, [`python3-config --includes`])])
+ 	AS_IF([test -z "$PYTHON_LIBS"],
+-		[AC_SUBST(PYTHON_LIBS, [`$PYTHON-config --libs`])])
++		[AC_SUBST(PYTHON_LIBS, [`python3-config --libs`])])
+ fi
+ 
+ AC_CHECK_PROG([has_doxygen], [doxygen], [true], [false])
+-- 
+2.37.2
+

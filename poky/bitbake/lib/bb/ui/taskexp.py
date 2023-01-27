@@ -177,7 +177,7 @@ class gtkthread(threading.Thread):
     quit = threading.Event()
     def __init__(self, shutdown):
         threading.Thread.__init__(self)
-        self.setDaemon(True)
+        self.daemon = True
         self.shutdown = shutdown
         if not Gtk.init_check()[0]:
             sys.stderr.write("Gtk+ init failed. Make sure DISPLAY variable is set.\n")

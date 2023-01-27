@@ -6,7 +6,7 @@ Subject: [PATCH] smartmontools: Improve reproducibility
 Backport changes added to master smartmontools.
 https://github.com/smartmontools/smartmontools/commit/24838916b4c0e91f5c897d44fcdeedb22848f684
 
-Upstream-Status: Backported
+Upstream-Status: Backport
 Signed-off-by: Oleksiy Obitotskyy <oobitots@cisco.com>
 
 ---

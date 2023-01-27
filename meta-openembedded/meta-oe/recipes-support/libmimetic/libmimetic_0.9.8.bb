@@ -19,6 +19,6 @@ UPSTREAM_CHECK_COMMITS = "1"
 
 S = "${WORKDIR}/git"
 
-CXXFLAGS += "-Wno-narrowing"
+CXXFLAGS += "-Wno-narrowing -std=c++14"
 
 inherit autotools

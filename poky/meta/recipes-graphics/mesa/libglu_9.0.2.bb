@@ -11,7 +11,9 @@ LIC_FILES_CHKSUM = "file://include/GL/glu.h;endline=29;md5=6b79c570f644363b35645
 # Epoch as this used to be part of mesa
 PE = "2"
 
-SRC_URI = "https://mesa.freedesktop.org/archive/glu/glu-${PV}.tar.gz"
+SRC_URI = "https://mesa.freedesktop.org/archive/glu/glu-${PV}.tar.gz \
+           file://0001-Remove-deprecated-register-in-C-17.patch \
+           "
 
 SRC_URI[sha256sum] = "24effdfb952453cc00e275e1c82ca9787506aba0282145fff054498e60e19a65"
 

@@ -2040,7 +2040,9 @@ class DevtoolUpgradeTests(DevtoolBase):
 
         #Modify the kernel source
         modfile = os.path.join(tempdir, 'init/version.c')
-        runCmd("sed -i 's/Linux/LiNuX/g' %s" % (modfile))
+        # Moved to uts.h in 6.1 onwards
+        modfile2 = os.path.join(tempdir, 'include/linux/uts.h')
+        runCmd("sed -i 's/Linux/LiNuX/g' %s %s" % (modfile, modfile2))
 
         #Modify the configuration
         codeconfigfile = os.path.join(tempdir, '.config.new')

@@ -13,7 +13,7 @@ Upstream-Status: Submitted [https://github.com/facebook/rocksdb/pull/7541]
 
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -153,12 +153,7 @@ else()
+@@ -154,12 +154,7 @@ else()
    if(WITH_BZ2)
      find_package(BZip2 REQUIRED)
      add_definitions(-DBZIP2)

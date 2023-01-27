@@ -1,0 +1,48 @@
+From 455001cb0112f7324ab50f555aa5ed5eae1bb93b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 16 Jan 2023 19:23:18 -0800
+Subject: [PATCH] Replace std::ptr_fun for c++17
+
+std::ptr_fun was deprecated in C++11, and removed completely in C++17.
+Similarly, std::not1 is deprecated since C++17.
+
+Modern compilers like clang >= 16 have started to notice it
+
+src/FatUtils.h:41:46: error: use of undeclared identifier 'ptr_fun'
+|   s.erase(find_if(s.rbegin(), s.rend(), not1(ptr_fun<int, int>(isspace))).base(), s.end());
+
+Therefore replace ptr_fun with lambda
+
+Also use 'unsigned char' parameter to std::isspace, for reason see [1]
+
+[1] https://en.cppreference.com/w/cpp/string/byte/isspace#Notes
+
+Upstream-Status: Submitted [https://github.com/Gregwar/fatcat/pull/36]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/FatUtils.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/FatUtils.h b/src/FatUtils.h
+index 5080f2a..a8d69ee 100644
+--- a/src/FatUtils.h
++++ b/src/FatUtils.h
+@@ -32,13 +32,13 @@ using namespace std;
+ 
+ // trim from start
+ static inline string ltrim(string s) {
+-  s.erase(s.begin(), find_if(s.begin(), s.end(), not1(ptr_fun<int, int>(isspace))));
++  s.erase(s.begin(), find_if(s.begin(), s.end(), [](unsigned char c) {return !isspace(c);}));
+   return s;
+ }
+ 
+ // trim from end
+ static inline string rtrim(string s) {
+-  s.erase(find_if(s.rbegin(), s.rend(), not1(ptr_fun<int, int>(isspace))).base(), s.end());
++  s.erase(find_if(s.rbegin(), s.rend(), [](unsigned char c) {return !isspace(c);}).base(), s.end());
+   return s;
+ }
+ 
+-- 
+2.39.0
+

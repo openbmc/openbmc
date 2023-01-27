@@ -1,0 +1,42 @@
+From c3e2c873ffa8e89b5f83dccc4e4e35dfcea633cb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 14 Jan 2023 12:39:43 -0800
+Subject: [PATCH] Define _DBUS_ALIGNOF using _Alignof when using C11 or newer
+
+WG14 N2350 made very clear that it is an UB having type definitions
+within "offsetof" [1]. This patch changes the implementation of macro
+_DBUS_ALIGNOF to builtin "_Alignof" to avoid undefined behavior.
+
+clang 16+ has started to diagnose this [2]
+
+Fixes build when using -std >= gnu11 and using clang16+
+
+[1] https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2350.htm
+[2] https://reviews.llvm.org/D133574
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/dbus/dbus/-/merge_requests/389]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ dbus/dbus-internals.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/dbus/dbus-internals.h b/dbus/dbus-internals.h
+index cc98c92a..2387752d 100644
+--- a/dbus/dbus-internals.h
++++ b/dbus/dbus-internals.h
+@@ -201,8 +201,12 @@ void _dbus_real_assert_not_reached (const char *explanation,
+     ((intptr_t) ((unsigned char*) &((struct_type*) 0)->member))
+ #endif
+ 
++#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__cplusplus)
++#define _DBUS_ALIGNOF(type) _Alignof(type)
++#else
+ #define _DBUS_ALIGNOF(type) \
+     (_DBUS_STRUCT_OFFSET (struct { char _1; type _2; }, _2))
++#endif
+ 
+ #if defined(DBUS_DISABLE_CHECKS) || defined(DBUS_DISABLE_ASSERT)
+ /* this is an assert and not an error, but in the typical --disable-checks case (you're trying
+-- 
+2.39.0
+

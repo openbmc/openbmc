@@ -1,0 +1,65 @@
+From 25946100e21cf2095bea334e8d7096798561d0b7 Mon Sep 17 00:00:00 2001
+From: Vincent Davis Jr <vince@underview.tech>
+Date: Wed, 28 Dec 2022 16:28:01 -0600
+Subject: [PATCH] gbm/backend: fix gbm compile without dri
+
+Upstream-Status: Backport
+
+https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/20447
+https://gitlab.freedesktop.org/mesa/mesa/-/commit/842ca284650f066e58706741a7d22d67b5088e60
+
+At mesa version 22.2.3 patch wasn't introduced until after.
+
+Commit introduces a fix that allows for gbm to be built with an empty
+backend. There are situation especially in a Yocto/OE cross compilation
+environment where you want to build with an empty backend. The particular
+situation is as such:
+
+The mesa-gl recipe is the preferred provider for virtual/libgbm, virtual/libgl,
+virtual/mesa, etc... But the x11 DISTRO_FEATURE in't included this leads to build
+errors such as:
+
+| /../../../ld: src/gbm/libgbm.so.1.0.0.p/main_backend.c.o: in function `find_backend':
+| backend.c:(.text.find_backend+0xa4): undefined reference to `gbm_dri_backend'
+| /../../../ld: src/gbm/libgbm.so.1.0.0.p/main_backend.c.o:(.data.rel.ro.builtin_backends+0x4):
+                undefined reference to `gbm_dri_backend'
+| collect2: error: ld returned 1 exit status
+
+Issue should be replicable by setting -Ddri3=disabled and -Dgbm=enabled
+
+Add fix to bypasses compilation issue by excluding gbm dri backend. If
+HAVE_DRI || HAVE_DRIX not specified.
+
+Acked-by: David Heidelberg <david.heidelberg@collabora.com>
+Signed-off-by: Vincent Davis Jr <vince@underview.tech>
+---
+ src/gbm/main/backend.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/gbm/main/backend.c b/src/gbm/main/backend.c
+index 974d0a76a4e..feee0703495 100644
+--- a/src/gbm/main/backend.c
++++ b/src/gbm/main/backend.c
+@@ -42,7 +42,9 @@
+ #define ARRAY_SIZE(a) (sizeof(a)/sizeof((a)[0]))
+ #define VER_MIN(a, b) ((a) < (b) ? (a) : (b))
+ 
++#if defined(HAVE_DRI) || defined(HAVE_DRI2) || defined(HAVE_DRI3)
+ extern const struct gbm_backend gbm_dri_backend;
++#endif
+ 
+ struct gbm_backend_desc {
+    const char *name;
+@@ -51,7 +53,9 @@ struct gbm_backend_desc {
+ };
+ 
+ static const struct gbm_backend_desc builtin_backends[] = {
++#if defined(HAVE_DRI) || defined(HAVE_DRI2) || defined(HAVE_DRI3)
+    { "dri", &gbm_dri_backend },
++#endif
+ };
+ 
+ #define BACKEND_LIB_SUFFIX "_gbm"
+-- 
+2.34.1
+
