@@ -55,3 +55,9 @@ CVE_PRODUCT = "mbed_tls"
 CVE_CHECK_IGNORE += "CVE-2021-43666"
 # Fix merged upstream https://github.com/Mbed-TLS/mbedtls/commit/9a4a9c66a48edfe9ece03c7e4a53310adf73a86c
 CVE_CHECK_IGNORE += "CVE-2021-45451"
+
+# Export source files/headers needed by Arm Trusted Firmware
+sysroot_stage_all:append() {
+	sysroot_stage_dir "${S}/library" "${SYSROOT_DESTDIR}/usr/share/mbedtls-source/library"
+	sysroot_stage_dir "${S}/include" "${SYSROOT_DESTDIR}/usr/share/mbedtls-source/include"
+}

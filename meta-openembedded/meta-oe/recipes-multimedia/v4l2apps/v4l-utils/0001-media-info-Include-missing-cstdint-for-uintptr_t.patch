@@ -1,0 +1,31 @@
+From 1d9ce7cd799770981043f656373cbd1bf7558b9a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 26 Jan 2023 17:00:00 -0800
+Subject: [PATCH] media-info: Include missing <cstdint> for uintptr_t
+
+gcc 13 moved some includes around and as a result <cstdint> is no longer
+transitively included [1]. Explicitly include it.
+
+[1] https://gcc.gnu.org/gcc-13/porting_to.html#header-dep-changes
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-media/20230127010741.3883339-1-raj.khem@gmail.com/]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ utils/common/media-info.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/utils/common/media-info.cpp b/utils/common/media-info.cpp
+index 53e132f5..1a25a4b6 100644
+--- a/utils/common/media-info.cpp
++++ b/utils/common/media-info.cpp
+@@ -3,6 +3,7 @@
+  * Copyright 2018 Cisco Systems, Inc. and/or its affiliates. All rights reserved.
+  */
+ 
++#include <cstdint>
+ #include <cstring>
+ #include <fstream>
+ #include <iostream>
+-- 
+2.39.1
+

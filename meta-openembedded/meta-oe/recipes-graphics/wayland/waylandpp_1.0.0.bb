@@ -2,7 +2,8 @@ SUMMARY = " C++ binding for Wayland using the most modern C++ technology"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3aae28cc66d61975114c2b14df215407"
 
-SRC_URI = "git://github.com/NilsBrause/waylandpp.git;protocol=https;branch=master"
+SRC_URI = "git://github.com/NilsBrause/waylandpp.git;protocol=https;branch=master \
+           file://0001-include-missing-cstdint.patch"
 
 DEPENDS = "pugixml"
 DEPENDS:append:class-target = " waylandpp-native wayland virtual/egl virtual/libgles2"

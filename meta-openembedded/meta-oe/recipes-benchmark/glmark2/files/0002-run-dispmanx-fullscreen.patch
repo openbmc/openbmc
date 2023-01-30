@@ -6,7 +6,7 @@ Subject: [PATCH] run dispmanx fullscreen
 The dispmanx flavour can only run fullscreen, therefore set the size to
 fullscreen when glmark2-es2-dispmanx is run.
 
-Upstream-status: submitted [https://github.com/glmark2/glmark2/pull/135]
+Upstream-Status: Submitted [https://github.com/glmark2/glmark2/pull/135]
 Signed-off-by: Trevor Woerner <twoerner@gmail.com>
 ---
  src/main.cpp | 5 +++++

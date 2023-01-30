@@ -3,7 +3,7 @@ From: "Roy.Li" <rongqing.li@windriver.com>
 Date: Thu, 22 Aug 2013 08:56:09 +0800
 Subject: [PATCH] tftp-hpa: add error check for disk filled up
 
-Upstream-status: Pending [Sent to http://www.syslinux.org/archives/2013-August/020765.html]
+Upstream-Status: Pending [Sent to http://www.syslinux.org/archives/2013-August/020765.html]
 
 Add error check when the write-buffer is finally flushed to the file,
 the caller can detect if the disk filled up (or had an i/o error) and

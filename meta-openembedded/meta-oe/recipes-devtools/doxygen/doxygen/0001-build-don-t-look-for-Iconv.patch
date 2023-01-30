@@ -10,7 +10,7 @@ C library. We don't need this check in meta-openembedded.
 Signed-off-by: Bartosz Golaszewski <brgl@bgdev.pl>
 Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
 
-Upstream-status: Inappropriate
+Upstream-Status: Inappropriate
 - upstream doxygen must build on many architectures, this change is
   too intrusive for upstream
 ---

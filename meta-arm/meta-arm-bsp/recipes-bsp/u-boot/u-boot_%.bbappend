@@ -77,9 +77,7 @@ SRC_URI:append:fvp-baser-aemv8r64 = " \
 #
 # Juno Machines
 #
-SRC_URI:append:juno = " file://0001-arm-juno-add-custom-bootcmd-to-autoboot-from-uEnv.tx.patch \
-                        file://0002-configs-vexpress-modify-to-boot-compressed-initramfs.patch \
-                      "
+SRC_URI:append:juno = " file://0001-configs-vexpress-modify-to-boot-compressed-initramfs.patch"
 
 
 #

@@ -3,7 +3,7 @@ From: Paul Eggleton <paul.eggleton@linux.intel.com>
 Date: Sun, 14 Jul 2019 19:13:21 -0700
 Subject: [PATCH] Fix building with musl
 
-Upstream-status: Pending
+Upstream-Status: Pending
 
 Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
 ---

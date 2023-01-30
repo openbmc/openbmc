@@ -8,8 +8,7 @@ Use pkg-config to get systemd.pc variables and systemdunitdir. Those
 variable ensure that .service files are installed in the correct paths
 and only when systemd is detected.
 
-Upstream Status: Pending [1]
-[1] https://github.com/fluent/fluent-bit/pull/5818
+Upstream-Status: Pending [https://github.com/fluent/fluent-bit/pull/5818]
 
 ---
  cmake/FindJournald.cmake | 4 ++++

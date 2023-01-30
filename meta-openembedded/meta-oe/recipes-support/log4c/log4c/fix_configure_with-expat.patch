@@ -1,7 +1,7 @@
 The original use of AC_ARG_WITH is buggy and causes expat support
 to be *disabled* if "--with-expat" is passed to configure.
 
-Upstream status: pending
+Upstream-Status: Pending
 
 Index: log4c-1.2.4/configure.in
 ===================================================================

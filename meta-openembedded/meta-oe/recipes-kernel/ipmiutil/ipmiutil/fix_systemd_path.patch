@@ -2,9 +2,9 @@ allow systemd path to be defined by configure option.
 
 The configure probes the host for systemd path information.
 
-Upstream Status: Inappropriate [Embedded]
+Upstream-Status: Inappropriate [Embedded]
 
-Signed-off-By: Armin Kuster <akuster@mvista.com>
+Signed-off-by: Armin Kuster <akuster@mvista.com>
 
 Index: ipmiutil-3.0.5/configure.ac
 ===================================================================

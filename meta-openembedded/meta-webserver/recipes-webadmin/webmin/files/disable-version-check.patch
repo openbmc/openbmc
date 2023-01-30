@@ -3,7 +3,7 @@ Disable OS version check in status screen
 The code is not able to accurately detect the correct distro/version at
 the moment.
 
-Upstream-status: Inappropriate
+Upstream-Status: Inappropriate
 
 Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
 

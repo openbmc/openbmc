@@ -3,7 +3,7 @@ From: Roy Li <rongqing.li@windriver.com>
 Date: Tue, 19 Aug 2014 11:31:35 +0800
 Subject: [PATCH] [PATCH] add the needed stdarg.h
 
-Upstream-status: Pending
+Upstream-Status: Pending
 
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
 

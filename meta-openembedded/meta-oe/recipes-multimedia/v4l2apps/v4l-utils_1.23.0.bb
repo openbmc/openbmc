@@ -32,6 +32,7 @@ SRC_URI = "\
     file://0003-original-patch-export-mediactl-headers.patch \
     file://0004-Do-not-use-getsubopt.patch \
     file://0005-configure.ac-Makefile.am-Support-building-without-NL.patch \
+    file://0001-media-info-Include-missing-cstdint-for-uintptr_t.patch \
 "
 
 SRCREV = "fd544473800d02e90bc289434cc44e5aa8fadd0f"

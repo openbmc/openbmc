@@ -10,7 +10,7 @@ it in place but remove the #if guard since it is only there to ensure that
 the l2tp_private.h file is updated if the rpc source file is changed and
 the two get out of sync.
 
-Upstream-status: pending
+Upstream-Status: pending
 
 Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
 ---

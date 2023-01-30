@@ -5,7 +5,7 @@ Subject: [PATCH] setup.py: link in sysroot, not in host directories
 
 Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
 
-Upstream-status: Unknown
+Upstream-Status: Unknown
 ---
  setup.py | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)

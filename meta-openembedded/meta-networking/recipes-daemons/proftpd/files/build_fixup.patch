@@ -6,7 +6,7 @@ make, move-pidfile-to-var-run, move-runfile-to-var-run
 move pidfile to /var/run
 redefine PR_RUN_DIR as ${localstatedir}/run
 
-Signed-off-By: Armin Kuster <akuster808@gmail.com>
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
 
 
 diff --git a/Make.rules.in b/Make.rules.in

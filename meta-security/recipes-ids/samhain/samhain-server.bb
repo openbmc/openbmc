@@ -8,6 +8,9 @@ SRC_URI += "file://samhain-server-volatiles \
             file://samhain-server-volatiles.conf \
            "
 
+MODE_NAME = "server"
+SAMHAIN_MODE = "server"
+
 TARGET_CC_ARCH += "${LDFLAGS}"
 
 do_install:append() {

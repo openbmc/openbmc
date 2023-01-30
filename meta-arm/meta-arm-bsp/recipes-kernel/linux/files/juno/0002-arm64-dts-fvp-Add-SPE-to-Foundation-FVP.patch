@@ -1,4 +1,4 @@
-From 3bd7a0219082c2c91570b81afc35f2aec57cade2 Mon Sep 17 00:00:00 2001
+From bd354219987dddbf8ab6fd11450b4046547aca1b Mon Sep 17 00:00:00 2001
 From: James Clark <james.clark@arm.com>
 Date: Thu, 17 Nov 2022 10:25:36 +0000
 Subject: [PATCH] arm64: dts: fvp: Add SPE to Foundation FVP
@@ -33,6 +33,3 @@ index c8bd23b1a7ba..029578072d8f 100644
  	watchdog@2a440000 {
  		compatible = "arm,sbsa-gwdt";
  		reg = <0x0 0x2a440000 0 0x1000>,
--- 
-2.30.2
-

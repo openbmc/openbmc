@@ -6,7 +6,7 @@ Subject: [PATCH] tests/toolbox.inc.sh: update regex for getting endian
 Update regex for getting endian in following condition:
 /proc/777/exe: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2
 
-Upstream-Status: Submited [Submitted to keyrings@vger.kernel.org ]
+Upstream-Status: Submitted [Submitted to keyrings@vger.kernel.org ]
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---

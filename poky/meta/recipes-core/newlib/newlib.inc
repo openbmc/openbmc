@@ -10,24 +10,19 @@ LIC_FILES_CHKSUM = " \
 		file://COPYING3;md5=d32239bcb673463ab874e80d47fae504 \
 		file://COPYING.LIBGLOSS;md5=c0469b6ebb847a75781066be515f032d \
 		file://COPYING.LIB;md5=2d5025d4aa3495befef8f17206a5b0a1 \
-		file://COPYING.NEWLIB;md5=8bb75595dbcc7d45e5c0d116d7bdf6ce \
+		file://COPYING.NEWLIB;md5=5a9d477b5f4eab20dccf655a77107a6e \
 		file://newlib/libc/posix/COPYRIGHT;md5=103468ff1982be840fdf4ee9f8b51bbf \
-		file://newlib/libc/sys/linux/linuxthreads/LICENSE;md5=73640207fbc79b198c7ffd4ad4d97aa0 \
 		"
 
-# Newlib maintainers sometimes publish the source
-# from a specific snapshot, after an upgrade we can
-# delete the following line and keep the empty default
-NEWLIB_SNAPSHOT = ".20211231"
-NEWLIB_SNAPSHOT ?= ""
-SRC_URI = "https://sourceware.org/pub/newlib/newlib-${PV}${NEWLIB_SNAPSHOT}.tar.gz"
-SRC_URI[sha256sum] = "c3a0e8b63bc3bef1aeee4ca3906b53b3b86c8d139867607369cb2915ffc54435"
-
+BASEVER = "4.3.0"
+PV = "${BASEVER}+git${SRCPV}"
+SRC_URI = "git://sourceware.org/git/newlib-cygwin.git;protocol=https;branch=main"
+SRCREV="9e09d6ed83cce4777a5950412647ccc603040409"
 
 INHIBIT_DEFAULT_DEPS = "1"
 DEPENDS = "virtual/${TARGET_PREFIX}gcc"
 
-S = "${WORKDIR}/newlib-${PV}${NEWLIB_SNAPSHOT}"
+S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
 ## disable stdlib
@@ -51,6 +46,12 @@ EXTRA_OECONF = " \
 		"
 
 do_configure[cleandirs] = "${B}"
+
+# We need a dummy limits.h to pass preprocessor checks
+do_configure:append(){
+    install -d ${STAGING_INCDIR}
+    touch  ${STAGING_INCDIR}/limits.h
+}
 
 do_install() {
 	oe_runmake install DESTDIR='${D}'

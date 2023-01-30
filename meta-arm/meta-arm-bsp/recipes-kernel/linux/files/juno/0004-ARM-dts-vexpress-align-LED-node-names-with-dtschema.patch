@@ -1,4 +1,4 @@
-From e15031539490733279c41ba87f4ef2b440a685f5 Mon Sep 17 00:00:00 2001
+From 4edb625e2256d5761312110e34cbc0164915d772 Mon Sep 17 00:00:00 2001
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Date: Fri, 25 Nov 2022 15:41:12 +0100
 Subject: [PATCH] ARM: dts: vexpress: align LED node names with dtschema
@@ -79,6 +79,3 @@ index f434fe5cf4a1..def538ce8769 100644
  					label = "v2m:green:user8";
  					gpios = <&v2m_led_gpios 7 0>;
  					linux,default-trigger = "cpu5";
--- 
-2.30.2
-

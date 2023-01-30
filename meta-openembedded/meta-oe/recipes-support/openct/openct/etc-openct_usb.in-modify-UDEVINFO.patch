@@ -5,7 +5,7 @@ Subject: [PATCH 2/2] etc/openct_usb.in: modify UDEVINFO
 
 this patch is from Fedora
 
-Upstream-status: Pending
+Upstream-Status: Pending
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 ---

@@ -1,6 +1,6 @@
 make rexec support ipv6
 
-Upstream-status: Pending
+Upstream-Status: Pending
 
 rexec equals rexec_af(... ,AF_INET) which only support ipv4,
 use rexec_af(..., AF_UNSPEC) to support both ipv6 and ipv4.

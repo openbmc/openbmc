@@ -4,8 +4,9 @@ DEPENDS += "newlib"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/libgloss:"
 
+SRC_URI:append = " file://libgloss-build-without-nostdinc.patch"
 SRC_URI:append:powerpc = " file://fix-rs6000-crt0.patch"
-SRC_URI:append:arm = " file://fix_makefile_include_arm_h.patch"
+SRC_URI:append:powerpc = " file://fix-rs6000-cflags.patch"
 
 do_configure() {
 	${S}/libgloss/configure ${EXTRA_OECONF}
@@ -28,6 +29,8 @@ do_install:append() {
 # Split packages correctly
 FILES:${PN} += "${libdir}/*.ld ${libdir}/*.specs"
 FILES:${PN}-dev += "${libdir}/cpu-init/*"
+# RiscV installation moved the syscall header to this location
+FILES:${PN}-dev += "${prefix}/${TARGET_SYS}/include/machine/*.h"
 
 INHIBIT_PACKAGE_STRIP = "1"
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"

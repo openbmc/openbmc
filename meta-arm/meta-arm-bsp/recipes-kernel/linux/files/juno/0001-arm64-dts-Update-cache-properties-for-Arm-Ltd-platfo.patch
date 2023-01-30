@@ -1,4 +1,4 @@
-From 59fb813f9742b349f48250bd7793279cafe2752c Mon Sep 17 00:00:00 2001
+From dc250cab31c6611cc7fa76bc8b2027dbd56dd65d Mon Sep 17 00:00:00 2001
 From: Pierre Gondois <pierre.gondois@arm.com>
 Date: Mon, 7 Nov 2022 16:56:58 +0100
 Subject: [PATCH] arm64: dts: Update cache properties for Arm Ltd platforms
@@ -136,6 +136,3 @@ index 5b6d9d8e934d..796cd7d02eb5 100644
  		};
  	};
  
--- 
-2.30.2
-

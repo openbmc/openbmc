@@ -7,7 +7,7 @@ Initializing the structure assuming glibc layout results in
 compile errors on musl, therefore do partial intialization and then
 assigning the members individually.
 
-Upstream-status: Submitted [https://github.com/schweikert/fping/pull/263]
+Upstream-Status: Submitted [https://github.com/schweikert/fping/pull/263]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  src/fping.c | 16 +++++++---------

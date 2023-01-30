@@ -9,6 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=4267f48fc738f50380cbeeb76f95cebc"
 DEPENDS = "libpcre2 zlib"
 
 SRC_URI = "git://github.com/pocoproject/poco.git;branch=master;protocol=https \
+           file://0001-Use-std-atomic-int-instead-of-std-atomic-bool.patch \
            file://run-ptest \
            "
 SRCREV = "1211613642269b7d53bea58b02de7fcd25ece3b9"

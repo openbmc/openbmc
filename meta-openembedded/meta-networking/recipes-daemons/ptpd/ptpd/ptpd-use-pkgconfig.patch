@@ -6,7 +6,7 @@ Subject: [PATCH] ptpd: use pkgconfig
 Yocto uses pkg-config for libpcap, rather than pcap-config, so use that
 instead as the source for libs and cflags.
 
-Upstream-status: Inappropriate [ embedded specific ]
+Upstream-Status: Inappropriate [ embedded specific ]
 
 Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
 ---

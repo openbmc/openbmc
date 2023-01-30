@@ -13,7 +13,7 @@ dhrystone sources:
 
 Additionally, this patch adds a simple Makefile.
 
-Upstream-status: Pending
+Upstream-Status: Pending
 
 Sign-off-by: Kimmo Surakka <kimmo.surakka@ge.com>
 Signed-off-by: Jose Alarcon <jose.alarcon@ge.com>

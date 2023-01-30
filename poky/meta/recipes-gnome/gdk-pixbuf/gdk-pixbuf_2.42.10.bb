@@ -12,15 +12,14 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c \
 
 SECTION = "libs"
 
-DEPENDS = "glib-2.0 gdk-pixbuf-native shared-mime-info"
-DEPENDS:remove:class-native = "gdk-pixbuf-native"
+DEPENDS = "glib-2.0 shared-mime-info"
 
 MAJ_VER = "${@oe.utils.trim_version("${PV}", 2)}"
 
 SRC_URI = "${GNOME_MIRROR}/${BPN}/${MAJ_VER}/${BPN}-${PV}.tar.xz \
            file://run-ptest \
            file://fatal-loader.patch \
-           file://0001-Add-use_prebuilt_tools-option.patch \
+           file://0001-meson.build-allow-a-subset-of-tests-in-cross-compile.patch \
            "
 
 SRC_URI[sha256sum] = "ee9b6c75d13ba096907a2e3c6b27b61bcd17f5c7ebeab5a5b439d2f2e39fe44b"
@@ -45,14 +44,6 @@ PACKAGECONFIG[tiff] = "-Dtiff=enabled,-Dtiff=disabled,tiff"
 PACKAGECONFIG[tests] = "-Dinstalled_tests=true,-Dinstalled_tests=false"
 
 EXTRA_OEMESON = "-Dman=false"
-
-EXTRA_OEMESON:append:class-target = " \
-    -Duse_prebuilt_tools=true \
-"
-
-EXTRA_OEMESON:append:class-nativesdk = " \
-    -Duse_prebuilt_tools=true \
-"
 
 PACKAGES =+ "${PN}-xlib"
 
@@ -112,10 +103,6 @@ do_install:append:class-native() {
 		GDK_PIXBUF_MODULE_FILE=${STAGING_LIBDIR_NATIVE}/gdk-pixbuf-2.0/${LIBV}/loaders.cache
 
 	create_wrapper ${D}/${bindir}/gdk-pixbuf-pixdata \
-		XDG_DATA_DIRS=${STAGING_DATADIR} \
-		GDK_PIXBUF_MODULE_FILE=${STAGING_LIBDIR_NATIVE}/gdk-pixbuf-2.0/${LIBV}/loaders.cache
-
-	create_wrapper ${D}/${bindir}/gdk-pixbuf-print-mime-types \
 		XDG_DATA_DIRS=${STAGING_DATADIR} \
 		GDK_PIXBUF_MODULE_FILE=${STAGING_LIBDIR_NATIVE}/gdk-pixbuf-2.0/${LIBV}/loaders.cache
 
