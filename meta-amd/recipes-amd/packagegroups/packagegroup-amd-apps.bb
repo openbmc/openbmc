@@ -28,7 +28,9 @@ RDEPENDS:${PN}-chassis = " \
         "
 
 SUMMARY:${PN}-fans = "AMD Fans"
-RDEPENDS:${PN}-fans = ""
+RDEPENDS:${PN}-fans = " \
+        phosphor-pid-control \
+        "
 
 SUMMARY:${PN}-flash = "AMD Flash"
 RDEPENDS:${PN}-flash = " \

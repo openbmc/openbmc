@@ -1,0 +1,58 @@
+{
+  "gpio_configs":[
+    {
+        "Name" : "IdButton",
+        "LineName" : "CHASSIS_ID_BTN",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "NMIButton",
+        "LineName" : "MON_P0_NMI_BTN",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "NMIOut",
+        "LineName" : "ASSERT_NMI_BTN",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveHigh"
+    },
+    {
+        "Name" : "PostComplete",
+        "LineName" : "MON_PWROK",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveHigh"
+    },
+    {
+        "Name" : "PowerButton",
+        "LineName" : "MON_P0_PWR_BTN",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "PowerOk",
+        "LineName" : "MON_P0_PWR_GOOD",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveHigh"
+    },
+    {
+        "Name" : "PowerOut",
+        "LineName" : "ASSERT_PWR_BTN",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveHigh"
+    },
+    {
+        "Name" : "ResetButton",
+        "LineName" : "MON_P0_RST_BTN",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "ResetOut",
+        "LineName" : "ASSERT_RST_BTN",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveHigh"
+    }
+]
+}

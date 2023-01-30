@@ -7,7 +7,7 @@ SRCREV = "c15430560aeb82a27358cc320af4a29e1296e6c1"
 PV = "1.7+git${SRCPV}"
 PR = "r1"
 
-SRC_URI += "git://github.com/jk-ozlabs/fbterm.git;nobranch=1;protocol=https"
+SRC_URI += "git://github.com/jk-ozlabs/fbterm.git;branch=master;protocol=https"
 SRC_URI += "file://fb.modes"
 
 S = "${WORKDIR}/git"

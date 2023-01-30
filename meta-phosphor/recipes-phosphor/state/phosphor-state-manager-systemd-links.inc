@@ -110,3 +110,21 @@ pkg_prerm:${PN}-host:append() {
         rm $LINK
     done
 }
+
+pkg_postinst:${PN}-scheduled-host-transition:append() {
+    for i in ${OBMC_HOST_INSTANCES};
+    do
+        mkdir -p $D$systemd_system_unitdir/multi-user.target.wants
+        LINK="$D$systemd_system_unitdir/multi-user.target.wants/xyz.openbmc_project.State.ScheduledHostTransition@${i}.service"
+        TARGET="../xyz.openbmc_project.State.ScheduledHostTransition@.service"
+        ln -s $TARGET $LINK
+    done
+}
+
+pkg_prerm:${PN}-scheduled-host-transition:append() {
+    for i in ${OBMC_HOST_INSTANCES};
+    do
+        LINK="$D$systemd_system_unitdir/multi-user.target.wants/xyz.openbmc_project.State.ScheduledHostTransition@${i}.service"
+        rm $LINK
+    done
+}

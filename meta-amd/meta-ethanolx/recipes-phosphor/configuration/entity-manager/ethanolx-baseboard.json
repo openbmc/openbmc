@@ -2,42 +2,50 @@
     "Exposes": [
         {
             "Name": "P0 Fan connector",
-            "Status": "disabled",
+            "Pwm" : 0,
+            "Tachs": [0],
             "Type": "FanConnector"
         },
         {
             "Name": "P1 Fan connector",
-            "Status": "disabled",
+            "Pwm" : 1,
+            "Tachs": [1],
             "Type": "FanConnector"
         },
         {
             "Name": "SYS FAN1 connector",
-            "Status": "disabled",
+            "Pwm" : 2,
+            "Tachs": [2],
             "Type": "FanConnector"
         },
         {
             "Name": "SYS FAN2 connector",
-            "Status": "disabled",
+            "Pwm" : 3,
+            "Tachs": [3],
             "Type": "FanConnector"
         },
         {
             "Name": "SYS FAN3 connector",
-            "Status": "disabled",
+            "Pwm" : 4,
+            "Tachs": [4],
             "Type": "FanConnector"
         },
         {
             "Name": "SYS FAN4 connector",
-            "Status": "disabled",
+            "Pwm" : 5,
+            "Tachs": [5],
             "Type": "FanConnector"
         },
         {
             "Name": "SYS FAN5 connector",
-            "Status": "disabled",
+            "Pwm" : 6,
+            "Tachs": [6],
             "Type": "FanConnector"
         },
         {
             "Name": "SYS FAN6 connector",
-            "Status": "disabled",
+            "Pwm" : 7,
+            "Tachs": [7],
             "Type": "FanConnector"
         },
         {
@@ -1148,6 +1156,314 @@
                 }
             ],
             "Type": "SBTSI"
+        },
+        {
+            "Class": "fan",
+            "FFGainCoefficient": 1.0,
+            "FFOffCoefficient": 0.0,
+            "ICoefficient": 0.0,
+            "ILimitMax": 0.0,
+            "ILimitMin": 0.0,
+            "Inputs": [
+                "P0_Fan"
+            ],
+            "Name": "P0_Fan",
+            "NegativeHysteresis": 0.0,
+            "OutLimitMax": 100.0,
+            "OutLimitMin": 10.0,
+            "Outputs": [
+                "Pwm 1"
+            ],
+            "PCoefficient": 0.0,
+            "PositiveHysteresis": 0.0,
+            "SlewNeg": 0.0,
+            "SlewPos": 0.0,
+            "Type": "Pid",
+            "Zones": [
+                "Zone 1"
+            ]
+        },
+        {
+            "Class": "fan",
+            "FFGainCoefficient": 1.0,
+            "FFOffCoefficient": 0.0,
+            "ICoefficient": 0.0,
+            "ILimitMax": 0.0,
+            "ILimitMin": 0.0,
+            "Inputs": [
+                "P1_Fan"
+            ],
+            "Name": "P1_Fan",
+            "NegativeHysteresis": 0.0,
+            "OutLimitMax": 100.0,
+            "OutLimitMin": 10.0,
+            "Outputs": [
+                "Pwm 2"
+            ],
+            "PCoefficient": 0.0,
+            "PositiveHysteresis": 0.0,
+            "SlewNeg": 0.0,
+            "SlewPos": 0.0,
+            "Type": "Pid",
+            "Zones": [
+                "Zone 2"
+            ]
+        },
+        {
+            "Class": "fan",
+            "FFGainCoefficient": 1.0,
+            "FFOffCoefficient": 0.0,
+            "ICoefficient": 0.0,
+            "ILimitMax": 0.0,
+            "ILimitMin": 0.0,
+            "Inputs": [
+                "SYS_FAN1"
+            ],
+            "Name": "SYS_FAN1",
+            "NegativeHysteresis": 0.0,
+            "OutLimitMax": 100.0,
+            "OutLimitMin": 10.0,
+            "Outputs": [
+                "Pwm 3"
+            ],
+            "PCoefficient": 0.0,
+            "PositiveHysteresis": 0.0,
+            "SlewNeg": 0.0,
+            "SlewPos": 0.0,
+            "Type": "Pid",
+            "Zones": [
+                "Zone 3"
+            ]
+        },
+        {
+            "Class": "fan",
+            "FFGainCoefficient": 1.0,
+            "FFOffCoefficient": 0.0,
+            "ICoefficient": 0.0,
+            "ILimitMax": 0.0,
+            "ILimitMin": 0.0,
+            "Inputs": [
+                "SYS_FAN2"
+            ],
+            "Name": "SYS_FAN2",
+            "NegativeHysteresis": 0.0,
+            "OutLimitMax": 100.0,
+            "OutLimitMin": 10.0,
+            "Outputs": [
+                "Pwm 4"
+            ],
+            "PCoefficient": 0.0,
+            "PositiveHysteresis": 0.0,
+            "SlewNeg": 0.0,
+            "SlewPos": 0.0,
+            "Type": "Pid",
+            "Zones": [
+                "Zone 3"
+            ]
+        },
+        {
+            "Class": "fan",
+            "FFGainCoefficient": 1.0,
+            "FFOffCoefficient": 0.0,
+            "ICoefficient": 0.0,
+            "ILimitMax": 0.0,
+            "ILimitMin": 0.0,
+            "Inputs": [
+                "SYS_FAN3"
+            ],
+            "Name": "SYS_FAN3",
+            "NegativeHysteresis": 0.0,
+            "OutLimitMax": 100.0,
+            "OutLimitMin": 10.0,
+            "Outputs": [
+                "Pwm 5"
+            ],
+            "PCoefficient": 0.0,
+            "PositiveHysteresis": 0.0,
+            "SlewNeg": 0.0,
+            "SlewPos": 0.0,
+            "Type": "Pid",
+            "Zones": [
+                "Zone 3"
+            ]
+        },
+        {
+            "Class": "fan",
+            "FFGainCoefficient": 1.0,
+            "FFOffCoefficient": 0.0,
+            "ICoefficient": 0.0,
+            "ILimitMax": 0.0,
+            "ILimitMin": 0.0,
+            "Inputs": [
+                "SYS_FAN4"
+            ],
+            "Name": "SYS_FAN4",
+            "NegativeHysteresis": 0.0,
+            "OutLimitMax": 100.0,
+            "OutLimitMin": 10.0,
+            "Outputs": [
+                "Pwm 6"
+            ],
+            "PCoefficient": 0.0,
+            "PositiveHysteresis": 0.0,
+            "SlewNeg": 0.0,
+            "SlewPos": 0.0,
+            "Type": "Pid",
+            "Zones": [
+                "Zone 3"
+            ]
+        },
+        {
+            "Class": "fan",
+            "FFGainCoefficient": 1.0,
+            "FFOffCoefficient": 0.0,
+            "ICoefficient": 0.0,
+            "ILimitMax": 0.0,
+            "ILimitMin": 0.0,
+            "Inputs": [
+                "SYS_FAN5"
+            ],
+            "Name": "SYS_FAN5",
+            "NegativeHysteresis": 0.0,
+            "OutLimitMax": 100.0,
+            "OutLimitMin": 10.0,
+            "Outputs": [
+                "Pwm 7"
+            ],
+            "PCoefficient": 0.0,
+            "PositiveHysteresis": 0.0,
+            "SlewNeg": 0.0,
+            "SlewPos": 0.0,
+            "Type": "Pid",
+            "Zones": [
+                "Zone 3"
+            ]
+        },
+        {
+            "Class": "fan",
+            "FFGainCoefficient": 1.0,
+            "FFOffCoefficient": 0.0,
+            "ICoefficient": 0.0,
+            "ILimitMax": 0.0,
+            "ILimitMin": 0.0,
+            "Inputs": [
+                "SYS_FAN6"
+            ],
+            "Name": "SYS_FAN6",
+            "NegativeHysteresis": 0.0,
+            "OutLimitMax": 100.0,
+            "OutLimitMin": 10.0,
+            "Outputs": [
+                "Pwm 8"
+            ],
+            "PCoefficient": 0.0,
+            "PositiveHysteresis": 0.0,
+            "SlewNeg": 0.0,
+            "SlewPos": 0.0,
+            "Type": "Pid",
+            "Zones": [
+                "Zone 3"
+            ]
+        },
+        {
+            "Class": "temp",
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "ICoefficient": -1.0,
+            "ILimitMax": 100,
+            "ILimitMin": 20,
+            "Inputs": [
+                "CPU0"
+            ],
+            "Name": "CPU0 Temperature Control",
+            "NegativeHysteresis": 5.0,
+            "OutLimitMax": 100,
+            "OutLimitMin": 30,
+            "Outputs": [],
+            "PCoefficient": -5,
+            "PositiveHysteresis": 0.0,
+            "SetPoint": 60.0,
+            "SlewNeg": -1,
+            "SlewPos": 0.0,
+            "Type": "Pid",
+            "Zones": [
+                "Zone 1"
+            ]
+        },
+        {
+            "Class": "temp",
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "ICoefficient": -1.0,
+            "ILimitMax": 100,
+            "ILimitMin": 20,
+            "Inputs": [
+                "CPU1"
+            ],
+            "Name": "CPU1 Temperature Control",
+            "NegativeHysteresis": 5.0,
+            "OutLimitMax": 100,
+            "OutLimitMin": 30,
+            "Outputs": [],
+            "PCoefficient": -5,
+            "PositiveHysteresis": 0.0,
+            "SetPoint": 60.0,
+            "SlewNeg": -1,
+            "SlewPos": 0.0,
+            "Type": "Pid",
+            "Zones": [
+                "Zone 2"
+            ]
+        },
+        {
+            "Class": "temp",
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "ICoefficient": -1.0,
+            "ILimitMax": 100,
+            "ILimitMin": 20,
+            "Inputs": [
+                "BMC",
+                "DIMM_P0_ABCD",
+                "DIMM_P0_ABCD_P1_EFGH",
+                "DIMM_P0_EFGH",
+                "DIMM_P0_EFGH_P1_ABCD",
+                "DIMM_P1_ABCD",
+                "DIMM_P1_EFGH",
+                "PCIe_Slots"
+            ],
+            "Name": "Board Temperature Control",
+            "NegativeHysteresis": 3.0,
+            "OutLimitMax": 100,
+            "OutLimitMin": 30,
+            "Outputs": [],
+            "PCoefficient": -5,
+            "PositiveHysteresis": 0.0,
+            "SetPoint": 35.0,
+            "SlewNeg": -1,
+            "SlewPos": 0.0,
+            "Type": "Pid",
+            "Zones": [
+                "Zone 3"
+            ]
+        },
+        {
+            "FailSafePercent": 100,
+            "MinThermalOutput": 10,
+            "Name": "Zone 1",
+            "Type": "Pid.Zone"
+        },
+        {
+            "FailSafePercent": 100,
+            "MinThermalOutput": 10,
+            "Name": "Zone 2",
+            "Type": "Pid.Zone"
+        },
+        {
+            "FailSafePercent": 100,
+            "MinThermalOutput": 10,
+            "Name": "Zone 3",
+            "Type": "Pid.Zone"
         }
     ],
     "Name": "AMD EthanolX Baseboard",
@@ -1159,5 +1475,6 @@
         "Model": "EthanolX",
         "PartNumber": "109-H43111-00A_02",
         "SerialNumber": "EX782B"
-    }
+    },
+    "xyz.openbmc_project.Inventory.Item.System": {}
 }

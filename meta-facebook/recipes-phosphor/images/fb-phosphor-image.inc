@@ -1,4 +1,7 @@
-IMAGE_FEATURES:remove = "obmc-net-ipmi"
+IMAGE_FEATURES:remove = "\
+    obmc-net-ipmi \
+    obmc-user-mgmt-ldap \
+    "
 IMAGE_FEATURES:remove:fb-nohost = "obmc-console"
 
 OBMC_IMAGE_EXTRA_INSTALL:append = "\
@@ -10,9 +13,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append = "\
     tmux \
     wget \
     "
+OBMC_IMAGE_EXTRA_INSTALL:append:mf-fb-secondary-emmc = " emmc-init"
 
 IMAGE_LINGUAS="en-us"
-
-OBMC_IMAGE_EXTRA_INSTALL:append:mf-fb-secondary-emmc = " emmc-init"
 
 include recipes-phosphor/images/fb-${MACHINE}-phosphor-image.inc

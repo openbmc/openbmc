@@ -1,13 +1,14 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-DEFAULT_TARGETS = " \
-    multi-user.target.requires/obmc-host-reset@{}.target \
-    multi-user.target.wants/phosphor-discover-system-state@{}.service \
+DEFAULT_TARGETS:append = " \
     obmc-chassis-poweron@{}.target.wants/chassis-poweron@{}.service \
     obmc-chassis-hard-poweroff@{}.target.wants/chassis-poweroff@{}.service \
     obmc-host-shutdown@{}.target.wants/host-poweroff@{}.service \
     obmc-host-start@{}.target.wants/host-poweron@{}.service \
     obmc-host-reboot@{}.target.wants/host-powercycle@{}.service \
+"
+DEFAULT_TARGETS:remove = " \
+    obmc-chassis-poweroff@{}.target.requires/obmc-powered-off@{}.service \
 "
 
 SRC_URI:append:greatlakes = " \

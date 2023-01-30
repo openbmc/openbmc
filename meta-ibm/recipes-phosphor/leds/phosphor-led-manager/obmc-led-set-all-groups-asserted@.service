@@ -2,7 +2,7 @@
 Description=Set the Asserted property of all the LED groups to %i
 Wants=xyz.openbmc_project.LED.GroupManager.service
 After=xyz.openbmc_project.LED.GroupManager.service
-After=op-reset-chassis-running@0.service
+After=phosphor-reset-chassis-running@0.service
 ConditionPathExists=!/run/openbmc/chassis@0-on
 
 [Service]

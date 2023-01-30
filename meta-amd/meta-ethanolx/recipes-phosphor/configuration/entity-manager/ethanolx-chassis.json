@@ -6,8 +6,6 @@
             "MaxReading": 6000,
             "Name": "P0_Fan",
             "Type": "AspeedFan",
-            "Pwm": 1,
-            "Tachs": [1],
             "Thresholds": [
                 {
                     "Direction": "less than",
@@ -41,8 +39,6 @@
             "MaxReading": 6000,
             "Name": "P1_Fan",
             "Type": "AspeedFan",
-            "Pwm": 2,
-            "Tachs": [2],
             "Thresholds": [
                 {
                     "Direction": "less than",
@@ -76,8 +72,6 @@
             "MaxReading": 6000,
             "Name": "SYS_FAN1",
             "Type": "AspeedFan",
-            "Pwm": 3,
-            "Tachs": [3],
             "Thresholds": [
                 {
                     "Direction": "less than",
@@ -111,8 +105,6 @@
             "MaxReading": 6000,
             "Name": "SYS_FAN2",
             "Type": "AspeedFan",
-            "Pwm": 4,
-            "Tachs": [4],
             "Thresholds": [
                 {
                     "Direction": "less than",
@@ -146,8 +138,6 @@
             "MaxReading": 6000,
             "Name": "SYS_FAN3",
             "Type": "AspeedFan",
-            "Pwm": 5,
-            "Tachs": [5],
             "Thresholds": [
                 {
                     "Direction": "less than",
@@ -181,8 +171,6 @@
             "MaxReading": 6000,
             "Name": "SYS_FAN4",
             "Type": "AspeedFan",
-            "Pwm": 6,
-            "Tachs": [6],
             "Thresholds": [
                 {
                     "Direction": "less than",
@@ -216,8 +204,6 @@
             "MaxReading": 6000,
             "Name": "SYS_FAN5",
             "Type": "AspeedFan",
-            "Pwm": 7,
-            "Tachs": [7],
             "Thresholds": [
                 {
                     "Direction": "less than",
@@ -251,8 +237,6 @@
             "MaxReading": 6000,
             "Name": "SYS_FAN6",
             "Type": "AspeedFan",
-            "Pwm": 8,
-            "Tachs": [8],
             "Thresholds": [
                 {
                     "Direction": "less than",
