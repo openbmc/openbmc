@@ -1,7 +1,7 @@
-From ce65575b9c2b186de098e0795a0de02a8f88331f Mon Sep 17 00:00:00 2001
+From ec718bc72f58287fc47ce4c121c00a1256e834f9 Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
 Date: Mon, 15 Aug 2022 17:08:47 +0800
-Subject: [PATCH 02/21] Add SEL add command
+Subject: [PATCH 02/20] Add SEL add command
 
 Signed-off-by: Stanley Chu <yschu@nuvoton.com>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Stanley Chu <yschu@nuvoton.com>
  1 file changed, 78 insertions(+), 6 deletions(-)
 
 diff --git a/dbus-sdr/storagecommands.cpp b/dbus-sdr/storagecommands.cpp
-index eeed777e..d12458ab 100644
+index b50db1a1..c2daf74d 100644
 --- a/dbus-sdr/storagecommands.cpp
 +++ b/dbus-sdr/storagecommands.cpp
 @@ -111,6 +111,11 @@ constexpr static const char* chassisTypeMainServer = "17";
@@ -22,9 +22,9 @@ index eeed777e..d12458ab 100644
 +    "xyz.openbmc_project.Logging.IPMI";
 +
  static std::vector<uint8_t> fruCache;
- static uint8_t cacheBus = 0xFF;
- static uint8_t cacheAddr = 0XFF;
-@@ -1111,17 +1116,84 @@ Unused arguments
+ static constexpr uint16_t invalidBus = 0xFFFF;
+ static constexpr uint8_t invalidAddr = 0xFF;
+@@ -1113,17 +1118,84 @@ Unused arguments
    uint8_t eventType, uint8_t eventData1, uint8_t eventData2,
    uint8_t eventData3
  */

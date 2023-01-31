@@ -1,79 +1,22 @@
-From c61ea2f20bbc1b18acacb71b37e4b43a4e34969a Mon Sep 17 00:00:00 2001
+From 44616abc3e85e9f6bc663b828687fc5402ef28b0 Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
 Date: Mon, 15 Aug 2022 16:13:12 +0800
-Subject: [PATCH] add dimm sensor
+Subject: [PATCH 4/5] add dimm sensor
 
 Signed-off-by: Stanley Chu <yschu@nuvoton.com>
 ---
- include/DIMMSensor.hpp |  51 ++++
- include/amd-apml.h     |  74 ++++++
- include/i3cdev.h       |  39 +++
- meson_options.txt      |   1 +
- src/DIMMSensor.cpp     | 577 +++++++++++++++++++++++++++++++++++++++++
- src/meson.build        |  15 ++
+ include/amd-apml.h |  74 ++++++
+ include/i3cdev.h   |  39 +++
+ meson_options.txt  |   1 +
+ src/DIMMSensor.cpp | 577 +++++++++++++++++++++++++++++++++++++++++++++
+ src/DIMMSensor.hpp |  51 ++++
+ src/meson.build    |  15 ++
  6 files changed, 757 insertions(+)
- create mode 100644 include/DIMMSensor.hpp
  create mode 100644 include/amd-apml.h
  create mode 100644 include/i3cdev.h
  create mode 100644 src/DIMMSensor.cpp
+ create mode 100644 src/DIMMSensor.hpp
 
-diff --git a/include/DIMMSensor.hpp b/include/DIMMSensor.hpp
-new file mode 100644
-index 00000000..91f2ce6a
---- /dev/null
-+++ b/include/DIMMSensor.hpp
-@@ -0,0 +1,51 @@
-+#pragma once
-+#include <boost/asio/deadline_timer.hpp>
-+#include <boost/container/flat_map.hpp>
-+#include <sensor.hpp>
-+
-+#include <chrono>
-+#include <limits>
-+#include <memory>
-+#include <string>
-+#include <vector>
-+
-+struct DIMMSensor : public Sensor
-+{
-+    DIMMSensor(std::shared_ptr<sdbusplus::asio::connection>& conn,
-+                  boost::asio::io_service& io, const std::string& name,
-+                  const std::string& sensorType,
-+                  const std::string& interface,
-+                  const std::string& sensorConfiguration,
-+                  sdbusplus::asio::object_server& objectServer,
-+                  std::vector<thresholds::Threshold>&& thresholds,
-+                  uint8_t busId, uint8_t addr, const std::string& pid,
-+                  uint8_t tempReg, double max, double min, uint8_t adcSel);
-+    ~DIMMSensor() override;
-+
-+    void checkThresholds(void) override;
-+    void read(void);
-+    void init(void);
-+    void work_thread(void);
-+
-+    uint8_t busId;
-+    uint8_t addr;
-+    std::string pid;
-+    uint8_t tempReg;
-+    std::string sensorName;
-+    std::string sensorType;
-+    std::string interface;
-+    uint8_t adcSel;
-+    double adcScal;
-+    double sensorVal;
-+
-+  private:
-+    int get_sensor_val(double *val);
-+    int get_temp_i3c(double *temp);
-+    int get_volt_i3c(double *volt);
-+    int get_reg_i3c(uint8_t reg, uint8_t *data, uint8_t len);
-+    int get_temp_sbrmi(double *temp);
-+    int get_power_sbrmi(double *power);
-+    int enableADC(void);
-+    sdbusplus::asio::object_server& objectServer;
-+    boost::asio::deadline_timer waitTimer;
-+};
 diff --git a/include/amd-apml.h b/include/amd-apml.h
 new file mode 100644
 index 00000000..04161092
@@ -210,13 +153,13 @@ index d6a8b966..c0ec6454 100644
 +option('dimm', type: 'feature', value: 'enabled', description: 'Enable DIMM sensor.',)
 diff --git a/src/DIMMSensor.cpp b/src/DIMMSensor.cpp
 new file mode 100644
-index 00000000..dd685090
+index 00000000..b9e6d6ae
 --- /dev/null
 +++ b/src/DIMMSensor.cpp
 @@ -0,0 +1,577 @@
-+#include <DIMMSensor.hpp>
-+#include <Utils.hpp>
-+#include <VariantVisitors.hpp>
++#include "DIMMSensor.hpp"
++#include "Utils.hpp"
++#include "VariantVisitors.hpp"
 +#include <boost/algorithm/string/predicate.hpp>
 +#include <boost/container/flat_map.hpp>
 +#include <sdbusplus/asio/connection.hpp>
@@ -791,11 +734,68 @@ index 00000000..dd685090
 +    io.run();
 +    return 0;
 +}
+diff --git a/src/DIMMSensor.hpp b/src/DIMMSensor.hpp
+new file mode 100644
+index 00000000..af2e4b96
+--- /dev/null
++++ b/src/DIMMSensor.hpp
+@@ -0,0 +1,51 @@
++#pragma once
++#include <boost/asio/deadline_timer.hpp>
++#include <boost/container/flat_map.hpp>
++#include "sensor.hpp"
++
++#include <chrono>
++#include <limits>
++#include <memory>
++#include <string>
++#include <vector>
++
++struct DIMMSensor : public Sensor
++{
++    DIMMSensor(std::shared_ptr<sdbusplus::asio::connection>& conn,
++                  boost::asio::io_service& io, const std::string& name,
++                  const std::string& sensorType,
++                  const std::string& interface,
++                  const std::string& sensorConfiguration,
++                  sdbusplus::asio::object_server& objectServer,
++                  std::vector<thresholds::Threshold>&& thresholds,
++                  uint8_t busId, uint8_t addr, const std::string& pid,
++                  uint8_t tempReg, double max, double min, uint8_t adcSel);
++    ~DIMMSensor() override;
++
++    void checkThresholds(void) override;
++    void read(void);
++    void init(void);
++    void work_thread(void);
++
++    uint8_t busId;
++    uint8_t addr;
++    std::string pid;
++    uint8_t tempReg;
++    std::string sensorName;
++    std::string sensorType;
++    std::string interface;
++    uint8_t adcSel;
++    double adcScal;
++    double sensorVal;
++
++  private:
++    int get_sensor_val(double *val);
++    int get_temp_i3c(double *temp);
++    int get_volt_i3c(double *volt);
++    int get_reg_i3c(uint8_t reg, uint8_t *data, uint8_t len);
++    int get_temp_sbrmi(double *temp);
++    int get_power_sbrmi(double *power);
++    int enableADC(void);
++    sdbusplus::asio::object_server& objectServer;
++    boost::asio::deadline_timer waitTimer;
++};
 diff --git a/src/meson.build b/src/meson.build
-index e2af923b..48b428ab 100644
+index 6f47fb0a..ab881fae 100644
 --- a/src/meson.build
 +++ b/src/meson.build
-@@ -196,3 +196,18 @@ if get_option('external').enabled()
+@@ -231,3 +231,18 @@ if get_option('external').enabled()
          install: true,
      )
  endif
@@ -809,8 +809,8 @@ index e2af923b..48b428ab 100644
 +            thresholds_dep,
 +            utils_dep,
 +        ],
-+        implicit_include_directories: false,
 +        include_directories: '../include',
++        cpp_args: uring_args,
 +        install: true,
 +    )
 +endif

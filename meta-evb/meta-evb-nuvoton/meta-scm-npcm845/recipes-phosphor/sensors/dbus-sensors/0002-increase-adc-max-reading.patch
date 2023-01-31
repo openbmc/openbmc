@@ -1,7 +1,7 @@
-From 7da8f4f98e86b7494aa4b47af09a121217aeb8cc Mon Sep 17 00:00:00 2001
+From 587b4a589db535f176ebb1b1af91ba5c1f3326c0 Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
 Date: Mon, 15 Aug 2022 14:46:11 +0800
-Subject: [PATCH 5/8] increase adc max reading
+Subject: [PATCH 2/5] increase adc max reading
 
 Signed-off-by: Stanley Chu <yschu@nuvoton.com>
 ---
@@ -9,10 +9,10 @@ Signed-off-by: Stanley Chu <yschu@nuvoton.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/ADCSensor.cpp b/src/ADCSensor.cpp
-index fe2c8a79..e7e0942a 100644
+index 2fc35e0a..8d0602b4 100644
 --- a/src/ADCSensor.cpp
 +++ b/src/ADCSensor.cpp
-@@ -35,7 +35,7 @@
+@@ -36,7 +36,7 @@
  static constexpr unsigned int sensorScaleFactor = 1000;
  
  static constexpr double roundFactor = 10000;     // 3 decimal places

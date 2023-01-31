@@ -1,7 +1,7 @@
-From edd3ee142b36be553f3f49c436c7e516bc1e9dd4 Mon Sep 17 00:00:00 2001
+From 2a5c0e85394f335f86912319dd6ef9ace13652d9 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Fri, 23 Dec 2022 10:07:51 +0800
-Subject: [PATCH] add psu sesnor: p2011 and mx16550
+Subject: [PATCH 5/5] add psu sesnor: p2011 and mx16550
 
 Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
@@ -9,10 +9,10 @@ Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/src/PSUSensorMain.cpp b/src/PSUSensorMain.cpp
-index 38f92a76..d78e96b5 100644
+index 845af476..09637fb8 100644
 --- a/src/PSUSensorMain.cpp
 +++ b/src/PSUSensorMain.cpp
-@@ -48,7 +48,7 @@ static constexpr auto sensorTypes{std::to_array<const char*>(
+@@ -49,7 +49,7 @@ static constexpr auto sensorTypes{std::to_array<const char*>(
       "MAX20734",  "MAX20796",    "MAX34451",  "MP2971",    "MP2973",
       "MP5023",    "PLI1209BC",   "pmbus",     "PXE1610",   "RAA228000",
       "RAA228228", "RAA228620",   "RAA229001", "RAA229004", "RAA229126",
@@ -21,7 +21,7 @@ index 38f92a76..d78e96b5 100644
  
  // clang-format off
  static constexpr auto pmbusNames{std::to_array<const char*>({
-@@ -95,7 +95,9 @@ static constexpr auto pmbusNames{std::to_array<const char*>({
+@@ -96,7 +96,9 @@ static constexpr auto pmbusNames{std::to_array<const char*>({
      "tps53679",
      "tps546d24",
      "xdpe11280",

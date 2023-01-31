@@ -1,7 +1,7 @@
-From fe26ef58e9013a34f2d8538d042a093c4e36a40c Mon Sep 17 00:00:00 2001
+From fe08913926c140713c34841f8d14bd00b3867310 Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
 Date: Mon, 15 Aug 2022 14:53:06 +0800
-Subject: [PATCH 6/8] change PSU sensor name to meet customer requirement
+Subject: [PATCH 3/5] change PSU sensor name to meet customer requirement
 
 Signed-off-by: Stanley Chu <yschu@nuvoton.com>
 ---
@@ -9,10 +9,10 @@ Signed-off-by: Stanley Chu <yschu@nuvoton.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/src/PSUSensorMain.cpp b/src/PSUSensorMain.cpp
-index fbf78434..505361d9 100644
+index b5af1769..845af476 100644
 --- a/src/PSUSensorMain.cpp
 +++ b/src/PSUSensorMain.cpp
-@@ -270,6 +270,7 @@ static void
+@@ -271,6 +271,7 @@ static void
          name += psuName;
          name += "_";
          name += pwmName;
