@@ -125,8 +125,9 @@ function fw_rev() {
   echo " BMC PowerSequencer : ${cmd}"
   #only display with smbios exists
   if [[ -e /var/lib/smbios/smbios2 ]]; then
-    cmd=$(busctl introspect xyz.openbmc_project.Smbios.MDR_V2 \
-            /xyz/openbmc_project/inventory/system/chassis/motherboard/bios | grep Version | awk '{print $4}')
+    cmd=$(busctl get-property xyz.openbmc_project.Smbios.MDR_V2 \
+            /xyz/openbmc_project/inventory/system/chassis/motherboard/bios\
+            xyz.openbmc_project.Inventory.Decorator.Revision Version | awk '{print $2}')
     echo " Bios: $cmd"
   fi
 
