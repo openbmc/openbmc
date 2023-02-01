@@ -1,0 +1,73 @@
+From 3035651bfc0dcdfd48d28acff6efe2f29bbe9439 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Thu, 6 Oct 2022 15:04:25 +0100
+Subject: [PATCH 04/25] arm_ffa: efi: unmap RX/TX buffers
+
+unmap RX/TX buffers at ExitBootServices()
+
+Unmapping the RX/TX buffers created by u-boot is needed before EFI
+runtime.
+
+At EFI runtime the linux kernel takes care of allocating its own RX/TX
+buffers and registering them with the secure world.
+
+Secure world should be using the RX/TX buffers created by the kernel.
+So, RX/TX buffers created by u-boot must be unmapped.
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Cc: Tom Rini <trini@konsulko.com>
+Cc: Simon Glass <sjg@chromium.org>
+Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Cc: Jens Wiklander <jens.wiklander@linaro.org>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20221122131751.22747-1-abdellatif.elkhlifi@arm.com/]
+
+Changelog:
+===============
+
+v8: pass NULL device pointer to the FF-A bus operation
+v7: replace debug() by log_err()
+---
+ lib/efi_loader/efi_boottime.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/lib/efi_loader/efi_boottime.c b/lib/efi_loader/efi_boottime.c
+index 6f7333638a..caa64028be 100644
+--- a/lib/efi_loader/efi_boottime.c
++++ b/lib/efi_loader/efi_boottime.c
+@@ -3,6 +3,9 @@
+  * EFI application boot time services
+  *
+  * Copyright (c) 2016 Alexander Graf
++ *
++ * (C) Copyright 2022 ARM Limited
++ * Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+  */
+ 
+ #include <common.h>
+@@ -23,6 +26,10 @@
+ #include <asm/setjmp.h>
+ #include <linux/libfdt_env.h>
+ 
++#if CONFIG_IS_ENABLED(ARM_FFA_TRANSPORT)
++#include <arm_ffa.h>
++#endif
++
+ DECLARE_GLOBAL_DATA_PTR;
+ 
+ /* Task priority level */
+@@ -2178,6 +2185,12 @@ static efi_status_t EFIAPI efi_exit_boot_services(efi_handle_t image_handle,
+ 		dm_remove_devices_flags(DM_REMOVE_ACTIVE_ALL);
+ 	}
+ 
++#if CONFIG_IS_ENABLED(ARM_FFA_TRANSPORT)
++		/* unmap FF-A RX/TX buffers */
++		if (ffa_bus_ops_get()->rxtx_unmap(NULL))
++			log_err("Can't unmap FF-A RX/TX buffers\n");
++#endif
++
+ 	/* Patch out unsupported runtime function */
+ 	efi_runtime_detach();
+ 
+-- 
+2.17.1
+

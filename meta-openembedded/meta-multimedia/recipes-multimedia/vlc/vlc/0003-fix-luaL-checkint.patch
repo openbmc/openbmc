@@ -1,7 +1,7 @@
 * luaL_checkint and luaL_optint were deprecated in lua 5.3
 * replacement functions are luaL_checkinteger and luaL_optinteger
 
-Upstream-status: Pending
+Upstream-Status: Pending
 
 Signed-off-by: Tim Orling <TicoTimo@gmail.com>
 

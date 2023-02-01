@@ -15,6 +15,7 @@
 
 addtask do_update_crates after do_patch
 do_update_crates[depends] = "python3-native:do_populate_sysroot"
+do_update_crates[nostamp] = "1"
 
 # The directory where to search for Cargo.lock files
 CARGO_LOCK_SRC_DIR ??= "${S}"

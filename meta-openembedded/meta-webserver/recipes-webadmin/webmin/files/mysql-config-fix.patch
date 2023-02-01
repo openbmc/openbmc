@@ -3,7 +3,7 @@ From: Diego Rondini <diego.ml@zoho.com>
 Date: Thu, 18 Feb 2016 15:44:06 +0100
 Subject: [PATCH] Adjust Mysql config defaults
 
-Upstream-status: Inappropriate [configuration]
+Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Diego Rondini <diego.ml@zoho.com>
 ---

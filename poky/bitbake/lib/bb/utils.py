@@ -1699,23 +1699,20 @@ def disable_network(uid=None, gid=None):
 
 def export_proxies(d):
     """ export common proxies variables from datastore to environment """
-    import os
 
     variables = ['http_proxy', 'HTTP_PROXY', 'https_proxy', 'HTTPS_PROXY',
                     'ftp_proxy', 'FTP_PROXY', 'no_proxy', 'NO_PROXY',
-                    'GIT_PROXY_COMMAND']
-    exported = False
+                    'GIT_PROXY_COMMAND', 'SSL_CERT_FILE', 'SSL_CERT_DIR']
 
-    for v in variables:
-        if v in os.environ.keys():
-            exported = True
-        else:
-            v_proxy = d.getVar(v)
-            if v_proxy is not None:
-                os.environ[v] = v_proxy
-                exported = True
+    origenv = d.getVar("BB_ORIGENV")
 
-    return exported
+    for name in variables:
+        value = d.getVar(name)
+        if not value and origenv:
+            value = origenv.getVar(name)
+        if value:
+            os.environ[name] = value
+
 
 
 def load_plugins(logger, plugins, pluginpath):

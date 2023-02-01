@@ -1,0 +1,59 @@
+From 5112785191e3279c671a027fe797be77e1071ecd Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Mon, 2 Jan 2023 13:45:46 +0100
+Subject: [PATCH] marvell.c: use portable integer types
+
+u_int32_t is not portable, but uint32_t is.
+
+Upstream-Status: Submitted [by email to mkubecek@suse.cz]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
+---
+ marvell.c | 34 +++++++++++++++++-----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/marvell.c b/marvell.c
+index d3d570e..3d42eed 100644
+--- a/marvell.c
++++ b/marvell.c
+@@ -31,23 +31,23 @@ static void dump_timer(const char *name, const void *p)
+ static void dump_queue(const char *name, const void *a, int rx)
+ {
+ 	struct desc {
+-		u_int32_t		ctl;
+-		u_int32_t		next;
+-		u_int32_t		data_lo;
+-		u_int32_t		data_hi;
+-		u_int32_t		status;
+-		u_int32_t		timestamp;
+-		u_int16_t		csum2;
+-		u_int16_t		csum1;
+-		u_int16_t		csum2_start;
+-		u_int16_t		csum1_start;
+-		u_int32_t		addr_lo;
+-		u_int32_t		addr_hi;
+-		u_int32_t		count_lo;
+-		u_int32_t		count_hi;
+-		u_int32_t               byte_count;
+-		u_int32_t               csr;
+-		u_int32_t               flag;
++		uint32_t		ctl;
++		uint32_t		next;
++		uint32_t		data_lo;
++		uint32_t		data_hi;
++		uint32_t		status;
++		uint32_t		timestamp;
++		uint16_t		csum2;
++		uint16_t		csum1;
++		uint16_t		csum2_start;
++		uint16_t		csum1_start;
++		uint32_t		addr_lo;
++		uint32_t		addr_hi;
++		uint32_t		count_lo;
++		uint32_t		count_hi;
++		uint32_t                byte_count;
++		uint32_t                csr;
++		uint32_t               flag;
+ 	};
+ 	const struct desc *d = a;
+ 

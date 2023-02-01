@@ -1,0 +1,76 @@
+From 46cadb787a3b13da39419706fae7d1ba703f4b68 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Fri, 23 Sep 2022 15:17:21 +0100
+Subject: [PATCH 10/25] arm_ffa: efi: corstone1000: enable MM communication
+
+turn on EFI MM communication
+
+On corstone1000 platform MM communication between u-boot
+and the secure world (Optee) is done using the FF-A bus.
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Cc: Tom Rini <trini@konsulko.com>
+Cc: Simon Glass <sjg@chromium.org>
+Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Cc: Jens Wiklander <jens.wiklander@linaro.org>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20221122131751.22747-1-abdellatif.elkhlifi@arm.com/]
+
+Changelog:
+===============
+
+v8:
+
+* drop OP-TEE configs from Corstone-1000 defconfig
+
+v7:
+
+* improve the definition of FFA_SHARED_MM_BUFFER_ADDR and
+  FFA_SHARED_MM_BUFFER_OFFSET
+* update FFA_SHARED_MM_BUFFER_ADDR value
+
+v6:
+
+* corstone-1000: enable optee driver
+* corstone-1000: remove CONFIG_ARM_FFA_EFI_RUNTIME_MODE from the defconfig
+
+v4:
+
+* corstone-1000: turn on EFI MM communication
+---
+ configs/corstone1000_defconfig | 2 ++
+ include/configs/corstone1000.h | 9 +++++++++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
+index ed2e0fe70a..c26f99e7e5 100644
+--- a/configs/corstone1000_defconfig
++++ b/configs/corstone1000_defconfig
+@@ -52,3 +52,5 @@ CONFIG_DM_SERIAL=y
+ CONFIG_USB=y
+ CONFIG_USB_ISP1760=y
+ CONFIG_ERRNO_STR=y
++CONFIG_EFI_MM_COMM_TEE=y
++CONFIG_ARM_FFA_TRANSPORT=y
+diff --git a/include/configs/corstone1000.h b/include/configs/corstone1000.h
+index 8e0230c135..0362d29ac2 100644
+--- a/include/configs/corstone1000.h
++++ b/include/configs/corstone1000.h
+@@ -14,6 +14,15 @@
+ 
+ #include <linux/sizes.h>
+ 
++#define FFA_SHARED_MM_BUFFER_SIZE	SZ_4K /* 4 KB */
++
++/*
++ * shared buffer physical address used for communication between
++ * u-boot and the MM SP
++ */
++#define FFA_SHARED_MM_BUFFER_ADDR	0x02000000UL
++#define FFA_SHARED_MM_BUFFER_OFFSET	0
++
+ #define V2M_BASE		0x80000000
+ 
+ #define CONFIG_PL011_CLOCK	50000000
+-- 
+2.17.1
+

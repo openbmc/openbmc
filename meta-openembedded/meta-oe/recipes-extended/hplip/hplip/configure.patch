@@ -1,7 +1,7 @@
 --- a/configure.in
 +++ b/configure.in
 @@ -30,7 +30,7 @@
- AC_INIT([HP Linux Imaging and Printing], [3.22.6], [3.22.6], [hplip])
+ AC_INIT([HP Linux Imaging and Printing], [3.22.10], [3.22.10], [hplip])
  
  #AM_INIT_AUTOMAKE([1.9 foreign])
 -AM_INIT_AUTOMAKE

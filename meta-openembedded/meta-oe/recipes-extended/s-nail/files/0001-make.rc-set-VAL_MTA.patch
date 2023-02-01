@@ -16,7 +16,7 @@ Fixes:
   # which sendmail
   /usr/sbin/sendmail
 
-Upstream-Status: Inappropriate[oe-specific]
+Upstream-Status: Inappropriate [oe-specific]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---

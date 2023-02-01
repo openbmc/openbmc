@@ -1,0 +1,45 @@
+From d55b6b1fa87700f3eae3a29522972d2e7be7d53e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 14 Jan 2023 10:11:35 -0800
+Subject: [PATCH] use _Alignof to avoid UB in ALIGNOF
+
+WG14 N2350 clearly says that it is an UB having type definitions
+within "offsetof" [1]. Clang 16+ has started diagnosing it [2].
+This patch changes the implementation of macro
+"ALIGNOF" to builtin "_Alignof" to avoid undefined behavior.
+
+_Alignof() return the ABI required minimum alignment.
+
+[1] https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2350.htm
+[2] https://reviews.llvm.org/D133574
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/xorg/lib/libxcb/-/merge_requests/42]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/c_client.py | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/c_client.py b/src/c_client.py
+index fd256f0..4e48f13 100644
+--- a/src/c_client.py
++++ b/src/c_client.py
+@@ -288,7 +288,6 @@ def c_open(self):
+     _c('#include "%s.h"', _ns.header)
+ 
+     _c('')
+-    _c('#define ALIGNOF(type) offsetof(struct { char dummy; type member; }, member)')
+ 
+     if _ns.is_ext:
+         for (n, h) in self.direct_imports:
+@@ -1266,7 +1265,7 @@ def _c_serialize_helper_fields(context, self,
+             count += 1
+ 
+         code_lines.append(
+-            '%s    xcb_align_to = ALIGNOF(%s);'
++            '%s    xcb_align_to = _Alignof(%s);'
+              % (space,
+                  'char'
+                   if field.c_field_type == 'void' or field.type.is_switch
+-- 
+2.39.0
+

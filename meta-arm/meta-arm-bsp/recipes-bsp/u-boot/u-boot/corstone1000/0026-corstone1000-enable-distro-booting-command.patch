@@ -1,0 +1,27 @@
+From 15778524604652db60f704a772b6815d0f4305bf Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Mon, 5 Dec 2022 17:02:32 +0000
+Subject: [PATCH] corstone1000: enable distro booting command
+
+enable distro_bootcmd
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ include/configs/corstone1000.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/configs/corstone1000.h b/include/configs/corstone1000.h
+index 1f28a0f6c0..548856b970 100644
+--- a/include/configs/corstone1000.h
++++ b/include/configs/corstone1000.h
+@@ -64,5 +64,6 @@
+ 
+ #include <config_distro_bootcmd.h>
+ 
++#define CONFIG_EXTRA_ENV_SETTINGS BOOTENV
+ 
+ #endif
+-- 
+2.17.1
+

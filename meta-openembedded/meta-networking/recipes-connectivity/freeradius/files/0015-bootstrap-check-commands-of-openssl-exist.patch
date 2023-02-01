@@ -1,0 +1,44 @@
+From 78494ea005bd38324953b05176d6eb2c3f55af2c Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Sun, 8 Jan 2023 23:21:24 +0800
+Subject: [PATCH] bootstrap: check commands of openssl exist
+
+It calls openssl commands dhparam and pkcs12 in script bootstrap. These
+commands are configurable based on configure options 'no-dh' and
+'no-des', and may not be provided by openssl. So check existence of
+these commands. If not, abort running of script bootstrap.
+
+1. https://github.com/openssl/openssl/blob/master/apps/build.info#L37
+2. https://github.com/openssl/openssl/blob/master/apps/build.info#L22
+
+Upstream-Status: Denied [https://github.com/FreeRADIUS/freeradius-server/pull/4059]
+				 The maintainer commented in the pull that the script could
+				 be run on a host which provides these openssl commands.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ raddb/certs/bootstrap | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/raddb/certs/bootstrap b/raddb/certs/bootstrap
+index 57de8cf0d7..4641c71700 100755
+--- a/raddb/certs/bootstrap
++++ b/raddb/certs/bootstrap
+@@ -13,6 +13,14 @@
+ umask 027
+ cd `dirname $0`
+ 
++#  check commands of openssl exist
++for cmd in dhparam pkcs12; do
++	if ! openssl ${cmd} -help >/dev/null 2>&1; then
++		echo "Error: command ${cmd} is not supported by openssl."
++		exit 1
++	fi
++done
++
+ make -h > /dev/null 2>&1
+ 
+ #
+-- 
+2.25.1
+

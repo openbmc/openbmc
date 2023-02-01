@@ -1,9 +1,10 @@
 Submitted By:            Armin K. <krejzi at email dot com>
 Date:                    2012-07-06
 Initial Package Version: 0.4.6
-Upstream Status:         Unknown
 Origin:                  Self
 Description:             Some build fixes.
+
+Upstream-Status: Pending
 
 Index: obex-data-server-0.4.6/src/ods-obex.c
 ===================================================================

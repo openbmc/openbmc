@@ -13,7 +13,7 @@ SRC_URI[sha256sum] = "f3bd36cd261b440a88a1190b1becca0578fee90b4b62decc796932fdd5
 inherit pypi python_flit_core
 
 # Bootstrap the native build
-DEPENDS:remove:class-native = "python3-picobuild-native python3-installer-native"
+DEPENDS:remove:class-native = "python3-build-native python3-installer-native"
 
 INSTALL_WHEEL_COMPILE_BYTECODE:class-native = "--no-compile-bytecode"
 

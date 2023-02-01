@@ -1,0 +1,32 @@
+From 9599d7d48913fca4c2bf0d0012f9655353ca6f6c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 18 Jan 2023 19:35:07 -0800
+Subject: [PATCH] Remove duplicate pe-dll.o entry deom targ_extra_ofiles
+
+Commit c60b3806799abf1d7f6cf5108a1b0e733a950b13 added support for
+aarch64-pe which introduced wrapper over pep-dll.c for x86_64 as well as
+aarch64, on x86_64 it was added but the old object pe-dll.o needs to be
+removed too, otherwise build fails with duplicate symbols from pe-dll.o
+and pep-dll-x86_64.o
+
+Upstream-Status: Submitted [https://sourceware.org/pipermail/binutils/2023-January/125739.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Cc: Jedidiah Thompson <wej22007@outlook.com>
+Cc: Zac Walker <zac.walker@linaro.org>
+---
+ ld/configure.tgt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/ld/configure.tgt b/ld/configure.tgt
+index de04a44b812..f80c84ab13c 100644
+--- a/ld/configure.tgt
++++ b/ld/configure.tgt
+@@ -1056,7 +1056,7 @@ x86_64-*-cygwin)	targ_emul=i386pep ;
+ 			;;
+ x86_64-*-mingw*)	targ_emul=i386pep ;
+ 			targ_extra_emuls=i386pe
+-			targ_extra_ofiles="deffilep.o pdb.o pep-dll.o pe-dll.o"
++			targ_extra_ofiles="deffilep.o pdb.o pe-dll.o"
+ 			;;
+ x86_64-*-gnu*)		targ_emul=elf_x86_64
+ 			targ_extra_emuls="elf32_x86_64 elf_iamcu elf_i386"

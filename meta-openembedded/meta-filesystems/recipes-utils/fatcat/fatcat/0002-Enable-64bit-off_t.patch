@@ -10,7 +10,7 @@ same as lseek64
 This helps compiling on latest musl where lseek64 and friends are not
 available
 
-Upstream-status: Submitted [https://github.com/Gregwar/fatcat/pull/34]
+Upstream-Status: Submitted [https://github.com/Gregwar/fatcat/pull/34]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  CMakeLists.txt         | 2 ++

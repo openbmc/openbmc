@@ -9,14 +9,20 @@ Fixes builds on mips where clang reports an error
     ^~~~
 
 Upstream-Status: Submitted [https://chromium-review.googlesource.com/c/v8/v8/+/3235674]
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
----
- src/wasm/baseline/liftoff-assembler.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
 
+Signed-off-by: Archana Polampalli <archana.polampalli@windriver.com>
+---
+ deps/v8/src/wasm/baseline/liftoff-assembler.h               | 6 +++---
+ deps/v8/src/wasm/baseline/mips/liftoff-assembler-mips.h     | 2 +-
+ deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64.h | 2 +-
+ .../src/wasm/baseline/riscv64/liftoff-assembler-riscv64.h   | 2 +-
+ 4 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/deps/v8/src/wasm/baseline/liftoff-assembler.h b/deps/v8/src/wasm/baseline/liftoff-assembler.h
+index 22c7f73a..db4cb168 100644
 --- a/deps/v8/src/wasm/baseline/liftoff-assembler.h
 +++ b/deps/v8/src/wasm/baseline/liftoff-assembler.h
-@@ -613,7 +613,7 @@ class LiftoffAssembler : public TurboAss
+@@ -646,7 +646,7 @@ class LiftoffAssembler : public TurboAssembler {
    void FinishCall(const ValueKindSig*, compiler::CallDescriptor*);
  
    // Move {src} into {dst}. {src} and {dst} must be different.
@@ -25,7 +31,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
    // Parallel register move: For a list of tuples <dst, src, kind>, move the
    // {src} register of kind {kind} into {dst}. If {src} equals {dst}, ignore
-@@ -759,8 +759,8 @@ class LiftoffAssembler : public TurboAss
+@@ -795,8 +795,8 @@ class LiftoffAssembler : public TurboAssembler {
    inline void MoveStackValue(uint32_t dst_offset, uint32_t src_offset,
                               ValueKind);
  
@@ -36,10 +42,12 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
    inline void Spill(int offset, LiftoffRegister, ValueKind);
    inline void Spill(int offset, WasmValue);
+diff --git a/deps/v8/src/wasm/baseline/mips/liftoff-assembler-mips.h b/deps/v8/src/wasm/baseline/mips/liftoff-assembler-mips.h
+index c76fd2f4..0fffe231 100644
 --- a/deps/v8/src/wasm/baseline/mips/liftoff-assembler-mips.h
 +++ b/deps/v8/src/wasm/baseline/mips/liftoff-assembler-mips.h
-@@ -658,7 +658,7 @@ void LiftoffAssembler::Store(Register ds
-     pinned = pinned | LiftoffRegList::ForRegs(dst_op.rm(), src);
+@@ -661,7 +661,7 @@ void LiftoffAssembler::Store(Register dst_addr, Register offset_reg,
+     pinned = pinned | LiftoffRegList{dst_op.rm(), src};
      LiftoffRegister tmp = GetUnusedRegister(src.reg_class(), pinned);
      // Save original value.
 -    Move(tmp, src, type.value_type());
@@ -47,9 +55,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
      src = tmp;
      pinned.set(tmp);
+diff --git a/deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64.h b/deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64.h
+index 36413545..48207337 100644
 --- a/deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64.h
 +++ b/deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64.h
-@@ -596,7 +596,7 @@ void LiftoffAssembler::Store(Register ds
+@@ -593,7 +593,7 @@ void LiftoffAssembler::Store(Register dst_addr, Register offset_reg,
      pinned.set(dst_op.rm());
      LiftoffRegister tmp = GetUnusedRegister(src.reg_class(), pinned);
      // Save original value.
@@ -58,9 +68,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
      src = tmp;
      pinned.set(tmp);
+diff --git a/deps/v8/src/wasm/baseline/riscv64/liftoff-assembler-riscv64.h b/deps/v8/src/wasm/baseline/riscv64/liftoff-assembler-riscv64.h
+index 642a7d2a..56ffcc2a 100644
 --- a/deps/v8/src/wasm/baseline/riscv64/liftoff-assembler-riscv64.h
 +++ b/deps/v8/src/wasm/baseline/riscv64/liftoff-assembler-riscv64.h
-@@ -580,7 +580,7 @@ void LiftoffAssembler::Store(Register ds
+@@ -589,7 +589,7 @@ void LiftoffAssembler::Store(Register dst_addr, Register offset_reg,
      pinned.set(dst_op.rm());
      LiftoffRegister tmp = GetUnusedRegister(src.reg_class(), pinned);
      // Save original value.
@@ -69,3 +81,5 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
      src = tmp;
      pinned.set(tmp);
+--
+2.34.1

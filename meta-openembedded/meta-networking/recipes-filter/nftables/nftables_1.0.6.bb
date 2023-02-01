@@ -37,7 +37,7 @@ RDEPENDS:${PN}-ptest += " ${PN}-python bash make iproute2 iputils-ping procps py
 
 TESTDIR = "tests"
 
-PRIVATE_LIBS:${PN}-ptest:append = "libnftables.so.1"
+PRIVATE_LIBS:${PN}-ptest:append = " libnftables.so.1"
 
 do_install:append() {
     # Avoid "contains reference to TMPDIR" warning

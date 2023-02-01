@@ -8,7 +8,7 @@ Most distos have there own verison of this fix. This was derived by
 -- Colin Watson <cjwatson@ubuntu.com>  Tue, 13 Sep 2011 10:07:08 +0100
 
 
-signed-off-by: Armin Kuster <akuster808@gmail.com>
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
 
 Index: netkit-rsh-0.17/rsh/Makefile
 ===================================================================

@@ -8,7 +8,11 @@ if ! numactl -s | grep -q "No NUMA support available on this system."; then
 	if  numademo -t -e 10M; then
 		echo "PASS: numademo"
 	else
-		echo "FAIL: numademo"
+		if [ "$?" = 77 ] ; then
+			echo "SKIP: numademo"
+		else
+			echo "FAIL: numademo"
+		fi
 	fi
 else
 	echo "SKIP: ./../test/bind_range"

@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=c1f21c4f72f372ef38a5a4aee55ec173"
 inherit deploy python3native
 require optee.inc
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/optee-os-3_19:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/optee-os-3.19.0:"
 
 CVE_PRODUCT = "linaro:op-tee op-tee:op-tee_os"
 

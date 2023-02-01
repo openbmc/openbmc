@@ -8,7 +8,7 @@ This carves out the core of sparse_file_read_normal and splits it off so
 it can be reused in the next patch. No functional change intended.
 
 Change-Id: Id00491fd7e5bb6fa28c517a0bb32b8b506539d4d
-Upstream-status: Backport [95657f3e5976d96073f7bbfe3a49192509999d1d]
+Upstream-Status: Backport [95657f3e5976d96073f7bbfe3a49192509999d1d]
 Signed-off-by: Sean Anderson <sean.anderson@seco.com>
 ---
  libsparse/sparse_read.c | 21 ++++++++++++++++-----

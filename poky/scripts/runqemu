@@ -1022,7 +1022,11 @@ class BaseConfig(object):
             # Use '%s' since they are integers
             os.putenv(k, '%s' % v)
 
-        self.unfs_opts="nfsvers=3,port=%s,tcp,mountport=%s" % (nfsd_port, mountd_port)
+        qb_nfsrootfs_extra_opt = self.get("QB_NFSROOTFS_EXTRA_OPT")
+        if qb_nfsrootfs_extra_opt and not qb_nfsrootfs_extra_opt.startswith(","):
+            qb_nfsrootfs_extra_opt = "," + qb_nfsrootfs_extra_opt
+
+        self.unfs_opts="nfsvers=3,port=%s,tcp,mountport=%s%s" % (nfsd_port, mountd_port, qb_nfsrootfs_extra_opt)
 
         # Extract .tar.bz2 or .tar.bz if no nfs dir
         if not (self.rootfs and os.path.isdir(self.rootfs)):

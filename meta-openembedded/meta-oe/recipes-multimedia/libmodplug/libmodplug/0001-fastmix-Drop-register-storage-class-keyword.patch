@@ -1,0 +1,38 @@
+From 7a25d5def379db387de9237f0b03605b3ae277b6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 17 Jan 2023 11:32:59 -0800
+Subject: [PATCH] fastmix: Drop 'register' storage class keyword
+
+It has been dropped from laters C/C++ standards ( c++17 and newer )
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/fastmix.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/fastmix.cpp b/src/fastmix.cpp
+index d693d20..aa51c4a 100644
+--- a/src/fastmix.cpp
++++ b/src/fastmix.cpp
+@@ -288,7 +288,7 @@ CzWINDOWEDFIR sfir;
+ // MIXING MACROS
+ // ----------------------------------------------------------------------------
+ #define SNDMIX_BEGINSAMPLELOOP8\
+-	register MODCHANNEL * const pChn = pChannel;\
++	MODCHANNEL * const pChn = pChannel;\
+ 	nPos = pChn->nPosLo;\
+ 	const signed char *p = (signed char *)(pChn->pCurrentSample+pChn->nPos);\
+ 	if (pChn->dwFlags & CHN_STEREO) p += pChn->nPos;\
+@@ -296,7 +296,7 @@ CzWINDOWEDFIR sfir;
+ 	do {
+ 
+ #define SNDMIX_BEGINSAMPLELOOP16\
+-	register MODCHANNEL * const pChn = pChannel;\
++	MODCHANNEL * const pChn = pChannel;\
+ 	nPos = pChn->nPosLo;\
+ 	const signed short *p = (signed short *)(pChn->pCurrentSample+(pChn->nPos*2));\
+ 	if (pChn->dwFlags & CHN_STEREO) p += pChn->nPos;\
+-- 
+2.39.0
+

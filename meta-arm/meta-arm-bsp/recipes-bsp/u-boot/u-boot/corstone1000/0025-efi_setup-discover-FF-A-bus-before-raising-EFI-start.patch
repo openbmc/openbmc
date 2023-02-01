@@ -1,0 +1,50 @@
+From de5994cda7a35317f12dc1cedb28cae1b932283a Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Wed, 30 Nov 2022 19:14:52 +0000
+Subject: [PATCH 25/25] efi_setup: discover FF-A bus before raising EFI started
+ event
+
+add FF-A discovery to efi_corstone1000_uboot_efi_started_event()
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ lib/efi_loader/efi_setup.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/lib/efi_loader/efi_setup.c b/lib/efi_loader/efi_setup.c
+index 63329bbff8..cf8abe3af0 100644
+--- a/lib/efi_loader/efi_setup.c
++++ b/lib/efi_loader/efi_setup.c
+@@ -142,9 +142,16 @@ static efi_status_t efi_init_secure_boot(void)
+ static int efi_corstone1000_uboot_efi_started_event(void)
+ {
+ 	struct ffa_send_direct_data msg = {0};
++	int ret;
+ 
+ 	log_debug("[%s]\n", __func__);
+ 
++	ret = ffa_bus_discover(NULL);
++	if (ret != 0) {
++		log_err("failure to discover FF-A bus\n");
++		return ret;
++	}
++
+ 	/*
+ 	 * setting the kernel started  event arguments:
+ 	 * setting capsule update interface ID(31:16)
+@@ -304,9 +311,9 @@ efi_status_t efi_init_obj_list(void)
+ 		int ffa_ret;
+ 		ffa_ret = efi_corstone1000_uboot_efi_started_event();
+ 		if (ffa_ret)
+-			debug("[efi_boottime][ERROR]: Failure to notify SE Proxy FW update service\n");
++			log_err("Failure to notify SE Proxy FW update service\n");
+ 		else
+-			debug("[efi_boottime][INFO]: SE Proxy FW update service notified\n");
++			debug("SE Proxy FW update service notified\n");
+ #endif
+ 
+ 	/* Initialize variable services */
+-- 
+2.17.1
+

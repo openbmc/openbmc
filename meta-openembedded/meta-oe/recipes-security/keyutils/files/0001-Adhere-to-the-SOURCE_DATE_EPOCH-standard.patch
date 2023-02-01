@@ -1,0 +1,30 @@
+From 3f7f70c746277e1a89978166533374a8b9bd5407 Mon Sep 17 00:00:00 2001
+From: Alex Kiernan <alex.kiernan@gmail.com>
+Date: Wed, 25 Jan 2023 17:05:25 +0000
+Subject: [PATCH] Adhere to the SOURCE_DATE_EPOCH standard
+
+Adhere to the SOURCE_DATE_EPOCH standard and use it's date when set
+otherwise fall back to the default behaviour.
+
+Signed-off-by: Jelle van der Waa <jelle@vdwaa.nl>
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 599b1452a05a..7776b0f0d63d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -109,7 +109,7 @@ all: keyctl request-key key.dns_resolver cxx
+ ###############################################################################
+ #RPATH = -Wl,-rpath,$(LIBDIR)
+ 
+-VCPPFLAGS	:= -DPKGBUILD="\"$(shell date -u +%F)\""
++VCPPFLAGS	:= -DPKGBUILD="\"$(date --utc --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%F)\""
+ VCPPFLAGS	+= -DPKGVERSION="\"keyutils-$(VERSION)\""
+ VCPPFLAGS	+= -DAPIVERSION="\"libkeyutils-$(APIVERSION)\""
+ 
+-- 
+2.39.0
+

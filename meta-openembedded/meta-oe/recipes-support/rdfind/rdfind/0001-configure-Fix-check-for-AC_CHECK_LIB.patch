@@ -15,7 +15,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 --- a/configure.ac
 +++ b/configure.ac
 @@ -46,7 +46,7 @@ AC_CHECK_HEADER(nettle/sha.h,,[AC_MSG_ER
-  On Debian-ish systems, use \"apt-get install nettle-dev\" to get a system
+  On Debian-ish systems, use "apt-get install nettle-dev" to get a system
   wide nettle install.
  ])]) 
 -AC_CHECK_LIB(nettle,main,,[AC_MSG_ERROR([

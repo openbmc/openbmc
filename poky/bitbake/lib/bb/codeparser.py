@@ -184,12 +184,12 @@ class CodeParserCache(MultiProcessCache):
         self.shellcachelines[h] = cacheline
         return cacheline
 
-    def init_cache(self, d):
+    def init_cache(self, cachedir):
         # Check if we already have the caches
         if self.pythoncache:
             return
 
-        MultiProcessCache.init_cache(self, d)
+        MultiProcessCache.init_cache(self, cachedir)
 
         # cachedata gets re-assigned in the parent
         self.pythoncache = self.cachedata[0]
@@ -201,8 +201,8 @@ class CodeParserCache(MultiProcessCache):
 
 codeparsercache = CodeParserCache()
 
-def parser_cache_init(d):
-    codeparsercache.init_cache(d)
+def parser_cache_init(cachedir):
+    codeparsercache.init_cache(cachedir)
 
 def parser_cache_save():
     codeparsercache.save_extras()

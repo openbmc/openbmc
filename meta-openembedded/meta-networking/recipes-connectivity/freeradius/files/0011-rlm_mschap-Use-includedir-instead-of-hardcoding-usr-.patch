@@ -1,0 +1,31 @@
+From f0e764826e3a85488047f7f4e94ebf91460d2c12 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Jun 2017 20:10:49 -0700
+Subject: [PATCH] rlm_mschap: Use includedir instead of hardcoding /usr/include
+
+OE QA flags it correctly as a voilation of cross compilation
+namespace
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/modules/rlm_mschap/configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/modules/rlm_mschap/configure.ac b/src/modules/rlm_mschap/configure.ac
+index 0fd105d7e6..6ab15509e5 100644
+--- a/src/modules/rlm_mschap/configure.ac
++++ b/src/modules/rlm_mschap/configure.ac
+@@ -75,7 +75,7 @@ if test x$with_[]modname != xno; then
+         mod_ldflags="-F /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -framework DirectoryService"
+     fi
+ 
+-    smart_try_dir="$winbind_include_dir /usr/include/samba-4.0"
++    smart_try_dir="$winbind_include_dir =/usr/include/samba-4.0"
+     FR_SMART_CHECK_INCLUDE(wbclient.h, [#include <stdint.h>
+ 					#include <stdbool.h>])
+     if test "x$ac_cv_header_wbclient_h" != "xyes"; then
+-- 
+2.25.1
+

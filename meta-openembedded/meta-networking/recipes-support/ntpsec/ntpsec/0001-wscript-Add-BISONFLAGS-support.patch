@@ -1,0 +1,29 @@
+From 792cb4f9d13450251c6344eed2b35f382c98df0d Mon Sep 17 00:00:00 2001
+From: Alex Kiernan <alexk@zuma.ai>
+Date: Thu, 19 Jan 2023 13:00:45 +0000
+Subject: [PATCH] wscript: Add BISONFLAGS support
+
+---
+ wscript | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/wscript b/wscript
+index 7329d6e46889..de51f1e9cdd9 100644
+--- a/wscript
++++ b/wscript
+@@ -140,6 +140,7 @@ def configure(ctx):
+     # Ensure m4 is present, or bison will fail with SIGPIPE
+     ctx.find_program('m4')
+     ctx.load('bison')
++    ctx.add_os_flags('BISONFLAGS')
+ 
+     for opt in opt_map:
+         ctx.env[opt] = opt_map[opt]
+@@ -911,6 +912,7 @@ int main(int argc, char **argv) {
+     msg_setting("CFLAGS", " ".join(ctx.env.CFLAGS))
+     msg_setting("LDFLAGS", " ".join(ctx.env.LDFLAGS))
+     msg_setting("LINKFLAGS_NTPD", " ".join(ctx.env.LINKFLAGS_NTPD))
++    msg_setting("BISONFLAGS", ctx.env.BISONFLAGS)
+     msg_setting("PREFIX", ctx.env.PREFIX)
+     msg_setting("LIBDIR", ctx.env.LIBDIR)
+     msg_setting("Droproot Support", droproot_type)

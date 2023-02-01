@@ -1,0 +1,31 @@
+From bf9795ffbda7bb241b708ff261976016efb943b1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 25 Jan 2023 23:12:19 -0800
+Subject: [PATCH] configure.ac: Remove native include path
+
+On OE com_err.h is found in /usr/include too, therefore adding new path
+to include search path is not needed. Moreover it fixed QA checks where
+it warns about using build system paths.
+
+Upstream-Status: Inappropriate [Cross-compile specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index eaac16f..d23d0b0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -134,7 +134,6 @@ fi
+ # Fedora, RHEL, Centos has com_err.h in /usr/include/et
+ AC_CHECK_HEADERS([et/com_err.h])
+ if test "$ac_cv_header_et_com_err_h" = "yes"; then
+-   CPPFLAGS="-I/usr/include/et $CPPFLAGS"
+    AC_DEFINE(HAVE_COM_ERR_H, 1)
+ fi
+ 
+-- 
+2.39.1
+

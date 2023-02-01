@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 SRC_URI = "http://poppler.freedesktop.org/${BP}.tar.xz \
            file://0001-Do-not-overwrite-all-our-build-flags.patch \
            file://basename-include.patch \
+           file://0001-cmake-Do-not-use-isystem.patch \
            "
 SRC_URI[sha256sum] = "fae9b88d3d5033117d38477b79220cfd0d8e252c278ec870ab1832501741fd94"
 

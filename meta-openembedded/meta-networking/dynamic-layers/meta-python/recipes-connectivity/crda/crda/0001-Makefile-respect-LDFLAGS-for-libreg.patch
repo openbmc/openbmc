@@ -7,20 +7,24 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 Signed-off-by: Stefan Müller-Klieser <s.mueller-klieser@phytec.de>
+
+Rebase for crda 4.15.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index 2879896..1650db8 100644
+index 528a14e..31f1b5e 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -116,7 +116,7 @@ keys-%.c: utils/key2pub.py $(wildcard $(PUBKEY_DIR)/*.pem)
  
- $(LIBREG): regdb.h reglib.h reglib.c
+ $(LIBREG): reglib.c regdb.h reglib.h
  	$(NQ) '  CC  ' $@
--	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -shared -Wl,-soname,$(LIBREG) $^ $(LIBREGLDLIBS)
-+	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -shared -Wl,-soname,$(LIBREG) $^ $(LDFLAGS) $(LIBREGLDLIBS)
+-	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -shared -Wl,-soname,$(LIBREG) $< $(LIBREGLDLIBS)
++	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -shared -Wl,-soname,$(LIBREG) $< $(LDFLAGS) $(LIBREGLDLIBS)
  
  install-libreg-headers:
  	$(NQ) '  INSTALL  libreg-headers'

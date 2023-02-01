@@ -3,7 +3,7 @@ From: Steffen Nurpmeso <steffen@sdaoden.eu>
 Date: Thu, 9 Jun 2022 18:06:04 +0800
 Subject: [PATCH] su_INLINE: gcc: only GNU specifics after -Og
 
-Upstream-Status: Backport[https://git.sdaoden.eu/browse/s-nail.git/commit/?id=c5544b66c3b4b2e161166562349908a07e324b38]
+Upstream-Status: Backport [https://git.sdaoden.eu/browse/s-nail.git/commit/?id=c5544b66c3b4b2e161166562349908a07e324b38]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---

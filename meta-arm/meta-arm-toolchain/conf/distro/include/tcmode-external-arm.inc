@@ -74,7 +74,6 @@ python toolchain_metadata_setup () {
 
     d = e.data
     l = d.createCopy()
-    oe_import(l)
 
     external_toolchain = l.getVar('EXTERNAL_TOOLCHAIN', True)
     if not external_toolchain or external_toolchain == 'UNDEFINED':

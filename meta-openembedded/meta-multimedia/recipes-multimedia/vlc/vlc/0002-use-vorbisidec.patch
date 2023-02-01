@@ -1,6 +1,6 @@
 * tremor provides libvorbisidec, use it instead of libvorbisdec
 
-Upstream-status: Pending
+Upstream-Status: Pending
 
 Signed-off-by: Tim Orling <TicoTimo@gmail.com>
 

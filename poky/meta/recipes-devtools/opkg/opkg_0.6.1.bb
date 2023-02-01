@@ -16,6 +16,7 @@ SRC_URI = "http://downloads.yoctoproject.org/releases/${BPN}/${BPN}-${PV}.tar.gz
            file://opkg.conf \
            file://0001-opkg_conf-create-opkg.lock-in-run-instead-of-var-run.patch \
            file://0002-opkg-key-remove-no-options-flag-from-gpg-calls.patch \
+           file://0001-Define-alignof-using-_Alignof-when-using-C11-or-newe.patch \
            file://run-ptest \
 "
 

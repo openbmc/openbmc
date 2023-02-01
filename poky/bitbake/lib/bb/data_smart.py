@@ -515,18 +515,18 @@ class DataSmart(MutableMapping):
         dest = self.dict
         while dest:
             if var in dest:
-                return dest[var], self.overridedata.get(var, None)
+                return dest[var]
 
             if "_data" not in dest:
                 break
             dest = dest["_data"]
-        return None, self.overridedata.get(var, None)
+        return None
 
     def _makeShadowCopy(self, var):
         if var in self.dict:
             return
 
-        local_var, _ = self._findVar(var)
+        local_var = self._findVar(var)
 
         if local_var:
             self.dict[var] = copy.copy(local_var)
@@ -782,10 +782,12 @@ class DataSmart(MutableMapping):
         if expand and cachename in self.expand_cache:
             return self.expand_cache[cachename].value
 
-        local_var, overridedata = self._findVar(var)
+        local_var = self._findVar(var)
         value = None
         removes = set()
-        if flag == "_content" and overridedata is not None and not parsing:
+        if flag == "_content" and not parsing:
+            overridedata = self.overridedata.get(var, None)
+        if flag == "_content" and not parsing and overridedata is not None:
             match = False
             active = {}
             self.need_overrides()
@@ -900,7 +902,7 @@ class DataSmart(MutableMapping):
     def delVarFlag(self, var, flag, **loginfo):
         self.expand_cache = {}
 
-        local_var, _ = self._findVar(var)
+        local_var = self._findVar(var)
         if not local_var:
             return
         if not var in self.dict:
@@ -943,7 +945,7 @@ class DataSmart(MutableMapping):
             self.dict[var][i] = flags[i]
 
     def getVarFlags(self, var, expand = False, internalflags=False):
-        local_var, _ = self._findVar(var)
+        local_var = self._findVar(var)
         flags = {}
 
         if local_var:

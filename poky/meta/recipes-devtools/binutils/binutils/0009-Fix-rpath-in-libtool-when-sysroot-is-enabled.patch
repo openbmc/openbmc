@@ -1,4 +1,4 @@
-From 98410efc334e31ccfbdc0080fb293b0e06885454 Mon Sep 17 00:00:00 2001
+From d6f4f62fda4fde10b805b06d5e61792ee821449c Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:42:38 +0000
 Subject: [PATCH] Fix rpath in libtool when sysroot is enabled

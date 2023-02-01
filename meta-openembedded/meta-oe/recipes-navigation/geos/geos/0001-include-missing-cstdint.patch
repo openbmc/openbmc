@@ -1,0 +1,82 @@
+From 11b9ef265a942cb3fdd373520d0c3fce67d3cdf9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 26 Jan 2023 18:05:33 -0800
+Subject: [PATCH] include missing <cstdint>
+
+gcc 13 moved some includes around and as a result <cstdint> is no longer transitively included [1]. Explicitly include it for uint{32,64}_t.
+
+[1] https://gcc.gnu.org/gcc-13/porting_to.html#header-dep-changes
+
+Upstream-Status: Backport [https://github.com/kraj/geos/commit/0e8d4368b]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/geos/geomgraph/TopologyLocation.h   | 1 +
+ include/geos/io/WKTWriter.h                 | 1 +
+ include/geos/shape/fractal/HilbertCode.h    | 1 +
+ include/geos/shape/fractal/HilbertEncoder.h | 1 +
+ include/geos/shape/fractal/MortonCode.h     | 1 +
+ 5 files changed, 5 insertions(+)
+
+diff --git a/include/geos/geomgraph/TopologyLocation.h b/include/geos/geomgraph/TopologyLocation.h
+index 4cbbacb3..a3ecd212 100644
+--- a/include/geos/geomgraph/TopologyLocation.h
++++ b/include/geos/geomgraph/TopologyLocation.h
+@@ -25,6 +25,7 @@
+ #include <geos/inline.h>
+ #include <geos/geom/Location.h>
+ 
++#include <cstdint>
+ #include <vector>
+ #include <array>
+ #include <string>
+diff --git a/include/geos/io/WKTWriter.h b/include/geos/io/WKTWriter.h
+index c0af8e71..0d60e975 100644
+--- a/include/geos/io/WKTWriter.h
++++ b/include/geos/io/WKTWriter.h
+@@ -25,6 +25,7 @@
+ 
+ #include <string>
+ #include <cctype>
++#include <cstdint>
+ 
+ #ifdef _MSC_VER
+ #pragma warning(push)
+diff --git a/include/geos/shape/fractal/HilbertCode.h b/include/geos/shape/fractal/HilbertCode.h
+index 46012efc..beeb28c6 100644
+--- a/include/geos/shape/fractal/HilbertCode.h
++++ b/include/geos/shape/fractal/HilbertCode.h
+@@ -17,6 +17,7 @@
+ 
+ #include <geos/export.h>
+ #include <string>
++#include <cstdint>
+ 
+ // Forward declarations
+ namespace geos {
+diff --git a/include/geos/shape/fractal/HilbertEncoder.h b/include/geos/shape/fractal/HilbertEncoder.h
+index 61c0010d..0126d3d9 100644
+--- a/include/geos/shape/fractal/HilbertEncoder.h
++++ b/include/geos/shape/fractal/HilbertEncoder.h
+@@ -16,6 +16,7 @@
+ #pragma once
+ 
+ #include <geos/export.h>
++#include <cstdint>
+ #include <string>
+ #include <vector>
+ 
+diff --git a/include/geos/shape/fractal/MortonCode.h b/include/geos/shape/fractal/MortonCode.h
+index 6743f87c..ad4a42e7 100644
+--- a/include/geos/shape/fractal/MortonCode.h
++++ b/include/geos/shape/fractal/MortonCode.h
+@@ -17,6 +17,7 @@
+ 
+ #include <geos/export.h>
+ #include <string>
++#include <cstdint>
+ 
+ // Forward declarations
+ namespace geos {
+-- 
+2.39.1
+

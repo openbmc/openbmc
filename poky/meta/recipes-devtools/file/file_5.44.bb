@@ -32,6 +32,7 @@ EXTRA_OEMAKE:append:class-target = " -e FILE_COMPILE=${STAGING_BINDIR_NATIVE}/fi
 EXTRA_OEMAKE:append:class-nativesdk = " -e FILE_COMPILE=${STAGING_BINDIR_NATIVE}/file-native/file"
 
 FILES:${PN} += "${datadir}/misc/*.mgc"
+FILES:${PN}:append:class-nativesdk = " ${SDKPATHNATIVE}/environment-setup.d/file.sh"
 
 do_compile:append:class-native() {
 	oe_runmake check
@@ -43,8 +44,10 @@ do_install:append:class-native() {
 }
 
 do_install:append:class-nativesdk() {
-	create_cmdline_wrapper ${D}/${bindir}/file \
-		--magic-file ${datadir}/misc/magic.mgc
+	mkdir -p ${D}${SDKPATHNATIVE}/environment-setup.d
+	cat <<- EOF > ${D}${SDKPATHNATIVE}/environment-setup.d/file.sh
+		export MAGIC="$OECORE_NATIVE_SYSROOT${datadir}/misc/magic.mgc"
+	EOF
 }
 
 BBCLASSEXTEND = "native nativesdk"

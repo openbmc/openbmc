@@ -5,7 +5,7 @@ Subject: [PATCH 1/2] etc/openct.udev.in: disablePROGRAM
 
 Bug fix: https://bugzilla.redhat.com/show_bug.cgi?id=287871
 
-Upstream-status: Pending
+Upstream-Status: Pending
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 ---

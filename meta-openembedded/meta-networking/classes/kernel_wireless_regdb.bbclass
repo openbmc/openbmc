@@ -17,4 +17,4 @@ do_kernel_add_regdb() {
     cp ${STAGING_LIBDIR_NATIVE}/crda/db.txt ${S}/net/wireless/db.txt
 }
 do_kernel_add_regdb[dirs] = "${S}"
-addtask kernel_add_regdb before do_build after do_configure
+addtask kernel_add_regdb before do_compile after do_configure

@@ -14,11 +14,8 @@ S = "${WORKDIR}/git"
 inherit meson pkgconfig systemd
 
 def get_service(d):
-    service_list = "xyz.openbmc_project.State.Boot.PostCode.service xyz.openbmc_project.State.Boot.PostCode@.service "
-    if(d.getVar('OBMC_HOST_INSTANCES') == '0'):
-      return service_list
-    else:
-      return service_list+" ".join(["xyz.openbmc_project.State.Boot.PostCode@{}.service".format(x) for x in d.getVar('OBMC_HOST_INSTANCES').split()])
+    return " ".join(["xyz.openbmc_project.State.Boot.PostCode@{}.service".format(x) for x in d.getVar('OBMC_HOST_INSTANCES').split()])
+
 SYSTEMD_SERVICE:${PN} = "${@get_service(d)}"
 DEPENDS += " \
     sdbusplus \
@@ -26,3 +23,5 @@ DEPENDS += " \
     phosphor-logging \
     libcereal \
     "
+FILES:${PN}  += "${systemd_system_unitdir}/xyz.openbmc_project.State.Boot.PostCode@.service"
+FILES:${PN}  += "${systemd_system_unitdir}/xyz.openbmc_project.State.Boot.PostCode.service"

@@ -11,7 +11,7 @@ just ask for python3 executable.
 
 | meson.build:9:0: ERROR: <ExternalProgram 'python3' -> ['<...>/recipe-sysroot-native/usr/bin/python3-native/python3']> is not a valid python or it is missing setuptools
 
-Upstream-Status:  Inappropriate [OE specific]
+Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
 

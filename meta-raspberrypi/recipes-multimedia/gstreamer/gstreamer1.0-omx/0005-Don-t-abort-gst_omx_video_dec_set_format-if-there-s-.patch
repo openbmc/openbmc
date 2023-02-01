@@ -11,7 +11,7 @@ Date: Fri, 4 Dec 2015 18:39:59 +0100
 Subject: [PATCH] Don't abort gst_omx_video_dec_set_format() if there's a
 timeout releasing the buffers taken by the egl_render out port
 
-Upstream-status: Pending
+Upstream-Status: Pending
 Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
 ---
  omx/gstomxvideodec.c | 2 ++

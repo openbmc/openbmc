@@ -1,0 +1,42 @@
+From 4788ce6ec602f6441970e1095572c4ff0e90c7c5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 17 Jan 2023 22:33:52 -0800
+Subject: [PATCH] Use unsigned int type for 1-bit integer bitfield
+
+In C++, signed integers are represented in two's complement. This also applies to signed bitfields.
+A signed bitfield composed of one bit can therefore store a value in the range -1 to 0.
+Assigning a value of 1 to such a bitfield should produce a warning since it is out of range of representable values.
+Therefore fix this case by using unsigned int instead of signed int
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ usl/usl_signal.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/usl/usl_signal.c b/usl/usl_signal.c
+index 45ddd94..8c1d4d0 100644
+--- a/usl/usl_signal.c
++++ b/usl/usl_signal.c
+@@ -39,12 +39,12 @@ struct usl_notifier {
+ };
+ 
+ typedef struct {
+-	volatile int	sighup:1;
+-	volatile int	sigterm:1;
+-	volatile int	sigchld:1;
+-	volatile int	sigusr1:1;
+-	volatile int	sigusr2:1;
+-	volatile int	running:1;
++	volatile unsigned int	sighup:1;
++	volatile unsigned int	sigterm:1;
++	volatile unsigned int	sigchld:1;
++	volatile unsigned int	sigusr1:1;
++	volatile unsigned int	sigusr2:1;
++	volatile unsigned int	running:1;
+ 	sig_atomic_t	waiting;
+ 	sigjmp_buf 	sigjmp;
+ } usl_signal_data_t;
+-- 
+2.39.1
+

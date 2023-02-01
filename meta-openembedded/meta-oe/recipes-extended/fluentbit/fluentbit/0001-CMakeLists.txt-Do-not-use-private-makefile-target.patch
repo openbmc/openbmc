@@ -8,8 +8,7 @@ are not under control or to be used at the CMakeLists level. In 3.20
 that private generation changed pre-requisite targets[1] and now logs
 contain the path compiler_depend.ts instead of the actual file.
 
-Upstream status: Pending [1]
-[1] https://github.com/fluent/fluent-bit/issues/5492
+Upstream-Status: Pending [https://github.com/fluent/fluent-bit/issues/5492]
 ---
  CMakeLists.txt              | 6 +-----
  lib/chunkio/CMakeLists.txt  | 7 +------

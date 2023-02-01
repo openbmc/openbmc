@@ -9,7 +9,7 @@ of warning-errors.
 | make[1]: Leaving directory `/srv/home/nitin/builds2/build0/tmp/work/i586-poky-linux/telepathy-python-0.15.19-r4/telepathy-python-0.15.19/src'
 | make: *** [all-recursive] Error 1
 
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
 2012/07/10
 Index: telepathy-python-0.15.19/src/Makefile.am
 ===================================================================

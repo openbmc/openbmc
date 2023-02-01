@@ -1,0 +1,55 @@
+From 48906e1038e469b429aa35d0f967730a929c3880 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 15 Jan 2023 00:16:25 -0800
+Subject: [PATCH 8/8] Define alignof using _Alignof when using C11 or newer
+
+WG14 N2350 made very clear that it is an UB having type definitions
+within "offsetof" [1]. This patch enhances the implementation of macro
+alignof_slot to use builtin "_Alignof" to avoid undefined behavior on
+when using std=c11 or newer
+
+clang 16+ has started to flag this [2]
+
+Fixes build when using -std >= gnu11 and using clang16+
+
+Older compilers gcc < 4.9 or clang < 8 has buggy _Alignof even though it
+may support C11, exclude those compilers too
+
+gnulib needs this fix and then it will be applied to downstream packages
+like gdb [3]
+
+[1] https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2350.htm
+[2] https://reviews.llvm.org/D133574
+[3] https://public-inbox.org/bug-gnulib/20230114232744.215167-1-raj.khem@gmail.com/T/#u
+
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/gnulib.git/commit/?id=2d404c7dd974cc65f894526f4a1b76bc1dcd8d82]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libiberty/sha1.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/libiberty/sha1.c b/libiberty/sha1.c
+index 504f06d3b9b..790ada82443 100644
+--- a/libiberty/sha1.c
++++ b/libiberty/sha1.c
+@@ -229,7 +229,17 @@ sha1_process_bytes (const void *buffer, size_t len, struct sha1_ctx *ctx)
+   if (len >= 64)
+     {
+ #if !_STRING_ARCH_unaligned
++/* GCC releases before GCC 4.9 had a bug in _Alignof.  See GCC bug 52023
++   <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52023>.
++   clang versions < 8.0.0 have the same bug.  */
++#if (!defined __STDC_VERSION__ || __STDC_VERSION__ < 201112 \
++     || (defined __GNUC__ && __GNUC__ < 4 + (__GNUC_MINOR__ < 9) \
++	&& !defined __clang__) \
++     || (defined __clang__ && __clang_major__ < 8))
+ # define alignof(type) offsetof (struct { char c; type x; }, x)
++#else
++# define alignof(type) _Alignof(type)
++#endif
+ # define UNALIGNED_P(p) (((size_t) p) % alignof (sha1_uint32) != 0)
+       if (UNALIGNED_P (buffer))
+ 	while (len > 64)
+-- 
+2.39.0
+

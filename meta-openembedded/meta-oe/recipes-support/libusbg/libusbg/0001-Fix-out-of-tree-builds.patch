@@ -7,7 +7,7 @@ The include flag should point to the source directory, not the build
 directory.
 
 Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
-Upstream-status: Submitted [https://github.com/libusbg/libusbg/pull/9]
+Upstream-Status: Submitted [https://github.com/libusbg/libusbg/pull/9]
 ---
  examples/Makefile.am | 2 +-
  src/Makefile.am      | 2 +-

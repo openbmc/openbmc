@@ -27,6 +27,11 @@
     <field type="CharField" name="giturl">git://git.openembedded.org/bitbake</field>
     <field type="CharField" name="branch">2.2</field>
   </object>
+  <object model="orm.bitbakeversion" pk="5">
+    <field type="CharField" name="name">dunfell</field>
+    <field type="CharField" name="giturl">git://git.openembedded.org/bitbake</field>
+    <field type="CharField" name="branch">1.46</field>
+  </object>
 
   <!-- Releases available -->
   <object model="orm.release" pk="1">
@@ -57,6 +62,13 @@
     <field type="CharField" name="branch_name">langdale</field>
     <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"https://cgit.openembedded.org/openembedded-core/log/?h=langdale\"&gt;OpenEmbedded Langdale&lt;/a&gt; branch.</field>
   </object>
+  <object model="orm.release" pk="5">
+    <field type="CharField" name="name">dunfell</field>
+    <field type="CharField" name="description">Openembedded Dunfell</field>
+    <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">5</field>
+    <field type="CharField" name="branch_name">dunfell</field>
+    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"https://cgit.openembedded.org/openembedded-core/log/?h=dunfell\"&gt;OpenEmbedded Dunfell&lt;/a&gt; branch.</field>
+  </object>
 
   <!-- Default layers for each release -->
   <object model="orm.releasedefaultlayer" pk="1">
@@ -73,6 +85,10 @@
   </object>
   <object model="orm.releasedefaultlayer" pk="4">
     <field rel="ManyToOneRel" to="orm.release" name="release">4</field>
+    <field type="CharField" name="layer_name">openembedded-core</field>
+  </object>
+  <object model="orm.releasedefaultlayer" pk="5">
+    <field rel="ManyToOneRel" to="orm.release" name="release">5</field>
     <field type="CharField" name="layer_name">openembedded-core</field>
   </object>
 

@@ -7,7 +7,7 @@ SRC_URI[sha256sum] = "8b67587c8f98cbbadfdd804539ed5455b6ed03802203485dd2f53c1422
 
 inherit pypi python_setuptools_build_meta
 
-PEP517_PICOBUILD_OPTS = "--loose-depends"
+PEP517_BUILD_OPTS = "--skip-dependency-check"
 
 DEPENDS += "python3-setuptools-scm-native"
 

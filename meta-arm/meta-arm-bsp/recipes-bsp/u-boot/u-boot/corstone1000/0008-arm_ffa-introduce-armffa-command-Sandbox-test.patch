@@ -1,0 +1,104 @@
+From 5507189fe37f1243d685c59ea52fa5643d3cc50c Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Tue, 29 Nov 2022 14:48:34 +0000
+Subject: [PATCH 08/25] arm_ffa: introduce armffa command Sandbox test
+
+Add Sandbox test for the armffa command
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Cc: Tom Rini <trini@konsulko.com>
+Cc: Simon Glass <sjg@chromium.org>
+Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Cc: Jens Wiklander <jens.wiklander@linaro.org>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20221122131751.22747-1-abdellatif.elkhlifi@arm.com/]
+
+Changelog:
+===============
+
+v4: drop use of helper APIs
+
+v1: introduce armffa command sandbox test
+---
+ MAINTAINERS       |  1 +
+ test/cmd/Makefile |  2 ++
+ test/cmd/armffa.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 42 insertions(+)
+ create mode 100644 test/cmd/armffa.c
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e682db8d8f..72f01769c9 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -256,6 +256,7 @@ F:	doc/arch/arm64.ffa.rst
+ F:	drivers/firmware/arm-ffa/
+ F:	include/arm_ffa.h
+ F:	include/sandbox_arm_ffa.h
++F:	test/cmd/armffa.c
+ F:	test/dm/ffa.c
+ 
+ ARM FREESCALE IMX
+diff --git a/test/cmd/Makefile b/test/cmd/Makefile
+index c331757425..19e9d0a995 100644
+--- a/test/cmd/Makefile
++++ b/test/cmd/Makefile
+@@ -1,6 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0+
+ #
+ # Copyright (c) 2013 Google, Inc
++# (C) Copyright 2022 ARM Limited
+ 
+ ifdef CONFIG_HUSH_PARSER
+ obj-$(CONFIG_CONSOLE_RECORD) += test_echo.o
+@@ -13,3 +14,4 @@ obj-$(CONFIG_CMD_MEM_SEARCH) += mem_search.o
+ obj-$(CONFIG_CMD_PINMUX) += pinmux.o
+ obj-$(CONFIG_CMD_PWM) += pwm.o
+ obj-$(CONFIG_CMD_SETEXPR) += setexpr.o
++obj-$(CONFIG_SANDBOX_FFA) += armffa.o
+diff --git a/test/cmd/armffa.c b/test/cmd/armffa.c
+new file mode 100644
+index 0000000000..e04363ba63
+--- /dev/null
++++ b/test/cmd/armffa.c
+@@ -0,0 +1,39 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Test for armffa command
++ *
++ * (C) Copyright 2022 ARM Limited
++ * Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
++ */
++
++#include <common.h>
++#include <dm/test.h>
++#include <sandbox_arm_ffa.h>
++#include <string.h>
++#include <test/test.h>
++#include <test/ut.h>
++
++#define PING_CMD_SIZE 19
++
++/* Basic test of 'armffa' command */
++static int dm_test_armffa_cmd(struct unit_test_state *uts)
++{
++	char ping_cmd[PING_CMD_SIZE] = {0};
++
++	ut_assertok(ffa_bus_discover(NULL));
++
++	/* armffa getpart <UUID> */
++	ut_assertok(run_command("armffa getpart " SANDBOX_SERVICE1_UUID, 0));
++
++	snprintf(ping_cmd, PING_CMD_SIZE, "armffa ping 0x%x", SANDBOX_SP1_ID);
++
++	/* armffa ping <ID> */
++	ut_assertok(run_command(ping_cmd, 0));
++
++	/* armffa devlist */
++	ut_assertok(run_command("armffa devlist", 0));
++
++	return CMD_RET_SUCCESS;
++}
++
++DM_TEST(dm_test_armffa_cmd, UT_TESTF_SCAN_FDT | UT_TESTF_CONSOLE_REC);
+-- 
+2.17.1
+

@@ -3,7 +3,7 @@ From: Koen Kooi <koen@dominion.thruhere.net>
 Date: Wed, 6 Aug 2014 14:53:03 +0200
 Subject: [PATCH] configure: use pkg-config for freetype
 
-Upstream-status: Pending
+Upstream-Status: Pending
 Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
 ---
  configure.ac | 37 ++++++++-----------------------------

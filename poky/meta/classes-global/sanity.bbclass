@@ -494,7 +494,7 @@ def check_gcc_version(sanity_data):
 
 # Tar version 1.24 and onwards handle overwriting symlinks correctly
 # but earlier versions do not; this needs to work properly for sstate
-# Version 1.28 is needed so opkg-build works correctly when reproducibile builds are enabled
+# Version 1.28 is needed so opkg-build works correctly when reproducible builds are enabled
 def check_tar_version(sanity_data):
     import subprocess
     try:
@@ -622,10 +622,10 @@ def check_sanity_sstate_dir_change(sstate_dir, data):
 def check_sanity_version_change(status, d):
     # Sanity checks to be done when SANITY_VERSION or NATIVELSBSTRING changes
     # In other words, these tests run once in a given build directory and then 
-    # never again until the sanity version or host distrubution id/version changes.
+    # never again until the sanity version or host distribution id/version changes.
 
     # Check the python install is complete. Examples that are often removed in
-    # minimal installations: glib-2.0-natives requries # xml.parsers.expat
+    # minimal installations: glib-2.0-natives requires xml.parsers.expat
     try:
         import xml.parsers.expat
     except ImportError as e:
@@ -682,7 +682,7 @@ def check_sanity_version_change(status, d):
         if i and workdir.startswith(i):
             status.addresult("You are building in a path included in PSEUDO_IGNORE_PATHS " + str(i) + " please locate the build outside this path.\n")
 
-    # Check if PSEUDO_IGNORE_PATHS and and paths under pseudo control overlap
+    # Check if PSEUDO_IGNORE_PATHS and paths under pseudo control overlap
     pseudoignorepaths = d.getVar('PSEUDO_IGNORE_PATHS', expand=True).split(",")
     pseudo_control_dir = "${D},${PKGD},${PKGDEST},${IMAGEROOTFS},${SDK_OUTPUT}"
     pseudocontroldir = d.expand(pseudo_control_dir).split(",")

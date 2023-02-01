@@ -1,0 +1,52 @@
+From 4fd2615b87b3cac0fd5bdc5fc82db05f6fcfdecf Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Tue, 17 Jan 2023 12:16:04 -0500
+Subject: [PATCH] fix: jbd2 upper bound for v5.10.163
+
+Use the correct upper bound of 5,11,0.
+
+Change-Id: I435b44b940c7346ed8c3ef0d445365ed156702d0
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+
+Upstream-Status: Backport
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+
+---
+ include/instrumentation/events/jbd2.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/include/instrumentation/events/jbd2.h b/include/instrumentation/events/jbd2.h
+index f7993511..9b77ab92 100644
+--- a/include/instrumentation/events/jbd2.h
++++ b/include/instrumentation/events/jbd2.h
+@@ -28,7 +28,7 @@ LTTNG_TRACEPOINT_EVENT(jbd2_checkpoint,
+ )
+ 
+ #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,2,0) \
+-	|| LTTNG_KERNEL_RANGE(5,10,163, 6,0,0) \
++	|| LTTNG_KERNEL_RANGE(5,10,163, 5,11,0) \
+ 	|| LTTNG_KERNEL_RANGE(5,15,87, 5,16,0) \
+ 	|| LTTNG_KERNEL_RANGE(6,0,18, 6,1,0) \
+ 	|| LTTNG_KERNEL_RANGE(6,1,4, 6,2,0))
+@@ -97,7 +97,7 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(jbd2_commit, jbd2_drop_transaction,
+ #endif
+ 
+ #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,2,0) \
+-	|| LTTNG_KERNEL_RANGE(5,10,163, 6,0,0) \
++	|| LTTNG_KERNEL_RANGE(5,10,163, 5,11,0) \
+ 	|| LTTNG_KERNEL_RANGE(5,15,87, 5,16,0) \
+ 	|| LTTNG_KERNEL_RANGE(6,0,18, 6,1,0) \
+ 	|| LTTNG_KERNEL_RANGE(6,1,4, 6,2,0))
+@@ -140,7 +140,7 @@ LTTNG_TRACEPOINT_EVENT(jbd2_submit_inode_data,
+ )
+ 
+ #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,2,0) \
+-	|| LTTNG_KERNEL_RANGE(5,10,163, 6,0,0) \
++	|| LTTNG_KERNEL_RANGE(5,10,163, 5,11,0) \
+ 	|| LTTNG_KERNEL_RANGE(5,15,87, 5,16,0) \
+ 	|| LTTNG_KERNEL_RANGE(6,0,18, 6,1,0) \
+ 	|| LTTNG_KERNEL_RANGE(6,1,4, 6,2,0))
+-- 
+2.35.4
+

@@ -6,7 +6,7 @@ Subject: [PATCH] net-snmp: add knob whether nlist.h are checked
 Previously, it still was checked when there was no nlish.h in sysroots directory.
 Add knob to decide whether nlist.h are checked or not.
 
-Upstream-status: Pending
+Upstream-Status: Pending
 
 Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
 

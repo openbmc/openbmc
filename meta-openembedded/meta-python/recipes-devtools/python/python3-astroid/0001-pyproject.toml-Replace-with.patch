@@ -1,0 +1,27 @@
+From 517f361ba4a6ae430acfe3b83986d32b4f811b58 Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Wed, 11 Jan 2023 13:56:24 +0200
+Subject: [PATCH] pyproject.toml: Replace ~= with >=
+
+Replace ~= with >= to avoid errors if the version is not exactly
+the same.
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 537bca9a..a01e0d45 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = ["setuptools~=62.6", "wheel~=0.37.1"]
++requires = ["setuptools>=62.6", "wheel>=0.37.1"]
+ build-backend = "setuptools.build_meta"
+ 
+ [project]
+-- 
+2.30.2
+

@@ -14,6 +14,7 @@ SRC_URI = "https://www.webkitgtk.org/releases/${BPN}-${PV}.tar.xz \
            file://reproducibility.patch \
            file://0001-When-building-introspection-files-do-not-quote-CFLAG.patch \
            file://0d3344e17d258106617b0e6d783d073b188a2548.patch \
+           file://d318bb461f040b90453bc4e100dcf967243ecd98.patch \
            "
 SRC_URI[sha256sum] = "41f001d1ed448c6936b394a9f20e4640eebf83a7f08262df28504f7410604a5a"
 
@@ -24,7 +25,7 @@ REQUIRED_DISTRO_FEATURES = "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', '
 
 CVE_PRODUCT = "webkitgtk webkitgtk\+"
 
-DEPENDS = " \
+DEPENDS += " \
           ruby-native \
           gperf-native \
           cairo \

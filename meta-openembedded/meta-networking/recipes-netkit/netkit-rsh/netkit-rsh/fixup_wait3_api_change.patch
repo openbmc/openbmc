@@ -8,7 +8,7 @@ https://sourceware.org/ml/libc-alpha/2016-02/msg00342.html
 
 Upstream-Status: Inappropriate [ no upstream maintaner ]
 
-Signed-off-by Armin Kuster <akuster@mvista.com>
+Signed-off-by: Armin Kuster <akuster@mvista.com>
 
 Index: netkit-rsh-0.17/rlogin/rlogin.c
 ===================================================================

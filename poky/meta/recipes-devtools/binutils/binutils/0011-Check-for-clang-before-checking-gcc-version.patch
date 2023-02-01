@@ -1,4 +1,4 @@
-From 628c10087e6e11a7bc748437c5b695835b704aaf Mon Sep 17 00:00:00 2001
+From 9d35ab04de550f1db5d2e74d37fdeab4ca436148 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 15 Apr 2020 14:17:20 -0700
 Subject: [PATCH] Check for clang before checking gcc version
@@ -18,10 +18,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/configure b/configure
-index be433ef6d5d..7494fbd2f06 100755
+index 417fc5a970c..bdc3583215f 100755
 --- a/configure
 +++ b/configure
-@@ -5294,7 +5294,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+@@ -5460,7 +5460,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
  /* end confdefs.h.  */
  
@@ -31,10 +31,10 @@ index be433ef6d5d..7494fbd2f06 100755
  #endif
  int main() {}
 diff --git a/configure.ac b/configure.ac
-index 1651cbf3b02..2e2ecc47542 100644
+index 3a1eb0357e5..1c00b9aec42 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1323,7 +1323,7 @@ if test "$GCC" = yes; then
+@@ -1444,7 +1444,7 @@ if test "$GCC" = yes; then
    AC_MSG_CHECKING([whether g++ accepts -static-libstdc++ -static-libgcc])
    AC_LANG_PUSH(C++)
    AC_LINK_IFELSE([AC_LANG_SOURCE([

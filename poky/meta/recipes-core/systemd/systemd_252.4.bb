@@ -50,6 +50,7 @@ SRC_URI_MUSL = "\
                file://0002-Add-sys-stat.h-for-S_IFDIR.patch \
                file://0001-Adjust-for-musl-headers.patch \
                file://0001-test-bus-error-strerror-is-assumed-to-be-GNU-specifi.patch \
+               file://0001-errno-util-Make-STRERROR-portable-for-musl.patch \
                "
 
 PAM_PLUGINS = " \
@@ -129,6 +130,12 @@ PACKAGECONFIG[cgroupv2] = "-Ddefault-hierarchy=unified,-Ddefault-hierarchy=hybri
 PACKAGECONFIG[coredump] = "-Dcoredump=true,-Dcoredump=false"
 PACKAGECONFIG[cryptsetup] = "-Dlibcryptsetup=true,-Dlibcryptsetup=false,cryptsetup,,cryptsetup"
 PACKAGECONFIG[tpm2] = "-Dtpm2=true,-Dtpm2=false,tpm2-tss,tpm2-tss libtss2 libtss2-tcti-device"
+# If multiple compression libraries are enabled, the format to use for compression is chosen implicitly,
+# so if you want to compress with e.g. lz4 you cannot enable zstd, so you cannot read zstd-compressed journal files.
+# This option allows to enable all compression formats for reading, but choosing a specific one for writing.
+PACKAGECONFIG[default-compression-lz4] = "-Dlz4=true -Ddefault-compression=lz4,,lz4"
+PACKAGECONFIG[default-compression-xz] = "-Dxz=true -Ddefault-compression=xz,,xz"
+PACKAGECONFIG[default-compression-zstd] = "-Dzstd=true -Ddefault-compression=zstd,,zstd"
 PACKAGECONFIG[dbus] = "-Ddbus=true,-Ddbus=false,dbus"
 PACKAGECONFIG[efi] = "-Defi=true,-Defi=false"
 PACKAGECONFIG[gnu-efi] = "-Dgnu-efi=true -Defi-libdir=${STAGING_LIBDIR} -Defi-includedir=${STAGING_INCDIR}/efi,-Dgnu-efi=false,gnu-efi"

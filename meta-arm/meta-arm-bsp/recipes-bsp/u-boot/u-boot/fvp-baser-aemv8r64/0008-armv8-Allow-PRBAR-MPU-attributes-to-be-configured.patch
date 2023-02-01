@@ -1,4 +1,4 @@
-From af05764e7b64e0704291ba2e71138f2345737afa Mon Sep 17 00:00:00 2001
+From 01490ab8deb0f0b61eeb55a02ee5ea430cfe7eee Mon Sep 17 00:00:00 2001
 From: Peter Hoyes <Peter.Hoyes@arm.com>
 Date: Wed, 18 May 2022 15:24:19 +0100
 Subject: [PATCH 8/9] armv8: Allow PRBAR MPU attributes to be configured
@@ -75,7 +75,7 @@ index 8de627cafd..dd4c689ea6 100644
  
  extern struct mpu_region *mpu_mem_map;
 diff --git a/board/armltd/vexpress64/vexpress64.c b/board/armltd/vexpress64/vexpress64.c
-index 1791cd986f..7858521fec 100644
+index 2310d18eb7..531fa4d618 100644
 --- a/board/armltd/vexpress64/vexpress64.c
 +++ b/board/armltd/vexpress64/vexpress64.c
 @@ -42,15 +42,18 @@ static struct mpu_region vexpress64_aemv8r_mem_map[] = {

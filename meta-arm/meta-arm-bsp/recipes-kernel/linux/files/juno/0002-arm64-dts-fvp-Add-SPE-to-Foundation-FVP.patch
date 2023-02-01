@@ -1,0 +1,35 @@
+From bd354219987dddbf8ab6fd11450b4046547aca1b Mon Sep 17 00:00:00 2001
+From: James Clark <james.clark@arm.com>
+Date: Thu, 17 Nov 2022 10:25:36 +0000
+Subject: [PATCH] arm64: dts: fvp: Add SPE to Foundation FVP
+
+Add SPE DT node to FVP model. If the model doesn't support SPE (e.g.,
+turned off via parameter), the driver will skip the initialisation
+accordingly and thus is safe.
+
+Signed-off-by: James Clark <james.clark@arm.com>
+Link: https://lore.kernel.org/r/20221117102536.237515-1-james.clark@arm.com
+Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+Upstream-Status: Backport
+---
+ arch/arm64/boot/dts/arm/foundation-v8.dtsi | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/arm/foundation-v8.dtsi b/arch/arm64/boot/dts/arm/foundation-v8.dtsi
+index c8bd23b1a7ba..029578072d8f 100644
+--- a/arch/arm64/boot/dts/arm/foundation-v8.dtsi
++++ b/arch/arm64/boot/dts/arm/foundation-v8.dtsi
+@@ -85,6 +85,11 @@ pmu {
+ 			     <GIC_SPI 63 IRQ_TYPE_LEVEL_HIGH>;
+ 	};
+ 
++	spe-pmu {
++		compatible = "arm,statistical-profiling-extension-v1";
++		interrupts = <GIC_PPI 5 IRQ_TYPE_LEVEL_HIGH>;
++	};
++
+ 	watchdog@2a440000 {
+ 		compatible = "arm,sbsa-gwdt";
+ 		reg = <0x0 0x2a440000 0 0x1000>,

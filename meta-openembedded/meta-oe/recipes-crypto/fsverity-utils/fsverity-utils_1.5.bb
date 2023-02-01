@@ -16,7 +16,7 @@ S = "${WORKDIR}/git"
 
 DEPENDS = "openssl"
 
-EXTRA_OEMAKE:append = "PREFIX=${prefix} LIBDIR=${libdir} USE_SHARED_LIB=1"
+EXTRA_OEMAKE:append = " PREFIX=${prefix} LIBDIR=${libdir} USE_SHARED_LIB=1"
 # We want to statically link the binary to libfsverity on native Windows
 EXTRA_OEMAKE:remove:mingw32:class-nativesdk = "USE_SHARED_LIB=1"
 EXTRA_OEMAKE:remove:mingw32:class-native = "USE_SHARED_LIB=1"

@@ -4,7 +4,7 @@ Date: Thu, 9 Jun 2022 18:26:38 +0800
 Subject: [PATCH] su_INLINE: eh no; give up, share detection with clang but for
  a thing
 
-Upstream-Status: Backport[https://git.sdaoden.eu/browse/s-nail.git/commit/?id=de2a44c393a39d80ddf12154aec94cace84b19c1]
+Upstream-Status: Backport [https://git.sdaoden.eu/browse/s-nail.git/commit/?id=de2a44c393a39d80ddf12154aec94cace84b19c1]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---

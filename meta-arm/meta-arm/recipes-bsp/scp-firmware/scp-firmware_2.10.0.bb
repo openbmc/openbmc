@@ -6,7 +6,9 @@ LICENSE = "BSD-3-Clause & Apache-2.0"
 LIC_FILES_CHKSUM = "file://license.md;beginline=5;md5=9db9e3d2fb8d9300a6c3d15101b19731 \
                     file://contrib/cmsis/git/LICENSE.txt;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
-SRC_URI = "gitsm://github.com/ARM-software/SCP-firmware.git;protocol=https;branch=master"
+SRC_URI_SCP_FIRMWARE ?= "gitsm://github.com/ARM-software/SCP-firmware.git;protocol=https"
+SRC_URI = "${SRC_URI_SCP_FIRMWARE};branch=${SRCBRANCH}"
+SRCBRANCH = "master"
 
 SRCREV  = "673d014f3861ad81cc5ab06d2884a314a610799b"
 
@@ -27,7 +29,7 @@ DEPENDS = "virtual/arm-none-eabi-gcc-native \
 # For now we only build with GCC, so stop meta-clang trying to get involved
 TOOLCHAIN = "gcc"
 
-SCP_BUILD_STR = "${@bb.utils.contains('SCP_BUILD_RELEASE', '1', 'release', 'debug', d)}"
+SCP_BUILD_STR = "${@bb.utils.contains('SCP_BUILD_RELEASE', '1', 'Release', 'Debug', d)}"
 
 inherit deploy
 
@@ -46,6 +48,7 @@ CFLAGS[unexport] = "1"
 EXTRA_OECMAKE = "-D CMAKE_BUILD_TYPE=${SCP_BUILD_STR} \
                  -D SCP_LOG_LEVEL=${SCP_LOG_LEVEL} \
                  -D SCP_PLATFORM_FEATURE_SET=${SCP_PLATFORM_FEATURE_SET} \
+                 -D DISABLE_CPPCHECK=1 \
                 "
 
 do_configure() {

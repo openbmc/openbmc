@@ -1,0 +1,30 @@
+Upstream-Status: Inappropriate  [OE-Specific]
+
+Since commit e0c0ad82 libgloss started passing the -nostdinc to CC.
+
+They dont want to build against C library headers that are already in
+the system to avoid pollution, however, we purposely build libgloss
+against the newly built newlib C library, thats why we keep newlib
+and libgloss in separate recipes and create a dependency between them.
+
+This causes an issue where bitbake stops finding newlib headers while
+libgloss is being built.
+
+Do not pass -nostdinc to CC to maintain current behavior of
+TCLIBC=newlib
+
+
+Signed-off-by: Alejandro Enedino Hernandez Samaniego <alejandro@enedino.org>
+Index: newlib-3.0.0/libgloss/configure
+===================================================================
+--- newlib-3.0.0.orig/libgloss/configure
++++ newlib-3.0.0/libgloss/configure
+@@ -5106,7 +5106,7 @@ fi
+ fi
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: $libc_cv_compiler_isystem" >&5
+ $as_echo "$libc_cv_compiler_isystem" >&6; }
+-CC="$CC -nostdinc $libc_cv_compiler_isystem"
++CC="$CC $libc_cv_compiler_isystem"
+ 
+ host_makefile_frag_path=$host_makefile_frag
+ 

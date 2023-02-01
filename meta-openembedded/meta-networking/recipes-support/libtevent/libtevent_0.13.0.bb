@@ -20,7 +20,7 @@ LIC_FILES_CHKSUM = "file://tevent.h;endline=26;md5=47386b7c539bf2706b7ce52dc9341
 SRC_URI[md5sum] = "9f413f3184f79a4deecd9444242a5dca"
 SRC_URI[sha256sum] = "b9437a917fa55344361beb64ec9e0042e99cae8879882a62dd38f6abe2371d0c"
 
-inherit pkgconfig waf-samba
+inherit pkgconfig ptest waf-samba
 
 PACKAGECONFIG ??= "\
     ${@bb.utils.filter('DISTRO_FEATURES', 'acl', d)} \
@@ -49,11 +49,21 @@ EXTRA_OECONF += "--disable-rpath \
                  --without-gettext \
                 "
 
+do_install:append() {
+    install -Dm 0755 ${B}/bin/test_tevent_trace ${D}${bindir}/test_tevent_trace
+    install -Dm 0755 ${B}/bin/test_tevent_tag ${D}${bindir}/test_tevent_tag
+    install -Dm 0755 ${B}/bin/replace_testsuite ${D}${bindir}/replace_testsuite
+}
+
 PACKAGES += "python3-tevent"
 
 RPROVIDES:${PN}-dbg += "python3-tevent-dbg"
 
 FILES:${PN} += "${libdir}/tevent/*"
+FILES:${PN}-ptest += "${bindir}/replace_testsuite \
+                      ${bindir}/test_tevent_tag \
+                      ${bindir}/test_tevent_trace \
+                      ${libdir}/libcmocka-tevent.so"
 FILES:python3-tevent = "${libdir}/python${PYTHON_BASEVERSION}/site-packages/*"
 
 INSANE_SKIP:${MLPREFIX}python3-tevent = "dev-so"

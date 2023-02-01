@@ -4,16 +4,7 @@ header:
 repos:
   meta-clang:
     url: https://github.com/kraj/meta-clang
-    patches:
-      pixman:
-        repo: meta-arm
-        path: ci/0001-Revert-pixman-Do-not-use-clang-assembler-for-now.patch
 
 local_conf_header:
   clang: |
     TOOLCHAIN = "clang"
-    # Backport d89e06ad94a46f6810d0a8787004b71b8ecaf87d to langdale
-    OBJCOPY:pn-linux-yocto:toolchain-clang = "${HOST_PREFIX}objcopy"
-    # Perf needs fixes backported, use GCC for now
-    # https://lore.kernel.org/linux-perf-users/Y5d4k7fDxfRP7hcN@kernel.org/T/#t
-    TOOLCHAIN:pn-perf = "gcc"

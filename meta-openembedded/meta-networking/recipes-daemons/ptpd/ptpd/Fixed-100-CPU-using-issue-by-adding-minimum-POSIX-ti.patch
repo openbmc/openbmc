@@ -8,8 +8,7 @@ Added minimum POSIX timer interval to prevent from timers firing
 to quickly for the process to handle, resulting in 100% CPU and
 endless signal queue.
 
-Upstream-status: Backport
-[From commit 1f0baae98a7b23e85f2bfd8f5de64795421c270e:
+Upstream-Status: Backport [From commit 1f0baae98a7b23e85f2bfd8f5de64795421c270e:
   - critical: added minimum POSIX timer interval to prevent from
     timers firing to quickly for the process to handle,
     resulting in 100% CPU and endless signal queue]

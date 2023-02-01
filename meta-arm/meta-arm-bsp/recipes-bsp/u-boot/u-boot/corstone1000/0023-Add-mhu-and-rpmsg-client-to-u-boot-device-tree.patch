@@ -1,0 +1,79 @@
+From 55e2bc835be50b23ef04066b950bbe75c0065d19 Mon Sep 17 00:00:00 2001
+From: Emekcan <emekcan.aras@arm.com>
+Date: Mon, 12 Sep 2022 15:47:06 +0100
+Subject: [PATCH 23/25] Add mhu and rpmsg client to u-boot device tree
+
+Adds external system controller and mhu driver to u-boot
+device tree. This enables communication between host and
+the external system.
+
+Signed-off-by: Emekcan Aras <Emekcan.Aras@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ arch/arm/dts/corstone1000.dtsi | 50 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
+
+diff --git a/arch/arm/dts/corstone1000.dtsi b/arch/arm/dts/corstone1000.dtsi
+index 2c7185e139..61e0c33247 100644
+--- a/arch/arm/dts/corstone1000.dtsi
++++ b/arch/arm/dts/corstone1000.dtsi
+@@ -161,6 +161,56 @@
+ 			status = "disabled";
+ 		};
+ 
++		mbox_es0mhu0_tx: mhu@1b000000 {
++			compatible = "arm,mhuv2-tx","arm,primecell";
++			reg = <0x1b000000 0x1000>;
++			clocks = <&refclk100mhz>;
++			clock-names = "apb_pclk";
++			interrupts = <GIC_SPI 11 IRQ_TYPE_LEVEL_HIGH>;
++			#mbox-cells = <2>;
++			arm,mhuv2-protocols = <1 1>;
++			mbox-name = "arm-es0-mhu0_tx";
++		};
++
++		mbox_es0mhu0_rx: mhu@1b010000 {
++			compatible = "arm,mhuv2-rx","arm,primecell";
++			reg = <0x1b010000 0x1000>;
++			clocks = <&refclk100mhz>;
++			clock-names = "apb_pclk";
++			interrupts = <GIC_SPI 12 IRQ_TYPE_LEVEL_HIGH>;
++			#mbox-cells = <2>;
++			arm,mhuv2-protocols = <1 1>;
++			mbox-name = "arm-es0-mhu0_rx";
++		};
++
++		mbox_es0mhu1_tx: mhu@1b020000 {
++			compatible = "arm,mhuv2-tx","arm,primecell";
++			reg = <0x1b020000 0x1000>;
++			clocks = <&refclk100mhz>;
++			clock-names = "apb_pclk";
++			interrupts = <GIC_SPI 46 IRQ_TYPE_LEVEL_HIGH>;
++			#mbox-cells = <2>;
++			arm,mhuv2-protocols = <1 1>;
++			mbox-name = "arm-es0-mhu1_tx";
++		};
++
++		mbox_es0mhu1_rx: mhu@1b030000 {
++			compatible = "arm,mhuv2-rx","arm,primecell";
++			reg = <0x1b030000 0x1000>;
++			clocks = <&refclk100mhz>;
++			clock-names = "apb_pclk";
++			interrupts = <GIC_SPI 47 IRQ_TYPE_LEVEL_HIGH>;
++			#mbox-cells = <2>;
++			arm,mhuv2-protocols = <1 1>;
++			mbox-name = "arm-es0-mhu1_rx";
++		};
++
++		client {
++			compatible = "arm,client";
++			mboxes = <&mbox_es0mhu0_tx 0 0>, <&mbox_es0mhu1_tx 0 0>, <&mbox_es0mhu0_rx 0 0>, <&mbox_es0mhu1_rx 0 0>;
++			mbox-names = "es0mhu0_tx", "es0mhu1_tx", "es0mhu0_rx", "es0mhu1_rx";
++		};
++
+ 		extsys0: extsys@1A010310 {
+ 			compatible = "arm,extsys_ctrl";
+ 			reg = <0x1A010310 0x4>,
+-- 
+2.17.1
+

@@ -19,3 +19,5 @@ EXTRA_OECONF = "\
     --enable-html-docs=no \
     --enable-latex-docs=no \
 "
+
+CXXFLAGS += "-std=c++14"

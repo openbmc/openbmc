@@ -17,8 +17,11 @@ help ()
 clean_cache()
 {
     s=`bitbake -e | grep ^CACHE= | cut -f2 -d\"`
+    # Stop any active memory resident server
+    bitbake -m
+    # Remove cache entries since we want to trigger a full reparse
     if [ "x${s}" != "x" ]; then
-        rm -rf ${s}
+        rm -f ${s}/bb_cache*.dat.*
     fi
 }
 
@@ -62,7 +65,7 @@ do_migrate_localcount ()
         return 1
     fi
 
-    rm -rf $df
+    rm -f $df
     clean_cache
     echo "Exporting LOCALCOUNT to AUTOINCs..."
     bitbake -R conf/migrate_localcount.conf -p

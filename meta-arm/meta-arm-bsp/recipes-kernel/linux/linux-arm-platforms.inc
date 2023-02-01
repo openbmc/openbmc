@@ -97,9 +97,15 @@ SRC_URI:append:fvp-baser-aemv8r64 = " file://fvp-baser-aemv8r64.dts;subdir=git/a
 # Juno KMACHINE
 #
 COMPATIBLE_MACHINE:juno = "juno"
-KBUILD_DEFCONFIG:juno = "defconfig"
-KCONFIG_MODE:juno = "--alldefconfig"
+#KBUILD_DEFCONFIG:juno = "defconfig"
+#KCONFIG_MODE:juno = "--alldefconfig"
 FILESEXTRAPATHS:prepend:juno := "${ARMBSPFILESPATHS}"
+SRC_URI:append:juno = " \
+    file://0001-arm64-dts-Update-cache-properties-for-Arm-Ltd-platfo.patch \
+    file://0002-arm64-dts-fvp-Add-SPE-to-Foundation-FVP.patch \
+    file://0003-arm64-dts-fvp-Add-information-about-L1-and-L2-caches.patch \
+    file://0004-ARM-dts-vexpress-align-LED-node-names-with-dtschema.patch \
+    "
 
 #
 # Musca B1/S2 can't run Linux

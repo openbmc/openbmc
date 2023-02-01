@@ -1,0 +1,35 @@
+From 960d10e89cf60d39998dae6fdcd4f0866b753a79 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 23 Jan 2023 12:31:35 -0800
+Subject: [PATCH] add missing <cstdint> for uint16_t
+
+This fixes build problems with gcc 13 snapshot [1]
+
+Fixes
+| include/apt-pkg/pkgcache.h:257:23: warning: cast from 'char*' to 'const uint16_t*' {aka 'const short unsigned int*'} increases required alignment of target type [-Wcast-align]
+|   257 |       uint16_t len = *reinterpret_cast<const uint16_t*>(name - sizeof(uint16_t));
+|       |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[1] https://www.gnu.org/software/gcc/gcc-13/porting_to.html
+
+Upstream-Status: Submitted [https://salsa.debian.org/apt-team/apt/-/merge_requests/276]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ apt-pkg/contrib/mmap.cc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/apt-pkg/contrib/mmap.cc b/apt-pkg/contrib/mmap.cc
+index 642e20473..0568e1cd0 100644
+--- a/apt-pkg/contrib/mmap.cc
++++ b/apt-pkg/contrib/mmap.cc
+@@ -23,6 +23,7 @@
+ #include <apt-pkg/macros.h>
+ #include <apt-pkg/mmap.h>
+ 
++#include <cstdint>
+ #include <cstring>
+ #include <string>
+ #include <errno.h>
+-- 
+2.39.1
+

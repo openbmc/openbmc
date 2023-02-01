@@ -1,0 +1,146 @@
+From 22e740d069e14875a64864bf86e0826a96560b44 Mon Sep 17 00:00:00 2001
+From: Sudeep Holla <sudeep.holla@arm.com>
+Date: Fri, 18 Nov 2022 15:10:17 +0000
+Subject: [PATCH] arm64: dts: fvp: Add information about L1 and L2 caches
+
+Add the information about L1 and L2 caches on FVP RevC platform.
+Though the cache size is configurable through the model parameters,
+having default values in the device tree helps to exercise and debug
+any code utilising the cache information without the need of real
+hardware.
+
+Link: https://lore.kernel.org/r/20221118151017.704716-1-sudeep.holla@arm.com
+Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+Upstream-Status: Backport
+---
+ arch/arm64/boot/dts/arm/fvp-base-revc.dts | 73 +++++++++++++++++++++++
+ 1 file changed, 73 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/arm/fvp-base-revc.dts b/arch/arm64/boot/dts/arm/fvp-base-revc.dts
+index 5f6f30c801a7..60472d65a355 100644
+--- a/arch/arm64/boot/dts/arm/fvp-base-revc.dts
++++ b/arch/arm64/boot/dts/arm/fvp-base-revc.dts
+@@ -47,48 +47,121 @@ cpu0: cpu@0 {
+ 			compatible = "arm,armv8";
+ 			reg = <0x0 0x000>;
+ 			enable-method = "psci";
++			i-cache-size = <0x8000>;
++			i-cache-line-size = <64>;
++			i-cache-sets = <256>;
++			d-cache-size = <0x8000>;
++			d-cache-line-size = <64>;
++			d-cache-sets = <256>;
++			next-level-cache = <&C0_L2>;
+ 		};
+ 		cpu1: cpu@100 {
+ 			device_type = "cpu";
+ 			compatible = "arm,armv8";
+ 			reg = <0x0 0x100>;
+ 			enable-method = "psci";
++			i-cache-size = <0x8000>;
++			i-cache-line-size = <64>;
++			i-cache-sets = <256>;
++			d-cache-size = <0x8000>;
++			d-cache-line-size = <64>;
++			d-cache-sets = <256>;
++			next-level-cache = <&C0_L2>;
+ 		};
+ 		cpu2: cpu@200 {
+ 			device_type = "cpu";
+ 			compatible = "arm,armv8";
+ 			reg = <0x0 0x200>;
+ 			enable-method = "psci";
++			i-cache-size = <0x8000>;
++			i-cache-line-size = <64>;
++			i-cache-sets = <256>;
++			d-cache-size = <0x8000>;
++			d-cache-line-size = <64>;
++			d-cache-sets = <256>;
++			next-level-cache = <&C0_L2>;
+ 		};
+ 		cpu3: cpu@300 {
+ 			device_type = "cpu";
+ 			compatible = "arm,armv8";
+ 			reg = <0x0 0x300>;
+ 			enable-method = "psci";
++			i-cache-size = <0x8000>;
++			i-cache-line-size = <64>;
++			i-cache-sets = <256>;
++			d-cache-size = <0x8000>;
++			d-cache-line-size = <64>;
++			d-cache-sets = <256>;
++			next-level-cache = <&C0_L2>;
+ 		};
+ 		cpu4: cpu@10000 {
+ 			device_type = "cpu";
+ 			compatible = "arm,armv8";
+ 			reg = <0x0 0x10000>;
+ 			enable-method = "psci";
++			i-cache-size = <0x8000>;
++			i-cache-line-size = <64>;
++			i-cache-sets = <256>;
++			d-cache-size = <0x8000>;
++			d-cache-line-size = <64>;
++			d-cache-sets = <256>;
++			next-level-cache = <&C1_L2>;
+ 		};
+ 		cpu5: cpu@10100 {
+ 			device_type = "cpu";
+ 			compatible = "arm,armv8";
+ 			reg = <0x0 0x10100>;
+ 			enable-method = "psci";
++			i-cache-size = <0x8000>;
++			i-cache-line-size = <64>;
++			i-cache-sets = <256>;
++			d-cache-size = <0x8000>;
++			d-cache-line-size = <64>;
++			d-cache-sets = <256>;
++			next-level-cache = <&C1_L2>;
+ 		};
+ 		cpu6: cpu@10200 {
+ 			device_type = "cpu";
+ 			compatible = "arm,armv8";
+ 			reg = <0x0 0x10200>;
+ 			enable-method = "psci";
++			i-cache-size = <0x8000>;
++			i-cache-line-size = <64>;
++			i-cache-sets = <256>;
++			d-cache-size = <0x8000>;
++			d-cache-line-size = <64>;
++			d-cache-sets = <256>;
++			next-level-cache = <&C1_L2>;
+ 		};
+ 		cpu7: cpu@10300 {
+ 			device_type = "cpu";
+ 			compatible = "arm,armv8";
+ 			reg = <0x0 0x10300>;
+ 			enable-method = "psci";
++			i-cache-size = <0x8000>;
++			i-cache-line-size = <64>;
++			i-cache-sets = <256>;
++			d-cache-size = <0x8000>;
++			d-cache-line-size = <64>;
++			d-cache-sets = <256>;
++			next-level-cache = <&C1_L2>;
++		};
++		C0_L2: l2-cache0 {
++			compatible = "cache";
++			cache-size = <0x80000>;
++			cache-line-size = <64>;
++			cache-sets = <512>;
++			cache-level = <2>;
++			cache-unified;
++		};
++
++		C1_L2: l2-cache1 {
++			compatible = "cache";
++			cache-size = <0x80000>;
++			cache-line-size = <64>;
++			cache-sets = <512>;
++			cache-level = <2>;
++			cache-unified;
+ 		};
+ 	};
+ 

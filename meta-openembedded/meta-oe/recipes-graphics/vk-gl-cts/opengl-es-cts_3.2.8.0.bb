@@ -12,7 +12,8 @@ SRCREV_jsoncpp = "9059f5cad030ba11d37818847443a53918c327b1"
 SRCREV_vulkan-docs = "d70e01c0be7b8a7d20b186b30b29a75b18bba75d"
 SRC_URI[renderdoc.sha256sum] = "e7b5f0aa5b1b0eadc63a1c624c0ca7f5af133aa857d6a4271b0ef3d0bdb6868e"
 
-SRC_URI += "file://0001-Remove-dead-variable-984.patch;patchdir=external/amber/src"
+SRC_URI += "file://0001-Remove-dead-variable-984.patch;patchdir=external/amber/src \
+            file://0001-include-missing-cstdint.patch;patchdir=external/amber/src"
 
 S = "${WORKDIR}/git"
 

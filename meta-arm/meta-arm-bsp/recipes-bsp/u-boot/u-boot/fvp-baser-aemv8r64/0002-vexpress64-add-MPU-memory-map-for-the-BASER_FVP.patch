@@ -1,4 +1,4 @@
-From 80c64d0c035a5cd0cb23c7b01be39f25e15c7193 Mon Sep 17 00:00:00 2001
+From 181f5efb401ffaa5ab0898b07a976796f75e502a Mon Sep 17 00:00:00 2001
 From: Qi Feng <qi.feng@arm.com>
 Date: Tue, 26 Jul 2022 18:13:23 +0800
 Subject: [PATCH 2/9] vexpress64: add MPU memory map for the BASER_FVP
@@ -17,7 +17,7 @@ Signed-off-by: Qi Feng <qi.feng@arm.com>
  1 file changed, 22 insertions(+)
 
 diff --git a/board/armltd/vexpress64/vexpress64.c b/board/armltd/vexpress64/vexpress64.c
-index 709ebf3fb0..1791cd986f 100644
+index af326dc6f4..2310d18eb7 100644
 --- a/board/armltd/vexpress64/vexpress64.c
 +++ b/board/armltd/vexpress64/vexpress64.c
 @@ -19,6 +19,7 @@

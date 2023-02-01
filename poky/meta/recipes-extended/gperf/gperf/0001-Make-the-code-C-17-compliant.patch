@@ -1,0 +1,29 @@
+From 6194f0027045433598a61965758b4531a3d06d1f Mon Sep 17 00:00:00 2001
+From: Bruno Haible <bruno@clisp.org>
+Date: Sun, 30 Aug 2020 12:36:15 +0200
+Subject: [PATCH] Make the code C++17 compliant.
+
+* lib/getline.cc (getstr): Don't use the 'register' keyword.
+
+Upstream-Status: Backport [https://git.savannah.gnu.org/gitweb/?p=gperf.git;a=commit;h=a63b830554920476881837eeacd4a6b507632b19]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/getline.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/getline.cc b/lib/getline.cc
+index c57c633..0984a7c 100644
+--- a/lib/getline.cc
++++ b/lib/getline.cc
+@@ -55,7 +55,7 @@ getstr (char **lineptr, size_t *n, FILE *stream, char terminator, size_t offset)
+ 
+   for (;;)
+     {
+-      register int c = getc (stream);
++      int c = getc (stream);
+ 
+       /* We always want at least one char left in the buffer, since we
+          always (unless we get an error while reading the first char)
+-- 
+2.39.0
+

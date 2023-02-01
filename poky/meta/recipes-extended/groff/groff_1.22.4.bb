@@ -12,7 +12,8 @@ SRC_URI = "${GNU_MIRROR}/groff/groff-${PV}.tar.gz \
 	file://groff-not-search-fonts-on-build-host.patch \
 	file://0001-support-musl.patch \
 	file://0001-Include-config.h.patch \
-        file://0001-Make-manpages-mulitlib-identical.patch \
+	file://0001-Make-manpages-mulitlib-identical.patch \
+	file://0001-Fix-code-style-issues.patch \
 "
 
 SRC_URI[md5sum] = "08fb04335e2f5e73f23ea4c3adbf0c5f"

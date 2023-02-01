@@ -10,6 +10,7 @@ SRC_URI = "\
         git://github.com/open-source-parsers/jsoncpp.git;protocol=https;destsuffix=git/external/jsoncpp/src;name=jsoncpp;branch=master \
         git://github.com/KhronosGroup/Vulkan-Docs.git;protocol=https;destsuffix=git/external/vulkan-docs/src;name=vulkan-docs;branch=main \
         https://raw.githubusercontent.com/baldurk/renderdoc/fcdea67879fa1991e56cf7734ce0ce27866b665f/renderdoc/api/app/renderdoc_app.h;subdir=git/external/renderdoc/src;name=renderdoc \
+        file://gen-framework-path.patch \
 "
 
 S = "${WORKDIR}/git"
@@ -25,7 +26,7 @@ ANY_OF_DISTRO_FEATURES += "opengl wayland"
 DEPENDS += "python3-lxml-native libpng zlib virtual/libgles2 qemu-native"
 
 SRC_URI += " \
-            file://0001-vulkancts.patch \
+            file://0001-vulkancts-Include-missing-cstdint.patch \
             file://0001-use-library-sonames-for-linking.patch \
 "
 

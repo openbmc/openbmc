@@ -16,7 +16,7 @@ See:
 
 My contribution is to tweak the wscript to link all the required libraries.
 
-Upstream-status: submitted [https://github.com/glmark2/glmark2/pull/135]
+Upstream-Status: Submitted [https://github.com/glmark2/glmark2/pull/135]
 Signed-off-by: Trevor Woerner <twoerner@gmail.com>
 ---
  src/native-state-dispmanx.cpp | 22 +++++++++++++++++-----

@@ -6,7 +6,7 @@ Subject: [PATCH] Fix implicit fallthrough warning
 Fixes a warning about an implicit fall through in a case statement
 (-Werror=implicit-fallthrough) with newer versions of GCC
 
-Upstream-status: Submitted [https://github.com/gnosek/fcgiwrap/pull/54]
+Upstream-Status: Submitted [https://github.com/gnosek/fcgiwrap/pull/54]
 Signed-off-by: Joshua Watt <Joshua.Watt@garmin.com>
 ---
  configure.ac                |   3 +

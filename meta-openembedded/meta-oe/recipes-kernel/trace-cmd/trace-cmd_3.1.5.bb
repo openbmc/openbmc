@@ -8,6 +8,7 @@ LIC_FILES_CHKSUM = " \
 
 SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/trace-cmd.git;branch=master \
            file://0001-Replace-LFS64-interfaces-off64_t-and-lseek64.patch \
+           file://0002-Drop-using-_LARGEFILE64_SOURCE.patch \
            file://0001-Do-not-emit-useless-rpath.patch"
 SRCREV = "18233e4c32857cb7ddd4960beeec8360ed834fc5"
 
@@ -25,7 +26,7 @@ do_compile() {
 }
 
 do_install() {
-       oe_runmake libdir_relative=${BASELIB} etcdir=${sysconfdir} pkgconfig_dir=${libdir}/pkgconfig DESTDIR=${D} install install_libs
+       oe_runmake libdir_relative=${baselib} etcdir=${sysconfdir} pkgconfig_dir=${libdir}/pkgconfig DESTDIR=${D} install install_libs
        # Because makefile uses cp instead of install we need to change owner of files
        chown -R root:root ${D}${libdir}
 }

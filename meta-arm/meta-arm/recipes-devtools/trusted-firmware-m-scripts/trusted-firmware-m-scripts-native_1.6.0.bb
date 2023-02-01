@@ -1,5 +1,6 @@
 
-SRC_URI = "git://git.trustedfirmware.org/TF-M/trusted-firmware-m.git;protocol=https;branch=${SRCBRANCH}"
+SRC_URI_TRUSTED_FIRMWARE_M ?= "git://git.trustedfirmware.org/TF-M/trusted-firmware-m.git;protocol=https"
+SRC_URI = "${SRC_URI_TRUSTED_FIRMWARE_M};branch=${SRCBRANCH}"
 # Use the wrapper script from TF-Mv1.6.0
 SRCBRANCH ?= "release/1.6.x"
 SRCREV = "7387d88158701a3c51ad51c90a05326ee12847a8"

@@ -1,0 +1,30 @@
+From 56e2cce87445d514c9992ecc19d03bb2115c82d6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 25 Jan 2023 22:17:31 -0800
+Subject: [PATCH] Include missing <cstdint>
+
+gcc 13 moved some includes around and as a result <cstdint> is no longer transitively included [1]. Explicitly include it for uint{32,64}_t.
+
+[1] https://gcc.gnu.org/gcc-13/porting_to.html#header-dep-changes
+
+Upstream-Status: Submitted [https://github.com/dbus-cxx/dbus-cxx/pull/111]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ dbus-cxx/enums.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/dbus-cxx/enums.h b/dbus-cxx/enums.h
+index 8253a4b..c793fad 100644
+--- a/dbus-cxx/enums.h
++++ b/dbus-cxx/enums.h
+@@ -5,6 +5,7 @@
+  *                                                                         *
+  *   This file is part of the dbus-cxx library.                            *
+  ***************************************************************************/
++#include <cstdint>
+ #include <ostream>
+ 
+ #ifndef DBUSCXX_ENUMS_H
+-- 
+2.39.1
+

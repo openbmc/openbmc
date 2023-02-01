@@ -1,0 +1,33 @@
+From e4ff7a2a9834e2589bc7bdda4b74f5bc962b15e6 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Wed, 27 Jan 2016 05:07:19 -0500
+Subject: [PATCH] rlm_python: add PY_INC_DIR in search dir
+
+configure option --with-rlm-python-include-dir is used to set
+PY_INC_DIR which is never used and it fails to find Python.h,
+so add it into search dir to fix it.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ src/modules/rlm_python/configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/modules/rlm_python/configure.ac b/src/modules/rlm_python/configure.ac
+index 08ecb62518..d5c0944ff1 100644
+--- a/src/modules/rlm_python/configure.ac
++++ b/src/modules/rlm_python/configure.ac
+@@ -98,7 +98,7 @@ if test x$with_[]modname != xno; then
+ 
+ 		old_CFLAGS=$CFLAGS
+ 		CFLAGS="$CFLAGS $PY_CFLAGS"
+-		smart_try_dir="$PY_PREFIX/include/python$PY_SYS_VERSION"
++		smart_try_dir="$PY_PREFIX/include/python$PY_SYS_VERSION $PY_INC_DIR"
+ 		FR_SMART_CHECK_INCLUDE(Python.h)
+ 		CFLAGS=$old_CFLAGS
+ 
+-- 
+2.25.1
+

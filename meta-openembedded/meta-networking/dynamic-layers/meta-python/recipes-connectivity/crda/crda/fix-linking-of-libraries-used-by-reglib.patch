@@ -15,7 +15,7 @@ Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index a3ead30..da2dcc3 100644
+index 528a14e..acd818b 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -30,7 +30,7 @@ CFLAGS += -std=gnu99 -Wall -Werror -pedantic
@@ -45,10 +45,10 @@ index a3ead30..da2dcc3 100644
  
 @@ -116,7 +116,7 @@ keys-%.c: utils/key2pub.py $(wildcard $(PUBKEY_DIR)/*.pem)
  
- $(LIBREG): regdb.h reglib.h reglib.c
+ $(LIBREG): reglib.c regdb.h reglib.h
  	$(NQ) '  CC  ' $@
--	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -shared -Wl,-soname,$(LIBREG) $^
-+	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -shared -Wl,-soname,$(LIBREG) $^ $(LIBREGLDLIBS)
+-	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -shared -Wl,-soname,$(LIBREG) $<
++	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -shared -Wl,-soname,$(LIBREG) $< $(LIBREGLDLIBS)
  
  install-libreg-headers:
  	$(NQ) '  INSTALL  libreg-headers'

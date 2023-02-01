@@ -1,0 +1,32 @@
+From 9c785ca0535d9c24e6699ee1243b427c1407acb5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 17 Jan 2023 19:31:17 -0800
+Subject: [PATCH] Fix incompatible function pointer types
+
+clang 16+ is flagging the function pointer prototype mismatches,
+therefore fix it.
+
+Fixes Issue #8487
+
+Upstream-Status: Submitted [https://github.com/FreeRDP/FreeRDP/pull/8622]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ client/X11/xf_disp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/client/X11/xf_disp.c b/client/X11/xf_disp.c
+index 32ddb626c..ef0cb93ff 100644
+--- a/client/X11/xf_disp.c
++++ b/client/X11/xf_disp.c
+@@ -248,7 +248,7 @@ static void xf_disp_OnTimer(void* context, TimerEventArgs* e)
+ 	xf_disp_sendResize(xfDisp);
+ }
+ 
+-static void xf_disp_OnWindowStateChange(void* context, const WindowStateChangeEventArgs* e)
++static void xf_disp_OnWindowStateChange(void* context, WindowStateChangeEventArgs* e)
+ {
+ 	xfContext* xfc;
+ 	xfDispContext* xfDisp;
+-- 
+2.39.1
+

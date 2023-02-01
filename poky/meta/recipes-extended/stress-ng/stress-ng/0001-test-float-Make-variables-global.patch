@@ -1,0 +1,34 @@
+From 958a86069c8d0149969b5c32212a28009c4a9ded Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 21 Jan 2023 23:18:18 -0800
+Subject: [PATCH] test-float: Make variables global
+
+Latest clang ( clang 16+ ) is able to optimize everything out when -O2 is used and as
+a result build succeeds and test output comes out to be wrong. Therefore
+make the variables global, so clang does not optimize away the functions
+
+Upstream-Status: Backport [https://github.com/ColinIanKing/stress-ng/commit/e299eb60a3a029e975304cc43045aea6ab1fad70]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test/test-float.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/test/test-float.c b/test/test-float.c
+index d2800cd3..ad5503c3 100644
+--- a/test/test-float.c
++++ b/test/test-float.c
+@@ -61,10 +61,9 @@
+ /* Avoid implicit int in the definition of test even if FLOAT is not known. */
+ typedef FLOAT float_type;
+ 
++FLOAT a = 0.0, b = 0.0, c = 0.0, d = 0.0;
+ static float_type HOT OPTIMIZE3 test(void)
+ {
+-	FLOAT a = 0.0, b = 0.0, c = 0.0, d = 0.0;
+-
+ 	float_ops(FLOAT, a, b, c, d, sin, cos);
+ 	float_ops(FLOAT, a, b, c, d, sinl, cosl);
+ 
+-- 
+2.39.1
+

@@ -40,14 +40,6 @@ SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} = "${INITSCRIPT_NAME}.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
-# mode mapping:
-# BPN                MODE_NAME   SAMHAIN_MODE
-# samhain-standalone standalone  no
-# samhain-client     client      client
-# samhain-server     server      server
-MODE_NAME = "${@d.getVar('BPN').split('-')[1]}"
-SAMHAIN_MODE = "${@oe.utils.ifelse(d.getVar('MODE_NAME') == 'standalone', 'no', '${MODE_NAME}')}"
-
 # supports mysql|postgresql|oracle|odbc but postgresql is the only one available
 
 PACKAGECONFIG ??= "postgresql ps \

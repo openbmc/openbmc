@@ -11,6 +11,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=fbc093901857fcd118f065f900982c24"
 BBCLASSEXTEND = "native nativesdk"
 
 SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/libusb-${PV}.tar.bz2 \
+           file://0001-configure.ac-Link-with-latomic-only-if-no-atomic-bui.patch \
            file://run-ptest \
           "
 
@@ -34,12 +35,12 @@ do_install:append() {
 	fi
 }
 
-do_compile_ptest() {                                                             
-    oe_runmake -C tests stress                                                   
-}                                                                                
-                                                                                 
-do_install_ptest() {                                                             
-    install -m 755 ${B}/tests/.libs/stress ${D}${PTEST_PATH}         
+do_compile_ptest() {
+    oe_runmake -C tests stress
+}
+
+do_install_ptest() {
+    install -m 755 ${B}/tests/.libs/stress ${D}${PTEST_PATH}
 }
 
 FILES:${PN} += "${base_libdir}/*.so.*"

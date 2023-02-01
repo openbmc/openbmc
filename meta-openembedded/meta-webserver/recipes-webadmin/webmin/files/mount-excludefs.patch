@@ -6,7 +6,7 @@ since these shouldn't be modified from the web interface.
 
 Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
 
-Upstream-status: Pending
+Upstream-Status: Pending
 
 --- webmin-1.570.orig/mount/index.cgi
 +++ webmin-1.570/mount/index.cgi

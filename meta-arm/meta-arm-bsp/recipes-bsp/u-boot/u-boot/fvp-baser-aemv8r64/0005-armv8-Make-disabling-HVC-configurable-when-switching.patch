@@ -1,4 +1,4 @@
-From f75060be04aaed4bb5a07cb40361d694b3775f4a Mon Sep 17 00:00:00 2001
+From a6daca56b77d7f1b26483f10eb33ebdd6e157d3e Mon Sep 17 00:00:00 2001
 From: Peter Hoyes <Peter.Hoyes@arm.com>
 Date: Fri, 10 Dec 2021 16:37:26 +0000
 Subject: [PATCH 5/9] armv8: Make disabling HVC configurable when switching to
@@ -22,12 +22,12 @@ Change-Id: I463d82f1db8a3cafcab40a9c0c208753569cc300
  3 files changed, 18 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/cpu/armv8/Kconfig b/arch/arm/cpu/armv8/Kconfig
-index 110adf63b3..a821e219d8 100644
+index dec4be0e30..95c03487a2 100644
 --- a/arch/arm/cpu/armv8/Kconfig
 +++ b/arch/arm/cpu/armv8/Kconfig
-@@ -199,4 +199,13 @@ config ARMV8_SWITCH_TO_EL1
- 	  operating system does not support booting at EL2, or you wish to prevent
- 	  any hypervisors from running. Supported for bootm, booti and bootefi.
+@@ -208,4 +208,13 @@ config ARMV8_CE_SHA256
+ 
+ endif
  
 +config ARMV8_DISABLE_HVC
 +	bool "Disable HVC calls before switching to EL1"
@@ -70,10 +70,10 @@ index 1a1edc9870..7167739210 100644
  
  	/* Return to AArch32 Supervisor mode from EL2 */
 diff --git a/configs/vexpress_aemv8r_defconfig b/configs/vexpress_aemv8r_defconfig
-index 35e5e8a5e1..605a724a61 100644
+index 6044f82b00..6226f6b2c1 100644
 --- a/configs/vexpress_aemv8r_defconfig
 +++ b/configs/vexpress_aemv8r_defconfig
-@@ -15,3 +15,4 @@ CONFIG_SYS_PROMPT="VExpress64# "
+@@ -18,3 +18,4 @@ CONFIG_SYS_PBSIZE=541
  CONFIG_VIRTIO_MMIO=y
  CONFIG_ARMV8_EXCEPTION_VECTORS=n
  CONFIG_ARMV8_SWITCH_TO_EL1=y

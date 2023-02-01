@@ -7,6 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=2caced0b25dfefd4c601d92bd15116de"
 SRC_URI = " \
     https://www.kernel.org/pub/software/libs/${BPN}/${BP}.tar.xz \
     file://run-ptest \
+    file://0001-build-don-t-expect-automake-to-set-PYTHON.patch \
 "
 
 SRC_URI[md5sum] = "28e79f6f70fee1da9079558d8b7b3736"

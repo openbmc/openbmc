@@ -1,0 +1,366 @@
+From 7702c4aeda51011be95ecbaab0dc2e7373d04286 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Tue, 29 Nov 2022 15:11:27 +0000
+Subject: [PATCH 11/25] efi: corstone1000: introduce EFI capsule update
+
+This commit provides capsule update feature for Corstone1000.
+
+This feature is available before and after ExitBootServices().
+
+A platform specific capsule buffer is allocated. This buffer
+is physically contiguous and allocated at the start of the DDR
+memory after u-boot relocation to the end of DDR.
+
+The capsule buffer is shared between u-boot and the secure world.
+On UpdateCapsule() , capsule data is copied to the buffer
+and a buffer ready event is generated using FF-A transport.
+
+On ExitBootServices() a kernel started event is sent to the
+SE Proxy FW update service. This event is generated on each boot.
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ board/armltd/corstone1000/corstone1000.c |   4 +
+ configs/corstone1000_defconfig           |   3 +
+ include/configs/corstone1000.h           |  18 ++++
+ include/efi_loader.h                     |   4 +-
+ lib/efi_loader/efi_boottime.c            |  36 +++++++
+ lib/efi_loader/efi_capsule.c             | 124 ++++++++++++++++++++++-
+ lib/efi_loader/efi_setup.c               |  15 +++
+ 7 files changed, 200 insertions(+), 4 deletions(-)
+
+diff --git a/board/armltd/corstone1000/corstone1000.c b/board/armltd/corstone1000/corstone1000.c
+index 4f4b96a095..76816f8f4e 100644
+--- a/board/armltd/corstone1000/corstone1000.c
++++ b/board/armltd/corstone1000/corstone1000.c
+@@ -66,6 +66,10 @@ static struct mm_region corstone1000_mem_map[] = {
+ 
+ struct mm_region *mem_map = corstone1000_mem_map;
+ 
++void set_dfu_alt_info(char *interface, char *devstr)
++{
++}
++
+ int board_init(void)
+ {
+ 	return 0;
+diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
+index c26f99e7e5..c72d027711 100644
+--- a/configs/corstone1000_defconfig
++++ b/configs/corstone1000_defconfig
+@@ -54,3 +54,6 @@ CONFIG_USB_ISP1760=y
+ CONFIG_ERRNO_STR=y
+ CONFIG_EFI_MM_COMM_TEE=y
+ CONFIG_ARM_FFA_TRANSPORT=y
++CONFIG_EFI_RUNTIME_UPDATE_CAPSULE=y
++CONFIG_EFI_CAPSULE_FIRMWARE_FIT=y
++CONFIG_EFI_CAPSULE_FIRMWARE_RAW=y
+diff --git a/include/configs/corstone1000.h b/include/configs/corstone1000.h
+index 0362d29ac2..4d20090c9b 100644
+--- a/include/configs/corstone1000.h
++++ b/include/configs/corstone1000.h
+@@ -14,6 +14,24 @@
+ 
+ #include <linux/sizes.h>
+ 
++/* The SE Proxy partition ID*/
++#define CORSTONE1000_SEPROXY_PART_ID		(0x8002)
++
++/* Update service ID provided by  the SE Proxy secure partition*/
++#define CORSTONE1000_SEPROXY_UPDATE_SVC_ID	(0x4)
++
++/* Notification events used with SE Proxy update service */
++#define CORSTONE1000_BUFFER_READY_EVT		(0x1)
++#define CORSTONE1000_KERNEL_STARTED_EVT		(0x2)
++
++/* Size in 4KB pages of the EFI capsule buffer */
++#define CORSTONE1000_CAPSULE_BUFFER_SIZE	(8192) /* 32 MB */
++
++/* Capsule GUID */
++#define EFI_CORSTONE1000_CAPSULE_ID_GUID \
++	EFI_GUID(0x3a770ddc, 0x409b, 0x48b2, 0x81, 0x41, \
++		 0x93, 0xb7, 0xc6, 0x0b, 0x20, 0x9e)
++
+ #define FFA_SHARED_MM_BUFFER_SIZE	SZ_4K /* 4 KB */
+ 
+ /*
+diff --git a/include/efi_loader.h b/include/efi_loader.h
+index 545ba06d94..773c4f6310 100644
+--- a/include/efi_loader.h
++++ b/include/efi_loader.h
+@@ -993,11 +993,11 @@ extern const struct efi_firmware_management_protocol efi_fmp_fit;
+ extern const struct efi_firmware_management_protocol efi_fmp_raw;
+ 
+ /* Capsule update */
+-efi_status_t EFIAPI efi_update_capsule(
++efi_status_t __efi_runtime EFIAPI efi_update_capsule(
+ 		struct efi_capsule_header **capsule_header_array,
+ 		efi_uintn_t capsule_count,
+ 		u64 scatter_gather_list);
+-efi_status_t EFIAPI efi_query_capsule_caps(
++efi_status_t __efi_runtime EFIAPI efi_query_capsule_caps(
+ 		struct efi_capsule_header **capsule_header_array,
+ 		efi_uintn_t capsule_count,
+ 		u64 *maximum_capsule_size,
+diff --git a/lib/efi_loader/efi_boottime.c b/lib/efi_loader/efi_boottime.c
+index 1099ccc800..d9eed33ac8 100644
+--- a/lib/efi_loader/efi_boottime.c
++++ b/lib/efi_loader/efi_boottime.c
+@@ -2103,6 +2103,33 @@ static void efi_exit_caches(void)
+ #endif
+ }
+ 
++#if IS_ENABLED(CONFIG_TARGET_CORSTONE1000)
++/**
++ * efi_corstone1000_kernel_started_event - notifies SE Proxy FW update service
++ *
++ * This function notifies the SE Proxy update service that the kernel has already started
++ *
++ * Return:
++ *
++ * 0: on success, otherwise failure
++ */
++static int efi_corstone1000_kernel_started_event(void)
++{
++	struct ffa_send_direct_data msg = {0};
++
++	log_debug("[%s]\n", __func__);
++
++	/*
++	 * setting the kernel started  event arguments
++	 */
++	msg.data0 = CORSTONE1000_SEPROXY_UPDATE_SVC_ID; /* x3 */
++	msg.data2 = CORSTONE1000_KERNEL_STARTED_EVT; /* x5 */
++
++	return ffa_bus_ops_get()->sync_send_receive(CORSTONE1000_SEPROXY_PART_ID, &msg, 0);
++}
++
++#endif
++
+ /**
+  * efi_exit_boot_services() - stop all boot services
+  * @image_handle: handle of the loaded image
+@@ -2209,6 +2236,15 @@ static efi_status_t EFIAPI efi_exit_boot_services(efi_handle_t image_handle,
+ 	/* Recalculate CRC32 */
+ 	efi_update_table_header_crc32(&systab.hdr);
+ 
++#if IS_ENABLED(CONFIG_TARGET_CORSTONE1000)
++	/* Notifying SE Proxy FW update service */
++	ffa_ret = efi_corstone1000_kernel_started_event();
++	if (ffa_ret)
++		debug("[efi_boottime][ERROR]: Failure to notify SE Proxy FW update service\n");
++	else
++		debug("[efi_boottime][INFO]: SE Proxy FW update service notified\n");
++#endif
++
+ 	/* Give the payload some time to boot */
+ 	efi_set_watchdog(0);
+ 	WATCHDOG_RESET();
+diff --git a/lib/efi_loader/efi_capsule.c b/lib/efi_loader/efi_capsule.c
+index a6b98f066a..636b61f0ad 100644
+--- a/lib/efi_loader/efi_capsule.c
++++ b/lib/efi_loader/efi_capsule.c
+@@ -25,6 +25,14 @@
+ #include <crypto/pkcs7_parser.h>
+ #include <linux/err.h>
+ 
++#ifdef CONFIG_TARGET_CORSTONE1000
++#include <arm_ffa.h>
++#include <cpu_func.h>
++
++void *__efi_runtime_data corstone1000_capsule_buf; /* capsule shared buffer virtual address */
++efi_guid_t corstone1000_capsule_guid = EFI_CORSTONE1000_CAPSULE_ID_GUID;
++#endif
++
+ DECLARE_GLOBAL_DATA_PTR;
+ 
+ const efi_guid_t efi_guid_capsule_report = EFI_CAPSULE_REPORT_GUID;
+@@ -512,6 +520,78 @@ static efi_status_t efi_capsule_update_firmware(
+ }
+ #endif /* CONFIG_EFI_CAPSULE_FIRMWARE_MANAGEMENT */
+ 
++#if IS_ENABLED(CONFIG_TARGET_CORSTONE1000)
++
++/**
++ * efi_corstone1000_alloc_capsule_shared_buf - allocate capsule shared buffer
++ * @capsule_image_size:	The capsule data (header + payload)
++ *
++ * This function allocates the physically contiguous buffer shared between u-boot
++ * and the secure world. On UpdateCapsule() capsule data is copied to the buffer
++ * and a door bell event is generated.
++ * The buffer is allocated at the start of the DDR memory after u-boot has been relocated
++ * to the end of DDR.
++ *
++ * Return:
++ *
++ * 0: on success, otherwise failure
++ */
++efi_status_t efi_corstone1000_alloc_capsule_shared_buf(void)
++{
++	efi_status_t efi_ret;
++	u64 ram_base = CONFIG_SYS_SDRAM_BASE;
++
++	log_debug("[%s]\n", __func__);
++
++	efi_ret = efi_allocate_pages(EFI_ALLOCATE_ADDRESS,
++				     EFI_RUNTIME_SERVICES_DATA,
++				     CORSTONE1000_CAPSULE_BUFFER_SIZE,
++				     &ram_base);
++
++	if (efi_ret != EFI_SUCCESS) {
++		corstone1000_capsule_buf = NULL;
++		log_err("EFI: Corstone1000: Allocating capsule shared buffer error (%d)\n"
++			, (int)efi_ret);
++		return efi_ret;
++	}
++
++	log_info("EFI: Corstone1000: Capsule shared buffer at 0x%x , size %d pages\n"
++		, (unsigned int)ram_base,
++		CORSTONE1000_CAPSULE_BUFFER_SIZE);
++
++	corstone1000_capsule_buf = (void *)map_sysmem((phys_addr_t)ram_base, 0);
++
++	return EFI_SUCCESS;
++}
++
++/**
++ * efi_corstone1000_buffer_ready_event - issue door bell event
++ * @capsule_image_size:	The capsule data (header + payload)
++ *
++ * This function notifies the SE Proxy update service that capsule data is available
++ * in the capsule shared buffer.
++ *
++ * Return:
++ *
++ * 0: on success, otherwise failure
++ */
++static int __efi_runtime efi_corstone1000_buffer_ready_event(u32 capsule_image_size)
++{
++	struct ffa_send_direct_data msg = {0};
++
++	log_debug("[%s]\n", __func__);
++
++	/*
++	 * setting the buffer ready event arguments
++	 */
++	msg.data0 = CORSTONE1000_SEPROXY_UPDATE_SVC_ID; /* x3 */
++	msg.data1 = capsule_image_size; /* x4 */
++	msg.data2 = CORSTONE1000_BUFFER_READY_EVT; /* x5 */
++
++	return ffa_bus_ops_get()->sync_send_receive(NULL, CORSTONE1000_SEPROXY_PART_ID, &msg, 0);
++}
++#endif
++
+ /**
+  * efi_update_capsule() - process information from operating system
+  * @capsule_header_array:	Array of virtual address pointers
+@@ -525,7 +605,7 @@ static efi_status_t efi_capsule_update_firmware(
+  *
+  * Return:			status code
+  */
+-efi_status_t EFIAPI efi_update_capsule(
++efi_status_t __efi_runtime EFIAPI efi_update_capsule(
+ 		struct efi_capsule_header **capsule_header_array,
+ 		efi_uintn_t capsule_count,
+ 		u64 scatter_gather_list)
+@@ -542,6 +622,13 @@ efi_status_t EFIAPI efi_update_capsule(
+ 		goto out;
+ 	}
+ 
++#if IS_ENABLED(CONFIG_TARGET_CORSTONE1000)
++		if (capsule_count != 1 || !corstone1000_capsule_buf) {
++			ret = EFI_INVALID_PARAMETER;
++			goto out;
++		}
++#endif
++
+ 	ret = EFI_SUCCESS;
+ 	for (i = 0, capsule = *capsule_header_array; i < capsule_count;
+ 	     i++, capsule = *(++capsule_header_array)) {
+@@ -554,6 +641,39 @@ efi_status_t EFIAPI efi_update_capsule(
+ 
+ 		log_debug("Capsule[%d] (guid:%pUs)\n",
+ 			  i, &capsule->capsule_guid);
++
++#if CONFIG_IS_ENABLED(TARGET_CORSTONE1000)
++		if (guidcmp(&corstone1000_capsule_guid, &capsule->capsule_guid)) {
++			ret = EFI_INVALID_PARAMETER;
++			log_err("Corstone1000: Invalid capsule GUID\n");
++			goto out;
++		}
++
++		if (efi_size_in_pages(capsule->capsule_image_size) >
++		    CORSTONE1000_CAPSULE_BUFFER_SIZE) {
++			log_err("Corstone1000: Capsule data size exceeds the shared buffer size\n");
++			ret = EFI_BUFFER_TOO_SMALL;
++			goto out;
++		}
++
++		/* copy the data to the contiguous buffer */
++		efi_memcpy_runtime(corstone1000_capsule_buf, capsule, capsule->capsule_image_size);
++
++		/* invalidate the data cache */
++		invalidate_dcache_all();
++
++		/* issue buffer ready event */
++		ret = efi_corstone1000_buffer_ready_event(capsule->capsule_image_size);
++		if (ret) {
++			log_err("EFI: Corstone1000: Buffer ready event error (%d)\n", (int)ret);
++			ret = EFI_DEVICE_ERROR;
++		} else {
++			ret = EFI_SUCCESS;
++		}
++
++		goto out;
++#endif
++
+ 		if (!guidcmp(&capsule->capsule_guid,
+ 			     &efi_guid_firmware_management_capsule_id)) {
+ 			ret  = efi_capsule_update_firmware(capsule);
+@@ -592,7 +712,7 @@ out:
+  *
+  * Return:			status code
+  */
+-efi_status_t EFIAPI efi_query_capsule_caps(
++efi_status_t __efi_runtime EFIAPI efi_query_capsule_caps(
+ 		struct efi_capsule_header **capsule_header_array,
+ 		efi_uintn_t capsule_count,
+ 		u64 *maximum_capsule_size,
+diff --git a/lib/efi_loader/efi_setup.c b/lib/efi_loader/efi_setup.c
+index c633fcd91e..443f409906 100644
+--- a/lib/efi_loader/efi_setup.c
++++ b/lib/efi_loader/efi_setup.c
+@@ -16,6 +16,13 @@
+ 
+ efi_status_t efi_obj_list_initialized = OBJ_LIST_NOT_INITIALIZED;
+ 
++#if IS_ENABLED(CONFIG_TARGET_CORSTONE1000)
++/**
++ * efi_corstone1000_alloc_capsule_shared_buf - allocate capsule shared buffer
++ */
++extern efi_status_t efi_corstone1000_alloc_capsule_shared_buf(void);
++#endif
++
+ /*
+  * Allow unaligned memory access.
+  *
+@@ -128,6 +135,14 @@ static efi_status_t efi_init_capsule(void)
+ {
+ 	efi_status_t ret = EFI_SUCCESS;
+ 
++#if IS_ENABLED(CONFIG_TARGET_CORSTONE1000)
++	ret = efi_corstone1000_alloc_capsule_shared_buf();
++	if (ret != EFI_SUCCESS) {
++		printf("EFI: Corstone-1000: cannot allocate caspsule shared buffer\n");
++		return ret;
++	}
++#endif
++
+ 	if (IS_ENABLED(CONFIG_EFI_HAVE_CAPSULE_UPDATE)) {
+ 		ret = efi_set_variable_int(u"CapsuleMax",
+ 					   &efi_guid_capsule_report,
+-- 
+2.17.1
+

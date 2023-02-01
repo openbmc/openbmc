@@ -42,3 +42,6 @@ do_install:append() {
 PTEST_PATH = "${libdir}/${BPN}/tests"
 FILES:${PN}-ptest =+ "${sysconfdir}/dbus-1/system.d/"
 FILES:${PN}-dev += "${bindir}/sdbus-c++-xml2cpp"
+
+# It adds -isystem which is spurious, no idea where it gets it from
+CCACHE_DISABLE = "1"
