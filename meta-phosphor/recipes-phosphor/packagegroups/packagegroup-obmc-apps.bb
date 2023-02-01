@@ -31,6 +31,7 @@ PACKAGES = " \
         ${PN}-telemetry \
         ${PN}-user-mgmt \
         ${PN}-user-mgmt-ldap \
+        ${PN}-dmtf-pmci \
         "
 
 SUMMARY:${PN}-bmc-state-mgmt = "BMC state management"
@@ -200,4 +201,9 @@ RDEPENDS:${PN}-user-mgmt-ldap = " \
         ${PN}-user-mgmt \
         nss-pam-ldapd \
         phosphor-ldap \
+        "
+
+SUMMARY:${PN}-dmtf-pmci = "DMTF PMCI Protocol Implementations"
+RDEPENDS:${PN}-dmtf-pmci = " \
+        ${@bb.utils.contains('DISTRO_FEATURES', 'mctp', 'mctp', '', d)} \
         "

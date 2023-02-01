@@ -45,6 +45,7 @@ IMAGE_FEATURES += " \
         obmc-network-mgmt \
         obmc-settings-mgmt \
         obmc-telemetry \
+        obmc-dmtf-pmci \
         "
 # The shadow recipe provides the binaries(like useradd, usermod) needed by the
 # phosphor-user-manager.
