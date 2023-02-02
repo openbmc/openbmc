@@ -1,5 +1,6 @@
 [Unit]
 Description=OpenBMC Fan Control Daemon
+After=xyz.openbmc_project.fansensor.service
 
 [Service]
 Type=simple
@@ -8,7 +9,6 @@ ExecStart=/usr/bin/swampd
 Restart=always
 RestartSec=5
 StartLimitInterval=0
-ExecStopPost=/usr/bin/fan-default-speed.sh
 
 [Install]
 WantedBy=basic.target
