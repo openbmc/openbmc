@@ -73,4 +73,5 @@ RDEPENDS:${PN}-system = " \
         cerberus-utility \
         estoraged \
         cryptsetup \
+        systemd-analyze \
         "
