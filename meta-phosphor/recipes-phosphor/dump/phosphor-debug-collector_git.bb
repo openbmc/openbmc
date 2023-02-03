@@ -17,7 +17,7 @@ DEPENDS += " \
         fmt \
 "
 PACKAGECONFIG ??= "${@bb.utils.contains_any('DISTRO_FEATURES', \
-         'obmc-ubi-fs phosphor-mmc', '', 'jffs-workaround', d)}"
+         'obmc-ubi-fs phosphor-mmc obmc-static-norootfs', '', 'jffs-workaround', d)}"
 PACKAGECONFIG[jffs-workaround] = "-Djffs-workaround=enabled, \
         -Djffs-workaround=disabled"
 PACKAGECONFIG[host-dump-transport-pldm] = " \
