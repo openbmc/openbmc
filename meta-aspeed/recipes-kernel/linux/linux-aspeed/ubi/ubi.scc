@@ -1,0 +1,3 @@
+define KFEATURE_DESCRIPTION "Enable UBIFS"
+
+kconf hardware ubi.cfg
