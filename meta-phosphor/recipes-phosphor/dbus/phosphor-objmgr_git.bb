@@ -15,6 +15,9 @@ PR = "r1"
 
 SRC_URI += "git://github.com/openbmc/phosphor-objmgr;branch=master;protocol=https"
 
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[unit-failure-monitor] = "-Dunit-failure-monitor=enabled,-Dunit-failure-monitor=disabled,,"
+
 SYSTEMD_SERVICE:${PN} += " \
         mapper-wait@.service \
         mapper-subtree-remove@.service \
