@@ -23,6 +23,72 @@
       "is_ipmi" : true
     }
   },
+  "2" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "3" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "4" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "5" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "6" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "7" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
   "8" : {
     "name" : "INTRABMC",
     "is_valid" : true,
@@ -31,6 +97,83 @@
     "channel_info" : {
       "medium_type" : "oem",
       "protocol_type" : "oem",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "9" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "10" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "11" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "12" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "13" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "14" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "15" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
       "session_supported" : "session-less",
       "is_ipmi" : true
     }
