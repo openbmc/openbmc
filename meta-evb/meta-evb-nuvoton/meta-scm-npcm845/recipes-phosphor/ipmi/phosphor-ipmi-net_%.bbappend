@@ -4,4 +4,4 @@ SRC_URI:append:scm-npcm845 = " file://0002-Add-RemoteIPAddr-support.patch"
 SRC_URI:append:scm-npcm845 = " file://0003-add-server-type-and-oem-id-to-meet-MS-spec.patch"
 SRC_URI:append:scm-npcm845 = " file://0004-set-channel-security-keys.patch"
 
-RMCPP_IFACE = "eth0"
+RMCPP_IFACE = "end0"
