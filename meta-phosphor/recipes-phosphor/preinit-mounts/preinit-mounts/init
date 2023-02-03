@@ -1,30 +1,30 @@
 #!/bin/sh
 
 mount_overlay() {
-  if ! mount overlay /etc -t overlay -o defaults,lowerdir=/etc,upperdir=/var/persist/etc,workdir=/var/persist/etc-work; then
-    mount overlay /etc -t overlay -o defaults,lowerdir=/etc:/var/persist/etc
-  fi
+    if ! mount overlay /etc -t overlay -o defaults,lowerdir=/etc,upperdir=/var/persist/etc,workdir=/var/persist/etc-work; then
+        mount overlay /etc -t overlay -o defaults,lowerdir=/etc:/var/persist/etc
+    fi
 }
 
 recreate_overlay() {
-  # Attempt to re-create the overlay by moving out the overlay contents and
-  # copying them back to /etc, which would create them back in the overlay
-  cd
-  if ! umount /etc; then
-    return
-  fi
-  rm -rf /var/persist/etc-save
-  mv /var/persist/etc /var/persist/etc-save
-  mkdir -p /var/persist/etc
-  mount_overlay
-  cp -rp /var/persist/etc-save/* /etc/
-  rm -rf /var/persist/etc-save
+    # Attempt to re-create the overlay by moving out the overlay contents and
+    # copying them back to /etc, which would create them back in the overlay
+    cd /
+    if ! umount /etc; then
+        return
+    fi
+    rm -rf /var/persist/etc-save
+    mv /var/persist/etc /var/persist/etc-save
+    mkdir -p /var/persist/etc
+    mount_overlay
+    cp -rp /var/persist/etc-save/* /etc/
+    rm -rf /var/persist/etc-save
 }
 
 if ! mount ubi0:rwfs /var -t ubifs -o defaults; then
-  if ! mount ubi0:rwfs /var -t ubifs -o defaults,ro; then
-    mount tmpfs /var -t tmpfs -o defaults
-  fi
+    if ! mount ubi0:rwfs /var -t ubifs -o defaults,ro; then
+        mount tmpfs /var -t tmpfs -o defaults
+    fi
 fi
 
 mkdir -p /var/persist/etc /var/persist/etc-work /var/persist/home/root
@@ -39,26 +39,25 @@ mount_overlay
 # overlay by doing an 'ls' command
 error="/var/overlay-error"
 recreate_overlay_done=
-cd /var/persist/etc/
-files=$(find . -type f)
+files=$(find /var/persist/etc -type f | sed 's#/var/persist/etc/##')
 for i in $files; do
-  ls -i /etc/$i >/dev/null 2>${error};
-  if [[ -s ${error} ]]; then
-    # We don't have a way to print this error to the journal, delete it
-    rm -f ${error}
-    if test -n "$recreate_overlay_done"; then
-      recreate_overlay
-      recreate_overlay_done="true"
+    ls -i "/etc/$i" >/dev/null 2>${error};
+    if [ -s ${error} ]; then
+        # We don't have a way to print this error to the journal, delete it
+        rm -f ${error}
+        if test -n "$recreate_overlay_done"; then
+            recreate_overlay
+            recreate_overlay_done="true"
+        fi
+        # Check file once more
+        ls -i "/etc/$i" >/dev/null 2>${error};
+        if [ -s ${error} ]; then
+            # File still corrupted, delete it from the overlay
+            echo "Removing corrupted file from overlay: $i"
+            rm -f ${error}
+            rm -f "/var/persist/etc/$i"
+        fi
     fi
-    # Check file once more
-    ls -i /etc/$i >/dev/null 2>${error};
-    if [[ -s ${error} ]]; then
-      # File still corrupted, delete it from the overlay
-      echo "Removing corrupted file from overlay: $i"
-      rm -f ${error}
-      rm -f /var/persist/etc/$i
-    fi
-  fi
 done
 
 exec /lib/systemd/systemd

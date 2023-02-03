@@ -153,7 +153,6 @@ meta-phosphor/recipes-phosphor/initrdscripts/files/obmc-shutdown.sh
 meta-phosphor/recipes-phosphor/initrdscripts/files/obmc-update.sh
 meta-phosphor/recipes-phosphor/initrdscripts/phosphor-mmc-init/mmc-init.sh
 meta-phosphor/recipes-phosphor/interfaces/bmcweb/run-ptest
-meta-phosphor/recipes-phosphor/preinit-mounts/preinit-mounts/init
 meta-phosphor/recipes-support/nss-pam-ldapd/files/nslcd.init
 meta-quanta/meta-common/recipes-quanta/network/usb-network/usb-network.sh
 meta-quanta/meta-gbs/recipes-gbs/gbs-bios-update/files/bios-update.sh
