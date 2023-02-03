@@ -2,8 +2,6 @@
 Description=Phosphor Chassis%i State Manager
 Before=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
 After=org.openbmc.control.Power@%i.service
-Wants=xyz.openbmc_project.Logging.service
-After=xyz.openbmc_project.Logging.service
 After=host-powerctrl.service
 
 [Service]

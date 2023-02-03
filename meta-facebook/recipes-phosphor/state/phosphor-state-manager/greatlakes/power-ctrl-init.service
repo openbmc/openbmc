@@ -1,7 +1,5 @@
 [Unit]
 Description=Power Control Initialization
-Wants=xyz.openbmc_project.Logging.service
-After=xyz.openbmc_project.Logging.service
 Before=mapper-wait@-xyz.openbmc_project.State.Chassis@0.service
 Before=mapper-wait@-xyz-openbmc_project-state-bmc.service
 
