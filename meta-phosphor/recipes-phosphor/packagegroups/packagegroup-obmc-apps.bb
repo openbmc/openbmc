@@ -37,7 +37,6 @@ SUMMARY:${PN}-bmc-state-mgmt = "BMC state management"
 RDEPENDS:${PN}-bmc-state-mgmt = " \
         ${VIRTUAL-RUNTIME_obmc-bmc-state-manager} \
         phosphor-state-manager-systemd-target-monitor \
-        obmc-targets \
         "
 
 SUMMARY:${PN}-bmcweb = "bmcweb support"

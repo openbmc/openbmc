@@ -1,6 +1,5 @@
 [Unit]
 Description=Phosphor DBus Monitor
-After=obmc-mapper.target
 
 [Service]
 Restart=always

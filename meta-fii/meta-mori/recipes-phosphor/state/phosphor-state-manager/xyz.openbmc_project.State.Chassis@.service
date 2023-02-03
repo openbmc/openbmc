@@ -1,8 +1,6 @@
 [Unit]
 Description=Phosphor Chassis%i State Manager
 Before=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
-Wants=obmc-mapper.target
-After=obmc-mapper.target
 After=org.openbmc.control.Power@%i.service
 Wants=xyz.openbmc_project.Logging.service
 After=xyz.openbmc_project.Logging.service

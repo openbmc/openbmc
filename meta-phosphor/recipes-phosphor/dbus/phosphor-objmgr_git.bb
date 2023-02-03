@@ -9,7 +9,7 @@ DEPENDS += "libtinyxml2"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "cli11"
-SRCREV = "58881d0b563ad6ea9e3d1c3fcb84496f41205f01"
+SRCREV = "a99e109c5846d55b6df31c19410642b3520a17c8"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
@@ -18,17 +18,15 @@ SRC_URI += "git://github.com/openbmc/phosphor-objmgr;branch=master;protocol=http
 SYSTEMD_SERVICE:${PN} += " \
         mapper-wait@.service \
         mapper-subtree-remove@.service \
+        xyz.openbmc_project.ObjectMapper.service \
         "
 S = "${WORKDIR}/git"
 
-inherit meson pkgconfig
-inherit obmc-phosphor-dbus-service
-inherit obmc-phosphor-systemd
+inherit meson pkgconfig systemd
 
 EXTRA_OEMESON += "-Dtests=disabled"
 
 PROVIDES += "libmapper"
 PACKAGE_BEFORE_PN += "libmapper"
 FILES:libmapper = "${libdir}/lib*.so*"
-
-DBUS_SERVICE:${PN} += "xyz.openbmc_project.ObjectMapper.service"
+FILES:${PN} += "${datadir}/dbus-1"

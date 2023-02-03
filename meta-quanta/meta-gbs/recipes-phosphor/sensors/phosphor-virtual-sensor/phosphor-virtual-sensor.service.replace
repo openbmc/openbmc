@@ -1,7 +1,5 @@
 [Unit]
 Description=Virtual sensors
-Wants=obmc-mapper.target
-After=obmc-mapper.target
 After=mapper-wait@-xyz-openbmc_project-sensors-temperature-inlet.service
 After=mapper-wait@-xyz-openbmc_project-sensors-temperature-outlet_0.service
 After=mapper-wait@-xyz-openbmc_project-sensors-temperature-outlet_1.service
