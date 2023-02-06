@@ -15,3 +15,4 @@ do_install:append() {
 }
 
 RDEPENDS:${PN}:append:df-obmc-ubi-fs = " preinit-mounts"
+RDEPENDS:${PN}:append:df-obmc-static-norootfs = " phosphor-static-norootfs-init"

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+cd /
+
+for f in /usr/libexec/phosphor-static-norootfs-init/*; do
+    if [ "$(basename "$f")" = "init" ]; then
+        continue
+    fi
+
+    $f
+done
+
+exec /lib/systemd/systemd

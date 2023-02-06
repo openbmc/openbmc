@@ -1,0 +1,6 @@
+#!/bin/sh
+
+mount dev dev -tdevtmpfs
+mount sys sys -tsysfs
+mount proc proc -tproc
+mount tmpfs run -t tmpfs -o mode=755,nodev
