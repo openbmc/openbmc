@@ -1,8 +1,9 @@
-From 494a1379116b8f0af4d0fe923167b81a5de82fc7 Mon Sep 17 00:00:00 2001
-From: jhkang <jhkang@nuvoton.com>
-Date: Wed, 29 Jun 2022 20:26:42 -0700
+From 8e8aa415917c2086c7cc843078f339ba82117fa0 Mon Sep 17 00:00:00 2001
+From: Eason Yang <yhyang2@nuvoton.com>
+Date: Mon, 6 Feb 2023 13:20:02 +0800
 Subject: [PATCH 5/5] Add support for CPLD firmware upgrade
 
+Signed-off-by: Eason Yang <yhyang2@nuvoton.com>
 ---
  activation.cpp    | 79 +++++++++++++++++++++++++++++++++++++++++++++++
  activation.hpp    |  5 +++
@@ -13,10 +14,10 @@ Subject: [PATCH 5/5] Add support for CPLD firmware upgrade
  6 files changed, 181 insertions(+)
 
 diff --git a/activation.cpp b/activation.cpp
-index 4a19222..d064376 100644
+index b2c3336..eb37ecb 100644
 --- a/activation.cpp
 +++ b/activation.cpp
-@@ -168,6 +168,19 @@ auto Activation::activation(Activations value) -> Activations
+@@ -159,6 +159,19 @@ auto Activation::activation(Activations value) -> Activations
          }
  #endif
  
@@ -36,7 +37,7 @@ index 4a19222..d064376 100644
          activationProgress->progress(10);
  
          parent.freeSpace(*this);
-@@ -352,6 +365,14 @@ void Activation::unitStateChange(sdbusplus::message::message& msg)
+@@ -342,6 +355,14 @@ void Activation::unitStateChange(sdbusplus::message_t& msg)
      }
  #endif
  
@@ -51,7 +52,7 @@ index 4a19222..d064376 100644
      onStateChanges(msg);
  
      return;
-@@ -560,6 +581,64 @@ void Activation::onStateChangesMcu(sdbusplus::message::message& msg)
+@@ -550,6 +571,64 @@ void Activation::onStateChangesMcu(sdbusplus::message::message& msg)
  
  #endif
  
@@ -117,10 +118,10 @@ index 4a19222..d064376 100644
  {
      auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
 diff --git a/activation.hpp b/activation.hpp
-index d71734c..d835475 100644
+index 557b00b..7d8c03b 100644
 --- a/activation.hpp
 +++ b/activation.hpp
-@@ -256,6 +256,11 @@ class Activation : public ActivationInherit, public Flash
+@@ -255,6 +255,11 @@ class Activation : public ActivationInherit, public Flash
      void onStateChangesMcu(sdbusplus::message::message&);
  #endif
  
@@ -130,13 +131,13 @@ index d71734c..d835475 100644
 +#endif
 +
      /** @brief Overloaded function that acts on service file state changes */
-     void onStateChanges(sdbusplus::message::message&) override;
+     void onStateChanges(sdbusplus::message_t&) override;
  
 diff --git a/item_updater.cpp b/item_updater.cpp
-index dbeacd4..7758ca4 100644
+index 9cc71c3..d55f0c0 100644
 --- a/item_updater.cpp
 +++ b/item_updater.cpp
-@@ -73,6 +73,9 @@ void ItemUpdater::createActivation(sdbusplus::message::message& msg)
+@@ -74,6 +74,9 @@ void ItemUpdater::createActivation(sdbusplus::message_t& msg)
  #endif
  #ifdef MCU_UPGRADE
                          value == VersionPurpose::MCU ||
@@ -146,7 +147,7 @@ index dbeacd4..7758ca4 100644
  #endif
                          value == VersionPurpose::System)
                      {
-@@ -947,6 +950,64 @@ void ItemUpdater::createMCUObject()
+@@ -957,6 +960,64 @@ void ItemUpdater::createMCUObject()
  }
  #endif
  
@@ -212,20 +213,20 @@ index dbeacd4..7758ca4 100644
  {
      // Check /run/media/slot to get the slot number
 diff --git a/item_updater.hpp b/item_updater.hpp
-index d980deb..4be179c 100644
+index 46472ca..d486acb 100644
 --- a/item_updater.hpp
 +++ b/item_updater.hpp
-@@ -70,6 +70,9 @@ class ItemUpdater : public ItemUpdaterInherit
- #endif
- #ifdef MCU_UPGRADE
-         createMCUObject();
-+ #endif
+@@ -67,6 +67,9 @@ class ItemUpdater : public ItemUpdaterInherit
+         restoreFieldModeStatus();
+ #ifdef HOST_BIOS_UPGRADE
+         createBIOSObject();
++#endif
 +#ifdef CPLD_UPGRADE
 +        createCPLDObject();
-  #endif
+ #endif
          emit_object_added();
      };
-@@ -300,6 +303,23 @@ class ItemUpdater : public ItemUpdaterInherit
+@@ -297,6 +300,23 @@ class ItemUpdater : public ItemUpdaterInherit
      std::unique_ptr<VersionClass> mcuVersion;
  #endif
  
@@ -250,7 +251,7 @@ index d980deb..4be179c 100644
      void getRunningSlot();
  };
 diff --git a/meson.build b/meson.build
-index b27b6f2..27bf01e 100644
+index 969fa43..4406b2d 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -61,6 +61,8 @@ conf.set_quoted('OS_RELEASE_FILE', '/etc/os-release')
@@ -282,7 +283,7 @@ index b27b6f2..27bf01e 100644
    conf.set('BMC_STATIC_DUAL_IMAGE', get_option('bmc-static-dual-image').enabled())
    conf.set_quoted('ALT_ROFS_DIR', get_option('alt-rofs-dir'))
 diff --git a/meson_options.txt b/meson_options.txt
-index 198d4de..ae00709 100644
+index 519ba2c..574a9cb 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
 @@ -15,6 +15,9 @@ option('host-bios-upgrade', type: 'feature', value: 'enabled',
@@ -295,7 +296,7 @@ index 198d4de..ae00709 100644
  option('sync-bmc-files', type: 'feature', value: 'enabled',
      description: 'Enable sync of filesystem files.')
  
-@@ -135,6 +138,12 @@ option(
+@@ -133,6 +136,12 @@ option(
      description: 'The MCU DBus object path.',
  )
  

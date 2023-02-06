@@ -1,22 +1,23 @@
-From fd179d29d479011a4cf7f449fa391b065a423930 Mon Sep 17 00:00:00 2001
-From: jhkang <jhkang@nuvoton.com>
-Date: Fri, 24 Jun 2022 04:02:23 -0700
+From ef4e81a9039120baa3a052a8a1f0bd6906390c75 Mon Sep 17 00:00:00 2001
+From: Eason Yang <yhyang2@nuvoton.com>
+Date: Mon, 6 Feb 2023 11:49:04 +0800
 Subject: [PATCH 4/4] Add support for MCU firmware upgrade
 
+Signed-off-by: Eason Yang <yhyang2@nuvoton.com>
 ---
  activation.cpp    | 97 ++++++++++++++++++++++++++++++++++++++++++++++-
  activation.hpp    |  8 ++++
- item_updater.cpp  | 60 ++++++++++++++++++++++++++++-
- item_updater.hpp  | 20 ++++++++++
+ item_updater.cpp  | 59 ++++++++++++++++++++++++++++
+ item_updater.hpp  | 17 +++++++++
  meson.build       |  8 ++++
  meson_options.txt | 15 ++++++++
- 6 files changed, 205 insertions(+), 3 deletions(-)
+ 6 files changed, 202 insertions(+), 2 deletions(-)
 
 diff --git a/activation.cpp b/activation.cpp
-index e057814..4a19222 100644
+index 7c1f735..b2c3336 100644
 --- a/activation.cpp
 +++ b/activation.cpp
-@@ -135,8 +135,8 @@ auto Activation::activation(Activations value) -> Activations
+@@ -126,8 +126,8 @@ auto Activation::activation(Activations value) -> Activations
                  std::make_unique<ActivationBlocksTransition>(bus, path);
          }
  
@@ -26,7 +27,7 @@ index e057814..4a19222 100644
          if (purpose == VersionPurpose::Host)
          {
              // Enable systemd signals
-@@ -152,6 +152,22 @@ auto Activation::activation(Activations value) -> Activations
+@@ -143,6 +143,22 @@ auto Activation::activation(Activations value) -> Activations
          }
  #endif
  
@@ -49,7 +50,7 @@ index e057814..4a19222 100644
          activationProgress->progress(10);
  
          parent.freeSpace(*this);
-@@ -319,8 +335,8 @@ void Activation::unitStateChange(sdbusplus::message::message& msg)
+@@ -309,8 +325,8 @@ void Activation::unitStateChange(sdbusplus::message_t& msg)
          return;
      }
  
@@ -59,7 +60,7 @@ index e057814..4a19222 100644
      if (purpose == VersionPurpose::Host)
      {
          onStateChangesBios(msg);
-@@ -328,6 +344,14 @@ void Activation::unitStateChange(sdbusplus::message::message& msg)
+@@ -318,6 +334,14 @@ void Activation::unitStateChange(sdbusplus::message_t& msg)
      }
  #endif
  
@@ -74,7 +75,7 @@ index e057814..4a19222 100644
      onStateChanges(msg);
  
      return;
-@@ -467,6 +491,75 @@ void Activation::onStateChangesBios(sdbusplus::message::message& msg)
+@@ -457,6 +481,75 @@ void Activation::onStateChangesBios(sdbusplus::message_t& msg)
  
  #endif
  
@@ -151,11 +152,11 @@ index e057814..4a19222 100644
  {
      auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
 diff --git a/activation.hpp b/activation.hpp
-index 7425a54..d71734c 100644
+index 94cc1bb..557b00b 100644
 --- a/activation.hpp
 +++ b/activation.hpp
-@@ -248,6 +248,14 @@ class Activation : public ActivationInherit, public Flash
-     void onStateChangesBios(sdbusplus::message::message&);
+@@ -247,6 +247,14 @@ class Activation : public ActivationInherit, public Flash
+     void onStateChangesBios(sdbusplus::message_t&);
  #endif
  
 +#ifdef MCU_UPGRADE
@@ -167,21 +168,13 @@ index 7425a54..d71734c 100644
 +#endif
 +
      /** @brief Overloaded function that acts on service file state changes */
-     void onStateChanges(sdbusplus::message::message&) override;
+     void onStateChanges(sdbusplus::message_t&) override;
  
 diff --git a/item_updater.cpp b/item_updater.cpp
-index 6128e50..dbeacd4 100644
+index ff9cfc0..9cc71c3 100644
 --- a/item_updater.cpp
 +++ b/item_updater.cpp
-@@ -40,7 +40,6 @@ using NotAllowed = sdbusplus::xyz::openbmc_project::Common::Error::NotAllowed;
- 
- void ItemUpdater::createActivation(sdbusplus::message::message& msg)
- {
--
-     using SVersion = server::Version;
-     using VersionPurpose = SVersion::VersionPurpose;
-     using VersionClass = phosphor::software::manager::Version;
-@@ -71,6 +70,9 @@ void ItemUpdater::createActivation(sdbusplus::message::message& msg)
+@@ -71,6 +71,9 @@ void ItemUpdater::createActivation(sdbusplus::message_t& msg)
                      if (value == VersionPurpose::BMC ||
  #ifdef HOST_BIOS_UPGRADE
                          value == VersionPurpose::Host ||
@@ -191,7 +184,7 @@ index 6128e50..dbeacd4 100644
  #endif
                          value == VersionPurpose::System)
                      {
-@@ -889,6 +891,62 @@ void ItemUpdater::createBIOSObject()
+@@ -898,6 +901,62 @@ void ItemUpdater::createBIOSObject()
  }
  #endif
  
@@ -255,20 +248,10 @@ index 6128e50..dbeacd4 100644
  {
      // Check /run/media/slot to get the slot number
 diff --git a/item_updater.hpp b/item_updater.hpp
-index ccacd28..d980deb 100644
+index c50d9de..46472ca 100644
 --- a/item_updater.hpp
 +++ b/item_updater.hpp
-@@ -68,6 +68,9 @@ class ItemUpdater : public ItemUpdaterInherit
- #ifdef HOST_BIOS_UPGRADE
-         createBIOSObject();
- #endif
-+#ifdef MCU_UPGRADE
-+        createMCUObject();
-+ #endif
-         emit_object_added();
-     };
- 
-@@ -280,6 +283,23 @@ class ItemUpdater : public ItemUpdaterInherit
+@@ -280,6 +280,23 @@ class ItemUpdater : public ItemUpdaterInherit
      std::unique_ptr<VersionClass> biosVersion;
  #endif
  
@@ -293,7 +276,7 @@ index ccacd28..d980deb 100644
      void getRunningSlot();
  };
 diff --git a/meson.build b/meson.build
-index 2bf7700..b27b6f2 100644
+index f99a034..969fa43 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -59,6 +59,8 @@ conf.set_quoted('BMC_ROFS_PREFIX', get_option('media-dir') + '/rofs-')
@@ -333,7 +316,7 @@ index 2bf7700..b27b6f2 100644
    conf.set('BMC_STATIC_DUAL_IMAGE', get_option('bmc-static-dual-image').enabled())
    conf.set_quoted('ALT_ROFS_DIR', get_option('alt-rofs-dir'))
 diff --git a/meson_options.txt b/meson_options.txt
-index e9eecff..198d4de 100644
+index a356b5b..519ba2c 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
 @@ -12,6 +12,9 @@ option('bmc-layout', type: 'combo',
@@ -346,7 +329,7 @@ index e9eecff..198d4de 100644
  option('sync-bmc-files', type: 'feature', value: 'enabled',
      description: 'Enable sync of filesystem files.')
  
-@@ -54,6 +57,12 @@ option(
+@@ -52,6 +55,12 @@ option(
      description: 'Directory where downloaded software images are placed.',
  )
  
@@ -359,7 +342,7 @@ index e9eecff..198d4de 100644
  option(
      'manifest-file-name', type: 'string',
      value: 'MANIFEST',
-@@ -120,6 +129,12 @@ option(
+@@ -118,6 +127,12 @@ option(
      description: 'The BIOS DBus object path.',
  )
  

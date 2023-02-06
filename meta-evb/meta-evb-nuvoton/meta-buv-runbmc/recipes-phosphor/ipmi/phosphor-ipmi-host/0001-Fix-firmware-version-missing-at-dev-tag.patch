@@ -1,23 +1,22 @@
-From 3f2952b42b8806558c2a0184914f5545433b5c76 Mon Sep 17 00:00:00 2001
-From: Brian Ma <chma0@nuvoton.com>
-Date: Fri, 17 Jun 2022 10:46:34 +0800
-Subject: [PATCH] Fix firmware version missing at dev tag
+From 78894a40241f73fb752de0bb564d99d2c7ab4662 Mon Sep 17 00:00:00 2001
+From: Eason Yang <yhyang2@nuvoton.com>
+Date: Mon, 6 Feb 2023 13:37:15 +0800
+Subject: [PATCH 1/1] Fix firmware version missing at dev tag
 
-The firmware version "v" must at the first character, wwe should not
+The firmware version "v" must at the first character, we should not
 handle other "v" (like "dev") to avoid parsing string error.
 
-Signed-off-by: Brian Ma <chma0@nuvoton.com>
-Change-Id: I274e7158b44f2c5dd566e47940bfc1fd7e5ebe83
+Signed-off-by: Eason Yang <yhyang2@nuvoton.com>
 ---
  apphandler.cpp | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/apphandler.cpp b/apphandler.cpp
-index 0577c07..7aa5c54 100644
+index a43200c6..9401c3ea 100644
 --- a/apphandler.cpp
 +++ b/apphandler.cpp
-@@ -486,7 +486,7 @@ int convertVersion(std::string s, Revision& rev)
-     std::string token;
+@@ -490,7 +490,7 @@ int convertVersion(std::string_view s, Revision& rev)
+     std::string_view token;
      uint16_t commits;
  
 -    auto location = s.find_first_of('v');
