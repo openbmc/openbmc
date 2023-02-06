@@ -25,6 +25,19 @@ FILES:${PN}-catalog-extralocales = "\
     ${exec_prefix}/lib/systemd/catalog/*.*.catalog \
 "
 
+SRC_URI:append = " \
+  file://40-hardware-watchdog.conf \
+  "
+
+FILES:${PN}:append = " \
+  ${systemd_unitdir}/system.conf.d/40-hardware-watchdog.conf \
+  "
+
+do_install:append() {
+    install -d -m 0755 ${D}${systemd_unitdir}/system.conf.d/
+    install -m 0644 ${WORKDIR}/40-hardware-watchdog.conf ${D}${systemd_unitdir}/system.conf.d/
+}
+
 # udev is added to the USERADD_PACKAGES due to some 'render' group
 # being necessary to create for /dev/dri handling, which we don't
 # have to worry about.  A side-effect of this is udev would RDEPEND on
