@@ -9,15 +9,15 @@
 
 KBRANCH ?= "NPCM-5.15-OpenBMC"
 LINUX_VERSION ?= "5.15.85"
-SRCREV = "3abf743f85cdcf65f0942eb7b814c08fa67ccec0"
+SRCREV = "5dd34e1e581c77ae77d28fbda1515a4ced82135f"
 
 require linux-nuvoton.inc
 
 SRC_URI:append:nuvoton = " file://0003-i2c-nuvoton-npcm750-runbmc-integrate-the-slave-mqueu.patch"
-SRC_URI:append:nuvoton = " file://0004-driver-ncsi-replace-del-timer-sync.patch"
-#SRC_URI:append:nuvoton = " file://0015-driver-misc-nuvoton-vdm-support-openbmc-libmctp.patch"
 SRC_URI:append:nuvoton = " file://0017-drivers-i2c-workaround-for-i2c-slave-behavior.patch"
-SRC_URI:append:nuvoton = " file://0018-cerberus-mailbox-driver.patch"
 
 # New Arch VDMX/VDMA driver
 # SRC_URI:append:nuvoton = " file://2222-driver-misc-add-nuvoton-vdmx-vdma-driver.patch"
+
+# SRC_URI:append:nuvoton = " file://0004-driver-ncsi-replace-del-timer-sync.patch"
+# SRC_URI:append:nuvoton = " file://0015-driver-misc-nuvoton-vdm-support-openbmc-libmctp.patch"
