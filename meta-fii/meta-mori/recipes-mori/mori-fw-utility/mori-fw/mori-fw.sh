@@ -21,7 +21,7 @@ function fwbios() {
   echo "${KERNEL_FIU_ID}" > "${KERNEL_SYSFS_FIU}"/bind
 
   # write to the mtd device
-  BIOS_MTD=$(grep "bios" /proc/mtd | sed -n 's/^\(.*\):.*/\1/p')
+  BIOS_MTD=$(grep "hnor" /proc/mtd | sed -n 's/^\(.*\):.*/\1/p')
 
   if [ ! -f "$1" ]; then
     echo " Cannot find the" "$1" "image file"
