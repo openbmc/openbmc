@@ -1,7 +1,7 @@
-From 494799e6d2f285280755d066c2db632c0fa48787 Mon Sep 17 00:00:00 2001
-From: Tim Lee <timlee660101@gmail.com>
-Date: Wed, 27 Nov 2019 09:56:22 +0800
-Subject: [PATCH] main: add feature for updating BootProgress and
+From ffbc9030ca158578295f80cf8b591bd1ce3b6fc4 Mon Sep 17 00:00:00 2001
+From: Eason Yang <yhyang2@nuvoton.com>
+Date: Wed, 8 Feb 2023 14:32:27 +0800
+Subject: [PATCH 1/1] main: add feature for updating BootProgress and 
  OperatingSystemState properties when host power on
 
 Due to BootProgress and OperatingSystemState of Host state didn't be updated correctly.
@@ -19,14 +19,14 @@ Result:
 "BootProgress": "xyz.openbmc_project.State.Boot.Progress.ProgressStages.OSStart",
 "OperatingSystemState": "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Standby" }
 
-Signed-off-by: Tim Lee <timlee660101@gmail.com>
+Signed-off-by: Eason Yang <yhyang2@nuvoton.com>
 ---
  lpcsnoop/snoop.hpp |  27 +++++++++
  main.cpp           | 133 +++++++++++++++++++++++++++++++++++++++++++++
  2 files changed, 160 insertions(+)
 
 diff --git a/lpcsnoop/snoop.hpp b/lpcsnoop/snoop.hpp
-index dab3334..b58d385 100644
+index dfa11de..3d9674f 100644
 --- a/lpcsnoop/snoop.hpp
 +++ b/lpcsnoop/snoop.hpp
 @@ -9,6 +9,33 @@ constexpr char snoopObject[] = "/xyz/openbmc_project/state/boot/raw0";
@@ -61,13 +61,13 @@ index dab3334..b58d385 100644
 +std::variant<std::string> standby = "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Standby";
 +
  template <typename... T>
- using ServerObject = typename sdbusplus::server::object::object<T...>;
+ using ServerObject = typename sdbusplus::server::object_t<T...>;
  using PostInterface = sdbusplus::xyz::openbmc_project::State::Boot::server::Raw;
 diff --git a/main.cpp b/main.cpp
-index 7886b75..00a0963 100644
+index 3b76870..7be506c 100644
 --- a/main.cpp
 +++ b/main.cpp
-@@ -40,6 +40,9 @@
+@@ -41,6 +41,9 @@
  #include <stdplus/signal.hpp>
  #include <thread>
  
@@ -77,7 +77,7 @@ index 7886b75..00a0963 100644
  #ifdef ENABLE_IPMI_SNOOP
  #include <xyz/openbmc_project/State/Boot/Raw/server.hpp>
  #endif
-@@ -96,6 +99,90 @@ void IpmiPostReporter::getSelectorPositionSignal(sdbusplus::bus::bus& bus)
+@@ -97,6 +100,90 @@ void IpmiPostReporter::getSelectorPositionSignal(sdbusplus::bus_t& bus)
  }
  #endif
  
@@ -168,7 +168,7 @@ index 7886b75..00a0963 100644
  static void usage(const char* name)
  {
      fprintf(stderr,
-@@ -115,6 +202,7 @@ static void usage(const char* name)
+@@ -116,6 +203,7 @@ static void usage(const char* name)
  void PostCodeEventHandler(PostReporter* reporter, bool verbose,
                            sdeventplus::source::IO& s, int postFd, uint32_t)
  {
@@ -176,7 +176,7 @@ index 7886b75..00a0963 100644
      uint64_t code = 0;
      ssize_t readb;
      while ((readb = read(postFd, &code, codeSize)) > 0)
-@@ -130,6 +218,46 @@ void PostCodeEventHandler(PostReporter* reporter, bool verbose,
+@@ -131,6 +219,46 @@ void PostCodeEventHandler(PostReporter* reporter, bool verbose,
          reporter->value(std::make_tuple(~code, secondary_post_code_t{}), true);
          reporter->value(std::make_tuple(code, secondary_post_code_t{}));
  
@@ -223,7 +223,7 @@ index 7886b75..00a0963 100644
          // read depends on old data being cleared since it doens't always read
          // the full code size
          code = 0;
-@@ -276,6 +404,11 @@ int main(int argc, char* argv[])
+@@ -290,6 +418,11 @@ int main(int argc, char* argv[])
              }
  #ifndef ENABLE_IPMI_SNOOP
              case 'd':

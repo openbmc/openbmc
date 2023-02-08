@@ -1,21 +1,20 @@
-From 8467a2be936744b63e3a601dca493bf602c755f7 Mon Sep 17 00:00:00 2001
-From: Tim Lee <timlee660101@gmail.com>
-Date: Mon, 20 Jun 2022 15:36:09 +0800
+From 398f767f89db6d539ef18291f2c28e06de2f3871 Mon Sep 17 00:00:00 2001
+From: Eason Yang <yhyang2@nuvoton.com>
+Date: Wed, 8 Feb 2023 15:06:28 +0800
 Subject: [PATCH 3/3] Create new user without SSH group
 
 Remove SSH group permission from default groups when create new user.
 
-Signed-off-by: Brian Ma <chma0@nuvoton.com>
-Signed-off-by: Tim Lee <timlee660101@gmail.com>
+Signed-off-by: Eason Yang <yhyang2@nuvoton.com>
 ---
- redfish-core/lib/account_service.hpp | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ redfish-core/lib/account_service.hpp | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/redfish-core/lib/account_service.hpp b/redfish-core/lib/account_service.hpp
-index c1841cde1..3d1b6f5c1 100644
+index 8da2c4aa2..76a4d131b 100644
 --- a/redfish-core/lib/account_service.hpp
 +++ b/redfish-core/lib/account_service.hpp
-@@ -1582,6 +1582,18 @@ inline void handleAccountCollectionPost(
+@@ -1636,6 +1636,17 @@ inline void handleAccountCollectionPost(
              return;
          }
  
@@ -30,11 +29,10 @@ index c1841cde1..3d1b6f5c1 100644
 +            }
 +        }
 +
-+
          crow::connections::systemBus->async_method_call(
              [asyncResp, username, password](const boost::system::error_code ec2,
-                                             sdbusplus::message::message& m) {
-@@ -1626,7 +1638,7 @@ inline void handleAccountCollectionPost(
+                                             sdbusplus::message_t& m) {
+@@ -1680,7 +1691,7 @@ inline void handleAccountCollectionPost(
              },
              "xyz.openbmc_project.User.Manager", "/xyz/openbmc_project/user",
              "xyz.openbmc_project.User.Manager", "CreateUser", username,

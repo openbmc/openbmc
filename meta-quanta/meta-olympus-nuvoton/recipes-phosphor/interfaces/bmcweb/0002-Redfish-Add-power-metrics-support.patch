@@ -1,18 +1,18 @@
-From 26778716cc866abb33859917b840669693c180a5 Mon Sep 17 00:00:00 2001
-From: Tim Lee <timlee660101@gmail.com>
-Date: Mon, 20 Jun 2022 15:06:19 +0800
+From 031c4bdb2cca4b2006fbd02b9e6de962666e9bab Mon Sep 17 00:00:00 2001
+From: Eason Yang <yhyang2@nuvoton.com>
+Date: Wed, 8 Feb 2023 14:54:34 +0800
 Subject: [PATCH 2/5] Redfish Add power metrics support
 
-Signed-off-by: Tim Lee <timlee660101@gmail.com>
+Signed-off-by: Eason Yang <yhyang2@nuvoton.com>
 ---
  redfish-core/lib/power.hpp | 75 ++++++++++++++++++++++++++++++++++++++
  1 file changed, 75 insertions(+)
 
 diff --git a/redfish-core/lib/power.hpp b/redfish-core/lib/power.hpp
-index 7b2a47ac7..03d3f83af 100644
+index 4d94e5766..1f2621b74 100644
 --- a/redfish-core/lib/power.hpp
 +++ b/redfish-core/lib/power.hpp
-@@ -283,6 +283,81 @@ inline void requestRoutesPower(App& app)
+@@ -290,6 +290,81 @@ inline void requestRoutesPower(App& app)
                      // be null if the limit is not enabled.
                      value = powerCap * std::pow(10, scale);
                  }
@@ -93,7 +93,7 @@ index 7b2a47ac7..03d3f83af 100644
 +                    "xyz.openbmc_project.Power.PowerMetric");
              };
  
-             crow::connections::systemBus->async_method_call(
+             sdbusplus::asio::getAllProperties(
 -- 
 2.17.1
 

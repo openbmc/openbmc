@@ -1,20 +1,32 @@
+From 430e7c554c9c54b72698fc30eca99b1a159ea6a5 Mon Sep 17 00:00:00 2001
+From: Eason Yang <yhyang2@nuvoton.com>
+Date: Wed, 8 Feb 2023 13:55:15 +0800
+Subject: [PATCH 1/1] restore verify bios
+
+Signed-off-by: Eason Yang <yhyang2@nuvoton.com>
+---
+ image_verify.cpp |  1 +
+ item_updater.cpp | 24 +++++++++++++++++++++++-
+ meson.build      |  2 ++
+ 3 files changed, 26 insertions(+), 1 deletion(-)
+
 diff --git a/image_verify.cpp b/image_verify.cpp
-index b7654aa..c66a4b6 100644
+index 9551e4e..01836e0 100644
 --- a/image_verify.cpp
 +++ b/image_verify.cpp
-@@ -93,6 +93,7 @@ bool Signature::verifyFullImage()
-     bool ret = true;
- #ifdef WANT_SIGNATURE_FULL_VERIFY
+@@ -105,6 +105,7 @@ bool Signature::verifyFullImage()
+     }
+ 
      std::vector<std::string> fullImages = {
 +        fs::path(imageDirPath) / "image-bios.sig",
          fs::path(imageDirPath) / "image-bmc.sig",
          fs::path(imageDirPath) / "image-hostfw.sig",
          fs::path(imageDirPath) / "image-kernel.sig",
 diff --git a/item_updater.cpp b/item_updater.cpp
-index b6464f6..46e80cc 100644
+index 2fdbc31..ff9cfc0 100644
 --- a/item_updater.cpp
 +++ b/item_updater.cpp
-@@ -748,6 +748,28 @@ bool ItemUpdater::checkImage(const std::string& filePath,
+@@ -843,6 +843,28 @@ bool ItemUpdater::checkImage(const std::string& filePath,
  }
  
  #ifdef HOST_BIOS_UPGRADE
@@ -43,7 +55,7 @@ index b6464f6..46e80cc 100644
  void ItemUpdater::createBIOSObject()
  {
      std::string path = BIOS_OBJPATH;
-@@ -763,7 +785,7 @@ void ItemUpdater::createBIOSObject()
+@@ -858,7 +880,7 @@ void ItemUpdater::createBIOSObject()
      createFunctionalAssociation(path);
  
      auto versionId = path.substr(pos + 1);
@@ -53,10 +65,10 @@ index b6464f6..46e80cc 100644
      biosActivation = std::make_unique<Activation>(
          bus, path, *this, versionId, server::Activation::Activations::Active,
 diff --git a/meson.build b/meson.build
-index e182f46..46cd239 100644
+index 0d9d68d..f99a034 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -58,6 +58,8 @@ conf.set_quoted('ALT_RWFS', '/media/alt/var/persist')
+@@ -57,6 +57,8 @@ conf.set_quoted('UPDATEABLE_REV_ASSOCIATION', 'software_version')
  conf.set_quoted('BMC_ROFS_PREFIX', get_option('media-dir') + '/rofs-')
  # The name of the BMC table of contents file
  conf.set_quoted('OS_RELEASE_FILE', '/etc/os-release')
@@ -65,3 +77,6 @@ index e182f46..46cd239 100644
  # The dir where activation data is stored in files
  conf.set_quoted('PERSIST_DIR', '/var/lib/phosphor-bmc-code-mgmt/')
  
+-- 
+2.17.1
+
