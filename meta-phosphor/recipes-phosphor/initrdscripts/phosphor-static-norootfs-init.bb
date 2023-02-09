@@ -8,6 +8,7 @@ SOURCE_FILES = "\
     init \
     10-early-mounts \
     20-udev \
+    21-factory-reset \
     30-ubiattach-or-format \
     50-mount-persistent \
     "
@@ -33,6 +34,8 @@ do_install() {
 }
 
 RDEPENDS:${PN} += " \
+    ${@d.getVar('PREFERRED_PROVIDER_u-boot-fw-utils', True) or \
+        'u-boot-fw-utils'} \
     ${VIRTUAL-RUNTIME_base-utils} \
     mtd-utils-ubifs \
     udev \

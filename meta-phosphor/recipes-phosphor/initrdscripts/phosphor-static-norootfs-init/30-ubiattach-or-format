@@ -4,7 +4,16 @@ if [ ! -e /dev/mtd/rwfs ]; then
     exit 1
 fi
 
-if ! ubiattach -p /dev/mtd/rwfs > /dev/null ; then
+if [ ! -e /run/format-persist ]; then
+    if ! ubiattach -p /dev/mtd/rwfs > /dev/null ; then
+        echo "unformatted-ubi" >> /run/format-persist
+    fi
+fi
+
+if [ -e /run/format-persist ]; then
+    echo "Formatting persistent volume: "
+    cat /run/format-persist
+
     if ! ubiformat --yes /dev/mtd/rwfs ; then
         exit 1
     fi
