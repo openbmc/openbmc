@@ -1,4 +1,4 @@
-From ee728971fd9d2da39356f1574d58d5daa3b24520 Mon Sep 17 00:00:00 2001
+From 316b81c462f065927d7fec56aadd5c8cb94d1cf0 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 26 Aug 2022 00:28:08 -0700
 Subject: [PATCH] configure: Remove runtime test for mmap that can map
@@ -10,24 +10,25 @@ mutexes
 
 Upstream-Status: Inappropriate [Cross-compile specific]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
- configure.in | 32 --------------------------------
- 1 file changed, 32 deletions(-)
+ configure.in | 30 ------------------------------
+ 1 file changed, 30 deletions(-)
 
 diff --git a/configure.in b/configure.in
-index a99049d..f1f55c7 100644
+index 3663220..dce9789 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -1182,38 +1182,6 @@ AC_CHECK_FUNCS([mmap munmap shm_open shm_unlink shmget shmat shmdt shmctl \
+@@ -1303,36 +1303,6 @@ AC_CHECK_FUNCS([mmap munmap shm_open shm_unlink shmget shmat shmdt shmctl \
  APR_CHECK_DEFINE(MAP_ANON, sys/mman.h)
  AC_CHECK_FILE(/dev/zero)
  
 -# Not all systems can mmap /dev/zero (such as HP-UX).  Check for that.
 -if test "$ac_cv_func_mmap" = "yes" &&
--   test "$ac_cv_file__dev_zero" = "yes"; then
--    AC_MSG_CHECKING(for mmap that can map /dev/zero)
--    AC_TRY_RUN([
--#include <sys/types.h>
+-  test "$ac_cv_file__dev_zero" = "yes"; then
+-    AC_CACHE_CHECK([for mmap that can map /dev/zero],
+-    [ac_cv_mmap__dev_zero],
+-    [AC_TRY_RUN([#include <sys/types.h>
 -#include <sys/stat.h>
 -#include <fcntl.h>
 -#ifdef HAVE_SYS_MMAN_H
@@ -49,14 +50,9 @@ index a99049d..f1f55c7 100644
 -            return 3;
 -        }
 -        return 0;
--    }], [], [ac_cv_file__dev_zero=no], [ac_cv_file__dev_zero=no])
--
--    AC_MSG_RESULT($ac_cv_file__dev_zero)
+-    }], [], [ac_cv_file__dev_zero=no], [ac_cv_file__dev_zero=no])])
 -fi
 -
  # Now we determine which one is our anonymous shmem preference.
  haveshmgetanon="0"
  havemmapzero="0"
--- 
-2.37.2
-

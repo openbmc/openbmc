@@ -8,6 +8,7 @@ SRC_URI += "git://github.com/ARM-software/sbsa-acs;destsuffix=edk2/ShellPkg/Appl
             git://github.com/tianocore/edk2-libc;destsuffix=edk2/edk2-libc;protocol=https;branch=master;name=libc \
             file://shell.patch \
             file://use_bfd_linker.patch \
+            file://enum-int-mismatch.patch \
             file://0001-Revert-peripheral-test-3-updated-for-multiple-uarts.patch;patchdir=ShellPkg/Application/sbsa-acs \
             "
 

@@ -392,7 +392,7 @@ def export_manifest_info(args):
                     for key in rd.getVarFlags('PACKAGECONFIG').keys():
                         if key == 'doc':
                             continue
-                        rvalues[pn]['packageconfig_opts'][key] = rd.getVarFlag('PACKAGECONFIG', key, True)
+                        rvalues[pn]['packageconfig_opts'][key] = rd.getVarFlag('PACKAGECONFIG', key)
 
                 if config['patches'] == 'yes':
                     patches = oe.recipeutils.get_recipe_patches(rd)

@@ -1,0 +1,32 @@
+From 87745a6cad0f7819ac8f8d3826f5e228ebd843c5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 2 Feb 2023 16:39:26 -0800
+Subject: [PATCH] Include missing <cstdint>
+
+gcc 13 moved some includes around and as a result <cstdint> is no
+longer transitively included [1]. Explicitly include it
+for uintXX_t.
+
+[1] https://gcc.gnu.org/gcc-13/porting_to.html#header-dep-changes
+
+Upstream-Status: Submitted [https://github.com/ARM-software/gator/pull/40]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ daemon/xml/CurrentConfigXML.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/daemon/xml/CurrentConfigXML.h b/daemon/xml/CurrentConfigXML.h
+index 0b239fd..d9047e3 100644
+--- a/daemon/xml/CurrentConfigXML.h
++++ b/daemon/xml/CurrentConfigXML.h
+@@ -1,6 +1,7 @@
+ /* Copyright (C) 2020-2021 by Arm Limited. All rights reserved. */
+ #pragma once
+ 
++#include <cstdint>
+ #include <set>
+ #include <string>
+ 
+-- 
+2.39.1
+

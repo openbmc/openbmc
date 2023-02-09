@@ -3,7 +3,7 @@ From: Trevor Woerner <twoerner@gmail.com>
 Date: Fri, 4 Dec 2020 01:54:37 -0500
 Subject: [PATCH] add "install" targets to Makefiles
 
-Upstream-status: submitted [https://github.com/AndrewFromMelbourne/raspidmx/pull/29]
+Upstream-Status: Submitted [https://github.com/AndrewFromMelbourne/raspidmx/pull/29]
 Signed-off-by: Trevor Woerner <twoerner@gmail.com>
 ---
  Makefile                   | 3 +++

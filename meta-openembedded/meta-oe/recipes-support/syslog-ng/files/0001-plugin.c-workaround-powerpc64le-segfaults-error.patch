@@ -1,0 +1,46 @@
+From 616446afab61ab98b28c81605e2efd4a689f37d1 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Fri, 20 Jan 2023 14:59:14 +0800
+Subject: [PATCH] plugin.c: workaround powerpc64le segfaults error
+
+syslog-ng segfaults on powerpc64le, workaround this error.
+See https://github.com/syslog-ng/syslog-ng/issues/4285 and
+https://sourceware.org/bugzilla/show_bug.cgi?id=30062 for more details.
+This patch should be dropped once the above issues are fixed.
+
+Upstream-Status: Inappropriate [OE Specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ lib/plugin.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/lib/plugin.c b/lib/plugin.c
+index fbbfb92..3a03617 100644
+--- a/lib/plugin.c
++++ b/lib/plugin.c
+@@ -528,10 +528,7 @@ plugin_discover_candidate_modules(PluginContext *context)
+                     }
+                 }
+               g_free(module_name);
+-              if (mod)
+-                g_module_close(mod);
+-              else
+-                mod = NULL;
++              mod = NULL;
+             }
+         }
+       g_dir_close(dir);
+@@ -663,8 +660,7 @@ plugin_list_modules(FILE *out, gboolean verbose)
+                   first = FALSE;
+                 }
+               g_free(module_name);
+-              if (mod)
+-                g_module_close(mod);
++              mod = NULL;
+             }
+         }
+       g_dir_close(dir);
+-- 
+2.17.1
+

@@ -1313,7 +1313,7 @@ class BaseConfig(object):
         """attempt to determine the appropriate qemu-system binary"""
         mach = self.get('MACHINE')
         if not mach:
-            search = '.*(qemux86-64|qemux86|qemuarm64|qemuarm|qemumips64|qemumips64el|qemumipsel|qemumips|qemuppc).*'
+            search = '.*(qemux86-64|qemux86|qemuarm64|qemuarm|qemuloongarch64|qemumips64|qemumips64el|qemumipsel|qemumips|qemuppc).*'
             if self.rootfs:
                 match = re.match(search, self.rootfs)
                 if match:
@@ -1336,6 +1336,8 @@ class BaseConfig(object):
             qbsys = 'x86_64'
         elif mach == 'qemuppc':
             qbsys = 'ppc'
+        elif mach == 'qemuloongarch64':
+            qbsys = 'loongarch64'
         elif mach == 'qemumips':
             qbsys = 'mips'
         elif mach == 'qemumips64':

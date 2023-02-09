@@ -141,6 +141,8 @@ LDFLAGS:append:x86 = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', ' -f
 EXTRA_OEMAKE = "V=1"
 
 do_configure() {
+    export TMPDIR="${B}/tmp"
+    mkdir -p ${B}/tmp
     ${S}/configure ${EXTRA_OECONF}
     sed -i -e "s,^X86ASMFLAGS=.*,& --debug-prefix-map=${S}=/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR} --debug-prefix-map=${B}=/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR},g" ${B}/ffbuild/config.mak
 }

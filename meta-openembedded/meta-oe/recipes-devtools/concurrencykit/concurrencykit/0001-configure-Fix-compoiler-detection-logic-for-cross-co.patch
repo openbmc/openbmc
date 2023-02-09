@@ -35,9 +35,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 +  fi
 +  assert "$CC" "not found"
 +fi
-+if `$CC --version | grep gcc >& /dev/null`; then
++if `$CC --version | grep gcc > /dev/null 2>&1`; then
 +  COMPILER=gcc
-+elif `$CC --version | grep clang >& /dev/null`; then
++elif `$CC --version | grep clang > /dev/null 2>&1`; then
 +  COMPILER=clang
 +else
 +  COMPILER="not-found"

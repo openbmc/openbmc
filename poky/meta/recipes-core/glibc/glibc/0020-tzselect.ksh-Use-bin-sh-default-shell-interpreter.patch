@@ -1,0 +1,27 @@
+From d8c8500b619231c23ef6a151821555786c0d2966 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 15 Dec 2021 21:47:53 -0800
+Subject: [PATCH] tzselect.ksh: Use /bin/sh default shell interpreter
+
+checkbashism reports no issues with tzselect.ksh, therefore using
+/bin/sh instead of /bin/bash should be safe and portable across systems
+which don't ship bash ( embedded systems )
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Cc: Adhemerval Zanella <adhemerval.zanella@linaro.org>
+Cc: Paul Eggert <eggert@cs.ucla.edu>
+---
+ timezone/tzselect.ksh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/timezone/tzselect.ksh b/timezone/tzselect.ksh
+index 18fce27e24..cc08efb0fb 100755
+--- a/timezone/tzselect.ksh
++++ b/timezone/tzselect.ksh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ # Ask the user about the time zone, and output the resulting TZ value to stdout.
+ # Interact with the user via stderr and stdin.
+ 

@@ -5,18 +5,6 @@ to resolve these issues properly upstream.
 Upstream-Status: Inappropriate [patches need rework]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
-Index: rustc-1.66.0-src/src/tools/clippy/src/driver.rs
-===================================================================
---- rustc-1.66.0-src.orig/src/tools/clippy/src/driver.rs
-+++ rustc-1.66.0-src/src/tools/clippy/src/driver.rs
-@@ -259,7 +259,6 @@ pub fn main() {
-                     .and_then(|out| String::from_utf8(out.stdout).ok())
-                     .map(|s| PathBuf::from(s.trim()))
-             })
--            .or_else(|| option_env!("SYSROOT").map(PathBuf::from))
-             .or_else(|| {
-                 let home = option_env!("RUSTUP_HOME")
-                     .or(option_env!("MULTIRUST_HOME"))
 Index: rustc-1.66.0-src/compiler/rustc_codegen_llvm/src/context.rs
 ===================================================================
 --- rustc-1.66.0-src.orig/compiler/rustc_codegen_llvm/src/context.rs

@@ -22,7 +22,14 @@ Change-Id: If2c6007a8c85bc3f3065002af8a7538b882fb4a8
 
 --- a/src/common/compat/compat-fcntl.c
 +++ b/src/common/compat/compat-fcntl.c
-@@ -13,7 +13,7 @@
+@@ -8,14 +8,17 @@
+ #define _LGPL_SOURCE
+ #include <common/compat/fcntl.h>
+ #include <common/macros.h>
++#include <common/bug.h>
++#include <stdint.h>
+ #include <unistd.h>
+ 
  #ifdef __linux__
  
  LTTNG_HIDDEN
@@ -30,25 +37,20 @@ Change-Id: If2c6007a8c85bc3f3065002af8a7538b882fb4a8
 +int compat_sync_file_range(int fd, off_t offset, off_t nbytes,
  		unsigned int flags)
  {
++	LTTNG_BUILD_BUG_ON(sizeof(off_t) != sizeof(int64_t));
  #ifdef HAVE_SYNC_FILE_RANGE
+ 	return sync_file_range(fd, offset, nbytes, flags);
+ #else
 --- a/src/common/compat/fcntl.h
 +++ b/src/common/compat/fcntl.h
-@@ -8,21 +8,21 @@
- #ifndef _COMPAT_FCNTL_H
- #define _COMPAT_FCNTL_H
- 
-+#include <assert.h>
- #include <fcntl.h>
- #include <sys/types.h>
+@@ -13,16 +13,12 @@
  
  #include <common/compat/errno.h>
  
 -#if (defined(__CYGWIN__))
 -typedef long long off64_t;
 -#endif
-+static_assert(sizeof(off_t) == sizeof(int64_t),
-+	      "Build system is misconfigured, off_t must be 64-bit wide");
- 
+-
  #if (defined(__FreeBSD__) || defined(__sun__))
  typedef off64_t loff_t;
  #endif
@@ -59,7 +61,7 @@ Change-Id: If2c6007a8c85bc3f3065002af8a7538b882fb4a8
  		unsigned int flags);
  #define lttng_sync_file_range(fd, offset, nbytes, flags) \
  	compat_sync_file_range(fd, offset, nbytes, flags)
-@@ -37,8 +37,8 @@ extern int compat_sync_file_range(int fd
+@@ -37,8 +33,8 @@ extern int compat_sync_file_range(int fd
  #define SYNC_FILE_RANGE_WAIT_BEFORE   0
  #define SYNC_FILE_RANGE_WRITE         0
  

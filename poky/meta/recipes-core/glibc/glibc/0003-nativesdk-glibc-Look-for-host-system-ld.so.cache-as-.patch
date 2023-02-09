@@ -1,4 +1,4 @@
-From a74ac72e6a25121c99f3875cf0245a435729e897 Mon Sep 17 00:00:00 2001
+From d1b745b6e4c6a755cceb92329227efce1547d5fc Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:48:24 +0000
 Subject: [PATCH] nativesdk-glibc: Look for host system ld.so.cache as well
@@ -30,7 +30,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index 1ad0868dad..c5e235d918 100644
+index fcb39a78d4..cde9fc2358 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
 @@ -2109,6 +2109,14 @@ _dl_map_object (struct link_map *loader, const char *name,

@@ -1,4 +1,4 @@
-From 07655aaa14f9d1f3a521caadde2936067ce84b07 Mon Sep 17 00:00:00 2001
+From c7419991ebca369d727cc2f4489fed91fd5bb83f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:31:06 +0000
 Subject: [PATCH] 'yes' within the path sets wrong config variables
@@ -29,7 +29,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  12 files changed, 28 insertions(+), 28 deletions(-)
 
 diff --git a/sysdeps/aarch64/configure b/sysdeps/aarch64/configure
-index bf972122b1..f9397b8d6e 100644
+index 2130f6b8f8..7b7e3bbcf1 100644
 --- a/sysdeps/aarch64/configure
 +++ b/sysdeps/aarch64/configure
 @@ -152,12 +152,12 @@ else
@@ -48,7 +48,7 @@ index bf972122b1..f9397b8d6e 100644
  else
    libc_cv_aarch64_be=no
 diff --git a/sysdeps/aarch64/configure.ac b/sysdeps/aarch64/configure.ac
-index 51253d9802..ba36a0e8b4 100644
+index 85c6f76508..8ecd15d273 100644
 --- a/sysdeps/aarch64/configure.ac
 +++ b/sysdeps/aarch64/configure.ac
 @@ -13,8 +13,8 @@ AC_DEFINE(SUPPORT_STATIC_PIE)

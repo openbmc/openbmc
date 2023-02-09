@@ -1,4 +1,4 @@
-From f02010965af21db018c4e108b2193c872406a314 Mon Sep 17 00:00:00 2001
+From 4482ed0b8bd506cc2590ceacfdada6cc34450796 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Tue, 4 Feb 2020 18:12:15 +0000
 Subject: [PATCH] mc: Fix manpage date indeterminism
@@ -21,7 +21,7 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/doc/man/date-of-man-include.am b/doc/man/date-of-man-include.am
-index 3a4e599..f11e9b3 100644
+index c6b1e69..165a796 100644
 --- a/doc/man/date-of-man-include.am
 +++ b/doc/man/date-of-man-include.am
 @@ -1,5 +1,5 @@
@@ -29,5 +29,5 @@ index 3a4e599..f11e9b3 100644
 -	-e "s/%DATE_OF_MAN_PAGE%/$${MAN_DATE}/g" \
 +	-e "s/%DATE_OF_MAN_PAGE%//g" \
  	-e "s/%MAN_VERSION%/@MAN_VERSION@/g" \
- 	-e "s{%prefix%{@prefix@{g" \
  	-e "s{%sysconfdir%{@sysconfdir@{g" \
+ 	-e "s{%libexecdir%{@libexecdir@{g" \

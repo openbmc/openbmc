@@ -20,13 +20,11 @@ DEPENDS = " \
 "
 
 PORTAL_BACKENDS ?= " \
-	${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'xdg-desktop-portal-wlr', '', d)} \
-	${@bb.utils.contains('DISTRO_FEATURES', 'gtk', 'xdg-desktop-portal-gnome', '', d)} \
-	${@bb.utils.contains('DISTRO_FEATURES', 'gtk+3', 'xdg-desktop-portal-gnome', '', d)} \
-	${@bb.utils.contains('DISTRO_FEATURES', 'gtk4', 'xdg-desktop-portal-gnome', '', d)} \
+	${@bb.utils.contains('DISTRO_FEATURES', 'gtk+3', 'xdg-desktop-portal-gtk', '', d)} \
+	${@bb.utils.contains('DISTRO_FEATURES', 'gtk4', 'xdg-desktop-portal-gtk', '', d)} \
 "
 
-RDEPENDS:${PN} = "bubblewrap ${PORTAL_BACKENDS}"
+RDEPENDS:${PN} = "bubblewrap rtkit ${PORTAL_BACKENDS}"
 
 inherit meson pkgconfig python3native features_check
 

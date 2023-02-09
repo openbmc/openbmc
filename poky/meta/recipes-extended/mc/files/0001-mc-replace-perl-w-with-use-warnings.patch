@@ -1,4 +1,4 @@
-From cdc7c278212ae836eecb4cc9d42c29443cc128a0 Mon Sep 17 00:00:00 2001
+From 62c86b69106d0d702167ba1b963ea1c201cce5af Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Thu, 6 Apr 2017 02:24:28 -0700
 Subject: [PATCH] mc: replace "perl -w" with "use warnings"
@@ -20,6 +20,7 @@ The man2hlp.in already has "use warnings;", so just remove '-w' is OK.
 Upstream-Status: Submitted [https://github.com/MidnightCommander/mc/pull/174]
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+
 ---
  src/man2hlp/man2hlp.in           | 2 +-
  src/vfs/extfs/helpers/a+.in      | 4 +++-
@@ -30,12 +31,12 @@ Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
  6 files changed, 13 insertions(+), 6 deletions(-)
 
 diff --git a/src/man2hlp/man2hlp.in b/src/man2hlp/man2hlp.in
-index f095830..558a674 100644
+index 08765d8..8aa7131 100644
 --- a/src/man2hlp/man2hlp.in
 +++ b/src/man2hlp/man2hlp.in
 @@ -1,4 +1,4 @@
--#! @PERL@ -w
-+#! @PERL@
+-#! @PERL_FOR_BUILD@ -w
++#! @PERL_FOR_BUILD@
  #
  #  Man page to help file converter
  #  Copyright (C) 1994, 1995, 1998, 2000, 2001, 2002, 2003, 2004, 2005,
@@ -59,7 +60,7 @@ index 579441c..fe446f4 100644
      $_ = shift(@_);
      s/([^\w\/.+-])/\\$1/g;
 diff --git a/src/vfs/extfs/helpers/mailfs.in b/src/vfs/extfs/helpers/mailfs.in
-index e9455be..059f41f 100644
+index 4bdd68b..5bb373b 100644
 --- a/src/vfs/extfs/helpers/mailfs.in
 +++ b/src/vfs/extfs/helpers/mailfs.in
 @@ -1,6 +1,7 @@
@@ -72,7 +73,7 @@ index e9455be..059f41f 100644
  # MC extfs for (possibly compressed) Berkeley style mailbox files
  # Peter Daum <gator@cs.tu-berlin.de> (Jan 1998, mc-4.1.24)
 diff --git a/src/vfs/extfs/helpers/patchfs.in b/src/vfs/extfs/helpers/patchfs.in
-index ef407de..3ad4b53 100644
+index c20cd54..1f1e75b 100644
 --- a/src/vfs/extfs/helpers/patchfs.in
 +++ b/src/vfs/extfs/helpers/patchfs.in
 @@ -1,4 +1,4 @@
@@ -107,7 +108,7 @@ index 418611f..82c7ccf 100644
               'apr' => '04', 'may' => '05', 'jun' => '06',
               'jul' => '07', 'aug' => '08', 'sep' => '09',
 diff --git a/src/vfs/extfs/helpers/uzip.in b/src/vfs/extfs/helpers/uzip.in
-index b1c4f90..c8eb335 100644
+index c468f3a..ceffb53 100644
 --- a/src/vfs/extfs/helpers/uzip.in
 +++ b/src/vfs/extfs/helpers/uzip.in
 @@ -1,4 +1,4 @@
@@ -124,6 +125,3 @@ index b1c4f90..c8eb335 100644
  
  #
  # Configuration options
--- 
-2.10.2
-

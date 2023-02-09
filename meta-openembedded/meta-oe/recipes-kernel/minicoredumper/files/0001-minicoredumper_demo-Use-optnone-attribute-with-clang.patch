@@ -1,0 +1,37 @@
+From abaac31d1cb4d0ba0e8e9ef7f344e62de3b150de Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 4 Feb 2023 16:50:46 -0800
+Subject: [PATCH] minicoredumper_demo: Use 'optnone' attribute with clang
+
+clang does not support optimize("On") yet, therefore use optnone which
+should give intended results with clang compiler
+
+Upstream-Status: Submitted [https://github.com/diamon/minicoredumper/pull/7]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/minicoredumper_demo/main.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/src/minicoredumper_demo/main.c b/src/minicoredumper_demo/main.c
+index 65aac46..e60eb82 100644
+--- a/src/minicoredumper_demo/main.c
++++ b/src/minicoredumper_demo/main.c
+@@ -11,8 +11,13 @@
+ #include <sys/types.h>
+ 
+ #include "minicoredumper.h"
+-
+-int __attribute__((optimize("O0"))) main(int argc, char *argv[])
++int
++#ifdef __clang__
++__attribute__((optnone))
++#else
++__attribute__((optimize("O0")))
++#endif
++main(int argc, char *argv[])
+ {
+ 	char *str1 = "This is string 1.";
+ 	unsigned long val1 = 0x1abc123f;
+-- 
+2.39.1
+

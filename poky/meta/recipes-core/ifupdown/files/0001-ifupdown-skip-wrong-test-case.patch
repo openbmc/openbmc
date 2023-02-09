@@ -1,4 +1,4 @@
-From 98243deface88614e3f332c4a85d04a9abce55ff Mon Sep 17 00:00:00 2001
+From 782d8a869c266820d0f34974436f244f67afaea7 Mon Sep 17 00:00:00 2001
 From: Zqiang <qiang.zhang@windriver.com>
 Date: Mon, 19 Apr 2021 14:15:45 +0800
 Subject: [PATCH] ifupdown: skip wrong test case
@@ -10,23 +10,21 @@ and are skipped directly.
 Upstream-Status: Inappropriate [oe-core specific]
 
 Signed-off-by: Zqiang <qiang.zhang@windriver.com>
+
 ---
  tests/testbuild-linux | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tests/testbuild-linux b/tests/testbuild-linux
-index 1181ea0..5f148eb 100755
+index 2fa1b8b..2c69856 100755
 --- a/tests/testbuild-linux
 +++ b/tests/testbuild-linux
 @@ -3,7 +3,7 @@
  dir=tests/linux
  
  result=true
--for test in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18; do
-+for test in 1 2 3 4 5 6 7 8 9 10 11 16 17 18; do
+-for test in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19; do
++for test in 1 2 3 4 5 6 7 8 9 10 11 16 17 18 19; do
  	if [ -e $dir/testcase.$test ]; then
  		args="$(cat $dir/testcase.$test | sed -n 's/^# RUN: //p')"
  	else
--- 
-2.17.1
-

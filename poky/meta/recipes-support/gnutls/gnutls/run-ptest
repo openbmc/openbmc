@@ -1,0 +1,90 @@
+#!/bin/sh
+
+rjob() {
+    local job=$1
+    local log=$2
+
+    # TODO: Output will be garbled
+    ./${job} >> ${log} 2>&1
+
+    ret=$?
+    case $ret in
+    0)
+        echo "PASS: $t" >> ${log}
+        echo "PASS: $t"
+        ;;
+    77)
+        echo "SKIP: $t" >> ${log}
+        echo "SKIP: $t"
+        ;;
+    *)
+        echo "FAIL: $t" >> ${log}
+        echo "FAIL: $t"
+        ;;
+    esac
+}
+
+is_disallowed() {
+    local key=$1
+    $(echo ${test_disallowlist} | grep -w -q ${key})
+    return $?
+}
+
+# TODO
+# This list should probably be in a external file
+# Testcases defined here either take very long time (dtls-stress)
+# or are dependent on local files (certs, etc) in local file system
+# currently not exported to target.
+
+test_disallowlist=""
+test_disallowlist="${test_disallowlist} dtls-stress"
+test_disallowlist="${test_disallowlist} handshake-large-cert"
+test_disallowlist="${test_disallowlist} id-on-xmppAddr"
+test_disallowlist="${test_disallowlist} mini-x509-cas"
+test_disallowlist="${test_disallowlist} pkcs12_simple"
+test_disallowlist="${test_disallowlist} protocol-set-allowlist"
+test_disallowlist="${test_disallowlist} psk-file"
+test_disallowlist="${test_disallowlist} rawpk-api"
+test_disallowlist="${test_disallowlist} set_pkcs12_cred"
+test_disallowlist="${test_disallowlist} system-override-curves-allowlist"
+test_disallowlist="${test_disallowlist} system-override-hash"
+test_disallowlist="${test_disallowlist} system-override-sig"
+test_disallowlist="${test_disallowlist} system-override-sig-tls"
+test_disallowlist="${test_disallowlist} system-prio-file"
+test_disallowlist="${test_disallowlist} x509cert-tl"
+
+LOG=${PWD}/tests.log
+cd tests
+max_njobs=$(grep -c ^processor /proc/cpuinfo)
+njobs=0
+
+for t in *; do
+    [ -x $t ] || continue
+    [ -f $t ] || continue
+
+    is_disallowed ${t}
+    [ $? -eq 0 ] && continue
+
+    rjob ${t} ${LOG} &
+    one=1
+    njobs=$(expr ${njobs} + ${one})
+    if [ ${njobs} -eq ${max_njobs} ]; then
+        wait
+        njobs=0
+    fi
+done
+wait
+
+skipped=$(grep -c SKIP ${LOG})
+passed=$(grep -c PASS ${LOG})
+failed=$(grep -c FAIL ${LOG})
+total=$(expr ${passed} + ${failed} + ${skipped})
+
+echo
+echo "gnutls test summary:"
+echo "--------------------"
+echo "total: ${total}"
+echo "pass : ${passed}"
+echo "fail : ${failed}"
+echo "skip : ${skipped}"
+echo

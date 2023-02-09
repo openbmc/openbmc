@@ -5,7 +5,7 @@ Subject: [PATCH] hello_pi: optionally build wayland-specific app
 
 Only build the wayland-specific hello_pi app when building for wayland.
 
-Upstream-status: inappropriate [the wayland example is not part of upstream]
+Upstream-Status: Inappropriate [the wayland example is not part of upstream]
 Signed-off-by: Trevor Woerner <twoerner@gmail.com>
 ---
  host_applications/linux/apps/hello_pi/CMakeLists.txt | 4 +++-

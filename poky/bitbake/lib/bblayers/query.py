@@ -29,12 +29,12 @@ class QueryPlugin(LayerPlugin):
 
     def do_show_layers(self, args):
         """show current configured layers."""
-        logger.plain("%s  %s  %s" % ("layer".ljust(20), "path".ljust(40), "priority"))
-        logger.plain('=' * 74)
+        logger.plain("%s  %s  %s" % ("layer".ljust(20), "path".ljust(70), "priority"))
+        logger.plain('=' * 104)
         for layer, _, regex, pri in self.tinfoil.cooker.bbfile_config_priorities:
             layerdir = self.bbfile_collections.get(layer, None)
-            layername = self.get_layer_name(layerdir)
-            logger.plain("%s  %s  %d" % (layername.ljust(20), layerdir.ljust(40), pri))
+            layername = layer
+            logger.plain("%s  %s  %s" % (layername.ljust(20), layerdir.ljust(70), pri))
 
     def version_str(self, pe, pv, pr = None):
         verstr = "%s" % pv

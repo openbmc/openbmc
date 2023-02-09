@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
-# Busybox version: 1.35.0
-# Sun Dec 26 16:55:55 2021
+# Busybox version: 1.36.0
+# Tue Jan  3 14:17:01 2023
 #
 CONFIG_HAVE_DOT_CONFIG=y
 
@@ -123,6 +123,9 @@ CONFIG_UNICODE_WIDE_WCHARS=y
 # CONFIG_UNICODE_BIDI_SUPPORT is not set
 # CONFIG_UNICODE_NEUTRAL_TABLE is not set
 # CONFIG_UNICODE_PRESERVE_BROKEN is not set
+# CONFIG_LOOP_CONFIGURE is not set
+# CONFIG_NO_LOOP_CONFIGURE is not set
+CONFIG_TRY_LOOP_CONFIGURE=y
 
 #
 # Applets
@@ -338,6 +341,7 @@ CONFIG_FEATURE_TR_CLASSES=y
 # CONFIG_FEATURE_TR_EQUIV is not set
 CONFIG_TRUE=y
 # CONFIG_TRUNCATE is not set
+# CONFIG_TSORT is not set
 CONFIG_TTY=y
 CONFIG_UNAME=y
 CONFIG_UNAME_OSNAME="GNU/Linux"
@@ -831,10 +835,12 @@ CONFIG_MICROCOM=y
 CONFIG_RFKILL=y
 # CONFIG_RUNLEVEL is not set
 # CONFIG_RX is not set
+# CONFIG_SEEDRNG is not set
 # CONFIG_SETFATTR is not set
 # CONFIG_SETSERIAL is not set
 CONFIG_STRINGS=y
 CONFIG_TIME=y
+# CONFIG_TREE is not set
 CONFIG_TS=y
 # CONFIG_TTYSIZE is not set
 # CONFIG_UBIATTACH is not set

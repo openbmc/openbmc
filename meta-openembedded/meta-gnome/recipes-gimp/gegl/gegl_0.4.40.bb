@@ -13,6 +13,8 @@ DEPENDS = " \
     json-glib \
 "
 
+DEPENDS:append:toolchain-clang  = " openmp"
+
 GNOMEBASEBUILDCLASS = "meson"
 
 inherit features_check gnomebase vala gobject-introspection

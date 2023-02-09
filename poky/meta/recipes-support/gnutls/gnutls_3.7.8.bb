@@ -22,11 +22,13 @@ SHRT_VER = "${@d.getVar('PV').split('.')[0]}.${@d.getVar('PV').split('.')[1]}"
 SRC_URI = "https://www.gnupg.org/ftp/gcrypt/gnutls/v${SHRT_VER}/gnutls-${PV}.tar.xz \
            file://arm_eabi.patch \
            file://0001-Creating-.hmac-file-should-be-excuted-in-target-envi.patch \
+           file://run-ptest \
+           file://Add-ptest-support.patch \
            "
 
 SRC_URI[sha256sum] = "c58ad39af0670efe6a8aee5e3a8b2331a1200418b64b7c51977fb396d4617114"
 
-inherit autotools texinfo pkgconfig gettext lib_package gtk-doc
+inherit autotools texinfo pkgconfig gettext lib_package gtk-doc ptest
 
 PACKAGECONFIG ??= "libidn  ${@bb.utils.filter('DISTRO_FEATURES', 'seccomp', d)}"
 
@@ -66,6 +68,10 @@ do_install:append:class-target() {
           install -d ${D}${bindir}/bin
           install -m 0755 ${B}/lib/.libs/fipshmac ${D}/${bindir}/
         fi
+}
+
+do_compile:append() {
+        oe_runmake ${PARALLEL_MAKE} -C tests buildtest-TESTS
 }
 
 PACKAGES =+ "${PN}-openssl ${PN}-xx ${PN}-fips"

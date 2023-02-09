@@ -4,14 +4,14 @@ Upstream-Status: Inappropriate [OE-Core]
 
 Signed-off-by: Saul Wold <sgw@linux.intel.com>
 
-Index: busybox-1.22.1/networking/ifupdown.c
+Index: busybox-1.36.0/networking/ifupdown.c
 ===================================================================
---- busybox-1.22.1.orig/networking/ifupdown.c
-+++ busybox-1.22.1/networking/ifupdown.c
-@@ -521,6 +521,10 @@ struct dhcp_client_t {
+--- busybox-1.36.0.orig/networking/ifupdown.c
++++ busybox-1.36.0/networking/ifupdown.c
+@@ -628,6 +628,10 @@ struct dhcp_client_t {
  };
  
- static const struct dhcp_client_t ext_dhcp_clients[] = {
+ static const struct dhcp_client_t ext_dhcp_clients[] ALIGN_PTR = {
 +	{ "connmand",
 +		"true",
 +		"true",

@@ -1,0 +1,47 @@
+From 27d3ec9df3157966819e4369e571769ed9e8604c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 9 Dec 2021 15:14:42 -0800
+Subject: [PATCH] timezone: Make shell interpreter overridable in tzselect.ksh
+
+define new macro called KSHELL which can be used to define default shell
+use Bash by default
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makeconfig        | 9 +++++++++
+ timezone/Makefile | 1 +
+ 2 files changed, 10 insertions(+)
+
+diff --git a/Makeconfig b/Makeconfig
+index 2fda4af5f7..87777942f3 100644
+--- a/Makeconfig
++++ b/Makeconfig
+@@ -309,6 +309,15 @@ ifndef sysincludedir
+ sysincludedir = /usr/include
+ endif
+ 
++# The full path name of a Posix-compliant shell, preferably one that supports
++# the Korn shell's 'select' statement as an extension.
++# These days, Bash is the most popular.
++# It should be OK to set this to /bin/sh, on platforms where /bin/sh
++# lacks 'select' or doesn't completely conform to Posix, but /bin/bash
++# is typically nicer if it works.
++ifndef KSHELL
++KSHELL = /bin/bash
++endif
+ 
+ # Commands to install files.
+ ifndef INSTALL_DATA
+diff --git a/timezone/Makefile b/timezone/Makefile
+index 0306c0bca9..4dfdcebdb7 100644
+--- a/timezone/Makefile
++++ b/timezone/Makefile
+@@ -136,6 +136,7 @@ $(objpfx)tzselect: tzselect.ksh $(common-objpfx)config.make
+ 	    -e '/TZVERSION=/s|see_Makefile|"$(version)"|' \
+ 	    -e '/PKGVERSION=/s|=.*|="$(PKGVERSION)"|' \
+ 	    -e '/REPORT_BUGS_TO=/s|=.*|="$(REPORT_BUGS_TO)"|' \
++	    -e 's|#!/bin/bash|#!$(KSHELL)|g' \
+ 	    < $< > $@.new
+ 	chmod 555 $@.new
+ 	mv -f $@.new $@

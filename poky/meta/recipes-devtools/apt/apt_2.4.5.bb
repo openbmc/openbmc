@@ -127,6 +127,7 @@ do_install:append:class-native() {
 
 do_install:append:class-nativesdk() {
 	customize_apt_conf_sample
+        rm -rf ${D}${localstatedir}/log
 }
 
 do_install:append:class-target() {

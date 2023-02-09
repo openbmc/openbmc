@@ -19,14 +19,14 @@ RPROVIDES:${PN} = "mongoose graphblas"
 # the command line. To get around this problem, set these variables to only the
 # program name and prepend the rest of the value onto the corresponding FLAGS
 # variable.
-CFLAGS:prepend := "${@" ".join(d.getVar('CC', True).split()[1:])} "
-export CC := "${@d.getVar('CC', True).split()[0]}"
+CFLAGS:prepend := "${@" ".join(d.getVar('CC').split()[1:])} "
+export CC := "${@d.getVar('CC').split()[0]}"
 
-CXXFLAGS:prepend := "${@" ".join(d.getVar('CXX', True).split()[1:])} "
-export CXX := "${@d.getVar('CXX', True).split()[0]}"
+CXXFLAGS:prepend := "${@" ".join(d.getVar('CXX').split()[1:])} "
+export CXX := "${@d.getVar('CXX').split()[0]}"
 
-LDFLAGS:prepend := "${@" ".join(d.getVar('LD', True).split()[1:])} "
-export LD := "${@d.getVar('LD', True).split()[0]}"
+LDFLAGS:prepend := "${@" ".join(d.getVar('LD').split()[1:])} "
+export LD := "${@d.getVar('LD').split()[0]}"
 
 export CMAKE_OPTIONS = " \
     -DCMAKE_INSTALL_PREFIX=${D}${prefix} \

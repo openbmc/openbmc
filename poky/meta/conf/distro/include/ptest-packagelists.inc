@@ -88,6 +88,7 @@ PTESTS_SLOW = "\
     elfutils-ptest \
     gettext-ptest \
     glib-2.0-ptest \
+    gnutls-ptest \
     gstreamer1.0-ptest \
     libevent-ptest \
     libgcrypt-ptest \

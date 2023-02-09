@@ -22,7 +22,7 @@ TFM_SIGN_PRIVATE_KEY = "${libdir}/tfm-scripts/root-RSA-3072_1.pem"
 RE_IMAGE_OFFSET = "0x1000"
 
 # u-boot
-PREFERRED_VERSION_u-boot ?= "2022.10"
+PREFERRED_VERSION_u-boot ?= "2023.01"
 EXTRA_IMAGEDEPENDS += "u-boot"
 
 UBOOT_CONFIG ??= "EFI"
@@ -49,7 +49,7 @@ EXTRA_IMAGEDEPENDS += "external-system"
 
 # Linux kernel
 PREFERRED_PROVIDER_virtual/kernel:forcevariable = "linux-yocto"
-PREFERRED_VERSION_linux-yocto = "5.19%"
+PREFERRED_VERSION_linux-yocto = "6.1%"
 KERNEL_IMAGETYPE = "Image.gz"
 
 INITRAMFS_IMAGE_BUNDLE ?= "1"
@@ -73,3 +73,6 @@ SERIAL_CONSOLES ?= "115200;ttyAMA0"
 WKS_FILE_DEPENDS:append = " ${EXTRA_IMAGEDEPENDS}"
 
 WKS_FILE ?= "corstone1000-image.corstone1000.wks"
+
+# Disable openssl in kmod to shink the initramfs size
+PACKAGECONFIG:remove:pn-kmod = "openssl"

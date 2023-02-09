@@ -1,21 +1,22 @@
-From 15778524604652db60f704a772b6815d0f4305bf Mon Sep 17 00:00:00 2001
+From 646269a92824f3e9b4145848e42ad3ba555e8931 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Mon, 5 Dec 2022 17:02:32 +0000
-Subject: [PATCH] corstone1000: enable distro booting command
+Subject: [PATCH 26/27] corstone1000: enable distro booting command
 
 enable distro_bootcmd
 
 Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 ---
  include/configs/corstone1000.h | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/include/configs/corstone1000.h b/include/configs/corstone1000.h
-index 1f28a0f6c0..548856b970 100644
+index a015a1630e2c..c30a7bfa0c0b 100644
 --- a/include/configs/corstone1000.h
 +++ b/include/configs/corstone1000.h
-@@ -64,5 +64,6 @@
+@@ -65,5 +65,6 @@
  
  #include <config_distro_bootcmd.h>
  
@@ -23,5 +24,5 @@ index 1f28a0f6c0..548856b970 100644
  
  #endif
 -- 
-2.17.1
+2.39.1
 

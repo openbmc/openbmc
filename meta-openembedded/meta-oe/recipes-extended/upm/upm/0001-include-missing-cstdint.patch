@@ -1,0 +1,43 @@
+From 64f75806c04c2ee819cf2f92cb564ad316354823 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 29 Jan 2023 00:27:47 -0800
+Subject: [PATCH] include missing <cstdint>
+
+gcc 13 moved some includes around and as a result <cstdint> is no longer transitively included [1]. Explicitly include it for uint{32,64}_t.
+
+[1] https://gcc.gnu.org/gcc-13/porting_to.html#header-dep-changes
+
+Upstream-Status: Submitted [https://github.com/eclipse/upm/pull/704]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/mcp9808/mcp9808.hpp | 1 +
+ src/micsv89/micsv89.hpp | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/src/mcp9808/mcp9808.hpp b/src/mcp9808/mcp9808.hpp
+index b9e138d7..2509cd30 100644
+--- a/src/mcp9808/mcp9808.hpp
++++ b/src/mcp9808/mcp9808.hpp
+@@ -13,6 +13,7 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include <iostream>
+ #include <string>
+ #include <interfaces/iTemperature.hpp>
+diff --git a/src/micsv89/micsv89.hpp b/src/micsv89/micsv89.hpp
+index 2f97dbce..c6e22ad8 100644
+--- a/src/micsv89/micsv89.hpp
++++ b/src/micsv89/micsv89.hpp
+@@ -11,6 +11,7 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include <iostream>
+ #include <string>
+ 
+-- 
+2.39.1
+

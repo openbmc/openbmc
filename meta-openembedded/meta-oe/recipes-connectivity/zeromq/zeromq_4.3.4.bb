@@ -8,6 +8,7 @@ PACKAGECONFIG[libsodium] = "-DWITH_LIBSODIUM=ON,-DWITH_LIBSODIUM=OFF, libsodium"
 
 SRC_URI = "http://github.com/zeromq/libzmq/releases/download/v${PV}/zeromq-${PV}.tar.gz \
     file://0001-CMakeLists-txt-Avoid-host-specific-path-to-libsodium.patch \
+    file://0001-src-secure_allocator.hpp-define-missing-rebind-type.patch \
     file://run-ptest \
 "
 SRC_URI[md5sum] = "c897d4005a3f0b8276b00b7921412379"

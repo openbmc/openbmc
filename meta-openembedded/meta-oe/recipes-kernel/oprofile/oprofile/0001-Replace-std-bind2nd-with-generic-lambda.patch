@@ -1,0 +1,34 @@
+From 5d879cb4f23c613e16b3f479ab09bbb5ff340201 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 6 Feb 2023 17:02:41 -0800
+Subject: [PATCH] Replace std::bind2nd with generic lambda
+
+std::bind2nd is gone in c++17, therefore stop using it and replace it
+with generic lambda from c++14 onwards
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libutil++/growable_vector.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libutil++/growable_vector.h b/libutil++/growable_vector.h
+index 350246a..9846e1e 100644
+--- a/libutil++/growable_vector.h
++++ b/libutil++/growable_vector.h
+@@ -93,9 +93,9 @@ public:
+ 
+ 	/// return true if all elements have the default constructed value
+ 	bool zero() const {
+-		return std::find_if(container.begin(), container.end(),
+-	                            std::bind2nd(std::not_equal_to<T>(), T()))
+-					== container.end();
++		return std::find_if(begin(container), end(container),
++				[&](auto const& elem) {return elem != T();})
++			== end(container);
+ 	}
+ 
+ private:
+-- 
+2.39.1
+

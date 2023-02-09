@@ -1,27 +1,26 @@
-Upstream-Status: Pending [Not submitted to upstream yet]
-Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
-
-From e683c37ee51717e625c8a598056cf4bb1bdadcbc Mon Sep 17 00:00:00 2001
+From 9fb971c23d423f593620ed82fb69a7e2cd35986a Mon Sep 17 00:00:00 2001
 From: Emekcan <emekcan.aras@arm.com>
 Date: Wed, 17 Aug 2022 14:21:42 +0100
-Subject: [PATCH] Add rpmsg driver for corstone1000
+Subject: [PATCH 3/6] Add rpmsg driver for corstone1000
 
 Adds rpmsg driver to communicate with external
 system in corstone1000 platform.
 
+Upstream-Status: Pending
 Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 ---
  drivers/rpmsg/Kconfig             |  10 ++
  drivers/rpmsg/Makefile            |   1 +
- drivers/rpmsg/rpmsg_arm_mailbox.c | 164 ++++++++++++++++++++++
+ drivers/rpmsg/rpmsg_arm_mailbox.c | 164 ++++++++++++++++++++++++++++++
  3 files changed, 175 insertions(+)
  create mode 100644 drivers/rpmsg/rpmsg_arm_mailbox.c
 
 diff --git a/drivers/rpmsg/Kconfig b/drivers/rpmsg/Kconfig
-index 0b4407abdf13..c276bd17bffe 100644
+index d3795860f5c0..fc6916d7b523 100644
 --- a/drivers/rpmsg/Kconfig
 +++ b/drivers/rpmsg/Kconfig
-@@ -73,4 +73,14 @@ config RPMSG_VIRTIO
+@@ -81,4 +81,14 @@ config RPMSG_VIRTIO
  	select RPMSG_NS
  	select VIRTIO
  
@@ -37,7 +36,7 @@ index 0b4407abdf13..c276bd17bffe 100644
 +
  endmenu
 diff --git a/drivers/rpmsg/Makefile b/drivers/rpmsg/Makefile
-index 8d452656f0ee..34e9c146cd64 100644
+index 58e3b382e316..6bdcc69688b2 100644
 --- a/drivers/rpmsg/Makefile
 +++ b/drivers/rpmsg/Makefile
 @@ -1,5 +1,6 @@
@@ -45,8 +44,8 @@ index 8d452656f0ee..34e9c146cd64 100644
  obj-$(CONFIG_RPMSG)		+= rpmsg_core.o
 +obj-$(CONFIG_RPMSG_ARM)		+= rpmsg_arm_mailbox.o
  obj-$(CONFIG_RPMSG_CHAR)	+= rpmsg_char.o
+ obj-$(CONFIG_RPMSG_CTRL)	+= rpmsg_ctrl.o
  obj-$(CONFIG_RPMSG_NS)		+= rpmsg_ns.o
- obj-$(CONFIG_RPMSG_MTK_SCP)	+= mtk_rpmsg.o
 diff --git a/drivers/rpmsg/rpmsg_arm_mailbox.c b/drivers/rpmsg/rpmsg_arm_mailbox.c
 new file mode 100644
 index 000000000000..4a80102669f6
@@ -218,5 +217,5 @@ index 000000000000..4a80102669f6
 +MODULE_DESCRIPTION("ARM RPMSG Driver");
 +MODULE_AUTHOR("Tushar Khandelwal <tushar.khandelwal@arm.com>");
 -- 
-2.17.1
+2.39.0
 

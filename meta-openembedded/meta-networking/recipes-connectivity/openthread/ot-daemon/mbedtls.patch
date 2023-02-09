@@ -17,19 +17,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  void mpi_mul_hlp( size_t i, mbedtls_mpi_uint *s, mbedtls_mpi_uint *d, mbedtls_mpi_uint b )
  {
 -    mbedtls_mpi_uint c = 0, t = 0;
-+    mbedtls_mpi_uint c = 0;
++    mbedtls_mpi_uint c = 0, t __attribute__ ((unused)) = 0;
  
  #if defined(MULADDC_HUIT)
      for( ; i >= 8; i -= 8 )
-@@ -1595,8 +1595,6 @@ void mpi_mul_hlp( size_t i, mbedtls_mpi_
-     }
- #endif /* MULADDC_HUIT */
- 
--    t++;
--
-     do {
-         *d += c; c = ( *d < c ); d++;
-     }
 --- a/third_party/mbedtls/repo/CMakeLists.txt
 +++ b/third_party/mbedtls/repo/CMakeLists.txt
 @@ -192,7 +192,7 @@ if(CMAKE_COMPILER_IS_GNU)

@@ -13,6 +13,9 @@ S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig gettext
 
-RDEPENDS:${PN} = "perl"
+# ispellaff2myspell: A program to convert ispell affix tables to myspell format
+PACKAGES =+ "${PN}-ispell"
+FILES:${PN}-ispell = "${bindir}/ispellaff2myspell"
+RDEPENDS:${PN}-ispell = "perl"
 
 BBCLASSEXTEND = "native"

@@ -48,4 +48,7 @@ do_install:append() {
               ${D}${systemd_system_unitdir}/xinetd.service
 }
 
-RDEPENDS:${PN} += "perl"
+# Script for converting inetd.conf files into xinetd.conf files
+PACKAGES =+ "${PN}-xconv"
+FILES:${PN}-xconv = "${bindir}/xconv.pl"
+RDEPENDS:${PN}-xconv += "perl"

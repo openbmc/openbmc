@@ -1,0 +1,58 @@
+From e63949205682bbd2a0e33e256119472d704a2549 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 29 Jan 2023 22:03:01 -0800
+Subject: [PATCH] Add missing header <cstdint> for uintXX_t types
+
+This is detected by gcc-13
+gcc 13 moved some includes around and as a result <cstdint> is no
+longer transitively included [1]. Explicitly include it for uintXX_t.
+
+[1] https://gcc.gnu.org/gcc-13/porting_to.html#header-dep-changes
+
+Upstream-Status: Submitted [https://android-review.googlesource.com/c/platform/external/perfetto/+/2399128]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/perfetto/ext/base/http/sha1.h    | 1 +
+ include/perfetto/ext/base/uuid.h         | 1 +
+ src/traced/probes/common/cpu_freq_info.h | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/include/perfetto/ext/base/http/sha1.h b/include/perfetto/ext/base/http/sha1.h
+index c583d69d4..7e3a48c83 100644
+--- a/include/perfetto/ext/base/http/sha1.h
++++ b/include/perfetto/ext/base/http/sha1.h
+@@ -20,6 +20,7 @@
+ #include <stddef.h>
+ 
+ #include <array>
++#include <cstdint>
+ #include <string>
+ 
+ namespace perfetto {
+diff --git a/include/perfetto/ext/base/uuid.h b/include/perfetto/ext/base/uuid.h
+index 1b4c53815..472042fab 100644
+--- a/include/perfetto/ext/base/uuid.h
++++ b/include/perfetto/ext/base/uuid.h
+@@ -18,6 +18,7 @@
+ #define INCLUDE_PERFETTO_EXT_BASE_UUID_H_
+ 
+ #include <array>
++#include <cstdint>
+ #include <string>
+ 
+ #include "perfetto/ext/base/optional.h"
+diff --git a/src/traced/probes/common/cpu_freq_info.h b/src/traced/probes/common/cpu_freq_info.h
+index 36f7f9c09..8232cbf64 100644
+--- a/src/traced/probes/common/cpu_freq_info.h
++++ b/src/traced/probes/common/cpu_freq_info.h
+@@ -17,6 +17,7 @@
+ #ifndef SRC_TRACED_PROBES_COMMON_CPU_FREQ_INFO_H_
+ #define SRC_TRACED_PROBES_COMMON_CPU_FREQ_INFO_H_
+ 
++#include <cstdint>
+ #include <map>
+ #include <string>
+ #include <vector>
+-- 
+2.39.1
+

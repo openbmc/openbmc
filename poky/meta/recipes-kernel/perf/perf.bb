@@ -276,6 +276,10 @@ do_configure:prepend () {
         sed -i -e "s,$target,$replacement1$replacement2$replacement3,g" \
                        "${S}/tools/perf/pmu-events/Build"
     fi
+    if [ -e "${S}/tools/perf/pmu-events/jevents.py" ]; then
+        sed -i -e "s#os.scandir(path)#sorted(os.scandir(path), key=lambda e: e.name)#g" \
+                       "${S}/tools/perf/pmu-events/jevents.py"
+    fi
     # end reproducibility substitutions
 
     # We need to ensure the --sysroot option in CC is preserved
@@ -356,6 +360,16 @@ FILES:${PN}-python = " \
                        "
 FILES:${PN}-perl = "${libexecdir}/perf-core/scripts/perl"
 
-
-INHIBIT_PACKAGE_DEBUG_SPLIT="1"
 DEBUG_OPTIMIZATION:append = " -Wno-error=maybe-uninitialized"
+
+PACKAGESPLITFUNCS =+ "perf_fix_sources"
+
+perf_fix_sources () {
+	for f in util/parse-events-flex.h util/parse-events-flex.c util/pmu-flex.c \
+			util/expr-flex.h util/expr-flex.c; do
+		f=${PKGD}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/$f
+		if [ -e $f ]; then
+			sed -i -e 's#${S}/##g' $f
+		fi
+	done
+}

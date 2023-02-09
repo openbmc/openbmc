@@ -1,4 +1,4 @@
-From 2d41508ed1059df2df9994d35d870be2005f575f Mon Sep 17 00:00:00 2001
+From 66e971a785aae80ba838a2604c679db70cbb8b3b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:51:38 +0000
 Subject: [PATCH] nativesdk-glibc: Raise the size of arrays containing dl paths
@@ -19,14 +19,14 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  elf/dl-load.c              | 4 ++--
  elf/dl-usage.c             | 6 ++++--
  elf/interp.c               | 2 +-
- elf/ldconfig.c             | 3 +++
+ elf/ldconfig.c             | 2 ++
  elf/rtld.c                 | 1 +
  iconv/gconv_conf.c         | 2 +-
  sysdeps/generic/dl-cache.h | 4 ----
- 8 files changed, 16 insertions(+), 10 deletions(-)
+ 8 files changed, 15 insertions(+), 10 deletions(-)
 
 diff --git a/elf/dl-cache.c b/elf/dl-cache.c
-index 8bbf110d02..c02a95d9b5 100644
+index 07c054b11a..0fa36548b0 100644
 --- a/elf/dl-cache.c
 +++ b/elf/dl-cache.c
 @@ -352,6 +352,10 @@ search_cache (const char *string_table, uint32_t string_table_size,
@@ -41,7 +41,7 @@ index 8bbf110d02..c02a95d9b5 100644
  _dl_cache_libcmp (const char *p1, const char *p2)
  {
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index ce3cbfa3c4..e116db24a1 100644
+index e514bdcc21..c43747a3a8 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
 @@ -117,8 +117,8 @@ enum { ncapstr = 1, max_capstrlen = 0 };
@@ -56,7 +56,7 @@ index ce3cbfa3c4..e116db24a1 100644
    SYSTEM_DIRS_LEN
  };
 diff --git a/elf/dl-usage.c b/elf/dl-usage.c
-index 98d8c98948..77ca98cbf9 100644
+index 53535c1583..3ba7d9d200 100644
 --- a/elf/dl-usage.c
 +++ b/elf/dl-usage.c
 @@ -25,6 +25,8 @@
@@ -68,7 +68,7 @@ index 98d8c98948..77ca98cbf9 100644
  void
  _dl_usage (const char *argv0, const char *wrong_option)
  {
-@@ -244,7 +246,7 @@ setting environment variables (which would be inherited by subprocesses).\n\
+@@ -184,7 +186,7 @@ setting environment variables (which would be inherited by subprocesses).\n\
    --list                list all dependencies and how they are resolved\n\
    --verify              verify that given object really is a dynamically linked\n\
                          object we can handle\n\
@@ -77,7 +77,7 @@ index 98d8c98948..77ca98cbf9 100644
    --library-path PATH   use given PATH instead of content of the environment\n\
                          variable LD_LIBRARY_PATH\n\
    --glibc-hwcaps-prepend LIST\n\
-@@ -267,7 +269,7 @@ setting environment variables (which would be inherited by subprocesses).\n\
+@@ -207,7 +209,7 @@ setting environment variables (which would be inherited by subprocesses).\n\
  \n\
  This program interpreter self-identifies as: " RTLD "\n\
  ",
@@ -85,9 +85,9 @@ index 98d8c98948..77ca98cbf9 100644
 +              argv0, LD_SO_CACHE);
    print_search_path_for_help (state);
    print_hwcaps_subdirectories (state);
-   print_legacy_hwcap_directories ();
+   _exit (EXIT_SUCCESS);
 diff --git a/elf/interp.c b/elf/interp.c
-index d82af036d1..9d282b2769 100644
+index ae21ae0cb3..b168e6da66 100644
 --- a/elf/interp.c
 +++ b/elf/interp.c
 @@ -18,5 +18,5 @@
@@ -98,24 +98,23 @@ index d82af036d1..9d282b2769 100644
 +const char __invoke_dynamic_linker__[4096] __attribute__ ((section (".interp")))
    = RUNTIME_LINKER;
 diff --git a/elf/ldconfig.c b/elf/ldconfig.c
-index 9394ac6438..7f66b1a460 100644
+index 166dccb528..8dda23c92c 100644
 --- a/elf/ldconfig.c
 +++ b/elf/ldconfig.c
-@@ -176,6 +176,9 @@ static struct argp argp =
+@@ -150,6 +150,8 @@ static struct argp argp =
    options, parse_opt, NULL, doc, NULL, more_help, NULL
  };
  
-+
 +extern const char LD_SO_CACHE[4096] __attribute__ ((section (".ldsocache")));
 +
- /* Check if string corresponds to an important hardware capability or
-    a platform.  */
- static int
+ /* Handle program arguments.  */
+ static error_t
+ parse_opt (int key, char *arg, struct argp_state *state)
 diff --git a/elf/rtld.c b/elf/rtld.c
-index cbbaf4a331..d2d27a0127 100644
+index b8467f37cf..be7bd08bc3 100644
 --- a/elf/rtld.c
 +++ b/elf/rtld.c
-@@ -189,6 +189,7 @@ dso_name_valid_for_suid (const char *p)
+@@ -190,6 +190,7 @@ dso_name_valid_for_suid (const char *p)
      }
    return *p != '\0';
  }
@@ -124,7 +123,7 @@ index cbbaf4a331..d2d27a0127 100644
  static void
  audit_list_init (struct audit_list *list)
 diff --git a/iconv/gconv_conf.c b/iconv/gconv_conf.c
-index f069e28323..6288f715ba 100644
+index 21165a558a..3dd67b0ea2 100644
 --- a/iconv/gconv_conf.c
 +++ b/iconv/gconv_conf.c
 @@ -35,7 +35,7 @@
@@ -137,7 +136,7 @@ index f069e28323..6288f715ba 100644
  /* Type to represent search path.  */
  struct path_elem
 diff --git a/sysdeps/generic/dl-cache.h b/sysdeps/generic/dl-cache.h
-index 93d4bea930..5249176441 100644
+index bd39ff7fb7..38f9e2ad57 100644
 --- a/sysdeps/generic/dl-cache.h
 +++ b/sysdeps/generic/dl-cache.h
 @@ -34,10 +34,6 @@
