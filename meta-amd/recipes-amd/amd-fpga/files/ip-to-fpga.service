@@ -1,0 +1,11 @@
+[Unit]
+Description=Transfer IP address to the FPGA
+BindsTo=sys-subsystem-net-devices-eth0.device
+After=sys-subsystem-net-devices-eth0.device
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/ip-to-fpga.sh
+
+[Install]
+WantedBy=multi-user.target
