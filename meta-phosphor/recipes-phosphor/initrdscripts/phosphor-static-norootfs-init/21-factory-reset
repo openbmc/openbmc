@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if [ ! -x /sbin/fw_printenv ]; then
+    exit 1
+fi
+
+# Need to create /run/lock so fw_printenv can create lockfile.
+mkdir /run/lock
+
+# Check uboot keys for 'factory-reset'
+if /sbin/fw_printenv openbmcinit openbmconce | grep -q factory-reset ; then
+    echo "factory-reset" >> /run/format-persist
+fi

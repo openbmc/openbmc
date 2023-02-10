@@ -2,7 +2,7 @@
 
 # Provide source directive to shellcheck.
 # shellcheck source=meta-facebook/recipes-phosphor/state/phosphor-state-manager/greatlakes/power-cmd
-source /usr/libexec/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
 
 SLOT_ID=$(( $1-1  << 2 ))
 # Host Power On

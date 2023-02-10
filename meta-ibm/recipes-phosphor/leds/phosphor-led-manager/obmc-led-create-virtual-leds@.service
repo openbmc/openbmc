@@ -3,5 +3,5 @@ Description=Create the virtual physical LEDs
 
 [Service]
 Restart=always
-ExecStart=/usr/sbin/phosphor-ledcontroller -p %f
+ExecStart=/usr/libexec/phosphor-led-sysfs/phosphor-ledcontroller -p %f
 SyslogIdentifier=obmc-led-create-virtual-leds

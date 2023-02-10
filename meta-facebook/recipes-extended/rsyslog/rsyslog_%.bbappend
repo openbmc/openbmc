@@ -6,7 +6,7 @@ SRC_URI += "file://rsyslog.conf \
            file://rotate-event-logs.timer \
 "
 
-PACKAGECONFIG:append = " imjournal"
+PACKAGECONFIG:append = " imjournal klog imfile"
 
 do_install:append() {
         install -m 0644 ${WORKDIR}/rotate-event-logs.service ${D}${systemd_system_unitdir}

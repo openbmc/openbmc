@@ -37,8 +37,9 @@ IMAGE_FEATURES += " \
         obmc-system-mgmt \
         obmc-user-mgmt \
         obmc-user-mgmt-ldap \
-        ${@bb.utils.contains('DISTRO_FEATURES', 'obmc-ubi-fs', 'read-only-rootfs', '', d)} \
-        ${@bb.utils.contains('DISTRO_FEATURES', 'phosphor-mmc', 'read-only-rootfs', '', d)} \
+        ${@bb.utils.contains_any('DISTRO_FEATURES', \
+            'obmc-ubi-fs phosphor-mmc obmc-static-norootfs', \
+            'read-only-rootfs', '', d)} \
         ssh-server-dropbear \
         obmc-debug-collector \
         obmc-network-mgmt \

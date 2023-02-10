@@ -8,3 +8,11 @@ RDEPENDS:${PN}-discover:append = " bletchley-common-tool"
 
 BLETCHLEY_SYS_ST_INIT_CONF_FMT = "bletchley-system-state-init.conf:phosphor-discover-system-state@{0}.service.d/bletchley-system-state-init.conf"
 SYSTEMD_OVERRIDE:${PN}-discover:bletchley += "${@compose_list_zip(d, 'BLETCHLEY_SYS_ST_INIT_CONF_FMT', 'OBMC_HOST_INSTANCES')}"
+
+#======================
+# Workaround for bletchley
+#======================
+CHASSIS_DEFAULT_TARGETS:remove:bletchley = " \
+    obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-on@{}.service \
+    obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-running@{}.service \
+"

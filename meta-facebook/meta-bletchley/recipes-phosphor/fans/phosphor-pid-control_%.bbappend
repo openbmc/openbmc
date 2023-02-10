@@ -1,9 +1,6 @@
 FILESEXTRAPATHS:prepend:bletchley := "${THISDIR}/${PN}:"
-SRC_URI:append:bletchley = " \
-    file://config.json \
-    "
 
-FILES:${PN}:append:bletchley = " ${datadir}/swampd/config.json"
+FILES:${PN}:append:bletchley = " ${datadir}/swampd"
 FILES:${PN}:append:bletchley = " ${systemd_system_unitdir}/phosphor-pid-control.service.d/*.conf"
 
 do_install:append:bletchley() {
@@ -16,5 +13,4 @@ do_install:append:bletchley() {
     echo "After=phosphor-virtual-sensor.service" >> ${override_file}
 
     install -d ${D}${datadir}/swampd
-    install -m 0644 -D ${WORKDIR}/config.json ${D}${datadir}/swampd/
 }

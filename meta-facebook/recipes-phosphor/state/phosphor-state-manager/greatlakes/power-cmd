@@ -2,7 +2,10 @@
 
 export POWER_BTN_HIGH=0xFF
 export POWER_BTN_LOW=0xFE
+export RESET_BTN_HIGH=0xFF
+export RESET_BTN_LOW=0xFD
 export power_seq=( "$POWER_BTN_HIGH" "$POWER_BTN_LOW" "$POWER_BTN_HIGH" )
+export reset_seq=( "$RESET_BTN_HIGH" "$RESET_BTN_LOW" "$RESET_BTN_HIGH")
 export SERVICE="xyz.openbmc_project.Ipmi.Channel.Ipmb"
 export OBJECT_PATH="/xyz/openbmc_project/Ipmi/Channel/Ipmb"
 export INTERFACE="org.openbmc.Ipmb"

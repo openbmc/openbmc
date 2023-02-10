@@ -1,0 +1,20 @@
+#!/bin/sh
+
+PERSIST=/run/mnt-persist
+
+if [ ! -d $PERSIST ]; then
+    exit 0
+fi
+
+for m in var etc home/root; do
+    if [ ! -d $PERSIST/$m-data ]; then
+        mkdir -p $PERSIST/$m-data
+    fi
+
+    if [ ! -d $PERSIST/$m-work ]; then
+        mkdir -p $PERSIST/$m-work
+    fi
+
+    mount overlay /$m -t overlay -o \
+        lowerdir=/$m,upperdir=$PERSIST/$m-data,workdir=$PERSIST/$m-work
+done

@@ -1,0 +1,10 @@
+[Unit]
+Description=Phosphor BIC Console SSH socket for Slot4
+Wants=obmc-console@ttyS3.service
+
+[Socket]
+ListenStream=2303
+Accept=yes
+
+[Install]
+WantedBy=sockets.target

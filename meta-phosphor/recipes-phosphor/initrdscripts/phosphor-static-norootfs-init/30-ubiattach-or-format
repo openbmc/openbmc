@@ -1,0 +1,31 @@
+#!/bin/sh
+
+if [ ! -e /dev/mtd/rwfs ]; then
+    exit 1
+fi
+
+if [ ! -e /run/format-persist ]; then
+    if ! ubiattach -p /dev/mtd/rwfs > /dev/null ; then
+        echo "unformatted-ubi" >> /run/format-persist
+    fi
+fi
+
+if [ -e /run/format-persist ]; then
+    echo "Formatting persistent volume: "
+    cat /run/format-persist
+
+    if ! ubiformat --yes /dev/mtd/rwfs ; then
+        exit 1
+    fi
+
+    if ! ubiattach -p /dev/mtd/rwfs ; then
+        exit 1
+    fi
+
+    if ! ubimkvol /dev/ubi0 -N rwfs -m ; then
+        exit 1
+    fi
+fi
+
+mkdir -p /run/mnt-persist
+mount -t ubifs ubi0:rwfs /run/mnt-persist -o sync,compr=zstd

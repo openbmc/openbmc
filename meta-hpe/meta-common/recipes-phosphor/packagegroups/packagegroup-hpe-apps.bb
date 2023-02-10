@@ -44,4 +44,5 @@ RDEPENDS:${PN}-system = " \
         webui-vue \
         phosphor-ipmi-ipmb \
         dbus-sensors \
+        host-ehci-owner-reset \
         "

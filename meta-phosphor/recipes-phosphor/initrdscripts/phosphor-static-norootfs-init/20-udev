@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# We need to run udevd in order to get the /dev/mtd volumes to show up.
+if udevd --daemon; then
+    udevadm trigger --type=devices --action=add && \
+        udevadm settle --timeout=10
+
+    udevadm control --exit
+fi

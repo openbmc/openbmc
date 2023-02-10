@@ -8,6 +8,7 @@ Conflicts=host-ac-off@%i.service
 Type=oneshot
 ExecStart=/usr/sbin/power-ctrl sled%i ac-on
 SyslogIdentifier=power-ctrl
+ExecStartPost=/bin/systemctl restart phosphor-discover-system-state@%i.service
 
 [Install]
 WantedBy=multi-user.target
