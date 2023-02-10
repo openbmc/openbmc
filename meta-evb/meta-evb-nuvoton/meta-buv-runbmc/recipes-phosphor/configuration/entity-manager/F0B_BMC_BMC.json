@@ -870,7 +870,7 @@
         }
     ],
     "Name": "BUV_RUNBMC_NUVOTON",
-    "Probe": "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': 'F0B-BMC-BMC'})",
+    "Probe": "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': 'F0B-BMC*'})",
     "Type": "Board",
     "xyz.openbmc_project.Inventory.Decorator.Ipmi": {
         "EntityId": 7,
