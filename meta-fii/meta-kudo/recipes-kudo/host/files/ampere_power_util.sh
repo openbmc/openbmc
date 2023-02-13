@@ -73,15 +73,11 @@ graceful_shutdown() {
 }
 
 host_reset() {
-  if [ "$(host_status)" == "on" ]; then
     echo "Triggering sysreset pin"
     busctl set-property xyz.openbmc_project.Watchdog /xyz/openbmc_project/watchdog/host0 xyz.openbmc_project.State.Watchdog ExpireAction s xyz.openbmc_project.State.Watchdog.Action.None
     set_gpio_ctrl S0_SYSRESET 0
     sleep 1
     set_gpio_ctrl S0_SYSRESET 1
-  else
-    echo "Host is off, cannot reset."
-  fi
 }
 
 host_cycle() {
