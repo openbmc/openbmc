@@ -1,0 +1,358 @@
+// SPDX-License-Identifier: GPL-2.0
+/dts-v1/;
+
+/* TCG2 Logs */
+/memreserve/ 0x35F00000 0x00010000;
+
+#include "nuvoton-npcm845.dtsi"
+#include "nuvoton-npcm845-scm-pincfg.dtsi"
+
+/ {
+	model = "Nuvoton npcm845 Development Board";
+	compatible = "nuvoton,npcm845";
+
+	aliases {
+		serial0 = &serial0;
+		serial1 = &serial4;
+		serial2 = &serial5;
+		ethernet0 = &gmac1;
+		spi0 = &fiu0;
+		spi3 = &fiu3;
+		usb0 = &udc0;
+		i2c1 = &i2c1;
+		i2c2 = &i2c2;
+		i2c3 = &i2c3;
+		i2c4 = &i2c4;
+		i2c5 = &i2c5;
+		i2c6 = &i2c6;
+		i2c7 = &i2c7;
+		i2c8 = &i2c8;
+		i2c9 = &i2c9;
+		i2c10 = &i2c10;
+		i2c11 = &i2c11;
+		i2c12 = &i2c12;
+		i2c15 = &i2c15;
+		i2c19 = &i2c19;
+
+	};
+
+	chosen {
+		stdout-path = &serial0;
+	};
+
+	memory {
+		reg = <0x0 0x0 0x0 0x80000000>;
+	};
+
+	vsbv8: vsbv8 {
+		compatible = "regulator-npcm845";
+		regulator-name = "v8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+	};
+
+	tpm@0 {
+		compatible = "microsoft,ftpm";
+	};
+
+	firmware {
+		optee {
+			 compatible = "linaro,optee-tz";
+			 method = "smc";
+		};
+	};
+};
+
+&serial0 {
+	status = "okay";
+	assigned-clocks = <&clk NPCM8XX_CLK_UART>,
+			  <&clk NPCM8XX_CLK_UART2>;
+	assigned-clock-parents = <&clk NPCM8XX_CLK_PLL2DIV2>;
+	assigned-clock-rates = <24000000>, <24000000>;
+};
+
+&serial4 {
+	status = "okay";
+	clock-frequency = <24000000>;
+};
+
+&serial5 {
+	status = "okay";
+	clock-frequency = <24000000>;
+};
+
+&fiu0 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi0cs1_pins>;
+	spi-nor@0 {
+		compatible = "jedec,spi-nor";
+		reg = <0>;
+		spi-max-frequency = <50000000>;
+	};
+	spi_flash@1 {
+		compatible = "jedec,spi-nor";
+		reg = <1>;
+		spi-max-frequency = <50000000>;
+	};
+};
+
+&fiu3 {
+	pinctrl-0 = <&spi3_pins>, <&spi3quad_pins>, <&spi3cs1_pins>;
+	status = "okay";
+	spi-nor@0 {
+		compatible = "jedec,spi-nor";
+		reg = <0>;
+		spi-max-frequency = <25000000>;
+	};
+	spi-nor@1 {
+		compatible = "jedec,spi-nor";
+		reg = <1>;
+		spi-max-frequency = <25000000>;
+	};
+};
+
+&gmac1 {
+	phy-mode = "rgmii-id";
+	status = "okay";
+};
+
+&sdhci0 {
+	index = <0x0>;
+	bus-width = <0x8>;
+	clocks = <&clk NPCM8XX_CLK_SDHC>;
+	clock-frequency = <50000000>;
+	vqmmc-supply = <&vsbv8>;
+	vqmmc-microvolt = <1800000>;
+	status = "okay";
+};
+
+&rng {
+	status = "okay";
+};
+
+&aes {
+	status = "okay";
+};
+
+&sha {
+	status = "okay";
+};
+
+&otp {
+	status = "okay";
+};
+
+&i2c1 {
+	status = "okay";
+};
+
+&i2c2 {
+	status = "okay";
+};
+
+&i2c3 {
+	status = "okay";
+};
+
+&i2c4 {
+	status = "okay";
+};
+
+&i2c5 {
+	status = "okay";
+};
+
+&i2c6 {
+	status = "okay";
+};
+
+&i2c7 {
+	status = "okay";
+};
+
+&i2c8 {
+	status = "okay";
+};
+
+&i2c9 {
+	status = "okay";
+};
+
+&i2c10 {
+	status = "okay";
+};
+
+&i2c11 {
+	status = "okay";
+};
+
+&i2c12 {
+	status = "okay";
+};
+
+&i2c15 {
+	status = "okay";
+};
+
+&i2c19 {
+	status = "okay";
+};
+
+&usbphy1 {
+	status = "okay";
+};
+
+&usbphy2 {
+	status = "okay";
+};
+
+&udc0 {
+	status = "okay";
+	phys = <&usbphy1 0>;
+};
+
+&udc1 {
+	status = "okay";
+	phys = <&usbphy1 0>;
+};
+
+&udc2 {
+	status = "okay";
+	phys = <&usbphy1 0>;
+};
+
+&udc3 {
+	status = "okay";
+	phys = <&usbphy1 0>;
+};
+
+&udc4 {
+	status = "okay";
+	phys = <&usbphy1 0>;
+};
+
+&udc6 {
+	status = "okay";
+	phys = <&usbphy1 0>;
+};
+
+&udc7 {
+	status = "okay";
+	phys = <&usbphy1 0>;
+};
+
+&udc8 {
+	status = "okay";
+	phys = <&usbphy1 0>;
+};
+
+&udc9 {
+	status = "okay";
+	phys = <&usbphy2 2>;
+};
+
+&host_intf {
+	type = "espi";
+	ioaddr = <0x2e>;
+	channel-support = <0xf>;
+};
+
+&pinctrl {
+        pinctrl-names = "default";
+        pinctrl-0 = <
+			&fm0cso_slew
+			&fm0_pins
+			&bu4_pins
+			&bu5_pins
+			&gspi_pins
+			&vgadig_pins
+			&gpio8oh_pins
+			&gpio9ol_pins
+			&gpio16i_pins
+			&gpio22oh_pins
+			&gpio23i_pins
+			&gpi35_pins
+			&gpi36_pins
+			&gpio39i_pins
+			&gpio40ol_pins
+			&gpio43oh_pins
+			&gpio44ol_pins
+			&gpio45ol_pins
+			&gpio46oh_pins
+			&gpio58oh_pins
+			&gpio61i_pins
+			&gpio62oh_pins
+			&gpio63oh_pins
+			&gpio64i_pins
+			&gpio65i_pins
+			&gpio66i_pins
+			&gpio67i_pins
+			&gpio68i_pins
+			&gpio69i_pins
+			&gpio71oh_pins
+			&gpio72i_pins
+			&gpio73oh_pins
+			&gpio74i_pins
+			&gpio75i_pins
+			&gpio76ol_pins
+			&gpio77i_pins
+			&gpio78oh_pins
+			&gpio79oh_pins
+			&gpio80oh_pins
+			&gpio81oh_pins
+			&gpio82oh_pins
+			&gpio83oh_pins
+			&gpio84i_pins
+			&gpio85i_pins
+			&gpio86oh_pins
+			&gpio87i_pins
+			&gpio88i_pins
+			&gpio90i_pins
+			&gpio93oh_pins
+			&gpio94ol_pins
+			&gpio96i_pins
+			&gpio97i_pins
+			&gpio99i_pins
+			&gpio100i_pins
+			&gpio101i_pins
+			&gpio114oh_pins
+			&gpio115ol_pins
+			&gpio120i_pins
+			&gpio121ol_pins
+			&gpio122oh_pins
+			&gpio123i_pins
+			&gpio124oh_pins
+			&gpio125ol_pins
+			&gpio126i_pins
+			&gpio127i_pins
+			&gpio141ol_pins
+			&gpio144ol_pins
+			&gpio146i_pins
+			&gpio147i_pins
+			&gpio153i_pins
+			&gpio155oh_pins
+			&gpio160oh_pins
+			&gpio162i_pins
+			&gpio169ol_pins
+			&gpio170i_pins
+			&gpio183i_pins
+			&gpio184i_pins
+			&gpio185i_pins
+			&gpio186i_pins
+			&gpio187od_pins
+			&gpio188i_pins
+			&gpio189i_pins
+			&gpio190oh_pins
+			&gpio200i_pins
+			&gpio218ol_pins
+			&gpio219oh_pins
+			&gpio222oh_pins
+			&gpio223oh_pins
+			&gpio231i_pins
+			&gpio233i_pins
+			&gpio234i_pins
+			&gpio235oh_pins
+        >;
+};
