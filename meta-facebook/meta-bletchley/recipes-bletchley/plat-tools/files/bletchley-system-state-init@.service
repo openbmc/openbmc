@@ -1,9 +1,9 @@
 [Unit]
 Description=Bletchley host state and chassis power state initialize for sled%i
-Wants=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
-After=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
-Wants=mapper-wait@-xyz-openbmc_project-state-host%i.service
-After=mapper-wait@-xyz-openbmc_project-state-host%i.service
+Wants=xyz.openbmc_project.State.Chassis@%i.service
+After=xyz.openbmc_project.State.Chassis@%i.service
+Wants=xyz.openbmc_project.State.Host@%i.service
+After=xyz.openbmc_project.State.Host@%i.service
 
 [Service]
 ExecStart=/usr/libexec/bletchley-system-state-init %i
