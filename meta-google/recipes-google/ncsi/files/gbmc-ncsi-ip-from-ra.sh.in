@@ -71,9 +71,15 @@ while true; do
       (( t_pfx_b[9] |= 1 ))
       hextet="fd$(printf '%02x' ${t_pfx_b[9]})"
       pfx="$(ip_bytes_to_str t_pfx_b)"
-    elif [[ "$line" =~ ^'DNS search list'' '*:' '*([a-z]+[0-9]+)[^.]*[.](.*.google.com)$ ]]; then
+    elif [[ "$line" =~ ^'DNS search list'' '*:' '*([^.]+)(.*[.]google[.]com)$ ]]; then
+      # Ideally, we use PCRE and with lookahead and can do this in a single regex
+      #   ^([a-zA-Z0-9-]+(?=-n[a-fA-F0-9]{1,4})|[a-zA-Z0-9-]+(?!-n[a-fA-F0-9]{1,4}))[^.]*[.]((?:[a-zA-Z0-9]*[.])*google[.]com)$
+      # Instead we do multiple steps to extract the needed info
       host="${BASH_REMATCH[1]}"
-      domain="${BASH_REMATCH[2]}"
+      domain="${BASH_REMATCH[2]#.}"
+      if [[ "$host" =~ (-n[a-fA-F0-9]{1,4})$ ]]; then
+        host="${host%${BASH_REMATCH[1]}}"
+      fi
     elif [[ "$line" =~ ^from' '(.*)$ ]]; then
       rtr="${BASH_REMATCH[1]}"
       set_net || true
