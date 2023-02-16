@@ -25,7 +25,7 @@ case "$config" in
     ;;
 esac
 
-set -ex
+set -e
 
 GADGET_BASE=/sys/kernel/config/usb_gadget
 
