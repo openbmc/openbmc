@@ -5,7 +5,7 @@ distro: poky-tiny
 
 defaults:
   repos:
-    refspec: langdale
+    refspec: master
 
 repos:
   meta-arm:

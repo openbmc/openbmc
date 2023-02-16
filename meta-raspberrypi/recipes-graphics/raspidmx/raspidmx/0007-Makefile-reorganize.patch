@@ -16,7 +16,7 @@ To build simply invoke 'make' with or without a -j option.
 To install simply invoke: make TARGET=install
 To clean simply invoke: make TARGET=clean
 
-Upstream-status: submitted [https://github.com/AndrewFromMelbourne/raspidmx/pull/29]
+Upstream-Status: Submitted [https://github.com/AndrewFromMelbourne/raspidmx/pull/29]
 Signed-off-by: Trevor Woerner <twoerner@gmail.com>
 ---
  Makefile | 19 +++++++------------

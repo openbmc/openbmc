@@ -37,6 +37,8 @@ PACKAGECONFIG[jpeg] = "--enable-jpeg,--disable-jpeg,jpeg,"
 PACKAGECONFIG[zlib] = "--enable-zlib,--disable-zlib,zlib,"
 PACKAGECONFIG[lzma] = "--enable-lzma,--disable-lzma,xz,"
 PACKAGECONFIG[webp] = "--enable-webp,--disable-webp,libwebp,"
+PACKAGECONFIG[zstd] = "--enable-zstd,--disable-zstd,zstd,"
+PACKAGECONFIG[libdeflate] = "--enable-libdeflate,--disable-libdeflate,libdeflate,"
 
 # Convert single-strip uncompressed images to multiple strips of specified
 # size (default: 8192) to reduce memory usage

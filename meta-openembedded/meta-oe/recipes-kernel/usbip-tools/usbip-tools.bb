@@ -65,5 +65,5 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 # Even though the libusbip is set to version 0.0.1, set the package version to match kernel
 # e.g. usbip-tools-5.14.21-r0.qemux86_64.rpm for qemu package using kernel 5.14.21
 python do_package:prepend() {
-    d.setVar('PKGV', d.getVar("KERNEL_VERSION", True).split("-")[0])
+    d.setVar('PKGV', d.getVar("KERNEL_VERSION").split("-")[0])
 }

@@ -1,0 +1,40 @@
+From 88d968346184058df18dc69171dcd4fd612c2341 Mon Sep 17 00:00:00 2001
+From: Jan Luebbe <sho@stratum0.net>
+Date: Mon, 30 Jan 2023 12:48:23 +0100
+Subject: [PATCH] avoid unnecessary check for sqlite3 binary
+
+Only the library is used, not the sqlite3 binary. Drop this check to simplify
+cross-compilation (as no native sqlite3 binary is needed).
+
+Upstream-Status: Submitted [https://github.com/opendnssec/SoftHSMv2/pull/694]
+---
+ m4/acx_sqlite3.m4 | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/m4/acx_sqlite3.m4 b/m4/acx_sqlite3.m4
+index fd942a75e1a6..17c126d161f5 100644
+--- a/m4/acx_sqlite3.m4
++++ b/m4/acx_sqlite3.m4
+@@ -4,19 +4,13 @@ AC_DEFUN([ACX_SQLITE3],[
+ 		[
+ 			SQLITE3_INCLUDES="-I$withval/include"
+ 			SQLITE3_LIBDIRS="-L$withval/lib"
+-			AC_PATH_PROGS(SQLITE3, sqlite3, sqlite3, $withval/bin)
+ 			
+ 		],[
+ 			SQLITE3_INCLUDES=""
+ 			SQLITE3_LIBDIRS=""
+-			AC_PATH_PROGS(SQLITE3, sqlite3, sqlite3, $PATH)
+ 		])
+ 
+ 	
+-	if ! test -x "$SQLITE3"; then
+-		AC_MSG_ERROR([sqlite3 command not found])
+-	fi
+-	
+ 	AC_MSG_CHECKING(what are the SQLite3 includes)
+ 	AC_MSG_RESULT($SQLITE3_INCLUDES)
+ 
+-- 
+2.30.2
+

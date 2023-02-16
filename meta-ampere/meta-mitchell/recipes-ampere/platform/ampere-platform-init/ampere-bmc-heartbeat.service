@@ -1,7 +1,5 @@
 [Unit]
 Description=Ampere BMC heartbeat service
-Wants=obmc-mapper.target
-After=obmc-mapper.target
 
 [Service]
 Type=simple

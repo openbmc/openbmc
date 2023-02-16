@@ -3,7 +3,7 @@ From: Trevor Woerner <twoerner@gmail.com>
 Date: Fri, 4 Dec 2020 03:47:17 -0500
 Subject: [PATCH] game/Makefile: install sample png files
 
-Upstream-status: submitted [https://github.com/AndrewFromMelbourne/raspidmx/pull/29]
+Upstream-Status: Submitted [https://github.com/AndrewFromMelbourne/raspidmx/pull/29]
 Signed-off-by: Trevor Woerner <twoerner@gmail.com>
 ---
  game/Makefile | 2 ++

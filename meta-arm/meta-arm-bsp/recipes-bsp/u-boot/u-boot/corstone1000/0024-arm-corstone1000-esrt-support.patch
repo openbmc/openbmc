@@ -1,7 +1,7 @@
-From 475f787ba7351282ca3ce0fcf9badc01821cd8a3 Mon Sep 17 00:00:00 2001
+From 34f363f9d1c13abecd06ec37567704d0dfc05e77 Mon Sep 17 00:00:00 2001
 From: Satish Kumar <satish.kumar01@arm.com>
 Date: Wed, 30 Nov 2022 19:11:43 +0000
-Subject: [PATCH 24/25] arm/corstone1000: esrt support
+Subject: [PATCH 24/27] arm/corstone1000: esrt support
 
 The implementation is platform specific and would require
 change in future.
@@ -12,6 +12,7 @@ is to be considered in the future.
 
 Signed-off-by: Satish Kumar <satish.kumar01@arm.com>
 Upstream-Status: Inappropriate [Redesign of FMP protocol for ESRT and Capsule update interface is required]
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 ---
  include/efi_api.h             |   2 +-
  lib/efi_loader/efi_firmware.c | 133 ++++++++++++++++++++++++++++++++++
@@ -19,7 +20,7 @@ Upstream-Status: Inappropriate [Redesign of FMP protocol for ESRT and Capsule up
  3 files changed, 143 insertions(+), 9 deletions(-)
 
 diff --git a/include/efi_api.h b/include/efi_api.h
-index 9bb0d44ac8..fcf2643e14 100644
+index 9bd70b0f18ce..23e427236a8f 100644
 --- a/include/efi_api.h
 +++ b/include/efi_api.h
 @@ -2030,7 +2030,7 @@ struct efi_firmware_image_descriptor {
@@ -32,10 +33,10 @@ index 9bb0d44ac8..fcf2643e14 100644
  struct efi_firmware_management_protocol {
  	efi_status_t (EFIAPI *get_image_info)(
 diff --git a/lib/efi_loader/efi_firmware.c b/lib/efi_loader/efi_firmware.c
-index 28d9a19edb..aa4af8036b 100644
+index c883e2ff0aa9..c6ab6e2182dd 100644
 --- a/lib/efi_loader/efi_firmware.c
 +++ b/lib/efi_loader/efi_firmware.c
-@@ -14,6 +14,7 @@
+@@ -15,6 +15,7 @@
  #include <signatures.h>
  
  #include <linux/list.h>
@@ -43,7 +44,7 @@ index 28d9a19edb..aa4af8036b 100644
  
  #define FMP_PAYLOAD_HDR_SIGNATURE	SIGNATURE_32('M', 'S', 'S', '1')
  
-@@ -416,8 +417,140 @@ efi_status_t EFIAPI efi_firmware_fit_set_image(
+@@ -417,8 +418,140 @@ efi_status_t EFIAPI efi_firmware_fit_set_image(
  	return EFI_EXIT(EFI_SUCCESS);
  }
  
@@ -185,7 +186,7 @@ index 28d9a19edb..aa4af8036b 100644
  	.set_image = efi_firmware_fit_set_image,
  	.check_image = efi_firmware_check_image_unsupported,
 diff --git a/lib/efi_loader/efi_setup.c b/lib/efi_loader/efi_setup.c
-index c154eb0e9d..63329bbff8 100644
+index 89f988b09c44..08c742edbd12 100644
 --- a/lib/efi_loader/efi_setup.c
 +++ b/lib/efi_loader/efi_setup.c
 @@ -167,14 +167,6 @@ static efi_status_t efi_init_capsule(void)
@@ -203,7 +204,7 @@ index c154eb0e9d..63329bbff8 100644
  	ret = efi_corstone1000_alloc_capsule_shared_buf();
  	if (ret != EFI_SUCCESS) {
  		printf("EFI: Corstone-1000: cannot allocate caspsule shared buffer\n");
-@@ -308,6 +300,15 @@ efi_status_t efi_init_obj_list(void)
+@@ -288,6 +280,15 @@ efi_status_t efi_init_obj_list(void)
  	if (ret != EFI_SUCCESS)
  		goto out;
  
@@ -220,5 +221,5 @@ index c154eb0e9d..63329bbff8 100644
  	ret = efi_init_variables();
  	if (ret != EFI_SUCCESS)
 -- 
-2.17.1
+2.39.1
 

@@ -11,25 +11,25 @@ In i2c mode rwmem accesses an i2c peripheral by sending i2c messages to it."
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-DEPENDS += "python3 python3-pybind11"
+DEPENDS += "fmt libinih"
 
 PV .= "+git${SRCPV}"
 
-SRCREV_rwmem = "3ec3e421211b58e766651c2e3a3a21acf14a1906"
-SRCREV_inih = "4b10c654051a86556dfdb634c891b6c3224c4109"
+SRCREV = "8416326777b2aada0706539b8f9f6acefa476b16"
 
-SRCREV_FORMAT = "rwmem_inih"
-
-SRC_URI = " \
-    git://github.com/tomba/rwmem.git;protocol=https;name=rwmem;branch=master \
-    git://github.com/benhoyt/inih.git;protocol=https;name=inih;nobranch=1;destsuffix=git/ext/inih \
-"
+SRC_URI = "git://github.com/tomba/rwmem.git;protocol=https;name=rwmem;branch=master \
+           file://0001-include-missing-cstdint.patch"
 
 S = "${WORKDIR}/git"
 
-inherit cmake pkgconfig
+inherit meson pkgconfig python3native
 
-do_install() {
-	install -D -m 0755 ${B}/bin/rwmem ${D}${bindir}/rwmem
-	install -D -m 0644 ${B}/lib/librwmem.a ${D}${libdir}/librwmem.a
+PACKAGECONFIG ?= "python static"
+PACKAGECONFIG[python] = "-Dpyrwmem=enabled,-Dpyrwmem=disabled,cmake-native python3 python3-pybind11"
+PACKAGECONFIG[static] = "-Dstatic-libc=true,-Dstatic-libc=false,"
+
+do_install:append() {
+	install -D -m 0644 ${B}/librwmem/librwmem.a ${D}${libdir}/librwmem.a
 }
+
+FILES:${PN} += "${libdir}/python3.11/site-packages/pyrwmem"

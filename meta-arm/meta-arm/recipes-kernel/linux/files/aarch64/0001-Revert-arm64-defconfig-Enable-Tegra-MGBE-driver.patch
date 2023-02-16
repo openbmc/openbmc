@@ -1,0 +1,28 @@
+From 7bc0bae10b0f21cfc8df23848844b66bf1b4d751 Mon Sep 17 00:00:00 2001
+From: Jon Mason <jdmason@kudzu.us>
+Date: Fri, 3 Feb 2023 05:16:43 -0500
+Subject: [PATCH 1/2] Revert "arm64: defconfig: Enable Tegra MGBE driver"
+
+This reverts commit 4cac4de4b05f0a1d5920d12278bf8787011661d3.
+
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+Upstream-Status: Inappropriate
+---
+ arch/arm64/configs/defconfig | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index 0b6af3348e79..70919b241469 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -362,7 +362,6 @@ CONFIG_SMSC911X=y
+ CONFIG_SNI_AVE=y
+ CONFIG_SNI_NETSEC=y
+ CONFIG_STMMAC_ETH=m
+-CONFIG_DWMAC_TEGRA=m
+ CONFIG_TI_K3_AM65_CPSW_NUSS=y
+ CONFIG_QCOM_IPA=m
+ CONFIG_MESON_GXL_PHY=m
+-- 
+2.30.2
+

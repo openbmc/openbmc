@@ -1,14 +1,19 @@
-Tweak tests of ifupdown to make it work with oe-core ptest framework.
+From a6bb2ac5f521c678abbbdb1960d28f750f4357a6 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Mon, 3 Feb 2020 17:33:11 +0800
+Subject: [PATCH] Tweak tests of ifupdown to make it work with oe-core ptest
+ framework.
 
 Upstream-Status: Inappropriate [oe-core specific]
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
 ---
  tests/testbuild-linux | 11 ++++++-----
  1 file changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/tests/testbuild-linux b/tests/testbuild-linux
-index 5f148eb..d9b1698 100755
+index 2c69856..05f0703 100755
 --- a/tests/testbuild-linux
 +++ b/tests/testbuild-linux
 @@ -1,6 +1,7 @@
@@ -19,8 +24,8 @@ index 5f148eb..d9b1698 100755
 +dir=$curdir/linux
  
  result=true
- for test in 1 2 3 4 5 6 7 8 9 10 11 16 17 18; do
-@@ -12,7 +13,7 @@ for test in 1 2 3 4 5 6 7 8 9 10 11 16 17 18; do
+ for test in 1 2 3 4 5 6 7 8 9 10 11 16 17 18 19; do
+@@ -12,7 +13,7 @@ for test in 1 2 3 4 5 6 7 8 9 10 11 16 17 18 19; do
          echo "Testcase $test: $args"
  
  	exitcode=0
@@ -29,7 +34,7 @@ index 5f148eb..d9b1698 100755
                  >$dir/up-res-out.$test 2>$dir/up-res-err.$test || exitcode=$?
  
          (echo "exit code: $exitcode";
-@@ -20,7 +21,7 @@ for test in 1 2 3 4 5 6 7 8 9 10 11 16 17 18; do
+@@ -20,7 +21,7 @@ for test in 1 2 3 4 5 6 7 8 9 10 11 16 17 18 19; do
           echo "====stderr===="; cat $dir/up-res-err.$test) > $dir/up-res.$test
  
  	exitcode=0
@@ -38,7 +43,7 @@ index 5f148eb..d9b1698 100755
                 >$dir/down-res-out.$test 2>$dir/down-res-err.$test || exitcode=$?
  
          (echo "exit code: $exitcode";
-@@ -28,9 +29,9 @@ for test in 1 2 3 4 5 6 7 8 9 10 11 16 17 18; do
+@@ -28,9 +29,9 @@ for test in 1 2 3 4 5 6 7 8 9 10 11 16 17 18 19; do
           echo "====stderr===="; cat $dir/down-res-err.$test) > $dir/down-res.$test
  
          if diff -ub $dir/up.$test $dir/up-res.$test && diff -ub $dir/down.$test $dir/down-res.$test; then
@@ -50,5 +55,3 @@ index 5f148eb..d9b1698 100755
                  result=false
          fi
          echo "=========="
---
-2.17.1

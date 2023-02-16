@@ -1,4 +1,4 @@
-From 54ca20a18253bcf0915b2e2985bbee79bf881ebe Mon Sep 17 00:00:00 2001
+From b68fcf0e23b91dca7fecfeeceb1c4267e29e6f9d Mon Sep 17 00:00:00 2001
 From: Paul Eggleton <paul.eggleton@linux.microsoft.com>
 Date: Tue, 16 Jun 2020 03:57:25 +0000
 Subject: [PATCH] build.c: ignore return of 1 from tar -cf

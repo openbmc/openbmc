@@ -28,7 +28,7 @@ FILES_SOLIBSDEV = ""
 FILES:${PN} += "${libdir}/*"
 INSANE_SKIP:${PN} += "dev-so"
 
-inherit cmake cpan-base pkgconfig python3native systemd
+inherit cmake cpan-base pkgconfig python3native python3targetconfig systemd
 
 SYSTEMD_SERVICE:${PN} = " \
     srp_daemon.service \

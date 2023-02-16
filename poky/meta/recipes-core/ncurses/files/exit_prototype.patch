@@ -1,18 +1,28 @@
-Add needed headers for including mbstate_t and exit()
+From 4a769a441d7e57a23017c3037cde3e53fb9f35fe Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 30 Aug 2022 15:58:32 -0700
+Subject: [PATCH] Add needed headers for including mbstate_t and exit()
 
 Upstream-Status: Inappropriate [Reconfigure will solve it]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ configure | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configure b/configure
+index f377f551..163f8899 100755
 --- a/configure
 +++ b/configure
-@@ -3422,6 +3422,7 @@ rm -f "conftest.$ac_objext" "conftest.$a
+@@ -3423,6 +3423,7 @@ rm -f "conftest.$ac_objext" "conftest.$ac_ext"
    cat >"conftest.$ac_ext" <<_ACEOF
- #line 3423 "configure"
+ #line 3424 "configure"
  #include "confdefs.h"
 +#include <stdlib.h>
  $ac_declaration
  int
  main (void)
-@@ -12997,6 +12998,7 @@ cat >"conftest.$ac_ext" <<_ACEOF
+@@ -13111,6 +13112,7 @@ cat >"conftest.$ac_ext" <<_ACEOF
  #include <stdlib.h>
  #include <stdarg.h>
  #include <stdio.h>

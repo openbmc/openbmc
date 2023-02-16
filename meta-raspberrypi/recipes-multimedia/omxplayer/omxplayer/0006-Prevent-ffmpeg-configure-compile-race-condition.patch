@@ -7,7 +7,7 @@ Additional dependency information is needed in Makefile.ffmpeg to ensure that
 the configure stage is finished before the compile stage starts.
 
 Signed-off-by: Paul Barker <pbarker@toganlabs.com>
-Upstream-status: Pending
+Upstream-Status: Pending
 
 ---
  Makefile.ffmpeg | 4 ++--

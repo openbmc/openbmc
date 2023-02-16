@@ -5,9 +5,9 @@
 #
 
 import http.server
+import logging
 import multiprocessing
 import os
-import traceback
 import signal
 from socketserver import ThreadingMixIn
 
@@ -15,20 +15,24 @@ class HTTPServer(ThreadingMixIn, http.server.HTTPServer):
 
     def server_start(self, root_dir, logger):
         os.chdir(root_dir)
+        self.logger = logger
         self.serve_forever()
 
 class HTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
     def log_message(self, format_str, *args):
-        pass
+        self.server.logger.info(format_str, *args)
 
-class HTTPService(object):
+class HTTPService:
 
     def __init__(self, root_dir, host='', port=0, logger=None):
         self.root_dir = root_dir
         self.host = host
         self.port = port
-        self.logger = logger
+        if logger:
+            self.logger = logger.getChild("HTTPService")
+        else:
+            self.logger = logging.getLogger("HTTPService")
 
     def start(self):
         if not os.path.exists(self.root_dir):
@@ -40,6 +44,12 @@ class HTTPService(object):
             self.port = self.server.server_port
         self.process = multiprocessing.Process(target=self.server.server_start, args=[self.root_dir, self.logger])
 
+        def handle_error(self, request, client_address):
+            import traceback
+            exception = traceback.format_exc()
+            self.logger.warn("Exception when handling %s: %s" % (request, exception))
+        self.server.handle_error = handle_error
+
         # The signal handler from testimage.bbclass can cause deadlocks here
         # if the HTTPServer is terminated before it can restore the standard 
         #signal behaviour
@@ -49,7 +59,7 @@ class HTTPService(object):
         signal.signal(signal.SIGTERM, orig)
 
         if self.logger:
-            self.logger.info("Started HTTPService on %s:%s" % (self.host, self.port))
+            self.logger.info("Started HTTPService for %s on %s:%s" % (self.root_dir, self.host, self.port))
 
 
     def stop(self):
@@ -61,3 +71,10 @@ class HTTPService(object):
         if self.logger:
             self.logger.info("Stopped HTTPService on %s:%s" % (self.host, self.port))
 
+if __name__ == "__main__":
+    import sys, logging
+
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=logging.DEBUG)
+    httpd = HTTPService(sys.argv[1], port=8888, logger=logger)
+    httpd.start()

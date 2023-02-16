@@ -656,7 +656,7 @@ builds are when execute, bitbake also supports user defined
 configuration of the `Python
 logging <https://docs.python.org/3/library/logging.html>`__ facilities
 through the :term:`BB_LOGCONFIG` variable. This
-variable defines a json or yaml `logging
+variable defines a JSON or YAML `logging
 configuration <https://docs.python.org/3/library/logging.config.html>`__
 that will be intelligently merged into the default configuration. The
 logging configuration is merged using the following rules:
@@ -690,9 +690,9 @@ logging configuration is merged using the following rules:
    adds a filter called ``BitBake.defaultFilter``, both filters will be
    applied to the logger
 
-As an example, consider the following user logging configuration file
-which logs all Hash Equivalence related messages of VERBOSE or higher to
-a file called ``hashequiv.log`` ::
+As a first example, you can create a ``hashequiv.json`` user logging
+configuration file to log all Hash Equivalence related messages of ``VERBOSE``
+or higher priority to a file called ``hashequiv.log``::
 
    {
        "version": 1,
@@ -721,3 +721,40 @@ a file called ``hashequiv.log`` ::
            }
        }
    }
+
+Then set the :term:`BB_LOGCONFIG` variable in ``conf/local.conf``::
+
+   BB_LOGCONFIG = "hashequiv.json"
+
+Another example is this ``warn.json`` file to log all ``WARNING`` and
+higher priority messages to a ``warn.log`` file::
+
+  {
+      "version": 1,
+      "formatters": {
+          "warnlogFormatter": {
+              "()": "bb.msg.BBLogFormatter",
+              "format": "%(levelname)s: %(message)s"
+          }
+      },
+
+      "handlers": {
+          "warnlog": {
+              "class": "logging.FileHandler",
+              "formatter": "warnlogFormatter",
+              "level": "WARNING",
+              "filename": "warn.log"
+          }
+      },
+
+      "loggers": {
+          "BitBake": {
+              "handlers": ["warnlog"]
+          }
+      },
+
+      "@disable_existing_loggers": false
+  }
+
+Note that BitBake's helper classes for structured logging are implemented in
+``lib/bb/msg.py``.

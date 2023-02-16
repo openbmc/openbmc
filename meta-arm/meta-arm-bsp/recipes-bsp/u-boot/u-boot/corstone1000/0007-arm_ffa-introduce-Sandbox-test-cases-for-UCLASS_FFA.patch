@@ -1,7 +1,7 @@
-From de26427c9f9b450ab4a18352fa51f46b3b585bc1 Mon Sep 17 00:00:00 2001
+From fcc5de7e0e618fa4ec82d37f5f0687af837e6f54 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Mon, 6 Jun 2022 17:26:06 +0100
-Subject: [PATCH 07/25] arm_ffa: introduce Sandbox test cases for UCLASS_FFA
+Subject: [PATCH 07/27] arm_ffa: introduce Sandbox test cases for UCLASS_FFA
 
 Add functional test cases for the FF-A core driver
 
@@ -29,6 +29,7 @@ v4: align sandbox tests with the new FF-A driver interfaces
  and new way of error handling
 
 v1: introduce sandbox tests
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 ---
  MAINTAINERS      |   1 +
  test/dm/Makefile |   2 +
@@ -37,10 +38,10 @@ v1: introduce sandbox tests
  create mode 100644 test/dm/ffa.c
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 23cebbd526..e682db8d8f 100644
+index 297d165f8401..c1d3d4ae1c56 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -256,6 +256,7 @@ F:	doc/arch/arm64.ffa.rst
+@@ -272,6 +272,7 @@ F:	doc/arch/arm64.ffa.rst
  F:	drivers/firmware/arm-ffa/
  F:	include/arm_ffa.h
  F:	include/sandbox_arm_ffa.h
@@ -49,7 +50,7 @@ index 23cebbd526..e682db8d8f 100644
  ARM FREESCALE IMX
  M:	Stefano Babic <sbabic@denx.de>
 diff --git a/test/dm/Makefile b/test/dm/Makefile
-index 7543df8823..e5a791768e 100644
+index 7a79b6e1a25d..85e99e1c120e 100644
 --- a/test/dm/Makefile
 +++ b/test/dm/Makefile
 @@ -1,6 +1,7 @@
@@ -60,7 +61,7 @@ index 7543df8823..e5a791768e 100644
  
  obj-$(CONFIG_UT_DM) += test-dm.o
  
-@@ -81,6 +82,7 @@ obj-$(CONFIG_POWER_DOMAIN) += power-domain.o
+@@ -85,6 +86,7 @@ obj-$(CONFIG_POWER_DOMAIN) += power-domain.o
  obj-$(CONFIG_ACPI_PMC) += pmc.o
  obj-$(CONFIG_DM_PMIC) += pmic.o
  obj-$(CONFIG_DM_PWM) += pwm.o
@@ -70,7 +71,7 @@ index 7543df8823..e5a791768e 100644
  obj-y += regmap.o
 diff --git a/test/dm/ffa.c b/test/dm/ffa.c
 new file mode 100644
-index 0000000000..128d8626a7
+index 000000000000..128d8626a761
 --- /dev/null
 +++ b/test/dm/ffa.c
 @@ -0,0 +1,392 @@
@@ -467,5 +468,5 @@ index 0000000000..128d8626a7
 +
 +DM_TEST(dm_test_ffa_nack, UT_TESTF_SCAN_FDT | UT_TESTF_CONSOLE_REC);
 -- 
-2.17.1
+2.39.1
 

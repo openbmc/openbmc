@@ -11,6 +11,7 @@ SRCREV = "ce864b17ea0e24a91e77c7dd3eb2d1ac4175b3f0"
 
 SRC_URI = "git://github.com/libb64/libb64;protocol=https;branch=master \
            file://0001-example-Do-not-run-the-tests.patch \
+           file://0002-use-BUFSIZ-as-buffer-size.patch \
            file://0001-Makefile-fix-parallel-build-of-examples.patch \
            file://0001-examples-Use-proper-function-prototype-for-main.patch \
            "

@@ -10,7 +10,7 @@ I get a build error saying:
 Therefore switch to the more common and more generic "pkg-config" instead of
 using a libpng-specific tool for flags and libraries.
 
-Upstream-status: submitted [https://github.com/AndrewFromMelbourne/raspidmx/pull/29]
+Upstream-Status: Submitted [https://github.com/AndrewFromMelbourne/raspidmx/pull/29]
 Signed-off-by: Trevor Woerner <twoerner@gmail.com>
 ---
  game/Makefile       | 4 ++--

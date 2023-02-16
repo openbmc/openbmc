@@ -23,7 +23,7 @@ PACKAGECONFIG ??= " \
 # we'll want to declare the dep and install the service.
 PACKAGECONFIG[systemd] = ",,systemd,libsystemd"
 SYSTEMD_SERVICE:${PN} = "mctpd.service mctp.target mctp-local.target"
-SYSTEMD_AUTO_ENABLE_${PN} = "enable"
+SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
 do_install:append () {
     if ${@bb.utils.contains('PACKAGECONFIG', 'systemd', 'true', 'false', d)}; then

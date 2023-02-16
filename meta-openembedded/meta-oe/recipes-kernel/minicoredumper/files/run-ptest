@@ -1,0 +1,12 @@
+#!/bin/sh
+
+echo minicoredumper_demo
+echo expecting Segmentation fault with core dump ...
+
+minicoredumper_demo 6 & sleep 3 && minicoredumper_demo
+
+if ls /var/crash/ | grep minicoredumper; then
+	echo SUCCESS
+else
+	echo FAIL
+fi

@@ -1,0 +1,32 @@
+From 752e30eebe5b91c323bafcbea8d450dd5683701a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 30 Jan 2023 10:31:10 -0800
+Subject: [PATCH] Include missing <cstdint> header
+
+gcc 13 moved some includes around and as a result <cstdint> is
+no longer transitively included [1]. Explicitly include it for
+int32_t.
+
+[1] https://gcc.gnu.org/gcc-13/porting_to.html#header-dep-changes
+
+Upstream-Status: Submitted [https://code-review.googlesource.com/c/re2/+/60970]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ third_party/re2/util/pcre.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/third_party/re2/util/pcre.h b/third_party/re2/util/pcre.h
+index 896b0bd..271a005 100644
+--- a/third_party/re2/util/pcre.h
++++ b/third_party/re2/util/pcre.h
+@@ -163,6 +163,7 @@
+ 
+ #include "util/util.h"
+ #include "re2/stringpiece.h"
++#include <cstdint>
+ 
+ #ifdef USEPCRE
+ #include <pcre.h>
+-- 
+2.39.1
+

@@ -25,6 +25,7 @@ EXTRA_OECONF += "--without-gssapi --sbindir=${bindir}"
 DEPENDS += "flex-native bison-native libpam libtirpc"
 inherit autotools-brokensep features_check
 
+CPPFLAGS += "-P"
 CFLAGS += "-I${STAGING_INCDIR}/tirpc"
 LIBS += "-ltirpc"
 

@@ -1,0 +1,32 @@
+From 84e884f99e581515b49d8973538bb17e1e6c0dc0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 26 Jan 2023 20:45:57 -0800
+Subject: [PATCH] include missing <cstdint>
+
+gcc 13 moved some includes around and as a result <cstdint> is no
+longer transitively included [1]. Explicitly include it for
+uint{32,64}_t.
+
+[1] https://gcc.gnu.org/gcc-13/porting_to.html#header-dep-changes
+
+Upstream-Status: Submitted [https://github.com/tomba/rwmem/pull/7]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ librwmem/helpers.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/librwmem/helpers.h b/librwmem/helpers.h
+index a0a738b..8d02c9c 100644
+--- a/librwmem/helpers.h
++++ b/librwmem/helpers.h
+@@ -1,6 +1,7 @@
+ #pragma once
+ 
+ #include <cerrno>
++#include <cstdint>
+ #include <string>
+ #include <vector>
+ #include <string.h>
+-- 
+2.39.1
+

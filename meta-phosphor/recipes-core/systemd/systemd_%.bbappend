@@ -6,6 +6,7 @@ PACKAGECONFIG = "\
         networkd \
         nss \
         pam \
+        pstore \
         randomseed \
         resolved \
         seccomp \

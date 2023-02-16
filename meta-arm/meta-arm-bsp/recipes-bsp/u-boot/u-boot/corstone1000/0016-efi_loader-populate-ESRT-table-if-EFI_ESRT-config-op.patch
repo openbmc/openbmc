@@ -1,7 +1,7 @@
-From 41a2c8bb23e587e9abe7b8bc62db1a93c0e5d841 Mon Sep 17 00:00:00 2001
+From 978d2b92a2ae1f2be71c85271c2d79a5eaf74815 Mon Sep 17 00:00:00 2001
 From: Vishnu Banavath <vishnu.banavath@arm.com>
 Date: Fri, 17 Dec 2021 19:49:02 +0000
-Subject: [PATCH 16/25] efi_loader: populate ESRT table if EFI_ESRT config
+Subject: [PATCH 16/27] efi_loader: populate ESRT table if EFI_ESRT config
  option is set
 
 This change is to call efi_esrt_populate function if CONFIG_EFI_ESRT
@@ -15,10 +15,10 @@ Upstream-Status: Pending [Not submitted to upstream yet]
  1 file changed, 7 insertions(+)
 
 diff --git a/lib/efi_loader/efi_capsule.c b/lib/efi_loader/efi_capsule.c
-index 0eee3c2d4c..94dc0dfe3d 100644
+index ef7b358ddba9..8eb8fc406adf 100644
 --- a/lib/efi_loader/efi_capsule.c
 +++ b/lib/efi_loader/efi_capsule.c
-@@ -668,6 +668,13 @@ efi_status_t __efi_runtime EFIAPI efi_update_capsule(
+@@ -852,6 +852,13 @@ efi_status_t __efi_runtime EFIAPI efi_update_capsule(
  			ret = EFI_SUCCESS;
  		}
  
@@ -33,5 +33,5 @@ index 0eee3c2d4c..94dc0dfe3d 100644
  #endif
  
 -- 
-2.17.1
+2.39.1
 

@@ -24,6 +24,7 @@ SED_CONFIG_EFI:x86-64 = ''
 SED_CONFIG_EFI:arm = ''
 SED_CONFIG_EFI:armeb = ''
 SED_CONFIG_EFI:aarch64 = ''
+SED_CONFIG_EFI:loongarch64 = ''
 
 do_compile () {
 	# Yes, this is crazy. If you build on a system with git < 2.14 from scratch, the tree will

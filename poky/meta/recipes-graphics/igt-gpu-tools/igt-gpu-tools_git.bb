@@ -9,17 +9,15 @@ LICENSE = "MIT"
 
 inherit meson pkgconfig
 
-SRCREV = "203def046b466fb2da67f9f15552d84e1c0b41f2"
-PV = "1.26"
+SRCREV = "2b29e8ac07fbcfadc48b9d60e4d736a6e3b289ab"
+PV = "1.27.1"
 
-SRC_URI = "git://gitlab.freedesktop.org/drm/igt-gpu-tools.git;protocol=https;branch=master \
-           file://0001-lib-meson.build-fix-meson-0.60-compatibility.patch \
-           "
+SRC_URI = "git://gitlab.freedesktop.org/drm/igt-gpu-tools.git;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"
 
 DEPENDS += "libdrm libpciaccess cairo udev glib-2.0 procps libunwind kmod openssl elfutils alsa-lib json-c bison-native"
-RDEPENDS:${PN} += "bash"
+RDEPENDS:${PN} += "bash perl"
 RDEPENDS:${PN}-tests += "bash"
 
 PACKAGE_BEFORE_PN = "${PN}-benchmarks ${PN}-tests"

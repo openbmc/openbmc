@@ -114,7 +114,7 @@ def llvm_features_from_target_fpu(d):
     # TARGET_FPU can be hard or soft. +soft-float tell llvm to use soft float
     # ABI. There is no option for hard.
 
-    fpu = d.getVar('TARGET_FPU', True)
+    fpu = d.getVar('TARGET_FPU')
     return ["+soft-float"] if fpu == "soft" else []
 
 def llvm_features(d):

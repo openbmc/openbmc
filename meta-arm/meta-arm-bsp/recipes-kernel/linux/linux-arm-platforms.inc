@@ -27,10 +27,6 @@ SRCREV:arm-platforms-kmeta = "6147e82375aa9df8f2a162d42ea6406c79c854c5"
 COMPATIBLE_MACHINE:corstone500 = "corstone500"
 KBUILD_DEFCONFIG:corstone500  = "multi_v7_defconfig"
 KCONFIG_MODE:corstone500 = "--alldefconfig"
-FILESEXTRAPATHS:prepend:corstone500 := "${ARMBSPFILESPATHS}"
-SRC_URI:append:corstone500 = " \
-           file://0001-arm-defconfig-drop-CONFIG_SND_SOC_AC97-from-multi_v7.patch \
-           "
 
 #
 # Corstone1000 KMACHINE

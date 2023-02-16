@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 DEPENDS = "gtk+3 glib-2.0 bluez5 python3-pygobject python3-cython-native"
 
-inherit meson gettext systemd gsettings pkgconfig python3native gtk-icon-cache
+inherit meson gettext systemd gsettings pkgconfig python3native gtk-icon-cache useradd
 
 SRC_URI = " \
     git://github.com/blueman-project/blueman.git;protocol=https;branch=2-3-stable \
@@ -23,6 +23,7 @@ SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 RRECOMMENDS:${PN} += "adwaita-icon-theme"
 RDEPENDS:${PN} += " \
     python3-core \
+    python3-ctypes \
     python3-dbus \
     python3-pygobject \
     python3-terminal \
@@ -58,3 +59,28 @@ do_install:append() {
                                               ${D}${bindir}/blueman-tray
 }
 
+do_install:append() {
+    install -d ${D}${datadir}/polkit-1/rules.d
+    cat >${D}${datadir}/polkit-1/rules.d/51-blueman.rules <<EOF
+/* Allow users in wheel group to use blueman feature requiring root without authentication */
+polkit.addRule(function(action, subject) {
+    if ((action.id == "org.blueman.network.setup" ||
+         action.id == "org.blueman.dhcp.client" ||
+         action.id == "org.blueman.rfkill.setstate" ||
+         action.id == "org.blueman.pppd.pppconnect") &&
+        subject.isInGroup("wheel")) {
+
+        return polkit.Result.YES;
+    }
+});
+EOF
+}
+
+USERADD_PACKAGES = "${PN}"
+USERADD_PARAM:${PN} = "--system --no-create-home --user-group --home-dir ${sysconfdir}/polkit-1 --shell /bin/nologin polkitd"
+
+do_install:append() {
+        # Fix up permissions on polkit rules.d to work with rpm4 constraints
+        chmod 700 ${D}/${datadir}/polkit-1/rules.d
+        chown polkitd:root ${D}/${datadir}/polkit-1/rules.d
+}

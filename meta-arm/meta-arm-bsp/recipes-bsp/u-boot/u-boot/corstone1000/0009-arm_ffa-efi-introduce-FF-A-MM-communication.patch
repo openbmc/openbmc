@@ -1,7 +1,7 @@
-From cefc1d101c62e62e66f9cbf1775defde7d2c3d27 Mon Sep 17 00:00:00 2001
+From e371b2d29aa447c1a186ab25b37b99fded967b77 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Mon, 15 Aug 2022 15:12:49 +0100
-Subject: [PATCH 09/25] arm_ffa: efi: introduce FF-A MM communication
+Subject: [PATCH 09/27] arm_ffa: efi: introduce FF-A MM communication
 
 Add MM communication support using FF-A transport
 
@@ -79,6 +79,8 @@ v2:
 v1:
 
 * introduce FF-A MM communication
+
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 ---
  include/mm_communication.h        |   5 +
  lib/efi_loader/Kconfig            |  14 +-
@@ -86,7 +88,7 @@ v1:
  3 files changed, 307 insertions(+), 6 deletions(-)
 
 diff --git a/include/mm_communication.h b/include/mm_communication.h
-index e65fbde60d..d409bed777 100644
+index e65fbde60d0a..d409bed77714 100644
 --- a/include/mm_communication.h
 +++ b/include/mm_communication.h
 @@ -6,6 +6,8 @@
@@ -109,10 +111,10 @@ index e65fbde60d..d409bed777 100644
   * Interface to the pseudo Trusted Application (TA), which provides a
   * communication channel with the Standalone MM (Management Mode)
 diff --git a/lib/efi_loader/Kconfig b/lib/efi_loader/Kconfig
-index b8fb2701a7..d292f57244 100644
+index b498c72206fd..ca7390848125 100644
 --- a/lib/efi_loader/Kconfig
 +++ b/lib/efi_loader/Kconfig
-@@ -61,13 +61,23 @@ config EFI_VARIABLE_FILE_STORE
+@@ -55,13 +55,23 @@ config EFI_VARIABLE_FILE_STORE
  	  stored as file /ubootefi.var on the EFI system partition.
  
  config EFI_MM_COMM_TEE
@@ -139,7 +141,7 @@ index b8fb2701a7..d292f57244 100644
  	bool "Don't persist non-volatile UEFI variables"
  	help
 diff --git a/lib/efi_loader/efi_variable_tee.c b/lib/efi_loader/efi_variable_tee.c
-index dfef18435d..3933a24e8c 100644
+index dfef18435dfa..3933a24e8cdc 100644
 --- a/lib/efi_loader/efi_variable_tee.c
 +++ b/lib/efi_loader/efi_variable_tee.c
 @@ -4,9 +4,12 @@
@@ -494,5 +496,5 @@ index dfef18435d..3933a24e8c 100644
  
  	/*
 -- 
-2.17.1
+2.39.1
 

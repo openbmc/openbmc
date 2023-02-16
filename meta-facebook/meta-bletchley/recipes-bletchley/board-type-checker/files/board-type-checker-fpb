@@ -26,7 +26,7 @@ set_frontpanel_model()
 I2C_BUS=10
 DEV_ADDR=0x40
 
-VIRT_SNR_CONF="/usr/share/phosphor-virtual-sensor/virtual_sensor_config.json"
+VIRT_SNR_CONF="/var/lib/phosphor-virtual-sensor/virtual_sensor_config.json"
 HDC1080_VIRT_SNR_CONF="/usr/share/phosphor-virtual-sensor/virtual_sensor_config_hdc1080.json"
 SI7021_VIRT_SNR_CONF="/usr/share/phosphor-virtual-sensor/virtual_sensor_config_si7021.json"
 
@@ -52,6 +52,10 @@ case "$CHIP_TYPE" in
     REQUIRED_CONF_PATH="$HDC1080_VIRT_SNR_CONF"
     ;;
 esac
+
+if [ ! -d "$(dirname $VIRT_SNR_CONF)" ]; then
+    mkdir -p "$(dirname $VIRT_SNR_CONF)"
+fi
 
 if [ ! -e "$VIRT_SNR_CONF" ]; then
     ln -s "$REQUIRED_CONF_PATH" "$VIRT_SNR_CONF"

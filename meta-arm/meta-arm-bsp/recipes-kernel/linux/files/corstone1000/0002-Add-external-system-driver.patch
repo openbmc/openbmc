@@ -1,50 +1,48 @@
-Upstream-Status: Pending[Not submitted to upstream yet]
-Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
-
-From 97509e82b51c57935fc8e918b33c09c4f6648ed7 Mon Sep 17 00:00:00 2001
+From 19eabe2a5fb97530820dd2a22fe6bc143a8d693f Mon Sep 17 00:00:00 2001
 From: Emekcan <emekcan.aras@arm.com>
 Date: Fri, 19 Aug 2022 14:51:08 +0100
-Subject: [PATCH] Add external system driver
+Subject: [PATCH 2/6] Add external system driver
 
 Adds external system driver to control it
 from user-space. It provides run and reset
 functionality at the moment.
 
+Upstream-Status: Pending[Not submitted to upstream yet]
 Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 ---
- drivers/misc/Kconfig           |   2 +
+ drivers/misc/Kconfig           |   1 +
  drivers/misc/Makefile          |   1 +
  drivers/misc/arm/Kconfig       |   5 ++
  drivers/misc/arm/Makefile      |   1 +
  drivers/misc/arm/extsys_ctrl.c | 151 +++++++++++++++++++++++++++++++++
- 5 files changed, 160 insertions(+)
+ 5 files changed, 159 insertions(+)
  create mode 100644 drivers/misc/arm/Kconfig
  create mode 100644 drivers/misc/arm/Makefile
  create mode 100644 drivers/misc/arm/extsys_ctrl.c
 
 diff --git a/drivers/misc/Kconfig b/drivers/misc/Kconfig
-index 0f5a49fc7c9e..5ca195110b3f 100644
+index 358ad56f6524..fd8654ffdab0 100644
 --- a/drivers/misc/Kconfig
 +++ b/drivers/misc/Kconfig
-@@ -487,4 +487,6 @@ source "drivers/misc/cardreader/Kconfig"
- source "drivers/misc/habanalabs/Kconfig"
+@@ -514,4 +514,5 @@ source "drivers/misc/habanalabs/Kconfig"
  source "drivers/misc/uacce/Kconfig"
  source "drivers/misc/pvpanic/Kconfig"
+ source "drivers/misc/mchp_pci1xxxx/Kconfig"
 +source "drivers/misc/arm/Kconfig"
-+
  endmenu
 diff --git a/drivers/misc/Makefile b/drivers/misc/Makefile
-index a086197af544..f5c1bd5747f7 100644
+index ac9b3e757ba1..f7852e4fd63d 100644
 --- a/drivers/misc/Makefile
 +++ b/drivers/misc/Makefile
-@@ -59,3 +59,4 @@ obj-$(CONFIG_UACCE)		+= uacce/
- obj-$(CONFIG_XILINX_SDFEC)	+= xilinx_sdfec.o
- obj-$(CONFIG_HISI_HIKEY_USB)	+= hisi_hikey_usb.o
- obj-$(CONFIG_HI6421V600_IRQ)	+= hi6421v600-irq.o
+@@ -62,3 +62,4 @@ obj-$(CONFIG_HI6421V600_IRQ)	+= hi6421v600-irq.o
+ obj-$(CONFIG_OPEN_DICE)		+= open-dice.o
+ obj-$(CONFIG_GP_PCI1XXXX)	+= mchp_pci1xxxx/
+ obj-$(CONFIG_VCPU_STALL_DETECTOR)	+= vcpu_stall_detector.o
 +obj-y				+= arm/
 diff --git a/drivers/misc/arm/Kconfig b/drivers/misc/arm/Kconfig
 new file mode 100644
-index 000000000000..3c4b3f08e6b4
+index 000000000000..9f1eb284e530
 --- /dev/null
 +++ b/drivers/misc/arm/Kconfig
 @@ -0,0 +1,5 @@
@@ -63,7 +61,7 @@ index 000000000000..1ca3084cf8a0
 +obj-$(CONFIG_EXTSYS_CTRL)	+= extsys_ctrl.o
 diff --git a/drivers/misc/arm/extsys_ctrl.c b/drivers/misc/arm/extsys_ctrl.c
 new file mode 100644
-index 000000000000..1c6ef14a32ae
+index 000000000000..7929070ff43d
 --- /dev/null
 +++ b/drivers/misc/arm/extsys_ctrl.c
 @@ -0,0 +1,151 @@
@@ -219,5 +217,5 @@ index 000000000000..1c6ef14a32ae
 +MODULE_AUTHOR("Morten Borup Petersen");
 +MODULE_AUTHOR("Rui Miguel Silva <rui.silva@arm.com>");
 -- 
-2.17.1
+2.39.0
 

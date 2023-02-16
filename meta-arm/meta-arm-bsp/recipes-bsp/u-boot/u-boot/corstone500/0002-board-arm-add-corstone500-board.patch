@@ -1,4 +1,4 @@
-From 70cf3f7498e98a98b21804f577f3b850018894da Mon Sep 17 00:00:00 2001
+From 376e7cc533e27f943191d44c112e3812885b8fd1 Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Wed, 8 Jan 2020 09:48:11 +0000
 Subject: [PATCH 2/2] board: arm: add corstone500 board
@@ -26,10 +26,10 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  create mode 100644 include/configs/corstone500.h
 
 diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index 82cd456f51f1..a925e7759ee8 100644
+index cac4fa09fd32..b875c1ef3d32 100644
 --- a/arch/arm/Kconfig
 +++ b/arch/arm/Kconfig
-@@ -1349,6 +1349,15 @@ config TARGET_CORSTONE1000
+@@ -1309,6 +1309,15 @@ config TARGET_CORSTONE1000
  	select PL01X_SERIAL
  	select DM
  
@@ -45,7 +45,7 @@ index 82cd456f51f1..a925e7759ee8 100644
  config TARGET_TOTAL_COMPUTE
  	bool "Support Total Compute Platform"
  	select ARM64
-@@ -2302,6 +2311,7 @@ source "board/bosch/shc/Kconfig"
+@@ -2264,6 +2273,7 @@ source "board/bosch/shc/Kconfig"
  source "board/bosch/guardian/Kconfig"
  source "board/Marvell/octeontx/Kconfig"
  source "board/Marvell/octeontx2/Kconfig"
@@ -141,14 +141,14 @@ index 000000000000..e878f5c6a521
 +
 diff --git a/configs/corstone500_defconfig b/configs/corstone500_defconfig
 new file mode 100644
-index 000000000000..e475cbe7e40d
+index 000000000000..91661beb8d8d
 --- /dev/null
 +++ b/configs/corstone500_defconfig
 @@ -0,0 +1,41 @@
 +CONFIG_ARM=y
 +CONFIG_SKIP_LOWLEVEL_INIT=y
 +CONFIG_TARGET_CORSTONE500=y
-+CONFIG_SYS_TEXT_BASE=0x88000000
++CONFIG_TEXT_BASE=0x88000000
 +CONFIG_SYS_MALLOC_LEN=0x840000
 +CONFIG_NR_DRAM_BANKS=1
 +CONFIG_ENV_SIZE=0x40000
@@ -295,5 +295,5 @@ index 000000000000..416f5fa4399d
 +#define CONFIG_ENV_IS_IN_FLASH		1
 +#endif
 -- 
-2.38.1
+2.39.1
 

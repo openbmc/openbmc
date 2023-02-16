@@ -7,7 +7,7 @@ The ALL_APPS symbol will optionally build an additional set of projects,
 however, several of them don't exist anymore. Remove them from the list of
 ALL_APPS.
 
-Upstream-status: submitted [https://github.com/raspberrypi/userland/pull/661]
+Upstream-Status: Submitted [https://github.com/raspberrypi/userland/pull/661]
 Signed-off-by: Trevor Woerner <twoerner@gmail.com>
 ---
  host_applications/linux/CMakeLists.txt | 4 ----

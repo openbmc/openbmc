@@ -17,6 +17,10 @@ SRC_URI += " \
     ${@bb.utils.contains("MACHINE_FEATURES", "wm8960", "file://wm8960.cfg", "", d)} \
     "
 
+SRC_URI:append:raspberrypi4 = " \
+    file://rpi4-nvmem.cfg \
+"
+
 KCONFIG_MODE = "--alldefconfig"
 KBUILD_DEFCONFIG:raspberrypi0-wifi ?= "bcmrpi_defconfig"
 KBUILD_DEFCONFIG:raspberrypi ?= "bcmrpi_defconfig"

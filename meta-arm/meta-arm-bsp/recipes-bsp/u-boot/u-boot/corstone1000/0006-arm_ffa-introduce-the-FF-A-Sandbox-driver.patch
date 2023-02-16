@@ -1,7 +1,7 @@
-From 6d28dcdc36ad87b6987c7f920e06165c74eca59d Mon Sep 17 00:00:00 2001
+From 49ed44c01f7e93d614483fc2d3cc7034808e9c07 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Tue, 29 Nov 2022 14:44:36 +0000
-Subject: [PATCH 06/25] arm_ffa: introduce the FF-A Sandbox driver
+Subject: [PATCH 06/27] arm_ffa: introduce the FF-A Sandbox driver
 
 Provide a Sandbox driver to emulate the FF-A ABIs
 
@@ -33,11 +33,11 @@ v4: align sandbox driver with the new FF-A driver interfaces
     and new way of error handling
 
 v1: introduce the sandbox driver
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 ---
  MAINTAINERS                                   |   1 +
  configs/sandbox64_defconfig                   |   2 +
  configs/sandbox_defconfig                     |   2 +
- doc/arch/sandbox.rst                          |   1 +
  drivers/firmware/arm-ffa/Kconfig              |   9 +-
  drivers/firmware/arm-ffa/Makefile             |   1 +
  drivers/firmware/arm-ffa/arm_ffa_prv.h        |  15 +-
@@ -47,16 +47,16 @@ v1: introduce the sandbox driver
  include/arm_ffa.h                             |   2 +-
  include/sandbox_arm_ffa.h                     |  91 +++
  lib/efi_loader/efi_boottime.c                 |   2 +-
- 13 files changed, 938 insertions(+), 13 deletions(-)
+ 12 files changed, 937 insertions(+), 13 deletions(-)
  create mode 100644 drivers/firmware/arm-ffa/sandbox.c
  create mode 100644 drivers/firmware/arm-ffa/sandbox_arm_ffa_prv.h
  create mode 100644 include/sandbox_arm_ffa.h
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index d50bdddea8..23cebbd526 100644
+index 61ce6c436fe1..297d165f8401 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -255,6 +255,7 @@ F:	cmd/armffa.c
+@@ -271,6 +271,7 @@ F:	cmd/armffa.c
  F:	doc/arch/arm64.ffa.rst
  F:	drivers/firmware/arm-ffa/
  F:	include/arm_ffa.h
@@ -65,10 +65,10 @@ index d50bdddea8..23cebbd526 100644
  ARM FREESCALE IMX
  M:	Stefano Babic <sbabic@denx.de>
 diff --git a/configs/sandbox64_defconfig b/configs/sandbox64_defconfig
-index 290d1506c2..36e6448968 100644
+index ba45ac0b71c1..4b8a1ec42bda 100644
 --- a/configs/sandbox64_defconfig
 +++ b/configs/sandbox64_defconfig
-@@ -248,3 +248,5 @@ CONFIG_TEST_FDTDEC=y
+@@ -259,3 +259,5 @@ CONFIG_FWU_MULTI_BANK_UPDATE=y
  CONFIG_UNIT_TEST=y
  CONFIG_UT_TIME=y
  CONFIG_UT_DM=y
@@ -76,30 +76,18 @@ index 290d1506c2..36e6448968 100644
 +CONFIG_SANDBOX_FFA=y
 \ No newline at end of file
 diff --git a/configs/sandbox_defconfig b/configs/sandbox_defconfig
-index ab5d3f19bf..8bf3848788 100644
+index be46cae7aad7..650f06ae61f7 100644
 --- a/configs/sandbox_defconfig
 +++ b/configs/sandbox_defconfig
-@@ -328,3 +328,5 @@ CONFIG_TEST_FDTDEC=y
+@@ -334,3 +334,5 @@ CONFIG_TEST_FDTDEC=y
  CONFIG_UNIT_TEST=y
  CONFIG_UT_TIME=y
  CONFIG_UT_DM=y
 +CONFIG_ARM_FFA_TRANSPORT=y
 +CONFIG_SANDBOX_FFA=y
 \ No newline at end of file
-diff --git a/doc/arch/sandbox.rst b/doc/arch/sandbox.rst
-index 068d4a3be4..5d7e1b2c48 100644
---- a/doc/arch/sandbox.rst
-+++ b/doc/arch/sandbox.rst
-@@ -203,6 +203,7 @@ Supported Drivers
- 
- U-Boot sandbox supports these emulations:
- 
-+- Arm FF-A
- - Block devices
- - Chrome OS EC
- - GPIO
 diff --git a/drivers/firmware/arm-ffa/Kconfig b/drivers/firmware/arm-ffa/Kconfig
-index be4df89d23..b86f16d778 100644
+index be4df89d23fa..b86f16d7785d 100644
 --- a/drivers/firmware/arm-ffa/Kconfig
 +++ b/drivers/firmware/arm-ffa/Kconfig
 @@ -2,8 +2,8 @@
@@ -123,7 +111,7 @@ index be4df89d23..b86f16d778 100644
 +	help
 +	  This emulates the FF-A handling under Sandbox and allows to test the FF-A driver
 diff --git a/drivers/firmware/arm-ffa/Makefile b/drivers/firmware/arm-ffa/Makefile
-index 043a8915be..0d21d6b47a 100644
+index 043a8915bec5..0d21d6b47ab9 100644
 --- a/drivers/firmware/arm-ffa/Makefile
 +++ b/drivers/firmware/arm-ffa/Makefile
 @@ -4,3 +4,4 @@
@@ -132,7 +120,7 @@ index 043a8915be..0d21d6b47a 100644
  obj-y += arm-ffa-uclass.o core.o
 +obj-$(CONFIG_SANDBOX_FFA) += sandbox.o
 diff --git a/drivers/firmware/arm-ffa/arm_ffa_prv.h b/drivers/firmware/arm-ffa/arm_ffa_prv.h
-index 4eea7dc036..bbc8b87069 100644
+index 4eea7dc03604..bbc8b87069ff 100644
 --- a/drivers/firmware/arm-ffa/arm_ffa_prv.h
 +++ b/drivers/firmware/arm-ffa/arm_ffa_prv.h
 @@ -19,6 +19,16 @@
@@ -165,7 +153,7 @@ index 4eea7dc036..bbc8b87069 100644
   * struct ffa_partition_uuid - 16 bytes UUID transmitted by FFA_PARTITION_INFO_GET
   * @a1-4:	32-bit words access to the UUID data
 diff --git a/drivers/firmware/arm-ffa/core.c b/drivers/firmware/arm-ffa/core.c
-index 0b1f8e6a07..560603b28b 100644
+index 0b1f8e6a078d..560603b28bcc 100644
 --- a/drivers/firmware/arm-ffa/core.c
 +++ b/drivers/firmware/arm-ffa/core.c
 @@ -1072,6 +1072,7 @@ static int ffa_msg_send_direct_req(struct udevice *dev, u16 dst_part_id,
@@ -235,7 +223,7 @@ index 0b1f8e6a07..560603b28b 100644
  
 diff --git a/drivers/firmware/arm-ffa/sandbox.c b/drivers/firmware/arm-ffa/sandbox.c
 new file mode 100644
-index 0000000000..16f1ca926e
+index 000000000000..16f1ca926ee2
 --- /dev/null
 +++ b/drivers/firmware/arm-ffa/sandbox.c
 @@ -0,0 +1,659 @@
@@ -900,7 +888,7 @@ index 0000000000..16f1ca926e
 +};
 diff --git a/drivers/firmware/arm-ffa/sandbox_arm_ffa_prv.h b/drivers/firmware/arm-ffa/sandbox_arm_ffa_prv.h
 new file mode 100644
-index 0000000000..4db57f5092
+index 000000000000..4db57f5092f8
 --- /dev/null
 +++ b/drivers/firmware/arm-ffa/sandbox_arm_ffa_prv.h
 @@ -0,0 +1,144 @@
@@ -1049,7 +1037,7 @@ index 0000000000..4db57f5092
 +
 +#endif
 diff --git a/include/arm_ffa.h b/include/arm_ffa.h
-index 74b16174c2..b88904fe50 100644
+index 74b16174c292..b88904fe50b0 100644
 --- a/include/arm_ffa.h
 +++ b/include/arm_ffa.h
 @@ -90,7 +90,7 @@ struct ffa_bus_ops {
@@ -1063,7 +1051,7 @@ index 74b16174c2..b88904fe50 100644
  
 diff --git a/include/sandbox_arm_ffa.h b/include/sandbox_arm_ffa.h
 new file mode 100644
-index 0000000000..d5df16f282
+index 000000000000..d5df16f2828c
 --- /dev/null
 +++ b/include/sandbox_arm_ffa.h
 @@ -0,0 +1,91 @@
@@ -1159,7 +1147,7 @@ index 0000000000..d5df16f282
 +
 +#endif
 diff --git a/lib/efi_loader/efi_boottime.c b/lib/efi_loader/efi_boottime.c
-index caa64028be..1099ccc800 100644
+index 3481f2afe7a9..fea4eb7a342e 100644
 --- a/lib/efi_loader/efi_boottime.c
 +++ b/lib/efi_loader/efi_boottime.c
 @@ -2185,7 +2185,7 @@ static efi_status_t EFIAPI efi_exit_boot_services(efi_handle_t image_handle,
@@ -1172,5 +1160,5 @@ index caa64028be..1099ccc800 100644
  		if (ffa_bus_ops_get()->rxtx_unmap(NULL))
  			log_err("Can't unmap FF-A RX/TX buffers\n");
 -- 
-2.17.1
+2.39.1
 

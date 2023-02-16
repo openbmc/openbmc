@@ -1,7 +1,7 @@
-From 40257d65b338b6e2ed9d89d6fa7c7b8701a4c311 Mon Sep 17 00:00:00 2001
+From fc8e8d4cb19ff30e69aa1855332544f1017f974c Mon Sep 17 00:00:00 2001
 From: Paul Gortmaker <paul.gortmaker@windriver.com>
 Date: Wed, 6 Aug 2014 14:54:12 -0400
-Subject: [PATCH 1/2] defn2[c|man]: don't rely on dpkg-architecture to set arch
+Subject: [PATCH] defn2[c|man]: don't rely on dpkg-architecture to set arch
 
 In yocto we'll always be cross compiling, and we'll always
 be building on linux for linux (vs. *BSD, hurd, etc.)
@@ -13,13 +13,14 @@ like the loopback device not being configured/enabled.
 
 Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
 Upstream-Status: Pending
+
 ---
  defn2c.pl   | 6 +++---
  defn2man.pl | 6 +++---
  2 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/defn2c.pl b/defn2c.pl
-index 8798dc2..f2551c7 100755
+index fa7a02e..bb4987d 100755
 --- a/defn2c.pl
 +++ b/defn2c.pl
 @@ -2,9 +2,9 @@
@@ -52,6 +53,3 @@ index 6ddcfdd..c9c4dd0 100755
  
  # declarations
  my $line;
--- 
-2.17.1
-

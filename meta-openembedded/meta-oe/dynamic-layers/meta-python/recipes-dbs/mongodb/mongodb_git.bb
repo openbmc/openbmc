@@ -11,9 +11,9 @@ DEPENDS = "openssl libpcap zlib boost curl python3 \
 
 inherit scons dos2unix siteinfo python3native systemd useradd
 
-PV = "4.4.13"
-#v4.4.13
-SRCREV = "df25c71b8674a78e17468f48bcda5285decb9246"
+PV = "4.4.18"
+#v4.4.18
+SRCREV = "8ed32b5c2c68ebe7f8ae2ebe8d23f36037a17dea"
 SRC_URI = "git://github.com/mongodb/mongo.git;branch=v4.4;protocol=https \
            file://0001-Tell-scons-to-use-build-settings-from-environment-va.patch \
            file://0001-Use-long-long-instead-of-int64_t.patch \
@@ -33,6 +33,7 @@ SRC_URI = "git://github.com/mongodb/mongo.git;branch=v4.4;protocol=https \
            file://0001-add-explict-static_cast-size_t-to-maxMemoryUsageByte.patch \
            file://0001-server-Adjust-the-cache-alignment-assumptions.patch \
            file://0001-The-std-lib-unary-binary_function-base-classes-are-d.patch \
+           file://0001-free_mon-Include-missing-cstdint.patch \
            "
 SRC_URI:append:libc-musl ="\
            file://0001-Mark-one-of-strerror_r-implementation-glibc-specific.patch \
@@ -73,8 +74,13 @@ WIREDTIGER ?= "off"
 WIREDTIGER:x86-64 = "on"
 WIREDTIGER:aarch64 = "on"
 
+# ld.gold: fatal error: build/59f4f0dd/mongo/mongod: Structure needs cleaning
+LDFLAGS:append:x86:libc-musl = " -fuse-ld=bfd"
+LDFLAGS:remove:toolchain-clang = "-fuse-ld=bfd"
+
 EXTRA_OESCONS = "PREFIX=${prefix} \
                  DESTDIR=${D} \
+                 MAXLINELENGTH='2097152' \
                  LIBPATH=${STAGING_LIBDIR} \
                  LINKFLAGS='${LDFLAGS}' \
                  CXXFLAGS='${CXXFLAGS}' \
@@ -102,8 +108,8 @@ scons_do_install() {
     # install binaries
     install -d ${D}${bindir}
     for i in mongod mongos mongo; do
-        if [ -f ${B}/build/opt/mongo/$i ]; then
-            install -m 0755 ${B}/build/opt/mongo/$i ${D}${bindir}
+        if [ -f ${B}/build/*/mongo/$i ]; then
+            install -m 0755 ${B}/build/*/mongo/$i ${D}${bindir}
         else
             bbnote "$i does not exist"
         fi

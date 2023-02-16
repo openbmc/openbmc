@@ -9,7 +9,7 @@ I end up with link errors of the type:
 
 Which is caused by not having -lvchostif in the link.
 
-Upstream-status: submitted [https://github.com/AndrewFromMelbourne/raspidmx/pull/29]
+Upstream-Status: Submitted [https://github.com/AndrewFromMelbourne/raspidmx/pull/29]
 Signed-off-by: Trevor Woerner <twoerner@gmail.com>
 ---
  game/Makefile              | 2 +-
