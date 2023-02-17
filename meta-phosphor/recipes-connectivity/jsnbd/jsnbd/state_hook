@@ -25,7 +25,7 @@ case "$config" in
     ;;
 esac
 
-set -ex
+set -e
 
 GADGET_BASE=/sys/kernel/config/usb_gadget
 
@@ -82,6 +82,3 @@ stop)
     echo "invalid action $action" >&2
     exit 1
 esac
-
-exit 0
-
