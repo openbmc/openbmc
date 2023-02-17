@@ -1,7 +1,7 @@
-From 031c4bdb2cca4b2006fbd02b9e6de962666e9bab Mon Sep 17 00:00:00 2001
+From b77ab9523ca47323a7757ed0fad8d4590c10aa22 Mon Sep 17 00:00:00 2001
 From: Eason Yang <yhyang2@nuvoton.com>
 Date: Wed, 8 Feb 2023 14:54:34 +0800
-Subject: [PATCH 2/5] Redfish Add power metrics support
+Subject: [PATCH 2/3] Redfish Add power metrics support
 
 Signed-off-by: Eason Yang <yhyang2@nuvoton.com>
 ---
@@ -9,12 +9,12 @@ Signed-off-by: Eason Yang <yhyang2@nuvoton.com>
  1 file changed, 75 insertions(+)
 
 diff --git a/redfish-core/lib/power.hpp b/redfish-core/lib/power.hpp
-index 4d94e5766..1f2621b74 100644
+index 116ea256c..1c91b9418 100644
 --- a/redfish-core/lib/power.hpp
 +++ b/redfish-core/lib/power.hpp
-@@ -290,6 +290,81 @@ inline void requestRoutesPower(App& app)
-                     // be null if the limit is not enabled.
-                     value = powerCap * std::pow(10, scale);
+@@ -288,6 +288,81 @@ inline void requestRoutesPower(App& app)
+                     sensorJson["PowerLimit"]["LimitInWatts"] =
+                         powerCap * std::pow(10, scale);
                  }
 +
 +                auto PowerMetricHandler =
@@ -95,5 +95,5 @@ index 4d94e5766..1f2621b74 100644
  
              sdbusplus::asio::getAllProperties(
 -- 
-2.17.1
+2.34.1
 
