@@ -1,0 +1,1 @@
+cat buv_fru.bin > /sys/bus/i2c/devices/4-0050/eeprom 

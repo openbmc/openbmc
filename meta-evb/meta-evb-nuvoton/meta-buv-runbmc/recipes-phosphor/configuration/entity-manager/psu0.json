@@ -1,0 +1,96 @@
+{
+    "Exposes": [
+        {
+            "Address": "0x40",
+            "Bus": 11,
+            "EntityId": 19,
+            "EntityInstance": 1,
+            "Name": "MB_P12V_INA219",
+            "CurrScaleFactor": 200,
+            "Labels": [
+                "in1",
+                "curr1",
+                "power1"
+            ],
+            "PowerScaleFactor": 200000,
+            "power1_Max": 300.0,
+            "in1_Max": 20.0,
+            "curr1_Max": 25.0,
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Label": "in1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 12.96
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "in1",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 12.56
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "in1",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 11.44
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "in1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 11.04
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "curr1",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 1.5
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "curr1",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "power1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 24.0
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "power1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "pmbus"
+        }
+    ],
+    "Name": "powersupply0",
+    "Probe": "TRUE",
+    "Type": "PowerSupply",
+    "xyz.openbmc_project.Inventory.Decorator.Asset": {
+        "Manufacturer": "Nuvoton",
+        "Model": "Nuvoton",
+        "PartNumber": "X9F7K2T6Y3P8J4R5",
+        "SerialNumber": "SN78594K3TQ2P7"
+    },
+    "xyz.openbmc_project.Inventory.Item": {
+        "Present": true,
+        "PrettyName": "powersupply0"
+    },
+    "xyz.openbmc_project.State.Decorator.OperationalStatus": {
+        "Functional": true
+    }
+}

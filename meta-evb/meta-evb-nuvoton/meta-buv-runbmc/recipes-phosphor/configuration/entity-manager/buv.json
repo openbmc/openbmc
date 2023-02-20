@@ -459,178 +459,6 @@
             "Type": "TMP75"
         },
         {
-            "Address": "0x4A",
-            "Bus": 13,
-            "EntityId": 7,
-            "EntityInstance": 2,
-            "Name": "BMC_Temp",
-            "Thresholds": [
-                {
-                    "Direction": "greater than",
-                    "Name": "upper critical",
-                    "Severity": 1,
-                    "Value": 75.000
-                },
-                {
-                    "Direction": "greater than",
-                    "Name": "upper non critical",
-                    "Severity": 0,
-                    "Value": 60.000
-                },
-                {
-                    "Direction": "less than",
-                    "Name": "lower non critical",
-                    "Severity": 0,
-                    "Value": 15.000
-                },
-                {
-                    "Direction": "less than",
-                    "Name": "lower critical",
-                    "Severity": 1,
-                    "Value": 0
-                }
-            ],
-            "Type": "TMP75"
-        },
-        {
-            "Address": "0x40",
-            "Bus": 11,
-            "EntityId": 19,
-            "EntityInstance": 1,
-            "Name": "MB_P12V_INA219",
-            "CurrScaleFactor": 200,
-            "Labels": [
-                "in1",
-                "curr1",
-                "power1"
-            ],
-            "PowerScaleFactor": 200000,
-            "power1_Max": 300.0,
-            "in1_Max": 20.0,
-            "curr1_Max": 25.0,
-            "Thresholds": [
-                {
-                    "Direction": "greater than",
-                    "Label": "in1",
-                    "Name": "upper critical",
-                    "Severity": 1,
-                    "Value": 12.96
-                },
-                {
-                    "Direction": "greater than",
-                    "Label": "in1",
-                    "Name": "upper non critical",
-                    "Severity": 0,
-                    "Value": 12.56
-                },
-                {
-                    "Direction": "less than",
-                    "Label": "in1",
-                    "Name": "lower non critical",
-                    "Severity": 0,
-                    "Value": 11.44
-                },
-                {
-                    "Direction": "less than",
-                    "Label": "in1",
-                    "Name": "lower critical",
-                    "Severity": 1,
-                    "Value": 11.04
-                },
-                {
-                    "Direction": "greater than",
-                    "Label": "curr1",
-                    "Name": "upper non critical",
-                    "Severity": 0,
-                    "Value": 1.5
-                },
-                {
-                    "Direction": "less than",
-                    "Label": "curr1",
-                    "Name": "lower non critical",
-                    "Severity": 0,
-                    "Value": 0
-                },
-                {
-                    "Direction": "greater than",
-                    "Label": "power1",
-                    "Name": "upper critical",
-                    "Severity": 1,
-                    "Value": 24.0
-                },
-                {
-                    "Direction": "less than",
-                    "Label": "power1",
-                    "Name": "lower critical",
-                    "Severity": 1,
-                    "Value": 0
-                }
-            ],
-            "Type": "pmbus"
-        },
-        {
-            "Address": "0x41",
-            "Bus": 11,
-            "EntityId": 19,
-            "EntityInstance": 2,
-            "Name": "MB_P3V_INA219",
-            "CurrScaleFactor": 200,
-            "Labels": [
-                "in1",
-                "curr1",
-                "power1"
-            ],
-            "PowerScaleFactor": 200000,
-            "power1_Max": 300.0,
-            "in1_Max": 20.0,
-            "curr1_Max": 100.0,
-            "Thresholds": [
-                {
-                    "Direction": "greater than",
-                    "Label": "in1",
-                    "Name": "upper critical",
-                    "Severity": 1,
-                    "Value": 3.95
-                },
-                {
-                    "Direction": "less than",
-                    "Label": "in1",
-                    "Name": "lower critical",
-                    "Severity": 1,
-                    "Value": 2.64
-                },
-                {
-                    "Direction": "greater than",
-                    "Label": "curr1",
-                    "Name": "upper non critical",
-                    "Severity": 0,
-                    "Value": 4.5
-                },
-                {
-                    "Direction": "less than",
-                    "Label": "curr1",
-                    "Name": "lower non critical",
-                    "Severity": 0,
-                    "Value": 0
-                },
-                {
-                    "Direction": "greater than",
-                    "Label": "power1",
-                    "Name": "upper critical",
-                    "Severity": 1,
-                    "Value": 12.0
-                },
-                {
-                    "Direction": "less than",
-                    "Label": "power1",
-                    "Name": "lower critical",
-                    "Severity": 1,
-                    "Value": 0
-                }
-            ],
-            "Type": "pmbus"
-        },
-        {
             "Class": "fan",
             "FFGainCoefficient": 1.0,
             "FFOffCoefficient": 0.0,
@@ -869,21 +697,23 @@
             ]
         }
     ],
-    "Name": "BUV_RUNBMC_NUVOTON",
-    "Probe": "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': 'F0B-BMC*'})",
+    "Name": "motherboard",
+    "Probe": "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': 'HSBUV'})",
     "Type": "Board",
-    "xyz.openbmc_project.Inventory.Decorator.Ipmi": {
-        "EntityId": 7,
-        "EntityInstance": 1
-    },
     "xyz.openbmc_project.Inventory.Decorator.Asset": {
         "Manufacturer": "$BOARD_MANUFACTURER",
-        "Model": "$PRODUCT_PRODUCT_NAME",
+        "Model": "$BOARD_PRODUCT_NAME",
         "PartNumber": "$BOARD_PART_NUMBER",
         "SerialNumber": "$BOARD_SERIAL_NUMBER"
     },
-    "xyz.openbmc_project.Inventory.Item.Bmc": {},
-    "xyz.openbmc_project.Common.UUID": {
-        "UUID": "$BOARD_INFO_AM1"
-    }
+    "xyz.openbmc_project.Inventory.Decorator.Ipmi": {
+        "EntityId": "0x7",
+        "EntityInstance": 0
+    },
+    "xyz.openbmc_project.Inventory.Decorator.I2CDevice": {
+        "Bus": "$BUS",
+        "Address": "$ADDRESS",
+        "Name": "$BOARD_PRODUCT_NAME"
+    },
+    "xyz.openbmc_project.Inventory.Item.System": {}
 }
