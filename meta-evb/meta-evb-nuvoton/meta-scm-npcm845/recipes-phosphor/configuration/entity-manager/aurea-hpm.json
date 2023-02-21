@@ -3,8 +3,6 @@
         {
             "LED": "fan_fault",
             "Name": "DUAL ROTOR FAN CONN",
-            "Pwm": 0,
-            "PwmName": "PWM_1",
             "PowerState": "On",
             "EntityId": "0x07",
             "EntityInstance": "0x00",
@@ -308,6 +306,173 @@
             "PowerState": "On",
             "Index": 11,
             "Name": "Fan_5B",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 600
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1000
+                }
+            ],
+            "Type": "I2CFan"
+        },
+        {
+            "Name": "SINGLE ROTOR FAN CONN",
+            "Pwm": 0,
+            "PwmName": "PWM_1",
+            "PowerState": "On",
+            "EntityId": "0x07",
+            "EntityInstance": "0x01",
+            "Tachs": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "Type": "FanConnector"
+        },
+        {
+            "Address": "0x20",
+            "Bus": 4,
+            "EntityId": "0x1D",
+            "EntityInstance": "0x11",
+            "BindConnector": "SINGLE ROTOR FAN CONN",
+            "PowerState": "On",
+            "Index": 0,
+            "Name": "Fan_6",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 600
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1000
+                }
+            ],
+            "Type": "I2CFan"
+        },
+        {
+            "Address": "0x20",
+            "Bus": 4,
+            "EntityId": "0x1D",
+            "EntityInstance": "0x12",
+            "BindConnector": "SINGLE ROTOR FAN CONN",
+            "PowerState": "On",
+            "Index": 1,
+            "Name": "Fan_7",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 600
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1000
+                }
+            ],
+            "Type": "I2CFan"
+        },
+        {
+            "Address": "0x20",
+            "Bus": 4,
+            "EntityId": "0x1D",
+            "EntityInstance": "0x13",
+            "BindConnector": "SINGLE ROTOR FAN CONN",
+            "PowerState": "On",
+            "Index": 2,
+            "Name": "Fan_8",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 600
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1000
+                }
+            ],
+            "Type": "I2CFan"
+        },
+        {
+            "Address": "0x20",
+            "Bus": 4,
+            "EntityId": "0x1D",
+            "EntityInstance": "0x14",
+            "BindConnector": "SINGLE ROTOR FAN CONN",
+            "PowerState": "On",
+            "Index": 3,
+            "Name": "Fan_9",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 600
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1000
+                }
+            ],
+            "Type": "I2CFan"
+        },
+        {
+            "Address": "0x20",
+            "Bus": 4,
+            "EntityId": "0x1D",
+            "EntityInstance": "0x15",
+            "BindConnector": "SINGLE ROTOR FAN CONN",
+            "PowerState": "On",
+            "Index": 4,
+            "Name": "Fan_10",
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 600
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 1000
+                }
+            ],
+            "Type": "I2CFan"
+        },
+        {
+            "Address": "0x20",
+            "Bus": 4,
+            "EntityId": "0x1D",
+            "EntityInstance": "0x16",
+            "BindConnector": "SINGLE ROTOR FAN CONN",
+            "PowerState": "On",
+            "Index": 5,
+            "Name": "Fan_11",
             "Thresholds": [
                 {
                     "Direction": "less than",
