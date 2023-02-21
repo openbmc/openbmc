@@ -10,10 +10,10 @@ SRC_URI:append:olympus-nuvoton = " file://0003-Create-new-user-without-SSH-group
 EXTRA_OEMESON:append:olympus-nuvoton = " -Dredfish-cpu-log=enabled"
 
 # Enable Redfish BMC Journal support
-EXTRA_OEMESON:append:olympus-nuvoton = " -Dredfish-bmc-journal=enabled"
+#EXTRA_OEMESON:append:olympus-nuvoton = " -Dredfish-bmc-journal=enabled"
 
 # Enable DBUS log service
-#EXTRA_OEMESON:append = " -Dredfish-dbus-log=enabled"
+EXTRA_OEMESON:append = " -Dredfish-dbus-log=enabled"
 
 # Enable TFTP
 EXTRA_OEMESON:append:olympus-nuvoton = " -Dinsecure-tftp-update=enabled"

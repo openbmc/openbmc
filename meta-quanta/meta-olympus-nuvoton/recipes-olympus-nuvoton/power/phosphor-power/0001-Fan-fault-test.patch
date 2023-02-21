@@ -1,0 +1,24 @@
+From d12da7f7cb7f50b36247faf3a536015e592d06f2 Mon Sep 17 00:00:00 2001
+From: Allen Kang <jhkang@nuvoton.com>
+Date: Tue, 21 Feb 2023 17:14:15 +0800
+Subject: [PATCH] Fan fault test
+
+---
+ power-supply/power_supply.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/power-supply/power_supply.cpp b/power-supply/power_supply.cpp
+index b2d6c03f..f027203e 100644
+--- a/power-supply/power_supply.cpp
++++ b/power-supply/power_supply.cpp
+@@ -145,6 +145,7 @@ void PowerSupply::analyze()
+             readFail = 0;
+ 
+             checkInputFault(statusWord);
++            statusWord = status_word::FAN_FAULT ;
+ 
+             if (powerOn && (inputFault == 0) && !faultFound)
+             {
+-- 
+2.34.1
+

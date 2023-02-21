@@ -1,0 +1,40 @@
+From 89a2df04caca9ed6a89f61aef77c73f1294e97d7 Mon Sep 17 00:00:00 2001
+From: Allen Kang <jhkang@nuvoton.com>
+Date: Thu, 9 Feb 2023 15:34:36 +0800
+Subject: [PATCH] Modify Olympus PSU driver to inspur-ipsps.c
+
+Signed-off-by: Allen Kang <jhkang@nuvoton.com>
+---
+ arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts | 2 +-
+ drivers/hwmon/pmbus/inspur-ipsps.c                   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+index 9b6691e54154..714661013035 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+@@ -338,7 +338,7 @@ tmp421@4c {
+ 	};
+ 
+ 	power-supply@58 {
+-		compatible = "flexpower";
++		compatible = "inspur,ipsps1";
+ 		reg = <0x58>;
+ 	};
+ };
+diff --git a/drivers/hwmon/pmbus/inspur-ipsps.c b/drivers/hwmon/pmbus/inspur-ipsps.c
+index 0f614e8d95f6..c92ac46cd563 100644
+--- a/drivers/hwmon/pmbus/inspur-ipsps.c
++++ b/drivers/hwmon/pmbus/inspur-ipsps.c
+@@ -16,7 +16,7 @@
+ #define IPSPS_REG_VENDOR_ID	0x99
+ #define IPSPS_REG_MODEL		0x9A
+ #define IPSPS_REG_FW_VERSION	0x9B
+-#define IPSPS_REG_PN		0x9C
++#define IPSPS_REG_PN		0xAD
+ #define IPSPS_REG_SN		0x9E
+ #define IPSPS_REG_HW_VERSION	0xB0
+ #define IPSPS_REG_MODE		0xFC
+-- 
+2.34.1
+

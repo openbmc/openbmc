@@ -9,3 +9,4 @@ SRC_URI:append:olympus-nuvoton = " file://0001-drivers-misc-porting-mcu-flash-dr
 SRC_URI:append:olympus-nuvoton = " file://0001-drivers-spi-Bugfixed-npcm_fiu_uma_read-set-wrong-val.patch"
 SRC_URI:append:olympus-nuvoton = " file://0001-dts-fix-firmware-update.patch"
 SRC_URI:append:olympus-nuvoton = " file://0001-dts-modify-flash-layout-for-increasing-flash-size.patch"
+SRC_URI:append:olympus-nuvoton = " file://0001-Modify-Olympus-PSU-driver-to-inspur-ipsps.c.patch"

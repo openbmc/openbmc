@@ -1,0 +1,39 @@
+From eb5b4a22fa7a3bbb478048c514c304c02efa1382 Mon Sep 17 00:00:00 2001
+From: Allen Kang <jhkang@nuvoton.com>
+Date: Tue, 21 Feb 2023 17:19:12 +0800
+Subject: [PATCH] Light up LED when fan fault
+
+---
+ power-supply/power_supply.cpp | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/power-supply/power_supply.cpp b/power-supply/power_supply.cpp
+index 2c346d47..06c9b363 100644
+--- a/power-supply/power_supply.cpp
++++ b/power-supply/power_supply.cpp
+@@ -449,6 +449,7 @@ void PowerSupply::checkOutputOvervoltageFault(const uint16_t statusWord)
+ void PowerSupply::checkFanFault(const uint16_t statusWord)
+ {
+     using namespace phosphor::pmbus;
++    bool assert = true ;
+ 
+     if (fanFault < FAULT_COUNT)
+     {
+@@ -480,6 +481,14 @@ void PowerSupply::checkFanFault(const uint16_t statusWord)
+                 metadata::RAW_STATUS(nv.get().c_str()),
+                 metadata::CALLOUT_INVENTORY_PATH(inventoryPath.c_str()));
+ 
++            auto method = this->bus.new_method_call(
++            "xyz.openbmc_project.LED.GroupManager", "/xyz/openbmc_project/led/groups/power_on",
++            "org.freedesktop.DBus.Properties", "Set");
++            method.append("xyz.openbmc_project.Led.Group");
++            method.append("Asserted");
++            method.append(std::variant<bool>(assert)) ;
++            bus.call_noreply(method);
++
+             faultFound = true;
+         }
+     }
+-- 
+2.34.1
+

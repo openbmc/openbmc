@@ -15,8 +15,6 @@
                     "/xyz/openbmc_project/sensors/power/ps0_output_power",
                     "/xyz/openbmc_project/sensors/voltage/ps0_input_voltage",
                     "/xyz/openbmc_project/sensors/voltage/ps0_output_voltage",
-                    "/xyz/openbmc_project/sensors/fan_tach/ps0_fan1",
-                    "/xyz/openbmc_project/sensors/fan_tach/ps0_fan2",
                     "/xyz/openbmc_project/sensors/temperature/ps0_tempture"
                 ]
             }
