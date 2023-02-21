@@ -1,0 +1,314 @@
+From 8c950bd5387e4f9e9d88343f0b27491cb0eab3ef Mon Sep 17 00:00:00 2001
+From: Allen Kang <jhkang@nuvoton.com>
+Date: Tue, 21 Feb 2023 15:38:32 +0800
+Subject: [PATCH] Add support for PSU firmware upgrade
+
+Signed-off-by: Allen Kang <jhkang@nuvoton.com>
+---
+ activation.cpp    | 79 +++++++++++++++++++++++++++++++++++++++++++++++
+ activation.hpp    |  5 +++
+ item_updater.cpp  | 61 ++++++++++++++++++++++++++++++++++++
+ item_updater.hpp  | 20 ++++++++++++
+ meson.build       |  7 +++++
+ meson_options.txt |  9 ++++++
+ 6 files changed, 181 insertions(+)
+
+diff --git a/activation.cpp b/activation.cpp
+index 7c1f735..aeb3c65 100644
+--- a/activation.cpp
++++ b/activation.cpp
+@@ -143,6 +143,19 @@ auto Activation::activation(Activations value) -> Activations
+         }
+ #endif
+ 
++#ifdef PSU_UPGRADE
++        if (purpose == VersionPurpose::PSU)
++        {
++            // Enable systemd signals
++            subscribeToSystemdSignals();
++
++            // Set initial progress
++            activationProgress->progress(20);
++
++            return softwareServer::Activation::activation(value);
++        }
++#endif
++
+         activationProgress->progress(10);
+ 
+         parent.freeSpace(*this);
+@@ -318,6 +331,14 @@ void Activation::unitStateChange(sdbusplus::message_t& msg)
+     }
+ #endif
+ 
++#ifdef PSU_UPGRADE
++    if (purpose == VersionPurpose::PSU)
++    {
++        onStateChangesPsu(msg);
++        return;
++    }
++#endif
++
+     onStateChanges(msg);
+ 
+     return;
+@@ -457,6 +478,64 @@ void Activation::onStateChangesBios(sdbusplus::message_t& msg)
+ 
+ #endif
+ 
++#ifdef PSU_UPGRADE
++void Activation::onStateChangesPsu(sdbusplus::message::message& msg)
++{
++    uint32_t newStateID{};
++    sdbusplus::message::object_path newStateObjPath;
++    std::string newStateUnit{};
++    std::string newStateResult{};
++
++    // Read the msg and populate each variable
++    msg.read(newStateID, newStateObjPath, newStateUnit, newStateResult);
++
++    auto psuServiceFile = "psu-update.service";
++
++    if (newStateResult == "done")
++    {
++        // unsubscribe to systemd signals
++        unsubscribeFromSystemdSignals();
++        auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
++                                      SYSTEMD_INTERFACE, "StartUnit");
++        method.append(psuServiceFile, "replace");
++        try
++        {
++            auto reply = bus.call(method);
++
++            // Wait a few seconds for the service file to finish,
++            // otherwise the PSU FW might be deleted before upgrading finished.
++            constexpr auto removeWait = std::chrono::seconds(10);
++            std::this_thread::sleep_for(removeWait);
++
++            // Set activation progress to 100
++            activationProgress->progress(100);
++
++            // Set Activation value to active
++            activation(softwareServer::Activation::Activations::Active);
++
++            info("PSU upgrade completed successfully.");
++            parent.psuVersion->version(
++                parent.versions.find(versionId)->second->version());
++
++            // Delete the uploaded activation
++            boost::asio::post(getIOContext(), [this]() {
++                this->parent.erase(this->versionId);
++            });
++        }
++        catch (const sdbusplus::exception::exception& e)
++        {
++            // Set Activation value to Failed
++            activation(softwareServer::Activation::Activations::Failed);
++
++            error("PSU upgrade failed.");
++        }
++    }
++
++    return;
++}
++
++#endif
++
+ void Activation::rebootBmc()
+ {
+     auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
+diff --git a/activation.hpp b/activation.hpp
+index 94cc1bb..ffeef9f 100644
+--- a/activation.hpp
++++ b/activation.hpp
+@@ -247,6 +247,11 @@ class Activation : public ActivationInherit, public Flash
+     void onStateChangesBios(sdbusplus::message_t&);
+ #endif
+ 
++#ifdef PSU_UPGRADE
++    /** @brief Function that acts on PSU upgrade service file state changes */
++    void onStateChangesPsu(sdbusplus::message::message&);
++#endif
++
+     /** @brief Overloaded function that acts on service file state changes */
+     void onStateChanges(sdbusplus::message_t&) override;
+ 
+diff --git a/item_updater.cpp b/item_updater.cpp
+index 929d190..f98a1cb 100644
+--- a/item_updater.cpp
++++ b/item_updater.cpp
+@@ -72,6 +72,9 @@ void ItemUpdater::createActivation(sdbusplus::message_t& msg)
+                     if (value == VersionPurpose::BMC ||
+ #ifdef HOST_BIOS_UPGRADE
+                         value == VersionPurpose::Host ||
++#endif
++#ifdef PSU_UPGRADE
++                        value == VersionPurpose::PSU ||
+ #endif
+                         value == VersionPurpose::System)
+                     {
+@@ -902,6 +905,64 @@ void ItemUpdater::createBIOSObject()
+ }
+ #endif
+ 
++#ifdef PSU_UPGRADE
++std::string restorePSUVersion()
++{
++    std::string version = "null";
++
++    fs::path release = fs::path(PERSIST_DIR) / PSU_RELEASE_FILE;
++    if (fs::exists(release))
++    {
++        try
++        {
++            version = VersionClass::getBMCVersion(release.string());
++        }
++        catch (const std::exception& e)
++        {
++            warning("Failed to parse PSU version: {ERROR}", "ERROR", e);
++        }
++    }
++    else
++    {
++        info("No psu version file exist");
++    }
++
++    return version;
++}
++
++void ItemUpdater::createPSUObject()
++{
++    std::string path = PSU_OBJPATH;
++    // Get version id from last item in the path
++    auto pos = path.rfind("/");
++    if (pos == std::string::npos)
++    {
++        error("No PSU version id found in object path {PATH}", "PATH", path);
++        return;
++    }
++
++    createActiveAssociation(path);
++    createFunctionalAssociation(path);
++
++    std::string versionId = path.substr(pos + 1);
++    auto version = restorePSUVersion();
++    AssociationList assocs = {};
++    psuActivation = std::make_unique<Activation>(
++        bus, path, *this, versionId, server::Activation::Activations::Active,
++        assocs);
++    auto dummyErase = [](std::string /*entryId*/) {
++        // Do nothing;
++    };
++    psuVersion = std::make_unique<VersionClass>(
++        bus, path, version, VersionPurpose::PSU, "", "",
++        std::vector<std::string>(),
++        std::bind(dummyErase, std::placeholders::_1), "");
++    psuVersion->deleteObject =
++        std::make_unique<phosphor::software::manager::Delete>(bus, path,
++                                                              *psuVersion);
++}
++#endif
++
+ void ItemUpdater::getRunningSlot()
+ {
+     // Check /run/media/slot to get the slot number
+diff --git a/item_updater.hpp b/item_updater.hpp
+index c50d9de..87b120f 100644
+--- a/item_updater.hpp
++++ b/item_updater.hpp
+@@ -67,6 +67,9 @@ class ItemUpdater : public ItemUpdaterInherit
+         restoreFieldModeStatus();
+ #ifdef HOST_BIOS_UPGRADE
+         createBIOSObject();
++#endif
++#ifdef PSU_UPGRADE
++        createPSUObject();
+ #endif
+         emit_object_added();
+     };
+@@ -280,6 +283,23 @@ class ItemUpdater : public ItemUpdaterInherit
+     std::unique_ptr<VersionClass> biosVersion;
+ #endif
+ 
++#ifdef PSU_UPGRADE
++    /** @brief Create the PSU object without knowing the version.
++     *
++     *  The object is created only to provide the DBus access so that an
++     *  external service could set the correct PSU version.
++     *  On PSU code update, the version is updated accordingly.
++     */
++    void createPSUObject();
++
++    /** @brief Persistent Activation D-Bus object for PSU */
++    std::unique_ptr<Activation> psuActivation;
++
++  public:
++    /** @brief Persistent Version D-Bus object for PSU */
++    std::unique_ptr<VersionClass> psuVersion;
++#endif
++
+     /** @brief Get the slot number of running image */
+     void getRunningSlot();
+ };
+diff --git a/meson.build b/meson.build
+index f99a034..fc4ddea 100644
+--- a/meson.build
++++ b/meson.build
+@@ -59,6 +59,8 @@ conf.set_quoted('BMC_ROFS_PREFIX', get_option('media-dir') + '/rofs-')
+ conf.set_quoted('OS_RELEASE_FILE', '/etc/os-release')
+ # The name of the host firmware version file
+ conf.set_quoted('HOST_RELEASE_FILE', 'bios-release')
++# The name of the psu firmware version file
++conf.set_quoted('PSU_RELEASE_FILE', 'psu-release')
+ # The dir where activation data is stored in files
+ conf.set_quoted('PERSIST_DIR', '/var/lib/phosphor-bmc-code-mgmt/')
+ 
+@@ -69,6 +71,7 @@ conf.set('MMC_LAYOUT', get_option('bmc-layout').contains('mmc'))
+ 
+ # Configurable features
+ conf.set('HOST_BIOS_UPGRADE', get_option('host-bios-upgrade').enabled())
++conf.set('PSU_UPGRADE', get_option('psu-upgrade').enabled())
+ conf.set('WANT_SIGNATURE_VERIFY', \
+     get_option('verify-signature').enabled() or \
+     get_option('verify-full-signature').enabled())
+@@ -98,6 +101,10 @@ if get_option('host-bios-upgrade').enabled()
+     conf.set_quoted('BIOS_OBJPATH', get_option('bios-object-path'))
+ endif
+ 
++if get_option('psu-upgrade').enabled()
++    conf.set_quoted('PSU_OBJPATH', get_option('psu-object-path'))
++endif
++
+ if get_option('bmc-static-dual-image').enabled()
+   conf.set('BMC_STATIC_DUAL_IMAGE', get_option('bmc-static-dual-image').enabled())
+   conf.set_quoted('ALT_ROFS_DIR', get_option('alt-rofs-dir'))
+diff --git a/meson_options.txt b/meson_options.txt
+index a356b5b..e2fd952 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -12,6 +12,9 @@ option('bmc-layout', type: 'combo',
+ option('host-bios-upgrade', type: 'feature', value: 'enabled',
+     description: 'Enable host bios upgrade support.')
+ 
++option('psu-upgrade', type: 'feature', value: 'enabled',
++    description: 'Enable psu upgrade support.')
++
+ option('sync-bmc-files', type: 'feature', value: 'enabled',
+     description: 'Enable sync of filesystem files.')
+ 
+@@ -118,6 +121,12 @@ option(
+     description: 'The BIOS DBus object path.',
+ )
+ 
++option(
++    'psu-object-path', type: 'string',
++    value: '/xyz/openbmc_project/software/psu_active',
++    description: 'The PSU DBus object path.',
++)
++
+ option('bmc-static-dual-image', type: 'feature', value: 'enabled',
+     description: 'Enable the dual image support for static layout.')
+ 
+-- 
+2.34.1
+

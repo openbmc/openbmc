@@ -4,6 +4,7 @@ SRC_URI:append:olympus-nuvoton = " file://support_update_uboot_with_emmc_image.p
 SRC_URI:append:olympus-nuvoton = " file://restore_verify_bios.patch"
 SRC_URI:append:olympus-nuvoton = " file://report_same_version.patch"
 #SRC_URI:append:olympus-nuvoton = " file://avoid_update_bios_fail_remove_mmc"
+SRC_URI:append:olympus-nuvoton = " file://0001-Add-support-for-PSU-firmware-upgrade.patch"
 
 PACKAGECONFIG:append:olympus-nuvoton = " verify_signature flash_bios"
 EXTRA_OEMESON:append:olympus-nuvoton = " -Doptional-images=image-bios"
