@@ -1,0 +1,8 @@
+[Unit]
+Description=NPCM7xx PSU F/W update service
+
+[Service]
+Restart=no
+Type=oneshot
+ExecStart=/usr/bin/psu-update.sh
+SyslogIdentifier=psu-update.sh
