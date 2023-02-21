@@ -1,17 +1,27 @@
-BmcBooted:
-    heartbeat:
-        Action: 'Blink'
-        DutyOn: 50
-        Period: 1000
-PowerOn:
-    identify:
-        Action: 'On'
 EnclosureFault:
     identify:
         Action: 'On'
+
 EnclosureIdentify:
     identify:
         Action: 'Blink'
         DutyOn: 50
         Period: 1000
 
+caterr_led:
+    caterr:
+        Action: 'Blink'
+        DutyOn: 50
+
+fan_fault:
+    blade_attention:
+        Action: 'Blink'
+        DutyOn: 50
+
+boot_status_inactive:
+    power_amber:
+        Action: 'On'
+
+boot_status_standby:
+    power_green:
+        Action: 'On'
