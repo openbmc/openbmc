@@ -1,3 +1,5 @@
+inherit entity-utils
+
 FILESEXTRAPATHS:prepend:olympus-nuvoton := "${THISDIR}/${PN}:"
 
 SRC_URI:append:olympus-nuvoton = " file://0001-Handle-now-allow-execption-in-account-service.patch"
@@ -9,11 +11,8 @@ SRC_URI:append:olympus-nuvoton = " file://0003-Create-new-user-without-SSH-group
 # Enable CPU Log support
 EXTRA_OEMESON:append:olympus-nuvoton = " -Dredfish-cpu-log=enabled"
 
-# Enable Redfish BMC Journal support
-#EXTRA_OEMESON:append:olympus-nuvoton = " -Dredfish-bmc-journal=enabled"
-
-# Enable DBUS log service
-EXTRA_OEMESON:append = " -Dredfish-dbus-log=enabled"
+# Enable Redfish DBUS log/Journal support
+EXTRA_OEMESON:append:olympus-nuvoton = " ${@entity_enabled(d, '-Dredfish-bmc-journal=enabled', '-Dredfish-dbus-log=enabled')}"
 
 # Enable TFTP
 EXTRA_OEMESON:append:olympus-nuvoton = " -Dinsecure-tftp-update=enabled"

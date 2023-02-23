@@ -1,6 +1,3 @@
-# Enable Redfish BMC Journal support
-EXTRA_OEMESON:append:scm-npcm845  = " -Dredfish-bmc-journal=enabled"
-
 # Enable Redfish Journal support
 EXTRA_OEMESON:append:scm-npcm845 = " -Dredfish-bmc-journal=enabled"
 
