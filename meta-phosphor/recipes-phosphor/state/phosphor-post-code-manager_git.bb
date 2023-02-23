@@ -4,7 +4,7 @@ interface /xyz/openbmc_project/state/boot/raw by snoopd daemon and save them \
 in a file under /var/lib for history."
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
-SRCREV = "8290e0f3297a2c5cbaa8d872d5cf8e19166ca177"
+SRCREV = "13cb853751aa2468247ad170aea29f0561204130"
 PV = "1.0+git${SRCPV}"
 
 SRC_URI = "git://github.com/openbmc/phosphor-post-code-manager.git;branch=master;protocol=https"
