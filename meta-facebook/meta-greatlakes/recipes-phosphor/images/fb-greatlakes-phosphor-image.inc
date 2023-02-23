@@ -1,6 +1,7 @@
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     greatlakes-sysinit \
     greatlakes-gpio-monitor-register \
+    phosphor-gpio-monitor \
 "
 
 # Currently, the led related services couldn't complete
