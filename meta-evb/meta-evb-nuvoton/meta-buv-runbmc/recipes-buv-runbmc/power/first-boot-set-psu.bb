@@ -10,7 +10,8 @@ RDEPENDS:${PN} = "${VIRTUAL-RUNTIME_base-utils}"
 RDEPENDS:${PN} += "bash"
 
 SYSTEMD_SERVICE:${PN} = "first-boot-set-psu@.service"
-SYSTEMD_SERVICE:${PN} += "first-boot-set-psu@0-2-0x58.service"
+SYSTEMD_SERVICE:${PN} += "first-boot-set-psu@0-11-0x40.service"
+SYSTEMD_SERVICE:${PN} += "first-boot-set-psu@1-11-0x41.service"
 
 SRC_URI = "file://${BPN}.sh file://${BPN}@.service"
 

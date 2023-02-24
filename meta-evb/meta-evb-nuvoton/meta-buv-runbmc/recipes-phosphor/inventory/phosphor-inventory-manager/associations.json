@@ -75,7 +75,27 @@
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/sensors/power/MB_P12V_INA219_Output_Power",
+                    "/xyz/openbmc_project/sensors/current/MB_P12V_INA219_Output_Current",
+                    "/xyz/openbmc_project/sensors/voltage/MB_P12V_INA219_Output_Voltage",
+                    "/xyz/openbmc_project/sensors/power/MB_P12V_INA219_Output_Power"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/powersupply1",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/current/MB_P3V3_INA219_Output_Current",
+                    "/xyz/openbmc_project/sensors/voltage/MB_P3V3_INA219_Output_Voltage",
                     "/xyz/openbmc_project/sensors/power/MB_P3V3_INA219_Output_Power"
                 ]
             }

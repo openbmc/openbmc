@@ -43,16 +43,24 @@ arr=(${input// / });
 
 
 #pmbus_read ${arr[1]} ${arr[2]} 0x99 11
-updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Asset" 1 "Manufacturer" "s" "Allen"
+updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Asset" 1 "Manufacturer" "s" "Nuvoton"
 
 #pmbus_read ${arr[1]} ${arr[2]} 0x9a 11
-updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Asset" 1 "Model" "s" "123"
+updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Asset" 1 "Model" "s" "Nuvoton"
 
-#pmbus_read ${arr[1]} ${arr[2]} 0xad 21
-updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Asset" 1 "PartNumber" "s" "456"
+if [ ${arr[0]} -eq 0 ]; then
+    #pmbus_read ${arr[1]} ${arr[2]} 0xad 21
+    updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Asset" 1 "PartNumber" "s" "X9F7K2T6Y3P8J4R5"
 
-#pmbus_read ${arr[1]} ${arr[2]} 0x9e 16
-updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Asset" 1 "SerialNumber" "s" "789"
+    #pmbus_read ${arr[1]} ${arr[2]} 0x9e 16
+    updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Asset" 1 "SerialNumber" "s" "SN78594K3TQ2P7"
+else
+    #pmbus_read ${arr[1]} ${arr[2]} 0xad 21
+    updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Asset" 1 "PartNumber" "s" "M9T5C8W2N1Z7Q6B4"
+
+    #pmbus_read ${arr[1]} ${arr[2]} 0x9e 16
+    updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Asset" 1 "SerialNumber" "s" "SN8461K3V9F2T7"
+fi
 
 updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Cacheable" 1 "Cached" "b" "true"
 updaet_inventory ${arr[0]} "xyz.openbmc_project.Inventory.Decorator.Replaceable" 1 "FieldReplaceable" "b" "true"

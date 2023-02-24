@@ -1,6 +1,6 @@
 1:
   /system:
-    entityID: 7
+    entityID: 25
     entityInstance: 1
     interfaces:
       xyz.openbmc_project.Inventory.Decorator.Asset:
@@ -51,7 +51,7 @@
       xyz.openbmc_project.Inventory.Item.Board:
 2:
   /system/chassis/motherboard/management_card/bmc:
-    entityID: 7
+    entityID: 6
     entityInstance: 1
     interfaces:
       xyz.openbmc_project.Inventory.Decorator.Asset:
@@ -91,6 +91,32 @@
     /system/chassis/motherboard/powersupply0:
         entityID: 10
         entityInstance: 1
+        interfaces:
+            xyz.openbmc_project.Inventory.Decorator.Asset:
+                BuildDate:
+                    IPMIFruProperty: Mfg Date
+                    IPMIFruSection: Board
+                Manufacturer:
+                    IPMIFruProperty: Manufacturer
+                    IPMIFruSection: Board
+                Model:
+                    IPMIFruProperty: Model Number
+                    IPMIFruSection: Board
+                PartNumber:
+                    IPMIFruProperty: Part Number
+                    IPMIFruSection: Board
+                SerialNumber:
+                    IPMIFruProperty: Serial Number
+                    IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Item:
+                PrettyName:
+                    IPMIFruProperty: Name
+                    IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Item.PowerSupply:
+4:
+    /system/chassis/motherboard/powersupply1:
+        entityID: 10
+        entityInstance: 2
         interfaces:
             xyz.openbmc_project.Inventory.Decorator.Asset:
                 BuildDate:
