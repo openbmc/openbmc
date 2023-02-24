@@ -68,7 +68,6 @@ RDEPENDS:${PN}-system = " \
         olympus-nuvoton-iptable-restore \
         srvcfg-manager \
         iperf3 \
-        phosphor-power-monitor \
         phosphor-power-systemd-links-monitor \
         phosphor-power-utils \
         phosphor-power \
@@ -76,6 +75,9 @@ RDEPENDS:${PN}-system = " \
 #RDEPENDS:${PN}-system:append = " \
 #        ${@entity_enabled(d, '', 'first-boot-set-psu')} \
 #        "
+RDEPENDS:${PN}-system:append = " \
+        ${@entity_enabled(d, 'phosphor-power-monitor-em', 'phosphor-power-monitor')} \
+        "
 
 #RDEPENDS:${PN}-system:append:olympus-entity = " \
 #        intel-ipmi-oem \

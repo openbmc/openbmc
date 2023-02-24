@@ -120,107 +120,6 @@
             "Labels": ["curr1"],
             "Type": "INA219"
     },
-    {
-            "Address": "0x58",
-            "Bus": "2",
-            "Name": "PSU",
-            "Labels": [
-                "pin",
-                "pout1",
-                "vin",
-                "vout1",
-                "iin",
-                "iout1",
-                "temp1"
-            ],
-            "Thresholds": [
-                {
-                    "Direction": "greater than",
-                    "Label": "pin",
-                    "Name": "upper critical",
-                    "Severity": 1,
-                    "Value": 1000
-                },
-                {
-                    "Direction": "greater than",
-                    "Label": "pin",
-                    "Name": "upper non critical",
-                    "Severity": 0,
-                    "Value": 950
-                },
-                {
-                    "Direction": "greater than",
-                    "Label": "temp1",
-                    "Name": "upper critical",
-                    "Severity": 1,
-                    "Value": 70
-                },
-                {
-                    "Direction": "greater than",
-                    "Label": "temp1",
-                    "Name": "upper non critical",
-                    "Severity": 0,
-                    "Value": 50
-                },
-                {
-                    "Direction": "greater than",
-                    "Label": "vin",
-                    "Name": "upper critical",
-                    "Severity": 1,
-                    "Value": 240
-                },
-                {
-                    "Direction": "greater than",
-                    "Label": "vin",
-                    "Name": "upper non critical",
-                    "Severity": 0,
-                    "Value": 233
-                },
-                {
-                    "Direction": "less than",
-                    "Label": "vin",
-                    "Name": "lower critical",
-                    "Severity": 1,
-                    "Value": 200
-                },
-                {
-                    "Direction": "less than",
-                    "Label": "vin",
-                    "Name": "lower non critical",
-                    "Severity": 0,
-                    "Value": 210
-                },
-                {
-                    "Direction": "greater than",
-                    "Label": "vout1",
-                    "Name": "upper critical",
-                    "Severity": 1,
-                    "Value": 13.494
-                },
-                {
-                    "Direction": "greater than",
-                    "Label": "vout1",
-                    "Name": "upper non critical",
-                    "Severity": 0,
-                    "Value": 13.101
-                },
-                {
-                    "Direction": "less than",
-                    "Label": "vout1",
-                    "Name": "lower critical",
-                    "Severity": 1,
-                    "Value": 10.616
-                },
-                {
-                    "Direction": "less than",
-                    "Label": "vout1",
-                    "Name": "lower non critical",
-                    "Severity": 0,
-                    "Value": 10.945
-                }
-            ],
-            "Type": "pmbus"
-     },
      {
              "Address": "0x11",
              "Bus": 8,
@@ -801,12 +700,13 @@
         }
     ],
     "Name": "RUNBMC OLYMPUS 1U",
-    "Probe": "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': 'F0B-BMC-MB'})",
+    "Probe": "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': 'F0B-BMC*'})",
     "Type": "Board",
     "xyz.openbmc_project.Inventory.Decorator.Asset": {
         "Manufacturer": "$BOARD_MANUFACTURER",
         "Model": "$PRODUCT_INFO_AM1",
         "PartNumber": "$BOARD_PART_NUMBER",
         "SerialNumber": "$BOARD_SERIAL_NUMBER"
-    }
+    },
+    "xyz.openbmc_project.Inventory.Item.System": {}
 }
