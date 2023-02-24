@@ -1,1 +1,2 @@
-require ${@bb.utils.contains('DISTRO_FEATURES', 'phosphor-mmc', 'rm-mirror-uboot.inc', '', d)}
+FILESEXTRAPATHS:prepend:nuvoton := "${THISDIR}/${PN}:"
+SRC_URI:append:nuvoton:df-phosphor-mmc = " file://disable-mmc-mirroruboot.patch"

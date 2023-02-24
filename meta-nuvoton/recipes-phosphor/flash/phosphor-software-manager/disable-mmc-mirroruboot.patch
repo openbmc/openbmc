@@ -1,0 +1,12 @@
+diff --git a/obmc-flash-bmc b/obmc-flash-bmc
+index 032096a..187f231 100644
+--- a/obmc-flash-bmc
++++ b/obmc-flash-bmc
+@@ -647,6 +647,7 @@ function mmc_setprimary() {
+ }
+ 
+ function mmc_mirroruboot() {
++    return
+     # Get current boot device; 0-primary_bootdev device; 1 - alt_bootdev
+     bootdev=$(cat /sys/kernel/debug/aspeed/sbc/abr_image)
+     if [[ "${bootdev}" == "0" ]]; then
