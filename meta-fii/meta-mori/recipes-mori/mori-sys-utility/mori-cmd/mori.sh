@@ -33,13 +33,21 @@ function usage_uart() {
   echo "        display  --> "
 }
 
+function usage_rtc() {
+  echo " mori rtc [parameter]"
+  echo "        lock  --> disable host access to rtc"
+  echo "        unlock  --> enable host access to rtc"
+  echo "        status  --> get status of host accessibility to rtc"
+}
+
 function usage() {
   echo " mori BMC console system utilities"
   echo " mori [optional] [parameter]"
-  echo "   rst   --> reset traget device"
-  echo "   fw    --> get version"
-  echo "   uart  --> control the uart mux"
-  echo "   led   --> control the leds"
+  echo "   rst     --> reset target device"
+  echo "   fw      --> get version"
+  echo "   uart    --> control the uart mux"
+  echo "   led     --> control the leds"
+  echo "   rtc     --> control host access to rtc"
 }
 
 function reset() {
@@ -246,6 +254,30 @@ function ledtoggle() {
     esac
 }
 
+function rtcctrl() {
+  case $1 in
+    lock)
+      # Disable host access to rtc
+      set_gpio_ctrl S0_RTC_LOCK 1
+      ;;
+    unlock)
+      # Enable host access to rtc
+      set_gpio_ctrl S0_RTC_LOCK 0
+      ;;
+    status)
+      cmd=$(get_gpio_ctrl S0_RTC_LOCK)
+      if [[ $cmd -eq 1 ]]; then
+        echo "locked"
+      else
+        echo "unlocked"
+      fi
+      ;;
+    *)
+      usage_rtc
+      ;;
+  esac
+}
+
 case $1 in
   rst)
     reset "$2"
@@ -258,6 +290,9 @@ case $1 in
     ;;
   led)
     ledtoggle "$2" "$3"
+    ;;
+  rtc)
+    rtcctrl "$2"
     ;;
   *)
     usage
