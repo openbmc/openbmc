@@ -1,6 +1,6 @@
 KBRANCH ?= "dev-5.14-gxp-openbmc"
 LINUX_VERSION ?= "5.14.0"
-SRCREV="6f1a2c5c0cc59692d5beafe5ff8a4c7539b82d7d"
+SRCREV="4ff23625306630ce50d9454fca590fa9b2daeb53"
 
 require linux-obmc.inc
 require conf/machine/include/fitimage-sign.inc
