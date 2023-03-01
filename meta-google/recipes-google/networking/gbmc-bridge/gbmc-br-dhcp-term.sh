@@ -13,9 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# If we don't have a saved IP, we keep running indefinitely
+if ! srcip="$(cat /var/google/gbmc-br-ip 2>/dev/null)"; then
+  echo 'Missing saved gbmc-br IP' >&2
+  exit 0
+fi
+
 # Wait until a well known service is network available
 echo "Waiting for network reachability" >&2
-while ! ping -c 1 -W 1 2001:4860:4860::8888 >/dev/null 2>&1; do
+while ! ping -I "$srcip" -c 1 -W 1 2001:4860:4860::8888 >/dev/null 2>&1; do
   sleep 1
 done
 

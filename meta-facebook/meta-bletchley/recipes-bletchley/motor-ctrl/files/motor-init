@@ -90,25 +90,18 @@ DETECT_PIN1="SLED${SLED_NUM}_MS_DETECT1"
 INIT_POS=$(get_gpio "$DETECT_PIN1")
 
 if [ "$INIT_POS" -eq 1 ];then
-    time_count=0
     echo "Making motor back to initial position..."
     motor-ctrl "$SLED" r >/dev/null
-    while  [ "$INIT_POS" -eq 1 ]  ;do
-        INIT_POS=$(get_gpio "$DETECT_PIN1")
-        sleep 0.1
-        time_count=$(( time_count + 1 ))
-        if [  $time_count -gt $CALIBRATE_TIMEOUT ];then
-            echo "Error: Step motor run over 1 cycle but switch never triggered"
-            break
-        fi
-    done
+    wait_gpio_falling "$DETECT_PIN1" "$CALIBRATE_TIMEOUT"
     motor-ctrl "$SLED" s >/dev/null
 fi
 
+INIT_POS=$(get_gpio "$DETECT_PIN1")
 if [ "$INIT_POS" -eq 0 ];then
     echo "Motor calibrated to initial position."
     exit 0
 else
+    echo "Error: Step motor run over 1 cycle but switch never triggered"
     echo "Find motor initial position failed"
     exit 1
 fi

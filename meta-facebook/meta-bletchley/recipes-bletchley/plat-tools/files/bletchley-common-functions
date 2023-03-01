@@ -38,6 +38,20 @@ set_gpio()
     return 0
 }
 
+wait_gpio_falling()
+{
+    local NET_NAME=$1
+    local TIMEOUT_SEC=$2
+
+    mapfile -t -d " " GPIO_INFO < <(gpiofind "$NET_NAME")
+    if [ "${#GPIO_INFO[@]}" -ne 2 ]; then
+        echo "wait_gpio_falling: can not find gpio, $NET_NAME"
+        return 1
+    fi
+
+    timeout "$TIMEOUT_SEC" gpiomon --falling-edge --num-events=1 "${GPIO_INFO[0]}" "${GPIO_INFO[1]%$'\n'}"
+}
+
 set_fan()
 {
     FAN_ID=$1
