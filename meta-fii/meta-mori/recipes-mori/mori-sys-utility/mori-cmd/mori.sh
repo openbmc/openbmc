@@ -40,6 +40,12 @@ function usage_rtc() {
   echo "        status  --> get status of host accessibility to rtc"
 }
 
+function usage_gpio() {
+  echo " mori gpio [parameter]"
+  echo "        get [GPIO_LINE_NAME] --> get the gpio value of GPIO_LINE_NAME"
+  echo "        set [GPIO_LINE_NAME] [GPIO_VALUE] --> set the gpio of GPIO_LINE_NAME to the value of GPIO_VALUE"
+}
+
 function usage() {
   echo " mori BMC console system utilities"
   echo " mori [optional] [parameter]"
@@ -48,6 +54,7 @@ function usage() {
   echo "   uart    --> control the uart mux"
   echo "   led     --> control the leds"
   echo "   rtc     --> control host access to rtc"
+  echo "   gpio    --> control the gpios"
 }
 
 function reset() {
@@ -278,6 +285,20 @@ function rtcctrl() {
   esac
 }
 
+function gpioctrl() {
+  case $1 in
+    get)
+      get_gpio_ctrl "$2"
+      ;;
+    set)
+      set_gpio_ctrl "$2" "$3"
+      ;;
+    *)
+      usage_gpio
+      ;;
+  esac
+}
+
 case $1 in
   rst)
     reset "$2"
@@ -293,6 +314,9 @@ case $1 in
     ;;
   rtc)
     rtcctrl "$2"
+    ;;
+  gpio)
+    gpioctrl "$2" "$3" "$4"
     ;;
   *)
     usage
