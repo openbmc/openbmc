@@ -5,12 +5,13 @@ inherit entity-utils
 SRC_URI += "file://psu.json"
 SRC_URI:append:olympus-nuvoton = " file://psu_em.json"
 SRC_URI:append:olympus-nuvoton = " file://0001-use-interface-xyz-openbmc_project.patch"
-SRC_URI:append:olympus-nuvoton = " file://0001-powerOn-always-return-true.patch"
-SRC_URI:append:olympus-nuvoton = " file://0001-Modify-power-supply-monitor-.service.patch"
-SRC_URI:append:olympus-nuvoton = " file://0001-Fan-fault-test.patch"
-SRC_URI:append:olympus-nuvoton = " file://0001-Add-create-PSU-DBUs-obj.patch"
-SRC_URI:append:olympus-nuvoton = " file://0001-Light-up-LED-when-fan-fault.patch"
-SRC_URI:append:olympus-nuvoton = " file://0002-support-Entity-Manager.patch"
+SRC_URI:append:olympus-nuvoton = " file://0002-powerOn-always-return-true.patch"
+SRC_URI:append:olympus-nuvoton = " file://0003-Modify-power-supply-monitor-.service.patch"
+SRC_URI:append:olympus-nuvoton = " file://0004-Fan-fault-test.patch"
+SRC_URI:append:olympus-nuvoton = " file://0005-Add-create-PSU-DBUs-obj.patch"
+SRC_URI:append:olympus-nuvoton = " file://0006-Light-up-LED-when-fan-fault.patch"
+SRC_URI:append:olympus-nuvoton = " file://0007-support-Entity-Manager.patch"
+SRC_URI:append:olympus-nuvoton = " file://0008-Get-powersupplyName-from-config-setting.patch"
 
 EXTRA_OEMESON:append:olympus-nuvoton = " \
     ${@entity_enabled(d, '-Dnuvoton-entity=true', '')} \

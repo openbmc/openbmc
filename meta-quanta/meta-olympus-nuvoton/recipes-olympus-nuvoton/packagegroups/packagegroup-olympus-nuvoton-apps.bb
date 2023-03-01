@@ -49,7 +49,6 @@ RDEPENDS:${PN}-system = " \
         phosphor-ipmi-blobs \
         ipmitool \
         phosphor-sel-logger \
-        phosphor-node-manager-proxy \
         phosphor-image-signing \
         openssl-bin \
         openssl-engines \
