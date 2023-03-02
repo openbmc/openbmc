@@ -919,12 +919,15 @@ loading time is 0 ms
 ```
 - Program CPLD, arbelevb_cpld.svf is the firmware file.
 ```
+/* Blue EVB */
 loadsvf -d /dev/jtag0 -s arbelevb_cpld.svf
+/* Green EVB */
+loadsvf -d /dev/jtag0 -s Arbel_EVB_CPLD_X02_siox_loopback.svf
 ```
 - After CPLD is programmed, three LEDs (blue/yellow/red, near to SW1) are turned on.
 
 - The CPLD SVF can be downloaded from here:
-[arbelevb_cpld.svf](https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-evb-npcm845/recipes-evb-npcm845/loadsvf/files/arbelevb_cpld.svf ), [arbelevb_readid.svf](https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-evb-npcm845/recipes-evb-npcm845/loadsvf/files/arbelevb_readid.svf )
+[arbelevb_cpld.svf](https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-evb-npcm845/recipes-evb-npcm845/loadsvf/files/arbelevb_cpld.svf ), [arbelevb_readid.svf](https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-evb-npcm845/recipes-evb-npcm845/loadsvf/files/arbelevb_readid.svf ), [Arbel_EVB_CPLD_X02_siox_loopback.svf](https://github.com/Nuvoton-Israel/openbmc/tree/npcm-master/meta-evb/meta-evb-nuvoton/meta-evb-npcm845/recipes-evb-npcm845/loadsvf/files/Arbel_EVB_CPLD_X02_siox_loopback.svf )
 
 ## SMBus
 
