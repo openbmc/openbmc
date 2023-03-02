@@ -4,7 +4,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENCE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 DEPENDS += "json-c"
 DEPENDS += "udev"
-SRCREV = "3ebe3dadd3f550d20080c8bb14dee113e322eb61"
+SRCREV = "d59ecca2963a42f2d7b29df220a392ee52401a2d"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
