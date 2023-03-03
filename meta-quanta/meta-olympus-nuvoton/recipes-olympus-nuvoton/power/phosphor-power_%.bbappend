@@ -10,7 +10,7 @@ SRC_URI:append:olympus-nuvoton = " file://0003-Modify-power-supply-monitor-.serv
 SRC_URI:append:olympus-nuvoton = " file://0004-Fan-fault-test.patch"
 SRC_URI:append:olympus-nuvoton = " file://0005-Add-create-PSU-DBUs-obj.patch"
 SRC_URI:append:olympus-nuvoton = " file://0006-Light-up-LED-when-fan-fault.patch"
-SRC_URI:append:olympus-nuvoton = " file://0007-support-Entity-Manager.patch"
+SRC_URI:append:olympus-nuvoton = " file://0007-Support-Entity-Manager-for-power-supply-monitoring.patch"
 SRC_URI:append:olympus-nuvoton = " file://0008-Get-powersupplyName-from-config-setting.patch"
 
 EXTRA_OEMESON:append:olympus-nuvoton = " \

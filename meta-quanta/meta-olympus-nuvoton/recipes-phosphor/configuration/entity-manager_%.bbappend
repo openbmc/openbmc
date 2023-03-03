@@ -5,7 +5,7 @@ SRC_URI:append:olympus-nuvoton = " file://F0B_BMC_MB.json"
 SRC_URI:append:olympus-nuvoton = " file://PSU_0.json"
 SRC_URI:append:olympus-nuvoton = " file://xyz.openbmc_project.EntityManager.service"
 SRC_URI:append:olympus-nuvoton = " file://xyz.openbmc_project.FruDevice.service"
-SRC_URI:append:olympus-nuvoton = " file://0001-war-entity-manager-powersupply.patch"
+SRC_URI:append:olympus-nuvoton = " file://0001-Add-new-type-of-settable-interface-PowerSupply.patch"
 
 FILES:${PN}:append:olympus-nuvoton = " ${datadir}/entity-manager/F0B_BMC_MB.json"
 FILES:${PN}:append:olympus-nuvoton = " ${datadir}/entity-manager/PSU_0.json"
