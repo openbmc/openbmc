@@ -1,4 +1,4 @@
-From 483d363bf825082b6db6de3c57d169e741861891 Mon Sep 17 00:00:00 2001
+From bff110a95a5e4c9db2d61e629b4aa4b84530201e Mon Sep 17 00:00:00 2001
 From: Jaxson Han <jaxson.han@arm.com>
 Date: Tue, 25 May 2021 07:25:00 +0100
 Subject: [PATCH] gic-v3: Prepare for gicv3 with EL2

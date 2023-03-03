@@ -7,10 +7,15 @@ COMPATIBLE_MACHINE = "corstone1000"
 
 inherit image
 inherit wic_nopt tfm_sign_image
+inherit  uefi_capsule
 
 PACKAGE_INSTALL = ""
 
-IMAGE_FSTYPES += "wic wic.nopt"
+IMAGE_FSTYPES += "wic wic.nopt uefi_capsule"
+
+UEFI_FIRMWARE_BINARY = "${PN}-${MACHINE}.${CAPSULE_IMGTYPE}"
+UEFI_CAPSULE_CONFIG = "${THISDIR}/files/${PN}-capsule-update-image.json"
+CAPSULE_IMGTYPE = "wic.nopt"
 
 do_sign_images() {
     # Sign TF-A BL2
@@ -19,7 +24,8 @@ do_sign_images() {
 
     # Update BL2 in the FIP image
     cp ${RECIPE_SYSROOT}/firmware/${TFA_FIP_BINARY} .
-    fiptool update --tb-fw ${TFM_IMAGE_SIGN_DIR}/signed_${TFA_BL2_BINARY} \
+    fiptool update --tb-fw \
+        ${TFM_IMAGE_SIGN_DEPLOY_DIR}/signed_${TFA_BL2_BINARY} \
         ${TFM_IMAGE_SIGN_DIR}/${TFA_FIP_BINARY}
 
     # Sign the FIP image

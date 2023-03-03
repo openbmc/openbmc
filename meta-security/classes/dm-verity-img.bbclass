@@ -63,7 +63,12 @@ verity_setup() {
     veritysetup --data-block-size=${DM_VERITY_IMAGE_DATA_BLOCK_SIZE} --hash-offset=$SIZE format $OUTPUT $OUTPUT | tail -n +2 | process_verity
 }
 
-VERITY_TYPES = "ext2.verity ext3.verity ext4.verity btrfs.verity erofs.verity erofs-lz4.verity erofs-lz4hc.verity"
+VERITY_TYPES = " \
+    ext2.verity ext3.verity ext4.verity \
+    btrfs.verity \
+    erofs.verity erofs-lz4.verity erofs-lz4hc.verity \
+    squashfs.verity squashfs-xz.verity squashfs-lzo.verity squashfs-lz4.verity squashfs-zst.verity \
+"
 IMAGE_TYPES += "${VERITY_TYPES}"
 CONVERSIONTYPES += "verity"
 CONVERSION_CMD:verity = "verity_setup ${type}"

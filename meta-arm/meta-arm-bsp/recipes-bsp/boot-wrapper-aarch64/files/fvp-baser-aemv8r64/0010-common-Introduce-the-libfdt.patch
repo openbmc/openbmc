@@ -1,4 +1,4 @@
-From fadf04f44b679d85e55b2e5f220fecbebb52ad03 Mon Sep 17 00:00:00 2001
+From b3762b6c5a56bf594bc5cb63d145e8efd86e106e Mon Sep 17 00:00:00 2001
 From: Jaxson Han <jaxson.han@arm.com>
 Date: Tue, 28 Dec 2021 17:02:17 +0800
 Subject: [PATCH] common: Introduce the libfdt

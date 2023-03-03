@@ -9,6 +9,7 @@ libiberty/
 	* rust-demangle.c (demangle_const): Add recursion limit.
 
 Upstream-Status: Backport [https://gcc.gnu.org/git/gitweb.cgi?p=gcc.git;h=9234cdca6ee88badfc00297e72f13dac4e540c79]
+Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
 ---
  libiberty/rust-demangle.c | 29 ++++++++++++++++++++---------
  1 file changed, 20 insertions(+), 9 deletions(-)

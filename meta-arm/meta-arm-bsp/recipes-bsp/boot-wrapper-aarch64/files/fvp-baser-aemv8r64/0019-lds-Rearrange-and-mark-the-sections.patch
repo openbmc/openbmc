@@ -1,4 +1,4 @@
-From 36b5fa3f4db49ac7aef42ff1d58a895226c7e96c Mon Sep 17 00:00:00 2001
+From 7c5e40d9f8699a55ac2187c035429c643e6d0ef0 Mon Sep 17 00:00:00 2001
 From: Jaxson Han <jaxson.han@arm.com>
 Date: Tue, 2 Nov 2021 15:10:28 +0800
 Subject: [PATCH] lds: Rearrange and mark the sections
@@ -56,6 +56,3 @@ index ab98ddf..85451f9 100644
  	PROVIDE(firmware_end = .);
  
  	ASSERT(etext <= (PHYS_OFFSET + TEXT_LIMIT), ".text overflow!")
--- 
-2.25.1
-

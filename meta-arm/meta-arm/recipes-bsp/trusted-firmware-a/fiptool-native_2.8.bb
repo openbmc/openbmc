@@ -10,8 +10,8 @@ SRC_URI = "${SRC_URI_TRUSTED_FIRMWARE_A};destsuffix=fiptool-${PV};branch=${SRCBR
 SRCBRANCH = "master"
 LIC_FILES_CHKSUM = "file://docs/license.rst;md5=b2c740efedc159745b9b31f88ff03dde"
 
-# Use fiptool from TF-A v2.7
-SRCREV = "35f4c7295bafeb32c8bcbdfb6a3f2e74a57e732b"
+# Use fiptool from TF-A v2.8
+SRCREV = "9881bb93a3bc0a3ea37e9f093e09ab4b360a9e48"
 
 DEPENDS += "openssl-native"
 

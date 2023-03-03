@@ -1,4 +1,4 @@
-From 8bdbb64d13f14d40546b71dbcfee2b2a8ea002a5 Mon Sep 17 00:00:00 2001
+From 3c1140c29c39561848056fb4b9a03042b00279f3 Mon Sep 17 00:00:00 2001
 From: Jaxson Han <jaxson.han@arm.com>
 Date: Wed, 29 Dec 2021 15:17:38 +0800
 Subject: [PATCH] common: Provide firmware info using libfdt
@@ -340,6 +340,3 @@ index 4d0876c..7f7befc 100644
 +
 +	dt_dump_all(fw_node);
 +}
--- 
-2.25.1
-

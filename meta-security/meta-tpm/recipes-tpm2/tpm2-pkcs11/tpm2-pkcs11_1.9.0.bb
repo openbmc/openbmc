@@ -8,18 +8,13 @@ DEPENDS = "autoconf-archive pkgconfig sqlite3 openssl libtss2-dev tpm2-tools lib
 
 SRC_URI = "https://github.com/tpm2-software/${BPN}/releases/download/${PV}/${BPN}-${PV}.tar.gz"
 
-SRC_URI[sha256sum] = "79f28899047defd6b4b72b7268dd56abf27774954022315f818c239af33e05bd"
+SRC_URI[sha256sum] = "35bf06c30cfa76fc0eba2c5f503cf7dd0d34a66afb2d292fee896b90362f633b"
 
 UPSTREAM_CHECK_URI = "https://github.com/tpm2-software/${BPN}/releases"
 
 inherit autotools-brokensep pkgconfig python3native
 
 EXTRA_OECONF += "--disable-ptool-checks"
-
-do_configure:prepend() {
-    # do not extract the version number from git
-    sed -i -e 's/m4_esyscmd_s(\[git describe --tags --always --dirty\])/${PV}/' ${S}/configure.ac
-}
 
 do_compile:append() {
     cd ${S}/tools

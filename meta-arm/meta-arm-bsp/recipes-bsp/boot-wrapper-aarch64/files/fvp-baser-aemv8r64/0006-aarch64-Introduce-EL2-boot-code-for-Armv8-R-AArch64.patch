@@ -1,4 +1,4 @@
-From 81df76f8d94cb6c31c01739b078a72bdb8497441 Mon Sep 17 00:00:00 2001
+From 8e44fac113d935affed1550480631f3fe7f30584 Mon Sep 17 00:00:00 2001
 From: Jaxson Han <jaxson.han@arm.com>
 Date: Tue, 25 May 2021 07:25:00 +0100
 Subject: [PATCH] aarch64: Introduce EL2 boot code for Armv8-R AArch64
@@ -36,10 +36,10 @@ Signed-off-by: Jaxson Han <jaxson.han@arm.com>
  2 files changed, 92 insertions(+), 2 deletions(-)
 
 diff --git a/arch/aarch64/boot.S b/arch/aarch64/boot.S
-index 908764a..def9192 100644
+index 3593ca5..a219ea7 100644
 --- a/arch/aarch64/boot.S
 +++ b/arch/aarch64/boot.S
-@@ -24,16 +24,24 @@ ASM_FUNC(_start)
+@@ -37,16 +37,24 @@ ASM_FUNC(_start)
  	 * Boot sequence
  	 * If CurrentEL == EL3, then goto EL3 initialisation and drop to
  	 *   lower EL before entering the kernel.
@@ -66,7 +66,7 @@ index 908764a..def9192 100644
  	mov	w0, #1
  	ldr	x1, =flag_keep_el
  	str	w0, [x1]
-@@ -139,6 +147,85 @@ el3_init:
+@@ -160,6 +168,85 @@ el3_init:
  	str	w0, [x1]
  	b	el_max_init
  
@@ -152,7 +152,7 @@ index 908764a..def9192 100644
  el_max_init:
  	ldr	x0, =COUNTER_FREQ
  	msr	cntfrq_el0, x0
-@@ -148,6 +235,7 @@ el_max_init:
+@@ -169,6 +256,7 @@ el_max_init:
  	b	start_el_max
  
  err_invalid_id:
@@ -161,7 +161,7 @@ index 908764a..def9192 100644
  
  	/*
 diff --git a/arch/aarch64/include/asm/cpu.h b/arch/aarch64/include/asm/cpu.h
-index b1003f4..91f803c 100644
+index 3767da3..3c0e00d 100644
 --- a/arch/aarch64/include/asm/cpu.h
 +++ b/arch/aarch64/include/asm/cpu.h
 @@ -25,6 +25,7 @@
@@ -172,7 +172,7 @@ index b1003f4..91f803c 100644
  #define SPSR_EL2H		(9 << 0)	/* EL2 Handler mode */
  #define SPSR_HYP		(0x1a << 0)	/* M[3:0] = hyp, M[4] = AArch32 */
  
-@@ -43,6 +44,7 @@
+@@ -50,6 +51,7 @@
  #else
  #define SCTLR_EL1_KERNEL	SCTLR_EL1_RES1
  #define SPSR_KERNEL		(SPSR_A | SPSR_D | SPSR_I | SPSR_F | SPSR_EL2H)

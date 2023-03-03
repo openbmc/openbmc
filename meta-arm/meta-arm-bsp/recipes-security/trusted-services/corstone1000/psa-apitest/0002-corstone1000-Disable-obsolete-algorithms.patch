@@ -1,0 +1,32 @@
+From 1bc041813df89a1be953d0ba3471e608f6fa7ed8 Mon Sep 17 00:00:00 2001
+From: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Date: Thu, 9 Feb 2023 20:54:40 +0000
+Subject: [PATCH] corstone1000: Disable obsolete algorithms
+
+curves of size <255 are obsolete algorithms
+
+Signed-off-by: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Upstream-Status: Inappropriate [Discussions of having these configs
+                                in a separate target is ongoing]
+---
+ .../targets/tgt_dev_apis_linux/nspe/pal_crypto_config.h       | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/api-tests/platform/targets/tgt_dev_apis_linux/nspe/pal_crypto_config.h b/api-tests/platform/targets/tgt_dev_apis_linux/nspe/pal_crypto_config.h
+index c6d4aad..1d9b356 100755
+--- a/api-tests/platform/targets/tgt_dev_apis_linux/nspe/pal_crypto_config.h
++++ b/api-tests/platform/targets/tgt_dev_apis_linux/nspe/pal_crypto_config.h
+@@ -66,6 +66,10 @@
+ #endif
+ #endif
+ 
++/* curves of size <255 are obsolete algorithms, should be disabled. */
++#undef ARCH_TEST_ECC_CURVE_SECP192R1
++#undef ARCH_TEST_ECC_CURVE_SECP224R1
++
+ /**
+  * \def ARCH_TEST_AES
+  *
+-- 
+2.25.1
+

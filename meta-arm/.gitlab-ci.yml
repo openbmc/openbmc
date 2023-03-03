@@ -3,6 +3,7 @@ image: ghcr.io/siemens/kas/kas:3.2
 variables:
   CPU_REQUEST: ""
   DEFAULT_TAG: ""
+  CACHE_DIR: $CI_BUILDS_DIR/persist
   # These are needed as the k8s executor doesn't respect the container entrypoint
   # by default
   FF_KUBERNETES_HONOR_ENTRYPOINT: 1
@@ -20,11 +21,11 @@ stages:
   interruptible: true
   variables:
     KAS_WORK_DIR: $CI_PROJECT_DIR/work
-    KAS_REPO_REF_DIR: $CI_BUILDS_DIR/persist/repos
-    SSTATE_DIR: $CI_BUILDS_DIR/persist/sstate
-    DL_DIR: $CI_BUILDS_DIR/persist/downloads
+    KAS_REPO_REF_DIR: $CACHE_DIR/repos
+    SSTATE_DIR: $CACHE_DIR/sstate
+    DL_DIR: $CACHE_DIR/downloads
     BB_LOGCONFIG: $CI_PROJECT_DIR/ci/logging.yml
-    TOOLCHAIN_DIR: $CI_BUILDS_DIR/persist/toolchains
+    TOOLCHAIN_DIR: $CACHE_DIR/toolchains
     IMAGE_DIR: $CI_PROJECT_DIR/work/build/tmp/deploy/images
     TOOLCHAIN_LINK_DIR: $CI_PROJECT_DIR/work/build/toolchains
   before_script:
@@ -41,6 +42,9 @@ stages:
   extends: .setup
   variables:
     KUBERNETES_CPU_REQUEST: $CPU_REQUEST
+  only:
+    variables:
+      - $BUILD_ENABLE_REGEX == null || $CI_JOB_NAME =~ $BUILD_ENABLE_REGEX
   script:
     - KASFILES=$(./ci/jobs-to-kas "$CI_JOB_NAME")
     - kas dump --update --force-checkout --resolve-refs --resolve-env $KASFILES 
@@ -51,6 +55,7 @@ stages:
     when: on_failure
     paths:
       - $CI_PROJECT_DIR/work/build/tmp/work*/**/temp/log.do_*.*
+      - $CI_PROJECT_DIR/work/build/tmp/work*/**/testimage/*
 
 #
 # Prep stage, update repositories once

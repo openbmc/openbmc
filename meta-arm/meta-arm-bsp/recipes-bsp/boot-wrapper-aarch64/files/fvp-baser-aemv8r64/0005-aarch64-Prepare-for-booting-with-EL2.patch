@@ -1,4 +1,4 @@
-From be814863cdd5f61d9a16eec012d500550053c8c6 Mon Sep 17 00:00:00 2001
+From ba955efb35ce1d41b562190d7c2fbcbcf8ef97ff Mon Sep 17 00:00:00 2001
 From: Jaxson Han <jaxson.han@arm.com>
 Date: Tue, 25 May 2021 07:25:00 +0100
 Subject: [PATCH] aarch64: Prepare for booting with EL2
@@ -15,10 +15,10 @@ Reviewed-by: Andre Przywara <andre.przywara@arm.com>
  2 files changed, 17 insertions(+), 1 deletion(-)
 
 diff --git a/arch/aarch64/boot.S b/arch/aarch64/boot.S
-index 6b45afc..908764a 100644
+index 243198d..3593ca5 100644
 --- a/arch/aarch64/boot.S
 +++ b/arch/aarch64/boot.S
-@@ -195,10 +195,18 @@ ASM_FUNC(jump_kernel)
+@@ -216,10 +216,18 @@ ASM_FUNC(jump_kernel)
  	 */
  	bfi	x4, x19, #5, #1
  

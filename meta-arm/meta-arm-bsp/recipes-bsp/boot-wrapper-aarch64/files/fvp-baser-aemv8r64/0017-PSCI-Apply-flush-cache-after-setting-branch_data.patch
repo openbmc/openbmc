@@ -1,4 +1,4 @@
-From 6923f2a0c59cf92ba5ad50ec1d658a357b4ba5d7 Mon Sep 17 00:00:00 2001
+From fa73d885be85eee4369b292ec601e7b024a68807 Mon Sep 17 00:00:00 2001
 From: Jaxson Han <jaxson.han@arm.com>
 Date: Tue, 2 Nov 2021 10:48:39 +0800
 Subject: [PATCH] PSCI: Apply flush cache after setting branch_data
@@ -47,6 +47,3 @@ index 945780b..6efc695 100644
  	return PSCI_RET_SUCCESS;
  }
  
--- 
-2.25.1
-

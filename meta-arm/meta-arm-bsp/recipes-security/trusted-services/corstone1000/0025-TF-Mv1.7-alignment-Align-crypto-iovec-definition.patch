@@ -1,0 +1,655 @@
+From a3e203136e7c552069ae582273e0540a219c105f Mon Sep 17 00:00:00 2001
+From: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Date: Thu, 9 Feb 2023 00:01:06 +0000
+Subject: [PATCH 2/3] TF-Mv1.7 alignment: Align crypto iovec definition
+
+This patch is to align psa_ipc_crypto_pack_iovec with TF-M v1.7
+And propagate changes accross psa_ipc functions
+More accuratly change sfn_id to function_id
+
+Signed-off-by: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Upstream-Status: Pending [Not submitted yet]
+---
+ .../backend/psa_ipc/crypto_ipc_backend.h      | 34 +++++++++----------
+ .../caller/psa_ipc/crypto_caller_aead.h       | 24 ++++++-------
+ .../crypto_caller_asymmetric_decrypt.h        |  2 +-
+ .../crypto_caller_asymmetric_encrypt.h        |  2 +-
+ .../caller/psa_ipc/crypto_caller_cipher.h     | 14 ++++----
+ .../caller/psa_ipc/crypto_caller_copy_key.h   |  2 +-
+ .../psa_ipc/crypto_caller_destroy_key.h       |  2 +-
+ .../caller/psa_ipc/crypto_caller_export_key.h |  2 +-
+ .../psa_ipc/crypto_caller_export_public_key.h |  2 +-
+ .../psa_ipc/crypto_caller_generate_key.h      |  2 +-
+ .../psa_ipc/crypto_caller_generate_random.h   |  2 +-
+ .../crypto_caller_get_key_attributes.h        |  2 +-
+ .../caller/psa_ipc/crypto_caller_hash.h       | 12 +++----
+ .../caller/psa_ipc/crypto_caller_import_key.h |  2 +-
+ .../psa_ipc/crypto_caller_key_derivation.h    | 20 +++++------
+ .../client/caller/psa_ipc/crypto_caller_mac.h | 12 +++----
+ .../caller/psa_ipc/crypto_caller_purge_key.h  |  2 +-
+ .../caller/psa_ipc/crypto_caller_sign_hash.h  |  4 +--
+ .../psa_ipc/crypto_caller_verify_hash.h       |  4 +--
+ 19 files changed, 73 insertions(+), 73 deletions(-)
+
+diff --git a/components/service/crypto/backend/psa_ipc/crypto_ipc_backend.h b/components/service/crypto/backend/psa_ipc/crypto_ipc_backend.h
+index ec25eaf8..aacd3fcc 100644
+--- a/components/service/crypto/backend/psa_ipc/crypto_ipc_backend.h
++++ b/components/service/crypto/backend/psa_ipc/crypto_ipc_backend.h
+@@ -28,23 +28,23 @@ struct psa_ipc_crypto_aead_pack_input {
+ };
+ 
+ struct psa_ipc_crypto_pack_iovec {
+-	uint32_t sfn_id;             /*!< Secure function ID used to dispatch the
+-				      *   request
+-				      */
+-	uint16_t step;               /*!< Key derivation step */
+-	psa_key_id_t key_id;         /*!< Key id */
+-	psa_algorithm_t alg;         /*!< Algorithm */
+-	uint32_t op_handle;          /*!< Frontend context handle associated to a
+-				      *   multipart operation
+-				      */
+-	uint32_t capacity;             /*!< Key derivation capacity */
+-	uint32_t ad_length;            /*!< Additional Data length for multipart AEAD */
+-	uint32_t plaintext_length;     /*!< Plaintext length for multipart AEAD */
+-	struct psa_ipc_crypto_aead_pack_input aead_in; /*!< FixMe: Temporarily used for
+-							    *   AEAD until the API is
+-							    *   restructured
+-							    */
+-};
++    psa_key_id_t key_id;     /*!< Key id */
++    psa_algorithm_t alg;     /*!< Algorithm */
++    uint32_t op_handle;      /*!< Frontend context handle associated to a
++                              *   multipart operation
++                              */
++    uint32_t capacity;         /*!< Key derivation capacity */
++    uint32_t ad_length;        /*!< Additional Data length for multipart AEAD */
++    uint32_t plaintext_length; /*!< Plaintext length for multipart AEAD */
++
++    struct psa_ipc_crypto_aead_pack_input aead_in; /*!< Packs AEAD-related inputs */
++
++    uint16_t function_id;    /*!< Used to identify the function in the
++                              *   API dispatcher to the service backend
++                              *   See tfm_crypto_func_sid for detail
++                              */
++    uint16_t step;           /*!< Key derivation step */
++}__packed;
+ 
+ #define iov_size sizeof(struct psa_ipc_crypto_pack_iovec)
+ 
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_aead.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_aead.h
+index f6aadd8b..efdffdf7 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_aead.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_aead.h
+@@ -44,7 +44,7 @@ static inline psa_status_t crypto_caller_aead_encrypt(
+ 	size_t in_len;
+ 	int i;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_AEAD_ENCRYPT_SID,
++		.function_id = TFM_CRYPTO_AEAD_ENCRYPT_SID,
+ 		.key_id = key,
+ 		.alg = alg,
+ 		.aead_in = { .nonce = {0}, .nonce_length = nonce_length },
+@@ -105,7 +105,7 @@ static inline psa_status_t crypto_caller_aead_decrypt(
+ 	size_t in_len;
+ 	int i;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_AEAD_DECRYPT_SID,
++		.function_id = TFM_CRYPTO_AEAD_DECRYPT_SID,
+ 		.key_id = key,
+ 		.alg = alg,
+ 		.aead_in = { .nonce = {0}, .nonce_length = nonce_length },
+@@ -156,7 +156,7 @@ static inline psa_status_t crypto_caller_aead_encrypt_setup(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-	    .sfn_id = TFM_CRYPTO_AEAD_ENCRYPT_SETUP_SID,
++	    .function_id = TFM_CRYPTO_AEAD_ENCRYPT_SETUP_SID,
+ 	    .key_id = key,
+ 	    .alg = alg,
+ 	    .op_handle = (*op_handle),
+@@ -185,7 +185,7 @@ static inline psa_status_t crypto_caller_aead_decrypt_setup(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-	    .sfn_id = TFM_CRYPTO_AEAD_DECRYPT_SETUP_SID,
++	    .function_id = TFM_CRYPTO_AEAD_DECRYPT_SETUP_SID,
+ 	    .key_id = key,
+ 	    .alg = alg,
+ 	    .op_handle = (*op_handle),
+@@ -214,7 +214,7 @@ static inline psa_status_t crypto_caller_aead_generate_nonce(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-	    .sfn_id = TFM_CRYPTO_AEAD_GENERATE_NONCE_SID,
++	    .function_id = TFM_CRYPTO_AEAD_GENERATE_NONCE_SID,
+ 	    .op_handle = op_handle,
+ 	};
+ 
+@@ -243,7 +243,7 @@ static inline psa_status_t crypto_caller_aead_set_nonce(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-	    .sfn_id = TFM_CRYPTO_AEAD_SET_NONCE_SID,
++	    .function_id = TFM_CRYPTO_AEAD_SET_NONCE_SID,
+ 	    .op_handle = op_handle,
+ 	};
+ 
+@@ -270,7 +270,7 @@ static inline psa_status_t crypto_caller_aead_set_lengths(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-	    .sfn_id = TFM_CRYPTO_AEAD_SET_LENGTHS_SID,
++	    .function_id = TFM_CRYPTO_AEAD_SET_LENGTHS_SID,
+ 	    .ad_length = ad_length,
+ 	    .plaintext_length = plaintext_length,
+ 	    .op_handle = op_handle,
+@@ -299,7 +299,7 @@ static inline psa_status_t crypto_caller_aead_update_ad(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-	    .sfn_id = TFM_CRYPTO_AEAD_UPDATE_AD_SID,
++	    .function_id = TFM_CRYPTO_AEAD_UPDATE_AD_SID,
+ 	    .op_handle = op_handle,
+ 	};
+ 
+@@ -339,7 +339,7 @@ static inline psa_status_t crypto_caller_aead_update(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-	    .sfn_id = TFM_CRYPTO_AEAD_UPDATE_SID,
++	    .function_id = TFM_CRYPTO_AEAD_UPDATE_SID,
+ 	    .op_handle = op_handle,
+ 	};
+ 
+@@ -383,7 +383,7 @@ static inline psa_status_t crypto_caller_aead_finish(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-	    .sfn_id = TFM_CRYPTO_AEAD_FINISH_SID,
++	    .function_id = TFM_CRYPTO_AEAD_FINISH_SID,
+ 	    .op_handle = op_handle,
+ 	};
+ 
+@@ -436,7 +436,7 @@ static inline psa_status_t crypto_caller_aead_verify(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-	    .sfn_id = TFM_CRYPTO_AEAD_VERIFY_SID,
++	    .function_id = TFM_CRYPTO_AEAD_VERIFY_SID,
+ 	    .op_handle = op_handle,
+ 	};
+ 
+@@ -482,7 +482,7 @@ static inline psa_status_t crypto_caller_aead_abort(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-	    .sfn_id = TFM_CRYPTO_AEAD_ABORT_SID,
++	    .function_id = TFM_CRYPTO_AEAD_ABORT_SID,
+ 	    .op_handle = op_handle,
+ 	};
+ 
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_asymmetric_decrypt.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_asymmetric_decrypt.h
+index ff01815c..c387eb55 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_asymmetric_decrypt.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_asymmetric_decrypt.h
+@@ -38,7 +38,7 @@ static inline psa_status_t crypto_caller_asymmetric_decrypt(
+ 	psa_status_t status;
+ 	size_t in_len;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_ASYMMETRIC_DECRYPT_SID,
++		.function_id = TFM_CRYPTO_ASYMMETRIC_DECRYPT_SID,
+ 		.key_id = id,
+ 		.alg = alg,
+ 	};
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_asymmetric_encrypt.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_asymmetric_encrypt.h
+index 1daf1689..8eb3de45 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_asymmetric_encrypt.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_asymmetric_encrypt.h
+@@ -38,7 +38,7 @@ static inline psa_status_t crypto_caller_asymmetric_encrypt(
+ 	psa_status_t status;
+ 	size_t in_len;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_ASYMMETRIC_ENCRYPT_SID,
++		.function_id = TFM_CRYPTO_ASYMMETRIC_ENCRYPT_SID,
+ 		.key_id = id,
+ 		.alg = alg,
+ 	};
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_cipher.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_cipher.h
+index fbefb28d..20aa46a5 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_cipher.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_cipher.h
+@@ -34,7 +34,7 @@ static inline psa_status_t crypto_caller_cipher_encrypt_setup(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_CIPHER_ENCRYPT_SETUP_SID,
++		.function_id = TFM_CRYPTO_CIPHER_ENCRYPT_SETUP_SID,
+ 		.key_id = key,
+ 		.alg = alg,
+ 		.op_handle = *op_handle,
+@@ -62,7 +62,7 @@ static inline psa_status_t crypto_caller_cipher_decrypt_setup(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_CIPHER_DECRYPT_SETUP_SID,
++		.function_id = TFM_CRYPTO_CIPHER_DECRYPT_SETUP_SID,
+ 		.key_id = key,
+ 		.alg = alg,
+ 		.op_handle = *op_handle,
+@@ -91,7 +91,7 @@ static inline psa_status_t crypto_caller_cipher_generate_iv(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_CIPHER_GENERATE_IV_SID,
++		.function_id = TFM_CRYPTO_CIPHER_GENERATE_IV_SID,
+ 		.op_handle = op_handle,
+ 	};
+ 	struct psa_invec in_vec[] = {
+@@ -120,7 +120,7 @@ static inline psa_status_t crypto_caller_cipher_set_iv(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_CIPHER_SET_IV_SID,
++		.function_id = TFM_CRYPTO_CIPHER_SET_IV_SID,
+ 		.op_handle = op_handle,
+ 	};
+ 	struct psa_invec in_vec[] = {
+@@ -150,7 +150,7 @@ static inline psa_status_t crypto_caller_cipher_update(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_CIPHER_UPDATE_SID,
++		.function_id = TFM_CRYPTO_CIPHER_UPDATE_SID,
+ 		.op_handle = op_handle,
+ 	};
+ 	struct psa_invec in_vec[] = {
+@@ -181,7 +181,7 @@ static inline psa_status_t crypto_caller_cipher_finish(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_CIPHER_FINISH_SID,
++		.function_id = TFM_CRYPTO_CIPHER_FINISH_SID,
+ 		.op_handle = op_handle,
+ 	};
+ 	struct psa_invec in_vec[] = {
+@@ -208,7 +208,7 @@ static inline psa_status_t crypto_caller_cipher_abort(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_CIPHER_ABORT_SID,
++		.function_id = TFM_CRYPTO_CIPHER_ABORT_SID,
+ 		.op_handle = op_handle,
+ 	};
+ 	struct psa_invec in_vec[] = {
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_copy_key.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_copy_key.h
+index 9a988171..48157d7e 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_copy_key.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_copy_key.h
+@@ -33,7 +33,7 @@ static inline psa_status_t crypto_caller_copy_key(struct service_client *context
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_COPY_KEY_SID,
++		.function_id = TFM_CRYPTO_COPY_KEY_SID,
+ 		.key_id = source_key,
+ 	};
+ 	struct psa_invec in_vec[] = {
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_destroy_key.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_destroy_key.h
+index d00f4faa..6d0a05e6 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_destroy_key.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_destroy_key.h
+@@ -31,7 +31,7 @@ static inline psa_status_t crypto_caller_destroy_key(struct service_client *cont
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_DESTROY_KEY_SID,
++		.function_id = TFM_CRYPTO_DESTROY_KEY_SID,
+ 		.key_id = id,
+ 	};
+ 	struct psa_invec in_vec[] = {
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_export_key.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_export_key.h
+index 8ac5477f..9a6b7013 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_export_key.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_export_key.h
+@@ -34,7 +34,7 @@ static inline psa_status_t crypto_caller_export_key(struct service_client *conte
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_EXPORT_KEY_SID,
++		.function_id = TFM_CRYPTO_EXPORT_KEY_SID,
+ 		.key_id = id,
+ 	};
+ 	struct psa_invec in_vec[] = {
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_export_public_key.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_export_public_key.h
+index b24c47f1..52bdd757 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_export_public_key.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_export_public_key.h
+@@ -34,7 +34,7 @@ static inline psa_status_t crypto_caller_export_public_key(struct service_client
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_EXPORT_PUBLIC_KEY_SID,
++		.function_id = TFM_CRYPTO_EXPORT_PUBLIC_KEY_SID,
+ 		.key_id = id,
+ 	};
+ 	struct psa_invec in_vec[] = {
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_generate_key.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_generate_key.h
+index 1b66ed40..7ed1673b 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_generate_key.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_generate_key.h
+@@ -32,7 +32,7 @@ static inline psa_status_t crypto_caller_generate_key(struct service_client *con
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_GENERATE_KEY_SID,
++		.function_id = TFM_CRYPTO_GENERATE_KEY_SID,
+ 	};
+ 	struct psa_invec in_vec[] = {
+ 		{ .base = psa_ptr_to_u32(&iov), .len = sizeof(struct psa_ipc_crypto_pack_iovec) },
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_generate_random.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_generate_random.h
+index 7c538237..4fb87aa8 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_generate_random.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_generate_random.h
+@@ -32,7 +32,7 @@ static inline psa_status_t crypto_caller_generate_random(struct service_client *
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_GENERATE_RANDOM_SID,
++		.function_id = TFM_CRYPTO_GENERATE_RANDOM_SID,
+ 	};
+ 	struct psa_invec in_vec[] = {
+ 		{ .base = psa_ptr_to_u32(&iov), .len = sizeof(struct psa_ipc_crypto_pack_iovec) },
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_get_key_attributes.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_get_key_attributes.h
+index 22f1d18f..2caa3bd3 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_get_key_attributes.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_get_key_attributes.h
+@@ -33,7 +33,7 @@ static inline psa_status_t crypto_caller_get_key_attributes(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_GET_KEY_ATTRIBUTES_SID,
++		.function_id = TFM_CRYPTO_GET_KEY_ATTRIBUTES_SID,
+ 		.key_id = key,
+ 	};
+ 	struct psa_invec in_vec[] = {
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_hash.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_hash.h
+index 9f37908a..4fb60d44 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_hash.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_hash.h
+@@ -33,7 +33,7 @@ static inline psa_status_t crypto_caller_hash_setup(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_HASH_SETUP_SID,
++		.function_id = TFM_CRYPTO_HASH_SETUP_SID,
+ 		.alg = alg,
+ 		.op_handle = *op_handle,
+ 	};
+@@ -60,7 +60,7 @@ static inline psa_status_t crypto_caller_hash_update(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_HASH_UPDATE_SID,
++		.function_id = TFM_CRYPTO_HASH_UPDATE_SID,
+ 		.op_handle = op_handle,
+ 	};
+ 	struct psa_invec in_vec[] = {
+@@ -88,7 +88,7 @@ static inline psa_status_t crypto_caller_hash_finish(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_HASH_FINISH_SID,
++		.function_id = TFM_CRYPTO_HASH_FINISH_SID,
+ 		.op_handle = op_handle,
+ 	};
+ 	struct psa_invec in_vec[] = {
+@@ -115,7 +115,7 @@ static inline psa_status_t crypto_caller_hash_abort(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_HASH_ABORT_SID,
++		.function_id = TFM_CRYPTO_HASH_ABORT_SID,
+ 		.op_handle = op_handle,
+ 	};
+ 	struct psa_invec in_vec[] = {
+@@ -141,7 +141,7 @@ static inline psa_status_t crypto_caller_hash_verify(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_HASH_VERIFY_SID,
++		.function_id = TFM_CRYPTO_HASH_VERIFY_SID,
+ 		.op_handle = op_handle,
+ 	};
+ 	struct psa_invec in_vec[] = {
+@@ -167,7 +167,7 @@ static inline psa_status_t crypto_caller_hash_clone(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_HASH_CLONE_SID,
++		.function_id = TFM_CRYPTO_HASH_CLONE_SID,
+ 		.op_handle = source_op_handle,
+ 	};
+ 	struct psa_invec in_vec[] = {
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_import_key.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_import_key.h
+index d4703366..1458163c 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_import_key.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_import_key.h
+@@ -33,7 +33,7 @@ static inline psa_status_t crypto_caller_import_key(struct service_client *conte
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_IMPORT_KEY_SID,
++		.function_id = TFM_CRYPTO_IMPORT_KEY_SID,
+ 	};
+ 	struct psa_invec in_vec[] = {
+ 		{ .base = psa_ptr_to_u32(&iov), .len = sizeof(struct psa_ipc_crypto_pack_iovec) },
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_key_derivation.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_key_derivation.h
+index 5ce4fb6c..16be9916 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_key_derivation.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_key_derivation.h
+@@ -33,7 +33,7 @@ static inline psa_status_t crypto_caller_key_derivation_setup(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_KEY_DERIVATION_SETUP_SID,
++		.function_id = TFM_CRYPTO_KEY_DERIVATION_SETUP_SID,
+ 		.alg = alg,
+ 		.op_handle = *op_handle,
+ 	};
+@@ -59,7 +59,7 @@ static inline psa_status_t crypto_caller_key_derivation_get_capacity(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_KEY_DERIVATION_GET_CAPACITY_SID,
++		.function_id = TFM_CRYPTO_KEY_DERIVATION_GET_CAPACITY_SID,
+ 		.op_handle = op_handle,
+ 	};
+ 	struct psa_invec in_vec[] = {
+@@ -84,7 +84,7 @@ static inline psa_status_t crypto_caller_key_derivation_set_capacity(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_KEY_DERIVATION_SET_CAPACITY_SID,
++		.function_id = TFM_CRYPTO_KEY_DERIVATION_SET_CAPACITY_SID,
+ 		.capacity = capacity,
+ 		.op_handle = op_handle,
+ 	};
+@@ -109,7 +109,7 @@ static inline psa_status_t crypto_caller_key_derivation_input_bytes(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_KEY_DERIVATION_INPUT_BYTES_SID,
++		.function_id = TFM_CRYPTO_KEY_DERIVATION_INPUT_BYTES_SID,
+ 		.step = step,
+ 		.op_handle = op_handle,
+ 	};
+@@ -134,7 +134,7 @@ static inline psa_status_t crypto_caller_key_derivation_input_key(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_KEY_DERIVATION_INPUT_KEY_SID,
++		.function_id = TFM_CRYPTO_KEY_DERIVATION_INPUT_KEY_SID,
+ 		.key_id = key,
+ 		.step = step,
+ 		.op_handle = op_handle,
+@@ -159,7 +159,7 @@ static inline psa_status_t crypto_caller_key_derivation_output_bytes(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_KEY_DERIVATION_OUTPUT_BYTES_SID,
++		.function_id = TFM_CRYPTO_KEY_DERIVATION_OUTPUT_BYTES_SID,
+ 		.op_handle = op_handle,
+ 	};
+ 	struct psa_invec in_vec[] = {
+@@ -185,7 +185,7 @@ static inline psa_status_t crypto_caller_key_derivation_output_key(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_KEY_DERIVATION_OUTPUT_KEY_SID,
++		.function_id = TFM_CRYPTO_KEY_DERIVATION_OUTPUT_KEY_SID,
+ 		.op_handle = op_handle,
+ 	};
+ 	struct psa_invec in_vec[] = {
+@@ -211,7 +211,7 @@ static inline psa_status_t crypto_caller_key_derivation_abort(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_KEY_DERIVATION_ABORT_SID,
++		.function_id = TFM_CRYPTO_KEY_DERIVATION_ABORT_SID,
+ 		.op_handle = op_handle,
+ 	};
+ 	struct psa_invec in_vec[] = {
+@@ -239,7 +239,7 @@ static inline psa_status_t crypto_caller_key_derivation_key_agreement(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_KEY_DERIVATION_KEY_AGREEMENT_SID,
++		.function_id = TFM_CRYPTO_KEY_DERIVATION_KEY_AGREEMENT_SID,
+ 		.key_id = private_key,
+ 		.step = step,
+ 		.op_handle = op_handle,
+@@ -270,7 +270,7 @@ static inline psa_status_t crypto_caller_raw_key_agreement(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_RAW_KEY_AGREEMENT_SID,
++		.function_id = TFM_CRYPTO_RAW_KEY_AGREEMENT_SID,
+ 		.alg = alg,
+ 		.key_id = private_key,
+ 	};
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_mac.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_mac.h
+index 3a820192..30222800 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_mac.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_mac.h
+@@ -34,7 +34,7 @@ static inline psa_status_t crypto_caller_mac_sign_setup(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_MAC_SIGN_SETUP_SID,
++		.function_id = TFM_CRYPTO_MAC_SIGN_SETUP_SID,
+ 		.key_id = key,
+ 		.alg = alg,
+ 		.op_handle = *op_handle,
+@@ -62,7 +62,7 @@ static inline psa_status_t crypto_caller_mac_verify_setup(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_MAC_VERIFY_SETUP_SID,
++		.function_id = TFM_CRYPTO_MAC_VERIFY_SETUP_SID,
+ 		.key_id = key,
+ 		.alg = alg,
+ 		.op_handle = *op_handle,
+@@ -90,7 +90,7 @@ static inline psa_status_t crypto_caller_mac_update(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_MAC_UPDATE_SID,
++		.function_id = TFM_CRYPTO_MAC_UPDATE_SID,
+ 		.op_handle = op_handle,
+ 	};
+ 	struct psa_invec in_vec[] = {
+@@ -118,7 +118,7 @@ static inline psa_status_t crypto_caller_mac_sign_finish(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_MAC_SIGN_FINISH_SID,
++		.function_id = TFM_CRYPTO_MAC_SIGN_FINISH_SID,
+ 		.op_handle = op_handle,
+ 	};
+ 	struct psa_invec in_vec[] = {
+@@ -147,7 +147,7 @@ static inline psa_status_t crypto_caller_mac_verify_finish(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_MAC_VERIFY_FINISH_SID,
++		.function_id = TFM_CRYPTO_MAC_VERIFY_FINISH_SID,
+ 		.op_handle = op_handle,
+ 	};
+ 	struct psa_invec in_vec[] = {
+@@ -172,7 +172,7 @@ static inline psa_status_t crypto_caller_mac_abort(
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_MAC_ABORT_SID,
++		.function_id = TFM_CRYPTO_MAC_ABORT_SID,
+ 		.op_handle = op_handle,
+ 	};
+ 	struct psa_invec in_vec[] = {
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_purge_key.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_purge_key.h
+index a3a796e2..f6ab0978 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_purge_key.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_purge_key.h
+@@ -31,7 +31,7 @@ static inline psa_status_t crypto_caller_purge_key(struct service_client *contex
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_PURGE_KEY_SID,
++		.function_id = TFM_CRYPTO_PURGE_KEY_SID,
+ 		.key_id = id,
+ 	};
+ 	struct psa_invec in_vec[] = {
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_sign_hash.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_sign_hash.h
+index 9276748d..8b53e3dc 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_sign_hash.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_sign_hash.h
+@@ -37,7 +37,7 @@ static inline psa_status_t crypto_caller_sign_hash(struct service_client *contex
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_ASYMMETRIC_SIGN_HASH_SID,
++		.function_id = TFM_CRYPTO_ASYMMETRIC_SIGN_HASH_SID,
+ 		.key_id = id,
+ 		.alg = alg,
+ 	};
+@@ -70,7 +70,7 @@ static inline psa_status_t crypto_caller_sign_message(struct service_client *con
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_ASYMMETRIC_SIGN_MESSAGE_SID,
++		.function_id = TFM_CRYPTO_ASYMMETRIC_SIGN_MESSAGE_SID,
+ 		.key_id = id,
+ 		.alg = alg,
+ 	};
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_verify_hash.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_verify_hash.h
+index bcd8e0e4..c9ed865b 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_verify_hash.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_verify_hash.h
+@@ -31,13 +31,13 @@ static inline psa_status_t crypto_caller_common(struct service_client *context,
+ 						     size_t hash_length,
+ 						     const uint8_t *signature,
+ 						     size_t signature_length,
+-						     uint32_t sfn_id)
++						     uint32_t function_id)
+ {
+ 	struct service_client *ipc = context;
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = sfn_id,
++		.function_id = function_id,
+ 		.key_id = id,
+ 		.alg = alg,
+ 	};
+-- 
+2.25.1
+

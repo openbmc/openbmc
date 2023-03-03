@@ -1,0 +1,32 @@
+From abdea43f1de61a0e76b13890cb403f7955998b02 Mon Sep 17 00:00:00 2001
+From: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Date: Thu, 9 Feb 2023 21:06:22 +0000
+Subject: [PATCH] corstone1000: Disable SHA512/384
+
+SHA512 and SHA384 is not available on Cryptocell (hardware accelerator)
+
+Signed-off-by: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Upstream-Status: Inappropriate [Discussions of having these configs
+                                in a separate target is ongoing]
+---
+ .../targets/tgt_dev_apis_linux/nspe/pal_crypto_config.h       | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/api-tests/platform/targets/tgt_dev_apis_linux/nspe/pal_crypto_config.h b/api-tests/platform/targets/tgt_dev_apis_linux/nspe/pal_crypto_config.h
+index 1d9b356..d6d552a 100755
+--- a/api-tests/platform/targets/tgt_dev_apis_linux/nspe/pal_crypto_config.h
++++ b/api-tests/platform/targets/tgt_dev_apis_linux/nspe/pal_crypto_config.h
+@@ -272,8 +272,8 @@
+ #define ARCH_TEST_SHA256
+ #ifndef TF_M_PROFILE_SMALL
+ #ifndef TF_M_PROFILE_MEDIUM
+-#define ARCH_TEST_SHA384
+-#define ARCH_TEST_SHA512
++// #define ARCH_TEST_SHA384
++// #define ARCH_TEST_SHA512
+ #endif
+ #endif
+ //#define ARCH_TEST_SHA512_224
+-- 
+2.25.1
+

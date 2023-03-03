@@ -1,4 +1,4 @@
-From b447242cd2457bec20d47fe6a8a5758d97a3bde3 Mon Sep 17 00:00:00 2001
+From f4704146e1af9f6e0a2220db6b39a328c813fac1 Mon Sep 17 00:00:00 2001
 From: Jaxson Han <jaxson.han@arm.com>
 Date: Wed, 19 Jan 2022 16:19:02 +0800
 Subject: [PATCH] common: Add mem usage to /memreserve/
@@ -20,7 +20,7 @@ Change-Id: I2ea80cdf736a910fa2c3deb622e21d50f04be960
  create mode 100644 common/device_tree.c
 
 diff --git a/Makefile.am b/Makefile.am
-index 5e8668a..734de92 100644
+index ab2c3a9..e905602 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -34,7 +34,7 @@ endif

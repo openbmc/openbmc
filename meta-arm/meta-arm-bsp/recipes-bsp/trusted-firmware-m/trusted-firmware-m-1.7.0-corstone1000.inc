@@ -11,6 +11,9 @@ TFM_PLATFORM_IS_FVP ?= "FALSE"
 EXTRA_OECMAKE += "-DPLATFORM_IS_FVP=${TFM_PLATFORM_IS_FVP}"
 EXTRA_OECMAKE += "-DCC312_LEGACY_DRIVER_API_ENABLED=OFF"
 
+## Setting SPM backend to IPC
+EXTRA_OECMAKE += "-DCONFIG_TFM_SPM_BACKEND=IPC"
+
 # libmetal
 LICENSE += "& BSD-3-Clause"
 LIC_FILES_CHKSUM += "file://../libmetal/LICENSE.md;md5=fe0b8a4beea8f0813b606d15a3df3d3c"
@@ -25,6 +28,11 @@ SRC_URI += "git://github.com/OpenAMP/open-amp.git;protocol=https;branch=main;nam
 SRCREV_openamp = "347397decaa43372fc4d00f965640ebde042966d"
 EXTRA_OECMAKE += "-DLIBOPENAMP_SRC_PATH=${S}/../openamp -DLIBOPENAMP_BIN_PATH=${B}/libopenamp-build"
 
+
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
+SRC_URI:append= " \
+    file://0001-Platform-corstone1000-Increase-number-of-assets.patch  \
+           "
 
 do_install() {
   install -D -p -m 0644 ${B}/install/outputs/tfm_s_signed.bin ${D}/firmware/tfm_s_signed.bin

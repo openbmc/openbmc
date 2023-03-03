@@ -25,6 +25,10 @@ SRC_URI:append:corstone1000  = " \
     file://0021-smm_gateway-add-checks-for-null-attributes.patch;patchdir=../trusted-services \
     file://0022-GetNextVariableName-Fix.patch;patchdir=../trusted-services \
     file://0023-Use-the-stateless-platform-service.patch;patchdir=../trusted-services \
+    file://0024-TF-Mv1.7-alignment-Align-PSA-Crypto-SIDs.patch;patchdir=../trusted-services \
+    file://0025-TF-Mv1.7-alignment-Align-crypto-iovec-definition.patch;patchdir=../trusted-services \
+    file://0026-TF-Mv1.7-alignment-PSA-crypto-client-in-out_vec.patch;patchdir=../trusted-services \
     "
+
 
 COMPATIBLE_MACHINE:n1sdp = "n1sdp"

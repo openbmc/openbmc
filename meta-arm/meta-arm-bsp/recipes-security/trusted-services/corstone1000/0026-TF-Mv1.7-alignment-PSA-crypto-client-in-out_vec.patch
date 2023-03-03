@@ -1,0 +1,117 @@
+From ee7e13dcc14110aa16f7c6453cfe72f088857ed2 Mon Sep 17 00:00:00 2001
+From: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Date: Thu, 9 Feb 2023 00:34:23 +0000
+Subject: [PATCH 3/3] TF-Mv1.7 alignment: PSA crypto client in/out_vec
+
+Few psa crypto operations have different in/out_vec expectations
+This patch is fixing the differences between psa crypto client in TS
+and psa crypto service in TF-M running on the secure enclave
+
+operations:
+- aead_generate_nonce: TFM service doesn't expect op_handle in in_vec
+- aead_update: TFM service doesn't expect op_handle in in_vec
+- cipher_generate_iv: TFM service doesn't expect op_handle in in_vec
+- cipher_update: TFM service doesn't expect op_handle in in_vec
+- hash_clone: TFM service expects target_op_handle in the in_vec
+              rationale is target_op_handle according to the spec
+              must be initialized and not active. and since hash_clone
+              manipulates it. hence, target_op_handle should be passed
+              as input and output.
+
+Signed-off-by: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Upstream-Status: Pending [Not submitted yet]
+---
+ .../crypto/client/caller/psa_ipc/crypto_caller_aead.h       | 6 ++----
+ .../crypto/client/caller/psa_ipc/crypto_caller_cipher.h     | 6 ++----
+ .../crypto/client/caller/psa_ipc/crypto_caller_hash.h       | 2 ++
+ 3 files changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_aead.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_aead.h
+index efdffdf7..e862c2de 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_aead.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_aead.h
+@@ -222,14 +222,13 @@ static inline psa_status_t crypto_caller_aead_generate_nonce(
+ 	    {.base = psa_ptr_to_u32(&iov), .len = sizeof(struct psa_ipc_crypto_pack_iovec)},
+ 	};
+ 	struct psa_outvec out_vec[] = {
+-	    {.base = psa_ptr_to_u32(&op_handle), .len = sizeof(uint32_t)},
+ 	    {.base = psa_ptr_to_u32(nonce), .len = nonce_size}
+ 	};
+ 
+ 	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
+ 	                   IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
+ 
+-	*nonce_length = out_vec[1].len;
++	*nonce_length = out_vec[0].len;
+ 	return status;
+ }
+ 
+@@ -353,7 +352,6 @@ static inline psa_status_t crypto_caller_aead_update(
+ 	    {.base = psa_ptr_const_to_u32(input), .len = input_length}
+ 	};
+ 	struct psa_outvec out_vec[] = {
+-	    {.base = psa_ptr_to_u32(&op_handle), .len = sizeof(uint32_t)},
+ 	    {.base = psa_ptr_const_to_u32(output), .len = output_size},
+ 	};
+ 
+@@ -365,7 +363,7 @@ static inline psa_status_t crypto_caller_aead_update(
+ 	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
+ 	                   in_len, out_vec, IOVEC_LEN(out_vec));
+ 
+-	*output_length = out_vec[1].len;
++	*output_length = out_vec[0].len;
+ 	return status;
+ }
+ 
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_cipher.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_cipher.h
+index 20aa46a5..948865e4 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_cipher.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_cipher.h
+@@ -98,14 +98,13 @@ static inline psa_status_t crypto_caller_cipher_generate_iv(
+ 		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
+ 	};
+ 	struct psa_outvec out_vec[] = {
+-		{ .base = psa_ptr_to_u32(&op_handle), .len = sizeof(uint32_t) },
+ 		{ .base = psa_ptr_to_u32(iv), .len = iv_size },
+ 	};
+ 
+ 	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
+ 			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
+ 
+-	*iv_length = out_vec[1].len;
++	*iv_length = out_vec[0].len;
+ 
+ 	return status;
+ }
+@@ -158,14 +157,13 @@ static inline psa_status_t crypto_caller_cipher_update(
+ 		{ .base = psa_ptr_const_to_u32(input), .len = input_length },
+ 	};
+ 	struct psa_outvec out_vec[] = {
+-		{ .base = psa_ptr_to_u32(&op_handle), .len = sizeof(uint32_t) },
+ 		{ .base = psa_ptr_to_u32(output), .len = output_size },
+ 	};
+ 
+ 	status = psa_call(caller, TFM_CRYPTO_HANDLE, PSA_IPC_CALL, in_vec,
+ 			  IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
+ 
+-	*output_length = out_vec[1].len;
++	*output_length = out_vec[0].len;
+ 
+ 	return status;
+ }
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_hash.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_hash.h
+index 4fb60d44..1e422130 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_hash.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_hash.h
+@@ -172,6 +172,8 @@ static inline psa_status_t crypto_caller_hash_clone(
+ 	};
+ 	struct psa_invec in_vec[] = {
+ 		{ .base = psa_ptr_to_u32(&iov), .len = iov_size },
++		{ .base = psa_ptr_to_u32(target_op_handle),
++			.len = sizeof(uint32_t) },
+ 	};
+ 	struct psa_outvec out_vec[] = {
+ 		{ .base = psa_ptr_to_u32(target_op_handle),
+-- 
+2.25.1
+

@@ -145,6 +145,10 @@ recipes = ("virtual/kernel",
            "edk2-firmware",
            "u-boot",
            "optee-os",
+           "hafnium",
+           "boot-wrapper-aarch64",
+           "gator-daemon",
+           "opencsd",
            "gcc-aarch64-none-elf-native",
            "gcc-arm-none-eabi-native")
 

@@ -6,34 +6,49 @@
 #  * Write the signing logic, which may call the function sign_host_image,
 #    described below
 
-inherit python3native deploy
+inherit python3native
 
 # The output and working directory
 TFM_IMAGE_SIGN_DIR = "${WORKDIR}/tfm-signed-images"
+TFM_IMAGE_SIGN_DEPLOY_DIR = "${WORKDIR}/deploy-tfm-signed-images"
 
+SSTATETASKS += "do_sign_images"
+do_sign_images[sstate-inputdirs] = "${TFM_IMAGE_SIGN_DEPLOY_DIR}"
+do_sign_images[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
+do_sign_images[dirs] = "${TFM_IMAGE_SIGN_DEPLOY_DIR} ${TFM_IMAGE_SIGN_DIR}"
+do_sign_images[cleandirs] = "${TFM_IMAGE_SIGN_DEPLOY_DIR} ${TFM_IMAGE_SIGN_DIR}"
+do_sign_images[stamp-extra-info] = "${MACHINE_ARCH}"
 tfm_sign_image_do_sign_images() {
     :
 }
-addtask sign_images after do_configure before do_compile
-do_sign_images[dirs] = "${TFM_IMAGE_SIGN_DIR}"
+addtask sign_images after do_prepare_recipe_sysroot before do_image
+EXPORT_FUNCTIONS do_sign_images
 
-tfm_sign_image_do_deploy() {
-    :
+python do_sign_images_setscene () {
+    sstate_setscene(d)
 }
-addtask deploy after do_sign_images
-
-deploy_signed_images() {
-    cp ${TFM_IMAGE_SIGN_DIR}/signed_* ${DEPLOYDIR}/
-}
-do_deploy[postfuncs] += "deploy_signed_images"
-
-EXPORT_FUNCTIONS do_sign_images do_deploy
+addtask do_sign_images_setscene
 
 DEPENDS += "trusted-firmware-m-scripts-native"
 
 # python3-cryptography needs the legacy provider, so set OPENSSL_MODULES to the
 # right path until this is relocated automatically.
 export OPENSSL_MODULES="${STAGING_LIBDIR_NATIVE}/ossl-modules"
+
+# The arguments passed to the TF-M image signing script. Override this variable
+# in an image recipe to customize the arguments.
+TFM_IMAGE_SIGN_ARGS ?= "\
+    -v ${RE_LAYOUT_WRAPPER_VERSION} \
+    --layout "${TFM_IMAGE_SIGN_DIR}/${host_binary_layout}" \
+    -k  "${RECIPE_SYSROOT_NATIVE}/${TFM_SIGN_PRIVATE_KEY}" \
+    --public-key-format full \
+    --align 1 \
+    --pad \
+    --pad-header \
+    --measured-boot-record \
+    -H ${RE_IMAGE_OFFSET} \
+    -s auto \
+"
 
 #
 # sign_host_image
@@ -62,18 +77,10 @@ enum image_attributes {
 };
 EOF
 
-    host_binary_signed="${TFM_IMAGE_SIGN_DIR}/signed_$(basename "${1}")"
+    host_binary_signed="${TFM_IMAGE_SIGN_DEPLOY_DIR}/signed_$(basename "${1}")"
 
     ${PYTHON} "${STAGING_LIBDIR_NATIVE}/tfm-scripts/wrapper/wrapper.py" \
-            -v ${RE_LAYOUT_WRAPPER_VERSION} \
-            --layout "${TFM_IMAGE_SIGN_DIR}/${host_binary_layout}" \
-            -k  "${RECIPE_SYSROOT_NATIVE}/${TFM_SIGN_PRIVATE_KEY}" \
-            --public-key-format full \
-            --align 1 \
-            --pad \
-            --pad-header \
-            -H ${RE_IMAGE_OFFSET} \
-            -s auto \
+            ${TFM_IMAGE_SIGN_ARGS} \
             "${1}" \
             "${host_binary_signed}"
 }
