@@ -7,7 +7,7 @@ In ascii mode, if the CR and LF was separated into different transfer
 blocks, LF will be just dropped instead of replacing the previous CR.
 Add a checking on the first character to fix it.
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Zhang Xiao <xiao.zhang@windriver.com>
 ---

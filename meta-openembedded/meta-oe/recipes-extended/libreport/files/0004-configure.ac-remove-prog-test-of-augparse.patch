@@ -5,7 +5,7 @@ Subject: [PATCH 4/4] configure.ac: remove prog test of augparse
 
 The build time does not require it.
 
-Upstream-Status:  Inappropriate workaround
+Upstream-Status: Inappropriate [workaround]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---

@@ -1,4 +1,8 @@
-Link libexecinfo if its found, this is needed for musl based systems
+From 19d00c15710840910a7397252c14d612746631fe Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 8 Mar 2021 14:58:40 -0800
+Subject: [PATCH] Link libexecinfo if its found, this is needed for musl based
+ systems
 
 Fixes
 ld: libglog.so.0.4.0: undefined reference to `backtrace'
@@ -6,17 +10,24 @@ ld: libglog.so.0.4.0: undefined reference to `backtrace'
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ CMakeLists.txt | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 846b444..1553358 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -144,6 +144,7 @@ check_cxx_compiler_flag (-Wunnamed-type-
- check_symbol_exists (snprintf cstdio HAVE_SNPRINTF)
+@@ -162,6 +162,7 @@ cmake_pop_check_state ()
+ check_cxx_symbol_exists (snprintf cstdio HAVE_SNPRINTF)
  
  check_library_exists (dbghelp UnDecorateSymbolName "" HAVE_DBGHELP)
 +check_library_exists (execinfo backtrace "" HAVE_EXECINFO)
  
  check_cxx_source_compiles ("
  #include <cstdlib>
-@@ -584,6 +585,10 @@ if (Unwind_FOUND)
+@@ -629,6 +630,10 @@ if (Unwind_FOUND)
    set (Unwind_DEPENDENCY "find_dependency (Unwind ${Unwind_VERSION})")
  endif (Unwind_FOUND)
  
@@ -25,5 +36,5 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 +endif (HAVE_EXECINFO)
 +
  if (HAVE_DBGHELP)
-    target_link_libraries (glog PUBLIC dbghelp)
- endif (HAVE_DBGHELP)
+   target_link_libraries (glog PRIVATE dbghelp)
+   set (glog_libraries_options_for_static_linking "${glog_libraries_options_for_static_linking} -ldbghelp")

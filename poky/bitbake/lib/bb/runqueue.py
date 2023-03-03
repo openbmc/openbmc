@@ -655,6 +655,7 @@ class RunQueueData:
 
         self.init_progress_reporter.start()
         self.init_progress_reporter.next_stage()
+        bb.event.check_for_interrupts(self.cooker.data)
 
         # Step A - Work out a list of tasks to run
         #
@@ -803,6 +804,7 @@ class RunQueueData:
         #self.dump_data()
 
         self.init_progress_reporter.next_stage()
+        bb.event.check_for_interrupts(self.cooker.data)
 
         # Resolve recursive 'recrdeptask' dependencies (Part B)
         #
@@ -899,6 +901,7 @@ class RunQueueData:
             self.runtaskentries[tid].depends.difference_update(recursivetasksselfref)
 
         self.init_progress_reporter.next_stage()
+        bb.event.check_for_interrupts(self.cooker.data)
 
         #self.dump_data()
 
@@ -980,6 +983,7 @@ class RunQueueData:
                 mark_active(tid, 1)
 
         self.init_progress_reporter.next_stage()
+        bb.event.check_for_interrupts(self.cooker.data)
 
         # Step C - Prune all inactive tasks
         #
@@ -1019,6 +1023,7 @@ class RunQueueData:
                 bb.msg.fatal("RunQueue", "Could not find any tasks with the tasknames %s to run within the recipes of the taskgraphs of the targets %s" % (str(self.cooker.configuration.runall), str(self.targets)))
 
         self.init_progress_reporter.next_stage()
+        bb.event.check_for_interrupts(self.cooker.data)
 
         # Handle runonly
         if self.cooker.configuration.runonly:
@@ -1059,6 +1064,7 @@ class RunQueueData:
         logger.verbose("Assign Weightings")
 
         self.init_progress_reporter.next_stage()
+        bb.event.check_for_interrupts(self.cooker.data)
 
         # Generate a list of reverse dependencies to ease future calculations
         for tid in self.runtaskentries:
@@ -1066,6 +1072,7 @@ class RunQueueData:
                 self.runtaskentries[dep].revdeps.add(tid)
 
         self.init_progress_reporter.next_stage()
+        bb.event.check_for_interrupts(self.cooker.data)
 
         # Identify tasks at the end of dependency chains
         # Error on circular dependency loops (length two)
@@ -1082,12 +1089,14 @@ class RunQueueData:
         logger.verbose("Compute totals (have %s endpoint(s))", len(endpoints))
 
         self.init_progress_reporter.next_stage()
+        bb.event.check_for_interrupts(self.cooker.data)
 
         # Calculate task weights
         # Check of higher length circular dependencies
         self.runq_weight = self.calculate_task_weights(endpoints)
 
         self.init_progress_reporter.next_stage()
+        bb.event.check_for_interrupts(self.cooker.data)
 
         # Sanity Check - Check for multiple tasks building the same provider
         for mc in self.dataCaches:
@@ -1188,6 +1197,7 @@ class RunQueueData:
 
         self.init_progress_reporter.next_stage()
         self.init_progress_reporter.next_stage()
+        bb.event.check_for_interrupts(self.cooker.data)
 
         # Iterate over the task list looking for tasks with a 'setscene' function
         self.runq_setscene_tids = set()
@@ -1200,6 +1210,7 @@ class RunQueueData:
                 self.runq_setscene_tids.add(tid)
 
         self.init_progress_reporter.next_stage()
+        bb.event.check_for_interrupts(self.cooker.data)
 
         # Invalidate task if force mode active
         if self.cooker.configuration.force:
@@ -1216,6 +1227,7 @@ class RunQueueData:
                     invalidate_task(fn + ":" + st, True)
 
         self.init_progress_reporter.next_stage()
+        bb.event.check_for_interrupts(self.cooker.data)
 
         # Create and print to the logs a virtual/xxxx -> PN (fn) table
         for mc in taskData:
@@ -1228,6 +1240,7 @@ class RunQueueData:
                 bb.parse.siggen.tasks_resolved(virtmap, virtpnmap, self.dataCaches[mc])
 
         self.init_progress_reporter.next_stage()
+        bb.event.check_for_interrupts(self.cooker.data)
 
         bb.parse.siggen.set_setscene_tasks(self.runq_setscene_tids)
 
@@ -1240,6 +1253,7 @@ class RunQueueData:
                     dealtwith.add(tid)
                     todeal.remove(tid)
                     self.prepare_task_hash(tid)
+                bb.event.check_for_interrupts(self.cooker.data)
 
         bb.parse.siggen.writeout_file_checksum_cache()
 
@@ -1483,6 +1497,7 @@ class RunQueue:
         """
 
         retval = True
+        bb.event.check_for_interrupts(self.cooker.data)
 
         if self.state is runQueuePrepare:
             # NOTE: if you add, remove or significantly refactor the stages of this
@@ -1941,8 +1956,7 @@ class RunQueueExecute:
                 try:
                     module = __import__(modname, fromlist=(name,))
                 except ImportError as exc:
-                    logger.critical("Unable to import scheduler '%s' from '%s': %s" % (name, modname, exc))
-                    raise SystemExit(1)
+                    bb.fatal("Unable to import scheduler '%s' from '%s': %s" % (name, modname, exc))
                 else:
                     schedulers.add(getattr(module, name))
         return schedulers

@@ -7,7 +7,7 @@ AC_CHECK_FILE is not suitable for cross-compile, so
 remove it to fix configure error:
 cannot check for file existence when cross compiling
 
-Upstream-Status: Inappropriate[oe specific]
+Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---

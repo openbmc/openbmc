@@ -13,3 +13,4 @@ Release 4.0 (kirkstone)
    release-notes-4.0.4
    release-notes-4.0.5
    release-notes-4.0.6
+   release-notes-4.0.7

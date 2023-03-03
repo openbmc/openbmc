@@ -11,7 +11,7 @@ lock_torture_wr-96 was split to different line due to limited buffer
 size(1k) set in kernel, check this case and re-parse the unfinished
 line.
 
-Upstream-Status: [Submitted: https://github.com/intel/pm-graph/pull/20]
+Upstream-Status: Submitted [https://github.com/intel/pm-graph/pull/20]
 
 Signed-off-by: Liwei Song <liwei.song@windriver.com>
 ---

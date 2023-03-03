@@ -24,8 +24,8 @@ reproducibility matters. The primary focus of the project is the ability to
 detect security issues being introduced. However, from a Yocto Project
 perspective, it is also hugely important that our builds are deterministic. When
 you build a given input set of metadata, we expect you to get consistent output.
-This has always been a key focus but, :yocto_docs:`since release 3.1 ("dunfell")
-</ref-manual/migration-3.1.html#reproducible-builds-now-enabled-by-default>`,
+This has always been a key focus but, :ref:`since release 3.1 ("dunfell")
+<migration-guides/migration-3.1:reproducible builds now enabled by default>`,
 it is now true down to the binary level including timestamps.
 
 For example, at some point in the future life of a product, you find that you

@@ -13,6 +13,7 @@ SRC_URI = "https://lttng.org/files/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://0009-Rename-genhd-wrapper-to-blkdev.patch \
            file://fix-jbd2-use-the-correct-print-format-v5.10.163.patch \
            file://fix-jbd2-upper-bound-for-v5.10.163.patch \
+           file://0001-fix-btrfs-move-accessor-helpers-into-accessors.h-v6..patch \
            "
 
 # Use :append here so that the patch is applied also when using devupstream

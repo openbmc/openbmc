@@ -153,9 +153,9 @@ default :term:`FILES` variables in ``bitbake.conf``::
 
    SOLIBS = ".so.*"
    SOLIBSDEV = ".so"
-   FILES_${PN} = "... ${libdir}/lib*${SOLIBS} ..."
+   FILES:${PN} = "... ${libdir}/lib*${SOLIBS} ..."
    FILES_SOLIBSDEV ?= "... ${libdir}/lib*${SOLIBSDEV} ..."
-   FILES_${PN}-dev = "... ${FILES_SOLIBSDEV} ..."
+   FILES:${PN}-dev = "... ${FILES_SOLIBSDEV} ..."
 
 :term:`SOLIBS` defines a pattern that matches real shared object libraries.
 :term:`SOLIBSDEV` matches the development form (unversioned symlink). These two

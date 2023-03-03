@@ -12,6 +12,7 @@ import shutil
 import bb.utils
 
 from bblayers.common import LayerPlugin
+from bblayers.action import ActionPlugin
 
 logger = logging.getLogger('bitbake-layers')
 
@@ -69,11 +70,19 @@ class CreatePlugin(LayerPlugin):
         with open(os.path.join(example, args.examplerecipe + '_%s.bb') % args.version, 'w') as fd:
             fd.write(example_template)
 
-        logger.plain('Add your new layer with \'bitbake-layers add-layer %s\'' % args.layerdir)
+        if args.add_layer:
+            # Add the layer to bblayers.conf
+            args.layerdir = [layerdir]
+            ActionPlugin.do_add_layer(self, args)
+            logger.plain('Layer added %s' % args.layerdir)
+
+        else:
+            logger.plain('Add your new layer with \'bitbake-layers add-layer %s\'' % args.layerdir)
 
     def register_commands(self, sp):
         parser_create_layer = self.add_command(sp, 'create-layer', self.do_create_layer, parserecipes=False)
         parser_create_layer.add_argument('layerdir', help='Layer directory to create')
+        parser_create_layer.add_argument('--add-layer', '-a', action='store_true', help='Add the layer to bblayers.conf after creation')
         parser_create_layer.add_argument('--layerid', '-i', help='Layer id to use if different from layername')
         parser_create_layer.add_argument('--priority', '-p', default=6, help='Priority of recipes in layer')
         parser_create_layer.add_argument('--example-recipe-name', '-e', dest='examplerecipe', default='example', help='Filename of the example recipe')

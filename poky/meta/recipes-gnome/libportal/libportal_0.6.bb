@@ -15,6 +15,6 @@ GIDOCGEN_MESON_OPTION = 'docs'
 
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
-DEPENDS += "glib-2.0 glib-2.0-native gtk+3 gtk4"
+DEPENDS += "glib-2.0 glib-2.0-native gtk+3 ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'gtk4', '', d)}"
 
-EXTRA_OEMESON = "-Dbackends=gtk3,gtk4"
+EXTRA_OEMESON = "-Dbackends=gtk3${@bb.utils.contains('DISTRO_FEATURES', 'opengl', ',gtk4', '', d)}"

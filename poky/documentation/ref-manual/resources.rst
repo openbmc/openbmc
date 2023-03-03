@@ -173,7 +173,7 @@ Here is a list of resources you might find helpful:
 -  :yocto_wiki:`FAQ </FAQ>`: A list of commonly asked
    questions and their answers.
 
--  :yocto_docs:`Release Information </migration-guides/>`:
+-  :doc:`Release Information </migration-guides/index>`:
    Migration guides, release notes, new features, updates and known issues
    for the current and past releases of the Yocto Project.
 

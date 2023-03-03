@@ -16,7 +16,7 @@ def func(x, y, returned=None, error=None):
 
 proxy.Method(a, b, callback=func, callback_args=(x, y))
 
-Upstream-Status: Cherry-pick [https://src.fedoraproject.org/cgit/rpms/python-pydbus.git/]
+Upstream-Status: Backport [https://src.fedoraproject.org/cgit/rpms/python-pydbus.git/]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---

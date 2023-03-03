@@ -23,6 +23,7 @@ SRC_URI = "https://sourceware.org/elfutils/ftp/${PV}/${BP}.tar.bz2 \
            file://0001-tests-Makefile.am-compile-test_nlist-with-standard-C.patch \
            file://0001-PR29926-debuginfod-Fix-usage-of-deprecated-CURLINFO_.patch \
            file://0002-debuginfod-client-Use-CURLOPT_PROTOCOLS_STR-for-libc.patch \
+           file://handle_DW_TAG_unspecified_type.patch \
            "
 SRC_URI:append:libc-musl = " \
            file://0003-musl-utils.patch \
@@ -98,8 +99,6 @@ do_install_ptest() {
 		cp -r ${B}/debuginfod                   ${D}${PTEST_PATH}
 		sed -i '/^Makefile:/c Makefile:'        ${D}${PTEST_PATH}/tests/Makefile
 		find ${D}${PTEST_PATH} -type f -name *.[hoc] | xargs -i rm {}
-		# TODO: remove below filter after https://sourceware.org/bugzilla/show_bug.cgi?id=30047 is fixed
-		sed -i -e '/funcretval/d' ${D}${PTEST_PATH}/tests/run-native-test.sh
 	fi
 }
 

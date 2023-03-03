@@ -1,0 +1,58 @@
+From 9c7654e063d65fb2645459a32fd14eebab484857 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 1 Mar 2023 15:50:26 -0800
+Subject: [PATCH] vtepty.cc: Do not typecast to GSpawnFlags
+
+GSpawnFlags is enum with max value 1 << 15 which means it fits into a
+short int, however here we are OR'ing VTE_SPAWN_* as well which have
+higher values
+
+Fixes error like
+src/vtepty.cc:577:16: error: integer value 234881535 is outside the valid range of values [0, 4095] for this enumeration type [-Wenum-constexpr-conversion]
+
+Fixes issue https://gitlab.gnome.org/GNOME/vte/-/issues/2618
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/vte/-/issues/2618]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/vtepty.cc | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/src/vtepty.cc b/src/vtepty.cc
+index 3aaa0d6b..2da2675f 100644
+--- a/src/vtepty.cc
++++ b/src/vtepty.cc
+@@ -574,18 +574,18 @@ catch (...)
+ static constexpr inline auto
+ all_spawn_flags() noexcept
+ {
+-        return GSpawnFlags(G_SPAWN_LEAVE_DESCRIPTORS_OPEN |
+-                           G_SPAWN_DO_NOT_REAP_CHILD |
+-                           G_SPAWN_SEARCH_PATH |
+-                           G_SPAWN_STDOUT_TO_DEV_NULL |
+-                           G_SPAWN_STDERR_TO_DEV_NULL |
+-                           G_SPAWN_CHILD_INHERITS_STDIN |
+-                           G_SPAWN_FILE_AND_ARGV_ZERO |
+-                           G_SPAWN_SEARCH_PATH_FROM_ENVP |
+-                           G_SPAWN_CLOEXEC_PIPES |
+-                           VTE_SPAWN_NO_PARENT_ENVV |
+-                           VTE_SPAWN_NO_SYSTEMD_SCOPE |
+-                           VTE_SPAWN_REQUIRE_SYSTEMD_SCOPE);
++        return (G_SPAWN_LEAVE_DESCRIPTORS_OPEN |
++                G_SPAWN_DO_NOT_REAP_CHILD |
++                G_SPAWN_SEARCH_PATH |
++                G_SPAWN_STDOUT_TO_DEV_NULL |
++                G_SPAWN_STDERR_TO_DEV_NULL |
++                G_SPAWN_CHILD_INHERITS_STDIN |
++                G_SPAWN_FILE_AND_ARGV_ZERO |
++                G_SPAWN_SEARCH_PATH_FROM_ENVP |
++                G_SPAWN_CLOEXEC_PIPES |
++                VTE_SPAWN_NO_PARENT_ENVV |
++                VTE_SPAWN_NO_SYSTEMD_SCOPE |
++                VTE_SPAWN_REQUIRE_SYSTEMD_SCOPE);
+ }
+ 
+ static constexpr inline auto
+-- 
+2.39.2
+

@@ -1,8 +1,3 @@
-# glib
-ac_cv_alignof_guint32=4
-ac_cv_alignof_guint64=8
-ac_cv_alignof_unsigned_long=4
-
 # at-spi2-core
 ac_cv_alignof_char=1
 ac_cv_alignof_dbind_pointer=4

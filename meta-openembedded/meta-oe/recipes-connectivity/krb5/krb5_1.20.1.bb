@@ -196,3 +196,6 @@ pkg_postinst:${PN}-kdc () {
 }
 
 BBCLASSEXTEND = "native nativesdk"
+
+inherit multilib_script
+MULTILIB_SCRIPTS = "${PN}-user:${bindir}/krb5-config"

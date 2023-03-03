@@ -208,7 +208,7 @@ fakeroot python do_populate_sdk() {
 }
 SSTATETASKS += "do_populate_sdk"
 SSTATE_SKIP_CREATION:task-populate-sdk = '1'
-do_populate_sdk[cleandirs] = "${SDKDEPLOYDIR}"
+do_populate_sdk[cleandirs] += "${SDKDEPLOYDIR}"
 do_populate_sdk[sstate-inputdirs] = "${SDKDEPLOYDIR}"
 do_populate_sdk[sstate-outputdirs] = "${SDK_DEPLOY}"
 do_populate_sdk[stamp-extra-info] = "${MACHINE_ARCH}${SDKMACHINE}"

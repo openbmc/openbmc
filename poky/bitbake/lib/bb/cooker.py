@@ -229,24 +229,26 @@ class BBCooker:
             self.handlePRServ()
 
     def setupConfigWatcher(self):
-        if self.configwatcher:
-            self.configwatcher.close()
-            self.confignotifier = None
-            self.configwatcher = None
-        self.configwatcher = pyinotify.WatchManager()
-        self.configwatcher.bbseen = set()
-        self.configwatcher.bbwatchedfiles = set()
-        self.confignotifier = pyinotify.Notifier(self.configwatcher, self.config_notifications)
+        with bb.utils.lock_timeout(self.inotify_threadlock):
+            if self.configwatcher:
+                self.configwatcher.close()
+                self.confignotifier = None
+                self.configwatcher = None
+            self.configwatcher = pyinotify.WatchManager()
+            self.configwatcher.bbseen = set()
+            self.configwatcher.bbwatchedfiles = set()
+            self.confignotifier = pyinotify.Notifier(self.configwatcher, self.config_notifications)
 
     def setupParserWatcher(self):
-        if self.watcher:
-            self.watcher.close()
-            self.notifier = None
-            self.watcher = None
-        self.watcher = pyinotify.WatchManager()
-        self.watcher.bbseen = set()
-        self.watcher.bbwatchedfiles = set()
-        self.notifier = pyinotify.Notifier(self.watcher, self.notifications)
+        with bb.utils.lock_timeout(self.inotify_threadlock):
+            if self.watcher:
+                self.watcher.close()
+                self.notifier = None
+                self.watcher = None
+            self.watcher = pyinotify.WatchManager()
+            self.watcher.bbseen = set()
+            self.watcher.bbwatchedfiles = set()
+            self.notifier = pyinotify.Notifier(self.watcher, self.notifications)
 
     def process_inotify_updates(self):
         with bb.utils.lock_timeout(self.inotify_threadlock):
@@ -337,12 +339,21 @@ class BBCooker:
                         providerlog.error("Root privilege is required to modify max_user_watches.")
                     raise
 
+    def handle_inotify_updates(self):
+        # reload files for which we got notifications
+        for p in self.inotify_modified_files:
+            bb.parse.update_cache(p)
+            if p in bb.parse.BBHandler.cached_statements:
+                del bb.parse.BBHandler.cached_statements[p]
+        self.inotify_modified_files = []
+
     def sigterm_exception(self, signum, stackframe):
         if signum == signal.SIGTERM:
             bb.warn("Cooker received SIGTERM, shutting down...")
         elif signum == signal.SIGHUP:
             bb.warn("Cooker received SIGHUP, shutting down...")
         self.state = state.forceshutdown
+        bb.event._should_exit.set()
 
     def setFeatures(self, features):
         # we only accept a new feature set if we're in state initial, so we can reset without problems
@@ -365,6 +376,7 @@ class BBCooker:
             if mod not in self.orig_sysmodules:
                 del sys.modules[mod]
 
+        self.handle_inotify_updates()
         self.setupConfigWatcher()
 
         # Need to preserve BB_CONSOLELOG over resets
@@ -1518,6 +1530,7 @@ class BBCooker:
             msg = None
             interrupted = 0
             if halt or self.state == state.forceshutdown:
+                bb.event._should_exit.set()
                 rq.finish_runqueue(True)
                 msg = "Forced shutdown"
                 interrupted = 2
@@ -1610,12 +1623,7 @@ class BBCooker:
         if self.state == state.running:
             return
 
-        # reload files for which we got notifications
-        for p in self.inotify_modified_files:
-            bb.parse.update_cache(p)
-            if p in bb.parse.BBHandler.cached_statements:
-                del bb.parse.BBHandler.cached_statements[p]
-        self.inotify_modified_files = []
+        self.handle_inotify_updates()
 
         if not self.baseconfig_valid:
             logger.debug("Reloading base configuration data")
@@ -1758,6 +1766,7 @@ class BBCooker:
             self.state = state.forceshutdown
         else:
             self.state = state.shutdown
+        bb.event._should_exit.set()
 
         if self.parser:
             self.parser.shutdown(clean=False)
@@ -1768,6 +1777,7 @@ class BBCooker:
             self.parser.shutdown(clean=False)
             self.parser.final_cleanup()
         self.state = state.initial
+        bb.event._should_exit.clear()
 
     def reset(self):
         if hasattr(bb.parse, "siggen"):

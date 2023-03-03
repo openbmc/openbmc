@@ -5,7 +5,7 @@ Subject: [PATCH 1/2] To aviod buffer overflow in telnet
 
 This patch is from Fedora.
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 ---

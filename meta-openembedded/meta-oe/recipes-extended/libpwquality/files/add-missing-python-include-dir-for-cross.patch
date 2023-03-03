@@ -4,7 +4,7 @@ Date: Mon, 3 Aug 2015 13:43:14 +0800
 Subject: [PATCH] setup.py.in: add missing python include dir for cross
  compiling
 
-Upstream-Status: inappropriate [oe-core specific]
+Upstream-Status: Inappropriate [oe-core specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---

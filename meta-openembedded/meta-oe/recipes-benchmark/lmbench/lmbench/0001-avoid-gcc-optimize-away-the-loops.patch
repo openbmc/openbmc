@@ -3,7 +3,7 @@ From: Roy Li <rongqing.li@windriver.com>
 Date: Thu, 5 May 2016 09:52:01 +0800
 Subject: [PATCH] [PATCH] avoid gcc optimize-away the loops
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Change expression used in do_integer_mul and do_uint64_mul
 benchmarks so GCC doesn't optimize-away the loops, other

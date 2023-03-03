@@ -1,0 +1,27 @@
+From 989b87ae46b3183a742031373fbb3e912ab9b666 Mon Sep 17 00:00:00 2001
+From: Andrey Filipenkov <decapitator@ukr.net>
+Date: Wed, 2 Nov 2022 13:38:40 +0300
+Subject: [PATCH] fix building on macOS
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport [https://github.com/unfs3/unfs3/commit/989b87ae46b3183a742031373fbb3e912ab9b666]
+---
+ attr.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/attr.c b/attr.c
+index 6253e84..0ce9375 100644
+--- a/attr.c
++++ b/attr.c
+@@ -18,6 +18,8 @@
+ #include <utime.h>
+ #include <errno.h>
+ #include <dirent.h>
++#include <stdlib.h>
++#include <string.h>
+ 
+ #include "backend.h"
+ #include "nfs.h"
+-- 
+2.39.1
+

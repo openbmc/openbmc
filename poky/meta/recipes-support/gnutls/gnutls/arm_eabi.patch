@@ -1,4 +1,4 @@
-From 8a5c96057cf305bbeac0d6e0e59ee24fbb9497fe Mon Sep 17 00:00:00 2001
+From 911213d9f72ddce468322d22d223127b93964409 Mon Sep 17 00:00:00 2001
 From: Joe Slater <jslater@windriver.com>
 Date: Wed, 25 Jan 2017 13:52:59 -0800
 Subject: [PATCH] gnutls: account for ARM_EABI
@@ -15,10 +15,10 @@ Signed-off-by: Joe Slater <jslater@windriver.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/tests/seccomp.c b/tests/seccomp.c
-index ed14d00..3c5b726 100644
+index a3148fe..443bc5f 100644
 --- a/tests/seccomp.c
 +++ b/tests/seccomp.c
-@@ -53,7 +53,9 @@ int disable_system_calls(void)
+@@ -52,7 +52,9 @@ int disable_system_calls(void)
  
  	ADD_SYSCALL(nanosleep, 0);
  	ADD_SYSCALL(clock_nanosleep, 0);
@@ -27,4 +27,4 @@ index ed14d00..3c5b726 100644
 +#endif
  	ADD_SYSCALL(getpid, 0);
  	ADD_SYSCALL(gettimeofday, 0);
- #if defined(HAVE_CLOCK_GETTIME)
+ # if defined(HAVE_CLOCK_GETTIME)

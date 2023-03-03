@@ -5,7 +5,7 @@ Subject: [PATCH] build: Do not build .sgml file
 
 It needs docbook-to-man tool which we do not have recipe for
 
-Upstream-Status: OE-Specific [needs native docbook-to-man tool]
+Upstream-Status: Inappropriate [needs native docbook-to-man tool]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---

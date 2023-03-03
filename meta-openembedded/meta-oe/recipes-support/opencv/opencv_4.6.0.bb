@@ -12,40 +12,19 @@ DEPENDS = "libtool swig-native bzip2 zlib glib-2.0 libwebp"
 
 SRCREV_opencv = "b0dc474160e389b9c9045da5db49d03ae17c6a6b"
 SRCREV_contrib = "7b77c355a8fdc97667b3fa1e7a0d37e4973fc868"
-SRCREV_ipp = "a56b6ac6f030c312b2dce17430eef13aed9af274"
 SRCREV_boostdesc = "34e4206aef44d50e6bbcd0ab06354b52e7466d26"
 SRCREV_vgg = "fccf7cd6a4b12079f73bbfb21745f9babcd4eb1d"
 SRCREV_face = "8afa57abc8229d611c4937165d20e2a2d9fc5a12"
 SRCREV_wechat-qrcode = "a8b69ccc738421293254aec5ddb38bd523503252"
 
-def ipp_filename(d):
-    import re
-    arch = d.getVar('TARGET_ARCH')
-    if re.match("i.86$", arch):
-        return "ippicv_2020_lnx_ia32_20191018_general.tgz"
-    else:
-        return "ippicv_2020_lnx_intel64_20191018_general.tgz"
-
-def ipp_md5sum(d):
-    import re
-    arch = d.getVar('TARGET_ARCH')
-    if re.match("i.86$", arch):
-        return "ad189a940fb60eb71f291321322fe3e8"
-    else:
-        return "7421de0095c7a39162ae13a6098782f9"
-
-IPP_FILENAME = "${@ipp_filename(d)}"
-IPP_MD5 = "${@ipp_md5sum(d)}"
 
 SRCREV_FORMAT = "opencv_contrib_ipp_boostdesc_vgg"
 SRC_URI = "git://github.com/opencv/opencv.git;name=opencv;branch=master;protocol=https \
            git://github.com/opencv/opencv_contrib.git;destsuffix=git/contrib;name=contrib;branch=master;protocol=https \
-           git://github.com/opencv/opencv_3rdparty.git;branch=ippicv/master_20191018;destsuffix=git/ipp;name=ipp;protocol=https \
            git://github.com/opencv/opencv_3rdparty.git;branch=contrib_xfeatures2d_boostdesc_20161012;destsuffix=git/boostdesc;name=boostdesc;protocol=https \
            git://github.com/opencv/opencv_3rdparty.git;branch=contrib_xfeatures2d_vgg_20160317;destsuffix=git/vgg;name=vgg;protocol=https \
            git://github.com/opencv/opencv_3rdparty.git;branch=contrib_face_alignment_20170818;destsuffix=git/face;name=face;protocol=https \
            git://github.com/WeChatCV/opencv_3rdparty.git;branch=wechat_qrcode;destsuffix=git/wechat_qrcode;name=wechat-qrcode;protocol=https \
-           file://0001-3rdparty-ippicv-Use-pre-downloaded-ipp.patch \
            file://0003-To-fix-errors-as-following.patch \
            file://0001-Temporarliy-work-around-deprecated-ffmpeg-RAW-functi.patch \
            file://0001-Dont-use-isystem.patch \
@@ -63,7 +42,6 @@ S = "${WORKDIR}/git"
 OPENCV_DLDIR = "${WORKDIR}/downloads"
 
 do_unpack_extra() {
-    tar xzf ${S}/ipp/ippicv/${IPP_FILENAME} -C ${S}
 
     md5() {
         # Return the MD5 of $1
@@ -92,8 +70,7 @@ EXTRA_OECMAKE = "-DOPENCV_EXTRA_MODULES_PATH=${S}/contrib/modules \
     -DWITH_1394=OFF \
     -DENABLE_PRECOMPILED_HEADERS=OFF \
     -DCMAKE_SKIP_RPATH=ON \
-    -DOPENCV_ICV_HASH=${IPP_MD5} \
-    -DIPPROOT=${S}/ippicv_lnx \
+    -DWITH_IPP=OFF \
     -DOPENCV_GENERATE_PKGCONFIG=ON \
     -DOPENCV_DOWNLOAD_PATH=${OPENCV_DLDIR} \
     -DOPENCV_ALLOW_DOWNLOADS=OFF \

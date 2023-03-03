@@ -3,6 +3,32 @@ From: Zuzana Svetlikova <zsvetlik@redhat.com>
 Date: Thu, 27 Apr 2017 14:25:42 +0200
 Subject: [PATCH] Disable running gyp on shared deps
 
+Upstream-Status: Inappropriate [embedded specific]
+
+Probably imported from:
+https://src.fedoraproject.org/rpms/nodejs/c/41af04f2a3c050fb44628e91ac65fd225b927acb?branch=22609d8c1bfeaa21fe0057645af20b3a2ccc7f53
+which is probably based on dont-run-gyp-files-for-bundled-deps.patch added in:
+https://github.com/alpinelinux/aports/commit/6662eb3199902e8451fb20dce82554ad96f796bb
+
+We also explicitly prune some dependencies from source in the bitbake recipe:
+
+python prune_sources() {
+    import shutil
+
+    shutil.rmtree(d.getVar('S') + '/deps/openssl')
+    if 'ares' in d.getVar('PACKAGECONFIG'):
+        shutil.rmtree(d.getVar('S') + '/deps/cares')
+    if 'brotli' in d.getVar('PACKAGECONFIG'):
+        shutil.rmtree(d.getVar('S') + '/deps/brotli')
+    if 'libuv' in d.getVar('PACKAGECONFIG'):
+        shutil.rmtree(d.getVar('S') + '/deps/uv')
+    if 'nghttp2' in d.getVar('PACKAGECONFIG'):
+        shutil.rmtree(d.getVar('S') + '/deps/nghttp2')
+    if 'zlib' in d.getVar('PACKAGECONFIG'):
+        shutil.rmtree(d.getVar('S') + '/deps/zlib')
+}
+do_unpack[postfuncs] += "prune_sources"
+
 ---
  Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

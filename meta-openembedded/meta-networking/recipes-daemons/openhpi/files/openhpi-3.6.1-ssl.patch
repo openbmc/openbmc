@@ -6,7 +6,7 @@ Taken from Fedora
 https://src.fedoraproject.org/rpms/openhpi/c/be77f5484b0206f8946a85b29424ea10bf863063
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-Upstream-Status: Unknown
+Upstream-Status: Pending [Unknown]
 
 diff -up openhpi-3.6.1/ssl/Makefile.am.than openhpi-3.6.1/ssl/Makefile.am
 --- openhpi-3.6.1/ssl/Makefile.am.than	2017-02-21 12:21:12.114814698 -0500

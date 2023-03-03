@@ -3,7 +3,7 @@ From: Matteo Croce <mcroce@microsoft.com>
 Date: Wed, 15 Sep 2021 17:54:01 +0200
 Subject: [PATCH] Use /usr/bin/env python3 instead of just /usr/bin/python3
 
-Upstream-Status: inappropriate [OE specific]
+Upstream-Status: Inappropriate [OE specific]
 
 ---
  ostra/ostra-cg        | 2 +-

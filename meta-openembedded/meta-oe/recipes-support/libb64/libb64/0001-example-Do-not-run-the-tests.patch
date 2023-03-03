@@ -3,7 +3,7 @@ From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 27 Mar 2021 21:41:04 -0700
 Subject: [PATCH] example: Do not run the tests
 
-Upstream-Status: Inappropritate [Cross-compile specific]
+Upstream-Status: Inappropriate [Cross-compile specific]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  examples/Makefile | 3 ---

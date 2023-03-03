@@ -1,6 +1,6 @@
 Add a description to the AC_DEFINE statements so that it appears in config.h and silences a fatal warning.
 
-Upstream-Status:Pending
+Upstream-Status: Pending
 Signed-off-by: Matthieu Crapet <Matthieu.Crapet@ingenico.com>
 ---
  configure.in | 6 +++---

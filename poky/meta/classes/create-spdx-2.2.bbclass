@@ -14,6 +14,8 @@ CVE_VERSION ??= "${PV}"
 SPDXDIR ??= "${WORKDIR}/spdx"
 SPDXDEPLOY = "${SPDXDIR}/deploy"
 SPDXWORK = "${SPDXDIR}/work"
+SPDXIMAGEWORK = "${SPDXDIR}/image-work"
+SPDXSDKWORK = "${SPDXDIR}/sdk-work"
 
 SPDX_TOOL_NAME ??= "oe-spdx-creator"
 SPDX_TOOL_VERSION ??= "1.0"
@@ -29,6 +31,8 @@ SPDX_NAMESPACE_PREFIX ??= "http://spdx.org/spdxdoc"
 SPDX_PRETTY ??= "0"
 
 SPDX_LICENSES ??= "${COREBASE}/meta/files/spdx-licenses.json"
+
+SPDX_CUSTOM_ANNOTATION_VARS ??= ""
 
 SPDX_ORG ??= "OpenEmbedded ()"
 SPDX_SUPPLIER ??= "Organization: ${SPDX_ORG}"
@@ -402,6 +406,53 @@ def collect_dep_sources(d, dep_recipes):
 
     return sources
 
+def add_download_packages(d, doc, recipe):
+    import os.path
+    from bb.fetch2 import decodeurl, CHECKSUM_LIST
+    import bb.process
+    import oe.spdx
+    import oe.sbom
+
+    for download_idx, src_uri in enumerate(d.getVar('SRC_URI').split()):
+        f = bb.fetch2.FetchData(src_uri, d)
+
+        for name in f.names:
+            package = oe.spdx.SPDXPackage()
+            package.name = "%s-source-%d" % (d.getVar("PN"), download_idx + 1)
+            package.SPDXID = oe.sbom.get_download_spdxid(d, download_idx + 1)
+
+            if f.type == "file":
+                continue
+
+            uri = f.type
+            proto = getattr(f, "proto", None)
+            if proto is not None:
+                uri = uri + "+" + proto
+            uri = uri + "://" + f.host + f.path
+
+            if f.method.supports_srcrev():
+                uri = uri + "@" + f.revisions[name]
+
+            if f.method.supports_checksum(f):
+                for checksum_id in CHECKSUM_LIST:
+                    if checksum_id.upper() not in oe.spdx.SPDXPackage.ALLOWED_CHECKSUMS:
+                        continue
+
+                    expected_checksum = getattr(f, "%s_expected" % checksum_id)
+                    if expected_checksum is None:
+                        continue
+
+                    c = oe.spdx.SPDXChecksum()
+                    c.algorithm = checksum_id.upper()
+                    c.checksumValue = expected_checksum
+                    package.checksums.append(c)
+
+            package.downloadLocation = uri
+            doc.packages.append(package)
+            doc.add_relationship(doc, "DESCRIBES", package)
+            # In the future, we might be able to do more fancy dependencies,
+            # but this should be sufficient for now
+            doc.add_relationship(package, "BUILD_DEPENDENCY_OF", recipe)
 
 python do_create_spdx() {
     from datetime import datetime, timezone
@@ -455,14 +506,6 @@ python do_create_spdx() {
     if bb.data.inherits_class("native", d) or bb.data.inherits_class("cross", d):
         recipe.annotations.append(create_annotation(d, "isNative"))
 
-    for s in d.getVar('SRC_URI').split():
-        if not s.startswith("file://"):
-            s = s.split(';')[0]
-            recipe.downloadLocation = s
-            break
-    else:
-        recipe.downloadLocation = "NOASSERTION"
-
     homepage = d.getVar("HOMEPAGE")
     if homepage:
         recipe.homepage = homepage
@@ -478,6 +521,10 @@ python do_create_spdx() {
     description = d.getVar("DESCRIPTION")
     if description:
         recipe.description = description
+
+    if d.getVar("SPDX_CUSTOM_ANNOTATION_VARS"):
+        for var in d.getVar('SPDX_CUSTOM_ANNOTATION_VARS').split():
+            recipe.annotations.append(create_annotation(d, var + "=" + d.getVar(var)))
 
     # Some CVEs may be patched during the build process without incrementing the version number,
     # so querying for CVEs based on the CPE id can lead to false positives. To account for this,
@@ -499,6 +546,8 @@ python do_create_spdx() {
 
     doc.packages.append(recipe)
     doc.add_relationship(doc, "DESCRIBES", recipe)
+
+    add_download_packages(d, doc, recipe)
 
     if process_sources(d) and include_sources:
         recipe_archive = deploy_dir_spdx / "recipes" / (doc.name + ".tar.zst")
@@ -821,10 +870,12 @@ def spdx_get_src(d):
         d.setVar("WORKDIR", workdir)
 
 do_rootfs[recrdeptask] += "do_create_spdx do_create_runtime_spdx"
+do_rootfs[cleandirs] += "${SPDXIMAGEWORK}"
 
 ROOTFS_POSTUNINSTALL_COMMAND =+ "image_combine_spdx ; "
 
 do_populate_sdk[recrdeptask] += "do_create_spdx do_create_runtime_spdx"
+do_populate_sdk[cleandirs] += "${SPDXSDKWORK}"
 POPULATE_SDK_POST_HOST_COMMAND:append:task-populate-sdk = " sdk_host_combine_spdx; "
 POPULATE_SDK_POST_TARGET_COMMAND:append:task-populate-sdk = " sdk_target_combine_spdx; "
 
@@ -840,7 +891,7 @@ python image_combine_spdx() {
     img_spdxid = oe.sbom.get_image_spdxid(image_name)
     packages = image_list_installed_packages(d)
 
-    combine_spdx(d, image_name, imgdeploydir, img_spdxid, packages)
+    combine_spdx(d, image_name, imgdeploydir, img_spdxid, packages, Path(d.getVar("SPDXIMAGEWORK")))
 
     def make_image_link(target_path, suffix):
         if image_link_name:
@@ -848,12 +899,8 @@ python image_combine_spdx() {
             if link != target_path:
                 link.symlink_to(os.path.relpath(target_path, link.parent))
 
-    image_spdx_path = imgdeploydir / (image_name + ".spdx.json")
-    make_image_link(image_spdx_path, ".spdx.json")
     spdx_tar_path = imgdeploydir / (image_name + ".spdx.tar.zst")
     make_image_link(spdx_tar_path, ".spdx.tar.zst")
-    spdx_index_path = imgdeploydir / (image_name + ".spdx.index.json")
-    make_image_link(spdx_index_path, ".spdx.index.json")
 }
 
 python sdk_host_combine_spdx() {
@@ -873,9 +920,9 @@ def sdk_combine_spdx(d, sdk_type):
     sdk_deploydir = Path(d.getVar("SDKDEPLOYDIR"))
     sdk_spdxid = oe.sbom.get_sdk_spdxid(sdk_name)
     sdk_packages = sdk_list_installed_packages(d, sdk_type == "target")
-    combine_spdx(d, sdk_name, sdk_deploydir, sdk_spdxid, sdk_packages)
+    combine_spdx(d, sdk_name, sdk_deploydir, sdk_spdxid, sdk_packages, Path(d.getVar('SPDXSDKWORK')))
 
-def combine_spdx(d, rootfs_name, rootfs_deploydir, rootfs_spdxid, packages):
+def combine_spdx(d, rootfs_name, rootfs_deploydir, rootfs_spdxid, packages, spdx_workdir):
     import os
     import oe.spdx
     import oe.sbom
@@ -944,7 +991,7 @@ def combine_spdx(d, rootfs_name, rootfs_deploydir, rootfs_spdxid, packages):
             comment="Runtime dependencies for %s" % name
         )
 
-    image_spdx_path = rootfs_deploydir / (rootfs_name + ".spdx.json")
+    image_spdx_path = spdx_workdir / (rootfs_name + ".spdx.json")
 
     with image_spdx_path.open("wb") as f:
         doc.to_json(f, sort_keys=True, indent=get_json_indent(d))
@@ -1020,7 +1067,3 @@ def combine_spdx(d, rootfs_name, rootfs_deploydir, rootfs_spdxid, packages):
             info.gname = "root"
 
             tar.addfile(info, fileobj=index_str)
-
-    spdx_index_path = rootfs_deploydir / (rootfs_name + ".spdx.index.json")
-    with spdx_index_path.open("w") as f:
-        json.dump(index, f, sort_keys=True, indent=get_json_indent(d))

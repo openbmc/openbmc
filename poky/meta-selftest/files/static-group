@@ -24,3 +24,5 @@ weston-launch:x:524:
 weston:x:525:
 wayland:x:526:
 render:x:527:
+sgx:x:528:
+ptest:x:529:

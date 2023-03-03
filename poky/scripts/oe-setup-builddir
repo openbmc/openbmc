@@ -62,7 +62,7 @@ fi
 
 unset SHOWYPDOC
 if [ -z "$OECORELOCALCONF" ]; then
-    OECORELOCALCONF="$OEROOT/meta/conf/local.conf.sample"
+    OECORELOCALCONF="$OEROOT/meta/conf/templates/default/local.conf.sample"
 fi
 if [ ! -r "$BUILDDIR/conf/local.conf" ]; then
     cat <<EOM
@@ -77,7 +77,7 @@ EOM
 fi
 
 if [ -z "$OECORELAYERCONF" ]; then
-    OECORELAYERCONF="$OEROOT/meta/conf/bblayers.conf.sample"
+    OECORELAYERCONF="$OEROOT/meta/conf/templates/default/bblayers.conf.sample"
 fi
 if [ ! -r "$BUILDDIR/conf/bblayers.conf" ]; then
     cat <<EOM
@@ -117,7 +117,7 @@ EOM
 fi
 
 if [ -z "$OECORENOTESCONF" ]; then
-    OECORENOTESCONF="$OEROOT/meta/conf/conf-notes.txt"
+    OECORENOTESCONF="$OEROOT/meta/conf/templates/default/conf-notes.txt"
 fi
 [ ! -r "$OECORENOTESCONF" ] || cat "$OECORENOTESCONF"
 unset OECORENOTESCONF

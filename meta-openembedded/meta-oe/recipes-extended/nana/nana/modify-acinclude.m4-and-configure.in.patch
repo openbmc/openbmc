@@ -7,7 +7,7 @@ this patch is from Debian to fix build errors.
 "acinclude.m4:34: error: automatic de-ANSI-fication
 support has been removed"
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 ---

@@ -9,11 +9,10 @@ SRC_URI = "gitsm://github.com/KhronosGroup/Vulkan-Samples.git;branch=main;protoc
            file://debugfix.patch \
            file://0001-Do-not-use-LFS64-functions-on-linux-musl.patch;patchdir=third_party/spdlog \
            file://0001-Deprecate-u8string_view.patch;patchdir=third_party/spdlog \
-           file://0001-parser.h-Including-missing-cstdint.patch \
            "
 
 UPSTREAM_CHECK_COMMITS = "1"
-SRCREV = "a42d4eab1e5fe7814dfbe91e3bbaf8ab62cf03f6"
+SRCREV = "3df7dba1b1f428f24cd9a242af78540a518f4b67"
 
 UPSTREAM_CHECK_GITTAGREGEX = "These are not the releases you're looking for"
 S = "${WORKDIR}/git"

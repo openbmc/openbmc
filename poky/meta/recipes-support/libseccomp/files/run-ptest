@@ -1,4 +1,7 @@
 #!/bin/sh
 
 cd tests
+sed -i 's/SUCCESS/PASS/g; s/FAILURE/FAIL/g; s/SKIPPED/SKIP/g' regression
+sed -i 's/"Test %s result:   %s\\n" "$1" "$2"/"%s: %s\\n" "$2" "$1"/g' regression
+sed -i 's/"Test %s result:   %s %s\\n" "$1" "$2" "$3"/"%s: %s %s\\n" "$2" "$1" "$3"/g' regression
 ./regression -a

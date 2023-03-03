@@ -10,7 +10,7 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index 0368e41..53d6a9d 100644
+index 97973ce..78273ff 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -8,7 +8,6 @@ BUILDFLAGS = \
@@ -20,7 +20,7 @@ index 0368e41..53d6a9d 100644
 -	-Werror \
  	$(NULL)
  
- SRCS = \
+ TESTFLAGS =	\
 -- 
-2.25.1
+2.34.1
 

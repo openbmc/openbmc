@@ -8,7 +8,7 @@ Do not compile man dir since error always occur.
  | make[2]: *** [sessreg.1] Error 1
 It is not a good way.But can remove it from SKIP_RECIPE.
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 ---

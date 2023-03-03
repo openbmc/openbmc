@@ -378,14 +378,7 @@ command::
 Unless you provide a specific recipe name on the command line, the
 command checks all recipes in all configured layers.
 
-Following is a partial example table that reports on all the recipes.
-Notice the reported reason for not upgrading the ``base-passwd`` recipe.
-In this example, while a new version is available upstream, you do not
-want to use it because the dependency on ``cdebconf`` is not easily
-satisfied. Maintainers can explicit the reason that is shown by adding
-the :term:`RECIPE_NO_UPDATE_REASON` variable to the corresponding recipe.
-See :yocto_git:`base-passwd.bb </poky/tree/meta/recipes-core/base-passwd/base-passwd_3.5.29.bb>`
-for an example::
+Following is a partial example table that reports on all the recipes::
 
    $ devtool check-upgrade-status
    ...
@@ -395,6 +388,16 @@ for an example::
    INFO: openssl                   1.1.1l          3.0.0           Alexander Kanavin <alex.kanavin@gmail.com>
    INFO: base-passwd               3.5.29          3.5.51          Anuj Mittal <anuj.mittal@intel.com>  cannot be updated due to: Version 3.5.38 requires cdebconf for update-passwd utility
    ...
+
+Notice the reported reason for not upgrading the ``base-passwd`` recipe.
+In this example, while a new version is available upstream, you do not
+want to use it because the dependency on ``cdebconf`` is not easily
+satisfied. Maintainers can explicit the reason that is shown by adding
+the :term:`RECIPE_NO_UPDATE_REASON` variable to the corresponding recipe.
+See :yocto_git:`base-passwd.bb </poky/tree/meta/recipes-core/base-passwd/base-passwd_3.5.29.bb?h=kirkstone>`
+for an example::
+
+   RECIPE_NO_UPDATE_REASON = "Version 3.5.38 requires cdebconf for update-passwd utility"
 
 Last but not least, you may set :term:`UPSTREAM_VERSION_UNKNOWN` to ``1``
 in a recipe when there's currently no way to determine its latest upstream

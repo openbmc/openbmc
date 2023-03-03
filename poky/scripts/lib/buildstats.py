@@ -79,8 +79,8 @@ class BSTask(dict):
             return self['rusage']['ru_oublock']
 
     @classmethod
-    def from_file(cls, buildstat_file):
-        """Read buildstat text file"""
+    def from_file(cls, buildstat_file, fallback_end=0):
+        """Read buildstat text file. fallback_end is an optional end time for tasks that are not recorded as finishing."""
         bs_task = cls()
         log.debug("Reading task buildstats from %s", buildstat_file)
         end_time = None
@@ -108,7 +108,10 @@ class BSTask(dict):
                     bs_task[ru_type][ru_key] = val
                 elif key == 'Status':
                     bs_task['status'] = val
-        if end_time is not None and start_time is not None:
+        # If the task didn't finish, fill in the fallback end time if specified
+        if start_time and not end_time and fallback_end:
+            end_time = fallback_end
+        if start_time and end_time:
             bs_task['elapsed_time'] = end_time - start_time
         else:
             raise BSError("{} looks like a invalid buildstats file".format(buildstat_file))
@@ -226,15 +229,33 @@ class BuildStats(dict):
         epoch = match.group('epoch')
         return name, epoch, version, revision
 
+    @staticmethod
+    def parse_top_build_stats(path):
+        """
+        Parse the top-level build_stats file for build-wide start and duration.
+        """
+        with open(path) as fobj:
+            for line in fobj.readlines():
+                key, val = line.split(':', 1)
+                val = val.strip()
+                if key == 'Build Started':
+                    start = float(val)
+                elif key == "Elapsed time":
+                    elapsed = float(val.split()[0])
+        return start, elapsed
+
     @classmethod
     def from_dir(cls, path):
         """Load buildstats from a buildstats directory"""
-        if not os.path.isfile(os.path.join(path, 'build_stats')):
+        top_stats = os.path.join(path, 'build_stats')
+        if not os.path.isfile(top_stats):
             raise BSError("{} does not look like a buildstats directory".format(path))
 
         log.debug("Reading buildstats directory %s", path)
-
         buildstats = cls()
+        build_started, build_elapsed = buildstats.parse_top_build_stats(top_stats)
+        build_end = build_started + build_elapsed
+
         subdirs = os.listdir(path)
         for dirname in subdirs:
             recipe_dir = os.path.join(path, dirname)
@@ -244,7 +265,7 @@ class BuildStats(dict):
             bsrecipe = BSRecipe(name, epoch, version, revision)
             for task in os.listdir(recipe_dir):
                 bsrecipe.tasks[task] = BSTask.from_file(
-                    os.path.join(recipe_dir, task))
+                    os.path.join(recipe_dir, task), build_end)
             if name in buildstats:
                 raise BSError("Cannot handle multiple versions of the same "
                               "package ({})".format(name))

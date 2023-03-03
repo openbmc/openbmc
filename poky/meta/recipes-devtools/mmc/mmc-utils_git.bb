@@ -5,7 +5,7 @@ LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://mmc.c;beginline=1;endline=20;md5=fae32792e20f4d27ade1c5a762d16b7d"
 
 SRCBRANCH ?= "master"
-SRCREV = "c62dd8e415b12cc7f9a362db23cd384caf77ff03"
+SRCREV = "d4c2910981ff99b983734426dfa99632fb81ac6b"
 
 PV = "0.1+git${SRCPV}"
 

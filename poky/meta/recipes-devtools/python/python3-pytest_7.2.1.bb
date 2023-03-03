@@ -11,7 +11,7 @@ DEPENDS += "python3-setuptools-scm-native"
 
 inherit update-alternatives pypi python_setuptools_build_meta
 
-RDEPENDS:${PN}:class-target += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-atomicwrites \
     ${PYTHON_PN}-attrs \
     ${PYTHON_PN}-debugger \

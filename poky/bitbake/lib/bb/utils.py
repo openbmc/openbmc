@@ -1698,22 +1698,11 @@ def disable_network(uid=None, gid=None):
         f.write("%s %s 1" % (gid, gid))
 
 def export_proxies(d):
+    from bb.fetch2 import get_fetcher_environment
     """ export common proxies variables from datastore to environment """
-
-    variables = ['http_proxy', 'HTTP_PROXY', 'https_proxy', 'HTTPS_PROXY',
-                    'ftp_proxy', 'FTP_PROXY', 'no_proxy', 'NO_PROXY',
-                    'GIT_PROXY_COMMAND', 'SSL_CERT_FILE', 'SSL_CERT_DIR']
-
-    origenv = d.getVar("BB_ORIGENV")
-
-    for name in variables:
-        value = d.getVar(name)
-        if not value and origenv:
-            value = origenv.getVar(name)
-        if value:
-            os.environ[name] = value
-
-
+    newenv = get_fetcher_environment(d)
+    for v in newenv:
+        os.environ[v] = newenv[v]
 
 def load_plugins(logger, plugins, pluginpath):
     def load_plugin(name):

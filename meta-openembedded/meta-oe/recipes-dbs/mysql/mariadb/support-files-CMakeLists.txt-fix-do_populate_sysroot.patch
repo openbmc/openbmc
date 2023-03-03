@@ -7,7 +7,7 @@ Comment out the logic which for suse as it introduces
 below do_populate_sysroot error:
 ERROR: mariadb-native-10.3.13-r0 do_populate_sysroot: sstate found an absolute path symlink /build/tmp/work/x86_64-linux/mariadb-native/10.3.13-r0/sysroot-destdir/build/tmp/work/x86_64-linux/mariadb-native/10.3.13-r0/recipe-sysroot-native/usr/sbin/rcmysql pointing at /build/tmp/work/x86_64-linux/mariadb-native/10.3.13-r0/recipe-sysroot-native/etc/init.d/mysql. Please replace this with a relative link.
 
-Upstream-Status: Inappropriate[oe build specific]
+Upstream-Status: Inappropriate [oe build specific]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 

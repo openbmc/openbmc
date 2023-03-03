@@ -5,7 +5,7 @@ Subject: [PATCH] port-linux: Re-order header includes
 
 linux/if.h when included before net/if.h casues duplicate definitions
 
-Upstream-Status: Iappropriate [Upstream is Dead] 
+Upstream-Status: Inappropriate [Upstream is Dead]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  Port-linux/interface.c | 2 +-

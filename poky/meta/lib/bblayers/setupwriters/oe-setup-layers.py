@@ -33,6 +33,8 @@ class OeSetupLayersWriter():
 
     def do_write(self, parent, args):
         """ Writes out a python script and a json config that replicate the directory structure and revisions of the layers in a current build. """
+        if not os.path.exists(args.destdir):
+            os.makedirs(args.destdir)
         repos = parent.make_repo_config(args.destdir)
         json = {"version":"1.0","sources":repos}
         if not repos:

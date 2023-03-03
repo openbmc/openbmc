@@ -6,7 +6,7 @@ Subject: [PATCH] Makefile: tweak install dir
 For oe-core, the man doc should be installed to /usr/share/man
 rather than /usr/locale/man.
 
-Upstream-Status: inappropriate (oe specific)
+Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---

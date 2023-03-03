@@ -31,7 +31,7 @@ DEPENDS:append:arc = " libgcc"
 KERNEL_CC:append:arc = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD:append:arc = " ${TOOLCHAIN_OPTIONS}"
 
-KERNEL_FEATURES:append:qemuall=" features/debug/printk.scc"
+KERNEL_FEATURES:append:qemuall=" features/debug/printk.scc features/taskstats/taskstats.scc"
 
 KERNEL_FEATURES:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'efi', 'cfg/efi.scc', '', d)}"
 KERNEL_FEATURES:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'numa', 'features/numa/numa.scc', '', d)}"

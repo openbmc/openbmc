@@ -157,6 +157,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-gmqtt \
     python3-gnupg \
     python3-google-api-python-client \
+    python3-gpiod \
     python3-gpsd-py3 \
     python3-graphviz \
     python3-greenlet \

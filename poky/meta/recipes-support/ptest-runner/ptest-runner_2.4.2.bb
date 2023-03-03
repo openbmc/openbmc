@@ -32,3 +32,8 @@ RDEPENDS:${PN}:append:libc-glibc = " libgcc"
 
 # pstree is called by ptest-runner-collect-system-data
 RDEPENDS:${PN}:append = " pstree"
+
+# Create a non-root user that test suites can use easily
+inherit useradd
+USERADD_PACKAGES = "${PN}"
+USERADD_PARAM:${PN} = "--system --no-create-home --home / --user-group ptest"

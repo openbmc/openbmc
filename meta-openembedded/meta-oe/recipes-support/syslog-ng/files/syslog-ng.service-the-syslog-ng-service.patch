@@ -1,7 +1,7 @@
 Subject: [PATCH] syslog-ng.service: the syslog-ng service can not start 
  successfully,so modify it.
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 Updated-by: Andrej Valek <andrej.valek@siemens.com>

@@ -7,10 +7,172 @@
 #
 
 import resulttool.resultutils as resultutils
-import json
 
 from oeqa.utils.git import GitRepo
 import oeqa.utils.gitarchive as gitarchive
+
+METADATA_MATCH_TABLE = {
+    "oeselftest": "OESELFTEST_METADATA"
+}
+
+OESELFTEST_METADATA_GUESS_TABLE={
+    "trigger-build-posttrigger": {
+        "run_all_tests": False,
+        "run_tests":["buildoptions.SourceMirroring.test_yocto_source_mirror"],
+        "skips": None,
+        "machine": None,
+        "select_tags":None,
+        "exclude_tags": None
+    },
+    "reproducible": {
+        "run_all_tests": False,
+        "run_tests":["reproducible"],
+        "skips": None,
+        "machine": None,
+        "select_tags":None,
+        "exclude_tags": None
+    },
+    "arch-qemu-quick": {
+        "run_all_tests": True,
+        "run_tests":None,
+        "skips": None,
+        "machine": None,
+        "select_tags":["machine"],
+        "exclude_tags": None
+    },
+    "arch-qemu-full-x86-or-x86_64": {
+        "run_all_tests": True,
+        "run_tests":None,
+        "skips": None,
+        "machine": None,
+        "select_tags":["machine", "toolchain-system"],
+        "exclude_tags": None
+    },
+    "arch-qemu-full-others": {
+        "run_all_tests": True,
+        "run_tests":None,
+        "skips": None,
+        "machine": None,
+        "select_tags":["machine", "toolchain-user"],
+        "exclude_tags": None
+    },
+    "selftest": {
+        "run_all_tests": True,
+        "run_tests":None,
+        "skips": ["distrodata.Distrodata.test_checkpkg", "buildoptions.SourceMirroring.test_yocto_source_mirror", "reproducible"],
+        "machine": None,
+        "select_tags":None,
+        "exclude_tags": ["machine", "toolchain-system", "toolchain-user"]
+    },
+    "bringup": {
+        "run_all_tests": True,
+        "run_tests":None,
+        "skips": ["distrodata.Distrodata.test_checkpkg", "buildoptions.SourceMirroring.test_yocto_source_mirror"],
+        "machine": None,
+        "select_tags":None,
+        "exclude_tags": ["machine", "toolchain-system", "toolchain-user"]
+    }
+}
+
+def test_has_at_least_one_matching_tag(test, tag_list):
+    return "oetags" in test and any(oetag in tag_list for oetag in test["oetags"])
+
+def all_tests_have_at_least_one_matching_tag(results, tag_list):
+    return all(test_has_at_least_one_matching_tag(test_result, tag_list) or test_name.startswith("ptestresult") for (test_name, test_result) in results.items())
+
+def any_test_have_any_matching_tag(results, tag_list):
+    return any(test_has_at_least_one_matching_tag(test, tag_list) for test in results.values())
+
+def have_skipped_test(result, test_prefix):
+    return all( result[test]['status'] == "SKIPPED" for test in result if test.startswith(test_prefix))
+
+def have_all_tests_skipped(result, test_prefixes_list):
+    return all(have_skipped_test(result, test_prefix) for test_prefix in test_prefixes_list)
+
+def guess_oeselftest_metadata(results):
+    """
+    When an oeselftest test result is lacking OESELFTEST_METADATA, we can try to guess it based on results content.
+    Check results for specific values (absence/presence of oetags, number and name of executed tests...),
+    and if it matches one of known configuration from autobuilder configuration, apply guessed OSELFTEST_METADATA
+    to it to allow proper test filtering.
+    This guessing process is tightly coupled to config.json in autobuilder. It should trigger less and less,
+    as new tests will have OESELFTEST_METADATA properly appended at test reporting time
+    """
+
+    if len(results) == 1 and "buildoptions.SourceMirroring.test_yocto_source_mirror" in results:
+        return OESELFTEST_METADATA_GUESS_TABLE['trigger-build-posttrigger']
+    elif all(result.startswith("reproducible") for result in results):
+        return OESELFTEST_METADATA_GUESS_TABLE['reproducible']
+    elif all_tests_have_at_least_one_matching_tag(results, ["machine"]):
+        return OESELFTEST_METADATA_GUESS_TABLE['arch-qemu-quick']
+    elif all_tests_have_at_least_one_matching_tag(results, ["machine", "toolchain-system"]):
+        return OESELFTEST_METADATA_GUESS_TABLE['arch-qemu-full-x86-or-x86_64']
+    elif all_tests_have_at_least_one_matching_tag(results, ["machine", "toolchain-user"]):
+        return OESELFTEST_METADATA_GUESS_TABLE['arch-qemu-full-others']
+    elif not any_test_have_any_matching_tag(results, ["machine", "toolchain-user", "toolchain-system"]):
+        if have_all_tests_skipped(results, ["distrodata.Distrodata.test_checkpkg", "buildoptions.SourceMirroring.test_yocto_source_mirror", "reproducible"]):
+            return OESELFTEST_METADATA_GUESS_TABLE['selftest']
+        elif have_all_tests_skipped(results, ["distrodata.Distrodata.test_checkpkg", "buildoptions.SourceMirroring.test_yocto_source_mirror"]):
+            return OESELFTEST_METADATA_GUESS_TABLE['bringup']
+
+    return None
+
+
+def metadata_matches(base_configuration, target_configuration):
+    """
+    For passed base and target, check test type. If test type matches one of
+    properties described in METADATA_MATCH_TABLE, compare metadata if it is
+    present in base. Return true if metadata matches, or if base lacks some
+    data (either TEST_TYPE or the corresponding metadata)
+    """
+    test_type = base_configuration.get('TEST_TYPE')
+    if test_type not in METADATA_MATCH_TABLE:
+        return True
+
+    metadata_key = METADATA_MATCH_TABLE.get(test_type)
+    if target_configuration.get(metadata_key) != base_configuration.get(metadata_key):
+        return False
+
+    return True
+
+
+def machine_matches(base_configuration, target_configuration):
+    return base_configuration.get('MACHINE') == target_configuration.get('MACHINE')
+
+
+def can_be_compared(logger, base, target):
+    """
+    Some tests are not relevant to be compared, for example some oeselftest
+    run with different tests sets or parameters. Return true if tests can be
+    compared
+    """
+    ret = True
+    base_configuration = base['configuration']
+    target_configuration = target['configuration']
+
+    # Older test results lack proper OESELFTEST_METADATA: if not present, try to guess it based on tests results.
+    if base_configuration.get('TEST_TYPE') == 'oeselftest' and 'OESELFTEST_METADATA' not in base_configuration:
+        guess = guess_oeselftest_metadata(base['result'])
+        if guess is None:
+            logger.error(f"ERROR: did not manage to guess oeselftest metadata for {base_configuration['STARTTIME']}")
+        else:
+            logger.debug(f"Enriching {base_configuration['STARTTIME']} with {guess}")
+            base_configuration['OESELFTEST_METADATA'] = guess
+    if target_configuration.get('TEST_TYPE') == 'oeselftest' and 'OESELFTEST_METADATA' not in target_configuration:
+        guess = guess_oeselftest_metadata(target['result'])
+        if guess is None:
+            logger.error(f"ERROR: did not manage to guess oeselftest metadata for {target_configuration['STARTTIME']}")
+        else:
+            logger.debug(f"Enriching {target_configuration['STARTTIME']} with {guess}")
+            target_configuration['OESELFTEST_METADATA'] = guess
+
+    # Test runs with LTP results in should only be compared with other runs with LTP tests in them
+    if base_configuration.get('TEST_TYPE') == 'runtime' and any(result.startswith("ltpresult") for result in base['result']):
+        ret = target_configuration.get('TEST_TYPE') == 'runtime' and any(result.startswith("ltpresult") for result in target['result'])
+
+    return ret and metadata_matches(base_configuration, target_configuration) \
+        and machine_matches(base_configuration, target_configuration)
+
 
 def compare_result(logger, base_name, target_name, base_result, target_result):
     base_result = base_result.get('result')
@@ -62,6 +224,8 @@ def regression_common(args, logger, base_results, target_results):
             # removing any pairs which match
             for c in base.copy():
                 for b in target.copy():
+                    if not can_be_compared(logger, base_results[a][c], target_results[a][b]):
+                        continue
                     res, resstr = compare_result(logger, c, b, base_results[a][c], target_results[a][b])
                     if not res:
                         matches.append(resstr)
@@ -71,6 +235,8 @@ def regression_common(args, logger, base_results, target_results):
             # Should only now see regressions, we may not be able to match multiple pairs directly
             for c in base:
                 for b in target:
+                    if not can_be_compared(logger, base_results[a][c], target_results[a][b]):
+                        continue
                     res, resstr = compare_result(logger, c, b, base_results[a][c], target_results[a][b])
                     if res:
                         regressions.append(resstr)
@@ -81,6 +247,24 @@ def regression_common(args, logger, base_results, target_results):
     print("\n".join(sorted(notfound)))
 
     return 0
+
+# Some test case naming is poor and contains random strings, particularly lttng/babeltrace.
+# Truncating the test names works since they contain file and line number identifiers
+# which allows us to match them without the random components.
+def fixup_ptest_names(results, logger):
+    for r in results:
+        for i in results[r]:
+            tests = list(results[r][i]['result'].keys())
+            for test in tests:
+                new = None
+                if test.startswith(("ptestresult.lttng-tools.", "ptestresult.babeltrace.", "ptestresult.babeltrace2")) and "_-_" in test:
+                    new = test.split("_-_")[0]
+                elif test.startswith(("ptestresult.curl.")) and "__" in test:
+                    new = test.split("__")[0]
+                if new:
+                    results[r][i]['result'][new] = results[r][i]['result'][test]
+                    del results[r][i]['result'][test]
+
 
 def regression_git(args, logger):
     base_results = {}
@@ -142,6 +326,9 @@ def regression_git(args, logger):
 
     base_results = resultutils.git_get_result(repo, revs[index1][2])
     target_results = resultutils.git_get_result(repo, revs[index2][2])
+
+    fixup_ptest_names(base_results, logger)
+    fixup_ptest_names(target_results, logger)
 
     regression_common(args, logger, base_results, target_results)
 

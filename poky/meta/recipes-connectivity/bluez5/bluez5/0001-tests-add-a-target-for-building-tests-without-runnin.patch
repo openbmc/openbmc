@@ -1,19 +1,20 @@
-From 4bdf0f96dcaa945fd29f26d56e5b36d8c23e4c8b Mon Sep 17 00:00:00 2001
+From a657fddd13a2e756b0af315301f1c44081e2f668 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 1 Apr 2016 17:07:34 +0300
 Subject: [PATCH] tests: add a target for building tests without running them
 
 Upstream-Status: Inappropriate [oe specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  Makefile.am | 3 +++
  1 file changed, 3 insertions(+)
 
 diff --git a/Makefile.am b/Makefile.am
-index 1a48a71..ba3b92f 100644
+index 7041f8e..25966cd 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -425,6 +425,9 @@ endif
+@@ -594,6 +594,9 @@ endif
  TESTS = $(unit_tests)
  AM_TESTS_ENVIRONMENT = MALLOC_CHECK_=3 MALLOC_PERTURB_=69
  
@@ -23,6 +24,3 @@ index 1a48a71..ba3b92f 100644
  if DBUS_RUN_SESSION
  AM_TESTS_ENVIRONMENT += dbus-run-session --
  endif
--- 
-2.8.0.rc3
-

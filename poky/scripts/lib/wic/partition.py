@@ -133,6 +133,8 @@ class Partition():
             self.update_fstab_in_rootfs = True
 
         if not self.source:
+            if self.fstype == "none":
+                return
             if not self.size and not self.fixed_size:
                 raise WicError("The %s partition has a size of zero. Please "
                                "specify a non-zero --size/--fixed-size for that "
@@ -404,6 +406,9 @@ class Partition():
         erofs_cmd = "mkfs.erofs %s -U %s %s %s" % \
                        (extraopts, self.fsuuid, rootfs, rootfs_dir)
         exec_native_cmd(erofs_cmd, native_sysroot, pseudo=pseudo)
+
+    def prepare_empty_partition_none(self, rootfs, oe_builddir, native_sysroot):
+        pass
 
     def prepare_empty_partition_ext(self, rootfs, oe_builddir,
                                     native_sysroot):

@@ -1,4 +1,4 @@
-Upstream-Status:Inappropriate [embedded specific]
+Upstream-Status: Inappropriate [embedded specific]
 
 fix the below error:
 configure: error: cannot run test program while cross compiling

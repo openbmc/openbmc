@@ -5,7 +5,7 @@ Subject: [PATCH] rust.configure: do not try to find a suitable upstream target
 
 OE is using custom targets and so this is bound to fail.
 
-Upstream-Status: Inapppropriate [oe-core specific]
+Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
 
 ---

@@ -12,6 +12,7 @@ PTESTS_FAST = "\
     bc-ptest \
     bluez5-ptest \
     busybox-ptest \
+    cpio-ptest \
     diffstat-ptest \
     diffutils-ptest \
     ethtool-ptest \

@@ -242,10 +242,8 @@ defined in the
    COMMERCIAL_AUDIO_PLUGINS ?= ""
    COMMERCIAL_VIDEO_PLUGINS ?= ""
 
-If you
-want to enable these components, you can do so by making sure you have
-statements similar to the following in your ``local.conf`` configuration
-file::
+If you want to enable these components, you can do so by making sure you have
+statements similar to the following in your ``local.conf`` configuration file::
 
    COMMERCIAL_AUDIO_PLUGINS = "gst-plugins-ugly-mad \
        gst-plugins-ugly-mpegaudioparse"
@@ -253,20 +251,26 @@ file::
        gst-plugins-ugly-mpegstream gst-plugins-bad-mpegvideoparse"
    LICENSE_FLAGS_ACCEPTED = "commercial_gst-plugins-ugly commercial_gst-plugins-bad commercial_qmmp"
 
-
-Of course, you could also create a matching list for those
-components using the more general "commercial" in the
-:term:`LICENSE_FLAGS_ACCEPTED` variable, but that would also enable all
-the other packages with :term:`LICENSE_FLAGS`
+Of course, you could also create a matching list for those components using the
+more general "commercial" string in the :term:`LICENSE_FLAGS_ACCEPTED` variable,
+but that would also enable all the other packages with :term:`LICENSE_FLAGS`
 containing "commercial", which you may or may not want::
 
    LICENSE_FLAGS_ACCEPTED = "commercial"
 
 Specifying audio and video plugins as part of the
-``COMMERCIAL_AUDIO_PLUGINS`` and ``COMMERCIAL_VIDEO_PLUGINS`` statements
-(along with the enabling :term:`LICENSE_FLAGS_ACCEPTED`) includes the
-plugins or components into built images, thus adding support for media
-formats or components.
+:term:`COMMERCIAL_AUDIO_PLUGINS` and :term:`COMMERCIAL_VIDEO_PLUGINS` statements
+(along with :term:`LICENSE_FLAGS_ACCEPTED`) includes the plugins or
+components into built images, thus adding support for media formats or
+components.
+
+.. note::
+
+   GStreamer "ugly" and "bad" plugins are actually available through
+   open source licenses. However, the "ugly" ones can be subject to software
+   patents in some countries, making it necessary to pay licensing fees
+   to distribute them. The "bad" ones are just deemed unreliable by the
+   GStreamer community and should therefore be used with care.
 
 Maintaining Open Source License Compliance During Your Product's Lifecycle
 ==========================================================================

@@ -3,7 +3,7 @@ Fix Makefile:
 * change the file format from dos to unix to avoid do_patch failed.
 * override gcc,SBIN_DIR and INSTALL for cross-compilation.
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 ---

@@ -1496,6 +1496,23 @@ functionality of the task:
    directory listed is used as the current working directory for the
    task.
 
+- ``[file-checksums]``: Controls the file dependencies for a task. The
+  baseline file list is the set of files associated with
+  :term:`SRC_URI`. May be used to set additional dependencies on
+  files not associated with :term:`SRC_URI`.
+
+  The value set to the list is a file-boolean pair where the first
+  value is the file name and the second is whether or not it
+  physically exists on the filesystem. ::
+
+    do_configure[file-checksums] += "${MY_DIRPATH}/my-file.txt:True"
+
+  It is important to record any paths which the task looked at and
+  which didn't exist. This means that if these do exist at a later
+  time, the task can be rerun with the new additional files. The
+  "exists" True or False value after the path allows this to be
+  handled.
+
 -  ``[lockfiles]``: Specifies one or more lockfiles to lock while the
    task executes. Only one task may hold a lockfile, and any task that
    attempts to lock an already locked file will block until the lock is

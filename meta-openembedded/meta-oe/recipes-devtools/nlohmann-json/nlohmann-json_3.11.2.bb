@@ -18,7 +18,7 @@ inherit cmake
 EXTRA_OECMAKE += "-DJSON_BuildTests=OFF"
 
 # nlohmann-json is a header only C++ library, so the main package will be empty.
-
+ALLOW_EMPTY:${PN} = "1"
 RDEPENDS:${PN}-dev = ""
 
 BBCLASSEXTEND = "native nativesdk"

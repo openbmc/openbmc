@@ -13,7 +13,7 @@ UPSTREAM_CHECK_URI = "https://github.com/${BPN}/${BPN}/releases"
 # Machine-specific as we examine MACHINE_FEATURES to decide whether to build the UEFI plugins
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-inherit meson vala gobject-introspection systemd bash-completion pkgconfig gi-docgen ptest manpages
+inherit meson vala gobject-introspection systemd bash-completion pkgconfig gi-docgen ptest manpages useradd
 
 GIDOCGEN_MESON_OPTION = 'docs'
 GIDOCGEN_MESON_ENABLE_FLAG = 'docgen'
@@ -114,6 +114,17 @@ DISABLE_NON_X86 = "plugin_intel_me plugin_intel_spi plugin_msr"
 DISABLE_NON_X86:x86 = ""
 DISABLE_NON_X86:x86-64 = ""
 PACKAGECONFIG:remove = "${DISABLE_NON_X86}"
+
+USERADD_PACKAGES = "${PN}"
+USERADD_PARAM:${PN} = "--system --no-create-home --user-group --home-dir ${sysconfdir}/polkit-1 --shell /bin/nologin polkitd"
+
+do_install:append() {
+    if ${@bb.utils.contains('PACKAGECONFIG', 'polkit', 'true', 'false', d)}; then
+        #Fix up permissions on polkit rules.d to work with rpm4 constraints
+        chmod 700 ${D}/${datadir}/polkit-1/rules.d
+        chown polkitd:root ${D}/${datadir}/polkit-1/rules.d
+    fi
+}
 
 FILES:${PN} += "${libdir}/fwupd-plugins-* \
                 ${libdir}/fwupd-${PV} \

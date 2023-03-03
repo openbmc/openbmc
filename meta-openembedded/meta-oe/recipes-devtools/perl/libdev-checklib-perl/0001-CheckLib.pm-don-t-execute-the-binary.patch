@@ -21,7 +21,7 @@ and use the return status to determine the lib's
 checking status is not appropriate in cross compile env.
  $ /yocto/builds/upgrade1/tmp/work/core2-64-poky-linux/libdbd-mysql-perl/4.050-r0/git/assertlibCOw_eujb
 
-Upstream-Status: Inappropriate[oe specific]
+Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---

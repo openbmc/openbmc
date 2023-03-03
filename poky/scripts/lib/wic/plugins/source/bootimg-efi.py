@@ -221,7 +221,7 @@ class BootimgEFIPlugin(SourcePlugin):
             elif source_params['loader'] == 'systemd-boot':
                 cls.do_configure_systemdboot(hdddir, creator, cr_workdir, source_params)
             elif source_params['loader'] == 'uefi-kernel':
-                return
+                pass
             else:
                 raise WicError("unrecognized bootimg-efi loader: %s" % source_params['loader'])
         except KeyError:

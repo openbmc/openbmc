@@ -2,16 +2,16 @@ commit 7c58a1e244ea83a9e7bbd51a6d354cee25cdbd33
 Author: Aws Ismail <aws.ismail@windriver.com>
 Date:   Wed Sep 12 23:35:40 2012 -0400
 
-    Fix openl2tpd initscript
-    
-    - Correct the location of the retval statement.
-    - use start-stop-daemon instead of daemon.
-    
-    Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+Fix openl2tpd initscript
 
-    Upstream-Status: Inappropriate [OE specific]
+- Correct the location of the retval statement.
+- use start-stop-daemon instead of daemon.
 
-    Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
 
 diff --git a/etc/rc.d/init.d/openl2tpd b/etc/rc.d/init.d/openl2tpd
 index ce21b50..7f27bb7 100755

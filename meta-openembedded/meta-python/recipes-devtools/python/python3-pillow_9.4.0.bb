@@ -38,11 +38,13 @@ RDEPENDS:${PN}-ptest += " \
     jpeg-tools \
     libwebp \
     ${PYTHON_PN}-core \
+    ${PYTHON_PN}-distutils \
     ${PYTHON_PN}-image \
     ${PYTHON_PN}-mmap \
     ${PYTHON_PN}-pytest \
     ${PYTHON_PN}-pytest-timeout \
     ${PYTHON_PN}-resource \
+    ${PYTHON_PN}-unixadmin\
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'tk', '', d)} \
 "
 

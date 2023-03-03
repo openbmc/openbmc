@@ -1,4 +1,4 @@
-From b729a356538d499fe25e82bfc78ea663bdaca0a8 Mon Sep 17 00:00:00 2001
+From 21a8295bac3805e4490ba2b5f136e7f4c121061b Mon Sep 17 00:00:00 2001
 From: Lei Maohui <leimaohui@fujitsu.com>
 Date: Mon, 23 May 2022 10:44:43 +0900
 Subject: [PATCH] Creating .hmac file should be excuted in target environment,
@@ -6,23 +6,22 @@ Subject: [PATCH] Creating .hmac file should be excuted in target environment,
 
 Upstream-Status: Inappropriate [https://gitlab.com/gnutls/gnutls/-/issues/1373]
 Signed-off-by: Lei Maohui <leimaohui@fujitsu.com>
+
 ---
  lib/Makefile.am | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/lib/Makefile.am b/lib/Makefile.am
-index 0b43ef9..cf263f0 100644
+index 6d4e8d2..24ef108 100644
 --- a/lib/Makefile.am
 +++ b/lib/Makefile.am
-@@ -206,8 +206,7 @@ hmac_files = .libs/.gnutls.hmac
-
- all-local: $(hmac_files)
-
--.libs/.gnutls.hmac: libgnutls.la fipshmac
+@@ -206,8 +206,7 @@ hmac_file = .libs/.$(gnutls_so).hmac
+ 
+ all-local: $(hmac_file)
+ 
+-$(hmac_file): libgnutls.la fipshmac
 -	$(AM_V_GEN) $(builddir)/fipshmac > $@-t && mv $@-t $@
-+.libs/.gnutls.hmac:
-
- CLEANFILES = $(hmac_files)
++.libs/.$(gnutls_so).hmac:
+ 
+ CLEANFILES = $(hmac_file)
  endif
---
-2.25.1

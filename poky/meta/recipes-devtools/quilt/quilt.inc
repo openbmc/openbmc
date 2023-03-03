@@ -61,12 +61,23 @@ do_install:append:class-native () {
     touch ${D}${sysconfdir}/quiltrc
 }
 
+# The tests need to run as a non-root user, so pull in the ptest user
+DEPENDS:append:class-target = "${@bb.utils.contains('PTEST_ENABLED', '1', ' ptest-runner', '', d)}"
+
 do_install_ptest() {
 	install ${WORKDIR}/test.sh ${D}${PTEST_PATH}
     mkdir ${D}${PTEST_PATH}/test
     install ${S}/test/* ${D}${PTEST_PATH}/test
     # mail needs a MTA, and the patch-wrapper is disabled
     rm -f ${D}${PTEST_PATH}/test/mail.test ${D}${PTEST_PATH}/test/patch-wrapper.test
+}
+
+# ptest.bbclass currently chowns the ptest directory explicitly, so we need to
+# change permission after that has happened so the ptest user can write a
+# temporary directory.
+do_install_ptest_base:append() {
+    chgrp ptest ${D}${PTEST_PATH}/test
+    chmod g+w ${D}${PTEST_PATH}/test
 }
 
 PACKAGES += "guards guards-doc"
@@ -84,5 +95,5 @@ RDEPENDS:${PN}-ptest += "file sed gawk diffutils findutils ed perl \
                          perl-module-filehandle perl-module-getopt-std \
                          perl-module-posix perl-module-file-temp \
                          perl-module-text-parsewords perl-module-overloading \
-                         bash util-linux-getopt \
+                         bash util-linux-getopt ptest-runner \
                         "

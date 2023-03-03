@@ -1,4 +1,4 @@
-From 61e741654cc2eb167bca212a3bb2ba8f3ba280c1 Mon Sep 17 00:00:00 2001
+From 7dcc5f46a31ac4eaa67c0ab3aaae38005db7458f Mon Sep 17 00:00:00 2001
 From: Mingli Yu <Mingli.Yu@windriver.com>
 Date: Fri, 24 Aug 2018 12:04:03 +0800
 Subject: [PATCH] test-gatt: Fix hung issue
@@ -21,15 +21,16 @@ no action.
 Upstream-Status: Submitted [https://marc.info/?l=linux-bluetooth&m=153508881804635&w=2]
 
 Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
+
 ---
  unit/test-gatt.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index c7e28f8..b57373b 100644
+index f92d860..a5f7117 100644
 --- a/unit/test-gatt.c
 +++ b/unit/test-gatt.c
-@@ -4463,7 +4463,7 @@ int main(int argc, char *argv[])
+@@ -4479,7 +4479,7 @@ int main(int argc, char *argv[])
  			test_server, service_db_1, NULL,
  			raw_pdu(0x03, 0x00, 0x02),
  			raw_pdu(0xbf, 0x00),
@@ -38,6 +39,3 @@ index c7e28f8..b57373b 100644
  
  	define_test_server("/robustness/unkown-command",
  			test_server, service_db_1, NULL,
--- 
-2.7.4
-

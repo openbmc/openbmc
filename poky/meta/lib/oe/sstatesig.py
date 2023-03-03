@@ -652,6 +652,10 @@ def OEOuthashBasic(path, sigfile, task, d):
                 if f == 'fixmepath':
                     continue
                 process(os.path.join(root, f))
+
+            for dir in dirs:
+                if os.path.islink(os.path.join(root, dir)):
+                    process(os.path.join(root, dir))
     finally:
         os.chdir(prev_dir)
 

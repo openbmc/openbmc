@@ -7,7 +7,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Upstream-Status: Submitted[https://gitlab.gnome.org/GNOME/gjs/-/merge_requests/690]
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gjs/-/merge_requests/690]
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
 ---

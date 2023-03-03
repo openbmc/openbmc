@@ -2,7 +2,7 @@ This fixes an issue when building with gcc 4.x
 
 https://github.com/openembedded/openembedded/tree/master/recipes/netkit-rpc/netkit-rpc
 
-Upstream-Status: Backported
+Upstream-Status: Backport
 
 Signed-off-by: Armin Kuster <akuster808@gmail.com>
 

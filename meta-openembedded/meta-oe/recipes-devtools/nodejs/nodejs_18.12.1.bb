@@ -3,6 +3,8 @@ HOMEPAGE = "http://nodejs.org"
 LICENSE = "MIT & ISC & BSD-2-Clause & BSD-3-Clause & Artistic-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=dfd7ae796baf5326016a3865ee1dc632"
 
+CVE_PRODUCT = "nodejs node.js"
+
 DEPENDS = "openssl"
 DEPENDS:append:class-target = " qemu-native"
 DEPENDS:append:class-native = " c-ares-native"
@@ -87,22 +89,22 @@ EXTRA_OEMAKE = "\
     builddir_name=./ \
 "
 
-python do_unpack() {
+python prune_sources() {
     import shutil
 
-    bb.build.exec_func('base_do_unpack', d)
-    shutil.rmtree(d.getVar('S') + '/deps/openssl', True)
+    shutil.rmtree(d.getVar('S') + '/deps/openssl')
     if 'ares' in d.getVar('PACKAGECONFIG'):
-        shutil.rmtree(d.getVar('S') + '/deps/cares', True)
+        shutil.rmtree(d.getVar('S') + '/deps/cares')
     if 'brotli' in d.getVar('PACKAGECONFIG'):
-        shutil.rmtree(d.getVar('S') + '/deps/brotli', True)
+        shutil.rmtree(d.getVar('S') + '/deps/brotli')
     if 'libuv' in d.getVar('PACKAGECONFIG'):
-        shutil.rmtree(d.getVar('S') + '/deps/uv', True)
+        shutil.rmtree(d.getVar('S') + '/deps/uv')
     if 'nghttp2' in d.getVar('PACKAGECONFIG'):
-        shutil.rmtree(d.getVar('S') + '/deps/nghttp2', True)
+        shutil.rmtree(d.getVar('S') + '/deps/nghttp2')
     if 'zlib' in d.getVar('PACKAGECONFIG'):
-        shutil.rmtree(d.getVar('S') + '/deps/zlib', True)
+        shutil.rmtree(d.getVar('S') + '/deps/zlib')
 }
+do_unpack[postfuncs] += "prune_sources"
 
 # V8's JIT infrastructure requires binaries such as mksnapshot and
 # mkpeephole to be run in the host during the build. However, these
@@ -135,24 +137,26 @@ addtask create_v8_qemu_wrapper after do_configure before do_compile
 
 LDFLAGS:append:x86 = " -latomic"
 
+CROSS_FLAGS = "--cross-compiling"
+CROSS_FLAGS:class-native = "--no-cross-compiling"
+
 # Node is way too cool to use proper autotools, so we install two wrappers to forcefully inject proper arch cflags to workaround gypi
 do_configure () {
-    export LD="${CXX}"
     GYP_DEFINES="${GYP_DEFINES}" export GYP_DEFINES
     # $TARGET_ARCH settings don't match --dest-cpu settings
-    python3 configure.py --prefix=${prefix} --cross-compiling \
+    python3 configure.py --verbose --prefix=${prefix} \
                --shared-openssl \
                --without-dtrace \
                --without-etw \
                --dest-cpu="${@map_nodejs_arch(d.getVar('TARGET_ARCH'), d)}" \
                --dest-os=linux \
-               --libdir=${D}${libdir} \
+               --libdir=${baselib} \
+               ${CROSS_FLAGS} \
                ${ARCHFLAGS} \
                ${PACKAGECONFIG_CONFARGS}
 }
 
 do_compile () {
-    export LD="${CXX}"
     install -D ${RECIPE_SYSROOT_NATIVE}/etc/ssl/openssl.cnf ${B}/deps/openssl/nodejs-openssl.cnf
     install -D ${B}/v8-qemu-wrapper.sh ${B}/out/Release/v8-qemu-wrapper.sh
     oe_runmake BUILDTYPE=Release
@@ -166,19 +170,6 @@ do_install_ptest () {
     cp -r  ${B}/out/Release/cctest ${D}${PTEST_PATH}/
     cp -r ${B}/test ${D}${PTEST_PATH}
     chown -R root:root ${D}${PTEST_PATH}
-}
-
-BINARIES = " \
-    bytecode_builtins_list_generator \
-    ${@bb.utils.contains('PACKAGECONFIG', 'icu', 'gen-regexp-special-case', '', d)} \
-    node_mksnapshot \
-    torque \
-"
-
-do_install:append:class-native() {
-    # Install the native binaries to provide it within sysroot for the target compilation
-    install -d ${D}${bindir}
-    (cd ${S}/out/Release && install ${BINARIES} ${D}${bindir})
 }
 
 PACKAGES =+ "${PN}-npm"

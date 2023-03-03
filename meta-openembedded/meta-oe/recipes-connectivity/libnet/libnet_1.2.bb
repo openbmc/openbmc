@@ -16,4 +16,6 @@ SRCREV = "deeeeaeb84f8bc5d2299913d4ccf53d0d4c26966"
 
 S = "${WORKDIR}/git"
 
-inherit autotools binconfig
+inherit autotools binconfig multilib_script
+MULTILIB_SCRIPTS = "${PN}-dev:${bindir}/libnet-config"
+

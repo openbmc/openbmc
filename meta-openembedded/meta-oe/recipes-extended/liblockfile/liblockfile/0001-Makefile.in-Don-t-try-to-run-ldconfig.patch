@@ -1,0 +1,51 @@
+From 5876bd17caac96df70ef400bfeebb155c0bd7359 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Wed, 8 Feb 2023 10:34:45 +0800
+Subject: [PATCH] Makefile.in: Don't try to run ldconfig
+
+when ldconfig is not installed on the build host, do_install
+will failed with error:
+ln -sf nfslock.so.0.1 /mnt/tmp-glibc/work/core2-64-wrs-linux/liblockfile/1.14-r0/image/usr/lib64/nfslock.so.0
+install -m 644 lockfile.h maillock.h /mnt/tmp-glibc/work/core2-64-wrs-linux/liblockfile/1.14-r0/image/usr/include
+if test "/mnt/tmp-glibc/work/core2-64-wrs-linux/liblockfile/1.14-r0/image" = ""; then ; fi
+if [ "mail" != "" ]; then\
+          install -g mail -m 2755 dotlockfile /mnt/tmp-glibc/work/core2-64-wrs-linux/liblockfile/1.14-r0/image/usr/bin;\
+        else \
+          install -g root -m 755 dotlockfile /mnt/tmp-glibc/work/core2-64-wrs-linux/liblockfile/1.14-r0/image/usr/bin; \
+        fi
+/bin/sh: -c: line 1: syntax error near unexpected token `;'
+/bin/sh: -c: line 1: `if test "/mnt/tmp-glibc/work/core2-64-wrs-linux/liblockfile/1.14-r0/image" = ""; then ; fi'
+
+Deleted line is not needed for OE, as it is cross-compile. And
+it can also fix above error
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ Makefile.in | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index bfa0acb..ae5be56 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -58,7 +58,6 @@ install_shared:	shared install_static install_common
+ 			$(libdir)/liblockfile.so.$(SOVER)
+ 		ln -s liblockfile.so.$(SOVER) $(libdir)/liblockfile.so.$(MAJOR)
+ 		ln -s liblockfile.so.$(SOVER) $(libdir)/liblockfile.so
+-		if test "$(DESTDIR)" = ""; then @LDCONFIG@; fi
+ 
+ install_common:
+ 		install -d -m 755 -g root -p $(includedir)
+@@ -79,7 +78,6 @@ install_nfslib:	nfslib
+ 		install -m 755 nfslock.so.$(NFSVER) $(nfslockdir)
+ 		ln -sf nfslock.so.$(NFSVER) $(libdir)/nfslock.so
+ 		ln -sf nfslock.so.$(NFSVER) $(libdir)/nfslock.so.0
+-		if test "$(DESTDIR)" = ""; then @LDCONFIG@; fi
+ 
+ clean:
+ 		rm -f *.a *.o *.so *.so.* dotlockfile
+-- 
+2.25.1
+

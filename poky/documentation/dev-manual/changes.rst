@@ -319,7 +319,7 @@ without using the scripts once the steps in
    command, see ``GIT-SEND-EMAIL(1)`` displayed using the
    ``man git-send-email`` command.
 
-The Yocto Project uses a `Patchwork instance <https://patchwork.openembedded.org/>`__
+The Yocto Project uses a `Patchwork instance <https://patchwork.yoctoproject.org/>`__
 to track the status of patches submitted to the various mailing lists and to
 support automated patch testing. Each submitted patch is checked for common
 mistakes and deviations from the expected patch format and submitters are

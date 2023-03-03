@@ -3,25 +3,25 @@ From: Joe Slater <jslater@windriver.com>
 Date: Thu, 9 Mar 2017 10:58:06 -0800
 Subject: [PATCH] chrony: fix build failure for arma9
 
-    Eliminate references to syscalls not available
-    for ARM_EABI.  Also add a dependency on libseccomp
-    which is needed for scfilter to work.
+Eliminate references to syscalls not available
+for ARM_EABI.  Also add a dependency on libseccomp
+which is needed for scfilter to work.
 
-    Set PACKAGECONFIG to not enable scfilter, since
-    kernel CONFIG_SECCOMP is unlikely to be set.  This
-    aligns the usage of libseccomp with that of other packages.
+Set PACKAGECONFIG to not enable scfilter, since
+kernel CONFIG_SECCOMP is unlikely to be set.  This
+aligns the usage of libseccomp with that of other packages.
 
-    Upstream-Status: Pending
+Upstream-Status: Pending
 
-    Signed-off-by: Joe Slater <jslater@windriver.com>
+Signed-off-by: Joe Slater <jslater@windriver.com>
 
-    Refresh patch for new upstream version.
+Refresh patch for new upstream version.
 
-    Signed-off-by: Robert Joslyn <robert.joslyn@redrectangle.org>
+Signed-off-by: Robert Joslyn <robert.joslyn@redrectangle.org>
 
-    Refreshed for 4.0
+Refreshed for 4.0
 
-    Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
  sys_linux.c | 15 +++++++++------

@@ -5,7 +5,7 @@ Subject: [PATCH] build: Do not build .sgml file
 
 It needs docbook2man tool which we do not have recipe for
 
-Upstream-Status: OE-Specific [needs native docbook2man tool]
+Upstream-Status: Inappropriate [needs native docbook2man tool]
 
 Signed-off-by: Jose Quaresma <jose.quaresma@foundries.io>
 ---

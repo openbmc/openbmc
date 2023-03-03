@@ -19,8 +19,8 @@ import json
 import os
 import subprocess
 
-def _is_layer_git_repo(layerdir):
-    git_dir = os.path.join(layerdir, ".git")
+def _is_repo_git_repo(repodir):
+    git_dir = os.path.join(repodir, ".git")
     if not os.access(git_dir, os.R_OK):
         return False
     try:
@@ -28,67 +28,73 @@ def _is_layer_git_repo(layerdir):
     except subprocess.CalledProcessError:
         return False
 
-def _is_layer_at_rev(layerdir, rev):
+def _is_repo_at_rev(repodir, rev):
     try:
-        curr_rev = subprocess.check_output("git -C %s rev-parse HEAD" % layerdir, shell=True, stderr=subprocess.DEVNULL)
+        curr_rev = subprocess.check_output("git -C %s rev-parse HEAD" % repodir, shell=True, stderr=subprocess.DEVNULL)
         if curr_rev.strip().decode("utf-8") == rev:
             return True
     except subprocess.CalledProcessError:
         pass
     return False
 
-def _is_layer_at_remote_uri(layerdir, remote, uri):
+def _is_repo_at_remote_uri(repodir, remote, uri):
     try:
-        curr_uri = subprocess.check_output("git -C %s remote get-url %s" % (layerdir, remote), shell=True, stderr=subprocess.DEVNULL)
+        curr_uri = subprocess.check_output("git -C %s remote get-url %s" % (repodir, remote), shell=True, stderr=subprocess.DEVNULL)
         if curr_uri.strip().decode("utf-8") == uri:
             return True
     except subprocess.CalledProcessError:
         pass
     return False
 
-def _do_checkout(args, json):
-    layers = json['sources']
-    for l_name in layers:
-        l_data = layers[l_name]
-        layerdir = os.path.abspath(os.path.join(args['destdir'], l_data['path']))
+def _contains_submodules(repodir):
+    return os.path.exists(os.path.join(repodir,".gitmodules"))
 
-        if 'contains_this_file' in l_data.keys():
+def _do_checkout(args, json):
+    repos = json['sources']
+    for r_name in repos:
+        r_data = repos[r_name]
+        repodir = os.path.abspath(os.path.join(args['destdir'], r_data['path']))
+
+        if 'contains_this_file' in r_data.keys():
             force_arg = 'force_bootstraplayer_checkout'
             if not args[force_arg]:
-                print('Note: not checking out source {layer}, use {layerflag} to override.'.format(layer=l_name, layerflag='--force-bootstraplayer-checkout'))
+                print('Note: not checking out source {repo}, use {repoflag} to override.'.format(repo=r_name, repoflag='--force-bootstraplayer-checkout'))
                 continue
-        l_remote = l_data['git-remote']
-        rev = l_remote['rev']
-        desc = l_remote['describe']
+        r_remote = r_data['git-remote']
+        rev = r_remote['rev']
+        desc = r_remote['describe']
         if not desc:
             desc = rev[:10]
-        branch = l_remote['branch']
-        remotes = l_remote['remotes']
+        branch = r_remote['branch']
+        remotes = r_remote['remotes']
 
-        print('\nSetting up source {}, revision {}, branch {}'.format(l_name, desc, branch))
-        if not _is_layer_git_repo(layerdir):
-            cmd = 'git init -q {}'.format(layerdir)
+        print('\nSetting up source {}, revision {}, branch {}'.format(r_name, desc, branch))
+        if not _is_repo_git_repo(repodir):
+            cmd = 'git init -q {}'.format(repodir)
             print("Running '{}'".format(cmd))
             subprocess.check_output(cmd, shell=True)
 
         for remote in remotes:
-            if not _is_layer_at_remote_uri(layerdir, remote, remotes[remote]['uri']):
+            if not _is_repo_at_remote_uri(repodir, remote, remotes[remote]['uri']):
                 cmd = "git remote remove {} > /dev/null 2>&1; git remote add {} {}".format(remote, remote, remotes[remote]['uri'])
-                print("Running '{}' in {}".format(cmd, layerdir))
-                subprocess.check_output(cmd, shell=True, cwd=layerdir)
+                print("Running '{}' in {}".format(cmd, repodir))
+                subprocess.check_output(cmd, shell=True, cwd=repodir)
 
                 cmd = "git fetch -q {} || true".format(remote)
-                print("Running '{}' in {}".format(cmd, layerdir))
-                subprocess.check_output(cmd, shell=True, cwd=layerdir)
+                print("Running '{}' in {}".format(cmd, repodir))
+                subprocess.check_output(cmd, shell=True, cwd=repodir)
 
-        if not _is_layer_at_rev(layerdir, rev):
+        if not _is_repo_at_rev(repodir, rev):
             cmd = "git fetch -q --all || true"
-            print("Running '{}' in {}".format(cmd, layerdir))
-            subprocess.check_output(cmd, shell=True, cwd=layerdir)
+            print("Running '{}' in {}".format(cmd, repodir))
+            subprocess.check_output(cmd, shell=True, cwd=repodir)
 
             cmd = 'git checkout -q {}'.format(rev)
-            print("Running '{}' in {}".format(cmd, layerdir))
-            subprocess.check_output(cmd, shell=True, cwd=layerdir)
+            print("Running '{}' in {}".format(cmd, repodir))
+            subprocess.check_output(cmd, shell=True, cwd=repodir)
+
+            if _contains_submodules(repodir):
+                print("Repo {} contains submodules, use 'git submodule update' to ensure they are up to date".format(repodir))
 
 parser = argparse.ArgumentParser(description="A self contained python script that fetches all the needed layers and sets them to correct revisions using data in a json format from a separate file. The json data can be created from an active build directory with 'bitbake-layers create-layers-setup destdir' and there's a sample file and a schema in meta/files/")
 
@@ -106,10 +112,10 @@ parser.add_argument('--jsondata', default=__file__+".json", help='File containin
 args = parser.parse_args()
 
 with open(args.jsondata) as f:
-    json = json.load(f)
+    json_f = json.load(f)
 
 supported_versions = ["1.0"]
-if json["version"] not in supported_versions:
-    raise Exception("File {} has version {}, which is not in supported versions: {}".format(args.jsondata, json["version"], supported_versions))
+if json_f["version"] not in supported_versions:
+    raise Exception("File {} has version {}, which is not in supported versions: {}".format(args.jsondata, json_f["version"], supported_versions))
 
-_do_checkout(vars(args), json)
+_do_checkout(vars(args), json_f)

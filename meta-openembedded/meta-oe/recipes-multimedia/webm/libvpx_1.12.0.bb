@@ -19,6 +19,7 @@ S = "${WORKDIR}/git"
 ARM_INSTRUCTION_SET = "arm"
 
 CFLAGS += "-fPIC"
+BUILD_LDFLAGS += "-pthread"
 
 export CC
 export LD = "${CC}"
@@ -48,3 +49,5 @@ do_install() {
     oe_runmake install DESTDIR=${D}
     chown -R root:root ${D}
 }
+
+BBCLASSEXTEND += "native"

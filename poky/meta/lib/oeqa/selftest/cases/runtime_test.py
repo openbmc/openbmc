@@ -260,17 +260,6 @@ class TestImage(OESelftestTestCase):
         if distro and (distro in ['debian-9', 'debian-10', 'centos-7', 'centos-8', 'ubuntu-16.04', 'ubuntu-18.04'] or distro.startswith('almalinux')):
             self.skipTest('virgl headless cannot be tested with %s' %(distro))
 
-        render_hint = """If /dev/dri/renderD* is absent due to lack of suitable GPU, 'modprobe vgem' will create one suitable for mesa llvmpipe software renderer."""
-        try:
-            content = os.listdir("/dev/dri")
-            if len([i for i in content if i.startswith('render')]) == 0:
-                self.fail("No render nodes found in /dev/dri: %s. %s" %(content, render_hint))
-        except FileNotFoundError:
-            self.fail("/dev/dri directory does not exist; no render nodes available on this machine. %s" %(render_hint))
-        try:
-            dripath = subprocess.check_output("PATH=/bin:/usr/bin:$PATH pkg-config --variable=dridriverdir dri", shell=True)
-        except subprocess.CalledProcessError as e:
-            self.fail("Could not determine the path to dri drivers on the host via pkg-config.\nPlease install Mesa development files (particularly, dri.pc) on the host machine.")
         qemu_distrofeatures = get_bb_var('DISTRO_FEATURES', 'qemu-system-native')
         features = 'IMAGE_CLASSES += "testimage"\n'
         if 'opengl' not in qemu_distrofeatures:

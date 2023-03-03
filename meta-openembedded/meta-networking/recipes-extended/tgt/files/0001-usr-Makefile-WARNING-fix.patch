@@ -6,7 +6,7 @@ Subject: [PATCH] usr/Makefile: WARNING fix WARNING: QA Issue: tgt:
  packages-split/tgt/usr/sbin/tgtd contains probably-redundant RPATH /usr/lib
  [useless-rpaths]
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 

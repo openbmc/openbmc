@@ -3,9 +3,7 @@ From: dgod <dgod.osa@gmail.com>
 Date: Mon, 21 Mar 2016 19:25:25 +0800
 Subject: [PATCH] fix css under gtk 3.20
 
-Upstream-Status: Applied [1]
-
-[1] https://git.lxde.org/gitweb/?p=lxde/lxdm.git;a=patch;h=72812894cfd9454d70e4b0753531e46580416771
+Upstream-Status: Backport [https://git.lxde.org/gitweb/?p=lxde/lxdm.git;a=patch;h=72812894cfd9454d70e4b0753531e46580416771]
 ---
  data/themes/Industrial/gtk.css | 1 +
  1 file changed, 1 insertion(+)

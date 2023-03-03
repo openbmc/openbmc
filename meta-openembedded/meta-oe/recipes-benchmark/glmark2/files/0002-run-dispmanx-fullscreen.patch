@@ -13,10 +13,10 @@ Signed-off-by: Trevor Woerner <twoerner@gmail.com>
  1 file changed, 5 insertions(+)
 
 diff --git a/src/main.cpp b/src/main.cpp
-index 677962e..273a217 100644
+index d1077fe..d717cd4 100644
 --- a/src/main.cpp
 +++ b/src/main.cpp
-@@ -164,6 +164,11 @@ main(int argc, char *argv[])
+@@ -202,6 +202,11 @@ main(int argc, char *argv[])
          Options::size = std::pair<int,int>(800, 600);
      }
  
@@ -26,5 +26,7 @@ index 677962e..273a217 100644
 +#endif
 +
      // Create the canvas
- #if GLMARK2_USE_X11
-     NativeStateX11 native_state;
+ #if GLMARK2_USE_EGL
+     GLStateEGL gl_state;
+--
+2.25.1

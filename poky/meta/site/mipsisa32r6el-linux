@@ -15,24 +15,6 @@ ac_cv_have_space_d_name_in_struct_dirent=${ac_cv_have_space_d_name_in_struct_dir
 # fget
 compat_cv_func_snprintf_works=${compat_cv_func_snprintf_works=yes}
 
-# glib
-glib_cv___va_copy=${glib_cv___va_copy=yes}
-glib_cv_has__inline=${glib_cv_has__inline=yes}
-glib_cv_has__inline__=${glib_cv_has__inline__=yes}
-glib_cv_hasinline=${glib_cv_hasinline=yes}
-glib_cv_long_long_format=${glib_cv_long_long_format=ll}
-glib_cv_rtldglobal_broken=${glib_cv_rtldglobal_broken=no}
-glib_cv_sane_realloc=${glib_cv_sane_realloc=yes}
-glib_cv_sizeof_gmutex=${glib_cv_sizeof_gmutex=24}
-glib_cv_sizeof_system_thread=${glib_cv_sizeof_system_thread=4}
-glib_cv_stack_grows=${glib_cv_stack_grows=no}
-glib_cv_uscore=${glib_cv_uscore=no}
-
-# glib-2.0
-glib_cv_stack_grows=${glib_cv_stack_grows=no}
-utils_cv_sys_open_max=${utils_cv_sys_open_max=1015}
-glib_cv_use_pid_surrogate=${glib_cv_use_pid_surrogate=yes}
-
 # libpcap
 ac_cv_linux_vers=${ac_cv_linux_vers=2}
 

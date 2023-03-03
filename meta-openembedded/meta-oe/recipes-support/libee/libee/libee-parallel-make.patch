@@ -3,7 +3,7 @@ fix parallel compiling problem
 without specifying libee_convert_DEPENDENCIES = libee.la, libee_convert
 can't find libee.la when linking as libee is not generated yet.
  
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Yao Zhao <yao.zhao@windriver.com>
 ---

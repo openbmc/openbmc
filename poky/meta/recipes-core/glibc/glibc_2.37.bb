@@ -1,8 +1,6 @@
 require glibc.inc
 require glibc-version.inc
 
-CVE_CHECK_IGNORE += "CVE-2020-10029 CVE-2021-27645"
-
 # glibc https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-1010022
 # glibc https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-1010023
 # glibc https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-1010024
@@ -16,8 +14,8 @@ CVE_CHECK_IGNORE += "CVE-2019-1010022 CVE-2019-1010023 CVE-2019-1010024"
 # Potential patch at https://sourceware.org/bugzilla/show_bug.cgi?id=22853
 CVE_CHECK_IGNORE += "CVE-2019-1010025"
 
-# This has been integrated into the 2.36 branch as of c399271 so is now fixed
-CVE_CHECK_IGNORE += "CVE-2022-39046"
+# This is integrated into the 2.37 branch as of 07b9521fc6
+CVE_CHECK_IGNORE += "CVE-2023-25139"
 
 DEPENDS += "gperf-native bison-native"
 

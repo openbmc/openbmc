@@ -6,7 +6,7 @@ Filtered with:
   filterdiff -p1 -x README -x 'debian/*'
 
 
-Upstream-Status: unmaintained
+Upstream-Status: Inappropriate [unmaintained]
 
 Index: hddtemp-0.3-beta15/doc/hddtemp.8
 ===================================================================

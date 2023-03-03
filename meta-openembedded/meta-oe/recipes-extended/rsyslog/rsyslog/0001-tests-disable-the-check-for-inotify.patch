@@ -12,7 +12,7 @@ since 2.6.13 [1].
 (it would require installing the libc headers otherwise,
  for the test  to detect /usr/include/sys/inotify.h.)
 
-Upstream-Status: Inappropriate[OE-specific]
+Upstream-Status: Inappropriate [OE-specific]
 
 Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
 ---

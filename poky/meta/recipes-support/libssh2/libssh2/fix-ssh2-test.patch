@@ -1,0 +1,23 @@
+In 8.8 OpenSSH disabled sha1 rsa-sha keys out of the box,
+so we need to re-enable them as a workaround for the test
+suite until upstream updates the tests.
+
+See: https://github.com/libssh2/libssh2/issues/630
+
+Upstream-Status: Backport [alternative fixes merged upstream]
+
+Patch taken from https://github.com/mirror-rpm/libssh2/commit/47f7114f7d0780f3075bad51a71881f45cc933c5
+
+--- a/tests/ssh2.sh
++++ b/tests/ssh2.sh
+@@ -25,7 +25,8 @@ $SSHD -f /dev/null -h "$srcdir"/etc/host
+     -o 'Port 4711' \
+     -o 'Protocol 2' \
+     -o "AuthorizedKeysFile $srcdir/etc/user.pub" \
+-    -o 'UsePrivilegeSeparation no' \
++    -o 'HostKeyAlgorithms +ssh-rsa' \
++    -o 'PubkeyAcceptedAlgorithms +ssh-rsa' \
+     -o 'StrictModes no' \
+     -D \
+     $libssh2_sshd_params &
+

@@ -18,13 +18,6 @@ screen_cv_sys_terminfo_used=${screen_cv_sys_terminfo_used=yes}
 # apache
 ac_cv_sizeof_ssize_t=${ac_cv_sizeof_ssize_t=4}
 
-# glib
-glib_cv_va_val_copy=${glib_cv_va_val_copy=yes}
-ac_cv_alignof_guint32=4
-ac_cv_alignof_guint64=8
-ac_cv_alignof_unsigned_long=4
-
-
 # slrn
 slrn_cv_va_val_copy=${slrn_cv_va_val_copy=yes}
 

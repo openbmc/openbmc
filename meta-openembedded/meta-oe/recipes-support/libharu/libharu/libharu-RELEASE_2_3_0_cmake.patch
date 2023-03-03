@@ -3,7 +3,7 @@ https://src.fedoraproject.org/rpms/libharu
 
 Fix the install destination of some files.
 
-Upstream-Status: inappropriate
+Upstream-Status: Inappropriate
 
 Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 

@@ -22,6 +22,17 @@ from oeqa.core.exception import OEQAPreRun, OEQATestNotFound
 
 from oeqa.utils.commands import runCmd, get_bb_vars, get_test_layer
 
+OESELFTEST_METADATA=["run_all_tests", "run_tests", "skips", "machine", "select_tags", "exclude_tags"]
+
+def get_oeselftest_metadata(args):
+    result = {}
+    raw_args = vars(args)
+    for metadata in OESELFTEST_METADATA:
+        if metadata in raw_args:
+            result[metadata] = raw_args[metadata]
+
+    return result
+
 class NonConcurrentTestSuite(unittest.TestSuite):
     def __init__(self, suite, processes, setupfunc, removefunc):
         super().__init__([suite])
@@ -334,12 +345,14 @@ class OESelftestTestContextExecutor(OETestContextExecutor):
         import platform
         from oeqa.utils.metadata import metadata_from_bb
         metadata = metadata_from_bb()
+        oeselftest_metadata = get_oeselftest_metadata(args)
         configuration = {'TEST_TYPE': 'oeselftest',
                         'STARTTIME': args.test_start_time,
                         'MACHINE': self.tc.td["MACHINE"],
                         'HOST_DISTRO': oe.lsb.distro_identifier().replace(' ', '-'),
                         'HOST_NAME': metadata['hostname'],
-                        'LAYERS': metadata['layers']}
+                        'LAYERS': metadata['layers'],
+                        'OESELFTEST_METADATA': oeselftest_metadata}
         return configuration
 
     def get_result_id(self, configuration):

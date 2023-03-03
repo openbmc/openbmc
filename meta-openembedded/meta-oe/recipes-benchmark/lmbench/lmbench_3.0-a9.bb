@@ -99,6 +99,6 @@ pkg_postinst:${PN} () {
 RDEPENDS:${PN} = "perl"
 FILES:${PN} += "${datadir}/lmbench"
 
-ALTERNATIVE:${PN} = "stream"
+ALTERNATIVE:${PN} = "stream hello"
 ALTERNATIVE_LINK_NAME[stream] = "${bindir}/stream"
-
+ALTERNATIVE_LINK_NAME[hello] = "${bindir}/hello"

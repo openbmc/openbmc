@@ -6,7 +6,7 @@ Subject: [PATCH] configure.in: Error fix.
 the error is: conftest.c:9:28: fatal error: ac_nonexistent.h:
 No such file or directory #include <ac_nonexistent.h>
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 
