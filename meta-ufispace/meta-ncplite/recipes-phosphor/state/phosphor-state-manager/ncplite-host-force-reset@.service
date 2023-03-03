@@ -1,0 +1,15 @@
+[Unit]
+Description=NCPLite Force Reset Host%i
+Wants=phosphor-reboot-host@%i.service
+Conflicts=obmc-chassis-poweroff@%i.target
+OnFailure=obmc-chassis-powerreset@%i.target
+
+[Service]
+RemainAfterExit=no
+Type=oneshot
+ExecStart=@SBINDIR@/host-control reset
+ExecStartPost=/bin/sh -c "busctl call xyz.openbmc_project.Logging.IPMI /xyz/openbmc_project/Logging/IPMI xyz.openbmc_project.Logging.IPMI IpmiSelAdd ssaybq 'Reset Button Pressed' '/xyz/openbmc_project/state/chassis0' 3 0x02 0xff 0xff true 0x0020"
+SyslogIdentifier=host-control
+
+[Install]
+WantedBy=obmc-host-force-warm-reboot@%i.target

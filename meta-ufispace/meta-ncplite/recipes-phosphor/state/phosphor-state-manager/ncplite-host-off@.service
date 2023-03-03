@@ -1,0 +1,16 @@
+[Unit]
+Description=NCPLite Host%i Off
+Before=obmc-chassis-hard-poweroff@%i.target
+Before=obmc-chassis-poweroff@%i.target
+Conflicts=obmc-host-startmin@%i.target
+OnFailure=obmc-chassis-poweroff@%i.target
+OnFailureJobMode=flush
+
+[Service]
+Type=oneshot
+ExecStart=@SBINDIR@/host-control gracefuloff
+ExecStartPost=/bin/sh -c "busctl call xyz.openbmc_project.Logging.IPMI \
+        /xyz/openbmc_project/Logging/IPMI \
+        xyz.openbmc_project.Logging.IPMI IpmiSelAdd ssaybq \
+        'Power Button Pressed' '/xyz/openbmc_project/state/chassis0' \
+        3 0x00 0xff 0xff true 0x0020"

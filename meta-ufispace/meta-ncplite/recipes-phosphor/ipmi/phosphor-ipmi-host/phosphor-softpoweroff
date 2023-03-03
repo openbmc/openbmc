@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "Ufi_Bmc: Trigger soft off the host"
+exit 0

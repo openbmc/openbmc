@@ -1,0 +1,17 @@
+{
+    "gpio_configs": {
+        "power_config": {
+            "power_good_in": "CPU_PWRGD",
+            "power_up_outs": [],
+            "reset_outs": []
+        }
+    },
+
+    "gpio_definitions": [
+        {
+            "name": "CPU_PWRGD",
+            "pin": "F0",
+            "direction": "in"
+        }
+    ]
+}

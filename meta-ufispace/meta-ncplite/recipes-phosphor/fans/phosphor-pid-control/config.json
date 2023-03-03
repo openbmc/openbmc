@@ -1,0 +1,177 @@
+{
+    "sensors": [
+        {
+            "name": "FAN0_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN0_RPM",
+            "writePath": "/sys/devices/platform/pwm-fan0/hwmon/**/pwm1",
+            "ignoreDbusMinMax": true,
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "FAN1_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN1_RPM",
+            "writePath": "/sys/devices/platform/pwm-fan0/hwmon/**/pwm1",
+            "ignoreDbusMinMax": true,
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "FAN2_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN2_RPM",
+            "writePath": "/sys/devices/platform/pwm-fan1/hwmon/**/pwm1",
+            "ignoreDbusMinMax": true,
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "FAN3_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN3_RPM",
+            "writePath": "/sys/devices/platform/pwm-fan1/hwmon/**/pwm1",
+            "ignoreDbusMinMax": true,
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "TEMP_MAC_ENV",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/TEMP_MAC_ENV",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "TEMP_MAC_DIE",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/TEMP_MAC_DIE",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        }
+    ],
+    "zones": [
+        {
+            "id": 1,
+            "minThermalOutput": 0.0,
+            "failsafePercent": 100.0,
+            "pids": [
+                {
+                    "name": "FAN0_RPM",
+                    "type": "fan",
+                    "inputs": ["FAN0_RPM"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "derivativeCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 1.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0
+                    }
+                },
+                {
+                    "name": "FAN1_RPM",
+                    "type": "fan",
+                    "inputs": ["FAN1_RPM"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "derivativeCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 1.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0
+                    }
+                },
+                {
+                    "name": "FAN2_RPM",
+                    "type": "fan",
+                    "inputs": ["FAN2_RPM"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "derivativeCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 1.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0
+                    }
+                },
+                {
+                    "name": "FAN3_RPM",
+                    "type": "fan",
+                    "inputs": ["FAN3_RPM"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "derivativeCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 1.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0
+                    }
+                },
+                {
+                    "name": "TEMP_MAC_DIE",
+                    "type": "stepwise",
+                    "inputs": ["TEMP_MAC_DIE"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "positiveHysteresis": 1.0,
+                        "negativeHysteresis": 1.0,
+                        "isCeiling": false,
+                        "reading": {
+                            "0": 25,
+                            "1": 40,
+                            "2": 50,
+                            "3": 60,
+                            "4": 70,
+                            "5": 80
+                        },
+                        "output": {
+                            "0": 45,
+                            "1": 60,
+                            "2": 75,
+                            "3": 85,
+                            "4": 90,
+                            "5": 100
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

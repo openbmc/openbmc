@@ -1,0 +1,10 @@
+[Unit]
+Description=NCPLite Chassis Power on
+Before=phosphor-wait-power-on@%i.service
+After=obmc-power-start-pre@%i.target
+Conflicts=ncplite-chassis-poweroff@%i.target
+
+[Service]
+Type=oneshot
+ExecStart=@SBINDIR@/chassis-control on
+SyslogIdentifier=chassis-control

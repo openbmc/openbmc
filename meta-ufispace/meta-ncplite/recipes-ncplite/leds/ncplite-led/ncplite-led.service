@@ -1,0 +1,12 @@
+[Unit]
+Description=NCPLite Front Panel LED Monitor
+After=xyz.openbmc_project.Inventory.Manager.service
+
+[Service]
+Restart=on-failure
+RestartSec=1s
+ExecStart=@LIBEXECDIR@/ncplite-led/ncplite-led.sh
+SyslogIdentifier=ncplite-led
+
+[Install]
+WantedBy=multi-user.target

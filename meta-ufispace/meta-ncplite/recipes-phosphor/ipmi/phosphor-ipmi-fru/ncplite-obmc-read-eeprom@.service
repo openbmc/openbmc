@@ -1,0 +1,17 @@
+[Unit]
+Description=Read %I EEPROM
+Wants=mapper-wait@-xyz-openbmc_project-inventory.service
+After=mapper-wait@-xyz-openbmc_project-inventory.service
+StartLimitInterval=120
+StartLimitBurst=10
+
+[Service]
+Restart=on-failure
+RestartSec=10
+EnvironmentFile={envfiledir}/obmc/eeproms/%I
+ExecStartPre={bindir}/of-name-to-eeprom.sh {envfiledir}/obmc/eeproms/%I
+ExecStart=/usr/bin/env phosphor-read-eeprom --eeprom $SYSFS_PATH --fruid $FRUID
+SyslogIdentifier=phosphor-read-eeprom
+
+[Install]
+WantedBy=multi-user.target

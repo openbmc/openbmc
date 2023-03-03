@@ -1,0 +1,12 @@
+[Unit]
+Description=Check GPIO State Manager
+After=phosphor-gpio-presence@.service
+Wants=phosphor-gpio-presence@.service
+
+[Service]
+ExecStart=@LIBEXECDIR@/ncplite-inventory-log/inventory-log.sh
+SyslogIdentifier=inventory-log
+Type=simple
+
+[Install]
+WantedBy=multi-user.target

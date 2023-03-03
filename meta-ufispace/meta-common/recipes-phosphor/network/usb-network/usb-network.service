@@ -1,0 +1,10 @@
+[Unit]
+Description=Enable USB Network
+After=phosphor-ipmi-host.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/usb-network.sh
+
+[Install]
+WantedBy=multi-user.target

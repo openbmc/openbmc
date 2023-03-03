@@ -1,0 +1,21 @@
+/xyz/openbmc_project/ipmi/sol/eth0:
+    - Interface: xyz.openbmc_project.Ipmi.SOL
+      Properties:
+          Enable:
+              Default: 'true'
+          Privilege:
+              Default: 4
+          Progress:
+              Default: 0
+          RetryCount:
+              Default: 7
+          RetryIntervalMS:
+              Default: 100
+          Threshold:
+              Default: 1
+
+/xyz/openbmc_project/control/host0/power_restore_policy:
+    - Interface: xyz.openbmc_project.Control.Power.RestorePolicy
+      Properties:
+          PowerRestorePolicy:
+              Default: RestorePolicy::Policy::AlwaysOn

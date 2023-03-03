@@ -1,0 +1,15 @@
+[Unit]
+Description=NCPLite Chassis Power Off
+Before=phosphor-wait-power-off@%i.service
+Conflicts=ncplite-chassis-poweron@%i.target
+
+[Service]
+Type=oneshot
+ExecStart=@SBINDIR@/chassis-control off
+ExecStartPost=/bin/sh -c "busctl call xyz.openbmc_project.Logging.IPMI \
+        /xyz/openbmc_project/Logging/IPMI \
+        xyz.openbmc_project.Logging.IPMI IpmiSelAdd ssaybq \
+        'Power Off' '/xyz/openbmc_project/state/host0' \
+        3 0x00 0xff 0xff true 0x0020"
+ExecStartPost=/bin/sleep 10
+SyslogIdentifier=chassis-control

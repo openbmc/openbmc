@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Usage of this utility
+usage() {
+    echo "Usage: $(basename "$0") [reset|gracefuloff]"
+}
+
+graceful_off() {
+    echo "Set GPIO to graceful shutdown Host"
+    gpioset --hold-period 50ms -t0 power-button=1
+    sleep 0.1
+    gpioset --hold-period 50ms -t0 power-button=0
+    gpioget power-button >/dev/null 2>&1
+}
+
+force_reset() {
+    echo "Set GPIO to reset Host"
+    gpioset --hold-period 50ms -t0 reset-button=0
+    sleep 0.1
+    gpioset --hold-period 50ms -t0 reset-button=1
+    gpioget reset-button >/dev/null 2>&1
+}
+
+if [ "$1" == "reset" ]; then
+    force_reset
+elif [ "$1" == "gracefuloff" ]; then
+    graceful_off
+else
+    echo "Invalid parameter"
+    usage
+fi
+exit 0

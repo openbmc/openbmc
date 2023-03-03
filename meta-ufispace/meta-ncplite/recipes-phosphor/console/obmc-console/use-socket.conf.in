@@ -1,0 +1,5 @@
+[Service]
+ExecStartPre=/usr/sbin/uart-routing.sh init
+ExecStart=-/usr/sbin/dropbear -r ${DROPBEAR_RSAKEY_DIR}/dropbear_rsa_host_key -c "/usr/bin/obmc-console-client" -i $DROPBEAR_EXTRA_ARGS
+ExecStopPost=/usr/sbin/uart-routing.sh reset
+StandardInput=socket

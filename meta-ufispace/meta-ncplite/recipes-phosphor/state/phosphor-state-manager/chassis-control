@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# Usage of this utility
+usage() {
+    echo "Usage: $(basename "$0") [on|off|forceoff]";
+}
+
+#Check CPU boot done pin drop in 30s
+timeout=30
+wait_graceful_off(){
+    echo "Wait for host shutdown in ${timeout}s"
+    while [ "${timeout}" -gt 0 ]; do
+        host_state=$(gpioget --numeric host0-ready)
+        timeout=$((timeout-1))
+        if [ "${host_state}" -eq 0 ]; then
+            echo "Host is graceful off"
+            return 0
+        fi
+        sleep 1
+    done
+    echo "Host still on, but reach timeout"
+}
+
+set_gpio_power_off() {
+    echo "Set GPIO to power off chassis"
+    gpioset --hold-period 50ms -t0 power-chassis-control0=1
+    gpioset --hold-period 50ms -t0 power-chassis-control1=1
+}
+
+set_gpio_power_on() {
+    echo "Set GPIO to power on chassis"
+    val=$(gpioget --numeric host0-ready)
+    if [ "$val" == 1 ]; then
+        exit 0
+    fi
+
+    gpioset --hold-period 50ms -t0 power-chassis-control0=0
+    gpioset --hold-period 50ms -t0 power-chassis-control1=0
+
+    #Record IPMI power cycle SEL
+    busctl call xyz.openbmc_project.Logging.IPMI \
+    /xyz/openbmc_project/Logging/IPMI \
+    xyz.openbmc_project.Logging.IPMI IpmiSelAdd ssaybq \
+    "Power Cycle" "/xyz/openbmc_project/state/host0" \
+    3 0x01 0xff 0xff true 0x0020
+}
+
+if [ "$1" == "on" ]; then
+    set_gpio_power_on
+elif [ "$1" == "off" ]; then
+    wait_graceful_off
+    set_gpio_power_off
+elif [ "$1" == "forceoff" ]; then
+    set_gpio_power_off
+else
+    echo "Invalid parameter"
+    usage
+fi
+exit 0
