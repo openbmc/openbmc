@@ -49,7 +49,7 @@ wait_gpio_falling()
         return 1
     fi
 
-    timeout "$TIMEOUT_SEC" gpiomon --falling-edge --num-events=1 "${GPIO_INFO[0]}" "${GPIO_INFO[1]%$'\n'}"
+    timeout "$TIMEOUT_SEC" gpiomon --silent --falling-edge --num-events=1 "${GPIO_INFO[0]}" "${GPIO_INFO[1]%$'\n'}"
 }
 
 set_fan()
