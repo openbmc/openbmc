@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ "$1" == "0" ]; then
+    echo "Enter chassis-cycle"
+    /usr/sbin/power-ctrl chassis-cycle
+else
+    echo "Enter sled$1 cycle"
+    /usr/sbin/power-ctrl "sled$1" cycle
+fi

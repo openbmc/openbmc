@@ -2,8 +2,8 @@
 Description=Power on System in Sled%i by Step Motor
 Requires=motor-init-calibration@%i.service
 After=motor-init-calibration@%i.service
-Requires=host-ac-on@%i.service
-After=host-ac-on@%i.service
+Requires=chassis-poweron@%i.service
+After=chassis-poweron@%i.service
 Conflicts=host-poweroff@%i.service
 
 [Service]

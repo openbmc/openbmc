@@ -2,7 +2,7 @@
 Description=Bletchlet SLED%i removal target
 
 Conflicts=motor-init-calibration@%i.service
-Conflicts=host-ac-on@%i.service
+Conflicts=chassis-poweron@%i.service
 Conflicts=bletchley-sled-insertion@%i.target
 
 RefuseManualStop=yes

@@ -14,4 +14,5 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
     board-type-checker \
     obmc-phosphor-buttons-signals \
     obmc-phosphor-buttons-handler \
+    phosphor-state-manager \
 "
