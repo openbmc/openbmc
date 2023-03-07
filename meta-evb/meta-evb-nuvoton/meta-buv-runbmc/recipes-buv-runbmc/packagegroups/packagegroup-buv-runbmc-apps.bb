@@ -47,7 +47,6 @@ RDEPENDS:${PN}-system = " \
     openssl-bin \
     openssl-engines \
     nuvoton-ipmi-oem \
-    phosphor-power-monitor \
     phosphor-power-systemd-links-monitor \
     phosphor-power-utils \
     phosphor-power \
@@ -55,6 +54,9 @@ RDEPENDS:${PN}-system = " \
 
 RDEPENDS:${PN}-system:append = " \
         ${@entity_enabled(d, '', 'first-boot-set-psu')} \
+        "
+RDEPENDS:${PN}-system:append = " \
+        ${@entity_enabled(d, 'phosphor-power-monitor-em', 'phosphor-power-monitor')} \
         "
 
 SUMMARY:${PN}-entity = "BUV RunBMC entity"

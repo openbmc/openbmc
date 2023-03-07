@@ -5,6 +5,7 @@ SRC_URI:append:buv-runbmc = " file://buv.json"
 SRC_URI:append:buv-runbmc = " file://psu0.json"
 SRC_URI:append:buv-runbmc = " file://psu1.json"
 SRC_URI:append:buv-runbmc = " file://blacklist.json"
+SRC_URI:append:buv-runbmc = " file://0001-Add-new-type-of-settable-interface-PowerSupply.patch"
 
 do_install:append:buv-runbmc() {
     rm -f ${D}/usr/share/entity-manager/configurations/*.json

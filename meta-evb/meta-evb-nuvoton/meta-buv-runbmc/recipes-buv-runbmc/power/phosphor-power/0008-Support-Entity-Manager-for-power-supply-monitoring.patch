@@ -1,0 +1,445 @@
+From 8273c77e9e317cb19b58337d14e35f5244c76762 Mon Sep 17 00:00:00 2001
+From: Ban Feng <kcfeng0@nuvoton.com>
+Date: Fri, 3 Mar 2023 11:21:27 +0800
+Subject: [PATCH] Support Entity-Manager for power supply monitoring
+
+Signed-off-by: Ban Feng <kcfeng0@nuvoton.com>
+---
+ meson.build                               |   4 +-
+ meson_options.txt                         |   9 ++
+ pmbus.cpp                                 |   1 +
+ power-supply/power_supply.cpp             | 114 +++++++++++++++++++++-
+ power-supply/power_supply.hpp             |   2 +
+ services/power-supply-monitor-em@.service |  15 +++
+ types.hpp                                 |   8 +-
+ utility.cpp                               |  15 ++-
+ 8 files changed, 162 insertions(+), 6 deletions(-)
+ create mode 100644 services/power-supply-monitor-em@.service
+
+diff --git a/meson.build b/meson.build
+index a44306a3..680505cf 100644
+--- a/meson.build
++++ b/meson.build
+@@ -50,6 +50,7 @@ servicedir = systemd.get_pkgconfig_variable('systemdsystemunitdir')
+ 
+ services = [
+     ['supply-monitor', 'power-supply-monitor@.service'],
++    ['supply-monitor-em', 'power-supply-monitor-em@.service'],
+     ['sequencer-monitor', 'pseq-monitor-pgood.service'],
+     ['sequencer-monitor', 'pseq-monitor.service'],
+     ['supply-monitor-ng', 'phosphor-psu-monitor.service'],
+@@ -94,6 +95,7 @@ conf.set(
+ conf.set10(
+     'DEVICE_ACCESS', get_option('device-access'))
+ conf.set10('IBM_VPD', get_option('ibm-vpd'))
++conf.set10('NUVOTON_ENTITY', get_option('nuvoton-entity'))
+ 
+ configure_file(output: 'config.h', configuration: conf)
+ 
+@@ -136,7 +138,7 @@ endif
+ if get_option('power-control')
+     subdir('phosphor-power-sequencer')
+ endif
+-if get_option('supply-monitor')
++if get_option('supply-monitor') or get_option('supply-monitor-em')
+     subdir('power-supply')
+ endif
+ if get_option('supply-monitor-ng')
+diff --git a/meson_options.txt b/meson_options.txt
+index 7cf4e54b..6aff0a68 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -37,6 +37,11 @@ option(
+     description: 'Setup for IBM VPD collection for inventory.',
+ )
+ 
++option(
++    'nuvoton-entity', type: 'boolean', value: false,
++    description: 'Setup for entity manager.',
++)
++
+ option(
+     'ucd90160-yaml', type: 'string', value: 'example/ucd90160.yaml',
+     description: 'The sequencer definition file to use.',
+@@ -52,6 +57,10 @@ option(
+     'supply-monitor', type: 'boolean',
+     description: 'Enable support for power supply monitoring'
+ )
++option(
++    'supply-monitor-em', type: 'boolean',
++    description: 'Enable support for power supply monitoring'
++)
+ option(
+     'supply-monitor-ng', type: 'boolean',
+     description: 'Enable support for power supply monitoring'
+diff --git a/pmbus.cpp b/pmbus.cpp
+index 6ab69442..8c6c67cf 100644
+--- a/pmbus.cpp
++++ b/pmbus.cpp
+@@ -394,6 +394,7 @@ void PMBus::findHwmonDir()
+                                      " DEVICE_PATH=" +
+                                      basePath.string())
+                              .c_str());
++        throw ReadFailure();
+     }
+ }
+ 
+diff --git a/power-supply/power_supply.cpp b/power-supply/power_supply.cpp
+index 06c9b363..03f7bb3b 100644
+--- a/power-supply/power_supply.cpp
++++ b/power-supply/power_supply.cpp
+@@ -30,6 +30,12 @@
+ 
+ #include <functional>
+ 
++#if (NUVOTON_ENTITY == 1)
++#include <systemd/sd-journal.h>
++
++static const std::string messageRegistryVersion("0.1");
++#endif
++
+ namespace phosphor
+ {
+ namespace power
+@@ -87,8 +93,10 @@ PowerSupply::PowerSupply(const std::string& name, size_t inst,
+         bus, match::rules::propertiesChanged(inventoryPath, INVENTORY_IFACE),
+         [this](auto& msg) { this->inventoryChanged(msg); });
+ 
++#if (NUVOTON_ENTITY == 0)
+     // Create /xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply0 DBus object
+     createInventoryObj() ;
++#endif
+ 
+     // Get initial presence state.
+     updatePresence();
+@@ -211,7 +219,7 @@ void PowerSupply::inventoryChanged(sdbusplus::message_t& msg)
+ void PowerSupply::updatePresence()
+ {
+     // Use getProperty utility function to get presence status.
+-    std::string service = "xyz.openbmc_project.Inventory.Manager";
++    std::string service = INVENTORY_MGR_IFACE;
+     util::getProperty(INVENTORY_IFACE, PRESENT_PROP, inventoryPath, service,
+                       bus, this->present);
+ }
+@@ -246,6 +254,7 @@ void PowerSupply::powerStateChanged(sdbusplus::message_t& msg)
+ 
+ void PowerSupply::updatePowerState()
+ {
++    powerOn = util::isPoweredOn(bus);
+     powerOn = true;
+ }
+ 
+@@ -306,12 +315,23 @@ void PowerSupply::checkInputFault(const uint16_t statusWord)
+             nv.add("STATUS_WORD", statusWord);
+             captureCmd(nv, STATUS_INPUT, Type::Debug);
+ 
++#if (NUVOTON_ENTITY == 1)
++            std::string redfishMessageID =
++                    "OpenBMC." + messageRegistryVersion;
++
++            nv.add(inventoryPath.c_str(), 0);
++            redfishMessageID += ".PowerSupplyFailed";
++            sd_journal_send("MESSAGE=%s", inventoryPath.c_str(),
++                            "REDFISH_MESSAGE_ID=%s", redfishMessageID.c_str(),
++                            "REDFISH_MESSAGE_ARGS=%s", nv.get().c_str(), NULL);
++#else
+             using metadata =
+                 org::open_power::Witherspoon::Fault::PowerSupplyInputFault;
+ 
+             report<PowerSupplyInputFault>(
+                 metadata::RAW_STATUS(nv.get().c_str()),
+                 metadata::CALLOUT_INVENTORY_PATH(inventoryPath.c_str()));
++#endif
+ 
+             faultFound = true;
+         }
+@@ -353,6 +373,16 @@ void PowerSupply::checkPGOrUnitOffFault(const uint16_t statusWord)
+             captureCmd(nv, STATUS_IOUT, Type::Debug);
+             captureCmd(nv, STATUS_MFR, Type::Debug);
+ 
++#if (NUVOTON_ENTITY == 1)
++            std::string redfishMessageID =
++                    "OpenBMC." + messageRegistryVersion;
++
++            nv.add(inventoryPath.c_str(), 5);
++            redfishMessageID += ".PowerSupplyFailed";
++            sd_journal_send("MESSAGE=%s", inventoryPath.c_str(),
++                            "REDFISH_MESSAGE_ID=%s", redfishMessageID.c_str(),
++                            "REDFISH_MESSAGE_ARGS=%s", nv.get().c_str(), NULL);
++#else
+             using metadata =
+                 org::open_power::Witherspoon::Fault::PowerSupplyShouldBeOn;
+ 
+@@ -360,6 +390,7 @@ void PowerSupply::checkPGOrUnitOffFault(const uint16_t statusWord)
+             report<PowerSupplyShouldBeOn>(
+                 metadata::RAW_STATUS(nv.get().c_str()),
+                 metadata::CALLOUT_INVENTORY_PATH(inventoryPath.c_str()));
++#endif
+         }
+     }
+ }
+@@ -393,12 +424,23 @@ void PowerSupply::checkCurrentOutOverCurrentFault(const uint16_t statusWord)
+             captureCmd(nv, STATUS_IOUT, Type::Debug);
+             captureCmd(nv, STATUS_MFR, Type::Debug);
+ 
++#if (NUVOTON_ENTITY == 1)
++            std::string redfishMessageID =
++                    "OpenBMC." + messageRegistryVersion;
++
++            nv.add(inventoryPath.c_str(), 4);
++            redfishMessageID += ".PowerSupplyFailed";
++            sd_journal_send("MESSAGE=%s", inventoryPath.c_str(),
++                            "REDFISH_MESSAGE_ID=%s", redfishMessageID.c_str(),
++                            "REDFISH_MESSAGE_ARGS=%s", nv.get().c_str(), NULL);
++#else
+             using metadata = org::open_power::Witherspoon::Fault::
+                 PowerSupplyOutputOvercurrent;
+ 
+             report<PowerSupplyOutputOvercurrent>(
+                 metadata::RAW_STATUS(nv.get().c_str()),
+                 metadata::CALLOUT_INVENTORY_PATH(inventoryPath.c_str()));
++#endif
+ 
+             faultFound = true;
+         }
+@@ -434,12 +476,23 @@ void PowerSupply::checkOutputOvervoltageFault(const uint16_t statusWord)
+             captureCmd(nv, STATUS_IOUT, Type::Debug);
+             captureCmd(nv, STATUS_MFR, Type::Debug);
+ 
++#if (NUVOTON_ENTITY == 1)
++            std::string redfishMessageID =
++                    "OpenBMC." + messageRegistryVersion;
++
++            nv.add(inventoryPath.c_str(), 3);
++            redfishMessageID += ".PowerSupplyFailed";
++            sd_journal_send("MESSAGE=%s", inventoryPath.c_str(),
++                            "REDFISH_MESSAGE_ID=%s", redfishMessageID.c_str(),
++                            "REDFISH_MESSAGE_ARGS=%s", nv.get().c_str(), NULL);
++#else
+             using metadata = org::open_power::Witherspoon::Fault::
+                 PowerSupplyOutputOvervoltage;
+ 
+             report<PowerSupplyOutputOvervoltage>(
+                 metadata::RAW_STATUS(nv.get().c_str()),
+                 metadata::CALLOUT_INVENTORY_PATH(inventoryPath.c_str()));
++#endif
+ 
+             faultFound = true;
+         }
+@@ -474,12 +527,23 @@ void PowerSupply::checkFanFault(const uint16_t statusWord)
+             captureCmd(nv, STATUS_TEMPERATURE, Type::Debug);
+             captureCmd(nv, STATUS_FANS_1_2, Type::Debug);
+ 
++#if (NUVOTON_ENTITY == 1)
++            std::string redfishMessageID =
++                    "OpenBMC." + messageRegistryVersion;
++
++            nv.add(inventoryPath.c_str(), 1);
++            redfishMessageID += ".PowerSupplyFailed";
++            sd_journal_send("MESSAGE=%s", inventoryPath.c_str(),
++                            "REDFISH_MESSAGE_ID=%s", redfishMessageID.c_str(),
++                            "REDFISH_MESSAGE_ARGS=%s", nv.get().c_str(), NULL);
++#else
+             using metadata =
+                 org::open_power::Witherspoon::Fault::PowerSupplyFanFault;
+ 
+             report<PowerSupplyFanFault>(
+                 metadata::RAW_STATUS(nv.get().c_str()),
+                 metadata::CALLOUT_INVENTORY_PATH(inventoryPath.c_str()));
++#endif
+ 
+             auto method = this->bus.new_method_call(
+             "xyz.openbmc_project.LED.GroupManager", "/xyz/openbmc_project/led/groups/power_on",
+@@ -537,12 +601,23 @@ void PowerSupply::checkTemperatureFault(const uint16_t statusWord)
+             nv.add("STATUS_TEMPERATURE", statusTemperature);
+             captureCmd(nv, STATUS_FANS_1_2, Type::Debug);
+ 
++#if (NUVOTON_ENTITY == 1)
++            std::string redfishMessageID =
++                    "OpenBMC." + messageRegistryVersion;
++
++            nv.add(inventoryPath.c_str(), 2);
++            redfishMessageID += ".PowerSupplyFailed";
++            sd_journal_send("MESSAGE=%s", inventoryPath.c_str(),
++                            "REDFISH_MESSAGE_ID=%s", redfishMessageID.c_str(),
++                            "REDFISH_MESSAGE_ARGS=%s", nv.get().c_str(), NULL);
++#else
+             using metadata = org::open_power::Witherspoon::Fault::
+                 PowerSupplyTemperatureFault;
+ 
+             report<PowerSupplyTemperatureFault>(
+                 metadata::RAW_STATUS(nv.get().c_str()),
+                 metadata::CALLOUT_INVENTORY_PATH(inventoryPath.c_str()));
++#endif
+ 
+             faultFound = true;
+         }
+@@ -619,6 +694,7 @@ void PowerSupply::resolveError(const std::string& callout,
+     }
+ }
+ 
++#if (NUVOTON_ENTITY == 0)
+ void PowerSupply::createInventoryObj()
+ {
+     using namespace phosphor::pmbus;
+@@ -687,12 +763,47 @@ void PowerSupply::createInventoryObj()
+         log<level::ERR>(e.what(), entry("PATH=%s", inventoryPath.c_str()));
+     }
+ }
++#endif
+ 
+ void PowerSupply::updateInventory()
+ {
+     using namespace phosphor::pmbus;
+     using namespace sdbusplus::message;
+ 
++#if (NUVOTON_ENTITY == 1)
++    std::string propName, fileName;
++
++    // update ASSET_IFACE and OPERATIONAL_STATE_IFACE properties
++    for (const auto& fru : fruJson.at("fruConfigs"))
++    {
++        if (fru.at("interface") == ASSET_IFACE)
++        {
++            try
++            {
++                propName = fru.at("propertyName");
++                fileName = present ? pmbusIntf.readString(fru.at("fileName"),
++                                                          inventoryPMBusAccessType)
++                                   : "";
++
++                util::setProperty(ASSET_IFACE,
++                                  propName,
++                                  inventoryPath,
++                                  INVENTORY_MGR_IFACE,
++                                  bus,
++                                  fileName);
++            }
++            catch (const ReadFailure& e)
++            {}
++        }
++    }
++
++    util::setProperty(OPERATIONAL_STATE_IFACE,
++                      FUNCTIONAL_PROP,
++                      inventoryPath,
++                      INVENTORY_MGR_IFACE,
++                      bus,
++                      present);
++#else
+     // Build the object map and send it to the inventory
+     using Properties = std::map<std::string, std::variant<std::string, bool>>;
+     using Interfaces = std::map<std::string, Properties>;
+@@ -757,6 +868,7 @@ void PowerSupply::updateInventory()
+     {
+         log<level::ERR>(e.what(), entry("PATH=%s", inventoryPath.c_str()));
+     }
++#endif
+ }
+ 
+ void PowerSupply::syncHistory()
+diff --git a/power-supply/power_supply.hpp b/power-supply/power_supply.hpp
+index 3da9f7f6..f8e88a3c 100644
+--- a/power-supply/power_supply.hpp
++++ b/power-supply/power_supply.hpp
+@@ -381,7 +381,9 @@ class PowerSupply : public Device
+      */
+     void checkTemperatureFault(const uint16_t statusWord);
+ 
++#if (NUVOTON_ENTITY == 0)
+     void createInventoryObj();
++#endif
+ 
+     /**
+      * @brief Adds properties to the inventory.
+diff --git a/services/power-supply-monitor-em@.service b/services/power-supply-monitor-em@.service
+new file mode 100644
+index 00000000..d0e95067
+--- /dev/null
++++ b/services/power-supply-monitor-em@.service
+@@ -0,0 +1,15 @@
++[Unit]
++Description=Power Supply %I Monitor
++Wants=mapper-wait@-xyz-openbmc_project-inventory-system-powersupply-powersupply%i.service
++After=mapper-wait@-xyz-openbmc_project-inventory-system-powersupply-powersupply%i.service
++Wants=mapper-wait@-xyz-openbmc_project-state-chassis0.service
++After=mapper-wait@-xyz-openbmc_project-state-chassis0.service
++ConditionPathExists=/etc/default/obmc/power-supply-monitor/power-supply-monitor-em-%i.conf
++
++[Service]
++EnvironmentFile=/etc/default/obmc/power-supply-monitor/power-supply-monitor-em-%i.conf
++ExecStart=/usr/bin/env psu-monitor --path=${DEVPATH} --instance=${INSTANCE} --inventory=${INVENTORY} --num-history-records=${NUM_HISTORY_RECORDS} --sync-gpio-path=${SYNC_GPIO_PATH} --sync-gpio-num=${SYNC_GPIO_NUM}
++SyslogIdentifier=psu-monitor
++
++[Install]
++RequiredBy=multi-user.target
+diff --git a/types.hpp b/types.hpp
+index fa9dc3a3..247dc48d 100644
+--- a/types.hpp
++++ b/types.hpp
+@@ -5,8 +5,12 @@
+ constexpr auto ASSOCIATION_IFACE = "xyz.openbmc_project.Association";
+ constexpr auto LOGGING_IFACE = "xyz.openbmc_project.Logging.Entry";
+ constexpr auto INVENTORY_IFACE = "xyz.openbmc_project.Inventory.Item";
+-constexpr auto POWER_IFACE = "org.openbmc.control.Power";
++constexpr auto POWER_IFACE = "xyz.openbmc_project.State.Chassis";
++#if (NUVOTON_ENTITY == 1)
++constexpr auto INVENTORY_MGR_IFACE = "xyz.openbmc_project.EntityManager";
++#else
+ constexpr auto INVENTORY_MGR_IFACE = "xyz.openbmc_project.Inventory.Manager";
++#endif
+ constexpr auto ASSET_IFACE = "xyz.openbmc_project.Inventory.Decorator.Asset";
+ constexpr auto PSU_INVENTORY_IFACE =
+     "xyz.openbmc_project.Inventory.Item.PowerSupply";
+@@ -36,7 +40,7 @@ constexpr auto FIELDREPLACEABLE_PROP = "FieldReplaceable";
+ 
+ 
+ constexpr auto INVENTORY_OBJ_PATH = "/xyz/openbmc_project/inventory";
+-constexpr auto POWER_OBJ_PATH = "/org/openbmc/control/power0";
++constexpr auto POWER_OBJ_PATH = "/xyz/openbmc_project/state/chassis0";
+ 
+ constexpr auto INPUT_HISTORY = "input_history";
+ 
+diff --git a/utility.cpp b/utility.cpp
+index ad8e2321..5156bfd5 100644
+--- a/utility.cpp
++++ b/utility.cpp
+@@ -19,6 +19,8 @@
+ 
+ #include <fstream>
+ 
++#include <xyz/openbmc_project/State/Chassis/server.hpp>
++
+ namespace phosphor
+ {
+ namespace power
+@@ -32,6 +34,8 @@ constexpr auto MAPPER_INTERFACE = "xyz.openbmc_project.ObjectMapper";
+ 
+ using namespace phosphor::logging;
+ using json = nlohmann::json;
++using PowerState =
++    sdbusplus::xyz::openbmc_project::State::server::Chassis::PowerState;
+ 
+ std::string getService(const std::string& path, const std::string& interface,
+                        sdbusplus::bus_t& bus, bool logError)
+@@ -164,8 +168,15 @@ bool isPoweredOn(sdbusplus::bus_t& bus, bool defaultState)
+     {
+         // When state = 1, system is powered on
+         auto service = util::getService(POWER_OBJ_PATH, POWER_IFACE, bus);
+-        getProperty<int32_t>(POWER_IFACE, "state", POWER_OBJ_PATH, service, bus,
+-                             state);
++        if (!service.empty())
++        {
++            PowerState currentPowerState;
++            getProperty(POWER_IFACE, "CurrentPowerState", POWER_OBJ_PATH, service, bus, currentPowerState);
++            if (currentPowerState == PowerState::On)
++            {
++                state = 1;
++            }
++        }
+     }
+     catch (const std::exception& e)
+     {
+-- 
+2.34.1
+
