@@ -1,0 +1,249 @@
+From bf4a4a922e41cdf5671b9d670ea5ee987fc6677d Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Fri, 3 Feb 2023 09:28:35 +0800
+Subject: [PATCH] add xyz/openbmc_project/Sensor/Aggregation/ for
+ phosphor-power
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ .../Aggregation/History/Average/meson.build   | 15 +++++
+ .../Aggregation/History/Maximum/meson.build   | 15 +++++
+ .../Sensor/Aggregation/History/meson.build    | 31 ++++++++++
+ .../Sensor/Aggregation/meson.build            |  2 +
+ gen/xyz/openbmc_project/Sensor/meson.build    |  2 +
+ .../History/Average.interface.yaml            | 57 +++++++++++++++++++
+ .../History/Maximum.interface.yaml            | 57 +++++++++++++++++++
+ 7 files changed, 179 insertions(+)
+ create mode 100644 gen/xyz/openbmc_project/Sensor/Aggregation/History/Average/meson.build
+ create mode 100644 gen/xyz/openbmc_project/Sensor/Aggregation/History/Maximum/meson.build
+ create mode 100644 gen/xyz/openbmc_project/Sensor/Aggregation/History/meson.build
+ create mode 100644 gen/xyz/openbmc_project/Sensor/Aggregation/meson.build
+ create mode 100644 yaml/xyz/openbmc_project/Sensor/Aggregation/History/Average.interface.yaml
+ create mode 100644 yaml/xyz/openbmc_project/Sensor/Aggregation/History/Maximum.interface.yaml
+
+diff --git a/gen/xyz/openbmc_project/Sensor/Aggregation/History/Average/meson.build b/gen/xyz/openbmc_project/Sensor/Aggregation/History/Average/meson.build
+new file mode 100644
+index 00000000..ca67f2d7
+--- /dev/null
++++ b/gen/xyz/openbmc_project/Sensor/Aggregation/History/Average/meson.build
+@@ -0,0 +1,15 @@
++# Generated file; do not modify.
++generated_sources += custom_target(
++    'xyz/openbmc_project/Sensor/Aggregation/History/Average__cpp'.underscorify(),
++    input: [ '../../../../../../../yaml/xyz/openbmc_project/Sensor/Aggregation/History/Average.interface.yaml',  ],
++    output: [ 'server.cpp', 'server.hpp', 'client.hpp',  ],
++    depend_files: sdbusplusplus_depfiles,
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'cpp',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.current_source_dir() / '../../../../../../../yaml',
++        'xyz/openbmc_project/Sensor/Aggregation/History/Average',
++    ],
++)
++
+diff --git a/gen/xyz/openbmc_project/Sensor/Aggregation/History/Maximum/meson.build b/gen/xyz/openbmc_project/Sensor/Aggregation/History/Maximum/meson.build
+new file mode 100644
+index 00000000..ac95d273
+--- /dev/null
++++ b/gen/xyz/openbmc_project/Sensor/Aggregation/History/Maximum/meson.build
+@@ -0,0 +1,15 @@
++# Generated file; do not modify.
++generated_sources += custom_target(
++    'xyz/openbmc_project/Sensor/Aggregation/History/Maximum__cpp'.underscorify(),
++    input: [ '../../../../../../../yaml/xyz/openbmc_project/Sensor/Aggregation/History/Maximum.interface.yaml',  ],
++    output: [ 'server.cpp', 'server.hpp', 'client.hpp',  ],
++    depend_files: sdbusplusplus_depfiles,
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'cpp',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.current_source_dir() / '../../../../../../../yaml',
++        'xyz/openbmc_project/Sensor/Aggregation/History/Maximum',
++    ],
++)
++
+diff --git a/gen/xyz/openbmc_project/Sensor/Aggregation/History/meson.build b/gen/xyz/openbmc_project/Sensor/Aggregation/History/meson.build
+new file mode 100644
+index 00000000..c979f5bd
+--- /dev/null
++++ b/gen/xyz/openbmc_project/Sensor/Aggregation/History/meson.build
+@@ -0,0 +1,31 @@
++# Generated file; do not modify.
++subdir('Average')
++generated_others += custom_target(
++    'xyz/openbmc_project/Sensor/Aggregation/History/Average__markdown'.underscorify(),
++    input: [ '../../../../../../yaml/xyz/openbmc_project/Sensor/Aggregation/History/Average.interface.yaml',  ],
++    output: [ 'Average.md' ],
++    depend_files: sdbusplusplus_depfiles,
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'markdown',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.current_source_dir() / '../../../../../../yaml',
++        'xyz/openbmc_project/Sensor/Aggregation/History/Average',
++    ],
++)
++
++subdir('Maximum')
++generated_others += custom_target(
++    'xyz/openbmc_project/Sensor/Aggregation/History/Maximum__markdown'.underscorify(),
++    input: [ '../../../../../../yaml/xyz/openbmc_project/Sensor/Aggregation/History/Maximum.interface.yaml',  ],
++    output: [ 'Maximum.md' ],
++    depend_files: sdbusplusplus_depfiles,
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'markdown',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.current_source_dir() / '../../../../../../yaml',
++        'xyz/openbmc_project/Sensor/Aggregation/History/Maximum',
++    ],
++)
++
+diff --git a/gen/xyz/openbmc_project/Sensor/Aggregation/meson.build b/gen/xyz/openbmc_project/Sensor/Aggregation/meson.build
+new file mode 100644
+index 00000000..44572fc1
+--- /dev/null
++++ b/gen/xyz/openbmc_project/Sensor/Aggregation/meson.build
+@@ -0,0 +1,2 @@
++# Generated file; do not modify.
++subdir('History')
+diff --git a/gen/xyz/openbmc_project/Sensor/meson.build b/gen/xyz/openbmc_project/Sensor/meson.build
+index 7b9c7a08..732fa893 100644
+--- a/gen/xyz/openbmc_project/Sensor/meson.build
++++ b/gen/xyz/openbmc_project/Sensor/meson.build
+@@ -74,3 +74,5 @@ generated_others += custom_target(
+     ],
+ )
+ 
++subdir('Aggregation')
++
+diff --git a/yaml/xyz/openbmc_project/Sensor/Aggregation/History/Average.interface.yaml b/yaml/xyz/openbmc_project/Sensor/Aggregation/History/Average.interface.yaml
+new file mode 100644
+index 00000000..1d6e89fb
+--- /dev/null
++++ b/yaml/xyz/openbmc_project/Sensor/Aggregation/History/Average.interface.yaml
+@@ -0,0 +1,57 @@
++description: >
++    Implement to provide an object that contains a history of averages.  The
++    object this interface is placed on should provide information about the
++    duration the average is calculated over.
++
++properties:
++    - name: Scale
++      type: int64
++      description: >
++          The reading scaling factor N, where the actual reading is value *
++          10^N. This is immutable once set.
++
++    - name: Unit
++      type: enum[self.Unit]
++      description: >
++          The unit of the reading.  Immutable once set for a sensor. For objects
++          in the temperature namespace, Unit must be "DegreesC". For objects in
++          the fan_tach namespace, Unit must be "RPMS". For objects in the
++          voltage namespace, Unit must be "Volts". For objects in the altitude
++          namespace, Unit must be "Meters". For objects in the current
++          namespace, Unit must be "Amperes". For objects in the power namespace,
++          Unit must be "Watts". For objects in the energy namespace, Unit must
++          be "Joules".
++
++    - name: Values
++      type: array[struct[uint64,int64]]
++      description: >
++          An array of timestamp, average value tuples.  The timestamp is the
++          number of milliseconds since 1970.  The entries in the array will
++          always be ordered from newest to oldest.
++
++enumerations:
++    - name: Unit
++      description: >
++          A sensor reading unit.
++      values:
++          - name: DegreesC
++            description: >
++                Temperature as degrees Celsius.
++          - name: RPMS
++            description: >
++                Frequency of rotation as revolutions per minute.
++          - name: Volts
++            description: >
++                Electromotive force as volts.
++          - name: Meters
++            description: >
++                Length as meters.
++          - name: Amperes
++            description: >
++                Electrical charge flow rate as Amperes.
++          - name: Watts
++            description: >
++                Rate of energy transfer as Watts.
++          - name: Joules
++            description: >
++                Energy transfer as Joules.
+diff --git a/yaml/xyz/openbmc_project/Sensor/Aggregation/History/Maximum.interface.yaml b/yaml/xyz/openbmc_project/Sensor/Aggregation/History/Maximum.interface.yaml
+new file mode 100644
+index 00000000..92adeae1
+--- /dev/null
++++ b/yaml/xyz/openbmc_project/Sensor/Aggregation/History/Maximum.interface.yaml
+@@ -0,0 +1,57 @@
++description: >
++    Implement to provide an object that contains a history of maximum values.
++    The values are the maximum values within a time period.  The object this
++    interface is placed on should provide information about the time period.
++
++properties:
++    - name: Scale
++      type: int64
++      description: >
++          The reading scaling factor N, where the actual reading is value *
++          10^N. This is immutable once set.
++
++    - name: Unit
++      type: enum[self.Unit]
++      description: >
++          The unit of the reading.  Immutable once set for a sensor. For objects
++          in the temperature namespace, Unit must be "DegreesC". For objects in
++          the fan_tach namespace, Unit must be "RPMS". For objects in the
++          voltage namespace, Unit must be "Volts". For objects in the altitude
++          namespace, Unit must be "Meters". For objects in the current
++          namespace, Unit must be "Amperes". For objects in the power namespace,
++          Unit must be "Watts". For objects in the energy namespace, Unit must
++          be "Joules".
++
++    - name: Values
++      type: array[struct[uint64,int64]]
++      description: >
++          An array of timestamp, maximum value tuples.  The timestamp is the
++          number of milliseconds since 1970.  The entries in the array will
++          always be ordered from newest to oldest.
++
++enumerations:
++    - name: Unit
++      description: >
++          A sensor reading unit.
++      values:
++          - name: DegreesC
++            description: >
++                Temperature as degrees Celsius.
++          - name: RPMS
++            description: >
++                Frequency of rotation as revolutions per minute.
++          - name: Volts
++            description: >
++                Electromotive force as volts.
++          - name: Meters
++            description: >
++                Length as meters.
++          - name: Amperes
++            description: >
++                Electrical charge flow rate as Amperes.
++          - name: Watts
++            description: >
++                Rate of energy transfer as Watts.
++          - name: Joules
++            description: >
++                Energy transfer as Joules.
+-- 
+2.34.1
+

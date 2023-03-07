@@ -1,0 +1,54 @@
+From 4a54e9e3db0bd411270d9f202a3e2817502f343f Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Fri, 3 Feb 2023 09:26:40 +0800
+Subject: [PATCH] use interface /xyz/openbmc_project/
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ power-supply/average.hpp | 4 ++--
+ power-supply/maximum.hpp | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/power-supply/average.hpp b/power-supply/average.hpp
+index 2a059123..34cccdd4 100644
+--- a/power-supply/average.hpp
++++ b/power-supply/average.hpp
+@@ -1,5 +1,5 @@
+ #pragma once
+-#include <org/open_power/Sensor/Aggregation/History/Average/server.hpp>
++#include <xyz/openbmc_project/Sensor/Aggregation/History/Average/server.hpp>
+ 
+ #include <functional>
+ 
+@@ -14,7 +14,7 @@ template <typename T>
+ using ServerObject = typename sdbusplus::server::object_t<T>;
+ 
+ using AverageInterface =
+-    sdbusplus::org::open_power::Sensor::Aggregation::History::server::Average;
++    sdbusplus::xyz::openbmc_project::Sensor::Aggregation::History::server::Average;
+ 
+ /**
+  * @class Average
+diff --git a/power-supply/maximum.hpp b/power-supply/maximum.hpp
+index 599548ea..fa2a16f5 100644
+--- a/power-supply/maximum.hpp
++++ b/power-supply/maximum.hpp
+@@ -1,5 +1,5 @@
+ #pragma once
+-#include <org/open_power/Sensor/Aggregation/History/Maximum/server.hpp>
++#include <xyz/openbmc_project/Sensor/Aggregation/History/Maximum/server.hpp>
+ 
+ #include <functional>
+ 
+@@ -14,7 +14,7 @@ template <typename T>
+ using ServerObject = typename sdbusplus::server::object_t<T>;
+ 
+ using MaximumInterface =
+-    sdbusplus::org::open_power::Sensor::Aggregation::History::server::Maximum;
++    sdbusplus::xyz::openbmc_project::Sensor::Aggregation::History::server::Maximum;
+ 
+ /**
+  * @class Maximum
+-- 
+2.34.1
+

@@ -1,0 +1,145 @@
+From 700d5fd994251f05058469ed1c9d8a597ecde7b3 Mon Sep 17 00:00:00 2001
+From: Allen Kang <jhkang@nuvoton.com>
+Date: Tue, 14 Feb 2023 14:39:21 +0800
+Subject: [PATCH] Allen add create PSU DBUs obj
+
+---
+ power-supply/power_supply.cpp | 73 +++++++++++++++++++++++++++++++++++
+ power-supply/power_supply.hpp |  2 +
+ types.hpp                     |  6 +++
+ 3 files changed, 81 insertions(+)
+
+diff --git a/power-supply/power_supply.cpp b/power-supply/power_supply.cpp
+index d2258b30..d4d8b67f 100644
+--- a/power-supply/power_supply.cpp
++++ b/power-supply/power_supply.cpp
+@@ -90,6 +90,10 @@ PowerSupply::PowerSupply(const std::string& name, size_t inst,
+     presentMatch = std::make_unique<match_t>(
+         bus, match::rules::propertiesChanged(inventoryPath, INVENTORY_IFACE),
+         [this](auto& msg) { this->inventoryChanged(msg); });
++
++    // Create /xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply0 DBus object
++    createInventoryObj() ;
++
+     // Get initial presence state.
+     updatePresence();
+ 
+@@ -630,6 +634,75 @@ void PowerSupply::resolveError(const std::string& callout,
+     }
+ }
+ 
++void PowerSupply::createInventoryObj()
++{
++    using namespace phosphor::pmbus;
++    using namespace sdbusplus::message;
++
++    log<level::ERR>("Allen power_supply.cpp createInventoryObj");
++    // Build the object map and send it to the inventory
++    using Properties = std::map<std::string, std::variant<std::string, bool>>;
++    using Interfaces = std::map<std::string, Properties>;
++    using Object = std::map<object_path, Interfaces>;
++    Properties assetProps;
++    Properties operProps;
++    Properties fieldreplaceableProps;
++    Properties cachedProps;
++    Properties prettyNameProps;
++    Properties presentProps ;
++    Interfaces interfaces;
++    Object object;
++    std::string powersupplyName = std::string( "powersupply0" ) ;
++
++    operProps.emplace(FUNCTIONAL_PROP, true);
++    interfaces.emplace(OPERATIONAL_STATE_IFACE, std::move(operProps));
++
++    cachedProps.emplace(CACHED_PROP, true);
++    interfaces.emplace(DECOR_CACHEABLE_IFACE, std::move(cachedProps));
++
++    fieldreplaceableProps.emplace(FIELDREPLACEABLE_PROP, true);
++    interfaces.emplace(DECOR_REPLACEABLE_IFACE, std::move(fieldreplaceableProps));
++
++    presentProps.emplace(PRESENT_PROP, true);
++    interfaces.emplace(INVENTORY_IFACE, std::move(presentProps));
++
++    prettyNameProps.emplace(PRETTYNAME_PROP, std::move(powersupplyName));
++    interfaces.emplace(INVENTORY_IFACE, std::move(operProps));
++
++    presentProps.emplace(PRESENT_PROP, true);
++    interfaces.emplace(PSU_INVENTORY_IFACE, std::move(presentProps));
++
++    // For Notify(), just send the relative path of the inventory
++    // object so remove the INVENTORY_OBJ_PATH prefix
++    auto path = inventoryPath.substr(strlen(INVENTORY_OBJ_PATH));
++    log<level::ERR>((std::string("Allen power_supply.cpp createInventoryObj inventoryPath=") + inventoryPath.c_str()).c_str());
++
++    object.emplace(path, std::move(interfaces));
++
++    try
++    {
++        auto service =
++            util::getService(INVENTORY_OBJ_PATH, INVENTORY_MGR_IFACE, bus);
++
++        if (service.empty())
++        {
++            log<level::ERR>("Unable to get inventory manager service");
++            return;
++        }
++
++        auto method = bus.new_method_call(service.c_str(), INVENTORY_OBJ_PATH,
++                                          INVENTORY_MGR_IFACE, "Notify");
++
++        method.append(std::move(object));
++
++        auto reply = bus.call(method);
++    }
++    catch (const std::exception& e)
++    {
++        log<level::ERR>(e.what(), entry("PATH=%s", inventoryPath.c_str()));
++    }
++}
++
+ void PowerSupply::updateInventory()
+ {
+     using namespace phosphor::pmbus;
+diff --git a/power-supply/power_supply.hpp b/power-supply/power_supply.hpp
+index c87df39c..3da9f7f6 100644
+--- a/power-supply/power_supply.hpp
++++ b/power-supply/power_supply.hpp
+@@ -381,6 +381,8 @@ class PowerSupply : public Device
+      */
+     void checkTemperatureFault(const uint16_t statusWord);
+ 
++    void createInventoryObj();
++
+     /**
+      * @brief Adds properties to the inventory.
+      *
+diff --git a/types.hpp b/types.hpp
+index 502c1347..fa9dc3a3 100644
+--- a/types.hpp
++++ b/types.hpp
+@@ -16,6 +16,8 @@ constexpr auto VERSION_IFACE = "xyz.openbmc_project.Software.Version";
+ constexpr auto AVAILABILITY_IFACE =
+     "xyz.openbmc_project.State.Decorator.Availability";
+ constexpr auto ASSOC_DEF_IFACE = "xyz.openbmc_project.Association.Definitions";
++constexpr auto DECOR_CACHEABLE_IFACE = "xyz.openbmc_project.Inventory.Decorator.Cacheable";
++constexpr auto DECOR_REPLACEABLE_IFACE = "xyz.openbmc_project.Inventory.Decorator.Replaceable";
+ #ifdef IBM_VPD
+ constexpr auto DINF_IFACE = "com.ibm.ipzvpd.DINF";
+ constexpr auto VINI_IFACE = "com.ibm.ipzvpd.VINI";
+@@ -25,9 +27,13 @@ constexpr auto ENDPOINTS_PROP = "endpoints";
+ constexpr auto MESSAGE_PROP = "Message";
+ constexpr auto RESOLVED_PROP = "Resolved";
+ constexpr auto PRESENT_PROP = "Present";
++constexpr auto PRETTYNAME_PROP = "PrettyName";
+ constexpr auto FUNCTIONAL_PROP = "Functional";
+ constexpr auto AVAILABLE_PROP = "Available";
+ constexpr auto ASSOC_PROP = "Associations";
++constexpr auto CACHED_PROP = "Cached";
++constexpr auto FIELDREPLACEABLE_PROP = "FieldReplaceable";
++
+ 
+ constexpr auto INVENTORY_OBJ_PATH = "/xyz/openbmc_project/inventory";
+ constexpr auto POWER_OBJ_PATH = "/org/openbmc/control/power0";
+-- 
+2.34.1
+

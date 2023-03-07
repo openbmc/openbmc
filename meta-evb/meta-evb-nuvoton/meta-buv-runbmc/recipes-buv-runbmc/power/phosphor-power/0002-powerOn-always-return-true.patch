@@ -1,0 +1,26 @@
+From b98ea31a984f2b976a1fda033e2dffbb5a845fe5 Mon Sep 17 00:00:00 2001
+From: Allen Kang <jhkang@nuvoton.com>
+Date: Tue, 21 Feb 2023 17:07:48 +0800
+Subject: [PATCH] powerOn always return true
+
+Signed-off-by: Allen Kang <jhkang@nuvoton.com>
+---
+ power-supply/power_supply.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/power-supply/power_supply.cpp b/power-supply/power_supply.cpp
+index ce6a43a7..b2d6c03f 100644
+--- a/power-supply/power_supply.cpp
++++ b/power-supply/power_supply.cpp
+@@ -241,7 +241,7 @@ void PowerSupply::powerStateChanged(sdbusplus::message_t& msg)
+ 
+ void PowerSupply::updatePowerState()
+ {
+-    powerOn = util::isPoweredOn(bus);
++    powerOn = true;
+ }
+ 
+ void PowerSupply::checkInputFault(const uint16_t statusWord)
+-- 
+2.34.1
+

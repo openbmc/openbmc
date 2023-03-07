@@ -47,6 +47,10 @@ RDEPENDS:${PN}-system = " \
     openssl-bin \
     openssl-engines \
     nuvoton-ipmi-oem \
+    phosphor-power-monitor \
+    phosphor-power-systemd-links-monitor \
+    phosphor-power-utils \
+    phosphor-power \
     "
 
 RDEPENDS:${PN}-system:append = " \

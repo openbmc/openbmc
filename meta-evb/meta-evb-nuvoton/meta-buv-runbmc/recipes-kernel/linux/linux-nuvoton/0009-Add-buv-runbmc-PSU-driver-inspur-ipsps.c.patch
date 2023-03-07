@@ -1,0 +1,47 @@
+From f097e76d8367fc2efa83302c29a4a4caf065ea79 Mon Sep 17 00:00:00 2001
+From: Allen Kang <jhkang@nuvoton.com>
+Date: Mon, 6 Mar 2023 16:14:17 +0800
+Subject: [PATCH] Add buv-runbmc PSU driver, inspur-ipsps.c.
+
+Signed-off-by: Allen Kang <jhkang@nuvoton.com>
+---
+ arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts | 9 +++++----
+ drivers/hwmon/pmbus/inspur-ipsps.c               | 2 +-
+ 2 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts b/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts
+index 25b58a47203f..72985a81dbe3 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts
+@@ -284,10 +284,11 @@ &i2c1 {
+ };
+ 
+ &i2c2 {
+-	#address-cells = <1>;
+-	#size-cells = <0>;
+-	clock-frequency= <100000>;
+-	status = "okay";
++	/* Refer Olympus's setting, should be modified once needed. */
++	power-supply@58 {
++		compatible = "inspur,ipsps1";
++		reg = <0x58>;
++	};
+ };
+ 
+ &i2c3 {
+diff --git a/drivers/hwmon/pmbus/inspur-ipsps.c b/drivers/hwmon/pmbus/inspur-ipsps.c
+index 0f614e8d95f6..c92ac46cd563 100644
+--- a/drivers/hwmon/pmbus/inspur-ipsps.c
++++ b/drivers/hwmon/pmbus/inspur-ipsps.c
+@@ -16,7 +16,7 @@
+ #define IPSPS_REG_VENDOR_ID	0x99
+ #define IPSPS_REG_MODEL		0x9A
+ #define IPSPS_REG_FW_VERSION	0x9B
+-#define IPSPS_REG_PN		0x9C
++#define IPSPS_REG_PN		0xAD
+ #define IPSPS_REG_SN		0x9E
+ #define IPSPS_REG_HW_VERSION	0xB0
+ #define IPSPS_REG_MODE		0xFC
+-- 
+2.34.1
+

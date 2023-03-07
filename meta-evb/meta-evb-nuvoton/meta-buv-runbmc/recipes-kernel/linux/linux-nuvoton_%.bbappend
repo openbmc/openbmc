@@ -6,6 +6,7 @@ SRC_URI:append:buv-runbmc = " \
   file://0006-driver-SPI-add-w25q01jv-support.patch \
   file://0007-Ampere-Altra-MAX-SSIF-IPMI-driver.patch \
   file://0008-driver-misc-seven-segment-display-gpio-driver.patch \
+  file://0009-Add-buv-runbmc-PSU-driver-inspur-ipsps.c.patch \
   "
 
 SRC_URI:append:buv-runbmc = " file://0001-drivers-spi-Bugfixed-npcm_fiu_uma_read-set-wrong-val.patch"
