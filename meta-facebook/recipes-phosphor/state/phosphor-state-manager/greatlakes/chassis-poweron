@@ -4,40 +4,40 @@
 # shellcheck source=meta-facebook/recipes-phosphor/state/phosphor-state-manager/greatlakes/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 
-POWER_OK_SLOT=$(( $1+9 ))
-slot=$(( $1-1 ))
-OFFSET=$(( 0x9 + slot ))
+CHASSIS_ID=$1
+SLOT=$(( $1-1 ))
+OFFSET=$(( 0x9 + SLOT ))
 
 # Server 12v power on
 chassis-power-on()
 {
-       result=$(i2cset -y $BUS_NUM $CPLD_PWR_CTRL_ADDR $OFFSET $POW_ON_SLOT)
+       result=$(i2cset -y "$CPLD_BUS_NUM" "$CPLD_PWR_CTRL_ADDR" "$OFFSET" "$POW_ON_SLOT")
        echo "$result"
        sleep 1
-       chassis_status=$(gpioget 0 $POWER_OK_SLOT)
-       if [ "$chassis_status" == 1 ]
+
+       # Check chassis stattus after doing 12V on
+       chassis_status=$(chassis-power-status $SLOT)
+       if [ "$chassis_status" == "$STATE_ON" ]
        then
+               busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON"
                echo "Chassis is power on"
        else
-               echo "Chassis is already on"
-               exit 1;
+               busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF"
+               echo "Chassis is power off"
+               exit 0;
        fi
 }
-chassis-power-gpio-status()
-{
-        if [ "$slot" -le 4  ]
-        then
-                status=$(gpioget 0 $POWER_OK_SLOT)
-                if [ "$status" == 0 ]
-                then
-                        chassis-power-on
-                        exit 0;
-                else
-                        echo "Chassis is already on"
-                        exit 1;
-                fi
-        fi
+
+chassis_status=$(chassis-power-status $SLOT)
+if [ "$chassis_status" == "$STATE_UNKNOWN" ]
+then
         echo "Invalid slot id"
         exit 1;
-}
-chassis-power-gpio-status
+elif [ "$chassis_status" == "$STATE_OFF" ]
+then
+        chassis-power-on
+        exit 0;
+else
+        echo "Chassis is already on"
+        exit 0;
+fi

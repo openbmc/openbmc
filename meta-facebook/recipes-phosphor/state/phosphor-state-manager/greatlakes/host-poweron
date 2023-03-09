@@ -4,36 +4,41 @@
 # shellcheck source=meta-facebook/recipes-phosphor/state/phosphor-state-manager/greatlakes/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 
+HOST_ID=$1
 SLOT_ID=$(( $1-1  << 2 ))
 # Host Power On
 host-power-on()
 {
         for pwr_cmd in "${power_seq[@]}"
         do
-             result="$(busctl call $SERVICE $OBJECT_PATH $INTERFACE sendRequest yyyyay $SLOT_ID $NETFN $LUN $CMD $DATA_LEN 0x01 0x42 0x01 0x00 "$pwr_cmd")"
+             result="$(busctl call "$SERVICE" "$OBJECT_PATH" "$INTERFACE" sendRequest yyyyay "$SLOT_ID" "$NETFN" "$LUN" "$CMD" "$DATA_LEN" 0x01 0x42 0x01 0x00 "$pwr_cmd")"
              echo "$result"
-             if [ "$pwr_cmd" == $POWER_BTN_LOW ]
+             if [ "$pwr_cmd" == "$POWER_BTN_LOW" ]
              then
                      sleep 2
              fi
         done
-        echo "Host power on"
-        exit 0;
+
+        # Check host status after doing host power on
+        host_status=$(host-power-status $SLOT_ID)
+        if [ "$host_status" == "$STATE_ON" ]
+        then
+             busctl set-property "$HOST_BUS_NAME""$HOST_ID" "$HOST_OBJ_PATH""$HOST_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_ON"
+             echo "Host power on"
+             exit 0;
+        else
+             busctl set-property "$HOST_BUS_NAME""$HOST_ID" "$HOST_OBJ_PATH""$HOST_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_OFF"
+             echo "Host power off"
+             exit 0;
+        fi
 }
 
 # Check Host Response and Status
-host-power-status()
-{
-   response="$(busctl call $SERVICE $OBJECT_PATH $INTERFACE sendRequest yyyyay $SLOT_ID 0x38 $LUN 0x03 0x03 0x15 0xa0 0x00)"
-
-   result=$(echo "$response" | cut -d" " -f $PWRGD_SYS_PWROK_INDEX)
-   res="$(( "$result" & 0x80  ))"
-   pgood="$(( "$res" >> 7 ))"
-   if [ "$pgood" == $STATE_OFF ]
-   then
-       host-power-on
-   fi
+host_status=$(host-power-status $SLOT_ID)
+if [ "$host_status" == "$STATE_OFF" ]
+then
+   host-power-on
+else
    echo "Power is already on"
    exit 1;
-}
-host-power-status
+fi
