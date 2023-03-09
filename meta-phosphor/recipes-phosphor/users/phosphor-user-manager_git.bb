@@ -14,6 +14,7 @@ PV = "1.0+git${SRCPV}"
 PR = "r1"
 
 SRC_URI = "git://github.com/openbmc/phosphor-user-manager;branch=master;protocol=https"
+SRC_URI += "file://upgrade_hostconsole_group.sh"
 
 S = "${WORKDIR}/git"
 
@@ -22,6 +23,11 @@ inherit obmc-phosphor-dbus-service
 inherit useradd
 
 EXTRA_OEMESON = "-Dtests=disabled"
+
+do_install:append() {
+  install -d ${D}${libexecdir}
+  install -m 0755 ${WORKDIR}/upgrade_hostconsole_group.sh ${D}${libexecdir}/upgrade_hostconsole_group.sh
+}
 
 FILES:phosphor-ldap += " \
         ${bindir}/phosphor-ldap-conf \
@@ -43,3 +49,11 @@ DBUS_SERVICE:${PN} += "xyz.openbmc_project.User.Manager.service"
 DBUS_SERVICE:phosphor-ldap = " \
         xyz.openbmc_project.Ldap.Config.service \
 "
+
+EXTRA_USERS_PARAMS += " \
+   groupadd hostconsole; \
+   "
+
+EXTRA_USERS_PARAMS += " \
+  usermod --append --groups hostconsole root; \
+  "

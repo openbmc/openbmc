@@ -48,5 +48,5 @@ USERADD_PACKAGES = "${PN}"
 # add a user called httpd for the server to assume
 USERADD_PARAM:${PN} = "-r -s /sbin/nologin bmcweb"
 
-GROUPADD_PARAM:${PN} = "web; redfish"
+GROUPADD_PARAM:${PN} = "web; redfish; hostconsole"
 FULL_OPTIMIZATION:append = " -Os"

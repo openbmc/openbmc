@@ -17,6 +17,7 @@ PR = "r1"
 
 SRC_URI = "git://github.com/openbmc/obmc-console;branch=master;protocol=https"
 SRC_URI += "file://${BPN}.conf"
+SRC_URI += "file://dropbear.env"
 
 S = "${WORKDIR}/git"
 SYSTEMD_SERVICE:${PN} += "obmc-console-ssh@.service \
@@ -31,6 +32,9 @@ inherit systemd
 do_install:append() {
         # Install the server configuration
         install -m 0755 -d ${D}${sysconfdir}/${BPN}
+
+        install -m 0644 ${WORKDIR}/dropbear.env ${D}${sysconfdir}/${BPN}/
+
         # If the OBMC_CONSOLE_TTYS variable is used without the default OBMC_CONSOLE_HOST_TTY
         # the port specific config file should be provided. If it is just OBMC_CONSOLE_HOST_TTY,
         # use the old style which supports both port specific or obmc-console.conf method.

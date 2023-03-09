@@ -2,6 +2,7 @@
 Description=Phosphor User Manager
 
 [Service]
+ExecStartPre=-/usr/libexec/upgrade_hostconsole_group.sh
 ExecStart=/usr/bin/env phosphor-user-manager
 SyslogIdentifier=phosphor-user-manager
 Restart=always
