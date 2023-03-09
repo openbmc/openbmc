@@ -16,8 +16,30 @@ function get_gpio_num() {
     fi
 
     if [ "${CHIP_PIN[0]}" -gt 7 ]; then
-        BUS_ADDR=$(gpiodetect | grep gpiochip"${CHIP_PIN[0]}" | awk '{print substr($2, 2, length($2) - 2)}')
-        GPIO_BASE=$(cat /sys/bus/i2c/devices/"$BUS_ADDR"/gpio/*/base)
+        BUS_ADDR=$(gpiodetect | grep gpiochip"${CHIP_PIN[0]}" | \
+                   grep -o '\[.*]' | tr -d ' \[\]')
+        GPIO_BASE_DIR=$(cd /sys/bus/i2c/devices/"$BUS_ADDR"/gpio/ || \
+                        exit; ls -1 -v)
+        # Check that there is a single gpiobank per i2c device
+        GPIO_BANKS=$(cd /sys/bus/i2c/devices/"$BUS_ADDR"/ || \
+                     exit ;  ls -1 -d -v gpiochip*)
+        # Determine which GPIO_BASE to use based on the place of the GPIO_BANK
+        # in comparision to GPIO_BANKS
+        # gpiochip# is set in reverse order of numbering for location of
+        # GPIO_BASE_DIR
+        count=$(echo "$GPIO_BANKS" | wc -w)
+        for X in ${GPIO_BANKS}
+        do
+            if [[ $(gpiofind "$1" | cut -d " " -f 1) == "$X" ]]; then
+                # Used to select the correct GPIO_BASE value
+                #shellcheck disable=SC2086
+                GPIO_BASE_DIR=$(echo ${GPIO_BASE_DIR} | cut -d " " -f $count)
+                break
+            fi
+            count=$((count-1))
+        done
+        tmp="/sys/bus/i2c/devices/$BUS_ADDR/gpio/${GPIO_BASE_DIR[0]}/base"
+        GPIO_BASE=$(cat "$tmp")
         echo "$((GPIO_BASE+CHIP_PIN[1]))"
     else
         echo "$((CHIP_PIN[0]*32+CHIP_PIN[1]))"
@@ -36,7 +58,12 @@ function set_gpio_ctrl() {
 function get_gpio_ctrl() {
     GPIO_NUM=$(get_gpio_num "$1")
     echo "$GPIO_NUM" > /sys/class/gpio/export
-    cat /sys/class/gpio/gpio"$GPIO_NUM"/value
+    # GPIOs added by drivers use different path for value most but not all
+    # drivers follow this trend
+    # Try reading like traditional GPIO, if fails, try reading in driver format
+    if ! cat /sys/class/gpio/gpio"$GPIO_NUM"/value 2> /dev/null ; then
+        cat /sys/class/gpio/"$1"/value
+    fi
     echo "$GPIO_NUM" > /sys/class/gpio/unexport
 }
 

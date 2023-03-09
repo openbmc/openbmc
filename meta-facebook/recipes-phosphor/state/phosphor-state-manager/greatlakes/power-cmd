@@ -20,3 +20,14 @@ export POW_ON_SLOT=0x01
 export POW_OFF_SLOT=0x00
 export CPLD_PWR_CTRL_ADDR=0xf
 export PWRGD_SYS_PWROK_INDEX=12
+export IANA="0x15 0xA0 0x0"
+export IANA_LEN=3
+export CHASSIS_BUS_NAME="xyz.openbmc_project.State.Chassis"
+export CHASSIS_OBJ_PATH="/xyz/openbmc_project/state/chassis"
+export CHASSIS_INTF_NAME="xyz.openbmc_project.State.Chassis"
+export CHASSIS_PROPERTY_NAME="CurrentPowerState"
+export HOST_BUS_NAME="xyz.openbmc_project.State.Host"
+export HOST_OBJ_PATH="/xyz/openbmc_project/state/host"
+export HOST_INTF_NAME="xyz.openbmc_project.State.Host"
+export HOST_PROPERTY_NAME="CurrentHostState"
+
