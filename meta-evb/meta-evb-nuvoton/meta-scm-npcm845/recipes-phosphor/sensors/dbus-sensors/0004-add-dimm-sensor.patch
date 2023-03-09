@@ -215,7 +215,7 @@ index 00000000..b9e6d6ae
 +}
 +
 +DIMMSensor::DIMMSensor(std::shared_ptr<sdbusplus::asio::connection>& conn,
-+                             boost::asio::io_service& io,
++                             boost::asio::io_context& io,
 +                             const std::string& sensorName,
 +                             const std::string& sensorType,
 +                             const std::string& interface,
@@ -552,7 +552,7 @@ index 00000000..b9e6d6ae
 +{
 +    static constexpr size_t pollTime = 1; // in seconds
 +
-+    waitTimer.expires_from_now(boost::posix_time::seconds(pollTime));
++    waitTimer.expires_after(std::chrono::seconds(pollTime));
 +    waitTimer.async_wait([this](const boost::system::error_code& ec) {
 +        if (ec == boost::asio::error::operation_aborted)
 +        {
@@ -574,7 +574,7 @@ index 00000000..b9e6d6ae
 +}
 +
 +void createSensors(
-+    boost::asio::io_service& io, sdbusplus::asio::object_server& objectServer,
++    boost::asio::io_context& io, sdbusplus::asio::object_server& objectServer,
 +    boost::container::flat_map<std::string, std::unique_ptr<DIMMSensor>>&
 +        sensors,
 +    std::shared_ptr<sdbusplus::asio::connection>& dbusConnection)
@@ -687,19 +687,19 @@ index 00000000..b9e6d6ae
 +
 +int main()
 +{
-+    boost::asio::io_service io;
++    boost::asio::io_context io;
 +    auto systemBus = std::make_shared<sdbusplus::asio::connection>(io);
 +    systemBus->request_name("xyz.openbmc_project.DIMMSensor");
 +    sdbusplus::asio::object_server objectServer(systemBus);
 +    objectServer.add_manager("/xyz/openbmc_project/sensors");
 +
-+    io.post([&]() { createSensors(io, objectServer, sensors, systemBus); });
++    boost::asio::post(io, [&]() { createSensors(io, objectServer, sensors, systemBus); });
 +
-+    boost::asio::deadline_timer configTimer(io);
++    boost::asio::steady_timer configTimer(io);
 +
 +    std::function<void(sdbusplus::message::message&)> eventHandler =
 +        [&](sdbusplus::message::message&) {
-+            configTimer.expires_from_now(boost::posix_time::seconds(1));
++            configTimer.expires_after(std::chrono::seconds(1));
 +            // create a timer because normally multiple properties change
 +            configTimer.async_wait([&](const boost::system::error_code& ec) {
 +                if (ec == boost::asio::error::operation_aborted)
@@ -754,7 +754,7 @@ index 00000000..af2e4b96
 +struct DIMMSensor : public Sensor
 +{
 +    DIMMSensor(std::shared_ptr<sdbusplus::asio::connection>& conn,
-+                  boost::asio::io_service& io, const std::string& name,
++                  boost::asio::io_context& io, const std::string& name,
 +                  const std::string& sensorType,
 +                  const std::string& interface,
 +                  const std::string& sensorConfiguration,
@@ -789,7 +789,7 @@ index 00000000..af2e4b96
 +    int get_power_sbrmi(double *power);
 +    int enableADC(void);
 +    sdbusplus::asio::object_server& objectServer;
-+    boost::asio::deadline_timer waitTimer;
++    boost::asio::steady_timer waitTimer;
 +};
 diff --git a/src/meson.build b/src/meson.build
 index 6f47fb0a..ab881fae 100644
