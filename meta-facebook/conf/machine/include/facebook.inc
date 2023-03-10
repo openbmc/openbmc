@@ -19,3 +19,5 @@ IMAGE_FEATURES:append = " allow-root-login"
 
 # Most of our hardware uses the default ttyS4 but at 57600.
 SERIAL_CONSOLES:facebook = "57600;ttyS4"
+
+OBMC_ORG_YAML_SUBDIRS:append:facebook = " com/meta"
