@@ -55,6 +55,9 @@ FLASH_NOR_UBI_OVERHEAD ?= "64"
 # Fixed partition offsets
 FLASH_UBOOT_SPL_SIZE ?= "64"
 FLASH_UBOOT_OFFSET ?= "0"
+FLASH_UBOOT_ENV_OFFSET ?= "384"
+FLASH_UBOOT_ENV_OFFSET:flash-65536 ?= "896"
+FLASH_UBOOT_ENV_OFFSET:flash-131072 ?= "896"
 FLASH_KERNEL_OFFSET ?= "512"
 FLASH_KERNEL_OFFSET:flash-65536 ?= "1024"
 FLASH_KERNEL_OFFSET:flash-131072 ?= "1024"
@@ -301,7 +304,7 @@ python do_generate_static() {
     _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
                                'u-boot.%s' % d.getVar('UBOOT_SUFFIX',True)),
                   uboot_offset,
-                  int(d.getVar('FLASH_KERNEL_OFFSET', True)))
+                  int(d.getVar('FLASH_UBOOT_ENV_OFFSET', True)))
 
     _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
                                d.getVar('FLASH_KERNEL_IMAGE', True)),
@@ -468,7 +471,7 @@ python do_generate_static_norootfs() {
     _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
                                'u-boot.%s' % d.getVar('UBOOT_SUFFIX',True)),
                   uboot_offset,
-                  int(d.getVar('FLASH_KERNEL_OFFSET', True)))
+                  int(d.getVar('FLASH_UBOOT_ENV_OFFSET', True)))
 
     _append_image(os.path.join(d.getVar('IMGDEPLOYDIR', True),
                                '%s.cpio.%s.fitImage' % (
