@@ -49,4 +49,4 @@ USERADD_PACKAGES = "${PN}"
 USERADD_PARAM:${PN} = "-r -s /sbin/nologin bmcweb"
 
 GROUPADD_PARAM:${PN} = "web; redfish"
-FULL_OPTIMIZATION = "-Os "
+FULL_OPTIMIZATION:append = " -Os"
