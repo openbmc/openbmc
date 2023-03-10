@@ -55,6 +55,9 @@ FLASH_NOR_UBI_OVERHEAD ?= "64"
 # Fixed partition offsets
 FLASH_UBOOT_SPL_SIZE ?= "64"
 FLASH_UBOOT_OFFSET ?= "0"
+FLASH_MANIFEST_OFFSET ?= "376"
+FLASH_MANIFEST_OFFSET:flash-65536 ?= "888"
+FLASH_MANIFEST_OFFSET:flash-131072 ?= "888"
 FLASH_UBOOT_ENV_OFFSET ?= "384"
 FLASH_UBOOT_ENV_OFFSET:flash-65536 ?= "896"
 FLASH_UBOOT_ENV_OFFSET:flash-131072 ?= "896"
@@ -440,12 +443,58 @@ do_generate_static_tar[depends] += " \
 do_generate_static_tar[vardepsexclude] = "DATETIME"
 
 python do_generate_static_norootfs() {
+    import hashlib
+    import json
     import subprocess
+
+    manifest = {
+        "type": "phosphor-image-manifest",
+        "version": 1,
+        "info": {
+            "purpose": d.getVar('VERSION_PURPOSE', True),
+            "machine": d.getVar('MACHINE', True),
+            "version": do_get_version(d).strip('"'),
+            "build-id": do_get_buildID(d).strip('"'),
+        },
+        "partitions": [],
+        # Create an empty hash-value so that the dictionary can be emitted,
+        # hashed, and then updated.
+        "manifest-sha256": "",
+    }
+    extended_version = do_get_extended_version(d).strip('"')
+    if extended_version:
+        manifest["info"]["extended-version"] = extended_version
+    compatible_names = d.getVar('OBMC_COMPATIBLE_NAMES', True)
+    if compatible_names:
+        manifest["info"]["compatible-names"] = compatible_names.split()
+
+    manifest_json_file = os.path.join(d.getVar('IMGDEPLOYDIR', True),
+                                      "phosphor-image-manifest.json")
 
     nor_image_basename = '%s.static.mtd' % d.getVar('IMAGE_NAME', True)
     nor_image = os.path.join(d.getVar('IMGDEPLOYDIR', True), nor_image_basename)
 
-    def _append_image(imgpath, start_kb, finish_kb):
+    def _add_manifest(partname, typename, offset, size, sha256_value = None):
+        manifest["partitions"].append(
+            {
+                "name": partname,
+                "type": typename,
+                "offset": offset,
+                "size": size,
+            }
+        )
+        if typename == "fit":
+            if "u-boot-fit" == partname:
+                manifest["partitions"][-1]["num-nodes"] = 1
+            elif "os-fit" == partname:
+                manifest["partitions"][-1]["num-nodes"] = 3
+            else:
+                bb.fatal(f"Unknown FIT partition type: {partname}")
+        if sha256_value:
+            manifest["partitions"][-1]["sha256"] = sha256_value
+
+
+    def _append_image(partname, typename, imgpath, start_kb, finish_kb):
         imgsize = os.path.getsize(imgpath)
         maxsize = (finish_kb - start_kb) * 1024
         bb.debug(1, 'Considering file size=' + str(imgsize) + ' name=' + imgpath)
@@ -454,31 +503,68 @@ python do_generate_static_norootfs() {
         if imgsize > maxsize:
             bb.fatal("Image '%s' is too large!" % imgpath)
 
+        with open(imgpath, "rb") as fp:
+            sha256 = hashlib.sha256(fp.read()).hexdigest()
+
+        _add_manifest(partname, typename, start_kb * 1024, imgsize, sha256)
+
         subprocess.check_call(['dd', 'bs=1k', 'conv=notrunc',
                                'seek=%d' % start_kb,
                                'if=%s' % imgpath,
                                'of=%s' % nor_image])
+
     uboot_offset = int(d.getVar('FLASH_UBOOT_OFFSET', True))
 
     spl_binary = d.getVar('SPL_BINARY', True)
     if spl_binary:
-        _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
+        _append_image("spl", "u-boot",
+                      os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
                                    'u-boot-spl.%s' % d.getVar('UBOOT_SUFFIX',True)),
                       int(d.getVar('FLASH_UBOOT_OFFSET', True)),
                       int(d.getVar('FLASH_UBOOT_SPL_SIZE', True)))
         uboot_offset += int(d.getVar('FLASH_UBOOT_SPL_SIZE', True))
 
-    _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
+    _append_image("u-boot-fit", "fit",
+                  os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
                                'u-boot.%s' % d.getVar('UBOOT_SUFFIX',True)),
                   uboot_offset,
-                  int(d.getVar('FLASH_UBOOT_ENV_OFFSET', True)))
+                  int(d.getVar('FLASH_MANIFEST_OFFSET', True)))
 
-    _append_image(os.path.join(d.getVar('IMGDEPLOYDIR', True),
+    _add_manifest("manifest", "json",
+                  int(d.getVar('FLASH_MANIFEST_OFFSET', True)) * 1024,
+                  (int(d.getVar('FLASH_UBOOT_ENV_OFFSET', True)) -
+                   int(d.getVar('FLASH_MANIFEST_OFFSET', True))) * 1024)
+
+    _add_manifest("u-boot-env", "data",
+                  int(d.getVar('FLASH_UBOOT_ENV_OFFSET', True)) * 1024,
+                  (int(d.getVar('FLASH_KERNEL_OFFSET', True)) -
+                   int(d.getVar('FLASH_UBOOT_ENV_OFFSET', True))) * 1024)
+
+    _append_image("os-fit", "fit",
+                  os.path.join(d.getVar('IMGDEPLOYDIR', True),
                                '%s.cpio.%s.fitImage' % (
                                     d.getVar('IMAGE_LINK_NAME', True),
                                     d.getVar('INITRAMFS_CTYPE', True))),
                   int(d.getVar('FLASH_KERNEL_OFFSET', True)),
                   int(d.getVar('FLASH_RWFS_OFFSET', True)))
+
+    _add_manifest("rwfs", "data",
+                  int(d.getVar('FLASH_RWFS_OFFSET', True)) * 1024,
+                  (int(d.getVar('FLASH_SIZE', True)) -
+                   int(d.getVar('FLASH_RWFS_OFFSET', True))) * 1024)
+
+    # Calculate the sha256 of the current manifest and update.
+    manifest_raw = json.dumps(manifest, indent=4)
+    manifest_raw = manifest_raw[:manifest_raw.find("manifest-sha256")]
+    manifest["manifest-sha256"] = hashlib.sha256(
+            manifest_raw.encode('utf-8')).hexdigest()
+
+    # Write the final manifest json and add it to the image.
+    with open(manifest_json_file, "wb") as fp:
+        fp.write(json.dumps(manifest, indent=4).encode('utf-8'))
+    _append_image("manifest", "json", manifest_json_file,
+                  int(d.getVar('FLASH_MANIFEST_OFFSET', True)),
+                  int(d.getVar('FLASH_UBOOT_ENV_OFFSET', True)))
 
     flash_symlink = os.path.join(
                         d.getVar('IMGDEPLOYDIR', True),
