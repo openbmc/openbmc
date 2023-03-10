@@ -8,7 +8,7 @@ DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "nlohmann-json"
-SRCREV = "ec6601d134e103e918a06393c99f0dd75f1a20f5"
+SRCREV = "a19c6fb2840b0dd0ffb4ecaac798e2979db7181d"
 PR = "r1"
 
 SRC_URI = "git://github.com/openbmc/phosphor-health-monitor.git;protocol=https;branch=master"
