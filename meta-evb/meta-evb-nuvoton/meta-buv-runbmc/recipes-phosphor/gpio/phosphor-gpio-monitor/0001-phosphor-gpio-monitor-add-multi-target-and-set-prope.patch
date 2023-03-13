@@ -1,0 +1,245 @@
+From e7c01f7d6413165b08f07dc0dd46e6cad86e5710 Mon Sep 17 00:00:00 2001
+From: Ban Feng <kcfeng0@nuvoton.com>
+Date: Fri, 10 Mar 2023 11:05:30 +0800
+Subject: [PATCH] phosphor-gpio-monitor: add multi-target and set property
+ feature
+
+Signed-off-by: Ban Feng <kcfeng0@nuvoton.com>
+---
+ gpioMon.cpp     | 76 ++++++++++++++++++++++++++++++++++++++++++++-----
+ gpioMon.hpp     | 22 +++++++++++---
+ gpioMonMain.cpp | 16 +++++++++--
+ 3 files changed, 100 insertions(+), 14 deletions(-)
+
+diff --git a/gpioMon.cpp b/gpioMon.cpp
+index 2ab079a..6c2690a 100644
+--- a/gpioMon.cpp
++++ b/gpioMon.cpp
+@@ -18,6 +18,7 @@
+ 
+ #include <phosphor-logging/log.hpp>
+ #include <sdbusplus/bus.hpp>
++#include <iostream>
+ 
+ namespace phosphor
+ {
+@@ -29,8 +30,46 @@ constexpr auto SYSTEMD_SERVICE = "org.freedesktop.systemd1";
+ constexpr auto SYSTEMD_ROOT = "/org/freedesktop/systemd1";
+ constexpr auto SYSTEMD_INTERFACE = "org.freedesktop.systemd1.Manager";
+ 
++constexpr auto MAPPER_BUSNAME = "xyz.openbmc_project.ObjectMapper";
++constexpr auto MAPPER_PATH = "/xyz/openbmc_project/object_mapper";
++constexpr auto MAPPER_INTERFACE = "xyz.openbmc_project.ObjectMapper";
++
++constexpr auto PROPERTY_INTF = "org.freedesktop.DBus.Properties";
++constexpr auto INVENTORY_IFACE = "xyz.openbmc_project.Inventory.Item";
++constexpr auto PRESENT_PROP = "Present";
++
+ using namespace phosphor::logging;
+ 
++std::string GpioMonitor::getService(const std::string& path, const std::string& interface,
++                                    sdbusplus::bus_t& bus, bool logError)
++{
++    auto method = bus.new_method_call(MAPPER_BUSNAME, MAPPER_PATH,
++                                      MAPPER_INTERFACE, "GetObject");
++
++    method.append(path);
++    method.append(std::vector<std::string>({interface}));
++
++    auto reply = bus.call(method);
++
++    std::map<std::string, std::vector<std::string>> response;
++    reply.read(response);
++
++    if (response.empty())
++    {
++        if (logError)
++        {
++            log<level::ERR>(
++                std::string("Error in mapper response for getting service name "
++                            "PATH=" +
++                            path + " INTERFACE=" + interface)
++                    .c_str());
++        }
++        return std::string{};
++    }
++
++    return response.begin()->first;
++}
++
+ void GpioMonitor::scheduleEventHandler()
+ {
+ 
+@@ -50,6 +89,7 @@ void GpioMonitor::scheduleEventHandler()
+ 
+ void GpioMonitor::gpioEventHandler()
+ {
++    bool gpioVal;
+     gpiod_line_event gpioLineEvent;
+ 
+     if (gpiod_line_event_read_fd(gpioEventDescriptor.native_handle(),
+@@ -68,15 +108,37 @@ void GpioMonitor::gpioEventHandler()
+     log<level::INFO>(logMessage.c_str());
+ 
+     /* Execute the target if it is defined. */
+-    if (!target.empty())
++    std::vector<std::string> targetsToStart;
++    if (gpioLineEvent.event_type == GPIOD_LINE_EVENT_RISING_EDGE)
++    {
++        gpioVal = false;
++        targetsToStart = target["RISING"];
++    }
++    else
++    {
++        gpioVal = true;
++        targetsToStart = target["FALLING"];
++    }
++    if (!targetsToStart.empty())
+     {
+         auto bus = sdbusplus::bus::new_default();
+-        auto method = bus.new_method_call(SYSTEMD_SERVICE, SYSTEMD_ROOT,
+-                                          SYSTEMD_INTERFACE, "StartUnit");
+-        method.append(target);
+-        method.append("replace");
+-
+-        bus.call_noreply(method);
++        auto service = getService(inventoryPath.c_str(), INVENTORY_IFACE, bus);
++        if (!service.empty())
++        {
++            auto methodSet = bus.new_method_call(service.c_str(), inventoryPath.c_str(),
++                                              PROPERTY_INTF, "Set");
++            methodSet.append(INVENTORY_IFACE, PRESENT_PROP, std::variant<bool>(gpioVal));
++            bus.call_noreply(methodSet);
++        }
++
++        for (auto &tar : targetsToStart)
++        {
++            auto method = bus.new_method_call(SYSTEMD_SERVICE, SYSTEMD_ROOT,
++                                         SYSTEMD_INTERFACE, "StartUnit");
++            method.append(tar);
++            method.append("replace");
++            bus.call_noreply(method);
++        }
+     }
+ 
+     /* if not required to continue monitoring then return */
+diff --git a/gpioMon.hpp b/gpioMon.hpp
+index b07bb40..a368bc6 100644
+--- a/gpioMon.hpp
++++ b/gpioMon.hpp
+@@ -4,6 +4,11 @@
+ 
+ #include <boost/asio/io_service.hpp>
+ #include <boost/asio/posix/stream_descriptor.hpp>
++#include <map>
++#include <sdbusplus/bus.hpp>
++#include <vector>
++
++constexpr auto INVENTORY_OBJ_PATH = "/xyz/openbmc_project/inventory";
+ 
+ namespace phosphor
+ {
+@@ -33,13 +38,15 @@ class GpioMonitor
+      *                           value change
+      *  @param[in] lineMsg     - GPIO line message to be used for log
+      *  @param[in] continueRun - Whether to continue after event occur
++     *  @param[in] invpath     - Inventory Path
+      */
+     GpioMonitor(gpiod_line* line, gpiod_line_request_config& config,
+-                boost::asio::io_service& io, const std::string& target,
+-                const std::string& lineMsg, bool continueRun) :
++                boost::asio::io_service& io,
++                std::map<std::string, std::vector<std::string>> target,
++                const std::string& lineMsg, bool continueRun, const std::string& invpath) :
+         gpioLine(line),
+         gpioConfig(config), gpioEventDescriptor(io), target(target),
+-        gpioLineMsg(lineMsg), continueAfterEvent(continueRun)
++        gpioLineMsg(lineMsg), continueAfterEvent(continueRun), inventoryPath(INVENTORY_OBJ_PATH + invpath)
+     {
+         requestGPIOEvents();
+     };
+@@ -55,7 +62,7 @@ class GpioMonitor
+     boost::asio::posix::stream_descriptor gpioEventDescriptor;
+ 
+     /** @brief Systemd unit to be started when the condition is met */
+-    const std::string target;
++    std::map<std::string, std::vector<std::string>> target;
+ 
+     /** @brief GPIO line name message */
+     std::string gpioLineMsg;
+@@ -63,6 +70,9 @@ class GpioMonitor
+     /** @brief If the monitor should continue after event */
+     bool continueAfterEvent;
+ 
++    /** @brief Inventory Path */
++    std::string inventoryPath;
++
+     /** @brief register handler for gpio event
+      *
+      *  @return  - 0 on success and -1 otherwise
+@@ -74,6 +84,10 @@ class GpioMonitor
+ 
+     /** @brief Handle the GPIO event and starts configured target */
+     void gpioEventHandler();
++
++    /** @brief Get the service name from the mapper for the interface and path passed in. */
++    std::string getService(const std::string& path, const std::string& interface,
++                           sdbusplus::bus_t& bus, bool logError = true);
+ };
+ 
+ } // namespace gpio
+diff --git a/gpioMonMain.cpp b/gpioMonMain.cpp
+index f8084a3..2f31e3c 100644
+--- a/gpioMonMain.cpp
++++ b/gpioMonMain.cpp
+@@ -21,6 +21,7 @@
+ #include <fstream>
+ #include <nlohmann/json.hpp>
+ #include <phosphor-logging/log.hpp>
++#include <iostream>
+ 
+ using namespace phosphor::logging;
+ 
+@@ -100,8 +101,11 @@ int main(int argc, char** argv)
+         /* flag to monitor */
+         bool flag = false;
+ 
++        /* Inventory Path */
++        std::string invpath;
++
+         /* target to start */
+-        std::string target;
++        std::map<std::string, std::vector<std::string>> target;
+ 
+         if (obj.find("LineName") == obj.end())
+         {
+@@ -164,18 +168,24 @@ int main(int argc, char** argv)
+             flag = obj["Continue"];
+         }
+ 
++        /* Get Inventory Path */
++        if (obj.find("Inventory") != obj.end())
++        {
++            invpath = obj["Inventory"];
++        }
++
+         /* Parse out target argument. It is fine if the user does not
+          * pass this if they are not interested in calling into any target
+          * on meeting a condition.
+          */
+         if (obj.find("Target") != obj.end())
+         {
+-            target = obj["Target"];
++            obj.at("Target").get_to(target);
+         }
+ 
+         /* Create a monitor object and let it do all the rest */
+         gpios.push_back(std::make_unique<phosphor::gpio::GpioMonitor>(
+-            line, config, io, target, lineMsg, flag));
++            line, config, io, target, lineMsg, flag, invpath));
+     }
+     io.run();
+ 
+-- 
+2.34.1
+

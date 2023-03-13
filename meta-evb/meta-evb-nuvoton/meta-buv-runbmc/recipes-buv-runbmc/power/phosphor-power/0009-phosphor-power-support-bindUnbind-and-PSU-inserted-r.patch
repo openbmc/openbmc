@@ -1,0 +1,172 @@
+From 8509d73e2b31ebb36b8253cdabd9392ca3f196a4 Mon Sep 17 00:00:00 2001
+From: Ban Feng <kcfeng0@nuvoton.com>
+Date: Wed, 15 Mar 2023 13:36:48 +0800
+Subject: [PATCH] phosphor-power: support bindUnbind and PSU inserted/removed
+ event log
+
+Signed-off-by: Ban Feng <kcfeng0@nuvoton.com>
+---
+ power-supply/power_supply.cpp | 62 +++++++++++++++++++++++++++++++++++
+ power-supply/power_supply.hpp | 19 +++++++++++
+ 2 files changed, 81 insertions(+)
+
+diff --git a/power-supply/power_supply.cpp b/power-supply/power_supply.cpp
+index 45246ca4..9309ba8c 100644
+--- a/power-supply/power_supply.cpp
++++ b/power-supply/power_supply.cpp
+@@ -29,6 +29,7 @@
+ #include <xyz/openbmc_project/Common/Device/error.hpp>
+ 
+ #include <functional>
++#include <fstream>
+ 
+ #if (NUVOTON_ENTITY == 1)
+ #include <systemd/sd-journal.h>
+@@ -69,6 +70,7 @@ PowerSupply::PowerSupply(const std::string& name, size_t inst,
+     powerOnTimer(e, std::bind([this]() { this->powerOn = true; }))
+ {
+     getAccessType();
++    getDriverPath();
+ 
+     using namespace sdbusplus::bus;
+     using namespace phosphor::pmbus;
+@@ -124,6 +126,22 @@ void PowerSupply::getAccessType()
+     inventoryPMBusAccessType = getPMBusAccessType(fruJson);
+ }
+ 
++void PowerSupply::getDriverPath()
++{
++    fs::path p = fs::path(monitorPath) / "driver";
++    try
++    {
++        driverPath =
++            fs::canonical(p); // Get the path that points to the driver dir
++    }
++    catch (const fs::filesystem_error& e)
++    {
++        log<level::ERR>("Failed to get canonical path",
++                        entry("MONITORPATH=%s", monitorPath.c_str()),
++                        entry("ERROR=%s", e.what()));
++    }
++}
++
+ void PowerSupply::captureCmd(util::NamesValues& nv, const std::string& cmd,
+                              phosphor::pmbus::Type type)
+ {
+@@ -200,11 +218,31 @@ void PowerSupply::inventoryChanged(sdbusplus::message_t& msg)
+     {
+         if (std::get<bool>(valPropMap->second))
+         {
++            bindUnbind(true);
++#if (NUVOTON_ENTITY == 1)
++            std::string redfishMessageID =
++                    "OpenBMC." + messageRegistryVersion;
++
++            redfishMessageID += ".PowerSupplyInserted";
++            sd_journal_send("MESSAGE=%s", inventoryPath.c_str(),
++                            "REDFISH_MESSAGE_ID=%s", redfishMessageID.c_str(),
++                            "REDFISH_MESSAGE_ARGS=%s", inventoryPath.c_str(), NULL);
++#endif
+             clearFaults();
+             presentTimer.restartOnce(presentInterval);
+         }
+         else
+         {
++            bindUnbind(false);
++#if (NUVOTON_ENTITY == 1)
++            std::string redfishMessageID =
++                    "OpenBMC." + messageRegistryVersion;
++
++            redfishMessageID += ".PowerSupplyRemoved";
++            sd_journal_send("MESSAGE=%s", inventoryPath.c_str(),
++                            "REDFISH_MESSAGE_ID=%s", redfishMessageID.c_str(),
++                            "REDFISH_MESSAGE_ARGS=%s", inventoryPath.c_str(), NULL);
++#endif
+             present = false;
+             presentTimer.setEnabled(false);
+ 
+@@ -624,6 +662,30 @@ void PowerSupply::checkTemperatureFault(const uint16_t statusWord)
+     }
+ }
+ 
++/* Get the device name from the device path */
++std::string parseDeviceName(std::string devPath)
++{
++    if (devPath.back() == '/')
++    {
++        devPath.pop_back();
++    }
++    return fs::path(devPath).stem().string();
++}
++
++void PowerSupply::bindUnbind(bool doBind)
++{
++    if (driverPath.empty())
++    {
++        return;
++    }
++
++    auto p = driverPath;
++    std::string devName = parseDeviceName(pmbusIntf.path());
++    p /= doBind ? "bind" : "unbind";
++    std::ofstream out(p.string());
++    out << devName;
++}
++
+ void PowerSupply::clearFaults()
+ {
+     readFail = 0;
+diff --git a/power-supply/power_supply.hpp b/power-supply/power_supply.hpp
+index f8e88a3c..fbccf2e1 100644
+--- a/power-supply/power_supply.hpp
++++ b/power-supply/power_supply.hpp
+@@ -19,6 +19,7 @@ namespace power
+ namespace psu
+ {
+ namespace sdbusRule = sdbusplus::bus::match::rules;
++namespace fs = std::filesystem;
+ 
+ constexpr auto FAULT_COUNT = 3;
+ 
+@@ -94,6 +95,12 @@ class PowerSupply : public Device
+     void enableHistory(const std::string& objectPath, size_t numRecords,
+                        const std::string& syncGPIOPath, size_t syncGPIONum);
+ 
++    /** @brief Bind or unbind the driver
++     *
++     * @param doBind - indicate if it's going to bind or unbind the driver
++     */
++    void bindUnbind(bool doBind);
++
+   private:
+     /**
+      * The path to use for reading various PMBus bits/words.
+@@ -114,6 +121,12 @@ class PowerSupply : public Device
+      */
+     std::string inventoryPath;
+ 
++    /** @brief The PSU device driver's path
++     *
++     * Usually it is the PSU driver.
++     */
++    fs::path driverPath;
++
+     /** @brief Connection for sdbusplus bus */
+     sdbusplus::bus_t& bus;
+ 
+@@ -279,6 +292,12 @@ class PowerSupply : public Device
+      */
+     void getAccessType();
+ 
++    /**
++     * @brief get the PSU device driver's path
++     *
++     */
++    void getDriverPath();
++
+     /**
+      * @brief Callback for inventory property changes
+      *
+-- 
+2.34.1
+

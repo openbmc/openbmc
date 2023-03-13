@@ -1,0 +1,13 @@
+[Unit]
+Description=Phosphor GPIO monitor
+After=xyz.openbmc_project.EntityManager.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+StartLimitInterval=0
+ExecStart=/usr/bin/phosphor-multi-gpio-monitor --config /usr/share/phosphor-gpio-monitor/BUV-GpioMonitorConfig.json
+
+[Install]
+WantedBy=multi-user.target

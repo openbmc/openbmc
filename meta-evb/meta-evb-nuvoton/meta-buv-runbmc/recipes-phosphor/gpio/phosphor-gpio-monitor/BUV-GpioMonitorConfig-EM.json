@@ -1,0 +1,19 @@
+[
+    {
+        "Name": "PSU1_PRESENT_N",
+        "GpioNum": 4,
+        "ChipId": "gpiochip0",
+        "EventMon": "BOTH",
+        "Target":
+        {
+            "FALLING": [
+                "psusensor_reload.service"
+            ],
+            "RISING": [
+                "psusensor_reload.service"
+            ]
+        },
+        "Continue": true,
+        "Inventory": "/system/powersupply/powersupply0"
+    }
+]

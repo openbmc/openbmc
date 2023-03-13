@@ -50,6 +50,8 @@ RDEPENDS:${PN}-system = " \
     phosphor-power-systemd-links-monitor \
     phosphor-power-utils \
     phosphor-power \
+    phosphor-gpio-monitor \
+    phosphor-gpio-monitor-monitor \
     "
 
 RDEPENDS:${PN}-system:append = " \
