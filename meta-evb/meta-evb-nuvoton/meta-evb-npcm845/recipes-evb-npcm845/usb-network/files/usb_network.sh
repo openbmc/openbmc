@@ -2,6 +2,21 @@
 
 cd /sys/kernel/config/usb_gadget
 
+version_above_5(){
+  MAJOR_VERSION=$(uname -r | awk -F '.' '{print $1}')
+  if [ $MAJOR_VERSION -ge 6 ]  ; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+dev_name="f0832000.udc"
+if version_above_5
+then
+  dev_name="ci_hdrc.2"
+fi
+
 if [ ! -f "g1" ]; then
     mkdir g1
     cd g1
@@ -21,7 +36,7 @@ if [ ! -f "g1" ]; then
     
     ln -s functions/rndis.usb0 configs/c.1
     
-    echo f0832000.udc > UDC
+    echo "${dev_name}" > UDC
 
 fi
 exit 0

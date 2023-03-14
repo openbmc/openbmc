@@ -5,6 +5,21 @@ gadget_dir=/sys/kernel/config/usb_gadget/$gadget_name
 mmc_device=/dev/mmcblk0
 mkdir -p $gadget_dir
 
+version_above_5(){
+  MAJOR_VERSION=$(uname -r | awk -F '.' '{print $1}')
+  if [ $MAJOR_VERSION -ge 6 ]  ; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+dev_name="f0831000.udc"
+if version_above_5
+then
+  dev_name="ci_hdrc.1"
+fi
+
 cd $gadget_dir
 # http://www.linux-usb.org/usb.ids
 #    |-> 1d6b  Linux Foundation
@@ -22,5 +37,5 @@ echo 1 > functions/mass_storage.usb0/lun.0/removable
 echo 0 > functions/mass_storage.usb0/lun.0/ro
 echo 0 > functions/mass_storage.usb0/lun.0/cdrom
 echo $mmc_device > functions/mass_storage.usb0/lun.0/file
-echo "f0833000.udc" > UDC
+echo "${dev_name}" > UDC
 exit 0
