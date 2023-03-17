@@ -1,4 +1,4 @@
-From f5a31b4f4ea8daaa0d337d5a2322ddb1912083fc Mon Sep 17 00:00:00 2001
+From 0b9a966b8a28961b078215ee7169e32a976d5e7d Mon Sep 17 00:00:00 2001
 From: Qi Feng <qi.feng@arm.com>
 Date: Wed, 26 May 2021 17:52:01 +0800
 Subject: [PATCH] Allow --enable-psci to choose between smc and hvc
@@ -40,7 +40,7 @@ Signed-off-by: Huifeng Zhang <Huifeng.Zhang@arm.com>
  2 files changed, 14 insertions(+), 10 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index f941b07..88a27de 100644
+index 5731a19..fc66662 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -50,11 +50,11 @@ endif

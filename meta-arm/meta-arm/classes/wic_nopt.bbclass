@@ -1,7 +1,7 @@
 # This class removes the empty partition table header
 # in the WIC file when --no-table WKS option is used
 
-IMAGE_TYPES += "wic.nopt"
+IMAGE_TYPES:append = " wic.nopt"
 
 CONVERSIONTYPES += "nopt"
 

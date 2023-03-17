@@ -1,4 +1,4 @@
-From ed46e83df2400b1b3f3364169aacf787bd91bd45 Mon Sep 17 00:00:00 2001
+From 9da48e3433b919868650cd60e28827273a42c63b Mon Sep 17 00:00:00 2001
 From: Jaxson Han <jaxson.han@arm.com>
 Date: Tue, 25 Jan 2022 14:56:36 +0800
 Subject: [PATCH] PSCI: Add function call entry point
@@ -69,6 +69,3 @@ index 6efc695..8fdefb5 100644
  void __noreturn psci_first_spin(unsigned int cpu)
  {
  	if (cpu == MPIDR_INVALID)
--- 
-2.25.1
-

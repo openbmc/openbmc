@@ -18,3 +18,6 @@ PACKAGECONFIG:append:p10bmc = " usb_code_update"
 # Enable Side Switch Boot
 PACKAGECONFIG:append:p10bmc = " side_switch_on_boot"
 
+# Set BMC Minimum Ship Level version format
+EXTRA_OEMESON:append:p10bmc = " -Dregex-bmc-msl='([a-z]+[0-9]{2})+([0-9]+).([0-9]+).([0-9]+)'"
+

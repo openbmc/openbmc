@@ -53,6 +53,7 @@ CHIPS:p10bmc = " \
                bus@1e78a000/i2c-bus@200/power-supply@6d \
                bus@1e78a000/i2c-bus@200/power-supply@6b \
                bus@1e78a000/i2c-bus@400/max31785@52 \
+               bus@1e78a000/i2c-bus@400/max31785b@52 \
                bus@1e78a000/i2c-bus@780/i2c-switch@70/i2c@3/max31785@52 \
                "
 

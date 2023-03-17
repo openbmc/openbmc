@@ -1,4 +1,4 @@
-From dd3e3f414d0e6ed1643c2e2ccac676b7fc1dc7a9 Mon Sep 17 00:00:00 2001
+From 0c0695cd3160ccdb95bae29b7668918015c0b6aa Mon Sep 17 00:00:00 2001
 From: Peter Hoyes <Peter.Hoyes@arm.com>
 Date: Tue, 1 Feb 2022 11:28:46 +0000
 Subject: [PATCH] Makefile: Change COUNTER_FREQ to 100 MHz
@@ -17,7 +17,7 @@ Change-Id: Ia9ad0f8ee488d1a887791f1fa1d8f3bf9c5887fd
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index 40bc5d6..b48173c 100644
+index 6604baa..cc6504e 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -13,7 +13,7 @@ SCRIPT_DIR	:= $(top_srcdir)/scripts
@@ -29,6 +29,3 @@ index 40bc5d6..b48173c 100644
  
  CPU_IDS		:= $(shell perl -I $(SCRIPT_DIR) $(SCRIPT_DIR)/findcpuids.pl $(KERNEL_DTB))
  NR_CPUS         := $(shell echo $(CPU_IDS) | tr ',' ' ' | wc -w)
--- 
-2.25.1
-

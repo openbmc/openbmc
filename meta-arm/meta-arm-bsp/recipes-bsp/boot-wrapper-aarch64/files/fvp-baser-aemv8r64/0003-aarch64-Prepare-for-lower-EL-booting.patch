@@ -1,4 +1,4 @@
-From ce628de7699dd6401ddf713efaa49872e2733619 Mon Sep 17 00:00:00 2001
+From 252cbd36e51414b60ab68306f9c38e358709494d Mon Sep 17 00:00:00 2001
 From: Jaxson Han <jaxson.han@arm.com>
 Date: Tue, 25 May 2021 07:25:00 +0100
 Subject: [PATCH] aarch64: Prepare for lower EL booting
@@ -17,11 +17,11 @@ Reviewed-by: Andre Przywara <andre.przywara@arm.com>
  1 file changed, 13 insertions(+), 2 deletions(-)
 
 diff --git a/arch/aarch64/boot.S b/arch/aarch64/boot.S
-index b589744..6b45afc 100644
+index 5105b41..243198d 100644
 --- a/arch/aarch64/boot.S
 +++ b/arch/aarch64/boot.S
-@@ -130,7 +130,16 @@ el3_init:
- 	mov	x0, #ZCR_EL3_LEN_MASK		// SVE: Enable full vector len
+@@ -151,7 +151,16 @@ el3_init:
+ 	mov	x0, #ZCR_EL3_LEN_MAX		// SVE: Enable full vector len
  	msr	ZCR_EL3, x0			// for EL2.
  
 -1:
@@ -38,7 +38,7 @@ index b589744..6b45afc 100644
  	ldr	x0, =COUNTER_FREQ
  	msr	cntfrq_el0, x0
  
-@@ -178,7 +187,7 @@ ASM_FUNC(jump_kernel)
+@@ -199,7 +208,7 @@ ASM_FUNC(jump_kernel)
  	b.eq	1f
  	br	x19			// Keep current EL
  
@@ -47,7 +47,7 @@ index b589744..6b45afc 100644
  
  	/*
  	 * If bit 0 of the kernel address is set, we're entering in AArch32
-@@ -196,3 +205,5 @@ ASM_FUNC(jump_kernel)
+@@ -217,3 +226,5 @@ ASM_FUNC(jump_kernel)
  	.align 3
  flag_keep_el:
  	.long 0

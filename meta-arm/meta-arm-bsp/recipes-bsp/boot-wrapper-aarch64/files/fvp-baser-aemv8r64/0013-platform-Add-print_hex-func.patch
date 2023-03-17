@@ -1,4 +1,4 @@
-From 5b8cb5192dbd0332e027e8999c3afe4433983291 Mon Sep 17 00:00:00 2001
+From f0ece5e8cac761a76a86df7204bae7c6ef09215f Mon Sep 17 00:00:00 2001
 From: Jaxson Han <jaxson.han@arm.com>
 Date: Wed, 29 Dec 2021 10:50:21 +0800
 Subject: [PATCH] platform: Add print_hex func

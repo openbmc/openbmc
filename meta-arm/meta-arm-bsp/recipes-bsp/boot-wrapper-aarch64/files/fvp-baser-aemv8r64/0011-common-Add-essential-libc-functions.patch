@@ -1,4 +1,4 @@
-From 0f2c7ca446063be6b193fbf870d38c0af19e15c5 Mon Sep 17 00:00:00 2001
+From e2eff4f80e65cb3fcbe6345b5376a6bf7de7e2cc Mon Sep 17 00:00:00 2001
 From: Jaxson Han <jaxson.han@arm.com>
 Date: Tue, 28 Dec 2021 17:28:25 +0800
 Subject: [PATCH] common: Add essential libc functions

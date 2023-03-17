@@ -1,0 +1,413 @@
+From ca7d37502f9453125aead14c7ee5181336cbe8f4 Mon Sep 17 00:00:00 2001
+From: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Date: Thu, 9 Feb 2023 00:22:40 +0000
+Subject: [PATCH 1/3] TF-Mv1.7 alignment: Align PSA Crypto SIDs
+
+This patch is to change the PSA Crypto SIDs to match the values of the
+PSA Crypto SID definitions in TF-M v1.7 running on the secure enclave
+
+Signed-off-by: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Upstream-Status: Pending [Not submitted yet]
+---
+ .../service/common/include/psa/crypto_sid.h   | 241 ++++++++++++++++++
+ components/service/common/include/psa/sid.h   |  78 +-----
+ .../caller/psa_ipc/crypto_caller_sign_hash.h  |   4 +-
+ .../psa_ipc/crypto_caller_verify_hash.h       |   4 +-
+ 4 files changed, 249 insertions(+), 78 deletions(-)
+ create mode 100644 components/service/common/include/psa/crypto_sid.h
+
+diff --git a/components/service/common/include/psa/crypto_sid.h b/components/service/common/include/psa/crypto_sid.h
+new file mode 100644
+index 00000000..5b05f46d
+--- /dev/null
++++ b/components/service/common/include/psa/crypto_sid.h
+@@ -0,0 +1,241 @@
++/*
++ * Copyright (c) 2023, Arm Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ *
++ */
++
++#ifndef __PSA_CRYPTO_SID_H__
++#define __PSA_CRYPTO_SID_H__
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++#include <stdint.h>
++
++/**
++ * \brief Type associated to the group of a function encoding. There can be
++ *        nine groups (Random, Key management, Hash, MAC, Cipher, AEAD,
++ *        Asym sign, Asym encrypt, Key derivation).
++ */
++enum tfm_crypto_group_id {
++    TFM_CRYPTO_GROUP_ID_RANDOM = 0x0,
++    TFM_CRYPTO_GROUP_ID_KEY_MANAGEMENT,
++    TFM_CRYPTO_GROUP_ID_HASH,
++    TFM_CRYPTO_GROUP_ID_MAC,
++    TFM_CRYPTO_GROUP_ID_CIPHER,
++    TFM_CRYPTO_GROUP_ID_AEAD,
++    TFM_CRYPTO_GROUP_ID_ASYM_SIGN,
++    TFM_CRYPTO_GROUP_ID_ASYM_ENCRYPT,
++    TFM_CRYPTO_GROUP_ID_KEY_DERIVATION,
++};
++
++/* X macro describing each of the available PSA Crypto APIs */
++#define KEY_MANAGEMENT_FUNCS                       \
++    X(TFM_CRYPTO_GET_KEY_ATTRIBUTES)               \
++    X(TFM_CRYPTO_RESET_KEY_ATTRIBUTES)             \
++    X(TFM_CRYPTO_OPEN_KEY)                         \
++    X(TFM_CRYPTO_CLOSE_KEY)                        \
++    X(TFM_CRYPTO_IMPORT_KEY)                       \
++    X(TFM_CRYPTO_DESTROY_KEY)                      \
++    X(TFM_CRYPTO_EXPORT_KEY)                       \
++    X(TFM_CRYPTO_EXPORT_PUBLIC_KEY)                \
++    X(TFM_CRYPTO_PURGE_KEY)                        \
++    X(TFM_CRYPTO_COPY_KEY)                         \
++    X(TFM_CRYPTO_GENERATE_KEY)
++
++#define HASH_FUNCS                                 \
++    X(TFM_CRYPTO_HASH_COMPUTE)                     \
++    X(TFM_CRYPTO_HASH_COMPARE)                     \
++    X(TFM_CRYPTO_HASH_SETUP)                       \
++    X(TFM_CRYPTO_HASH_UPDATE)                      \
++    X(TFM_CRYPTO_HASH_CLONE)                       \
++    X(TFM_CRYPTO_HASH_FINISH)                      \
++    X(TFM_CRYPTO_HASH_VERIFY)                      \
++    X(TFM_CRYPTO_HASH_ABORT)
++
++#define MAC_FUNCS                                  \
++    X(TFM_CRYPTO_MAC_COMPUTE)                      \
++    X(TFM_CRYPTO_MAC_VERIFY)                       \
++    X(TFM_CRYPTO_MAC_SIGN_SETUP)                   \
++    X(TFM_CRYPTO_MAC_VERIFY_SETUP)                 \
++    X(TFM_CRYPTO_MAC_UPDATE)                       \
++    X(TFM_CRYPTO_MAC_SIGN_FINISH)                  \
++    X(TFM_CRYPTO_MAC_VERIFY_FINISH)                \
++    X(TFM_CRYPTO_MAC_ABORT)
++
++#define CIPHER_FUNCS                               \
++    X(TFM_CRYPTO_CIPHER_ENCRYPT)                   \
++    X(TFM_CRYPTO_CIPHER_DECRYPT)                   \
++    X(TFM_CRYPTO_CIPHER_ENCRYPT_SETUP)             \
++    X(TFM_CRYPTO_CIPHER_DECRYPT_SETUP)             \
++    X(TFM_CRYPTO_CIPHER_GENERATE_IV)               \
++    X(TFM_CRYPTO_CIPHER_SET_IV)                    \
++    X(TFM_CRYPTO_CIPHER_UPDATE)                    \
++    X(TFM_CRYPTO_CIPHER_FINISH)                    \
++    X(TFM_CRYPTO_CIPHER_ABORT)
++
++#define AEAD_FUNCS                                 \
++    X(TFM_CRYPTO_AEAD_ENCRYPT)                     \
++    X(TFM_CRYPTO_AEAD_DECRYPT)                     \
++    X(TFM_CRYPTO_AEAD_ENCRYPT_SETUP)               \
++    X(TFM_CRYPTO_AEAD_DECRYPT_SETUP)               \
++    X(TFM_CRYPTO_AEAD_GENERATE_NONCE)              \
++    X(TFM_CRYPTO_AEAD_SET_NONCE)                   \
++    X(TFM_CRYPTO_AEAD_SET_LENGTHS)                 \
++    X(TFM_CRYPTO_AEAD_UPDATE_AD)                   \
++    X(TFM_CRYPTO_AEAD_UPDATE)                      \
++    X(TFM_CRYPTO_AEAD_FINISH)                      \
++    X(TFM_CRYPTO_AEAD_VERIFY)                      \
++    X(TFM_CRYPTO_AEAD_ABORT)
++
++#define ASYMMETRIC_SIGN_FUNCS                      \
++    X(TFM_CRYPTO_ASYMMETRIC_SIGN_MESSAGE)          \
++    X(TFM_CRYPTO_ASYMMETRIC_VERIFY_MESSAGE)        \
++    X(TFM_CRYPTO_ASYMMETRIC_SIGN_HASH)             \
++    X(TFM_CRYPTO_ASYMMETRIC_VERIFY_HASH)
++
++#define AYSMMETRIC_ENCRYPT_FUNCS                   \
++    X(TFM_CRYPTO_ASYMMETRIC_ENCRYPT)               \
++    X(TFM_CRYPTO_ASYMMETRIC_DECRYPT)
++
++#define KEY_DERIVATION_FUNCS                       \
++    X(TFM_CRYPTO_RAW_KEY_AGREEMENT)                \
++    X(TFM_CRYPTO_KEY_DERIVATION_SETUP)             \
++    X(TFM_CRYPTO_KEY_DERIVATION_GET_CAPACITY)      \
++    X(TFM_CRYPTO_KEY_DERIVATION_SET_CAPACITY)      \
++    X(TFM_CRYPTO_KEY_DERIVATION_INPUT_BYTES)       \
++    X(TFM_CRYPTO_KEY_DERIVATION_INPUT_KEY)         \
++    X(TFM_CRYPTO_KEY_DERIVATION_KEY_AGREEMENT)     \
++    X(TFM_CRYPTO_KEY_DERIVATION_OUTPUT_BYTES)      \
++    X(TFM_CRYPTO_KEY_DERIVATION_OUTPUT_KEY)        \
++    X(TFM_CRYPTO_KEY_DERIVATION_ABORT)
++
++#define RANDOM_FUNCS                               \
++    X(TFM_CRYPTO_GENERATE_RANDOM)
++
++/*
++ * Define function IDs in each group. The function ID will be encoded into
++ * tfm_crypto_func_sid below.
++ * Each group is defined as a dedicated enum in case the total number of
++ * PSA Crypto APIs exceeds 256.
++ */
++#define X(func_id)    func_id,
++enum tfm_crypto_key_management_func_id {
++    KEY_MANAGEMENT_FUNCS
++};
++enum tfm_crypto_hash_func_id {
++    HASH_FUNCS
++};
++enum tfm_crypto_mac_func_id {
++    MAC_FUNCS
++};
++enum tfm_crypto_cipher_func_id {
++    CIPHER_FUNCS
++};
++enum tfm_crypto_aead_func_id {
++    AEAD_FUNCS
++};
++enum tfm_crypto_asym_sign_func_id {
++    ASYMMETRIC_SIGN_FUNCS
++};
++enum tfm_crypto_asym_encrypt_func_id {
++    AYSMMETRIC_ENCRYPT_FUNCS
++};
++enum tfm_crypto_key_derivation_func_id {
++    KEY_DERIVATION_FUNCS
++};
++enum tfm_crypto_random_func_id {
++    RANDOM_FUNCS
++};
++#undef X
++
++#define FUNC_ID(func_id)    (((func_id) & 0xFF) << 8)
++
++/*
++ * Numerical progressive value identifying a function API exposed through
++ * the interfaces (S or NS). It's used to dispatch the requests from S/NS
++ * to the corresponding API implementation in the Crypto service backend.
++ *
++ * Each function SID is encoded as uint16_t.
++ *     |  Func ID  |  Group ID |
++ *     15         8 7          0
++ * Func ID is defined in each group func_id enum above
++ * Group ID is defined in tfm_crypto_group_id.
++ */
++enum tfm_crypto_func_sid {
++
++#define X(func_id)      func_id ## _SID = (uint16_t)((FUNC_ID(func_id)) | \
++                                   (TFM_CRYPTO_GROUP_ID_KEY_MANAGEMENT & 0xFF)),
++
++    KEY_MANAGEMENT_FUNCS
++
++#undef X
++#define X(func_id)      func_id ## _SID = (uint16_t)((FUNC_ID(func_id)) | \
++                                            (TFM_CRYPTO_GROUP_ID_HASH & 0xFF)),
++    HASH_FUNCS
++
++#undef X
++#define X(func_id)      func_id ## _SID = (uint16_t)((FUNC_ID(func_id)) | \
++                                            (TFM_CRYPTO_GROUP_ID_MAC & 0xFF)),
++    MAC_FUNCS
++
++#undef X
++#define X(func_id)      func_id ## _SID = (uint16_t)((FUNC_ID(func_id)) | \
++                                           (TFM_CRYPTO_GROUP_ID_CIPHER & 0xFF)),
++    CIPHER_FUNCS
++
++#undef X
++#define X(func_id)      func_id ## _SID = (uint16_t)((FUNC_ID(func_id)) | \
++                                             (TFM_CRYPTO_GROUP_ID_AEAD & 0xFF)),
++    AEAD_FUNCS
++
++#undef X
++#define X(func_id)      func_id ## _SID = (uint16_t)((FUNC_ID(func_id)) | \
++                                        (TFM_CRYPTO_GROUP_ID_ASYM_SIGN & 0xFF)),
++    ASYMMETRIC_SIGN_FUNCS
++
++#undef X
++#define X(func_id)      func_id ## _SID = (uint16_t)((FUNC_ID(func_id)) | \
++                                     (TFM_CRYPTO_GROUP_ID_ASYM_ENCRYPT & 0xFF)),
++    AYSMMETRIC_ENCRYPT_FUNCS
++
++#undef X
++#define X(func_id)      func_id ## _SID = (uint16_t)((FUNC_ID(func_id)) | \
++                                   (TFM_CRYPTO_GROUP_ID_KEY_DERIVATION & 0xFF)),
++    KEY_DERIVATION_FUNCS
++
++#undef X
++#define X(func_id)      func_id ## _SID = (uint16_t)((FUNC_ID(func_id)) | \
++                                           (TFM_CRYPTO_GROUP_ID_RANDOM & 0xFF)),
++    RANDOM_FUNCS
++
++};
++#undef X
++
++/**
++ * \brief Define an invalid value for an SID
++ *
++ */
++#define TFM_CRYPTO_SID_INVALID (~0x0u)
++
++/**
++ * \brief This value is used to mark an handle as invalid.
++ *
++ */
++#define TFM_CRYPTO_INVALID_HANDLE (0x0u)
++
++/**
++ * \brief Define miscellaneous literal constants that are used in the service
++ *
++ */
++enum {
++    TFM_CRYPTO_NOT_IN_USE = 0,
++    TFM_CRYPTO_IN_USE = 1
++};
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* __PSA_CRYPTO_SID_H__ */
+diff --git a/components/service/common/include/psa/sid.h b/components/service/common/include/psa/sid.h
+index 8103a9af..50ad070e 100644
+--- a/components/service/common/include/psa/sid.h
++++ b/components/service/common/include/psa/sid.h
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2019-2021, Arm Limited. All rights reserved.
++ * Copyright (c) 2019-2023, Arm Limited. All rights reserved.
+  *
+  * SPDX-License-Identifier: BSD-3-Clause
+  *
+@@ -12,6 +12,9 @@
+ extern "C" {
+ #endif
+ 
++/******** PSA Crypto SIDs ********/
++#include "crypto_sid.h"
++
+ /******** TFM_SP_PS ********/
+ #define TFM_PROTECTED_STORAGE_SERVICE_SID                          (0x00000060U)
+ #define TFM_PROTECTED_STORAGE_SERVICE_VERSION                      (1U)
+@@ -43,79 +46,6 @@ extern "C" {
+ #define TFM_PLATFORM_SERVICE_HANDLE       (0x40000105U)
+ 
+ 
+-/**
+- * \brief Define a progressive numerical value for each SID which can be used
+- *        when dispatching the requests to the service
+- */
+-enum {
+-    TFM_CRYPTO_GET_KEY_ATTRIBUTES_SID = (0u),
+-    TFM_CRYPTO_RESET_KEY_ATTRIBUTES_SID,
+-    TFM_CRYPTO_OPEN_KEY_SID,
+-    TFM_CRYPTO_CLOSE_KEY_SID,
+-    TFM_CRYPTO_IMPORT_KEY_SID,
+-    TFM_CRYPTO_DESTROY_KEY_SID,
+-    TFM_CRYPTO_EXPORT_KEY_SID,
+-    TFM_CRYPTO_EXPORT_PUBLIC_KEY_SID,
+-    TFM_CRYPTO_PURGE_KEY_SID,
+-    TFM_CRYPTO_COPY_KEY_SID,
+-    TFM_CRYPTO_HASH_COMPUTE_SID,
+-    TFM_CRYPTO_HASH_COMPARE_SID,
+-    TFM_CRYPTO_HASH_SETUP_SID,
+-    TFM_CRYPTO_HASH_UPDATE_SID,
+-    TFM_CRYPTO_HASH_FINISH_SID,
+-    TFM_CRYPTO_HASH_VERIFY_SID,
+-    TFM_CRYPTO_HASH_ABORT_SID,
+-    TFM_CRYPTO_HASH_CLONE_SID,
+-    TFM_CRYPTO_MAC_COMPUTE_SID,
+-    TFM_CRYPTO_MAC_VERIFY_SID,
+-    TFM_CRYPTO_MAC_SIGN_SETUP_SID,
+-    TFM_CRYPTO_MAC_VERIFY_SETUP_SID,
+-    TFM_CRYPTO_MAC_UPDATE_SID,
+-    TFM_CRYPTO_MAC_SIGN_FINISH_SID,
+-    TFM_CRYPTO_MAC_VERIFY_FINISH_SID,
+-    TFM_CRYPTO_MAC_ABORT_SID,
+-    TFM_CRYPTO_CIPHER_ENCRYPT_SID,
+-    TFM_CRYPTO_CIPHER_DECRYPT_SID,
+-    TFM_CRYPTO_CIPHER_ENCRYPT_SETUP_SID,
+-    TFM_CRYPTO_CIPHER_DECRYPT_SETUP_SID,
+-    TFM_CRYPTO_CIPHER_GENERATE_IV_SID,
+-    TFM_CRYPTO_CIPHER_SET_IV_SID,
+-    TFM_CRYPTO_CIPHER_UPDATE_SID,
+-    TFM_CRYPTO_CIPHER_FINISH_SID,
+-    TFM_CRYPTO_CIPHER_ABORT_SID,
+-    TFM_CRYPTO_AEAD_ENCRYPT_SID,
+-    TFM_CRYPTO_AEAD_DECRYPT_SID,
+-    TFM_CRYPTO_AEAD_ENCRYPT_SETUP_SID,
+-    TFM_CRYPTO_AEAD_DECRYPT_SETUP_SID,
+-    TFM_CRYPTO_AEAD_GENERATE_NONCE_SID,
+-    TFM_CRYPTO_AEAD_SET_NONCE_SID,
+-    TFM_CRYPTO_AEAD_SET_LENGTHS_SID,
+-    TFM_CRYPTO_AEAD_UPDATE_AD_SID,
+-    TFM_CRYPTO_AEAD_UPDATE_SID,
+-    TFM_CRYPTO_AEAD_FINISH_SID,
+-    TFM_CRYPTO_AEAD_VERIFY_SID,
+-    TFM_CRYPTO_AEAD_ABORT_SID,
+-    TFM_CRYPTO_SIGN_MESSAGE_SID,
+-    TFM_CRYPTO_VERIFY_MESSAGE_SID,
+-    TFM_CRYPTO_SIGN_HASH_SID,
+-    TFM_CRYPTO_VERIFY_HASH_SID,
+-    TFM_CRYPTO_ASYMMETRIC_ENCRYPT_SID,
+-    TFM_CRYPTO_ASYMMETRIC_DECRYPT_SID,
+-    TFM_CRYPTO_KEY_DERIVATION_SETUP_SID,
+-    TFM_CRYPTO_KEY_DERIVATION_GET_CAPACITY_SID,
+-    TFM_CRYPTO_KEY_DERIVATION_SET_CAPACITY_SID,
+-    TFM_CRYPTO_KEY_DERIVATION_INPUT_BYTES_SID,
+-    TFM_CRYPTO_KEY_DERIVATION_INPUT_KEY_SID,
+-    TFM_CRYPTO_KEY_DERIVATION_KEY_AGREEMENT_SID,
+-    TFM_CRYPTO_KEY_DERIVATION_OUTPUT_BYTES_SID,
+-    TFM_CRYPTO_KEY_DERIVATION_OUTPUT_KEY_SID,
+-    TFM_CRYPTO_KEY_DERIVATION_ABORT_SID,
+-    TFM_CRYPTO_RAW_KEY_AGREEMENT_SID,
+-    TFM_CRYPTO_GENERATE_RANDOM_SID,
+-    TFM_CRYPTO_GENERATE_KEY_SID,
+-    TFM_CRYPTO_SID_MAX,
+-};
+-
+ /******** TFM_SP_PLATFORM ********/
+ #define TFM_SP_PLATFORM_SYSTEM_RESET_SID                           (0x00000040U)
+ #define TFM_SP_PLATFORM_SYSTEM_RESET_VERSION                       (1U)
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_sign_hash.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_sign_hash.h
+index e4a2b167..9276748d 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_sign_hash.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_sign_hash.h
+@@ -37,7 +37,7 @@ static inline psa_status_t crypto_caller_sign_hash(struct service_client *contex
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_SIGN_HASH_SID,
++		.sfn_id = TFM_CRYPTO_ASYMMETRIC_SIGN_HASH_SID,
+ 		.key_id = id,
+ 		.alg = alg,
+ 	};
+@@ -70,7 +70,7 @@ static inline psa_status_t crypto_caller_sign_message(struct service_client *con
+ 	struct rpc_caller *caller = ipc->caller;
+ 	psa_status_t status;
+ 	struct psa_ipc_crypto_pack_iovec iov = {
+-		.sfn_id = TFM_CRYPTO_SIGN_MESSAGE_SID,
++		.sfn_id = TFM_CRYPTO_ASYMMETRIC_SIGN_MESSAGE_SID,
+ 		.key_id = id,
+ 		.alg = alg,
+ 	};
+diff --git a/components/service/crypto/client/caller/psa_ipc/crypto_caller_verify_hash.h b/components/service/crypto/client/caller/psa_ipc/crypto_caller_verify_hash.h
+index cc9279ee..bcd8e0e4 100644
+--- a/components/service/crypto/client/caller/psa_ipc/crypto_caller_verify_hash.h
++++ b/components/service/crypto/client/caller/psa_ipc/crypto_caller_verify_hash.h
+@@ -63,7 +63,7 @@ static inline psa_status_t crypto_caller_verify_hash(struct service_client *cont
+ {
+ 
+ 	return crypto_caller_common(context,id,alg,hash,hash_length,
+-			signature,signature_length, TFM_CRYPTO_VERIFY_HASH_SID);
++			signature,signature_length, TFM_CRYPTO_ASYMMETRIC_VERIFY_HASH_SID);
+ }
+ 
+ static inline psa_status_t crypto_caller_verify_message(struct service_client *context,
+@@ -76,7 +76,7 @@ static inline psa_status_t crypto_caller_verify_message(struct service_client *c
+ {
+ 
+ 	return crypto_caller_common(context,id,alg,hash,hash_length,
+-			signature,signature_length, TFM_CRYPTO_VERIFY_MESSAGE_SID);
++			signature,signature_length, TFM_CRYPTO_ASYMMETRIC_VERIFY_MESSAGE_SID);
+ }
+ 
+ #ifdef __cplusplus
+-- 
+2.25.1
+

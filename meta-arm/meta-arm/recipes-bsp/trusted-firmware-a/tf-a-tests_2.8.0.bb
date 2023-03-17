@@ -11,7 +11,7 @@ SRC_URI_TRUSTED_FIRMWARE_A_TESTS ?= "git://git.trustedfirmware.org/TF-A/tf-a-tes
 SRC_URI = "${SRC_URI_TRUSTED_FIRMWARE_A_TESTS};branch=${SRCBRANCH} \
           file://tf-a-tests-no-warn-rwx-segments.patch"
 SRCBRANCH = "master"
-SRCREV = "5f591f67738a1bbe6b262c53d9dad46ed8bbcd67"
+SRCREV = "f7b3be91ab954c495912fc7bc48383cd83bfec2d"
 
 DEPENDS += "optee-os"
 

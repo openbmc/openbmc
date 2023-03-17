@@ -6,3 +6,5 @@ Common targets are:
 
      core-image-full-cmdline: A small image with more Linux functionality
                               installed, including a ssh server.
+
+Note that the core targets will not set the default phosphor password.

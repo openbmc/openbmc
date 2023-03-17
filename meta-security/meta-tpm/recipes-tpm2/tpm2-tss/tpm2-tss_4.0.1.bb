@@ -10,15 +10,16 @@ SRC_URI = "https://github.com/tpm2-software/${BPN}/releases/download/${PV}/${BPN
            file://fixup_hosttools.patch \
            "
 
-SRC_URI[sha256sum] = "48305e4144dcf6d10f3b25b7bccf0189fd2d1186feafd8cd68c6b17ecf0d7912"
+SRC_URI[sha256sum] = "532a70133910b6bd842289915b3f9423c0205c0ea009d65294ca18a74087c950"
 
 UPSTREAM_CHECK_URI = "https://github.com/tpm2-software/${BPN}/releases"
 
 inherit autotools pkgconfig systemd useradd
 
-PACKAGECONFIG ??= ""
+PACKAGECONFIG ??= "vendor"
 PACKAGECONFIG[oxygen] = ",--disable-doxygen-doc, "
-PACKAGECONFIG[fapi] = "--enable-fapi,--disable-fapi,curl json-c "
+PACKAGECONFIG[fapi] = "--enable-fapi,--disable-fapi,curl json-c util-linux-libuuid "
+PACKAGECONFIG[policy] = "--enable-policy,--disable-policy,json-c util-linux-libuuid "
 
 EXTRA_OECONF += "--enable-static --with-udevrulesdir=${nonarch_base_libdir}/udev/rules.d/"
 EXTRA_OECONF += "--runstatedir=/run"
@@ -27,11 +28,6 @@ EXTRA_OECONF:remove = " --disable-static"
 USERADD_PACKAGES = "${PN}"
 GROUPADD_PARAM:${PN} = "--system tss"
 USERADD_PARAM:${PN} = "--system -M -d /var/lib/tpm -s /bin/false -g tss tss"
-
-do_configure:prepend() {
-    # do not extract the version number from git
-    sed -i -e 's/m4_esyscmd_s(\[git describe --tags --always --dirty\])/${PV}/' ${S}/configure.ac
-}
 
 do_install:append() {
     # Remove /run as it is created on startup

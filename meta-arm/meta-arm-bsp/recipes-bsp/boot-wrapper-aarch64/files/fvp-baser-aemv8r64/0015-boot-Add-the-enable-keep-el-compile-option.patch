@@ -1,4 +1,4 @@
-From 8271c21bcff260295203214b7b8c87cdb8236453 Mon Sep 17 00:00:00 2001
+From 5995f83592aea874f5b423538e36675e2204582b Mon Sep 17 00:00:00 2001
 From: Jaxson Han <jaxson.han@arm.com>
 Date: Tue, 4 Jan 2022 17:01:55 +0800
 Subject: [PATCH] boot: Add the --enable-keep-el compile option
@@ -23,7 +23,7 @@ Change-Id: I3ba9c87cf0b59d163ca433f74c9e3a46e5ca2c63
  4 files changed, 20 insertions(+), 1 deletion(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index 734de92..054becd 100644
+index e905602..6604baa 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -33,6 +33,10 @@ PSCI_CPU_ON	:= 0xc4000003
@@ -38,10 +38,10 @@ index 734de92..054becd 100644
  COMMON_OBJ	:= boot.o bakery_lock.o platform.o lib.o device_tree.o
  
 diff --git a/arch/aarch64/boot.S b/arch/aarch64/boot.S
-index 6dbd5cc..157c097 100644
+index 27b1139..c079d22 100644
 --- a/arch/aarch64/boot.S
 +++ b/arch/aarch64/boot.S
-@@ -233,7 +233,11 @@ el2_init:
+@@ -254,7 +254,11 @@ el2_init:
  	msr	cnthctl_el2, x0
  	isb
  
@@ -53,7 +53,7 @@ index 6dbd5cc..157c097 100644
  	ldr	x1, =spsr_to_elx
  	str	w0, [x1]
  	// fall through
-@@ -313,5 +317,5 @@ ASM_FUNC(jump_kernel)
+@@ -334,5 +338,5 @@ ASM_FUNC(jump_kernel)
  	.align 3
  flag_keep_el:
  	.long 0

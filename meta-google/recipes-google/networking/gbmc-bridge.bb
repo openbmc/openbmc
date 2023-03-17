@@ -27,6 +27,7 @@ SRC_URI += " \
   file://gbmc-br-dhcp-term.service \
   file://gbmc-br-lib.sh \
   file://gbmc-br-load-ip.service \
+  file://gbmc-start-dhcp.sh \
   "
 
 FILES:${PN}:append = " \
@@ -120,6 +121,9 @@ do_install() {
   install -m0644 ${WORKDIR}/50-gbmc-psu-hardreset.sh ${D}${datadir}/gbmc-br-dhcp/
 
   install -m0644 ${WORKDIR}/gbmc-br-lib.sh ${D}${datadir}/
+
+  install -d ${D}/${bindir}
+  install -m0755 ${WORKDIR}/gbmc-start-dhcp.sh ${D}${bindir}/
 }
 
 do_rm_work:prepend() {

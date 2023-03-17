@@ -2,7 +2,7 @@
 Description=Turn on AC at Sled%i
 Requires=motor-init-calibration@%i.service
 After=motor-init-calibration@%i.service
-Conflicts=host-ac-off@%i.service
+Conflicts=chassis-poweroff@%i.service
 
 [Service]
 Type=oneshot

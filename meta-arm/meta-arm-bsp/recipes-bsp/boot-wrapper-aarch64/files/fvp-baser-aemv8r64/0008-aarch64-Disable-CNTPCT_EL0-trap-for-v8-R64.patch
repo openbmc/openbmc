@@ -1,4 +1,4 @@
-From 3f4614e02f0f8d2522510578da2752f8e3511bb3 Mon Sep 17 00:00:00 2001
+From 521c121eccb386aca7c75d92528e495546adccec Mon Sep 17 00:00:00 2001
 From: Jaxson Han <jaxson.han@arm.com>
 Date: Mon, 25 Oct 2021 17:09:13 +0800
 Subject: [PATCH] aarch64: Disable CNTPCT_EL0 trap for v8-R64
@@ -24,10 +24,10 @@ Change-Id: I4147e66341c8153312021e6f2ab67d0037246da1
  1 file changed, 12 insertions(+)
 
 diff --git a/arch/aarch64/boot.S b/arch/aarch64/boot.S
-index def9192..6dbd5cc 100644
+index a219ea7..27b1139 100644
 --- a/arch/aarch64/boot.S
 +++ b/arch/aarch64/boot.S
-@@ -219,6 +219,18 @@ el2_init:
+@@ -240,6 +240,18 @@ el2_init:
  	orr	x0, x0, #(1 << 41)		// HCR_EL2.API
  
  1:	msr	hcr_el2, x0

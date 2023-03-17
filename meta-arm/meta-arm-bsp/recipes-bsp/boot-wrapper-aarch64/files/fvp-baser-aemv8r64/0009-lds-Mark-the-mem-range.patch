@@ -1,4 +1,4 @@
-From 2851f0e6c1216894b9498d7b91256bb1ef49e544 Mon Sep 17 00:00:00 2001
+From 780df234d98db81485b1f351f902a68def35c9d4 Mon Sep 17 00:00:00 2001
 From: Jaxson Han <jaxson.han@arm.com>
 Date: Tue, 2 Nov 2021 15:10:28 +0800
 Subject: [PATCH] lds: Mark the mem range

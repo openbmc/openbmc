@@ -8,12 +8,13 @@ SRC_URI += "git://github.com/ARM-software/sbsa-acs;destsuffix=edk2/ShellPkg/Appl
             git://github.com/tianocore/edk2-libc;destsuffix=edk2/edk2-libc;protocol=https;branch=master;name=libc \
             file://shell.patch \
             file://use_bfd_linker.patch \
-            file://enum-int-mismatch.patch \
-            file://0001-Revert-peripheral-test-3-updated-for-multiple-uarts.patch;patchdir=ShellPkg/Application/sbsa-acs \
+            file://0001-Fix-function-protype-mismatches.patch;patchdir=ShellPkg/Application/sbsa-acs \
+            file://0001-Fix-for-issue-245.patch;patchdir=ShellPkg/Application/sbsa-acs \
             "
 
-SRCREV_acs = "28ecef569303af18b571ff3d66bbdcb6135eaed8"
-SRCREV_libc = "c32222fed9927420fc46da503dea1ebb874698b6"
+
+SRCREV_acs = "7d7a3fe81ad7e6f05143ba17db50107f1ab6c9cd"
+SRCREV_libc = "a806ea1062c254bd6e09db7d0f7beb4d14bc3ed0"
 
 # GCC12 trips on it
 #see https://src.fedoraproject.org/rpms/edk2/blob/rawhide/f/0032-Basetools-turn-off-gcc12-warning.patch

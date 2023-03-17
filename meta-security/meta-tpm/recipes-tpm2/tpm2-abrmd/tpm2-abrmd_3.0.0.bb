@@ -18,7 +18,7 @@ SRC_URI = "\
     file://tpm2-abrmd.default \
 "
 
-SRC_URI[sha256sum] = "a7844a257eaf5176f612fe9620018edc0880cca7036465ad2593f83ae0ad6673"
+SRC_URI[sha256sum] = "d59aff34164aa705b05155b86607f6b66918a433104f754a3fcf76216dd9f465"
 
 UPSTREAM_CHECK_URI = "https://github.com/tpm2-software/${BPN}/releases"
 

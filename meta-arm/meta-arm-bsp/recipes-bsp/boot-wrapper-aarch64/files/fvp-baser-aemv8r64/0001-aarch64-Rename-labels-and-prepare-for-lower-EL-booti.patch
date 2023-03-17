@@ -1,4 +1,4 @@
-From 3e7cfbe39a2a053d2a6b0d928cc172ed9d1c6da8 Mon Sep 17 00:00:00 2001
+From 545f6950ae4dc55b4974986aa9629adb16eaf4e1 Mon Sep 17 00:00:00 2001
 From: Jaxson Han <jaxson.han@arm.com>
 Date: Tue, 25 May 2021 07:25:00 +0100
 Subject: [PATCH] aarch64: Rename labels and prepare for lower EL booting
@@ -18,10 +18,10 @@ Signed-off-by: Jaxson Han <jaxson.han@arm.com>
  3 files changed, 27 insertions(+), 14 deletions(-)
 
 diff --git a/arch/aarch64/boot.S b/arch/aarch64/boot.S
-index 27ba449..84e1646 100644
+index d682ba5..fab694e 100644
 --- a/arch/aarch64/boot.S
 +++ b/arch/aarch64/boot.S
-@@ -21,18 +21,30 @@ ASM_FUNC(_start)
+@@ -34,18 +34,30 @@ ASM_FUNC(_start)
  
  	/*
  	 * EL3 initialisation
@@ -56,7 +56,7 @@ index 27ba449..84e1646 100644
  	orr	x0, x0, #(1 << 0)		// Non-secure EL1
  	orr	x0, x0, #(1 << 8)		// HVC enable
  
-@@ -124,7 +136,7 @@ ASM_FUNC(_start)
+@@ -145,7 +157,7 @@ ASM_FUNC(_start)
  
  	bl	gic_secure_init
  
@@ -65,7 +65,7 @@ index 27ba449..84e1646 100644
  
  err_invalid_id:
  	b	.
-@@ -151,7 +163,7 @@ ASM_FUNC(jump_kernel)
+@@ -172,7 +184,7 @@ ASM_FUNC(jump_kernel)
  	bl	find_logical_id
  	bl	setup_stack		// Reset stack pointer
  
@@ -74,7 +74,7 @@ index 27ba449..84e1646 100644
  	cmp	w0, #0			// Prepare Z flag
  
  	mov	x0, x20
-@@ -160,7 +172,7 @@ ASM_FUNC(jump_kernel)
+@@ -181,7 +193,7 @@ ASM_FUNC(jump_kernel)
  	mov	x3, x23
  
  	b.eq	1f
@@ -83,7 +83,7 @@ index 27ba449..84e1646 100644
  
  1:	mov	x4, #SPSR_KERNEL
  
-@@ -178,5 +190,5 @@ ASM_FUNC(jump_kernel)
+@@ -199,5 +211,5 @@ ASM_FUNC(jump_kernel)
  
  	.data
  	.align 3
