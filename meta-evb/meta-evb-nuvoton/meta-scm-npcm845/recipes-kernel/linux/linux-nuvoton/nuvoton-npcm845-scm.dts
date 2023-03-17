@@ -370,9 +370,13 @@
 			status = "okay";
 		};
 
-		video: video@f0810000 {
+		vcd: vcd@f0810000 {
 			status = "okay";
 			memory-region = <&video_memory>;
+		};
+
+		ece: video-codec@f0820000 {
+			status = "okay";
 		};
 
 		tip_mbox: mailbox@f080d000 {
