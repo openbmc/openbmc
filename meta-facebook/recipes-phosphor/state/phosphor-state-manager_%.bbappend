@@ -17,6 +17,11 @@ CHASSIS_DEFAULT_TARGETS:remove = " \
     obmc-chassis-poweroff@{}.target.requires/obmc-powered-off@{}.service \
 "
 
+CHASSIS_DEFAULT_TARGETS:remove:greatlakes = " \
+    obmc-chassis-poweroff@{}.target.requires/obmc-power-stop@{}.service \
+    obmc-chassis-poweron@{}.target.requires/obmc-power-start@{}.service \
+    "
+
 SRC_URI:append:greatlakes = " \
     file://chassis-poweroff@.service \
     file://chassis-poweron@.service \
