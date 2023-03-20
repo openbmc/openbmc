@@ -126,42 +126,42 @@ FLASH_UBI_RWFS_CMD:ubi-rwfs-ubifs = "${UBIFS_RWFS_CMD}"
 FLASH_EXT4_RWFS_CMD:mmc-rwfs-ext4 = "${EXT4_RWFS_CMD}"
 
 mk_empty_image() {
-	image_dst="$1"
-	image_size_kb=$2
-	dd if=/dev/zero bs=1k count=$image_size_kb \
-		| tr '\000' '\377' > $image_dst
+    image_dst="$1"
+    image_size_kb=$2
+    dd if=/dev/zero bs=1k count=$image_size_kb \
+        | tr '\000' '\377' > $image_dst
 }
 
 mk_empty_image_zeros() {
-	image_dst="$1"
-	image_size_kb=$2
-	dd if=/dev/zero of=$image_dst bs=1k count=$image_size_kb
+    image_dst="$1"
+    image_size_kb=$2
+    dd if=/dev/zero of=$image_dst bs=1k count=$image_size_kb
 }
 
 clean_rwfs() {
-	type=$1
-	shift
+    type=$1
+    shift
 
-	rm -f ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$type
-	rm -rf $type
-	mkdir $type
+    rm -f ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$type
+    rm -rf $type
+    mkdir $type
 }
 
 make_rwfs() {
-	type=$1
-	cmd=$2
-	shift
-	shift
-	opts="$@"
+    type=$1
+    cmd=$2
+    shift
+    shift
+    opts="$@"
 
-	mkdir -p $type
+    mkdir -p $type
 
-	$cmd $opts
+    $cmd $opts
 }
 
 do_generate_rwfs_static() {
-	clean_rwfs ${OVERLAY_BASETYPE}
-	make_rwfs ${OVERLAY_BASETYPE} "${FLASH_STATIC_RWFS_CMD}" ${OVERLAY_MKFS_OPTS}
+    clean_rwfs ${OVERLAY_BASETYPE}
+    make_rwfs ${OVERLAY_BASETYPE} "${FLASH_STATIC_RWFS_CMD}" ${OVERLAY_MKFS_OPTS}
 }
 do_generate_rwfs_static[dirs] = " ${S}/static"
 do_generate_rwfs_static[depends] += " \
@@ -169,8 +169,8 @@ do_generate_rwfs_static[depends] += " \
         "
 
 do_generate_rwfs_ubi() {
-	clean_rwfs ${FLASH_UBI_OVERLAY_BASETYPE}
-	make_rwfs ${FLASH_UBI_OVERLAY_BASETYPE} "${FLASH_UBI_RWFS_CMD}"
+    clean_rwfs ${FLASH_UBI_OVERLAY_BASETYPE}
+    make_rwfs ${FLASH_UBI_OVERLAY_BASETYPE} "${FLASH_UBI_RWFS_CMD}"
 }
 do_generate_rwfs_ubi[dirs] = " ${S}/ubi"
 do_generate_rwfs_ubi[depends] += " \
@@ -178,9 +178,9 @@ do_generate_rwfs_ubi[depends] += " \
         "
 
 do_generate_rwfs_ext4() {
-	clean_rwfs rwfs.${FLASH_EXT4_OVERLAY_BASETYPE}
-	mk_empty_image ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.rwfs.ext4 1024
-	make_rwfs ${FLASH_EXT4_OVERLAY_BASETYPE} "${FLASH_EXT4_RWFS_CMD}" ${OVERLAY_MKFS_OPTS}
+    clean_rwfs rwfs.${FLASH_EXT4_OVERLAY_BASETYPE}
+    mk_empty_image ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.rwfs.ext4 1024
+    make_rwfs ${FLASH_EXT4_OVERLAY_BASETYPE} "${FLASH_EXT4_RWFS_CMD}" ${OVERLAY_MKFS_OPTS}
 }
 do_generate_rwfs_ext4[dirs] = " ${S}/ext4"
 do_generate_rwfs_ext4[depends] += " \
@@ -188,22 +188,22 @@ do_generate_rwfs_ext4[depends] += " \
         "
 
 add_volume() {
-	config_file=$1
-	vol_id=$2
-	vol_type=$3
-	vol_name=$4
-	image=$5
-	vol_size=$6
+    config_file=$1
+    vol_id=$2
+    vol_type=$3
+    vol_name=$4
+    image=$5
+    vol_size=$6
 
-	echo \[$vol_name\] >> $config_file
-	echo mode=ubi >> $config_file
-	echo image=$image >> $config_file
-	echo vol_type=$vol_type >> $config_file
-	echo vol_name=$vol_name >> $config_file
-	echo vol_id=$vol_id >> $config_file
-	if [ ! -z $vol_size ]; then
-		echo vol_size=$vol_size >> $config_file
-	fi
+    echo \[$vol_name\] >> $config_file
+    echo mode=ubi >> $config_file
+    echo image=$image >> $config_file
+    echo vol_type=$vol_type >> $config_file
+    echo vol_name=$vol_name >> $config_file
+    echo vol_id=$vol_id >> $config_file
+    if [ ! -z $vol_size ]; then
+        echo vol_size=$vol_size >> $config_file
+    fi
 }
 
 python do_generate_ubi() {
@@ -220,31 +220,31 @@ do_generate_ubi[depends] += " \
         "
 
 do_make_ubi() {
-	cfg=ubinize-${IMAGE_NAME}.cfg
-	rm -f $cfg ubi-img
-	# Construct the ubinize config file
-	add_volume $cfg 0 static kernel-${VERSION_ID} \
-		${DEPLOY_DIR_IMAGE}/${FLASH_KERNEL_IMAGE}
+    cfg=ubinize-${IMAGE_NAME}.cfg
+    rm -f $cfg ubi-img
+    # Construct the ubinize config file
+    add_volume $cfg 0 static kernel-${VERSION_ID} \
+        ${DEPLOY_DIR_IMAGE}/${FLASH_KERNEL_IMAGE}
 
-	add_volume $cfg 1 static rofs-${VERSION_ID} \
-		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${FLASH_UBI_BASETYPE}
+    add_volume $cfg 1 static rofs-${VERSION_ID} \
+        ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${FLASH_UBI_BASETYPE}
 
-	add_volume $cfg 2 dynamic rwfs ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${FLASH_UBI_OVERLAY_BASETYPE} ${FLASH_UBI_RWFS_TXT_SIZE}
+    add_volume $cfg 2 dynamic rwfs ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${FLASH_UBI_OVERLAY_BASETYPE} ${FLASH_UBI_RWFS_TXT_SIZE}
 
-	# Build the ubi partition image
-	ubinize -p ${FLASH_PEB_SIZE}KiB -m ${FLASH_PAGE_SIZE} -o ubi-img $cfg
+    # Build the ubi partition image
+    ubinize -p ${FLASH_PEB_SIZE}KiB -m ${FLASH_PAGE_SIZE} -o ubi-img $cfg
 
-	# Concatenate the uboot and ubi partitions
-	mk_empty_image ${IMGDEPLOYDIR}/${IMAGE_NAME}.ubi.mtd ${FLASH_SIZE}
-	dd bs=1k conv=notrunc seek=${FLASH_UBOOT_OFFSET} \
-		if=${DEPLOY_DIR_IMAGE}/u-boot.${UBOOT_SUFFIX} \
-		of=${IMGDEPLOYDIR}/${IMAGE_NAME}.ubi.mtd
-	dd bs=1k conv=notrunc seek=${FLASH_UBI_OFFSET} \
-		if=ubi-img \
-		of=${IMGDEPLOYDIR}/${IMAGE_NAME}.ubi.mtd
+    # Concatenate the uboot and ubi partitions
+    mk_empty_image ${IMGDEPLOYDIR}/${IMAGE_NAME}.ubi.mtd ${FLASH_SIZE}
+    dd bs=1k conv=notrunc seek=${FLASH_UBOOT_OFFSET} \
+        if=${DEPLOY_DIR_IMAGE}/u-boot.${UBOOT_SUFFIX} \
+        of=${IMGDEPLOYDIR}/${IMAGE_NAME}.ubi.mtd
+    dd bs=1k conv=notrunc seek=${FLASH_UBI_OFFSET} \
+        if=ubi-img \
+        of=${IMGDEPLOYDIR}/${IMAGE_NAME}.ubi.mtd
 
-	cd ${IMGDEPLOYDIR}
-	ln -sf ${IMAGE_NAME}.ubi.mtd ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.ubi.mtd
+    cd ${IMGDEPLOYDIR}
+    ln -sf ${IMAGE_NAME}.ubi.mtd ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.ubi.mtd
 }
 do_make_ubi[dirs] = "${S}/ubi"
 do_make_ubi[depends] += " \
@@ -255,8 +255,8 @@ do_make_ubi[depends] += " \
         "
 
 do_mk_static_nor_image() {
-	# Assemble the flash image
-	mk_empty_image ${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd ${FLASH_SIZE}
+    # Assemble the flash image
+    mk_empty_image ${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd ${FLASH_SIZE}
 }
 
 do_generate_image_uboot_file() {
@@ -335,16 +335,16 @@ python do_generate_static() {
 }
 
 do_mk_static_symlinks() {
-	cd ${IMGDEPLOYDIR}
-	ln -sf ${IMAGE_NAME}.static.mtd ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.static.mtd
+    cd ${IMGDEPLOYDIR}
+    ln -sf ${IMAGE_NAME}.static.mtd ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.static.mtd
 
-	# Maintain non-standard legacy links
-	do_generate_image_uboot_file ${IMGDEPLOYDIR}/image-u-boot
-	ln -sf ${IMAGE_NAME}.static.mtd ${IMGDEPLOYDIR}/flash-${MACHINE}
-	ln -sf ${IMAGE_NAME}.static.mtd ${IMGDEPLOYDIR}/image-bmc
-	ln -sf ${FLASH_KERNEL_IMAGE} ${IMGDEPLOYDIR}/image-kernel
-	ln -sf ${IMAGE_LINK_NAME}.${IMAGE_BASETYPE} ${IMGDEPLOYDIR}/image-rofs
-	ln -sf ${IMAGE_LINK_NAME}.${OVERLAY_BASETYPE} ${IMGDEPLOYDIR}/image-rwfs
+    # Maintain non-standard legacy links
+    do_generate_image_uboot_file ${IMGDEPLOYDIR}/image-u-boot
+    ln -sf ${IMAGE_NAME}.static.mtd ${IMGDEPLOYDIR}/flash-${MACHINE}
+    ln -sf ${IMAGE_NAME}.static.mtd ${IMGDEPLOYDIR}/image-bmc
+    ln -sf ${FLASH_KERNEL_IMAGE} ${IMGDEPLOYDIR}/image-kernel
+    ln -sf ${IMAGE_LINK_NAME}.${IMAGE_BASETYPE} ${IMGDEPLOYDIR}/image-rofs
+    ln -sf ${IMAGE_LINK_NAME}.${OVERLAY_BASETYPE} ${IMGDEPLOYDIR}/image-rwfs
 }
 do_generate_static[dirs] = "${S}/static"
 do_generate_static[depends] += " \
@@ -354,52 +354,52 @@ do_generate_static[depends] += " \
         "
 
 make_signatures() {
-	signing_key="${SIGNING_KEY}"
+    signing_key="${SIGNING_KEY}"
 
-	if [ "${INSECURE_KEY}" == "True" ] && [ -n "${SIGNING_PUBLIC_KEY}" ]; then
-		echo "Using SIGNING_PUBLIC_KEY"
-		signing_key=""
-	fi
+    if [ "${INSECURE_KEY}" == "True" ] && [ -n "${SIGNING_PUBLIC_KEY}" ]; then
+        echo "Using SIGNING_PUBLIC_KEY"
+        signing_key=""
+    fi
 
-	if [ -n "${signing_key}" ] && [ -n "${SIGNING_PUBLIC_KEY}" ]; then
-		echo "Both SIGNING_KEY and SIGNING_PUBLIC_KEY are defined, expecting only one"
-		exit 1
-	fi
+    if [ -n "${signing_key}" ] && [ -n "${SIGNING_PUBLIC_KEY}" ]; then
+        echo "Both SIGNING_KEY and SIGNING_PUBLIC_KEY are defined, expecting only one"
+        exit 1
+    fi
 
-	signature_files=""
-	if [ -n "${signing_key}" ]; then
-		for file in "$@"; do
-			openssl dgst -sha256 -sign ${signing_key} -out "${file}.sig" $file
-			signature_files="${signature_files} ${file}.sig"
-		done
+    signature_files=""
+    if [ -n "${signing_key}" ]; then
+        for file in "$@"; do
+            openssl dgst -sha256 -sign ${signing_key} -out "${file}.sig" $file
+            signature_files="${signature_files} ${file}.sig"
+        done
 
-		if [ -n "${signature_files}" ]; then
-			sort_signature_files=$(echo "${signature_files}" | tr ' ' '\n' | sort | tr '\n' ' ')
-			cat ${sort_signature_files} > image-full
-			openssl dgst -sha256 -sign ${signing_key} -out image-full.sig image-full
-			signature_files="${signature_files} image-full.sig"
-		fi
-	fi
+        if [ -n "${signature_files}" ]; then
+            sort_signature_files=$(echo "${signature_files}" | tr ' ' '\n' | sort | tr '\n' ' ')
+            cat ${sort_signature_files} > image-full
+            openssl dgst -sha256 -sign ${signing_key} -out image-full.sig image-full
+            signature_files="${signature_files} image-full.sig"
+        fi
+    fi
 }
 
 do_generate_static_alltar() {
-	ln -sf ${S}/MANIFEST MANIFEST
-	ln -sf ${S}/publickey publickey
-	ln -sf ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.static.mtd image-bmc
+    ln -sf ${S}/MANIFEST MANIFEST
+    ln -sf ${S}/publickey publickey
+    ln -sf ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.static.mtd image-bmc
 
-	make_signatures image-bmc MANIFEST publickey
+    make_signatures image-bmc MANIFEST publickey
 
-	tar -h -cvf ${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd.all.tar \
-	    image-bmc MANIFEST publickey ${signature_files}
+    tar -h -cvf ${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd.all.tar \
+        image-bmc MANIFEST publickey ${signature_files}
 
-	cd ${IMGDEPLOYDIR}
+    cd ${IMGDEPLOYDIR}
 
-	ln -sf ${IMAGE_NAME}.static.mtd.all.tar \
-		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.static.mtd.all.tar
+    ln -sf ${IMAGE_NAME}.static.mtd.all.tar \
+        ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.static.mtd.all.tar
 
-	# Maintain non-standard legacy link.
-	ln -sf ${IMAGE_NAME}.static.mtd.all.tar \
-		${IMGDEPLOYDIR}/${MACHINE}-${DATETIME}.all.tar
+    # Maintain non-standard legacy link.
+    ln -sf ${IMAGE_NAME}.static.mtd.all.tar \
+        ${IMGDEPLOYDIR}/${MACHINE}-${DATETIME}.all.tar
 
 }
 do_generate_static_alltar[vardepsexclude] = "DATETIME"
@@ -411,42 +411,42 @@ do_generate_static_alltar[depends] += " \
         "
 
 make_image_links() {
-	rwfs=$1
-	rofs=$2
-	shift
-	shift
+    rwfs=$1
+    rofs=$2
+    shift
+    shift
 
-	# Create some links to help make the tar archive in the format
-	# expected by phosphor-bmc-code-mgmt.
-	do_generate_image_uboot_file image-u-boot
-	ln -sf ${DEPLOY_DIR_IMAGE}/${FLASH_KERNEL_IMAGE} image-kernel
-	ln -sf ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$rofs image-rofs
-	ln -sf ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$rwfs image-rwfs
+    # Create some links to help make the tar archive in the format
+    # expected by phosphor-bmc-code-mgmt.
+    do_generate_image_uboot_file image-u-boot
+    ln -sf ${DEPLOY_DIR_IMAGE}/${FLASH_KERNEL_IMAGE} image-kernel
+    ln -sf ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$rofs image-rofs
+    ln -sf ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$rwfs image-rwfs
 }
 
 make_tar_of_images() {
-	type=$1
-	shift
-	extra_files="$@"
+    type=$1
+    shift
+    extra_files="$@"
 
-	# Create the tar archive
-	tar -h -cvf ${IMGDEPLOYDIR}/${IMAGE_NAME}.$type.tar \
-		image-u-boot image-kernel image-rofs image-rwfs $extra_files
+    # Create the tar archive
+    tar -h -cvf ${IMGDEPLOYDIR}/${IMAGE_NAME}.$type.tar \
+        image-u-boot image-kernel image-rofs image-rwfs $extra_files
 
-	cd ${IMGDEPLOYDIR}
-	ln -sf ${IMAGE_NAME}.$type.tar ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$type.tar
+    cd ${IMGDEPLOYDIR}
+    ln -sf ${IMAGE_NAME}.$type.tar ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$type.tar
 }
 
 do_generate_static_tar() {
-	ln -sf ${S}/MANIFEST MANIFEST
-	ln -sf ${S}/publickey publickey
-	make_image_links ${OVERLAY_BASETYPE} ${IMAGE_BASETYPE}
-	make_signatures image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey
-	make_tar_of_images static.mtd MANIFEST publickey ${signature_files}
+    ln -sf ${S}/MANIFEST MANIFEST
+    ln -sf ${S}/publickey publickey
+    make_image_links ${OVERLAY_BASETYPE} ${IMAGE_BASETYPE}
+    make_signatures image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey
+    make_tar_of_images static.mtd MANIFEST publickey ${signature_files}
 
-	# Maintain non-standard legacy link.
-	cd ${IMGDEPLOYDIR}
-	ln -sf ${IMAGE_NAME}.static.mtd.tar ${IMGDEPLOYDIR}/${MACHINE}-${DATETIME}.tar
+    # Maintain non-standard legacy link.
+    cd ${IMGDEPLOYDIR}
+    ln -sf ${IMAGE_NAME}.static.mtd.tar ${IMGDEPLOYDIR}/${MACHINE}-${DATETIME}.tar
 }
 do_generate_static_tar[dirs] = " ${S}/static"
 do_generate_static_tar[depends] += " \
@@ -596,11 +596,11 @@ do_generate_static_norootfs[depends] += " \
         "
 
 do_generate_ubi_tar() {
-	ln -sf ${S}/MANIFEST MANIFEST
-	ln -sf ${S}/publickey publickey
-	make_image_links ${FLASH_UBI_OVERLAY_BASETYPE} ${FLASH_UBI_BASETYPE}
-	make_signatures image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey
-	make_tar_of_images ubi.mtd MANIFEST publickey ${signature_files}
+    ln -sf ${S}/MANIFEST MANIFEST
+    ln -sf ${S}/publickey publickey
+    make_image_links ${FLASH_UBI_OVERLAY_BASETYPE} ${FLASH_UBI_BASETYPE}
+    make_signatures image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey
+    make_tar_of_images ubi.mtd MANIFEST publickey ${signature_files}
 }
 do_generate_ubi_tar[dirs] = " ${S}/ubi"
 do_generate_ubi_tar[depends] += " \
@@ -613,38 +613,38 @@ do_generate_ubi_tar[depends] += " \
         "
 
 do_generate_ext4_tar() {
-	# Generate the U-Boot image
-	mk_empty_image_zeros image-u-boot ${MMC_UBOOT_SIZE}
-	do_generate_image_uboot_file image-u-boot
+    # Generate the U-Boot image
+    mk_empty_image_zeros image-u-boot ${MMC_UBOOT_SIZE}
+    do_generate_image_uboot_file image-u-boot
 
-	# Generate a compressed ext4 filesystem with the fitImage file in it to be
-	# flashed to the boot partition of the eMMC
-	install -d boot-image
-	install -m 644 ${DEPLOY_DIR_IMAGE}/${FLASH_KERNEL_IMAGE} boot-image/fitImage
-	mk_empty_image_zeros boot-image.${FLASH_EXT4_BASETYPE} ${MMC_BOOT_PARTITION_SIZE}
-	mkfs.ext4 -F -i 4096 -d boot-image boot-image.${FLASH_EXT4_BASETYPE}
-	# Error codes 0-3 indicate successfull operation of fsck
-	fsck.ext4 -pvfD boot-image.${FLASH_EXT4_BASETYPE} || [ $? -le 3 ]
-	zstd -f -k -T0 -c ${ZSTD_COMPRESSION_LEVEL} boot-image.${FLASH_EXT4_BASETYPE} > boot-image.${FLASH_EXT4_BASETYPE}.zst
+    # Generate a compressed ext4 filesystem with the fitImage file in it to be
+    # flashed to the boot partition of the eMMC
+    install -d boot-image
+    install -m 644 ${DEPLOY_DIR_IMAGE}/${FLASH_KERNEL_IMAGE} boot-image/fitImage
+    mk_empty_image_zeros boot-image.${FLASH_EXT4_BASETYPE} ${MMC_BOOT_PARTITION_SIZE}
+    mkfs.ext4 -F -i 4096 -d boot-image boot-image.${FLASH_EXT4_BASETYPE}
+    # Error codes 0-3 indicate successfull operation of fsck
+    fsck.ext4 -pvfD boot-image.${FLASH_EXT4_BASETYPE} || [ $? -le 3 ]
+    zstd -f -k -T0 -c ${ZSTD_COMPRESSION_LEVEL} boot-image.${FLASH_EXT4_BASETYPE} > boot-image.${FLASH_EXT4_BASETYPE}.zst
 
-	# Generate the compressed ext4 rootfs
-	zstd -f -k -T0 -c ${ZSTD_COMPRESSION_LEVEL} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${FLASH_EXT4_BASETYPE} > ${IMAGE_LINK_NAME}.${FLASH_EXT4_BASETYPE}.zst
+    # Generate the compressed ext4 rootfs
+    zstd -f -k -T0 -c ${ZSTD_COMPRESSION_LEVEL} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${FLASH_EXT4_BASETYPE} > ${IMAGE_LINK_NAME}.${FLASH_EXT4_BASETYPE}.zst
 
-	ln -sf boot-image.${FLASH_EXT4_BASETYPE}.zst image-kernel
-	ln -sf ${IMAGE_LINK_NAME}.${FLASH_EXT4_BASETYPE}.zst image-rofs
-	ln -sf ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.rwfs.${FLASH_EXT4_OVERLAY_BASETYPE} image-rwfs
-	ln -sf ${S}/MANIFEST MANIFEST
-	ln -sf ${S}/publickey publickey
+    ln -sf boot-image.${FLASH_EXT4_BASETYPE}.zst image-kernel
+    ln -sf ${IMAGE_LINK_NAME}.${FLASH_EXT4_BASETYPE}.zst image-rofs
+    ln -sf ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.rwfs.${FLASH_EXT4_OVERLAY_BASETYPE} image-rwfs
+    ln -sf ${S}/MANIFEST MANIFEST
+    ln -sf ${S}/publickey publickey
 
-	hostfw_update_file="${DEPLOY_DIR_IMAGE}/hostfw/update/image-hostfw"
-	if [ -e "${hostfw_update_file}" ]; then
-		ln -sf "${hostfw_update_file}" image-hostfw
-		make_signatures image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey image-hostfw
-		make_tar_of_images ext4.mmc MANIFEST publickey ${signature_files} image-hostfw
-	else
-		make_signatures image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey
-		make_tar_of_images ext4.mmc MANIFEST publickey ${signature_files}
-	fi
+    hostfw_update_file="${DEPLOY_DIR_IMAGE}/hostfw/update/image-hostfw"
+    if [ -e "${hostfw_update_file}" ]; then
+        ln -sf "${hostfw_update_file}" image-hostfw
+        make_signatures image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey image-hostfw
+        make_tar_of_images ext4.mmc MANIFEST publickey ${signature_files} image-hostfw
+    else
+        make_signatures image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey
+        make_tar_of_images ext4.mmc MANIFEST publickey ${signature_files}
+    fi
 }
 do_generate_ext4_tar[dirs] = " ${S}/ext4"
 do_generate_ext4_tar[depends] += " \
