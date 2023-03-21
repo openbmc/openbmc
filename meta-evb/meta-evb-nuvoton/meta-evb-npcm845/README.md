@@ -286,10 +286,10 @@ setenv ethact gmac2
 tftp 10000000 image-kernel
 /* Blue/Green EVB */
 sf probe 0:0
-sf update 0x10000000 0x200000 ${filesize}
+sf update 0x10000000 0x400000 ${filesize}
 /* Red EVB */
 sf probe 0:1
-sf update 0x10000000 0x200000 ${filesize}
+sf update 0x10000000 0x400000 ${filesize}
 ```
 
 * Flash bootloader
