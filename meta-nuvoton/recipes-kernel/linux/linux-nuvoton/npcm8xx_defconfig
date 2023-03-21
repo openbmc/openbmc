@@ -202,3 +202,6 @@ CONFIG_TCG_FTPM_TEE=y
 CONFIG_MAILBOX=y
 CONFIG_NPCM_MBOX=y
 CONFIG_NPCM_MBOX_CERBERUS=y
+
+# Enable multi decompressor to improve overall I/O performance
+CONFIG_SQUASHFS_DECOMP_MULTI=y
