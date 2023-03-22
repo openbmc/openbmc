@@ -26,5 +26,25 @@
         "EventMon": "FALLING",
         "Target": "ampere_overtemp@1.service",
         "Continue": true
+    },
+    {
+        "Name": "S0_HIGHTEMP",
+        "LineName": "s0-hightemp-n",
+        "EventMon": "BOTH",
+        "Targets": {
+          "FALLING": ["ampere_hightemp_start@0.service"],
+          "RISING": ["ampere_hightemp_stop@0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "S1_HIGHTEMP",
+        "LineName": "s1-hightemp-n",
+        "EventMon": "BOTH",
+        "Targets": {
+          "FALLING": ["ampere_hightemp_start@1.service"],
+          "RISING": ["ampere_hightemp_stop@1.service"]
+        },
+        "Continue": true
     }
 ]
