@@ -15,7 +15,7 @@
 # inherit license_static
 ####
 
-STATIC_LICENSE_DIR = "${IMAGE_ROOTFS}/usr/share/www/common-licenses"
+STATIC_LICENSE_DIR = "${IMAGE_ROOTFS}${datadir}/www/common-licenses"
 
 
 def add_index_html_header(f):

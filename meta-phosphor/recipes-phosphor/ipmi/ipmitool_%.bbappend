@@ -30,4 +30,4 @@ do_compile:prepend() {
 }
 
 # make sure that the enterprise-numbers file gets installed in the root FS
-FILES:${PN} += "/usr/share/misc/enterprise-numbers"
+FILES:${PN} += "${datadir}/misc/enterprise-numbers"
