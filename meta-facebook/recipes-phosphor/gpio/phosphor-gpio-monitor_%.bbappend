@@ -15,9 +15,9 @@ GPIO_HOST_TEMPLATES:append = " ${WORKDIR}/phosphor-multi-gpio-monitor.json"
 
 do_install:append:fb-compute-multihost() {
 
-    install -d ${D}/usr/share/phosphor-gpio-monitor
+    install -d ${D}${datadir}/phosphor-gpio-monitor
     install -m 0644 ${WORKDIR}/phosphor-multi-gpio-monitor.json \
-                    ${D}/usr/share/phosphor-gpio-monitor/phosphor-multi-gpio-monitor.json
+                    ${D}${datadir}/phosphor-gpio-monitor/phosphor-multi-gpio-monitor.json
 
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/obmc-ipmb-rescan-fru.service \
