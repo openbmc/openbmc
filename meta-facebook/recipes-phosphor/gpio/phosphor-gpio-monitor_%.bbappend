@@ -23,7 +23,7 @@ do_install:append:fb-compute-multihost() {
     install -m 0644 ${WORKDIR}/obmc-ipmb-rescan-fru.service \
                     ${D}${systemd_system_unitdir}
 
-    install -d ${D}/usr/libexec/phosphor-gpio-monitor
-    install -m 0777 ${WORKDIR}/ipmb-rescan-fru.sh ${D}/usr/libexec/phosphor-gpio-monitor/
+    install -d ${D}${libexecdir}/phosphor-gpio-monitor
+    install -m 0777 ${WORKDIR}/ipmb-rescan-fru.sh ${D}${libexecdir}/phosphor-gpio-monitor/
 }
 FILES:${PN} += "/lib/systemd/system/obmc-ipmb-rescan-fru.service"
