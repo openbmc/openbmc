@@ -7,7 +7,7 @@ SRC_URI:append:kudo = " \
     file://virtual_sensor_config.json \
     "
 do_install:append:kudo() {
-    install -d ${D}/usr/share
-    install -m 0644 ${WORKDIR}/virtual_sensor_config.json ${D}/usr/share/phosphor-virtual-sensor/virtual_sensor_config.json
+    install -d ${D}${datadir}
+    install -m 0644 ${WORKDIR}/virtual_sensor_config.json ${D}${datadir}/phosphor-virtual-sensor/virtual_sensor_config.json
 }
 

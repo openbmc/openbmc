@@ -22,7 +22,7 @@ SYSTEMD_SERVICE:${PN}-monitor += " \
                                  "
 
 FILES:${PN}-monitor += " \
-                        /usr/share/${PN}/phosphor-multi-gpio-monitor.json \
+                        ${datadir}/${PN}/phosphor-multi-gpio-monitor.json \
                         /usr/sbin/ampere_scp_failover.sh \
                         /usr/sbin/ampere_psu_reset_hotswap.sh \
                        "
