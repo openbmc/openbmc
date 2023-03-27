@@ -1,7 +1,7 @@
 FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
 FILESEXTRAPATHS:append := "${THISDIR}/${PN}/${MACHINE}:"
 
-RDEPENDS:${PN} += "bash"
+RDEPENDS:${PN}-monitor += "bash"
 
 PACKAGECONFIG:append = " json"
 
@@ -15,6 +15,10 @@ SRC_URI:append = " file://events.json \
                   file://phosphor-fan-monitor@.service \
                   file://ampere_set_fan_max_speed.sh \
                 "
+
+FILES:${PN}-monitor += " \
+                        ${bindir}/ampere_set_fan_max_speed.sh \
+                       "
 
 do_configure:prepend() {
         mkdir -p ${S}/control/config_files/${MACHINE}
