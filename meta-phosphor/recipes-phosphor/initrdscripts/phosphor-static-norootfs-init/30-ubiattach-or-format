@@ -8,6 +8,12 @@ if [ ! -e /run/format-persist ]; then
     if ! ubiattach -p /dev/mtd/rwfs > /dev/null ; then
         echo "unformatted-ubi" >> /run/format-persist
     fi
+
+    if ! ubinfo /dev/ubi0 -N rwfs > /dev/null ; then
+        # ubi device attached, but volume not exist
+        ubidetach -p /dev/mtd/rwfs
+        echo "missing-ubi-volume" >> /run/format-persist
+    fi
 fi
 
 if [ -e /run/format-persist ]; then
