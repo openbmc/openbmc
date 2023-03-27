@@ -15,6 +15,8 @@ SRC_URI += " \
 SYSTEMD_SERVICE:${PN}-monitor += " \
                                   ampere-host-shutdown-ack@.service \
                                   ampere_overtemp@.service \
+                                  ampere_hightemp_start@.service \
+                                  ampere_hightemp_stop@.service \
                                   ampere_scp_failover.service \
                                   psu_hotswap_reset@.service \
                                  "

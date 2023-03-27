@@ -3,7 +3,7 @@ RDEPENDS:${PN}-extras:append = " \
                                 phosphor-image-signing \
                                 phosphor-virtual-sensor \
                                 phosphor-misc-usb-ctrl \
-                                ampere-gpio-handling \
+                                phosphor-gpio-monitor-monitor \
                                "
 
 RDEPENDS:${PN}-inventory:append = " \
