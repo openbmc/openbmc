@@ -1,4 +1,4 @@
-From a8efe19351920acdb6630d98adb039a015e4650a Mon Sep 17 00:00:00 2001
+From 984902a656885866082a477511b39a290f9d1937 Mon Sep 17 00:00:00 2001
 From: Eason Yang <yhyang2@nuvoton.com>
 Date: Tue, 31 Jan 2023 15:49:43 +0800
 Subject: [PATCH] intrusionsensor: Add polling event status by sysfs.
@@ -19,18 +19,18 @@ Signed-off-by: Eason Yang <yhyang2@nuvoton.com>
  3 files changed, 171 insertions(+), 12 deletions(-)
 
 diff --git a/src/ChassisIntrusionSensor.cpp b/src/ChassisIntrusionSensor.cpp
-index 5bff6db9..1733b83b 100644
+index eb325fc5..bfe770ff 100644
 --- a/src/ChassisIntrusionSensor.cpp
 +++ b/src/ChassisIntrusionSensor.cpp
-@@ -18,6 +18,7 @@
- 
+@@ -19,6 +19,7 @@
  #include <fcntl.h>
  #include <sys/ioctl.h>
+ #include <systemd/sd-journal.h>
 +#include <sys/inotify.h>
  #include <unistd.h>
  
  #include <boost/asio/io_context.hpp>
-@@ -26,6 +27,7 @@
+@@ -27,6 +28,7 @@
  #include <cerrno>
  #include <chrono>
  #include <iostream>
@@ -38,7 +38,7 @@ index 5bff6db9..1733b83b 100644
  #include <memory>
  #include <string>
  #include <thread>
-@@ -258,6 +260,88 @@ void ChassisIntrusionSensor::initGpioDeviceFile()
+@@ -261,6 +263,88 @@ void ChassisIntrusionSensor::initGpioDeviceFile()
      }
  }
  
@@ -127,7 +127,7 @@ index 5bff6db9..1733b83b 100644
  int ChassisIntrusionSensor::setSensorValue(const std::string& req,
                                             std::string& propertyValue)
  {
-@@ -274,7 +358,7 @@ int ChassisIntrusionSensor::setSensorValue(const std::string& req,
+@@ -277,7 +361,7 @@ int ChassisIntrusionSensor::setSensorValue(const std::string& req,
  }
  
  void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
@@ -136,7 +136,7 @@ index 5bff6db9..1733b83b 100644
  {
      if (debug)
      {
-@@ -290,12 +374,17 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
+@@ -293,12 +377,17 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
              std::cerr << "gpio pinName = " << mPinName
                        << ", gpioInverted = " << gpioInverted << "\n";
          }
@@ -155,7 +155,7 @@ index 5bff6db9..1733b83b 100644
      {
          return;
      }
-@@ -304,9 +393,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
+@@ -307,9 +396,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
      mBusId = busId;
      mSlaveAddr = slaveAddr;
      mGpioInverted = gpioInverted;
@@ -168,7 +168,7 @@ index 5bff6db9..1733b83b 100644
      {
          // initialize first if not initialized before
          if (!mInitialized)
-@@ -322,6 +413,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
+@@ -325,6 +416,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
              {
                  initGpioDeviceFile();
              }
@@ -180,7 +180,7 @@ index 5bff6db9..1733b83b 100644
  
              mInitialized = true;
          }
-@@ -336,6 +432,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
+@@ -339,6 +435,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
              std::cerr << "Start polling intrusion sensors\n";
              pollSensorStatusByGpio();
          }
@@ -192,7 +192,7 @@ index 5bff6db9..1733b83b 100644
      }
  
      // invalid para, release resource
-@@ -355,6 +456,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
+@@ -358,6 +459,11 @@ void ChassisIntrusionSensor::start(IntrusionSensorType type, int busId,
                      mGpioLine.release();
                  }
              }
@@ -204,7 +204,7 @@ index 5bff6db9..1733b83b 100644
              mInitialized = false;
          }
      }
-@@ -364,7 +470,8 @@ ChassisIntrusionSensor::ChassisIntrusionSensor(
+@@ -367,7 +473,8 @@ ChassisIntrusionSensor::ChassisIntrusionSensor(
      boost::asio::io_context& io,
      std::shared_ptr<sdbusplus::asio::dbus_interface> iface) :
      mIface(std::move(iface)),
@@ -214,7 +214,7 @@ index 5bff6db9..1733b83b 100644
  {}
  
  ChassisIntrusionSensor::~ChassisIntrusionSensor()
-@@ -381,4 +488,9 @@ ChassisIntrusionSensor::~ChassisIntrusionSensor()
+@@ -384,4 +491,9 @@ ChassisIntrusionSensor::~ChassisIntrusionSensor()
              mGpioLine.release();
          }
      }

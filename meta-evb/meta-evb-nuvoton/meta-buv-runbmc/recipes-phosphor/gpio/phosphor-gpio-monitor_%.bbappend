@@ -5,7 +5,7 @@ SYSTEMD_SERVICE:${PN}-monitor += "psusensor_reload.service"
 
 SRC_URI:append:buv-runbmc = " file://BUV-GpioMonitorConfig-EM.json"
 SRC_URI:append:buv-runbmc = " file://psu_hotplug_action.sh"
-SRC_URI:append:buv-runbmc = " file://0001-phosphor-gpio-monitor-add-multi-target-and-set-prope.patch"
+SRC_URI:append:buv-runbmc = " file://0001-phosphor-gpio-monitor-add-set-Inventory.Item-Present.patch"
 
 RDEPENDS:${PN} += "bash"
 
