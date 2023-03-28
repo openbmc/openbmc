@@ -7,6 +7,7 @@ DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "nlohmann-json"
 DEPENDS += "cli11"
 DEPENDS += "libpldm"
+DEPENDS += "phosphor-logging"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
