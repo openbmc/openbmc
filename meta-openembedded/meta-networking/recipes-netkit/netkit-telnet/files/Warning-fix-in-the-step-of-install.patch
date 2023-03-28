@@ -6,7 +6,7 @@ Subject: [PATCH 2/2] WARNING Fix and modify "CFLAGS"
 WARNING: QA Issue: File '/usr/sbin/in.telnetd' from netkit-telnet was 
 already stripped, this will prevent future debugging! [already-stripped]
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 ---

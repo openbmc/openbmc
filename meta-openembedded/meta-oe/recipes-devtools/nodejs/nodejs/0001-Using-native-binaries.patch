@@ -3,6 +3,13 @@ From: Guillaume Burel <guillaume.burel@stormshield.eu>
 Date: Fri, 3 Jan 2020 11:25:54 +0100
 Subject: [PATCH] Using native binaries
 
+Upstream-Status: Inappropriate [embedded specific]
+
+Originally added in:
+https://git.openembedded.org/meta-openembedded/commit/?id=1c8e4a679ae382f953b2e5c7a4966a4646314f3e
+later extended and renamed in:
+https://git.openembedded.org/meta-openembedded/commit/?id=feeb172d1a8bf010490d22b8df9448b20d9d2aed
+
 Signed-off-by: Archana Polampalli <archana.polampalli@windriver.com>
 ---
  node.gyp                 | 1 +

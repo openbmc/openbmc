@@ -10,7 +10,7 @@ TUNEVALID[riscv64nc] = "Enable 64-bit RISC-V optimizations without compressed in
 
 TUNEVALID[bigendian] = "Big endian mode"
 
-AVAILTUNES += "riscv64 riscv32 riscv64nf riscv32nf"
+AVAILTUNES += "riscv64 riscv32 riscv64nc riscv64nf riscv32nf"
 
 # Default
 TUNE_FEATURES:tune-riscv64 = "riscv64"

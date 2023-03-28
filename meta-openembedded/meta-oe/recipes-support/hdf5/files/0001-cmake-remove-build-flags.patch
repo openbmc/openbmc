@@ -5,7 +5,7 @@ Subject: [PATCH] cmake: remove build flags
 
 Remove the build flags to improve reproducibility.
 
-Upstream-Status: Inappropriate[oe specific]
+Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---

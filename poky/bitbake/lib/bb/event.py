@@ -69,6 +69,7 @@ _eventfilter = None
 _uiready = False
 _thread_lock = threading.Lock()
 _heartbeat_enabled = False
+_should_exit = threading.Event()
 
 def enable_threadlock():
     # Always needed now
@@ -85,6 +86,16 @@ def enable_heartbeat():
 def disable_heartbeat():
     global _heartbeat_enabled
     _heartbeat_enabled = False
+
+#
+# In long running code, this function should be called periodically
+# to check if we should exit due to an interuption (.e.g Ctrl+C from the UI)
+#
+def check_for_interrupts(d):
+    global _should_exit
+    if _should_exit.is_set():
+        bb.warn("Exiting due to interrupt.")
+        raise bb.BBHandledException()
 
 def execute_handler(name, handler, event, d):
     event.data = d

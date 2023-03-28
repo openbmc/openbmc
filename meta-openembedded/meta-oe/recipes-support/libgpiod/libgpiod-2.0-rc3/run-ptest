@@ -1,0 +1,24 @@
+#!/bin/sh
+
+testbins="gpiod-test gpio-tools-test gpiod-cxx-test"
+
+ptestdir=$(dirname "$(readlink -f "$0")")
+cd $ptestdir/tests
+
+# libgpiod v2 uses gpio-sim - a configfs-based testing module. We need to
+# make sure configfs is mounted before running any tests.
+modprobe configfs
+mountpoint /sys/kernel/config > /dev/null || mount -t configfs configfs /sys/kernel/config
+
+for testbin in $testbins; do
+	if test -e ./$testbin; then
+		./$testbin > ./$testbin.out 2>&1
+		if [ $? -ne 0 ]; then
+			echo "FAIL: $testbin"
+		else
+			echo "PASS: $testbin"
+		fi
+	else
+		echo "SKIP: $testbin"
+	fi
+done

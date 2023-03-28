@@ -45,6 +45,13 @@ class MakeSetupPlugin(LayerPlugin):
             return ""
         return describe.strip()
 
+    def _is_submodule(self, repo_path):
+        # This is slightly brittle: git does not offer a way to tell whether
+        # a given repo dir is a submodule checkout, so we need to rely on .git
+        # being a file (rather than a dir like it is in standalone checkouts).
+        # The file typically contains a gitdir pointer to elsewhere.
+        return os.path.isfile(os.path.join(repo_path,".git"))
+
     def make_repo_config(self, destdir):
         """ This is a helper function for the writer plugins that discovers currently configured layers.
         The writers do not have to use it, but it can save a bit of work and avoid duplicated code, hence it is
@@ -63,6 +70,9 @@ class MakeSetupPlugin(LayerPlugin):
                 logger.error("Layer {name} in {path} has uncommitted modifications or is not in a git repository.".format(name=l_name,path=l_path))
                 return
             repo_path = self._get_repo_path(l_path)
+
+            if self._is_submodule(repo_path):
+                continue
             if repo_path not in repos.keys():
                 repos[repo_path] = {'path':os.path.basename(repo_path),'git-remote':{'rev':l_rev, 'branch':l_branch, 'remotes':self._get_remotes(repo_path), 'describe':self._get_describe(repo_path)}}
                 if repo_path == destdir_repo:

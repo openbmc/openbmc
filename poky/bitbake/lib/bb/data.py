@@ -114,8 +114,8 @@ def emit_var(var, o=sys.__stdout__, d = init(), all=False):
     if d.getVarFlag(var, 'python', False) and func:
         return False
 
-    export = d.getVarFlag(var, "export", False)
-    unexport = d.getVarFlag(var, "unexport", False)
+    export = bb.utils.to_boolean(d.getVarFlag(var, "export"))
+    unexport = bb.utils.to_boolean(d.getVarFlag(var, "unexport"))
     if not all and not export and not unexport and not func:
         return False
 
@@ -188,8 +188,8 @@ def emit_env(o=sys.__stdout__, d = init(), all=False):
 
 def exported_keys(d):
     return (key for key in d.keys() if not key.startswith('__') and
-                                      d.getVarFlag(key, 'export', False) and
-                                      not d.getVarFlag(key, 'unexport', False))
+                                      bb.utils.to_boolean(d.getVarFlag(key, 'export')) and
+                                      not bb.utils.to_boolean(d.getVarFlag(key, 'unexport')))
 
 def exported_vars(d):
     k = list(exported_keys(d))
@@ -375,7 +375,7 @@ def generate_dependencies(d, ignored_vars):
 
     mod_funcs = set(bb.codeparser.modulecode_deps.keys())
     keys = set(key for key in d if not key.startswith("__")) | mod_funcs
-    shelldeps = set(key for key in d.getVar("__exportlist", False) if d.getVarFlag(key, "export", False) and not d.getVarFlag(key, "unexport", False))
+    shelldeps = set(key for key in d.getVar("__exportlist", False) if bb.utils.to_boolean(d.getVarFlag(key, "export")) and not bb.utils.to_boolean(d.getVarFlag(key, "unexport")))
     varflagsexcl = d.getVar('BB_SIGNATURE_EXCLUDE_FLAGS')
 
     codeparserd = d.createCopy()

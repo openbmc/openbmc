@@ -9,13 +9,12 @@ warning as errors
 Upstream-Status: Inappropriate [OE-Specific]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
 ---
  usr/Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/usr/Makefile b/usr/Makefile
-index 3fc2248..2b5a234 100644
+index 84f33bc..9e7b839 100644
 --- a/usr/Makefile
 +++ b/usr/Makefile
 @@ -44,7 +44,7 @@ HOMEDIR ?= $(etcdir)/iscsi
@@ -25,5 +24,8 @@ index 3fc2248..2b5a234 100644
 -WARNFLAGS ?= -Wall -Wextra -Werror -Wstrict-prototypes -fno-common
 +WARNFLAGS ?= -Wall -Wextra -Wstrict-prototypes -fno-common
  CFLAGS += $(WARNFLAGS) -I../include -I. -D_GNU_SOURCE \
- 	  -I$(TOPDIR)/libopeniscsiusr
- CFLAGS += $(shell $(PKG_CONFIG) --cflags libkmod)
+ 	  -I$(TOPDIR)/libopeniscsiusr \
+ 	  -DISCSI_VERSION_STR=\"$(ISCSI_VERSION_STR)\"
+-- 
+2.34.1
+

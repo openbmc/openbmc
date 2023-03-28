@@ -8,9 +8,7 @@ Content-Transfer-Encoding: 8bit
 
 in out of tree builds lxdm.conf is empty
 
-Upstream-Status: submitted [1]
-
-[1] http://sourceforge.net/p/lxde/mailman/message/32901417/
+Upstream-Status: Submitted [http://sourceforge.net/p/lxde/mailman/message/32901417/]
 
 Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
 ---

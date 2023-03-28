@@ -1,0 +1,5 @@
+# short-description: This file is used in oe-selftest wic module to test uefi-kernel loader
+
+part /boot --source bootimg-efi --sourceparams="loader=uefi-kernel"
+part / --source rootfs --fstype=ext4 --align 1024 --use-uuid
+

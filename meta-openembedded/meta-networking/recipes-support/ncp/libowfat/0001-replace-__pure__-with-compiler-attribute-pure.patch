@@ -5,7 +5,7 @@ Subject: [PATCH] replace __pure__ with compiler attribute 'pure'
 
 Remove defining __deprecated__
 
-Upstream-Status: OE-Specific [Untested with dietlibc]
+Upstream-Status: Inappropriate [Untested with dietlibc]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  byte.h     |  22 ++++++----

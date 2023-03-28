@@ -5,7 +5,7 @@ Subject: [PATCH] configure.ac: convert AC_TRY_RUN to AC_TRY_LINK statements
 
 This is not completely safe, but it's the least invasive fix.
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>

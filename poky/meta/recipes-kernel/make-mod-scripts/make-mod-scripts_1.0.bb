@@ -27,7 +27,8 @@ EXTRA_OEMAKE += " HOSTCXX="${BUILD_CXX} ${BUILD_CXXFLAGS} ${BUILD_LDFLAGS}" CROS
 do_configure() {
 	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
 	for t in prepare scripts_basic scripts; do
-		oe_runmake CC="${KERNEL_CC}" LD="${KERNEL_LD}" AR="${KERNEL_AR}" \
+		oe_runmake CC="${KERNEL_CC}" LD="${KERNEL_LD}" \
+		AR="${KERNEL_AR}" OBJCOPY="${KERNEL_OBJCOPY}" \
 		-C ${STAGING_KERNEL_DIR} O=${STAGING_KERNEL_BUILDDIR} $t
 	done
 }

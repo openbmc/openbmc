@@ -1,6 +1,6 @@
 allow a longer timeout
 
-Upstream-Status: Backport 
+Upstream-Status: Backport
 
 Signed-off-by: Morgan Little <morgan.little@windriver.com>
 

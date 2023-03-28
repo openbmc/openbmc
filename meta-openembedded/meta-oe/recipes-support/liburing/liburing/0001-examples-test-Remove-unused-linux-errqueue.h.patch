@@ -1,0 +1,47 @@
+From 0fbcc44fe1fb2dc6807660b2cff1c2995add095b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 18 Feb 2023 18:01:22 -0800
+Subject: [PATCH] examples,test: Remove unused linux/errqueue.h
+
+This header is not needed therefore remove it, this cleanup also helps
+compiling on musl/clang
+
+/usr/include/linux/errqueue.h:57:20: error: array has incomplete element typ
+e 'struct timespec'
+        struct timespec ts[3];
+                          ^
+
+Upstream-Status: Submitted [https://github.com/axboe/liburing/pull/798]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ examples/send-zerocopy.c | 1 -
+ test/send-zerocopy.c     | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/examples/send-zerocopy.c b/examples/send-zerocopy.c
+index 6092af9..cf1fa8b 100644
+--- a/examples/send-zerocopy.c
++++ b/examples/send-zerocopy.c
+@@ -13,7 +13,6 @@
+ #include <string.h>
+ 
+ #include <arpa/inet.h>
+-#include <linux/errqueue.h>
+ #include <linux/if_packet.h>
+ #include <linux/ipv6.h>
+ #include <linux/socket.h>
+diff --git a/test/send-zerocopy.c b/test/send-zerocopy.c
+index 86a31cd..5d578c6 100644
+--- a/test/send-zerocopy.c
++++ b/test/send-zerocopy.c
+@@ -11,7 +11,6 @@
+ #include <string.h>
+ 
+ #include <arpa/inet.h>
+-#include <linux/errqueue.h>
+ #include <linux/if_packet.h>
+ #include <linux/ipv6.h>
+ #include <linux/socket.h>
+-- 
+2.39.2
+

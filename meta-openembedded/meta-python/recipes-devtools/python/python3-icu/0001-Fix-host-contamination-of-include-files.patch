@@ -10,25 +10,25 @@ Also, don't use icu-config
 Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Armin Kuster <akuster808@gmail.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
 ---
  setup.py | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/setup.py b/setup.py
-index d308b80..56e9c74 100644
+index 176c9ab..0a10268 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -81,7 +81,7 @@ Building PyICU %s for ICU %s (max ICU major version supported: %s)
+@@ -68,7 +68,7 @@ elif platform.startswith('freebsd'):
  
  CONFIGURE_WITH_ICU_CONFIG = {
-     'darwin': True,
+     'darwin': False,
 -    'linux': True,
 +    'linux': False,
      'freebsd': False, # not tested
      'win32': False,   # no icu-config
      'sunos5': False,  # not tested
-@@ -273,7 +273,6 @@ setup(name="PyICU",
+@@ -277,7 +277,6 @@ setup(name="PyICU",
        ext_modules=[Extension('icu._icu_',
                               [filename for filename in sorted(os.listdir(os.curdir))
                                if filename.endswith('.cpp')],
@@ -36,3 +36,6 @@ index d308b80..56e9c74 100644
                               extra_compile_args=_cflags,
                               extra_link_args=_lflags,
                               libraries=_libraries)],
+-- 
+2.34.1
+

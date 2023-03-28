@@ -6,7 +6,7 @@ Subject: [PATCH 3/4] comment out sections shutdown and environment in
 
 Both of them is disabled by default.
 
-Upstream-Status: Inappropriate[oe specific]
+Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 

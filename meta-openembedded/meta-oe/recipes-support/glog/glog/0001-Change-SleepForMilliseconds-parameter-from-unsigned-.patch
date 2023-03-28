@@ -1,0 +1,33 @@
+From 176230435cb4b64ff7f2d97f77a04579ad9ca239 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 18 Feb 2023 13:14:14 -0800
+Subject: [PATCH] Change SleepForMilliseconds parameter from unsigned int -> long
+
+Fixes following error on 32bit platforms
+
+src/googletest.h:631:35: error: non-constant-expression cannot be narrowed from type 'unsigned int' to 'long' in initializer list [-Wc++11-narrowing]
+  const struct timespec req = {0, t * 1000 * 1000};
+                                  ^~~~~~~~~~~~~~~
+
+Upstream-Status: Submitted [https://github.com/google/glog/pull/894]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/googletest.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/googletest.h b/src/googletest.h
+index 5761361..836b06c 100644
+--- a/src/googletest.h
++++ b/src/googletest.h
+@@ -625,7 +625,7 @@ class Thread {
+ #endif
+ };
+ 
+-static inline void SleepForMilliseconds(unsigned t) {
++static inline void SleepForMilliseconds(long t) {
+ #ifndef GLOG_OS_WINDOWS
+ # if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 199309L
+   const struct timespec req = {0, t * 1000 * 1000};
+-- 
+2.39.2
+

@@ -417,8 +417,7 @@ class Git(FetchMethod):
             # It would be nice to just do this inline here by running 'git-lfs fetch'
             # on the bare clonedir, but that operation requires a working copy on some
             # releases of Git LFS.
-            tmpdir = tempfile.mkdtemp(dir=d.getVar('DL_DIR'))
-            try:
+            with tempfile.TemporaryDirectory(dir=d.getVar('DL_DIR')) as tmpdir:
                 # Do the checkout. This implicitly involves a Git LFS fetch.
                 Git.unpack(self, ud, tmpdir, d)
 
@@ -436,8 +435,6 @@ class Git(FetchMethod):
                 # downloaded.
                 if os.path.exists(os.path.join(tmpdir, "git", ".git", "lfs")):
                     runfetchcmd("tar -cf - lfs | tar -xf - -C %s" % ud.clonedir, d, workdir="%s/git/.git" % tmpdir)
-            finally:
-                bb.utils.remove(tmpdir, recurse=True)
 
     def build_mirror_data(self, ud, d):
 
@@ -659,11 +656,6 @@ class Git(FetchMethod):
         """
         Check if the repository has 'lfs' (large file) content
         """
-
-        if not ud.nobranch:
-            branchname = ud.branches[ud.names[0]]
-        else:
-            branchname = "master"
 
         # The bare clonedir doesn't use the remote names; it has the branch immediately.
         if wd == ud.clonedir:

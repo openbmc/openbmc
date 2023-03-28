@@ -15,12 +15,14 @@ SRC_URI += " \
 SYSTEMD_SERVICE:${PN}-monitor += " \
                                   ampere-host-shutdown-ack@.service \
                                   ampere_overtemp@.service \
+                                  ampere_hightemp_start@.service \
+                                  ampere_hightemp_stop@.service \
                                   ampere_scp_failover.service \
                                   psu_hotswap_reset@.service \
                                  "
 
 FILES:${PN}-monitor += " \
-                        /usr/share/${PN}/phosphor-multi-gpio-monitor.json \
+                        ${datadir}/${PN}/phosphor-multi-gpio-monitor.json \
                         /usr/sbin/ampere_scp_failover.sh \
                         /usr/sbin/ampere_psu_reset_hotswap.sh \
                        "

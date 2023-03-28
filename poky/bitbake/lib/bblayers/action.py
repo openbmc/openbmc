@@ -11,6 +11,7 @@ import shutil
 import sys
 import tempfile
 
+from bb.cookerdata import findTopdir
 import bb.utils
 
 from bblayers.common import LayerPlugin
@@ -37,7 +38,7 @@ class ActionPlugin(LayerPlugin):
                 sys.stderr.write("Specified layer directory %s doesn't contain a conf/layer.conf file\n" % layerdir)
                 return 1
 
-        bblayers_conf = os.path.join('conf', 'bblayers.conf')
+        bblayers_conf = os.path.join(findTopdir(),'conf', 'bblayers.conf')
         if not os.path.exists(bblayers_conf):
             sys.stderr.write("Unable to find bblayers.conf\n")
             return 1
@@ -65,7 +66,7 @@ class ActionPlugin(LayerPlugin):
 
     def do_remove_layer(self, args):
         """Remove one or more layers from bblayers.conf."""
-        bblayers_conf = os.path.join('conf', 'bblayers.conf')
+        bblayers_conf = os.path.join(findTopdir() ,'conf', 'bblayers.conf')
         if not os.path.exists(bblayers_conf):
             sys.stderr.write("Unable to find bblayers.conf\n")
             return 1

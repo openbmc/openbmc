@@ -15,14 +15,14 @@ S = "${WORKDIR}/git"
 inherit allarch
 
 do_compile() {
-	:
+    :
 }
 
 firmware_dir="${nonarch_base_libdir}/firmware/"
 
 do_install() {
-	install -d ${D}${firmware_dir}
-	install -m 0644 ${S}/dist-bin/cf-fsi-fw.bin ${D}${firmware_dir}
+    install -d ${D}${firmware_dir}
+    install -m 0644 ${S}/dist-bin/cf-fsi-fw.bin ${D}${firmware_dir}
 }
 
 FILES:${PN} = "${firmware_dir}"

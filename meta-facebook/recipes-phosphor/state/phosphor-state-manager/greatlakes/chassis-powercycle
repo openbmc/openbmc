@@ -4,36 +4,47 @@
 # shellcheck source=meta-facebook/recipes-phosphor/state/phosphor-state-manager/greatlakes/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 
-POWER_OK_SLOT=$(( $1+9 ))
-slot=$(( $1-1 ))
-OFFSET=$(( 0x9 + slot ))
+SLOT=$(( $1-1 ))
+OFFSET=$(( 0x9 + SLOT ))
 
-chassis-power-gpio-status()
+chassis-power-cycle()
 {
-    POWER_OK_SLOT=$(( $1+9 ))
-    if [ "$1" -le 4  ]
+    CHASSIS_ID=$1
+
+    if [ "$CHASSIS_ID" -le 4  ]
     then
-        status=$(gpioget 0 $POWER_OK_SLOT)
-        if [ "$status" == 1 ]
+        chassis_status=$(chassis-power-status $SLOT)
+        if [ "$chassis_status" == "$STATE_ON" ]
         then
-            i2cset -y $BUS_NUM $CPLD_PWR_CTRL_ADDR $OFFSET $POW_OFF_SLOT
+            i2cset -y "$CPLD_BUS_NUM" "$CPLD_PWR_CTRL_ADDR" "$OFFSET" "$POW_OFF_SLOT"
             sleep 10
-	fi
-        i2cset -y $BUS_NUM $CPLD_PWR_CTRL_ADDR $OFFSET $POW_ON_SLOT
-        exit 0;
+        fi
+        i2cset -y "$CPLD_BUS_NUM" "$CPLD_PWR_CTRL_ADDR" "$OFFSET" "$POW_ON_SLOT"
+        sleep 2
+
+        # Check chassis stattus after doing 12V cycle
+        chassis_status=$(chassis-power-status $SLOT)
+        if [ "$chassis_status" == "$STATE_ON" ]
+        then
+            busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON"
+            exit 0;
+        else
+            busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF"
+            exit 0;
+        fi
     fi
-    echo "invalid slot id"
+
+    echo "Invalid slot id"
     exit 1;
 }
 
-chassisid=$1
-if [ "$chassisid" == 0 ]
+if [ "$1" == 0 ]
 then
     echo "Enter SLED-cycle"
-    result=$(i2cset -y $BUS_NUM $CPLD_PWR_CTRL_ADDR 0x2b 0x1)
+    result=$(i2cset -y "$CPLD_BUS_NUM" "$CPLD_PWR_CTRL_ADDR" 0x2b 0x1)
     echo "$result"
 else
     echo "Enter slot$1 cycle"
-    chassis-power-gpio-status "$chassisid"
+    chassis-power-cycle "$1"
 fi
 

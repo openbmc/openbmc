@@ -10,7 +10,7 @@ conftest.c:168:17: fatal error: pkg.h: No such file or directory
  #include <pkg.h>
                  ^
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 

@@ -1,6 +1,6 @@
 [PATCH] fix the empty file writting
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 With the feature that checking the disk filled up, the return
 value of function write_behind was checked and used to detect

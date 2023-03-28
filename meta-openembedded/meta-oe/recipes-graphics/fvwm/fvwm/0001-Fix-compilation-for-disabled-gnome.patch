@@ -10,7 +10,7 @@ COMPAT_OLD_KEYSYMDEF is a check for a legacy system, which our system
 most definitely is not.  It is accomplished by trying to execute
 a program, which does not work when cross compiling.
 
-Upstream-Status: inappropriate [OE specific]
+Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Jarmo Jaakkola <jarmo.jaakkola@vincit.fi>
 Signed-off-by: Riku Hämäläinen <riku.hamalainen@ge.com>
 Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.co.uk>

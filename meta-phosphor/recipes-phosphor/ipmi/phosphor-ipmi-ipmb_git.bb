@@ -18,4 +18,4 @@ S = "${WORKDIR}/git"
 
 inherit cmake pkgconfig systemd
 
-FILES:${PN} += "/usr/share/ipmbbridge/ipmb-channels.json"
+FILES:${PN} += "${datadir}/ipmbbridge/ipmb-channels.json"

@@ -12,8 +12,8 @@ do_install:append:fb-withhost(){
 
     install -d ${D}$/lib/systemd/system
     install -m 0644 ${WORKDIR}/bmc-set-time.service  ${D}$/lib/systemd/system
-    install -d ${D}/usr/libexec
-    install -m 0777 ${WORKDIR}/set-bmc-time-from-host ${D}/usr/libexec
+    install -d ${D}${libexecdir}
+    install -m 0777 ${WORKDIR}/set-bmc-time-from-host ${D}${libexecdir}
 }
 
 SYSTEMD_SERVICE:${PN}:fb-withhost += "bmc-set-time.service"

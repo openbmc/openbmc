@@ -24,3 +24,6 @@ EXTRA_OECONF += " --prefix=/usr/local \
 		--disable-libodbc \
 		--disable-static \
 		"
+
+inherit multilib_script
+MULTILIB_SCRIPTS = "${PN}:${bindir}/iodbc-config"

@@ -5,7 +5,7 @@ Subject: vlan: do not include ${HOME}/linux/include dir
 in front of sanitized kernel headers in OE chroot. Drop this include
 option.
 
-Upstream-Status: not-applicable
+Upstream-Status: Inappropriate [embedded specific]
 
 Index: vlan/MakeInclude
 ===================================================================

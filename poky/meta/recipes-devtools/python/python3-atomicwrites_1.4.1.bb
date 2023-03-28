@@ -22,3 +22,5 @@ do_install_ptest() {
 }
 
 RDEPENDS:${PN} = "${PYTHON_PN}-misc"
+
+BBCLASSEXTEND = "native nativesdk"

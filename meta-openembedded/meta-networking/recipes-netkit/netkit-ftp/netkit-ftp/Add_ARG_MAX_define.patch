@@ -1,7 +1,6 @@
 This adds ARG_MAX define to be _SC_ARG_MAX
 
-Upstream-Status: Inappropriate.
-Most distros have their own verion for this fix.
+Upstream-Status: Inappropriate [Most distros have their own verion for this fix]
 
 Signed-off-by: Armin Kuster <akuster808@gmail.com>
 

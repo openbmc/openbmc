@@ -141,3 +141,5 @@ KERNEL_CLASSES:append = " obmc-phosphor-kernel-version"
 # should be used everywhere in phosphor, but some layers may append this with
 # their own organization(s).
 OBMC_ORG_YAML_SUBDIRS += " org/freedesktop xyz/openbmc_project"
+
+PREFERRED_VERSION_libgpiod = "1.6.4"

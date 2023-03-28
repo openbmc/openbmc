@@ -6,7 +6,7 @@ Subject: [PATCH] Modify configure.in and etc/Makefile.am
 this patch is from Fedora to fix error:
 "conftest.c:26:9: error: unknown type name 'not'"
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 ---

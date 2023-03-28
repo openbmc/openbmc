@@ -1,0 +1,48 @@
+From 64be669638e198bc0c7c1a344547265dfacd2470 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 23 Jan 2023 15:29:02 -0800
+Subject: [PATCH] risc-v: Handle R_RISCV_CALL_PLT reloc
+
+GNU assembler starting 2.40 release always generates R_RISCV_CALL_PLT
+reloc for call in assembler [1], similarly llvm does not make
+distinction between R_RISCV_CALL_PLT and R_RISCV_CALL [2]
+
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/grub-devel/2023-02/msg00143.html]
+
+[1] https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=70f35d72ef04cd23771875c1661c9975044a749c
+[2] https://reviews.llvm.org/D132530
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ grub-core/kern/riscv/dl.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/grub-core/kern/riscv/dl.c
++++ b/grub-core/kern/riscv/dl.c
+@@ -188,6 +188,7 @@ grub_arch_dl_relocate_symbols (grub_dl_t
+ 	  break;
+ 
+ 	case R_RISCV_CALL:
++	case R_RISCV_CALL_PLT:
+ 	  {
+ 	    grub_uint32_t *abs_place = place;
+ 	    grub_ssize_t off = sym_addr - (grub_addr_t) place;
+--- a/util/grub-mkimagexx.c
++++ b/util/grub-mkimagexx.c
+@@ -1294,6 +1294,7 @@ SUFFIX (relocate_addrs) (Elf_Ehdr *e, st
+ 		     }
+ 		     break;
+ 		   case R_RISCV_CALL:
++		   case R_RISCV_CALL_PLT:
+ 		     {
+ 		       grub_uint32_t hi20, lo12;
+ 
+@@ -1725,6 +1726,7 @@ translate_relocation_pe (struct translat
+ 	case R_RISCV_BRANCH:
+ 	case R_RISCV_JAL:
+ 	case R_RISCV_CALL:
++	case R_RISCV_CALL_PLT:
+ 	case R_RISCV_PCREL_HI20:
+ 	case R_RISCV_PCREL_LO12_I:
+ 	case R_RISCV_PCREL_LO12_S:

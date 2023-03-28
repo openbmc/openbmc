@@ -6,7 +6,7 @@ Subject: [PATCH] Fix signature of main function
 Clang-15 errors out otherewise.
 Include needed headers for missing functions
 
-Upstream-Status:Pending
+Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  src/chkshsgr.c    | 2 +-

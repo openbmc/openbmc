@@ -30,8 +30,8 @@ do_install:append:fb-withhost() {
 
     install -m 0755 -d ${D}/var/lib/phosphor-fan-presence/sensor-monitor
 
-    install -d ${D}/usr/libexec/phosphor-fan-sensor-monitor
-    install -m 0777 ${WORKDIR}/host-poweroff ${D}/usr/libexec/phosphor-fan-sensor-monitor/
+    install -d ${D}${libexecdir}/phosphor-fan-sensor-monitor
+    install -m 0777 ${WORKDIR}/host-poweroff ${D}${libexecdir}/phosphor-fan-sensor-monitor/
 }
 
 pkg_postinst:${PN}-sensor-monitor() {
@@ -48,5 +48,5 @@ pkg_postinst:${PN}-sensor-monitor() {
     ln -s $TARGET $LINK
 }
 
-FILES:${PN}-sensor-monitor += "/usr/libexec/phosphor-fan-sensor-monitor/host-poweroff"
+FILES:${PN}-sensor-monitor += "${libexecdir}/phosphor-fan-sensor-monitor/host-poweroff"
 FILES:${PN}-sensor-monitor += "${systemd_system_unitdir}"

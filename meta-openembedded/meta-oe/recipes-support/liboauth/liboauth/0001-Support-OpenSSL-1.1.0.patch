@@ -5,7 +5,7 @@ Subject: [PATCH] Support OpenSSL 1.1.0
 
 Taken from https://github.com/x42/liboauth/issues/9
 
-Upstream-Status: Submitted[https://github.com/x42/liboauth/issues/9]
+Upstream-Status: Submitted [https://github.com/x42/liboauth/issues/9]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  src/hash.c | 65 ++++++++++++++++++++++++++++++++++++------------------

@@ -1,7 +1,7 @@
 From 62fdead139edb0f29b2f222efcb8f39be15b057e Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Mon, 30 Jul 2018 15:47:13 +0800
-Subject: [PATCH 2/4] pykickstart/parser.py: add lock for readKickstart and 
+Subject: [PATCH 2/4] pykickstart/parser.py: add lock for readKickstart and
  support https without certification
 
 - Add lock for readKickstart to fix race issue
@@ -9,18 +9,19 @@ Subject: [PATCH 2/4] pykickstart/parser.py: add lock for readKickstart and
 - Support to download kickstart file through https without certification
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
 ---
  pykickstart/load.py   |  2 +-
  pykickstart/parser.py | 18 ++++++++++++++++++
  2 files changed, 19 insertions(+), 1 deletion(-)
 
 diff --git a/pykickstart/load.py b/pykickstart/load.py
-index c6f013f..7adb751 100644
+index 8da8051..e856c8d 100644
 --- a/pykickstart/load.py
 +++ b/pykickstart/load.py
-@@ -30,7 +30,7 @@ from requests.exceptions import SSLError, RequestException
+@@ -32,7 +32,7 @@ log = logging.getLogger("anaconda.main")
  
- _is_url = lambda location: '://' in location  # RFC 3986
+ is_url = lambda location: '://' in location  # RFC 3986
  
 -SSL_VERIFY = True
 +SSL_VERIFY = False
@@ -28,10 +29,10 @@ index c6f013f..7adb751 100644
  def load_to_str(location, user=None, passwd=None):
      '''Load a destination URL or file into a string.
 diff --git a/pykickstart/parser.py b/pykickstart/parser.py
-index e44099b..e68174d 100644
+index b95ba90..a55a9a3 100644
 --- a/pykickstart/parser.py
 +++ b/pykickstart/parser.py
-@@ -55,6 +55,20 @@ from pykickstart.i18n import _
+@@ -51,6 +51,20 @@ from pykickstart.i18n import _
  STATE_END = "end"
  STATE_COMMANDS = "commands"
  
@@ -52,7 +53,7 @@ index e44099b..e68174d 100644
  def _preprocessStateMachine(lineIter):
      l = None
      lineno = 0
-@@ -788,6 +802,10 @@ class KickstartParser(object):
+@@ -791,6 +805,10 @@ class KickstartParser(object):
          self._stateMachine(i)
  
      def readKickstart(self, f, reset=True, username=None, password=None):
@@ -64,5 +65,5 @@ index e44099b..e68174d 100644
          if reset:
              self._reset()
 -- 
-2.7.4
+2.34.1
 

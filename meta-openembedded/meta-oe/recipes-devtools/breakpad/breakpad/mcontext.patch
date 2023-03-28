@@ -1,6 +1,6 @@
 map the mcontext_t structure for musl
 
-Upstream-Status: Inappropriate[need to consider Android]
+Upstream-Status: Inappropriate [need to consider Android]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Index: git/src/client/linux/minidump_writer/linux_core_dumper.cc

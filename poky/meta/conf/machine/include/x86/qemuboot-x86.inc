@@ -1,6 +1,6 @@
 # For runqemu
 IMAGE_CLASSES += "qemuboot"
-QB_SMP = "-smp 4"
+QB_SMP ?= "-smp 4"
 QB_CPU:x86 = "-cpu IvyBridge -machine q35,i8042=off"
 QB_CPU_KVM:x86 = "-cpu IvyBridge -machine q35,i8042=off"
 

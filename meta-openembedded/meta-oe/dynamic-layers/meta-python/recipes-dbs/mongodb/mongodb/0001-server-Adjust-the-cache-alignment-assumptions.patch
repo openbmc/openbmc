@@ -15,7 +15,7 @@ src/mongo/db/stats/counters.h:185:47: error: static assertion failed: cache line
 The structure need to ensure true sharing for both the elements
 so align it to hardware_constructive_interference_size instead
 
-Upstream-Status: Reported [https://jira.mongodb.org/browse/SERVER-65664]
+Upstream-Status: Inappropriate [https://jira.mongodb.org/browse/SERVER-65664]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---

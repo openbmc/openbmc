@@ -5,7 +5,7 @@ Subject: [PATCH] drop zenity detection
 
 OE does not support zenity
 
-Upstream-Status: inappropriate [OE specific]
+Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---

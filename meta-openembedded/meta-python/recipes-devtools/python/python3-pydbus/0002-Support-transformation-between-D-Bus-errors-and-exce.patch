@@ -7,7 +7,7 @@ Subject: [PATCH 2/2] Support transformation between D-Bus errors and
 Exceptions can be registered with decorators, raised in a remote
 method and recreated after return from the remote call.
 
-Upstream-Status: Cherry-pick [https://src.fedoraproject.org/cgit/rpms/python-pydbus.git/]
+Upstream-Status: Backport [https://src.fedoraproject.org/cgit/rpms/python-pydbus.git/]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---

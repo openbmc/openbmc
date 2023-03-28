@@ -10,7 +10,7 @@ Subject: [PATCH] makedumpfile: replace hardcode CFLAGS
 * Forcibly to link dynamic library as the poky build
   system doesn't build static library by default
 
-Upstream-Status: Inappropriate[oe specific]
+Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 

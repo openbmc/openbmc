@@ -30,6 +30,8 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0001-contrib-vhost-user-blk-Replace-lseek64-with-lseek.patch \
            file://0002-linux-user-Replace-use-of-lfs64-related-functions-an.patch \
            file://0001-configure-Fix-check-tcg-not-executing-any-tests.patch \
+           file://0001-Revert-linux-user-add-more-compat-ioctl-definitions.patch \
+           file://0002-Revert-linux-user-fix-compat-with-glibc-2.36-sys-mou.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 

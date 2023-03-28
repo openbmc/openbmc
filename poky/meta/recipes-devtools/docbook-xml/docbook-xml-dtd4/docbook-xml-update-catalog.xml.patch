@@ -1,97 +1,12 @@
+21/3/2023: modified to remove 4.0
+
 docbook-xml: update catalog.xml
 
 Refer Ubuntu 13.04 to update catalog.xml
 
 Upstream-Status: Inappropriate [docbook 4.x development has ceased, docbook 5 is entirely different]
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
----
- docbook-4.0/catalog.xml   | 72 +++++++++++++++++++++++++++++++++++++++++++++++
- docbook-4.1.2/catalog.xml | 66 +++++++++++++++++++++++++++++++++++++++++++
- docbook-4.2/catalog.xml   | 69 ++++++---------------------------------------
- docbook-4.3/catalog.xml   | 72 ++++++++---------------------------------------
- docbook-4.4/catalog.xml   | 63 ++---------------------------------------
- docbook-4.5/catalog.xml   | 63 ++---------------------------------------
- 6 files changed, 165 insertions(+), 240 deletions(-)
- create mode 100644 docbook-4.0/catalog.xml
- create mode 100644 docbook-4.1.2/catalog.xml
 
-diff --git a/docbook-4.0/catalog.xml b/docbook-4.0/catalog.xml
-new file mode 100644
---- /dev/null
-+++ b/docbook-4.0/catalog.xml
-@@ -0,0 +1,72 @@
-+<?xml version='1.0'?>
-+<!DOCTYPE catalog PUBLIC "-//OASIS//DTD Entity Resolution XML Catalog V1.0//EN" 
-+    "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd">
-+
-+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
-+
-+<!-- ...................................................................... -->
-+<!-- XML Catalog data for DocBook XML V4.0............................... -->
-+<!-- File catalog.xml ..................................................... -->
-+
-+<!-- Please direct all questions, bug reports, or suggestions for
-+     changes to the docbook@lists.oasis-open.org mailing list. For more
-+     information, see http://www.oasis-open.org/.
-+  -->
-+
-+<!-- This is the catalog data file for DocBook V4.0. It is provided as
-+     a convenience in building your own catalog files. You need not use
-+     the filenames listed here, and need not use the filename method of
-+     identifying storage objects at all.  See the documentation for
-+     detailed information on the files associated with the DocBook DTD.
-+     See XML Catalogs at http://www.oasis-open.org/committees/entity/ for
-+     detailed information on supplying and using catalog data.
-+  -->
-+
-+<!-- ...................................................................... -->
-+<!-- DocBook driver file .................................................. -->
-+
-+<public publicId="-//Norman Walsh//DTD DocBk XML V4.0//EN"
-+        uri="docbookx.dtd"/>
-+
-+<!-- Other ways to refer to DocBook XML v4.0............................... -->
-+<public publicId="-//Norman Walsh//DTD DocBook XML V4.0//EN"
-+        uri="docbookx.dtd"/>
-+
-+<system systemId="http://www.oasis-open.org/docbook/xml/4.0/docbookx.dtd"
-+        uri="docbookx.dtd"/>
-+
-+<!-- ...................................................................... -->
-+<!-- DocBook modules ...................................................... -->
-+
-+<public publicId="-//Norman Walsh//ENTITIES DocBook XML Notations V4.0//EN"
-+        uri="dbnotnx.mod"/>
-+
-+<public publicId="-//Norman Walsh//ENTITIES DocBook XML Character Entities V4.0//EN"
-+        uri="dbcentx.mod"/>
-+
-+<public publicId="-//Norman Walsh//ELEMENTS DocBook XML Information Pool V4.0//EN"
-+        uri="dbpoolx.mod"/>
-+
-+<public publicId="-//Norman Walsh//ELEMENTS DocBook XML Document Hierarchy V4.0//EN"
-+        uri="dbhierx.mod"/>
-+
-+<public publicId="-//Norman Walsh//ENTITIES DocBook XML Additional General Entities V4.0//EN"
-+        uri="dbgenent.mod"/>
-+
-+<public publicId="-//Norman Walsh//DTD CALS Table Model XML V4.0//EN"
-+        uri="calstblx.dtd"/>
-+
-+<!-- UNOFFICIAL conversion of the exchange table model to XML, based on the OASIS Exchange -->
-+<!--    Table Model PUBLIC "-//SGML Open//DTD Exchange Table Model 19960430//EN"           -->
-+<public publicId="-//Normal Walsh//Exchange Table Model 19960430 XML V4.0//EN"
-+        uri="soextblx.dtd"/>
-+
-+<!-- the following FPI is declared for the DTD inside the DTD, but we'll -->
-+<!-- use the version from the latest DocBook
-+<public publicId="-//OASIS//DTD XML Exchange Table Model 19990315//EN"
-+        uri="soextblx.dtd"/> -->
-+
-+<!-- End of catalog data for DocBook XML V4.0 ............................. -->
-+<!-- ...................................................................... -->
-+
-+</catalog>
 diff --git a/docbook-4.1.2/catalog.xml b/docbook-4.1.2/catalog.xml
 new file mode 100644
 --- /dev/null

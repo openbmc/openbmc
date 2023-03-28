@@ -34,7 +34,7 @@ This patch is only needded by doxygen-native.
 
 Updated to apply to release 1.9.1.
 
-Upstream-Status: Inappropriate[oe specific]
+Upstream-Status: Inappropriate [oe specific]
 
 Co-Authored-By: Kai Kang <kai.kang@windriver.com>
 Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>

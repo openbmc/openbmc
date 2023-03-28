@@ -18,15 +18,6 @@ ac_cv_func_strtod=${ac_cv_func_strtod=yes}
 # off_t is always 64bit on musl systems
 ac_cv_sys_file_offset_bits=${ac_cv_sys_file_offset_bits=64}
 
-# glib
-glib_cv_strlcpy=${glib_cv_strlcpy=no}
-ac_cv_func_printf_unix98=${ac_cv_func_printf_unix98=yes}
-ac_cv_func_snprintf_c99=${ac_cv_func_snprintf_c99=yes}
-ac_cv_func_vsnprintf_c99=${ac_cv_func_vsnprintf_c99=yes}
-glib_cv_compliant_posix_memalign=${glib_cv_compliant_posix_memalign=1}
-glib_cv_long_long_format=${glib_cv_long_long_format=ll}
-glib_cv_have_qsort_r=${glib_cv_have_qsort_r=yes}
-
 #dbus-glib
 ac_cv_have_abstract_sockets=${ac_cv_have_abstract_sockets=yes}
 

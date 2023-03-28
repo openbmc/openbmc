@@ -129,10 +129,28 @@ class NpmShrinkWrap(FetchMethod):
 
                 localpath = os.path.join(d.getVar("DL_DIR"), localfile)
 
+            # Handle local tarball and link sources
+            elif version.startswith("file"):
+                localpath = version[5:]
+                if not version.endswith(".tgz"):
+                    unpack = False
+
             # Handle git sources
-            elif version.startswith("git"):
+            elif version.startswith(("git", "bitbucket","gist")) or (
+                not version.endswith((".tgz", ".tar", ".tar.gz"))
+                and not version.startswith((".", "@", "/"))
+                and "/" in version
+            ):
                 if version.startswith("github:"):
                     version = "git+https://github.com/" + version[len("github:"):]
+                elif version.startswith("gist:"):
+                    version = "git+https://gist.github.com/" + version[len("gist:"):]
+                elif version.startswith("bitbucket:"):
+                    version = "git+https://bitbucket.org/" + version[len("bitbucket:"):]
+                elif version.startswith("gitlab:"):
+                    version = "git+https://gitlab.com/" + version[len("gitlab:"):]
+                elif not version.startswith(("git+","git:")):
+                    version = "git+https://github.com/" + version
                 regex = re.compile(r"""
                     ^
                     git\+
@@ -157,12 +175,6 @@ class NpmShrinkWrap(FetchMethod):
                 uri.params["destsuffix"] = destsuffix
 
                 url = str(uri)
-
-            # Handle local tarball and link sources
-            elif version.startswith("file"):
-                localpath = version[5:]
-                if not version.endswith(".tgz"):
-                    unpack = False
 
             else:
                 raise ParameterError("Unsupported dependency: %s" % name, ud.url)

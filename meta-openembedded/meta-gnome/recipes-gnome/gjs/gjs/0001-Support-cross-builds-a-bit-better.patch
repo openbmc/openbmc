@@ -9,7 +9,7 @@ Content-Transfer-Encoding: 8bit
 * Do not build/run mozjs-linked program
 * Do not try to run test applications
 
-Upstream-Status: Submitted[https://gitlab.gnome.org/GNOME/gjs/-/merge_requests/690]
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gjs/-/merge_requests/690]
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
 ---

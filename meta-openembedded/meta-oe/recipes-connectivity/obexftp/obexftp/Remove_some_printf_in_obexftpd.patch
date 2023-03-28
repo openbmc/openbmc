@@ -1,6 +1,6 @@
 Signed-off-by: Jun Zhu <R01007@freescale.com>
 
-Upstream-Status:  Not applicable
+Upstream-Status: Inappropriate [embedded specific]
 
 diff -Nru obexftp-0.23/apps.orig/obexftpd.c obexftp-0.23/apps/obexftpd.c
 --- obexftp-0.23/apps.orig/obexftpd.c	2013-11-08 10:42:20.816631583 +0800

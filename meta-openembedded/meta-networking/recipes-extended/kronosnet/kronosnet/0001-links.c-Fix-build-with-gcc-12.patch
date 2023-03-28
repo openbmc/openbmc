@@ -15,7 +15,7 @@ Fixes:
   |       |                           ^~~~
   | cc1: all warnings being treated as errors
 
-Upstream-Status: Submitted[https://github.com/kronosnet/kronosnet/pull/382]
+Upstream-Status: Submitted [https://github.com/kronosnet/kronosnet/pull/382]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---

@@ -10,7 +10,7 @@ Adding the "retain-splash” option to tell plymouth to keep the boot
 splash’s contents on screen even after plymouth exits to make the
 splash screen show more friendly on the system which boots so fast.
 
-Upstream-Status: Inappropriate[embedded specific]
+Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---

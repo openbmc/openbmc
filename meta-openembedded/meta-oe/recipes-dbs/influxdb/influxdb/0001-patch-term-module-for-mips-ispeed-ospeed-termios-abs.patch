@@ -3,7 +3,7 @@ From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 11 Jan 2021 15:16:57 -0800
 Subject: [PATCH] patch term module for mips ispeed/ospeed termios absense
 
-Upstream-Status: OE-Specific [needed on mips]
+Upstream-Status: Inappropriate [OE-Specific needed on mips]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---

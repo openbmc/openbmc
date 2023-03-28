@@ -8,7 +8,7 @@ When building with OpenSSL 1.1 and newer, use the new built-in
  structs having been made opaque.
 Bug-Debian: https://bugs.debian.org/828589
 
-Upstream-Status: Unknown
+Upstream-Status: Pending [Unknown]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---

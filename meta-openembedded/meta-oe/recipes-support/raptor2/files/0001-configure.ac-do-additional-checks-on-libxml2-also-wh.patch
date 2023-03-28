@@ -7,9 +7,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Upstream-Status: Applied [1]
-
-[1] https://github.com/dajobe/raptor/pull/33
+Upstream-Status: Backport [https://github.com/dajobe/raptor/commit/e75b1dbb7f2a6514b8d391b200c45a2bec6268bf]
 
 Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
 ---

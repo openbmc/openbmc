@@ -37,3 +37,6 @@ PACKAGES =+ "${BPN}-loaders ${BPN}-filters ${BPN}-data"
 FILES:${PN}-data = "${datadir}"
 FILES:imlib2-loaders = "${libdir}/imlib2/loaders/*.so"
 FILES:imlib2-filters = "${libdir}/imlib2/filters/*.so"
+
+inherit multilib_script
+MULTILIB_SCRIPTS = "${PN}-bin:${bindir}/imlib2-config"

@@ -23,8 +23,8 @@ inherit autotools update-alternatives pkgconfig
 ALTERNATIVE_PRIORITY = "100"
 
 ALTERNATIVE:${PN} = "ftp"
-ALTERNATIVE_LINK_NAME_${PN} = "${bindir}/ftp"
-ALTERNATIVE_TARGET_${PN}  = "${bindir}/tnftp"
+ALTERNATIVE_LINK_NAME[ftp] = "${bindir}/ftp"
+ALTERNATIVE_TARGET[ftp] = "${bindir}/tnftp"
 
 FILES:${PN} = "${bindir}/tnftp"
 

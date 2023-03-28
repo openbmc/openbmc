@@ -7,7 +7,7 @@ bitbake passes CFLAGS that are often in conflict with the ones set
 in mbedtls' CMakeLists.txt. Such conflicts are the inability to use
 FORTIFY_SOURCE=2 except in release mode
 
-Upstream-Status: Innapropriate [due to fluent-bit having it's own Release flags that also overwrite bitbake ones.]
+Upstream-Status: Inappropriate [due to fluent-bit having it's own Release flags that also overwrite bitbake ones.]
 ---
  lib/mbedtls-2.28.0/CMakeLists.txt | 2 --
  1 file changed, 2 deletions(-)

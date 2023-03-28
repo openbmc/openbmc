@@ -288,7 +288,7 @@ extension (e.g. ``.tar``, ``.tar.gz``, ``.tar.bz2``, ``.zip``, and so
 forth), are automatically extracted during the
 :ref:`ref-tasks-unpack` task. For
 another example that specifies these types of files, see the
-":ref:`dev-manual/new-recipe:autotooled package`" section.
+":ref:`dev-manual/new-recipe:building an autotooled package`" section.
 
 Another way of specifying source is from an SCM. For Git repositories,
 you must specify :term:`SRCREV` and you should specify :term:`PV` to include
@@ -361,7 +361,7 @@ and searches specific directories in a certain order:
 ``files``. The directories are assumed to be subdirectories of the
 directory in which the recipe or append file resides. For another
 example that specifies these types of files, see the
-":ref:`dev-manual/new-recipe:single .c file package (hello world!)`" section.
+"`building a single .c file package`_" section.
 
 The previous example also specifies a patch file. Patch files are files
 whose names usually end in ``.patch`` or ``.diff`` but can end with
@@ -776,7 +776,7 @@ the software being built:
    ``PREFIX=${D}``, ``INSTALLROOT=${D}``, and so forth).
 
    For an example recipe using ``make install``, see the
-   ":ref:`dev-manual/new-recipe:makefile-based package`" section.
+   ":ref:`dev-manual/new-recipe:building a makefile-based package`" section.
 
 -  *Manual:* You need to define a :ref:`ref-tasks-install` function in your
    recipe. The function must first use ``install -d`` to create the
@@ -1165,28 +1165,29 @@ Examples
 ========
 
 To help summarize how to write a recipe, this section provides some
-examples given various scenarios:
+recipe examples given various scenarios:
 
--  Recipes that use local files
+-  `Building a single .c file package`_
 
--  Using an Autotooled package
+-  `Building a Makefile-based package`_
 
--  Using a Makefile-based package
+-  `Building an Autotooled package`_
 
--  Splitting an application into multiple packages
+-  `Building a Meson package`_
 
--  Adding binaries to an image
+-  `Splitting an application into multiple packages`_
 
-Single .c File Package (Hello World!)
--------------------------------------
+-  `Packaging externally produced binaries`_
 
-Building an application from a single file that is stored locally (e.g.
-under ``files``) requires a recipe that has the file listed in the
-:term:`SRC_URI` variable. Additionally, you need to manually write the
-:ref:`ref-tasks-compile` and :ref:`ref-tasks-install` tasks. The :term:`S` variable defines the
-directory containing the source code, which is set to
-:term:`WORKDIR` in this case --- the
-directory BitBake uses for the build::
+Building a Single .c File Package
+---------------------------------
+
+Building an application from a single file that is stored locally (e.g. under
+``files``) requires a recipe that has the file listed in the :term:`SRC_URI`
+variable. Additionally, you need to manually write the :ref:`ref-tasks-compile`
+and :ref:`ref-tasks-install` tasks. The :term:`S` variable defines the
+directory containing the source code, which is set to :term:`WORKDIR` in this
+case --- the directory BitBake uses for the build::
 
    SUMMARY = "Simple helloworld application"
    SECTION = "examples"
@@ -1206,52 +1207,22 @@ directory BitBake uses for the build::
        install -m 0755 helloworld ${D}${bindir}
    }
 
-By default, the ``helloworld``, ``helloworld-dbg``, and
-``helloworld-dev`` packages are built. For information on how to
-customize the packaging process, see the
+By default, the ``helloworld``, ``helloworld-dbg``, and ``helloworld-dev`` packages
+are built. For information on how to customize the packaging process, see the
 ":ref:`dev-manual/new-recipe:splitting an application into multiple packages`"
 section.
 
-Autotooled Package
-------------------
+Building a Makefile-Based Package
+---------------------------------
 
-Applications that use Autotools such as ``autoconf`` and ``automake``
-require a recipe that has a source archive listed in :term:`SRC_URI` and
-also inherit the :ref:`ref-classes-autotools` class,
-which contains the definitions of all the steps needed to build an
-Autotool-based application. The result of the build is automatically
-packaged. And, if the application uses NLS for localization, packages
-with local information are generated (one package per language).
-Following is one example: (``hello_2.3.bb``)::
-
-   SUMMARY = "GNU Helloworld application"
-   SECTION = "examples"
-   LICENSE = "GPL-2.0-or-later"
-   LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
-
-   SRC_URI = "${GNU_MIRROR}/hello/hello-${PV}.tar.gz"
-
-   inherit autotools gettext
-
-The variable :term:`LIC_FILES_CHKSUM` is used to track source license
-changes as described in the
-":ref:`dev-manual/licenses:tracking license changes`" section in
-the Yocto Project Overview and Concepts Manual. You can quickly create
-Autotool-based recipes in a manner similar to the previous example.
-
-Makefile-Based Package
-----------------------
-
-Applications that use GNU ``make`` also require a recipe that has the
-source archive listed in :term:`SRC_URI`. You do not need to add a
-:ref:`ref-tasks-compile` step since by default BitBake starts the ``make`` command
-to compile the application. If you need additional ``make`` options, you
-should store them in the
-:term:`EXTRA_OEMAKE` or
-:term:`PACKAGECONFIG_CONFARGS`
-variables. BitBake passes these options into the GNU ``make``
-invocation. Note that a :ref:`ref-tasks-install` task is still required.
-Otherwise, BitBake runs an empty :ref:`ref-tasks-install` task by default.
+Applications built with GNU ``make`` require a recipe that has the source archive
+listed in :term:`SRC_URI`. You do not need to add a :ref:`ref-tasks-compile`
+step since by default BitBake starts the ``make`` command to compile the
+application. If you need additional ``make`` options, you should store them in
+the :term:`EXTRA_OEMAKE` or :term:`PACKAGECONFIG_CONFARGS` variables. BitBake
+passes these options into the GNU ``make`` invocation. Note that a
+:ref:`ref-tasks-install` task is still required. Otherwise, BitBake runs an
+empty :ref:`ref-tasks-install` task by default.
 
 Some applications might require extra parameters to be passed to the
 compiler. For example, the application might need an additional header
@@ -1293,6 +1264,60 @@ In the following example, ``lz4`` is a makefile-based package::
    }
 
    BBCLASSEXTEND = "native nativesdk"
+
+Building an Autotooled Package
+------------------------------
+
+Applications built with the Autotools such as ``autoconf`` and ``automake``
+require a recipe that has a source archive listed in :term:`SRC_URI` and also
+inherit the :ref:`ref-classes-autotools` class, which contains the definitions
+of all the steps needed to build an Autotool-based application. The result of
+the build is automatically packaged. And, if the application uses NLS for
+localization, packages with local information are generated (one package per
+language). Following is one example: (``hello_2.3.bb``)::
+
+   SUMMARY = "GNU Helloworld application"
+   SECTION = "examples"
+   LICENSE = "GPL-2.0-or-later"
+   LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
+
+   SRC_URI = "${GNU_MIRROR}/hello/hello-${PV}.tar.gz"
+
+   inherit autotools gettext
+
+The variable :term:`LIC_FILES_CHKSUM` is used to track source license changes
+as described in the ":ref:`dev-manual/licenses:tracking license changes`"
+section in the Yocto Project Overview and Concepts Manual. You can quickly
+create Autotool-based recipes in a manner similar to the previous example.
+
+Building a Meson Package
+------------------------
+
+Applications built with the `Meson build system <https://mesonbuild.com/>`__
+just need a recipe that has sources described in :term:`SRC_URI` and inherits
+the :ref:`ref-classes-meson` class.
+
+The :oe_git:`ipcalc recipe </meta-openembedded/tree/meta-networking/recipes-support/ipcalc>`
+is a simple example of an application without dependencies::
+
+   SUMMARY = "Tool to assist in network address calculations for IPv4 and IPv6."
+   HOMEPAGE = "https://gitlab.com/ipcalc/ipcalc"
+
+   SECTION = "net"
+
+   LICENSE = "GPL-2.0-only"
+   LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
+
+   SRC_URI = "git://gitlab.com/ipcalc/ipcalc.git;protocol=https;branch=master"
+   SRCREV = "4c4261a47f355946ee74013d4f5d0494487cc2d6"
+
+   S = "${WORKDIR}/git"
+
+   inherit meson
+
+Applications with dependencies are likely to inherit the
+:ref:`ref-classes-pkgconfig` class, as ``pkg-config`` is the default method
+used by Meson to find dependencies and compile applications against them.
 
 Splitting an Application into Multiple Packages
 -----------------------------------------------

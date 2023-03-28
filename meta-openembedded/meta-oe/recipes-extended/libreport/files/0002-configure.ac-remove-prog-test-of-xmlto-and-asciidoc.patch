@@ -7,7 +7,7 @@ The prog of xmlto and asciidoc were used to generate documents,
 and since the doc module has already been disabled, so we should
 remove the prog test.
 
-Upstream-Status:  Inappropriate workaround
+Upstream-Status: Inappropriate [workaround]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---

@@ -14,6 +14,10 @@ def get_recipe_spdxid(d):
     return "SPDXRef-%s-%s" % ("Recipe", d.getVar("PN"))
 
 
+def get_download_spdxid(d, idx):
+    return "SPDXRef-Download-%s-%d" % (d.getVar("PN"), idx)
+
+
 def get_package_spdxid(pkg):
     return "SPDXRef-Package-%s" % pkg
 

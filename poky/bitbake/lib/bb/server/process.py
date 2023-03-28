@@ -405,7 +405,11 @@ class ProcessServer():
             nextsleep = 0.1
             fds = []
 
-            self.cooker.process_inotify_updates()
+            try:
+                self.cooker.process_inotify_updates()
+            except Exception as exc:
+                serverlog("Exception %s in inofify updates broke the idle_thread, exiting" % traceback.format_exc())
+                self.quit = True
 
             with bb.utils.lock_timeout(self._idlefuncsLock):
                 items = list(self._idlefuns.items())
@@ -473,6 +477,10 @@ class ProcessServer():
         if not self.idle:
             self.idle = threading.Thread(target=self.idle_thread)
             self.idle.start()
+        elif self.idle and not self.idle.is_alive():
+            serverlog("Idle thread terminated, main thread exiting too")
+            bb.error("Idle thread terminated, main thread exiting too")
+            self.quit = True
 
         if nextsleep is not None:
             if self.xmlrpc:

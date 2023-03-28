@@ -13,16 +13,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# If we don't have a saved IP, we keep running indefinitely
-if ! srcip="$(cat /var/google/gbmc-br-ip 2>/dev/null)"; then
-  echo 'Missing saved gbmc-br IP' >&2
-  exit 0
-fi
+# shellcheck source=meta-google/recipes-google/networking/network-sh/lib.sh
+source /usr/share/network/lib.sh || exit
 
 # Wait until a well known service is network available
-echo "Waiting for network reachability" >&2
-while ! ping -I "$srcip" -c 1 -W 1 2001:4860:4860::8888 >/dev/null 2>&1; do
-  sleep 1
+echo 'Waiting for network reachability' >&2
+while true; do
+  before=$SECONDS
+  addrs="$(ip addr show gbmcbr | grep '^ *inet6' | awk '{print $2}')"
+  for addr in $addrs; do
+    # Remove the prefix length
+    ip="${addr%/*}"
+    ip_to_bytes ip_bytes "$ip" || continue
+    # Ignore ULAs and non-gBMC addresses
+    (( ip_bytes[0] & 0xfc == 0xfc || ip_bytes[8] != 0xfd )) && continue
+    # Only allow for the short, well known addresses <pfx>:fd01:: and not
+    # <pfx>:fd00:83c1:292d:feef. Otherwise, powercycle may be unavailable.
+    (( ip_bytes[9] == 0 )) && continue
+    for i in {10..15}; do
+      (( ip_bytes[i] != 0 )) && continue 2
+    done
+    echo "Trying reachability from $ip" >&2
+    for i in {0..5}; do
+      ping -I "$ip" -c 1 -W 1 2001:4860:4860::8888 >/dev/null 2>&1 && break 3
+      sleep 1
+    done
+  done
+  # Ensure we only complete the addr lookup loop every 10s
+  tosleep=$((before + 10 - SECONDS))
+  if (( tosleep > 0 )); then
+    sleep $tosleep
+  fi
 done
 
 # We need to guarantee we wait at least 5 minutes from reachable in

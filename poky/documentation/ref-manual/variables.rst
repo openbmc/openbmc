@@ -1313,6 +1313,26 @@ system and gives an overview of their function and contents.
       optional at the distribution level, in case the hardware supports
       Bluetooth but you do not ever intend to use it.
 
+   :term:`COMMERCIAL_AUDIO_PLUGINS`
+      This variable is specific to the :yocto_git:`GStreamer recipes
+      </poky/tree/meta/recipes-multimedia/gstreamer/gstreamer1.0-meta-base.bb>`.
+      It allows to build the GStreamer `"ugly"
+      <https://github.com/GStreamer/gst-plugins-ugly>`__  and
+      `"bad" <https://github.com/GStreamer/gst-plugins-bad>`__ audio plugins.
+
+      See the :ref:`dev-manual/licenses:other variables related to commercial licenses`
+      section for usage details.
+
+   :term:`COMMERCIAL_VIDEO_PLUGINS`
+      This variable is specific to the :yocto_git:`GStreamer recipes
+      </poky/tree/meta/recipes-multimedia/gstreamer/gstreamer1.0-meta-base.bb>`.
+      It allows to build the GStreamer `"ugly"
+      <https://github.com/GStreamer/gst-plugins-ugly>`__  and
+      `"bad" <https://github.com/GStreamer/gst-plugins-bad>`__ video plugins.
+
+      See the :ref:`dev-manual/licenses:other variables related to commercial licenses`
+      section for usage details.
+
    :term:`COMMON_LICENSE_DIR`
       Points to ``meta/files/common-licenses`` in the
       :term:`Source Directory`, which is where generic license
@@ -2004,9 +2024,9 @@ system and gives an overview of their function and contents.
       variable.
 
    :term:`DEV_PKG_DEPENDENCY`
-      Provides an easy way for recipes to disable or adjust the runtime
-      dependency (:term:`RDEPENDS`) of the ``${PN}-dev`` package on the main
-      (``${PN}``) package, particularly where the main package may be empty.
+      Provides an easy way for recipes to disable or adjust the runtime recommendation
+      (:term:`RRECOMMENDS`) of the ``${PN}-dev`` package on the main
+      (``${PN}``) package.
 
    :term:`DISABLE_STATIC`
       Used in order to disable static linking by default (in order to save
@@ -2528,6 +2548,20 @@ system and gives an overview of their function and contents.
       variable specifies additional configuration options you want to pass
       to the ``scons`` command line.
 
+   :term:`EXTRA_OEMESON`
+      Additional `Meson <https://mesonbuild.com/>`__ options. See the
+      :ref:`ref-classes-meson` class for additional information.
+
+      In addition to standard Meson options, such options correspond to
+      `Meson build options <https://mesonbuild.com/Build-options.html>`__
+      defined in the ``meson_options.txt`` file in the sources to build.
+      Here is an example::
+
+         EXTRA_OEMESON = "-Dpython=disabled -Dvalgrind=disabled"
+
+      Note that any custom value for the Meson ``--buildtype`` option
+      should be set through the :term:`MESON_BUILDTYPE` variable.
+
    :term:`EXTRA_USERS_PARAMS`
       When inheriting the :ref:`ref-classes-extrausers`
       class, this variable provides image level user and group operations.
@@ -2892,13 +2926,14 @@ system and gives an overview of their function and contents.
 
    :term:`FIT_KERNEL_COMP_ALG`
       Compression algorithm to use for the kernel image inside the FIT Image.
-      At present, the only supported values are "gzip" (default) or "none"
+      At present, the only supported values are "gzip" (default), "lzo" or "none".
       If you set this variable to anything other than "none" you may also need
       to set :term:`FIT_KERNEL_COMP_ALG_EXTENSION`.
 
    :term:`FIT_KERNEL_COMP_ALG_EXTENSION`
       File extension corresponding to :term:`FIT_KERNEL_COMP_ALG`. The default
-      value is ".gz".
+      value is ".gz". If you set :term:`FIT_KERNEL_COMP_ALG` to "lzo",
+      you may want to set this variable to ".lzo".
 
    :term:`FIT_KEY_GENRSA_ARGS`
       Arguments to openssl genrsa for generating RSA private key for signing
@@ -4274,9 +4309,9 @@ system and gives an overview of their function and contents.
       To use the variable, set it in the append file for your kernel recipe
       using the following form::
 
-         KBUILD_DEFCONFIG_KMACHINE ?= defconfig_file
+         KBUILD_DEFCONFIG:<machine> ?= "defconfig_file"
 
-      Here is an example from a "raspberrypi2" :term:`KMACHINE` build that uses
+      Here is an example from a "raspberrypi2" :term:`MACHINE` build that uses
       a ``defconfig`` file named "bcm2709_defconfig"::
 
          KBUILD_DEFCONFIG:raspberrypi2 = "bcm2709_defconfig"
@@ -5137,6 +5172,17 @@ system and gives an overview of their function and contents.
    :term:`MAINTAINER`
       The email address of the distribution maintainer.
 
+   :term:`MESON_BUILDTYPE`
+      Value of the Meson ``--buildtype`` argument used by the
+      :ref:`ref-classes-meson` class. It defaults to ``debug`` if
+      :term:`DEBUG_BUILD` is set to "1", and ``plain`` otherwise.
+
+      See `Meson build options <https://mesonbuild.com/Builtin-options.html>`__
+      for the values you could set in a recipe. Values such as ``plain``,
+      ``debug``, ``debugoptimized``, ``release`` and ``minsize`` allow
+      you to specify the inclusion of debugging symbols and the compiler
+      optimizations (none, performance or size).
+
    :term:`METADATA_BRANCH`
       The branch currently checked out for the OpenEmbedded-Core layer (path
       determined by :term:`COREBASE`).
@@ -5397,6 +5443,16 @@ system and gives an overview of their function and contents.
       See the ``meta/classes-recipe/binconfig.bbclass`` in the
       :term:`Source Directory` for details on how this class
       applies these additional sed command arguments.
+
+   :term:`OECMAKE_GENERATOR`
+      A variable for the :ref:`ref-classes-cmake` class, allowing to choose
+      which back-end will be generated by CMake to build an application.
+
+      By default, this variable is set to ``Ninja``, which is faster than GNU
+      make, but if building is broken with Ninja, a recipe can use this
+      variable to use GNU make instead::
+
+         OECMAKE_GENERATOR = "Unix Makefiles"
 
    :term:`OE_IMPORTS`
       An internal variable used to tell the OpenEmbedded build system what
@@ -7793,7 +7849,7 @@ system and gives an overview of their function and contents.
 
       :term:`SSTATE_EXCLUDEDEPS_SYSROOT` is evaluated as two regular
       expressions of recipe and dependency to ignore. An example
-      is the rule in :oe_git:`meta/conf/layer.conf </meta/conf/layer.conf>`::
+      is the rule in :oe_git:`meta/conf/layer.conf </openembedded-core/tree/meta/conf/layer.conf>`::
 
          # Nothing needs to depend on libc-initial
          # base-passwd/shadow-sysroot don't need their dependencies
@@ -8480,7 +8536,7 @@ system and gives an overview of their function and contents.
          responsibility to ensure that the toolchain is compatible with the
          default toolchain. Using older or newer versions of these
          components might cause build problems. See
-         :yocto_docs:`Release Information </migration-guides/>` for your
+         :doc:`Release Information </migration-guides/index>` for your
          version of the Yocto Project, to find the specific components with
          which the toolchain must be compatible.
 

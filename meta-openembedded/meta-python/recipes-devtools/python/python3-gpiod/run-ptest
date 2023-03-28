@@ -1,0 +1,15 @@
+#!/bin/sh
+
+cd $(dirname "$(readlink -f "$0")")
+
+# python3-gpiod uses gpio-sim - a configfs-based testing module. We need to
+# make sure configfs is mounted before running any tests.
+modprobe configfs
+mountpoint /sys/kernel/config > /dev/null || mount -t configfs configfs /sys/kernel/config
+
+python3 -m gpiod-test -v > ./python3-gpiod.out 2>&1
+if [ $? -ne 0 ]; then
+	echo "FAIL: python3-gpiod"
+else
+	echo "PASS: python3-gpiod"
+fi

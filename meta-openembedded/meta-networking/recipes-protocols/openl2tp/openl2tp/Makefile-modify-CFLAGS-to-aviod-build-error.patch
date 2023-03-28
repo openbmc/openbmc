@@ -3,7 +3,7 @@ From: Li xin <lixin.fnst@cn.fujitsu.com>
 Date: Mon, 1 Dec 2014 01:53:41 +0900
 Subject: [PATCH] Makefile:modify CFLAGS to aviod build error.
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 ---

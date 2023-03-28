@@ -8,21 +8,23 @@ We need the definitions for things like u_intX_t
 Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
 ---
  libusb/usb.h | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/libusb/usb.h b/libusb/usb.h
-index fa0e6c6..4e88eb8 100644
+index ea62543..18b610a 100644
 --- a/libusb/usb.h
 +++ b/libusb/usb.h
-@@ -45,6 +45,8 @@ typedef unsigned __int32  uint32_t;
+@@ -46,6 +46,8 @@ typedef unsigned __int32  uint32_t;
  #include <stdint.h>
  #endif
  
 +#include <sys/types.h>
 +
- /*
-  * USB spec information
-  *
+ /* On linux PATH_MAX is defined in linux/limits.h. */
+ #if defined(__linux__)
+ #include <linux/limits.h>
+-- 
+2.34.1
+

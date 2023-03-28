@@ -7,21 +7,6 @@ ac_cv_sizeof_ssize_t=8
 ac_cv_alignof_char=1
 ac_cv_alignof_double=8
 
-# glib
-#glib_cv_sizeof_gmutex=${glib_cv_sizeof_gmutex=24}
-#glib_cv_sizeof_system_thread=${glib_cv_sizeof_system_thread=4}
-#glib_cv_sizeof_gmutex=${glib_cv_sizeof_gmutex=24}
-
-# glib-2.0
-#glib_cv_sizeof_gmutex=${glib_cv_sizeof_gmutex=24}
-#glib_cv_sizeof_intmax_t=${glib_cv_sizeof_intmax_t=8}
-#glib_cv_sizeof_ptrdiff_t=${glib_cv_sizeof_ptrdiff_t=4}
-#glib_cv_sizeof_size_t=${glib_cv_sizeof_size_t=4}
-#glib_cv_sizeof_system_thread=${glib_cv_sizeof_system_thread=4}
-ac_cv_alignof_guint32=4
-ac_cv_alignof_guint64=8
-ac_cv_alignof_unsigned_long=8
-
 # at-spi2-core
 ac_cv_alignof_dbind_pointer=8
 ac_cv_alignof_dbind_struct=1

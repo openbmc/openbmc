@@ -41,25 +41,6 @@ ac_cv_func_fnmatch_works=${ac_cv_func_fnmatch_works=yes}
 # gettext
 am_cv_func_working_getline=${am_cv_func_working_getline=yes}
 
-# glib
-glib_cv_stack_grows=${glib_cv_stack_grows=no}
-glib_cv_uscore=${glib_cv_uscore=no}
-glib_cv_use_pid_surrogate=${glib_cv_use_pid_surrogate=yes}
-glib_cv_has__inline=${glib_cv_has__inline=yes}
-glib_cv_has__inline__=${glib_cv_has__inline__=yes}
-glib_cv_hasinline=${glib_cv_hasinline=yes}
-glib_cv_sane_realloc=${glib_cv_sane_realloc=yes}
-glib_cv_uscore=${glib_cv_uscore=no}
-glib_cv_va_val_copy=${glib_cv_va_val_copy=yes}
-glib_cv_rtldglobal_broken=${glib_cv_rtldglobal_broken=no}
-glib_cv_sys_pthread_mutex_trylock_posix=${glib_cv_sys_pthread_mutex_trylock_posix=yes}
-glib_cv_sys_pthread_getspecific_posix=${glib_cv_sys_pthread_getspecific_posix=yes}
-glib_cv_sys_pthread_cond_timedwait_posix=${glib_cv_sys_pthread_cond_timedwait_posix=yes}
-
-# glib-2.0
-glib_cv_long_long_format=${glib_cv_long_long_format=ll}
-glib_cv_sys_use_pid_niceness_surrogate=${glib_cv_sys_use_pid_niceness_surrogate=yes}
-
 #gstreamer
 as_cv_unaligned_access=${as_cv_unaligned_access=no}
 

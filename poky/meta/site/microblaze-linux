@@ -26,29 +26,6 @@ ac_cv_uint=${ac_cv_uint=yes}
 ac_cv_ulong=${ac_cv_ulong=yes}
 ac_cv_ushort=${ac_cv_ushort=yes}
 
-# glib
-glib_cv_stack_grows=${glib_cv_stack_grows=no}
-glib_cv_has__inline=${glib_cv_has__inline=yes}
-glib_cv_has__inline__=${glib_cv_has__inline__=yes}
-glib_cv_hasinline=${glib_cv_hasinline=yes}
-glib_cv_sane_realloc=${glib_cv_sane_realloc=yes}
-glib_cv_uscore=${glib_cv_uscore=no}
-glib_cv_va_copy=${glib_cv_va_copy=yes}
-glib_cv_va_val_copy=${glib_cv_va_val_copy=yes}
-glib_cv___va_copy=${glib_cv___va_copy=yes}
-
-# glib-2.0
-glib_cv_long_long_format=${glib_cv_long_long_format=ll}
-ac_cv_alignof_guint32=4
-ac_cv_alignof_guint64=8
-ac_cv_alignof_unsigned_long=4
-glib_cv_sizeof_gmutex=${glib_cv_sizeof_gmutex=24}
-glib_cv_sizeof_intmax_t=${glib_cv_sizeof_intmax_t=8}
-glib_cv_sizeof_ptrdiff_t=${glib_cv_sizeof_ptrdiff_t=4}
-glib_cv_sizeof_size_t=${glib_cv_sizeof_size_t=4}
-glib_cv_sizeof_system_thread=${glib_cv_sizeof_system_thread=4}
-glib_cv_sys_use_pid_niceness_surrogate=${glib_cv_sys_use_pid_niceness_surrogate=yes}
-
 # startup-notification
 lf_cv_sane_realloc=yes
 

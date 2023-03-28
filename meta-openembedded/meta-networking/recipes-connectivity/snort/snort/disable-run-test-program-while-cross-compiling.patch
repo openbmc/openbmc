@@ -6,7 +6,7 @@ Subject: [PATCH] Disable run test program while cross compiling
 fix configure error:
 configure: error: cannot run test program while cross compiling
 
-Upstream-Status:Inappropriate [embedded specific]
+Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---

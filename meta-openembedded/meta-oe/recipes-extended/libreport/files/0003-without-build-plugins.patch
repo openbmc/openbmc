@@ -3,7 +3,7 @@ From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 26 Apr 2017 03:51:03 -0400
 Subject: [PATCH 3/4] without build plugins
 
-Upstream-Status:  Inappropriate workaround
+Upstream-Status: Inappropriate [workaround]
 
 Rebase to 2.9.1
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>

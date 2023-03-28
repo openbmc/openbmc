@@ -72,6 +72,21 @@ class CommonCheckLayer(OECheckLayerTestCase):
                 self.tc.layer['name'])
             self.fail('\n'.join(msg))
 
+    @unittest.expectedFailure
+    def test_patches_upstream_status(self):
+        import sys
+        sys.path.append(os.path.join(sys.path[0], '../../../../meta/lib/'))
+        import oe.qa
+        patches = []
+        for dirpath, dirs, files in os.walk(self.tc.layer['path']):
+            for filename in files:
+                if filename.endswith(".patch"):
+                    ppath = os.path.join(dirpath, filename)
+                    if oe.qa.check_upstream_status(ppath):
+                        patches.append(ppath)
+        self.assertEqual(len(patches), 0 , \
+                msg="Found following patches with malformed or missing upstream status:\n%s" % '\n'.join([str(patch) for patch in patches]))
+
     def test_signatures(self):
         if self.tc.layer['type'] == LayerType.SOFTWARE and \
            not self.tc.test_software_layer_signatures:
