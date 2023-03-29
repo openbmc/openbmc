@@ -1,39 +1,26 @@
-From 4a24b4acfaa876969c24f2ef014cf37a59ca11e5 Mon Sep 17 00:00:00 2001
+From f5ddf7bbc318c91c25b7e691119d5e455c618ef9 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Thu, 9 Mar 2023 12:09:14 +0800
 Subject: [PATCH] add psu sesnor: p2011 and mx16550
 
 Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
- src/PSUSensorMain.cpp | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ src/PSUSensorMain.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/src/PSUSensorMain.cpp b/src/PSUSensorMain.cpp
-index 6dab8897..9cf1d383 100644
+index 3af86e41..b4a74f41 100644
 --- a/src/PSUSensorMain.cpp
 +++ b/src/PSUSensorMain.cpp
-@@ -86,7 +86,9 @@ static constexpr auto sensorTypes{std::to_array<const char*>({
-     "TPS53679",
-     "TPS546D24",
-     "XDPE11280",
--    "XDPE12284"})};
-+    "XDPE12284",
-+    "P2011",
-+    "MAX16550"})};
+@@ -88,6 +88,8 @@ static const I2CDeviceTypeMap sensorTypes{
+     {"TPS546D24", I2CDeviceType{"tps546d24", true}},
+     {"XDPE11280", I2CDeviceType{"xdpe11280", true}},
+     {"XDPE12284", I2CDeviceType{"xdpe12284", true}},
++    {"P2011", I2CDeviceType{"p2011", true}},
++    {"MAX16550", I2CDeviceType{"max16550", true}},
+ };
  
- static constexpr auto pmbusNames{std::to_array<const char*>({
-     "adm1266",
-@@ -133,7 +135,9 @@ static constexpr auto pmbusNames{std::to_array<const char*>({
-     "tps53679",
-     "tps546d24",
-     "xdpe11280",
--    "xdpe12284"
-+    "xdpe12284",
-+    "p2011",
-+    "max16550"
- })};
- //clang-format on
- 
+ namespace fs = std::filesystem;
 -- 
 2.34.1
 
