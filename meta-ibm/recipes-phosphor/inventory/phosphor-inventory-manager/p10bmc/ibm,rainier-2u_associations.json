@@ -2282,6 +2282,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/cablecard0_cxp_top_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -2309,6 +2320,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/cablecard0_cxp_bot_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -2338,6 +2360,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/cablecard3_cxp_top_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -2365,6 +2398,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/cablecard3_cxp_bot_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -2394,6 +2438,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/cablecard4_cxp_top_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -2421,6 +2476,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/cablecard4_cxp_bot_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -2450,6 +2516,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/cablecard10_cxp_top_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -2477,6 +2554,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/cablecard10_cxp_bot_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
