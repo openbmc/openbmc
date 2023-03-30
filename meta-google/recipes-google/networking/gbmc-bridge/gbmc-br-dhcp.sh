@@ -76,5 +76,5 @@ if [ "$1" = bound ]; then
   # Ensure that the installer knows we have completed processing DHCP by
   # running a service that reports completion
   echo 'Start DHCP Done' >&2
-  systemctl start dhcp-done --no-block
+  systemctl start dhcp-done@DONE --no-block
 fi

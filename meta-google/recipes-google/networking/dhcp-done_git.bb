@@ -6,7 +6,7 @@ require ../google-misc/google-misc.inc
 
 inherit systemd
 
-SYSTEMD_SERVICE:${PN} += "dhcp-done.service"
+SYSTEMD_SERVICE:${PN} += "dhcp-done@.service"
 
 DEPENDS += " \
   sdeventplus \
