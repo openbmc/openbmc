@@ -1,0 +1,8 @@
+[Service]
+Type=oneshot
+SyslogIdentifier=gbmc-log-ramoops
+SyslogLevelPrefix=true
+ExecStart=/usr/bin/find /sys/fs/pstore -name '*-*' -print -exec cat {} \;
+
+[Install]
+WantedBy=multi-user.target
