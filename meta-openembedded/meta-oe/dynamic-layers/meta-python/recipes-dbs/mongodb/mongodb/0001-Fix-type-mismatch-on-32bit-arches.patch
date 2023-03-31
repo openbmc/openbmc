@@ -1,0 +1,33 @@
+From 81eabea4e4da55cddfe8bcfcbc3759fa90948254 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 3 Mar 2023 14:13:29 -0800
+Subject: [PATCH] Fix type mismatch on 32bit arches
+
+std::set::size returns an unsigned integral type.
+std::max call therefore gets (unsigned int, unsigned long) here.
+Type of both arguments is not same, so its ambigous
+and there is no matching std::max implementation for mismatching
+arguments. std::max expects both input variables to be of
+same type, max(int,int) etc..
+
+Fixes
+src/mongo/util/processinfo_linux.cpp:424:16: error: no matching function for call to 'max'
+        return std::max(socketIds.size(), 1ul);
+
+Upstream-Status: Submitted [https://jira.mongodb.org/browse/SERVER-74633]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/mongo/util/processinfo_linux.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/src/mongo/util/processinfo_linux.cpp
++++ b/src/mongo/util/processinfo_linux.cpp
+@@ -421,7 +421,7 @@ public:
+ 
+         // On ARM64, the "physical id" field is unpopulated, causing there to be 0 sockets found. In
+         // this case, we default to 1.
+-        return std::max(socketIds.size(), 1ul);
++        return std::max(static_cast<unsigned long>(socketIds.size()), 1ul);
+     }
+ 
+     /**

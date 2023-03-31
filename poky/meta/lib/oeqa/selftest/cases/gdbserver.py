@@ -10,13 +10,12 @@ import shutil
 import concurrent.futures
 
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import bitbake, get_bb_var, runqemu, runCmd
+from oeqa.utils.commands import bitbake, get_bb_var, get_bb_vars , runqemu, runCmd
 
 class GdbServerTest(OESelftestTestCase):
     def test_gdb_server(self):
         target_arch = self.td["TARGET_ARCH"]
         target_sys = self.td["TARGET_SYS"]
-        deploy_dir = get_bb_var("DEPLOY_DIR_IMAGE")
 
         features = """
 IMAGE_GEN_DEBUGFS = "1"
@@ -34,11 +33,13 @@ CORE_IMAGE_EXTRA_INSTALL = "gdbserver"
         r = runCmd("%s --version" % gdb_binary, native_sysroot=native_sysroot, target_sys=target_sys)
         self.assertEqual(r.status, 0)
         self.assertIn("GNU gdb", r.output)
+        image = 'core-image-minimal'
+        bb_vars = get_bb_vars(['DEPLOY_DIR_IMAGE', 'IMAGE_LINK_NAME'], image)
 
         with tempfile.TemporaryDirectory(prefix="debugfs-") as debugfs:
-            filename = os.path.join(deploy_dir, "core-image-minimal-%s-dbg.tar.bz2" % self.td["MACHINE"])
+            filename = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], "%s-dbg.tar.bz2" % bb_vars['IMAGE_LINK_NAME'])
             shutil.unpack_archive(filename, debugfs)
-            filename = os.path.join(deploy_dir, "core-image-minimal-%s.tar.bz2" % self.td["MACHINE"])
+            filename = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], "%s.tar.bz2" % bb_vars['IMAGE_LINK_NAME'])
             shutil.unpack_archive(filename, debugfs)
 
             with runqemu("core-image-minimal", runqemuparams="nographic") as qemu:

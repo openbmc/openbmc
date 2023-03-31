@@ -69,12 +69,10 @@ type the following::
 
    $ bitbake matchbox-desktop
 
-Several different
-versions of ``matchbox-desktop`` might exist. BitBake chooses the one
-selected by the distribution configuration. You can get more details
-about how BitBake chooses between different target versions and
-providers in the
-":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-execution:preferences`" section
+Several different versions of ``matchbox-desktop`` might exist. BitBake chooses
+the one selected by the distribution configuration. You can get more details
+about how BitBake chooses between different target versions and providers in the
+":ref:`bitbake-user-manual/bitbake-user-manual-execution:preferences`" section
 of the BitBake User Manual.
 
 BitBake also tries to execute any dependent tasks first. So for example,
@@ -570,13 +568,11 @@ Source Control Managers (Optional)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Another place from which the build system can get source files is with
-:ref:`bitbake:bitbake-user-manual/bitbake-user-manual-fetching:fetchers` employing various Source
-Control Managers (SCMs) such as Git or Subversion. In such cases, a
-repository is cloned or checked out. The
-:ref:`ref-tasks-fetch` task inside
-BitBake uses the :term:`SRC_URI`
-variable and the argument's prefix to determine the correct fetcher
-module.
+:ref:`bitbake-user-manual/bitbake-user-manual-fetching:fetchers` employing
+various Source Control Managers (SCMs) such as Git or Subversion. In such
+cases, a repository is cloned or checked out. The :ref:`ref-tasks-fetch` task
+inside BitBake uses the :term:`SRC_URI` variable and the argument's prefix to
+determine the correct fetcher module.
 
 .. note::
 
@@ -680,7 +676,7 @@ closer look at each of those areas.
 .. note::
 
    Documentation for the BitBake tool is available separately. See the
-   BitBake User Manual
+   :doc:`BitBake User Manual <bitbake:index>`
    for reference material on BitBake.
 
 Source Fetching
@@ -1145,7 +1141,7 @@ Since :term:`STAMPS_DIR` is usually a subdirectory of :term:`TMPDIR`, removing
 properly be rerun to repopulate :term:`TMPDIR`.
 
 If you want some task to always be considered "out of date", you can
-mark it with the :ref:`nostamp <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:variable flags>`
+mark it with the :ref:`nostamp <bitbake-user-manual/bitbake-user-manual-metadata:variable flags>`
 varflag. If some other task depends on such a task, then that task will
 also always be considered out of date, which might not be what you want.
 
@@ -1811,19 +1807,18 @@ The following list explains the previous example:
       }
       addtask do_deploy_setscene
 
-  ``sstate_setscene()`` takes the flags above as input and accelerates the :ref:`ref-tasks-deploy` task
-  through the shared state cache if possible. If the task was
-  accelerated, ``sstate_setscene()`` returns True. Otherwise, it
-  returns False, and the normal :ref:`ref-tasks-deploy` task runs. For more
-  information, see the ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-execution:setscene`"
-  section in the BitBake User Manual.
+   ``sstate_setscene()`` takes the flags above as input and accelerates the
+   :ref:`ref-tasks-deploy` task through the shared state cache if possible. If
+   the task was accelerated, ``sstate_setscene()`` returns True. Otherwise, it
+   returns False, and the normal :ref:`ref-tasks-deploy` task runs. For more
+   information, see the ":ref:`bitbake-user-manual/bitbake-user-manual-execution:setscene`"
+   section in the BitBake User Manual.
 
--  The ``do_deploy[dirs] = "${DEPLOYDIR} ${B}"`` line creates
-   ``${DEPLOYDIR}`` and ``${B}`` before the :ref:`ref-tasks-deploy` task runs, and
-   also sets the current working directory of :ref:`ref-tasks-deploy` to ``${B}``.
-   For more information, see the ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:variable flags`"
-   section in the BitBake
-   User Manual.
+-  The ``do_deploy[dirs] = "${DEPLOYDIR} ${B}"`` line creates ``${DEPLOYDIR}``
+   and ``${B}`` before the :ref:`ref-tasks-deploy` task runs, and also sets the
+   current working directory of :ref:`ref-tasks-deploy` to ``${B}``. For more
+   information, see the ":ref:`bitbake-user-manual/bitbake-user-manual-metadata:variable flags`"
+   section in the BitBake User Manual.
 
    .. note::
 
@@ -1835,12 +1830,10 @@ The following list explains the previous example:
               do_package[sstate-plaindirs] = "${PKGD} ${PKGDEST}"
 
 
--  The ``do_deploy[stamp-extra-info] = "${MACHINE_ARCH}"`` line appends
-   extra metadata to the :ref:`stamp
-   file <overview-manual/concepts:stamp files and the rerunning of tasks>`. In
-   this case, the metadata makes the task specific to a machine's architecture.
-   See
-   ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-execution:the task list`"
+-  The ``do_deploy[stamp-extra-info] = "${MACHINE_ARCH}"`` line appends extra
+   metadata to the :ref:`stamp file <overview-manual/concepts:stamp files and the rerunning of tasks>`.
+   In this case, the metadata makes the task specific to a machine's architecture.
+   See the ":ref:`bitbake-user-manual/bitbake-user-manual-execution:the task list`"
    section in the BitBake User Manual for more information on the
    ``stamp-extra-info`` flag.
 
@@ -2122,12 +2115,12 @@ dependencies, you must manually declare the dependencies.
    :term:`ALLOW_EMPTY` variable
    for more information.
 
-The :ref:`ref-tasks-package` task depends on the :ref:`ref-tasks-packagedata` task of each
-recipe in :term:`DEPENDS` through use
-of a ``[``\ :ref:`deptask <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:variable flags>`\ ``]``
-declaration, which guarantees that the required
-shared-library/module-to-package mapping information will be available
-when needed as long as :term:`DEPENDS` has been correctly set.
+The :ref:`ref-tasks-package` task depends on the :ref:`ref-tasks-packagedata`
+task of each recipe in :term:`DEPENDS` through use of a
+``[``\ :ref:`deptask <bitbake-user-manual/bitbake-user-manual-metadata:variable flags>`\ ``]``
+declaration, which guarantees that the required shared-library /
+module-to-package mapping information will be available when needed as long as
+:term:`DEPENDS` has been correctly set.
 
 Fakeroot and Pseudo
 ===================

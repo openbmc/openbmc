@@ -16,8 +16,9 @@ PACKAGECONFIG[gles] = "-DFREEGLUT_GLES=ON,-DFREEGLUT_GLES=OFF,"
 PACKAGECONFIG[wayland] = "-DFREEGLUT_WAYLAND=ON,-DFREEGLUT_WAYLAND=OFF,libxkbcommon"
 PACKAGECONFIG[demos] = "-DFREEGLUT_BUILD_DEMOS=ON,-DFREEGLUT_BUILD_DEMOS=OFF,"
 PACKAGECONFIG[x11] = ",,virtual/libx11 libice libxmu libglu libxrandr libxext"
-# Do not use -fno-common, check back when upgrading to new version it might not be needed
-CFLAGS += "-fcommon"
+# Add -Wno-implicit-function-declaration since it might be otherwise treated at
+# error by clang16+ and this is not really a problem
+CFLAGS += "-Wno-implicit-function-declaration"
 
 PROVIDES += "mesa-glut"
 

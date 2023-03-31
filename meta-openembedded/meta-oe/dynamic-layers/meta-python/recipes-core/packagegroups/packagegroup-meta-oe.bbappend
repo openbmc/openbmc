@@ -3,10 +3,10 @@ RDEPENDS:packagegroup-meta-oe-devtools += "\
     rwmem \
     mongodb \
 "
-packagegroup-meta-oe-devtools:remove:riscv64 = "mongodb"
-packagegroup-meta-oe-devtools:remove:riscv32 = "mongodb"
-packagegroup-meta-oe-devtools:remove:mipsarch = "mongodb"
-packagegroup-meta-oe-devtools:remove:powerpc = "mongodb"
+RDEPENDS:packagegroup-meta-oe-devtools:remove:riscv64 = "mongodb"
+RDEPENDS:packagegroup-meta-oe-devtools:remove:riscv32 = "mongodb"
+RDEPENDS:packagegroup-meta-oe-devtools:remove:mipsarch = "mongodb"
+RDEPENDS:packagegroup-meta-oe-devtools:remove:powerpc = "mongodb"
 
 RDEPENDS:packagegroup-meta-oe-connectivity += "\
     lirc \

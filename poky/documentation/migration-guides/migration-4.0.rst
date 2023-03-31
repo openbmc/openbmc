@@ -207,8 +207,8 @@ For the ``append`` plus ``+=`` (and ``prepend`` plus ``=+``) combinations,
 the content should be prefixed (respectively suffixed) by a space to maintain
 the same behavior.  You can learn more about override style syntax operators
 (``append``, ``prepend`` and ``remove``) in the BitBake documentation:
-:ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:appending and prepending (override style syntax)`
-and :ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:removal (override style syntax)`.
+:ref:`bitbake-user-manual/bitbake-user-manual-metadata:appending and prepending (override style syntax)`
+and :ref:`bitbake-user-manual/bitbake-user-manual-metadata:removal (override style syntax)`.
 
 Miscellaneous changes
 ~~~~~~~~~~~~~~~~~~~~~

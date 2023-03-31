@@ -67,6 +67,8 @@ FILES:${PN}-dev += "${libdir}/gstreamer-1.0/*.a ${libdir}/gstreamer-1.0/include"
 FILES:${PN}-bash-completion += "${datadir}/bash-completion/completions/ ${datadir}/bash-completion/helpers/gst*"
 FILES:${PN}-dbg += "${datadir}/gdb ${datadir}/gstreamer-1.0/gdb"
 
+RDEPENDS:${PN}-ptest:append:libc-glibc = " glibc-gconv-iso8859-5"
+
 CVE_PRODUCT = "gstreamer"
 
 PTEST_BUILD_HOST_FILES = ""

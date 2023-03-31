@@ -243,12 +243,12 @@ system and gives an overview of their function and contents.
       To add a tune to the list, be sure to append it with spaces using the
       "+=" BitBake operator. Do not simply replace the list by using the
       "=" operator. See the
-      ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:basic syntax`" section in the BitBake
+      ":ref:`bitbake-user-manual/bitbake-user-manual-metadata:basic syntax`" section in the BitBake
       User Manual for more information.
 
    :term:`AZ_SAS`
       Azure Storage Shared Access Signature, when using the
-      :ref:`Azure Storage fetcher (az://) <bitbake:bitbake-user-manual/bitbake-user-manual-fetching:fetchers>`
+      :ref:`Azure Storage fetcher (az://) <bitbake-user-manual/bitbake-user-manual-fetching:fetchers>`
       This variable can be defined to be used by the fetcher to authenticate
       and gain access to non-public artifacts::
 
@@ -1833,15 +1833,14 @@ system and gives an overview of their function and contents.
 
           DEPENDS = "bar"
 
-      The practical effect of the previous
-      assignment is that all files installed by bar will be available in
-      the appropriate staging sysroot, given by the
-      :term:`STAGING_DIR* <STAGING_DIR>` variables, by the time the
-      :ref:`ref-tasks-configure` task for ``foo`` runs.
-      This mechanism is implemented by having :ref:`ref-tasks-configure` depend on
-      the :ref:`ref-tasks-populate_sysroot` task of
-      each recipe listed in :term:`DEPENDS`, through a
-      ``[``\ :ref:`deptask <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:variable flags>`\ ``]``
+      The practical effect of the previous assignment is that all files
+      installed by bar will be available in the appropriate staging sysroot,
+      given by the :term:`STAGING_DIR* <STAGING_DIR>` variables, by the time
+      the :ref:`ref-tasks-configure` task for ``foo`` runs. This mechanism is
+      implemented by having :ref:`ref-tasks-configure` depend on the
+      :ref:`ref-tasks-populate_sysroot` task of each recipe listed in
+      :term:`DEPENDS`, through a
+      ``[``\ :ref:`deptask <bitbake-user-manual/bitbake-user-manual-metadata:variable flags>`\ ``]``
       declaration in the :ref:`ref-classes-base` class.
 
       .. note::
@@ -1888,12 +1887,12 @@ system and gives an overview of their function and contents.
             to the recipe that installs ``libbar``, other recipes might
             fail to link against ``libfoo``.
 
-      For information on runtime dependencies, see the
-      :term:`RDEPENDS` variable. You can also see the
-      ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:tasks`" and
-      ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-execution:dependencies`" sections in the
-      BitBake User Manual for additional information on tasks and
-      dependencies.
+      For information on runtime dependencies, see the :term:`RDEPENDS`
+      variable. You can also see the
+      ":ref:`bitbake-user-manual/bitbake-user-manual-metadata:tasks`" and
+      ":ref:`bitbake-user-manual/bitbake-user-manual-execution:dependencies`"
+      sections in the BitBake User Manual for additional information on tasks
+      and dependencies.
 
    :term:`DEPLOY_DIR`
       Points to the general area that the OpenEmbedded build system uses to
@@ -2111,19 +2110,27 @@ system and gives an overview of their function and contents.
       provide with this variable, see the ":ref:`ref-features-distro`" section.
 
    :term:`DISTRO_FEATURES_BACKFILL`
-      Features to be added to :term:`DISTRO_FEATURES` if not also present in
-      :term:`DISTRO_FEATURES_BACKFILL_CONSIDERED`.
+      A space-separated list of features to be added to :term:`DISTRO_FEATURES`
+      if not also present in :term:`DISTRO_FEATURES_BACKFILL_CONSIDERED`.
 
       This variable is set in the ``meta/conf/bitbake.conf`` file. It is
       not intended to be user-configurable. It is best to just reference
-      the variable to see which distro features are being backfilled for
-      all distro configurations. See the ":ref:`ref-features-backfill`" section
-      for more information.
+      the variable to see which distro features are being
+      :ref:`backfilled <ref-features-backfill>` for all distro configurations.
 
    :term:`DISTRO_FEATURES_BACKFILL_CONSIDERED`
-      Features from :term:`DISTRO_FEATURES_BACKFILL` that should not be
-      backfilled (i.e. added to :term:`DISTRO_FEATURES`) during the build. See
-      the ":ref:`ref-features-backfill`" section for more information.
+      A space-separated list of features from :term:`DISTRO_FEATURES_BACKFILL`
+      that should not be :ref:`backfilled <ref-features-backfill>` (i.e. added
+      to :term:`DISTRO_FEATURES`) during the build.
+
+      This corresponds to an opt-out mechanism. When new default distro
+      features are introduced, distribution maintainers can review (`consider`)
+      them and decide to exclude them from the
+      :ref:`backfilled <ref-features-backfill>` features. Therefore, the
+      combination of :term:`DISTRO_FEATURES_BACKFILL` and
+      :term:`DISTRO_FEATURES_BACKFILL_CONSIDERED` makes it possible to
+      add new default features without breaking existing distributions.
+
 
    :term:`DISTRO_FEATURES_DEFAULT`
       A convenience variable that gives you the default list of distro
@@ -2809,15 +2816,13 @@ system and gives an overview of their function and contents.
       recipe to correctly extend the path.
 
    :term:`FILESOVERRIDES`
-      A subset of :term:`OVERRIDES` used by the
-      OpenEmbedded build system for creating
-      :term:`FILESPATH`. The :term:`FILESOVERRIDES` variable
-      uses overrides to automatically extend the
-      :term:`FILESPATH` variable. For an example of how
-      that works, see the :term:`FILESPATH` variable
+      A subset of :term:`OVERRIDES` used by the OpenEmbedded build system for
+      creating :term:`FILESPATH`. The :term:`FILESOVERRIDES` variable uses
+      overrides to automatically extend the :term:`FILESPATH` variable. For an
+      example of how that works, see the :term:`FILESPATH` variable
       description. Additionally, you find more information on how overrides
       are handled in the
-      ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:conditional syntax (overrides)`"
+      ":ref:`bitbake-user-manual/bitbake-user-manual-metadata:conditional syntax (overrides)`"
       section of the BitBake User Manual.
 
       By default, the :term:`FILESOVERRIDES` variable is defined as::
@@ -3539,19 +3544,19 @@ system and gives an overview of their function and contents.
             section in the Yocto Project Development Tasks Manual.
 
          -  Using :term:`IMAGE_INSTALL` with the
-            :ref:`+= <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:appending (+=) and prepending (=+) with spaces>`
+            :ref:`+= <bitbake-user-manual/bitbake-user-manual-metadata:appending (+=) and prepending (=+) with spaces>`
             BitBake operator within the ``/conf/local.conf`` file or from
-            within an image recipe is not recommended. Use of this operator
-            in these ways can cause ordering issues. Since
-            :ref:`ref-classes-core-image` sets :term:`IMAGE_INSTALL` to a default
-            value using the
-            :ref:`?= <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:setting a default value (?=)>`
+            within an image recipe is not recommended. Use of this operator in
+            these ways can cause ordering issues. Since
+            :ref:`ref-classes-core-image` sets :term:`IMAGE_INSTALL` to a
+            default value using the
+            :ref:`?= <bitbake-user-manual/bitbake-user-manual-metadata:setting a default value (?=)>`
             operator, using a ``+=`` operation against :term:`IMAGE_INSTALL`
             results in unexpected behavior when used within
-            ``conf/local.conf``. Furthermore, the same operation from
-            within an image recipe may or may not succeed depending on the
-            specific situation. In both these cases, the behavior is
-            contrary to how most users expect the ``+=`` operator to work.
+            ``conf/local.conf``. Furthermore, the same operation from within an
+            image recipe may or may not succeed depending on the specific
+            situation. In both these cases, the behavior is contrary to how
+            most users expect the ``+=`` operator to work.
 
    :term:`IMAGE_LINGUAS`
       Specifies the list of locales to install into the image during the
@@ -3913,7 +3918,7 @@ system and gives an overview of their function and contents.
       ``classes-global/`` or ``classes/`` subdirectories.
 
       For more information on :term:`INHERIT`, see the
-      :ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:\`\`inherit\`\` configuration directive`"
+      :ref:`bitbake-user-manual/bitbake-user-manual-metadata:\`\`inherit\`\` configuration directive`"
       section in the BitBake User Manual.
 
    :term:`INHERIT_DISTRO`
@@ -4736,31 +4741,7 @@ system and gives an overview of their function and contents.
       ``LAYERRECOMMENDS_mylayer``).
 
    :term:`LAYERSERIES_COMPAT`
-      Lists the versions of the :term:`OpenEmbedded-Core (OE-Core)` for which
-      a layer is compatible. Using the :term:`LAYERSERIES_COMPAT` variable
-      allows the layer maintainer to indicate which combinations of the
-      layer and OE-Core can be expected to work. The variable gives the
-      system a way to detect when a layer has not been tested with new
-      releases of OE-Core (e.g. the layer is not maintained).
-
-      To specify the OE-Core versions for which a layer is compatible, use
-      this variable in your layer's ``conf/layer.conf`` configuration file.
-      For the list, use the Yocto Project
-      :yocto_wiki:`Release Name </Releases>` (e.g.
-      &DISTRO_NAME_NO_CAP;). To specify multiple OE-Core versions for the
-      layer, use a space-separated list::
-
-         LAYERSERIES_COMPAT_layer_root_name = "&DISTRO_NAME_NO_CAP; &DISTRO_NAME_NO_CAP_MINUS_ONE;"
-
-      .. note::
-
-         Setting :term:`LAYERSERIES_COMPAT` is required by the Yocto Project
-         Compatible version 2 standard.
-         The OpenEmbedded build system produces a warning if the variable
-         is not set for any given layer.
-
-      See the ":ref:`dev-manual/layers:creating your own layer`"
-      section in the Yocto Project Development Tasks Manual.
+      See :term:`bitbake:LAYERSERIES_COMPAT` in the BitBake manual.
 
    :term:`LAYERVERSION`
       Optionally specifies the version of a layer as a single number. You
@@ -5129,19 +5110,27 @@ system and gives an overview of their function and contents.
       shipped, see the ":ref:`ref-features-machine`" section.
 
    :term:`MACHINE_FEATURES_BACKFILL`
-      Features to be added to :term:`MACHINE_FEATURES` if not also present in
+      A list of space-separated features to be added to
+      :term:`MACHINE_FEATURES` if not also present in
       :term:`MACHINE_FEATURES_BACKFILL_CONSIDERED`.
 
-      This variable is set in the ``meta/conf/bitbake.conf`` file. It is
-      not intended to be user-configurable. It is best to just reference
-      the variable to see which machine features are being backfilled for
-      all machine configurations. See the ":ref:`ref-features-backfill`"
-      section for more information.
+      This variable is set in the ``meta/conf/bitbake.conf`` file. It is not
+      intended to be user-configurable. It is best to just reference the
+      variable to see which machine features are being
+      :ref:`backfilled <ref-features-backfill>` for all machine configurations.
 
    :term:`MACHINE_FEATURES_BACKFILL_CONSIDERED`
-      Features from :term:`MACHINE_FEATURES_BACKFILL` that should not be
-      backfilled (i.e. added to :term:`MACHINE_FEATURES`) during the build. See
-      the ":ref:`ref-features-backfill`" section for more information.
+      A list of space-separated features from :term:`MACHINE_FEATURES_BACKFILL`
+      that should not be :ref:`backfilled <ref-features-backfill>` (i.e. added
+      to :term:`MACHINE_FEATURES`) during the build.
+
+      This corresponds to an opt-out mechanism. When new default machine
+      features are introduced, machine definition maintainers can review
+      (`consider`) them and decide to exclude them from the
+      :ref:`backfilled <ref-features-backfill>` features. Therefore, the
+      combination of :term:`MACHINE_FEATURES_BACKFILL` and
+      :term:`MACHINE_FEATURES_BACKFILL_CONSIDERED` makes it possible to
+      add new default features without breaking existing machine definitions.
 
    :term:`MACHINEOVERRIDES`
       A colon-separated list of overrides that apply to the current
@@ -5603,7 +5592,7 @@ system and gives an overview of their function and contents.
          FOO:an-override = "overridden"
 
       See the
-      ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:conditional syntax (overrides)`"
+      ":ref:`bitbake-user-manual/bitbake-user-manual-metadata:conditional syntax (overrides)`"
       section in the BitBake User Manual for more information on the
       overrides mechanism.
 
@@ -6808,12 +6797,11 @@ system and gives an overview of their function and contents.
 
          RDEPENDS:${PN} = "foo (>= 1.2)"
 
-      For information on build-time dependencies, see the
-      :term:`DEPENDS` variable. You can also see the
-      ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:tasks`" and
-      ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-execution:dependencies`" sections in the
-      BitBake User Manual for additional information on tasks and
-      dependencies.
+      For information on build-time dependencies, see the :term:`DEPENDS`
+      variable. You can also see the
+      ":ref:`bitbake-user-manual/bitbake-user-manual-metadata:tasks`" and
+      ":ref:`bitbake-user-manual/bitbake-user-manual-execution:dependencies`" sections in the
+      BitBake User Manual for additional information on tasks and dependencies.
 
    :term:`RECIPE_NO_UPDATE_REASON`
       If a recipe should not be replaced by a more recent upstream version,

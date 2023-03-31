@@ -1,0 +1,43 @@
+From a54e035f802e79e3292d8ad39a14bd7c060eb7b1 Mon Sep 17 00:00:00 2001
+From: Breno Leitao <breno.leitao@gmail.com>
+Date: Tue, 21 Mar 2023 21:58:28 -0700
+Subject: [PATCH] include: Check for previous declaration of uintptr_t
+
+Adding a extra check before declaring uintptr_t. Currently musl uses
+macro __DEFINED_uintptr_t once it defines uintptr_t type. Checking
+this macro before defining it, and, defining it when uintptr_t is
+defined.
+
+Taken from Alpine
+
+Upstream-Status: Pending
+Signed-off-by: Breno Leitao <breno.leitao@gmail.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/cmocka.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/cmocka.h b/include/cmocka.h
+index a21d965..f540793 100644
+--- a/include/cmocka.h
++++ b/include/cmocka.h
+@@ -121,7 +121,7 @@ typedef uintmax_t LargestIntegralType;
+     ((LargestIntegralType)(value))
+ 
+ /* Smallest integral type capable of holding a pointer. */
+-#if !defined(_UINTPTR_T) && !defined(_UINTPTR_T_DEFINED) && !defined(HAVE_UINTPTR_T)
++#if !defined(_UINTPTR_T) && !defined(_UINTPTR_T_DEFINED) && !defined(HAVE_UINTPTR_T) && !defined(__DEFINED_uintptr_t)
+ # if defined(_WIN32)
+     /* WIN32 is an ILP32 platform */
+     typedef unsigned int uintptr_t;
+@@ -147,6 +147,7 @@ typedef uintmax_t LargestIntegralType;
+ 
+ # define _UINTPTR_T
+ # define _UINTPTR_T_DEFINED
++# define __DEFINED_uintptr_t
+ #endif /* !defined(_UINTPTR_T) || !defined(_UINTPTR_T_DEFINED) */
+ 
+ /* Perform an unsigned cast to uintptr_t. */
+-- 
+2.40.0
+

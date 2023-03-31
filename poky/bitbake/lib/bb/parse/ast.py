@@ -400,6 +400,9 @@ def finalize(fn, d, variant = None):
 
         d.setVar('BBINCLUDED', bb.parse.get_file_depends(d))
 
+        if d.getVar('__BBAUTOREV_SEEN') and d.getVar('__BBSRCREV_SEEN') and not d.getVar("__BBAUTOREV_ACTED_UPON"):
+            bb.fatal("AUTOREV/SRCPV set too late for the fetcher to work properly, please set the variables earlier in parsing. Erroring instead of later obtuse build failures.")
+
         bb.event.fire(bb.event.RecipeParsed(fn), d)
     finally:
         bb.event.set_handlers(saved_handlers)

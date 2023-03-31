@@ -1,4 +1,4 @@
-From 0d066a901292e6a44ff7bc7ee16f99dd2ba4ea15 Mon Sep 17 00:00:00 2001
+From b4ec6635af4d4a47e9ab7bbd5347e78710d19362 Mon Sep 17 00:00:00 2001
 From: Tudor Florea <tudor.florea@enea.com>
 Date: Wed, 28 May 2014 18:59:54 +0200
 Subject: [PATCH] ethtool: use serial-tests config needed by ptest.
@@ -15,11 +15,11 @@ Upstream-Status: Inappropriate
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index 3eb4e7b..ee5c72f 100644
+index ebdfd39..c93b79a 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
- AC_INIT(ethtool, 6.1, netdev@vger.kernel.org)
+ AC_INIT(ethtool, 6.2, netdev@vger.kernel.org)
  AC_PREREQ(2.52)
  AC_CONFIG_SRCDIR([ethtool.c])
 -AM_INIT_AUTOMAKE([gnu subdir-objects])

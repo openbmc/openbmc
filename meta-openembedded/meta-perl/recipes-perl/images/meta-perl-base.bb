@@ -1,4 +1,4 @@
-SUMMARY = "meta-per build test image"
+SUMMARY = "meta-perl build test image"
 
 IMAGE_INSTALL = "packagegroup-core-boot"
 

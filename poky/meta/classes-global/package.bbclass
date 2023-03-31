@@ -468,7 +468,7 @@ python do_package () {
     # cache.  This is useful if an item this class depends on changes in a
     # way that the output of this class changes.  rpmdeps is a good example
     # as any change to rpmdeps requires this to be rerun.
-    # PACKAGE_BBCLASS_VERSION = "4"
+    # PACKAGE_BBCLASS_VERSION = "5"
 
     # Init cachedpath
     global cpath
@@ -495,6 +495,15 @@ python do_package () {
         return
 
     bb.build.exec_func("package_convert_pr_autoinc", d)
+
+    # Check for conflict between renamed packages and existing ones
+    # for each package in PACKAGES, check if it will be renamed to an existing one
+    for p in packages:
+        localdata = bb.data.createCopy(d)
+        localdata.setVar('OVERRIDES', p)
+        rename = localdata.getVar('PKG')
+        if (rename != None) and rename in packages:
+            bb.fatal('package "%s" is renamed to "%s" using PKG:%s, but package name already exists'%(p,rename,p))
 
     ###########################################################################
     # Optimisations

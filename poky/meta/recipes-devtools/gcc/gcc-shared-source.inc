@@ -16,6 +16,6 @@ do_deploy_source_date_epoch () {
 	sde_file=${SDE_FILE}
 	sde_file=${sde_file#${WORKDIR}/}
 	mkdir -p ${SDE_DEPLOYDIR} $(dirname ${SDE_FILE})
-	cp -p ${S}/../$sde_file ${SDE_DEPLOYDIR}
-	cp -p ${S}/../$sde_file ${SDE_FILE}
+	cp -p $(dirname ${S})/$sde_file ${SDE_DEPLOYDIR}
+	cp -p $(dirname ${S})/$sde_file ${SDE_FILE}
 }

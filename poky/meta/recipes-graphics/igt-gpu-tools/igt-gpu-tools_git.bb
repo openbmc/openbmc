@@ -12,7 +12,9 @@ inherit meson pkgconfig
 SRCREV = "2b29e8ac07fbcfadc48b9d60e4d736a6e3b289ab"
 PV = "1.27.1"
 
-SRC_URI = "git://gitlab.freedesktop.org/drm/igt-gpu-tools.git;protocol=https;branch=master"
+SRC_URI = "git://gitlab.freedesktop.org/drm/igt-gpu-tools.git;protocol=https;branch=master \
+           file://0001-Support-procps-4.x.patch \
+           "
 
 S = "${WORKDIR}/git"
 

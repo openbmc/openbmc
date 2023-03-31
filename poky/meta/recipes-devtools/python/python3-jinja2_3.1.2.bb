@@ -12,8 +12,7 @@ CVE_PRODUCT = "jinja2 jinja"
 
 CLEANBROKEN = "1"
 
-inherit pypi setuptools3
-inherit ${@bb.utils.filter('DISTRO_FEATURES', 'ptest', d)}
+inherit pypi setuptools3 ptest
 
 SRC_URI += " \
 	file://run-ptest \
@@ -25,9 +24,10 @@ do_install_ptest() {
 }
 
 RDEPENDS:${PN}-ptest += " \
-	${PYTHON_PN}-pytest \
-        ${PYTHON_PN}-toml \
-	${PYTHON_PN}-unixadmin \
+    ${PYTHON_PN}-pytest \
+    ${PYTHON_PN}-unittest-automake-output \
+    ${PYTHON_PN}-toml \
+    ${PYTHON_PN}-unixadmin \
 "
 
 RDEPENDS:${PN} += " \

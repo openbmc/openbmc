@@ -1,0 +1,28 @@
+From 6afaaf164ab9370204856961a92ad8ee523a8293 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Fri, 3 Mar 2023 13:24:58 +0100
+Subject: [PATCH] xorg-macros.m4.in: do not run AC_CANONICAL_HOST in manpage
+ section macro
+
+This doesn't work when building allarch items, as it calls into
+config.sub with the host triplet, and config.sub can't match
+it against any architeture it knows.
+
+Upstream-Status: Inappropriate [oe specific]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ xorg-macros.m4.in | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/xorg-macros.m4.in b/xorg-macros.m4.in
+index 3b8b8e9..6541236 100644
+--- a/xorg-macros.m4.in
++++ b/xorg-macros.m4.in
+@@ -111,7 +111,6 @@ AC_SUBST(TRADITIONALCPPFLAGS)
+ # Added AC_PROG_SED in version 1.8
+ 
+ AC_DEFUN([XORG_MANPAGE_SECTIONS],[
+-AC_REQUIRE([AC_CANONICAL_HOST])
+ AC_REQUIRE([AC_PROG_SED])
+ 
+ case $host_os in

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # ptest script for glibc - to run time related tests to
 # facilitate Y2038 validation
 # Run with 'ptest-runner glibc-tests'

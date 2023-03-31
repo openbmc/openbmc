@@ -77,7 +77,7 @@ adjustments:
       either define the entire list by using the "=" operator, or you
       will need to append a value using either ":append" or the "+="
       operator. You can learn more about these operators in the
-      ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:basic syntax`"
+      ":ref:`bitbake-user-manual/bitbake-user-manual-metadata:basic syntax`"
       section of the BitBake User Manual.
 
 -  If you have classes or recipes that add additional tasks to the

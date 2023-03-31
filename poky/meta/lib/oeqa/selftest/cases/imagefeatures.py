@@ -6,7 +6,7 @@
 
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.core.decorator import OETestTag
-from oeqa.utils.commands import runCmd, bitbake, get_bb_var, runqemu
+from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars, runqemu
 from oeqa.utils.sshcontrol import SSHControl
 import glob
 import os
@@ -102,12 +102,11 @@ class ImageFeatures(OESelftestTestCase):
         features = 'IMAGE_FSTYPES += " ext4 ext4.bmap ext4.bmap.gz"'
         self.write_config(features)
 
-        image_name = 'core-image-minimal'
-        bitbake(image_name)
+        image = 'core-image-minimal'
+        bitbake(image)
+        bb_vars = get_bb_vars(['DEPLOY_DIR_IMAGE', 'IMAGE_LINK_NAME'], image)
 
-        deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
-        link_name = get_bb_var('IMAGE_LINK_NAME', image_name)
-        image_path = os.path.join(deploy_dir_image, "%s.ext4" % link_name)
+        image_path = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], "%s.ext4" % bb_vars['IMAGE_LINK_NAME'])
         bmap_path = "%s.bmap" % image_path
         gzip_path = "%s.gz" % bmap_path
 
@@ -120,8 +119,8 @@ class ImageFeatures(OESelftestTestCase):
         image_stat = os.stat(image_path)
         self.assertGreater(image_stat.st_size, image_stat.st_blocks * 512)
 
-        # check if the resulting gzip is valid
-        self.assertTrue(runCmd('gzip -t %s' % gzip_path))
+        # check if the resulting gzip is valid, --force is needed in case gzip_path is a symlink
+        self.assertTrue(runCmd('gzip --test --force %s' % gzip_path))
 
     def test_hypervisor_fmts(self):
         """
@@ -139,14 +138,13 @@ class ImageFeatures(OESelftestTestCase):
             features += 'IMAGE_FSTYPES += "ext4.%s"\n' % itype
         self.write_config(features)
 
-        image_name = 'core-image-minimal'
-        bitbake(image_name)
+        image = 'core-image-minimal'
+        bitbake(image)
+        bb_vars = get_bb_vars(['DEPLOY_DIR_IMAGE', 'IMAGE_LINK_NAME'], image)
 
-        deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
-        link_name = get_bb_var('IMAGE_LINK_NAME', image_name)
         for itype in img_types:
-            image_path = os.path.join(deploy_dir_image, "%s.ext4.%s" %
-                                      (link_name, itype))
+            image_path = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], "%s.ext4.%s" %
+                                      (bb_vars['IMAGE_LINK_NAME'], itype))
 
             # check if result image file is in deploy directory
             self.assertTrue(os.path.exists(image_path))
@@ -177,13 +175,11 @@ class ImageFeatures(OESelftestTestCase):
         features = 'IMAGE_FSTYPES += "%s %s.sha256sum"' % (conv, conv)
         self.write_config(features)
 
-        image_name = 'core-image-minimal'
-        bitbake(image_name)
-
-        deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
-        link_name = get_bb_var('IMAGE_LINK_NAME', image_name)
-        image_path = os.path.join(deploy_dir_image, "%s.%s" %
-                                  (link_name, conv))
+        image = 'core-image-minimal'
+        bitbake(image)
+        bb_vars = get_bb_vars(['DEPLOY_DIR_IMAGE', 'IMAGE_LINK_NAME'], image)
+        image_path = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], "%s.%s" %
+                                  (bb_vars['IMAGE_LINK_NAME'], conv))
 
         # check if resulting image is in the deploy directory
         self.assertTrue(os.path.exists(image_path))
@@ -191,7 +187,7 @@ class ImageFeatures(OESelftestTestCase):
 
         # check if the resulting sha256sum agrees
         self.assertTrue(runCmd('cd %s;sha256sum -c %s.%s.sha256sum' %
-                               (deploy_dir_image, link_name, conv)))
+                               (bb_vars['DEPLOY_DIR_IMAGE'], bb_vars['IMAGE_LINK_NAME'], conv)))
 
     def test_image_fstypes(self):
         """
@@ -200,10 +196,10 @@ class ImageFeatures(OESelftestTestCase):
         Product:     oe-core
         Author:      Ed Bartosh <ed.bartosh@linux.intel.com>
         """
-        image_name = 'core-image-minimal'
+        image = 'core-image-minimal'
 
-        all_image_types = set(get_bb_var("IMAGE_TYPES", image_name).split())
-        skip_image_types = set(('container', 'elf', 'f2fs', 'multiubi', 'tar.zst', 'wic.zst', 'squashfs-lzo'))
+        all_image_types = set(get_bb_var("IMAGE_TYPES", image).split())
+        skip_image_types = set(('container', 'elf', 'f2fs', 'tar.zst', 'wic.zst', 'squashfs-lzo'))
         img_types = all_image_types - skip_image_types
 
         config = """
@@ -211,17 +207,31 @@ IMAGE_FSTYPES += "%s"
 WKS_FILE = "wictestdisk.wks"
 MKUBIFS_ARGS ?= "-m 2048 -e 129024 -c 2047"
 UBINIZE_ARGS ?= "-m 2048 -p 128KiB -s 512"
+MULTIUBI_BUILD += "mtd_2_128"
+MKUBIFS_ARGS_mtd_2_128 ?= "-m 2048 -e 129024 -c 2047"
+UBINIZE_ARGS_mtd_2_128 ?= "-m 2048 -p 128KiB -s 512"
+MULTIUBI_BUILD += "mtd_4_256"
+MKUBIFS_ARGS_mtd_4_256 ?= "-m 4096 -e 253952 -c 4096"
+UBINIZE_ARGS_mtd_4_256 ?= "-m 4096 -p 256KiB"
 """ % ' '.join(img_types)
         self.write_config(config)
 
-        bitbake(image_name)
+        bitbake(image)
+        bb_vars = get_bb_vars(['DEPLOY_DIR_IMAGE', 'IMAGE_LINK_NAME', 'MULTIUBI_BUILD'], image)
 
-        deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
-        link_name = get_bb_var('IMAGE_LINK_NAME', image_name)
         for itype in img_types:
-            image_path = os.path.join(deploy_dir_image, "%s.%s" % (link_name, itype))
-            # check if result image is in deploy directory
-            self.assertTrue(os.path.exists(image_path),
+            if itype == 'multiubi':
+                # For multiubi build we need to manage MULTIUBI_BUILD entry to append
+                # specific name to IMAGE_LINK_NAME
+                for vname in bb_vars['MULTIUBI_BUILD'].split():
+                    image_path = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], "%s_%s.ubifs" % (bb_vars['IMAGE_LINK_NAME'], vname))
+                    # check if result image is in deploy directory
+                    self.assertTrue(os.path.exists(image_path),
+                                    "%s image %s doesn't exist" % (itype, image_path))
+            else:
+            	image_path = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], "%s.%s" % (bb_vars['IMAGE_LINK_NAME'], itype))
+            	# check if result image is in deploy directory
+            	self.assertTrue(os.path.exists(image_path),
                             "%s image %s doesn't exist" % (itype, image_path))
 
     def test_useradd_static(self):
@@ -271,19 +281,20 @@ SKIP_RECIPE[busybox] = "Don't build this"
                      Yeoh Ee Peng <ee.peng.yeoh@intel.com>
         """
       
-        image_name = 'core-image-minimal'
+        image = 'core-image-minimal'
+        image_fstypes_debugfs = 'tar.bz2'
         features = 'IMAGE_GEN_DEBUGFS = "1"\n'
-        features += 'IMAGE_FSTYPES_DEBUGFS = "tar.bz2"\n'
+        features += 'IMAGE_FSTYPES_DEBUGFS = "%s"\n' % image_fstypes_debugfs
         self.write_config(features)
 
-        bitbake(image_name)
-        deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
-        dbg_tar_file = os.path.join(deploy_dir_image, "*-dbg.rootfs.tar.bz2")
-        debug_files = glob.glob(dbg_tar_file)
-        self.assertNotEqual(len(debug_files), 0, 'debug filesystem not generated at %s' % dbg_tar_file)
-        result = runCmd('cd %s; tar xvf %s' % (deploy_dir_image, dbg_tar_file))
+        bitbake(image)
+        bb_vars = get_bb_vars(['DEPLOY_DIR_IMAGE', 'IMAGE_LINK_NAME'], image)
+
+        dbg_tar_file = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], "%s-dbg.%s" % (bb_vars['IMAGE_LINK_NAME'], image_fstypes_debugfs))
+        self.assertTrue(os.path.exists(dbg_tar_file), 'debug filesystem not generated at %s' % dbg_tar_file)
+        result = runCmd('cd %s; tar xvf %s' % (bb_vars['DEPLOY_DIR_IMAGE'], dbg_tar_file))
         self.assertEqual(result.status, 0, msg='Failed to extract %s: %s' % (dbg_tar_file, result.output))
-        result = runCmd('find %s -name %s' % (deploy_dir_image, "udevadm"))
+        result = runCmd('find %s -name %s' % (bb_vars['DEPLOY_DIR_IMAGE'], "udevadm"))
         self.assertTrue("udevadm" in result.output, msg='Failed to find udevadm: %s' % result.output)
         dbg_symbols_targets = result.output.splitlines()
         self.assertTrue(dbg_symbols_targets, msg='Failed to split udevadm: %s' % dbg_symbols_targets)
@@ -293,9 +304,33 @@ SKIP_RECIPE[busybox] = "Don't build this"
 
     def test_empty_image(self):
         """Test creation of image with no packages"""
-        bitbake('test-empty-image')
-        res_dir = get_bb_var('DEPLOY_DIR_IMAGE')
-        images = os.path.join(res_dir, "test-empty-image-*.manifest")
-        result = glob.glob(images)
-        with open(result[1],"r") as f:
+        image = 'test-empty-image'
+        bitbake(image)
+        bb_vars = get_bb_vars(['DEPLOY_DIR_IMAGE', 'IMAGE_LINK_NAME'], image)
+        manifest = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], "%s.manifest" % bb_vars['IMAGE_LINK_NAME'])
+        self.assertTrue(os.path.exists(manifest))
+
+        with open(manifest, "r") as f:
                 self.assertEqual(len(f.read().strip()),0)
+
+    def test_mandb(self):
+        """
+        Test that an image containing manpages has working man and apropos commands.
+        """
+        config = """
+DISTRO_FEATURES:append = " api-documentation"
+CORE_IMAGE_EXTRA_INSTALL = "man-pages kmod-doc"
+"""
+        self.write_config(config)
+        bitbake("core-image-minimal")
+
+        with runqemu('core-image-minimal', ssh=False, runqemuparams='nographic') as qemu:
+            # This manpage is provided by man-pages
+            status, output = qemu.run_serial("apropos 8859")
+            self.assertEqual(status, 1, 'Failed to run apropos: %s' % (output))
+            self.assertIn("iso_8859_15", output)
+
+            # This manpage is provided by kmod
+            status, output = qemu.run_serial("man --pager=cat modprobe")
+            self.assertEqual(status, 1, 'Failed to run man: %s' % (output))
+            self.assertIn("force-modversion", output)

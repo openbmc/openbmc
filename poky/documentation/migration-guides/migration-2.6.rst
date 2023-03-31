@@ -274,7 +274,7 @@ The following changes have occurred:
    specifying list items to remove, be aware that leading and trailing
    whitespace resulting from the removal is retained.
 
-   See the ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:removal (override style syntax)`"
+   See the ":ref:`bitbake-user-manual/bitbake-user-manual-metadata:removal (override style syntax)`"
    section in the BitBake User Manual for a detailed example.
 
 .. _migration-2.6-systemd-configuration-now-split-out-to-system-conf:

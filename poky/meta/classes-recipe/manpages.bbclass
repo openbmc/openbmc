@@ -23,17 +23,7 @@ pkg_postinst:${MAN_PKG}:append () {
 	if ${@bb.utils.contains('PACKAGECONFIG', 'manpages', 'true', 'false', d)}; then
 		if test -n "$D"; then
 			if ${@bb.utils.contains('MACHINE_FEATURES', 'qemu-usermode', 'true', 'false', d)}; then
-				sed "s:\(\s\)/:\1$D/:g" $D${sysconfdir}/man_db.conf | ${@qemu_run_binary(d, '$D', '${bindir}/mandb')} -C - -u -q $D${mandir}
-				chown -R root:root $D${mandir}
-
-				mkdir -p $D${localstatedir}/cache/man
-				cd $D${mandir}
-				find . -name index.db | while read index; do
-					mkdir -p $D${localstatedir}/cache/man/$(dirname ${index})
-					mv ${index} $D${localstatedir}/cache/man/${index}
-					chown man:man $D${localstatedir}/cache/man/${index}
-				done
-				cd -
+				$INTERCEPT_DIR/postinst_intercept update_mandb ${PKG} mlprefix=${MLPREFIX} binprefix=${MLPREFIX} bindir=${bindir} sysconfdir=${sysconfdir} mandir=${mandir}
 			else
 				$INTERCEPT_DIR/postinst_intercept delay_to_first_boot ${PKG} mlprefix=${MLPREFIX}
 			fi

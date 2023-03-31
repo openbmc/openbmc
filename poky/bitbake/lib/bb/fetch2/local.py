@@ -72,7 +72,7 @@ class Local(FetchMethod):
             filespath = d.getVar('FILESPATH')
             if filespath:
                 locations = filespath.split(":")
-            msg = "Unable to find file " + urldata.url + " anywhere. The paths that were searched were:\n    " + "\n    ".join(locations)
+            msg = "Unable to find file " + urldata.url + " anywhere to download to " + urldata.localpath + ". The paths that were searched were:\n    " + "\n    ".join(locations)
             raise FetchError(msg)
 
         return True

@@ -1,5 +1,6 @@
 SUMMARY = "Meta-networking packagegroups"
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit packagegroup
 
 PROVIDES = "${PACKAGES}"
@@ -152,13 +153,13 @@ RDEPENDS:packagegroup-meta-networking-protocols = "\
     babeld \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "dante", "", d)} \
     freediameter \
+    frr \
     net-snmp \
     openflow \
     openflow \
     openl2tp \
     mdns \
     nopoll \
-    quagga \
     radiusclient-ng \
     tsocks \
     openlldp \
@@ -214,7 +215,7 @@ RDEPENDS:packagegroup-meta-networking-support = "\
     yp-tools \
     mtr \
     netsniff-ng \
-    ntp ntpdate sntp ntpdc ntpq ntp-tickadj ntp-utils \
+    ntp sntp ntpdc ntpq ntp-tickadj ntp-utils \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "ntpsec", "", d)} \
     nbd-client \
     nbd-server \
@@ -259,6 +260,7 @@ RDEPENDS:packagegroup-meta-networking-support = "\
     ettercap \
 "
 RDEPENDS:packagegroup-meta-networking-support:remove:mipsarch = "memcached"
+RDEPENDS:packagegroup-meta-networking-support:remove:riscv64 = "memcached"
 RDEPENDS:packagegroup-meta-networking-support:remove:libc-musl = "ypbind-mt"
 
 EXCLUDE_FROM_WORLD = "1"

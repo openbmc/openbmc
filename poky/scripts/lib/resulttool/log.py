@@ -28,12 +28,10 @@ def show_reproducible(result, reproducible, logger):
 def log(args, logger):
     results = resultutils.load_resultsdata(args.source)
 
-    ptest_count = sum(1 for _, _, _, r in resultutils.test_run_results(results) if 'ptestresult.sections' in r)
-    if ptest_count > 1 and not args.prepend_run:
-        print("%i ptest sections found. '--prepend-run' is required" % ptest_count)
-        return 1
-
     for _, run_name, _, r in resultutils.test_run_results(results):
+        if args.list_ptest:
+            print('\n'.join(sorted(r['ptestresult.sections'].keys())))
+
         if args.dump_ptest:
             for sectname in ['ptestresult.sections', 'ltpposixresult.sections', 'ltpresult.sections']:
              if sectname in r:
@@ -48,6 +46,9 @@ def log(args, logger):
 
                     os.makedirs(dest_dir, exist_ok=True)
                     dest = os.path.join(dest_dir, '%s.log' % name)
+                    if os.path.exists(dest):
+                        print("Overlapping ptest logs found, skipping %s. The '--prepend-run' option would avoid this" % name)
+                        continue
                     print(dest)
                     with open(dest, 'w') as f:
                         f.write(logdata)
@@ -86,6 +87,8 @@ def register_commands(subparsers):
     parser.set_defaults(func=log)
     parser.add_argument('source',
             help='the results file/directory/URL to import')
+    parser.add_argument('--list-ptest', action='store_true',
+            help='list the ptest test names')
     parser.add_argument('--ptest', action='append', default=[],
             help='show logs for a ptest')
     parser.add_argument('--dump-ptest', metavar='DIR',

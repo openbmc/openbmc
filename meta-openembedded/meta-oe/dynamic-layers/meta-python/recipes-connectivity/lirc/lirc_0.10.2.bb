@@ -21,6 +21,7 @@ SRC_URI = "http://prdownloads.sourceforge.net/lirc/lirc-${PV}.tar.bz2 \
            file://lirc_options.conf \
            file://lirc.tmpfiles \
            file://0001-Makefile.am-do-not-clobber-PYTHONPATH-from-build-env.patch \
+           file://0001-Unbolt-ubuntu-hack.patch \
            "
 SRC_URI[sha256sum] = "3d44ec8274881cf262f160805641f0827ffcc20ade0d85e7e6f3b90e0d3d222a"
 

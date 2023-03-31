@@ -381,7 +381,7 @@ def collect_dep_recipes(d, doc, spdx_recipe):
     return dep_recipes
 
 collect_dep_recipes[vardepsexclude] += "BB_TASKDEPDATA"
-
+collect_dep_recipes[vardeps] += "DEPENDS"
 
 def collect_dep_sources(d, dep_recipes):
     import oe.sbom

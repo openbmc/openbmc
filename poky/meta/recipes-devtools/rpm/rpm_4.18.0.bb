@@ -39,6 +39,7 @@ SRC_URI = "git://github.com/rpm-software-management/rpm;branch=rpm-4.18.x;protoc
            file://0001-build-pack.c-do-not-insert-payloadflags-into-.rpm-me.patch \
            file://0001-configure.ac-add-linux-gnux32-variant-to-triplet-han.patch \
            file://fifofix.patch \
+           file://0001-python-Use-Py_hash_t-instead-of-long-in-hdr_hash.patch \
            "
 
 PE = "1"
@@ -121,8 +122,8 @@ do_install:append:class-nativesdk() {
 
 	mkdir -p ${D}${SDKPATHNATIVE}/environment-setup.d
 	cat <<- EOF > ${D}${SDKPATHNATIVE}/environment-setup.d/rpm.sh
-		export RPM_CONFIGDIR="$OECORE_NATIVE_SYSROOT${libdir}/rpm"
-		export RPM_ETCCONFIGDIR="$OECORE_NATIVE_SYSROOT${sysconfdir}"
+		export RPM_CONFIGDIR="${libdir}/rpm"
+		export RPM_ETCCONFIGDIR="${SDKPATHNATIVE}"
 		export RPM_NO_CHROOT_FOR_SCRIPTS=1
 	EOF
 }
@@ -133,6 +134,9 @@ do_install:append:class-target() {
 }
 do_install:append:class-nativesdk() {
     rm -rf ${D}${SDKPATHNATIVE}/var
+    # Ensure find-debuginfo is located correctly inside SDK
+    mkdir -p ${D}${SDKPATHNATIVE}/etc/rpm
+    echo "%__find_debuginfo   ${SDKPATHNATIVE}/usr/bin/find-debuginfo" >> ${D}${SDKPATHNATIVE}/etc/rpm/macros
 }
 
 do_install:append () {
@@ -158,9 +162,7 @@ FILES:${PN}-build = "\
     ${libdir}/librpmbuild.so.* \
     ${libdir}/rpm/brp-* \
     ${libdir}/rpm/check-* \
-    ${libdir}/rpm/debugedit \
     ${libdir}/rpm/sepdebugcrcfix \
-    ${libdir}/rpm/find-debuginfo.sh \
     ${libdir}/rpm/find-lang.sh \
     ${libdir}/rpm/*provides* \
     ${libdir}/rpm/*requires* \
@@ -172,6 +174,7 @@ FILES:${PN}-build = "\
     ${libdir}/rpm/macros.p* \
     ${libdir}/rpm/fileattrs/* \
 "
+FILES:${PN}-build:append:class-nativesdk = " ${SDKPATHNATIVE}/etc/rpm/macros"
 
 FILES:${PN}-sign = "\
     ${bindir}/rpmsign \
@@ -186,7 +189,7 @@ PACKAGES += "python3-rpm"
 PROVIDES += "python3-rpm"
 FILES:python3-rpm = "${PYTHON_SITEPACKAGES_DIR}/rpm/*"
 
-RDEPENDS:${PN}-build = "bash perl python3-core"
+RDEPENDS:${PN}-build = "bash perl python3-core debugedit"
 
 PACKAGE_PREPROCESS_FUNCS += "rpm_package_preprocess"
 

@@ -1,10 +1,17 @@
+From fd3fce8c1a3d0c70a0ffd461fbbe7e2ef71dd3a7 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Tue, 7 Mar 2023 11:05:45 +0800
+Subject: [PATCH] Update patch for 1.17
 
-#
-# Patch managed by http://www.mn-logistik.de/unsupported/pxa250/patcher
-#
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ configure.ac | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
---- liblockfile-1.05/./configure.in~configure
-+++ liblockfile-1.05/./configure.in
+diff --git a/configure.ac b/configure.ac
+index df26cee..76e9165 100644
+--- a/configure.ac
++++ b/configure.ac
 @@ -1,4 +1,5 @@
 -AC_INIT(lockfile.c)
 +AC_INIT
@@ -12,7 +19,7 @@
  AC_CONFIG_HEADER(autoconf.h)
  AC_REVISION($Revision: 1.0 $)dnl
  
-@@ -111,7 +112,8 @@
+@@ -111,7 +112,8 @@ AC_SUBST(TARGETS)
  AC_SUBST(INSTALL_TARGETS)
  AC_SUBST(nfslockdir)
  
@@ -23,3 +30,6 @@
 -)
 +])
 +AC_OUTPUT
+-- 
+2.25.1
+

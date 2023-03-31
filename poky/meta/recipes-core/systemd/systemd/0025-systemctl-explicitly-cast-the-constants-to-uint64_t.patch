@@ -1,0 +1,44 @@
+From fad29ce1f5cc7b12bc13671d9ad80775771a67eb Mon Sep 17 00:00:00 2001
+From: Frantisek Sumsal <frantisek@sumsal.cz>
+Date: Fri, 3 Mar 2023 12:17:27 +0100
+Subject: [PATCH] systemctl: explicitly cast the constants to uint64_t
+
+Otherwise under certain conditions `va_arg()` might get garbage instead
+of the expected value, i.e.:
+
+$ sudo build-o0/systemctl disable asdfasfaf
+sd_bus_message_appendv: Got uint64_t: 0
+Failed to disable unit: Unit file asdfasfaf.service does not exist.
+
+$ sudo build-o1/systemctl disable asdfasfaf
+sd_bus_message_appendv: Got uint64_t: 7954875719681572864
+Failed to disable unit: Invalid argument
+
+(reproduced on an armv7hl machine)
+
+Resolves: #26568
+Follow-up to: bf1bea43f15
+Related issue: https://github.com/systemd/systemd/pull/14470#discussion_r362893735
+
+Upstream-Status: Backport [https://github.com/systemd/systemd/commit/c63bfd0884cf20e48befbee49d41f667660a8802]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ src/systemctl/systemctl-enable.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/systemctl/systemctl-enable.c b/src/systemctl/systemctl-enable.c
+index 86d9f602fa..f94a286122 100644
+--- a/src/systemctl/systemctl-enable.c
++++ b/src/systemctl/systemctl-enable.c
+@@ -211,7 +211,7 @@ int verb_enable(int argc, char *argv[], void *userdata) {
+ 
+                 if (send_runtime) {
+                         if (streq(method, "DisableUnitFilesWithFlagsAndInstallInfo"))
+-                                r = sd_bus_message_append(m, "t", arg_runtime ? UNIT_FILE_RUNTIME : 0);
++                                r = sd_bus_message_append(m, "t", arg_runtime ? (uint64_t) UNIT_FILE_RUNTIME : UINT64_C(0));
+                         else
+                                 r = sd_bus_message_append(m, "b", arg_runtime);
+                         if (r < 0)
+-- 
+2.39.2
+

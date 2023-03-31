@@ -1,0 +1,65 @@
+From c41b3be62fbb78e0939fddaebad519360cbd8702 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Mon, 6 Mar 2023 09:27:57 +0100
+Subject: [PATCH] src/w.c: use only utmpx
+
+Nowadays this works both on musl and glibc systems, however on musl
+utmp.h is also needed to avoid the following failure:
+
+| ../git/src/w.c: In function 'print_from':
+| ../git/src/w.c:73:28: error: '__UT_HOSTSIZE' undeclared (first use in this function); did you mean 'UT_HOSTSIZE'?
+|    73 | #       define UT_HOSTSIZE __UT_HOSTSIZE
+|       |                            ^~~~~~~~~~~~~
+| ../git/src/w.c:233:64: note: in expansion of macro 'UT_HOSTSIZE'
+|   233 |                         print_display_or_interface(u->ut_host, UT_HOSTSIZE, fromlen - len);
+|       |                                                                ^~~~~~~~~~~
+|
+
+It is caused by including utmpx.h, but not utmp.h, which (on musl)
+lacks the needed definitions.
+
+I have verified that both musl and glibc based builds continue to work.
+
+Upstream-Status: Submitted [https://gitlab.com/procps-ng/procps/-/merge_requests/171]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
+---
+ src/w.c | 17 ++---------------
+ 1 file changed, 2 insertions(+), 15 deletions(-)
+
+diff --git a/src/w.c b/src/w.c
+index 5e878f04..912c5df3 100644
+--- a/src/w.c
++++ b/src/w.c
+@@ -46,11 +46,8 @@
+ #include <termios.h>
+ #include <time.h>
+ #include <unistd.h>
+-#ifdef HAVE_UTMPX_H
+-#	include <utmpx.h>
+-#else
+-#	include <utmp.h>
+-#endif
++#include <utmp.h>
++#include <utmpx.h>
+ #include <arpa/inet.h>
+ 
+ #include "c.h"
+@@ -63,17 +60,7 @@
+ static int ignoreuser = 0;	/* for '-u' */
+ static int oldstyle = 0;	/* for '-o' */
+ 
+-#ifdef HAVE_UTMPX_H
+ typedef struct utmpx utmp_t;
+-#else
+-typedef struct utmp utmp_t;
+-#endif
+-
+-#if !defined(UT_HOSTSIZE) || defined(__UT_HOSTSIZE)
+-#	define UT_HOSTSIZE __UT_HOSTSIZE
+-#	define UT_LINESIZE __UT_LINESIZE
+-#	define UT_NAMESIZE __UT_NAMESIZE
+-#endif
+ 
+ #ifdef W_SHOWFROM
+ # define FROM_STRING "on"

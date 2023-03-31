@@ -1,0 +1,32 @@
+From f8ab74a76049f69adeebe92c62593547e05a075d Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@fujitsu.com>
+Date: Wed, 11 Jan 2023 17:22:41 +0900
+Subject: [PATCH] Fix build error when build this file.
+
+| snprintf.c:770:64: error: 'PG_STRERROR_R_BUFLEN' undeclared (first use in this function)
+|   770 |                                         char            errbuf[PG_STRERROR_R_BUFLEN];
+|       |                                                                ^~~~~~~~~~~~~~~~~~~~
+
+PG_STRERROR_R_BUFLEN is defined in postgresql, but pgpool doesn't
+include the header of postgresql.
+
+Upstream-Status: Inappropriate [OE-Specific]
+Signed-off-by: Lei Maohui <leimaohui@fujitsu.com>
+---
+ src/parser/snprintf.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/parser/snprintf.c b/src/parser/snprintf.c
+index 84ebdb2..3387897 100644
+--- a/src/parser/snprintf.c
++++ b/src/parser/snprintf.c
+@@ -46,6 +46,7 @@
+ #include "pool_parser.h"
+ #include "stringinfo.h"
+ #include "utils/palloc.h"
++#include "postgresql/server/port.h"
+
+ /*
+  * We used to use the platform's NL_ARGMAX here, but that's a bad idea,
+--
+2.25.1

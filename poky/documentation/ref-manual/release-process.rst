@@ -97,6 +97,23 @@ through the same release process as do point releases. You can find more
 information about stable branch maintenance at
 :yocto_wiki:`/Stable_branch_maintenance`.
 
+.. note::
+
+   In some circumstances, a layer can be created by the community in order to
+   add a specific feature or support a new version of some package for an LTS
+   release.  This is called a "mixin" layer. These are thin and specific
+   purpose layers which can be stacked with an LTS release to "mix" a specific
+   feature into that build. These are created on an as-needed basis and
+   maintained by the people who need them.
+
+   Policies on testing these layers depend on how widespread their usage is and
+   determined on a case-by-case basis. You can find some "mixin" layers in the
+   :yocto_git:`meta-lts-mixins </meta-lts-mixins>` repository. While the Yocto
+   Project provides hosting for those repositories, it does not provides
+   testing on them. Other "mixin" layers may be released elsewhere by the wider
+   community.
+
+
 Testing and Quality Assurance
 =============================
 

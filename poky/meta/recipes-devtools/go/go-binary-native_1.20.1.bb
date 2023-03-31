@@ -16,6 +16,8 @@ SRC_URI[go_linux_ppc64le.sha256sum] = "85cfd4b89b48c94030783b6e9e619e35557862358
 UPSTREAM_CHECK_URI = "https://golang.org/dl/"
 UPSTREAM_CHECK_REGEX = "go(?P<pver>\d+(\.\d+)+)\.linux"
 
+CVE_PRODUCT = "go"
+
 S = "${WORKDIR}/go"
 
 inherit goarch native

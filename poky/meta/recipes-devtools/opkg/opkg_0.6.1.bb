@@ -65,7 +65,7 @@ do_install_ptest () {
 RDEPENDS:${PN} = "${VIRTUAL-RUNTIME_update-alternatives} opkg-arch-config libarchive"
 RDEPENDS:${PN}:class-native = ""
 RDEPENDS:${PN}:class-nativesdk = ""
-RDEPENDS:${PN}-ptest += "make binutils python3-core python3-compression"
+RDEPENDS:${PN}-ptest += "make binutils python3-core python3-compression bash python3-crypt python3-io"
 RREPLACES:${PN} = "opkg-nogpg opkg-collateral"
 RCONFLICTS:${PN} = "opkg-collateral"
 RPROVIDES:${PN} = "opkg-collateral"

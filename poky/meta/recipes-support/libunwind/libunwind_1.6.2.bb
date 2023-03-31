@@ -5,6 +5,7 @@ SRC_URI = "http://download.savannah.nongnu.org/releases/libunwind/libunwind-${PV
            file://0004-Fix-build-on-mips-musl.patch \
            file://0005-ppc32-Consider-ucontext-mismatches-between-glibc-and.patch \
            file://0006-Fix-for-X32.patch \
+           file://0001-src-Gtrace-remove-unguarded-print-calls.patch \
            "
 SRC_URI:append:libc-musl = " file://musl-header-conflict.patch"
 

@@ -91,12 +91,21 @@ RDEPENDS:${PN}-ptest += " \
     packagegroup-core-buildessential \
     perl-dev \
     perl-module-blib \
+    perl-module-encode-encoding \
+    perl-module-extutils-cbuilder-base \
     perl-module-extutils-command-mm \
+    perl-module-extutils-mm-unix \
     perl-module-file-temp \
     perl-module-lib \
+    perl-module-parse-cpan-meta \
     perl-module-perlio \
     perl-module-perlio-encoding \
+    perl-module-pod-simple-transcodesmart \
     perl-module-pod-text \
+    perl-module-tap-base \
+    perl-module-tap-formatter-base \
+    perl-module-tap-formatter-file \
+    perl-module-tap-formatter-session \
     perl-module-tap-harness-env \
     perl-module-tap-parser \
     perl-module-tap-parser-scheduler \

@@ -1,9 +1,6 @@
 require timezone.inc
 
-#
 SUMMARY = "tzcode, timezone zoneinfo utils -- zic, zdump, tzselect"
-
-S = "${WORKDIR}"
 
 inherit native
 

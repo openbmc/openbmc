@@ -9,7 +9,7 @@ LICENSE = "GPL-2.0-only & LGPL-2.1-only"
 RDEPENDS:${PN}-ptest = "bash"
 
 require qemu-targets.inc
-inherit pkgconfig ptest
+inherit pkgconfig ptest update-rc.d systemd
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=441c28d2cf86e15a37fa47e15a72fbac \
                     file://COPYING.LIB;endline=24;md5=8c5efda6cf1e1b03dcfd0e6c0d271c7f"
@@ -32,6 +32,8 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0001-configure-Fix-check-tcg-not-executing-any-tests.patch \
            file://0001-Revert-linux-user-add-more-compat-ioctl-definitions.patch \
            file://0002-Revert-linux-user-fix-compat-with-glibc-2.36-sys-mou.patch \
+           file://qemu-guest-agent.init \
+           file://qemu-guest-agent.udev \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 
@@ -132,6 +134,20 @@ do_configure[cleandirs] += "${B}"
 do_install () {
 	export STRIP=""
 	oe_runmake 'DESTDIR=${D}' install
+
+	# If we built the guest agent, also install startup/udev rules
+	if [ -e "${D}${bindir}/qemu-ga" ]; then
+		install -d ${D}${sysconfdir}/init.d/
+		install -m 0755 ${WORKDIR}/qemu-guest-agent.init ${D}${sysconfdir}/init.d/qemu-guest-agent
+		sed -i 's:@bindir@:${bindir}:' ${D}${sysconfdir}/init.d/qemu-guest-agent
+
+		install -d ${D}${sysconfdir}/udev/rules.d/
+		install -m 0644 ${WORKDIR}/qemu-guest-agent.udev ${D}${sysconfdir}/udev/rules.d/60-qemu-guest-agent.rules
+
+		install -d ${D}${systemd_unitdir}/system/
+		install -m 0644 ${S}/contrib/systemd/qemu-guest-agent.service ${D}${systemd_unitdir}/system
+		sed -i -e 's,-/usr/bin/,-${bindir}/,g' ${D}${systemd_unitdir}/system/qemu-guest-agent.service
+	fi
 }
 
 # The following fragment will create a wrapper for qemu-mips user emulation
@@ -210,3 +226,20 @@ PACKAGECONFIG[jack] = "--enable-jack,--disable-jack,jack,"
 INSANE_SKIP:${PN} = "arch"
 
 FILES:${PN} += "${datadir}/icons"
+
+# Put the guest agent in a separate package
+PACKAGES =+ "${PN}-guest-agent"
+SUMMARY:${PN}-guest-agent = "QEMU guest agent"
+FILES:${PN}-guest-agent += " \
+    ${bindir}/qemu-ga \
+    ${sysconfdir}/udev/rules.d/60-qemu-guest-agent.rules \
+    ${sysconfdir}/init.d/qemu-guest-agent \
+    ${systemd_unitdir}/system/qemu-guest-agent.service \
+"
+
+INITSCRIPT_PACKAGES = "${PN}-guest-agent"
+INITSCRIPT_NAME:${PN}-guest-agent = "qemu-guest-agent"
+INITSCRIPT_PARAMS:${PN}-guest-agent = "defaults"
+
+SYSTEMD_PACKAGES = "${PN}-guest-agent"
+SYSTEMD_SERVICE:${PN}-guest-agent = "qemu-guest-agent.service"

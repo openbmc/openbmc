@@ -3,6 +3,7 @@ gdbserver_tests/hginfo
 memcheck/tests/supp_unknown
 helgrind/tests/tls_threads
 helgrind/tests/pth_mempcpy_false_races
+drd/tests/bar_bad
 drd/tests/bar_bad_xml
 drd/tests/pth_barrier_thr_cr
 drd/tests/std_thread2

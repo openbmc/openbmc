@@ -15,7 +15,7 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 
 --- a/config/cmake/libh5cc.in
 +++ b/config/cmake/libh5cc.in
-@@ -45,7 +45,7 @@ for arg in $@ ; do
+@@ -44,7 +44,7 @@ for arg in $@ ; do
        exit $status
        ;;
      *)
@@ -45,8 +45,8 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
                      H5_CPPFLAGS: @H5_CPPFLAGS@
                      AM_CPPFLAGS: @AM_CPPFLAGS@
                           CFLAGS: @CMAKE_C_FLAGS@
-@@ -52,8 +52,8 @@ Languages:
- @BUILD_FORTRAN_CONDITIONAL_TRUE@         Static Fortran Library: @H5_ENABLE_STATIC_LIB@
+@@ -53,8 +53,8 @@ Languages:
+ @BUILD_FORTRAN_CONDITIONAL_TRUE@               Module Directory: @CMAKE_Fortran_MODULE_DIRECTORY@
  
                              C++: @HDF5_BUILD_CPP_LIB@
 -@BUILD_CXX_CONDITIONAL_TRUE@                   C++ Compiler: @CMAKE_CXX_COMPILER@ @CMAKE_CXX_COMPILER_VERSION@

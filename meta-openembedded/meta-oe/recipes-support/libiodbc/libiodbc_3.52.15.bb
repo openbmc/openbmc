@@ -18,6 +18,7 @@ SRC_URI[sha256sum] = "c74541e3327fc9a1c7ccf103645471c67bc014542d70f572476eb07c0b
 inherit autotools
 
 EXTRA_OECONF += " --prefix=/usr/local \
+		--includedir=/usr/include/iodbc \
 		--with-iodbc-inidir=/etc \
 		--enable-odbc3 \
 		--enable-pthreads \

@@ -13,11 +13,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  configure.ac | 31 +++++++++++--------------------
  1 file changed, 11 insertions(+), 20 deletions(-)
 
-diff --git a/configure.ac b/configure.ac
-index d7cf692..f81b99d 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -3427,27 +3427,18 @@ AC_ARG_ENABLE(mmal,
+@@ -3461,27 +3461,18 @@ AC_ARG_ENABLE(mmal,
    AS_HELP_STRING([--enable-mmal],
      [Multi-Media Abstraction Layer (MMAL) hardware plugin (default enable)]))
  if test "${enable_mmal}" != "no"; then
@@ -56,6 +54,3 @@ index d7cf692..f81b99d 100644
  
  dnl
  dnl evas plugin
--- 
-2.26.1
-

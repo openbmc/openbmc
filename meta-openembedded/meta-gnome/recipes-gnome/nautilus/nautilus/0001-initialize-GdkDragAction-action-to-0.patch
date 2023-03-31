@@ -1,0 +1,47 @@
+From d8f8859369b228d86aeeb043d732b9c60fdce289 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 24 Mar 2023 15:29:04 -0700
+Subject: [PATCH] initialize GdkDragAction action to 0
+
+This helps in silencing clang found warning
+
+autilus-pathbar.c:759:9: error: variable 'action' is used uninitialized whenever 'if' condition is false [-Werror,-Wsometimes-uninitialized]
+    if (G_VALUE_HOLDS (value, GDK_TYPE_FILE_LIST))
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/nautilus/-/merge_requests/1158]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/nautilus-pathbar.c | 2 +-
+ src/nautilus-window.c  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/nautilus-pathbar.c b/src/nautilus-pathbar.c
+index 1b6ea6a..a5ab780 100644
+--- a/src/nautilus-pathbar.c
++++ b/src/nautilus-pathbar.c
+@@ -746,7 +746,7 @@ on_drag_motion (GtkDropTarget *target,
+                 gpointer       user_data)
+ {
+     ButtonData *button_data = user_data;
+-    GdkDragAction action;
++    GdkDragAction action = 0;
+     const GValue *value;
+     graphene_point_t start;
+ 
+diff --git a/src/nautilus-window.c b/src/nautilus-window.c
+index 30299b1..74c548f 100644
+--- a/src/nautilus-window.c
++++ b/src/nautilus-window.c
+@@ -1476,7 +1476,7 @@ extra_drag_value_cb (AdwTabBar    *self,
+ {
+     NautilusWindowSlot *slot = NAUTILUS_WINDOW_SLOT (adw_tab_page_get_child (page));
+     g_autoptr (NautilusFile) file = nautilus_file_get (nautilus_window_slot_get_location (slot));
+-    GdkDragAction action;
++    GdkDragAction action = 0;
+ 
+     if (value == NULL)
+     {
+-- 
+2.40.0
+

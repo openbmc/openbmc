@@ -27,6 +27,37 @@ case "$1" in
     restart)
         echo "Stopping redis-server..."
         start-stop-daemon --stop --quiet --exec /usr/bin/redis-server
+
+        # Since busybox implementation ignores --retry arguments repeatedly check
+        # if the process is still running and try another signal after a timeout,
+        # efectively simulating a stop with --retry=TERM/5/KILL/5 schedule.
+        waitAfterTerm=5000000 # us / 5000 ms / 5 s
+        waitAfterKill=5000000 # us / 5000 ms / 5 s
+        waitStep=100000 # us / 100 ms / 0.1 s
+        waited=0
+        start-stop-daemon --stop --test --quiet --exec /usr/bin/redis-server
+        processOff=$?
+        while [ $processOff -eq 0 ] && [ $waited -le $waitAfterTerm ] ; do
+            usleep ${waitStep}
+            ((waited+=${waitStep}))
+            start-stop-daemon --stop --test --quiet --exec /usr/bin/redis-server
+            processOff=$?
+        done
+        if [ $processOff -eq 0 ] ; then
+            start-stop-daemon --stop --signal KILL --exec /usr/bin/redis-server
+            start-stop-daemon --stop --test --quiet --exec /usr/bin/redis-server
+            processOff=$?
+        fi
+        waited=0
+        while [ $processOff -eq 0 ] && [ $waited -le $waitAfterKill ] ; do
+            usleep ${waitStep}
+            ((waited+=${waitStep}))
+            start-stop-daemon --stop --test --quiet --exec /usr/bin/redis-server
+            processOff=$?
+        done
+        # Here $processOff will indicate if waiting and retrying according to
+        # the schedule ended in a successfull stop or not.
+
 	echo "Starting redis-server..."
         start-stop-daemon --start --quiet --exec /usr/bin/redis-server -- $ARGS
 	;;

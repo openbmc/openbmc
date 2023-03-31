@@ -66,6 +66,7 @@ RDEPENDS:${PN}-ptest += "${PYTHON_PN}-pytest \
                          ${PYTHON_PN}-hypothesis \
                          ${PYTHON_PN}-sortedcontainers \
                          ${PYTHON_PN}-resource \
+                         ${PYTHON_PN}-typing-extensions \
                          ldd \
 "
 

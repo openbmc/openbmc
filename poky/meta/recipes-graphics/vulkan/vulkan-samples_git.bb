@@ -18,7 +18,7 @@ UPSTREAM_CHECK_GITTAGREGEX = "These are not the releases you're looking for"
 S = "${WORKDIR}/git"
 
 REQUIRED_DISTRO_FEATURES = 'vulkan'
-COMPATIBLE_HOST = "(x86_64|aarch64|mips64|powerpc64|riscv64).*-linux"
+COMPATIBLE_HOST = "(x86_64|aarch64|mips64|powerpc64|riscv64|loongarch64).*-linux"
 
 inherit cmake features_check
 

@@ -20,7 +20,8 @@ DEPENDS += "ethtool \
 
 RDEPENDS:${PN} += "bash ethtool libgcc"
 
-SRC_URI = "gitsm://github.com/Ettercap/ettercap;branch=master;protocol=https"
+SRC_URI = "gitsm://github.com/Ettercap/ettercap;branch=master;protocol=https \
+           file://0001-sslstrip-Enhance-the-libcurl-version-check-to-consid.patch"
 
 SRCREV = "7281fbddb7da7478beb1d21e3cb105fff3778b31"
 

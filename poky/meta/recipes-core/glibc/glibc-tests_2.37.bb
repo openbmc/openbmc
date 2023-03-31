@@ -27,7 +27,7 @@ python __anonymous() {
 # Remove any leftovers from original glibc recipe
 RPROVIDES:${PN} = "${PN}"
 RRECOMMENDS:${PN} = ""
-RDEPENDS:${PN} = " glibc sed"
+RDEPENDS:${PN} = " glibc sed bash"
 RDEPENDS:${PN}-ptest = "${PN}"
 DEPENDS += "sed"
 

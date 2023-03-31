@@ -1,61 +1,57 @@
 .. SPDX-License-Identifier: CC-BY-2.5
 
-===========================
- Supported Release Manuals
-===========================
+=================================
+BitBake Supported Release Manuals
+=================================
 
-******************************
-Release Series 3.4 (honister)
-******************************
+*****************************
+Release Series 4.1 (langdale)
+*****************************
 
-- :yocto_docs:`3.4 BitBake User Manual </3.4/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.4.1 BitBake User Manual </3.4.1/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.4.2 BitBake User Manual </3.4.2/bitbake-user-manual/bitbake-user-manual.html>`
+- :yocto_docs:`BitBake 2.2 User Manual </bitbake/2.2/>`
 
-******************************
-Release Series 3.3 (hardknott)
-******************************
+*****************************
+Release Series 4.0 (kirstone)
+*****************************
 
-- :yocto_docs:`3.3 BitBake User Manual </3.3/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.3.1 BitBake User Manual </3.3.1/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.3.2 BitBake User Manual </3.3.2/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.3.3 BitBake User Manual </3.3.3/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.3.4 BitBake User Manual </3.3.4/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.3.5 BitBake User Manual </3.3.5/bitbake-user-manual/bitbake-user-manual.html>`
+- :yocto_docs:`BitBake 2.0 User Manual </bitbake/2.0/>`
 
 ****************************
 Release Series 3.1 (dunfell)
 ****************************
 
-- :yocto_docs:`3.1 BitBake User Manual </3.1/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.1.1 BitBake User Manual </3.1.1/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.1.2 BitBake User Manual </3.1.2/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.1.3 BitBake User Manual </3.1.3/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.1.4 BitBake User Manual </3.1.4/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.1.5 BitBake User Manual </3.1.5/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.1.6 BitBake User Manual </3.1.6/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.1.7 BitBake User Manual </3.1.7/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.1.8 BitBake User Manual </3.1.8/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.1.9 BitBake User Manual </3.1.9/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.1.10 BitBake User Manual </3.1.10/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.1.11 BitBake User Manual </3.1.11/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.1.12 BitBake User Manual </3.1.12/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.1.13 BitBake User Manual </3.1.13/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.1.14 BitBake User Manual </3.1.14/bitbake-user-manual/bitbake-user-manual.html>`
+- :yocto_docs:`BitBake 1.46 User Manual </bitbake/1.46/>`
 
-==========================
- Outdated Release Manuals
-==========================
+================================
+BitBake Outdated Release Manuals
+================================
+
+******************************
+Release Series 3.4 (honister)
+******************************
+
+- :yocto_docs:`BitBake 1.52 User Manual </bitbake/1.52/>`
+
+******************************
+Release Series 3.3 (hardknott)
+******************************
+
+- :yocto_docs:`BitBake 1.50 User Manual </bitbake/1.50/>`
 
 *******************************
 Release Series 3.2 (gatesgarth)
 *******************************
 
-- :yocto_docs:`3.2 BitBake User Manual </3.2/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.2.1 BitBake User Manual </3.2.1/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.2.2 BitBake User Manual </3.2.2/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.2.3 BitBake User Manual </3.2.3/bitbake-user-manual/bitbake-user-manual.html>`
-- :yocto_docs:`3.2.4 BitBake User Manual </3.2.4/bitbake-user-manual/bitbake-user-manual.html>`
+- :yocto_docs:`BitBake 1.48 User Manual </bitbake/1.48/>`
+
+*******************************************
+Release Series 3.1 (dunfell first versions)
+*******************************************
+
+- :yocto_docs:`3.1 BitBake User Manual </3.1/bitbake-user-manual/bitbake-user-manual.html>`
+- :yocto_docs:`3.1.1 BitBake User Manual </3.1.1/bitbake-user-manual/bitbake-user-manual.html>`
+- :yocto_docs:`3.1.2 BitBake User Manual </3.1.2/bitbake-user-manual/bitbake-user-manual.html>`
+- :yocto_docs:`3.1.3 BitBake User Manual </3.1.3/bitbake-user-manual/bitbake-user-manual.html>`
 
 *************************
 Release Series 3.0 (zeus)

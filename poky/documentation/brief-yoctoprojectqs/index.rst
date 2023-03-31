@@ -70,11 +70,9 @@ Build Host Packages
 
 You must install essential host packages on your build host. The
 following command installs the host packages based on an Ubuntu
-distribution:
+distribution::
 
-.. code-block:: shell
-
-  $ sudo apt install &UBUNTU_HOST_PACKAGES_ESSENTIAL;
+   $ sudo apt install &UBUNTU_HOST_PACKAGES_ESSENTIAL;
 
 .. note::
 
@@ -262,7 +260,7 @@ an entire Linux distribution, including the toolchain, from source.
    For information on using the ``bitbake`` command, see the
    :ref:`overview-manual/concepts:bitbake` section in the Yocto Project Overview and
    Concepts Manual, or see
-   :ref:`bitbake:bitbake-user-manual/bitbake-user-manual-intro:the bitbake command`
+   :ref:`bitbake-user-manual/bitbake-user-manual-intro:the bitbake command`
    in the BitBake User Manual.
 
 #. **Simulate Your Image Using QEMU:** Once this particular image is

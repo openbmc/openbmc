@@ -8,13 +8,12 @@ a few target paths, reworks a few tests to be more friendly for cross
 and drops other tests.
 
 Upstream-Status: Inappropriate [build system specific changes]
-
 ---
- src/configure.in | 66 ++++++++++++++------------------------------------------
- 1 file changed, 16 insertions(+), 50 deletions(-)
+ src/configure.in | 62 ++++++++++--------------------------------------
+ 1 file changed, 12 insertions(+), 50 deletions(-)
 
 diff --git a/src/configure.in b/src/configure.in
-index 90a07df..1d30243 100644
+index 4add50c..9dff457 100644
 --- a/src/configure.in
 +++ b/src/configure.in
 @@ -5,6 +5,13 @@ AC_INIT(pppoe.c)
@@ -67,13 +66,15 @@ index 90a07df..1d30243 100644
  fi
  
  AC_SUBST(LINUX_KERNELMODE_PLUGIN)
-@@ -142,15 +149,8 @@ AC_CHECK_SIZEOF(unsigned short)
+@@ -142,17 +149,8 @@ AC_CHECK_SIZEOF(unsigned short)
  AC_CHECK_SIZEOF(unsigned int)
  AC_CHECK_SIZEOF(unsigned long)
  
+-dnl Check for location of ip
+-AC_PATH_PROG(IP, ip, NOTFOUND, $PATH:/bin:/sbin:/usr/bin:/usr/sbin)
+-
 -dnl Check for location of pppd
 -AC_PATH_PROG(PPPD, pppd, NOTFOUND, $PATH:/sbin:/usr/sbin:/usr/local/sbin)
--AC_PATH_PROG(ECHO, echo, echo)
 -
 -dnl Check for setsid (probably Linux-specific)
 -AC_PATH_PROG(SETSID, setsid, "", $PATH:/sbin:/usr/sbin:/usr/local/sbin)
@@ -84,7 +85,7 @@ index 90a07df..1d30243 100644
  
  dnl Check for Linux-specific kernel support for PPPoE
  AC_MSG_CHECKING(for Linux 2.4.X kernel-mode PPPoE support)
-@@ -195,44 +195,8 @@ if test "$GCC" = yes; then
+@@ -195,42 +193,6 @@ if test "$GCC" = yes; then
  	CFLAGS="$CFLAGS -fno-strict-aliasing -Wall -Wstrict-prototypes"
  fi
  
@@ -124,30 +125,9 @@ index 90a07df..1d30243 100644
 -	;;
 -esac
 -
- dnl Figure out packing order of structures
--AC_MSG_CHECKING([packing order of bit fields])
-+AC_CACHE_CHECK([packing order of bit fields],rpppoe_cv_pack_bitfields,[
- if test "${rpppoe_cv_pack_bitfields+set}" != set ; then
- AC_TRY_RUN([
- union foo {
-@@ -259,10 +223,11 @@ main(void)
- }], rpppoe_cv_pack_bitfields=normal, rpppoe_cv_pack_bitfields=rev,
- $ECHO "no defaults for cross-compiling"; exit 0)
- fi
-+])
- 
- if test "$rpppoe_cv_pack_bitfields" = "rev" ; then
- 	AC_MSG_RESULT(reversed)
--	AC_DEFINE(PACK_BITFIELDS_REVERSED)
-+	AC_DEFINE([PACK_BITFIELDS_REVERSED], [], [Reversed bitfields])
- else
- 	AC_MSG_RESULT(normal)
- fi
-@@ -326,6 +291,7 @@ AC_SUBST(PPPOE_SERVER_DEPS)
- AC_SUBST(RDYNAMIC)
- AC_SUBST(LIBEVENT)
- AC_SUBST(ECHO)
-+AC_SUBST(HAVE_STRUCT_SOCKADDR_LL)
- AC_SUBST(LDFLAGS)
- 
- datadir_evaluated=`eval echo $datadir`
+ # Sigh... got to fix this up for tcl
+ test "x$prefix" = xNONE && prefix=$ac_default_prefix
+ # Let make expand exec_prefix.
+-- 
+2.34.1
+

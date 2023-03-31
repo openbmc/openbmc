@@ -1,0 +1,126 @@
+#! /usr/bin/python3
+#
+# Dump a summary of the specified buildstats to the terminal, filtering and
+# sorting by walltime.
+#
+# SPDX-License-Identifier: GPL-2.0-only
+
+import argparse
+import dataclasses
+import datetime
+import enum
+import os
+import pathlib
+import sys
+
+scripts_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(scripts_path, "lib"))
+import buildstats
+
+
+@dataclasses.dataclass
+class Task:
+    recipe: str
+    task: str
+    start: datetime.datetime
+    duration: datetime.timedelta
+
+
+class Sorting(enum.Enum):
+    start = 1
+    duration = 2
+
+    # argparse integration
+    def __str__(self) -> str:
+        return self.name
+
+    def __repr__(self) -> str:
+        return self.name
+
+    @staticmethod
+    def from_string(s: str):
+        try:
+            return Sorting[s]
+        except KeyError:
+            return s
+
+
+def read_buildstats(path: pathlib.Path) -> buildstats.BuildStats:
+    if not path.exists():
+        raise Exception(f"No such file or directory: {path}")
+    if path.is_file():
+        return buildstats.BuildStats.from_file_json(path)
+    if (path / "build_stats").is_file():
+        return buildstats.BuildStats.from_dir(path)
+    raise Exception(f"Cannot find buildstats in {path}")
+
+
+def dump_buildstats(args, bs: buildstats.BuildStats):
+    tasks = []
+    for recipe in bs.values():
+        for task, stats in recipe.tasks.items():
+            t = Task(
+                recipe.name,
+                task,
+                datetime.datetime.fromtimestamp(stats["start_time"]),
+                datetime.timedelta(seconds=int(stats.walltime)),
+            )
+            tasks.append(t)
+
+    tasks.sort(key=lambda t: getattr(t, args.sort.name))
+
+    minimum = datetime.timedelta(seconds=args.shortest)
+    highlight = datetime.timedelta(seconds=args.highlight)
+
+    for t in tasks:
+        if t.duration >= minimum:
+            line = f"{t.duration}    {t.recipe}:{t.task}"
+            if args.highlight and t.duration >= highlight:
+                print(f"\033[1m{line}\033[0m")
+            else:
+                print(line)
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+
+    parser.add_argument(
+        "buildstats", metavar="BUILDSTATS", help="Buildstats file", type=pathlib.Path
+    )
+    parser.add_argument(
+        "--sort",
+        "-s",
+        type=Sorting.from_string,
+        choices=list(Sorting),
+        default=Sorting.start,
+        help="Sort tasks",
+    )
+    parser.add_argument(
+        "--shortest",
+        "-t",
+        type=int,
+        default=1,
+        metavar="SECS",
+        help="Hide tasks shorter than SECS seconds",
+    )
+    parser.add_argument(
+        "--highlight",
+        "-g",
+        type=int,
+        default=60,
+        metavar="SECS",
+        help="Highlight tasks longer than SECS seconds (0 disabled)",
+    )
+
+    args = parser.parse_args(argv)
+
+    bs = read_buildstats(args.buildstats)
+    dump_buildstats(args, bs)
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

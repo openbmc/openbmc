@@ -18,8 +18,9 @@ LIC_FILES_CHKSUM = " \
 SRC_URI = "git://github.com/OpenSC/${BPN}.git;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
-# v1.27
-SRCREV = "2306f896c2f3c147792300155316fd65825aabad"
+# master
+SRCREV = "f23911037d9790a3f3a3447a78d31a6362358e21"
+PV .= "+1.30.0+git${SRCPV}"
 
 UPSTREAM_CHECK_GITTAGREGEX = "pkcs11-helper-(?P<pver>\d+(\.\d+)+)"
 

@@ -96,6 +96,7 @@ EXTRA_OECONF = "--program-prefix=${TARGET_PREFIX} \
                 --disable-werror \
                 --enable-deterministic-archives \
                 --enable-plugins \
+                --enable-new-dtags \
                 --disable-gdb \
                 --disable-gdbserver \
                 --disable-libdecnumber \

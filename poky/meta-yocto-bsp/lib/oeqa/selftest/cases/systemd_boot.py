@@ -2,7 +2,7 @@ import os
 
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.core.decorator.depends import OETestDepends
-from oeqa.utils.commands import runCmd, bitbake, get_bb_var, runqemu
+from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars, runqemu
 
 class Systemdboot(OESelftestTestCase):
 
@@ -21,8 +21,9 @@ class Systemdboot(OESelftestTestCase):
         features += 'MACHINE = "genericx86-64"'
         self.append_config(features)
 
-        deploydir = get_bb_var('DEPLOY_DIR_IMAGE', "core-image-minimal")
-        systemdbootfile = os.path.join(deploydir, 'systemd-bootx64.efi')
+        image = 'core-image-minimal'
+        bb_vars = get_bb_vars(['DEPLOY_DIR_IMAGE', 'IMAGE_LINK_NAME'], image)
+        systemdbootfile = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], 'systemd-bootx64.efi')
 
         # Ensure we're actually testing that this gets built and not that
         # it was around from an earlier build
@@ -50,8 +51,8 @@ class Systemdboot(OESelftestTestCase):
         AutomatedBy:  Jose Perez Carranza <jose.perez.carranza at linux-intel.com>
         """
 
-        systemdbootimage = os.path.join(deploydir, 'core-image-minimal-genericx86-64.wic')
-        imagebootfile = os.path.join(deploydir, 'bootx64.efi')
+        systemdbootimage = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], '%s.wic' % bb_vars['IMAGE_LINK_NAME'])
+        imagebootfile = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], 'bootx64.efi')
 
         # Clean environment before start the test
         if os.path.isfile(imagebootfile):

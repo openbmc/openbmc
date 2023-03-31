@@ -1,0 +1,65 @@
+From 4f0d7d2f4900ce8555e09854dc681278b7a3d9a9 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Thu, 23 Mar 2023 13:09:23 +0800
+Subject: [PATCH 3/3] Makefile.am: do not update manual
+
+The tarball ships these manuals, no need to re-generate them.
+We have local patches for debugedit.c and sepdebugcrcfix.c,
+this will triger re-generation of the manuals, which causes
+error of missing help2man.
+
+This is an OE specific patch. If we don't have local patches
+patching debugedit.c and sepdebugcrcfix.c, this patch is also
+not needed.
+
+Upstream-Status: Inappropriate [OE Specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ Makefile.am | 30 ------------------------------
+ 1 file changed, 30 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 98b2f20..f91deea 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -52,36 +52,6 @@ sepdebugcrcfix_LDADD = @LIBELF_LIBS@
+ # Manual pages are generated for dist
+ dist_man_MANS = debugedit.1 sepdebugcrcfix.1 find-debuginfo.1
+ 
+-# The 'case' ensures the man pages are only generated if the corresponding
+-# source script (the first prerequisite) or configure.ac (for the version)
+-# has been changed.  The executable prerequisite is solely meant to force
+-# these docs to be made only after the executable has been compiled.
+-# This makes sure help2man is not normally necessary (since the generated
+-# man pages are distributed).
+-debugedit.1: tools/debugedit.c configure.ac debugedit$(EXEEXT)
+-	@case '$?' in \
+-	  *$<* | *configure.ac* ) $(HELP2MAN) -N --output=$@ \
+-		--name='debug source path manipulation tool' \
+-		./debugedit$(EXEEXT) ;; \
+-	  * ) : ;; \
+-	esac
+-
+-sepdebugcrcfix.1: tools/sepdebugcrcfix.c configure.ac sepdebugcrcfix$(EXEEXT)
+-	@case '$?' in \
+-	  *$<* | *configure.ac* ) $(HELP2MAN) -N --output=$@ \
+-		--name='fixes CRC for separate .debug files' \
+-		./sepdebugcrcfix$(EXEEXT) ;;\
+-	  * ) : ;; \
+-	esac
+-
+-find-debuginfo.1: $(top_srcdir)/scripts/find-debuginfo.in configure.ac find-debuginfo
+-	@case '$?' in \
+-	  *$<* | *configure.ac* ) $(HELP2MAN) -N --output=$@ \
+-		--name='finds debuginfo and processes it' \
+-		./find-debuginfo ;;\
+-	  * ) : ;; \
+-	esac
+-
+ noinst_HEADERS= tools/ansidecl.h \
+ 		tools/hashtab.h \
+ 		tools/md5.h \
+-- 
+2.17.1
+

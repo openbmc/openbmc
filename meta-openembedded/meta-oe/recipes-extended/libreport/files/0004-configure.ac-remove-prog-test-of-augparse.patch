@@ -1,25 +1,29 @@
-From c1c301502a8f69b9889197744b301a136082f09d Mon Sep 17 00:00:00 2001
+From 62c922f43b54585d25ba89be36c10612b479270b Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Thu, 27 Apr 2017 02:15:02 -0400
-Subject: [PATCH 4/4] configure.ac: remove prog test of augparse
+Subject: [PATCH] configure.ac: remove prog test of augparse
 
 The build time does not require it.
 
 Upstream-Status: Inappropriate [workaround]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Modify to apply to v2.17.8.
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
 ---
- configure.ac | 8 --------
- 1 file changed, 8 deletions(-)
+ configure.ac | 9 ---------
+ 1 file changed, 9 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index aceccf4..83c101b 100644
+index 17ece200..89b463a4 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -350,14 +350,6 @@ AC_ARG_WITH(augeaslenslibdir,
-                            [Directory for librepor lens (default: /usr/share/augeas/lenses)])],
-             [], [with_augeaslenslibdir="/usr/share/augeas/lenses"])
- AC_SUBST([AUGEAS_LENS_LIB_DIR], [$with_augeaslenslibdir])
+@@ -287,15 +287,6 @@ AC_ARG_WITH(largedatatmpdir,
+             [], [with_largedatatmpdir="/var/tmp"])
+ AC_SUBST([LARGE_DATA_TMP_DIR], [$with_largedatatmpdir])
+ 
 -AC_PATH_PROG(AUGPARSE, augparse, no)
 -[if test "$AUGPARSE" = "no"]
 -[then]
@@ -28,9 +32,10 @@ index aceccf4..83c101b 100644
 -    [echo "Then run configure again before attempting to build libreport."]
 -    [exit 1]
 -[fi]
- 
+-
  AC_ARG_WITH([defaultdumpdirmode],
              AS_HELP_STRING([--with-defaultdumpdirmode=OCTAL-MODE],
+                            [Default dump dir mode (default: 0x1A0 (0640))]),
 -- 
-2.7.4
+2.25.1
 

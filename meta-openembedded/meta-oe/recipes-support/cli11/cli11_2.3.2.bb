@@ -23,3 +23,5 @@ inherit ptest
 
 # cli11 is a header only C++ library, so the main package will be empty.
 RDEPENDS:${PN}-dev = ""
+
+BBCLASSEXTEND = "native nativesdk"

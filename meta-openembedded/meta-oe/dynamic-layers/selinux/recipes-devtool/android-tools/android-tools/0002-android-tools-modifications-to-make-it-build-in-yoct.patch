@@ -1,0 +1,366 @@
+From fe211cbc305a9316c1d4da2f086d6a50f1c92188 Mon Sep 17 00:00:00 2001
+From: Etienne Cordonnier <ecordonnier@snap.com>
+Date: Fri, 17 Mar 2023 10:33:11 +0100
+Subject: [PATCH] android-tools: modifications to make it build in yocto
+
+- Fix relocation errors on aarch64, e.g.:
+"relocation R_AARCH64_ADR_PREL_PG_HI21 against symbol `_ZTV19SparseFileBufSource' which may bind externally can not be used when making a shared object; recompile with -fPIC"
+
+- use ln -f to avoid error "File exists" on incremental builds
+
+- fix missing headers
+
+Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
+
+---
+ debian/external/boringssl/libcrypto.mk         |  1 +
+ debian/system/core/append2simg.mk              |  2 +-
+ debian/system/core/fastboot.mk                 |  2 +-
+ debian/system/core/img2simg.mk                 |  2 +-
+ debian/system/core/libbacktrace.mk             |  8 ++++----
+ debian/system/core/libbase.mk                  |  5 +++--
+ debian/system/core/libcutils.mk                |  5 +++--
+ debian/system/core/liblog.mk                   |  3 ++-
+ debian/system/core/libsparse.mk                |  5 +++--
+ debian/system/core/libutils.mk                 |  2 +-
+ debian/system/core/libziparchive.mk            |  5 +++--
+ debian/system/core/simg2img.mk                 |  2 +-
+ debian/system/core/simg2simg.mk                |  2 +-
+ frameworks/native/libs/adbd_auth/adbd_auth.cpp |  2 ++
+ system/core/adb/adb_listeners.cpp              | 12 ++++++------
+ system/core/adb/transport_local.cpp            |  2 +-
+ 16 files changed, 34 insertions(+), 26 deletions(-)
+
+diff --git a/debian/external/boringssl/libcrypto.mk b/debian/external/boringssl/libcrypto.mk
+index c0ea54f4..b3a77bfd 100644
+--- a/debian/external/boringssl/libcrypto.mk
++++ b/debian/external/boringssl/libcrypto.mk
+@@ -27,6 +27,7 @@ CPPFLAGS += \
+   -DBORINGSSL_IMPLEMENTATION \
+   -DBORINGSSL_SHARED_LIBRARY \
+   -DOPENSSL_SMALL \
++  -DOPENSSL_NO_ASM \
+   -Iexternal/boringssl/src/crypto \
+   -Iexternal/boringssl/src/include \
+ 
+diff --git a/debian/system/core/append2simg.mk b/debian/system/core/append2simg.mk
+index 1599bdb8..598c751d 100644
+--- a/debian/system/core/append2simg.mk
++++ b/debian/system/core/append2simg.mk
+@@ -11,7 +11,7 @@ CPPFLAGS += \
+ 
+ LDFLAGS += \
+   -Ldebian/out/system/core \
+-  -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
++  -Wl,-rpath='$$ORIGIN/../lib/android' \
+   -lbase \
+   -llog \
+   -lpthread \
+diff --git a/debian/system/core/fastboot.mk b/debian/system/core/fastboot.mk
+index d5c9a285..a59ba1a4 100644
+--- a/debian/system/core/fastboot.mk
++++ b/debian/system/core/fastboot.mk
+@@ -49,7 +49,7 @@ CPPFLAGS += \
+ 
+ LDFLAGS += \
+   -Ldebian/out/system/core \
+-  -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
++  -Wl,-rpath='$$ORIGIN/../lib/android' \
+   -fuse-ld=gold \
+   -lbase \
+   -lcutils \
+diff --git a/debian/system/core/img2simg.mk b/debian/system/core/img2simg.mk
+index 11adf014..8baf5ba5 100644
+--- a/debian/system/core/img2simg.mk
++++ b/debian/system/core/img2simg.mk
+@@ -11,7 +11,7 @@ CPPFLAGS += \
+ 
+ LDFLAGS += \
+   -Ldebian/out/system/core \
+-  -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
++  -Wl,-rpath='$$ORIGIN/../lib/android' \
+   -lbase \
+   -llog \
+   -lpthread \
+diff --git a/debian/system/core/libbacktrace.mk b/debian/system/core/libbacktrace.mk
+index e3411d76..86e69874 100644
+--- a/debian/system/core/libbacktrace.mk
++++ b/debian/system/core/libbacktrace.mk
+@@ -1,3 +1,4 @@
++include rules_yocto.mk
+ include /usr/share/dpkg/architecture.mk
+ 
+ NAME = libbacktrace
+@@ -83,10 +84,9 @@ CPPFLAGS += \
+ LDFLAGS += \
+   -L/usr/lib/p7zip \
+   -Ldebian/out/system/core \
+-  -Wl,-rpath=/usr/lib/p7zip \
+-  -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
++  -Wl,-rpath='$$ORIGIN' \
+   -Wl,-soname,$(NAME).so.0 \
+-  -l:7z.so \
++  -l7z \
+   -lbase \
+   -llog \
+   -lpthread \
+@@ -101,7 +101,7 @@ endif
+ build: $(OBJECTS_CXX) $(OBJECTS_ASSEMBLY) debian/out/external/libunwind/libunwind.a
+ 	mkdir -p debian/out/system/core
+ 	$(CXX) $^ -o debian/out/system/core/$(NAME).so.0 $(LDFLAGS)
+-	cd debian/out/system/core && ln -s $(NAME).so.0 $(NAME).so
++	cd debian/out/system/core && ln -sf $(NAME).so.0 $(NAME).so
+ 
+ $(OBJECTS_CXX): %.o: %.cpp
+ 	$(CXX) -c -o $@ $< $(CXXFLAGS) $(CPPFLAGS)
+diff --git a/debian/system/core/libbase.mk b/debian/system/core/libbase.mk
+index d2b074ba..8a90d6de 100644
+--- a/debian/system/core/libbase.mk
++++ b/debian/system/core/libbase.mk
+@@ -1,3 +1,4 @@
++include rules_yocto.mk
+ NAME = libbase
+ 
+ SOURCES = \
+@@ -30,7 +31,7 @@ CPPFLAGS += \
+ 
+ LDFLAGS += \
+   -Ldebian/out/system/core \
+-  -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
++  -Wl,-rpath='$$ORIGIN' \
+   -Wl,-soname,$(NAME).so.0 \
+   -llog \
+   -lpthread \
+@@ -44,7 +45,7 @@ endif
+ 
+ build: $(OBJECTS)
+ 	$(CXX) $^ -o debian/out/system/core/$(NAME).so.0 $(LDFLAGS)
+-	cd debian/out/system/core && ln -s $(NAME).so.0 $(NAME).so
++	cd debian/out/system/core && ln -sf $(NAME).so.0 $(NAME).so
+ 
+ $(OBJECTS): %.o: %.cpp
+ 	$(CXX) -c -o $@ $< $(CXXFLAGS) $(CPPFLAGS)
+diff --git a/debian/system/core/libcutils.mk b/debian/system/core/libcutils.mk
+index 9d928b56..c22b0965 100644
+--- a/debian/system/core/libcutils.mk
++++ b/debian/system/core/libcutils.mk
+@@ -1,3 +1,4 @@
++include rules_yocto.mk
+ NAME = libcutils
+ 
+ libcutils_nonwindows_sources = \
+@@ -47,7 +48,7 @@ CPPFLAGS += \
+ 
+ LDFLAGS += \
+   -Ldebian/out/system/core \
+-  -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
++  -Wl,-rpath='$$ORIGIN' \
+   -Wl,-soname,$(NAME).so.0 \
+   -lbase \
+   -llog \
+@@ -56,7 +57,7 @@ LDFLAGS += \
+ 
+ build: $(OBJECTS_C) $(OBJECTS_CXX)
+ 	$(CXX) $^ -o debian/out/system/core/$(NAME).so.0 $(LDFLAGS)
+-	cd debian/out/system/core && ln -s $(NAME).so.0 $(NAME).so
++	cd debian/out/system/core && ln -sf $(NAME).so.0 $(NAME).so
+ 
+ $(OBJECTS_C): %.o: %.c
+ 	$(CC) -c -o $@ $< $(CFLAGS) $(CPPFLAGS)
+diff --git a/debian/system/core/liblog.mk b/debian/system/core/liblog.mk
+index f8c3d7fe..34a07341 100644
+--- a/debian/system/core/liblog.mk
++++ b/debian/system/core/liblog.mk
+@@ -1,3 +1,4 @@
++include rules_yocto.mk
+ NAME = liblog
+ 
+ liblog_sources = \
+@@ -35,7 +36,7 @@ LDFLAGS += \
+ build: $(OBJECTS)
+ 	mkdir -p debian/out/system/core
+ 	$(CXX) $^ -o debian/out/system/core/$(NAME).so.0 $(LDFLAGS)
+-	cd debian/out/system/core && ln -s $(NAME).so.0 $(NAME).so
++	cd debian/out/system/core && ln -sf $(NAME).so.0 $(NAME).so
+ 
+ $(OBJECTS): %.o: %.cpp
+ 	$(CXX) -c -o $@ $< $(CXXFLAGS) $(CPPFLAGS)
+diff --git a/debian/system/core/libsparse.mk b/debian/system/core/libsparse.mk
+index c2b2694c..2da12b8e 100644
+--- a/debian/system/core/libsparse.mk
++++ b/debian/system/core/libsparse.mk
+@@ -1,3 +1,4 @@
++include rules_yocto.mk
+ NAME = libsparse
+ 
+ SOURCES = \
+@@ -19,7 +20,7 @@ CPPFLAGS += \
+ 
+ LDFLAGS += \
+   -Ldebian/out/system/core \
+-  -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
++  -Wl,-rpath='$$ORIGIN' \
+   -Wl,-soname,$(NAME).so.0 \
+   -lbase \
+   -lz \
+@@ -27,7 +28,7 @@ LDFLAGS += \
+ 
+ build: $(OBJECTS)
+ 	$(CXX) $^ -o debian/out/system/core/$(NAME).so.0 $(LDFLAGS)
+-	cd debian/out/system/core && ln -s $(NAME).so.0 $(NAME).so
++	cd debian/out/system/core && ln -sf $(NAME).so.0 $(NAME).so
+ 
+ $(OBJECTS): %.o: %.cpp
+ 	$(CXX) -c -o $@ $< $(CXXFLAGS) $(CPPFLAGS)
+diff --git a/debian/system/core/libutils.mk b/debian/system/core/libutils.mk
+index c37b1d2d..332492c1 100644
+--- a/debian/system/core/libutils.mk
++++ b/debian/system/core/libutils.mk
+@@ -41,7 +41,7 @@ CPPFLAGS += \
+ 
+ LDFLAGS += \
+   -Ldebian/out/system/core \
+-  -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
++  -Wl,-rpath='$$ORIGIN' \
+   -Wl,-soname,$(NAME).so.0 \
+   -lbacktrace \
+   -lcutils \
+diff --git a/debian/system/core/libziparchive.mk b/debian/system/core/libziparchive.mk
+index 1b286b4e..1b7499be 100644
+--- a/debian/system/core/libziparchive.mk
++++ b/debian/system/core/libziparchive.mk
+@@ -1,3 +1,4 @@
++include rules_yocto.mk
+ NAME = libziparchive
+ 
+ SOURCES = \
+@@ -19,7 +20,7 @@ CPPFLAGS += \
+ 
+ LDFLAGS += \
+   -Ldebian/out/system/core \
+-  -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
++  -Wl,-rpath='$$ORIGIN' \
+   -Wl,-soname,$(NAME).so.0 \
+   -lbase \
+   -llog \
+@@ -29,7 +30,7 @@ LDFLAGS += \
+ 
+ build: $(OBJECTS)
+ 	$(CXX) $^ -o debian/out/system/core/$(NAME).so.0 $(LDFLAGS)
+-	cd debian/out/system/core && ln -s $(NAME).so.0 $(NAME).so
++	cd debian/out/system/core && ln -sf $(NAME).so.0 $(NAME).so
+ 
+ $(OBJECTS): %.o: %.cc
+ 	$(CXX) -c -o $@ $< $(CXXFLAGS) $(CPPFLAGS)
+diff --git a/debian/system/core/simg2img.mk b/debian/system/core/simg2img.mk
+index f6e3f59d..df4f44f3 100644
+--- a/debian/system/core/simg2img.mk
++++ b/debian/system/core/simg2img.mk
+@@ -13,7 +13,7 @@ CPPFLAGS += \
+ 
+ LDFLAGS += \
+   -Ldebian/out/system/core \
+-  -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
++  -Wl,-rpath='$$ORIGIN/../lib/android' \
+   -lbase \
+   -llog \
+   -lpthread \
+diff --git a/debian/system/core/simg2simg.mk b/debian/system/core/simg2simg.mk
+index ed53b04c..646ab030 100644
+--- a/debian/system/core/simg2simg.mk
++++ b/debian/system/core/simg2simg.mk
+@@ -13,7 +13,7 @@ CPPFLAGS += \
+ 
+ LDFLAGS += \
+   -Ldebian/out/system/core \
+-  -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
++  -Wl,-rpath='$$ORIGIN/../lib/android' \
+   -lbase \
+   -llog \
+   -lpthread \
+diff --git a/frameworks/native/libs/adbd_auth/adbd_auth.cpp b/frameworks/native/libs/adbd_auth/adbd_auth.cpp
+index a9c23110..6ca334ba 100644
+--- a/frameworks/native/libs/adbd_auth/adbd_auth.cpp
++++ b/frameworks/native/libs/adbd_auth/adbd_auth.cpp
+@@ -23,8 +23,10 @@
+ #include <sys/eventfd.h>
+ #include <sys/uio.h>
+ 
++#include <atomic>
+ #include <chrono>
+ #include <deque>
++#include <optional>
+ #include <string>
+ #include <string_view>
+ #include <tuple>
+diff --git a/system/core/adb/adb_listeners.cpp b/system/core/adb/adb_listeners.cpp
+index 29909a55..440cdbd4 100644
+--- a/system/core/adb/adb_listeners.cpp
++++ b/system/core/adb/adb_listeners.cpp
+@@ -109,7 +109,7 @@ static void listener_event_func(int _fd, unsigned ev, void* _l)
+ }
+ 
+ // Called as a transport disconnect function. |arg| is the raw alistener*.
+-static void listener_disconnect(void* arg, atransport*) EXCLUDES(listener_list_mutex) {
++static void listener_disconnect(void* arg, atransport*) {
+     std::lock_guard<std::mutex> lock(listener_list_mutex);
+     for (auto iter = listener_list.begin(); iter != listener_list.end(); ++iter) {
+         if (iter->get() == arg) {
+@@ -121,7 +121,7 @@ static void listener_disconnect(void* arg, atransport*) EXCLUDES(listener_list_m
+ }
+ 
+ // Write the list of current listeners (network redirections) into a string.
+-std::string format_listeners() EXCLUDES(listener_list_mutex) {
++std::string format_listeners() {
+     std::lock_guard<std::mutex> lock(listener_list_mutex);
+     std::string result;
+     for (auto& l : listener_list) {
+@@ -140,7 +140,7 @@ std::string format_listeners() EXCLUDES(listener_list_mutex) {
+ }
+ 
+ InstallStatus remove_listener(const char* local_name, atransport* transport)
+-    EXCLUDES(listener_list_mutex) {
++{
+     std::lock_guard<std::mutex> lock(listener_list_mutex);
+     for (auto iter = listener_list.begin(); iter != listener_list.end(); ++iter) {
+         if (local_name == (*iter)->local_name) {
+@@ -151,7 +151,7 @@ InstallStatus remove_listener(const char* local_name, atransport* transport)
+     return INSTALL_STATUS_LISTENER_NOT_FOUND;
+ }
+ 
+-void remove_all_listeners() EXCLUDES(listener_list_mutex) {
++void remove_all_listeners() {
+     std::lock_guard<std::mutex> lock(listener_list_mutex);
+     auto iter = listener_list.begin();
+     while (iter != listener_list.end()) {
+@@ -164,7 +164,7 @@ void remove_all_listeners() EXCLUDES(listener_list_mutex) {
+     }
+ }
+ 
+-void close_smartsockets() EXCLUDES(listener_list_mutex) {
++void close_smartsockets() {
+     std::lock_guard<std::mutex> lock(listener_list_mutex);
+     auto pred = [](const std::unique_ptr<alistener>& listener) {
+         return listener->local_name == "*smartsocket*";
+@@ -174,7 +174,7 @@ void close_smartsockets() EXCLUDES(listener_list_mutex) {
+ 
+ InstallStatus install_listener(const std::string& local_name, const char* connect_to,
+                                atransport* transport, int no_rebind, int* resolved_tcp_port,
+-                               std::string* error) EXCLUDES(listener_list_mutex) {
++                               std::string* error) {
+     std::lock_guard<std::mutex> lock(listener_list_mutex);
+     for (auto& l : listener_list) {
+         if (local_name == l->local_name) {
+diff --git a/system/core/adb/transport_local.cpp b/system/core/adb/transport_local.cpp
+index c7261860..5988ec4d 100644
+--- a/system/core/adb/transport_local.cpp
++++ b/system/core/adb/transport_local.cpp
+@@ -333,7 +333,7 @@ struct EmulatorConnection : public FdConnection {
+ 
+ /* Only call this function if you already hold local_transports_lock. */
+ static atransport* find_emulator_transport_by_adb_port_locked(int adb_port)
+-    REQUIRES(local_transports_lock) {
++{
+     auto it = local_transports.find(adb_port);
+     if (it == local_transports.end()) {
+         return nullptr;

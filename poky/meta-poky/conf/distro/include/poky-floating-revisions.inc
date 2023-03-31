@@ -1,52 +1,22 @@
 #
-# Package Versions for cutting edge testing:
+# Set recipe versions to auto-rev for cutting edge testing
 #
 
-#SRCREV:pn-opkg-native ?= "${AUTOREV}"
-#SRCREV:pn-opkg-sdk ?= "${AUTOREV}"
-#SRCREV:pn-opkg ?= "${AUTOREV}"
-#SRCREV:pn-opkg-utils-native ?= "${AUTOREV}"
-#SRCREV:pn-opkg-utils ?= "${AUTOREV}"
-SRCREV:pn-gconf-dbus ?= "${AUTOREV}"
-SRCREV:pn-matchbox-common ?= "${AUTOREV}"
-SRCREV:pn-matchbox-config-gtk ?= "${AUTOREV}"
-SRCREV:pn-matchbox-desktop ?= "${AUTOREV}"
-SRCREV:pn-matchbox-keyboard ?= "${AUTOREV}"
-SRCREV:pn-matchbox-panel-2 ?= "${AUTOREV}"
-SRCREV:pn-matchbox-themes-extra ?= "${AUTOREV}"
-SRCREV:pn-matchbox-terminal ?= "${AUTOREV}"
-SRCREV:pn-matchbox-wm ?= "${AUTOREV}"
-SRCREV:pn-settings-daemon ?= "${AUTOREV}"
-SRCREV:pn-screenshot ?= "${AUTOREV}"
-SRCREV:pn-libfakekey ?= "${AUTOREV}"
-SRCREV:pn-psplash ?= "${AUTOREV}"
-SRCREV:pn-gtk-sato-engine ?= "${AUTOREV}"
-SRCREV:pn-matchbox-theme-sato ?= "${AUTOREV}"
-SRCREV:pn-sato-icon-theme ?= "${AUTOREV}"
-SRCREV:pn-matchbox-desktop-sato ?= "${AUTOREV}"
-SRCREV:pn-oh-puzzles ?= "${AUTOREV}"
-SRCREV:pn-libowl ?= "${AUTOREV}"
-SRCREV:pn-libmatchbox ?= "${AUTOREV}"
-SRCREV:pn-ofono ?= "${AUTOREV}"
+INHERIT += "poky-bleeding"
 
-SRCREV:pn-dri2proto = "${AUTOREV}"
-#PREFERRED_VERSION_dri2proto ?= "1.99.1+git%"
-SRCREV:pn-libdrm = "${AUTOREV}"
-#PREFERRED_VERSION_libdrm ?= "2.4.0+git%"
-SRCREV:pn-libxcb = "${AUTOREV}"
-#PREFERRED_VERSION_libxcb ?= "1.1.90.1+gitr%"
-SRCREV:pn-lib-proto = "${AUTOREV}"
-#PREFERRED_VERSION_xcb-proto ?= "1.2+gitr%"
-SRCREV:pn-libxcb-sdk = "${AUTOREV}"
-#PREFERRED_VERSION_libxcb-sdk ?= "1.1.90.1+gitr%"
-SRCREV:pn-xf86-input-evdev = "${AUTOREV}"
-#PREFERRED_VERSION_xf86-input-evdev ?= "2.0.4"
-SRCREV:pn-xf86-input-mouse = "${AUTOREV}"
-#PREFERRED_VERSION_xf86-input-mouse ?= "1.3.0+git%"
-SRCREV:pn-xf86-input-synaptics = "${AUTOREV}"
-#PREFERRED_VERSION_xf86-input-synaptics ?= "0.15.2+git%"
-
-#SRCDATE_oprofile ?= "${DATE}"
-
-PREFERRED_VERSION_oprofile ?= "0.9.4+cvs${SRCDATE_oprofile}"
-
+POKY_AUTOREV_RECIPES = "\
+    libmatchbox \
+    opkg-utils \
+    matchbox-config-gtk \
+    matchbox-desktop \
+    matchbox-keyboard \
+    matchbox-panel-2 \
+    matchbox-terminal \
+    matchbox-theme-sato \
+    matchbox-wm \
+    pseudo \
+    puzzles \
+    sato-icon-theme \
+    sato-screenshot \
+    settings-daemon \
+"

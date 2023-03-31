@@ -27,4 +27,4 @@ do_compile() {
 }
 
 RDEPENDS:${PN} += "perl-module-carp perl-module-overload perl-module-universal perl-module-io-handle"
-RDEPENDS:${PN}-ptest += "libxml-parser-perl perl-module-file-glob"
+RDEPENDS:${PN}-ptest += "libxml-parser-perl perl-module-file-glob perl-module-cwd perl-module-constant"

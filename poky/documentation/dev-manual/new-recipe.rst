@@ -257,15 +257,14 @@ located. For a graphical representation of source locations, see the
 ":ref:`overview-manual/concepts:sources`" section in
 the Yocto Project Overview and Concepts Manual.
 
-The :ref:`ref-tasks-fetch` task uses
-the prefix of each entry in the :term:`SRC_URI` variable value to determine
-which :ref:`fetcher <bitbake:bitbake-user-manual/bitbake-user-manual-fetching:fetchers>` to use to get your
-source files. It is the :term:`SRC_URI` variable that triggers the fetcher.
-The :ref:`ref-tasks-patch` task uses
-the variable after source is fetched to apply patches. The OpenEmbedded
-build system uses
-:term:`FILESOVERRIDES` for
-scanning directory locations for local files in :term:`SRC_URI`.
+The :ref:`ref-tasks-fetch` task uses the prefix of each entry in the
+:term:`SRC_URI` variable value to determine which
+:ref:`fetcher <bitbake-user-manual/bitbake-user-manual-fetching:fetchers>`
+to use to get your source files. It is the :term:`SRC_URI` variable that triggers
+the fetcher. The :ref:`ref-tasks-patch` task uses the variable after source is
+fetched to apply patches. The OpenEmbedded build system uses
+:term:`FILESOVERRIDES` for scanning directory locations for local files in
+:term:`SRC_URI`.
 
 The :term:`SRC_URI` variable in your recipe must define each unique location
 for your source files. It is good practice to not hard-code version
@@ -1422,12 +1421,9 @@ doing the following:
       do_configure[noexec] = "1"
       do_compile[noexec] = "1"
 
-   Unlike
-   :ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:deleting a task`,
-   using the flag preserves the dependency chain from the
-   :ref:`ref-tasks-fetch`,
-   :ref:`ref-tasks-unpack`, and
-   :ref:`ref-tasks-patch` tasks to the
+   Unlike :ref:`bitbake-user-manual/bitbake-user-manual-metadata:deleting a task`,
+   using the flag preserves the dependency chain from the :ref:`ref-tasks-fetch`,
+   :ref:`ref-tasks-unpack`, and :ref:`ref-tasks-patch` tasks to the
    :ref:`ref-tasks-install` task.
 
 -  Make sure your :ref:`ref-tasks-install` task installs the binaries

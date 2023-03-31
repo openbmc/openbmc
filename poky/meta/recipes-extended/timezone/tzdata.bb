@@ -4,8 +4,6 @@ DEPENDS = "tzcode-native"
 
 inherit allarch
 
-S = "${WORKDIR}"
-
 DEFAULT_TIMEZONE ?= "Universal"
 INSTALL_TIMEZONE_FILE ?= "1"
 
@@ -18,17 +16,21 @@ TZONES = " \
 # "fat" is needed by e.g. MariaDB's mysql_tzinfo_to_sql
 ZIC_FMT ?= "slim"
 
+do_configure[cleandirs] = "${B}"
+B = "${WORKDIR}/build"
+
 do_compile() {
 	for zone in ${TZONES}; do
-		${STAGING_BINDIR_NATIVE}/zic -b ${ZIC_FMT} -d ${WORKDIR}${datadir}/zoneinfo -L /dev/null ${S}/${zone}
-		${STAGING_BINDIR_NATIVE}/zic -b ${ZIC_FMT} -d ${WORKDIR}${datadir}/zoneinfo/posix -L /dev/null ${S}/${zone}
-		${STAGING_BINDIR_NATIVE}/zic -b ${ZIC_FMT} -d ${WORKDIR}${datadir}/zoneinfo/right -L ${S}/leapseconds ${S}/${zone}
+		${STAGING_BINDIR_NATIVE}/zic -b ${ZIC_FMT} -d ${B}/zoneinfo -L /dev/null ${S}/${zone}
+		${STAGING_BINDIR_NATIVE}/zic -b ${ZIC_FMT} -d ${B}/zoneinfo/posix -L /dev/null ${S}/${zone}
+		${STAGING_BINDIR_NATIVE}/zic -b ${ZIC_FMT} -d ${B}/zoneinfo/right -L ${S}/leapseconds ${S}/${zone}
 	done
 }
 
 do_install() {
-	install -d ${D}$exec_prefix ${D}${datadir}/zoneinfo
-	cp -pPR ${WORKDIR}$exec_prefix ${D}${base_prefix}
+	install -d ${D}${datadir}/zoneinfo
+	cp -pPR ${B}/zoneinfo/* ${D}${datadir}/zoneinfo
+
 	# libc is removing zoneinfo files from package
 	cp -pP "${S}/zone.tab" ${D}${datadir}/zoneinfo
 	cp -pP "${S}/zone1970.tab" ${D}${datadir}/zoneinfo

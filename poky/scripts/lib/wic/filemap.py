@@ -46,6 +46,13 @@ def get_block_size(file_obj):
             bsize = stat.st_blksize
         else:
             raise IOError("Unable to determine block size")
+
+    # The logic in this script only supports a maximum of a 4KB
+    # block size
+    max_block_size = 4 * 1024
+    if bsize > max_block_size:
+        bsize = max_block_size
+
     return bsize
 
 class ErrorNotSupp(Exception):

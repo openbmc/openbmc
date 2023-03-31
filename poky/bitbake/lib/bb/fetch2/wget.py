@@ -369,15 +369,7 @@ class Wget(FetchMethod):
 
                 with opener.open(r, timeout=30) as response:
                     pass
-            except urllib.error.URLError as e:
-                if try_again:
-                    logger.debug2("checkstatus: trying again")
-                    return self.checkstatus(fetch, ud, d, False)
-                else:
-                    # debug for now to avoid spamming the logs in e.g. remote sstate searches
-                    logger.debug2("checkstatus() urlopen failed: %s" % e)
-                    return False
-            except ConnectionResetError as e:
+            except (urllib.error.URLError, ConnectionResetError, TimeoutError) as e:
                 if try_again:
                     logger.debug2("checkstatus: trying again")
                     return self.checkstatus(fetch, ud, d, False)

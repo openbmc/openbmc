@@ -1823,18 +1823,18 @@ def process_pkgconfig(pkgfiles, d):
                     with open(file, 'r') as f:
                         lines = f.readlines()
                     for l in lines:
-                        m = var_re.match(l)
-                        if m:
-                            name = m.group(1)
-                            val = m.group(2)
-                            pd.setVar(name, pd.expand(val))
-                            continue
                         m = field_re.match(l)
                         if m:
                             hdr = m.group(1)
                             exp = pd.expand(m.group(2))
                             if hdr == 'Requires':
                                 pkgconfig_needed[pkg] += exp.replace(',', ' ').split()
+                                continue
+                        m = var_re.match(l)
+                        if m:
+                            name = m.group(1)
+                            val = m.group(2)
+                            pd.setVar(name, pd.expand(val))
 
     for pkg in packages.split():
         pkgs_file = os.path.join(shlibswork_dir, pkg + ".pclist")

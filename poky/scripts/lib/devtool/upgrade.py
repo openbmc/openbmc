@@ -125,11 +125,8 @@ def _write_append(rc, srctreebase, srctree, same_dir, no_same_dir, rev, copied, 
     return af
 
 def _cleanup_on_error(rd, srctree):
-    rdp = os.path.split(rd)[0] # recipes folder
     if os.path.exists(rd):
         shutil.rmtree(rd)
-    if not len(os.listdir(rdp)):
-        os.rmdir(rdp)
     srctree = os.path.abspath(srctree)
     if os.path.exists(srctree):
         shutil.rmtree(srctree)

@@ -1,4 +1,4 @@
-From 9beb650712d448ad9c0899de9d98e9b623f9c249 Mon Sep 17 00:00:00 2001
+From 05227e74b732f13ed5a2a98232676f98bba028e6 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Fri, 12 Aug 2022 11:18:15 +0800
 Subject: [PATCH] Makefile.in: redefine LOCKPROG
@@ -11,23 +11,41 @@ And it should be "/usr/bin/dotlockfile" on the target.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+
+Update patch for 1.17, also redefine LOCKPROG in other lines
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
- Makefile.in | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Makefile.in | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index 6e53179..bfa0acb 100644
+index e447cb2..e02d75e 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -42,7 +42,7 @@ dotlockfile:	dotlockfile.o xlockfile.o
- 		$(CC) $(LDFLAGS) -o dotlockfile dotlockfile.o xlockfile.o
+@@ -44,19 +44,19 @@ dotlockfile:	dotlockfile.o dlockfile.o
+ 		$(CC) $(LDFLAGS) -o dotlockfile dotlockfile.o dlockfile.o
+ 
+ dotlockfile.o:	dotlockfile.c
+-		$(CC) $(CFLAGS) -DLOCKPROG=\"$(bindir)/dotlockfile\" \
++		$(CC) $(CFLAGS) -DLOCKPROG=\"/usr/bin/dotlockfile\" \
+ 			-c dotlockfile.c
  
  lockfile.o:	lockfile.c
 -		$(CC) $(CFLAGS) -DLIB -DLOCKPROG=\"$(bindir)/dotlockfile\" \
 +		$(CC) $(CFLAGS) -DLIB -DLOCKPROG=\"/usr/bin/dotlockfile\" \
- 			-c lockfile.c
+ 			-DSTATIC -c lockfile.c
  
- xlockfile.o:	lockfile.c
+ solockfile.o:	lockfile.c
+-		$(CC) $(CFLAGS) -DLIB -DLOCKPROG=\"$(bindir)/dotlockfile\" \
++		$(CC) $(CFLAGS) -DLIB -DLOCKPROG=\"/usr/bin/dotlockfile\" \
+ 			-c lockfile.c -o solockfile.o
+ 
+ dlockfile.o:	lockfile.c
+-		$(CC) $(CFLAGS) -DLOCKPROG=\"$(bindir)/dotlockfile\" \
++		$(CC) $(CFLAGS) -DLOCKPROG=\"/usr/bin/dotlockfile\" \
+ 			-c lockfile.c -o dlockfile.o
+ 
+ install_static:	static install_common
 -- 
 2.25.1
 

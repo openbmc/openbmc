@@ -1,28 +1,32 @@
-From 1f7d106c7d982fe055addc8d883b161202233175 Mon Sep 17 00:00:00 2001
+From 73dc0c2cd942e30f5f7cb40cb5828895b96f0fb1 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 26 Apr 2017 03:47:58 -0400
-Subject: [PATCH 1/4] Makefile.am: remove doc and apidoc
+Subject: [PATCH] Makefile.am: remove doc and apidoc
 
 There was a failure at do_install time, so remove doc to workaround.
 
 Upstream-Status: Inappropriate [workaround]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Context modified to apply to v2.17.8.
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
 ---
  Makefile.am | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index 9ad827c..34364a8 100644
+index 4ff2f5c5..d4e30bc2 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -1,5 +1,5 @@
  ACLOCAL_AMFLAGS = -I m4
--SUBDIRS = po src tests doc apidoc
-+SUBDIRS = po src tests
+-SUBDIRS = data po src tests doc apidoc
++SUBDIRS = data po src tests
  
  EXTRA_DIST = \
      libreport.pc.in \
 -- 
-2.7.4
+2.25.1
 

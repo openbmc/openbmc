@@ -1,4 +1,4 @@
-From 363eb1aaeca914c7d36a2cdaf1417e4f87af4c22 Mon Sep 17 00:00:00 2001
+From 079d04c187800e22f18723c74e41c4e46eef67f8 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Thu, 19 Jul 2018 01:12:47 -0700
 Subject: [PATCH] Makefile.in: define dotlockfile.1 installed to man
@@ -16,10 +16,10 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index 0f1b506..6e53179 100644
+index 3a74811..e447cb2 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -71,7 +71,7 @@ install_common:
+@@ -82,7 +82,7 @@ install_common:
  		else \
  		  install -g root -m 755 dotlockfile $(bindir); \
  		fi
@@ -29,5 +29,5 @@ index 0f1b506..6e53179 100644
  
  install_nfslib:	nfslib
 -- 
-2.17.1
+2.25.1
 

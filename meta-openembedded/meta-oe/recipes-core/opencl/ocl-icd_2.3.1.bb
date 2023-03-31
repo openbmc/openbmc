@@ -14,5 +14,7 @@ S = "${WORKDIR}/git"
 inherit autotools
 
 DEPENDS = "ruby-native"
+PROVIDES = "virtual/opencl-icd"
+RPROVIDES:${PN} = "virtual/opencl-icd"
 
 BBCLASSEXTEND = "native nativesdk"

@@ -115,7 +115,7 @@ New Features / Enhancements in 4.0
 
    - Fetcher enhancements:
    
-      - New :ref:`bitbake:bitbake-user-manual/bitbake-user-manual-fetching:crate fetcher (\`\`crate://\`\`)` for Rust packages
+      - New :ref:`bitbake-user-manual/bitbake-user-manual-fetching:crate fetcher (\`\`crate://\`\`)` for Rust packages
       - Added striplevel support to unpack
       - git: Add a warning asking users to set a branch in git urls
       - git: Allow git fetcher to support subdir param

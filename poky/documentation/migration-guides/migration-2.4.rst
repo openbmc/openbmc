@@ -286,7 +286,7 @@ The following are additional changes:
 
 -  BitBake fires multiple "BuildStarted" events when multiconfig is
    enabled (one per configuration). For more information, see the
-   ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:events`"
+   ":ref:`bitbake-user-manual/bitbake-user-manual-metadata:events`"
    section in the BitBake User Manual.
 
 -  By default, the ``security_flags.inc`` file sets a

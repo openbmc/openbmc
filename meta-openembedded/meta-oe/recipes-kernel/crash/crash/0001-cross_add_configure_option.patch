@@ -1,27 +1,27 @@
-From 73269df4d8196abe81112acaa2613155b308a8b8 Mon Sep 17 00:00:00 2001
+From e3ba432243d9be4e845daabc78a0ae7c03c680f5 Mon Sep 17 00:00:00 2001
 From: Lei Maohui <leimaohui@cn.fujitsu.com>
 Date: Fri, 9 Jan 2015 11:51:18 +0900
-Subject: [PATCH 1/9] cross_add_configure_option
+Subject: [PATCH] cross_add_configure_option
 
-%% original patch: 0001-cross_add_configure_option.patch
+
 ---
  Makefile | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index a2baec1..f1972c8 100644
+index 7266e305..390fc0ef 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -232,7 +232,7 @@ gdb_merge: force
+@@ -260,7 +260,7 @@ gdb_merge: force
  	@echo "../../${PROGRAM} ../../${PROGRAM}lib.a" > ${GDB}/gdb/mergeobj
  	@rm -f ${PROGRAM}
  	@if [ ! -f ${GDB}/config.status ]; then \
 -	  (cd ${GDB}; ./configure ${GDB_CONF_FLAGS} --with-separate-debug-dir=/usr/lib/debug \
 +	  (cd ${GDB}; ./configure --host=${GDB_TARGET} --build=${GDB_HOST} --with-separate-debug-dir=/usr/lib/debug \
  	    --with-bugurl="" --with-expat=no --with-python=no --disable-sim; \
- 	  make --no-print-directory CRASH_TARGET=${TARGET}; echo ${TARGET} > crash.target) \
- 	else make --no-print-directory rebuild; fi
-@@ -283,7 +283,7 @@ force:
+ 	  $(MAKE) CRASH_TARGET=${TARGET}; echo ${TARGET} > crash.target) \
+ 	else $(MAKE) rebuild; fi
+@@ -306,7 +306,7 @@ force:
  
  make_configure: force
  	@rm -f configure
@@ -30,6 +30,3 @@ index a2baec1..f1972c8 100644
  
  clean: make_configure
  	@./configure ${CONF_TARGET_FLAG} -q -b
--- 
-2.8.1
-

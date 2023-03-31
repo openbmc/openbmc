@@ -1,0 +1,60 @@
+From b3756eaa49a3de2f388bc269b2928a0233358fea Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Tue, 7 Mar 2023 12:05:00 -0500
+Subject: [PATCH 2/4] fix: uuid: Decouple guid_t and uuid_le types and
+ respective macros (v6.3)
+
+See upstream commit :
+
+  commit 5e6a51787fef20b849682d8c49ec9c2beed5c373
+  Author: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+  Date:   Tue Jan 24 15:38:38 2023 +0200
+
+    uuid: Decouple guid_t and uuid_le types and respective macros
+
+    The guid_t type and respective macros are being used internally only.
+    The uuid_le has its user outside the kernel. Decouple these types and
+    macros, and make guid_t completely internal type to the kernel.
+
+Upstream-Status: Backport
+
+Change-Id: I8644fd139b0630e9cf18886b84e33bffab1e5abd
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/lttng/events-internal.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/include/lttng/events-internal.h b/include/lttng/events-internal.h
+index e31e6abb..a91a659e 100644
+--- a/include/lttng/events-internal.h
++++ b/include/lttng/events-internal.h
+@@ -9,6 +9,7 @@
+ #define _LTTNG_EVENTS_INTERNAL_H
+ 
+ #include <wrapper/compiler_attributes.h>
++#include <wrapper/uuid.h>
+ 
+ #include <lttng/events.h>
+ 
+@@ -289,7 +290,7 @@ struct lttng_metadata_cache {
+ 	atomic_t producing;		/* Metadata being produced (incomplete) */
+ 	struct kref refcount;		/* Metadata cache usage */
+ 	struct list_head metadata_stream;	/* Metadata stream list */
+-	uuid_le uuid;			/* Trace session unique ID (copy) */
++	guid_t uuid;			/* Trace session unique ID (copy) */
+ 	struct mutex lock;		/* Produce/consume lock */
+ 	uint64_t version;		/* Current version of the metadata */
+ };
+@@ -463,7 +464,7 @@ struct lttng_kernel_session_private {
+ 	struct list_head events;		/* Event list head */
+ 	struct list_head list;			/* Session list */
+ 	unsigned int free_chan_id;		/* Next chan ID to allocate */
+-	uuid_le uuid;				/* Trace session unique ID */
++	guid_t uuid;				/* Trace session unique ID */
+ 	struct lttng_metadata_cache *metadata_cache;
+ 	unsigned int metadata_dumped:1,
+ 		tstate:1;			/* Transient enable state */
+-- 
+2.34.1
+

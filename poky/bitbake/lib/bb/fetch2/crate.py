@@ -33,7 +33,7 @@ class Crate(Wget):
         return ud.type in ['crate']
 
     def recommends_checksum(self, urldata):
-        return False
+        return True
 
     def urldata_init(self, ud, d):
         """
@@ -56,8 +56,10 @@ class Crate(Wget):
         if len(parts) < 5:
             raise bb.fetch2.ParameterError("Invalid URL: Must be crate://HOST/NAME/VERSION", ud.url)
 
-        # last field is version
-        version = parts[len(parts) - 1]
+        # version is expected to be the last token
+        # but ignore possible url parameters which will be used
+        # by the top fetcher class
+        version, _, _ = parts[len(parts) -1].partition(";")
         # second to last field is name
         name = parts[len(parts) - 2]
         # host (this is to allow custom crate registries to be specified
@@ -69,7 +71,8 @@ class Crate(Wget):
 
         ud.url = "https://%s/%s/%s/download" % (host, name, version)
         ud.parm['downloadfilename'] = "%s-%s.crate" % (name, version)
-        ud.parm['name'] = name
+        if 'name' not in ud.parm:
+            ud.parm['name'] = name
 
         logger.debug2("Fetching %s to %s" % (ud.url, ud.parm['downloadfilename']))
 

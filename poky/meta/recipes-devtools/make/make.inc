@@ -11,3 +11,8 @@ SRC_URI = "${GNU_MIRROR}/make/make-${PV}.tar.gz \
 inherit autotools gettext pkgconfig texinfo
 
 PROVIDES = "virtual/make"
+
+# Otherwise $CXX leaks into /usr/bin/make
+do_configure:prepend() {
+    unset CXX
+}

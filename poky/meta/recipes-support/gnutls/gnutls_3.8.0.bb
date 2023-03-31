@@ -80,6 +80,8 @@ FILES:${PN}-openssl = "${libdir}/libgnutls-openssl.so.*"
 FILES:${PN}-xx = "${libdir}/libgnutlsxx.so.*"
 FILES:${PN}-fips = "${bindir}/fipshmac"
 
+RDEPENDS:${PN}-ptest += "python3"
+
 BBCLASSEXTEND = "native nativesdk"
 
 pkg_postinst_ontarget:${PN}-fips () {

@@ -5,11 +5,9 @@ Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Tim Orling <TicoTimo@gmail.com>
 
-Index: vlc-2.1.4/configure.ac
-===================================================================
---- vlc-2.1.4.orig/configure.ac
-+++ vlc-2.1.4/configure.ac
-@@ -1693,7 +1693,16 @@ PKG_ENABLE_MODULES_VLC([BLURAY], [libblu
+--- a/configure.ac
++++ b/configure.ac
+@@ -1892,7 +1892,16 @@ PKG_ENABLE_MODULES_VLC([BLURAY], [libblu
  dnl
  dnl  OpenCV wrapper and example filters
  dnl

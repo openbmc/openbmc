@@ -448,8 +448,8 @@ RDEPENDS:packagegroup-meta-oe-extended:remove:mips = "sysdig"
 RDEPENDS:packagegroup-meta-oe-extended:remove:powerpc = "upm mraa minifi-cpp"
 RDEPENDS:packagegroup-meta-oe-extended:remove:powerpc64 = "upm mraa minifi-cpp"
 RDEPENDS:packagegroup-meta-oe-extended:remove:powerpc64le = "upm mraa sysdig"
-RDEPENDS:packagegroup-meta-oe-extended:remove:riscv64 = "upm libleak libyang mraa sysdig tiptop"
-RDEPENDS:packagegroup-meta-oe-extended:remove:riscv32 = "upm libleak libyang mraa sysdig tiptop"
+RDEPENDS:packagegroup-meta-oe-extended:remove:riscv64 = "upm libleak mraa sysdig tiptop"
+RDEPENDS:packagegroup-meta-oe-extended:remove:riscv32 = "upm libleak mraa sysdig tiptop"
 
 RDEPENDS:packagegroup-meta-oe-extended-python2 ="\
     ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", bb.utils.contains('I_SWEAR_TO_MIGRATE_TO_PYTHON3', 'yes', 'openlmi-tools', '', d), "", d)} \

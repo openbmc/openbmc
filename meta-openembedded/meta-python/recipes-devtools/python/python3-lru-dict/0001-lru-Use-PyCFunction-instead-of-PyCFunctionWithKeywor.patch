@@ -1,0 +1,37 @@
+From 5013406c409a0a143a315146df388281bfb2172d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 1 Mar 2023 19:53:36 -0800
+Subject: [PATCH] lru: Use PyCFunction instead of PyCFunctionWithKeywords
+
+PyMethodDef uses PyMethodDef and not PyCFunctionWithKeywords and when
+callback is specified as PyCFunctionWithKeywords, clang 16+ is able to
+detect function signature mismatch in function pointers now.
+
+Fixes
+lru.c:629:17: error: incompatible function pointer types initializing 'PyCFunction' (aka 'struct _object *(*)(struct _object *, struct _object *)') with an expression of type 'PyCFunctionWithKeywords' (aka 'struct _object *(*)(struct _object *, struct _object *, struct _object *)') [-Wincompatible-function-pointer-types]
+    {"popitem", (PyCFunctionWithKeywords)LRU_popitem, METH_VARARGS | METH_KEYWORDS,
+                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+
+Upstream-Status: Submitted [https://github.com/amitdev/lru-dict/pull/45]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lru.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lru.c b/lru.c
+index 8adcb4b..33c18ab 100644
+--- a/lru.c
++++ b/lru.c
+@@ -626,7 +626,7 @@ static PyMethodDef LRU_methods[] = {
+                     PyDoc_STR("L.setdefault(key, default=None) -> If L has key return its value, otherwise insert key with a value of default and return default")},
+     {"pop", (PyCFunction)LRU_pop, METH_VARARGS,
+                     PyDoc_STR("L.pop(key[, default]) -> If L has key return its value and remove it from L, otherwise return default. If default is not given and key is not in L, a KeyError is raised.")},
+-    {"popitem", (PyCFunctionWithKeywords)LRU_popitem, METH_VARARGS | METH_KEYWORDS,
++    {"popitem", (PyCFunction)LRU_popitem, METH_VARARGS | METH_KEYWORDS,
+                     PyDoc_STR("L.popitem([least_recent=True]) -> Returns and removes a (key, value) pair. The pair returned is the least-recently used if least_recent is true, or the most-recently used if false.")},
+     {"set_size", (PyCFunction)LRU_set_size, METH_VARARGS,
+                     PyDoc_STR("L.set_size() -> set size of LRU")},
+-- 
+2.39.2
+

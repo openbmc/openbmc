@@ -1,0 +1,14 @@
+#!/bin/sh
+
+rc=0
+for TEST in lsusb testlibusb; do
+	if ! ./$TEST ; then
+		echo "FAIL: $TEST"
+		rc=$((rc + 1))
+	else
+		echo "PASS: $TEST"
+	fi
+done
+
+# return number of failed tests
+exit $rc

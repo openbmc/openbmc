@@ -1,7 +1,7 @@
-From 9beadcdfca9198548f06bf18f3f26e1d11542e53 Mon Sep 17 00:00:00 2001
+From 276c45d0663124c9ccab0ddc8b97fb5cdc8b3867 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 31 Jul 2018 16:53:04 +0800
-Subject: [PATCH 2/4] configure.ac: remove prog test of xmlto and asciidoc
+Subject: [PATCH] configure.ac: remove prog test of xmlto and asciidoc
 
 The prog of xmlto and asciidoc were used to generate documents,
 and since the doc module has already been disabled, so we should
@@ -10,15 +10,19 @@ remove the prog test.
 Upstream-Status: Inappropriate [workaround]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Modify to apply to v 2.17.8.
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
 ---
  configure.ac | 18 ------------------
  1 file changed, 18 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index feafc28..aceccf4 100644
+index da8cf898..17ece200 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -56,24 +56,6 @@ IT_PROG_INTLTOOL([0.35.0])
+@@ -57,24 +57,6 @@ IT_PROG_INTLTOOL([0.35.0])
  
  dnl ****** END ****************************************
  
@@ -42,7 +46,7 @@ index feafc28..aceccf4 100644
 -
  AC_ARG_WITH(bugzilla,
  AS_HELP_STRING([--with-bugzilla],[use Bugzilla plugin (default is YES)]),
- LIBREPORT_PARSE_WITH([bugzilla]))
+ LIBREPORT_PARSE_WITH([bugzilla]),
 -- 
-2.7.4
+2.25.1
 

@@ -15,7 +15,7 @@ include lttng-platforms.inc
 DEPENDS = "liburcu popt libxml2 util-linux bison-native"
 RDEPENDS:${PN} = "libgcc"
 RRECOMMENDS:${PN} += "${LTTNGMODULES}"
-RDEPENDS:${PN}-ptest += "make perl bash gawk babeltrace procps perl-module-overloading coreutils util-linux kmod ${LTTNGMODULES} sed python3-core grep"
+RDEPENDS:${PN}-ptest += "make perl bash gawk babeltrace procps perl-module-overloading coreutils util-linux kmod ${LTTNGMODULES} sed python3-core grep binutils"
 RDEPENDS:${PN}-ptest:append:libc-glibc = " glibc-utils"
 RDEPENDS:${PN}-ptest:append:libc-musl = " musl-utils"
 # babelstats.pl wants getopt-long
@@ -84,7 +84,7 @@ do_install_ptest () {
     done
 
     # Patch in the correct path for the custom libraries a helper executable needs
-    sed -i -e 's!FIXMEPTESTPATH!${PTEST_PATH}!' "${D}${PTEST_PATH}/run-ptest"
+    sed -i -e 's!FIXMEPTESTPATH!${PTEST_PATH}!g' "${D}${PTEST_PATH}/run-ptest"
 
     # Prevent 'make check' from recursing into non-test subdirectories.
     sed -i -e 's!^SUBDIRS = .*!SUBDIRS = tests!' "${D}${PTEST_PATH}/Makefile"

@@ -39,8 +39,6 @@ UPSTREAM_CHECK_URI = "${DEBIAN_MIRROR}/main/a/apt/"
 # is considered stable, e.g. 1.0, 1.4, 1.8, 2.2, 2.6, etc. As there is no way
 # to express 'divisible by 4 plus 2' in regex (that I know of), let's hardcode a few.
 UPSTREAM_CHECK_REGEX = "[^\d\.](?P<pver>((2\.2)|(2\.6)|(3\.0)|(3\.4)|(3\.8)|(4\.2))(\.\d+)+)\.tar"
-# needs be marked as unknown until 2.6 is out
-UPSTREAM_VERSION_UNKNOWN = "1"
 
 inherit cmake perlnative bash-completion useradd
 

@@ -4,15 +4,15 @@ BUGTRACKER = "http://bugzilla.yoctoproject.org/"
 
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
-                    file://main.c;endline=20;md5=96e39176d9e355639a0b8b1c7a840820"
+                    file://main.c;endline=20;md5=7d9d802a36298b5c74440a880e2f4817"
 
 DEPENDS = "gtk+3 vte"
 SECTION = "x11/utils"
 
-#SRCREV tagged 0.2
-SRCREV = "161276d0f5d1be8187010fd0d9581a6feca70ea5"
+SRCREV = "99e6eb7db1b5fef110973d96194eec992a2515a2"
 SRC_URI = "git://git.yoctoproject.org/${BPN};branch=master"
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))"
+PV = "0.2+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 

@@ -14,3 +14,7 @@ SRCREV = "b421f56d9ee31a966058d23bd23c966221c91396"
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
+
+DEBUG_OPTIMIZATION:append = " -Wno-error=inline"
+
+

@@ -1,4 +1,4 @@
-From 3730a38efad969fb6f8227df07eb4461a078f5a3 Mon Sep 17 00:00:00 2001
+From b23d38f1216c4d70738edaa367cf9ecd2dd4b660 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 13 Dec 2019 12:59:26 -0800
 Subject: [PATCH] Add configure time check for setsid
@@ -7,18 +7,19 @@ Do not assume glibc == linux
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  configure    | 1 +
  configure.in | 1 +
  main.c       | 4 ++--
  xtermcfg.hin | 1 +
- 5 files changed, 6 insertions(+), 2 deletions(-)
+ 4 files changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/configure b/configure
-index 0aafefc..03e8df0 100755
+index 72342c7..c2ec2ac 100755
 --- a/configure
 +++ b/configure
-@@ -5605,6 +5605,7 @@ for ac_func in \
+@@ -5803,6 +5803,7 @@ for ac_func in \
  	unsetenv \
  	sched_yield \
  	setpgid \
@@ -27,7 +28,7 @@ index 0aafefc..03e8df0 100755
  	tcgetattr \
  	waitpid \
 diff --git a/configure.in b/configure.in
-index d2fee88..74d65df 100644
+index 56dbc25..0608c80 100644
 --- a/configure.in
 +++ b/configure.in
 @@ -99,6 +99,7 @@ AC_CHECK_FUNCS( \
@@ -39,10 +40,10 @@ index d2fee88..74d65df 100644
  	tcgetattr \
  	waitpid \
 diff --git a/main.c b/main.c
-index 5e60589..b81d2be 100644
+index 24da0eb..332174c 100644
 --- a/main.c
 +++ b/main.c
-@@ -2903,7 +2903,7 @@ main(int argc, char *argv[]ENVP_ARG)
+@@ -2956,7 +2956,7 @@ main(int argc, char *argv[]ENVP_ARG)
      }
  }
  
@@ -51,7 +52,7 @@ index 5e60589..b81d2be 100644
  #define USE_OPENPTY 1
  static int opened_tty = -1;
  #endif
-@@ -4074,7 +4074,7 @@ spawnXTerm(XtermWidget xw, unsigned line_speed)
+@@ -4205,7 +4205,7 @@ spawnXTerm(XtermWidget xw, unsigned line_speed)
  	    /*
  	     * now in child process
  	     */
@@ -61,17 +62,14 @@ index 5e60589..b81d2be 100644
  #else
  	    int pgrp = getpid();
 diff --git a/xtermcfg.hin b/xtermcfg.hin
-index 1dbc3b8..4f3ff5b 100644
+index 19048cd..e54d2cd 100644
 --- a/xtermcfg.hin
 +++ b/xtermcfg.hin
-@@ -95,6 +95,7 @@
- #undef HAVE_PUTENV		/* AC_CHECK_FUNCS(putenv) */
+@@ -98,6 +98,7 @@
  #undef HAVE_SCHED_YIELD		/* AC_CHECK_FUNCS(sched_yield) */
+ #undef HAVE_SETITIMER		/* CF_SETITIMER */
  #undef HAVE_SETPGID		/* AC_CHECK_FUNCS(setpgid) */
 +#undef HAVE_SETSID		/* AC_CHECK_FUNCS(setsid) */
  #undef HAVE_STDINT_H		/* AC_PROG_CC_STDC */
  #undef HAVE_STDLIB_H		/* AC_CHECK_HEADERS(stdlib.h) */
  #undef HAVE_STDNORETURN_H	/* CF_C11_NORETURN */
--- 
-2.24.1
-

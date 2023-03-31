@@ -1,0 +1,42 @@
+From 9f81377dddfe32d950844d7053020a36b40fce08 Mon Sep 17 00:00:00 2001
+From: Manoj Saun <manojsingh.saun@windriver.com>
+Date: Wed, 22 Mar 2023 08:07:26 +0000
+Subject: [PATCH] postgresql: fix ptest failure of sysviews
+
+The patch "0001-config_info.c-not-expose-build-info.patch" hides the debug info
+in pg_config table which reduces the count of rows from pg_config and leads to
+sysviews test failure.
+To fix it we need to reduce the count of parameters in sysviews test.
+Also we need to reduce the row count in expected result of sysview test
+to make the test output shown as pass.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Manoj Saun <manojsingh.saun@windriver.com>
+---
+ src/test/regress/expected/sysviews.out | 2 +-
+ src/test/regress/sql/sysviews.sql      | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+--- a/src/test/regress/expected/sysviews.out
++++ b/src/test/regress/expected/sysviews.out
+@@ -29,7 +29,7 @@ select name, ident, parent, level, total
+ (1 row)
+ 
+ -- At introduction, pg_config had 23 entries; it may grow
+-select count(*) > 20 as ok from pg_config;
++select count(*) > 13 as ok from pg_config;
+  ok 
+ ----
+  t
+--- a/src/test/regress/sql/sysviews.sql
++++ b/src/test/regress/sql/sysviews.sql
+@@ -18,7 +18,7 @@ select name, ident, parent, level, total
+   from pg_backend_memory_contexts where level = 0;
+ 
+ -- At introduction, pg_config had 23 entries; it may grow
+-select count(*) > 20 as ok from pg_config;
++select count(*) > 13 as ok from pg_config;
+ 
+ -- We expect no cursors in this test; see also portals.sql
+ select count(*) = 0 as ok from pg_cursors;

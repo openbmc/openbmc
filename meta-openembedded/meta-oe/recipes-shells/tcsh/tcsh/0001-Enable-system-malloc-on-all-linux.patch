@@ -13,18 +13,18 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/config_f.h b/config_f.h
-index 6a632a5..0a66960 100644
+index fb9e69b..c207c25 100644
 --- a/config_f.h
 +++ b/config_f.h
-@@ -139,7 +139,7 @@
+@@ -147,7 +147,7 @@
   *		This can be much slower and no memory statistics will be
   *		provided.
   */
--#if defined(__MACHTEN__) || defined(PURIFY) || defined(MALLOC_TRACE) || defined(_OSD_POSIX) || defined(__MVS__) || defined (__CYGWIN__) || defined(__GLIBC__) || defined(__OpenBSD__) || defined(__APPLE__) || defined (__ANDROID__)
-+#if defined(__MACHTEN__) || defined(PURIFY) || defined(MALLOC_TRACE) || defined(_OSD_POSIX) || defined(__MVS__) || defined (__CYGWIN__) || defined(__linux__) || defined(__OpenBSD__) || defined(__APPLE__)
+-#if defined(__MACHTEN__) || defined(PURIFY) || defined(MALLOC_TRACE) || defined(_OSD_POSIX) || defined(__MVS__) || defined (__CYGWIN__) || defined(__GLIBC__) || defined(__OpenBSD__) || defined(__APPLE__) || defined (__ANDROID__) || defined(__NetBSD__) || !defined(HAVE_WORKING_SBRK)
++#if defined(__MACHTEN__) || defined(PURIFY) || defined(MALLOC_TRACE) || defined(_OSD_POSIX) || defined(__MVS__) || defined (__CYGWIN__) || defined(__linux__) || defined(__OpenBSD__) || defined(__APPLE__) || defined (__ANDROID__) || defined(__NetBSD__) || !defined(HAVE_WORKING_SBRK)
  # define SYSMALLOC
  #else
  # undef SYSMALLOC
 -- 
-2.12.1
+2.34.1
 

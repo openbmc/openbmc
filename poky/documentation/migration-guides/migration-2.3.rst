@@ -198,9 +198,9 @@ The following changes took place for BitBake:
    fetcher passes the new parameter through the ``SVN_SSH`` environment
    variable during the :ref:`ref-tasks-fetch` task.
 
-   See the ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-fetching:subversion (svn) fetcher (\`\`svn://\`\`)`"
-   section in the BitBake
-   User Manual for additional information.
+   See the
+   ":ref:`bitbake-user-manual/bitbake-user-manual-fetching:subversion (svn) fetcher (\`\`svn://\`\`)`"
+   section in the BitBake User Manual for additional information.
 
 -  ``BB_SETSCENE_VERIFY_FUNCTION`` and ``BB_SETSCENE_VERIFY_FUNCTION2``
    Removed: Because the mechanism they were part of is no longer

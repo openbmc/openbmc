@@ -1,4 +1,4 @@
-From b4e04e5dd13c9de8b336f7d0c254973a225e3b5f Mon Sep 17 00:00:00 2001
+From acd3985f9c428882f1b731a6f9ce5cb1a4a3a02c Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Mon, 1 Jul 2019 16:14:16 +0800
 Subject: [PATCH] ldb: Add configure options for packages
@@ -26,7 +26,7 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
  2 files changed, 78 insertions(+), 20 deletions(-)
 
 diff --git a/lib/replace/wscript b/lib/replace/wscript
-index 4c774d9..63c9967 100644
+index 5c2b750..a38baae 100644
 --- a/lib/replace/wscript
 +++ b/lib/replace/wscript
 @@ -25,6 +25,41 @@ def options(opt):
@@ -71,7 +71,7 @@ index 4c774d9..63c9967 100644
  @Utils.run_once
  def configure(conf):
      conf.RECURSE('buildtools/wafsamba')
-@@ -35,12 +70,25 @@ def configure(conf):
+@@ -38,12 +73,25 @@ def configure(conf):
      conf.DEFINE('HAVE_LIBREPLACE', 1)
      conf.DEFINE('LIBREPLACE_NETWORK_CHECKS', 1)
  
@@ -98,10 +98,10 @@ index 4c774d9..63c9967 100644
 +    if Options.options.enable_libcap:
 +        conf.CHECK_HEADERS('sys/capability.h')
 +
-     conf.CHECK_HEADERS('port.h')
      conf.CHECK_HEADERS('sys/fcntl.h sys/filio.h sys/filsys.h sys/fs/s5param.h')
      conf.CHECK_HEADERS('sys/id.h sys/ioctl.h sys/ipc.h sys/mman.h sys/mode.h sys/ndir.h sys/priv.h')
-@@ -110,8 +158,9 @@ def configure(conf):
+     conf.CHECK_HEADERS('sys/resource.h sys/security.h sys/shm.h sys/statfs.h sys/statvfs.h sys/termio.h')
+@@ -113,8 +161,9 @@ def configure(conf):
      conf.CHECK_HEADERS('sys/fileio.h sys/filesys.h sys/dustat.h sys/sysmacros.h')
      conf.CHECK_HEADERS('xfs/libxfs.h netgroup.h')
  
@@ -113,7 +113,7 @@ index 4c774d9..63c9967 100644
      conf.CHECK_HEADERS('nss_common.h nsswitch.h ns_api.h')
      conf.CHECK_HEADERS('sys/extattr.h sys/ea.h sys/proplist.h sys/cdefs.h')
      conf.CHECK_HEADERS('utmp.h utmpx.h lastlog.h')
-@@ -434,20 +483,21 @@ def configure(conf):
+@@ -436,20 +485,21 @@ def configure(conf):
  
      strlcpy_in_bsd = False
  
@@ -150,7 +150,7 @@ index 4c774d9..63c9967 100644
      conf.CHECK_CODE('''
                  struct ucred cred;
 diff --git a/wscript b/wscript
-index 60bb7cf..7f14847 100644
+index 03076e6..5365408 100644
 --- a/wscript
 +++ b/wscript
 @@ -40,6 +40,14 @@ def options(opt):

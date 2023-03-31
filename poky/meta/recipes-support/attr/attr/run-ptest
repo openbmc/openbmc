@@ -1,3 +1,10 @@
 #!/bin/sh
 
+set +e
 make test-suite.log
+exitcode=$?
+if [ $exitcode -ne 0 -a -e test-suite.log ]; then
+    cat test-suite.log
+fi
+exit $exitcode
+

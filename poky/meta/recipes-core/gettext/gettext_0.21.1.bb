@@ -182,7 +182,7 @@ do_install_ptest() {
     fi
 }
 
-RDEPENDS:${PN}-ptest += "make xz"
+RDEPENDS:${PN}-ptest += "make xz bash"
 RDEPENDS:${PN}-ptest:append:libc-glibc = "\
     glibc-gconv-big5 \
     glibc-charmap-big5 \

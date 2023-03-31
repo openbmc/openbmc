@@ -1,0 +1,30 @@
+From ee405855bca7d6399ff1a1aef952010056c84ff6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 1 Mar 2023 21:08:09 -0800
+Subject: [PATCH] Do not use -Werror with clang
+
+Too many warnings to handle for a distro build
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test/CMakeLists.txt | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
+index e7f85f19..0b6fd980 100644
+--- a/test/CMakeLists.txt
++++ b/test/CMakeLists.txt
+@@ -197,10 +197,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+ 		message("GLM: Clang - ${CMAKE_CXX_COMPILER_ID} compiler")
+ 	endif()
+ 
+-	add_compile_options(-Werror -Weverything)
+-	add_compile_options(-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-c++11-long-long -Wno-padded -Wno-gnu-anonymous-struct -Wno-nested-anon-types)
+-	add_compile_options(-Wno-undefined-reinterpret-cast -Wno-sign-conversion -Wno-unused-variable -Wno-missing-prototypes -Wno-unreachable-code -Wno-missing-variable-declarations -Wno-sign-compare -Wno-global-constructors -Wno-unused-macros -Wno-format-nonliteral)
+-
+ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+ 	if(NOT GLM_QUIET)
+ 		message("GLM: GCC - ${CMAKE_CXX_COMPILER_ID} compiler")
+-- 
+2.39.2
+

@@ -21,6 +21,7 @@ RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-betamax \
 	${PYTHON_PN}-mock \
 	${PYTHON_PN}-multiprocessing \
+	${PYTHON_PN}-trustme \
 "
 
 do_install_ptest() {

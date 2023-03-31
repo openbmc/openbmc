@@ -81,7 +81,7 @@ EXTRA_OEMAKE = '\
     LDSHARED="${CC} -shared" \
     AR="${AR}" \
     LD="${LD}" \
-    EXTRA_CFLAGS="-ldw" \
+    EXTRA_CFLAGS="-ldw -I${S}" \
     YFLAGS='-y --file-prefix-map=${WORKDIR}=/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}' \
     EXTRA_LDFLAGS="${PERF_EXTRA_LDFLAGS}" \
     perfexecdir=${libexecdir} \
@@ -279,6 +279,16 @@ do_configure:prepend () {
     if [ -e "${S}/tools/perf/pmu-events/jevents.py" ]; then
         sed -i -e "s#os.scandir(path)#sorted(os.scandir(path), key=lambda e: e.name)#g" \
                        "${S}/tools/perf/pmu-events/jevents.py"
+    fi
+    if [ -e "${S}/tools/perf/arch/arm64/Makefile" ]; then
+	sed -i 's,sysdef := $(srctree)/,sysdef := ,' ${S}/tools/perf/arch/arm64/Makefile
+	sed -i 's,$(incpath) $(sysdef),$(incpath) $(srctree)/$(sysdef) $(sysdef),' ${S}/tools/perf/arch/arm64/Makefile
+    fi
+    if [ -e "${S}/tools/perf/arch/arm64/entry/syscalls/mksyscalltbl" ]; then
+	if ! grep -q input_rel ${S}/tools/perf/arch/arm64/entry/syscalls/mksyscalltbl; then
+	    sed -i 's,input=$4,input=$4\ninput_rel=$5,' ${S}/tools/perf/arch/arm64/entry/syscalls/mksyscalltbl
+	fi
+	sed -i 's,#include \\"\$input\\",#include \\"\$input_rel\\",'  ${S}/tools/perf/arch/arm64/entry/syscalls/mksyscalltbl
     fi
     # end reproducibility substitutions
 

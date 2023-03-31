@@ -785,7 +785,7 @@ class FetcherLocalTest(FetcherTest):
 
         # Fetch and check revision
         self.d.setVar("SRCREV", "AUTOINC")
-        self.d.setVar("__BBSEENSRCREV", "1")
+        self.d.setVar("__BBSRCREV_SEEN", "1")
         url = "git://" + self.gitdir + ";branch=master;protocol=file;" + suffix
         fetcher = bb.fetch.Fetch([url], self.d)
         fetcher.download()
@@ -1654,7 +1654,7 @@ class GitShallowTest(FetcherTest):
         self.d.setVar('BB_GIT_SHALLOW', '1')
         self.d.setVar('BB_GENERATE_MIRROR_TARBALLS', '0')
         self.d.setVar('BB_GENERATE_SHALLOW_TARBALLS', '1')
-        self.d.setVar("__BBSEENSRCREV", "1")
+        self.d.setVar("__BBSRCREV_SEEN", "1")
 
     def assertRefs(self, expected_refs, cwd=None):
         if cwd is None:
@@ -2218,7 +2218,7 @@ class GitLfsTest(FetcherTest):
 
         self.d.setVar('SRCREV', '${AUTOREV}')
         self.d.setVar('AUTOREV', '${@bb.fetch2.get_autorev(d)}')
-        self.d.setVar("__BBSEENSRCREV", "1")
+        self.d.setVar("__BBSRCREV_SEEN", "1")
 
         bb.utils.mkdirhier(self.srcdir)
         self.git_init(cwd=self.srcdir)
@@ -2377,12 +2377,43 @@ class CrateTest(FetcherTest):
         d = self.d
 
         fetcher = bb.fetch2.Fetch(uris, self.d)
+        ud = fetcher.ud[fetcher.urls[0]]
+
+        self.assertIn("name", ud.parm)
+        self.assertEqual(ud.parm["name"], "glob")
+        self.assertIn("downloadfilename", ud.parm)
+        self.assertEqual(ud.parm["downloadfilename"], "glob-0.2.11.crate")
+
         fetcher.download()
         fetcher.unpack(self.tempdir)
         self.assertEqual(sorted(os.listdir(self.tempdir)), ['cargo_home', 'download' , 'unpacked'])
         self.assertEqual(sorted(os.listdir(self.tempdir + "/download")), ['glob-0.2.11.crate', 'glob-0.2.11.crate.done'])
         self.assertTrue(os.path.exists(self.tempdir + "/cargo_home/bitbake/glob-0.2.11/.cargo-checksum.json"))
         self.assertTrue(os.path.exists(self.tempdir + "/cargo_home/bitbake/glob-0.2.11/src/lib.rs"))
+
+    @skipIfNoNetwork()
+    def test_crate_url_params(self):
+
+        uri = "crate://crates.io/aho-corasick/0.7.20;name=aho-corasick-renamed"
+        self.d.setVar('SRC_URI', uri)
+
+        uris = self.d.getVar('SRC_URI').split()
+        d = self.d
+
+        fetcher = bb.fetch2.Fetch(uris, self.d)
+        ud = fetcher.ud[fetcher.urls[0]]
+
+        self.assertIn("name", ud.parm)
+        self.assertEqual(ud.parm["name"], "aho-corasick-renamed")
+        self.assertIn("downloadfilename", ud.parm)
+        self.assertEqual(ud.parm["downloadfilename"], "aho-corasick-0.7.20.crate")
+
+        fetcher.download()
+        fetcher.unpack(self.tempdir)
+        self.assertEqual(sorted(os.listdir(self.tempdir)), ['cargo_home', 'download' , 'unpacked'])
+        self.assertEqual(sorted(os.listdir(self.tempdir + "/download")), ['aho-corasick-0.7.20.crate', 'aho-corasick-0.7.20.crate.done'])
+        self.assertTrue(os.path.exists(self.tempdir + "/cargo_home/bitbake/aho-corasick-0.7.20/.cargo-checksum.json"))
+        self.assertTrue(os.path.exists(self.tempdir + "/cargo_home/bitbake/aho-corasick-0.7.20/src/lib.rs"))
 
     @skipIfNoNetwork()
     def test_crate_url_multi(self):
@@ -2394,6 +2425,19 @@ class CrateTest(FetcherTest):
         d = self.d
 
         fetcher = bb.fetch2.Fetch(uris, self.d)
+        ud = fetcher.ud[fetcher.urls[0]]
+
+        self.assertIn("name", ud.parm)
+        self.assertEqual(ud.parm["name"], "glob")
+        self.assertIn("downloadfilename", ud.parm)
+        self.assertEqual(ud.parm["downloadfilename"], "glob-0.2.11.crate")
+
+        ud = fetcher.ud[fetcher.urls[1]]
+        self.assertIn("name", ud.parm)
+        self.assertEqual(ud.parm["name"], "time")
+        self.assertIn("downloadfilename", ud.parm)
+        self.assertEqual(ud.parm["downloadfilename"], "time-0.1.35.crate")
+
         fetcher.download()
         fetcher.unpack(self.tempdir)
         self.assertEqual(sorted(os.listdir(self.tempdir)), ['cargo_home', 'download' , 'unpacked'])
@@ -2402,6 +2446,18 @@ class CrateTest(FetcherTest):
         self.assertTrue(os.path.exists(self.tempdir + "/cargo_home/bitbake/glob-0.2.11/src/lib.rs"))
         self.assertTrue(os.path.exists(self.tempdir + "/cargo_home/bitbake/time-0.1.35/.cargo-checksum.json"))
         self.assertTrue(os.path.exists(self.tempdir + "/cargo_home/bitbake/time-0.1.35/src/lib.rs"))
+
+    @skipIfNoNetwork()
+    def test_crate_incorrect_cksum(self):
+        uri = "crate://crates.io/aho-corasick/0.7.20"
+        self.d.setVar('SRC_URI', uri)
+        self.d.setVarFlag("SRC_URI", "aho-corasick.sha256sum", hashlib.sha256("Invalid".encode("utf-8")).hexdigest())
+
+        uris = self.d.getVar('SRC_URI').split()
+
+        fetcher = bb.fetch2.Fetch(uris, self.d)
+        with self.assertRaisesRegexp(bb.fetch2.FetchError, "Fetcher failure for URL"):
+            fetcher.download()
 
 class NPMTest(FetcherTest):
     def skipIfNoNpm():
@@ -2912,7 +2968,7 @@ class GitSharedTest(FetcherTest):
         super(GitSharedTest, self).setUp()
         self.recipe_url = "git://git.openembedded.org/bitbake;branch=master"
         self.d.setVar('SRCREV', '82ea737a0b42a8b53e11c9cde141e9e9c0bd8c40')
-        self.d.setVar("__BBSEENSRCREV", "1")
+        self.d.setVar("__BBSRCREV_SEEN", "1")
 
     @skipIfNoNetwork()
     def test_shared_unpack(self):

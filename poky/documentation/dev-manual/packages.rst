@@ -999,12 +999,12 @@ test. Here is what you have to do for each recipe:
 Creating Node Package Manager (NPM) Packages
 ============================================
 
-:wikipedia:`NPM <Npm_(software)>` is a package
-manager for the JavaScript programming language. The Yocto Project
-supports the NPM :ref:`fetcher <bitbake:bitbake-user-manual/bitbake-user-manual-fetching:fetchers>`. You can
-use this fetcher in combination with
-:doc:`devtool </ref-manual/devtool-reference>` to create
-recipes that produce NPM packages.
+:wikipedia:`NPM <Npm_(software)>` is a package manager for the JavaScript
+programming language. The Yocto Project supports the NPM
+:ref:`fetcher <bitbake-user-manual/bitbake-user-manual-fetching:fetchers>`.
+You can use this fetcher in combination with
+:doc:`devtool </ref-manual/devtool-reference>` to create recipes that produce
+NPM packages.
 
 There are two workflows that allow you to create NPM packages using
 ``devtool``: the NPM registry modules method and the NPM project code

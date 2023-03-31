@@ -1,46 +1,18 @@
 #!/bin/sh
-# Valid tests to run
-tests="utest_binary \
-       utest_bits \
-       utest_common \
-       utest_hash_table \
-       utest_inet_types \
-       utest_int8 \
-       utest_json \
-       utest_list \
-       utest_merge \
-       utest_metadata \
-       utest_parser_yang \
-       utest_parser_yin \
-       utest_pattern \
-       utest_printer_yang \
-       utest_printer_yin \
-       utest_range \
-       utest_schema \
-       utest_set \
-       utest_string \
-       utest_tree_data \
-       utest_tree_schema_compile \
-       utest_types \
-       utest_xml \
-       utest_xpath \
-       utest_yang_types \
-       utest_yanglib"
 
 # cd into right directory
 ptestdir=$(dirname "$(readlink -f "$0")")
 cd "$ptestdir"/tests || exit
 
-# Run specified tests
+tests=$(find * -type f -name 'utest_*')
+
 for f in $tests
 do
-    if test -e ./"$f"; then
+    if test -x ./"$f"; then
         if ./"$f" > ./"$f".out 2> ./"$f".err; then
             echo "PASS: $f"
         else
             echo "FAIL: $f"
         fi
-    else
-        echo "SKIP: $f"
     fi
 done

@@ -26,7 +26,7 @@ Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
  1 file changed, 210 insertions(+), 4 deletions(-)
 
 diff --git a/lib/packlib.c b/lib/packlib.c
-index 8acb7be..a9d8750 100644
+index 9396e1d..d0bb181 100644
 --- a/lib/packlib.c
 +++ b/lib/packlib.c
 @@ -16,6 +16,12 @@
@@ -41,8 +41,8 @@ index 8acb7be..a9d8750 100644
 +#include <byteswap.h>
  #include "packer.h"
  
- static const char vers_id[] = "packlib.c : v2.3p2 Alec Muffett 18 May 1993";
-@@ -45,6 +51,185 @@ typedef struct
+ #define DEBUG 0
+@@ -43,6 +49,185 @@ typedef struct
      char data_get[NUMWORDS][MAXWORDLEN];
  } PWDICT64;
  
@@ -228,7 +228,7 @@ index 8acb7be..a9d8750 100644
  
  static int
  _PWIsBroken64(FILE *ifp)
-@@ -57,6 +242,7 @@ _PWIsBroken64(FILE *ifp)
+@@ -55,6 +240,7 @@ _PWIsBroken64(FILE *ifp)
         return 0;
      }
  
@@ -236,7 +236,7 @@ index 8acb7be..a9d8750 100644
      return (pdesc64.header.pih_magic == PIH_MAGIC);
  }
  
-@@ -149,7 +335,11 @@ PWOpen(prefix, mode)
+@@ -147,7 +333,11 @@ PWOpen(prefix, mode)
  	pdesc.header.pih_blocklen = NUMWORDS;
  	pdesc.header.pih_numwords = 0;
  
@@ -249,7 +249,7 @@ index 8acb7be..a9d8750 100644
      } else
      {
  	pdesc.flags &= ~PFOR_WRITE;
-@@ -173,6 +363,7 @@ PWOpen(prefix, mode)
+@@ -171,6 +361,7 @@ PWOpen(prefix, mode)
  	    return NULL;
  	}
  
@@ -257,7 +257,7 @@ index 8acb7be..a9d8750 100644
          if ((pdesc.header.pih_magic == 0) || (pdesc.header.pih_numwords == 0))
          {
              /* uh-oh. either a broken "64-bit" file or a garbage file. */
-@@ -195,6 +386,7 @@ PWOpen(prefix, mode)
+@@ -193,6 +384,7 @@ PWOpen(prefix, mode)
  		}
                  return NULL;
              }
@@ -265,7 +265,7 @@ index 8acb7be..a9d8750 100644
              if (pdesc64.header.pih_magic != PIH_MAGIC)
              {
                  /* nope, not "64-bit" after all */
-@@ -290,6 +482,7 @@ PWOpen(prefix, mode)
+@@ -288,6 +480,7 @@ PWOpen(prefix, mode)
                  {
                      pdesc.flags &= ~PFOR_USEHWMS;
                  }
@@ -273,7 +273,7 @@ index 8acb7be..a9d8750 100644
                  for (i = 0; i < sizeof(pdesc.hwms) / sizeof(pdesc.hwms[0]); i++)
                  {
                      pdesc.hwms[i] = pdesc64.hwms[i];
-@@ -299,6 +492,7 @@ PWOpen(prefix, mode)
+@@ -297,6 +490,7 @@ PWOpen(prefix, mode)
  	    {
  		pdesc.flags &= ~PFOR_USEHWMS;
  	    }
@@ -281,7 +281,7 @@ index 8acb7be..a9d8750 100644
  #if DEBUG
              for (i=1; i<=0xff; i++)
              {
-@@ -332,7 +526,11 @@ PWClose(pwp)
+@@ -330,7 +524,11 @@ PWClose(pwp)
  	    return (-1);
  	}
  
@@ -294,7 +294,7 @@ index 8acb7be..a9d8750 100644
  	{
  	    fprintf(stderr, "index magic fwrite failed\n");
  	    return (-1);
-@@ -351,7 +549,12 @@ PWClose(pwp)
+@@ -349,7 +547,12 @@ PWClose(pwp)
  	    	printf("hwm[%02x] = %d\n", i, pwp->hwms[i]);
  #endif
  	    }
@@ -308,7 +308,7 @@ index 8acb7be..a9d8750 100644
  	}
      }
  
-@@ -405,7 +608,8 @@ PutPW(pwp, string)
+@@ -403,7 +606,8 @@ PutPW(pwp, string)
  
  	datum = (uint32_t) ftell(pwp->dfp);
  
@@ -318,7 +318,7 @@ index 8acb7be..a9d8750 100644
  
  	fputs(pwp->data_put[0], pwp->dfp);
  	putc(0, (FILE*) pwp->dfp);
-@@ -464,6 +668,7 @@ GetPW(pwp, number)
+@@ -462,6 +666,7 @@ GetPW(pwp, number)
             perror("(index fread failed)");
             return NULL;
         }
@@ -326,7 +326,7 @@ index 8acb7be..a9d8750 100644
         datum = datum64;
      } else {
         if (fseek(pwp->ifp, sizeof(struct pi_header) + (thisblock * sizeof(uint32_t)), 0))
-@@ -477,6 +682,7 @@ GetPW(pwp, number)
+@@ -475,6 +680,7 @@ GetPW(pwp, number)
             perror("(index fread failed)");
             return NULL;
         }

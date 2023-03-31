@@ -1,3 +1,8 @@
+From af49d8df559aa18f97d14ab7971f211238a16041 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Thu, 9 Mar 2023 10:50:10 +0800
+Subject: [PATCH] Makefile: Don't write ${TARGET} to crash.target
+
 This enables parallel building (multiple jobs in gdb) by reading the
 value from GDB_MAKE_JOBS.
 
@@ -8,19 +13,26 @@ Upstream-Status: Pending
 Don't write ${TARGET} to crash.target which causes rebuild fails.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
---
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
 diff --git a/Makefile b/Makefile
-index 27a1d47..bcf2d2f 100644
+index cd25c7d..d61c4c5 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -232,8 +232,8 @@ gdb_merge: force
+@@ -262,8 +262,8 @@ gdb_merge: force
  	@if [ ! -f ${GDB}/config.status ]; then \
  	  (cd ${GDB}; ./configure --host=${GDB_TARGET} --build=${GDB_HOST} --with-separate-debug-dir=/usr/lib/debug \
  	    --with-bugurl="" --with-expat=no --with-python=no --disable-sim; \
--	  make --no-print-directory CRASH_TARGET=${TARGET}; echo ${TARGET} > crash.target) \
--	else make --no-print-directory rebuild; fi
-+	  make --no-print-directory CRASH_TARGET=${TARGET} ${GDB_MAKE_JOBS}; ) \
-+	else make --no-print-directory ${GDB_MAKE_JOBS} rebuild; fi
+-	  $(MAKE) CRASH_TARGET=${TARGET}; echo ${TARGET} > crash.target) \
+-	else $(MAKE) rebuild; fi
++	  $(MAKE) CRASH_TARGET=${TARGET} ${GDB_MAKE_JOBS}; ) \
++	else $(MAKE) ${GDB_MAKE_JOBS} rebuild; fi
  	@if [ ! -f ${PROGRAM} ]; then \
  	  echo; echo "${PROGRAM} build failed"; \
  	  echo; exit 1; fi
+-- 
+2.25.1
+

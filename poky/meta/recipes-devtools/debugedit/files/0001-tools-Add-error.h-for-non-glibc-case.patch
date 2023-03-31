@@ -1,0 +1,102 @@
+From 4c797d3b559ba51bd9ccd9a2036245819acce843 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Thu, 23 Mar 2023 10:54:21 +0800
+Subject: [PATCH] tools: Add error.h for non-glibc case
+
+error is glibc specific API, so this patch will mostly not accepted
+upstream given that elfutils has been closely tied to glibc
+
+This is a OE specific workaround for musl.
+
+Upstream-Status: Inappropriate [OE Specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ tools/debugedit.c      |  7 ++++++-
+ tools/error.h          | 27 +++++++++++++++++++++++++++
+ tools/sepdebugcrcfix.c |  7 ++++++-
+ 3 files changed, 39 insertions(+), 2 deletions(-)
+ create mode 100644 tools/error.h
+
+diff --git a/tools/debugedit.c b/tools/debugedit.c
+index 668777a..a72c3c0 100644
+--- a/tools/debugedit.c
++++ b/tools/debugedit.c
+@@ -25,7 +25,6 @@
+ #include <byteswap.h>
+ #include <endian.h>
+ #include <errno.h>
+-#include <error.h>
+ #include <limits.h>
+ #include <string.h>
+ #include <stdlib.h>
+@@ -40,6 +39,12 @@
+ #include <gelf.h>
+ #include <dwarf.h>
+ 
++#ifdef __GLIBC__
++#include <error.h>
++#else
++#include "error.h"
++#endif
++
+ #ifndef MAX
+ #define MAX(m, n) ((m) < (n) ? (n) : (m))
+ #endif
+diff --git a/tools/error.h b/tools/error.h
+new file mode 100644
+index 0000000..9b24418
+--- /dev/null
++++ b/tools/error.h
+@@ -0,0 +1,27 @@
++#ifndef _ERROR_H_
++#define _ERROR_H_
++
++#include <stdarg.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <errno.h>
++
++static unsigned int error_message_count = 0;
++
++static inline void error(int status, int errnum, const char* format, ...)
++{
++	va_list ap;
++	fprintf(stderr, "%s: ", program_invocation_name);
++	va_start(ap, format);
++	vfprintf(stderr, format, ap);
++	va_end(ap);
++	if (errnum)
++		fprintf(stderr, ": %s", strerror(errnum));
++	fprintf(stderr, "\n");
++	error_message_count++;
++	if (status)
++		exit(status);
++}
++
++#endif        /* _ERROR_H_ */
+diff --git a/tools/sepdebugcrcfix.c b/tools/sepdebugcrcfix.c
+index da50e6c..c4a9d56 100644
+--- a/tools/sepdebugcrcfix.c
++++ b/tools/sepdebugcrcfix.c
+@@ -29,10 +29,15 @@
+ #include <endian.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+-#include <error.h>
+ #include <libelf.h>
+ #include <gelf.h>
+ 
++#ifdef __GLIBC__
++#include <error.h>
++#else
++#include "error.h"
++#endif
++
+ #ifndef _
+ #define _(x) x
+ #endif
+-- 
+2.17.1
+

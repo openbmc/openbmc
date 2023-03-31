@@ -749,10 +749,13 @@ def subprocess_setup():
     # SIGPIPE errors are known issues with gzip/bash
     signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
-def get_autorev(d):
-    #  only not cache src rev in autorev case
+def mark_recipe_nocache(d):
     if d.getVar('BB_SRCREV_POLICY') != "cache":
         d.setVar('BB_DONT_CACHE', '1')
+
+def get_autorev(d):
+    mark_recipe_nocache(d)
+    d.setVar("__BBAUTOREV_SEEN", True)
     return "AUTOINC"
 
 def get_srcrev(d, method_name='sortable_revision'):
@@ -769,7 +772,7 @@ def get_srcrev(d, method_name='sortable_revision'):
     that fetcher provides a method with the given name and the same signature as sortable_revision.
     """
 
-    d.setVar("__BBSEENSRCREV", "1")
+    d.setVar("__BBSRCREV_SEEN", "1")
     recursion = d.getVar("__BBINSRCREV")
     if recursion:
         raise FetchError("There are recursive references in fetcher variables, likely through SRC_URI")
@@ -1219,6 +1222,7 @@ def srcrev_internal_helper(ud, d, name):
     if srcrev == "INVALID" or not srcrev:
         raise FetchError("Please set a valid SRCREV for url %s (possible key names are %s, or use a ;rev=X URL parameter)" % (str(attempts), ud.url), ud.url)
     if srcrev == "AUTOINC":
+        d.setVar("__BBAUTOREV_ACTED_UPON", True)
         srcrev = ud.method.latest_revision(ud, d, name)
 
     return srcrev
@@ -1291,17 +1295,12 @@ class FetchData(object):
 
             if checksum_name in self.parm:
                 checksum_expected = self.parm[checksum_name]
-            elif self.type not in ["http", "https", "ftp", "ftps", "sftp", "s3", "az"]:
+            elif self.type not in ["http", "https", "ftp", "ftps", "sftp", "s3", "az", "crate"]:
                 checksum_expected = None
             else:
                 checksum_expected = d.getVarFlag("SRC_URI", checksum_name)
 
             setattr(self, "%s_expected" % checksum_id, checksum_expected)
-
-        for checksum_id in CHECKSUM_LIST:
-            configure_checksum(checksum_id)
-
-        self.ignore_checksums = False
 
         self.names = self.parm.get("name",'default').split(',')
 
@@ -1323,6 +1322,11 @@ class FetchData(object):
 
         if hasattr(self.method, "urldata_init"):
             self.method.urldata_init(self, d)
+
+        for checksum_id in CHECKSUM_LIST:
+            configure_checksum(checksum_id)
+
+        self.ignore_checksums = False
 
         if "localpath" in self.parm:
             # if user sets localpath for file, use it instead.

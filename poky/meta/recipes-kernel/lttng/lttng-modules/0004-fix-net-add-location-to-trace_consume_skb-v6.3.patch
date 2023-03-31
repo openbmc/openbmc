@@ -1,0 +1,62 @@
+From 12f43cab7daceff0c73c78276b5a5b9cc1d5056f Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Tue, 7 Mar 2023 11:10:26 -0500
+Subject: [PATCH 4/4] fix: net: add location to trace_consume_skb() (v6.3)
+
+See upstream commit :
+
+  commit dd1b527831a3ed659afa01b672d8e1f7e6ca95a5
+  Author: Eric Dumazet <edumazet@google.com>
+  Date:   Thu Feb 16 15:47:18 2023 +0000
+
+    net: add location to trace_consume_skb()
+
+    kfree_skb() includes the location, it makes sense
+    to add it to consume_skb() as well.
+
+Upstream-Status: Backport
+
+Change-Id: I8d871187d90e7fe113a63e209b00aebe0df475f3
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/instrumentation/events/skb.h | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/include/instrumentation/events/skb.h b/include/instrumentation/events/skb.h
+index 186732ea..3c43f32d 100644
+--- a/include/instrumentation/events/skb.h
++++ b/include/instrumentation/events/skb.h
+@@ -61,6 +61,21 @@ LTTNG_TRACEPOINT_EVENT_MAP(kfree_skb,
+ )
+ #endif
+ 
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,3,0))
++LTTNG_TRACEPOINT_EVENT_MAP(consume_skb,
++
++	skb_consume,
++
++	TP_PROTO(struct sk_buff *skb, void *location),
++
++	TP_ARGS(skb, location),
++
++	TP_FIELDS(
++		ctf_integer_hex(void *, skbaddr, skb)
++		ctf_integer_hex(void *, location, location)
++	)
++)
++#else
+ LTTNG_TRACEPOINT_EVENT_MAP(consume_skb,
+ 
+ 	skb_consume,
+@@ -73,6 +88,7 @@ LTTNG_TRACEPOINT_EVENT_MAP(consume_skb,
+ 		ctf_integer_hex(void *, skbaddr, skb)
+ 	)
+ )
++#endif
+ 
+ LTTNG_TRACEPOINT_EVENT(skb_copy_datagram_iovec,
+ 
+-- 
+2.34.1
+

@@ -13,6 +13,8 @@ DEPENDS:append:class-nativesdk = " nativesdk-rust-llvm"
 
 DEPENDS += "rust-llvm (=${PV})"
 
+RDEPENDS:${PN}:append:class-target = " gcc g++ binutils"
+
 # Otherwise we'll depend on what we provide
 INHIBIT_DEFAULT_RUST_DEPS:class-native = "1"
 # We don't need to depend on gcc-native because yocto assumes it exists

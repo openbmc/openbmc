@@ -1,0 +1,46 @@
+From c41653e856d05ed430d22f8b311714ff756a0e0b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 23 Mar 2023 18:05:27 -0700
+Subject: [PATCH] cmake: Do not check for upstart on build host
+
+Some ubuntu distros might have this directory /usr/share/upstart around
+and yocto based distros not using systemd will process this piece of
+code and falsely assume that target supports upstart, which may not be
+true in case of cross-compilation.
+
+This also can end up in configure errors e.g.
+
+| CMake Error at src/CMakeLists.txt:496 (install):
+|   install DIRECTORY given unknown argument "/etc/td-agent-bit/".
+|
+|
+| -- Configuring incomplete, errors occurred!
+
+Upstream-Status: Inappropriate [ Cross-compile Specific ]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/CMakeLists.txt | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index bb30b2a..c63b6d8 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -486,14 +486,6 @@ if(FLB_BINARY)
+       )
+     install(FILES ${FLB_SYSTEMD_SCRIPT} COMPONENT binary DESTINATION ${SYSTEMD_UNITDIR})
+     install(DIRECTORY DESTINATION ${FLB_INSTALL_CONFDIR} COMPONENT binary)
+-  elseif(IS_DIRECTORY /usr/share/upstart)
+-    set(FLB_UPSTART_SCRIPT "${PROJECT_SOURCE_DIR}/init/${FLB_OUT_NAME}.conf")
+-    configure_file(
+-      "${PROJECT_SOURCE_DIR}/init/upstart.in"
+-      ${FLB_UPSTART_SCRIPT}
+-      )
+-    install(FILES ${FLB_UPSTART_SCRIPT} COMPONENT binary DESTINATION /etc/init)
+-    install(DIRECTORY DESTINATION COMPONENT binary ${FLB_INSTALL_CONFDIR})
+   else()
+     # FIXME: should we support Sysv init script ?
+   endif()
+-- 
+2.40.0
+

@@ -29,7 +29,7 @@ do_install_ptest() {
 	chown -R root:root ${D}${PTEST_PATH}/testfiles
 }
 
-RDEPENDS:${PN} += "perl-module-encode perl-module-perlio"
+RDEPENDS:${PN} += "perl-module-encode perl-module-perlio perl-module-encode-encoding"
 
 RDEPENDS:${PN}-ptest += " \
     perl-module-base  \

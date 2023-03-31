@@ -47,6 +47,7 @@ PACKAGECONFIG[gnutls] = "--with-tls=gnutls,--with-tls=no,gnutls"
 PACKAGECONFIG[pam] = "--enable-pam --with-pam-module=unix, --disable-pam, libpam"
 PACKAGECONFIG[systemd] = "--with-systemd=${systemd_system_unitdir},--without-systemd,systemd"
 PACKAGECONFIG[xinetd] = "--with-xinetd=${sysconfdir}/xinetd.d,--without-xinetd,xinetd"
+PACKAGECONFIG[webif] = "--enable-webif,--disable-webif"
 
 EXTRA_OECONF = " \
                --enable-dbus \
@@ -66,7 +67,7 @@ EXTRA_OECONF = " \
 EXTRA_AUTORECONF += "--exclude=autoheader"
 
 do_install () {
-	oe_runmake "DESTDIR=${D}" install
+	oe_runmake "BUILDROOT=${D}" install
 
 	# Remove /var/run from package as cupsd will populate it on startup
 	rm -fr ${D}/${localstatedir}/run
@@ -74,7 +75,7 @@ do_install () {
 	rmdir ${D}/${libexecdir}/${BPN}/driver
 
 	# Fix the pam configuration file permissions
-	if ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'true', 'false', d)}; then
+	if ${@bb.utils.contains('PACKAGECONFIG', 'pam', 'true', 'false', d)}; then
 	    chmod 0644 ${D}${sysconfdir}/pam.d/cups
 	fi
 
@@ -92,7 +93,7 @@ do_install () {
 	fi
 }
 
-PACKAGES =+ "${PN}-lib ${PN}-libimage"
+PACKAGES =+ "${PN}-lib ${PN}-libimage ${PN}-webif"
 
 RDEPENDS:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'procps', '', d)}"
 FILES:${PN} += "${libexecdir}/cups/"
@@ -101,13 +102,10 @@ FILES:${PN}-lib = "${libdir}/libcups.so.*"
 
 FILES:${PN}-libimage = "${libdir}/libcupsimage.so.*"
 
-#package the html for the webgui inside the main packages (~1MB uncompressed)
+# put the html for the web interface into its own PACKAGE
+FILES:${PN}-webif += "${datadir}/doc/cups/ ${datadir}/icons/"
+RRECOMMENDS:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'webif', '${PN}-webif', '', d)}"
 
-FILES:${PN} += "${datadir}/doc/cups/images \
-                ${datadir}/doc/cups/*html \
-                ${datadir}/doc/cups/*.css \
-                ${datadir}/icons/ \
-               "
 CONFFILES:${PN} += "${sysconfdir}/cups/cupsd.conf"
 
 MULTILIB_SCRIPTS = "${PN}-dev:${bindir}/cups-config"

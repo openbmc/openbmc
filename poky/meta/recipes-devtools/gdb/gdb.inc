@@ -14,6 +14,7 @@ SRC_URI = "${GNU_MIRROR}/gdb/gdb-${PV}.tar.xz \
            file://0007-Fix-invalid-sigprocmask-call.patch \
            file://0008-Define-alignof-using-_Alignof-when-using-C11-or-newe.patch \
            file://0009-gdbserver-linux-low.cc-Fix-a-typo-in-ternary-operato.patch \
+           file://add-missing-ldflags.patch \
            "
 SRC_URI[sha256sum] = "115ad5c18d69a6be2ab15882d365dda2a2211c14f480b3502c6eba576e2e95a0"
 

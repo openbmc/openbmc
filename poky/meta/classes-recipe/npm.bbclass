@@ -82,7 +82,7 @@ def npm_pack(env, srcdir, workdir):
     subprocess.run(['tar', 'czf', tarball,
                     '--exclude', './node-modules',
                     '--exclude-vcs',
-                    '--transform', 's,^\./,package/,',
+                    '--transform', r's,^\./,package/,',
                     '--mtime', '1985-10-26T08:15:00.000Z',
                     '.'],
                    check = True, cwd = srcdir)

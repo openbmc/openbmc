@@ -288,7 +288,7 @@ python base_eventhandler() {
             bb.plain('\n%s\n%s\n' % (statusheader, '\n'.join(statuslines)))
 
     # This code is to silence warnings where the SDK variables overwrite the 
-    # target ones and we'd see dulpicate key names overwriting each other
+    # target ones and we'd see duplicate key names overwriting each other
     # for various PREFERRED_PROVIDERS
     if isinstance(e, bb.event.RecipePreFinalise):
         if d.getVar("TARGET_PREFIX") == d.getVar("SDK_PREFIX"):
@@ -351,7 +351,7 @@ base_do_compile() {
 
 addtask install after do_compile
 do_install[dirs] = "${B}"
-# Remove and re-create ${D} so that is it guaranteed to be empty
+# Remove and re-create ${D} so that it is guaranteed to be empty
 do_install[cleandirs] = "${D}"
 
 base_do_install() {

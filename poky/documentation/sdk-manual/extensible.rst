@@ -651,12 +651,11 @@ counterparts.
    :ref:`dev-manual/upgrading-recipes:upgrading recipes` section
    of the Yocto Project Development Tasks Manual.
 
-The ``devtool upgrade`` command is flexible enough to allow you to
-specify source code revision and versioning schemes, extract code into
-or out of the ``devtool``
-:ref:`devtool-the-workspace-layer-structure`,
-and work with any source file forms that the
-:ref:`bitbake:bitbake-user-manual/bitbake-user-manual-fetching:fetchers` support.
+The ``devtool upgrade`` command is flexible enough to allow you to specify
+source code revision and versioning schemes, extract code into or out of the
+``devtool`` :ref:`devtool-the-workspace-layer-structure`, and work with any
+source file forms that the
+:ref:`bitbake-user-manual/bitbake-user-manual-fetching:fetchers` support.
 
 The following diagram shows the common development flow used with the
 ``devtool upgrade`` command:

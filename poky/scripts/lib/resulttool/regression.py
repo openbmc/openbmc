@@ -190,11 +190,20 @@ def compare_result(logger, base_name, target_name, base_result, target_result):
             else:
                 logger.error('Failed to retrieved base test case status: %s' % k)
     if result:
-        resultstring = "Regression: %s\n            %s\n" % (base_name, target_name)
-        for k in sorted(result):
-            resultstring += '    %s: %s -> %s\n' % (k, result[k]['base'], result[k]['target'])
+        new_pass_count = sum(test['target'] is not None and test['target'].startswith("PASS") for test in result.values())
+        # Print a regression report only if at least one test has a regression status (FAIL, SKIPPED, absent...)
+        if new_pass_count < len(result):
+            resultstring = "Regression:  %s\n             %s\n" % (base_name, target_name)
+            for k in sorted(result):
+                if not result[k]['target'] or not result[k]['target'].startswith("PASS"):
+                    resultstring += '    %s: %s -> %s\n' % (k, result[k]['base'], result[k]['target'])
+            if new_pass_count > 0:
+                resultstring += f'    Additionally, {new_pass_count} previously failing test(s) is/are now passing\n'
+        else:
+            resultstring = "Improvement: %s\n             %s\n             (+%d test(s) passing)" % (base_name, target_name, new_pass_count)
+            result = None
     else:
-        resultstring = "Match: %s\n       %s" % (base_name, target_name)
+        resultstring = "Match:       %s\n             %s" % (base_name, target_name)
     return result, resultstring
 
 def get_results(logger, source):
@@ -206,11 +215,37 @@ def regression(args, logger):
 
     regression_common(args, logger, base_results, target_results)
 
+# Some test case naming is poor and contains random strings, particularly lttng/babeltrace.
+# Truncating the test names works since they contain file and line number identifiers
+# which allows us to match them without the random components.
+def fixup_ptest_names(results, logger):
+    for r in results:
+        for i in results[r]:
+            tests = list(results[r][i]['result'].keys())
+            for test in tests:
+                new = None
+                if test.startswith(("ptestresult.lttng-tools.", "ptestresult.babeltrace.", "ptestresult.babeltrace2")) and "_-_" in test:
+                    new = test.split("_-_")[0]
+                elif test.startswith(("ptestresult.curl.")) and "__" in test:
+                    new = test.split("__")[0]
+                elif test.startswith(("ptestresult.dbus.")) and "__" in test:
+                    new = test.split("__")[0]
+                elif test.startswith("ptestresult.binutils") and "build-st-" in test:
+                    new = test.split(" ")[0]
+                elif test.startswith("ptestresult.gcc") and "/tmp/runtest." in test:
+                    new = ".".join(test.split(".")[:2])
+                if new:
+                    results[r][i]['result'][new] = results[r][i]['result'][test]
+                    del results[r][i]['result'][test]
+
 def regression_common(args, logger, base_results, target_results):
     if args.base_result_id:
         base_results = resultutils.filter_resultsdata(base_results, args.base_result_id)
     if args.target_result_id:
         target_results = resultutils.filter_resultsdata(target_results, args.target_result_id)
+
+    fixup_ptest_names(base_results, logger)
+    fixup_ptest_names(target_results, logger)
 
     matches = []
     regressions = []
@@ -243,28 +278,10 @@ def regression_common(args, logger, base_results, target_results):
         else:
             notfound.append("%s not found in target" % a)
     print("\n".join(sorted(matches)))
+    print("\n")
     print("\n".join(sorted(regressions)))
     print("\n".join(sorted(notfound)))
-
     return 0
-
-# Some test case naming is poor and contains random strings, particularly lttng/babeltrace.
-# Truncating the test names works since they contain file and line number identifiers
-# which allows us to match them without the random components.
-def fixup_ptest_names(results, logger):
-    for r in results:
-        for i in results[r]:
-            tests = list(results[r][i]['result'].keys())
-            for test in tests:
-                new = None
-                if test.startswith(("ptestresult.lttng-tools.", "ptestresult.babeltrace.", "ptestresult.babeltrace2")) and "_-_" in test:
-                    new = test.split("_-_")[0]
-                elif test.startswith(("ptestresult.curl.")) and "__" in test:
-                    new = test.split("__")[0]
-                if new:
-                    results[r][i]['result'][new] = results[r][i]['result'][test]
-                    del results[r][i]['result'][test]
-
 
 def regression_git(args, logger):
     base_results = {}
@@ -326,9 +343,6 @@ def regression_git(args, logger):
 
     base_results = resultutils.git_get_result(repo, revs[index1][2])
     target_results = resultutils.git_get_result(repo, revs[index2][2])
-
-    fixup_ptest_names(base_results, logger)
-    fixup_ptest_names(target_results, logger)
 
     regression_common(args, logger, base_results, target_results)
 

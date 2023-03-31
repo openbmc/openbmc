@@ -1,0 +1,29 @@
+From 6937685426aff8059b68b2941a0fe549eca21ce5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 3 Mar 2023 23:04:56 -0800
+Subject: [PATCH] meson: Add riscv32 to seccomp unsupported list
+
+rv32 needs to upstream the libseccomp support
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 6a888b8..a87c419 100644
+--- a/meson.build
++++ b/meson.build
+@@ -65,7 +65,7 @@ udev_dep = dependency('libudev', required: get_option('udev'))
+ host_os = host_machine.system()
+ host_cpu = host_machine.cpu()
+ supported_os = ['linux']
+-unsupported_cpus = ['alpha', 'ia64', 'm68k', 'sh4', 'sparc', 'sparc64']
++unsupported_cpus = ['alpha', 'ia64', 'm68k', 'riscv32', 'sh4', 'sparc', 'sparc64']
+ if supported_os.contains(host_os) and not unsupported_cpus.contains(host_cpu)
+   seccomp_dep = dependency('libseccomp')
+ else
+-- 
+2.39.2
+

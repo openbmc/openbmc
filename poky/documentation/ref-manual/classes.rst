@@ -858,8 +858,9 @@ introspection. This functionality is only enabled if the
 
 .. note::
 
-   This functionality is backfilled by default and, if not applicable,
-   should be disabled through :term:`DISTRO_FEATURES_BACKFILL_CONSIDERED` or
+   This functionality is :ref:`backfilled <ref-features-backfill>` by default
+   and, if not applicable, should be disabled through
+   :term:`DISTRO_FEATURES_BACKFILL_CONSIDERED` or
    :term:`MACHINE_FEATURES_BACKFILL_CONSIDERED`, respectively.
 
 .. _ref-classes-grub-efi:

@@ -1,0 +1,36 @@
+From 9a8ede03ef61cdf527ce3a80771150a7452e4603 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 11 Mar 2023 22:56:17 -0800
+Subject: [PATCH] sg_dd.c: Use off_t instead of uint
+
+uint is not available on every platform e.g. linux/musl systems. Use
+uint32_t instead to represent 'off' variable, Fixes
+
+sg_dd.c:2402:17: error: use of undeclared identifier 'uint'; did you mean 'int'?
+                uint off;
+                ^~~~
+                int
+1 error generated.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/sg_dd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/sg_dd.c b/src/sg_dd.c
+index 9d05c93..35e2423 100644
+--- a/src/sg_dd.c
++++ b/src/sg_dd.c
+@@ -2399,7 +2399,7 @@ main(int argc, char * argv[])
+             res = blocks * blk_sz;
+             if (iflag.zero && iflag.ff && (blk_sz >= 4)) {
+                 uint32_t pos = (uint32_t)skip;
+-                uint off;
++                uint32_t off;
+ 
+                 for (k = 0, off = 0; k < blocks; ++k, off += blk_sz, ++pos) {
+                     for (j = 0; j < (blk_sz - 3); j += 4)
+-- 
+2.39.2
+

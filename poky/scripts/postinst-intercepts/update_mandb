@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# SPDX-License-Identifier: MIT
+#
+
+set -eu
+
+# Create a temporary man_db.conf with paths to the rootfs, as mandb needs absolute paths
+CONFIG=$(mktemp --tmpdir update-mandb.XXXXX)
+sed "s:\(\s\)/:\1$D/:g" $D${sysconfdir}/man_db.conf > $CONFIG
+
+PSEUDO_UNLOAD=1 ${binprefix}qemuwrapper -L $D $D${bindir}/mandb --config-file $CONFIG --create
+
+rm -f $CONFIG
+
+chown -R man:man $D${localstatedir}/cache/man/

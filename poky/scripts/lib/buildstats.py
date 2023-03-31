@@ -234,6 +234,7 @@ class BuildStats(dict):
         """
         Parse the top-level build_stats file for build-wide start and duration.
         """
+        start = elapsed = 0
         with open(path) as fobj:
             for line in fobj.readlines():
                 key, val = line.split(':', 1)

@@ -1,0 +1,11 @@
+--- ninja-1.11.1/src/ninja/__init__.py.old	2022-11-05 09:49:23.000000000 +0100
++++ ninja-1.11.1/src/ninja/__init__.py	2023-03-10 09:45:13.452082888 +0100
+@@ -44,7 +44,7 @@
+ 
+ 
+ def _program(name, args):
+-    return subprocess.call([os.path.join(BIN_DIR, name)] + args, close_fds=False)
++    return subprocess.call([name] + args, close_fds=False)
+ 
+ 
+ def ninja():

@@ -6,7 +6,7 @@ Features
 
 This chapter provides a reference of shipped machine and distro features
 you can include as part of your image, a reference on image features you
-can select, and a reference on feature backfilling.
+can select, and a reference on :ref:`ref-features-backfill`.
 
 Features provide a mechanism for working out which packages should be
 included in the generated images. Distributions can select which
@@ -416,58 +416,50 @@ these valid features is as follows:
 Feature Backfilling
 ===================
 
-Sometimes it is necessary in the OpenEmbedded build system to extend
-:term:`MACHINE_FEATURES` or
-:term:`DISTRO_FEATURES` to control functionality
-that was previously enabled and not able to be disabled. For these
-cases, we need to add an additional feature item to appear in one of
-these variables, but we do not want to force developers who have
-existing values of the variables in their configuration to add the new
-feature in order to retain the same overall level of functionality.
-Thus, the OpenEmbedded build system has a mechanism to automatically
-"backfill" these added features into existing distro or machine
+Sometimes it is necessary in the OpenEmbedded build system to
+add new functionality to :term:`MACHINE_FEATURES` or
+:term:`DISTRO_FEATURES`, but at the same time, allow existing
+distributions or machine definitions to opt out of such new
+features, to retain the same overall level of functionality.
+
+To make this possible, the OpenEmbedded build system has a mechanism to
+automatically "backfill" features into existing distro or machine
 configurations. You can see the list of features for which this is done
-by finding the
-:term:`DISTRO_FEATURES_BACKFILL` and
-:term:`MACHINE_FEATURES_BACKFILL`
-variables in the ``meta/conf/bitbake.conf`` file.
+by checking the :term:`DISTRO_FEATURES_BACKFILL` and
+:term:`MACHINE_FEATURES_BACKFILL` variables in the
+``meta/conf/bitbake.conf`` file.
 
-Because such features are backfilled by default into all configurations
-as described in the previous paragraph, developers who wish to disable
-the new features need to be able to selectively prevent the backfilling
-from occurring. They can do this by adding the undesired feature or
-features to the
+These two variables are paired with the
 :term:`DISTRO_FEATURES_BACKFILL_CONSIDERED`
-or
-:term:`MACHINE_FEATURES_BACKFILL_CONSIDERED`
-variables for distro features and machine features respectively.
+and :term:`MACHINE_FEATURES_BACKFILL_CONSIDERED` variables
+which allow distro or machine configuration maintainers to `consider` any
+added feature, and decide when they wish to keep or exclude such feature,
+thus preventing the backfilling from happening.
 
-Here are two examples to help illustrate feature backfilling:
+Here are two examples to illustrate feature backfilling:
 
--  *The "pulseaudio" distro feature option*: Previously, PulseAudio
-   support was enabled within the Qt and GStreamer frameworks. Because
-   of this, the feature is backfilled and thus enabled for all distros
-   through the :term:`DISTRO_FEATURES_BACKFILL` variable in the
-   ``meta/conf/bitbake.conf`` file. However, your distro needs to
-   disable the feature. You can disable the feature without affecting
-   other existing distro configurations that need PulseAudio support by
-   adding "pulseaudio" to :term:`DISTRO_FEATURES_BACKFILL_CONSIDERED` in
-   your distro's ``.conf`` file. Adding the feature to this variable
-   when it also exists in the :term:`DISTRO_FEATURES_BACKFILL` variable
-   prevents the build system from adding the feature to your
-   configuration's :term:`DISTRO_FEATURES`, effectively disabling the
-   feature for that particular distro.
+-  *The "pulseaudio" distro feature option*: Previously, PulseAudio support was
+   enabled within the Qt and GStreamer frameworks. Because of this, the feature
+   is now backfilled and thus enabled for all distros through the
+   :term:`DISTRO_FEATURES_BACKFILL` variable in the ``meta/conf/bitbake.conf``
+   file. However, if your distro needs to disable the feature, you can do so
+   without affecting other existing distro configurations that need PulseAudio
+   support. You do this by adding "pulseaudio" to
+   :term:`DISTRO_FEATURES_BACKFILL_CONSIDERED` in your distro's ``.conf``
+   file. So, adding the feature to this variable when it also exists in the
+   :term:`DISTRO_FEATURES_BACKFILL` variable prevents the build system from
+   adding the feature to your configuration's :term:`DISTRO_FEATURES`,
+   effectively disabling the feature for that particular distro.
 
 -  *The "rtc" machine feature option*: Previously, real time clock (RTC)
    support was enabled for all target devices. Because of this, the
    feature is backfilled and thus enabled for all machines through the
-   :term:`MACHINE_FEATURES_BACKFILL` variable in the
-   ``meta/conf/bitbake.conf`` file. However, your target device does not
-   have this capability. You can disable RTC support for your device
-   without affecting other machines that need RTC support by adding the
-   feature to your machine's :term:`MACHINE_FEATURES_BACKFILL_CONSIDERED`
-   list in the machine's ``.conf`` file. Adding the feature to this
-   variable when it also exists in the :term:`MACHINE_FEATURES_BACKFILL`
-   variable prevents the build system from adding the feature to your
-   configuration's :term:`MACHINE_FEATURES`, effectively disabling RTC
-   support for that particular machine.
+   :term:`MACHINE_FEATURES_BACKFILL` variable in the ``meta/conf/bitbake.conf``
+   file. However, if your target device does not have this capability, you can
+   disable RTC support for your device without affecting other machines
+   that need RTC support. You do this by adding the "rtc" feature to the
+   :term:`MACHINE_FEATURES_BACKFILL_CONSIDERED` list in your machine's ``.conf``
+   file. So, adding the feature to this variable when it also exists in the
+   :term:`MACHINE_FEATURES_BACKFILL` variable prevents the build system from
+   adding the feature to your configuration's :term:`MACHINE_FEATURES`,
+   effectively disabling RTC support for that particular machine.

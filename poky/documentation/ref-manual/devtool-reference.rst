@@ -353,7 +353,7 @@ variables in package recipes.
       :yocto_git:`maintainers.inc </poky/tree/meta/conf/distro/include/maintainers.inc>`
       file.
 
-   -  If the recipe is using the :ref:`bitbake:bitbake-user-manual/bitbake-user-manual-fetching:git fetcher (\`\`git://\`\`)`
+   -  If the recipe is using the :ref:`bitbake-user-manual/bitbake-user-manual-fetching:git fetcher (\`\`git://\`\`)`
       rather than a tarball, the commit hash points to the commit that matches
       the recipe's latest version tag, or in the absence of suitable tags,
       to the latest commit (when :term:`UPSTREAM_CHECK_COMMITS` set to ``1``

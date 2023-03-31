@@ -1,0 +1,31 @@
+From 048e4fdd08ac588feb27b03e3ec1824e24f77d62 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 5 Mar 2023 14:13:25 -0800
+Subject: [PATCH 3/3] configure: Disable incompatible-function-pointer-types
+ warning
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 9f1c099e13..8e45a05808 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -98,6 +98,11 @@ AS_IF([test -n "${with_binary_version}"],[
+ dnl Prevent clang from accepting unknown flags with a mere warning
+ AX_APPEND_COMPILE_FLAGS([-Werror=unknown-warning-option -Werror=invalid-command-line-argument], [CFLAGS])
+ AX_APPEND_COMPILE_FLAGS([-Werror=unknown-warning-option -Werror=invalid-command-line-argument], [CXXFLAGS])
++dnl disable clang from erroring on function pointer protype mismatch, vlc seems to rely on that
++dnl especially in  modules/video_filter/deinterlace/algo_yadif.c how it interpolates 'filter` variable
++dnl between different functions yadif_filter_line_c_16bit() and yadif_filter_line_c()
++AX_APPEND_COMPILE_FLAGS([-Wno-error=incompatible-function-pointer-types -Wno-error=incompatible-function-pointer-types], [CFLAGS])
++AX_APPEND_COMPILE_FLAGS([-Wno-error=incompatible-function-pointer-types -Wno-error=incompatible-function-pointer-types], [CXXFLAGS])
+ 
+ dnl
+ dnl  Check the operating system
+-- 
+2.39.2
+

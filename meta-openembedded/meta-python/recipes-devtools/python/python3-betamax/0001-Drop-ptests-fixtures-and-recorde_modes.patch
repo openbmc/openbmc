@@ -1,0 +1,333 @@
+From 0e0b63ae80df5d7849b2e1c5ab9a668e8378b5e8 Mon Sep 17 00:00:00 2001
+From: Zhixiong Chi <zhixiong.chi@windriver.com>
+Date: Tue, 28 Mar 2023 06:05:45 +0000
+Subject: [PATCH] Drop ptests fixtures and recorde_modes
+
+The usage of fixture in test_fixtures has been deprecated.
+See https://docs.pytest.org/en/stable/explanation/fixtures.html and
+https://docs.pytest.org/en/stable/deprecations.html#calling-fixtures-directly
+for more information about fixtures.
+Meanwhile the test_record_modes relies on httpbin.org which has been sold and
+re-sold several times, and it adds X-Amzn-Trace-Id header that can possibly
+diff for each request.
+It leads to ptest failure, so drop it now until we find the solution.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Zhixiong Chi <zhixiong.chi@windriver.com>
+---
+ tests/integration/test_fixtures.py     |  60 -----------
+ tests/integration/test_record_modes.py | 132 -------------------------
+ tests/unit/test_fixtures.py            |  94 ------------------
+ 3 files changed, 286 deletions(-)
+ delete mode 100644 tests/integration/test_fixtures.py
+ delete mode 100644 tests/integration/test_record_modes.py
+ delete mode 100644 tests/unit/test_fixtures.py
+
+diff --git a/tests/integration/test_fixtures.py b/tests/integration/test_fixtures.py
+deleted file mode 100644
+index fc3d1e7..0000000
+--- a/tests/integration/test_fixtures.py
++++ /dev/null
+@@ -1,60 +0,0 @@
+-import os.path
+-
+-import pytest
+-
+-
+-@pytest.mark.usefixtures('betamax_session')
+-class TestPyTestFixtures:
+-    @pytest.fixture(autouse=True)
+-    def setup(self, request):
+-        """After test hook to assert everything."""
+-        def finalizer():
+-            test_dir = os.path.abspath('.')
+-            cassette_name = ('tests.integration.test_fixtures.'  # Module name
+-                             'TestPyTestFixtures.'  # Class name
+-                             'test_pytest_fixture'  # Test function name
+-                             '.json')
+-            file_name = os.path.join(test_dir, 'tests', 'cassettes',
+-                                     cassette_name)
+-            assert os.path.exists(file_name) is True
+-
+-        request.addfinalizer(finalizer)
+-
+-    def test_pytest_fixture(self, betamax_session):
+-        """Exercise the fixture itself."""
+-        resp = betamax_session.get('https://httpbin.org/get')
+-        assert resp.ok
+-
+-
+-@pytest.mark.usefixtures('betamax_parametrized_session')
+-class TestPyTestParametrizedFixtures:
+-    @pytest.fixture(autouse=True)
+-    def setup(self, request):
+-        """After test hook to assert everything."""
+-        def finalizer():
+-            test_dir = os.path.abspath('.')
+-            cassette_name = ('tests.integration.test_fixtures.'  # Module name
+-                             'TestPyTestParametrizedFixtures.'  # Class name
+-                             'test_pytest_fixture'  # Test function name
+-                             '[https---httpbin.org-get]'  # Parameter
+-                             '.json')
+-            file_name = os.path.join(test_dir, 'tests', 'cassettes',
+-                                     cassette_name)
+-            assert os.path.exists(file_name) is True
+-
+-        request.addfinalizer(finalizer)
+-
+-    @pytest.mark.parametrize('url', ('https://httpbin.org/get',))
+-    def test_pytest_fixture(self, betamax_parametrized_session, url):
+-        """Exercise the fixture itself."""
+-        resp = betamax_parametrized_session.get(url)
+-        assert resp.ok
+-
+-
+-@pytest.mark.parametrize('problematic_arg', [r'aaa\bbb', 'ccc:ddd', 'eee*fff'])
+-def test_pytest_parametrize_with_filesystem_problematic_chars(
+-        betamax_parametrized_session, problematic_arg):
+-    """
+-    Exercice parametrized args containing characters which might cause
+-    problems when getting translated into file names. """
+-    assert True
+diff --git a/tests/integration/test_record_modes.py b/tests/integration/test_record_modes.py
+deleted file mode 100644
+index 58c8846..0000000
+--- a/tests/integration/test_record_modes.py
++++ /dev/null
+@@ -1,132 +0,0 @@
+-from betamax import Betamax, BetamaxError
+-
+-from tests.integration.helper import IntegrationHelper
+-
+-
+-class TestRecordOnce(IntegrationHelper):
+-    def test_records_new_interaction(self):
+-        s = self.session
+-        with Betamax(s).use_cassette('test_record_once') as betamax:
+-            self.cassette_path = betamax.current_cassette.cassette_path
+-            assert betamax.current_cassette.is_empty() is True
+-            r = s.get('http://httpbin.org/get')
+-            assert r.status_code == 200
+-            assert betamax.current_cassette.is_empty() is True
+-            assert betamax.current_cassette.interactions != []
+-
+-    def test_replays_response_from_cassette(self):
+-        s = self.session
+-        with Betamax(s).use_cassette('test_replays_response') as betamax:
+-            self.cassette_path = betamax.current_cassette.cassette_path
+-            assert betamax.current_cassette.is_empty() is True
+-            r0 = s.get('http://httpbin.org/get')
+-            assert r0.status_code == 200
+-            assert betamax.current_cassette.interactions != []
+-            assert len(betamax.current_cassette.interactions) == 1
+-            r1 = s.get('http://httpbin.org/get')
+-            assert len(betamax.current_cassette.interactions) == 2
+-            assert r1.status_code == 200
+-            r0_headers = r0.headers.copy()
+-            r0_headers.pop('Date')
+-            r0_headers.pop('Age', None)
+-            r0_headers.pop('X-Processed-Time', None)
+-            r1_headers = r1.headers.copy()
+-            r1_headers.pop('Date')
+-            r1_headers.pop('Age', None)
+-            r1_headers.pop('X-Processed-Time', None)
+-            # NOTE(sigmavirus24): This fails if the second request is
+-            # technically a second later. Ignoring the Date headers allows
+-            # this test to succeed.
+-            # NOTE(hroncok): httpbin.org added X-Processed-Time header that
+-            # can possibly differ (and often does)
+-            assert r0_headers == r1_headers
+-            assert r0.content == r1.content
+-
+-
+-class TestRecordNone(IntegrationHelper):
+-    def test_raises_exception_when_no_interactions_present(self):
+-        s = self.session
+-        with Betamax(s) as betamax:
+-            betamax.use_cassette('test', record='none')
+-            self.cassette_created = False
+-            assert betamax.current_cassette is not None
+-            self.assertRaises(BetamaxError, s.get, 'http://httpbin.org/get')
+-
+-    def test_record_none_does_not_create_cassettes(self):
+-        s = self.session
+-        with Betamax(s) as betamax:
+-            self.assertRaises(ValueError, betamax.use_cassette,
+-                              'test_record_none', record='none')
+-        self.cassette_created = False
+-
+-
+-class TestRecordNewEpisodes(IntegrationHelper):
+-    def setUp(self):
+-        super(TestRecordNewEpisodes, self).setUp()
+-        with Betamax(self.session).use_cassette('test_record_new'):
+-            self.session.get('http://httpbin.org/get')
+-            self.session.get('http://httpbin.org/redirect/2')
+-
+-    def test_records_new_events_with_existing_cassette(self):
+-        s = self.session
+-        opts = {'record': 'new_episodes'}
+-        with Betamax(s).use_cassette('test_record_new', **opts) as betamax:
+-            cassette = betamax.current_cassette
+-            self.cassette_path = cassette.cassette_path
+-            assert cassette.interactions != []
+-            assert len(cassette.interactions) == 4
+-            assert cassette.is_empty() is False
+-            s.get('https://httpbin.org/get')
+-            assert len(cassette.interactions) == 5
+-
+-        with Betamax(s).use_cassette('test_record_new') as betamax:
+-            cassette = betamax.current_cassette
+-            assert len(cassette.interactions) == 5
+-            r = s.get('https://httpbin.org/get')
+-            assert r.status_code == 200
+-
+-
+-class TestRecordNewEpisodesCreatesCassettes(IntegrationHelper):
+-    def test_creates_new_cassettes(self):
+-        recorder = Betamax(self.session)
+-        opts = {'record': 'new_episodes'}
+-        cassette_name = 'test_record_new_makes_new_cassettes'
+-        with recorder.use_cassette(cassette_name, **opts) as betamax:
+-            self.cassette_path = betamax.current_cassette.cassette_path
+-            self.session.get('https://httpbin.org/get')
+-
+-
+-class TestRecordAll(IntegrationHelper):
+-    def setUp(self):
+-        super(TestRecordAll, self).setUp()
+-        with Betamax(self.session).use_cassette('test_record_all'):
+-            self.session.get('http://httpbin.org/get')
+-            self.session.get('http://httpbin.org/redirect/2')
+-            self.session.get('http://httpbin.org/get')
+-
+-    def test_records_new_interactions(self):
+-        s = self.session
+-        opts = {'record': 'all'}
+-        with Betamax(s).use_cassette('test_record_all', **opts) as betamax:
+-            cassette = betamax.current_cassette
+-            self.cassette_path = cassette.cassette_path
+-            assert cassette.interactions != []
+-            assert len(cassette.interactions) == 5
+-            assert cassette.is_empty() is False
+-            s.post('http://httpbin.org/post', data={'foo': 'bar'})
+-            assert len(cassette.interactions) == 6
+-
+-        with Betamax(s).use_cassette('test_record_all') as betamax:
+-            assert len(betamax.current_cassette.interactions) == 6
+-
+-    def test_replaces_old_interactions(self):
+-        s = self.session
+-        opts = {'record': 'all'}
+-        with Betamax(s).use_cassette('test_record_all', **opts) as betamax:
+-            cassette = betamax.current_cassette
+-            self.cassette_path = cassette.cassette_path
+-            assert cassette.interactions != []
+-            assert len(cassette.interactions) == 5
+-            assert cassette.is_empty() is False
+-            s.get('http://httpbin.org/get')
+-            assert len(cassette.interactions) == 5
+diff --git a/tests/unit/test_fixtures.py b/tests/unit/test_fixtures.py
+deleted file mode 100644
+index 387d9ce..0000000
+--- a/tests/unit/test_fixtures.py
++++ /dev/null
+@@ -1,94 +0,0 @@
+-try:
+-    import unittest.mock as mock
+-except ImportError:
+-    import mock
+-
+-import pytest
+-import unittest
+-
+-import requests
+-
+-import betamax
+-from betamax.fixtures import pytest as pytest_fixture
+-from betamax.fixtures import unittest as unittest_fixture
+-
+-
+-class TestPyTestFixture(unittest.TestCase):
+-    def setUp(self):
+-        self.mocked_betamax = mock.MagicMock()
+-        self.patched_betamax = mock.patch.object(
+-            betamax.recorder, 'Betamax', return_value=self.mocked_betamax)
+-        self.patched_betamax.start()
+-
+-    def tearDown(self):
+-        self.patched_betamax.stop()
+-
+-    def test_adds_stop_as_a_finalizer(self):
+-        # Mock a pytest request object
+-        request = mock.MagicMock()
+-        request.cls = request.module = None
+-        request.function.__name__ = 'test'
+-
+-        pytest_fixture.betamax_recorder(request)
+-        assert request.addfinalizer.called is True
+-        request.addfinalizer.assert_called_once_with(self.mocked_betamax.stop)
+-
+-    def test_auto_starts_the_recorder(self):
+-        # Mock a pytest request object
+-        request = mock.MagicMock()
+-        request.cls = request.module = None
+-        request.function.__name__ = 'test'
+-
+-        pytest_fixture.betamax_recorder(request)
+-        self.mocked_betamax.start.assert_called_once_with()
+-
+-
+-class FakeBetamaxTestCase(unittest_fixture.BetamaxTestCase):
+-    def test_fake(self):
+-        pass
+-
+-
+-class TestUnittestFixture(unittest.TestCase):
+-    def setUp(self):
+-        self.mocked_betamax = mock.MagicMock()
+-        self.patched_betamax = mock.patch.object(
+-            betamax.recorder, 'Betamax', return_value=self.mocked_betamax)
+-        self.betamax = self.patched_betamax.start()
+-        self.fixture = FakeBetamaxTestCase(methodName='test_fake')
+-
+-    def tearDown(self):
+-        self.patched_betamax.stop()
+-
+-    def test_setUp(self):
+-        self.fixture.setUp()
+-
+-        self.mocked_betamax.use_cassette.assert_called_once_with(
+-            'FakeBetamaxTestCase.test_fake'
+-        )
+-        self.mocked_betamax.start.assert_called_once_with()
+-
+-    def test_setUp_rejects_arbitrary_session_classes(self):
+-        self.fixture.SESSION_CLASS = object
+-
+-        with pytest.raises(AssertionError):
+-            self.fixture.setUp()
+-
+-    def test_setUp_accepts_session_subclasses(self):
+-        class TestSession(requests.Session):
+-            pass
+-
+-        self.fixture.SESSION_CLASS = TestSession
+-
+-        self.fixture.setUp()
+-
+-        assert self.betamax.called is True
+-        call_kwargs = self.betamax.call_args[-1]
+-        assert isinstance(call_kwargs['session'], TestSession)
+-
+-    def test_tearDown_calls_stop(self):
+-        recorder = mock.Mock()
+-        self.fixture.recorder = recorder
+-
+-        self.fixture.tearDown()
+-
+-        recorder.stop.assert_called_once_with()
+-- 
+2.35.5
+

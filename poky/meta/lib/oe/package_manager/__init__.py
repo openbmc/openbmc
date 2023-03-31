@@ -122,7 +122,8 @@ def generate_locale_archive(d, rootfs, target_arch, localedir):
         "riscv32": ["--uint32-align=4", "--little-endian"],
         "i586": ["--uint32-align=4", "--little-endian"],
         "i686": ["--uint32-align=4", "--little-endian"],
-        "x86_64": ["--uint32-align=4", "--little-endian"]
+        "x86_64": ["--uint32-align=4", "--little-endian"],
+        "loongarch64": ["--uint32-align=4", "--little-endian"]
     }
     if target_arch in locale_arch_options:
         arch_options = locale_arch_options[target_arch]

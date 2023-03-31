@@ -81,7 +81,7 @@ class OETestContext(object):
     def runTests(self, processes=None, skips=[]):
         self.runner = self.runnerClass(self, descriptions=False, verbosity=2)
 
-        # Dinamically skip those tests specified though arguments
+        # Dynamically skip those tests specified though arguments
         self.skipTests(skips)
 
         self._run_start_time = time.time()

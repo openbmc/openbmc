@@ -13,7 +13,6 @@ DEPENDS = " \
     pipewire \
     dbus-native \
     fuse3 \
-    bubblewrap-native \
     xmlto-native \
     flatpak \
     python3-dbus-native \
@@ -37,3 +36,12 @@ S = "${WORKDIR}/git"
 SRCREV = "88af6c8ca4106fcf70925355350a669848e9fd5a"
 
 FILES:${PN} += "${libdir}/systemd ${datadir}/dbus-1"
+
+EXTRA_OEMESON += "--cross-file=${WORKDIR}/meson-${PN}.cross"
+
+do_write_config:append() {
+    cat >${WORKDIR}/meson-${PN}.cross <<EOF
+[binaries]
+bwrap = '${bindir}/bwrap'
+EOF
+}

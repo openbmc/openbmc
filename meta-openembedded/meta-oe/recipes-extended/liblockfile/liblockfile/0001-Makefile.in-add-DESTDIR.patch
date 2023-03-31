@@ -1,4 +1,4 @@
-From 67843dabe1177840697839b916fd899218893ec7 Mon Sep 17 00:00:00 2001
+From 8e370a2f35d0c3472ddc9068fab19d0077434c61 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Thu, 19 Jul 2018 00:25:23 -0700
 Subject: [PATCH] Makefile.in: add DESTDIR
@@ -29,7 +29,7 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index 36a6d23..1e4130e 100644
+index 9c74b35..8cbda1d 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -12,11 +12,11 @@ CC		= @CC@
@@ -50,5 +50,5 @@ index 36a6d23..1e4130e 100644
  MAILGROUP	= @MAILGROUP@
  
 -- 
-2.17.1
+2.25.1
 

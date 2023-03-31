@@ -357,13 +357,16 @@ The sphinx.ext.intersphinx extension is enabled by default
 so that we can cross reference content from other Sphinx based
 documentation projects, such as the BitBake manual.
 
-References to the BitBake manual can be done:
+References to the BitBake manual can directly be done:
  - With a specific description instead of the section name:
-  :ref:`Azure Storage fetcher (az://) <bitbake:bitbake-user-manual/bitbake-user-manual-fetching:fetchers>`
+  :ref:`Azure Storage fetcher (az://) <bitbake-user-manual/bitbake-user-manual-fetching:fetchers>`
  - With the section name:
-  :ref:`bitbake:bitbake-user-manual/bitbake-user-manual-intro:usage and syntax` option
- - Linking to the entire BitBake manual:
-  :doc:`BitBake User Manual <bitbake:index>`
+  :ref:`bitbake-user-manual/bitbake-user-manual-intro:usage and syntax` option
+
+If you want to refer to an entire document (or chapter) in the BitBake manual,
+you have to use the ":doc:" macro with the "bitbake:" prefix:
+ - :doc:`BitBake User Manual <bitbake:index>`
+ - :doc:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata`" chapter
 
 Note that a reference to a variable (:term:`VARIABLE`) automatically points to
 the BitBake manual if the variable is not described in the Reference Manual's Variable Glossary.
@@ -371,6 +374,11 @@ However, if you need to bypass this, you can explicitely refer to a description 
 BitBake manual as follows:
 
   :term:`bitbake:BB_NUMBER_PARSE_THREADS`
+
+This would be the same if we had identical document filenames in
+both the Yocto Project and BitBake manuals:
+
+  :ref:`bitbake:directory/file:section title`
 
 Submitting documentation changes
 ================================

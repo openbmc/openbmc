@@ -1,33 +1,45 @@
+From 8b882650b730cb6e025d47d65574f43549b7a1a3 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Thu, 9 Mar 2023 10:28:28 +0800
+Subject: [PATCH] Makefile: Put gdb source tarball in SRC_URI
+
 Put gdb source tarball in SRC_URI and don't fetch and extract it during
 do_compile.
 
 Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---
+ Makefile | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
+
 diff --git a/Makefile b/Makefile
-index bb0a34e..5eb7604 100644
+index 79aef17..146da6a 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -228,7 +228,7 @@ all: make_configure
- #	@make --no-print-directory extensions
+@@ -254,7 +254,7 @@ all: make_configure
+ #	@$(MAKE) extensions
  
  gdb_merge: force
 -	@if [ ! -f ${GDB}/README ]; then \
 +	@if [ ! -f ${GDB}/${GDB}.patch ]; then \
- 	  make --no-print-directory gdb_unzip; fi
+ 	  $(MAKE) gdb_unzip; fi
  	@echo "${LDFLAGS} -lz -ldl -rdynamic" > ${GDB}/gdb/mergelibs
  	@echo "../../${PROGRAM} ../../${PROGRAM}lib.a" > ${GDB}/gdb/mergeobj
-@@ -255,12 +255,6 @@ gdb_unzip:
-	@rm -f gdb.files
-	@for FILE in ${GDB_FILES} dummy; do\
-	  echo $$FILE >> gdb.files; done
+@@ -281,12 +281,6 @@ gdb_unzip:
+ 	@rm -f gdb.files
+ 	@for FILE in ${GDB_FILES} dummy; do\
+ 	  echo $$FILE >> gdb.files; done
 -	@if [ ! -f ${GDB}.tar.gz ] && [ ! -f /usr/bin/wget ]; then \
 -	  echo /usr/bin/wget is required to download ${GDB}.tar.gz; echo; exit 1; fi
 -	@if [ ! -f ${GDB}.tar.gz ] && [ -f /usr/bin/wget ]; then \
 -	  [ ! -t 2 ] && WGET_OPTS="--progress=dot:mega"; \
 -	  wget $$WGET_OPTS http://ftp.gnu.org/gnu/gdb/${GDB}.tar.gz; fi
 -	@tar --exclude-from gdb.files -xzmf ${GDB}.tar.gz
-	@make --no-print-directory gdb_patch
-
+ 	@$(MAKE) gdb_patch
+ 
  gdb_patch:
+-- 
+2.25.1
+

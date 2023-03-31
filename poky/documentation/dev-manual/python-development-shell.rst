@@ -27,7 +27,7 @@ functions::
    pydevshell> bb.build.exec_func("do_unpack", d)
    pydevshell>
 
-See the ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:functions you can call from within python`"
+See the ":ref:`bitbake-user-manual/bitbake-user-manual-metadata:functions you can call from within python`"
 section in the BitBake User Manual for details about available functions.
 
 The commands execute just as if the OpenEmbedded build

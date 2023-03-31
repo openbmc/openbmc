@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Define cpio test work dir
-WORKDIR=/usr/lib/cpio/ptest/tests/
+WORKDIR=@PTEST_PATH@/tests/
 
 # Run test
 cd ${WORKDIR}

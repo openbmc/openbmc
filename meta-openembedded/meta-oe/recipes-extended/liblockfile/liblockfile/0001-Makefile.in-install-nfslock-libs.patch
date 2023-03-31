@@ -1,4 +1,4 @@
-From 631d46efff2a6d8970e202ba5422ebedd17a8d2f Mon Sep 17 00:00:00 2001
+From 0f34d1d91d641c3d5c5bb2eb11bd6eec7cfaf738 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Thu, 19 Jul 2018 01:00:10 -0700
 Subject: [PATCH] Makefile.in: install nfslock.so and nfslock.so.0
@@ -14,10 +14,10 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/Makefile.in b/Makefile.in
-index 1e4130e..0f1b506 100644
+index 8cbda1d..3a74811 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -77,6 +77,8 @@ install_common:
+@@ -88,6 +88,8 @@ install_common:
  install_nfslib:	nfslib
  		install -d -m 755 -g root -p $(nfslockdir)
  		install -m 755 nfslock.so.$(NFSVER) $(nfslockdir)
@@ -25,7 +25,7 @@ index 1e4130e..0f1b506 100644
 +		ln -sf nfslock.so.$(NFSVER) $(libdir)/nfslock.so.0
  		if test "$(DESTDIR)" = ""; then @LDCONFIG@; fi
  
- clean:
+ test:		test-stamp
 -- 
-2.17.1
+2.25.1
 

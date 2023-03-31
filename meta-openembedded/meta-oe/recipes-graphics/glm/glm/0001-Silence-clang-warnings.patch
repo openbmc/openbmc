@@ -26,8 +26,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  test/gtx/gtx_fast_trigonometry.cpp | 30 ++++++++++++------------------
  3 files changed, 14 insertions(+), 20 deletions(-)
 
-diff --git a/glm/ext/quaternion_common.inl b/glm/ext/quaternion_common.inl
-index 0e4a3bb2..6f99f52d 100644
 --- a/glm/ext/quaternion_common.inl
 +++ b/glm/ext/quaternion_common.inl
 @@ -104,7 +104,7 @@ namespace glm
@@ -39,21 +37,6 @@ index 0e4a3bb2..6f99f52d 100644
              return (sin(angle - a * phi)* x + sin(a * phi) * z) / sin(angle);
          }
      }
-diff --git a/glm/gtc/random.inl b/glm/gtc/random.inl
-index 70485098..a4af2a06 100644
---- a/glm/gtc/random.inl
-+++ b/glm/gtc/random.inl
-@@ -22,7 +22,7 @@ namespace detail
- 		GLM_FUNC_QUALIFIER static vec<1, uint8, P> call()
- 		{
- 			return vec<1, uint8, P>(
--				std::rand() % std::numeric_limits<uint8>::max());
-+				static_cast<uint8>(std::rand()) % std::numeric_limits<uint8>::max());
- 		}
- 	};
- 
-diff --git a/test/gtx/gtx_fast_trigonometry.cpp b/test/gtx/gtx_fast_trigonometry.cpp
-index 8bf86ba0..ddaa708b 100644
 --- a/test/gtx/gtx_fast_trigonometry.cpp
 +++ b/test/gtx/gtx_fast_trigonometry.cpp
 @@ -19,15 +19,14 @@ namespace fastCos
@@ -160,6 +143,3 @@ index 8bf86ba0..ddaa708b 100644
  		const std::clock_t timestamp3 = std::clock();
  		const std::clock_t time_fast = timestamp2 - timestamp1;
  		const std::clock_t time_default = timestamp3 - timestamp2;
--- 
-2.31.1
-

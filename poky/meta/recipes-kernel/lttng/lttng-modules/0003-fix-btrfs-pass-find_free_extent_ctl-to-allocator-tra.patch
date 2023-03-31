@@ -1,0 +1,116 @@
+From d0eeda3f84ba1643831561a2488ca2e99e9472b1 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Tue, 7 Mar 2023 11:26:25 -0500
+Subject: [PATCH 3/4] fix: btrfs: pass find_free_extent_ctl to allocator
+ tracepoints (v6.3)
+
+See upstream commit :
+
+  commit cfc2de0fce015d4249c674ef9f5e0b4817ba5c53
+  Author: Boris Burkov <boris@bur.io>
+  Date:   Thu Dec 15 16:06:31 2022 -0800
+
+    btrfs: pass find_free_extent_ctl to allocator tracepoints
+
+    The allocator tracepoints currently have a pile of values from ffe_ctl.
+    In modifying the allocator and adding more tracepoints, I found myself
+    adding to the already long argument list of the tracepoints. It makes it
+    a lot simpler to just send in the ffe_ctl itself.
+
+Upstream-Status: Backport
+
+Change-Id: Iab4132a9d3df3a6369591a50fb75374b1e399fa4
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/instrumentation/events/btrfs.h | 60 +++++++++++++++++++++++++-
+ 1 file changed, 58 insertions(+), 2 deletions(-)
+
+diff --git a/include/instrumentation/events/btrfs.h b/include/instrumentation/events/btrfs.h
+index 01157107..7c7b9b0c 100644
+--- a/include/instrumentation/events/btrfs.h
++++ b/include/instrumentation/events/btrfs.h
+@@ -13,6 +13,10 @@
+ #include <../fs/btrfs/accessors.h>
+ #endif
+ 
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,3,0))
++#include <../fs/btrfs/extent-tree.h>
++#endif
++
+ #ifndef _TRACE_BTRFS_DEF_
+ #define _TRACE_BTRFS_DEF_
+ struct btrfs_root;
+@@ -1963,7 +1967,26 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__reserved_extent,  btrfs_reserved_extent_f
+ 
+ #endif /* #else #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,10,0)) */
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,10,0) || \
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,3,0))
++LTTNG_TRACEPOINT_EVENT_MAP(find_free_extent,
++
++	btrfs_find_free_extent,
++
++	TP_PROTO(const struct btrfs_root *root,
++		const struct find_free_extent_ctl *ffe_ctl),
++
++	TP_ARGS(root, ffe_ctl),
++
++	TP_FIELDS(
++		ctf_array(u8, fsid, root->lttng_fs_info_fsid, BTRFS_UUID_SIZE)
++		ctf_integer(u64, root_objectid, root->root_key.objectid)
++		ctf_integer(u64, num_bytes, ffe_ctl->num_bytes)
++		ctf_integer(u64, empty_size, ffe_ctl->empty_size)
++		ctf_integer(u64, flags, ffe_ctl->flags)
++	)
++)
++
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,10,0) || \
+ 	LTTNG_KERNEL_RANGE(5,9,5, 5,10,0) || \
+ 	LTTNG_KERNEL_RANGE(5,4,78, 5,5,0) || \
+ 	LTTNG_UBUNTU_KERNEL_RANGE(5,8,18,44, 5,9,0,0))
+@@ -2102,7 +2125,40 @@ LTTNG_TRACEPOINT_EVENT_MAP(find_free_extent,
+ )
+ #endif
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,5,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,3,0))
++LTTNG_TRACEPOINT_EVENT_CLASS(btrfs__reserve_extent,
++
++	TP_PROTO(const struct btrfs_block_group *block_group,
++		const struct find_free_extent_ctl *ffe_ctl),
++
++	TP_ARGS(block_group, ffe_ctl),
++
++	TP_FIELDS(
++		ctf_array(u8, fsid, block_group->lttng_fs_info_fsid, BTRFS_UUID_SIZE)
++		ctf_integer(u64, bg_objectid, block_group->start)
++		ctf_integer(u64, flags, block_group->flags)
++		ctf_integer(u64, start, ffe_ctl->search_start)
++		ctf_integer(u64, len, ffe_ctl->num_bytes)
++	)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__reserve_extent, btrfs_reserve_extent,
++
++	TP_PROTO(const struct btrfs_block_group *block_group,
++		const struct find_free_extent_ctl *ffe_ctl),
++
++	TP_ARGS(block_group, ffe_ctl)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__reserve_extent, btrfs_reserve_extent_cluster,
++
++	TP_PROTO(const struct btrfs_block_group *block_group,
++		const struct find_free_extent_ctl *ffe_ctl),
++
++	TP_ARGS(block_group, ffe_ctl)
++)
++
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,5,0))
+ LTTNG_TRACEPOINT_EVENT_CLASS(btrfs__reserve_extent,
+ 
+ 	TP_PROTO(const struct btrfs_block_group *block_group, u64 start,
+-- 
+2.34.1
+

@@ -56,7 +56,7 @@ python populate_packages:prepend() {
             '${PN}-ptest%s', '%s', recursive=True, match_path=True)
 }
 
-RDEPENDS:${PN}-ptest += "${PN}-modules ${PN}-doc sed"
+RDEPENDS:${PN}-ptest += "${PN}-modules ${PN}-doc sed procps-ps"
 
 # The perl-ptest package contains Perl internal modules and generating file
 # dependencies for it causes problems.

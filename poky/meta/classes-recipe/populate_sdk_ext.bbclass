@@ -719,7 +719,7 @@ sdk_ext_postinst() {
 
 	# A bit of another hack, but we need this in the path only for devtool
 	# so put it at the end of $PATH.
-	echo "export PATH=$target_sdk_dir/sysroots/${SDK_SYS}${bindir_nativesdk}:\$PATH" >> $env_setup_script
+	echo "export PATH=\"$target_sdk_dir/sysroots/${SDK_SYS}${bindir_nativesdk}:\$PATH\"" >> $env_setup_script
 
 	echo "printf 'SDK environment now set up; additionally you may now run devtool to perform development tasks.\nRun devtool --help for further details.\n'" >> $env_setup_script
 

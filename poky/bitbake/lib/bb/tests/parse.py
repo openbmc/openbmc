@@ -218,3 +218,24 @@ VAR = " \\
         with self.assertRaises(bb.BBHandledException):
             d = bb.parse.handle(f.name, self.d)['']
 
+
+    at_sign_in_var_flag = """
+A[flag@.service] = "nonet"
+B[flag@.target] = "ntb"
+
+unset A[flag@.service]
+"""
+    def test_parse_at_sign_in_var_flag(self):
+        f = self.parsehelper(self.at_sign_in_var_flag)
+        d = bb.parse.handle(f.name, self.d)['']
+        self.assertEqual(d.getVar("A"), None)
+        self.assertEqual(d.getVar("B"), None)
+        self.assertEqual(d.getVarFlag("A","flag@.service"), None)
+        self.assertEqual(d.getVarFlag("B","flag@.target"), "ntb")
+
+    def test_parse_invalid_at_sign_in_var_flag(self):
+        invalid_at_sign = self.at_sign_in_var_flag.replace("B[f", "B[@f")
+        f = self.parsehelper(invalid_at_sign)
+        with self.assertRaises(bb.parse.ParseError):
+            d = bb.parse.handle(f.name, self.d)['']
+

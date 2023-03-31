@@ -22,8 +22,9 @@ PACKAGECONFIG ??= "bz2 lzma zlib"
 PACKAGECONFIG[bz2] = "--enable-bzlib, --disable-bzlib, bzip2"
 PACKAGECONFIG[lzma] = "--enable-xzlib, --disable-xzlib, xz"
 PACKAGECONFIG[zlib] = "--enable-zlib, --disable-zlib, zlib"
-
-EXTRA_OECONF += "--disable-libseccomp"
+PACKAGECONFIG[zstdlib] = "--enable-zstdlib, --disable-zstdlib, zstd"
+PACKAGECONFIG[lzlib] = "--enable-lzlib, --disable-lzlib, lzip"
+PACKAGECONFIG[seccomp] = "--enable-libseccomp, --disable-libseccomp, libseccomp"
 
 ALTERNATIVE:${PN} = "file"
 ALTERNATIVE_LINK_NAME[file] = "${bindir}/file"

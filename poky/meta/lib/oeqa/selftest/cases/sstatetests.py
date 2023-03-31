@@ -9,12 +9,174 @@ import shutil
 import glob
 import subprocess
 import tempfile
+import datetime
+import re
 
-from oeqa.utils.commands import runCmd, bitbake, get_bb_var, create_temp_layer
-from oeqa.selftest.cases.sstate import SStateBase
+from oeqa.utils.commands import runCmd, bitbake, get_bb_var, create_temp_layer, get_bb_vars
+from oeqa.selftest.case import OESelftestTestCase
+
 import oe
-
 import bb.siggen
+
+class SStateBase(OESelftestTestCase):
+
+    def setUpLocal(self):
+        super(SStateBase, self).setUpLocal()
+        self.temp_sstate_location = None
+        needed_vars = ['SSTATE_DIR', 'NATIVELSBSTRING', 'TCLIBC', 'TUNE_ARCH',
+                       'TOPDIR', 'TARGET_VENDOR', 'TARGET_OS']
+        bb_vars = get_bb_vars(needed_vars)
+        self.sstate_path = bb_vars['SSTATE_DIR']
+        self.hostdistro = bb_vars['NATIVELSBSTRING']
+        self.tclibc = bb_vars['TCLIBC']
+        self.tune_arch = bb_vars['TUNE_ARCH']
+        self.topdir = bb_vars['TOPDIR']
+        self.target_vendor = bb_vars['TARGET_VENDOR']
+        self.target_os = bb_vars['TARGET_OS']
+        self.distro_specific_sstate = os.path.join(self.sstate_path, self.hostdistro)
+
+    # Creates a special sstate configuration with the option to add sstate mirrors
+    def config_sstate(self, temp_sstate_location=False, add_local_mirrors=[]):
+        self.temp_sstate_location = temp_sstate_location
+
+        if self.temp_sstate_location:
+            temp_sstate_path = os.path.join(self.builddir, "temp_sstate_%s" % datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
+            config_temp_sstate = "SSTATE_DIR = \"%s\"" % temp_sstate_path
+            self.append_config(config_temp_sstate)
+            self.track_for_cleanup(temp_sstate_path)
+        bb_vars = get_bb_vars(['SSTATE_DIR', 'NATIVELSBSTRING'])
+        self.sstate_path = bb_vars['SSTATE_DIR']
+        self.hostdistro = bb_vars['NATIVELSBSTRING']
+        self.distro_specific_sstate = os.path.join(self.sstate_path, self.hostdistro)
+
+        if add_local_mirrors:
+            config_set_sstate_if_not_set = 'SSTATE_MIRRORS ?= ""'
+            self.append_config(config_set_sstate_if_not_set)
+            for local_mirror in add_local_mirrors:
+                self.assertFalse(os.path.join(local_mirror) == os.path.join(self.sstate_path), msg='Cannot add the current sstate path as a sstate mirror')
+                config_sstate_mirror = "SSTATE_MIRRORS += \"file://.* file:///%s/PATH\"" % local_mirror
+                self.append_config(config_sstate_mirror)
+
+    # Returns a list containing sstate files
+    def search_sstate(self, filename_regex, distro_specific=True, distro_nonspecific=True):
+        result = []
+        for root, dirs, files in os.walk(self.sstate_path):
+            if distro_specific and re.search(r"%s/%s/[a-z0-9]{2}/[a-z0-9]{2}$" % (self.sstate_path, self.hostdistro), root):
+                for f in files:
+                    if re.search(filename_regex, f):
+                        result.append(f)
+            if distro_nonspecific and re.search(r"%s/[a-z0-9]{2}/[a-z0-9]{2}$" % self.sstate_path, root):
+                for f in files:
+                    if re.search(filename_regex, f):
+                        result.append(f)
+        return result
+
+    # Test sstate files creation and their location
+    def run_test_sstate_creation(self, targets, distro_specific=True, distro_nonspecific=True, temp_sstate_location=True, should_pass=True):
+        self.config_sstate(temp_sstate_location, [self.sstate_path])
+
+        if  self.temp_sstate_location:
+            bitbake(['-cclean'] + targets)
+        else:
+            bitbake(['-ccleansstate'] + targets)
+
+        bitbake(targets)
+        file_tracker = []
+        results = self.search_sstate('|'.join(map(str, targets)), distro_specific, distro_nonspecific)
+        if distro_nonspecific:
+            for r in results:
+                if r.endswith(("_populate_lic.tar.zst", "_populate_lic.tar.zst.siginfo", "_fetch.tar.zst.siginfo", "_unpack.tar.zst.siginfo", "_patch.tar.zst.siginfo")):
+                    continue
+                file_tracker.append(r)
+        else:
+            file_tracker = results
+
+        if should_pass:
+            self.assertTrue(file_tracker , msg="Could not find sstate files for: %s" % ', '.join(map(str, targets)))
+        else:
+            self.assertTrue(not file_tracker , msg="Found sstate files in the wrong place for: %s (found %s)" % (', '.join(map(str, targets)), str(file_tracker)))
+
+    # Test the sstate files deletion part of the do_cleansstate task
+    def run_test_cleansstate_task(self, targets, distro_specific=True, distro_nonspecific=True, temp_sstate_location=True):
+        self.config_sstate(temp_sstate_location, [self.sstate_path])
+
+        bitbake(['-ccleansstate'] + targets)
+
+        bitbake(targets)
+        archives_created = self.search_sstate('|'.join(map(str, [s + r'.*?\.tar.zst$' for s in targets])), distro_specific, distro_nonspecific)
+        self.assertTrue(archives_created, msg="Could not find sstate .tar.zst files for: %s (%s)" % (', '.join(map(str, targets)), str(archives_created)))
+
+        siginfo_created = self.search_sstate('|'.join(map(str, [s + r'.*?\.siginfo$' for s in targets])), distro_specific, distro_nonspecific)
+        self.assertTrue(siginfo_created, msg="Could not find sstate .siginfo files for: %s (%s)" % (', '.join(map(str, targets)), str(siginfo_created)))
+
+        bitbake(['-ccleansstate'] + targets)
+        archives_removed = self.search_sstate('|'.join(map(str, [s + r'.*?\.tar.zst$' for s in targets])), distro_specific, distro_nonspecific)
+        self.assertTrue(not archives_removed, msg="do_cleansstate didn't remove .tar.zst sstate files for: %s (%s)" % (', '.join(map(str, targets)), str(archives_removed)))
+
+    # Test rebuilding of distro-specific sstate files
+    def run_test_rebuild_distro_specific_sstate(self, targets, temp_sstate_location=True):
+        self.config_sstate(temp_sstate_location, [self.sstate_path])
+
+        bitbake(['-ccleansstate'] + targets)
+
+        bitbake(targets)
+        results = self.search_sstate('|'.join(map(str, [s + r'.*?\.tar.zst$' for s in targets])), distro_specific=False, distro_nonspecific=True)
+        filtered_results = []
+        for r in results:
+            if r.endswith(("_populate_lic.tar.zst", "_populate_lic.tar.zst.siginfo")):
+                continue
+            filtered_results.append(r)
+        self.assertTrue(filtered_results == [], msg="Found distro non-specific sstate for: %s (%s)" % (', '.join(map(str, targets)), str(filtered_results)))
+        file_tracker_1 = self.search_sstate('|'.join(map(str, [s + r'.*?\.tar.zst$' for s in targets])), distro_specific=True, distro_nonspecific=False)
+        self.assertTrue(len(file_tracker_1) >= len(targets), msg = "Not all sstate files were created for: %s" % ', '.join(map(str, targets)))
+
+        self.track_for_cleanup(self.distro_specific_sstate + "_old")
+        shutil.copytree(self.distro_specific_sstate, self.distro_specific_sstate + "_old")
+        shutil.rmtree(self.distro_specific_sstate)
+
+        bitbake(['-cclean'] + targets)
+        bitbake(targets)
+        file_tracker_2 = self.search_sstate('|'.join(map(str, [s + r'.*?\.tar.zst$' for s in targets])), distro_specific=True, distro_nonspecific=False)
+        self.assertTrue(len(file_tracker_2) >= len(targets), msg = "Not all sstate files were created for: %s" % ', '.join(map(str, targets)))
+
+        not_recreated = [x for x in file_tracker_1 if x not in file_tracker_2]
+        self.assertTrue(not_recreated == [], msg="The following sstate files were not recreated: %s" % ', '.join(map(str, not_recreated)))
+
+        created_once = [x for x in file_tracker_2 if x not in file_tracker_1]
+        self.assertTrue(created_once == [], msg="The following sstate files were created only in the second run: %s" % ', '.join(map(str, created_once)))
+
+    def sstate_common_samesigs(self, configA, configB, allarch=False):
+
+        self.write_config(configA)
+        self.track_for_cleanup(self.topdir + "/tmp-sstatesamehash")
+        bitbake("world meta-toolchain -S none")
+        self.write_config(configB)
+        self.track_for_cleanup(self.topdir + "/tmp-sstatesamehash2")
+        bitbake("world meta-toolchain -S none")
+
+        def get_files(d, result):
+            for root, dirs, files in os.walk(d):
+                for name in files:
+                    if "meta-environment" in root or "cross-canadian" in root:
+                        continue
+                    if "do_build" not in name:
+                        # 1.4.1+gitAUTOINC+302fca9f4c-r0.do_package_write_ipk.sigdata.f3a2a38697da743f0dbed8b56aafcf79
+                        (_, task, _, shash) = name.rsplit(".", 3)
+                        result[os.path.join(os.path.basename(root), task)] = shash
+
+        files1 = {}
+        files2 = {}
+        subdirs = sorted(glob.glob(self.topdir + "/tmp-sstatesamehash/stamps/*-nativesdk*-linux"))
+        if allarch:
+            subdirs.extend(sorted(glob.glob(self.topdir + "/tmp-sstatesamehash/stamps/all-*-linux")))
+
+        for subdir in subdirs:
+            nativesdkdir = os.path.basename(subdir)
+            get_files(self.topdir + "/tmp-sstatesamehash/stamps/" + nativesdkdir, files1)
+            get_files(self.topdir + "/tmp-sstatesamehash2/stamps/" + nativesdkdir, files2)
+
+        self.maxDiff = None
+        self.assertEqual(files1, files2)
 
 class SStateTests(SStateBase):
     def test_autorev_sstate_works(self):
@@ -55,32 +217,7 @@ class SStateTests(SStateBase):
         result = runCmd('git add bar.txt; git commit -asm "add bar"', cwd=srcdir)
         bitbake("dbus-wait-test -c unpack")
 
-
-    # Test sstate files creation and their location
-    def run_test_sstate_creation(self, targets, distro_specific=True, distro_nonspecific=True, temp_sstate_location=True, should_pass=True):
-        self.config_sstate(temp_sstate_location, [self.sstate_path])
-
-        if  self.temp_sstate_location:
-            bitbake(['-cclean'] + targets)
-        else:
-            bitbake(['-ccleansstate'] + targets)
-
-        bitbake(targets)
-        file_tracker = []
-        results = self.search_sstate('|'.join(map(str, targets)), distro_specific, distro_nonspecific)
-        if distro_nonspecific:
-            for r in results:
-                if r.endswith(("_populate_lic.tar.zst", "_populate_lic.tar.zst.siginfo", "_fetch.tar.zst.siginfo", "_unpack.tar.zst.siginfo", "_patch.tar.zst.siginfo")):
-                    continue
-                file_tracker.append(r)
-        else:
-            file_tracker = results
-
-        if should_pass:
-            self.assertTrue(file_tracker , msg="Could not find sstate files for: %s" % ', '.join(map(str, targets)))
-        else:
-            self.assertTrue(not file_tracker , msg="Found sstate files in the wrong place for: %s (found %s)" % (', '.join(map(str, targets)), str(file_tracker)))
-
+class SStateCreation(SStateBase):
     def test_sstate_creation_distro_specific_pass(self):
         self.run_test_sstate_creation(['binutils-cross-'+ self.tune_arch, 'binutils-native'], distro_specific=True, distro_nonspecific=False, temp_sstate_location=True)
 
@@ -93,23 +230,7 @@ class SStateTests(SStateBase):
     def test_sstate_creation_distro_nonspecific_fail(self):
         self.run_test_sstate_creation(['linux-libc-headers'], distro_specific=True, distro_nonspecific=False, temp_sstate_location=True, should_pass=False)
 
-    # Test the sstate files deletion part of the do_cleansstate task
-    def run_test_cleansstate_task(self, targets, distro_specific=True, distro_nonspecific=True, temp_sstate_location=True):
-        self.config_sstate(temp_sstate_location, [self.sstate_path])
-
-        bitbake(['-ccleansstate'] + targets)
-
-        bitbake(targets)
-        archives_created = self.search_sstate('|'.join(map(str, [s + r'.*?\.tar.zst$' for s in targets])), distro_specific, distro_nonspecific)
-        self.assertTrue(archives_created, msg="Could not find sstate .tar.zst files for: %s (%s)" % (', '.join(map(str, targets)), str(archives_created)))
-
-        siginfo_created = self.search_sstate('|'.join(map(str, [s + r'.*?\.siginfo$' for s in targets])), distro_specific, distro_nonspecific)
-        self.assertTrue(siginfo_created, msg="Could not find sstate .siginfo files for: %s (%s)" % (', '.join(map(str, targets)), str(siginfo_created)))
-
-        bitbake(['-ccleansstate'] + targets)
-        archives_removed = self.search_sstate('|'.join(map(str, [s + r'.*?\.tar.zst$' for s in targets])), distro_specific, distro_nonspecific)
-        self.assertTrue(not archives_removed, msg="do_cleansstate didn't remove .tar.zst sstate files for: %s (%s)" % (', '.join(map(str, targets)), str(archives_removed)))
-
+class SStateCleanup(SStateBase):
     def test_cleansstate_task_distro_specific_nonspecific(self):
         targets = ['binutils-cross-'+ self.tune_arch, 'binutils-native']
         targets.append('linux-libc-headers')
@@ -123,39 +244,7 @@ class SStateTests(SStateBase):
         targets.append('linux-libc-headers')
         self.run_test_cleansstate_task(targets, distro_specific=True, distro_nonspecific=False, temp_sstate_location=True)
 
-
-    # Test rebuilding of distro-specific sstate files
-    def run_test_rebuild_distro_specific_sstate(self, targets, temp_sstate_location=True):
-        self.config_sstate(temp_sstate_location, [self.sstate_path])
-
-        bitbake(['-ccleansstate'] + targets)
-
-        bitbake(targets)
-        results = self.search_sstate('|'.join(map(str, [s + r'.*?\.tar.zst$' for s in targets])), distro_specific=False, distro_nonspecific=True)
-        filtered_results = []
-        for r in results:
-            if r.endswith(("_populate_lic.tar.zst", "_populate_lic.tar.zst.siginfo")):
-                continue
-            filtered_results.append(r)
-        self.assertTrue(filtered_results == [], msg="Found distro non-specific sstate for: %s (%s)" % (', '.join(map(str, targets)), str(filtered_results)))
-        file_tracker_1 = self.search_sstate('|'.join(map(str, [s + r'.*?\.tar.zst$' for s in targets])), distro_specific=True, distro_nonspecific=False)
-        self.assertTrue(len(file_tracker_1) >= len(targets), msg = "Not all sstate files were created for: %s" % ', '.join(map(str, targets)))
-
-        self.track_for_cleanup(self.distro_specific_sstate + "_old")
-        shutil.copytree(self.distro_specific_sstate, self.distro_specific_sstate + "_old")
-        shutil.rmtree(self.distro_specific_sstate)
-
-        bitbake(['-cclean'] + targets)
-        bitbake(targets)
-        file_tracker_2 = self.search_sstate('|'.join(map(str, [s + r'.*?\.tar.zst$' for s in targets])), distro_specific=True, distro_nonspecific=False)
-        self.assertTrue(len(file_tracker_2) >= len(targets), msg = "Not all sstate files were created for: %s" % ', '.join(map(str, targets)))
-
-        not_recreated = [x for x in file_tracker_1 if x not in file_tracker_2]
-        self.assertTrue(not_recreated == [], msg="The following sstate files were not recreated: %s" % ', '.join(map(str, not_recreated)))
-
-        created_once = [x for x in file_tracker_2 if x not in file_tracker_1]
-        self.assertTrue(created_once == [], msg="The following sstate files were created only in the second run: %s" % ', '.join(map(str, created_once)))
-
+class SStateDistroTests(SStateBase):
     def test_rebuild_distro_specific_sstate_cross_native_targets(self):
         self.run_test_rebuild_distro_specific_sstate(['binutils-cross-' + self.tune_arch, 'binutils-native'], temp_sstate_location=True)
 
@@ -165,7 +254,7 @@ class SStateTests(SStateBase):
     def test_rebuild_distro_specific_sstate_native_target(self):
         self.run_test_rebuild_distro_specific_sstate(['binutils-native'], temp_sstate_location=True)
 
-
+class SStateCacheManagement(SStateBase):
     # Test the sstate-cache-management script. Each element in the global_config list is used with the corresponding element in the target_config list
     # global_config elements are expected to not generate any sstate files that would be removed by sstate-cache-management.sh (such as changing the value of MACHINE)
     def run_test_sstate_cache_management_script(self, target, global_config=[''], target_config=[''], ignore_patterns=[]):
@@ -244,6 +333,7 @@ class SStateTests(SStateBase):
         target_config.append('')
         self.run_test_sstate_cache_management_script('m4', global_config,  target_config, ignore_patterns=['populate_lic'])
 
+class SStateHashSameSigs(SStateBase):
     def test_sstate_32_64_same_hash(self):
         """
         The sstate checksums for both native and target should not vary whether
@@ -329,6 +419,7 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
         self.maxDiff = None
         self.assertCountEqual(files1, files2)
 
+class SStateHashSameSigs2(SStateBase):
     def test_sstate_allarch_samesigs(self):
         """
         The sstate checksums of allarch packages should be independent of whichever
@@ -377,39 +468,7 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
 """
         self.sstate_common_samesigs(configA, configB)
 
-    def sstate_common_samesigs(self, configA, configB, allarch=False):
-
-        self.write_config(configA)
-        self.track_for_cleanup(self.topdir + "/tmp-sstatesamehash")
-        bitbake("world meta-toolchain -S none")
-        self.write_config(configB)
-        self.track_for_cleanup(self.topdir + "/tmp-sstatesamehash2")
-        bitbake("world meta-toolchain -S none")
-
-        def get_files(d, result):
-            for root, dirs, files in os.walk(d):
-                for name in files:
-                    if "meta-environment" in root or "cross-canadian" in root:
-                        continue
-                    if "do_build" not in name:
-                        # 1.4.1+gitAUTOINC+302fca9f4c-r0.do_package_write_ipk.sigdata.f3a2a38697da743f0dbed8b56aafcf79
-                        (_, task, _, shash) = name.rsplit(".", 3)
-                        result[os.path.join(os.path.basename(root), task)] = shash
-
-        files1 = {}
-        files2 = {}
-        subdirs = sorted(glob.glob(self.topdir + "/tmp-sstatesamehash/stamps/*-nativesdk*-linux"))
-        if allarch:
-            subdirs.extend(sorted(glob.glob(self.topdir + "/tmp-sstatesamehash/stamps/all-*-linux")))
-
-        for subdir in subdirs:
-            nativesdkdir = os.path.basename(subdir)
-            get_files(self.topdir + "/tmp-sstatesamehash/stamps/" + nativesdkdir, files1)
-            get_files(self.topdir + "/tmp-sstatesamehash2/stamps/" + nativesdkdir, files2)
-
-        self.maxDiff = None
-        self.assertEqual(files1, files2)
-
+class SStateHashSameSigs3(SStateBase):
     def test_sstate_sametune_samesigs(self):
         """
         The sstate checksums of two identical machines (using the same tune) should be the
@@ -497,7 +556,7 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
         self.maxDiff = None
         self.assertCountEqual(files1, files2)
 
-
+class SStateHashSameSigs4(SStateBase):
     def test_sstate_noop_samesigs(self):
         """
         The sstate checksums of two builds with these variables changed or

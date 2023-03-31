@@ -1,0 +1,35 @@
+From 6ef189c45b763aedac5ef57ed6a5fc125fa95b41 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 3 Mar 2023 09:54:48 -0800
+Subject: [PATCH] python: Use Py_hash_t instead of long in hdr_hash
+
+Fixes
+python/header-py.c:744:2: error: incompatible function pointer types initializing 'hashfunc' (aka 'int (*)(struct _object *)') with an expression of type 'long (PyObject *)' (aka 'long (struct _object *)') [-Wincompatible-function-pointer-types]
+|         hdr_hash,                       /* tp_hash */
+|         ^~~~~~~~
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/rpm/pull/2409]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ python/header-py.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/python/header-py.c b/python/header-py.c
+index 0aed0c9267..c15503f359 100644
+--- a/python/header-py.c
++++ b/python/header-py.c
+@@ -316,9 +316,9 @@ static PyObject * hdr_dsOfHeader(PyObject * s)
+                                  "(Oi)", s, RPMTAG_NEVR);
+ }
+ 
+-static long hdr_hash(PyObject * h)
++static Py_hash_t hdr_hash(PyObject * h)
+ {
+-    return (long) h;
++    return (Py_hash_t) h;
+ }
+ 
+ static PyObject * hdr_reduce(hdrObject *s)
+-- 
+2.39.2
+

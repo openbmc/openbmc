@@ -1,0 +1,55 @@
+From d85a7a3ae2bb9f5267b2af43784633ae8f011f21 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Mon, 13 Mar 2023 09:50:15 +0800
+Subject: [PATCH] Fix buildpaths warning
+
+Fix buildpath warning:
+WARNING: syslog-ng-4.0.1-r0 do_package_qa: QA Issue: File /usr/include/syslog-ng/syslog-ng-config-64.h in package syslog-ng-dev contains reference to TMPDIR [buildpaths]
+WARNING: syslog-ng-4.0.1-r0 do_package_qa: QA Issue: File /usr/bin/syslog-ng-update-virtualenv in package syslog-ng contains reference to TMPDIR
+File /usr/bin/pdbtool in package syslog-ng contains reference to TMPDIR [buildpaths]
+WARNING: syslog-ng-4.0.1-r0 do_package_qa: QA Issue: File /usr/lib/syslog-ng/libdbparser.so in package syslog-ng-libs contains reference to TMPDIR [buildpaths]
+
+* SYSLOG_NG_PATH_TOPSRC_DIR is /yocto/build/tmp/work/core2-64-poky-linux/syslog-ng/4.0.1-r0,
+  which is used to get xsd dir in build SYSLOG_NG_PATH_TOPSRC_DIR/doc/xsd, 
+  which is not suitable for target, set it to "/source" for fixing this buildpath warning
+
+* SYSTEM_PYTHON is /yocto/build/tmp/hosttools/python3, set to python3
+  for target.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ configure.ac                           | 2 +-
+ scripts/syslog-ng-update-virtualenv.in | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 79a1502..1ad6508 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1930,7 +1930,7 @@ AC_DEFINE_UNQUOTED(PYTHON_SYSCONF_MODULE_DIR, "$python_sysconf_moduledir", [Pyth
+ AC_DEFINE_UNQUOTED(PATH_LOGGENPLUGINDIR, "$loggenplugindir", [loggenplugin installation directory])
+ AC_DEFINE_UNQUOTED(MODULE_PATH, "$module_path", [module search path])
+ AC_DEFINE_UNQUOTED(JAVA_MODULE_PATH, "$java_module_path", [java module search path])
+-AC_DEFINE_UNQUOTED(PATH_TOPSRC_DIR, "$abs_topsrcdir", [self-defined top_srcdir path])
++AC_DEFINE_UNQUOTED(PATH_TOPSRC_DIR, "/source", [self-defined top_srcdir path])
+ AC_DEFINE_UNQUOTED(PACKAGE_NAME, "$PACKAGE_NAME", [package name])
+ 
+ 
+diff --git a/scripts/syslog-ng-update-virtualenv.in b/scripts/syslog-ng-update-virtualenv.in
+index ed85baf..b1a9e34 100755
+--- a/scripts/syslog-ng-update-virtualenv.in
++++ b/scripts/syslog-ng-update-virtualenv.in
+@@ -62,7 +62,7 @@ done
+ set -e
+ 
+ REQUIREMENTS_FILE=${python_moduledir}/requirements.txt
+-SYSTEM_PYTHON=@PYTHON@
++SYSTEM_PYTHON=python3
+ VENV_PYTHON=${python_venvdir}/bin/python
+ 
+ if [ "$display_prompt" -ne 0 ]; then
+-- 
+2.25.1
+

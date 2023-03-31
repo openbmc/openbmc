@@ -1,0 +1,47 @@
+When running the configure check "checking for ELF support in BFD", LDFLAGS
+were not being passed in to libtool. In OE/YP, we need these flags when using
+uninative due to the games we play with the dynamic loader.
+
+If a version of libzstd was built against a newer glibc, it would need
+newer pthread symbols which it wouldn't find with the system linker. At
+runtime this isn't an issue as it would be switched to use uninative but we
+pass flags in LDFLAGS to allow this.
+
+The comments say LDFLAGS are used but it was dropped in this commit:
+
+https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=5218fa9e8937b007d554f1e01c2e4ecdb9b7e271
+
+and probably needs to be put back upstream.
+
+The bug is rare to reproduce as it depends on the host libzstd was built
+against.
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=binutils-gdb.git;a=commitdiff;h=5fc6b6d44cd63651c2902cbfc5b9734a55aaa617]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: gdb-13.1/gdb/acinclude.m4
+===================================================================
+--- gdb-13.1.orig/gdb/acinclude.m4
++++ gdb-13.1/gdb/acinclude.m4
+@@ -234,7 +234,7 @@ AC_DEFUN([GDB_AC_CHECK_BFD], [
+   # points somewhere with bfd, with -I/foo/lib and -L/foo/lib.  We
+   # always want our bfd.
+   CFLAGS="-I${srcdir}/../include -I../bfd -I${srcdir}/../bfd $CFLAGS"
+-  LDFLAGS="-L../bfd -L../libiberty"
++  LDFLAGS="-L../bfd -L../libiberty $LDFLAGS"
+   intl=`echo $LIBINTL | sed 's,${top_builddir}/,,g'`
+   LIBS="-lbfd -liberty $intl $LIBS"
+   CC="./libtool --quiet --mode=link $CC"
+Index: gdb-13.1/gdb/configure
+===================================================================
+--- gdb-13.1.orig/gdb/configure
++++ gdb-13.1/gdb/configure
+@@ -28561,7 +28561,7 @@ WIN32LIBS="$WIN32LIBS $WIN32APILIBS"
+   # points somewhere with bfd, with -I/foo/lib and -L/foo/lib.  We
+   # always want our bfd.
+   CFLAGS="-I${srcdir}/../include -I../bfd -I${srcdir}/../bfd $CFLAGS"
+-  LDFLAGS="-L../bfd -L../libiberty"
++  LDFLAGS="-L../bfd -L../libiberty $LDFLAGS"
+   intl=`echo $LIBINTL | sed 's,${top_builddir}/,,g'`
+   LIBS="-lbfd -liberty $intl $LIBS"
+   CC="./libtool --quiet --mode=link $CC"

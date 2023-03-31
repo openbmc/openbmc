@@ -72,7 +72,7 @@ RDEPENDS:${PN} += " \
         python3-resource \
         python3-terminal \
 "
-RDEPENDS:${PN}-filter += "perl"
+RDEPENDS:${PN}-filter += "perl ghostscript"
 
 # need to snag the debug file or OE will fail on backend package
 FILES:${PN}-dbg += "\

@@ -133,7 +133,7 @@ RDEPENDS:${PN}-ptest += " bash coreutils curl file \
    perl-module-carp perl-module-symbol \
    procps sed ${PN}-dbg ${PN}-src ${TCLIBC}-src gcc-runtime-dbg \
    util-linux-taskset"
-RDEPENDS:${PN}-ptest:append:libc-glibc = " glibc-utils"
+RDEPENDS:${PN}-ptest:append:libc-glibc = " glibc-utils glibc-gconv-utf-32"
 
 # One of the tests contains a bogus interpreter path on purpose.
 # Skip file dependency check

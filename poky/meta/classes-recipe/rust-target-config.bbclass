@@ -245,6 +245,14 @@ TARGET_POINTER_WIDTH[riscv64gc] = "64"
 TARGET_C_INT_WIDTH[riscv64gc] = "64"
 MAX_ATOMIC_WIDTH[riscv64gc] = "64"
 
+## loongarch64-unknown-linux-{gnu, musl}
+DATA_LAYOUT[loongarch64] = "e-m:e-i8:8:32-i16:16:32-i64:64-n32:64-S128"
+TARGET_ENDIAN[loongarch64] = "little"
+TARGET_POINTER_WIDTH[loongarch64] = "64"
+TARGET_C_INT_WIDTH[loongarch64] = "32"
+MAX_ATOMIC_WIDTH[loongarch64] = "64"
+FEATURES[loongarch64] = "+d"
+
 # Convert a normal arch (HOST_ARCH, TARGET_ARCH, BUILD_ARCH, etc) to something
 # rust's internals won't choke on.
 def arch_to_rust_target_arch(arch):
@@ -288,6 +296,7 @@ def llvm_cpu(d):
     trans['mips64el'] = "mips64"
     trans['riscv64'] = "generic-rv64"
     trans['riscv32'] = "generic-rv32"
+    trans['loongarch64'] = "la464"
 
     if target in ["mips", "mipsel", "powerpc"]:
         feat = frozenset(d.getVar('TUNE_FEATURES').split())
@@ -367,6 +376,8 @@ def rust_gen_target(d, thing, wd, arch):
         tspec['llvm-abiname'] = "lp64d"
     if "riscv32" in tspec['llvm-target']:
         tspec['llvm-abiname'] = "ilp32d"
+    if "loongarch64" in tspec['llvm-target']:
+        tspec['llvm-abiname'] = "lp64d"
     tspec['vendor'] = "unknown"
     tspec['target-family'] = "unix"
     tspec['linker'] = "{}{}gcc".format(d.getVar('CCACHE'), prefix)

@@ -6,4 +6,14 @@
 # test plan to raise ERRORs; this is just noise.
 makeargs="LOG_DRIVER_FLAGS=--ignore-exit abs_top_srcdir=$PWD abs_top_builddir=$PWD GREP=grep SED=sed PYTHON=python3"
 
-exec make -C tests -k -s $makeargs $target 2>/dev/null
+exec 2> error.log
+make -C tests -k -s $makeargs $target
+exitcode=$?
+if [ -e error.log ]; then
+    cat error.log
+fi
+if [ -e tests/test-suite.log ]; then
+    cat tests/test-suite.log
+fi
+
+exit $exitcode

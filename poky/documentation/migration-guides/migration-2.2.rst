@@ -121,11 +121,10 @@ compared to uClibc.
 ``${B}`` No Longer Default Working Directory for Tasks
 ------------------------------------------------------
 
-``${``\ :term:`B`\ ``}`` is no longer the default working
-directory for tasks. Consequently, any custom tasks you define now need
-to either have the
-``[``\ :ref:`dirs <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:variable flags>`\ ``]`` flag
-set, or the task needs to change into the appropriate working directory
+``${``\ :term:`B`\ ``}`` is no longer the default working directory for tasks.
+Consequently, any custom tasks you define now need to either have the
+``[``\ :ref:`dirs <bitbake-user-manual/bitbake-user-manual-metadata:variable flags>`\ ``]``
+flag set, or the task needs to change into the appropriate working directory
 manually (e.g using ``cd`` for a shell task).
 
 .. note::

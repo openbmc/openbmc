@@ -24,19 +24,22 @@ SECTION = "libs"
 
 S = "${WORKDIR}/git"
 SRCREV = "89f040a5c938985c5f30728baed21e49d0846a53"
-SRC_URI = "git://github.com/ARMmbed/mbedtls.git;protocol=https;branch=mbedtls-2.28"
+SRC_URI = "git://github.com/ARMmbed/mbedtls.git;protocol=https;branch=mbedtls-2.28 \
+           file://run-ptest \
+          "
 
-inherit cmake update-alternatives
+inherit cmake update-alternatives ptest
 
-PACKAGECONFIG ??= "shared-libs programs"
+PACKAGECONFIG ??= "shared-libs programs ${@bb.utils.contains('PTEST_ENABLED', '1', 'tests', '', d)}"
 PACKAGECONFIG[shared-libs] = "-DUSE_SHARED_MBEDTLS_LIBRARY=ON,-DUSE_SHARED_MBEDTLS_LIBRARY=OFF"
 PACKAGECONFIG[programs] = "-DENABLE_PROGRAMS=ON,-DENABLE_PROGRAMS=OFF"
 PACKAGECONFIG[werror] = "-DMBEDTLS_FATAL_WARNINGS=ON,-DMBEDTLS_FATAL_WARNINGS=OFF"
 # Make X.509 and TLS calls use PSA
 # https://github.com/Mbed-TLS/mbedtls/blob/development/docs/use-psa-crypto.md
 PACKAGECONFIG[psa] = ""
+PACKAGECONFIG[tests] = "-DENABLE_TESTING=ON,-DENABLE_TESTING=OFF"
 
-EXTRA_OECMAKE = "-DENABLE_TESTING=OFF -DLIB_INSTALL_DIR:STRING=${libdir}"
+EXTRA_OECMAKE = "-DLIB_INSTALL_DIR:STRING=${libdir}"
 
 # For now the only way to enable PSA is to explicitly pass a -D via CFLAGS
 CFLAGS:append = "${@bb.utils.contains('PACKAGECONFIG', 'psa', ' -DMBEDTLS_USE_PSA_CRYPTO', '', d)}"
@@ -63,4 +66,11 @@ CVE_CHECK_IGNORE += "CVE-2021-45451"
 sysroot_stage_all:append() {
 	sysroot_stage_dir "${S}/library" "${SYSROOT_DESTDIR}/usr/share/mbedtls-source/library"
 	sysroot_stage_dir "${S}/include" "${SYSROOT_DESTDIR}/usr/share/mbedtls-source/include"
+}
+
+do_install_ptest () {
+	install -d ${D}${PTEST_PATH}/tests
+	cp -f ${B}/tests/test_suite_* ${D}${PTEST_PATH}/tests/
+	find ${D}${PTEST_PATH}/tests/ -type f -name "*.c" -delete
+	cp -fR ${S}/tests/data_files ${D}${PTEST_PATH}/tests/
 }

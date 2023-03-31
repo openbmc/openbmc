@@ -12,9 +12,6 @@ PR = "r8"
 
 inherit allarch fontcache
 
-# remove at next version upgrade or when output changes
-HASHEQUIV_HASH_VERSION .= ".1"
-
 FONT_PACKAGES = "${PN}"
 
 SRC_URI = "${GNOME_MIRROR}/ttf-bitstream-vera/1.10/ttf-bitstream-vera-${PV}.tar.bz2"

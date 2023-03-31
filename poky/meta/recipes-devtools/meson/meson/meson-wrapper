@@ -13,20 +13,19 @@ fi
 # config is already in meson.cross.
 unset CC CXX CPP LD AR NM STRIP
 
-for arg in "$@"; do
-    case "$arg" in
-    -*) continue ;;
-    *) SUBCMD="$arg"; break ;;
-    esac
-done
+case "$1" in
+setup|configure|dist|install|introspect|init|test|wrap|subprojects|rewrite|compile|devenv|env2mfile|help) MESON_CMD="$1" ;;
+*) echo meson-wrapper: Implicit setup command assumed; MESON_CMD=setup ;;
+esac
 
-if [ "$SUBCMD" = "setup" ] || [ -d "$SUBCMD" ]; then
-    MESON_SUB_OPTS=" \
+if [ "$MESON_CMD" = "setup" ]; then
+    MESON_SETUP_OPTS=" \
         --cross-file="$OECORE_NATIVE_SYSROOT/usr/share/meson/${TARGET_PREFIX}meson.cross" \
         --native-file="$OECORE_NATIVE_SYSROOT/usr/share/meson/meson.native" \
         "
+    echo meson-wrapper: Running meson with setup options: \"$MESON_SETUP_OPTS\"
 fi
 
 exec "$OECORE_NATIVE_SYSROOT/usr/bin/meson.real" \
     "$@" \
-    $MESON_SUB_OPTS
+    $MESON_SETUP_OPTS

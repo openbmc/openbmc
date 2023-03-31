@@ -302,7 +302,7 @@ def preset_all(root):
     # For the stateless configuration, where /etc is generated at runtime
     # (for example on a tmpfs), this script shouldn't run at all and we
     # allow systemd to completely populate /etc.
-    (root / SYSCONFDIR / "machine-id").write_text("uninitialized")
+    (root / SYSCONFDIR / "machine-id").touch()
 
 
 def main():

@@ -53,10 +53,11 @@ do_install_ptest() {
 }
 
 
-RDEPENDS:${PN}-ptest += "make coreutils diffutils"
+RDEPENDS:${PN}-ptest += "make coreutils diffutils bash"
 RDEPENDS:${PN}-ptest:append:libc-glibc = "\
      locale-base-fr-fr \
      locale-base-fr-fr.iso-8859-1 \
+     glibc-gconv-iso8859-1 \
 "
 
 INSANE_SKIP:${PN}-ptest += "ldflags"

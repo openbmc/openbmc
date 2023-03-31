@@ -13,7 +13,7 @@ SRCREV = "4321ed5c7b4bffa41b8a2a13dc7f3ece1191f4f3"
 
 inherit cmake pkgconfig features_check
 
-REQUIRED_DISTRO_FEATURES = "opengl"
+REQUIRED_DISTRO_FEATURES:class-target = "opengl"
 
 EXTRA_OECMAKE:class-native = " \
 	-DBUILD_SCANNER=ON \

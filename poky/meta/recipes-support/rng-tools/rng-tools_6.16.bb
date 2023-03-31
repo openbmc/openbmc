@@ -30,12 +30,21 @@ PACKAGECONFIG[libp11] = "--with-pkcs11,--without-pkcs11,libp11 openssl"
 PACKAGECONFIG[nistbeacon] = "--with-nistbeacon,--without-nistbeacon,curl libxml2"
 PACKAGECONFIG[qrypt] = "--with-qrypt,--without-qrypt,curl"
 
-INITSCRIPT_NAME = "rng-tools"
-INITSCRIPT_PARAMS = "start 03 2 3 4 5 . stop 30 0 6 1 ."
+INITSCRIPT_PACKAGES = "${PN}-service"
+INITSCRIPT_NAME:${PN}-service = "rng-tools"
+INITSCRIPT_PARAMS:${PN}-service = "start 03 2 3 4 5 . stop 30 0 6 1 ."
 
-SYSTEMD_SERVICE:${PN} = "rng-tools.service"
+SYSTEMD_PACKAGES = "${PN}-service"
+SYSTEMD_SERVICE:${PN}-service = "rng-tools.service"
 
 CFLAGS += " -DJENT_CONF_ENABLE_INTERNAL_TIMER "
+
+PACKAGES =+ "${PN}-service"
+
+FILES:${PN}-service += " \
+    ${sysconfdir}/init.d/rng-tools \
+    ${sysconfdir}/default/rng-tools \
+"
 
 # Refer autogen.sh in rng-tools
 do_configure:prepend() {

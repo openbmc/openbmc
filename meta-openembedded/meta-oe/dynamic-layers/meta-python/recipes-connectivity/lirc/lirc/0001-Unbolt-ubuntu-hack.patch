@@ -1,0 +1,26 @@
+From ca126a2832aaff0deef3ba7eaf411dd0dc43b068 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 16 Mar 2023 11:31:14 -0700
+Subject: [PATCH] Unbolt ubuntu hack
+
+This bites during cross compiling where the target is different than
+build host and build host might be ubuntu but that does not matter in
+cross compilation case. This fails builds when usrmerge feature is used
+
+Upstream-Status: Inappropriates [ Cross-compile specific ]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -429,7 +429,7 @@ AC_CHECK_LIB([udev], [udev_device_new_fr
+ ])
+ 
+ dnl Ubuntu's systemd pkg-config seems broken beyond repair. So:
+-kernelversion=`cat /proc/version || echo "non-linux"`
++kernelversion="cross-compiled"
+ AS_CASE([$kernelversion],
+   [*Ubuntu*],[
+     AC_MSG_NOTICE([Hardwiring Ubuntu systemd setup])

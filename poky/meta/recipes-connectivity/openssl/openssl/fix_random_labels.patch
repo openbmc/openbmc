@@ -1,0 +1,22 @@
+The perl script adds random suffixes to the local function names to ensure
+it doesn't clash with other parts of openssl. Set the random number seed
+to something predictable so the assembler files are generated consistently
+and our own reproducible builds tests pass.
+
+Upstream-Status: Pending
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: openssl-3.1.0/crypto/modes/asm/aes-gcm-avx512.pl
+===================================================================
+--- openssl-3.1.0.orig/crypto/modes/asm/aes-gcm-avx512.pl
++++ openssl-3.1.0/crypto/modes/asm/aes-gcm-avx512.pl
+@@ -191,6 +191,9 @@ my $CTX_OFFSET_HTable    = (16 * 6);
+ # ;;; Helper functions
+ # ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 
++# Ensure the local labels are reproduicble
++srand(10000);
++
+ # ; Generates "random" local labels
+ sub random_string() {
+   my @chars  = ('a' .. 'z', 'A' .. 'Z', '0' .. '9', '_');

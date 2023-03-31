@@ -1,0 +1,82 @@
+From 939200ef160c95c8a9d71fd80c99f42a1de0a9f0 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Tue, 7 Mar 2023 11:41:14 -0500
+Subject: [PATCH 1/4] fix: mm: introduce vma->vm_flags wrapper functions (v6.3)
+
+See upstream commit :
+
+  commit bc292ab00f6c7a661a8a605c714e8a148f629ef6
+  Author: Suren Baghdasaryan <surenb@google.com>
+  Date:   Thu Jan 26 11:37:47 2023 -0800
+
+    mm: introduce vma->vm_flags wrapper functions
+
+    vm_flags are among VMA attributes which affect decisions like VMA merging
+    and splitting.  Therefore all vm_flags modifications are performed after
+    taking exclusive mmap_lock to prevent vm_flags updates racing with such
+    operations.  Introduce modifier functions for vm_flags to be used whenever
+    flags are updated.  This way we can better check and control correct
+    locking behavior during these updates.
+
+Upstream-Status: Backport
+
+Change-Id: I2cf662420d9d7748e5e310d3ea4bac98ba7d7f94
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/wrapper/mm.h                  | 16 ++++++++++++++++
+ src/lib/ringbuffer/ring_buffer_mmap.c |  4 +++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/include/wrapper/mm.h b/include/wrapper/mm.h
+index d3bdda66..61ac8127 100644
+--- a/include/wrapper/mm.h
++++ b/include/wrapper/mm.h
+@@ -13,6 +13,22 @@
+ 
+ #include <lttng/kernel-version.h>
+ 
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,3,0))
++static inline
++void wrapper_vm_flags_set(struct vm_area_struct *vma,
++		vm_flags_t flags)
++{
++	vm_flags_set(vma, flags);
++}
++#else
++static inline
++void wrapper_vm_flags_set(struct vm_area_struct *vma,
++		vm_flags_t flags)
++{
++	vma->vm_flags |= flags;
++}
++#endif
++
+ #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,6,0) \
+ 		|| LTTNG_UBUNTU_KERNEL_RANGE(4,4,25,44, 4,5,0,0))
+ 
+diff --git a/src/lib/ringbuffer/ring_buffer_mmap.c b/src/lib/ringbuffer/ring_buffer_mmap.c
+index 25e2d8d5..d24b76a3 100644
+--- a/src/lib/ringbuffer/ring_buffer_mmap.c
++++ b/src/lib/ringbuffer/ring_buffer_mmap.c
+@@ -17,6 +17,8 @@
+ #include <ringbuffer/frontend.h>
+ #include <ringbuffer/vfs.h>
+ 
++#include <wrapper/mm.h>
++
+ /*
+  * fault() vm_op implementation for ring buffer file mapping.
+  */
+@@ -113,7 +115,7 @@ static int lib_ring_buffer_mmap_buf(struct lttng_kernel_ring_buffer *buf,
+ 		return -EINVAL;
+ 
+ 	vma->vm_ops = &lib_ring_buffer_mmap_ops;
+-	vma->vm_flags |= VM_DONTEXPAND;
++	wrapper_vm_flags_set(vma, VM_DONTEXPAND);
+ 	vma->vm_private_data = buf;
+ 
+ 	return 0;
+-- 
+2.34.1
+

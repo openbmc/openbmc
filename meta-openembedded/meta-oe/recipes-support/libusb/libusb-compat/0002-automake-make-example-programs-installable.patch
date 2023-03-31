@@ -1,0 +1,24 @@
+From 9dcdfa716e3c3831d9b70472b39dab2fd370f503 Mon Sep 17 00:00:00 2001
+From: Yoann Congal <yoann.congal@smile.fr>
+Date: Sun, 26 Feb 2023 16:04:35 +0100
+Subject: [PATCH] automake: make example programs installable
+
+The example programs are used as tests for ptest, so we need a way to
+install them on the rootfs.
+
+Upstream-Status: Inappropriate [oe-core specific]
+---
+ examples/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/examples/Makefile.am b/examples/Makefile.am
+index 9bd3efc..f4324c2 100644
+--- a/examples/Makefile.am
++++ b/examples/Makefile.am
+@@ -1,5 +1,5 @@
+ AM_CPPFLAGS = -I$(top_srcdir)/libusb
+-noinst_PROGRAMS = lsusb testlibusb
++bin_PROGRAMS = lsusb testlibusb
+ 
+ lsusb_SOURCES = lsusb.c
+ lsusb_LDADD = ../libusb/libusb.la

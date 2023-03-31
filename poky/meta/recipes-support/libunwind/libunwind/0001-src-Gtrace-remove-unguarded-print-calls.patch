@@ -1,0 +1,52 @@
+From 87d24ee47fd0e0461fca32d17564f21d76cbcb92 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Fri, 24 Mar 2023 16:18:44 +0000
+Subject: [PATCH] src/Gtrace: remove unguarded print() calls
+
+There is a use of printf() without #include stdio.h in src/arm/Gtrace.c,
+which results in a compiler error if clang 16 is used:
+
+src/arm/Gtrace.c:529:7: error: call to undeclared library function
+'printf' with type 'int (const char *, ...)'; ISO C99 and later do not
+support implicit function declarations [-Wimplicit-function-declaration]
+
+Replace the printf("XXX") with a Dprintf, so it doesn't pull stdio in
+unless in a debug build, and reword the message to be clearer.
+
+Also there is another printf("XXX") inside a FreeBSD-specific block in
+the UNW_ARM_FRAME_SIGRETURN case, replace this with a #error as the code
+needs to be implemented.
+
+Fixes #482.
+
+Upstream-Status: Submitted [https://github.com/libunwind/libunwind/pull/483]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ src/arm/Gtrace.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/arm/Gtrace.c b/src/arm/Gtrace.c
+index 51fc281d..9e0f25af 100644
+--- a/src/arm/Gtrace.c
++++ b/src/arm/Gtrace.c
+@@ -514,7 +514,7 @@ tdep_trace (unw_cursor_t *cursor, void **buffer, int *size)
+       if (likely(ret >= 0))
+         ACCESS_MEM_FAST(ret, c->validate, d, cfa + LINUX_SC_LR_OFF, lr);
+ #elif defined(__FreeBSD__)
+-      printf("XXX\n");
++      #error implement UNW_ARM_FRAME_SIGRETURN on FreeBSD
+ #endif
+ 
+       /* Resume stack at signal restoration point. The stack is not
+@@ -526,7 +526,7 @@ tdep_trace (unw_cursor_t *cursor, void **buffer, int *size)
+       break;
+ 
+     case UNW_ARM_FRAME_SYSCALL:
+-      printf("XXX1\n");
++      Dprintf ("%s: implement me\n", __FUNCTION__);
+       break;
+ 
+     default:
+-- 
+2.34.1
+

@@ -38,18 +38,27 @@ def get_sha1(pokydir, revision):
         logger.error(f"Can not find SHA-1 for {revision} in {pokydir}")
         return None
 
+def get_branch(tag):
+    # The tags in test results repository, as returned by git rev-list, have the following form:
+    # refs/tags/<branch>/<count>-g<sha1>/<num>
+    return '/'.join(tag.split("/")[2:-2])
+
 def fetch_testresults(workdir, sha1):
     logger.info(f"Fetching test results for {sha1} in {workdir}")
     rawtags = subprocess.check_output(["git", "ls-remote", "--refs", "--tags", "origin", f"*{sha1}*"], cwd=workdir).decode('utf-8').strip()
     if not rawtags:
         raise Exception(f"No reference found for commit {sha1} in {workdir}")
+    branch = ""
     for rev in [rawtag.split()[1] for rawtag in rawtags.splitlines()]:
-        logger.info(f"Fetching matching revisions: {rev}")
+        if not branch:
+            branch = get_branch(rev)
+        logger.info(f"Fetching matching revision: {rev}")
         subprocess.check_call(["git", "fetch", "--depth", "1", "origin", f"{rev}:{rev}"], cwd=workdir)
+    return branch
 
-def compute_regression_report(workdir, baserevision, targetrevision):
+def compute_regression_report(workdir, basebranch, baserevision, targetbranch, targetrevision):
     logger.info(f"Running resulttool regression between SHA1 {baserevision} and {targetrevision}")
-    report = subprocess.check_output([resulttool, "regression-git", "--commit", baserevision, "--commit2", targetrevision, workdir]).decode("utf-8")
+    report = subprocess.check_output([resulttool, "regression-git", "--branch", basebranch, "--commit", baserevision, "--branch2", targetbranch, "--commit2", targetrevision, workdir]).decode("utf-8")
     return report
 
 def print_report_with_header(report, baseversion, baserevision, targetversion, targetrevision):
@@ -74,9 +83,9 @@ def regression(args):
             if not args.testresultsdir:
                 subprocess.check_call(["rm", "-rf",  workdir])
             sys.exit(1)
-        fetch_testresults(workdir, baserevision)
-        fetch_testresults(workdir, targetrevision)
-        report = compute_regression_report(workdir, baserevision, targetrevision)
+        basebranch = fetch_testresults(workdir, baserevision)
+        targetbranch = fetch_testresults(workdir, targetrevision)
+        report = compute_regression_report(workdir, basebranch, baserevision, targetbranch, targetrevision)
         print_report_with_header(report, args.base, baserevision, args.target, targetrevision)
     finally:
         if not args.testresultsdir:

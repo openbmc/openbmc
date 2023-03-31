@@ -110,8 +110,10 @@ function.
 Ubuntu and Debian
 -----------------
 
-Here are the required packages by function given a
-supported Ubuntu or Debian Linux distribution:
+Here are the packages needed to build an image on a headless system
+with a supported Ubuntu or Debian Linux distribution::
+
+   $ sudo apt install &UBUNTU_HOST_PACKAGES_ESSENTIAL;
 
 .. note::
 
@@ -123,80 +125,63 @@ supported Ubuntu or Debian Linux distribution:
          $ sudo apt build-dep qemu
          $ sudo apt remove oss4-dev
 
--  *Essentials:* Packages needed to build an image on a headless system::
+Here are the packages needed to build Project documentation manuals::
 
-      $ sudo apt install &UBUNTU_HOST_PACKAGES_ESSENTIAL;
-
--  *Documentation:* Packages needed if you are going to build out the
-   Yocto Project documentation manuals::
-
-      $ sudo apt install make python3-pip inkscape texlive-latex-extra
-      &PIP3_HOST_PACKAGES_DOC;
+   $ sudo apt install make python3-pip inkscape texlive-latex-extra
+   &PIP3_HOST_PACKAGES_DOC;
 
 Fedora Packages
 ---------------
 
-Here are the required packages by function given a
-supported Fedora Linux distribution:
+Here are the packages needed to build an image on a headless system
+with a supported Fedora Linux distribution::
 
--  *Essentials:* Packages needed to build an image for a headless
-   system::
+   $ sudo dnf install &FEDORA_HOST_PACKAGES_ESSENTIAL;
 
-      $ sudo dnf install &FEDORA_HOST_PACKAGES_ESSENTIAL;
+Here are the packages needed to build Project documentation manuals::
 
--  *Documentation:* Packages needed if you are going to build out the
-   Yocto Project documentation manuals::
-
-      $ sudo dnf install make python3-pip which inkscape texlive-fncychap
-      &PIP3_HOST_PACKAGES_DOC;
+   $ sudo dnf install make python3-pip which inkscape texlive-fncychap
+   &PIP3_HOST_PACKAGES_DOC;
 
 openSUSE Packages
 -----------------
 
-Here are the required packages by function given a
-supported openSUSE Linux distribution:
+Here are the packages needed to build an image on a headless system
+with a supported openSUSE distribution::
 
--  *Essentials:* Packages needed to build an image for a headless
-   system::
+   $ sudo zypper install &OPENSUSE_HOST_PACKAGES_ESSENTIAL;
 
-      $ sudo zypper install &OPENSUSE_HOST_PACKAGES_ESSENTIAL;
+Here are the packages needed to build Project documentation manuals::
 
--  *Documentation:* Packages needed if you are going to build out the
-   Yocto Project documentation manuals::
-
-      $ sudo zypper install make python3-pip which inkscape texlive-fncychap
-      &PIP3_HOST_PACKAGES_DOC;
+   $ sudo zypper install make python3-pip which inkscape texlive-fncychap
+   &PIP3_HOST_PACKAGES_DOC;
 
 
-AlmaLinux-8 Packages
---------------------
+AlmaLinux Packages
+------------------
 
-Here are the required packages by function given a
-supported AlmaLinux-8 Linux distribution:
+Here are the packages needed to build an image on a headless system
+with a supported AlmaLinux distribution::
 
--  *Essentials:* Packages needed to build an image for a headless
-   system::
+   $ sudo dnf install &ALMALINUX8_HOST_PACKAGES_ESSENTIAL;
 
-      $ sudo dnf install &CENTOS8_HOST_PACKAGES_ESSENTIAL;
+.. note::
 
-   .. note::
+   -  Extra Packages for Enterprise Linux (i.e. ``epel-release``) is
+      a collection of packages from Fedora built on RHEL/CentOS for
+      easy installation of packages not included in enterprise Linux
+      by default. You need to install these packages separately.
 
-      -  Extra Packages for Enterprise Linux (i.e. ``epel-release``) is
-         a collection of packages from Fedora built on RHEL/CentOS for
-         easy installation of packages not included in enterprise Linux
-         by default. You need to install these packages separately.
+   -  The ``PowerTools/CRB`` repo provides additional packages such as
+      ``rpcgen`` and ``texinfo``.
 
-      -  The ``PowerTools`` repo provides additional packages such as
-         ``rpcgen`` and ``texinfo``.
+   -  The ``makecache`` command consumes additional Metadata from
+      ``epel-release``.
 
-      -  The ``makecache`` command consumes additional Metadata from
-         ``epel-release``.
+Here are the packages needed to build Project documentation manuals::
 
--  *Documentation:* Packages needed if you are going to build out the
-   Yocto Project documentation manuals::
-
-      $ sudo dnf install make python3-pip which inkscape texlive-fncychap
-      &PIP3_HOST_PACKAGES_DOC;
+   $ sudo dnf install make python3-pip which inkscape texlive-fncychap
+   &PIP3_HOST_PACKAGES_DOC;
 
 .. _system-requirements-buildtools:
 

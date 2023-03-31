@@ -108,7 +108,7 @@ Viewing Variable Values
 Sometimes you need to know the value of a variable as a result of
 BitBake's parsing step. This could be because some unexpected behavior
 occurred in your project. Perhaps an attempt to :ref:`modify a variable
-<bitbake:bitbake-user-manual/bitbake-user-manual-metadata:modifying existing
+<bitbake-user-manual/bitbake-user-manual-metadata:modifying existing
 variables>` did not work out as expected.
 
 BitBake's ``-e`` option is used to display variable values after
@@ -282,15 +282,14 @@ Viewing Task Variable Dependencies
 ==================================
 
 As mentioned in the
-":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-execution:checksums (signatures)`" section of the BitBake
-User Manual, BitBake tries to automatically determine what variables a
-task depends on so that it can rerun the task if any values of the
-variables change. This determination is usually reliable. However, if
-you do things like construct variable names at runtime, then you might
-have to manually declare dependencies on those variables using
-``vardeps`` as described in the
-":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:variable flags`" section of the BitBake
-User Manual.
+":ref:`bitbake-user-manual/bitbake-user-manual-execution:checksums (signatures)`"
+section of the BitBake User Manual, BitBake tries to automatically determine
+what variables a task depends on so that it can rerun the task if any values of
+the variables change. This determination is usually reliable. However, if you
+do things like construct variable names at runtime, then you might have to
+manually declare dependencies on those variables using ``vardeps`` as described
+in the ":ref:`bitbake-user-manual/bitbake-user-manual-metadata:variable flags`"
+section of the BitBake User Manual.
 
 If you are unsure whether a variable dependency is being picked up
 automatically for a given task, you can list the variable dependencies
@@ -457,7 +456,7 @@ out), then you can use the ``-f`` option.
 
    The reason ``-f`` is never required when running the
    :ref:`ref-tasks-devshell` task is because the
-   [\ :ref:`nostamp <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:variable flags>`\ ]
+   [\ :ref:`nostamp <bitbake-user-manual/bitbake-user-manual-metadata:variable flags>`\ ]
    variable flag is already set for the task.
 
 The following example shows one way you can use the ``-f`` option::
@@ -572,10 +571,10 @@ log to ``${T}/log.do_``\ `task`, and can also log to standard output
 -  ``bb.note(msg)``: Writes "NOTE: msg" to the log. Also logs to
    stdout if BitBake is called with "-v".
 
--  ``bb.debug(level, msg)``: Writes "DEBUG: msg" to the
-   log. Also logs to stdout if the log level is greater than or equal to
-   level. See the ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-intro:usage and syntax`" option
-   in the BitBake User Manual for more information.
+-  ``bb.debug(level, msg)``: Writes "DEBUG: msg" to the log. Also logs to
+   stdout if the log level is greater than or equal to level. See the
+   ":ref:`bitbake-user-manual/bitbake-user-manual-intro:usage and syntax`"
+   option in the BitBake User Manual for more information.
 
 -  ``bb.warn(msg)``: Writes "WARNING: msg" to the log while also
    logging to stdout.

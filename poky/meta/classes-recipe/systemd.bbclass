@@ -152,6 +152,7 @@ python systemd_populate_packages() {
     def systemd_check_services():
         searchpaths = [oe.path.join(d.getVar("sysconfdir"), "systemd", "system"),]
         searchpaths.append(d.getVar("systemd_system_unitdir"))
+        searchpaths.append(d.getVar("systemd_user_unitdir"))
         systemd_packages = d.getVar('SYSTEMD_PACKAGES')
 
         keys = 'Also'

@@ -65,6 +65,7 @@ RDEPENDS:${PN}-ptest = "acl \
                         bash \
                         coreutils \
                         perl \
+                        perl-module-constant \
                         perl-module-filehandle \
                         perl-module-getopt-std \
                         perl-module-posix \

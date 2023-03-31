@@ -103,7 +103,7 @@ class SFTP(FetchMethod):
         if path[:3] == '/~/':
             path = path[3:]
 
-        remote = '%s%s:%s' % (user, urlo.hostname, path)
+        remote = '"%s%s:%s"' % (user, urlo.hostname, path)
 
         cmd = '%s %s %s %s' % (basecmd, port, remote, lpath)
 

@@ -13,9 +13,6 @@ SRC_URI = "git://github.com/smuellerDD/jitterentropy-library.git;branch=master;p
 SRCREV = "4544e11320138ac02797af81766f4476a71bb09f"
 S = "${WORKDIR}/git"
 
-# remove at next version upgrade or when output changes
-HASHEQUIV_HASH_VERSION .= ".2"
-
 do_configure[noexec] = "1"
 
 LDFLAGS += "-Wl,-O0"

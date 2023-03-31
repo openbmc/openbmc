@@ -1,0 +1,75 @@
+# SPDX-License-Identifier: GPL-2.0-only
+# Initially written by: Michael Tokarev <mjt@tls.msk.ru>
+# For QEMU Debian downstream package
+
+set -e
+
+. /etc/init.d/functions
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC="QEMU Guest Agent"
+NAME=qemu-ga
+DAEMON=@bindir@/$NAME
+PIDFILE=/var/run/$NAME.pid
+
+# config
+DAEMON_ARGS=""
+# default transport
+TRANSPORT=virtio-serial:/dev/virtio-ports/org.qemu.guest_agent.0
+NO_START=0
+
+test ! -r /etc/default/qemu-guest-agent || . /etc/default/qemu-guest-agent
+test "$NO_START" = "0" || exit 0
+test -x "$DAEMON" || exit 0
+
+#
+# Function that checks whenever system has necessary environment
+# It also splits $TRANSPORT into $method and $path
+#
+do_check_transport() {
+	method=${TRANSPORT%%:*};
+	path=${TRANSPORT#*:}
+	case "$method" in
+	    virtio-serial | isa-serial)
+		if [ ! -e "$path" ]; then
+		    echo "$NAME: transport endpoint not found, not starting"
+		    return 1
+		fi
+		;;
+	esac
+}
+
+case "$1" in
+  start)
+	do_check_transport || exit 0
+	echo -n "Starting $DESC: "
+	start-stop-daemon -S -p $PIDFILE -x "$DAEMON" -- \
+		$DAEMON_ARGS -d -m "$method" -p "$path"
+	echo "$NAME."
+	;;
+  stop)
+	echo -n "Stopping $DESC: "
+	start-stop-daemon -K -x "$DAEMON" -p $PIDFILE
+	echo "$NAME."
+	;;
+  status)
+	status "$DAEMON"
+	exit $?
+	;;
+  restart|force-reload)
+	do_check_transport || exit 0
+	echo -n "Restarting $DESC: "
+	start-stop-daemon -K -x "$DAEMON" -p $PIDFILE
+	sleep 1
+	start-stop-daemon -S -p $PIDFILE -x "$DAEMON" -- \
+		$DAEMON_ARGS -d -m "$method" -p "$path"
+	echo "$NAME."
+	;;
+  *)
+	N=/etc/init.d/$NAME
+	echo "Usage: $N {start|stop|status|restart|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

@@ -33,16 +33,14 @@ do_unpack[postfuncs] += "prune_sources"
  Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index 93d63110..79caaec2 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -138,7 +138,7 @@ with-code-cache test-code-cache:
+@@ -169,7 +169,7 @@ with-code-cache test-code-cache:
  	$(warning '$@' target is a noop)
  
  out/Makefile: config.gypi common.gypi node.gyp \
 -	deps/uv/uv.gyp deps/llhttp/llhttp.gyp deps/zlib/zlib.gyp \
 +	deps/llhttp/llhttp.gyp \
+ 	deps/simdutf/simdutf.gyp \
  	tools/v8_gypfiles/toolchain.gypi tools/v8_gypfiles/features.gypi \
  	tools/v8_gypfiles/inspector.gypi tools/v8_gypfiles/v8.gyp
- 	$(PYTHON) tools/gyp_node.py -f make

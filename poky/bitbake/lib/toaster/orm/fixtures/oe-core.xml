@@ -23,9 +23,9 @@
     <field type="CharField" name="branch">master</field>
   </object>
   <object model="orm.bitbakeversion" pk="4">
-    <field type="CharField" name="name">langdale</field>
+    <field type="CharField" name="name">mickledore</field>
     <field type="CharField" name="giturl">git://git.openembedded.org/bitbake</field>
-    <field type="CharField" name="branch">2.2</field>
+    <field type="CharField" name="branch">2.4</field>
   </object>
   <object model="orm.bitbakeversion" pk="5">
     <field type="CharField" name="name">dunfell</field>
@@ -56,11 +56,11 @@
     <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"https://cgit.openembedded.org/openembedded-core/log/\"&gt;OpenEmbedded master&lt;/a&gt; branch.</field>
   </object>
   <object model="orm.release" pk="4">
-    <field type="CharField" name="name">langdale</field>
-    <field type="CharField" name="description">Openembedded Langdale</field>
+    <field type="CharField" name="name">mickledore</field>
+    <field type="CharField" name="description">Openembedded Mickledore</field>
     <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">4</field>
-    <field type="CharField" name="branch_name">langdale</field>
-    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"https://cgit.openembedded.org/openembedded-core/log/?h=langdale\"&gt;OpenEmbedded Langdale&lt;/a&gt; branch.</field>
+    <field type="CharField" name="branch_name">mickledore</field>
+    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"https://cgit.openembedded.org/openembedded-core/log/?h=mickledore\"&gt;OpenEmbedded Mickledore&lt;/a&gt; branch.</field>
   </object>
   <object model="orm.release" pk="5">
     <field type="CharField" name="name">dunfell</field>

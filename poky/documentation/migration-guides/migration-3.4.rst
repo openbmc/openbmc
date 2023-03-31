@@ -45,7 +45,7 @@ would now become::
    BB_TASK_NICE_LEVEL:task-testimage = '0'
 
 This also applies to
-:ref:`variable queries to the datastore <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:functions for accessing datastore variables>`,
+:ref:`variable queries to the datastore <bitbake-user-manual/bitbake-user-manual-metadata:functions for accessing datastore variables>`,
 for example using ``getVar`` and similar so ``d.getVar("RDEPENDS_${PN}")``
 becomes ``d.getVar("RDEPENDS:${PN}")``.
 

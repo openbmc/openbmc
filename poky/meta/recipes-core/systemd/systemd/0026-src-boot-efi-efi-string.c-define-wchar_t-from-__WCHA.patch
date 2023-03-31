@@ -1,0 +1,44 @@
+From 34072f456b4fe880fbb2f18760b64a1a6c1eebb8 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Mon, 6 Mar 2023 15:24:49 +0100
+Subject: [PATCH] src/boot/efi/efi-string.c: define wchar_t from __WCHAR_TYPE__
+
+systemd-boot relies on wchar_t being 16 bit, and breaks at build time otherwise.
+
+To set wchar_t to 16 bit it is passing -fshort-wchar to gcc; this has the
+desired effect on glibc (which sets wchar_t from __WCHAR_TYPE__) but not on
+musl (which hardcodes it to 32 bit).
+
+This patch ensures wchar_t is set from the compiler flags on all systems; note
+that systemd-boot is not actually using functions from musl or other libc, just their headers.
+
+Meanwhile upstream has refactored the code to not rely on libc headers at all;
+however this will not be backported to v253 and we need a different fix.
+
+Upstream-Status: Inappropriate [fixed differently in trunk according to https://github.com/systemd/systemd/pull/26689]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ src/boot/efi/efi-string.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/boot/efi/efi-string.c b/src/boot/efi/efi-string.c
+index 22923d60f6..5d09d4281f 100644
+--- a/src/boot/efi/efi-string.c
++++ b/src/boot/efi/efi-string.c
+@@ -2,7 +2,13 @@
+ 
+ #include <stdbool.h>
+ #include <stdint.h>
++
++#if SD_BOOT
++typedef __WCHAR_TYPE__ wchar_t;
++#define __DEFINED_wchar_t
++#else
+ #include <wchar.h>
++#endif
+ 
+ #include "efi-string.h"
+ 
+-- 
+2.39.2
+

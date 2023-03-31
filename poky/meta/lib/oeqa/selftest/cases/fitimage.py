@@ -5,7 +5,7 @@
 #
 
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import runCmd, bitbake, get_bb_var
+from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars
 import os
 import re
 
@@ -42,15 +42,14 @@ FIT_DESC = "A model description"
         self.write_config(config)
 
         # fitImage is created as part of linux recipe
-        bitbake("virtual/kernel")
+        image = "virtual/kernel"
+        bitbake(image)
+        bb_vars = get_bb_vars(['DEPLOY_DIR_IMAGE', 'INITRAMFS_IMAGE_NAME', 'KERNEL_FIT_LINK_NAME'], image)
 
-        image_type = "core-image-minimal"
-        deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
-        machine = get_bb_var('MACHINE')
-        fitimage_its_path = os.path.join(deploy_dir_image,
-            "fitImage-its-%s-%s-%s" % (image_type, machine, machine))
-        fitimage_path = os.path.join(deploy_dir_image,
-            "fitImage-%s-%s-%s" % (image_type, machine, machine))
+        fitimage_its_path = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'],
+            "fitImage-its-%s-%s" % (bb_vars['INITRAMFS_IMAGE_NAME'], bb_vars['KERNEL_FIT_LINK_NAME']))
+        fitimage_path = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'],
+            "fitImage-%s-%s" % (bb_vars['INITRAMFS_IMAGE_NAME'], bb_vars['KERNEL_FIT_LINK_NAME']))
 
         self.assertTrue(os.path.exists(fitimage_its_path),
             "%s image tree source doesn't exist" % (fitimage_its_path))
@@ -123,15 +122,14 @@ UBOOT_MKIMAGE_SIGN_ARGS = "-c 'a smart comment'"
         self.write_config(config)
 
         # fitImage is created as part of linux recipe
-        bitbake("virtual/kernel")
+        image = "virtual/kernel"
+        bitbake(image)
+        bb_vars = get_bb_vars(['DEPLOY_DIR_IMAGE', 'KERNEL_FIT_LINK_NAME'], image)
 
-        image_type = "core-image-minimal"
-        deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
-        machine = get_bb_var('MACHINE')
-        fitimage_its_path = os.path.join(deploy_dir_image,
-            "fitImage-its-%s" % (machine,))
-        fitimage_path = os.path.join(deploy_dir_image,
-            "fitImage-%s.bin" % (machine,))
+        fitimage_its_path = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'],
+            "fitImage-its-%s" % (bb_vars['KERNEL_FIT_LINK_NAME']))
+        fitimage_path = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'],
+            "fitImage-%s.bin" % (bb_vars['KERNEL_FIT_LINK_NAME']))
 
         self.assertTrue(os.path.exists(fitimage_its_path),
             "%s image tree source doesn't exist" % (fitimage_its_path))

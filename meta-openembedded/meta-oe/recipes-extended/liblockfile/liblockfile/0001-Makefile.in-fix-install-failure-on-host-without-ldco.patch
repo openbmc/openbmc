@@ -1,0 +1,63 @@
+From 8b3a5916fff4004b5b2f1e8a1d3a051346ba3901 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Fri, 10 Mar 2023 08:59:39 +0800
+Subject: [PATCH] Makefile.in: fix install failure on host without ldconfig
+
+fix syntax error when ldconfig is not installed on host
+
+when ldconfig is not installed on the build host, install will failed with
+error:
+ln -sf nfslock.so.0.1 /mnt/tmp-glibc/work/core2-64-wrs-linux/liblockfile/1.14-r0/image/usr/lib64/nfslock.so.0
+install -m 644 lockfile.h maillock.h /mnt/tmp-glibc/work/core2-64-wrs-linux/liblockfile/1.14-r0/image/usr/include
+if test "/mnt/tmp-glibc/work/core2-64-wrs-linux/liblockfile/1.14-r0/image" = ""; then ; fi
+if [ "mail" != "" ]; then\
+          install -g mail -m 2755 dotlockfile /mnt/tmp-glibc/work/core2-64-wrs-linux/liblockfile/1.14-r0/image/usr/bin;\
+        else \
+          install -g root -m 755 dotlockfile /mnt/tmp-glibc/work/core2-64-wrs-linux/liblockfile/1.14-r0/image/usr/bin; \
+        fi
+/bin/sh: -c: line 1: syntax error near unexpected token `;'
+/bin/sh: -c: line 1: `if test "/mnt/tmp-glibc/work/core2-64-wrs-linux/liblockfile/1.14-r0/image" = ""; then ; fi'
+
+Upstream-Status: Submitted [https://github.com/miquels/liblockfile/pull/20]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ Makefile.in | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index e02d75e..5fc5b5a 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -9,6 +9,10 @@ NFSVER		= 0.1
+ CFLAGS		= @CFLAGS@ -I.
+ LDFLAGS		= @LDFLAGS@
+ CC		= @CC@
++LDCONFIG       = @LDCONFIG@
++ifeq ($(LDCONFIG),)
++    LDCONFIG = ":"
++endif
+ 
+ prefix		= $(DESTDIR)@prefix@
+ exec_prefix	= @exec_prefix@
+@@ -69,7 +73,7 @@ install_shared:	shared install_static install_common
+ 			$(libdir)/liblockfile.so.$(SOVER)
+ 		ln -s liblockfile.so.$(SOVER) $(libdir)/liblockfile.so.$(MAJOR)
+ 		ln -s liblockfile.so.$(SOVER) $(libdir)/liblockfile.so
+-		if test "$(DESTDIR)" = ""; then @LDCONFIG@; fi
++		if test "$(DESTDIR)" = ""; then $(LDCONFIG); fi
+ 
+ install_common:
+ 		install -d -m 755 -g root -p $(includedir)
+@@ -90,7 +94,7 @@ install_nfslib:	nfslib
+ 		install -m 755 nfslock.so.$(NFSVER) $(nfslockdir)
+ 		ln -sf nfslock.so.$(NFSVER) $(libdir)/nfslock.so
+ 		ln -sf nfslock.so.$(NFSVER) $(libdir)/nfslock.so.0
+-		if test "$(DESTDIR)" = ""; then @LDCONFIG@; fi
++		if test "$(DESTDIR)" = ""; then $(LDCONFIG); fi
+ 
+ test:		test-stamp
+ 		@:
+-- 
+2.25.1
+

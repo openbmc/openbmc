@@ -12,7 +12,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -196,19 +196,19 @@ set (HDF5_HL_F90_C_LIB_TARGET     "${HDF
+@@ -191,19 +191,19 @@ set (HDF5_HL_F90_C_LIB_TARGET     "${HDF
  set (HDF5_JAVA_JNI_LIB_TARGET     "${HDF5_JAVA_JNI_LIB_CORENAME}")
  set (HDF5_JAVA_HDF5_LIB_TARGET    "${HDF5_JAVA_HDF5_LIB_CORENAME}")
  set (HDF5_JAVA_TEST_LIB_TARGET    "${HDF5_JAVA_TEST_LIB_CORENAME}")

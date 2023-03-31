@@ -24,6 +24,7 @@ class RunqemuTests(OESelftestTestCase):
         super(RunqemuTests, self).setUpLocal()
         self.recipe = 'core-image-minimal'
         self.machine =  self.td['MACHINE']
+        self.image_link_name =  get_bb_var('IMAGE_LINK_NAME', self.recipe)
 
         self.fstypes = "ext4"
         if self.td["HOST_ARCH"] in ('i586', 'i686', 'x86_64'):
@@ -127,7 +128,7 @@ SYSLINUX_TIMEOUT = "10"
 
     def test_boot_qemu_boot(self):
         """Test runqemu /path/to/image.qemuboot.conf"""
-        qemuboot_conf = "%s-%s.qemuboot.conf" % (self.recipe, self.machine)
+        qemuboot_conf = "%s.qemuboot.conf" % (self.image_link_name)
         qemuboot_conf = os.path.join(self.deploy_dir_image, qemuboot_conf)
         if not os.path.exists(qemuboot_conf):
             self.skipTest("%s not found" % qemuboot_conf)
@@ -138,7 +139,7 @@ SYSLINUX_TIMEOUT = "10"
 
     def test_boot_rootfs(self):
         """Test runqemu /path/to/rootfs.ext4"""
-        rootfs = "%s-%s.ext4" % (self.recipe, self.machine)
+        rootfs = "%s.ext4" % (self.image_link_name)
         rootfs = os.path.join(self.deploy_dir_image, rootfs)
         if not os.path.exists(rootfs):
             self.skipTest("%s not found" % rootfs)
@@ -167,8 +168,9 @@ class QemuTest(OESelftestTestCase):
         cls.recipe = 'core-image-minimal'
         cls.machine =  get_bb_var('MACHINE')
         cls.deploy_dir_image =  get_bb_var('DEPLOY_DIR_IMAGE')
+        cls.image_link_name =  get_bb_var('IMAGE_LINK_NAME', cls.recipe)
         cls.cmd_common = "runqemu nographic"
-        cls.qemuboot_conf = "%s-%s.qemuboot.conf" % (cls.recipe, cls.machine)
+        cls.qemuboot_conf = "%s.qemuboot.conf" % (cls.image_link_name)
         cls.qemuboot_conf = os.path.join(cls.deploy_dir_image, cls.qemuboot_conf)
         bitbake(cls.recipe)
 
@@ -200,7 +202,7 @@ class QemuTest(OESelftestTestCase):
             self.assertTrue(qemu_shutdown_succeeded, 'Failed: %s does not shutdown within timeout(%s)' % (self.machine, shutdown_timeout))
 
     def test_qemu_can_boot_nfs_and_shutdown(self):
-        rootfs_tar = "%s-%s.tar.bz2" % (self.recipe, self.machine)
+        rootfs_tar = "%s.tar.bz2" % (self.image_link_name)
         rootfs_tar = os.path.join(self.deploy_dir_image, rootfs_tar)
         self.assertExists(rootfs_tar)
         cmd = "%s %s" % (self.cmd_common, rootfs_tar)

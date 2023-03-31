@@ -19,7 +19,7 @@ import tempfile
 import configparser
 import re
 import copy
-import pipes
+import shlex
 import shutil
 from string import Template
 from functools import reduce
@@ -1275,7 +1275,7 @@ def apply_commit(parent, rev, largs, wargs, dest_dir, file_filter=None):
         target = os.path.join(wargs["destdir"], dest_dir)
         if not os.path.isdir(target):
             os.makedirs(target)
-        quoted_target = pipes.quote(target)
+        quoted_target = shlex.quote(target)
         # os.sysconf('SC_ARG_MAX') is lying: running a command with
         # string length 629343 already failed with "Argument list too
         # long" although SC_ARG_MAX = 2097152. "man execve" explains
@@ -1287,7 +1287,7 @@ def apply_commit(parent, rev, largs, wargs, dest_dir, file_filter=None):
             unquoted_args = []
             cmdsize = 100 + len(quoted_target)
             while update:
-                quoted_next = pipes.quote(update[0])
+                quoted_next = shlex.quote(update[0])
                 size_next = len(quoted_next) + len(dest_dir) + 1
                 logger.debug('cmdline length %d + %d < %d?' % (cmdsize, size_next, os.sysconf('SC_ARG_MAX')))
                 if cmdsize + size_next < max_cmdsize:

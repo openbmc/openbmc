@@ -1,0 +1,62 @@
+From 04a864f33848da6af1dea906ba4922770022ef66 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Thu, 16 Mar 2023 14:21:32 +0000
+Subject: [PATCH] Clean up test runner
+
+Test code doesn't need to manually construct a TestSuite and a
+TextTestRunner, the unittest module has a discovery function that does
+all this for you.
+
+Delete all of the manual logic from tests.py, replace it with the two
+lines to bring in the doctest unit tests, and update the makefile to
+run the unittest discovery.
+
+Upstream-Status: Submitted [https://github.com/stefankoegl/python-json-pointer/pull/54]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ makefile |  2 +-
+ tests.py | 24 ++++--------------------
+ 2 files changed, 5 insertions(+), 21 deletions(-)
+
+diff --git a/tests.py b/tests.py
+index 9252369..6b4b8cc 100755
+--- a/tests.py
++++ b/tests.py
+@@ -7,6 +7,7 @@ import doctest
+ import unittest
+ import sys
+ import copy
++import jsonpointer
+ from jsonpointer import resolve_pointer, EndOfList, JsonPointerException, \
+          JsonPointer, set_pointer
+ 
+@@ -410,23 +411,6 @@ class AltTypesTests(unittest.TestCase):
+         self.assertRaises(JsonPointerException, resolve_pointer, doc, '/root/1/2/3/4')
+ 
+ 
+-
+-suite = unittest.TestSuite()
+-suite.addTest(unittest.makeSuite(SpecificationTests))
+-suite.addTest(unittest.makeSuite(ComparisonTests))
+-suite.addTest(unittest.makeSuite(WrongInputTests))
+-suite.addTest(unittest.makeSuite(ToLastTests))
+-suite.addTest(unittest.makeSuite(SetTests))
+-suite.addTest(unittest.makeSuite(AltTypesTests))
+-
+-modules = ['jsonpointer']
+-
+-for module in modules:
+-    m = __import__(module, fromlist=[module])
+-    suite.addTest(doctest.DocTestSuite(m))
+-
+-runner = unittest.TextTestRunner(verbosity=1)
+-result = runner.run(suite)
+-
+-if not result.wasSuccessful():
+-    sys.exit(1)
++def load_tests(loader, tests, ignore):
++    tests.addTests(doctest.DocTestSuite(jsonpointer))
++    return tests
+-- 
+2.34.1
+

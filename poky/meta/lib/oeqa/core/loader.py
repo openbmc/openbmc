@@ -37,7 +37,7 @@ def _find_duplicated_modules(suite, directory):
         if path:
             raise ImportError("Duplicated %s module found in %s" % (module, path))
 
-def _built_modules_dict(modules):
+def _built_modules_dict(modules, logger):
     modules_dict = {}
 
     if modules == None:
@@ -48,6 +48,9 @@ def _built_modules_dict(modules):
         # characters, whereas class names do
         m = re.match(r'^([0-9a-z_.]+)(?:\.(\w[^.]*)(?:\.([^.]+))?)?$', module, flags=re.ASCII)
         if not m:
+            logger.warn("module '%s' was skipped from selected modules, "\
+                "because it doesn't match with module name assumptions: "\
+                "package and module names do not contain upper case characters, whereas class names do" % module)
             continue
 
         module_name, class_name, test_name = m.groups()
@@ -58,6 +61,8 @@ def _built_modules_dict(modules):
             modules_dict[module_name][class_name] = []
         if test_name and test_name not in modules_dict[module_name][class_name]:
             modules_dict[module_name][class_name].append(test_name)
+    if modules and not modules_dict:
+        raise OEQATestNotFound("All selected modules were skipped, this would trigger selftest with all tests and -r ignored.")
 
     return modules_dict
 
@@ -71,7 +76,7 @@ class OETestLoader(unittest.TestLoader):
             *args, **kwargs):
         self.tc = tc
 
-        self.modules = _built_modules_dict(modules)
+        self.modules = _built_modules_dict(modules, tc.logger)
 
         self.tests = tests
         self.modules_required = modules_required

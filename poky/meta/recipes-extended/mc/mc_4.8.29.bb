@@ -14,9 +14,6 @@ SRC_URI = "http://www.midnight-commander.org/downloads/${BPN}-${PV}.tar.bz2 \
            "
 SRC_URI[sha256sum] = "ba6b2d8752806ac23fe045c1b081eb66dcefa6159205c79f86c005dcaf9941c1"
 
-# remove at next version upgrade or when output changes
-HASHEQUIV_HASH_VERSION .= ".2"
-
 inherit autotools gettext pkgconfig
 
 #

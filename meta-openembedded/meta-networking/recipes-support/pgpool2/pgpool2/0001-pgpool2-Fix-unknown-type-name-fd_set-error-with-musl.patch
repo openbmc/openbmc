@@ -1,0 +1,33 @@
+From 5d335b5ddd052f047759cae0e9b94ec49f9f3884 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@fujitsu.com>
+Date: Mon, 20 Mar 2023 02:03:04 +0000
+Subject: [PATCH] pgpool2: Fix unknown type name 'fd_set' error with musl.
+
+| read.c: In function 'read_until_ready_for_query':
+| read.c:53:24: error: storage size of 'timeoutval' isn't known
+|    53 |         struct timeval timeoutval;
+|       |                        ^~~~~~~~~~
+| read.c:54:9: error: unknown type name 'fd_set'
+|    54 |         fd_set          readmask;
+|       |         ^~~~~~
+
+Upstream-Status: Inappropriate [embedded specific]
+Signed-off-by: Lei Maohui <leimaohui@fujitsu.com>
+---
+ src/tools/pgproto/read.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/tools/pgproto/read.c b/src/tools/pgproto/read.c
+index c7fb548..4efe641 100644
+--- a/src/tools/pgproto/read.c
++++ b/src/tools/pgproto/read.c
+@@ -19,6 +19,7 @@
+ #include "../../include/config.h"
+ #include "pgproto/pgproto.h"
+ #include <unistd.h>
++#include <sys/select.h>
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <string.h>
+--
+2.34.1

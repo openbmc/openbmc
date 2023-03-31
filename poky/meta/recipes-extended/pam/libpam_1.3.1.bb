@@ -30,7 +30,7 @@ SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/Linux-PAM-${PV}.tar.xz \
 SRC_URI[md5sum] = "558ff53b0fc0563ca97f79e911822165"
 SRC_URI[sha256sum] = "eff47a4ecd833fbf18de9686632a70ee8d0794b79aecb217ebd0ce11db4cd0db"
 
-DEPENDS = "bison-native flex flex-native cracklib libxml2-native virtual/crypt"
+DEPENDS = "bison-native flex-native cracklib libxml2-native virtual/crypt"
 
 EXTRA_OECONF = "--includedir=${includedir}/security \
                 --libdir=${base_libdir} \
