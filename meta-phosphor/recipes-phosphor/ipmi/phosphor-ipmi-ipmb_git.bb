@@ -16,6 +16,6 @@ SRC_URI = "git://github.com/openbmc/ipmbbridge.git;branch=master;protocol=https"
 SYSTEMD_SERVICE:${PN} = "ipmb.service"
 S = "${WORKDIR}/git"
 
-inherit cmake pkgconfig systemd
+inherit meson pkgconfig systemd
 
 FILES:${PN} += "${datadir}/ipmbbridge/ipmb-channels.json"
