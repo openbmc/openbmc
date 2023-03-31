@@ -1,0 +1,7 @@
+header:
+  version: 9
+
+#NOTE: This is the default for poky.  This is only being added for completeness/clarity
+local_conf_header:
+  kernel: |
+    PREFERRED_PROVIDER_virtual/kernel = "linux-yocto"

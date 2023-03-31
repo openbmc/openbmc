@@ -1,0 +1,99 @@
+From 25924b6c0504faae0b0ed680c09fb8996b6aaba6 Mon Sep 17 00:00:00 2001
+From: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Date: Wed, 21 Dec 2022 15:42:21 +0000
+Subject: [PATCH 5/10] Platform:corstone1000:fwu: metadata_read validate crc
+
+Add validation logic to metadata_read function.
+Also, add metadata_read_without_validation
+
+Signed-off-by: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ .../target/arm/corstone1000/CMakeLists.txt    |  1 +
+ .../corstone1000/fw_update_agent/fwu_agent.c  | 51 +++++++++++++++++++
+ 2 files changed, 52 insertions(+)
+
+diff --git a/platform/ext/target/arm/corstone1000/CMakeLists.txt b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+index 554fc51b21..9db2864033 100644
+--- a/platform/ext/target/arm/corstone1000/CMakeLists.txt
++++ b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+@@ -75,6 +75,7 @@ target_sources(platform_s
+         fw_update_agent/uefi_capsule_parser.c
+         fw_update_agent/fwu_agent.c
+         fw_update_agent/uefi_fmp.c
++        soft_crc/soft_crc.c
+         $<$<NOT:$<BOOL:${PLATFORM_DEFAULT_OTP}>>:${PLATFORM_DIR}/ext/accelerator/cc312/otp_cc312.c>
+ )
+ 
+diff --git a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+index 1a42c72bd5..eb17c3a377 100644
+--- a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
++++ b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+@@ -193,6 +193,53 @@ static enum fwu_agent_error_t private_metadata_write(
+     return FWU_AGENT_SUCCESS;
+ }
+ 
++static enum fwu_agent_error_t metadata_validate(struct fwu_metadata *p_metadata)
++{
++    int ret;
++
++    FWU_LOG_MSG("%s: enter:\n\r", __func__);
++
++    if (!p_metadata) {
++        return FWU_AGENT_ERROR;
++    }
++
++    uint32_t calculated_crc32 = crc32((uint8_t *)&(p_metadata->version),
++                                      sizeof(struct fwu_metadata) - sizeof(uint32_t));
++
++    if (p_metadata->crc_32 != calculated_crc32) {
++        FWU_LOG_MSG("%s: failed: crc32 calculated: 0x%x, given: 0x%x\n\r", __func__,
++                    calculated_crc32, p_metadata->crc_32);
++        return FWU_AGENT_ERROR;
++    }
++
++    FWU_LOG_MSG("%s: success\n\r", __func__);
++
++    return FWU_AGENT_SUCCESS;
++}
++
++static enum fwu_agent_error_t metadata_read_without_validation(struct fwu_metadata *p_metadata)
++{
++    int ret;
++
++    FWU_LOG_MSG("%s: enter: flash addr = %u, size = %d\n\r", __func__,
++                  FWU_METADATA_REPLICA_1_OFFSET, sizeof(struct fwu_metadata));
++
++    if (!p_metadata) {
++        return FWU_AGENT_ERROR;
++    }
++
++    ret = FWU_METADATA_FLASH_DEV.ReadData(FWU_METADATA_REPLICA_1_OFFSET,
++                                p_metadata, sizeof(struct fwu_metadata));
++    if (ret < 0 || ret != sizeof(struct fwu_metadata)) {
++        return FWU_AGENT_ERROR;
++    }
++
++    FWU_LOG_MSG("%s: success: active = %u, previous = %d\n\r", __func__,
++                  p_metadata->active_index, p_metadata->previous_active_index);
++
++    return FWU_AGENT_SUCCESS;
++}
++
+ static enum fwu_agent_error_t metadata_read(struct fwu_metadata *p_metadata)
+ {
+     int ret;
+@@ -210,6 +257,10 @@ static enum fwu_agent_error_t metadata_read(struct fwu_metadata *p_metadata)
+         return FWU_AGENT_ERROR;
+     }
+ 
++    if (metadata_validate(p_metadata) != FWU_AGENT_SUCCESS) {
++        return FWU_AGENT_ERROR;
++    }
++
+     FWU_LOG_MSG("%s: success: active = %u, previous = %d\n\r", __func__,
+                   p_metadata->active_index, p_metadata->previous_active_index);
+ 
+-- 
+2.25.1
+

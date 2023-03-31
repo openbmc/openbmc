@@ -14,6 +14,7 @@ inherit pkgconfig autotools features_check
 REQUIRED_DISTRO_FEATURES = "ima"
 REQUIRED_DISTRO_FEATURES:class-native = ""
 
+EXTRA_OECONF += "MANPAGE_DOCBOOK_XSL=0"
 EXTRA_OECONF:append:class-target = " --with-kernel-headers=${STAGING_KERNEL_BUILDDIR}"
 
 # blkid is called by evmctl when creating evm checksums.

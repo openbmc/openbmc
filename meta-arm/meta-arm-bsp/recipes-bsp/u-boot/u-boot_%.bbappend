@@ -44,19 +44,31 @@ SRC_URI:append:corstone1000 = " \
         file://0024-arm-corstone1000-esrt-support.patch					\
         file://0025-efi_setup-discover-FF-A-bus-before-raising-EFI-start.patch		\
         file://0026-corstone1000-enable-distro-booting-command.patch			\
+        file://0027-drivers-nvmxip-introduce-NVM-XIP-block-storage-emula.patch		\
+        file://0028-sandbox64-fix-return-unsigned-long-in-readq.patch			\
+        file://0029-sandbox64-add-support-for-NVMXIP-QSPI.patch			\
+        file://0030-corstone1000-add-NVM-XIP-QSPI-device-tree-node.patch		\
+        file://0031-corstone1000-enable-NVM-XIP-QSPI-flash.patch			\
+        file://0032-sandbox64-add-a-test-case-for-UCLASS_NVMXIP.patch			\
+        file://0033-nvmxip-provide-a-u-boot-shell-test-command.patch			\
+        file://0034-corstone1000-add-fwu-metadata-store-info.patch			\
+        file://0035-nvmxip-shorter-block-device-name.patch				\
+        file://0036-efi_boottime-allow-to-reset-a-path-after-boot.patch		\
+        file://0037-fwu_metadata-make-sure-structures-are-packed.patch			\
+        file://0038-corstone1000-add-boot-index.patch					\
+        file://0039-corstone1000-adjust-boot-bank-and-kernel-location.patch		\
+        file://0040-corstone1000-add-nvmxip-fwu-mdata-and-gpt-options.patch		\
+        file://0041-nvmxip-move-header-to-include.patch				\
+        file://0042-corstone1000-set-kernel_addr-based-on-boot_idx.patch		\
+        file://0043-corstone1000-boot-index-from-active.patch				\
         "
 
 #
 # FVP BASE
 #
-SRC_URI:append:fvp-base = " file://bootargs.cfg"
-
-#
-# FVP BASE ARM32
-#
-SRC_URI:append:fvp-base-arm32 = " file://0001-Add-vexpress_aemv8a_aarch32-variant.patch \
-				  file://0002-Revert-vexpress64-Enable-OF_CONTROL-and-OF_BOARD-for.patch \
-				"
+SRC_URI:append:fvp-base = " file://bootargs.cfg \
+	file://0001-Revert-vexpress64-pick-DRAM-size-from-DT.patch \
+	"
 
 #
 # FVP BASER

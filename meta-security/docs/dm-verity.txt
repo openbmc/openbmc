@@ -1,0 +1,114 @@
+dm-verity and Yocto/OE
+----------------------
+The dm-verity feature provides a level of data integrity and resistance to
+data tampering.  It does this by creating a hash for each data block of
+the underlying device as the base of a hash tree.  There are many
+documents out there to further explain the implementaion, such as the
+in-kernel one itself:
+
+https://docs.kernel.org/admin-guide/device-mapper/verity.html
+
+The goal of this document is not to reproduce that content, but instead to
+capture the Yocto/OE specifics of the dm-verity infrastructure used here.
+
+Ideally this should enable a person to build and deploy an image on one of
+the supported reference platforms, and then further adapt to their own
+platform and specific storage requirements.
+
+Basic Settings
+--------------
+Largely everything is driven off of a dm-verity image class; a typical
+block of non MACHINE specific settings are shown below:
+
+INITRAMFS_IMAGE = "dm-verity-image-initramfs"
+DM_VERITY_IMAGE = "core-image-minimal"
+DM_VERITY_IMAGE_TYPE = "ext4"
+IMAGE_CLASSES += "dm-verity-img"
+INITRAMFS_IMAGE_BUNDLE = "1"
+
+Kernel Configuration
+--------------------
+Kernel configuration for dm-verity happens automatically via IMAGE_CLASSES
+which will source features/device-mapper/dm-verity.scc when dm-verity-img
+is used. [See commit d9feafe991c]
+
+Supported Platforms
+-------------------
+In theory, you can use dm-verity anywhere - there is nothing arch/BSP
+specific in the core kernel support.  However, at the BSP level, one
+eventually has to decide what device(s) are to be hashed, and where the
+hash tables are stored.
+
+To that end, the BSP storage specifics live in meta-security/wic dir and
+represent the current set of example configurations that have been tested
+and submitted at some point.
+
+Getting Started
+---------------
+This document assumes you are starting from the basic auto-created
+conf/local.conf and conf/bblayers.conf from the oe-init-build-env
+
+Firstly, you need the meta-security layer to conf/bblayers.conf along with
+the dependencies it has -- see the top level meta-security README for that.
+
+Next, assuming you'll be using dm-verity for validation of your rootfs,
+you'll need to enable read-only rootfs support in your local.conf with:
+
+EXTRA_IMAGE_FEATURES = "read-only-rootfs"
+
+For more details, see the associated documentation:
+
+https://docs.yoctoproject.org/dev/dev-manual/read-only-rootfs.html
+
+Also add the basic block of dm-verity settings shown above, and select
+your MACHINE from one of the supported platforms.
+
+If there is a dm-verity-<MACHINE>.txt file for your BSP, check that for
+any additional platform specific recommended settings, such as the
+WKS_FILES which can specify board specific storage layout discussed below.
+
+Then you should be able to do a "bitbake core-image-minimal" just like any
+other normal build.  What you will notice, is the content in
+tmp/deploy/images/<MACHINE>/ now have suffixes like "rootfs.ext4.verity"
+
+While you can manually work with these images just like any other build,
+this is where the BSP specific recipes in meta-security/wic can simplify
+things and remove a bunch of manual steps that might be error prone.
+
+Consider for example, the beaglebone black WIC file, which contains:
+
+part /boot --source bootimg-partition --ondisk mmcblk0 --fstype=vfat
+--label boot --active --align 4 --fixed-size 32 --sourceparams="loader=u-boot" --use-uuid
+part / --source rawcopy --ondisk mmcblk0 --sourceparams="file=${IMGDEPLOYDIR}/${DM_VERITY_IMAGE}-${MACHINE}.${DM_VERITY_IMAGE_TYPE}.verity"
+bootloader --append="console=ttyS0,115200"
+
+As can be seen, it maps out the partitions, including the bootloader, and
+saves doing a whole bunch of manual partitioning and dd steps.
+
+This file is copied into tmp/deploy/images/<MACHINE>/ with bitbake
+variables expanded with their corresponding values for wic to make use of.
+
+Continuing with the beaglebone example, we'll see output similar to:
+
+             ----------------------
+$ wic create -e core-image-minimal beaglebone-yocto-verity
+
+[...]
+
+INFO: Creating image(s)...
+
+INFO: The new image(s) can be found here:
+  ./beaglebone-yocto-verity.wks-202303070223-mmcblk0.direct
+
+The following build artifacts were used to create the image(s):
+  BOOTIMG_DIR:       /home/paul/poky/build-bbb-verity/tmp/work/beaglebone_yocto-poky-linux-gnueabi/core-image-minimal/1.0-r0/recipe-sysroot/usr/share
+  KERNEL_DIR:        /home/paul/poky/build-bbb-verity/tmp/deploy/images/beaglebone-yocto
+  NATIVE_SYSROOT:    /home/paul/poky/build-bbb-verity/tmp/work/cortexa8hf-neon-poky-linux-gnueabi/wic-tools/1.0-r0/recipe-sysroot-native
+
+INFO: The image(s) were created using OE kickstart file:
+  /home/paul/poky/meta-security/wic/beaglebone-yocto-verity.wks.in
+             ----------------------
+
+The "direct" image contains the partition table, bootloader, and dm-verity
+enabled ext4 image all in one -- ready to write to a raw device, such as a
+u-SD card in the case of the beaglebone.

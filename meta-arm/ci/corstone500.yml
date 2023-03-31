@@ -3,17 +3,10 @@ header:
   includes:
     - ci/base.yml
     - ci/fvp.yml
+    - ci/poky-tiny.yml
 
 local_conf_header:
   fvp-config: |
     IMAGE_FEATURES:remove = " ssh-server-dropbear"
-  extrapackages: |
-    # Intentionally blank to prevent perf from being added to the image in base.yml
 
 machine: corstone500
-
-distro: poky-tiny
-
-target:
-  - core-image-minimal
-  - perf

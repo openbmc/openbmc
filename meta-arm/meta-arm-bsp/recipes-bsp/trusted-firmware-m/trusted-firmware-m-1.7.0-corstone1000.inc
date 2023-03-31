@@ -11,9 +11,6 @@ TFM_PLATFORM_IS_FVP ?= "FALSE"
 EXTRA_OECMAKE += "-DPLATFORM_IS_FVP=${TFM_PLATFORM_IS_FVP}"
 EXTRA_OECMAKE += "-DCC312_LEGACY_DRIVER_API_ENABLED=OFF"
 
-## Setting SPM backend to IPC
-EXTRA_OECMAKE += "-DCONFIG_TFM_SPM_BACKEND=IPC"
-
 # libmetal
 LICENSE += "& BSD-3-Clause"
 LIC_FILES_CHKSUM += "file://../libmetal/LICENSE.md;md5=fe0b8a4beea8f0813b606d15a3df3d3c"
@@ -30,8 +27,18 @@ EXTRA_OECMAKE += "-DLIBOPENAMP_SRC_PATH=${S}/../openamp -DLIBOPENAMP_BIN_PATH=${
 
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
-SRC_URI:append= " \
-    file://0001-Platform-corstone1000-Increase-number-of-assets.patch  \
+SRC_URI:append:corstone1000 = " \
+    file://0001-Platform-corstone1000-Introduce-IO-framework.patch              \
+    file://0002-Platform-corstone1000-Add-IO-test-in-ci_regressions.patch       \
+    file://0003-Platform-corstone1000-Add-soft-crc32-calculation.patch          \
+    file://0004-Platform-corstone1000-calculate-metadata-crc32.patch            \
+    file://0005-Platform-corstone1000-fwu-metadata_read-validate-crc.patch      \
+    file://0006-Platform-corstone1000-Add-common-platform-logger.patch          \
+    file://0007-Platform-corstone1000-Introduce-GPT-parser.patch                \
+    file://0008-Platform-corstone1000-BL1-changes-to-adapt-to-new-fl.patch      \
+    file://0009-Platform-corstone1000-BL2-uses-GPT-layout.patch                 \
+    file://0010-Platform-corstone1000-flash_layout-simplification.patch         \
+    file://0011-corstone1000-make-sure-to-write-fwu-metadata-to-repl.patch      \
            "
 
 do_install() {

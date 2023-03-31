@@ -1,0 +1,735 @@
+From 1fdc3000f1ab6f9c1bb792cb8baff16a7517c03a Mon Sep 17 00:00:00 2001
+From: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Date: Thu, 22 Dec 2022 14:27:41 +0000
+Subject: [PATCH 7/10] Platform:corstone1000: Introduce GPT parser
+
+Adding GPT parser
+Side changes required:
+Includes the implementation of the `plat_get_image_source` function
+in the platform.c file.
+
+The GPT parser requires the function. Given the image id, it should
+return handle to the IO device contains the image and image
+specification that allows IO storage access to the image.
+
+Signed-off-by: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ .../target/arm/corstone1000/partition/efi.h   |  36 ++
+ .../target/arm/corstone1000/partition/gpt.c   |  58 ++++
+ .../target/arm/corstone1000/partition/gpt.h   |  51 +++
+ .../target/arm/corstone1000/partition/mbr.h   |  29 ++
+ .../arm/corstone1000/partition/partition.c    | 310 ++++++++++++++++++
+ .../arm/corstone1000/partition/partition.h    |  47 +++
+ .../target/arm/corstone1000/partition/uuid.h  |  76 +++++
+ .../ext/target/arm/corstone1000/platform.c    |  20 ++
+ .../ext/target/arm/corstone1000/platform.h    |  14 +
+ 9 files changed, 641 insertions(+)
+ create mode 100644 platform/ext/target/arm/corstone1000/partition/efi.h
+ create mode 100644 platform/ext/target/arm/corstone1000/partition/gpt.c
+ create mode 100644 platform/ext/target/arm/corstone1000/partition/gpt.h
+ create mode 100644 platform/ext/target/arm/corstone1000/partition/mbr.h
+ create mode 100644 platform/ext/target/arm/corstone1000/partition/partition.c
+ create mode 100644 platform/ext/target/arm/corstone1000/partition/partition.h
+ create mode 100644 platform/ext/target/arm/corstone1000/partition/uuid.h
+ create mode 100644 platform/ext/target/arm/corstone1000/platform.c
+ create mode 100644 platform/ext/target/arm/corstone1000/platform.h
+
+diff --git a/platform/ext/target/arm/corstone1000/partition/efi.h b/platform/ext/target/arm/corstone1000/partition/efi.h
+new file mode 100644
+index 0000000000..f66daffb32
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/partition/efi.h
+@@ -0,0 +1,36 @@
++/*
++ * Copyright (c) 2021, Linaro Limited
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ *
++ */
++
++#ifndef DRIVERS_PARTITION_EFI_H
++#define DRIVERS_PARTITION_EFI_H
++
++#include <string.h>
++
++#include "uuid.h"
++
++#define EFI_NAMELEN 36
++
++static inline int guidcmp(const void *g1, const void *g2) {
++    return memcmp(g1, g2, sizeof(struct efi_guid));
++}
++
++static inline void *guidcpy(void *dst, const void *src) {
++    return memcpy(dst, src, sizeof(struct efi_guid));
++}
++
++#define EFI_GUID(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)  \
++    {                                                      \
++        (a) & 0xffffffff, (b)&0xffff, (c)&0xffff, {        \
++            (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) \
++        }                                                  \
++    }
++
++#define NULL_GUID                                                            \
++    EFI_GUID(0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
++             0x00, 0x00)
++
++#endif /* DRIVERS_PARTITION_EFI_H */
+diff --git a/platform/ext/target/arm/corstone1000/partition/gpt.c b/platform/ext/target/arm/corstone1000/partition/gpt.c
+new file mode 100644
+index 0000000000..8549785e3b
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/partition/gpt.c
+@@ -0,0 +1,58 @@
++/*
++ * Copyright (c) 2016-2022, ARM Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include "gpt.h"
++
++#include <assert.h>
++#include <errno.h>
++#include <string.h>
++
++#include "efi.h"
++
++static int unicode_to_ascii(unsigned short *str_in, unsigned char *str_out) {
++    uint8_t *name;
++    int i;
++
++    assert((str_in != NULL) && (str_out != NULL));
++
++    name = (uint8_t *)str_in;
++
++    assert(name[0] != '\0');
++
++    /* check whether the unicode string is valid */
++    for (i = 1; i < (EFI_NAMELEN << 1); i += 2) {
++        if (name[i] != '\0') return -EINVAL;
++    }
++    /* convert the unicode string to ascii string */
++    for (i = 0; i < (EFI_NAMELEN << 1); i += 2) {
++        str_out[i >> 1] = name[i];
++        if (name[i] == '\0') break;
++    }
++    return 0;
++}
++
++int parse_gpt_entry(gpt_entry_t *gpt_entry, partition_entry_t *entry) {
++    int result;
++
++    assert((gpt_entry != NULL) && (entry != NULL));
++
++    if ((gpt_entry->first_lba == 0) && (gpt_entry->last_lba == 0)) {
++        return -EINVAL;
++    }
++
++    memset(entry, 0, sizeof(partition_entry_t));
++    result = unicode_to_ascii(gpt_entry->name, (uint8_t *)entry->name);
++    if (result != 0) {
++        return result;
++    }
++    entry->start = (uint64_t)gpt_entry->first_lba * PLAT_PARTITION_BLOCK_SIZE;
++    entry->length = (uint64_t)(gpt_entry->last_lba - gpt_entry->first_lba + 1) *
++                    PLAT_PARTITION_BLOCK_SIZE;
++    guidcpy(&entry->part_guid, &gpt_entry->unique_uuid);
++    guidcpy(&entry->type_guid, &gpt_entry->type_uuid);
++
++    return 0;
++}
+diff --git a/platform/ext/target/arm/corstone1000/partition/gpt.h b/platform/ext/target/arm/corstone1000/partition/gpt.h
+new file mode 100644
+index 0000000000..b528fc05c0
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/partition/gpt.h
+@@ -0,0 +1,51 @@
++/*
++ * Copyright (c) 2016, ARM Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef GPT_H
++#define GPT_H
++
++#include "efi.h"
++#include "partition.h"
++#include "uuid.h"
++
++#define PARTITION_TYPE_GPT 0xee
++#define GPT_HEADER_OFFSET PLAT_PARTITION_BLOCK_SIZE
++#define GPT_ENTRY_OFFSET (GPT_HEADER_OFFSET + PLAT_PARTITION_BLOCK_SIZE)
++
++#define GPT_SIGNATURE "EFI PART"
++
++typedef struct gpt_entry {
++    struct efi_guid type_uuid;
++    struct efi_guid unique_uuid;
++    unsigned long long first_lba;
++    unsigned long long last_lba;
++    unsigned long long attr;
++    unsigned short name[EFI_NAMELEN];
++} gpt_entry_t;
++
++typedef struct gpt_header {
++    unsigned char signature[8];
++    unsigned int revision;
++    unsigned int size;
++    unsigned int header_crc;
++    unsigned int reserved;
++    unsigned long long current_lba;
++    unsigned long long backup_lba;
++    unsigned long long first_lba;
++    unsigned long long last_lba;
++    struct efi_guid disk_uuid;
++    /* starting LBA of array of partition entries */
++    unsigned long long part_lba;
++    /* number of partition entries in array */
++    unsigned int list_num;
++    /* size of a single partition entry (usually 128) */
++    unsigned int part_size;
++    unsigned int part_crc;
++} gpt_header_t;
++
++int parse_gpt_entry(gpt_entry_t *gpt_entry, partition_entry_t *entry);
++
++#endif /* GPT_H */
+diff --git a/platform/ext/target/arm/corstone1000/partition/mbr.h b/platform/ext/target/arm/corstone1000/partition/mbr.h
+new file mode 100644
+index 0000000000..e77f367016
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/partition/mbr.h
+@@ -0,0 +1,29 @@
++/*
++ * Copyright (c) 2016, ARM Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef MBR_H
++#define MBR_H
++
++#define MBR_OFFSET 0
++
++#define MBR_PRIMARY_ENTRY_OFFSET 0x1be
++#define MBR_PRIMARY_ENTRY_SIZE 0x10
++#define MBR_PRIMARY_ENTRY_NUMBER 4
++#define MBR_CHS_ADDRESS_LEN 3
++
++#define MBR_SIGNATURE_FIRST 0x55
++#define MBR_SIGNATURE_SECOND 0xAA
++
++typedef struct mbr_entry {
++    unsigned char status;
++    unsigned char first_sector[MBR_CHS_ADDRESS_LEN];
++    unsigned char type;
++    unsigned char last_sector[MBR_CHS_ADDRESS_LEN];
++    unsigned int first_lba;
++    unsigned int sector_nums;
++} mbr_entry_t;
++
++#endif /* MBR_H */
+diff --git a/platform/ext/target/arm/corstone1000/partition/partition.c b/platform/ext/target/arm/corstone1000/partition/partition.c
+new file mode 100644
+index 0000000000..afc6aa1c5c
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/partition/partition.c
+@@ -0,0 +1,310 @@
++/*
++ * Copyright (c) 2016-2022, ARM Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include "partition.h"
++
++#include <assert.h>
++#include <errno.h>
++#include <inttypes.h>
++#include <stdio.h>
++#include <string.h>
++
++#include "efi.h"
++#include "gpt.h"
++#include "mbr.h"
++
++#include "io_storage.h"
++#include "platform.h"
++#include "soft_crc.h"
++
++#define PLAT_LOG_MODULE_NAME "partition"
++#include "platform_log.h"
++
++static uint8_t mbr_sector[PLAT_PARTITION_BLOCK_SIZE];
++static partition_entry_list_t list;
++
++#if LOG_LEVEL >= LOG_LEVEL_DEBUG
++static void dump_entries(int num) {
++    char name[EFI_NAMELEN];
++    int i, j, len;
++
++    VERBOSE("Partition table with %d entries:", num);
++    for (i = 0; i < num; i++) {
++        len = snprintf(name, EFI_NAMELEN, "%s", list.list[i].name);
++        for (j = 0; j < EFI_NAMELEN - len - 1; j++) {
++            name[len + j] = ' ';
++        }
++        name[EFI_NAMELEN - 1] = '\0';
++        VERBOSE("%d: %s %x%x %d", i + 1, name,
++                (uint32_t)(list.list[i].start >> 32),
++                (uint32_t)list.list[i].start,
++                (uint32_t)(list.list[i].start + list.list[i].length - 4));
++    }
++}
++#else
++#define dump_entries(num) ((void)num)
++#endif
++
++/*
++ * Load the first sector that carries MBR header.
++ * The MBR boot signature should be always valid whether it's MBR or GPT.
++ */
++static int load_mbr_header(uintptr_t image_handle, mbr_entry_t *mbr_entry) {
++    size_t bytes_read;
++    uintptr_t offset;
++    int result;
++
++    assert(mbr_entry != NULL);
++    /* MBR partition table is in LBA0. */
++    result = io_seek(image_handle, IO_SEEK_SET, MBR_OFFSET);
++    if (result != 0) {
++        WARN("Failed to seek (%i)\n", result);
++        return result;
++    }
++    result = io_read(image_handle, (uintptr_t)&mbr_sector,
++                     PLAT_PARTITION_BLOCK_SIZE, &bytes_read);
++    if (result != 0) {
++        WARN("Failed to read data (%i)\n", result);
++        return result;
++    }
++
++    /* Check MBR boot signature. */
++    if ((mbr_sector[LEGACY_PARTITION_BLOCK_SIZE - 2] != MBR_SIGNATURE_FIRST) ||
++        (mbr_sector[LEGACY_PARTITION_BLOCK_SIZE - 1] != MBR_SIGNATURE_SECOND)) {
++        ERROR("MBR signature isn't correct");
++        return -ENOENT;
++    }
++    offset = (uintptr_t)&mbr_sector + MBR_PRIMARY_ENTRY_OFFSET;
++    memcpy(mbr_entry, (void *)offset, sizeof(mbr_entry_t));
++    return 0;
++}
++
++/*
++ * Load GPT header and check the GPT signature and header CRC.
++ * If partition numbers could be found, check & update it.
++ */
++static int load_gpt_header(uintptr_t image_handle) {
++    gpt_header_t header;
++    size_t bytes_read;
++    int result;
++    uint32_t header_crc, calc_crc;
++
++    result = io_seek(image_handle, IO_SEEK_SET, GPT_HEADER_OFFSET);
++    if (result != 0) {
++        return result;
++    }
++    result = io_read(image_handle, (uintptr_t)&header, sizeof(gpt_header_t),
++                     &bytes_read);
++    if ((result != 0) || (sizeof(gpt_header_t) != bytes_read)) {
++        return result;
++    }
++    if (memcmp(header.signature, GPT_SIGNATURE, sizeof(header.signature)) !=
++        0) {
++        return -EINVAL;
++    }
++
++    /*
++     * UEFI Spec 2.8 March 2019 Page 119: HeaderCRC32 value is
++     * computed by setting this field to 0, and computing the
++     * 32-bit CRC for HeaderSize bytes.
++     */
++    header_crc = header.header_crc;
++    header.header_crc = 0U;
++
++    calc_crc = crc32((uint8_t *)&header, DEFAULT_GPT_HEADER_SIZE);
++    if (header_crc != calc_crc) {
++        ERROR("Invalid GPT Header CRC: Expected 0x%x but got 0x%x.\n",
++              header_crc, calc_crc);
++        return -EINVAL;
++    }
++
++    header.header_crc = header_crc;
++
++    /* partition numbers can't exceed PLAT_PARTITION_MAX_ENTRIES */
++    list.entry_count = header.list_num;
++    if (list.entry_count > PLAT_PARTITION_MAX_ENTRIES) {
++        list.entry_count = PLAT_PARTITION_MAX_ENTRIES;
++    }
++    return 0;
++}
++
++static int load_mbr_entry(uintptr_t image_handle, mbr_entry_t *mbr_entry,
++                          int part_number) {
++    size_t bytes_read;
++    uintptr_t offset;
++    int result;
++
++    assert(mbr_entry != NULL);
++    /* MBR partition table is in LBA0. */
++    result = io_seek(image_handle, IO_SEEK_SET, MBR_OFFSET);
++    if (result != 0) {
++        WARN("Failed to seek (%i)\n", result);
++        return result;
++    }
++    result = io_read(image_handle, (uintptr_t)&mbr_sector,
++                     PLAT_PARTITION_BLOCK_SIZE, &bytes_read);
++    if (result != 0) {
++        WARN("Failed to read data (%i)\n", result);
++        return result;
++    }
++
++    /* Check MBR boot signature. */
++    if ((mbr_sector[LEGACY_PARTITION_BLOCK_SIZE - 2] != MBR_SIGNATURE_FIRST) ||
++        (mbr_sector[LEGACY_PARTITION_BLOCK_SIZE - 1] != MBR_SIGNATURE_SECOND)) {
++        return -ENOENT;
++    }
++    offset = (uintptr_t)&mbr_sector + MBR_PRIMARY_ENTRY_OFFSET +
++             MBR_PRIMARY_ENTRY_SIZE * part_number;
++    memcpy(mbr_entry, (void *)offset, sizeof(mbr_entry_t));
++
++    return 0;
++}
++
++static int load_mbr_entries(uintptr_t image_handle) {
++    mbr_entry_t mbr_entry;
++    int i;
++
++    list.entry_count = MBR_PRIMARY_ENTRY_NUMBER;
++
++    for (i = 0; i < list.entry_count; i++) {
++        load_mbr_entry(image_handle, &mbr_entry, i);
++        list.list[i].start = mbr_entry.first_lba * 512;
++        list.list[i].length = mbr_entry.sector_nums * 512;
++        list.list[i].name[0] = mbr_entry.type;
++    }
++
++    return 0;
++}
++
++static int load_gpt_entry(uintptr_t image_handle, gpt_entry_t *entry) {
++    size_t bytes_read;
++    int result;
++
++    assert(entry != NULL);
++    result = io_read(image_handle, (uintptr_t)entry, sizeof(gpt_entry_t),
++                     &bytes_read);
++    if (sizeof(gpt_entry_t) != bytes_read) return -EINVAL;
++    return result;
++}
++
++static int verify_partition_gpt(uintptr_t image_handle) {
++    gpt_entry_t entry;
++    int result, i;
++
++    for (i = 0; i < list.entry_count; i++) {
++        result = load_gpt_entry(image_handle, &entry);
++        assert(result == 0);
++        if (result != 0) {
++            break;
++        }
++        result = parse_gpt_entry(&entry, &list.list[i]);
++        if (result != 0) {
++            break;
++        }
++    }
++    if (i == 0) {
++        return -EINVAL;
++    }
++    /*
++     * Only records the valid partition number that is loaded from
++     * partition table.
++     */
++    list.entry_count = i;
++    dump_entries(list.entry_count);
++
++    return 0;
++}
++
++int load_partition_table(unsigned int image_id) {
++    uintptr_t dev_handle, image_handle, image_spec = 0;
++    mbr_entry_t mbr_entry;
++    int result;
++
++    result = plat_get_image_source(image_id, &dev_handle, &image_spec);
++    if (result != 0) {
++        WARN("Failed to obtain reference to image id=%u (%i)\n", image_id,
++             result);
++        return result;
++    }
++
++    result = io_open(dev_handle, image_spec, &image_handle);
++    if (result != 0) {
++        WARN("Failed to open image id=%u (%i)\n", image_id, result);
++        return result;
++    }
++
++    result = load_mbr_header(image_handle, &mbr_entry);
++    if (result != 0) {
++        ERROR("Loading mbr header failed with image id=%u (%i)\n", image_id,
++              result);
++        return result;
++    }
++    if (mbr_entry.type == PARTITION_TYPE_GPT) {
++        INFO("Loading gpt header");
++        result = load_gpt_header(image_handle);
++        assert(result == 0);
++        if (result != 0) {
++            ERROR("Failed load gpt header! %i", result);
++            goto load_partition_table_exit;
++        }
++        result = io_seek(image_handle, IO_SEEK_SET, GPT_ENTRY_OFFSET);
++        assert(result == 0);
++        if (result != 0) {
++            ERROR("Failed seek gpt header! %i", result);
++            goto load_partition_table_exit;
++        }
++        result = verify_partition_gpt(image_handle);
++        if (result != 0) {
++            ERROR("Failed verify gpt partition %i", result);
++            goto load_partition_table_exit;
++        }
++    } else {
++        result = load_mbr_entries(image_handle);
++    }
++
++load_partition_table_exit:
++    io_close(image_handle);
++    return result;
++}
++
++const partition_entry_t *get_partition_entry(const char *name) {
++    int i;
++
++    for (i = 0; i < list.entry_count; i++) {
++        if (strcmp(name, list.list[i].name) == 0) {
++            return &list.list[i];
++        }
++    }
++    return NULL;
++}
++
++const partition_entry_t *get_partition_entry_by_type(const uuid_t *type_uuid) {
++    int i;
++
++    for (i = 0; i < list.entry_count; i++) {
++        if (guidcmp(type_uuid, &list.list[i].type_guid) == 0) {
++            return &list.list[i];
++        }
++    }
++
++    return NULL;
++}
++
++const partition_entry_t *get_partition_entry_by_uuid(const uuid_t *part_uuid) {
++    int i;
++
++    for (i = 0; i < list.entry_count; i++) {
++        if (guidcmp(part_uuid, &list.list[i].part_guid) == 0) {
++            return &list.list[i];
++        }
++    }
++
++    return NULL;
++}
++
++const partition_entry_list_t *get_partition_entry_list(void) { return &list; }
++
++void partition_init(unsigned int image_id) { load_partition_table(image_id); }
+diff --git a/platform/ext/target/arm/corstone1000/partition/partition.h b/platform/ext/target/arm/corstone1000/partition/partition.h
+new file mode 100644
+index 0000000000..54af47aca4
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/partition/partition.h
+@@ -0,0 +1,47 @@
++/*
++ * Copyright (c) 2016-2022, ARM Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PARTITION_H
++#define PARTITION_H
++
++#include <stdint.h>
++
++#include "efi.h"
++#include "uuid.h"
++
++#if !PLAT_PARTITION_MAX_ENTRIES
++#define PLAT_PARTITION_MAX_ENTRIES 16
++#endif /* PLAT_PARTITION_MAX_ENTRIES */
++
++#if !PLAT_PARTITION_BLOCK_SIZE
++#define PLAT_PARTITION_BLOCK_SIZE 512
++#endif /* PLAT_PARTITION_BLOCK_SIZE */
++
++#define LEGACY_PARTITION_BLOCK_SIZE 512
++
++#define DEFAULT_GPT_HEADER_SIZE 92
++
++typedef struct partition_entry {
++    uint64_t start;
++    uint64_t length;
++    char name[EFI_NAMELEN];
++    struct efi_guid part_guid;
++    struct efi_guid type_guid;
++} partition_entry_t;
++
++typedef struct partition_entry_list {
++    partition_entry_t list[PLAT_PARTITION_MAX_ENTRIES];
++    int entry_count;
++} partition_entry_list_t;
++
++int load_partition_table(unsigned int image_id);
++const partition_entry_t *get_partition_entry(const char *name);
++const partition_entry_t *get_partition_entry_by_type(const uuid_t *type_guid);
++const partition_entry_t *get_partition_entry_by_uuid(const uuid_t *part_uuid);
++const partition_entry_list_t *get_partition_entry_list(void);
++void partition_init(unsigned int image_id);
++
++#endif /* PARTITION_H */
+diff --git a/platform/ext/target/arm/corstone1000/partition/uuid.h b/platform/ext/target/arm/corstone1000/partition/uuid.h
+new file mode 100644
+index 0000000000..06fec5a3c0
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/partition/uuid.h
+@@ -0,0 +1,76 @@
++/*-
++ * Copyright (c) 2002 Marcel Moolenaar
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
++ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
++ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
++ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
++ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
++ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
++ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ *
++ * $FreeBSD$
++ */
++
++/*
++ * Portions copyright (c) 2014-2020, ARM Limited and Contributors.
++ * All rights reserved.
++ */
++
++#ifndef UUID_H
++#define UUID_H
++
++#include <stdint.h>
++
++/* Length of a node address (an IEEE 802 address). */
++#define _UUID_NODE_LEN 6
++
++/* Length of UUID string including dashes. */
++#define _UUID_STR_LEN 36
++
++/*
++ * See also:
++ *      http://www.opengroup.org/dce/info/draft-leach-uuids-guids-01.txt
++ *      http://www.opengroup.org/onlinepubs/009629399/apdxa.htm
++ *
++ * A DCE 1.1 compatible source representation of UUIDs.
++ */
++struct uuid {
++    uint8_t time_low[4];
++    uint8_t time_mid[2];
++    uint8_t time_hi_and_version[2];
++    uint8_t clock_seq_hi_and_reserved;
++    uint8_t clock_seq_low;
++    uint8_t node[_UUID_NODE_LEN];
++};
++
++struct efi_guid {
++    uint32_t time_low;
++    uint16_t time_mid;
++    uint16_t time_hi_and_version;
++    uint8_t clock_seq_and_node[8];
++};
++
++union uuid_helper_t {
++    struct uuid uuid_struct;
++    struct efi_guid efi_guid;
++};
++
++/* XXX namespace pollution? */
++typedef struct uuid uuid_t;
++
++#endif /* UUID_H */
+diff --git a/platform/ext/target/arm/corstone1000/platform.c b/platform/ext/target/arm/corstone1000/platform.c
+new file mode 100644
+index 0000000000..908b66b7ac
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/platform.c
+@@ -0,0 +1,20 @@
++/*
++ * Copyright (c) 2023, Arm Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ *
++ */
++
++#include "platform.h"
++
++#include <stdint.h>
++
++/* Return an IO device handle and specification which can be used to access
++ * an image. This has to be implemented for the GPT parser. */
++int32_t plat_get_image_source(unsigned int image_id, uintptr_t *dev_handle,
++                              uintptr_t *image_spec) {
++    (void)image_id;
++    *dev_handle = NULL;
++    *image_spec = NULL;
++    return 0;
++}
+diff --git a/platform/ext/target/arm/corstone1000/platform.h b/platform/ext/target/arm/corstone1000/platform.h
+new file mode 100644
+index 0000000000..250f9cd9f5
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/platform.h
+@@ -0,0 +1,14 @@
++/*
++ * Copyright (c) 2023, Arm Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ *
++ */
++
++#ifndef __PLATFORM_H__
++#define __PLATFORM_H__
++
++int32_t plat_get_image_source(unsigned int image_id, uintptr_t *dev_handle,
++                              uintptr_t *image_spec);
++
++#endif /*__PLATFORM_H__*/
+-- 
+2.25.1
+

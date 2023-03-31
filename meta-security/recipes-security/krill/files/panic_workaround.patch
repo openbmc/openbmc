@@ -5,7 +5,7 @@ Index: git/Cargo.toml
 ===================================================================
 --- git.orig/Cargo.toml
 +++ git/Cargo.toml
-@@ -71,7 +71,7 @@ static-openssl = [ "openssl/vendored" ]
+@@ -91,7 +91,7 @@ hsm-tests-pkcs11 = [ "hsm" ]
  # Make sure that Krill crashes on panics, rather than losing threads and
  # limping on in a bad state.
  [profile.release]
@@ -13,4 +13,4 @@ Index: git/Cargo.toml
 +#panic = "abort"
  
  [dev-dependencies]
- # for user management
+ regex     = "1.5.5"

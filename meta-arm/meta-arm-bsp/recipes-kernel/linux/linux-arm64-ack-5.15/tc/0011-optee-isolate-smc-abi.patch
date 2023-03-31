@@ -22,7 +22,7 @@ matter of reorganizing the code.
 
 Reviewed-by: Sumit Garg <sumit.garg@linaro.org>
 Signed-off-by: Jens Wiklander <jens.wiklander@linaro.org>
-Upstream-Status: Pending [Not submitted to upstream yet]
+Upstream-Status: Backport [c51a564a5b48355f30309b84cdffe3f96d1ae0d3]
 Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com>
 ---
  drivers/tee/optee/Makefile        |    4 +-

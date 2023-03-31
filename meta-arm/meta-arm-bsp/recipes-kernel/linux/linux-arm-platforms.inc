@@ -14,7 +14,6 @@ ARMBSPFILESPATHS := "${THISDIR}:${THISDIR}/files:"
 # Arm platforms kmeta
 SRC_URI_KMETA = "file://arm-platforms-kmeta;type=kmeta;name=arm-platforms-kmeta;destsuffix=arm-platforms-kmeta"
 SRC_URI:append:fvp-base = " ${SRC_URI_KMETA}"
-SRC_URI:append:fvp-base-arm32 = " ${SRC_URI_KMETA}"
 SRC_URI:append:fvp-baser-aemv8r64 = " ${SRC_URI_KMETA}"
 SRC_URI:append:juno = " ${SRC_URI_KMETA}"
 SRC_URI:append:n1sdp = " ${SRC_URI_KMETA}"
@@ -68,21 +67,6 @@ FILESEXTRAPATHS:prepend:fvp-base := "${ARMBSPFILESPATHS}"
 SRC_URI:append:fvp-base = " file://0001-arm64-dts-fvp-Enable-virtio-rng-support.patch"
 
 #
-# FVP BASE ARM32 KMACHINE
-#
-COMPATIBLE_MACHINE:fvp-base-arm32 = "fvp-base-arm32"
-KMACHINE:fvp-base-arm32 = "fvp-arm32"
-FILESEXTRAPATHS:prepend:fvp-base-arm32 := "${ARMBSPFILESPATHS}"
-SRC_URI:append:fvp-base-arm32 = " file://0001-ARM-vexpress-enable-GICv3.patch"
-# We want to use the DT in the arm64 tree but the kernel build doesn't like that, so symlink it
-do_compile:prepend:fvp-base-arm32() {
-    mkdir --parents ${S}/arch/arm/boot/dts/arm
-    for file in fvp-base-revc.dts rtsm_ve-motherboard.dtsi rtsm_ve-motherboard-rs2.dtsi; do
-        ln -fsr ${S}/arch/arm64/boot/dts/arm/$file ${S}/arch/arm/boot/dts/arm
-    done
-}
-
-#
 # FVP BaseR AEMv8r64 Machine
 #
 COMPATIBLE_MACHINE:fvp-baser-aemv8r64 = "fvp-baser-aemv8r64"
@@ -112,7 +96,7 @@ COMPATIBLE_MACHINE:musca-s1 = "(^$)"
 #
 # N1SDP KMACHINE
 #
-FILESEXTRAPATHS:prepend:n1sdp := "${THISDIR}/linux-yocto-5.19/n1sdp:"
+FILESEXTRAPATHS:prepend:n1sdp := "${THISDIR}/linux-yocto-6.1/n1sdp:"
 COMPATIBLE_MACHINE:n1sdp = "n1sdp"
 KBUILD_DEFCONFIG:n1sdp = "defconfig"
 KCONFIG_MODE:n1sdp = "--alldefconfig"
@@ -124,6 +108,7 @@ SRC_URI:append:n1sdp = " \
     file://0004-n1sdp-pcie-add-quirk-support-enabling-remote-chip-PC.patch \
     file://0005-arm64-kpti-Whitelist-early-Arm-Neoverse-N1-revisions.patch \
     file://0006-arm64-defconfig-disable-config-options-that-does-not.patch \
+    file://enable-nvme.cfg \
     file://enable-realtek-R8169.cfg \
     file://enable-usb_conn_gpio.cfg \
     file://usb_xhci_pci_renesas.cfg \

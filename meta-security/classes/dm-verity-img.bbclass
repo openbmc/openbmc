@@ -25,6 +25,9 @@ STAGING_VERITY_DIR ?= "${TMPDIR}/work-shared/${MACHINE}/dm-verity"
 # Define the data block size to use in veritysetup.
 DM_VERITY_IMAGE_DATA_BLOCK_SIZE ?= "1024"
 
+# Define the hash block size to use in veritysetup.
+DM_VERITY_IMAGE_HASH_BLOCK_SIZE ?= "4096"
+
 # Process the output from veritysetup and generate the corresponding .env
 # file. The output from veritysetup is not very machine-friendly so we need to
 # convert it to some better format. Let's drop the first line (doesn't contain
@@ -56,11 +59,18 @@ verity_setup() {
     local SIZE=$(stat --printf="%s" $INPUT)
     local OUTPUT=$INPUT.verity
 
+    if [ ${DM_VERITY_IMAGE_DATA_BLOCK_SIZE} -ge ${DM_VERITY_IMAGE_HASH_BLOCK_SIZE} ]; then
+        align=${DM_VERITY_IMAGE_DATA_BLOCK_SIZE}
+    else
+        align=${DM_VERITY_IMAGE_HASH_BLOCK_SIZE}
+    fi
+    SIZE=$(expr \( $SIZE + $align - 1 \) / $align \* $align)
+
     cp -a $INPUT $OUTPUT
 
     # Let's drop the first line of output (doesn't contain any useful info)
     # and feed the rest to another function.
-    veritysetup --data-block-size=${DM_VERITY_IMAGE_DATA_BLOCK_SIZE} --hash-offset=$SIZE format $OUTPUT $OUTPUT | tail -n +2 | process_verity
+    veritysetup --data-block-size=${DM_VERITY_IMAGE_DATA_BLOCK_SIZE} --hash-block-size=${DM_VERITY_IMAGE_HASH_BLOCK_SIZE} --hash-offset=$SIZE format $OUTPUT $OUTPUT | tail -n +2 | process_verity
 }
 
 VERITY_TYPES = " \
@@ -87,7 +97,7 @@ python __anonymous() {
     if verity_image != pn:
         return # This doesn't concern this image
 
-    if len(verity_type.split()) is not 1:
+    if len(verity_type.split()) != 1:
         bb.fatal('DM_VERITY_IMAGE_TYPE must contain exactly one type')
 
     d.appendVar('IMAGE_FSTYPES', ' %s.verity' % verity_type)

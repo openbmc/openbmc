@@ -1,0 +1,37 @@
+dm-verity and beaglebone-black
+------------------------------
+Set/uncomment the MACHINE line for "beaglebone-yocto" if you haven't yet.
+
+In addition to the basic dm-verity settings, you'll also want in local.conf:
+
+IMAGE_BOOT_FILES:remove = "zImage"
+IMAGE_BOOT_FILES:append = " zImage-initramfs-${MACHINE}.bin;zImage"
+WKS_FILES = "${MACHINE}-verity.wks.in"
+
+Read-only issues: The beaglebone BSP by default declares the following:
+
+   SERIAL_CONSOLES ?= "115200;ttyS0 115200;ttyO0 115200;ttyAMA0"
+   SERIAL_CONSOLES_CHECK = "${SERIAL_CONSOLES}"
+
+...which are variables used by sysV init, in order to determine the
+appropriate /etc/inittab entries.  The problem that arises is that by
+default, an on-target runtime check of /proc/consoles is used to finalize
+the /etc/inittab -- and of course that fails a build with read-only-rootfs
+[see the pkg_postinst_ontarget rule in the sysvinit rule for details.]
+
+If you don't need a serial console, the quick fix is to add in local.conf
+
+SERIAL_CONSOLES = ""
+
+If you do need/want a serial console, then probably a local bbappend to
+manually set the /etc/inittab as desired is easiest.
+
+After running "wic create -e core-image-minimal beaglebone-yocto-verity"
+you should have a "direct" image ready to write to a u-SD card.  Remember
+that the "direct" image contains the bootloader and partition table
+already, so you'll be writing it to a device such as /dev/sdb and not
+just a partition  -- like /dev/sdb1
+
+Also recall that booting from u-SD requires pressing and holding the S2
+(SYSBOOT) button during power-on in order to divert the boot from the normal
+soldered on storage and to the removable u-SD card.

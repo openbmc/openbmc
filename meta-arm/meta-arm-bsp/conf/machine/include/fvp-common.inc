@@ -16,7 +16,7 @@ PREFERRED_PROVIDER_virtual/kernel ?= "linux-yocto"
 
 KERNEL_DEVICETREE = "arm/fvp-base-revc.dtb"
 
-EXTRA_IMAGEDEPENDS += "trusted-firmware-a u-boot"
+EXTRA_IMAGEDEPENDS += "trusted-firmware-a"
 
 # As this is a virtual target that will not be used in the real world there is
 # no need for real SSH keys.

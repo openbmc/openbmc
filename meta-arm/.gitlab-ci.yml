@@ -58,7 +58,8 @@ stages:
       - $CI_PROJECT_DIR/work/build/tmp/work*/**/testimage/*
 
 #
-# Prep stage, update repositories once
+# Prep stage, update repositories once.
+# Set the CI variable CI_CLEAN_REPOS=1 to refetch the respositories from scratch
 #
 update-repos:
   extends: .setup
@@ -70,9 +71,12 @@ update-repos:
 # Build stage, the actual build jobs
 #
 # Available options for building are
+#  DISTRO: [poky, poky-tiny]
+#  KERNEL: [linux-yocto, linux-yocto-dev, linux-yocto-rt]
 #  TOOLCHAINS: [gcc, clang, armgcc, external-gccarm]
 #  TCLIBC: [glibc, musl]
-#  FIRMWARE: [uboot, edk2]
+#  FIRMWARE: [u-boot, edk2]
+#  TS: [none, trusted-services]
 #  VIRT: [none, xen]
 #  TESTING: testimage
 
@@ -88,7 +92,7 @@ corstone1000-fvp:
   extends: .build
   parallel:
     matrix:
-      - TESTING: [testimage,tftf]
+      - TESTING: [testimage, tftf]
   tags:
     - x86_64
 
@@ -100,13 +104,7 @@ fvp-base:
   parallel:
     matrix:
       - TESTING: testimage
-
-fvp-base-arm32:
-  extends: .build
-  parallel:
-    matrix:
-      - TOOLCHAINS: [gcc, external-gccarm]
-        TESTING: testimage
+      - FIRMWARE: edk2
 
 fvp-baser-aemv8r64:
   extends: .build
@@ -127,7 +125,7 @@ juno:
   parallel:
     matrix:
       - TOOLCHAINS: [gcc, clang]
-        FIRMWARE: [uboot, edk2]
+        FIRMWARE: [u-boot, edk2]
 
 musca-b1:
   extends: .build
@@ -146,14 +144,16 @@ qemu-generic-arm64:
   extends: .build
   parallel:
     matrix:
-      - TOOLCHAINS: [gcc, clang]
+      - KERNEL: [linux-yocto, linux-yocto-dev, linux-yocto-rt]
+        TOOLCHAINS: [gcc, clang]
         TESTING: testimage
 
 qemuarm64-secureboot:
   extends: .build
   parallel:
     matrix:
-      - TOOLCHAINS: [gcc, clang]
+      - KERNEL: [linux-yocto, linux-yocto-dev, linux-yocto-rt]
+        TOOLCHAINS: [gcc, clang]
         TCLIBC: [glibc, musl]
         TS: [none, trusted-services]
         TESTING: testimage
@@ -162,8 +162,12 @@ qemuarm64:
   extends: .build
   parallel:
     matrix:
-      - TOOLCHAINS: [gcc, clang]
-        EFI: [uboot, edk2]
+      - DISTRO: poky
+        KERNEL: [linux-yocto, linux-yocto-dev, linux-yocto-rt]
+        TOOLCHAINS: [gcc, clang]
+        FIRMWARE: [u-boot, edk2]
+        TESTING: testimage
+      - DISTRO: poky-tiny
         TESTING: testimage
       - VIRT: xen
 
@@ -171,15 +175,20 @@ qemuarm-secureboot:
   extends: .build
   parallel:
     matrix:
-      - TOOLCHAINS: [gcc, clang]
+      - KERNEL: [linux-yocto, linux-yocto-dev, linux-yocto-rt]
+        TOOLCHAINS: [gcc, clang, external-gccarm]
         TESTING: testimage
 
 qemuarm:
   extends: .build
   parallel:
     matrix:
-      - TOOLCHAINS: [gcc, clang]
-        EFI: [uboot, edk2]
+      - DISTRO: poky
+        KERNEL: [linux-yocto, linux-yocto-dev, linux-yocto-rt]
+        TOOLCHAINS: [gcc, clang]
+        FIRMWARE: [u-boot, edk2]
+        TESTING: testimage
+      - DISTRO: poky-tiny
         TESTING: testimage
       - VIRT: xen
 
@@ -187,7 +196,11 @@ qemuarmv5:
   extends: .build
   parallel:
     matrix:
-      - TESTING: testimage
+      - DISTRO: poky
+        KERNEL: [linux-yocto, linux-yocto-dev, linux-yocto-rt]
+        TESTING: testimage
+      - DISTRO: poky-tiny
+        TESTING: testimage
 
 sgi575:
   extends: .build

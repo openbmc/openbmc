@@ -10,3 +10,5 @@ SRC_URI = "git://github.com/akuster/openscap.git;branch=oe-1.3;protocol=https \
 "
 
 PV = "1.3.3+git${SRCPV}"
+
+DEFAULT_PREFERENCE = "-1"

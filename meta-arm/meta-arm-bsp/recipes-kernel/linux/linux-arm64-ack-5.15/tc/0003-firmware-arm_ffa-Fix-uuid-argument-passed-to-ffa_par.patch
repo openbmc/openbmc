@@ -6,7 +6,7 @@ Subject: [PATCH 03/40] firmware: arm_ffa: Fix uuid argument passed to
 
 Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
 Change-Id: Ib2749ec3e02da5bb6d835f7dbf2d608c41fad1f2
-Upstream-Status: Pending [Not submitted to upstream yet]
+Upstream-Status: Backport [f3c45c045e25ed52461829d2ce07954f72b6ad15]
 Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com>
 ---
  drivers/firmware/arm_ffa/driver.c | 2 +-

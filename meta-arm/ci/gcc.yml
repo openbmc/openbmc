@@ -1,0 +1,7 @@
+header:
+  version: 11
+
+#NOTE: This is the default for poky.  This is only being added for completeness/clarity
+local_conf_header:
+  toolchain: |
+    TOOLCHAIN = "gcc"

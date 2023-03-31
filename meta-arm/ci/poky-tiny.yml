@@ -1,0 +1,14 @@
+header:
+  version: 9
+
+distro: poky-tiny
+
+local_conf_header:
+  hacking: |
+    TEST_SUITES = "ping"
+  extrapackages: |
+    # Intentionally blank to prevent perf from being added to the image in base.yml
+
+target:
+  - core-image-minimal
+  - perf

@@ -1,2 +1,2 @@
 PACKAGECONFIG:append:rpi = " hls \
-                   ${@bb.utils.contains('LICENSE_FLAGS_ACCEPTED', 'commercial', 'gpl faad', '', d)}"
+                   ${@bb.utils.contains('LICENSE_FLAGS_ACCEPTED', 'commercial', 'faad', '', d)}"

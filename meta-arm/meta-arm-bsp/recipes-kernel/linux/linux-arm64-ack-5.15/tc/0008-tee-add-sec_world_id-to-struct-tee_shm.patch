@@ -9,7 +9,7 @@ secure world.
 
 Reviewed-by: Sumit Garg <sumit.garg@linaro.org>
 Signed-off-by: Jens Wiklander <jens.wiklander@linaro.org>
-Upstream-Status: Pending [Not submitted to upstream yet]
+Upstream-Status: Backport [9028b2463c1ea96f51c3ba53e2479346019ff6ad]
 Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com>
 ---
  include/linux/tee_drv.h | 7 ++++++-

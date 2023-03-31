@@ -4,6 +4,7 @@
 
 import sys
 import os
+import shutil
 import subprocess
 import pathlib
 
@@ -34,9 +35,14 @@ if __name__ == "__main__":
 
     for repo in repositories:
         repodir = base_repodir / repo_shortname(repo)
+
+        if "CI_CLEAN_REPOS" in os.environ:
+            print("Cleaning %s..." % repo)
+            shutil.rmtree(repodir, ignore_errors=True)
+
         if repodir.exists():
             print("Updating %s..." % repo)
-            subprocess.run(["git", "-C", repodir, "fetch"], check=True)
+            subprocess.run(["git", "-C", repodir, "-c", "gc.autoDetach=false", "fetch"], check=True)
         else:
             print("Cloning %s..." % repo)
             subprocess.run(["git", "clone", "--bare", repo, repodir], check=True)

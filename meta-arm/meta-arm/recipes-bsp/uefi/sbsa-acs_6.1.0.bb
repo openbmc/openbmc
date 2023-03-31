@@ -1,4 +1,4 @@
-require recipes-bsp/uefi/edk2-firmware_202205.bb
+require recipes-bsp/uefi/edk2-firmware_202302.bb
 PROVIDES:remove = "virtual/bootloader"
 
 LICENSE += "& Apache-2.0"
@@ -6,8 +6,8 @@ LIC_FILES_CHKSUM += "file://ShellPkg/Application/sbsa-acs/LICENSE.md;md5=2a94494
 
 SRC_URI += "git://github.com/ARM-software/sbsa-acs;destsuffix=edk2/ShellPkg/Application/sbsa-acs;protocol=https;branch=master;name=acs \
             git://github.com/tianocore/edk2-libc;destsuffix=edk2/edk2-libc;protocol=https;branch=master;name=libc \
-            file://shell.patch \
-            file://use_bfd_linker.patch \
+            file://0002-Patch-in-the-paths-to-the-SBSA-test-suite.patch \
+            file://0003-Enforce-using-good-old-BFD-linker.patch \
             file://0001-Fix-function-protype-mismatches.patch;patchdir=ShellPkg/Application/sbsa-acs \
             file://0001-Fix-for-issue-245.patch;patchdir=ShellPkg/Application/sbsa-acs \
             "

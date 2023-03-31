@@ -1,0 +1,1354 @@
+From 1db9afdbf70eb9708640debe5d7d24558fe0f63a Mon Sep 17 00:00:00 2001
+From: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Date: Mon, 7 Nov 2022 12:49:11 +0000
+Subject: [PATCH 01/10] Platform: corstone1000: Introduce IO framework
+
+- Introduce IO storage framework
+- Add IO flash to abstract flash implementation details from upper layer
+
+Signed-off-by: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Upstream-Status: Accepted [TF-Mv1.8.0]
+---
+ .../target/arm/corstone1000/CMakeLists.txt    |   4 +
+ .../ext/target/arm/corstone1000/io/io_block.c | 527 ++++++++++++++++++
+ .../ext/target/arm/corstone1000/io/io_block.h |  40 ++
+ .../ext/target/arm/corstone1000/io/io_defs.h  |  27 +
+ .../target/arm/corstone1000/io/io_driver.h    |  54 ++
+ .../ext/target/arm/corstone1000/io/io_flash.c | 183 ++++++
+ .../ext/target/arm/corstone1000/io/io_flash.h |  37 ++
+ .../target/arm/corstone1000/io/io_storage.c   | 289 ++++++++++
+ .../target/arm/corstone1000/io/io_storage.h   |  92 +++
+ 9 files changed, 1253 insertions(+)
+ create mode 100644 platform/ext/target/arm/corstone1000/io/io_block.c
+ create mode 100644 platform/ext/target/arm/corstone1000/io/io_block.h
+ create mode 100644 platform/ext/target/arm/corstone1000/io/io_defs.h
+ create mode 100644 platform/ext/target/arm/corstone1000/io/io_driver.h
+ create mode 100644 platform/ext/target/arm/corstone1000/io/io_flash.c
+ create mode 100644 platform/ext/target/arm/corstone1000/io/io_flash.h
+ create mode 100644 platform/ext/target/arm/corstone1000/io/io_storage.c
+ create mode 100644 platform/ext/target/arm/corstone1000/io/io_storage.h
+
+diff --git a/platform/ext/target/arm/corstone1000/CMakeLists.txt b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+index cfbaffc995..7808efae68 100644
+--- a/platform/ext/target/arm/corstone1000/CMakeLists.txt
++++ b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+@@ -125,6 +125,9 @@ target_sources(platform_bl2
+         fw_update_agent/fwu_agent.c
+         bl2_security_cnt.c
+         $<$<NOT:$<BOOL:${PLATFORM_DEFAULT_OTP}>>:${PLATFORM_DIR}/ext/accelerator/cc312/otp_cc312.c>
++        io/io_block.c
++        io/io_flash.c
++        io/io_storage.c
+ )
+ 
+ if (PLATFORM_IS_FVP)
+@@ -182,6 +185,7 @@ target_include_directories(platform_bl2
+         fip_parser
+         Native_Driver
+         fw_update_agent
++        io
+         .
+     INTERFACE
+         cc312
+diff --git a/platform/ext/target/arm/corstone1000/io/io_block.c b/platform/ext/target/arm/corstone1000/io/io_block.c
+new file mode 100644
+index 0000000000..f7eaf7444c
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/io/io_block.c
+@@ -0,0 +1,527 @@
++/*
++ * Copyright (c) 2022 Arm Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Licensed under the Apache License, Version 2.0 (the License); you may
++ * not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an AS IS BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#include "io_block.h"
++
++#include <assert.h>
++#include <errno.h>
++
++#include "io_defs.h"
++#include "io_driver.h"
++#include "io_storage.h"
++
++typedef struct {
++    io_block_dev_spec_t *dev_spec;
++    uintptr_t base;
++    uint32_t file_pos;
++    uint32_t size;
++} block_dev_state_t;
++
++#define is_power_of_2(x) (((x) != 0U) && (((x) & ((x)-1U)) == 0U))
++
++io_type_t device_type_block(void);
++
++static int block_open(io_dev_info_t *dev_info, const uintptr_t spec,
++                      io_entity_t *entity);
++static int block_seek(io_entity_t *entity, int mode, size_t offset);
++static int block_read(io_entity_t *entity, uintptr_t buffer, size_t length,
++                      size_t *length_read);
++static int block_write(io_entity_t *entity, const uintptr_t buffer,
++                       size_t length, size_t *length_written);
++static int block_close(io_entity_t *entity);
++static int block_dev_open(const uintptr_t dev_spec, io_dev_info_t **dev_info);
++static int block_dev_close(io_dev_info_t *dev_info);
++
++static const io_dev_connector_t block_dev_connector = {.dev_open =
++                                                           block_dev_open};
++
++static const io_dev_funcs_t block_dev_funcs = {
++    .type = device_type_block,
++    .open = block_open,
++    .seek = block_seek,
++    .size = NULL,
++    .read = block_read,
++    .write = block_write,
++    .close = block_close,
++    .dev_init = NULL,
++    .dev_close = block_dev_close,
++};
++
++static block_dev_state_t state_pool[MAX_IO_BLOCK_DEVICES];
++static io_dev_info_t dev_info_pool[MAX_IO_BLOCK_DEVICES];
++
++/* Track number of allocated block state */
++static unsigned int block_dev_count;
++
++io_type_t device_type_block(void) { return IO_TYPE_BLOCK; }
++
++/* Locate a block state in the pool, specified by address */
++static int find_first_block_state(const io_block_dev_spec_t *dev_spec,
++                                  unsigned int *index_out) {
++    unsigned int index;
++    int result = -ENOENT;
++
++    for (index = 0U; index < MAX_IO_BLOCK_DEVICES; ++index) {
++        /* dev_spec is used as identifier since it's unique */
++        if (state_pool[index].dev_spec == dev_spec) {
++            result = 0;
++            *index_out = index;
++            break;
++        }
++    }
++    return result;
++}
++
++/* Allocate a device info from the pool and return a pointer to it */
++static int allocate_dev_info(io_dev_info_t **dev_info) {
++    int result = -ENOMEM;
++    assert(dev_info != NULL);
++
++    if (block_dev_count < MAX_IO_BLOCK_DEVICES) {
++        unsigned int index = 0;
++        result = find_first_block_state(NULL, &index);
++        assert(result == 0);
++        /* initialize dev_info */
++        dev_info_pool[index].funcs = &block_dev_funcs;
++        dev_info_pool[index].info = (uintptr_t)&state_pool[index];
++        *dev_info = &dev_info_pool[index];
++        ++block_dev_count;
++    }
++
++    return result;
++}
++
++/* Release a device info to the pool */
++static int free_dev_info(io_dev_info_t *dev_info) {
++    int result;
++    unsigned int index = 0;
++    block_dev_state_t *state;
++    assert(dev_info != NULL);
++
++    state = (block_dev_state_t *)dev_info->info;
++    result = find_first_block_state(state->dev_spec, &index);
++    if (result == 0) {
++        /* free if device info is valid */
++        memset(state, 0, sizeof(block_dev_state_t));
++        memset(dev_info, 0, sizeof(io_dev_info_t));
++        --block_dev_count;
++    }
++
++    return result;
++}
++
++static int block_open(io_dev_info_t *dev_info, const uintptr_t spec,
++                      io_entity_t *entity) {
++    block_dev_state_t *cur;
++    io_block_spec_t *region;
++
++    assert((dev_info->info != (uintptr_t)NULL) && (spec != (uintptr_t)NULL) &&
++           (entity->info == (uintptr_t)NULL));
++
++    region = (io_block_spec_t *)spec;
++    cur = (block_dev_state_t *)dev_info->info;
++    assert(((region->offset % cur->dev_spec->block_size) == 0) &&
++           ((region->length % cur->dev_spec->block_size) == 0));
++
++    cur->base = region->offset;
++    cur->size = region->length;
++    cur->file_pos = 0;
++
++    entity->info = (uintptr_t)cur;
++    return 0;
++}
++
++/* parameter offset is relative address at here */
++static int block_seek(io_entity_t *entity, int mode, size_t offset) {
++    block_dev_state_t *cur;
++
++    assert(entity->info != (uintptr_t)NULL);
++
++    cur = (block_dev_state_t *)entity->info;
++
++    assert((offset >= 0) && ((uint32_t)offset < cur->size));
++    switch (mode) {
++        case IO_SEEK_SET:
++            cur->file_pos = (uint32_t)offset;
++            break;
++        case IO_SEEK_CUR:
++            cur->file_pos += (uint32_t)offset;
++            break;
++        default:
++            return -EINVAL;
++    }
++    assert(cur->file_pos < cur->size);
++    return 0;
++}
++
++/*
++ * This function allows the caller to read any number of bytes
++ * from any position. It hides from the caller that the low level
++ * driver only can read aligned blocks of data. For this reason
++ * we need to handle the use case where the first byte to be read is not
++ * aligned to start of the block, the last byte to be read is also not
++ * aligned to the end of a block, and there are zero or more blocks-worth
++ * of data in between.
++ *
++ * In such a case we need to read more bytes than requested (i.e. full
++ * blocks) and strip-out the leading bytes (aka skip) and the trailing
++ * bytes (aka padding). See diagram below
++ *
++ * cur->file_pos ------------
++ *                          |
++ * cur->base                |
++ *  |                       |
++ *  v                       v<----  length   ---->
++ *  --------------------------------------------------------------
++ * |           |         block#1    |        |   block#n          |
++ * |  block#0  |            +       |   ...  |     +              |
++ * |           | <- skip -> +       |        |     + <- padding ->|
++ *  ------------------------+----------------------+--------------
++ *             ^                                                  ^
++ *             |                                                  |
++ *             v    iteration#1                iteration#n        v
++ *              --------------------------------------------------
++ *             |                    |        |                    |
++ *             |<----  request ---->|  ...   |<----- request ---->|
++ *             |                    |        |                    |
++ *              --------------------------------------------------
++ *            /                   /          |                    |
++ *           /                   /           |                    |
++ *          /                   /            |                    |
++ *         /                   /             |                    |
++ *        /                   /              |                    |
++ *       /                   /               |                    |
++ *      /                   /                |                    |
++ *     /                   /                 |                    |
++ *    /                   /                  |                    |
++ *   /                   /                   |                    |
++ *  <---- request ------>                    <------ request  ----->
++ *  ---------------------                    -----------------------
++ *  |        |          |                    |          |           |
++ *  |<-skip->|<-nbytes->|           -------->|<-nbytes->|<-padding->|
++ *  |        |          |           |        |          |           |
++ *  ---------------------           |        -----------------------
++ *  ^        \           \          |        |          |
++ *  |         \           \         |        |          |
++ *  |          \           \        |        |          |
++ *  buf->offset \           \   buf->offset  |          |
++ *               \           \               |          |
++ *                \           \              |          |
++ *                 \           \             |          |
++ *                  \           \            |          |
++ *                   \           \           |          |
++ *                    \           \          |          |
++ *                     \           \         |          |
++ *                      --------------------------------
++ *                      |           |        |         |
++ * buffer-------------->|           | ...    |         |
++ *                      |           |        |         |
++ *                      --------------------------------
++ *                      <-count#1->|                   |
++ *                      <----------  count#n   -------->
++ *                      <----------  length  ---------->
++ *
++ * Additionally, the IO driver has an underlying buffer that is at least
++ * one block-size and may be big enough to allow.
++ */
++static int block_read(io_entity_t *entity, uintptr_t buffer, size_t length,
++                      size_t *length_read) {
++    block_dev_state_t *cur;
++    io_block_spec_t *buf;
++    io_block_ops_t *ops;
++    int lba;
++    size_t block_size, left;
++    size_t nbytes;  /* number of bytes read in one iteration */
++    size_t request; /* number of requested bytes in one iteration */
++    size_t count;   /* number of bytes already read */
++    /*
++     * number of leading bytes from start of the block
++     * to the first byte to be read
++     */
++    size_t skip;
++
++    /*
++     * number of trailing bytes between the last byte
++     * to be read and the end of the block
++     */
++    size_t padding;
++
++    assert(entity->info != (uintptr_t)NULL);
++    cur = (block_dev_state_t *)entity->info;
++    ops = &(cur->dev_spec->ops);
++    buf = &(cur->dev_spec->buffer);
++    block_size = cur->dev_spec->block_size;
++    assert((length <= cur->size) && (length > 0U) && (ops->read != 0));
++
++    /*
++     * We don't know the number of bytes that we are going
++     * to read in every iteration, because it will depend
++     * on the low level driver.
++     */
++    count = 0;
++    for (left = length; left > 0U; left -= nbytes) {
++        /*
++         * We must only request operations aligned to the block
++         * size. Therefore if file_pos is not block-aligned,
++         * we have to request the operation to start at the
++         * previous block boundary and skip the leading bytes. And
++         * similarly, the number of bytes requested must be a
++         * block size multiple
++         */
++        skip = cur->file_pos & (block_size - 1U);
++
++        /*
++         * Calculate the block number containing file_pos
++         * - e.g. block 3.
++         */
++        lba = (cur->file_pos + cur->base) / block_size;
++
++        if ((skip + left) > buf->length) {
++            /*
++             * The underlying read buffer is too small to
++             * read all the required data - limit to just
++             * fill the buffer, and then read again.
++             */
++            request = buf->length;
++        } else {
++            /*
++             * The underlying read buffer is big enough to
++             * read all the required data. Calculate the
++             * number of bytes to read to align with the
++             * block size.
++             */
++            request = skip + left;
++            request = (request + (block_size - 1U)) & ~(block_size - 1U);
++        }
++        request = ops->read(lba, buf->offset, request);
++
++        if (request <= skip) {
++            /*
++             * We couldn't read enough bytes to jump over
++             * the skip bytes, so we should have to read
++             * again the same block, thus generating
++             * the same error.
++             */
++            return -EIO;
++        }
++
++        /*
++         * Need to remove skip and padding bytes,if any, from
++         * the read data when copying to the user buffer.
++         */
++        nbytes = request - skip;
++        padding = (nbytes > left) ? nbytes - left : 0U;
++        nbytes -= padding;
++
++        memcpy((void *)(buffer + count), (void *)(buf->offset + skip), nbytes);
++
++        cur->file_pos += nbytes;
++        count += nbytes;
++    }
++    assert(count == length);
++    *length_read = count;
++
++    return 0;
++}
++
++/*
++ * This function allows the caller to write any number of bytes
++ * from any position. It hides from the caller that the low level
++ * driver only can write aligned blocks of data.
++ * See comments for block_read for more details.
++ */
++static int block_write(io_entity_t *entity, const uintptr_t buffer,
++                       size_t length, size_t *length_written) {
++    block_dev_state_t *cur;
++    io_block_spec_t *buf;
++    io_block_ops_t *ops;
++    int lba;
++    size_t block_size, left;
++    size_t nbytes;  /* number of bytes read in one iteration */
++    size_t request; /* number of requested bytes in one iteration */
++    size_t count;   /* number of bytes already read */
++    /*
++     * number of leading bytes from start of the block
++     * to the first byte to be read
++     */
++    size_t skip;
++
++    /*
++     * number of trailing bytes between the last byte
++     * to be read and the end of the block
++     */
++    size_t padding;
++    assert(entity->info != (uintptr_t)NULL);
++    cur = (block_dev_state_t *)entity->info;
++    ops = &(cur->dev_spec->ops);
++    buf = &(cur->dev_spec->buffer);
++    block_size = cur->dev_spec->block_size;
++    assert((length <= cur->size) && (length > 0U) && (ops->read != 0) &&
++           (ops->write != 0));
++
++    /*
++     * We don't know the number of bytes that we are going
++     * to write in every iteration, because it will depend
++     * on the low level driver.
++     */
++    count = 0;
++    for (left = length; left > 0U; left -= nbytes) {
++        /*
++         * We must only request operations aligned to the block
++         * size. Therefore if file_pos is not block-aligned,
++         * we have to request the operation to start at the
++         * previous block boundary and skip the leading bytes. And
++         * similarly, the number of bytes requested must be a
++         * block size multiple
++         */
++        skip = cur->file_pos & (block_size - 1U);
++
++        /*
++         * Calculate the block number containing file_pos
++         * - e.g. block 3.
++         */
++        lba = (cur->file_pos + cur->base) / block_size;
++
++        if ((skip + left) > buf->length) {
++            /*
++             * The underlying read buffer is too small to
++             * read all the required data - limit to just
++             * fill the buffer, and then read again.
++             */
++            request = buf->length;
++        } else {
++            /*
++             * The underlying read buffer is big enough to
++             * read all the required data. Calculate the
++             * number of bytes to read to align with the
++             * block size.
++             */
++            request = skip + left;
++            request = (request + (block_size - 1U)) & ~(block_size - 1U);
++        }
++
++        /*
++         * The number of bytes that we are going to write
++         * from the user buffer will depend of the size
++         * of the current request.
++         */
++        nbytes = request - skip;
++        padding = (nbytes > left) ? nbytes - left : 0U;
++        nbytes -= padding;
++
++        /*
++         * If we have skip or padding bytes then we have to preserve
++         * some content and it means that we have to read before
++         * writing
++         */
++        if ((skip > 0U) || (padding > 0U)) {
++            request = ops->read(lba, buf->offset, request);
++            /*
++             * The read may return size less than
++             * requested. Round down to the nearest block
++             * boundary
++             */
++            request &= ~(block_size - 1U);
++            if (request <= skip) {
++                /*
++                 * We couldn't read enough bytes to jump over
++                 * the skip bytes, so we should have to read
++                 * again the same block, thus generating
++                 * the same error.
++                 */
++                return -EIO;
++            }
++            nbytes = request - skip;
++            padding = (nbytes > left) ? nbytes - left : 0U;
++            nbytes -= padding;
++        }
++
++        memcpy((void *)(buf->offset + skip), (void *)(buffer + count), nbytes);
++
++        request = ops->write(lba, buf->offset, request);
++        if (request <= skip) return -EIO;
++
++        /*
++         * And the previous write operation may modify the size
++         * of the request, so again, we have to calculate the
++         * number of bytes that we consumed from the user
++         * buffer
++         */
++        nbytes = request - skip;
++        padding = (nbytes > left) ? nbytes - left : 0U;
++        nbytes -= padding;
++
++        cur->file_pos += nbytes;
++        count += nbytes;
++    }
++    assert(count == length);
++    *length_written = count;
++
++    return 0;
++}
++
++static int block_close(io_entity_t *entity) {
++    entity->info = (uintptr_t)NULL;
++    return 0;
++}
++
++static int block_dev_open(const uintptr_t dev_spec, io_dev_info_t **dev_info) {
++    block_dev_state_t *cur;
++    io_block_spec_t *buffer;
++    io_dev_info_t *info;
++    size_t block_size;
++    int result;
++    assert(dev_info != NULL);
++    result = allocate_dev_info(&info);
++    if (result != 0) return -ENOENT;
++
++    cur = (block_dev_state_t *)info->info;
++    /* dev_spec is type of io_block_dev_spec_t. */
++    cur->dev_spec = (io_block_dev_spec_t *)dev_spec;
++    buffer = &(cur->dev_spec->buffer);
++    block_size = cur->dev_spec->block_size;
++
++    assert((block_size > 0U) && (is_power_of_2(block_size) != 0U) &&
++           ((buffer->length % block_size) == 0U));
++
++    *dev_info = info; /* cast away const */
++    (void)block_size;
++    (void)buffer;
++    return 0;
++}
++
++static int block_dev_close(io_dev_info_t *dev_info) {
++    return free_dev_info(dev_info);
++}
++
++/* Exported functions */
++
++/* Register the Block driver with the IO abstraction */
++int register_io_dev_block(const io_dev_connector_t **dev_con) {
++    int result;
++
++    assert(dev_con != NULL);
++
++    /*
++     * Since dev_info isn't really used in io_register_device, always
++     * use the same device info at here instead.
++     */
++    result = io_register_device(&dev_info_pool[0]);
++    if (result == 0) *dev_con = &block_dev_connector;
++    return result;
++}
+diff --git a/platform/ext/target/arm/corstone1000/io/io_block.h b/platform/ext/target/arm/corstone1000/io/io_block.h
+new file mode 100644
+index 0000000000..1603aa74c5
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/io/io_block.h
+@@ -0,0 +1,40 @@
++/*
++ * Copyright (c) 2022 Arm Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Licensed under the Apache License, Version 2.0 (the License); you may
++ * not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an AS IS BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#ifndef __IO_BLOCK_H__
++#define __IO_BLOCK_H__
++
++#include "io_storage.h"
++
++/* block devices ops */
++typedef struct io_block_ops {
++    size_t (*read)(int lba, uintptr_t buf, size_t size);
++    size_t (*write)(int lba, const uintptr_t buf, size_t size);
++} io_block_ops_t;
++
++typedef struct io_block_dev_spec {
++    io_block_spec_t buffer;
++    io_block_ops_t ops;
++    size_t block_size;
++} io_block_dev_spec_t;
++
++struct io_dev_connector;
++
++int register_io_dev_block(const struct io_dev_connector **dev_con);
++
++#endif /* __IO_BLOCK_H__ */
+\ No newline at end of file
+diff --git a/platform/ext/target/arm/corstone1000/io/io_defs.h b/platform/ext/target/arm/corstone1000/io/io_defs.h
+new file mode 100644
+index 0000000000..acba969ed6
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/io/io_defs.h
+@@ -0,0 +1,27 @@
++/*
++ * Copyright (c) 2022 Arm Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Licensed under the Apache License, Version 2.0 (the License); you may
++ * not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an AS IS BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#ifndef __IO_DEFS_H__
++#define __IO_DEFS_H__
++
++#define MAX_IO_DEVICES          (2)
++#define MAX_IO_HANDLES          (2)
++#define MAX_IO_BLOCK_DEVICES    (2)
++#define MAX_IO_FLASH_DEVICES    (2)
++
++#endif /* __IO_DEFS_H__ */
+\ No newline at end of file
+diff --git a/platform/ext/target/arm/corstone1000/io/io_driver.h b/platform/ext/target/arm/corstone1000/io/io_driver.h
+new file mode 100644
+index 0000000000..cf9e21a6d4
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/io/io_driver.h
+@@ -0,0 +1,54 @@
++/*
++ * Copyright (c) 2014-2022, ARM Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef __IO_DRIVER_H__
++#define __IO_DRIVER_H__
++
++#include <io_storage.h>
++#include <stdint.h>
++
++/* Generic IO entity structure,representing an accessible IO construct on the
++ * device, such as a file */
++typedef struct io_entity {
++    struct io_dev_info *dev_handle;
++    uintptr_t info;
++} io_entity_t;
++
++/* Device info structure, providing device-specific functions and a means of
++ * adding driver-specific state */
++typedef struct io_dev_info {
++    const struct io_dev_funcs *funcs;
++    uintptr_t info;
++} io_dev_info_t;
++
++/* Structure used to create a connection to a type of device */
++typedef struct io_dev_connector {
++    /* dev_open opens a connection to a particular device driver */
++    int (*dev_open)(const uintptr_t dev_spec, io_dev_info_t **dev_info);
++} io_dev_connector_t;
++
++/* Structure to hold device driver function pointers */
++typedef struct io_dev_funcs {
++    io_type_t (*type)(void);
++    int (*open)(io_dev_info_t *dev_info, const uintptr_t spec,
++                io_entity_t *entity);
++    int (*seek)(io_entity_t *entity, int mode, size_t offset);
++    int (*size)(io_entity_t *entity, size_t *length);
++    int (*read)(io_entity_t *entity, uintptr_t buffer, size_t length,
++                size_t *length_read);
++    int (*write)(io_entity_t *entity, const uintptr_t buffer, size_t length,
++                 size_t *length_written);
++    int (*close)(io_entity_t *entity);
++    int (*dev_init)(io_dev_info_t *dev_info, const uintptr_t init_params);
++    int (*dev_close)(io_dev_info_t *dev_info);
++} io_dev_funcs_t;
++
++/* Operations intended to be performed during platform initialisation */
++
++/* Register an IO device */
++int io_register_device(const io_dev_info_t *dev_info);
++
++#endif /* __IO_DRIVER_H__ */
+diff --git a/platform/ext/target/arm/corstone1000/io/io_flash.c b/platform/ext/target/arm/corstone1000/io/io_flash.c
+new file mode 100644
+index 0000000000..ff4524e9c5
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/io/io_flash.c
+@@ -0,0 +1,183 @@
++/*
++ * Copyright (c) 2022 Arm Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Licensed under the Apache License, Version 2.0 (the License); you may
++ * not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an AS IS BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#include "io_flash.h"
++
++#include <assert.h>
++#include <errno.h>
++
++#include "Driver_Flash.h"
++#include "io_block.h"
++#include "io_defs.h"
++#include "io_driver.h"
++#include "io_storage.h"
++
++#if MAX_IO_FLASH_DEVICES > MAX_IO_BLOCK_DEVICES
++#error \
++    "FLASH devices are BLOCK devices .. MAX_IO_FLASH_DEVICES should be less or equal to MAX_IO_BLOCK_DEVICES"
++#endif
++
++/* Private Prototypes */
++
++static int flash_dev_open(const uintptr_t dev_spec, io_dev_info_t **dev_info);
++static size_t flash_read(int lba, uintptr_t buf, size_t size, size_t flash_id);
++static size_t flash_write(int lba, const uintptr_t buf, size_t size,
++                          size_t flash_id);
++static size_t flash0_read(int lba, uintptr_t buf, size_t size);
++static size_t flash0_write(int lba, uintptr_t buf, size_t size);
++static size_t flash1_read(int lba, uintptr_t buf, size_t size);
++static size_t flash1_write(int lba, uintptr_t buf, size_t size);
++
++/** Private Data **/
++
++/* Flash device data */
++static const io_dev_connector_t flash_dev_connector = {.dev_open =
++                                                           flash_dev_open};
++static size_t flash_dev_count = 0;
++static io_flash_dev_spec_t *flash_dev_specs[MAX_IO_FLASH_DEVICES];
++
++/* Block device data */
++static io_dev_connector_t block_dev_connectors[MAX_IO_FLASH_DEVICES];
++static io_block_dev_spec_t block_dev_spec[MAX_IO_FLASH_DEVICES];
++
++/* Flash devices read/write function pointers */
++static io_block_ops_t flashs_ops[MAX_IO_FLASH_DEVICES] = {
++    [0] = {.read = flash0_read, .write = flash0_write},
++    [1] = {.read = flash1_read, .write = flash1_write},
++};
++
++/* Flash ops functions */
++static size_t flash_read(int lba, uintptr_t buf, size_t size, size_t flash_id) {
++    ARM_DRIVER_FLASH *flash_driver =
++        ((ARM_DRIVER_FLASH *)flash_dev_specs[flash_id]->flash_driver);
++    ARM_FLASH_INFO *info = flash_driver->GetInfo();
++    uint32_t addr = info->sector_size * lba;
++    uint32_t offset = addr - flash_dev_specs[flash_id]->base_addr;
++    size_t rem = info->sector_count * info->sector_size - offset;
++    size_t cnt = size < rem ? size : rem;
++
++    return flash_driver->ReadData(offset, buf, cnt);
++}
++
++static size_t flash_write(int lba, const uintptr_t buf, size_t size,
++                          size_t flash_id) {
++    ARM_DRIVER_FLASH *flash_driver =
++        ((ARM_DRIVER_FLASH *)flash_dev_specs[flash_id]->flash_driver);
++    ARM_FLASH_INFO *info = flash_driver->GetInfo();
++    int32_t rc = 0;
++    uint32_t addr = info->sector_size * lba;
++    uint32_t offset = addr - flash_dev_specs[flash_id]->base_addr;
++    size_t rem = info->sector_count * info->sector_size - offset;
++    size_t cnt = size < rem ? size : rem;
++
++    flash_driver->EraseSector(offset);
++    rc = flash_driver->ProgramData(offset, buf, cnt);
++    return rc;
++}
++
++/* Flash ops functions wrapper for each device */
++
++static size_t flash0_read(int lba, uintptr_t buf, size_t size) {
++    return flash_read(lba, buf, size, 0);
++}
++
++static size_t flash0_write(int lba, uintptr_t buf, size_t size) {
++    return flash_write(lba, buf, size, 0);
++}
++
++static size_t flash1_read(int lba, uintptr_t buf, size_t size) {
++    return flash_read(lba, buf, size, 1);
++}
++
++static size_t flash1_write(int lba, uintptr_t buf, size_t size) {
++    return flash_write(lba, buf, size, 1);
++}
++
++/**
++ *  Helper function to find the index of stored flash_dev_specs or
++ *  return a free slot in case of a new dev_spec
++ */
++static int find_flash_dev_specs(const uintptr_t dev_spec) {
++    /* Search in the saved ones */
++    for (int i = 0; i < flash_dev_count; ++i) {
++        if (flash_dev_specs[i] != NULL &&
++            flash_dev_specs[i]->flash_driver ==
++                ((io_flash_dev_spec_t *)dev_spec)->flash_driver) {
++            return i;
++        }
++    }
++    /* Find the first empty flash_dev_specs to be used */
++    for (int i = 0; i < flash_dev_count; ++i) {
++        if (flash_dev_specs[i] == NULL) {
++            return i;
++        }
++    }
++    return -1;
++}
++
++/**
++ * This function should be called
++ */
++static int flash_dev_open(const uintptr_t dev_spec, io_dev_info_t **dev_info) {
++    ARM_DRIVER_FLASH *flash_driver;
++    assert(dev_info != NULL);
++    assert(dev_spec != NULL);
++
++    size_t index = find_flash_dev_specs(dev_spec);
++
++    /* Check if Flash ops functions are defined for this flash */
++    assert(flashs_ops[index].read && flashs_ops[index].write);
++
++    flash_dev_specs[index] = dev_spec;
++    flash_driver = flash_dev_specs[index]->flash_driver;
++
++    block_dev_spec[index].block_size = flash_driver->GetInfo()->sector_size;
++    block_dev_spec[index].buffer.offset = flash_dev_specs[index]->buffer;
++    block_dev_spec[index].buffer.length = flash_dev_specs[index]->bufferlen;
++    block_dev_spec[index].ops = flashs_ops[index];
++
++    flash_driver->Initialize(NULL);
++
++    block_dev_connectors[index].dev_open(&block_dev_spec[index], dev_info);
++
++    return 0;
++}
++
++/* Exported functions */
++
++/**
++ * Register the flash device.
++ * Internally it register a block device.
++ */
++int register_io_dev_flash(const io_dev_connector_t **dev_con) {
++    int result;
++
++    if (flash_dev_count >= MAX_IO_FLASH_DEVICES) {
++        return -ENOENT;
++    }
++    assert(dev_con != NULL);
++
++    result = register_io_dev_block(dev_con);
++    if (result == 0) {
++        /* Store the block dev connector */
++        block_dev_connectors[flash_dev_count++] = **dev_con;
++        /* Override dev_con with the flash dev connector */
++        *dev_con = &flash_dev_connector;
++    }
++    return result;
++}
+diff --git a/platform/ext/target/arm/corstone1000/io/io_flash.h b/platform/ext/target/arm/corstone1000/io/io_flash.h
+new file mode 100644
+index 0000000000..8bc38b5824
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/io/io_flash.h
+@@ -0,0 +1,37 @@
++/*
++ * Copyright (c) 2022 Arm Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Licensed under the Apache License, Version 2.0 (the License); you may
++ * not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an AS IS BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#ifndef __IO_FLASH_H__
++#define __IO_FLASH_H__
++
++#include "io_storage.h"
++
++typedef struct io_flash_dev_spec {
++    uintptr_t buffer;
++    size_t bufferlen;
++    uint32_t base_addr;
++    uintptr_t flash_driver;
++} io_flash_dev_spec_t;
++
++struct io_dev_connector;
++
++/* Register the flash driver with the IO abstraction internally it register a
++ * block device*/
++int register_io_dev_flash(const struct io_dev_connector **dev_con);
++
++#endif /* __IO_FLASH_H__ */
+diff --git a/platform/ext/target/arm/corstone1000/io/io_storage.c b/platform/ext/target/arm/corstone1000/io/io_storage.c
+new file mode 100644
+index 0000000000..f26f4980f0
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/io/io_storage.c
+@@ -0,0 +1,289 @@
++/*
++ * Copyright (c) 2022 Arm Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Licensed under the Apache License, Version 2.0 (the License); you may
++ * not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an AS IS BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#include <assert.h>
++#include <errno.h>
++#include <stdbool.h>
++
++#include "io_defs.h"
++#include "io_driver.h"
++
++/* Storage for a fixed maximum number of IO entities, definable by platform */
++static io_entity_t entity_pool[MAX_IO_HANDLES];
++
++/* Simple way of tracking used storage - each entry is NULL or a pointer to an
++ * entity */
++static io_entity_t *entity_map[MAX_IO_HANDLES];
++
++/* Track number of allocated entities */
++static unsigned int entity_count;
++
++/* Array of fixed maximum of registered devices, definable by platform */
++static const io_dev_info_t *devices[MAX_IO_DEVICES];
++
++/* Number of currently registered devices */
++static unsigned int dev_count;
++
++/* Return a boolean value indicating whether a device connector is valid */
++static bool is_valid_dev_connector(const io_dev_connector_t *dev_con) {
++    return (dev_con != NULL) && (dev_con->dev_open != NULL);
++}
++
++/* Return a boolean value indicating whether a device handle is valid */
++static bool is_valid_dev(const uintptr_t dev_handle) {
++    const io_dev_info_t *dev = (io_dev_info_t *)dev_handle;
++
++    return (dev != NULL) && (dev->funcs != NULL) &&
++           (dev->funcs->type != NULL) && (dev->funcs->type() < IO_TYPE_MAX);
++}
++
++/* Return a boolean value indicating whether an IO entity is valid */
++static bool is_valid_entity(const uintptr_t handle) {
++    const io_entity_t *entity = (io_entity_t *)handle;
++
++    return (entity != NULL) && (is_valid_dev((uintptr_t)entity->dev_handle));
++}
++
++/* Return a boolean value indicating whether a seek mode is valid */
++static bool is_valid_seek_mode(io_seek_mode_t mode) {
++    return ((mode != IO_SEEK_INVALID) && (mode < IO_SEEK_MAX));
++}
++
++/* Open a connection to a specific device */
++static int io_storage_dev_open(const io_dev_connector_t *dev_con,
++                               const uintptr_t dev_spec,
++                               io_dev_info_t **dev_info) {
++    assert(dev_info != NULL);
++    assert(is_valid_dev_connector(dev_con));
++
++    return dev_con->dev_open(dev_spec, dev_info);
++}
++
++/* Set a handle to track an entity */
++static void set_handle(uintptr_t *handle, io_entity_t *entity) {
++    assert(handle != NULL);
++    *handle = (uintptr_t)entity;
++}
++
++/* Locate an entity in the pool, specified by address */
++static int find_first_entity(const io_entity_t *entity,
++                             unsigned int *index_out) {
++    int result = -ENOENT;
++    for (unsigned int index = 0; index < MAX_IO_HANDLES; ++index) {
++        if (entity_map[index] == entity) {
++            result = 0;
++            *index_out = index;
++            break;
++        }
++    }
++    return result;
++}
++
++/* Allocate an entity from the pool and return a pointer to it */
++static int allocate_entity(io_entity_t **entity) {
++    int result = -ENOMEM;
++    assert(entity != NULL);
++
++    if (entity_count < MAX_IO_HANDLES) {
++        unsigned int index = 0;
++        result = find_first_entity(NULL, &index);
++        assert(result == 0);
++        *entity = &entity_pool[index];
++        entity_map[index] = &entity_pool[index];
++        ++entity_count;
++    }
++
++    return result;
++}
++
++/* Release an entity back to the pool */
++static int free_entity(const io_entity_t *entity) {
++    int result;
++    unsigned int index = 0;
++    assert(entity != NULL);
++
++    result = find_first_entity(entity, &index);
++    if (result == 0) {
++        entity_map[index] = NULL;
++        --entity_count;
++    }
++
++    return result;
++}
++
++/* Exported API */
++
++/* Register an io device */
++int io_register_device(const io_dev_info_t *dev_info) {
++    int result = -ENOMEM;
++    assert(dev_info != NULL);
++
++    if (dev_count < MAX_IO_DEVICES) {
++        devices[dev_count] = dev_info;
++        dev_count++;
++        result = 0;
++    }
++
++    return result;
++}
++
++/* Open a connection to an IO device */
++int io_dev_open(const io_dev_connector_t *dev_con, const uintptr_t dev_spec,
++                uintptr_t *handle) {
++    assert(handle != NULL);
++    return io_storage_dev_open(dev_con, dev_spec, (io_dev_info_t **)handle);
++}
++
++/* Initialise an IO device explicitly - to permit lazy initialisation or
++ * re-initialisation */
++int io_dev_init(uintptr_t dev_handle, const uintptr_t init_params) {
++    int result = 0;
++    assert(dev_handle != (uintptr_t)NULL);
++    assert(is_valid_dev(dev_handle));
++
++    io_dev_info_t *dev = (io_dev_info_t *)dev_handle;
++
++    /* Absence of registered function implies NOP here */
++    if (dev->funcs->dev_init != NULL) {
++        result = dev->funcs->dev_init(dev, init_params);
++    }
++
++    return result;
++}
++
++/* Close a connection to a device */
++int io_dev_close(uintptr_t dev_handle) {
++    int result = 0;
++    assert(dev_handle != (uintptr_t)NULL);
++    assert(is_valid_dev(dev_handle));
++
++    io_dev_info_t *dev = (io_dev_info_t *)dev_handle;
++
++    /* Absence of registered function implies NOP here */
++    if (dev->funcs->dev_close != NULL) {
++        result = dev->funcs->dev_close(dev);
++    }
++
++    return result;
++}
++
++/* Synchronous operations */
++
++/* Open an IO entity */
++int io_open(uintptr_t dev_handle, const uintptr_t spec, uintptr_t *handle) {
++    int result;
++    assert((spec != (uintptr_t)NULL) && (handle != NULL));
++    assert(is_valid_dev(dev_handle));
++
++    io_dev_info_t *dev = (io_dev_info_t *)dev_handle;
++    io_entity_t *entity;
++
++    result = allocate_entity(&entity);
++
++    if (result == 0) {
++        assert(dev->funcs->open != NULL);
++        result = dev->funcs->open(dev, spec, entity);
++
++        if (result == 0) {
++            entity->dev_handle = dev;
++            set_handle(handle, entity);
++        } else
++            free_entity(entity);
++    }
++    return result;
++}
++
++/* Seek to a specific position in an IO entity */
++int io_seek(uintptr_t handle, io_seek_mode_t mode, int32_t offset) {
++    int result = -ENODEV;
++    assert(is_valid_entity(handle) && is_valid_seek_mode(mode));
++
++    io_entity_t *entity = (io_entity_t *)handle;
++
++    io_dev_info_t *dev = entity->dev_handle;
++
++    if (dev->funcs->seek != NULL)
++        result = dev->funcs->seek(entity, mode, offset);
++
++    return result;
++}
++
++/* Determine the length of an IO entity */
++int io_size(uintptr_t handle, size_t *length) {
++    int result = -ENODEV;
++    assert(is_valid_entity(handle) && (length != NULL));
++
++    io_entity_t *entity = (io_entity_t *)handle;
++
++    io_dev_info_t *dev = entity->dev_handle;
++
++    if (dev->funcs->size != NULL) result = dev->funcs->size(entity, length);
++
++    return result;
++}
++
++/* Read data from an IO entity */
++int io_read(uintptr_t handle, uintptr_t buffer, size_t length,
++            size_t *length_read) {
++    int result = -ENODEV;
++    assert(is_valid_entity(handle));
++
++    io_entity_t *entity = (io_entity_t *)handle;
++
++    io_dev_info_t *dev = entity->dev_handle;
++
++    if (dev->funcs->read != NULL)
++        result = dev->funcs->read(entity, buffer, length, length_read);
++
++    return result;
++}
++
++/* Write data to an IO entity */
++int io_write(uintptr_t handle, const uintptr_t buffer, size_t length,
++             size_t *length_written) {
++    int result = -ENODEV;
++    assert(is_valid_entity(handle));
++
++    io_entity_t *entity = (io_entity_t *)handle;
++
++    io_dev_info_t *dev = entity->dev_handle;
++
++    if (dev->funcs->write != NULL) {
++        result = dev->funcs->write(entity, buffer, length, length_written);
++    }
++
++    return result;
++}
++
++/* Close an IO entity */
++int io_close(uintptr_t handle) {
++    int result = 0;
++    assert(is_valid_entity(handle));
++
++    io_entity_t *entity = (io_entity_t *)handle;
++
++    io_dev_info_t *dev = entity->dev_handle;
++
++    /* Absence of registered function implies NOP here */
++    if (dev->funcs->close != NULL) result = dev->funcs->close(entity);
++
++    /* Ignore improbable free_entity failure */
++    (void)free_entity(entity);
++
++    return result;
++}
+diff --git a/platform/ext/target/arm/corstone1000/io/io_storage.h b/platform/ext/target/arm/corstone1000/io/io_storage.h
+new file mode 100644
+index 0000000000..0cdca5b269
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/io/io_storage.h
+@@ -0,0 +1,92 @@
++/*
++ * Copyright (c) 2022 Arm Limited. All rights reserved.
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Licensed under the Apache License, Version 2.0 (the License); you may
++ * not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an AS IS BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#ifndef __IO_STORAGE_H__
++#define __IO_STORAGE_H__
++
++#include <stddef.h>
++#include <stdint.h>
++
++/* Access modes used when accessing data on a device */
++#define IO_MODE_INVALID (0)
++#define IO_MODE_RO (1 << 0)
++#define IO_MODE_RW (1 << 1)
++
++/* Device type which can be used to enable policy decisions about which device
++ * to access */
++typedef enum {
++    IO_TYPE_INVALID,
++    IO_TYPE_SEMIHOSTING,
++    IO_TYPE_MEMMAP,
++    IO_TYPE_DUMMY,
++    IO_TYPE_FIRMWARE_IMAGE_PACKAGE,
++    IO_TYPE_BLOCK,
++    IO_TYPE_MTD,
++    IO_TYPE_MMC,
++    IO_TYPE_STM32IMAGE,
++    IO_TYPE_ENCRYPTED,
++    IO_TYPE_MAX
++} io_type_t;
++
++/* Modes used when seeking data on a supported device */
++typedef enum {
++    IO_SEEK_INVALID,
++    IO_SEEK_SET,
++    IO_SEEK_END,
++    IO_SEEK_CUR,
++    IO_SEEK_MAX
++} io_seek_mode_t;
++
++/* Connector type, providing a means of identifying a device to open */
++struct io_dev_connector;
++
++/* Block specification - used to refer to data on a device supporting
++ * block-like entities */
++typedef struct io_block_spec {
++    size_t offset;
++    size_t length;
++} io_block_spec_t;
++
++
++/* Open a connection to a device */
++int io_dev_open(const struct io_dev_connector *dev_con,
++                const uintptr_t dev_spec, uintptr_t *handle);
++
++/* Initialise a device explicitly - to permit lazy initialisation or
++ * re-initialisation */
++int io_dev_init(uintptr_t dev_handle, const uintptr_t init_params);
++
++/* Close a connection to a device */
++int io_dev_close(uintptr_t dev_handle);
++
++/* Synchronous operations */
++int io_open(uintptr_t dev_handle, const uintptr_t spec, uintptr_t *handle);
++
++int io_seek(uintptr_t handle, io_seek_mode_t mode, int32_t offset);
++
++int io_size(uintptr_t handle, size_t *length);
++
++int io_read(uintptr_t handle, uintptr_t buffer, size_t length,
++            size_t *length_read);
++
++int io_write(uintptr_t handle, const uintptr_t buffer, size_t length,
++             size_t *length_written);
++
++int io_close(uintptr_t handle);
++
++#endif /* __IO_STORAGE_H__ */
+-- 
+2.25.1
+

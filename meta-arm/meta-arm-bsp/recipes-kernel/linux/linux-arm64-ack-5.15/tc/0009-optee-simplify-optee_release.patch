@@ -11,7 +11,7 @@ A separate optee_release_supp() is added for the supplicant device.
 
 Reviewed-by: Sumit Garg <sumit.garg@linaro.org>
 Signed-off-by: Jens Wiklander <jens.wiklander@linaro.org>
-Upstream-Status: Pending [Not submitted to upstream yet]
+Upstream-Status: Backport [c0ab6db39a908d86ed44e8a5632548e2ec1b4dca]
 Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com>
 ---
  drivers/tee/optee/call.c          | 31 ++++++++++-------

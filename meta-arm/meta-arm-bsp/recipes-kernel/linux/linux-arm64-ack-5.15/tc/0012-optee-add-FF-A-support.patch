@@ -16,7 +16,7 @@ enabled.
 [1] https://developer.arm.com/documentation/den0077/latest
 Acked-by: Sumit Garg <sumit.garg@linaro.org>
 Signed-off-by: Jens Wiklander <jens.wiklander@linaro.org>
-Upstream-Status: Pending [Not submitted to upstream yet]
+Upstream-Status: Backport [4615e5a34b95e0d81467f6d2176f19a5d184cb5d]
 Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com>
 ---
  drivers/tee/optee/Makefile        |   1 +

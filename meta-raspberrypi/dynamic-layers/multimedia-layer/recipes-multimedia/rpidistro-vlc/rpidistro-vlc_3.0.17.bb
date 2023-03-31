@@ -14,6 +14,7 @@ SRC_URI = "\
     file://0005-mmal_exit_fix.patch \
     file://0006-mmal_chain.patch \
     file://0007-armv6.patch \
+    file://0008-configure-Disable-incompatible-function-pointer-type.patch \
     file://2001-fix-luaL-checkint.patch \
     file://2002-use-vorbisidec.patch \
     file://3001-configure.ac-setup-for-OE-usage.patch \

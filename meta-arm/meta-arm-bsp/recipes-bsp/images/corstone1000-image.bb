@@ -6,16 +6,16 @@ LICENSE = "MIT"
 COMPATIBLE_MACHINE = "corstone1000"
 
 inherit image
-inherit wic_nopt tfm_sign_image
+inherit tfm_sign_image
 inherit  uefi_capsule
 
 PACKAGE_INSTALL = ""
 
-IMAGE_FSTYPES += "wic wic.nopt uefi_capsule"
+IMAGE_FSTYPES += "wic uefi_capsule"
 
 UEFI_FIRMWARE_BINARY = "${PN}-${MACHINE}.${CAPSULE_IMGTYPE}"
 UEFI_CAPSULE_CONFIG = "${THISDIR}/files/${PN}-capsule-update-image.json"
-CAPSULE_IMGTYPE = "wic.nopt"
+CAPSULE_IMGTYPE = "wic"
 
 do_sign_images() {
     # Sign TF-A BL2

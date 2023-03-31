@@ -7,6 +7,10 @@ COMPATIBLE_MACHINE:qemuarm64 = "qemuarm64"
 EDK2_PLATFORM:qemuarm64      = "ArmVirtQemu-AARCH64"
 EDK2_PLATFORM_DSC:qemuarm64  = "ArmVirtPkg/ArmVirtQemu.dsc"
 EDK2_BIN_NAME:qemuarm64      = "QEMU_EFI.fd"
+SRC_URI:append:qemuarm64 = " \
+    file://0001-Revert-ArmVirtPkg-QemuVirtMemInfoLib-use-HOB-not-PCD.patch \
+    file://0002-Revert-ArmVirtPkg-ArmVirtQemu-omit-PCD-PEIM-unless-T.patch \
+   "
 
 COMPATIBLE_MACHINE:qemuarm = "qemuarm"
 EDK2_PLATFORM:qemuarm      = "ArmVirtQemu-ARM"

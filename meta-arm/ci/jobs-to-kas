@@ -18,7 +18,7 @@ for i in $(echo $1 | cut -s -d ':' -f 2 | sed 's/[][,]//g'); do
 	# defaults, we can simply ignore those parameters.  They are necessary
 	# to pass in so that matrix can correctly setup all of the permutations
 	# of each individual run.
-	if [[ $i == 'none' || $i == 'gcc' || $i == 'glibc' || $i == 'uboot' ]]; then
+	if [[ $i == 'none' ]]; then
 		continue
 	fi
 	FILES+=":ci/$i.yml"

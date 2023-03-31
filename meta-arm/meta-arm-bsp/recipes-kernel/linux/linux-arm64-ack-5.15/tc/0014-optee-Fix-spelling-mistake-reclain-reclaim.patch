@@ -10,7 +10,7 @@ Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 Reviewed-by: Sumit Garg <sumit.garg@linaro.org>
 [jw: added a fixes]
 Signed-off-by: Jens Wiklander <jens.wiklander@linaro.org>
-Upstream-Status: Pending [Not submitted to upstream yet]
+Upstream-Status: Backport [1b73a9e4986a4e9065bacf1e5ab2dfda17b54161]
 Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com
 ---
  drivers/tee/optee/ffa_abi.c | 4 ++--

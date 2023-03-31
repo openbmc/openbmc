@@ -1,0 +1,8 @@
+header:
+  version: 11
+
+local_conf_header:
+  bootfirmware: |
+    PREFERRED_PROVIDER_virtual/bootloader = "u-boot"
+    TFA_UBOOT = "1"
+    TFA_UEFI = "0"

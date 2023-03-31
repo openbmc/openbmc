@@ -1,0 +1,6 @@
+header:
+  version: 9
+
+local_conf_header:
+  kernel: |
+    PREFERRED_PROVIDER_virtual/kernel = "linux-yocto-dev"

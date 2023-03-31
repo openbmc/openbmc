@@ -1,0 +1,337 @@
+From f70bbd0d8efefcc69916fc0393bc413fb39924af Mon Sep 17 00:00:00 2001
+From: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Date: Tue, 10 Jan 2023 22:33:26 +0000
+Subject: [PATCH 8/10] Platform: corstone1000: BL1 changes to adapt to new flash
+ layout
+
+The commit prepares BL1 to adapt to new GPT-based flash layout.
+
+BL1 does not incorporate a GPT parser and still uses a static
+configuration to understand the flash.
+
+The flash_layout.h is also modified/marked in a way to start
+the process of its simplification.
+
+Signed-off-by: Satish Kumar <satish.kumar01@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ .../arm/corstone1000/bl1/bl1_boot_hal.c       | 10 +--
+ .../arm/corstone1000/bl1/bl1_flash_map.c      | 17 ++--
+ .../target/arm/corstone1000/bl2_flash_map.c   |  8 +-
+ .../corstone1000/fw_update_agent/fwu_agent.c  | 16 ++--
+ .../corstone1000/fw_update_agent/fwu_agent.h  |  4 +-
+ .../arm/corstone1000/partition/flash_layout.h | 84 +++++++++----------
+ 6 files changed, 66 insertions(+), 73 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/bl1/bl1_boot_hal.c b/platform/ext/target/arm/corstone1000/bl1/bl1_boot_hal.c
+index 9caa26b26c..a5fe0f7da1 100644
+--- a/platform/ext/target/arm/corstone1000/bl1/bl1_boot_hal.c
++++ b/platform/ext/target/arm/corstone1000/bl1/bl1_boot_hal.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2019-2022, Arm Limited. All rights reserved.
++ * Copyright (c) 2019-2023, Arm Limited. All rights reserved.
+  *
+  * SPDX-License-Identifier: BSD-3-Clause
+  *
+@@ -601,12 +601,12 @@ __attribute__((naked)) void boot_clear_bl2_ram_area(void)
+     );
+ }
+ 
+-extern void add_bank_offset_to_image_offset(uint32_t bank_offset);
++extern void set_flash_area_image_offset(uint32_t offset);
+ 
+ int32_t boot_platform_init(void)
+ {
+     int32_t result;
+-    uint32_t bank_offset;
++    uint32_t image_offset;
+ 
+     result = corstone1000_watchdog_init();
+     if (result != ARM_DRIVER_OK) {
+@@ -653,8 +653,8 @@ int32_t boot_platform_init(void)
+         }
+     }
+ 
+-    bl1_get_boot_bank(&bank_offset);
+-    add_bank_offset_to_image_offset(bank_offset);
++    bl1_get_active_bl2_image(&image_offset);
++    set_flash_area_image_offset(image_offset);
+ 
+     return 0;
+ }
+diff --git a/platform/ext/target/arm/corstone1000/bl1/bl1_flash_map.c b/platform/ext/target/arm/corstone1000/bl1/bl1_flash_map.c
+index c8a1f13319..0e615da254 100644
+--- a/platform/ext/target/arm/corstone1000/bl1/bl1_flash_map.c
++++ b/platform/ext/target/arm/corstone1000/bl1/bl1_flash_map.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2019-2021, Arm Limited. All rights reserved.
++ * Copyright (c) 2019-2021, 2023 Arm Limited. All rights reserved.
+  *
+  * SPDX-License-Identifier: BSD-3-Clause
+  *
+@@ -22,23 +22,22 @@ struct flash_area flash_map[] = {
+         .fa_id = FLASH_AREA_8_ID,
+         .fa_device_id = FLASH_DEVICE_ID,
+         .fa_driver = &FLASH_DEV_NAME,
+-        .fa_off = FLASH_AREA_8_OFFSET,
++        .fa_off = FLASH_INVALID_OFFSET,
+         .fa_size = FLASH_AREA_8_SIZE,
+     },
++    /* Secondary slot is not supported */
+     {
+-        .fa_id = FLASH_AREA_9_ID,
++        .fa_id = FLASH_INVALID_ID,
+         .fa_device_id = FLASH_DEVICE_ID,
+         .fa_driver = &FLASH_DEV_NAME,
+-        .fa_off = FLASH_AREA_9_OFFSET,
+-        .fa_size = FLASH_AREA_9_SIZE,
++        .fa_off = FLASH_INVALID_OFFSET,
++        .fa_size = FLASH_INVALID_SIZE,
+     },
+ };
+ 
+ const int flash_map_entry_num = ARRAY_SIZE(flash_map);
+ 
+-void add_bank_offset_to_image_offset(uint32_t bank_offset)
++void set_flash_area_image_offset(uint32_t offset)
+ {
+-    for (int i = 0; i < flash_map_entry_num; i++) {
+-        flash_map[i].fa_off += bank_offset;
+-    }
++    flash_map[0].fa_off = offset;
+ }
+diff --git a/platform/ext/target/arm/corstone1000/bl2_flash_map.c b/platform/ext/target/arm/corstone1000/bl2_flash_map.c
+index 0a6a592d94..f512045a44 100644
+--- a/platform/ext/target/arm/corstone1000/bl2_flash_map.c
++++ b/platform/ext/target/arm/corstone1000/bl2_flash_map.c
+@@ -28,15 +28,15 @@ struct flash_area flash_map[] = {
+         .fa_id = FLASH_AREA_0_ID,
+         .fa_device_id = FLASH_DEVICE_ID,
+         .fa_driver = &FLASH_DEV_NAME,
+-        .fa_off = FLASH_AREA_0_OFFSET,
+-        .fa_size = FLASH_AREA_0_SIZE,
++        .fa_off = FLASH_INVALID_OFFSET,
++        .fa_size = FLASH_INVALID_SIZE,
+     },
+     {
+         .fa_id = FLASH_AREA_1_ID,
+         .fa_device_id = FLASH_DEVICE_ID,
+         .fa_driver = &FLASH_DEV_NAME,
+-        .fa_off = FLASH_AREA_1_OFFSET,
+-        .fa_size = FLASH_AREA_1_SIZE,
++        .fa_off = FLASH_INVALID_OFFSET,
++        .fa_size = FLASH_INVALID_SIZE,
+     },
+ #ifndef TFM_S_REG_TEST
+     {
+diff --git a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+index eb17c3a377..e4f9da1ec3 100644
+--- a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
++++ b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+@@ -154,7 +154,7 @@ static enum fwu_agent_error_t private_metadata_read(
+         return FWU_AGENT_ERROR;
+     }
+ 
+-    ret = FWU_METADATA_FLASH_DEV.ReadData(FWU_PRIVATE_AREA_OFFSET, p_metadata,
++    ret = FWU_METADATA_FLASH_DEV.ReadData(FWU_PRIVATE_METADATA_REPLICA_1_OFFSET, p_metadata,
+                                           sizeof(struct fwu_private_metadata));
+     if (ret < 0 || ret != sizeof(struct fwu_private_metadata)) {
+         return FWU_AGENT_ERROR;
+@@ -178,12 +178,12 @@ static enum fwu_agent_error_t private_metadata_write(
+         return FWU_AGENT_ERROR;
+     }
+ 
+-    ret = FWU_METADATA_FLASH_DEV.EraseSector(FWU_PRIVATE_AREA_OFFSET);
++    ret = FWU_METADATA_FLASH_DEV.EraseSector(FWU_PRIVATE_METADATA_REPLICA_1_OFFSET);
+     if (ret != ARM_DRIVER_OK) {
+         return FWU_AGENT_ERROR;
+     }
+ 
+-    ret = FWU_METADATA_FLASH_DEV.ProgramData(FWU_PRIVATE_AREA_OFFSET,
++    ret = FWU_METADATA_FLASH_DEV.ProgramData(FWU_PRIVATE_METADATA_REPLICA_1_OFFSET,
+                                 p_metadata, sizeof(struct fwu_private_metadata));
+     if (ret < 0 || ret != sizeof(struct fwu_private_metadata)) {
+         return FWU_AGENT_ERROR;
+@@ -769,7 +769,7 @@ static enum fwu_agent_error_t fwu_select_previous(
+ 
+ }
+ 
+-void bl1_get_boot_bank(uint32_t *bank_offset)
++void bl1_get_active_bl2_image(uint32_t *offset)
+ {
+     struct fwu_private_metadata priv_metadata;
+     enum fwu_agent_state_t current_state;
+@@ -823,15 +823,15 @@ void bl1_get_boot_bank(uint32_t *bank_offset)
+     }
+ 
+     if (boot_index == BANK_0) {
+-        *bank_offset = BANK_0_PARTITION_OFFSET;
++        *offset = SE_BL2_BANK_0_OFFSET;
+     } else if (boot_index == BANK_1) {
+-        *bank_offset = BANK_1_PARTITION_OFFSET;
++        *offset = SE_BL2_BANK_1_OFFSET;
+     } else {
+         FWU_ASSERT(0);
+     }
+ 
+-    FWU_LOG_MSG("%s: exit: booting from bank = %u, offset = %x\n\r", __func__,
+-                        boot_index, *bank_offset);
++    FWU_LOG_MSG("%s: exit: booting from bank = %u, offset = 0x%x\n\r", __func__,
++                        boot_index, *offset);
+ 
+     return;
+ }
+diff --git a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.h b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.h
+index 00a08354be..eb8320ed8a 100644
+--- a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.h
++++ b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.h
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2021, Arm Limited. All rights reserved.
++ * Copyright (c) 2021-2023, Arm Limited. All rights reserved.
+  *
+  * SPDX-License-Identifier: BSD-3-Clause
+  *
+@@ -44,7 +44,7 @@ enum fwu_agent_error_t corstone1000_fwu_flash_image(void);
+  */
+ enum fwu_agent_error_t corstone1000_fwu_host_ack(void);
+ 
+-void bl1_get_boot_bank(uint32_t *bank_offset);
++void bl1_get_active_bl2_image(uint32_t *bank_offset);
+ void bl2_get_boot_bank(uint32_t *bank_offset);
+ 
+ /* When in trial state, start the timer for host to respond.
+diff --git a/platform/ext/target/arm/corstone1000/partition/flash_layout.h b/platform/ext/target/arm/corstone1000/partition/flash_layout.h
+index 5970a13c12..347c91acbb 100644
+--- a/platform/ext/target/arm/corstone1000/partition/flash_layout.h
++++ b/platform/ext/target/arm/corstone1000/partition/flash_layout.h
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2017-2022 Arm Limited. All rights reserved.
++ * Copyright (c) 2017-2023 Arm Limited. All rights reserved.
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+@@ -98,56 +98,56 @@
+ 
+ #endif
+ 
+-/* Flash layout (32MB) :-
+- *
+- * 1 MB     : FWU_METADATA_PARTITION_SIZE
+- * 15.5 MB  : BANK 1 PARTITION SIZE
+- * 15.5 MB  : BANK 2 PARTITION SIZE
+- *
+- */
+-#define FWU_METADATA_PARTITION_SIZE     (0x100000)   /* 1MB */
+-#define BANK_PARTITION_SIZE             (0xF80000)   /* 15.5 MB */
++/* Static Configurations of the Flash */
++#define SE_BL2_PARTITION_SIZE           (0x18800)    /* 98 KB */
++#define SE_BL2_BANK_0_OFFSET            (0x9000)  /* 72nd LBA */
++#define SE_BL2_BANK_1_OFFSET            (0x1002000)  /* 32784th LBA */
+ 
+-#define FLASH_BASE_OFFSET               (0x0)
++/* Space in flash to store metadata and uefi variables */
++#define FWU_METADATA_FLASH_DEV          (FLASH_DEV_NAME)
++#define FWU_METADATA_FLASH_SECTOR_SIZE  (FLASH_SECTOR_SIZE)
+ 
+-/* BANK layout (15MB: BANK_PARTITION_SIZE) :-
+- *
+- * 200 KB    : SE_BL2_PARTITION_SIZE + SE_BL2_PARTITION_SIZE
+- * 752 KB    : TFM_PARTITION_SIZE + TFM_PARTITION_SIZE
+- * 2 MB      : FIP_PARTITION_SIZE
+- * 12+ MB    : KERNEL_PARTITION_SIZE
+- *
+- */
+-#define SE_BL2_PARTITION_SIZE           (0x19000)    /* 100 KB */
+-#define TFM_PARTITION_SIZE              (0x5E000)    /* 376 KB */
+-#define FIP_PARTITION_SIZE              (0x200000)   /* 2 MB */
+-#define KERNEL_PARTITION_SIZE           (0xC00000)   /* 12 MB */
++#define FWU_METADATA_REPLICA_1_OFFSET   (0x5000)  /* 40th LBA */
++#define FWU_METADATA_REPLICA_2_OFFSET   (FWU_METADATA_REPLICA_1_OFFSET + \
++                                         FWU_METADATA_FLASH_SECTOR_SIZE)
+ 
++#define FWU_PRIVATE_METADATA_REPLICA_1_OFFSET   (FWU_METADATA_REPLICA_2_OFFSET + \
++                                                 FWU_METADATA_FLASH_SECTOR_SIZE)
++#define FWU_PRIVATE_METADATA_REPLICA_2_OFFSET   (FWU_PRIVATE_METADATA_REPLICA_1_OFFSET + \
++                                                 FWU_METADATA_FLASH_SECTOR_SIZE)
+ 
++#define BANK_0_PARTITION_OFFSET         (SE_BL2_BANK_0_OFFSET + \
++                                         SE_BL2_PARTITION_SIZE)
++#define BANK_1_PARTITION_OFFSET         (SE_BL2_BANK_1_OFFSET + \
++                                         SE_BL2_PARTITION_SIZE)
+ 
++/* BL1: mcuboot flashmap configurations */
++#define FLASH_AREA_8_ID                 (1)
++#define FLASH_AREA_8_SIZE               (SE_BL2_PARTITION_SIZE)
+ 
+-/* 1MB: space in flash to store metadata and uefi variables */
+-#define FWU_METADATA_FLASH_DEV          (FLASH_DEV_NAME)
+-#define FWU_METADATA_FLASH_SECTOR_SIZE  (FLASH_SECTOR_SIZE)
++#define FLASH_INVALID_ID                (0xFF)
++#define FLASH_INVALID_OFFSET            (0xFFFFFFFF)
++#define FLASH_INVALID_SIZE              (0xFFFFFFFF)
+ 
+-#define FWU_METADATA_PARTITION_OFFSET   (FLASH_BASE_OFFSET)
+-#define FWU_METADATA_AREA_SIZE          (FWU_METADATA_FLASH_SECTOR_SIZE)
+-#define FWU_METADATA_REPLICA_1_OFFSET   (FLASH_BASE_OFFSET)
+-#define FWU_METADATA_REPLICA_2_OFFSET   (FWU_METADATA_REPLICA_1_OFFSET + \
+-                                         FWU_METADATA_AREA_SIZE)
+-#define FWU_PRIVATE_AREA_SIZE           (FLASH_SECTOR_SIZE)
+-#define FWU_PRIVATE_AREA_OFFSET         (FWU_METADATA_REPLICA_2_OFFSET + \
+-                                         FWU_METADATA_AREA_SIZE)
++#define BL1_FLASH_AREA_IMAGE_PRIMARY(x)     (((x) == 0) ? FLASH_AREA_8_ID : \
++                                                          255 )
++#define BL1_FLASH_AREA_IMAGE_SECONDARY(x)   (((x) == 0) ? FLASH_INVALID_ID : \
++                                                          255 )
++
++#define BL1_FLASH_AREA_IMAGE_SCRATCH        255
+ 
++/* FWU Configurations */
+ #define NR_OF_FW_BANKS                  (2)
+ #define NR_OF_IMAGES_IN_FW_BANK         (4) /* Secure Enclave: BL2 and TF-M \
+                                              * Host: FIP and Kernel image
+                                              */
+ 
+-#define BANK_0_PARTITION_OFFSET         (FWU_METADATA_PARTITION_OFFSET + \
+-                                         FWU_METADATA_PARTITION_SIZE)
+-#define BANK_1_PARTITION_OFFSET         (BANK_0_PARTITION_OFFSET + \
+-                                         BANK_PARTITION_SIZE)
++/****** TODO: START : NEED SIMPLIFICATION BASED ON GPT *******************/
++/* Bank configurations */
++#define BANK_PARTITION_SIZE             (0xFE0000)   /* 15.875 MB */
++#define TFM_PARTITION_SIZE              (0x5E000)    /* 376 KB */
++#define FIP_PARTITION_SIZE              (0x200000)   /* 2 MB */
++#define KERNEL_PARTITION_SIZE           (0xC00000)   /* 12 MB */
+ 
+ /************************************************************/
+ /* Bank : Images flash offsets are with respect to the bank */
+@@ -170,13 +170,6 @@
+ #define BL2_IMAGE_OFFSET                (0x0)
+ #define BL2_IMAGE_MAX_SIZE              (SE_BL2_PARTITION_SIZE)
+ 
+-#define BL1_FLASH_AREA_IMAGE_PRIMARY(x)     (((x) == 0) ? FLASH_AREA_8_ID : \
+-                                                          255 )
+-#define BL1_FLASH_AREA_IMAGE_SECONDARY(x)   (((x) == 0) ? FLASH_AREA_9_ID : \
+-                                                          255 )
+-
+-#define BL1_FLASH_AREA_IMAGE_SCRATCH        255
+-
+ /* Image 1: TF-M primary and secondary images */
+ #define FLASH_AREA_0_ID                 (1)
+ #define FLASH_AREA_0_OFFSET             (FLASH_AREA_9_OFFSET + \
+@@ -229,6 +222,7 @@
+ #define FWU_METADATA_IMAGE_3_OFFSET     (KERNEL_PARTITION_OFFSET)
+ #define FWU_METADATA_IMAGE_3_SIZE_LIMIT (KERNEL_PARTITION_SIZE)
+ 
++/****** TODO: END : NEED SIMPLIFICATION BASED ON GPT *******************/
+ 
+ /*******************************/
+ /*** ITS, PS and NV Counters ***/
+-- 
+2.25.1
+

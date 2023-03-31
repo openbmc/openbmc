@@ -1,4 +1,3 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/optee-os:"
 require optee-os_3.18.0.bb
 
 SUMMARY = "OP-TEE Trusted OS TA devkit"

@@ -6,7 +6,8 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files/corstone1000:"
 
 SRC_URI:append = " \ 
 	file://0001-Fix-FF-A-version-in-SPMC-manifest.patch \
-	"
+    file://0002-feat-corstone1000-bl2-loads-fip-based-on-metadata.patch \
+    "
 
 TFA_DEBUG = "1"
 TFA_UBOOT ?= "1"
@@ -31,6 +32,9 @@ EXTRA_OEMAKE:append = " \
                         CREATE_KEYS=1 \
                         GENERATE_COT=1 \
                         TRUSTED_BOARD_BOOT=1 \
+                        ARM_GPT_SUPPORT=1 \
+                        PSA_FWU_SUPPORT=1 \
+                        NR_OF_IMAGES_IN_FW_BANK=4 \
                         COT=tbbr \
                         ARM_ROTPK_LOCATION=devel_rsa  \
                         ROT_KEY=plat/arm/board/common/rotpk/arm_rotprivk_rsa.pem \

@@ -1,0 +1,174 @@
+From 3be91bde755c376a38c3affb9640b39df1acdd9c Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Thu, 22 Dec 2022 11:30:16 +0000
+Subject: [PATCH 32/43] sandbox64: add a test case for UCLASS_NVMXIP
+
+provide a test for NVM XIP devices
+
+The test case allows to make sure of the following:
+
+- The NVM XIP QSPI devices are probed
+- The DT entries are read correctly
+- the data read from the flash by the NVMXIP block driver is correct
+
+Upstream-Status: Submitted
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+---
+ MAINTAINERS      |   1 +
+ test/dm/Makefile |   4 ++
+ test/dm/nvmxip.c | 115 +++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 120 insertions(+)
+ create mode 100644 test/dm/nvmxip.c
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index ba15dd02d58d..82cb6075cb32 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1210,6 +1210,7 @@ S:	Maintained
+ F:	doc/develop/driver-model/nvmxip.rst
+ F:	doc/device-tree-bindings/nvmxip/nvmxip.txt
+ F:	drivers/nvmxip/
++F:	test/dm/nvmxip.c
+ 
+ NVMEM
+ M:	Sean Anderson <seanga2@gmail.com>
+diff --git a/test/dm/Makefile b/test/dm/Makefile
+index 85e99e1c120e..bc8214da2da2 100644
+--- a/test/dm/Makefile
++++ b/test/dm/Makefile
+@@ -18,6 +18,10 @@ obj-$(CONFIG_UT_DM) += test-uclass.o
+ obj-$(CONFIG_UT_DM) += core.o
+ obj-$(CONFIG_UT_DM) += read.o
+ obj-$(CONFIG_UT_DM) += phys2bus.o
++ifeq ($(CONFIG_NVMXIP_QSPI)$(CONFIG_SANDBOX64),yy)
++obj-y += nvmxip.o
++endif
++
+ ifneq ($(CONFIG_SANDBOX),)
+ ifeq ($(CONFIG_ACPIGEN),y)
+ obj-y += acpi.o
+diff --git a/test/dm/nvmxip.c b/test/dm/nvmxip.c
+new file mode 100644
+index 000000000000..484e6077b4a9
+--- /dev/null
++++ b/test/dm/nvmxip.c
+@@ -0,0 +1,115 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Functional tests for UCLASS_FFA  class
++ *
++ * (C) Copyright 2022 ARM Limited
++ * Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
++ */
++
++#include <common.h>
++#include <console.h>
++#include <blk.h>
++#include <dm.h>
++#include <dm/test.h>
++#include "../../drivers/nvmxip/nvmxip.h"
++#include <test/test.h>
++#include <test/ut.h>
++
++/* NVMXIP devices described in the device tree  */
++#define SANDBOX_NVMXIP_DEVICES 2
++
++/* reference device tree data for the probed devices */
++static struct nvmxip_plat nvmqspi_refdata[SANDBOX_NVMXIP_DEVICES] = {
++	{0x08000000, 9, 4096}, {0x08200000, 9, 2048}
++};
++
++#define NVMXIP_BLK_START_PATTERN 0x1122334455667788ULL
++#define NVMXIP_BLK_END_PATTERN 0xa1a2a3a4a5a6a7a8ULL
++
++static int dm_nvmxip_flash_sanity(u8 device_idx, void *buffer)
++{
++	int i;
++	u64 *ptr = NULL;
++	u8 *base = NULL;
++	unsigned long blksz;
++
++	blksz = 1 << nvmqspi_refdata[device_idx].lba_shift;
++
++	/* if buffer not NULL, init the flash with the pattern data*/
++	if (!buffer)
++		base = map_sysmem(nvmqspi_refdata[device_idx].phys_base, 0);
++	else
++		base = buffer;
++
++	for (i = 0; i < nvmqspi_refdata[device_idx].lba ; i++) {
++		ptr = (u64 *)(base + i * blksz);
++
++		/* write an 8 bytes pattern at the start of the current block*/
++		if (!buffer)
++			*ptr = NVMXIP_BLK_START_PATTERN;
++		else if (*ptr != NVMXIP_BLK_START_PATTERN)
++			return -EINVAL;
++
++		ptr = (u64 *)((u8 *)ptr + blksz - sizeof(u64));
++
++		/* write an 8 bytes pattern at the end of the current block*/
++		if (!buffer)
++			*ptr = NVMXIP_BLK_END_PATTERN;
++		else if (*ptr != NVMXIP_BLK_END_PATTERN)
++			return -EINVAL;
++	}
++
++	if (!buffer)
++		unmap_sysmem(base);
++
++	return 0;
++}
++
++static int dm_test_nvmxip(struct unit_test_state *uts)
++{
++	struct nvmxip_plat *plat_data = NULL;
++	struct udevice *dev = NULL, *bdev = NULL;
++	u8 device_idx;
++	void *buffer = NULL;
++	unsigned long flashsz;
++
++	/* set the flash content first for both devices */
++	dm_nvmxip_flash_sanity(0, NULL);
++	dm_nvmxip_flash_sanity(1, NULL);
++
++	/*  probing all NVM XIP QSPI devices */
++	for (device_idx = 0, uclass_first_device(UCLASS_NVMXIP, &dev);
++	     dev;
++	     uclass_next_device(&dev), device_idx++) {
++		plat_data = dev_get_plat(dev);
++
++		/* device tree entries checks */
++		ut_assertok(nvmqspi_refdata[device_idx].phys_base != plat_data->phys_base);
++		ut_assertok(nvmqspi_refdata[device_idx].lba_shift != plat_data->lba_shift);
++		ut_assertok(nvmqspi_refdata[device_idx].lba != plat_data->lba);
++
++		/* before reading all the flash blocks, let's calculate the flash size */
++		flashsz = plat_data->lba << plat_data->lba_shift;
++
++		/* allocate the user buffer where to copy the blocks data to */
++		buffer = calloc(flashsz, 1);
++		ut_assertok(!buffer);
++
++		/* the block device is the child of the parent device probed with DT*/
++		ut_assertok(device_find_first_child(dev, &bdev));
++
++		/* reading all the flash blocks*/
++		ut_asserteq(plat_data->lba, blk_read(bdev, 0, plat_data->lba, buffer));
++
++		/* compare the data read from flash with the expected data */
++		ut_assertok(dm_nvmxip_flash_sanity(device_idx, buffer));
++
++		free(buffer);
++	}
++
++	ut_assertok(device_idx != SANDBOX_NVMXIP_DEVICES);
++
++	return CMD_RET_SUCCESS;
++}
++
++DM_TEST(dm_test_nvmxip, UT_TESTF_SCAN_FDT | UT_TESTF_CONSOLE_REC);
+-- 
+2.39.2
+

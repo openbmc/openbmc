@@ -1,0 +1,411 @@
+From 6f95d99329e178b7dea5cf7affac2c55135bbb85 Mon Sep 17 00:00:00 2001
+From: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Date: Wed, 11 Jan 2023 10:27:04 +0000
+Subject: [PATCH 9/10] Platform:corstone1000: BL2 uses GPT layout
+
+Adabt BL2 to use GPT parser find tfm and fip partitions, and then
+extract info to populate MCUBOOT flashmap.
+
+Side changes required:
+Borrow 2k of BL2 code memory to Data memory (during linking)
+i.e. Increase BL2_DATA_GAP_SIZE and decrease SE_BL2_PARTITION_SIZE
+
+Signed-off-by: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ .../target/arm/corstone1000/CMakeLists.txt    |  5 +-
+ .../target/arm/corstone1000/bl2_flash_map.c   |  7 --
+ .../target/arm/corstone1000/boot_hal_bl2.c    | 86 +++++++++++++-----
+ .../corstone1000/fw_update_agent/fwu_agent.c  | 24 ++---
+ .../corstone1000/fw_update_agent/fwu_agent.h  |  2 +-
+ .../arm/corstone1000/partition/flash_layout.h |  2 +-
+ .../ext/target/arm/corstone1000/platform.c    | 87 ++++++++++++++++++-
+ .../ext/target/arm/corstone1000/platform.h    | 10 +++
+ 8 files changed, 168 insertions(+), 55 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/CMakeLists.txt b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+index a120f39ea4..f16c1c40b0 100644
+--- a/platform/ext/target/arm/corstone1000/CMakeLists.txt
++++ b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+@@ -130,6 +130,10 @@ target_sources(platform_bl2
+         io/io_block.c
+         io/io_flash.c
+         io/io_storage.c
++        soft_crc/soft_crc.c
++        partition/partition.c
++        partition/gpt.c
++        platform.c
+ )
+ 
+ if (PLATFORM_IS_FVP)
+@@ -174,7 +178,6 @@ target_compile_definitions(bl2
+         $<$<BOOL:${CRYPTO_HW_ACCELERATOR}>:CRYPTO_HW_ACCELERATOR>
+         $<$<BOOL:${CRYPTO_HW_ACCELERATOR_OTP_PROVISIONING}>:CRYPTO_HW_ACCELERATOR_OTP_PROVISIONING>
+         $<$<BOOL:${PLATFORM_PSA_ADAC_SECURE_DEBUG}>:PLATFORM_PSA_ADAC_SECURE_DEBUG>
+-
+ )
+ target_compile_definitions(bootutil
+     PRIVATE
+diff --git a/platform/ext/target/arm/corstone1000/bl2_flash_map.c b/platform/ext/target/arm/corstone1000/bl2_flash_map.c
+index f512045a44..599f80b411 100644
+--- a/platform/ext/target/arm/corstone1000/bl2_flash_map.c
++++ b/platform/ext/target/arm/corstone1000/bl2_flash_map.c
+@@ -58,13 +58,6 @@ struct flash_area flash_map[] = {
+ 
+ const int flash_map_entry_num = ARRAY_SIZE(flash_map);
+ 
+-void add_bank_offset_to_image_offset(uint32_t bank_offset)
+-{
+-    for (int i = 0; i < flash_map_entry_num; i++) {
+-        flash_map[i].fa_off += bank_offset;
+-    }
+-}
+-
+ int boot_get_image_exec_ram_info(uint32_t image_id,
+                                  uint32_t *exec_ram_start,
+                                  uint32_t *exec_ram_size)
+diff --git a/platform/ext/target/arm/corstone1000/boot_hal_bl2.c b/platform/ext/target/arm/corstone1000/boot_hal_bl2.c
+index 323d9707fe..52db26beea 100644
+--- a/platform/ext/target/arm/corstone1000/boot_hal_bl2.c
++++ b/platform/ext/target/arm/corstone1000/boot_hal_bl2.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2019-2022, Arm Limited. All rights reserved.
++ * Copyright (c) 2019-2023, Arm Limited. All rights reserved.
+  *
+  * SPDX-License-Identifier: BSD-3-Clause
+  *
+@@ -30,6 +30,14 @@
+ #include "crypto_hw.h"
+ #endif
+ 
++#include "efi.h"
++#include "partition.h"
++#include "platform.h"
++
++static const uint8_t * const tfm_part_names[] = {"tfm_primary", "tfm_secondary"};
++static const uint8_t * const fip_part_names[] = {"FIP_A", "FIP_B"};
++
++
+ /* Flash device name must be specified by target */
+ extern ARM_DRIVER_FLASH FLASH_DEV_NAME;
+ 
+@@ -39,28 +47,62 @@ REGION_DECLARE(Image$$, ARM_LIB_HEAP, $$ZI$$Limit)[];
+ #define ARRAY_SIZE(arr) (sizeof(arr)/sizeof((arr)[0]))
+ extern struct flash_area flash_map[];
+ 
+-int32_t fill_bl2_flash_map_by_parsing_fips(uint32_t bank_offset)
+-{
+-    int result;
++static bool fill_flash_map_with_tfm_data(uint8_t boot_index) {
++
++    if (boot_index >= ARRAY_SIZE(tfm_part_names)) {
++        BOOT_LOG_ERR("%d is an invalid boot_index, 0 <= boot_index < %d",
++                     boot_index, ARRAY_SIZE(tfm_part_names));
++        return false;
++    }
++    partition_entry_t *tfm_entry =
++        get_partition_entry(tfm_part_names[boot_index]);
++    if (tfm_entry == NULL) {
++        BOOT_LOG_ERR("Could not find partition %s", tfm_part_names[boot_index]);
++        return false;
++    }
++    flash_map[0].fa_off = tfm_entry->start;
++    flash_map[0].fa_size = tfm_entry->length;
++    return true;
++}
++
++static bool fill_flash_map_with_fip_data(uint8_t boot_index) {
+     uint32_t tfa_offset = 0;
+-    uint32_t tfa_size = 0;
++    size_t tfa_size = 0;
++    uint32_t fip_offset = 0;
++    size_t fip_size = 0;
++    int result;
++
++    if (boot_index >= ARRAY_SIZE(fip_part_names)) {
++        BOOT_LOG_ERR("%d is an invalid boot_index, 0 <= boot_index < %d",
++                     boot_index, ARRAY_SIZE(fip_part_names));
++        return false;
++    }
++    partition_entry_t *fip_entry =
++        get_partition_entry(fip_part_names[boot_index]);
++    if (fip_entry == NULL) {
++        BOOT_LOG_ERR("Could not find partition %s", fip_part_names[boot_index]);
++        return false;
++    }
++
++    fip_offset = fip_entry->start;
++    fip_size = fip_entry->length;
+ 
+     /* parse directly from flash using XIP mode */
+     /* FIP is large so its not a good idea to load it in memory */
+-    result = parse_fip_and_extract_tfa_info(bank_offset + FLASH_FIP_ADDRESS,
+-                  FLASH_FIP_SIZE,
+-                  &tfa_offset, &tfa_size);
++    result = parse_fip_and_extract_tfa_info(
++        FLASH_BASE_ADDRESS + fip_offset + FIP_SIGNATURE_AREA_SIZE, fip_size,
++        &tfa_offset, &tfa_size);
+     if (result != FIP_PARSER_SUCCESS) {
+         BOOT_LOG_ERR("parse_fip_and_extract_tfa_info failed");
+-        return 1;
++        return false;
+     }
+ 
+-    flash_map[2].fa_off = FLASH_FIP_OFFSET + tfa_offset;
++    flash_map[2].fa_off = fip_offset + FIP_SIGNATURE_AREA_SIZE + tfa_offset;
+     flash_map[2].fa_size = tfa_size;
+     flash_map[3].fa_off = flash_map[2].fa_off + flash_map[2].fa_size;
+     flash_map[3].fa_size = tfa_size;
+ 
+-    return 0;
++    return true;
+ }
+ 
+ #ifdef PLATFORM_PSA_ADAC_SECURE_DEBUG
+@@ -89,26 +131,29 @@ uint8_t secure_debug_rotpk[32];
+ 
+ #endif
+ 
+-extern void add_bank_offset_to_image_offset(uint32_t bank_offset);
+-
+ int32_t boot_platform_init(void)
+ {
+     int32_t result;
++    uint8_t boot_index;
+ 
+     result = corstone1000_watchdog_init();
+     if (result != ARM_DRIVER_OK) {
+         return 1;
+     }
+ 
+-#ifndef TFM_S_REG_TEST
+-    result = fill_bl2_flash_map_by_parsing_fips(BANK_0_PARTITION_OFFSET);
+-    if (result) {
++    result = FLASH_DEV_NAME.Initialize(NULL);
++    if (result != ARM_DRIVER_OK) {
+         return 1;
+     }
+-#endif
+ 
+-    result = FLASH_DEV_NAME.Initialize(NULL);
+-    if (result != ARM_DRIVER_OK) {
++    plat_io_storage_init();
++    partition_init(PLATFORM_GPT_IMAGE);
++
++    boot_index = bl2_get_boot_bank();
++
++    if (!fill_flash_map_with_tfm_data(boot_index)
++    || !fill_flash_map_with_fip_data(boot_index)) {
++        BOOT_LOG_ERR("Filling flash map has failed!");
+         return 1;
+     }
+ 
+@@ -149,9 +194,6 @@ int32_t boot_platform_post_init(void)
+     }
+ #endif
+ 
+-    bl2_get_boot_bank(&bank_offset);
+-    add_bank_offset_to_image_offset(bank_offset);
+-
+     return 0;
+ }
+ 
+diff --git a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+index e4f9da1ec3..1052bf9f00 100644
+--- a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
++++ b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+@@ -836,34 +836,20 @@ void bl1_get_active_bl2_image(uint32_t *offset)
+     return;
+ }
+ 
+-void bl2_get_boot_bank(uint32_t *bank_offset)
++uint8_t bl2_get_boot_bank(void)
+ {
+-    uint32_t boot_index;
++    uint8_t boot_index;
+     struct fwu_private_metadata priv_metadata;
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
+-
++    FWU_LOG_MSG("%s: enter", __func__);
+     if (fwu_metadata_init()) {
+         FWU_ASSERT(0);
+     }
+-
+     if (private_metadata_read(&priv_metadata)) {
+         FWU_ASSERT(0);
+     }
+-
+     boot_index = priv_metadata.boot_index;
+-
+-    if (boot_index == BANK_0) {
+-        *bank_offset = BANK_0_PARTITION_OFFSET;
+-    } else if (boot_index == BANK_1) {
+-        *bank_offset = BANK_1_PARTITION_OFFSET;
+-    } else {
+-        FWU_ASSERT(0);
+-    }
+-
+-    FWU_LOG_MSG("%s: exit: booting from bank = %u, offset = %x\n\r", __func__,
+-                        boot_index, *bank_offset);
+-
+-    return;
++    FWU_LOG_MSG("%s: exit: booting from bank = %u", __func__, boot_index);
++    return boot_index;
+ }
+ 
+ static void disable_host_ack_timer(void)
+diff --git a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.h b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.h
+index eb8320ed8a..701f205583 100644
+--- a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.h
++++ b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.h
+@@ -45,7 +45,7 @@ enum fwu_agent_error_t corstone1000_fwu_flash_image(void);
+ enum fwu_agent_error_t corstone1000_fwu_host_ack(void);
+ 
+ void bl1_get_active_bl2_image(uint32_t *bank_offset);
+-void bl2_get_boot_bank(uint32_t *bank_offset);
++uint8_t bl2_get_boot_bank(void);
+ 
+ /* When in trial state, start the timer for host to respond.
+  * Diable timer when host responds back either by calling
+diff --git a/platform/ext/target/arm/corstone1000/partition/flash_layout.h b/platform/ext/target/arm/corstone1000/partition/flash_layout.h
+index 347c91acbb..c5cf94a52c 100644
+--- a/platform/ext/target/arm/corstone1000/partition/flash_layout.h
++++ b/platform/ext/target/arm/corstone1000/partition/flash_layout.h
+@@ -32,7 +32,7 @@
+ #define SRAM_BASE                       (0x30000000)
+ #define SRAM_SIZE                       (0x80000)     /* 512 KB */
+ 
+-#define BL2_DATA_GAP_SIZE               (0x09000)     /* 36 KB */
++#define BL2_DATA_GAP_SIZE               (0x09800)  /* 38 KB */
+ 
+ #define BL1_DATA_START                  (SRAM_BASE)
+ #define BL1_DATA_SIZE                   (0x10000)     /* 64 KiB*/
+diff --git a/platform/ext/target/arm/corstone1000/platform.c b/platform/ext/target/arm/corstone1000/platform.c
+index 908b66b7ac..6add0d7e1b 100644
+--- a/platform/ext/target/arm/corstone1000/platform.c
++++ b/platform/ext/target/arm/corstone1000/platform.c
+@@ -5,16 +5,95 @@
+  *
+  */
+ 
++#include "stdint.h"
++
++#include "Driver_Flash.h"
++#include "flash_layout.h"
++
++#include "io_driver.h"
++#include "io_flash.h"
++#include "io_storage.h"
++
+ #include "platform.h"
+ 
+-#include <stdint.h>
++#define PLAT_LOG_MODULE_NAME    "platform"
++#include "platform_log.h"
++
++typedef struct {
++    uintptr_t dev_handle;
++    uintptr_t image_spec;
++} platform_image_source_t;
++
++extern ARM_DRIVER_FLASH FLASH_DEV_NAME;
++
++static io_dev_connector_t *flash_dev_con;
++static uint8_t local_block_flash[FLASH_SECTOR_SIZE];
++static io_flash_dev_spec_t flash_dev_spec = {
++    .buffer = local_block_flash,
++    .bufferlen = FLASH_SECTOR_SIZE,
++    .base_addr = FLASH_BASE_ADDRESS,
++    .flash_driver = &FLASH_DEV_NAME,
++};
++static io_block_spec_t flash_spec = {
++    .offset = FLASH_BASE_ADDRESS,
++    .length = FLASH_TOTAL_SIZE
++};
++
++static platform_image_source_t platform_image_source[] = {
++    [PLATFORM_GPT_IMAGE] = {
++        .dev_handle = NULL,
++        .image_spec = &flash_spec,
++    }
++};
++
++/* Initialize io storage of the platform */
++int32_t plat_io_storage_init(void)
++{
++    int rc = -1;
++    uintptr_t flash_dev_handle = NULL;
++    uintptr_t flash_handle = NULL;
++
++    rc = register_io_dev_flash((const io_dev_connector_t **) &flash_dev_con);
++    if (rc != 0) {
++        ERROR("Failed to register io flash rc: %d", rc);
++        return rc;
++    }
++
++    rc = io_dev_open(flash_dev_con, (const uintptr_t)&flash_dev_spec, &flash_dev_handle);
++    if (rc != 0) {
++        ERROR("Failed to open io flash dev rc: %d", rc);
++        return rc;
++    }
++
++    VERBOSE("Flash_dev_handle = %p",flash_dev_handle);
++
++    rc = io_open(flash_dev_handle, (const uintptr_t)&flash_spec, &flash_handle);
++    if (rc != 0) {
++        ERROR("Failed to open io flash rc: %d", rc);
++        return rc;
++    }
++
++    VERBOSE("Flash_handle = %p",flash_handle);
++
++    rc = io_close(flash_handle);
++    if (rc != 0) {
++        ERROR("Failed to close io flash rc: %d", rc);
++        return rc;
++    }
++    /* Update the platform image source that uses the flash with dev handles */
++    platform_image_source[PLATFORM_GPT_IMAGE].dev_handle = flash_dev_handle;
++
++    return rc;
++}
+ 
+ /* Return an IO device handle and specification which can be used to access
+  * an image. This has to be implemented for the GPT parser. */
+ int32_t plat_get_image_source(unsigned int image_id, uintptr_t *dev_handle,
+                               uintptr_t *image_spec) {
+-    (void)image_id;
+-    *dev_handle = NULL;
+-    *image_spec = NULL;
++    if (image_id >= PLATFORM_IMAGE_COUNT) {
++        return -1;
++    }
++    *dev_handle = platform_image_source[image_id].dev_handle;
++    *image_spec = platform_image_source[image_id].image_spec;
+     return 0;
+ }
+diff --git a/platform/ext/target/arm/corstone1000/platform.h b/platform/ext/target/arm/corstone1000/platform.h
+index 250f9cd9f5..894f5e3090 100644
+--- a/platform/ext/target/arm/corstone1000/platform.h
++++ b/platform/ext/target/arm/corstone1000/platform.h
+@@ -8,6 +8,16 @@
+ #ifndef __PLATFORM_H__
+ #define __PLATFORM_H__
+ 
++typedef enum {
++    PLATFORM_GPT_IMAGE = 0,
++    PLATFORM_IMAGE_COUNT,
++}platform_image_id_t;
++
++/* Initialize io storage of the platform */
++int32_t plat_io_storage_init(void);
++
++/* Return an IO device handle and specification which can be used to access
++ * an image. This has to be implemented for the GPT parser. */
+ int32_t plat_get_image_source(unsigned int image_id, uintptr_t *dev_handle,
+                               uintptr_t *image_spec);
+ 
+-- 
+2.25.1
+

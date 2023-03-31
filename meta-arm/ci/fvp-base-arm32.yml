@@ -1,7 +1,0 @@
-header:
-  version: 11
-  includes:
-    - ci/base.yml
-    - ci/fvp.yml
-
-machine: fvp-base-arm32

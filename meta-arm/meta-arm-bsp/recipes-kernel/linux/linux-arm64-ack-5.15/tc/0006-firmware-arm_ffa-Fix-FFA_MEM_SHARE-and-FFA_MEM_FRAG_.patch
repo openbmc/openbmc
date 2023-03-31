@@ -12,7 +12,7 @@ check for this return code.
 
 Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
 Change-Id: I7ef44742d53a9e75d8587d1213be98a1352f16d4
-Upstream-Status: Pending [Not submitted to upstream yet]
+Upstream-Status: Backport [987756f67dee237ec35f3b249ab1ae25260c5340]
 Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com>
 ---
  drivers/firmware/arm_ffa/driver.c | 12 ++++++++----

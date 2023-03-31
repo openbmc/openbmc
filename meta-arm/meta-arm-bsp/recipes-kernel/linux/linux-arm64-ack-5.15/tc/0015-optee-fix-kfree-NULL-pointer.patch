@@ -15,7 +15,7 @@ Signed-off-by: Lv Ruyi <lv.ruyi@zte.com.cn>
 Reviewed-by: Sumit Garg <sumit.garg@linaro.org>
 [jw: removed the redundant braces]
 Signed-off-by: Jens Wiklander <jens.wiklander@linaro.org>
-Upstream-Status: Pending [Not submitted to upstream yet]
+Upstream-Status: Backport [c23ca66a4dadb6f050dc57358bc8d57a747c35bf]
 Signed-off-by: Rupinderjit Singh <rupinderjit.singh@arm.com
 ---
  drivers/tee/optee/ffa_abi.c | 7 +++----

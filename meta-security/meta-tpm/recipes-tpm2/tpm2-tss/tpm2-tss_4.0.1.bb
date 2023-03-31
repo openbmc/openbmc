@@ -14,6 +14,8 @@ SRC_URI[sha256sum] = "532a70133910b6bd842289915b3f9423c0205c0ea009d65294ca18a740
 
 UPSTREAM_CHECK_URI = "https://github.com/tpm2-software/${BPN}/releases"
 
+CVE_PRODUCT = "tpm2_software_stack"
+
 inherit autotools pkgconfig systemd useradd
 
 PACKAGECONFIG ??= "vendor"

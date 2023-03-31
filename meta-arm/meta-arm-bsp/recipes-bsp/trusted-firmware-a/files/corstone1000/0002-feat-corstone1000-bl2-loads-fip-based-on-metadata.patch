@@ -1,0 +1,167 @@
+From 360aa32846a97e775750e06865d462c6258179fa Mon Sep 17 00:00:00 2001
+From: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+Date: Mon, 9 Jan 2023 13:59:06 +0000
+Subject: [PATCH] feat(corstone1000): bl2 loads fip based on metadata
+
+Previously bl2 was reading the boot_index directly with a hard coded
+address and then set the fip image spec with fip offsets base based on
+the boot_index value.
+This commit removes this logic and rely on PSA_FWU_SUPPORT
+which reads the fip partition based on the active firmware bank written in
+metadata.
+
+Note: fip partition contains signature area at the begining. Hence, the fip
+image starts at fip partition + fip signature area size.
+
+Upstream-Status: Pending
+Signed-off-by: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
+
+%% original patch: 0002-feat-corstone1000-bl2-loads-fip-based-on-metadata.patch
+---
+ bl2/bl2_main.c                                |  4 +++
+ .../corstone1000/common/corstone1000_plat.c   | 32 ++++++-------------
+ .../common/include/platform_def.h             | 12 +++----
+ tools/cert_create/Makefile                    |  4 +--
+ tools/fiptool/Makefile                        |  4 +--
+ 5 files changed, 24 insertions(+), 32 deletions(-)
+
+diff --git a/bl2/bl2_main.c b/bl2/bl2_main.c
+index 5da803795..f25dc3029 100644
+--- a/bl2/bl2_main.c
++++ b/bl2/bl2_main.c
+@@ -86,6 +86,10 @@ void bl2_main(void)
+ 	/* Perform remaining generic architectural setup in S-EL1 */
+ 	bl2_arch_setup();
+ 
++#if ARM_GPT_SUPPORT
++	partition_init(GPT_IMAGE_ID);
++#endif
++
+ #if PSA_FWU_SUPPORT
+ 	fwu_init();
+ #endif /* PSA_FWU_SUPPORT */
+diff --git a/plat/arm/board/corstone1000/common/corstone1000_plat.c b/plat/arm/board/corstone1000/common/corstone1000_plat.c
+index 0235f8b84..7f9708a82 100644
+--- a/plat/arm/board/corstone1000/common/corstone1000_plat.c
++++ b/plat/arm/board/corstone1000/common/corstone1000_plat.c
+@@ -33,36 +33,17 @@ const mmap_region_t plat_arm_mmap[] = {
+ static void set_fip_image_source(void)
+ {
+ 	const struct plat_io_policy *policy;
+-	/*
+-	 * metadata for firmware update is written at 0x0000 offset of the flash.
+-	 * PLAT_ARM_BOOT_BANK_FLAG contains the boot bank that TF-M is booted.
+-	 * As per firmware update spec, at a given point of time, only one bank
+-	 * is active. This means, TF-A should boot from the same bank as TF-M.
+-	 */
+-	volatile uint32_t *boot_bank_flag = (uint32_t *)(PLAT_ARM_BOOT_BANK_FLAG);
+-
+-	if (*boot_bank_flag > 1) {
+-		VERBOSE("Boot_bank is set higher than possible values");
+-	}
+-
+-	VERBOSE("Boot bank flag = %u.\n\r", *boot_bank_flag);
+ 
+ 	policy = FCONF_GET_PROPERTY(arm, io_policies, FIP_IMAGE_ID);
+ 
+ 	assert(policy != NULL);
+ 	assert(policy->image_spec != 0UL);
+ 
++	/* FIP Partition contains Signature area at the begining which TF-A doesn't expect */
+ 	io_block_spec_t *spec = (io_block_spec_t *)policy->image_spec;
++	spec->offset += FIP_SIGNATURE_AREA_SIZE;
++	spec->length -= FIP_SIGNATURE_AREA_SIZE;
+ 
+-	if ((*boot_bank_flag) == 0) {
+-		VERBOSE("Booting from bank 0: fip offset = 0x%lx\n\r",
+-						PLAT_ARM_FIP_BASE_BANK0);
+-		spec->offset = PLAT_ARM_FIP_BASE_BANK0;
+-	} else {
+-		VERBOSE("Booting from bank 1: fip offset = 0x%lx\n\r",
+-						PLAT_ARM_FIP_BASE_BANK1);
+-		spec->offset = PLAT_ARM_FIP_BASE_BANK1;
+-	}
+ }
+ 
+ void bl2_platform_setup(void)
+@@ -75,6 +56,13 @@ void bl2_platform_setup(void)
+ 	set_fip_image_source();
+ }
+ 
++void bl2_early_platform_setup2(u_register_t arg0, u_register_t arg1,
++			       u_register_t arg2, u_register_t arg3)
++{
++	arm_bl2_early_platform_setup((uintptr_t)arg0, (meminfo_t *)arg1);
++	NOTICE("CS1k: early at bl2_platform_setup\n");
++}
++
+ /* corstone1000 only has one always-on power domain and there
+  * is no power control present
+  */
+diff --git a/plat/arm/board/corstone1000/common/include/platform_def.h b/plat/arm/board/corstone1000/common/include/platform_def.h
+index 584d485f3..0bfab05a4 100644
+--- a/plat/arm/board/corstone1000/common/include/platform_def.h
++++ b/plat/arm/board/corstone1000/common/include/platform_def.h
+@@ -173,16 +173,16 @@
+ 
+ /* NOR Flash */
+ 
+-#define PLAT_ARM_BOOT_BANK_FLAG		UL(0x08002000)
+-#define PLAT_ARM_FIP_BASE_BANK0		UL(0x081EF000)
+-#define PLAT_ARM_FIP_BASE_BANK1		UL(0x0916F000)
+-#define PLAT_ARM_FIP_MAX_SIZE		UL(0x1ff000)  /* 1.996 MB */
+-
+ #define PLAT_ARM_NVM_BASE		V2M_FLASH0_BASE
+ #define PLAT_ARM_NVM_SIZE		(SZ_32M)  /* 32 MB */
++#define PLAT_ARM_FIP_MAX_SIZE		UL(0x1ff000)  /* 1.996 MB */
+ 
+-#define PLAT_ARM_FLASH_IMAGE_BASE	PLAT_ARM_FIP_BASE_BANK0
++#define PLAT_ARM_FLASH_IMAGE_BASE	UL(0x08000000)
+ #define PLAT_ARM_FLASH_IMAGE_MAX_SIZE	PLAT_ARM_FIP_MAX_SIZE
++#define PLAT_ARM_FIP_OFFSET_IN_GPT	(0x86000)
++
++/* FIP Information */
++#define FIP_SIGNATURE_AREA_SIZE         (0x1000)      /* 4 KB */
+ 
+ /*
+  * Some data must be aligned on the biggest cache line size in the platform.
+diff --git a/tools/cert_create/Makefile b/tools/cert_create/Makefile
+index ca548b836..32b5486a0 100644
+--- a/tools/cert_create/Makefile
++++ b/tools/cert_create/Makefile
+@@ -69,8 +69,8 @@ INC_DIR += -I ./include -I ${PLAT_INCLUDE} -I ${OPENSSL_DIR}/include
+ # directory. However, for a local build of OpenSSL, the built binaries are
+ # located under the main project directory (i.e.: ${OPENSSL_DIR}, not
+ # ${OPENSSL_DIR}/lib/).
+-LIB_DIR := -L ${OPENSSL_DIR}/lib -L ${OPENSSL_DIR}
+-LIB := -lssl -lcrypto
++LIB_DIR := -L ${OPENSSL_DIR}/lib -L ${OPENSSL_DIR} ${BUILD_LDFLAGS} ${BUILD_LDFLAGS} ${BUILD_LDFLAGS} ${BUILD_LDFLAGS} ${BUILD_LDFLAGS} ${BUILD_LDFLAGS}
++LIB := -lssl -lcrypto ${BUILD_LDFLAGS} ${BUILD_LDFLAGS} ${BUILD_LDFLAGS} ${BUILD_LDFLAGS} ${BUILD_LDFLAGS} ${BUILD_LDFLAGS}
+ 
+ HOSTCC ?= gcc
+ 
+diff --git a/tools/fiptool/Makefile b/tools/fiptool/Makefile
+index e6aeba95b..7c047479e 100644
+--- a/tools/fiptool/Makefile
++++ b/tools/fiptool/Makefile
+@@ -29,7 +29,7 @@ endif
+ # directory. However, for a local build of OpenSSL, the built binaries are
+ # located under the main project directory (i.e.: ${OPENSSL_DIR}, not
+ # ${OPENSSL_DIR}/lib/).
+-LDLIBS := -L${OPENSSL_DIR}/lib -L${OPENSSL_DIR} -lcrypto
++LDLIBS := -L${OPENSSL_DIR}/lib -L${OPENSSL_DIR} -lcrypto ${BUILD_LDFLAGS} ${BUILD_LDFLAGS} ${BUILD_LDFLAGS} ${BUILD_LDFLAGS} ${BUILD_LDFLAGS} ${BUILD_LDFLAGS}
+ 
+ ifeq (${V},0)
+   Q := @
+@@ -37,7 +37,7 @@ else
+   Q :=
+ endif
+ 
+-INCLUDE_PATHS := -I../../include/tools_share  -I${OPENSSL_DIR}/include
++INCLUDE_PATHS := -I../../include/tools_share  -I${OPENSSL_DIR}/include ${BUILD_CFLAGS} ${BUILD_CFLAGS} ${BUILD_CFLAGS} ${BUILD_CFLAGS} ${BUILD_CFLAGS} ${BUILD_CFLAGS}
+ 
+ HOSTCC ?= gcc
+ 
+-- 
+2.25.1
+
