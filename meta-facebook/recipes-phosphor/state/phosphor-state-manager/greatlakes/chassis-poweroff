@@ -11,7 +11,7 @@ OFFSET=$(( 0x9 + SLOT ))
 # Server 12v power off
 chassis-power-off()
 {
-        result=$(i2cset -y "$CPLD_BUS_NUM" "$CPLD_PWR_CTRL_ADDR" "$OFFSET $POW_OFF_SLOT")
+        result=$(i2cset -y "$CPLD_BUS_NUM" "$CPLD_PWR_CTRL_ADDR" "$OFFSET" "$POW_OFF_SLOT")
         echo "$result"
         sleep 1
 

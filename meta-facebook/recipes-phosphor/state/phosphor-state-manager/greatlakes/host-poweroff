@@ -12,8 +12,14 @@ host-power-off()
 {
         for pwr_cmd in "${power_seq[@]}"
         do
-             result="$(busctl call "$SERVICE" "$OBJECT_PATH" "$INTERFACE" sendRequest yyyyay "$SLOT_ID" "$NETFN" "$LUN" "$CMD" "$DATA_LEN" 0x01 0x42 0x01 0x00 "$pwr_cmd")"
-             echo "$result"
+             response="$(busctl call "$SERVICE" "$OBJECT_PATH" "$INTERFACE" sendRequest yyyyay "$SLOT_ID" "$NETFN" "$LUN" "$CMD" "$DATA_LEN" 0x01 0x42 0x01 0x00 "$pwr_cmd")"
+             echo "$response"
+             result=$(echo "$response" | cut -d" " -f "$IPMB_CMD_COMPLETE_CODE_INDEX")
+             if [ "$result" -ne 0 ]
+             then
+                     echo "Failed to send ipmb command"
+                     exit 1
+             fi
              if [ "$pwr_cmd" == "$POWER_BTN_LOW" ]
              then
                      sleep 6

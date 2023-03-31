@@ -35,6 +35,7 @@ export CHASSIS_ON="xyz.openbmc_project.State.Chassis.PowerState.On"
 export CHASSIS_OFF="xyz.openbmc_project.State.Chassis.PowerState.Off"
 export HOST_ON="xyz.openbmc_project.State.Host.HostState.Running"
 export HOST_OFF="xyz.openbmc_project.State.Host.HostState.Off"
+export IPMB_CMD_COMPLETE_CODE_INDEX=2
 
 host-power-status()
 {

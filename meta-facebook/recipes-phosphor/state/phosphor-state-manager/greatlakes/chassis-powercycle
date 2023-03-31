@@ -18,6 +18,12 @@ chassis-power-cycle()
         then
             i2cset -y "$CPLD_BUS_NUM" "$CPLD_PWR_CTRL_ADDR" "$OFFSET" "$POW_OFF_SLOT"
             sleep 10
+            chassis_status=$(chassis-power-status $SLOT)
+            if [ "$chassis_status" -ne "$STATE_OFF" ]
+            then
+                echo "chassis$CHASSIS_ID power off fail"
+                exit 1
+            fi
         fi
         i2cset -y "$CPLD_BUS_NUM" "$CPLD_PWR_CTRL_ADDR" "$OFFSET" "$POW_ON_SLOT"
         sleep 2
