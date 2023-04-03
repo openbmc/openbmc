@@ -66,9 +66,8 @@ function reset() {
       ;;
     system)
       # S0 system reset
-      set_gpio_ctrl S0_SYSRESET 0
-      sleep 1
-      set_gpio_ctrl S0_SYSRESET 1
+      echo "System has been reset, host will start booting in a few minutes"
+      ipmitool chassis power reset
       ;;
     btn)
       # virtual power button on

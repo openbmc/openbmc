@@ -21,3 +21,9 @@
               Default: 32
           BridgeDeviceAddress:
               Default: 32
+
+/xyz/openbmc_project/control/host0/power_restore_policy:
+    - Interface: xyz.openbmc_project.Control.Power.RestorePolicy
+      Properties:
+          PowerRestorePolicy:
+              Default: RestorePolicy::Policy::AlwaysOn
