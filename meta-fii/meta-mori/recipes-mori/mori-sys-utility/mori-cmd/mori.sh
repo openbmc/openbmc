@@ -7,7 +7,6 @@ source /usr/libexec/mori-fw/mori-lib.sh
 
 function usage_rst() {
   echo " mori rst [parameter]"
-  echo "        hotswap  --> reset the whole mori node"
   echo "        system   --> reset the host"
   echo "        btn      --> trigger a power button event"
   echo "        shutdown --> send out shutdown signal to CPU"
@@ -59,11 +58,6 @@ function usage() {
 
 function reset() {
   case $1 in
-    hotswap)
-      # Virtual AC reset
-      echo "mori.sh rst hotswap occurred"
-      set_gpio_ctrl HOTSWAP 1
-      ;;
     system)
       # S0 system reset
       echo "System has been reset, host will start booting in a few minutes"

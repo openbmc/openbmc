@@ -17,12 +17,14 @@ function fwbios() {
 
   # write to the mtd device
   BIOS_MTD=$(grep "hnor" /proc/mtd | sed -n 's/^\(.*\):.*/\1/p')
-
+  {
+  flock -x 200
   echo "Flashing BIOS @/dev/${BIOS_MTD}"
   if ! flashcp -v $1 /dev/${BIOS_MTD} ; then
     echo "Flashing the bios failed " >&2
     ret=1
   fi
+  } 200>$RST_LOCK_FILE
 
   cleanup_bios_access
 
@@ -30,6 +32,7 @@ function fwbios() {
 }
 
 function fwbmccpld() {
+  ret=0
   if [ ! -s "$1" ]; then
     echo "Image file" "$1" "is empty or nonexistent, BMC CPLD update failed"
     return 1
@@ -40,18 +43,24 @@ function fwbmccpld() {
   set_gpio_ctrl MB_JTAG_MUX_SEL 0
   set_gpio_ctrl BMC_JTAG_MUX_SEL  1
 
+  {
+  flock -x 200
   # 1st condition checks if the svf file is valid
   # 2nd condition checks flashing logs for flash errors
   if ! mesg=$(loadsvf -d /dev/jtag0 -s $1 -m 0 2>&1) \
         || echo "$mesg" | grep -i -e error -e fail ; then
+    echo "$mesg" | grep -i -e error -e fail
     echo "BMC CPLD update failed"
-    return 1
+    ret=1
+  else
+    echo "BMC CPLD update successful"
   fi
-  echo "BMC CPLD update successful"
-  return 0
+  } 200>$RST_LOCK_FILE
+  return $ret
 }
 
 function fwmbcpld() {
+  ret=0
   if [ ! -s "$1" ]; then
     echo "Image file" "$1" "is empty or nonexistent, MB CPLD update failed"
     return 1
@@ -62,17 +71,22 @@ function fwmbcpld() {
   set_gpio_ctrl MB_JTAG_MUX_SEL 1
   set_gpio_ctrl BMC_JTAG_MUX_SEL  0
 
+  {
+  flock -x 200
   # 1st condition checks if the svf file is valid
   # 2nd condition checks flashing logs for flash errors
   if ! mesg=$(loadsvf -d /dev/jtag0 -s $1 -m 0 2>&1) \
         || echo "$mesg" | grep -i -e error -e fail ; then
     echo "MB CPLD update failed"
-    return 1
+  ret=1
+  else
+    echo "MB CPLD update successful"
   fi
+  } 200>$RST_LOCK_FILE
   set_gpio_ctrl MB_JTAG_MUX_SEL 0
   echo "MB CPLD update successful"
 
-  return 0
+  return $ret
 }
 
 function fwbootstrap() {
@@ -100,24 +114,27 @@ function fwbootstrap() {
 
 function fwmb_pwr_seq(){
   #$1 PS seq config file
+  ret=0
   if [[ ! -e "$1" ]]; then
     echo "The file $1 does not exist"
     return 1
   fi
-  echo "${I2C_MB_PWRSEQ[0]}"-00"${I2C_MB_PWRSEQ[1]}" > \
-    /sys/bus/i2c/drivers/adm1266/unbind
-  #Parameters passed to mb_power_sequencer_flash to be used to flash PS
+  echo "${I2C_MB_PWRSEQ[0]}"-00"${I2C_MB_PWRSEQ[1]}" > /sys/bus/i2c/drivers/adm1266/unbind
+  {
+  flock -x 200
+  #Parameters passed to adm1266_fw_fx to be used to flash PS
   #1st I2C bus number of PS's
   #2nd PS seq config file
   if [ "$(mb_power_sequencer_flash ${I2C_MB_PWRSEQ[0]} $1)" -ne  0 ]; then
 
     echo "The power seq flash failed" >&2
-    return 1
+    ret=1
+  else
+    echo "${I2C_MB_PWRSEQ[0]}"-00"${I2C_MB_PWRSEQ[1]}" > /sys/bus/i2c/drivers/adm1266/bind
   fi
-  echo "${I2C_MB_PWRSEQ[0]}"-00"${I2C_MB_PWRSEQ[1]}" > \
-    /sys/bus/i2c/drivers/adm1266/bind
+  } 200>$RST_LOCK_FILE
 
-  return 0
+  return $ret
 }
 
 if [[ ! $(which flashcp) ]]; then
