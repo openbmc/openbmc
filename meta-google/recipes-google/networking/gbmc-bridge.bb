@@ -46,6 +46,7 @@ RDEPENDS:${PN}:append = " \
   mstpd-mstpd \
   network-sh \
   ndisc6-rdisc6 \
+  nftables-systemd \
   "
 
 SYSTEMD_SERVICE:${PN} += " \
