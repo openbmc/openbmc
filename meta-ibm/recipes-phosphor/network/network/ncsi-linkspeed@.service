@@ -1,6 +1,7 @@
 [Unit]
 Description=Set %i gigabit link speed
 After=network.target
+ConditionPathExists=/sys/class/net/%i
 
 [Service]
 TimeoutSec=90s
