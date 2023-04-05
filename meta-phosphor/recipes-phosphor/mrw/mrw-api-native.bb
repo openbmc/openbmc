@@ -10,12 +10,13 @@ SRC_URI += "${MRW_API_SRC_URI}"
 
 S = "${WORKDIR}/git"
 
-inherit native
-inherit perlnative
 inherit cpan-base
 inherit mrw-rev
+inherit perlnative
+inherit native
 
 do_install() {
-    install -d ${D}${PERLLIBDIRS:class-native}/site_perl/${PERLVERSION}/mrw
-    install -m 0755 scripts/Targets.pm ${D}${PERLLIBDIRS:class-native}/site_perl/${PERLVERSION}/mrw/Targets.pm
+    perl_version="${@get_perl_version(d)}"
+    install -d ${D}${PERLLIBDIRS:class-native}/site_perl/${perl_version}/mrw
+    install -m 0755 scripts/Targets.pm ${D}${PERLLIBDIRS:class-native}/site_perl/${perl_version}/mrw/Targets.pm
 }
