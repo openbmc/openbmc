@@ -9,3 +9,4 @@ RRECOMMENDS:${PN}:append = " \
     phosphor-logging \
     sdbusplus \
     "
+RRECOMMENDS:${PN}:append:df-etcd = " etc-cpp-apiv3 protobuf"
