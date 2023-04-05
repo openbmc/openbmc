@@ -18,6 +18,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = \
   '${@"" if not d.getVar("GBMC_NCSI_IF_NAME") else " gbmc-ncsi-config"}'
 OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = \
   '${@"" if not d.getVar("GBMC_MAC_EEPROM_OF_NAME") else " gbmc-mac-config"}'
+OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = \
+  '${@"" if not d.getVar("GBMC_ETHER_MAP") else " gbmc-nic-rename"}'
 
 # Include these useful utilities for all gbmc platforms
 OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = " ipmitool"

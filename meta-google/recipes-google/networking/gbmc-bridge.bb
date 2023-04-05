@@ -73,6 +73,23 @@ def mac_to_eui64(mac):
   idx = range(0, len(b)-1, 2)
   return ':'.join([format((b[i] << 8) + b[i+1], '04x') for i in idx])
 
+GBMC_BRIDGE_INTFS ?= ""
+
+ethernet_bridge_install() {
+  # install udev rules if any
+  if [ -z "${GBMC_BRIDGE_INTFS}"]; then
+    return
+  fi
+  cat /dev/null > ${WORKDIR}/-ether-bridge.network
+  echo "[Match]" >> ${WORKDIR}/-ether-bridge.network
+  echo "Name=${GBMC_BRIDGE_INTFS}" >>  ${WORKDIR}/-ether-bridge.network
+  echo "[Network]" >> ${WORKDIR}/-ether-bridge.network
+  echo "Bridge=gbmcbr" >> ${WORKDIR}/-ether-bridge.network
+
+  install -d ${D}/${sysconfdir}/systemd/network
+  install -m 0644 ${WORKDIR}/-ether-bridge.network ${D}/${sysconfdir}/systemd/network/
+}
+
 do_install() {
   netdir=${D}${systemd_unitdir}/network
   install -d -m0755 $netdir
@@ -84,6 +101,8 @@ do_install() {
   else
     sed -i '/@ADDR@/d' ${WORKDIR}/-bmc-gbmcbr.network.in
   fi
+
+  ethernet_bridge_install
 
   install -m0644 ${WORKDIR}/-bmc-gbmcbr.netdev $netdir/
   install -m0644 ${WORKDIR}/-bmc-gbmcbr.network.in $netdir/-bmc-gbmcbr.network
