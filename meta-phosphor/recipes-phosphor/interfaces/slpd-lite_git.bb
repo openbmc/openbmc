@@ -14,5 +14,5 @@ SRC_URI += "git://github.com/openbmc/slpd-lite;branch=master;protocol=https"
 SYSTEMD_SERVICE:${PN} += "slpd-lite.service"
 S = "${WORKDIR}/git"
 
-inherit autotools pkgconfig
+inherit meson pkgconfig
 inherit obmc-phosphor-systemd
