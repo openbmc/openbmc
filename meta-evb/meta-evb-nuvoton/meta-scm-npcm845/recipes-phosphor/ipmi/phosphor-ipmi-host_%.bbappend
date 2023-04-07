@@ -1,7 +1,7 @@
 FILESEXTRAPATHS:append:scm-npcm845 := "${THISDIR}/${PN}:"
 
-EXTRA_OECONF:append:scm-npcm845 = " --disable-i2c-whitelist-check"
-EXTRA_OECONF:append:scm-npcm845 = " --enable-sel_logger_clears_sel"
+EXTRA_OEMESON:append:scm-npcm845 = " -Di2c-whitelist-check=disabled"
+EXTRA_OEMESON:append:scm-npcm845 = " -Dsel-logger-clears-sel=enabled"
 
 # Fix build error when enable dbus-sdr
 # SRC_URI:append:scm-npcm845 = " file://0001-dbus-sdr-fix-build-break.patch"
