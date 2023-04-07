@@ -6,7 +6,7 @@ StartLimitInterval=25
 StartLimitBurst=5
 
 [Service]
-ExecStart=/usr/bin/env ampere_update_mac.sh eth0 14 80
+ExecStart=/usr/sbin/ampere_update_mac.sh eth0 14 80
 SyslogIdentifier=ampere_update_mac.sh
 RemainAfterExit=yes
 Restart=on-failure

@@ -6,7 +6,7 @@ ConditionPathExists=!/var/ampere/sysfw-hang-disable
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/env ampere_sysfw_hang_handler.sh
+ExecStart=/usr/sbin/ampere_sysfw_hang_handler.sh
 SyslogIdentifier=ampere_sysfw_hang
 
 [Install]

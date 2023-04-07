@@ -6,5 +6,5 @@ Conflicts=obmc-chassis-poweroff@%i.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/env ampere_gpio_utils.sh power on
+ExecStart=/usr/sbin/ampere_gpio_utils.sh power on
 SyslogIdentifier=ampere_gpio_utils

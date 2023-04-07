@@ -4,7 +4,7 @@ Description=Ampere BMC heartbeat service
 [Service]
 Type=simple
 Restart=always
-ExecStart=/usr/bin/env ampere_bmc_heartbeat.sh
+ExecStart=/usr/sbin/ampere_bmc_heartbeat.sh
 SyslogIdentifier = "ampere-bmc-heartbeat"
 
 [Install]

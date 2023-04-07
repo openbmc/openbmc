@@ -4,7 +4,7 @@ Requires=xyz.openbmc_project.EntityManager.service
 After=xyz.openbmc_project.EntityManager.service
 
 [Service]
-ExecStart=/usr/bin/env ampere_update_mac.sh eth1 3 80
+ExecStart=/usr/sbin/ampere_update_mac.sh eth1 3 80
 SyslogIdentifier=ampere_update_mac.sh
 Type=oneshot
 RemainAfterExit=yes

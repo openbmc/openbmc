@@ -4,5 +4,5 @@ Conflicts=obmc-chassis-poweron@0.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/env ampere_power_util.sh mb shutdown_ack
+ExecStart=/usr/sbin/ampere_power_util.sh mb shutdown_ack
 SyslogIdentifier=ampere_host_shutdown_ack

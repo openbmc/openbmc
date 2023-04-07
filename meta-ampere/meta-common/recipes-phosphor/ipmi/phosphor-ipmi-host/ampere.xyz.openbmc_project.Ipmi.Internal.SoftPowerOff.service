@@ -8,6 +8,6 @@ ConditionPathExists=!/lib/systemd/system/pldmSoftPowerOff.service
 
 [Service]
 Restart=no
-ExecStart=/usr/bin/env phosphor-softpoweroff
+ExecStart=/usr/bin/phosphor-softpoweroff
 SyslogIdentifier=phosphor-softpoweroff
 Type=oneshot
