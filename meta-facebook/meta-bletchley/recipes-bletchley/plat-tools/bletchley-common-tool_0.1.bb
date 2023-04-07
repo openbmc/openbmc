@@ -10,6 +10,7 @@ SRC_URI += " \
     file://bletchley-system-state-init \
     file://bletchley-system-state-init@.service \
     file://bletchley-usbmux-util \
+    file://bletchley-net-util \
     "
 
 do_install() {
@@ -18,6 +19,7 @@ do_install() {
 
     install -d ${D}${bindir}
     install -m 0755 ${WORKDIR}/bletchley-usbmux-util ${D}${bindir}
+    install -m 0755 ${WORKDIR}/bletchley-net-util ${D}${bindir}
 }
 
 
