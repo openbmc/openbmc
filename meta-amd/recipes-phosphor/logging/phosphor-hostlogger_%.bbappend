@@ -5,5 +5,5 @@ DEFAULT_INSTANCE:ethanolx = "ttyS0"
 DEFAULT_INSTANCE:daytonax = "ttyVUART0"
 
 SRC_URI:remove = "file://${BPN}.conf"
-SRC_URI:ethanolx += "file://ttyS0.conf"
-SRC_URI:daytonax += "file://ttyVUART0.conf"
+SRC_URI:append:ethanolx = " file://ttyS0.conf"
+SRC_URI:append:daytonax = " file://ttyVUART0.conf"
