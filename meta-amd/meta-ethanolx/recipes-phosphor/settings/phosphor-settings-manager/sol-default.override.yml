@@ -12,6 +12,6 @@
           RetryCount:
               Default: 7
           RetryIntervalMS:
-              Default: 1
+              Default: 100
           Threshold:
               Default: 1
