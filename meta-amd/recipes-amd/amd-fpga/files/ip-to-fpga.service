@@ -4,7 +4,7 @@ BindsTo=sys-subsystem-net-devices-eth0.device
 After=sys-subsystem-net-devices-eth0.device
 
 [Service]
-Type=oneshot
+Type=simple
 ExecStart=/usr/bin/ip-to-fpga.sh
 
 [Install]
