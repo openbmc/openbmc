@@ -46,4 +46,5 @@ RDEPENDS:${PN}-system = " \
         ipmitool \
         phosphor-hostlogger \
         webui-vue \
+        srvcfg-manager \
         "
