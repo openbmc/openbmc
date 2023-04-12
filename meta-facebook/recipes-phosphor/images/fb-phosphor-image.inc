@@ -2,7 +2,13 @@ IMAGE_FEATURES:remove = "\
     obmc-net-ipmi \
     obmc-user-mgmt-ldap \
     "
-IMAGE_FEATURES:remove:fb-nohost = "obmc-console"
+IMAGE_FEATURES:remove:fb-nohost = "\
+    obmc-console \
+    ssh-server-dropbear \
+    "
+IMAGE_FEATURES:append:fb-nohost = "\
+    ssh-server-openssh \
+    "
 
 OBMC_IMAGE_EXTRA_INSTALL:append = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'tpm', \
