@@ -20,4 +20,8 @@ inherit meson pkgconfig
 inherit python3native
 inherit obmc-phosphor-dbus-service
 
+EXTRA_OEMESON = " \
+    -Dtests=disabled \
+    "
+
 DBUS_SERVICE:${PN} += "xyz.openbmc_project.Network.SNMP.service"
