@@ -71,6 +71,11 @@ RDEPENDS:${PN}-devtools = " \
         trace-enable \
         "
 
+EXTRA_DEV_DEBUG_TOOLS = "gdbserver strace opkg curl"
+RDEPENDS:${PN}-devtools:append = " \
+        ${@bb.utils.contains('DISTRO_FEATURES', 'extra-dev-debug-tools', '${EXTRA_DEV_DEBUG_TOOLS}', '', d)} \
+        "
+
 SUMMARY:${PN}-dbus-monitor = "Support for dbus monitoring"
 RDEPENDS:${PN}-dbus-monitor = " \
         phosphor-dbus-monitor \
