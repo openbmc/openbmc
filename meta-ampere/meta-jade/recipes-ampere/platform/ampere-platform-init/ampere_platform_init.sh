@@ -4,6 +4,7 @@
 source /usr/sbin/gpio-lib.sh
 # shellcheck source=meta-ampere/meta-jade/recipes-ampere/platform/ampere-utils/gpio-defs.sh
 source /usr/sbin/gpio-defs.sh
+source /usr/sbin/ampere_uart_console_setup.sh
 
 # Configure to boot from MAIN SPI-HOST
 gpio_configure_output "$SPI0_BACKUP_SEL" 0
@@ -45,3 +46,6 @@ if [ "$bootstatus" == '32' ]; then
 fi
 
 gpio_configure_output "$BMC_READY" 1
+# =======================================================
+# Setting uart muxes to BMC as default
+uart_console_setup
