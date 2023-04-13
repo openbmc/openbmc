@@ -4,6 +4,7 @@
 source /usr/sbin/gpio-lib.sh
 # shellcheck source=meta-ampere/meta-mitchell/recipes-ampere/platform/ampere-platform-init/mtmitchell_platform_gpios_init.sh
 source /usr/sbin/platform_gpios_init.sh
+source /usr/sbin/ampere_uart_console_setup.sh
 
 #pre platform init function. implemented in platform_gpios_init.sh
 pre-platform-init
@@ -40,6 +41,10 @@ echo "CONFIGURE: gpio pins to input"
 for gpioName in "${input_gpios_in_bmc_reboot[@]}"; do
     gpio_name_input "$gpioName"
 done
+
+# =======================================================
+# Setting uart muxes to BMC as default
+uart_console_setup
 
 #post platform init function. implemented in platform_gpios_init.sh
 post-platform-init
