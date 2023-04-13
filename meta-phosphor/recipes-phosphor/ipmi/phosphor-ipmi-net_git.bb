@@ -34,6 +34,10 @@ SYSTEMD_SERVICE:${PN} = " \
 inherit meson pkgconfig
 inherit systemd
 
+PACKAGECONFIG ??= "pam-authenticate rmcp-ping"
+PACKAGECONFIG[rmcp-ping] = "-Drmcp_ping=enabled,-Drmcp_ping=disabled"
+PACKAGECONFIG[pam-authenticate] = "-Dpam_authenticate=enabled,-Dpam_authenticate=disabled"
+
 EXTRA_OEMESON = " \
         -Dtests=disabled \
         "
