@@ -72,7 +72,7 @@ sync_multi_host_datetime()
 
         if [[ $(echo "$multi_host_time_result" | awk '{ print NF }') -eq 18 ]];
         then
-            echo "syncing up host " $index " date time with bmc..."
+            echo "syncing up host " "$index" " date time with bmc..."
             date -s @$((0x$(echo "$multi_host_time_result" | \
             awk '{printf "%02x%02x%02x%02x",$18,$17,$16,$15}')))
             sync

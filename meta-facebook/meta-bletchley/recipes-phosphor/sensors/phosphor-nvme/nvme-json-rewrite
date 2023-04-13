@@ -10,13 +10,13 @@ export_gpio() {
 
 for i in {0..5}
 do
-    SLED_NVME_PCIE_EN[$i]=0
+    SLED_NVME_PCIE_EN[i]=0
     for file in /sys/bus/i2c/drivers/pca953x/"$i"-0041/gpio/gpiochip*/base
     do
         if [ -f "$file" ]; then
             GPIOCHIP_BASE="$(cat /sys/bus/i2c/drivers/pca953x/"$i"-0041/gpio/gpiochip*/base)"
-            SLED_NVME_PCIE_EN[$i]=$((GPIOCHIP_BASE+3))
-            export_gpio ${SLED_NVME_PCIE_EN[$i]}
+            SLED_NVME_PCIE_EN[i]=$((GPIOCHIP_BASE+3))
+            export_gpio "${SLED_NVME_PCIE_EN[i]}"
             break
         fi
     done

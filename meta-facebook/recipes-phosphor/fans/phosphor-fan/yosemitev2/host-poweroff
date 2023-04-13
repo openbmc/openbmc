@@ -19,7 +19,7 @@ power-off-all-hosts()
         echo "chosen host id :::$host_id"
 
         # host power off
-        output=$(busctl set-property $DBUS_SERVICE$host_id $DBUS_OBJECT$host_id $DBUS_INTERFACE $DBUS_PROPERTY s $PROPERTY_VALUE)
+        output=$(busctl set-property $DBUS_SERVICE"$host_id" $DBUS_OBJECT"$host_id" $DBUS_INTERFACE $DBUS_PROPERTY s $PROPERTY_VALUE)
         echo "$output"
 
     done
