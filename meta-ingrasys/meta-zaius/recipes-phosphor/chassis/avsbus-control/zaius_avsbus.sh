@@ -18,8 +18,8 @@ i2c_path="/sys/bus/i2c/devices/"
 # Initializes the AVSBus VOUT setpoint to the value in PMBus VOUT_COMMAND
 vrm_avs_enable()
 {
-    echo Enabling AVSBus on bus $1 VRM @$2 rail $3...
-    echo 1 > $(echo ${i2c_path}/$1-$(printf "%04x" $2)/hwmon/hwmon*/avs$(printf "%d" $3)_enable)
+    echo "Enabling AVSBus on bus $1 VRM @$2 rail $3..."
+    echo 1 > "${i2c_path}/$1-$(printf "%04x" "$2")/hwmon/hwmon*/avs$(printf "%d" "$3")_enable"
 }
 
 # Usage: vrm_avs_disable <bus> <i2c_address> <page>
@@ -29,8 +29,8 @@ vrm_avs_enable()
 # - AVSBus Copy: VOUT_COMMAND remains unchanged
 vrm_avs_disable()
 {
-    echo Disabling AVSBus on bus $1 VRM @$2 rail $3...
-    echo 0 > $(echo ${i2c_path}/$1-$(printf "%04x" $2)/hwmon/hwmon*/avs$(printf "%d" $3)_enable)
+    echo "Disabling AVSBus on bus $1 VRM @$2 rail $3..."
+    echo 0 > "${i2c_path}/$1-$(printf "%04x" "$2")/hwmon/hwmon*/avs$(printf "%d" "$3")_enable"
 }
 
 # Usage: for_each_rail <command>
@@ -41,15 +41,15 @@ for_each_rail()
     do
         for addr_page in $addrs_pages
         do
-            $1 $bus `echo $addr_page | tr : " "`
+            $1 "$bus" "$(echo "$addr_page" | tr : " ")"
         done
     done
 }
 
-if [ "$1" == "enable" ]
+if [ "$1" = "enable" ]
 then
     for_each_rail vrm_avs_enable
-elif [ "$1" == "disable" ]
+elif [ "$1" = "disable" ]
 then
     for_each_rail vrm_avs_disable
 else

@@ -127,8 +127,6 @@ meta-google/recipes-phosphor/flash/google-key/verify-bmc-image.sh
 meta-google/recipes-phosphor/flash/inplace-gbmc-update/inplace-gbmc-verify.sh
 meta-ibm/meta-romulus/recipes-phosphor/chassis/vrm-control/vrm-control.sh
 meta-ibm/recipes-phosphor/chassis/vrm-control/vrm-control.sh
-meta-ingrasys/meta-zaius/recipes-phosphor/chassis/avsbus-control/zaius_avsbus.sh
-meta-ingrasys/meta-zaius/recipes-phosphor/chassis/vcs-control/zaius_vcs.sh
 meta-inventec/meta-transformers/recipes-phosphor/init/transformers-init/transformers-init.sh
 meta-openpower/recipes-bsp/pdata/files/power-target.sh
 meta-openpower/recipes-phosphor/network/first-boot-set-hostname/first-boot-set-hostname.sh

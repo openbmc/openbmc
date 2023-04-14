@@ -21,7 +21,7 @@ SYSTEMD_SERVICE:${PN} += "${TMPL_ON}"
 SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT_ON', 'OBMC_CHASSIS_INSTANCES')}"
 
 SRC_URI += "file://zaius_vcs.sh"
-RDEPENDS:${PN} += "i2c-tools"
+RDEPENDS:${PN} += "bash i2c-tools"
 
 do_install() {
         install -d ${D}${bindir}
