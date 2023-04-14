@@ -21,6 +21,7 @@ EXTRA_IBM_LOGGING_PKGS:witherspoon = ""
 EXTRA_IBM_LOGGING_PKGS:witherspoon-tacoma = ""
 EXTRA_IBM_LOGGING_PKGS:p10bmc = " \
     python3-sbe-log-parsers \
+    hostboot-pel-parsers \
 "
 
 RDEPENDS:${PN}-inventory:append:ibm-ac-server = " openpower-fru-vpd openpower-occ-control phosphor-cooling-type phosphor-gpio-monitor-presence"
