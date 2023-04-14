@@ -7,7 +7,7 @@ SRCREV = "08e854a6c425011d029e4e02241afee5060f15eb"
 PV = "0.1+git${SRCPV}"
 PR = "r1"
 
-SRC_URI += "git://github.com/jk-ozlabs/uart-render-controller;branch=master;protocol=https"
+SRC_URI = "git://github.com/jk-ozlabs/uart-render-controller;branch=master;protocol=https"
 SRC_URI += "file://uart-render-controller.service"
 
 S = "${WORKDIR}/git"

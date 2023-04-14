@@ -16,7 +16,7 @@ SRCREV = "0c60faaa0b53dad6561b95e66c0a601e442aeecf"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
-SRC_URI += "git://github.com/openbmc/phosphor-gpio-monitor;branch=master;protocol=https"
+SRC_URI = "git://github.com/openbmc/phosphor-gpio-monitor;branch=master;protocol=https"
 
 SYSTEMD_PACKAGES = "${GPIO_PACKAGES}"
 SYSTEMD_SERVICE:${PN}-monitor += "phosphor-multi-gpio-monitor.service"

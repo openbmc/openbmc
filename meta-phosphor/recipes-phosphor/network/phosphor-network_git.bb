@@ -21,7 +21,7 @@ PACKAGECONFIG[persist-mac] = "-Dpersist-mac=true, -persist-mac=false,,"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
-SRC_URI += "git://github.com/openbmc/phosphor-networkd;branch=master;protocol=https"
+SRC_URI = "git://github.com/openbmc/phosphor-networkd;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 SYSTEMD_PACKAGES = "${PN}"

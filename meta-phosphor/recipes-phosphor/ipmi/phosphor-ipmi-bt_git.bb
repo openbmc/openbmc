@@ -9,7 +9,7 @@ SRCREV = "87a0efd5f529c39c0e2039519b6595aa0a22bbde"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
-SRC_URI += "git://github.com/openbmc/btbridge;branch=master;protocol=https"
+SRC_URI = "git://github.com/openbmc/btbridge;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

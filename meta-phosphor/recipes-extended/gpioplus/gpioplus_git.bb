@@ -7,7 +7,7 @@ SRCREV = "01bc0bf6b15fa3dcd8904bea6c9e40c502d0230f"
 PV = "0.1+git${SRCPV}"
 PR = "r1"
 
-SRC_URI += "git://github.com/openbmc/gpioplus;branch=master;protocol=https"
+SRC_URI = "git://github.com/openbmc/gpioplus;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

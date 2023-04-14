@@ -6,7 +6,7 @@ SRCREV = "42627cab5c87a25540e004ccae3077461e1480bb"
 PV = "0.1+git${SRCPV}"
 PR = "r1"
 
-SRC_URI += "git://github.com/openbmc/libbej;branch=main;protocol=https"
+SRC_URI = "git://github.com/openbmc/libbej;branch=main;protocol=https"
 
 S = "${WORKDIR}/git"
 

@@ -11,7 +11,7 @@ SRCREV = "db7e56bdb0765da28327a371ed3295bf8ca74803"
 PV = "0.1+git${SRCPV}"
 PR = "r1"
 
-SRC_URI += "git://github.com/openbmc/sdeventplus;branch=master;protocol=https"
+SRC_URI = "git://github.com/openbmc/sdeventplus;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

@@ -22,7 +22,7 @@ SRCREV = "e81b7c9d1aa571694200cc2afdca238cb23a7442"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
-SRC_URI += "git://github.com/openbmc/phosphor-net-ipmid;branch=master;protocol=https"
+SRC_URI = "git://github.com/openbmc/phosphor-net-ipmid;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 # install parameterized service and socket files

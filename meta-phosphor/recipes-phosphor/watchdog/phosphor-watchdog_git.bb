@@ -16,7 +16,7 @@ DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "phosphor-logging"
 DEPENDS += "systemd"
 
-SRC_URI += "git://github.com/openbmc/phosphor-watchdog;branch=master;protocol=https"
+SRC_URI = "git://github.com/openbmc/phosphor-watchdog;branch=master;protocol=https"
 SRCREV = "d1b1e79b74238694c7a25f873ace2ff6dab1b683"
 S = "${WORKDIR}/git"
 

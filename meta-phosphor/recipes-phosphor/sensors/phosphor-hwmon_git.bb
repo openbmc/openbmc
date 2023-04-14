@@ -18,7 +18,7 @@ PACKAGECONFIG[max31785-msl] = "-Denable-max31785-msl=true, -Denable-max31785-msl
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
-SRC_URI += "git://github.com/openbmc/phosphor-hwmon;branch=master;protocol=https"
+SRC_URI = "git://github.com/openbmc/phosphor-hwmon;branch=master;protocol=https"
 
 SYSTEMD_PACKAGES = "${PN} max31785-msl"
 SYSTEMD_SERVICE:${PN} = "xyz.openbmc_project.Hwmon@.service"

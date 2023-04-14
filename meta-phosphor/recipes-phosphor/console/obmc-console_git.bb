@@ -15,7 +15,7 @@ PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_system_unitdir},
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
-SRC_URI += "git://github.com/openbmc/obmc-console;branch=master;protocol=https"
+SRC_URI = "git://github.com/openbmc/obmc-console;branch=master;protocol=https"
 SRC_URI += "file://${BPN}.conf"
 
 S = "${WORKDIR}/git"

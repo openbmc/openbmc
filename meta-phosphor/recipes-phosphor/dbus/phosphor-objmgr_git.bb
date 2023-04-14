@@ -13,7 +13,7 @@ SRCREV = "403027426d684b62459a2fe7225a7c60accb0e5c"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
-SRC_URI += "git://github.com/openbmc/phosphor-objmgr;branch=master;protocol=https"
+SRC_URI = "git://github.com/openbmc/phosphor-objmgr;branch=master;protocol=https"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[unit-failure-monitor] = "-Dunit-failure-monitor=enabled,-Dunit-failure-monitor=disabled,,"

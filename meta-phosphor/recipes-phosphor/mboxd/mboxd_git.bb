@@ -13,7 +13,7 @@ PACKAGECONFIG[virtual-pnor] = "--enable-virtual-pnor,--disable-virtual-pnor"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
-SRC_URI += "git://github.com/openbmc/hiomapd.git;branch=master;protocol=https"
+SRC_URI = "git://github.com/openbmc/hiomapd.git;branch=master;protocol=https"
 SRC_URI += "file://99-aspeed-lpc-ctrl.rules"
 
 S = "${WORKDIR}/git"

@@ -14,7 +14,7 @@ SRCREV = "200adf8fa81459195372f47135f2daf7f9fbbcdf"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
-SRC_URI += "git://github.com/openbmc/phosphor-psu-code-mgmt;branch=master;protocol=https"
+SRC_URI = "git://github.com/openbmc/phosphor-psu-code-mgmt;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 SYSTEMD_SERVICE:${PN} = "xyz.openbmc_project.Software.Psu.Updater.service"

@@ -9,7 +9,7 @@ SRCREV = "55aac8e1bd6fafbbd9dcc8205dabec9c32ca2da4"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
-SRC_URI += "git://github.com/openbmc/slpd-lite;branch=master;protocol=https"
+SRC_URI = "git://github.com/openbmc/slpd-lite;branch=master;protocol=https"
 
 SYSTEMD_SERVICE:${PN} += "slpd-lite.service"
 S = "${WORKDIR}/git"

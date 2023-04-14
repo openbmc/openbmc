@@ -13,7 +13,7 @@ SRCREV = "e8d664d1689cfec3449ec964262d665f7b4ec873"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
-SRC_URI += "git://github.com/openbmc/phosphor-user-manager;branch=master;protocol=https"
+SRC_URI = "git://github.com/openbmc/phosphor-user-manager;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

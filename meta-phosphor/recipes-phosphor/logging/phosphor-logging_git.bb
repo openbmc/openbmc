@@ -27,7 +27,7 @@ PACKAGECONFIG[openpower-pels] = " \
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
-SRC_URI += "git://github.com/openbmc/phosphor-logging;branch=master;protocol=https"
+SRC_URI = "git://github.com/openbmc/phosphor-logging;branch=master;protocol=https"
 
 SYSTEMD_PACKAGES = "${LOGGING_PACKAGES}"
 S = "${WORKDIR}/git"

@@ -10,7 +10,7 @@ S = "${WORKDIR}/git"
 inherit meson obmc-phosphor-utils pkgconfig
 inherit systemd
 
-SRC_URI += "git://github.com/openbmc/openpower-proc-control;branch=master;protocol=https"
+SRC_URI = "git://github.com/openbmc/openpower-proc-control;branch=master;protocol=https"
 SRCREV = "be14ec2d4350ba245538ad0330587af809fa31c2"
 
 DEPENDS += " \
