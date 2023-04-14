@@ -12,7 +12,7 @@ pnormtd="$(findmtd pnor)"
 pnor="${pnormtd#mtd}"
 pnordev="/dev/mtd${pnor}"
 
-if [[ ! "$(dd if=${pnordev} bs=1 count=3 2> /dev/null)" = "UBI" ]]; then
+if [ ! "$(dd if="${pnordev}" bs=1 count=3 2> /dev/null)" = "UBI" ]; then
   echo "${pnordev} is not formatted UBI"
   exit 1
 fi

@@ -129,12 +129,7 @@ meta-hpe/meta-common/recipes-hpe/host/host-boot-enable/host-boot-enable.sh
 meta-hpe/meta-common/recipes-phosphor/initrdscripts/files/gxp-obmc-init.sh
 meta-hpe/meta-dl360poc/recipes-hpe/host/host-boot-enable/host-boot-enable.sh
 meta-ibm/meta-romulus/recipes-phosphor/chassis/vrm-control/vrm-control.sh
-meta-ibm/meta-romulus/recipes-phosphor/gpio/id-button/toggle_identify_led.sh
-meta-ibm/recipes-phosphor/chassis/power-workarounds/witherspoon/power-workarounds.sh
-meta-ibm/recipes-phosphor/chassis/vrm-control/ibm-ac-server/ir35221-unbind-bind.sh
 meta-ibm/recipes-phosphor/chassis/vrm-control/vrm-control.sh
-meta-ibm/recipes-phosphor/gpio/id-button/toggle_identify_led.sh
-meta-ibm/recipes-phosphor/mboxd/mboxd/check_pnor_format.sh
 meta-ingrasys/meta-zaius/recipes-phosphor/chassis/avsbus-control/zaius_avsbus.sh
 meta-ingrasys/meta-zaius/recipes-phosphor/chassis/vcs-control/zaius_vcs.sh
 meta-inventec/meta-transformers/recipes-phosphor/init/transformers-init/transformers-init.sh

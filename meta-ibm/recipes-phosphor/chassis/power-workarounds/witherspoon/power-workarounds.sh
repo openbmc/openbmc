@@ -45,10 +45,11 @@ ucd=
 ucdpath="/sys/bus/i2c/drivers/ucd9000"
 if [ -e $ucdpath ]
 then
-  ucd=`ls -1 $ucdpath | grep 64`
+  # shellcheck disable=SC2010
+  ucd=$(ls -1 $ucdpath | grep 64)
   if [ -n "$ucd" ]
   then
-    echo $ucd > $ucdpath/unbind
+    echo "$ucd" > $ucdpath/unbind
   fi
 fi
 
@@ -67,8 +68,8 @@ i2cset -y 11 0x64 0xF7 0x01 i
 i2cset -y 11 0x64 0xF8 0x15 0x16 0x80 0x08 0x00 0x00 0x20 0x40 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 i
 
 # change VDN delays based on UCD MFR_REVISION setting
-REV=`i2cget -y 11 0x64 0x9B i 2|cut -f2 -d' '`
-if [ "$REV" == "0x01" -o "$REV" == "0x02" ] ; then
+REV=$(i2cget -y 11 0x64 0x9B i 2|cut -f2 -d' ')
+if [ "$REV" = "0x01" ] || [ "$REV" = "0x02" ] ; then
   # use 20ms delay for VDN
   #TON_DELAY rail 8
   i2cset -y 11 0x64 0x00 0x07 i
@@ -120,15 +121,16 @@ i2cset -y 5 0x70 0x00 0x01 # PAGE 1
 i2cset -y 5 0x70 0x46 0x0816 w # OC to 43A
 
 # re-bind ucd driver only if we unbound it (i.e. ucd has been set with a value)
-if [ -e $ucdpath -a -n "$ucd" ]; then
+if [ -e $ucdpath ] && [ -n "$ucd" ]; then
   j=0
-  until [ $j -ge $ucd_retries ] || [ -e $ucdpath/$ucd ]; do
+  until [ $j -ge $ucd_retries ] || [ -e "$ucdpath/$ucd" ]; do
     j=$((j+1))
-    echo $ucd > $ucdpath/bind || ret=$?
+    # shellcheck disable=2320
+    echo "$ucd" > $ucdpath/bind || ret=$?
     if [ $j -gt 1 ]; then
       echo "rebinding UCD driver. Retry number $j"
       sleep 1
     fi
   done
-  if [ ! -e $ucdpath/$ucd ]; then exit $ret; fi
+  if [ ! -e "$ucdpath/$ucd" ]; then exit "$ret"; fi
 fi
