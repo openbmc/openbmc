@@ -289,6 +289,7 @@ normalize_ip() {
 }
 
 network_init=1
-return 0 2>/dev/null
-echo "network is a library, not executed directly" >&2
-exit 1
+if ! (return 0 2>/dev/null); then
+  echo "network is a library, not executed directly" >&2
+  exit 1
+fi

@@ -42,7 +42,7 @@ while true; do
   # Ensure we only complete the addr lookup loop every 10s
   tosleep=$((before + 10 - SECONDS))
   if (( tosleep > 0 )); then
-    sleep $tosleep
+    sleep "$tosleep"
   fi
 done
 
@@ -99,7 +99,7 @@ while true; do
   w=$((active_ms/1000/1000 + (wait_min*60) - cur_s))
   [ "$w" -lt 0 ] && break
   echo "Waiting ${w}s for DHCP process" >&2
-  sleep $w
+  sleep "$w"
 done
 
 echo "Stopping DHCP processing" >&2
