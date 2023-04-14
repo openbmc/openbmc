@@ -100,8 +100,6 @@ exit 1
 fi
 
 lint_exempt="\
-meta-amd/recipes-amd/amd-fpga/files/ethanolx/fpgardu.sh
-meta-bytedance/meta-g220a/recipes-network/network/static-mac-addr/mac-check
 meta-google/recipes-google/gpio/gpio-ctrl/lib.sh
 meta-google/recipes-google/host-power-ctrl/gpio-host-pwr/host_isoff.sh
 meta-google/recipes-google/host-power-ctrl/gpio-host-pwr/host_powercycle.sh
@@ -135,15 +133,12 @@ meta-ibm/meta-romulus/recipes-phosphor/gpio/id-button/toggle_identify_led.sh
 meta-ibm/recipes-phosphor/chassis/power-workarounds/witherspoon/power-workarounds.sh
 meta-ibm/recipes-phosphor/chassis/vrm-control/ibm-ac-server/ir35221-unbind-bind.sh
 meta-ibm/recipes-phosphor/chassis/vrm-control/vrm-control.sh
-meta-ibm/recipes-phosphor/dump/phosphor-debug-collector/plugins.d/ibm_elogall
-meta-ibm/recipes-phosphor/dump/phosphor-debug-collector/plugins.d/pels
 meta-ibm/recipes-phosphor/gpio/id-button/toggle_identify_led.sh
 meta-ibm/recipes-phosphor/mboxd/mboxd/check_pnor_format.sh
 meta-ingrasys/meta-zaius/recipes-phosphor/chassis/avsbus-control/zaius_avsbus.sh
 meta-ingrasys/meta-zaius/recipes-phosphor/chassis/vcs-control/zaius_vcs.sh
 meta-inventec/meta-transformers/recipes-phosphor/init/transformers-init/transformers-init.sh
 meta-openpower/recipes-bsp/pdata/files/power-target.sh
-meta-openpower/recipes-phosphor/dump/phosphor-debug-collector/plugins.d/guard
 meta-openpower/recipes-phosphor/network/first-boot-set-hostname/first-boot-set-hostname.sh
 meta-openpower/recipes-phosphor/network/first-boot-set-mac/first-boot-set-mac.sh
 meta-openpower/recipes-phosphor/occ/openpower-occ-control/occ-active.sh
