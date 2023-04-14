@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Command line debug tools like pdbg and ecmd requires
 # PDBG_DTB environment variable.
 # attributes tool required PDBG_DTB, PDATA_INFODB and PDATA_ATTR_OVERRIDE

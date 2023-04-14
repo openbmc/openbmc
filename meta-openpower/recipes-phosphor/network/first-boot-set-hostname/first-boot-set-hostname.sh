@@ -29,11 +29,11 @@ sync_hostname() {
     BMC_ITEM_PATH=${BMC_ITEM_PATH%\"*}
 
     BMC_ITEM_SERVICE=$(mapper get-service \
-                                ${BMC_ITEM_PATH} 2>/dev/null || true)
+                                "${BMC_ITEM_PATH}" 2>/dev/null || true)
 
-    if [[ -n "${BMC_ITEM_SERVICE}" ]]; then
-        BMC_SN=$(busctl get-property ${BMC_ITEM_SERVICE} \
-                            ${BMC_ITEM_PATH} \
+    if [ -n "${BMC_ITEM_SERVICE}" ]; then
+        BMC_SN=$(busctl get-property "${BMC_ITEM_SERVICE}" \
+                            "${BMC_ITEM_PATH}" \
                             ${INV_ASSET_IFACE} SerialNumber)
         # 's "002B0DH1000"'
         BMC_SN=${BMC_SN#*\"}
@@ -42,7 +42,7 @@ sync_hostname() {
         show_error "No BMC item found in the Inventory. Is VPD EEPROM empty?"
     fi
 
-    if [[ -z "${BMC_SN}" ]] ; then
+    if [ -z "${BMC_SN}" ] ; then
         show_error "BMC Serial Number empty! Setting Hostname as 'hostname + mac address' "
 
         NETWORK_ITEM_IFACE='xyz.openbmc_project.Inventory.Item.NetworkInterface'
@@ -57,24 +57,24 @@ sync_hostname() {
         NETWORK_ITEM_PATH=${NETWORK_ITEM_PATH#*\"}
         NETWORK_ITEM_PATH=${NETWORK_ITEM_PATH%\"*}
 
-        NETWORK_ITEM_OBJ=$(mapper get-service ${NETWORK_ITEM_PATH} 2>/dev/null || true)
+        NETWORK_ITEM_OBJ=$(mapper get-service "${NETWORK_ITEM_PATH}" 2>/dev/null || true)
 
-        if [[ -z "${NETWORK_ITEM_OBJ}" ]]; then
+        if [ -z "${NETWORK_ITEM_OBJ}" ]; then
             show_error 'No Ethernet interface found in the Inventory. Unique hostname not set!'
             exit 1
         fi
 
-        MAC_ADDR=$(busctl get-property ${NETWORK_ITEM_OBJ} \
-                               ${NETWORK_ITEM_PATH} \
-                               ${NETWORK_ITEM_IFACE} MACAddress)
+        MAC_ADDR=$(busctl get-property "${NETWORK_ITEM_OBJ}" \
+                               "${NETWORK_ITEM_PATH}" \
+                               "${NETWORK_ITEM_IFACE}" MACAddress)
 
         # 's "54:52:01:02:03:04"'
         MAC_ADDR=${MAC_ADDR#*\"}
         MAC_ADDR=${MAC_ADDR%\"*}
 
-        hostnamectl set-hostname $(hostname)-${MAC_ADDR}
+        hostnamectl set-hostname "$(hostname)-${MAC_ADDR}"
     else
-        hostnamectl set-hostname $(hostname)-${BMC_SN}
+        hostnamectl set-hostname "$(hostname)-${BMC_SN}"
     fi
 
 }

@@ -128,10 +128,6 @@ meta-google/recipes-phosphor/flash/inplace-gbmc-update/inplace-gbmc-verify.sh
 meta-ibm/meta-romulus/recipes-phosphor/chassis/vrm-control/vrm-control.sh
 meta-ibm/recipes-phosphor/chassis/vrm-control/vrm-control.sh
 meta-inventec/meta-transformers/recipes-phosphor/init/transformers-init/transformers-init.sh
-meta-openpower/recipes-bsp/pdata/files/power-target.sh
-meta-openpower/recipes-phosphor/network/first-boot-set-hostname/first-boot-set-hostname.sh
-meta-openpower/recipes-phosphor/network/first-boot-set-mac/first-boot-set-mac.sh
-meta-openpower/recipes-phosphor/occ/openpower-occ-control/occ-active.sh
 meta-phosphor/recipes-support/nss-pam-ldapd/files/nslcd.init
 meta-quanta/meta-common/recipes-quanta/network/usb-network/usb-network.sh
 meta-quanta/meta-gbs/recipes-gbs/gbs-bios-update/files/bios-update.sh
