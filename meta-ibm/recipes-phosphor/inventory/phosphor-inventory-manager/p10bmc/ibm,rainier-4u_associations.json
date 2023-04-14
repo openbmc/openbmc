@@ -875,6 +875,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/cpu0_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "power_managed_by",
+                        "fType": "power_managing"
+                    },
+                    "paths":
+                    [
+                        "/org/open_power/control/occ0"
+                    ]
                 }
             ]
         },
@@ -902,6 +913,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/cpu0_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "power_managed_by",
+                        "fType": "power_managing"
+                    },
+                    "paths":
+                    [
+                        "/org/open_power/control/occ1"
                     ]
                 }
             ]
@@ -931,6 +953,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/cpu1_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "power_managed_by",
+                        "fType": "power_managing"
+                    },
+                    "paths":
+                    [
+                        "/org/open_power/control/occ2"
+                    ]
                 }
             ]
         },
@@ -958,6 +991,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/cpu1_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "power_managed_by",
+                        "fType": "power_managing"
+                    },
+                    "paths":
+                    [
+                        "/org/open_power/control/occ3"
                     ]
                 }
             ]

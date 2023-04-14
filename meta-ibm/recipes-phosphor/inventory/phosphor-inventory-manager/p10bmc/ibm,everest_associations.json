@@ -2095,6 +2095,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/cpu0_c14_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "power_managed_by",
+                        "fType": "power_managing"
+                    },
+                    "paths":
+                    [
+                        "/org/open_power/control/occ0"
+                    ]
                 }
             ]
         },
@@ -2122,6 +2133,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/cpu0_c14_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "power_managed_by",
+                        "fType": "power_managing"
+                    },
+                    "paths":
+                    [
+                        "/org/open_power/control/occ1"
                     ]
                 }
             ]
@@ -2151,6 +2173,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/cpu1_c19_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "power_managed_by",
+                        "fType": "power_managing"
+                    },
+                    "paths":
+                    [
+                        "/org/open_power/control/occ2"
+                    ]
                 }
             ]
         },
@@ -2178,6 +2211,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/cpu1_c19_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "power_managed_by",
+                        "fType": "power_managing"
+                    },
+                    "paths":
+                    [
+                        "/org/open_power/control/occ3"
                     ]
                 }
             ]
@@ -2207,6 +2251,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/cpu2_c56_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "power_managed_by",
+                        "fType": "power_managing"
+                    },
+                    "paths":
+                    [
+                        "/org/open_power/control/occ4"
+                    ]
                 }
             ]
         },
@@ -2234,6 +2289,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/cpu2_c56_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "power_managed_by",
+                        "fType": "power_managing"
+                    },
+                    "paths":
+                    [
+                        "/org/open_power/control/occ5"
                     ]
                 }
             ]
@@ -2263,6 +2329,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/cpu3_c61_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "power_managed_by",
+                        "fType": "power_managing"
+                    },
+                    "paths":
+                    [
+                        "/org/open_power/control/occ6"
+                    ]
                 }
             ]
         },
@@ -2290,6 +2367,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/cpu3_c61_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "power_managed_by",
+                        "fType": "power_managing"
+                    },
+                    "paths":
+                    [
+                        "/org/open_power/control/occ7"
                     ]
                 }
             ]
