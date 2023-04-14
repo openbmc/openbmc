@@ -3,7 +3,7 @@
 echo update: "$@"
 
 echoerr() {
-	echo 1>&2 "ERROR: $@"
+	echo 1>&2 "ERROR: $*"
 }
 
 cd /
@@ -31,7 +31,7 @@ mtdismounted() {
 	then
 		return 0
 	fi
-	n=$(cat /sys/class/mtd/mtd$m/name)
+	n=$(cat "/sys/class/mtd/mtd$m/name")
 	if test -n "$n" && grep -s "mtd:$n " /proc/mounts
 	then
 		return 0
@@ -42,18 +42,18 @@ mtdismounted() {
 # Detect child partitions when the whole flash is to be updated.
 # Ignore mtdNro and mtdblockN names in the class subsystem directory.
 childmtds() {
-	for m in /sys/class/mtd/$1/mtd*
+	for m in "/sys/class/mtd/$1/mtd"*
 	do
 		m=${m##*/}
 		if test "${m%ro}" = "${m#mtdblock}"
 		then
-			echo $m
+			echo "$m"
 		fi
 	done
 }
 
 toobig() {
-	if test $(stat -L -c "%s" "$1") -gt $(cat /sys/class/mtd/"$2"/size)
+	if test "$(stat -L -c "%s" "$1")" -gt "$(cat "/sys/class/mtd/$2/size")"
 	then
 		return 0
 	fi
@@ -64,7 +64,7 @@ findmtd() {
 	m=$(grep -xl "$1" /sys/class/mtd/*/name)
 	m=${m%/name}
 	m=${m##*/}
-	echo $m
+	echo "$m"
 }
 
 blkid_fs_type() {
@@ -73,12 +73,12 @@ blkid_fs_type() {
 	#    # blkid /dev/mtdblock5
 	#    /dev/mtdblock5: TYPE="squashfs"
 	# Process output to extract TYPE value "squashfs".
-	blkid $1 | sed -e 's/^.*TYPE="//' -e 's/".*$//'
+	blkid "$1" | sed -e 's/^.*TYPE="//' -e 's/".*$//'
 }
 
 probe_fs_type() {
-	fst=$(blkid_fs_type $1)
-	echo ${fst:=jffs2}
+	fst=$(blkid_fs_type "$1")
+	echo "${fst:=jffs2}"
 }
 
 rwfs=$(findmtd rwfs)
@@ -162,16 +162,16 @@ HERE
 	esac
 done
 
-if test "x$dosave" = xy
+if test "$dosave" = "y"
 then
 	if test ! -d $upper -a -n "$rwfs"
 	then
 		mkdir -p $rwdir
-		mount $rwdev $rwdir -t $(probe_fs_type $rwdev) -o $rorwopts
+		mount "$rwdev" $rwdir -t "$(probe_fs_type "$rwdev")" -o "$rorwopts"
 		mounted=$rwdir
 	fi
 
-	while read f
+	while read -r f
 	do
 		# Entries shall start with /, no trailing /.. or embedded /../
 		if test "/${f#/}" != "$f" -o "${f%/..}" != "${f#*/../}"
@@ -209,7 +209,7 @@ fi
 
 for f in $imglist
 do
-	m=$(findmtd ${f#$image})
+	m=$(findmtd "${f#"$image"}")
 	if test -z "$m"
 	then
 		echoerr "Unable to find mtd partition for ${f##*/}."
@@ -220,9 +220,9 @@ do
 		echoerr "Image ${f##*/} too big for $m."
 		exit 1
 	fi
-	for s in $m $(childmtds $m)
+	for s in $m $(childmtds "$m")
 	do
-		if test -n "$checkmount" && mtdismounted $s
+		if test -n "$checkmount" && mtdismounted "$s"
 		then
 			echoerr "Device $s is mounted, ${f##*/} is busy."
 			exit 1
@@ -234,41 +234,41 @@ if test -n "$doflash"
 then
 	for f in $imglist
 	do
-		if test ! -s $f
+		if test ! -s "$f"
 		then
-			echo "Skipping empty update of ${f#$image}."
-			rm $f
+			echo "Skipping empty update of ${f#"$image"}."
+			rm "$f"
 			continue
 		fi
-		m=$(findmtd ${f#$image})
-		echo "Updating ${f#$image}..."
-		flashcp -v $f /dev/$m && rm $f
+		m=$(findmtd "${f#"$image"}")
+		echo "Updating ${f#"$image"}..."
+		flashcp -v "$f" "/dev/$m" && rm "$f"
 	done
 fi
 
-if test -d $save -a "x$toram" = xy
+if test -d "$save" -a "$toram" = "y"
 then
 	mkdir -p $upper
-	cp -rp $save/. $upper/
+	cp -rp "$save/." "$upper/"
 fi
 
-if test -d $save -a "x$dorestore" = xy
+if test -d "$save" -a "$dorestore" = "y"
 then
 	odir=$rwdir
 	rwdir=/run/rw
-	upper=$rwdir${upper#$odir}
+	upper=$rwdir${upper#"$odir"}
 
 	mkdir -p $rwdir
-	mount $rwdev $rwdir -t $(probe_fs_type $rwdev) -o $rwopts
-	mkdir -p $upper
-	cp -rp $save/. $upper/
+	mount "$rwdev" $rwdir -t "$(probe_fs_type "$rwdev")" -o $rwopts
+	mkdir -p "$upper"
+	cp -rp "$save/." "$upper/"
 	umount $rwdir
 	rmdir $rwdir
 fi
 
-if test "x$doclean" = xy
+if test "$doclean" = "y"
 then
-	rm -rf $save
+	rm -rf "$save"
 fi
 
 exit

@@ -2,7 +2,7 @@
 
 echo shutdown: "$@"
 
-export PS1=shutdown-sh#\ 
+export PS1="shutdown-sh# "
 # exec bin/sh
 
 cd /
@@ -24,9 +24,9 @@ mkdir -p /mnt
 mount --move /oldroot/run /mnt
 
 set -x
-for f in $( awk '/oldroot|mnt/ { print $2 }' < /proc/mounts | sort -r )
+awk '/oldroot|mnt/ { print $2 }' < /proc/mounts | sort -r | while IFS= read -r f
 do
-	umount $f
+	umount "$f"
 done
 set +x
 
@@ -43,7 +43,7 @@ then
 		if test -c /dev/watchdog
 		then
 			echo Pinging watchdog ${wdt+with args $wdt}
-			watchdog $wdt -F /dev/watchdog &
+			watchdog "$wdt" -F /dev/watchdog &
 			wd=$!
 		else
 			wd=
@@ -63,8 +63,8 @@ then
 			kill -9 $wd
 			if test -n "$wdrst"
 			then
-				echo Resetting watchdog timeouts to $wdrst
-				watchdog $wdrst -F /dev/watchdog &
+				echo "Resetting watchdog timeouts to $wdrst"
+				watchdog "$wdrst" -F /dev/watchdog &
 				sleep 1
 				# Kill the watchdog daemon, setting a timeout
 				# for the remaining shutdown work
@@ -98,5 +98,5 @@ fi
 
 echo "Execute ${1-reboot} -f if all unmounted ok, or exec /init"
 
-export PS1=shutdown-sh#\ 
+export PS1=shutdown-sh#\
 exec /bin/sh
