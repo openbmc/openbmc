@@ -1,8 +1,7 @@
 #!/bin/sh
 
-for i in `ls test/*_test`; do
-    $i
-    if [ $? -eq 0 ]; then
+for i in test/*_test; do
+    if $i ; then
         echo "PASS: $i"
     else
         echo "FAIL: $i"
