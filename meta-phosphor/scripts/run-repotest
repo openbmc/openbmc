@@ -125,9 +125,6 @@ meta-google/recipes-google/ssh/authorized-keys-comp/authorized-keys-comp.sh
 meta-google/recipes-google/test/test-sh/test.sh
 meta-google/recipes-phosphor/flash/google-key/verify-bmc-image.sh
 meta-google/recipes-phosphor/flash/inplace-gbmc-update/inplace-gbmc-verify.sh
-meta-hpe/meta-common/recipes-hpe/host/host-boot-enable/host-boot-enable.sh
-meta-hpe/meta-common/recipes-phosphor/initrdscripts/files/gxp-obmc-init.sh
-meta-hpe/meta-dl360poc/recipes-hpe/host/host-boot-enable/host-boot-enable.sh
 meta-ibm/meta-romulus/recipes-phosphor/chassis/vrm-control/vrm-control.sh
 meta-ibm/recipes-phosphor/chassis/vrm-control/vrm-control.sh
 meta-ingrasys/meta-zaius/recipes-phosphor/chassis/avsbus-control/zaius_avsbus.sh

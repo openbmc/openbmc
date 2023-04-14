@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 fslist="proc sys dev run"
 rodir=run/initramfs/ro
@@ -7,7 +7,7 @@ upper=$rwdir/cow
 work=$rwdir/work
 
 cd /
-mkdir -p $fslist
+mkdir -p "$fslist"
 mount dev dev -tdevtmpfs
 mount sys sys -tsysfs
 mount proc proc -tproc
@@ -27,7 +27,7 @@ findmtd() {
 	m=$(grep -xl "$1" /sys/class/mtd/*/name)
 	m=${m%/name}
 	m=${m##*/}
-	echo $m
+	echo "$m"
 }
 
 blkid_fs_type() {
@@ -36,12 +36,12 @@ blkid_fs_type() {
 	#    # blkid /dev/mtdblock5
 	#    /dev/mtdblock5: TYPE="squashfs"
 	# Process output to extract TYPE value "squashfs".
-	blkid $1 | sed -e 's/^.*TYPE="//' -e 's/".*$//'
+	blkid "$1" | sed -e 's/^.*TYPE="//' -e 's/".*$//'
 }
 
 probe_fs_type() {
-	fst=$(blkid_fs_type $1)
-	echo ${fst:=jffs2}
+	fst=$(blkid_fs_type "$1")
+	echo "${fst:=jffs2}"
 }
 
 # This fw_get_env_var is a possibly broken version of fw_printenv that
@@ -65,10 +65,9 @@ get_fw_env_var() {
 	# * print the value of the variable name passed as argument
 
 	envdev=$(findmtd u-boot-env)
-	if test -n $envdev
+	if test -n "$envdev"
 	then
-		cat /dev/$envdev |
-		tr '\n\000' '\r\n' |
+		tr '\n\000' '\r\n' < "/dev/$envdev" |
 		tail -c +5 | tail -c +${copies-1} |
 		sed -ne '/^$/,$d' -e "s/^$1=//p"
 	fi
@@ -98,10 +97,10 @@ try_tftp() {
 
 	rest="${1#tftp://}"
 	path=${rest#*/}
-	host=${rest%$path}
+	host=${rest%"$path"}
 	host="${host%/}"
-	port="${host#${host%:*}}"
-	host="${host%$port}"
+	port="${host#"${host%:*}"}"
+	host="${host%"$port"}"
 	port="${port#:}"
 
 	setup_resolv
@@ -159,7 +158,7 @@ When finished exec new init or cleanup and run reboot -f.
 
 Warning: No job control!  Shell exit will panic the system!
 HERE
-		export PS1=init#\ 
+		export PS1=init#\
 		exec /bin/sh
 	fi
 }
@@ -169,8 +168,8 @@ check_dip() {
   devmem 0x800000b8 16 0xFF
   dip=$(devmem 0x800000b8 16)
 
-  value1=$((( $dip & 0xFF00 ) >> 8 ))
-  value2=$((( $dip & 0x0040 ) >> 6 ))
+  value1=$((( dip & 0xFF00 ) >> 8 ))
+  value2=$((( dip & 0x0040 ) >> 6 ))
 
   if [ $value1 -eq 0 ] && [ $value2 -eq 1 ]
   then
@@ -195,7 +194,7 @@ consider_download_http=y
 consider_download_ftp=y
 
 rofst=squashfs
-rwfst=$(probe_fs_type $rwdev)
+rwfst=$(probe_fs_type "$rwdev")
 roopts=ro
 rwopts=rw
 
@@ -230,14 +229,14 @@ then
 	get_fw_env_var openbmconce >> $optfile
 fi
 
-echo rofs = $rofs $rofst   rwfs = $rwfs $rwfst
+echo "rofs = $rofs $rofst   rwfs = $rwfs $rwfst"
 
 if grep -w debug-init-sh $optfile
 then
 	debug_takeover "Debug initial shell requested by command line."
 fi
 
-if test "x$consider_download_files" = xy &&
+if test "$consider_download_files" = "y" &&
 	grep -w openbmc-init-download-files $optfile
 then
 	if test -f ${urlfile##*/}
@@ -250,7 +249,7 @@ then
 	fi
 	url="$(cat $urlfile)"
 	rest="${url#*://}"
-	proto="${url%$rest}"
+	proto="${url%"$rest"}"
 
 	if test -z "$url"
 	then
@@ -260,7 +259,7 @@ then
 		echo "Download failed."
 	elif test "$proto" = tftp://
 	then
-		if test "x$consider_download_tftp" = xy
+		if test "$consider_download_tftp" = "y"
 		then
 			try_tftp "$url"
 		else
@@ -268,7 +267,7 @@ then
 		fi
 	elif test "$proto" = http://
 	then
-		if test "x$consider_download_http" = xy
+		if test "$consider_download_http" = "y"
 		then
 			try_wget "$url"
 		else
@@ -276,7 +275,7 @@ then
 		fi
 	elif test "$proto" = ftp://
 	then
-		if test "x$consider_download_ftp" = xy
+		if test "$consider_download_ftp" = "y"
 		then
 			try_wget "$url"
 		else
@@ -289,15 +288,15 @@ fi
 
 # If there are images in root move them to /run/initramfs/ or /run/ now.
 imagebasename=${image##*/}
-if test -n "${imagebasename}" && ls /${imagebasename}* > /dev/null 2>&1
+if test -n "${imagebasename}" && ls /"${imagebasename}"* > /dev/null 2>&1
 then
-	if test "x$flash_images_before_init" = xy
+	if test "$flash_images_before_init" = "y"
 	then
 		echo "Flash images found, will update before starting init."
-		mv /${imagebasename}* ${image%$imagebasename}
+		mv /"${imagebasename}"* ${image%"$imagebasename"}
 	else
 		echo "Flash images found, will use but deferring flash update."
-		mv /${imagebasename}* /run/
+		mv /"${imagebasename}"* /run/
 	fi
 fi
 
@@ -316,7 +315,7 @@ else
 	do_save=--save-files
 fi
 
-if test "x$force_rwfst_jffs2" = xy -a $rwfst != jffs2 -a ! -f $trigger
+if test "$force_rwfst_jffs2" = "y" -a "$rwfst" != jffs2 -a ! -f $trigger
 then
 	echo "Converting read-write overlay filesystem to jffs2 forced."
 	touch $trigger
@@ -337,7 +336,7 @@ then
 		fi
 		$update --no-restore-files $do_save
 		echo "Clearing read-write overlay filesystem."
-		flash_eraseall /dev/$rwfs
+		flash_eraseall "/dev/$rwfs"
 		echo "Restoring saved files to read-write overlay filesystem."
 		touch $trigger
 		$update --no-save-files --clean-saved-files
@@ -345,7 +344,7 @@ then
 		$update --clean-saved-files $do_save
 	fi
 
-	rwfst=$(probe_fs_type $rwdev)
+	rwfst=$(probe_fs_type "$rwdev")
 	fsck=$fsckbase$rwfst
 fi
 
@@ -370,7 +369,7 @@ then
 fi
 
 if grep -w copy-base-filesystem-to-ram $optfile &&
-	test ! -e /run/image-rofs && ! cp $rodev /run/image-rofs
+	test ! -e /run/image-rofs && ! cp "$rodev" /run/image-rofs
 then
 	# Remove any partial copy to avoid attempted usage later
 	if test -e  /run/image-rofs
@@ -387,19 +386,19 @@ then
 	roopts=$roopts,loop
 fi
 
-mount $rodev $rodir -t $rofst -o $roopts
+mount "$rodev" $rodir -t $rofst -o $roopts
 
-if test -x $rodir$fsck
+if test -x "$rodir$fsck"
 then
 	for fs in $fslist
 	do
-		mount --bind $fs $rodir/$fs
+		mount --bind "$fs" "$rodir/$fs"
 	done
-	chroot $rodir $fsck $fsckopts $rwdev
+	chroot $rodir "$fsck" $fsckopts "$rwdev"
 	rc=$?
 	for fs in $fslist
 	do
-		umount $rodir/$fs
+		umount "$rodir/$fs"
 	done
 	if test $rc -gt 1
 	then
@@ -414,7 +413,7 @@ if test "$rwfst" = none
 then
 	echo "Running with read-write overlay in RAM for this boot."
 	echo "No state will be preserved unless flash update performed."
-elif ! mount $rwdev $rwdir -t $rwfst -o $rwopts
+elif ! mount "$rwdev" $rwdir -t "$rwfst" -o $rwopts
 then
 	msg="$(cat)" << HERE
 
@@ -444,7 +443,7 @@ done
 
 for f in $fslist
 do
-	mount --move $f root/$f
+	mount --move "$f" "root/$f"
 done
 
 # switch_root /root $init
