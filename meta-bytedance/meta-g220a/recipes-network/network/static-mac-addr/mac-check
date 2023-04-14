@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Copyright 2018 Intel Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,17 +49,17 @@ set_fw_env_mac() {
 read_eeprom_mac() {
 	local iface="$1"
 	a=0
-	if [ $iface = "eth1" ];then
+	if [ "$iface" = "eth1" ];then
 		a=8
 	fi
-	for  ((i=a;i <= ((7+a));i++));do
+	for  ((i=a;i <= (7+a);i++));do
 		i2cset -y 1 0x50 0x00 $i
-		tmp=`i2cget -y 1 0x50`
-		local mac[$i]=${tmp:2}
+        tmp=$(i2cget -y 1 0x50)
+		local mac[i]=${tmp:2}
 		local mac_str=$mac_str:${mac[$i]}
 	done
 	mac_str=${mac_str:1:17}
-	echo $mac_str 2>/dev/null
+	echo "$mac_str" 2>/dev/null
 }
 
 create_macdir() {
@@ -79,14 +79,17 @@ mac_check() {
 	local envname="$2"
 
 	# Read the MAC address in use by the NIC
-	local hw_mac=$(read_hw_mac "$iface")
+	local hw_mac
+    hw_mac=$(read_hw_mac "$iface")
 
 	# Read the MAC address stored in the non-volatile file provisioned in
 	# manufacturing.
-	local sofs_mac=$(read_sofs_mac "$iface")
+	local sofs_mac
+    sofs_mac=$(read_sofs_mac "$iface")
 
-	local eeprom_mac=$(read_eeprom_mac "$iface")
-	if [ -n "$eeprom_mac" ] && [ -z "$sofs_mac"]; then
+	local eeprom_mac
+    eeprom_mac=$(read_eeprom_mac "$iface")
+	if [ -n "$eeprom_mac" ] && [ -z "$sofs_mac" ]; then
 		set_hw_mac "$iface" "$eeprom_mac"
 		set_fw_env_mac "$envname" "$eeprom_mac"
 		return $?
@@ -99,7 +102,8 @@ mac_check() {
 		return $?
 	elif [ -n "$hw_mac" ]; then
 		# Read the MAC address stored by U-Boot
-		local fw_env_mac=$(read_fw_env_mac "$envname")
+		local fw_env_mac
+        fw_env_mac=$(read_fw_env_mac "$envname")
 		if [ -z "$fw_env_mac" ] || [ "$fw_env_mac" != "$hw_mac" ]; then
 			set_fw_env_mac "$envname" "$hw_mac"
 			return $?
@@ -117,7 +121,7 @@ create_macdir
 error=0
 first_error_seen=0
 
-while read IFACE UBDEV; do
+while read -r IFACE UBDEV; do
 	mac_check "$IFACE" "$UBDEV"
 	error=$?
 	if [ $error -ne 0 ] && [ $first_error_seen -eq 0 ]; then

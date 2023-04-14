@@ -22,3 +22,5 @@ do_install() {
     install -d ${D}${bindir}
     install -m 0755 ${WORKDIR}/mac-check ${D}${bindir}
 }
+
+RDEPENDS:${PN}:append = " bash"
