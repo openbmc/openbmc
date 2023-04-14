@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Provide source directive to shellcheck.
-# shellcheck source=meta-facebook/recipes-phosphor/state/phosphor-state-manager/greatlakes/host-poweron
+# shellcheck source=meta-facebook/recipes-phosphor/state/phosphor-state-manager/greatlakes/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 
 HOST_ID=$1
@@ -29,7 +29,7 @@ then
   host-reboot 6
   sleep 15
   host-reboot 2
-  
+
   host_status=$(host-power-status $SLOT_ID)
   if [ "$host_status" == "$STATE_ON" ]
   then

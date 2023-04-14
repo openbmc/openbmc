@@ -39,7 +39,6 @@ host_status=$(host-power-status $SLOT_ID)
 if [ "$host_status" == "$STATE_ON" ]
 then
     host-reboot 1
-    exit 0;
 else
     echo "Host is Off"
     exit 1;
