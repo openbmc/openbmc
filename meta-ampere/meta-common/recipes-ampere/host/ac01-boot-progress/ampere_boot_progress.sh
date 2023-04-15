@@ -149,7 +149,7 @@ cnt=0
 while [ $cnt -lt 30 ];
 do
 	# Sleep 200ms
-	usleep 200000
+	sleep 1s
 	if ! read -r bg <<< "$(cat /sys/bus/platform/devices/smpro-misc.2.auto/boot_progress)";
 	then
 		cnt=$((cnt + 1))
@@ -180,6 +180,11 @@ do
 	if [ "${boot_status}" == "03" ]; then
 		# Log Redfish Event if failure.
 		log_redfish_bios_panic_event "$boot_stage" "$uefi_code"
+		# Dimm training failed, check errors
+		if [ "${boot_stage}" == "04" ]; then
+			/usr/sbin/dimm_train_fail_log.sh 0
+			/usr/sbin/dimm_train_fail_log.sh 1
+		fi
 	elif [ "${boot_status}" == "01" ]; then
 		# Check and set boot progress to dbus
 		set_boot_progress "$boot_stage" "$uefi_code"

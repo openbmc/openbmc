@@ -1,5 +1,5 @@
-SUMMARY = "Altra Boot Progress Handling Service"
-DESCRIPTION = "OpenBMC Altra Boot Progress Handling Daemon"
+SUMMARY = "Phosphor OpenBMC Boot Progress Handling Service"
+DESCRIPTION = "Phosphor OpenBMC Altra Boot Progress Handling Daemon"
 
 PR = "r1"
 LICENSE = "Apache-2.0"
@@ -14,6 +14,7 @@ RDEPENDS:${PN} += "bash"
 
 SRC_URI = " \
            file://ampere_boot_progress.sh \
+           file://dimm_train_fail_log.sh \
           "
 
 SYSTEMD_PACKAGES = "${PN}"
@@ -29,5 +30,6 @@ SYSTEMD_SERVICE:${PN} += "${HOST_ON_RESET_HOSTTMPL}"
 do_install () {
     install -d ${D}${sbindir}
     install -m 0755 ${WORKDIR}/ampere_boot_progress.sh ${D}${sbindir}/
+    install -m 0755 ${WORKDIR}/dimm_train_fail_log.sh ${D}${sbindir}/
 }
 

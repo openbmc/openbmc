@@ -1,6 +1,6 @@
 [Unit]
 Description=Ampere Altra Boot Progress Handling
-After=ampere-host-already-on@0.target
+After=obmc-host-already-on@0.target
 BindTo=obmc-host-already-on@0.target
 
 [Service]
