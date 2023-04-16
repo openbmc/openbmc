@@ -129,30 +129,6 @@ meta-ibm/meta-romulus/recipes-phosphor/chassis/vrm-control/vrm-control.sh
 meta-ibm/recipes-phosphor/chassis/vrm-control/vrm-control.sh
 meta-inventec/meta-transformers/recipes-phosphor/init/transformers-init/transformers-init.sh
 meta-phosphor/recipes-support/nss-pam-ldapd/files/nslcd.init
-meta-quanta/meta-common/recipes-quanta/network/usb-network/usb-network.sh
-meta-quanta/meta-gbs/recipes-gbs/gbs-bios-update/files/bios-update.sh
-meta-quanta/meta-gbs/recipes-gbs/gbs-bios-update/files/bios-verify.sh
-meta-quanta/meta-gbs/recipes-gbs/gbs-bmc-update/files/bmc-verify.sh
-meta-quanta/meta-gbs/recipes-gbs/gbs-detect-gpio-present/files/detect-gpio-present.sh
-meta-quanta/meta-gbs/recipes-gbs/gbs-sysinit/files/gbs-sysinit.sh
-meta-quanta/meta-gbs/recipes-gbs/hotswap-power-cycle/files/tray_powercycle.sh
-meta-quanta/meta-gbs/recipes-google/acpi-power-state/acpi-power-state-daemon/gbs-check-host-state.sh
-meta-quanta/meta-gbs/recipes-google/acpi-power-state/acpi-power-state-daemon/gbs-set-failsafe.sh
-meta-quanta/meta-gbs/recipes-phosphor/fans/phosphor-pid-control/fan-table-init.sh
-meta-quanta/meta-gbs/recipes-phosphor/sensors/phosphor-nvme/nvme_json_rewrite.sh
-meta-quanta/meta-gsj/recipes-gsj/detect-fan-fail/files/detect-fan-fail.sh
-meta-quanta/meta-gsj/recipes-gsj/gsj-hotswap-change-setting/files/gsj-hotswap-change-setting.sh
-meta-quanta/meta-gsj/recipes-gsj/quanta-nvme-powerctrl/files/init_once.sh
-meta-quanta/meta-gsj/recipes-gsj/quanta-nvme-powerctrl/files/nvme_powerctrl_library.sh
-meta-quanta/meta-gsj/recipes-gsj/quanta-nvme-powerctrl/files/nvme_powermanager.sh
-meta-quanta/meta-gsj/recipes-gsj/usb-network/files/usb_network.sh
-meta-quanta/meta-gsj/recipes-phosphor/fans/phosphor-pid-control/fan-control.sh
-meta-quanta/meta-gsj/recipes-phosphor/fans/phosphor-pid-control/fan-default-speed.sh
-meta-quanta/meta-olympus-nuvoton/recipes-olympus-nuvoton/power/first-boot-set-psu/first-boot-set-psu.sh
-meta-quanta/meta-olympus-nuvoton/recipes-phosphor/fans/phosphor-pid-control/fan-full-speed.sh
-meta-quanta/meta-q71l/recipes-phosphor/quanta-powerctrl/files/init_once.sh
-meta-quanta/meta-q71l/recipes-phosphor/quanta-powerctrl/files/poweroff.sh
-meta-quanta/meta-q71l/recipes-phosphor/quanta-powerctrl/files/poweron.sh
 "
 
 types=(json shell)

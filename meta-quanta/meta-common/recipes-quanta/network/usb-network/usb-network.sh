@@ -6,25 +6,25 @@ host_mac_path="/tmp/usb0_host"
 
 check_usb_local_administered() {
     is_enable="$(cat ${mac_config} | grep 'USBLAA')"
-    echo ${is_enable}
+    echo "${is_enable}"
 }
 
 # Set the locally administered bit (the second least-significant
 # bit of the first octet) of the MAC address
 set_local_administered_bit() {
-    mac="$(tr -d '\0' < $1)"
+    mac="$(tr -d '\0' < "$1")"
     first_byte="${mac:0:2}"
     first_byte="$((0x$first_byte|2))"
     first_byte="$(printf "%02x\n" "$first_byte")"
     mac="${first_byte}${mac:2}"
-    echo $mac
+    echo "$mac"
 }
 
-cd /sys/kernel/config/usb_gadget
+cd /sys/kernel/config/usb_gadget || exit 1
 
 if [ ! -f "g1" ]; then
     mkdir g1
-    cd g1
+    cd g1 || exit 1
 
     echo 0x1d6b > idVendor  # Linux foundation
     echo 0x0104 > idProduct # Multifunction composite gadget
@@ -41,8 +41,8 @@ if [ ! -f "g1" ]; then
     if [[ $(check_usb_local_administered) == "USBLAA=true" ]]; then
         dev_mac="$(set_local_administered_bit $dev_mac_path)"
         host_mac="$(set_local_administered_bit $host_mac_path)"
-        echo $dev_mac > $dev_mac_path
-        echo $host_mac > $host_mac_path
+        echo "$dev_mac" > $dev_mac_path
+        echo "$host_mac" > $host_mac_path
     fi
 
     mkdir -p functions/ecm.usb0

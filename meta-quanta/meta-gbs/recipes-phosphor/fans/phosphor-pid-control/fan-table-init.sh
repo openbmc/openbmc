@@ -12,29 +12,29 @@ mapper wait /xyz/openbmc_project/sensors/fan_tach/fb_fan1
 mapper wait /xyz/openbmc_project/sensors/fan_tach/fb_fan2
 
 # generate fan table writePath
-Fan_0_To_4_Hwmon="$(ls /sys/devices/platform/ahb/ahb\:*/*pwm-fan-controller/hwmon/)"
+Fan_0_To_4_Hwmon="$(ls /sys/devices/platform/ahb/ahb:*/*pwm-fan-controller/hwmon/)"
 
 if [[ "$Fan_0_To_4_Hwmon" != "" ]]; then
-    sed -i "s/@Fan_0_To_4_Hwmon@/$Fan_0_To_4_Hwmon/g" $TEMP_FILE
+    sed -i "s/@Fan_0_To_4_Hwmon@/$Fan_0_To_4_Hwmon/g" "$TEMP_FILE"
 fi
 
 presentGpio=()
 presentState=()
 gpioPath="/sys/class/gpio/gpio"
 if [[ -f "/etc/nvme/nvme_config.json" ]]; then
-    presentGpio=($(cat /etc/nvme/nvme_config.json | grep NVMeDrivePresentPin \
+    # shellcheck disable=SC2207
+    presentGpio=($(grep NVMeDrivePresentPin /etc/nvme/nvme_config.json \
                    | awk '{print $2}' | cut -d "," -f 0))
 fi
 
 nvmePath="/xyz/openbmc_project/sensors/temperature/nvme"
-nvmeInventoryPath="/xyz/openbmc_project/inventory/system/chassis/motherboard/nvme"
 # Get and Set WCTEMP
 for ((i = 0; i < 16; i++)); do
     name="@WCTemp$(printf "%02d" $i)@"
     wcTemp=72000
 
     if [[ -d "${gpioPath}${presentGpio[i]}" ]] &&
-       [[ "$(cat ${gpioPath}${presentGpio[i]}/value)" == "0" ]]; then
+       [[ "$(cat "${gpioPath}${presentGpio[i]}/value")" == "0" ]]; then
         presentState[i]="true"
     else
         presentState[i]="false"

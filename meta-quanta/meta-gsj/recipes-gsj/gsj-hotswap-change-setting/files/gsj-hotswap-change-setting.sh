@@ -17,7 +17,7 @@ function set_hotswap_reg()
 function get_hotswap_value()
 {
     #get the value of reg "0xd9", return value should be "0x08"
-    echo "$(i2cget -f -y $I2C_BUS $CHIP_ADDR 0xd9)"
+    i2cget -f -y $I2C_BUS $CHIP_ADDR 0xd9
 }
 
 function export_gpio()
@@ -32,7 +32,7 @@ function export_gpio()
 
 function get_gpio_value()
 {
-    echo "$(cat $GPIO_BasePath/gpio$GPIO_ID/value)"
+    cat $GPIO_BasePath/gpio$GPIO_ID/value
 }
 
 function setting_hotswap()

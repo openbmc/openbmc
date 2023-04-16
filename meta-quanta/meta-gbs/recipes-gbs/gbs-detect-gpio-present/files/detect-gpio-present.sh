@@ -27,24 +27,24 @@ LOG_DEASSERT_FLAG="false"
 LOG_GENID_FLAG="0x0020"
 present_state=("true" "true" "true" "true" "true" "true" "true" "true" "true" "true" "true" "true")
 
-for i in ${!PRESENT_OBJPATH[@]}
+for i in "${!PRESENT_OBJPATH[@]}"
 do
-    mapper wait ${PRESENT_OBJPATH[$i]}
+    mapper wait "${PRESENT_OBJPATH[$i]}"
 done
 
 while true; do
-    for i in ${!PRESENT_OBJPATH[@]}
+    for i in "${!PRESENT_OBJPATH[@]}"
     do
-        boot_status="$(busctl get-property $SERVICE_NAME ${PRESENT_OBJPATH[$i]} $INTERFACE_NAME Present | awk '{print $2}')"
+        boot_status="$(busctl get-property $SERVICE_NAME "${PRESENT_OBJPATH[$i]}" $INTERFACE_NAME Present | awk '{print $2}')"
 
-        if [ $boot_status == "false" ] && [ ${present_state[$i]} == "true" ];then
-            echo "Update cable $(($i+1)) state."
-            present_state[$i]="false"
-            busctl call $IPMI_LOG_SERVICE $IPMI_LOG_OBJPATH $IPMI_LOG_INTERFACE $IPMI_LOG_FUNCT $IPMI_LOG_PARA_FORMAT "$LOG_ERR" ${PRESENT_OBJPATH[$i]} $LOG_EVENT_DATA $LOG_ASSERT_FLAG $LOG_GENID_FLAG
-        elif [ $boot_status == "true" ] && [ ${present_state[$i]} == "false" ];then
-            echo "Update cable $(($i+1)) state."
-            present_state[$i]="true"
-            busctl call $IPMI_LOG_SERVICE $IPMI_LOG_OBJPATH $IPMI_LOG_INTERFACE $IPMI_LOG_FUNCT $IPMI_LOG_PARA_FORMAT "$LOG_ERR" ${PRESENT_OBJPATH[$i]} $LOG_EVENT_DATA $LOG_DEASSERT_FLAG $LOG_GENID_FLAG
+        if [ "$boot_status" == "false" ] && [ "${present_state[$i]}" == "true" ];then
+            echo "Update cable $((i+1)) state."
+            present_state[i]="false"
+            busctl call $IPMI_LOG_SERVICE $IPMI_LOG_OBJPATH $IPMI_LOG_INTERFACE $IPMI_LOG_FUNCT $IPMI_LOG_PARA_FORMAT "$LOG_ERR" "${PRESENT_OBJPATH[$i]}" "$LOG_EVENT_DATA" $LOG_ASSERT_FLAG $LOG_GENID_FLAG
+        elif [ "$boot_status" == "true" ] && [ "${present_state[$i]}" == "false" ];then
+            echo "Update cable $((i+1)) state."
+            present_state[i]="true"
+            busctl call $IPMI_LOG_SERVICE $IPMI_LOG_OBJPATH $IPMI_LOG_INTERFACE $IPMI_LOG_FUNCT $IPMI_LOG_PARA_FORMAT "$LOG_ERR" "${PRESENT_OBJPATH[$i]}" "$LOG_EVENT_DATA" $LOG_DEASSERT_FLAG $LOG_GENID_FLAG
         fi
     done
     sleep 1

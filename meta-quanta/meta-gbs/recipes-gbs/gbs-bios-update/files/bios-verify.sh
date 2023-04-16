@@ -14,11 +14,11 @@ echo "Verify bios image..."
 
 if [ -e $IMAGE_FILE ] && [ -e $SIG_FILE ];
 then
-    sha256_image=`sha256sum "$IMAGE_FILE" | awk '{print $1}'`
-    sha256_file=`awk '{print $1}' $SIG_FILE`
+    sha256_image=$(sha256sum "$IMAGE_FILE" | awk '{print $1}')
+    sha256_file=$(awk '{print $1}' $SIG_FILE)
 fi
 
-if [[ $sha256_image != $sha256_file ]];
+if [ "$sha256_image" != "$sha256_file" ];
 then
     echo "bios image verify fail."
     rm -f $IMAGE_FILE

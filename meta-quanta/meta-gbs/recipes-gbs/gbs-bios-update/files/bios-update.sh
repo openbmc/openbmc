@@ -28,14 +28,9 @@ KERNEL_SYSFS_FIU="/sys/bus/platform/drivers/NPCM-FIU"
 # the node of FIU is spi for kernel 5.10, but
 # for less than or equal kernel 5.4, the node
 # is fiu
-for fname in $(find ${KERNEL_SYSFS_FIU} -type l)
-do
-    if [ "${fname##*\.}" == "fiu" ]
-    then
-        KERNEL_FIU_ID="c0000000.fiu"
-        break
-    fi
-done
+if ls "$KERNEL_SYSFS_FIU"/*.fiu 1> /dev/null 2>&1; then
+  KERNEL_FIU_ID="c0000000.fiu"
+fi
 
 IMAGE_FILE="/tmp/image-bios"
 
@@ -45,7 +40,7 @@ findmtd() {
     m=$(grep -xl "$1" /sys/class/mtd/*/name)
     m=${m%/name}
     m=${m##*/}
-    echo $m
+    echo "$m"
 }
 
 cleanup() {
@@ -82,8 +77,7 @@ main() {
         exit 1
     fi
 
-    flashcp -v $IMAGE_FILE /dev/"${bios_mtd}"
-    if [ $? -eq 0 ]; then
+    if flashcp -v $IMAGE_FILE /dev/"${bios_mtd}" ; then
         echo "bios update successfully..."
     else
         echo "bios update failed..."
@@ -91,6 +85,6 @@ main() {
     fi
 }
 # Exit without running main() if sourced
-return 0 2>/dev/null
-
-main "$@"
+if ! (return 0 2>/dev/null); then
+    main "$@"
+fi

@@ -9,7 +9,7 @@ bmclog="/tmp/update-bmc.log"
 if [ -f $publickey ];then
     r="$(openssl dgst -verify $publickey -sha256 -signature $sigfile $bmcimage)"
     echo "$r" > $bmclog
-    if [[ "Verified OK" == "$r" ]]; then
+    if [ "Verified OK" = "$r" ]; then
         mv $bmcimage $imagebmc
         rm -f $sigfile
         exit 0

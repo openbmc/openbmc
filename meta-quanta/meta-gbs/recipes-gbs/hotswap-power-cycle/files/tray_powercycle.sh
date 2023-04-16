@@ -27,12 +27,12 @@ stop_phosphor_hwmon() {
 main() {
   # Stop phosphor-hwmon so that ADM1272 powercycle doesn't happen
   # in the middle of an i2c transaction and stuck the bus low
-  stop_phosphor_hwmon
+  stop_phosphor_hwmon "$@"
 
   gpioset gpiochip6 26=1
 }
 
 # Exit without running main() if sourced
-return 0 2>/dev/null
-
-main "$@"
+if ! (return 0 2>/dev/null) ; then
+    main "$@"
+fi
