@@ -41,10 +41,10 @@ while true; do
         current_status="$(busctl get-property $SERVICE_NAME "${INVENTORY_OBJPATH[$i]}" $INTERFACE_NAME Present | awk '{print $2}')"
 
         if [ "$current_status" == "true" ] && [ "${initial_state[$i]}" == "false" ];then
-            initial_state[$i]="true"
+            initial_state[i]="true"
             busctl call $IPMI_LOG_SERVICE $IPMI_LOG_OBJPATH $IPMI_LOG_INTERFACE $IPMI_LOG_FUNCT $IPMI_LOG_PARA_FORMAT "$LOG_ERR" "${INVENTORY_OBJPATH[$i]}" "$LOG_EVENT_DATA" $LOG_ASSERT_FLAG $LOG_GENID_FLAG
         elif [ "$current_status" == "false" ] && [ "${initial_state[$i]}" == "true" ]; then
-            initial_state[$i]="false"
+            initial_state[i]="false"
             busctl call $IPMI_LOG_SERVICE $IPMI_LOG_OBJPATH $IPMI_LOG_INTERFACE $IPMI_LOG_FUNCT $IPMI_LOG_PARA_FORMAT "$LOG_ERR" "${INVENTORY_OBJPATH[$i]}" "$LOG_EVENT_DATA" $LOG_DEASSERT_FLAG $LOG_GENID_FLAG
         fi
     done
