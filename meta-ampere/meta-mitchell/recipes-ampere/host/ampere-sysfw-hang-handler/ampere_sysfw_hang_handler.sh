@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# shellcheck disable=SC2046
-# shellcheck source=/dev/null
-
+# shellcheck source=meta-ampere/meta-mitchell/recipes-ampere/platform/ampere-platform-init/gpio-lib.sh
 source /usr/sbin/gpio-lib.sh
 
 # Do event trigger

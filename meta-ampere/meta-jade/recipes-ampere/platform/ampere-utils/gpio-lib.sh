@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# shellcheck source=/dev/null
+# shellcheck source=meta-ampere/meta-jade/recipes-ampere/platform/ampere-utils/gpio-defs.sh
 source /usr/sbin/gpio-defs.sh
 
 function gpio_number() {

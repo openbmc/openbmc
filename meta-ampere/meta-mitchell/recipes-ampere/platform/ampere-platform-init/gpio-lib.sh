@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# shellcheck disable=SC2154
-# shellcheck source=/dev/null
-
 # Configure GPIO as output and set its value
 AST2600_GPIO_BASE=(
     816
