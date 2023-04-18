@@ -19,7 +19,7 @@
 #        <UARTx_MODE> of 1 sets CPU To HDR_CONN
 #        <UARTx_MODE> of 2 sets BMC to CPU (eg dropbear ssh server on port 2200)
 
-# shellcheck source=/dev/null
+# shellcheck source=meta-ampere/meta-jade/recipes-ampere/platform/ampere-utils/gpio-lib.sh
 source /usr/sbin/gpio-lib.sh
 
 if [ $# -lt 2 ]; then
