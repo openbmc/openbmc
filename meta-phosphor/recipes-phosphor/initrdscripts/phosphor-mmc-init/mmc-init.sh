@@ -63,7 +63,10 @@ fi
 mkdir -p /var/lock
 resetval=$(fw_printenv -n rwreset 2>/dev/null)
 if gpiopresent=$(gpiofind factory-reset-toggle) ; then
-    gpioval=$(gpioget "$gpiopresent")
+    # gpiopresent contains both the gpiochip and line number as
+    # separate words, and gpioget needs to see them as such.
+    # shellcheck disable=SC2086
+    gpioval=$(gpioget $gpiopresent)
 else
     gpioval=""
 fi
