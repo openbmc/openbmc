@@ -7,23 +7,13 @@
 source /usr/libexec/mori-fw/mori-lib.sh
 
 function fwbios() {
-  KERNEL_FIU_ID="c0000000.spi"
-  KERNEL_SYSFS_FIU="/sys/bus/platform/drivers/NPCM-FIU"
   ret=0
   if [ ! -f "$1" ]; then
     echo " Cannot find the" "$1" "image file"
     return 1
   fi
 
-  # switch the SPI mux from Host to BMC
-  set_gpio_ctrl FM_BIOS_FLASH_SPI_MUX_R_SEL 1
-
-  # rescan the spi bus
-  if [ -d "${KERNEL_SYSFS_FIU}/${KERNEL_FIU_ID}" ]; then
-    echo "${KERNEL_FIU_ID}" > "${KERNEL_SYSFS_FIU}"/unbind
-    sleep 1
-  fi
-  echo "${KERNEL_FIU_ID}" > "${KERNEL_SYSFS_FIU}"/bind
+  setup_bios_access
 
   # write to the mtd device
   BIOS_MTD=$(grep "hnor" /proc/mtd | sed -n 's/^\(.*\):.*/\1/p')
@@ -34,11 +24,7 @@ function fwbios() {
     ret=1
   fi
 
-  # switch the SPI mux from BMC to Host
-  if [ -d "${KERNEL_SYSFS_FIU}/${KERNEL_FIU_ID}" ]; then
-    echo "${KERNEL_FIU_ID}" > "${KERNEL_SYSFS_FIU}"/unbind
-  fi
-  set_gpio_ctrl FM_BIOS_FLASH_SPI_MUX_R_SEL 0
+  cleanup_bios_access
 
   return $ret
 }
