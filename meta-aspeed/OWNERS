@@ -4,5 +4,4 @@ owners:
 matchers:
 - partial_regex: recipes-bsp/u-boot
   reviewers:
-   - chiawei_wang@aspeedtech.com
    - zweiss@equinix.com
