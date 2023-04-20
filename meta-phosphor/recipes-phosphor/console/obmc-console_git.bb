@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=fa818a259cbed7ce8bc2a22d35a464fc"
 DEPENDS += "autoconf-archive-native \
             systemd \
            "
-SRCREV = "cc07530fdb356b7750f58c2a6b35c9cf180ed99c"
+SRCREV = "21f4cb4a76858d7dec71a04883894b8bc54d774f"
 PACKAGECONFIG ??= "udev ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 PACKAGECONFIG[udev] = "--with-udevdir=`pkg-config --variable=udevdir udev`,\
                        --without-udevdir,udev"
