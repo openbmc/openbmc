@@ -31,6 +31,7 @@ FILES:${PN} += "${libexecdir}/ncsi-wait-and-set-speed"
 FILES:${PN} += "${datadir}/network/*.json"
 
 PACKAGECONFIG:append = " sync-mac"
+PACKAGECONFIG:append = " persist-mac"
 PACKAGECONFIG:append:p10bmc = " hyp-nw-config"
 
 install_network_configuration(){
