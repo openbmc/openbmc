@@ -9,9 +9,7 @@ DEPENDS += " \
     ${PYTHON_PN}-sdbus++-native \
     sdbusplus \
 "
-PACKAGECONFIG[verify_signature] = " \
-    -Dverify-full-signature=enabled, \
-    -Dverify-full-signature=disabled"
+PACKAGECONFIG[verify_signature] = "-Dverify-signature=enabled, -Dverify-signature=disabled"
 PACKAGECONFIG[sync_bmc_files] = "-Dsync-bmc-files=enabled, -Dsync-bmc-files=disabled"
 PACKAGECONFIG[usb_code_update] = "-Dusb-code-update=enabled, -Dusb-code-update=disabled, cli11"
 PACKAGECONFIG[side_switch_on_boot] = "-Dside-switch-on-boot=enabled, -Dside-switch-on-boot=disabled, cli11"
