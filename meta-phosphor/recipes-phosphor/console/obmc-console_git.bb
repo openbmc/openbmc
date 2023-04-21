@@ -7,11 +7,9 @@ DEPENDS += "autoconf-archive-native \
             systemd \
            "
 SRCREV = "86e3fd70f003264a05a09452c60ea8b9da6be287"
-PACKAGECONFIG ??= "udev ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
-PACKAGECONFIG[udev] = "--with-udevdir=`pkg-config --variable=udevdir udev`,\
-                       --without-udevdir,udev"
-PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_system_unitdir}, \
-                          --without-systemdsystemunitdir"
+PACKAGECONFIG ??= "udev"
+PACKAGECONFIG[udev] = "-Dudev=enabled,-Dudev=disabled,udev"
+PACKAGECONFIG[concurrent-servers] = "-Dconcurrent-servers=true,-Dconcurrent-servers=false,"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
@@ -25,7 +23,7 @@ SYSTEMD_SERVICE:${PN} += "obmc-console-ssh@.service \
                 obmc-console@.service \
                 "
 
-inherit autotools pkgconfig
+inherit meson pkgconfig
 inherit obmc-phosphor-discovery-service
 inherit systemd
 

@@ -20,7 +20,7 @@ SYSTEMD_SERVICE:${PN}:remove = "obmc-console-ssh.socket"
 
 FILES:${PN}:remove = "${systemd_system_unitdir}/obmc-console-ssh@.service.d/use-socket.conf"
 
-EXTRA_OECONF:append = " --enable-concurrent-servers"
+PACKAGECONFIG:append = " concurrent-servers"
 
 do_install:append() {
     # Install the console client configurations
