@@ -5,3 +5,4 @@ Address=192.168.0.10/16
 [Network]
 LinkLocalAddressing=no
 IPv6AcceptRA=no
+DHCP=no
