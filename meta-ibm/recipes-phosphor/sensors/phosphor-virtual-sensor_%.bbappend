@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}/${MACHINE}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 SRC_URI:append:p10bmc = " file://virtual_sensor_config.json"
 
 do_install:append:p10bmc() {
