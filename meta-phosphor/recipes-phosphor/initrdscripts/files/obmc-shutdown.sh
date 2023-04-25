@@ -43,7 +43,8 @@ then
 		if test -c /dev/watchdog
 		then
 			echo Pinging watchdog ${wdt+with args $wdt}
-			watchdog "$wdt" -F /dev/watchdog &
+			# shellcheck disable=SC2086
+			watchdog $wdt -F /dev/watchdog &
 			wd=$!
 		else
 			wd=
