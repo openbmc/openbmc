@@ -2,6 +2,8 @@ Example build invocations:
 
 p10bmc:
 MACHINE=p10bmc bitbake obmc-phosphor-image
+p10bmc-distributed:
+MACHINE=p10bmc-distributed bitbake obmc-phosphor-image
 swift:
 MACHINE=swift bitbake obmc-phosphor-image
 witherspoon:
