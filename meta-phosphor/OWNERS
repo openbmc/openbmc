@@ -3,3 +3,8 @@ owners:
 - edtanous@google.com
 - geissonator@yahoo.com
 - patrick@stwcx.xyz
+
+matchers:
+- partial_regex: recipes-phosphor/initrdscripts
+  reviewers:
+  - zev@bewilderbeest.net
