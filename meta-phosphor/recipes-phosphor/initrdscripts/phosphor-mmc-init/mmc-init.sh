@@ -23,7 +23,13 @@ mmcdev="/dev/mmcblk0"
 rwfsdev="/dev/disk/by-partlabel/rwfs"
 
 cd /
-mkdir -p "$fslist"
+
+# We want to make all the directories in $fslist, not one directory named by
+# concatonating the names with spaces
+#
+# shellcheck disable=SC2086
+mkdir -p $fslist
+
 mount dev dev -tdevtmpfs
 mount sys sys -tsysfs
 mount proc proc -tproc
