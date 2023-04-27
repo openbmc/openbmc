@@ -2,7 +2,7 @@ FILESEXTRAPATHS:prepend:gbmc := "${THISDIR}/${PN}:"
 
 SRC_URI:append:gbmc = " file://default"
 
-SYSTEMD_SERVICE:${PN}:append:gbmc = " rng-tools-nojitter.service"
+SYSTEMD_SERVICE:${PN}-service:append:gbmc = " rng-tools-nojitter.service"
 
 do_install:append:gbmc() {
   install -m 0644 ${D}${systemd_system_unitdir}/rng-tools.service \
