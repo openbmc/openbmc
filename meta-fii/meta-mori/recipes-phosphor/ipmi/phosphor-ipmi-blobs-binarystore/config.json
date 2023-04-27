@@ -2,4 +2,10 @@
   "blobBaseId": "/skm/hss/",
   "sysFilePath": "/sys/bus/i2c/devices/42-0055/eeprom",
   "offsetBytes": 0
+},
+{
+  "blobBaseId": "/skm/hss-backup/",
+  "sysFilePath": "/sys/bus/i2c/devices/4-0050/eeprom",
+  "offsetBytes": 256,
+  "maxSizeBytes": 512
 }]
