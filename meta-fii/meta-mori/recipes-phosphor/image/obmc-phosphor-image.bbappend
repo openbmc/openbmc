@@ -9,7 +9,6 @@ OBMC_IMAGE_EXTRA_INSTALL:append:mori = " google-ipmi-i2c"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " phosphor-sel-logger"
 
 # Required tools and utilities
-OBMC_IMAGE_EXTRA_INSTALL:append:mori = " hotswap-power-cycle"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " loadsvf"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " memtester"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " openssl-bin"
