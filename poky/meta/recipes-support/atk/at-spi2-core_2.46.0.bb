@@ -13,7 +13,7 @@ SRC_URI = "${GNOME_MIRROR}/${BPN}/${MAJ_VER}/${BPN}-${PV}.tar.xz"
 
 SRC_URI[sha256sum] = "aa0c86c79f7a8d67bae49a5b7a5ab08430c608cffe6e33bf47a72f41ab03c3d0"
 
-DEPENDS = "dbus glib-2.0 libxml2"
+DEPENDS = "dbus glib-2.0 glib-2.0-native libxml2"
 
 # For backwards compatibility
 PROVIDES += "atk at-spi2-atk"

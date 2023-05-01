@@ -856,3 +856,11 @@ class FindSigInfoResult(Event):
     def __init__(self, result):
         Event.__init__(self)
         self.result = result
+
+class ParseError(Event):
+    """
+    Event to indicate parse failed
+    """
+    def __init__(self, msg):
+        super().__init__()
+        self._msg = msg

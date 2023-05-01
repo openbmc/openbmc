@@ -8,6 +8,7 @@ in different locations, therefore its best to rely on pkgconf to find
 the libs and header locations instead of assuming /opt/vc which might
 work on some distros ( like raspbian ) but not everywhere
 
+Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  configure.ac | 31 +++++++++++--------------------

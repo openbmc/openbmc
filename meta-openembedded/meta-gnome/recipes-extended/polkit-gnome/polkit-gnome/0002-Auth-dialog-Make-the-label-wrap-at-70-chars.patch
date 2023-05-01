@@ -1,0 +1,34 @@
+From: Lars Uebernickel <lars@uebernic.de>
+Date: Fri, 17 Oct 2014 15:35:25 +0200
+Subject: Auth dialog: Make the label wrap at 70 chars
+
+Because GtkWindow doesn't have a default width anymore.
+
+Bug: https://bugzilla.gnome.org/show_bug.cgi?id=738688
+Bug-Ubuntu: https://launchpad.net/bugs/1382566
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/polkitgnomeauthenticationdialog.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/polkitgnomeauthenticationdialog.c b/src/polkitgnomeauthenticationdialog.c
+index d307516..efd4185 100644
+--- a/src/polkitgnomeauthenticationdialog.c
++++ b/src/polkitgnomeauthenticationdialog.c
+@@ -574,6 +574,7 @@ polkit_gnome_authentication_dialog_constructed (GObject *object)
+   g_free (s);
+   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
+   gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
++  gtk_label_set_max_width_chars (GTK_LABEL (label), 70);
+   gtk_box_pack_start (GTK_BOX (main_vbox), label, FALSE, FALSE, 0);
+ 
+   /* secondary message */
+@@ -601,6 +602,7 @@ polkit_gnome_authentication_dialog_constructed (GObject *object)
+     }
+   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
+   gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
++  gtk_label_set_max_width_chars (GTK_LABEL (label), 70);
+   gtk_box_pack_start (GTK_BOX (main_vbox), label, FALSE, FALSE, 0);
+ 
+   /* user combobox */

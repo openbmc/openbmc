@@ -1,3 +1,8 @@
+Install all examples
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 Index: libdc1394/examples/Makefile.am
 ===================================================================
 --- libdc1394.orig/examples/Makefile.am

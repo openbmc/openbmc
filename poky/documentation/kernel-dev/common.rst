@@ -1083,7 +1083,7 @@ Consider an example that configures the "CONFIG_SMP" setting for the
 .. note::
 
    The OpenEmbedded build system recognizes this kernel as ``linux-yocto``
-   through Metadata (e.g. :term:`PREFERRED_VERSION`\ ``_linux-yocto ?= "12.4%"``).
+   through Metadata (e.g. :term:`PREFERRED_VERSION`\ ``_linux-yocto ?= "4.12%"``).
 
 Once ``menuconfig`` launches, use the interface to navigate through the
 selections to find the configuration settings in which you are
@@ -1384,7 +1384,7 @@ runs. This task validates the kernel configuration by checking the final
 ``.config`` file against the input files. During the check, the task
 produces warning messages for the following issues:
 
--  Requested options that did not make the final ``.config`` file.
+-  Requested options that did not make it into the final ``.config`` file.
 
 -  Configuration items that appear twice in the same configuration
    fragment.

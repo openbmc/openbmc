@@ -5,6 +5,7 @@ Subject: [PATCH 2/2] Fix printf format errors
 
 error: format not a string literal and no format arguments
 
+Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  main.c | 4 ++--

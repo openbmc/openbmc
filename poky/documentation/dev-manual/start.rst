@@ -302,7 +302,7 @@ Project Build Host:
    as these releases are frequently tested against the Yocto Project and
    officially supported. For a list of the distributions under
    validation and their status, see the ":ref:`Supported Linux
-   Distributions <detailed-supported-distros>`"
+   Distributions <system-requirements-supported-distros>`"
    section in the Yocto Project Reference Manual and the wiki page at
    :yocto_wiki:`Distribution Support </Distribution_Support>`.
 

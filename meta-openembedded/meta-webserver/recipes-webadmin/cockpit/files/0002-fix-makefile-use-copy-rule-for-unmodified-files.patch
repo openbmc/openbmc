@@ -3,6 +3,8 @@ From: Michael Haener <michael.haener@siemens.com>
 Date: Wed, 25 Mar 2020 08:32:07 +0100
 Subject: [PATCH] fix(makefile): use copy rule for unmodified files
 
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  pkg/Makefile.am | 27 +++++++++++++++++++++++++++
  1 file changed, 27 insertions(+)

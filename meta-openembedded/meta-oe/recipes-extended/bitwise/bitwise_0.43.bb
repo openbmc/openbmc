@@ -12,6 +12,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 SRC_URI = "https://github.com/mellowcandle/bitwise/releases/download/v${PV}/bitwise-v${PV}.tar.gz \
            file://0001-makefile.am-Fix-build-when-build-dir-is-not-same-as-.patch \
+           file://run-ptest \
+           file://ptest.out.expected \
            "
 SRC_URI[sha256sum] = "f524f794188a10defc4df673d8cf0b3739f93e58e93aff0cdb8a99fbdcca2ffb"
 
@@ -21,4 +23,10 @@ S = "${WORKDIR}/${BPN}-v${PV}"
 
 DEPENDS = "ncurses readline"
 
-inherit autotools
+inherit autotools ptest
+
+do_install_ptest() {
+    install -d ${D}${PTEST_PATH}
+    install -m 0644 ${WORKDIR}/ptest.out.expected ${D}${PTEST_PATH}/ptest.out.expected
+}
+

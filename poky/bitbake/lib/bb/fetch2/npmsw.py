@@ -205,7 +205,9 @@ class NpmShrinkWrap(FetchMethod):
         # This fetcher resolves multiple URIs from a shrinkwrap file and then
         # forwards it to a proxy fetcher. The management of the donestamp file,
         # the lockfile and the checksums are forwarded to the proxy fetcher.
-        ud.proxy = Fetch([dep["url"] for dep in ud.deps if dep["url"]], data)
+        shrinkwrap_urls = [dep["url"] for dep in ud.deps if dep["url"]]
+        if shrinkwrap_urls:
+            ud.proxy = Fetch(shrinkwrap_urls, data)
         ud.needdonestamp = False
 
     @staticmethod

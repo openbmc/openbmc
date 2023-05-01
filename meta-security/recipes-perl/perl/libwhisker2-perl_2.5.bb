@@ -19,9 +19,10 @@ PACKAGEGROUP ??=""
 PACKAGEGROUP[ssl] = ", , libnet-ssleay-perl, libnet-ssleay-perl"
 
 do_install() {
-    install -d 755 ${D}${PERLLIBDIRS}/vendor_perl/${PERLVERSION}
-    install -d 755 ${D}${datadir}/perl/${PERLVERSION}
-    oe_runmake install DESTDIR=${D} INSTALLDIR=${PERLLIBDIRS}/vendor_perl/${PERLVERSION} MANDIR=${datadir}/perl/${PERLVERSION}
+    perl_version="${@get_perl_version(d)}"
+    install -d 755 ${D}${PERLLIBDIRS}/vendor_perl/${perl_version}
+    install -d 755 ${D}${datadir}/perl/${perl_version}
+    oe_runmake install DESTDIR=${D} INSTALLDIR=${PERLLIBDIRS}/vendor_perl/${perl_version} MANDIR=${datadir}/perl/${perl_version}
 }
 
 FILES:${PN} += "${datadir}/perl"

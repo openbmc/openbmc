@@ -260,17 +260,6 @@ the package feeds area. For more information, see the
 ":ref:`overview-manual/concepts:package feeds`" section in
 the Yocto Project Overview and Concepts Manual.
 
-.. _ref-tasks-package_write_tar:
-
-``do_package_write_tar``
-------------------------
-
-Creates tarballs and places them in the
-``${``\ :term:`DEPLOY_DIR_TAR`\ ``}`` directory in
-the package feeds area. For more information, see the
-":ref:`overview-manual/concepts:package feeds`" section in
-the Yocto Project Overview and Concepts Manual.
-
 .. _ref-tasks-packagedata:
 
 ``do_packagedata``

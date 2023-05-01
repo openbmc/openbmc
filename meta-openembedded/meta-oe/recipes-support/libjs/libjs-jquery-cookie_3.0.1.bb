@@ -3,7 +3,7 @@ HOMEPAGE = "https://github.com/js-cookie/js-cookie"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e16cf0e247d84f8999bf55865a9c98cf"
 
-SRC_URI = "git://github.com/js-cookie/js-cookie.git;protocol=http;branch=master;protocol=https"
+SRC_URI = "git://github.com/js-cookie/js-cookie.git;protocol=https;branch=master"
 
 SRCREV = "0ba77141dd215782cc7770347a457906908c66ff"
 

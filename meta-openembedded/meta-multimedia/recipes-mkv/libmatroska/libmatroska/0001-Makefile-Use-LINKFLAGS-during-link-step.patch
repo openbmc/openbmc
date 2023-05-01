@@ -5,6 +5,7 @@ Subject: [PATCH] Makefile: Use LINKFLAGS during link step
 
 Adds much needed GNU_HASH section into the .so
 
+Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  make/linux/Makefile | 2 +-

@@ -32,6 +32,7 @@ SRC_URI = "git://github.com/apache/nifi-minifi-cpp.git;branch=master;protocol=ht
             file://0001-Fix-build-with-libc.patch \
             file://0001-civetweb-Disable-lto.patch \
             file://0001-Add-missing-includes-cstdint-and-cstdio.patch \
+            file://0001-Do-not-use-LFS64-functions-on-linux-musl.patch \
             file://minifi.service \
             file://systemd-volatile.conf \
             file://sysvinit-volatile.conf \

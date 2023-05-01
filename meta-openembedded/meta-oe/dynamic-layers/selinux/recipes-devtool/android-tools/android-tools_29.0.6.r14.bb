@@ -67,7 +67,7 @@ COMPATIBLE_HOST:powerpc64le = "(null)"
 
 inherit systemd
 
-SYSTEMD_SERVICE:${PN} = "android-tools-adbd.service"
+SYSTEMD_SERVICE:${PN}-adbd = "android-tools-adbd.service"
 
 # Find libbsd headers during native builds
 CC:append:class-native = " -I${STAGING_INCDIR}"

@@ -1,3 +1,7 @@
+add mediatomb support
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 diff -Nru webmin-1.570.bak/mediatomb/index.cgi webmin-1.570/mediatomb/index.cgi
 --- webmin-1.570.bak/mediatomb/index.cgi	1969-12-31 16:00:00.000000000 -0800
 +++ webmin-1.570/mediatomb/index.cgi	2011-10-26 10:00:05.992522036 -0700

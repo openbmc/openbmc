@@ -29,7 +29,26 @@ and conceptual information in the :doc:`/overview-manual/index`.
    For more information about the Yocto Project Documentation set, see
    the :ref:`ref-manual/resources:links and related documentation` section.
 
-.. _detailed-supported-distros:
+Minimum Free Disk Space
+=======================
+
+To build an image such as ``core-image-sato`` for the ``qemux86-64`` machine,
+you need a system with at least &MIN_DISK_SPACE; Gbytes of free disk space.
+However, much more disk space will be necessary to build more complex images,
+to run multiple builds and to cache build artifacts, improving build efficiency.
+
+If you have a shortage of disk space, see the ":doc:`/dev-manual/disk-space`"
+section of the Development Tasks Manual.
+
+Minimum System RAM
+==================
+
+You will manage to build an image such as ``core-image-sato`` for the
+``qemux86-64`` machine with as little as &MIN_RAM; Gbytes of RAM on an old
+system with 4 CPU cores, but your builds will be much faster on a system with
+as much RAM and as many CPU cores as possible.
+
+.. _system-requirements-supported-distros:
 
 Supported Linux Distributions
 =============================

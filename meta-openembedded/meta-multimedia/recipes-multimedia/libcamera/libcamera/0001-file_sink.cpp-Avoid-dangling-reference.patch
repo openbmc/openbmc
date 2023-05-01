@@ -1,0 +1,44 @@
+From 2eaffc9ac8b47c354404075761fe8f76fad0ced4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 24 Jan 2023 01:18:25 -0800
+Subject: [PATCH] file_sink.cpp: Avoid dangling-reference
+
+Fixes following errors with gcc-13
+
+../git/src/cam/file_sink.cpp:92:45: error: possibly dangling reference to a temporary [-Werror=dangling-reference]
+   92 |                 const FrameMetadata::Plane &meta = buffer->metadata().planes()[i];
+      |                                             ^~~~
+../git/src/cam/file_sink.cpp:92:81: note: the temporary was destroyed at the end of the full expression '(& buffer->libcamera::FrameBuffer::metadata())->libcamera::FrameMetadata::planes().libcamera::Span<const libcamera::FrameMetadata::Plane>::operator[](i)'
+   92 |                 const FrameMetadata::Plane &meta = buffer->metadata().planes()[i];
+      |                                                                                 ^
+cc1plus: all warnings being treated as errors
+
+Upstream-Status: Submitted [https://lists.libcamera.org/pipermail/libcamera-devel/2023-January/036575.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ src/apps/cam/file_sink.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/apps/cam/file_sink.cpp b/src/apps/cam/file_sink.cpp
+index b32aad24..9f4c5648 100644
+--- a/src/apps/cam/file_sink.cpp
++++ b/src/apps/cam/file_sink.cpp
+@@ -114,13 +114,13 @@ void FileSink::writeBuffer(const Stream *stream, FrameBuffer *buffer,
+ 	}
+ 
+ 	for (unsigned int i = 0; i < buffer->planes().size(); ++i) {
+-		const FrameMetadata::Plane &meta = buffer->metadata().planes()[i];
++		unsigned int bytesused = buffer->metadata().planes()[i].bytesused;
+ 
+ 		Span<uint8_t> data = image->data(i);
+-		unsigned int length = std::min<unsigned int>(meta.bytesused, data.size());
++		unsigned int length = std::min<unsigned int>(bytesused, data.size());
+ 
+-		if (meta.bytesused > data.size())
+-			std::cerr << "payload size " << meta.bytesused
++		if (bytesused > data.size())
++			std::cerr << "payload size " << bytesused
+ 				  << " larger than plane size " << data.size()
+ 				  << std::endl;
+ 

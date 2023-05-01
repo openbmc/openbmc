@@ -1,0 +1,41 @@
+commit 670cae834827a8f794e6f7464fa57790d911b63c
+Author: SoumyaWind <121475834+SoumyaWind@users.noreply.github.com>
+Date:   Tue Dec 27 17:40:17 2022 +0530
+
+    shadow: Fix can not print full login timeout message
+    
+    Login timed out message prints only first few bytes when write is immediately followed by exit.
+    Calling exit from new handler provides enough time to display full message.
+
+Upstream-Status: Accepted [https://github.com/shadow-maint/shadow/commit/670cae834827a8f794e6f7464fa57790d911b63c]
+
+diff --git a/src/login.c b/src/login.c
+index 116e2cb3..c55f4de0 100644
+--- a/src/login.c
++++ b/src/login.c
+@@ -120,6 +120,7 @@ static void get_pam_user (char **ptr_pam_user);
+ 
+ static void init_env (void);
+ static void alarm_handler (int);
++static void exit_handler (int);
+ 
+ /*
+  * usage - print login command usage and exit
+@@ -391,11 +392,16 @@ static void init_env (void)
+ #endif				/* !USE_PAM */
+ }
+ 
++static void exit_handler (unused int sig)
++{
++	_exit (0);
++}
+ 
+ static void alarm_handler (unused int sig)
+ {
+ 	write (STDERR_FILENO, tmsg, strlen (tmsg));
+-	_exit (0);
++	signal(SIGALRM, exit_handler);
++	alarm(2);
+ }
+ 
+ #ifdef USE_PAM

@@ -34,6 +34,7 @@ INITSCRIPT_PACKAGES = "${PN}-httpd ${PN}-syslog ${PN}-udhcpd ${PN}-mdev ${PN}-hw
 
 INITSCRIPT_NAME:${PN}-httpd = "busybox-httpd"
 INITSCRIPT_NAME:${PN}-hwclock = "hwclock.sh"
+INITSCRIPT_PARAMS:${PN}-hwclock = "start 40 S . stop 20 0 1 6 ."
 INITSCRIPT_NAME:${PN}-mdev = "mdev"
 INITSCRIPT_PARAMS:${PN}-mdev = "start 04 S ."
 INITSCRIPT_NAME:${PN}-syslog = "syslog"

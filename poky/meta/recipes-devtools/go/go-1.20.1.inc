@@ -16,5 +16,6 @@ SRC_URI += "\
     file://0009-go-Filter-build-paths-on-staticly-linked-arches.patch \
     file://0010-cmd-compile-re-compile-instantiated-generic-methods-.patch \
     file://CVE-2023-24532.patch \
+    file://CVE-2023-24537.patch \
 "
 SRC_URI[main.sha256sum] = "b5c1a3af52c385a6d1c76aed5361cf26459023980d0320de7658bae3915831a2"

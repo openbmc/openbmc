@@ -24,3 +24,5 @@ EXTRA_OEMESON += "\
 "
 
 inherit meson pkgconfig setuptools3-base upstream-version-is-even
+
+FILES:${PN} += "${libdir}/gstreamer-1.0"

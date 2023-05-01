@@ -1,0 +1,87 @@
+From 348ea441db84a211d4fca7ef5544b5cd06a8a872 Mon Sep 17 00:00:00 2001
+From: Thomas De Schampheleire <thomas.de_schampheleire@nokia.com>
+Date: Tue, 4 Apr 2023 15:26:07 +0200
+Subject: [PATCH] tracetool: use relative paths for '#line' preprocessor
+ directives
+
+The event filename is an absolute path. Convert it to a relative path when
+writing '#line' directives, to preserve reproducibility of the generated
+output when different base paths are used.
+
+Upstream-Status: Pending
+
+---
+ scripts/tracetool/backend/ftrace.py | 4 +++-
+ scripts/tracetool/backend/log.py    | 4 +++-
+ scripts/tracetool/backend/syslog.py | 4 +++-
+ 3 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/tracetool/backend/ftrace.py b/scripts/tracetool/backend/ftrace.py
+index 5fa30ccc08..baed2ae61c 100644
+--- a/scripts/tracetool/backend/ftrace.py
++++ b/scripts/tracetool/backend/ftrace.py
+@@ -12,6 +12,8 @@
+ __email__      = "stefanha@redhat.com"
+ 
+ 
++import os.path
++
+ from tracetool import out
+ 
+ 
+@@ -45,7 +47,7 @@ def generate_h(event, group):
+         args=event.args,
+         event_id="TRACE_" + event.name.upper(),
+         event_lineno=event.lineno,
+-        event_filename=event.filename,
++        event_filename=os.path.relpath(event.filename),
+         fmt=event.fmt.rstrip("\n"),
+         argnames=argnames)
+ 
+diff --git a/scripts/tracetool/backend/log.py b/scripts/tracetool/backend/log.py
+index 17ba1cd90e..de27b7e62e 100644
+--- a/scripts/tracetool/backend/log.py
++++ b/scripts/tracetool/backend/log.py
+@@ -12,6 +12,8 @@
+ __email__      = "stefanha@redhat.com"
+ 
+ 
++import os.path
++
+ from tracetool import out
+ 
+ 
+@@ -53,7 +55,7 @@ def generate_h(event, group):
+         '    }',
+         cond=cond,
+         event_lineno=event.lineno,
+-        event_filename=event.filename,
++        event_filename=os.path.relpath(event.filename),
+         name=event.name,
+         fmt=event.fmt.rstrip("\n"),
+         argnames=argnames)
+diff --git a/scripts/tracetool/backend/syslog.py b/scripts/tracetool/backend/syslog.py
+index 5a3a00fe31..012970f6cc 100644
+--- a/scripts/tracetool/backend/syslog.py
++++ b/scripts/tracetool/backend/syslog.py
+@@ -12,6 +12,8 @@
+ __email__      = "stefanha@redhat.com"
+ 
+ 
++import os.path
++
+ from tracetool import out
+ 
+ 
+@@ -41,7 +43,7 @@ def generate_h(event, group):
+         '    }',
+         cond=cond,
+         event_lineno=event.lineno,
+-        event_filename=event.filename,
++        event_filename=os.path.relpath(event.filename),
+         name=event.name,
+         fmt=event.fmt.rstrip("\n"),
+         argnames=argnames)
+-- 
+2.39.2
+

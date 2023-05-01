@@ -3,6 +3,8 @@ From: Adrian Freihofer <adrian.freihofer@siemens.com>
 Date: Wed, 4 Dec 2019 17:23:46 +0100
 Subject: [PATCH] remove tests dep on gobject-intro
 
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  src/ws/Makefile-ws.am | 54 ---------------------------------------------------
  1 file changed, 54 deletions(-)

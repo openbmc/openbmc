@@ -10,9 +10,9 @@ SRCREV = "84831b20512abd9033414ca5f5a023f333525335"
 S = "${WORKDIR}/git"
 
 do_compile() {
-    ${CC} ${CFLAGS} ${LDFLAGS} reboot-mode.c -o reboot-mode
+    ${CC} ${CFLAGS} ${LDFLAGS} ${S}/reboot-mode.c -o ${B}/reboot-mode
 }
 
 do_install() {
-    install -D -m 0755 ${S}/reboot-mode ${D}${bindir}/reboot-mode
+    install -D -m 0755 ${B}/reboot-mode ${D}${bindir}/reboot-mode
 }

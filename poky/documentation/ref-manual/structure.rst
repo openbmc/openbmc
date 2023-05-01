@@ -750,7 +750,9 @@ and lists of files and directories with known permissions.
 -------------
 
 This directory contains OpenEmbedded Python library code used during the
-build process.
+build process. It is enabled via the ``addpylib`` directive in
+``meta/conf/local.conf``. For more information, see
+:ref:`bitbake-user-manual/bitbake-user-manual-metadata:extending python library code`.
 
 .. _structure-meta-recipes-bsp:
 

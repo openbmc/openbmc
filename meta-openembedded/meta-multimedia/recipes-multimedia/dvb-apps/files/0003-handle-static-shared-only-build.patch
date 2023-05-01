@@ -6,6 +6,7 @@ Subject: [PATCH] Make.rules: Handle static/shared only build
 Do not build .a library when enable_static is set to "no"
 Do not build .so library when enable_shared is set to "no"
 
+Upstream-Status: Pending
 Signed-off-by: Romain Naour <romain.naour@openwide.fr>
 ---
  Make.rules | 10 ++++++++--

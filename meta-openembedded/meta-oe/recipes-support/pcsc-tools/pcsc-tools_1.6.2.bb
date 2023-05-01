@@ -13,4 +13,12 @@ S = "${WORKDIR}/git"
 
 DEPENDS = "pcsc-lite"
 
+RDEPENDS:${PN} += " \
+	${@bb.utils.contains('DISTRO_FEATURES','systemd','pcsc-lite-systemd', 'pcsc-lite', d)} \
+	perl \
+	perl-module-getopt-std \
+	perl-module-file-stat \
+	libpcsc-perl \
+"
+
 FILES:${PN} += "${datadir}/pcsc/smartcard_list.txt"

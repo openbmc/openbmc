@@ -7,8 +7,8 @@ Subject: [PATCH 2/4] Add ImageProcessor only when DISBALE_IMAGEPROCESSOR_BUILD
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- Makefile.am | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ Makefile.am | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/Makefile.am b/Makefile.am
 index 5f75759..73421b1 100644
@@ -27,6 +27,22 @@ index 5f75759..73421b1 100644
  #else
  #hpcupsdir = $(cupsfilterdir)
  #hpcups_PROGRAMS = hpcups
+@@ -687,6 +692,7 @@
+ 
+ install-data-hook:
+ if HPLIP_BUILD
++if !DISBALE_IMAGEPROCESSOR_BUILD
+ 	if [ \( "$(UNAME)" = "x86_64" -a  -d "$(libdir)/" \) ]; then \
+ 		cp prnt/hpcups/libImageProcessor-x86_64.so $(libdir)/ ; \
+ 		chmod 775 $(libdir)/libImageProcessor-x86_64.so ; \
+@@ -697,6 +703,7 @@
+ 		chmod 775 $(libdir)/libImageProcessor-x86_32.so ; \
+ 		ln -sf $(libdir)/libImageProcessor-x86_32.so $(libdir)/libImageProcessor.so ; \
+ 	fi
++endif #DISABLE_IMAGEPROCESSOR
+ 	if [ -d "/usr/share/ipp-usb/quirks/" ]; then \
+ 		echo "ipp-usb directory exists"; \
+ 		cp prnt/ipp-usb/HPLIP.conf /usr/share/ipp-usb/quirks/ ; \
 -- 
 2.37.3
 

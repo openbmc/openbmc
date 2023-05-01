@@ -15,11 +15,10 @@ S = "${WORKDIR}/git"
 
 do_configure:prepend() {
     mkdir -p ${S}/tests/catch2
-    cp ${DL_DIR}/catch.hpp ${S}/tests/catch2/catch.hpp 
+    cp ${DL_DIR}/catch.hpp ${S}/tests/catch2/catch.hpp
 }
 
 inherit cmake
-inherit ptest
 
 # cli11 is a header only C++ library, so the main package will be empty.
 RDEPENDS:${PN}-dev = ""

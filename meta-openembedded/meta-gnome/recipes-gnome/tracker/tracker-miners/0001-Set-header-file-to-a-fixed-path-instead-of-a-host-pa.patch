@@ -7,22 +7,8 @@ Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Lei Maohui <leimaohui@fujitsu.com>
 ---
- src/libtracker-miner/tracker-miner-enum-types.c.template        | 2 +-
- .../tracker-miners-enum-types.c.template                        | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/src/libtracker-miner/tracker-miner-enum-types.c.template b/src/libtracker-miner/tracker-miner-enum-types.c.template
-index 7be7a01..46a4dc9 100644
---- a/src/libtracker-miner/tracker-miner-enum-types.c.template
-+++ b/src/libtracker-miner/tracker-miner-enum-types.c.template
-@@ -7,7 +7,7 @@
-
- /*** BEGIN file-production ***/
- /* enumerations from "@basename@" */
--#include "@filename@"
-+#include "tracker-miner-enums.h"
- /*** END file-production ***/
-
+ src/libtracker-miners-common/tracker-miner-enum-types.c.template        | 1 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
 diff --git a/src/libtracker-miners-common/tracker-miners-enum-types.c.template b/src/libtracker-miners-common/tracker-miners-enum-types.c.template
 index c712dda..cb449e2 100644

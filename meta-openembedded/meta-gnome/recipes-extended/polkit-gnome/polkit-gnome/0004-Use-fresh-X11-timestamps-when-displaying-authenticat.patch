@@ -1,0 +1,48 @@
+From: Jeffrey Knockel <jeff250@gmail.com>
+Date: Mon, 30 Apr 2018 18:05:20 +0000
+Subject: Use fresh X11 timestamps when displaying authentication dialog
+
+This circumvents focus-stealing prevention.
+
+Bug: https://bugzilla.gnome.org/show_bug.cgi?id=676076
+Bug-Debian: https://bugs.debian.org/684300
+Bug-Ubuntu: https://launchpad.net/bugs/946171
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/polkitgnomeauthenticator.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/polkitgnomeauthenticator.c b/src/polkitgnomeauthenticator.c
+index 23163b4..e57d76e 100644
+--- a/src/polkitgnomeauthenticator.c
++++ b/src/polkitgnomeauthenticator.c
+@@ -26,6 +26,7 @@
+ #include <sys/types.h>
+ #include <pwd.h>
+ #include <glib/gi18n.h>
++#include <gdk/gdkx.h>
+ 
+ #include <polkit/polkit.h>
+ #include <polkitagent/polkitagent.h>
+@@ -306,7 +307,17 @@ session_request (PolkitAgentSession *session,
+     }
+ 
+   gtk_widget_show_all (GTK_WIDGET (authenticator->dialog));
+-  gtk_window_present (GTK_WINDOW (authenticator->dialog));
++  GdkWindow *window = gtk_widget_get_window (GTK_WIDGET (authenticator->dialog));
++
++  if (GDK_IS_X11_WINDOW (window))
++    {
++    gtk_window_present_with_time (GTK_WINDOW (authenticator->dialog), gdk_x11_get_server_time (window));
++    }
++  else
++    {
++    gtk_window_present (GTK_WINDOW (authenticator->dialog));
++    }
++
+   password = polkit_gnome_authentication_dialog_run_until_response_for_prompt (POLKIT_GNOME_AUTHENTICATION_DIALOG (authenticator->dialog),
+                                                                                modified_request,
+                                                                                echo_on,
+

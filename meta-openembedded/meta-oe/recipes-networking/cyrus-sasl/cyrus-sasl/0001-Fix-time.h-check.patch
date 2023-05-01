@@ -28,11 +28,9 @@ Signed-off-by: Sam James <sam@gentoo.org>
  plugins/cram.c | 4 ++++
  2 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/configure.ac b/configure.ac
-index e1bf53b6..ad781830 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1290,7 +1290,7 @@ AC_CHECK_HEADERS_ONCE([sys/time.h])
+@@ -1231,7 +1231,7 @@ AC_CHECK_HEADERS_ONCE([sys/time.h])
  
  AC_HEADER_DIRENT
  AC_HEADER_SYS_WAIT
@@ -41,8 +39,6 @@ index e1bf53b6..ad781830 100644
  
  IPv6_CHECK_SS_FAMILY()
  IPv6_CHECK_SA_LEN()
-diff --git a/plugins/cram.c b/plugins/cram.c
-index d02e9baa..695aaa91 100644
 --- a/plugins/cram.c
 +++ b/plugins/cram.c
 @@ -53,6 +53,10 @@
@@ -56,6 +52,3 @@ index d02e9baa..695aaa91 100644
  #include <sasl.h>
  #include <saslplug.h>
  #include <saslutil.h>
--- 
-2.37.3
-

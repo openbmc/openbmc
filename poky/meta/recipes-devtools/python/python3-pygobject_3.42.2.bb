@@ -10,7 +10,7 @@ GIR_MESON_OPTION = ""
 
 inherit gnomebase setuptools3-base gobject-introspection upstream-version-is-even
 
-DEPENDS += "python3 glib-2.0"
+DEPENDS += "python3 glib-2.0 gobject-introspection"
 
 SRCNAME="pygobject"
 

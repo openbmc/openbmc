@@ -33,3 +33,12 @@ FILES:${PN} += " \
     ${datadir}/metainfo \
     ${libdir}/nautilus \
 "
+
+EXTRA_OEMESON += "--cross-file=${WORKDIR}/meson-${PN}.cross"
+
+do_write_config:append() {
+    cat >${WORKDIR}/meson-${PN}.cross <<EOF
+[binaries]
+cpio = '${bindir}/cpio'
+EOF
+}

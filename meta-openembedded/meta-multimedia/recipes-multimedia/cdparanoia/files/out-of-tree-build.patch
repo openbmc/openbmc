@@ -1,3 +1,8 @@
+Fix build out of tree builds
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 Index: cdparanoia-III-10.2/Makefile.in
 ===================================================================
 --- cdparanoia-III-10.2.orig/Makefile.in

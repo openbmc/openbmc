@@ -72,7 +72,7 @@ class Crate(Wget):
         ud.url = "https://%s/%s/%s/download" % (host, name, version)
         ud.parm['downloadfilename'] = "%s-%s.crate" % (name, version)
         if 'name' not in ud.parm:
-            ud.parm['name'] = name
+            ud.parm['name'] = '%s-%s' % (name, version)
 
         logger.debug2("Fetching %s to %s" % (ud.url, ud.parm['downloadfilename']))
 

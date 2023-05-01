@@ -3,6 +3,7 @@ From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 25 Jul 2017 18:28:15 -0700
 Subject: [PATCH] Makefile.am: Link with libm for powl() API
 
+Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  Makefile.am | 2 +-

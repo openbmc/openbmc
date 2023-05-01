@@ -109,6 +109,5 @@ PACKAGE_BEFORE_PN += "${PN}-libs"
 # https://github.com/isc-projects/bind9/commit/0e25af628cd776f98c04fc4cc59048f5448f6c88
 FILES_SOLIBSDEV = "${libdir}/*[!0-9].so ${libdir}/libbind9.so"
 FILES:${PN}-libs = "${libdir}/named/*.so* ${libdir}/*-${PV}.so"
-FILES:${PN}-staticdev += "${libdir}/*.la"
 
 DEV_PKG_DEPENDENCY = ""

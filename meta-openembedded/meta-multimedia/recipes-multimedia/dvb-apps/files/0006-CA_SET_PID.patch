@@ -1,3 +1,7 @@
+Fix build with newer than 4.14 kernels
+
+Upstream-Status: Inappropriate [OE-specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Index: dvb-apps/util/dst-utils/dst_test.c
 ===================================================================
 --- dvb-apps.orig/util/dst-utils/dst_test.c

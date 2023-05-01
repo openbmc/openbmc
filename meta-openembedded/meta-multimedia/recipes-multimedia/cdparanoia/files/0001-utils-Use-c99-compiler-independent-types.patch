@@ -5,6 +5,7 @@ Subject: [PATCH] utils: Use c99 compiler independent types
 
 Make it portable across different platforms
 
+Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  utils.h | 13 +++++++------

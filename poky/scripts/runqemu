@@ -384,13 +384,19 @@ class BaseConfig(object):
                     fst =  m.group(1)
             if fst:
                 self.check_arg_fstype(fst)
-                qb = re.sub('\.' + fst + "$", '', self.rootfs)
-                qb = '%s%s' % (re.sub('\.rootfs$', '', qb), '.qemuboot.conf')
+                qb = re.sub('\.' + fst + "$", '.qemuboot.conf', self.rootfs)
                 if os.path.exists(qb):
                     self.qemuboot = qb
                     self.qbconfload = True
                 else:
-                    logger.warning("%s doesn't exist" % qb)
+                    logger.warning("%s doesn't exist, will try to remove '.rootfs' from filename" % qb)
+                    # They to remove .rootfs (IMAGE_NAME_SUFFIX) as well
+                    qb = re.sub('\.rootfs.qemuboot.conf$', '.qemuboot.conf', qb)
+                    if os.path.exists(qb):
+                        self.qemuboot = qb
+                        self.qbconfload = True
+                    else:
+                        logger.warning("%s doesn't exist" % qb)
             else:
                 raise RunQemuError("Can't find FSTYPE from: %s" % p)
 
@@ -424,6 +430,7 @@ class BaseConfig(object):
         # are there other scenarios in which we need to support being
         # invoked by bitbake?
         deploy = self.get('DEPLOY_DIR_IMAGE')
+        image_link_name = self.get('IMAGE_LINK_NAME')
         bbchild = deploy and self.get('OE_TMPDIR')
         if bbchild:
             self.set_machine_deploy_dir(arg, deploy)
@@ -448,6 +455,12 @@ class BaseConfig(object):
         else:
             logger.error("%s not a directory valid DEPLOY_DIR_IMAGE" % deploy_dir_image)
             self.set("MACHINE", arg)
+        if not image_link_name:
+            s = re.search('^IMAGE_LINK_NAME="(.*)"', self.bitbake_e, re.M)
+            if s:
+                image_link_name = s.group(1)
+                self.set("IMAGE_LINK_NAME", image_link_name)
+                logger.debug('Using IMAGE_LINK_NAME = "%s"' % image_link_name)
 
     def set_dri_path(self):
         drivers_path = os.path.join(self.bindir_native, '../lib/dri')
@@ -550,10 +563,17 @@ to your build configuration.
             self.check_arg_machine(unknown_arg)
 
         if not (self.get('DEPLOY_DIR_IMAGE') or self.qbconfload):
-            self.load_bitbake_env()
+            self.load_bitbake_env(target=self.rootfs)
             s = re.search('^DEPLOY_DIR_IMAGE="(.*)"', self.bitbake_e, re.M)
             if s:
                 self.set("DEPLOY_DIR_IMAGE", s.group(1))
+
+        if not self.get('IMAGE_LINK_NAME') and self.rootfs:
+            s = re.search('^IMAGE_LINK_NAME="(.*)"', self.bitbake_e, re.M)
+            if s:
+                image_link_name = s.group(1)
+                self.set("IMAGE_LINK_NAME", image_link_name)
+                logger.debug('Using IMAGE_LINK_NAME = "%s"' % image_link_name)
 
     def check_kvm(self):
         """Check kvm and kvm-host"""
@@ -660,8 +680,8 @@ to your build configuration.
 
         if self.rootfs and not os.path.exists(self.rootfs):
             # Lazy rootfs
-            self.rootfs = "%s/%s-%s.%s" % (self.get('DEPLOY_DIR_IMAGE'),
-                    self.rootfs, self.get('MACHINE'),
+            self.rootfs = "%s/%s.%s" % (self.get('DEPLOY_DIR_IMAGE'),
+                    self.get('IMAGE_LINK_NAME'),
                     self.fstype)
         elif not self.rootfs:
             glob_name = '%s/%s*.%s' % (self.get('DEPLOY_DIR_IMAGE'), self.get('IMAGE_NAME'), self.fstype)
@@ -865,8 +885,10 @@ to your build configuration.
                 machine = self.get('MACHINE')
                 if not machine:
                     machine = os.path.basename(deploy_dir_image)
-                self.qemuboot = "%s/%s-%s.qemuboot.conf" % (deploy_dir_image,
-                        self.rootfs, machine)
+                if not self.get('IMAGE_LINK_NAME'):
+                    raise RunQemuError("IMAGE_LINK_NAME wasn't set to find corresponding .qemuboot.conf file")
+                self.qemuboot = "%s/%s.qemuboot.conf" % (deploy_dir_image,
+                        self.get('IMAGE_LINK_NAME'))
             else:
                 cmd = 'ls -t %s/*.qemuboot.conf' %  deploy_dir_image
                 logger.debug('Running %s...' % cmd)
@@ -1600,7 +1622,7 @@ to your build configuration.
 
         self.cleaned = True
 
-    def run_bitbake_env(self, mach=None):
+    def run_bitbake_env(self, mach=None, target=''):
         bitbake = shutil.which('bitbake')
         if not bitbake:
             return
@@ -1613,22 +1635,33 @@ to your build configuration.
             multiconfig = "mc:%s" % multiconfig
 
         if mach:
-            cmd = 'MACHINE=%s bitbake -e %s' % (mach, multiconfig)
+            cmd = 'MACHINE=%s bitbake -e %s %s' % (mach, multiconfig, target)
         else:
-            cmd = 'bitbake -e %s' % multiconfig
+            cmd = 'bitbake -e %s %s' % (multiconfig, target)
 
         logger.info('Running %s...' % cmd)
-        return subprocess.check_output(cmd, shell=True).decode('utf-8')
+        try:
+            return subprocess.check_output(cmd, shell=True).decode('utf-8')
+        except subprocess.CalledProcessError as err:
+            logger.warning("Couldn't run '%s' to gather environment information, maybe the target wasn't an image name, will retry with virtual/kernel as a target:\n%s" % (cmd, err.output.decode('utf-8')))
+            # need something with IMAGE_NAME_SUFFIX/IMAGE_LINK_NAME defined (kernel also inherits image-artifact-names.bbclass)
+            target = 'virtual/kernel'
+            if mach:
+                cmd = 'MACHINE=%s bitbake -e %s %s' % (mach, multiconfig, target)
+            else:
+                cmd = 'bitbake -e %s %s' % (multiconfig, target)
+            try:
+                return subprocess.check_output(cmd, shell=True).decode('utf-8')
+            except subprocess.CalledProcessError as err:
+                logger.warning("Couldn't run '%s' to gather environment information, giving up with 'bitbake -e':\n%s" % (cmd, err.output.decode('utf-8')))
+                return ''
 
-    def load_bitbake_env(self, mach=None):
+
+    def load_bitbake_env(self, mach=None, target=None):
         if self.bitbake_e:
             return
 
-        try:
-            self.bitbake_e = self.run_bitbake_env(mach=mach)
-        except subprocess.CalledProcessError as err:
-            self.bitbake_e = ''
-            logger.warning("Couldn't run 'bitbake -e' to gather environment information:\n%s" % err.output.decode('utf-8'))
+        self.bitbake_e = self.run_bitbake_env(mach=mach, target=target)
 
     def validate_combos(self):
         if (self.fstype in self.vmtypes) and self.kernel:

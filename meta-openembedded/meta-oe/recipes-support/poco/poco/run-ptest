@@ -1,9 +1,8 @@
 #!/bin/sh
 while read runner; do
-  pushd . >/dev/null
+  oldpath=`pwd` >/dev/null
   cd bin
   echo Testing $runner
   ./$runner-testrunner -all
-  popd >/dev/null
+  cd $oldpath >/dev/null
 done < testrunners
-

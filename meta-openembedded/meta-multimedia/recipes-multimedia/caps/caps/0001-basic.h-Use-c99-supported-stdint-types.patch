@@ -5,6 +5,7 @@ Subject: [PATCH] basic.h: Use c99 supported stdint types
 
 include stdint.h for getting the definitions for int types
 
+Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  basics.h | 17 +++++++++--------

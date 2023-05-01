@@ -1,9 +1,5 @@
 # N1SDP specific TFA support
 
-# Align with post-N1SDP-2022.06.22 refresh
-SRCREV_tfa  = "1309c6c805190bd376c0561597653f3f8ecd0f58"
-PV .= "+git${SRCPV}"
-
 COMPATIBLE_MACHINE = "n1sdp"
 TFA_PLATFORM       = "n1sdp"
 TFA_BUILD_TARGET   = "all fip"

@@ -72,7 +72,7 @@ In order to use the Wic utility with the OpenEmbedded Build system, your
 system needs to meet the following requirements:
 
 -  The Linux distribution on your development host must support the
-   Yocto Project. See the ":ref:`detailed-supported-distros`"
+   Yocto Project. See the ":ref:`system-requirements-supported-distros`"
    section in the Yocto Project Reference Manual for the list of
    distributions that support the Yocto Project.
 

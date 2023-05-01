@@ -10,7 +10,7 @@ SRCREV = "3af04acd38bbc61bbdcdd931dcf234c971aa5336"
 PV = "1.8.0"
 
 SRC_URI = "\
-    git://github.com/oetiker/rrdtool-1.x.git;branch=master;protocol=http;;protocol=https \
+    git://github.com/oetiker/rrdtool-1.x.git;protocol=https;branch=master \
 "
 
 S = "${WORKDIR}/git"

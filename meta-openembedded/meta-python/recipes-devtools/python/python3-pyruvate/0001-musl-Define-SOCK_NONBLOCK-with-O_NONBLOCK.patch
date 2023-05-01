@@ -1,0 +1,99 @@
+From f2b06fa4ea6ec9a33f8b269f0a1730a26276c5b0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 8 Apr 2023 08:25:46 -0700
+Subject: [PATCH] musl: Define SOCK_NONBLOCK with O_NONBLOCK
+
+Much like glibc, these defines are same on musl [1] [2]
+therefore consolidate the definition in one place
+for SOCK_NONBLOCK
+
+[1] https://github.com/search?q=repo%3Abminor%2Fmusl++%22%23define+SOCK_NONBLOCK%22&type=code
+[2] https://github.com/search?q=repo%3Abminor%2Fmusl++%22%23define+O_NONBLOCK%22&type=code
+
+Upstream-Status: Submitted [https://github.com/rust-lang/libc/pull/3191]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/unix/linux_like/linux/musl/b32/arm/mod.rs  | 2 --
+ src/unix/linux_like/linux/musl/b32/hexagon.rs  | 1 -
+ src/unix/linux_like/linux/musl/b32/mips/mod.rs | 2 --
+ src/unix/linux_like/linux/musl/b32/powerpc.rs  | 2 --
+ src/unix/linux_like/linux/musl/b32/x86/mod.rs  | 2 --
+ src/unix/linux_like/linux/musl/b64/mod.rs      | 2 --
+ src/unix/linux_like/linux/musl/mod.rs          | 1 +
+ 7 files changed, 1 insertion(+), 11 deletions(-)
+
+--- a/src/unix/linux_like/linux/musl/b32/arm/mod.rs
++++ b/src/unix/linux_like/linux/musl/b32/arm/mod.rs
+@@ -311,8 +311,6 @@ pub const O_SYNC: ::c_int = 1052672;
+ pub const O_RSYNC: ::c_int = 1052672;
+ pub const O_DSYNC: ::c_int = 4096;
+ 
+-pub const SOCK_NONBLOCK: ::c_int = 2048;
+-
+ pub const MAP_ANON: ::c_int = 0x0020;
+ pub const MAP_GROWSDOWN: ::c_int = 0x0100;
+ pub const MAP_DENYWRITE: ::c_int = 0x0800;
+--- a/src/unix/linux_like/linux/musl/b32/hexagon.rs
++++ b/src/unix/linux_like/linux/musl/b32/hexagon.rs
+@@ -295,7 +295,6 @@ pub const SIG_SETMASK: ::c_int = 2; // F
+ pub const SIG_BLOCK: ::c_int = 0x000000;
+ pub const SIG_UNBLOCK: ::c_int = 0x01;
+ pub const SOCK_DGRAM: ::c_int = 2;
+-pub const SOCK_NONBLOCK: ::c_int = 2048;
+ pub const SOCK_SEQPACKET: ::c_int = 5;
+ pub const SOCK_STREAM: ::c_int = 1;
+ pub const SOL_CAIF: ::c_int = 278;
+--- a/src/unix/linux_like/linux/musl/b32/mips/mod.rs
++++ b/src/unix/linux_like/linux/musl/b32/mips/mod.rs
+@@ -250,8 +250,6 @@ pub const O_SYNC: ::c_int = 0o40020;
+ pub const O_RSYNC: ::c_int = 0o40020;
+ pub const O_DSYNC: ::c_int = 0o020;
+ 
+-pub const SOCK_NONBLOCK: ::c_int = 0o200;
+-
+ pub const MAP_ANON: ::c_int = 0x800;
+ pub const MAP_GROWSDOWN: ::c_int = 0x1000;
+ pub const MAP_DENYWRITE: ::c_int = 0x2000;
+--- a/src/unix/linux_like/linux/musl/b32/powerpc.rs
++++ b/src/unix/linux_like/linux/musl/b32/powerpc.rs
+@@ -243,8 +243,6 @@ pub const O_SYNC: ::c_int = 1052672;
+ pub const O_RSYNC: ::c_int = 1052672;
+ pub const O_DSYNC: ::c_int = 4096;
+ 
+-pub const SOCK_NONBLOCK: ::c_int = 2048;
+-
+ pub const MAP_ANON: ::c_int = 0x0020;
+ pub const MAP_GROWSDOWN: ::c_int = 0x0100;
+ pub const MAP_DENYWRITE: ::c_int = 0x0800;
+--- a/src/unix/linux_like/linux/musl/b32/x86/mod.rs
++++ b/src/unix/linux_like/linux/musl/b32/x86/mod.rs
+@@ -300,8 +300,6 @@ pub const O_SYNC: ::c_int = 1052672;
+ pub const O_RSYNC: ::c_int = 1052672;
+ pub const O_DSYNC: ::c_int = 4096;
+ 
+-pub const SOCK_NONBLOCK: ::c_int = 2048;
+-
+ pub const MAP_ANON: ::c_int = 0x0020;
+ pub const MAP_GROWSDOWN: ::c_int = 0x0100;
+ pub const MAP_DENYWRITE: ::c_int = 0x0800;
+--- a/src/unix/linux_like/linux/musl/b64/mod.rs
++++ b/src/unix/linux_like/linux/musl/b64/mod.rs
+@@ -133,8 +133,6 @@ s! {
+ pub const __SIZEOF_PTHREAD_RWLOCK_T: usize = 56;
+ pub const __SIZEOF_PTHREAD_MUTEX_T: usize = 40;
+ 
+-pub const SOCK_NONBLOCK: ::c_int = 2048;
+-
+ pub const SOCK_SEQPACKET: ::c_int = 5;
+ 
+ extern "C" {
+--- a/src/unix/linux_like/linux/musl/mod.rs
++++ b/src/unix/linux_like/linux/musl/mod.rs
+@@ -527,6 +527,7 @@ pub const POSIX_MADV_DONTNEED: ::c_int =
+ pub const MAP_ANONYMOUS: ::c_int = MAP_ANON;
+ 
+ pub const SOCK_DCCP: ::c_int = 6;
++pub const SOCK_NONBLOCK: ::c_int = O_NONBLOCK;
+ pub const SOCK_PACKET: ::c_int = 10;
+ 
+ pub const SOMAXCONN: ::c_int = 128;

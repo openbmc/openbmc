@@ -39,5 +39,11 @@ PIP3_HOST_PACKAGES_DOC : "$ sudo pip3 install sphinx sphinx_rtd_theme pyyaml"
 MIN_PYTHON_VERSION : "3.8.0"
 MIN_TAR_VERSION : "1.28"
 MIN_GIT_VERSION : "1.8.3.1"
-MIN_GCC_VERSION : "7.5"
+MIN_GCC_VERSION : "8.0"
 MIN_MAKE_VERSION : "4.0"
+# Disk space (Gbytes) needed to generate qemux86-64 core-image-sato on Ubuntu 22.04 (x86-64), rounded up from 87
+MIN_DISK_SPACE : "90"
+# Disk space (Gbytes) needed to generate qemux86-64 core-image-sato on Ubuntu 22.04 (x86-64) with "rm_work", rounded up from 38
+MIN_DISK_SPACE_RM_WORK : "40"
+# RAM (Gbytes) needed to generate qemux86-64 core-image-sato on Ubuntu 22.04 (x86-64) on a 4 core system
+MIN_RAM : "8"

@@ -5,13 +5,12 @@ SECTION = "console/network"
 LICENSE = "EPL-2.0 | EDL-1.0"
 
 LIC_FILES_CHKSUM = " \
+    file://LICENSE;md5=fd3b896dadaeec3410d753ffaeadcfac \
     file://edl-v10;md5=3adfcc70f5aeb7a44f3f9b495aa1fbf3 \
     file://epl-v20;md5=d9fc0efef5228704e7f5b37f27192723 \
-    file://notice.html;md5=943f861069889acecebf51dfa24478e2 \
-    file://about.html;md5=e5662cbb5f8fd5c9faac526e4077898e \
 "
 
-SRC_URI = "git://github.com/eclipse/paho.mqtt.c;protocol=http;branch=master;protocol=https"
+SRC_URI = "git://github.com/eclipse/paho.mqtt.c;protocol=https;branch=master"
 
 SRCREV = "4157a27d39f1dd5b95750ecb6acd1481432785d8"
 

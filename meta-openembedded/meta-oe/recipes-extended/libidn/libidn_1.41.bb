@@ -18,6 +18,7 @@ inherit pkgconfig autotools gettext texinfo gtk-doc
 
 SRC_URI = "${GNU_MIRROR}/libidn/${BPN}-${PV}.tar.gz \
            file://dont-depend-on-help2man.patch \
+           file://0001-largefile.m4-Sync-with-latest-gnulib.patch \
            "
 
 #SRC_URI[md5sum] = "813c7b268d1051ca02c3610986126f38"

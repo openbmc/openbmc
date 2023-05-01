@@ -1,0 +1,29 @@
+From 334abb04ff953dabec63a91094de43e3cf064d7d Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Fri, 24 Feb 2023 17:29:24 +0100
+Subject: [PATCH] configure.ac: disable gnome-tools that are not provided
+
+Upstream-Status: Inappropriate [OE-specific]
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 24eb724..02fccbd 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -33,8 +33,8 @@ LT_INIT
+ # GNOME
+ # *****
+ 
+-GNOME_DEBUG_CHECK
+-GNOME_COMPILE_WARNINGS([maximum])
++#GNOME_DEBUG_CHECK
++#GNOME_COMPILE_WARNINGS([maximum])
+ 
+ #### gcc warning flags
+ 
+-- 
+2.34.1
+

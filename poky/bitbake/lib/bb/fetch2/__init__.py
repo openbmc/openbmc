@@ -560,7 +560,6 @@ def verify_checksum(ud, d, precomputed={}, localpath=None, fatal_nochecksum=True
     file against those in the recipe each time, rather than only after
     downloading. See https://bugzilla.yoctoproject.org/show_bug.cgi?id=5571.
     """
-
     if ud.ignore_checksums or not ud.method.supports_checksum(ud):
         return {}
 
@@ -605,11 +604,7 @@ def verify_checksum(ud, d, precomputed={}, localpath=None, fatal_nochecksum=True
 
         # If strict checking enabled and neither sum defined, raise error
         if strict == "1":
-            messages.append("No checksum specified for '%s', please add at " \
-                            "least one to the recipe:" % ud.localpath)
-            messages.extend(checksum_lines)
-            logger.error("\n".join(messages))
-            raise NoChecksumError("Missing SRC_URI checksum", ud.url)
+            raise NoChecksumError("\n".join(checksum_lines))
 
         bb.event.fire(MissingChecksumEvent(ud.url, **checksum_event), d)
 
@@ -1728,6 +1723,7 @@ class Fetch(object):
         network = self.d.getVar("BB_NO_NETWORK")
         premirroronly = bb.utils.to_boolean(self.d.getVar("BB_FETCH_PREMIRRORONLY"))
 
+        checksum_missing_messages = []
         for u in urls:
             ud = self.ud[u]
             ud.setup_localpath(self.d)
@@ -1739,7 +1735,6 @@ class Fetch(object):
 
             try:
                 self.d.setVar("BB_NO_NETWORK", network)
-
                 if m.verify_donestamp(ud, self.d) and not m.need_update(ud, self.d):
                     done = True
                 elif m.try_premirror(ud, self.d):
@@ -1811,13 +1806,20 @@ class Fetch(object):
                     raise ChecksumError("Stale Error Detected")
 
             except BBFetchException as e:
-                if isinstance(e, ChecksumError):
+                if isinstance(e, NoChecksumError):
+                    (message, _) = e.args
+                    checksum_missing_messages.append(message)
+                    continue
+                elif isinstance(e, ChecksumError):
                     logger.error("Checksum failure fetching %s" % u)
                 raise
 
             finally:
                 if ud.lockfile:
                     bb.utils.unlockfile(lf)
+        if checksum_missing_messages:
+            logger.error("Missing SRC_URI checksum, please add those to the recipe: \n%s", "\n".join(checksum_missing_messages))
+            raise BBFetchException("There was some missing checksums in the recipe")
 
     def checkstatus(self, urls=None):
         """

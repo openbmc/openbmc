@@ -1,0 +1,31 @@
+From fb6eb15b34b5b07a431bb4c3585341411a3e088f Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Tue, 28 Feb 2023 13:42:18 +0100
+Subject: [PATCH] libdecor-gtk.c: dont skip for conflicting_symbols
+
+This is a hack that should be removed, once the underlying bug in glibc was fixed and
+libdecor was updated to use dlmopen() instead of dlopen()
+
+https://gitlab.freedesktop.org/libdecor/libdecor/-/issues/47
+https://gitlab.freedesktop.org/libdecor/libdecor/-/issues/44
+
+---
+ src/plugins/gtk/libdecor-gtk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/plugins/gtk/libdecor-gtk.c b/src/plugins/gtk/libdecor-gtk.c
+index 228161e..fd91afb 100644
+--- a/src/plugins/gtk/libdecor-gtk.c
++++ b/src/plugins/gtk/libdecor-gtk.c
+@@ -2606,7 +2606,7 @@ libdecor_plugin_description = {
+ 	.priorities = priorities,
+ 	.constructor = libdecor_plugin_new,
+ 	.conflicting_symbols = {
+-		"png_free",
++		//"png_free",
+ 		NULL,
+ 	},
+ };
+-- 
+2.34.1
+

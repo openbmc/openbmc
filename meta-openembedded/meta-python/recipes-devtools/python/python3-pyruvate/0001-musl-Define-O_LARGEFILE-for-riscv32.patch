@@ -1,0 +1,21 @@
+From fdf98602ad20d06ebf65574541caac68ca421ac4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 8 Apr 2023 09:19:53 -0700
+Subject: [PATCH] musl: Define O_LARGEFILE for riscv32
+
+Upstream-Status: Submitted [https://github.com/rust-lang/libc/pull/3191]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/unix/linux_like/linux/musl/b32/riscv32/mod.rs | 1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/src/unix/linux_like/linux/musl/b32/riscv32/mod.rs
++++ b/src/unix/linux_like/linux/musl/b32/riscv32/mod.rs
+@@ -370,6 +370,7 @@ pub const __SIZEOF_PTHREAD_CONDATTR_T: u
+ pub const __SIZEOF_PTHREAD_MUTEXATTR_T: usize = 4;
+ pub const O_DIRECT: ::c_int = 16384;
+ pub const O_DIRECTORY: ::c_int = 65536;
++pub const O_LARGEFILE: ::c_int = 0o0100000;
+ pub const O_NOFOLLOW: ::c_int = 131072;
+ pub const MAP_HUGETLB: ::c_int = 262144;
+ pub const MAP_LOCKED: ::c_int = 8192;

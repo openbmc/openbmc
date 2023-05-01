@@ -1,4 +1,3 @@
-# This file contains content which was not automatically generated using cargo-bitbake on the cargo.toml file of uutils-coreutils
 # Copyright (c) 2022, Snap Inc.
 # Released under the MIT license (see COPYING.MIT for the terms)
 

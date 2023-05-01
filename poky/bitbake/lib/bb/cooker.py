@@ -1764,9 +1764,9 @@ class BBCooker:
     def shutdown(self, force=False):
         if force:
             self.state = state.forceshutdown
+            bb.event._should_exit.set()
         else:
             self.state = state.shutdown
-        bb.event._should_exit.set()
 
         if self.parser:
             self.parser.shutdown(clean=False)
@@ -2223,7 +2223,7 @@ class CookerParser(object):
 
             self.results = itertools.chain(self.results, self.parse_generator())
 
-    def shutdown(self, clean=True):
+    def shutdown(self, clean=True, eventmsg="Parsing halted due to errors"):
         if not self.toparse:
             return
         if self.haveshutdown:
@@ -2238,6 +2238,7 @@ class CookerParser(object):
 
             bb.event.fire(event, self.cfgdata)
         else:
+            bb.event.fire(bb.event.ParseError(eventmsg), self.cfgdata)
             bb.error("Parsing halted due to errors, see error messages above")
 
         # Cleanup the queue before call process.join(), otherwise there might be
@@ -2355,7 +2356,7 @@ class CookerParser(object):
         except bb.parse.ParseError as exc:
             self.error += 1
             logger.error(str(exc))
-            self.shutdown(clean=False)
+            self.shutdown(clean=False, eventmsg=str(exc))
             return False
         except bb.data_smart.ExpansionError as exc:
             self.error += 1

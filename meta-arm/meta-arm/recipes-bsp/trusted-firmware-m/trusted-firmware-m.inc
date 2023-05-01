@@ -72,14 +72,12 @@ EXTRA_OECMAKE += "${@bb.utils.contains('TFM_DEBUG', '1', '-DCMAKE_BUILD_TYPE=Deb
 # Verbose builds
 EXTRA_OECMAKE += "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON"
 
-EXTRA_OECMAKE += "-DMBEDCRYPTO_PATH=${S}/../mbedtls -DTFM_TEST_REPO_PATH=${S}/../tf-m-tests -DMCUBOOT_PATH=${S}/../mcuboot -DQCBOR_PATH=${S}/../qcbor"
+EXTRA_OECMAKE += "-DMBEDCRYPTO_PATH=${S}/../mbedtls -DTFM_TEST_REPO_PATH=${S}/../tf-m-tests -DTFM_EXTRAS_REPO_PATH=${S}/../tfm-extras -DMCUBOOT_PATH=${S}/../mcuboot -DQCBOR_PATH=${S}/../qcbor"
 
 export CMAKE_BUILD_PARALLEL_LEVEL = "${@oe.utils.parallel_make(d, False)}"
 
-# Let the Makefile handle setting up the CFLAGS and LDFLAGS as it is a standalone application
-CFLAGS[unexport] = "1"
-LDFLAGS[unexport] = "1"
 AS[unexport] = "1"
+CC[unexport] = "1"
 LD[unexport] = "1"
 
 # python3-cryptography needs the legacy provider, so set OPENSSL_MODULES to the
@@ -108,11 +106,16 @@ do_install() {
 
 FILES:${PN} = "/firmware"
 SYSROOT_DIRS += "/firmware"
+FILES:${PN}-dbg = "/firmware/*.elf"
 
 addtask deploy after do_install
 do_deploy() {
     cp -rf ${D}/firmware/* ${DEPLOYDIR}/
 }
 
-# Build paths are currently embedded
+# Build paths are currently embedded because it's impossible to pass -fdebug-prefix-map
 INSANE_SKIP:${PN} += "buildpaths"
+INSANE_SKIP:${PN}-dbg += "buildpaths"
+# Target binaries will be 32-bit Arm
+INSANE_SKIP:${PN} += "arch"
+INSANE_SKIP:${PN}-dbg += "arch"

@@ -85,6 +85,10 @@ do_install:append() {
     # Remove /var/run as it is created on startup
     rm -rf ${D}${localstatedir}/run
 
+    # it causes install conflict when multilib enabled
+    # since python support is disabled, not deliver it
+    rm -f ${D}${bindir}/syslog-ng-update-virtualenv
+
     # support for systemd
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -m 644 ${WORKDIR}/syslog-ng.conf.systemd ${D}${sysconfdir}/${BPN}/${BPN}.conf

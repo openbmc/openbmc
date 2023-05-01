@@ -6,6 +6,7 @@ Subject: [PATCH] dvbdate: Remove Obsoleted stime API calls
 stime() has been deprecated in glibc 2.31+ its recommended to
 replaced with clock_settime()
 
+Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  util/dvbdate/dvbdate.c | 5 ++++-

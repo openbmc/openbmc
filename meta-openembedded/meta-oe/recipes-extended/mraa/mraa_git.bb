@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=91e7de50a8d3cf01057f318d72460acd"
 SRCREV = "7786c7ded5c9ce7773890d0e3dc27632898fc6b1"
 PV = "2.2.0+git${SRCPV}"
 
-SRC_URI = "git://github.com/eclipse/${BPN}.git;protocol=http;branch=master;protocol=https \
+SRC_URI = "git://github.com/eclipse/${BPN}.git;protocol=https;branch=master \
            file://0001-cmake-Use-a-regular-expression-to-match-x86-architec.patch \
            file://0001-include-Declare-gVERSION-global-as-extern.patch \
            "

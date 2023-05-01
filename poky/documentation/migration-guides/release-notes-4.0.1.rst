@@ -86,7 +86,7 @@ Fixes in 4.0.1
 -  migration-3.4: add missing entry on :term:`EXTRA_USERS_PARAMS`
 -  migration-guides: add release notes for 4.0
 -  migration-guides: complete migration guide for 4.0
--  migration-guides: release-notes-4.0: mention LTS release
+-  migration-guides: release-notes-4.0: mention :term:`LTS` release
 -  migration-guides: release-notes-4.0: update 'Repositories / Downloads' section
 -  migration-guides: stop including documents with ".. include"
 -  musl: Fix build when usrmerge distro feature is enabled

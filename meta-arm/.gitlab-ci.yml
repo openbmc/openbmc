@@ -1,4 +1,4 @@
-image: ghcr.io/siemens/kas/kas:3.2
+image: ghcr.io/siemens/kas/kas:3.2.3
 
 variables:
   CPU_REQUEST: ""
@@ -42,9 +42,21 @@ stages:
   extends: .setup
   variables:
     KUBERNETES_CPU_REQUEST: $CPU_REQUEST
-  only:
-    variables:
-      - $BUILD_ENABLE_REGEX == null || $CI_JOB_NAME =~ $BUILD_ENABLE_REGEX
+  rules:
+    # Don't run MR pipelines
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
+    # Don't run pipelines for tags
+    - if: $CI_COMMIT_TAG
+      when: never
+    # Don't run if BUILD_ENABLE_REGEX is set, but the job doesn't match the regex
+    - if: '$BUILD_ENABLE_REGEX != null && $CI_JOB_NAME !~ $BUILD_ENABLE_REGEX'
+      when: never
+    # Allow the dev kernels to fail and not fail the overall build
+    - if: '$KERNEL == "linux-yocto-dev"'
+      allow_failure: true
+    # Catch all for everything else
+    - if: '$KERNEL != "linux-yocto-dev"'
   script:
     - KASFILES=$(./ci/jobs-to-kas "$CI_JOB_NAME")
     - kas dump --update --force-checkout --resolve-refs --resolve-env $KASFILES 
@@ -207,6 +219,9 @@ sgi575:
 
 tc1:
   extends: .build
+  parallel:
+    matrix:
+      - TESTING: testimage
   tags:
     - x86_64
 

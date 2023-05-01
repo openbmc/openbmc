@@ -1,0 +1,29 @@
+From fee4cb0ae2d1fcd012cb7f501c3db0d8ec910798 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 2 Apr 2023 10:01:51 -0700
+Subject: [PATCH] configure.ac: Fix missing  comma in AS_IF
+
+this is flagged with autconf 2.72
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 47a069e..9cdfd3f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -744,7 +744,7 @@ dnl
+             IPFW_EXE=""
+             IPTABLES_EXE=""
+             FIREWALLD_EXE=""
+-          ]
++          ],
+         ]
+       ]
+     ]
+-- 
+2.40.0
+

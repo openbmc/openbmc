@@ -750,6 +750,29 @@ Errors and Warnings
     other things in the patches, those can be discarded.
 
 
+.. _qa-check-patch-status:
+
+- ``Missing Upstream-Status in patch <patchfile> Please add according to <url> [patch-status-core/patch-status-noncore]``
+
+    The Upstream-Status value is missing in the specified patch file's header.
+    This value is intended to track whether or not the patch has been sent
+    upstream, whether or not it has been merged, etc.
+
+    There are two options for this same check - ``patch-status-core`` (for
+    recipes in OE-Core) and ``patch-status-noncore`` (for recipes in any other
+    layer).
+
+    For more information on setting Upstream-Status see:
+    https://www.openembedded.org/wiki/Commit_Patch_Message_Guidelines#Patch_Header_Recommendations:_Upstream-Status
+
+
+- ``Malformed Upstream-Status in patch <patchfile> Please correct according to <url> [patch-status-core/patch-status-noncore]``
+
+    The Upstream-Status value in the specified patch file's header is invalid -
+    it must be a specific format. See the "Missing Upstream-Status" entry above
+    for more information.
+
+
 .. _qa-check-buildpaths:
 
 - ``File <filename> in package <packagename> contains reference to TMPDIR [buildpaths]``

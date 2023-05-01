@@ -5,6 +5,7 @@ Subject: [PATCH] make: Do not build po files
 
 Target fails to build
 
+Upstream-Status: Inappropriate [Cross-compile specific]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  Makefile.am | 2 +-

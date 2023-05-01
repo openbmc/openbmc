@@ -9,4 +9,3 @@ SRCREV = "cbb9c3c5162a0d7018c7b3e053153a04d4fbbbb9"
 S = "${WORKDIR}/git"
 
 inherit cmake
-inherit ptest

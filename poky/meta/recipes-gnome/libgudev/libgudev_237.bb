@@ -7,7 +7,7 @@ HOMEPAGE = "https://wiki.gnome.org/Projects/libgudev"
 BUGTRACKER = "https://gitlab.gnome.org/GNOME/libgudev/issues"
 SRC_URI[archive.sha256sum] = "0d06b21170d20c93e4f0534dbb9b0a8b4f1119ffb00b4031aaeb5b9148b686aa"
 
-DEPENDS = "glib-2.0 udev"
+DEPENDS = "glib-2.0 glib-2.0-native udev"
 
 RCONFLICTS:${PN} = "systemd (<= 220)"
 

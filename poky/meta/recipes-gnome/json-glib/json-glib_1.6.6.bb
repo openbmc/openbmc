@@ -9,7 +9,7 @@ BUGTRACKER = "https://gitlab.gnome.org/GNOME/json-glib/issues"
 LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=7fbc338309ac38fefcd64b04bb903e34"
 
-DEPENDS = "glib-2.0"
+DEPENDS = "glib-2.0 glib-2.0-native"
 
 GNOMEBASEBUILDCLASS = "meson"
 inherit gnomebase lib_package gobject-introspection gi-docgen gettext ptest-gnome manpages upstream-version-is-even
