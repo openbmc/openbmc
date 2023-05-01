@@ -17,7 +17,7 @@ workdir=$(mktemp -d -t onig.ptest.XXXXXX)
 status="${workdir}/failed"
 touch "${status}"
 
-find tests/ -perm -111 -type f -exec sh -c '
+find tests/ -perm -111 -type f ! -path "tests/.debug/*" -exec sh -c '
     workdir="${1}"
     status="${2}"
     t="${3}"

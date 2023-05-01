@@ -238,7 +238,7 @@ class QemuRunner:
         self.origchldhandler = signal.getsignal(signal.SIGCHLD)
         signal.signal(signal.SIGCHLD, self.handleSIGCHLD)
 
-        self.logger.debug('launchcmd=%s'%(launch_cmd))
+        self.logger.debug('launchcmd=%s' % (launch_cmd))
 
         # FIXME: We pass in stdin=subprocess.PIPE here to work around stty
         # blocking at the end of the runqemu script when using this within
@@ -275,7 +275,7 @@ class QemuRunner:
             os._exit(0)
 
         self.logger.debug("runqemu started, pid is %s" % self.runqemu.pid)
-        self.logger.debug("waiting at most %s seconds for qemu pid (%s)" %
+        self.logger.debug("waiting at most %d seconds for qemu pid (%s)" %
                           (self.runqemutime, time.strftime("%D %H:%M:%S")))
         endtime = time.time() + self.runqemutime
         while not self.is_alive() and time.time() < endtime:
@@ -299,7 +299,7 @@ class QemuRunner:
             self.logger.warning('runqemu exited with code %d' % self.runqemu.returncode)
 
         if not self.is_alive():
-            self.logger.error("Qemu pid didn't appear in %s seconds (%s)" %
+            self.logger.error("Qemu pid didn't appear in %d seconds (%s)" %
                               (self.runqemutime, time.strftime("%D %H:%M:%S")))
 
             qemu_pid = None
@@ -332,8 +332,8 @@ class QemuRunner:
         try:
             os.chdir(os.path.dirname(qmp_port))
             try:
-               from qmp.legacy import QEMUMonitorProtocol
-               self.qmp = QEMUMonitorProtocol(os.path.basename(qmp_port))
+                from qmp.legacy import QEMUMonitorProtocol
+                self.qmp = QEMUMonitorProtocol(os.path.basename(qmp_port))
             except OSError as msg:
                 self.logger.warning("Failed to initialize qemu monitor socket: %s File: %s" % (msg, msg.filename))
                 return False
@@ -343,8 +343,8 @@ class QemuRunner:
                 self.logger.debug("QMP Port does not exist waiting for it to be created")
                 endtime = time.time() + self.runqemutime
                 while not os.path.exists(qmp_port) and self.is_alive() and time.time() < endtime:
-                   self.logger.info("QMP port does not exist yet!")
-                   time.sleep(0.5)
+                    self.logger.info("QMP port does not exist yet!")
+                    time.sleep(0.5)
                 if not os.path.exists(qmp_port) and self.is_alive():
                     self.logger.warning("QMP Port still does not exist but QEMU is alive")
                     return False
@@ -354,7 +354,7 @@ class QemuRunner:
                 self.qmp.settimeout(self.runqemutime)
                 self.qmp.connect()
                 connect_time = time.time()
-                self.logger.info("QMP connected to QEMU at %s and took %s seconds" %
+                self.logger.info("QMP connected to QEMU at %s and took %.2f seconds" %
                                   (time.strftime("%D %H:%M:%S"),
                                    time.time() - launch_time))
             except OSError as msg:
@@ -388,14 +388,14 @@ class QemuRunner:
 
         # Release the qemu process to continue running
         self.run_monitor('cont')
-        self.logger.info("QMP released QEMU at %s and took %s seconds from connect" %
+        self.logger.info("QMP released QEMU at %s and took %.2f seconds from connect" %
                           (time.strftime("%D %H:%M:%S"),
                            time.time() - connect_time))
 
         # We are alive: qemu is running
         out = self.getOutput(output)
         netconf = False # network configuration is not required by default
-        self.logger.debug("qemu started in %s seconds - qemu procces pid is %s (%s)" %
+        self.logger.debug("qemu started in %.2f seconds - qemu procces pid is %s (%s)" %
                           (time.time() - (endtime - self.runqemutime),
                            self.qemupid, time.strftime("%D %H:%M:%S")))
         cmdline = ''
@@ -419,7 +419,7 @@ class QemuRunner:
             except (IndexError, ValueError):
                 # Try to get network configuration from runqemu output
                 match = re.match(r'.*Network configuration: (?:ip=)*([0-9.]+)::([0-9.]+):([0-9.]+).*',
-                                 out, re.MULTILINE|re.DOTALL)
+                                 out, re.MULTILINE | re.DOTALL)
                 if match:
                     self.ip, self.server_ip, self.netmask = match.groups()
                     # network configuration is required as we couldn't get it
@@ -486,9 +486,9 @@ class QemuRunner:
                             self.server_socket = qemusock
                             stopread = True
                             reachedlogin = True
-                            self.logger.debug("Reached login banner in %s seconds (%s, %s)" %
+                            self.logger.debug("Reached login banner in %.2f seconds (%s)" %
                                               (time.time() - (endtime - self.boottime),
-                                              time.strftime("%D %H:%M:%S"), time.time()))
+                                              time.strftime("%D %H:%M:%S")))
                     else:
                         # no need to check if reachedlogin unless we support multiple connections
                         self.logger.debug("QEMU socket disconnected before login banner reached. (%s)" %
@@ -516,7 +516,7 @@ class QemuRunner:
             (status, output) = self.run_serial(self.boot_patterns['send_login_user'], raw=True, timeout=120)
             if re.search(self.boot_patterns['search_login_succeeded'], output):
                 self.logged = True
-                self.logger.debug("Logged as root in serial console")
+                self.logger.debug("Logged in as %s in serial console" % self.boot_patterns['send_login_user'].replace("\n", ""))
                 if netconf:
                     # configure guest networking
                     cmd = "ifconfig eth0 %s netmask %s up\n" % (self.ip, self.netmask)
@@ -527,7 +527,7 @@ class QemuRunner:
                         self.logger.debug("Couldn't configure guest networking")
             else:
                 self.logger.warning("Couldn't login into serial console"
-                            " as root using blank password")
+                            " as %s using blank password" % self.boot_patterns['send_login_user'].replace("\n", ""))
                 self.logger.warning("The output:\n%s" % output)
         except:
             self.logger.warning("Serial console failed while trying to login")
@@ -548,12 +548,12 @@ class QemuRunner:
                     if e.errno != errno.ESRCH:
                         raise
             try:
-                outs, errs = self.runqemu.communicate(timeout = self.runqemutime)
+                outs, errs = self.runqemu.communicate(timeout=self.runqemutime)
                 if outs:
                     self.logger.info("Output from runqemu:\n%s", outs.decode("utf-8"))
                 if errs:
                     self.logger.info("Stderr from runqemu:\n%s", errs.decode("utf-8"))
-            except TimeoutExpired:
+            except subprocess.TimeoutExpired:
                 self.logger.debug("Sending SIGKILL to runqemu")
                 os.killpg(os.getpgid(self.runqemu.pid), signal.SIGKILL)
             if not self.runqemu.stdout.closed:

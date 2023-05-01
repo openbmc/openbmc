@@ -58,6 +58,7 @@ do_install:append() {
 	rm -rf ${D}${includedir}
 	rm -rf ${D}${datadir}/locale
 	rm -f ${D}${infodir}/bfd.info
+        rm -f ${D}${infodir}/sframe-spec.info
 }
 
 RRECOMMENDS:gdb:append:linux = " glibc-thread-db "

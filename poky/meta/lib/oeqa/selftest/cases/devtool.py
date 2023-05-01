@@ -848,6 +848,99 @@ class DevtoolModifyTests(DevtoolBase):
         # Try building
         bitbake(testrecipe)
 
+    def test_devtool_modify_git_crates_subpath(self):
+        # This tests two things in devtool context:
+        #   - that we support local git dependencies for cargo based recipe
+        #   - that we support patches in SRC_URI when git url contains subpath parameter
+
+        # Check preconditions:
+        #    recipe inherits cargo
+        #    git:// uri with a subpath as the main package
+        #    some crate:// in SRC_URI
+        #    others git:// in SRC_URI
+        #    cointains a patch
+        testrecipe = 'zvariant'
+        bb_vars = get_bb_vars(['SRC_URI', 'FILE', 'WORKDIR', 'CARGO_HOME'], testrecipe)
+        recipefile = bb_vars['FILE']
+        workdir = bb_vars['WORKDIR']
+        cargo_home = bb_vars['CARGO_HOME']
+        src_uri = bb_vars['SRC_URI'].split()
+        self.assertTrue(src_uri[0].startswith('git://'),
+                        'This test expects the %s recipe to have a git repo has its main uri' % testrecipe)
+        self.assertIn(';subpath=', src_uri[0],
+                      'This test expects the %s recipe to have a git uri with subpath' % testrecipe)
+        self.assertTrue(any([uri.startswith('crate://') for uri in src_uri]),
+                        'This test expects the %s recipe to have some crates in its src uris' % testrecipe)
+        self.assertGreater(sum(map(lambda x:x.startswith('git://'), src_uri)), 2,
+                           'This test expects the %s recipe to have several git:// uris' % testrecipe)
+        self.assertTrue(any([uri.startswith('file://') and '.patch' in uri for uri in src_uri]),
+                        'This test expects the %s recipe to have a patch in its src uris' % testrecipe)
+
+        self._test_recipe_contents(recipefile, {}, ['cargo'])
+
+        # Clean up anything in the workdir/sysroot/sstate cache
+        bitbake('%s -c cleansstate' % testrecipe)
+        # Try modifying a recipe
+        tempdir = tempfile.mkdtemp(prefix='devtoolqa')
+        self.track_for_cleanup(tempdir)
+        self.track_for_cleanup(self.workspacedir)
+        self.add_command_to_tearDown('bitbake -c clean %s' % testrecipe)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
+        result = runCmd('devtool modify %s -x %s' % (testrecipe, tempdir))
+        self.assertExists(os.path.join(tempdir, 'Cargo.toml'), 'Extracted source could not be found')
+        self.assertExists(os.path.join(self.workspacedir, 'conf', 'layer.conf'), 'Workspace directory not created. devtool output: %s' % result.output)
+        matches = glob.glob(os.path.join(self.workspacedir, 'appends', 'zvariant_*.bbappend'))
+        self.assertTrue(matches, 'bbappend not created')
+        # Test devtool status
+        result = runCmd('devtool status')
+        self.assertIn(testrecipe, result.output)
+        self.assertIn(tempdir, result.output)
+        # Check git repo
+        self._check_src_repo(tempdir)
+        # Check that the patch is correctly applied
+        # last commit message in the tree must contain
+        # %% original patch: <patchname>
+        # ..
+        patchname = None
+        for uri in src_uri:
+            if uri.startswith('file://') and '.patch' in uri:
+                patchname = uri.replace("file://", "").partition('.patch')[0] + '.patch'
+        self.assertIsNotNone(patchname)
+        result = runCmd('git -C %s log -1' % tempdir)
+        self.assertIn("%%%% original patch: %s" % patchname, result.output)
+
+        # Configure the recipe to check that the git dependencies are correctly patched in cargo config
+        bitbake('-c configure %s' % testrecipe)
+
+        cargo_config_path = os.path.join(cargo_home, 'config')
+        with open(cargo_config_path, "r") as f:
+            cargo_config_contents = [line.strip('\n') for line in f.readlines()]
+
+        # Get back git dependencies of the recipe (ignoring the main one)
+        # and check that they are all correctly patched to be fetched locally
+        git_deps = [uri for uri in src_uri if uri.startswith("git://")][1:]
+        for git_dep in git_deps:
+            raw_url, _, raw_parms = git_dep.partition(";")
+            parms = {}
+            for parm in raw_parms.split(";"):
+                name_parm, _, value_parm = parm.partition('=')
+                parms[name_parm]=value_parm
+            self.assertIn('protocol', parms, 'git dependencies uri should contain the "protocol" parameter')
+            self.assertIn('name', parms, 'git dependencies uri should contain the "name" parameter')
+            self.assertIn('destsuffix', parms, 'git dependencies uri should contain the "destsuffix" parameter')
+            self.assertIn('type', parms, 'git dependencies uri should contain the "type" parameter')
+            self.assertEqual(parms['type'], 'git-dependency', 'git dependencies uri should have "type=git-dependency"')
+            raw_url = raw_url.replace("git://", '%s://' % parms['protocol'])
+            patch_line = '[patch."%s"]' % raw_url
+            path_patched = os.path.join(workdir, parms['destsuffix'])
+            path_override_line = '%s = { path = "%s" }' % (parms['name'], path_patched)
+            # Would have been better to use tomllib to read this file :/
+            self.assertIn(patch_line, cargo_config_contents)
+            self.assertIn(path_override_line, cargo_config_contents)
+
+        # Try to package the recipe
+        bitbake('-c package_qa %s' % testrecipe)
+
     def test_devtool_modify_localfiles(self):
         # Check preconditions
         testrecipe = 'lighttpd'

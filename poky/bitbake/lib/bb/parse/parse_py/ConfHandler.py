@@ -21,7 +21,7 @@ __config_regexp__  = re.compile( r"""
     ^
     (?P<exp>export\s+)?
     (?P<var>[a-zA-Z0-9\-_+.${}/~:]+?)
-    (\[(?P<flag>[a-zA-Z0-9\-_+.][a-zA-Z0-9\-_+.@]+)\])?
+    (\[(?P<flag>[a-zA-Z0-9\-_+.][a-zA-Z0-9\-_+.@]*)\])?
 
     \s* (
         (?P<colon>:=) |
@@ -103,7 +103,7 @@ def include_single_file(parentfn, fn, lineno, data, error_out):
 # We have an issue where a UI might want to enforce particular settings such as
 # an empty DISTRO variable. If configuration files do something like assigning
 # a weak default, it turns out to be very difficult to filter out these changes,
-# particularly when the weak default might appear half way though parsing a chain 
+# particularly when the weak default might appear half way though parsing a chain
 # of configuration files. We therefore let the UIs hook into configuration file
 # parsing. This turns out to be a hard problem to solve any other way.
 confFilters = []

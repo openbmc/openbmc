@@ -1,4 +1,4 @@
-DESCRIPTION = "Alabaster is a visually (c)lean, responsive, configurable theme for the Sphinx documentation system. It is Python 2+3 compatible."
+SUMMARY = "Alabaster is a visually (c)lean, responsive, configurable theme for the Sphinx documentation system."
 HOMEPAGE = "https://alabaster.readthedocs.io/en/latest/"
 SECTION = "devel/python"
 LICENSE = "BSD-3-Clause"

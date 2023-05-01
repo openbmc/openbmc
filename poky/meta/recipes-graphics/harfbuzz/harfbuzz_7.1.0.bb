@@ -11,6 +11,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b98429b8e8e3c2a67cfef01e99e4893d \
 SRC_URI = "${GITHUB_BASE_URI}/download/${PV}/${BPN}-${PV}.tar.xz"
 SRC_URI[sha256sum] = "f135a61cd464c9ed6bc9823764c188f276c3850a8dc904628de2a87966b7077b"
 
+DEPENDS += "glib-2.0-native"
+
 inherit meson pkgconfig lib_package gtk-doc gobject-introspection github-releases
 
 GIR_MESON_ENABLE_FLAG = 'enabled'

@@ -1,0 +1,27 @@
+From 3b74181d626f7dedb47377450ca7c43457a66cda Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_L_K@t-online.de>
+Date: Sat, 1 Apr 2023 04:42:32 +0200
+Subject: [PATCH] Makefile: add clean target
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index a51c2c9..fbe2aec 100644
+--- a/Makefile
++++ b/Makefile
+@@ -19,5 +19,7 @@ install: all
+ uninstall:
+ 	rm -rf '$(DESTDIR)$(PREFIX)/include/ffnvcodec' '$(DESTDIR)$(PREFIX)/$(LIBDIR)/pkgconfig/ffnvcodec.pc'
+ 
+-.PHONY: all install uninstall
++clean: uninstall
++
++.PHONY: all clean install uninstall
+ 
+-- 
+2.34.1
+

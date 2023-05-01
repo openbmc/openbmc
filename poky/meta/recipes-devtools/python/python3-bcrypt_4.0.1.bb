@@ -1,4 +1,4 @@
-DESCRIPTION = "Modern password hashing for your software and your servers."
+SUMMARY = "Modern password hashing for your software and your servers."
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=8f7bb094c7232b058c7e9f2e431f389c"
 HOMEPAGE = "https://pypi.org/project/bcrypt/"

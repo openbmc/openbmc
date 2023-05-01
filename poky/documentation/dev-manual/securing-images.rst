@@ -68,7 +68,7 @@ more secure:
 
 -  Regularly update your version of Poky and OE-Core from their upstream
    developers, e.g. to apply updates and security fixes from stable
-   and LTS branches.
+   and :term:`LTS` branches.
 
 -  Ensure you remove or disable debugging functionality before producing
    the final image. For information on how to do this, see the

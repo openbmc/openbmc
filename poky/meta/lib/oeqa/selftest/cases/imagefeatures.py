@@ -229,10 +229,10 @@ UBINIZE_ARGS_mtd_4_256 ?= "-m 4096 -p 256KiB"
                     self.assertTrue(os.path.exists(image_path),
                                     "%s image %s doesn't exist" % (itype, image_path))
             else:
-            	image_path = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], "%s.%s" % (bb_vars['IMAGE_LINK_NAME'], itype))
-            	# check if result image is in deploy directory
-            	self.assertTrue(os.path.exists(image_path),
-                            "%s image %s doesn't exist" % (itype, image_path))
+                image_path = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], "%s.%s" % (bb_vars['IMAGE_LINK_NAME'], itype))
+                # check if result image is in deploy directory
+                self.assertTrue(os.path.exists(image_path),
+                                "%s image %s doesn't exist" % (itype, image_path))
 
     def test_useradd_static(self):
         config = """

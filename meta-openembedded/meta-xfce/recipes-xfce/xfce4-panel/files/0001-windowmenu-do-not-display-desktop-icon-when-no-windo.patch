@@ -14,7 +14,7 @@ Upstream-Status: Pending
 
 Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
 
-Rebase for xfce4 4.18.0.
+Rebase for xfce4-panel 4.18.3.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
@@ -22,10 +22,10 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/plugins/windowmenu/windowmenu.c b/plugins/windowmenu/windowmenu.c
-index ba245a3..f8fdee8 100644
+index be7dea4..2f432b0 100644
 --- a/plugins/windowmenu/windowmenu.c
 +++ b/plugins/windowmenu/windowmenu.c
-@@ -250,7 +250,7 @@ window_menu_plugin_init (WindowMenuPlugin *plugin)
+@@ -262,7 +262,7 @@ window_menu_plugin_init (WindowMenuPlugin *plugin)
    g_signal_connect (G_OBJECT (plugin->button), "toggled",
        G_CALLBACK (window_menu_plugin_menu), plugin);
  
@@ -33,8 +33,8 @@ index ba245a3..f8fdee8 100644
 +  plugin->icon = gtk_image_new_from_icon_name (NULL, GTK_ICON_SIZE_BUTTON);
    gtk_container_add (GTK_CONTAINER (plugin->button), plugin->icon);
    gtk_widget_show (plugin->icon);
- }
-@@ -680,19 +680,19 @@ window_menu_plugin_active_window_changed (WnckScreen       *screen,
+ 
+@@ -695,19 +695,19 @@ window_menu_plugin_active_window_changed (WnckScreen       *screen,
            /* skip 'fake' windows */
            type = wnck_window_get_window_type (window);
            if (type == WNCK_WINDOW_DESKTOP || type == WNCK_WINDOW_DOCK)

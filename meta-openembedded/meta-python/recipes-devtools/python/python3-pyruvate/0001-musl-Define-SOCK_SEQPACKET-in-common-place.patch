@@ -1,0 +1,92 @@
+From e00da82cd46221bfb650895c9cea65082da66b4e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 8 Apr 2023 09:25:31 -0700
+Subject: [PATCH] musl: Define SOCK_SEQPACKET in common place
+
+This define is not architecture specific in musl [1]
+
+[1] https://git.musl-libc.org/cgit/musl/tree/include/sys/socket.h#n90
+
+Upstream-Status: Submitted [https://github.com/rust-lang/libc/pull/3191]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/unix/linux_like/linux/musl/b32/arm/mod.rs  | 1 -
+ src/unix/linux_like/linux/musl/b32/hexagon.rs  | 1 -
+ src/unix/linux_like/linux/musl/b32/mips/mod.rs | 1 -
+ src/unix/linux_like/linux/musl/b32/powerpc.rs  | 1 -
+ src/unix/linux_like/linux/musl/b32/x86/mod.rs  | 1 -
+ src/unix/linux_like/linux/musl/b64/mod.rs      | 2 --
+ src/unix/linux_like/linux/musl/mod.rs          | 1 +
+ 7 files changed, 1 insertion(+), 7 deletions(-)
+
+--- a/src/unix/linux_like/linux/musl/b32/arm/mod.rs
++++ b/src/unix/linux_like/linux/musl/b32/arm/mod.rs
+@@ -324,7 +324,6 @@ pub const MAP_SYNC: ::c_int = 0x080000;
+ 
+ pub const SOCK_STREAM: ::c_int = 1;
+ pub const SOCK_DGRAM: ::c_int = 2;
+-pub const SOCK_SEQPACKET: ::c_int = 5;
+ 
+ pub const EDEADLK: ::c_int = 35;
+ pub const ENAMETOOLONG: ::c_int = 36;
+--- a/src/unix/linux_like/linux/musl/b32/hexagon.rs
++++ b/src/unix/linux_like/linux/musl/b32/hexagon.rs
+@@ -292,7 +292,6 @@ pub const SIG_SETMASK: ::c_int = 2; // F
+ pub const SIG_BLOCK: ::c_int = 0x000000;
+ pub const SIG_UNBLOCK: ::c_int = 0x01;
+ pub const SOCK_DGRAM: ::c_int = 2;
+-pub const SOCK_SEQPACKET: ::c_int = 5;
+ pub const SOCK_STREAM: ::c_int = 1;
+ pub const SOL_CAIF: ::c_int = 278;
+ pub const SOL_IUCV: ::c_int = 277;
+--- a/src/unix/linux_like/linux/musl/b32/mips/mod.rs
++++ b/src/unix/linux_like/linux/musl/b32/mips/mod.rs
+@@ -348,7 +348,6 @@ pub const ERFKILL: ::c_int = 167;
+ 
+ pub const SOCK_STREAM: ::c_int = 2;
+ pub const SOCK_DGRAM: ::c_int = 1;
+-pub const SOCK_SEQPACKET: ::c_int = 5;
+ 
+ pub const SA_ONSTACK: ::c_int = 0x08000000;
+ pub const SA_SIGINFO: ::c_int = 8;
+--- a/src/unix/linux_like/linux/musl/b32/powerpc.rs
++++ b/src/unix/linux_like/linux/musl/b32/powerpc.rs
+@@ -255,7 +255,6 @@ pub const MAP_STACK: ::c_int = 0x020000;
+ 
+ pub const SOCK_STREAM: ::c_int = 1;
+ pub const SOCK_DGRAM: ::c_int = 2;
+-pub const SOCK_SEQPACKET: ::c_int = 5;
+ 
+ pub const EDEADLK: ::c_int = 35;
+ pub const ENAMETOOLONG: ::c_int = 36;
+--- a/src/unix/linux_like/linux/musl/b32/x86/mod.rs
++++ b/src/unix/linux_like/linux/musl/b32/x86/mod.rs
+@@ -313,7 +313,6 @@ pub const MAP_SYNC: ::c_int = 0x080000;
+ 
+ pub const SOCK_STREAM: ::c_int = 1;
+ pub const SOCK_DGRAM: ::c_int = 2;
+-pub const SOCK_SEQPACKET: ::c_int = 5;
+ 
+ pub const EDEADLK: ::c_int = 35;
+ pub const ENAMETOOLONG: ::c_int = 36;
+--- a/src/unix/linux_like/linux/musl/b64/mod.rs
++++ b/src/unix/linux_like/linux/musl/b64/mod.rs
+@@ -133,8 +133,6 @@ s! {
+ pub const __SIZEOF_PTHREAD_RWLOCK_T: usize = 56;
+ pub const __SIZEOF_PTHREAD_MUTEX_T: usize = 40;
+ 
+-pub const SOCK_SEQPACKET: ::c_int = 5;
+-
+ extern "C" {
+     pub fn getrandom(buf: *mut ::c_void, buflen: ::size_t, flags: ::c_uint) -> ::ssize_t;
+ }
+--- a/src/unix/linux_like/linux/musl/mod.rs
++++ b/src/unix/linux_like/linux/musl/mod.rs
+@@ -530,6 +530,7 @@ pub const POSIX_MADV_DONTNEED: ::c_int =
+ 
+ pub const MAP_ANONYMOUS: ::c_int = MAP_ANON;
+ 
++pub const SOCK_SEQPACKET: ::c_int = 5;
+ pub const SOCK_DCCP: ::c_int = 6;
+ pub const SOCK_NONBLOCK: ::c_int = O_NONBLOCK;
+ pub const SOCK_PACKET: ::c_int = 10;

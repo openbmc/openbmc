@@ -1,0 +1,5 @@
+#!/bin/sh
+
+set -u
+
+make -k check

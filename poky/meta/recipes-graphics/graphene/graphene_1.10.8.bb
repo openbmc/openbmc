@@ -11,8 +11,9 @@ SRC_URI[archive.sha256sum] = "a37bb0e78a419dcbeaa9c7027bcff52f5ec2367c25ec859da3
 
 # Disable neon support by default on ARM-32 platforms because of the
 # following upstream bug: https://github.com/ebassi/graphene/issues/215
-PACKAGECONFIG ?= "${@bb.utils.contains('TUNE_FEATURES', 'aarch64', 'neon', '', d)}"
+PACKAGECONFIG ?= "gobject-types ${@bb.utils.contains('TUNE_FEATURES', 'aarch64', 'neon', '', d)}"
 
+PACKAGECONFIG[gobject-types] = "-Dgobject_types=true,-Dgobject_types=false,glib-2.0"
 PACKAGECONFIG[neon] = "-Darm_neon=true,-Darm_neon=false,"
 
 GIR_MESON_ENABLE_FLAG = 'enabled'

@@ -40,8 +40,6 @@ do_install_ptest() {
                 cp -r ${B}/tests                        ${D}${PTEST_PATH}
                 cp -r ${S}/tests/*                      ${D}${PTEST_PATH}/tests/
                 sed -i '/^Makefile:/c Makefile:'        ${D}${PTEST_PATH}/tests/Makefile
-                sed -i -e  "s;LOCALE_FR='fr_FR';LOCALE_FR='fr_FR.iso88591';g" \
-                       -e  "s;LOCALE_FR_UTF8='none';LOCALE_FR_UTF8='fr_FR.utf8';g" ${D}${PTEST_PATH}/tests/Makefile
                 find ${D}${PTEST_PATH} -type f -name *.[hoc] | xargs -i rm {}
                 cp ${S}/build-aux/update-copyright  ${D}${PTEST_PATH}/tests/
                 sed -i 's;update-copyright;./update-copyright;g' ${D}${PTEST_PATH}/tests/test-update-copyright.sh
@@ -52,6 +50,10 @@ do_install_ptest() {
                 ln -s ptest ${D}${libdir}/${BPN}/${BP} 
 }
 
+do_install_ptest:append:libc-glibc() {
+                sed -i -e  "s;LOCALE_FR='fr_FR';LOCALE_FR='fr_FR.iso88591';g" \
+                       -e  "s;LOCALE_FR_UTF8='none';LOCALE_FR_UTF8='fr_FR.utf8';g" ${D}${PTEST_PATH}/tests/Makefile
+}
 
 RDEPENDS:${PN}-ptest += "make coreutils diffutils bash"
 RDEPENDS:${PN}-ptest:append:libc-glibc = "\

@@ -1,4 +1,4 @@
-DESCRIPTION = "Lua is a powerful light-weight programming language designed \
+SUMMARY = "Lua is a powerful light-weight programming language designed \
 for extending applications."
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://doc/readme.html;beginline=307;endline=330;md5=79c3f6b19ad05efe24c1681f025026bb"
@@ -54,6 +54,12 @@ do_install () {
 
 do_install_ptest () {
         cp -R --no-dereference --preserve=mode,links -v ${WORKDIR}/lua-${PV_testsuites}-tests ${D}${PTEST_PATH}/test
+}
+
+do_install_ptest:append:libc-musl () {
+        # locale tests does not work on musl, due to limited locale implementation
+        # https://wiki.musl-libc.org/open-issues.html#Locale-limitations
+        sed -i -e 's|os.setlocale("pt_BR") or os.setlocale("ptb")|false|g' ${D}${PTEST_PATH}/test/literals.lua
 }
 
 BBCLASSEXTEND = "native nativesdk"

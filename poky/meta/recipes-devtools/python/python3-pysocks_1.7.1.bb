@@ -1,4 +1,4 @@
-DESCRIPTION = "A Python SOCKS client module"
+SUMMARY = "A Python SOCKS client module"
 HOMEPAGE = "http://python-requests.org"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1d457bcffb9661b45f799d4efee72f16"

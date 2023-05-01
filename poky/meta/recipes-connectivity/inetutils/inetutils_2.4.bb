@@ -1,3 +1,4 @@
+SUMMARY = "The GNU inetutils are a collection of common networking utilities and servers."
 DESCRIPTION = "The GNU inetutils are a collection of common \
 networking utilities and servers including ftp, ftpd, rcp, \
 rexec, rlogin, rlogind, rsh, rshd, syslog, syslogd, talk, \

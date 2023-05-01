@@ -1,0 +1,38 @@
+From 5cfe30829174a18ec64e53c84292a0229ffa5602 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zolt=C3=A1n=20B=C3=B6sz=C3=B6rm=C3=A9nyi?=
+ <zboszor@gmail.com>
+Date: Thu, 30 Mar 2023 11:31:27 +0200
+Subject: [PATCH] Fix installing ipp-usb quirk
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Use $(DESTDIR) as installation prefix for
+/usr/share/usb-ipp/quirk/HPLIP.conf.
+
+Signed-off-by: Zoltán Böszörményi <zboszor@gmail.com>
+---
+ Makefile.am | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index e10364d..f520225 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -703,10 +703,9 @@ if !DISBALE_IMAGEPROCESSOR_BUILD
+ 		ln -sf $(libdir)/libImageProcessor-x86_32.so $(libdir)/libImageProcessor.so ; \
+ 	fi
+ endif #DISABLE_IMAGEPROCESSOR
+-	if [ -d "/usr/share/ipp-usb/quirks/" ]; then \
+-		echo "ipp-usb directory exists"; \
+-		cp prnt/ipp-usb/HPLIP.conf /usr/share/ipp-usb/quirks/ ; \
+-	fi
++	install -d -m0755 $(DESTDIR)/usr/share/ipp-usb/quirks ; \
++	echo "ipp-usb directory exists"; \
++	cp prnt/ipp-usb/HPLIP.conf $(DESTDIR)/usr/share/ipp-usb/quirks/
+ if !HPLIP_CLASS_DRIVER
+ #	   If scanner build, add hpaio entry to sane dll.conf.
+ 	if [ "$(scan_build)" = "yes" ]; then \
+-- 
+2.39.2
+

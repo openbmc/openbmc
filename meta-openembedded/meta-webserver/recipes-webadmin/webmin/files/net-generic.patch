@@ -1,8 +1,8 @@
-# Add support for configuring network interfaces on a generic linux system
-#
-# Upstream-status: Not appropriate [config]
-#
-# Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+Add support for configuring network interfaces on a generic linux system
+
+Upstream-Status: Inappropriate [config]
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
 Index: webmin-1.850/net/module.info
 ===================================================================
 --- webmin-1.850.orig/net/module.info

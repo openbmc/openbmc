@@ -6,7 +6,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Upstram status:  Inappropriate [configuration]
+Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
 
@@ -22,11 +22,11 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/xfsettingsd/xsettings.xml b/xfsettingsd/xsettings.xml
-index 65ba1ee..9efb3cd 100644
+index d8fe2ac..0f5246b 100644
 --- a/xfsettingsd/xsettings.xml
 +++ b/xfsettingsd/xsettings.xml
-@@ -1,8 +1,8 @@
- <?xml version="1.0" encoding="UTF-8"?>
+@@ -6,8 +6,8 @@
+ 
  <channel name="xsettings" version="1.0">
    <property name="Net" type="empty">
 -    <property name="ThemeName" type="empty"/>

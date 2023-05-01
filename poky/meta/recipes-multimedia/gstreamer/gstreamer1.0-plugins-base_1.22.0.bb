@@ -1,6 +1,6 @@
 require gstreamer1.0-plugins-common.inc
 
-DESCRIPTION = "'Base' GStreamer plugins and helper libraries"
+SUMMARY = "'Base' GStreamer plugins and helper libraries"
 HOMEPAGE = "https://gstreamer.freedesktop.org/"
 BUGTRACKER = "https://gitlab.freedesktop.org/gstreamer/gst-plugins-base/-/issues"
 LICENSE = "LGPL-2.1-or-later"

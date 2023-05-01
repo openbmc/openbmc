@@ -10,7 +10,9 @@ DEPENDS="coreutils popt"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-SRC_URI = "${GITHUB_BASE_URI}/download/${PV}/${BP}.tar.xz"
+SRC_URI = "${GITHUB_BASE_URI}/download/${PV}/${BP}.tar.xz \
+           file://run-ptest \
+           "
 
 SRC_URI[sha256sum] = "8fa12015e3b8415c121fc9c0ca53aa872f7b0702f543afda7e32b6c4900f6516"
 
@@ -44,7 +46,7 @@ EXTRA_OEMAKE = "\
 # INSTALL=install and BASEDIR=/usr.
 OS_NAME = "Linux"
 
-inherit autotools systemd github-releases
+inherit autotools systemd github-releases ptest
 
 SYSTEMD_SERVICE:${PN} = "\
     ${BPN}.service \
@@ -86,3 +88,27 @@ do_install(){
         install -p -m 0755 ${S}/examples/logrotate.cron ${D}${sysconfdir}/cron.daily/logrotate
     fi
 }
+
+do_install_ptest() {
+    cp -r ${S}/test/* ${D}${PTEST_PATH}
+    cp ${S}/test-driver ${D}${PTEST_PATH}
+    cp ${B}/test/Makefile ${D}${PTEST_PATH}
+
+    # Do not rebuild Makefile
+    sed -i 's/^Makefile:/_Makefile:/' ${D}${PTEST_PATH}/Makefile
+
+    # Fix top_builddir and top_srcdir
+    sed -e 's/^top_builddir = \(.*\)/top_builddir = ./' \
+        -e 's/^top_srcdir = \(.*\)/top_srcdir = ./' \
+        -i ${D}${PTEST_PATH}/Makefile
+
+    # Replace bash with sh
+    sed -i 's,/bin/bash,/bin/sh,' ${D}${PTEST_PATH}/Makefile
+
+    # Replace gawk with awk
+    sed -i 's/gawk/awk/' ${D}${PTEST_PATH}/Makefile
+    ln -s ${sbindir}/logrotate ${D}${PTEST_PATH}
+}
+
+# coreutils is needed to have "readlink"
+RDEPENDS:${PN}-ptest += "make coreutils"

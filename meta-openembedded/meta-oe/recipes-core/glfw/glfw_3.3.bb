@@ -20,7 +20,17 @@ EXTRA_OECMAKE += "-DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_DOCS=OFF"
 
 CFLAGS += "-fPIC"
 
-DEPENDS = "libpng libglu zlib libxrandr libxinerama libxi libxcursor"
-REQUIRED_DISTRO_FEATURES = "x11 opengl"
+DEPENDS = "libpng libglu zlib"
+REQUIRED_DISTRO_FEATURES = "opengl"
+ANY_OF_DISTRO_FEATURES = "wayland x11"
+
+# upstream considers x11 and wayland backends mutually exclusive and will
+# prioritize wayland if it is enabled, but wayland has dependencies that cannot
+# be satisfied by this layer so it is disabled by default
+
+PACKAGECONFIG ??= "x11"
+
+PACKAGECONFIG[wayland] = "-DGLFW_USE_WAYLAND=ON,,wayland wayland-native wayland-protocols extra-cmake-modules libxkbcommon"
+PACKAGECONFIG[x11] = ",,libxrandr libxinerama libxi libxcursor"
 
 COMPATIBLE_HOST:libc-musl = "null"

@@ -1,4 +1,4 @@
-DESCRIPTION = "pyelftools is a pure-Python library for parsing and analyzing ELF files and DWARF debugging information"
+SUMMARY = "pyelftools is a pure-Python library for parsing and analyzing ELF files and DWARF debugging information"
 HOMEPAGE = "https://github.com/eliben/pyelftools"
 SECTION = "devel/python"
 LICENSE = "PD"

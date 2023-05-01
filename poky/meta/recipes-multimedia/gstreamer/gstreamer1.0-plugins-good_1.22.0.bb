@@ -1,6 +1,6 @@
 require gstreamer1.0-plugins-common.inc
 
-DESCRIPTION = "'Good' GStreamer plugins"
+SUMMARY = "'Good' GStreamer plugins"
 HOMEPAGE = "https://gstreamer.freedesktop.org/"
 BUGTRACKER = "https://gitlab.freedesktop.org/gstreamer/gst-plugins-good/-/issues"
 

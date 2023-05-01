@@ -25,7 +25,7 @@ SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/Linux-PAM-${PV}.tar.xz \
            file://pam-unix-nullok-secure.patch \
            file://crypt_configure.patch \
            file://pam-volatiles.conf \
-          "
+           "
 
 SRC_URI[md5sum] = "558ff53b0fc0563ca97f79e911822165"
 SRC_URI[sha256sum] = "eff47a4ecd833fbf18de9686632a70ee8d0794b79aecb217ebd0ce11db4cd0db"

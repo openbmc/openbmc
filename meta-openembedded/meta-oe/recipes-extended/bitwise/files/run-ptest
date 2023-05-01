@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Test 1: Basic bitwise operation
+bitwise --no-color -w b 0x42 > test.out
+
+# Compare expected output with actual output
+
+if ! cmp test.out ptest.out.expected; then
+    echo "[FAIL] Test 1: Basic bitwise operation"
+    exit 1
+fi

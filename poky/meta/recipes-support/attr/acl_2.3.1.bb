@@ -61,6 +61,10 @@ do_install_ptest() {
         rm ${D}${PTEST_PATH}/.libs/libtestlookup.lai
 }
 
+do_install_ptest:append:libc-musl() {
+        sed -i -e '/test\/misc.test/d' ${D}${PTEST_PATH}/Makefile
+}
+
 RDEPENDS:${PN}-ptest = "acl \
                         bash \
                         coreutils \

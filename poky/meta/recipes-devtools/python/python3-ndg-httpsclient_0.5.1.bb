@@ -1,4 +1,4 @@
-DESCRIPTION = "Provides enhanced HTTPS support for httplib and urllib2 using PyOpenSSL"
+SUMMARY = "Provides enhanced HTTPS support for httplib and urllib2 using PyOpenSSL"
 HOMEPAGE = "https://github.com/cedadev/ndg_httpsclient/"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://MANIFEST.in;md5=ce22c0cd986d2de3f7073cd6b5523ae0"

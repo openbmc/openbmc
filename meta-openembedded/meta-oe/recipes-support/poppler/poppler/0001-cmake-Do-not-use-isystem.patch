@@ -1,4 +1,4 @@
-From 51a2a1e4d8ca4040a6a7eac398cb704da35f39e5 Mon Sep 17 00:00:00 2001
+From 04686340c4cd375a17d60d31bf6943367cc33214 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 21 Jan 2023 03:09:08 -0800
 Subject: [PATCH] cmake: Do not use -isystem
@@ -28,6 +28,7 @@ but instead of prepending, it will append to system headers and the
 issue is addressed
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  CMakeLists.txt         |  4 ++--
  glib/CMakeLists.txt    |  4 ++--
@@ -38,7 +39,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  6 files changed, 16 insertions(+), 16 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 4768ac8..cdc014d 100644
+index c6c757c..5f1c540 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -603,10 +603,10 @@ add_library(poppler ${poppler_SRCS})
@@ -53,7 +54,7 @@ index 4768ac8..cdc014d 100644
 +  target_include_directories(poppler  PRIVATE ${LCMS2_INCLUDE_DIR})
  endif()
  generate_export_header(poppler BASE_NAME poppler-private EXPORT_FILE_NAME "${CMAKE_CURRENT_BINARY_DIR}/poppler_private_export.h")
- set_target_properties(poppler PROPERTIES VERSION 126.0.0 SOVERSION 126)
+ set_target_properties(poppler PROPERTIES VERSION 127.0.0 SOVERSION 127)
 diff --git a/glib/CMakeLists.txt b/glib/CMakeLists.txt
 index 52e8687..08ab39a 100644
 --- a/glib/CMakeLists.txt
@@ -187,6 +188,3 @@ index 1c3ebcb..bc1840a 100644
  endif()
  install(TARGETS pdftops DESTINATION bin)
  install(FILES pdftops.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
--- 
-2.39.1
-

@@ -8,7 +8,7 @@ SUMMARY = "Light and Versatile Graphics Library"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENCE.txt;md5=bf1198c89ae87f043108cea62460b03a"
 
-SRC_URI = "gitsm://github.com/lvgl/lvgl;destsuffix=${S};protocol=https;nobranch=1"
+SRC_URI = "gitsm://github.com/lvgl/lvgl;protocol=https;nobranch=1"
 SRCREV = "d38eb1e689fa5a64c25e677275172d9c8a4ab2f0"
 
 REQUIRED_DISTRO_FEATURES = "wayland"
@@ -16,8 +16,8 @@ REQUIRED_DISTRO_FEATURES = "wayland"
 inherit cmake
 inherit features_check
 
-EXTRA_OECMAKE = "-DLIB_INSTALL_DIR=${BASELIB}"
-S = "${WORKDIR}/${PN}-${PV}"
+EXTRA_OECMAKE = "-DLIB_INSTALL_DIR=${baselib}"
+S = "${WORKDIR}/git"
 
 LVGL_CONFIG_LV_MEM_CUSTOM ?= "0"
 

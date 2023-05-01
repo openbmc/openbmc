@@ -21,7 +21,7 @@ S = "${WORKDIR}/git"
 
 inherit pkgconfig cmake features_check python3native qemu
 
-ANY_OF_DISTRO_FEATURES += "opengl wayland"
+ANY_OF_DISTRO_FEATURES += "opengl vulkan"
 
 DEPENDS += "python3-lxml-native libpng zlib virtual/libgles2 qemu-native"
 

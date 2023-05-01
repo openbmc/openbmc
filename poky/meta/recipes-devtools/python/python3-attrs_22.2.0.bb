@@ -1,4 +1,4 @@
-DESCRIPTION = "Classes Without Boilerplate"
+SUMMARY = "Classes Without Boilerplate"
 HOMEPAGE = "http://www.attrs.org/"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=5e55731824cf9205cfabeab9a0600887"

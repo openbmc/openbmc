@@ -6,9 +6,13 @@ DEPENDS = "glib-2.0 libusb"
 
 inherit meson gobject-introspection gtk-doc gettext vala
 
-PACKAGECONFIG ??= "${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'vapi', '', d)}"
+PACKAGECONFIG:class-target ??= "${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'vapi', '', d)}"
 PACKAGECONFIG[vapi] = "-Dvapi=true,-Dvapi=false"
+
+EXTRA_OEMESON:append:class-native = " -Dtests=false -Dintrospection=false"
 
 SRC_URI = "git://github.com/hughsie/libgusb.git;branch=main;protocol=https"
 SRCREV = "332d5b987ffecb824426e88518e05547faf2b520"
 S = "${WORKDIR}/git"
+
+BBCLASSEXTEND = "native"

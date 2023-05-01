@@ -1,0 +1,35 @@
+From b87552c504b53a5e5df2438adfe24e35b0168aba Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 8 Apr 2023 08:51:02 -0700
+Subject: [PATCH] musl/riscv32: Define F_SETLK, F_SETLKW and fix F_GETLK
+
+F_SETLK and F_SETLKW were not defined therefore define them
+and F_GETLK value was not matching the musl port hence fixed
+
+Upstream-Status: Submitted [https://github.com/rust-lang/libc/pull/3191]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/unix/linux_like/linux/musl/b32/riscv32/mod.rs | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/unix/linux_like/linux/musl/b32/riscv32/mod.rs b/src/unix/linux_like/linux/musl/b32/riscv32/mod.rs
+index 9ce6a9fd3..e56ff4853 100644
+--- a/src/unix/linux_like/linux/musl/b32/riscv32/mod.rs
++++ b/src/unix/linux_like/linux/musl/b32/riscv32/mod.rs
+@@ -339,9 +339,11 @@ pub const POLLWRBAND: ::c_short = 512;
+ pub const O_ASYNC: ::c_int = 8192;
+ pub const O_NDELAY: ::c_int = 2048;
+ pub const EFD_NONBLOCK: ::c_int = 2048;
+-pub const F_GETLK: ::c_int = 5;
+-pub const F_GETOWN: ::c_int = 9;
+ pub const F_SETOWN: ::c_int = 8;
++pub const F_GETOWN: ::c_int = 9;
++pub const F_GETLK: ::c_int = 12;
++pub const F_SETLK: ::c_int = 13;
++pub const F_SETLKW: ::c_int = 14;
+ pub const SFD_NONBLOCK: ::c_int = 2048;
+ pub const TCSANOW: ::c_int = 0;
+ pub const TCSADRAIN: ::c_int = 1;
+-- 
+2.40.0
+

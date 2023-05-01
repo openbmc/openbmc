@@ -1,4 +1,4 @@
-DESCRIPTION = "Is a sphinx extension which outputs QtHelp document."
+SUMMARY = "Is a sphinx extension which outputs QtHelp document."
 HOMEPAGE = "http://babel.edgewall.org/"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f7a83b72ea86d04827575ec0b63430eb"

@@ -1,0 +1,13 @@
+Unsigned decimal: 66
+Signed decimal: 66
+Hexadecimal: 0x42
+Octal: 0102
+Human: 66
+Radix64: 0/
+IPv4 (Network byte order - Big):  66.0.0.0
+IPv4 (Reverwsed byte order - Little):  0.0.0.66
+ASCII: .......B
+Binary:
+0 1 0 0 0 0 1 0
+     7 -  0
+

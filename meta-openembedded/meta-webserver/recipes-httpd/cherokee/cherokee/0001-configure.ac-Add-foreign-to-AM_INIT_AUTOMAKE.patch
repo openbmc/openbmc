@@ -7,6 +7,7 @@ Fixes errors like
 | Makefile.am: error: required file './README' not found
 | Makefile.am: error: required file './ChangeLog' not found
 
+Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  configure.ac | 2 +-

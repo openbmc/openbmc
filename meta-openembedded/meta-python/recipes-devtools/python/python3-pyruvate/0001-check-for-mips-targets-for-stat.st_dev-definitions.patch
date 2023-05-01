@@ -19,7 +19,9 @@ currently the build fails on mips archirecture with type mismatches
       296 |                 device: stat.st_dev,
           |                         ^^^^^^^^^^^ expected `u64`, found `u32`
 
-Upstream-Status: Submitted [https://github.com/lucab/libsystemd-rs/pull/103]
+Drop this patch when libsystemd-rs crate bumps to 0.6.0+
+
+Upstream-Status: Backport [https://github.com/lucab/libsystemd-rs/pull/104]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  src/logging.rs | 3 +++

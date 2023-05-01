@@ -1,4 +1,4 @@
-DESCRIPTION = "Object-oriented filesystem paths"
+SUMMARY = "Object-oriented filesystem paths"
 HOMEPAGE = "https://github.com/mcmtroffaes/pathlib2"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=2dc08586cce3ab91bfa091b655c0e440"

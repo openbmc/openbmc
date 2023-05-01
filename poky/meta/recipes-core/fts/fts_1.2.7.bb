@@ -1,7 +1,7 @@
 # Copyright (C) 2015 Khem Raj <raj.khem@gmail.com>
 # Released under the MIT license (see COPYING.MIT for the terms)
 
-SUMMARY = "Implementation of ftsfor musl libc packages"
+SUMMARY = "Implementation of fts for musl libc packages"
 HOMEPAGE = "https://github.com/pullmoll/musl-fts"
 DESCRIPTION = "The musl-fts package implements the fts(3) functions fts_open, fts_read, fts_children, fts_set and fts_close, which are missing in musl libc."
 LICENSE = "BSD-3-Clause"

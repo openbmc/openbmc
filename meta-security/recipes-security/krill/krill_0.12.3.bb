@@ -10,7 +10,7 @@ SRC_URI = "git://github.com/NLnetLabs/krill.git;protocol=https;branch=main"
 SRCREV = "e92098419c7ad82939e0483bc76df21eff705b80"
 SRC_URI += "file://panic_workaround.patch"
 
-include krill.inc
+include krill-crates.inc
 
 UPSTREAM_CHECK_URI = "https://github.com/NLnetLabs/${BPN}/releases"
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
@@ -18,7 +18,7 @@ UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = ""
 
-inherit pkgconfig useradd systemd cargo
+inherit pkgconfig useradd systemd cargo cargo-update-recipe-crates
 
 do_install:append () {
     install -d ${D}${sysconfdir}

@@ -21,8 +21,6 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  create mode 100644 src/basic/parse-printf-format.c
  create mode 100644 src/basic/parse-printf-format.h
 
-diff --git a/meson.build b/meson.build
-index bfc86857d6..fb96143c37 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -755,6 +755,7 @@ endif
@@ -31,10 +29,8 @@ index bfc86857d6..fb96143c37 100644
                    'linux/vm_sockets.h',
 +                  'printf.h',
                    'sys/auxv.h',
+                   'threads.h',
                    'valgrind/memcheck.h',
-                   'valgrind/valgrind.h',
-diff --git a/src/basic/meson.build b/src/basic/meson.build
-index 7aae031d81..1aa9f5006d 100644
 --- a/src/basic/meson.build
 +++ b/src/basic/meson.build
 @@ -173,6 +173,11 @@ endforeach
@@ -49,9 +45,6 @@ index 7aae031d81..1aa9f5006d 100644
  ############################################################
  
  arch_list = [
-diff --git a/src/basic/parse-printf-format.c b/src/basic/parse-printf-format.c
-new file mode 100644
-index 0000000000..49437e5445
 --- /dev/null
 +++ b/src/basic/parse-printf-format.c
 @@ -0,0 +1,273 @@
@@ -328,9 +321,6 @@ index 0000000000..49437e5445
 +
 +        return last;
 +}
-diff --git a/src/basic/parse-printf-format.h b/src/basic/parse-printf-format.h
-new file mode 100644
-index 0000000000..47be7522d7
 --- /dev/null
 +++ b/src/basic/parse-printf-format.h
 @@ -0,0 +1,57 @@
@@ -391,8 +381,6 @@ index 0000000000..47be7522d7
 +size_t parse_printf_format(const char *fmt, size_t n, int *types);
 +
 +#endif /* HAVE_PRINTF_H */
-diff --git a/src/basic/stdio-util.h b/src/basic/stdio-util.h
-index 4e93ac90c9..f9deb6f662 100644
 --- a/src/basic/stdio-util.h
 +++ b/src/basic/stdio-util.h
 @@ -1,12 +1,12 @@
@@ -409,8 +397,6 @@ index 4e93ac90c9..f9deb6f662 100644
  
  _printf_(3, 4)
  static inline char *snprintf_ok(char *buf, size_t len, const char *format, ...) {
-diff --git a/src/libsystemd/sd-journal/journal-send.c b/src/libsystemd/sd-journal/journal-send.c
-index 3b74d2246e..136ebcb153 100644
 --- a/src/libsystemd/sd-journal/journal-send.c
 +++ b/src/libsystemd/sd-journal/journal-send.c
 @@ -2,7 +2,6 @@
@@ -429,6 +415,3 @@ index 3b74d2246e..136ebcb153 100644
  
  #define SNDBUF_SIZE (8*1024*1024)
  
--- 
-2.39.2
-

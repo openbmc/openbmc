@@ -21,6 +21,7 @@ SRCREV = "ebef1e929807629befafbb2918ea1a08c7194554"
 SRC_URI = "git://github.com/USCiLab/cereal.git;branch=master;protocol=https \
            file://0001-sandbox-Do-not-use-int8_t-in-std-uniform_int_distrib.patch \
            file://0001-cmake-Use-idirafter-instead-of-isystem.patch \
+           file://0001-doctest-Do-not-use-unnamed-class.patch \
            file://run-ptest \
 "
 

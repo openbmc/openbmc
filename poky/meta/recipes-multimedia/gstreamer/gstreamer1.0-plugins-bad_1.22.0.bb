@@ -1,7 +1,7 @@
 require gstreamer1.0-plugins-common.inc
 require gstreamer1.0-plugins-license.inc
 
-DESCRIPTION = "'Bad' GStreamer plugins and helper libraries "
+SUMMARY = "'Bad' GStreamer plugins and helper libraries "
 HOMEPAGE = "https://gstreamer.freedesktop.org/"
 BUGTRACKER = "https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/-/issues"
 

@@ -7,7 +7,7 @@ SECTION = "libs"
 LICENSE = "HDF5"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ac1039f6bf7c9ab2b3693836f46d0735"
 
-inherit cmake siteinfo qemu
+inherit cmake siteinfo qemu multilib_header
 
 DEPENDS += "qemu-native"
 
@@ -44,6 +44,7 @@ do_install:append() {
     # Used for generating config files on target
     install -m 755 ${B}/bin/H5detect ${D}${bindir}
     install -m 755 ${B}/bin/H5make_libsettings ${D}${bindir}
+    oe_multilib_header H5pubconf.h
 }
 
 BBCLASSEXTEND = "native"

@@ -1,0 +1,39 @@
+From b9f825b298b555c4770024d1f68ef1df65aad20a Mon Sep 17 00:00:00 2001
+From: Wentao Zhang <wentao.zhang@windriver.com>
+Date: Mon, 20 Mar 2023 13:39:52 +0800
+Subject: [PATCH] Update test_sysconfig for posix_user purelib
+
+Steps to trigger the failed test:
+Edit local.conf to add something as follows:
+    BASELIB = "lib64"
+    IMAGE_INSTALL:append = " python3-tests".
+bitbake core-image-sato
+runqemu qemux86-64 nographic slirp
+Reproducer:
+    $python3 -m test test_sysconfig
+
+Update test_sysconfig.test_user_similar() for the posix_user scheme:
+"purelib" doesn't use sys.platlibdir.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Wentao Zhang <wentao.zhang@windriver.com>
+---
+ Lib/test/test_sysconfig.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Lib/test/test_sysconfig.py b/Lib/test/test_sysconfig.py
+index d96371d..20aea4b 100644
+--- a/Lib/test/test_sysconfig.py
++++ b/Lib/test/test_sysconfig.py
+@@ -373,7 +373,7 @@ class TestSysConfig(unittest.TestCase):
+                 expected = os.path.normpath(global_path.replace(base, user, 1))
+                 # bpo-44860: platlib of posix_user doesn't use sys.platlibdir,
+                 # whereas posix_prefix does.
+-                if name == 'platlib':
++                if name == 'platlib' or name == 'purelib':
+                     # Replace "/lib64/python3.11/site-packages" suffix
+                     # with "/lib/python3.11/site-packages".
+                     py_version_short = sysconfig.get_python_version()
+-- 
+2.25.1
+

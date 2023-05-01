@@ -3,6 +3,8 @@ From: Carlos <carlos.rodriguez@ridgerun.com>
 Date: Fri, 15 Dec 2017 10:14:05 -0600
 Subject: [PATCH] gstd:yocto compatibility
 
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  gstd/Makefile.am                | 2 +-
  3 files changed, 9 insertions(+), 3 deletions(-)

@@ -18,97 +18,9 @@ SRC_URI += " \
     file://fixup.patch \
     "
 
-SRC_URI += " \
-    crate://crates.io/autocfg/1.0.1 \
-    crate://crates.io/semver-parser/0.7.0 \
-    crate://crates.io/arrayvec/0.4.12 \
-    crate://crates.io/ryu/1.0.5 \
-    crate://crates.io/libc/0.2.86 \
-    crate://crates.io/bitflags/1.2.1 \
-    crate://crates.io/version_check/0.9.2 \
-    crate://crates.io/memchr/2.3.4 \
-    crate://crates.io/nodrop/0.1.14 \
-    crate://crates.io/cfg-if/0.1.9 \
-    crate://crates.io/static_assertions/0.3.4 \
-    crate://crates.io/getrandom/0.1.16 \
-    crate://crates.io/cfg-if/1.0.0 \
-    crate://crates.io/siphasher/0.3.3 \
-    crate://crates.io/ppv-lite86/0.2.10 \
-    crate://crates.io/proc-macro-hack/0.5.19 \
-    crate://crates.io/proc-macro2/0.4.30 \
-    crate://crates.io/unicode-xid/0.1.0 \
-    crate://crates.io/syn/0.15.44 \
-    crate://crates.io/build_const/0.2.1 \
-    crate://crates.io/num-derive/0.2.5 \
-    crate://crates.io/base64/0.11.0 \
-    crate://crates.io/widestring/0.4.3 \
-    crate://crates.io/md5/0.7.0 \
-    crate://crates.io/uuid/0.8.2 \
-    crate://crates.io/byteorder/1.4.2 \
-    crate://crates.io/semver/0.9.0 \
-    crate://crates.io/nom/5.1.1 \
-    crate://crates.io/num-traits/0.2.14 \
-    crate://crates.io/num-integer/0.1.44 \
-    crate://crates.io/num-bigint/0.2.6 \
-    crate://crates.io/num-bigint/0.3.1 \
-    crate://crates.io/num-rational/0.2.4 \
-    crate://crates.io/num-complex/0.2.4 \
-    crate://crates.io/num-iter/0.1.42 \
-    crate://crates.io/phf_shared/0.8.0 \
-    crate://crates.io/crc/1.8.1 \
-    crate://crates.io/rustc_version/0.2.3 \
-    crate://crates.io/phf/0.8.0 \
-    crate://crates.io/lexical-core/0.6.8 \
-    crate://crates.io/time/0.1.44 \
-    crate://crates.io/quote/0.6.13 \
-    crate://crates.io/rand_core/0.5.1 \
-    crate://crates.io/rand_chacha/0.2.2 \
-    crate://crates.io/rand_pcg/0.2.1 \
-    crate://crates.io/num-traits/0.1.43 \
-    crate://crates.io/rand/0.7.3 \
-    crate://crates.io/enum_primitive/0.1.1 \
-    crate://crates.io/phf_generator/0.8.0 \
-    crate://crates.io/phf_codegen/0.8.0 \
-    crate://crates.io/tls-parser/0.9.4 \
-    crate://crates.io/num/0.2.1 \
-    crate://crates.io/rusticata-macros/2.1.0 \
-    crate://crates.io/ntp-parser/0.4.0 \
-    crate://crates.io/der-oid-macro/0.2.0 \
-    crate://crates.io/der-parser/3.0.4 \
-    crate://crates.io/ipsec-parser/0.5.0 \
-    crate://crates.io/x509-parser/0.6.5 \
-    crate://crates.io/der-parser/4.1.0 \
-    crate://crates.io/snmp-parser/0.6.0 \
-    crate://crates.io/kerberos-parser/0.5.0 \
-    crate://crates.io/wasi/0.10.0+wasi-snapshot-preview1 \
-    crate://crates.io/winapi/0.3.9 \
-    crate://crates.io/winapi-i686-pc-windows-gnu/0.4.0 \
-    crate://crates.io/winapi-x86_64-pc-windows-gnu/0.4.0 \
-    crate://crates.io/log/0.4.0 \
-    crate://crates.io/rand_hc/0.2.0 \
-    crate://crates.io/wasi/0.9.0+wasi-snapshot-preview1 \
-    crate://crates.io/sawp/0.5.0 \
-    crate://crates.io/sawp-modbus/0.5.0 \
-    crate://crates.io/brotli/3.3.0 \
-    crate://crates.io/flate2/1.0.20 \
-    crate://crates.io/alloc-no-stdlib/2.0.1 \
-    crate://crates.io/alloc-stdlib/0.2.1 \
-    crate://crates.io/brotli-decompressor/2.3.1 \
-    crate://crates.io/crc32fast/1.2.1 \
-    crate://crates.io/miniz_oxide/0.4.4 \
-    crate://crates.io/adler/1.0.2 \
-    "
+inherit autotools pkgconfig python3native systemd ptest cargo cargo-update-recipe-crates
 
-# test case support
-SRC_URI += " \
-    crate://crates.io/test-case/1.0.1 \
-    crate://crates.io/proc-macro2/1.0.1 \
-    crate://crates.io/quote/1.0.1 \
-    crate://crates.io/syn/1.0.1 \
-    crate://crates.io/unicode-xid/0.2.0 \
-    "
-
-inherit autotools pkgconfig python3native systemd ptest cargo
+require  ${BPN}-crates.inc
 
 EXTRA_OECONF += " --disable-debug \
     --disable-gccmarch-native \
@@ -118,6 +30,7 @@ EXTRA_OECONF += " --disable-debug \
     "
 
 CARGO_SRC_DIR = "rust"
+#CARGO_LOCK_SRC_DIR = "${S}/rust"
 
 B = "${S}"
 

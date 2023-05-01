@@ -137,7 +137,7 @@ The :ref:`ref-classes-base` class is special in that every ``.bb`` file implicit
 inherits the class. This class contains definitions for standard basic
 tasks such as fetching, unpacking, configuring (empty by default),
 compiling (runs any ``Makefile`` present), installing (empty by default)
-and packaging (empty by default). These classes are often overridden or
+and packaging (empty by default). These tasks are often overridden or
 extended by other classes such as the :ref:`ref-classes-autotools` class or the
 :ref:`ref-classes-package` class.
 
@@ -579,6 +579,49 @@ add the task at the appropriate place, which is usually after
 :ref:`ref-tasks-compile` or
 :ref:`ref-tasks-install`. The class then takes care of
 staging the files from :term:`DEPLOYDIR` to :term:`DEPLOY_DIR_IMAGE`.
+
+.. _ref-classes-devicetree:
+
+``devicetree``
+==============
+
+The :ref:`ref-classes-devicetree` class allows to build a recipe that compiles
+device tree source files that are not in the kernel tree.
+
+The compilation of out-of-tree device tree sources is the same as the kernel
+in-tree device tree compilation process. This includes the ability to include
+sources from the kernel such as SoC ``dtsi`` files as well as C header files,
+such as ``gpio.h``.
+
+The :ref:`ref-tasks-compile` task will compile two kinds of files:
+
+- Regular device tree sources with a ``.dts`` extension.
+
+- Device tree overlays, detected from the presence of the ``/plugin/;``
+  string in the file contents.
+
+This class behaves in a similar way as the :ref:`ref-classes-kernel-devicetree`
+class, also deploying output files into ``/boot/devicetree``. However, this
+class stores the deployed device tree binaries into the ``devicetree``
+subdirectory. This avoids clashes with the :ref:`ref-classes-kernel-devicetree`
+output. Additionally, the device trees are populated into the sysroot for
+access via the sysroot from within other recipes.
+
+An extra padding is appended to non-overlay device trees binaries. This
+can typically be used as extra space for adding extra properties at boot time.
+The padding size can be modified by setting ``DT_PADDING_SIZE`` to the desired
+size, in bytes.
+
+See :oe_git:`devicetree.bbclass sources
+</openembedded-core/tree/meta/classes-recipe/devicetree.bbclass>` 
+for further variables controlling this class.
+
+Here is an excerpt of an example ``recipes-kernel/linux/devicetree-acme.bb``
+recipe inheriting this class::
+
+   inherit devicetree
+   COMPATIBLE_MACHINE = "^mymachine$"
+   SRC_URI:mymachine = "file://mymachine.dts"
 
 .. _ref-classes-devshell:
 
@@ -1192,6 +1235,11 @@ Here are the tests you can list with the :term:`WARN_QA` and
    ``initscripts`` recipe is actually built and thus the
    ``initscripts-functions`` package is made available.
 
+-  ``configure-gettext:`` Checks that if a recipe is building something
+   that uses automake and the automake files contain an ``AM_GNU_GETTEXT``
+   directive, that the recipe also inherits the :ref:`ref-classes-gettext`
+   class to ensure that gettext is available during the build.
+
 -  ``compile-host-path:`` Checks the
    :ref:`ref-tasks-compile` log for indications that
    paths to locations on the build host were used. Using such paths
@@ -1308,10 +1356,38 @@ Here are the tests you can list with the :term:`WARN_QA` and
    ``/usr/libexec``. This check is not performed if the ``libexecdir``
    variable has been set explicitly to ``/usr/libexec``.
 
+-  ``mime:`` Check that if a package contains mime type files (``.xml``
+   files in ``${datadir}/mime/packages``) that the recipe also inherits
+   the :ref:`ref-classes-mime` class in order to ensure that these get
+   properly installed.
+
+-  ``mime-xdg:`` Checks that if a package contains a .desktop file with a
+   'MimeType' key present, that the recipe inherits the
+   :ref:`ref-classes-mime-xdg` class that is required in order for that
+   to be activated.
+
+-  ``missing-update-alternatives:`` Check that if a recipe sets the
+   :term:`ALTERNATIVE` variable that the recipe also inherits
+   :ref:`ref-classes-update-alternatives` such that the alternative will
+   be correctly set up.
+
 -  ``packages-list:`` Checks for the same package being listed
    multiple times through the :term:`PACKAGES` variable
    value. Installing the package in this manner can cause errors during
    packaging.
+
+-  ``patch-fuzz:`` Checks for fuzz in patch files that may allow
+   them to apply incorrectly if the underlying code changes.
+
+-  ``patch-status-core:`` Checks that the Upstream-Status is specified
+   and valid in the headers of patches for recipes in the OE-Core layer.
+
+-  ``patch-status-noncore:`` Checks that the Upstream-Status is specified
+   and valid in the headers of patches for recipes in layers other than
+   OE-Core.
+
+-  ``perllocalpod:`` Checks for ``perllocal.pod`` being erroneously
+   installed and packaged by a recipe.
 
 -  ``perm-config:`` Reports lines in ``fs-perms.txt`` that have an
    invalid format.
@@ -1366,11 +1442,19 @@ Here are the tests you can list with the :term:`WARN_QA` and
    options are being passed to the linker commands and your binaries
    have potential security issues.
 
+-  ``shebang-size:`` Check that the shebang line (``#!`` in the first line)
+   in a packaged script is not longer than 128 characters, which can cause
+   an error at runtime depending on the operating system.
+
 -  ``split-strip:`` Reports that splitting or stripping debug symbols
    from binaries has failed.
 
 -  ``staticdev:`` Checks for static library files (``*.a``) in
    non-``staticdev`` packages.
+
+-  ``src-uri-bad:`` Checks that the :term:`SRC_URI` value set by a recipe
+   does not contain a reference to ``${PN}`` (instead of the correct
+   ``${BPN}``) nor refers to unstable Github archive tarballs.
 
 -  ``symlink-to-sysroot:`` Checks for symlinks in packages that point
    into :term:`TMPDIR` on the host. Such symlinks will
@@ -1382,6 +1466,12 @@ Here are the tests you can list with the :term:`WARN_QA` and
    ":doc:`/ref-manual/qa-checks`" for more information regarding runtime performance
    issues.
 
+-  ``unhandled-features-check:`` check that if one of the variables that
+   the :ref:`ref-classes-features_check` class supports (e.g.
+   :term:`REQUIRED_DISTRO_FEATURES`) is set by a recupe, then the recipe
+   also inherits :ref:`ref-classes-features_check` in order for the
+   requirement to actually work.
+
 -  ``unlisted-pkg-lics:`` Checks that all declared licenses applying
    for a package are also declared on the recipe level (i.e. any license
    in ``LICENSE:*`` should appear in :term:`LICENSE`).
@@ -1391,19 +1481,23 @@ Here are the tests you can list with the :term:`WARN_QA` and
    the linker (e.g. ``/lib`` and ``/usr/lib``). While these paths will
    not cause any breakage, they do waste space and are unnecessary.
 
+-  ``usrmerge:`` If ``usrmerge`` is in :term:`DISTRO_FEATURES`, this
+   check will ensure that no package installs files to root (``/bin``,
+   ``/sbin``, ``/lib``, ``/lib64``) directories.
+
 -  ``var-undefined:`` Reports when variables fundamental to packaging
    (i.e. :term:`WORKDIR`,
    :term:`DEPLOY_DIR`, :term:`D`,
    :term:`PN`, and :term:`PKGD`) are undefined
    during :ref:`ref-tasks-package`.
 
--  ``version-going-backwards:`` If Build History is enabled, reports
-   when a package being written out has a lower version than the
-   previously written package under the same name. If you are placing
-   output packages into a feed and upgrading packages on a target system
-   using that feed, the version of a package going backwards can result
-   in the target system not correctly upgrading to the "new" version of
-   the package.
+-  ``version-going-backwards:`` If the :ref:`ref-classes-buildhistory`
+   class is enabled, reports when a package being written out has a lower
+   version than the previously written package under the same name. If
+   you are placing output packages into a feed and upgrading packages on
+   a target system using that feed, the version of a package going
+   backwards can result in the target system not correctly upgrading to
+   the "new" version of the package.
 
    .. note::
 
@@ -2025,13 +2119,7 @@ The :ref:`ref-classes-package` class supports generating packages from a build's
 output. The core generic functionality is in ``package.bbclass``. The
 code specific to particular package types resides in these
 package-specific classes: :ref:`ref-classes-package_deb`,
-:ref:`ref-classes-package_rpm`, :ref:`ref-classes-package_ipk`, and
-:ref:`ref-classes-package_tar`.
-
-.. note::
-
-   The :ref:`ref-classes-package_tar` class is broken and
-   not supported. It is recommended that you do not use this class.
+:ref:`ref-classes-package_rpm`, :ref:`ref-classes-package_ipk`.
 
 You can control the list of resulting package formats by using the
 :term:`PACKAGE_CLASSES` variable defined in your ``conf/local.conf``
@@ -2120,25 +2208,6 @@ are written out in a ``.rpm`` file format to the
 This class inherits the :ref:`ref-classes-package` class and
 is enabled through the :term:`PACKAGE_CLASSES`
 variable in the ``local.conf`` file.
-
-.. _ref-classes-package_tar:
-
-``package_tar``
-===============
-
-The :ref:`ref-classes-package_tar` class provides support for creating tarballs. The
-class ensures the packages are written out in a tarball format to the
-``${``\ :term:`DEPLOY_DIR_TAR`\ ``}`` directory.
-
-This class inherits the :ref:`ref-classes-package` class and
-is enabled through the :term:`PACKAGE_CLASSES`
-variable in the ``local.conf`` file.
-
-.. note::
-
-   You cannot specify the :ref:`ref-classes-package_tar` class first using the
-   :term:`PACKAGE_CLASSES` variable. You must use ``.deb``, ``.ipk``, or ``.rpm``
-   file formats for your image or SDK.
 
 .. _ref-classes-packagedata:
 

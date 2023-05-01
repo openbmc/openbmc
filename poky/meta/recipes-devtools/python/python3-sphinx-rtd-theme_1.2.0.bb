@@ -1,4 +1,4 @@
-DESCRIPTION = "Sphinx Theme reader"
+SUMMARY = "Sphinx Theme reader"
 HOMEPAGE = "https://github.com/readthedocs/sphinx_rtd_theme"
 SECTION = "devel/python"
 LICENSE = "MIT & OFL-1.1"

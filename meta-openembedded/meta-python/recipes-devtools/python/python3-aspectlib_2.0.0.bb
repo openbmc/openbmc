@@ -21,8 +21,10 @@ do_install_ptest() {
 }
 
 RDEPENDS:${PN}-ptest += "\
-    python3-tornado \
     python3-process-tests \
+    python3-pytest \
+    python3-tornado \
+    python3-unittest-automake-output \
 "
 
 RDEPENDS:${PN} += "python3-core python3-fields"

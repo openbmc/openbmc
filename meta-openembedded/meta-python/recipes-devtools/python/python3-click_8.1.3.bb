@@ -13,6 +13,7 @@ SRC_URI[sha256sum] = "7682dc8afb30297001674575ea00d1814d808d6a36af415a82bd481d37
 inherit pypi setuptools3 ptest
 
 SRC_URI += " \
+	file://0001-tests-Fix-test_bytes_args.patch \
 	file://run-ptest \
 "
 

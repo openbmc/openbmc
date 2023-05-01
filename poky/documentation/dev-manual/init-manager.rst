@@ -1,83 +1,107 @@
 .. SPDX-License-Identifier: CC-BY-SA-2.0-UK
 
+.. _init-manager:
+
 Selecting an Initialization Manager
 ***********************************
 
-By default, the Yocto Project uses SysVinit as the initialization
-manager. However, there is also support for systemd, which is a full
-replacement for init with parallel starting of services, reduced shell
-overhead and other features that are used by many distributions.
+By default, the Yocto Project uses :wikipedia:`SysVinit <Init#SysV-style>` as
+the initialization manager. There is also support for BusyBox init, a simpler
+implementation, as well as support for :wikipedia:`systemd <Systemd>`, which
+is a full replacement for init with parallel starting of services, reduced
+shell overhead, increased security and resource limits for services, and other
+features that are used by many distributions.
 
-Within the system, SysVinit treats system components as services. These
-services are maintained as shell scripts stored in the ``/etc/init.d/``
-directory. Services organize into different run levels. This
-organization is maintained by putting links to the services in the
-``/etc/rcN.d/`` directories, where `N/` is one of the following options:
-"S", "0", "1", "2", "3", "4", "5", or "6".
+Within the system, SysVinit and BusyBox init treat system components as
+services. These services are maintained as shell scripts stored in the
+``/etc/init.d/`` directory.
+
+SysVinit is more elaborate than BusyBox init and organizes services in
+different run levels. This organization is maintained by putting links
+to the services in the ``/etc/rcN.d/`` directories, where `N/` is one
+of the following options: "S", "0", "1", "2", "3", "4", "5", or "6".
 
 .. note::
 
    Each runlevel has a dependency on the previous runlevel. This
    dependency allows the services to work properly.
 
+Both SysVinit and BusyBox init are configured through the ``/etc/inittab``
+file, with a very similar syntax, though of course BusyBox init features
+are more limited.
+
 In comparison, systemd treats components as units. Using units is a
 broader concept as compared to using a service. A unit includes several
-different types of entities. Service is one of the types of entities.
+different types of entities. ``Service`` is one of the types of entities.
 The runlevel concept in SysVinit corresponds to the concept of a target
 in systemd, where target is also a type of supported unit.
 
-In a SysVinit-based system, services load sequentially (i.e. one by one)
-during init and parallelization is not supported. With systemd, services
-start in parallel. Needless to say, the method can have an impact on
-system startup performance.
+In systems with SysVinit or BusyBox init, services load sequentially (i.e. one
+by one) during init and parallelization is not supported. With systemd, services
+start in parallel. This method can have an impact on the startup performance
+of a given service, though systemd will also provide more services by default,
+therefore increasing the total system boot time. systemd also substantially
+increases system size because of its multiple components and the extra
+dependencies it pulls.
 
-If you want to use SysVinit, you do not have to do anything. But, if you
-want to use systemd, you must take some steps as described in the
-following sections.
+On the contrary, BusyBox init is the simplest and the lightest solution and
+also comes with BusyBox mdev as device manager, a lighter replacement to
+:wikipedia:`udev <Udev>`, which SysVinit and systemd both use.
 
-Using systemd Exclusively
+The ":ref:`device-manager`" chapter has more details about device managers.
+
+Using SysVinit with udev
 =========================
 
-Set these variables in your distribution configuration file as follows::
+SysVinit with  the udev device manager corresponds to the
+default setting in Poky. This corresponds to setting::
 
-   DISTRO_FEATURES:append = " systemd"
-   VIRTUAL-RUNTIME_init_manager = "systemd"
+   INIT_MANAGER = "sysvinit"
 
-You can also prevent the SysVinit distribution feature from
-being automatically enabled as follows::
+Using BusyBox init with BusyBox mdev
+====================================
 
-   DISTRO_FEATURES_BACKFILL_CONSIDERED = "sysvinit"
+BusyBox init with BusyBox mdev is the simplest and lightest solution
+for small root filesystems. All you need is BusyBox, which most systems
+have anyway::
 
-Doing so removes any
-redundant SysVinit scripts.
+   INIT_MANAGER = "mdev-busybox"
 
-To remove initscripts from your image altogether, set this variable
-also::
+Using systemd
+=============
 
-   VIRTUAL-RUNTIME_initscripts = ""
+The last option is to use systemd together with the udev device
+manager. This is the most powerful and versatile solution, especially
+for more complex systems::
 
-For information on the backfill variable, see
-:term:`DISTRO_FEATURES_BACKFILL_CONSIDERED`.
+   INIT_MANAGER = "systemd"
 
-Using systemd for the Main Image and Using SysVinit for the Rescue Image
-========================================================================
+This will enable systemd and remove sysvinit components from the image.
+See :yocto_git:`meta/conf/distro/include/init-manager-systemd.inc
+</poky/tree/meta/conf/distro/include/init-manager-systemd.inc>` for exact
+details on what this does.
 
-Set these variables in your distribution configuration file as follows::
+Controling systemd from the target command line
+-----------------------------------------------
 
-   DISTRO_FEATURES:append = " systemd"
-   VIRTUAL-RUNTIME_init_manager = "systemd"
+Here is a quick reference for controling systemd from the command line on the
+target. Instead of opening and sometimes modifying files, most interaction
+happens through the ``systemctl`` and ``journalctl`` commands:
 
-Doing so causes your main image to use the
-``packagegroup-core-boot.bb`` recipe and systemd. The rescue/minimal
-image cannot use this package group. However, it can install SysVinit
-and the appropriate packages will have support for both systemd and
-SysVinit.
+-  ``systemctl status``: show the status of all services
+-  ``systemctl status <service>``: show the status of one service
+-  ``systemctl [start|stop] <service>``: start or stop a service
+-  ``systemctl [enable|disable] <service>``: enable or disable a service at boot time
+-  ``systemctl list-units``: list all available units
+-  ``journalctl -a``: show all logs for all services
+-  ``journalctl -f``: show only the last log entries, and keep printing updates as they arrive
+-  ``journalctl -u``: show only logs from a particular service
 
 Using systemd-journald without a traditional syslog daemon
-==========================================================
+----------------------------------------------------------
 
 Counter-intuitively, ``systemd-journald`` is not a syslog runtime or provider,
-and the proper way to use systemd-journald as your sole logging mechanism is to
+and the proper way to use ``systemd-journald`` as your sole logging mechanism is to
 effectively disable syslog entirely by setting these variables in your distribution
 configuration file::
 
@@ -85,5 +109,5 @@ configuration file::
    VIRTUAL-RUNTIME_base-utils-syslog = ""
 
 Doing so will prevent ``rsyslog`` / ``busybox-syslog`` from being pulled in by
-default, leaving only ``journald``.
+default, leaving only ``systemd-journald``.
 

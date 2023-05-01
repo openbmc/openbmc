@@ -1,0 +1,38 @@
+From 03bbb1b055c41ec652470f775b55a7cf80d664ef Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 17 Apr 2023 16:46:12 -0700
+Subject: [PATCH] doctest: Do not use unnamed class
+
+When compiling with clang this results in emitting absolute path into
+debug info, especially .debug_str section has
+
+~(unnamed class at /mnt/b/yoe/master/build/tmp/work/core2-64-yoe-linux-musl/libcereal/1.3.2+gitAUTOINC+ebef1e9298-r0/git/unittests/doctest.h:6428:5)
+(unnamed class at /mnt/b/yoe/master/build/tmp/work/core2-64-yoe-linux-musl/libcereal/1.3.2+gitAUTOINC+ebef1e9298-r0/git/unittests/doctest.h:6428:5)
+
+Therefore use a name for the class instead and help get rid of this
+absolute path in debug info. This fixes
+
+File /usr/lib/libcereal/ptest/tests/.debug/test_unordered_map in package libcereal-dbg contains reference to TMPDIR
+
+Upstream-Status: Submitted [https://github.com/USCiLab/cereal/pull/788]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ unittests/doctest.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/unittests/doctest.h b/unittests/doctest.h
+index cd5b44d6..e6d8f7f9 100644
+--- a/unittests/doctest.h
++++ b/unittests/doctest.h
+@@ -6424,7 +6424,7 @@ void Context::setCout(std::ostream* out) { p->cout = out; }
+ static class DiscardOStream : public std::ostream
+ {
+ private:
+-    class : public std::streambuf
++    class discardBufStream: public std::streambuf
+     {
+     private:
+         // allowing some buffering decreases the amount of calls to overflow
+-- 
+2.40.0
+

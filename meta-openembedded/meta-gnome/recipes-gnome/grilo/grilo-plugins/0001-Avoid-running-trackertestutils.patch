@@ -1,4 +1,4 @@
-From 9deaed70221a12e26f968be26233b75fa5669476 Mon Sep 17 00:00:00 2001
+From a76c5c40f95b2961bed8f6427080f0fcf6ec00d6 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Sat, 15 May 2021 23:25:09 +0200
 Subject: [PATCH] Avoid running trackertestutils
@@ -12,23 +12,21 @@ It breaks configuration:
 Upstream-Status: Inappropriate [OE-Specific]
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+
 ---
  meson.build | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 6a03778..17ef1e1 100644
+index fca5f98..3c1aa06 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -78,7 +78,7 @@ totem_plparser_dep = dependency('totem-plparser', version: '>= 3.4.1', required:
+@@ -98,7 +98,7 @@ totem_plparser_dep = dependency('totem-plparser', version: '>= 3.4.1', required:
  totem_plparser_mini_dep = dependency('totem-plparser-mini', version: '>= 3.4.1', required: false)
  tracker_sparql_dep = dependency('tracker-sparql-2.0', version: '>= 2.3.0', required: false)
  tracker3_dep = dependency('tracker-sparql-3.0', required: false)
 -tracker3_testutils_dep = dependency('tracker-testutils-3.0', required: false)
 +tracker3_testutils_dep = dependency('tracker-testutils-3.0-avoid-find', required: false)
  
- lua_dep = dependency('lua', version: '>= 5.3.0', required: false)
- if not lua_dep.found()
--- 
-2.31.1
-
+ lua_pkg = [
+   'lua',

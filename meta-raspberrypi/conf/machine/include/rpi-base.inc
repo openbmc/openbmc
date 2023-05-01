@@ -35,6 +35,7 @@ RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
     overlays/i2c-rtc.dtbo \
     overlays/imx219.dtbo \
     overlays/imx477.dtbo \
+    overlays/imx708.dtbo \
     overlays/iqaudio-dac.dtbo \
     overlays/iqaudio-dacplus.dtbo \
     overlays/mcp2515-can0.dtbo \

@@ -1,4 +1,4 @@
-DESCRIPTION = "Recipe to trigger execution of all ptest images."
+SUMMARY = "Recipe to trigger execution of all ptest images."
 HOMEPAGE = "https://www.yoctoproject.org/"
 
 LICENSE = "MIT"

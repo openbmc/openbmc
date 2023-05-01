@@ -1,9 +1,9 @@
-# Remove "start on boot" option from webmin configuration, as
-# end-users should not need to configure this from the web interface
-#
-# Upstream-status: Inappropriate
-#
-# Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+Remove "start on boot" option from webmin configuration, as
+end-users should not need to configure this from the web interface
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
 --- webmin-1.570.orig/webmin/index.cgi
 +++ webmin-1.570/webmin/index.cgi
 @@ -79,20 +79,6 @@ print &ui_buttons_start();

@@ -354,6 +354,9 @@ system and gives an overview of their function and contents.
    :term:`BB_BASEHASH_IGNORE_VARS`
       See :term:`bitbake:BB_BASEHASH_IGNORE_VARS` in the BitBake manual.
 
+   :term:`BB_CACHEDIR`
+      See :term:`bitbake:BB_CACHEDIR` in the BitBake manual.
+
    :term:`BB_CHECK_SSL_CERTS`
       See :term:`bitbake:BB_CHECK_SSL_CERTS` in the BitBake manual.
 
@@ -1986,25 +1989,6 @@ system and gives an overview of their function and contents.
       ":ref:`overview-manual/concepts:package feeds`" section
       in the Yocto Project Overview and Concepts Manual.
 
-   :term:`DEPLOY_DIR_TAR`
-      Points to the area that the OpenEmbedded build system uses to place
-      tarballs that are ready to be used outside of the build system. This
-      variable applies only when :term:`PACKAGE_CLASSES` contains
-      ":ref:`ref-classes-package_tar`".
-
-      The BitBake configuration file initially defines this variable as a
-      sub-folder of :term:`DEPLOY_DIR`::
-
-         DEPLOY_DIR_TAR = "${DEPLOY_DIR}/tar"
-
-      The :ref:`ref-classes-package_tar` class uses the
-      :term:`DEPLOY_DIR_TAR` variable to make sure the
-      :ref:`ref-tasks-package_write_tar` task
-      writes TAR packages into the appropriate folder. For more information
-      on how packaging works, see the
-      ":ref:`overview-manual/concepts:package feeds`" section
-      in the Yocto Project Overview and Concepts Manual.
-
    :term:`DEPLOYDIR`
       When inheriting the :ref:`ref-classes-deploy` class, the
       :term:`DEPLOYDIR` points to a temporary work area for deployed files that
@@ -2914,6 +2898,10 @@ system and gives an overview of their function and contents.
       For guidance on how to create your own file permissions settings
       table file, examine the existing ``fs-perms.txt``.
 
+   :term:`FIT_CONF_DEFAULT_DTB`
+      Specifies the default device tree binary (dtb) file for a fitImage when
+      multiple are provided.
+
    :term:`FIT_DESC`
       Specifies the description string encoded into a fitImage. The default
       value is set by the :ref:`ref-classes-kernel-fitimage`
@@ -3583,11 +3571,34 @@ system and gives an overview of their function and contents.
    :term:`IMAGE_LINK_NAME`
       The name of the output image symlink (which does not include
       the version part as :term:`IMAGE_NAME` does). The default value
-      is derived using the :term:`IMAGE_BASENAME` and :term:`MACHINE`
-      variables::
+      is derived using the :term:`IMAGE_BASENAME` and
+      :term:`IMAGE_MACHINE_SUFFIX` variables::
 
-         IMAGE_LINK_NAME ?= "${IMAGE_BASENAME}-${MACHINE}"
+         IMAGE_LINK_NAME ?= "${IMAGE_BASENAME}${IMAGE_MACHINE_SUFFIX}"
 
+      .. note::
+
+         It is possible to set this to "" to disable symlink creation,
+         however, you also need to set :term:`IMAGE_NAME` to still have
+         a reasonable value e.g.::
+
+            IMAGE_LINK_NAME = ""
+            IMAGE_NAME = "${IMAGE_BASENAME}${IMAGE_MACHINE_SUFFIX}${IMAGE_VERSION_SUFFIX}"
+
+   :term:`IMAGE_MACHINE_SUFFIX`
+      Specifies the by default machine-specific suffix for image file names
+      (before the extension). The default value is set as follows::
+
+         IMAGE_MACHINE_SUFFIX ??= "-${MACHINE}"
+
+      The default :term:`DEPLOY_DIR_IMAGE` already has a :term:`MACHINE`
+      subdirectory, so you may find it unnecessary to also include this suffix
+      in the name of every image file. If you prefer to remove the suffix you
+      can set this variable to an empty string::
+
+         IMAGE_MACHINE_SUFFIX = ""
+
+      (Not to be confused with :term:`IMAGE_NAME_SUFFIX`.)
 
    :term:`IMAGE_MANIFEST`
       The manifest file for the image. This file lists all the installed
@@ -3608,12 +3619,11 @@ system and gives an overview of their function and contents.
       section in the Yocto Project Overview and Concepts Manual.
 
    :term:`IMAGE_NAME`
-      The name of the output image files minus the extension. This variable
-      is derived using the :term:`IMAGE_BASENAME`,
-      :term:`MACHINE`, and :term:`IMAGE_VERSION_SUFFIX`
-      variables::
+      The name of the output image files minus the extension. By default
+      this variable is set using the :term:`IMAGE_LINK_NAME`, and
+      :term:`IMAGE_VERSION_SUFFIX` variables::
 
-         IMAGE_NAME ?= "${IMAGE_BASENAME}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
+         IMAGE_NAME ?= "${IMAGE_LINK_NAME}${IMAGE_VERSION_SUFFIX}"
 
    :term:`IMAGE_NAME_SUFFIX`
       Suffix used for the image output filename --- defaults to ``".rootfs"``
@@ -3654,12 +3664,7 @@ system and gives an overview of their function and contents.
       Defines the package type (i.e. DEB, RPM, IPK, or TAR) used by the
       OpenEmbedded build system. The variable is defined appropriately by
       the :ref:`ref-classes-package_deb`, :ref:`ref-classes-package_rpm`,
-      :ref:`ref-classes-package_ipk`, or :ref:`ref-classes-package_tar` class.
-
-      .. note::
-
-         The ``package_tar`` class is broken and is not supported. It is
-         recommended that you do not use it.
+      or :ref:`ref-classes-package_ipk` class.
 
       The :ref:`ref-classes-populate-sdk-*` and :ref:`ref-classes-image`
       classes use the :term:`IMAGE_PKGTYPE` for packaging up images and SDKs.
@@ -3837,43 +3842,6 @@ system and gives an overview of their function and contents.
       files to be deployed into :term:`IMGDEPLOYDIR`, and the class will take
       care of copying them into :term:`DEPLOY_DIR_IMAGE` afterwards.
 
-   :term:`INC_PR`
-      Helps define the recipe revision for recipes that share a common
-      ``include`` file. You can think of this variable as part of the
-      recipe revision as set from within an include file.
-
-      Suppose, for example, you have a set of recipes that are used across
-      several projects. And, within each of those recipes the revision (its
-      :term:`PR` value) is set accordingly. In this case, when
-      the revision of those recipes changes, the burden is on you to find
-      all those recipes and be sure that they get changed to reflect the
-      updated version of the recipe. In this scenario, it can get
-      complicated when recipes that are used in many places and provide
-      common functionality are upgraded to a new revision.
-
-      A more efficient way of dealing with this situation is to set the
-      :term:`INC_PR` variable inside the ``include`` files that the recipes
-      share and then expand the :term:`INC_PR` variable within the recipes to
-      help define the recipe revision.
-
-      The following provides an example that shows how to use the
-      :term:`INC_PR` variable given a common ``include`` file that defines the
-      variable. Once the variable is defined in the ``include`` file, you
-      can use the variable to set the :term:`PR` values in each recipe. You
-      will notice that when you set a recipe's :term:`PR` you can provide more
-      granular revisioning by appending values to the :term:`INC_PR` variable::
-
-         recipes-graphics/xorg-font/xorg-font-common.inc:INC_PR = "r2"
-         recipes-graphics/xorg-font/encodings_1.0.4.bb:PR = "${INC_PR}.1"
-         recipes-graphics/xorg-font/font-util_1.3.0.bb:PR = "${INC_PR}.0"
-         recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
-
-      The
-      first line of the example establishes the baseline revision to be
-      used for all recipes that use the ``include`` file. The remaining
-      lines in the example are from individual recipes and show how the
-      :term:`PR` value is set.
-
    :term:`INCOMPATIBLE_LICENSE`
       Specifies a space-separated list of license names (as they would
       appear in :term:`LICENSE`) that should be excluded
@@ -3988,46 +3956,36 @@ system and gives an overview of their function and contents.
          even if the toolchain's binaries are strippable, there are other files
          needed for the build that are not strippable.
 
-   :term:`Initramfs`
-      An Initial RAM Filesystem (:term:`Initramfs`) is an optionally compressed
-      :wikipedia:`cpio <Cpio>` archive which is extracted
-      by the Linux kernel into RAM in a special :wikipedia:`tmpfs <Tmpfs>`
-      instance, used as the initial root filesystem.
+   :term:`INIT_MANAGER`
+      Specifies the system init manager to use. Available options are:
 
-      This is a replacement for the legacy init RAM disk ("initrd")
-      technique, booting on an emulated block device in RAM, but being less
-      efficient because of the overhead of going through a filesystem and
-      having to duplicate accessed file contents in the file cache in RAM,
-      as for any block device.
+      -  ``sysvinit``
+      -  ``systemd``
+      -  ``mdev-busybox``
+      -  ``none``
 
-      .. note:
+      With ``sysvinit``, the init manager is set to
+      :wikipedia:`SysVinit <Init#SysV-style>`, the traditional UNIX init
+      system. This is the default choice in the Poky distribution, together with
+      the Udev device manager (see the ":ref:`device-manager`" section).
 
-         As far as bootloaders are concerned, :term:`Initramfs` and "initrd"
-         images are still copied to RAM in the same way. That's why most
-	 most bootloaders refer to :term:`Initramfs` images as "initrd"
-	 or "init RAM disk".
+      With ``systemd``, the init manager becomes :wikipedia:`systemd <Systemd>`,
+      which comes with the :wikipedia:`udev <Udev>` device manager.
 
-      This kind of mechanism is typically used for two reasons:
+      With ``mdev-busybox``, the init manager becomes the much simpler BusyBox
+      init, together with the BusyBox mdev device manager. This is the simplest
+      and lightest solution, and probably the best choice for low-end systems
+      with a rather slow CPU and a limited amount of RAM.
 
-      -  For booting the same kernel binary on multiple systems requiring
-         different device drivers. The :term:`Initramfs` image is then customized
-	 for each type of system, to include the specific  kernel modules
-         necessary to access the final root filesystem. This technique
-	 is used on all GNU / Linux distributions for desktops and servers.
+      With ``none``, the init manager is also set to ``sysvinit``. This is the
+      default setting in OpenEmbedded-Core. This option also selects the
+      :wikipedia:`udev <Udev>` device manager.
 
-      -  For booting faster. As the root filesystem is extracted into RAM,
-         accessing the first user-space applications is very fast, compared
-         to having to initialize a block device, to access multiple blocks
-         from it, and to go through a filesystem having its own overhead.
-         For example, this allows to display a splashscreen very early,
-	 and to later take care of mounting the final root filesystem and
-         loading less time-critical kernel drivers.
-
-      This cpio archive can either be loaded to RAM by the bootloader,
-      or be included in the kernel binary.
-
-      For information on creating and using an :term:`Initramfs`, see the
-      ":ref:`dev-manual/building:building an initial ram filesystem (Initramfs) image`"
+      More concretely, this is used to include
+      ``conf/distro/include/init-manager-${INIT_MANAGER}.inc`` into the global
+      configuration. You can have a look at the
+      :yocto_git:`meta/conf/distro/include/init-manager-*.inc </poky/tree/meta/conf/distro/include>`
+      files for more information, and also the ":ref:`init-manager`"
       section in the Yocto Project Development Tasks Manual.
 
    :term:`INITRAMFS_DEPLOY_DIR_IMAGE`
@@ -4140,6 +4098,19 @@ system and gives an overview of their function and contents.
       :term:`Initramfs`, see the ":ref:`dev-manual/building:building an initial ram filesystem (Initramfs) image`" section
       in the Yocto Project Development Tasks Manual.
 
+   :term:`INITRAMFS_IMAGE_NAME`
+
+      This value needs to stay in sync with :term:`IMAGE_LINK_NAME`, but with
+      :term:`INITRAMFS_IMAGE` instead of :term:`IMAGE_BASENAME`. The default value
+      is set as follows:
+
+         INITRAMFS_IMAGE_NAME ?= "${@['${INITRAMFS_IMAGE}${IMAGE_MACHINE_SUFFIX}', ''][d.getVar('INITRAMFS_IMAGE') == '']}"
+
+      That is, if :term:`INITRAMFS_IMAGE` is set, the value of
+      :term:`INITRAMFS_IMAGE_NAME` will be set based upon
+      :term:`INITRAMFS_IMAGE` and :term:`IMAGE_MACHINE_SUFFIX`.
+
+
    :term:`INITRAMFS_LINK_NAME`
       The link name of the initial RAM filesystem image. This variable is
       set in the ``meta/classes-recipe/kernel-artifact-names.bbclass`` file as
@@ -4174,10 +4145,7 @@ system and gives an overview of their function and contents.
 
          INITRAMFS_NAME ?= "initramfs-${KERNEL_ARTIFACT_NAME}"
 
-      The value of the :term:`KERNEL_ARTIFACT_NAME`
-      variable, which is set in the same file, has the following value::
-
-         KERNEL_ARTIFACT_NAME ?= "${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
+      See :term:`KERNEL_ARTIFACT_NAME` for additional information.
 
    :term:`INITRD`
       Indicates list of filesystem images to concatenate and use as an
@@ -4381,9 +4349,9 @@ system and gives an overview of their function and contents.
       ``meta/classes-recipe/kernel-artifact-names.bbclass`` file, has the
       following default value::
 
-         KERNEL_ARTIFACT_NAME ?= "${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
+         KERNEL_ARTIFACT_NAME ?= "${PKGE}-${PKGV}-${PKGR}${IMAGE_MACHINE_SUFFIX}${IMAGE_VERSION_SUFFIX}"
 
-      See the :term:`PKGE`, :term:`PKGV`, :term:`PKGR`, :term:`MACHINE`
+      See the :term:`PKGE`, :term:`PKGV`, :term:`PKGR`, :term:`IMAGE_MACHINE_SUFFIX`
       and :term:`IMAGE_VERSION_SUFFIX` variables for additional information.
 
    :term:`KERNEL_CLASSES`
@@ -4394,6 +4362,20 @@ system and gives an overview of their function and contents.
       fitImage support and resides in ``meta/classes-recipe/kernel-fitimage.bbclass``.
       You can register custom kernel image types with the
       :ref:`ref-classes-kernel` class using this variable.
+
+   :term:`KERNEL_DANGLING_FEATURES_WARN_ONLY`
+      When kernel configuration fragments are missing for some
+      :term:`KERNEL_FEATURES` specified by layers or BSPs,
+      building and configuring the kernel stops with an error.
+    
+      You can turn these errors into warnings by setting the
+      following in ``conf/local.conf``::
+
+         KERNEL_DANGLING_FEATURES_WARN_ONLY = "1"
+    
+      You will still be warned that runtime issues may occur,
+      but at least the kernel configuration and build process will
+      be allowed to continue.
 
    :term:`KERNEL_DEBUG_TIMESTAMPS`
       If set to "1", enables timestamping functionality during building
@@ -4441,10 +4423,7 @@ system and gives an overview of their function and contents.
 
          KERNEL_DTB_NAME ?= "${KERNEL_ARTIFACT_NAME}"
 
-      The value of the :term:`KERNEL_ARTIFACT_NAME`
-      variable, which is set in the same file, has the following value::
-
-         KERNEL_ARTIFACT_NAME ?= "${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
+      See :term:`KERNEL_ARTIFACT_NAME` for additional information.
 
    :term:`KERNEL_DTC_FLAGS`
       Specifies the ``dtc`` flags that are passed to the Linux kernel build
@@ -4507,10 +4486,7 @@ system and gives an overview of their function and contents.
 
          KERNEL_FIT_NAME ?= "${KERNEL_ARTIFACT_NAME}"
 
-      The value of the :term:`KERNEL_ARTIFACT_NAME`
-      variable, which is set in the same file, has the following value::
-
-         KERNEL_ARTIFACT_NAME ?= "${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
+      See :term:`KERNEL_ARTIFACT_NAME` for additional information.
 
    :term:`KERNEL_IMAGE_LINK_NAME`
       The link name for the kernel image. This variable is set in the
@@ -4546,11 +4522,7 @@ system and gives an overview of their function and contents.
 
          KERNEL_IMAGE_NAME ?= "${KERNEL_ARTIFACT_NAME}"
 
-      The value of the
-      :term:`KERNEL_ARTIFACT_NAME` variable,
-      which is set in the same file, has the following value::
-
-         KERNEL_ARTIFACT_NAME ?= "${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
+      See :term:`KERNEL_ARTIFACT_NAME` for additional information.
 
    :term:`KERNEL_IMAGETYPE`
       The type of kernel to build for a device, usually set by the machine
@@ -5299,10 +5271,7 @@ system and gives an overview of their function and contents.
 
          MODULE_TARBALL_NAME ?= "${KERNEL_ARTIFACT_NAME}"
 
-      The value of the :term:`KERNEL_ARTIFACT_NAME` variable,
-      which is set in the same file, has the following value::
-
-         KERNEL_ARTIFACT_NAME ?= "${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
+      See :term:`KERNEL_ARTIFACT_NAME` for additional information.
 
    :term:`MOUNT_BASE`
       On non-systemd systems (where ``udev-extraconf`` is being used),
@@ -5678,14 +5647,7 @@ system and gives an overview of their function and contents.
       You can provide one or more of the following arguments for the
       variable::
 
-         PACKAGE_CLASSES ?= "package_rpm package_deb package_ipk package_tar"
-
-      .. note::
-
-         While it is a legal option, the :ref:`ref-classes-package_tar`
-         class has limited functionality due to no support for package
-         dependencies by that backend. Therefore, it is recommended that
-         you do not use it.
+         PACKAGE_CLASSES ?= "package_rpm package_deb package_ipk"
 
       The build system uses only the first argument in the list as the
       package manager when creating your image or SDK. However, packages
@@ -7040,6 +7002,11 @@ system and gives an overview of their function and contents.
 
          RSUGGESTS:${PN} = "useful_package another_package"
 
+   :term:`RUST_CHANNEL`
+      Specifies which version of Rust to build - "stable", "beta" or "nightly".
+      The default value is "stable". Set this at your own risk, as values other
+      than "stable" are not guaranteed to work at a given time.
+
    :term:`S`
       The location in the :term:`Build Directory` where
       unpacked recipe source code resides. By default, this directory is
@@ -7089,6 +7056,14 @@ system and gives an overview of their function and contents.
    :term:`SDK_ARCH`
       The target architecture for the SDK. Typically, you do not directly
       set this variable. Instead, use :term:`SDKMACHINE`.
+
+   :term:`SDK_ARCHIVE_TYPE`
+      Specifies the type of archive to create for the SDK. Valid values:
+
+      - ``tar.xz`` (default)
+      - ``zip``
+
+      Only one archive type can be specified.
 
    :term:`SDK_BUILDINFO_FILE`
       When using the :ref:`ref-classes-image-buildinfo` class,
@@ -7318,6 +7293,11 @@ system and gives an overview of their function and contents.
       :term:`DISTRO_VERSION` and
       :term:`METADATA_REVISION` variables.
 
+   :term:`SDK_ZIP_OPTIONS`
+      Specifies extra options to pass to the ``zip`` command when zipping the SDK
+      (i.e. when :term:`SDK_ARCHIVE_TYPE` is set to "zip"). The default value is
+      "-y".
+
    :term:`SDKEXTPATH`
       The default installation directory for the Extensible SDK. By
       default, this directory is based on the :term:`DISTRO`
@@ -7385,9 +7365,9 @@ system and gives an overview of their function and contents.
 
    :term:`SERIAL_CONSOLES`
       Defines a serial console (TTY) to enable using
-      `getty <https://en.wikipedia.org/wiki/Getty_(Unix)>`__. Provide a
-      value that specifies the baud rate followed by the TTY device name
-      separated by a semicolon. Use spaces to separate multiple devices::
+      :wikipedia:`getty <Getty_(Unix)>`. Provide a value that specifies the
+      baud rate followed by the TTY device name separated by a semicolon.
+      Use spaces to separate multiple devices::
 
          SERIAL_CONSOLES = "115200;ttyS0 115200;ttyS1"
 
@@ -7628,6 +7608,32 @@ system and gives an overview of their function and contents.
       of the :term:`SPDX` output in ``tmp/deploy/images/MACHINE/``
       (+ 0.07\% with the tested image), compared to just enabling
       :term:`SPDX_INCLUDE_SOURCES`.
+
+   :term:`SPDX_CUSTOM_ANNOTATION_VARS`
+      This option allows to associate `SPDX annotations
+      <https://spdx.github.io/spdx-spec/v2.3/annotations/>`__ to a recipe,
+      using the values of variables in the recipe::
+        
+         ANNOTATION1 = "First annotation for recipe"
+         ANNOTATION2 = "Second annotation for recipe"
+         SPDX_CUSTOM_ANNOTATION_VARS = "ANNOTATION1 ANNOTATION2"
+
+      This will add a new block to the recipe ``.sdpx.json`` output::
+
+         "annotations": [
+           {
+             "annotationDate": "2023-04-18T08:32:12Z",
+             "annotationType": "OTHER",
+             "annotator": "Tool: oe-spdx-creator - 1.0",
+             "comment": "ANNOTATION1=First annotation for recipe"
+           },
+           {
+             "annotationDate": "2023-04-18T08:32:12Z",
+             "annotationType": "OTHER",
+             "annotator": "Tool: oe-spdx-creator - 1.0",
+             "comment": "ANNOTATION2=Second annotation for recipe"
+           }
+         ],
 
    :term:`SPDX_INCLUDE_SOURCES`
       This option allows to add a description of the source files used to build
@@ -8316,12 +8322,10 @@ system and gives an overview of their function and contents.
       will be silently ignored.
 
    :term:`SYSVINIT_ENABLED_GETTYS`
-      When using
-      :ref:`SysVinit <dev-manual/new-recipe:enabling system services>`,
+      When using :ref:`SysVinit <dev-manual/new-recipe:enabling system services>`,
       specifies a space-separated list of the virtual terminals that should
-      run a `getty <https://en.wikipedia.org/wiki/Getty_%28Unix%29>`__
-      (allowing login), assuming :term:`USE_VT` is not set to
-      "0".
+      run a :wikipedia:`getty <Getty_(Unix)>` (allowing login), assuming
+      :term:`USE_VT` is not set to "0".
 
       The default value for :term:`SYSVINIT_ENABLED_GETTYS` is "1" (i.e. only
       run a getty on the first virtual terminal).
@@ -9228,9 +9232,8 @@ system and gives an overview of their function and contents.
    :term:`USE_VT`
       When using
       :ref:`SysVinit <dev-manual/new-recipe:enabling system services>`,
-      determines whether or not to run a
-      `getty <https://en.wikipedia.org/wiki/Getty_%28Unix%29>`__ on any
-      virtual terminals in order to enable logging in through those
+      determines whether or not to run a :wikipedia:`getty <Getty_(Unix)>`
+      on any virtual terminals in order to enable logging in through those
       terminals.
 
       The default value used for :term:`USE_VT` is "1" when no default value is
@@ -9386,6 +9389,18 @@ system and gives an overview of their function and contents.
       By default, :term:`VOLATILE_LOG_DIR` is set to "yes", which means the
       file is not persistent. You can override this setting by setting the
       variable to "no" to make the log directory persistent.
+
+   :term:`VOLATILE_TMP_DIR`
+      Specifies the persistence of the target's ``/tmp`` directory.
+
+      By default, :term:`VOLATILE_TMP_DIR` is set to "yes", in which case
+      ``/tmp`` links to a directory which resides in RAM in a ``tmpfs``
+      filesystem.
+
+      If instead, you want the ``/tmp`` directory to be persistent, set the
+      variable to "no" to make it a regular directory in the root filesystem.
+
+      This supports both sysvinit and systemd based systems.
 
    :term:`WARN_QA`
       Specifies the quality assurance checks whose failures are reported as

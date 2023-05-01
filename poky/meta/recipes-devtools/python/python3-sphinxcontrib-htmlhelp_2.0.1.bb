@@ -1,4 +1,4 @@
-DESCRIPTION = "sphinxcontrib-htmlhelp is a sphinx extension which renders HTML help files"
+SUMMARY = "sphinxcontrib-htmlhelp is a sphinx extension which renders HTML help files"
 HOMEPAGE = "https://www.sphinx-doc.org"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=24dce5ef6a13563241c24bc366f48886"

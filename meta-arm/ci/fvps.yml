@@ -13,7 +13,8 @@ local_conf_header:
 
 target:
   - nativesdk-fvp-base-a-aem
-  - nativesdk-fvp-n1-edge
-  - nativesdk-fvp-sgi575
   - nativesdk-fvp-corstone500
   - nativesdk-fvp-corstone1000
+  - nativesdk-fvp-n1-edge
+  - nativesdk-fvp-sgi575
+  - nativesdk-fvp-tc1

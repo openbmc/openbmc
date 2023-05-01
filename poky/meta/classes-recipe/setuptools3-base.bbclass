@@ -23,15 +23,8 @@ export CCSHARED  = "-fPIC -DPIC"
 # the python executable
 export LINKFORSHARED = "${SECURITY_CFLAGS} -Xlinker -export-dynamic"
 
-FILES:${PN} += "${libdir}/* ${libdir}/${PYTHON_DIR}/*"
+FILES:${PN} += "${PYTHON_SITEPACKAGES_DIR}"
+FILES:${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/*.a"
+FILES:${PN}-dev += "${PYTHON_SITEPACKAGES_DIR}/*.la"
 
-FILES:${PN}-staticdev += "\
-  ${PYTHON_SITEPACKAGES_DIR}/*.a \
-"
-FILES:${PN}-dev += "\
-  ${datadir}/pkgconfig \
-  ${libdir}/pkgconfig \
-  ${PYTHON_SITEPACKAGES_DIR}/*.la \
-"
 inherit python3native python3targetconfig
-

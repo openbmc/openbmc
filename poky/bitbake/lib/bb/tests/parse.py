@@ -222,6 +222,7 @@ VAR = " \\
     at_sign_in_var_flag = """
 A[flag@.service] = "nonet"
 B[flag@.target] = "ntb"
+C[f] = "flag"
 
 unset A[flag@.service]
 """
@@ -232,6 +233,7 @@ unset A[flag@.service]
         self.assertEqual(d.getVar("B"), None)
         self.assertEqual(d.getVarFlag("A","flag@.service"), None)
         self.assertEqual(d.getVarFlag("B","flag@.target"), "ntb")
+        self.assertEqual(d.getVarFlag("C","f"), "flag")
 
     def test_parse_invalid_at_sign_in_var_flag(self):
         invalid_at_sign = self.at_sign_in_var_flag.replace("B[f", "B[@f")

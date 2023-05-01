@@ -5,11 +5,12 @@
 #
 
 """Helper module for GPG signing"""
-import os
 
 import bb
-import subprocess
+import os
 import shlex
+import subprocess
+import tempfile
 
 class LocalSigner(object):
     """Class for handling local (on the build host) signing"""
@@ -73,8 +74,6 @@ class LocalSigner(object):
             cmd += ['--homedir', self.gpg_path]
         if armor:
             cmd += ['--armor']
-        if output_suffix:
-            cmd += ['-o', input_file + "." + output_suffix]
         if use_sha256:
             cmd += ['--digest-algo', "SHA256"]
 
@@ -83,19 +82,27 @@ class LocalSigner(object):
         if self.gpg_version > (2,1,):
             cmd += ['--pinentry-mode', 'loopback']
 
-        cmd += [input_file]
-
         try:
             if passphrase_file:
                 with open(passphrase_file) as fobj:
                     passphrase = fobj.readline();
 
-            job = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-            (_, stderr) = job.communicate(passphrase.encode("utf-8"))
+            if not output_suffix:
+                output_suffix = 'asc' if armor else 'sig'
+            output_file = input_file + "." + output_suffix
+            with tempfile.TemporaryDirectory(dir=os.path.dirname(output_file)) as tmp_dir:
+                tmp_file = os.path.join(tmp_dir, os.path.basename(output_file))
+                cmd += ['-o', tmp_file]
 
-            if job.returncode:
-                bb.fatal("GPG exited with code %d: %s" % (job.returncode, stderr.decode("utf-8")))
+                cmd += [input_file]
 
+                job = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+                (_, stderr) = job.communicate(passphrase.encode("utf-8"))
+
+                if job.returncode:
+                    bb.fatal("GPG exited with code %d: %s" % (job.returncode, stderr.decode("utf-8")))
+
+                os.rename(tmp_file, output_file)
         except IOError as e:
             bb.error("IO error (%s): %s" % (e.errno, e.strerror))
             raise Exception("Failed to sign '%s'" % input_file)

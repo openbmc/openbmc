@@ -193,6 +193,7 @@ do_install_ptest () {
     sed -i '/^abs_top_builddir/s/= .*$/= \$\{PWD\}/g' ${D}${PTEST_PATH}/Makefile
     sed -i '/^abs_top_srcdir/s/= .*$/= \$\{PWD\}/g' ${D}${PTEST_PATH}/Makefile
     sed -i '/^built_programs/s/ginstall/install/g' ${D}${PTEST_PATH}/Makefile
+    sed -i '/^CC =/s/ --sysroot=.*recipe-sysroot/ /g' ${D}${PTEST_PATH}/Makefile
     chmod -R 777 ${D}${PTEST_PATH}
 
     # Disable subcase stty-pairs.sh, it will cause test framework hang

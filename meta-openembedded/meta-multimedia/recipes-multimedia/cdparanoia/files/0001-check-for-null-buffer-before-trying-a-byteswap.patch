@@ -8,6 +8,7 @@ Author: Monty <paranoia@xiph.org>
 Patch from debian
 http://sources.debian.net/src/cdparanoia/3.10.2%2Bdebian-11/debian/patches/04-endian.patch
 
+Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  interface/interface.c | 2 +-

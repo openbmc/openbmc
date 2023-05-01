@@ -48,6 +48,10 @@ do_install_ptest() {
 	cp -rf ${S}/test/ ${D}${PTEST_PATH}
 }
 
+do_install_ptest:append:libc-musl() {
+        sed -i -e 's|f: Operation n|f: N|g' ${D}${PTEST_PATH}/test/attr.test
+}
+
 RDEPENDS:${PN}-ptest = "attr \
                         bash \
                         coreutils \

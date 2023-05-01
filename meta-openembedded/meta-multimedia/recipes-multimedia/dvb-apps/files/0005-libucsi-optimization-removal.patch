@@ -1,3 +1,8 @@
+Use -O1 with gcc > 6
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 diff -r 3d43b280298c lib/libucsi/endianops.h
 --- a/lib/libucsi/endianops.h	Fri Mar 21 20:26:36 2014 +0100
 +++ b/lib/libucsi/endianops.h	Fri Jan 19 06:56:15 2018 +0000

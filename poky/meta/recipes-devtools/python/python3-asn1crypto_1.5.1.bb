@@ -1,4 +1,4 @@
-DESCRIPTION = "A fast, pure Python library for parsing and serializing ASN.1 structures"
+SUMMARY = "A fast, pure Python library for parsing and serializing ASN.1 structures"
 HOMEPAGE = "https://github.com/wbond/asn1crypto"
 SECTION = "devel/python"
 LICENSE = "MIT"

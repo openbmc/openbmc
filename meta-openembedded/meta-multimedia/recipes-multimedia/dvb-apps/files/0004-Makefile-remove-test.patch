@@ -5,6 +5,7 @@ Subject: [PATCH] Makefile: remove test
 
 Tests needs static libraries, remove them for shared only build.
 
+Upstream-Status: Inappropriate [Cross-compile specific]
 Signed-off-by: Romain Naour <romain.naour@openwide.fr>
 ---
  Makefile | 1 -

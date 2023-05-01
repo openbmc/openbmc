@@ -610,6 +610,28 @@
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/imaplib.*.pyc"
         ]
     },
+    "ensurepip": {
+        "summary": "Support for bootstrapping the pip installer",
+        "rdepends": [
+            "asyncio",
+            "compile",
+            "core",
+            "ctypes",
+            "image",
+            "io",
+            "mmap",
+            "plistlib",
+            "pprint",
+            "unixadmin",
+            "xmlrpc"
+        ],
+        "files": [
+            "${libdir}/python${PYTHON_MAJMIN}/ensurepip/"
+        ],
+        "cached": [
+            "${libdir}/python${PYTHON_MAJMIN}/ensurepip/_uninstall.*.pyc"
+        ]
+    },
     "fcntl": {
         "summary": "Python's fcntl interface",
         "rdepends": [
@@ -800,6 +822,7 @@
             "distutils",
             "doctest",
             "email",
+            "ensurepip",
             "fcntl",
             "html",
             "idle",
@@ -829,6 +852,7 @@
             "stringold",
             "syslog",
             "terminal",
+            "tomllib",
             "threading",
             "tkinter",
             "unittest",
@@ -1178,6 +1202,22 @@
             "${libdir}/python${PYTHON_MAJMIN}/tkinter"
         ],
         "cached": []
+    },
+    "tomllib": {
+        "summary": "Provides an interface for parsing TOML",
+        "rdepends": [
+            "core",
+            "datetime",
+            "stringold"
+        ],
+        "files": [
+            "${libdir}/python${PYTHON_MAJMIN}/tomllib/"
+        ],
+        "cached": [
+            "${libdir}/python${PYTHON_MAJMIN}/tomllib/_re.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/tomllib/_types.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/tomllib/_parser.*.pyc"
+        ]
     },
     "unittest": {
         "summary": "Python unit testing framework",

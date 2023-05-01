@@ -17,13 +17,17 @@ SRC_URI[archive.sha256sum] = "2b472696cbac79db8e405724118ec945219c5b9b18af63dc8c
 
 S = "${WORKDIR}/${GNOMEBN}-${PV}"
 
-do_install:append() {
-    for i in generate_wrap_init.pl gmmproc; do
-        sed -i -e '1s,.*,#!${bindir}/env perl,' ${D}${libdir}/glibmm-2.68/proc/$i
-    done
-}
-
 FILES:${PN} = "${libdir}/lib*.so.*"
 FILES:${PN}-dev += "${datadir}/glibmm-* ${libdir}/${BPN}/include/ ${libdir}/${BPN}/proc/ ${libdir}/giomm-2.68/include/"
 
 RDEPENDS:${PN}-dev = "perl"
+
+EXTRA_OEMESON += "--cross-file=${WORKDIR}/meson-${PN}.cross -Dmaintainer-mode=false"
+
+do_write_config:append() {
+    cat >${WORKDIR}/meson-${PN}.cross <<EOF
+[binaries]
+m4 = '${bindir}/m4'
+perl = '${bindir}/perl'
+EOF
+}

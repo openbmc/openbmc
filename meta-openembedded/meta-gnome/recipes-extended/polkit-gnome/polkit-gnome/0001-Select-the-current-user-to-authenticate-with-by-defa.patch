@@ -1,0 +1,80 @@
+From: Utopia Maintenance Team
+ <pkg-utopia-maintainers@lists.alioth.debian.org>
+Date: Mon, 30 Apr 2018 17:56:52 +0000
+Subject: Select the current user to authenticate with by default
+
+Bug: http://bugzilla.gnome.org/show_bug.cgi?id=596188
+Bug-Ubuntu: https://launchpad.net/bugs/435227
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/polkitgnomeauthenticationdialog.c | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
+
+diff --git a/src/polkitgnomeauthenticationdialog.c b/src/polkitgnomeauthenticationdialog.c
+index 743cc96..d307516 100644
+--- a/src/polkitgnomeauthenticationdialog.c
++++ b/src/polkitgnomeauthenticationdialog.c
+@@ -138,7 +138,7 @@ user_combobox_changed (GtkComboBox *widget,
+ static void
+ create_user_combobox (PolkitGnomeAuthenticationDialog *dialog)
+ {
+-  int n;
++  int n, i, selected_index = 0;
+   GtkComboBox *combo;
+   GtkTreeIter iter;
+   GtkCellRenderer *renderer;
+@@ -162,7 +162,7 @@ create_user_combobox (PolkitGnomeAuthenticationDialog *dialog)
+ 
+ 
+   /* For each user */
+-  for (n = 0; dialog->priv->users[n] != NULL; n++)
++  for (i = 0, n = 0; dialog->priv->users[n] != NULL; n++)
+     {
+       gchar *gecos;
+       gchar *real_name;
+@@ -224,6 +224,14 @@ create_user_combobox (PolkitGnomeAuthenticationDialog *dialog)
+                           USERNAME_COL, dialog->priv->users[n],
+                           -1);
+ 
++      i++;
++      if (passwd->pw_uid == getuid ())
++        {
++          selected_index = i;
++          g_free (dialog->priv->selected_user);
++          dialog->priv->selected_user = g_strdup (dialog->priv->users[n]);
++        }
++
+       g_free (real_name);
+       g_object_unref (pixbuf);
+     }
+@@ -252,8 +260,8 @@ create_user_combobox (PolkitGnomeAuthenticationDialog *dialog)
+                                       user_combobox_set_sensitive,
+                                       NULL, NULL);
+ 
+-  /* Initially select the "Select user..." ... */
+-  gtk_combo_box_set_active (GTK_COMBO_BOX (combo), 0);
++  /* Select the default user */
++  gtk_combo_box_set_active (GTK_COMBO_BOX (combo), selected_index);
+ 
+   /* Listen when a new user is selected */
+   g_signal_connect (GTK_WIDGET (combo),
+@@ -719,16 +727,13 @@ polkit_gnome_authentication_dialog_constructed (GObject *object)
+   gtk_widget_set_tooltip_markup (label, s);
+   g_free (s);
+ 
+-  if (have_user_combobox)
++  /* Disable password entry and authenticate until have a user selected */
++  if (have_user_combobox && gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->priv->user_combobox)) == 0)
+     {
+-      /* ... and make the password entry and "Authenticate" button insensitive */
+       gtk_widget_set_sensitive (dialog->priv->prompt_label, FALSE);
+       gtk_widget_set_sensitive (dialog->priv->password_entry, FALSE);
+       gtk_widget_set_sensitive (dialog->priv->auth_button, FALSE);
+     }
+-  else
+-    {
+-    }
+ 
+   gtk_widget_realize (GTK_WIDGET (dialog));
+ 

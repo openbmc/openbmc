@@ -22,8 +22,8 @@ inherit autotools-brokensep gettext update-alternatives manpages
 EXTRA_OECONF = " \
     --bindir=${base_bindir} \
     --enable-etcdir=${sysconfdir} \
-    --enable-fndir=${datadir}/${PN}/${PV}/functions \
-    --enable-site-fndir=${datadir}/${PN}/site-functions \
+    --enable-fndir=${datadir}/${BPN}/${PV}/functions \
+    --enable-site-fndir=${datadir}/${BPN}/site-functions \
     --with-term-lib='ncursesw ncurses' \
     --with-tcsetpgrp \
     --enable-cap \

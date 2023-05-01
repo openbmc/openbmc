@@ -6,11 +6,15 @@ Upstream-Status: Inappropriate [cross compile specific]
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 
+---
+ configure.ac | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
+
 diff --git a/configure.ac b/configure.ac
-index f0ec537..05c393d 100644
+index 6f149bb..3890677 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -230,9 +230,9 @@ dnl ---------------------------------------------------------------------------
+@@ -237,9 +237,9 @@ dnl ---------------------------------------------------------------------------
  #
  AC_DEFUN([AC_CHECK_X_HEADER], [
    ac_save_CPPFLAGS="$CPPFLAGS"
@@ -23,7 +27,7 @@ index f0ec537..05c393d 100644
    CPPFLAGS="$CPPFLAGS $X_CFLAGS"
    AC_CHECK_HEADER([$1],[$2],[$3],[$4])
    CPPFLAGS="$ac_save_CPPFLAGS"])
-@@ -241,9 +241,9 @@ AC_DEFUN([AC_CHECK_X_HEADER], [
+@@ -248,9 +248,9 @@ AC_DEFUN([AC_CHECK_X_HEADER], [
  #
  AC_DEFUN([AC_TRY_X_COMPILE], [
    ac_save_CPPFLAGS="$CPPFLAGS"
@@ -34,9 +38,9 @@ index f0ec537..05c393d 100644
 +#    CPPFLAGS="$CPPFLAGS -I$includedir"
 +#  fi
    CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-   AC_TRY_COMPILE([$1], [$2], [$3], [$4])
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[$1]], [[$2]])], [$3], [$4])
    CPPFLAGS="$ac_save_CPPFLAGS"])
-@@ -257,15 +257,15 @@ AC_DEFUN([AC_CHECK_X_LIB], [
+@@ -264,15 +264,15 @@ AC_DEFUN([AC_CHECK_X_LIB], [
    ac_save_LDFLAGS="$LDFLAGS"
  #  ac_save_LIBS="$LIBS"
  

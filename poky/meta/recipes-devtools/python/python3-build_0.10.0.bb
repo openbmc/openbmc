@@ -18,6 +18,15 @@ do_compile:prepend:class-native() {
     export PYTHONPATH="${S}/src"
 }
 
-RDEPENDS:${PN} += "python3-packaging python3-pyproject-hooks"
+RDEPENDS:${PN} += " \
+    python3-compression \
+    python3-difflib \
+    python3-ensurepip \
+    python3-logging \
+    python3-packaging \
+    python3-pyproject-hooks \
+    python3-tomllib \
+    python3-venv \
+"
 
 BBCLASSEXTEND = "native nativesdk"

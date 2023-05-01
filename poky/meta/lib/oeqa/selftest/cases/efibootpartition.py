@@ -15,7 +15,7 @@ class GenericEFITest(OESelftestTestCase):
     @skipIfNotMachine("qemux86-64", "test is qemux86-64 specific currently")
     def test_boot_efi(self):
         cmd = "runqemu nographic serial wic ovmf"
-        if oe.types.qemu_use_kvm(self.td['QEMU_USE_KVM'], self.td["TARGET_ARCH"]):
+        if oe.types.qemu_use_kvm(self.td.get('QEMU_USE_KVM', 0), self.td["TARGET_ARCH"]):
             cmd += " kvm"
         image = "core-image-minimal"
 

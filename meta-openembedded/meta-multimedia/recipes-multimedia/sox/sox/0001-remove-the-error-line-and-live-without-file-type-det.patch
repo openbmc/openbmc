@@ -1,11 +1,11 @@
 From d0313be5fb947df399a4db24a5f9244510d2ce87 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 12 Jul 2017 16:36:06 -0700
-Subject: [PATCH] remove the #error line and live without file-type detection
- with pipes
+Subject: [PATCH] remove the #error line and live without file-type detection with pipes
 
 this fallback is executed with musl
 
+Upstream-Status: Inappropriate [musl specific]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  src/formats.c | 1 -

@@ -26,3 +26,6 @@ PACKAGECONFIG[test-ui] = "-Denable-test-ui=true, -Denable-test-ui=false, gtk+3 l
 # Once we have a recipe for 'totem-plparser' this can turn into a PACKAGECONFIG
 EXTRA_OEMESON = "-Denable-grl-pls=false"
 
+do_compile:append() {
+        sed -i -e 's,${B}/../,,' ${B}/src/grl-type-builtins.h
+}

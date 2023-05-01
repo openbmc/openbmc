@@ -2380,7 +2380,7 @@ class CrateTest(FetcherTest):
         ud = fetcher.ud[fetcher.urls[0]]
 
         self.assertIn("name", ud.parm)
-        self.assertEqual(ud.parm["name"], "glob")
+        self.assertEqual(ud.parm["name"], "glob-0.2.11")
         self.assertIn("downloadfilename", ud.parm)
         self.assertEqual(ud.parm["downloadfilename"], "glob-0.2.11.crate")
 
@@ -2428,13 +2428,13 @@ class CrateTest(FetcherTest):
         ud = fetcher.ud[fetcher.urls[0]]
 
         self.assertIn("name", ud.parm)
-        self.assertEqual(ud.parm["name"], "glob")
+        self.assertEqual(ud.parm["name"], "glob-0.2.11")
         self.assertIn("downloadfilename", ud.parm)
         self.assertEqual(ud.parm["downloadfilename"], "glob-0.2.11.crate")
 
         ud = fetcher.ud[fetcher.urls[1]]
         self.assertIn("name", ud.parm)
-        self.assertEqual(ud.parm["name"], "time")
+        self.assertEqual(ud.parm["name"], "time-0.1.35")
         self.assertIn("downloadfilename", ud.parm)
         self.assertEqual(ud.parm["downloadfilename"], "time-0.1.35.crate")
 
@@ -2451,7 +2451,7 @@ class CrateTest(FetcherTest):
     def test_crate_incorrect_cksum(self):
         uri = "crate://crates.io/aho-corasick/0.7.20"
         self.d.setVar('SRC_URI', uri)
-        self.d.setVarFlag("SRC_URI", "aho-corasick.sha256sum", hashlib.sha256("Invalid".encode("utf-8")).hexdigest())
+        self.d.setVarFlag("SRC_URI", "aho-corasick-0.7.20.sha256sum", hashlib.sha256("Invalid".encode("utf-8")).hexdigest())
 
         uris = self.d.getVar('SRC_URI').split()
 

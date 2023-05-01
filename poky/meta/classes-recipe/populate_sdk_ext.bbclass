@@ -369,7 +369,8 @@ python copy_buildsystem () {
             f.write('BUILDCFG_HEADER = ""\n\n')
 
             # Write METADATA_REVISION
-            f.write('METADATA_REVISION = "%s"\n\n' % d.getVar('METADATA_REVISION'))
+            # Needs distro override so it can override the value set in the bbclass code (later than local.conf)
+            f.write('METADATA_REVISION:%s = "%s"\n\n' % (d.getVar('DISTRO'), d.getVar('METADATA_REVISION')))
 
             f.write('# Provide a flag to indicate we are in the EXT_SDK Context\n')
             f.write('WITHIN_EXT_SDK = "1"\n\n')

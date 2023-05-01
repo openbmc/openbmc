@@ -1,4 +1,4 @@
-DESCRIPTION = "The Vulkan Samples is collection of resources to help develop optimized Vulkan applications."
+SUMMARY = "The Vulkan Samples is collection of resources to help develop optimized Vulkan applications."
 HOMEPAGE = "https://www.khronos.org/vulkan/"
 BUGTRACKER = "https://github.com/KhronosGroup/Vulkan-Samples/issues"
 LICENSE = "Apache-2.0"

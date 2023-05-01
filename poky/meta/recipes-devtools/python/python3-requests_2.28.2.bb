@@ -1,4 +1,4 @@
-DESCRIPTION = "Python HTTP for Humans."
+SUMMARY = "Python HTTP for Humans."
 HOMEPAGE = "http://python-requests.org"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=34400b68072d710fecd0a2940a0d1658"

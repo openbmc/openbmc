@@ -1,9 +1,37 @@
 #!/bin/sh
 
+export MALLOC_CONF_ALL=${MALLOC_CONF}
+# Concatenate the individual test's MALLOC_CONF and MALLOC_CONF_ALL.
+export_malloc_conf() {
+  if [ "x${MALLOC_CONF}" != "x" -a "x${MALLOC_CONF_ALL}" != "x" ] ; then
+    export MALLOC_CONF="${MALLOC_CONF},${MALLOC_CONF_ALL}"
+  else
+    export MALLOC_CONF="${MALLOC_CONF}${MALLOC_CONF_ALL}"
+  fi
+}
+
+
+
 saved_dir=$PWD
 for dir in tests/* ; do
 	cd $dir
 	for atest in * ; do
+		if [[ "${atest##*.}" == "sh" ]]; then
+			continue
+		fi
+		if [ -e "${atest}.sh" ] ; then
+		  	# Source the shell script corresponding to the test in a subshell and
+		  	# execute the test.  This allows the shell script to set MALLOC_CONF, which
+		  	# is then used to set MALLOC_CONF (thus allowing the
+		  	# per test shell script to ignore the  detail).
+		  	enable_fill=1 \
+		  	enable_prof=1 \
+		  	. $(pwd)/${atest}.sh && \
+		  	export_malloc_conf
+		else
+		  	export MALLOC_CONF= && \
+		  	export_malloc_conf
+		fi
 		if [ \( -x $atest \) -a \( -f $atest \) ] ; then
 			rm -rf tests.log
 			./$atest > tests.log 2>&1
@@ -18,4 +46,3 @@ for dir in tests/* ; do
 	done
 	cd $saved_dir
 done
-

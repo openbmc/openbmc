@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=cf5713fba707073020b1db2acaa73e78 \
 SRC_URI = "git://git.adelielinux.org/adelie/musl-locales;protocol=https;branch=main"
 
 PV = "1.0+git${SRCPV}"
-SRCREV = "cac3dcdccd1d0c08d17f4919d862737d64b76f79"
+SRCREV = "5663f5bfd30bf9e1e0ba3fc5fe2da6725969f30e"
 
 S = "${WORKDIR}/git"
 
@@ -35,6 +35,7 @@ LICENSE:locale-base-en-gb = "MIT"
 LICENSE:locale-base-en-us = "MIT"
 LICENSE:locale-base-es-es = "MIT"
 LICENSE:locale-base-fi-fi = "MIT"
+LICENSE:locale-base-fr-ca = "MIT"
 LICENSE:locale-base-fr-fr = "MIT"
 LICENSE:locale-base-it-it = "MIT"
 LICENSE:locale-base-nb-no = "MIT"
@@ -52,6 +53,7 @@ PACKAGES =+ "locale-base-cs-cz \
              locale-base-en-us \
              locale-base-es-es \
              locale-base-fi-fi \
+             locale-base-fr-ca \
              locale-base-fr-fr \
              locale-base-it-it \
              locale-base-nb-no \
@@ -69,6 +71,7 @@ FILES:locale-base-en-gb += "${datadir}/i18n/locales/musl/en_GB.UTF-8"
 FILES:locale-base-en-us += "${datadir}/i18n/locales/musl/en_US.UTF-8"
 FILES:locale-base-es-es += "${datadir}/i18n/locales/musl/es_ES.UTF-8"
 FILES:locale-base-fi-fi += "${datadir}/i18n/locales/musl/fi_FI.UTF-8"
+FILES:locale-base-fr-ca += "${datadir}/i18n/locales/musl/fr_CA.UTF-8"
 FILES:locale-base-fr-fr += "${datadir}/i18n/locales/musl/fr_FR.UTF-8"
 FILES:locale-base-it-it += "${datadir}/i18n/locales/musl/it_IT.UTF-8"
 FILES:locale-base-nb-no += "${datadir}/i18n/locales/musl/nb_NO.UTF-8"

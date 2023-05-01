@@ -1,4 +1,4 @@
-DESCRIPTION = "Parses image files’ header and return image size."
+SUMMARY = "Parses image files’ header and return image size."
 HOMEPAGE = "https://github.com/shibukawa/imagesize_py"
 SECTION = "devel/python"
 LICENSE = "MIT"

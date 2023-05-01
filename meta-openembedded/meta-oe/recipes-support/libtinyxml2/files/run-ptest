@@ -1,0 +1,10 @@
+#!/bin/sh
+
+for i in `ls xmltest`; do
+    ./$i
+    if [ $? -eq 0 ]; then
+        echo "PASS: $i"
+    else
+        echo "FAIL: $i"
+    fi
+done

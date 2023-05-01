@@ -1972,6 +1972,24 @@ looking at the source code of the ``bb`` module, which is in
 the commonly used functions ``bb.utils.contains()`` and
 ``bb.utils.mkdirhier()``, which come with docstrings.
 
+Extending Python Library Code
+-----------------------------
+
+If you wish to add your own Python library code (e.g. to provide
+functions/classes you can use from Python functions in the metadata)
+you can do so from any layer using the ``addpylib`` directive.
+This directive is typically added to your layer configuration (
+``conf/layer.conf``) although it will be handled in any ``.conf`` file.
+
+Usage is of the form::
+
+   addpylib <directory> <namespace>
+
+Where <directory> specifies the directory to add to the library path.
+The specified <namespace> is imported automatically, and if the imported
+module specifies an attribute named ``BBIMPORTS``, that list of
+sub-modules is iterated and imported too.
+
 Testing and Debugging BitBake Python code
 -----------------------------------------
 

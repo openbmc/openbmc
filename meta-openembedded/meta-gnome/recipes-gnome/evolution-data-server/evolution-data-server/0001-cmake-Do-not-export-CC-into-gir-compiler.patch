@@ -1,3 +1,7 @@
+Use G_IR_SCANNER without passing additional environment
+
+Upstream-Status: Inappropriate [OE-specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 --- a/cmake/modules/GObjectIntrospection.cmake
 +++ b/cmake/modules/GObjectIntrospection.cmake
 @@ -122,9 +122,7 @@ macro(gir_add_introspection gir)

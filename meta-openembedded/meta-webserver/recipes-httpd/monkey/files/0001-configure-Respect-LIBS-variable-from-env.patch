@@ -6,6 +6,7 @@ Subject: [PATCH] configure: Respect LIBS variable from env
 For musl we need to pass -lexecinfo from env
 this change accomodates that
 
+Upstream-Status: Inappropriate [OE-specific]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  configure | 2 +-

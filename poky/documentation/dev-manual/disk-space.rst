@@ -17,6 +17,12 @@ building a recipe once the recipe is built. For more information on
 "rm_work", see the :ref:`ref-classes-rm-work` class in the
 Yocto Project Reference Manual.
 
+When you inherit this class and build a ``core-image-sato`` image for a
+``qemux86-64`` machine from an Ubuntu 22.04 x86-64 system, you end up with a
+final disk usage of 22 Gbytes instead of &MIN_DISK_SPACE; Gbytes. However,
+&MIN_DISK_SPACE_RM_WORK; Gbytes of initial free disk space are still needed to
+create temporary files before they can be deleted.
+
 Purging Duplicate Shared State Cache Files
 ==========================================
 

@@ -12,6 +12,7 @@ SRC_URI = "${GNU_MIRROR}/cpio/cpio-${PV}.tar.gz \
            file://0001-obstack-Fix-a-clang-warning.patch \
            file://CVE-2021-38185.patch \
            file://0001-Use-__alignof__-with-clang.patch \
+           file://0001-Wrong-CRC-with-ASCII-CRC-for-large-files.patch \
            file://run-ptest \
            "
 

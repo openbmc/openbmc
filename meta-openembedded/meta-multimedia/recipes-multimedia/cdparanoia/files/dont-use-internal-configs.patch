@@ -1,3 +1,8 @@
+Fix build on aarch64
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 Index: cdparanoia-III-10.2/configure.in
 ===================================================================
 --- cdparanoia-III-10.2.orig/configure.in

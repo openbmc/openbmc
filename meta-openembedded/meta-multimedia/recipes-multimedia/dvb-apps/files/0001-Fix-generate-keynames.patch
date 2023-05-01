@@ -5,6 +5,7 @@ symbols. However, when cross-compiling, the include path points
 somewhere else. Allow the user to pass CROSS_ROOT to point to the
 root of the cross-compilation environment.
 
+Upstream-Status: Inappropriate [Cross-compile specific]
 Signed-off-by: Arnout Vandecappelle (Essensium/Mind) <arnout@mind.be>
 ---
 diff -rup dvb-apps-83c746462ccb.orig/util/av7110_loadkeys/generate-keynames.sh dvb-apps-83c746462ccb/util/av7110_loadkeys/generate-keynames.sh

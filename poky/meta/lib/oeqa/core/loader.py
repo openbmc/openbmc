@@ -316,6 +316,9 @@ class OETestLoader(unittest.TestLoader):
                                   module_name_small in self.modules) \
                                else False
 
+        if any(c.isupper() for c in module.__name__):
+            raise SystemExit("Module '%s' contains uppercase characters and this isn't supported. Please fix the module name." % module.__name__)
+
         return (load_module, load_underscore)
 
 

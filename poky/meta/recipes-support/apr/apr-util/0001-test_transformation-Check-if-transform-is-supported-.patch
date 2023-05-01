@@ -1,0 +1,37 @@
+From 3a97f58cfb40fc1911bbfd067e8457a472613d75 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 18 Apr 2023 22:58:00 -0700
+Subject: [PATCH] test_transformation: Check if transform is supported before
+ using it
+
+This helps in excluding these tests on systems where these are not
+available e.g. musl
+
+Upstream-Status: Submitted [https://bz.apache.org/bugzilla/show_bug.cgi?id=66570]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test/testxlate.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/test/testxlate.c b/test/testxlate.c
+index 6981eff..de00fa4 100644
+--- a/test/testxlate.c
++++ b/test/testxlate.c
+@@ -116,8 +116,12 @@ static void test_transformation(abts_case *tc, void *data)
+     }
+ 
+     /* 4. Transformation using charset aliases */
+-    one_test(tc, "UTF-8", "UTF-7", test_utf8, test_utf7, p);
+-    one_test(tc, "UTF-7", "UTF-8", test_utf7, test_utf8, p);
++    if (is_transform_supported(tc, "UTF-8", "UTF-7", p)) {
++        one_test(tc, "UTF-8", "UTF-7", test_utf8, test_utf7, p);
++    }
++    if (is_transform_supported(tc, "UTF-7", "UTF-8", p)) {
++        one_test(tc, "UTF-7", "UTF-8", test_utf7, test_utf8, p);
++    }
+ }
+ 
+ #endif /* APR_HAS_XLATE */
+-- 
+2.40.0
+

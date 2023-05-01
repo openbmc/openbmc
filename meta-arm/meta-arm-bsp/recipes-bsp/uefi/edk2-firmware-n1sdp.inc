@@ -1,8 +1,3 @@
-# Align with N1SDP-2022.06.22 release
-SRCREV_edk2           = "b24306f15daa2ff8510b06702114724b33895d3c"
-SRCREV_edk2-platforms = "fdaf4eb69a8b6839aecf6d3bdd938aa5c34a8a17"
-PV .= "+git${SRCPV}"
-
 # N1SDP specific EDK2 configurations
 EDK2_BUILD_RELEASE = "0"
 EDK2_PLATFORM      = "n1sdp"
@@ -20,8 +15,14 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files/edk2-platforms:"
 
 SRC_URI:append = "\
     file://0001-Platform-ARM-N1sdp-Add-support-to-parse-NT_FW_CONFIG.patch;patchdir=edk2-platforms \
-    file://0002-Platform-ARM-N1Sdp-Fix-RemoteDdrSize-cast.patch;patchdir=edk2-platforms            \
+    file://0002-Platform-ARM-N1Sdp-Fix-RemoteDdrSize-cast.patch;patchdir=edk2-platforms \
     file://0003-Platform-ARM-N1Sdp-Modify-the-IRQ-ID-of-Debug-UART-a.patch;patchdir=edk2-platforms \
+    file://0004-Silicon-ARM-NeoverseN1Soc-Enable-SCP-QSPI-flash-regi.patch;patchdir=edk2-platforms \
+    file://0005-Platform-ARM-N1Sdp-NOR-flash-library-for-N1Sdp.patch;patchdir=edk2-platforms \
+    file://0006-Platform-ARM-N1Sdp-NOR-flash-Dxe-Driver-for-N1Sdp.patch;patchdir=edk2-platforms \
+    file://0007-Platform-ARM-N1Sdp-Persistent-storage-for-N1Sdp.patch;patchdir=edk2-platforms \
+    file://0008-Platform-ARM-N1Sdp-Enable-FaultTolerantWrite-Dxe-dri.patch;patchdir=edk2-platforms \
+    file://0009-Platform-ARM-N1Sdp-manually-poll-QSPI-status-bit-aft.patch;patchdir=edk2-platforms \
 "
 
 do_deploy:append() {

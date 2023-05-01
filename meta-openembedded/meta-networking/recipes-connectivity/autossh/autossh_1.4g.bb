@@ -2,9 +2,8 @@ DESCRIPTION = "autossh is a program to start a copy of ssh and monitor it, resta
 HOMEPAGE = "https://www.harding.motd.ca/autossh/"
 
 LICENSE = "BSD-1-Clause & BSD-4-Clause"
-LIC_FILES_CHKSUM = "file://autossh.spec;md5=80a6701134723fd3420e733b46a0eb97 \
-                    file://autossh.c;md5=76c37acd40ac45050a4ced145b1e2707;startline=7;endline=23 \
-                    file://daemon.h;md5=6bbeaac616b9bc8de7b40049004f4289;startline=7;endline=39"
+LIC_FILES_CHKSUM = "file://autossh.c;beginline=7;endline=22;md5=9ae0c9b04856148d77984ef58536732b \
+                    file://daemon.h;beginline=7;endline=36;md5=839bb7bf781ff48da4a3fec2a62a1a47"
 
 SRC_URI = "https://www.harding.motd.ca/autossh/${BP}.tgz"
 SRC_URI[md5sum] = "2b804bc1bf6d2f2afaa526d02df7c0a2"

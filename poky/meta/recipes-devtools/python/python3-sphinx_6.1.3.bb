@@ -1,4 +1,4 @@
-DESCRIPTION = "Python documentation generator"
+SUMMARY = "Python documentation generator"
 HOMEPAGE = "http://sphinx-doc.org/"
 SECTION = "devel/python"
 LICENSE = "BSD-2-Clause & MIT & BSD-3-Clause"

@@ -24,4 +24,18 @@ RDEPENDS:${PN} += " \
     ${PYTHON_PN}-resource \
 "
 
+RDEPENDS:${PN}-tests += " \
+     ${PN} \
+     ${PYTHON_PN} \
+     coreutils \
+     procps \
+     binutils \
+     gcc \
+     gcc-symlinks \
+     libstdc++ \
+     libstdc++-dev \
+"
+
+INSANE_SKIP:${PN}-tests += "dev-deps"
+
 BBCLASSEXTEND = "native nativesdk"

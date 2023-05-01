@@ -9,6 +9,7 @@ Content-Transfer-Encoding: 8bit
 * TRY_RUN: does not work for OE
 * HAVE_LKSTRFTIME is set by recipe as configure option
 
+Upstream-Status: Inappropriate [Cross-compile specific]
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
 ---
  CMakeLists.txt | 23 -----------------------

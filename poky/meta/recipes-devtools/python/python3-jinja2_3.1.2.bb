@@ -1,4 +1,4 @@
-DESCRIPTION = "Python Jinja2: A small but fast and easy to use stand-alone template engine written in pure python."
+SUMMARY = "Python Jinja2: A small but fast and easy to use stand-alone template engine written in pure python."
 HOMEPAGE = "https://pypi.org/project/Jinja2/"
 
 LICENSE = "BSD-3-Clause"

@@ -571,11 +571,12 @@ class PartitionedImage():
             self._create_partition(self.path, part.type,
                                    parted_fs_type, part.start, part.size_sec)
 
-            if part.part_name:
+            if self.ptable_format == "gpt" and (part.part_name or part.label):
+                partition_label = part.part_name if part.part_name else part.label
                 logger.debug("partition %d: set name to %s",
-                             part.num, part.part_name)
+                             part.num, partition_label)
                 exec_native_cmd("sgdisk --change-name=%d:%s %s" % \
-                                         (part.num, part.part_name,
+                                         (part.num, partition_label,
                                           self.path), self.native_sysroot)
 
             if part.part_type:
@@ -590,13 +591,6 @@ class PartitionedImage():
                              part.num, part.uuid)
                 exec_native_cmd("sgdisk --partition-guid=%d:%s %s" % \
                                 (part.num, part.uuid, self.path),
-                                self.native_sysroot)
-
-            if part.label and self.ptable_format == "gpt":
-                logger.debug("partition %d: set name to %s",
-                             part.num, part.label)
-                exec_native_cmd("parted -s %s name %d %s" % \
-                                (self.path, part.num, part.label),
                                 self.native_sysroot)
 
             if part.active:

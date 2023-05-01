@@ -1,27 +1,25 @@
-From 588bb5cb248aaeaf0fea33084229c99ad1574291 Mon Sep 17 00:00:00 2001
+From 7c1f95995ce9180221bac03b7b1e1696b8a79de7 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 7 Sep 2022 11:12:28 -0700
 Subject: [PATCH] Warn not error if xsltproc is not found
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index 7659f41..537203e 100644
+index 6896c19..2a1fb52 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -177,7 +177,7 @@ AC_SUBST([systemdunitdir], [$systemdunitdir])
+@@ -182,7 +182,7 @@ AC_SUBST([systemdunitdir], [$systemdunitdir])
  # package as xgettext, and we find them by PATH, so just check for the one.
- AC_PATH_PROG([XGETTEXT], [xsltproc], [no])
+ AC_PATH_PROG([XGETTEXT], [xgettext], [no])
  if test "$XGETTEXT" = "no"; then
 -        AC_MSG_ERROR([Please install gettext tools])
 +        AC_MSG_WARN([Please install gettext tools])
  fi
  
  # ssh-add
--- 
-2.37.3
-

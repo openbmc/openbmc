@@ -105,16 +105,14 @@ class BitBakeLogging(OESelftestTestCase):
         self.write_config('BBINCLUDELOGS = ""')
         result = bitbake("logging-test -c pythontest_exit -f -v", ignore_status = True)
         self.assertIn("ERROR: Logfile of failure stored in:", result.output)
-        # python tasks don't log output with -v currently
-        #self.assertCount(result.output, "This is python stdout", 1)
+        self.assertCount(result.output, "This is python stdout", 1)
 
     def test_python_exit_loggingD(self):
         # logs, verbose
         self.write_config('BBINCLUDELOGS = "yes"')
         result = bitbake("logging-test -c pythontest_exit -f -v", ignore_status = True)
         self.assertIn("ERROR: Logfile of failure stored in:", result.output)
-        # python tasks don't log output with -v currently
-        #self.assertCount(result.output, "This is python stdout", 1)
+        self.assertCount(result.output, "This is python stdout", 1)
 
     def test_python_exec_func_python_loggingA(self):
         # no logs, no verbose
@@ -139,8 +137,7 @@ class BitBakeLogging(OESelftestTestCase):
         result = bitbake("logging-test -c pythontest_exec_func_python -f -v",
                          ignore_status = True)
         self.assertIn("ERROR: Logfile of failure stored in:", result.output)
-        # python tasks don't log output with -v currently
-        #self.assertCount(result.output, "This is python stdout", 1)
+        self.assertCount(result.output, "This is python stdout", 1)
 
     def test_python_exec_func_python_loggingD(self):
         # logs, verbose
@@ -148,8 +145,7 @@ class BitBakeLogging(OESelftestTestCase):
         result = bitbake("logging-test -c pythontest_exec_func_python -f -v",
                          ignore_status = True)
         self.assertIn("ERROR: Logfile of failure stored in:", result.output)
-        # python tasks don't log output with -v currently
-        #self.assertCount(result.output, "This is python stdout", 1)
+        self.assertCount(result.output, "This is python stdout", 1)
 
     def test_python_fatal_loggingA(self):
         # no logs, no verbose
@@ -173,8 +169,7 @@ class BitBakeLogging(OESelftestTestCase):
         self.write_config('BBINCLUDELOGS = ""')
         result = bitbake("logging-test -c pythontest_fatal -f -v", ignore_status = True)
         self.assertIn("ERROR: Logfile of failure stored in:", result.output)
-        # python tasks don't log output with -v currently
-        #self.assertCount(result.output, "This is python fatal test stdout", 1)
+        self.assertCount(result.output, "This is python fatal test stdout", 1)
         self.assertCount(result.output, "This is a fatal error", 1)
 
     def test_python_fatal_loggingD(self):
@@ -182,7 +177,6 @@ class BitBakeLogging(OESelftestTestCase):
         self.write_config('BBINCLUDELOGS = "yes"')
         result = bitbake("logging-test -c pythontest_fatal -f -v", ignore_status = True)
         self.assertIn("ERROR: Logfile of failure stored in:", result.output)
-        # python tasks don't log output with -v currently
-        #self.assertCount(result.output, "This is python fatal test stdout", 1)
+        self.assertCount(result.output, "This is python fatal test stdout", 1)
         self.assertCount(result.output, "This is a fatal error", 1)
 

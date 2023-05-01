@@ -1,7 +1,7 @@
 require gstreamer1.0-plugins-common.inc
 require gstreamer1.0-plugins-license.inc
 
-DESCRIPTION = "'Ugly GStreamer plugins"
+SUMMARY = "'Ugly GStreamer plugins"
 HOMEPAGE = "https://gstreamer.freedesktop.org/"
 BUGTRACKER = "https://gitlab.freedesktop.org/gstreamer/gst-plugins-ugly/-/issues"
 

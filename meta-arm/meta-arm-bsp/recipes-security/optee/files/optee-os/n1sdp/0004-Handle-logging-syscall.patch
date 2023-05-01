@@ -15,8 +15,8 @@ diff --git a/core/arch/arm/kernel/spmc_sp_handler.c b/core/arch/arm/kernel/spmc_
 index e0fa0aa6..c7a45387 100644
 --- a/core/arch/arm/kernel/spmc_sp_handler.c
 +++ b/core/arch/arm/kernel/spmc_sp_handler.c
-@@ -1004,6 +1004,12 @@ void spmc_sp_msg_handler(struct thread_smc_args *args,
- 			ffa_mem_reclaim(args, caller_sp);
+@@ -1132,6 +1132,12 @@ void spmc_sp_msg_handler(struct thread_smc_args *args,
+ 			handle_mem_perm_set(args, caller_sp);
  			sp_enter(args, caller_sp);
  			break;
 +		case 0xdeadbeef:

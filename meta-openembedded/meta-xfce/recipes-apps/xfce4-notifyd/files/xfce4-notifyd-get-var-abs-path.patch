@@ -1,0 +1,41 @@
+Native pkg_config only return basename of the variable queried. Invoke `which`
+to get the absolute path.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ configure.ac | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 0f49e2b..a589147 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -116,7 +116,7 @@ AC_MSG_CHECKING([for gdbus-codegen])
+ if test x"$GDBUS_CODEGEN" = x""; then
+     GDBUS_CODEGEN=`$PKG_CONFIG --variable=gdbus_codegen gio-2.0`
+ fi
+-if test -x "$GDBUS_CODEGEN"; then
++if test -x "$(which $GDBUS_CODEGEN)"; then
+     AC_MSG_RESULT([$GDBUS_CODEGEN])
+ else
+     AC_MSG_ERROR([could not find gdbus-codegen in \$PATH. You can run
+@@ -129,7 +129,7 @@ AC_MSG_CHECKING([for glib-compile-resources])
+ if test x"$GLIB_COMPILE_RESOURCES" = x""; then
+     GLIB_COMPILE_RESOURCES=`$PKG_CONFIG --variable=glib_compile_resources gio-2.0`
+ fi
+-if test -x "$GLIB_COMPILE_RESOURCES"; then
++if test -x "$(which $GLIB_COMPILE_RESOURCES)"; then
+     AC_MSG_RESULT([$GLIB_COMPILE_RESOURCES])
+ else
+     AC_MSG_ERROR([could not find glib-compile-resources in \$PATH. You can run
+@@ -142,7 +142,7 @@ AC_MSG_CHECKING([for glib-genmarshal])
+ if test x"$GLIB_GENMARSHAL" = x""; then
+     GLIB_GENMARSHAL=`$PKG_CONFIG --variable=glib_genmarshal glib-2.0`
+ fi
+-if test -x "$GLIB_GENMARSHAL"; then
++if test -x "$(which $GLIB_GENMARSHAL)"; then
+     AC_MSG_RESULT([$GLIB_GENMARSHAL])
+ else
+     AC_MSG_ERROR([could not find glib-genmarshal in \$PATH. You can run

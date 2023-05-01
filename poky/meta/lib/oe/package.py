@@ -8,7 +8,7 @@ import errno
 import fnmatch
 import itertools
 import os
-import pipes
+import shlex
 import re
 import glob
 import stat
@@ -41,7 +41,7 @@ def runstrip(arg):
 
     stripcmd = [strip]
     skip_strip = False
-    # kernel module    
+    # kernel module
     if elftype & 16:
         if is_kernel_module_signed(file):
             bb.debug(1, "Skip strip on signed module %s" % file)
@@ -1556,7 +1556,7 @@ def process_shlibs(pkgfiles, d):
         sonames = set()
         renames = []
         ldir = os.path.dirname(file).replace(pkgdest + "/" + pkg, '')
-        cmd = d.getVar('OBJDUMP') + " -p " + pipes.quote(file) + " 2>/dev/null"
+        cmd = d.getVar('OBJDUMP') + " -p " + shlex.quote(file) + " 2>/dev/null"
         fd = os.popen(cmd)
         lines = fd.readlines()
         fd.close()
@@ -2012,4 +2012,3 @@ def process_depchains(pkgfiles, d):
                 for dep in bb.utils.explode_deps(d.getVar('RDEPENDS:' + base) or ""):
                     add_dep(rdeps, dep)
                 pkg_addrrecs(pkg, base, suffix, func, rdeps, d)
-

@@ -35,7 +35,7 @@ EXTRA_OEMESON:prepend:class-nativesdk = "${@['', '${GIRMESONBUILD}'][d.getVar('G
 
 # Generating introspection data depends on a combination of native and target
 # introspection tools, and qemu to run the target tools.
-DEPENDS:append:class-target = " gobject-introspection gobject-introspection-native qemu-native"
+DEPENDS:append:class-target = " ${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'gobject-introspection gobject-introspection-native qemu-native', '', d)}"
 
 # Even though introspection is disabled on -native, gobject-introspection package is still
 # needed for m4 macros.
@@ -46,10 +46,12 @@ DEPENDS:append:class-nativesdk = " gobject-introspection-native"
 export XDG_DATA_DIRS = "${STAGING_DATADIR}:${STAGING_LIBDIR}"
 
 do_configure:prepend:class-target () {
-    # introspection.m4 pre-packaged with upstream tarballs does not yet
-    # have our fixes
-    mkdir -p ${S}/m4
-    cp ${STAGING_DIR_TARGET}/${datadir}/aclocal/introspection.m4 ${S}/m4
+    if [ "${@bb.utils.contains('GI_DATA_ENABLED', 'True', '1', '0', d)}" = "1" ] ; then
+        # introspection.m4 pre-packaged with upstream tarballs does not yet
+        # have our fixes
+        mkdir -p ${S}/m4
+        cp ${STAGING_DIR_TARGET}/${datadir}/aclocal/introspection.m4 ${S}/m4
+    fi
 }
 
 # .typelib files are needed at runtime and so they go to the main package (so

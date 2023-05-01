@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-# This bbclass implements device tree compliation for user provided device tree
+# This bbclass implements device tree compilation for user provided device tree
 # sources. The compilation of the device tree sources is the same as the kernel
 # device tree compilation process, this includes being able to include sources
 # from the kernel such as soc dtsi files or header files such as gpio.h. In

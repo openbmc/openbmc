@@ -16,6 +16,7 @@ from random import choice
 import oeqa
 import oe
 import bb.utils
+import bb.tinfoil
 
 from oeqa.core.context import OETestContext, OETestContextExecutor
 from oeqa.core.exception import OEQAPreRun, OEQATestNotFound
@@ -79,6 +80,12 @@ class OESelftestTestContext(OETestContext):
             self.removebuilddir = removebuilddir
 
     def setup_builddir(self, suffix, selftestdir, suite):
+        # Get SSTATE_DIR from the parent build dir
+        with bb.tinfoil.Tinfoil(tracking=True) as tinfoil:
+            tinfoil.prepare(quiet=2, config_only=True)
+            d = tinfoil.config_data
+            sstatedir = str(d.getVar('SSTATE_DIR'))
+
         builddir = os.environ['BUILDDIR']
         if not selftestdir:
             selftestdir = get_test_layer()
@@ -117,6 +124,9 @@ class OESelftestTestContext(OETestContext):
                 os.environ[e] = os.environ[e].replace(builddir + "/", newbuilddir + "/")
             if os.environ[e].endswith(builddir):
                 os.environ[e] = os.environ[e].replace(builddir, newbuilddir)
+
+        # Set SSTATE_DIR to match the parent SSTATE_DIR
+        subprocess.check_output("echo 'SSTATE_DIR ?= \"%s\"' >> %s/conf/local.conf" % (sstatedir, newbuilddir), cwd=newbuilddir, shell=True)
 
         os.chdir(newbuilddir)
 

@@ -1,4 +1,4 @@
-DESCRIPTION = "C implementation of createrepo."
+SUMMARY = "C implementation of createrepo."
 HOMEPAGE = "https://github.com/rpm-software-management/createrepo_c/wiki"
 
 LICENSE = "GPL-2.0-only"

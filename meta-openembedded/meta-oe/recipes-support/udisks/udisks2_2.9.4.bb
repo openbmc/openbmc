@@ -35,6 +35,12 @@ do_configure:prepend() {
     touch ${S}/build-aux/config.rpath
 }
 
+PACKAGECONFIG ?= ""
+
+PACKAGECONFIG[lvm2] = "--enable-lvm2,--disable-lvm2,lvm2"
+PACKAGECONFIG[btrfs] = "--enable-btrfs,--disable-btrfs,,btrfs-tools"
+PACKAGECONFIG[lsm] = "--enable-lsm,--disable-lsm,libstoragemgmt"
+
 FILES:${PN} += " \
     ${datadir}/dbus-1/ \
     ${datadir}/polkit-1 \

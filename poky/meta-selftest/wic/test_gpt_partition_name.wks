@@ -1,0 +1,7 @@
+# short-description: image to test part-name in GPT partitions
+
+part --fstype=ext4 --part-name boot-A --label boot --size 1M --align 1024
+part / --source rootfs --fstype=ext4 --part-name root-A --align 1024
+part --fstype=ext4 --label ext-space --size 1M --align 1024
+
+bootloader --ptable gpt

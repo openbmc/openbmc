@@ -14,11 +14,10 @@ LICENSE = "GPL-2.0-only & LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://LICENSE.GPL2;md5=751419260aa954499f7abaabaa882bbe \
                     file://LICENSE.LGPL2.1;md5=4fbd65380cdd255951079008b364516c"
 
-SRCREV = "6c327d74aa0d350482e82a247d7018559699798d"
+SRCREV = "ed18c2ab79e8b94182d5dcf31d58457763f3e3e1"
 SRCBRANCH = "v253-stable"
 SRC_URI = "git://github.com/systemd/systemd-stable.git;protocol=https;branch=${SRCBRANCH} \
            file://0026-src-boot-efi-efi-string.c-define-wchar_t-from-__WCHA.patch \
-           file://0025-systemctl-explicitly-cast-the-constants-to-uint64_t.patch \
            "
 
 S = "${WORKDIR}/git"

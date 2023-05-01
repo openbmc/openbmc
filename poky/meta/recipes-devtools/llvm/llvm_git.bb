@@ -1,7 +1,7 @@
 # Copyright (C) 2017 Khem Raj <raj.khem@gmail.com>
 # Released under the MIT license (see COPYING.MIT for the terms)
 
-DESCRIPTION = "The LLVM Compiler Infrastructure"
+SUMMARY = "The LLVM Compiler Infrastructure"
 HOMEPAGE = "http://llvm.org"
 LICENSE = "Apache-2.0-with-LLVM-exception"
 SECTION = "devel"
@@ -82,9 +82,8 @@ EXTRA_OECMAKE += "-DLLVM_ENABLE_ASSERTIONS=OFF \
                   -DLLVM_OPTIMIZED_TABLEGEN=ON \
                   -DLLVM_TARGETS_TO_BUILD='${LLVM_TARGETS}' \
                   -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=ON \
-                  -DPYTHON_EXECUTABLE=${HOSTTOOLS_DIR}/python3 \
                   -DCMAKE_BUILD_TYPE=Release \
-                  -G Ninja"
+                 "
 
 EXTRA_OECMAKE:append:class-target = "\
                   -DCMAKE_CROSSCOMPILING:BOOL=ON \

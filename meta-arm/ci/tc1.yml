@@ -2,8 +2,11 @@ header:
   version: 11
   includes:
     - ci/base.yml
+    - ci/fvp.yml
+    - ci/meta-openembedded.yml
 
 machine: tc1
 
 target:
-  - tc-artifacts-image
+  - core-image-minimal
+  - trusted-firmware-m

@@ -1,4 +1,4 @@
-DESCRIPTION = "This is a simple example recipe that cross-compiles a Go program."
+SUMMARY = "This is a simple example recipe that cross-compiles a Go program."
 SECTION = "examples"
 HOMEPAGE = "https://golang.org/"
 

@@ -1,4 +1,4 @@
-DESCRIPTION = "Implements a XML/HTML/XHTML Markup safe string for Python"
+SUMMARY = "Implements a XML/HTML/XHTML Markup safe string for Python"
 HOMEPAGE = "http://github.com/mitsuhiko/markupsafe"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=ffeffa59c90c9c4a033c7574f8f3fb75"

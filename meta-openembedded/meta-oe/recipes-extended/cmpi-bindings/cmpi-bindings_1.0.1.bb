@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b19ee058d2d5f69af45da98051d91064"
 SECTION = "Development/Libraries"
 DEPENDS = "swig-native python3 sblim-cmpi-devel"
 
-SRC_URI = "git://github.com/kkaempf/cmpi-bindings.git;protocol=http;branch=master;protocol=https \
+SRC_URI = "git://github.com/kkaempf/cmpi-bindings.git;protocol=https;branch=master \
            file://cmpi-bindings-0.4.17-no-ruby-perl.patch \
            file://cmpi-bindings-0.4.17-sblim-sigsegv.patch \
            file://cmpi-bindings-0.9.5-python-lib-dir.patch \
