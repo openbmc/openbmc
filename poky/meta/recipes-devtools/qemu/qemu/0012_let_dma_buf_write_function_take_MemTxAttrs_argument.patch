@@ -1,0 +1,129 @@
+From 392e48af3468d7f8e49db33fdc9e28b5f99276ce Mon Sep 17 00:00:00 2001
+From: =?utf8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Wed, 15 Dec 2021 23:02:21 +0100
+Subject: [PATCH] dma: Let dma_buf_write() take MemTxAttrs argument
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+
+Let devices specify transaction attributes when calling
+dma_buf_write().
+
+Keep the default MEMTXATTRS_UNSPECIFIED in the few callers.
+
+CVE: CVE-2021-3611
+Upstream-Status: Backport [https://git.qemu.org/?p=qemu.git;a=commit;h=392e48af3468d7f8e49db33fdc9e28b5f99276ce]
+
+Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
+Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+Message-Id: <20211223115554.3155328-12-philmd@redhat.com>
+Signed-off-by: Bhabu Bindu <bhabu.bindu@kpit.com>
+---
+ hw/ide/ahci.c         | 6 ++++--
+ hw/nvme/ctrl.c        | 3 ++-
+ hw/scsi/megasas.c     | 2 +-
+ hw/scsi/scsi-bus.c    | 2 +-
+ include/sysemu/dma.h  | 2 +-
+ softmmu/dma-helpers.c | 5 ++---
+ 6 files changed, 11 insertions(+), 9 deletions(-)
+
+diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+index 8e77ddb..079d297 100644
+--- a/hw/ide/ahci.c
++++ b/hw/ide/ahci.c
+@@ -1381,8 +1381,10 @@ static void ahci_pio_transfer(const IDEDMA *dma)
+                             has_sglist ? "" : "o");
+ 
+     if (has_sglist && size) {
++        const MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
++
+         if (is_write) {
+-            dma_buf_write(s->data_ptr, size, &s->sg);
++            dma_buf_write(s->data_ptr, size, &s->sg, attrs);
+         } else {
+             dma_buf_read(s->data_ptr, size, &s->sg);
+         }
+@@ -1479,7 +1481,7 @@ static int ahci_dma_rw_buf(const IDEDMA *dma, bool is_write)
+     if (is_write) {
+         dma_buf_read(p, l, &s->sg);
+     } else {
+-        dma_buf_write(p, l, &s->sg);
++        dma_buf_write(p, l, &s->sg, MEMTXATTRS_UNSPECIFIED);
+     }
+ 
+     /* free sglist, update byte count */
+diff --git a/hw/nvme/ctrl.c b/hw/nvme/ctrl.c
+index 5f573c4..e1a531d 100644
+--- a/hw/nvme/ctrl.c
++++ b/hw/nvme/ctrl.c
+@@ -1146,10 +1146,11 @@ static uint16_t nvme_tx(NvmeCtrl *n, NvmeSg *sg, uint8_t *ptr, uint32_t len,
+     assert(sg->flags & NVME_SG_ALLOC);
+ 
+     if (sg->flags & NVME_SG_DMA) {
++        const MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
+         uint64_t residual;
+ 
+         if (dir == NVME_TX_DIRECTION_TO_DEVICE) {
+-            residual = dma_buf_write(ptr, len, &sg->qsg);
++            residual = dma_buf_write(ptr, len, &sg->qsg, attrs);
+         } else {
+             residual = dma_buf_read(ptr, len, &sg->qsg);
+         }
+diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+index 2dae33f..79fd14c 100644
+--- a/hw/scsi/megasas.c
++++ b/hw/scsi/megasas.c
+@@ -1465,7 +1465,7 @@ static int megasas_dcmd_set_properties(MegasasState *s, MegasasCmd *cmd)
+                                             dcmd_size);
+         return MFI_STAT_INVALID_PARAMETER;
+     }
+-    dma_buf_write(&info, dcmd_size, &cmd->qsg);
++    dma_buf_write(&info, dcmd_size, &cmd->qsg, MEMTXATTRS_UNSPECIFIED);
+     trace_megasas_dcmd_unsupported(cmd->index, cmd->iov_size);
+     return MFI_STAT_OK;
+ }
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index 77325d8..64a506a 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -1423,7 +1423,7 @@ void scsi_req_data(SCSIRequest *req, int len)
+     if (req->cmd.mode == SCSI_XFER_FROM_DEV) {
+         req->resid = dma_buf_read(buf, len, req->sg);
+     } else {
+-        req->resid = dma_buf_write(buf, len, req->sg);
++        req->resid = dma_buf_write(buf, len, req->sg, MEMTXATTRS_UNSPECIFIED);
+     }
+     scsi_req_continue(req);
+ }
+diff --git a/include/sysemu/dma.h b/include/sysemu/dma.h
+index 0d5b836..e3dd74a 100644
+--- a/include/sysemu/dma.h
++++ b/include/sysemu/dma.h
+@@ -303,7 +303,7 @@ BlockAIOCB *dma_blk_write(BlockBackend *blk,
+                           QEMUSGList *sg, uint64_t offset, uint32_t align,
+                           BlockCompletionFunc *cb, void *opaque);
+ uint64_t dma_buf_read(void *ptr, int32_t len, QEMUSGList *sg);
+-uint64_t dma_buf_write(void *ptr, int32_t len, QEMUSGList *sg);
++uint64_t dma_buf_write(void *ptr, int32_t len, QEMUSGList *sg, MemTxAttrs attrs);
+ 
+ void dma_acct_start(BlockBackend *blk, BlockAcctCookie *cookie,
+                     QEMUSGList *sg, enum BlockAcctType type);
+diff --git a/softmmu/dma-helpers.c b/softmmu/dma-helpers.c
+index fa81d2b..2f1a241 100644
+--- a/softmmu/dma-helpers.c
++++ b/softmmu/dma-helpers.c
+@@ -322,10 +322,9 @@ uint64_t dma_buf_read(void *ptr, int32_t len, QEMUSGList *sg)
+                       MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+-uint64_t dma_buf_write(void *ptr, int32_t len, QEMUSGList *sg)
++uint64_t dma_buf_write(void *ptr, int32_t len, QEMUSGList *sg, MemTxAttrs attrs)
+ {
+-    return dma_buf_rw(ptr, len, sg, DMA_DIRECTION_TO_DEVICE,
+-                      MEMTXATTRS_UNSPECIFIED);
++    return dma_buf_rw(ptr, len, sg, DMA_DIRECTION_TO_DEVICE, attrs);
+ }
+ 
+ void dma_acct_start(BlockBackend *blk, BlockAcctCookie *cookie,
+-- 
+1.8.3.1

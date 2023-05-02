@@ -265,3 +265,6 @@ Miscellaneous changes
   when parsing recipes. Any code depending on the previous behaviour will no longer
   work - change any such code to explicitly use appropriate path variables instead.
 
+- In order to exclude the kernel image from the image rootfs,
+  :term:`RRECOMMENDS`\ ``:${KERNEL_PACKAGE_NAME}-base`` should be set instead of
+  :term:`RDEPENDS`\ ``:${KERNEL_PACKAGE_NAME}-base``.

@@ -1,0 +1,65 @@
+From 959384e74e1b508acc3af6e806b3d7b87335fc2a Mon Sep 17 00:00:00 2001
+From: =?utf8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Wed, 15 Dec 2021 22:59:46 +0100
+Subject: [PATCH] dma: Let dma_buf_rw() take MemTxAttrs argument
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+
+Let devices specify transaction attributes when calling dma_buf_rw().
+
+Keep the default MEMTXATTRS_UNSPECIFIED in the 2 callers.
+
+CVE: CVE-2021-3611
+Upstream-Status: Backport [https://git.qemu.org/?p=qemu.git;a=commit;h=959384e74e1b508acc3af6e806b3d7b87335fc2a]
+
+Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
+Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+Message-Id: <20211223115554.3155328-11-philmd@redhat.com>
+Signed-off-by: Bhabu Bindu <bhabu.bindu@kpit.com>
+---
+ softmmu/dma-helpers.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/softmmu/dma-helpers.c b/softmmu/dma-helpers.c
+index 7f37548..fa81d2b 100644
+--- a/softmmu/dma-helpers.c
++++ b/softmmu/dma-helpers.c
+@@ -295,7 +295,7 @@ BlockAIOCB *dma_blk_write(BlockBackend *blk,
+ 
+ 
+ static uint64_t dma_buf_rw(void *buf, int32_t len, QEMUSGList *sg,
+-                           DMADirection dir)
++                           DMADirection dir, MemTxAttrs attrs)
+ {
+     uint8_t *ptr = buf;
+     uint64_t resid;
+@@ -307,8 +307,7 @@ static uint64_t dma_buf_rw(void *buf, int32_t len, QEMUSGList *sg,
+     while (len > 0) {
+         ScatterGatherEntry entry = sg->sg[sg_cur_index++];
+         int32_t xfer = MIN(len, entry.len);
+-        dma_memory_rw(sg->as, entry.base, ptr, xfer, dir,
+-                      MEMTXATTRS_UNSPECIFIED);
++        dma_memory_rw(sg->as, entry.base, ptr, xfer, dir, attrs);
+         ptr += xfer;
+         len -= xfer;
+         resid -= xfer;
+@@ -319,12 +318,14 @@ static uint64_t dma_buf_rw(void *buf, int32_t len, QEMUSGList *sg,
+ 
+ uint64_t dma_buf_read(void *ptr, int32_t len, QEMUSGList *sg)
+ {
+-    return dma_buf_rw(ptr, len, sg, DMA_DIRECTION_FROM_DEVICE);
++    return dma_buf_rw(ptr, len, sg, DMA_DIRECTION_FROM_DEVICE,
++                      MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ uint64_t dma_buf_write(void *ptr, int32_t len, QEMUSGList *sg)
+ {
+-    return dma_buf_rw(ptr, len, sg, DMA_DIRECTION_TO_DEVICE);
++    return dma_buf_rw(ptr, len, sg, DMA_DIRECTION_TO_DEVICE,
++                      MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ void dma_acct_start(BlockBackend *blk, BlockAcctCookie *cookie,
+-- 
+1.8.3.1

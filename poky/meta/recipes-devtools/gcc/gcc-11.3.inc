@@ -48,7 +48,6 @@ SRC_URI = "\
            file://0016-If-CXXFLAGS-contains-something-unsupported-by-the-bu.patch \
            file://0017-handle-sysroot-support-for-nativesdk-gcc.patch \
            file://0018-Search-target-sysroot-gcc-version-specific-dirs-with.patch \
-           file://0019-nios2-Define-MUSL_DYNAMIC_LINKER.patch \
            file://0020-Add-ssp_nonshared-to-link-commandline-for-musl-targe.patch \
            file://0021-Link-libgcc-using-LDFLAGS-not-just-SHLIB_LDFLAGS.patch \
            file://0022-sync-gcc-stddef.h-with-musl.patch \

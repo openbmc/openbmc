@@ -117,7 +117,7 @@ scons_do_install() {
 
     # install mongo data folder
     install -m 755 -d ${D}${localstatedir}/lib/${BPN}
-    chown ${PN}:${PN} ${D}${localstatedir}/lib/${BPN}
+    chown ${BPN}:${BPN} ${D}${localstatedir}/lib/${BPN}
 
     # Create /var/log/mongodb in runtime.
     if [ "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}" ]; then

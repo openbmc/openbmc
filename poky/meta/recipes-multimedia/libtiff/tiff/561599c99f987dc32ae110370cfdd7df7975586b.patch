@@ -1,4 +1,4 @@
-From 561599c99f987dc32ae110370cfdd7df7975586b Mon Sep 17 00:00:00 2001
+From 7b91458541769f3d7eddc55a39d01730af2489fc Mon Sep 17 00:00:00 2001
 From: Even Rouault <even.rouault@spatialys.com>
 Date: Sat, 5 Feb 2022 20:36:41 +0100
 Subject: [PATCH] TIFFReadDirectory(): avoid calling memcpy() with a null
@@ -12,10 +12,10 @@ CVE: CVE-2022-0562
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/libtiff/tif_dirread.c b/libtiff/tif_dirread.c
-index 2bbc4585..23194ced 100644
+index d84147a..ae52ad4 100644
 --- a/libtiff/tif_dirread.c
 +++ b/libtiff/tif_dirread.c
-@@ -4177,7 +4177,8 @@ TIFFReadDirectory(TIFF* tif)
+@@ -4173,7 +4173,8 @@ TIFFReadDirectory(TIFF* tif)
                      goto bad;
                  }
  
@@ -25,6 +25,3 @@ index 2bbc4585..23194ced 100644
                  _TIFFsetShortArray(&tif->tif_dir.td_sampleinfo, new_sampleinfo, tif->tif_dir.td_extrasamples);
                  _TIFFfree(new_sampleinfo);
          }
--- 
-GitLab
-

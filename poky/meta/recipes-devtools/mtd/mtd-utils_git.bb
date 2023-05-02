@@ -11,9 +11,9 @@ inherit autotools pkgconfig update-alternatives
 DEPENDS = "zlib e2fsprogs util-linux"
 RDEPENDS:mtd-utils-tests += "bash"
 
-PV = "2.1.4"
+PV = "2.1.5"
 
-SRCREV = "c7f1bfa44a84d02061787e2f6093df5cc40b9f5c"
+SRCREV = "3f3b4cc6c3120107e7aaa21c6415772a255ac49c"
 SRC_URI = "git://git.infradead.org/mtd-utils.git;branch=master \
            file://add-exclusion-to-mkfs-jffs2-git-2.patch \
            "

@@ -43,10 +43,10 @@ Signed-off-by: Ruiqiang Hao <Ruiqiang.Hao@windriver.com>
  gcc/testsuite/lib/target-supports.exp     |  3 ++-
  9 files changed, 79 insertions(+), 8 deletions(-)
 
-diff --git a/gcc/config/arm/arm-cpus.in b/gcc/config/arm/arm-cpus.in
-index bcc9ebe9f..58d83829c 100644
---- a/gcc/config/arm/arm-cpus.in
-+++ b/gcc/config/arm/arm-cpus.in
+Index: gcc-11.3.0/gcc/config/arm/arm-cpus.in
+===================================================================
+--- gcc-11.3.0.orig/gcc/config/arm/arm-cpus.in
++++ gcc-11.3.0/gcc/config/arm/arm-cpus.in
 @@ -132,6 +132,9 @@ define feature cmse
  # Architecture rel 8.1-M.
  define feature armv8_1m_main
@@ -57,7 +57,7 @@ index bcc9ebe9f..58d83829c 100644
  # Floating point and Neon extensions.
  # VFPv1 is not supported in GCC.
  
-@@ -293,6 +296,7 @@ define fgroup ARMv8m_base ARMv6m armv8 cmse tdiv
+@@ -293,6 +296,7 @@ define fgroup ARMv8m_base ARMv6m armv8 c
  define fgroup ARMv8m_main ARMv7m armv8 cmse
  define fgroup ARMv8r      ARMv8a
  define fgroup ARMv8_1m_main ARMv8m_main armv8_1m_main
@@ -87,10 +87,10 @@ index bcc9ebe9f..58d83829c 100644
  begin arch iwmmxt
   tune for iwmmxt
   tune flags LDSCHED STRONG XSCALE
-diff --git a/gcc/config/arm/arm-tables.opt b/gcc/config/arm/arm-tables.opt
-index 5692d4fb7..ae3dd9414 100644
---- a/gcc/config/arm/arm-tables.opt
-+++ b/gcc/config/arm/arm-tables.opt
+Index: gcc-11.3.0/gcc/config/arm/arm-tables.opt
+===================================================================
+--- gcc-11.3.0.orig/gcc/config/arm/arm-tables.opt
++++ gcc-11.3.0/gcc/config/arm/arm-tables.opt
 @@ -380,10 +380,13 @@ EnumValue
  Enum(arm_arch) String(armv8.1-m.main) Value(30)
  
@@ -107,10 +107,10 @@ index 5692d4fb7..ae3dd9414 100644
  
  Enum
  Name(arm_fpu) Type(enum fpu_type)
-diff --git a/gcc/config/arm/arm.h b/gcc/config/arm/arm.h
-index 47c13a9e5..088c7725c 100644
---- a/gcc/config/arm/arm.h
-+++ b/gcc/config/arm/arm.h
+Index: gcc-11.3.0/gcc/config/arm/arm.h
+===================================================================
+--- gcc-11.3.0.orig/gcc/config/arm/arm.h
++++ gcc-11.3.0/gcc/config/arm/arm.h
 @@ -456,7 +456,8 @@ enum base_architecture
    BASE_ARCH_8A = 8,
    BASE_ARCH_8M_BASE = 8,
@@ -121,10 +121,10 @@ index 47c13a9e5..088c7725c 100644
  };
  
  /* The major revision number of the ARM Architecture implemented by the target.  */
-diff --git a/gcc/config/arm/t-aprofile b/gcc/config/arm/t-aprofile
-index 8574ac3e2..68e2251c7 100644
---- a/gcc/config/arm/t-aprofile
-+++ b/gcc/config/arm/t-aprofile
+Index: gcc-11.3.0/gcc/config/arm/t-aprofile
+===================================================================
+--- gcc-11.3.0.orig/gcc/config/arm/t-aprofile
++++ gcc-11.3.0/gcc/config/arm/t-aprofile
 @@ -26,8 +26,8 @@
  
  # Arch and FPU variants to build libraries with
@@ -136,7 +136,7 @@ index 8574ac3e2..68e2251c7 100644
  
  # ARMv7-A - build nofp, fp-d16 and SIMD variants
  
-@@ -46,6 +46,11 @@ MULTILIB_REQUIRED	+= mthumb/march=armv8-a/mfloat-abi=soft
+@@ -46,6 +46,11 @@ MULTILIB_REQUIRED	+= mthumb/march=armv8-
  MULTILIB_REQUIRED	+= mthumb/march=armv8-a+simd/mfloat-abi=hard
  MULTILIB_REQUIRED	+= mthumb/march=armv8-a+simd/mfloat-abi=softfp
  
@@ -148,7 +148,7 @@ index 8574ac3e2..68e2251c7 100644
  # Matches
  
  # Arch Matches
-@@ -129,17 +134,29 @@ MULTILIB_MATCHES	+= march?armv8-a=march?armv8.6-a
+@@ -129,17 +134,29 @@ MULTILIB_MATCHES	+= march?armv8-a=march?
  MULTILIB_MATCHES	+= $(foreach ARCH, $(v8_6_a_simd_variants), \
  			     march?armv8-a+simd=march?armv8.6-a$(ARCH))
  
@@ -180,11 +180,11 @@ index 8574ac3e2..68e2251c7 100644
 -			     $(foreach ARCH, armv7-a armv8-a, \
 +			     $(foreach ARCH, armv7-a armv8-a armv9-a, \
  			       mthumb/march.$(ARCH)/mfloat-abi.soft=m$(MODE)/march.$(ARCH)/mfloat-abi.softfp))
-diff --git a/gcc/config/arm/t-arm-elf b/gcc/config/arm/t-arm-elf
-index d68def308..b3a900e8c 100644
---- a/gcc/config/arm/t-arm-elf
-+++ b/gcc/config/arm/t-arm-elf
-@@ -38,6 +38,8 @@ v7ve_fps	:= vfpv3-d16 vfpv3 vfpv3-d16-fp16 vfpv3-fp16 vfpv4 neon \
+Index: gcc-11.3.0/gcc/config/arm/t-arm-elf
+===================================================================
+--- gcc-11.3.0.orig/gcc/config/arm/t-arm-elf
++++ gcc-11.3.0/gcc/config/arm/t-arm-elf
+@@ -38,6 +38,8 @@ v7ve_fps	:= vfpv3-d16 vfpv3 vfpv3-d16-fp
  # it seems to work ok.
  v8_fps		:= simd fp16 crypto fp16+crypto dotprod fp16fml
  
@@ -202,7 +202,7 @@ index d68def308..b3a900e8c 100644
  # No floating point variants, require thumb1 softfp
  all_nofp_t	:= armv6-m armv6s-m armv8-m.base
  
-@@ -110,6 +114,11 @@ MULTILIB_MATCHES     += $(foreach ARCH, $(all_v8_archs), \
+@@ -110,6 +114,11 @@ MULTILIB_MATCHES     += $(foreach ARCH,
  			  $(foreach FPARCH, $(v8_fps), \
  			    march?armv7+fp=march?$(ARCH)+$(FPARCH)))
  
@@ -214,11 +214,11 @@ index d68def308..b3a900e8c 100644
  MULTILIB_MATCHES     += $(foreach ARCH, armv7e-m armv8-m.mainline, \
  			  march?armv7+fp=march?$(ARCH)+fp.dp)
  
-diff --git a/gcc/config/arm/t-multilib b/gcc/config/arm/t-multilib
-index ddc5033bf..d789b86ee 100644
---- a/gcc/config/arm/t-multilib
-+++ b/gcc/config/arm/t-multilib
-@@ -78,6 +78,8 @@ v8_4_a_simd_variants	:= $(call all_feat_combs, simd fp16 crypto i8mm bf16)
+Index: gcc-11.3.0/gcc/config/arm/t-multilib
+===================================================================
+--- gcc-11.3.0.orig/gcc/config/arm/t-multilib
++++ gcc-11.3.0/gcc/config/arm/t-multilib
+@@ -78,6 +78,8 @@ v8_4_a_simd_variants	:= $(call all_feat_
  v8_5_a_simd_variants	:= $(call all_feat_combs, simd fp16 crypto i8mm bf16)
  v8_6_a_simd_variants	:= $(call all_feat_combs, simd fp16 crypto i8mm bf16)
  v8_r_nosimd_variants	:= +crc
@@ -227,7 +227,7 @@ index ddc5033bf..d789b86ee 100644
  
  ifneq (,$(HAS_APROFILE))
  include $(srcdir)/config/arm/t-aprofile
-@@ -202,6 +204,16 @@ MULTILIB_MATCHES	+= march?armv7=march?armv8.6-a
+@@ -202,6 +204,16 @@ MULTILIB_MATCHES	+= march?armv7=march?ar
  MULTILIB_MATCHES	+= $(foreach ARCH, $(v8_6_a_simd_variants), \
  			     march?armv7+fp=march?armv8.6-a$(ARCH))
  
@@ -244,10 +244,10 @@ index ddc5033bf..d789b86ee 100644
  endif		# Not APROFILE.
  
  # Use Thumb libraries for everything.
-diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
-index 7184a62d0..9a712c0d6 100644
---- a/gcc/doc/invoke.texi
-+++ b/gcc/doc/invoke.texi
+Index: gcc-11.3.0/gcc/doc/invoke.texi
+===================================================================
+--- gcc-11.3.0.orig/gcc/doc/invoke.texi
++++ gcc-11.3.0/gcc/doc/invoke.texi
 @@ -19701,6 +19701,7 @@ Permissible names are:
  @samp{armv7-m}, @samp{armv7e-m},
  @samp{armv8-m.base}, @samp{armv8-m.main},
@@ -256,10 +256,10 @@ index 7184a62d0..9a712c0d6 100644
  @samp{iwmmxt} and @samp{iwmmxt2}.
  
  Additionally, the following architectures, which lack support for the
-diff --git a/gcc/testsuite/gcc.target/arm/multilib.exp b/gcc/testsuite/gcc.target/arm/multilib.exp
-index 4b30025db..e3f06c316 100644
---- a/gcc/testsuite/gcc.target/arm/multilib.exp
-+++ b/gcc/testsuite/gcc.target/arm/multilib.exp
+Index: gcc-11.3.0/gcc/testsuite/gcc.target/arm/multilib.exp
+===================================================================
+--- gcc-11.3.0.orig/gcc/testsuite/gcc.target/arm/multilib.exp
++++ gcc-11.3.0/gcc/testsuite/gcc.target/arm/multilib.exp
 @@ -135,6 +135,14 @@ if {[multilib_config "aprofile"] } {
  	{-march=armv8.6-a+simd+fp16 -mfloat-abi=softfp} "thumb/v8-a+simd/softfp"
  	{-march=armv8.6-a+simd+fp16+nofp -mfloat-abi=softfp} "thumb/v8-a/nofp"
@@ -275,10 +275,10 @@ index 4b30025db..e3f06c316 100644
  	{-mcpu=cortex-a53+crypto -mfloat-abi=hard} "thumb/v8-a+simd/hard"
  	{-mcpu=cortex-a53+nofp -mfloat-abi=softfp} "thumb/v8-a/nofp"
  	{-march=armv8-a+crc -mfloat-abi=hard -mfpu=vfp} "thumb/v8-a+simd/hard"
-diff --git a/gcc/testsuite/lib/target-supports.exp b/gcc/testsuite/lib/target-supports.exp
-index 857e57218..52e043917 100644
---- a/gcc/testsuite/lib/target-supports.exp
-+++ b/gcc/testsuite/lib/target-supports.exp
+Index: gcc-11.3.0/gcc/testsuite/lib/target-supports.exp
+===================================================================
+--- gcc-11.3.0.orig/gcc/testsuite/lib/target-supports.exp
++++ gcc-11.3.0/gcc/testsuite/lib/target-supports.exp
 @@ -4820,7 +4820,8 @@ foreach { armfunc armflag armdefs } {
  	v8m_base "-march=armv8-m.base -mthumb -mfloat-abi=soft"
  		__ARM_ARCH_8M_BASE__
@@ -289,6 +289,3 @@ index 857e57218..52e043917 100644
      eval [string map [list FUNC $armfunc FLAG $armflag DEFS $armdefs ] {
  	proc check_effective_target_arm_arch_FUNC_ok { } {
  	    return [check_no_compiler_messages arm_arch_FUNC_ok assembly {
--- 
-2.34.1
-

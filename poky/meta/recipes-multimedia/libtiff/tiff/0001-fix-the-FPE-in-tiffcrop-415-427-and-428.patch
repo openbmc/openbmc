@@ -1,4 +1,4 @@
-From 029da2cf70e8e38f10d62d4b0be440fb9d145af0 Mon Sep 17 00:00:00 2001
+From 6cfe933df4dbac5479801b2bd10103ef7db815ee Mon Sep 17 00:00:00 2001
 From: 4ugustus <wangdw.augustus@qq.com>
 Date: Sat, 11 Jun 2022 09:31:43 +0000
 Subject: [PATCH] fix the FPE in tiffcrop (#415, #427, and #428)

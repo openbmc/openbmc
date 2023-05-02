@@ -10,7 +10,7 @@ def bad_runtime_vars(cfgdata, d):
     for var in d.getVar("__recipe_sanity_badruntimevars").split():
         val = d.getVar(var, False)
         if val and val != cfgdata.get(var):
-            __note("%s should be %s_${PN}" % (var, var), d)
+            __note("%s should be %s:${PN}" % (var, var), d)
 
 __recipe_sanity_reqvars = "DESCRIPTION"
 __recipe_sanity_reqdiffvars = ""

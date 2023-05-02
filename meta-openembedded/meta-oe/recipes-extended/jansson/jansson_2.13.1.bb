@@ -11,4 +11,7 @@ SRC_URI[sha256sum] = "f4f377da17b10201a60c1108613e78ee15df6b12016b116b6de42209f4
 
 inherit autotools pkgconfig
 
+# upstream considers it isn't a real bug https://github.com/akheron/jansson/issues/548
+CVE_CHECK_IGNORE = "CVE-2020-36325 "
+
 BBCLASSEXTEND = "native"

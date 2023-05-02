@@ -12,16 +12,18 @@ Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
 Signed-off-by: Alejandro Hernandez Samaniego <alejandro@enedino.org>
+Refresh for 3.10.7:
+Signed-off-by: Tim Orling <tim.orling@konsulko.com>
 
 ---
  setup.py | 8 ++++++++
  1 file changed, 8 insertions(+)
 
 diff --git a/setup.py b/setup.py
-index 2be4738..62f0e18 100644
+index 85a2b26357..7605347bf5 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -517,6 +517,14 @@ class PyBuildExt(build_ext):
+@@ -517,6 +517,14 @@ def print_three_column(lst):
                  print("%-*s   %-*s   %-*s" % (longest, e, longest, f,
                                                longest, g))
  
@@ -35,4 +37,4 @@ index 2be4738..62f0e18 100644
 +
          if self.missing:
              print()
-             print("Python build finished successfully!")
+             print("The necessary bits to build these optional modules were not "

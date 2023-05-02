@@ -1,0 +1,296 @@
+From 4a63054bce23982b99f4d3c65528e47e614086b2 Mon Sep 17 00:00:00 2001
+From: =?utf8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Fri, 17 Dec 2021 23:49:30 +0100
+Subject: [PATCH] pci: Let ld*_pci_dma() propagate MemTxResult
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+
+ld*_dma() returns a MemTxResult type. Do not discard
+it, return it to the caller.
+
+Update the few callers.
+
+CVE: CVE-2021-3611
+Upstream-Status: Backport [https://git.qemu.org/?p=qemu.git;a=commit;h=4a63054bce23982b99f4d3c65528e47e614086b2]
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+Message-Id: <20211223115554.3155328-24-philmd@redhat.com>
+Signed-off-by: Bhabu Bindu <bhabu.bindu@kpit.com>
+---
+ hw/audio/intel-hda.c |  2 +-
+ hw/net/eepro100.c    | 25 ++++++++++---------------
+ hw/net/tulip.c       | 16 ++++++++--------
+ hw/scsi/megasas.c    | 21 ++++++++++++---------
+ hw/scsi/mptsas.c     | 16 +++++++++++-----
+ hw/scsi/vmw_pvscsi.c | 16 ++++++++++------
+ include/hw/pci/pci.h | 17 ++++++++---------
+ 7 files changed, 60 insertions(+), 53 deletions(-)
+
+diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
+index e34b7ab..2b55d52 100644
+--- a/hw/audio/intel-hda.c
++++ b/hw/audio/intel-hda.c
+@@ -335,7 +335,7 @@ static void intel_hda_corb_run(IntelHDAState *d)
+ 
+         rp = (d->corb_rp + 1) & 0xff;
+         addr = intel_hda_addr(d->corb_lbase, d->corb_ubase);
+-        verb = ldl_le_pci_dma(&d->pci, addr + 4 * rp, MEMTXATTRS_UNSPECIFIED);
++        ldl_le_pci_dma(&d->pci, addr + 4 * rp, &verb, MEMTXATTRS_UNSPECIFIED);
+         d->corb_rp = rp;
+ 
+         dprint(d, 2, "%s: [rp 0x%x] verb 0x%08x\n", __func__, rp, verb);
+diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
+index eb82e9c..679f52f 100644
+--- a/hw/net/eepro100.c
++++ b/hw/net/eepro100.c
+@@ -769,18 +769,16 @@ static void tx_command(EEPRO100State *s)
+     } else {
+         /* Flexible mode. */
+         uint8_t tbd_count = 0;
++        uint32_t tx_buffer_address;
++        uint16_t tx_buffer_size;
++        uint16_t tx_buffer_el;
++
+         if (s->has_extended_tcb_support && !(s->configuration[6] & BIT(4))) {
+             /* Extended Flexible TCB. */
+             for (; tbd_count < 2; tbd_count++) {
+-                uint32_t tx_buffer_address = ldl_le_pci_dma(&s->dev,
+-                                                            tbd_address,
+-                                                            attrs);
+-                uint16_t tx_buffer_size = lduw_le_pci_dma(&s->dev,
+-                                                          tbd_address + 4,
+-                                                          attrs);
+-                uint16_t tx_buffer_el = lduw_le_pci_dma(&s->dev,
+-                                                        tbd_address + 6,
+-                                                        attrs);
++                ldl_le_pci_dma(&s->dev, tbd_address, &tx_buffer_address, attrs);
++                lduw_le_pci_dma(&s->dev, tbd_address + 4, &tx_buffer_size, attrs);
++                lduw_le_pci_dma(&s->dev, tbd_address + 6, &tx_buffer_el, attrs);
+                 tbd_address += 8;
+                 TRACE(RXTX, logout
+                     ("TBD (extended flexible mode): buffer address 0x%08x, size 0x%04x\n",
+@@ -796,12 +794,9 @@ static void tx_command(EEPRO100State *s)
+         }
+         tbd_address = tbd_array;
+         for (; tbd_count < s->tx.tbd_count; tbd_count++) {
+-            uint32_t tx_buffer_address = ldl_le_pci_dma(&s->dev, tbd_address,
+-                                                        attrs);
+-            uint16_t tx_buffer_size = lduw_le_pci_dma(&s->dev, tbd_address + 4,
+-                                                      attrs);
+-            uint16_t tx_buffer_el = lduw_le_pci_dma(&s->dev, tbd_address + 6,
+-                                                    attrs);
++            ldl_le_pci_dma(&s->dev, tbd_address, &tx_buffer_address, attrs);
++            lduw_le_pci_dma(&s->dev, tbd_address + 4, &tx_buffer_size, attrs);
++            lduw_le_pci_dma(&s->dev, tbd_address + 6, &tx_buffer_el, attrs);
+             tbd_address += 8;
+             TRACE(RXTX, logout
+                 ("TBD (flexible mode): buffer address 0x%08x, size 0x%04x\n",
+diff --git a/hw/net/tulip.c b/hw/net/tulip.c
+index c76e486..d5b6cc5 100644
+--- a/hw/net/tulip.c
++++ b/hw/net/tulip.c
+@@ -73,15 +73,15 @@ static void tulip_desc_read(TULIPState *s, hwaddr p,
+     const MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
+ 
+     if (s->csr[0] & CSR0_DBO) {
+-        desc->status = ldl_be_pci_dma(&s->dev, p, attrs);
+-        desc->control = ldl_be_pci_dma(&s->dev, p + 4, attrs);
+-        desc->buf_addr1 = ldl_be_pci_dma(&s->dev, p + 8, attrs);
+-        desc->buf_addr2 = ldl_be_pci_dma(&s->dev, p + 12, attrs);
++        ldl_be_pci_dma(&s->dev, p, &desc->status, attrs);
++        ldl_be_pci_dma(&s->dev, p + 4, &desc->control, attrs);
++        ldl_be_pci_dma(&s->dev, p + 8, &desc->buf_addr1, attrs);
++        ldl_be_pci_dma(&s->dev, p + 12, &desc->buf_addr2, attrs);
+     } else {
+-        desc->status = ldl_le_pci_dma(&s->dev, p, attrs);
+-        desc->control = ldl_le_pci_dma(&s->dev, p + 4, attrs);
+-        desc->buf_addr1 = ldl_le_pci_dma(&s->dev, p + 8, attrs);
+-        desc->buf_addr2 = ldl_le_pci_dma(&s->dev, p + 12, attrs);
++        ldl_le_pci_dma(&s->dev, p, &desc->status, attrs);
++        ldl_le_pci_dma(&s->dev, p + 4, &desc->control, attrs);
++        ldl_le_pci_dma(&s->dev, p + 8, &desc->buf_addr1, attrs);
++        ldl_le_pci_dma(&s->dev, p + 12, &desc->buf_addr2, attrs);
+     }
+ }
+ 
+diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+index 98b1370..dc9bbdb 100644
+--- a/hw/scsi/megasas.c
++++ b/hw/scsi/megasas.c
+@@ -202,9 +202,12 @@ static uint64_t megasas_frame_get_context(MegasasState *s,
+                                           unsigned long frame)
+ {
+     PCIDevice *pci = &s->parent_obj;
+-    return ldq_le_pci_dma(pci,
+-                          frame + offsetof(struct mfi_frame_header, context),
+-                          MEMTXATTRS_UNSPECIFIED);
++    uint64_t val;
++
++    ldq_le_pci_dma(pci, frame + offsetof(struct mfi_frame_header, context),
++                   &val, MEMTXATTRS_UNSPECIFIED);
++
++    return val;
+ }
+ 
+ static bool megasas_frame_is_ieee_sgl(MegasasCmd *cmd)
+@@ -536,8 +539,8 @@ static MegasasCmd *megasas_enqueue_frame(MegasasState *s,
+     s->busy++;
+ 
+     if (s->consumer_pa) {
+-        s->reply_queue_tail = ldl_le_pci_dma(pcid, s->consumer_pa,
+-                                             MEMTXATTRS_UNSPECIFIED);
++        ldl_le_pci_dma(pcid, s->consumer_pa, &s->reply_queue_tail,
++                       MEMTXATTRS_UNSPECIFIED);
+     }
+     trace_megasas_qf_enqueue(cmd->index, cmd->count, cmd->context,
+                              s->reply_queue_head, s->reply_queue_tail, s->busy);
+@@ -568,14 +571,14 @@ static void megasas_complete_frame(MegasasState *s, uint64_t context)
+             stl_le_pci_dma(pci_dev, s->reply_queue_pa + queue_offset,
+                            context, attrs);
+         }
+-        s->reply_queue_tail = ldl_le_pci_dma(pci_dev, s->consumer_pa, attrs);
++        ldl_le_pci_dma(pci_dev, s->consumer_pa, &s->reply_queue_tail, attrs);
+         trace_megasas_qf_complete(context, s->reply_queue_head,
+                                   s->reply_queue_tail, s->busy);
+     }
+ 
+     if (megasas_intr_enabled(s)) {
+         /* Update reply queue pointer */
+-        s->reply_queue_tail = ldl_le_pci_dma(pci_dev, s->consumer_pa, attrs);
++        ldl_le_pci_dma(pci_dev, s->consumer_pa, &s->reply_queue_tail, attrs);
+         tail = s->reply_queue_head;
+         s->reply_queue_head = megasas_next_index(s, tail, s->fw_cmds);
+         trace_megasas_qf_update(s->reply_queue_head, s->reply_queue_tail,
+@@ -679,9 +682,9 @@ static int megasas_init_firmware(MegasasState *s, MegasasCmd *cmd)
+     pa_lo = le32_to_cpu(initq->pi_addr_lo);
+     pa_hi = le32_to_cpu(initq->pi_addr_hi);
+     s->producer_pa = ((uint64_t) pa_hi << 32) | pa_lo;
+-    s->reply_queue_head = ldl_le_pci_dma(pcid, s->producer_pa, attrs);
++    ldl_le_pci_dma(pcid, s->producer_pa, &s->reply_queue_head, attrs);
+     s->reply_queue_head %= MEGASAS_MAX_FRAMES;
+-    s->reply_queue_tail = ldl_le_pci_dma(pcid, s->consumer_pa, attrs);
++    ldl_le_pci_dma(pcid, s->consumer_pa, &s->reply_queue_tail, attrs);
+     s->reply_queue_tail %= MEGASAS_MAX_FRAMES;
+     flags = le32_to_cpu(initq->flags);
+     if (flags & MFI_QUEUE_FLAG_CONTEXT64) {
+diff --git a/hw/scsi/mptsas.c b/hw/scsi/mptsas.c
+index ac9f4df..5181b0c 100644
+--- a/hw/scsi/mptsas.c
++++ b/hw/scsi/mptsas.c
+@@ -177,10 +177,16 @@ static dma_addr_t mptsas_ld_sg_base(MPTSASState *s, uint32_t flags_and_length,
+     dma_addr_t addr;
+ 
+     if (flags_and_length & MPI_SGE_FLAGS_64_BIT_ADDRESSING) {
+-        addr = ldq_le_pci_dma(pci, *sgaddr + 4, attrs);
++        uint64_t addr64;
++
++        ldq_le_pci_dma(pci, *sgaddr + 4, &addr64, attrs);
++        addr = addr64;
+         *sgaddr += 12;
+     } else {
+-        addr = ldl_le_pci_dma(pci, *sgaddr + 4, attrs);
++        uint32_t addr32;
++
++        ldl_le_pci_dma(pci, *sgaddr + 4, &addr32, attrs);
++        addr = addr32;
+         *sgaddr += 8;
+     }
+     return addr;
+@@ -204,7 +210,7 @@ static int mptsas_build_sgl(MPTSASState *s, MPTSASRequest *req, hwaddr addr)
+         dma_addr_t addr, len;
+         uint32_t flags_and_length;
+ 
+-        flags_and_length = ldl_le_pci_dma(pci, sgaddr, MEMTXATTRS_UNSPECIFIED);
++        ldl_le_pci_dma(pci, sgaddr, &flags_and_length, MEMTXATTRS_UNSPECIFIED);
+         len = flags_and_length & MPI_SGE_LENGTH_MASK;
+         if ((flags_and_length & MPI_SGE_FLAGS_ELEMENT_TYPE_MASK)
+             != MPI_SGE_FLAGS_SIMPLE_ELEMENT ||
+@@ -235,8 +241,8 @@ static int mptsas_build_sgl(MPTSASState *s, MPTSASRequest *req, hwaddr addr)
+                 break;
+             }
+ 
+-            flags_and_length = ldl_le_pci_dma(pci, next_chain_addr,
+-                                              MEMTXATTRS_UNSPECIFIED);
++            ldl_le_pci_dma(pci, next_chain_addr, &flags_and_length,
++                           MEMTXATTRS_UNSPECIFIED);
+             if ((flags_and_length & MPI_SGE_FLAGS_ELEMENT_TYPE_MASK)
+                 != MPI_SGE_FLAGS_CHAIN_ELEMENT) {
+                 return MPI_IOCSTATUS_INVALID_SGL;
+diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
+index 33e16f9..4d9969f 100644
+--- a/hw/scsi/vmw_pvscsi.c
++++ b/hw/scsi/vmw_pvscsi.c
+@@ -50,10 +50,10 @@
+ #define PVSCSI_MAX_CMD_DATA_WORDS \
+     (sizeof(PVSCSICmdDescSetupRings)/sizeof(uint32_t))
+ 
+-#define RS_GET_FIELD(m, field) \
+-    (ldl_le_pci_dma(&container_of(m, PVSCSIState, rings)->parent_obj, \
++#define RS_GET_FIELD(pval, m, field) \
++    ldl_le_pci_dma(&container_of(m, PVSCSIState, rings)->parent_obj, \
+                  (m)->rs_pa + offsetof(struct PVSCSIRingsState, field), \
+-                 MEMTXATTRS_UNSPECIFIED))
++                 pval, MEMTXATTRS_UNSPECIFIED)
+ #define RS_SET_FIELD(m, field, val) \
+     (stl_le_pci_dma(&container_of(m, PVSCSIState, rings)->parent_obj, \
+                  (m)->rs_pa + offsetof(struct PVSCSIRingsState, field), val, \
+@@ -249,10 +249,11 @@ pvscsi_ring_cleanup(PVSCSIRingInfo *mgr)
+ static hwaddr
+ pvscsi_ring_pop_req_descr(PVSCSIRingInfo *mgr)
+ {
+-    uint32_t ready_ptr = RS_GET_FIELD(mgr, reqProdIdx);
++    uint32_t ready_ptr;
+     uint32_t ring_size = PVSCSI_MAX_NUM_PAGES_REQ_RING
+                             * PVSCSI_MAX_NUM_REQ_ENTRIES_PER_PAGE;
+ 
++    RS_GET_FIELD(&ready_ptr, mgr, reqProdIdx);
+     if (ready_ptr != mgr->consumed_ptr
+         && ready_ptr - mgr->consumed_ptr < ring_size) {
+         uint32_t next_ready_ptr =
+@@ -323,8 +324,11 @@ pvscsi_ring_flush_cmp(PVSCSIRingInfo *mgr)
+ static bool
+ pvscsi_ring_msg_has_room(PVSCSIRingInfo *mgr)
+ {
+-    uint32_t prodIdx = RS_GET_FIELD(mgr, msgProdIdx);
+-    uint32_t consIdx = RS_GET_FIELD(mgr, msgConsIdx);
++    uint32_t prodIdx;
++    uint32_t consIdx;
++
++    RS_GET_FIELD(&prodIdx, mgr, msgProdIdx);
++    RS_GET_FIELD(&consIdx, mgr, msgConsIdx);
+ 
+     return (prodIdx - consIdx) < (mgr->msg_len_mask + 1);
+ }
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index c90cecc..5b36334 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -850,15 +850,14 @@ static inline MemTxResult pci_dma_write(PCIDevice *dev, dma_addr_t addr,
+                       DMA_DIRECTION_FROM_DEVICE, MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+-#define PCI_DMA_DEFINE_LDST(_l, _s, _bits)                              \
+-    static inline uint##_bits##_t ld##_l##_pci_dma(PCIDevice *dev,      \
+-                                                   dma_addr_t addr, \
+-                                                   MemTxAttrs attrs) \
+-    {                                                                   \
+-        uint##_bits##_t val; \
+-        ld##_l##_dma(pci_get_address_space(dev), addr, &val, attrs); \
+-        return val; \
+-    }                                                                   \
++#define PCI_DMA_DEFINE_LDST(_l, _s, _bits) \
++    static inline MemTxResult ld##_l##_pci_dma(PCIDevice *dev, \
++                                               dma_addr_t addr, \
++                                               uint##_bits##_t *val, \
++                                               MemTxAttrs attrs) \
++    { \
++        return ld##_l##_dma(pci_get_address_space(dev), addr, val, attrs); \
++    } \
+     static inline MemTxResult st##_s##_pci_dma(PCIDevice *dev, \
+                                                dma_addr_t addr, \
+                                                uint##_bits##_t val, \
+-- 
+1.8.3.1
+

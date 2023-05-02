@@ -22,6 +22,7 @@ PTESTS_FAST = "\
     gettext-ptest \
     glib-networking-ptest \
     gzip-ptest \
+    json-c-ptest \
     json-glib-ptest \
     libconvert-asn1-perl-ptest \
     liberror-perl-ptest \
@@ -99,7 +100,7 @@ PTESTS_SLOW = "\
 "
 
 PTESTS_SLOW:remove:riscv64 = "valgrind-ptest"
-PTESTS_PROBLEMS:append:riscv64 = "valgrind-ptest"
+PTESTS_PROBLEMS:append:riscv64 = " valgrind-ptest"
 
 #    ruby-ptest \ # Timeout
 #    lz4-ptest \ # Needs a rewrite

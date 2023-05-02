@@ -1,0 +1,46 @@
+From 4915a7e52fcea8fe283a842890a1e726b1e26b10 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@fujitsu.com>
+Date: Fri, 10 Mar 2023 03:48:46 +0000
+Subject: [PATCH] dhcpcd.8: Fix conflict error when enable multilib.
+
+Error: Transaction test error:
+ file /usr/share/man/man8/dhcpcd.8 conflicts between attempted
+ installs of dhcpcd-doc-9.4.1-r0.cortexa57 and
+ lib32-dhcpcd-doc-9.4.1-r0.armv7ahf_neon
+
+The differences between the two files are as follows:
+@@ -821,7 +821,7 @@
+ If you always use the same options, put them here.
+ .It Pa /usr/libexec/dhcpcd-run-hooks
+ Bourne shell script that is run to configure or de-configure an interface.
+-.It Pa /usr/lib64/dhcpcd/dev
++.It Pa /usr/lib/dhcpcd/dev
+ Linux
+ .Pa /dev
+ management modules.
+
+It is just a man file, there is no necessary to manage multiple
+versions.
+
+Upstream-Status: Inappropriate [oe specific]
+Signed-off-by: Lei Maohui <leimaohui@fujitsu.com>
+---
+ src/dhcpcd.8.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/dhcpcd.8.in b/src/dhcpcd.8.in
+index bc6b3b5..791f2ba 100644
+--- a/src/dhcpcd.8.in
++++ b/src/dhcpcd.8.in
+@@ -821,7 +821,7 @@ Configuration file for dhcpcd.
+ If you always use the same options, put them here.
+ .It Pa @SCRIPT@
+ Bourne shell script that is run to configure or de-configure an interface.
+-.It Pa @LIBDIR@/dhcpcd/dev
++.It Pa /usr/<libdir>/dhcpcd/dev
+ Linux
+ .Pa /dev
+ management modules.
+-- 
+2.34.1
+

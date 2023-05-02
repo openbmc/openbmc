@@ -13,8 +13,13 @@ UPSTREAM_CHECK_URI = "https://roy.marples.name/downloads/dhcpcd/"
 
 SRC_URI = "https://roy.marples.name/downloads/${BPN}/${BPN}-${PV}.tar.xz \
            file://0001-remove-INCLUDEDIR-to-prevent-build-issues.patch \
+           file://0001-20-resolv.conf-improve-the-sitation-of-working-with-.patch \
+           file://0001-privsep-Allow-getrandom-sysctl-for-newer-glibc.patch \
+           file://0002-privsep-Allow-newfstatat-syscall-as-well.patch \
+           file://0001-privsep-linux-fix-SECCOMP_AUDIT_ARCH-missing-ppc64le.patch \
            file://dhcpcd.service \
            file://dhcpcd@.service \
+           file://0001-dhcpcd.8-Fix-conflict-error-when-enable-multilib.patch \
            "
 
 SRC_URI[sha256sum] = "819357634efed1ea5cf44ec01b24d3d3f8852fec8b4249925dcc5667c54e376c"

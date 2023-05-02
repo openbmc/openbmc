@@ -47,11 +47,15 @@ distributions:
 
 -  Fedora 35
 
+-  Fedora 36
+
 -  CentOS 7.x
 
 -  CentOS 8.x
 
 -  AlmaLinux 8.5
+
+-  AlmaLinux 8.7
 
 -  Debian GNU/Linux 9.x (Stretch)
 

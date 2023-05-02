@@ -1,0 +1,91 @@
+From e2d784b67dc724a9b0854b49255ba0ee8ca46543 Mon Sep 17 00:00:00 2001
+From: =?utf8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Wed, 15 Dec 2021 22:18:19 +0100
+Subject: [PATCH] pci: Let pci_dma_rw() take MemTxAttrs argument
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+
+Let devices specify transaction attributes when calling pci_dma_rw().
+
+Keep the default MEMTXATTRS_UNSPECIFIED in the few callers.
+
+CVE: CVE-2021-3611
+Upstream-Status: Backport [https://git.qemu.org/?p=qemu.git;a=commit;h=e2d784b67dc724a9b0854b49255ba0ee8ca46543]
+
+Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
+Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+Message-Id: <20211223115554.3155328-10-philmd@redhat.com>
+Signed-off-by: Bhabu Bindu <bhabu.bindu@kpit.com>
+---
+ hw/audio/intel-hda.c |  3 ++-
+ hw/scsi/esp-pci.c    |  2 +-
+ include/hw/pci/pci.h | 10 ++++++----
+ 3 files changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
+index 8ce9df6..fb3d34a 100644
+--- a/hw/audio/intel-hda.c
++++ b/hw/audio/intel-hda.c
+@@ -427,7 +427,8 @@ static bool intel_hda_xfer(HDACodecDevice *dev, uint32_t stnr, bool output,
+         dprint(d, 3, "dma: entry %d, pos %d/%d, copy %d\n",
+                st->be, st->bp, st->bpl[st->be].len, copy);
+ 
+-        pci_dma_rw(&d->pci, st->bpl[st->be].addr + st->bp, buf, copy, !output);
++        pci_dma_rw(&d->pci, st->bpl[st->be].addr + st->bp, buf, copy, !output,
++                   MEMTXATTRS_UNSPECIFIED);
+         st->lpib += copy;
+         st->bp += copy;
+         buf += copy;
+diff --git a/hw/scsi/esp-pci.c b/hw/scsi/esp-pci.c
+index dac054a..1792f84 100644
+--- a/hw/scsi/esp-pci.c
++++ b/hw/scsi/esp-pci.c
+@@ -280,7 +280,7 @@ static void esp_pci_dma_memory_rw(PCIESPState *pci, uint8_t *buf, int len,
+         len = pci->dma_regs[DMA_WBC];
+     }
+ 
+-    pci_dma_rw(PCI_DEVICE(pci), addr, buf, len, dir);
++    pci_dma_rw(PCI_DEVICE(pci), addr, buf, len, dir, MEMTXATTRS_UNSPECIFIED);
+ 
+     /* update status registers */
+     pci->dma_regs[DMA_WBC] -= len;
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index 1acefc2..a751ab5 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -806,10 +806,10 @@ static inline AddressSpace *pci_get_address_space(PCIDevice *dev)
+  */
+ static inline MemTxResult pci_dma_rw(PCIDevice *dev, dma_addr_t addr,
+                                      void *buf, dma_addr_t len,
+-                                     DMADirection dir)
++                                     DMADirection dir, MemTxAttrs attrs)
+ {
+     return dma_memory_rw(pci_get_address_space(dev), addr, buf, len,
+-                         dir, MEMTXATTRS_UNSPECIFIED);
++                         dir, attrs);
+ }
+ 
+ /**
+@@ -827,7 +827,8 @@ static inline MemTxResult pci_dma_rw(PCIDevice *dev, dma_addr_t addr,
+ static inline MemTxResult pci_dma_read(PCIDevice *dev, dma_addr_t addr,
+                                        void *buf, dma_addr_t len)
+ {
+-    return pci_dma_rw(dev, addr, buf, len, DMA_DIRECTION_TO_DEVICE);
++    return pci_dma_rw(dev, addr, buf, len,
++                      DMA_DIRECTION_TO_DEVICE, MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ /**
+@@ -845,7 +846,8 @@ static inline MemTxResult pci_dma_read(PCIDevice *dev, dma_addr_t addr,
+ static inline MemTxResult pci_dma_write(PCIDevice *dev, dma_addr_t addr,
+                                         const void *buf, dma_addr_t len)
+ {
+-    return pci_dma_rw(dev, addr, (void *) buf, len, DMA_DIRECTION_FROM_DEVICE);
++    return pci_dma_rw(dev, addr, (void *) buf, len,
++                      DMA_DIRECTION_FROM_DEVICE, MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ #define PCI_DMA_DEFINE_LDST(_l, _s, _bits)                              \
+-- 
+1.8.3.1

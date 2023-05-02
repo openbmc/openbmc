@@ -1,0 +1,71 @@
+From f024b8937d8b614994b94e86d2240fafcc7d2d73 Mon Sep 17 00:00:00 2001
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri, 17 Dec 2021 17:57:15 +0100
+Subject: [PATCH 10/21] target/ppc: Split out do_fmadd
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Create a common function for all of the madd helpers.
+Let the compiler tail call or inline as it chooses.
+
+Upstream-Status: Backport
+[https://git.qemu.org/?p=qemu.git;a=commit;h=ffdaff8e9c698061f57a6b1827570562c5a1c909]
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20211119160502.17432-20-richard.henderson@linaro.org>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+---
+ target/ppc/fpu_helper.c | 33 ++++++++++++++++++---------------
+ 1 file changed, 18 insertions(+), 15 deletions(-)
+
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index 3b1cb25666..9a1e7e6244 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -649,23 +649,26 @@ static void float_invalid_op_madd(CPUPPCState *env, int flags,
+     }
+ }
+ 
+-#define FPU_FMADD(op, madd_flags)                                       \
+-uint64_t helper_##op(CPUPPCState *env, uint64_t arg1,                   \
+-                     uint64_t arg2, uint64_t arg3)                      \
+-{                                                                       \
+-    uint32_t flags;                                                     \
+-    float64 ret = float64_muladd(arg1, arg2, arg3, madd_flags,          \
+-                                 &env->fp_status);                      \
+-    flags = get_float_exception_flags(&env->fp_status);                 \
+-    if (flags) {                                                        \
+-        if (flags & float_flag_invalid) {                               \
+-            float_invalid_op_madd(env, flags, 1, GETPC());              \
+-        }                                                               \
+-        do_float_check_status(env, GETPC());                            \
+-    }                                                                   \
+-    return ret;                                                         \
++static float64 do_fmadd(CPUPPCState *env, float64 a, float64 b,
++                         float64 c, int madd_flags, uintptr_t retaddr)
++{
++    float64 ret = float64_muladd(a, b, c, madd_flags, &env->fp_status);
++    int flags = get_float_exception_flags(&env->fp_status);
++
++    if (flags) {
++        if (flags & float_flag_invalid) {
++            float_invalid_op_madd(env, flags, 1, retaddr);
++        }
++        do_float_check_status(env, retaddr);
++    }
++    return ret;
+ }
+ 
++#define FPU_FMADD(op, madd_flags)                                    \
++    uint64_t helper_##op(CPUPPCState *env, uint64_t arg1,            \
++                         uint64_t arg2, uint64_t arg3)               \
++    { return do_fmadd(env, arg1, arg2, arg3, madd_flags, GETPC()); }
++
+ #define MADD_FLGS 0
+ #define MSUB_FLGS float_muladd_negate_c
+ #define NMADD_FLGS float_muladd_negate_result
+-- 
+2.17.1
+

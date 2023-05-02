@@ -1,0 +1,41 @@
+From 98ff271a4d1a1d60ae53b1f742df7c188b163375 Mon Sep 17 00:00:00 2001
+From: Matheus Ferst <matheus.ferst@eldorado.org.br>
+Date: Fri, 17 Dec 2021 17:57:18 +0100
+Subject: [PATCH 13/21] target/ppc: fix xscvqpdp register access
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This instruction has VRT and VRB fields instead of T/TX and B/BX.
+
+Upstream-Status: Backport
+[https://git.qemu.org/?p=qemu.git;a=commit;h=38d4914c5065e14f0969161274793ded448f067f]
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Matheus Ferst <matheus.ferst@eldorado.org.br>
+Message-Id: <20211213120958.24443-4-victor.colombo@eldorado.org.br>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+---
+ target/ppc/translate/vsx-impl.c.inc | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/target/ppc/translate/vsx-impl.c.inc b/target/ppc/translate/vsx-impl.c.inc
+index e2447750dd..ab5cb21f13 100644
+--- a/target/ppc/translate/vsx-impl.c.inc
++++ b/target/ppc/translate/vsx-impl.c.inc
+@@ -913,8 +913,9 @@ static void gen_xscvqpdp(DisasContext *ctx)
+         return;
+     }
+     opc = tcg_const_i32(ctx->opcode);
+-    xt = gen_vsr_ptr(xT(ctx->opcode));
+-    xb = gen_vsr_ptr(xB(ctx->opcode));
++
++    xt = gen_vsr_ptr(rD(ctx->opcode) + 32);
++    xb = gen_vsr_ptr(rB(ctx->opcode) + 32);
+     gen_helper_xscvqpdp(cpu_env, opc, xt, xb);
+     tcg_temp_free_i32(opc);
+     tcg_temp_free_ptr(xt);
+-- 
+2.17.1
+

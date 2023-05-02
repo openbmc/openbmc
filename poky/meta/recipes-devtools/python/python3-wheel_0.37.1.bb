@@ -8,7 +8,9 @@ SRC_URI[sha256sum] = "e9a504e793efbca1b8e0e9cb979a249cf4a0a7b5b8c9e8b65a5e39d495
 
 inherit python_flit_core pypi
 
-SRC_URI += " file://0001-Backport-pyproject.toml-from-flit-backend-branch.patch"
+SRC_URI += "file://0001-Backport-pyproject.toml-from-flit-backend-branch.patch \
+            file://0001-Fixed-potential-DoS-attack-via-WHEEL_INFO_RE.patch \
+           "
 
 BBCLASSEXTEND = "native nativesdk"
 

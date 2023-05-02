@@ -1,5 +1,5 @@
 # This class is used to help the alternatives system which is useful when
-# multiple sources provide same command. You can use update-alternatives
+# multiple sources provide the same command. You can use update-alternatives
 # command directly in your recipe, but in most cases this class simplifies
 # that job.
 #
@@ -29,7 +29,7 @@
 # A non-default link to create for a target
 # ALTERNATIVE_TARGET[name] = "target"
 #
-#   This is the name of the binary as it's been install by do_install
+#   This is the name of the binary as it's been installed by do_install
 #   i.e. ALTERNATIVE_TARGET[sh] = "/bin/bash"
 #
 # A package specific link for a target
@@ -62,7 +62,7 @@ ALTERNATIVE_PRIORITY = "10"
 
 # We need special processing for vardeps because it can not work on
 # modified flag values.  So we aggregate the flags into a new variable
-# and include that vairable in the set.
+# and include that variable in the set.
 UPDALTVARS  = "ALTERNATIVE ALTERNATIVE_LINK_NAME ALTERNATIVE_TARGET ALTERNATIVE_PRIORITY"
 
 PACKAGE_WRITE_DEPS += "virtual/update-alternatives-native"

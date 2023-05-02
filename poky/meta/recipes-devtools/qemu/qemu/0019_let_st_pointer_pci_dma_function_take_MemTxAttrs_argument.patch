@@ -1,0 +1,303 @@
+From a423a1b523296f8798a5851aaaba64dd166c0a74 Mon Sep 17 00:00:00 2001
+From: =?utf8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Fri, 17 Dec 2021 22:39:42 +0100
+Subject: [PATCH] pci: Let st*_pci_dma() take MemTxAttrs argument
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+
+Let devices specify transaction attributes when calling st*_pci_dma().
+
+Keep the default MEMTXATTRS_UNSPECIFIED in the few callers.
+
+CVE: CVE-2021-3611
+Upstream-Status: Backport [https://git.qemu.org/?p=qemu.git;a=commit;h=a423a1b523296f8798a5851aaaba64dd166c0a74]
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+Message-Id: <20211223115554.3155328-21-philmd@redhat.com>
+Signed-off-by: Bhabu Bindu <bhabu.bindu@kpit.com>
+---
+ hw/audio/intel-hda.c | 10 ++++++----
+ hw/net/eepro100.c    | 29 ++++++++++++++++++-----------
+ hw/net/tulip.c       | 18 ++++++++++--------
+ hw/scsi/megasas.c    | 15 ++++++++++-----
+ hw/scsi/vmw_pvscsi.c |  3 ++-
+ include/hw/pci/pci.h | 11 ++++++-----
+ 6 files changed, 52 insertions(+), 34 deletions(-)
+
+diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
+index fb3d34a..3309ae0 100644
+--- a/hw/audio/intel-hda.c
++++ b/hw/audio/intel-hda.c
+@@ -345,6 +345,7 @@ static void intel_hda_corb_run(IntelHDAState *d)
+ 
+ static void intel_hda_response(HDACodecDevice *dev, bool solicited, uint32_t response)
+ {
++    const MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
+     HDACodecBus *bus = HDA_BUS(dev->qdev.parent_bus);
+     IntelHDAState *d = container_of(bus, IntelHDAState, codecs);
+     hwaddr addr;
+@@ -367,8 +368,8 @@ static void intel_hda_response(HDACodecDevice *dev, bool solicited, uint32_t res
+     ex = (solicited ? 0 : (1 << 4)) | dev->cad;
+     wp = (d->rirb_wp + 1) & 0xff;
+     addr = intel_hda_addr(d->rirb_lbase, d->rirb_ubase);
+-    stl_le_pci_dma(&d->pci, addr + 8*wp, response);
+-    stl_le_pci_dma(&d->pci, addr + 8*wp + 4, ex);
++    stl_le_pci_dma(&d->pci, addr + 8 * wp, response, attrs);
++    stl_le_pci_dma(&d->pci, addr + 8 * wp + 4, ex, attrs);
+     d->rirb_wp = wp;
+ 
+     dprint(d, 2, "%s: [wp 0x%x] response 0x%x, extra 0x%x\n",
+@@ -394,6 +395,7 @@ static void intel_hda_response(HDACodecDevice *dev, bool solicited, uint32_t res
+ static bool intel_hda_xfer(HDACodecDevice *dev, uint32_t stnr, bool output,
+                            uint8_t *buf, uint32_t len)
+ {
++    const MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
+     HDACodecBus *bus = HDA_BUS(dev->qdev.parent_bus);
+     IntelHDAState *d = container_of(bus, IntelHDAState, codecs);
+     hwaddr addr;
+@@ -428,7 +430,7 @@ static bool intel_hda_xfer(HDACodecDevice *dev, uint32_t stnr, bool output,
+                st->be, st->bp, st->bpl[st->be].len, copy);
+ 
+         pci_dma_rw(&d->pci, st->bpl[st->be].addr + st->bp, buf, copy, !output,
+-                   MEMTXATTRS_UNSPECIFIED);
++                   attrs);
+         st->lpib += copy;
+         st->bp += copy;
+         buf += copy;
+@@ -451,7 +453,7 @@ static bool intel_hda_xfer(HDACodecDevice *dev, uint32_t stnr, bool output,
+     if (d->dp_lbase & 0x01) {
+         s = st - d->st;
+         addr = intel_hda_addr(d->dp_lbase & ~0x01, d->dp_ubase);
+-        stl_le_pci_dma(&d->pci, addr + 8*s, st->lpib);
++        stl_le_pci_dma(&d->pci, addr + 8 * s, st->lpib, attrs);
+     }
+     dprint(d, 3, "dma: --\n");
+ 
+diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
+index 16e95ef..83c4431 100644
+--- a/hw/net/eepro100.c
++++ b/hw/net/eepro100.c
+@@ -700,6 +700,8 @@ static void set_ru_state(EEPRO100State * s, ru_state_t state)
+ 
+ static void dump_statistics(EEPRO100State * s)
+ {
++    const MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
++
+     /* Dump statistical data. Most data is never changed by the emulation
+      * and always 0, so we first just copy the whole block and then those
+      * values which really matter.
+@@ -707,16 +709,18 @@ static void dump_statistics(EEPRO100State * s)
+      */
+     pci_dma_write(&s->dev, s->statsaddr, &s->statistics, s->stats_size);
+     stl_le_pci_dma(&s->dev, s->statsaddr + 0,
+-                   s->statistics.tx_good_frames);
++                   s->statistics.tx_good_frames, attrs);
+     stl_le_pci_dma(&s->dev, s->statsaddr + 36,
+-                   s->statistics.rx_good_frames);
++                   s->statistics.rx_good_frames, attrs);
+     stl_le_pci_dma(&s->dev, s->statsaddr + 48,
+-                   s->statistics.rx_resource_errors);
++                   s->statistics.rx_resource_errors, attrs);
+     stl_le_pci_dma(&s->dev, s->statsaddr + 60,
+-                   s->statistics.rx_short_frame_errors);
++                   s->statistics.rx_short_frame_errors, attrs);
+ #if 0
+-    stw_le_pci_dma(&s->dev, s->statsaddr + 76, s->statistics.xmt_tco_frames);
+-    stw_le_pci_dma(&s->dev, s->statsaddr + 78, s->statistics.rcv_tco_frames);
++    stw_le_pci_dma(&s->dev, s->statsaddr + 76,
++                   s->statistics.xmt_tco_frames, attrs);
++    stw_le_pci_dma(&s->dev, s->statsaddr + 78,
++                   s->statistics.rcv_tco_frames, attrs);
+     missing("CU dump statistical counters");
+ #endif
+ }
+@@ -833,6 +837,7 @@ static void set_multicast_list(EEPRO100State *s)
+ 
+ static void action_command(EEPRO100State *s)
+ {
++    const MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
+     /* The loop below won't stop if it gets special handcrafted data.
+        Therefore we limit the number of iterations. */
+     unsigned max_loop_count = 16;
+@@ -911,7 +916,7 @@ static void action_command(EEPRO100State *s)
+         }
+         /* Write new status. */
+         stw_le_pci_dma(&s->dev, s->cb_address,
+-                       s->tx.status | ok_status | STATUS_C);
++                       s->tx.status | ok_status | STATUS_C, attrs);
+         if (bit_i) {
+             /* CU completed action. */
+             eepro100_cx_interrupt(s);
+@@ -937,6 +942,7 @@ static void action_command(EEPRO100State *s)
+ 
+ static void eepro100_cu_command(EEPRO100State * s, uint8_t val)
+ {
++    const MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
+     cu_state_t cu_state;
+     switch (val) {
+     case CU_NOP:
+@@ -986,7 +992,7 @@ static void eepro100_cu_command(EEPRO100State * s, uint8_t val)
+         /* Dump statistical counters. */
+         TRACE(OTHER, logout("val=0x%02x (dump stats)\n", val));
+         dump_statistics(s);
+-        stl_le_pci_dma(&s->dev, s->statsaddr + s->stats_size, 0xa005);
++        stl_le_pci_dma(&s->dev, s->statsaddr + s->stats_size, 0xa005, attrs);
+         break;
+     case CU_CMD_BASE:
+         /* Load CU base. */
+@@ -997,7 +1003,7 @@ static void eepro100_cu_command(EEPRO100State * s, uint8_t val)
+         /* Dump and reset statistical counters. */
+         TRACE(OTHER, logout("val=0x%02x (dump stats and reset)\n", val));
+         dump_statistics(s);
+-        stl_le_pci_dma(&s->dev, s->statsaddr + s->stats_size, 0xa007);
++        stl_le_pci_dma(&s->dev, s->statsaddr + s->stats_size, 0xa007, attrs);
+         memset(&s->statistics, 0, sizeof(s->statistics));
+         break;
+     case CU_SRESUME:
+@@ -1612,6 +1618,7 @@ static ssize_t nic_receive(NetClientState *nc, const uint8_t * buf, size_t size)
+      * - Magic packets should set bit 30 in power management driver register.
+      * - Interesting packets should set bit 29 in power management driver register.
+      */
++    const MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
+     EEPRO100State *s = qemu_get_nic_opaque(nc);
+     uint16_t rfd_status = 0xa000;
+ #if defined(CONFIG_PAD_RECEIVED_FRAMES)
+@@ -1726,9 +1733,9 @@ static ssize_t nic_receive(NetClientState *nc, const uint8_t * buf, size_t size)
+     TRACE(OTHER, logout("command 0x%04x, link 0x%08x, addr 0x%08x, size %u\n",
+           rfd_command, rx.link, rx.rx_buf_addr, rfd_size));
+     stw_le_pci_dma(&s->dev, s->ru_base + s->ru_offset +
+-                offsetof(eepro100_rx_t, status), rfd_status);
++                offsetof(eepro100_rx_t, status), rfd_status, attrs);
+     stw_le_pci_dma(&s->dev, s->ru_base + s->ru_offset +
+-                offsetof(eepro100_rx_t, count), size);
++                offsetof(eepro100_rx_t, count), size, attrs);
+     /* Early receive interrupt not supported. */
+ #if 0
+     eepro100_er_interrupt(s);
+diff --git a/hw/net/tulip.c b/hw/net/tulip.c
+index ca69f7e..1f2c79d 100644
+--- a/hw/net/tulip.c
++++ b/hw/net/tulip.c
+@@ -86,16 +86,18 @@ static void tulip_desc_read(TULIPState *s, hwaddr p,
+ static void tulip_desc_write(TULIPState *s, hwaddr p,
+         struct tulip_descriptor *desc)
+ {
++    const MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
++
+     if (s->csr[0] & CSR0_DBO) {
+-        stl_be_pci_dma(&s->dev, p, desc->status);
+-        stl_be_pci_dma(&s->dev, p + 4, desc->control);
+-        stl_be_pci_dma(&s->dev, p + 8, desc->buf_addr1);
+-        stl_be_pci_dma(&s->dev, p + 12, desc->buf_addr2);
++        stl_be_pci_dma(&s->dev, p, desc->status, attrs);
++        stl_be_pci_dma(&s->dev, p + 4, desc->control, attrs);
++        stl_be_pci_dma(&s->dev, p + 8, desc->buf_addr1, attrs);
++        stl_be_pci_dma(&s->dev, p + 12, desc->buf_addr2, attrs);
+     } else {
+-        stl_le_pci_dma(&s->dev, p, desc->status);
+-        stl_le_pci_dma(&s->dev, p + 4, desc->control);
+-        stl_le_pci_dma(&s->dev, p + 8, desc->buf_addr1);
+-        stl_le_pci_dma(&s->dev, p + 12, desc->buf_addr2);
++        stl_le_pci_dma(&s->dev, p, desc->status, attrs);
++        stl_le_pci_dma(&s->dev, p + 4, desc->control, attrs);
++        stl_le_pci_dma(&s->dev, p + 8, desc->buf_addr1, attrs);
++        stl_le_pci_dma(&s->dev, p + 12, desc->buf_addr2, attrs);
+     }
+ }
+ 
+diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+index 091a350..b5e8b14 100644
+--- a/hw/scsi/megasas.c
++++ b/hw/scsi/megasas.c
+@@ -168,14 +168,16 @@ static void megasas_frame_set_cmd_status(MegasasState *s,
+                                          unsigned long frame, uint8_t v)
+ {
+     PCIDevice *pci = &s->parent_obj;
+-    stb_pci_dma(pci, frame + offsetof(struct mfi_frame_header, cmd_status), v);
++    stb_pci_dma(pci, frame + offsetof(struct mfi_frame_header, cmd_status),
++                v, MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ static void megasas_frame_set_scsi_status(MegasasState *s,
+                                           unsigned long frame, uint8_t v)
+ {
+     PCIDevice *pci = &s->parent_obj;
+-    stb_pci_dma(pci, frame + offsetof(struct mfi_frame_header, scsi_status), v);
++    stb_pci_dma(pci, frame + offsetof(struct mfi_frame_header, scsi_status),
++                v, MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ static inline const char *mfi_frame_desc(unsigned int cmd)
+@@ -542,6 +544,7 @@ static MegasasCmd *megasas_enqueue_frame(MegasasState *s,
+ 
+ static void megasas_complete_frame(MegasasState *s, uint64_t context)
+ {
++    const MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
+     PCIDevice *pci_dev = PCI_DEVICE(s);
+     int tail, queue_offset;
+ 
+@@ -555,10 +558,12 @@ static void megasas_complete_frame(MegasasState *s, uint64_t context)
+          */
+         if (megasas_use_queue64(s)) {
+             queue_offset = s->reply_queue_head * sizeof(uint64_t);
+-            stq_le_pci_dma(pci_dev, s->reply_queue_pa + queue_offset, context);
++            stq_le_pci_dma(pci_dev, s->reply_queue_pa + queue_offset,
++                           context, attrs);
+         } else {
+             queue_offset = s->reply_queue_head * sizeof(uint32_t);
+-            stl_le_pci_dma(pci_dev, s->reply_queue_pa + queue_offset, context);
++            stl_le_pci_dma(pci_dev, s->reply_queue_pa + queue_offset,
++                           context, attrs);
+         }
+         s->reply_queue_tail = ldl_le_pci_dma(pci_dev, s->consumer_pa);
+         trace_megasas_qf_complete(context, s->reply_queue_head,
+@@ -572,7 +577,7 @@ static void megasas_complete_frame(MegasasState *s, uint64_t context)
+         s->reply_queue_head = megasas_next_index(s, tail, s->fw_cmds);
+         trace_megasas_qf_update(s->reply_queue_head, s->reply_queue_tail,
+                                 s->busy);
+-        stl_le_pci_dma(pci_dev, s->producer_pa, s->reply_queue_head);
++        stl_le_pci_dma(pci_dev, s->producer_pa, s->reply_queue_head, attrs);
+         /* Notify HBA */
+         if (msix_enabled(pci_dev)) {
+             trace_megasas_msix_raise(0);
+diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
+index cd76bd6..59c3e8b 100644
+--- a/hw/scsi/vmw_pvscsi.c
++++ b/hw/scsi/vmw_pvscsi.c
+@@ -55,7 +55,8 @@
+                  (m)->rs_pa + offsetof(struct PVSCSIRingsState, field)))
+ #define RS_SET_FIELD(m, field, val) \
+     (stl_le_pci_dma(&container_of(m, PVSCSIState, rings)->parent_obj, \
+-                 (m)->rs_pa + offsetof(struct PVSCSIRingsState, field), val))
++                 (m)->rs_pa + offsetof(struct PVSCSIRingsState, field), val, \
++                 MEMTXATTRS_UNSPECIFIED))
+ 
+ struct PVSCSIClass {
+     PCIDeviceClass parent_class;
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index 8c5f2ed..9f51ef2 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -859,11 +859,12 @@ static inline MemTxResult pci_dma_write(PCIDevice *dev, dma_addr_t addr,
+                      MEMTXATTRS_UNSPECIFIED); \
+         return val; \
+     }                                                                   \
+-    static inline void st##_s##_pci_dma(PCIDevice *dev,                 \
+-                                        dma_addr_t addr, uint##_bits##_t val) \
+-    {                                                                   \
+-        st##_s##_dma(pci_get_address_space(dev), addr, val, \
+-                     MEMTXATTRS_UNSPECIFIED); \
++    static inline void st##_s##_pci_dma(PCIDevice *dev, \
++                                        dma_addr_t addr, \
++                                        uint##_bits##_t val, \
++                                        MemTxAttrs attrs) \
++    { \
++        st##_s##_dma(pci_get_address_space(dev), addr, val, attrs); \
+     }
+ 
+ PCI_DMA_DEFINE_LDST(ub, b, 8);
+-- 
+1.8.3.1
+

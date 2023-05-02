@@ -1,0 +1,121 @@
+From 6bc0b2cffab0ee280ae9730262f162f25c16f6c2 Mon Sep 17 00:00:00 2001
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri, 17 Dec 2021 17:57:14 +0100
+Subject: [PATCH 05/21] softfloat: Add flag specific to signaling nans
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+PowerPC has this flag, and it's easier to compute it here
+than after the fact.
+
+Upstream-Status: Backport
+[https://git.qemu.org/?p=qemu.git;a=commit;h=e706d4455b8d54252b11fc504c56df060151cb89]
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20211119160502.17432-8-richard.henderson@linaro.org>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+---
+ fpu/softfloat-parts.c.inc     | 18 ++++++++++++------
+ fpu/softfloat.c               |  4 +++-
+ include/fpu/softfloat-types.h |  1 +
+ 3 files changed, 16 insertions(+), 7 deletions(-)
+
+diff --git a/fpu/softfloat-parts.c.inc b/fpu/softfloat-parts.c.inc
+index b8563cd2df..9518f3dc61 100644
+--- a/fpu/softfloat-parts.c.inc
++++ b/fpu/softfloat-parts.c.inc
+@@ -19,7 +19,7 @@ static void partsN(return_nan)(FloatPartsN *a, float_status *s)
+ {
+     switch (a->cls) {
+     case float_class_snan:
+-        float_raise(float_flag_invalid, s);
++        float_raise(float_flag_invalid | float_flag_invalid_snan, s);
+         if (s->default_nan_mode) {
+             parts_default_nan(a, s);
+         } else {
+@@ -40,7 +40,7 @@ static FloatPartsN *partsN(pick_nan)(FloatPartsN *a, FloatPartsN *b,
+                                      float_status *s)
+ {
+     if (is_snan(a->cls) || is_snan(b->cls)) {
+-        float_raise(float_flag_invalid, s);
++        float_raise(float_flag_invalid | float_flag_invalid_snan, s);
+     }
+ 
+     if (s->default_nan_mode) {
+@@ -68,7 +68,7 @@ static FloatPartsN *partsN(pick_nan_muladd)(FloatPartsN *a, FloatPartsN *b,
+     int which;
+ 
+     if (unlikely(abc_mask & float_cmask_snan)) {
+-        float_raise(float_flag_invalid, s);
++        float_raise(float_flag_invalid | float_flag_invalid_snan, s);
+     }
+ 
+     which = pickNaNMulAdd(a->cls, b->cls, c->cls,
+@@ -1049,8 +1049,10 @@ static int64_t partsN(float_to_sint)(FloatPartsN *p, FloatRoundMode rmode,
+ 
+     switch (p->cls) {
+     case float_class_snan:
++        flags |= float_flag_invalid_snan;
++        /* fall through */
+     case float_class_qnan:
+-        flags = float_flag_invalid;
++        flags |= float_flag_invalid;
+         r = max;
+         break;
+ 
+@@ -1114,8 +1116,10 @@ static uint64_t partsN(float_to_uint)(FloatPartsN *p, FloatRoundMode rmode,
+ 
+     switch (p->cls) {
+     case float_class_snan:
++        flags |= float_flag_invalid_snan;
++        /* fall through */
+     case float_class_qnan:
+-        flags = float_flag_invalid;
++        flags |= float_flag_invalid;
+         r = max;
+         break;
+ 
+@@ -1341,7 +1345,9 @@ static FloatRelation partsN(compare)(FloatPartsN *a, FloatPartsN *b,
+     }
+ 
+     if (unlikely(ab_mask & float_cmask_anynan)) {
+-        if (!is_quiet || (ab_mask & float_cmask_snan)) {
++        if (ab_mask & float_cmask_snan) {
++            float_raise(float_flag_invalid | float_flag_invalid_snan, s);
++        } else if (!is_quiet) {
+             float_raise(float_flag_invalid, s);
+         }
+         return float_relation_unordered;
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 9a28720d82..834ed3a054 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -2543,8 +2543,10 @@ floatx80 floatx80_mod(floatx80 a, floatx80 b, float_status *status)
+ static void parts_float_to_ahp(FloatParts64 *a, float_status *s)
+ {
+     switch (a->cls) {
+-    case float_class_qnan:
+     case float_class_snan:
++        float_raise(float_flag_invalid_snan, s);
++        /* fall through */
++    case float_class_qnan:
+         /*
+          * There is no NaN in the destination format.  Raise Invalid
+          * and return a zero with the sign of the input NaN.
+diff --git a/include/fpu/softfloat-types.h b/include/fpu/softfloat-types.h
+index 5a9671e564..e557b9126b 100644
+--- a/include/fpu/softfloat-types.h
++++ b/include/fpu/softfloat-types.h
+@@ -156,6 +156,7 @@ enum {
+     float_flag_invalid_imz     = 0x0100,  /* inf * 0 */
+     float_flag_invalid_idi     = 0x0200,  /* inf / inf */
+     float_flag_invalid_zdz     = 0x0400,  /* 0 / 0 */
++    float_flag_invalid_snan    = 0x2000,  /* any operand was snan */
+ };
+ 
+ /*
+-- 
+2.17.1
+

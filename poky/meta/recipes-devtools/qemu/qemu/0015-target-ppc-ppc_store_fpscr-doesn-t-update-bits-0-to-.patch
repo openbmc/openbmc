@@ -1,0 +1,70 @@
+From 7448ee811d86b18a7f7f59e20853bd852e548f59 Mon Sep 17 00:00:00 2001
+From: "Lucas Mateus Castro (alqotel)" <lucas.araujo@eldorado.org.br>
+Date: Fri, 17 Dec 2021 17:57:13 +0100
+Subject: [PATCH 15/21] target/ppc: ppc_store_fpscr doesn't update bits 0 to 28
+ and 52
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This commit fixes the difference reported in the bug in the reserved
+bit 52, it does this by adding this bit to the mask of bits to not be
+directly altered in the ppc_store_fpscr function (the hardware used to
+compare to QEMU was a Power9).
+
+The bits 0 to 27 were also added to the mask, as they are marked as
+reserved in the PowerISA and bit 28 is a reserved extension of the DRN
+field (bits 29:31) but can't be set using mtfsfi, while the other DRN
+bits may be set using mtfsfi instruction, so bit 28 was also added to
+the mask.
+
+Although this is a difference reported in the bug, since it's a reserved
+bit it may be a "don't care" case, as put in the bug report. Looking at
+the ISA it doesn't explicitly mention this bit can't be set, like it
+does for FEX and VX, so I'm unsure if this is necessary.
+
+Resolves: https://gitlab.com/qemu-project/qemu/-/issues/266
+
+Upstream-Status: Backport
+[https://git.qemu.org/?p=qemu.git;a=commit;h=25ee608d79c1890c0f4e8c495ec8629d5712de45]
+
+Signed-off-by: Lucas Mateus Castro (alqotel) <lucas.araujo@eldorado.org.br>
+Message-Id: <20211201163808.440385-4-lucas.araujo@eldorado.org.br>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+---
+ target/ppc/cpu.c | 2 +-
+ target/ppc/cpu.h | 4 ++++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/target/ppc/cpu.c b/target/ppc/cpu.c
+index f933d9f2bd..d7b42bae52 100644
+--- a/target/ppc/cpu.c
++++ b/target/ppc/cpu.c
+@@ -112,7 +112,7 @@ static inline void fpscr_set_rounding_mode(CPUPPCState *env)
+ 
+ void ppc_store_fpscr(CPUPPCState *env, target_ulong val)
+ {
+-    val &= ~(FP_VX | FP_FEX);
++    val &= FPSCR_MTFS_MASK;
+     if (val & FPSCR_IX) {
+         val |= FP_VX;
+     }
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index e946da5f3a..441d3dce19 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -759,6 +759,10 @@ enum {
+                           FP_VXZDZ  | FP_VXIMZ  | FP_VXVC   | FP_VXSOFT | \
+                           FP_VXSQRT | FP_VXCVI)
+ 
++/* FPSCR bits that can be set by mtfsf, mtfsfi and mtfsb1 */
++#define FPSCR_MTFS_MASK (~(MAKE_64BIT_MASK(36, 28) | PPC_BIT(28) |        \
++                           FP_FEX | FP_VX | PPC_BIT(52)))
++
+ /*****************************************************************************/
+ /* Vector status and control register */
+ #define VSCR_NJ         16 /* Vector non-java */
+-- 
+2.17.1
+

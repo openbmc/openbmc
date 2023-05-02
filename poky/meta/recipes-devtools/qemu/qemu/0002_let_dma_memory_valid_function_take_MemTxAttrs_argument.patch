@@ -1,0 +1,60 @@
+From 7ccb391ccd594b3f33de8deb293ff8d47bb4e219 Mon Sep 17 00:00:00 2001
+From: =?utf8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Thu, 3 Sep 2020 09:28:49 +0200
+Subject: [PATCH] dma: Let dma_memory_valid() take MemTxAttrs argument
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+
+Let devices specify transaction attributes when calling
+dma_memory_valid().
+
+CVE: CVE-2021-3611
+Upstream-Status: Backport [https://git.qemu.org/?p=qemu.git;a=commit;h=7ccb391ccd594b3f33de8deb293ff8d47bb4e219]
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20211223115554.3155328-2-philmd@redhat.com>
+Signed-off-by: Bhabu Bindu <bhabu.bindu@kpit.com>
+---
+ include/hw/ppc/spapr_vio.h | 2 +-
+ include/sysemu/dma.h       | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/include/hw/ppc/spapr_vio.h b/include/hw/ppc/spapr_vio.h
+index 4bea87f..4c45f15 100644
+--- a/include/hw/ppc/spapr_vio.h
++++ b/include/hw/ppc/spapr_vio.h
+@@ -91,7 +91,7 @@ static inline void spapr_vio_irq_pulse(SpaprVioDevice *dev)
+ static inline bool spapr_vio_dma_valid(SpaprVioDevice *dev, uint64_t taddr,
+                                        uint32_t size, DMADirection dir)
+ {
+-    return dma_memory_valid(&dev->as, taddr, size, dir);
++    return dma_memory_valid(&dev->as, taddr, size, dir, MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ static inline int spapr_vio_dma_read(SpaprVioDevice *dev, uint64_t taddr,
+diff --git a/include/sysemu/dma.h b/include/sysemu/dma.h
+index 3201e79..296f3b5 100644
+--- a/include/sysemu/dma.h
++++ b/include/sysemu/dma.h
+@@ -73,11 +73,11 @@ static inline void dma_barrier(AddressSpace *as, DMADirection dir)
+  * dma_memory_{read,write}() and check for errors */
+ static inline bool dma_memory_valid(AddressSpace *as,
+                                     dma_addr_t addr, dma_addr_t len,
+-                                    DMADirection dir)
++                                    DMADirection dir, MemTxAttrs attrs)
+ {
+     return address_space_access_valid(as, addr, len,
+                                       dir == DMA_DIRECTION_FROM_DEVICE,
+-                                      MEMTXATTRS_UNSPECIFIED);
++                                      attrs);
+ }
+ 
+ static inline MemTxResult dma_memory_rw_relaxed(AddressSpace *as,
+-- 
+1.8.3.1
+

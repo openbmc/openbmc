@@ -128,7 +128,7 @@ class Trace:
     def compile(self, writer):
 
         def find_parent_id_for(pid):
-            if pid is 0:
+            if pid == 0:
                 return 0
             ppid = self.parent_map.get(pid)
             if ppid:

@@ -1,0 +1,60 @@
+From 25492154b42f68a48752a7f61eaf1fb61e454e52 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Tue, 18 Oct 2022 18:09:06 +0200
+Subject: [PATCH] shared/json: allow json_variant_dump() to return an error
+
+Upstream-Status: Backport [https://github.com/systemd/systemd/commit/7922ead507e0d83e4ec72a8cbd2b67194766e58c]
+
+Needed to fix CVE-2022-45873.patch backported from systemd/main,
+otherwise it fails to build with:
+
+| ../git/src/shared/elf-util.c: In function 'parse_elf_object':
+| ../git/src/shared/elf-util.c:792:27: error: void value not ignored as it ought to be
+|   792 |                         r = json_variant_dump(package_metadata, JSON_FORMAT_FLUSH, json_out, NULL);
+|       |                           ^
+
+Signed-off-by: Martin Jansa <martin2.jansa@lgepartner.com>
+---
+ src/shared/json.c | 7 ++++---
+ src/shared/json.h | 2 +-
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/src/shared/json.c b/src/shared/json.c
+index dff95eda26..81c05efe22 100644
+--- a/src/shared/json.c
++++ b/src/shared/json.c
+@@ -1792,9 +1792,9 @@ int json_variant_format(JsonVariant *v, JsonFormatFlags flags, char **ret) {
+         return (int) sz - 1;
+ }
+ 
+-void json_variant_dump(JsonVariant *v, JsonFormatFlags flags, FILE *f, const char *prefix) {
++int json_variant_dump(JsonVariant *v, JsonFormatFlags flags, FILE *f, const char *prefix) {
+         if (!v)
+-                return;
++                return 0;
+ 
+         if (!f)
+                 f = stdout;
+@@ -1820,7 +1820,8 @@ void json_variant_dump(JsonVariant *v, JsonFormatFlags flags, FILE *f, const cha
+                 fputc('\n', f); /* In case of SSE add a second newline */
+ 
+         if (flags & JSON_FORMAT_FLUSH)
+-                fflush(f);
++                return fflush_and_check(f);
++        return 0;
+ }
+ 
+ int json_variant_filter(JsonVariant **v, char **to_remove) {
+diff --git a/src/shared/json.h b/src/shared/json.h
+index 8760354b66..c712700763 100644
+--- a/src/shared/json.h
++++ b/src/shared/json.h
+@@ -187,7 +187,7 @@ typedef enum JsonFormatFlags {
+ } JsonFormatFlags;
+ 
+ int json_variant_format(JsonVariant *v, JsonFormatFlags flags, char **ret);
+-void json_variant_dump(JsonVariant *v, JsonFormatFlags flags, FILE *f, const char *prefix);
++int json_variant_dump(JsonVariant *v, JsonFormatFlags flags, FILE *f, const char *prefix);
+ 
+ int json_variant_filter(JsonVariant **v, char **to_remove);
+ 

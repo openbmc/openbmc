@@ -24,6 +24,12 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/raid/mdadm/${BPN}-${PV}.tar.xz \
            file://0001-mdadm-skip-test-11spare-migration.patch \
            file://0001-Fix-parsing-of-r-in-monitor-manager-mode.patch \
            file://0001-Makefile-install-mdcheck.patch \
+           file://0001-mdadm-Fix-optional-write-behind-parameter.patch \
+           file://0001-tests-02lineargrow-clear-the-superblock-at-every-ite.patch \
+           file://0001-tests-00raid0-add-a-test-that-validates-raid0-with-l.patch \
+           file://0001-tests-fix-raid0-tests-for-0.90-metadata.patch \
+           file://0001-tests-00readonly-Run-udevadm-settle-before-setting-r.patch \
+           file://0001-tests-04update-metadata-avoid-passing-chunk-size-to.patch \
            "
 
 SRC_URI[sha256sum] = "461c215670864bb74a4d1a3620684aa2b2f8296dffa06743f26dda5557acf01d"

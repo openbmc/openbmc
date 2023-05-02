@@ -1469,15 +1469,31 @@ system and gives an overview of their function and contents.
          # This is windows only issue.
          CVE_CHECK_IGNORE += "CVE-2020-15523"
 
+   :term:`CVE_CHECK_SHOW_WARNINGS`
+      Specifies whether or not the :ref:`cve-check <ref-classes-cve-check>`
+      class should generate warning messages on the console when unpatched
+      CVEs are found. The default is "1", but you may wish to set it to "0" if
+      you are already examining/processing the logs after the build has
+      completed and thus do not need the warning messages.
+
    :term:`CVE_CHECK_SKIP_RECIPE`
       The list of package names (:term:`PN`) for which
       CVEs (Common Vulnerabilities and Exposures) are ignored.
+
+   :term:`CVE_DB_UPDATE_INTERVAL`
+      Specifies the CVE database update interval in seconds, as used by
+      ``cve-update-db-native``. The default value is "86400" i.e. once a day
+      (24*60*60). If the value is set to "0" then the update will be forced
+      every time. Alternatively, a negative value e.g. "-1" will disable
+      updates entirely.
 
    :term:`CVE_PRODUCT`
       In a recipe, defines the name used to match the recipe name
       against the name in the upstream `NIST CVE database <https://nvd.nist.gov/>`__.
 
-      The default is ${:term:`BPN`}. If it does not match the name in the NIST CVE
+      The default is ${:term:`BPN`} (except for recipes that inherit the
+      :ref:`pypi <ref-classes-pypi>` class where it is set based upon
+      :term:`PYPI_PACKAGE`). If it does not match the name in the NIST CVE
       database or matches with multiple entries in the database, the default
       value needs to be changed.
 
@@ -1491,6 +1507,18 @@ system and gives an overview of their function and contents.
       vendor name as a prefix. The syntax for this is::
 
          CVE_PRODUCT = "vendor:package"
+
+   :term:`CVE_VERSION`
+      In a recipe, defines the version used to match the recipe version
+      against the version in the `NIST CVE database <https://nvd.nist.gov/>`__
+      when usign :ref:`cve-check <ref-classes-cve-check>`.
+
+      The default is ${:term:`PV`} but if recipes use custom version numbers
+      which do not map to upstream software component release versions and the versions
+      used in the CVE database, then this variable can be used to set the
+      version number for :ref:`cve-check <ref-classes-cve-check>`. Example::
+
+          CVE_VERSION = "2.39"
 
    :term:`CVSDIR`
       The directory in which files checked out under the CVS system are
@@ -6089,6 +6117,14 @@ system and gives an overview of their function and contents.
 
       :term:`PV` is the default value of the :term:`PKGV` variable.
 
+   :term:`PYPI_PACKAGE`
+      When inheriting the :ref:`pypi <ref-classes-pypi>` class, specifies the
+      `PyPI <https://pypi.org/>`__ package name to be built. The default value
+      is set based upon :term:`BPN` (stripping any "python-" or "python3-"
+      prefix off if present), however for some packages it will need to be set
+      explicitly if that will not match the package name (e.g. where the
+      package name has a prefix, underscores, uppercase letters etc.)
+
    :term:`PYTHON_ABI`
       When used by recipes that inherit the
       :ref:`setuptools3 <ref-classes-setuptools3>` class, denotes the
@@ -7058,6 +7094,88 @@ system and gives an overview of their function and contents.
 
          You can specify only a single URL in :term:`SOURCE_MIRROR_URL`.
 
+   :term:`SPDX_ARCHIVE_PACKAGED`
+      This option allows to add to :term:`SPDX` output compressed archives
+      of the files in the generated target packages.
+
+      Such archives are available in
+      ``tmp/deploy/spdx/MACHINE/packages/packagename.tar.zst``
+      under the :term:`Build Directory`.
+
+      Enable this option as follows::
+
+         SPDX_ARCHIVE_PACKAGED = "1"
+
+      According to our tests on release 4.1 "langdale", building
+      ``core-image-minimal`` for the ``qemux86-64`` machine, enabling this
+      option multiplied the size of the ``tmp/deploy/spdx`` directory by a
+      factor of 13 (+1.6 GiB for this image), compared to just using the
+      :ref:`create-spdx <ref-classes-create-spdx>` class with no option.
+
+      Note that this option doesn't increase the size of :term:`SPDX`
+      files in ``tmp/deploy/images/MACHINE``.
+
+   :term:`SPDX_ARCHIVE_SOURCES`
+      This option allows to add to :term:`SPDX` output compressed archives
+      of the sources for packages installed on the target. It currently
+      only works when :term:`SPDX_INCLUDE_SOURCES` is set.
+
+      This is one way of fulfilling "source code access" license
+      requirements.
+
+      Such source archives are available in
+      ``tmp/deploy/spdx/MACHINE/recipes/recipe-packagename.tar.zst``
+      under the :term:`Build Directory`.
+
+      Enable this option as follows::
+
+         SPDX_INCLUDE_SOURCES = "1"
+         SPDX_ARCHIVE_SOURCES = "1"
+
+      According to our tests on release 4.1 "langdale", building
+      ``core-image-minimal`` for the ``qemux86-64`` machine, enabling
+      these options multiplied the size of the ``tmp/deploy/spdx``
+      directory by a factor of 11 (+1.4 GiB for this image),
+      compared to just using the :ref:`create-spdx <ref-classes-create-spdx>`
+      class with no option.
+
+      Note that using this option only marginally increases the size
+      of the :term:`SPDX` output in ``tmp/deploy/images/MACHINE/``
+      (+ 0.07\% with the tested image), compared to just enabling
+      :term:`SPDX_INCLUDE_SOURCES`.
+
+   :term:`SPDX_INCLUDE_SOURCES`
+      This option allows to add a description of the source files used to build
+      the host tools and the target packages, to the ``spdx.json`` files in
+      ``tmp/deploy/spdx/MACHINE/recipes/`` under the :term:`Build Directory`.
+      As a consequence, the ``spdx.json`` files under the ``by-namespace`` and
+      ``packages`` subdirectories in ``tmp/deploy/spdx/MACHINE`` are also
+      modified to include references to such source file descriptions.
+
+      Enable this option as follows::
+
+         SPDX_INCLUDE_SOURCES = "1"
+
+      According to our tests on release 4.1 "langdale", building
+      ``core-image-minimal`` for the ``qemux86-64`` machine, enabling
+      this option multiplied the total size of the ``tmp/deploy/spdx``
+      directory by a factor of 3  (+291 MiB for this image),
+      and the size of the ``IMAGE-MACHINE.spdx.tar.zst`` in
+      ``tmp/deploy/images/MACHINE`` by a factor of 130 (+15 MiB for this
+      image), compared to just using the
+      :ref:`create-spdx <ref-classes-create-spdx>` class with no option.
+
+   :term:`SPDX_PRETTY`
+      This option makes the SPDX output more human-readable, using
+      identation and newlines, instead of the default output in a
+      single line::
+
+         SPDX_PRETTY = "1"
+
+      The generated SPDX files are approximately 20% bigger, but
+      this option is recommended if you want to inspect the SPDX
+      output files with a text editor.
+
    :term:`SPDXLICENSEMAP`
       Maps commonly used license names to their SPDX counterparts found in
       ``meta/files/common-licenses/``. For the default :term:`SPDXLICENSEMAP`
@@ -7216,6 +7334,32 @@ system and gives an overview of their function and contents.
 
    :term:`SSTATE_DIR`
       The directory for the shared state cache.
+
+   :term:`SSTATE_EXCLUDEDEPS_SYSROOT`
+      This variable allows to specify indirect dependencies to exclude
+      from sysroots, for example to avoid the situations when a dependency on
+      any ``-native`` recipe will pull in all dependencies of that recipe
+      in the recipe sysroot. This behaviour might not always be wanted,
+      for example when that ``-native`` recipe depends on build tools
+      that are not relevant for the current recipe.
+
+      This way, irrelevant dependencies are ignored, which could have
+      prevented the reuse of prebuilt artifacts stored in the Shared
+      State Cache.
+
+      :term:`SSTATE_EXCLUDEDEPS_SYSROOT` is evaluated as two regular
+      expressions of recipe and dependency to ignore. An example
+      is the rule in :oe_git:`meta/conf/layer.conf </openembedded-core/tree/meta/conf/layer.conf>`::
+
+         # Nothing needs to depend on libc-initial
+         # base-passwd/shadow-sysroot don't need their dependencies
+         SSTATE_EXCLUDEDEPS_SYSROOT += "\
+             .*->.*-initial.* \
+             .*(base-passwd|shadow-sysroot)->.* \
+         "
+
+      The ``->`` substring represents the dependency between
+      the two regular expressions.
 
    :term:`SSTATE_MIRROR_ALLOW_NETWORK`
       If set to "1", allows fetches from mirrors that are specified in

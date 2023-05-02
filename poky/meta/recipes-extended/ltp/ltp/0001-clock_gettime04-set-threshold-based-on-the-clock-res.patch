@@ -1,0 +1,89 @@
+From 9851deb86ef257a98d7433280161d8ca685aa669 Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Tue, 29 Mar 2022 13:03:51 +0800
+Subject: [PATCH] clock_gettime04: set threshold based on the clock resolution
+
+This is to get rid of the intermittent failures in clock_gettime04,
+which are likely caused by different clock tick rates on platforms.
+Here give two thresholds (in milliseconds) for comparison, one for
+COARSE clock and one for the rest.
+
+Error log:
+  clock_gettime04.c:163: TFAIL: CLOCK_REALTIME_COARSE(syscall with old kernel spec):
+        Difference between successive readings greater than 5 ms (1): 10
+  clock_gettime04.c:163: TFAIL: CLOCK_MONOTONIC_COARSE(vDSO with old kernel spec):
+	Difference between successive readings greater than 5 ms (2): 10
+
+From Waiman Long:
+  That failure happens for CLOCK_REALTIME_COARSE which is a faster but less
+  precise version of CLOCK_REALTIME. The time resolution is actually a clock
+  tick. Since arm64 has a HZ rate of 100. That means each tick is 10ms. So a
+  CLOCK_REALTIME_COARSE threshold of 5ms is probably not enough. I would say
+  in the case of CLOCK_REALTIME_COARSE, we have to increase the threshold based
+  on the clock tick rate of the system. This is more a test failure than is
+  an inherent problem in the kernel.
+
+Fixes #898
+
+Upstream-Status: Backport
+[https://github.com/linux-test-project/ltp/commit/9851deb86ef257a98d7433280161d8ca685aa669]
+
+Reported-by: Eirik Fuller <efuller@redhat.com>
+Signed-off-by: Li Wang <liwang@redhat.com>
+Cc: Waiman Long <llong@redhat.com>
+Cc: Viresh Kumar <viresh.kumar@linaro.org>
+Reviewed-by: Cyril Hrubis <chrubis@suse.cz>
+Acked-by: Waiman Long <longman@redhat.com>
+Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+---
+ .../syscalls/clock_gettime/clock_gettime04.c   | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/clock_gettime/clock_gettime04.c b/testcases/kernel/syscalls/clock_gettime/clock_gettime04.c
+index a8d2c5b38..c279da79e 100644
+--- a/testcases/kernel/syscalls/clock_gettime/clock_gettime04.c
++++ b/testcases/kernel/syscalls/clock_gettime/clock_gettime04.c
+@@ -35,7 +35,7 @@ clockid_t clks[] = {
+ };
+ 
+ static gettime_t ptr_vdso_gettime, ptr_vdso_gettime64;
+-static long long delta = 5;
++static long long delta, precise_delta, coarse_delta;
+ 
+ static inline int do_vdso_gettime(gettime_t vdso, clockid_t clk_id, void *ts)
+ {
+@@ -92,9 +92,18 @@ static struct time64_variants variants[] = {
+ 
+ static void setup(void)
+ {
++	struct timespec res;
++
++	clock_getres(CLOCK_REALTIME, &res);
++	precise_delta = 5 + res.tv_nsec / 1000000;
++
++	clock_getres(CLOCK_REALTIME_COARSE, &res);
++	coarse_delta = 5 + res.tv_nsec / 1000000;
++
+ 	if (tst_is_virt(VIRT_ANY)) {
+ 		tst_res(TINFO, "Running in a virtual machine, multiply the delta by 10.");
+-		delta *= 10;
++		precise_delta *= 10;
++		coarse_delta *= 10;
+ 	}
+ 
+ 	find_clock_gettime_vdso(&ptr_vdso_gettime, &ptr_vdso_gettime64);
+@@ -108,6 +117,11 @@ static void run(unsigned int i)
+ 	int count = 10000, ret;
+ 	unsigned int j;
+ 
++	if (clks[i] == CLOCK_REALTIME_COARSE || clks[i] == CLOCK_MONOTONIC_COARSE)
++		delta = coarse_delta;
++	else
++		delta = precise_delta;
++
+ 	do {
+ 		for (j = 0; j < ARRAY_SIZE(variants); j++) {
+ 			/* Refresh time in start */
+-- 
+2.34.1
+

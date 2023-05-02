@@ -1,0 +1,93 @@
+From a1821ad612994b95cb6597efd15e0a888676386c Mon Sep 17 00:00:00 2001
+From: Victor Colombo <victor.colombo@eldorado.org.br>
+Date: Fri, 17 Dec 2021 17:57:18 +0100
+Subject: [PATCH 11/21] target/ppc: Fix xs{max, min}[cj]dp to use VSX registers
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+PPC instruction xsmaxcdp, xsmincdp, xsmaxjdp, and xsminjdp are using
+vector registers when they should be using VSX ones. This happens
+because the instructions are using GEN_VSX_HELPER_R3, which adds 32
+to the register numbers, effectively making them vector registers.
+
+This patch fixes it by changing these instructions to use
+GEN_VSX_HELPER_X3.
+
+Upstream-Status: Backport
+[https://git.qemu.org/?p=qemu.git;a=commit;h=201fc774e0e1cc76ec23b595968004a7b14fb6e8]
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Victor Colombo <victor.colombo@eldorado.org.br>
+Message-Id: <20211213120958.24443-2-victor.colombo@eldorado.org.br>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+---
+ target/ppc/fpu_helper.c             | 4 ++--
+ target/ppc/helper.h                 | 8 ++++----
+ target/ppc/translate/vsx-impl.c.inc | 8 ++++----
+ 3 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index 9a1e7e6244..ecdcd36a11 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -2375,7 +2375,7 @@ VSX_MAX_MIN(xvmindp, minnum, 2, float64, VsrD(i))
+ VSX_MAX_MIN(xvminsp, minnum, 4, float32, VsrW(i))
+ 
+ #define VSX_MAX_MINC(name, max)                                               \
+-void helper_##name(CPUPPCState *env, uint32_t opcode,                         \
++void helper_##name(CPUPPCState *env,                                          \
+                    ppc_vsr_t *xt, ppc_vsr_t *xa, ppc_vsr_t *xb)               \
+ {                                                                             \
+     ppc_vsr_t t = *xt;                                                        \
+@@ -2410,7 +2410,7 @@ VSX_MAX_MINC(xsmaxcdp, 1);
+ VSX_MAX_MINC(xsmincdp, 0);
+ 
+ #define VSX_MAX_MINJ(name, max)                                               \
+-void helper_##name(CPUPPCState *env, uint32_t opcode,                         \
++void helper_##name(CPUPPCState *env,                                          \
+                    ppc_vsr_t *xt, ppc_vsr_t *xa, ppc_vsr_t *xb)               \
+ {                                                                             \
+     ppc_vsr_t t = *xt;                                                        \
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 627811cefc..12a3d5f269 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -392,10 +392,10 @@ DEF_HELPER_4(xscmpoqp, void, env, i32, vsr, vsr)
+ DEF_HELPER_4(xscmpuqp, void, env, i32, vsr, vsr)
+ DEF_HELPER_4(xsmaxdp, void, env, vsr, vsr, vsr)
+ DEF_HELPER_4(xsmindp, void, env, vsr, vsr, vsr)
+-DEF_HELPER_5(xsmaxcdp, void, env, i32, vsr, vsr, vsr)
+-DEF_HELPER_5(xsmincdp, void, env, i32, vsr, vsr, vsr)
+-DEF_HELPER_5(xsmaxjdp, void, env, i32, vsr, vsr, vsr)
+-DEF_HELPER_5(xsminjdp, void, env, i32, vsr, vsr, vsr)
++DEF_HELPER_4(xsmaxcdp, void, env, vsr, vsr, vsr)
++DEF_HELPER_4(xsmincdp, void, env, vsr, vsr, vsr)
++DEF_HELPER_4(xsmaxjdp, void, env, vsr, vsr, vsr)
++DEF_HELPER_4(xsminjdp, void, env, vsr, vsr, vsr)
+ DEF_HELPER_3(xscvdphp, void, env, vsr, vsr)
+ DEF_HELPER_4(xscvdpqp, void, env, i32, vsr, vsr)
+ DEF_HELPER_3(xscvdpsp, void, env, vsr, vsr)
+diff --git a/target/ppc/translate/vsx-impl.c.inc b/target/ppc/translate/vsx-impl.c.inc
+index c0e38060b4..02df75339e 100644
+--- a/target/ppc/translate/vsx-impl.c.inc
++++ b/target/ppc/translate/vsx-impl.c.inc
+@@ -1098,10 +1098,10 @@ GEN_VSX_HELPER_R2_AB(xscmpoqp, 0x04, 0x04, 0, PPC2_VSX)
+ GEN_VSX_HELPER_R2_AB(xscmpuqp, 0x04, 0x14, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X3(xsmaxdp, 0x00, 0x14, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X3(xsmindp, 0x00, 0x15, 0, PPC2_VSX)
+-GEN_VSX_HELPER_R3(xsmaxcdp, 0x00, 0x10, 0, PPC2_ISA300)
+-GEN_VSX_HELPER_R3(xsmincdp, 0x00, 0x11, 0, PPC2_ISA300)
+-GEN_VSX_HELPER_R3(xsmaxjdp, 0x00, 0x12, 0, PPC2_ISA300)
+-GEN_VSX_HELPER_R3(xsminjdp, 0x00, 0x12, 0, PPC2_ISA300)
++GEN_VSX_HELPER_X3(xsmaxcdp, 0x00, 0x10, 0, PPC2_ISA300)
++GEN_VSX_HELPER_X3(xsmincdp, 0x00, 0x11, 0, PPC2_ISA300)
++GEN_VSX_HELPER_X3(xsmaxjdp, 0x00, 0x12, 0, PPC2_ISA300)
++GEN_VSX_HELPER_X3(xsminjdp, 0x00, 0x12, 0, PPC2_ISA300)
+ GEN_VSX_HELPER_X2(xscvdphp, 0x16, 0x15, 0x11, PPC2_ISA300)
+ GEN_VSX_HELPER_X2(xscvdpsp, 0x12, 0x10, 0, PPC2_VSX)
+ GEN_VSX_HELPER_R2(xscvdpqp, 0x04, 0x1A, 0x16, PPC2_ISA300)
+-- 
+2.17.1
+

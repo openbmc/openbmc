@@ -1,18 +1,18 @@
+From 2dd282a54e5fccf9b501973e6da5f83ebde8e980 Mon Sep 17 00:00:00 2001
+From: 4ugustus <wangdw.augustus@qq.com>
+Date: Thu, 10 Mar 2022 08:48:00 +0000
+Subject: [PATCH] fix heap buffer overflow in tiffcp (#278)
+
 CVE: CVE-2022-0924
 Upstream-Status: Backport
 Signed-off-by: Ross Burton <ross.burton@arm.com>
-
-From 1074b9691322b1e3671cd8ea0b6b3509d08978fb Mon Sep 17 00:00:00 2001
-From: 4ugustus <wangdw.augustus@qq.com>
-Date: Thu, 10 Mar 2022 08:48:00 +0000
-Subject: [PATCH 6/6] fix heap buffer overflow in tiffcp (#278)
 
 ---
  tools/tiffcp.c | 17 ++++++++++++++++-
  1 file changed, 16 insertions(+), 1 deletion(-)
 
 diff --git a/tools/tiffcp.c b/tools/tiffcp.c
-index 1f889516..552d8fad 100644
+index 1f88951..552d8fa 100644
 --- a/tools/tiffcp.c
 +++ b/tools/tiffcp.c
 @@ -1661,12 +1661,27 @@ DECLAREwriteFunc(writeBufferToSeparateStrips)
@@ -52,6 +52,3 @@ index 1f889516..552d8fad 100644
  			if (TIFFWriteEncodedStrip(out, strip++, obuf, stripsize) < 0) {
  				TIFFError(TIFFFileName(out),
  				    "Error, can't write strip %"PRIu32,
--- 
-2.25.1
-

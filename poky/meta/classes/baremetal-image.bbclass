@@ -95,6 +95,17 @@ QB_OPT_APPEND:append:qemuriscv32 = " -bios none"
 CFLAGS:append:qemuriscv64 = " -mcmodel=medany"
 
 
+## Emulate image.bbclass
+# Handle inherits of any of the image classes we need
+IMAGE_CLASSES ??= ""
+IMGCLASSES = " ${IMAGE_CLASSES}"
+inherit ${IMGCLASSES}
+# Set defaults to satisfy IMAGE_FEATURES check
+IMAGE_FEATURES ?= ""
+IMAGE_FEATURES[type] = "list"
+IMAGE_FEATURES[validitems] += ""
+
+
 # This next part is necessary to trick the build system into thinking
 # its building an image recipe so it generates the qemuboot.conf
 addtask do_rootfs before do_image after do_install

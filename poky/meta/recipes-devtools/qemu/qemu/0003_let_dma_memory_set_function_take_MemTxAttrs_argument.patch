@@ -1,0 +1,98 @@
+From 7a36e42d9114474278ce30ba36945cc62292eb60 Mon Sep 17 00:00:00 2001
+From: =?utf8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Thu, 3 Sep 2020 10:28:32 +0200
+Subject: [PATCH] dma: Let dma_memory_set() take MemTxAttrs argument
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+
+Let devices specify transaction attributes when calling
+dma_memory_set().
+
+CVE: CVE-2021-3611
+Upstream-Status: Backport [https://git.qemu.org/?p=qemu.git;a=commit;h=7a36e42d9114474278ce30ba36945cc62292eb60]
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20211223115554.3155328-3-philmd@redhat.com>
+Signed-off-by: Bhabu Bindu <bhabu.bindu@kpit.com>
+---
+ hw/nvram/fw_cfg.c          | 3 ++-
+ include/hw/ppc/spapr_vio.h | 3 ++-
+ include/sysemu/dma.h       | 3 ++-
+ softmmu/dma-helpers.c      | 5 ++---
+ 4 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index c06b30d..f7803fe 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -399,7 +399,8 @@ static void fw_cfg_dma_transfer(FWCfgState *s)
+              * tested before.
+              */
+             if (read) {
+-                if (dma_memory_set(s->dma_as, dma.address, 0, len)) {
++                if (dma_memory_set(s->dma_as, dma.address, 0, len,
++                                   MEMTXATTRS_UNSPECIFIED)) {
+                     dma.control |= FW_CFG_DMA_CTL_ERROR;
+                 }
+             }
+diff --git a/include/hw/ppc/spapr_vio.h b/include/hw/ppc/spapr_vio.h
+index 4c45f15..c90e74a 100644
+--- a/include/hw/ppc/spapr_vio.h
++++ b/include/hw/ppc/spapr_vio.h
+@@ -111,7 +111,8 @@ static inline int spapr_vio_dma_write(SpaprVioDevice *dev, uint64_t taddr,
+ static inline int spapr_vio_dma_set(SpaprVioDevice *dev, uint64_t taddr,
+                                     uint8_t c, uint32_t size)
+ {
+-    return (dma_memory_set(&dev->as, taddr, c, size) != 0) ?
++    return (dma_memory_set(&dev->as, taddr,
++                           c, size, MEMTXATTRS_UNSPECIFIED) != 0) ?
+         H_DEST_PARM : H_SUCCESS;
+ }
+ 
+diff --git a/include/sysemu/dma.h b/include/sysemu/dma.h
+index 296f3b5..d23516f 100644
+--- a/include/sysemu/dma.h
++++ b/include/sysemu/dma.h
+@@ -175,9 +175,10 @@ static inline MemTxResult dma_memory_write(AddressSpace *as, dma_addr_t addr,
+  * @addr: address within that address space
+  * @c: constant byte to fill the memory
+  * @len: the number of bytes to fill with the constant byte
++ * @attrs: memory transaction attributes
+  */
+ MemTxResult dma_memory_set(AddressSpace *as, dma_addr_t addr,
+-                           uint8_t c, dma_addr_t len);
++                           uint8_t c, dma_addr_t len, MemTxAttrs attrs);
+ 
+ /**
+  * address_space_map: Map a physical memory region into a host virtual address.
+diff --git a/softmmu/dma-helpers.c b/softmmu/dma-helpers.c
+index 7d766a5..1f07217 100644
+--- a/softmmu/dma-helpers.c
++++ b/softmmu/dma-helpers.c
+@@ -19,7 +19,7 @@
+ /* #define DEBUG_IOMMU */
+ 
+ MemTxResult dma_memory_set(AddressSpace *as, dma_addr_t addr,
+-                           uint8_t c, dma_addr_t len)
++                           uint8_t c, dma_addr_t len, MemTxAttrs attrs)
+ {
+     dma_barrier(as, DMA_DIRECTION_FROM_DEVICE);
+ 
+@@ -31,8 +31,7 @@ MemTxResult dma_memory_set(AddressSpace *as, dma_addr_t addr,
+     memset(fillbuf, c, FILLBUF_SIZE);
+     while (len > 0) {
+         l = len < FILLBUF_SIZE ? len : FILLBUF_SIZE;
+-        error |= address_space_write(as, addr, MEMTXATTRS_UNSPECIFIED,
+-                                     fillbuf, l);
++        error |= address_space_write(as, addr, attrs, fillbuf, l);
+         len -= l;
+         addr += l;
+     }
+-- 
+1.8.3.1
+

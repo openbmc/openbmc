@@ -1,0 +1,42 @@
+From ef748a8bd8720416b673e1743e5673a801e8279f Mon Sep 17 00:00:00 2001
+From: Jiasheng Jiang <jiasheng@iscas.ac.cn>
+Date: Tue, 15 Feb 2022 17:58:08 +0800
+Subject: [PATCH] avcodec/vp3: Add missing check for av_malloc
+
+Since the av_malloc() may fail and return NULL pointer,
+it is needed that the 's->edge_emu_buffer' should be checked
+whether the new allocation is success.
+
+Fixes: d14723861b ("VP3: fix decoding of videos with stride > 2048")
+Reviewed-by: Peter Ross <pross@xvid.org>
+Signed-off-by: Jiasheng Jiang <jiasheng@iscas.ac.cn>
+
+CVE: CVE-2022-3109
+
+Upstream-Status: Backport [https://github.com/FFmpeg/FFmpeg/commit/656cb0450aeb73b25d7d26980af342b37ac4c568]
+
+Signed-off-by: Narpat Mali <narpat.mali@windriver.com>
+
+---
+ libavcodec/vp3.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/libavcodec/vp3.c b/libavcodec/vp3.c
+index 5b9ba60..f1eccfe 100644
+--- a/libavcodec/vp3.c
++++ b/libavcodec/vp3.c
+@@ -2677,8 +2677,13 @@ static int vp3_decode_frame(AVCodecContext *avctx,
+     if ((ret = ff_thread_get_buffer(avctx, &s->current_frame, AV_GET_BUFFER_FLAG_REF)) < 0)
+         goto error;
+ 
+-    if (!s->edge_emu_buffer)
++    if (!s->edge_emu_buffer) {
+         s->edge_emu_buffer = av_malloc(9 * FFABS(s->current_frame.f->linesize[0]));
++        if (!s->edge_emu_buffer) {
++            ret = AVERROR(ENOMEM);
++            goto error;
++        }
++    }
+ 
+     if (s->keyframe) {
+         if (!s->theora) {

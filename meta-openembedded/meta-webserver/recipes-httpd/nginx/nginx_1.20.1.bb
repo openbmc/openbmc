@@ -1,6 +1,8 @@
 require nginx.inc
 
-SRC_URI += "file://CVE-2021-3618.patch"
+SRC_URI += "file://CVE-2021-3618.patch \
+            file://CVE-2022-41741-CVE-2022-41742.patch \
+           "
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=206629dc7c7b3e87acb31162363ae505"
 

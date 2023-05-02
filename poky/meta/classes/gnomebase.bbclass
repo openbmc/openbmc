@@ -1,5 +1,5 @@
 def gnome_verdir(v):
-    return ".".join(v.split(".")[:-1])
+    return ".".join(v.split(".")[:-1]) or v
 
 
 GNOME_COMPRESS_TYPE ?= "xz"

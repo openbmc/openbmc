@@ -11,6 +11,7 @@
 import os
 import sys
 import warnings
+
 warnings.simplefilter("default")
 import argparse
 import logging
@@ -26,6 +27,7 @@ myname = os.path.basename(sys.argv[0])
 logger = bb.msg.logger_create(myname)
 
 is_dump = myname == 'bitbake-dumpsig'
+
 
 def find_siginfo(tinfoil, pn, taskname, sigs=None):
     result = None
@@ -52,6 +54,7 @@ def find_siginfo(tinfoil, pn, taskname, sigs=None):
         sys.exit(2)
     return result
 
+
 def find_siginfo_task(bbhandler, pn, taskname, sig1=None, sig2=None):
     """ Find the most recent signature files for the specified PN/task """
 
@@ -63,10 +66,10 @@ def find_siginfo_task(bbhandler, pn, taskname, sig1=None, sig2=None):
         if not sigfiles:
             logger.error('No sigdata files found matching %s %s matching either %s or %s' % (pn, taskname, sig1, sig2))
             sys.exit(1)
-        elif not sig1 in sigfiles:
+        elif sig1 not in sigfiles:
             logger.error('No sigdata files found matching %s %s with signature %s' % (pn, taskname, sig1))
             sys.exit(1)
-        elif not sig2 in sigfiles:
+        elif sig2 not in sigfiles:
             logger.error('No sigdata files found matching %s %s with signature %s' % (pn, taskname, sig2))
             sys.exit(1)
         latestfiles = [sigfiles[sig1], sigfiles[sig2]]
@@ -88,9 +91,9 @@ def recursecb(key, hash1, hash2):
     recout = []
     if not hashfiles:
         recout.append("Unable to find matching sigdata for %s with hashes %s or %s" % (key, hash1, hash2))
-    elif not hash1 in hashfiles:
+    elif hash1 not in hashfiles:
         recout.append("Unable to find matching sigdata for %s with hash %s" % (key, hash1))
-    elif not hash2 in hashfiles:
+    elif hash2 not in hashfiles:
         recout.append("Unable to find matching sigdata for %s with hash %s" % (key, hash2))
     else:
         out2 = bb.siggen.compare_sigfiles(hashfiles[hash1], hashfiles[hash2], recursecb, color=color)
@@ -110,36 +113,36 @@ parser.add_argument('-D', '--debug',
 
 if is_dump:
     parser.add_argument("-t", "--task",
-            help="find the signature data file for the last run of the specified task",
-            action="store", dest="taskargs", nargs=2, metavar=('recipename', 'taskname'))
+                        help="find the signature data file for the last run of the specified task",
+                        action="store", dest="taskargs", nargs=2, metavar=('recipename', 'taskname'))
 
     parser.add_argument("sigdatafile1",
-            help="Signature file to dump. Not used when using -t/--task.",
-            action="store", nargs='?', metavar="sigdatafile")
+                        help="Signature file to dump. Not used when using -t/--task.",
+                        action="store", nargs='?', metavar="sigdatafile")
 else:
     parser.add_argument('-c', '--color',
-            help='Colorize the output (where %(metavar)s is %(choices)s)',
-            choices=['auto', 'always', 'never'], default='auto', metavar='color')
+                        help='Colorize the output (where %(metavar)s is %(choices)s)',
+                        choices=['auto', 'always', 'never'], default='auto', metavar='color')
 
     parser.add_argument('-d', '--dump',
-            help='Dump the last signature data instead of comparing (equivalent to using bitbake-dumpsig)',
-            action='store_true')
+                        help='Dump the last signature data instead of comparing (equivalent to using bitbake-dumpsig)',
+                        action='store_true')
 
     parser.add_argument("-t", "--task",
-            help="find the signature data files for the last two runs of the specified task and compare them",
-            action="store", dest="taskargs", nargs=2, metavar=('recipename', 'taskname'))
+                        help="find the signature data files for the last two runs of the specified task and compare them",
+                        action="store", dest="taskargs", nargs=2, metavar=('recipename', 'taskname'))
 
     parser.add_argument("-s", "--signature",
-            help="With -t/--task, specify the signatures to look for instead of taking the last two",
-            action="store", dest="sigargs", nargs=2, metavar=('fromsig', 'tosig'))
+                        help="With -t/--task, specify the signatures to look for instead of taking the last two",
+                        action="store", dest="sigargs", nargs=2, metavar=('fromsig', 'tosig'))
 
     parser.add_argument("sigdatafile1",
-            help="First signature file to compare (or signature file to dump, if second not specified). Not used when using -t/--task.",
-            action="store", nargs='?')
+                        help="First signature file to compare (or signature file to dump, if second not specified). Not used when using -t/--task.",
+                        action="store", nargs='?')
 
     parser.add_argument("sigdatafile2",
-            help="Second signature file to compare",
-            action="store", nargs='?')
+                        help="Second signature file to compare",
+                        action="store", nargs='?')
 
 options = parser.parse_args()
 if is_dump:
@@ -157,7 +160,8 @@ if options.taskargs:
     with bb.tinfoil.Tinfoil() as tinfoil:
         tinfoil.prepare(config_only=True)
         if not options.dump and options.sigargs:
-            files = find_siginfo_task(tinfoil, options.taskargs[0], options.taskargs[1], options.sigargs[0], options.sigargs[1])
+            files = find_siginfo_task(tinfoil, options.taskargs[0], options.taskargs[1], options.sigargs[0],
+                                      options.sigargs[1])
         else:
             files = find_siginfo_task(tinfoil, options.taskargs[0], options.taskargs[1])
 
@@ -166,7 +170,8 @@ if options.taskargs:
             output = bb.siggen.dump_sigfile(files[-1])
         else:
             if len(files) < 2:
-                logger.error('Only one matching sigdata file found for the specified task (%s %s)' % (options.taskargs[0], options.taskargs[1]))
+                logger.error('Only one matching sigdata file found for the specified task (%s %s)' % (
+                    options.taskargs[0], options.taskargs[1]))
                 sys.exit(1)
 
             # Recurse into signature comparison

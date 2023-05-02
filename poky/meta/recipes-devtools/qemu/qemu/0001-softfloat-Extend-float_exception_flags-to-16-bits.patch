@@ -1,0 +1,75 @@
+From 0bec1ded33a857f59cf5f3ceca2f72694256e710 Mon Sep 17 00:00:00 2001
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri, 17 Dec 2021 17:57:14 +0100
+Subject: [PATCH 01/21] softfloat: Extend float_exception_flags to 16 bits
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We will shortly have more than 8 bits of exceptions.
+Repack the existing flags into low bits and reformat to hex.
+
+Upstream-Status: Backport
+[https://git.qemu.org/?p=qemu.git;a=commit;h=149a48f6e6ccedfa01307d45884aa480f5bf77c5]
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20211119160502.17432-2-richard.henderson@linaro.org>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+---
+ include/fpu/softfloat-types.h | 16 ++++++++--------
+ include/fpu/softfloat.h       |  2 +-
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/include/fpu/softfloat-types.h b/include/fpu/softfloat-types.h
+index 5bcbd041f7..65a43aff59 100644
+--- a/include/fpu/softfloat-types.h
++++ b/include/fpu/softfloat-types.h
+@@ -145,13 +145,13 @@ typedef enum __attribute__((__packed__)) {
+  */
+ 
+ enum {
+-    float_flag_invalid   =  1,
+-    float_flag_divbyzero =  4,
+-    float_flag_overflow  =  8,
+-    float_flag_underflow = 16,
+-    float_flag_inexact   = 32,
+-    float_flag_input_denormal = 64,
+-    float_flag_output_denormal = 128
++    float_flag_invalid         = 0x0001,
++    float_flag_divbyzero       = 0x0002,
++    float_flag_overflow        = 0x0004,
++    float_flag_underflow       = 0x0008,
++    float_flag_inexact         = 0x0010,
++    float_flag_input_denormal  = 0x0020,
++    float_flag_output_denormal = 0x0040,
+ };
+ 
+ /*
+@@ -171,8 +171,8 @@ typedef enum __attribute__((__packed__)) {
+  */
+ 
+ typedef struct float_status {
++    uint16_t float_exception_flags;
+     FloatRoundMode float_rounding_mode;
+-    uint8_t     float_exception_flags;
+     FloatX80RoundPrec floatx80_rounding_precision;
+     bool tininess_before_rounding;
+     /* should denormalised results go to zero and set the inexact flag? */
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index a249991e61..0d3b407807 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -100,7 +100,7 @@ typedef enum {
+ | Routine to raise any or all of the software IEC/IEEE floating-point
+ | exception flags.
+ *----------------------------------------------------------------------------*/
+-static inline void float_raise(uint8_t flags, float_status *status)
++static inline void float_raise(uint16_t flags, float_status *status)
+ {
+     status->float_exception_flags |= flags;
+ }
+-- 
+2.17.1
+

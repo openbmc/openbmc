@@ -1,0 +1,34 @@
+From 80be37351d995654f86b838f6b5ed47e8a90261b Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Fri, 23 Sep 2022 12:05:17 +0800
+Subject: [PATCH] CMakeLists.txt: not include import_executables.cmake
+
+building failed since native does not generate import_executables.cmake
+In fact, our building system will export the needed commands.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ CMakeLists.txt | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f9e2b1b..34924ba 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -394,11 +394,6 @@ CHECK_LIBFMT()
+ ADD_SUBDIRECTORY(tpool)
+ CHECK_SYSTEMD()
+ 
+-IF(CMAKE_CROSSCOMPILING AND NOT DEFINED CMAKE_CROSSCOMPILING_EMULATOR)
+-  SET(IMPORT_EXECUTABLES "IMPORTFILE-NOTFOUND" CACHE FILEPATH "Path to import_executables.cmake from a native build")
+-  INCLUDE(${IMPORT_EXECUTABLES})
+-ENDIF()
+-
+ #
+ # Setup maintainer mode options. Platform checks are
+ # not run with the warning options as to not perturb fragile checks
+-- 
+2.25.1
+

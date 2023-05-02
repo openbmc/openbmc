@@ -43,7 +43,7 @@ def menuconfig(args, config, basepath, workspace):
             return 1
 
         check_workspace_recipe(workspace, args.component)
-        pn = rd.getVar('PN', True)
+        pn = rd.getVar('PN')
 
         if not rd.getVarFlag('do_menuconfig','task'):
             raise DevtoolError("This recipe does not support menuconfig option")

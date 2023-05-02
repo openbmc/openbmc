@@ -1,0 +1,91 @@
+From 292e13142d277c15bdd68331abc607e46628b7e1 Mon Sep 17 00:00:00 2001
+From: =?utf8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Wed, 15 Dec 2021 23:38:52 +0100
+Subject: [PATCH] dma: Let dma_buf_rw() propagate MemTxResult
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+
+dma_memory_rw() returns a MemTxResult type. Do not discard
+it, return it to the caller.
+
+Since dma_buf_rw() was previously returning the QEMUSGList
+size not consumed, add an extra argument where this size
+can be stored.
+
+Update the 2 callers.
+
+CVE: CVE-2021-3611
+Upstream-Status: Backport [https://git.qemu.org/?p=qemu.git;a=commit;h=292e13142d277c15bdd68331abc607e46628b7e1]
+
+Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
+Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+Message-Id: <20211223115554.3155328-14-philmd@redhat.com>
+Signed-off-by: Bhabu Bindu <bhabu.bindu@kpit.com>
+---
+ softmmu/dma-helpers.c | 25 +++++++++++++++++++------
+ 1 file changed, 19 insertions(+), 6 deletions(-)
+
+diff --git a/softmmu/dma-helpers.c b/softmmu/dma-helpers.c
+index a391773..b0be156 100644
+--- a/softmmu/dma-helpers.c
++++ b/softmmu/dma-helpers.c
+@@ -294,12 +294,14 @@ BlockAIOCB *dma_blk_write(BlockBackend *blk,
+ }
+ 
+ 
+-static uint64_t dma_buf_rw(void *buf, int32_t len, QEMUSGList *sg,
+-                           DMADirection dir, MemTxAttrs attrs)
++static MemTxResult dma_buf_rw(void *buf, int32_t len, uint64_t *residp,
++                              QEMUSGList *sg, DMADirection dir,
++                              MemTxAttrs attrs)
+ {
+     uint8_t *ptr = buf;
+     uint64_t resid;
+     int sg_cur_index;
++    MemTxResult res = MEMTX_OK;
+ 
+     resid = sg->size;
+     sg_cur_index = 0;
+@@ -307,23 +309,34 @@ static uint64_t dma_buf_rw(void *buf, int32_t len, QEMUSGList *sg,
+     while (len > 0) {
+         ScatterGatherEntry entry = sg->sg[sg_cur_index++];
+         int32_t xfer = MIN(len, entry.len);
+-        dma_memory_rw(sg->as, entry.base, ptr, xfer, dir, attrs);
++        res |= dma_memory_rw(sg->as, entry.base, ptr, xfer, dir, attrs);
+         ptr += xfer;
+         len -= xfer;
+         resid -= xfer;
+     }
+ 
+-    return resid;
++    if (residp) {
++        *residp = resid;
++    }
++    return res;
+ }
+ 
+ uint64_t dma_buf_read(void *ptr, int32_t len, QEMUSGList *sg, MemTxAttrs attrs)
+ {
+-    return dma_buf_rw(ptr, len, sg, DMA_DIRECTION_FROM_DEVICE, attrs);
++    uint64_t resid;
++
++    dma_buf_rw(ptr, len, &resid, sg, DMA_DIRECTION_FROM_DEVICE, attrs);
++
++    return resid;
+ }
+ 
+ uint64_t dma_buf_write(void *ptr, int32_t len, QEMUSGList *sg, MemTxAttrs attrs)
+ {
+-    return dma_buf_rw(ptr, len, sg, DMA_DIRECTION_TO_DEVICE, attrs);
++    uint64_t resid;
++
++    dma_buf_rw(ptr, len, &resid, sg, DMA_DIRECTION_TO_DEVICE, attrs);
++
++    return resid;
+ }
+ 
+ void dma_acct_start(BlockBackend *blk, BlockAcctCookie *cookie,
+-- 
+1.8.3.1
+

@@ -11,6 +11,7 @@ DEPENDS += "asciidoc-native xmlto-native"
 
 SRC_URI = "git://github.com/scottchiefbaker/dool.git;branch=master;protocol=https \
 	   file://0001-Fix-build-error-as-following.patch \
+	   file://0001-Fix-rename-in-docs.patch \
           "
 
 SRCREV = "34a3244b46aa70a31f871a7ca8ffa8d3a7b950d2"

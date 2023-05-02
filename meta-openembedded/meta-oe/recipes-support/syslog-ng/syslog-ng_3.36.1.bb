@@ -22,6 +22,14 @@ SRC_URI = "https://github.com/balabit/syslog-ng/releases/download/${BP}/${BP}.ta
            file://volatiles.03_syslog-ng \
            file://syslog-ng-tmp.conf \
            file://syslog-ng.service-the-syslog-ng-service.patch \
+	   file://CVE-2022-38725-0001.patch \
+           file://CVE-2022-38725-0002.patch \
+           file://CVE-2022-38725-0003.patch \
+           file://CVE-2022-38725-0004.patch \
+           file://CVE-2022-38725-0005.patch \
+           file://CVE-2022-38725-0006.patch \
+           file://CVE-2022-38725-0007.patch \
+           file://CVE-2022-38725-0008.patch \
 "
 
 SRC_URI[sha256sum] = "90a25c9767fe749db50f118ddfc92ec71399763d2ecd5ad4f11ff5eea049e60b"

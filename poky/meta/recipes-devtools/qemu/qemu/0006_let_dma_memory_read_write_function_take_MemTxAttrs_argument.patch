@@ -1,0 +1,1453 @@
+From ba06fe8add5b788956a7317246c6280dfc157040 Mon Sep 17 00:00:00 2001
+From: =?utf8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Thu, 3 Sep 2020 10:08:29 +0200
+Subject: [PATCH] dma: Let dma_memory_read/write() take MemTxAttrs argument
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+
+Let devices specify transaction attributes when calling
+dma_memory_read() or dma_memory_write().
+
+Patch created mechanically using spatch with this script:
+
+  @@
+  expression E1, E2, E3, E4;
+  @@
+  (
+  - dma_memory_read(E1, E2, E3, E4)
+  + dma_memory_read(E1, E2, E3, E4, MEMTXATTRS_UNSPECIFIED)
+  |
+  - dma_memory_write(E1, E2, E3, E4)
+  + dma_memory_write(E1, E2, E3, E4, MEMTXATTRS_UNSPECIFIED)
+  )
+
+CVE: CVE-2021-3611
+Upstream-Status: Backport [https://git.qemu.org/?p=qemu.git;a=commit;h=ba06fe8add5b788956a7317246c6280dfc157040]
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20211223115554.3155328-6-philmd@redhat.com>
+Signed-off-by: Bhabu Bindu <bhabu.bindu@kpit.com>
+---
+ hw/arm/musicpal.c             | 13 +++++++------
+ hw/arm/smmu-common.c          |  3 ++-
+ hw/arm/smmuv3.c               | 14 +++++++++-----
+ hw/core/generic-loader.c      |  3 ++-
+ hw/dma/pl330.c                | 12 ++++++++----
+ hw/dma/sparc32_dma.c          | 16 ++++++++++------
+ hw/dma/xlnx-zynq-devcfg.c     |  6 ++++--
+ hw/dma/xlnx_dpdma.c           | 10 ++++++----
+ hw/i386/amd_iommu.c           | 16 +++++++++-------
+ hw/i386/intel_iommu.c         | 28 +++++++++++++++++-----------
+ hw/ide/macio.c                |  2 +-
+ hw/intc/xive.c                |  7 ++++---
+ hw/misc/bcm2835_property.c    |  3 ++-
+ hw/misc/macio/mac_dbdma.c     | 10 ++++++----
+ hw/net/allwinner-sun8i-emac.c | 18 ++++++++++++------
+ hw/net/ftgmac100.c            | 25 ++++++++++++++++---------
+ hw/net/imx_fec.c              | 32 ++++++++++++++++++++------------
+ hw/net/npcm7xx_emc.c          | 20 ++++++++++++--------
+ hw/nvram/fw_cfg.c             |  9 ++++++---
+ hw/pci-host/pnv_phb3.c        |  5 +++--
+ hw/pci-host/pnv_phb3_msi.c    |  9 ++++++---
+ hw/pci-host/pnv_phb4.c        |  5 +++--
+ hw/sd/allwinner-sdhost.c      | 14 ++++++++------
+ hw/sd/sdhci.c                 | 35 ++++++++++++++++++++++-------------
+ hw/usb/hcd-dwc2.c             |  8 ++++----
+ hw/usb/hcd-ehci.c             |  6 ++++--
+ hw/usb/hcd-ohci.c             | 18 +++++++++++-------
+ hw/usb/hcd-xhci.c             | 18 +++++++++++-------
+ include/hw/ppc/spapr_vio.h    |  6 ++++--
+ include/sysemu/dma.h          | 20 ++++++++++++--------
+ 30 files changed, 241 insertions(+), 150 deletions(-)
+
+diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
+index 2d612cc..2680ec5 100644
+--- a/hw/arm/musicpal.c
++++ b/hw/arm/musicpal.c
+@@ -185,13 +185,13 @@ static void eth_rx_desc_put(AddressSpace *dma_as, uint32_t addr,
+     cpu_to_le16s(&desc->buffer_size);
+     cpu_to_le32s(&desc->buffer);
+     cpu_to_le32s(&desc->next);
+-    dma_memory_write(dma_as, addr, desc, sizeof(*desc));
++    dma_memory_write(dma_as, addr, desc, sizeof(*desc), MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ static void eth_rx_desc_get(AddressSpace *dma_as, uint32_t addr,
+                             mv88w8618_rx_desc *desc)
+ {
+-    dma_memory_read(dma_as, addr, desc, sizeof(*desc));
++    dma_memory_read(dma_as, addr, desc, sizeof(*desc), MEMTXATTRS_UNSPECIFIED);
+     le32_to_cpus(&desc->cmdstat);
+     le16_to_cpus(&desc->bytes);
+     le16_to_cpus(&desc->buffer_size);
+@@ -215,7 +215,7 @@ static ssize_t eth_receive(NetClientState *nc, const uint8_t *buf, size_t size)
+             eth_rx_desc_get(&s->dma_as, desc_addr, &desc);
+             if ((desc.cmdstat & MP_ETH_RX_OWN) && desc.buffer_size >= size) {
+                 dma_memory_write(&s->dma_as, desc.buffer + s->vlan_header,
+-                                          buf, size);
++                                 buf, size, MEMTXATTRS_UNSPECIFIED);
+                 desc.bytes = size + s->vlan_header;
+                 desc.cmdstat &= ~MP_ETH_RX_OWN;
+                 s->cur_rx[i] = desc.next;
+@@ -241,13 +241,13 @@ static void eth_tx_desc_put(AddressSpace *dma_as, uint32_t addr,
+     cpu_to_le16s(&desc->bytes);
+     cpu_to_le32s(&desc->buffer);
+     cpu_to_le32s(&desc->next);
+-    dma_memory_write(dma_as, addr, desc, sizeof(*desc));
++    dma_memory_write(dma_as, addr, desc, sizeof(*desc), MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ static void eth_tx_desc_get(AddressSpace *dma_as, uint32_t addr,
+                             mv88w8618_tx_desc *desc)
+ {
+-    dma_memory_read(dma_as, addr, desc, sizeof(*desc));
++    dma_memory_read(dma_as, addr, desc, sizeof(*desc), MEMTXATTRS_UNSPECIFIED);
+     le32_to_cpus(&desc->cmdstat);
+     le16_to_cpus(&desc->res);
+     le16_to_cpus(&desc->bytes);
+@@ -269,7 +269,8 @@ static void eth_send(mv88w8618_eth_state *s, int queue_index)
+         if (desc.cmdstat & MP_ETH_TX_OWN) {
+             len = desc.bytes;
+             if (len < 2048) {
+-                dma_memory_read(&s->dma_as, desc.buffer, buf, len);
++                dma_memory_read(&s->dma_as, desc.buffer, buf, len,
++                                MEMTXATTRS_UNSPECIFIED);
+                 qemu_send_packet(qemu_get_queue(s->nic), buf, len);
+             }
+             desc.cmdstat &= ~MP_ETH_TX_OWN;
+diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+index 0459850..e09b9c1 100644
+--- a/hw/arm/smmu-common.c
++++ b/hw/arm/smmu-common.c
+@@ -193,7 +193,8 @@ static int get_pte(dma_addr_t baseaddr, uint32_t index, uint64_t *pte,
+     dma_addr_t addr = baseaddr + index * sizeof(*pte);
+ 
+     /* TODO: guarantee 64-bit single-copy atomicity */
+-    ret = dma_memory_read(&address_space_memory, addr, pte, sizeof(*pte));
++    ret = dma_memory_read(&address_space_memory, addr, pte, sizeof(*pte),
++                          MEMTXATTRS_UNSPECIFIED);
+ 
+     if (ret != MEMTX_OK) {
+         info->type = SMMU_PTW_ERR_WALK_EABT;
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index 01b60be..3b43368 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -102,7 +102,8 @@ static inline MemTxResult queue_read(SMMUQueue *q, void *data)
+ {
+     dma_addr_t addr = Q_CONS_ENTRY(q);
+ 
+-    return dma_memory_read(&address_space_memory, addr, data, q->entry_size);
++    return dma_memory_read(&address_space_memory, addr, data, q->entry_size,
++                           MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ static MemTxResult queue_write(SMMUQueue *q, void *data)
+@@ -110,7 +111,8 @@ static MemTxResult queue_write(SMMUQueue *q, void *data)
+     dma_addr_t addr = Q_PROD_ENTRY(q);
+     MemTxResult ret;
+ 
+-    ret = dma_memory_write(&address_space_memory, addr, data, q->entry_size);
++    ret = dma_memory_write(&address_space_memory, addr, data, q->entry_size,
++                           MEMTXATTRS_UNSPECIFIED);
+     if (ret != MEMTX_OK) {
+         return ret;
+     }
+@@ -285,7 +287,8 @@ static int smmu_get_ste(SMMUv3State *s, dma_addr_t addr, STE *buf,
+ 
+     trace_smmuv3_get_ste(addr);
+     /* TODO: guarantee 64-bit single-copy atomicity */
+-    ret = dma_memory_read(&address_space_memory, addr, buf, sizeof(*buf));
++    ret = dma_memory_read(&address_space_memory, addr, buf, sizeof(*buf),
++                          MEMTXATTRS_UNSPECIFIED);
+     if (ret != MEMTX_OK) {
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "Cannot fetch pte at address=0x%"PRIx64"\n", addr);
+@@ -306,7 +309,8 @@ static int smmu_get_cd(SMMUv3State *s, STE *ste, uint32_t ssid,
+ 
+     trace_smmuv3_get_cd(addr);
+     /* TODO: guarantee 64-bit single-copy atomicity */
+-    ret = dma_memory_read(&address_space_memory, addr, buf, sizeof(*buf));
++    ret = dma_memory_read(&address_space_memory, addr, buf, sizeof(*buf),
++                          MEMTXATTRS_UNSPECIFIED);
+     if (ret != MEMTX_OK) {
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "Cannot fetch pte at address=0x%"PRIx64"\n", addr);
+@@ -411,7 +415,7 @@ static int smmu_find_ste(SMMUv3State *s, uint32_t sid, STE *ste,
+         l1ptr = (dma_addr_t)(strtab_base + l1_ste_offset * sizeof(l1std));
+         /* TODO: guarantee 64-bit single-copy atomicity */
+         ret = dma_memory_read(&address_space_memory, l1ptr, &l1std,
+-                              sizeof(l1std));
++                              sizeof(l1std), MEMTXATTRS_UNSPECIFIED);
+         if (ret != MEMTX_OK) {
+             qemu_log_mask(LOG_GUEST_ERROR,
+                           "Could not read L1PTR at 0X%"PRIx64"\n", l1ptr);
+diff --git a/hw/core/generic-loader.c b/hw/core/generic-loader.c
+index d14f932..9a24ffb 100644
+--- a/hw/core/generic-loader.c
++++ b/hw/core/generic-loader.c
+@@ -57,7 +57,8 @@ static void generic_loader_reset(void *opaque)
+ 
+     if (s->data_len) {
+         assert(s->data_len < sizeof(s->data));
+-        dma_memory_write(s->cpu->as, s->addr, &s->data, s->data_len);
++        dma_memory_write(s->cpu->as, s->addr, &s->data, s->data_len,
++                         MEMTXATTRS_UNSPECIFIED);
+     }
+ }
+ 
+diff --git a/hw/dma/pl330.c b/hw/dma/pl330.c
+index 0cb4619..31ce01b 100644
+--- a/hw/dma/pl330.c
++++ b/hw/dma/pl330.c
+@@ -1111,7 +1111,8 @@ static inline const PL330InsnDesc *pl330_fetch_insn(PL330Chan *ch)
+     uint8_t opcode;
+     int i;
+ 
+-    dma_memory_read(ch->parent->mem_as, ch->pc, &opcode, 1);
++    dma_memory_read(ch->parent->mem_as, ch->pc, &opcode, 1,
++                    MEMTXATTRS_UNSPECIFIED);
+     for (i = 0; insn_desc[i].size; i++) {
+         if ((opcode & insn_desc[i].opmask) == insn_desc[i].opcode) {
+             return &insn_desc[i];
+@@ -1125,7 +1126,8 @@ static inline void pl330_exec_insn(PL330Chan *ch, const PL330InsnDesc *insn)
+     uint8_t buf[PL330_INSN_MAXSIZE];
+ 
+     assert(insn->size <= PL330_INSN_MAXSIZE);
+-    dma_memory_read(ch->parent->mem_as, ch->pc, buf, insn->size);
++    dma_memory_read(ch->parent->mem_as, ch->pc, buf, insn->size,
++                    MEMTXATTRS_UNSPECIFIED);
+     insn->exec(ch, buf[0], &buf[1], insn->size - 1);
+ }
+ 
+@@ -1189,7 +1191,8 @@ static int pl330_exec_cycle(PL330Chan *channel)
+     if (q != NULL && q->len <= pl330_fifo_num_free(&s->fifo)) {
+         int len = q->len - (q->addr & (q->len - 1));
+ 
+-        dma_memory_read(s->mem_as, q->addr, buf, len);
++        dma_memory_read(s->mem_as, q->addr, buf, len,
++                        MEMTXATTRS_UNSPECIFIED);
+         trace_pl330_exec_cycle(q->addr, len);
+         if (trace_event_get_state_backends(TRACE_PL330_HEXDUMP)) {
+             pl330_hexdump(buf, len);
+@@ -1220,7 +1223,8 @@ static int pl330_exec_cycle(PL330Chan *channel)
+             fifo_res = pl330_fifo_get(&s->fifo, buf, len, q->tag);
+         }
+         if (fifo_res == PL330_FIFO_OK || q->z) {
+-            dma_memory_write(s->mem_as, q->addr, buf, len);
++            dma_memory_write(s->mem_as, q->addr, buf, len,
++                             MEMTXATTRS_UNSPECIFIED);
+             trace_pl330_exec_cycle(q->addr, len);
+             if (trace_event_get_state_backends(TRACE_PL330_HEXDUMP)) {
+                 pl330_hexdump(buf, len);
+diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
+index 03bc500..0ef13c5 100644
+--- a/hw/dma/sparc32_dma.c
++++ b/hw/dma/sparc32_dma.c
+@@ -81,11 +81,11 @@ void ledma_memory_read(void *opaque, hwaddr addr,
+     addr |= s->dmaregs[3];
+     trace_ledma_memory_read(addr, len);
+     if (do_bswap) {
+-        dma_memory_read(&is->iommu_as, addr, buf, len);
++        dma_memory_read(&is->iommu_as, addr, buf, len, MEMTXATTRS_UNSPECIFIED);
+     } else {
+         addr &= ~1;
+         len &= ~1;
+-        dma_memory_read(&is->iommu_as, addr, buf, len);
++        dma_memory_read(&is->iommu_as, addr, buf, len, MEMTXATTRS_UNSPECIFIED);
+         for(i = 0; i < len; i += 2) {
+             bswap16s((uint16_t *)(buf + i));
+         }
+@@ -103,7 +103,8 @@ void ledma_memory_write(void *opaque, hwaddr addr,
+     addr |= s->dmaregs[3];
+     trace_ledma_memory_write(addr, len);
+     if (do_bswap) {
+-        dma_memory_write(&is->iommu_as, addr, buf, len);
++        dma_memory_write(&is->iommu_as, addr, buf, len,
++                         MEMTXATTRS_UNSPECIFIED);
+     } else {
+         addr &= ~1;
+         len &= ~1;
+@@ -114,7 +115,8 @@ void ledma_memory_write(void *opaque, hwaddr addr,
+             for(i = 0; i < l; i += 2) {
+                 tmp_buf[i >> 1] = bswap16(*(uint16_t *)(buf + i));
+             }
+-            dma_memory_write(&is->iommu_as, addr, tmp_buf, l);
++            dma_memory_write(&is->iommu_as, addr, tmp_buf, l,
++                             MEMTXATTRS_UNSPECIFIED);
+             len -= l;
+             buf += l;
+             addr += l;
+@@ -148,7 +150,8 @@ void espdma_memory_read(void *opaque, uint8_t *buf, int len)
+     IOMMUState *is = (IOMMUState *)s->iommu;
+ 
+     trace_espdma_memory_read(s->dmaregs[1], len);
+-    dma_memory_read(&is->iommu_as, s->dmaregs[1], buf, len);
++    dma_memory_read(&is->iommu_as, s->dmaregs[1], buf, len,
++                    MEMTXATTRS_UNSPECIFIED);
+     s->dmaregs[1] += len;
+ }
+ 
+@@ -158,7 +161,8 @@ void espdma_memory_write(void *opaque, uint8_t *buf, int len)
+     IOMMUState *is = (IOMMUState *)s->iommu;
+ 
+     trace_espdma_memory_write(s->dmaregs[1], len);
+-    dma_memory_write(&is->iommu_as, s->dmaregs[1], buf, len);
++    dma_memory_write(&is->iommu_as, s->dmaregs[1], buf, len,
++                     MEMTXATTRS_UNSPECIFIED);
+     s->dmaregs[1] += len;
+ }
+ 
+diff --git a/hw/dma/xlnx-zynq-devcfg.c b/hw/dma/xlnx-zynq-devcfg.c
+index e33112b..f5ad1a0 100644
+--- a/hw/dma/xlnx-zynq-devcfg.c
++++ b/hw/dma/xlnx-zynq-devcfg.c
+@@ -161,12 +161,14 @@ static void xlnx_zynq_devcfg_dma_go(XlnxZynqDevcfg *s)
+             btt = MIN(btt, dmah->dest_len);
+         }
+         DB_PRINT("reading %x bytes from %x\n", btt, dmah->src_addr);
+-        dma_memory_read(&address_space_memory, dmah->src_addr, buf, btt);
++        dma_memory_read(&address_space_memory, dmah->src_addr, buf, btt,
++                        MEMTXATTRS_UNSPECIFIED);
+         dmah->src_len -= btt;
+         dmah->src_addr += btt;
+         if (loopback && (dmah->src_len || dmah->dest_len)) {
+             DB_PRINT("writing %x bytes from %x\n", btt, dmah->dest_addr);
+-            dma_memory_write(&address_space_memory, dmah->dest_addr, buf, btt);
++            dma_memory_write(&address_space_memory, dmah->dest_addr, buf, btt,
++                             MEMTXATTRS_UNSPECIFIED);
+             dmah->dest_len -= btt;
+             dmah->dest_addr += btt;
+         }
+diff --git a/hw/dma/xlnx_dpdma.c b/hw/dma/xlnx_dpdma.c
+index 967548a..2d7eae7 100644
+--- a/hw/dma/xlnx_dpdma.c
++++ b/hw/dma/xlnx_dpdma.c
+@@ -652,7 +652,7 @@ size_t xlnx_dpdma_start_operation(XlnxDPDMAState *s, uint8_t channel,
+         }
+ 
+         if (dma_memory_read(&address_space_memory, desc_addr, &desc,
+-                            sizeof(DPDMADescriptor))) {
++                            sizeof(DPDMADescriptor), MEMTXATTRS_UNSPECIFIED)) {
+             s->registers[DPDMA_EISR] |= ((1 << 1) << channel);
+             xlnx_dpdma_update_irq(s);
+             s->operation_finished[channel] = true;
+@@ -708,7 +708,8 @@ size_t xlnx_dpdma_start_operation(XlnxDPDMAState *s, uint8_t channel,
+                     if (dma_memory_read(&address_space_memory,
+                                         source_addr[0],
+                                         &s->data[channel][ptr],
+-                                        line_size)) {
++                                        line_size,
++                                        MEMTXATTRS_UNSPECIFIED)) {
+                         s->registers[DPDMA_ISR] |= ((1 << 12) << channel);
+                         xlnx_dpdma_update_irq(s);
+                         DPRINTF("Can't get data.\n");
+@@ -736,7 +737,8 @@ size_t xlnx_dpdma_start_operation(XlnxDPDMAState *s, uint8_t channel,
+                     if (dma_memory_read(&address_space_memory,
+                                         source_addr[frag],
+                                         &(s->data[channel][ptr]),
+-                                        fragment_len)) {
++                                        fragment_len,
++                                        MEMTXATTRS_UNSPECIFIED)) {
+                         s->registers[DPDMA_ISR] |= ((1 << 12) << channel);
+                         xlnx_dpdma_update_irq(s);
+                         DPRINTF("Can't get data.\n");
+@@ -754,7 +756,7 @@ size_t xlnx_dpdma_start_operation(XlnxDPDMAState *s, uint8_t channel,
+             DPRINTF("update the descriptor with the done flag set.\n");
+             xlnx_dpdma_desc_set_done(&desc);
+             dma_memory_write(&address_space_memory, desc_addr, &desc,
+-                             sizeof(DPDMADescriptor));
++                             sizeof(DPDMADescriptor), MEMTXATTRS_UNSPECIFIED);
+         }
+ 
+         if (xlnx_dpdma_desc_completion_interrupt(&desc)) {
+diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+index 91fe34a..4d13d8e 100644
+--- a/hw/i386/amd_iommu.c
++++ b/hw/i386/amd_iommu.c
+@@ -181,7 +181,7 @@ static void amdvi_log_event(AMDVIState *s, uint64_t *evt)
+     }
+ 
+     if (dma_memory_write(&address_space_memory, s->evtlog + s->evtlog_tail,
+-                         evt, AMDVI_EVENT_LEN)) {
++                         evt, AMDVI_EVENT_LEN, MEMTXATTRS_UNSPECIFIED)) {
+         trace_amdvi_evntlog_fail(s->evtlog, s->evtlog_tail);
+     }
+ 
+@@ -376,7 +376,8 @@ static void amdvi_completion_wait(AMDVIState *s, uint64_t *cmd)
+     }
+     if (extract64(cmd[0], 0, 1)) {
+         if (dma_memory_write(&address_space_memory, addr, &data,
+-            AMDVI_COMPLETION_DATA_SIZE)) {
++                             AMDVI_COMPLETION_DATA_SIZE,
++                             MEMTXATTRS_UNSPECIFIED)) {
+             trace_amdvi_completion_wait_fail(addr);
+         }
+     }
+@@ -502,7 +503,7 @@ static void amdvi_cmdbuf_exec(AMDVIState *s)
+     uint64_t cmd[2];
+ 
+     if (dma_memory_read(&address_space_memory, s->cmdbuf + s->cmdbuf_head,
+-        cmd, AMDVI_COMMAND_SIZE)) {
++                        cmd, AMDVI_COMMAND_SIZE, MEMTXATTRS_UNSPECIFIED)) {
+         trace_amdvi_command_read_fail(s->cmdbuf, s->cmdbuf_head);
+         amdvi_log_command_error(s, s->cmdbuf + s->cmdbuf_head);
+         return;
+@@ -836,7 +837,7 @@ static bool amdvi_get_dte(AMDVIState *s, int devid, uint64_t *entry)
+     uint32_t offset = devid * AMDVI_DEVTAB_ENTRY_SIZE;
+ 
+     if (dma_memory_read(&address_space_memory, s->devtab + offset, entry,
+-        AMDVI_DEVTAB_ENTRY_SIZE)) {
++                        AMDVI_DEVTAB_ENTRY_SIZE, MEMTXATTRS_UNSPECIFIED)) {
+         trace_amdvi_dte_get_fail(s->devtab, offset);
+         /* log error accessing dte */
+         amdvi_log_devtab_error(s, devid, s->devtab + offset, 0);
+@@ -881,7 +882,8 @@ static inline uint64_t amdvi_get_pte_entry(AMDVIState *s, uint64_t pte_addr,
+ {
+     uint64_t pte;
+ 
+-    if (dma_memory_read(&address_space_memory, pte_addr, &pte, sizeof(pte))) {
++    if (dma_memory_read(&address_space_memory, pte_addr,
++                        &pte, sizeof(pte), MEMTXATTRS_UNSPECIFIED)) {
+         trace_amdvi_get_pte_hwerror(pte_addr);
+         amdvi_log_pagetab_error(s, devid, pte_addr, 0);
+         pte = 0;
+@@ -1048,7 +1050,7 @@ static int amdvi_get_irte(AMDVIState *s, MSIMessage *origin, uint64_t *dte,
+     trace_amdvi_ir_irte(irte_root, offset);
+ 
+     if (dma_memory_read(&address_space_memory, irte_root + offset,
+-                        irte, sizeof(*irte))) {
++                        irte, sizeof(*irte), MEMTXATTRS_UNSPECIFIED)) {
+         trace_amdvi_ir_err("failed to get irte");
+         return -AMDVI_IR_GET_IRTE;
+     }
+@@ -1108,7 +1110,7 @@ static int amdvi_get_irte_ga(AMDVIState *s, MSIMessage *origin, uint64_t *dte,
+     trace_amdvi_ir_irte(irte_root, offset);
+ 
+     if (dma_memory_read(&address_space_memory, irte_root + offset,
+-                        irte, sizeof(*irte))) {
++                        irte, sizeof(*irte), MEMTXATTRS_UNSPECIFIED)) {
+         trace_amdvi_ir_err("failed to get irte_ga");
+         return -AMDVI_IR_GET_IRTE;
+     }
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index f584449..5b865ac 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -569,7 +569,8 @@ static int vtd_get_root_entry(IntelIOMMUState *s, uint8_t index,
+     dma_addr_t addr;
+ 
+     addr = s->root + index * sizeof(*re);
+-    if (dma_memory_read(&address_space_memory, addr, re, sizeof(*re))) {
++    if (dma_memory_read(&address_space_memory, addr,
++                        re, sizeof(*re), MEMTXATTRS_UNSPECIFIED)) {
+         re->lo = 0;
+         return -VTD_FR_ROOT_TABLE_INV;
+     }
+@@ -602,7 +603,8 @@ static int vtd_get_context_entry_from_root(IntelIOMMUState *s,
+     }
+ 
+     addr = addr + index * ce_size;
+-    if (dma_memory_read(&address_space_memory, addr, ce, ce_size)) {
++    if (dma_memory_read(&address_space_memory, addr,
++                        ce, ce_size, MEMTXATTRS_UNSPECIFIED)) {
+         return -VTD_FR_CONTEXT_TABLE_INV;
+     }
+ 
+@@ -639,8 +641,8 @@ static uint64_t vtd_get_slpte(dma_addr_t base_addr, uint32_t index)
+     assert(index < VTD_SL_PT_ENTRY_NR);
+ 
+     if (dma_memory_read(&address_space_memory,
+-                        base_addr + index * sizeof(slpte), &slpte,
+-                        sizeof(slpte))) {
++                        base_addr + index * sizeof(slpte),
++                        &slpte, sizeof(slpte), MEMTXATTRS_UNSPECIFIED)) {
+         slpte = (uint64_t)-1;
+         return slpte;
+     }
+@@ -704,7 +706,8 @@ static int vtd_get_pdire_from_pdir_table(dma_addr_t pasid_dir_base,
+     index = VTD_PASID_DIR_INDEX(pasid);
+     entry_size = VTD_PASID_DIR_ENTRY_SIZE;
+     addr = pasid_dir_base + index * entry_size;
+-    if (dma_memory_read(&address_space_memory, addr, pdire, entry_size)) {
++    if (dma_memory_read(&address_space_memory, addr,
++                        pdire, entry_size, MEMTXATTRS_UNSPECIFIED)) {
+         return -VTD_FR_PASID_TABLE_INV;
+     }
+ 
+@@ -728,7 +731,8 @@ static int vtd_get_pe_in_pasid_leaf_table(IntelIOMMUState *s,
+     index = VTD_PASID_TABLE_INDEX(pasid);
+     entry_size = VTD_PASID_ENTRY_SIZE;
+     addr = addr + index * entry_size;
+-    if (dma_memory_read(&address_space_memory, addr, pe, entry_size)) {
++    if (dma_memory_read(&address_space_memory, addr,
++                        pe, entry_size, MEMTXATTRS_UNSPECIFIED)) {
+         return -VTD_FR_PASID_TABLE_INV;
+     }
+ 
+@@ -2275,7 +2279,8 @@ static bool vtd_get_inv_desc(IntelIOMMUState *s,
+     uint32_t dw = s->iq_dw ? 32 : 16;
+     dma_addr_t addr = base_addr + offset * dw;
+ 
+-    if (dma_memory_read(&address_space_memory, addr, inv_desc, dw)) {
++    if (dma_memory_read(&address_space_memory, addr,
++                        inv_desc, dw, MEMTXATTRS_UNSPECIFIED)) {
+         error_report_once("Read INV DESC failed.");
+         return false;
+     }
+@@ -2308,8 +2313,9 @@ static bool vtd_process_wait_desc(IntelIOMMUState *s, VTDInvDesc *inv_desc)
+         dma_addr_t status_addr = inv_desc->hi;
+         trace_vtd_inv_desc_wait_sw(status_addr, status_data);
+         status_data = cpu_to_le32(status_data);
+-        if (dma_memory_write(&address_space_memory, status_addr, &status_data,
+-                             sizeof(status_data))) {
++        if (dma_memory_write(&address_space_memory, status_addr,
++                             &status_data, sizeof(status_data),
++                             MEMTXATTRS_UNSPECIFIED)) {
+             trace_vtd_inv_desc_wait_write_fail(inv_desc->hi, inv_desc->lo);
+             return false;
+         }
+@@ -3120,8 +3126,8 @@ static int vtd_irte_get(IntelIOMMUState *iommu, uint16_t index,
+     }
+ 
+     addr = iommu->intr_root + index * sizeof(*entry);
+-    if (dma_memory_read(&address_space_memory, addr, entry,
+-                        sizeof(*entry))) {
++    if (dma_memory_read(&address_space_memory, addr,
++                        entry, sizeof(*entry), MEMTXATTRS_UNSPECIFIED)) {
+         error_report_once("%s: read failed: ind=0x%x addr=0x%" PRIx64,
+                           __func__, index, addr);
+         return -VTD_FR_IR_ROOT_INVAL;
+diff --git a/hw/ide/macio.c b/hw/ide/macio.c
+index b03d401..f08318c 100644
+--- a/hw/ide/macio.c
++++ b/hw/ide/macio.c
+@@ -97,7 +97,7 @@ static void pmac_ide_atapi_transfer_cb(void *opaque, int ret)
+         /* Non-block ATAPI transfer - just copy to RAM */
+         s->io_buffer_size = MIN(s->io_buffer_size, io->len);
+         dma_memory_write(&address_space_memory, io->addr, s->io_buffer,
+-                         s->io_buffer_size);
++                         s->io_buffer_size, MEMTXATTRS_UNSPECIFIED);
+         io->len = 0;
+         ide_atapi_cmd_ok(s);
+         m->dma_active = false;
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 190194d..f15f985 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -1246,8 +1246,8 @@ void xive_end_queue_pic_print_info(XiveEND *end, uint32_t width, Monitor *mon)
+         uint64_t qaddr = qaddr_base + (qindex << 2);
+         uint32_t qdata = -1;
+ 
+-        if (dma_memory_read(&address_space_memory, qaddr, &qdata,
+-                            sizeof(qdata))) {
++        if (dma_memory_read(&address_space_memory, qaddr,
++                            &qdata, sizeof(qdata), MEMTXATTRS_UNSPECIFIED)) {
+             qemu_log_mask(LOG_GUEST_ERROR, "XIVE: failed to read EQ @0x%"
+                           HWADDR_PRIx "\n", qaddr);
+             return;
+@@ -1311,7 +1311,8 @@ static void xive_end_enqueue(XiveEND *end, uint32_t data)
+     uint32_t qdata = cpu_to_be32((qgen << 31) | (data & 0x7fffffff));
+     uint32_t qentries = 1 << (qsize + 10);
+ 
+-    if (dma_memory_write(&address_space_memory, qaddr, &qdata, sizeof(qdata))) {
++    if (dma_memory_write(&address_space_memory, qaddr,
++                         &qdata, sizeof(qdata), MEMTXATTRS_UNSPECIFIED)) {
+         qemu_log_mask(LOG_GUEST_ERROR, "XIVE: failed to write END data @0x%"
+                       HWADDR_PRIx "\n", qaddr);
+         return;
+diff --git a/hw/misc/bcm2835_property.c b/hw/misc/bcm2835_property.c
+index 73941bd..76ea511 100644
+--- a/hw/misc/bcm2835_property.c
++++ b/hw/misc/bcm2835_property.c
+@@ -69,7 +69,8 @@ static void bcm2835_property_mbox_push(BCM2835PropertyState *s, uint32_t value)
+             break;
+         case 0x00010003: /* Get board MAC address */
+             resplen = sizeof(s->macaddr.a);
+-            dma_memory_write(&s->dma_as, value + 12, s->macaddr.a, resplen);
++            dma_memory_write(&s->dma_as, value + 12, s->macaddr.a, resplen,
++                             MEMTXATTRS_UNSPECIFIED);
+             break;
+         case 0x00010004: /* Get board serial */
+             qemu_log_mask(LOG_UNIMP,
+diff --git a/hw/misc/macio/mac_dbdma.c b/hw/misc/macio/mac_dbdma.c
+index e220f1a..efcc026 100644
+--- a/hw/misc/macio/mac_dbdma.c
++++ b/hw/misc/macio/mac_dbdma.c
+@@ -94,7 +94,7 @@ static void dbdma_cmdptr_load(DBDMA_channel *ch)
+     DBDMA_DPRINTFCH(ch, "dbdma_cmdptr_load 0x%08x\n",
+                     ch->regs[DBDMA_CMDPTR_LO]);
+     dma_memory_read(&address_space_memory, ch->regs[DBDMA_CMDPTR_LO],
+-                    &ch->current, sizeof(dbdma_cmd));
++                    &ch->current, sizeof(dbdma_cmd), MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ static void dbdma_cmdptr_save(DBDMA_channel *ch)
+@@ -104,7 +104,7 @@ static void dbdma_cmdptr_save(DBDMA_channel *ch)
+                     le16_to_cpu(ch->current.xfer_status),
+                     le16_to_cpu(ch->current.res_count));
+     dma_memory_write(&address_space_memory, ch->regs[DBDMA_CMDPTR_LO],
+-                     &ch->current, sizeof(dbdma_cmd));
++                     &ch->current, sizeof(dbdma_cmd), MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ static void kill_channel(DBDMA_channel *ch)
+@@ -371,7 +371,8 @@ static void load_word(DBDMA_channel *ch, int key, uint32_t addr,
+         return;
+     }
+ 
+-    dma_memory_read(&address_space_memory, addr, &current->cmd_dep, len);
++    dma_memory_read(&address_space_memory, addr, &current->cmd_dep, len,
++                    MEMTXATTRS_UNSPECIFIED);
+ 
+     if (conditional_wait(ch))
+         goto wait;
+@@ -403,7 +404,8 @@ static void store_word(DBDMA_channel *ch, int key, uint32_t addr,
+         return;
+     }
+ 
+-    dma_memory_write(&address_space_memory, addr, &current->cmd_dep, len);
++    dma_memory_write(&address_space_memory, addr, &current->cmd_dep, len,
++                     MEMTXATTRS_UNSPECIFIED);
+ 
+     if (conditional_wait(ch))
+         goto wait;
+diff --git a/hw/net/allwinner-sun8i-emac.c b/hw/net/allwinner-sun8i-emac.c
+index ff611f1..ecc0245 100644
+--- a/hw/net/allwinner-sun8i-emac.c
++++ b/hw/net/allwinner-sun8i-emac.c
+@@ -350,7 +350,8 @@ static void allwinner_sun8i_emac_get_desc(AwSun8iEmacState *s,
+                                           FrameDescriptor *desc,
+                                           uint32_t phys_addr)
+ {
+-    dma_memory_read(&s->dma_as, phys_addr, desc, sizeof(*desc));
++    dma_memory_read(&s->dma_as, phys_addr, desc, sizeof(*desc),
++                    MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ static uint32_t allwinner_sun8i_emac_next_desc(AwSun8iEmacState *s,
+@@ -402,7 +403,8 @@ static void allwinner_sun8i_emac_flush_desc(AwSun8iEmacState *s,
+                                             FrameDescriptor *desc,
+                                             uint32_t phys_addr)
+ {
+-    dma_memory_write(&s->dma_as, phys_addr, desc, sizeof(*desc));
++    dma_memory_write(&s->dma_as, phys_addr, desc, sizeof(*desc),
++                     MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ static bool allwinner_sun8i_emac_can_receive(NetClientState *nc)
+@@ -460,7 +462,8 @@ static ssize_t allwinner_sun8i_emac_receive(NetClientState *nc,
+                             << RX_DESC_STATUS_FRM_LEN_SHIFT;
+         }
+ 
+-        dma_memory_write(&s->dma_as, desc.addr, buf, desc_bytes);
++        dma_memory_write(&s->dma_as, desc.addr, buf, desc_bytes,
++                         MEMTXATTRS_UNSPECIFIED);
+         allwinner_sun8i_emac_flush_desc(s, &desc, s->rx_desc_curr);
+         trace_allwinner_sun8i_emac_receive(s->rx_desc_curr, desc.addr,
+                                            desc_bytes);
+@@ -512,7 +515,8 @@ static void allwinner_sun8i_emac_transmit(AwSun8iEmacState *s)
+             desc.status |= TX_DESC_STATUS_LENGTH_ERR;
+             break;
+         }
+-        dma_memory_read(&s->dma_as, desc.addr, packet_buf + packet_bytes, bytes);
++        dma_memory_read(&s->dma_as, desc.addr, packet_buf + packet_bytes,
++                        bytes, MEMTXATTRS_UNSPECIFIED);
+         packet_bytes += bytes;
+         desc.status &= ~DESC_STATUS_CTL;
+         allwinner_sun8i_emac_flush_desc(s, &desc, s->tx_desc_curr);
+@@ -634,7 +638,8 @@ static uint64_t allwinner_sun8i_emac_read(void *opaque, hwaddr offset,
+         break;
+     case REG_TX_CUR_BUF:        /* Transmit Current Buffer */
+         if (s->tx_desc_curr != 0) {
+-            dma_memory_read(&s->dma_as, s->tx_desc_curr, &desc, sizeof(desc));
++            dma_memory_read(&s->dma_as, s->tx_desc_curr, &desc, sizeof(desc),
++                            MEMTXATTRS_UNSPECIFIED);
+             value = desc.addr;
+         } else {
+             value = 0;
+@@ -647,7 +652,8 @@ static uint64_t allwinner_sun8i_emac_read(void *opaque, hwaddr offset,
+         break;
+     case REG_RX_CUR_BUF:        /* Receive Current Buffer */
+         if (s->rx_desc_curr != 0) {
+-            dma_memory_read(&s->dma_as, s->rx_desc_curr, &desc, sizeof(desc));
++            dma_memory_read(&s->dma_as, s->rx_desc_curr, &desc, sizeof(desc),
++                            MEMTXATTRS_UNSPECIFIED);
+             value = desc.addr;
+         } else {
+             value = 0;
+diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
+index 25685ba..83ef0a7 100644
+--- a/hw/net/ftgmac100.c
++++ b/hw/net/ftgmac100.c
+@@ -453,7 +453,8 @@ static void do_phy_ctl(FTGMAC100State *s)
+ 
+ static int ftgmac100_read_bd(FTGMAC100Desc *bd, dma_addr_t addr)
+ {
+-    if (dma_memory_read(&address_space_memory, addr, bd, sizeof(*bd))) {
++    if (dma_memory_read(&address_space_memory, addr,
++                        bd, sizeof(*bd), MEMTXATTRS_UNSPECIFIED)) {
+         qemu_log_mask(LOG_GUEST_ERROR, "%s: failed to read descriptor @ 0x%"
+                       HWADDR_PRIx "\n", __func__, addr);
+         return -1;
+@@ -473,7 +474,8 @@ static int ftgmac100_write_bd(FTGMAC100Desc *bd, dma_addr_t addr)
+     lebd.des1 = cpu_to_le32(bd->des1);
+     lebd.des2 = cpu_to_le32(bd->des2);
+     lebd.des3 = cpu_to_le32(bd->des3);
+-    if (dma_memory_write(&address_space_memory, addr, &lebd, sizeof(lebd))) {
++    if (dma_memory_write(&address_space_memory, addr,
++                         &lebd, sizeof(lebd), MEMTXATTRS_UNSPECIFIED)) {
+         qemu_log_mask(LOG_GUEST_ERROR, "%s: failed to write descriptor @ 0x%"
+                       HWADDR_PRIx "\n", __func__, addr);
+         return -1;
+@@ -554,7 +556,8 @@ static void ftgmac100_do_tx(FTGMAC100State *s, uint32_t tx_ring,
+             len =  sizeof(s->frame) - frame_size;
+         }
+ 
+-        if (dma_memory_read(&address_space_memory, bd.des3, ptr, len)) {
++        if (dma_memory_read(&address_space_memory, bd.des3,
++                            ptr, len, MEMTXATTRS_UNSPECIFIED)) {
+             qemu_log_mask(LOG_GUEST_ERROR, "%s: failed to read packet @ 0x%x\n",
+                           __func__, bd.des3);
+             s->isr |= FTGMAC100_INT_AHB_ERR;
+@@ -1030,20 +1033,24 @@ static ssize_t ftgmac100_receive(NetClientState *nc, const uint8_t *buf,
+             bd.des1 = lduw_be_p(buf + 14) | FTGMAC100_RXDES1_VLANTAG_AVAIL;
+ 
+             if (s->maccr & FTGMAC100_MACCR_RM_VLAN) {
+-                dma_memory_write(&address_space_memory, buf_addr, buf, 12);
+-                dma_memory_write(&address_space_memory, buf_addr + 12, buf + 16,
+-                                 buf_len - 16);
++                dma_memory_write(&address_space_memory, buf_addr, buf, 12,
++                                 MEMTXATTRS_UNSPECIFIED);
++                dma_memory_write(&address_space_memory, buf_addr + 12,
++                                 buf + 16, buf_len - 16,
++                                 MEMTXATTRS_UNSPECIFIED);
+             } else {
+-                dma_memory_write(&address_space_memory, buf_addr, buf, buf_len);
++                dma_memory_write(&address_space_memory, buf_addr, buf,
++                                 buf_len, MEMTXATTRS_UNSPECIFIED);
+             }
+         } else {
+             bd.des1 = 0;
+-            dma_memory_write(&address_space_memory, buf_addr, buf, buf_len);
++            dma_memory_write(&address_space_memory, buf_addr, buf, buf_len,
++                             MEMTXATTRS_UNSPECIFIED);
+         }
+         buf += buf_len;
+         if (size < 4) {
+             dma_memory_write(&address_space_memory, buf_addr + buf_len,
+-                             crc_ptr, 4 - size);
++                             crc_ptr, 4 - size, MEMTXATTRS_UNSPECIFIED);
+             crc_ptr += 4 - size;
+         }
+ 
+diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+index 9c7035b..0db9aaf 100644
+--- a/hw/net/imx_fec.c
++++ b/hw/net/imx_fec.c
+@@ -387,19 +387,22 @@ static void imx_phy_write(IMXFECState *s, int reg, uint32_t val)
+ 
+ static void imx_fec_read_bd(IMXFECBufDesc *bd, dma_addr_t addr)
+ {
+-    dma_memory_read(&address_space_memory, addr, bd, sizeof(*bd));
++    dma_memory_read(&address_space_memory, addr, bd, sizeof(*bd),
++                    MEMTXATTRS_UNSPECIFIED);
+ 
+     trace_imx_fec_read_bd(addr, bd->flags, bd->length, bd->data);
+ }
+ 
+ static void imx_fec_write_bd(IMXFECBufDesc *bd, dma_addr_t addr)
+ {
+-    dma_memory_write(&address_space_memory, addr, bd, sizeof(*bd));
++    dma_memory_write(&address_space_memory, addr, bd, sizeof(*bd),
++                     MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ static void imx_enet_read_bd(IMXENETBufDesc *bd, dma_addr_t addr)
+ {
+-    dma_memory_read(&address_space_memory, addr, bd, sizeof(*bd));
++    dma_memory_read(&address_space_memory, addr, bd, sizeof(*bd),
++                    MEMTXATTRS_UNSPECIFIED);
+ 
+     trace_imx_enet_read_bd(addr, bd->flags, bd->length, bd->data,
+                    bd->option, bd->status);
+@@ -407,7 +410,8 @@ static void imx_enet_read_bd(IMXENETBufDesc *bd, dma_addr_t addr)
+ 
+ static void imx_enet_write_bd(IMXENETBufDesc *bd, dma_addr_t addr)
+ {
+-    dma_memory_write(&address_space_memory, addr, bd, sizeof(*bd));
++    dma_memory_write(&address_space_memory, addr, bd, sizeof(*bd),
++                     MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ static void imx_eth_update(IMXFECState *s)
+@@ -474,7 +478,8 @@ static void imx_fec_do_tx(IMXFECState *s)
+             len = ENET_MAX_FRAME_SIZE - frame_size;
+             s->regs[ENET_EIR] |= ENET_INT_BABT;
+         }
+-        dma_memory_read(&address_space_memory, bd.data, ptr, len);
++        dma_memory_read(&address_space_memory, bd.data, ptr, len,
++                        MEMTXATTRS_UNSPECIFIED);
+         ptr += len;
+         frame_size += len;
+         if (bd.flags & ENET_BD_L) {
+@@ -555,7 +560,8 @@ static void imx_enet_do_tx(IMXFECState *s, uint32_t index)
+             len = ENET_MAX_FRAME_SIZE - frame_size;
+             s->regs[ENET_EIR] |= ENET_INT_BABT;
+         }
+-        dma_memory_read(&address_space_memory, bd.data, ptr, len);
++        dma_memory_read(&address_space_memory, bd.data, ptr, len,
++                        MEMTXATTRS_UNSPECIFIED);
+         ptr += len;
+         frame_size += len;
+         if (bd.flags & ENET_BD_L) {
+@@ -1103,11 +1109,12 @@ static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
+             buf_len += size - 4;
+         }
+         buf_addr = bd.data;
+-        dma_memory_write(&address_space_memory, buf_addr, buf, buf_len);
++        dma_memory_write(&address_space_memory, buf_addr, buf, buf_len,
++                         MEMTXATTRS_UNSPECIFIED);
+         buf += buf_len;
+         if (size < 4) {
+             dma_memory_write(&address_space_memory, buf_addr + buf_len,
+-                             crc_ptr, 4 - size);
++                             crc_ptr, 4 - size, MEMTXATTRS_UNSPECIFIED);
+             crc_ptr += 4 - size;
+         }
+         bd.flags &= ~ENET_BD_E;
+@@ -1210,8 +1217,8 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+              */
+             const uint8_t zeros[2] = { 0 };
+ 
+-            dma_memory_write(&address_space_memory, buf_addr,
+-                             zeros, sizeof(zeros));
++            dma_memory_write(&address_space_memory, buf_addr, zeros,
++                             sizeof(zeros), MEMTXATTRS_UNSPECIFIED);
+ 
+             buf_addr += sizeof(zeros);
+             buf_len  -= sizeof(zeros);
+@@ -1220,11 +1227,12 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+             shift16 = false;
+         }
+ 
+-        dma_memory_write(&address_space_memory, buf_addr, buf, buf_len);
++        dma_memory_write(&address_space_memory, buf_addr, buf, buf_len,
++                         MEMTXATTRS_UNSPECIFIED);
+         buf += buf_len;
+         if (size < 4) {
+             dma_memory_write(&address_space_memory, buf_addr + buf_len,
+-                             crc_ptr, 4 - size);
++                             crc_ptr, 4 - size, MEMTXATTRS_UNSPECIFIED);
+             crc_ptr += 4 - size;
+         }
+         bd.flags &= ~ENET_BD_E;
+diff --git a/hw/net/npcm7xx_emc.c b/hw/net/npcm7xx_emc.c
+index 545b2b7..9a23289 100644
+--- a/hw/net/npcm7xx_emc.c
++++ b/hw/net/npcm7xx_emc.c
+@@ -200,7 +200,8 @@ static void emc_update_irq_from_reg_change(NPCM7xxEMCState *emc)
+ 
+ static int emc_read_tx_desc(dma_addr_t addr, NPCM7xxEMCTxDesc *desc)
+ {
+-    if (dma_memory_read(&address_space_memory, addr, desc, sizeof(*desc))) {
++    if (dma_memory_read(&address_space_memory, addr, desc,
++                        sizeof(*desc), MEMTXATTRS_UNSPECIFIED)) {
+         qemu_log_mask(LOG_GUEST_ERROR, "%s: Failed to read descriptor @ 0x%"
+                       HWADDR_PRIx "\n", __func__, addr);
+         return -1;
+@@ -221,7 +222,7 @@ static int emc_write_tx_desc(const NPCM7xxEMCTxDesc *desc, dma_addr_t addr)
+     le_desc.status_and_length = cpu_to_le32(desc->status_and_length);
+     le_desc.ntxdsa = cpu_to_le32(desc->ntxdsa);
+     if (dma_memory_write(&address_space_memory, addr, &le_desc,
+-                         sizeof(le_desc))) {
++                         sizeof(le_desc), MEMTXATTRS_UNSPECIFIED)) {
+         qemu_log_mask(LOG_GUEST_ERROR, "%s: Failed to write descriptor @ 0x%"
+                       HWADDR_PRIx "\n", __func__, addr);
+         return -1;
+@@ -231,7 +232,8 @@ static int emc_write_tx_desc(const NPCM7xxEMCTxDesc *desc, dma_addr_t addr)
+ 
+ static int emc_read_rx_desc(dma_addr_t addr, NPCM7xxEMCRxDesc *desc)
+ {
+-    if (dma_memory_read(&address_space_memory, addr, desc, sizeof(*desc))) {
++    if (dma_memory_read(&address_space_memory, addr, desc,
++                        sizeof(*desc), MEMTXATTRS_UNSPECIFIED)) {
+         qemu_log_mask(LOG_GUEST_ERROR, "%s: Failed to read descriptor @ 0x%"
+                       HWADDR_PRIx "\n", __func__, addr);
+         return -1;
+@@ -252,7 +254,7 @@ static int emc_write_rx_desc(const NPCM7xxEMCRxDesc *desc, dma_addr_t addr)
+     le_desc.reserved = cpu_to_le32(desc->reserved);
+     le_desc.nrxdsa = cpu_to_le32(desc->nrxdsa);
+     if (dma_memory_write(&address_space_memory, addr, &le_desc,
+-                         sizeof(le_desc))) {
++                         sizeof(le_desc), MEMTXATTRS_UNSPECIFIED)) {
+         qemu_log_mask(LOG_GUEST_ERROR, "%s: Failed to write descriptor @ 0x%"
+                       HWADDR_PRIx "\n", __func__, addr);
+         return -1;
+@@ -366,7 +368,8 @@ static void emc_try_send_next_packet(NPCM7xxEMCState *emc)
+         buf = malloced_buf;
+     }
+ 
+-    if (dma_memory_read(&address_space_memory, next_buf_addr, buf, length)) {
++    if (dma_memory_read(&address_space_memory, next_buf_addr, buf,
++                        length, MEMTXATTRS_UNSPECIFIED)) {
+         qemu_log_mask(LOG_GUEST_ERROR, "%s: Failed to read packet @ 0x%x\n",
+                       __func__, next_buf_addr);
+         emc_set_mista(emc, REG_MISTA_TXBERR);
+@@ -551,10 +554,11 @@ static ssize_t emc_receive(NetClientState *nc, const uint8_t *buf, size_t len1)
+ 
+     buf_addr = rx_desc.rxbsa;
+     emc->regs[REG_CRXBSA] = buf_addr;
+-    if (dma_memory_write(&address_space_memory, buf_addr, buf, len) ||
++    if (dma_memory_write(&address_space_memory, buf_addr, buf,
++                         len, MEMTXATTRS_UNSPECIFIED) ||
+         (!(emc->regs[REG_MCMDR] & REG_MCMDR_SPCRC) &&
+-         dma_memory_write(&address_space_memory, buf_addr + len, crc_ptr,
+-                          4))) {
++         dma_memory_write(&address_space_memory, buf_addr + len,
++                          crc_ptr, 4, MEMTXATTRS_UNSPECIFIED))) {
+         qemu_log_mask(LOG_GUEST_ERROR, "%s: Bus error writing packet\n",
+                       __func__);
+         emc_set_mista(emc, REG_MISTA_RXBERR);
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index f7803fe..9b91b15 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -357,7 +357,8 @@ static void fw_cfg_dma_transfer(FWCfgState *s)
+     dma_addr = s->dma_addr;
+     s->dma_addr = 0;
+ 
+-    if (dma_memory_read(s->dma_as, dma_addr, &dma, sizeof(dma))) {
++    if (dma_memory_read(s->dma_as, dma_addr,
++                        &dma, sizeof(dma), MEMTXATTRS_UNSPECIFIED)) {
+         stl_be_dma(s->dma_as, dma_addr + offsetof(FWCfgDmaAccess, control),
+                    FW_CFG_DMA_CTL_ERROR);
+         return;
+@@ -419,7 +420,8 @@ static void fw_cfg_dma_transfer(FWCfgState *s)
+              */
+             if (read) {
+                 if (dma_memory_write(s->dma_as, dma.address,
+-                                    &e->data[s->cur_offset], len)) {
++                                     &e->data[s->cur_offset], len,
++                                     MEMTXATTRS_UNSPECIFIED)) {
+                     dma.control |= FW_CFG_DMA_CTL_ERROR;
+                 }
+             }
+@@ -427,7 +429,8 @@ static void fw_cfg_dma_transfer(FWCfgState *s)
+                 if (!e->allow_write ||
+                     len != dma.length ||
+                     dma_memory_read(s->dma_as, dma.address,
+-                                    &e->data[s->cur_offset], len)) {
++                                    &e->data[s->cur_offset], len,
++                                    MEMTXATTRS_UNSPECIFIED)) {
+                     dma.control |= FW_CFG_DMA_CTL_ERROR;
+                 } else if (e->write_cb) {
+                     e->write_cb(e->callback_opaque, s->cur_offset, len);
+diff --git a/hw/pci-host/pnv_phb3.c b/hw/pci-host/pnv_phb3.c
+index 9c4451c..c6e7871 100644
+--- a/hw/pci-host/pnv_phb3.c
++++ b/hw/pci-host/pnv_phb3.c
+@@ -715,7 +715,8 @@ static bool pnv_phb3_resolve_pe(PnvPhb3DMASpace *ds)
+     bus_num = pci_bus_num(ds->bus);
+     addr = rtt & PHB_RTT_BASE_ADDRESS_MASK;
+     addr += 2 * ((bus_num << 8) | ds->devfn);
+-    if (dma_memory_read(&address_space_memory, addr, &rte, sizeof(rte))) {
++    if (dma_memory_read(&address_space_memory, addr, &rte,
++                        sizeof(rte), MEMTXATTRS_UNSPECIFIED)) {
+         phb3_error(ds->phb, "Failed to read RTT entry at 0x%"PRIx64, addr);
+         /* Set error bits ? fence ? ... */
+         return false;
+@@ -794,7 +795,7 @@ static void pnv_phb3_translate_tve(PnvPhb3DMASpace *ds, hwaddr addr,
+             /* Grab the TCE address */
+             taddr = base | (((addr >> sh) & ((1ul << tbl_shift) - 1)) << 3);
+             if (dma_memory_read(&address_space_memory, taddr, &tce,
+-                                sizeof(tce))) {
++                                sizeof(tce), MEMTXATTRS_UNSPECIFIED)) {
+                 phb3_error(phb, "Failed to read TCE at 0x%"PRIx64, taddr);
+                 return;
+             }
+diff --git a/hw/pci-host/pnv_phb3_msi.c b/hw/pci-host/pnv_phb3_msi.c
+index 099d209..8bcbc2c 100644
+--- a/hw/pci-host/pnv_phb3_msi.c
++++ b/hw/pci-host/pnv_phb3_msi.c
+@@ -53,7 +53,8 @@ static bool phb3_msi_read_ive(PnvPHB3 *phb, int srcno, uint64_t *out_ive)
+         return false;
+     }
+ 
+-    if (dma_memory_read(&address_space_memory, ive_addr, &ive, sizeof(ive))) {
++    if (dma_memory_read(&address_space_memory, ive_addr,
++                        &ive, sizeof(ive), MEMTXATTRS_UNSPECIFIED)) {
+         qemu_log_mask(LOG_GUEST_ERROR, "Failed to read IVE at 0x%" PRIx64,
+                       ive_addr);
+         return false;
+@@ -73,7 +74,8 @@ static void phb3_msi_set_p(Phb3MsiState *msi, int srcno, uint8_t gen)
+         return;
+     }
+ 
+-    if (dma_memory_write(&address_space_memory, ive_addr + 4, &p, 1)) {
++    if (dma_memory_write(&address_space_memory, ive_addr + 4,
++                         &p, 1, MEMTXATTRS_UNSPECIFIED)) {
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "Failed to write IVE (set P) at 0x%" PRIx64, ive_addr);
+     }
+@@ -89,7 +91,8 @@ static void phb3_msi_set_q(Phb3MsiState *msi, int srcno)
+         return;
+     }
+ 
+-    if (dma_memory_write(&address_space_memory, ive_addr + 5, &q, 1)) {
++    if (dma_memory_write(&address_space_memory, ive_addr + 5,
++                         &q, 1, MEMTXATTRS_UNSPECIFIED)) {
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "Failed to write IVE (set Q) at 0x%" PRIx64, ive_addr);
+     }
+diff --git a/hw/pci-host/pnv_phb4.c b/hw/pci-host/pnv_phb4.c
+index 40b7932..1fbf732 100644
+--- a/hw/pci-host/pnv_phb4.c
++++ b/hw/pci-host/pnv_phb4.c
+@@ -891,7 +891,8 @@ static bool pnv_phb4_resolve_pe(PnvPhb4DMASpace *ds)
+     bus_num = pci_bus_num(ds->bus);
+     addr = rtt & PHB_RTT_BASE_ADDRESS_MASK;
+     addr += 2 * PCI_BUILD_BDF(bus_num, ds->devfn);
+-    if (dma_memory_read(&address_space_memory, addr, &rte, sizeof(rte))) {
++    if (dma_memory_read(&address_space_memory, addr, &rte,
++                        sizeof(rte), MEMTXATTRS_UNSPECIFIED)) {
+         phb_error(ds->phb, "Failed to read RTT entry at 0x%"PRIx64, addr);
+         /* Set error bits ? fence ? ... */
+         return false;
+@@ -961,7 +962,7 @@ static void pnv_phb4_translate_tve(PnvPhb4DMASpace *ds, hwaddr addr,
+             /* Grab the TCE address */
+             taddr = base | (((addr >> sh) & ((1ul << tbl_shift) - 1)) << 3);
+             if (dma_memory_read(&address_space_memory, taddr, &tce,
+-                                sizeof(tce))) {
++                                sizeof(tce), MEMTXATTRS_UNSPECIFIED)) {
+                 phb_error(ds->phb, "Failed to read TCE at 0x%"PRIx64, taddr);
+                 return;
+             }
+diff --git a/hw/sd/allwinner-sdhost.c b/hw/sd/allwinner-sdhost.c
+index 9166d66..de5bc49 100644
+--- a/hw/sd/allwinner-sdhost.c
++++ b/hw/sd/allwinner-sdhost.c
+@@ -311,7 +311,8 @@ static uint32_t allwinner_sdhost_process_desc(AwSdHostState *s,
+     uint8_t buf[1024];
+ 
+     /* Read descriptor */
+-    dma_memory_read(&s->dma_as, desc_addr, desc, sizeof(*desc));
++    dma_memory_read(&s->dma_as, desc_addr, desc, sizeof(*desc),
++                    MEMTXATTRS_UNSPECIFIED);
+     if (desc->size == 0) {
+         desc->size = klass->max_desc_size;
+     } else if (desc->size > klass->max_desc_size) {
+@@ -337,23 +338,24 @@ static uint32_t allwinner_sdhost_process_desc(AwSdHostState *s,
+         /* Write to SD bus */
+         if (is_write) {
+             dma_memory_read(&s->dma_as,
+-                            (desc->addr & DESC_SIZE_MASK) + num_done,
+-                            buf, buf_bytes);
++                            (desc->addr & DESC_SIZE_MASK) + num_done, buf,
++                            buf_bytes, MEMTXATTRS_UNSPECIFIED);
+             sdbus_write_data(&s->sdbus, buf, buf_bytes);
+ 
+         /* Read from SD bus */
+         } else {
+             sdbus_read_data(&s->sdbus, buf, buf_bytes);
+             dma_memory_write(&s->dma_as,
+-                             (desc->addr & DESC_SIZE_MASK) + num_done,
+-                             buf, buf_bytes);
++                             (desc->addr & DESC_SIZE_MASK) + num_done, buf,
++                             buf_bytes, MEMTXATTRS_UNSPECIFIED);
+         }
+         num_done += buf_bytes;
+     }
+ 
+     /* Clear hold flag and flush descriptor */
+     desc->status &= ~DESC_STATUS_HOLD;
+-    dma_memory_write(&s->dma_as, desc_addr, desc, sizeof(*desc));
++    dma_memory_write(&s->dma_as, desc_addr, desc, sizeof(*desc),
++                     MEMTXATTRS_UNSPECIFIED);
+ 
+     return num_done;
+ }
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index c9dc065..e0bbc90 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -616,8 +616,8 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
+                     s->blkcnt--;
+                 }
+             }
+-            dma_memory_write(s->dma_as, s->sdmasysad,
+-                             &s->fifo_buffer[begin], s->data_count - begin);
++            dma_memory_write(s->dma_as, s->sdmasysad, &s->fifo_buffer[begin],
++                             s->data_count - begin, MEMTXATTRS_UNSPECIFIED);
+             s->sdmasysad += s->data_count - begin;
+             if (s->data_count == block_size) {
+                 s->data_count = 0;
+@@ -637,8 +637,8 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
+                 s->data_count = block_size;
+                 boundary_count -= block_size - begin;
+             }
+-            dma_memory_read(s->dma_as, s->sdmasysad,
+-                            &s->fifo_buffer[begin], s->data_count - begin);
++            dma_memory_read(s->dma_as, s->sdmasysad, &s->fifo_buffer[begin],
++                            s->data_count - begin, MEMTXATTRS_UNSPECIFIED);
+             s->sdmasysad += s->data_count - begin;
+             if (s->data_count == block_size) {
+                 sdbus_write_data(&s->sdbus, s->fifo_buffer, block_size);
+@@ -670,9 +670,11 @@ static void sdhci_sdma_transfer_single_block(SDHCIState *s)
+ 
+     if (s->trnmod & SDHC_TRNS_READ) {
+         sdbus_read_data(&s->sdbus, s->fifo_buffer, datacnt);
+-        dma_memory_write(s->dma_as, s->sdmasysad, s->fifo_buffer, datacnt);
++        dma_memory_write(s->dma_as, s->sdmasysad, s->fifo_buffer, datacnt,
++                         MEMTXATTRS_UNSPECIFIED);
+     } else {
+-        dma_memory_read(s->dma_as, s->sdmasysad, s->fifo_buffer, datacnt);
++        dma_memory_read(s->dma_as, s->sdmasysad, s->fifo_buffer, datacnt,
++                        MEMTXATTRS_UNSPECIFIED);
+         sdbus_write_data(&s->sdbus, s->fifo_buffer, datacnt);
+     }
+     s->blkcnt--;
+@@ -694,7 +696,8 @@ static void get_adma_description(SDHCIState *s, ADMADescr *dscr)
+     hwaddr entry_addr = (hwaddr)s->admasysaddr;
+     switch (SDHC_DMA_TYPE(s->hostctl1)) {
+     case SDHC_CTRL_ADMA2_32:
+-        dma_memory_read(s->dma_as, entry_addr, &adma2, sizeof(adma2));
++        dma_memory_read(s->dma_as, entry_addr, &adma2, sizeof(adma2),
++                        MEMTXATTRS_UNSPECIFIED);
+         adma2 = le64_to_cpu(adma2);
+         /* The spec does not specify endianness of descriptor table.
+          * We currently assume that it is LE.
+@@ -705,7 +708,8 @@ static void get_adma_description(SDHCIState *s, ADMADescr *dscr)
+         dscr->incr = 8;
+         break;
+     case SDHC_CTRL_ADMA1_32:
+-        dma_memory_read(s->dma_as, entry_addr, &adma1, sizeof(adma1));
++        dma_memory_read(s->dma_as, entry_addr, &adma1, sizeof(adma1),
++                        MEMTXATTRS_UNSPECIFIED);
+         adma1 = le32_to_cpu(adma1);
+         dscr->addr = (hwaddr)(adma1 & 0xFFFFF000);
+         dscr->attr = (uint8_t)extract32(adma1, 0, 7);
+@@ -717,10 +721,13 @@ static void get_adma_description(SDHCIState *s, ADMADescr *dscr)
+         }
+         break;
+     case SDHC_CTRL_ADMA2_64:
+-        dma_memory_read(s->dma_as, entry_addr, &dscr->attr, 1);
+-        dma_memory_read(s->dma_as, entry_addr + 2, &dscr->length, 2);
++        dma_memory_read(s->dma_as, entry_addr, &dscr->attr, 1,
++                        MEMTXATTRS_UNSPECIFIED);
++        dma_memory_read(s->dma_as, entry_addr + 2, &dscr->length, 2,
++                        MEMTXATTRS_UNSPECIFIED);
+         dscr->length = le16_to_cpu(dscr->length);
+-        dma_memory_read(s->dma_as, entry_addr + 4, &dscr->addr, 8);
++        dma_memory_read(s->dma_as, entry_addr + 4, &dscr->addr, 8,
++                        MEMTXATTRS_UNSPECIFIED);
+         dscr->addr = le64_to_cpu(dscr->addr);
+         dscr->attr &= (uint8_t) ~0xC0;
+         dscr->incr = 12;
+@@ -785,7 +792,8 @@ static void sdhci_do_adma(SDHCIState *s)
+                     }
+                     dma_memory_write(s->dma_as, dscr.addr,
+                                      &s->fifo_buffer[begin],
+-                                     s->data_count - begin);
++                                     s->data_count - begin,
++                                     MEMTXATTRS_UNSPECIFIED);
+                     dscr.addr += s->data_count - begin;
+                     if (s->data_count == block_size) {
+                         s->data_count = 0;
+@@ -810,7 +818,8 @@ static void sdhci_do_adma(SDHCIState *s)
+                     }
+                     dma_memory_read(s->dma_as, dscr.addr,
+                                     &s->fifo_buffer[begin],
+-                                    s->data_count - begin);
++                                    s->data_count - begin,
++                                    MEMTXATTRS_UNSPECIFIED);
+                     dscr.addr += s->data_count - begin;
+                     if (s->data_count == block_size) {
+                         sdbus_write_data(&s->sdbus, s->fifo_buffer, block_size);
+diff --git a/hw/usb/hcd-dwc2.c b/hw/usb/hcd-dwc2.c
+index e1d96ac..8755e9c 100644
+--- a/hw/usb/hcd-dwc2.c
++++ b/hw/usb/hcd-dwc2.c
+@@ -272,8 +272,8 @@ static void dwc2_handle_packet(DWC2State *s, uint32_t devadr, USBDevice *dev,
+ 
+         if (pid != USB_TOKEN_IN) {
+             trace_usb_dwc2_memory_read(hcdma, tlen);
+-            if (dma_memory_read(&s->dma_as, hcdma,
+-                                s->usb_buf[chan], tlen) != MEMTX_OK) {
++            if (dma_memory_read(&s->dma_as, hcdma, s->usb_buf[chan], tlen,
++                                MEMTXATTRS_UNSPECIFIED) != MEMTX_OK) {
+                 qemu_log_mask(LOG_GUEST_ERROR, "%s: dma_memory_read failed\n",
+                               __func__);
+             }
+@@ -328,8 +328,8 @@ babble:
+ 
+         if (pid == USB_TOKEN_IN) {
+             trace_usb_dwc2_memory_write(hcdma, actual);
+-            if (dma_memory_write(&s->dma_as, hcdma, s->usb_buf[chan],
+-                                 actual) != MEMTX_OK) {
++            if (dma_memory_write(&s->dma_as, hcdma, s->usb_buf[chan], actual,
++                                 MEMTXATTRS_UNSPECIFIED) != MEMTX_OK) {
+                 qemu_log_mask(LOG_GUEST_ERROR, "%s: dma_memory_write failed\n",
+                               __func__);
+             }
+diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
+index 6caa7ac..33a8a37 100644
+--- a/hw/usb/hcd-ehci.c
++++ b/hw/usb/hcd-ehci.c
+@@ -383,7 +383,8 @@ static inline int get_dwords(EHCIState *ehci, uint32_t addr,
+     }
+ 
+     for (i = 0; i < num; i++, buf++, addr += sizeof(*buf)) {
+-        dma_memory_read(ehci->as, addr, buf, sizeof(*buf));
++        dma_memory_read(ehci->as, addr, buf, sizeof(*buf),
++                        MEMTXATTRS_UNSPECIFIED);
+         *buf = le32_to_cpu(*buf);
+     }
+ 
+@@ -405,7 +406,8 @@ static inline int put_dwords(EHCIState *ehci, uint32_t addr,
+ 
+     for (i = 0; i < num; i++, buf++, addr += sizeof(*buf)) {
+         uint32_t tmp = cpu_to_le32(*buf);
+-        dma_memory_write(ehci->as, addr, &tmp, sizeof(tmp));
++        dma_memory_write(ehci->as, addr, &tmp, sizeof(tmp),
++                         MEMTXATTRS_UNSPECIFIED);
+     }
+ 
+     return num;
+diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
+index 56e2315..a93d6b2 100644
+--- a/hw/usb/hcd-ohci.c
++++ b/hw/usb/hcd-ohci.c
+@@ -452,7 +452,8 @@ static inline int get_dwords(OHCIState *ohci,
+     addr += ohci->localmem_base;
+ 
+     for (i = 0; i < num; i++, buf++, addr += sizeof(*buf)) {
+-        if (dma_memory_read(ohci->as, addr, buf, sizeof(*buf))) {
++        if (dma_memory_read(ohci->as, addr,
++                            buf, sizeof(*buf), MEMTXATTRS_UNSPECIFIED)) {
+             return -1;
+         }
+         *buf = le32_to_cpu(*buf);
+@@ -471,7 +472,8 @@ static inline int put_dwords(OHCIState *ohci,
+ 
+     for (i = 0; i < num; i++, buf++, addr += sizeof(*buf)) {
+         uint32_t tmp = cpu_to_le32(*buf);
+-        if (dma_memory_write(ohci->as, addr, &tmp, sizeof(tmp))) {
++        if (dma_memory_write(ohci->as, addr,
++                             &tmp, sizeof(tmp), MEMTXATTRS_UNSPECIFIED)) {
+             return -1;
+         }
+     }
+@@ -488,7 +490,8 @@ static inline int get_words(OHCIState *ohci,
+     addr += ohci->localmem_base;
+ 
+     for (i = 0; i < num; i++, buf++, addr += sizeof(*buf)) {
+-        if (dma_memory_read(ohci->as, addr, buf, sizeof(*buf))) {
++        if (dma_memory_read(ohci->as, addr,
++                            buf, sizeof(*buf), MEMTXATTRS_UNSPECIFIED)) {
+             return -1;
+         }
+         *buf = le16_to_cpu(*buf);
+@@ -507,7 +510,8 @@ static inline int put_words(OHCIState *ohci,
+ 
+     for (i = 0; i < num; i++, buf++, addr += sizeof(*buf)) {
+         uint16_t tmp = cpu_to_le16(*buf);
+-        if (dma_memory_write(ohci->as, addr, &tmp, sizeof(tmp))) {
++        if (dma_memory_write(ohci->as, addr,
++                             &tmp, sizeof(tmp), MEMTXATTRS_UNSPECIFIED)) {
+             return -1;
+         }
+     }
+@@ -537,8 +541,8 @@ static inline int ohci_read_iso_td(OHCIState *ohci,
+ static inline int ohci_read_hcca(OHCIState *ohci,
+                                  dma_addr_t addr, struct ohci_hcca *hcca)
+ {
+-    return dma_memory_read(ohci->as, addr + ohci->localmem_base,
+-                           hcca, sizeof(*hcca));
++    return dma_memory_read(ohci->as, addr + ohci->localmem_base, hcca,
++                           sizeof(*hcca), MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ static inline int ohci_put_ed(OHCIState *ohci,
+@@ -572,7 +576,7 @@ static inline int ohci_put_hcca(OHCIState *ohci,
+     return dma_memory_write(ohci->as,
+                             addr + ohci->localmem_base + HCCA_WRITEBACK_OFFSET,
+                             (char *)hcca + HCCA_WRITEBACK_OFFSET,
+-                            HCCA_WRITEBACK_SIZE);
++                            HCCA_WRITEBACK_SIZE, MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ /* Read/Write the contents of a TD from/to main memory.  */
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index e017000..ed2b9ea 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -487,7 +487,7 @@ static inline void xhci_dma_read_u32s(XHCIState *xhci, dma_addr_t addr,
+ 
+     assert((len % sizeof(uint32_t)) == 0);
+ 
+-    dma_memory_read(xhci->as, addr, buf, len);
++    dma_memory_read(xhci->as, addr, buf, len, MEMTXATTRS_UNSPECIFIED);
+ 
+     for (i = 0; i < (len / sizeof(uint32_t)); i++) {
+         buf[i] = le32_to_cpu(buf[i]);
+@@ -507,7 +507,7 @@ static inline void xhci_dma_write_u32s(XHCIState *xhci, dma_addr_t addr,
+     for (i = 0; i < n; i++) {
+         tmp[i] = cpu_to_le32(buf[i]);
+     }
+-    dma_memory_write(xhci->as, addr, tmp, len);
++    dma_memory_write(xhci->as, addr, tmp, len, MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ static XHCIPort *xhci_lookup_port(XHCIState *xhci, struct USBPort *uport)
+@@ -618,7 +618,7 @@ static void xhci_write_event(XHCIState *xhci, XHCIEvent *event, int v)
+                                ev_trb.status, ev_trb.control);
+ 
+     addr = intr->er_start + TRB_SIZE*intr->er_ep_idx;
+-    dma_memory_write(xhci->as, addr, &ev_trb, TRB_SIZE);
++    dma_memory_write(xhci->as, addr, &ev_trb, TRB_SIZE, MEMTXATTRS_UNSPECIFIED);
+ 
+     intr->er_ep_idx++;
+     if (intr->er_ep_idx >= intr->er_size) {
+@@ -679,7 +679,8 @@ static TRBType xhci_ring_fetch(XHCIState *xhci, XHCIRing *ring, XHCITRB *trb,
+ 
+     while (1) {
+         TRBType type;
+-        dma_memory_read(xhci->as, ring->dequeue, trb, TRB_SIZE);
++        dma_memory_read(xhci->as, ring->dequeue, trb, TRB_SIZE,
++                        MEMTXATTRS_UNSPECIFIED);
+         trb->addr = ring->dequeue;
+         trb->ccs = ring->ccs;
+         le64_to_cpus(&trb->parameter);
+@@ -726,7 +727,8 @@ static int xhci_ring_chain_length(XHCIState *xhci, const XHCIRing *ring)
+ 
+     while (1) {
+         TRBType type;
+-        dma_memory_read(xhci->as, dequeue, &trb, TRB_SIZE);
++        dma_memory_read(xhci->as, dequeue, &trb, TRB_SIZE,
++                        MEMTXATTRS_UNSPECIFIED);
+         le64_to_cpus(&trb.parameter);
+         le32_to_cpus(&trb.status);
+         le32_to_cpus(&trb.control);
+@@ -781,7 +783,8 @@ static void xhci_er_reset(XHCIState *xhci, int v)
+         xhci_die(xhci);
+         return;
+     }
+-    dma_memory_read(xhci->as, erstba, &seg, sizeof(seg));
++    dma_memory_read(xhci->as, erstba, &seg, sizeof(seg),
++                    MEMTXATTRS_UNSPECIFIED);
+     le32_to_cpus(&seg.addr_low);
+     le32_to_cpus(&seg.addr_high);
+     le32_to_cpus(&seg.size);
+@@ -2397,7 +2400,8 @@ static TRBCCode xhci_get_port_bandwidth(XHCIState *xhci, uint64_t pctx)
+     /* TODO: actually implement real values here */
+     bw_ctx[0] = 0;
+     memset(&bw_ctx[1], 80, xhci->numports); /* 80% */
+-    dma_memory_write(xhci->as, ctx, bw_ctx, sizeof(bw_ctx));
++    dma_memory_write(xhci->as, ctx, bw_ctx, sizeof(bw_ctx),
++                     MEMTXATTRS_UNSPECIFIED);
+ 
+     return CC_SUCCESS;
+ }
+diff --git a/include/hw/ppc/spapr_vio.h b/include/hw/ppc/spapr_vio.h
+index c90e74a..5d2ea8e 100644
+--- a/include/hw/ppc/spapr_vio.h
++++ b/include/hw/ppc/spapr_vio.h
+@@ -97,14 +97,16 @@ static inline bool spapr_vio_dma_valid(SpaprVioDevice *dev, uint64_t taddr,
+ static inline int spapr_vio_dma_read(SpaprVioDevice *dev, uint64_t taddr,
+                                      void *buf, uint32_t size)
+ {
+-    return (dma_memory_read(&dev->as, taddr, buf, size) != 0) ?
++    return (dma_memory_read(&dev->as, taddr,
++                            buf, size, MEMTXATTRS_UNSPECIFIED) != 0) ?
+         H_DEST_PARM : H_SUCCESS;
+ }
+ 
+ static inline int spapr_vio_dma_write(SpaprVioDevice *dev, uint64_t taddr,
+                                       const void *buf, uint32_t size)
+ {
+-    return (dma_memory_write(&dev->as, taddr, buf, size) != 0) ?
++    return (dma_memory_write(&dev->as, taddr,
++                             buf, size, MEMTXATTRS_UNSPECIFIED) != 0) ?
+         H_DEST_PARM : H_SUCCESS;
+ }
+ 
+diff --git a/include/sysemu/dma.h b/include/sysemu/dma.h
+index e8ad422..522682b 100644
+--- a/include/sysemu/dma.h
++++ b/include/sysemu/dma.h
+@@ -143,12 +143,14 @@ static inline MemTxResult dma_memory_rw(AddressSpace *as, dma_addr_t addr,
+  * @addr: address within that address space
+  * @buf: buffer with the data transferred
+  * @len: length of the data transferred
++ * @attrs: memory transaction attributes
+  */
+ static inline MemTxResult dma_memory_read(AddressSpace *as, dma_addr_t addr,
+-                                          void *buf, dma_addr_t len)
++                                          void *buf, dma_addr_t len,
++                                          MemTxAttrs attrs)
+ {
+     return dma_memory_rw(as, addr, buf, len,
+-                         DMA_DIRECTION_TO_DEVICE, MEMTXATTRS_UNSPECIFIED);
++                         DMA_DIRECTION_TO_DEVICE, attrs);
+ }
+ 
+ /**
+@@ -162,12 +164,14 @@ static inline MemTxResult dma_memory_read(AddressSpace *as, dma_addr_t addr,
+  * @addr: address within that address space
+  * @buf: buffer with the data transferred
+  * @len: the number of bytes to write
++ * @attrs: memory transaction attributes
+  */
+ static inline MemTxResult dma_memory_write(AddressSpace *as, dma_addr_t addr,
+-                                           const void *buf, dma_addr_t len)
++                                           const void *buf, dma_addr_t len,
++                                           MemTxAttrs attrs)
+ {
+     return dma_memory_rw(as, addr, (void *)buf, len,
+-                         DMA_DIRECTION_FROM_DEVICE, MEMTXATTRS_UNSPECIFIED);
++                         DMA_DIRECTION_FROM_DEVICE, attrs);
+ }
+ 
+ /**
+@@ -239,7 +243,7 @@ static inline void dma_memory_unmap(AddressSpace *as,
+                                                             dma_addr_t addr) \
+     {                                                                   \
+         uint##_bits##_t val;                                            \
+-        dma_memory_read(as, addr, &val, (_bits) / 8);                   \
++        dma_memory_read(as, addr, &val, (_bits) / 8, MEMTXATTRS_UNSPECIFIED); \
+         return _end##_bits##_to_cpu(val);                               \
+     }                                                                   \
+     static inline void st##_sname##_##_end##_dma(AddressSpace *as,      \
+@@ -247,20 +251,20 @@ static inline void dma_memory_unmap(AddressSpace *as,
+                                                  uint##_bits##_t val)   \
+     {                                                                   \
+         val = cpu_to_##_end##_bits(val);                                \
+-        dma_memory_write(as, addr, &val, (_bits) / 8);                  \
++        dma_memory_write(as, addr, &val, (_bits) / 8, MEMTXATTRS_UNSPECIFIED); \
+     }
+ 
+ static inline uint8_t ldub_dma(AddressSpace *as, dma_addr_t addr)
+ {
+     uint8_t val;
+ 
+-    dma_memory_read(as, addr, &val, 1);
++    dma_memory_read(as, addr, &val, 1, MEMTXATTRS_UNSPECIFIED);
+     return val;
+ }
+ 
+ static inline void stb_dma(AddressSpace *as, dma_addr_t addr, uint8_t val)
+ {
+-    dma_memory_write(as, addr, &val, 1);
++    dma_memory_write(as, addr, &val, 1, MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ DEFINE_LDST_DMA(uw, w, 16, le);
+-- 
+1.8.3.1
+

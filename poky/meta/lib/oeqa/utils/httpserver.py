@@ -38,6 +38,12 @@ class HTTPService(object):
             self.port = self.server.server_port
         self.process = multiprocessing.Process(target=self.server.server_start, args=[self.root_dir, self.logger])
 
+        def handle_error(self, request, client_address):
+            import traceback
+            exception = traceback.format_exc()
+            self.logger.warn("Exception when handling %s: %s" % (request, exception))
+        self.server.handle_error = handle_error
+
         # The signal handler from testimage.bbclass can cause deadlocks here
         # if the HTTPServer is terminated before it can restore the standard 
         #signal behaviour

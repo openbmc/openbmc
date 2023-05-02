@@ -1,0 +1,35 @@
+From 70a008c59992b0ac6a868530bc3e249b7777ab95 Mon Sep 17 00:00:00 2001
+From: Archana Polampalli <archana.polampalli@windriver.com>
+Date: Fri, 16 Dec 2022 05:19:06 +0000
+Subject: [PATCH] Nodejs: Fixed pipes DeprecationWarning
+
+DeprecationWarning: 'pipes' is deprecated and slated for removal in Python 3.13
+
+Signed-off-by: Archana Polampalli <archana.polampalli@windriver.com>
+---
+ configure.py | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/configure.py b/configure.py
+index d3192ca04c..8d279220fd 100755
+--- a/configure.py
++++ b/configure.py
+@@ -5,7 +5,6 @@ import sys
+ import errno
+ import argparse
+ import os
+-import pipes
+ import pprint
+ import re
+ import shlex
+@@ -2041,7 +2040,7 @@ write('config.gypi', do_not_edit +
+       pprint.pformat(output, indent=2, width=1024) + '\n')
+
+ write('config.status', '#!/bin/sh\nset -x\nexec ./configure ' +
+-      ' '.join([pipes.quote(arg) for arg in original_argv]) + '\n')
++      ' '.join([shlex.quote(arg) for arg in original_argv]) + '\n')
+ os.chmod('config.status', 0o775)
+
+
+--
+2.34.1

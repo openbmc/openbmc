@@ -9,6 +9,8 @@ SRC_URI += "\
    file://0001-configure.ac-bypass-autoconf-2.69-version-check.patch \
    file://remove_duplicate.patch \
    file://0001-config_info.c-not-expose-build-info.patch \
+   file://0001-Properly-NULL-terminate-GSS-receive-buffer-on-error-.patch \
+   file://0001-postgresql-fix-ptest-failure-of-sysviews.patch \
 "
 
 SRC_URI[sha256sum] = "d4f72cb5fb857c9a9f75ec8cf091a1771272802f2178f0b2e65b7b6ff64f4a30"

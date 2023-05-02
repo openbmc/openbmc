@@ -2798,7 +2798,14 @@ class ParserReflect(object):
     def signature(self):
         try:
             import hashlib
+        except ImportError:
+            raise RuntimeError("Unable to import hashlib")
+        try:
             sig = hashlib.new('MD5', usedforsecurity=False)
+        except TypeError:
+            # Some configurations don't appear to support two arguments
+            sig = hashlib.new('MD5')
+        try:
             if self.start:
                 sig.update(self.start.encode('latin-1'))
             if self.prec:

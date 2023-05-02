@@ -1,0 +1,41 @@
+From c0ee1527358474c75067993d1bb233ad3a4ee081 Mon Sep 17 00:00:00 2001
+From: =?utf8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Thu, 16 Dec 2021 11:24:56 +0100
+Subject: [PATCH] dma: Have dma_buf_rw() take a void pointer
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+
+DMA operations are run on any kind of buffer, not arrays of
+uint8_t. Convert dma_buf_rw() to take a void pointer argument
+to save us pointless casts to uint8_t *.
+
+CVE: CVE-2021-3611
+Upstream-Status: Backport [https://git.qemu.org/?p=qemu.git;a=commit;h=c0ee1527358474c75067993d1bb233ad3a4ee081]
+
+Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
+Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+Message-Id: <20211223115554.3155328-8-philmd@redhat.com>
+Signed-off-by: Bhabu Bindu <bhabu.bindu@kpit.com>
+---
+ softmmu/dma-helpers.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/softmmu/dma-helpers.c b/softmmu/dma-helpers.c
+index 3c06a2f..09e2999 100644
+--- a/softmmu/dma-helpers.c
++++ b/softmmu/dma-helpers.c
+@@ -294,9 +294,10 @@ BlockAIOCB *dma_blk_write(BlockBackend *blk,
+ }
+ 
+ 
+-static uint64_t dma_buf_rw(uint8_t *ptr, int32_t len, QEMUSGList *sg,
++static uint64_t dma_buf_rw(void *buf, int32_t len, QEMUSGList *sg,
+                            DMADirection dir)
+ {
++    uint8_t *ptr = buf;
+     uint64_t resid;
+     int sg_cur_index;
+ 
+-- 
+1.8.3.1

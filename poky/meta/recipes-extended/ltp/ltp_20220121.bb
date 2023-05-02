@@ -29,6 +29,7 @@ SRC_URI = "git://github.com/linux-test-project/ltp.git;branch=master;protocol=ht
            file://0001-metadata-parse.sh-sort-filelist-for-reproducibility.patch \
            file://disable_hanging_tests.patch \
            file://0001-syscalls-pread02-extend-buffer-to-avoid-glibc-overflow-detection.patch \
+           file://0001-clock_gettime04-set-threshold-based-on-the-clock-res.patch \
            "
 
 S = "${WORKDIR}/git"

@@ -1,0 +1,301 @@
+From 509c5974398952618abdd17f39117b88e3f50057 Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Thu, 1 Dec 2022 10:28:04 -0800
+Subject: [PATCH] Fix C23-related conformance bug
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Problem reported by Houge Langley for ‘gcc -std=gnu99’ in:
+https://bugs.gentoo.org/show_bug.cgi?id=883719
+* NEWS: Mention this.
+* date.c, localtime.c, private.h, zdump.c, zic.c:
+Use ATTRIBUTE_* at the start of function declarations,
+not later (such as after the keyword ‘static’).
+This is required for strict conformance to C23.
+
+Upstream-Status: Backport [https://github.com/eggert/tz/commit/9cfe9507fcc22cd4a0c4da486ea1c7f0de6b075f]
+
+NEWS change skipped to avoid conflicts.
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ date.c      |  2 +-
+ localtime.c |  4 ++--
+ private.h   |  6 +++---
+ zdump.c     | 12 ++++++------
+ zic.c       | 34 +++++++++++++++++-----------------
+ 5 files changed, 29 insertions(+), 29 deletions(-)
+
+diff --git a/date.c b/date.c
+index 11c5e5fe..97df6ab0 100644
+--- a/date.c
++++ b/date.c
+@@ -42,7 +42,7 @@ static void		display(const char *, time_t);
+ static void		dogmt(void);
+ static void		errensure(void);
+ static void		timeout(FILE *, const char *, const struct tm *);
+-static ATTRIBUTE_NORETURN void usage(void);
++ATTRIBUTE_NORETURN static void usage(void);
+ 
+ int
+ main(const int argc, char *argv[])
+diff --git a/localtime.c b/localtime.c
+index 1d22d351..3bf1b911 100644
+--- a/localtime.c
++++ b/localtime.c
+@@ -838,7 +838,7 @@ is_digit(char c)
+ ** Return a pointer to that character.
+ */
+ 
+-static ATTRIBUTE_REPRODUCIBLE const char *
++ATTRIBUTE_REPRODUCIBLE static const char *
+ getzname(register const char *strp)
+ {
+ 	register char	c;
+@@ -859,7 +859,7 @@ getzname(register const char *strp)
+ ** We don't do any checking here; checking is done later in common-case code.
+ */
+ 
+-static ATTRIBUTE_REPRODUCIBLE const char *
++ATTRIBUTE_REPRODUCIBLE static const char *
+ getqzname(register const char *strp, const int delim)
+ {
+ 	register int	c;
+diff --git a/private.h b/private.h
+index 7a73eff7..ae522986 100644
+--- a/private.h
++++ b/private.h
+@@ -628,7 +628,7 @@ char *asctime(struct tm const *);
+ char *asctime_r(struct tm const *restrict, char *restrict);
+ char *ctime(time_t const *);
+ char *ctime_r(time_t const *, char *);
+-double difftime(time_t, time_t) ATTRIBUTE_UNSEQUENCED;
++ATTRIBUTE_UNSEQUENCED double difftime(time_t, time_t);
+ size_t strftime(char *restrict, size_t, char const *restrict,
+ 		struct tm const *restrict);
+ # if HAVE_STRFTIME_L
+@@ -740,10 +740,10 @@ timezone_t tzalloc(char const *);
+ void tzfree(timezone_t);
+ # ifdef STD_INSPIRED
+ #  if TZ_TIME_T || !defined posix2time_z
+-time_t posix2time_z(timezone_t, time_t) ATTRIBUTE_REPRODUCIBLE;
++ATTRIBUTE_REPRODUCIBLE time_t posix2time_z(timezone_t, time_t);
+ #  endif
+ #  if TZ_TIME_T || !defined time2posix_z
+-time_t time2posix_z(timezone_t, time_t) ATTRIBUTE_REPRODUCIBLE;
++ATTRIBUTE_REPRODUCIBLE time_t time2posix_z(timezone_t, time_t);
+ #  endif
+ # endif
+ #endif
+diff --git a/zdump.c b/zdump.c
+index 7acb3e2d..3e482ba3 100644
+--- a/zdump.c
++++ b/zdump.c
+@@ -89,7 +89,7 @@ static bool	warned;
+ static bool	errout;
+ 
+ static char const *abbr(struct tm const *);
+-static intmax_t	delta(struct tm *, struct tm *) ATTRIBUTE_REPRODUCIBLE;
++ATTRIBUTE_REPRODUCIBLE static intmax_t delta(struct tm *, struct tm *);
+ static void dumptime(struct tm const *);
+ static time_t hunt(timezone_t, time_t, time_t, bool);
+ static void show(timezone_t, char *, time_t, bool);
+@@ -97,7 +97,7 @@ static void showextrema(timezone_t, char *, time_t, struct tm *, time_t);
+ static void showtrans(char const *, struct tm const *, time_t, char const *,
+ 		      char const *);
+ static const char *tformat(void);
+-static time_t yeartot(intmax_t) ATTRIBUTE_REPRODUCIBLE;
++ATTRIBUTE_REPRODUCIBLE static time_t yeartot(intmax_t);
+ 
+ /* Is C an ASCII digit?  */
+ static bool
+@@ -125,7 +125,7 @@ is_alpha(char a)
+ 	}
+ }
+ 
+-static ATTRIBUTE_NORETURN void
++ATTRIBUTE_NORETURN static void
+ size_overflow(void)
+ {
+   fprintf(stderr, _("%s: size overflow\n"), progname);
+@@ -134,7 +134,7 @@ size_overflow(void)
+ 
+ /* Return A + B, exiting if the result would overflow either ptrdiff_t
+    or size_t.  */
+-static ATTRIBUTE_REPRODUCIBLE ptrdiff_t
++ATTRIBUTE_REPRODUCIBLE static ptrdiff_t
+ sumsize(size_t a, size_t b)
+ {
+ #ifdef ckd_add
+@@ -151,7 +151,7 @@ sumsize(size_t a, size_t b)
+ 
+ /* Return a pointer to a newly allocated buffer of size SIZE, exiting
+    on failure.  SIZE should be nonzero.  */
+-static void * ATTRIBUTE_MALLOC
++ATTRIBUTE_MALLOC static void *
+ xmalloc(size_t size)
+ {
+   void *p = malloc(size);
+@@ -920,7 +920,7 @@ showextrema(timezone_t tz, char *zone, time_t lo, struct tm *lotmp, time_t hi)
+ # include <stdarg.h>
+ 
+ /* A substitute for snprintf that is good enough for zdump.  */
+-static int ATTRIBUTE_FORMAT((printf, 3, 4))
++ATTRIBUTE_FORMAT((printf, 3, 4)) static int
+ my_snprintf(char *s, size_t size, char const *format, ...)
+ {
+   int n;
+diff --git a/zic.c b/zic.c
+index 892414af..f143fcef 100644
+--- a/zic.c
++++ b/zic.c
+@@ -459,20 +459,20 @@ static char		roll[TZ_MAX_LEAPS];
+ ** Memory allocation.
+ */
+ 
+-static ATTRIBUTE_NORETURN void
++ATTRIBUTE_NORETURN static void
+ memory_exhausted(const char *msg)
+ {
+ 	fprintf(stderr, _("%s: Memory exhausted: %s\n"), progname, msg);
+ 	exit(EXIT_FAILURE);
+ }
+ 
+-static ATTRIBUTE_NORETURN void
++ATTRIBUTE_NORETURN static void
+ size_overflow(void)
+ {
+   memory_exhausted(_("size overflow"));
+ }
+ 
+-static ATTRIBUTE_REPRODUCIBLE ptrdiff_t
++ATTRIBUTE_REPRODUCIBLE static ptrdiff_t
+ size_sum(size_t a, size_t b)
+ {
+ #ifdef ckd_add
+@@ -487,7 +487,7 @@ size_sum(size_t a, size_t b)
+   size_overflow();
+ }
+ 
+-static ATTRIBUTE_REPRODUCIBLE ptrdiff_t
++ATTRIBUTE_REPRODUCIBLE static ptrdiff_t
+ size_product(ptrdiff_t nitems, ptrdiff_t itemsize)
+ {
+ #ifdef ckd_mul
+@@ -502,7 +502,7 @@ size_product(ptrdiff_t nitems, ptrdiff_t itemsize)
+   size_overflow();
+ }
+ 
+-static ATTRIBUTE_REPRODUCIBLE ptrdiff_t
++ATTRIBUTE_REPRODUCIBLE static ptrdiff_t
+ align_to(ptrdiff_t size, ptrdiff_t alignment)
+ {
+   ptrdiff_t lo_bits = alignment - 1, sum = size_sum(size, lo_bits);
+@@ -526,7 +526,7 @@ memcheck(void *ptr)
+ 	return ptr;
+ }
+ 
+-static void * ATTRIBUTE_MALLOC
++ATTRIBUTE_MALLOC static void *
+ emalloc(size_t size)
+ {
+   return memcheck(malloc(size));
+@@ -538,7 +538,7 @@ erealloc(void *ptr, size_t size)
+   return memcheck(realloc(ptr, size));
+ }
+ 
+-static char * ATTRIBUTE_MALLOC
++ATTRIBUTE_MALLOC static char *
+ estrdup(char const *str)
+ {
+   return memcheck(strdup(str));
+@@ -608,7 +608,7 @@ eat(int fnum, lineno num)
+ 	eats(fnum, num, 0, -1);
+ }
+ 
+-static void ATTRIBUTE_FORMAT((printf, 1, 0))
++ATTRIBUTE_FORMAT((printf, 1, 0)) static void
+ verror(const char *const string, va_list args)
+ {
+ 	/*
+@@ -626,7 +626,7 @@ verror(const char *const string, va_list args)
+ 	fprintf(stderr, "\n");
+ }
+ 
+-static void ATTRIBUTE_FORMAT((printf, 1, 2))
++ATTRIBUTE_FORMAT((printf, 1, 2)) static void
+ error(const char *const string, ...)
+ {
+ 	va_list args;
+@@ -636,7 +636,7 @@ error(const char *const string, ...)
+ 	errors = true;
+ }
+ 
+-static void ATTRIBUTE_FORMAT((printf, 1, 2))
++ATTRIBUTE_FORMAT((printf, 1, 2)) static void
+ warning(const char *const string, ...)
+ {
+ 	va_list args;
+@@ -666,7 +666,7 @@ close_file(FILE *stream, char const *dir, char const *name,
+   }
+ }
+ 
+-static ATTRIBUTE_NORETURN void
++ATTRIBUTE_NORETURN static void
+ usage(FILE *stream, int status)
+ {
+   fprintf(stream,
+@@ -3597,7 +3597,7 @@ lowerit(char a)
+ }
+ 
+ /* case-insensitive equality */
+-static ATTRIBUTE_REPRODUCIBLE bool
++ATTRIBUTE_REPRODUCIBLE static bool
+ ciequal(register const char *ap, register const char *bp)
+ {
+ 	while (lowerit(*ap) == lowerit(*bp++))
+@@ -3606,7 +3606,7 @@ ciequal(register const char *ap, register const char *bp)
+ 	return false;
+ }
+ 
+-static ATTRIBUTE_REPRODUCIBLE bool
++ATTRIBUTE_REPRODUCIBLE static bool
+ itsabbr(register const char *abbr, register const char *word)
+ {
+ 	if (lowerit(*abbr) != lowerit(*word))
+@@ -3622,7 +3622,7 @@ itsabbr(register const char *abbr, register const char *word)
+ 
+ /* Return true if ABBR is an initial prefix of WORD, ignoring ASCII case.  */
+ 
+-static ATTRIBUTE_REPRODUCIBLE bool
++ATTRIBUTE_REPRODUCIBLE static bool
+ ciprefix(char const *abbr, char const *word)
+ {
+   do
+@@ -3725,14 +3725,14 @@ getfields(char *cp, char **array, int arrayelts)
+ 	return nsubs;
+ }
+ 
+-static ATTRIBUTE_NORETURN void
++ATTRIBUTE_NORETURN static void
+ time_overflow(void)
+ {
+   error(_("time overflow"));
+   exit(EXIT_FAILURE);
+ }
+ 
+-static ATTRIBUTE_REPRODUCIBLE zic_t
++ATTRIBUTE_REPRODUCIBLE static zic_t
+ oadd(zic_t t1, zic_t t2)
+ {
+ #ifdef ckd_add
+@@ -3746,7 +3746,7 @@ oadd(zic_t t1, zic_t t2)
+   time_overflow();
+ }
+ 
+-static ATTRIBUTE_REPRODUCIBLE zic_t
++ATTRIBUTE_REPRODUCIBLE static zic_t
+ tadd(zic_t t1, zic_t t2)
+ {
+ #ifdef ckd_add

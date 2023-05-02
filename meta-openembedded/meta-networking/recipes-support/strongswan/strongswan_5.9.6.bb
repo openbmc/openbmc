@@ -10,6 +10,7 @@ DEPENDS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'tpm2', '  tpm2-tss', 
 
 SRC_URI = "http://download.strongswan.org/strongswan-${PV}.tar.bz2 \
            file://0001-enum-Fix-compiler-warning.patch \
+           file://CVE-2022-40617.patch \
            "
 
 SRC_URI[sha256sum] = "91d0978ac448912759b85452d8ff0d578aafd4507aaf4f1c1719f9d0c7318ab7"

@@ -1,0 +1,59 @@
+From 4746f16253b784287bc8a5003990c1c3b9a03a62 Mon Sep 17 00:00:00 2001
+From: Su_Laus <sulau@freenet.de>
+Date: Thu, 25 Aug 2022 16:11:41 +0200
+Subject: [PATCH] tiffcrop: disable incompatibility of -Z, -X, -Y, -z options
+ with any PAGE_MODE_x option (fixes #411 and #413)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+tiffcrop does not support –Z, -z, -X and –Y options together with any other PAGE_MODE_x options like  -H, -V, -P, -J, -K or –S.
+
+Code analysis:
+
+With the options –Z, -z, the crop.selections are set to a value > 0. Within main(), this triggers the call of processCropSelections(), which copies the sections from the read_buff into seg_buffs[].
+In the following code in main(), the only supported step, where that seg_buffs are further handled are within an if-clause with  if (page.mode == PAGE_MODE_NONE) .
+
+Execution of the else-clause often leads to buffer-overflows.
+
+Therefore, the above option combination is not supported and will be disabled to prevent those buffer-overflows.
+
+The MR solves issues #411 and #413.
+
+CVE: CVE-2022-3597 CVE-2022-3626 CVE-2022-3627
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ doc/tools/tiffcrop.rst |  8 ++++++++
+ tools/tiffcrop.c       | 32 +++++++++++++++++++++++++-------
+ 2 files changed, 33 insertions(+), 7 deletions(-)
+
+diff --git a/tools/tiffcrop.c b/tools/tiffcrop.c
+index 8fd856dc..41a2ea36 100644
+--- a/tools/tiffcrop.c
++++ b/tools/tiffcrop.c
+@@ -2138,9 +2143,20 @@ void  process_command_opts (int argc, char *argv[], char *mp, char *mode, uint32
+     R = (crop_data->crop_mode & CROP_REGIONS) ? 1 : 0;
+     S = (page->mode & PAGE_MODE_ROWSCOLS) ? 1 : 0;
+     if (XY + Z + R + S > 1) {
+-        TIFFError("tiffcrop input error", "The crop options(-X|-Y), -Z, -z and -S are mutually exclusive.->Exit");
++        TIFFError("tiffcrop input error", "The crop options(-X|-Y), -Z, -z and -S are mutually exclusive.->exit");
+         exit(EXIT_FAILURE);
+     }
++
++    /* Check for not allowed combination:
++     * Any of the -X, -Y, -Z and -z options together with other PAGE_MODE_x options
++     * such as -H, -V, -P, -J or -K are not supported and may cause buffer overflows.
++.    */
++    if ((XY + Z + R > 0) && page->mode != PAGE_MODE_NONE) {
++        TIFFError("tiffcrop input error",
++            "Any of the crop options -X, -Y, -Z and -z together with other PAGE_MODE_x options such as - H, -V, -P, -J or -K is not supported and may cause buffer overflows..->exit");
++        exit(EXIT_FAILURE);
++    }
++
+   }  /* end process_command_opts */
+ 
+ /* Start a new output file if one has not been previously opened or
+-- 
+2.34.1
+

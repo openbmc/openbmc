@@ -7,11 +7,13 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=2ee41112a44fe7014dce33e26468ba93"
 
 SECTION = "net"
 
-SRC_URI = "http://monkey-project.com/releases/1.6/monkey-${PV}.tar.gz \
+SRC_URI = "git://github.com/monkey/monkey;branch=1.6;protocol=https \
+           file://0001-fastcgi-Use-value-instead-of-address-of-sin6_port.patch \
            file://monkey.service \
            file://monkey.init"
 
-SRC_URI[sha256sum] = "f1122e89cda627123286542b0a18fcaa131cbe9d4f5dd897d9455157289148fb"
+SRCREV = "7999b487fded645381d387ec0e057e92407b0d2c"
+S = "${WORKDIR}/git"
 
 UPSTREAM_CHECK_URI = "https://github.com/monkey/monkey/releases"
 UPSTREAM_CHECK_REGEX = "v(?P<pver>\d+(\.\d+)+).tar.gz"

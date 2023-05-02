@@ -17,6 +17,8 @@ SRC_URI = "https://downloads.isc.org/isc/dhcp/${PV}/dhcp-${PV}.tar.gz \
            file://0001-Makefile.am-only-build-dhcrelay.patch \
            file://0002-bind-Makefile.in-disable-backtrace.patch \
            file://0003-bind-Makefile.in-regenerate-configure.patch \
+           file://CVE-2022-2928.patch \
+           file://CVE-2022-2929.patch \
            "
 
 SRC_URI[sha256sum] = "0e3ec6b4c2a05ec0148874bcd999a66d05518378d77421f607fb0bc9d0135818"

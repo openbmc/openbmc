@@ -1,4 +1,4 @@
-From eecb0712f4c3a5b449f70c57988260a667ddbdef Mon Sep 17 00:00:00 2001
+From 895867b72bd6c46da79de1a07d0993cd104e92cd Mon Sep 17 00:00:00 2001
 From: Even Rouault <even.rouault@spatialys.com>
 Date: Sun, 6 Feb 2022 13:08:38 +0100
 Subject: [PATCH] TIFFFetchStripThing(): avoid calling memcpy() with a null
@@ -12,10 +12,10 @@ CVE: CVE-2022-0561
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/libtiff/tif_dirread.c b/libtiff/tif_dirread.c
-index 23194ced..50ebf8ac 100644
+index ae52ad4..d654a1c 100644
 --- a/libtiff/tif_dirread.c
 +++ b/libtiff/tif_dirread.c
-@@ -5777,8 +5777,9 @@ TIFFFetchStripThing(TIFF* tif, TIFFDirEntry* dir, uint32_t nstrips, uint64_t** l
+@@ -5766,8 +5766,9 @@ TIFFFetchStripThing(TIFF* tif, TIFFDirEntry* dir, uint32_t nstrips, uint64_t** l
  			_TIFFfree(data);
  			return(0);
  		}
@@ -27,6 +27,3 @@ index 23194ced..50ebf8ac 100644
  		_TIFFfree(data);
  		data=resizeddata;
  	}
--- 
-GitLab
-

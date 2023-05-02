@@ -579,7 +579,10 @@ class RecipetoolTests(RecipetoolBase):
 
         commonlicdir = get_bb_var('COMMON_LICENSE_DIR')
 
-        d = bb.tinfoil.TinfoilDataStoreConnector
+        class DataConnectorCopy(bb.tinfoil.TinfoilDataStoreConnector):
+            pass
+
+        d = DataConnectorCopy
         d.getVar = Mock(return_value=commonlicdir)
 
         srctree = tempfile.mkdtemp(prefix='recipetoolqa')

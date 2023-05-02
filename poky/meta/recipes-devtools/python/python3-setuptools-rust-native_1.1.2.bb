@@ -14,9 +14,7 @@ SRC_URI[sha256sum] = "a0adb9b503c0ffc4e8fe80b7c617898cefa78049983aaaea7f747e153a
 
 inherit cargo pypi python_setuptools_build_meta native
 
-DEPENDS += "python3-setuptools-scm-native python3-wheel-native"
-
-RDEPENDS:${PN}:class-native += " \
+DEPENDS += " \
     python3-semantic-version-native \
     python3-setuptools-native \
     python3-setuptools-scm-native \

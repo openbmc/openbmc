@@ -167,5 +167,7 @@ python uninative_changeinterp () {
             if not elf.isDynamic():
                 continue
 
+            os.chmod(f, s[stat.ST_MODE] | stat.S_IWUSR)
             subprocess.check_output(("patchelf-uninative", "--set-interpreter", d.getVar("UNINATIVE_LOADER"), f), stderr=subprocess.STDOUT)
+            os.chmod(f, s[stat.ST_MODE])
 }

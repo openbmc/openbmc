@@ -1,0 +1,120 @@
+From 2280c27afc65bb2af95dd44a88e3b7117bfe240a Mon Sep 17 00:00:00 2001
+From: =?utf8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Fri, 17 Dec 2021 23:53:34 +0100
+Subject: [PATCH] dma: Let st*_dma() take MemTxAttrs argument
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+
+Let devices specify transaction attributes when calling st*_dma().
+
+Keep the default MEMTXATTRS_UNSPECIFIED in the few callers.
+
+CVE: CVE-2021-3611
+Upstream-Status: Backport [https://git.qemu.org/?p=qemu.git;a=commit;h=2280c27afc65bb2af95dd44a88e3b7117bfe240a]
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: CÃ©dric Le Goater <clg@kaod.org>
+Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+Message-Id: <20211223115554.3155328-16-philmd@redhat.com>
+Signed-off-by: Bhabu Bindu <bhabu.bindu@kpit.com>
+---
+ hw/nvram/fw_cfg.c          |  4 ++--
+ include/hw/pci/pci.h       |  3 ++-
+ include/hw/ppc/spapr_vio.h | 12 ++++++++----
+ include/sysemu/dma.h       | 10 ++++++----
+ 4 files changed, 18 insertions(+), 11 deletions(-)
+
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index 9b91b15..e5f3c981 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -360,7 +360,7 @@ static void fw_cfg_dma_transfer(FWCfgState *s)
+     if (dma_memory_read(s->dma_as, dma_addr,
+                         &dma, sizeof(dma), MEMTXATTRS_UNSPECIFIED)) {
+         stl_be_dma(s->dma_as, dma_addr + offsetof(FWCfgDmaAccess, control),
+-                   FW_CFG_DMA_CTL_ERROR);
++                   FW_CFG_DMA_CTL_ERROR, MEMTXATTRS_UNSPECIFIED);
+         return;
+     }
+ 
+@@ -446,7 +446,7 @@ static void fw_cfg_dma_transfer(FWCfgState *s)
+     }
+ 
+     stl_be_dma(s->dma_as, dma_addr + offsetof(FWCfgDmaAccess, control),
+-                dma.control);
++                dma.control, MEMTXATTRS_UNSPECIFIED);
+ 
+     trace_fw_cfg_read(s, 0);
+ }
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index a751ab5..d07e970 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -859,7 +859,8 @@ static inline MemTxResult pci_dma_write(PCIDevice *dev, dma_addr_t addr,
+     static inline void st##_s##_pci_dma(PCIDevice *dev,                 \
+                                         dma_addr_t addr, uint##_bits##_t val) \
+     {                                                                   \
+-        st##_s##_dma(pci_get_address_space(dev), addr, val);            \
++        st##_s##_dma(pci_get_address_space(dev), addr, val, \
++                     MEMTXATTRS_UNSPECIFIED); \
+     }
+ 
+ PCI_DMA_DEFINE_LDST(ub, b, 8);
+diff --git a/include/hw/ppc/spapr_vio.h b/include/hw/ppc/spapr_vio.h
+index 5d2ea8e..e87f8e6 100644
+--- a/include/hw/ppc/spapr_vio.h
++++ b/include/hw/ppc/spapr_vio.h
+@@ -118,10 +118,14 @@ static inline int spapr_vio_dma_set(SpaprVioDevice *dev, uint64_t taddr,
+         H_DEST_PARM : H_SUCCESS;
+ }
+ 
+-#define vio_stb(_dev, _addr, _val) (stb_dma(&(_dev)->as, (_addr), (_val)))
+-#define vio_sth(_dev, _addr, _val) (stw_be_dma(&(_dev)->as, (_addr), (_val)))
+-#define vio_stl(_dev, _addr, _val) (stl_be_dma(&(_dev)->as, (_addr), (_val)))
+-#define vio_stq(_dev, _addr, _val) (stq_be_dma(&(_dev)->as, (_addr), (_val)))
++#define vio_stb(_dev, _addr, _val) \
++        (stb_dma(&(_dev)->as, (_addr), (_val), MEMTXATTRS_UNSPECIFIED))
++#define vio_sth(_dev, _addr, _val) \
++        (stw_be_dma(&(_dev)->as, (_addr), (_val), MEMTXATTRS_UNSPECIFIED))
++#define vio_stl(_dev, _addr, _val) \
++        (stl_be_dma(&(_dev)->as, (_addr), (_val), MEMTXATTRS_UNSPECIFIED))
++#define vio_stq(_dev, _addr, _val) \
++        (stq_be_dma(&(_dev)->as, (_addr), (_val), MEMTXATTRS_UNSPECIFIED))
+ #define vio_ldq(_dev, _addr) (ldq_be_dma(&(_dev)->as, (_addr)))
+ 
+ int spapr_vio_send_crq(SpaprVioDevice *dev, uint8_t *crq);
+diff --git a/include/sysemu/dma.h b/include/sysemu/dma.h
+index fd8f160..009dd3c 100644
+--- a/include/sysemu/dma.h
++++ b/include/sysemu/dma.h
+@@ -249,10 +249,11 @@ static inline void dma_memory_unmap(AddressSpace *as,
+     }                                                                   \
+     static inline void st##_sname##_##_end##_dma(AddressSpace *as,      \
+                                                  dma_addr_t addr,       \
+-                                                 uint##_bits##_t val)   \
++                                                 uint##_bits##_t val,   \
++                                                 MemTxAttrs attrs)      \
+     {                                                                   \
+         val = cpu_to_##_end##_bits(val);                                \
+-        dma_memory_write(as, addr, &val, (_bits) / 8, MEMTXATTRS_UNSPECIFIED); \
++        dma_memory_write(as, addr, &val, (_bits) / 8, attrs); \
+     }
+ 
+ static inline uint8_t ldub_dma(AddressSpace *as, dma_addr_t addr)
+@@ -263,9 +264,10 @@ static inline uint8_t ldub_dma(AddressSpace *as, dma_addr_t addr)
+     return val;
+ }
+ 
+-static inline void stb_dma(AddressSpace *as, dma_addr_t addr, uint8_t val)
++static inline void stb_dma(AddressSpace *as, dma_addr_t addr,
++                           uint8_t val, MemTxAttrs attrs)
+ {
+-    dma_memory_write(as, addr, &val, 1, MEMTXATTRS_UNSPECIFIED);
++    dma_memory_write(as, addr, &val, 1, attrs);
+ }
+ 
+ DEFINE_LDST_DMA(uw, w, 16, le);
+-- 
+1.8.3.1
+

@@ -1,0 +1,47 @@
+From 6bebb270731758fae3114b7d24c2b12b7c325cc5 Mon Sep 17 00:00:00 2001
+From: =?utf8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Fri, 17 Dec 2021 23:47:30 +0100
+Subject: [PATCH] pci: Let st*_pci_dma() propagate MemTxResult
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+
+st*_dma() returns a MemTxResult type. Do not discard
+it, return it to the caller.
+
+CVE: CVE-2021-3611
+Upstream-Status: Backport [https://git.qemu.org/?p=qemu.git;a=commit;h=6bebb270731758fae3114b7d24c2b12b7c325cc5]
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+Message-Id: <20211223115554.3155328-23-philmd@redhat.com>
+Signed-off-by: Bhabu Bindu <bhabu.bindu@kpit.com>
+---
+ include/hw/pci/pci.h | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index 7a46c1f..c90cecc 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -859,12 +859,12 @@ static inline MemTxResult pci_dma_write(PCIDevice *dev, dma_addr_t addr,
+         ld##_l##_dma(pci_get_address_space(dev), addr, &val, attrs); \
+         return val; \
+     }                                                                   \
+-    static inline void st##_s##_pci_dma(PCIDevice *dev, \
+-                                        dma_addr_t addr, \
+-                                        uint##_bits##_t val, \
+-                                        MemTxAttrs attrs) \
++    static inline MemTxResult st##_s##_pci_dma(PCIDevice *dev, \
++                                               dma_addr_t addr, \
++                                               uint##_bits##_t val, \
++                                               MemTxAttrs attrs) \
+     { \
+-        st##_s##_dma(pci_get_address_space(dev), addr, val, attrs); \
++        return st##_s##_dma(pci_get_address_space(dev), addr, val, attrs); \
+     }
+ 
+ PCI_DMA_DEFINE_LDST(ub, b, 8);
+-- 
+1.8.3.1
+

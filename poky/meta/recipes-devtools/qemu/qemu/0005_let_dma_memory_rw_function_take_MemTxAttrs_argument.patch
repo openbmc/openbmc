@@ -1,0 +1,158 @@
+From 23faf5694ff8054b847e9733297727be4a641132 Mon Sep 17 00:00:00 2001
+From: =?utf8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Thu, 3 Sep 2020 09:37:43 +0200
+Subject: [PATCH] dma: Let dma_memory_rw() take MemTxAttrs argument
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+
+Let devices specify transaction attributes when calling
+dma_memory_rw().
+
+CVE: CVE-2021-3611
+Upstream-Status: Backport [https://git.qemu.org/?p=qemu.git;a=commit;h=23faf5694ff8054b847e9733297727be4a641132]
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20211223115554.3155328-5-philmd@redhat.com>
+Signed-off-by: Bhabu Bindu <bhabu.bindu@kpit.com>
+---
+ hw/intc/spapr_xive.c  |  3 ++-
+ hw/usb/hcd-ohci.c     | 10 ++++++----
+ include/hw/pci/pci.h  |  3 ++-
+ include/sysemu/dma.h  | 11 ++++++-----
+ softmmu/dma-helpers.c |  3 ++-
+ 5 files changed, 18 insertions(+), 12 deletions(-)
+
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index 4ec659b..eae95c7 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -1684,7 +1684,8 @@ static target_ulong h_int_esb(PowerPCCPU *cpu,
+         mmio_addr = xive->vc_base + xive_source_esb_mgmt(xsrc, lisn) + offset;
+ 
+         if (dma_memory_rw(&address_space_memory, mmio_addr, &data, 8,
+-                          (flags & SPAPR_XIVE_ESB_STORE))) {
++                          (flags & SPAPR_XIVE_ESB_STORE),
++                          MEMTXATTRS_UNSPECIFIED)) {
+             qemu_log_mask(LOG_GUEST_ERROR, "XIVE: failed to access ESB @0x%"
+                           HWADDR_PRIx "\n", mmio_addr);
+             return H_HARDWARE;
+diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
+index 1cf2816..56e2315 100644
+--- a/hw/usb/hcd-ohci.c
++++ b/hw/usb/hcd-ohci.c
+@@ -586,7 +586,8 @@ static int ohci_copy_td(OHCIState *ohci, struct ohci_td *td,
+     if (n > len)
+         n = len;
+ 
+-    if (dma_memory_rw(ohci->as, ptr + ohci->localmem_base, buf, n, dir)) {
++    if (dma_memory_rw(ohci->as, ptr + ohci->localmem_base, buf,
++                      n, dir, MEMTXATTRS_UNSPECIFIED)) {
+         return -1;
+     }
+     if (n == len) {
+@@ -595,7 +596,7 @@ static int ohci_copy_td(OHCIState *ohci, struct ohci_td *td,
+     ptr = td->be & ~0xfffu;
+     buf += n;
+     if (dma_memory_rw(ohci->as, ptr + ohci->localmem_base, buf,
+-                      len - n, dir)) {
++                      len - n, dir, MEMTXATTRS_UNSPECIFIED)) {
+         return -1;
+     }
+     return 0;
+@@ -613,7 +614,8 @@ static int ohci_copy_iso_td(OHCIState *ohci,
+     if (n > len)
+         n = len;
+ 
+-    if (dma_memory_rw(ohci->as, ptr + ohci->localmem_base, buf, n, dir)) {
++    if (dma_memory_rw(ohci->as, ptr + ohci->localmem_base, buf,
++                      n, dir, MEMTXATTRS_UNSPECIFIED)) {
+         return -1;
+     }
+     if (n == len) {
+@@ -622,7 +624,7 @@ static int ohci_copy_iso_td(OHCIState *ohci,
+     ptr = end_addr & ~0xfffu;
+     buf += n;
+     if (dma_memory_rw(ohci->as, ptr + ohci->localmem_base, buf,
+-                      len - n, dir)) {
++                      len - n, dir, MEMTXATTRS_UNSPECIFIED)) {
+         return -1;
+     }
+     return 0;
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index e7cdf2d..4383f1c 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -808,7 +808,8 @@ static inline MemTxResult pci_dma_rw(PCIDevice *dev, dma_addr_t addr,
+                                      void *buf, dma_addr_t len,
+                                      DMADirection dir)
+ {
+-    return dma_memory_rw(pci_get_address_space(dev), addr, buf, len, dir);
++    return dma_memory_rw(pci_get_address_space(dev), addr, buf, len,
++                         dir, MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ /**
+diff --git a/include/sysemu/dma.h b/include/sysemu/dma.h
+index 3be803c..e8ad422 100644
+--- a/include/sysemu/dma.h
++++ b/include/sysemu/dma.h
+@@ -121,15 +121,15 @@ static inline MemTxResult dma_memory_write_relaxed(AddressSpace *as,
+  * @buf: buffer with the data transferred
+  * @len: the number of bytes to read or write
+  * @dir: indicates the transfer direction
++ * @attrs: memory transaction attributes
+  */
+ static inline MemTxResult dma_memory_rw(AddressSpace *as, dma_addr_t addr,
+                                         void *buf, dma_addr_t len,
+-                                        DMADirection dir)
++                                        DMADirection dir, MemTxAttrs attrs)
+ {
+     dma_barrier(as, dir);
+ 
+-    return dma_memory_rw_relaxed(as, addr, buf, len, dir,
+-                                 MEMTXATTRS_UNSPECIFIED);
++    return dma_memory_rw_relaxed(as, addr, buf, len, dir, attrs);
+ }
+ 
+ /**
+@@ -147,7 +147,8 @@ static inline MemTxResult dma_memory_rw(AddressSpace *as, dma_addr_t addr,
+ static inline MemTxResult dma_memory_read(AddressSpace *as, dma_addr_t addr,
+                                           void *buf, dma_addr_t len)
+ {
+-    return dma_memory_rw(as, addr, buf, len, DMA_DIRECTION_TO_DEVICE);
++    return dma_memory_rw(as, addr, buf, len,
++                         DMA_DIRECTION_TO_DEVICE, MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ /**
+@@ -166,7 +167,7 @@ static inline MemTxResult dma_memory_write(AddressSpace *as, dma_addr_t addr,
+                                            const void *buf, dma_addr_t len)
+ {
+     return dma_memory_rw(as, addr, (void *)buf, len,
+-                         DMA_DIRECTION_FROM_DEVICE);
++                         DMA_DIRECTION_FROM_DEVICE, MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ /**
+diff --git a/softmmu/dma-helpers.c b/softmmu/dma-helpers.c
+index 1f07217..5bf76ff 100644
+--- a/softmmu/dma-helpers.c
++++ b/softmmu/dma-helpers.c
+@@ -305,7 +305,8 @@ static uint64_t dma_buf_rw(uint8_t *ptr, int32_t len, QEMUSGList *sg,
+     while (len > 0) {
+         ScatterGatherEntry entry = sg->sg[sg_cur_index++];
+         int32_t xfer = MIN(len, entry.len);
+-        dma_memory_rw(sg->as, entry.base, ptr, xfer, dir);
++        dma_memory_rw(sg->as, entry.base, ptr, xfer, dir,
++                      MEMTXATTRS_UNSPECIFIED);
+         ptr += xfer;
+         len -= xfer;
+         resid -= xfer;
+-- 
+1.8.3.1
+

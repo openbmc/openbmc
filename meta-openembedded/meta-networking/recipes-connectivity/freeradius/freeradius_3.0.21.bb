@@ -33,6 +33,8 @@ SRC_URI = "git://github.com/FreeRADIUS/freeradius-server.git;branch=v3.0.x;lfs=0
     file://radiusd-volatiles.conf \
     file://check-openssl-cmds-in-script-bootstrap.patch \
     file://0001-version.c-don-t-print-build-flags.patch \
+    file://CVE-2022-41860.patch \
+    file://CVE-2022-41861.patch \
 "
 
 raddbdir="${sysconfdir}/${MLPREFIX}raddb"

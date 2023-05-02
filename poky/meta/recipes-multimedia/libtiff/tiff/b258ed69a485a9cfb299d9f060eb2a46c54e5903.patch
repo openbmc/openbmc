@@ -1,0 +1,46 @@
+From fb89eab3ed46bbb0276bdee05b570455f6a27d2f Mon Sep 17 00:00:00 2001
+From: Su_Laus <sulau@freenet.de>
+Date: Sun, 6 Feb 2022 19:52:17 +0100
+Subject: [PATCH] Move the crop_width and crop_length computation after the
+ sanity check to avoid warnings when built with
+ -fsanitize=unsigned-integer-overflow.
+
+Upstream-Status: Backport [https://gitlab.com/libtiff/libtiff/-/commit/b258ed69a485a9cfb299d9f060eb2a46c54e5903?merge_request_iid=294]
+
+Signed-off-by: Teoh Jay Shen <jay.shen.teoh@intel.com>
+
+CVE: CVE-2022-2868
+
+---
+ tools/tiffcrop.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/tools/tiffcrop.c b/tools/tiffcrop.c
+index 0ef5bb2..99e4208 100644
+--- a/tools/tiffcrop.c
++++ b/tools/tiffcrop.c
+@@ -5389,15 +5389,13 @@ computeInputPixelOffsets(struct crop_mask *crop, struct image_data *image,
+   off->endx   = endx;
+   off->endy   = endy;
+ 
+-  crop_width  = endx - startx + 1;
+-  crop_length = endy - starty + 1;
+-
+   if (endx + 1 <= startx)
+     {
+     TIFFError("computeInputPixelOffsets", 
+                "Invalid left/right margins and /or image crop width requested");
+     return (-1);
+     }
++  crop_width  = endx - startx + 1;
+   if (crop_width > image->width)
+     crop_width = image->width;
+ 
+@@ -5407,6 +5405,7 @@ computeInputPixelOffsets(struct crop_mask *crop, struct image_data *image,
+               "Invalid top/bottom margins and /or image crop length requested");
+     return (-1);
+     }
++  crop_length = endy - starty + 1;
+   if (crop_length > image->length)
+     crop_length = image->length;
+ 

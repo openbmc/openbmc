@@ -1,6 +1,6 @@
 require go-common.inc
 
-FILESEXTRAPATHS:prepend := "${FILE_DIRNAME}/go-1.18:"
+FILESEXTRAPATHS:prepend := "${FILE_DIRNAME}/go-1.19:${FILE_DIRNAME}/go-1.18:"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=5d4950ecb7b26d2c5e4e7b4e0dd74707"
 
@@ -17,6 +17,17 @@ SRC_URI += "\
     file://0001-exec.go-do-not-write-linker-flags-into-buildids.patch \
     file://0001-src-cmd-dist-buildgo.go-do-not-hardcode-host-compile.patch \
     file://CVE-2022-27664.patch \
+    file://0001-net-http-httputil-avoid-query-parameter-smuggling.patch \
+    file://CVE-2022-41715.patch \
+    file://CVE-2022-41717.patch \
+    file://CVE-2022-2879.patch \
+    file://CVE-2022-41720.patch \
+    file://CVE-2022-41723.patch \
+    file://cve-2022-41724.patch \
+    file://add_godebug.patch \
+    file://cve-2022-41725.patch \
+    file://CVE-2022-41722.patch \
+    file://CVE-2023-24537.patch \
 "
 SRC_URI[main.sha256sum] = "a1a48b23afb206f95e7bbaa9b898d965f90826f6f1d1fc0c1d784ada0cd300fd"
 
@@ -24,3 +35,6 @@ SRC_URI[main.sha256sum] = "a1a48b23afb206f95e7bbaa9b898d965f90826f6f1d1fc0c1d784
 # fix in 1.17 onwards where we can drop this.
 # https://github.com/golang/go/issues/30999#issuecomment-910470358
 CVE_CHECK_IGNORE += "CVE-2021-29923"
+
+# This is specific to Microsoft Windows
+CVE_CHECK_IGNORE += "CVE-2022-41716"

@@ -160,12 +160,7 @@ def catch_parse_error(func):
     def wrapped(fn, *args):
         try:
             return func(fn, *args)
-        except IOError as exc:
-            import traceback
-            parselog.critical(traceback.format_exc())
-            parselog.critical("Unable to parse %s: %s" % (fn, exc))
-            raise bb.BBHandledException()
-        except bb.data_smart.ExpansionError as exc:
+        except Exception as exc:
             import traceback
 
             bbdir = os.path.dirname(__file__) + os.sep
@@ -176,9 +171,6 @@ def catch_parse_error(func):
                 if not fn.startswith(bbdir):
                     break
             parselog.critical("Unable to parse %s" % fn, exc_info=(exc_class, exc, tb))
-            raise bb.BBHandledException()
-        except bb.parse.ParseError as exc:
-            parselog.critical(str(exc))
             raise bb.BBHandledException()
     return wrapped
 
@@ -301,13 +293,8 @@ class CookerDataBuilder(object):
                 bb.event.fire(bb.event.MultiConfigParsed(self.mcdata), self.data)
 
             self.data_hash = data_hash.hexdigest()
-        except (SyntaxError, bb.BBHandledException):
-            raise bb.BBHandledException()
         except bb.data_smart.ExpansionError as e:
             logger.error(str(e))
-            raise bb.BBHandledException()
-        except Exception:
-            logger.exception("Error parsing configuration files")
             raise bb.BBHandledException()
 
 
@@ -435,7 +422,7 @@ class CookerDataBuilder(object):
                 msg += (" and bitbake did not find a conf/bblayers.conf file in"
                         " the expected location.\nMaybe you accidentally"
                         " invoked bitbake from the wrong directory?")
-            raise SystemExit(msg)
+            bb.fatal(msg)
 
         if not data.getVar("TOPDIR"):
             data.setVar("TOPDIR", os.path.abspath(os.getcwd()))

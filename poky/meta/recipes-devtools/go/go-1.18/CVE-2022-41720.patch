@@ -1,0 +1,514 @@
+From f8896a97a0630b0f2f8c488310147f7f20b3ec7d Mon Sep 17 00:00:00 2001
+From: Damien Neil <dneil@google.com>
+Date: Thu, 10 Nov 2022 12:16:27 -0800
+Subject: [PATCH] os, net/http: avoid escapes from os.DirFS and http.Dir on
+ Windows
+
+Do not permit access to Windows reserved device names (NUL, COM1, etc.)
+via os.DirFS and http.Dir filesystems.
+
+Avoid escapes from os.DirFS(`\`) on Windows. DirFS would join the
+the root to the relative path with a path separator, making
+os.DirFS(`\`).Open(`/foo/bar`) open the path `\\foo\bar`, which is
+a UNC name. Not only does this not open the intended file, but permits
+reference to any file on the system rather than only files on the
+current drive.
+
+Make os.DirFS("") invalid, with all file access failing. Previously,
+a root of "" was interpreted as "/", which is surprising and probably
+unintentional.
+
+Fixes CVE-2022-41720.
+Fixes #56694.
+
+Change-Id: I275b5fa391e6ad7404309ea98ccc97405942e0f0
+Reviewed-on: https://team-review.git.corp.google.com/c/golang/go-private/+/1663832
+Reviewed-by: Julie Qiu <julieqiu@google.com>
+Reviewed-by: Tatiana Bradley <tatianabradley@google.com>
+Reviewed-on: https://go-review.googlesource.com/c/go/+/455360
+Reviewed-by: Michael Pratt <mpratt@google.com>
+TryBot-Result: Gopher Robot <gobot@golang.org>
+Run-TryBot: Jenny Rakoczy <jenny@golang.org>
+
+CVE: CVE-2022-41720
+Upstream-Status: Backport [7013a4f5f816af62033ad63dd06b77c30d7a62a7]
+Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
+---
+ src/go/build/deps_test.go                 |  1 +
+ src/internal/safefilepath/path.go         | 21 +++++
+ src/internal/safefilepath/path_other.go   | 23 ++++++
+ src/internal/safefilepath/path_test.go    | 88 +++++++++++++++++++++
+ src/internal/safefilepath/path_windows.go | 95 +++++++++++++++++++++++
+ src/net/http/fs.go                        |  8 +-
+ src/net/http/fs_test.go                   | 28 +++++++
+ src/os/file.go                            | 36 +++++++--
+ src/os/os_test.go                         | 38 +++++++++
+ 9 files changed, 328 insertions(+), 10 deletions(-)
+ create mode 100644 src/internal/safefilepath/path.go
+ create mode 100644 src/internal/safefilepath/path_other.go
+ create mode 100644 src/internal/safefilepath/path_test.go
+ create mode 100644 src/internal/safefilepath/path_windows.go
+
+diff --git a/src/go/build/deps_test.go b/src/go/build/deps_test.go
+index 45e2f25..dc3bb8c 100644
+--- a/src/go/build/deps_test.go
++++ b/src/go/build/deps_test.go
+@@ -165,6 +165,7 @@ var depsRules = `
+ 	io/fs
+ 	< internal/testlog
+ 	< internal/poll
++	< internal/safefilepath
+ 	< os
+ 	< os/signal;
+ 
+diff --git a/src/internal/safefilepath/path.go b/src/internal/safefilepath/path.go
+new file mode 100644
+index 0000000..0f0a270
+--- /dev/null
++++ b/src/internal/safefilepath/path.go
+@@ -0,0 +1,21 @@
++// Copyright 2022 The Go Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style
++// license that can be found in the LICENSE file.
++
++// Package safefilepath manipulates operating-system file paths.
++package safefilepath
++
++import (
++	"errors"
++)
++
++var errInvalidPath = errors.New("invalid path")
++
++// FromFS converts a slash-separated path into an operating-system path.
++//
++// FromFS returns an error if the path cannot be represented by the operating
++// system. For example, paths containing '\' and ':' characters are rejected
++// on Windows.
++func FromFS(path string) (string, error) {
++	return fromFS(path)
++}
+diff --git a/src/internal/safefilepath/path_other.go b/src/internal/safefilepath/path_other.go
+new file mode 100644
+index 0000000..f93da18
+--- /dev/null
++++ b/src/internal/safefilepath/path_other.go
+@@ -0,0 +1,23 @@
++// Copyright 2022 The Go Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style
++// license that can be found in the LICENSE file.
++
++//go:build !windows
++
++package safefilepath
++
++import "runtime"
++
++func fromFS(path string) (string, error) {
++	if runtime.GOOS == "plan9" {
++		if len(path) > 0 && path[0] == '#' {
++			return path, errInvalidPath
++		}
++	}
++	for i := range path {
++		if path[i] == 0 {
++			return "", errInvalidPath
++		}
++	}
++	return path, nil
++}
+diff --git a/src/internal/safefilepath/path_test.go b/src/internal/safefilepath/path_test.go
+new file mode 100644
+index 0000000..dc662c1
+--- /dev/null
++++ b/src/internal/safefilepath/path_test.go
+@@ -0,0 +1,88 @@
++// Copyright 2022 The Go Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style
++// license that can be found in the LICENSE file.
++
++package safefilepath_test
++
++import (
++	"internal/safefilepath"
++	"os"
++	"path/filepath"
++	"runtime"
++	"testing"
++)
++
++type PathTest struct {
++	path, result string
++}
++
++const invalid = ""
++
++var fspathtests = []PathTest{
++	{".", "."},
++	{"/a/b/c", "/a/b/c"},
++	{"a\x00b", invalid},
++}
++
++var winreservedpathtests = []PathTest{
++	{`a\b`, `a\b`},
++	{`a:b`, `a:b`},
++	{`a/b:c`, `a/b:c`},
++	{`NUL`, `NUL`},
++	{`./com1`, `./com1`},
++	{`a/nul/b`, `a/nul/b`},
++}
++
++// Whether a reserved name with an extension is reserved or not varies by
++// Windows version.
++var winreservedextpathtests = []PathTest{
++	{"nul.txt", "nul.txt"},
++	{"a/nul.txt/b", "a/nul.txt/b"},
++}
++
++var plan9reservedpathtests = []PathTest{
++	{`#c`, `#c`},
++}
++
++func TestFromFS(t *testing.T) {
++	switch runtime.GOOS {
++	case "windows":
++		if canWriteFile(t, "NUL") {
++			t.Errorf("can unexpectedly write a file named NUL on Windows")
++		}
++		if canWriteFile(t, "nul.txt") {
++			fspathtests = append(fspathtests, winreservedextpathtests...)
++		} else {
++			winreservedpathtests = append(winreservedpathtests, winreservedextpathtests...)
++		}
++		for i := range winreservedpathtests {
++			winreservedpathtests[i].result = invalid
++		}
++		for i := range fspathtests {
++			fspathtests[i].result = filepath.FromSlash(fspathtests[i].result)
++		}
++	case "plan9":
++		for i := range plan9reservedpathtests {
++			plan9reservedpathtests[i].result = invalid
++		}
++	}
++	tests := fspathtests
++	tests = append(tests, winreservedpathtests...)
++	tests = append(tests, plan9reservedpathtests...)
++	for _, test := range tests {
++		got, err := safefilepath.FromFS(test.path)
++		if (got == "") != (err != nil) {
++			t.Errorf(`FromFS(%q) = %q, %v; want "" only if err != nil`, test.path, got, err)
++		}
++		if got != test.result {
++			t.Errorf("FromFS(%q) = %q, %v; want %q", test.path, got, err, test.result)
++		}
++	}
++}
++
++func canWriteFile(t *testing.T, name string) bool {
++	path := filepath.Join(t.TempDir(), name)
++	os.WriteFile(path, []byte("ok"), 0666)
++	b, _ := os.ReadFile(path)
++	return string(b) == "ok"
++}
+diff --git a/src/internal/safefilepath/path_windows.go b/src/internal/safefilepath/path_windows.go
+new file mode 100644
+index 0000000..909c150
+--- /dev/null
++++ b/src/internal/safefilepath/path_windows.go
+@@ -0,0 +1,95 @@
++// Copyright 2022 The Go Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style
++// license that can be found in the LICENSE file.
++
++package safefilepath
++
++import (
++	"syscall"
++	"unicode/utf8"
++)
++
++func fromFS(path string) (string, error) {
++	if !utf8.ValidString(path) {
++		return "", errInvalidPath
++	}
++	for len(path) > 1 && path[0] == '/' && path[1] == '/' {
++		path = path[1:]
++	}
++	containsSlash := false
++	for p := path; p != ""; {
++		// Find the next path element.
++		i := 0
++		dot := -1
++		for i < len(p) && p[i] != '/' {
++			switch p[i] {
++			case 0, '\\', ':':
++				return "", errInvalidPath
++			case '.':
++				if dot < 0 {
++					dot = i
++				}
++			}
++			i++
++		}
++		part := p[:i]
++		if i < len(p) {
++			containsSlash = true
++			p = p[i+1:]
++		} else {
++			p = ""
++		}
++		// Trim the extension and look for a reserved name.
++		base := part
++		if dot >= 0 {
++			base = part[:dot]
++		}
++		if isReservedName(base) {
++			if dot < 0 {
++				return "", errInvalidPath
++			}
++			// The path element is a reserved name with an extension.
++			// Some Windows versions consider this a reserved name,
++			// while others do not. Use FullPath to see if the name is
++			// reserved.
++			if p, _ := syscall.FullPath(part); len(p) >= 4 && p[:4] == `\\.\` {
++				return "", errInvalidPath
++			}
++		}
++	}
++	if containsSlash {
++		// We can't depend on strings, so substitute \ for / manually.
++		buf := []byte(path)
++		for i, b := range buf {
++			if b == '/' {
++				buf[i] = '\\'
++			}
++		}
++		path = string(buf)
++	}
++	return path, nil
++}
++
++// isReservedName reports if name is a Windows reserved device name.
++// It does not detect names with an extension, which are also reserved on some Windows versions.
++//
++// For details, search for PRN in
++// https://docs.microsoft.com/en-us/windows/desktop/fileio/naming-a-file.
++func isReservedName(name string) bool {
++	if 3 <= len(name) && len(name) <= 4 {
++		switch string([]byte{toUpper(name[0]), toUpper(name[1]), toUpper(name[2])}) {
++		case "CON", "PRN", "AUX", "NUL":
++			return len(name) == 3
++		case "COM", "LPT":
++			return len(name) == 4 && '1' <= name[3] && name[3] <= '9'
++		}
++	}
++	return false
++}
++
++func toUpper(c byte) byte {
++	if 'a' <= c && c <= 'z' {
++		return c - ('a' - 'A')
++	}
++	return c
++}
+diff --git a/src/net/http/fs.go b/src/net/http/fs.go
+index 57e731e..43ee4b5 100644
+--- a/src/net/http/fs.go
++++ b/src/net/http/fs.go
+@@ -9,6 +9,7 @@ package http
+ import (
+ 	"errors"
+ 	"fmt"
++	"internal/safefilepath"
+ 	"io"
+ 	"io/fs"
+ 	"mime"
+@@ -69,14 +70,15 @@ func mapDirOpenError(originalErr error, name string) error {
+ // Open implements FileSystem using os.Open, opening files for reading rooted
+ // and relative to the directory d.
+ func (d Dir) Open(name string) (File, error) {
+-	if filepath.Separator != '/' && strings.ContainsRune(name, filepath.Separator) {
+-		return nil, errors.New("http: invalid character in file path")
++	path, err := safefilepath.FromFS(path.Clean("/" + name))
++	if err != nil {
++		return nil, errors.New("http: invalid or unsafe file path")
+ 	}
+ 	dir := string(d)
+ 	if dir == "" {
+ 		dir = "."
+ 	}
+-	fullName := filepath.Join(dir, filepath.FromSlash(path.Clean("/"+name)))
++	fullName := filepath.Join(dir, path)
+ 	f, err := os.Open(fullName)
+ 	if err != nil {
+ 		return nil, mapDirOpenError(err, fullName)
+diff --git a/src/net/http/fs_test.go b/src/net/http/fs_test.go
+index b42ade1..941448a 100644
+--- a/src/net/http/fs_test.go
++++ b/src/net/http/fs_test.go
+@@ -648,6 +648,34 @@ func TestFileServerZeroByte(t *testing.T) {
+ 	}
+ }
+ 
++func TestFileServerNamesEscape(t *testing.T) {
++	t.Run("h1", func(t *testing.T) {
++		testFileServerNamesEscape(t, h1Mode)
++	})
++	t.Run("h2", func(t *testing.T) {
++		testFileServerNamesEscape(t, h2Mode)
++	})
++}
++func testFileServerNamesEscape(t *testing.T, h2 bool) {
++	defer afterTest(t)
++	ts := newClientServerTest(t, h2, FileServer(Dir("testdata"))).ts
++	defer ts.Close()
++	for _, path := range []string{
++		"/../testdata/file",
++		"/NUL", // don't read from device files on Windows
++	} {
++		res, err := ts.Client().Get(ts.URL + path)
++		if err != nil {
++			t.Fatal(err)
++		}
++		res.Body.Close()
++		if res.StatusCode < 400 || res.StatusCode > 599 {
++			t.Errorf("Get(%q): got status %v, want 4xx or 5xx", path, res.StatusCode)
++		}
++
++	}
++}
++
+ type fakeFileInfo struct {
+ 	dir      bool
+ 	basename string
+diff --git a/src/os/file.go b/src/os/file.go
+index e717f17..cb87158 100644
+--- a/src/os/file.go
++++ b/src/os/file.go
+@@ -37,12 +37,12 @@
+ // Note: The maximum number of concurrent operations on a File may be limited by
+ // the OS or the system. The number should be high, but exceeding it may degrade
+ // performance or cause other issues.
+-//
+ package os
+ 
+ import (
+ 	"errors"
+ 	"internal/poll"
++	"internal/safefilepath"
+ 	"internal/testlog"
+ 	"internal/unsafeheader"
+ 	"io"
+@@ -623,6 +623,8 @@ func isWindowsNulName(name string) bool {
+ // the /prefix tree, then using DirFS does not stop the access any more than using
+ // os.Open does. DirFS is therefore not a general substitute for a chroot-style security
+ // mechanism when the directory tree contains arbitrary content.
++//
++// The directory dir must not be "".
+ func DirFS(dir string) fs.FS {
+ 	return dirFS(dir)
+ }
+@@ -641,10 +643,11 @@ func containsAny(s, chars string) bool {
+ type dirFS string
+ 
+ func (dir dirFS) Open(name string) (fs.File, error) {
+-	if !fs.ValidPath(name) || runtime.GOOS == "windows" && containsAny(name, `\:`) {
+-		return nil, &PathError{Op: "open", Path: name, Err: ErrInvalid}
++	fullname, err := dir.join(name)
++	if err != nil {
++		return nil, &PathError{Op: "stat", Path: name, Err: err}
+ 	}
+-	f, err := Open(string(dir) + "/" + name)
++	f, err := Open(fullname)
+ 	if err != nil {
+ 		return nil, err // nil fs.File
+ 	}
+@@ -652,16 +655,35 @@ func (dir dirFS) Open(name string) (fs.File, error) {
+ }
+ 
+ func (dir dirFS) Stat(name string) (fs.FileInfo, error) {
+-	if !fs.ValidPath(name) || runtime.GOOS == "windows" && containsAny(name, `\:`) {
+-		return nil, &PathError{Op: "stat", Path: name, Err: ErrInvalid}
++	fullname, err := dir.join(name)
++	if err != nil {
++		return nil, &PathError{Op: "stat", Path: name, Err: err}
+ 	}
+-	f, err := Stat(string(dir) + "/" + name)
++	f, err := Stat(fullname)
+ 	if err != nil {
+ 		return nil, err
+ 	}
+ 	return f, nil
+ }
+ 
++// join returns the path for name in dir.
++func (dir dirFS) join(name string) (string, error) {
++	if dir == "" {
++		return "", errors.New("os: DirFS with empty root")
++	}
++	if !fs.ValidPath(name) {
++		return "", ErrInvalid
++	}
++	name, err := safefilepath.FromFS(name)
++	if err != nil {
++		return "", ErrInvalid
++	}
++	if IsPathSeparator(dir[len(dir)-1]) {
++		return string(dir) + name, nil
++	}
++	return string(dir) + string(PathSeparator) + name, nil
++}
++
+ // ReadFile reads the named file and returns the contents.
+ // A successful call returns err == nil, not err == EOF.
+ // Because ReadFile reads the whole file, it does not treat an EOF from Read
+diff --git a/src/os/os_test.go b/src/os/os_test.go
+index 506f1fb..be269bb 100644
+--- a/src/os/os_test.go
++++ b/src/os/os_test.go
+@@ -2702,6 +2702,44 @@ func TestDirFS(t *testing.T) {
+ 	if err == nil {
+ 		t.Fatalf(`Open testdata\dirfs succeeded`)
+ 	}
++
++	// Test that Open does not open Windows device files.
++	_, err = d.Open(`NUL`)
++	if err == nil {
++		t.Errorf(`Open NUL succeeded`)
++	}
++}
++
++func TestDirFSRootDir(t *testing.T) {
++	cwd, err := os.Getwd()
++	if err != nil {
++		t.Fatal(err)
++	}
++	cwd = cwd[len(filepath.VolumeName(cwd)):] // trim volume prefix (C:) on Windows
++	cwd = filepath.ToSlash(cwd)               // convert \ to /
++	cwd = strings.TrimPrefix(cwd, "/")        // trim leading /
++
++	// Test that Open can open a path starting at /.
++	d := DirFS("/")
++	f, err := d.Open(cwd + "/testdata/dirfs/a")
++	if err != nil {
++		t.Fatal(err)
++	}
++	f.Close()
++}
++
++func TestDirFSEmptyDir(t *testing.T) {
++	d := DirFS("")
++	cwd, _ := os.Getwd()
++	for _, path := range []string{
++		"testdata/dirfs/a",                          // not DirFS(".")
++		filepath.ToSlash(cwd) + "/testdata/dirfs/a", // not DirFS("/")
++	} {
++		_, err := d.Open(path)
++		if err == nil {
++			t.Fatalf(`DirFS("").Open(%q) succeeded`, path)
++		}
++	}
+ }
+ 
+ func TestDirFSPathsValid(t *testing.T) {

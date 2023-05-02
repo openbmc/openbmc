@@ -38,7 +38,7 @@ RDEPENDS:${PN}-ptest += " make bash python3-core python3-ctypes python3-json pyt
 
 TESTDIR = "tests"
 
-PRIVATE_LIBS:${PN}-ptest:append = "libnftables.so.1"
+PRIVATE_LIBS:${PN}-ptest:append = " libnftables.so.1"
 
 do_install_ptest() {
     cp -rf ${S}/build-aux ${D}${PTEST_PATH}

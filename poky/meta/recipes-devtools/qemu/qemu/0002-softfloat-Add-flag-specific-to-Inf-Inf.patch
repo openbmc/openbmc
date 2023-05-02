@@ -1,0 +1,59 @@
+From 9b0737858b2b68c3a4d1e0611f2732679c997c6d Mon Sep 17 00:00:00 2001
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri, 17 Dec 2021 17:57:14 +0100
+Subject: [PATCH 02/21] softfloat: Add flag specific to Inf - Inf
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+PowerPC has this flag, and it's easier to compute it here
+than after the fact.
+
+Upstream-Status: Backport
+[https://git.qemu.org/?p=qemu.git;a=commit;h=ba11446c40903b9d97fb75a078d43fee6444d3b6]
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20211119160502.17432-3-richard.henderson@linaro.org>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+---
+ fpu/softfloat-parts.c.inc     | 3 ++-
+ include/fpu/softfloat-types.h | 1 +
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/fpu/softfloat-parts.c.inc b/fpu/softfloat-parts.c.inc
+index 41d4b17e41..eb2b475ca4 100644
+--- a/fpu/softfloat-parts.c.inc
++++ b/fpu/softfloat-parts.c.inc
+@@ -354,7 +354,7 @@ static FloatPartsN *partsN(addsub)(FloatPartsN *a, FloatPartsN *b,
+                 return a;
+             }
+             /* Inf - Inf */
+-            float_raise(float_flag_invalid, s);
++            float_raise(float_flag_invalid | float_flag_invalid_isi, s);
+             parts_default_nan(a, s);
+             return a;
+         }
+@@ -494,6 +494,7 @@ static FloatPartsN *partsN(muladd)(FloatPartsN *a, FloatPartsN *b,
+ 
+         if (ab_mask & float_cmask_inf) {
+             if (c->cls == float_class_inf && a->sign != c->sign) {
++                float_raise(float_flag_invalid | float_flag_invalid_isi, s);
+                 goto d_nan;
+             }
+             goto return_inf;
+diff --git a/include/fpu/softfloat-types.h b/include/fpu/softfloat-types.h
+index 65a43aff59..eaa12e1e00 100644
+--- a/include/fpu/softfloat-types.h
++++ b/include/fpu/softfloat-types.h
+@@ -152,6 +152,7 @@ enum {
+     float_flag_inexact         = 0x0010,
+     float_flag_input_denormal  = 0x0020,
+     float_flag_output_denormal = 0x0040,
++    float_flag_invalid_isi     = 0x0080,  /* inf - inf */
+ };
+ 
+ /*
+-- 
+2.17.1
+

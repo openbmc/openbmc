@@ -36,7 +36,7 @@ How do I install/not-install the kernel image on the root filesystem?
 The kernel image (e.g. ``vmlinuz``) is provided by the
 ``kernel-image`` package. Image recipes depend on ``kernel-base``. To
 specify whether or not the kernel image is installed in the generated
-root filesystem, override ``RDEPENDS:${KERNEL_PACKAGE_NAME}-base`` to include or not
+root filesystem, override ``RRECOMMENDS:${KERNEL_PACKAGE_NAME}-base`` to include or not
 include "kernel-image". See the
 ":ref:`dev-manual/common-tasks:appending other layers metadata with your layer`"
 section in the

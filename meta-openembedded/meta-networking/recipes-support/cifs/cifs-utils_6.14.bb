@@ -5,7 +5,10 @@ LICENSE = "GPL-3.0-only & LGPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 SRCREV = "8c06dce7d596e478c20bc54bdcec87ad97f80a1b"
-SRC_URI = "git://git.samba.org/cifs-utils.git;branch=master"
+SRC_URI = "git://git.samba.org/cifs-utils.git;branch=master \
+           file://CVE-2022-27239.patch \
+           file://CVE-2022-29869.patch \
+"
 
 S = "${WORKDIR}/git"
 DEPENDS += "libtalloc"

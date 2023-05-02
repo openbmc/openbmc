@@ -8,7 +8,7 @@ LICENSE = "GPL-3.0-or-later & LGPL-2.1-or-later"
 LICENSE:${PN} = "LGPL-2.1-or-later"
 LICENSE:${PN}-xx = "LGPL-2.1-or-later"
 LICENSE:${PN}-bin = "GPL-3.0-or-later"
-LICENSE:${PN}-OpenSSL = "GPL-3.0-or-later"
+LICENSE:${PN}-openssl = "GPL-3.0-or-later"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=71391c8e0c1cfe68077e7fce3b586283 \
                     file://doc/COPYING;md5=c678957b0c8e964aa6c70fd77641a71e \
@@ -22,6 +22,7 @@ SHRT_VER = "${@d.getVar('PV').split('.')[0]}.${@d.getVar('PV').split('.')[1]}"
 SRC_URI = "https://www.gnupg.org/ftp/gcrypt/gnutls/v${SHRT_VER}/gnutls-${PV}.tar.xz \
            file://arm_eabi.patch \
            file://CVE-2022-2509.patch \
+           file://CVE-2023-0361.patch \
            "
 
 SRC_URI[sha256sum] = "e6adbebcfbc95867de01060d93c789938cf89cc1d1f6ef9ef661890f6217451f"

@@ -12,6 +12,10 @@ PYPI_PACKAGE = "GitPython"
 
 inherit pypi python_setuptools_build_meta
 
+SRC_URI += "file://0001-python3-git-CVE-2022-24439-fix-from-PR-1518.patch \
+            file://0001-python3-git-CVE-2022-24439-fix-from-PR-1521.patch \
+           "
+
 SRC_URI[sha256sum] = "1c885ce809e8ba2d88a29befeb385fcea06338d3640712b59ca623c220bb5704"
 
 DEPENDS += " ${PYTHON_PN}-gitdb"

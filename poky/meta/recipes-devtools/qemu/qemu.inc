@@ -13,7 +13,6 @@ inherit pkgconfig ptest python3-dir
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=441c28d2cf86e15a37fa47e15a72fbac \
                     file://COPYING.LIB;endline=24;md5=8c5efda6cf1e1b03dcfd0e6c0d271c7f"
-
 SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://powerpc_rom.bin \
            file://run-ptest \
@@ -36,13 +35,64 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://CVE-2021-4206.patch \
            file://CVE-2021-4207.patch \
            file://CVE-2022-35414.patch \
-           file://CVE-2021-3507_1.patch \
-           file://CVE-2021-3507_2.patch \
            file://CVE-2021-3929.patch \
            file://CVE-2021-4158.patch \
            file://CVE-2022-0358.patch \
            file://CVE-2022-0216_1.patch \
            file://CVE-2022-0216_2.patch \
+           file://CVE-2021-3750-1.patch \
+           file://CVE-2021-3750-2.patch \
+           file://CVE-2021-3750-3.patch \
+           file://0001-use-uint32t-for-reply-queue-head-tail-values.patch \
+           file://0002_let_dma_memory_valid_function_take_MemTxAttrs_argument.patch \
+           file://0003_let_dma_memory_set_function_take_MemTxAttrs_argument.patch \
+           file://0004_let_dma_memory_rw_relaxed_function_take_MemTxAttrs_argument.patch \
+           file://0005_let_dma_memory_rw_function_take_MemTxAttrs_argument.patch \
+           file://0006_let_dma_memory_read_write_function_take_MemTxAttrs_argument.patch \
+           file://0007_let_dma_memory_map_function_take_MemTxAttrs_argument.patch \
+           file://0008_have_dma_buf_rw_function_take_a_void_pointer.patch \
+           file://0009_have_dma_buf_read_and_dma_buf_write_functions_take_a_void.patch \
+           file://0010_let_pci_dma_rw_function_take_MemTxAttrs_argument.patch \
+           file://0011_let_dma_buf_rw_function_take_MemTxAttrs_argument.patch \
+           file://0012_let_dma_buf_write_function_take_MemTxAttrs_argument.patch \
+           file://0013_let_dma_buf_read_function_take_MemTxAttrs_argument.patch \
+           file://0014_let_dma_buf_rw_function_propagate_MemTxResult.patch \
+           file://0015_let_st_pointer_dma_function_take_MemTxAttrs_argument.patch \
+           file://0016_let_ld_pointer_dma_function_take_MemTxAttrs_argument.patch \
+           file://0017_let_st_pointer_dma_function_propagate_MemTxResult.patch \
+           file://0018_let_ld_pointer_dma_function_propagate_MemTxResult.patch \
+           file://0019_let_st_pointer_pci_dma_function_take_MemTxAttrs_argument.patch \
+           file://0020_let_ld_pointer_pci_dma_function_take_MemTxAttrs_argument.patch \
+           file://0021_let_st_pointer_pci_dma_function_propagate_MemTxResult.patch \
+           file://0022_let_ld_pointer_pci_dma_function_propagate_MemTxResult.patch \
+           file://CVE-2021-3611_1.patch \
+           file://CVE-2021-3611_2.patch \
+           file://0001-net-tulip-Restrict-DMA-engine-to-memories.patch \
+           file://0001-softfloat-Extend-float_exception_flags-to-16-bits.patch \
+           file://0002-softfloat-Add-flag-specific-to-Inf-Inf.patch \
+           file://0003-softfloat-Add-flag-specific-to-Inf-0.patch \
+           file://0004-softfloat-Add-flags-specific-to-Inf-Inf-and-0-0.patch \
+           file://0005-softfloat-Add-flag-specific-to-signaling-nans.patch \
+           file://0006-target-ppc-Update-float_invalid_op_addsub-for-new-fl.patch \
+           file://0007-target-ppc-Update-float_invalid_op_mul-for-new-flags.patch \
+           file://0008-target-ppc-Update-float_invalid_op_div-for-new-flags.patch \
+           file://0009-target-ppc-Update-fmadd-for-new-flags.patch \
+           file://0010-target-ppc-Split-out-do_fmadd.patch \
+           file://0011-target-ppc-Fix-xs-max-min-cj-dp-to-use-VSX-registers.patch \
+           file://0012-target-ppc-Move-xs-max-min-cj-dp-to-decodetree.patch \
+           file://0013-target-ppc-fix-xscvqpdp-register-access.patch \
+           file://0014-target-ppc-move-xscvqpdp-to-decodetree.patch \
+           file://0015-target-ppc-ppc_store_fpscr-doesn-t-update-bits-0-to-.patch \
+           file://0016-target-ppc-Introduce-TRANS-FLAGS-macros.patch \
+           file://0017-target-ppc-Implement-Vector-Expand-Mask.patch \
+           file://0018-target-ppc-Implement-Vector-Extract-Mask.patch \
+           file://0019-target-ppc-Implement-Vector-Mask-Move-insns.patch \
+           file://0020-target-ppc-move-xs-n-madd-am-ds-p-xs-n-msub-am-ds-p-.patch \
+           file://0021-target-ppc-implement-xs-n-maddqp-o-xs-n-msubqp-o.patch \
+           file://CVE-2022-3165.patch \
+           file://CVE-2022-4144.patch \
+           file://0001-hw-display-qxl-Have-qxl_log_command-Return-early-if-.patch \
+           file://0001-hw-display-qxl-Pass-requested-buffer-size-to-qxl_phy.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 
@@ -161,6 +211,7 @@ PACKAGECONFIG:remove:mingw32 = "kvm virglrenderer epoxy gtk+"
 PACKAGECONFIG[sdl] = "--enable-sdl,--disable-sdl,libsdl2"
 PACKAGECONFIG[virtfs] = "--enable-virtfs --enable-attr --enable-cap-ng,--disable-virtfs,libcap-ng attr,"
 PACKAGECONFIG[aio] = "--enable-linux-aio,--disable-linux-aio,libaio,"
+PACKAGECONFIG[uring] = "--enable-linux-io-uring,--disable-linux-io-uring,liburing"
 PACKAGECONFIG[xfs] = "--enable-xfsctl,--disable-xfsctl,xfsprogs,"
 PACKAGECONFIG[xen] = "--enable-xen,--disable-xen,xen-tools,xen-tools-libxenstore xen-tools-libxenctrl xen-tools-libxenguest"
 PACKAGECONFIG[vnc-sasl] = "--enable-vnc --enable-vnc-sasl,--disable-vnc-sasl,cyrus-sasl,"
@@ -212,6 +263,7 @@ PACKAGECONFIG[rdma] = "--enable-rdma,--disable-rdma"
 PACKAGECONFIG[vde] = "--enable-vde,--disable-vde"
 PACKAGECONFIG[slirp] = "--enable-slirp=internal,--disable-slirp"
 PACKAGECONFIG[brlapi] = "--enable-brlapi,--disable-brlapi"
+PACKAGECONFIG[jack] = "--enable-jack,--disable-jack,jack,"
 
 INSANE_SKIP:${PN} = "arch"
 

@@ -1,0 +1,174 @@
+From 1c1f82fbf0a434948b041eb35c671137628d5538 Mon Sep 17 00:00:00 2001
+From: Matheus Ferst <matheus.ferst@eldorado.org.br>
+Date: Wed, 2 Mar 2022 06:51:38 +0100
+Subject: [PATCH 21/21] target/ppc: implement xs[n]maddqp[o]/xs[n]msubqp[o]
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Implement the following PowerISA v3.0 instuctions:
+xsmaddqp[o]: VSX Scalar Multiply-Add Quad-Precision [using round to Odd]
+xsmsubqp[o]: VSX Scalar Multiply-Subtract Quad-Precision [using round
+             to Odd]
+xsnmaddqp[o]: VSX Scalar Negative Multiply-Add Quad-Precision [using
+              round to Odd]
+xsnmsubqp[o]: VSX Scalar Negative Multiply-Subtract Quad-Precision
+              [using round to Odd]
+
+Upstream-Status: Backport
+[https://git.qemu.org/?p=qemu.git;a=commit;h=3bb1aed246d7b59ceee625a82628f7369d492a8f]
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Matheus Ferst <matheus.ferst@eldorado.org.br>
+Message-Id: <20220225210936.1749575-38-matheus.ferst@eldorado.org.br>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+---
+ target/ppc/fpu_helper.c             | 42 +++++++++++++++++++++++++++++
+ target/ppc/helper.h                 |  9 +++++++
+ target/ppc/insn32.decode            |  4 +++
+ target/ppc/translate/vsx-impl.c.inc | 25 +++++++++++++++++
+ 4 files changed, 80 insertions(+)
+
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index 853e5f6029..bdbbdb3b11 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -2102,6 +2102,48 @@ VSX_MADD(xvmsubsp, 4, float32, VsrW(i), MSUB_FLGS, 0, 0)
+ VSX_MADD(xvnmaddsp, 4, float32, VsrW(i), NMADD_FLGS, 0, 0)
+ VSX_MADD(xvnmsubsp, 4, float32, VsrW(i), NMSUB_FLGS, 0, 0)
+ 
++/*
++ * VSX_MADDQ - VSX floating point quad-precision muliply/add
++ *   op    - instruction mnemonic
++ *   maddflgs - flags for the float*muladd routine that control the
++ *           various forms (madd, msub, nmadd, nmsub)
++ *   ro    - round to odd
++ */
++#define VSX_MADDQ(op, maddflgs, ro)                                            \
++void helper_##op(CPUPPCState *env, ppc_vsr_t *xt, ppc_vsr_t *s1, ppc_vsr_t *s2,\
++                 ppc_vsr_t *s3)                                                \
++{                                                                              \
++    ppc_vsr_t t = *xt;                                                         \
++                                                                               \
++    helper_reset_fpstatus(env);                                                \
++                                                                               \
++    float_status tstat = env->fp_status;                                       \
++    set_float_exception_flags(0, &tstat);                                      \
++    if (ro) {                                                                  \
++        tstat.float_rounding_mode = float_round_to_odd;                        \
++    }                                                                          \
++    t.f128 = float128_muladd(s1->f128, s3->f128, s2->f128, maddflgs, &tstat);  \
++    env->fp_status.float_exception_flags |= tstat.float_exception_flags;       \
++                                                                               \
++    if (unlikely(tstat.float_exception_flags & float_flag_invalid)) {          \
++        float_invalid_op_madd(env, tstat.float_exception_flags,                \
++                              false, GETPC());                                 \
++    }                                                                          \
++                                                                               \
++    helper_compute_fprf_float128(env, t.f128);                                 \
++    *xt = t;                                                                   \
++    do_float_check_status(env, GETPC());                                       \
++}
++
++VSX_MADDQ(XSMADDQP, MADD_FLGS, 0)
++VSX_MADDQ(XSMADDQPO, MADD_FLGS, 1)
++VSX_MADDQ(XSMSUBQP, MSUB_FLGS, 0)
++VSX_MADDQ(XSMSUBQPO, MSUB_FLGS, 1)
++VSX_MADDQ(XSNMADDQP, NMADD_FLGS, 0)
++VSX_MADDQ(XSNMADDQPO, NMADD_FLGS, 1)
++VSX_MADDQ(XSNMSUBQP, NMSUB_FLGS, 0)
++VSX_MADDQ(XSNMSUBQPO, NMSUB_FLGS, 0)
++
+ /*
+  * VSX_SCALAR_CMP_DP - VSX scalar floating point compare double precision
+  *   op    - instruction mnemonic
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index e147b37644..b5080c4955 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -444,6 +444,15 @@ DEF_HELPER_5(XSMSUBSP, void, env, vsr, vsr, vsr, vsr)
+ DEF_HELPER_5(XSNMADDSP, void, env, vsr, vsr, vsr, vsr)
+ DEF_HELPER_5(XSNMSUBSP, void, env, vsr, vsr, vsr, vsr)
+ 
++DEF_HELPER_5(XSMADDQP, void, env, vsr, vsr, vsr, vsr)
++DEF_HELPER_5(XSMADDQPO, void, env, vsr, vsr, vsr, vsr)
++DEF_HELPER_5(XSMSUBQP, void, env, vsr, vsr, vsr, vsr)
++DEF_HELPER_5(XSMSUBQPO, void, env, vsr, vsr, vsr, vsr)
++DEF_HELPER_5(XSNMADDQP, void, env, vsr, vsr, vsr, vsr)
++DEF_HELPER_5(XSNMADDQPO, void, env, vsr, vsr, vsr, vsr)
++DEF_HELPER_5(XSNMSUBQP, void, env, vsr, vsr, vsr, vsr)
++DEF_HELPER_5(XSNMSUBQPO, void, env, vsr, vsr, vsr, vsr)
++
+ DEF_HELPER_4(xvadddp, void, env, vsr, vsr, vsr)
+ DEF_HELPER_4(xvsubdp, void, env, vsr, vsr, vsr)
+ DEF_HELPER_4(xvmuldp, void, env, vsr, vsr, vsr)
+diff --git a/target/ppc/insn32.decode b/target/ppc/insn32.decode
+index 0ff8818084..6bcb1e6804 100644
+--- a/target/ppc/insn32.decode
++++ b/target/ppc/insn32.decode
+@@ -457,21 +457,25 @@ XSMADDADP       111100 ..... ..... ..... 00100001 . . . @XX3
+ XSMADDMDP       111100 ..... ..... ..... 00101001 . . . @XX3
+ XSMADDASP       111100 ..... ..... ..... 00000001 . . . @XX3
+ XSMADDMSP       111100 ..... ..... ..... 00001001 . . . @XX3
++XSMADDQP        111111 ..... ..... ..... 0110000100 .   @X_rc
+ 
+ XSMSUBADP       111100 ..... ..... ..... 00110001 . . . @XX3
+ XSMSUBMDP       111100 ..... ..... ..... 00111001 . . . @XX3
+ XSMSUBASP       111100 ..... ..... ..... 00010001 . . . @XX3
+ XSMSUBMSP       111100 ..... ..... ..... 00011001 . . . @XX3
++XSMSUBQP        111111 ..... ..... ..... 0110100100 .   @X_rc
+ 
+ XSNMADDASP      111100 ..... ..... ..... 10000001 . . . @XX3
+ XSNMADDMSP      111100 ..... ..... ..... 10001001 . . . @XX3
+ XSNMADDADP      111100 ..... ..... ..... 10100001 . . . @XX3
+ XSNMADDMDP      111100 ..... ..... ..... 10101001 . . . @XX3
++XSNMADDQP       111111 ..... ..... ..... 0111000100 .   @X_rc
+ 
+ XSNMSUBASP      111100 ..... ..... ..... 10010001 . . . @XX3
+ XSNMSUBMSP      111100 ..... ..... ..... 10011001 . . . @XX3
+ XSNMSUBADP      111100 ..... ..... ..... 10110001 . . . @XX3
+ XSNMSUBMDP      111100 ..... ..... ..... 10111001 . . . @XX3
++XSNMSUBQP       111111 ..... ..... ..... 0111100100 .   @X_rc
+ 
+ ## VSX splat instruction
+ 
+diff --git a/target/ppc/translate/vsx-impl.c.inc b/target/ppc/translate/vsx-impl.c.inc
+index 90d3ac665b..4253f01319 100644
+--- a/target/ppc/translate/vsx-impl.c.inc
++++ b/target/ppc/translate/vsx-impl.c.inc
+@@ -1249,6 +1249,31 @@ TRANS_FLAGS2(VSX207, XSNMADDMSP, do_xsmadd_XX3, false, gen_helper_XSNMADDSP)
+ TRANS_FLAGS2(VSX207, XSNMSUBASP, do_xsmadd_XX3, true, gen_helper_XSNMSUBSP)
+ TRANS_FLAGS2(VSX207, XSNMSUBMSP, do_xsmadd_XX3, false, gen_helper_XSNMSUBSP)
+ 
++static bool do_xsmadd_X(DisasContext *ctx, arg_X_rc *a,
++        void (*gen_helper)(TCGv_ptr, TCGv_ptr, TCGv_ptr, TCGv_ptr, TCGv_ptr),
++        void (*gen_helper_ro)(TCGv_ptr, TCGv_ptr, TCGv_ptr, TCGv_ptr, TCGv_ptr))
++{
++    int vrt, vra, vrb;
++
++    REQUIRE_INSNS_FLAGS2(ctx, ISA300);
++    REQUIRE_VSX(ctx);
++
++    vrt = a->rt + 32;
++    vra = a->ra + 32;
++    vrb = a->rb + 32;
++
++    if (a->rc) {
++        return do_xsmadd(ctx, vrt, vra, vrt, vrb, gen_helper_ro);
++    }
++
++    return do_xsmadd(ctx, vrt, vra, vrt, vrb, gen_helper);
++}
++
++TRANS(XSMADDQP, do_xsmadd_X, gen_helper_XSMADDQP, gen_helper_XSMADDQPO)
++TRANS(XSMSUBQP, do_xsmadd_X, gen_helper_XSMSUBQP, gen_helper_XSMSUBQPO)
++TRANS(XSNMADDQP, do_xsmadd_X, gen_helper_XSNMADDQP, gen_helper_XSNMADDQPO)
++TRANS(XSNMSUBQP, do_xsmadd_X, gen_helper_XSNMSUBQP, gen_helper_XSNMSUBQPO)
++
+ #define GEN_VSX_HELPER_VSX_MADD(name, op1, aop, mop, inval, type)             \
+ static void gen_##name(DisasContext *ctx)                                     \
+ {                                                                             \
+-- 
+2.17.1
+

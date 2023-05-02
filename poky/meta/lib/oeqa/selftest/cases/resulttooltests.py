@@ -69,7 +69,7 @@ class ResultToolTests(OESelftestTestCase):
         self.assertTrue('target_result1' in results['runtime/mydistro/qemux86/image'], msg="Pair not correct:%s" % results)
         self.assertTrue('target_result3' in results['runtime/mydistro/qemux86-64/image'], msg="Pair not correct:%s" % results)
 
-    def test_regrresion_can_get_regression_result(self):
+    def test_regression_can_get_regression_result(self):
         base_result_data = {'result': {'test1': {'status': 'PASSED'},
                                        'test2': {'status': 'PASSED'},
                                        'test3': {'status': 'FAILED'},

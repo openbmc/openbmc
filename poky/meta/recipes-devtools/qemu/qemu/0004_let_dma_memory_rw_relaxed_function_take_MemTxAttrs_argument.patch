@@ -1,0 +1,78 @@
+From 4afd0f2f220ec3dc8518b8de0d66cbf8d2fd1be7 Mon Sep 17 00:00:00 2001
+From: =?utf8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Thu, 3 Sep 2020 09:30:10 +0200
+Subject: [PATCH] dma: Let dma_memory_rw_relaxed() take MemTxAttrs argument
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+
+We will add the MemTxAttrs argument to dma_memory_rw() in
+the next commit. Since dma_memory_rw_relaxed() is only used
+by dma_memory_rw(), modify it first in a separate commit to
+keep the next commit easier to review.
+
+CVE: CVE-2021-3611
+Upstream-Status: Backport [https://git.qemu.org/?p=qemu.git;a=commit;h=4afd0f2f220ec3dc8518b8de0d66cbf8d2fd1be7]
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20211223115554.3155328-4-philmd@redhat.com>
+Signed-off-by: Bhabu Bindu <bhabu.bindu@kpit.com>
+---
+ include/sysemu/dma.h | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/include/sysemu/dma.h b/include/sysemu/dma.h
+index d23516f..3be803c 100644
+--- a/include/sysemu/dma.h
++++ b/include/sysemu/dma.h
+@@ -83,9 +83,10 @@ static inline bool dma_memory_valid(AddressSpace *as,
+ static inline MemTxResult dma_memory_rw_relaxed(AddressSpace *as,
+                                                 dma_addr_t addr,
+                                                 void *buf, dma_addr_t len,
+-                                                DMADirection dir)
++                                                DMADirection dir,
++                                                MemTxAttrs attrs)
+ {
+-    return address_space_rw(as, addr, MEMTXATTRS_UNSPECIFIED,
++    return address_space_rw(as, addr, attrs,
+                             buf, len, dir == DMA_DIRECTION_FROM_DEVICE);
+ }
+ 
+@@ -93,7 +94,9 @@ static inline MemTxResult dma_memory_read_relaxed(AddressSpace *as,
+                                                   dma_addr_t addr,
+                                                   void *buf, dma_addr_t len)
+ {
+-    return dma_memory_rw_relaxed(as, addr, buf, len, DMA_DIRECTION_TO_DEVICE);
++    return dma_memory_rw_relaxed(as, addr, buf, len,
++                                 DMA_DIRECTION_TO_DEVICE,
++                                 MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ static inline MemTxResult dma_memory_write_relaxed(AddressSpace *as,
+@@ -102,7 +105,8 @@ static inline MemTxResult dma_memory_write_relaxed(AddressSpace *as,
+                                                    dma_addr_t len)
+ {
+     return dma_memory_rw_relaxed(as, addr, (void *)buf, len,
+-                                 DMA_DIRECTION_FROM_DEVICE);
++                                 DMA_DIRECTION_FROM_DEVICE,
++                                 MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ /**
+@@ -124,7 +128,8 @@ static inline MemTxResult dma_memory_rw(AddressSpace *as, dma_addr_t addr,
+ {
+     dma_barrier(as, dir);
+ 
+-    return dma_memory_rw_relaxed(as, addr, buf, len, dir);
++    return dma_memory_rw_relaxed(as, addr, buf, len, dir,
++                                 MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ /**
+-- 
+1.8.3.1
+

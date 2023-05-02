@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
+
 Release 4.0 (kirkstone)
 =======================
 
@@ -9,3 +11,8 @@ Release 4.0 (kirkstone)
    release-notes-4.0.2
    release-notes-4.0.3
    release-notes-4.0.4
+   release-notes-4.0.5
+   release-notes-4.0.6
+   release-notes-4.0.7
+   release-notes-4.0.8
+   release-notes-4.0.9

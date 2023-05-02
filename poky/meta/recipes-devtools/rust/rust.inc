@@ -79,7 +79,7 @@ python do_configure() {
     config = configparser.RawConfigParser()
 
     # [target.ARCH-poky-linux]
-    target_section = "target.{}".format(d.getVar('TARGET_SYS', True))
+    target_section = "target.{}".format(d.getVar('TARGET_SYS'))
     config.add_section(target_section)
 
     llvm_config = d.expand("${YOCTO_ALTERNATE_EXE_PATH}")
@@ -90,7 +90,7 @@ python do_configure() {
 
     # If we don't do this rust-native will compile it's own llvm for BUILD.
     # [target.${BUILD_ARCH}-unknown-linux-gnu]
-    target_section = "target.{}".format(d.getVar('SNAPSHOT_BUILD_SYS', True))
+    target_section = "target.{}".format(d.getVar('SNAPSHOT_BUILD_SYS'))
     config.add_section(target_section)
 
     config.set(target_section, "llvm-config", e(llvm_config))
@@ -124,26 +124,26 @@ python do_configure() {
     config.set("build", "vendor", e(True))
 
     if not "targets" in locals():
-        targets = [d.getVar("TARGET_SYS", True)]
+        targets = [d.getVar("TARGET_SYS")]
     config.set("build", "target", e(targets))
 
     if not "hosts" in locals():
-        hosts = [d.getVar("HOST_SYS", True)]
+        hosts = [d.getVar("HOST_SYS")]
     config.set("build", "host", e(hosts))
 
     # We can't use BUILD_SYS since that is something the rust snapshot knows
     # nothing about when trying to build some stage0 tools (like fabricate)
-    config.set("build", "build", e(d.getVar("SNAPSHOT_BUILD_SYS", True)))
+    config.set("build", "build", e(d.getVar("SNAPSHOT_BUILD_SYS")))
 
     # [install]
     config.add_section("install")
     # ./x.py install doesn't have any notion of "destdir"
     # but we can prepend ${D} to all the directories instead
-    config.set("install", "prefix",  e(d.getVar("D", True) + d.getVar("prefix", True)))
-    config.set("install", "bindir",  e(d.getVar("D", True) + d.getVar("bindir", True)))
-    config.set("install", "libdir",  e(d.getVar("D", True) + d.getVar("libdir", True)))
-    config.set("install", "datadir", e(d.getVar("D", True) + d.getVar("datadir", True)))
-    config.set("install", "mandir",  e(d.getVar("D", True) + d.getVar("mandir", True)))
+    config.set("install", "prefix",  e(d.getVar("D") + d.getVar("prefix")))
+    config.set("install", "bindir",  e(d.getVar("D") + d.getVar("bindir")))
+    config.set("install", "libdir",  e(d.getVar("D") + d.getVar("libdir")))
+    config.set("install", "datadir", e(d.getVar("D") + d.getVar("datadir")))
+    config.set("install", "mandir",  e(d.getVar("D") + d.getVar("mandir")))
 
     with open("config.toml", "w") as f:
         f.write('changelog-seen = 2\n\n')

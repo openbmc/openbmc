@@ -1,0 +1,65 @@
+From 24aed6bcb6b6d266149591f955c2460c28759eb4 Mon Sep 17 00:00:00 2001
+From: =?utf8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Fri, 17 Dec 2021 23:56:14 +0100
+Subject: [PATCH] dma: Let st*_dma() propagate MemTxResult
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+
+dma_memory_write() returns a MemTxResult type. Do not discard
+it, return it to the caller.
+
+CVE: CVE-2021-3611
+Upstream-Status: Backport [https://git.qemu.org/?p=qemu.git;a=commit;h=24aed6bcb6b6d266149591f955c2460c28759eb4]
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: CÃ©dric Le Goater <clg@kaod.org>
+Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+Message-Id: <20211223115554.3155328-18-philmd@redhat.com>
+Signed-off-by: Bhabu Bindu <bhabu.bindu@kpit.com>
+---
+ include/sysemu/dma.h | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/include/sysemu/dma.h b/include/sysemu/dma.h
+index d1635f5..895044d 100644
+--- a/include/sysemu/dma.h
++++ b/include/sysemu/dma.h
+@@ -248,13 +248,13 @@ static inline void dma_memory_unmap(AddressSpace *as,
+         dma_memory_read(as, addr, &val, (_bits) / 8, attrs); \
+         return _end##_bits##_to_cpu(val);                               \
+     }                                                                   \
+-    static inline void st##_sname##_##_end##_dma(AddressSpace *as,      \
+-                                                 dma_addr_t addr,       \
+-                                                 uint##_bits##_t val,   \
+-                                                 MemTxAttrs attrs)      \
+-    {                                                                   \
+-        val = cpu_to_##_end##_bits(val);                                \
+-        dma_memory_write(as, addr, &val, (_bits) / 8, attrs);           \
++    static inline MemTxResult st##_sname##_##_end##_dma(AddressSpace *as, \
++                                                        dma_addr_t addr, \
++                                                        uint##_bits##_t val, \
++                                                        MemTxAttrs attrs) \
++    { \
++        val = cpu_to_##_end##_bits(val); \
++        return dma_memory_write(as, addr, &val, (_bits) / 8, attrs); \
+     }
+ 
+ static inline uint8_t ldub_dma(AddressSpace *as, dma_addr_t addr, MemTxAttrs attrs)
+@@ -265,10 +265,10 @@ static inline uint8_t ldub_dma(AddressSpace *as, dma_addr_t addr, MemTxAttrs att
+     return val;
+ }
+ 
+-static inline void stb_dma(AddressSpace *as, dma_addr_t addr,
+-                           uint8_t val, MemTxAttrs attrs)
++static inline MemTxResult stb_dma(AddressSpace *as, dma_addr_t addr,
++                                  uint8_t val, MemTxAttrs attrs)
+ {
+-    dma_memory_write(as, addr, &val, 1, attrs);
++    return dma_memory_write(as, addr, &val, 1, attrs);
+ }
+ 
+ DEFINE_LDST_DMA(uw, w, 16, le);
+-- 
+1.8.3.1
+

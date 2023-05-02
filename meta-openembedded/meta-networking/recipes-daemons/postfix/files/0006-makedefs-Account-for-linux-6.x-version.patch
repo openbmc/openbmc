@@ -1,0 +1,35 @@
+From e5ddcf9575437bacd64c2b68501b413014186a6a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 19 Oct 2022 10:15:01 -0700
+Subject: [PATCH] makedefs: Account for linux 6.x version
+
+Major version has bumped to 6 and script needs to know that
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ makedefs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/makedefs
++++ b/makedefs
+@@ -613,7 +613,7 @@ EOF
+ 		: ${SHLIB_ENV="LD_LIBRARY_PATH=`pwd`/lib"}
+ 		: ${PLUGIN_LD="${CC-gcc} -shared"}
+ 		;;
+- Linux.[345].*)	SYSTYPE=LINUX$RELEASE_MAJOR
++ Linux.[3-6]*)	SYSTYPE=LINUX$RELEASE_MAJOR
+ 		case "$CCARGS" in
+ 		 *-DNO_DB*) ;;
+ 		 *-DHAS_DB*) ;;
+--- a/src/util/sys_defs.h
++++ b/src/util/sys_defs.h
+@@ -751,7 +751,7 @@ extern int initgroups(const char *, int)
+  /*
+   * LINUX.
+   */
+-#if defined(LINUX2) || defined(LINUX3) || defined(LINUX4) || defined(LINUX5)
++#if defined(LINUX2) || defined(LINUX3) || defined(LINUX4) || defined(LINUX5) || defined(LINUX6)
+ #define SUPPORTED
+ #define UINT32_TYPE	unsigned int
+ #define UINT16_TYPE	unsigned short

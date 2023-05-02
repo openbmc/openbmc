@@ -1,12 +1,13 @@
+From 9b2645d830b4ad004824cf28d81f3b974faf0037 Mon Sep 17 00:00:00 2001
+From: Su Laus <sulau@freenet.de>
+Date: Tue, 8 Mar 2022 17:02:44 +0000
+Subject: [PATCH] tiffcrop: fix issue #380 and #382 heap buffer overflow in
+
 CVE: CVE-2022-0891
 CVE: CVE-2022-1056
 Upstream-Status: Backport
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 
-From e46b49e60fddb2e924302fb1751f79eb9cfb2253 Mon Sep 17 00:00:00 2001
-From: Su Laus <sulau@freenet.de>
-Date: Tue, 8 Mar 2022 17:02:44 +0000
-Subject: [PATCH 2/6] tiffcrop: fix issue #380 and #382 heap buffer overflow in
  extractImageSection
 
 ---
@@ -14,7 +15,7 @@ Subject: [PATCH 2/6] tiffcrop: fix issue #380 and #382 heap buffer overflow in
  1 file changed, 36 insertions(+), 56 deletions(-)
 
 diff --git a/tools/tiffcrop.c b/tools/tiffcrop.c
-index b85c2ce7..302a7e91 100644
+index b85c2ce..302a7e9 100644
 --- a/tools/tiffcrop.c
 +++ b/tools/tiffcrop.c
 @@ -105,8 +105,8 @@
@@ -214,6 +215,3 @@ index b85c2ce7..302a7e91 100644
      /* allocate a buffer if we don't have one already */
      if (createImageSection(sectsize, sect_buff_ptr))
        {
--- 
-2.25.1
-

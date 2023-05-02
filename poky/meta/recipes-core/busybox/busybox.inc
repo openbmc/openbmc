@@ -138,19 +138,26 @@ do_configure () {
 	do_prepare_config
 	merge_config.sh -m .config ${@" ".join(find_cfgs(d))}
 	cml1_do_configure
+
+	# Save a copy of .config and autoconf.h.
+	cp .config .config.orig
+	cp include/autoconf.h include/autoconf.h.orig
 }
 
 do_compile() {
 	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
 	export KCONFIG_NOTIMESTAMP=1
 
+	# Ensure we start do_compile with the original .config and autoconf.h.
+	# These files should always have matching timestamps.
+	cp .config.orig .config
+	cp include/autoconf.h.orig include/autoconf.h
+
 	if [ "${BUSYBOX_SPLIT_SUID}" = "1" -a x`grep "CONFIG_FEATURE_INDIVIDUAL=y" .config` = x ]; then
+		# Guard againt interrupted do_compile: clean temporary files.
+		rm -f .config.app.suid .config.app.nosuid .config.disable.apps .config.nonapps
+
 		# split the .config into two parts, and make two busybox binaries
-		if [ -e .config.orig ]; then
-			# Need to guard again an interrupted do_compile - restore any backup
-			cp .config.orig .config
-		fi
-		cp .config .config.orig
 		oe_runmake busybox.cfg.suid
 		oe_runmake busybox.cfg.nosuid
 
@@ -187,15 +194,18 @@ do_compile() {
 			bbfatal "busybox suid binary incorrectly provides /bin/sh"
 		fi
 
-		# copy .config.orig back to .config, because the install process may check this file
-		cp .config.orig .config
 		# cleanup
-		rm .config.orig .config.app.suid .config.app.nosuid .config.disable.apps .config.nonapps
+		rm .config.app.suid .config.app.nosuid .config.disable.apps .config.nonapps
 	else
 		oe_runmake busybox_unstripped
 		cp busybox_unstripped busybox
 		oe_runmake busybox.links
 	fi
+
+	# restore original .config and autoconf.h, because the install process
+	# may check these files
+	cp .config.orig .config
+	cp include/autoconf.h.orig include/autoconf.h
 }
 
 do_install () {

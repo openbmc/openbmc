@@ -9,7 +9,7 @@ SRC_URI = "git://github.com/dbus-cxx/dbus-cxx.git;branch=master;protocol=https \
            file://0001-Include-typeinfo-for-typeid.patch \
            file://0001-include-utility-header.patch \
 "
-SRC_URI:append:libc-musl = "file://fix_build_musl.patch"
+SRC_URI:append:libc-musl = " file://fix_build_musl.patch"
 SRCREV = "73532d6a5faae9c721c2cc9535b8ef32d4d18264"
 
 DEPENDS = "\

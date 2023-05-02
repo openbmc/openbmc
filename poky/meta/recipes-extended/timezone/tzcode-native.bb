@@ -1,9 +1,8 @@
 require timezone.inc
 
-#
 SUMMARY = "tzcode, timezone zoneinfo utils -- zic, zdump, tzselect"
 
-S = "${WORKDIR}"
+SRC_URI += "file://0001-Fix-C23-related-conformance-bug.patch"
 
 inherit native
 

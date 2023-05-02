@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://xterm.h;beginline=3;endline=31;md5=5ec6748ed90e588caa
 
 SRC_URI = "http://invisible-mirror.net/archives/${BPN}/${BP}.tgz \
            file://0001-Add-configure-time-check-for-setsid.patch \
+           file://CVE-2022-45063.patch \
           "
 
 SRC_URI[sha256sum] = "c6d08127cb2409c3a04bcae559b7025196ed770bb7bf26630abcb45d95f60ab1"

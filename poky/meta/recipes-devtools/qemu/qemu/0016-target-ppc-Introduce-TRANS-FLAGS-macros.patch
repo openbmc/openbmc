@@ -1,0 +1,133 @@
+From 232f979babccd6dfac40a54ee33521e652a0577c Mon Sep 17 00:00:00 2001
+From: Luis Pires <luis.pires@eldorado.org.br>
+Date: Wed, 2 Mar 2022 06:51:36 +0100
+Subject: [PATCH 16/21] target/ppc: Introduce TRANS*FLAGS macros
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+New macros that add FLAGS and FLAGS2 checking were added for
+both TRANS and TRANS64.
+
+Upstream-Status: Backport
+[https://git.qemu.org/?p=qemu.git;a=commit;h=19f0862dd8fa6510b2f5b3aff4859363602cd0cf]
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Luis Pires <luis.pires@eldorado.org.br>
+[ferst: - TRANS_FLAGS2 instead of TRANS_FLAGS_E
+        - Use the new macros in load/store vector insns ]
+Signed-off-by: Matheus Ferst <matheus.ferst@eldorado.org.br>
+Message-Id: <20220225210936.1749575-2-matheus.ferst@eldorado.org.br>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+---
+ target/ppc/translate.c              | 19 +++++++++++++++
+ target/ppc/translate/vsx-impl.c.inc | 37 ++++++++++-------------------
+ 2 files changed, 31 insertions(+), 25 deletions(-)
+
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 9960df6e18..c12abc32f6 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -7377,10 +7377,29 @@ static int times_16(DisasContext *ctx, int x)
+ #define TRANS(NAME, FUNC, ...) \
+     static bool trans_##NAME(DisasContext *ctx, arg_##NAME *a) \
+     { return FUNC(ctx, a, __VA_ARGS__); }
++#define TRANS_FLAGS(FLAGS, NAME, FUNC, ...) \
++    static bool trans_##NAME(DisasContext *ctx, arg_##NAME *a) \
++    {                                                          \
++        REQUIRE_INSNS_FLAGS(ctx, FLAGS);                       \
++        return FUNC(ctx, a, __VA_ARGS__);                      \
++    }
++#define TRANS_FLAGS2(FLAGS2, NAME, FUNC, ...) \
++    static bool trans_##NAME(DisasContext *ctx, arg_##NAME *a) \
++    {                                                          \
++        REQUIRE_INSNS_FLAGS2(ctx, FLAGS2);                     \
++        return FUNC(ctx, a, __VA_ARGS__);                      \
++    }
+ 
+ #define TRANS64(NAME, FUNC, ...) \
+     static bool trans_##NAME(DisasContext *ctx, arg_##NAME *a) \
+     { REQUIRE_64BIT(ctx); return FUNC(ctx, a, __VA_ARGS__); }
++#define TRANS64_FLAGS2(FLAGS2, NAME, FUNC, ...) \
++    static bool trans_##NAME(DisasContext *ctx, arg_##NAME *a) \
++    {                                                          \
++        REQUIRE_64BIT(ctx);                                    \
++        REQUIRE_INSNS_FLAGS2(ctx, FLAGS2);                     \
++        return FUNC(ctx, a, __VA_ARGS__);                      \
++    }
+ 
+ /* TODO: More TRANS* helpers for extra insn_flags checks. */
+ 
+diff --git a/target/ppc/translate/vsx-impl.c.inc b/target/ppc/translate/vsx-impl.c.inc
+index c08185e857..99c8a57e50 100644
+--- a/target/ppc/translate/vsx-impl.c.inc
++++ b/target/ppc/translate/vsx-impl.c.inc
+@@ -2070,12 +2070,6 @@ static bool do_lstxv(DisasContext *ctx, int ra, TCGv displ,
+ 
+ static bool do_lstxv_D(DisasContext *ctx, arg_D *a, bool store, bool paired)
+ {
+-    if (paired) {
+-        REQUIRE_INSNS_FLAGS2(ctx, ISA310);
+-    } else {
+-        REQUIRE_INSNS_FLAGS2(ctx, ISA300);
+-    }
+-
+     if (paired || a->rt >= 32) {
+         REQUIRE_VSX(ctx);
+     } else {
+@@ -2089,7 +2083,6 @@ static bool do_lstxv_PLS_D(DisasContext *ctx, arg_PLS_D *a,
+                            bool store, bool paired)
+ {
+     arg_D d;
+-    REQUIRE_INSNS_FLAGS2(ctx, ISA310);
+     REQUIRE_VSX(ctx);
+ 
+     if (!resolve_PLS_D(ctx, &d, a)) {
+@@ -2101,12 +2094,6 @@ static bool do_lstxv_PLS_D(DisasContext *ctx, arg_PLS_D *a,
+ 
+ static bool do_lstxv_X(DisasContext *ctx, arg_X *a, bool store, bool paired)
+ {
+-    if (paired) {
+-        REQUIRE_INSNS_FLAGS2(ctx, ISA310);
+-    } else {
+-        REQUIRE_INSNS_FLAGS2(ctx, ISA300);
+-    }
+-
+     if (paired || a->rt >= 32) {
+         REQUIRE_VSX(ctx);
+     } else {
+@@ -2116,18 +2103,18 @@ static bool do_lstxv_X(DisasContext *ctx, arg_X *a, bool store, bool paired)
+     return do_lstxv(ctx, a->ra, cpu_gpr[a->rb], a->rt, store, paired);
+ }
+ 
+-TRANS(STXV, do_lstxv_D, true, false)
+-TRANS(LXV, do_lstxv_D, false, false)
+-TRANS(STXVP, do_lstxv_D, true, true)
+-TRANS(LXVP, do_lstxv_D, false, true)
+-TRANS(STXVX, do_lstxv_X, true, false)
+-TRANS(LXVX, do_lstxv_X, false, false)
+-TRANS(STXVPX, do_lstxv_X, true, true)
+-TRANS(LXVPX, do_lstxv_X, false, true)
+-TRANS64(PSTXV, do_lstxv_PLS_D, true, false)
+-TRANS64(PLXV, do_lstxv_PLS_D, false, false)
+-TRANS64(PSTXVP, do_lstxv_PLS_D, true, true)
+-TRANS64(PLXVP, do_lstxv_PLS_D, false, true)
++TRANS_FLAGS2(ISA300, STXV, do_lstxv_D, true, false)
++TRANS_FLAGS2(ISA300, LXV, do_lstxv_D, false, false)
++TRANS_FLAGS2(ISA310, STXVP, do_lstxv_D, true, true)
++TRANS_FLAGS2(ISA310, LXVP, do_lstxv_D, false, true)
++TRANS_FLAGS2(ISA300, STXVX, do_lstxv_X, true, false)
++TRANS_FLAGS2(ISA300, LXVX, do_lstxv_X, false, false)
++TRANS_FLAGS2(ISA310, STXVPX, do_lstxv_X, true, true)
++TRANS_FLAGS2(ISA310, LXVPX, do_lstxv_X, false, true)
++TRANS64_FLAGS2(ISA310, PSTXV, do_lstxv_PLS_D, true, false)
++TRANS64_FLAGS2(ISA310, PLXV, do_lstxv_PLS_D, false, false)
++TRANS64_FLAGS2(ISA310, PSTXVP, do_lstxv_PLS_D, true, true)
++TRANS64_FLAGS2(ISA310, PLXVP, do_lstxv_PLS_D, false, true)
+ 
+ static void gen_xxblendv_vec(unsigned vece, TCGv_vec t, TCGv_vec a, TCGv_vec b,
+                              TCGv_vec c)
+-- 
+2.17.1
+

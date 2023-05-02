@@ -1,0 +1,73 @@
+From 52f1760d2d65e1a61028cb9d8610c8a38aa44cfc Mon Sep 17 00:00:00 2001
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri, 17 Dec 2021 17:57:14 +0100
+Subject: [PATCH 04/21] softfloat: Add flags specific to Inf / Inf and 0 / 0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+PowerPC has these flags, and it's easier to compute them here
+than after the fact.
+
+Upstream-Status: Backport
+[https://git.qemu.org/?p=qemu.git;a=commit;h=10cc964030fca459591d9353571f3b1b4e1b5aec]
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20211119160502.17432-5-richard.henderson@linaro.org>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+---
+ fpu/softfloat-parts.c.inc     | 16 +++++++++++-----
+ include/fpu/softfloat-types.h |  2 ++
+ 2 files changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/fpu/softfloat-parts.c.inc b/fpu/softfloat-parts.c.inc
+index 3ed793347b..b8563cd2df 100644
+--- a/fpu/softfloat-parts.c.inc
++++ b/fpu/softfloat-parts.c.inc
+@@ -590,11 +590,13 @@ static FloatPartsN *partsN(div)(FloatPartsN *a, FloatPartsN *b,
+     }
+ 
+     /* 0/0 or Inf/Inf => NaN */
+-    if (unlikely(ab_mask == float_cmask_zero) ||
+-        unlikely(ab_mask == float_cmask_inf)) {
+-        float_raise(float_flag_invalid, s);
+-        parts_default_nan(a, s);
+-        return a;
++    if (unlikely(ab_mask == float_cmask_zero)) {
++        float_raise(float_flag_invalid | float_flag_invalid_zdz, s);
++        goto d_nan;
++    }
++    if (unlikely(ab_mask == float_cmask_inf)) {
++        float_raise(float_flag_invalid | float_flag_invalid_idi, s);
++        goto d_nan;
+     }
+ 
+     /* All the NaN cases */
+@@ -625,6 +627,10 @@ static FloatPartsN *partsN(div)(FloatPartsN *a, FloatPartsN *b,
+     float_raise(float_flag_divbyzero, s);
+     a->cls = float_class_inf;
+     return a;
++
++ d_nan:
++    parts_default_nan(a, s);
++    return a;
+ }
+ 
+ /*
+diff --git a/include/fpu/softfloat-types.h b/include/fpu/softfloat-types.h
+index 56b4cf7835..5a9671e564 100644
+--- a/include/fpu/softfloat-types.h
++++ b/include/fpu/softfloat-types.h
+@@ -154,6 +154,8 @@ enum {
+     float_flag_output_denormal = 0x0040,
+     float_flag_invalid_isi     = 0x0080,  /* inf - inf */
+     float_flag_invalid_imz     = 0x0100,  /* inf * 0 */
++    float_flag_invalid_idi     = 0x0200,  /* inf / inf */
++    float_flag_invalid_zdz     = 0x0400,  /* 0 / 0 */
+ };
+ 
+ /*
+-- 
+2.17.1
+

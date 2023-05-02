@@ -1,0 +1,126 @@
+From 613f373f0b652ab2fb2572633e7a23807096790b Mon Sep 17 00:00:00 2001
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri, 17 Dec 2021 17:57:14 +0100
+Subject: [PATCH 03/21] softfloat: Add flag specific to Inf * 0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+PowerPC has this flag, and it's easier to compute it here
+than after the fact.
+
+Upstream-Status: Backport
+[https://git.qemu.org/?p=qemu.git;a=commit;h=bead3c9b0ff8efd652afb27923d8ab4458b3bbd9]
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20211119160502.17432-4-richard.henderson@linaro.org>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+---
+ fpu/softfloat-parts.c.inc      |  4 ++--
+ fpu/softfloat-specialize.c.inc | 12 ++++++------
+ include/fpu/softfloat-types.h  |  1 +
+ 3 files changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/fpu/softfloat-parts.c.inc b/fpu/softfloat-parts.c.inc
+index eb2b475ca4..3ed793347b 100644
+--- a/fpu/softfloat-parts.c.inc
++++ b/fpu/softfloat-parts.c.inc
+@@ -423,7 +423,7 @@ static FloatPartsN *partsN(mul)(FloatPartsN *a, FloatPartsN *b,
+ 
+     /* Inf * Zero == NaN */
+     if (unlikely(ab_mask == float_cmask_infzero)) {
+-        float_raise(float_flag_invalid, s);
++        float_raise(float_flag_invalid | float_flag_invalid_imz, s);
+         parts_default_nan(a, s);
+         return a;
+     }
+@@ -489,6 +489,7 @@ static FloatPartsN *partsN(muladd)(FloatPartsN *a, FloatPartsN *b,
+ 
+     if (unlikely(ab_mask != float_cmask_normal)) {
+         if (unlikely(ab_mask == float_cmask_infzero)) {
++            float_raise(float_flag_invalid | float_flag_invalid_imz, s);
+             goto d_nan;
+         }
+ 
+@@ -567,7 +568,6 @@ static FloatPartsN *partsN(muladd)(FloatPartsN *a, FloatPartsN *b,
+     goto finish_sign;
+ 
+  d_nan:
+-    float_raise(float_flag_invalid, s);
+     parts_default_nan(a, s);
+     return a;
+ }
+diff --git a/fpu/softfloat-specialize.c.inc b/fpu/softfloat-specialize.c.inc
+index f2ad0f335e..943e3301d2 100644
+--- a/fpu/softfloat-specialize.c.inc
++++ b/fpu/softfloat-specialize.c.inc
+@@ -506,7 +506,7 @@ static int pickNaNMulAdd(FloatClass a_cls, FloatClass b_cls, FloatClass c_cls,
+      * the default NaN
+      */
+     if (infzero && is_qnan(c_cls)) {
+-        float_raise(float_flag_invalid, status);
++        float_raise(float_flag_invalid | float_flag_invalid_imz, status);
+         return 3;
+     }
+ 
+@@ -533,7 +533,7 @@ static int pickNaNMulAdd(FloatClass a_cls, FloatClass b_cls, FloatClass c_cls,
+          * case sets InvalidOp and returns the default NaN
+          */
+         if (infzero) {
+-            float_raise(float_flag_invalid, status);
++            float_raise(float_flag_invalid | float_flag_invalid_imz, status);
+             return 3;
+         }
+         /* Prefer sNaN over qNaN, in the a, b, c order. */
+@@ -556,7 +556,7 @@ static int pickNaNMulAdd(FloatClass a_cls, FloatClass b_cls, FloatClass c_cls,
+          * case sets InvalidOp and returns the input value 'c'
+          */
+         if (infzero) {
+-            float_raise(float_flag_invalid, status);
++            float_raise(float_flag_invalid | float_flag_invalid_imz, status);
+             return 2;
+         }
+         /* Prefer sNaN over qNaN, in the c, a, b order. */
+@@ -580,7 +580,7 @@ static int pickNaNMulAdd(FloatClass a_cls, FloatClass b_cls, FloatClass c_cls,
+      * a default NaN
+      */
+     if (infzero) {
+-        float_raise(float_flag_invalid, status);
++        float_raise(float_flag_invalid | float_flag_invalid_imz, status);
+         return 2;
+     }
+ 
+@@ -597,7 +597,7 @@ static int pickNaNMulAdd(FloatClass a_cls, FloatClass b_cls, FloatClass c_cls,
+ #elif defined(TARGET_RISCV)
+     /* For RISC-V, InvalidOp is set when multiplicands are Inf and zero */
+     if (infzero) {
+-        float_raise(float_flag_invalid, status);
++        float_raise(float_flag_invalid | float_flag_invalid_imz, status);
+     }
+     return 3; /* default NaN */
+ #elif defined(TARGET_XTENSA)
+@@ -606,7 +606,7 @@ static int pickNaNMulAdd(FloatClass a_cls, FloatClass b_cls, FloatClass c_cls,
+      * an input NaN if we have one (ie c).
+      */
+     if (infzero) {
+-        float_raise(float_flag_invalid, status);
++        float_raise(float_flag_invalid | float_flag_invalid_imz, status);
+         return 2;
+     }
+     if (status->use_first_nan) {
+diff --git a/include/fpu/softfloat-types.h b/include/fpu/softfloat-types.h
+index eaa12e1e00..56b4cf7835 100644
+--- a/include/fpu/softfloat-types.h
++++ b/include/fpu/softfloat-types.h
+@@ -153,6 +153,7 @@ enum {
+     float_flag_input_denormal  = 0x0020,
+     float_flag_output_denormal = 0x0040,
+     float_flag_invalid_isi     = 0x0080,  /* inf - inf */
++    float_flag_invalid_imz     = 0x0100,  /* inf * 0 */
+ };
+ 
+ /*
+-- 
+2.17.1
+

@@ -1,0 +1,32 @@
+#!/bin/sh
+
+./hello &> $test.output 2>&1
+out="Hello world!"
+
+if grep -i "$out" $test.output 2>&1 ; then
+   echo "PASS: Hello duktape"
+else
+   echo "FAIL: Hello duktape"
+fi
+rm -f $test.output
+
+./eval "print('Hello world!'); 123;" > out.log
+
+sed -n '2p' out.log > eval.log
+sed -n '3p' out.log >> eval.log
+
+if grep  -w 'Hello world!\|123' eval.log 2>&1; then
+   echo "PASS: eval duktape"
+else
+   echo "FAIL: eval duktape"
+fi
+rm -f eval.log out.log
+
+./evloop timer-test.js > evloop.log 2>&1
+
+if grep -i "no active timers and no sockets to poll" evloop.log 2>&1; then
+   echo "PASS: evloop duktape"
+else
+   echo "FAIL: evloop duktape"
+fi
+rm -f evloop.log

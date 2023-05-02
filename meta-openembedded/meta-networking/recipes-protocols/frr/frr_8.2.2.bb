@@ -12,6 +12,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 SRC_URI = "git://github.com/FRRouting/frr.git;protocol=https;branch=stable/8.2 \
            file://CVE-2022-37035.patch \
            file://CVE-2022-37032.patch \
+           file://CVE-2022-42917.patch \
            file://frr.pam \
 	      "
 

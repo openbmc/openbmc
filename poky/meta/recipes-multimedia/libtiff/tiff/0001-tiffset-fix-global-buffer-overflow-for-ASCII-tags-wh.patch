@@ -1,11 +1,12 @@
+From bc71e64b6f4477ed69064802b1252bab904a89b4 Mon Sep 17 00:00:00 2001
+From: 4ugustus <wangdw.augustus@qq.com>
+Date: Tue, 25 Jan 2022 16:25:28 +0000
+Subject: [PATCH] tiffset: fix global-buffer-overflow for ASCII tags where
+
 CVE: CVE-2022-22844
 Upstream-Status: Backport
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 
-From b12a0326e6064b6e0b051d1184a219877472f69b Mon Sep 17 00:00:00 2001
-From: 4ugustus <wangdw.augustus@qq.com>
-Date: Tue, 25 Jan 2022 16:25:28 +0000
-Subject: [PATCH] tiffset: fix global-buffer-overflow for ASCII tags where
  count is required (fixes #355)
 
 ---
@@ -13,7 +14,7 @@ Subject: [PATCH] tiffset: fix global-buffer-overflow for ASCII tags where
  1 file changed, 13 insertions(+), 3 deletions(-)
 
 diff --git a/tools/tiffset.c b/tools/tiffset.c
-index 8c9e23c5..e7a88c09 100644
+index 8c9e23c..e7a88c0 100644
 --- a/tools/tiffset.c
 +++ b/tools/tiffset.c
 @@ -146,9 +146,19 @@ main(int argc, char* argv[])
@@ -39,5 +40,3 @@ index 8c9e23c5..e7a88c09 100644
              } else if (TIFFFieldWriteCount(fip) > 0
  		       || TIFFFieldWriteCount(fip) == TIFF_VARIABLE) {
                  int     ret = 1;
--- 
-2.25.1

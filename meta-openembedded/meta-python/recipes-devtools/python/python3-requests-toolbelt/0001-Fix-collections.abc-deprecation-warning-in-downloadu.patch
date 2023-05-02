@@ -1,0 +1,41 @@
+From 7188b06330e5260be20bce8cbcf0d5ae44e34eaf Mon Sep 17 00:00:00 2001
+From: Jon Dufresne <jon.dufresne@gmail.com>
+Date: Fri, 1 Feb 2019 16:30:01 -0800
+Subject: [PATCH] Fix collections.abc deprecation warning in downloadutils
+
+Warning appears as:
+
+tests/test_downloadutils.py::test_stream_response_to_specific_filename
+  requests_toolbelt/downloadutils/stream.py:161: DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated, and in 3.8 it will stop working
+    if path and isinstance(getattr(path, 'write', None), collections.Callable):
+
+Upstream-Status: Backport [https://github.com/requests/toolbelt/commit/7188b06330e5260be20bce8cbcf0d5ae44e34eaf]
+
+Signed-off-by: Narpat Mali <narpat.mali@windriver.com>
+---
+ requests_toolbelt/downloadutils/stream.py | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/requests_toolbelt/downloadutils/stream.py b/requests_toolbelt/downloadutils/stream.py
+index eed60a7..1d1c31b 100644
+--- a/requests_toolbelt/downloadutils/stream.py
++++ b/requests_toolbelt/downloadutils/stream.py
+@@ -1,6 +1,5 @@
+ # -*- coding: utf-8 -*-
+ """Utilities for dealing with streamed requests."""
+-import collections
+ import os.path
+ import re
+ 
+@@ -158,7 +157,7 @@ def stream_response_to_file(response, path=None, chunksize=_DEFAULT_CHUNKSIZE):
+     pre_opened = False
+     fd = None
+     filename = None
+-    if path and isinstance(getattr(path, 'write', None), collections.Callable):
++    if path and callable(getattr(path, 'write', None)):
+         pre_opened = True
+         fd = path
+         filename = getattr(fd, 'name', None)
+-- 
+2.25.1
+

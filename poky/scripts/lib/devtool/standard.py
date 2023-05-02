@@ -765,6 +765,16 @@ def get_staging_kbranch(srcdir):
         staging_kbranch = "".join(branch.split('\n')[0])
     return staging_kbranch
 
+def get_real_srctree(srctree, s, workdir):
+    # Check that recipe isn't using a shared workdir
+    s = os.path.abspath(s)
+    workdir = os.path.abspath(workdir)
+    if s.startswith(workdir) and s != workdir and os.path.dirname(s) != workdir:
+        # Handle if S is set to a subdirectory of the source
+        srcsubdir = os.path.relpath(s, workdir).split(os.sep, 1)[1]
+        srctree = os.path.join(srctree, srcsubdir)
+    return srctree
+
 def modify(args, config, basepath, workspace):
     """Entry point for the devtool 'modify' subcommand"""
     import bb
@@ -923,14 +933,7 @@ def modify(args, config, basepath, workspace):
 
         # Need to grab this here in case the source is within a subdirectory
         srctreebase = srctree
-
-        # Check that recipe isn't using a shared workdir
-        s = os.path.abspath(rd.getVar('S'))
-        workdir = os.path.abspath(rd.getVar('WORKDIR'))
-        if s.startswith(workdir) and s != workdir and os.path.dirname(s) != workdir:
-            # Handle if S is set to a subdirectory of the source
-            srcsubdir = os.path.relpath(s, workdir).split(os.sep, 1)[1]
-            srctree = os.path.join(srctree, srcsubdir)
+        srctree = get_real_srctree(srctree, rd.getVar('S'), rd.getVar('WORKDIR'))
 
         bb.utils.mkdirhier(os.path.dirname(appendfile))
         with open(appendfile, 'w') as f:
@@ -1406,6 +1409,18 @@ def _export_local_files(srctree, rd, destdir, srctreebase):
     updated = OrderedDict()
     added = OrderedDict()
     removed = OrderedDict()
+
+    # Get current branch and return early with empty lists
+    # if on one of the override branches
+    # (local files are provided only for the main branch and processing
+    # them against lists from recipe overrides will result in mismatches
+    # and broken modifications to recipes).
+    stdout, _ = bb.process.run('git rev-parse --abbrev-ref HEAD',
+                               cwd=srctree)
+    branchname = stdout.rstrip()
+    if branchname.startswith(override_branch_prefix):
+        return (updated, added, removed)
+
     local_files_dir = os.path.join(srctreebase, 'oe-local-files')
     git_files = _git_ls_tree(srctree)
     if 'oe-local-files' in git_files:
@@ -1635,31 +1650,25 @@ def _update_recipe_patch(recipename, workspace, srctree, rd, appendlayerdir, wil
     tempdir = tempfile.mkdtemp(prefix='devtool')
     try:
         local_files_dir = tempfile.mkdtemp(dir=tempdir)
-        if filter_patches:
-            upd_f = {}
-            new_f = {}
-            del_f = {}
-        else:
-            upd_f, new_f, del_f = _export_local_files(srctree, rd, local_files_dir, srctreebase)
-
-        remove_files = []
-        if not no_remove:
-            # Get all patches from source tree and check if any should be removed
-            all_patches_dir = tempfile.mkdtemp(dir=tempdir)
-            _, _, del_p = _export_patches(srctree, rd, initial_rev,
-                                          all_patches_dir)
-            # Remove deleted local files and  patches
-            remove_files = list(del_f.values()) + list(del_p.values())
+        upd_f, new_f, del_f = _export_local_files(srctree, rd, local_files_dir, srctreebase)
 
         # Get updated patches from source tree
         patches_dir = tempfile.mkdtemp(dir=tempdir)
         upd_p, new_p, _ = _export_patches(srctree, rd, update_rev,
                                           patches_dir, changed_revs)
+        # Get all patches from source tree and check if any should be removed
+        all_patches_dir = tempfile.mkdtemp(dir=tempdir)
+        _, _, del_p = _export_patches(srctree, rd, initial_rev,
+                                      all_patches_dir)
         logger.debug('Pre-filtering: update: %s, new: %s' % (dict(upd_p), dict(new_p)))
         if filter_patches:
             new_p = OrderedDict()
             upd_p = OrderedDict((k,v) for k,v in upd_p.items() if k in filter_patches)
-            remove_files = [f for f in remove_files if f in filter_patches]
+            del_p = OrderedDict((k,v) for k,v in del_p.items() if k in filter_patches)
+        remove_files = []
+        if not no_remove:
+            # Remove deleted local files and  patches
+            remove_files = list(del_f.values()) + list(del_p.values())
         updatefiles = False
         updaterecipe = False
         destpath = None
