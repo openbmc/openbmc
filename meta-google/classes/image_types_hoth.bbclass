@@ -11,6 +11,7 @@ FLASH_HOTH_UPDATE_OFFSET:hoth:aarch64 = "${@61376 if FLASH_SIZE == '65536' else 
 
 # Leave a zero-size u-boot env partition.
 FLASH_UBOOT_ENV_OFFSET = "${FLASH_KERNEL_OFFSET}"
+FLASH_UBOOT_ENV_OFFSET:flash-65536 = "${FLASH_KERNEL_OFFSET:flash-65536}"
 
 # Support BMC image to have secondary hoth firmware
 ENABLE_HOTH_SECONDARY ?= "no"
