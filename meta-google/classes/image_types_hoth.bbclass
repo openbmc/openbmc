@@ -12,13 +12,22 @@ FLASH_HOTH_UPDATE_OFFSET:hoth:aarch64 = "${@61376 if FLASH_SIZE == '65536' else 
 # Leave a zero-size u-boot env partition.
 FLASH_UBOOT_ENV_OFFSET = "${FLASH_KERNEL_OFFSET}"
 
+# Support BMC image to have secondary hoth firmware
+ENABLE_HOTH_SECONDARY ?= "no"
+
 python do_generate_static:append() {
     _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
                                'image-hoth-update'),
                   int(d.getVar('FLASH_HOTH_UPDATE_OFFSET', True)),
                   int(d.getVar('FLASH_SIZE', True)))
+    if d.getVar('ENABLE_HOTH_SECONDARY',True) == 'yes':
+        _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
+                               'image-hoth-update-2nd'),
+                  int(d.getVar('FLASH_HOTH_SECONDARY_OFFSET', True)),
+                  int(d.getVar('FLASH_SIZE', True)))
 }
 do_generate_static[depends] += "virtual/hoth-firmware:do_deploy"
+do_generate_static[depends] += "${@'virtual/hoth-firmware-2nd:do_deploy' if ENABLE_HOTH_SECONDARY == 'yes' else ''}"
 
 python do_generate_layout () {
     import time
