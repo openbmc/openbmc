@@ -46,6 +46,10 @@ RRECOMMENDS:${PN}-host = "${PN}-host-check ${PN}-reset-sensor-states"
 # The obmc-targets are the base targets required to boot a computer system
 RRECOMMENDS:${PN}-host += "${PN}-obmc-targets"
 
+# Make it the default to create an info log when the chassis transitions
+# from off to on
+RRECOMMENDS:${PN}-chassis:append = " ${PN}-chassis-poweron-log"
+
 inherit meson pkgconfig
 inherit obmc-phosphor-dbus-service
 inherit obmc-phosphor-systemd
