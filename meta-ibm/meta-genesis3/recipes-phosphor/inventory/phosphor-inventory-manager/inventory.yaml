@@ -1,0 +1,1952 @@
+description: >
+    IBM Genesis3 inventory fixups
+
+events:
+    - name: Add BMC details
+      description: >
+          Add the BMC inventory path
+      type: startup
+      actions:
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/bmc:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Decorator.Asset:
+                      Manufacturer:
+                          value: "Aspeed"
+                          type: string
+                      Model:
+                          value: "AST2500"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.Bmc:
+    - name: Add DIMMs
+      description: >
+          Add the DIMM inventory path.
+      type: startup
+      actions:
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_a0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM A0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU0_DIMM_A0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_a1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM A1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU0_DIMM_A1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_b0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM B0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU0_DIMM_B0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_b1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM B1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU0_DIMM_B1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_c0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM C0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU0_DIMM_C0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_c1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM C1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU0_DIMM_C1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_d0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM D0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU0_DIMM_D0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_d1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM D1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU0_DIMM_D1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_e0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM E0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU0_DIMM_E0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_e1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM E1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU0_DIMM_E1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_f0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM F0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU0_DIMM_F0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_f1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM F1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU0_DIMM_F1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_g0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM G0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU1_DIMM_G0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_g1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM G1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU1_DIMM_G1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_h0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM H0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU1_DIMM_H0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_h1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM H1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU1_DIMM_H1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_j0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM J0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU1_DIMM_J0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_j1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM J1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU1_DIMM_J1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_k0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM K0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU1_DIMM_K0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_k1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM K1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU1_DIMM_K1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_l0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM L0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU1_DIMM_L0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_l1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM L1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU1_DIMM_L1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_m0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM M0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU1_DIMM_M0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_m1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM M1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU1_DIMM_M1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_n0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM N0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU2_DIMM_N0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_n1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM N1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU2_DIMM_N1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_p0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM P0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU2_DIMM_P0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_p1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM P1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU2_DIMM_P1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_q0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM Q0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU2_DIMM_Q0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_q1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM Q1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU2_DIMM_Q1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_r0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM R0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU2_DIMM_R0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_r1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM R1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU2_DIMM_R1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_s0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM S0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU2_DIMM_S0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_s1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM S1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU2_DIMM_S1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_t0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM T0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU2_DIMM_T0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_t1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM T1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU2_DIMM_T1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_u0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM U0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU3_DIMM_U0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_u1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM U1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU3_DIMM_U1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_v0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM V0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU3_DIMM_V0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_v1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM V1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU3_DIMM_V1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_w0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM W0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU3_DIMM_W0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_w1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM W1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU3_DIMM_W1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_x0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM X0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU3_DIMM_X0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_x1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM X1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU3_DIMM_X1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_y0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM Y0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU3_DIMM_Y0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_y1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM Y1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU3_DIMM_Y1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_z0:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM Z0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU3_DIMM_Z0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/dimm_z1:
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.State.Decorator.OperationalStatus:
+                      Functional:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "DIMM Z1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Dimm:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "CPU3_DIMM_Z1"
+                          type: string
+
+    - name: Add CPU PCIe slots
+      description: >
+          Add the CPU PCIe interface on the chassis inventory path
+      type: startup
+      actions:
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd01:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD01"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd02:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD02"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd03:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD03"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd04:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD04"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd05:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD05"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd06:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD06"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd07:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD07"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd08:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD08"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd09:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD09"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd10:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD10"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd11:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD11"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd12:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD12"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd13:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD13"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd14:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD14"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd15:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD15"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd16:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD16"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd17:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD17"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd18:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD18"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd19:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD19"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd20:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD20"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd21:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD21"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd22:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD22"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd23:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD23"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd24:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD24"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd25:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD25"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd26:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD26"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd27:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD27"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd28:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD28"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd29:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD29"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd30:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: true
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD30"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd31:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD31"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rssd32:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: false
+                          type: boolean
+                      PrettyName:
+                          value: "RSSD22"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.OEM"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+    - name: Add CPUS
+      description: >
+          Add the CPUs inventory path.
+      type: startup
+      actions:
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/cpu0:
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "CPU0"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Decorator.Asset:
+                      Manufacturer:
+                          value: "Intel"
+                          type: string
+                      Model:
+                          value: "2nd Generation Intel Xeon Scalable Processors"
+                          type: string
+
+                  xyz.openbmc_project.Inventory.Item.Cpu:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "Socket0"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/cpu1:
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "CPU1"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Decorator.Asset:
+                      Manufacturer:
+                          value: "Intel"
+                          type: string
+                      Model:
+                          value: "2nd Generation Intel Xeon Scalable Processors"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.Cpu:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "Socket1"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/cpu2:
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "CPU2"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Decorator.Asset:
+                      Manufacturer:
+                          value: "Intel"
+                          type: string
+                      Model:
+                          value: "2nd Generation Intel Xeon Scalable Processors"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.Cpu:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "Socket2"
+                          type: string
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/cpu3:
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "CPU3"
+                          type: string
+                      Present:
+                          value: false
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Decorator.Replaceable:
+                      FieldReplaceable:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Decorator.Asset:
+                      Manufacturer:
+                          value: "Intel"
+                          type: string
+                      Model:
+                          value: "2nd Generation Intel Xeon Scalable Processors"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.Cpu:
+                  xyz.openbmc_project.Inventory.Decorator.LocationCode:
+                      LocationCode:
+                          value: "Socket3"
+                          type: string
+    - name: Add NVMe M.2 interface 1
+      description: >
+          Add the M.2 NVMe interface on the chassis inventory path
+      type: startup
+      actions:
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/m2_ssd1:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: true
+                          type: boolean
+                      PrettyName:
+                          value: "M.2 SSD1"
+                          type: string
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.M_2"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+    - name: Add NVMe M.2 interface 2
+      description: >
+          Add the M.2 NVMe interface on the chassis inventory path
+      type: startup
+      actions:
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/m2_ssd2:
+                  xyz.openbmc_project.Inventory.Item:
+                      Present:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.PCIeSlot:
+                      HotPluggable:
+                          value: true
+                          type: boolean
+                      SlotType:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.SlotTypes.M_2"
+                          type: string
+                      Generation:
+                          value: "xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.Gen3"
+                          type: string
+    - name: Add RTC battery
+      description: >
+          Add the RTC interface on the chassis inventory path
+      type: startup
+      actions:
+          - name: createObjects
+            objs:
+                /system/chassis/motherboard/rtc_bat:
+                  xyz.openbmc_project.Inventory.Item:
+                      PrettyName:
+                          value: "RTC Battery"
+                          type: string
+                      Present:
+                          value: true
+                          type: boolean
+                  xyz.openbmc_project.Inventory.Item.Battery:
