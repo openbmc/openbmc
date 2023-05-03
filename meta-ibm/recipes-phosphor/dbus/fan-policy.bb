@@ -8,9 +8,9 @@ inherit phosphor-dbus-monitor
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
-SRC_URI += "file://air-cooled.yaml"
+SRC_URI:append:df-openpower = " file://air-cooled.yaml"
 SRC_URI:append:ibm-ac-server = " file://water-cooled.yaml"
-SRC_URI += "file://fan-errors.yaml"
+SRC_URI:append:df-openpower = " file://fan-errors.yaml"
 
 SRC_URI:remove:p10bmc = "file://air-cooled.yaml"
 SRC_URI:remove:p10bmc = "file://fan-errors.yaml"

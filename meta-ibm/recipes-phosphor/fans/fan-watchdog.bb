@@ -19,5 +19,5 @@ WATCHDOG_FMT = "../${WATCHDOG_SERVICE}:${TGTFMT}.wants/${WATCHDOG_SERVICE}"
 
 SYSTEMD_SERVICE:${PN} += "${RESET_SERVICE} ${MONITOR_SERVICE} ${WATCHDOG_SERVICE}"
 SYSTEMD_LINK:${PN} += "${RESET_FMT} ${WATCHDOG_FMT}"
-SYSTEMD_ENVIRONMENT_FILE:${PN} += "obmc/fan-watchdog/reset-fan-watchdog.conf"
-SYSTEMD_ENVIRONMENT_FILE:${PN} += "obmc/fan-watchdog/fan-watchdog.conf"
+SYSTEMD_ENVIRONMENT_FILE:${PN}:append:df-openpower = " obmc/fan-watchdog/reset-fan-watchdog.conf"
+SYSTEMD_ENVIRONMENT_FILE:${PN}:append:df-openpower = " obmc/fan-watchdog/fan-watchdog.conf"
