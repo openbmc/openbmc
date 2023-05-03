@@ -118,6 +118,24 @@ pkg_prerm:${PN}-chassis-check-power-status:append() {
     done
 }
 
+pkg_postinst:${PN}-chassis-poweron-log:append() {
+    for i in ${OBMC_CHASSIS_INSTANCES};
+    do
+        mkdir -p $D$systemd_system_unitdir/obmc-chassis-poweron@${i}.target.wants
+        LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@${i}.target.wants/phosphor-create-chassis-poweron-log@${i}.service"
+        TARGET="../phosphor-create-chassis-poweron-log@.service"
+        ln -s $TARGET $LINK
+    done
+}
+
+pkg_prerm:${PN}-chassis-poweron-log:append() {
+    for i in ${OBMC_CHASSIS_INSTANCES};
+    do
+        LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@${i}.target.wants/phosphor-create-chassis-poweron-log@${i}.service"
+        rm $LINK
+    done
+}
+
 pkg_postinst:${PN}-host:append() {
     for i in ${OBMC_HOST_INSTANCES};
     do

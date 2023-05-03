@@ -23,6 +23,7 @@ STATE_MGR_PACKAGES = " \
     ${PN}-scheduled-host-transition \
     ${PN}-chassis-check-power-status \
     ${PN}-secure-check \
+    ${PN}-chassis-poweron-log \
 "
 PACKAGE_BEFORE_PN += "${STATE_MGR_PACKAGES}"
 ALLOW_EMPTY:${PN} = "1"
@@ -79,6 +80,8 @@ SYSTEMD_SERVICE:${PN}-chassis += "obmc-power-stop@.service"
 SYSTEMD_SERVICE:${PN}-chassis += "obmc-powered-off@.service"
 SYSTEMD_SERVICE:${PN}-chassis += "phosphor-reset-chassis-on@.service"
 SYSTEMD_SERVICE:${PN}-chassis += "phosphor-reset-chassis-running@.service"
+
+SYSTEMD_SERVICE:${PN}-chassis-poweron-log += "phosphor-create-chassis-poweron-log@.service"
 
 FILES:${PN}-chassis += "${bindir}/obmcutil"
 
@@ -236,6 +239,6 @@ RESET_FMT_CTRL = "../${RESET_TMPL_CTRL}:${SYSD_TGT}.wants/${RESET_INSTFMT_CTRL}"
 SYSTEMD_LINK:${PN}-obmc-targets += "${@compose_list_zip(d, 'RESET_FMT_CTRL', 'OBMC_CHASSIS_INSTANCES')}"
 
 SRC_URI = "git://github.com/openbmc/phosphor-state-manager;branch=master;protocol=https"
-SRCREV = "c079c3f0a348b1f1e32b05b07fdb6414c8d3b53f"
+SRCREV = "afe12d69a0c8182e7b587d81531e0a9e376f5ce7"
 
 S = "${WORKDIR}/git"
