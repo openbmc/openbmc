@@ -25,7 +25,7 @@ python do_generate_static:append() {
         _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
                                'image-hoth-update-2nd'),
                   int(d.getVar('FLASH_HOTH_SECONDARY_OFFSET', True)),
-                  int(d.getVar('FLASH_SIZE', True)))
+                  int(d.getVar('FLASH_RWFS_OFFSET', True)))
 }
 do_generate_static[depends] += "virtual/hoth-firmware:do_deploy"
 do_generate_static[depends] += "${@'virtual/hoth-firmware-2nd:do_deploy' if ENABLE_HOTH_SECONDARY == 'yes' else ''}"
