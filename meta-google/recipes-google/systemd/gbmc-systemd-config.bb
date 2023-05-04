@@ -14,6 +14,7 @@ SRC_URI:append = " \
   file://40-gbmc-forward.conf \
   file://40-gbmc-sysctl.conf \
   file://40-gbmc-time.conf \
+  file://10-gbmc.conf \
   "
 
 FILES:${PN}:append = " \
@@ -22,6 +23,8 @@ FILES:${PN}:append = " \
   ${systemd_unitdir}/timesyncd.conf.d/40-gbmc-time.conf \
   ${libdir}/sysctl.d/40-gbmc-sysctl.conf \
   ${libdir}/sysctl.d/40-gbmc-forward.conf \
+  ${systemd_system_unitdir}/sysinit.target.wants/systemd-time-wait-sync.service \
+  ${systemd_system_unitdir}/systemd-time-wait-sync.d/10-gbmc.conf \
   "
 
 FILES:${PN}:append:dev = " \
@@ -59,6 +62,11 @@ do_install() {
 
   install -d -m 0755 ${D}${systemd_unitdir}/timesyncd.conf.d/
   install -D -m0644 ${WORKDIR}/40-gbmc-time.conf ${D}${systemd_unitdir}/timesyncd.conf.d/
+
+  mkdir -p ${D}${systemd_system_unitdir}/sysinit.target.wants/
+  ln -sv ${systemd_system_unitdir}/systemd-time-wait-sync.service ${D}${systemd_system_unitdir}/sysinit.target.wants/
+  mkdir -p ${D}${systemd_system_unitdir}/systemd-time-wait-sync.d/
+  install -D -m0644 ${WORKDIR}/10-gbmc.conf ${D}${systemd_system_unitdir}/systemd-time-wait-sync.d/
 }
 
 do_install:append:dev() {
