@@ -7,7 +7,10 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e11f5c3149cdec4bb309babb020b32b9 \
                     file://src/hb-ucd.cc;beginline=1;endline=15;md5=29d4dcb6410429195df67efe3382d8bc"
 
-SRC_URI = "http://www.freedesktop.org/software/harfbuzz/release/${BP}.tar.xz"
+SRC_URI = "http://www.freedesktop.org/software/harfbuzz/release/${BP}.tar.xz \
+           file://CVE-2023-25193-pre0.patch \
+           file://CVE-2023-25193-pre1.patch \
+           file://CVE-2023-25193.patch"
 SRC_URI[md5sum] = "2b3a4dfdb3e5e50055f941978944da9f"
 SRC_URI[sha256sum] = "9413b8d96132d699687ef914ebb8c50440efc87b3f775d25856d7ec347c03c12"
 

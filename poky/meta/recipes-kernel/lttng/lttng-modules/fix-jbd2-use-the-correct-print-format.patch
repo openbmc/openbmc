@@ -1,0 +1,147 @@
+fix: jbd2: use the correct print format
+See upstream commit :
+
+  commit d87a7b4c77a997d5388566dd511ca8e6b8e8a0a8
+  Author: Bixuan Cui <cuibixuan@linux.alibaba.com>
+  Date:   Tue Oct 11 19:33:44 2022 +0800
+
+    jbd2: use the correct print format
+
+    The print format error was found when using ftrace event:
+        <...>-1406 [000] .... 23599442.895823: jbd2_end_commit: dev 252,8 transaction -1866216965 sync 0 head -1866217368
+        <...>-1406 [000] .... 23599442.896299: jbd2_start_commit: dev 252,8 transaction -1866216964 sync 0
+
+    Use the correct print format for transaction, head and tid.
+
+Change-Id: Ic053f0e0c1e24ebc75bae51d07696aaa5e1c0094
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+
+Upstream-status: Backport
+Signed-off-by: Steve Sakoman <steve@sakoman.com>
+Note: combines three upstream commits:
+https://github.com/lttng/lttng-modules/commit/b28830a0dcdf95ec3e6b390b4d032667deaad0c0
+https://github.com/lttng/lttng-modules/commit/4fd2615b87b3cac0fd5bdc5fc82db05f6fcfdecf
+https://github.com/lttng/lttng-modules/commit/612c99eb24bf72f4d47d02025e92de8c35ece14e
+
+diff --git a/instrumentation/events/lttng-module/jbd2.h b/instrumentation/events/lttng-module/jbd2.h
+--- a/instrumentation/events/lttng-module/jbd2.h
++++ b/instrumentation/events/lttng-module/jbd2.h
+@@ -29,6 +29,25 @@ LTTNG_TRACEPOINT_EVENT(jbd2_checkpoint,
+ 	)
+ )
+ 
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,2,0) \
++	|| LTTNG_KERNEL_RANGE(5,4,229, 5,5,0) \
++	|| LTTNG_KERNEL_RANGE(5,10,163, 5,11,0) \
++	|| LTTNG_KERNEL_RANGE(5,15,87, 5,16,0) \
++	|| LTTNG_KERNEL_RANGE(6,0,18, 6,1,0) \
++	|| LTTNG_KERNEL_RANGE(6,1,4, 6,2,0))
++LTTNG_TRACEPOINT_EVENT_CLASS(jbd2_commit,
++
++	TP_PROTO(journal_t *journal, transaction_t *commit_transaction),
++
++	TP_ARGS(journal, commit_transaction),
++
++	TP_FIELDS(
++		ctf_integer(dev_t, dev, journal->j_fs_dev->bd_dev)
++		ctf_integer(char, sync_commit, commit_transaction->t_synchronous_commit)
++		ctf_integer(tid_t, transaction, commit_transaction->t_tid)
++	)
++)
++#else
+ LTTNG_TRACEPOINT_EVENT_CLASS(jbd2_commit,
+ 
+ 	TP_PROTO(journal_t *journal, transaction_t *commit_transaction),
+@@ -41,6 +60,7 @@ LTTNG_TRACEPOINT_EVENT_CLASS(jbd2_commit
+ 		ctf_integer(int, transaction, commit_transaction->t_tid)
+ 	)
+ )
++#endif
+ 
+ LTTNG_TRACEPOINT_EVENT_INSTANCE(jbd2_commit, jbd2_start_commit,
+ 
+@@ -79,6 +99,25 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(jbd2_com
+ )
+ #endif
+ 
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,2,0) \
++	|| LTTNG_KERNEL_RANGE(5,4,229, 5,5,0) \
++	|| LTTNG_KERNEL_RANGE(5,10,163, 5,11,0) \
++	|| LTTNG_KERNEL_RANGE(5,15,87, 5,16,0) \
++	|| LTTNG_KERNEL_RANGE(6,0,18, 6,1,0) \
++	|| LTTNG_KERNEL_RANGE(6,1,4, 6,2,0))
++LTTNG_TRACEPOINT_EVENT(jbd2_end_commit,
++	TP_PROTO(journal_t *journal, transaction_t *commit_transaction),
++
++	TP_ARGS(journal, commit_transaction),
++
++	TP_FIELDS(
++		ctf_integer(dev_t, dev, journal->j_fs_dev->bd_dev)
++		ctf_integer(char, sync_commit, commit_transaction->t_synchronous_commit)
++		ctf_integer(tid_t, transaction, commit_transaction->t_tid)
++		ctf_integer(tid_t, head, journal->j_tail_sequence)
++	)
++)
++#else
+ LTTNG_TRACEPOINT_EVENT(jbd2_end_commit,
+ 	TP_PROTO(journal_t *journal, transaction_t *commit_transaction),
+ 
+@@ -91,6 +130,7 @@ LTTNG_TRACEPOINT_EVENT(jbd2_end_commit,
+ 		ctf_integer(int, head, journal->j_tail_sequence)
+ 	)
+ )
++#endif
+ 
+ LTTNG_TRACEPOINT_EVENT(jbd2_submit_inode_data,
+ 	TP_PROTO(struct inode *inode),
+@@ -103,7 +143,48 @@ LTTNG_TRACEPOINT_EVENT(jbd2_submit_inode
+ 	)
+ )
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(2,6,32))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,2,0) \
++	|| LTTNG_KERNEL_RANGE(5,4,229, 5,5,0) \
++	|| LTTNG_KERNEL_RANGE(5,10,163, 5,11,0) \
++	|| LTTNG_KERNEL_RANGE(5,15,87, 5,16,0) \
++	|| LTTNG_KERNEL_RANGE(6,0,18, 6,1,0) \
++	|| LTTNG_KERNEL_RANGE(6,1,4, 6,2,0))
++LTTNG_TRACEPOINT_EVENT(jbd2_run_stats,
++	TP_PROTO(dev_t dev, tid_t tid,
++		 struct transaction_run_stats_s *stats),
++
++	TP_ARGS(dev, tid, stats),
++
++	TP_FIELDS(
++		ctf_integer(dev_t, dev, dev)
++		ctf_integer(tid_t, tid, tid)
++		ctf_integer(unsigned long, wait, stats->rs_wait)
++		ctf_integer(unsigned long, running, stats->rs_running)
++		ctf_integer(unsigned long, locked, stats->rs_locked)
++		ctf_integer(unsigned long, flushing, stats->rs_flushing)
++		ctf_integer(unsigned long, logging, stats->rs_logging)
++		ctf_integer(__u32, handle_count, stats->rs_handle_count)
++		ctf_integer(__u32, blocks, stats->rs_blocks)
++		ctf_integer(__u32, blocks_logged, stats->rs_blocks_logged)
++	)
++)
++
++LTTNG_TRACEPOINT_EVENT(jbd2_checkpoint_stats,
++	TP_PROTO(dev_t dev, tid_t tid,
++		 struct transaction_chp_stats_s *stats),
++
++	TP_ARGS(dev, tid, stats),
++
++	TP_FIELDS(
++		ctf_integer(dev_t, dev, dev)
++		ctf_integer(tid_t, tid, tid)
++		ctf_integer(unsigned long, chp_time, stats->cs_chp_time)
++		ctf_integer(__u32, forced_to_close, stats->cs_forced_to_close)
++		ctf_integer(__u32, written, stats->cs_written)
++		ctf_integer(__u32, dropped, stats->cs_dropped)
++	)
++)
++#else
+ LTTNG_TRACEPOINT_EVENT(jbd2_run_stats,
+ 	TP_PROTO(dev_t dev, unsigned long tid,
+ 		 struct transaction_run_stats_s *stats),

@@ -14,7 +14,7 @@ stack than are available.
 
 To cope, add in stack limit checking to throw an appropriate error when this
 happens.
-
+CVE: CVE-2021-45944
 Upstream-Status: Backported [https://git.ghostscript.com/?p=ghostpdl.git;a=patch;h=7861fcad13c497728189feafb41cd57b5b50ea25]
 Signed-off-by: Minjae Kim <flowergom@gmail.com>
 ---

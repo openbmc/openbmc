@@ -175,8 +175,8 @@ class TestImage(OESelftestTestCase):
         if "DISPLAY" not in os.environ:
             self.skipTest("virgl gtk test must be run inside a X session")
         distro = oe.lsb.distro_identifier()
-        if distro and distro == 'almalinux-8.6':
-            self.skipTest('virgl isn\'t working with Alma 8')
+        if distro and distro.startswith('almalinux'):
+            self.skipTest('virgl isn\'t working with Alma Linux')
         if distro and distro == 'debian-8':
             self.skipTest('virgl isn\'t working with Debian 8')
         if distro and distro == 'centos-7':
@@ -191,6 +191,8 @@ class TestImage(OESelftestTestCase):
             self.skipTest('virgl isn\'t working with Fedora 36')
         if distro and distro == 'opensuseleap-15.0':
             self.skipTest('virgl isn\'t working with Opensuse 15.0')
+        if distro and distro == 'ubuntu-22.04':
+            self.skipTest('virgl isn\'t working with Ubuntu 22.04')
 
         qemu_packageconfig = get_bb_var('PACKAGECONFIG', 'qemu-system-native')
         sdl_packageconfig = get_bb_var('PACKAGECONFIG', 'libsdl2-native')
@@ -234,7 +236,7 @@ class TestImage(OESelftestTestCase):
         except FileNotFoundError:
             self.skipTest("/dev/dri directory does not exist; no render nodes available on this machine.")
         try:
-            dripath = subprocess.check_output("pkg-config --variable=dridriverdir dri", shell=True)
+            dripath = subprocess.check_output("PATH=/bin:/usr/bin:$PATH pkg-config --variable=dridriverdir dri", shell=True)
         except subprocess.CalledProcessError as e:
             self.skipTest("Could not determine the path to dri drivers on the host via pkg-config.\nPlease install Mesa development files (particularly, dri.pc) on the host machine.")
         qemu_packageconfig = get_bb_var('PACKAGECONFIG', 'qemu-system-native')

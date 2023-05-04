@@ -4,6 +4,8 @@ DEPENDS = "go-native virtual/${TARGET_PREFIX}gcc-crosssdk virtual/nativesdk-${TA
 PN = "go-crosssdk-${SDK_SYS}"
 PROVIDES = "virtual/${TARGET_PREFIX}go-crosssdk"
 
+export GOCACHE = "${B}/.cache"
+
 do_configure[noexec] = "1"
 
 do_compile() {

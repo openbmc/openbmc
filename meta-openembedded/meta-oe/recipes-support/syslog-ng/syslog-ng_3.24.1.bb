@@ -9,6 +9,7 @@ SRC_URI += " \
            file://0001-syslog-ng-fix-segment-fault-during-service-start.patch \
            file://shebang.patch \
            file://syslog-ng-tmp.conf \
+           file://CVE-2022-38725.patch \
            "
 
 SRC_URI[md5sum] = "ef9de066793f7358af7312b964ac0450"

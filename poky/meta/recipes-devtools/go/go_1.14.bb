@@ -7,8 +7,8 @@ export CGO_ENABLED_riscv64 = ""
 # windows/mips/riscv doesn't support -buildmode=pie, so skip the QA checking
 # for windows/mips/riscv and their variants.
 python() {
-    if 'mips' in d.getVar('TARGET_ARCH',True) or 'riscv' in d.getVar('TARGET_ARCH',True) or 'windows' in d.getVar('TARGET_GOOS', True):
-        d.appendVar('INSANE_SKIP_%s' % d.getVar('PN',True), " textrel")
+    if 'mips' in d.getVar('TARGET_ARCH') or 'riscv' in d.getVar('TARGET_ARCH') or 'windows' in d.getVar('TARGET_GOOS'):
+        d.appendVar('INSANE_SKIP_%s' % d.getVar('PN'), " textrel")
     else:
         d.setVar('GOBUILDMODE', 'pie')
 }

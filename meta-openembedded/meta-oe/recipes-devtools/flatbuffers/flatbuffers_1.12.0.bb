@@ -24,11 +24,16 @@ BUILD_CXXFLAGS += "-std=c++11 -fPIC"
 # BUILD_TYPE=Release is required, otherwise flatc is not installed
 EXTRA_OECMAKE += "\
     -DCMAKE_BUILD_TYPE=Release \
-    -DFLATBUFFERS_BUILD_TESTS=OFF \    
+    -DFLATBUFFERS_BUILD_TESTS=OFF \
     -DFLATBUFFERS_BUILD_SHAREDLIB=ON \
 "
 
 inherit cmake
+
+rm_flatc_cmaketarget_for_target() {
+    rm -f "${SYSROOT_DESTDIR}/${libdir}/cmake/flatbuffers/FlatcTargets.cmake"
+}
+SYSROOT_PREPROCESS_FUNCS:class-target += "rm_flatc_cmaketarget_for_target"
 
 S = "${WORKDIR}/git"
 

@@ -45,6 +45,7 @@ PACKAGE_NO_GCONV ?= "0"
 OVERRIDES_append = ":${TARGET_ARCH}-${TARGET_OS}"
 
 locale_base_postinst_ontarget() {
+mkdir ${libdir}/locale
 localedef --inputfile=${datadir}/i18n/locales/%s --charmap=%s %s
 }
 

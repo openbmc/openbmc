@@ -1,0 +1,44 @@
+From 60d966708d7cf105dccf128d2b7a38b0b2580a1a Mon Sep 17 00:00:00 2001
+From: Jonathan Wakely <jwakely@redhat.com>
+Date: Fri, 5 Nov 2021 21:42:20 +0000
+Subject: [PATCH] libstdc++: Fix inconsistent noexcept-specific for valarray
+ begin/end
+
+These declarations should be noexcept after I added it to the
+definitions in <valarray>.
+
+libstdc++-v3/ChangeLog:
+
+	* include/bits/range_access.h (begin(valarray), end(valarray)):
+	Add noexcept.
+
+(cherry picked from commit 2b2d97fc545635a0f6aa9c9ee3b017394bc494bf)
+
+Upstream-Status: Backport [https://github.com/hkaelber/gcc/commit/2b2d97fc545635a0f6aa9c9ee3b017394bc494bf]
+Signed-off-by: Virendra Thakur <virendrak@kpit.com>
+
+---
+ libstdc++-v3/include/bits/range_access.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/libstdc++-v3/include/bits/range_access.h b/libstdc++-v3/include/bits/range_access.h
+index 3d99ea92027..4736e75fda1 100644
+--- a/libstdc++-v3/include/bits/range_access.h
++++ b/libstdc++-v3/include/bits/range_access.h
+@@ -101,10 +101,10 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+ 
+   template<typename _Tp> class valarray;
+   // These overloads must be declared for cbegin and cend to use them.
+-  template<typename _Tp> _Tp* begin(valarray<_Tp>&);
+-  template<typename _Tp> const _Tp* begin(const valarray<_Tp>&);
+-  template<typename _Tp> _Tp* end(valarray<_Tp>&);
+-  template<typename _Tp> const _Tp* end(const valarray<_Tp>&);
++  template<typename _Tp> _Tp* begin(valarray<_Tp>&) noexcept;
++  template<typename _Tp> const _Tp* begin(const valarray<_Tp>&) noexcept;
++  template<typename _Tp> _Tp* end(valarray<_Tp>&) noexcept;
++  template<typename _Tp> const _Tp* end(const valarray<_Tp>&) noexcept;
+ 
+   /**
+    *  @brief  Return an iterator pointing to the first element of
+-- 
+2.25.1

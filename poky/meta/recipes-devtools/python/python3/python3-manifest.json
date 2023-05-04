@@ -531,7 +531,9 @@
         "rdepends": [
             "core"
         ],
-        "files": [],
+        "files": [
+            "${libdir}/python${PYTHON_MAJMIN}/distutils/command/wininst-*.exe"
+        ],
         "cached": []
     },
     "distutils": {

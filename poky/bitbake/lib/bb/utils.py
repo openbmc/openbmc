@@ -461,8 +461,15 @@ def lockfile(name, shared=False, retry=True, block=False):
     consider the possibility of sending a signal to the process to break
     out - at which point you want block=True rather than retry=True.
     """
+    basename = os.path.basename(name)
+    if len(basename) > 255:
+        root, ext = os.path.splitext(basename)
+        basename = root[:255 - len(ext)] + ext
+
     dirname = os.path.dirname(name)
     mkdirhier(dirname)
+
+    name = os.path.join(dirname, basename)
 
     if not os.access(dirname, os.W_OK):
         logger.error("Unable to acquire lock '%s', directory is not writable",
@@ -497,7 +504,7 @@ def lockfile(name, shared=False, retry=True, block=False):
                     return lf
             lf.close()
         except OSError as e:
-            if e.errno == errno.EACCES:
+            if e.errno == errno.EACCES or e.errno == errno.ENAMETOOLONG:
                 logger.error("Unable to acquire lock '%s', %s",
                              e.strerror, name)
                 sys.exit(1)
@@ -1563,21 +1570,22 @@ def set_process_name(name):
 
 # export common proxies variables from datastore to environment
 def export_proxies(d):
-    import os
+    """ export common proxies variables from datastore to environment """
 
     variables = ['http_proxy', 'HTTP_PROXY', 'https_proxy', 'HTTPS_PROXY',
                     'ftp_proxy', 'FTP_PROXY', 'no_proxy', 'NO_PROXY',
-                    'GIT_PROXY_COMMAND']
+                    'GIT_PROXY_COMMAND', 'SSL_CERT_FILE', 'SSL_CERT_DIR']
     exported = False
 
-    for v in variables:
-        if v in os.environ.keys():
+    origenv = d.getVar("BB_ORIGENV")
+
+    for name in variables:
+        value = d.getVar(name)
+        if not value and origenv:
+            value = origenv.getVar(name)
+        if value:
+            os.environ[name] = value
             exported = True
-        else:
-            v_proxy = d.getVar(v)
-            if v_proxy is not None:
-                os.environ[v] = v_proxy
-                exported = True
 
     return exported
 

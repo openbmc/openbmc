@@ -377,7 +377,7 @@ activities using the Yocto Project:
    Index <http://layers.openembedded.org/layerindex/layers/>`__, which
    is a website that indexes OpenEmbedded-Core layers.
 
--  *Patchwork:* `Patchwork <http://jk.ozlabs.org/projects/patchwork/>`__
+-  *Patchwork:* `Patchwork <https://patchwork.yoctoproject.org/>`__
    is a fork of a project originally started by
    `OzLabs <http://ozlabs.org/>`__. The project is a web-based tracking
    system designed to streamline the process of bringing contributions

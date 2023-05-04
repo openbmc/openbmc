@@ -1,0 +1,58 @@
+From 316b81c462f065927d7fec56aadd5c8cb94d1cf0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 26 Aug 2022 00:28:08 -0700
+Subject: [PATCH] configure: Remove runtime test for mmap that can map
+ /dev/zero
+
+This never works for cross-compile moreover it ends up disabling
+ac_cv_file__dev_zero which then results in compiler errors in shared
+mutexes
+
+Upstream-Status: Inappropriate [Cross-compile specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ configure.in | 30 ------------------------------
+ 1 file changed, 30 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 3663220..dce9789 100644
+--- a/configure.in
++++ b/configure.in
+@@ -1303,36 +1303,6 @@ AC_CHECK_FUNCS([mmap munmap shm_open shm_unlink shmget shmat shmdt shmctl \
+ APR_CHECK_DEFINE(MAP_ANON, sys/mman.h)
+ AC_CHECK_FILE(/dev/zero)
+ 
+-# Not all systems can mmap /dev/zero (such as HP-UX).  Check for that.
+-if test "$ac_cv_func_mmap" = "yes" &&
+-  test "$ac_cv_file__dev_zero" = "yes"; then
+-    AC_CACHE_CHECK([for mmap that can map /dev/zero],
+-    [ac_cv_mmap__dev_zero],
+-    [AC_TRY_RUN([#include <sys/types.h>
+-#include <sys/stat.h>
+-#include <fcntl.h>
+-#ifdef HAVE_SYS_MMAN_H
+-#include <sys/mman.h>
+-#endif
+-    int main()
+-    {
+-        int fd;
+-        void *m;
+-        fd = open("/dev/zero", O_RDWR);
+-        if (fd < 0) {
+-            return 1;
+-        }
+-        m = mmap(0, sizeof(void*), PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+-        if (m == (void *)-1) {  /* aka MAP_FAILED */
+-            return 2;
+-        }
+-        if (munmap(m, sizeof(void*)) < 0) {
+-            return 3;
+-        }
+-        return 0;
+-    }], [], [ac_cv_file__dev_zero=no], [ac_cv_file__dev_zero=no])])
+-fi
+-
+ # Now we determine which one is our anonymous shmem preference.
+ haveshmgetanon="0"
+ havemmapzero="0"

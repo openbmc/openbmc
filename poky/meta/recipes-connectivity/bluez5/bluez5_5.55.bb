@@ -6,6 +6,13 @@ SRC_URI[sha256sum] = "8863717113c4897e2ad3271fc808ea245319e6fd95eed2e934fae8e089
 # These issues have kernel fixes rather than bluez fixes so exclude here
 CVE_CHECK_WHITELIST += "CVE-2020-12352 CVE-2020-24490"
 
+# Commit 7a80d2096f1b7125085e21448112aa02f49f5e9a, e2b0f0d8d63e1223bb714a9efb37e2257818268b 
+# and 0388794dc5fdb73a4ea88bcf148de0a12b4364d4 to fix CVE-2022-39177 
+# already backport in CVE-2022-39176.patch
+# https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/1977968
+
+CVE_CHECK_WHITELIST += "CVE-2022-39177"
+
 # noinst programs in Makefile.tools that are conditional on READLINE
 # support
 NOINST_TOOLS_READLINE ?= " \

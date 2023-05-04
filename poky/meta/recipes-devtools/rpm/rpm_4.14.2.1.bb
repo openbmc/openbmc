@@ -47,6 +47,10 @@ SRC_URI = "git://github.com/rpm-software-management/rpm;branch=rpm-4.14.x;protoc
            file://0001-rpmio-Fix-lzopen_internal-mode-parsing-when-Tn-is-us.patch \
            file://CVE-2021-3421.patch \
            file://CVE-2021-20266.patch \
+           file://CVE-2021-3521-01.patch \
+           file://CVE-2021-3521-02.patch \
+           file://CVE-2021-3521-03.patch \
+           file://CVE-2021-3521.patch \
            "
 
 PE = "1"

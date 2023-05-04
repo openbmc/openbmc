@@ -211,7 +211,7 @@ def get_deployed_dependencies(d):
     deploy = {}
     # Get all the dependencies for the current task (rootfs).
     taskdata = d.getVar("BB_TASKDEPDATA", False)
-    pn = d.getVar("PN", True)
+    pn = d.getVar("PN")
     depends = list(set([dep[0] for dep
                     in list(taskdata.values())
                     if not dep[0].endswith("-native") and not dep[0] == pn]))

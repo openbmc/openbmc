@@ -201,9 +201,9 @@ def deploy(args, config, basepath, workspace):
                 print('  %s' % item)
             return 0
 
-        extraoptions = ''
+        extraoptions = '-o HostKeyAlgorithms=+ssh-rsa'
         if args.no_host_check:
-            extraoptions += '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+            extraoptions += ' -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
         if not args.show_status:
             extraoptions += ' -q'
 
@@ -274,9 +274,9 @@ def undeploy(args, config, basepath, workspace):
     elif not args.recipename and not args.all:
         raise argparse_oe.ArgumentUsageError('If you don\'t specify a recipe, you must specify -a/--all', 'undeploy-target')
 
-    extraoptions = ''
+    extraoptions = '-o HostKeyAlgorithms=+ssh-rsa'
     if args.no_host_check:
-        extraoptions += '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+        extraoptions += ' -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
     if not args.show_status:
         extraoptions += ' -q'
 

@@ -10,8 +10,6 @@
 
 inherit kernel
 require recipes-kernel/linux/linux-yocto.inc
-# for ncurses tests
-inherit pkgconfig
 
 # provide this .inc to set specific revisions
 include recipes-kernel/linux/linux-yocto-dev-revisions.inc

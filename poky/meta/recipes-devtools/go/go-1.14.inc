@@ -41,6 +41,23 @@ SRC_URI += "\
     file://0002-CVE-2022-32190.patch \
     file://0003-CVE-2022-32190.patch \
     file://0004-CVE-2022-32190.patch \
+    file://CVE-2022-2880.patch \
+    file://CVE-2022-2879.patch \
+    file://CVE-2021-33195.patch \
+    file://CVE-2021-33198.patch \
+    file://CVE-2021-44716.patch \
+    file://CVE-2022-24921.patch \
+    file://CVE-2022-28131.patch \
+    file://CVE-2022-28327.patch \
+    file://CVE-2022-41715.patch \
+    file://CVE-2022-41717.patch \
+    file://CVE-2022-1962.patch \
+    file://CVE-2022-41723.patch \
+    file://CVE-2022-41722-1.patch \
+    file://CVE-2022-41722-2.patch \
+    file://CVE-2020-29510.patch \
+    file://CVE-2023-24537.patch \
+    file://CVE-2023-24534.patch \
 "
 
 SRC_URI_append_libc-musl = " file://0009-ld-replace-glibc-dynamic-linker-with-musl.patch"
@@ -56,4 +73,21 @@ CVE_CHECK_WHITELIST += "CVE-2021-29923"
 CVE_CHECK_WHITELIST += "CVE-2022-29526"
 
 # Issue only on windows
+CVE_CHECK_WHITELIST += "CVE-2022-29804"
+CVE_CHECK_WHITELIST += "CVE-2022-30580"
 CVE_CHECK_WHITELIST += "CVE-2022-30634"
+
+# Issue is in golang.org/x/net/html/parse.go, not used in go compiler
+CVE_CHECK_WHITELIST += "CVE-2021-33194"
+
+# Issue introduced in go1.16, does not exist in 1.14
+CVE_CHECK_WHITELIST += "CVE-2021-41772"
+
+# Fixes code that was added in go1.16, does not exist in 1.14
+CVE_CHECK_WHITELIST += "CVE-2022-30630"
+
+# This is specific to Microsoft Windows
+CVE_CHECK_WHITELIST += "CVE-2022-41716"
+
+# Issue introduced in go1.15beta1, does not exist in 1.14
+CVE_CHECK_WHITELIST += "CVE-2022-1705"

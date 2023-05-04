@@ -8,6 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=55c0f320370091249c1755c0d2b48e89"
 SRC_URI = "git://github.com/python-pillow/Pillow.git;branch=6.2.x;protocol=https \
            file://0001-support-cross-compiling.patch \
            file://0001-explicitly-set-compile-options.patch \
+           file://0001-CVE-2022-45198.patch \
 "
 SRCREV ?= "6e0f07bbe38def22d36ee176b2efd9ea74b453a6"
 

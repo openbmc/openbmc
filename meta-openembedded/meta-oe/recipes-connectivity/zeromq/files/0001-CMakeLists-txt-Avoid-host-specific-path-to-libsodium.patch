@@ -19,8 +19,8 @@ Signed-off-by: Niko Mauno <niko.mauno@vaisala.com>
 
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -1210,7 +1210,7 @@
-   target_link_libraries(libzmq ${OPTIONAL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+@@ -1440,7 +1440,7 @@ if(BUILD_SHARED)
+   endif()
  
    if(SODIUM_FOUND)
 -    target_link_libraries(libzmq ${SODIUM_LIBRARIES})
@@ -28,8 +28,8 @@ Signed-off-by: Niko Mauno <niko.mauno@vaisala.com>
      # On Solaris, libsodium depends on libssp
      if(${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
        target_link_libraries(libzmq ssp)
-@@ -1240,7 +1240,7 @@
-   target_link_libraries(libzmq-static ${OPTIONAL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+@@ -1485,7 +1485,7 @@ if(BUILD_STATIC)
+   endif()
  
    if(SODIUM_FOUND)
 -    target_link_libraries(libzmq-static ${SODIUM_LIBRARIES})

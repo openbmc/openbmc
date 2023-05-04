@@ -18,6 +18,8 @@ SRC_URI = "https://releases.pagure.org/SSSD/${BPN}/${BP}.tar.gz \
            file://volatiles.99_sssd \
            file://fix-ldblibdir.patch \
            file://0001-build-Don-t-use-AC_CHECK_FILE-when-building-manpages.patch \
+           file://CVE-2022-4254-1.patch \
+           file://CVE-2022-4254-2.patch \
            "
 
 SRC_URI[md5sum] = "757bbb6f15409d8d075f4f06cb678d50"

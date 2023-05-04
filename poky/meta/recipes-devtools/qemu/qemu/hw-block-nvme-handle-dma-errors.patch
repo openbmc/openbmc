@@ -1,0 +1,146 @@
+From ea2a7c7676d8eb9d1458eaa4b717df46782dcb3a Mon Sep 17 00:00:00 2001
+From: Gaurav Gupta <gauragup@cisco.com>
+Date: Wed, 29 Mar 2023 14:07:17 -0700
+Subject: [PATCH 2/2] hw/block/nvme: handle dma errors
+
+Handling DMA errors gracefully is required for the device to pass the
+block/011 test ("disable PCI device while doing I/O") in the blktests
+suite.
+
+With this patch the device sets the Controller Fatal Status bit in the
+CSTS register when failing to read from a submission queue or writing to
+a completion queue; expecting the host to reset the controller.
+
+If DMA errors occur at any other point in the execution of the command
+(say, while mapping the PRPs), the command is aborted with a Data
+Transfer Error status code.
+
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+Signed-off-by: Gaurav Gupta <gauragup@cisco.com>
+---
+ hw/block/nvme.c       | 41 +++++++++++++++++++++++++++++++----------
+ hw/block/trace-events |  3 +++
+ 2 files changed, 34 insertions(+), 10 deletions(-)
+
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index e6f24a6..bda446d 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -60,14 +60,14 @@ static bool nvme_addr_is_cmb(NvmeCtrl *n, hwaddr addr)
+     return addr >= low && addr < hi;
+ }
+ 
+-static void nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
++static int nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
+ {
+     if (n->cmbsz && nvme_addr_is_cmb(n, addr)) {
+         memcpy(buf, (void *)&n->cmbuf[addr - n->ctrl_mem.addr], size);
+-        return;
++        return 0;
+     }
+ 
+-    pci_dma_read(&n->parent_obj, addr, buf, size);
++    return pci_dma_read(&n->parent_obj, addr, buf, size);
+ }
+ 
+ static int nvme_check_sqid(NvmeCtrl *n, uint16_t sqid)
+@@ -152,6 +152,7 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
+     hwaddr trans_len = n->page_size - (prp1 % n->page_size);
+     trans_len = MIN(len, trans_len);
+     int num_prps = (len >> n->page_bits) + 1;
++    int ret;
+ 
+     if (unlikely(!prp1)) {
+         trace_nvme_err_invalid_prp();
+@@ -178,7 +179,11 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
+ 
+             nents = (len + n->page_size - 1) >> n->page_bits;
+             prp_trans = MIN(n->max_prp_ents, nents) * sizeof(uint64_t);
+-            nvme_addr_read(n, prp2, (void *)prp_list, prp_trans);
++            ret = nvme_addr_read(n, prp2, (void *)prp_list, prp_trans);
++            if (ret) {
++                trace_pci_nvme_err_addr_read(prp2);
++                return NVME_DATA_TRAS_ERROR;
++            }
+             while (len != 0) {
+                 uint64_t prp_ent = le64_to_cpu(prp_list[i]);
+ 
+@@ -191,8 +196,12 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
+                     i = 0;
+                     nents = (len + n->page_size - 1) >> n->page_bits;
+                     prp_trans = MIN(n->max_prp_ents, nents) * sizeof(uint64_t);
+-                    nvme_addr_read(n, prp_ent, (void *)prp_list,
+-                        prp_trans);
++                    ret = nvme_addr_read(n, prp_ent, (void *)prp_list,
++                                         prp_trans);
++                    if (ret) {
++                        trace_pci_nvme_err_addr_read(prp_ent);
++                        return NVME_DATA_TRAS_ERROR;
++                    }
+                     prp_ent = le64_to_cpu(prp_list[i]);
+                 }
+ 
+@@ -286,6 +295,7 @@ static void nvme_post_cqes(void *opaque)
+     NvmeCQueue *cq = opaque;
+     NvmeCtrl *n = cq->ctrl;
+     NvmeRequest *req, *next;
++    int ret;
+ 
+     QTAILQ_FOREACH_SAFE(req, &cq->req_list, entry, next) {
+         NvmeSQueue *sq;
+@@ -295,15 +305,21 @@ static void nvme_post_cqes(void *opaque)
+             break;
+         }
+ 
+-        QTAILQ_REMOVE(&cq->req_list, req, entry);
+         sq = req->sq;
+         req->cqe.status = cpu_to_le16((req->status << 1) | cq->phase);
+         req->cqe.sq_id = cpu_to_le16(sq->sqid);
+         req->cqe.sq_head = cpu_to_le16(sq->head);
+         addr = cq->dma_addr + cq->tail * n->cqe_size;
++        ret = pci_dma_write(&n->parent_obj, addr, (void *)&req->cqe,
++                            sizeof(req->cqe));
++        if (ret) {
++            trace_pci_nvme_err_addr_write(addr);
++            trace_pci_nvme_err_cfs();
++            n->bar.csts = NVME_CSTS_FAILED;
++            break;
++        }
++        QTAILQ_REMOVE(&cq->req_list, req, entry);
+         nvme_inc_cq_tail(cq);
+-        pci_dma_write(&n->parent_obj, addr, (void *)&req->cqe,
+-            sizeof(req->cqe));
+         QTAILQ_INSERT_TAIL(&sq->req_list, req, entry);
+     }
+     if (cq->tail != cq->head) {
+@@ -888,7 +904,12 @@ static void nvme_process_sq(void *opaque)
+ 
+     while (!(nvme_sq_empty(sq) || QTAILQ_EMPTY(&sq->req_list))) {
+         addr = sq->dma_addr + sq->head * n->sqe_size;
+-        nvme_addr_read(n, addr, (void *)&cmd, sizeof(cmd));
++        if (nvme_addr_read(n, addr, (void *)&cmd, sizeof(cmd))) {
++            trace_pci_nvme_err_addr_read(addr);
++            trace_pci_nvme_err_cfs();
++            n->bar.csts = NVME_CSTS_FAILED;
++            break;
++        }
+         nvme_inc_sq_head(sq);
+ 
+         req = QTAILQ_FIRST(&sq->req_list);
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index c03e80c..4e4ad4e 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -60,6 +60,9 @@ nvme_mmio_shutdown_set(void) "shutdown bit set"
+ nvme_mmio_shutdown_cleared(void) "shutdown bit cleared"
+ 
+ # nvme traces for error conditions
++pci_nvme_err_addr_read(uint64_t addr) "addr 0x%"PRIx64""
++pci_nvme_err_addr_write(uint64_t addr) "addr 0x%"PRIx64""
++pci_nvme_err_cfs(void) "controller fatal status"
+ nvme_err_invalid_dma(void) "PRP/SGL is too small for transfer size"
+ nvme_err_invalid_prplist_ent(uint64_t prplist) "PRP list entry is null or not page aligned: 0x%"PRIx64""
+ nvme_err_invalid_prp2_align(uint64_t prp2) "PRP2 is not page aligned: 0x%"PRIx64""
+-- 
+1.8.3.1
+

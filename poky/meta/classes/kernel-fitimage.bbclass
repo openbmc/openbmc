@@ -59,6 +59,9 @@ FIT_SIGN_ALG ?= "rsa2048"
 # fitImage Padding Algo
 FIT_PAD_ALG ?= "pkcs-1.5"
 
+# Arguments passed to mkimage for signing
+UBOOT_MKIMAGE_SIGN_ARGS ?= ""
+
 #
 # Emit the fitImage ITS header
 #
@@ -479,7 +482,8 @@ fitimage_assemble() {
 			${@'-D "${UBOOT_MKIMAGE_DTCOPTS}"' if len('${UBOOT_MKIMAGE_DTCOPTS}') else ''} \
 			-F -k "${UBOOT_SIGN_KEYDIR}" \
 			$add_key_to_u_boot \
-			-r arch/${ARCH}/boot/${2}
+			-r arch/${ARCH}/boot/${2} \
+			${UBOOT_MKIMAGE_SIGN_ARGS}
 	fi
 }
 

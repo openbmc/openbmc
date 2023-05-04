@@ -75,7 +75,7 @@ python __anonymous () {
     # KERNEL_IMAGETYPES may contain a mixture of image types supported directly
     # by the kernel build system and types which are created by post-processing
     # the output of the kernel build system (e.g. compressing vmlinux ->
-    # vmlinux.gz in kernel_do_compile()).
+    # vmlinux.gz in kernel_do_transform_kernel()).
     # KERNEL_IMAGETYPE_FOR_MAKE should contain only image types supported
     # directly by the kernel build system.
     if not d.getVar('KERNEL_IMAGETYPE_FOR_MAKE'):
@@ -106,6 +106,8 @@ python __anonymous () {
     # standalone for use by wic and other tools.
     if image:
         d.appendVarFlag('do_bundle_initramfs', 'depends', ' ${INITRAMFS_IMAGE}:do_image_complete')
+    if image and bb.utils.to_boolean(d.getVar('INITRAMFS_IMAGE_BUNDLE')):
+        bb.build.addtask('do_transform_bundled_initramfs', 'do_deploy', 'do_bundle_initramfs', d)
 
     # NOTE: setting INITRAMFS_TASK is for backward compatibility
     #       The preferred method is to set INITRAMFS_IMAGE, because
@@ -280,6 +282,14 @@ do_bundle_initramfs () {
 }
 do_bundle_initramfs[dirs] = "${B}"
 
+kernel_do_transform_bundled_initramfs() {
+        # vmlinux.gz is not built by kernel
+	if (echo "${KERNEL_IMAGETYPES}" | grep -wq "vmlinux\.gz"); then
+		gzip -9cn < ${KERNEL_OUTPUT_DIR}/vmlinux.initramfs > ${KERNEL_OUTPUT_DIR}/vmlinux.gz.initramfs
+        fi
+}
+do_transform_bundled_initramfs[dirs] = "${B}"
+
 python do_devshell_prepend () {
     os.environ["LDFLAGS"] = ''
 }
@@ -311,6 +321,10 @@ kernel_do_compile() {
 		export KBUILD_BUILD_TIMESTAMP="$ts"
 		export KCONFIG_NOTIMESTAMP=1
 		bbnote "KBUILD_BUILD_TIMESTAMP: $ts"
+	else
+		ts=`LC_ALL=C date`
+		export KBUILD_BUILD_TIMESTAMP="$ts"
+		bbnote "KBUILD_BUILD_TIMESTAMP: $ts"
 	fi
 	# The $use_alternate_initrd is only set from
 	# do_bundle_initramfs() This variable is specifically for the
@@ -329,12 +343,17 @@ kernel_do_compile() {
 	for typeformake in ${KERNEL_IMAGETYPE_FOR_MAKE} ; do
 		oe_runmake ${typeformake} CC="${KERNEL_CC} $cc_extra " LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} $use_alternate_initrd
 	done
+}
+
+kernel_do_transform_kernel() {
 	# vmlinux.gz is not built by kernel
 	if (echo "${KERNEL_IMAGETYPES}" | grep -wq "vmlinux\.gz"); then
 		mkdir -p "${KERNEL_OUTPUT_DIR}"
 		gzip -9cn < ${B}/vmlinux > "${KERNEL_OUTPUT_DIR}/vmlinux.gz"
 	fi
 }
+do_transform_kernel[dirs] = "${B}"
+addtask transform_kernel after do_compile before do_install
 
 do_compile_kernelmodules() {
 	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS MACHINE
@@ -351,6 +370,10 @@ do_compile_kernelmodules() {
 		ts=`LC_ALL=C date -d @$SOURCE_DATE_EPOCH`
 		export KBUILD_BUILD_TIMESTAMP="$ts"
 		export KCONFIG_NOTIMESTAMP=1
+		bbnote "KBUILD_BUILD_TIMESTAMP: $ts"
+	else
+		ts=`LC_ALL=C date`
+		export KBUILD_BUILD_TIMESTAMP="$ts"
 		bbnote "KBUILD_BUILD_TIMESTAMP: $ts"
 	fi
 	if (grep -q -i -e '^CONFIG_MODULES=y$' ${B}/.config); then
@@ -572,11 +595,11 @@ do_savedefconfig() {
 do_savedefconfig[nostamp] = "1"
 addtask savedefconfig after do_configure
 
-inherit cml1
+inherit cml1 pkgconfig
 
 KCONFIG_CONFIG_COMMAND_append = " LD='${KERNEL_LD}' HOSTLDFLAGS='${BUILD_LDFLAGS}'"
 
-EXPORT_FUNCTIONS do_compile do_install do_configure
+EXPORT_FUNCTIONS do_compile do_transform_kernel do_transform_bundled_initramfs do_install do_configure
 
 # kernel-base becomes kernel-${KERNEL_VERSION}
 # kernel-image becomes kernel-image-${KERNEL_VERSION}
@@ -721,7 +744,7 @@ kernel_do_deploy() {
 	fi
 
 	if [ ! -z "${INITRAMFS_IMAGE}" -a x"${INITRAMFS_IMAGE_BUNDLE}" = x1 ]; then
-		for imageType in ${KERNEL_IMAGETYPE_FOR_MAKE} ; do
+		for imageType in ${KERNEL_IMAGETYPES} ; do
 			if [ "$imageType" = "fitImage" ] ; then
 				continue
 			fi

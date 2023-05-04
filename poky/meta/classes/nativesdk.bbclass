@@ -113,3 +113,5 @@ do_packagedata[stamp-extra-info] = ""
 USE_NLS = "${SDKUSE_NLS}"
 
 OLDEST_KERNEL = "${SDK_OLDEST_KERNEL}"
+
+PATH_prepend = "${COREBASE}/scripts/nativesdk-intercept:"

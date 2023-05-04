@@ -1338,7 +1338,7 @@ class FetchCheckStatusTest(FetcherTest):
                       "http://downloads.yoctoproject.org/releases/sato/sato-engine-0.2.tar.gz",
                       "http://downloads.yoctoproject.org/releases/sato/sato-engine-0.3.tar.gz",
                       "https://yoctoproject.org/",
-                      "https://yoctoproject.org/documentation",
+                      "https://docs.yoctoproject.org/",
                       "http://downloads.yoctoproject.org/releases/opkg/opkg-0.1.7.tar.gz",
                       "http://downloads.yoctoproject.org/releases/opkg/opkg-0.3.0.tar.gz",
                       "ftp://sourceware.org/pub/libffi/libffi-1.20.tar.gz",
@@ -1750,7 +1750,7 @@ class GitShallowTest(FetcherTest):
         self.add_empty_file('bsub', cwd=smdir)
 
         self.git('submodule init', cwd=self.srcdir)
-        self.git('submodule add file://%s' % smdir, cwd=self.srcdir)
+        self.git('-c protocol.file.allow=always submodule add file://%s' % smdir, cwd=self.srcdir)
         self.git('submodule update', cwd=self.srcdir)
         self.git('commit -m submodule -a', cwd=self.srcdir)
 
@@ -1782,7 +1782,7 @@ class GitShallowTest(FetcherTest):
         self.add_empty_file('bsub', cwd=smdir)
 
         self.git('submodule init', cwd=self.srcdir)
-        self.git('submodule add file://%s' % smdir, cwd=self.srcdir)
+        self.git('-c protocol.file.allow=always submodule add file://%s' % smdir, cwd=self.srcdir)
         self.git('submodule update', cwd=self.srcdir)
         self.git('commit -m submodule -a', cwd=self.srcdir)
 

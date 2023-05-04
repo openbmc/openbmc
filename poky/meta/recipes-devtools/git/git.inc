@@ -11,8 +11,24 @@ SRC_URI = "${KERNELORG_MIRROR}/software/scm/git/git-${PV}.tar.gz;name=tarball \
            ${KERNELORG_MIRROR}/software/scm/git/git-manpages-${PV}.tar.gz;name=manpages \
            file://fixsort.patch \
            file://CVE-2021-40330.patch \
+           file://CVE-2022-23521.patch \
+           file://CVE-2022-41903-01.patch \
+           file://CVE-2022-41903-02.patch \
+           file://CVE-2022-41903-03.patch \
+           file://CVE-2022-41903-04.patch \
+           file://CVE-2022-41903-05.patch \
+           file://CVE-2022-41903-06.patch \
+           file://CVE-2022-41903-07.patch \
+           file://CVE-2022-41903-08.patch \
+           file://CVE-2022-41903-09.patch \
+           file://CVE-2022-41903-10.patch \
+           file://CVE-2022-41903-11.patch \
+           file://CVE-2022-41903-12.patch \
+           file://CVE-2023-22490-1.patch \
+           file://CVE-2023-22490-2.patch \
+           file://CVE-2023-22490-3.patch \
+           file://CVE-2023-23946.patch \
            "
-
 S = "${WORKDIR}/git-${PV}"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=7c0d7ef03a7eb04ce795b0f60e68e7e1"
@@ -23,6 +39,10 @@ CVE_PRODUCT = "git-scm:git"
 # in mirrored git repos. Most OE users wouldn't build the docs and
 # we don't see this as a major issue for our general users/usecases.
 CVE_CHECK_WHITELIST += "CVE-2022-24975"
+# This is specific to Git-for-Windows
+CVE_CHECK_WHITELIST += "CVE-2022-41953"
+# specific to Git for Windows
+CVE_CHECK_WHITELIST += "CVE-2023-22743"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[cvsserver] = ""

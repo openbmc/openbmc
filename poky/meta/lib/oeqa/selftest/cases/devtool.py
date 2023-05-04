@@ -1323,7 +1323,7 @@ class DevtoolExtractTests(DevtoolBase):
             # Now really test deploy-target
             result = runCmd('devtool deploy-target -c %s root@%s' % (testrecipe, qemu.ip))
             # Run a test command to see if it was installed properly
-            sshargs = '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+            sshargs = '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o HostKeyAlgorithms=+ssh-rsa'
             result = runCmd('ssh %s root@%s %s' % (sshargs, qemu.ip, testcommand))
             # Check if it deployed all of the files with the right ownership/perms
             # First look on the host - need to do this under pseudo to get the correct ownership/perms
