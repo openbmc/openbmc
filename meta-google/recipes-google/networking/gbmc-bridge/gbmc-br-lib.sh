@@ -70,6 +70,9 @@ gbmc_br_reload_ip() {
     return 0
   fi
 
+  # Remove legacy network configuration
+  rm -rf /etc/systemd/network/{00,}-bmc-gbmcbr.network.d
+
   local pfx_bytes=()
   if ! ip_to_bytes pfx_bytes "$ip"; then
     echo "Ignoring Invalid IPv6: $ip" >&2
@@ -111,16 +114,16 @@ EOF
 
 gbmc_br_set_ip() {
   local ip="${1-}"
-
+  local old_ip=
   if [ -n "$ip" ]; then
+    old_ip="$(cat /var/google/gbmc-br-ip 2>/dev/null)"
+    [ "$old_ip" != "$ip" ] || return
     mkdir -p /var/google || return
     echo "$ip" >/var/google/gbmc-br-ip || return
   else
+    [ -f "/var/google/gbmc-br-ip" ] || return
     rm -rf /var/google/gbmc-br-ip
   fi
-
-  # Remove legacy network configuration
-  rm -rf /etc/systemd/network/{00,}-bmc-gbmcbr.network.d
 
   gbmc_br_run_hooks GBMC_BR_LIB_SET_IP_HOOKS "$ip" || return
 
