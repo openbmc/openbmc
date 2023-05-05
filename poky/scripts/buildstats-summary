@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#!/usr/bin/env python3
 #
 # Dump a summary of the specified buildstats to the terminal, filtering and
 # sorting by walltime.

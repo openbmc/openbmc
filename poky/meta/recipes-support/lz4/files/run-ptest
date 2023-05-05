@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# Define test work dir
+WORKDIR=@PTEST_PATH@/tests/
+
+# Run test
+cd ${WORKDIR}
+
+case_name="test_frame"
+./frametest 
+ret=$?
+if [[ ${ret} == "0" ]]; then
+    echo "PASS: lz4/$case_name"
+else
+    echo "FAIL: lz4/$case_name"
+fi
+

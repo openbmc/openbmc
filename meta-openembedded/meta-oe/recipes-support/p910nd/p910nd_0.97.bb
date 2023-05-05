@@ -2,21 +2,28 @@ DESCRIPTION = "A small network printer daemon for embedded situations that passe
 HOMEPAGE = "http://p910nd.sourceforge.net/"
 SECTION = "console/utils"
 LICENSE = "GPL-2.0-only"
-LIC_FILES_CHKSUM = "file://COPYING;md5=8ca43cbc842c2336e835926c2166c28b"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=3d82780e8917b360cbee7b9ec3e40734"
 
 PR = "r2"
 
-SRC_URI = "${SOURCEFORGE_MIRROR}/p910nd/p910nd-${PV}.tar.bz2 \
+# v0.97
+SRCREV = "57ebc07ad8723ea4106090536c58c7f7160743e2"
+SRC_URI = "git://github.com/kenyapcomau/p910nd;protocol=https;branch=master \
            file://fix-var-lock.patch"
 
-SRC_URI[md5sum] = "69461a6c54dca0b13ecad5b83864b43e"
-SRC_URI[sha256sum] = "4ac980a3ae24babae6f70f0a692625ece03a4a92c357fbb10d2e368386c3c26f"
+S = "${WORKDIR}/git"
+
+inherit update-rc.d
+
+INITSCRIPT_NAME = "p910nd"
+INITSCRIPT_PARAMS = "start 90 2 3 4 5 . stop 60 0 1 6 ."
 
 do_compile () {
-    ${CC} ${LDFLAGS} -o p910nd p910nd.c
+    ${CC} ${CFLAGS} ${LDFLAGS} -o p910nd p910nd.c
 }
 
 do_install () {
     install -D -m 0755 ${S}/p910nd ${D}${sbindir}/p910nd
-    install -D -m 0644 ${S}/p910nd.conf ${D}${sysconfdir}/p910nd.conf
+    install -D -m 0644 ${S}/aux/p910nd.conf ${D}${sysconfdir}/sysconfig/p910nd.conf
+    install -D -m 0644 ${S}/aux/p910nd.init ${D}${sysconfdir}/init.d/p910nd
 }

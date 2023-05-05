@@ -151,6 +151,8 @@ class BBCooker:
 
     def __init__(self, featureSet=None, server=None):
         self.recipecaches = None
+        self.baseconfig_valid = False
+        self.parsecache_valid = False
         self.eventlog = None
         self.skiplist = {}
         self.featureset = CookerFeatures()
@@ -264,11 +266,25 @@ class BBCooker:
                     n.read_events()
                     n.process_events()
 
+    def _baseconfig_set(self, value):
+        if value and not self.baseconfig_valid:
+            bb.server.process.serverlog("Base config valid")
+        elif not value and self.baseconfig_valid:
+            bb.server.process.serverlog("Base config invalidated")
+        self.baseconfig_valid = value
+
+    def _parsecache_set(self, value):
+        if value and not self.parsecache_valid:
+            bb.server.process.serverlog("Parse cache valid")
+        elif not value and self.parsecache_valid:
+            bb.server.process.serverlog("Parse cache invalidated")
+        self.parsecache_valid = value
+
     def config_notifications(self, event):
         if event.maskname == "IN_Q_OVERFLOW":
             bb.warn("inotify event queue overflowed, invalidating caches.")
-            self.parsecache_valid = False
-            self.baseconfig_valid = False
+            self._parsecache_set(False)
+            self._baseconfig_set(False)
             bb.parse.clear_cache()
             return
         if not event.pathname in self.configwatcher.bbwatchedfiles:
@@ -281,12 +297,12 @@ class BBCooker:
                 bb.parse.clear_cache()
         if not event.pathname in self.inotify_modified_files:
             self.inotify_modified_files.append(event.pathname)
-        self.baseconfig_valid = False
+        self._baseconfig_set(False)
 
     def notifications(self, event):
         if event.maskname == "IN_Q_OVERFLOW":
             bb.warn("inotify event queue overflowed, invalidating caches.")
-            self.parsecache_valid = False
+            self._parsecache_set(False)
             bb.parse.clear_cache()
             return
         if event.pathname.endswith("bitbake-cookerdaemon.log") \
@@ -300,7 +316,7 @@ class BBCooker:
                 bb.parse.clear_cache()
         if not event.pathname in self.inotify_modified_files:
             self.inotify_modified_files.append(event.pathname)
-        self.parsecache_valid = False
+        self._parsecache_set(False)
 
     def add_filewatch(self, deps, watcher=None, dirs=False):
         if not watcher:
@@ -422,8 +438,8 @@ class BBCooker:
         for mc in self.databuilder.mcdata.values():
             self.add_filewatch(mc.getVar("__base_depends", False), self.configwatcher)
 
-        self.baseconfig_valid = True
-        self.parsecache_valid = False
+        self._baseconfig_set(True)
+        self._parsecache_set(False)
 
     def handlePRServ(self):
         # Setup a PR Server based on the new configuration
@@ -489,7 +505,7 @@ class BBCooker:
 
         self.handleCollections(self.data.getVar("BBFILE_COLLECTIONS"))
 
-        self.parsecache_valid = False
+        self._parsecache_set(False)
 
     def updateConfigOpts(self, options, environment, cmdline):
         self.ui_cmdline = cmdline
@@ -1509,7 +1525,7 @@ class BBCooker:
                     bb.event.fire(bb.event.BuildCompleted(len(rq.rqdata.runtaskentries), buildname, item, failures, interrupted), self.databuilder.mcdata[mc])
                     bb.event.disable_heartbeat()
                 # We trashed self.recipecaches above
-                self.parsecache_valid = False
+                self._parsecache_set(False)
                 self.configuration.limited_deps = False
                 bb.parse.siggen.reset(self.data)
                 if quietlog:
@@ -1678,7 +1694,7 @@ class BBCooker:
                 self.add_filewatch([[dirent]], dirs=True)
 
             self.parser = CookerParser(self, mcfilelist, total_masked)
-            self.parsecache_valid = True
+            self._parsecache_set(True)
 
         self.state = state.parsing
 
@@ -1796,8 +1812,7 @@ class BBCooker:
            self.data = self.databuilder.data
         # In theory tinfoil could have modified the base data before parsing,
         # ideally need to track if anything did modify the datastore
-        self.parsecache_valid = False
-
+        self._parsecache_set(False)
 
 class CookerExit(bb.event.Event):
     """

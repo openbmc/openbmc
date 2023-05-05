@@ -44,6 +44,8 @@ class PtestParser(object):
                 result = section_regex['begin'].search(line)
                 if result:
                     current_section['name'] = result.group(1)
+                    if current_section['name'] not in self.results:
+                        self.results[current_section['name']] = {}
                     continue
 
                 result = section_regex['end'].search(line)
@@ -75,8 +77,6 @@ class PtestParser(object):
                 for t in test_regex:
                     result = test_regex[t].search(line)
                     if result:
-                        if current_section['name'] not in self.results:
-                            self.results[current_section['name']] = {}
                         self.results[current_section['name']][result.group(1).strip()] = t
 
         # Python performance for repeatedly joining long strings is poor, do it all at once at the end.

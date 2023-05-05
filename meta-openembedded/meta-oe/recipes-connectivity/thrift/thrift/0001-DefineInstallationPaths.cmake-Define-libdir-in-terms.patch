@@ -12,7 +12,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 --- a/build/cmake/DefineInstallationPaths.cmake
 +++ b/build/cmake/DefineInstallationPaths.cmake
-@@ -26,11 +26,11 @@
+@@ -26,11 +26,11 @@ else()
      set(LIB_INSTALL_DIR "lib${LIB_SUFFIX}" CACHE PATH "The library install dir (default: lib${LIB_SUFFIX})")
  endif()
  set(INCLUDE_INSTALL_DIR "include" CACHE PATH "The library install dir (default: include)")
@@ -29,7 +29,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  set(cmakedir "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DIR}")
 --- a/build/cmake/DefineCMakeDefaults.cmake
 +++ b/build/cmake/DefineCMakeDefaults.cmake
-@@ -44,8 +44,8 @@
+@@ -44,8 +44,8 @@ include(BuildType)
  # top of the build tree rather than in hard-to-find leaf
  # directories. This simplifies manual testing and the use of the build
  # tree rather than installed thrift libraries.

@@ -125,8 +125,8 @@ do_populate_sysroot[vardeps] += "${SYSROOT_PREPROCESS_FUNCS}"
 do_populate_sysroot[vardepsexclude] += "BB_MULTI_PROVIDER_ALLOWED"
 
 POPULATESYSROOTDEPS = ""
-POPULATESYSROOTDEPS:class-target = "virtual/${MLPREFIX}${HOST_PREFIX}binutils:do_populate_sysroot"
-POPULATESYSROOTDEPS:class-nativesdk = "virtual/${HOST_PREFIX}binutils-crosssdk:do_populate_sysroot"
+POPULATESYSROOTDEPS:class-target = "virtual/${HOST_PREFIX}binutils:do_populate_sysroot"
+POPULATESYSROOTDEPS:class-nativesdk = "virtual/${HOST_PREFIX}binutils:do_populate_sysroot"
 do_populate_sysroot[depends] += "${POPULATESYSROOTDEPS}"
 
 SSTATETASKS += "do_populate_sysroot"

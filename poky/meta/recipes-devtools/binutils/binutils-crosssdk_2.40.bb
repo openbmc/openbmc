@@ -4,8 +4,6 @@ inherit crosssdk
 
 PN = "binutils-crosssdk-${SDK_SYS}"
 
-PROVIDES = "virtual/${TARGET_PREFIX}binutils-crosssdk"
-
 SRC_URI += "file://0001-binutils-crosssdk-Generate-relocatable-SDKs.patch"
 
 do_configure:prepend () {

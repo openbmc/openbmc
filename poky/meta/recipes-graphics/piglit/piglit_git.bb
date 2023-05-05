@@ -10,10 +10,11 @@ SRC_URI = "git://gitlab.freedesktop.org/mesa/piglit.git;protocol=https;branch=ma
            file://0001-cmake-install-bash-completions-in-the-right-place.patch \
            file://0002-cmake-use-proper-WAYLAND_INCLUDE_DIRS-variable.patch \
            file://0003-tests-util-piglit-shader.c-do-not-hardcode-build-pat.patch \
+           file://0001-tests-Fix-narrowing-errors-seen-with-clang.patch \
            "
 UPSTREAM_CHECK_COMMITS = "1"
 
-SRCREV = "0f4a875b05feb44426a2d43146f5e3c6ea5f8038"
+SRCREV = "c39bc6062a373c371d9c8076a66acbb26c661471"
 # (when PV goes above 1.0 remove the trailing r)
 PV = "1.0+gitr${SRCPV}"
 

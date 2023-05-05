@@ -9,7 +9,7 @@ DEPENDS = "gdk-pixbuf-native"
 SRCREV = "44afb7506d43cca15582b4c5b90ba5580344d75d"
 PV = "0.1+git${SRCPV}"
 
-SRC_URI = "git://git.yoctoproject.org/${BPN};branch=master \
+SRC_URI = "git://git.yoctoproject.org/${BPN};branch=master;protocol=https \
            file://psplash-init \
            file://psplash-start.service \
            file://psplash-systemd.service \

@@ -109,6 +109,10 @@ do_configure:class-native() {
     -Ui_xlocale \
     -Alddlflags=' ${LDFLAGS}' \
     ${PACKAGECONFIG_CONFARGS}
+
+    # This prevents leakage of build paths into perl-native binaries, which
+    # causes non-deterministic troubles when those paths no longer exist or aren't accessible.
+    sed -i -e "s,${STAGING_LIBDIR},/completelyboguspath,g" config.h
 }
 
 do_configure:append() {

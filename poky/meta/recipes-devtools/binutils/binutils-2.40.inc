@@ -19,7 +19,7 @@ SRCBRANCH ?= "binutils-2_40-branch"
 UPSTREAM_CHECK_GITTAGREGEX = "binutils-(?P<pver>\d+_(\d_?)*)"
 
 SRCREV ?= "ffb83e32fc11f36b7b82b876c14888f82cd983b3"
-BINUTILS_GIT_URI ?= "git://sourceware.org/git/binutils-gdb.git;branch=${SRCBRANCH};protocol=git"
+BINUTILS_GIT_URI ?= "git://sourceware.org/git/binutils-gdb.git;branch=${SRCBRANCH};protocol=https"
 SRC_URI = "\
      ${BINUTILS_GIT_URI} \
      file://0004-Point-scripts-location-to-libdir.patch \
@@ -35,5 +35,6 @@ SRC_URI = "\
      file://0014-configure-remove-dependencies-on-gmp-and-mpfr-when-g.patch \
      file://0015-Remove-duplicate-pe-dll.o-entry-deom-targ_extra_ofil.patch \
      file://0016-CVE-2023-25586.patch \
+     file://fix-time64.patch \
 "
 S  = "${WORKDIR}/git"

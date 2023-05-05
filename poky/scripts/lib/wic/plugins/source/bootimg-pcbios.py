@@ -122,7 +122,7 @@ class BootimgPcbiosPlugin(SourcePlugin):
             syslinux_conf += "DEFAULT boot\n"
             syslinux_conf += "LABEL boot\n"
 
-            kernel = "/vmlinuz"
+            kernel = "/" + get_bitbake_var("KERNEL_IMAGETYPE")
             syslinux_conf += "KERNEL " + kernel + "\n"
 
             syslinux_conf += "APPEND label=boot root=%s %s\n" % \
@@ -155,8 +155,8 @@ class BootimgPcbiosPlugin(SourcePlugin):
                 kernel = "%s-%s.bin" % \
                     (get_bitbake_var("KERNEL_IMAGETYPE"), get_bitbake_var("INITRAMFS_LINK_NAME"))
 
-        cmds = ("install -m 0644 %s/%s %s/vmlinuz" %
-                (staging_kernel_dir, kernel, hdddir),
+        cmds = ("install -m 0644 %s/%s %s/%s" %
+                (staging_kernel_dir, kernel, hdddir, get_bitbake_var("KERNEL_IMAGETYPE")),
                 "install -m 444 %s/syslinux/ldlinux.sys %s/ldlinux.sys" %
                 (bootimg_dir, hdddir),
                 "install -m 0644 %s/syslinux/vesamenu.c32 %s/vesamenu.c32" %

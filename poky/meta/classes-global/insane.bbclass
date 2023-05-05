@@ -617,22 +617,14 @@ def check_32bit_symbols(path, packagename, d, elf, messages):
             # At this point, any symbol information is stripped into the debug
             # package, so that is the only place we will find them.
             elfpath = elfpath.replace('.debug/', '')
-            allowed = (
-                d.getVarFlag(
-                    'INSANE_SKIP:' + d.getVar('PN'), elfpath.replace('/', '_')
-                ) or ''
-            ).split()
-            usedapis -= set(allowed)
-            if usedapis:
+            allowed = "32bit-time" in (d.getVar('INSANE_SKIP') or '').split()
+            if not allowed:
                 msgformat = elfpath + " uses 32-bit api '%s'"
                 for sym in usedapis:
                     oe.qa.add_message(messages, '32bit-time', msgformat % sym)
                 oe.qa.add_message(
                     messages, '32bit-time',
-                    'Suppress with INSANE_SKIP:%s[%s] = "%s"' % (
-                        d.getVar('PN'), elfpath.replace('/', '_'),
-                        ' '.join(usedapis)
-                    )
+                    'Suppress with INSANE_SKIP = "32bit-time"'
                 )
 
 # Check license variables

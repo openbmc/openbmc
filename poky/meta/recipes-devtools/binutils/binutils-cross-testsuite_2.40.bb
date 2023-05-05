@@ -18,8 +18,8 @@ do_configure() {
 }
 
 # target depends
-DEPENDS += "virtual/${MLPREFIX}${TARGET_PREFIX}binutils"
-DEPENDS += "virtual/${MLPREFIX}${TARGET_PREFIX}gcc"
+DEPENDS += "virtual/${TARGET_PREFIX}binutils"
+DEPENDS += "virtual/${TARGET_PREFIX}gcc"
 DEPENDS += "virtual/${MLPREFIX}${TARGET_PREFIX}compilerlibs"
 DEPENDS += "virtual/${MLPREFIX}libc"
 

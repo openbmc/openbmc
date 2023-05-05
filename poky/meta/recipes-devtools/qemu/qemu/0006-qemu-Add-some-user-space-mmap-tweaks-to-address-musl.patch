@@ -23,11 +23,11 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org
  linux-user/mmap.c | 10 +++++++---
  1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/linux-user/mmap.c b/linux-user/mmap.c
-index c125031b9..e651834a5 100644
---- a/linux-user/mmap.c
-+++ b/linux-user/mmap.c
-@@ -749,12 +749,16 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
+Index: qemu-8.0.0/linux-user/mmap.c
+===================================================================
+--- qemu-8.0.0.orig/linux-user/mmap.c
++++ qemu-8.0.0/linux-user/mmap.c
+@@ -776,12 +776,16 @@ abi_long target_mremap(abi_ulong old_add
      int prot;
      void *host_addr;
  
@@ -47,6 +47,3 @@ index c125031b9..e651834a5 100644
          return -1;
      }
  
--- 
-2.30.2
-

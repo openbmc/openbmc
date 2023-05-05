@@ -1,4 +1,4 @@
-From 8a884f55bd1527baa82fab68c186ba546273860c Mon Sep 17 00:00:00 2001
+From 66d85d3f26e21cf7c38b27de0dcc42376f5d853e Mon Sep 17 00:00:00 2001
 From: Denys Dmytriyenko <denys@ti.com>
 Date: Sun, 6 Apr 2014 19:51:39 -0400
 Subject: [PATCH] Disable installing header file provided by another package
@@ -6,19 +6,20 @@ Subject: [PATCH] Disable installing header file provided by another package
 Signed-off-by: Denys Dmytriyenko <denys@ti.com>
 
 Upstream-Status: Inappropriate [ OE specific ]
+
 ---
  Makefile | 1 -
  1 file changed, 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index 5a080e0..bf02396 100644
+index d83aee6..c8d8ae5 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -33,7 +33,6 @@ install: modules_install
+@@ -36,7 +36,6 @@ install: modules_install
  
  modules_install:
  	$(MAKE) $(KERNEL_MAKE_OPTS) modules_install
 -	install -m 644 -D crypto/cryptodev.h $(DESTDIR)/$(includedir)/crypto/cryptodev.h
  
- clean:
- 	$(MAKE) $(KERNEL_MAKE_OPTS) clean
+ install_tests: tests
+ 	$(MAKE) -C tests install DESTDIR=$(PREFIX)

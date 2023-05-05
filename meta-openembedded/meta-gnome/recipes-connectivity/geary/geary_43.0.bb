@@ -35,6 +35,7 @@ inherit meson pkgconfig mime-xdg gtk-icon-cache gobject-introspection vala featu
 
 SRC_URI = " \
 	git://github.com/GNOME/geary.git;nobranch=1;protocol=https \
+	file://0001-meson-Use-PKG_CONFIG_SYSROOT_DIR-when-using-pkg-conf.patch \
 "
 
 S = "${WORKDIR}/git"

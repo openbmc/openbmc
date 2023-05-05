@@ -1,0 +1,203 @@
+From e99ee73e7660689203b83fab6b26c400191b145c Mon Sep 17 00:00:00 2001
+From: Andrew Geissler <geissonator@yahoo.com>
+Date: Fri, 24 Mar 2023 10:00:35 -0500
+Subject: [PATCH] xxhash: bump to v2.1.2
+
+There is a known issue in v2.1.1:
+
+  https://github.com/cespare/xxhash/issues/54
+
+Fix that issue by bumping to the version with the fix.
+
+This has been fixed in upstream etcd via the following:
+
+  https://github.com/etcd-io/etcd/commit/f0f77fc14e3bd4d94a953b490e810a06ef36695a
+
+But it was a pretty major upgrade so just take the one piece we need for
+the etcd v3.5 release tag.
+
+Signed-off-by: Andrew Geissler <geissonator@yahoo.com>
+---
+ client/v3/go.mod | 2 +-
+ client/v3/go.sum | 2 ++
+ etcdctl/go.mod   | 2 +-
+ etcdctl/go.sum   | 3 ++-
+ etcdutl/go.mod   | 2 +-
+ etcdutl/go.sum   | 3 ++-
+ go.mod           | 2 +-
+ go.sum           | 3 ++-
+ server/go.mod    | 2 +-
+ server/go.sum    | 3 ++-
+ tests/go.mod     | 2 +-
+ tests/go.sum     | 3 ++-
+ 12 files changed, 18 insertions(+), 11 deletions(-)
+
+diff --git a/client/v3/go.mod b/client/v3/go.mod
+index ec286316a..6e72eb067 100644
+--- a/client/v3/go.mod
++++ b/client/v3/go.mod
+@@ -15,7 +15,7 @@ require (
+ 
+ require (
+ 	github.com/beorn7/perks v1.0.1 // indirect
+-	github.com/cespare/xxhash/v2 v2.1.1 // indirect
++	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+ 	github.com/coreos/go-semver v0.3.0 // indirect
+ 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
+ 	github.com/gogo/protobuf v1.3.2 // indirect
+diff --git a/client/v3/go.sum b/client/v3/go.sum
+index 024078504..8866fabba 100644
+--- a/client/v3/go.sum
++++ b/client/v3/go.sum
+@@ -14,6 +14,8 @@ github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6r
+ github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
+ github.com/cespare/xxhash/v2 v2.1.1 h1:6MnRN8NT7+YBpUIWxHtefFZOKTAPgGjpQSxqLNn0+qY=
+ github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
++github.com/cespare/xxhash/v2 v2.1.2 h1:YRXhKfTDauu4ajMg1TPgFO5jnlC2HCbmLXMcTG5cbYE=
++github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
+ github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
+ github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
+ github.com/cncf/udpa/go v0.0.0-20201120205902-5459f2c99403/go.mod h1:WmhPx2Nbnhtbo57+VJT5O0JRkEi1Wbu0z5j0R8u5Hbk=
+diff --git a/etcdctl/go.mod b/etcdctl/go.mod
+index 2101ed78e..3a727b492 100644
+--- a/etcdctl/go.mod
++++ b/etcdctl/go.mod
+@@ -23,7 +23,7 @@ require (
+ 
+ require (
+ 	github.com/beorn7/perks v1.0.1 // indirect
+-	github.com/cespare/xxhash/v2 v2.1.1 // indirect
++	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+ 	github.com/coreos/go-semver v0.3.0 // indirect
+ 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
+ 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
+diff --git a/etcdctl/go.sum b/etcdctl/go.sum
+index 980aca775..765a77e72 100644
+--- a/etcdctl/go.sum
++++ b/etcdctl/go.sum
+@@ -38,8 +38,9 @@ github.com/certifi/gocertifi v0.0.0-20200922220541-2c3bb06c6054 h1:uH66TXeswKn5P
+ github.com/certifi/gocertifi v0.0.0-20200922220541-2c3bb06c6054/go.mod h1:sGbDF6GwGcLpkNXPUTkMRoywsNa/ol15pxFe6ERfguA=
+ github.com/cespare/xxhash v1.1.0 h1:a6HrQnmkObjyL+Gs60czilIUGqrzKutQD6XZog3p+ko=
+ github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
+-github.com/cespare/xxhash/v2 v2.1.1 h1:6MnRN8NT7+YBpUIWxHtefFZOKTAPgGjpQSxqLNn0+qY=
+ github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
++github.com/cespare/xxhash/v2 v2.1.2 h1:YRXhKfTDauu4ajMg1TPgFO5jnlC2HCbmLXMcTG5cbYE=
++github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
+ github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
+ github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
+ github.com/cncf/udpa/go v0.0.0-20201120205902-5459f2c99403/go.mod h1:WmhPx2Nbnhtbo57+VJT5O0JRkEi1Wbu0z5j0R8u5Hbk=
+diff --git a/etcdutl/go.mod b/etcdutl/go.mod
+index 24fd3f1bb..7f7ad8bc4 100644
+--- a/etcdutl/go.mod
++++ b/etcdutl/go.mod
+@@ -36,7 +36,7 @@ require (
+ 
+ require (
+ 	github.com/beorn7/perks v1.0.1 // indirect
+-	github.com/cespare/xxhash/v2 v2.1.1 // indirect
++	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+ 	github.com/coreos/go-semver v0.3.0 // indirect
+ 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
+ 	github.com/gogo/protobuf v1.3.2 // indirect
+diff --git a/etcdutl/go.sum b/etcdutl/go.sum
+index 7d3675855..4c894740e 100644
+--- a/etcdutl/go.sum
++++ b/etcdutl/go.sum
+@@ -37,8 +37,9 @@ github.com/certifi/gocertifi v0.0.0-20200922220541-2c3bb06c6054 h1:uH66TXeswKn5P
+ github.com/certifi/gocertifi v0.0.0-20200922220541-2c3bb06c6054/go.mod h1:sGbDF6GwGcLpkNXPUTkMRoywsNa/ol15pxFe6ERfguA=
+ github.com/cespare/xxhash v1.1.0 h1:a6HrQnmkObjyL+Gs60czilIUGqrzKutQD6XZog3p+ko=
+ github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
+-github.com/cespare/xxhash/v2 v2.1.1 h1:6MnRN8NT7+YBpUIWxHtefFZOKTAPgGjpQSxqLNn0+qY=
+ github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
++github.com/cespare/xxhash/v2 v2.1.2 h1:YRXhKfTDauu4ajMg1TPgFO5jnlC2HCbmLXMcTG5cbYE=
++github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
+ github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
+ github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
+ github.com/cncf/udpa/go v0.0.0-20201120205902-5459f2c99403/go.mod h1:WmhPx2Nbnhtbo57+VJT5O0JRkEi1Wbu0z5j0R8u5Hbk=
+diff --git a/go.mod b/go.mod
+index 3df2c43e1..f794ab8d2 100644
+--- a/go.mod
++++ b/go.mod
+@@ -39,7 +39,7 @@ require (
+ require (
+ 	github.com/beorn7/perks v1.0.1 // indirect
+ 	github.com/cenkalti/backoff/v4 v4.1.1 // indirect
+-	github.com/cespare/xxhash/v2 v2.1.1 // indirect
++	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+ 	github.com/cockroachdb/datadriven v1.0.1-0.20220214170620-9913f5bc19b7 // indirect
+ 	github.com/cockroachdb/errors v1.9.0 // indirect
+ 	github.com/coreos/go-semver v0.3.0 // indirect
+diff --git a/go.sum b/go.sum
+index 7bb455e8b..e2e07cfe4 100644
+--- a/go.sum
++++ b/go.sum
+@@ -50,8 +50,9 @@ github.com/certifi/gocertifi v0.0.0-20191021191039-0944d244cd40/go.mod h1:sGbDF6
+ github.com/certifi/gocertifi v0.0.0-20200922220541-2c3bb06c6054/go.mod h1:sGbDF6GwGcLpkNXPUTkMRoywsNa/ol15pxFe6ERfguA=
+ github.com/cespare/xxhash v1.1.0 h1:a6HrQnmkObjyL+Gs60czilIUGqrzKutQD6XZog3p+ko=
+ github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
+-github.com/cespare/xxhash/v2 v2.1.1 h1:6MnRN8NT7+YBpUIWxHtefFZOKTAPgGjpQSxqLNn0+qY=
+ github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
++github.com/cespare/xxhash/v2 v2.1.2 h1:YRXhKfTDauu4ajMg1TPgFO5jnlC2HCbmLXMcTG5cbYE=
++github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
+ github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
+ github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
+ github.com/cncf/udpa/go v0.0.0-20201120205902-5459f2c99403/go.mod h1:WmhPx2Nbnhtbo57+VJT5O0JRkEi1Wbu0z5j0R8u5Hbk=
+diff --git a/server/go.mod b/server/go.mod
+index 46dcfad08..ab635e592 100644
+--- a/server/go.mod
++++ b/server/go.mod
+@@ -47,7 +47,7 @@ require (
+ require (
+ 	github.com/beorn7/perks v1.0.1 // indirect
+ 	github.com/cenkalti/backoff/v4 v4.1.1 // indirect
+-	github.com/cespare/xxhash/v2 v2.1.1 // indirect
++	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+ 	github.com/davecgh/go-spew v1.1.1 // indirect
+ 	github.com/gorilla/websocket v1.4.2 // indirect
+ 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
+diff --git a/server/go.sum b/server/go.sum
+index 8f78c3864..c4fbfac25 100644
+--- a/server/go.sum
++++ b/server/go.sum
+@@ -39,8 +39,9 @@ github.com/certifi/gocertifi v0.0.0-20200922220541-2c3bb06c6054 h1:uH66TXeswKn5P
+ github.com/certifi/gocertifi v0.0.0-20200922220541-2c3bb06c6054/go.mod h1:sGbDF6GwGcLpkNXPUTkMRoywsNa/ol15pxFe6ERfguA=
+ github.com/cespare/xxhash v1.1.0 h1:a6HrQnmkObjyL+Gs60czilIUGqrzKutQD6XZog3p+ko=
+ github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
+-github.com/cespare/xxhash/v2 v2.1.1 h1:6MnRN8NT7+YBpUIWxHtefFZOKTAPgGjpQSxqLNn0+qY=
+ github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
++github.com/cespare/xxhash/v2 v2.1.2 h1:YRXhKfTDauu4ajMg1TPgFO5jnlC2HCbmLXMcTG5cbYE=
++github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
+ github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
+ github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
+ github.com/cncf/udpa/go v0.0.0-20201120205902-5459f2c99403/go.mod h1:WmhPx2Nbnhtbo57+VJT5O0JRkEi1Wbu0z5j0R8u5Hbk=
+diff --git a/tests/go.mod b/tests/go.mod
+index b578bbf02..45820817c 100644
+--- a/tests/go.mod
++++ b/tests/go.mod
+@@ -46,7 +46,7 @@ require (
+ require (
+ 	github.com/beorn7/perks v1.0.1 // indirect
+ 	github.com/cenkalti/backoff/v4 v4.1.1 // indirect
+-	github.com/cespare/xxhash/v2 v2.1.1 // indirect
++	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+ 	github.com/coreos/go-semver v0.3.0 // indirect
+ 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
+ 	github.com/creack/pty v1.1.11 // indirect
+diff --git a/tests/go.sum b/tests/go.sum
+index 203bf65d6..46c18c31f 100644
+--- a/tests/go.sum
++++ b/tests/go.sum
+@@ -39,8 +39,9 @@ github.com/certifi/gocertifi v0.0.0-20200922220541-2c3bb06c6054 h1:uH66TXeswKn5P
+ github.com/certifi/gocertifi v0.0.0-20200922220541-2c3bb06c6054/go.mod h1:sGbDF6GwGcLpkNXPUTkMRoywsNa/ol15pxFe6ERfguA=
+ github.com/cespare/xxhash v1.1.0 h1:a6HrQnmkObjyL+Gs60czilIUGqrzKutQD6XZog3p+ko=
+ github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
+-github.com/cespare/xxhash/v2 v2.1.1 h1:6MnRN8NT7+YBpUIWxHtefFZOKTAPgGjpQSxqLNn0+qY=
+ github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
++github.com/cespare/xxhash/v2 v2.1.2 h1:YRXhKfTDauu4ajMg1TPgFO5jnlC2HCbmLXMcTG5cbYE=
++github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
+ github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
+ github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
+ github.com/cncf/udpa/go v0.0.0-20201120205902-5459f2c99403/go.mod h1:WmhPx2Nbnhtbo57+VJT5O0JRkEi1Wbu0z5j0R8u5Hbk=
+-- 
+2.37.1 (Apple Git-137.1)
+

@@ -182,7 +182,7 @@ AlmaLinux Packages
 Here are the packages needed to build an image on a headless system
 with a supported AlmaLinux distribution::
 
-   $ sudo dnf install &ALMALINUX8_HOST_PACKAGES_ESSENTIAL;
+   $ sudo dnf install &ALMALINUX_HOST_PACKAGES_ESSENTIAL;
 
 .. note::
 

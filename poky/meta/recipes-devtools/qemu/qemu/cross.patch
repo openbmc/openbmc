@@ -14,19 +14,19 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
  configure | 4 ----
  1 file changed, 4 deletions(-)
 
-Index: qemu-7.1.0/configure
+Index: qemu-8.0.0/configure
 ===================================================================
---- qemu-7.1.0.orig/configure
-+++ qemu-7.1.0/configure
-@@ -2710,7 +2710,6 @@ if test "$skip_meson" = no; then
-   echo "strip = [$(meson_quote $strip)]" >> $cross
+--- qemu-8.0.0.orig/configure
++++ qemu-8.0.0/configure
+@@ -2590,7 +2590,6 @@ if test "$skip_meson" = no; then
    echo "widl = [$(meson_quote $widl)]" >> $cross
    echo "windres = [$(meson_quote $windres)]" >> $cross
+   echo "windmc = [$(meson_quote $windmc)]" >> $cross
 -  if test "$cross_compile" = "yes"; then
      cross_arg="--cross-file config-meson.cross"
      echo "[host_machine]" >> $cross
      echo "system = '$targetos'" >> $cross
-@@ -2728,9 +2727,6 @@ if test "$skip_meson" = no; then
+@@ -2608,9 +2607,6 @@ if test "$skip_meson" = no; then
      else
          echo "endian = 'little'" >> $cross
      fi

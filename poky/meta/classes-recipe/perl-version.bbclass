@@ -26,9 +26,6 @@ def get_perl_version(d):
             return m.group(1)
     return None
 
-PERLVERSION := "${@get_perl_version(d)}"
-PERLVERSION[vardepvalue] = ""
-
 
 # Determine the staged arch of perl from the perl configuration file
 # Assign vardepvalue, because otherwise signature is changed before and after
@@ -48,9 +45,6 @@ def get_perl_arch(d):
         if m:
             return m.group(1)
     return None
-
-PERLARCH := "${@get_perl_arch(d)}"
-PERLARCH[vardepvalue] = ""
 
 # Determine the staged arch of perl-native from the perl configuration file
 # Assign vardepvalue, because otherwise signature is changed before and after

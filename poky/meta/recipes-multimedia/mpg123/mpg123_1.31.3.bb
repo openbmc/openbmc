@@ -35,6 +35,8 @@ PACKAGECONFIG[sdl] = ",,libsdl2"
 AUDIOMODS += "${@bb.utils.filter('PACKAGECONFIG', 'alsa esd jack openal portaudio sdl', d)}"
 AUDIOMODS += "${@bb.utils.contains('PACKAGECONFIG', 'pulseaudio', 'pulse', '', d)}"
 
+CACHED_CONFIGUREVARS:libc-musl = "ac_cv_sys_file_offset_bits=no"
+
 EXTRA_OECONF = " \
     --enable-shared \
     --enable-largefile \

@@ -1,0 +1,49 @@
+From a57d78a94e7cbc8cfa468b58c7d4e23668c05fec Mon Sep 17 00:00:00 2001
+From: Andrew Geissler <geissonator@yahoo.com>
+Date: Tue, 2 May 2023 13:36:36 -0600
+Subject: [PATCH] test_lib.sh: remove gobin requirement during build
+
+This tool is installed as a part of the build process (build.sh sources
+test_lib.sh)
+
+This tool has been removed in the latest etcd main branch. Installing it
+as a part of the build process breaks bitbake (it doesn't allow
+downloading of packages once in the build steps).
+
+This tool is not needed to build etcd (it appears to be used for some
+optional test cases).
+
+Signed-off-by: Andrew Geissler <geissonator@yahoo.com>
+---
+ scripts/test_lib.sh | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/test_lib.sh b/scripts/test_lib.sh
+index 44b9d2895..da97a9c26 100644
+--- a/scripts/test_lib.sh
++++ b/scripts/test_lib.sh
+@@ -140,7 +140,7 @@ function run {
+   command=("${command[@]@Q}")
+   if [[ "${rpath}" != "." && "${rpath}" != "" ]]; then
+     repro="(cd ${rpath} && ${command[*]})"
+-  else 
++  else
+     repro="${command[*]}"
+   fi
+ 
+@@ -305,7 +305,11 @@ function tool_exists {
+ 
+ # Ensure gobin is available, as it runs majority of the tools
+ if ! command -v "gobin" >/dev/null; then
+-    run env GO111MODULE=off go get github.com/myitcv/gobin || exit 1
++    # This script is run as a part of the build process. Installing packages
++    # during the build process is not allowed in bitbake.
++    # Gobin is deprecated and not needed when building in the bitbake env
++    echo "Not installing gobin in bitbake env"
++    # run env GO111MODULE=off go get github.com/myitcv/gobin || exit 1
+ fi
+ 
+ # tool_get_bin [tool] - returns absolute path to a tool binary (or returns error)
+-- 
+2.37.1 (Apple Git-137.1)
+

@@ -16,11 +16,11 @@ Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
  linux-user/syscall.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index f65045efe..340e0c6f0 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -113,7 +113,9 @@
+Index: qemu-8.0.0/linux-user/syscall.c
+===================================================================
+--- qemu-8.0.0.orig/linux-user/syscall.c
++++ qemu-8.0.0/linux-user/syscall.c
+@@ -115,7 +115,9 @@
  #include <linux/blkpg.h>
  #include <netpacket/packet.h>
  #include <linux/netlink.h>
@@ -30,6 +30,3 @@ index f65045efe..340e0c6f0 100644
  #include <linux/rtc.h>
  #include <sound/asound.h>
  #ifdef HAVE_BTRFS_H
--- 
-2.30.2
-

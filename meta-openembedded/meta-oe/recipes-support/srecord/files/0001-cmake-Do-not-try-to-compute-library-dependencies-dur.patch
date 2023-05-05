@@ -1,0 +1,45 @@
+From 756169511ed13e4c7adc06c7c108d365ac66b9f8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 30 Apr 2023 22:58:47 -0700
+Subject: [PATCH] cmake: Do not try to compute library dependencies during
+ install
+
+Since we are cross-building the dependencies are not in final install
+location but in a staging area in recipe specific sysroot and it wont be
+able to resolve the libraries all the time
+
+Fixes
+| CMake Error at srec_cat/cmake_install.cmake:66 (file):
+|   file Could not resolve runtime dependencies:
+|
+|     libc++.so.1
+|     libc.so
+| Call Stack (most recent call first):
+|   cmake_install.cmake:52 (include)
+
+Upstream-Status: Inappropriate [OE-specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ etc/packaging.cmake | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/etc/packaging.cmake b/etc/packaging.cmake
+index ee2a32c..9804fd8 100644
+--- a/etc/packaging.cmake
++++ b/etc/packaging.cmake
+@@ -45,12 +45,6 @@ FUNCTION(INSTALL_SRECORD_EXECUTABLE_TARGET target)
+ 
+   install(IMPORTED_RUNTIME_ARTIFACTS ${target}
+     RUNTIME_DEPENDENCY_SET ${PROJECT_NAME}_dlls COMPONENT ${target})
+-  install(RUNTIME_DEPENDENCY_SET ${PROJECT_NAME}_dlls
+-    PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-"
+-    POST_EXCLUDE_REGEXES ".*system32/.*\\.dll"
+-    DIRECTORIES ${DLL_SEARCH_DIRS}
+-    COMPONENT ${target}
+-    )
+ ENDFUNCTION()
+ 
+ # Packaging
+-- 
+2.40.1
+

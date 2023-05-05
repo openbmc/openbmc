@@ -14,7 +14,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 10 insertions(+), 23 deletions(-)
 
 diff --git a/ftparchive/apt-ftparchive.cc b/ftparchive/apt-ftparchive.cc
-index 87ce9153c..56fdc2246 100644
+index 0f6587281..0a253b12b 100644
 --- a/ftparchive/apt-ftparchive.cc
 +++ b/ftparchive/apt-ftparchive.cc
 @@ -48,6 +48,11 @@
@@ -33,19 +33,19 @@ index 87ce9153c..56fdc2246 100644
     bool SrcDone;
     time_t ContentsMTime;
     
--   struct ContentsCompare : public binary_function<PackageMap,PackageMap,bool>
+-   struct ContentsCompare
 -   {
 -      inline bool operator() (const PackageMap &x,const PackageMap &y)
 -      {return x.ContentsMTime < y.ContentsMTime;};
 -   };
 -    
--   struct DBCompare : public binary_function<PackageMap,PackageMap,bool>
+-   struct DBCompare
 -   {
 -      inline bool operator() (const PackageMap &x,const PackageMap &y)
 -      {return x.BinCacheDB < y.BinCacheDB;};
 -   };  
 -
--   struct SrcDBCompare : public binary_function<PackageMap,PackageMap,bool>
+-   struct SrcDBCompare
 -   {
 -      inline bool operator() (const PackageMap &x,const PackageMap &y)
 -      {return x.SrcCacheDB < y.SrcCacheDB;};

@@ -1,0 +1,85 @@
+From d75193671c235e4b3bd02417b40516f3bfeb55b6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 30 Apr 2023 14:09:21 -0700
+Subject: [PATCH] Disable doxygen
+
+doxygen (dot) detect does not work in cross environment here with cmake
+
+Upstream-Status: Inappropriate [Cross-compile specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ etc/configure.cmake    | 2 +-
+ srecord/CMakeLists.txt | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+--- a/etc/configure.cmake
++++ b/etc/configure.cmake
+@@ -103,32 +103,3 @@ option(_TANDEM_SOURCE ON)
+ # Enable general extensions on Solaris.
+ option(__EXTENSIONS__ ON)
+ 
+-# Doxygen configuration
+-find_package(Doxygen REQUIRED doxygen dot)
+-
+-set(DOXYGEN_DOT_GRAPH_MAX_NODES 150)
+-set(DOXYGEN_ALPHABETICAL_INDEX NO)
+-set(DOXYGEN_BUILTIN_STL_SUPPORT YES)
+-set(DOXYGEN_CASE_SENSE_NAMES NO)
+-set(DOXYGEN_CLASS_DIAGRAMS YES)
+-set(DOXYGEN_DISTRIBUTE_GROUP_DOC YES)
+-set(DOXYGEN_EXCLUDE bin)
+-set(DOXYGEN_EXTRACT_ALL YES)
+-set(DOXYGEN_EXTRACT_LOCAL_CLASSES NO)
+-set(DOXYGEN_FILE_PATTERNS *.h)
+-set(DOXYGEN_GENERATE_TREEVIEW YES)
+-set(DOXYGEN_HIDE_FRIEND_COMPOUNDS YES)
+-set(DOXYGEN_HIDE_IN_BODY_DOCS YES)
+-set(DOXYGEN_HIDE_UNDOC_CLASSES YES)
+-set(DOXYGEN_HIDE_UNDOC_MEMBERS YES)
+-set(DOXYGEN_JAVADOC_AUTOBRIEF YES)
+-set(DOXYGEN_QT_AUTOBRIEF YES)
+-set(DOXYGEN_QUIET YES)
+-set(DOXYGEN_RECURSIVE YES)
+-set(DOXYGEN_REFERENCED_BY_RELATION YES)
+-set(DOXYGEN_REFERENCES_RELATION YES)
+-set(DOXYGEN_SORT_BY_SCOPE_NAME YES)
+-set(DOXYGEN_SORT_MEMBER_DOCS NO)
+-set(DOXYGEN_SOURCE_BROWSER YES)
+-set(DOXYGEN_STRIP_CODE_COMMENTS NO)
+-set(DOXYGEN_GENERATE_HTML YES)
+--- a/srecord/CMakeLists.txt
++++ b/srecord/CMakeLists.txt
+@@ -34,9 +34,9 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE
+         FILES_MATCHING PATTERN "*.h")
+ 
+ # Install the Doxygen output for the website
+-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html
+-        DESTINATION ${CMAKE_INSTALL_DOCDIR}/htdocs/srecord
+- 	COMPONENT website)
++#install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html
++#        DESTINATION ${CMAKE_INSTALL_DOCDIR}/htdocs/srecord
++# 	COMPONENT website)
+ 
+ # Generate config.h to suit local environment
+ configure_file(config.h.in config.h @ONLY)
+@@ -44,6 +44,6 @@ configure_file(patchlevel.h.in patchleve
+ include_directories(${CMAKE_CURRENT_BINARY_DIR})
+ 
+ # Generate doxygen content
+-doxygen_add_docs(doxygen
+-                 ${LIB_SRECORD_HDR}
+-		 ALL)
++#doxygen_add_docs(doxygen
++#                 ${LIB_SRECORD_HDR}
++#		 ALL)
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -55,7 +55,7 @@ enable_testing()
+ add_subdirectory(test)
+ 
+ # Documentation & Man Pages
+-add_subdirectory(doc)
++# add_subdirectory(doc)
+ 
+ # Package SRecord
+ include(CPack)

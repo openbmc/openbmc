@@ -18,10 +18,10 @@ Cc: Michael S. Tsirkin <mst@redhat.com>
  util/mmap-alloc.c | 10 +++++++---
  1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-index 893d86435..86d3cda24 100644
---- a/util/mmap-alloc.c
-+++ b/util/mmap-alloc.c
+Index: qemu-8.0.0/util/mmap-alloc.c
+===================================================================
+--- qemu-8.0.0.orig/util/mmap-alloc.c
++++ qemu-8.0.0/util/mmap-alloc.c
 @@ -10,14 +10,18 @@
   * later.  See the COPYING file in the top-level directory.
   */
@@ -44,6 +44,3 @@ index 893d86435..86d3cda24 100644
  #include "qemu/mmap-alloc.h"
  #include "qemu/host-utils.h"
  #include "qemu/cutils.h"
--- 
-2.30.2
-

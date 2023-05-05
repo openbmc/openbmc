@@ -37,7 +37,7 @@ GOMIPS:mips:class-target[export] = "1"
 
 DEPENDS_GOLANG:class-target = "virtual/${TUNE_PKGARCH}-go virtual/${TARGET_PREFIX}go-runtime"
 DEPENDS_GOLANG:class-native = "go-native"
-DEPENDS_GOLANG:class-nativesdk = "virtual/${TARGET_PREFIX}go-crosssdk virtual/${TARGET_PREFIX}go-runtime"
+DEPENDS_GOLANG:class-nativesdk = "virtual/${TARGET_PREFIX}go virtual/${TARGET_PREFIX}go-runtime"
 
 DEPENDS:append = " ${DEPENDS_GOLANG}"
 

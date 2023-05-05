@@ -16,6 +16,7 @@ do_configure[noexec] = "1"
 #                     HOME_URL SUPPORT_URL BUG_REPORT_URL
 OS_RELEASE_FIELDS = "\
     ID ID_LIKE NAME VERSION VERSION_ID VERSION_CODENAME PRETTY_NAME \
+    CPE_NAME \
 "
 OS_RELEASE_UNQUOTED_FIELDS = "ID VERSION_ID VARIANT_ID"
 
@@ -25,6 +26,20 @@ VERSION = "${DISTRO_VERSION}${@' (%s)' % DISTRO_CODENAME if 'DISTRO_CODENAME' in
 VERSION_ID = "${DISTRO_VERSION}"
 VERSION_CODENAME = "${DISTRO_CODENAME}"
 PRETTY_NAME = "${DISTRO_NAME} ${VERSION}"
+
+# The vendor field is hardcoded to "openembedded" deliberately. We'd
+# advise developers leave it as this value to clearly identify the
+# underlying build environment from which the OS was constructed. We
+# understand people will want to identify themselves as the people who
+# built the image, we'd suggest using the DISTRO element to do this, so
+# that is customisable.
+# This end result combines to mean systems can be traced back to both who
+# built them and which system was used, which is ultimately the goal of
+# the CPE.
+
+CPE_DISTRO ??= "${DISTRO}"
+CPE_NAME="cpe:/o:openembedded:${CPE_DISTRO}:${VERSION_ID}"
+
 BUILD_ID ?= "${DATETIME}"
 BUILD_ID[vardepsexclude] = "DATETIME"
 

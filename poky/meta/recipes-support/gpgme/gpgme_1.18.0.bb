@@ -69,6 +69,8 @@ FILES:python3-gpg = "${PYTHON_SITEPACKAGES_DIR}/*"
 FILES:${PN}-dev += "${datadir}/common-lisp/source/gpgme/*"
 
 CFLAGS:append:libc-musl = " -D__error_t_defined "
+CACHED_CONFIGUREVARS:libc-musl = "ac_cv_sys_file_offset_bits=no"
+
 do_configure:prepend () {
 	# Else these could be used in preference to those in aclocal-copy
 	rm -f ${S}/m4/gpg-error.m4

@@ -12,7 +12,7 @@ DEPENDS = "gtk+3 startup-notification dbus"
 SECTION = "x11/wm"
 
 SRCREV = "0fd6a0c3f3b7bbf4f4b46190d71f7aef35d6bbfd"
-SRC_URI = "git://git.yoctoproject.org/${BPN}-2;branch=master \
+SRC_URI = "git://git.yoctoproject.org/${BPN}-2;branch=master;protocol=https \
            file://vfolders/ \
            "
 

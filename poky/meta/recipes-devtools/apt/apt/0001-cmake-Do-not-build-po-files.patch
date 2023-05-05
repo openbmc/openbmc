@@ -15,16 +15,18 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 7 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 3c8ec3f..821a24f 100644
+index be157a55f..54163ae6c 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -245,13 +245,6 @@ add_subdirectory(ftparchive)
+@@ -252,15 +252,6 @@ add_subdirectory(ftparchive)
  add_subdirectory(methods)
  add_subdirectory(test)
  
 -if (USE_NLS)
 -add_subdirectory(po)
+-endif()
 -
+-if(TARGET update-po AND TARGET update-po4a)
 -# Link update-po4a into the update-po target
 -add_dependencies(update-po update-po4a)
 -endif()
@@ -32,6 +34,3 @@ index 3c8ec3f..821a24f 100644
  # Create our directories.
  install_empty_directories(
    ${CONF_DIR}/apt.conf.d
--- 
-2.31.0
-

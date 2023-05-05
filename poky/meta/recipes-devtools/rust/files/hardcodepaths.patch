@@ -4,12 +4,11 @@ to resolve these issues properly upstream.
 
 Upstream-Status: Inappropriate [patches need rework]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
 
-Index: rustc-1.66.0-src/compiler/rustc_codegen_llvm/src/context.rs
-===================================================================
---- rustc-1.66.0-src.orig/compiler/rustc_codegen_llvm/src/context.rs
-+++ rustc-1.66.0-src/compiler/rustc_codegen_llvm/src/context.rs
-@@ -160,46 +160,6 @@ pub unsafe fn create_module<'ll>(
+--- rustc-1.69.0-src/compiler/rustc_codegen_llvm/src/context.rs.orig	2023-04-21 08:38:23.092458478 +0100
++++ rustc-1.69.0-src/compiler/rustc_codegen_llvm/src/context.rs	2023-04-21 08:39:00.266819755 +0100
+@@ -156,46 +156,6 @@
          }
      }
  
@@ -39,7 +38,7 @@ Index: rustc-1.66.0-src/compiler/rustc_codegen_llvm/src/context.rs
 -        //
 -        // FIXME(#34960)
 -        let cfg_llvm_root = option_env!("CFG_LLVM_ROOT").unwrap_or("");
--        let custom_llvm_used = cfg_llvm_root.trim() != "";
+-        let custom_llvm_used = !cfg_llvm_root.trim().is_empty();
 -
 -        if !custom_llvm_used && target_data_layout != llvm_data_layout {
 -            bug!(

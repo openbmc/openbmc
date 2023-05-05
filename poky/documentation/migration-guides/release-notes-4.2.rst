@@ -8,37 +8,34 @@ New Features / Enhancements in 4.2
 
 -  Linux kernel 6.1, glibc 2.37 and ~350 other recipe upgrades
 
--  Python 3.8 is the minimum Python version required on the build host.
+-  Python 3.8+ and GCC 8.0+ are now the minimum required versions on the build host.
    For host distributions that do not provide it, this is included as part of the
    :term:`buildtools` tarball.
 
 -  BitBake in this release now supports a new ``addpylib`` directive to enable
-   Python libraries within layers.
+   Python libraries within layers. For more information,
+   see :ref:`bitbake-user-manual/bitbake-user-manual-metadata:extending python library code`.
 
    This directive should be added to your layer configuration
    as in the below example from ``meta/conf/layer.conf``::
 
       addpylib ${LAYERDIR}/lib oe
 
--  BitBake has seen multiple internal changes that may impact
+-  BitBake has seen multiple internal changes that may improve
    memory and disk usage as well as parsing time, in particular:
 
    -  BitBake's Cooker server is now multithreaded.
+
+   -  Ctrl+C can now be used to interrupt some long-running operations
+      that previously ignored it.
 
    -  BitBake's cache has been extended to include more hash
       debugging data, but has also been optimized to :yocto_git:`compress
       cache data <https://git.yoctoproject.org/poky/commit/?h=mickledore&id=7d010055e2af3294e17db862f42664ca689a9356>`.
 
-   -  BitBake's Cooker server :yocto_git:`can now be pinged
-      </poky/commit/?h=mickledore&id=26f255da09>`
-      from the UI.
-
--  Architecture-specific enhancements:
-
-   -  This release adds initial support for the
-      :wikipedia:`LoongArch <Loongson#LoongArch>`
-      (``loongarch64``) architecture, though there is no testing for it yet.
-
+   -  BitBake's UI will now ping the server regularly to ensure
+      it is still alive.
+ 
 -  New variables:
 
    -  :term:`VOLATILE_TMP_DIR` allows to specify
@@ -70,27 +67,6 @@ New Features / Enhancements in 4.2
 
    -  Use built-in Rust targets for ``-native`` builds to save several
       minutes building the Rust toolchain
-
--  Python 3.8+ and GCC 8.0+ are now the minimum required versions on the build host
-
--  BitBake in this release now supports a new ``addpylib`` directive to enable
-   Python libraries within layers. For more information,
-   see :ref:`bitbake-user-manual/bitbake-user-manual-metadata:extending python library code`.
-
--  BitBake has seen multiple internal changes that may improve
-   memory and disk usage as well as parsing time, in particular:
-
-   -  BitBake's Cooker server is now multithreaded.
-
-   -  Ctrl+C can now be used to interrupt some long-running operations
-      that previously ignored it.
-
-   -  BitBake's cache has been extended to include more hash
-      debugging data, but has also been optimized to :yocto_git:`compress
-      cache data <https://git.yoctoproject.org/poky/commit/?h=mickledore&id=7d010055e2af3294e17db862f42664ca689a9356>`.
-
-   -  BitBake's UI will now ping the server regularly to ensure
-      it is still alive.
 
 -  Architecture-specific enhancements:
 
@@ -227,7 +203,6 @@ New Features / Enhancements in 4.2
    - ``base-passwd``
    - ``cronie``
    - ``cups``
-   - ``cups``
    - ``curl``
    - ``file``
    - ``gstreamer1.0-plugins-good``
@@ -309,9 +284,6 @@ New Features / Enhancements in 4.2
       -  ``patch-fuzz`` is now in :term:`ERROR_QA` by default, and actually stops the build
 
    -  Many packages were updated to add large file support.
-
-   -  New :term:`VOLATILE_TMP_DIR` variable allows to specify whether ``/tmp``
-      should be on persistent storage or in RAM.
 
    -  ``vulkan-loader``: allow headless targets to build the loader
    -  ``dhcpcd``: fix to work with systemd

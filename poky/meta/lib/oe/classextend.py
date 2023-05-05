@@ -32,6 +32,9 @@ class ClassExtender(object):
         if name.endswith("-" + self.extname):
             name = name.replace("-" + self.extname, "")
         if name.startswith("virtual/"):
+            # Assume large numbers of dashes means a triplet is present and we don't need to convert
+            if name.count("-") >= 3 and name.endswith(("-go", "-binutils", "-gcc", "-g++")):
+                return name
             subs = name.split("/", 1)[1]
             if not subs.startswith(self.extname):
                 return "virtual/" + self.extname + "-" + subs
@@ -150,9 +153,7 @@ class NativesdkClassExtender(ClassExtender):
     def map_depends(self, dep):
         if dep.startswith(self.extname):
             return dep
-        if dep.endswith(("-gcc", "-g++")):
-            return dep + "-crosssdk"
-        elif dep.endswith(("-native", "-native-runtime")) or ('nativesdk-' in dep) or ('-cross-' in dep) or ('-crosssdk-' in dep):
+        if dep.endswith(("-native", "-native-runtime")) or ('nativesdk-' in dep) or ('-cross-' in dep) or ('-crosssdk-' in dep):
             return dep
         else:
             return self.extend_name(dep)

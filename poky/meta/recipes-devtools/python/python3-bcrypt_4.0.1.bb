@@ -7,11 +7,13 @@ DEPENDS += "${PYTHON_PN}-cffi-native"
 
 SRC_URI[sha256sum] = "27d375903ac8261cfe4047f6709d16f7d18d39b1ec92aaf72af989552a650ebd"
 
-inherit pypi python_setuptools3_rust ptest cargo-update-recipe-crates
+inherit pypi python_setuptools3_rust ptest-cargo cargo-update-recipe-crates
 
 SRC_URI += " \
 	file://run-ptest \
 "
+
+CARGO_SRC_DIR = "src/_bcrypt"
 
 require ${BPN}-crates.inc
 

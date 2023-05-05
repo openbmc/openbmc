@@ -38,4 +38,4 @@ RDEPENDS:${PN}-tests += " \
 
 INSANE_SKIP:${PN}-tests += "dev-deps"
 
-BBCLASSEXTEND = "native nativesdk"
+BBCLASSEXTEND = "native"

@@ -12,10 +12,14 @@ PE = "1"
 
 SRCREV = "5ff839680134437dbf4678f3d0c7b371d84f4964"
 
-SRC_URI = "git://github.com/lz4/lz4.git;branch=release;protocol=https"
+SRC_URI = "git://github.com/lz4/lz4.git;branch=release;protocol=https \
+	   file://run-ptest \
+	   "
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>.*)"
 
 S = "${WORKDIR}/git"
+
+inherit ptest
 
 # Fixed in r118, which is larger than the current version.
 CVE_CHECK_IGNORE += "CVE-2014-4715"
@@ -27,3 +31,17 @@ do_install() {
 }
 
 BBCLASSEXTEND = "native nativesdk"
+
+RDEPENDS:${PN}-ptest += "bash"
+
+do_compile_ptest() {
+        oe_runmake -C ${B}/tests/
+}
+
+do_install_ptest() {
+	install -d ${D}${PTEST_PATH}/tests/
+	install --mode=755 ${B}/tests/frametest ${D}${PTEST_PATH}/tests/
+	sed -i "s#@PTEST_PATH@#${PTEST_PATH}#g" ${D}${PTEST_PATH}/run-ptest
+
+}
+

@@ -19,10 +19,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  library/std/src/sys/unix/fs.rs | 27 ++++++++++++++++++++-------
  3 files changed, 38 insertions(+), 12 deletions(-)
 
-diff --git a/library/std/src/os/linux/fs.rs b/library/std/src/os/linux/fs.rs
-index 479bbcc17a8..ab0b2a3eda3 100644
---- a/library/std/src/os/linux/fs.rs
-+++ b/library/std/src/os/linux/fs.rs
+Index: rustc-1.69.0-src/library/std/src/os/linux/fs.rs
+===================================================================
+--- rustc-1.69.0-src.orig/library/std/src/os/linux/fs.rs
++++ rustc-1.69.0-src/library/std/src/os/linux/fs.rs
 @@ -329,7 +329,14 @@ pub trait MetadataExt {
  impl MetadataExt for Metadata {
      #[allow(deprecated)]
@@ -39,11 +39,11 @@ index 479bbcc17a8..ab0b2a3eda3 100644
      }
      fn st_dev(&self) -> u64 {
          self.as_inner().as_inner().st_dev as u64
-diff --git a/library/std/src/sys/unix/fd.rs b/library/std/src/sys/unix/fd.rs
-index dbaa3c33e2e..5d31557bd11 100644
---- a/library/std/src/sys/unix/fd.rs
-+++ b/library/std/src/sys/unix/fd.rs
-@@ -115,9 +115,12 @@ pub fn read_to_end(&self, buf: &mut Vec<u8>) -> io::Result<usize> {
+Index: rustc-1.69.0-src/library/std/src/sys/unix/fd.rs
+===================================================================
+--- rustc-1.69.0-src.orig/library/std/src/sys/unix/fd.rs
++++ rustc-1.69.0-src/library/std/src/sys/unix/fd.rs
+@@ -121,9 +121,12 @@ impl FileDesc {
      }
  
      pub fn read_at(&self, buf: &mut [u8], offset: u64) -> io::Result<usize> {
@@ -58,7 +58,7 @@ index dbaa3c33e2e..5d31557bd11 100644
          use libc::pread64;
  
          unsafe {
-@@ -181,9 +184,12 @@ pub fn is_write_vectored(&self) -> bool {
+@@ -276,9 +279,12 @@ impl FileDesc {
      }
  
      pub fn write_at(&self, buf: &[u8], offset: u64) -> io::Result<usize> {
@@ -73,11 +73,11 @@ index dbaa3c33e2e..5d31557bd11 100644
          use libc::pwrite64;
  
          unsafe {
-diff --git a/library/std/src/sys/unix/fs.rs b/library/std/src/sys/unix/fs.rs
-index aea0c26ee8b..e7be4729ca6 100644
---- a/library/std/src/sys/unix/fs.rs
-+++ b/library/std/src/sys/unix/fs.rs
-@@ -45,19 +45,24 @@
+Index: rustc-1.69.0-src/library/std/src/sys/unix/fs.rs
+===================================================================
+--- rustc-1.69.0-src.orig/library/std/src/sys/unix/fs.rs
++++ rustc-1.69.0-src/library/std/src/sys/unix/fs.rs
+@@ -46,9 +46,13 @@ use libc::{c_int, mode_t};
      all(target_os = "linux", target_env = "gnu")
  ))]
  use libc::c_char;
@@ -93,12 +93,11 @@ index aea0c26ee8b..e7be4729ca6 100644
  use libc::fstatat64;
  #[cfg(any(
      target_os = "android",
-     target_os = "solaris",
-     target_os = "fuchsia",
+@@ -57,9 +61,10 @@ use libc::fstatat64;
      target_os = "redox",
--    target_os = "illumos"
-+    target_os = "illumos",
-+    target_env = "musl"
+     target_os = "illumos",
+     target_os = "nto",
++    target_env = "musl",
  ))]
  use libc::readdir as readdir64;
 -#[cfg(target_os = "linux")]
@@ -106,7 +105,7 @@ index aea0c26ee8b..e7be4729ca6 100644
  use libc::readdir64;
  #[cfg(any(target_os = "emscripten", target_os = "l4re"))]
  use libc::readdir64_r;
-@@ -77,7 +82,13 @@
+@@ -80,7 +85,13 @@ use libc::{
      dirent as dirent64, fstat as fstat64, fstatat as fstatat64, ftruncate64, lseek64,
      lstat as lstat64, off64_t, open as open64, stat as stat64,
  };
@@ -120,7 +119,7 @@ index aea0c26ee8b..e7be4729ca6 100644
      target_os = "linux",
      target_os = "emscripten",
      target_os = "l4re",
-@@ -87,7 +98,7 @@
+@@ -90,7 +101,7 @@ use libc::{
      dirent as dirent64, fstat as fstat64, ftruncate as ftruncate64, lseek as lseek64,
      lstat as lstat64, off_t as off64_t, open as open64, stat as stat64,
  };
@@ -129,7 +128,7 @@ index aea0c26ee8b..e7be4729ca6 100644
  use libc::{dirent64, fstat64, ftruncate64, lseek64, lstat64, off64_t, open64, stat64};
  
  pub use crate::sys_common::fs::try_exists;
-@@ -260,6 +271,7 @@ unsafe impl Sync for Dir {}
+@@ -277,6 +288,7 @@ unsafe impl Sync for Dir {}
  #[cfg(any(
      target_os = "android",
      target_os = "linux",
@@ -137,7 +136,7 @@ index aea0c26ee8b..e7be4729ca6 100644
      target_os = "solaris",
      target_os = "illumos",
      target_os = "fuchsia",
-@@ -292,6 +304,7 @@ struct dirent64_min {
+@@ -311,6 +323,7 @@ struct dirent64_min {
  }
  
  #[cfg(not(any(
@@ -145,7 +144,7 @@ index aea0c26ee8b..e7be4729ca6 100644
      target_os = "android",
      target_os = "linux",
      target_os = "solaris",
-@@ -745,7 +758,7 @@ pub fn file_name(&self) -> OsString {
+@@ -786,7 +799,7 @@ impl DirEntry {
      }
  
      #[cfg(all(
@@ -154,7 +153,7 @@ index aea0c26ee8b..e7be4729ca6 100644
          not(miri)
      ))]
      pub fn metadata(&self) -> io::Result<FileAttr> {
-@@ -769,7 +782,7 @@ pub fn metadata(&self) -> io::Result<FileAttr> {
+@@ -810,7 +823,7 @@ impl DirEntry {
      }
  
      #[cfg(any(
@@ -163,6 +162,3 @@ index aea0c26ee8b..e7be4729ca6 100644
          miri
      ))]
      pub fn metadata(&self) -> io::Result<FileAttr> {
--- 
-2.39.0
-

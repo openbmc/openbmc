@@ -21,13 +21,13 @@ Signed-off-by: Yuval Shaia <yuval.shaia.ml@gmail.com>
  hw/rdma/vmw/pvrdma_cmd.c | 6 ++++++
  1 file changed, 6 insertions(+)
 
-diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-index da7ddfa548..89db963c46 100644
---- a/hw/rdma/vmw/pvrdma_cmd.c
-+++ b/hw/rdma/vmw/pvrdma_cmd.c
-@@ -796,6 +796,12 @@ int pvrdma_exec_cmd(PVRDMADev *dev)
- 
-     dsr_info = &dev->dsr_info;
+Index: qemu-8.0.0/hw/rdma/vmw/pvrdma_cmd.c
+===================================================================
+--- qemu-8.0.0.orig/hw/rdma/vmw/pvrdma_cmd.c
++++ qemu-8.0.0/hw/rdma/vmw/pvrdma_cmd.c
+@@ -782,6 +782,12 @@ int pvrdma_exec_cmd(PVRDMADev *dev)
+             goto out;
+     }
  
 +    if (!dsr_info->dsr) {
 +            /* Buggy or malicious guest driver */
@@ -38,6 +38,3 @@ index da7ddfa548..89db963c46 100644
      if (dsr_info->req->hdr.cmd >= sizeof(cmd_handlers) /
                        sizeof(struct cmd_handler)) {
          rdma_error_report("Unsupported command");
--- 
-2.34.1
-

@@ -16,11 +16,11 @@ Upstream-Status: Pending
  scripts/tracetool/backend/syslog.py | 4 +++-
  3 files changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/tracetool/backend/ftrace.py b/scripts/tracetool/backend/ftrace.py
-index 5fa30ccc08..baed2ae61c 100644
---- a/scripts/tracetool/backend/ftrace.py
-+++ b/scripts/tracetool/backend/ftrace.py
-@@ -12,6 +12,8 @@
+Index: qemu-8.0.0/scripts/tracetool/backend/ftrace.py
+===================================================================
+--- qemu-8.0.0.orig/scripts/tracetool/backend/ftrace.py
++++ qemu-8.0.0/scripts/tracetool/backend/ftrace.py
+@@ -12,6 +12,8 @@ __maintainer__ = "Stefan Hajnoczi"
  __email__      = "stefanha@redhat.com"
  
  
@@ -38,11 +38,11 @@ index 5fa30ccc08..baed2ae61c 100644
          fmt=event.fmt.rstrip("\n"),
          argnames=argnames)
  
-diff --git a/scripts/tracetool/backend/log.py b/scripts/tracetool/backend/log.py
-index 17ba1cd90e..de27b7e62e 100644
---- a/scripts/tracetool/backend/log.py
-+++ b/scripts/tracetool/backend/log.py
-@@ -12,6 +12,8 @@
+Index: qemu-8.0.0/scripts/tracetool/backend/log.py
+===================================================================
+--- qemu-8.0.0.orig/scripts/tracetool/backend/log.py
++++ qemu-8.0.0/scripts/tracetool/backend/log.py
+@@ -12,6 +12,8 @@ __maintainer__ = "Stefan Hajnoczi"
  __email__      = "stefanha@redhat.com"
  
  
@@ -60,11 +60,11 @@ index 17ba1cd90e..de27b7e62e 100644
          name=event.name,
          fmt=event.fmt.rstrip("\n"),
          argnames=argnames)
-diff --git a/scripts/tracetool/backend/syslog.py b/scripts/tracetool/backend/syslog.py
-index 5a3a00fe31..012970f6cc 100644
---- a/scripts/tracetool/backend/syslog.py
-+++ b/scripts/tracetool/backend/syslog.py
-@@ -12,6 +12,8 @@
+Index: qemu-8.0.0/scripts/tracetool/backend/syslog.py
+===================================================================
+--- qemu-8.0.0.orig/scripts/tracetool/backend/syslog.py
++++ qemu-8.0.0/scripts/tracetool/backend/syslog.py
+@@ -12,6 +12,8 @@ __maintainer__ = "Stefan Hajnoczi"
  __email__      = "stefanha@redhat.com"
  
  
@@ -82,6 +82,3 @@ index 5a3a00fe31..012970f6cc 100644
          name=event.name,
          fmt=event.fmt.rstrip("\n"),
          argnames=argnames)
--- 
-2.39.2
-

@@ -8,12 +8,11 @@ PR = "r6"
 
 FONT_PACKAGES = "${PN}"
 
-SRC_URI = "http://archive.ubuntu.com/ubuntu/pool/main/t/ttf-arphic-uming/ttf-arphic-uming_0.2.${PV}.1.orig.tar.gz"
-S = "${WORKDIR}"
+SRC_URI = "https://deb.debian.org/debian/pool/main/f/fonts-arphic-uming/fonts-arphic-uming_0.2.${PV}.2.orig.tar.bz2"
+S = "${WORKDIR}/ttf-arphic-uming-0.2.20080216.2"
 
 require ttf.inc
 
 FILES:${PN} = "${datadir}"
 
-SRC_URI[md5sum] = "d219fcaf953f3eb1889399955a00379f"
-SRC_URI[sha256sum] = "8038a6db9e832456d5da5559aff8d15130243be1091bf24f3243503a6f1bda98"
+SRC_URI[sha256sum] = "e3c19e04ea7a565b4acff6f1e4248084d2e10752e305bf7dd6c76e80860dc1db"

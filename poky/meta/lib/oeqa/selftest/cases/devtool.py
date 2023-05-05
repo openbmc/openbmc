@@ -876,7 +876,7 @@ class DevtoolModifyTests(DevtoolBase):
         self.assertTrue(any([uri.startswith('file://') and '.patch' in uri for uri in src_uri]),
                         'This test expects the %s recipe to have a patch in its src uris' % testrecipe)
 
-        self._test_recipe_contents(recipefile, {}, ['cargo'])
+        self._test_recipe_contents(recipefile, {}, ['ptest-cargo'])
 
         # Clean up anything in the workdir/sysroot/sstate cache
         bitbake('%s -c cleansstate' % testrecipe)

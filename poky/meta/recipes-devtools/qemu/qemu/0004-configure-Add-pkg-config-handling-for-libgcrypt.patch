@@ -14,11 +14,11 @@ Signed-off-by: He Zhe <zhe.he@windriver.com>
  meson.build | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/meson.build b/meson.build
-index 861de93c4..d45ff2d7c 100644
---- a/meson.build
-+++ b/meson.build
-@@ -1063,7 +1063,7 @@ endif
+Index: qemu-8.0.0/meson.build
+===================================================================
+--- qemu-8.0.0.orig/meson.build
++++ qemu-8.0.0/meson.build
+@@ -1213,7 +1213,7 @@ endif
  if not gnutls_crypto.found()
    if (not get_option('gcrypt').auto() or have_system) and not get_option('nettle').enabled()
      gcrypt = dependency('libgcrypt', version: '>=1.8',
@@ -27,6 +27,3 @@ index 861de93c4..d45ff2d7c 100644
                          required: get_option('gcrypt'),
                          kwargs: static_kwargs)
      # Debian has removed -lgpg-error from libgcrypt-config
--- 
-2.30.2
-

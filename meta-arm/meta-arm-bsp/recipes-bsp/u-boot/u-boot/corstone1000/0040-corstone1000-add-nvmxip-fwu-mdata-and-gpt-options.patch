@@ -1,4 +1,4 @@
-From 7c694af3fd5de372349f740b62cd3d909483fe2e Mon Sep 17 00:00:00 2001
+From 0c2bd094b7686e9497327d825470cb90aa29d10f Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Wed, 1 Feb 2023 16:19:40 +0000
 Subject: [PATCH 40/43] corstone1000: add nvmxip, fwu-mdata and gpt options
@@ -10,15 +10,14 @@ and fwu metadata will be available.
 Upstream-Status: Pending
 Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 ---
- configs/corstone1000_defconfig | 31 +++++++++++++++++++------------
- fs/fs.c                        |  5 +++++
- 2 files changed, 24 insertions(+), 12 deletions(-)
+ configs/corstone1000_defconfig | 33 ++++++++++++++++++++-------------
+ 1 file changed, 20 insertions(+), 13 deletions(-)
 
 diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
-index e009faee0252..711cf13592db 100644
+index e009faee0252..96bb86ec91e9 100644
 --- a/configs/corstone1000_defconfig
 +++ b/configs/corstone1000_defconfig
-@@ -4,13 +4,15 @@ CONFIG_TARGET_CORSTONE1000=y
+@@ -4,18 +4,20 @@ CONFIG_TARGET_CORSTONE1000=y
  CONFIG_TEXT_BASE=0x80000000
  CONFIG_SYS_MALLOC_LEN=0x2000000
  CONFIG_NR_DRAM_BANKS=1
@@ -36,6 +35,12 @@ index e009faee0252..711cf13592db 100644
  CONFIG_FIT=y
  CONFIG_BOOTDELAY=3
  CONFIG_USE_BOOTARGS=y
+ CONFIG_BOOTARGS="console=ttyAMA0 loglevel=9 ip=dhcp earlyprintk"
+-CONFIG_BOOTCOMMAND="run retrieve_kernel_load_addr; echo Loading kernel from $kernel_addr to memory ... ; unzip $kernel_addr 0x90000000; loadm 0x90000000 $kernel_addr_r 0xf00000; usb start; usb reset; run distro_bootcmd; bootefi $kernel_addr_r $fdtcontroladdr;"
++CONFIG_BOOTCOMMAND="echo Loading kernel from $kernel_addr to memory ... ; unzip $kernel_addr 0x90000000; loadm 0x90000000 $kernel_addr_r 0xf00000; usb start; usb reset; run distro_bootcmd; bootefi $kernel_addr_r $fdtcontroladdr;"
+ CONFIG_CONSOLE_RECORD=y
+ CONFIG_LOGLEVEL=7
+ # CONFIG_DISPLAY_CPUINFO is not set
 @@ -23,11 +25,16 @@ CONFIG_LOGLEVEL=7
  CONFIG_SYS_MAXARGS=64
  CONFIG_SYS_CBSIZE=512
@@ -93,41 +98,6 @@ index e009faee0252..711cf13592db 100644
 -CONFIG_EFI_CAPSULE_FIRMWARE_RAW=y
 +CONFIG_FWU_MULTI_BANK_UPDATE=y
 +# CONFIG_TOOLS_MKEFICAPSULE is not set
-diff --git a/fs/fs.c b/fs/fs.c
-index 8324b4a22f20..f54955a2b7f6 100644
---- a/fs/fs.c
-+++ b/fs/fs.c
-@@ -437,11 +437,13 @@ int fs_set_blk_dev(const char *ifname, const char *dev_part_str, int fstype)
- 	}
- #endif
- 
-+	log_err("RUI: fs_set_blk_dev fstype: %d\n", fstype);
- 	part = part_get_info_by_dev_and_name_or_num(ifname, dev_part_str, &fs_dev_desc,
- 						    &fs_partition, 1);
- 	if (part < 0)
- 		return -1;
- 
-+	log_err("RUI: fs_set_blk_dev 1\n");
- 	for (i = 0, info = fstypes; i < ARRAY_SIZE(fstypes); i++, info++) {
- 		if (fstype != FS_TYPE_ANY && info->fstype != FS_TYPE_ANY &&
- 				fstype != info->fstype)
-@@ -450,6 +452,8 @@ int fs_set_blk_dev(const char *ifname, const char *dev_part_str, int fstype)
- 		if (!fs_dev_desc && !info->null_dev_desc_ok)
- 			continue;
- 
-+		log_err("RUI: fs_set_blk_dev 2: info->fstype: %d part: %d\n",
-+			info->fstype, part);
- 		if (!info->probe(fs_dev_desc, &fs_partition)) {
- 			fs_type = info->fstype;
- 			fs_dev_part = part;
-@@ -457,6 +461,7 @@ int fs_set_blk_dev(const char *ifname, const char *dev_part_str, int fstype)
- 		}
- 	}
- 
-+	log_err("RUI: fs_set_blk_dev 3\n");
- 	return -1;
- }
- 
 -- 
-2.39.2
+2.40.0
 

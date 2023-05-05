@@ -17,22 +17,25 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  tests/unit/meson.build | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/unit/meson.build b/tests/unit/meson.build
-index 96b295263..e4c3246dc 100644
---- a/tests/unit/meson.build
-+++ b/tests/unit/meson.build
-@@ -44,9 +44,9 @@ tests = {
+Index: qemu-8.0.0/tests/unit/meson.build
+===================================================================
+--- qemu-8.0.0.orig/tests/unit/meson.build
++++ qemu-8.0.0/tests/unit/meson.build
+@@ -46,7 +46,7 @@ tests = {
    'test-keyval': [testqapi],
    'test-logging': [],
    'test-uuid': [],
 -  'ptimer-test': ['ptimer-test-stubs.c', meson.project_source_root() / 'hw/core/ptimer.c'],
 +  'ptimer-test': ['ptimer-test-stubs.c', '../../hw/core/ptimer.c'],
    'test-qapi-util': [],
--  'test-smp-parse': [qom, meson.project_source_root() / 'hw/core/machine-smp.c'],
-+  'test-smp-parse': [qom, '../../hw/core/machine-smp.c'],
- }
- 
- if have_system or have_tools
--- 
-2.30.2
-
+   'test-interval-tree': [],
+   'test-xs-node': [qom],
+@@ -136,7 +136,7 @@ if have_system
+     'test-util-sockets': ['socket-helpers.c'],
+     'test-base64': [],
+     'test-bufferiszero': [],
+-    'test-smp-parse': [qom, meson.project_source_root() / 'hw/core/machine-smp.c'],
++    'test-smp-parse': [qom, '../../hw/core/machine-smp.c'],
+     'test-vmstate': [migration, io],
+     'test-yank': ['socket-helpers.c', qom, io, chardev]
+   }

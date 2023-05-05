@@ -81,6 +81,10 @@ UBOOT_FIT_KEY_REQ_ARGS ?= "-batch -new"
 # Standard format for public key certificate
 UBOOT_FIT_KEY_SIGN_PKCS ?= "-x509"
 
+# length of address in number of <u32> cells
+# ex: 1 32bits address, 2 64bits address
+UBOOT_FIT_ADDRESS_CELLS ?= "1"
+
 # This is only necessary for determining the signing configuration
 KERNEL_PN = "${PREFERRED_PROVIDER_virtual/kernel}"
 
@@ -234,7 +238,7 @@ uboot_fitimage_assemble() {
 
 / {
     description = "${UBOOT_FIT_DESC}";
-    #address-cells = <1>;
+    #address-cells = <${UBOOT_FIT_ADDRESS_CELLS}>;
 
     images {
         uboot {

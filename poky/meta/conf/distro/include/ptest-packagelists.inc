@@ -106,6 +106,7 @@ PTESTS_SLOW = "\
     tcl \
     util-linux \
     valgrind \
+    lz4 \
 "
 
 PTESTS_SLOW:remove:riscv64 = "valgrind"
@@ -115,7 +116,6 @@ PTESTS_SLOW:remove:x86 = "valgrind"
 PTESTS_PROBLEMS:append:x86 = " valgrind"
 
 #    ruby \ # Timeout
-#    lz4 \ # Needs a rewrite
 #    rt-tests \ # Needs to be checked whether it runs at all
 #    bash \ # Test outcomes are non-deterministic by design
 #    ifupdown \ # Tested separately in lib/oeqa/selftest/cases/imagefeatures.py
@@ -128,7 +128,6 @@ PTESTS_PROBLEMS:append:x86 = " valgrind"
 
 PTESTS_PROBLEMS = "\
     ruby \
-    lz4 \
     rt-tests \
     bash \
     ifupdown \

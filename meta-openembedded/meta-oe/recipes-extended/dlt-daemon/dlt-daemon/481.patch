@@ -1,0 +1,47 @@
+From 95476de802585629c6d89707a9247bbb0c70f6c9 Mon Sep 17 00:00:00 2001
+From: Gianfranco Costamagna <costamagnagianfranco@yahoo.it>
+Date: Fri, 28 Apr 2023 22:39:57 +0200
+Subject: [PATCH] Update gtest_dlt_daemon_multiple_files_logging.cpp
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fix build error due to dlt_vlog not having the correct format string with security build flags enabled
+
+[ 88%] Building CXX object tests/CMakeFiles/gtest_dlt_daemon_multiple_files_logging.dir/gtest_dlt_daemon_multiple_files_logging.cpp.o
+cd dlt-daemon-2.18.9/obj-x86_64-linux-gnu/tests && /usr/bin/c++ -DCONFIGURATION_FILES_DIR=\"/etc\" -DDLT_DAEMON_USE_FIFO_IPC -DDLT_LIB_USE_FIFO_IPC -DDLT_NETWORK_TRACE_ENABLE -DDLT_SYSTEMD_ENABLE -DDLT_SYSTEMD_JOURNAL_ENABLE -DDLT_UNIT_TESTS -DDLT_USER_IPC_PATH=\"/tmp\" -DDLT_USE_IPv6 -DEXTENDED_FILTERING -D_GNU_SOURCE -Idlt-daemon-2.18.9 -Idlt-daemon-2.18.9/obj-x86_64-linux-gnu/include/dlt -Idlt-daemon-2.18.9/include/dlt -Idlt-daemon-2.18.9/src/shared -Idlt-daemon-2.18.9/src/core_dump_handler -Idlt-daemon-2.18.9/src/offlinelogstorage -Idlt-daemon-2.18.9/src/lib -Idlt-daemon-2.18.9/src/daemon -Idlt-daemon-2.18.9/src/console -Idlt-daemon-2.18.9/src/gateway -Idlt-daemon-2.18.9/systemd/3rdparty -g -O2 -ffile-prefix-map=dlt-daemon-2.18.9=. -flto=auto -ffat-lto-objects -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -isystem /include -std=gnu++0x -std=gnu++11 -Wall -Wextra -Wno-variadic-macros -Wno-strict-aliasing -DGTEST_HAS_PTHREAD=1 -MD -MT tests/CMakeFiles/gtest_dlt_daemon_multiple_files_logging.dir/gtest_dlt_daemon_multiple_files_logging.cpp.o -MF CMakeFiles/gtest_dlt_daemon_multiple_files_logging.dir/gtest_dlt_daemon_multiple_files_logging.cpp.o.d -o CMakeFiles/gtest_dlt_daemon_multiple_files_logging.dir/gtest_dlt_daemon_multiple_files_logging.cpp.o -c dlt-daemon-2.18.9/tests/gtest_dlt_daemon_multiple_files_logging.cpp
+dlt-daemon-2.18.9/tests/gtest_dlt_daemon_multiple_files_logging.cpp: In member function ‘virtual void t_dlt_logging_multiple_files_append_reinit_normal_Test::TestBody()’:
+dlt-daemon-2.18.9/tests/gtest_dlt_daemon_multiple_files_logging.cpp:106:13: error: format not a string literal and no format arguments [-Werror=format-security]
+  106 |     dlt_vlog(LOG_INFO, log1);
+      |     ~~~~~~~~^~~~~~~~~~~~~~~~
+dlt-daemon-2.18.9/tests/gtest_dlt_daemon_multiple_files_logging.cpp:110:13: error: format not a string literal and no format arguments [-Werror=format-security]
+  110 |     dlt_vlog(LOG_INFO, log2);
+      |     ~~~~~~~~^~~~~~~~~~~~~~~~
+In file included from /usr/include/string.h:535,
+                 from /usr/include/gtest/internal/gtest-port.h:264,
+                 from /usr/include/gtest/internal/gtest-internal.h:40,
+                 from /usr/include/gtest/gtest.h:62,
+                 from dlt-daemon-2.18.9/tests/gtest_dlt_daemon_multiple_files_logging.cpp:27:
+In function ‘strncpy’,
+---
+ tests/gtest_dlt_daemon_multiple_files_logging.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/gtest_dlt_daemon_multiple_files_logging.cpp b/tests/gtest_dlt_daemon_multiple_files_logging.cpp
+index 2da512e1..05b58f2c 100644
+--- a/tests/gtest_dlt_daemon_multiple_files_logging.cpp
++++ b/tests/gtest_dlt_daemon_multiple_files_logging.cpp
+@@ -103,11 +103,11 @@ TEST(t_dlt_logging_multiple_files_append_reinit, normal)
+     const char* log2 = "TWO\n";
+ 
+     configure(path, file_name, true, file_size, max_file_size);
+-    dlt_vlog(LOG_INFO, log1);
++    dlt_vlog(LOG_INFO, "%s", log1);
+     EXPECT_NO_THROW(dlt_log_free());
+ 
+     configure(path, file_name, true, file_size, max_file_size);
+-    dlt_vlog(LOG_INFO, log2);
++    dlt_vlog(LOG_INFO, "%s", log2);
+     EXPECT_NO_THROW(dlt_log_free());
+     verify_in_one_file(path, file_name, log1, log2);
+ }

@@ -86,10 +86,10 @@ def gen_updatealternativesvardeps(d):
 
     for p in pkgs:
         for v in vars:
-            for flag in sorted((d.getVarFlags("%s_%s" % (v,p)) or {}).keys()):
+            for flag in sorted((d.getVarFlags("%s:%s" % (v,p)) or {}).keys()):
                 if flag == "doc" or flag == "vardeps" or flag == "vardepsexp":
                     continue
-                d.appendVar('%s_VARDEPS_%s' % (v,p), ' %s:%s' % (flag, d.getVarFlag('%s_%s' % (v,p), flag, False)))
+                d.appendVar('%s_VARDEPS_%s' % (v,p), ' %s:%s' % (flag, d.getVarFlag('%s:%s' % (v,p), flag, False)))
 
 def ua_extend_depends(d):
     if not 'virtual/update-alternatives' in d.getVar('PROVIDES'):

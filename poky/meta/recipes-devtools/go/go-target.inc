@@ -1,5 +1,5 @@
 DEPENDS = "virtual/${TUNE_PKGARCH}-go go-native"
-DEPENDS:class-nativesdk = "virtual/${TARGET_PREFIX}go-crosssdk go-native"
+DEPENDS:class-nativesdk = "virtual/${TARGET_PREFIX}go go-native"
 
 DEBUG_PREFIX_MAP = "\
                      -fdebug-prefix-map=${STAGING_DIR_HOST}= \

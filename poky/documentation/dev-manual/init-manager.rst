@@ -111,3 +111,52 @@ configuration file::
 Doing so will prevent ``rsyslog`` / ``busybox-syslog`` from being pulled in by
 default, leaving only ``systemd-journald``.
 
+Summary
+-------
+
+The Yocto Project supports three different initialization managers, offering
+increasing levels of complexity and functionality:
+
+.. list-table::
+   :widths: 40 20 20 20
+   :header-rows: 1
+
+   * - 
+     - BusyBox init
+     - SysVinit
+     - systemd
+   * - Size
+     - Small
+     - Small
+     - Big [#footnote-systemd-size]_
+   * - Complexity
+     - Small
+     - Medium
+     - High
+   * - Support for boot profiles
+     - No
+     - Yes ("runlevels")
+     - Yes ("targets")
+   * - Services defined as
+     - Shell scripts
+     - Shell scripts
+     - Description files
+   * - Starting services in parallel
+     - No
+     - No
+     - Yes
+   * - Setting service resource limits
+     - No
+     - No
+     - Yes
+   * - Support service isolation
+     - No
+     - No
+     - Yes
+   * - Integrated logging
+     - No
+     - No
+     - Yes
+
+.. [#footnote-systemd-size] Using systemd increases the ``core-image-minimal``
+   image size by 160\% for ``qemux86-64`` on Mickledore (4.2), compared to SysVinit.

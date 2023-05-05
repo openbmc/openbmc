@@ -18,11 +18,11 @@ Signed-off-by: Roy Li <rongqing.li@windriver.com>
  hw/mips/malta.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/mips/malta.c b/hw/mips/malta.c
-index 628851172..12d37f35d 100644
---- a/hw/mips/malta.c
-+++ b/hw/mips/malta.c
-@@ -61,7 +61,7 @@
+Index: qemu-8.0.0/hw/mips/malta.c
+===================================================================
+--- qemu-8.0.0.orig/hw/mips/malta.c
++++ qemu-8.0.0/hw/mips/malta.c
+@@ -64,7 +64,7 @@
  #define ENVP_PADDR          0x2000
  #define ENVP_VADDR          cpu_mips_phys_to_kseg0(NULL, ENVP_PADDR)
  #define ENVP_NB_ENTRIES     16
@@ -31,6 +31,3 @@ index 628851172..12d37f35d 100644
  
  /* Hardware addresses */
  #define FLASH_ADDRESS       0x1e000000ULL
--- 
-2.30.2
-

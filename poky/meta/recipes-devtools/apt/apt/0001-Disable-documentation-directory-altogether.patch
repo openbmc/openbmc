@@ -13,11 +13,11 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 9745c13..7cfc9ee 100644
+index 668e2d762..62f441bfa 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -239,7 +239,7 @@ add_subdirectory(apt-pkg)
- add_subdirectory(apt-private)
+@@ -246,7 +246,7 @@ add_subdirectory(apt-private)
+ endif()
  add_subdirectory(cmdline)
  add_subdirectory(completions)
 -add_subdirectory(doc)

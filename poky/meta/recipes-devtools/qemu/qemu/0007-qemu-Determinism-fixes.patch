@@ -16,10 +16,10 @@ RP 2021/3/1
  scripts/decodetree.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/decodetree.py b/scripts/decodetree.py
-index a03dc6b5e..4ea24c1f3 100644
---- a/scripts/decodetree.py
-+++ b/scripts/decodetree.py
+Index: qemu-8.0.0/scripts/decodetree.py
+===================================================================
+--- qemu-8.0.0.orig/scripts/decodetree.py
++++ qemu-8.0.0/scripts/decodetree.py
 @@ -1328,7 +1328,7 @@ def main():
      toppat = ExcMultiPattern(0)
  
@@ -29,6 +29,3 @@ index a03dc6b5e..4ea24c1f3 100644
          f = open(filename, 'rt', encoding='utf-8')
          parse_file(f, toppat)
          f.close()
--- 
-2.30.2
-

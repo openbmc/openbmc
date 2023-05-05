@@ -1,4 +1,4 @@
-From 1980a8f4779a955e73285e7a0d86549b69bea5c8 Mon Sep 17 00:00:00 2001
+From 3ba8ba9410464d0986bc6cc5ddb1819745af1eb2 Mon Sep 17 00:00:00 2001
 From: Yu Zongchun <b40527@freescale.com>
 Date: Sun, 28 Apr 2013 14:39:22 +0800
 Subject: [PATCH] Add the compile and install rules for cryptodev tests folder
@@ -10,27 +10,27 @@ Signed-off-by: Yu Zongchun <b40527@freescale.com>
 Upstream-Status: Pending
 
 ---
- Makefile       |    6 ++++++
- tests/Makefile |    8 ++++++++
- 2 files changed, 14 insertions(+), 0 deletions(-)
+ Makefile       | 6 ++++++
+ tests/Makefile | 8 ++++++++
+ 2 files changed, 14 insertions(+)
 
-Index: git/Makefile
-===================================================================
---- git.orig/Makefile
-+++ git/Makefile
-@@ -35,6 +35,9 @@ modules_install:
- 	$(MAKE) $(KERNEL_MAKE_OPTS) modules_install
- 	install -m 644 -D crypto/cryptodev.h $(DESTDIR)/$(includedir)/crypto/cryptodev.h
+diff --git a/Makefile b/Makefile
+index d83aee6..3a750a1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -41,6 +41,9 @@ modules_install:
+ install_tests: tests
+ 	$(MAKE) -C tests install DESTDIR=$(PREFIX)
  
 +install_tests:
 +	make -C tests install DESTDIR=$(PREFIX)
 +
  clean:
  	$(MAKE) $(KERNEL_MAKE_OPTS) clean
- 	rm -f $(hostprogs) *~
-@@ -43,6 +46,9 @@ clean:
- check:
- 	CFLAGS=$(CRYPTODEV_CFLAGS) KERNEL_DIR=$(KERNEL_DIR) $(MAKE) -C tests check
+ 	CFLAGS=$(CRYPTODEV_CFLAGS) KERNEL_DIR=$(KERNEL_DIR) $(MAKE) -C tests clean
+@@ -54,6 +57,9 @@ tests:
+ 
+ .PHONY: install modules_install tests install_tests
  
 +testprogs:
 +	KERNEL_DIR=$(KERNEL_DIR) make -C tests testprogs
@@ -38,10 +38,10 @@ Index: git/Makefile
  CPOPTS =
  ifneq ($(SHOW_TYPES),)
  CPOPTS += --show-types
-Index: git/tests/Makefile
-===================================================================
---- git.orig/tests/Makefile
-+++ git/tests/Makefile
+diff --git a/tests/Makefile b/tests/Makefile
+index 2502f32..2fb7a9a 100644
+--- a/tests/Makefile
++++ b/tests/Makefile
 @@ -23,6 +23,12 @@ bindir = $(execprefix)/bin
  
  all: $(hostprogs)

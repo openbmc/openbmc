@@ -3962,7 +3962,6 @@ system and gives an overview of their function and contents.
       -  ``sysvinit``
       -  ``systemd``
       -  ``mdev-busybox``
-      -  ``none``
 
       With ``sysvinit``, the init manager is set to
       :wikipedia:`SysVinit <Init#SysV-style>`, the traditional UNIX init
@@ -3976,10 +3975,6 @@ system and gives an overview of their function and contents.
       init, together with the BusyBox mdev device manager. This is the simplest
       and lightest solution, and probably the best choice for low-end systems
       with a rather slow CPU and a limited amount of RAM.
-
-      With ``none``, the init manager is also set to ``sysvinit``. This is the
-      default setting in OpenEmbedded-Core. This option also selects the
-      :wikipedia:`udev <Udev>` device manager.
 
       More concretely, this is used to include
       ``conf/distro/include/init-manager-${INIT_MANAGER}.inc`` into the global

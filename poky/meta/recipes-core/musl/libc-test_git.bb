@@ -11,7 +11,7 @@ inherit ptest
 
 SRCREV = "18e28496adee3d84fefdda6efcb9c5b8996a2398"
 SRC_URI = " \
-    git://repo.or.cz/libc-test;branch=master \
+    git://repo.or.cz/libc-test;branch=master;protocol=https \
     file://run-ptest \
 "
 

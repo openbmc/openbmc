@@ -26,6 +26,7 @@ RDEPENDS:${PN} += " \
     ${PYTHON_PN}-py \
     ${PYTHON_PN}-setuptools \
     ${PYTHON_PN}-six \
+    ${PYTHON_PN}-tomllib \
     ${PYTHON_PN}-wcwidth \
 "
 

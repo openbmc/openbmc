@@ -92,6 +92,10 @@ FIT_SUPPORTED_INITRAMFS_FSTYPES ?= "cpio.lz4 cpio.lzo cpio.lzma cpio.xz cpio.zst
 # Allow user to select the default DTB for FIT image when multiple dtb's exists.
 FIT_CONF_DEFAULT_DTB ?= ""
 
+# length of address in number of <u32> cells
+# ex: 1 32bits address, 2 64bits address
+FIT_ADDRESS_CELLS ?= "1"
+
 # Keys used to sign individually image nodes.
 # The keys to sign image nodes must be different from those used to sign
 # configuration nodes, otherwise the "required" property, from
@@ -110,7 +114,7 @@ fitimage_emit_fit_header() {
 
 / {
         description = "${FIT_DESC}";
-        #address-cells = <1>;
+        #address-cells = <${FIT_ADDRESS_CELLS}>;
 EOF
 }
 

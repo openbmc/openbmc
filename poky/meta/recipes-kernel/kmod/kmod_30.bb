@@ -17,7 +17,7 @@ inherit autotools bash-completion gtk-doc pkgconfig manpages update-alternatives
 
 SRCREV = "5d46434a63ae0160150a0efdde1914873697e273"
 
-SRC_URI = "git://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git;branch=master \
+SRC_URI = "git://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git;branch=master;protocol=https \
            file://depmod-search.conf \
            file://avoid_parallel_tests.patch \
            "
