@@ -1,0 +1,12 @@
+[Unit]
+Description=Monitor fault events and updade fault LED status
+After=xyz.openbmc_project.State.Host@0.service
+
+[Service]
+Restart=on-failure
+ExecStart=/usr/sbin/ampere_fault_monitor.sh
+SyslogIdentifier=ampere_fault_monitor.sh
+Type=simple
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

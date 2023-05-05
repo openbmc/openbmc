@@ -1,0 +1,12 @@
+[Unit]
+Description=Monitor GPIO fault and updade fault LED status %i
+Before=obmc-host-start-pre@0.target
+After=obmc-host-already-on@0.target
+Conflicts=obmc-host-stop@0.target
+
+[Service]
+Restart=no
+ExecStart=/bin/sh -c "if [ -f /usr/sbin/ampere_check_gpio_fault.sh ]; then /usr/sbin/ampere_check_gpio_fault.sh %i; fi"
+ExecStopPost=/bin/sh -c "if [ -f /tmp/gpio_fault ]; then sleep 5; rm /tmp/gpio_fault; fi"
+SyslogIdentifier=ampere_check_fault_gpio
+Type=simple
