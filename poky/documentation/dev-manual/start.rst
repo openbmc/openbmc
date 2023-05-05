@@ -613,44 +613,23 @@ Use the following procedure to locate the latest upstream copy of the
       For information on cloning a repository, see the
       ":ref:`dev-manual/start:cloning the \`\`poky\`\` repository`" section.
 
-Accessing Index of Releases
----------------------------
+Accessing Source Archives
+-------------------------
 
-Yocto Project maintains an Index of Releases area that contains related
-files that contribute to the Yocto Project. Rather than Git
-repositories, these files are tarballs that represent snapshots in time
-of a given component.
+The Yocto Project also provides source archives of its releases, which
+are available on :yocto_dl:`/releases/yocto/`. Then, choose the subdirectory
+containing the release you wish to use, for example
+:yocto_dl:`yocto-&DISTRO; </releases/yocto/yocto-&DISTRO;/>`.
+
+You will find there source archives of individual components (if you wish
+to use them individually), and of the corresponding Poky release bundling
+a selection of these components. 
 
 .. note::
 
    The recommended method for accessing Yocto Project components is to
    use Git to clone the upstream repository and work from within that
-   locally cloned repository. However, this section documents how to
-   use a tarball snapshot of any given component.
-
-Follow these steps to locate and download a particular tarball:
-
-#. *Access the Index of Releases:* Open a browser and go to
-   :yocto_dl:`Index of Releases </releases>`. The
-   list represents released components (e.g. ``bitbake``, ``sato``, and
-   so on).
-
-   .. note::
-
-      The ``yocto`` directory contains the full array of released Poky
-      tarballs. The ``poky`` directory in the Index of Releases was
-      historically used for very early releases and exists now only for
-      retroactive completeness.
-
-#. *Select a Component:* Click on any released component in which you
-   are interested (e.g. ``yocto``).
-
-#. *Find the Tarball:* Drill down to find the associated tarball. For
-   example, click on ``yocto-&DISTRO;`` to view files associated with the
-   Yocto Project &DISTRO; release.
-
-#. *Download the Tarball:* Click the tarball to download and save a
-   snapshot of the given component.
+   locally cloned repository.
 
 Using the Downloads Page
 ------------------------
@@ -659,7 +638,7 @@ The :yocto_home:`Yocto Project Website <>` uses a "DOWNLOADS" page
 from which you can locate and download tarballs of any Yocto Project
 release. Rather than Git repositories, these files represent snapshot
 tarballs similar to the tarballs located in the Index of Releases
-described in the ":ref:`dev-manual/start:accessing index of releases`" section.
+described in the ":ref:`dev-manual/start:accessing source archives`" section.
 
 #. *Go to the Yocto Project Website:* Open The
    :yocto_home:`Yocto Project Website <>` in your browser.

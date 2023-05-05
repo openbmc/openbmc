@@ -169,10 +169,9 @@ these tarballs gives you a snapshot of the released files.
 In summary, here is where you can get the project files needed for
 development:
 
--  :yocto_git:`Source Repositories: <>` This area contains IDE
-   Plugins, Matchbox, Poky, Poky Support, Tools, Yocto Linux Kernel, and
-   Yocto Metadata Layers. You can create local copies of Git
-   repositories for each of these areas.
+-  :yocto_git:`Source Repositories: <>` This area contains Poky, Yocto
+   documentation, metadata layers, and Linux kernel. You can create local
+   copies of Git repositories for each of these areas.
 
    .. image:: figures/source-repos.png
       :width: 100%
@@ -181,28 +180,17 @@ development:
    see the ":ref:`dev-manual/start:accessing source repositories`"
    Section in the Yocto Project Development Tasks Manual.
 
--  :yocto_dl:`Index of /releases: </releases>` This is an index
-   of releases such as Poky, Pseudo, installers for cross-development
-   toolchains, miscellaneous support and all released versions of Yocto
-   Project in the form of images or tarballs. Downloading and extracting
-   these files does not produce a local copy of the Git repository but
-   rather a snapshot of a particular release or image.
+-  :yocto_dl:`Yocto release archives: </releases/yocto>` This is where you can
+   download tarballs corresponding to each Yocto Project release. Downloading
+   and extracting these files does not produce a local copy of a Git repository
+   but rather a snapshot corresponding to a particular release.
 
-   .. image:: figures/index-downloads.png
-      :align: center
-      :width: 50%
-
-   For steps on how to view and access these files, see the
-   ":ref:`dev-manual/start:accessing index of releases`"
-   section in the Yocto Project Development Tasks Manual.
-
--  *"DOWNLOADS" page for the* :yocto_home:`Yocto Project Website <>` *:*
-
-   The Yocto Project website includes a "DOWNLOADS" page accessible
+-  :yocto_home:`DOWNLOADS page </software-overview/downloads/>`:
+   The :yocto_home:`Yocto Project website <>` includes a "DOWNLOADS" page accessible
    through the "SOFTWARE" menu that allows you to download any Yocto
    Project release, tool, and Board Support Package (BSP) in tarball
-   form. The tarballs are similar to those found in the
-   :yocto_dl:`Index of /releases: </releases>` area.
+   form. The hyperlinks point to the tarballs under
+   :yocto_dl:`/releases/yocto/`.
 
    .. image:: figures/yp-download.png
       :width: 100%

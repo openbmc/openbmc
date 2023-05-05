@@ -580,6 +580,49 @@ add the task at the appropriate place, which is usually after
 :ref:`ref-tasks-install`. The class then takes care of
 staging the files from :term:`DEPLOYDIR` to :term:`DEPLOY_DIR_IMAGE`.
 
+.. _ref-classes-devicetree:
+
+``devicetree``
+==============
+
+The :ref:`ref-classes-devicetree` class allows to build a recipe that compiles
+device tree source files that are not in the kernel tree.
+
+The compilation of out-of-tree device tree sources is the same as the kernel
+in-tree device tree compilation process. This includes the ability to include
+sources from the kernel such as SoC ``dtsi`` files as well as C header files,
+such as ``gpio.h``.
+
+The :ref:`ref-tasks-compile` task will compile two kinds of files:
+
+- Regular device tree sources with a ``.dts`` extension.
+
+- Device tree overlays, detected from the presence of the ``/plugin/;``
+  string in the file contents.
+
+This class behaves in a similar way as the :ref:`ref-classes-kernel-devicetree`
+class, also deploying output files into ``/boot/devicetree``. However, this
+class stores the deployed device tree binaries into the ``devicetree``
+subdirectory. This avoids clashes with the :ref:`ref-classes-kernel-devicetree`
+output. Additionally, the device trees are populated into the sysroot for
+access via the sysroot from within other recipes.
+
+An extra padding is appended to non-overlay device trees binaries. This
+can typically be used as extra space for adding extra properties at boot time.
+The padding size can be modified by setting ``DT_PADDING_SIZE`` to the desired
+size, in bytes.
+
+See :oe_git:`devicetree.bbclass sources
+</openembedded-core/tree/meta/classes-recipe/devicetree.bbclass>` 
+for further variables controlling this class.
+
+Here is an excerpt of an example ``recipes-kernel/linux/devicetree-acme.bb``
+recipe inheriting this class::
+
+   inherit devicetree
+   COMPATIBLE_MACHINE = "^mymachine$"
+   SRC_URI:mymachine = "file://mymachine.dts"
+
 .. _ref-classes-devshell:
 
 ``devshell``

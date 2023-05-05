@@ -1,4 +1,4 @@
-From e8272dc9390adfd0818d1093c83f3b5c07649a95 Mon Sep 17 00:00:00 2001
+From d736c596f7a8446955d35bef5adae22de24ab9ab Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Thu, 23 Feb 2023 10:35:00 +0000
 Subject: [PATCH 42/43] corstone1000: set kernel_addr based on boot_idx
@@ -13,12 +13,13 @@ then set the env variable kernel_addr with that value.
 Upstream-Status: Pending
 Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 ---
- board/armltd/corstone1000/corstone1000.c | 55 +++++++++++++++++++++++-
- configs/corstone1000_defconfig           |  1 +
- 2 files changed, 55 insertions(+), 1 deletion(-)
+ board/armltd/corstone1000/corstone1000.c   | 58 +++++++++++++++++++++-
+ board/armltd/corstone1000/corstone1000.env |  8 ---
+ configs/corstone1000_defconfig             |  1 +
+ 3 files changed, 58 insertions(+), 9 deletions(-)
 
 diff --git a/board/armltd/corstone1000/corstone1000.c b/board/armltd/corstone1000/corstone1000.c
-index 0a58ccd99cdd..0923ca6e8c5b 100644
+index 0a58ccd99cdd..b767195cccb6 100644
 --- a/board/armltd/corstone1000/corstone1000.c
 +++ b/board/armltd/corstone1000/corstone1000.c
 @@ -5,13 +5,23 @@
@@ -45,7 +46,7 @@ index 0a58ccd99cdd..0923ca6e8c5b 100644
  static struct mm_region corstone1000_mem_map[] = {
  	{
  		/* CVM */
-@@ -108,5 +118,48 @@ int dram_init_banksize(void)
+@@ -108,5 +118,51 @@ int dram_init_banksize(void)
  
  void fwu_plat_get_bootidx(int *boot_idx)
  {
@@ -70,6 +71,9 @@ index 0a58ccd99cdd..0923ca6e8c5b 100644
 +	plat = dev_get_plat(dev);
 +	device_find_first_child(dev, &bdev);
 +	desc = dev_get_uclass_plat(bdev);
++	ret = fwu_get_active_index(&corstone1000_boot_idx);
++	if (ret < 0)
++		log_err("corstone1000: failed to read boot index\n");
 +
 +	if (!corstone1000_boot_idx)
 +		ret = part_get_info_by_name(desc, CORSTONE1000_KERNEL_PRIMARY,
@@ -95,8 +99,25 @@ index 0a58ccd99cdd..0923ca6e8c5b 100644
 +
 +	return ret;
  }
+diff --git a/board/armltd/corstone1000/corstone1000.env b/board/armltd/corstone1000/corstone1000.env
+index a6ee4962211b..ee318b1b1c30 100644
+--- a/board/armltd/corstone1000/corstone1000.env
++++ b/board/armltd/corstone1000/corstone1000.env
+@@ -2,12 +2,4 @@
+ 
+ usb_pgood_delay=250
+ boot_bank_flag=0x08005006
+-kernel_addr_bank_0=0x08280000
+-kernel_addr_bank_1=0x0936E000
+-retrieve_kernel_load_addr=
+-	if itest.l *${boot_bank_flag} == 0; then
+-		setenv kernel_addr $kernel_addr_bank_0;
+-	else
+-		setenv kernel_addr $kernel_addr_bank_1;
+-	fi;
+ kernel_addr_r=0x88200000
 diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
-index 711cf13592db..68054f755624 100644
+index 96bb86ec91e9..23e9e6ae5bd3 100644
 --- a/configs/corstone1000_defconfig
 +++ b/configs/corstone1000_defconfig
 @@ -22,6 +22,7 @@ CONFIG_CONSOLE_RECORD=y
@@ -108,5 +129,5 @@ index 711cf13592db..68054f755624 100644
  CONFIG_SYS_CBSIZE=512
  # CONFIG_CMD_CONSOLE is not set
 -- 
-2.39.2
+2.40.0
 

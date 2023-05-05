@@ -277,7 +277,7 @@ universal, the list includes them just in case:
       This term means "Long Term Support", and in the context of the Yocto
       Project, it corresponds to selected stable releases for which bug and
       security fixes are provided for at least two years. See
-      ":doc:`/ref-manual/release-process`" for details.
+      the :ref:`ref-long-term-support-releases` section for details.
 
    :term:`Metadata`
       A key element of the Yocto Project is the Metadata that
@@ -297,6 +297,12 @@ universal, the list includes them just in case:
       the kernel config fragments and features contained in the
       :yocto_git:`yocto-kernel-cache </yocto-kernel-cache>`
       Git repository.
+
+   :term:`Mixin`
+      A :term:`Mixin` layer is a layer which can be created by the community to
+      add a specific feature or support a new version of some package for an
+      :term:`LTS` release. See the :ref:`ref-long-term-support-releases`
+      section for details.
 
    :term:`OpenEmbedded-Core (OE-Core)`
       OE-Core is metadata comprised of

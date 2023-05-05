@@ -3959,16 +3959,28 @@ system and gives an overview of their function and contents.
    :term:`INIT_MANAGER`
       Specifies the system init manager to use. Available options are:
 
-      -  ``sysvinit`` - System V init (default for poky)
-      -  ``systemd`` - systemd
-      -  ``mdev-busybox`` - mdev provided by busybox
-      -  ``none`` - no init manager
+      -  ``sysvinit``
+      -  ``systemd``
+      -  ``mdev-busybox``
+
+      With ``sysvinit``, the init manager is set to
+      :wikipedia:`SysVinit <Init#SysV-style>`, the traditional UNIX init
+      system. This is the default choice in the Poky distribution, together with
+      the Udev device manager (see the ":ref:`device-manager`" section).
+
+      With ``systemd``, the init manager becomes :wikipedia:`systemd <Systemd>`,
+      which comes with the :wikipedia:`udev <Udev>` device manager.
+
+      With ``mdev-busybox``, the init manager becomes the much simpler BusyBox
+      init, together with the BusyBox mdev device manager. This is the simplest
+      and lightest solution, and probably the best choice for low-end systems
+      with a rather slow CPU and a limited amount of RAM.
 
       More concretely, this is used to include
       ``conf/distro/include/init-manager-${INIT_MANAGER}.inc`` into the global
-      configuration. You can have a look at the ``conf/distro/include/init-manager-*.inc``
-      files for more information, and also the
-      ":ref:`dev-manual/init-manager:selecting an initialization manager`"
+      configuration. You can have a look at the
+      :yocto_git:`meta/conf/distro/include/init-manager-*.inc </poky/tree/meta/conf/distro/include>`
+      files for more information, and also the ":ref:`init-manager`"
       section in the Yocto Project Development Tasks Manual.
 
    :term:`INITRAMFS_DEPLOY_DIR_IMAGE`
@@ -4345,6 +4357,20 @@ system and gives an overview of their function and contents.
       fitImage support and resides in ``meta/classes-recipe/kernel-fitimage.bbclass``.
       You can register custom kernel image types with the
       :ref:`ref-classes-kernel` class using this variable.
+
+   :term:`KERNEL_DANGLING_FEATURES_WARN_ONLY`
+      When kernel configuration fragments are missing for some
+      :term:`KERNEL_FEATURES` specified by layers or BSPs,
+      building and configuring the kernel stops with an error.
+    
+      You can turn these errors into warnings by setting the
+      following in ``conf/local.conf``::
+
+         KERNEL_DANGLING_FEATURES_WARN_ONLY = "1"
+    
+      You will still be warned that runtime issues may occur,
+      but at least the kernel configuration and build process will
+      be allowed to continue.
 
    :term:`KERNEL_DEBUG_TIMESTAMPS`
       If set to "1", enables timestamping functionality during building
@@ -7334,9 +7360,9 @@ system and gives an overview of their function and contents.
 
    :term:`SERIAL_CONSOLES`
       Defines a serial console (TTY) to enable using
-      `getty <https://en.wikipedia.org/wiki/Getty_(Unix)>`__. Provide a
-      value that specifies the baud rate followed by the TTY device name
-      separated by a semicolon. Use spaces to separate multiple devices::
+      :wikipedia:`getty <Getty_(Unix)>`. Provide a value that specifies the
+      baud rate followed by the TTY device name separated by a semicolon.
+      Use spaces to separate multiple devices::
 
          SERIAL_CONSOLES = "115200;ttyS0 115200;ttyS1"
 
@@ -7577,6 +7603,32 @@ system and gives an overview of their function and contents.
       of the :term:`SPDX` output in ``tmp/deploy/images/MACHINE/``
       (+ 0.07\% with the tested image), compared to just enabling
       :term:`SPDX_INCLUDE_SOURCES`.
+
+   :term:`SPDX_CUSTOM_ANNOTATION_VARS`
+      This option allows to associate `SPDX annotations
+      <https://spdx.github.io/spdx-spec/v2.3/annotations/>`__ to a recipe,
+      using the values of variables in the recipe::
+        
+         ANNOTATION1 = "First annotation for recipe"
+         ANNOTATION2 = "Second annotation for recipe"
+         SPDX_CUSTOM_ANNOTATION_VARS = "ANNOTATION1 ANNOTATION2"
+
+      This will add a new block to the recipe ``.sdpx.json`` output::
+
+         "annotations": [
+           {
+             "annotationDate": "2023-04-18T08:32:12Z",
+             "annotationType": "OTHER",
+             "annotator": "Tool: oe-spdx-creator - 1.0",
+             "comment": "ANNOTATION1=First annotation for recipe"
+           },
+           {
+             "annotationDate": "2023-04-18T08:32:12Z",
+             "annotationType": "OTHER",
+             "annotator": "Tool: oe-spdx-creator - 1.0",
+             "comment": "ANNOTATION2=Second annotation for recipe"
+           }
+         ],
 
    :term:`SPDX_INCLUDE_SOURCES`
       This option allows to add a description of the source files used to build
@@ -8265,12 +8317,10 @@ system and gives an overview of their function and contents.
       will be silently ignored.
 
    :term:`SYSVINIT_ENABLED_GETTYS`
-      When using
-      :ref:`SysVinit <dev-manual/new-recipe:enabling system services>`,
+      When using :ref:`SysVinit <dev-manual/new-recipe:enabling system services>`,
       specifies a space-separated list of the virtual terminals that should
-      run a `getty <https://en.wikipedia.org/wiki/Getty_%28Unix%29>`__
-      (allowing login), assuming :term:`USE_VT` is not set to
-      "0".
+      run a :wikipedia:`getty <Getty_(Unix)>` (allowing login), assuming
+      :term:`USE_VT` is not set to "0".
 
       The default value for :term:`SYSVINIT_ENABLED_GETTYS` is "1" (i.e. only
       run a getty on the first virtual terminal).
@@ -9177,9 +9227,8 @@ system and gives an overview of their function and contents.
    :term:`USE_VT`
       When using
       :ref:`SysVinit <dev-manual/new-recipe:enabling system services>`,
-      determines whether or not to run a
-      `getty <https://en.wikipedia.org/wiki/Getty_%28Unix%29>`__ on any
-      virtual terminals in order to enable logging in through those
+      determines whether or not to run a :wikipedia:`getty <Getty_(Unix)>`
+      on any virtual terminals in order to enable logging in through those
       terminals.
 
       The default value used for :term:`USE_VT` is "1" when no default value is
