@@ -1,0 +1,12 @@
+[Unit]
+Description=Migrate dropbear keys from /var/lib to /etc
+Before=dropbearkey.service
+ConditionPathExists=/var/lib/dropbear/dropbear_rsa_host_key
+
+[Service]
+RemainAfterExit=yes
+Type=oneshot
+ExecStart=/usr/libexec/dropbear/migrate-key-location
+
+[Install]
+WantedBy=dropbearkey.service

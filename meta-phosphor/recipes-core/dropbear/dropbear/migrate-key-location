@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if [ ! -e /etc/dropbear/dropbear_rsa_host_key ]; then
+    if [ -e /var/lib/dropbear/dropbear_rsa_host_key ]; then
+        echo "Migrating Dropbear key from /var/lib to /etc."
+        mkdir -p /etc/dropbear
+        mv /var/lib/dropbear/dropbear_rsa_host_key /etc/dropbear
+    else
+        echo "No Dropbear key found in /var/lib."
+    fi
+fi
