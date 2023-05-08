@@ -1,0 +1,20 @@
+0:
+    /system/chassis/motherboard/bmc/ethernet0:
+        entityID: 6
+        entityInstance: 1
+        interfaces:
+            xyz.openbmc_project.Inventory.Item.NetworkInterface:
+                MACAddress:
+                    IPMIFruProperty: Custom Field 2
+                    IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Item.Ethernet:
+    /system/chassis/motherboard/bmc/ethernet1:
+        entityID: 6
+        entityInstance: 2
+        interfaces:
+            xyz.openbmc_project.Inventory.Item.NetworkInterface:
+                MACAddress:
+                    IPMIFruProperty: Custom Field 3
+                    IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Item.Ethernet:
+
