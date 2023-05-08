@@ -40,6 +40,8 @@ require conf/machine/include/arm/armv8a/tune-cortexa35.inc
 PREFERRED_VERSION_trusted-firmware-a = "2.6.0"
 
 PREFERRED_VERSION_optee-os = "3.18.0"
+PREFERRED_VERSION_optee-os-tadevkit = "3.18.0"
+PREFERRED_VERSION_optee-test = "3.18.0"
 
 UBOOT_MKIMAGE:append:npcm8xx = " -E -B 8"
 
