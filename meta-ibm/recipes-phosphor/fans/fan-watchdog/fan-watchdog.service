@@ -11,4 +11,4 @@ ExecStart=/sbin/watchdog -T ${{TIMEOUT}} -t ${{INTERVAL}} -F ${{DEVICE}}
 KillSignal=SIGKILL
 
 [Install]
-RequiredBy=obmc-chassis-poweron@0.target
+#RequiredBy=obmc-chassis-poweron@0.target
