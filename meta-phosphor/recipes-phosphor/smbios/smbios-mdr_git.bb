@@ -10,7 +10,7 @@ DEPENDS += " \
     phosphor-dbus-interfaces \
     phosphor-logging \
     "
-SRCREV = "defbc2acdbdf7827706ddd7fee53d193b3d849b3"
+SRCREV = "ca2b38a60bf1c2bd4819f275625809dc79471523"
 PACKAGECONFIG ?= "cpuinfo"
 PACKAGECONFIG[smbios-no-dimm] = "-DDIMM_DBUS=OFF,-DDIMM_DBUS=ON"
 PACKAGECONFIG[cpuinfo] = "-DCPU_INFO=ON,-DCPU_INFO=OFF,libpeci i2c-tools"
