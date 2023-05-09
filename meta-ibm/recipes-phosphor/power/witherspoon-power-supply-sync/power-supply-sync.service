@@ -10,4 +10,4 @@ ConditionPathExists=!/run/openbmc/chassis@0-on
 ExecStart=/usr/bin/phosphor-gpio-util --gpio=105 --path=/dev/gpiochip0 --delay=5 --action=low_high
 
 [Install]
-RequiredBy=obmc-chassis-poweron@0.target
+#RequiredBy=obmc-chassis-poweron@0.target
