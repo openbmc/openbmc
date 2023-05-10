@@ -737,8 +737,8 @@
                 {
                     "types":
                     {
-                        "rType": "power_managed_by",
-                        "fType": "power_managing"
+                        "rType": "power_managing",
+                        "fType": "power_managed_by"
                     },
                     "paths":
                     [
@@ -776,8 +776,8 @@
                 {
                     "types":
                     {
-                        "rType": "power_managed_by",
-                        "fType": "power_managing"
+                        "rType": "power_managing",
+                        "fType": "power_managed_by"
                     },
                     "paths":
                     [
@@ -815,8 +815,8 @@
                 {
                     "types":
                     {
-                        "rType": "power_managed_by",
-                        "fType": "power_managing"
+                        "rType": "power_managing",
+                        "fType": "power_managed_by"
                     },
                     "paths":
                     [
@@ -854,8 +854,8 @@
                 {
                     "types":
                     {
-                        "rType": "power_managed_by",
-                        "fType": "power_managing"
+                        "rType": "power_managing",
+                        "fType": "power_managed_by"
                     },
                     "paths":
                     [
