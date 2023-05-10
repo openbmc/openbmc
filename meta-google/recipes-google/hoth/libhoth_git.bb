@@ -4,7 +4,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 SRC_URI = "git://github.com/google/libhoth;protocol=https;branch=main"
-SRCREV = "b31307b7bf525efda0164e461fb1e0a5c302d306"
+SRCREV = "519c5855964796f111c6d97b61507f15ea9d0dc9"
 
 PV = "1.0+git${SRCPV}"
 
