@@ -6,7 +6,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 SRC_URI = "git://github.com/openbmc/dbus-top;protocol=https;branch=main"
-SRCREV = "8c5208f16572b65a88b669f113ac73cb46255e5f"
+SRCREV = "c3aa2a814fa855589389a1530f6078723cc6a610"
 
 S = "${WORKDIR}/git"
 inherit meson pkgconfig
