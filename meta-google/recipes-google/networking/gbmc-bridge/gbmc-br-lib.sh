@@ -117,11 +117,11 @@ gbmc_br_set_ip() {
   local old_ip=
   if [ -n "$ip" ]; then
     old_ip="$(cat /var/google/gbmc-br-ip 2>/dev/null)"
-    [ "$old_ip" != "$ip" ] || return
+    [ "$old_ip" == "$ip" ] && return
     mkdir -p /var/google || return
     echo "$ip" >/var/google/gbmc-br-ip || return
   else
-    [ -f "/var/google/gbmc-br-ip" ] || return
+    [ ! -f "/var/google/gbmc-br-ip" ] && return
     rm -rf /var/google/gbmc-br-ip
   fi
 
