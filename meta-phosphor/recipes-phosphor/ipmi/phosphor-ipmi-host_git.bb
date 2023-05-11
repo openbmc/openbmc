@@ -21,7 +21,7 @@ def ipmi_whitelists(d):
     whitelists = [ '{}-whitelist-native'.format(x) for x in whitelists ]
     return ' '.join(whitelists)
 
-PACKAGECONFIG ??= "allowlist i2c-allowlist boot-flag-safe-mode softoff libuserlayer"
+PACKAGECONFIG ??= "allowlist i2c-allowlist boot-flag-safe-mode softoff libuserlayer entity-manager-decorators"
 PACKAGECONFIG[dynamic-sensors] = "-Ddynamic-sensors=enabled,-Ddynamic-sensors=disabled"
 PACKAGECONFIG[hybrid-sensors] = "-Dhybrid-sensors=enabled,-Dhybrid-sensors=disabled"
 PACKAGECONFIG[sel-logger-clears-sel] = "-Dsel-logger-clears-sel=enabled,-Dsel-logger-clears-sel=disabled"
@@ -33,6 +33,7 @@ PACKAGECONFIG[softoff] = "-Dsoftoff=enabled,-Dsoftoff=disabled"
 PACKAGECONFIG[update-functional-on-fail] = "-Dupdate-functional-on-fail=enabled,-Dupdate-functional-on-fail=disabled"
 PACKAGECONFIG[libuserlayer] = "-Dlibuserlayer=enabled,-Dlibuserlayer=disabled"
 PACKAGECONFIG[sensors-cache] = "-Dsensors-cache=enabled,-Dsensors-cache=disabled"
+PACKAGECONFIG[entity-manager-decorators] = "-Dentity-manager-decorators=enabled,-Dentity-manager-decorators=disabled"
 
 
 DEPENDS += "nlohmann-json"
