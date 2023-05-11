@@ -2,8 +2,10 @@ require u-boot-common-nuvoton.inc
 
 SUMMARY = "U-Boot bootloader fw_printenv/setenv utilities"
 DEPENDS = "mtd-utils bison-native"
+RDEPENDS:${PN} = "udev-nuvoton-mtd-partitions"
 
 PROVIDES += "u-boot-fw-utils"
+SRC_URI += "file://fw_env.config"
 
 INSANE_SKIP:${PN} = "already-stripped"
 
@@ -22,7 +24,7 @@ do_install () {
   install -d ${D}${sysconfdir}
   install -m 755 ${S}/tools/env/fw_printenv ${D}${base_sbindir}/fw_printenv
   install -m 755 ${S}/tools/env/fw_printenv ${D}${base_sbindir}/fw_setenv
-  install -m 0644 ${S}/tools/env/fw_env.config ${D}${sysconfdir}/fw_env.config
+  install -m 0644 ${WORKDIR}/fw_env.config ${D}${sysconfdir}/fw_env.config
 }
 
 do_install:class-cross () {

@@ -4,3 +4,4 @@ PREFERRED_PROVIDER_u-boot ?= "u-boot-nuvoton"
 PREFERRED_PROVIDER_u-boot-fw-utils ?= "u-boot-fw-utils-nuvoton"
 
 MACHINEOVERRIDES .= ":nuvoton"
+MACHINE_EXTRA_RRECOMMENDS += "udev-nuvoton-mtd-partitions"
