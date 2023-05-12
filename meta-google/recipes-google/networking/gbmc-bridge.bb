@@ -28,6 +28,7 @@ SRC_URI += " \
   file://gbmc-br-lib.sh \
   file://gbmc-br-load-ip.service \
   file://gbmc-start-dhcp.sh \
+  file://50-gbmc-br-cn-redirect.rules \
   "
 
 FILES:${PN}:append = " \
@@ -113,6 +114,7 @@ do_install() {
   nftables_dir=${D}${sysconfdir}/nftables
   install -d -m0755 "$nftables_dir"
   install -m0644 ${WORKDIR}/50-gbmc-br.rules $nftables_dir/
+  install -m0644 ${WORKDIR}/50-gbmc-br-cn-redirect.rules $nftables_dir/
 
   avahi_dir=${D}${sysconfdir}/avahi/services
   install -d -m 0755 "$avahi_dir"

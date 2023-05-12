@@ -1,0 +1,30 @@
+table bridge filter {
+    chain gbmcbr_mark {
+        type filter hook prerouting priority -300;
+        iifname == "cn0" mark set 1 return
+        iifname == "cn1" mark set 2 return
+    }
+}
+
+table inet raw {
+    chain gbmcbr_nat_input {
+        type filter hook prerouting priority -300;
+        # client should only use 10166 for this purpose and
+        # it should NOT use service port directly
+        # otherwise drop later if the packets goes into input
+        tcp dport 10167-10168 mark set 0xff
+        mark 1 tcp dport 10166 tcp dport set 10167 notrack
+        mark 2 tcp dport 10166 tcp dport set 10168 notrack
+    }
+    chain gbmcbr_nat_output {
+        type filter hook output priority -300;
+        tcp sport 10167 tcp sport set 10166 notrack
+        tcp sport 10168 tcp sport set 10166 notrack
+    }
+}
+
+table inet filter {
+    chain gbmc_br_redir_input {
+        mark 0xff drop
+    }
+}

@@ -13,6 +13,7 @@ table inet filter {
     type filter hook input priority 0; policy drop;
     iifname != gbmcbr accept
     ct state established accept
+    jump gbmc_br_redir_input
     jump gbmc_br_int_input
     jump gbmc_br_pub_input
     reject
