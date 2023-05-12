@@ -3,9 +3,6 @@ FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
 RRECOMMENDS:${PN} += "ipmitool"
 RDEPENDS:${PN} += "bash"
 
-PACKAGECONFIG:append = " dynamic-sensors"
-HOSTIPMI_PROVIDER_LIBRARY += "libdynamiccmds.so"
-
 SRC_URI += "\
             file://ampere-phosphor-softpoweroff \
             file://ampere.xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service \
