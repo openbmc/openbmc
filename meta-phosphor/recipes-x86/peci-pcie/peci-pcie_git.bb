@@ -4,7 +4,7 @@ and provides it on D-Bus"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=7becf906c8f8d03c237bad13bc3dac53"
 DEPENDS = "boost sdbusplus libpeci"
-SRCREV = "42a9ac884be499e41b52299a4c920028965046f7"
+SRCREV = "4fe704c4b2a6c79879922e3875494b7bbe6155d5"
 PV = "0.1+git${SRCPV}"
 
 SRC_URI = "git://github.com/openbmc/peci-pcie;branch=master;protocol=https"
