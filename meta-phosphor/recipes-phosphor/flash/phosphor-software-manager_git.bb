@@ -103,3 +103,18 @@ DBUS_SERVICE:${PN}-version += "xyz.openbmc_project.Software.Version.service"
 DBUS_SERVICE:${PN}-download-mgr += "xyz.openbmc_project.Software.Download.service"
 DBUS_SERVICE:${PN}-updater += "xyz.openbmc_project.Software.BMC.Updater.service"
 DBUS_SERVICE:${PN}-sync += "xyz.openbmc_project.Software.Sync.service"
+
+pkg_postinst:${PN}-side-switch() {
+    if ${@bb.utils.contains('PACKAGECONFIG', 'side_switch_on_boot', 'true', 'false', d)} ; then
+        mkdir -p $D$systemd_system_unitdir/obmc-host-startmin@0.target.wants
+        LINK="$D$systemd_system_unitdir/obmc-host-startmin@0.target.wants/phosphor-bmc-side-switch.service"
+        TARGET="../phosphor-bmc-side-switch.service"
+        ln -s $TARGET $LINK
+    fi
+}
+pkg_prerm:${PN}-side-switch() {
+    if ${@bb.utils.contains('PACKAGECONFIG', 'side_switch_on_boot', 'true', 'false', d)} ; then
+        LINK="$D$systemd_system_unitdir/obmc-host-startmin@0.target.wants/phosphor-bmc-side-switch.service"
+        rm $LINK
+    fi
+}
