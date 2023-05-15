@@ -13,6 +13,7 @@ POWER_SERVICE_PACKAGES_P10 = " \
     phosphor-power-utils \
     phosphor-power \
     phosphor-power-regulators \
+    phosphor-power-systemd-links-regulators \
     phosphor-power-psu-monitor \
 "
 
