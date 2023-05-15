@@ -1,8 +1,0 @@
-DEVPATH=/xyz/openbmc_project/watchdog/host0
-SERVICE=xyz.openbmc_project.Watchdog
-UNIT_HARD_RESET=ampere-host-power-cycle.service
-UNIT_POWER_OFF=ampere-chassis-poweroff.service
-UNIT_POWER_CYCLE=ampere-chassis-powercycle.service
-FALLBACK_ACTION=xyz.openbmc_project.State.Watchdog.Action.PowerCycle
-FALLBACK_INTERVAL=10800000
-MIN_INTERVAL=60000
