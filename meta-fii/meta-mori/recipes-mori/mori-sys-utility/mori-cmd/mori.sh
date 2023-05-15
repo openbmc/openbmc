@@ -129,8 +129,12 @@ function fw_rev() {
     echo " Bios: $cmd"
   fi
 
-  adm1266_ver "${I2C_MB_PWRSEQ[0]}" | grep REVISION
+  if [[ ! $(which mb_power_sequencer_version) ]]; then
+    echo "mb_power_sequencer_version utility not installed"
+    return
+  fi
 
+  mb_power_sequencer_version "${I2C_MB_PWRSEQ[0]}" | grep REVISION
 }
 
 function uartmux() {

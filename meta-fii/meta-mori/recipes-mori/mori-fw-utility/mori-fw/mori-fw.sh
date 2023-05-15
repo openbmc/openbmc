@@ -97,7 +97,7 @@ function fwbootstrap() {
   #switch access to BMC
   set_gpio_ctrl CPU_EEPROM_SEL 0
 
-  if [ "$(ampere_eeprom_prog -b ${I2C_CPU_EEPROM[0]} -s 0x${I2C_CPU_EEPROM[1]} -p -f $1)" -ne  0 ]; then
+  if [ "$(bootstrap_flash -b ${I2C_CPU_EEPROM[0]} -s 0x${I2C_CPU_EEPROM[1]} -p -f $1)" -ne  0 ]; then
     echo "CPU bootstrap EEPROM update failed" >&2
     return 1
   fi
@@ -118,16 +118,18 @@ function fwmb_pwr_seq(){
     echo "The file $1 does not exist"
     return 1
   fi
-  echo "${I2C_MB_PWRSEQ[0]}"-00"${I2C_MB_PWRSEQ[1]}" > /sys/bus/i2c/drivers/adm1266/unbind
-  #Parameters passed to adm1266_fw_fx to be used to flash PS
+  echo "${I2C_MB_PWRSEQ[0]}"-00"${I2C_MB_PWRSEQ[1]}" > \
+    /sys/bus/i2c/drivers/adm1266/unbind
+  #Parameters passed to mb_power_sequencer_flash to be used to flash PS
   #1st I2C bus number of PS's
   #2nd PS seq config file
-  if [ "$(adm1266_fw_fx ${I2C_MB_PWRSEQ[0]} $1)" -ne  0 ]; then
+  if [ "$(mb_power_sequencer_flash ${I2C_MB_PWRSEQ[0]} $1)" -ne  0 ]; then
 
     echo "The power seq flash failed" >&2
     return 1
   fi
-  echo "${I2C_MB_PWRSEQ[0]}"-00"${I2C_MB_PWRSEQ[1]}" > /sys/bus/i2c/drivers/adm1266/bind
+  echo "${I2C_MB_PWRSEQ[0]}"-00"${I2C_MB_PWRSEQ[1]}" > \
+    /sys/bus/i2c/drivers/adm1266/bind
 
   return 0
 }
@@ -138,6 +140,14 @@ if [[ ! $(which flashcp) ]]; then
 fi
 if [[ ! $(which loadsvf) ]]; then
     echo "loadsvf utility not installed"
+    exit 1
+fi
+if [[ ! $(which mb_power_sequencer_flash) ]]; then
+    echo "mb_power_sequencer_flash utility not installed"
+    exit 1
+fi
+if [[ ! $(which bootstrap_flash) ]]; then
+    echo "bootstrap_flash utility not installed"
     exit 1
 fi
 if [[ ! -e /dev/jtag0 ]]; then
