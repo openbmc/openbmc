@@ -120,7 +120,7 @@ ipmi_fru_alloc() {
     local fdn="${BASH_REMATCH[1]}"
     local start=$SECONDS
     local file
-    while (( SECONDS - start < 60 )); do
+    while (( SECONDS - start < 300 )); do
       local rc=0
       ipmi_fru_device_alloc "$fdn" "$ret" || rc=$?
       (( rc == 0 )) && break
