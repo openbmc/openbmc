@@ -3,7 +3,7 @@ HOMEPAGE = "https://github.com/openbmc/phosphor-misc"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 DEPENDS = "systemd"
-SRCREV = "37c76da7c277f3531f35ec726ac690e53ab4915a"
+SRCREV = "8419820f64f33704a7912715d86ee5c5cbfc121b"
 PACKAGECONFIG ??= " \
     first-boot-set-hostname \
     first-boot-set-mac \
