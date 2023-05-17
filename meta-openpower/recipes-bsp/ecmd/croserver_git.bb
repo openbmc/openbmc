@@ -3,8 +3,8 @@ DESCRIPTION = "eCMD is a hardware access API for IBM Systems"
 LICENSE= "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${S}/NOTICE;md5=fee220301a2af3faf8f211524b4248ea"
 
-SRC_URI = "git://github.com/open-power/eCMD.git;branch=master;protocol=https"
-SRCREV = "57b40102a54dac8b4b9cdc91beefd709d222867e"
+SRC_URI = "git://github.com/open-power/eCMD.git;branch=ecmd15;protocol=https"
+SRCREV = "72b925d4fabc8bff71d56f7a5ec7e3f0730f8f06"
 DEPENDS += "zlib"
 
 SRC_URI += "file://croserver.service"
