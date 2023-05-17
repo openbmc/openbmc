@@ -20,4 +20,5 @@ REQ_ATTRS_XMLS = "hwpf/fapi2/xml/attribute_info/chip_attributes.xml \
            chips/p10/procedures/xml/attribute_info/p10_qme_attributes.xml \
            chips/p10/procedures/xml/attribute_info/p10_runn_attributes.xml \
            chips/p10/procedures/xml/attribute_info/p10_sbe_load_bootloader_attributes.xml \
-           chips/p10/procedures/xml/attribute_info/p10_sbe_attributes.xml"
+           chips/p10/procedures/xml/attribute_info/p10_sbe_attributes.xml \
+           chips/p10/procedures/xml/attribute_info/pm_plat_attributes.xml"
