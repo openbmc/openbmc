@@ -38,3 +38,13 @@ do_install:append:witherspoon-tacoma() {
         printf "\nEEPROM=/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a600.i2c-bus/i2c-11/11-0051/eeprom" >> ${DEST}/inventory
 }
 
+pkg_postinst:${PN}:p10bmc() {
+    mkdir -p $D$systemd_system_unitdir/obmc-chassis-poweroff@0.target.wants
+    LINK="$D$systemd_system_unitdir/obmc-chassis-poweroff@0.target.wants/wait-vpd-parsers.service"
+    TARGET="../wait-vpd-parsers.service"
+    ln -s $TARGET $LINK
+}
+pkg_prerm:${PN}:p10bmc() {
+    LINK="$D$systemd_system_unitdir/obmc-chassis-poweroff@0.target.wants/wait-vpd-parsers.service"
+    rm $LINK
+}
