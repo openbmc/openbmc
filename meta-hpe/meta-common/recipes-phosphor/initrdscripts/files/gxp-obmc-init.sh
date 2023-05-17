@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 fslist="proc sys dev run"
 rodir=run/initramfs/ro
@@ -7,7 +7,10 @@ upper=$rwdir/cow
 work=$rwdir/work
 
 cd /
-mkdir -p "$fslist"
+for f in $fslist
+do
+	mkdir -p "$f"
+done
 mount dev dev -tdevtmpfs
 mount sys sys -tsysfs
 mount proc proc -tproc
@@ -125,15 +128,23 @@ try_wget() {
 	fi
 }
 
+getch() {
+        old=$(stty -g)
+        stty raw -echo min 0 time 50
+        printf '%s' "$(dd bs=1 count=1 2>/dev/null)"
+        stty "$old"
+}
+
 debug_takeover() {
 	echo "$@"
-	read -t 5 -n 1 -s -r -p  "Press any key to log in and try to manually fix, force recovery in 5 seconds"
-	if test $? -gt 0
+	echo "Press (Y/y) to log in and try to manually fix, force recovery in 5 seconds"
+	answer=$(getch)
+	if [ "$answer" != "y" ] && [ "$answer" != "Y" ] ; 
 	then
 		mkdir -p /var/lock
 		envdev=$(findmtd u-boot-env)
-		echo -e "/dev/${envdev}\t0x00000\t0x10000" > /etc/fw_env.config
-		echo -e "/dev/${envdev}\t0x10000\t0x10000" >> /etc/fw_env.config
+		echo "/dev/${envdev}     0x00000     0x10000" > /etc/fw_env.config
+		echo "/dev/${envdev}     0x10000     0x10000" >> /etc/fw_env.config
 		fw_setenv force_recovery 1
 		fw_setenv last_booterrmsg "$@"
 		devmem 0xc0000000 32 0x01

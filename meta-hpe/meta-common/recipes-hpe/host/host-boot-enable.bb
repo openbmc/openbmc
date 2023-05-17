@@ -14,8 +14,6 @@ SYSTEMD_LINK_${PN} += "${HOST_BOOT_FMT}"
 SRC_URI += "file://host-boot-enable.service"
 SRC_URI += "file://host-boot-enable.sh"
 
-RDEPENDS:${PN}:append = " bash"
-
 do_install() {
 	install -d ${D}${bindir}
 	install -m 0755 ${WORKDIR}/host-boot-enable.sh ${D}${bindir}

@@ -45,4 +45,5 @@ RDEPENDS:${PN}-system = " \
         phosphor-ipmi-ipmb \
         dbus-sensors \
         host-ehci-owner-reset \
+        host-boot-enable \
         "

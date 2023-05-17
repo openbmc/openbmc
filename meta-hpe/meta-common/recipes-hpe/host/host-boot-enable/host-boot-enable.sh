@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 findmtd() {
   m=$(grep -xl "$1" /sys/class/mtd/*/name)
@@ -7,10 +7,9 @@ findmtd() {
   echo "$m"
 }
 
-rom_lists=(host-prime host-second vrom-prime vrom-second)
-rom_mtd_list=()
+set -- host-prime host-second vrom-prime vrom-second
 
-for f in "${rom_lists[@]}"
+for f in "$@"
 do
   image=$(findmtd "${f}")
   if test -z "$image"
@@ -18,14 +17,13 @@ do
     echo "Unable to find mtd partition for ${f}"
     exit 1
   fi
-  rom_mtd_list+=("$image")
 done
 
 #enable vrom
 # host-prime to vrom-prime
-dd if="/dev/${rom_mtd_list[0]}" of="/dev/${rom_mtd_list[2]}"
+dd if="/dev/$(findmtd host-prime)" of="/dev/$(findmtd vrom-prime)"
 # host-second to vrom-second
-dd if="/dev/${rom_mtd_list[1]}" of="/dev/${rom_mtd_list[3]}"
+dd if="/dev/$(findmtd host-second)" of="/dev/$(findmtd vrom-second)"
 
 echo 0x1800008a > /sys/class/soc/srom/vromoff
 
