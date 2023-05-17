@@ -45,7 +45,7 @@ gbmc_upgrade_fetch() (
   # Determine the path of the image file for the correct machine
   # Our netboot can serve us images for multiple models
   local machine
-  machine="$(source /etc/os-release && echo "$OPENBMC_TARGET_MACHINE")" || return
+  machine="$(source /etc/os-release && echo "$GBMC_TARGET_MACHINE")" || return
 
   # Ensure some sane output file limit
   # Currently no BMC image is larger than 64M
