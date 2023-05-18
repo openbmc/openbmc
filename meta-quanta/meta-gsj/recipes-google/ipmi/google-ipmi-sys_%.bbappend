@@ -6,5 +6,5 @@ SYSTEMD_SERVICE:${PN}:remove:gsj = " \
   "
 
 do_install:append:gsj() {
-   rm -r ${D}/lib
+   rm -r ${D}${systemd_unitdir}
 }
