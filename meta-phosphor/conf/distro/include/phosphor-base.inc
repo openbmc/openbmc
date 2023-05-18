@@ -107,6 +107,7 @@ DISTRO_FEATURES_DEFAULT = " \
         slp \
         systemd \
         seccomp \
+        usrmerge \
         "
 
 DISTRO_FEATURES += " \
