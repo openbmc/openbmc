@@ -15,6 +15,8 @@ S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
 
+EXTRA_OECONF += "--libdir=${base_libdir}"
+
 FILES:${PN} += " \
                ${base_libdir}/security/ \
                ${sysconfdir}/key_file \
