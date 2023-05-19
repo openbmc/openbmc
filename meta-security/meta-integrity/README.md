@@ -76,7 +76,7 @@ other layers needed. e.g.:
 
 It has some dependencies on a suitable BSP; in particular the kernel
 must have a recent enough IMA/EVM subsystem. The layer was tested with
-Linux 3.19 and uses some features (like loading X509 certificates
+Linux 6.1 and uses some features (like loading X509 certificates
 directly from the kernel) which were added in that release. Your
 mileage may vary with older kernels.
 
@@ -89,10 +89,17 @@ Adding the layer only enables IMA (see below regarding EVM) during
 compilation of the Linux kernel. To also activate it when building
 the image, enable image signing in the local.conf like this:
 
+    DISTRO_FEATURES:append = " integrity ima"
+
     IMAGE_CLASSES += "ima-evm-rootfs"
+
     IMA_EVM_KEY_DIR = "${INTEGRITY_BASE}/data/debug-keys"
     IMA_EVM_PRIVKEY = "${IMA_EVM_KEY_DIR}/privkey_ima.pem"
     IMA_EVM_X509 = "${IMA_EVM_KEY_DIR}/x509_ima.der"
+    IMA_EVM_ROOT_CA = "${IMA_EVM_KEY_DIR}/ima-local-ca.pem"
+
+    # The following policy enforces IMA & EVM signatures
+    IMA_EVM_POLICY = "${INTEGRITY_BASE}/recipes-security/ima_policy_appraise_all/files/ima_policy_appraise_all"
 
 This uses the default keys provided in the "data" directory of the layer.
 Because everyone has access to these private keys, such an image
@@ -113,10 +120,7 @@ for that are included in the layer. This is also how the
     cd $IMA_EVM_KEY_DIR
     # In that shell, create the keys. Several options exist:
 
-    # 1. Self-signed keys.
-    $INTEGRITY_BASE/scripts/ima-gen-self-signed.sh
-
-    # 2. Keys signed by a new CA.
+    # 1. Keys signed by a new CA.
     # When asked for a PEM passphrase, that will be for the root CA.
     # Signing images then will not require entering that passphrase,
     # only creating new certificates does. Most likely the default
@@ -125,13 +129,11 @@ for that are included in the layer. This is also how the
     # $INTEGRITY_BASE/scripts/ima-gen-local-ca.sh
     # $INTEGRITY_BASE/scripts/ima-gen-CA-signed.sh
 
-    # 3. Keys signed by an existing CA.
+    # 2. Keys signed by an existing CA.
     # $INTEGRITY_BASE/scripts/ima-gen-CA-signed.sh <CA.pem> <CA.priv>
     exit
 
-When using ``ima-self-signed.sh`` as described above, self-signed keys
-are created. Alternatively, one can also use keys signed by a CA.  The
-``ima-gen-local-ca.sh`` and ``ima-gen.sh`` scripts create a root CA
+The ``ima-gen-local-ca.sh`` and ``ima-gen.sh`` scripts create a root CA
 and sign the signing keys with it. The ``ima-evm-rootfs.bbclass`` then
 supports adding tha CA's public key to the kernel's system keyring by
 compiling it directly into the kernel. Because it is unknown whether
@@ -187,7 +189,7 @@ IMA policy loading became broken in systemd 2.18. The modified systemd
 changes. To activate policy loading via systemd, place a policy file
 in `/etc/ima/ima-policy`, for example with:
 
-    IMA_EVM_POLICY_SYSTEMD = "${INTEGRITY_BASE}/data/ima_policy_simple"
+    IMA_EVM_POLICY = "${INTEGRITY_BASE}/data/ima_policy_simple"
 
 To check that measuring works, look at `/sys/kernel/security/ima/ascii_runtime_measurements`
 

@@ -5,7 +5,7 @@ require suricata.inc
 LIC_FILES_CHKSUM = "file://LICENSE;beginline=1;endline=2;md5=c70d8d3310941dcdfcd1e02800a1f548"
 
 SRC_URI = "http://www.openinfosecfoundation.org/download/suricata-${PV}.tar.gz"
-SRC_URI[sha256sum] = "59bfd1bf5d9c1596226fa4815bf76643ce59698866c107a26269c481f125c4d7"
+SRC_URI[sha256sum] = "4da5e4e91e49992633a6024ce10afe6441255b2775a8f20f1ef188bd1129ac66"
 
 DEPENDS = "lz4 libhtp"
 

@@ -20,7 +20,6 @@ CAKEY=${2:-ima-local-ca.priv}
 
 cat << __EOF__ >$GENKEY
 [ req ]
-default_bits = 1024
 distinguished_name = req_distinguished_name
 prompt = no
 string_mask = utf8only
@@ -36,13 +35,15 @@ basicConstraints=critical,CA:FALSE
 #basicConstraints=CA:FALSE
 keyUsage=digitalSignature
 #keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+extendedKeyUsage=critical,codeSigning
 subjectKeyIdentifier=hash
 authorityKeyIdentifier=keyid
 #authorityKeyIdentifier=keyid,issuer
 __EOF__
 
-openssl req -new -nodes -utf8 -sha1 -days 365 -batch -config $GENKEY \
-        -out csr_ima.pem -keyout privkey_ima.pem
-openssl x509 -req -in csr_ima.pem -days 365 -extfile $GENKEY -extensions v3_usr \
+openssl req -new -nodes -utf8 -sha256 -days 36500 -batch -config $GENKEY \
+        -out csr_ima.pem -keyout privkey_ima.pem \
+        -newkey ec -pkeyopt ec_paramgen_curve:prime256v1
+openssl x509 -req -in csr_ima.pem -days 36500 -extfile $GENKEY -extensions v3_usr \
         -CA $CA -CAkey $CAKEY -CAcreateserial \
         -outform DER -out x509_ima.der

@@ -17,7 +17,7 @@ IMA_EVM_X509 ?= "${IMA_EVM_KEY_DIR}/x509_ima.der"
 # with a .x509 suffix. See linux-%.bbappend for details.
 #
 # ima-local-ca.x509 is what ima-gen-local-ca.sh creates.
-IMA_EVM_ROOT_CA ?= ""
+IMA_EVM_ROOT_CA ?= "${IMA_EVM_KEY_DIR}/ima-local-ca.pem"
 
 # Sign all regular files by default.
 IMA_EVM_ROOTFS_SIGNED ?= ". -type f"
@@ -30,6 +30,9 @@ IMA_EVM_ROOTFS_IVERSION ?= ""
 
 # Avoid re-generating fstab when ima is enabled.
 WIC_CREATE_EXTRA_ARGS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'ima', ' --no-fstab-update', '', d)}"
+
+# Add necessary tools (e.g., keyctl) to image
+IMAGE_INSTALL:append = "${@bb.utils.contains('DISTRO_FEATURES', 'ima', ' ima-evm-utils', '', d)}"
 
 ima_evm_sign_rootfs () {
     cd ${IMAGE_ROOTFS}
@@ -59,17 +62,32 @@ ima_evm_sign_rootfs () {
        perl -pi -e 's;(\S+)(\s+)(${@"|".join((d.getVar("IMA_EVM_ROOTFS_IVERSION", True) or "no-such-mount-point").split())})(\s+)(\S+)(\s+)(\S+);\1\2\3\4\5\6\7,iversion;; s/(,iversion)+/,iversion/;' etc/fstab
     fi
 
-    # Sign file with private IMA key. EVM not supported at the moment.
-    bbnote "IMA/EVM: signing files 'find ${IMA_EVM_ROOTFS_SIGNED}' with private key '${IMA_EVM_PRIVKEY}'"
-    find ${IMA_EVM_ROOTFS_SIGNED} | xargs -d "\n" --no-run-if-empty --verbose evmctl ima_sign --key ${IMA_EVM_PRIVKEY}
-    bbnote "IMA/EVM: hashing files 'find ${IMA_EVM_ROOTFS_HASHED}'"
-    find ${IMA_EVM_ROOTFS_HASHED} | xargs -d "\n" --no-run-if-empty --verbose evmctl ima_hash
+    # Detect 32bit target to pass --m32 to evmctl by looking at libc
+    tmp="$(file "${IMAGE_ROOTFS}/lib/libc.so.6" | grep -o 'ELF .*-bit')"
+    if [ "${tmp}" = "ELF 32-bit" ]; then
+        evmctl_param="--m32"
+    elif [ "${tmp}" = "ELF 64-bit" ]; then
+        evmctl_param=""
+    else
+        bberror "Unknown target architecture bitness: '${tmp}'" >&2
+        exit 1
+    fi
+
+    bbnote "IMA/EVM: Signing root filesystem at ${IMAGE_ROOTFS} with key ${IMA_EVM_PRIVKEY}"
+    evmctl sign --imasig ${evmctl_param} --portable -a sha256 --key ${IMA_EVM_PRIVKEY} -r "${IMAGE_ROOTFS}"
+
+    # check signing key and signature verification key
+    evmctl ima_verify ${evmctl_param} --key "${IMA_EVM_X509}" "${IMAGE_ROOTFS}/lib/libc.so.6" || exit 1
+    evmctl verify     ${evmctl_param} --key "${IMA_EVM_X509}" "${IMAGE_ROOTFS}/lib/libc.so.6" || exit 1
 
     # Optionally install custom policy for loading by systemd.
-    if [ "${IMA_EVM_POLICY_SYSTEMD}" ]; then
+    if [ "${IMA_EVM_POLICY}" ]; then
         install -d ./${sysconfdir}/ima
         rm -f ./${sysconfdir}/ima/ima-policy
-        install "${IMA_EVM_POLICY_SYSTEMD}" ./${sysconfdir}/ima/ima-policy
+        install "${IMA_EVM_POLICY}" ./${sysconfdir}/ima/ima-policy
+
+        bbnote "IMA/EVM: Signing IMA policy with key ${IMA_EVM_PRIVKEY}"
+        evmctl sign --imasig ${evmctl_param} --portable -a sha256 --key "${IMA_EVM_PRIVKEY}" "${IMAGE_ROOTFS}/etc/ima/ima-policy"
     fi
 }
 

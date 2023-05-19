@@ -5,7 +5,7 @@ require suricata.inc
 LIC_FILES_CHKSUM = "file://LICENSE;beginline=1;endline=2;md5=596ab7963a1a0e5198e5a1c4aa621843"
 
 SRC_URI = "git://github.com/OISF/libhtp.git;protocol=https;branch=0.5.x"
-SRCREV = "b14f81bfddbc7206ea713177fcf1e1090257dcd2"
+SRCREV = "be0063a6138f795fc1af76cc5340bcb11d3b0b87"
 
 DEPENDS = "zlib"
 

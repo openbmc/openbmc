@@ -6,8 +6,13 @@ DEPENDS += "openssl attr keyutils"
 
 DEPENDS:class-native += "openssl-native keyutils-native"
 
-SRC_URI = "https://sourceforge.net/projects/linux-ima/files/${BPN}/${BP}.tar.gz"
-SRC_URI[sha256sum] = "fcf85b31d6292051b3679e5f17ffa7f89b6898957aad0f59aa4e9878884b27d1"
+FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
+
+SRC_URI = " \
+    https://github.com/mimizohar/ima-evm-utils/releases/download/v${PV}/${BP}.tar.gz \
+    file://0001-Do-not-get-generation-using-ioctl-when-evm_portable-.patch \
+"
+SRC_URI[sha256sum] = "45f1caa3ad59ec59a1d6a74ea5df38c413488cd952ab62d98cf893c15e6f246d"
 
 inherit pkgconfig autotools features_check
 

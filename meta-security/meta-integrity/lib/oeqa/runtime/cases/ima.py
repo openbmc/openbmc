@@ -58,21 +58,19 @@ class IMACheck(OERuntimeTestCase):
     @OETestDepends(['ima.IMACheck.test_ima_enabled'])
     def test_ima_hash(self):
         ''' Test if IMA stores correct file hash '''
-        filename = "/etc/filetest"
+        filename = "/etc/ld.so.cache"
         ima_measure_file = "/sys/kernel/security/ima/ascii_runtime_measurements"
-        status, output = self.target.run("echo test > %s" % filename)
-        self.assertEqual(status, 0, "Cannot create file %s on target" % filename)
 
         # wait for the IMA system to update the entry
-        maximum_tries = 30
+        maximum_tries = 3 
         tries = 0
-        status, output = self.target.run("sha1sum %s" %filename)
+        status, output = self.target.run("sha256sum %s" %filename)
         sleep(2)
         current_hash = output.split()[0]
         ima_hash = ""
 
         while tries < maximum_tries:
-            status, output = self.target.run("cat %s | grep %s" \
+            status, output = self.target.run("cat %s | grep -e '%s'" \
                 % (ima_measure_file, filename))
             # get last entry, 4th field
             if status == 0:

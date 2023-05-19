@@ -1,0 +1,77 @@
+dm-verity and x86-64 and systemd
+--------------------------------
+In this example, we'll target combining qemux86-64 with dm-verity and
+also systemd - systemd has dm-verity bindings and is more likely to be
+used on x86.
+
+While dm-verity in a qemu environment doesn't make practial sense as a
+deployment - it can be a useful stepping stone for testing and getting to
+a final physical deployment.
+
+Set/uncomment the MACHINE line for "qemux86-64" if you haven't yet.  It
+should be the default if unspecified, but check to be sure.  As of this
+writing (kernel v6.1) the resulting qemux86-64 build can also be booted
+successfully on physical hardware, but if you don't intend to use qemu,
+you might instead want to choose "genericx86-64"
+
+This will make use of wic/systemd-bootdisk-dmverity.wks.in -- note that it
+contains a dependency on the meta-intel layer for microcode, so you'll need
+to fetch and add that layer in addition to the meta-security related layers.
+
+In addition to the basic dm-verity settings, choose systemd in local.conf:
+
+DISTRO_FEATURES:append = " security systemd"
+VIRTUAL-RUNTIME_init_manager = "systemd"
+EFI_PROVIDER = "systemd-boot"
+PACKAGECONFIG:append:pn-systemd = " cryptsetup"
+
+Note the last line - you won't typically see that in on-line instructions
+for enabling systemd.  It is important for dm-verity, since it triggers
+the build and installation of components like this onto the rootfs:
+
+   /lib/systemd/system-generators/systemd-veritysetup-generator
+   /lib/systemd/systemd-veritysetup
+
+Now build the components for the wic image:
+
+   bitbake intel-microcode
+   bitbake core-image-minimal
+
+Assemble the image:
+
+           ------------------------------
+build-qemu-x86_64$wic create systemd-bootdisk-dmverity -e core-image-minimal
+INFO: Building wic-tools...
+
+[...]
+
+INFO: Creating image(s)...
+
+INFO: The new image(s) can be found here:
+  ./systemd-bootdisk-dmverity.wks-202304181413-sda.direct
+
+The following build artifacts were used to create the image(s):
+  BOOTIMG_DIR:                  /home/paul/poky/build-qemu-x86_64/tmp/work/qemux86_64-poky-linux/core-image-minimal/1.0-r0/recipe-sysroot/usr/share
+  KERNEL_DIR:                   /home/paul/poky/build-qemu-x86_64/tmp/deploy/images/qemux86-64
+  NATIVE_SYSROOT:               /home/paul/poky/build-qemu-x86_64/tmp/work/core2-64-poky-linux/wic-tools/1.0-r0/recipe-sysroot-native
+
+INFO: The image(s) were created using OE kickstart file:
+  /home/paul/poky/meta-security/wic/systemd-bootdisk-dmverity.wks.in
+build-qemu-x86_64$
+           ------------------------------
+
+The "runqemu" script defaults were acceptable for testing with only the
+verity image needing to be specified, i.e.
+
+    runqemu \
+    nographic \
+    qemux86-64 \
+    tmp/deploy/images/qemux86-64/core-image-minimal-qemux86-64-*.rootfs.ext4.verity
+
+You will see the above "direct" image file and also similarly named
+individual partition images.  To boot on UEFI enabled physical hardware,
+you need to simply write the "direct" image file to a USB stick with dd
+and the partition images can largely be ignored.
+
+Further information on interacting with the systemd UEFI loader is here:
+https://www.freedesktop.org/wiki/Software/systemd/systemd-boot/

@@ -1,0 +1,35 @@
+From 00ace817c5134d9844db387cadb9517ebad43808 Mon Sep 17 00:00:00 2001
+From: Stefan Berger <stefanb@linux.ibm.com>
+Date: Tue, 18 Apr 2023 11:43:55 -0400
+Subject: [PATCH] Do not get generation using ioctl when evm_portable is true
+
+If a signatures is detected as being portable do not attempt to read the
+generation with the ioctl since in some cases this may not be supported
+by the filesystem and is also not needed for computing a portable
+signature.
+
+This avoids the current work-around of passing --generation 0 when the
+ioctl is not supported by the filesystem.
+
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ src/evmctl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/evmctl.c b/src/evmctl.c
+index 6d2bb67..c35a28c 100644
+--- a/src/evmctl.c
++++ b/src/evmctl.c
+@@ -376,7 +376,7 @@ static int calc_evm_hash(const char *file, unsigned char *hash)
+ 	if (mode_str)
+ 		st.st_mode = strtoul(mode_str, NULL, 10);
+ 
+-	if (!evm_immutable) {
++	if (!evm_immutable && !evm_portable) {
+ 		if (S_ISREG(st.st_mode) && !generation_str) {
+ 			int fd = open(file, 0);
+ 
+---
+2.39.2
+
+

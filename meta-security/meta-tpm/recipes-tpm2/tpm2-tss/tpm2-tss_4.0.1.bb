@@ -18,7 +18,7 @@ CVE_PRODUCT = "tpm2_software_stack"
 
 inherit autotools pkgconfig systemd useradd
 
-PACKAGECONFIG ??= "vendor"
+PACKAGECONFIG ??= ""
 PACKAGECONFIG[oxygen] = ",--disable-doxygen-doc, "
 PACKAGECONFIG[fapi] = "--enable-fapi,--disable-fapi,curl json-c util-linux-libuuid "
 PACKAGECONFIG[policy] = "--enable-policy,--disable-policy,json-c util-linux-libuuid "

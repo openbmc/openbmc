@@ -18,7 +18,6 @@ GENKEY=ima-local-ca.genkey
 
 cat << __EOF__ >$GENKEY
 [ req ]
-default_bits = 2048
 distinguished_name = req_distinguished_name
 prompt = no
 string_mask = utf8only
@@ -33,10 +32,11 @@ emailAddress = john.doe@example.com
 basicConstraints=CA:TRUE
 subjectKeyIdentifier=hash
 authorityKeyIdentifier=keyid:always,issuer
-# keyUsage = cRLSign, keyCertSign
+keyUsage = cRLSign, keyCertSign
 __EOF__
 
-openssl req -new -x509 -utf8 -sha1 -days 3650 -batch -config $GENKEY \
+openssl req -new -x509 -utf8 -sha256 -days 36500 -batch -config $GENKEY \
+        -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 \
         -outform DER -out ima-local-ca.x509 -keyout ima-local-ca.priv
 
 openssl x509 -inform DER -in ima-local-ca.x509 -out ima-local-ca.pem

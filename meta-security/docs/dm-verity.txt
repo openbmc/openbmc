@@ -31,6 +31,8 @@ Kernel Configuration
 Kernel configuration for dm-verity happens automatically via IMAGE_CLASSES
 which will source features/device-mapper/dm-verity.scc when dm-verity-img
 is used. [See commit d9feafe991c]
+IMPORTANT: As per the top level README, you *must* put security in the
+DISTRO_FEATURES, or else you won't get the dm-verity kernel settings.
 
 Supported Platforms
 -------------------
@@ -51,10 +53,17 @@ conf/local.conf and conf/bblayers.conf from the oe-init-build-env
 Firstly, you need the meta-security layer to conf/bblayers.conf along with
 the dependencies it has -- see the top level meta-security README for that.
 
-Next, assuming you'll be using dm-verity for validation of your rootfs,
-you'll need to enable read-only rootfs support in your local.conf with:
+Note that if you are using dm-verity for your rootfs, then it enforces a
+read-only mount right at the kernel level, so be prepared for issues such
+as failed creation of temporary files and similar.
+
+Yocto does support additional checks and changes via setting:
 
 EXTRA_IMAGE_FEATURES = "read-only-rootfs"
+
+...but since read-only is enforced at the kernel level already, using
+this feature isn't a hard requirement.  It may be best to delay/defer
+making use of this until after you've established basic booting.
 
 For more details, see the associated documentation:
 
