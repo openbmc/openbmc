@@ -1,0 +1,9 @@
+[Unit]
+Description=Monitor the etcd config file changes
+
+[Path]
+PathChanged=/run/etcd-new.conf
+Unit=etcd-new.service
+
+[Install]
+WantedBy=multi-user.target

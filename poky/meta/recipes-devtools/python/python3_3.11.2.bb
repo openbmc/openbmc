@@ -72,11 +72,11 @@ ALTERNATIVE_LINK_NAME[python3-config] = "${bindir}/python${PYTHON_MAJMIN}-config
 ALTERNATIVE_TARGET[python3-config] = "${bindir}/python${PYTHON_MAJMIN}-config-${MULTILIB_SUFFIX}"
 
 
-DEPENDS = "bzip2-replacement-native libffi bzip2 openssl sqlite3 zlib virtual/libintl xz virtual/crypt util-linux-libuuid libtirpc libnsl2 autoconf-archive-native ncurses"
+DEPENDS = "bzip2-replacement-native expat libffi bzip2 openssl sqlite3 zlib virtual/libintl xz virtual/crypt util-linux-libuuid libtirpc libnsl2 autoconf-archive-native ncurses"
 DEPENDS:append:class-target = " python3-native"
 DEPENDS:append:class-nativesdk = " python3-native"
 
-EXTRA_OECONF = " --without-ensurepip --enable-shared --with-platlibdir=${baselib}"
+EXTRA_OECONF = " --without-ensurepip --enable-shared --with-platlibdir=${baselib} --with-system-expat"
 EXTRA_OECONF:append:class-native = " --bindir=${bindir}/${PN}"
 EXTRA_OECONF:append:class-target = " --with-build-python=nativepython3"
 EXTRA_OECONF:append:class-nativesdk = " --with-build-python=nativepython3"
@@ -95,17 +95,15 @@ CACHED_CONFIGUREVARS = " \
 "
 
 # PGO currently causes builds to not be reproducible so disable by default, see YOCTO #13407
-PACKAGECONFIG:class-target ??= "readline gdbm ${@bb.utils.filter('DISTRO_FEATURES', 'lto', d)}"
-PACKAGECONFIG:class-native ??= "readline gdbm"
-PACKAGECONFIG:class-nativesdk ??= "readline gdbm"
-PACKAGECONFIG[readline] = ",,readline"
+PACKAGECONFIG ??= "editline gdbm ${@bb.utils.filter('DISTRO_FEATURES', 'lto', d)}"
+PACKAGECONFIG[readline] = "--with-readline=readline,,readline,,,editline"
 PACKAGECONFIG[editline] = "--with-readline=editline,,libedit,,,readline"
 # Use profile guided optimisation by running PyBench inside qemu-user
 PACKAGECONFIG[pgo] = "--enable-optimizations,,qemu-native"
 PACKAGECONFIG[tk] = ",,tk"
 PACKAGECONFIG[tcl] = ",,tcl"
 PACKAGECONFIG[gdbm] = ",,gdbm"
-PACKAGECONFIG[lto] = "--with-lto,,"
+PACKAGECONFIG[lto] = "--with-lto,--without-lto"
 
 do_configure:prepend () {
     mkdir -p ${B}/Modules

@@ -38,6 +38,7 @@ PACKAGECONFIG[eap-mschapv2] = "--enable-eap-mschapv2,--disable-eap-mschapv2,,${P
 PACKAGECONFIG[gmp] = "--enable-gmp,--disable-gmp,gmp,${PN}-plugin-gmp"
 PACKAGECONFIG[ldap] = "--enable-ldap,--disable-ldap,openldap,${PN}-plugin-ldap"
 PACKAGECONFIG[mysql] = "--enable-mysql,--disable-mysql,mysql5,${PN}-plugin-mysql"
+PACKAGECONFIG[nm] = "--enable-nm,--disable-nm,networkmanager,${PN}-nm"
 PACKAGECONFIG[openssl] = "--enable-openssl,--disable-openssl,openssl,${PN}-plugin-openssl"
 PACKAGECONFIG[soup] = "--enable-soup,--disable-soup,libsoup-2.4,${PN}-plugin-soup"
 PACKAGECONFIG[sqlite3] = "--enable-sqlite,--disable-sqlite,sqlite3,${PN}-plugin-sqlite"
@@ -100,6 +101,10 @@ ALLOW_EMPTY:${PN}-imcvs = "1"
 
 FILES:${PN}-imcvs = "${libdir}/ipsec/imcvs/*.so"
 FILES:${PN}-imcvs-dbg += "${libdir}/ipsec/imcvs/.debug"
+
+PACKAGES =+ "${PN}-nm ${PN}-nm-dbg"
+FILES:${PN}-nm = "${libexecdir}/ipsec/charon-nm ${datadir}/dbus-1/system.d/nm-strongswan-service.conf"
+FILES:${PN}-nm-dbg = "${libexecdir}/ipsec/.debug/charon-nm"
 
 PACKAGES_DYNAMIC += "^${PN}-plugin-.*$"
 NOAUTOPACKAGEDEBUG = "1"

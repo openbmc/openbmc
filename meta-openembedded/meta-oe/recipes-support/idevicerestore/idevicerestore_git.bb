@@ -10,7 +10,7 @@ DEPENDS = "libirecovery libimobiledevice libzip curl libimobiledevice-glue opens
 
 PV = "1.0.1+git${SRCPV}"
 
-SRCREV = "7d622d916be16f2df5a72bf53a42f3a326bbfaa4"
+SRCREV = "163a1647dedb7ca4656c0f072e4733573f9f982b"
 SRC_URI = "git://github.com/libimobiledevice/idevicerestore;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"

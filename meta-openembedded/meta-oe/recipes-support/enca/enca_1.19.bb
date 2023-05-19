@@ -10,8 +10,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=24b9569831c46d4818450b55282476b4"
 SRC_URI = "https://dl.cihar.com/enca/enca-${PV}.tar.gz \
     file://dont-run-tests.patch \
     file://makefile-remove-tools.patch \
-    file://libenca-003-iconv.patch "
-
+    file://libenca-003-iconv.patch \
+    file://0001-Do-not-use-MKTEMP_PROG-in-cross-build.patch"
 SRC_URI[sha256sum] = "4c305cc59f3e57f2cfc150a6ac511690f43633595760e1cb266bf23362d72f8a"
 
 inherit autotools

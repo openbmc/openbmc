@@ -10,23 +10,19 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=ac58ac14f9d9d02cafd2d81ef38fb2cc \
 DEPENDS = "lcms bzip2 jpeg libpng tiff zlib fftw freetype libtool"
 
 BASE_PV := "${PV}"
-PV .= "-5"
+PV .= "-8"
 SRC_URI = "git://github.com/ImageMagick/ImageMagick.git;branch=main;protocol=https \
            file://0001-m4-Use-autconf-provided-AC_FUNC_FSEEKO.patch"
-SRCREV = "2d24be538f286962c355cf422bb525375ac77998"
+SRCREV = "920f79206ff59f30a4cff22c9c9c393508b82663"
 
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig update-alternatives
 export ac_cv_sys_file_offset_bits="64"
 
-# xml disabled because it's using xml2-config --prefix to determine prefix which returns just /usr with our libxml2
-# if someone needs xml support then fix it first
-EXTRA_OECONF = "--program-prefix= --program-suffix=.im7 --without-perl \
-                --disable-openmp --without-xml --disable-opencl \
-                --enable-largefile"
+EXTRA_OECONF = "--program-prefix= --program-suffix=.im7 --without-perl --enable-largefile"
 
-PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)}"
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)} cxx webp xml"
 PACKAGECONFIG[cxx] = "--with-magick-plus-plus,--without-magick-plus-plus"
 PACKAGECONFIG[graphviz] = "--with-gvc,--without-gvc,graphviz"
 PACKAGECONFIG[jp2] = "--with-jp2,,jasper"
@@ -38,6 +34,17 @@ PACKAGECONFIG[tcmalloc] = "--with-tcmalloc=yes,--with-tcmalloc=no,gperftools"
 PACKAGECONFIG[webp] = "--with-webp,--without-webp,libwebp"
 PACKAGECONFIG[wmf] = "--with-wmf,--without-wmf,libwmf"
 PACKAGECONFIG[x11] = "--with-x,--without-x,virtual/libx11 libxext libxt"
+PACKAGECONFIG[xml] = "--with-xml,--without-xml,libxml2"
+
+do_install:append:class-target() {
+    for file in MagickCore-config.im7 MagickWand-config.im7 Magick++-config.im7; do
+        sed -i 's,${STAGING_DIR_NATIVE},,g' ${D}${bindir}/"$file"
+    done
+    sed -i 's,${S},,g' ${D}${libdir}/ImageMagick-${BASE_PV}/config-Q16HDRI/configure.xml
+    sed -i 's,${B},,g' ${D}${libdir}/ImageMagick-${BASE_PV}/config-Q16HDRI/configure.xml
+    sed -i 's,${RECIPE_SYSROOT},,g' ${D}${libdir}/ImageMagick-${BASE_PV}/config-Q16HDRI/configure.xml
+    sed -i 's,${HOSTTOOLS_DIR},${bindir},g' ${D}${sysconfdir}/ImageMagick-7/delegates.xml
+}
 
 FILES:${PN} += "${libdir}/ImageMagick-${BASE_PV}/config-Q16* \
                 ${datadir}/ImageMagick-7"

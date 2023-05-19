@@ -4,7 +4,7 @@ SUMMARY = "Generic library for reporting various problems"
 HOMEPAGE = "https://abrt.readthedocs.org/"
 LICENSE = "GPL-2.0-or-later"
 DEPENDS = "xmlrpc-c xmlrpc-c-native intltool-native \
-        json-c libtar libnewt libproxy rpm \
+        json-c libarchive libtar libnewt libproxy rpm \
         augeas satyr systemd \
 "
 

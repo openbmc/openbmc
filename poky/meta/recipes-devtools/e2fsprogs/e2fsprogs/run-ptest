@@ -8,3 +8,4 @@ rm -f *.tmp
 rm -f *.ok
 rm -f *.failed
 rm -f *.log
+cp ../data/test_data.tmp ./

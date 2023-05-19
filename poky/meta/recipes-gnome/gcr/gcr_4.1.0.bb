@@ -17,8 +17,7 @@ CFLAGS += "-D_GNU_SOURCE"
 
 GNOMEBASEBUILDCLASS = "meson"
 GTKDOC_MESON_OPTION = "gtk_doc"
-inherit gnomebase gtk-icon-cache gi-docgen features_check upstream-version-is-even vala gobject-introspection gettext mime mime-xdg
-UPSTREAM_CHECK_REGEX = "gcr-(?P<pver>\d+\.(\d*[02468])+(\.\d+)+)\.tar.xz"
+inherit gnomebase gtk-icon-cache gi-docgen features_check vala gobject-introspection gettext mime mime-xdg
 
 REQUIRED_DISTRO_FEATURES = "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'opengl', '', d)}"
 

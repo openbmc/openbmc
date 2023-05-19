@@ -30,4 +30,4 @@ do_install:append() {
     find ${D}${prefix} -maxdepth 1 -type f -delete
 }
 
-EXTRA_OECMAKE = "-DPAHO_WITH_SSL=ON"
+EXTRA_OECMAKE = "-DPAHO_WITH_SSL=ON -DPAHO_ENABLE_TESTING=OFF -DPAHO_HIGH_PERFORMANCE=ON"

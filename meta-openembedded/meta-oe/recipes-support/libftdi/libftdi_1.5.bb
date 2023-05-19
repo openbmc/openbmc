@@ -27,6 +27,11 @@ EXTRA_OECMAKE = "-DSTATICLIBS=off -DEXAMPLES=off \
                  -DPYTHON_LIBRARY=${STAGING_LIBDIR}/lib${PYTHON_DIR}${PYTHON_ABI}.so \
                  -DPYTHON_INCLUDE_DIR=${STAGING_INCDIR}/${PYTHON_DIR}${PYTHON_ABI}"
 
+do_install:append() {
+    # remove absolute paths
+    sed -i -e 's|${RECIPE_SYSROOT}||g' ${D}${libdir}/cmake/libftdi1/LibFTDI1Config.cmake
+}
+
 BBCLASSEXTEND = "native nativesdk"
 
 PACKAGES =+ "${PN}-python ftdi-eeprom"

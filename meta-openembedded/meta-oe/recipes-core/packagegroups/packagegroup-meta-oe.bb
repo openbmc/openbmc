@@ -641,7 +641,8 @@ RDEPENDS:packagegroup-meta-oe-kernel ="\
     usbip-tools \
 "
 RDEPENDS:packagegroup-meta-oe-kernel:append:x86 = " intel-speed-select ipmiutil pm-graph turbostat"
-RDEPENDS:packagegroup-meta-oe-kernel:append:x86-64 = " intel-speed-select ipmiutil kpatch pm-graph turbostat bpftool"
+RDEPENDS:packagegroup-meta-oe-kernel:append:x86-64 = " intel-speed-select ipmiutil pm-graph turbostat bpftool"
+RDEPENDS:packagegroup-meta-oe-kernel:append:x86-64:libc-glibc = " kpatch"
 RDEPENDS:packagegroup-meta-oe-kernel:append:powerpc64 = " libpfm4"
 
 # Kernel-selftest does not build with 5.8 and its exluded from build too so until its fixed remove it
@@ -667,7 +668,6 @@ RDEPENDS:packagegroup-meta-oe-multimedia ="\
     jack-server \
     jack-utils \
     libass \
-    libburn \
     libcdio-paranoia \
     libcdio \
     ${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "commercial", "libmad", "", d)} \
@@ -989,6 +989,7 @@ RDEPENDS:packagegroup-meta-oe-ptest-packages:append:x86-64 = " mcelog-ptest"
 RDEPENDS:packagegroup-meta-oe-ptest-packages:remove:riscv64 = "oprofile-ptest"
 RDEPENDS:packagegroup-meta-oe-ptest-packages:remove:riscv32 = "oprofile-ptest"
 RDEPENDS:packagegroup-meta-oe-ptest-packages:remove:arm = "numactl-ptest"
+RDEPENDS:packagegroup-meta-oe-ptest-packages:remove:libc-musl = "minicoredumper-ptest"
 
 
 RDEPENDS:packagegroup-meta-oe-fortran-packages = "\

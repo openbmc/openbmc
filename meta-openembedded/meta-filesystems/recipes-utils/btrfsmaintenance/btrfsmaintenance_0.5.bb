@@ -38,9 +38,9 @@ do_install() {
         ${D}${systemd_system_unitdir}
 
     install -Dm0644 ${S}/btrfsmaintenance-functions \
-        ${D}${datadir}/${PN}/btrfsmaintenance-functions
+        ${D}${datadir}/${BPN}/btrfsmaintenance-functions
     install -Dm0755 ${S}/*.sh \
-        ${D}${datadir}/${PN}
+        ${D}${datadir}/${BPN}
 
     install -Dm0644 ${S}/sysconfig.btrfsmaintenance \
         ${D}${sysconfdir}/default/btrfsmaintenance

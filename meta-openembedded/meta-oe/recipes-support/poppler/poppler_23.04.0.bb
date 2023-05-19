@@ -10,7 +10,7 @@ SRC_URI = "http://poppler.freedesktop.org/${BP}.tar.xz \
            "
 SRC_URI[sha256sum] = "b6d893dc7dcd4138b9e9df59a13c59695e50e80dc5c2cacee0674670693951a1"
 
-DEPENDS = "fontconfig zlib cairo lcms glib-2.0"
+DEPENDS = "fontconfig zlib cairo lcms glib-2.0 glib-2.0-native"
 
 inherit cmake pkgconfig gobject-introspection
 

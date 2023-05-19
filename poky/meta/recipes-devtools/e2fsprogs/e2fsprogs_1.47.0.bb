@@ -141,4 +141,7 @@ do_install_ptest() {
 
         install -d ${D}${PTEST_PATH}/lib
         install -m 0644 ${B}/lib/config.h  ${D}${PTEST_PATH}/lib/
+
+        install -d ${D}${PTEST_PATH}/data
+        install -m 0644 ${B}/tests/test_data.tmp ${D}${PTEST_PATH}/data/
 }

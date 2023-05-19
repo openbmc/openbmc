@@ -14,6 +14,7 @@ SRC_URI = "${GNU_MIRROR}/cpio/cpio-${PV}.tar.gz \
            file://0001-Use-__alignof__-with-clang.patch \
            file://0001-Wrong-CRC-with-ASCII-CRC-for-large-files.patch \
            file://run-ptest \
+           file://test.sh \
            "
 
 SRC_URI[md5sum] = "389c5452d667c23b5eceb206f5000810"
@@ -57,8 +58,23 @@ do_install_ptest() {
     install --mode=755 ${B}/tests/atlocal ${D}${PTEST_PATH}/tests/
     install --mode=755 ${B}/tests/genfile ${D}${PTEST_PATH}/tests/
     install --mode=755 ${S}/tests/testsuite ${D}${PTEST_PATH}/tests/
-    sed -i "s#@PTEST_PATH@#${PTEST_PATH}#g" ${D}${PTEST_PATH}/run-ptest
+    install --mode=755 ${WORKDIR}/test.sh ${D}${PTEST_PATH}/test.sh
+    sed -i "s#@PTEST_PATH@#${PTEST_PATH}#g" ${D}${PTEST_PATH}/test.sh
 }
+
+# ptest.bbclass currently chowns the ptest directory explicitly, so we need to
+# change permission after that has happened so the ptest user can write a
+# temporary directory.
+do_install_ptest_base:append() {
+    chgrp -R ptest ${D}${PTEST_PATH}/
+    chmod -R g+w ${D}${PTEST_PATH}/
+}
+
+# The tests need to run as a non-root user, so pull in the ptest user
+DEPENDS:append:class-target = "${@bb.utils.contains('PTEST_ENABLED', '1', ' ptest-runner', '', d)}"
+PACKAGE_WRITE_DEPS += "ptest-runner"
+
+RDEPENDS:${PN}-ptest += "ptest-runner"
 
 PACKAGES =+ "${PN}-rmt"
 

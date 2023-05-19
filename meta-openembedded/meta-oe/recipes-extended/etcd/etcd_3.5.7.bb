@@ -8,6 +8,10 @@ SRC_URI = " \
     git://github.com/etcd-io/etcd;branch=release-3.5;protocol=https \
     file://0001-xxhash-bump-to-v2.1.2.patch;patchdir=src/${GO_IMPORT} \
     file://0001-test_lib.sh-remove-gobin-requirement-during-build.patch;patchdir=src/${GO_IMPORT} \
+    file://etcd.service \
+    file://etcd-existing.conf \
+    file://etcd-new.service \
+    file://etcd-new.path \
 "
 
 SRCREV = "215b53cf3b48ee761f4c40908b3874b2e5e95e9f"
@@ -22,7 +26,7 @@ RDEPENDS:${PN}-dev = " \
 
 export GO111MODULE="on"
 
-inherit go
+inherit go systemd pkgconfig features_check
 
 # Go based binaries do not handle being stripped
 INHIBIT_PACKAGE_STRIP = "1"
@@ -49,10 +53,21 @@ go_do_compile:prepend() {
     chmod u+w -R ${WORKDIR}/build/pkg/mod
 }
 
+REQUIRED_DISTRO_FEATURES = "systemd"
+SYSTEMD_PACKAGES = "${PN}"
+SYSTEMD_SERVICE:${PN}:append = " etcd.service etcd-new.service etcd-new.path"
+
 do_install:append() {
     install -d ${D}${bindir}/
-    install -m 0755 ${D}/usr/lib/go/src/go.etcd.io/etcd/v3/bin/etcd ${D}${bindir}
-    install -m 0755 ${D}/usr/lib/go/src/go.etcd.io/etcd/v3/bin/etcdctl ${D}${bindir}
-    install -m 0755 ${D}/usr/lib/go/src/go.etcd.io/etcd/v3/bin/etcdutl ${D}${bindir}
+    install -m 0755 ${D}${libdir}/go/src/go.etcd.io/etcd/v3/bin/etcd ${D}${bindir}
+    install -m 0755 ${D}${libdir}/go/src/go.etcd.io/etcd/v3/bin/etcdctl ${D}${bindir}
+    install -m 0755 ${D}${libdir}/go/src/go.etcd.io/etcd/v3/bin/etcdutl ${D}${bindir}
+    install -m 0644 ${WORKDIR}/etcd-existing.conf -D -t ${D}${sysconfdir}/etcd.d
+    install -d ${D}${systemd_system_unitdir}
+    install -m 0644 ${WORKDIR}/etcd.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${WORKDIR}/etcd-new.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${WORKDIR}/etcd-new.path ${D}${systemd_system_unitdir}/
 }
+
+FILES:${PN}:append = " ${sysconfdir}/etcd.d/etcd-existing.conf"
 

@@ -1,0 +1,15 @@
+[Unit]
+Description=etcd cluster member start/add service
+Documentation=https://etcd.io/docs/v3.5/op-guide/clustering/
+ConditionPathExists=!/var/lib/etcd/member
+ConditionPathExists=/run/etcd-new.conf
+OnFailure=etcd.service
+
+[Service]
+Type=notify
+EnvironmentFile=/run/etcd-new.conf
+ExecStart=/usr/bin/etcd
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

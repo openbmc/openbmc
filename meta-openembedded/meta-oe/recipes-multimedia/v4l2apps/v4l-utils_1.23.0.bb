@@ -38,14 +38,10 @@ SRCREV = "9431e4b26b4842d1401e80ada9f14593dca3a94c"
 PV .= "+git${SRCPV}"
 
 S = "${WORKDIR}/git"
-B = "${S}"
 
 do_configure:prepend() {
-    ${S}/bootstrap.sh
+    cd ${S}; ./bootstrap.sh; cd -
 }
-
-SRC_URI[md5sum] = "8aa73287320a49e9170a8255d7b2c7e6"
-SRC_URI[sha256sum] = "65c6fbe830a44ca105c443b027182c1b2c9053a91d1e72ad849dfab388b94e31"
 
 EXTRA_OECONF = "--enable-shared --with-udevdir=${base_libdir}/udev \
                 --disable-v4l2-compliance-32 --disable-v4l2-ctl-32"

@@ -16,6 +16,7 @@ SRC_URI = "ftp://ftp.mars.org/pub/mpeg/libmad-${PV}.tar.gz \
     file://fix_for_mips_with_gcc-4.5.0.patch \
     file://obsolete_automake_macros.patch \
     file://automake-foreign.patch \
+    file://0001-configure-Respect-the-cflags-from-environment.patch \
 "
 SRC_URI:append:toolchain-clang = " file://0004-Remove-clang-unsupported-compiler-flags.patch "
 

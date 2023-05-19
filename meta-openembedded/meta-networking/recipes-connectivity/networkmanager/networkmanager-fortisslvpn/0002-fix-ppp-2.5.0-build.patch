@@ -1,0 +1,34 @@
+From 8773f772d39f8eee6edc1fd2e5437c754ed41e1e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Eivind=20N=C3=A6ss?= <eivnaes@yahoo.com>
+Date: Sat, 4 Mar 2023 21:29:54 +0000
+Subject: [PATCH] Fixing configure.ac from previous change
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Accepted
+Signed-off-by: Eivind Næss <eivnaes@yahoo.com>
+---
+ configure.ac | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 877493e..a5b4abb 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -47,11 +47,7 @@ AC_CHECK_HEADERS(pppd/pppd.h,,
+ 
+ dnl
+ dnl Check the presense of other pppd/*.h files
+-AC_CHECK_HEADERS([
+-    pppd/chap.h
+-    pppd/chap-new.h
+-    pppd/chap_ms.h
+-    ])
++AC_CHECK_HEADERS(pppd/chap.h pppd/chap-new.h pppd/chap_ms.h)
+ 
+ dnl
+ dnl Versions >= 2.5.0 will have pkg-config support
+-- 
+GitLab
+

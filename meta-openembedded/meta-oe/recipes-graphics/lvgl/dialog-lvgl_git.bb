@@ -1,8 +1,11 @@
 # SPDX-FileCopyrightText: Huawei Inc.
 # SPDX-License-Identifier: MIT
 
-SRC_URI = "gitsm://git.ostc-eu.org/rzr/dialog-lvgl;destsuffix=${S};protocol=https;nobranch=1"
-SRCREV = "5d2121457a6988c97cacb0790594440693fc3d29"
+SRC_URI = "git://git.ostc-eu.org/rzr/dialog-lvgl;destsuffix=${S};protocol=https;nobranch=1 \
+           file://0001-wayland-Switch-to-custom-timer-tick.patch \
+           file://0002-wayland-Fix-callback-data-type.patch \
+           "
+SRCREV = "cdf8d38acca87e871c3a488fd07f1e4779590f8e"
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=8ce0a84e5276f01364119c873b712c4f"

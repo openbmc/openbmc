@@ -1,9 +1,11 @@
 [Unit]
 Description=Load USB gadget schemas
+Requires=sys-kernel-config.mount
+After=sys-kernel-config.mount
 
 [Service]
-Type=oneshot
+Type=simple
 ExecStart=/usr/bin/gadget-start
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=usb-gadget.target

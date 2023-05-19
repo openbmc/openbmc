@@ -10,8 +10,9 @@ DEPENDS = "libplist usbmuxd libusbmuxd libtasn1 gnutls libgcrypt libimobiledevic
 
 PV = "1.3.0+git${SRCPV}"
 
-SRCREV = "2eec1b9a172354c8521123a767d998b17bd2ac18"
-SRC_URI = "git://github.com/libimobiledevice/libimobiledevice;protocol=https;branch=master"
+SRCREV = "860ffb707af3af94467d2ece4ad258dda957c6cd"
+SRC_URI = "git://github.com/libimobiledevice/libimobiledevice;protocol=https;branch=master \
+           file://0001-include-unistd.h-for-usleep.patch"
 
 S = "${WORKDIR}/git"
 inherit autotools pkgconfig

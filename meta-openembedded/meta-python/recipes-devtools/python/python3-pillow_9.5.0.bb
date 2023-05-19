@@ -30,6 +30,7 @@ RDEPENDS:${PN} += " \
     ${PYTHON_PN}-misc \
     ${PYTHON_PN}-logging \
     ${PYTHON_PN}-numbers \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'libxcb', '', d)} \
 "
 
 RDEPENDS:${PN}-ptest += " \

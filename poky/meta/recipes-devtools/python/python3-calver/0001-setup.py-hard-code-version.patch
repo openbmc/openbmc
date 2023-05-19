@@ -1,0 +1,32 @@
+From 390a233ed969f82b2ef209b23bfb523e785603f9 Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Tue, 9 May 2023 10:19:41 -0400
+Subject: [PATCH] setup.py: hard-code version
+
+setup.py is pulling the build version from the current date rather than
+a release tag or other predictable method, causing reproducibility 
+issues in builds. Patch this to make reproducible builds work while
+discussing this with upstream maintainer (or developing a patch that can
+make calver rely on a more standard pyproject.toml solution).
+
+Upstream-Status: Inappropriate (configuration)
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 73f6b10..2e27cf1 100644
+--- a/setup.py
++++ b/setup.py
+@@ -42,5 +42,5 @@ setup(
+             "use_calver = calver.integration:version",
+         ],
+     },
+-    version=calver_version(True),
++    version=calver_version("2022.6.26"),
+ )
+-- 
+2.40.0
+

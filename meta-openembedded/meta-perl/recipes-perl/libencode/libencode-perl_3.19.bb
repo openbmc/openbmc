@@ -21,8 +21,8 @@ UPSTREAM_CHECK_REGEX = "Encode\-(?P<pver>(\d+\.\d+))(?!_\d+).tar"
 
 S = "${WORKDIR}/Encode-${PV}"
 
+#EXTRA_CPANFLAGS:append = "PERL=../recipe-sysroot-native/usr/bin/perl-native/perl"
 inherit cpan ptest-perl
-
 do_install:prepend() {
     # Requires "-T" (taint) option on command line
     rm -rf ${B}/t/taint.t
@@ -30,6 +30,10 @@ do_install:prepend() {
     # and we cannot load perl-module-encode because we are providing
     # an alternative
     rm -rf ${B}/t/use-Encode-Alias.t
+}
+
+do_install:append() {
+    sed -i -e "s|${STAGING_BINDIR_NATIVE}/perl-native||g" ${S}/*/*.exh ${S}/*.exh
 }
 
 do_install_ptest() {

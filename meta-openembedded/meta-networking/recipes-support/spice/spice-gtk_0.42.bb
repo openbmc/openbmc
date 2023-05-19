@@ -46,8 +46,13 @@ inherit meson pkgconfig vala gobject-introspection features_check
 
 REQUIRED_DISTRO_FEATURES = "opengl"
 
-EXTRA_OEMESON = "-Dpie=true -Dvapi=enabled -Dintrospection=enabled"
-EXTRA_OEMESON:append:libc-musl = " -Dcoroutine=libucontext"
+GIR_MESON_ENABLE_FLAG = 'enabled'
+GIR_MESON_DISABLE_FLAG = 'disabled'
 
+PACKAGECONFIG ??= "${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'vapi', '', d)}"
+PACKAGECONFIG[vapi] = "-Dvapi=enabled,-Dvapi=disabled"
+
+EXTRA_OEMESON = "-Dpie=true"
+EXTRA_OEMESON:append:libc-musl = " -Dcoroutine=libucontext"
 
 FILES:${PN} += "${datadir}"

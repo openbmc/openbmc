@@ -1,0 +1,31 @@
+We don't need to build ninja so there's no need to use scikit-build,
+as we just need the python module with it's one ninja() function.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/pyproject.toml b/pyproject.toml
+index b895c20..577b642 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,7 +1,6 @@
+ [build-system]
+ requires = [
+     "setuptools>=42",
+-    "scikit-build>=0.12",
+ ]
+ build-backend = "setuptools.build_meta"
+ 
+diff --git a/setup.py b/setup.py
+index dbe1fbc..3259754 100755
+--- a/setup.py
++++ b/setup.py
+@@ -5,7 +5,7 @@ import os
+ import sys
+ from distutils.text_file import TextFile
+ 
+-from skbuild import setup
++from setuptools import setup
+ 
+ # Add current folder to path
+ # This is required to import versioneer in an isolated pip build

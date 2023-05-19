@@ -1532,11 +1532,18 @@ code to build all kernel trees. All needed headers are staged into the
 :term:`STAGING_KERNEL_DIR` directory to allow out-of-tree module builds
 using the :ref:`ref-classes-module` class.
 
-This means that each built kernel module is packaged separately and
-inter-module dependencies are created by parsing the ``modinfo`` output.
-If all modules are required, then installing the ``kernel-modules``
-package installs all packages with modules and various other kernel
-packages such as ``kernel-vmlinux``.
+If a file named ``defconfig`` is listed in :term:`SRC_URI`, then by default
+:ref:`ref-tasks-configure` copies it as ``.config`` in the build directory,
+so it is automatically used as the kernel configuration for the build. This
+copy is not performed in case ``.config`` already exists there: this allows
+recipes to produce a configuration by other means in
+``do_configure:prepend``.
+
+Each built kernel module is packaged separately and inter-module
+dependencies are created by parsing the ``modinfo`` output.  If all modules
+are required, then installing the ``kernel-modules`` package installs all
+packages with modules and various other kernel packages such as
+``kernel-vmlinux``.
 
 The :ref:`ref-classes-kernel` class contains logic that allows you to embed an initial
 RAM filesystem (:term:`Initramfs`) image when you build the kernel image. For
@@ -1590,7 +1597,8 @@ Only a single kernel can be added to the FIT image created by
 :ref:`ref-classes-kernel-fitimage` and the kernel image in FIT is mandatory. The
 address where the kernel image is to be loaded by U-Boot is
 specified by :term:`UBOOT_LOADADDRESS` and the entrypoint by
-:term:`UBOOT_ENTRYPOINT`.
+:term:`UBOOT_ENTRYPOINT`. Setting :term:`FIT_ADDRESS_CELLS` to "2"
+is necessary if such addresses are 64 bit ones.
 
 Multiple device trees can be added to the FIT image created by
 :ref:`ref-classes-kernel-fitimage` and the device tree is optional.

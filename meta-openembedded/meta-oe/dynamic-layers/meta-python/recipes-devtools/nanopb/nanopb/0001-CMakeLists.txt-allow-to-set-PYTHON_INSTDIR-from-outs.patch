@@ -1,0 +1,67 @@
+From 30c79d1b49839a15c05a0d0ca7e54787cd7988c6 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Thu, 4 May 2023 07:17:57 +0000
+Subject: [PATCH] CMakeLists.txt: allow to set PYTHON_INSTDIR from outside
+
+CMakeLists.txt used:
+
+find_package(Python REQUIRED COMPONENTS Interpreter)
+execute_process(
+    COMMAND ${Python_EXECUTABLE} -c
+        "import os.path, sys, sysconfig; print(os.path.relpath(sysconfig.get_path('purelib'), start=sys.prefix))"
+    OUTPUT_VARIABLE PYTHON_INSTDIR
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+but with python3native this returns:
+
+nanopb/0.4.7-r0/git $ ../recipe-sysroot-native/usr/bin/python3-native/python3 -c "import os.path, sys, sysconfig; print(os.path.relpath(sysconfig.get_path('purelib'), start=sys.prefix))"
+lib/python3.11/site-packages
+
+which doesn't respect target libdir which might be lib64 with multilib and with python3targetconfig
+it also doesn't work right because of the long relative path:
+
+nanopb/0.4.7-r0/build $ ../recipe-sysroot-native/usr/bin/python3-native/python3 -c "import os.path, sys, sysconfig; print(os.path.relpath(sysconfig.get_path('purelib'), start=sys.prefix))"
+../../../../../../../../../../../../usr/lib64/python3.11/site-packages
+
+CMake Error at cmake_install.cmake:46 (file):
+  file cannot create directory:
+  /OE/lge/build/starfish/nanbield/BUILD/work/o22-starfish-linux/nanopb/0.4.7-r0/image/usr/../../../../../../../../../../../../usr/lib64/python3.11/site-packages/proto.
+  Maybe need administrative privileges.
+
+Let CMake variable to be passed from the recipe to avoid this as we're already using
+${D}${PYTHON_SITEPACKAGES_DIR} in do_install:append anyway.
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+Upstream-Status: Pending
+---
+ CMakeLists.txt | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8d241c5..7d3f993 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -39,13 +39,15 @@ if(NOT DEFINED CMAKE_INSTALL_CMAKEDIR)
+     set(CMAKE_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/nanopb")
+ endif()
+ 
+-find_package(Python REQUIRED COMPONENTS Interpreter)
+-execute_process(
+-    COMMAND ${Python_EXECUTABLE} -c
+-        "import os.path, sys, sysconfig; print(os.path.relpath(sysconfig.get_path('purelib'), start=sys.prefix))"
+-    OUTPUT_VARIABLE PYTHON_INSTDIR
+-    OUTPUT_STRIP_TRAILING_WHITESPACE
+-)
++if(NOT DEFINED PYTHON_INSTDIR)
++    find_package(Python REQUIRED COMPONENTS Interpreter)
++    execute_process(
++        COMMAND ${Python_EXECUTABLE} -c
++            "import os.path, sys, sysconfig; print(os.path.relpath(sysconfig.get_path('purelib'), start=sys.prefix))"
++        OUTPUT_VARIABLE PYTHON_INSTDIR
++        OUTPUT_STRIP_TRAILING_WHITESPACE
++    )
++endif()
+ 
+ if(nanopb_BUILD_GENERATOR)
+     set(generator_protos nanopb)

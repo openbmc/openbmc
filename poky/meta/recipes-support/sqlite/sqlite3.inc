@@ -18,7 +18,7 @@ S = "${WORKDIR}/sqlite-autoconf-${SQLITE_PV}"
 UPSTREAM_CHECK_URI = "http://www.sqlite.org/"
 UPSTREAM_CHECK_REGEX = "releaselog/(?P<pver>(\d+[\.\-_]*)+)\.html"
 
-CVE_PRODUCT = "sqlite"
+CVE_PRODUCT = "sqlite sqlite3"
 
 inherit autotools pkgconfig siteinfo
 

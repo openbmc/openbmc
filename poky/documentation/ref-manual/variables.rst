@@ -2898,6 +2898,26 @@ system and gives an overview of their function and contents.
       For guidance on how to create your own file permissions settings
       table file, examine the existing ``fs-perms.txt``.
 
+   :term:`FIT_ADDRESS_CELLS`
+
+      Specifies the value of the ``#address-cells`` value for the
+      description of the kernel FIT image.  
+
+      The default value is set to "1" by the :ref:`ref-classes-kernel-fitimage`
+      class, which corresponds to 32 bit addresses. 
+
+      For platforms who need to set 64 bit addresses in
+      :term:`UBOOT_LOADADDRESS` and :term:`UBOOT_ENTRYPOINT`, you need to
+      set this value to "2", as two 32 bit values (cells) will be needed 
+      to represent such addresses.
+
+      Here is an example setting "0x400000000" as a load address::
+    
+         FIT_ADDRESS_CELLS = "2"
+         UBOOT_LOADADDRESS= "0x04 0x00000000"
+
+      See `more details about #address-cells <https://elinux.org/Device_Tree_Usage#How_Addressing_Works>`__.
+
    :term:`FIT_CONF_DEFAULT_DTB`
       Specifies the default device tree binary (dtb) file for a fitImage when
       multiple are provided.
@@ -9041,10 +9061,16 @@ system and gives an overview of their function and contents.
       creation, the :term:`UBOOT_ENTRYPOINT` variable is passed as a
       command-line parameter to the ``uboot-mkimage`` utility.
 
+      To pass a 64 bit address for FIT image creation, you will need to set
+      the :term:`FIT_ADDRESS_CELLS` variable too.
+
    :term:`UBOOT_LOADADDRESS`
       Specifies the load address for the U-Boot image. During U-Boot image
       creation, the :term:`UBOOT_LOADADDRESS` variable is passed as a
       command-line parameter to the ``uboot-mkimage`` utility.
+
+      To pass a 64 bit address for FIT image creation, you will need to set
+      the :term:`FIT_ADDRESS_CELLS` variable too.
 
    :term:`UBOOT_LOCALVERSION`
       Appends a string to the name of the local version of the U-Boot

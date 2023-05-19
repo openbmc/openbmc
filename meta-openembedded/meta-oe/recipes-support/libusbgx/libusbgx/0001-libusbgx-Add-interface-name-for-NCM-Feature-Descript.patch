@@ -1,0 +1,52 @@
+From 4f3f2ad08e6ca132bd1dd388e02b57223bf4219d Mon Sep 17 00:00:00 2001
+From: Ming Liu <liu.ming50@gmail.com>
+Date: Sun, 11 Dec 2022 14:11:49 +0100
+Subject: [PATCH] libusbgx: Add interface name for NCM Feature Descriptors
+
+In commit: abf422bffca4a4767e7e242c44910dbf5ef7094f
+[
+Author: Stefan Agner <stefan.agner@toradex.com>
+Date:   Tue Jan 24 14:22:25 2017 -0800
+
+    libusbgx: Add interface name for Feature Descriptors
+
+    This adds interface name required for "Feature Descriptors". If
+    specified, we can assume that a Feature Descriptor with the
+    interface name of the specified string is understood by the
+    kernel (e.g. interface.rndis).
+]
+
+it only added Feature Descriptors for RNDIS, NCM also needs that, or
+else it could not be recognized by Windows systems.
+
+Add Feature Descriptors interface name for NCM.
+
+Upstream-Status: Submitted [https://github.com/linux-usb-gadgets/libusbgx/pull/73]
+
+Signed-off-by: Ming Liu <liu.ming50@gmail.com>
+---
+ src/function/ether.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/function/ether.c b/src/function/ether.c
+index b1fe1d2..a9eaf33 100644
+--- a/src/function/ether.c
++++ b/src/function/ether.c
+@@ -184,8 +184,14 @@ struct usbg_function_type usbg_f_type_subset = {
+ 	ETHER_FUNCTION_OPTS
+ };
+ 
++static char *ncm_os_desc_ifnames[] = {
++	"ncm",
++	NULL
++};
++
+ struct usbg_function_type usbg_f_type_ncm = {
+ 	.name = "ncm",
++	.os_desc_iname = ncm_os_desc_ifnames,
+ 	ETHER_FUNCTION_OPTS
+ };
+ 
+-- 
+2.25.1
+

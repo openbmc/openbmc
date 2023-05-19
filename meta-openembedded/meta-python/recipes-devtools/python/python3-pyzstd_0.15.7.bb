@@ -11,3 +11,8 @@ PYPI_PACKAGE = "pyzstd"
 SRC_URI[sha256sum] = "55e503f28f5a9d225ce9d0639e3f5b1801bacace5aea926ec2998e73c5150fe7"
 
 inherit pypi setuptools3
+
+# clang-16 with -flto segfaults on arm, therefore ignore flto for now
+do_configure:append:arm:toolchain-clang() {
+    sed -i -e "s|'-flto'|''|" ${S}/setup.py
+}

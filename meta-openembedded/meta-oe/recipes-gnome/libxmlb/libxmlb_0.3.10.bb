@@ -8,6 +8,8 @@ SRC_URI = "git://github.com/hughsie/libxmlb.git;branch=main;protocol=https \
 SRCREV = "a6cac6a715d57c393bbddee4d0381ad943341af9"
 S = "${WORKDIR}/git"
 
+DEPENDS = "glib-2.0 xz"
+
 inherit gobject-introspection gtk-doc meson ptest-gnome lib_package
 
 PACKAGECONFIG ??= "\

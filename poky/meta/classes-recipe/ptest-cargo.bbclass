@@ -1,5 +1,8 @@
 inherit cargo ptest
 
+RUST_TEST_ARGS ??= ""
+RUST_TEST_ARGS[doc] = "Arguments to give to the test binaries (e.g. --shuffle)"
+
 # I didn't find a cleaner way to share data between compile and install tasks
 CARGO_TEST_BINARIES_FILES ?= "${B}/test_binaries_list"
 
@@ -74,6 +77,7 @@ python do_install_ptest_cargo() {
     pn = d.getVar("PN", True)
     ptest_path = d.getVar("PTEST_PATH", True)
     cargo_test_binaries_file = d.getVar('CARGO_TEST_BINARIES_FILES', True)
+    rust_test_args = d.getVar('RUST_TEST_ARGS') or ""
 
     ptest_dir = os.path.join(dest_dir, ptest_path.lstrip('/'))
     os.makedirs(ptest_dir, exist_ok=True)
@@ -94,12 +98,12 @@ python do_install_ptest_cargo() {
             f.write(f"\necho \"\"\n")
             f.write(f"echo \"## starting to run rust tests ##\"\n")
             for test_path in test_paths:
-                f.write(f"{test_path}\n")
+                f.write(f"{test_path} {rust_test_args}\n")
     else:
         with open(ptest_script, "a") as f:
             f.write("#!/bin/sh\n")
             for test_path in test_paths:
-                f.write(f"{test_path}\n")
+                f.write(f"{test_path} {rust_test_args}\n")
         os.chmod(ptest_script, 0o755)
 
     # this is chown -R root:root ${D}${PTEST_PATH}

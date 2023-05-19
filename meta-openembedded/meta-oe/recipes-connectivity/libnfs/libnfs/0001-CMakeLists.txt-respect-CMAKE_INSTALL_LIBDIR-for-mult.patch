@@ -1,0 +1,61 @@
+From 95708ff427c12b58e53fab225a08c811ca358394 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Wed, 3 May 2023 22:27:10 +0200
+Subject: [PATCH] CMakeLists.txt: respect ${CMAKE_INSTALL_LIBDIR} for multilib
+
+* fixes:
+  ERROR: libnfs-5.0.2-r0 do_package: QA Issue: libnfs: Files/directories were installed but not shipped in any package:
+    /usr/lib/libnfs.so
+    /usr/lib/libnfs.so.11.1.0
+    /usr/lib/libnfs.so.5.0.2
+    /usr/lib/pkgconfig
+    /usr/lib/cmake
+    /usr/lib/pkgconfig/libnfs.pc
+    /usr/lib/cmake/libnfs
+    /usr/lib/cmake/libnfs/libnfs-config-version.cmake
+    /usr/lib/cmake/libnfs/libnfs-config.cmake
+    /usr/lib/cmake/libnfs/libnfs-config-noconfig.cmake
+    /usr/lib/cmake/libnfs/FindNFS.cmake
+  Please set FILES such that these items are packaged. Alternatively if they are unneeded, avoid installing them or delete them within do_install.
+  libnfs: 11 installed and not shipped files. [installed-vs-shipped]
+
+  when libdir is /usr/lib64 with multilib
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+Upstream-Status: Pending
+---
+ CMakeLists.txt     | 6 +++---
+ lib/CMakeLists.txt | 4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 4fb0fe7..8e5a0e4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -6,11 +6,11 @@ project(libnfs
+ 
+ set(SOVERSION 11.1.0 CACHE STRING "" FORCE)
+ 
+-set(INSTALL_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib" CACHE PATH "Installation directory for libraries")
++set(INSTALL_LIB_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" CACHE PATH "Installation directory for libraries")
+ set(INSTALL_INC_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "Installation directory for headers")
+ set(INSTALL_MAN_DIR "${CMAKE_INSTALL_PREFIX}/share/man" CACHE PATH "Installation directory for manual pages")
+-set(INSTALL_PKGCONFIG_DIR "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" CACHE PATH "Installation directory for pkgconfig (.pc) files")
+-set(INSTALL_CMAKE_DIR "${CMAKE_INSTALL_PREFIX}/lib/cmake/libnfs" CACHE PATH "Installation directory for cmake (.cmake) files")
++set(INSTALL_PKGCONFIG_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/pkgconfig" CACHE PATH "Installation directory for pkgconfig (.pc) files")
++set(INSTALL_CMAKE_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/cmake/libnfs" CACHE PATH "Installation directory for cmake (.cmake) files")
+ 
+ option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+ option(ENABLE_TESTS "Build and run test programs" OFF)
+diff --git a/lib/CMakeLists.txt b/lib/CMakeLists.txt
+index 88ba7b8..5ff89dc 100644
+--- a/lib/CMakeLists.txt
++++ b/lib/CMakeLists.txt
+@@ -23,5 +23,5 @@ set_target_properties(nfs PROPERTIES
+ 
+ install(TARGETS nfs EXPORT libnfs
+                     RUNTIME DESTINATION bin
+-                    ARCHIVE DESTINATION lib
+-                    LIBRARY DESTINATION lib)
++                    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++                    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})

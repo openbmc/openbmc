@@ -1,0 +1,31 @@
+From 6cb8069cfe08114f1dc7b50a7fcd4dc040cd1bbb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 9 May 2023 20:19:23 -0700
+Subject: [PATCH] include unistd.h for usleep()
+
+clang16 flags the missing header
+
+Fixes
+../../git/tools/idevicedevmodectl.c:363:2: error: call to undeclared function 'usleep'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+
+Upstream-Status: Submitted [https://github.com/libimobiledevice/libimobiledevice/pull/1444]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tools/idevicedevmodectl.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tools/idevicedevmodectl.c b/tools/idevicedevmodectl.c
+index 739bc13..9fe8d6a 100644
+--- a/tools/idevicedevmodectl.c
++++ b/tools/idevicedevmodectl.c
+@@ -34,6 +34,7 @@
+ #ifndef WIN32
+ #include <signal.h>
+ #endif
++#include <unistd.h>
+ 
+ #ifdef WIN32
+ #include <windows.h>
+-- 
+2.40.1
+

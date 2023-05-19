@@ -13,7 +13,9 @@ DEPENDS = "glib-2.0 dbus json-glib libsoup-3.0 intltool-native"
 inherit meson pkgconfig gtk-doc gobject-introspection vala useradd
 
 SRCREV = "bbfb6289dedb88cb8155d9f6868787d5432e1f90"
-SRC_URI = "git://gitlab.freedesktop.org/geoclue/geoclue.git;protocol=https;nobranch=1"
+SRC_URI = "git://gitlab.freedesktop.org/geoclue/geoclue.git;protocol=https;nobranch=1 \
+    file://0001-libgeoclue-don-t-try-to-use-g-ir-scanner-when-intros.patch \
+"
 
 S = "${WORKDIR}/git"
 

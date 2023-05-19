@@ -69,6 +69,10 @@ do_configure:prepend() {
     export SYSROOT=$PKG_CONFIG_SYSROOT_DIR
 }
 
+do_configure:append() {
+   sed -i -e 's|${WORKDIR}||g' ${B}/include/autoconf.h
+}
+
 do_compile_ptest() {
     oe_runmake -C ${TESTDIR} buildtest-TESTS
 }
