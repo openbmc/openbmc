@@ -43,3 +43,8 @@ RDEPENDS:${PN}-flash = " \
     phosphor-software-manager \
     phosphor-ipmi-flash \
     "
+
+SUMMARY:${PN}-fans = "IBM Fans"
+RDEPENDS:${PN}-fans = " \
+        phosphor-pid-control \
+        "
