@@ -3,7 +3,7 @@ DESCRIPTION = "PLDM library implementing various PLDM specifications"
 HOMEPAGE = "https://github.com/openbmc/libpldm"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
-SRCREV = "b443b487266bb752a7339e9b05b9a6ce97b82916"
+SRCREV = "953bc8c1a4e9f21981897d06b71159e403dfff1b"
 PACKAGECONFIG[oem-ibm] = "-Doem-ibm=enabled,-Doem-ibm=disabled,,"
 
 PV = "0.1.0+git${SRCPV}"
