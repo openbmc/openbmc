@@ -430,6 +430,17 @@
                         "/xyz/openbmc_project/led/groups/partition_system_attention_indicator",
                         "/xyz/openbmc_project/led/groups/platform_system_attention_indicator"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "identified_by",
+                        "fType": "identifying"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/led/groups/enclosure_identify"
+                    ]
                 }
             ]
         },
