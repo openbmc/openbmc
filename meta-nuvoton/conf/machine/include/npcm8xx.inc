@@ -58,3 +58,5 @@ TFA_UBOOT = "1"
 TFA_BUILD_TARGET = "bl31"
 
 OPTEEMACHINE ?= "nuvoton"
+
+TIP_IMAGE ?= "True"
