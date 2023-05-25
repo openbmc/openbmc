@@ -62,3 +62,5 @@ EXTRA_OECONF:append:witherspoon-tacoma = " --enable-concurrent-servers"
 do_install:append:witherspoon-tacoma() {
         install_concurrent_console_config
 }
+
+SRC_URI:append:sbp1 = " file://server.ttyVUART0.conf"
