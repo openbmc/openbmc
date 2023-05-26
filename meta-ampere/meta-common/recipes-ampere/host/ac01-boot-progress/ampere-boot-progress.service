@@ -6,6 +6,3 @@ BindTo=obmc-host-already-on@0.target
 [Service]
 ExecStart=/usr/sbin/ampere_boot_progress.sh
 SyslogIdentifier=ampere-boot-progress
-
-[Install]
-WantedBy=obmc-host-already-on@0.target
