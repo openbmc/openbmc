@@ -31,7 +31,7 @@ inherit gnomebase gettext gnome-help features_check
 def gnome_verdir(v):
     return oe.utils.trim_version(v, 1)
 
-REQUIRED_DISTRO_FEATURES = "x11 opengl"
+REQUIRED_DISTRO_FEATURES = "x11 opengl gobject-introspection-data"
 
 PACKAGECONFIG ?= ""
 PACKAGECONFIG[doc] = "-Dmanuals=true,-Dmanuals=false,libxslt-native docbook-xsl-stylesheets-native"

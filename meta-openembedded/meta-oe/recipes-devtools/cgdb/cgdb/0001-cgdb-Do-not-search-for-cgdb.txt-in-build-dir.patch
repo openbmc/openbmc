@@ -1,0 +1,34 @@
+From be56e955a32e5e9da0be32008afb8a8ee60e9b56 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 24 May 2023 19:31:23 -0700
+Subject: [PATCH] cgdb: Do not search for cgdb.txt in build dir
+
+If we do cross builds it encodes the build time workdir here and it wont
+be useful to look into this dir since cross-built cgdb may not run on
+build host and build workdir will not exist on target
+
+Upstream-Status: Inappropriate [Cross-compile specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ cgdb/interface.cpp | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/cgdb/interface.cpp b/cgdb/interface.cpp
+index dc58137..d3aab5e 100644
+--- a/cgdb/interface.cpp
++++ b/cgdb/interface.cpp
+@@ -1568,11 +1568,6 @@ void if_display_help(void)
+ 
+     fs_util_get_path(PKGDATADIR, "cgdb.txt", cgdb_help_file);
+ 
+-    /* File doesn't exist. Try to find cgdb.txt in the build dir in case
+-     * the user is running a built cgdb binary directly. */
+-    if (!fs_verify_file_exists(cgdb_help_file))
+-        fs_util_get_path(TOPBUILDDIR, "doc/cgdb.txt", cgdb_help_file);
+-
+     ret_val = source_set_exec_line(src_viewer, cgdb_help_file, 1, 0);
+ 
+     if (ret_val == 0)
+-- 
+2.40.1
+

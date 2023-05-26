@@ -1,0 +1,82 @@
+From d798af685e9e1166400acbdab082c17b02dad85b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 18 May 2023 23:28:10 -0700
+Subject: [PATCH] Remove builddir and srcdir paths from test binaries
+
+Encoding buildtime paths is not needed since if these tests are to be
+run they will be run on target where builddir structure most certainly
+wont be available.
+
+Fixes
+WARNING: libpeas-1.36.0-r0 do_package_qa: QA Issue: File /usr/bin/peas-demo in package libpeas-demo contains reference to TMPDIR [buildpaths]
+
+Upstream-Status: Inappropriate [Cross-compile specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ peas-demo/meson.build                 | 2 +-
+ tests/libpeas-gtk/testing/meson.build | 4 ++--
+ tests/libpeas/testing/meson.build     | 4 ++--
+ tests/testing-util/meson.build        | 4 ++--
+ 4 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/peas-demo/meson.build b/peas-demo/meson.build
+index a3ec53b..855ebf2 100644
+--- a/peas-demo/meson.build
++++ b/peas-demo/meson.build
+@@ -9,7 +9,7 @@ peas_demo_c = [
+ 
+ peas_demo_c_args = [
+   '-DHAVE_CONFIG_H',
+-  '-DPEAS_BUILDDIR="@0@"'.format(builddir),
++  '-DPEAS_BUILDDIR="/usr/src/debug/libpeas"',
+   '-DPEAS_PREFIX="@0@"'.format(prefix),
+   '-DPEAS_LIBDIR="@0@"'.format(libdir),
+ ]
+diff --git a/tests/libpeas-gtk/testing/meson.build b/tests/libpeas-gtk/testing/meson.build
+index 646f42d..fd9a692 100644
+--- a/tests/libpeas-gtk/testing/meson.build
++++ b/tests/libpeas-gtk/testing/meson.build
+@@ -19,8 +19,8 @@ libpeas_gtk_testing_deps = [
+ 
+ libpeas_gtk_testing_c_args = [
+   '-DHAVE_CONFIG_H',
+-  '-DBUILDDIR="@0@"'.format(builddir),
+-  '-DSRCDIR="@0@"'.format(srcdir),
++  '-DBUILDDIR="/usr/src/debug/libpeas"',
++  '-DSRCDIR="/usr/src/debug/libpeas"',
+ ]
+ 
+ libpeas_gtk_testing_lib = library(
+diff --git a/tests/libpeas/testing/meson.build b/tests/libpeas/testing/meson.build
+index 74ba7b1..084daa9 100644
+--- a/tests/libpeas/testing/meson.build
++++ b/tests/libpeas/testing/meson.build
+@@ -21,8 +21,8 @@ libpeas_testing_deps = [
+ 
+ libpeas_testing_c_args = [
+   '-DHAVE_CONFIG_H',
+-  '-DBUILDDIR="@0@"'.format(builddir),
+-  '-DSRCDIR="@0@"'.format(srcdir),
++  '-DBUILDDIR="/usr/src/debug/libpeas"',
++  '-DSRCDIR="/usr/src/debug/libpeas"',
+ ]
+ 
+ libpeas_testing_lib = library(
+diff --git a/tests/testing-util/meson.build b/tests/testing-util/meson.build
+index 1c40740..83ad059 100644
+--- a/tests/testing-util/meson.build
++++ b/tests/testing-util/meson.build
+@@ -17,8 +17,8 @@ libtesting_util_deps = [
+ 
+ libtesting_util_c_args = [
+   '-DHAVE_CONFIG_H',
+-  '-DBUILDDIR="@0@"'.format(builddir),
+-  '-DSRCDIR="@0@"'.format(srcdir),
++  '-DBUILDDIR="/usr/src/debug/libpeas"',
++  '-DSRCDIR="/usr/src/debug/libpeas"',
+   '-UG_DISABLE_ASSERT',
+   '-UG_DISABLE_CAST_CHECKS',
+ ]
+-- 
+2.40.1
+

@@ -18,13 +18,16 @@ inherit cargo pypi python_setuptools_build_meta
 
 DEPENDS += "python3-setuptools-scm-native python3-wheel-native"
 
-RDEPENDS:${PN}:class-native += " \
-    python3-semantic-version-native \
-    python3-setuptools-native \
-    python3-setuptools-scm-native \
-    python3-toml-native \
-    python3-typing-extensions-native \
-    python3-wheel-native \
+RDEPENDS:${PN} += " \
+    python3-distutils \
+    python3-json \
+    python3-semantic-version \
+    python3-setuptools \
+    python3-setuptools-scm \
+    python3-shell \
+    python3-toml \
+    python3-typing-extensions \
+    python3-wheel \
 "
 
 BBCLASSEXTEND = "native"

@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=84dcc94da3adb52b53ae4fa38fe49e5d"
 inherit features_check systemd
 
 RDEPENDS:${PN} = "python3-pygobject python3-dbus"
-REQUIRED_DISTRO_FEATURES = "systemd"
+REQUIRED_DISTRO_FEATURES = "systemd gobject-introspection-data"
 
 SRCREV = "30e278e50749a60a930ceaa0971207c6436b8a0c"
 SRC_URI = "git://gitlab.com/craftyguy/networkd-dispatcher;protocol=https;nobranch=1"

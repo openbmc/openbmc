@@ -4,12 +4,10 @@ SECTION = "libs"
 LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING.txt;md5=7c13b3376cea0ce68d2d2da0a1b3a72c"
 
-SRCREV = "92d6a35f3d8d721cda7d6fe664b435311dd368b4"
-PV = "0.23"
+SRCREV = "c4498c27761d04d4ac631ec59c1613bfed079da5"
+PV = "0.24"
 
-SRC_URI = "git://github.com/analogdevicesinc/libiio.git;protocol=https;branch=master \
-           file://0001-CMake-Move-include-CheckCSourceCompiles-before-its-m.patch \
-"
+SRC_URI = "git://github.com/analogdevicesinc/libiio.git;protocol=https;branch=master"
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
 
 S = "${WORKDIR}/git"
@@ -20,7 +18,7 @@ DEPENDS = " \
     flex-native bison-native libaio \
 "
 
-inherit cmake python3native systemd setuptools3
+inherit cmake python3native systemd setuptools3 pkgconfig
 
 EXTRA_OECMAKE = " \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo \

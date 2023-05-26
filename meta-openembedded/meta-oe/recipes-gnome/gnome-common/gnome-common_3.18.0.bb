@@ -16,7 +16,7 @@ DEPENDS = ""
 
 # Default to enable autoconf-archive to avoid conflicts
 PACKAGECONFIG ??= "autoconf-archive"
-PACKAGECONFIG[autoconf-archive] = "--with-autoconf-archive, --without-autoconf-archive, autoconf-archive"
+PACKAGECONFIG[autoconf-archive] = "--with-autoconf-archive, --without-autoconf-archive, autoconf-archive,autoconf-archive"
 
 FILES:${PN} += "${datadir}/aclocal"
 FILES:${PN}-dev = ""

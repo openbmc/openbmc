@@ -103,6 +103,7 @@ class NpmEnvironment(object):
         """Run npm command in a controlled environment"""
         with tempfile.TemporaryDirectory() as tmpdir:
             d = bb.data.createCopy(self.d)
+            d.setVar("PATH", d.getVar("PATH"))  # PATH might contain $HOME - evaluate it before patching
             d.setVar("HOME", tmpdir)
 
             if not workdir:

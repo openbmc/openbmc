@@ -1,33 +1,69 @@
-Upstream-Status: Inappropriate [configuration]
+Don't hardcode paths to libusb, instead use pkg-config.
 
---- a/configure.in
-+++ b/configure.in
-@@ -599,6 +599,8 @@ if test "$class_driver" = "no" && test "
-       AC_CHECK_HEADERS(usb.h, ,[AC_MSG_ERROR([cannot find libusb-devel support], 11)])
-    else
-       AC_CHECK_LIB([usb-1.0], [libusb_init], [LIBS="$LIBS"], [AC_MSG_ERROR([cannot find libusb 1.0 support], 2)])
-+      LIBUSBINCLUDEROOT?="/usr/include/"
-+      AC_ARG_VAR(LIBUSBINCLUDEROOT, [path to libusb-1.0 folder])
-       AC_CHECK_HEADERS(libusb-1.0/libusb.h, ,[AC_MSG_ERROR([cannot find libusb-1.0-devel support], 11)])
-    fi
- fi
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/Makefile.am b/Makefile.am
+index b77327f..29e838a 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -109,7 +109,7 @@ libhpmud_la_SOURCES += io/hpmud/musb_lib
- libhpmud_la_LDFLAGS += -lusb
+@@ -107,12 +107,11 @@ libhpmud_la_SOURCES = io/hpmud/hpmud.c io/hpmud/mlc.c io/hpmud/model.c io/hpmud/
+ 
+ if LIBUSB01_BUILD
+ libhpmud_la_SOURCES += io/hpmud/musb_libusb01.c 
+-libhpmud_la_LDFLAGS += -lusb
  else
  libhpmud_la_SOURCES += io/hpmud/musb.c 
 -libhpmud_la_CFLAGS  += -I/usr/include/libusb-1.0
-+libhpmud_la_CFLAGS  += -I$(LIBUSBINCLUDEROOT)/libusb-1.0
- libhpmud_la_LDFLAGS += -lusb-1.0
+-libhpmud_la_LDFLAGS += -lusb-1.0
+ endif
++libhpmud_la_CFLAGS  += $(USB_CFLAGS)
++libhpmud_la_LDFLAGS += $(USB_LIBS)
+ 
+ 
+ if NETWORK_BUILD
+@@ -356,7 +355,7 @@ hpmudextdir = $(pyexecdir)
+ hpmudext_LTLIBRARIES = hpmudext.la
+ hpmudext_la_LDFLAGS = -module -avoid-version
+ hpmudext_la_SOURCES = io/mudext/hpmudext.c
+-hpmudext_la_CFLAGS = -I$(PYTHONINCLUDEDIR)
++hpmudext_la_CFLAGS = -I$(PYTHONINCLUDEDIR) $(USB_CFLAGS)
+ hpmudext_la_LIBADD = libhpmud.la
+ 
+ if NETWORK_BUILD
+@@ -364,9 +363,6 @@ hpmudext_la_LIBADD += libhpdiscovery.la
+ hpmudext_la_CFLAGS += -Iprotocol/discovery
  endif
  
-@@ -362,7 +362,7 @@ hpmudext_la_CFLAGS += -Iprotocol/discove
- endif
- 
- if !LIBUSB01_BUILD
+-if !LIBUSB01_BUILD
 -hpmudext_la_CFLAGS +=-I/usr/include/libusb-1.0 
-+hpmudext_la_CFLAGS +=-I$(LIBUSBINCLUDEROOT)/libusb-1.0 
- endif
+-endif
  endif #!HPLIP_CLASS_DRIVER
  # ui (qt3)
+ if GUI_BUILD
+diff --git a/configure.in b/configure.in
+index b1c690c..4a65c97 100644
+--- a/configure.in
++++ b/configure.in
+@@ -36,6 +36,7 @@ AC_PROG_CXX
+ AC_PROG_CC
+ AC_PROG_INSTALL
+ AC_PROG_LIBTOOL
++PKG_PROG_PKG_CONFIG
+ 
+ # Checks for required libraries, don't set global -lpthread, -lm, -ljpeg, ... here, set in Makefile.
+ AC_CHECK_LIB([pthread], [pthread_create], [LIBS="$LIBS"], [AC_MSG_ERROR([cannot find libpthread support], 7)])
+@@ -620,11 +621,9 @@ if test "$class_driver" = "no" && test "$hpijs_only_build" = "no" && test "$hpcu
+    AC_CHECK_LIB([cups], [cupsDoFileRequest], [LIBS="$LIBS"], [AC_MSG_ERROR([cannot find libcups support], 9)])
+    AC_CHECK_HEADERS(cups/cups.h, ,[AC_MSG_ERROR([cannot find cups-devel support], 3)])
+    if test "$libusb01_build" = "yes"; then
+-      AC_CHECK_LIB([usb], [usb_init], [LIBS="$LIBS"], [AC_MSG_ERROR([cannot find libusb support], 2)])
+-      AC_CHECK_HEADERS(usb.h, ,[AC_MSG_ERROR([cannot find libusb-devel support], 11)])
++      PKG_CHECK_MODULES([USB], [libusb])
+    else
+-      AC_CHECK_LIB([usb-1.0], [libusb_init], [LIBS="$LIBS"], [AC_MSG_ERROR([cannot find libusb 1.0 support], 2)])
+-      AC_CHECK_HEADERS(libusb-1.0/libusb.h, ,[AC_MSG_ERROR([cannot find libusb-1.0-devel support], 11)])
++      PKG_CHECK_MODULES([USB], [libusb-1.0])
+    fi
+ fi
+ 

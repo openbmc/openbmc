@@ -1,4 +1,4 @@
-From 81da32c3404b58cbad7b3af00854e0cf2dc3dbf1 Mon Sep 17 00:00:00 2001
+From 262ac90394e36e0b4e86042d9c5385703f5b6536 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 23 Aug 2019 10:19:48 +0800
 Subject: [PATCH] musl-utils
@@ -22,7 +22,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  4 files changed, 29 insertions(+)
 
 diff --git a/src/arlib.h b/src/arlib.h
-index e117166..8326f6c 100644
+index d4a4221..f6336d9 100644
 --- a/src/arlib.h
 +++ b/src/arlib.h
 @@ -29,6 +29,12 @@
@@ -39,7 +39,7 @@ index e117166..8326f6c 100644
  /* State of -D/-U flags.  */
  extern bool arlib_deterministic_output;
 diff --git a/src/elfcompress.c b/src/elfcompress.c
-index 92f2fac..0b037a5 100644
+index 18ade66..a6ed4e1 100644
 --- a/src/elfcompress.c
 +++ b/src/elfcompress.c
 @@ -37,6 +37,13 @@
@@ -57,10 +57,10 @@ index 92f2fac..0b037a5 100644
  ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
  
 diff --git a/src/strip.c b/src/strip.c
-index 30a1f9d..e89a7f0 100644
+index 2a2cc80..8e9f773 100644
 --- a/src/strip.c
 +++ b/src/strip.c
-@@ -46,6 +46,13 @@
+@@ -45,6 +45,13 @@
  #include <system.h>
  #include <printversion.h>
  
@@ -75,10 +75,10 @@ index 30a1f9d..e89a7f0 100644
  
  /* Name and version of program.  */
 diff --git a/src/unstrip.c b/src/unstrip.c
-index 3472637..40c73f3 100644
+index d5bd182..d797823 100644
 --- a/src/unstrip.c
 +++ b/src/unstrip.c
-@@ -52,6 +52,15 @@
+@@ -51,6 +51,15 @@
  #include "libeu.h"
  #include "printversion.h"
  

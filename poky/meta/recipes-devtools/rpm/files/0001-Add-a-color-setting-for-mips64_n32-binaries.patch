@@ -1,4 +1,4 @@
-From 5492ac3c716020a27a25253bbffe810db43202bf Mon Sep 17 00:00:00 2001
+From 93f219df68f3741ff63a294a16bcbe8deba1112f Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 9 Mar 2017 18:54:02 +0200
 Subject: [PATCH] Add a color setting for mips64_n32 binaries
@@ -11,11 +11,11 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  rpmrc.in      | 2 ++
  2 files changed, 6 insertions(+)
 
-Index: git/build/rpmfc.c
-===================================================================
---- git.orig/build/rpmfc.c
-+++ git/build/rpmfc.c
-@@ -645,6 +645,7 @@ exit:
+diff --git a/build/rpmfc.c b/build/rpmfc.c
+index 26606378f..a16e3f4e9 100644
+--- a/build/rpmfc.c
++++ b/build/rpmfc.c
+@@ -646,6 +646,7 @@ exit:
  static const struct rpmfcTokens_s rpmfcTokens[] = {
    { "directory",		RPMFC_INCLUDE },
  
@@ -23,20 +23,20 @@ Index: git/build/rpmfc.c
    { "ELF 32-bit",		RPMFC_ELF32|RPMFC_INCLUDE },
    { "ELF 64-bit",		RPMFC_ELF64|RPMFC_INCLUDE },
  
-@@ -1150,6 +1151,9 @@ static uint32_t getElfColor(const char *
+@@ -1151,6 +1152,9 @@ static uint32_t getElfColor(const char *fn)
  		color = RPMFC_ELF32;
  		break;
  	    }
 +            if (ehdr.e_machine == EM_MIPS || ehdr.e_machine == EM_MIPS_RS3_LE)
 +                if (ehdr.e_flags & EF_MIPS_ABI2)
 +                    color = RPMFC_ELFMIPSN32;
- 	    elf_end(elf);
  	}
- 	close(fd);
-Index: git/rpmrc.in
-===================================================================
---- git.orig/rpmrc.in
-+++ git/rpmrc.in
+ 	if (elf)
+ 	    elf_end(elf);
+diff --git a/rpmrc.in b/rpmrc.in
+index 2975a3a0e..c7232b48b 100644
+--- a/rpmrc.in
++++ b/rpmrc.in
 @@ -139,6 +139,8 @@ archcolor: mipsr6el 1
  archcolor: mips64r6 2
  archcolor: mips64r6el 2

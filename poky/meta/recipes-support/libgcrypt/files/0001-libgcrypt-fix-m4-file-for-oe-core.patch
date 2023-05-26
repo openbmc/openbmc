@@ -1,4 +1,4 @@
-From 839f38e5ecc22b7f1b837284bbbffac8cb32ab1e Mon Sep 17 00:00:00 2001
+From bcfd89abdb5110b93314297120412d4c7f2da313 Mon Sep 17 00:00:00 2001
 From: Trevor Gamblin <trevor.gamblin@windriver.com>
 Date: Tue, 29 Oct 2019 14:08:32 -0400
 Subject: [PATCH] libgcrypt: fix m4 file for oe-core
@@ -17,7 +17,7 @@ Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
  1 file changed, 4 insertions(+), 86 deletions(-)
 
 diff --git a/src/libgcrypt.m4 b/src/libgcrypt.m4
-index 19d514f..21125c7 100644
+index cd4249e..e53a36f 100644
 --- a/src/libgcrypt.m4
 +++ b/src/libgcrypt.m4
 @@ -29,41 +29,6 @@ dnl is added to the gpg_config_script_warn variable.
@@ -35,7 +35,7 @@ index 19d514f..21125c7 100644
 -  fi
 -
 -  use_gpgrt_config=""
--  if test x"${LIBGCRYPT_CONFIG}" = x -a x"$GPGRT_CONFIG" != x -a "$GPGRT_CONFIG" != "no"; then
+-  if test x"$GPGRT_CONFIG" != x -a "$GPGRT_CONFIG" != "no"; then
 -    if $GPGRT_CONFIG libgcrypt --exists; then
 -      LIBGCRYPT_CONFIG="$GPGRT_CONFIG libgcrypt"
 -      AC_MSG_NOTICE([Use gpgrt-config as libgcrypt-config])

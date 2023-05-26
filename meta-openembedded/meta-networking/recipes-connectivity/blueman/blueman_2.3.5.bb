@@ -4,7 +4,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 DEPENDS = "gtk+3 glib-2.0 bluez5 python3-pygobject python3-cython-native"
 
-inherit meson gettext systemd gsettings pkgconfig python3native gtk-icon-cache useradd
+inherit meson gettext systemd gsettings pkgconfig python3native gtk-icon-cache useradd features_check
+
+REQUIRED_DISTRO_FEATURES = "gobject-introspection"
 
 SRC_URI = " \
     git://github.com/blueman-project/blueman.git;protocol=https;branch=2-3-stable \

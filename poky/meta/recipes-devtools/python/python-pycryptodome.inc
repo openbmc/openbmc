@@ -10,12 +10,14 @@ inherit pypi
 PYPI_PACKAGE_EXT = "tar.gz"
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-io \
-    ${PYTHON_PN}-math \
+    python3-cffi \
+    python3-ctypes \
+    python3-io \
+    python3-math \
 "
 
 RDEPENDS:${PN}-tests += " \
-    ${PYTHON_PN}-unittest \
+    python3-unittest \
 "
 
 PACKAGES =+ "${PN}-tests"

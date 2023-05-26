@@ -31,9 +31,10 @@ EXTRA_OECMAKE += "\
     -DUA_LOGLEVEL=600 \
 "
 
-PACKAGECONFIG ?= "encryption pubsub pubsub-eth"
+PACKAGECONFIG ?= "encryption-mbedtls pubsub pubsub-eth"
 PACKAGECONFIG[amalgamation] = "-DUA_ENABLE_AMALGAMATION=ON, -DUA_ENABLE_AMALGAMATION=OFF"
-PACKAGECONFIG[encryption] = "-DUA_ENABLE_ENCRYPTION=MBEDTLS, , mbedtls"
+PACKAGECONFIG[encryption-mbedtls] = "-DUA_ENABLE_ENCRYPTION=MBEDTLS, , mbedtls, , , encryption-openssl"
+PACKAGECONFIG[encryption-openssl] = "-DUA_ENABLE_ENCRYPTION=OPENSSL, , openssl, , , encryption-mbedtls"
 PACKAGECONFIG[pubsub] = "-DUA_ENABLE_PUBSUB=ON, -DUA_ENABLE_PUBSUB=OFF"
 PACKAGECONFIG[pubsub-eth] = "-DUA_ENABLE_PUBSUB_ETH_UADP=ON, -DUA_ENABLE_PUBSUB_ETH_UADP=OFF"
 PACKAGECONFIG[werror] = "-DUA_FORCE_WERROR=ON, -DUA_FORCE_WERROR=OFF"

@@ -561,6 +561,7 @@ class CommandsSync:
                 appendfiles = command.cooker.collections[mc].get_file_appends(fn)
         else:
             appendfiles = []
+        layername = command.cooker.collections[mc].calc_bbfile_priority(fn)[2]
         # We are calling bb.cache locally here rather than on the server,
         # but that's OK because it doesn't actually need anything from
         # the server barring the global datastore (which we have a remote
@@ -568,10 +569,10 @@ class CommandsSync:
         if config_data:
             # We have to use a different function here if we're passing in a datastore
             # NOTE: we took a copy above, so we don't do it here again
-            envdata = command.cooker.databuilder._parse_recipe(config_data, fn, appendfiles, mc)['']
+            envdata = command.cooker.databuilder._parse_recipe(config_data, fn, appendfiles, mc, layername)['']
         else:
             # Use the standard path
-            envdata = command.cooker.databuilder.parseRecipe(fn, appendfiles)
+            envdata = command.cooker.databuilder.parseRecipe(fn, appendfiles, layername)
         idx = command.remotedatastores.store(envdata)
         return DataStoreConnectionHandle(idx)
     parseRecipeFile.readonly = True

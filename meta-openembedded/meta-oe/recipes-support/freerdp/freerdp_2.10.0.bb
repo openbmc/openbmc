@@ -54,6 +54,10 @@ FILES:libfreerdp = "${libdir}/lib*${SOLIBS}"
 
 PACKAGES_DYNAMIC += "^libfreerdp-plugin-.*"
 
+do_configure:append() {
+    sed -i -e 's|${WORKDIR}||g' ${B}/buildflags.h
+}
+
 # we will need winpr-makecert to generate TLS certificates
 do_install:append () {
     install -d ${D}${bindir}

@@ -424,6 +424,10 @@ class FetcherTest(unittest.TestCase):
 
     def git_init(self, cwd=None):
         self.git('init', cwd=cwd)
+        # Explicitly set initial branch to master as
+        # a common setup is to use other default
+        # branch than master.
+        self.git(['checkout', '-b', 'master'], cwd=cwd)
         if not self.git(['config', 'user.email'], cwd=cwd):
             self.git(['config', 'user.email', 'you@example.com'], cwd=cwd)
         if not self.git(['config', 'user.name'], cwd=cwd):
@@ -2390,6 +2394,31 @@ class CrateTest(FetcherTest):
         self.assertEqual(sorted(os.listdir(self.tempdir + "/download")), ['glob-0.2.11.crate', 'glob-0.2.11.crate.done'])
         self.assertTrue(os.path.exists(self.tempdir + "/cargo_home/bitbake/glob-0.2.11/.cargo-checksum.json"))
         self.assertTrue(os.path.exists(self.tempdir + "/cargo_home/bitbake/glob-0.2.11/src/lib.rs"))
+
+    @skipIfNoNetwork()
+    def test_crate_url_matching_recipe(self):
+
+        self.d.setVar('BP', 'glob-0.2.11')
+
+        uri = "crate://crates.io/glob/0.2.11"
+        self.d.setVar('SRC_URI', uri)
+
+        uris = self.d.getVar('SRC_URI').split()
+        d = self.d
+
+        fetcher = bb.fetch2.Fetch(uris, self.d)
+        ud = fetcher.ud[fetcher.urls[0]]
+
+        self.assertIn("name", ud.parm)
+        self.assertEqual(ud.parm["name"], "glob-0.2.11")
+        self.assertIn("downloadfilename", ud.parm)
+        self.assertEqual(ud.parm["downloadfilename"], "glob-0.2.11.crate")
+
+        fetcher.download()
+        fetcher.unpack(self.tempdir)
+        self.assertEqual(sorted(os.listdir(self.tempdir)), ['download', 'glob-0.2.11', 'unpacked'])
+        self.assertEqual(sorted(os.listdir(self.tempdir + "/download")), ['glob-0.2.11.crate', 'glob-0.2.11.crate.done'])
+        self.assertTrue(os.path.exists(self.tempdir + "/glob-0.2.11/src/lib.rs"))
 
     @skipIfNoNetwork()
     def test_crate_url_params(self):

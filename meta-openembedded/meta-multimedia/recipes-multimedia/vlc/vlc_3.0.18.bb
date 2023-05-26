@@ -101,6 +101,7 @@ do_configure:append() {
     for qtpath in adapters components/epg components/playlist components/sout dialogs managers styles util/buttons; do
         mkdir -p "${B}/modules/gui/qt/$qtpath"
     done
+    sed -i -e 's|${WORKDIR}||g' ${B}/config.h
 }
 
 # This recipe packages vlc as a library as well, so qt4 dependencies

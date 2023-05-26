@@ -451,7 +451,7 @@ class QemuRunner:
         self.logger.debug("Waiting at most %d seconds for login banner (%s)" %
                           (self.boottime, time.strftime("%D %H:%M:%S")))
         endtime = time.time() + self.boottime
-        socklist = [self.server_socket]
+        filelist = [self.server_socket, self.runqemu.stdout]
         reachedlogin = False
         stopread = False
         qemusock = None
@@ -459,30 +459,40 @@ class QemuRunner:
         data = b''
         while time.time() < endtime and not stopread:
             try:
-                sread, swrite, serror = select.select(socklist, [], [], 5)
+                sread, swrite, serror = select.select(filelist, [], [], 5)
             except InterruptedError:
                 continue
-            for sock in sread:
-                if sock is self.server_socket:
+            for file in sread:
+                if file is self.server_socket:
                     qemusock, addr = self.server_socket.accept()
-                    qemusock.setblocking(0)
-                    socklist.append(qemusock)
-                    socklist.remove(self.server_socket)
+                    qemusock.setblocking(False)
+                    filelist.append(qemusock)
+                    filelist.remove(self.server_socket)
                     self.logger.debug("Connection from %s:%s" % addr)
                 else:
                     # try to avoid reading only a single character at a time
                     time.sleep(0.1)
-                    data = data + sock.recv(1024)
+                    if hasattr(file, 'read'):
+                        read = file.read(1024)
+                    elif hasattr(file, 'recv'):
+                        read = file.recv(1024)
+                    else:
+                        self.logger.error('Invalid file type: %s\n%s' % (file))
+                        read = b''
+
+                    self.logger.debug2('Partial boot log:\n%s' % (read.decode('utf-8', errors='ignore')))
+                    data = data + read
                     if data:
                         bootlog += data
                         if self.serial_ports < 2:
-                            # this socket has mixed console/kernel data, log it to logfile
+                            # this file has mixed console/kernel data, log it to logfile
                             self.log(data)
 
                         data = b''
 
                         decodedlog = self.decode_qemulog(bootlog)
                         if self.boot_patterns['search_reached_prompt'] in decodedlog:
+                            self.server_socket.close()
                             self.server_socket = qemusock
                             stopread = True
                             reachedlogin = True
@@ -493,8 +503,8 @@ class QemuRunner:
                         # no need to check if reachedlogin unless we support multiple connections
                         self.logger.debug("QEMU socket disconnected before login banner reached. (%s)" %
                                           time.strftime("%D %H:%M:%S"))
-                        socklist.remove(sock)
-                        sock.close()
+                        filelist.remove(file)
+                        file.close()
                         stopread = True
 
         if not reachedlogin:

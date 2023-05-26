@@ -8,9 +8,9 @@ HOMEPAGE = "http://www.libimobiledevice.org/"
 
 DEPENDS = "libimobiledevice-glue libusb1 readline"
 
-PV = "1.0.1+git${SRCPV}"
+PV = "1.1.0"
 
-SRCREV = "ab5b4d8d4c0e90c05d80f80c7e99a6516de9b5c6"
+SRCREV = "98c9f7055ec1f2e09fac69ef1413a8757113b838"
 SRC_URI = "git://github.com/libimobiledevice/libirecovery;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"

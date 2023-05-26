@@ -1,0 +1,34 @@
+From c4f85268da6c30b0aec3d9a0e951b2088887cff4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 22 May 2023 18:35:37 -0700
+Subject: [PATCH] cow.c: Replace stat64 with stat
+
+LFS64 is deprecated in latest musl and this fails to build
+therefore switch to using stat API which is same as stat64 these days
+
+Upstream-Status: Inappropriate [No upstream]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ moo/cow.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/moo/cow.c
++++ b/moo/cow.c
+@@ -161,7 +161,7 @@ int write_cow_header(char *cow_file, int
+ 		     int sectorsize, int alignment, long long *size)
+ {
+         struct cow_header_v3 *header;
+-	struct stat64 buf;
++	struct stat buf;
+ 	int err;
+ 
+ 	err = cow_seek_file(fd, 0);
+@@ -192,7 +192,7 @@ int write_cow_header(char *cow_file, int
+ 		      backing_file))
+ 		goto out_free;
+ 
+-	err = stat64(header->backing_file, &buf);
++	err = stat(header->backing_file, &buf);
+ 	if(err < 0){
+ 		cow_printf("Stat of backing file '%s' failed, errno = %d\n",
+ 			   header->backing_file, errno);

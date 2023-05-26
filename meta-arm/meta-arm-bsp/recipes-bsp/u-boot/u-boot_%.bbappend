@@ -97,11 +97,4 @@ SRC_URI:append:juno = " file://0001-configs-vexpress-modify-to-boot-compressed-i
 #
 SRC_URI:append:tc = " \
         file://bootargs.cfg \
-        file://0001-arm-total_compute-update-secure-dram-size.patch \
-        file://0002-arm_ffa-introducing-Arm-FF-A-low-level-driver.patch \
-        file://0003-arm-total_compute-enable-psci.patch \
-        file://0004-arm_ffa-rxtx_map-should-use-64-bit-calls.patch \
-        file://0005-efi_firmware-add-new-fmp-driver-that-supports-arm-fw.patch \
-        file://0006-arm-total_compute-enable-capsule-update.patch \
-        file://0007-arm_ffa-unmap-rxtx-buffer-before-exiting-u-boot.patch \
         "

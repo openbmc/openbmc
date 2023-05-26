@@ -15,7 +15,7 @@ SRC_URI = "git://github.com/storaged-project/blivet-gui.git;branch=master;protoc
            "
 
 inherit features_check
-REQUIRED_DISTRO_FEATURES = "x11 systemd"
+REQUIRED_DISTRO_FEATURES = "x11 systemd gobject-introspection-data"
 
 inherit setuptools3_legacy python3native
 

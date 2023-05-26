@@ -53,3 +53,5 @@ PACKAGES =+ "${PN}-gif2webp"
 
 DESCRIPTION:${PN}-gif2webp = "Simple tool to convert animated GIFs to WebP"
 FILES:${PN}-gif2webp = "${bindir}/gif2webp"
+
+BBCLASSEXTEND += "native nativesdk"

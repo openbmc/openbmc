@@ -152,6 +152,23 @@
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/wave.*.pyc"
         ]
     },
+    "cgitb": {
+        "summary": "Special exception handler for Python scripts",
+        "rdepends": [
+            "core",
+            "crypt",
+            "html",
+            "io",
+            "math",
+            "pydoc"
+        ],
+        "files": [
+            "${libdir}/python${PYTHON_MAJMIN}/cgitb.py"
+        ],
+        "cached": [
+            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/cgitb.*.pyc"
+        ]
+    },
     "codecs": {
         "summary": "Python codec",
         "rdepends": [
@@ -1219,6 +1236,18 @@
             "${libdir}/python${PYTHON_MAJMIN}/tomllib/_parser.*.pyc"
         ]
     },
+    "turtle": {
+        "summary": "Turtle graphics is a popular way for introducing programming to kids.",
+        "rdepends": [
+            "tkinter"
+        ],
+        "files": [
+            "${libdir}/python${PYTHON_MAJMIN}/turtle.py"
+        ],
+        "cached": [
+            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/turtle.*.pyc"
+        ]
+     },
     "unittest": {
         "summary": "Python unit testing framework",
         "rdepends": [
@@ -1303,6 +1332,19 @@
             "${libdir}/python${PYTHON_MAJMIN}/xmlrpc/__pycache__"
         ],
         "cached": []
+    },
+    "zipapp": {
+        "summary": "Tools to manage the creation of zip files containing Python code",
+        "rdepends": [
+            "compression",
+            "core"
+        ],
+        "files": [
+            "${libdir}/python${PYTHON_MAJMIN}/zipapp.py"
+        ],
+        "cached": [
+            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/zipapp.*.pyc"
+        ]
     },
     "zoneinfo": {
         "summary": "IANA time zone support",

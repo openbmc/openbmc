@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e \
                     file://src/near.h;beginline=1;endline=20;md5=358e4deefef251a4761e1ffacc965d13 \
                    "
 
-DEPENDS = "dbus glib-2.0 libnl"
+DEPENDS = "dbus glib-2.0 libnl autoconf-archive-native"
 
 SRC_URI = "git://git.kernel.org/pub/scm/network/nfc/neard.git;protocol=https;branch=master \
            file://neard.in \

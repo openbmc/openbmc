@@ -13,19 +13,17 @@ DEPENDS += "xorgproto \
             xtrans \
             libxcb \
             xorgproto-native \
-            autoconf-archive \
+            autoconf-archive-native \
             "
 
 PROVIDES = "virtual/libx11"
-
-FILESEXTRAPATHS =. "${FILE_DIRNAME}/libx11:"
 
 PE = "1"
 
 XORG_PN = "libX11"
 
-SRC_URI += "file://disable_tests.patch \
-            "
+SRC_URI += "file://disable_tests.patch"
+
 SRC_URI[sha256sum] = "c9a287a5aefa9804ce3cfafcf516fe96ed3f7e8e45c0e2ee59e84c86757df518"
 
 inherit gettext

@@ -19,7 +19,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BP}.tar.gz \
            file://0001-Drop-using-register-storage-classifier.patch"
 SRC_URI[sha256sum] = "533c3f2f6b53e4163ded4fd81d1f11ae6162a0f6451bd5e62a8382d0c1366624"
 
-DEPENDS += "cups python3 libusb"
+DEPENDS += "cups python3 libusb1"
 
 inherit autotools-brokensep python3-dir python3native python3targetconfig pkgconfig systemd
 
@@ -29,7 +29,6 @@ export STAGING_LIBDIR
 CFLAGS += "-I${STAGING_INCDIR}/python${PYTHON_BASEVERSION}${PYTHON_ABI}"
 
 EXTRA_OECONF += "\
-        LIBUSBINCLUDEROOT=${STAGING_INCDIR} \
         --enable-cups-drv-install \
         --enable-cups-ppd-install \
         --disable-network-build \
@@ -74,12 +73,6 @@ RDEPENDS:${PN} += " \
         python3-terminal \
 "
 RDEPENDS:${PN}-filter += "perl ghostscript"
-
-# need to snag the debug file or OE will fail on backend package
-FILES:${PN}-dbg += "\
-        ${libexecdir}/cups/backend/.debug \
-        ${PYTHON_SITEPACKAGES_DIR}/.debug \
-        ${libexecdir}/cups/filter/.debug "
 
 FILES:${PN} += "${datadir}/ipp-usb/quirks/HPLIP.conf"
 FILES:${PN}-dev += "${PYTHON_SITEPACKAGES_DIR}/*.la"

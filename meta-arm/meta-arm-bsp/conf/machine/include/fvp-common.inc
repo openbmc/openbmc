@@ -33,15 +33,15 @@ FVP_CONFIG[bp.virtio_net.hostbridge.userNetworking] ?= "1"
 # Tell testimage to connect to localhost:8022, and forward that to SSH in the FVP.
 FVP_CONFIG[bp.virtio_net.hostbridge.userNetPorts] = "8022=22"
 FVP_CONFIG[cache_state_modelled] ?= "0"
-FVP_CONFIG[bp.secureflashloader.fname] ?= "${DEPLOY_DIR_IMAGE}/bl1-fvp.bin"
-FVP_CONFIG[bp.flashloader0.fname] ?= "${DEPLOY_DIR_IMAGE}/fip-fvp.bin"
-FVP_CONFIG[bp.virtioblockdevice.image_path] ?= "${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.rootfs.wic"
+FVP_CONFIG[bp.secureflashloader.fname] ?= "bl1-fvp.bin"
+FVP_CONFIG[bp.flashloader0.fname] ?= "fip-fvp.bin"
+FVP_CONFIG[bp.virtioblockdevice.image_path] ?= "${IMAGE_NAME}.rootfs.wic"
 # Set the baseline to ARMv8.4, as the default is 8.0.
 FVP_CONFIG[cluster0.has_arm_v8-4] = "1"
 FVP_CONFIG[cluster1.has_arm_v8-4] = "1"
 FVP_CONSOLE ?= "terminal_0"
-FVP_DATA ?= "cluster0.cpu0=${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}@0x80080000 \
-             cluster0.cpu0=${DEPLOY_DIR_IMAGE}/fvp-base-revc.dtb@0x8fc00000"
+FVP_DATA ?= "cluster0.cpu0=${KERNEL_IMAGETYPE}@0x80080000 \
+             cluster0.cpu0=fvp-base-revc.dtb@0x8fc00000"
 FVP_TERMINALS[bp.terminal_0] ?= "Console"
 FVP_TERMINALS[bp.terminal_1] ?= ""
 FVP_TERMINALS[bp.terminal_2] ?= ""

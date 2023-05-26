@@ -5,7 +5,8 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=25cdec9afe3f1f26212ead6bd2f7fac8"
 
 SRC_URI = "git://github.com/gerbera/gerbera.git;protocol=https;branch=master \
            file://0001-Fix-build-with-fmt-9.0.patch \
-          "
+           file://0001-Fix-build-against-fmt-10.patch \
+           "
 
 SRCREV = "d73d8c1346213d784753c02ea771970500e0df2a"
 

@@ -98,6 +98,10 @@ EXTRA_OECONF = " \
     ${PACKAGECONFIG_CONFARGS} \
 "
 
+do_configure:append() {
+    sed -i -e 's#${WORKDIR}#<WORKDIR>#g' ${B}/config.h
+}
+
 link_waf() {
     ln -s waf-2.0.25 ${S}/waf
 }

@@ -6,11 +6,9 @@ Upstream-Status: Inappropriate [Embedded]
 
 Signed-off-by: Armin Kuster <akuster@mvista.com>
 
-Index: ipmiutil-3.0.5/configure.ac
-===================================================================
---- ipmiutil-3.0.5.orig/configure.ac
-+++ ipmiutil-3.0.5/configure.ac
-@@ -149,7 +149,6 @@ CROSS_LFLAGS=""
+--- a/configure.ac
++++ b/configure.ac
+@@ -151,7 +151,6 @@ CROSS_LFLAGS=""
  CROSS_CFLAGS=""
  LIBSENSORS=""
  SAM2OBJ="isensor2.o ievents2.o"
@@ -18,7 +16,7 @@ Index: ipmiutil-3.0.5/configure.ac
  
  AC_ARG_ENABLE([useflags],
      [  --enable-useflags    include environment CFLAGS and LDFLAGS.],
-@@ -200,29 +199,42 @@ AC_ARG_ENABLE([gpl],
+@@ -211,29 +210,42 @@ AC_ARG_ENABLE([gpl],
  
  dnl Does this Linux have systemd enabled?  Otherwise use sysv init.
  AC_ARG_ENABLE([systemd],
@@ -83,7 +81,7 @@ Index: ipmiutil-3.0.5/configure.ac
  fi
  
  dnl start main logic
-@@ -528,7 +540,7 @@ AC_SUBST(INS_LIB)
+@@ -563,7 +575,7 @@ AC_SUBST(INS_LIB)
  AC_SUBST(SUBDIR_S)
  AC_SUBST(CROSS_CFLAGS)
  AC_SUBST(CROSS_LFLAGS)
@@ -92,10 +90,8 @@ Index: ipmiutil-3.0.5/configure.ac
  AC_SUBST(SHR_LINK)
  AC_SUBST(pkgconfigdir)
  
-Index: ipmiutil-3.0.5/scripts/Makefile.am
-===================================================================
---- ipmiutil-3.0.5.orig/scripts/Makefile.am
-+++ ipmiutil-3.0.5/scripts/Makefile.am
+--- a/scripts/Makefile.am
++++ b/scripts/Makefile.am
 @@ -17,7 +17,8 @@ cronto = ${DESTDIR}${etcdir}/cron.daily
  sbinto = ${DESTDIR}${sbindir}
  varto  = ${DESTDIR}/var/lib/ipmiutil
@@ -106,7 +102,7 @@ Index: ipmiutil-3.0.5/scripts/Makefile.am
  sysvinit = ${datato}
  sbinfls = ialarms ihealth ifru igetevent ireset icmd isol ilan isensor isel iserial iwdt iconfig ipicmg ifirewall ifwum ihpm iuser
  
-@@ -47,10 +48,14 @@ install:
+@@ -47,10 +48,13 @@ install:
  	${INSTALL_SCRIPT_SH} ipmi_port.sh ${sysvinit}/ipmi_port
  	${INSTALL_SCRIPT_SH} ipmi_info    ${sysvinit}/ipmi_info
  	${INSTALL_SCRIPT_SH} checksel     ${datato}
@@ -114,7 +110,6 @@ Index: ipmiutil-3.0.5/scripts/Makefile.am
 -	${INSTALL_DATA_SH} ipmiutil_asy.service ${sysdto}
 -	${INSTALL_DATA_SH} ipmiutil_evt.service ${sysdto}
 -	${INSTALL_DATA_SH} ipmi_port.service    ${sysdto}
-+	
 +	if [ ! -z "${systemddir}" ]; then \
 +		$(MKDIR) ${sysdto}; \
 +		${INSTALL_DATA_SH} ipmiutil_wdt.service ${sysdto}; \
@@ -122,6 +117,6 @@ Index: ipmiutil-3.0.5/scripts/Makefile.am
 +		${INSTALL_DATA_SH} ipmiutil_evt.service ${sysdto}; \
 +		${INSTALL_DATA_SH} ipmi_port.service    ${sysdto}; \
 +	fi
- 	${INSTALL_SCRIPT_SH} ipmiutil.env     ${datato}
+ 	${INSTALL_SCRIPT_SH} ipmiutil.env.template  ${datato}
+ 	${INSTALL_SCRIPT_SH} ipmiutil.env.template  ${datato}/ipmiutil.env
  	${INSTALL_SCRIPT_SH} ipmiutil.pre     ${datato}
- 	${INSTALL_SCRIPT_SH} ipmiutil.setup   ${datato}

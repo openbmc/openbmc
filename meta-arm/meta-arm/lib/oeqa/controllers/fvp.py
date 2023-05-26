@@ -3,7 +3,7 @@ import pexpect
 import os
 
 from oeqa.core.target.ssh import OESSHTarget
-from fvp import conffile, runner
+from fvp import runner
 
 
 class OEFVPSSHTarget(OESSHTarget):
@@ -19,7 +19,6 @@ class OEFVPSSHTarget(OESSHTarget):
         basename = pathlib.Path(rootfs)
         basename = basename.name.replace("".join(basename.suffixes), "")
         self.fvpconf = image_dir / (basename + ".fvpconf")
-        self.config = conffile.load(self.fvpconf)
         self.bootlog = bootlog
 
         if not self.fvpconf.exists():
@@ -31,7 +30,7 @@ class OEFVPSSHTarget(OESSHTarget):
     def start(self, **kwargs):
         self.fvp_log = self._create_logfile("fvp")
         self.fvp = runner.FVPRunner(self.logger)
-        self.fvp.start(self.config, stdout=self.fvp_log)
+        self.fvp.start(self.fvpconf, stdout=self.fvp_log)
         self.logger.debug(f"Started FVP PID {self.fvp.pid()}")
         self._after_start()
 
@@ -72,8 +71,9 @@ class OEFVPTarget(OEFVPSSHTarget):
     def _after_start(self):
         with open(self.fvp_log.name, 'rb') as logfile:
             parser = runner.ConsolePortParser(logfile)
-            self.logger.debug(f"Awaiting console on terminal {self.config['consoles']['default']}")
-            port = parser.parse_port(self.config['consoles']['default'])
+            config = self.fvp.getConfig()
+            self.logger.debug(f"Awaiting console on terminal {config['consoles']['default']}")
+            port = parser.parse_port(config['consoles']['default'])
             console = self.fvp.create_pexpect(port)
             try:
                 console.expect("login\\:", timeout=self.boot_timeout)
@@ -105,7 +105,8 @@ class OEFVPSerialTarget(OEFVPSSHTarget):
     def _after_start(self):
         with open(self.fvp_log.name, 'rb') as logfile:
             parser = runner.ConsolePortParser(logfile)
-            for name, console in self.config["consoles"].items():
+            config = self.fvp.getConfig()
+            for name, console in config["consoles"].items():
                 logfile = self._create_logfile(name)
                 self.logger.info(f'Creating terminal {name} on {console}')
                 port = parser.parse_port(console)

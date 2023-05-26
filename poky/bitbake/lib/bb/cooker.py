@@ -504,6 +504,9 @@ class BBCooker:
             self.recipecaches[mc] = bb.cache.CacheData(self.caches_array)
 
         self.handleCollections(self.data.getVar("BBFILE_COLLECTIONS"))
+        self.collections = {}
+        for mc in self.multiconfigs:
+            self.collections[mc] = CookerCollectFiles(self.bbfile_config_priorities, mc)
 
         self._parsecache_set(False)
 
@@ -640,7 +643,8 @@ class BBCooker:
 
         if fn:
             try:
-                envdata = self.databuilder.parseRecipe(fn, self.collections[mc].get_file_appends(fn))
+                layername = self.collections[mc].calc_bbfile_priority(fn)[2]
+                envdata = self.databuilder.parseRecipe(fn, self.collections[mc].get_file_appends(fn), layername)
             except Exception as e:
                 parselog.exception("Unable to read %s", fn)
                 raise
@@ -1378,8 +1382,8 @@ class BBCooker:
         if bf.startswith("/") or bf.startswith("../"):
             bf = os.path.abspath(bf)
 
-        self.collections = {mc: CookerCollectFiles(self.bbfile_config_priorities, mc)}
-        filelist, masked, searchdirs = self.collections[mc].collect_bbfiles(self.databuilder.mcdata[mc], self.databuilder.mcdata[mc])
+        collections = {mc: CookerCollectFiles(self.bbfile_config_priorities, mc)}
+        filelist, masked, searchdirs = collections[mc].collect_bbfiles(self.databuilder.mcdata[mc], self.databuilder.mcdata[mc])
         try:
             os.stat(bf)
             bf = os.path.abspath(bf)
@@ -1445,7 +1449,8 @@ class BBCooker:
 
         bb_caches = bb.cache.MulticonfigCache(self.databuilder, self.data_hash, self.caches_array)
 
-        infos = bb_caches[mc].parse(fn, self.collections[mc].get_file_appends(fn))
+        layername = self.collections[mc].calc_bbfile_priority(fn)[2]
+        infos = bb_caches[mc].parse(fn, self.collections[mc].get_file_appends(fn), layername)
         infos = dict(infos)
 
         fn = bb.cache.realfn2virtual(fn, cls, mc)
@@ -1676,13 +1681,10 @@ class BBCooker:
                 for dep in self.configuration.extra_assume_provided:
                     self.recipecaches[mc].ignored_dependencies.add(dep)
 
-            self.collections = {}
-
             mcfilelist = {}
             total_masked = 0
             searchdirs = set()
             for mc in self.multiconfigs:
-                self.collections[mc] = CookerCollectFiles(self.bbfile_config_priorities, mc)
                 (filelist, masked, search) = self.collections[mc].collect_bbfiles(self.databuilder.mcdata[mc], self.databuilder.mcdata[mc])
 
                 mcfilelist[mc] = filelist
@@ -1833,10 +1835,10 @@ class CookerCollectFiles(object):
         self.bbfile_config_priorities = sorted(priorities, key=lambda tup: tup[1], reverse=True)
 
     def calc_bbfile_priority(self, filename):
-        for _, _, regex, pri in self.bbfile_config_priorities:
+        for layername, _, regex, pri in self.bbfile_config_priorities:
             if regex.match(filename):
-                return pri, regex
-        return 0, None
+                return pri, regex, layername
+        return 0, None, None
 
     def get_bbfiles(self):
         """Get list of default .bb files by reading out the current directory"""
@@ -2009,7 +2011,7 @@ class CookerCollectFiles(object):
         # Calculate priorities for each file
         for p in pkgfns:
             realfn, cls, mc = bb.cache.virtualfn2realfn(p)
-            priorities[p], regex = self.calc_bbfile_priority(realfn)
+            priorities[p], regex, _ = self.calc_bbfile_priority(realfn)
             if regex in unmatched_regex:
                 matched_regex.add(regex)
                 unmatched_regex.remove(regex)
@@ -2146,7 +2148,7 @@ class Parser(multiprocessing.Process):
             self.results.close()
             self.results.join_thread()
 
-    def parse(self, mc, cache, filename, appends):
+    def parse(self, mc, cache, filename, appends, layername):
         try:
             origfilter = bb.event.LogHandler.filter
             # Record the filename we're parsing into any events generated
@@ -2160,7 +2162,7 @@ class Parser(multiprocessing.Process):
             bb.event.set_class_handlers(self.handlers.copy())
             bb.event.LogHandler.filter = parse_filter
 
-            return True, mc, cache.parse(filename, appends)
+            return True, mc, cache.parse(filename, appends, layername)
         except Exception as exc:
             tb = sys.exc_info()[2]
             exc.recipe = filename
@@ -2200,10 +2202,11 @@ class CookerParser(object):
         for mc in self.cooker.multiconfigs:
             for filename in self.mcfilelist[mc]:
                 appends = self.cooker.collections[mc].get_file_appends(filename)
+                layername = self.cooker.collections[mc].calc_bbfile_priority(filename)[2]
                 if not self.bb_caches[mc].cacheValid(filename, appends):
-                    self.willparse.add((mc, self.bb_caches[mc], filename, appends))
+                    self.willparse.add((mc, self.bb_caches[mc], filename, appends, layername))
                 else:
-                    self.fromcache.add((mc, self.bb_caches[mc], filename, appends))
+                    self.fromcache.add((mc, self.bb_caches[mc], filename, appends, layername))
 
         self.total = len(self.fromcache) + len(self.willparse)
         self.toparse = len(self.willparse)
@@ -2314,7 +2317,7 @@ class CookerParser(object):
             self.syncthread.join()
 
     def load_cached(self):
-        for mc, cache, filename, appends in self.fromcache:
+        for mc, cache, filename, appends, layername in self.fromcache:
             infos = cache.loadCached(filename, appends)
             yield False, mc, infos
 
@@ -2417,9 +2420,10 @@ class CookerParser(object):
         bb.cache.SiggenRecipeInfo.reset()
         to_reparse = set()
         for mc in self.cooker.multiconfigs:
-            to_reparse.add((mc, filename, self.cooker.collections[mc].get_file_appends(filename)))
+            layername = self.cooker.collections[mc].calc_bbfile_priority(filename)[2]
+            to_reparse.add((mc, filename, self.cooker.collections[mc].get_file_appends(filename), layername))
 
-        for mc, filename, appends in to_reparse:
-            infos = self.bb_caches[mc].parse(filename, appends)
+        for mc, filename, appends, layername in to_reparse:
+            infos = self.bb_caches[mc].parse(filename, appends, layername)
             for vfn, info_array in infos:
                 self.cooker.recipecaches[mc].add_from_recipeinfo(vfn, info_array)

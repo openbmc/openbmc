@@ -1,0 +1,60 @@
+From e1b93db6a13d955c6bab6358a7fa27fecb59479f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 11 May 2023 17:24:46 -0700
+Subject: [PATCH] ippool: Port to ppp 2.5 APIs
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ pppd/ippool.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/pppd/ippool.c b/pppd/ippool.c
+index 88cb901..d4b5c97 100644
+--- a/pppd/ippool.c
++++ b/pppd/ippool.c
+@@ -6,7 +6,7 @@
+ #include <stdlib.h>
+ #include <errno.h>
+ #include "pppd.h"
+-#include "pathnames.h"
++#include "options.h"
+ #include "fsm.h" /* Needed for lcp.h to include cleanly */
+ #include "lcp.h"
+ #include "ccp.h"
+@@ -23,7 +23,7 @@
+ 
+ #include "ippool_rpc.h"
+ 
+-const char pppd_version[] = VERSION;
++const char pppd_version[] = PPPD_VERSION;
+ 
+ static char *ippool_pool_name = NULL;
+ static char *ippool_pool_name2 = NULL;
+@@ -205,13 +205,13 @@ void plugin_init(void)
+ {
+ #if defined(__linux__)
+ 	extern int new_style_driver;	/* From sys-linux.c */
+-	if (!ppp_available() && !new_style_driver)
++	if (!ppp_check_kernel_support() && !new_style_driver)
+ 		fatal("Kernel doesn't support ppp_generic - "
+ 		    "needed for Ippool");
+ #else
+ 	fatal("No IP pool support on this OS");
+ #endif
+-	add_options(ippool_options);
++	ppp_add_options(ippool_options);
+ 
+ 	memset(&ippool_addr, 0, sizeof(ippool_addr));
+ 
+@@ -219,6 +219,6 @@ void plugin_init(void)
+ 	ip_down_hook = ippool_release_ip;
+ 
+ 	/* brute force, just in case ip_down_hook doesn't get called */
+-	add_notifier(&exitnotify, ippool_cleanup, 0);
++	ppp_add_notify(NF_EXIT, ippool_cleanup, 0);
+ }
+ 
+-- 
+2.40.1
+

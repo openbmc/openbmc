@@ -15,7 +15,9 @@ SRC_URI[sha256sum] = "28fd90e88bda0dfd460f370f353474811b2e295d7eb27f0d7d18ffa3d7
 # glib-2.0-native is needed for GSETTINGS_RULES autoconf macro from gsettings.m4
 DEPENDS = "intltool-native glib-2.0-native nftables"
 
-inherit gettext autotools-brokensep bash-completion pkgconfig python3native python3-dir gsettings systemd update-rc.d ptest
+inherit gettext autotools-brokensep bash-completion pkgconfig python3native python3-dir gsettings systemd update-rc.d ptest features_check
+
+REQUIRED_DISTRO_FEATURES = "gobject-introspection"
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 PACKAGECONFIG[systemd] = "--with-systemd-unitdir=${systemd_system_unitdir},--disable-systemd"

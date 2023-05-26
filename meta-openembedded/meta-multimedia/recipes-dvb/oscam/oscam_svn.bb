@@ -8,7 +8,7 @@ DEPENDS = "libusb1 openssl pcsc-lite"
 
 SRC_URI = "svn://www.streamboard.tv/svn/oscam;module=trunk;protocol=http \
            "
-SRCREV = "11491"
+SRCREV = "11718"
 PV = "1.10+${SRCPV}"
 
 S = "${WORKDIR}/trunk"
@@ -17,3 +17,6 @@ inherit cmake
 
 EXTRA_OECMAKE = "-DDEFAULT_CS_CONFDIR=${sysconfdir} -DCMAKE_BUILD_TYPE=Debug"
 
+do_configure:append() {
+    sed -i -e '1 s|${TOPDIR}|<TOPDIR>|g' ${B}/config.c
+}

@@ -1,0 +1,168 @@
+From 2c08724e8a7e3a0ee8cdd91246a714a17f2ba5c1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 17 May 2023 17:31:56 -0700
+Subject: [PATCH] Fix build against fmt 10+
+
+Fixes
+git/src/config/setup/config_setup_vector.cc:191:9:   required from here
+| /home/hains/openpli-dm920-python3/build/tmp/work/cortexa15hf-neon-vfpv4-oe-linux-gnueabi/gerbera/1.11.0-r0/
+recipe-sysroot/usr/include/fmt/core.h:1691:7: error: static assertion failed: Cannot format an argument. To make type T formattable provide a formatter<T> specialization: https://fmt.dev/latest/api.html#udt
+|  1691 |       formattable,
+|       |       ^~~~~~~~~~~
+
+Source: https://github.com/Hains/openpli-dm920-python3/commit/688ae121bd3928925a8656bd4aaf3857d8e8a8ed
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/config/setup/config_setup_array.cc       | 6 +++---
+ src/config/setup/config_setup_autoscan.cc    | 2 +-
+ src/config/setup/config_setup_client.cc      | 2 +-
+ src/config/setup/config_setup_dictionary.cc  | 6 +++---
+ src/config/setup/config_setup_dynamic.cc     | 2 +-
+ src/config/setup/config_setup_transcoding.cc | 2 +-
+ src/config/setup/config_setup_tweak.cc       | 2 +-
+ src/config/setup/config_setup_vector.cc      | 4 ++--
+ 8 files changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/src/config/setup/config_setup_array.cc b/src/config/setup/config_setup_array.cc
+index 8f3cf1db..efc9b501 100644
+--- a/src/config/setup/config_setup_array.cc
++++ b/src/config/setup/config_setup_array.cc
+@@ -136,11 +136,11 @@ std::vector<std::string> ConfigArraySetup::getXmlContent(const pugi::xml_node& o
+     std::vector<std::string> result;
+     if (initArray) {
+         if (!initArray(optValue, result, ConfigDefinition::mapConfigOption(nodeOption))) {
+-            throw_std_runtime_error("Invalid {} array value '{}'", xpath, optValue);
++            throw_std_runtime_error("Invalid {} array value '{}'", xpath, optValue.value());
+         }
+     } else {
+         if (!createOptionFromNode(optValue, result)) {
+-            throw_std_runtime_error("Invalid {} array value '{}'", xpath, optValue);
++            throw_std_runtime_error("Invalid {} array value '{}'", xpath, optValue.value());
+         }
+     }
+     if (result.empty()) {
+@@ -149,7 +149,7 @@ std::vector<std::string> ConfigArraySetup::getXmlContent(const pugi::xml_node& o
+         result = defaultEntries;
+     }
+     if (notEmpty && result.empty()) {
+-        throw_std_runtime_error("Invalid array {} empty '{}'", xpath, optValue);
++        throw_std_runtime_error("Invalid array {} empty '{}'", xpath, optValue.value());
+     }
+     return result;
+ }
+diff --git a/src/config/setup/config_setup_autoscan.cc b/src/config/setup/config_setup_autoscan.cc
+index e882ca3e..d773419b 100644
+--- a/src/config/setup/config_setup_autoscan.cc
++++ b/src/config/setup/config_setup_autoscan.cc
+@@ -203,7 +203,7 @@ std::shared_ptr<ConfigOption> ConfigAutoscanSetup::newOption(const pugi::xml_nod
+ {
+     auto result = std::vector<AutoscanDirectory>();
+     if (!createOptionFromNode(optValue, result)) {
+-        throw_std_runtime_error("Init {} autoscan failed '{}'", xpath, optValue);
++        throw_std_runtime_error("Init {} autoscan failed '{}'", xpath, optValue.value());
+     }
+     optionValue = std::make_shared<AutoscanListOption>(result);
+     return optionValue;
+diff --git a/src/config/setup/config_setup_client.cc b/src/config/setup/config_setup_client.cc
+index 30bb98cb..56be9c53 100644
+--- a/src/config/setup/config_setup_client.cc
++++ b/src/config/setup/config_setup_client.cc
+@@ -163,7 +163,7 @@ std::shared_ptr<ConfigOption> ConfigClientSetup::newOption(const pugi::xml_node&
+     auto result = std::make_shared<ClientConfigList>();
+ 
+     if (!createOptionFromNode(isEnabled ? optValue : pugi::xml_node(nullptr), result)) {
+-        throw_std_runtime_error("Init {} client config failed '{}'", xpath, optValue);
++        throw_std_runtime_error("Init {} client config failed '{}'", xpath, optValue.value());
+     }
+     optionValue = std::make_shared<ClientConfigListOption>(result);
+     return optionValue;
+diff --git a/src/config/setup/config_setup_dictionary.cc b/src/config/setup/config_setup_dictionary.cc
+index eb91c694..ea2aaa05 100644
+--- a/src/config/setup/config_setup_dictionary.cc
++++ b/src/config/setup/config_setup_dictionary.cc
+@@ -162,11 +162,11 @@ std::map<std::string, std::string> ConfigDictionarySetup::getXmlContent(const pu
+     std::map<std::string, std::string> result;
+     if (initDict) {
+         if (!initDict(optValue, result)) {
+-            throw_std_runtime_error("Init {} dictionary failed '{}'", xpath, optValue);
++            throw_std_runtime_error("Init {} dictionary failed '{}'", xpath, optValue.value());
+         }
+     } else {
+         if (!createOptionFromNode(optValue, result) && required) {
+-            throw_std_runtime_error("Init {} dictionary failed '{}'", xpath, optValue);
++            throw_std_runtime_error("Init {} dictionary failed '{}'", xpath, optValue.value());
+         }
+     }
+     if (result.empty()) {
+@@ -175,7 +175,7 @@ std::map<std::string, std::string> ConfigDictionarySetup::getXmlContent(const pu
+         result = defaultEntries;
+     }
+     if (notEmpty && result.empty()) {
+-        throw_std_runtime_error("Invalid dictionary {} empty '{}'", xpath, optValue);
++        throw_std_runtime_error("Invalid dictionary {} empty '{}'", xpath, optValue.value());
+     }
+     return result;
+ }
+diff --git a/src/config/setup/config_setup_dynamic.cc b/src/config/setup/config_setup_dynamic.cc
+index 6a43b820..93030b85 100644
+--- a/src/config/setup/config_setup_dynamic.cc
++++ b/src/config/setup/config_setup_dynamic.cc
+@@ -179,7 +179,7 @@ std::shared_ptr<ConfigOption> ConfigDynamicContentSetup::newOption(const pugi::x
+     auto result = std::make_shared<DynamicContentList>();
+ 
+     if (!createOptionFromNode(optValue, result)) {
+-        throw_std_runtime_error("Init {} DynamicContentList failed '{}'", xpath, optValue);
++        throw_std_runtime_error("Init {} DynamicContentList failed '{}'", xpath, optValue.value());
+     }
+     optionValue = std::make_shared<DynamicContentListOption>(result);
+     return optionValue;
+diff --git a/src/config/setup/config_setup_transcoding.cc b/src/config/setup/config_setup_transcoding.cc
+index 4827f109..c353ce1f 100644
+--- a/src/config/setup/config_setup_transcoding.cc
++++ b/src/config/setup/config_setup_transcoding.cc
+@@ -492,7 +492,7 @@ std::shared_ptr<ConfigOption> ConfigTranscodingSetup::newOption(const pugi::xml_
+     auto result = std::make_shared<TranscodingProfileList>();
+ 
+     if (!createOptionFromNode(isEnabled ? optValue : pugi::xml_node(nullptr), result)) {
+-        throw_std_runtime_error("Init {} transcoding failed '{}'", xpath, optValue);
++        throw_std_runtime_error("Init {} transcoding failed '{}'", xpath, optValue.value());
+     }
+     optionValue = std::make_shared<TranscodingProfileListOption>(result);
+     return optionValue;
+diff --git a/src/config/setup/config_setup_tweak.cc b/src/config/setup/config_setup_tweak.cc
+index d7692c09..72c2beb2 100644
+--- a/src/config/setup/config_setup_tweak.cc
++++ b/src/config/setup/config_setup_tweak.cc
+@@ -242,7 +242,7 @@ std::shared_ptr<ConfigOption> ConfigDirectorySetup::newOption(const pugi::xml_no
+     auto result = std::make_shared<DirectoryConfigList>();
+ 
+     if (!createOptionFromNode(optValue, result)) {
+-        throw_std_runtime_error("Init {} DirectoryConfigList failed '{}'", xpath, optValue);
++        throw_std_runtime_error("Init {} DirectoryConfigList failed '{}'", xpath, optValue.value());
+     }
+     optionValue = std::make_shared<DirectoryTweakOption>(result);
+     return optionValue;
+diff --git a/src/config/setup/config_setup_vector.cc b/src/config/setup/config_setup_vector.cc
+index c8ff853d..91f99ca4 100644
+--- a/src/config/setup/config_setup_vector.cc
++++ b/src/config/setup/config_setup_vector.cc
+@@ -180,7 +180,7 @@ std::vector<std::vector<std::pair<std::string, std::string>>> ConfigVectorSetup:
+ {
+     std::vector<std::vector<std::pair<std::string, std::string>>> result;
+     if (!createOptionFromNode(optValue, result) && required) {
+-        throw_std_runtime_error("Init {} vector failed '{}'", xpath, optValue);
++        throw_std_runtime_error("Init {} vector failed '{}'", xpath, optValue.value());
+     }
+     if (result.empty()) {
+         log_debug("{} assigning {} default values", xpath, defaultEntries.size());
+@@ -188,7 +188,7 @@ std::vector<std::vector<std::pair<std::string, std::string>>> ConfigVectorSetup:
+         result = defaultEntries;
+     }
+     if (notEmpty && result.empty()) {
+-        throw_std_runtime_error("Invalid vector {} empty '{}'", xpath, optValue);
++        throw_std_runtime_error("Invalid vector {} empty '{}'", xpath, optValue.value());
+     }
+     return result;
+ }

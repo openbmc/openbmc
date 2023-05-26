@@ -15,7 +15,6 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=71391c8e0c1cfe68077e7fce3b586283 \
                     file://doc/COPYING.LESSER;md5=4fbd65380cdd255951079008b364516c"
 
 DEPENDS = "nettle gmp virtual/libiconv libunistring"
-DEPENDS:append:libc-musl = " argp-standalone"
 
 SHRT_VER = "${@d.getVar('PV').split('.')[0]}.${@d.getVar('PV').split('.')[1]}"
 
@@ -30,20 +29,24 @@ SRC_URI[sha256sum] = "0ea0d11a1660a1e63f960f157b197abe6d0c8cb3255be24e1fb3815930
 
 inherit autotools texinfo pkgconfig gettext lib_package gtk-doc ptest
 
-PACKAGECONFIG ??= "libidn  ${@bb.utils.filter('DISTRO_FEATURES', 'seccomp', d)}"
+PACKAGECONFIG ??= "libidn libtasn1 ${@bb.utils.filter('DISTRO_FEATURES', 'seccomp', d)}"
 
 # You must also have CONFIG_SECCOMP enabled in the kernel for
 # seccomp to work.
 PACKAGECONFIG[seccomp] = "--with-libseccomp-prefix=${STAGING_EXECPREFIXDIR},ac_cv_libseccomp=no,libseccomp"
 PACKAGECONFIG[libidn] = "--with-idn,--without-idn,libidn2"
-PACKAGECONFIG[libtasn1] = "--with-included-libtasn1=no,--with-included-libtasn1,libtasn1"
+PACKAGECONFIG[libtasn1] = "--without-included-libtasn1,--with-included-libtasn1,libtasn1"
 PACKAGECONFIG[p11-kit] = "--with-p11-kit,--without-p11-kit,p11-kit"
 PACKAGECONFIG[tpm] = "--with-tpm,--without-tpm,trousers"
 PACKAGECONFIG[fips] = "--enable-fips140-mode --with-libdl-prefix=${STAGING_BASELIBDIR}"
+PACKAGECONFIG[dane] = "--enable-libdane,--disable-libdane,unbound"
+# Certificate compression
+PACKAGECONFIG[brotli] = "--with-brotli,--without-brotli,brotli"
+PACKAGECONFIG[zlib] = "--with-zlib,--without-zlib,zlib"
+PACKAGECONFIG[zstd] = "--with-zstd,--without-zstd,zstd"
 
 EXTRA_OECONF = " \
     --enable-doc \
-    --disable-libdane \
     --disable-rpath \
     --enable-openssl-compatibility \
     --with-libpthread-prefix=${STAGING_DIR_HOST}${prefix} \
@@ -54,12 +57,14 @@ EXTRA_OECONF = " \
 # Otherwise the tools try and use HOSTTOOLS_DIR/bash as a shell.
 export POSIX_SHELL="${base_bindir}/sh"
 
-LDFLAGS:append:libc-musl = " -largp"
-
 do_configure:prepend() {
 	for dir in . lib; do
 		rm -f ${dir}/aclocal.m4 ${dir}/m4/libtool.m4 ${dir}/m4/lt*.m4
 	done
+}
+
+do_compile_ptest() {
+    oe_runmake -C tests buildtest-TESTS
 }
 
 do_install:append:class-target() {
@@ -69,13 +74,11 @@ do_install:append:class-target() {
         fi
 }
 
-do_compile:append() {
-        oe_runmake ${PARALLEL_MAKE} -C tests buildtest-TESTS
-}
-
-PACKAGES =+ "${PN}-openssl ${PN}-xx ${PN}-fips"
+PACKAGES =+ "${PN}-dane ${PN}-openssl ${PN}-xx ${PN}-fips"
 
 FILES:${PN}-dev += "${bindir}/gnutls-cli-debug"
+
+FILES:${PN}-dane = "${libdir}/libgnutls-dane.so.*"
 FILES:${PN}-openssl = "${libdir}/libgnutls-openssl.so.*"
 FILES:${PN}-xx = "${libdir}/libgnutlsxx.so.*"
 FILES:${PN}-fips = "${bindir}/fipshmac"

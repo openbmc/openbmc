@@ -1,7 +1,7 @@
-From f49f27f1bc67d07440b0ac9a7d767a8ea1589bfe Mon Sep 17 00:00:00 2001
+From e244a72c6f8803550f37e81f72bbae039651013b Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 15 Dec 2015 15:50:44 +0200
-Subject: [PATCH 5/5] Modify vg_test wrapper to support PTEST formats
+Subject: [PATCH] Modify vg_test wrapper to support PTEST formats
 
 Change the valgrind regression test script vg_regtest to
 support the yocto ptest stdout reporting format.  The commit adds
@@ -25,11 +25,11 @@ Increase time limit to 90 s.
 
 Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
 ---
- tests/vg_regtest.in | 75 +++++++++++++++++++++++++++++++++++++++--------------
+ tests/vg_regtest.in | 75 +++++++++++++++++++++++++++++++++------------
  1 file changed, 55 insertions(+), 20 deletions(-)
 
 diff --git a/tests/vg_regtest.in b/tests/vg_regtest.in
-index a441f42..cb05b52 100755
+index ad18800..e4bd8cb 100755
 --- a/tests/vg_regtest.in
 +++ b/tests/vg_regtest.in
 @@ -47,6 +47,7 @@
@@ -49,7 +49,7 @@ index a441f42..cb05b52 100755
       . "   Use EXTRA_REGTEST_OPTS to supply extra args for all tests\n"
       . "\n";
  
-@@ -186,6 +187,7 @@ my $outer_args;
+@@ -187,6 +188,7 @@ my $run_outer_args = "";
  my $valgrind_lib = "$tests_dir/.in_place";
  my $keepunfiltered = 0;
  my $looptillfail = 0;
@@ -57,7 +57,7 @@ index a441f42..cb05b52 100755
  
  # default filter is the one named "filter_stderr" in the test's directory
  my $default_stderr_filter = "filter_stderr";
-@@ -244,6 +246,8 @@ sub process_command_line()
+@@ -245,6 +247,8 @@ sub process_command_line()
                  $keepunfiltered = 1;
              } elsif ($arg =~ /^--loop-till-fail$/) {
                  $looptillfail = 1;
@@ -66,7 +66,7 @@ index a441f42..cb05b52 100755
              } else {
                  die $usage;
              }
-@@ -365,13 +369,28 @@ sub read_vgtest_file($)
+@@ -376,13 +380,28 @@ sub read_vgtest_file($)
  #----------------------------------------------------------------------------
  # Since most of the program time is spent in system() calls, need this to
  # propagate a Ctrl-C enabling us to quit.
@@ -100,7 +100,7 @@ index a441f42..cb05b52 100755
  # if $keepunfiltered, copies $1 to $1.unfiltered.out
  # renames $0 tp $1
  sub filtered_rename($$) 
-@@ -419,23 +438,25 @@ sub do_diffs($$$$)
+@@ -430,23 +449,25 @@ sub do_diffs($$$$)
                  # A match;  remove .out and any previously created .diff files.
                  unlink("$name.$mid.out");
                  unlink(<$name.$mid.diff*>);
@@ -128,7 +128,7 @@ index a441f42..cb05b52 100755
      $vgtest =~ /^(.*)\.vgtest/;
      my $name = $1;
      my $fullname = "$dir/$name"; 
-@@ -454,7 +475,11 @@ sub do_one_test($$)
+@@ -465,7 +486,11 @@ sub do_one_test($$)
          } elsif (256 == $prereq_res) {
              # Nb: weird Perl-ism -- exit code of '1' is seen by Perl as 256...
              # Prereq failed, skip.
@@ -141,7 +141,7 @@ index a441f42..cb05b52 100755
              return;
          } else {
              # Bad prereq; abort.
-@@ -472,7 +497,7 @@ sub do_one_test($$)
+@@ -483,7 +508,7 @@ sub do_one_test($$)
          }
          # If there is a progB, let's start it in background:
          printf("%-16s valgrind $extraopts $vgopts $prog $args (progB: $progB $argsB)\n",
@@ -150,7 +150,7 @@ index a441f42..cb05b52 100755
          # progB.done used to detect child has finished. See below.
          # Note: redirection of stdout and stderr is before $progB to allow argsB
          # to e.g. redirect stdoutB to stderrB
-@@ -488,7 +513,8 @@ sub do_one_test($$)
+@@ -499,7 +524,8 @@ sub do_one_test($$)
                       . "touch progB.done)  &");
          }
      } else {
@@ -160,7 +160,7 @@ index a441f42..cb05b52 100755
      }
  
      # Collect environment variables, if any.
-@@ -529,7 +555,7 @@ sub do_one_test($$)
+@@ -540,7 +566,7 @@ sub do_one_test($$)
      # Find all the .stdout.exp files.  If none, use /dev/null.
      my @stdout_exps = <$name.stdout.exp*>;
      @stdout_exps = ( "/dev/null" ) if (0 == scalar @stdout_exps);
@@ -169,7 +169,7 @@ index a441f42..cb05b52 100755
  
      # Filter stderr
      $stderr_filter_args = $name if (! defined $stderr_filter_args);
-@@ -538,7 +564,7 @@ sub do_one_test($$)
+@@ -549,7 +575,7 @@ sub do_one_test($$)
      # Find all the .stderr.exp files.  At least one must exist.
      my @stderr_exps = <$name.stderr.exp*>;
      (0 != scalar @stderr_exps) or die "Could not find `$name.stderr.exp*'\n";
@@ -178,7 +178,7 @@ index a441f42..cb05b52 100755
  
      if (defined $progB) {
          # wait for the child to be finished
-@@ -562,7 +588,7 @@ sub do_one_test($$)
+@@ -573,7 +599,7 @@ sub do_one_test($$)
          # Find all the .stdoutB.exp files.  If none, use /dev/null.
          my @stdoutB_exps = <$name.stdoutB.exp*>;
          @stdoutB_exps = ( "/dev/null" ) if (0 == scalar @stdoutB_exps);
@@ -187,7 +187,7 @@ index a441f42..cb05b52 100755
          
          # Filter stderr
          $stderrB_filter_args = $name if (! defined $stderrB_filter_args);
-@@ -571,7 +597,7 @@ sub do_one_test($$)
+@@ -582,7 +608,7 @@ sub do_one_test($$)
          # Find all the .stderrB.exp files.  At least one must exist.
          my @stderrB_exps = <$name.stderrB.exp*>;
          (0 != scalar @stderrB_exps) or die "Could not find `$name.stderrB.exp*'\n";
@@ -196,7 +196,7 @@ index a441f42..cb05b52 100755
      }
  
      # Maybe do post-test check
-@@ -583,7 +609,7 @@ sub do_one_test($$)
+@@ -594,7 +620,7 @@ sub do_one_test($$)
  	    # Find all the .post.exp files.  If none, use /dev/null.
  	    my @post_exps = <$name.post.exp*>;
  	    @post_exps = ( "/dev/null" ) if (0 == scalar @post_exps);
@@ -205,7 +205,7 @@ index a441f42..cb05b52 100755
  	}
      }
   
-@@ -592,6 +618,13 @@ sub do_one_test($$)
+@@ -603,6 +629,13 @@ sub do_one_test($$)
              print("(cleanup operation failed: $cleanup)\n");
      }
  
@@ -219,25 +219,25 @@ index a441f42..cb05b52 100755
      $num_tests_done++;
  }
  
-@@ -631,7 +664,7 @@ sub test_one_dir($$)
-     my $found_tests = (0 != (grep { $_ =~ /\.vgtest$/ } @fs));
+@@ -643,7 +676,7 @@ sub test_one_dir($$)
  
+     my $tests_start_time = time;
      if ($found_tests) {
 -        print "-- Running  tests in $full_dir $dashes\n";
 +        print "-- Running  tests in $full_dir $dashes\n" if ($yoctoptest == 0);
      }
      foreach my $f (@fs) {
          if (-d $f) {
-@@ -641,7 +674,7 @@ sub test_one_dir($$)
-         }
-     }
-     if ($found_tests) {
--        print "-- Finished tests in $full_dir $dashes\n";
+@@ -657,7 +690,7 @@ sub test_one_dir($$)
+         my $end_time = "(in $tests_cost_time sec)";
+         my $end_dashes = "-" x (50 - (length $full_dir)
+                                    - (length $end_time) - 1);
+-        print "-- Finished tests in $full_dir $end_time $end_dashes\n";
 +        print "-- Finished tests in $full_dir $dashes\n" if ($yoctoptest == 0);
      }
  
      chdir("..");
-@@ -667,10 +700,12 @@ sub summarise_results
+@@ -683,10 +716,12 @@ sub summarise_results
             $num_failures{"stdout"},   plural($num_failures{"stdout"}),
             $num_failures{"stderrB"},  plural($num_failures{"stderrB"}),
             $num_failures{"stdoutB"},  plural($num_failures{"stdoutB"}),
@@ -253,5 +253,5 @@ index a441f42..cb05b52 100755
      print "\n";
  }
 -- 
-2.6.2
+2.30.2
 

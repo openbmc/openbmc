@@ -15,10 +15,12 @@ SRCREV = "6636e2c2ef5ffe361535cb45fc61682c5ef46b71"
 
 S = "${WORKDIR}/git"
 
+# Numerous scripts assume ${baselib} == lib, which is not true.
+#
 do_configure:prepend() {
-	sed -i 's:\$BATS_ROOT/lib:\$BATS_ROOT/${baselib}:g' ${S}/libexec/bats-core/bats
-	sed -i 's:\$BATS_ROOT/lib:\$BATS_ROOT/${baselib}:g' ${S}/libexec/bats-core/bats-exec-file
-	sed -i 's:\$BATS_ROOT/lib:\$BATS_ROOT/${baselib}:g' ${S}/libexec/bats-core/bats-exec-test
+	for f in ${S}/libexec/bats-core/* ${S}/lib/bats-core/* ; do
+		sed -i 's:\$BATS_ROOT/lib/:\$BATS_ROOT/${baselib}/:g' $f
+	done
 }
 
 do_install() {

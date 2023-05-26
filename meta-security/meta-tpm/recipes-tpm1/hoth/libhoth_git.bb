@@ -7,7 +7,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 SRC_URI = "git://github.com/google/libhoth;protocol=https;branch=main"
-SRCREV = "1622e8a040d21dd564fdc1cb4df5eda01688c197"
+SRCREV = "769296220dc88df33f4726aa11e39e049257b3c4"
 
 DEPENDS += "libusb1"
 

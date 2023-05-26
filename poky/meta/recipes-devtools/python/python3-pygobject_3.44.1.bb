@@ -8,9 +8,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=a916467b91076e631dd8edb7424769c7"
 GNOMEBASEBUILDCLASS = "meson"
 GIR_MESON_OPTION = ""
 
-inherit gnomebase setuptools3-base gobject-introspection upstream-version-is-even
+inherit gnomebase setuptools3-base gobject-introspection upstream-version-is-even features_check
 
-DEPENDS += "python3 glib-2.0 gobject-introspection"
+REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
+
+DEPENDS += "python3 glib-2.0"
 
 SRCNAME="pygobject"
 
@@ -24,7 +26,10 @@ S = "${WORKDIR}/${SRCNAME}-${PV}"
 
 PACKAGECONFIG ??= "${@bb.utils.contains_any('DISTRO_FEATURES', [ 'directfb', 'wayland', 'x11' ], 'cairo', '', d)}"
 
-RDEPENDS:${PN} += "python3-pkgutil"
+RDEPENDS:${PN} += " \
+    python3-io \
+    python3-pkgutil \
+"
 
 # python3-pycairo is checked on configuration -> DEPENDS
 # we don't link against python3-pycairo -> RDEPENDS

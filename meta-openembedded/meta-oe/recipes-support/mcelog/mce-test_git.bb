@@ -14,14 +14,16 @@ SRC_URI = "git://git.kernel.org/pub/scm/utils/cpu/mce/mce-test.git;protocol=git;
            file://makefile-remove-ldflags.patch \
            file://0001-gcov_merge.py-scov_merge.py-switch-to-python3.patch \
           "
-SRCREV = "7643baf6c3919b3d727e6ba6c2e545dc6a653307"
-PV = "20190917+git${SRCPV}"
+SRCREV = "025014dedca39d2b8a57a82e52286e72e157d73a"
+PV = "20222810+git${SRCPV}"
 
 RDEPENDS:${PN} = "mcelog mce-inject dialog bash"
 
 COMPATIBLE_HOST = '(i.86|x86_64).*-linux'
 
 S ="${WORKDIR}/git"
+
+EXTRA_OEMAKE += "CFLAGS='${CFLAGS}'"
 
 do_install:append(){
    install -d ${D}/opt/mce-test

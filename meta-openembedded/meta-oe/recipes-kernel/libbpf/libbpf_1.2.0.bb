@@ -17,6 +17,7 @@ COMPATIBLE_HOST = "(x86_64|i.86|aarch64|riscv64|powerpc64).*-linux"
 S = "${WORKDIR}/git/src"
 
 EXTRA_OEMAKE += "DESTDIR=${D} LIBDIR=${libdir} INCLUDEDIR=${includedir}"
+EXTRA_OEMAKE:append:class-native = " UAPIDIR=${includedir}"
 
 inherit pkgconfig
 
@@ -26,6 +27,10 @@ do_compile() {
 
 do_install() {
 	oe_runmake install
+}
+
+do_install:append:class-native() {
+	oe_runmake install_uapi_headers
 }
 
 BBCLASSEXTEND = "native nativesdk"

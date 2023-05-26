@@ -14,7 +14,7 @@ logger = logging.getLogger("RunFVP")
 libdir = pathlib.Path(__file__).parents[1] / "meta-arm" / "lib"
 sys.path.insert(0, str(libdir))
 
-from fvp import terminal, runner, conffile
+from fvp import terminal, runner
 
 def parse_args(arguments):
     import argparse
@@ -49,14 +49,15 @@ def parse_args(arguments):
     logger.debug(f"FVP arguments: {fvp_args}")
     return args, fvp_args
 
-def start_fvp(args, config, extra_args):
+def start_fvp(args, fvpconf, extra_args):
     fvp = runner.FVPRunner(logger)
     try:
-        fvp.start(config, extra_args, args.terminals)
+        fvp.start(fvpconf, extra_args, args.terminals)
 
         if args.console:
-            expected_terminal = config["consoles"]["default"]
-            if not expected_terminal:
+            config = fvp.getConfig()
+            expected_terminal = config["consoles"].get("default")
+            if expected_terminal is None:
                 logger.error("--console used but FVP_CONSOLE not set in machine configuration")
                 return 1
             port_stdout, log_stdout = itertools.tee(fvp.stdout, 2)
@@ -87,9 +88,7 @@ def runfvp(cli_args):
         config_file = args.config
     else:
         config_file = conffile.find(args.config)
-    logger.debug(f"Loading {config_file}")
-    config = conffile.load(config_file)
-    start_fvp(args, config, extra_args)
+    start_fvp(args, config_file, extra_args)
 
 
 if __name__ == "__main__":

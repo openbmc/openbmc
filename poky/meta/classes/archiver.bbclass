@@ -76,6 +76,28 @@ do_ar_original[dirs] = "${ARCHIVER_OUTDIR} ${ARCHIVER_WORKDIR}"
 
 # This is a convenience for the shell script to use it
 
+def include_package(d, pn):
+
+    included, reason = copyleft_should_include(d)
+    if not included:
+        bb.debug(1, 'archiver: %s is excluded: %s' % (pn, reason))
+        return False
+
+    else:
+        bb.debug(1, 'archiver: %s is included: %s' % (pn, reason))
+
+    # glibc-locale: do_fetch, do_unpack and do_patch tasks have been deleted,
+    # so avoid archiving source here.
+    if pn.startswith('glibc-locale'):
+        return False
+
+    # We just archive gcc-source for all the gcc related recipes
+    if d.getVar('BPN') in ['gcc', 'libgcc'] \
+            and not pn.startswith('gcc-source'):
+        bb.debug(1, 'archiver: %s is excluded, covered by gcc-source' % pn)
+        return False
+
+    return True
 
 python () {
     pn = d.getVar('PN')
@@ -86,23 +108,7 @@ python () {
                 pn = p
                 break
 
-    included, reason = copyleft_should_include(d)
-    if not included:
-        bb.debug(1, 'archiver: %s is excluded: %s' % (pn, reason))
-        return
-    else:
-        bb.debug(1, 'archiver: %s is included: %s' % (pn, reason))
-
-
-    # glibc-locale: do_fetch, do_unpack and do_patch tasks have been deleted,
-    # so avoid archiving source here.
-    if pn.startswith('glibc-locale'):
-        return
-
-    # We just archive gcc-source for all the gcc related recipes
-    if d.getVar('BPN') in ['gcc', 'libgcc'] \
-            and not pn.startswith('gcc-source'):
-        bb.debug(1, 'archiver: %s is excluded, covered by gcc-source' % pn)
+    if not include_package(d, pn):
         return
 
     # TARGET_SYS in ARCHIVER_ARCH will break the stamp for gcc-source in multiconfig

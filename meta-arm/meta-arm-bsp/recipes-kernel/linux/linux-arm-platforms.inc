@@ -17,7 +17,6 @@ SRC_URI:append:fvp-base = " ${SRC_URI_KMETA}"
 SRC_URI:append:fvp-baser-aemv8r64 = " ${SRC_URI_KMETA}"
 SRC_URI:append:juno = " ${SRC_URI_KMETA}"
 SRC_URI:append:n1sdp = " ${SRC_URI_KMETA}"
-SRC_URI:append:tc = " ${SRC_URI_KMETA}"
 SRCREV:arm-platforms-kmeta = "6147e82375aa9df8f2a162d42ea6406c79c854c5"
 
 #
@@ -128,54 +127,5 @@ KCONFIG_MODE:sgi575 = "--alldefconfig"
 # Total Compute (TC0/TC1) KMACHINE
 #
 COMPATIBLE_MACHINE:tc = "(tc0|tc1)"
+KBUILD_DEFCONFIG:tc = "defconfig"
 KCONFIG_MODE:tc = "--alldefconfig"
-FILESEXTRAPATHS:prepend:tc := "${ARMBSPFILESPATHS}:${THISDIR}/linux-arm64-ack-5.15/tc:"
-SRC_URI:append:tc = " \
-    file://gki_defconfig \
-    file://0001-drm-Add-component-aware-simple-encoder.patch \
-    file://0001-drm-komeda-Fix-handling-of-atomic-commits-in-the-ato.patch \
-    file://0002-drm-arm-komeda-add-RENDER-capability-to-the-device-n.patch \
-    file://0003-firmware-arm_ffa-Fix-uuid-argument-passed-to-ffa_par.patch \
-    file://0004-firmware-arm_ffa-Add-ffa_dev_get_drvdata.patch \
-    file://0005-firmware-arm_ffa-extern-ffa_bus_type.patch \
-    file://0006-firmware-arm_ffa-Fix-FFA_MEM_SHARE-and-FFA_MEM_FRAG_.patch \
-    file://0007-Revert-optee-use-driver-internal-tee_context-for-som.patch \
-    file://0008-tee-add-sec_world_id-to-struct-tee_shm.patch \
-    file://0009-optee-simplify-optee_release.patch \
-    file://0010-optee-refactor-driver-with-internal-callbacks.patch \
-    file://0011-optee-isolate-smc-abi.patch \
-    file://0012-optee-add-FF-A-support.patch \
-    file://0013-optee-smc_abi.c-add-missing-include-linux-mm.h.patch \
-    file://0014-optee-Fix-spelling-mistake-reclain-reclaim.patch \
-    file://0015-optee-fix-kfree-NULL-pointer.patch \
-    file://0016-perf-arm-cmn-Account-for-NUMA-affinity.patch \
-    file://0017-perf-arm-cmn-Drop-compile-test-restriction.patch \
-    file://0018-perf-arm-cmn-Refactor-node-ID-handling.patch \
-    file://0019-perf-arm-cmn-Streamline-node-iteration.patch \
-    file://0020-perf-arm-cmn-Refactor-DTM-handling.patch \
-    file://0021-perf-arm-cmn-Optimise-DTM-counter-reads.patch \
-    file://0022-perf-arm-cmn-Optimise-DTC-counter-accesses.patch \
-    file://0023-perf-arm-cmn-Move-group-validation-data-off-stack.patch \
-    file://0024-perf-arm-cmn-Demarcate-CMN-600-specifics.patch \
-    file://0025-perf-arm-cmn-Support-new-IP-features.patch \
-    file://0026-perf-arm-cmn-Add-CI-700-Support.patch \
-    file://0027-ANDROID-trusty-Backport-of-trusty-driver.patch \
-    file://0028-ANDROID-trusty-Remove-FFA-specific-initilization.patch \
-    file://0029-ANDROID-trusty-Rename-transfer-memory-function-to-le.patch \
-    file://0030-ANDROID-trusty-Separate-out-SMC-based-transport.patch \
-    file://0031-ANDROID-trusty-Modify-device-compatible-string.patch \
-    file://0032-ANDROID-trusty-Add-transport-descriptor.patch \
-    file://0033-ANDROID-trusty-Add-trusty-ffa-driver.patch \
-    file://0034-ANDROID-trusty-ffa-Add-support-for-FFA-memory-operat.patch \
-    file://0035-ANDROID-trusty-ffa-Enable-FFA-transport-for-both-mem.patch \
-    file://0036-ANDROID-trusty-Make-trusty-transports-configurable.patch \
-    file://0037-ANDROID-trusty-log-include-panic_notifier.h.patch \
-    file://0038-ANDROID-trusty-ipc-fix-VIRTIO_ID_TRUSTY_IPC-ID.patch \
-    file://0039-gki_config-add-tc-disable_mpam.patch \
-    file://0040-ANDROID-KVM-arm64-disable-FFA-driver-at-EL2.patch \
-    file://init_disassemble_info-signature-changes-causes-compile-failures.patch \
-    file://0041-etherdevice-Adjust-ether_addr-prototypes-to-silence-.patch \
-    file://0042-mm-page_alloc-fix-building-error-on-Werror-array-com.patch \
-    "
-KERNEL_FEATURES:append:tc = " bsp/arm-platforms/tc.scc"
-KERNEL_FEATURES:append:tc1 = " bsp/arm-platforms/tc-autofdo.scc"

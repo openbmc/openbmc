@@ -1,4 +1,4 @@
-From a3cdf17643bf33d532ec269913974195e136b7fc Mon Sep 17 00:00:00 2001
+From 38e401969a2ff8269919cbeacec733a67f041735 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Fri, 11 Mar 2016 15:35:55 +0000
 Subject: [PATCH] glib-2.0: relocate the GIO module directory for native builds
@@ -13,38 +13,33 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
 
 Port patch to 2.48
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
-
 ---
- gio/giomodule.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ gio/giomodule.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
 diff --git a/gio/giomodule.c b/gio/giomodule.c
-index f5dbb45..c926e77 100644
+index 11ce7d8..cc27ecd 100644
 --- a/gio/giomodule.c
 +++ b/gio/giomodule.c
-@@ -58,6 +58,8 @@
- #ifdef G_OS_WIN32
- #include "gregistrysettingsbackend.h"
- #include "giowin32-priv.h"
-+#else
-+#include <dlfcn.h>
- #endif
- #include <glib/gstdio.h>
- 
-@@ -1261,7 +1263,15 @@ get_gio_module_dir (void)
-                                      NULL);
+@@ -1271,9 +1271,6 @@ get_gio_module_dir (void)
        g_free (install_dir);
  #else
--      module_dir = g_strdup (GIO_MODULE_DIR);
-+      Dl_info info;
-+
-+      if (dladdr (g_io_module_new, &info)) {
-+        char *libdir = g_path_get_dirname (info.dli_fname);
-+        module_dir = g_build_filename (libdir, "gio", "modules", NULL);
-+        g_free (libdir);
-+      } else {
-+        module_dir = g_strdup (GIO_MODULE_DIR);
-+      }
+       module_dir = g_strdup (GIO_MODULE_DIR);
+-#ifdef __APPLE__
+-#include "TargetConditionals.h"
+-#if TARGET_OS_OSX
+ #include <dlfcn.h>
+       {
+         g_autofree gchar *path = NULL;
+@@ -1292,8 +1289,6 @@ get_gio_module_dir (void)
+               }
+           }
+       }
+-#endif
+-#endif
  #endif
      }
  
+-- 
+2.30.2
+

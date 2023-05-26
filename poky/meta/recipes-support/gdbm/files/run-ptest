@@ -4,4 +4,4 @@
 
 cd tests
 
-./testsuite AUTOTEST_PATH=$PWD abs_builddir=$PWD COMPAT=1 | sed 's/^[^0-9]*\([0-9]\+\): \(.*\)\(ok\|pass\|skipped\|fail\|FAILED\)\(.*\)$/\3: \2 \4/;s/ \+/ /g;s/^ok/PASS/;s/^skipped/SKIP/;s/^fail/FAIL/;s/^FAILED/FAIL/'
+./testsuite --am-fmt AUTOTEST_PATH=$PWD abs_builddir=$PWD COMPAT=1

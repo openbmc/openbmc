@@ -1,4 +1,4 @@
-From 31f94ef5b43a984a98f0eebd2dcf1b53aa1d7bce Mon Sep 17 00:00:00 2001
+From 3875ab692a7d7ee796a6d5d2ece6daa3db81d5c4 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 08:37:11 +0400
 Subject: [PATCH] gcc-4.3.1: ARCH_FLAGS_FOR_TARGET
@@ -12,10 +12,10 @@ Upstream-Status: Inappropriate [embedded specific]
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/configure b/configure
-index 5dcaab14ae9..f76310a36bb 100755
+index 85883099410..044315af1da 100755
 --- a/configure
 +++ b/configure
-@@ -10165,7 +10165,7 @@ fi
+@@ -10183,7 +10183,7 @@ fi
  # for target_alias and gcc doesn't manage it consistently.
  target_configargs="--cache-file=./config.cache ${target_configargs}"
  
@@ -25,10 +25,10 @@ index 5dcaab14ae9..f76310a36bb 100755
   *" newlib "*)
    case " $target_configargs " in
 diff --git a/configure.ac b/configure.ac
-index 85977482aee..8b9097c7a45 100644
+index 2b612dce6e9..f26fffd4f62 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -3346,7 +3346,7 @@ fi
+@@ -3339,7 +3339,7 @@ fi
  # for target_alias and gcc doesn't manage it consistently.
  target_configargs="--cache-file=./config.cache ${target_configargs}"
  

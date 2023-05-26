@@ -129,6 +129,7 @@ CFLAGS += " -D_GNU_SOURCE -D_LARGEFILE64_SOURCE -g -DPTYS_ARE_GETPT -DPTYS_ARE_S
 CFLAGS += " -DHAVE_LIBDL "
 LDFLAGS += " -ldl "
 LDFLAGS:append:libc-musl = " -lucontext "
+LDFLAGS:append:riscv64 = " -latomic"
 
 EXTRA_OEMAKE = "INSTALL_ROOT=${D}"
 

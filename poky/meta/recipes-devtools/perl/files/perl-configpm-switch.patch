@@ -1,4 +1,4 @@
-From 055d4c31f41611b7d7fb6b0e38b3818a053de38d Mon Sep 17 00:00:00 2001
+From e789c1a0c9de5928a3b49f5b9d81b63636f5c7bb Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Sun, 27 May 2007 21:04:11 +0000
 Subject: [PATCH] perl: 5.8.7 -> 5.8.8 (from OE)

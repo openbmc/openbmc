@@ -42,7 +42,7 @@ PACKAGECONFIG[verbose-mode] = "--enable-verbose-mode,,,"
 PACKAGECONFIG[audit] = "--enable-libaudit,--disable-libaudit,audit"
 PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux"
 
-DEPENDS = "expat virtual/libintl autoconf-archive glib-2.0"
+DEPENDS = "expat virtual/libintl autoconf-archive-native glib-2.0"
 RDEPENDS:${PN} += "${PN}-common ${PN}-tools"
 RDEPENDS:${PN}:class-native = ""
 

@@ -171,6 +171,7 @@ class KickStart():
         part.add_argument('--rootfs-dir')
         part.add_argument('--type', default='primary',
                 choices = ('primary', 'logical'))
+        part.add_argument('--hidden', action='store_true')
 
         # --size and --fixed-size cannot be specified together; options
         # ----extra-space and --overhead-factor should also raise a parser

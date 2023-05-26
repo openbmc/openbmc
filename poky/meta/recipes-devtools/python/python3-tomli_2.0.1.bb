@@ -11,3 +11,8 @@ inherit pypi python_flit_core
 SRC_URI[sha256sum] = "de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"
 
 BBCLASSEXTEND = "native nativesdk"
+
+RDEPENDS:${PN} += " \
+    python3-datetime \
+    python3-stringold \
+"

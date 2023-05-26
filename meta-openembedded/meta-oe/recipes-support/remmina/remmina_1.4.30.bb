@@ -38,6 +38,10 @@ PACKAGECONFIG[spice] = "-DWITH_SPICE=ON, -DWITH_SPICE=OFF, spice spice-protocol"
 # Switch on gtk support in avahi recipe if you want to enable avahi support
 PACKAGECONFIG[avahi] = "-DWITH_AVAHI=ON, -DWITH_AVAHI=OFF, avahi"
 
+do_configure:append() {
+    sed -i -e 's|${WORKDIR}|<WORKDIR>|g' ${B}/generated/buildflags.h
+}
+
 RDEPENDS:${PN} = "bash"
 
 FILES:${PN}+= " \

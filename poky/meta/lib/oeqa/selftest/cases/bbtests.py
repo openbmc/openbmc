@@ -41,7 +41,7 @@ class BitbakeTests(OESelftestTestCase):
 
     def test_event_handler(self):
         self.write_config("INHERIT += \"test_events\"")
-        result = bitbake('m4-native')
+        result = bitbake('selftest-hello-native')
         find_build_started = re.search(r"NOTE: Test for bb\.event\.BuildStarted(\n.*)*NOTE: Executing.*Tasks", result.output)
         find_build_completed = re.search(r"Tasks Summary:.*(\n.*)*NOTE: Test for bb\.event\.BuildCompleted", result.output)
         self.assertTrue(find_build_started, msg = "Match failed in:\n%s"  % result.output)
@@ -49,11 +49,11 @@ class BitbakeTests(OESelftestTestCase):
         self.assertNotIn('Test for bb.event.InvalidEvent', result.output)
 
     def test_local_sstate(self):
-        bitbake('m4-native')
-        bitbake('m4-native -cclean')
-        result = bitbake('m4-native')
-        find_setscene = re.search("m4-native.*do_.*_setscene", result.output)
-        self.assertTrue(find_setscene, msg = "No \"m4-native.*do_.*_setscene\" message found during bitbake m4-native. bitbake output: %s" % result.output )
+        bitbake('selftest-hello-native')
+        bitbake('selftest-hello-native -cclean')
+        result = bitbake('selftest-hello-native')
+        find_setscene = re.search("selftest-hello-native.*do_.*_setscene", result.output)
+        self.assertTrue(find_setscene, msg = "No \"selftest-hello-native.*do_.*_setscene\" message found during bitbake selftest-hello-native. bitbake output: %s" % result.output )
 
     def test_bitbake_invalid_recipe(self):
         result = bitbake('-b asdf', ignore_status=True)
@@ -175,7 +175,7 @@ SSTATE_DIR = \"${TOPDIR}/download-selftest\"
         self.assertIn('localconf', result.output)
 
     def test_dry_run(self):
-        result = runCmd('bitbake -n m4-native')
+        result = runCmd('bitbake -n selftest-hello-native')
         self.assertEqual(0, result.status, "bitbake dry run didn't run as expected. %s" % result.output)
 
     def test_just_parse(self):
@@ -233,7 +233,7 @@ INHERIT:remove = \"report-error\"
 
     def test_setscene_only(self):
         """ Bitbake option to restore from sstate only within a build (i.e. execute no real tasks, only setscene)"""
-        test_recipe = 'ed'
+        test_recipe = 'selftest-hello-native'
 
         bitbake(test_recipe)
         bitbake('-c clean %s' % test_recipe)
@@ -246,7 +246,7 @@ INHERIT:remove = \"report-error\"
                                              'Executed tasks were: %s' % (task, str(tasks)))
 
     def test_skip_setscene(self):
-        test_recipe = 'ed'
+        test_recipe = 'selftest-hello-native'
 
         bitbake(test_recipe)
         bitbake('-c clean %s' % test_recipe)

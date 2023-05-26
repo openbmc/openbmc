@@ -1,0 +1,39 @@
+From 970b901e1999f415da8bac205f526c808ddad0ba Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Mon, 8 May 2023 10:40:43 +0200
+Subject: [PATCH] src/cmd_parser.c: add a missing parameter name
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This resolves the following error with older versions of gcc:
+| /srv/storage/alex/yocto/build-32/tmp/work/x86_64-linux/createrepo-c-native/0.21.1-r0/git/src/cmd_parser.c: In function ‘duplicated_nevra_option_parser’:
+| /srv/storage/alex/yocto/build-32/tmp/work/x86_64-linux/createrepo-c-native/0.21.1-r0/git/src/cmd_parser.c:76:32: error: parameter name omitted
+|    76 | duplicated_nevra_option_parser(const gchar *,
+|       |                                ^~~~~~~~~~~~~
+| /srv/storage/alex/yocto/build-32/tmp/work/x86_64-linux/createrepo-c-native/0.21.1-r0/git/src/cmd_parser.c:78:32: error: parameter name omitted
+|    78 |                                gpointer,
+|       |                                ^~~~~~~~
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/createrepo_c/pull/366]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ src/cmd_parser.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/cmd_parser.c b/src/cmd_parser.c
+index 97c9ea7..63af7ea 100644
+--- a/src/cmd_parser.c
++++ b/src/cmd_parser.c
+@@ -73,9 +73,9 @@ struct CmdOptions _cmd_options = {
+ 
+ 
+ gboolean
+-duplicated_nevra_option_parser(const gchar *,
++duplicated_nevra_option_parser(const gchar *option_name,
+                                const gchar *value,
+-                               gpointer,
++                               gpointer data,
+                                GError **error)
+ {
+     if (!g_strcmp0(value, "keep"))

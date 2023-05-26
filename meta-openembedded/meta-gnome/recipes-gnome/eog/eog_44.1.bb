@@ -19,8 +19,10 @@ GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase pkgconfig gsettings gobject-introspection gettext mime-xdg features_check gtk-icon-cache
 
-REQUIRED_DISTRO_FEATURES = "opengl"
+# FIXME: whilst eog uses libpeas <2, g-i is needed. This can be removed when libpeas2 is used.
+REQUIRED_DISTRO_FEATURES = "opengl gobject-introspection-data"
 
+SRC_URI += "file://0001-Replace-filename-with-basename.patch"
 SRC_URI[archive.sha256sum] = "e2c963f232fe5a1091dcc18bec25a730e91b02af6e466601efa55e500cd74cab"
 
 GTKDOC_MESON_OPTION = "gtk_doc"

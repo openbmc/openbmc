@@ -22,6 +22,7 @@ GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase gsettings gobject-introspection vala gtk-doc manpages bash-completion features_check python3native
 
+SRC_URI += "file://0001-meson-Do-not-define-TOP_SRCDIR.patch"
 SRC_URI[archive.sha256sum] = "f972d50ac7bafdccf113b1eb99dcae35404685a99e55bfef16f3ac83b4de974d"
 
 # gobject-introspection is mandatory and cannot be configured

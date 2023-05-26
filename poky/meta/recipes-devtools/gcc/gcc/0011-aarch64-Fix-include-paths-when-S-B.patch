@@ -1,0 +1,55 @@
+From 710d1325474e708e6b34eebe09f3f130420af293 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 31 Jan 2023 22:03:38 -0800
+Subject: [PATCH] aarch64: Fix include paths when S != B
+
+aarch64.h gets copied into build directory when built out of tree, in
+this case build uses this file but does not find the includes inside it
+since they are not found in any of include paths specified in compiler
+cmdline.
+
+Fixes build errors like
+
+% g++ -c   -isystem/mnt/b/yoe/master/build/tmp/work/x86_64-linux/gcc-cross-aarch64/13.0.1-r0/recipe-sysroot-native/usr/include -O2 -pipe   -DIN_GCC  -DCROSS_DIRECTORY_STRUCTURE   -fno-exceptions -fno-rtti -fasynchronous-unwind-tables -W -Wall -Wno-narrowing -Wwrite-strings -Wcast-qual -Wmissing-format-attribute -Wconditionally-supported -Woverloaded-virtual -pedantic -Wno-long-long -Wno-variadic-macros -Wno-overlength-strings   -DHAVE_CONFIG_H  -DGENERATOR_FILE -I. -Ibuild -I../../../../../../../work-shared/gcc-13.0.1-r0/gcc-b2ec2504af77b35e748067eeb846821d12a6b6b4/gcc -I../../../../../../../work-shared/gcc-13.0.1-r0/gcc-b2ec2504af77b35e748067eeb846821d12a6b6b4/gcc/build -I../../../../../../../work-shared/gcc-13.0.1-r0/gcc-b2ec2504af77b35e748067eeb846821d12a6b6b4/gcc/../include  -I../../../../../../../work-shared/gcc-13.0.1-r0/gcc-b2ec2504af77b35e748067eeb846821d12a6b6b4/gcc/../libcpp/include -o build/gencheck.o ../../../../../../../work-shared/gcc-13.0.1-r0/gcc-b2ec2504af77b35e748067eeb846821d12a6b6b4/gcc/gencheck.cc
+In file included from ./tm.h:34,
+                 from ../../../../../../../work-shared/gcc-13.0.1-r0/gcc-b2ec2504af77b35e748067eeb846821d12a6b6b4/gcc/gencheck.cc:23:
+./config/aarch64/aarch64.h:164:10: fatal error: aarch64-option-extensions.def: No such file or directory
+  164 | #include "aarch64-option-extensions.def"
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105144
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gcc/config/aarch64/aarch64.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/gcc/config/aarch64/aarch64.h b/gcc/config/aarch64/aarch64.h
+index 155cace6afe..07d68958908 100644
+--- a/gcc/config/aarch64/aarch64.h
++++ b/gcc/config/aarch64/aarch64.h
+@@ -161,8 +161,8 @@
+ enum class aarch64_feature : unsigned char {
+ #define AARCH64_OPT_EXTENSION(A, IDENT, C, D, E, F) IDENT,
+ #define AARCH64_ARCH(A, B, IDENT, D, E) IDENT,
+-#include "aarch64-option-extensions.def"
+-#include "aarch64-arches.def"
++#include "config/aarch64/aarch64-option-extensions.def"
++#include "config/aarch64/aarch64-arches.def"
+ };
+ 
+ /* Define unique flags for each of the above.  */
+@@ -171,8 +171,8 @@ enum class aarch64_feature : unsigned char {
+     = aarch64_feature_flags (1) << int (aarch64_feature::IDENT);
+ #define AARCH64_OPT_EXTENSION(A, IDENT, C, D, E, F) HANDLE (IDENT)
+ #define AARCH64_ARCH(A, B, IDENT, D, E) HANDLE (IDENT)
+-#include "aarch64-option-extensions.def"
+-#include "aarch64-arches.def"
++#include "config/aarch64/aarch64-option-extensions.def"
++#include "config/aarch64/aarch64-arches.def"
+ #undef HANDLE
+ 
+ #endif

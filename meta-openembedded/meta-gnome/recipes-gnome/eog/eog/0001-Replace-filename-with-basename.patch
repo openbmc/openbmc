@@ -1,0 +1,48 @@
+From d00edda1f57f904e1590828bea3cedb53d789c48 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 24 May 2023 20:33:59 -0700
+Subject: [PATCH] Replace filename with basename
+
+This avoids emitting absolute paths into generated sourcecode, it
+improves reproducibility. See [1]
+
+[1] https://developer-old.gnome.org/gobject/stable/glib-mkenums.html
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/eog/-/merge_requests/154]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/eog-enum-types.c.template | 4 ++--
+ src/eog-enum-types.h.template | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/eog-enum-types.c.template b/src/eog-enum-types.c.template
+index 0249baf..1013dcf 100644
+--- a/src/eog-enum-types.c.template
++++ b/src/eog-enum-types.c.template
+@@ -4,8 +4,8 @@
+ /*** END file-header ***/
+ 
+ /*** BEGIN file-production ***/
+-/* enumerations from "@filename@" */
+-#include "@filename@"
++/* enumerations from "@basename@" */
++#include "@basename@"
+ 
+ /*** END file-production ***/
+ 
+diff --git a/src/eog-enum-types.h.template b/src/eog-enum-types.h.template
+index bc3c195..8f4e916 100644
+--- a/src/eog-enum-types.h.template
++++ b/src/eog-enum-types.h.template
+@@ -8,7 +8,7 @@ G_BEGIN_DECLS
+ /*** END file-header ***/
+ 
+ /*** BEGIN file-production ***/
+-/* Enumerations from "@filename@" */
++/* Enumerations from "@basename@" */
+ 
+ /*** END file-production ***/
+ 
+-- 
+2.40.1
+

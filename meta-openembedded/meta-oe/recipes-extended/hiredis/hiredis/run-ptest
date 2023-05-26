@@ -1,0 +1,3 @@
+#!/bin/sh
+
+TEST_SSL=0 TEST_ASYNC=0 ./test.sh

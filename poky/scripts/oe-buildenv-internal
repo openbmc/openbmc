@@ -92,19 +92,20 @@ fi
 PYTHONPATH=$BITBAKEDIR/lib:$PYTHONPATH
 export PYTHONPATH
 
-# Make sure our paths are at the beginning of $PATH
-for newpath in "$BITBAKEDIR/bin" "$OEROOT/scripts"; do
-    # Remove any existences of $newpath from $PATH
-    PATH=$(echo $PATH | sed -re "s#(^|:)$newpath(:|$)#\2#g;s#^:##")
+# Remove any paths added by sourcing this script before
+[ -n "$OE_ADDED_PATHS" ] && PATH=$(echo $PATH | sed -e "s#$OE_ADDED_PATHS##") ||
+    PATH=$(echo $PATH | sed -e "s#$OEROOT/scripts:$BITBAKEDIR/bin:##")
 
-    # Add $newpath to $PATH
-    PATH="$newpath:$PATH"
-done
-unset BITBAKEDIR newpath
+# Make sure our paths are at the beginning of $PATH
+OE_ADDED_PATHS="$OEROOT/scripts:$BITBAKEDIR/bin:"
+PATH="$OE_ADDED_PATHS$PATH"
+export OE_ADDED_PATHS
+
+# This is not needed anymore
+unset BITBAKEDIR
 
 # Used by the runqemu script
 export BUILDDIR
-export PATH
 
 BB_ENV_PASSTHROUGH_ADDITIONS_OE="MACHINE DISTRO TCMODE TCLIBC HTTP_PROXY http_proxy \
 HTTPS_PROXY https_proxy FTP_PROXY ftp_proxy FTPS_PROXY ftps_proxy ALL_PROXY \

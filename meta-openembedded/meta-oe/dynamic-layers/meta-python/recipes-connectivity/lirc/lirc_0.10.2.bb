@@ -40,7 +40,7 @@ PACKAGECONFIG ?= " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', ' systemd', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', ' x11', '', d)} \
 "
-CACHED_CONFIGUREVARS = "HAVE_WORKING_POLL=yes"
+CACHED_CONFIGUREVARS = "HAVE_WORKING_POLL=yes SH_PATH=/bin/sh"
 
 #EXTRA_OEMAKE = 'SUBDIRS="lib daemons tools"'
 

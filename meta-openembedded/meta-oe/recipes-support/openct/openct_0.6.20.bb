@@ -14,6 +14,7 @@ SRC_URI = " \
     https://downloads.sourceforge.net/project/opensc/${BPN}/${BPN}-${PV}.tar.gz \
     file://etc-openct.udev.in-disablePROGRAM.patch \
     file://etc-openct_usb.in-modify-UDEVINFO.patch \
+    file://0001-m4-Just-emit-the-first-line-of-compiler-version.patch \
     file://openct.init \
     file://openct.sysconfig \
     file://openct.service \

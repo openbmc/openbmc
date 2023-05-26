@@ -15,10 +15,12 @@ S = "${WORKDIR}/git"
 
 inherit cmake setuptools3-base
 
-DEPENDS += "libxml2 expat libcheck"
+DEPENDS = "expat libxml2 zlib"
 
-EXTRA_OECMAKE = " -DPYTHON_INSTALL_DIR=${PYTHON_SITEPACKAGES_DIR} -DPYTHON_DESIRED=3"
+EXTRA_OECMAKE = "-DPYTHON_INSTALL_DIR=${PYTHON_SITEPACKAGES_DIR} \
+                 -DENABLE_DOCS=OFF \
+                 -DENABLE_TESTS=OFF"
+
 OECMAKE_SOURCEPATH = "${S}/libcomps"
 
 BBCLASSEXTEND = "native nativesdk"
-

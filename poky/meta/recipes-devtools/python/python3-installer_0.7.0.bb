@@ -15,6 +15,12 @@ inherit pypi python_flit_core
 # Bootstrap the native build
 DEPENDS:remove:class-native = "python3-build-native python3-installer-native"
 
+RDEPENDS:${PN} += " \
+    python3-compile \
+    python3-compression \
+    python3-netclient \
+"
+
 INSTALL_WHEEL_COMPILE_BYTECODE:class-native = "--no-compile-bytecode"
 
 do_compile:class-native () {

@@ -1,4 +1,4 @@
-From 32129f9682d0d27fc67af10f077ad2768935cbe6 Mon Sep 17 00:00:00 2001
+From 37c7471aa476dfc591a7123e39e38ef8b049f5c0 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 09:30:32 +0400
 Subject: [PATCH] gcc: armv4: pass fix-v4bx to linker to support EABI.
@@ -11,18 +11,17 @@ for eabi defaulting toolchains.
 
 We might want to send it upstream.
 
+Upstream-Status: Submitted [https://gcc.gnu.org/pipermail/gcc-patches/2023-April/615319.html]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
-Upstream-Status: Pending
 ---
  gcc/config/arm/linux-eabi.h | 6 +++++-
  1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/gcc/config/arm/linux-eabi.h b/gcc/config/arm/linux-eabi.h
-index 17c18b27145..8eacb099317 100644
+index dce7f59eeea..27402c629c6 100644
 --- a/gcc/config/arm/linux-eabi.h
 +++ b/gcc/config/arm/linux-eabi.h
-@@ -91,10 +91,14 @@
+@@ -88,10 +88,14 @@
  #define MUSL_DYNAMIC_LINKER \
    SYSTEMLIBS_DIR "ld-musl-arm" MUSL_DYNAMIC_LINKER_E "%{mfloat-abi=hard:hf}%{mfdpic:-fdpic}.so.1"
  

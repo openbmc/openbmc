@@ -28,7 +28,7 @@ do_configure:append () {
 
 # ignore strip to avoid yocto errors in stripping
 do_compile () {
-    oe_runmake PLATFORM=ARM 'STRIP=echo' all
+    oe_runmake PLATFORM=ARM 'STRIP=echo' CCFLAGS="${CFLAGS}" all
 }
 
 do_install () {

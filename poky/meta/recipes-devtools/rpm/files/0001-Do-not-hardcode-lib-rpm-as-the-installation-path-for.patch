@@ -1,4 +1,4 @@
-From 4ab6a4c5bbad65c3401016bb26b87214cdd0c59b Mon Sep 17 00:00:00 2001
+From 5fc560aaf1184d35d161f7d50dbb6323c90cc02d Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 27 Feb 2017 09:43:30 +0200
 Subject: [PATCH] Do not hardcode "lib/rpm" as the installation path for
@@ -13,10 +13,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  rpm.am       | 4 ++--
  3 files changed, 4 insertions(+), 4 deletions(-)
 
-Index: git/configure.ac
-===================================================================
---- git.orig/configure.ac
-+++ git/configure.ac
+diff --git a/configure.ac b/configure.ac
+index e6676c581..ec28db9b6 100644
+--- a/configure.ac
++++ b/configure.ac
 @@ -942,7 +942,7 @@ else
      usrprefix=$prefix
  fi
@@ -26,11 +26,11 @@ Index: git/configure.ac
  AC_SUBST(RPMCONFIGDIR)
  
  AC_SUBST(OBJDUMP)
-Index: git/macros.in
-===================================================================
---- git.orig/macros.in
-+++ git/macros.in
-@@ -911,7 +911,7 @@ package or when debugging this package.\
+diff --git a/macros.in b/macros.in
+index a2411d784..735b74d99 100644
+--- a/macros.in
++++ b/macros.in
+@@ -930,7 +930,7 @@ package or when debugging this package.\
  %_sharedstatedir	%{_prefix}/com
  %_localstatedir		%{_prefix}/var
  %_lib			lib
@@ -39,10 +39,10 @@ Index: git/macros.in
  %_includedir		%{_prefix}/include
  %_infodir		%{_datadir}/info
  %_mandir		%{_datadir}/man
-Index: git/rpm.am
-===================================================================
---- git.orig/rpm.am
-+++ git/rpm.am
+diff --git a/rpm.am b/rpm.am
+index 55b5b3935..5a51f102b 100644
+--- a/rpm.am
++++ b/rpm.am
 @@ -1,10 +1,10 @@
  # Internal binaries
  ## HACK: It probably should be $(libexecdir)/rpm or $(libdir)/rpm
@@ -55,4 +55,4 @@ Index: git/rpm.am
 +rpmconfigdir = $(libdir)/rpm
  
  # Libtool version (current-revision-age) for all our libraries
- rpm_version_info = 12:0:3
+ rpm_version_info = 13:0:4

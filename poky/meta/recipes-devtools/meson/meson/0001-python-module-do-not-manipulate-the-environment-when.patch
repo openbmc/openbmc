@@ -1,4 +1,4 @@
-From 2e9582167bf9d3273004edb2637310531f0155ab Mon Sep 17 00:00:00 2001
+From a97dba12cff6c4c9181909141a1a9f38d7c900bf Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 19 Nov 2018 14:24:26 +0100
 Subject: [PATCH] python module: do not manipulate the environment when calling
@@ -8,30 +8,30 @@ Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 ---
- mesonbuild/modules/python.py | 6 +-----
+ mesonbuild/dependencies/python.py | 6 +-----
  1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/mesonbuild/modules/python.py b/mesonbuild/modules/python.py
-index 3bbccd1..fda7a25 100644
---- a/mesonbuild/modules/python.py
-+++ b/mesonbuild/modules/python.py
-@@ -277,9 +277,6 @@ def python_factory(env: 'Environment', for_machine: 'MachineChoice',
-                 # there is no LIBPC, so we can't search in it
-                 return NotFoundDependency('python', env)
+diff --git a/mesonbuild/dependencies/python.py b/mesonbuild/dependencies/python.py
+index 14386f9..118a15f 100644
+--- a/mesonbuild/dependencies/python.py
++++ b/mesonbuild/dependencies/python.py
+@@ -354,9 +354,6 @@ def python_factory(env: 'Environment', for_machine: 'MachineChoice',
+                     empty.name = 'python'
+                     return empty
  
--            old_pkg_libdir = os.environ.pop('PKG_CONFIG_LIBDIR', None)
--            old_pkg_path = os.environ.pop('PKG_CONFIG_PATH', None)
--            os.environ['PKG_CONFIG_LIBDIR'] = pkg_libdir
-             try:
-                 return PythonPkgConfigDependency(name, env, kwargs, installation, True)
-             finally:
-@@ -288,8 +285,7 @@ def python_factory(env: 'Environment', for_machine: 'MachineChoice',
-                         os.environ[name] = value
-                     elif name in os.environ:
-                         del os.environ[name]
--                set_env('PKG_CONFIG_LIBDIR', old_pkg_libdir)
--                set_env('PKG_CONFIG_PATH', old_pkg_path)
-+                pass
+-                old_pkg_libdir = os.environ.pop('PKG_CONFIG_LIBDIR', None)
+-                old_pkg_path = os.environ.pop('PKG_CONFIG_PATH', None)
+-                os.environ['PKG_CONFIG_LIBDIR'] = pkg_libdir
+                 try:
+                     return PythonPkgConfigDependency(name, env, kwargs, installation, True)
+                 finally:
+@@ -365,8 +362,7 @@ def python_factory(env: 'Environment', for_machine: 'MachineChoice',
+                             os.environ[name] = value
+                         elif name in os.environ:
+                             del os.environ[name]
+-                    set_env('PKG_CONFIG_LIBDIR', old_pkg_libdir)
+-                    set_env('PKG_CONFIG_PATH', old_pkg_path)
++                    pass
  
-         candidates.append(functools.partial(wrap_in_pythons_pc_dir, pkg_name, env, kwargs, installation))
-         # We only need to check both, if a python install has a LIBPC. It might point to the wrong location,
+             candidates.append(functools.partial(wrap_in_pythons_pc_dir, pkg_name, env, kwargs, installation))
+             # We only need to check both, if a python install has a LIBPC. It might point to the wrong location,

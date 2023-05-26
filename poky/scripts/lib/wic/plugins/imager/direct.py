@@ -605,6 +605,13 @@ class PartitionedImage():
                                 (self.path, part.num, part.system_id),
                                 self.native_sysroot)
 
+            if part.hidden and self.ptable_format == "gpt":
+                logger.debug("Set hidden attribute for partition '%s' on disk '%s'",
+                             part.num, self.path)
+                exec_native_cmd("sfdisk --part-attrs %s %s RequiredPartition" % \
+                                (self.path, part.num),
+                                self.native_sysroot)
+
     def cleanup(self):
         pass
 

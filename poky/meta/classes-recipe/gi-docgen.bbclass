@@ -10,7 +10,8 @@
 
 # This variable is set to True if api-documentation is in
 # DISTRO_FEATURES, and False otherwise.
-GIDOCGEN_ENABLED ?= "${@bb.utils.contains('DISTRO_FEATURES', 'api-documentation', 'True', 'False', d)}"
+GIDOCGEN_ENABLED ?= "${@bb.utils.contains('DISTRO_FEATURES', 'api-documentation gobject-introspection-data', 'True', 'False', d)}"
+
 # When building native recipes, disable gi-docgen, as it is not necessary,
 # pulls in additional dependencies, and makes build times longer
 GIDOCGEN_ENABLED:class-native = "False"

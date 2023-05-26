@@ -30,3 +30,7 @@ EXTRA_OECONF:append:libc-musl = " --disable-execinfo"
 
 EXTRA_OEMAKE = "CFLAGS_NO_WERROR=yes"
 CLEANBROKEN = "1"
+
+do_configure:append() {
+    sed -i -e "s|${WORKDIR}|<TOPDIR>|g" ${B}/build.linux/build.c
+}

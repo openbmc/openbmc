@@ -464,7 +464,7 @@ RDEPENDS:packagegroup-meta-oe-gnome ="\
     gtk+ \
     gtkmm3 \
     gtkmm \
-    libpeas \
+    ${@bb.utils.contains("DISTRO_FEATURES", "gobject-introspection-data", "libpeas", "", d)} \
     pyxdg \
     vte9 \
     gnome-theme-adwaita \
@@ -982,6 +982,7 @@ RDEPENDS:packagegroup-meta-oe-ptest-packages = "\
     poco-ptest \
     cmocka-ptest \
     minicoredumper-ptest \
+    hiredis-ptest \
 "
 RDEPENDS:packagegroup-meta-oe-ptest-packages:append:x86 = " mcelog-ptest"
 RDEPENDS:packagegroup-meta-oe-ptest-packages:append:x86-64 = " mcelog-ptest"

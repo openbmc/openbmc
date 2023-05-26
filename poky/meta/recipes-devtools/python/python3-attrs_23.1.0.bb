@@ -8,17 +8,14 @@ SRC_URI[sha256sum] = "6279836d581513a26f1bf235f9acd333bc9115683f14f7e8fae46c98fc
 inherit pypi python_hatchling
 
 DEPENDS += " \
-    ${PYTHON_PN}-hatch-vcs-native \
-    ${PYTHON_PN}-hatch-fancy-pypi-readme-native \
+    python3-hatch-vcs-native \
+    python3-hatch-fancy-pypi-readme-native \
 "
 
-RDEPENDS:${PN}:class-target += " \
-    ${PYTHON_PN}-crypt \
-    ${PYTHON_PN}-ctypes \
-"
-RDEPENDS:${PN}:class-nativesdk += " \
-    ${PYTHON_PN}-crypt \
-    ${PYTHON_PN}-ctypes \
+RDEPENDS:${PN}+= " \
+    python3-compression \
+    python3-ctypes \
+    python3-crypt \
 "
 
 BBCLASSEXTEND = "native nativesdk"

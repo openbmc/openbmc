@@ -23,6 +23,8 @@ EXTRA_OEMESON += "\
     -Dlibpython-dir=${libdir} \
 "
 
-inherit meson pkgconfig setuptools3-base upstream-version-is-even
+inherit meson pkgconfig setuptools3-base upstream-version-is-even features_check
 
 FILES:${PN} += "${libdir}/gstreamer-1.0"
+
+REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"

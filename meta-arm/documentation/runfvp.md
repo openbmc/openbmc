@@ -64,7 +64,7 @@ If `FVP_PROVIDER` is not set then it is assumed that `FVP_EXE` is installed on t
 Parameters passed to the FVP with the `--parameter`/`-C` option.  These are expressed as variable flags so individual parameters can be altered easily. For example:
 
 ```
-FVP_CONFIG[bp.flashloader0.fname] = "${DEPLOY_DIR_IMAGE}/fip-fvp.bin"
+FVP_CONFIG[bp.flashloader0.fname] = "fip-fvp.bin"
 ```
 
 ### `FVP_DATA`
@@ -72,8 +72,8 @@ FVP_CONFIG[bp.flashloader0.fname] = "${DEPLOY_DIR_IMAGE}/fip-fvp.bin"
 Specify raw data to load at the specified address, passed to the FVP with the `--data` option.  This is a space-separated list of parameters in the format `[INST=]FILE@[MEMSPACE:]ADDRESS`. For example:
 
 ```
-FVP_DATA = "cluster0.cpu0=${DEPLOY_DIR_IMAGE}/Image@0x80080000 \
-            cluster0.cpu0=${DEPLOY_DIR_IMAGE}/fvp-base-revc.dtb@0x83000000"
+FVP_DATA = "cluster0.cpu0=Image@0x80080000 \
+            cluster0.cpu0=fvp-base-revc.dtb@0x83000000"
 ```
 
 ### `FVP_APPLICATIONS`
@@ -81,7 +81,7 @@ FVP_DATA = "cluster0.cpu0=${DEPLOY_DIR_IMAGE}/Image@0x80080000 \
 Applications to load on the cores, passed to the FVP with the `--application` option.  These are expressed as variable flags with the flag name being the instance and flag value the filename, for example:
 
 ```
-FVP_APPLICATIONS[cluster0] = "${DEPLOY_DIR_IMAGE}/linux-system.axf"
+FVP_APPLICATIONS[cluster0] = "linux-system.axf"
 ```
 
 Note that symbols are not allowed in flag names, so if you need to use a wildcard in the instance then you'll need to use `FVP_EXTRA_ARGS` and `--application` directly.

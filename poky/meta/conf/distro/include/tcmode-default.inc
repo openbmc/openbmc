@@ -16,7 +16,7 @@ PREFERRED_PROVIDER_virtual/${SDK_PREFIX}compilerlibs = "nativesdk-gcc-runtime"
 # Default libc config
 PREFERRED_PROVIDER_virtual/gettext ??= "gettext"
 
-GCCVERSION ?= "12.%"
+GCCVERSION ?= "13.%"
 SDKGCCVERSION ?= "${GCCVERSION}"
 BINUVERSION ?= "2.40%"
 GDBVERSION ?= "13.%"
@@ -24,7 +24,7 @@ GLIBCVERSION ?= "2.37"
 LINUXLIBCVERSION ?= "6.1%"
 QEMUVERSION ?= "8.0%"
 GOVERSION ?= "1.20%"
-LLVMVERSION ?= "15.%"
+LLVMVERSION ?= "16.%"
 RUSTVERSION ?= "1.69%"
 
 PREFERRED_VERSION_gcc ?= "${GCCVERSION}"

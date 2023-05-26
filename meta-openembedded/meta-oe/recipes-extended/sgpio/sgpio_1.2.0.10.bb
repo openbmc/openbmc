@@ -14,6 +14,7 @@ S = "${WORKDIR}/${BPN}"
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE_GPL;md5=393a5ca445f6965873eca0259a17f833"
 
+EXTRA_OEMAKE = "CFLAGS='${CFLAGS}'"
 do_compile:prepend() {
     oe_runmake clean
 }

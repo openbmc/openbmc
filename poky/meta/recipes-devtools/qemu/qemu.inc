@@ -224,6 +224,7 @@ PACKAGECONFIG[vde] = "--enable-vde,--disable-vde"
 PACKAGECONFIG[slirp] = "--enable-slirp,--disable-slirp,libslirp"
 PACKAGECONFIG[brlapi] = "--enable-brlapi,--disable-brlapi"
 PACKAGECONFIG[jack] = "--enable-jack,--disable-jack,jack,"
+PACKAGECONFIG[debuginfo] = "--enable-libdw,--disable-libdw,elfutils"
 
 INSANE_SKIP:${PN} = "arch"
 

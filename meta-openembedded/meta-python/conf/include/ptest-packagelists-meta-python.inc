@@ -27,6 +27,7 @@ PTESTS_FAST_META_PYTHON = "\
     python3-polyline \
     python3-precise-runner \
     python3-prettytable \
+    python3-pylint \
     python3-ptyprocess \
     python3-pyasn1-modules \
     python3-pyroute2 \

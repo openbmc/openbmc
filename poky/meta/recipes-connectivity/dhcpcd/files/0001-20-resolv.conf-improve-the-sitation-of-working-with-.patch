@@ -27,7 +27,7 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  1 file changed, 13 insertions(+), 4 deletions(-)
 
 diff --git a/hooks/20-resolv.conf b/hooks/20-resolv.conf
-index 504a6c53..eb6e5845 100644
+index 7c29e276..becc019f 100644
 --- a/hooks/20-resolv.conf
 +++ b/hooks/20-resolv.conf
 @@ -11,8 +11,12 @@ nocarrier_roaming_dir="$state_dir/roaming"
@@ -35,7 +35,7 @@ index 504a6c53..eb6e5845 100644
  "
  : ${resolvconf:=resolvconf}
 +resolvconf_from_systemd=false
- if type "$resolvconf" >/dev/null 2>&1; then
+ if command -v "$resolvconf" >/dev/null 2>&1; then
  	have_resolvconf=true
 +	if [ $(basename $(readlink -f $(which $resolvconf))) = resolvectl ]; then
 +		resolvconf_from_systemd=true

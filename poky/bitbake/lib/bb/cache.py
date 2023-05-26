@@ -514,11 +514,11 @@ class Cache(object):
 
         return len(self.depends_cache)
 
-    def parse(self, filename, appends):
+    def parse(self, filename, appends, layername):
         """Parse the specified filename, returning the recipe information"""
         self.logger.debug("Parsing %s", filename)
         infos = []
-        datastores = self.databuilder.parseRecipeVariants(filename, appends, mc=self.mc)
+        datastores = self.databuilder.parseRecipeVariants(filename, appends, mc=self.mc, layername=layername)
         depends = []
         variants = []
         # Process the "real" fn last so we can store variants list

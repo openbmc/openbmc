@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/MIT;md5=0835ad
 SRCREV = "ad0e89cbfb4d0c1ce4d097e134eb7be67baebb36"
 SRC_URI = "git://github.com/gabime/spdlog.git;protocol=https;branch=v1.x \
            file://0001-Do-not-use-LFS64-functions-on-linux-musl.patch \
+           file://fix-build-for-master-fmt.patch \
            "
 
 DEPENDS += "fmt"

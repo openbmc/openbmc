@@ -1,4 +1,4 @@
-From 4fbbd40d7db89cdbeaf93df1e1da692b1f80a5bc Mon Sep 17 00:00:00 2001
+From 4f9c952ad5fa68260d6a40570b0fdb7359c85057 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 7 Dec 2015 23:39:54 +0000
 Subject: [PATCH] handle sysroot support for nativesdk-gcc
@@ -38,15 +38,15 @@ Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
  gcc/c-family/c-opts.cc    |  4 +--
  gcc/config/linux.h        | 24 +++++++--------
  gcc/config/rs6000/sysv4.h | 24 +++++++--------
- gcc/cppdefault.cc         | 63 ++++++++++++++++++++++++---------------
- gcc/cppdefault.h          | 13 ++++----
- gcc/gcc.cc                | 20 +++++++++----
+ gcc/cppdefault.cc         | 65 ++++++++++++++++++++++++---------------
+ gcc/cppdefault.h          | 13 +++-----
+ gcc/gcc.cc                | 20 ++++++++----
  gcc/incpath.cc            | 12 ++++----
  gcc/prefix.cc             |  6 ++--
- 8 files changed, 94 insertions(+), 72 deletions(-)
+ 8 files changed, 95 insertions(+), 73 deletions(-)
 
 diff --git a/gcc/c-family/c-opts.cc b/gcc/c-family/c-opts.cc
-index a341a061758..83b0bef4dbb 100644
+index c68a2a27469..77e9b5eceaa 100644
 --- a/gcc/c-family/c-opts.cc
 +++ b/gcc/c-family/c-opts.cc
 @@ -1458,8 +1458,8 @@ add_prefixed_path (const char *suffix, incpath_kind chain)
@@ -61,10 +61,10 @@ index a341a061758..83b0bef4dbb 100644
    path = (char *) xmalloc (prefix_len + suffix_len + 1);
    memcpy (path, prefix, prefix_len);
 diff --git a/gcc/config/linux.h b/gcc/config/linux.h
-index 8a3cd4f2d34..58143dff731 100644
+index 57496ff1f2f..c921cf6ef63 100644
 --- a/gcc/config/linux.h
 +++ b/gcc/config/linux.h
-@@ -134,53 +134,53 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+@@ -121,53 +121,53 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
   * Unfortunately, this is mostly duplicated from cppdefault.cc */
  #if DEFAULT_LIBC == LIBC_MUSL
  #define INCLUDE_DEFAULTS_MUSL_GPP			\
@@ -129,7 +129,7 @@ index 8a3cd4f2d34..58143dff731 100644
  #else
  #define INCLUDE_DEFAULTS_MUSL_NATIVE
  #endif
-@@ -205,7 +205,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+@@ -192,7 +192,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
      INCLUDE_DEFAULTS_MUSL_TOOL				\
      INCLUDE_DEFAULTS_MUSL_SUBDIR_TARGET			\
      INCLUDE_DEFAULTS_MUSL_NATIVE			\
@@ -139,10 +139,10 @@ index 8a3cd4f2d34..58143dff731 100644
    }
  #endif
 diff --git a/gcc/config/rs6000/sysv4.h b/gcc/config/rs6000/sysv4.h
-index e5dd6538358..b496849b792 100644
+index 3a443abcf6b..ef83a5a432e 100644
 --- a/gcc/config/rs6000/sysv4.h
 +++ b/gcc/config/rs6000/sysv4.h
-@@ -958,53 +958,53 @@ ncrtn.o%s"
+@@ -950,53 +950,53 @@ ncrtn.o%s"
  /* Include order changes for musl, same as in generic linux.h.  */
  #if DEFAULT_LIBC == LIBC_MUSL
  #define INCLUDE_DEFAULTS_MUSL_GPP			\
@@ -207,7 +207,7 @@ index e5dd6538358..b496849b792 100644
  #else
  #define INCLUDE_DEFAULTS_MUSL_NATIVE
  #endif
-@@ -1029,7 +1029,7 @@ ncrtn.o%s"
+@@ -1021,7 +1021,7 @@ ncrtn.o%s"
      INCLUDE_DEFAULTS_MUSL_TOOL				\
      INCLUDE_DEFAULTS_MUSL_SUBDIR_TARGET			\
      INCLUDE_DEFAULTS_MUSL_NATIVE			\
@@ -217,7 +217,7 @@ index e5dd6538358..b496849b792 100644
    }
  #endif
 diff --git a/gcc/cppdefault.cc b/gcc/cppdefault.cc
-index 52cf14e92f8..d8977afc05e 100644
+index 734590a7059..b4a8fc29e4a 100644
 --- a/gcc/cppdefault.cc
 +++ b/gcc/cppdefault.cc
 @@ -35,6 +35,30 @@
@@ -272,7 +272,7 @@ index 52cf14e92f8..d8977afc05e 100644
        GPLUSPLUS_INCLUDE_DIR_ADD_SYSROOT, 0 },
  #endif
  #ifdef GPLUSPLUS_LIBCXX_INCLUDE_DIR
-@@ -62,23 +86,23 @@ const struct default_include cpp_include_defaults[]
+@@ -62,26 +86,26 @@ const struct default_include cpp_include_defaults[]
  #endif
  #ifdef GCC_INCLUDE_DIR
      /* This is the dir for gcc's private headers.  */
@@ -297,12 +297,16 @@ index 52cf14e92f8..d8977afc05e 100644
  #endif
  #ifdef FIXED_INCLUDE_DIR
      /* This is the dir for fixincludes.  */
+ #ifndef SYSROOT_HEADERS_SUFFIX_SPEC
+-    { FIXED_INCLUDE_DIR, "GCC", 0, 0, 0, 2 },
++    { FIXED_INCLUDE_DIRVAR, "GCC", 0, 0, 0, 2 },
+ #endif
 -    { FIXED_INCLUDE_DIR, "GCC", 0, 0, 0,
 +    { FIXED_INCLUDE_DIRVAR, "GCC", 0, 0, 0,
        /* A multilib suffix needs adding if different multilibs use
  	 different headers.  */
  #ifdef SYSROOT_HEADERS_SUFFIX_SPEC
-@@ -90,33 +114,24 @@ const struct default_include cpp_include_defaults[]
+@@ -93,33 +117,24 @@ const struct default_include cpp_include_defaults[]
  #endif
  #ifdef CROSS_INCLUDE_DIR
      /* One place the target system's headers might be.  */
@@ -343,7 +347,7 @@ index 52cf14e92f8..d8977afc05e 100644
  /* This value is set by cpp_relocated at runtime */
  const char *gcc_exec_prefix;
 diff --git a/gcc/cppdefault.h b/gcc/cppdefault.h
-index fb97c0b5814..6267150facc 100644
+index e26b424e99c..c9abb090dcd 100644
 --- a/gcc/cppdefault.h
 +++ b/gcc/cppdefault.h
 @@ -33,7 +33,8 @@
@@ -378,10 +382,10 @@ index fb97c0b5814..6267150facc 100644
     subdirectory of the actual installation.  */
  extern const char *gcc_exec_prefix;
 diff --git a/gcc/gcc.cc b/gcc/gcc.cc
-index aa4cf92fb78..5569a39a14a 100644
+index 8af0c814c33..605fe3b8c0d 100644
 --- a/gcc/gcc.cc
 +++ b/gcc/gcc.cc
-@@ -252,6 +252,8 @@ FILE *report_times_to_file = NULL;
+@@ -255,6 +255,8 @@ FILE *report_times_to_file = NULL;
  #endif
  static const char *target_system_root = DEFAULT_TARGET_SYSTEM_ROOT;
  
@@ -390,7 +394,7 @@ index aa4cf92fb78..5569a39a14a 100644
  /* Nonzero means pass the updated target_system_root to the compiler.  */
  
  static int target_system_root_changed;
-@@ -575,6 +577,7 @@ or with constant text in a single argument.
+@@ -578,6 +580,7 @@ or with constant text in a single argument.
   %G     process LIBGCC_SPEC as a spec.
   %R     Output the concatenation of target_system_root and
          target_sysroot_suffix.
@@ -398,7 +402,7 @@ index aa4cf92fb78..5569a39a14a 100644
   %S     process STARTFILE_SPEC as a spec.  A capital S is actually used here.
   %E     process ENDFILE_SPEC as a spec.  A capital E is actually used here.
   %C     process CPP_SPEC as a spec.
-@@ -1627,10 +1630,10 @@ static const char *gcc_libexec_prefix;
+@@ -1619,10 +1622,10 @@ static const char *gcc_libexec_prefix;
     gcc_exec_prefix is set because, in that case, we know where the
     compiler has been installed, and use paths relative to that
     location instead.  */
@@ -413,7 +417,7 @@ index aa4cf92fb78..5569a39a14a 100644
  
  /* For native compilers, these are well-known paths containing
     components that may be provided by the system.  For cross
-@@ -1638,9 +1641,9 @@ static const char *const standard_startfile_prefix = STANDARD_STARTFILE_PREFIX;
+@@ -1630,9 +1633,9 @@ static const char *const standard_startfile_prefix = STANDARD_STARTFILE_PREFIX;
  static const char *md_exec_prefix = MD_EXEC_PREFIX;
  static const char *md_startfile_prefix = MD_STARTFILE_PREFIX;
  static const char *md_startfile_prefix_1 = MD_STARTFILE_PREFIX_1;
@@ -425,7 +429,7 @@ index aa4cf92fb78..5569a39a14a 100644
    = STANDARD_STARTFILE_PREFIX_2;
  
  /* A relative path to be used in finding the location of tools
-@@ -6676,6 +6679,11 @@ do_spec_1 (const char *spec, int inswitch, const char *soft_matched_part)
+@@ -6652,6 +6655,11 @@ do_spec_1 (const char *spec, int inswitch, const char *soft_matched_part)
  	      }
  	    break;
  
@@ -438,7 +442,7 @@ index aa4cf92fb78..5569a39a14a 100644
  	    value = do_spec_1 (startfile_spec, 0, NULL);
  	    if (value != 0)
 diff --git a/gcc/incpath.cc b/gcc/incpath.cc
-index c80f100f476..5ac03c08693 100644
+index 46c0d543205..d088dae7b04 100644
 --- a/gcc/incpath.cc
 +++ b/gcc/incpath.cc
 @@ -135,7 +135,7 @@ add_standard_paths (const char *sysroot, const char *iprefix,
@@ -485,10 +489,10 @@ index c80f100f476..5ac03c08693 100644
  	      str = update_path (ostr, p->component);
  	      free (ostr);
 diff --git a/gcc/prefix.cc b/gcc/prefix.cc
-index 096ed5afa3d..2526f0ecc39 100644
+index c2a37bde5ea..33944701ced 100644
 --- a/gcc/prefix.cc
 +++ b/gcc/prefix.cc
-@@ -72,7 +72,9 @@ License along with GCC; see the file COPYING3.  If not see
+@@ -73,7 +73,9 @@ License along with GCC; see the file COPYING3.  If not see
  #include "prefix.h"
  #include "common/common-target.h"
  
@@ -499,7 +503,7 @@ index 096ed5afa3d..2526f0ecc39 100644
  
  static const char *get_key_value (char *);
  static char *translate_name (char *);
-@@ -212,7 +214,7 @@ translate_name (char *name)
+@@ -213,7 +215,7 @@ translate_name (char *name)
  	prefix = getenv (key);
  
        if (prefix == 0)

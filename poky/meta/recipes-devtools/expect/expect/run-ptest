@@ -1,0 +1,6 @@
+#!/bin/sh
+
+out_put=`tclsh tests/all.tcl -verbose bpse`
+echo
+echo "${out_put}" | awk '/PASSED|FAILED|SKIPPED/{gsub(/PASSED/,"PASS"); gsub(/FAILED/,"FAIL"); gsub(/SKIPPED/,"SKIP"); if ($NF=="PASS"){print $NF": "$(NF-1)}else{print $NF": "$2}}' | uniq
+

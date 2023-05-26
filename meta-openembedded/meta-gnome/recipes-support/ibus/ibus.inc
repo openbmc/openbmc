@@ -31,6 +31,9 @@ EXTRA_OECONF = " \
     --disable-emoji-dict \
     --disable-python2 \
 "
+EXTRA_OECONF:append:class-target = "\
+    --with-python=${bindir}/python3 \
+"
 
 do_configure:prepend() {
     touch ${S}/ChangeLog

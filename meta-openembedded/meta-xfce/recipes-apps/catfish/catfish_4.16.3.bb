@@ -3,7 +3,9 @@ SECTION = "x11/application"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4325afd396febcb659c36b49533135d4"
 
-inherit xfce-app python_setuptools_build_meta gtk-icon-cache mime-xdg
+inherit xfce-app python_setuptools_build_meta gtk-icon-cache mime-xdg features_check
+
+REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
 
 DEPENDS += "python3-distutils-extra-native"
 

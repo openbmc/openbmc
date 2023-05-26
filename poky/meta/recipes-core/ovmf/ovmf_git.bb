@@ -26,8 +26,8 @@ SRC_URI = "gitsm://github.com/tianocore/edk2.git;branch=master;protocol=https \
            file://0006-reproducible.patch \
            "
 
-PV = "edk2-stable202211"
-SRCREV = "fff6d81270b57ee786ea18ad74f43149b9f03494"
+PV = "edk2-stable202302"
+SRCREV = "f80f052277c88a67c55e107b550f504eeea947d3"
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>edk2-stable.*)"
 
 inherit deploy

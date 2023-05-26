@@ -1,0 +1,82 @@
+Add optional output in automake style, for integration with ptest.
+Export CK_AUTOMAKE=1 when running a test suite and you'll get
+PASS/FAIL lines on standard output.
+
+Marking this as Inappropriate right now as it's a little rough on the
+edges. Filed https://github.com/libcheck/check/issues/349 to discuss
+with upstream.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/src/check_log.c b/src/check_log.c
+index 0844661..ad23c65 100644
+--- a/src/check_log.c
++++ b/src/check_log.c
+@@ -26,6 +26,7 @@
+ #if ENABLE_SUBUNIT
+ #include <subunit/child.h>
+ #endif
++#include <libgen.h>
+ 
+ #include "check_error.h"
+ #include "check_list.h"
+@@ -381,6 +382,34 @@ void tap_lfun(SRunner * sr CK_ATTRIBUTE_UNUSED, FILE * file,
+     }
+ }
+ 
++void am_lfun(SRunner * sr CK_ATTRIBUTE_UNUSED, FILE * file,
++             enum print_output printmode CK_ATTRIBUTE_UNUSED, void *obj,
++             enum cl_event evt)
++{
++    TestResult *tr;
++    const char* types[] = { "INVALID", "PASS", "FAIL", "ERROR"};
++
++    switch (evt)
++    {
++        case CLINITLOG_SR:
++        case CLENDLOG_SR:
++        case CLSTART_SR:
++        case CLSTART_S:
++        case CLEND_SR:
++        case CLEND_S:
++        case CLSTART_T:
++            break;
++        case CLEND_T:
++            tr = (TestResult *)obj;
++            fprintf(file, "%s: %s:%s:%s %s\n",
++                    types[tr->rtype], basename(tr->file), tr->tcname, tr->tname, tr->msg);
++            fflush(file);
++            break;
++        default:
++            eprintf("Bad event type received in am_lfun", __FILE__, __LINE__);
++    }
++}
++
+ #if ENABLE_SUBUNIT
+ void subunit_lfun(SRunner * sr, FILE * file, enum print_output printmode,
+                   void *obj, enum cl_event evt)
+@@ -527,6 +556,9 @@ void srunner_init_logging(SRunner * sr, enum print_output print_mode)
+     {
+         srunner_register_lfun(sr, f, f != stdout, tap_lfun, print_mode);
+     }
++    if (getenv("CK_AUTOMAKE"))
++        srunner_register_lfun(sr, stdout, 0, am_lfun, print_mode);
++
+     srunner_send_evt(sr, NULL, CLINITLOG_SR);
+ }
+ 
+diff --git a/src/check_log.h b/src/check_log.h
+index 7223b98..bfe1de3 100644
+--- a/src/check_log.h
++++ b/src/check_log.h
+@@ -40,6 +40,9 @@ void xml_lfun(SRunner * sr, FILE * file, enum print_output,
+ void tap_lfun(SRunner * sr, FILE * file, enum print_output,
+               void *obj, enum cl_event evt);
+ 
++void am_lfun(SRunner * sr, FILE * file, enum print_output,
++             void *obj, enum cl_event evt);
++
+ void subunit_lfun(SRunner * sr, FILE * file, enum print_output,
+                   void *obj, enum cl_event evt);
+ 

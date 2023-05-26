@@ -5,8 +5,8 @@ After=rpcbind.service
 
 [Service]
 Type=simple
-# Start ippoold in the foreground!
-ExecStart=@SBINDIR@/ippoold -f
+# Start ippoold in the foreground! and enable RPC
+ExecStart=@SBINDIR@/ippoold -R -f
 # Normal output will go to syslog, so suppress stdout.
 StandardOutput=null
 # ExecStop is not needed. systemd will send SIGTERM

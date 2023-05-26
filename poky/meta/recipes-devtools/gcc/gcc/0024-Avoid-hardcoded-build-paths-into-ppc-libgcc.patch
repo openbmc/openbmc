@@ -1,0 +1,28 @@
+From 4623d87d779853a2862ee92a15a41fded81eddb8 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Sat, 20 Aug 2022 09:04:14 -0700
+Subject: [PATCH] Avoid hardcoded build paths into ppc libgcc
+
+Avoid encoding build paths into sources used for floating point on powerpc.
+(MACHINE=qemuppc bitbake libgcc).
+
+Upstream-Status: Submitted [https://gcc.gnu.org/pipermail/gcc-patches/2022-August/599882.html]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libgcc/config/rs6000/t-float128 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libgcc/config/rs6000/t-float128 b/libgcc/config/rs6000/t-float128
+index b09b5664af0..513e63748f1 100644
+--- a/libgcc/config/rs6000/t-float128
++++ b/libgcc/config/rs6000/t-float128
+@@ -103,7 +103,7 @@ $(ibm128_dec_objs)	: INTERNAL_CFLAGS += $(IBM128_CFLAGS_DECIMAL)
+ $(fp128_softfp_src) : $(srcdir)/soft-fp/$(subst -sw,,$(subst kf,tf,$@)) $(fp128_dep)
+ 	@src="$(srcdir)/soft-fp/$(subst -sw,,$(subst kf,tf,$@))"; \
+ 	echo "Create $@"; \
+-	(echo "/* file created from $$src */"; \
++	(echo "/* file created from `basename $$src` */"; \
+ 	 echo; \
+ 	 sed -f $(fp128_sed) < $$src) > $@
+ 

@@ -4,7 +4,6 @@ LICENSE = "EPL-1.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=9109f5fc16cf963fb3cdd32781b3ce04"
 
 DEPENDS = " \
-    intltool-native \
     bison-native \
     groff-native \
     libtool \

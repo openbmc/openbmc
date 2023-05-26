@@ -1,7 +1,7 @@
 SUMMARY = "Virtual terminal emulator GTK+ widget library"
 BUGTRACKER = "https://bugzilla.gnome.org/buglist.cgi?product=vte"
 LICENSE = "LGPL-2.0-only"
-DEPENDS = " glib-2.0 gtk+ intltool-native gnome-common-native ncurses"
+DEPENDS = "glib-2.0-native glib-2.0 gtk+ intltool-native gnome-common-native ncurses"
 RDEPENDS:libvte = "vte-termcap"
 
 # help gnomebase get the SRC_URI correct

@@ -11,6 +11,7 @@ LICENSE  = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING.LESSER;md5=2d5025d4aa3495befef8f17206a5b0a1"
 
 SRC_URI = "${GITHUB_BASE_URI}/download/${PV}/check-${PV}.tar.gz \
+           file://automake-output.patch \
            file://not-echo-compiler-info-to-check_stdint.h.patch"
 SRC_URI[sha256sum] = "a8de4e0bacfb4d76dd1c618ded263523b53b85d92a146d8835eb1a52932fa20a"
 GITHUB_BASE_URI = "https://github.com/libcheck/check/releases/"
@@ -33,4 +34,3 @@ PACKAGES =+ "checkmk"
 FILES:checkmk = "${bindir}/checkmk"
 
 RDEPENDS:checkmk = "gawk"
-

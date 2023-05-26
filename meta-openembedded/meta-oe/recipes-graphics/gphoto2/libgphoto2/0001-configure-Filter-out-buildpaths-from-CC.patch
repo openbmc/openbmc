@@ -1,0 +1,48 @@
+From 06be633b8f4e2241bd37d4faf62b49606ad778e7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 25 May 2023 19:01:36 -0700
+Subject: [PATCH] configure: Filter out buildpaths from CC
+
+Upstream-Status: Inappropriate [Cross-compile specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac                 | 4 +++-
+ libgphoto2_port/configure.ac | 6 ++++--
+ 2 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 17216b1..39c8cc4 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -261,7 +261,9 @@ GP_CONFIG_MSG([Compiler],[${CC}])
+ GP_CONFIG_MSG([libltdl includes],[$LTDLINCL])
+ GP_CONFIG_MSG([libltdl library],[$LIBLTDL])
+ 
+-AC_DEFINE_UNQUOTED([HAVE_CC], ["$CC"],
++CC_NO_SYSROOT=`echo $CC | sed -e \
++		's|--sysroot=.*\b||g'`
++AC_DEFINE_UNQUOTED([HAVE_CC], ["$CC_NO_SYSROOT"],
+                    [The C compiler we are using])
+ 
+ 
+diff --git a/libgphoto2_port/configure.ac b/libgphoto2_port/configure.ac
+index 1086b8e..59f3c34 100644
+--- a/libgphoto2_port/configure.ac
++++ b/libgphoto2_port/configure.ac
+@@ -103,8 +103,10 @@ GP_CONFIG_MSG([Compiler],[${CC}])
+ GP_CONFIG_MSG([libltdl includes],[$LTDLINCL])
+ GP_CONFIG_MSG([libltdl library],[$LIBLTDL])
+ 
+-AC_DEFINE_UNQUOTED([HAVE_CC], ["$CC"],
+-                   [The C compiler we're using])
++CC_NO_SYSROOT=`echo $CC | sed -e \
++		's|--sysroot=.*\b||g'`
++AC_DEFINE_UNQUOTED([HAVE_CC], ["$CC_NO_SYSROOT"],
++                   [The C compiler we are using])
+ 
+ AM_CPPFLAGS=""
+ 
+-- 
+2.40.1
+

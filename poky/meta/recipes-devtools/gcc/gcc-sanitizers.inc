@@ -86,6 +86,7 @@ COMPATIBLE_HOST:libc-musl = 'null'
 FILES:libasan += "${libdir}/libasan.so.* ${libdir}/libhwasan.so.*"
 FILES:libasan-dev += "\
     ${libdir}/libasan_preinit.o \
+    ${libdir}/libhwasan_preinit.o \
     ${libdir}/libasan.so \
     ${libdir}/libhwasan.so \
     ${libdir}/libasan.la \

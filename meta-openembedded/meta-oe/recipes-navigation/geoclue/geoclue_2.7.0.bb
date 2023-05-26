@@ -27,7 +27,7 @@ PACKAGECONFIG[3g] = "-D3g-source=true,-D3g-source=false,modemmanager"
 PACKAGECONFIG[modem-gps] = "-Dmodem-gps-source=true,-Dmodem-gps-source=false,modemmanager"
 PACKAGECONFIG[cdma] = "-Dcdma-source=true,-Dcdma-source=false,modemmanager"
 PACKAGECONFIG[nmea] = "-Dnmea-source=true,-Dnmea-source=false,avahi,avahi-daemon"
-PACKAGECONFIG[lib] = "-Dlibgeoclue=true,-Dlibgeoclue=false,gobject-introspection"
+PACKAGECONFIG[lib] = "-Dlibgeoclue=true,-Dlibgeoclue=false"
 
 GTKDOC_MESON_OPTION = "gtk-doc"
 

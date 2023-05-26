@@ -17,6 +17,7 @@ PTESTS_FAST = "\
     diffutils \
     ethtool \
     expat \
+    expect \
     findutils \
     flex \
     gawk \

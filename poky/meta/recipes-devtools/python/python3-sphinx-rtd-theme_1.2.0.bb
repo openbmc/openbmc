@@ -6,7 +6,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=a1db7d4ef426c2935227264e1d4ae8f9 \
                     file://OFL-License.txt;md5=4534c22e0147eadb6828bd9fe86d4868 \
                     file://Apache-License-2.0.txt;md5=8a75796f0ef19c3f601d69857f5a9a5b"
 
-DEPENDS = "python3-sphinx"
+RDEPENDS:${PN} += " \
+    python3-compile \
+    python3-sphinx \
+"
 
 PYPI_PACKAGE = "sphinx_rtd_theme"
 

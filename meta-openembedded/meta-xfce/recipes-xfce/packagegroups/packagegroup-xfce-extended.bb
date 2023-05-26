@@ -50,7 +50,7 @@ RRECOMMENDS:${PN} = " \
     xfce4-verve-plugin \
     \
     ${@bb.utils.contains('DISTRO_FEATURES','polkit','xfce-polkit','',d)} \
-    ${@bb.utils.contains("DISTRO_FEATURES", "bluetooth", "blueman", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "bluetooth gobject-introspection", "blueman", "", d)} \
     \
     thunar-media-tags-plugin \
     thunar-archive-plugin \
@@ -63,6 +63,6 @@ RRECOMMENDS:${PN} = " \
     xfce4-taskmanager \
     gigolo \
     mousepad \
-    catfish \
-    xfce4-panel-profiles \
+    ${@bb.utils.contains("DISTRO_FEATURES", "gobject-introspection-data", "catfish", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "gobject-introspection-data", "xfce4-panel-profiles", "", d)} \
 "

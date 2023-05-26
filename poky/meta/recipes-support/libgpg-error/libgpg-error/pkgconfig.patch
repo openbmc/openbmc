@@ -1,4 +1,4 @@
-From e10f93167c76c477a7b97286cfac603795bf28d8 Mon Sep 17 00:00:00 2001
+From b0df1cb468264a9bb9113524f0e1318c456b2348 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Thu, 29 Mar 2018 15:12:17 +0800
 Subject: [PATCH] support pkgconfig
@@ -14,17 +14,19 @@ Signed-off-by: Armin Kuster <akuster808@gmail.com>
 Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 
 ---
- src/gpg-error.m4 | 165 +----------------------------------------------
- 1 file changed, 3 insertions(+), 162 deletions(-)
+ src/gpg-error.m4 | 192 ++---------------------------------------------
+ 1 file changed, 5 insertions(+), 187 deletions(-)
 
 diff --git a/src/gpg-error.m4 b/src/gpg-error.m4
-index a975e53..af4bf2f 100644
+index 7fa52b1..15a0859 100644
 --- a/src/gpg-error.m4
 +++ b/src/gpg-error.m4
-@@ -27,162 +27,12 @@ dnl is added to the gpg_config_script_warn variable.
+@@ -15,187 +15,14 @@
  dnl
- AC_DEFUN([AM_PATH_GPG_ERROR],
- [ AC_REQUIRE([AC_CANONICAL_HOST])
+ dnl Find gpg-error-config, for backward compatibility
+ dnl
+-dnl _AM_PATH_POSSIBLE_GPG_ERROR_CONFIG
+-AC_DEFUN([_AM_PATH_POSSIBLE_GPG_ERROR_CONFIG],[dnl
 -  gpg_error_config_prefix=""
 -  dnl --with-libgpg-error-prefix=PFX is the preferred name for this option,
 -  dnl since that is consistent with how our three siblings use the directory/
@@ -60,9 +62,14 @@ index a975e53..af4bf2f 100644
 -  fi
 -
 -  AC_PATH_PROG(GPG_ERROR_CONFIG, gpg-error-config, no)
--  min_gpg_error_version=ifelse([$1], ,1.33,$1)
--  ok=no
+-])
 -
+-dnl
+-dnl Find gpgrt-config, which uses .pc file
+-dnl (minimum pkg-config functionality, supporting cross build)
+-dnl
+-dnl _AM_PATH_GPGRT_CONFIG
+-AC_DEFUN([_AM_PATH_GPGRT_CONFIG],[dnl
 -  AC_PATH_PROG(GPGRT_CONFIG, gpgrt-config, no, [$prefix/bin:$PATH])
 -  if test "$GPGRT_CONFIG" != "no"; then
 -    # Determine gpgrt_libdir
@@ -118,12 +125,9 @@ index a975e53..af4bf2f 100644
 -        fi
 -        if test -n "$gpgrt_libdir"; then break; fi
 -      done
--      if test -z "$libdir_candidates"; then
--        # No valid pkgconfig dir in any of the system directories, fallback
--        gpgrt_libdir=${possible_libdir1}
--      fi
--    else
--      # When we cannot determine system libdir-format, use this:
+-    fi
+-    if test -z "$gpgrt_libdir"; then
+-      # No valid pkgconfig dir in any of the system directories, fallback
 -      gpgrt_libdir=${possible_libdir1}
 -    fi
 -  else
@@ -137,12 +141,33 @@ index a975e53..af4bf2f 100644
 -      AC_MSG_NOTICE([Use gpgrt-config with $gpgrt_libdir as gpg-error-config])
 -      gpg_error_config_version=`$GPG_ERROR_CONFIG --modversion`
 -    else
+-      gpg_error_config_version=`$GPG_ERROR_CONFIG --version`
 -      unset GPGRT_CONFIG
 -    fi
 -  elif test "$GPG_ERROR_CONFIG" != "no"; then
 -    gpg_error_config_version=`$GPG_ERROR_CONFIG --version`
 -    unset GPGRT_CONFIG
 -  fi
+-])
+-
+-dnl AM_PATH_GPG_ERROR([MINIMUM-VERSION,
+-dnl                   [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND ]]])
+-dnl
+-dnl Test for libgpg-error and define GPG_ERROR_CFLAGS, GPG_ERROR_LIBS,
+-dnl GPG_ERROR_MT_CFLAGS, and GPG_ERROR_MT_LIBS.  The _MT_ variants are
+-dnl used for programs requireing real multi thread support.
+-dnl
+-dnl If a prefix option is not used, the config script is first
+-dnl searched in $SYSROOT/bin and then along $PATH.  If the used
+-dnl config script does not match the host specification the script
+-dnl is added to the gpg_config_script_warn variable.
+-dnl
+-AC_DEFUN([AM_PATH_GPG_ERROR],[dnl
+-AC_REQUIRE([AC_CANONICAL_HOST])dnl
+-AC_REQUIRE([_AM_PATH_POSSIBLE_GPG_ERROR_CONFIG])dnl
+-AC_REQUIRE([_AM_PATH_GPGRT_CONFIG])dnl
+-  min_gpg_error_version=ifelse([$1], ,1.33,$1)
+-  ok=no
 -  if test "$GPG_ERROR_CONFIG" != "no"; then
 -    req_major=`echo $min_gpg_error_version | \
 -               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)/\1/'`
@@ -163,6 +188,8 @@ index a975e53..af4bf2f 100644
 -    fi
 -  fi
 -  AC_MSG_CHECKING(for GPG Error - version >= $min_gpg_error_version)
++AC_DEFUN([AM_PATH_GPG_ERROR],
++[ AC_REQUIRE([AC_CANONICAL_HOST])
 +  min_gpg_error_version=ifelse([$1], ,0.0,$1)
 +  PKG_CHECK_MODULES(GPG_ERROR, [gpg-error >= $min_gpg_error_version], [ok=yes], [ok=no])
    if test $ok = yes; then
@@ -187,7 +214,7 @@ index a975e53..af4bf2f 100644
      fi
      if test x"$gpg_error_config_host" != xnone ; then
        if test x"$gpg_error_config_host" != x"$host" ; then
-@@ -198,15 +48,6 @@ AC_DEFUN([AM_PATH_GPG_ERROR],
+@@ -211,15 +38,6 @@ AC_REQUIRE([_AM_PATH_GPGRT_CONFIG])dnl
        fi
      fi
    else

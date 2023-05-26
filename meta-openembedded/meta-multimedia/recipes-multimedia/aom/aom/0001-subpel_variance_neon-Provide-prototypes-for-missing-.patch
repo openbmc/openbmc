@@ -1,6 +1,6 @@
-From c33e07f78982acfb0574a84fb523f8591e55c50e Mon Sep 17 00:00:00 2001
+From 35c1ed84a158354c37e329bad0e236b156836ac7 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
-Date: Sun, 11 Sep 2022 19:46:28 -0700
+Date: Tue, 23 May 2023 14:59:26 -0700
 Subject: [PATCH] subpel_variance_neon: Provide prototypes for missing
  functions
 
@@ -11,18 +11,19 @@ larations [-Wimplicit-function-declaration]
 |          ^
 
 Upstream-Status: Pending
+
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- aom_dsp/arm/subpel_variance_neon.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ aom_dsp/arm/subpel_variance_neon.c | 76 ++++++++++++++++++++++++++++++
+ 1 file changed, 76 insertions(+)
 
 diff --git a/aom_dsp/arm/subpel_variance_neon.c b/aom_dsp/arm/subpel_variance_neon.c
-index 4ecf891cbeb..859168ea0c5 100644
+index a05886066c4..ea6bada224d 100644
 --- a/aom_dsp/arm/subpel_variance_neon.c
 +++ b/aom_dsp/arm/subpel_variance_neon.c
-@@ -20,6 +20,22 @@
- #include "aom_dsp/aom_filter.h"
+@@ -20,6 +20,82 @@
  #include "aom_dsp/variance.h"
+ #include "aom_dsp/arm/mem_neon.h"
  
 +extern unsigned int aom_variance8x8_neon(const uint8_t *a, int a_stride,
 +                                         const uint8_t *b, int b_stride,
@@ -32,7 +33,43 @@ index 4ecf891cbeb..859168ea0c5 100644
 +                                         const uint8_t *b, int b_stride,
 +                                         unsigned int *sse);
 +
++extern unsigned int aom_variance16x32_neon(const uint8_t *a, int a_stride,
++                                         const uint8_t *b, int b_stride,
++                                         unsigned int *sse);
++
++extern unsigned int aom_variance16x64_neon(const uint8_t *a, int a_stride,
++                                         const uint8_t *b, int b_stride,
++                                         unsigned int *sse);
++
++extern unsigned int aom_variance32x8_neon(const uint8_t *a, int a_stride,
++                                         const uint8_t *b, int b_stride,
++                                         unsigned int *sse);
++
++extern unsigned int aom_variance32x16_neon(const uint8_t *a, int a_stride,
++                                         const uint8_t *b, int b_stride,
++                                         unsigned int *sse);
++
 +extern unsigned int aom_variance32x32_neon(const uint8_t *a, int a_stride,
++                                         const uint8_t *b, int b_stride,
++                                         unsigned int *sse);
++
++extern unsigned int aom_variance32x64_neon(const uint8_t *a, int a_stride,
++                                         const uint8_t *b, int b_stride,
++                                         unsigned int *sse);
++
++extern unsigned int aom_variance32x128_neon(const uint8_t *a, int a_stride,
++                                         const uint8_t *b, int b_stride,
++                                         unsigned int *sse);
++
++extern unsigned int aom_variance64x8_neon(const uint8_t *a, int a_stride,
++                                         const uint8_t *b, int b_stride,
++                                         unsigned int *sse);
++
++extern unsigned int aom_variance64x16_neon(const uint8_t *a, int a_stride,
++                                         const uint8_t *b, int b_stride,
++                                         unsigned int *sse);
++
++extern unsigned int aom_variance64x32_neon(const uint8_t *a, int a_stride,
 +                                         const uint8_t *b, int b_stride,
 +                                         unsigned int *sse);
 +
@@ -40,9 +77,33 @@ index 4ecf891cbeb..859168ea0c5 100644
 +                                         const uint8_t *b, int b_stride,
 +                                         unsigned int *sse);
 +
- // Load 2 sets of 4 bytes when alignment is not guaranteed.
- static INLINE uint8x8_t load_unaligned_u8(const uint8_t *buf, int stride) {
-   uint32_t a;
++extern unsigned int aom_variance64x128_neon(const uint8_t *a, int a_stride,
++                                         const uint8_t *b, int b_stride,
++                                         unsigned int *sse);
++
++extern unsigned int aom_variance128x8_neon(const uint8_t *a, int a_stride,
++                                         const uint8_t *b, int b_stride,
++                                         unsigned int *sse);
++
++extern unsigned int aom_variance128x16_neon(const uint8_t *a, int a_stride,
++                                         const uint8_t *b, int b_stride,
++                                         unsigned int *sse);
++
++extern unsigned int aom_variance128x32_neon(const uint8_t *a, int a_stride,
++                                         const uint8_t *b, int b_stride,
++                                         unsigned int *sse);
++
++extern unsigned int aom_variance128x64_neon(const uint8_t *a, int a_stride,
++                                         const uint8_t *b, int b_stride,
++                                         unsigned int *sse);
++
++extern unsigned int aom_variance128x128_neon(const uint8_t *a, int a_stride,
++                                         const uint8_t *b, int b_stride,
++                                         unsigned int *sse);
++
+ static void var_filter_block2d_bil_w4(const uint8_t *src_ptr, uint8_t *dst_ptr,
+                                       int src_stride, int pixel_step,
+                                       int dst_height, int filter_offset) {
 -- 
-2.37.3
+2.40.1
 

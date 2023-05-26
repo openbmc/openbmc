@@ -60,3 +60,6 @@ do_install:append () {
 }
 
 PARALLEL_MAKE = ""
+
+# dhcp-relay contains a bundled "bind", thus their dev packages conflict each other
+RCONFLICTS:${PN}-dev = "bind-dev"

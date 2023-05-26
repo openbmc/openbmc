@@ -151,6 +151,7 @@ def fork_off_task(cfg, data, databuilder, workerdata, extraconfigdata, runtask):
     taskhash = runtask['taskhash']
     unihash = runtask['unihash']
     appends = runtask['appends']
+    layername = runtask['layername']
     taskdepdata = runtask['taskdepdata']
     quieterrors = runtask['quieterrors']
     # We need to setup the environment BEFORE the fork, since
@@ -262,7 +263,7 @@ def fork_off_task(cfg, data, databuilder, workerdata, extraconfigdata, runtask):
                     bb.parse.siggen.set_taskhashes(workerdata["newhashes"])
                 ret = 0
 
-                the_data = databuilder.parseRecipe(fn, appends)
+                the_data = databuilder.parseRecipe(fn, appends, layername)
                 the_data.setVar('BB_TASKHASH', taskhash)
                 the_data.setVar('BB_UNIHASH', unihash)
                 bb.parse.siggen.setup_datacache_from_datastore(fn, the_data)

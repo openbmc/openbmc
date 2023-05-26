@@ -22,7 +22,7 @@ index 8c4d2048..e021af32 100644
  	@echo "HTREE=y" >> test_one
  	@echo "QUOTA=y" >> test_one
 -	@echo "SRCDIR=@srcdir@" >> test_one
-+	@echo "SRCDIR=${prefix}${libdir}/e2fsprogs/ptest/test" >> test_one
++	@echo "SRCDIR=@PTEST_PATH@/test" >> test_one
  	@echo "DIFF_OPTS=@UNI_DIFF_OPTS@" >> test_one
  	@echo "SIZEOF_TIME_T=@SIZEOF_TIME_T@" >> test_one
  	@echo "DD=@DD@" >>test_one
@@ -31,7 +31,7 @@ index 8c4d2048..e021af32 100644
  	@[ -f test_script ] && chmod u+w test_script || true
  	@echo "#!/bin/sh" > test_script
 -	@echo "SRCDIR=@srcdir@" >> test_script
-+	@echo "SRCDIR=${prefix}${libdir}/e2fsprogs/ptest/test" >> test_script
++	@echo "SRCDIR=@PTEST_PATH@/test" >> test_script
  	@cat $(srcdir)/test_script.in >> test_script
  	@chmod +x-w test_script
  

@@ -26,9 +26,10 @@ PACKAGES =+ "${PN}-gst"
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[gst] = "-Dgstreamer=enabled,-Dgstreamer=disabled,gstreamer1.0 gstreamer1.0-plugins-base"
 
+LIBCAMERA_PIPELINES ??= "auto"
+
 EXTRA_OEMESON = " \
-    -Dpipelines=uvcvideo,simple,vimc \
-    -Dipas=vimc \
+    -Dpipelines=${LIBCAMERA_PIPELINES} \
     -Dv4l2=true \
     -Dcam=enabled \
     -Dlc-compliance=disabled \

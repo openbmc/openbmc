@@ -47,8 +47,8 @@ RRECOMMENDS:${PN} = "adwaita-icon-theme"
 PACKAGES =+ "${PN}-nautilus-extension"
 
 do_install:prepend() {
-    sed -i -e 's|${B}/||g' ${B}/libview/ev-view-type-builtins.c
-    sed -i -e 's|${B}/||g' ${B}/libdocument/ev-document-type-builtins.c
+    sed -i -e 's|${B}/../${PN}-${PV}|/usr/src/debug/${PN}/${PV}-${PR}|g' ${B}/libview/ev-view-type-builtins.c
+    sed -i -e 's|${B}/../${PN}-${PV}|/usr/src/debug/${PN}/${PV}-${PR}|g' ${B}/libdocument/ev-document-type-builtins.c
 }
 
 FILES:${PN} += "${datadir}/dbus-1 \
