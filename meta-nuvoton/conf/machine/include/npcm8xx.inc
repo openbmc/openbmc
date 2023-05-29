@@ -3,6 +3,7 @@
 #@DESCRIPTION: Common machine configuration for Nuvoton NPCM8XX Chip
 
 require conf/machine/include/nuvoton.inc
+require conf/machine/include/igps-keys.inc
 
 KERNEL_IMAGETYPE ?= "Image"
 KERNEL_EXTRA_ARGS ?= "UIMAGE_LOADADDR=0x00008000"
@@ -58,5 +59,7 @@ TFA_UBOOT = "1"
 TFA_BUILD_TARGET = "bl31"
 
 OPTEEMACHINE ?= "nuvoton"
+
+SECURED_IMAGE ?= "True"
 
 TIP_IMAGE ?= "True"

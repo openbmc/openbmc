@@ -21,14 +21,26 @@ do_patch() {
 
 do_install() {
 	install -d ${DEST}
-	if [ "${TIP_IMAGE}" = "True" ] ; then
-		install py_scripts/ImageGeneration/references/BootBlockAndHeader_${DEVICE_GEN}_${IGPS_MACHINE}.xml ${DEST}
+    if [ "${TIP_IMAGE}" = "True" ] ; then
+        install py_scripts/ImageGeneration/references/BootBlockAndHeader_${DEVICE_GEN}_${IGPS_MACHINE}.xml ${DEST}
 	else
-		install py_scripts/ImageGeneration/references/BootBlockAndHeader_A1_${IGPS_MACHINE}_NoTip.xml ${DEST}
-	fi
+        install py_scripts/ImageGeneration/references/BootBlockAndHeader_${DEVICE_GEN}_${IGPS_MACHINE}_NoTip.xml ${DEST}
+    fi
 	install py_scripts/ImageGeneration/references/UbootHeader_${DEVICE_GEN}.xml ${DEST}
 	install py_scripts/ImageGeneration/inputs/BL31_AndHeader.xml ${DEST}
 	install py_scripts/ImageGeneration/inputs/OpTeeAndHeader.xml ${DEST}
+	install py_scripts/ImageGeneration/asn1.py ${DEST}
+	install py_scripts/ImageGeneration/BinarySignatureGenerator.py ${DEST}
+}
+
+inherit deploy
+
+do_deploy () {
+	# copy default keys to deploy folder
+	install -d ${DEPLOYDIR}
+	cp -vur py_scripts/ImageGeneration/keys/${SIGN_TYPE} ${DEPLOYDIR}/
 }
 
 inherit native
+
+addtask deploy before do_build after do_compile
