@@ -59,6 +59,11 @@ done
 
 # Write out each MAC override to the runtime networkd configuration
 for (( i=0; i<num; i++ )); do
+  if (( mac[5] > 0xff )); then
+    echo "MAC assignment too large: ${mac[@]}" >&2
+    rc=2
+    break
+  fi
   for intf in ${num_to_intfs[$i]}; do
     macstr=$(printf '%02x:%02x:%02x:%02x:%02x:%02x' "${mac[@]}")
     echo "Setting $intf to $macstr" >&2
@@ -71,11 +76,7 @@ for (( i=0; i<num; i++ )); do
       printf '[NetDev]\nMACAddress=%s\n' "$macstr" >"$override"/50-mac.conf
     done
   done
-  if (( ++mac[5] > 0xff )); then
-    echo "MAC assignment too large: ${mac[@]}" >&2
-    rc=2
-    break
-  fi
+  (( ++mac[5] ))
 done
 
 exit $rc
