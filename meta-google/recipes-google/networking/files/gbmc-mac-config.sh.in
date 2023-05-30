@@ -75,6 +75,13 @@ for (( i=0; i<num; i++ )); do
       mkdir -p "$override"
       printf '[NetDev]\nMACAddress=%s\n' "$macstr" >"$override"/50-mac.conf
     done
+    # In case we don't have any interface configs, set the MAC directly
+    # This is safe to apply, as systemd-networkd will always override this
+    # value based on written configs.
+    if ip link show $intf >/dev/null 2>&1 && \
+       ! ip link set dev $intf address $macstr; then
+      echo "Setting MAC($macstr) on $intf failed" >&2
+    fi
   done
   (( ++mac[5] ))
 done
