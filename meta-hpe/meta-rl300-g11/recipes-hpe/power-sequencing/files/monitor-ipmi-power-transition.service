@@ -1,0 +1,11 @@
+[Unit]
+Description=RL300 IPMI power sequencing request
+After=dbus.service
+
+[Service]
+Restart=always
+RestartSec=5
+ExecStart=/usr/bin/ipmi-power-button-monitoring.sh
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,8 @@
+[Unit]
+Description=HPE RL300 PowerOK
+
+[Service]
+ExecStart=/usr/bin/gpios-manager up
+
+[Install]
+# WantedBy=multi-user.target
