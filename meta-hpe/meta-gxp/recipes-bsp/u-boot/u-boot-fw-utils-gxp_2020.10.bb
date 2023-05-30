@@ -3,9 +3,6 @@ require u-boot-common-gxp_2020.10.inc
 SRC_URI += "file://fw_env.config"
 SRC_URI += "file://alt_fw_env.config"
 
-# FIXME - Get fw_printenv/fw_setenv tool
-UBOOT_MACHINE ?= "gxp_defconfig"
-
 SUMMARY = "U-Boot bootloader fw_printenv/setenv utilities"
 DEPENDS += "mtd-utils"
 
