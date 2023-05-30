@@ -1,0 +1,11 @@
+[Unit]
+Description=RL300 power supply 2 monitoring
+After=dbus.service
+
+[Service]
+Restart=always
+RestartSec=5
+ExecStart=startMonitoring2.sh
+
+[Install]
+WantedBy=multi-user.target
