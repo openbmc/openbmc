@@ -12,7 +12,7 @@ DEPENDS += "boost"
 DEPENDS += "libgpiod"
 DEPENDS += "cli11"
 DEPENDS += "nlohmann-json"
-SRCREV = "39084b4a64eb5288677f23fdde84c0b69003faf5"
+SRCREV = "0172969c58370a0f4f41d646dce76c23dd0637cd"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
