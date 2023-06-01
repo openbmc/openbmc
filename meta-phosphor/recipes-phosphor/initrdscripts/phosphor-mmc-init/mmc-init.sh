@@ -1,20 +1,21 @@
 #!/bin/sh
 
-# Get the value of the root env variable found in /proc/cmdline
-get_root() {
+kgetopt ()
+{
     _cmdline="$(cat /proc/cmdline)"
-    root=
-    for opt in $_cmdline
+    _optname="$1"
+    _optval="$2"
+    for _opt in $_cmdline
     do
-        case $opt in
-            root=PARTLABEL=*)
-                root=${opt##root=PARTLABEL=}
+        case "$_opt" in
+            "${_optname}"=*)
+                _optval="${_opt##"${_optname}"=}"
                 ;;
             *)
                 ;;
         esac
     done
-    [ -n "$root" ] && echo "$root"
+    [ -n "$_optval" ] && echo "$_optval"
 }
 
 fslist="proc sys dev run"
@@ -61,7 +62,7 @@ udevadm trigger --type=devices --action=add
 udevadm settle --timeout=10
 
 mkdir -p $rodir
-if ! mount /dev/disk/by-partlabel/"$(get_root)" $rodir -t ext4 -o ro; then
+if ! mount /dev/disk/by-partlabel/"$(kgetopt root=PARTLABEL)" $rodir -t ext4 -o ro; then
     /bin/sh
 fi
 
@@ -102,8 +103,10 @@ rm -rf $rodir/var/persist/etc-work/
 mkdir -p $rodir/var/persist/etc $rodir/var/persist/etc-work $rodir/var/persist/home/root
 mount overlay $rodir/etc -t overlay -o lowerdir=$rodir/etc,upperdir=$rodir/var/persist/etc,workdir=$rodir/var/persist/etc-work
 
+init="$(kgetopt init /sbin/init)"
+
 for f in $fslist; do
     mount --move "$f" "$rodir/$f"
 done
 
-exec switch_root $rodir /sbin/init
+exec switch_root $rodir "$init"
