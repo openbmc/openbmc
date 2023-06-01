@@ -64,6 +64,3 @@ host_pwr_start_watchdog() {
 }
 
 host_pwr_init=1
-return 0 2>/dev/null
-echo "gpio-host-pwr is a library, not executed directly" >&2
-exit 1

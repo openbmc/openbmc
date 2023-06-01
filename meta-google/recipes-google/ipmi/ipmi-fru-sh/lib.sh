@@ -228,6 +228,3 @@ read_area() {
 }
 
 ipmi_fru_init=1
-return 0 2>/dev/null
-echo "ipmi-fru is a library, not executed directly" >&2
-exit 1

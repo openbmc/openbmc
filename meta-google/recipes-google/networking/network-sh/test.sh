@@ -197,5 +197,4 @@ test_normalize_ip() {
   expect_streq "$ip" 'fd01:1::1'
 }
 
-return 0 2>/dev/null
 main

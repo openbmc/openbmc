@@ -245,6 +245,3 @@ gpio_get_value() {
 }
 
 gpio_ctrl_init=1
-return 0 2>/dev/null
-echo "gpio-ctrl is a library, not executed directly" >&2
-exit 1

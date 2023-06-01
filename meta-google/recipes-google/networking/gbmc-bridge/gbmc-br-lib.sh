@@ -131,7 +131,3 @@ gbmc_br_set_ip() {
 }
 
 gbmc_br_lib_init=1
-if ! (return 0 2>/dev/null); then
-  echo "gbmc-br-lib is a library, not executed directly" >&2
-  exit 1
-fi
