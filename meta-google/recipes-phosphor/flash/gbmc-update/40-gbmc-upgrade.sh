@@ -17,18 +17,17 @@
 
 : "${GBMC_UPGRADE_SIG=/tmp/bmc.sig}"
 
-gbmc_upgrade_hook() {
-  [ -n "${bootfile_url-}" ] || return 0
+GBMC_UPGRADE_UNPACK_FILES=()
+# shellcheck disable=SC2034
+GBMC_UPGRADE_HOOKS=(gbmc_upgrade_internal)
 
-  local tmpdir
-  tmpdir="$(mktemp -d)" || return
-  gbmc_upgrade_internal || true
-  # SC doesn't know our variable is defined elsewhere
-  # shellcheck disable=SC2153
-  rm -rf -- "$tmpdir" "$GBMC_UPGRADE_SIG" "$GBMC_UPGRADE_IMG"
-}
+if machine="$(source /etc/os-release && echo "$GBMC_TARGET_MACHINE")"; then
+  GBMC_UPGRADE_UNPACK_FILES+=("*/firmware-gbmc/$machine")
+else
+  echo 'Failed to find GBMC machine type from /etc/os-release' >&2
+fi
 
-gbmc_upgrade_fetch() (
+gbmc_upgrade_dl_unpack() {
   echo "Fetching $bootfile_url" >&2
 
   # We only support tarballs at the moment, our URLs will always denote
@@ -42,11 +41,6 @@ gbmc_upgrade_fetch() (
     return 1
   fi
 
-  # Determine the path of the image file for the correct machine
-  # Our netboot can serve us images for multiple models
-  local machine
-  machine="$(source /etc/os-release && echo "$GBMC_TARGET_MACHINE")" || return
-
   # Ensure some sane output file limit
   # Currently no BMC image is larger than 64M
   # We want to allow 2 images and a small amount of metadata (2*64+2)M
@@ -57,12 +51,13 @@ gbmc_upgrade_fetch() (
   while true; do
     local st=()
     curl -LSsk --max-time $((timeout - SECONDS)) "$bootfile_url" |
-      tar "${tflags[@]}" --wildcards -xC "$tmpdir" "*/firmware-gbmc/$machine" \
+      tar "${tflags[@]}" --wildcards -xC "$tmpdir" "${GBMC_UPGRADE_UNPACK_FILES[@]}" 2>"$tmpdir"/tarerr \
       && st=("${PIPESTATUS[@]}") || st=("${PIPESTATUS[@]}")
     # Curl failures should continue
     if (( st[0] == 0 )); then
       # Tar failures when curl succeeds are hard errors to start over.
-      if (( st[1] != 0 )); then
+      # shellcheck disable=SC2143
+      if (( st[1] != 0 )) && [[ -n $(grep -v '\(Exiting with failure status\|Not found in archive\|Cannot hard link\)' "$tmpdir"/tarerr) ]]; then
         echo 'Unpacking failed' >&2
         return 1
       fi
@@ -76,7 +71,20 @@ gbmc_upgrade_fetch() (
     (shopt -s nullglob dotglob; rm -rf -- "${tmpdir:?}"/*)
     sleep $stime
   done
+}
 
+gbmc_upgrade_hook() {
+  [ -n "${bootfile_url-}" ] || return 0
+
+  local tmpdir
+  tmpdir="$(mktemp -d)" || return
+  # shellcheck disable=SC2015
+  gbmc_upgrade_dl_unpack && gbmc_br_run_hooks GBMC_UPGRADE_HOOKS || true
+  # shellcheck disable=SC2153
+  rm -rf -- "$tmpdir" "$GBMC_UPGRADE_SIG" "$GBMC_UPGRADE_IMG"
+}
+
+gbmc_upgrade_fetch() (
   local sig
   sig="$(find "$tmpdir" -name 'image-*.sig' | head -n 1)" || return
   local img="${sig%.sig}"
