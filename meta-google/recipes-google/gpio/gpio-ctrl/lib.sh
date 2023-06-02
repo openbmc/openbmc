@@ -31,6 +31,7 @@ declare -A GPIO_NAMES_TO_SCM=(
 # named GPIOs
 shopt -s nullglob
 for conf in /usr/share/gpio-ctrl/conf.d/*.sh; do
+  # shellcheck source=/dev/null
   source "$conf"
 done
 
@@ -98,13 +99,14 @@ gpio_name_to_num() {
     gpio_sysfs_lookup_cache["$id"]="$sysfs"
   fi
 
-  local ngpio=$(cat "$sysfs"/ngpio)
+  local ngpio
+  ngpio=$(<"$sysfs"/ngpio)
   if (( ngpio <= offset )); then
     echo "$name with gpiochip $sysfs only has $ngpio but wants $offset" >&2
     return 1
   fi
 
-  gpio_lookup_cache["$name"]=$(( $(cat "$sysfs"/base) + offset ))
+  gpio_lookup_cache["$name"]=$(( $(<"$sysfs"/base) + offset ))
   echo "${gpio_lookup_cache["$name"]}"
 }
 
@@ -124,7 +126,7 @@ gpio_build_cache() {
   local gpios=("$@")
 
   if (( ${#gpios[@]} == 0 )); then
-    gpios="${!GPIO_NAMES_TO_SCM[@]}"
+    gpios=("${!GPIO_NAMES_TO_SCM[@]}")
   fi
 
   local deadline=$(( timeout + SECONDS ))
