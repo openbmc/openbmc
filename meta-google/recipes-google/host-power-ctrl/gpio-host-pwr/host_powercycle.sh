@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# shellcheck source=meta-google/recipes-google/gpio/gpio-ctrl/lib.sh
 source /usr/share/gpio-host-pwr/lib.sh || exit
 gpio_build_cache 10 "$HOST_GPIO_PGOOD" "$HOST_GPIO_PWR_BTN" || exit
 
