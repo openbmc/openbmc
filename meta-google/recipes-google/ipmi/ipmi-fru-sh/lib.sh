@@ -15,26 +15,33 @@
 
 [ -n "${ipmi_fru_init-}" ] && return
 
+# shellcheck disable=SC2034
 IPMI_FRU_COMMON_HEADER_INTERNAL_OFFSET_IDX=1
+# shellcheck disable=SC2034
 IPMI_FRU_COMMON_HEADER_CHASSIS_OFFSET_IDX=2
+# shellcheck disable=SC2034
 IPMI_FRU_COMMON_HEADER_BOARD_OFFSET_IDX=3
+# shellcheck disable=SC2034
 IPMI_FRU_COMMON_HEADER_PRODUCT_OFFSET_IDX=4
+# shellcheck disable=SC2034
 IPMI_FRU_COMMON_HEADER_MULTI_RECORD_OFFSET_IDX=5
+# shellcheck disable=SC2034
 IPMI_FRU_AREA_HEADER_SIZE_IDX=1
+# shellcheck disable=SC2034
 IPMI_FRU_CHECKSUM_IDX=-1
 
 offset_1bw() {
   local addr="$1"
   local off="$2"
   local extra="${3-0}"
-  echo w$((1+extra))@$addr $(( off & 0xff ))
+  echo "w$((1+extra))@$addr $(( off & 0xff ))"
 }
 
 offset_2bw() {
   local addr="$1"
   local off="$2"
   local extra="${3-0}"
-  echo w$((2+extra))@$addr $(( (off >> 8) & 0xff )) $(( off & 0xff ))
+  echo "w$((2+extra))@$addr $(( (off >> 8) & 0xff )) $(( off & 0xff ))"
 }
 
 of_name_to_eeproms() {
@@ -43,14 +50,14 @@ of_name_to_eeproms() {
     echo "Failed to find eeproms with of_name '$1'" >&2
     return 1
   fi
-  echo "$names" | sed 's,/of_node/name$,/eeprom,'
+  echo "${names//of_node\/name/eeprom}"
 }
 
 of_name_to_eeprom() {
   local eeproms
   eeproms="$(of_name_to_eeproms "$1")" || return
   if (( "$(echo "$eeproms" | wc -l)" != 1 )); then
-    echo "Got more than one eeprom for '$1':" $eeproms >&2
+    echo "Got more than one eeprom for '$1': $eeproms" >&2
     return 1
   fi
   echo "$eeproms"
@@ -72,6 +79,7 @@ ipmi_fru_device_alloc() {
 
   local jqq='.data[0] | (.BUS.data | tostring) + " " + (.ADDRESS.data | tostring)'
   local busaddr
+  # shellcheck disable=SC2207
   busaddr=($(echo "$json" | jq -r "$jqq")) || return
 
   # FRU 0 is hardcoded and FruDevice does not report the correct bus for it
@@ -91,7 +99,8 @@ ipmi_fru_device_alloc() {
         return 1
       fi
       last=$rsp
-      rsp=$(i2ctransfer -f -y ${busaddr[0]} $(offset_1bw ${busaddr[1]} 0) r1) || return
+      # shellcheck disable=SC2046
+      rsp=$(i2ctransfer -f -y "${busaddr[0]}" $(offset_1bw "${busaddr[1]}" 0) r1) || return
     done
     # FRUs never start with 0xff bytes, so we can figure out addressing mode
     if (( rsp != 0xff )); then
@@ -107,8 +116,8 @@ ipmi_fru_alloc() {
 
   # Pick the first free index to return as the allocated entry
   for (( ret = 0; ret < "${#IPMI_FRU_EEPROM_FILE[@]}"; ++ret )); do
-    [ -n "${IPMI_FRU_EEPROM_FILE[@]+1}" ] || \
-      [ -n "${IPMI_FRU_EEPROM_BUSADDR[@]+1}" ]|| break
+    [ -n "${IPMI_FRU_EEPROM_FILE[*]+1}" ] || \
+      [ -n "${IPMI_FRU_EEPROM_BUSADDR[*]+1}" ]|| break
   done
 
   if [[ "$name" =~ ^of-name:(.*)$ || "$name" =~ ^([^:]*)$ ]]; then
@@ -151,13 +160,14 @@ checksum() {
 fix_checksum() {
   local -n fix_checksum_arr="$1"
   old_cksum=${fix_checksum_arr[$IPMI_FRU_CHECKSUM_IDX]}
-  ((fix_checksum_arr[$IPMI_FRU_CHECKSUM_IDX]-=$(checksum fix_checksum_arr)))
-  ((fix_checksum_arr[$IPMI_FRU_CHECKSUM_IDX]&=0xff))
+  ((fix_checksum_arr[IPMI_FRU_CHECKSUM_IDX]-=$(checksum fix_checksum_arr)))
+  ((fix_checksum_arr[IPMI_FRU_CHECKSUM_IDX]&=0xff))
   printf 'Corrected %s checksum from 0x%02X -> 0x%02X\n' \
     "$1" "${old_cksum}" "${fix_checksum_arr[$IPMI_FRU_CHECKSUM_IDX]}" >&2
 }
 
 read_bytes() {
+  # shellcheck disable=SC2206
   local busaddr=(${IPMI_FRU_EEPROM_BUSADDR["$1"]-})
   local file="${IPMI_FRU_EEPROM_FILE["$1"]-$1}"
   local offset="$2"
@@ -165,7 +175,8 @@ read_bytes() {
 
   if (( "${#busaddr[@]}" > 0)); then
     echo "Reading ${busaddr[*]} at $offset for $size" >&2
-    i2ctransfer -f -y ${busaddr[0]} $(${busaddr[2]} ${busaddr[1]} $offset) r$size
+    # shellcheck disable=SC2046
+    i2ctransfer -f -y "${busaddr[0]}" $("${busaddr[2]}" "${busaddr[1]}" "$offset") "r$size"
   else
     echo "Reading $file at $offset for $size" >&2
     dd if="$file" bs=1 count="$size" skip="$offset" 2>/dev/null | \
@@ -174,6 +185,7 @@ read_bytes() {
 }
 
 write_bytes() {
+  # shellcheck disable=SC2206
   local busaddr=(${IPMI_FRU_EEPROM_BUSADDR["$1"]-})
   local file="${IPMI_FRU_EEPROM_FILE["$1"]-$1}"
   local offset="$2"
@@ -181,12 +193,14 @@ write_bytes() {
 
   if (( "${#busaddr[@]}" > 0)); then
     echo "Writing ${busaddr[*]} at $offset for ${#bytes_arr[@]}" >&2
-    i2ctransfer -f -y ${busaddr[0]} $(${busaddr[2]} ${busaddr[1]} $offset ${#bytes_arr[@]}) ${bytes_arr[@]}
+    # shellcheck disable=SC2046
+    i2ctransfer -f -y "${busaddr[0]}" $("${busaddr[2]}" "${busaddr[1]}" "$offset" "${#bytes_arr[@]}") "${bytes_arr[@]}"
   else
     local hexstr
     hexstr="$(printf '\\x%x' "${bytes_arr[@]}")" || return
     echo "Writing $file at $offset for ${#bytes_arr[@]}" >&2
-    printf "$hexstr" | dd of="$file" bs=1 seek=$offset 2>/dev/null
+    # shellcheck disable=SC2059
+    printf "$hexstr" | dd of="$file" bs=1 seek="$offset" 2>/dev/null
   fi
 }
 
@@ -194,6 +208,7 @@ read_header() {
   local eeprom="$1"
   local -n header_arr="$2"
 
+  # shellcheck disable=SC2207
   header_arr=($(read_bytes "$eeprom" 0 8)) || return
   echo "Checking $eeprom FRU Header version" >&2
   # FRU header is always version 1
@@ -212,6 +227,7 @@ read_area() {
   local area_size="${4-0}"
 
   offset=$((offset*8))
+  # shellcheck disable=SC2207
   area_arr=($(read_bytes "$eeprom" "$offset" 8)) || return
   echo "Checking $eeprom $offset FRU Area version" >&2
   # FRU Area is always version 1
@@ -219,6 +235,7 @@ read_area() {
   if (( area_size == 0 )); then
     area_size=${area_arr[$IPMI_FRU_AREA_HEADER_SIZE_IDX]}
   fi
+  # shellcheck disable=SC2207
   area_arr=($(read_bytes "$eeprom" "$offset" $((area_size*8)))) || return
   echo "Checking $eeprom $offset FRU Area checksum" >&2
   local sum
