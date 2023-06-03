@@ -127,7 +127,6 @@ meta-google/recipes-phosphor/flash/google-key/verify-bmc-image.sh
 meta-google/recipes-phosphor/flash/inplace-gbmc-update/inplace-gbmc-verify.sh
 meta-ibm/meta-romulus/recipes-phosphor/chassis/vrm-control/vrm-control.sh
 meta-ibm/recipes-phosphor/chassis/vrm-control/vrm-control.sh
-meta-inventec/meta-transformers/recipes-phosphor/init/transformers-init/transformers-init.sh
 meta-phosphor/recipes-support/nss-pam-ldapd/files/nslcd.init
 "
 
