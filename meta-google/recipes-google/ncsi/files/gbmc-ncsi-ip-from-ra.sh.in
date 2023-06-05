@@ -15,7 +15,9 @@
 
 [ ! -e /usr/share/gbmc-br-lib.sh ] && exit
 
+# shellcheck source=meta-google/recipes-google/networking/network-sh/lib.sh
 source /usr/share/network/lib.sh || exit
+# shellcheck source=meta-google/recipes-google/networking/gbmc-bridge/gbmc-br-lib.sh
 source /usr/share/gbmc-br-lib.sh || exit
 
 NCSI_IF='@NCSI_IF@'
@@ -25,7 +27,7 @@ old_fqdn=
 old_rtr=
 
 set_host() {
-  [ -n "$host" -a -n "$domain" -a -n "$hextet" ] || return
+  [[ -n "$host" && -n "$domain" && -n "$hextet" ]] || return
 
   local fqdn="$host-n$hextet.$domain"
   [ "$fqdn" != "$old_fqdn" ] || return
@@ -36,7 +38,7 @@ set_host() {
 }
 
 set_net() {
-  [ -n "$pfx" -a -n "$rtr" ] || return
+  [[ -n "$pfx" && -n "$rtr" ]] || return
   [[ "$pfx" != "$old_pfx" || "$rtr" != "$old_rtr" ]] || return
   old_pfx="$pfx"
   old_rtr="$rtr"
@@ -57,7 +59,7 @@ set_net() {
 w=60
 while true; do
   start=$SECONDS
-  while read line; do
+  while read -r line; do
     if [ -z "$line" ]; then
       hextet=
       pfx=
@@ -69,7 +71,7 @@ while true; do
       ip_to_bytes t_pfx_b "$t_pfx" || continue
       (( t_pfx_len == 76 && t_pfx_b[8] & 0xfd == 0xfd )) || continue
       (( t_pfx_b[9] |= 1 ))
-      hextet="fd$(printf '%02x' ${t_pfx_b[9]})"
+      hextet="fd$(printf '%02x' "${t_pfx_b[9]}")"
       pfx="$(ip_bytes_to_str t_pfx_b)"
     elif [[ "$line" =~ ^'DNS search list'' '*:' '*([^.]+)(.*[.]google[.]com)$ ]]; then
       # Ideally, we use PCRE and with lookahead and can do this in a single regex
@@ -78,7 +80,7 @@ while true; do
       host="${BASH_REMATCH[1]}"
       domain="${BASH_REMATCH[2]#.}"
       if [[ "$host" =~ (-n[a-fA-F0-9]{1,4})$ ]]; then
-        host="${host%${BASH_REMATCH[1]}}"
+        host="${host%"${BASH_REMATCH[1]}"}"
       fi
     elif [[ "$line" =~ ^from' '(.*)$ ]]; then
       rtr="${BASH_REMATCH[1]}"
