@@ -3,12 +3,12 @@ shopt -s nullglob
 
 # We want to iterate over all system users, check if they are opted-in to ssh
 # authorized_keys building, and then construct their keyfile
-for user in $(cut -d':' -f1 /etc/passwd); do
-  home="$(eval echo ~$user)" || continue
-  link="$(readlink $home/.ssh/authorized_keys 2>/dev/null)" || continue
+while read -r user; do
+  home="$(eval echo "~$user")" || continue
+  link="$(readlink "$home"/.ssh/authorized_keys 2>/dev/null)" || continue
   # Users are only opted-in if they symlink to our well-known directory where
   # the final output of this script lives.
-  if [ "$link" != "/run/authorized_keys/$user" ]; then
+  if [[ $link != "/run/authorized_keys/$user" ]]; then
     echo "Ignoring $user $home/.ssh/authorized_keys" >&2
     continue
   fi
@@ -46,6 +46,6 @@ for user in $(cut -d':' -f1 /etc/passwd); do
     cat "${basemap[$key]}" >>/run/authorized_keys.tmp
   done
   mkdir -p /run/authorized_keys
-  mv /run/authorized_keys.tmp /run/authorized_keys/$user
-  chown $user /run/authorized_keys/$user
-done
+  mv /run/authorized_keys.tmp /run/authorized_keys/"$user"
+  chown "$user" /run/authorized_keys/"$user"
+done < <(cut -d':' -f1 /etc/passwd)
