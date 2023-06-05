@@ -47,7 +47,8 @@ cleanup() {
   test -n "$GNUPGHOME" && rm -rf "$GNUPGHOME"
 }
 trap cleanup ERR EXIT INT
-export GNUPGHOME="$(mktemp -d)" || exit
+GNUPGHOME="$(mktemp -d)" || exit
+export GNUPGHOME
 
 gpg() {
   command gpg --batch --allow-non-selfsigned-uid --no-tty "$@"
