@@ -22,7 +22,6 @@
 # 1. Verify the image
 # 2. Rename the image
 
-KEYRING=/etc/googlekeys/gbmc/gbmc.gpg
 SIGNATURE_FILE=/tmp/bmc.sig
 STATUS_FILE=/tmp/bmc.verify
 
