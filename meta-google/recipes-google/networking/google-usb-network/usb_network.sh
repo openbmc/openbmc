@@ -67,13 +67,13 @@ EOF
 
     local gadget_dir="${CONFIGFS_HOME}/usb_gadget/${GADGET_DIR_NAME}"
     mkdir -p "${gadget_dir}" || return
-    echo ${ID_VENDOR} > "${gadget_dir}/idVendor" || return
-    echo ${ID_PRODUCT} > "${gadget_dir}/idProduct" || return
+    echo "${ID_VENDOR}" >"${gadget_dir}/idVendor" || return
+    echo "${ID_PRODUCT}" >"${gadget_dir}/idProduct" || return
 
     local str_en_dir="${gadget_dir}/strings/0x409"
     mkdir -p "${str_en_dir}" || return
-    echo ${STR_EN_VENDOR} > "${str_en_dir}/manufacturer" || return
-    echo ${STR_EN_PRODUCT} > "${str_en_dir}/product" || return
+    echo "${STR_EN_VENDOR}" >"${str_en_dir}/manufacturer" || return
+    echo "${STR_EN_PRODUCT}" >"${str_en_dir}/product" || return
 
     local config_dir="${gadget_dir}/configs/c.1"
     mkdir -p "${config_dir}" || return
@@ -85,11 +85,11 @@ EOF
     mkdir -p "${func_dir}" || return
 
     if [[ -n $HOST_MAC_ADDR ]]; then
-        echo ${HOST_MAC_ADDR} >${func_dir}/host_addr || return
+        echo "${HOST_MAC_ADDR}" >"${func_dir}"/host_addr || return
     fi
 
     if [[ -n $DEV_MAC_ADDR ]]; then
-        echo ${DEV_MAC_ADDR} >${func_dir}/dev_addr || return
+        echo "${DEV_MAC_ADDR}" >"${func_dir}"/dev_addr || return
     fi
 
     ln -s "${func_dir}" "${config_dir}" || return
@@ -97,7 +97,7 @@ EOF
     # This only works on kernel 5.12+, we have to ignore failures for now
     echo "$IFACE_NAME" >"${func_dir}"/ifname || true
 
-    echo "${BIND_DEVICE}" >${gadget_dir}/UDC || return
+    echo "${BIND_DEVICE}" >"${gadget_dir}"/UDC || return
     # Try to reconfigure a few times in case we race with systemd-networkd
     local start=$SECONDS
     while (( SECONDS - start < 5 )); do
@@ -113,25 +113,25 @@ EOF
 
 gadget_stop() {
     local gadget_dir="${CONFIGFS_HOME}/usb_gadget/${GADGET_DIR_NAME}"
-    rm -f ${gadget_dir}/configs/c.1/${DEV_TYPE}.${IFACE_NAME}
-    rmdir ${gadget_dir}/functions/${DEV_TYPE}.${IFACE_NAME} \
-      ${gadget_dir}/configs/c.1/strings/0x409 \
-      ${gadget_dir}/configs/c.1 \
-      ${gadget_dir}/strings/0x409 \
-      ${gadget_dir} || true
+    rm -f "${gadget_dir}/configs/c.1/${DEV_TYPE}.${IFACE_NAME}"
+    rmdir "${gadget_dir}/functions/${DEV_TYPE}.${IFACE_NAME}" \
+      "${gadget_dir}/configs/c.1/strings/0x409" \
+      "${gadget_dir}/configs/c.1" \
+      "${gadget_dir}/strings/0x409" \
+      "${gadget_dir}" || true
 
     rm -f /run/systemd/network/+-bmc-"${IFACE_NAME}".network
     networkctl reload || true
 }
 
-opts=$(getopt \
+opts="$(getopt \
     --longoptions "$(printf "%s," "${ARGUMENT_LIST[@]}")" \
     --name "$(basename "$0")" \
     --options "" \
     -- "$@"
-)
+)"
 
-eval set --$opts
+eval set -- "$opts"
 
 CONFIGFS_HOME=${CONFIGFS_HOME:-/sys/kernel/config}
 ID_VENDOR="0x18d1" # Google
