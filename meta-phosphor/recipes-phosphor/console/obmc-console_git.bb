@@ -64,9 +64,9 @@ do_install:append() {
                         # Link the custom configuration to the required location
                         ln -sr ${D}${sysconfdir}/${BPN}.conf ${D}${sysconfdir}/${BPN}/server.${OBMC_CONSOLE_TTYS}.conf
                 else
-                        # Otherwise, remove socket-id from the shipped configuration to
+                        # Otherwise, remove console-id from the shipped configuration to
                         # align with the lack of a client configuration file
-                        sed -ri '/^socket-id =/d' ${D}${sysconfdir}/${BPN}/server.${OBMC_CONSOLE_TTYS}.conf
+                        sed -ri '/^console-id =/d' ${D}${sysconfdir}/${BPN}/server.${OBMC_CONSOLE_TTYS}.conf
                 fi
         fi
 }
