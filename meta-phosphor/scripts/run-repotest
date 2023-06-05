@@ -100,31 +100,6 @@ exit 1
 fi
 
 lint_exempt="\
-meta-google/recipes-google/gpio/gpio-ctrl/lib.sh
-meta-google/recipes-google/host-power-ctrl/gpio-host-pwr/host_isoff.sh
-meta-google/recipes-google/host-power-ctrl/gpio-host-pwr/host_powercycle.sh
-meta-google/recipes-google/host-power-ctrl/gpio-host-pwr/host_poweroff.sh
-meta-google/recipes-google/host-power-ctrl/gpio-host-pwr/host_poweron.sh
-meta-google/recipes-google/host-power-ctrl/gpio-host-pwr/host_reset.sh
-meta-google/recipes-google/host-power-ctrl/gpio-host-pwr/lib.sh
-meta-google/recipes-google/ipmi/ipmi-fru-sh/lib.sh
-meta-google/recipes-google/ncsi/files/gbmc-ncsi-ip-from-ra.sh.in
-meta-google/recipes-google/networking/files/gbmc-ip-monitor-test.sh
-meta-google/recipes-google/networking/files/gbmc-ip-monitor.sh
-meta-google/recipes-google/networking/files/gbmc-mac-config.sh.in
-meta-google/recipes-google/networking/gbmc-bridge/gbmc-br-from-ra.sh
-meta-google/recipes-google/networking/gbmc-bridge/gbmc-br-gw-src.sh
-meta-google/recipes-google/networking/gbmc-bridge/gbmc-br-nft.sh
-meta-google/recipes-google/networking/gbmc-bridge/gbmc-br-ula.sh
-meta-google/recipes-google/networking/google-usb-network/usb_network.sh
-meta-google/recipes-google/networking/google-usb-network/usb_network_test.sh
-meta-google/recipes-google/networking/network-sh/lib.sh
-meta-google/recipes-google/networking/network-sh/test.sh
-meta-google/recipes-google/nftables/files/nft-configure.sh
-meta-google/recipes-google/ssh/authorized-keys-comp/authorized-keys-comp.sh
-meta-google/recipes-google/test/test-sh/test.sh
-meta-google/recipes-phosphor/flash/google-key/verify-bmc-image.sh
-meta-google/recipes-phosphor/flash/inplace-gbmc-update/inplace-gbmc-verify.sh
 meta-phosphor/recipes-support/nss-pam-ldapd/files/nslcd.init
 "
 
