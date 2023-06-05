@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2317
 # Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,13 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cd "$(dirname "$0")"
-source gbmc-ip-monitor.sh
+cd "$(dirname "$0")" || exit
 if [ -e ../gbmc-ip-monitor.bb ]; then
+  # shellcheck source=meta-google/recipes-google/test/test-sh/lib.sh
   source '../../test/test-sh/lib.sh'
 else
+  # shellcheck source=meta-google/recipes-google/test/test-sh/lib.sh
   source "$SYSROOT/usr/share/test/lib.sh"
 fi
+# shellcheck source=meta-google/recipes-google/networking/files/gbmc-ip-monitor.sh
+source gbmc-ip-monitor.sh
 
 test_init_empty() {
   ip() {
@@ -86,12 +90,12 @@ EOF
 
 test_init_route_populated() {
   ip() {
-    if [ "$1" = "-4" -a "${2-}" = 'route' ]; then
+    if [[ "$1" == "-4" && "${2-}" == 'route' ]]; then
       cat <<EOF
 default via 192.168.243.254 dev eno2 proto dhcp metric 100
 192.168.242.0/23 dev eno2 proto kernel scope link src 192.168.242.57 metric 100
 EOF
-    elif [ "$1" = "-6" -a "${2-}" = 'route' ]; then
+    elif [[ "$1" == "-6" && "${2-}" == 'route' ]]; then
       cat <<EOF
 ::1 dev lo proto kernel metric 256 pref medium
 fd01:ff2:5687:4::/64 dev eno2 proto ra metric 100 pref medium
