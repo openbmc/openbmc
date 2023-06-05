@@ -13,12 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" || exit
 if [ -e ../network-sh.bb ]; then
+  # shellcheck source=meta-google/recipes-google/test/test-sh/lib.sh
   source '../../test/test-sh/lib.sh'
 else
+  # shellcheck source=meta-google/recipes-google/test/test-sh/lib.sh
   source "$SYSROOT/usr/share/test/lib.sh"
 fi
+# shellcheck source=meta-google/recipes-google/networking/network-sh/lib.sh
 source lib.sh
 
 expect_array_numeq() {
@@ -111,6 +114,7 @@ test_ip6_to_bytes() {
   expect_err 0 ip_to_bytes out '1:2:3:4:5:6:7:8'
   expected=(0 1 0 2 0 3 0 4 0 5 0 6 0 7 0 8)
   expect_array_numeq out expected
+  # shellcheck disable=SC2034
   out=()
 }
 
@@ -139,6 +143,7 @@ test_ip6_bytes_str() {
   in=(0xfd 1 0 0 0 0 0 1 0 1 0 0 0 0 0 1)
   str="$(ip_bytes_to_str in)" || fail
   expect_streq "$str" 'fd01:0:0:1:1::1'
+  # shellcheck disable=SC2034
   in=(0 1 0 1 0xdd 0xdd 0 1 0 1 0 1 0 1 0 1)
   str="$(ip_bytes_to_str in)" || fail
   expect_streq "$str" '1:1:dddd:1:1:1:1:1'

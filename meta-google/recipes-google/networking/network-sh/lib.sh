@@ -27,7 +27,7 @@ mac_to_bytes() {
   IFS=:
   local byte
   for byte in $str; do
-    bytes+=(0x$byte)
+    bytes+=("0x$byte")
   done
   IFS="$oldifs"
 }
@@ -46,12 +46,13 @@ mac_to_eui64() {
 
   # Using EUI-64 conversion rules, create the suffix bytes from MAC bytes
   # Invert bit-1 of the first byte, and insert 0xfffe in the middle.
+  # shellcheck disable=SC2034
   local suffix_bytes=(
     0 0 0 0 0 0 0 0
     $((mac_bytes[0] ^ 2))
-    ${mac_bytes[@]:1:2}
+    "${mac_bytes[@]:1:2}"
     $((0xff)) $((0xfe))
-    ${mac_bytes[@]:3:3}
+    "${mac_bytes[@]:3:3}"
   )
 
   # Return the EUI-64 bytes in the IPv6 format
@@ -84,7 +85,7 @@ ip_to_bytes() {
         IFS="$oldifs"
         return 1
       fi
-      bytes+=($v)
+      bytes+=("$v")
     done
     # IPv4 addresses must have all 4 bytes present
     if (( "${#bytes[@]}" != 4 )); then
@@ -151,10 +152,12 @@ ip_to_bytes() {
   fi
 
   IFS="$oldifs"
+  # shellcheck disable=SC2034
   bytes_out=("${bytes[@]}")
 }
 
 ip_bytes_to_str() {
+  # shellcheck disable=SC2178
   local -n bytes="$1"
 
   if (( "${#bytes[@]}" == 4 )); then
@@ -172,7 +175,7 @@ ip_bytes_to_str() {
     for (( i=0; i<=16; i+=2 )); do
       # Terminate the run of zeros if we are at the end of the array or
       # have a non-zero hextet
-      if (( i == 16 || bytes[$i] != 0 || bytes[$((i+1))] != 0 )); then
+      if (( i == 16 || bytes[i] != 0 || bytes[$((i+1))] != 0 )); then
         local s=$((i - first_zero))
         if (( s >= longest_s )); then
           longest_i=$first_zero
@@ -198,7 +201,7 @@ ip_bytes_to_str() {
         if (( i != 0 )); then
           printf ':'
         fi
-        printf '%x' $(( (bytes[$i]<<8) | bytes[$(($i+1))]))
+        printf '%x' $(( (bytes[i]<<8) | bytes[$((i+1))]))
       fi
     done
     printf '\n'
@@ -239,7 +242,7 @@ ip_pfx_concat() {
   local i
   # Check the rest of the whole bytes to make sure they are empty
   for (( i=cidr/8+1; i<${#pfx_bytes[@]}; i++ )); do
-    if (( pfx_bytes[$i] != 0 )); then
+    if (( pfx_bytes[i] != 0 )); then
       echo "Byte $i not 0: $pfx" >&2
       return 1
     fi
@@ -264,7 +267,7 @@ ip_pfx_concat() {
   local i
   # Check the bytes before the CIDR for emptiness to ensure they don't overlap
   for (( i=0; i<cidr/8; i++ )); do
-    if (( sfx_bytes[$i] != 0 )); then
+    if (( sfx_bytes[i] != 0 )); then
       echo "Byte $i not 0: $sfx" >&2
       return 1
     fi
@@ -272,7 +275,7 @@ ip_pfx_concat() {
 
   out_bytes=()
   for (( i=0; i<${#pfx_bytes[@]}; i++ )); do
-    out_bytes+=($(( pfx_bytes[$i] | sfx_bytes[$i] )))
+    out_bytes+=($(( pfx_bytes[i] | sfx_bytes[i] )))
   done
   echo "$(ip_bytes_to_str out_bytes)/$cidr"
 }
@@ -283,6 +286,7 @@ ip_pfx_to_cidr() {
 }
 
 normalize_ip() {
+  # shellcheck disable=SC2034
   local ip_bytes=()
   ip_to_bytes ip_bytes "$1" || return
   ip_bytes_to_str ip_bytes
