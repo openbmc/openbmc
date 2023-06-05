@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# shellcheck source=meta-google/recipes-google/ipmi/ipmi-fru-sh/lib.sh
 source /usr/share/ipmi-fru/lib.sh || exit
 
 ipmi_fru_alloc '@EEPROM@' eeprom || exit
@@ -41,7 +42,7 @@ if (( internal[1] != 1 || internal[2] != 32 )); then
   exit 1
 fi
 mac=("${internal[@]:3:6}")
-num="${internal[@]:9:1}"
+num="${internal[9]}"
 macstr=$(printf '%02x:%02x:%02x:%02x:%02x:%02x' "${mac[@]}")
 echo "Base MAC $macstr num $num" >&2
 
@@ -49,6 +50,7 @@ rc=0
 
 # Pre-Determine if we will miss an allocation due to the number of
 # addresses the FRU actually supports.
+# shellcheck disable=SC2190
 declare -A num_to_intfs=(@NUM_TO_INTFS@)
 for key in "${!num_to_intfs[@]}"; do
   if (( key >= num )); then
@@ -60,7 +62,7 @@ done
 # Write out each MAC override to the runtime networkd configuration
 for (( i=0; i<num; i++ )); do
   if (( mac[5] > 0xff )); then
-    echo "MAC assignment too large: ${mac[@]}" >&2
+    echo "MAC assignment too large: ${mac[*]}" >&2
     rc=2
     break
   fi
@@ -78,8 +80,8 @@ for (( i=0; i<num; i++ )); do
     # In case we don't have any interface configs, set the MAC directly
     # This is safe to apply, as systemd-networkd will always override this
     # value based on written configs.
-    if ip link show $intf >/dev/null 2>&1 && \
-       ! ip link set dev $intf address $macstr; then
+    if ip link show "$intf" >/dev/null 2>&1 && \
+       ! ip link set dev "$intf" address "$macstr"; then
       echo "Setting MAC($macstr) on $intf failed" >&2
     fi
   done
