@@ -10,7 +10,7 @@ export PATH=$PATH:/usr/sbin:/usr/libexec
 source /usr/libexec/bletchley-common-functions
 
 DELAY_POWER_ON="0.5"
-DELAY_POWER_OFF="5"
+DELAY_POWER_OFF="10"
 DELAY_POWER_RECOVERY_MODE="10"
 POWER_BTN_TIMEOUT_SEC=10
 
