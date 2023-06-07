@@ -17,7 +17,7 @@ inherit perlnative
 
 SRCREV_FORMAT = "libekb_ekb"
 
-SRCREV_libekb = "3d1b2963082d7725c3a4a2960d6f3f3336f401a7"
+SRCREV_libekb = "b62ed7865055145593cc05a3c654dddc5dcbc704"
 SRCREV_ekb = "${EKB_REV}"
 
 SRC_URI = "git://git@github.com/open-power/libekb_p10;branch=main;name=libekb;protocol=https \
