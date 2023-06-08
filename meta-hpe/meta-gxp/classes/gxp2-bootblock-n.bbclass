@@ -1,4 +1,4 @@
-# TODO:  Manually copy the U-Boot signing key and customer-key-block here:
+# TODO:  Manually copy the U-Boot signing key here:
 HPE_GXP_KEY_FILES_DIR = "${COREBASE}/meta-hpe/meta-gxp/recipes-bsp/image/files"
 
 inherit deploy
@@ -16,6 +16,4 @@ do_deploy () {
   # Copy in the U-Boot signing key
   install -m 644 ${HPE_GXP_KEY_FILES_DIR}/customer_private_key.pem ${DEPLOYDIR}/hpe-uboot-signing-key.pem
 
-  # Copy in the customer keyblock
-  install -m 644 ${HPE_GXP_KEY_FILES_DIR}/customer-key-block ${DEPLOYDIR}/customer-key-block
 }

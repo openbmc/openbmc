@@ -27,7 +27,6 @@ def do_get_version(d):
         pass
     return version
 
-CUSTOMER_KEY_BLOCK ?= "customer-key-block"
 HPE_GXP_BOOTBLOCK_IMAGE ?= "gxp-bootblock.bin"
 HPE_UBOOT_SIGNING_HEADER ?= "hpe-uboot-header.section"
 HPE_UBOOT_SIGNING_HEADER_512 ?= "hpe-uboot-header-512.section"
@@ -113,27 +112,17 @@ do_generate_hpe_image() {
             if=${DEPLOY_DIR_IMAGE}/u-boot.${UBOOT_SUFFIX} \
             of=${DEPLOY_DIR_IMAGE}/u-boot-tmp.${UBOOT_SUFFIX}
 
-    keyblockver="$(expr `grep -c -i 'CustomerKeyBlockVersion\$2.0' "${DEPLOY_DIR_IMAGE}/${CUSTOMER_KEY_BLOCK}"` + 1)"
-
+    
     # TODO - replace this openssl signing command line with whatever command you need to create a
     # digital signature of ${DEPLOY_DIR_IMAGE}/u-boot-tmp.${UBOOT_SUFFIX}
-    if [ ${keyblockver} -eq 1 ]
-    then
-        openssl sha256 -sign ${DEPLOY_DIR_IMAGE}/${HPE_UBOOT_SIGNING_KEY} -out ${DEPLOY_DIR_IMAGE}/gxp_tmp.sig \
-            ${DEPLOY_DIR_IMAGE}/u-boot-tmp.${UBOOT_SUFFIX}
 
-        # Cat U-Boot header+signature
-        cat ${DEPLOY_DIR_IMAGE}/${HPE_UBOOT_SIGNING_HEADER} ${DEPLOY_DIR_IMAGE}/gxp_tmp.sig \
-            > ${DEPLOY_DIR_IMAGE}/gxp-uboot.sig
-    elif [ ${keyblockver} -eq 2 ]
-    then
-        openssl sha384 -sign ${DEPLOY_DIR_IMAGE}/${HPE_UBOOT_SIGNING_KEY} -out ${DEPLOY_DIR_IMAGE}/gxp_tmp.sig \
-            ${DEPLOY_DIR_IMAGE}/u-boot-tmp.${UBOOT_SUFFIX}
+    openssl sha384 -sign ${DEPLOY_DIR_IMAGE}/${HPE_UBOOT_SIGNING_KEY} -out ${DEPLOY_DIR_IMAGE}/gxp_tmp.sig \
+        ${DEPLOY_DIR_IMAGE}/u-boot-tmp.${UBOOT_SUFFIX}
 
-        # Cat U-Boot header+signature
-        cat ${DEPLOY_DIR_IMAGE}/${HPE_UBOOT_SIGNING_HEADER_512} ${DEPLOY_DIR_IMAGE}/gxp_tmp.sig \
-            > ${DEPLOY_DIR_IMAGE}/gxp-uboot.sig
-    fi
+    # Cat U-Boot header+signature
+    cat ${DEPLOY_DIR_IMAGE}/${HPE_UBOOT_SIGNING_HEADER_512} ${DEPLOY_DIR_IMAGE}/gxp_tmp.sig \
+        > ${DEPLOY_DIR_IMAGE}/gxp-uboot.sig
+
 
     # Create hpe-section
     dd if=/dev/zero bs=1k count=576 > ${DEPLOY_DIR_IMAGE}/hpe-section
@@ -151,21 +140,6 @@ do_generate_hpe_image() {
     # hpe-section2 is the same as hpe-section up to this point
     cp ${DEPLOY_DIR_IMAGE}/hpe-section ${DEPLOY_DIR_IMAGE}/hpe-section2
 
-    # Expand the customer-key-block to 64 KB
-    dd if=/dev/zero bs=1k count=64 > ${DEPLOY_DIR_IMAGE}/${CUSTOMER_KEY_BLOCK}.tmp
-    dd bs=1k conv=notrunc seek=0 count=64 \
-        if=${DEPLOY_DIR_IMAGE}/${CUSTOMER_KEY_BLOCK} \
-        of=${DEPLOY_DIR_IMAGE}/${CUSTOMER_KEY_BLOCK}.tmp
-
-    # Add the customer-key-block to hpe-section
-    dd bs=1k conv=notrunc seek=320 count=64 \
-        if=${DEPLOY_DIR_IMAGE}/${CUSTOMER_KEY_BLOCK}.tmp \
-        of=${DEPLOY_DIR_IMAGE}/hpe-section
-
-    # Add a second copy of the customer-key-block to hpe-section
-    dd bs=1k conv=notrunc seek=384 count=64 \
-        if=${DEPLOY_DIR_IMAGE}/${CUSTOMER_KEY_BLOCK}.tmp \
-        of=${DEPLOY_DIR_IMAGE}/hpe-section
 
     # Expand uboot to 384K
     dd if=/dev/zero bs=1k count=384 > ${DEPLOY_DIR_IMAGE}/u-boot-tmp.${UBOOT_SUFFIX}
@@ -176,8 +150,7 @@ do_generate_hpe_image() {
     # Remove unnecessary files
     rm ${DEPLOY_DIR_IMAGE}/u-boot.${UBOOT_SUFFIX} \
        ${DEPLOY_DIR_IMAGE}/gxp_tmp.sig \
-       ${DEPLOY_DIR_IMAGE}/gxp-uboot.sig \
-       ${DEPLOY_DIR_IMAGE}/${CUSTOMER_KEY_BLOCK}.tmp
+       ${DEPLOY_DIR_IMAGE}/gxp-uboot.sig 
 
     mv ${DEPLOY_DIR_IMAGE}/u-boot-tmp.${UBOOT_SUFFIX} ${DEPLOY_DIR_IMAGE}/u-boot.${UBOOT_SUFFIX}
 
