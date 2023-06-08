@@ -8,14 +8,11 @@ Before=srvcfg-manager.service
 ConditionPathExists=!/var/lib/ipmi-net-disable-one-time
 
 [Service]
-ExecStart=/bin/systemctl stop phosphor-ipmi-net@eth0.socket
-ExecStart=/bin/systemctl disable phosphor-ipmi-net@eth0.socket
-ExecStart=/bin/systemctl stop phosphor-ipmi-net@eth0.service
-ExecStart=/bin/systemctl disable phosphor-ipmi-net@eth0.service
-ExecStart=/bin/systemctl stop phosphor-ipmi-net@eth1.socket
-ExecStart=/bin/systemctl disable phosphor-ipmi-net@eth1.socket
-ExecStart=/bin/systemctl stop phosphor-ipmi-net@eth1.service
-ExecStart=/bin/systemctl disable phosphor-ipmi-net@eth1.service
+ExecStart=/bin/systemctl disable --no-reload --now \
+    phosphor-ipmi-net@eth0.socket \
+    phosphor-ipmi-net@eth0.service \
+    phosphor-ipmi-net@eth1.socket \
+    phosphor-ipmi-net@eth1.service
 ExecStart=/bin/touch /var/lib/ipmi-net-disable-one-time
 SyslogIdentifier=first-boot-disable-ipmi-net
 Type=oneshot
