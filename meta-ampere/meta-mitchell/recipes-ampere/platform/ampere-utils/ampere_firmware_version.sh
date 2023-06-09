@@ -40,24 +40,24 @@ do_bp_cpld_firmware_report() {
 	BP_ID=$1
 	if [[ $BP_ID == 1 ]]; then
 		echo "Front Backplane 1 CPLD"
-		ampere_cpldupdate_i2c -b 101 -s 0x40 -t 2 -v
-		ampere_cpldupdate_i2c -b 101 -s 0x40 -t 2 -i
+		ampere_cpldupdate_i2c -b 101 -s 0x40 -t 3 -v
+		ampere_cpldupdate_i2c -b 101 -s 0x40 -t 3 -i
 	elif [[ $BP_ID == 2 ]]; then
 		echo "Front Backplane 2 CPLD"
-		ampere_cpldupdate_i2c -b 102 -s 0x40 -t 2 -v
-		ampere_cpldupdate_i2c -b 102 -s 0x40 -t 2 -i
+		ampere_cpldupdate_i2c -b 102 -s 0x40 -t 3 -v
+		ampere_cpldupdate_i2c -b 102 -s 0x40 -t 3 -i
 	elif [[ $BP_ID == 3 ]]; then
 		echo "Front Backplane 3 CPLD"
-		ampere_cpldupdate_i2c -b 100 -s 0x40 -t 2 -v
-		ampere_cpldupdate_i2c -b 100 -s 0x40 -t 2 -i
+		ampere_cpldupdate_i2c -b 100 -s 0x40 -t 3 -v
+		ampere_cpldupdate_i2c -b 100 -s 0x40 -t 3 -i
 	elif [[ $BP_ID == 4 ]]; then
 		echo "Rear Backplane 1 CPLD"
-		ampere_cpldupdate_i2c -b 103 -s 0x40 -t 2 -v
-		ampere_cpldupdate_i2c -b 103 -s 0x40 -t 2 -i
+		ampere_cpldupdate_i2c -b 103 -s 0x40 -t 3 -v
+		ampere_cpldupdate_i2c -b 103 -s 0x40 -t 3 -i
 	elif [[ $BP_ID == 5 ]]; then
 		echo "Rear Backplane 2 CPLD"
-		ampere_cpldupdate_i2c -b 104 -s 0x40 -t 2 -v
-		ampere_cpldupdate_i2c -b 104 -s 0x40 -t 2 -i
+		ampere_cpldupdate_i2c -b 104 -s 0x40 -t 3 -v
+		ampere_cpldupdate_i2c -b 104 -s 0x40 -t 3 -i
 	fi
 }
 
