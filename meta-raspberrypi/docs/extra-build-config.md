@@ -155,6 +155,16 @@ For further customisation the KERNEL_IMAGETYPE and KERNEL_BOOTCMD variables can
 be overridden to select the exact kernel image type (eg. zImage) and u-boot
 command (eg. bootz) to be used.
 
+To operate correctly, U-Boot requires `enable_uart=1` in `config.txt` file for
+the following boards:
+* Raspberry Pi Zero W
+* Raspberry Pi 3 32-bit
+* Raspberry Pi 3 64-bit
+* Raspberry Pi 4 32-bit
+* Raspberry Pi 4 64-bit
+It means that, for those boards, `RPI_USE_U_BOOT = "1"` is not compatible with
+`ENABLE_UART = "0"`.
+
 ## Image with Initramfs
 
 To build an initramfs image:

@@ -11,6 +11,12 @@ SRC_URI += " \
         file://run-ptest \
 "
 
+RDEPENDS:${PN} += " \
+    python3-datetime \
+    python3-profile \
+    python3-stringold \
+"
+
 RDEPENDS:${PN}-ptest += " \
         ${PYTHON_PN}-poetry-core \
         ${PYTHON_PN}-pytest \

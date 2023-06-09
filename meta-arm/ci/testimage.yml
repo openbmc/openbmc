@@ -1,5 +1,7 @@
 header:
   version: 11
+  includes:
+    - ci/debug.yml
 
 local_conf_header:
   testimage: |

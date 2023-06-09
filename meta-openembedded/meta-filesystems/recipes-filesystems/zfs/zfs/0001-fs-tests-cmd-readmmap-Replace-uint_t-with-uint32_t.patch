@@ -1,0 +1,46 @@
+From 1f9a5cb860b3509791e59a8cae9d5f265e832ed0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 28 May 2023 16:33:15 -0700
+Subject: [PATCH] fs-tests/cmd/readmmap: Replace uint_t with uint32_t
+
+Makes it portable across glibc and musl
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/zfs-tests/cmd/readmmap.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/tests/zfs-tests/cmd/readmmap.c b/tests/zfs-tests/cmd/readmmap.c
+index 704ffd55c8..a2590e0e8d 100644
+--- a/tests/zfs-tests/cmd/readmmap.c
++++ b/tests/zfs-tests/cmd/readmmap.c
+@@ -38,6 +38,7 @@
+  *		0 : no errors
+  * --------------------------------------------------------------
+  */
++#include <stdint.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
+@@ -55,7 +56,7 @@ main(int argc, char **argv)
+ 	char *buf = NULL;
+ 	char *map = NULL;
+ 	int fd = -1, bytes, retval = 0;
+-	uint_t seed;
++	uint32_t seed;
+ 
+ 	if (argc < 2 || optind == argc) {
+ 		(void) fprintf(stderr,
+@@ -92,7 +93,7 @@ main(int argc, char **argv)
+ 		retval = 1;
+ 		goto end;
+ 	}
+-	seed = (uint_t)time(NULL);
++	seed = (uint32_t)time(NULL);
+ 	srandom(seed);
+ 
+ 	idx = random() % size;
+-- 
+2.40.1
+

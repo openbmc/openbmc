@@ -18,6 +18,12 @@ inherit setuptools3 ptest
 
 DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
 
+RDEPENDS:${PN} += " \
+    python3-asyncio \
+    python3-pytest \
+    python3-unittest \
+"
+
 S = "${WORKDIR}/git"
 
 do_install_ptest() {

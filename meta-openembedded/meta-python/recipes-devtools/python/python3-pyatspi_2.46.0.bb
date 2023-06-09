@@ -20,3 +20,5 @@ REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
 inherit pkgconfig autotools python3native
 
 FILES:${PN} += "${PYTHON_SITEPACKAGES_DIR}/pyatspi/*"
+
+RDEPENDS:${PN} += "python3-pygobject"

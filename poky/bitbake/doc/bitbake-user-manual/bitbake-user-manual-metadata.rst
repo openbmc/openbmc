@@ -1519,6 +1519,12 @@ functionality of the task:
    released. You can use this variable flag to accomplish mutual
    exclusion.
 
+-  ``[network]``: When set to "1", allows a task to access the network. By
+   default, only the ``do_fetch`` task is granted network access. Recipes
+   shouldn't access the network outside of ``do_fetch`` as it usually
+   undermines fetcher source mirroring, image and licence manifests, software
+   auditing and supply chain security.
+
 -  ``[noexec]``: When set to "1", marks the task as being empty, with
    no execution required. You can use the ``[noexec]`` flag to set up
    tasks as dependency placeholders, or to disable tasks defined

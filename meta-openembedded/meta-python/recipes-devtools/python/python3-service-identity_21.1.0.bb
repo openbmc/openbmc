@@ -14,6 +14,12 @@ SRC_URI += " \
 	file://run-ptest \
 "
 
+RDEPENDS:${PN} += " \
+    python3-attr \
+    python3-cryptography \
+    python3-pyasn1-modules \
+"
+
 RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
 "

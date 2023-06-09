@@ -2,11 +2,11 @@ require gcc-common.inc
 
 # Third digit in PV should be incremented after a minor release
 
-PV = "13.1.0"
+PV = "13.1.1"
 
 # BINV should be incremented to a revision after a minor gcc release
 
-BINV = "13.1.0"
+BINV = "13.1.1"
 
 FILESEXTRAPATHS =. "${FILE_DIRNAME}/gcc:${FILE_DIRNAME}/gcc/backport:"
 
@@ -30,14 +30,14 @@ LIC_FILES_CHKSUM = "\
 #SOURCEDIR ?= "official-gcc-${@'${RELEASE}'[0:7]}"
 
 # from snapshot
-#RELEASE ?= "13.1.0-RC-20230421"
-#SOURCEDIR ?= "gcc-${RELEASE}"
-#BASEURI ?= "https://gcc.gnu.org/pub/gcc/snapshots/${RELEASE}/gcc-${RELEASE}.tar.xz"
+RELEASE ?= "13-20230520"
+SOURCEDIR ?= "gcc-${RELEASE}"
+BASEURI ?= "https://gcc.gnu.org/pub/gcc/snapshots/${RELEASE}/gcc-${RELEASE}.tar.xz"
 
 # official release
-RELEASE ?= "${PV}"
-BASEURI ?= "${GNU_MIRROR}/gcc/gcc-${PV}/gcc-${PV}.tar.xz"
-SOURCEDIR ?= "gcc-${PV}"
+#RELEASE ?= "${PV}"
+#BASEURI ?= "${GNU_MIRROR}/gcc/gcc-${PV}/gcc-${PV}.tar.xz"
+#SOURCEDIR ?= "gcc-${PV}"
 
 SRC_URI = "${BASEURI} \
            file://0001-gcc-4.3.1-ARCH_FLAGS_FOR_TARGET.patch \
@@ -65,7 +65,7 @@ SRC_URI = "${BASEURI} \
            file://0023-Fix-install-path-of-linux64.h.patch \
            file://0024-Avoid-hardcoded-build-paths-into-ppc-libgcc.patch \
 "
-SRC_URI[sha256sum] = "61d684f0aa5e76ac6585ad8898a2427aade8979ed5e7f85492286c4dfc13ee86"
+SRC_URI[sha256sum] = "b8716f92e468086fca5aea8873f7405f1cd7d309ad0719f0a90c57b3483e448c"
 
 S = "${TMPDIR}/work-shared/gcc-${PV}-${PR}/${SOURCEDIR}"
 B = "${WORKDIR}/gcc-${PV}/build.${HOST_SYS}.${TARGET_SYS}"

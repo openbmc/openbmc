@@ -1,0 +1,28 @@
+From 4fc59f5733d187941e9a7ce5e9ea33714d85285c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 26 May 2023 09:30:59 -0700
+Subject: [PATCH] libipvs: Include missing sys/types.h
+
+Its needed for u_intXX_t types
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libipvs/ip_vs.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libipvs/ip_vs.h b/libipvs/ip_vs.h
+index 2670c23..625b6cd 100644
+--- a/libipvs/ip_vs.h
++++ b/libipvs/ip_vs.h
+@@ -8,6 +8,7 @@
+ 
+ #include <netinet/in.h>
+ #include <sys/socket.h>
++#include <sys/types.h>
+ #include <arpa/inet.h>
+ #include <linux/types.h>	/* For __beXX types in userland */
+ 
+-- 
+2.40.1
+

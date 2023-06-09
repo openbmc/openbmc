@@ -10,23 +10,24 @@ or 64Kb set by ntp should be good in glibc these days.
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
 ---
  libntp/work_thread.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/libntp/work_thread.c b/libntp/work_thread.c
-index 03a5647..3ddd751 100644
+index c1fe5c2..21db4a0 100644
 --- a/libntp/work_thread.c
 +++ b/libntp/work_thread.c
-@@ -41,7 +41,7 @@
- #ifndef THREAD_MINSTACKSIZE
- # define THREAD_MINSTACKSIZE	(64U * 1024)
- #endif
--#ifndef __sun
-+#if !defined(__sun) && !defined(__GLIBC__)
- #if defined(PTHREAD_STACK_MIN) && THREAD_MINSTACKSIZE < PTHREAD_STACK_MIN
- # undef THREAD_MINSTACKSIZE
- # define THREAD_MINSTACKSIZE PTHREAD_STACK_MIN
+@@ -598,7 +598,7 @@ start_blocking_thread_internal(
+ 		/* now clamp on lower stack limit. */
+ 		if (nstacksize < THREAD_MINSTACKSIZE)
+ 			nstacksize = THREAD_MINSTACKSIZE;
+-#            ifdef PTHREAD_STACK_MIN
++#            ifdef PTHREAD_STACK_MIN && !defined(__GLIBC__)
+ 		if (nstacksize < PTHREAD_STACK_MIN)
+ 			nstacksize = PTHREAD_STACK_MIN;
+ #            endif
 -- 
-2.32.0
+2.34.1
 

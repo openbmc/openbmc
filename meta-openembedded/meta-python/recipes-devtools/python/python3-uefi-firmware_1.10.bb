@@ -15,3 +15,8 @@ SRCREV = "dfb15b068960b771e2e1536d34790dac9b5bfe32"
 S = "${WORKDIR}/git"
 
 inherit setuptools3
+
+RDEPENDS:${PN} += " \
+    python3-ctypes \
+    python3-logging \
+"

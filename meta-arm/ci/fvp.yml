@@ -3,9 +3,10 @@ header:
 
 local_conf_header:
   testimagefvp: |
+    LICENSE_FLAGS_ACCEPTED += "Arm-FVP-EULA"
     INHERIT += "fvpboot"
+  failing_tests: |
     # This fails but we can't add to the ignorelist from meta-arm yet
     # https://bugzilla.yoctoproject.org/show_bug.cgi?id=14604
     TEST_SUITES:remove = "parselogs"
-  failing_tests: |
     TEST_SUITES:remove = "xorg"

@@ -4,15 +4,15 @@
 BitBake Supported Release Manuals
 =================================
 
-*****************************
-Release Series 4.1 (langdale)
-*****************************
+*******************************
+Release Series 4.2 (mickledore)
+*******************************
 
-- :yocto_docs:`BitBake 2.2 User Manual </bitbake/2.2/>`
+- :yocto_docs:`BitBake 2.4 User Manual </bitbake/2.4/>`
 
-*****************************
-Release Series 4.0 (kirstone)
-*****************************
+******************************
+Release Series 4.0 (kirkstone)
+******************************
 
 - :yocto_docs:`BitBake 2.0 User Manual </bitbake/2.0/>`
 
@@ -25,6 +25,12 @@ Release Series 3.1 (dunfell)
 ================================
 BitBake Outdated Release Manuals
 ================================
+
+*****************************
+Release Series 4.1 (langdale)
+*****************************
+
+- :yocto_docs:`BitBake 2.2 User Manual </bitbake/2.2/>`
 
 ******************************
 Release Series 3.4 (honister)

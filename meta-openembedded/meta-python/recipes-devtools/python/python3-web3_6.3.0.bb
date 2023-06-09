@@ -13,6 +13,8 @@ RDEPENDS:${PN} += " \
     python3-distutils \
     python3-eth-account \
     python3-idna \
+    python3-jsonschema \
+    python3-google-api-core \
     python3-lru-dict \
     python3-requests \
     python3-setuptools \

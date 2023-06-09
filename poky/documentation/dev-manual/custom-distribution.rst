@@ -98,11 +98,12 @@ layer. The following steps provide some more detail:
 
    -  Add any image recipes that are specific to your distribution.
 
-   -  Add a ``psplash`` append file for a branded splash screen. For
-      information on append files, see the
-      ":ref:`dev-manual/layers:appending other layers metadata with your layer`"
-      section.
+   -  Add a ``psplash`` append file for a branded splash screen, using
+      the :term:`SPLASH_IMAGES` variable.
 
    -  Add any other append files to make custom changes that are
       specific to individual recipes.
 
+   For information on append files, see the
+   ":ref:`dev-manual/layers:appending other layers metadata with your layer`"
+   section.

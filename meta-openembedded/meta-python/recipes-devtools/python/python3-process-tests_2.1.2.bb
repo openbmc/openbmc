@@ -13,3 +13,9 @@ inherit pypi setuptools3
 RDEPENDS:${PN} += "python3-core"
 
 BBCLASSEXTEND = "native nativesdk"
+
+RDEPENDS:${PN} += " \
+    python3-io \
+    python3-logging \
+    python3-unittest \
+"

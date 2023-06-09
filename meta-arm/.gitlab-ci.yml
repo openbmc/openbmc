@@ -150,7 +150,7 @@ n1sdp:
   parallel:
     matrix:
       - TOOLCHAINS: [gcc, armgcc]
-        TS: [none, trusted-services]
+        TS: [none, n1sdp-ts]
 
 qemu-generic-arm64:
   extends: .build
@@ -167,7 +167,7 @@ qemuarm64-secureboot:
       - KERNEL: [linux-yocto, linux-yocto-dev, linux-yocto-rt]
         TOOLCHAINS: [gcc, clang]
         TCLIBC: [glibc, musl]
-        TS: [none, trusted-services]
+        TS: [none, qemuarm64-secureboot-ts]
         TESTING: testimage
 
 qemuarm64:
@@ -188,7 +188,10 @@ qemuarm-secureboot:
   parallel:
     matrix:
       - KERNEL: [linux-yocto, linux-yocto-dev, linux-yocto-rt]
-        TOOLCHAINS: [gcc, clang, external-gccarm]
+        TOOLCHAINS: [gcc, clang]
+        TCLIBC: [glibc, musl]
+        TESTING: testimage
+      - TOOLCHAINS: external-gccarm
         TESTING: testimage
 
 qemuarm:

@@ -11,3 +11,8 @@ SRC_URI[sha256sum] = "e9ca006a4df2488a60bd9a740011ee948d81904be2364f017e56016950
 inherit pypi setuptools3
 
 PYPI_PACKAGE = "libevdev"
+
+RDEPENDS:${PN} += " \
+    libevdev \
+    python3-ctypes \
+"

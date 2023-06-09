@@ -10,10 +10,11 @@ inherit pypi setuptools3
 PYPI_SRC_URI:append = ";downloadfilename=${BP}.${PYPI_PACKAGE_EXT}"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-six \
-    ${PYTHON_PN}-stringold \
-    ${PYTHON_PN}-threading \
+    python3-logging \
+    python3-scons \
+    python3-six \
+    python3-stringold \
+    python3-threading \
 "
 
 BBCLASSEXTEND = "native nativesdk"

@@ -9,6 +9,7 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/network/${BPN}/${BP}.tar.xz \
            file://CVE-2022-32293_p2.patch \
            file://CVE-2022-32292.patch \
            file://0001-gdhcp-Verify-and-sanitize-packet-length-first.patch \
+           file://0001-vpn-Adding-support-for-latest-pppd-2.5.0-release.patch \
            "
 
 SRC_URI:append:libc-musl = " file://0002-resolve-musl-does-not-implement-res_ninit.patch"

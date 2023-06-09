@@ -13,6 +13,7 @@ SRC_URI = "http://projects.openmoko.org/frs/download.php/923/orrery_2.7_clean.ta
            file://orrery.png \
            file://use.GdkPixbuf.patch \
            file://0001-orrery-Fix-sprintf-format.patch \
+           file://0001-Append-cflags-instead-of-overriding-in-Makefile.am.patch \
            "
 
 SRC_URI[md5sum]    = "bd62a33e7554ee1030313dfcdefcda8b"
@@ -22,7 +23,7 @@ S = "${WORKDIR}/${BPN}"
 
 do_configure:prepend() {
     # fix DSO issue with binutils-2.22
-    sed -i 's/ -lrt/ -lrt -lm/g' ${S}/Makefile.am
+    sed -i 's/ -lrt$/ -lrt -lm/g' ${S}/Makefile.am
 }
 do_install:append() {
     install -d ${D}${datadir}/orrery
@@ -30,6 +31,7 @@ do_install:append() {
     chown -R root:root ${D}${datadir}/orrery
     install -d ${D}${datadir}/icons
     install -m 0755 ${WORKDIR}/orrery.png ${D}${datadir}/icons
+    rm -rf ${D}${datadir}/orrery/Makefile*
 }
 
 FILES:${PN} += "${datadir}/icons/orrery.png"

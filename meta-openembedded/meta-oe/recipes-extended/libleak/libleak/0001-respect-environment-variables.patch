@@ -8,18 +8,17 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  Makefile | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 1d70f17..c7e726e 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1,5 +1,5 @@
+@@ -1,8 +1,8 @@
 -CFLAGS = -g -O2 -Wall -fPIC -Ilibwuya
 -LDFLAGS = -Llibwuya
 +CFLAGS += -g -O2 -Wall -fPIC -Ilibwuya
 +LDFLAGS += -Llibwuya
  
  libleak.so: libleak.o
- 	CFLAGS='-fPIC' make -C libwuya
--- 
-2.30.1
-
+-	CFLAGS='-fPIC' make -C libwuya
++	make -C libwuya
+ 	$(CC) -shared -o $@ $^ $(LDFLAGS) -lwuya -lpthread -ldl -lbacktrace
+ 
+ clean:

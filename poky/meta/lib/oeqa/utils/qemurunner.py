@@ -188,7 +188,7 @@ class QemuRunner:
     def launch(self, launch_cmd, get_ip = True, qemuparams = None, extra_bootparams = None, env = None):
         # use logfile to determine the recipe-sysroot-native path and
         # then add in the site-packages path components and add that
-        # to the python sys.path so qmp.py can be found.
+        # to the python sys.path so the qmp module can be found.
         python_path = os.path.dirname(os.path.dirname(self.logfile))
         python_path += "/recipe-sysroot-native/usr/lib/qemu-python"
         sys.path.append(python_path)
@@ -196,7 +196,7 @@ class QemuRunner:
         try:
             qmp = importlib.import_module("qmp")
         except Exception as e:
-            self.logger.error("qemurunner: qmp.py missing, please ensure it's installed (%s)" % str(e))
+            self.logger.error("qemurunner: qmp module missing, please ensure it's installed in %s (%s)" % (python_path, str(e)))
             return False
         # Path relative to tmpdir used as cwd for qemu below to avoid unix socket path length issues
         qmp_file = "." + next(tempfile._get_candidate_names())

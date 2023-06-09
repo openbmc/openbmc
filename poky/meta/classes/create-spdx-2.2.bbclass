@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-DEPLOY_DIR_SPDX ??= "${DEPLOY_DIR}/spdx/${MACHINE}"
+DEPLOY_DIR_SPDX ??= "${DEPLOY_DIR}/spdx"
 
 # The product name that the CVE database uses.  Defaults to BPN, but may need to
 # be overriden per recipe (for example tiff.bb sets CVE_PRODUCT=libtiff).
@@ -16,6 +16,7 @@ SPDXDEPLOY = "${SPDXDIR}/deploy"
 SPDXWORK = "${SPDXDIR}/work"
 SPDXIMAGEWORK = "${SPDXDIR}/image-work"
 SPDXSDKWORK = "${SPDXDIR}/sdk-work"
+SPDXDEPS = "${SPDXDIR}/deps.json"
 
 SPDX_TOOL_NAME ??= "oe-spdx-creator"
 SPDX_TOOL_VERSION ??= "1.0"
@@ -137,7 +138,7 @@ def convert_license_to_spdx(lic, document, d, existing={}):
                     with open(filename, errors="replace") as f:
                         extracted_info.extractedText = f.read()
                 else:
-                    bb.error("Cannot find any text for license %s" % name)
+                    bb.fatal("Cannot find any text for license %s" % name)
 
         extracted[name] = extracted_info
         document.hasExtractedLicensingInfos.append(extracted_info)
@@ -167,7 +168,7 @@ def convert_license_to_spdx(lic, document, d, existing={}):
 
         return spdx_license
 
-    lic_split = lic.replace("(", " ( ").replace(")", " ) ").split()
+    lic_split = lic.replace("(", " ( ").replace(")", " ) ").replace("|", " | ").replace("&", " & ").split()
 
     return ' '.join(convert(l) for l in lic_split)
 
@@ -337,21 +338,24 @@ def add_package_sources_from_debug(d, package_doc, spdx_package, package, packag
 
             package_doc.add_relationship(pkg_file, "GENERATED_FROM", ref_id, comment=debugsrc)
 
+add_package_sources_from_debug[vardepsexclude] += "STAGING_KERNEL_DIR"
+
 def collect_dep_recipes(d, doc, spdx_recipe):
+    import json
     from pathlib import Path
     import oe.sbom
     import oe.spdx
 
     deploy_dir_spdx = Path(d.getVar("DEPLOY_DIR_SPDX"))
+    spdx_deps_file = Path(d.getVar("SPDXDEPS"))
 
     dep_recipes = []
-    taskdepdata = d.getVar("BB_TASKDEPDATA", False)
-    deps = sorted(set(
-        dep[0] for dep in taskdepdata.values() if
-            dep[1] == "do_create_spdx" and dep[0] != d.getVar("PN")
-    ))
-    for dep_pn in deps:
-        dep_recipe_path = deploy_dir_spdx / "recipes" / ("recipe-%s.spdx.json" % dep_pn)
+
+    with spdx_deps_file.open("r") as f:
+        deps = json.load(f)
+
+    for dep_pn, dep_hashfn in deps:
+        dep_recipe_path = oe.sbom.doc_path_by_hashfn(deploy_dir_spdx, "recipe-" + dep_pn, dep_hashfn)
 
         spdx_dep_doc, spdx_dep_sha1 = oe.sbom.read_doc(dep_recipe_path)
 
@@ -380,8 +384,6 @@ def collect_dep_recipes(d, doc, spdx_recipe):
 
     return dep_recipes
 
-collect_dep_recipes[vardepsexclude] += "BB_TASKDEPDATA"
-collect_dep_recipes[vardeps] += "DEPENDS"
 
 def collect_dep_sources(d, dep_recipes):
     import oe.sbom
@@ -453,6 +455,52 @@ def add_download_packages(d, doc, recipe):
             # In the future, we might be able to do more fancy dependencies,
             # but this should be sufficient for now
             doc.add_relationship(package, "BUILD_DEPENDENCY_OF", recipe)
+
+def collect_direct_deps(d, dep_task):
+    current_task = "do_" + d.getVar("BB_CURRENTTASK")
+    pn = d.getVar("PN")
+
+    taskdepdata = d.getVar("BB_TASKDEPDATA", False)
+
+    for this_dep in taskdepdata.values():
+        if this_dep[0] == pn and this_dep[1] == current_task:
+            break
+    else:
+        bb.fatal(f"Unable to find this {pn}:{current_task} in taskdepdata")
+
+    deps = set()
+    for dep_name in this_dep[3]:
+        dep_data = taskdepdata[dep_name]
+        if dep_data[1] == dep_task and dep_data[0] != pn:
+            deps.add((dep_data[0], dep_data[7]))
+
+    return sorted(deps)
+
+collect_direct_deps[vardepsexclude] += "BB_TASKDEPDATA"
+collect_direct_deps[vardeps] += "DEPENDS"
+
+python do_collect_spdx_deps() {
+    # This task calculates the build time dependencies of the recipe, and is
+    # required because while a task can deptask on itself, those dependencies
+    # do not show up in BB_TASKDEPDATA. To work around that, this task does the
+    # deptask on do_create_spdx and writes out the dependencies it finds, then
+    # do_create_spdx reads in the found dependencies when writing the actual
+    # SPDX document
+    import json
+    from pathlib import Path
+
+    spdx_deps_file = Path(d.getVar("SPDXDEPS"))
+
+    deps = collect_direct_deps(d, "do_create_spdx")
+
+    with spdx_deps_file.open("w") as f:
+        json.dump(deps, f)
+}
+# NOTE: depending on do_unpack is a hack that is necessary to get it's dependencies for archive the source
+addtask do_collect_spdx_deps after do_unpack
+do_collect_spdx_deps[depends] += "${PATCHDEPENDENCY}"
+do_collect_spdx_deps[deptask] = "do_create_spdx"
+do_collect_spdx_deps[dirs] = "${SPDXDIR}"
 
 python do_create_spdx() {
     from datetime import datetime, timezone
@@ -571,7 +619,7 @@ python do_create_spdx() {
 
     dep_recipes = collect_dep_recipes(d, doc, recipe)
 
-    doc_sha1 = oe.sbom.write_doc(d, doc, "recipes", indent=get_json_indent(d))
+    doc_sha1 = oe.sbom.write_doc(d, doc, d.getVar("SSTATE_PKGARCH"), "recipes", indent=get_json_indent(d))
     dep_recipes.append(oe.sbom.DepRecipe(doc, doc_sha1, recipe))
 
     recipe_ref = oe.spdx.SPDXExternalDocumentRef()
@@ -636,10 +684,11 @@ python do_create_spdx() {
 
             add_package_sources_from_debug(d, package_doc, spdx_package, package, package_files, sources)
 
-            oe.sbom.write_doc(d, package_doc, "packages", indent=get_json_indent(d))
+            oe.sbom.write_doc(d, package_doc, d.getVar("SSTATE_PKGARCH"), "packages", indent=get_json_indent(d))
 }
+do_create_spdx[vardepsexclude] += "BB_NUMBER_THREADS"
 # NOTE: depending on do_unpack is a hack that is necessary to get it's dependencies for archive the source
-addtask do_create_spdx after do_package do_packagedata do_unpack before do_populate_sdk do_build do_rm_work
+addtask do_create_spdx after do_package do_packagedata do_unpack do_collect_spdx_deps before do_populate_sdk do_build do_rm_work
 
 SSTATETASKS += "do_create_spdx"
 do_create_spdx[sstate-inputdirs] = "${SPDXDEPLOY}"
@@ -653,7 +702,6 @@ addtask do_create_spdx_setscene
 do_create_spdx[dirs] = "${SPDXWORK}"
 do_create_spdx[cleandirs] = "${SPDXDEPLOY} ${SPDXWORK}"
 do_create_spdx[depends] += "${PATCHDEPENDENCY}"
-do_create_spdx[deptask] = "do_create_spdx"
 
 def collect_package_providers(d):
     from pathlib import Path
@@ -665,23 +713,29 @@ def collect_package_providers(d):
 
     providers = {}
 
-    taskdepdata = d.getVar("BB_TASKDEPDATA", False)
-    deps = sorted(set(
-        dep[0] for dep in taskdepdata.values() if dep[0] != d.getVar("PN")
-    ))
-    deps.append(d.getVar("PN"))
+    deps = collect_direct_deps(d, "do_create_spdx")
+    deps.append((d.getVar("PN"), d.getVar("BB_HASHFILENAME")))
 
-    for dep_pn in deps:
-        recipe_data = oe.packagedata.read_pkgdata(dep_pn, d)
+    for dep_pn, dep_hashfn in deps:
+        localdata = d
+        recipe_data = oe.packagedata.read_pkgdata(dep_pn, localdata)
+        if not recipe_data:
+            localdata = bb.data.createCopy(d)
+            localdata.setVar("PKGDATA_DIR", "${PKGDATA_DIR_SDK}")
+            recipe_data = oe.packagedata.read_pkgdata(dep_pn, localdata)
 
         for pkg in recipe_data.get("PACKAGES", "").split():
 
-            pkg_data = oe.packagedata.read_subpkgdata_dict(pkg, d)
+            pkg_data = oe.packagedata.read_subpkgdata_dict(pkg, localdata)
             rprovides = set(n for n, _ in bb.utils.explode_dep_versions2(pkg_data.get("RPROVIDES", "")).items())
             rprovides.add(pkg)
 
+            if "PKG" in pkg_data:
+                pkg = pkg_data["PKG"]
+                rprovides.add(pkg)
+
             for r in rprovides:
-                providers[r] = pkg
+                providers[r] = (pkg, dep_hashfn)
 
     return providers
 
@@ -717,7 +771,7 @@ python do_create_runtime_spdx() {
             if not oe.packagedata.packaged(package, localdata):
                 continue
 
-            pkg_spdx_path = deploy_dir_spdx / "packages" / (pkg_name + ".spdx.json")
+            pkg_spdx_path = oe.sbom.doc_path(deploy_dir_spdx, pkg_name, d.getVar("SSTATE_PKGARCH"), "packages")
 
             package_doc, package_doc_sha1 = oe.sbom.read_doc(pkg_spdx_path)
 
@@ -761,7 +815,7 @@ python do_create_runtime_spdx() {
                 if dep not in providers:
                     continue
 
-                dep = providers[dep]
+                (dep, dep_hashfn) = providers[dep]
 
                 if not oe.packagedata.packaged(dep, localdata):
                     continue
@@ -772,7 +826,7 @@ python do_create_runtime_spdx() {
                 if dep in dep_package_cache:
                     (dep_spdx_package, dep_package_ref) = dep_package_cache[dep]
                 else:
-                    dep_path = deploy_dir_spdx / "packages" / ("%s.spdx.json" % dep_pkg)
+                    dep_path = oe.sbom.doc_path_by_hashfn(deploy_dir_spdx, dep_pkg, dep_hashfn)
 
                     spdx_dep_doc, spdx_dep_sha1 = oe.sbom.read_doc(dep_path)
 
@@ -800,8 +854,10 @@ python do_create_runtime_spdx() {
                 )
                 seen_deps.add(dep)
 
-            oe.sbom.write_doc(d, runtime_doc, "runtime", spdx_deploy, indent=get_json_indent(d))
+            oe.sbom.write_doc(d, runtime_doc, d.getVar("SSTATE_PKGARCH"), "runtime", spdx_deploy, indent=get_json_indent(d))
 }
+
+do_create_runtime_spdx[vardepsexclude] += "OVERRIDES"
 
 addtask do_create_runtime_spdx after do_create_spdx before do_build do_rm_work
 SSTATETASKS += "do_create_runtime_spdx"
@@ -869,6 +925,8 @@ def spdx_get_src(d):
     finally:
         d.setVar("WORKDIR", workdir)
 
+spdx_get_src[vardepsexclude] += "STAGING_KERNEL_DIR"
+
 do_rootfs[recrdeptask] += "do_create_spdx do_create_runtime_spdx"
 do_rootfs[cleandirs] += "${SPDXIMAGEWORK}"
 
@@ -933,6 +991,8 @@ def combine_spdx(d, rootfs_name, rootfs_deploydir, rootfs_spdxid, packages, spdx
     import tarfile
     import bb.compress.zstd
 
+    providers = collect_package_providers(d)
+
     creation_time = datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     deploy_dir_spdx = Path(d.getVar("DEPLOY_DIR_SPDX"))
     source_date_epoch = d.getVar("SOURCE_DATE_EPOCH")
@@ -956,7 +1016,12 @@ def combine_spdx(d, rootfs_name, rootfs_deploydir, rootfs_spdxid, packages, spdx
     doc.packages.append(image)
 
     for name in sorted(packages.keys()):
-        pkg_spdx_path = deploy_dir_spdx / "packages" / (name + ".spdx.json")
+        if name not in providers:
+            bb.fatal("Unable to find provider for '%s'" % name)
+
+        pkg_name, pkg_hashfn = providers[name]
+
+        pkg_spdx_path = oe.sbom.doc_path_by_hashfn(deploy_dir_spdx, pkg_name, pkg_hashfn)
         pkg_doc, pkg_doc_sha1 = oe.sbom.read_doc(pkg_spdx_path)
 
         for p in pkg_doc.packages:
@@ -973,7 +1038,7 @@ def combine_spdx(d, rootfs_name, rootfs_deploydir, rootfs_spdxid, packages, spdx
         else:
             bb.fatal("Unable to find package with name '%s' in SPDX file %s" % (name, pkg_spdx_path))
 
-        runtime_spdx_path = deploy_dir_spdx / "runtime" / ("runtime-" + name + ".spdx.json")
+        runtime_spdx_path = oe.sbom.doc_path_by_hashfn(deploy_dir_spdx, "runtime-" + name, pkg_hashfn)
         runtime_doc, runtime_doc_sha1 = oe.sbom.read_doc(runtime_spdx_path)
 
         runtime_ref = oe.spdx.SPDXExternalDocumentRef()
@@ -1045,7 +1110,7 @@ def combine_spdx(d, rootfs_name, rootfs_deploydir, rootfs_spdxid, packages, spdx
                     })
 
                 for ref in doc.externalDocumentRefs:
-                    ref_path = deploy_dir_spdx / "by-namespace" / ref.spdxDocument.replace("/", "_")
+                    ref_path = oe.sbom.doc_path_by_namespace(deploy_dir_spdx, ref.spdxDocument)
                     collect_spdx_document(ref_path)
 
             collect_spdx_document(image_spdx_path)
@@ -1067,3 +1132,5 @@ def combine_spdx(d, rootfs_name, rootfs_deploydir, rootfs_spdxid, packages, spdx
             info.gname = "root"
 
             tar.addfile(info, fileobj=index_str)
+
+combine_spdx[vardepsexclude] += "BB_NUMBER_THREADS"

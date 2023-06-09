@@ -29,6 +29,9 @@ DEPENDS = "virtual/arm-none-eabi-gcc-native \
 # For now we only build with GCC, so stop meta-clang trying to get involved
 TOOLCHAIN = "gcc"
 
+# remove once arm-none-eabi-gcc updates to 13 or newer like poky
+DEBUG_PREFIX_MAP:remove = "-fcanon-prefix-map"
+
 inherit deploy
 
 B = "${WORKDIR}/build"

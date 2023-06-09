@@ -1,0 +1,28 @@
+From e13f15205425c67e1101031a33107fa9cd2d65f9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 26 May 2023 10:32:53 -0700
+Subject: [PATCH] Append cflags instead of overriding in Makefile.am
+
+Fixes
+WARNING: orrery-2.7-r0 do_package_qa: QA Issue: File /usr/bin/.debug/orrery in package orrery-dbg contains reference to TMPDIR [buildpaths]
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index b64449f..23637b3 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,4 +1,4 @@
+-CFLAGS = -g -O3 -Wall
++CFLAGS += -g -O3 -Wall
+ 
+ bin_PROGRAMS = orrery
+ orrery_SOURCES = planetInfo.c orrery.c orrery.h phaseConstants.h
+-- 
+2.40.1
+

@@ -10,6 +10,7 @@ SRC_URI[sha256sum] = "88fc51d9a26b10fc331be344f1781224a375b78488fc343620184e95a4
 
 BBCLASSEXTEND = "native nativesdk"
 
-RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-asyncio \
+RDEPENDS:${PN} = " \
+    python3-asyncio \
+    python3-profile \
 "

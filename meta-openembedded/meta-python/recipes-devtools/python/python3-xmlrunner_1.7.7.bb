@@ -7,3 +7,5 @@ SRC_URI[md5sum] = "7b0b152ed2d278516aedbc0cac22dfb3"
 SRC_URI[sha256sum] = "5a6113d049eca7646111ee657266966e5bbfb0b5ceb2e83ee0772e16d7110f39"
 
 inherit pypi setuptools3
+
+RDEPENDS:${PN} += "python3-unittest"

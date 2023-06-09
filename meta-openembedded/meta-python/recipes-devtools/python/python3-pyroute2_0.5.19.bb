@@ -8,29 +8,30 @@ SRC_URI[sha256sum] = "45460d12ed2a5caf272a357a3360b36d1e346f17afe1425b66fc21d70f
 inherit setuptools3 pypi ptest
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-ctypes \
-    ${PYTHON_PN}-distutils \
-    ${PYTHON_PN}-io \
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-multiprocessing \
-    ${PYTHON_PN}-pickle \
-    ${PYTHON_PN}-pkgutil \
-    ${PYTHON_PN}-pprint \
-    ${PYTHON_PN}-shell \
-    ${PYTHON_PN}-unixadmin \
+    python3-ctypes \
+    python3-distutils \
+    python3-io \
+    python3-json \
+    python3-fcntl \
+    python3-logging \
+    python3-multiprocessing \
+    python3-pickle \
+    python3-pkgutil \
+    python3-pprint \
+    python3-shell \
+    python3-unixadmin \
 "
 
 SRC_URI += " \
-	file://run-ptest \
+    file://run-ptest \
 "
 
 RDEPENDS:${PN}-ptest += " \
-	${PYTHON_PN}-pytest \
-	${PYTHON_PN}-fcntl \
+    python3-pytest \
+    python3-fcntl \
 "
 
 do_install_ptest() {
-	install -d ${D}${PTEST_PATH}/tests
-	cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
+    install -d ${D}${PTEST_PATH}/tests
+    cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
 }

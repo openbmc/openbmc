@@ -1,0 +1,67 @@
+From aaf28a4630af60496c9d33db1d06a7d7d8983422 Mon Sep 17 00:00:00 2001
+From: Sebastian Gottschall <s.gottschall@dd-wrt.com>
+Date: Tue, 23 May 2023 13:50:24 +0600
+Subject: [PATCH] fixes broken aarch64 inline assembly for gcc 13.1
+
+fixes the following error
+
+/mnt/b/yoe/master/build/tmp/work/imx8qm_var_som-yoe-linux/zfs/2.1.9-r0/build/../zfs-2.1.9/module/zfs/vdev_raidz_math_aarch64_neon_common.h:549:24: error: the register specified for 'w7' is not general enough to be used as a register variable
+  549 | register unsigned char w7 asm("v7") __attribute__((vector_size(16)));
+      |                        ^~
+/mnt/b/yoe/master/build/tmp/work/imx8qm_var_som-yoe-linux/zfs/2.1.9-r0/build/../zfs-2.1.9/module/zfs/vdev_raidz_math_aarch64_neonx2.c:193:9: note: in expansion of macro 'GEN_X_DEFINE_6_7'
+  193 |         GEN_X_DEFINE_6_7()      \
+      |         ^~~~~~~~~~~~~~~~
+/mnt/b/yoe/master/build/tmp/work/imx8qm_var_som-yoe-linux/zfs/2.1.9-r0/build/../zfs-2.1.9/module/zfs/vdev_raidz_math_impl.h:1360:9: note: in expansion of macro 'REC_PQR_DEFINE'
+ 1360 |         REC_PQR_DEFINE();
+      |         ^~~~~~~~~~~~~~
+/mnt/b/yoe/master/build/tmp/work/imx8qm_var_som-yoe-linux/zfs/2.1.9-r0/build/../zfs-2.1.9/module/zfs/vdev_raidz_math_aarch64_neon_common.h:551:24: error: the register specified for 'w8' is not general enough to be used as a register variable
+  551 | register unsigned char w8 asm("v8") __attribute__((vector_size(16)));   \
+      |                        ^~
+/mnt/b/yoe/master/build/tmp/work/imx8qm_var_som-yoe-linux/zfs/2.1.9-r0/build/../zfs-2.1.9/module/zfs/vdev_raidz_math_aarch64_neonx2.c:194:9: note: in expansion of macro 'GEN_X_DEFINE_8_9'
+  194 |         GEN_X_DEFINE_8_9()      \
+      |         ^~~~~~~~~~~~~~~~
+/mnt/b/yoe/master/build/tmp/work/imx8qm_var_som-yoe-linux/zfs/2.1.9-r0/build/../zfs-2.1.9/module/zfs/vdev_raidz_math_impl.h:1360:9: note: in expansion of macro 'REC_PQR_DEFINE'
+ 1360 |         REC_PQR_DEFINE();
+      |         ^~~~~~~~~~~~~~
+/mnt/b/yoe/master/build/tmp/work/imx8qm_var_som-yoe-linux/zfs/2.1.9-r0/build/../zfs-2.1.9/module/zfs/vdev_raidz_math_aarch64_neon_common.h:552:24: error: the register specified for 'w9' is not general enough to be used as a register variable
+  552 | register unsigned char w9 asm("v9") __attribute__((vector_size(16)));
+      |                        ^~
+/mnt/b/yoe/master/build/tmp/work/imx8qm_var_som-yoe-linux/zfs/2.1.9-r0/build/../zfs-2.1.9/module/zfs/vdev_raidz_math_aarch64_neonx2.c:194:9: note: in expansion of macro 'GEN_X_DEFINE_8_9'
+  194 |         GEN_X_DEFINE_8_9()      \
+      |         ^~~~~~~~~~~~~~~~
+/mnt/b/yoe/master/build/tmp/work/imx8qm_var_som-yoe-linux/zfs/2.1.9-r0/build/../zfs-2.1.9/module/zfs/vdev_raidz_math_impl.h:1360:9: note: in expansion of macro 'REC_PQR_DEFINE'
+ 1360 |         REC_PQR_DEFINE();
+
+Upstream-Status: Pending [https://github.com/BrainSlayer/zfs/commit/aaf28a4630af60496c9d33db1d06a7d7d8983422]
+Signed-off-by: Sebastian Gottschall <s.gottschall@dd-wrt.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ module/Kbuild.in | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+--- a/module/Kbuild.in
++++ b/module/Kbuild.in
+@@ -57,9 +57,9 @@ asflags-y := $(ZFS_MODULE_CFLAGS) $(ZFS_
+ ccflags-y := $(ZFS_MODULE_CFLAGS) $(ZFS_MODULE_CPPFLAGS)
+ 
+ ifeq ($(CONFIG_ARM64),y)
+-CFLAGS_REMOVE_zcommon/zfs_fletcher_aarch64_neon.o += -mgeneral-regs-only
+-CFLAGS_REMOVE_zfs/vdev_raidz_math_aarch64_neon.o += -mgeneral-regs-only
+-CFLAGS_REMOVE_zfs/vdev_raidz_math_aarch64_neonx2.o += -mgeneral-regs-only
++CFLAGS_REMOVE_zcommon/zfs_fletcher_aarch64_neon.o = -mgeneral-regs-only
++CFLAGS_REMOVE_zfs/vdev_raidz_math_aarch64_neon.o = -mgeneral-regs-only
++CFLAGS_REMOVE_zfs/vdev_raidz_math_aarch64_neonx2.o = -mgeneral-regs-only
+ endif
+ 
+ # Suppress unused-value warnings in sparc64 architecture headers
+--- a/META
++++ b/META
+@@ -1,7 +1,7 @@
+ Meta:          1
+ Name:          zfs
+ Branch:        1.0
+-Version:       2.1.99
++Version:       2.1.11
+ Release:       1
+ Release-Tags:  relext
+ License:       CDDL

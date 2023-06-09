@@ -7,7 +7,7 @@ Security Fixes in Yocto-4.0.7
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  binutils: Fix :cve:`2022-4285`
--  curl: Fix :cve:`2022-43551` and `CVE-2022-43552 <https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-43552>`__
+-  curl: Fix :cve:`2022-43551` and :cve_mitre:`2022-43552`
 -  ffmpeg: Fix :cve:`2022-3109` and :cve:`2022-3341`
 -  go: Fix :cve:`2022-41715` and :cve:`2022-41717`
 -  libX11: Fix :cve:`2022-3554` and :cve:`2022-3555`
@@ -24,7 +24,7 @@ Security Fixes in Yocto-4.0.7
 -  sqlite: Fix :cve:`2022-46908`
 -  systemd: Fix :cve:`2022-45873`
 -  vim: Fix :cve:`2023-0049`, :cve:`2023-0051`, :cve:`2023-0054` and :cve:`2023-0088`
--  webkitgtk: Fix :cve:`2022-32886`, `CVE-2022-32891 <https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-32891>`__ and :cve:`2022-32912`
+-  webkitgtk: Fix :cve:`2022-32886`, :cve_mitre:`2022-32891` and :cve:`2022-32912`
 
 
 Fixes in Yocto-4.0.7

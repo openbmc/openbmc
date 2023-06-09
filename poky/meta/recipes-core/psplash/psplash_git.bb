@@ -65,9 +65,12 @@ S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig update-rc.d update-alternatives systemd
 
-PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} progress-bar fullscreen"
 
 PACKAGECONFIG[systemd] = "--with-systemd,--without-systemd,systemd"
+PACKAGECONFIG[fullscreen] = "--enable-img-fullscreen"
+PACKAGECONFIG[startup-msg] = ",--disable-startup-msg"
+PACKAGECONFIG[progress-bar] = ",--disable-progress-bar"
 
 ALTERNATIVE_PRIORITY = "100"
 ALTERNATIVE_LINK_NAME[psplash] = "${bindir}/psplash"

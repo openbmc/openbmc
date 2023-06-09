@@ -29,7 +29,7 @@ PACKAGECONFIG[sqlite] = "SQLITE=1,SQLITE=0,sqlite3"
 PACKAGECONFIG[zlib]   = "ZLIB=1,ZLIB=0,zlib gzip-native"
 
 # use the PACKAGECONFIG configurations arguments
-EXTRA_OEMAKE = "${PACKAGECONFIG_CONFARGS}"
+EXTRA_OEMAKE = "${PACKAGECONFIG_CONFARGS} RPM_OPT_FLAGS='${CFLAGS}'"
 
 do_compile() {
     # build core only - don't ship gui

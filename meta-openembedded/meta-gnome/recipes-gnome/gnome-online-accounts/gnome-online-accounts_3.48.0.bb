@@ -8,6 +8,7 @@ inherit gnomebase gsettings gobject-introspection gtk-icon-cache vala features_c
 
 DEPENDS = "gdk-pixbuf dbus glib-2.0"
 
+SRC_URI += "file://0001-Replace-filename-with-basename.patch"
 SRC_URI[archive.sha256sum] = "418bb9fcffdbd72a98205ad365137617fc1e3551a54de74f6a98d45d266175bf"
 
 PACKAGECONFIG ?= "goabackend kerberos owncloud lastfm google windows_live"

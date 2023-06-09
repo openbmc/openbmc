@@ -18,10 +18,16 @@ COMPATIBLE_HOST = "(arm|aarch64).*-linux"
 KERNEL_MODULE_AUTOLOAD += "arm-ffa-user"
 KERNEL_MODULE_PROBECONF += "arm-ffa-user"
 
-# This debugfs driver is used only by uefi-test for testing SmmGW SP
-# UUIDs = SMM Gateway SP
-FFA-USER-UUID-LIST ?= "ed32d533-99e6-4209-9cc0-2d72cdd998a7"
-module_conf_arm-ffa-user = "options arm-ffa-user uuid_str_list=${FFA-USER-UUID-LIST}"
+# SMM Gateway SP
+UUID_LIST = "${@bb.utils.contains('MACHINE_FEATURES', 'ts-smm-gateway', \
+                                  'ed32d533-99e6-4209-9cc0-2d72cdd998a7', '' , d)}"
+# SPMC Tests SPs
+UUID_LIST:append = "${@bb.utils.contains('MACHINE_FEATURES', 'optee-spmc-test', \
+                                  ',5c9edbc3-7b3a-4367-9f83-7c191ae86a37,7817164c-c40c-4d1a-867a-9bb2278cf41a,23eb0100-e32a-4497-9052-2f11e584afa6', '' , d)}"
+
+FFA_USER_UUID_LIST ?= "${@d.getVar('UUID_LIST').strip(',')}"
+
+module_conf_arm-ffa-user = "options arm-ffa-user uuid_str_list=${FFA_USER_UUID_LIST}"
 
 do_install:append() {
     install -d ${D}${includedir}

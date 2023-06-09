@@ -14,6 +14,13 @@ SRC_URI += " \
 	file://run-ptest \
 "
 
+RDEPENDS:${PN} += " \
+    python3-cryptography \
+    python3-datetime \
+    python3-idna \
+    python3-io \
+"
+
 RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
 	${PYTHON_PN}-service-identity \

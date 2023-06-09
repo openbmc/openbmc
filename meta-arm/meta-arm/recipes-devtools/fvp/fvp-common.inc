@@ -3,6 +3,7 @@ HOMEPAGE = "https://developer.arm.com/tools-and-software/simulation-models/fixed
 # FVP has an End User License Agreement. Add Arm-FVP-EULA to your
 # LICENSE_FLAGS_ACCEPTED if you agree to these terms.
 LICENSE_FLAGS = "Arm-FVP-EULA"
+LICENSE_FLAGS_DETAILS[Arm-FVP-EULA] = "https://developer.arm.com/downloads/-/arm-ecosystem-fvps/eula"
 
 LICENSE = "Proprietary & Apache-2.0 & Python-2.0 & GPL-3.0-with-GCC-exception & Zlib & NCSA & LGPL-2.0-or-later & MIT & BSD-3-Clause"
 

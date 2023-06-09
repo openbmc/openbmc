@@ -40,6 +40,8 @@ to run multiple builds and to cache build artifacts, improving build efficiency.
 If you have a shortage of disk space, see the ":doc:`/dev-manual/disk-space`"
 section of the Development Tasks Manual.
 
+.. _system-requirements-minimum-ram:
+
 Minimum System RAM
 ==================
 

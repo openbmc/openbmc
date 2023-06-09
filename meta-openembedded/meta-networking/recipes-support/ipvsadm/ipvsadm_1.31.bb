@@ -20,6 +20,8 @@ SRC_URI = "https://mirrors.edge.kernel.org/pub/linux/utils/kernel/ipvsadm/${BP}.
         file://0001-Modify-the-Makefile-for-cross-compile.patch \
         file://0003-ipvsadm-remove-dependency-on-bash.patch \
         file://makefile-add-ldflags.patch \
+        file://0001-Add-CCFLAGS-to-cflags.patch \
+        file://0001-libipvs-Include-missing-sys-types.h.patch \
 "
 
 SRC_URI[md5sum] = "f6d1707c5baf684b58fd33682d67871f"
@@ -27,10 +29,10 @@ SRC_URI[sha256sum] = "1a0a5e25b5a1226435d2fb76341656f83a710183aebb0d204db39c0ec3
 
 UPSTREAM_CHECK_URI = "${KERNELORG_MIRROR}/linux/utils/kernel/ipvsadm"
 
+EXTRA_OEMAKE += "CCFLAGS='${CFLAGS}'"
+
 do_compile() {
-    oe_runmake \
-    CC="${CC} -I${STAGING_INCDIR} -I${STAGING_INCDIR}/libnl3 -L${STAGING_LIBDIR}" \
-    all
+    oe_runmake all
 }
 
 do_install() {

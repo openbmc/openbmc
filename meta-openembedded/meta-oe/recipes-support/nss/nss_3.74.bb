@@ -289,3 +289,6 @@ CVE_CHECK_IGNORE += "CVE-2006-5201"
 # CVES CVE-2017-11695 CVE-2017-11696 CVE-2017-11697 CVE-2017-11698 only affect
 # the legacy db (libnssdbm), only compiled with --enable-legacy-db.
 CVE_CHECK_IGNORE += "CVE-2017-11695 CVE-2017-11696 CVE-2017-11697 CVE-2017-11698"
+
+# vulnerability was introduced in 3.77 and fixed in 3.87
+CVE_CHECK_IGNORE += "CVE-2022-3479"

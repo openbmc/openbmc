@@ -137,6 +137,10 @@ PERF_EXTRA_LDFLAGS:mipsarchn64el = "-m elf64ltsmip"
 do_compile() {
 	# Linux kernel build system is expected to do the right thing
 	unset CFLAGS
+        test -e ${S}/tools/lib/traceevent/plugins/Makefile && \
+            sed -i -e 's|\$(libdir)/traceevent/plugins|\$(libdir)/traceevent_${KERNEL_VERSION}/plugins|g' ${S}/tools/lib/traceevent/plugins/Makefile
+	test -e ${S}/tools/perf/Makefile.config && \
+            sed -i -e 's|\$(libdir)/traceevent/plugins|\$(libdir)/traceevent_${KERNEL_VERSION}/plugins|g' ${S}/tools/perf/Makefile.config
 	oe_runmake all
 }
 
@@ -364,7 +368,7 @@ RSUGGESTS_SCRIPTING = "${@bb.utils.contains('PACKAGECONFIG', 'scripting', '${PN}
 RSUGGESTS:${PN} += "${PN}-archive ${PN}-tests ${RSUGGESTS_SCRIPTING}"
 
 FILES_SOLIBSDEV = ""
-FILES:${PN} += "${libexecdir}/perf-core ${exec_prefix}/libexec/perf-core ${libdir}/traceevent ${libdir}/libperf-jvmti.so"
+FILES:${PN} += "${libexecdir}/perf-core ${exec_prefix}/libexec/perf-core ${libdir}/traceevent* ${libdir}/libperf-jvmti.so"
 FILES:${PN}-archive = "${libdir}/perf/perf-core/perf-archive"
 FILES:${PN}-tests = "${libdir}/perf/perf-core/tests ${libexecdir}/perf-core/tests"
 FILES:${PN}-python = " \

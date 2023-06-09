@@ -293,11 +293,11 @@ example:
       # CC=i586-poky-linux-gcc -m32 -march=i586 --sysroot=/opt/poky/2.5/sysroots/i586-poky-linux
       # CC="gcc"
       all: main.o module.o
-      	${CC} main.o module.o -o target_bin
+        ${CC} main.o module.o -o target_bin
       main.o: main.c module.h
       	${CC} -I . -c main.c
-      module.o: module.c
-      	module.h ${CC} -I . -c module.c
+      module.o: module.c module.h
+        ${CC} -I . -c module.c
       clean:
       	rm -rf *.o
       	rm target_bin

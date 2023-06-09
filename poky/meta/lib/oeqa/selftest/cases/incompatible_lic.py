@@ -113,6 +113,7 @@ INCOMPATIBLE_LICENSE:pn-core-image-minimal = "GPL-3.0* LGPL-3.0*"
             raise AssertionError(result.output)
 
     def test_bash_and_license(self):
+        self.disable_class("create-spdx")
         self.write_config(self.default_config() + '\nLICENSE:append:pn-bash = " & SomeLicense"')
         error_msg = "ERROR: core-image-minimal-1.0-r0 do_rootfs: Package bash cannot be installed into the image because it has incompatible license(s): GPL-3.0-or-later"
 
@@ -121,6 +122,7 @@ INCOMPATIBLE_LICENSE:pn-core-image-minimal = "GPL-3.0* LGPL-3.0*"
             raise AssertionError(result.output)
 
     def test_bash_or_license(self):
+        self.disable_class("create-spdx")
         self.write_config(self.default_config() + '\nLICENSE:append:pn-bash = " | SomeLicense"')
 
         bitbake('core-image-minimal')

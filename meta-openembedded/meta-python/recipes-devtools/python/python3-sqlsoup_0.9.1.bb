@@ -7,3 +7,5 @@ PYPI_PACKAGE = "sqlsoup"
 SRC_URI[sha256sum] = "2fafb7732a663dcd59b37e64d1c94d5fb20d4fad32cd8ee260aa1cd9a10340d6"
 
 inherit pypi setuptools3
+
+RDEPENDS:${PN} += "python3-sqlalchemy"

@@ -54,6 +54,9 @@ deltask do_compile
 deltask do_install
 deltask do_populate_sysroot
 
+do_create_runtime_spdx[deptask] = "do_create_spdx"
+do_create_runtime_spdx[rdeptask] = ""
+
 INHIBIT_DEFAULT_DEPS = "1"
 
 python () {

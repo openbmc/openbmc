@@ -46,6 +46,8 @@ def get_glibc_loader(d):
         dynamic_loader = "${base_libdir}/ld-linux-mipsn8.so.1"
     elif targetarch.startswith("mips"):
         dynamic_loader = "${base_libdir}/ld.so.1"
+    elif targetarch.startswith("loongarch64"):
+        dynamic_loader = "${base_libdir}/ld-linux-loongarch-lp64d.so.1"
     elif targetarch == "powerpc64le":
         dynamic_loader = "${base_libdir}/ld64.so.2"
     elif targetarch == "powerpc64":

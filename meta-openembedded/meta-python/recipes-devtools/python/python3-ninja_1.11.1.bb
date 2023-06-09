@@ -15,6 +15,11 @@ do_install:append () {
 	rm -rf ${D}${bindir}
 }
 
-RDEPENDS:${PN} = "ninja"
+RDEPENDS:${PN} = " \
+    ninja \
+    python3-io \
+    python3-json \
+    python3-ninja-syntax \
+"
 
 BBCLASSEXTEND = "native nativesdk"

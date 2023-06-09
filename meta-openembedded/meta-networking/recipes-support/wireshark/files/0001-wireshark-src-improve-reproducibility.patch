@@ -13,24 +13,11 @@ Signed-off-by: Oleksiy Obitotskyy <oobitots@cisco.com>
  tools/ncp2222.py         | 2 +-
  2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tools/make-plugin-reg.py b/tools/make-plugin-reg.py
-index 66b4656..c52b3fc 100755
---- a/tools/make-plugin-reg.py
-+++ b/tools/make-plugin-reg.py
-@@ -28,7 +28,7 @@ preamble = """\
-  *
-  * Generated automatically from %s.
-  */
--""" % (sys.argv[0])
-+""" % (os.path.basename(sys.argv[0]))
- 
- # Create the proper list of filenames
- filenames = []
-diff --git a/tools/ncp2222.py b/tools/ncp2222.py
-index 1dea4ec..dc376e3 100755
---- a/tools/ncp2222.py
-+++ b/tools/ncp2222.py
-@@ -5858,7 +5858,7 @@ def produce_code():
+Index: wireshark-4.0.6/tools/ncp2222.py
+===================================================================
+--- wireshark-4.0.6.orig/tools/ncp2222.py
++++ wireshark-4.0.6/tools/ncp2222.py
+@@ -5891,7 +5891,7 @@ def produce_code():
  
      print("/*")
      print(" * Do not modify this file. Changes will be overwritten.")
@@ -39,6 +26,3 @@ index 1dea4ec..dc376e3 100755
      print(" */\n")
  
      print("""
--- 
-2.26.2.Cisco
-

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """\
 Sanitize a bitbake file following the OpenEmbedded style guidelines,
@@ -436,8 +436,8 @@ if __name__ == "__main__":
     # -- dump the sanitized .bb file --
     addEmptyLine = False
     # write comments that are not related to variables nor routines
-    for l in commentBloc:
-        olines.append(l)
+    for c in commentBloc:
+        olines.append(c)
     # write variables and routines
     previourVarPrefix = "unknown"
     for k in OE_vars:
@@ -446,8 +446,8 @@ if __name__ == "__main__":
         if seen_vars[k] != []:
             if addEmptyLine and not k.startswith(previourVarPrefix):
                 olines.append("")
-            for l in seen_vars[k]:
-                olines.append(l)
+            for s in seen_vars[k]:
+                olines.append(s)
             previourVarPrefix = k.split('_')[0] == '' and "unknown" or k.split('_')[0]
     for line in olines:
         print(line)

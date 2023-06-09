@@ -516,12 +516,12 @@ python () {
         check_license_format(d)
         unmatched_license_flags = check_license_flags(d)
         if unmatched_license_flags:
-            if len(unmatched_license_flags) == 1:
-                message = "because it has a restricted license '{0}'. Which is not listed in LICENSE_FLAGS_ACCEPTED".format(unmatched_license_flags[0])
-            else:
-                message = "because it has restricted licenses {0}. Which are not listed in LICENSE_FLAGS_ACCEPTED".format(
-                    ", ".join("'{0}'".format(f) for f in unmatched_license_flags))
-            bb.debug(1, "Skipping %s %s" % (pn, message))
+            for unmatched in unmatched_license_flags:
+                message = "Has a restricted license '%s' which is not listed in your LICENSE_FLAGS_ACCEPTED." % unmatched
+                details = d.getVarFlag("LICENSE_FLAGS_DETAILS", unmatched)
+                if details:
+                    message += " For further details, see %s." % details
+            bb.debug(1, "Skipping %s: %s" % (pn, message))
             raise bb.parse.SkipRecipe(message)
 
     # If we're building a target package we need to use fakeroot (pseudo)

@@ -39,6 +39,10 @@ inherit cmake pkgconfig update-rc.d systemd
 
 OECMAKE_GENERATOR = "Unix Makefiles"
 
+do_configure:append() {
+    sed -i -e 's|${STAGING_BINDIR_TOOLCHAIN}/||g' ${S}/include/monkey/mk_env.h
+}
+
 do_install:append() {
     rmdir ${D}${localstatedir}/log/${BPN} ${D}${localstatedir}/run ${D}${localstatedir}/log
     rmdir --ignore-fail-on-non-empty ${D}${localstatedir}

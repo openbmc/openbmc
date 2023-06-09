@@ -375,7 +375,7 @@ class ProcessServer():
                 lock = bb.utils.lockfile(lockfile, shared=False, retry=False, block=False)
                 if not lock:
                     newlockcontents = get_lock_contents(lockfile)
-                    if not newlockcontents[0].startswith([os.getpid() + "\n", os.getpid() + " "]):
+                    if not newlockcontents[0].startswith([f"{os.getpid()}\n", f"{os.getpid()} "]):
                         # A new server was started, the lockfile contents changed, we can exit
                         serverlog("Lockfile now contains different contents, exiting: " + str(newlockcontents))
                         return

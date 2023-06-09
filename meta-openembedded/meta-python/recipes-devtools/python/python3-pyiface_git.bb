@@ -7,6 +7,12 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=4fe869ee987a340198fb0d54c55c47f1"
 
 DEPENDS += "python3-setuptools-scm-native"
 
+RDEPENDS:${PN} += " \
+    python3-ctypes \
+    python3-fcntl \
+    python3-io \
+"
+
 inherit setuptools3
 
 SRC_URI = "git://github.com/bat-serjo/PyIface.git;protocol=https;branch=master"

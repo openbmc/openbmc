@@ -9,7 +9,7 @@ S = "${WORKDIR}/git"
 
 inherit autotools gettext pkgconfig python3native features_check
 
-REQUIRED_DISTRO_FEATURES = "gobject-introspection-data gobject-introspection"
+REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
 
 DEPENDS = "cups glib-2.0 libusb xmlto-native desktop-file-utils-native autoconf-archive-native"
 

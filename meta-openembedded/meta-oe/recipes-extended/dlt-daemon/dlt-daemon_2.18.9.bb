@@ -1,20 +1,20 @@
 SUMMARY = "Diagnostic Log and Trace"
 DESCRIPTION = "This component provides a standardised log and trace interface, \
 based on the standardised protocol specified in the AUTOSAR standard 4.0 DLT. \
-This component can be used by GENIVI components and other applications as \
+This component can be used by COVESA components and other applications as \
 logging facility providing: \
 - the DLT shared library \
 - the DLT daemon, including startup scripts \
 - the DLT daemon adaptors- the DLT client console utilities \
 - the DLT test applications"
-HOMEPAGE = "https://www.genivi.org/"
+HOMEPAGE = "https://www.covesa.global/"
 SECTION = "console/utils"
 LICENSE = "MPL-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=8184208060df880fe3137b93eb88aeea"
 
 DEPENDS = "zlib gzip-native json-c"
 
-SRC_URI = "git://github.com/GENIVI/${BPN}.git;protocol=https;branch=master \
+SRC_URI = "git://github.com/COVESA/${BPN}.git;protocol=https;branch=master \
            file://0002-Don-t-execute-processes-as-a-specific-user.patch \
            file://0004-Modify-systemd-config-directory.patch \
            file://481.patch \

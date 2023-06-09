@@ -249,6 +249,13 @@ class OESelftestTestCase(OETestCase):
         self.logger.debug("Writing to: %s\n%s\n" % (self.machineinc_path, data))
         ftools.write_file(self.machineinc_path, data)
 
+    def disable_class(self, classname):
+        destfile = "%s/classes/%s.bbclass" % (self.builddir, classname)
+        os.makedirs(os.path.dirname(destfile), exist_ok=True)
+        self.track_for_cleanup(destfile)
+        self.logger.debug("Creating empty class: %s\n" % (destfile))
+        ftools.write_file(destfile, "")
+
     # check does path exist
     def assertExists(self, expr, msg=None):
         if not os.path.exists(expr):

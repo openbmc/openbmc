@@ -11,6 +11,11 @@ SRC_URI += " \
         file://run-ptest \
 "
 
+RDEPENDS:${PN} += " \
+    python3-compression \
+    python3-unittest \
+"
+
 RDEPENDS:${PN}-ptest += " \
         ${PYTHON_PN}-pytest \
         ${PYTHON_PN}-typing-extensions \

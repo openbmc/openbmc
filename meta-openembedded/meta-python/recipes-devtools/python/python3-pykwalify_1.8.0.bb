@@ -11,9 +11,10 @@ PYPI_PACKAGE = "pykwalify"
 inherit setuptools3 pypi
 
 RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-docopt \
-    ${PYTHON_PN}-dateutil \
-    ${PYTHON_PN}-ruamel-yaml \
+    python3-dateutil \
+    python3-docopt \
+    python3-logging \
+    python3-ruamel-yaml \
 "
 
 BBCLASSEXTEND = "native nativesdk"

@@ -10,6 +10,9 @@ SRC_URI[sha256sum] = "bd6ca4a3c4285c1a2d4349e5a035fdf8fb94e04ccd0fcbe6ba289dae9c
 PYPI_PACKAGE = "PyJWT"
 inherit pypi setuptools3
 
-RDEPENDS:${PN} = "${PYTHON_PN}-cryptography"
+RDEPENDS:${PN} = " \
+    python3-json \
+    python3-cryptography \
+"
 
 BBCLASSEXTEND = "native nativesdk"

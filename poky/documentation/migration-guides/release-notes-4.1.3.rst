@@ -24,8 +24,8 @@ Security Fixes in Yocto-4.1.3
 -  sudo: Fix :cve:`2023-22809`
 -  tar: Fix :cve:`2022-48303`
 -  vim: Fix :cve:`2023-0049`, :cve:`2023-0051`, :cve:`2023-0054`, :cve:`2023-0288`, :cve:`2023-0433` and :cve:`2023-0512`
--  xserver-xorg: Fix `CVE-2023-0494 <https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-0494>`__
--  xwayland: Fix `CVE-2023-0494 <https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-0494>`__
+-  xserver-xorg: Fix :cve_mitre:`2023-0494`
+-  xwayland: Fix :cve_mitre:`2023-0494`
 
 
 Fixes in Yocto-4.1.3

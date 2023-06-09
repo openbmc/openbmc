@@ -59,4 +59,8 @@ do_install:append() {
 
 FILES:${PN} += "${PYTHON_SITEPACKAGES_DIR} ${datadir}/ncat"
 
-RDEPENDS:${PN} += "python3-core"
+RDEPENDS:${PN} += " \
+    python3-difflib \
+    python3-asyncio \
+    python3-xml \
+"

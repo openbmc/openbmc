@@ -1352,23 +1352,26 @@ class Wic2(WicTestCase):
         """Test --part-name argument to set partition name in GPT table"""
         config = 'IMAGE_FSTYPES += "wic"\nWKS_FILE = "test_gpt_partition_name.wks"\n'
         self.append_config(config)
-        bitbake('core-image-minimal')
+        image = 'core-image-minimal'
+        bitbake(image)
         self.remove_config(config)
         deploy_dir = get_bb_var('DEPLOY_DIR_IMAGE')
-        machine = self.td['MACHINE']
+        bb_vars = get_bb_vars(['DEPLOY_DIR_IMAGE', 'IMAGE_LINK_NAME'], image)
+        image_path = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], '%s.wic' % bb_vars['IMAGE_LINK_NAME'])
 
-        image_path = os.path.join(deploy_dir, 'core-image-minimal-%s.wic' % machine)
+        sysroot = get_bb_var('RECIPE_SYSROOT_NATIVE', 'wic-tools')
+
         # Image is created
-        self.assertTrue(os.path.exists(image_path))
+        self.assertTrue(os.path.exists(image_path), "image file %s doesn't exist" % image_path)
 
         # Check the names of the three partitions
         # as listed in test_gpt_partition_name.wks
-        result = runCmd("sfdisk --part-label %s 1" % image_path)
+        result = runCmd("%s/usr/sbin/sfdisk --part-label %s 1" % (sysroot, image_path))
         self.assertEqual('boot-A', result.output)
-        result = runCmd("sfdisk --part-label %s 2" % image_path)
+        result = runCmd("%s/usr/sbin/sfdisk --part-label %s 2" % (sysroot, image_path))
         self.assertEqual('root-A', result.output)
         # When the --part-name is not defined, the partition name is equal to the --label
-        result = runCmd("sfdisk --part-label %s 3" % image_path)
+        result = runCmd("%s/usr/sbin/sfdisk --part-label %s 3" % (sysroot, image_path))
         self.assertEqual('ext-space', result.output)
 
 class ModifyTests(WicTestCase):

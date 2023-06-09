@@ -5,12 +5,12 @@ Subject: [PATCH] test: Fix build with new compiler defaults to -fno-common
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
 ---
  sntp/tests/run-packetHandling.c | 2 +-
  sntp/tests/run-t-log.c          | 2 +-
  sntp/tests/run-utilities.c      | 2 +-
- tests/libntp/test-libntp.h      | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/sntp/tests/run-packetHandling.c b/sntp/tests/run-packetHandling.c
 index 7790b20..c58380c 100644
@@ -51,16 +51,6 @@ index f717882..98d9bf1 100644
  
  
  //=======MAIN=====
-diff --git a/tests/libntp/test-libntp.h b/tests/libntp/test-libntp.h
-index 93050b3..60461d8 100644
---- a/tests/libntp/test-libntp.h
-+++ b/tests/libntp/test-libntp.h
-@@ -5,4 +5,4 @@
- 
- time_t timefunc(time_t *ptr);
- void settime(int y, int m, int d, int H, int M, int S);
--time_t nowtime;
-+extern time_t nowtime;
 -- 
-2.32.0
+2.34.1
 

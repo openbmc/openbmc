@@ -11,3 +11,9 @@ PIP_INSTALL_PACKAGE = "pefile"
 PIP_INSTALL_DIST_PATH = "${S}/dist"
 
 BBCLASSEXTEND = "native nativesdk"
+
+RDEPENDS:${PN} += " \
+    python3-mmap \
+    python3-netclient \
+    python3-stringold \
+"

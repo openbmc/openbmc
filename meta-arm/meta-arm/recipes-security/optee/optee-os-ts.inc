@@ -51,4 +51,12 @@ DEPENDS:append  = "${@bb.utils.contains('MACHINE_FEATURES', 'ts-smm-gateway', \
 SP_PATHS:append = "${@bb.utils.contains('MACHINE_FEATURES', 'ts-smm-gateway', \
                                         ' ${TS_BIN}/${SMM_GATEWAY_UUID}.stripped.elf', '', d)}"
 
-EXTRA_OEMAKE:append = "${@oe.utils.conditional('SP_PATHS', '', '', ' CFG_SECURE_PARTITION=y SP_PATHS="${SP_PATHS}" ', d)}"
+# SPM test SPs
+DEPENDS:append  = "${@bb.utils.contains('MACHINE_FEATURES', 'optee-spmc-test', \
+                                        ' ts-sp-spm-test1 ts-sp-spm-test2 ts-sp-spm-test3', '' , d)}"
+SP_PATHS:append = "${@bb.utils.contains('MACHINE_FEATURES', 'optee-spmc-test', \
+                                        ' ${TS_BIN}/${SPM_TEST1_UUID}.stripped.elf ${TS_BIN}/${SPM_TEST2_UUID}.stripped.elf ${TS_BIN}/${SPM_TEST3_UUID}.stripped.elf', '', d)}"
+EXTRA_OEMAKE:append = "${@bb.utils.contains('MACHINE_FEATURES', 'optee-spmc-test', \
+                                        ' CFG_SPMC_TESTS=y', '' , d)}"
+
+EXTRA_OEMAKE:append = "${@oe.utils.conditional('SP_PATHS', '', '', ' CFG_MAP_EXT_DT_SECURE=y CFG_SECURE_PARTITION=y SP_PATHS="${SP_PATHS}" ', d)}"

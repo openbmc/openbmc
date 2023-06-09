@@ -2,7 +2,7 @@ DESCRIPTION = "Bluetooth library with attribute support"
 SECTION = "libs/network"
 
 LICENSE = "GPL-2.0-or-later | BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://CMakeLists.txt;beginline=1;endline=6;md5=71fdd2be76b4e95fe28324a70d4981c5"
+LIC_FILES_CHKSUM = "file://CMakeLists.txt;beginline=1;endline=6;md5=a87ee154f005a6f035b8b34ac2191f3b"
 
 DEPENDS = "bluez5 glib-2.0"
 DEPENDS += "glib-2.0-native"
@@ -14,7 +14,7 @@ SRC_URI = "git://github.com/labapart/gattlib.git;branch=master;protocol=https \
            "
 
 SRCBRANCH = "master"
-SRCREV = "fa54ae42ccb3d8f911e00b02ed1e581537e47f79"
+SRCREV = "33a8a275928b186381bb0aea0f9778e330e57ec3"
 
 S = "${WORKDIR}/git"
 
@@ -27,6 +27,13 @@ EXTRA_OECMAKE += "-DGATTLIB_PYTHON_INTERFACE=OFF"
 EXTRA_OECMAKE += "-DGATTLIB_BUILD_DOCS=OFF"
 
 inherit pkgconfig cmake
+
+do_compile:append() {
+    for f in org-bluez-gattdescriptor1.c org-bluez-battery1.c org-bluez-adaptater1.c \
+        org-bluez-device1.c org-bluez-gattservice1.c org-bluez-gattcharacteristic1.c; do
+        sed -i -e 's|${B}/dbus/||g' ${B}/dbus/$f
+    done
+}
 
 FILES:${PN} = "${libdir}/*"
 FILES:${PN}-dev = "${includedir}/* ${libdir}/pkgconfig"

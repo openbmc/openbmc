@@ -9,7 +9,7 @@ SRC_URI += "crate://crates.io/parsec-tool/${PV} \
 "
 SRC_URI[parsec-tool-0.6.0.sha256sum] = "f51d5d7f0caca1c335324b52482fa5edbf6c9cfd2e6865e5cb22716d52dcb367"
 
-S = "${CARGO_VENDORING_DIRECTORY}/${BP}"
+B = "${CARGO_VENDORING_DIRECTORY}/${BP}"
 
 do_install() {
   install -d ${D}/${bindir}

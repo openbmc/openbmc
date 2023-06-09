@@ -1,0 +1,36 @@
+From 1bc180ec333d90e1a11deff46b5639ab5d40408d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 26 May 2023 09:29:23 -0700
+Subject: [PATCH] Add CCFLAGS to cflags
+
+This is to append the flags from build environment.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile         | 1 +
+ libipvs/Makefile | 3 +++
+ 2 files changed, 4 insertions(+)
+
+--- a/Makefile
++++ b/Makefile
+@@ -50,6 +50,7 @@ else
+     CFLAGS = -Wall -Wunused -Wstrict-prototypes -g
+ endif
+ 
++CFLAGS += $(CCFLAGS)
+ 
+ #####################################
+ # No servicable parts below this line
+--- a/libipvs/Makefile
++++ b/libipvs/Makefile
+@@ -1,6 +1,9 @@
+ # Makefile for libipvs
+ 
+ CFLAGS		= -Wall -Wunused -Wstrict-prototypes -g -fPIC
++
++CFLAGS += $(CCFLAGS)
++
+ ifneq (0,$(HAVE_NL))
+ CFLAGS		+= -DLIBIPVS_USE_NL
+ CFLAGS		+= $(shell \

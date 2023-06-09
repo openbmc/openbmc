@@ -8,6 +8,8 @@ header:
 machine: qemuarm64
 
 local_conf_header:
+  license: |
+    LICENSE_FLAGS_ACCEPTED += "Arm-FVP-EULA"
   sdk: |
     SDKMACHINE = "x86_64"
 

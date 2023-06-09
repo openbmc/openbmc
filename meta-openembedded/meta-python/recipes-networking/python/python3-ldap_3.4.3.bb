@@ -22,8 +22,9 @@ do_configure:prepend() {
 }
 
 RDEPENDS:${PN} = " \
-    ${PYTHON_PN}-pprint \
-    ${PYTHON_PN}-threading \
-    ${PYTHON_PN}-pyasn1 \
-    ${PYTHON_PN}-pyasn1-modules \
+    python3-pprint \
+    python3-pyasn1 \
+    python3-pyasn1-modules \
+    python3-threading \
+    python3-unittest \
 "

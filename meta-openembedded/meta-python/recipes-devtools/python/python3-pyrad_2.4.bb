@@ -9,3 +9,11 @@ SRC_URI[sha256sum] = "057de4b7e89d8da57ba782c1bde45c63ebee720ae2c0b0a69beaff15c4
 SRC_URI += "file://use-poetry-core.patch"
 
 inherit pypi python_poetry_core
+
+RDEPENDS:${PN} += " \
+    python3-crypt \
+    python3-io \
+    python3-logging \
+    python3-netaddr \
+    python3-six \
+"

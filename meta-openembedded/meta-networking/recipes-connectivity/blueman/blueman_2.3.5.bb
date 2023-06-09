@@ -6,7 +6,7 @@ DEPENDS = "gtk+3 glib-2.0 bluez5 python3-pygobject python3-cython-native"
 
 inherit meson gettext systemd gsettings pkgconfig python3native gtk-icon-cache useradd features_check
 
-REQUIRED_DISTRO_FEATURES = "gobject-introspection"
+REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
 
 SRC_URI = " \
     git://github.com/blueman-project/blueman.git;protocol=https;branch=2-3-stable \

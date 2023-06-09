@@ -178,11 +178,25 @@ do_deploy() {
     fi
 
     # UART support
-    if [ "${ENABLE_UART}" = "1" ] || [ "${ENABLE_UART}" = "0" ] ; then
+    if [ "${ENABLE_UART}" = "1" ] || [ "${ENABLE_UART}" = "0" ]; then
         echo "# Enable UART" >>$CONFIG
         echo "enable_uart=${ENABLE_UART}" >>$CONFIG
     elif [ -n "${ENABLE_UART}" ]; then
         bbfatal "Invalid value for ENABLE_UART [${ENABLE_UART}]. The value for ENABLE_UART can be 0 or 1."
+    fi
+
+    # U-Boot requires "enable_uart=1" for various boards to operate correctly
+    # cf https://source.denx.de/u-boot/u-boot/-/blob/v2023.04/arch/arm/mach-bcm283x/Kconfig?ref_type=tags#L65
+    if [ "${RPI_USE_U_BOOT}" = "1" ] && [ "${ENABLE_UART}" != "1" ]; then
+        case "${UBOOT_MACHINE}" in
+            rpi_0_w_defconfig|rpi_3_32b_config|rpi_4_32b_config|rpi_arm64_config)
+                if [ "${ENABLE_UART}" = "0" ]; then
+                    bbfatal "Invalid configuration: RPI_USE_U_BOOT requires to enable the UART in config.txt for ${MACHINE}"
+                fi
+                echo "# U-Boot requires UART" >>$CONFIG
+                echo "enable_uart=1" >>$CONFIG
+                ;;
+        esac
     fi
 
     # Infrared support

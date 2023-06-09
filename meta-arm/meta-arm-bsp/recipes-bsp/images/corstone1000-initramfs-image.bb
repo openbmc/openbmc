@@ -15,8 +15,6 @@ inherit core-image
 
 inherit image-buildinfo
 
-IMAGE_FEATURES += "debug-tweaks"
-
 #package management is not supported in corstone1000
 IMAGE_FEATURES:remove = "package-management"
 

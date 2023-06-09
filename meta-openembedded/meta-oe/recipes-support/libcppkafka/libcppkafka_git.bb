@@ -21,4 +21,5 @@ S = "${WORKDIR}/git"
 
 do_install:append(){
     chrpath -d ${D}${libdir}/libcppkafka.so.0.3.1
+    sed -i -e 's|${STAGING_INCDIR}|\$\{includedir\}|g' ${D}${datadir}/pkgconfig/cppkafka.pc
 }

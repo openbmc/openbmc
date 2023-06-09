@@ -26,6 +26,9 @@ inherit goarch
 
 # | ./github.com/minio/mc/main.go:27:(.text+0xd258b8): relocation R_MIPS_HI16 against `a local symbol' cannot be used when making a shared object; recompile with -fPIC
 COMPATIBLE_HOST:mips = "null"
+# ERROR: QA Issue: minio: ELF binary /usr/sbin/mc has relocations in .text [textrel]
+# Needs fixing with go >= 1.20.4"
+EXCLUDE_FROM_WORLD = "1"
 
 DEPENDS += "rsync-native"
 

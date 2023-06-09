@@ -1,0 +1,33 @@
+From 92747aab189aa3cee954ab31ee019205f8984155 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 27 May 2023 17:22:10 -0700
+Subject: [PATCH] cmake: Allow SYSTEMCTL_BIN to be overridden from environment
+
+This allows to encode correct paths which are inside the target rootfs
+for systemctl
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9b7462861..c4d82fb49 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -226,7 +226,10 @@ else()
+   set(CYTHON_EXECUTABLE "")
+ endif()
+ 
+-find_program(SYSTEMCTL_BIN systemctl HINTS "/usr/bin" "/bin")
++if (NOT SYSTEMCTL_BIN)
++  find_program(SYSTEMCTL_BIN systemctl HINTS "/usr/bin" "/bin")
++endif()
++
+ if (NOT SYSTEMCTL_BIN)
+   set (SYSTEMCTL_BIN "/bin/systemctl")
+ endif()
+-- 
+2.40.1
+

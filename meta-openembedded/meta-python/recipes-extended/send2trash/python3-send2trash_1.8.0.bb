@@ -7,3 +7,5 @@ inherit pypi setuptools3
 SRC_URI[sha256sum] = "d2c24762fd3759860a0aff155e45871447ea58d2be6bdd39b5c8f966a0c99c2d"
 
 PYPI_PACKAGE = "Send2Trash"
+
+RDEPENDS:${PN} += "python3-datetime"

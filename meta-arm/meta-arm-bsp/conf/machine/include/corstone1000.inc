@@ -43,6 +43,7 @@ OPTEE_BINARY = "tee-pager_v2.bin"
 # Include smm-gateway and se-proxy SPs into optee-os binary
 MACHINE_FEATURES += "ts-smm-gateway ts-se-proxy"
 TS_PLATFORM = "arm/corstone1000"
+TS_SP_SE_PROXY_CONFIG = "corstone1000"
 
 # External System(Cortex-M3)
 EXTRA_IMAGEDEPENDS += "external-system"

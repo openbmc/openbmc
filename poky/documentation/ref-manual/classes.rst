@@ -607,10 +607,15 @@ subdirectory. This avoids clashes with the :ref:`ref-classes-kernel-devicetree`
 output. Additionally, the device trees are populated into the sysroot for
 access via the sysroot from within other recipes.
 
+By default, all device tree sources located in :term:`DT_FILES_PATH` directory
+are compiled. To select only particular sources, set :term:`DT_FILES` to
+a space-separated list of files (relative to :term:`DT_FILES_PATH`). For
+convenience, both ``.dts`` and ``.dtb`` extensions can be used.
+
 An extra padding is appended to non-overlay device trees binaries. This
 can typically be used as extra space for adding extra properties at boot time.
-The padding size can be modified by setting ``DT_PADDING_SIZE`` to the desired
-size, in bytes.
+The padding size can be modified by setting :term:`DT_PADDING_SIZE`
+to the desired size, in bytes.
 
 See :oe_git:`devicetree.bbclass sources
 </openembedded-core/tree/meta/classes-recipe/devicetree.bbclass>` 
@@ -1468,7 +1473,7 @@ Here are the tests you can list with the :term:`WARN_QA` and
 
 -  ``unhandled-features-check:`` check that if one of the variables that
    the :ref:`ref-classes-features_check` class supports (e.g.
-   :term:`REQUIRED_DISTRO_FEATURES`) is set by a recupe, then the recipe
+   :term:`REQUIRED_DISTRO_FEATURES`) is set by a recipe, then the recipe
    also inherits :ref:`ref-classes-features_check` in order for the
    requirement to actually work.
 
@@ -1571,19 +1576,27 @@ Linux kernel compilation (including modules).
 The :ref:`ref-classes-kernel-devicetree` class, which is inherited by the
 :ref:`ref-classes-kernel` class, supports device tree generation.
 
+Its behavior is mainly controlled by the following variables:
+
+-  :term:`KERNEL_DEVICETREE_BUNDLE`: whether to bundle the kernel and device tree
+-  :term:`KERNEL_DTBDEST`: directory where to install DTB files
+-  :term:`KERNEL_DTBVENDORED`: whether to keep vendor subdirectories
+-  :term:`KERNEL_DTC_FLAGS`: flags for ``dtc``, the Device Tree Compiler
+-  :term:`KERNEL_PACKAGE_NAME`: base name of the kernel packages
+
 .. _ref-classes-kernel-fitimage:
 
 ``kernel-fitimage``
 ===================
 
 The :ref:`ref-classes-kernel-fitimage` class provides support to pack a kernel image,
-device trees, a U-boot script, a :term:`Initramfs` bundle and a RAM disk
+device trees, a U-boot script, an :term:`Initramfs` bundle and a RAM disk
 into a single FIT image. In theory, a FIT image can support any number
 of kernels, U-boot scripts, :term:`Initramfs` bundles, RAM disks and device-trees.
 However, :ref:`ref-classes-kernel-fitimage` currently only supports
 limited usecases: just one kernel image, an optional U-boot script,
 an optional :term:`Initramfs` bundle, an optional RAM disk, and any number of
-device tree.
+device trees.
 
 To create a FIT image, it is required that :term:`KERNEL_CLASSES`
 is set to include ":ref:`ref-classes-kernel-fitimage`" and :term:`KERNEL_IMAGETYPE`
@@ -3172,6 +3185,44 @@ You can also specify the machine using this method::
 
 See the :term:`UBOOT_CONFIG` and :term:`UBOOT_MACHINE` variables for additional
 information.
+
+.. _ref-classes-uboot-sign:
+
+``uboot-sign``
+==============
+
+The :ref:`ref-classes-uboot-sign` class provides support for U-Boot verified boot.
+It is intended to be inherited from U-Boot recipes.
+
+Here are variables used by this class:
+
+-  :term:`SPL_MKIMAGE_DTCOPTS`: DTC options for U-Boot ``mkimage`` when
+   building the FIT image.
+-  :term:`SPL_SIGN_ENABLE`: enable signing the FIT image.
+-  :term:`SPL_SIGN_KEYDIR`: directory containing the signing keys.
+-  :term:`SPL_SIGN_KEYNAME`: base filename of the signing keys.
+-  :term:`UBOOT_FIT_ADDRESS_CELLS`: ``#address-cells`` value for the FIT image.
+-  :term:`UBOOT_FIT_DESC`: description string encoded into the FIT image.
+-  :term:`UBOOT_FIT_GENERATE_KEYS`: generate the keys if they don't exist yet.
+-  :term:`UBOOT_FIT_HASH_ALG`: hash algorithm for the FIT image.
+-  :term:`UBOOT_FIT_KEY_GENRSA_ARGS`: ``openssl genrsa`` arguments.
+-  :term:`UBOOT_FIT_KEY_REQ_ARGS`: ``openssl req`` arguments.
+-  :term:`UBOOT_FIT_SIGN_ALG`: signature algorithm for the FIT image.
+-  :term:`UBOOT_FIT_SIGN_NUMBITS`: size of the private key for FIT image
+   signing.                                                  
+-  :term:`UBOOT_FIT_KEY_SIGN_PKCS`: algorithm for the public key certificate
+   for FIT image signing.
+-  :term:`UBOOT_FITIMAGE_ENABLE`: enable the generation of a U-Boot FIT image.
+-  :term:`UBOOT_MKIMAGE_DTCOPTS`: DTC options for U-Boot ``mkimage`` when
+   rebuilding the FIT image containing the kernel.
+
+See U-Boot's documentation for details about `verified boot
+<https://source.denx.de/u-boot/u-boot/-/blob/master/doc/uImage.FIT/verified-boot.txt>`__
+and the `signature process
+<https://source.denx.de/u-boot/u-boot/-/blob/master/doc/uImage.FIT/signature.txt>`__.
+
+See also the description of :ref:`ref-classes-kernel-fitimage` class, which this class
+imitates.
 
 .. _ref-classes-uninative:
 

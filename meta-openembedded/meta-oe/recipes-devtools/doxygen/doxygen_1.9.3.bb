@@ -14,4 +14,8 @@ SRC_URI[sha256sum] = "f352dbc3221af7012b7b00935f2dfdc9fb67a97d43287d2f6c81c50449
 
 inherit cmake python3native
 
+EXTRA_OECMAKE += "\
+    -DFLEX_TARGET_ARG_COMPILE_FLAGS='--noline' \
+    -DBISON_TARGET_ARG_COMPILE_FLAGS='--no-lines' \
+"
 BBCLASSEXTEND = "native nativesdk"

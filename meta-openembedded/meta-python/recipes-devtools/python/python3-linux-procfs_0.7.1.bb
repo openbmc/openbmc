@@ -10,3 +10,5 @@ SRCREV = "7f43598387e44e2da93ead2e075b7232429e4cc4"
 S = "${WORKDIR}/git"
 
 inherit setuptools3
+
+RDEPENDS:${PN} += "python3-six"

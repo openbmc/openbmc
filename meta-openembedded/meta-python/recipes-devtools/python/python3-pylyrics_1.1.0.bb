@@ -10,3 +10,9 @@ PYPI_PACKAGE = "PyLyrics"
 PYPI_PACKAGE_EXT = "zip"
 
 inherit pypi setuptools3
+
+RDEPENDS:${PN} += " \
+    python3-beautifulsoup4 \
+    python3-classes \
+    python3-requests \
+"

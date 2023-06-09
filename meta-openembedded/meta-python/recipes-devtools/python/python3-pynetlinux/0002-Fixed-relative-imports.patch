@@ -1,0 +1,60 @@
+From afb778669efbc658a29e6bdb1c4834fee42931aa Mon Sep 17 00:00:00 2001
+From: Robert Grant <rgrant@mdi.us.com>
+Date: Wed, 10 Sep 2014 14:56:33 -0400
+Subject: [PATCH] Fixed relative imports
+
+Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+
+---
+Upstream-Status: Accepted
+
+ pynetlinux/__init__.py | 8 ++++----
+ pynetlinux/brctl.py    | 2 +-
+ pynetlinux/tap.py      | 2 +-
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/pynetlinux/__init__.py b/pynetlinux/__init__.py
+index dbbf392..b6e1b8e 100644
+--- a/pynetlinux/__init__.py
++++ b/pynetlinux/__init__.py
+@@ -2,7 +2,7 @@
+ #   import pylinux
+ # does a reasonable thing.
+ 
+-import brctl
+-import ifconfig
+-import tap
+-import route
++from . import brctl
++from . import ifconfig
++from . import tap
++from . import route
+diff --git a/pynetlinux/brctl.py b/pynetlinux/brctl.py
+index f54d176..a8b926e 100644
+--- a/pynetlinux/brctl.py
++++ b/pynetlinux/brctl.py
+@@ -3,7 +3,7 @@ import fcntl
+ import os
+ import struct
+ 
+-import ifconfig
++from . import ifconfig
+ 
+ SYSFS_NET_PATH = "/sys/class/net"
+ 
+diff --git a/pynetlinux/tap.py b/pynetlinux/tap.py
+index 0a0d59c..3f8ad3a 100644
+--- a/pynetlinux/tap.py
++++ b/pynetlinux/tap.py
+@@ -2,7 +2,7 @@ import fcntl
+ import os
+ import struct
+ 
+-import ifconfig
++from . import ifconfig
+ 
+ # From linux/if_tun.h
+ 
+-- 
+2.39.2
+

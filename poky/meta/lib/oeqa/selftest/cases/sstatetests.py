@@ -18,6 +18,9 @@ from oeqa.selftest.case import OESelftestTestCase
 import oe
 import bb.siggen
 
+# Set to True to preserve stamp files after test execution for debugging failures
+keep_temp_files = False
+
 class SStateBase(OESelftestTestCase):
 
     def setUpLocal(self):
@@ -34,6 +37,10 @@ class SStateBase(OESelftestTestCase):
         self.target_vendor = bb_vars['TARGET_VENDOR']
         self.target_os = bb_vars['TARGET_OS']
         self.distro_specific_sstate = os.path.join(self.sstate_path, self.hostdistro)
+
+    def track_for_cleanup(self, path):
+        if not keep_temp_files:
+            super().track_for_cleanup(path)
 
     # Creates a special sstate configuration with the option to add sstate mirrors
     def config_sstate(self, temp_sstate_location=False, add_local_mirrors=[]):

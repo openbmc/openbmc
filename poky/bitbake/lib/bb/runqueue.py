@@ -2353,7 +2353,8 @@ class RunQueueExecute:
                 taskhash = self.rqdata.runtaskentries[revdep].hash
                 unihash = self.rqdata.runtaskentries[revdep].unihash
                 deps = self.filtermcdeps(task, mc, deps)
-                taskdepdata[revdep] = [pn, taskname, fn, deps, provides, taskhash, unihash]
+                hashfn = self.rqdata.dataCaches[mc].hashfn[taskfn]
+                taskdepdata[revdep] = [pn, taskname, fn, deps, provides, taskhash, unihash, hashfn]
                 for revdep2 in deps:
                     if revdep2 not in taskdepdata:
                         additional.append(revdep2)
@@ -2693,7 +2694,8 @@ class RunQueueExecute:
                 provides = self.rqdata.dataCaches[mc].fn_provides[taskfn]
                 taskhash = self.rqdata.runtaskentries[revdep].hash
                 unihash = self.rqdata.runtaskentries[revdep].unihash
-                taskdepdata[revdep] = [pn, taskname, fn, deps, provides, taskhash, unihash]
+                hashfn = self.rqdata.dataCaches[mc].hashfn[taskfn]
+                taskdepdata[revdep] = [pn, taskname, fn, deps, provides, taskhash, unihash, hashfn]
                 for revdep2 in deps:
                     if revdep2 not in taskdepdata:
                         additional.append(revdep2)

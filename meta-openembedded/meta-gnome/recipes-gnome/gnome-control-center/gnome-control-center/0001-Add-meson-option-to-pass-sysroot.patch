@@ -28,16 +28,29 @@ index dbca723..af0f871 100644
  option('ibus', type: 'boolean', value: true, description: 'build with IBus support')
  option('privileged_group', type: 'string', value: 'wheel', description: 'name of group that has elevated permissions')
 diff --git a/panels/background/meson.build b/panels/background/meson.build
-index 3634c47..459ccfe 100644
+index 69af0cfea..6edcaa5ff 100644
 --- a/panels/background/meson.build
 +++ b/panels/background/meson.build
-@@ -25,7 +25,7 @@ common_sources = []
+@@ -19,7 +19,7 @@ common_sources = []
  
  enums = 'gdesktop-enums-types'
  enums_header = files(
 -  gsettings_desktop_dep.get_pkgconfig_variable('prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h',
 +  get_option('oe_sysroot') + gsettings_desktop_dep.get_pkgconfig_variable('prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h',
    'cc-background-item.h'
+ )
+ 
+diff --git a/panels/datetime/meson.build b/panels/datetime/meson.build
+index 3b6f5e197..30b207882 100644
+--- a/panels/datetime/meson.build
++++ b/panels/datetime/meson.build
+@@ -45,7 +45,7 @@ sources = files(
+ 
+ enums = 'gdesktop-enums-types'
+ enums_header = files(
+-  gsettings_desktop_dep.get_pkgconfig_variable('prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h',
++  get_option('oe_sysroot') + gsettings_desktop_dep.get_pkgconfig_variable('prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h',
+   'cc-datetime-panel.h'
  )
  
 -- 

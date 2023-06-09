@@ -10,6 +10,13 @@ New Features / Enhancements in 4.3
 
 -  New variables:
 
+   -  :term:`FIT_ADDRESS_CELLS` and :term:`UBOOT_FIT_ADDRESS_CELLS`.
+      See details below.
+
+   -  :term:`KERNEL_DTBDEST`: directory where to install DTB files.
+
+   -  :term:`KERNEL_DTBVENDORED`: whether to keep vendor subdirectories.
+
 -  Architecture-specific enhancements:
 
 -  Kernel-related enhancements:
@@ -22,14 +29,20 @@ New Features / Enhancements in 4.3
 
 -  QEMU/runqemu enhancements:
 
+   -  QEMU has been upgraded to version 8.0
+
+-  Rust improvements:
+
+   -  Rust has been upgraded to version 1.69
+
 -  Image-related enhancements:
 
 -  wic Image Creator enhancements:
 
 -  FIT image related improvements:
 
-   -  New :term:`FIT_ADDRESS_CELLS` variable allowing
-      to specify 64 bit addresses.
+   -  New :term:`FIT_ADDRESS_CELLS` and :term:`UBOOT_FIT_ADDRESS_CELLS` variables allowing
+      to specify 64 bit addresses, typically for loading U-Boot.
 
 -  SDK-related improvements:
 
@@ -43,6 +56,8 @@ New Features / Enhancements in 4.3
       invalidated which is useful for memory resident bitbake debugging.
 
 -  Packaging changes:
+
+-  Prominent documentation updates:
 
 -  Miscellaneous changes:
 

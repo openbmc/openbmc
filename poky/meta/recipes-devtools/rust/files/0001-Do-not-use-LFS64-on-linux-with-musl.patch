@@ -19,10 +19,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  library/std/src/sys/unix/fs.rs | 27 ++++++++++++++++++++-------
  3 files changed, 38 insertions(+), 12 deletions(-)
 
-Index: rustc-1.69.0-src/library/std/src/os/linux/fs.rs
+Index: rustc-1.70.0-src/library/std/src/os/linux/fs.rs
 ===================================================================
---- rustc-1.69.0-src.orig/library/std/src/os/linux/fs.rs
-+++ rustc-1.69.0-src/library/std/src/os/linux/fs.rs
+--- rustc-1.70.0-src.orig/library/std/src/os/linux/fs.rs
++++ rustc-1.70.0-src/library/std/src/os/linux/fs.rs
 @@ -329,7 +329,14 @@ pub trait MetadataExt {
  impl MetadataExt for Metadata {
      #[allow(deprecated)]
@@ -39,10 +39,10 @@ Index: rustc-1.69.0-src/library/std/src/os/linux/fs.rs
      }
      fn st_dev(&self) -> u64 {
          self.as_inner().as_inner().st_dev as u64
-Index: rustc-1.69.0-src/library/std/src/sys/unix/fd.rs
+Index: rustc-1.70.0-src/library/std/src/sys/unix/fd.rs
 ===================================================================
---- rustc-1.69.0-src.orig/library/std/src/sys/unix/fd.rs
-+++ rustc-1.69.0-src/library/std/src/sys/unix/fd.rs
+--- rustc-1.70.0-src.orig/library/std/src/sys/unix/fd.rs
++++ rustc-1.70.0-src/library/std/src/sys/unix/fd.rs
 @@ -121,9 +121,12 @@ impl FileDesc {
      }
  
@@ -73,11 +73,11 @@ Index: rustc-1.69.0-src/library/std/src/sys/unix/fd.rs
          use libc::pwrite64;
  
          unsafe {
-Index: rustc-1.69.0-src/library/std/src/sys/unix/fs.rs
+Index: rustc-1.70.0-src/library/std/src/sys/unix/fs.rs
 ===================================================================
---- rustc-1.69.0-src.orig/library/std/src/sys/unix/fs.rs
-+++ rustc-1.69.0-src/library/std/src/sys/unix/fs.rs
-@@ -46,9 +46,13 @@ use libc::{c_int, mode_t};
+--- rustc-1.70.0-src.orig/library/std/src/sys/unix/fs.rs
++++ rustc-1.70.0-src/library/std/src/sys/unix/fs.rs
+@@ -47,9 +47,13 @@ use libc::{c_int, mode_t};
      all(target_os = "linux", target_env = "gnu")
  ))]
  use libc::c_char;
@@ -93,7 +93,7 @@ Index: rustc-1.69.0-src/library/std/src/sys/unix/fs.rs
  use libc::fstatat64;
  #[cfg(any(
      target_os = "android",
-@@ -57,9 +61,10 @@ use libc::fstatat64;
+@@ -58,9 +62,10 @@ use libc::fstatat64;
      target_os = "redox",
      target_os = "illumos",
      target_os = "nto",
@@ -105,7 +105,7 @@ Index: rustc-1.69.0-src/library/std/src/sys/unix/fs.rs
  use libc::readdir64;
  #[cfg(any(target_os = "emscripten", target_os = "l4re"))]
  use libc::readdir64_r;
-@@ -80,7 +85,13 @@ use libc::{
+@@ -81,7 +86,13 @@ use libc::{
      dirent as dirent64, fstat as fstat64, fstatat as fstatat64, ftruncate64, lseek64,
      lstat as lstat64, off64_t, open as open64, stat as stat64,
  };
@@ -119,7 +119,7 @@ Index: rustc-1.69.0-src/library/std/src/sys/unix/fs.rs
      target_os = "linux",
      target_os = "emscripten",
      target_os = "l4re",
-@@ -90,7 +101,7 @@ use libc::{
+@@ -91,7 +102,7 @@ use libc::{
      dirent as dirent64, fstat as fstat64, ftruncate as ftruncate64, lseek as lseek64,
      lstat as lstat64, off_t as off64_t, open as open64, stat as stat64,
  };
@@ -128,7 +128,7 @@ Index: rustc-1.69.0-src/library/std/src/sys/unix/fs.rs
  use libc::{dirent64, fstat64, ftruncate64, lseek64, lstat64, off64_t, open64, stat64};
  
  pub use crate::sys_common::fs::try_exists;
-@@ -277,6 +288,7 @@ unsafe impl Sync for Dir {}
+@@ -278,6 +289,7 @@ unsafe impl Sync for Dir {}
  #[cfg(any(
      target_os = "android",
      target_os = "linux",
@@ -136,7 +136,7 @@ Index: rustc-1.69.0-src/library/std/src/sys/unix/fs.rs
      target_os = "solaris",
      target_os = "illumos",
      target_os = "fuchsia",
-@@ -311,6 +323,7 @@ struct dirent64_min {
+@@ -312,6 +324,7 @@ struct dirent64_min {
  }
  
  #[cfg(not(any(
@@ -144,7 +144,7 @@ Index: rustc-1.69.0-src/library/std/src/sys/unix/fs.rs
      target_os = "android",
      target_os = "linux",
      target_os = "solaris",
-@@ -786,7 +799,7 @@ impl DirEntry {
+@@ -787,7 +800,7 @@ impl DirEntry {
      }
  
      #[cfg(all(
@@ -153,7 +153,7 @@ Index: rustc-1.69.0-src/library/std/src/sys/unix/fs.rs
          not(miri)
      ))]
      pub fn metadata(&self) -> io::Result<FileAttr> {
-@@ -810,7 +823,7 @@ impl DirEntry {
+@@ -811,7 +824,7 @@ impl DirEntry {
      }
  
      #[cfg(any(

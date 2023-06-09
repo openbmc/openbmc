@@ -42,7 +42,7 @@ BUILD_OPTIMIZATION:append = " -O2"
 # Package configuration - match ostree defaults, but without rofiles-fuse
 # otherwise we introduce a dependendency on meta-filesystems and swap
 # soup for curl to avoid bringing in deprecated libsoup2 (though
-# to run ptest requires that you have soup).
+# to run ptest requires that you have soup2 or soup3).
 PACKAGECONFIG ??= " \
     ${@bb.utils.filter('DISTRO_FEATURES', 'selinux smack', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd libmount', '', d)} \
@@ -85,7 +85,8 @@ PACKAGECONFIG[openssl] = "--with-crypto=openssl, , openssl, , , glib gnutls"
 PACKAGECONFIG[rofiles-fuse] = "--enable-rofiles-fuse, --disable-rofiles-fuse, fuse3"
 PACKAGECONFIG[selinux] = "--with-selinux, --without-selinux, libselinux, bubblewrap"
 PACKAGECONFIG[smack] = "--with-smack, --without-smack, smack"
-PACKAGECONFIG[soup] = "--with-soup, --without-soup --disable-glibtest, libsoup-2.4"
+PACKAGECONFIG[soup2] = "--with-soup, --without-soup, libsoup-2.4, , , soup3"
+PACKAGECONFIG[soup3] = "--with-soup3, --without-soup3, libsoup, , , soup2"
 PACKAGECONFIG[static] = ""
 PACKAGECONFIG[systemd] = "--with-libsystemd --with-systemdsystemunitdir=${systemd_system_unitdir}, --without-libsystemd, systemd"
 PACKAGECONFIG[trivial-httpd-cmdline] = "--enable-trivial-httpd-cmdline, --disable-trivial-httpd-cmdline"
@@ -188,7 +189,7 @@ RDEPENDS:${PN}:class-target = " \
 #
 # Something like this in your local.conf:
 #
-# PACKAGECONFIG:append:pn-ostree = " static soup"
+# PACKAGECONFIG:append:pn-ostree = " static soup3"
 # KERNEL_EXTRA_FEATURES:append = " features/overlayfs/overlayfs.scc"
 # TARGET_CFLAGS:append:pn-busybox = " -static"
 #

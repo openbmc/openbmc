@@ -1941,7 +1941,7 @@ Thanks to this, the depending tasks will keep a previously recorded
 task hash, and BitBake will be able to retrieve their output from
 the Shared State cache, instead of re-executing them. Similarly, the
 output of further downstream tasks can also be retrieved from Shared
-Shate.
+State.
 
 If the output hash is unknown, a new entry will be created on the Hash
 Equivalence server, matching the task hash to that output.

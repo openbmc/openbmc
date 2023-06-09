@@ -17,7 +17,10 @@ DEPENDS += "parted"
 
 RDEPENDS:${PN}:class-target += " \
     parted (>= 2.3) \
-    python3-stringold python3-codecs python3-math \
+    python3-codecs \
+    python3-math \
+    python3-numbers \
+    python3-stringold \
 "
 RDEPENDS:${PN}:class-native = ""
 

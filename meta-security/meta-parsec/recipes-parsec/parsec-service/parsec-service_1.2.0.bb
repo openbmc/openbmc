@@ -14,7 +14,7 @@ SRC_URI += "crate://crates.io/parsec-service/${PV} \
 "
 SRC_URI[parsec-service-1.2.0.sha256sum] = "f58e7ba859c22cc1904dc8298b1a7d94ee1ba3b4d4808f28e4cc0c96ddb149c9"
 
-S = "${CARGO_VENDORING_DIRECTORY}/${BP}"
+B = "${CARGO_VENDORING_DIRECTORY}/${BP}"
 
 PACKAGECONFIG ??= "PKCS11 MBED-CRYPTO"
 have_TPM = "${@bb.utils.contains('DISTRO_FEATURES', 'tpm2', 'TPM', '', d)}"

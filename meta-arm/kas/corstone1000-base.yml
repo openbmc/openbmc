@@ -31,7 +31,6 @@ local_conf_header:
   base: |
     CONF_VERSION = "2"
     PACKAGE_CLASSES = "package_ipk"
-    LICENSE_FLAGS_ACCEPTED += "armcompiler"
     BB_NUMBER_THREADS ?= "16"
     PARALLEL_MAKE ?= "-j16"
     PACKAGECONFIG:append:pn-perf = " coresight"

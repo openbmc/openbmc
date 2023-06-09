@@ -5,7 +5,8 @@ SECTION = "libs"
 DEPENDS = "libnl"
 RDEPENDS:${PN} = "bash perl"
 
-SRC_URI = "git://github.com/linux-rdma/rdma-core.git;branch=master;protocol=https"
+SRC_URI = "git://github.com/linux-rdma/rdma-core.git;branch=master;protocol=https \
+           file://0001-cmake-Allow-SYSTEMCTL_BIN-to-be-overridden-from-envi.patch"
 SRCREV = "f2789cbd394c5839e8942d585a494ab72fd97e39"
 S = "${WORKDIR}/git"
 
@@ -16,6 +17,7 @@ LIC_FILES_CHKSUM = "file://COPYING.BSD_FB;md5=0ec18bae1a9df92c8d6ae01f94a289ae \
 
 EXTRA_OECMAKE = " \
     -DCMAKE_INSTALL_SYSTEMD_SERVICEDIR=${systemd_system_unitdir} \
+    -DSYSTEMCTL_BIN=${base_bindir}/systemctl \
     -DCMAKE_INSTALL_PERLDIR=${libdir}/perl5/${@get_perl_version(d)} \
     -DNO_MAN_PAGES=1 \
 "

@@ -344,7 +344,7 @@ Here are the image features available for all images:
 -  *splash:* Enables showing a splash screen during boot. By default,
    this screen is provided by ``psplash``, which does allow
    customization. If you prefer to use an alternative splash screen
-   package, you can do so by setting the ``SPLASH`` variable to a
+   package, you can do so by setting the :term:`SPLASH` variable to a
    different package name (or names) within the image recipe or at the
    distro configuration level.
 

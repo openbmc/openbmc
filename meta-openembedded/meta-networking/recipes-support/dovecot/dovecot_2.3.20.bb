@@ -18,7 +18,7 @@ DEPENDS = "openssl xz zlib bzip2 libcap icu libtirpc bison-native"
 CFLAGS += "-I${STAGING_INCDIR}/tirpc"
 LDFLAGS += "-ltirpc"
 
-inherit autotools pkgconfig systemd useradd gettext
+inherit autotools pkgconfig systemd useradd gettext multilib_header
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'ldap pam systemd', d)}"
 
@@ -56,6 +56,7 @@ do_install:append () {
         sed -i -e 's#@SYSCONFDIR@#${sysconfdir}#g' ${D}${systemd_unitdir}/system/dovecot.service
         sed -i -e 's#@SBINDIR@#${sbindir}#g' ${D}${systemd_unitdir}/system/dovecot.service
     fi
+    oe_multilib_header dovecot/config.h
 }
 
 USERADD_PACKAGES = "${PN}"

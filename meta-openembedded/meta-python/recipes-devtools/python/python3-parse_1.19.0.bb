@@ -8,18 +8,19 @@ SRC_URI[sha256sum] = "9ff82852bcb65d139813e2a5197627a94966245c897796760a3a2a8eb6
 inherit pypi setuptools3 ptest
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-datetime \
-    ${PYTHON_PN}-logging \
-    "
+    python3-datetime \
+    python3-logging \
+    python3-numbers \
+"
 
 SRC_URI += " \
-	file://run-ptest \
+    file://run-ptest \
 "
 
 RDEPENDS:${PN}-ptest += " \
-	${PYTHON_PN}-pytest \
+    python3-pytest \
 "
 
 do_install_ptest() {
-	cp -f ${S}/test_parse.py ${D}${PTEST_PATH}/
+    cp -f ${S}/test_parse.py ${D}${PTEST_PATH}/
 }
