@@ -1,8 +1,0 @@
-[Service]
-Type=oneshot
-SyslogIdentifier=gbmc-log-ramoops
-SyslogLevelPrefix=true
-ExecStart=/usr/bin/find /sys/fs/pstore -name 'dmesg-*' -print -exec cat {} \; -exec rm -f {} \;
-
-[Install]
-WantedBy=multi-user.target
