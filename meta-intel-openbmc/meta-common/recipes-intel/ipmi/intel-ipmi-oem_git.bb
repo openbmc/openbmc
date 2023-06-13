@@ -10,7 +10,7 @@ SRCREV = "152e9145400e422015d7715446a85b0b4bfae38e"
 S = "${WORKDIR}/git"
 PV = "0.1+git${SRCPV}"
 
-DEPENDS = "boost phosphor-ipmi-host phosphor-logging systemd phosphor-dbus-interfaces libgpiod"
+DEPENDS = "boost phosphor-ipmi-host phosphor-logging systemd phosphor-dbus-interfaces libgpiod libtinyxml2"
 
 inherit cmake obmc-phosphor-ipmiprovider-symlink pkgconfig
 
