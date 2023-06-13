@@ -27,6 +27,9 @@ inherit systemd
 inherit useradd
 inherit pkgconfig meson ptest
 
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[insecure-redfish-expand]="-Dinsecure-enable-redfish-query=enabled"
+
 EXTRA_OEMESON = " \
     --buildtype=minsize \
     -Dtests=${@bb.utils.contains('PTEST_ENABLED', '1', 'enabled', 'disabled', d)} \
