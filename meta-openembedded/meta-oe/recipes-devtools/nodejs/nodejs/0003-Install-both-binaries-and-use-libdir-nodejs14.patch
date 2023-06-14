@@ -1,0 +1,84 @@
+From 5b22fac923d1ca3e9fefb97f5a171124a88f5e22 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Tue, 19 Mar 2019 23:22:40 -0400
+Subject: [PATCH] Install both binaries and use libdir.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This allows us to build with a shared library for other users while
+still providing the normal executable.
+
+Taken from - https://src.fedoraproject.org/rpms/nodejs/raw/rawhide/f/0002-Install-both-binaries-and-use-libdir.patch
+
+Upstream-Status: Pending
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.py     |  7 +++++++
+ tools/install.py | 21 +++++++++------------
+ 2 files changed, 16 insertions(+), 12 deletions(-)
+
+diff --git a/configure.py b/configure.py
+index e6f7e4db..6cf5c45d 100755
+--- a/configure.py
++++ b/configure.py
+@@ -626,6 +626,12 @@ parser.add_option('--shared',
+     help='compile shared library for embedding node in another project. ' +
+          '(This mode is not officially supported for regular applications)')
+
++parser.add_option('--libdir',
++    action='store',
++    dest='libdir',
++    default='lib',
++    help='a directory to install the shared library into')
++
+ parser.add_option('--without-v8-platform',
+     action='store_true',
+     dest='without_v8_platform',
+@@ -1202,6 +1208,7 @@ def configure_node(o):
+   o['variables']['node_no_browser_globals'] = b(options.no_browser_globals)
+
+   o['variables']['node_shared'] = b(options.shared)
++  o['variables']['libdir'] = options.libdir
+   node_module_version = getmoduleversion.get_version()
+
+   if options.dest_os == 'android':
+diff --git a/tools/install.py b/tools/install.py
+index 729b416f..9bfc6234 100755
+--- a/tools/install.py
++++ b/tools/install.py
+@@ -121,22 +121,19 @@ def subdir_files(path, dest, action):
+
+ def files(action):
+   is_windows = sys.platform == 'win32'
+-  output_file = 'node'
+   output_prefix = 'out/Release/'
++  output_libprefix = output_prefix
+
+-  if 'false' == variables.get('node_shared'):
+-    if is_windows:
+-      output_file += '.exe'
++  if is_windows:
++    output_bin = 'node.exe'
++    output_lib = 'node.dll'
+   else:
+-    if is_windows:
+-      output_file += '.dll'
+-    else:
+-      output_file = 'lib' + output_file + '.' + variables.get('shlib_suffix')
++    output_bin = 'node'
++    output_lib = 'libnode.' + variables.get('shlib_suffix')
+
+-  if 'false' == variables.get('node_shared'):
+-    action([output_prefix + output_file], 'bin/' + output_file)
+-  else:
+-    action([output_prefix + output_file], 'lib/' + output_file)
++  action([output_prefix + output_bin], 'bin/' + output_bin)
++  if 'true' == variables.get('node_shared'):
++    action([output_libprefix + output_lib], variables.get('libdir') + '/' + output_lib)
+
+   if 'true' == variables.get('node_use_dtrace'):
+     action(['out/Release/node.d'], 'lib/dtrace/node.d')

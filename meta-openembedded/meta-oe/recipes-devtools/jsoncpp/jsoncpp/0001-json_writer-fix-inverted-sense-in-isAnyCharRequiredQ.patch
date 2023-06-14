@@ -1,0 +1,52 @@
+From 2d5a94aeeab01f0448b5a0bb8d4a9a23a5b790d5 Mon Sep 17 00:00:00 2001
+From: Andrew Childs <lorne@cons.org.nz>
+Date: Sat, 28 Dec 2019 16:04:24 +0900
+Subject: [PATCH] json_writer: fix inverted sense in isAnyCharRequiredQuoting
+ (#1120)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This bug is only affects platforms where `char` is unsigned.
+
+When char is a signed type, values >= 0x80 are also considered < 0,
+and hence require escaping due to the < ' ' condition.
+
+When char is an unsigned type, values >= 0x80 match none of the
+conditions and are considered safe to emit without escaping.
+
+This shows up as a test failure:
+
+* Detail of EscapeSequenceTest/writeEscapeSequence test failure:
+/build/source/src/test_lib_json/main.cpp(3370): expected == result
+  Expected: '["\"","\\","\b","\f","\n","\r","\t","\u0278","\ud852\udf62"]
+  '
+  Actual  : '["\"","\\","\b","\f","\n","\r","\t","ɸ","𤭢"]
+  '
+Upstream-Status: Backport [https://github.com/open-source-parsers/jsoncpp/commit/f11611c8785082ead760494cba06196f14a06dcb]
+
+Signed-off-by: Viktor Rosendahl <Viktor.Rosendahl@bmw.de>
+
+---
+ src/lib_json/json_writer.cpp | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/lib_json/json_writer.cpp b/src/lib_json/json_writer.cpp
+index 519ce23..b68a638 100644
+--- a/src/lib_json/json_writer.cpp
++++ b/src/lib_json/json_writer.cpp
+@@ -178,8 +178,9 @@ static bool isAnyCharRequiredQuoting(char const* s, size_t n) {
+ 
+   char const* const end = s + n;
+   for (char const* cur = s; cur < end; ++cur) {
+-    if (*cur == '\\' || *cur == '\"' || *cur < ' ' ||
+-        static_cast<unsigned char>(*cur) < 0x80)
++    if (*cur == '\\' || *cur == '\"' ||
++        static_cast<unsigned char>(*cur) < ' ' ||
++        static_cast<unsigned char>(*cur) >= 0x80)
+       return true;
+   }
+   return false;
+-- 
+2.17.1
+

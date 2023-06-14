@@ -1,0 +1,75 @@
+From cbf5a2bce75ca2c2fd3e247796b9892f5298584e Mon Sep 17 00:00:00 2001
+From: "John M. Schanck" <jschanck@mozilla.com>
+Date: Thu, 13 Apr 2023 17:43:46 +0000
+Subject: [PATCH] Bug 1826650 - cmd/ecperf: fix dangling pointer warning on gcc
+ 13. r=djackson
+
+Differential Revision: https://phabricator.services.mozilla.com/D174822
+
+--HG--
+extra : moz-landing-system : lando
+---
+ cmd/ecperf/ecperf.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/cmd/ecperf/ecperf.c b/cmd/ecperf/ecperf.c
+index 705d68f35..a07004d8e 100644
+--- a/cmd/ecperf/ecperf.c
++++ b/cmd/ecperf/ecperf.c
+@@ -53,6 +53,7 @@ PKCS11Thread(void *data)
+     SECItem sig;
+     CK_SESSION_HANDLE session;
+     CK_RV crv;
++    void *tmp = NULL;
+ 
+     threadData->status = SECSuccess;
+     threadData->count = 0;
+@@ -68,6 +69,7 @@ PKCS11Thread(void *data)
+     if (threadData->isSign) {
+         sig.data = sigData;
+         sig.len = sizeof(sigData);
++        tmp = threadData->p2;
+         threadData->p2 = (void *)&sig;
+     }
+ 
+@@ -79,6 +81,10 @@ PKCS11Thread(void *data)
+         }
+         threadData->count++;
+     }
++
++    if (threadData->isSign) {
++        threadData->p2 = tmp;
++    }
+     return;
+ }
+ 
+@@ -89,6 +95,7 @@ genericThread(void *data)
+     int iters = threadData->iters;
+     unsigned char sigData[256];
+     SECItem sig;
++    void *tmp = NULL;
+ 
+     threadData->status = SECSuccess;
+     threadData->count = 0;
+@@ -96,6 +103,7 @@ genericThread(void *data)
+     if (threadData->isSign) {
+         sig.data = sigData;
+         sig.len = sizeof(sigData);
++        tmp = threadData->p2;
+         threadData->p2 = (void *)&sig;
+     }
+ 
+@@ -107,6 +115,10 @@ genericThread(void *data)
+         }
+         threadData->count++;
+     }
++
++    if (threadData->isSign) {
++        threadData->p2 = tmp;
++    }
+     return;
+ }
+ 
+-- 
+2.40.1
+

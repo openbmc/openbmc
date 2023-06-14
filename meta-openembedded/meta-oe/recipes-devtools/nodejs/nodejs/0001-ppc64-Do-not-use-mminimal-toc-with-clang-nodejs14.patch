@@ -1,0 +1,27 @@
+From 0976af0f3b328436ea44a74a406f311adb2ab211 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 15 Jun 2021 19:01:31 -0700
+Subject: [PATCH] ppc64: Do not use -mminimal-toc with clang
+
+clang does not support this option
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ common.gypi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/common.gypi b/common.gypi
+index ee91fb1d..049c8f8c 100644
+--- a/common.gypi
++++ b/common.gypi
+@@ -413,7 +413,7 @@
+             'ldflags': [ '-m32' ],
+           }],
+           [ 'target_arch=="ppc64" and OS!="aix"', {
+-            'cflags': [ '-m64', '-mminimal-toc' ],
++            'cflags': [ '-m64' ],
+             'ldflags': [ '-m64' ],
+           }],
+           [ 'target_arch=="s390x"', {
+--
+2.32.0

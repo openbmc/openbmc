@@ -45,6 +45,7 @@ SRC_URI = "git://github.com/opensvc/multipath-tools.git;protocol=http;branch=mas
            file://0031-Always-use-devmapper-for-kpartx.patch \
            file://0001-fix-bug-of-do_compile-and-do_install.patch \
            file://0001-add-explicit-dependency-on-libraries.patch \
+           file://CVE-2022-41973.patch \
            "
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=5f30f0716dfdd0d91eb439ebec522ec2"
@@ -117,3 +118,6 @@ FILES_kpartx = "${base_sbindir}/kpartx \
 
 RDEPENDS_${PN} += "kpartx"
 PARALLEL_MAKE = ""
+
+FILES:${PN}-libs += "usr/lib/*.so.*"
+FILES:${PN}-libs += "usr/lib/tmpfiles.d/*"

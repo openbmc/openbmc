@@ -1,0 +1,40 @@
+From e1d838089cd461d9efcf4d29d9f18f65994d2d6b Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Sun, 3 Oct 2021 22:48:39 +0200
+Subject: [PATCH] jinja/tests.py: add py 3.10 fix
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ deps/v8/third_party/jinja2/tests.py      | 2 +-
+ tools/inspector_protocol/jinja2/tests.py | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/deps/v8/third_party/jinja2/tests.py b/deps/v8/third_party/jinja2/tests.py
+index 0adc3d4..b14f85f 100644
+--- a/deps/v8/third_party/jinja2/tests.py
++++ b/deps/v8/third_party/jinja2/tests.py
+@@ -10,7 +10,7 @@
+ """
+ import operator
+ import re
+-from collections import Mapping
++from collections.abc import Mapping
+ from jinja2.runtime import Undefined
+ from jinja2._compat import text_type, string_types, integer_types
+ import decimal
+diff --git a/tools/inspector_protocol/jinja2/tests.py b/tools/inspector_protocol/jinja2/tests.py
+index 0adc3d4..b14f85f 100644
+--- a/tools/inspector_protocol/jinja2/tests.py
++++ b/tools/inspector_protocol/jinja2/tests.py
+@@ -10,7 +10,7 @@
+ """
+ import operator
+ import re
+-from collections import Mapping
++from collections.abc import Mapping
+ from jinja2.runtime import Undefined
+ from jinja2._compat import text_type, string_types, integer_types
+ import decimal
+--
+2.20.1

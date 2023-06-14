@@ -177,6 +177,8 @@ class TestImage(OESelftestTestCase):
         distro = oe.lsb.distro_identifier()
         if distro and distro.startswith('almalinux'):
             self.skipTest('virgl isn\'t working with Alma Linux')
+        if distro and distro.startswith('rocky'):
+            self.skipTest('virgl isn\'t working with Rocky Linux')
         if distro and distro == 'debian-8':
             self.skipTest('virgl isn\'t working with Debian 8')
         if distro and distro == 'centos-7':
@@ -189,10 +191,14 @@ class TestImage(OESelftestTestCase):
             self.skipTest('virgl isn\'t working with Fedora 35')
         if distro and distro == 'fedora-36':
             self.skipTest('virgl isn\'t working with Fedora 36')
+        if distro and distro == 'fedora-37':
+            self.skipTest('virgl isn\'t working with Fedora 37')
         if distro and distro == 'opensuseleap-15.0':
             self.skipTest('virgl isn\'t working with Opensuse 15.0')
         if distro and distro == 'ubuntu-22.04':
             self.skipTest('virgl isn\'t working with Ubuntu 22.04')
+        if distro and distro == 'ubuntu-22.10':
+            self.skipTest('virgl isn\'t working with Ubuntu 22.10')
 
         qemu_packageconfig = get_bb_var('PACKAGECONFIG', 'qemu-system-native')
         sdl_packageconfig = get_bb_var('PACKAGECONFIG', 'libsdl2-native')

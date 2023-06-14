@@ -1,0 +1,46 @@
+From 4e7e332b25a2794f381323518e52d8d95273b69e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Franti=C5=A1ek=20Kren=C5=BEelok?= <fkrenzel@redhat.com>
+Date: Mon, 30 Jan 2023 12:59:20 +0000
+Subject: [PATCH] Bug 1812671 - build failure while implicitly casting
+ SECStatus to PRUInt32. r=nss-reviewers,mt
+
+Author of the patch: Bob Relyea <rrelyea@redhat.com>
+
+Differential Revision: https://phabricator.services.mozilla.com/D167983
+
+--HG--
+extra : moz-landing-system : lando
+---
+ lib/ssl/ssl3exthandle.c | 2 +-
+ lib/ssl/sslsnce.c       | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/ssl/ssl3exthandle.c b/lib/ssl/ssl3exthandle.c
+index b5ae62f39..7134447bf 100644
+--- a/lib/ssl/ssl3exthandle.c
++++ b/lib/ssl/ssl3exthandle.c
+@@ -201,7 +201,7 @@ ssl3_FreeSniNameArray(TLSExtensionData *xtnData)
+  * Clients sends a filled in session ticket if one is available, and otherwise
+  * sends an empty ticket.  Servers always send empty tickets.
+  */
+-PRInt32
++SECStatus
+ ssl3_ClientSendSessionTicketXtn(const sslSocket *ss, TLSExtensionData *xtnData,
+                                 sslBuffer *buf, PRBool *added)
+ {
+diff --git a/lib/ssl/sslsnce.c b/lib/ssl/sslsnce.c
+index 56edafa1f..49f041c97 100644
+--- a/lib/ssl/sslsnce.c
++++ b/lib/ssl/sslsnce.c
+@@ -1820,7 +1820,7 @@ ssl_GetSelfEncryptKeyPair(SECKEYPublicKey **pubKey,
+     return SECSuccess;
+ }
+ 
+-static PRBool
++static SECStatus
+ ssl_GenerateSelfEncryptKeys(void *pwArg, PRUint8 *keyName,
+                             PK11SymKey **aesKey, PK11SymKey **macKey);
+ 
+-- 
+2.40.1
+

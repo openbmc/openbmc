@@ -56,3 +56,6 @@ do_install_append(){
 
 # enable kernel-sample for oeqa/runtime/cases's ksample.py test
 KERNEL_FEATURES_append_qemuall=" features/kernel-sample/kernel-sample.scc"
+
+# CVE exclusion
+include recipes-kernel/linux/cve-exclusion.inc

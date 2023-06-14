@@ -43,6 +43,7 @@ SRC_URI = "https://curl.haxx.se/download/curl-${PV}.tar.bz2 \
            file://CVE-2022-35260.patch \
            file://CVE-2022-43552.patch \
            file://CVE-2023-23916.patch \
+           file://CVE-2023-27534-pre1.patch \
            file://CVE-2023-27534.patch \
            file://CVE-2023-27538.patch \
            file://CVE-2023-27533.patch \
