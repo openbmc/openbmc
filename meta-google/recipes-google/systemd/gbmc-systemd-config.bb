@@ -56,6 +56,9 @@ do_install() {
   mkdir -p ${D}${sysconfdir}/systemd/system
   ln -sv /dev/null ${D}${sysconfdir}/systemd/system/systemd-pstore.service
 
+  # mask networkd-wait-online.service to avoid waiting
+  ln -sv /dev/null ${D}/${sysconfdir}/systemd/system/systemd-networkd-wait-online.service
+
   install -d -m0755 ${D}${libdir}/sysctl.d
   install -m 0644 ${WORKDIR}/40-gbmc-forward.conf ${D}${libdir}/sysctl.d/
   install -m 0644 ${WORKDIR}/40-gbmc-sysctl.conf ${D}${libdir}/sysctl.d/
