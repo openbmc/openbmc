@@ -8,7 +8,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=9c42325015702feda4f4d2f19a55b767 \
                     file://COPYING.MPL;md5=3c617710e51cdbe0fc00716f056dfb1a \
 "
 
-SRC_URI = "http://nice.freedesktop.org/releases/libnice-${PV}.tar.gz"
+SRC_URI = "http://nice.freedesktop.org/releases/libnice-${PV}.tar.gz \
+           file://0001-agent-meson-Replace-filename-with-basename.patch"
 SRC_URI[sha256sum] = "72e73a2acf20f59093e21d5601606e405873503eb35f346fa621de23e99b3b39"
 
 DEPENDS = "glib-2.0 gnutls"

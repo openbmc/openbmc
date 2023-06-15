@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=751419260aa954499f7abaabaa882bbe"
 SRCREV = "bcb82804daa8f725b6add259dcef2067e61a75aa"
 PV .= "+git${SRCPV}"
 
-SRC_URI = "git://git.yoctoproject.org/ptest-runner2;branch=master \
+SRC_URI = "git://git.yoctoproject.org/ptest-runner2;branch=master;protocol=https \
 "
 
 S = "${WORKDIR}/git"

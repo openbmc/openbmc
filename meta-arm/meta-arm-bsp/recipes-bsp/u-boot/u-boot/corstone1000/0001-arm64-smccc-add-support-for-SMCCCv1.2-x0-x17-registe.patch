@@ -1,7 +1,7 @@
-From f1f1780630302e1d7cab95d1c6dc32e2fc0bdd70 Mon Sep 17 00:00:00 2001
+From 5ce8bf4ad1aeb2657a7ab83c46eeb2cdaa56cfd4 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Fri, 29 Jul 2022 13:06:19 +0100
-Subject: [PATCH 01/27] arm64: smccc: add support for SMCCCv1.2 x0-x17
+Subject: [PATCH 01/42] arm64: smccc: add support for SMCCCv1.2 x0-x17
  registers
 
 add support for x0-x17 registers used by the SMC calls
@@ -48,7 +48,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  3 files changed, 110 insertions(+)
 
 diff --git a/arch/arm/cpu/armv8/smccc-call.S b/arch/arm/cpu/armv8/smccc-call.S
-index dc92b28777c3..ec6f299bc929 100644
+index dc92b28777..ec6f299bc9 100644
 --- a/arch/arm/cpu/armv8/smccc-call.S
 +++ b/arch/arm/cpu/armv8/smccc-call.S
 @@ -1,6 +1,8 @@
@@ -116,7 +116,7 @@ index dc92b28777c3..ec6f299bc929 100644
 +
 +#endif
 diff --git a/arch/arm/lib/asm-offsets.c b/arch/arm/lib/asm-offsets.c
-index 22fd541f9a28..db6d7ed23428 100644
+index 22fd541f9a..db6d7ed234 100644
 --- a/arch/arm/lib/asm-offsets.c
 +++ b/arch/arm/lib/asm-offsets.c
 @@ -9,6 +9,9 @@
@@ -148,7 +148,7 @@ index 22fd541f9a28..db6d7ed23428 100644
  
  	return 0;
 diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-index e1d09884a1c5..9105031d55d3 100644
+index e1d09884a1..9105031d55 100644
 --- a/include/linux/arm-smccc.h
 +++ b/include/linux/arm-smccc.h
 @@ -1,6 +1,8 @@
@@ -209,5 +209,5 @@ index e1d09884a1c5..9105031d55d3 100644
   * struct arm_smccc_quirk - Contains quirk information
   * @id: quirk identification
 -- 
-2.39.1
+2.25.1
 

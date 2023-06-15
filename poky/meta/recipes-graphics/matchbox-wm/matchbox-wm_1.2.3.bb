@@ -11,7 +11,7 @@ SECTION = "x11/wm"
 DEPENDS = "libmatchbox virtual/libx11 libxext libxrender startup-notification expat gconf libxcursor libxfixes"
 
 SRCREV = "ce8c1053270d960a7235ab5c3435f707541810a4"
-SRC_URI = "git://git.yoctoproject.org/matchbox-window-manager;branch=master \
+SRC_URI = "git://git.yoctoproject.org/matchbox-window-manager;branch=master;protocol=https \
            file://kbdconfig"
 
 S = "${WORKDIR}/git"

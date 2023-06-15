@@ -1,7 +1,7 @@
-From 6a73345662d53ebaa9750c70aa8fc7f40d3f8524 Mon Sep 17 00:00:00 2001
+From b9c44c396f9ad9588184272cdc5ed98e19e82c0a Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Tue, 29 Nov 2022 15:11:27 +0000
-Subject: [PATCH 11/27] efi: corstone1000: introduce EFI capsule update
+Subject: [PATCH 11/42] efi: corstone1000: introduce EFI capsule update
 
 This commit provides capsule update feature for Corstone1000.
 
@@ -32,7 +32,7 @@ Upstream-Status: Pending [Not submitted to upstream yet]
  7 files changed, 200 insertions(+), 4 deletions(-)
 
 diff --git a/board/armltd/corstone1000/corstone1000.c b/board/armltd/corstone1000/corstone1000.c
-index 4f4b96a095c2..76816f8f4ea1 100644
+index 4f4b96a095..76816f8f4e 100644
 --- a/board/armltd/corstone1000/corstone1000.c
 +++ b/board/armltd/corstone1000/corstone1000.c
 @@ -66,6 +66,10 @@ static struct mm_region corstone1000_mem_map[] = {
@@ -47,7 +47,7 @@ index 4f4b96a095c2..76816f8f4ea1 100644
  {
  	return 0;
 diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
-index d1dc06c86c2c..06eac3e041fe 100644
+index d1dc06c86c..06eac3e041 100644
 --- a/configs/corstone1000_defconfig
 +++ b/configs/corstone1000_defconfig
 @@ -54,3 +54,6 @@ CONFIG_USB_ISP1760=y
@@ -58,7 +58,7 @@ index d1dc06c86c2c..06eac3e041fe 100644
 +CONFIG_EFI_CAPSULE_FIRMWARE_FIT=y
 +CONFIG_EFI_CAPSULE_FIRMWARE_RAW=y
 diff --git a/include/configs/corstone1000.h b/include/configs/corstone1000.h
-index b6226fa12af3..cd30499e3c9c 100644
+index b6226fa12a..cd30499e3c 100644
 --- a/include/configs/corstone1000.h
 +++ b/include/configs/corstone1000.h
 @@ -14,6 +14,24 @@
@@ -87,7 +87,7 @@ index b6226fa12af3..cd30499e3c9c 100644
  
  /*
 diff --git a/include/efi_loader.h b/include/efi_loader.h
-index f9e427f09059..26981141c228 100644
+index f9e427f090..26981141c2 100644
 --- a/include/efi_loader.h
 +++ b/include/efi_loader.h
 @@ -1032,11 +1032,11 @@ extern const struct efi_firmware_management_protocol efi_fmp_fit;
@@ -105,7 +105,7 @@ index f9e427f09059..26981141c228 100644
  		efi_uintn_t capsule_count,
  		u64 *maximum_capsule_size,
 diff --git a/lib/efi_loader/efi_boottime.c b/lib/efi_loader/efi_boottime.c
-index fea4eb7a342e..faab74474d77 100644
+index fea4eb7a34..faab74474d 100644
 --- a/lib/efi_loader/efi_boottime.c
 +++ b/lib/efi_loader/efi_boottime.c
 @@ -2103,6 +2103,33 @@ static void efi_exit_caches(void)
@@ -159,7 +159,7 @@ index fea4eb7a342e..faab74474d77 100644
  	efi_set_watchdog(0);
  	schedule();
 diff --git a/lib/efi_loader/efi_capsule.c b/lib/efi_loader/efi_capsule.c
-index 0997cd248fe3..9e8ddaac7f03 100644
+index 0997cd248f..9e8ddaac7f 100644
 --- a/lib/efi_loader/efi_capsule.c
 +++ b/lib/efi_loader/efi_capsule.c
 @@ -26,6 +26,14 @@
@@ -329,7 +329,7 @@ index 0997cd248fe3..9e8ddaac7f03 100644
  		efi_uintn_t capsule_count,
  		u64 *maximum_capsule_size,
 diff --git a/lib/efi_loader/efi_setup.c b/lib/efi_loader/efi_setup.c
-index 543764113530..1ad2fa52d7e9 100644
+index 5437641135..1ad2fa52d7 100644
 --- a/lib/efi_loader/efi_setup.c
 +++ b/lib/efi_loader/efi_setup.c
 @@ -16,6 +16,13 @@
@@ -362,5 +362,5 @@ index 543764113530..1ad2fa52d7e9 100644
  		ret = efi_set_variable_int(u"CapsuleMax",
  					   &efi_guid_capsule_report,
 -- 
-2.39.1
+2.25.1
 

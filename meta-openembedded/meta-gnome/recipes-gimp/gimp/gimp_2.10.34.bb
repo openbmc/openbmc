@@ -43,7 +43,9 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 SHPV = "${@gnome_verdir("${PV}")}"
 
-SRC_URI = "https://download.gimp.org/pub/${BPN}/v${SHPV}/${BP}.tar.bz2"
+SRC_URI = "https://download.gimp.org/pub/${BPN}/v${SHPV}/${BP}.tar.bz2 \
+           file://0001-configure-Keep-first-line-of-compiler-version-string.patch \
+           file://0001-libtool-Do-not-add-build-time-library-paths-to-LD_LI.patch"
 SRC_URI[sha256sum] = "84004642d351b398a4293cd7fd3592044a944f05bb52850ee6068f247c657aa3"
 
 EXTRA_OECONF = "--disable-python \

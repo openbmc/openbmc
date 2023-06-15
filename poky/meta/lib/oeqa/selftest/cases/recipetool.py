@@ -361,7 +361,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         tempsrc = os.path.join(self.tempdir, 'srctree')
         os.makedirs(tempsrc)
         recipefile = os.path.join(self.tempdir, 'libmatchbox.bb')
-        srcuri = 'git://git.yoctoproject.org/libmatchbox'
+        srcuri = 'git://git.yoctoproject.org/libmatchbox;protocol=https'
         result = runCmd(['recipetool', 'create', '-o', recipefile, srcuri + ";rev=9f7cf8895ae2d39c465c04cc78e918c157420269", '-x', tempsrc])
         self.assertTrue(os.path.isfile(recipefile), 'recipetool did not create recipe file; output:\n%s' % result.output)
         checkvars = {}
@@ -511,13 +511,13 @@ class RecipetoolCreateTests(RecipetoolBase):
         self._test_recipetool_create_git('http://git.yoctoproject.org/git/matchbox-keyboard')
 
     def test_recipetool_create_git_srcuri_master(self):
-        self._test_recipetool_create_git('git://git.yoctoproject.org/matchbox-keyboard;branch=master')
+        self._test_recipetool_create_git('git://git.yoctoproject.org/matchbox-keyboard;branch=master;protocol=https')
 
     def test_recipetool_create_git_srcuri_branch(self):
-        self._test_recipetool_create_git('git://git.yoctoproject.org/matchbox-keyboard;branch=matchbox-keyboard-0-1')
+        self._test_recipetool_create_git('git://git.yoctoproject.org/matchbox-keyboard;branch=matchbox-keyboard-0-1;protocol=https')
 
     def test_recipetool_create_git_srcbranch(self):
-        self._test_recipetool_create_git('git://git.yoctoproject.org/matchbox-keyboard', 'matchbox-keyboard-0-1')
+        self._test_recipetool_create_git('git://git.yoctoproject.org/matchbox-keyboard;protocol=https', 'matchbox-keyboard-0-1')
 
 
 class RecipetoolTests(RecipetoolBase):

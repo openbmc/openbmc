@@ -1,7 +1,7 @@
-From 5816c61212f9710a5c7310cd7c57cc349e852152 Mon Sep 17 00:00:00 2001
+From 5af272d2bb2a7a8c8a4732c8d598dd1713856949 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Tue, 29 Nov 2022 14:48:34 +0000
-Subject: [PATCH 08/27] arm_ffa: introduce armffa command Sandbox test
+Subject: [PATCH 08/42] arm_ffa: introduce armffa command Sandbox test
 
 Add Sandbox test for the armffa command
 
@@ -27,7 +27,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  create mode 100644 test/cmd/armffa.c
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index c1d3d4ae1c56..a2f60a3b93a6 100644
+index c1d3d4ae1c..a2f60a3b93 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
 @@ -272,6 +272,7 @@ F:	doc/arch/arm64.ffa.rst
@@ -39,7 +39,7 @@ index c1d3d4ae1c56..a2f60a3b93a6 100644
  
  ARM FREESCALE IMX
 diff --git a/test/cmd/Makefile b/test/cmd/Makefile
-index bc961df3dcee..21aa6d740ee8 100644
+index bc961df3dc..21aa6d740e 100644
 --- a/test/cmd/Makefile
 +++ b/test/cmd/Makefile
 @@ -1,6 +1,7 @@
@@ -60,7 +60,7 @@ index bc961df3dcee..21aa6d740ee8 100644
  obj-$(CONFIG_CMD_WGET) += wget.o
 diff --git a/test/cmd/armffa.c b/test/cmd/armffa.c
 new file mode 100644
-index 000000000000..e04363ba63f9
+index 0000000000..e04363ba63
 --- /dev/null
 +++ b/test/cmd/armffa.c
 @@ -0,0 +1,39 @@
@@ -104,5 +104,5 @@ index 000000000000..e04363ba63f9
 +
 +DM_TEST(dm_test_armffa_cmd, UT_TESTF_SCAN_FDT | UT_TESTF_CONSOLE_REC);
 -- 
-2.39.1
+2.25.1
 

@@ -22,3 +22,5 @@ PACKAGECONFIG[swig] = "--with-swig,--without-swig, swig"
 EXTRA_OECONF = "--without-python"
 
 RDEPENDS:${PN} += "bash"
+
+FILES:${PN}-staticdev += "${libexecdir}/gensio/${PV}/libgensio_*.a"

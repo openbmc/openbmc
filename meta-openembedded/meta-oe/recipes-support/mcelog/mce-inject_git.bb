@@ -21,4 +21,4 @@ COMPATIBLE_HOST = '(x86_64.*|i.86.*)-linux'
 
 inherit autotools-brokensep
 
-EXTRA_OEMAKE = "destdir=${D}"
+EXTRA_OEMAKE = "destdir=${D} CFLAGS='${CFLAGS}'"

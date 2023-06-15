@@ -18,7 +18,11 @@ S = "${WORKDIR}/libgpiod-2.0/bindings/python"
 inherit setuptools3 ptest
 
 DEPENDS += "libgpiod"
-RDEPENDS:${PN} += "libgpiod (>= 2.0)"
+RDEPENDS:${PN} += " \
+    libgpiod (>= 2.0) \
+    python3-datetime \
+    python3-profile \
+"
 RDEPENDS:${PN}-ptest += "python3-setuptools"
 
 export GPIOD_WITH_TESTS = "${@bb.utils.contains("PTEST_ENABLED", "1", "1", "0", d)}"

@@ -38,4 +38,4 @@ FILES:${PN} += " \
 FILES:${PN}-dev += " \
     ${datadir}/gettext \
 "
-
+RDEPENDS:${PN} += "python3-core"

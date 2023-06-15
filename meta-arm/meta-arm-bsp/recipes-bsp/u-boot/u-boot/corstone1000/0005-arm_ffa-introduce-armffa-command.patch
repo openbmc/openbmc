@@ -1,7 +1,7 @@
-From c6b116c4793449775064a8fc949a3b607b7ade27 Mon Sep 17 00:00:00 2001
+From f3bc86a7ec63c0454577cb6712395c577b2cfd66 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Mon, 6 Jun 2022 12:46:38 +0100
-Subject: [PATCH 05/27] arm_ffa: introduce armffa command
+Subject: [PATCH 05/42] arm_ffa: introduce armffa command
 
 Provide armffa command showcasing the use of the FF-A driver
 
@@ -59,7 +59,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  create mode 100644 cmd/armffa.c
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 509619d31ce6..61ce6c436fe1 100644
+index 509619d31c..61ce6c436f 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
 @@ -267,6 +267,7 @@ F:	configs/cortina_presidio-asic-pnand_defconfig
@@ -71,7 +71,7 @@ index 509619d31ce6..61ce6c436fe1 100644
  F:	drivers/firmware/arm-ffa/
  F:	include/arm_ffa.h
 diff --git a/cmd/Kconfig b/cmd/Kconfig
-index b2d75987170e..7d0a40e8acb4 100644
+index b2d7598717..7d0a40e8ac 100644
 --- a/cmd/Kconfig
 +++ b/cmd/Kconfig
 @@ -924,6 +924,16 @@ endmenu
@@ -92,7 +92,7 @@ index b2d75987170e..7d0a40e8acb4 100644
  	#depends on FLASH_CFI_DRIVER
  	bool "armflash"
 diff --git a/cmd/Makefile b/cmd/Makefile
-index 0b6a96c1d914..c757f1647da6 100644
+index 0b6a96c1d9..c757f1647d 100644
 --- a/cmd/Makefile
 +++ b/cmd/Makefile
 @@ -12,6 +12,8 @@ obj-y += panic.o
@@ -106,7 +106,7 @@ index 0b6a96c1d914..c757f1647da6 100644
  obj-$(CONFIG_CMD_AES) += aes.o
 diff --git a/cmd/armffa.c b/cmd/armffa.c
 new file mode 100644
-index 000000000000..d2e8687bfb1f
+index 0000000000..d2e8687bfb
 --- /dev/null
 +++ b/cmd/armffa.c
 @@ -0,0 +1,237 @@
@@ -348,7 +348,7 @@ index 000000000000..d2e8687bfb1f
 +	   "devlist\n"
 +	   "	 - displays the arm_ffa device info\n");
 diff --git a/drivers/firmware/arm-ffa/Kconfig b/drivers/firmware/arm-ffa/Kconfig
-index e4914b9bc779..be4df89d23fa 100644
+index e4914b9bc7..be4df89d23 100644
 --- a/drivers/firmware/arm-ffa/Kconfig
 +++ b/drivers/firmware/arm-ffa/Kconfig
 @@ -4,6 +4,7 @@ config ARM_FFA_TRANSPORT
@@ -360,5 +360,5 @@ index e4914b9bc779..be4df89d23fa 100644
  	select DEVRES
  	help
 -- 
-2.39.1
+2.25.1
 

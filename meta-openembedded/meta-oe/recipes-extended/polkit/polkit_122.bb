@@ -4,7 +4,7 @@ HOMEPAGE = "http://www.freedesktop.org/wiki/Software/polkit"
 LICENSE = "LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=155db86cdbafa7532b41f390409283eb"
 
-SRC_URI = "git://github.com/freedesktop/polkit.git;protocol=https;branch=master"
+SRC_URI = "git://gitlab.freedesktop.org/polkit/polkit.git;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"
 SRCREV = "da87c5698019897dd731bb2cbb54ebd9c9481f52"

@@ -27,7 +27,7 @@ GTKDOC_MESON_OPTION = "gtk_doc"
 
 MULTILIB_SCRIPTS = "${PN}:${bindir}/g-ir-annotation-tool ${PN}:${bindir}/g-ir-scanner"
 
-DEPENDS += " libffi zlib glib-2.0 python3 flex-native bison-native autoconf-archive"
+DEPENDS += " libffi zlib glib-2.0 python3 flex-native bison-native autoconf-archive-native"
 
 # target build needs qemu to run temporary introspection binaries created
 # on the fly by g-ir-scanner and a native version of itself to run

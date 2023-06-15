@@ -1,7 +1,7 @@
-From 5866edd29215e939eaad38956886df6c7af5ab96 Mon Sep 17 00:00:00 2001
+From a6fee840a411a6a7b6c276d0a7b1d5445039e6c2 Mon Sep 17 00:00:00 2001
 From: Vishnu Banavath <vishnu.banavath@arm.com>
 Date: Mon, 15 Aug 2022 15:46:18 +0100
-Subject: [PATCH 18/27] efi_loader: send bootcomplete message to secure enclave
+Subject: [PATCH 18/42] efi_loader: send bootcomplete message to secure enclave
 
 On corstone1000 platform, Secure Enclave will be expecting
 an event from uboot when it performs capsule update. Previously,
@@ -21,7 +21,7 @@ Upstream-Status: Pending [Not submitted to upstream yet]
  4 files changed, 41 insertions(+), 45 deletions(-)
 
 diff --git a/include/configs/corstone1000.h b/include/configs/corstone1000.h
-index e4c7bcb96f27..be13b98d4829 100644
+index e4c7bcb96f..be13b98d48 100644
 --- a/include/configs/corstone1000.h
 +++ b/include/configs/corstone1000.h
 @@ -22,7 +22,7 @@
@@ -34,7 +34,7 @@ index e4c7bcb96f27..be13b98d4829 100644
  #define PREP_SEPROXY_SVC_ID_MASK	GENMASK(31, 16)
  #define PREP_SEPROXY_SVC_ID(x)	 (FIELD_PREP(PREP_SEPROXY_SVC_ID_MASK, (x)))
 diff --git a/lib/efi_loader/efi_boottime.c b/lib/efi_loader/efi_boottime.c
-index 36a0be7ba104..fea4eb7a342e 100644
+index 36a0be7ba1..fea4eb7a34 100644
 --- a/lib/efi_loader/efi_boottime.c
 +++ b/lib/efi_loader/efi_boottime.c
 @@ -30,11 +30,6 @@
@@ -102,7 +102,7 @@ index 36a0be7ba104..fea4eb7a342e 100644
  	efi_set_watchdog(0);
  	schedule();
 diff --git a/lib/efi_loader/efi_firmware.c b/lib/efi_loader/efi_firmware.c
-index 0a38a96351ff..70568f22909e 100644
+index 0a38a96351..70568f2290 100644
 --- a/lib/efi_loader/efi_firmware.c
 +++ b/lib/efi_loader/efi_firmware.c
 @@ -48,7 +48,7 @@ static efi_status_t efi_corstone1000_img_info_get (
@@ -115,7 +115,7 @@ index 0a38a96351ff..70568f22909e 100644
  	}
  
 diff --git a/lib/efi_loader/efi_setup.c b/lib/efi_loader/efi_setup.c
-index 1ad2fa52d7e9..89f988b09c44 100644
+index 1ad2fa52d7..89f988b09c 100644
 --- a/lib/efi_loader/efi_setup.c
 +++ b/lib/efi_loader/efi_setup.c
 @@ -17,6 +17,9 @@
@@ -179,5 +179,5 @@ index 1ad2fa52d7e9..89f988b09c44 100644
  	if (ret != EFI_SUCCESS) {
  		printf("EFI: Corstone-1000: cannot allocate caspsule shared buffer\n");
 -- 
-2.39.1
+2.25.1
 

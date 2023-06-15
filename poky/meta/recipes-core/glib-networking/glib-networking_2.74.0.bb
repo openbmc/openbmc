@@ -24,6 +24,7 @@ GNOMEBASEBUILDCLASS = "meson"
 inherit gnomebase gettext upstream-version-is-even gio-module-cache ptest-gnome
 
 SRC_URI += "file://run-ptest"
+SRC_URI += "file://eagain.patch"
 
 FILES:${PN} += "\
                 ${libdir}/gio/modules/libgio*.so \

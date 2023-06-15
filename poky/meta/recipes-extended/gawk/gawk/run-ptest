@@ -3,6 +3,11 @@
 cd test
 for i in `grep -E "^[a-z0-9_-]*:$" Maketests |awk -F: '{print $1}'`; do
   unset LANG
+  grep -q "^$i$" skipped.txt
+  if [ $? -eq 0 ]; then
+    echo "SKIP: $i"
+    continue
+  fi
   srcdir=`pwd` AWKPROG=gawk AWK=gawk CMP=cmp make -f Maketests $i >$i.tmp 2>&1
   if [ -e _$i ]; then
     cat _$i

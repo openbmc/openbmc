@@ -5,11 +5,10 @@ protocol (RFCs 2128 and 2139)."
 HOMEPAGE = "http://sourceforge.net/projects/radiusclient-ng.berlios/"
 SECTION = "net"
 
-SRC_URI = "${DEBIAN_MIRROR}/main/r/${BPN}/${BPN}_${PV}.orig.tar.gz \
+SRC_URI = "http://archive.ubuntu.com/ubuntu/pool/universe/r/${BPN}/${BPN}_${PV}.orig.tar.gz \
    file://Modify-configure.in-and-etc-Makefile.am.patch \
    file://config-site.radiusclient-ng-${PV}"
 
-SRC_URI[md5sum] = "6fb7d4d0aefafaee7385831ac46a8e9c"
 SRC_URI[sha256sum] = "282a9f1355f190efbb06c0d7c4e062eaa652caf342ed3ad361ac595f72f09f14"
 
 LICENSE = "BSD-3-Clause & BSD-2-Clause & HPND"

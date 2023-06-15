@@ -1,0 +1,31 @@
+From 146b5116140d719e4e9ae19748c0b6dee7d82f96 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 22 May 2023 22:01:28 -0700
+Subject: [PATCH] m4: Just emit the first line of compiler version
+
+Avoids emitting buildpaths into comments
+Fixes
+WARNING: openct-0.6.20-r0 do_package_qa: QA Issue: File /usr/include/openct/types.h in package openct-dev contains reference to TMPDIR [buildpaths]
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ m4/ac_create_stdint_h.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/m4/ac_create_stdint_h.m4 b/m4/ac_create_stdint_h.m4
+index 66de704..4b7223a 100644
+--- a/m4/ac_create_stdint_h.m4
++++ b/m4/ac_create_stdint_h.m4
+@@ -110,7 +110,7 @@ echo "#define" $_ac_stdint_h "1" >>$ac_stdint_h
+ echo "#ifndef" _GENERATED_STDINT_H >>$ac_stdint_h
+ echo "#define" _GENERATED_STDINT_H '"'$PACKAGE $VERSION'"' >>$ac_stdint_h
+ if test "$GCC" = "yes" ; then
+-  echo "/* generated using a gnu compiler version" `$CC --version` "*/" \
++  echo "/* generated using a gnu compiler version" `$CC --version|head -1` "*/" \
+   >>$ac_stdint_h
+ else
+   echo "/* generated using $CC */" >>$ac_stdint_h
+-- 
+2.40.1
+

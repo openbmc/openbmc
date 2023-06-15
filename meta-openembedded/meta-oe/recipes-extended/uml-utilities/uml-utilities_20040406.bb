@@ -8,6 +8,8 @@ SRC_URI = "http://downloads.sourceforge.net/project/user-mode-linux/tools/1/uml_
            file://unstrip.patch \
            file://0001-include-required-system-header-files-for-fd_set-and-.patch \
            file://0001-Add-missing-standard-headers-for-str-and-exit-APIs.patch \
+           file://0001-cow.c-Replace-stat64-with-stat.patch \
+           file://0001-makefiles-Append-to-CFLAGS-instead-of-re-assign.patch \
            "
 SRC_URI[md5sum] = "2c1ccd9efacbfb39e42d482b89b2550a"
 SRC_URI[sha256sum] = "4f179b1db021ef15ac7e9b2eed57c525db127a754c574f591c367460cded9f41"

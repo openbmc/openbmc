@@ -9,7 +9,7 @@ SECTION = "libs"
 LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=7fbc338309ac38fefcd64b04bb903e34"
 
-DEPENDS = "dbus glib-2.0 glib-2.0-native gdk-pixbuf"
+DEPENDS = "glib-2.0 glib-2.0-native gdk-pixbuf"
 
 PACKAGECONFIG ?= ""
 PACKAGECONFIG[tests] = "-Dtests=true,-Dtests=false,gtk+3"

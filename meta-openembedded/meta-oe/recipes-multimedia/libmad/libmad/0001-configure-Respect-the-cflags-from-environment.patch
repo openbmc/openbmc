@@ -1,0 +1,47 @@
+From 26342d1c775205f661f5cf005b7e054a04f5d32e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 16 May 2023 10:14:57 -0700
+Subject: [PATCH] configure: Respect the cflags from environment
+
+This is needed with OE like cross-build envs where certain important
+flags maybe passed as global policy to aid cross compiling or
+reproducibility etc.
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -73,12 +73,9 @@ debug=""
+ optimize=""
+ profile=""
+ 
+-set -- $CFLAGS
+-CFLAGS=""
+-
+ if test "$GCC" = yes
+ then
+-    CFLAGS="-Wall"
++    CFLAGS="$CFLAGS -Wall"
+ fi
+ 
+ while test $# -gt 0
+@@ -115,10 +112,13 @@ do
+ 	    optimize="$optimize $1"
+ 	    shift
+ 	    ;;
+-	*)
++	-*)
+ 	    CFLAGS="$CFLAGS $1"
+ 	    shift
+ 	    ;;
++	*)
++	    shift
++	    ;;
+     esac
+ done
+ 

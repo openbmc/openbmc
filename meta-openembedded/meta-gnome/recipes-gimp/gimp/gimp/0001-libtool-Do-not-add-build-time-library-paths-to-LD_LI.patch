@@ -1,0 +1,34 @@
+From c720df90dfe3a3e92e34bfb36a04cc792064a501 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 24 May 2023 22:39:02 -0700
+Subject: [PATCH] libtool: Do not add build time library paths to
+ LD_LIBRARY_PATH
+
+This does not serve much purpose on cross builds as it will add build
+time paths which are only useful when trying to run these tools from
+build area but when they are cross built this is not possible to run
+them like this.
+
+Upstream-Status: Inappropriate [Cross-compile specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ltmain.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ltmain.sh b/ltmain.sh
+index 134902c..068d74a 100644
+--- a/ltmain.sh
++++ b/ltmain.sh
+@@ -5748,7 +5748,7 @@ func_exec_program ()
+ 	if test yes = "$shlibpath_overrides_runpath" && test -n "$shlibpath_var" && test -n "$temp_rpath"; then
+ 	  $ECHO "\
+     # Add our own library path to $shlibpath_var
+-    $shlibpath_var=\"$temp_rpath\$$shlibpath_var\"
++    $shlibpath_var=\"$shlibpath_var\"
+ 
+     # Some systems cannot cope with colon-terminated $shlibpath_var
+     # The second colon is a workaround for a bug in BeOS R4 sed
+-- 
+2.40.1
+

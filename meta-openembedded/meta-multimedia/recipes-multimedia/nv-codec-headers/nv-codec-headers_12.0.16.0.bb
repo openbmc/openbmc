@@ -10,7 +10,7 @@ SRC_URI = " \
 SRCREV = "c5e4af74850a616c42d39ed45b9b8568b71bf8bf"
 S = "${WORKDIR}/git"
 
-EXTRA_OEMAKE = "PREFIX=${prefix} DESTDIR=${D}"
+EXTRA_OEMAKE = "PREFIX=${prefix} DESTDIR=${D} LIBDIR=${baselib}"
 
 do_install() {
     oe_runmake install

@@ -1,0 +1,122 @@
+From ac72fffe639d564f59ec1e1eafde83980acef1b5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 23 May 2023 14:40:31 -0700
+Subject: [PATCH] makefiles: Append to CFLAGS instead of re-assign
+
+This helps in inserting yocto provided CFLAGS from build environment
+
+Upstream-Status: Inappropriate [No upstream]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ jailtest/Makefile    | 2 +-
+ mconsole/Makefile    | 2 +-
+ moo/Makefile         | 2 +-
+ port-helper/Makefile | 2 +-
+ tunctl/Makefile      | 2 +-
+ uml_net/Makefile     | 2 +-
+ uml_router/Makefile  | 2 +-
+ watchdog/Makefile    | 2 +-
+ 8 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/jailtest/Makefile b/jailtest/Makefile
+index 610ca1a..025fca9 100644
+--- a/jailtest/Makefile
++++ b/jailtest/Makefile
+@@ -1,6 +1,6 @@
+ OBJS = jailtest.o
+ BIN = jailtest
+-CFLAGS = -g -Wall
++CFLAGS += -g -Wall
+ 
+ BIN_DIR ?= /usr/bin
+ 
+diff --git a/mconsole/Makefile b/mconsole/Makefile
+index 9818d8a..74a2560 100644
+--- a/mconsole/Makefile
++++ b/mconsole/Makefile
+@@ -1,6 +1,6 @@
+ BIN = uml_mconsole
+ OBJS = $(BIN).o
+-CFLAGS = -g -Wall
++CFLAGS += -g -Wall
+ 
+ BIN_DIR ?= /usr/bin
+ 
+diff --git a/moo/Makefile b/moo/Makefile
+index 6cdb591..60d300d 100644
+--- a/moo/Makefile
++++ b/moo/Makefile
+@@ -3,7 +3,7 @@ BIN = uml_moo uml_mkcow
+ uml_moo_OBJS = uml_moo.o cow.o
+ uml_mkcow_OBJS = uml_mkcow.o cow.o
+ 
+-CFLAGS = -g -Wall -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE
++CFLAGS += -g -Wall -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE
+ 
+ BIN_DIR ?= /usr/bin
+ 
+diff --git a/port-helper/Makefile b/port-helper/Makefile
+index 8e33bdf..8b695f3 100644
+--- a/port-helper/Makefile
++++ b/port-helper/Makefile
+@@ -1,6 +1,6 @@
+ OBJS = port-helper.o
+ BIN = port-helper
+-CFLAGS = -g -Wall
++CFLAGS += -g -Wall
+ 
+ LIB_DIR ?= /usr/lib/uml
+ 
+diff --git a/tunctl/Makefile b/tunctl/Makefile
+index 743bfea..a39ad2b 100644
+--- a/tunctl/Makefile
++++ b/tunctl/Makefile
+@@ -1,6 +1,6 @@
+ OBJS = tunctl.o
+ BIN = tunctl
+-CFLAGS = -g -Wall
++CFLAGS += -g -Wall
+ 
+ BIN_DIR ?= /usr/bin
+ 
+diff --git a/uml_net/Makefile b/uml_net/Makefile
+index 36efec6..2e1ad0e 100644
+--- a/uml_net/Makefile
++++ b/uml_net/Makefile
+@@ -1,7 +1,7 @@
+ TUNTAP = $(shell [ -e /usr/include/linux/if_tun.h ] && echo -DTUNTAP)
+ 
+ BIN = uml_net
+-CFLAGS = -g -Wall $(TUNTAP)
++CFLAGS += -g -Wall $(TUNTAP)
+ 
+ BIN_DIR ?= /usr/bin
+ 
+diff --git a/uml_router/Makefile b/uml_router/Makefile
+index b7b5401..e399ea5 100644
+--- a/uml_router/Makefile
++++ b/uml_router/Makefile
+@@ -2,7 +2,7 @@ TUNTAP = $(shell [ -e /usr/include/linux/if_tun.h ] && echo -DTUNTAP)
+ 
+ OBJS = hash.o port.o uml_switch.o 
+ BIN = uml_switch
+-CFLAGS = -g -Wall $(TUNTAP)
++CFLAGS += -g -Wall $(TUNTAP)
+ 
+ BIN_DIR ?= /usr/bin
+ 
+diff --git a/watchdog/Makefile b/watchdog/Makefile
+index c26fd9f..5178cc6 100644
+--- a/watchdog/Makefile
++++ b/watchdog/Makefile
+@@ -1,6 +1,6 @@
+ BIN = uml_watchdog
+ OBJS = $(BIN).o
+-CFLAGS = -g -Wall
++CFLAGS += -g -Wall
+ 
+ BIN_DIR ?= /usr/bin
+ 
+-- 
+2.40.1
+

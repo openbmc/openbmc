@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=c678957b0c8e964aa6c70fd77641a71e"
 
 inherit autotools gettext texinfo update-alternatives pkgconfig
 
-DEPENDS += "autoconf-archive"
+DEPENDS += "autoconf-archive-native"
 
 EXTRA_OECONF = "--without-libgnutls-prefix --without-libssl-prefix \
                 --disable-rpath"

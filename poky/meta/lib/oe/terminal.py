@@ -104,6 +104,10 @@ class Rxvt(XTerminal):
     command = 'rxvt -T "{title}" -e {command}'
     priority = 1
 
+class URxvt(XTerminal):
+    command = 'urxvt -T "{title}" -e {command}'
+    priority = 1
+
 class Screen(Terminal):
     command = 'screen -D -m -t "{title}" -S devshell {command}'
 

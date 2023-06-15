@@ -1,7 +1,7 @@
-From 69cfd14c37bee479eb3cb7e6dd2df23f460f0713 Mon Sep 17 00:00:00 2001
+From 77cf1f517f6d92d5e3efb40d8335adb03b289525 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Tue, 29 Nov 2022 14:40:05 +0000
-Subject: [PATCH 03/27] arm_ffa: introduce Arm FF-A low-level driver
+Subject: [PATCH 03/42] arm_ffa: introduce Arm FF-A low-level driver
 
 Add the core driver implementing Arm Firmware Framework for Armv8-A v1.0
 
@@ -134,7 +134,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  create mode 100644 include/arm_ffa.h
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 3fc4cd0f12d3..509619d31ce6 100644
+index 3fc4cd0f12..509619d31c 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
 @@ -264,6 +264,13 @@ F:	drivers/net/cortina_ni.h
@@ -153,7 +153,7 @@ index 3fc4cd0f12d3..509619d31ce6 100644
  M:	Fabio Estevam <festevam@gmail.com>
 diff --git a/doc/arch/arm64.ffa.rst b/doc/arch/arm64.ffa.rst
 new file mode 100644
-index 000000000000..dfcec82e456e
+index 0000000000..dfcec82e45
 --- /dev/null
 +++ b/doc/arch/arm64.ffa.rst
 @@ -0,0 +1,218 @@
@@ -376,7 +376,7 @@ index 000000000000..dfcec82e456e
 +------------
 +   * Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 diff --git a/doc/arch/index.rst b/doc/arch/index.rst
-index b3e85f9bf347..cf1cfc9287c2 100644
+index b3e85f9bf3..cf1cfc9287 100644
 --- a/doc/arch/index.rst
 +++ b/doc/arch/index.rst
 @@ -8,6 +8,7 @@ Architecture-specific doc
@@ -388,7 +388,7 @@ index b3e85f9bf347..cf1cfc9287c2 100644
     mips
     nios2
 diff --git a/drivers/Kconfig b/drivers/Kconfig
-index 75ac149d3118..ff75b7c3f883 100644
+index 75ac149d31..ff75b7c3f8 100644
 --- a/drivers/Kconfig
 +++ b/drivers/Kconfig
 @@ -6,6 +6,8 @@ source "drivers/core/Kconfig"
@@ -401,7 +401,7 @@ index 75ac149d3118..ff75b7c3f883 100644
  
  source "drivers/axi/Kconfig"
 diff --git a/drivers/Makefile b/drivers/Makefile
-index 6f1de58e0030..28c8f538c83a 100644
+index 6f1de58e00..28c8f538c8 100644
 --- a/drivers/Makefile
 +++ b/drivers/Makefile
 @@ -112,6 +112,7 @@ obj-y += iommu/
@@ -414,7 +414,7 @@ index 6f1de58e0030..28c8f538c83a 100644
  obj-$(CONFIG_W1) += w1/
 diff --git a/drivers/firmware/arm-ffa/Kconfig b/drivers/firmware/arm-ffa/Kconfig
 new file mode 100644
-index 000000000000..e4914b9bc779
+index 0000000000..e4914b9bc7
 --- /dev/null
 +++ b/drivers/firmware/arm-ffa/Kconfig
 @@ -0,0 +1,30 @@
@@ -450,7 +450,7 @@ index 000000000000..e4914b9bc779
 +
 diff --git a/drivers/firmware/arm-ffa/Makefile b/drivers/firmware/arm-ffa/Makefile
 new file mode 100644
-index 000000000000..043a8915bec5
+index 0000000000..043a8915be
 --- /dev/null
 +++ b/drivers/firmware/arm-ffa/Makefile
 @@ -0,0 +1,6 @@
@@ -462,7 +462,7 @@ index 000000000000..043a8915bec5
 +obj-y += arm-ffa-uclass.o core.o
 diff --git a/drivers/firmware/arm-ffa/arm-ffa-uclass.c b/drivers/firmware/arm-ffa/arm-ffa-uclass.c
 new file mode 100644
-index 000000000000..7d9695d28922
+index 0000000000..7d9695d289
 --- /dev/null
 +++ b/drivers/firmware/arm-ffa/arm-ffa-uclass.c
 @@ -0,0 +1,16 @@
@@ -484,7 +484,7 @@ index 000000000000..7d9695d28922
 +};
 diff --git a/drivers/firmware/arm-ffa/arm_ffa_prv.h b/drivers/firmware/arm-ffa/arm_ffa_prv.h
 new file mode 100644
-index 000000000000..4eea7dc03604
+index 0000000000..4eea7dc036
 --- /dev/null
 +++ b/drivers/firmware/arm-ffa/arm_ffa_prv.h
 @@ -0,0 +1,200 @@
@@ -690,7 +690,7 @@ index 000000000000..4eea7dc03604
 +#endif
 diff --git a/drivers/firmware/arm-ffa/core.c b/drivers/firmware/arm-ffa/core.c
 new file mode 100644
-index 000000000000..0b1f8e6a078d
+index 0000000000..0b1f8e6a07
 --- /dev/null
 +++ b/drivers/firmware/arm-ffa/core.c
 @@ -0,0 +1,1315 @@
@@ -2011,7 +2011,7 @@ index 000000000000..0b1f8e6a078d
 +};
 diff --git a/include/arm_ffa.h b/include/arm_ffa.h
 new file mode 100644
-index 000000000000..74b16174c292
+index 0000000000..74b16174c2
 --- /dev/null
 +++ b/include/arm_ffa.h
 @@ -0,0 +1,97 @@
@@ -2113,7 +2113,7 @@ index 000000000000..74b16174c292
 +
 +#endif
 diff --git a/include/dm/uclass-id.h b/include/dm/uclass-id.h
-index 376f741cc2bb..fa08a66ac8e0 100644
+index 376f741cc2..fa08a66ac8 100644
 --- a/include/dm/uclass-id.h
 +++ b/include/dm/uclass-id.h
 @@ -4,6 +4,9 @@
@@ -2135,5 +2135,5 @@ index 376f741cc2bb..fa08a66ac8e0 100644
  	UCLASS_FPGA,		/* FPGA device */
  	UCLASS_FUZZING_ENGINE,	/* Fuzzing engine */
 -- 
-2.39.1
+2.25.1
 

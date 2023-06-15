@@ -1,7 +1,7 @@
-From 7d2c73749107a5859c7158a859a62c3e8b2d33e2 Mon Sep 17 00:00:00 2001
+From b09b391e33e024a18842dfdc99282d0050cc5fcb Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Thu, 6 Oct 2022 15:04:25 +0100
-Subject: [PATCH 04/27] arm_ffa: efi: unmap RX/TX buffers
+Subject: [PATCH 04/42] arm_ffa: efi: unmap RX/TX buffers
 
 unmap RX/TX buffers at ExitBootServices()
 
@@ -32,7 +32,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  1 file changed, 13 insertions(+)
 
 diff --git a/lib/efi_loader/efi_boottime.c b/lib/efi_loader/efi_boottime.c
-index e65ca6a4cbee..3481f2afe7a9 100644
+index e65ca6a4cb..3481f2afe7 100644
 --- a/lib/efi_loader/efi_boottime.c
 +++ b/lib/efi_loader/efi_boottime.c
 @@ -3,6 +3,9 @@
@@ -70,5 +70,5 @@ index e65ca6a4cbee..3481f2afe7a9 100644
  	efi_runtime_detach();
  
 -- 
-2.39.1
+2.25.1
 

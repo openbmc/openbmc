@@ -35,7 +35,9 @@ INITSCRIPT_PARAMS = "defaults"
 INHIBIT_UPDATERCD_BBCLASS = "${@bb.utils.contains('PACKAGECONFIG', 'examples', '1', '0', d)}"
 
 do_install:append() {
-    install -Dm 0755 ${WORKDIR}/gadget-start ${D}/${bindir}/gadget-start
+    install -Dm 0755 ${WORKDIR}/gadget-start ${D}${bindir}/gadget-start
+    sed -i -e 's,/usr/bin,${bindir},g' -e 's,/etc,${sysconfdir},g' ${D}${bindir}/gadget-start
+
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -Dm 0644 ${WORKDIR}/usbgx.service ${D}${systemd_system_unitdir}/usbgx.service
     fi

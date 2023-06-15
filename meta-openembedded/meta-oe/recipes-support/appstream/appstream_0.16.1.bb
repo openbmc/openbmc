@@ -21,7 +21,7 @@ DEPENDS = " \
 
 inherit meson gobject-introspection gettext gtk-doc pkgconfig vala
 
-GIR_MESON_OPTION = ""
+GIR_MESON_OPTION = "gir"
 
 SRC_URI = "https://www.freedesktop.org/software/appstream/releases/AppStream-${PV}.tar.xz"
 SRC_URI:append:class-target = " file://0001-fix-crosscompile.patch"

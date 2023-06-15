@@ -1,4 +1,4 @@
-From 90d1bb804033a74b54f64cd5d3127c004c266af8 Mon Sep 17 00:00:00 2001
+From 70da8b91026c5381d430194910fc15e3b6c5ec7f Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 19 Feb 2020 09:51:16 -0800
 Subject: [PATCH] binutils-nativesdk: Search for alternative ld.so.conf in SDK
@@ -29,7 +29,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  5 files changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/ld/Makefile.am b/ld/Makefile.am
-index 12b2c3c453f..0590b7055d0 100644
+index b3195b4be68..fc6460317a7 100644
 --- a/ld/Makefile.am
 +++ b/ld/Makefile.am
 @@ -42,7 +42,8 @@ ZLIBINC = @zlibinc@
@@ -43,7 +43,7 @@ index 12b2c3c453f..0590b7055d0 100644
  NO_WERROR = @NO_WERROR@
  AM_CFLAGS = $(WARN_CFLAGS) $(ELF_CLFAGS) $(JANSSON_CFLAGS) $(ZSTD_CFLAGS)
 diff --git a/ld/Makefile.in b/ld/Makefile.in
-index 3d5685d6bae..70643b1ce46 100644
+index fe422569228..4a4c851b44a 100644
 --- a/ld/Makefile.in
 +++ b/ld/Makefile.in
 @@ -566,7 +566,8 @@ ZLIB = @zlibdir@ -lz
@@ -65,7 +65,7 @@ index eff6693e052..95787012b89 100644
        info.path = NULL;
        info.len = info.alloc = 0;
 -      tmppath = concat (ld_sysroot, prefix, "/etc/ld.so.conf",
-+      tmppath = concat (ld_sysconfdir, "/ld.so.conf",
++      tmppath = concat (ld_sysconfdir, "/etc/ld.so.conf",
  			(const char *) NULL);
        if (!ldelf_parse_ld_so_conf (&info, tmppath))
  	{

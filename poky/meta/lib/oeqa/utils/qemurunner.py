@@ -483,6 +483,7 @@ class QemuRunner:
 
                         decodedlog = self.decode_qemulog(bootlog)
                         if self.boot_patterns['search_reached_prompt'] in decodedlog:
+                            self.server_socket.close()
                             self.server_socket = qemusock
                             stopread = True
                             reachedlogin = True

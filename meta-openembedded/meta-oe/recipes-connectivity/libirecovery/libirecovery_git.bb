@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "\
 
 HOMEPAGE = "http://www.libimobiledevice.org/"
 
-DEPENDS = "libimobiledevice-glue libusb1"
+DEPENDS = "libimobiledevice-glue libusb1 readline"
 
 PV = "1.0.1+git${SRCPV}"
 

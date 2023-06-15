@@ -15,7 +15,13 @@ S = "${WORKDIR}/libgpiod-2.0"
 PACKAGECONFIG[tests] = "--enable-tests --enable-gpioset-interactive,--disable-tests,kmod util-linux glib-2.0 catch2 libedit"
 PACKAGECONFIG[gpioset-interactive] = "--enable-gpioset-interactive,--disable-gpioset-interactive,libedit"
 
+PACKAGES =+ "${PN}-ptest-dev"
 FILES:${PN}-tools += "${bindir}/gpionotify"
 FILES:${PN}-ptest += "${libdir}/libgpiosim.so.*"
+FILES:${PN}-ptest-dev += "${includedir}/gpiosim.h"
 
 RRECOMMENDS:${PN}-ptest += "kernel-module-gpio-sim"
+
+do_install_ptest:append() {
+    install -m 0644 ${S}/tests/gpiosim/gpiosim.h ${D}${includedir}/gpiosim.h
+}

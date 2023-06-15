@@ -1,0 +1,30 @@
+From 6c434bdd31d674f85a82cb83248571813c7a37ff Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Wed, 3 May 2023 18:06:46 +0200
+Subject: [PATCH] libgeoclue: don't try to use g-ir-scanner when introspection
+ isn't enabled
+
+* it finds target g-ir-scanner, so gir is found(), but when it tries to call it, it fails:
+  http://errors.yoctoproject.org/Errors/Details/702778/
+  geoclue/2.7.0-r0/recipe-sysroot/usr/bin/g-ir-scanner-wrapper: line 5: g-ir-scanner: command not found
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+Upstream-Status: Pending
+
+ libgeoclue/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libgeoclue/meson.build b/libgeoclue/meson.build
+index 5f05dad..7ed06a1 100644
+--- a/libgeoclue/meson.build
++++ b/libgeoclue/meson.build
+@@ -77,7 +77,7 @@ gir_sources = [ libgeoclue_sources,
+                 libgeoclue_headers,
+                 libgeoclue_public_api_gen_sources[1] ]
+ 
+-if gir.found()
++if gir.found() and get_option('introspection')
+   geo_gir = gnome.generate_gir(libgeoclue,
+                                sources: gir_sources,
+                                namespace: 'Geoclue',

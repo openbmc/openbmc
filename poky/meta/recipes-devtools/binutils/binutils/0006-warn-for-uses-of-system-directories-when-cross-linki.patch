@@ -1,4 +1,4 @@
-From b9af05e87ac8eb4fa18a75939edb661056246c30 Mon Sep 17 00:00:00 2001
+From 725ca09ee1041f64589f26ba815ef11da687c608 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 15 Jan 2016 06:31:09 +0000
 Subject: [PATCH] warn for uses of system directories when cross linking
@@ -77,7 +77,7 @@ index ad0dc6a106c..d21edaddce7 100644
  #undef EXTRA_SHLIB_EXTENSION
  
 diff --git a/ld/configure b/ld/configure
-index 49936a0cb2a..5f5dad6d67c 100755
+index 995708089fd..6406a42c442 100755
 --- a/ld/configure
 +++ b/ld/configure
 @@ -839,6 +839,7 @@ with_lib_path
@@ -253,7 +253,7 @@ index ceaca2d85d0..62e7b4e5341 100644
      {
        if (error_count < MAX_ERRORS_IN_A_ROW)
 diff --git a/ld/lexsup.c b/ld/lexsup.c
-index c5960385572..eb54627fb71 100644
+index a1c6140100d..d47ba4f977d 100644
 --- a/ld/lexsup.c
 +++ b/ld/lexsup.c
 @@ -613,6 +613,14 @@ static const struct ld_option ld_options[] =
@@ -271,7 +271,7 @@ index c5960385572..eb54627fb71 100644
  };
  
  #define OPTION_COUNT ARRAY_SIZE (ld_options)
-@@ -1735,6 +1743,14 @@ parse_args (unsigned argc, char **argv)
+@@ -1737,6 +1745,14 @@ parse_args (unsigned argc, char **argv)
  	  config.print_map_discarded = true;
  	  break;
  

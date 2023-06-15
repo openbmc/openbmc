@@ -1,7 +1,7 @@
-From 80273f9bcab14059ec92e5c05826ae52113cebe6 Mon Sep 17 00:00:00 2001
+From d761d59dd251ae93980f659d253576fc872f2c5f Mon Sep 17 00:00:00 2001
 From: Vishnu Banavath <vishnu.banavath@arm.com>
 Date: Fri, 10 Dec 2021 20:10:41 +0000
-Subject: [PATCH 14/27] efi_boottime: corstone1000: pass interface id and
+Subject: [PATCH 14/42] efi_boottime: corstone1000: pass interface id and
  kernel event id using register w4
 
 Initially the interface/event IDs are passed to the SP using register
@@ -22,7 +22,7 @@ Upstream-Status: Pending [Not submitted to upstream yet]
  1 file changed, 10 insertions(+), 3 deletions(-)
 
 diff --git a/lib/efi_loader/efi_boottime.c b/lib/efi_loader/efi_boottime.c
-index faab74474d77..36a0be7ba104 100644
+index faab74474d..36a0be7ba1 100644
 --- a/lib/efi_loader/efi_boottime.c
 +++ b/lib/efi_loader/efi_boottime.c
 @@ -30,6 +30,11 @@
@@ -54,5 +54,5 @@ index faab74474d77..36a0be7ba104 100644
  	return ffa_bus_ops_get()->sync_send_receive(CORSTONE1000_SEPROXY_PART_ID, &msg, 0);
  }
 -- 
-2.39.1
+2.25.1
 

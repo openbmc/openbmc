@@ -1,0 +1,40 @@
+From d6eee2d52f31e034f9d84d38a749d86a63d5b769 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 22 May 2023 20:37:47 -0700
+Subject: [PATCH] curlpp-config.in: Remove references to absolute buildpaths
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ extras/curlpp-config.in | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/extras/curlpp-config.in b/extras/curlpp-config.in
+index b0bd964..1416b94 100644
+--- a/extras/curlpp-config.in
++++ b/extras/curlpp-config.in
+@@ -43,7 +43,7 @@ while test $# -gt 0; do
+ 
+     case "$1" in
+     --cc)
+-	echo @CC@
++	curl-config --cc
+ 	;;
+ 
+     --prefix)
+@@ -73,10 +73,10 @@ while test $# -gt 0; do
+        	;;
+ 
+     --libs)
+-       	echo -L@libdir@ @LDFLAGS@ @LIBS@ `curl-config --libs` -lcurlpp
++       	echo `curl-config --libs` -lcurlpp
+        	;;
+     --static-libs)
+-       	echo @libdir_static@/libcurlpp.@libext@ @LDFLAGS@ @LIBS@ `curl-config --static-libs`
++       	echo $prefix/@libdir_static@/libcurlpp.@libext@ `curl-config --static-libs`
+         ;;
+ 
+     *)
+-- 
+2.40.1
+

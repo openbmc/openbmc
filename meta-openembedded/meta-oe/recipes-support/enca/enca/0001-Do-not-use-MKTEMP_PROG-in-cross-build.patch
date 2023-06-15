@@ -1,0 +1,30 @@
+From c6a59d512706978e8c67f9a2d84ec650f8763368 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 8 May 2023 18:02:52 -0700
+Subject: [PATCH] Do not use $MKTEMP_PROG in cross-build
+
+$MKTEMP_PROG points to native location which could be absolute path that
+wont exist on target rootfs. Therefore use it from PATH
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4852a2f..d23b384 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -186,7 +186,7 @@ ye_PATH_LOCALE_ALIAS
+ 
+ dnl Random filename generation in scripts
+ if test -n "$MKTEMP_PROG"; then
+-  SHELL_RANDOM_FILENAME='`'$MKTEMP_PROG' /tmp/enca-$$-XXXXXXXX`'
++  SHELL_RANDOM_FILENAME='`mktemp /tmp/enca-$$-XXXXXXXX`'
+ else
+   SHELL_RANDOM_FILENAME='/tmp/enca-$$-$RANDOM'
+ fi
+-- 
+2.40.1
+

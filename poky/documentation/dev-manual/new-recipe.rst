@@ -1289,6 +1289,8 @@ as described in the ":ref:`dev-manual/licenses:tracking license changes`"
 section in the Yocto Project Overview and Concepts Manual. You can quickly
 create Autotool-based recipes in a manner similar to the previous example.
 
+.. _ref-building-meson-package:
+
 Building a Meson Package
 ------------------------
 

@@ -9,6 +9,7 @@ LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5f30f0716dfdd0d91eb439ebec522ec2"
 
 DEPENDS = " \
+    glib-2.0-native \
     glib-2.0 \
     e2fsprogs \
     libcap \
@@ -27,6 +28,8 @@ SRC_URI[sha256sum] = "ceb0788755a0bff5738d44543552fbf883cf71df481baa3ca7288da7a4
 S = "${WORKDIR}/libostree-${PV}"
 
 inherit autotools bash-completion gobject-introspection github-releases gtk-doc manpages pkgconfig ptest-gnome systemd
+
+UNKNOWN_CONFIGURE_OPT_IGNORE = "--disable-introspection --enable-introspection"
 
 # Workaround compile failure:
 # |../git/src/libotutil/zbase32.c:37:1: error: function returns an aggregate [-Werror=aggregate-return]

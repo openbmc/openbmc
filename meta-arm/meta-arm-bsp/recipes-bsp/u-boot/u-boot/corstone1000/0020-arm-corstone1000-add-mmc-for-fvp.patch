@@ -1,7 +1,7 @@
-From 0a4aa2a03a208996e7448c79edd0adef9a697255 Mon Sep 17 00:00:00 2001
+From d6c183a99a7d232ef5dbf886c49e7fb75b50ecf9 Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Wed, 30 Nov 2022 15:37:22 +0000
-Subject: [PATCH 20/27] arm:corstone1000: add mmc for fvp
+Subject: [PATCH 20/42] arm:corstone1000: add mmc for fvp
 
 Enable support mmc/sdcard for the corstone1000 FVP.
 
@@ -15,7 +15,7 @@ Upstream-Status: Pending [Not submitted to upstream yet]
  3 files changed, 32 insertions(+), 8 deletions(-)
 
 diff --git a/board/armltd/corstone1000/corstone1000.c b/board/armltd/corstone1000/corstone1000.c
-index 76816f8f4ea1..d6ca6e896140 100644
+index 76816f8f4e..d6ca6e8961 100644
 --- a/board/armltd/corstone1000/corstone1000.c
 +++ b/board/armltd/corstone1000/corstone1000.c
 @@ -38,19 +38,35 @@ static struct mm_region corstone1000_mem_map[] = {
@@ -61,7 +61,7 @@ index 76816f8f4ea1..d6ca6e896140 100644
  		/* OCVM */
  		.virt = 0x80000000UL,
 diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
-index 06eac3e041fe..f7c276a10a6e 100644
+index 06eac3e041..f7c276a10a 100644
 --- a/configs/corstone1000_defconfig
 +++ b/configs/corstone1000_defconfig
 @@ -40,7 +40,13 @@ CONFIG_VERSION_VARIABLE=y
@@ -80,7 +80,7 @@ index 06eac3e041fe..f7c276a10a6e 100644
  CONFIG_PHY_SMSC=y
  CONFIG_SMC911X=y
 diff --git a/include/configs/corstone1000.h b/include/configs/corstone1000.h
-index be13b98d4829..a015a1630e2c 100644
+index be13b98d48..a015a1630e 100644
 --- a/include/configs/corstone1000.h
 +++ b/include/configs/corstone1000.h
 @@ -59,7 +59,9 @@
@@ -95,5 +95,5 @@ index be13b98d4829..a015a1630e2c 100644
  #include <config_distro_bootcmd.h>
  
 -- 
-2.39.1
+2.25.1
 

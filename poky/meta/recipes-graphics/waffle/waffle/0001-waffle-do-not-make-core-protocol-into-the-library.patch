@@ -1,4 +1,4 @@
-From 7610ec4b572d3a54d30fca6798f0c406f3fd8a46 Mon Sep 17 00:00:00 2001
+From 71f9399d6cea1e2e885a98b98d82eb628832a86e Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Tue, 26 Oct 2021 08:52:17 +0200
 Subject: [PATCH] waffle: do not make core protocol into the library
@@ -9,28 +9,13 @@ wayland.xml from the host.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
----
- meson.build            | 4 ----
- src/waffle/meson.build | 7 -------
- 2 files changed, 11 deletions(-)
 
-diff --git a/meson.build b/meson.build
-index ffc02ff..0bb6128 100644
---- a/meson.build
-+++ b/meson.build
-@@ -104,10 +104,6 @@ else
-   dep_wayland_client = dependency(
-     'wayland-client', version : '>= 1.10', required : get_option('wayland'),
-   )
--  if dep_wayland_client.found()
--    wayland_core_xml = join_paths(dep_wayland_client.get_pkgconfig_variable('pkgdatadir'),
--    'wayland.xml')
--  endif
-   dep_wayland_egl = dependency(
-     'wayland-egl', version : '>= 9.1', required : get_option('wayland'),
-   )
+---
+ src/waffle/meson.build | 7 -------
+ 1 file changed, 7 deletions(-)
+
 diff --git a/src/waffle/meson.build b/src/waffle/meson.build
-index 01898c8..6245868 100644
+index e2636c7..3ff5762 100644
 --- a/src/waffle/meson.build
 +++ b/src/waffle/meson.build
 @@ -88,12 +88,6 @@ if build_surfaceless

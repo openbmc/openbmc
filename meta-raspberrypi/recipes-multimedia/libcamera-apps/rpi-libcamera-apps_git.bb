@@ -9,8 +9,10 @@ LIC_FILES_CHKSUM = "file://license.txt;md5=a0013d1b383d72ba4bdc5b750e7d1d77"
 
 SRC_URI = "\
     git://github.com/raspberrypi/libcamera-apps.git;protocol=https;branch=main \
+    file://0001-utils-version.py-use-usr-bin-env-in-shebang.patch \
 "
-SRCREV = "22a52590c33a813743b4e6337478c208201c77b1"
+PV = "1.1.2+git${SRCPV}"
+SRCREV = "12098520a3dec36ba796655baac7efece457f8d8"
 
 S = "${WORKDIR}/git"
 
@@ -26,19 +28,17 @@ EXTRA_OECMAKE = "\
     -DCMAKE_LIBRARY_PATH=${STAGING_LIBDIR} \
 "
 
-EXTRA_OECMAKE:append:raspberrypi3 = " -DENABLE_COMPILE_FLAGS_FOR_TARGET=armv8-neon"
-EXTRA_OECMAKE:append:raspberrypi4 = " -DENABLE_COMPILE_FLAGS_FOR_TARGET=armv8-neon"
+LIBCAMERA_ARCH = "${TARGET_ARCH}"
+LIBCAMERA_ARCH:aarch64 = "arm64"
+LIBCAMERA_ARCH:arm = "armv8-neon"
+EXTRA_OECMAKE += "-DENABLE_COMPILE_FLAGS_FOR_TARGET=${LIBCAMERA_ARCH}"
 
 PACKAGECONFIG[x11] = "-DENABLE_X11=1,-DENABLE_X11=0"
 PACKAGECONFIG[qt] = "-DENABLE_QT=1,-DENABLE_QT=0"
 PACKAGECONFIG[opencv] = "-DENABLE_OPENCV=1,-DENABLE_OPENCV=0"
 PACKAGECONFIG[tensorflow-lite] = "-DENABLE_TFLITE=1,-DENABLE_TFLITE=0"
 
-# Build does not version solibs so we need to change the suffix
-SOLIBS = ".so"
-FILES_SOLIBSDEV = ""
-
 do_install:append() {
     # Requires python3-core which not all systems may have
-    rm ${D}/${bindir}/camera-bug-report
+    rm -v ${D}/${bindir}/camera-bug-report
 }

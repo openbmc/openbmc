@@ -1,0 +1,42 @@
+From 738f530829fb5ee37d74191d34f75d72921284ca Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Thu, 4 May 2023 18:07:16 +0000
+Subject: [PATCH] utils/version.py: use /usr/bin/env in shebang
+
+* it uses subprocess text=True which is available only since python-3.7
+  when running on host with python-3.6 it fails with:
+Traceback (most recent call last):
+  File "TOPDIR/BUILD/work/raspberrypi4_64-oe-linux/rpi-libcamera-apps/git-r0/git/utils/version.py", line 19, in generate_version
+    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, text=True)
+  File "/usr/lib/python3.6/subprocess.py", line 423, in run
+    with Popen(*popenargs, **kwargs) as process:
+TypeError: __init__() got an unexpected keyword argument 'text'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "TOPDIR/BUILD/work/raspberrypi4_64-oe-linux/rpi-libcamera-apps/git-r0/git/utils/version.py", line 52, in <module>
+    generate_version()
+  File "TOPDIR/BUILD/work/raspberrypi4_64-oe-linux/rpi-libcamera-apps/git-r0/git/utils/version.py", line 48, in generate_version
+    print(f'{commit} {datetime.now().strftime("%d-%m-%Y (%H:%M:%S)")}', end="")
+UnboundLocalError: local variable 'commit' referenced before assignment
+Generating version string:
+
+  even when newer python3 is in PATH (either from buildtools or from python3native)
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+Upstream-Status: Pending
+---
+ utils/version.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/utils/version.py b/utils/version.py
+index fc2d431..1400eed 100755
+--- a/utils/version.py
++++ b/utils/version.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/env python3
+ 
+ # Copyright (C) 2021, Raspberry Pi (Trading) Limited
+ # Generate version information for libcamera-apps

@@ -48,6 +48,9 @@ SRC_URI:append:corstone1000 = " \
     file://0010-Platform-corstone1000-Adds-compiler-flags-to-FWU-age.patch      \
     file://0011-Platform-corstone1000-adjust-PS-asset-configuration.patch       \
     file://0012-Platform-corstone1000-Increase-number-of-assets.patch           \
+    file://0013-Platform-corstone1000-Increase-BL2-size-in-flash-lay.patch      \
+    file://0014-Platform-Corstone1000-Increase-BL2_DATA_SIZE.patch              \
+    file://0015-Platform-Corstone1000-Calculate-the-new-CRC32-value-.patch      \
     file://corstone1000/rwx.patch                                               \
     "
 

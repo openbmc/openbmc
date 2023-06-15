@@ -1,7 +1,7 @@
-From 49ed44c01f7e93d614483fc2d3cc7034808e9c07 Mon Sep 17 00:00:00 2001
+From 301430b7c8dceebe349b82c598097628da733090 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Tue, 29 Nov 2022 14:44:36 +0000
-Subject: [PATCH 06/27] arm_ffa: introduce the FF-A Sandbox driver
+Subject: [PATCH 06/42] arm_ffa: introduce the FF-A Sandbox driver
 
 Provide a Sandbox driver to emulate the FF-A ABIs
 
@@ -53,7 +53,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  create mode 100644 include/sandbox_arm_ffa.h
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 61ce6c436fe1..297d165f8401 100644
+index 61ce6c436f..297d165f84 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
 @@ -271,6 +271,7 @@ F:	cmd/armffa.c
@@ -65,7 +65,7 @@ index 61ce6c436fe1..297d165f8401 100644
  ARM FREESCALE IMX
  M:	Stefano Babic <sbabic@denx.de>
 diff --git a/configs/sandbox64_defconfig b/configs/sandbox64_defconfig
-index ba45ac0b71c1..4b8a1ec42bda 100644
+index ba45ac0b71..4b8a1ec42b 100644
 --- a/configs/sandbox64_defconfig
 +++ b/configs/sandbox64_defconfig
 @@ -259,3 +259,5 @@ CONFIG_FWU_MULTI_BANK_UPDATE=y
@@ -76,7 +76,7 @@ index ba45ac0b71c1..4b8a1ec42bda 100644
 +CONFIG_SANDBOX_FFA=y
 \ No newline at end of file
 diff --git a/configs/sandbox_defconfig b/configs/sandbox_defconfig
-index be46cae7aad7..650f06ae61f7 100644
+index be46cae7aa..650f06ae61 100644
 --- a/configs/sandbox_defconfig
 +++ b/configs/sandbox_defconfig
 @@ -334,3 +334,5 @@ CONFIG_TEST_FDTDEC=y
@@ -87,7 +87,7 @@ index be46cae7aad7..650f06ae61f7 100644
 +CONFIG_SANDBOX_FFA=y
 \ No newline at end of file
 diff --git a/drivers/firmware/arm-ffa/Kconfig b/drivers/firmware/arm-ffa/Kconfig
-index be4df89d23fa..b86f16d7785d 100644
+index be4df89d23..b86f16d778 100644
 --- a/drivers/firmware/arm-ffa/Kconfig
 +++ b/drivers/firmware/arm-ffa/Kconfig
 @@ -2,8 +2,8 @@
@@ -111,7 +111,7 @@ index be4df89d23fa..b86f16d7785d 100644
 +	help
 +	  This emulates the FF-A handling under Sandbox and allows to test the FF-A driver
 diff --git a/drivers/firmware/arm-ffa/Makefile b/drivers/firmware/arm-ffa/Makefile
-index 043a8915bec5..0d21d6b47ab9 100644
+index 043a8915be..0d21d6b47a 100644
 --- a/drivers/firmware/arm-ffa/Makefile
 +++ b/drivers/firmware/arm-ffa/Makefile
 @@ -4,3 +4,4 @@
@@ -120,7 +120,7 @@ index 043a8915bec5..0d21d6b47ab9 100644
  obj-y += arm-ffa-uclass.o core.o
 +obj-$(CONFIG_SANDBOX_FFA) += sandbox.o
 diff --git a/drivers/firmware/arm-ffa/arm_ffa_prv.h b/drivers/firmware/arm-ffa/arm_ffa_prv.h
-index 4eea7dc03604..bbc8b87069ff 100644
+index 4eea7dc036..bbc8b87069 100644
 --- a/drivers/firmware/arm-ffa/arm_ffa_prv.h
 +++ b/drivers/firmware/arm-ffa/arm_ffa_prv.h
 @@ -19,6 +19,16 @@
@@ -153,7 +153,7 @@ index 4eea7dc03604..bbc8b87069ff 100644
   * struct ffa_partition_uuid - 16 bytes UUID transmitted by FFA_PARTITION_INFO_GET
   * @a1-4:	32-bit words access to the UUID data
 diff --git a/drivers/firmware/arm-ffa/core.c b/drivers/firmware/arm-ffa/core.c
-index 0b1f8e6a078d..560603b28bcc 100644
+index 0b1f8e6a07..560603b28b 100644
 --- a/drivers/firmware/arm-ffa/core.c
 +++ b/drivers/firmware/arm-ffa/core.c
 @@ -1072,6 +1072,7 @@ static int ffa_msg_send_direct_req(struct udevice *dev, u16 dst_part_id,
@@ -223,7 +223,7 @@ index 0b1f8e6a078d..560603b28bcc 100644
  
 diff --git a/drivers/firmware/arm-ffa/sandbox.c b/drivers/firmware/arm-ffa/sandbox.c
 new file mode 100644
-index 000000000000..16f1ca926ee2
+index 0000000000..16f1ca926e
 --- /dev/null
 +++ b/drivers/firmware/arm-ffa/sandbox.c
 @@ -0,0 +1,659 @@
@@ -888,7 +888,7 @@ index 000000000000..16f1ca926ee2
 +};
 diff --git a/drivers/firmware/arm-ffa/sandbox_arm_ffa_prv.h b/drivers/firmware/arm-ffa/sandbox_arm_ffa_prv.h
 new file mode 100644
-index 000000000000..4db57f5092f8
+index 0000000000..4db57f5092
 --- /dev/null
 +++ b/drivers/firmware/arm-ffa/sandbox_arm_ffa_prv.h
 @@ -0,0 +1,144 @@
@@ -1037,7 +1037,7 @@ index 000000000000..4db57f5092f8
 +
 +#endif
 diff --git a/include/arm_ffa.h b/include/arm_ffa.h
-index 74b16174c292..b88904fe50b0 100644
+index 74b16174c2..b88904fe50 100644
 --- a/include/arm_ffa.h
 +++ b/include/arm_ffa.h
 @@ -90,7 +90,7 @@ struct ffa_bus_ops {
@@ -1051,7 +1051,7 @@ index 74b16174c292..b88904fe50b0 100644
  
 diff --git a/include/sandbox_arm_ffa.h b/include/sandbox_arm_ffa.h
 new file mode 100644
-index 000000000000..d5df16f2828c
+index 0000000000..d5df16f282
 --- /dev/null
 +++ b/include/sandbox_arm_ffa.h
 @@ -0,0 +1,91 @@
@@ -1147,7 +1147,7 @@ index 000000000000..d5df16f2828c
 +
 +#endif
 diff --git a/lib/efi_loader/efi_boottime.c b/lib/efi_loader/efi_boottime.c
-index 3481f2afe7a9..fea4eb7a342e 100644
+index 3481f2afe7..fea4eb7a34 100644
 --- a/lib/efi_loader/efi_boottime.c
 +++ b/lib/efi_loader/efi_boottime.c
 @@ -2185,7 +2185,7 @@ static efi_status_t EFIAPI efi_exit_boot_services(efi_handle_t image_handle,
@@ -1160,5 +1160,5 @@ index 3481f2afe7a9..fea4eb7a342e 100644
  		if (ffa_bus_ops_get()->rxtx_unmap(NULL))
  			log_err("Can't unmap FF-A RX/TX buffers\n");
 -- 
-2.39.1
+2.25.1
 

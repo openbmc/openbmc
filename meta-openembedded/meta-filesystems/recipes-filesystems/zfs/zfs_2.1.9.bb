@@ -27,12 +27,16 @@ EXTRA_OECONF:append = " \
     --with-linux=${STAGING_KERNEL_DIR} --with-linux-obj=${STAGING_KERNEL_BUILDDIR} \
     --with-mounthelperdir=${base_sbin} \
     --with-udevdir=${base_libdir}/udev \
+    --with-systemdunitdir=${systemd_system_unitdir} \
+    --with-systemdgeneratordir=${nonarch_base_libdir}/systemd/system-generators \
+    --with-systemdpresetdir=${nonarch_base_libdir}/systemd/system-preset \
+    --with-systemdmodulesloaddir=${sysconfdir}/module-load.d \
     --without-dracutdir \
-    "
+"
 
 EXTRA_OEMAKE:append = " \
     INSTALL_MOD_PATH=${D}${root_prefix} \
-    "
+"
 
 do_install:append() {
     # /usr/share/zfs contains the zfs-tests folder which we do not need:
@@ -42,19 +46,25 @@ do_install:append() {
 }
 
 FILES:${PN} += "\
-    ${base_sbindir}/* \
-    ${base_libdir}/* \
-    ${sysconfdir}/* \
-    ${sbindir}/* \
-    ${bindir}/* \
-    ${libexecdir}/${BPN}/* \
-    ${libdir}/* \
-    "
+    ${nonarch_base_libdir}/modules \
+    ${systemd_system_unitdir} \
+    ${nonarch_base_libdir}/systemd/system-generators \
+    ${nonarch_base_libdir}/systemd/system-preset \
+    ${sysconfdir}/modules-load.d/${BPN}.conf \
+    ${sysconfdir}/default/${BPN} \
+    ${sysconfdir}/sudoers.d/${BPN} \
+    ${sysconfdir}/${BPN} \
+    ${base_libdir}/udev \
+    ${sbindir} \
+    ${bindir} \
+    ${libexecdir}/${BPN} \
+    ${libdir} \
+"
 
 FILES:${PN}-dev += "\
-    ${prefix}/src/zfs-${PV}/* \
-    ${prefix}/src/spl-${PV}/* \
-    "
+    ${prefix}/src/zfs-${PV} \
+    ${prefix}/src/spl-${PV} \
+"
 # Not yet ported to rv32
 COMPATIBLE_HOST:riscv32 = "null"
 # conflicting definition of ABS macro from asm/asm.h from kernel

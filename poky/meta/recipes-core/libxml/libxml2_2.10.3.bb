@@ -40,15 +40,15 @@ inherit autotools pkgconfig binconfig-disabled ptest
 
 inherit ${@bb.utils.contains('PACKAGECONFIG', 'python', 'python3targetconfig', '', d)}
 
-RDEPENDS:${PN}-ptest += "bash make ${@bb.utils.contains('PACKAGECONFIG', 'python', 'libgcc python3-core python3-logging python3-shell python3-stringold python3-threading python3-unittest ${PN}-python', '', d)}"
+RDEPENDS:${PN}-ptest += "bash make locale-base-en-us ${@bb.utils.contains('PACKAGECONFIG', 'python', 'libgcc python3-core python3-logging python3-shell python3-stringold python3-threading python3-unittest ${PN}-python', '', d)}"
 
 RDEPENDS:${PN}-python += "${@bb.utils.contains('PACKAGECONFIG', 'python', 'python3-core', '', d)}"
 
+RDEPENDS:${PN}-ptest:append:libc-musl = " musl-locales"
 RDEPENDS:${PN}-ptest:append:libc-glibc = " glibc-gconv-ebcdic-us \
                                            glibc-gconv-ibm1141 \
                                            glibc-gconv-iso8859-5 \
                                            glibc-gconv-euc-jp \
-                                           locale-base-en-us \
                                          "
 
 # WARNING: zlib is required for RPM use
@@ -83,6 +83,11 @@ do_install_ptest () {
     if ! ${@bb.utils.contains('PACKAGECONFIG', 'python', 'true', 'false', d)}; then
         rm -rf ${D}${PTEST_DIR}/python
     fi
+}
+
+# with musl we need to enable icu support explicitly for these tests
+do_install_ptest:append:libc-musl () {
+	rm -rf ${D}/${PTEST_PATH}/test/icu_parse_test.xml
 }
 
 do_install:append:class-native () {

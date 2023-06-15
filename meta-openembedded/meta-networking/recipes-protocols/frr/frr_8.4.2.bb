@@ -18,6 +18,8 @@ SRCREV = "62ac43de9f3bc470586cf4f51fadf013bf542b32"
 
 UPSTREAM_CHECK_GITTAGREGEX = "frr-(?P<pver>\d+(\.\d+)+)$"
 
+CVE_PRODUCT = "frrouting"
+
 S = "${WORKDIR}/git"
 
 inherit autotools-brokensep python3native pkgconfig useradd systemd

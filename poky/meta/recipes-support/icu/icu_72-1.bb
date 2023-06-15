@@ -6,8 +6,7 @@ same results on all platforms."
 HOMEPAGE = "http://site.icu-project.org/"
 
 LICENSE = "ICU"
-DEPENDS = "icu-native autoconf-archive"
-DEPENDS:class-native = "autoconf-archive-native"
+DEPENDS = "icu-native autoconf-archive-native"
 
 CVE_PRODUCT = "international_components_for_unicode"
 
